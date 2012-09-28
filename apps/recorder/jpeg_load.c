@@ -30,6 +30,7 @@
 #include "plugin.h"
 #include "debug.h"
 #include "jpeg_load.h"
+#include "symbols.h"
 /*#define JPEG_BS_DEBUG*/
 //#define ROCKBOX_DEBUG_JPEG
 /* for portability of below JPEG code */
@@ -1995,6 +1996,7 @@ int read_jpeg_file(const char* filename,
 {
     return clip_jpeg_file(filename, 0, 0, bm, maxsize, format, cformat);
 }
+EXPORT_SYMBOL(read_jpeg_file);
 #endif
 
 static int calc_scale(int in_size, int out_size)

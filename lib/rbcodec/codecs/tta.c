@@ -38,7 +38,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, TTA_OUTPUT_DEPTH - 1);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, TTA_OUTPUT_DEPTH - 1);
     }
 
     return CODEC_OK;
@@ -60,18 +60,18 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
 
     if (set_tta_info(&info) < 0 || player_init(&info) < 0)
         return CODEC_ERROR;
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
     if (info.NCH == 2) {
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (info.NCH == 1) {
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels\n");
         player_stop();
@@ -82,19 +82,19 @@ enum codec_status codec_run(void)
     decodedsamples = 0;
     endofstream = 0;
 
-    if (ci->id3->offset > 0)
+    if (ci.id3->offset > 0)
     {
-        /* Need to save offset for later use (cleared indirectly by advance_buffer) */
-        new_pos = set_position(ci->id3->offset, TTA_SEEK_POS);
+        /* Need to save offset for later use (cleared indirectly by codec_advance_buffer) */
+        new_pos = set_position(ci.id3->offset, TTA_SEEK_POS);
         if (new_pos >= 0)
             decodedsamples = new_pos;
     }
 
-    ci->set_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
+    audio_codec_update_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
 
     while (!endofstream)
     {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -107,19 +107,19 @@ enum codec_status codec_run(void)
                 decodedsamples = new_pos;
             }
 
-            ci->set_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
-            ci->seek_complete();
+            audio_codec_update_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
+            codec_seek_complete();
         }
 
         sample_count = get_samples(samples);
         if (sample_count < 0)
             break;
  
-        ci->pcmbuf_insert(samples, NULL, sample_count);
+        codec_pcmbuf_insert(samples, NULL, sample_count);
         decodedsamples += sample_count;
         if (decodedsamples >= info.DATALENGTH)
             endofstream = 1;
-        ci->set_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
+        audio_codec_update_elapsed((uint64_t)info.LENGTH * 1000 * decodedsamples / info.DATALENGTH);
     }
 
     player_stop();

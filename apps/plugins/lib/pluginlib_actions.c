@@ -452,5 +452,5 @@ int pluginlib_getaction(int timeout,
     plugin_context_order = (struct button_mapping **)plugin_contexts;
     plugin_context_count = count;
     last_context = 0;
-    return rb->get_custom_action(CONTEXT_PLUGIN,timeout,get_context_map);
+    return get_custom_action(CONTEXT_PLUGIN,timeout,get_context_map);
 }

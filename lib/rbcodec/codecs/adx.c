@@ -50,7 +50,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
         /* we only render 16 bits */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 16);
     }
 
     return CODEC_OK;
@@ -85,12 +85,12 @@ enum codec_status codec_run(void)
     /* init history */
     ch1_1=ch1_2=ch2_1=ch2_2=0;
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
         
     /* Get header */
     DEBUGF("ADX: request initial buffer\n");
-    ci->seek_buffer(0);
-    buf = ci->request_buffer(&n, 0x38);
+    codec_seek_buffer(0);
+    buf = codec_request_buffer(&n, 0x38);
     if (!buf || n < 0x38) {
         return CODEC_ERROR;
     }
@@ -103,7 +103,7 @@ enum codec_status codec_run(void)
     channels = buf[7];
     
     /* useful for seeking and reporting current playback position */
-    avgbytespersec = ci->id3->frequency * 18 * channels / 32;
+    avgbytespersec = ci.id3->frequency * 18 * channels / 32;
     DEBUGF("avgbytespersec=%ld\n",(unsigned long)avgbytespersec);
 
     /* calculate filter coefficients */
@@ -118,7 +118,7 @@ enum codec_status codec_run(void)
     {
         const int64_t big28 = 0x10000000LL;
         const int64_t big32 = 0x100000000LL;
-        int64_t frequency = ci->id3->frequency;
+        int64_t frequency = ci.id3->frequency;
         int64_t phasemultiple = cutoff*big32/frequency;
 
         long z;
@@ -214,15 +214,15 @@ enum codec_status codec_run(void)
     bufoff = chanstart;
 
     /* get in position */
-    ci->seek_buffer(bufoff);
-    ci->set_elapsed(0);
+    codec_seek_buffer(bufoff);
+    audio_codec_update_elapsed(0);
 
     /* setup pcm buffer format */
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
     if (channels == 2) {
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (channels == 1) {
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("ADX CODEC_ERROR: more than 2 channels\n");
         return CODEC_ERROR;
@@ -236,7 +236,7 @@ enum codec_status codec_run(void)
     /* The main decoder loop */
         
     while (!endofstream) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -245,7 +245,7 @@ enum codec_status codec_run(void)
         if (bufoff > end_adr-18*channels && looping) {
             DEBUGF("ADX: loop!\n");
             /* check for endless looping */
-            if (ci->loop_track()) {
+            if (codec_loop_track()) {
                 loop_count=0;
                 fade_count = -1; /* disable fade */
             } else {
@@ -253,14 +253,14 @@ enum codec_status codec_run(void)
                 loop_count++;
                 if (loop_count >= LOOP_TIMES && fade_count < 0) {
                     /* frames to fade over */
-                    fade_frames = FADE_LENGTH*ci->id3->frequency/32/1000;
+                    fade_frames = FADE_LENGTH*ci.id3->frequency/32/1000;
                     /* volume relative to fade_frames */
                     fade_count = fade_frames;
                     DEBUGF("ADX: fade_frames = %d\n",fade_frames);
                 }
             }
             bufoff = start_adr;
-            ci->seek_buffer(bufoff);
+            codec_seek_buffer(bufoff);
         }
 
         /* do we need to seek? */
@@ -281,22 +281,22 @@ enum codec_status codec_run(void)
                 bufoff-=end_adr-start_adr;
                 loop_count++;
             }
-            ci->seek_buffer(bufoff);
+            codec_seek_buffer(bufoff);
 
-            ci->set_elapsed(
+            audio_codec_update_elapsed(
                ((end_adr-start_adr)*loop_count + bufoff-chanstart)*
                1000LL/avgbytespersec);
 
-            ci->seek_complete();
+            codec_seek_complete();
         }
 
-        if (bufoff>ci->filesize-channels*18) break; /* End of stream */
+        if (bufoff>ci.filesize-channels*18) break; /* End of stream */
         
         sampleswritten=0;
           
         while (
                 /* Is there data left in the file? */
-                (bufoff <= ci->filesize-(18*channels)) &&
+                (bufoff <= ci.filesize-(18*channels)) &&
                 /* Is there space in the output buffer? */
                 (sampleswritten <= WAV_CHUNK_SIZE-(32*channels)) &&
                 /* Should we be looping? */
@@ -307,7 +307,7 @@ enum codec_status codec_run(void)
             int32_t ch1_0, d;
 
             /* fetch a frame */
-            buf = ci->request_buffer(&n, 18);
+            buf = codec_request_buffer(&n, 18);
 
             if (!buf || n!=18) {
                 DEBUGF("ADX: couldn't get buffer at %lx\n",
@@ -338,14 +338,14 @@ enum codec_status codec_run(void)
                 ch1_2 = ch1_1; ch1_1 = ch1_0;
             }
             bufoff+=18;
-            ci->advance_buffer(18);
+            codec_advance_buffer(18);
             
             if (channels == 2) {
                 /* decode second channel */
                 int32_t scale;
                 int32_t ch2_0, d;
 
-                buf = ci->request_buffer(&n, 18);
+                buf = codec_request_buffer(&n, 18);
 
                 if (!buf || n!=18) {
                     DEBUGF("ADX: couldn't get buffer at %lx\n",
@@ -378,7 +378,7 @@ enum codec_status codec_run(void)
                     ch2_2 = ch2_1; ch2_1 = ch2_0;
                 }
                 bufoff+=18;
-                ci->advance_buffer(18);
+                codec_advance_buffer(18);
                 sampleswritten--; /* go back to first channel's next sample */
             }
 
@@ -393,9 +393,9 @@ enum codec_status codec_run(void)
         if (channels == 2)
             sampleswritten >>= 1; /* make samples/channel */
 
-        ci->pcmbuf_insert(samples, NULL, sampleswritten);
+        codec_pcmbuf_insert(samples, NULL, sampleswritten);
             
-        ci->set_elapsed(
+        audio_codec_update_elapsed(
            ((end_adr-start_adr)*loop_count + bufoff-chanstart)*
            1000LL/avgbytespersec);
     }

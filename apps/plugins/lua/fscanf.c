@@ -268,15 +268,15 @@ static int fspeek(void *userp)
 {
     int fd = *((int*) userp);
     char buf = 0;
-    if(rb->read(fd, &buf, 1) == 1)
-        rb->lseek(fd, -1, SEEK_CUR);
+    if(read(fd, &buf, 1) == 1)
+        lseek(fd, -1, SEEK_CUR);
     return buf;
 }
 
 static void fspop(void *userp)
 {
     int fd = *((int*) userp);
-    rb->lseek(fd, 1, SEEK_CUR);
+    lseek(fd, 1, SEEK_CUR);
 }
 
 int PREFIX(fscanf)(int fd, const char *fmt, ...)

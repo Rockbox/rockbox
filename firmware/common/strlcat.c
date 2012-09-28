@@ -17,6 +17,7 @@
  */
 
 #include <string.h>
+#include "symbols.h"
 
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the
@@ -52,4 +53,4 @@ strlcat(char *dst, const char *src, size_t siz)
 
         return(dlen + (s - src));       /* count does not include NUL */
 }
-
+EXPORT_SYMBOL(strlcat);

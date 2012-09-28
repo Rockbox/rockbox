@@ -38,7 +38,7 @@ jmp_buf rb_jump_buf;
 static size_t read_handler(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
     (void)datasource;
-    return ci->read_filebuf(ptr, nmemb*size);
+    return codec_read_filebuf(ptr, nmemb*size);
 }
 
 static int initial_seek_handler(void *datasource, ogg_int64_t offset, int whence)
@@ -54,12 +54,12 @@ static int seek_handler(void *datasource, ogg_int64_t offset, int whence)
     (void)datasource;
 
     if (whence == SEEK_CUR) {
-        offset += ci->curpos;
+        offset += ci.curpos;
     } else if (whence == SEEK_END) {
-        offset += ci->filesize;
+        offset += ci.filesize;
     }
 
-    if (ci->seek_buffer(offset)) {
+    if (codec_seek_buffer(offset)) {
         return 0;
     }
 
@@ -75,7 +75,7 @@ static int close_handler(void *datasource)
 static long tell_handler(void *datasource)
 {
     (void)datasource;
-    return ci->curpos;
+    return ci.curpos;
 }
 
 /* This sets the DSP parameters based on the current logical bitstream
@@ -91,13 +91,13 @@ static bool vorbis_set_codec_parameters(OggVorbis_File *vf)
         return false;
     }
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-    codec_set_replaygain(ci->id3);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
+    codec_set_replaygain(ci.id3);
 
     if (vi->channels == 2) {
-          ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+          codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     } else if (vi->channels == 1) {
-          ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+          codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     }
 
     return true;
@@ -109,7 +109,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     if (reason == CODEC_LOAD) {
         if (codec_init())
             return CODEC_ERROR;
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 24);
     }
 
     return CODEC_OK;
@@ -147,17 +147,17 @@ enum codec_status codec_run(void)
     callbacks.tell_func = tell_handler;
     callbacks.close_func = close_handler;
 
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
 
     /* Open a non-seekable stream */
-    error = ov_open_callbacks(ci, &vf, NULL, 0, callbacks);
+    error = ov_open_callbacks(&ci, &vf, NULL, 0, callbacks);
     
     /* If the non-seekable open was successful, we need to supply the missing
      * data to make it seekable.  This is a hack, but it's reasonable since we
      * don't want to run the whole file through the buffer before we start
      * playing.  Using Tremor's seekable open routine would cause us to do
      * this, so we pretend not to be seekable at first.  Then we fill in the
-     * missing fields of vf with 1) information in ci->id3, and 2) info
+     * missing fields of vf with 1) information in ci.id3, and 2) info
      * obtained by Tremor in the above ov_open call.
      *
      * Note that this assumes there is only ONE logical Vorbis bitstream in our
@@ -175,14 +175,14 @@ enum codec_status codec_run(void)
          vf.pcmlengths = vf_pcmlengths;
 
          vf.offsets[0] = 0;
-         vf.offsets[1] = ci->id3->filesize;
+         vf.offsets[1] = ci.id3->filesize;
          vf.dataoffsets[0] = vf.offset;
          vf.pcmlengths[0] = 0;
-         vf.pcmlengths[1] = ci->id3->samples;
+         vf.pcmlengths[1] = ci.id3->samples;
          vf.serialnos[0] = vf.current_serialno;
          vf.callbacks.seek_func = seek_handler;
          vf.seekable = 1;
-         vf.end = ci->id3->filesize;
+         vf.end = ci.id3->filesize;
          vf.ready_state = OPENED;
          vf.links = 1;
     } else {
@@ -190,31 +190,31 @@ enum codec_status codec_run(void)
          goto done;
     }
 
-    if (ci->id3->offset) {
-        ci->seek_buffer(ci->id3->offset);
-        ov_raw_seek(&vf, ci->id3->offset);
-        ci->set_elapsed(ov_time_tell(&vf));
-        ci->set_offset(ov_raw_tell(&vf));
+    if (ci.id3->offset) {
+        codec_seek_buffer(ci.id3->offset);
+        ov_raw_seek(&vf, ci.id3->offset);
+        audio_codec_update_elapsed(ov_time_tell(&vf));
+        audio_codec_update_offset(ov_raw_tell(&vf));
     }
     else {
-        ci->set_elapsed(0);
+        audio_codec_update_elapsed(0);
     }
 
     previous_section = -1;
     eof = 0;
     while (!eof) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
             if (ov_time_seek(&vf, param)) {
-                //ci->logf("ov_time_seek failed");
+                //logf("ov_time_seek failed");
             }
 
-            ci->set_elapsed(ov_time_tell(&vf));
-            ci->seek_complete();
+            audio_codec_update_elapsed(ov_time_tell(&vf));
+            codec_seek_complete();
         }
 
         /* Read host-endian signed 24-bit PCM samples */
@@ -234,9 +234,9 @@ enum codec_status codec_run(void)
         } else if (n < 0) {
             DEBUGF("Vorbis: Error decoding frame\n");
         } else {
-            ci->pcmbuf_insert(pcm[0], pcm[1], n);
-            ci->set_offset(ov_raw_tell(&vf));
-            ci->set_elapsed(ov_time_tell(&vf));
+            codec_pcmbuf_insert(pcm[0], pcm[1], n);
+            audio_codec_update_offset(ov_raw_tell(&vf));
+            audio_codec_update_elapsed(ov_time_tell(&vf));
         }
     }
 
@@ -245,7 +245,7 @@ done:
 #if 0 /* defined(SIMULATOR) */
     {
         size_t bufsize;
-        void* buf = ci->codec_get_buffer(&bufsize);
+        void* buf = codec_get_buffer(&bufsize);
 
         DEBUGF("Vorbis: Memory max: %zu\n", get_max_size(buf));
     }

@@ -34,9 +34,9 @@
 
 
 static int readable (const char *filename) {
-  int f = rb->open(filename, O_RDONLY);  /* try to open file */
+  int f = open(filename, O_RDONLY);  /* try to open file */
   if (f < 0) return 0;  /* open failed */
-  rb->close(f);
+  close(f);
   return 1;
 }
 
@@ -193,7 +193,7 @@ static void modinit (lua_State *L, const char *modname) {
   lua_setfield(L, -2, "_M");  /* module._M = module */
   lua_pushstring(L, modname);
   lua_setfield(L, -2, "_NAME");
-  dot = rb->strrchr(modname, '.');  /* look for last dot in module name */
+  dot = strrchr(modname, '.');  /* look for last dot in module name */
   if (dot == NULL) dot = modname;
   else dot++;
   /* set _PACKAGE as package name (full module name minus last part) */

@@ -38,6 +38,7 @@
 #include "viewport.h"
 #include "file.h"
 #include "splash.h"
+#include "symbols.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -705,6 +706,7 @@ int kbd_input(char* text, int buflen)
     }
     return ret;
 }
+EXPORT_SYMBOL(kbd_input);
 
 static void kbd_calc_params(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state)

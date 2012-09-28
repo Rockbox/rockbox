@@ -27,7 +27,7 @@
 #include "mdct.h"
 #include "fft.h"
 
-extern struct codec_api *ci;
+//extern struct codec_api *ci;
 
 /* Standard library functions that are used by the codecs follow here */
 

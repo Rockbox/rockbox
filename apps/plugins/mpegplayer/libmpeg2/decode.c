@@ -503,7 +503,7 @@ mpeg2dec_t * mpeg2_init (void)
 
     mpeg2dec->decoder.DCTblock = static_dct_block;
 
-    rb->memset (mpeg2dec->decoder.DCTblock, 0, DCT_BLOCKSIZE);
+    memset (mpeg2dec->decoder.DCTblock, 0, DCT_BLOCKSIZE);
 
     DEBUGF("DCTblock: %p\n", mpeg2dec->decoder.DCTblock);
 

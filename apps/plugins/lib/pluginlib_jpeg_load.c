@@ -22,7 +22,5 @@
 ****************************************************************************/
 
 #include <plugin.h>
-#include "wrappers.h"
 
-#define filesize rb->filesize
 #include "../../recorder/jpeg_load.c"

@@ -105,21 +105,21 @@ static void open_snd(void)
 {
     sndstate = SPS_OPENED;
     sound_avail=1;
-   rb->pcm_play_stop();
+   pcm_play_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPR_44);
+    pcm_set_frequency(SAMPR_44);
 }
 
 static void close_snd(int normal)
 {
     (void)normal;
     sound_avail = 0;
-    rb->pcm_play_stop();    
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_play_stop();    
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
 
@@ -218,23 +218,23 @@ static void write_buf(void){
                     = my_buf[j+10] = my_buf[j+11] \
                     = (((byte)sp_sound_buf[i])<<8) >> settings.volume;
 
-    rb->pcm_play_data(&get_more,NULL,(unsigned char*)(my_buf),TMNUM*4*3*2);
+    pcm_play_data(&get_more,NULL,(unsigned char*)(my_buf),TMNUM*4*3*2);
 
 #if 0
     /* can use to save and later analyze what we produce */
-    i = rb->open ( "/sound.raw" , O_WRONLY | O_APPEND | O_CREAT, 0666);
-    rb->write ( i  , sp_sound_buf , TMNUM );
-    rb->close (i);
+    i = open ( "/sound.raw" , O_WRONLY | O_APPEND | O_CREAT, 0666);
+    write ( i  , sp_sound_buf , TMNUM );
+    close (i);
 
 
-    i = rb->open ( "/sound2.raw" , O_WRONLY | O_APPEND |O_CREAT, 0666);
-    rb->write ( i  , (unsigned char *)my_buf , TMNUM*4*3 );
-    rb->close (i);
+    i = open ( "/sound2.raw" , O_WRONLY | O_APPEND |O_CREAT, 0666);
+    write ( i  , (unsigned char *)my_buf , TMNUM*4*3 );
+    close (i);
 #endif
 
 
     while(!doneplay)
-        rb->yield();
+        yield();
  
 }
 void play_sound(int evenframe)

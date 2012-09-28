@@ -1,4 +1,4 @@
-gcc-support.c
+/* gcc-support.c */
 pluginlib_actions.c
 helper.c
 md5.c
@@ -26,7 +26,7 @@ grey_sh.S
 
 #endif /* HAVE_LCD_BITMAP && LCD_DEPTH < 4 */
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(USE_ELFLOADER))
 overlay.c
 #endif
 

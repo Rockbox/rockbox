@@ -56,7 +56,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 31);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 31);
     }
 
     return CODEC_OK;
@@ -77,7 +77,7 @@ enum codec_status codec_run(void)
     intptr_t param;
 
     /* Remember the resume position */
-    resume_offset = ci->id3->offset;
+    resume_offset = ci.id3->offset;
 restart_track:
     if (codec_init()) {
         LOGF("(WMA Voice) Error: Error initialising codec\n");
@@ -86,16 +86,16 @@ restart_track:
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This
        saves us from parsing it again here. */
-    memcpy(&wfx, ci->id3->toc, sizeof(wfx));
+    memcpy(&wfx, ci.id3->toc, sizeof(wfx));
     memset(&avctx, 0, sizeof(AVCodecContext));
     memset(&avpkt, 0, sizeof(AVPacket));
     
-    ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
-    ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
+    codec_configure(DSP_SWITCH_FREQUENCY, wfx.rate);
+    codec_configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_INTERLEAVED);
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
     
     /* Initialise the AVCodecContext */
     init_codec_ctx(&avctx, &wfx);
@@ -106,10 +106,10 @@ restart_track:
     }
 
     /* Now advance the file position to the first frame */
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    codec_seek_buffer(ci.id3->first_frame_offset);
     
     elapsedtime = 0;
-    ci->set_elapsed(0);
+    audio_codec_update_elapsed(0);
 
     resume_offset = 0;
     
@@ -117,30 +117,30 @@ restart_track:
 
     while (pktcnt < wfx.numpackets)
     {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         /* Deal with any pending seek requests */
         if (action == CODEC_ACTION_SEEK_TIME) {
-            ci->set_elapsed(param);
+            audio_codec_update_elapsed(param);
 
             if (param == 0) {
-                ci->set_elapsed(0);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_complete();
                 goto restart_track; /* Pretend you never saw this... */
             }
 
             elapsedtime = asf_seek(param, &wfx);
             if (elapsedtime < 1){
-                ci->set_elapsed(0);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_complete();
                 goto next_track;
             }
 
-            ci->set_elapsed(elapsedtime);
-            ci->seek_complete();
+            audio_codec_update_elapsed(elapsedtime);
+            codec_seek_complete();
         }
         
 new_packet:
@@ -165,7 +165,7 @@ new_packet:
                     LOGF("(WMA Voice) Error: decode_packet returned %d", res);
                     if(res == ERROR_WMAPRO_IN_WMAVOICE){
                     /* Just skip this packet */
-                        ci->advance_buffer(packetlength);
+                        codec_advance_buffer(packetlength);
                         goto new_packet;    
                     }
                     else {
@@ -175,19 +175,19 @@ new_packet:
                 avpkt.data += res;
                 avpkt.size -= res;
                 if(outlen) {
-                    ci->yield ();
+                    yield ();
                     outlen /= sizeof(int32_t);
-                    ci->pcmbuf_insert(decoded, NULL, outlen);
+                    codec_pcmbuf_insert(decoded, NULL, outlen);
                     elapsedtime += outlen*10/(wfx.rate/100);
-                    ci->set_elapsed(elapsedtime);
-                    ci->yield ();
+                    audio_codec_update_elapsed(elapsedtime);
+                    yield ();
                 }
             }
 
         }
 
         /* Advance to the next logical packet */
-        ci->advance_buffer(packetlength);
+        codec_advance_buffer(packetlength);
     }
 
     return CODEC_OK;

@@ -73,12 +73,12 @@ static int compare(const void* p1, const void* p2)
     char *s1 = *(char **)p1;
     char *s2 = *(char **)p2;
 
-    return rb->strcasecmp(s2, s1);
+    return strcasecmp(s2, s1);
 }
 
 static void sort_buffer(void)
 {
-    rb->qsort(pointers, num_entries, sizeof(char *), compare);
+    qsort(pointers, num_entries, sizeof(char *), compare);
 }
 
 static int read_buffer(int offset)
@@ -88,17 +88,17 @@ static int read_buffer(int offset)
     char *tmp_ptr;
     int readsize;
 
-    fd = rb->open_utf8(filename, O_RDONLY);
+    fd = open_utf8(filename, O_RDONLY);
     if(fd < 0)
         return 10 * fd - 1;
 
-    bomsize = rb->lseek(fd, 0, SEEK_CUR);
+    bomsize = lseek(fd, 0, SEEK_CUR);
     offset += bomsize;
 
     /* Fill the buffer from the file */
-    rb->lseek(fd, offset, SEEK_SET);
-    readsize = rb->read(fd, stringbuffer, buf_size);
-    rb->close(fd);
+    lseek(fd, offset, SEEK_SET);
+    readsize = read(fd, stringbuffer, buf_size);
+    close(fd);
 
     if(readsize < 0)
         return readsize * 10 - 2;
@@ -143,11 +143,11 @@ static int write_file(void)
     int rc;
 
     /* Create a temporary file */
-    rb->snprintf(tmpfilename, MAX_PATH+1, "%s.tmp", filename);
+    snprintf(tmpfilename, MAX_PATH+1, "%s.tmp", filename);
     if (bomsize)
-        fd = rb->open_utf8(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC);
+        fd = open_utf8(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC);
     else
-        fd = rb->open(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+        fd = open(tmpfilename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
     if(fd < 0)
         return 10 * fd - 1;
@@ -155,29 +155,29 @@ static int write_file(void)
     /* Write the sorted strings, with appended CR/LF, to the temp file,
        in reverse order */
     for(i = num_entries-1;i >= 0;i--) {
-        rc = rb->write(fd, pointers[i], rb->strlen(pointers[i]));
+        rc = write(fd, pointers[i], strlen(pointers[i]));
         if(rc < 0) {
-            rb->close(fd);
+            close(fd);
             return 10 * rc - 2;
         }
 
-        rc = rb->write(fd, crlf, 2);
+        rc = write(fd, crlf, 2);
         if(rc < 0) {
-            rb->close(fd);
+            close(fd);
             return 10 * rc - 3;
         }
     }
 
-    rb->close(fd);
+    close(fd);
 
     /* Remove the original file */
-    rc = rb->remove(filename);
+    rc = remove(filename);
     if(rc < 0) {
         return 10 * rc - 4;
     }
 
     /* Replace the old file with the new */
-    rc = rb->rename(tmpfilename, filename);
+    rc = rename(tmpfilename, filename);
     if(rc < 0) {
         return 10 * rc - 5;
     }
@@ -192,38 +192,38 @@ enum plugin_status plugin_start(const void* parameter)
 
     filename = (char *)parameter;
 
-    buf = rb->plugin_get_audio_buffer(&buf_size); /* start munching memory */
+    buf = plugin_get_audio_buffer(&buf_size); /* start munching memory */
 
     stringbuffer = buf;
     pointers = (char **)(buf + buf_size - sizeof(int));
 
-    rb->lcd_clear_display();
-    rb->splash(0, "Loading...");
+    lcd_clear_display();
+    splash(0, "Loading...");
 
     rc = read_buffer(0);
     if(rc == 0) {
-        rb->lcd_clear_display();
-        rb->splash(0, "Sorting...");
+        lcd_clear_display();
+        splash(0, "Sorting...");
         sort_buffer();
 
-        rb->lcd_clear_display();
-        rb->splash(0, "Writing...");
+        lcd_clear_display();
+        splash(0, "Writing...");
 
         rc = write_file();
         if(rc < 0) {
-            rb->lcd_clear_display();
-            rb->splashf(HZ, "Can't write file: %d", rc);
+            lcd_clear_display();
+            splashf(HZ, "Can't write file: %d", rc);
         } else {
-            rb->lcd_clear_display();
-            rb->splash(HZ, "Done");
+            lcd_clear_display();
+            splash(HZ, "Done");
         }
     } else {
         if(rc < 0) {
-            rb->lcd_clear_display();
-            rb->splashf(HZ, "Can't read file: %d", rc);
+            lcd_clear_display();
+            splashf(HZ, "Can't read file: %d", rc);
         } else {
-            rb->lcd_clear_display();
-            rb->splash(HZ, "The file is too big");
+            lcd_clear_display();
+            splash(HZ, "The file is too big");
         }
     }
 

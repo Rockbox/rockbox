@@ -8,41 +8,6 @@
 
 #undef WIN32
 
-#ifndef NO_MMSUPP_DEFINES
-#define snprintf(...)		rb->snprintf(__VA_ARGS__)
-#define fdprintf(...)		rb->fdprintf(__VA_ARGS__)
-#define vsnprintf(...)		rb->vsnprintf(__VA_ARGS__)
-
-#define srand(a)			rb->srand(a)
-#define rand()				rb->rand()
-#define qsort(a,b,c,d)		rb->qsort(a,b,c,d)
-#define atoi(a)				rb->atoi(a)
-
-#undef strlen
-#define strlen(a)           rb->strlen(a)
-#undef strcpy
-#define strcpy(a,b)         rb->strcpy(a,b)
-#undef strcat
-#define strcat(a,b)         rb->strcat(a,b)
-#undef strncmp
-#define strncmp(a,b,c)      rb->strncmp(a,b,c)
-#undef strcasecmp
-#define strcasecmp(a,b)     rb->strcasecmp(a,b)
-
-#undef open
-#define open(a,b)		rb->open(a,b)
-#undef lseek
-#define lseek(a,b,c)	rb->lseek(a,b,c)
-#undef close
-#define close(a)		rb->close(a)
-#undef read
-#define read(a,b,c)		rb->read(a,b,c)
-#undef write
-#define write(a,b,c)	rb->write(a,b,c)
-#undef filesize
-#define filesize(a)		rb->filesize(a)
-#endif
-
 #define malloc(x)		tlsf_malloc(x)
 #define free(x)			tlsf_free(x)
 #define realloc(x,y)	tlsf_realloc(x,y)

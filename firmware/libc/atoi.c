@@ -21,6 +21,7 @@
 
 #include <stdlib.h>
 #include "ctype.h"
+#include "symbols.h"
 
 int atoi (const char *str)
 {
@@ -55,3 +56,4 @@ int atoi (const char *str)
     
     return value * sign;
 }
+EXPORT_SYMBOL(atoi);

@@ -62,6 +62,8 @@
 #include "list.h"
 #include "buttonbar.h"
 
+#include "symbols.h"
+
 #define MAX_MENUS 8
 /* used to allow for dynamic menus */
 #define MAX_MENU_SUBITEMS 64
@@ -713,3 +715,4 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 
     return ret;
 }
+EXPORT_SYMBOL(do_menu);

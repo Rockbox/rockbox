@@ -38,6 +38,7 @@
 #include "logf.h"
 #include "mp3data.h"
 #include "platform.h"
+#include "symbols.h"
 
 //#define DEBUG_VERBOSE
 
@@ -683,6 +684,7 @@ int count_mp3_frames(int fd,  int startpos,  int filesize,
         return 0;
     }
 }
+EXPORT_SYMBOL(count_mp3_frames);
 
 static const char cooltext[] = "Rockbox - rocks your box";
 
@@ -844,5 +846,5 @@ int create_xing_header(int fd, long startpos, long filesize,
     
     return info.frame_size;
 }
-
+EXPORT_SYMBOL(create_xing_header);
 #endif

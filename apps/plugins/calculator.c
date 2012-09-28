@@ -689,7 +689,7 @@ static void clearInput(void)
     calStatus = cal_normal;
     clearResult();
     cleartypingbuf();
-    rb->lcd_clear_display();
+    lcd_clear_display();
     drawButtons(buttonGroup);
     drawLines();
 }
@@ -734,11 +734,11 @@ static void switchOperands(void)
 static void drawLines(void)
 {
     int i;
-    rb->lcd_hline(0, LCD_WIDTH, Y_1_POS-1);
+    lcd_hline(0, LCD_WIDTH, Y_1_POS-1);
     for (i = 0; i < 5 ; i++)
-        rb->lcd_hline(0, LCD_WIDTH, Y_1_POS+i*REC_HEIGHT);
+        lcd_hline(0, LCD_WIDTH, Y_1_POS+i*REC_HEIGHT);
     for (i = 0; i < 4 ; i++)
-        rb->lcd_vline(X_1_POS+i*REC_WIDTH, Y_1_POS, LCD_HEIGHT);
+        lcd_vline(X_1_POS+i*REC_WIDTH, Y_1_POS, LCD_HEIGHT);
 }
 
 static void drawButtons(int group)
@@ -746,24 +746,24 @@ static void drawButtons(int group)
     int i, j, w, h;
     for (i = 0; i <= 4; i++){
         for (j = 0; j <= 4; j++){
-            rb->lcd_getstringsize( buttonChar[group][i][j],&w,&h);
+            lcd_getstringsize( buttonChar[group][i][j],&w,&h);
             if (i == btn_row && j == btn_col) /* selected item */
-                rb->lcd_set_drawmode(DRMODE_SOLID);
+                lcd_set_drawmode(DRMODE_SOLID);
             else
-                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            rb->lcd_fillrect( X_0_POS + j*REC_WIDTH,
+                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lcd_fillrect( X_0_POS + j*REC_WIDTH,
                               Y_1_POS + i*REC_HEIGHT,
                               REC_WIDTH, REC_HEIGHT+1);
             if (i == btn_row && j == btn_col) /* selected item */
-                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             else
-                rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
+                lcd_set_drawmode(DRMODE_SOLID);
+            lcd_putsxy( X_0_POS + j*REC_WIDTH + (REC_WIDTH - w)/2,
                             Y_1_POS + i*REC_HEIGHT + (REC_HEIGHT - h)/2 + 1,
                             buttonChar[group][i][j] );
         }
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /* -----------------------------------------------------------------------
@@ -773,11 +773,11 @@ static void cal_initial (void)
 {
     int w,h;
 
-    rb->lcd_getstringsize("2nd",&w,&h);
+    lcd_getstringsize("2nd",&w,&h);
     if (w > REC_WIDTH || h > REC_HEIGHT)
-        rb->lcd_setfont(FONT_SYSFIXED);
+        lcd_setfont(FONT_SYSFIXED);
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
 #ifdef CALCULATOR_OPERATORS
     /* basic operators are available through separate button */
@@ -793,14 +793,14 @@ static void cal_initial (void)
     prev_btn_col = btn_col;
     drawButtons(buttonGroup);
     drawLines();
-    rb->lcd_update();
+    lcd_update();
 
     /* initial mem and output display*/
     clearMem();
     printResult();
 
     /* clear button queue */
-    rb->button_clear_queue();
+    button_clear_queue();
 }
 
 /* -----------------------------------------------------------------------
@@ -1099,7 +1099,7 @@ static void printButtonGroups(int group)
 {
     drawButtons(group);
     drawLines();
-    rb->lcd_update();
+    lcd_update();
 }
 /* -----------------------------------------------------------------------
 flash the currently marked button
@@ -1109,20 +1109,20 @@ static void flashButton(void)
     int k, w, h;
     for (k=2;k>0;k--)
     {
-        rb->lcd_getstringsize( buttonChar[buttonGroup][btn_row][btn_col],&w,&h);
-        rb->lcd_set_drawmode(DRMODE_SOLID|(k==1) ? 0 : DRMODE_INVERSEVID);
-        rb->lcd_fillrect( X_0_POS + btn_col*REC_WIDTH + 1,
+        lcd_getstringsize( buttonChar[buttonGroup][btn_row][btn_col],&w,&h);
+        lcd_set_drawmode(DRMODE_SOLID|(k==1) ? 0 : DRMODE_INVERSEVID);
+        lcd_fillrect( X_0_POS + btn_col*REC_WIDTH + 1,
                           Y_1_POS + btn_row*REC_HEIGHT + 1,
                           REC_WIDTH - 1, REC_HEIGHT - 1);
-        rb->lcd_putsxy( X_0_POS + btn_col*REC_WIDTH + (REC_WIDTH - w)/2,
+        lcd_putsxy( X_0_POS + btn_col*REC_WIDTH + (REC_WIDTH - w)/2,
                         Y_1_POS + btn_row*REC_HEIGHT + (REC_HEIGHT - h)/2 +1,
                         buttonChar[buttonGroup][btn_row][btn_col] );
-        rb->lcd_update_rect( X_0_POS + btn_col*REC_WIDTH + 1,
+        lcd_update_rect( X_0_POS + btn_col*REC_WIDTH + 1,
                             Y_1_POS + btn_row*REC_HEIGHT + 1,
                             REC_WIDTH - 1, REC_HEIGHT - 1);
 
         if (k!= 1)
-            rb->sleep(HZ/22);
+            sleep(HZ/22);
 
     }
 }
@@ -1137,17 +1137,17 @@ static void deleteAnimation(int pos)
     if (pos<1 || pos >18)
         return;
 
-    rb->lcd_getstringsize("0", &w, &h);
+    lcd_getstringsize("0", &w, &h);
     x = (pos==1? 4: LCD_WIDTH - 4 - w);
 
     for (k=0;k<4;k++){
-        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(x, Y_1_POS - h -1, w, h);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_fillrect(x + (w*k)/8, Y_1_POS - h -1 + (h*k)/8,
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(x, Y_1_POS - h -1, w, h);
+        lcd_set_drawmode(DRMODE_SOLID);
+        lcd_fillrect(x + (w*k)/8, Y_1_POS - h -1 + (h*k)/8,
                          (w*(4-k))/4, (h*(4-k))/4);
-        rb->lcd_update_rect(x, Y_1_POS - h -1, w, h);
-        rb->sleep(HZ/32);
+        lcd_update_rect(x, Y_1_POS - h -1, w, h);
+        sleep(HZ/32);
     }
 }
 #endif
@@ -1302,16 +1302,16 @@ static void printResult(void)
     switch_Status:
     switch(calStatus){
         case cal_exit:
-            rb->lcd_clear_display();
-            rb->splash(HZ/3, "Bye now!");
+            lcd_clear_display();
+            splash(HZ/3, "Bye now!");
             break;
         case cal_error:
             clearbuf();
-            rb->snprintf(buf, 19, "%18s","Error");
+            snprintf(buf, 19, "%18s","Error");
             break;
         case cal_toDo:
             clearbuf();
-            rb->snprintf(buf, 19, "%18s","Coming soon ^_* ");
+            snprintf(buf, 19, "%18s","Coming soon ^_* ");
             break;
 
         case cal_normal:
@@ -1334,19 +1334,19 @@ static void printResult(void)
             if(SCIENTIFIC_FORMAT){
                 /* output format: X.XXXX eXXX */
                 if(power > -98){ /* power-1 >= -99, eXXX or e-XX */
-                    rb->snprintf(buf, 12, "%11s",typingbuf);
+                    snprintf(buf, 12, "%11s",typingbuf);
                     for(k=11;k<=14;k++) buf[k] = ' ';
                     cleartypingbuf();
-                    rb->snprintf(typingbuf, 5, "e%d",power-1);
-                    rb->snprintf(buf+11, 5, "%4s",typingbuf);
+                    snprintf(typingbuf, 5, "e%d",power-1);
+                    snprintf(buf+11, 5, "%4s",typingbuf);
                 }
                 else{  /* power-1 <= -100, e-XXX */
-                    rb->snprintf(buf, 12, "%11s",typingbuf);
-                    rb->snprintf(buf+11, 6, "e%d",power-1);
+                    snprintf(buf, 12, "%11s",typingbuf);
+                    snprintf(buf+11, 6, "e%d",power-1);
                 }
             }
             else{
-                rb->snprintf(buf, 12, "%11s",typingbuf);
+                snprintf(buf, 12, "%11s",typingbuf);
             } /* if SCIENTIFIC_FORMAT */
             break;
         case cal_typing:
@@ -1354,16 +1354,16 @@ static void printResult(void)
             clearbuf();
             operbuf[0] = oper;
             operbuf[1] = ( ABS(memTemp) > MINIMUM )?'M':' ';
-            rb->snprintf(buf, 12, "%11s",typingbuf);
+            snprintf(buf, 12, "%11s",typingbuf);
             break;
 
     }
 
-    rb->lcd_getstringsize(buf, &w, &h);
-    rb->screen_clear_area(rb->screens[0], 0, 0, LCD_WIDTH, Y_1_POS - 1);
-    rb->lcd_putsxy(4, Y_1_POS - h -1, operbuf);
-    rb->lcd_putsxy(LCD_WIDTH - w - 4, Y_1_POS - h -1, buf);
-    rb->lcd_update_rect(0, 1, LCD_WIDTH, Y_1_POS);
+    lcd_getstringsize(buf, &w, &h);
+    screen_clear_area(&screens[0], 0, 0, LCD_WIDTH, Y_1_POS - 1);
+    lcd_putsxy(4, Y_1_POS - h -1, operbuf);
+    lcd_putsxy(LCD_WIDTH - w - 4, Y_1_POS - h -1, buf);
+    lcd_update_rect(0, 1, LCD_WIDTH, Y_1_POS);
 }
 
 /* -----------------------------------------------------------------------
@@ -1784,26 +1784,26 @@ enum plugin_status plugin_start(const void* parameter)
     /* now go ahead and have fun! */
 
 #ifdef HAVE_TOUCHSCREEN
-    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
 
     cal_initial();
 
     while (calStatus != cal_exit ) {
-        btn = rb->button_get_w_tmo(HZ/2);
+        btn = button_get_w_tmo(HZ/2);
 #ifdef HAVE_TOUCHSCREEN
         if(btn & BUTTON_TOUCHSCREEN)
         {
             struct ts_raster_result res;
-            if(touchscreen_map_raster(&calc_raster, rb->button_get_data() >> 16,
-                                      rb->button_get_data() & 0xffff, &res) == 1)
+            if(touchscreen_map_raster(&calc_raster, button_get_data() >> 16,
+                                      button_get_data() & 0xffff, &res) == 1)
             {
                 btn_row = res.y;
                 btn_col = res.x;
                 drawButtons(buttonGroup);
                 drawLines();
 
-                rb->lcd_update();
+                lcd_update();
 
                 prev_btn_row = btn_row;
                 prev_btn_col = btn_col;
@@ -1834,15 +1834,15 @@ enum plugin_status plugin_start(const void* parameter)
             drawLines();
         }
 
-        rb->lcd_update();
+        lcd_update();
 
-        if(rb->default_event_handler(btn) == SYS_USB_CONNECTED)
+        if(default_event_handler(btn) == SYS_USB_CONNECTED)
             return PLUGIN_USB_CONNECTED;
 
         if (btn != BUTTON_NONE)
             lastbtn = btn;
     } /* while (calStatus != cal_exit ) */
 
-    rb->button_clear_queue();
+    button_clear_queue();
     return PLUGIN_OK;
 }

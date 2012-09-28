@@ -41,8 +41,8 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-        ci->configure(DSP_SET_SAMPLE_DEPTH, SHN_OUTPUT_DEPTH-1);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, SHN_OUTPUT_DEPTH-1);
     }
 
     return CODEC_OK;
@@ -65,52 +65,52 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* Shorten decoder initialization */
-    ci->memset(&sc, 0, sizeof(ShortenContext));
+    memset(&sc, 0, sizeof(ShortenContext));
 
     /* Skip id3v2 tags */
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    codec_seek_buffer(ci.id3->first_frame_offset);
 
     /* Read the shorten & wave headers */
-    buf = ci->request_buffer(&bytesleft, MAX_HEADER_SIZE);
+    buf = codec_request_buffer(&bytesleft, MAX_HEADER_SIZE);
     res = shorten_init(&sc, (unsigned char *)buf, bytesleft);
     if (res < 0) {
         LOGF("Shorten: shorten_init error: %d\n", res);
         return CODEC_ERROR;
     }
 
-    ci->id3->frequency = sc.sample_rate;
-    ci->configure(DSP_SWITCH_FREQUENCY, sc.sample_rate);
+    ci.id3->frequency = sc.sample_rate;
+    codec_configure(DSP_SWITCH_FREQUENCY, sc.sample_rate);
 
     if (sc.sample_rate) {
-        ci->id3->length = (sc.totalsamples / sc.sample_rate) * 1000;
+        ci.id3->length = (sc.totalsamples / sc.sample_rate) * 1000;
     } else {
-        ci->id3->length = 0;
+        ci.id3->length = 0;
     }
 
-    if (ci->id3->length) {
-        ci->id3->bitrate = (ci->id3->filesize * 8) / ci->id3->length;
+    if (ci.id3->length) {
+        ci.id3->bitrate = (ci.id3->filesize * 8) / ci.id3->length;
     }
 
     consumed = sc.gb.index/8;
-    ci->advance_buffer(consumed);
+    codec_advance_buffer(consumed);
     sc.bitindex = sc.gb.index - 8*consumed;
 
 seek_start:
-    ci->set_elapsed(0);
+    audio_codec_update_elapsed(0);
 
     /* The main decoding loop */
-    ci->memset(&decoded0, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
-    ci->memset(&decoded1, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
-    ci->memset(&offset0, 0, sizeof(int32_t)*MAX_OFFSET_SIZE);
-    ci->memset(&offset1, 0, sizeof(int32_t)*MAX_OFFSET_SIZE);
+    memset(&decoded0, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
+    memset(&decoded1, 0, sizeof(int32_t)*MAX_DECODE_SIZE);
+    memset(&offset0, 0, sizeof(int32_t)*MAX_OFFSET_SIZE);
+    memset(&offset1, 0, sizeof(int32_t)*MAX_OFFSET_SIZE);
 
     samplesdone = 0;
-    buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
+    buf = codec_request_buffer(&bytesleft, MAX_BUFFER_SIZE);
     while (bytesleft) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -118,19 +118,19 @@ seek_start:
         /* Seek to start of track */
         if (action == CODEC_ACTION_SEEK_TIME) {
             if (param == 0 &&
-                ci->seek_buffer(sc.header_bits/8 + ci->id3->first_frame_offset)) {
+                codec_seek_buffer(sc.header_bits/8 + ci.id3->first_frame_offset)) {
                 sc.bitindex = sc.header_bits - 8*(sc.header_bits/8);
-                ci->seek_complete();
+                codec_seek_complete();
                 goto seek_start;
             }
-            ci->seek_complete();
+            codec_seek_complete();
         }
 
         /* Decode a frame */
-        ci->memcpy(ibuf, buf, bytesleft); /* copy buf to iram */
+        memcpy(ibuf, buf, bytesleft); /* copy buf to iram */
         res = shorten_decode_frames(&sc, &nsamples, decoded0, decoded1,
                                     offset0, offset1, (unsigned char *)ibuf,
-                                    bytesleft, ci->yield);
+                                    bytesleft, yield);
  
         if (res == FN_ERROR) {
             LOGF("Shorten: shorten_decode_frames error (%lu)\n",
@@ -139,14 +139,14 @@ seek_start:
         } else {
             /* Insert decoded samples in pcmbuf */
             if (nsamples) {
-                ci->yield();
-                ci->pcmbuf_insert(decoded0 + sc.nwrap, decoded1 + sc.nwrap,
+                yield();
+                codec_pcmbuf_insert(decoded0 + sc.nwrap, decoded1 + sc.nwrap,
                                   nsamples);
 
                 /* Update the elapsed-time indicator */
                 samplesdone += nsamples;
                 elapsedtime = (samplesdone*10) / (sc.sample_rate/100);
-                ci->set_elapsed(elapsedtime);
+                audio_codec_update_elapsed(elapsedtime);
             }
 
             /* End of shorten stream...go to next track */
@@ -155,8 +155,8 @@ seek_start:
         }
 
         consumed = sc.gb.index/8;
-        ci->advance_buffer(consumed);
-        buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
+        codec_advance_buffer(consumed);
+        buf = codec_request_buffer(&bytesleft, MAX_BUFFER_SIZE);
         sc.bitindex = sc.gb.index - 8*consumed;
     }
 

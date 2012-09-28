@@ -30,7 +30,7 @@ struct MIDIfile midi_file IBSS_ATTR;
 struct MIDIfile * loadFile(const char * filename)
 {
     struct MIDIfile * mfload;
-    int file = rb->open (filename, O_RDONLY);
+    int file = open (filename, O_RDONLY);
 
     if(file < 0)
     {
@@ -40,7 +40,7 @@ struct MIDIfile * loadFile(const char * filename)
 
     mfload = &midi_file;
 
-    rb->memset(mfload, 0, sizeof(struct MIDIfile));
+    memset(mfload, 0, sizeof(struct MIDIfile));
 
     int fileID = readID(file);
     if(fileID != ID_MTHD)
@@ -50,17 +50,17 @@ struct MIDIfile * loadFile(const char * filename)
             midi_debug("Detected RMID file");
             midi_debug("Looking for MThd header");
             char dummy[17];
-            rb->read(file, &dummy, 16);
+            read(file, &dummy, 16);
             if(readID(file) != ID_MTHD)
             {
-                rb->close(file);
+                close(file);
                 midi_debug("Invalid MIDI header within RIFF.");
                 return NULL;
             }
 
         } else
         {
-            rb->close(file);
+            close(file);
             midi_debug("Invalid file header chunk.");
             return NULL;
         }
@@ -68,14 +68,14 @@ struct MIDIfile * loadFile(const char * filename)
 
     if(readFourBytes(file)!=6)
     {
-        rb->close(file);
+        close(file);
         midi_debug("Header chunk size invalid.");
         return NULL;
     }
 
     if(readTwoBytes(file)==2)
     {
-        rb->close(file);
+        close(file);
         midi_debug("MIDI file type 2 not supported");
         return NULL;
     }
@@ -99,7 +99,7 @@ struct MIDIfile * loadFile(const char * filename)
                 midi_debug("Warning: file claims to have %d tracks. I only see %d here.", mfload->numTracks, track);
                 mfload->numTracks = track;
             }
-            rb->close(file);
+            close(file);
             return mfload;
         }
 
@@ -116,7 +116,7 @@ struct MIDIfile * loadFile(const char * filename)
         }
     }
 
-    rb->close(file);
+    close(file);
     return mfload;
 
 }
@@ -153,7 +153,7 @@ static int readEvent(int file, void * dest)
                 /* Null-terminate for text events */
                 ev->evData = malloc(ev->len+1); /* Extra byte for the null termination */
 
-                rb->read(file, ev->evData, ev->len);
+                read(file, ev->evData, ev->len);
                 ev->evData[ev->len] = 0;
 
                 switch(ev->d1)
@@ -262,7 +262,7 @@ struct Track tracks[48] IBSS_ATTR;
 struct Track * readTrack(int file)
 {
     struct Track * trk = &tracks[curr_track++];
-    rb->memset(trk, 0, sizeof(struct Track));
+    memset(trk, 0, sizeof(struct Track));
 
     trk->size = readFourBytes(file);
     trk->pos = 0;
@@ -270,12 +270,12 @@ struct Track * readTrack(int file)
 
     int numEvents=0;
 
-    int pos = rb->lseek(file, 0, SEEK_CUR);
+    int pos = lseek(file, 0, SEEK_CUR);
 
     while(readEvent(file, NULL))    /* Memory saving technique                   */
         numEvents++;                /* Attempt to read in events, count how many */
                                     /* THEN allocate memory and read them in     */
-    rb->lseek(file, pos, SEEK_SET);
+    lseek(file, pos, SEEK_SET);
 
     int trackSize = (numEvents+1) * sizeof(struct Event);
     void * dataPtr = malloc(trackSize);
@@ -311,11 +311,11 @@ int readID(int file)
         midi_debug("End of file reached.");
         return ID_EOF;
     }
-    if(rb->strcmp(id, "MThd")==0)
+    if(strcmp(id, "MThd")==0)
         return ID_MTHD;
-    if(rb->strcmp(id, "MTrk")==0)
+    if(strcmp(id, "MTrk")==0)
         return ID_MTRK;
-    if(rb->strcmp(id, "RIFF")==0)
+    if(strcmp(id, "RIFF")==0)
         return ID_RIFF;
     return ID_UNKNOWN;
 }

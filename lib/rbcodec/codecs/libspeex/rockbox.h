@@ -31,13 +31,13 @@
 
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
-#define DEBUGF ci->debugf
+#define DEBUGF debugf
 #endif
 
 
 #ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
-#define LOGF ci->logf
+#define LOGF logf
 #endif
 
 #endif /* ROCKBOX_VOICE_CODEC */

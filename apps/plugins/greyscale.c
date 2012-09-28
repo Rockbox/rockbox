@@ -218,10 +218,10 @@ int main(void)
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
-    rb->lcd_setfont(FONT_SYSFIXED);   /* select default font */
+    lcd_setfont(FONT_SYSFIXED);   /* select default font */
 
     /* get the remainder of the plugin buffer */
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *) plugin_get_buffer(&gbuf_size);
 
     /* initialize the greyscale buffer:
        Archos: 112 pixels wide, 7 rows (56 pixels) high.
@@ -229,22 +229,22 @@ int main(void)
     if (!grey_init(gbuf, gbuf_size, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, GFX_HEIGHT, NULL))
     {
-        rb->splash(HZ, "Not enough memory.");
+        splash(HZ, "Not enough memory.");
         return PLUGIN_ERROR;
     }
 
     /* place greyscale overlay 1 row down */
     grey_set_position(0, 8);
 
-    rb->lcd_puts(0, 0, "Shades: 129");
-    rb->lcd_update();
+    lcd_puts(0, 0, "Shades: 129");
+    lcd_update();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
     grey_show(true);          /* switch on greyscale overlay */
 
-    time = *rb->current_tick; /* start time measurement */
+    time = current_tick; /* start time measurement */
 
     grey_set_background(150);
     grey_clear_display();     /* fill everything with grey 150 */
@@ -295,12 +295,12 @@ int main(void)
 
     grey_update();
 
-    time = *rb->current_tick - time;  /* end time measurement */
+    time = current_tick - time;  /* end time measurement */
 
-    rb->lcd_putsf(0, 0, "Shades: 129, %d.%02ds", time / 100, time % 100);
+    lcd_putsf(0, 0, "Shades: 129, %d.%02ds", time / 100, time % 100);
     grey_deferred_lcd_update();       /* schedule an lcd_update() */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     /* drawing is now finished, play around with scrolling 
@@ -311,7 +311,7 @@ int main(void)
     {
         scroll_amount = 1;
 
-        button = rb->button_get(true);
+        button = button_get(true);
 
         exit_on_usb(button);
 

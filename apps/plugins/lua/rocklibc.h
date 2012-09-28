@@ -39,10 +39,6 @@ extern int errno;
 #define __likely   LIKELY
 #define __unlikely UNLIKELY
 
-/* Simple substitutions */
-#define memcmp rb->memcmp
-#define strlen rb->strlen
-
 extern int PREFIX(fscanf)(int fd, const char *fmt, ...);
 
 #endif /* _ROCKLIBC_H_ */

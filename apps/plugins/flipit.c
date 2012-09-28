@@ -472,7 +472,7 @@ static int cursor_pos, moves;
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p)
 {
-    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, 
+    lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, 
                          STRIDE(SCREEN_MAIN, BMPWIDTH_flipit_tokens, 
                             BMPHEIGHT_flipit_tokens),
                          GRID_LEFT + (p%5) * (TK_WIDTH+TK_SPACE),
@@ -484,17 +484,17 @@ static void draw_spot(int p)
 static void draw_cursor(void) 
 {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_bitmap_transparent( flipit_cursor,
+    lcd_bitmap_transparent( flipit_cursor,
                                 GRID_LEFT + (cursor_pos%5) * (TK_WIDTH+TK_SPACE),
                                 GRID_TOP + (cursor_pos/5) * (TK_HEIGHT+TK_SPACE),
                                 TK_WIDTH, TK_HEIGHT );
 #else
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_mono_bitmap( flipit_cursor,
+    lcd_set_drawmode(DRMODE_FG);
+    lcd_mono_bitmap( flipit_cursor,
                          GRID_LEFT + (cursor_pos%5) * (TK_WIDTH+TK_SPACE),
                          GRID_TOP + (cursor_pos/5) * (TK_HEIGHT+TK_SPACE),
                          TK_WIDTH, TK_HEIGHT );
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 #endif
 }
 
@@ -503,15 +503,15 @@ static void draw_info_panel(void)
 {
     char s[32];
 
-    rb->lcd_set_drawmode( DRMODE_SOLID|DRMODE_INVERSEVID );
-    rb->lcd_fillrect( GRID_LEFT, GRID_TOP + 4*(TK_HEIGHT+TK_SPACE),
+    lcd_set_drawmode( DRMODE_SOLID|DRMODE_INVERSEVID );
+    lcd_fillrect( GRID_LEFT, GRID_TOP + 4*(TK_HEIGHT+TK_SPACE),
                       GRID_WIDTH, PANEL_HEIGHT );
-    rb->lcd_set_drawmode( DRMODE_SOLID );
-    rb->lcd_drawrect( GRID_LEFT, GRID_TOP + 4*(TK_HEIGHT+TK_SPACE),
+    lcd_set_drawmode( DRMODE_SOLID );
+    lcd_drawrect( GRID_LEFT, GRID_TOP + 4*(TK_HEIGHT+TK_SPACE),
                       GRID_WIDTH, PANEL_HEIGHT );
 
-    rb->snprintf( s, sizeof(s), "Flips: %d", moves );
-    rb->lcd_putsxy( (LCD_WIDTH - rb->lcd_getstringsize(s, NULL, NULL)) / 2,
+    snprintf( s, sizeof(s), "Flips: %d", moves );
+    lcd_putsxy( (LCD_WIDTH - lcd_getstringsize(s, NULL, NULL)) / 2,
                     GRID_TOP + 4*(TK_HEIGHT+TK_SPACE) + 2, s );
 }
 
@@ -533,7 +533,7 @@ static void release_gfx(void)
     
     for (i = 0; i < 5; i++)
         if (gfx_chars[i])
-            rb->lcd_unlock_pattern(gfx_chars[i]);
+            lcd_unlock_pattern(gfx_chars[i]);
 }
 
 static bool init_gfx(void)
@@ -541,13 +541,13 @@ static bool init_gfx(void)
     int i;
 
     for (i = 0; i < 5; i++) {
-        if ((gfx_chars[i] = rb->lcd_get_locked_pattern()) == 0) {
+        if ((gfx_chars[i] = lcd_get_locked_pattern()) == 0) {
             release_gfx();
             return false;
         }
     }
     for (i = 0; i < 4; i++)
-        rb->lcd_define_pattern(gfx_chars[i], tk_pat[i]);
+        lcd_define_pattern(gfx_chars[i], tk_pat[i]);
     return true;
 }
 
@@ -557,31 +557,31 @@ static void draw_spot(int p)
     if ((p/5) & 1)
         p -= 5;
 
-    rb->lcd_putc (p%5, p/10, gfx_chars[2*spots[p]+spots[p+5]]);
+    lcd_putc (p%5, p/10, gfx_chars[2*spots[p]+spots[p+5]]);
 }
 
 /* draw the cursor at the current cursor position */
 static void draw_cursor(void) 
 {
     if ((cursor_pos/5) & 1) {
-        rb->memcpy( cur_pat, tk_pat[2*spots[cursor_pos-5]+spots[cursor_pos]], 7 );
+        memcpy( cur_pat, tk_pat[2*spots[cursor_pos-5]+spots[cursor_pos]], 7 );
         cur_pat[4] ^= 0x15;
         cur_pat[6] ^= 0x11;
     }
     else {
-        rb->memcpy( cur_pat, tk_pat[2*spots[cursor_pos]+spots[cursor_pos+5]], 7 );
+        memcpy( cur_pat, tk_pat[2*spots[cursor_pos]+spots[cursor_pos+5]], 7 );
         cur_pat[0] ^= 0x15;
         cur_pat[2] ^= 0x11;
     }
-    rb->lcd_define_pattern(gfx_chars[4], cur_pat);
-    rb->lcd_putc( cursor_pos%5, cursor_pos/10, gfx_chars[4] );
+    lcd_define_pattern(gfx_chars[4], cur_pat);
+    lcd_putc( cursor_pos%5, cursor_pos/10, gfx_chars[4] );
 }
 
 /* draw the info panel ... duh */
 static void draw_info_panel(void)
 {
-    rb->lcd_puts( 6, 0, "Flips" );
-    rb->lcd_putsf( 6, 1, "%d", moves );
+    lcd_puts( 6, 0, "Flips" );
+    lcd_putsf( 6, 1, "%d", moves );
 }
 
 #endif /* LCD */
@@ -642,7 +642,7 @@ static void move_cursor(int x, int y)
                      + ( ( y + 4 + cursor_pos/5 )%4 )*5;
         draw_cursor();
     }
-    rb->lcd_update();
+    lcd_update();
 }
 
 /* initialize the board */
@@ -650,16 +650,16 @@ static void flipit_init(void)
 {
     int i;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     for (i=0; i<20; i++) {
         spots[i]=1;
         toggle[i]=1;
         draw_spot(i);
     }
-    rb->lcd_update();
+    lcd_update();
 
     for (i=0; i<20; i++) {
-        cursor_pos = (rb->rand() % 20);
+        cursor_pos = (rand() % 20);
         flipit_toggle();
     }
 
@@ -667,7 +667,7 @@ static void flipit_init(void)
     draw_cursor();
     moves = 0;
     draw_info_panel();
-    rb->lcd_update();
+    lcd_update();
 }
 
 /* the main game loop */
@@ -682,7 +682,7 @@ static bool flipit_loop(void)
 
     flipit_init();
     while(true) {
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button) {
 #ifdef FLIPIT_RC_QUIT
             case FLIPIT_RC_QUIT:
@@ -709,8 +709,8 @@ static bool flipit_loop(void)
                             cursor_pos = i;
                             flipit_toggle();
                             draw_cursor();
-                            rb->lcd_update();
-                            rb->sleep(HZ*2/3);
+                            lcd_update();
+                            sleep(HZ*2/3);
                         }
                 }
                 break;
@@ -727,7 +727,7 @@ static bool flipit_loop(void)
                             cursor_pos = i;
                             flipit_toggle();
                             draw_cursor();
-                            rb->lcd_update();
+                            lcd_update();
                             break;
                         }
                 }
@@ -742,7 +742,7 @@ static bool flipit_loop(void)
                 if (!flipit_finished()) {
                     flipit_toggle();
                     draw_cursor();
-                    rb->lcd_update();
+                    lcd_update();
                 }
                 break;
 
@@ -788,7 +788,7 @@ static bool flipit_loop(void)
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -808,116 +808,116 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_WHITE);
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
+    lcd_set_foreground(LCD_BLACK);
 #endif
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
-    rb->splash(HZ, "FlipIt!");
+    splash(HZ, "FlipIt!");
 
 #ifdef HAVE_LCD_BITMAP
     /* print instructions */
-    rb->lcd_clear_display();
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
 #if CONFIG_KEYPAD == RECORDER_PAD
-    rb->lcd_putsxy(2, 8, "[OFF] to stop");
-    rb->lcd_putsxy(2, 18, "[PLAY] toggle");
-    rb->lcd_putsxy(2, 28, "[F1] shuffle");
-    rb->lcd_putsxy(2, 38, "[F2] solution");
-    rb->lcd_putsxy(2, 48, "[F3] step by step");
+    lcd_putsxy(2, 8, "[OFF] to stop");
+    lcd_putsxy(2, 18, "[PLAY] toggle");
+    lcd_putsxy(2, 28, "[F1] shuffle");
+    lcd_putsxy(2, 38, "[F2] solution");
+    lcd_putsxy(2, 48, "[F3] step by step");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_putsxy(2, 8, "[OFF] to stop");
-    rb->lcd_putsxy(2, 18, "[MODE] toggle");
-    rb->lcd_putsxy(2, 28, "[M-LEFT] shuffle");
-    rb->lcd_putsxy(2, 38, "[M-UP] solution");
-    rb->lcd_putsxy(2, 48, "[M-RIGHT] step by step");
+    lcd_putsxy(2, 8, "[OFF] to stop");
+    lcd_putsxy(2, 18, "[MODE] toggle");
+    lcd_putsxy(2, 28, "[M-LEFT] shuffle");
+    lcd_putsxy(2, 38, "[M-UP] solution");
+    lcd_putsxy(2, 48, "[M-RIGHT] step by step");
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-    rb->lcd_putsxy(2, 8, "[STOP] to stop");
-    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
-    rb->lcd_putsxy(2, 28, "[MODE] shuffle");
-    rb->lcd_putsxy(2, 38, "[PLAY] solution");
-    rb->lcd_putsxy(2, 48, "[REC] step by step");
+    lcd_putsxy(2, 8, "[STOP] to stop");
+    lcd_putsxy(2, 18, "[SELECT] toggle");
+    lcd_putsxy(2, 28, "[MODE] shuffle");
+    lcd_putsxy(2, 38, "[PLAY] solution");
+    lcd_putsxy(2, 48, "[REC] step by step");
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-    rb->lcd_putsxy(2, 8, "[S-MENU] to stop");
-    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
-    rb->lcd_putsxy(2, 28, "[S-LEFT] shuffle");
-    rb->lcd_putsxy(2, 38, "[S-PLAY] solution");
-    rb->lcd_putsxy(2, 48, "[S-RIGHT] step by step");
+    lcd_putsxy(2, 8, "[S-MENU] to stop");
+    lcd_putsxy(2, 18, "[SELECT] toggle");
+    lcd_putsxy(2, 28, "[S-LEFT] shuffle");
+    lcd_putsxy(2, 38, "[S-PLAY] solution");
+    lcd_putsxy(2, 48, "[S-RIGHT] step by step");
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-    rb->lcd_putsxy(2, 8, "[POWER] to stop");
-    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
-    rb->lcd_putsxy(2, 28, "[REC] shuffle");
-    rb->lcd_putsxy(2, 38, "[PLAY..] solution");
-    rb->lcd_putsxy(2, 48, "[PLAY] step by step");
+    lcd_putsxy(2, 8, "[POWER] to stop");
+    lcd_putsxy(2, 18, "[SELECT] toggle");
+    lcd_putsxy(2, 28, "[REC] shuffle");
+    lcd_putsxy(2, 38, "[PLAY..] solution");
+    lcd_putsxy(2, 48, "[PLAY] step by step");
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-    rb->lcd_putsxy(2, 8, "[POWER] to stop");
-    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
-    rb->lcd_putsxy(2, 28, "[MENU] shuffle");
-    rb->lcd_putsxy(2, 38, "[VOL+] solution");
-    rb->lcd_putsxy(2, 48, "[VOL-] step by step");
+    lcd_putsxy(2, 8, "[POWER] to stop");
+    lcd_putsxy(2, 18, "[SELECT] toggle");
+    lcd_putsxy(2, 28, "[MENU] shuffle");
+    lcd_putsxy(2, 38, "[VOL+] solution");
+    lcd_putsxy(2, 48, "[VOL-] step by step");
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-    rb->lcd_putsxy(2, 8, "[POWER] to stop");
-    rb->lcd_putsxy(2, 18, "[REW] toggle");
-    rb->lcd_putsxy(2, 28, "[PL-LEFT] shuffle");
-    rb->lcd_putsxy(2, 38, "[PL-RIGHT] solution");
-    rb->lcd_putsxy(2, 48, "[PL-UP] step by step");
+    lcd_putsxy(2, 8, "[POWER] to stop");
+    lcd_putsxy(2, 18, "[REW] toggle");
+    lcd_putsxy(2, 28, "[PL-LEFT] shuffle");
+    lcd_putsxy(2, 38, "[PL-RIGHT] solution");
+    lcd_putsxy(2, 48, "[PL-UP] step by step");
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-    rb->lcd_putsxy(2, 8, "[BACK] to stop");
-    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
-    rb->lcd_putsxy(2, 28, "[MENU] shuffle");
-    rb->lcd_putsxy(2, 38, "[VOL+] solution");
-    rb->lcd_putsxy(2, 48, "[VOL-] step by step");
+    lcd_putsxy(2, 8, "[BACK] to stop");
+    lcd_putsxy(2, 18, "[SELECT] toggle");
+    lcd_putsxy(2, 28, "[MENU] shuffle");
+    lcd_putsxy(2, 38, "[VOL+] solution");
+    lcd_putsxy(2, 48, "[VOL-] step by step");
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_C200_PAD)
-    rb->lcd_putsxy(2, 8, "[POWER] to stop");
-    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
-    rb->lcd_putsxy(2, 28, "[REC-LEFT] shuffle");
-    rb->lcd_putsxy(2, 38, "[REC-RIGHT] solution");
-    rb->lcd_putsxy(2, 48, "[REC-SEL] step by step");
+    lcd_putsxy(2, 8, "[POWER] to stop");
+    lcd_putsxy(2, 18, "[SELECT] toggle");
+    lcd_putsxy(2, 28, "[REC-LEFT] shuffle");
+    lcd_putsxy(2, 38, "[REC-RIGHT] solution");
+    lcd_putsxy(2, 48, "[REC-SEL] step by step");
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-    rb->lcd_putsxy(2, 8, "[REC] to stop");
-    rb->lcd_putsxy(2, 18, "[PLAY] toggle");
-    rb->lcd_putsxy(2, 28, "[MODE] shuffle");
-    rb->lcd_putsxy(2, 38, "[MENU..] solution");
-    rb->lcd_putsxy(2, 48, "[MENU] step by step");
+    lcd_putsxy(2, 8, "[REC] to stop");
+    lcd_putsxy(2, 18, "[PLAY] toggle");
+    lcd_putsxy(2, 28, "[MODE] shuffle");
+    lcd_putsxy(2, 38, "[MENU..] solution");
+    lcd_putsxy(2, 48, "[MENU] step by step");
 #elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
-    rb->lcd_putsxy(2, 8, "[POWER] to stop");
-    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
-    rb->lcd_putsxy(2, 28, "[VOL+] shuffle");
-    rb->lcd_putsxy(2, 38, "[PREV] solution");
-    rb->lcd_putsxy(2, 48, "[NEXT] step by step");
+    lcd_putsxy(2, 8, "[POWER] to stop");
+    lcd_putsxy(2, 18, "[SELECT] toggle");
+    lcd_putsxy(2, 28, "[VOL+] shuffle");
+    lcd_putsxy(2, 38, "[PREV] solution");
+    lcd_putsxy(2, 48, "[NEXT] step by step");
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-    rb->lcd_putsxy(2, 8, "[BOTTOMLEFT]  to stop");
-    rb->lcd_putsxy(2, 18, "[CENTRE]      toggle");
-    rb->lcd_putsxy(2, 28, "[TOPRIGHT]    shuffle");
-    rb->lcd_putsxy(2, 38, "[BOTTOMLEFT]  solution");
-    rb->lcd_putsxy(2, 48, "[BOTTOMRIGHT] step by step");
+    lcd_putsxy(2, 8, "[BOTTOMLEFT]  to stop");
+    lcd_putsxy(2, 18, "[CENTRE]      toggle");
+    lcd_putsxy(2, 28, "[TOPRIGHT]    shuffle");
+    lcd_putsxy(2, 38, "[BOTTOMLEFT]  solution");
+    lcd_putsxy(2, 48, "[BOTTOMRIGHT] step by step");
 #endif
 
-    rb->lcd_update();
+    lcd_update();
 #else /* HAVE_LCD_CHARCELLS */
     if (!init_gfx())
         return PLUGIN_ERROR;
 #endif
-    rb->button_get_w_tmo(HZ*3);
+    button_get_w_tmo(HZ*3);
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     draw_info_panel();
     for (i=0; i<20; i++) {
         spots[i]=1;
         draw_spot(i);
     }
-    rb->lcd_update();
-    rb->sleep(HZ*3/2);
-    rb->srand(*rb->current_tick);
+    lcd_update();
+    sleep(HZ*3/2);
+    srand(current_tick);
 
     rc = flipit_loop();
 #ifdef HAVE_LCD_CHARCELLS

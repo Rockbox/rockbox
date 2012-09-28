@@ -30,6 +30,7 @@
 #include "general.h"
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
+#include "symbols.h"
 
 /**
  * Aspects implemented in the target-specific portion:
@@ -216,11 +217,13 @@ bool pcm_is_playing(void)
 {
     return pcm_playing;
 }
+EXPORT_SYMBOL(pcm_is_playing);
 
 bool pcm_is_paused(void)
 {
     return pcm_paused;
 }
+EXPORT_SYMBOL(pcm_is_paused);
 
 /****************************************************************************
  * Functions that do not require targeted implementation but only a targeted
@@ -309,6 +312,7 @@ void pcm_play_data(pcm_play_callback_type get_more,
 
     pcm_play_unlock();
 }
+EXPORT_SYMBOL(pcm_play_data);
 
 bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
                                     const void **addr, size_t *size)
@@ -373,6 +377,7 @@ void pcm_play_pause(bool play)
 
     pcm_play_unlock();
 }
+EXPORT_SYMBOL(pcm_play_pause);
 
 void pcm_play_stop(void)
 {
@@ -393,6 +398,7 @@ void pcm_play_stop(void)
 
     pcm_play_unlock();
 }
+EXPORT_SYMBOL(pcm_play_stop);
 
 /**/
 
@@ -424,6 +430,7 @@ void pcm_set_frequency(unsigned int samplerate)
     pcm_sampr = hw_freq_sampr[index];
     pcm_fsel = index;
 }
+EXPORT_SYMBOL(pcm_set_frequency);
 
 /* apply pcm settings to the hardware */
 void pcm_apply_settings(void)
@@ -439,6 +446,7 @@ void pcm_apply_settings(void)
         pcm_curr_sampr = pcm_sampr;
     }
 }
+EXPORT_SYMBOL(pcm_apply_settings);
 
 #ifdef HAVE_RECORDING
 /** Low level pcm recording apis **/
@@ -530,6 +538,7 @@ void pcm_init_recording(void)
 
     pcm_rec_unlock();
 }
+EXPORT_SYMBOL(pcm_init_recording);
 
 void pcm_close_recording(void)
 {
@@ -549,6 +558,7 @@ void pcm_close_recording(void)
 
     pcm_rec_unlock();
 }
+EXPORT_SYMBOL(pcm_close_recording);
 
 void pcm_record_data(pcm_rec_callback_type more_ready,
                      pcm_status_callback_type status_cb,
@@ -579,6 +589,7 @@ void pcm_record_data(pcm_rec_callback_type more_ready,
 
     pcm_rec_unlock();
 } /* pcm_record_data */
+EXPORT_SYMBOL(pcm_record_data);
 
 void pcm_stop_recording(void)
 {
@@ -595,6 +606,7 @@ void pcm_stop_recording(void)
 
     pcm_rec_unlock();
 } /* pcm_stop_recording */
+EXPORT_SYMBOL(pcm_stop_recording);
 
 bool pcm_rec_dma_complete_callback(enum pcm_dma_status status,
                                    void **addr, size_t *size)

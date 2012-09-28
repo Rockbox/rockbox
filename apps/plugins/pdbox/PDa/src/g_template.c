@@ -8,7 +8,7 @@
 #include "m_pd.h"
 #include "s_stuff.h"
 #include "g_canvas.h"
-#define snprintf rb->snprintf
+#define snprintf snprintf
 #else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>

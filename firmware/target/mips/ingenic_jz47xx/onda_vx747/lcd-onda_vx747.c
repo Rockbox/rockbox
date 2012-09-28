@@ -24,6 +24,7 @@
 #include "r61509.h"
 #include "lcd.h"
 #include "lcd-target.h"
+#include "system.h"
 
 #define PIN_CS_N    (32*1+17)  /* Chip select */
 #define PIN_RESET_N (32*1+18)  /* Reset       */

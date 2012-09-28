@@ -62,24 +62,24 @@ static void setoptions (void)
     DIR* dir;
     char optionsave[sizeof(savedir)+sizeof(optionname)];
 
-    dir=rb->opendir(savedir);
+    dir=opendir(savedir);
     if(!dir)
-        rb->mkdir(savedir);
+        mkdir(savedir);
     else
-        rb->closedir(dir);
+        closedir(dir);
 
     snprintf(optionsave, sizeof(optionsave), "%s/%s", savedir, optionname);
 
     fd = open(optionsave, O_RDONLY);
 
     int optionssize = sizeof(options);
-    int filesize = 0;
+    int file_size = 0;
     if(fd >= 0)
-        filesize = rb->filesize(fd);
+        file_size = filesize(fd);
 
     /* don't read the option file if the size
      * is not as expected to avoid crash */
-    if(fd < 0 || filesize!=optionssize)
+    if(fd < 0 || file_size!=optionssize)
     {
     /* no options to read, set defaults */
 #ifdef HAVE_TOUCHSCREEN
@@ -434,19 +434,19 @@ void doevents(void)
 
 static int gnuboy_main(const char *rom)
 {
-    rb->lcd_puts(0,0,"Init video");
+    lcd_puts(0,0,"Init video");
     vid_init();
-    rb->lcd_puts(0,1,"Init sound");
+    lcd_puts(0,1,"Init sound");
     rockboy_pcm_init();
-    rb->lcd_puts(0,2,"Loading rom");
+    lcd_puts(0,2,"Loading rom");
     loader_init(rom);
     if(shut)
         return PLUGIN_ERROR;
-    rb->lcd_puts(0,3,"Emu reset");
+    lcd_puts(0,3,"Emu reset");
     emu_reset();
-    rb->lcd_puts(0,4,"Emu run");
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_puts(0,4,"Emu run");
+    lcd_clear_display();
+    lcd_update();
     if(options.autosave) sn_load();
     emu_run();
 
@@ -457,25 +457,25 @@ static int gnuboy_main(const char *rom)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     if (!parameter)
     {
-        rb->splash(HZ*3, "Play gameboy ROM file! (.gb/.gbc)");
+        splash(HZ*3, "Play gameboy ROM file! (.gb/.gbc)");
         return PLUGIN_OK;
     }
-    if(rb->audio_status())
+    if(audio_status())
     {
         audio_bufferbase = audio_bufferpointer
-            = rb->plugin_get_buffer(&audio_buffer_free);
+            = plugin_get_buffer(&audio_buffer_free);
         plugbuf=true;
     }
     else
     {
         audio_bufferbase = audio_bufferpointer
-            = rb->plugin_get_audio_buffer(&audio_buffer_free);
+            = plugin_get_audio_buffer(&audio_buffer_free);
         plugbuf=false;
     }
 #if MEMORYSIZE <= 8 && (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -490,11 +490,11 @@ enum plugin_status plugin_start(const void* parameter)
     cleanshut=0;
 
 #ifdef HAVE_WHEEL_POSITION
-    rb->wheel_send_events(false);
+    wheel_send_events(false);
 #endif
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_PAL256);
+    lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
     /* ignore backlight time out */
@@ -503,25 +503,25 @@ enum plugin_status plugin_start(const void* parameter)
     gnuboy_main(parameter);
 
 #ifdef HAVE_WHEEL_POSITION
-    rb->wheel_send_events(true);
+    wheel_send_events(true);
 #endif
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
+    lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
     backlight_use_settings();
 
-    if(!rb->audio_status())
+    if(!audio_status())
         rockboy_pcm_close();
 
     if(shut&&!cleanshut)
     {
-        rb->splash(HZ/2, errormsg);
+        splash(HZ/2, errormsg);
         return PLUGIN_ERROR;
     }
 
-    rb->splash(HZ/2, "Closing Rockboy");
+    splash(HZ/2, "Closing Rockboy");
 
     savesettings();
 

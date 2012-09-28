@@ -528,13 +528,13 @@ static inline int get_newy (int y, int len, int deg)
 /* make random function get it's value from the device ticker */
 static inline void randomize (void)
 {
-    rb->srand (*rb->current_tick);
+    srand (current_tick);
 }
 
 /* get a random number between 0 and range-1 */
 static int t_rand (int range)
 {
-    return rb->rand () % range;
+    return rand () % range;
 }
 
 /* initializes the test help board */
@@ -543,7 +543,7 @@ static void init_testboard (void)
     int j;                   /* testboard */
     for (j = 0; j < BOARD_H; j++)
         /* UNCHEKED == (int)0 */
-        rb->memset( testboard[j], 0, BOARD_W * sizeof( int ) );
+        memset( testboard[j], 0, BOARD_W * sizeof( int ) );
 }
 
 /* initializes the game board on with the player,qix's and black qix */
@@ -607,9 +607,9 @@ static void refresh_board (void)
     int x;
 
 #if LCD_DEPTH>=2
-    rb->lcd_set_background (LCD_BLACK);
+    lcd_set_background (LCD_BLACK);
 #endif
-    rb->lcd_clear_display ();
+    lcd_clear_display ();
     for (j = 0; j < BOARD_H; j++)
     {
         unsigned last_color = board[j][0];
@@ -618,11 +618,11 @@ static void refresh_board (void)
             if( last_color != board[j][i] )
             {
 #if LCD_DEPTH>=2
-                rb->lcd_set_foreground (last_color);
+                lcd_set_foreground (last_color);
 #else
                 if (last_color != EMPTIED)
 #endif
-                rb->lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
+                lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
                                   BOARD_Y + CUBE_SIZE * j,
                                   CUBE_SIZE  * (i - last_i), CUBE_SIZE );
                 last_color = board[j][i];
@@ -630,57 +630,57 @@ static void refresh_board (void)
             }
         }
 #if LCD_DEPTH>=2
-        rb->lcd_set_foreground (last_color);
+        lcd_set_foreground (last_color);
 #else
         if (last_color != EMPTIED)
 #endif
-        rb->lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
+        lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
                           BOARD_Y + CUBE_SIZE * j,
                           CUBE_SIZE * (i - last_i), CUBE_SIZE);
     }
 
 #if LCD_DEPTH>=2
-    rb->lcd_set_foreground (LCD_BLACK);
-    rb->lcd_set_background (CLR_LTBLUE);
+    lcd_set_foreground (LCD_BLACK);
+    lcd_set_background (CLR_LTBLUE);
 #else
-    rb->lcd_set_drawmode (DRMODE_COMPLEMENT);
+    lcd_set_drawmode (DRMODE_COMPLEMENT);
 #endif
-    rb->lcd_putsxyf (BOARD_X, BOARD_Y, "Level %d", player.level + 1);
-    rb->lcd_putsxyf (BOARD_X + CUBE_SIZE * BOARD_W - 24, BOARD_Y, "%d%%",
+    lcd_putsxyf (BOARD_X, BOARD_Y, "Level %d", player.level + 1);
+    lcd_putsxyf (BOARD_X + CUBE_SIZE * BOARD_W - 24, BOARD_Y, "%d%%",
                      percentage_cache);
-    rb->lcd_putsxyf (BOARD_X, BOARD_Y + CUBE_SIZE * BOARD_H - 8, "Score: %d",
+    lcd_putsxyf (BOARD_X, BOARD_Y + CUBE_SIZE * BOARD_H - 8, "Score: %d",
                     player.score);
 #if LCD_DEPTH>=2
     x = BOARD_X + CUBE_SIZE * BOARD_W - 60;
 #else
     x = BOARD_X + CUBE_SIZE * BOARD_W - 40;
 #endif
-    rb->lcd_putsxyf (x, BOARD_Y + CUBE_SIZE * BOARD_H - 8, 
+    lcd_putsxyf (x, BOARD_Y + CUBE_SIZE * BOARD_H - 8, 
                  (player.lives != 1) ? "%d Lives" : "%d Life", player.lives);
 
 #if LCD_DEPTH>=2
-    rb->lcd_set_foreground (PLR_COL);
-    rb->lcd_set_background (board[player.j][player.i]);
+    lcd_set_foreground (PLR_COL);
+    lcd_set_background (board[player.j][player.i]);
 #endif
-    rb->lcd_mono_bitmap (pics[PIC_PLAYER], player.i * CUBE_SIZE + BOARD_X,
+    lcd_mono_bitmap (pics[PIC_PLAYER], player.i * CUBE_SIZE + BOARD_X,
                          player.j * CUBE_SIZE + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
 
 #if LCD_DEPTH>=2
-    rb->lcd_set_background (EMPTIED);
-    rb->lcd_set_foreground (LCD_WHITE);
-    rb->lcd_set_drawmode (DRMODE_FG);
+    lcd_set_background (EMPTIED);
+    lcd_set_foreground (LCD_WHITE);
+    lcd_set_drawmode (DRMODE_FG);
 #else
-    rb->lcd_set_drawmode (DRMODE_FG);
+    lcd_set_drawmode (DRMODE_FG);
 #endif
     for (j = 0; j < player.level + STARTING_QIXES; j++)
-        rb->lcd_mono_bitmap (pics[PIC_QIX], qixes[j].x + BOARD_X,
+        lcd_mono_bitmap (pics[PIC_QIX], qixes[j].x + BOARD_X,
                              qixes[j].y + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
 #if LCD_DEPTH>=2
-    rb->lcd_set_foreground (LCD_BLACK);
+    lcd_set_foreground (LCD_BLACK);
 #endif
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    lcd_set_drawmode (DRMODE_SOLID);
 
-    rb->lcd_update ();
+    lcd_update ();
 }
 
 static inline int infested_area (int i, int j, int v)
@@ -814,7 +814,7 @@ static void complete_trail (int fill)
         percentage_cache = percentage();
      }
 
-     rb->button_clear_queue();
+     button_clear_queue();
 }
 
 /* returns the color the real pixel(x,y) on the lcd is pointing at */
@@ -856,7 +856,7 @@ static void die (void)
         player.gameover = true;
     else {
         refresh_board ();
-        rb->splash (HZ, "Crash!");
+        splash (HZ, "Crash!");
         complete_trail (false);
         player.move = MOVE_NO;
         player.drawing = false;
@@ -987,14 +987,14 @@ static inline void move_board (void)
     }
     if (percentage_cache >= difficulty) {               /* finished level */
         refresh_board ();
-        rb->splashf (HZ * 2, "Level %d finished", player.level+1);
+        splashf (HZ * 2, "Level %d finished", player.level+1);
         player.score += percentage_cache;
         if (player.level < MAX_LEVEL)
             player.level++;
         init_board ();
         refresh_board ();
-        rb->button_clear_queue();
-        rb->splash (HZ * 2, "Ready?");
+        button_clear_queue();
+        splash (HZ * 2, "Ready?");
     }
 }
 
@@ -1008,7 +1008,7 @@ static void init_game (void)
     player.drawing = false;
     init_board ();
     refresh_board ();
-    rb->splash (HZ * 2, "Ready?");
+    splash (HZ * 2, "Ready?");
 }
 
 /* the main menu */
@@ -1023,7 +1023,7 @@ static int xobox_menu_cb(int action, const struct menu_item_ex *this_item)
 
 static int xobox_menu(bool ingame)
 {
-    rb->button_clear_queue();
+    button_clear_queue();
     
     int selection = 0;
     MENUITEM_STRINGLIST(main_menu, "Xobox Menu", xobox_menu_cb,
@@ -1033,17 +1033,17 @@ static int xobox_menu(bool ingame)
     _ingame = ingame;
 
     while (true) {
-        switch (rb->do_menu(&main_menu, &selection, NULL, false)) {
+        switch (do_menu(&main_menu, &selection, NULL, false)) {
             case 0:
                 return 0;
             case 1:
                 init_game ();
                 return 0;
             case 2:
-                rb->set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
+                set_int ("Speed", "", UNIT_INT, &speed, NULL, 1, 1, 10, NULL);
                 break;
             case 3:
-                rb->set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
+                set_int ("Difficulty", "", UNIT_INT, &difficulty, NULL,
                             5, 50, 95, NULL);
                 break;
             case 4:
@@ -1071,16 +1071,16 @@ static int xobox_loop (void)
     }
 
     while (!quit) {
-        end = *rb->current_tick + ((11-speed)*HZ)/100;
+        end = current_tick + ((11-speed)*HZ)/100;
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold()) {
+        if (button_hold()) {
             pause = true;
-            rb->splash (HZ, "Paused");
+            splash (HZ, "Paused");
         }
 #endif
 
-        button = rb->button_get_w_tmo (1);
+        button = button_get_w_tmo (1);
         switch (button) {
             case UP:
             case UP|BUTTON_REPEAT:
@@ -1101,7 +1101,7 @@ static int xobox_loop (void)
             case PAUSE:
                 pause = !pause;
                 if (pause)
-                    rb->splash (HZ, "Paused");
+                    splash (HZ, "Paused");
                 break;
             case QUIT:
                 if (!pause) {
@@ -1111,7 +1111,7 @@ static int xobox_loop (void)
                 }
                 break;
             default:
-                if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
+                if (default_event_handler (button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -1120,16 +1120,16 @@ static int xobox_loop (void)
             refresh_board ();
         }
         if (player.gameover) {
-            rb->splash (HZ, "Game Over!");
+            splash (HZ, "Game Over!");
             if (xobox_menu(false)) {
                 quit = true;
             }
         }
 
-        if (TIME_BEFORE(*rb->current_tick, end))
-            rb->sleep (end - *rb->current_tick);
+        if (TIME_BEFORE(current_tick, end))
+            sleep (end - current_tick);
         else
-            rb->yield ();
+            yield ();
 
     }                           /* end while */
     return PLUGIN_OK;           /* for no warnings on compiling */
@@ -1142,9 +1142,9 @@ enum plugin_status plugin_start (const void *parameter)
 
     (void) parameter;
 
-    rb->lcd_setfont (FONT_SYSFIXED);
+    lcd_setfont (FONT_SYSFIXED);
 #if LCD_DEPTH>=2
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     /* Turn off backlight timeout */
@@ -1155,7 +1155,7 @@ enum plugin_status plugin_start (const void *parameter)
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-    rb->lcd_setfont (FONT_UI);
+    lcd_setfont (FONT_UI);
 
     return ret;
 }

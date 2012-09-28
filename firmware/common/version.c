@@ -20,4 +20,7 @@
  ****************************************************************************/
 
 #include "version.h"
+#include "symbols.h"
+
 const char rbversion[] = RBVERSION;
+EXPORT_SYMBOL(rbversion);

@@ -11,7 +11,7 @@ to this file... */
 #include "../../pdbox.h"
 #include "m_pd.h"
 #include "g_canvas.h"
-#define snprintf rb->snprintf
+#define snprintf snprintf
 #define atof rb_atof
 #else /* ROCKBOX */
 #include <stdlib.h>

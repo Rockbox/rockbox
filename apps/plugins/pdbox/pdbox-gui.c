@@ -64,10 +64,10 @@ void drawcircle(int x, int y, int r)
     int yp = r;
 
     /* Draw outer points. */
-    rb->lcd_drawpixel(x, y + r);
-    rb->lcd_drawpixel(x, y + r);
-    rb->lcd_drawpixel(x + r, y);
-    rb->lcd_drawpixel(x - r, y);
+    lcd_drawpixel(x, y + r);
+    lcd_drawpixel(x, y + r);
+    lcd_drawpixel(x + r, y);
+    lcd_drawpixel(x - r, y);
 
     /* Calculate coordinates of points in one octant. */
     while(xp < yp)
@@ -87,14 +87,14 @@ void drawcircle(int x, int y, int r)
         f += ddfx;
 
         /* Draw pixels in all octants. */
-        rb->lcd_drawpixel(x + xp, y + yp);
-        rb->lcd_drawpixel(x + xp, y - yp);
-        rb->lcd_drawpixel(x - xp, y + yp);
-        rb->lcd_drawpixel(x - xp, y - yp);
-        rb->lcd_drawpixel(x + yp, y + xp);
-        rb->lcd_drawpixel(x + yp, y - xp);
-        rb->lcd_drawpixel(x - yp, y + xp);
-        rb->lcd_drawpixel(x - yp, y - xp);
+        lcd_drawpixel(x + xp, y + yp);
+        lcd_drawpixel(x + xp, y - yp);
+        lcd_drawpixel(x - xp, y + yp);
+        lcd_drawpixel(x - xp, y - yp);
+        lcd_drawpixel(x + yp, y + xp);
+        lcd_drawpixel(x + yp, y - xp);
+        lcd_drawpixel(x - yp, y + xp);
+        lcd_drawpixel(x - yp, y - xp);
     }
 }
 
@@ -108,10 +108,10 @@ void fillcircle(int x, int y, int r)
     int yp = r;
 
     /* Draw outer points. */
-    rb->lcd_drawpixel(x, y + r);
-    rb->lcd_drawpixel(x, y + r);
-    rb->lcd_drawpixel(x + r, y);
-    rb->lcd_drawpixel(x - r, y);
+    lcd_drawpixel(x, y + r);
+    lcd_drawpixel(x, y + r);
+    lcd_drawpixel(x + r, y);
+    lcd_drawpixel(x - r, y);
 
     /* Calculate coordinates of points in one octant. */
     while(xp < yp)
@@ -131,14 +131,14 @@ void fillcircle(int x, int y, int r)
         f += ddfx;
 
         /* Fill circle with horizontal lines. */
-        rb->lcd_hline(x - xp, x + xp, y - yp);
-        rb->lcd_hline(x - xp, x + xp, y + yp);
-        rb->lcd_hline(x - yp, x + yp, y - xp);
-        rb->lcd_hline(x - yp, x + yp, y + xp);
+        lcd_hline(x - xp, x + xp, y - yp);
+        lcd_hline(x - xp, x + xp, y + yp);
+        lcd_hline(x - yp, x + yp, y - xp);
+        lcd_hline(x - yp, x + yp, y + xp);
     }
 
     /* Draw last horizontal line (central one). */
-    rb->lcd_hline(x - r, x + r, y);
+    lcd_hline(x - r, x + r, y);
 }
 
 /* Initialize GUI. */
@@ -159,19 +159,19 @@ void pd_gui_init(void)
     number_corner = 5 * screen_multiplier;
 
     /* Get back- and foreground colors. */
-    bgcolor = rb->lcd_get_background();
-    fgcolor = rb->lcd_get_foreground();
+    bgcolor = lcd_get_background();
+    fgcolor = lcd_get_foreground();
 
     /* Clear background. */
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* Draw background of appropriate color. */
-    rb->lcd_set_foreground(bgcolor);
-    rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-    rb->lcd_set_foreground(fgcolor);
+    lcd_set_foreground(bgcolor);
+    lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_set_foreground(fgcolor);
 
     /* Update display. */
-    rb->lcd_update();
+    lcd_update();
 }
 
 /* Load PD patch. */
@@ -189,18 +189,18 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
     if(!fd)
     {
         /* Show error message and make plug-in quit. */
-        rb->splash(HZ, "Error opening .pd file!");
+        splash(HZ, "Error opening .pd file!");
         quit = true;
         return 0;
     }
 
     /* Read lines from PD file. */
-    while(rb->read_line(fd, line, sizeof(line)) > 0)
+    while(read_line(fd, line, sizeof(line)) > 0)
     {
         /* Check whether we got too many widgets. */
         if(widgets >= max_widgets)
         {
-            rb->splash(HZ, "Too many widgets!");
+            splash(HZ, "Too many widgets!");
             quit = true;
             return 0;
         }
@@ -438,13 +438,13 @@ unsigned int pd_gui_load_patch(struct pd_widget* wg, unsigned int max_widgets)
 void pd_gui_draw_standard(void)
 {
     /* Draw main circle. */
-    rb->lcd_set_foreground(fgcolor);
+    lcd_set_foreground(fgcolor);
     fillcircle(LCD_WIDTH / 2,
                LCD_HEIGHT / 2,
                2 * MIN(LCD_WIDTH, LCD_HEIGHT) / 5);
 
     /* Draw center circle. */
-    rb->lcd_set_foreground(action_on ? BTNCOLOR_DARK : BTNCOLOR_LIGHT);
+    lcd_set_foreground(action_on ? BTNCOLOR_DARK : BTNCOLOR_LIGHT);
     fillcircle(LCD_WIDTH / 2,
                LCD_HEIGHT / 2,
                MIN(LCD_WIDTH, LCD_HEIGHT) / 8);
@@ -471,7 +471,7 @@ void pd_gui_draw_standard(void)
                    MIN(LCD_WIDTH, LCD_HEIGHT) / 8);
 
     /* Restore foreground color. */
-    rb->lcd_set_foreground(fgcolor);
+    lcd_set_foreground(fgcolor);
 }
 
 /* Draw custom user interface. */
@@ -487,11 +487,11 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
         {
             case PD_BANG:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(bgcolor);
-                rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(fgcolor);
+                lcd_set_foreground(bgcolor);
+                lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_set_foreground(fgcolor);
                 /* Draw border (rectangle). */
-                rb->lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
                 /* Draw button (circle), being filled depending on value. */
                 if(((int) wg->value) == 0) /* Button not pressed. */
                     drawcircle(wg->x + wg->w/2,
@@ -505,86 +505,86 @@ void pd_gui_draw_custom(struct pd_widget* wg, unsigned int widgets)
 
             case PD_VSLIDER:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(bgcolor);
-                rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(fgcolor);
+                lcd_set_foreground(bgcolor);
+                lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_set_foreground(fgcolor);
                 /* Draw border. */
-                rb->lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
                 /* Draw slider. */
                 v = ((float) wg->h / (wg->max - wg->min)) *
                     (wg->max - wg->value);
-                rb->lcd_fillrect(wg->x, wg->y + v, wg->w, 2);
+                lcd_fillrect(wg->x, wg->y + v, wg->w, 2);
                 break;
 
             case PD_HSLIDER:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(bgcolor);
-                rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(fgcolor);
+                lcd_set_foreground(bgcolor);
+                lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_set_foreground(fgcolor);
                 /* Draw border. */
-                rb->lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_drawrect(wg->x, wg->y, wg->w, wg->h);
                 /* Draw slider. */
                 v = ((float) wg->w / (wg->max - wg->min)) *
                     (wg->max - wg->value);
-                rb->lcd_fillrect(wg->x + wg->w - v, wg->y, 2, wg->h);
+                lcd_fillrect(wg->x + wg->w - v, wg->y, 2, wg->h);
                 break;
 
             case PD_HRADIO:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(bgcolor);
-                rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(fgcolor);
+                lcd_set_foreground(bgcolor);
+                lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_set_foreground(fgcolor);
                 for(j = 0; j < wg->w / wg->h; j++)
                 {
                     /* Draw border. */
-                    rb->lcd_drawrect(wg->x + wg->h * j, wg->y, wg->h, wg->h);
+                    lcd_drawrect(wg->x + wg->h * j, wg->y, wg->h, wg->h);
                     /* If marked, draw button. */
                     if(((int) wg->value) == j)
-                        rb->lcd_fillrect(wg->x + wg->h * j + 2, wg->y + 2,
+                        lcd_fillrect(wg->x + wg->h * j + 2, wg->y + 2,
                                          wg->h - 4, wg->h - 4);
                 }
                 break;
 
             case PD_VRADIO:
                 /* Clear area to (re-)draw. */
-                rb->lcd_set_foreground(bgcolor);
-                rb->lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
-                rb->lcd_set_foreground(fgcolor);
+                lcd_set_foreground(bgcolor);
+                lcd_fillrect(wg->x, wg->y, wg->w, wg->h);
+                lcd_set_foreground(fgcolor);
                 for(j = 0; j < wg->h / wg->w; j++)
                 {
                     /* Draw border. */
-                    rb->lcd_drawrect(wg->x, wg->y + wg->w * j, wg->w, wg->w);
+                    lcd_drawrect(wg->x, wg->y + wg->w * j, wg->w, wg->w);
                     /* If marked, draw button. */
                     if(((int) wg->value) == j)
-                        rb->lcd_fillrect(wg->x + 2, wg->y + wg->w * j + 2,
+                        lcd_fillrect(wg->x + 2, wg->y + wg->w * j + 2,
                                          wg->w - 4, wg->w - 4);
                 }
                 break;
 
             case PD_NUMBER:
-                rb->lcd_hline(wg->x,
+                lcd_hline(wg->x,
                               wg->x + wg->w - number_corner,
                               wg->y);
-                rb->lcd_drawline(wg->x + wg->w - number_corner,
+                lcd_drawline(wg->x + wg->w - number_corner,
                                  wg->y,
                                  wg->x + wg->w,
                                  wg->y + number_corner);
-                rb->lcd_vline(wg->x + wg->w,
+                lcd_vline(wg->x + wg->w,
                               wg->y + number_corner,
                               wg->y + wg->h);
-                rb->lcd_hline(wg->x,
+                lcd_hline(wg->x,
                               wg->x + wg->w,
                               wg->y + wg->h);
-                rb->lcd_vline(wg->x,
+                lcd_vline(wg->x,
                               wg->y,
                               wg->y + wg->h);
                 char sbuf[8];
                 ftoan(wg->value, sbuf, 8);
-                rb->lcd_putsxy(wg->x + 2, wg->y + 2, sbuf);
+                lcd_putsxy(wg->x + 2, wg->y + 2, sbuf);
                 break;
 
             case PD_TEXT:
-                rb->lcd_putsxy(wg->x + 2, wg->y, wg->name);
+                lcd_putsxy(wg->x + 2, wg->y, wg->name);
                 break;
 
             case PD_SYMBOL:
@@ -603,14 +603,14 @@ void pd_gui_draw(struct pd_widget* wg, unsigned int widgets)
         pd_gui_draw_custom(wg, widgets);
 
     /* Update display. */
-    rb->lcd_update();
+    lcd_update();
 }
 
 /* Parse buttons, if needed, send messages to the Pure Data code. */
 bool pd_gui_parse_buttons(unsigned int widgets)
 {
     static long last_bv = 0;
-    long bv = rb->button_get(false);
+    long bv = button_get(false);
 
     /* Extract differences between current and previous button values. */
     long diff_bv = bv ^ last_bv;

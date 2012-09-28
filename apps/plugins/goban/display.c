@@ -85,7 +85,7 @@ static void cursor_updated (void);
 void
 clear_marks_display (void)
 {
-    rb->memset (display_marks, ' ', sizeof (display_marks));
+    memset (display_marks, ' ', sizeof (display_marks));
     has_comment = false;
 }
 
@@ -130,15 +130,15 @@ draw_all_marks (void)
                 if (display_marks[x + y * board_width] != 'b' &&
                     display_marks[x + y * board_width] != 'w')
                 {
-                    rb->lcd_set_foreground (MARK_COLOR);
+                    lcd_set_foreground (MARK_COLOR);
                 }
                 else
                 {
-                    rb->lcd_set_foreground (CURSOR_COLOR);
+                    lcd_set_foreground (CURSOR_COLOR);
                 }
-                rb->lcd_set_drawmode (DRMODE_FG);
+                lcd_set_drawmode (DRMODE_FG);
 #else
-                rb->lcd_set_drawmode (DRMODE_FG + DRMODE_COMPLEMENT);
+                lcd_set_drawmode (DRMODE_FG + DRMODE_COMPLEMENT);
 #endif
 
                 if (display_marks[x + y * board_width] & (1 << 7))
@@ -150,7 +150,7 @@ draw_all_marks (void)
                         display_marks[x + y * board_width] & (~(1 << 7));
                     to_display[1] = '\0';
 
-                    rb->lcd_getstringsize (to_display, &width, &height);
+                    lcd_getstringsize (to_display, &width, &height);
 
                     int display_x =
                         pixel_x (POS (x, y)) + LINE_OFFSET - (width / 2);
@@ -177,7 +177,7 @@ draw_all_marks (void)
                         display_y = LCD_HEIGHT - 1 - height;
                     }
 
-                    rb->lcd_putsxy (display_x, display_y, to_display);
+                    lcd_putsxy (display_x, display_y, to_display);
                     continue;
                 }
 
@@ -194,18 +194,18 @@ draw_all_marks (void)
                 case 'm':
                     if (intersection_size <= 5)
                     {
-                        rb->lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET +
+                        lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET +
                                            1,
                                            pixel_y (POS (x, y)) + LINE_OFFSET +
                                            1);
-                        rb->lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET -
+                        lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET -
                                            1,
                                            pixel_y (POS (x, y)) + LINE_OFFSET -
                                            1);
                     }
                     else
                     {
-                        rb->lcd_drawrect (pixel_x (POS (x, y)) + LINE_OFFSET -
+                        lcd_drawrect (pixel_x (POS (x, y)) + LINE_OFFSET -
                                           intersection_size / 6,
                                           pixel_y (POS (x, y)) + LINE_OFFSET -
                                           intersection_size / 6,
@@ -216,18 +216,18 @@ draw_all_marks (void)
                 case 's':
                     if (intersection_size <= 5)
                     {
-                        rb->lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET +
+                        lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET +
                                            1,
                                            pixel_y (POS (x, y)) + LINE_OFFSET +
                                            1);
-                        rb->lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET -
+                        lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET -
                                            1,
                                            pixel_y (POS (x, y)) + LINE_OFFSET -
                                            1);
                     }
                     else
                     {
-                        rb->lcd_fillrect (pixel_x (POS (x, y)) + LINE_OFFSET -
+                        lcd_fillrect (pixel_x (POS (x, y)) + LINE_OFFSET -
                                           intersection_size / 6,
                                           pixel_y (POS (x, y)) + LINE_OFFSET -
                                           intersection_size / 6,
@@ -251,11 +251,11 @@ draw_all_marks (void)
                 case 't':
                     if (intersection_size <= 7)
                     {
-                        rb->lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET -
+                        lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET -
                                            1,
                                            pixel_y (POS (x, y)) + LINE_OFFSET +
                                            1);
-                        rb->lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET +
+                        lcd_drawpixel (pixel_x (POS (x, y)) + LINE_OFFSET +
                                            1,
                                            pixel_y (POS (x, y)) + LINE_OFFSET -
                                            1);
@@ -282,7 +282,7 @@ draw_all_marks (void)
                     break;
                 };
 
-                rb->lcd_set_drawmode (DRMODE_SOLID);
+                lcd_set_drawmode (DRMODE_SOLID);
                 /* don't have to undo the colors for LCD_DEPTH > 1, most
                    functions assume bg and fg get clobbered */
             }
@@ -299,17 +299,17 @@ draw_circle (int c_x, int c_y, int r, bool filled)
     int y = r;
 
     /* draw the points on the axes to make the loop easier */
-    rb->lcd_drawpixel (c_x, c_y + r);
-    rb->lcd_drawpixel (c_x, c_y - r);
+    lcd_drawpixel (c_x, c_y + r);
+    lcd_drawpixel (c_x, c_y - r);
 
     if (filled)
     {
-        rb->lcd_hline (c_x - r, c_x + r, c_y);
+        lcd_hline (c_x - r, c_x + r, c_y);
     }
     else
     {
-        rb->lcd_drawpixel (c_x + r, c_y);
-        rb->lcd_drawpixel (c_x - r, c_y);
+        lcd_drawpixel (c_x + r, c_y);
+        lcd_drawpixel (c_x - r, c_y);
     }
 
     /* Now walk from the very top of the circle to 1/8th of the way around
@@ -339,22 +339,22 @@ draw_circle (int c_x, int c_y, int r, bool filled)
         {
             /* each line takes care of 2 points on the circle so we only
                need 4 */
-            rb->lcd_hline (c_x - y, c_x + y, c_y + x);
-            rb->lcd_hline (c_x - y, c_x + y, c_y - x);
-            rb->lcd_hline (c_x - x, c_x + x, c_y + y);
-            rb->lcd_hline (c_x - x, c_x + x, c_y - y);
+            lcd_hline (c_x - y, c_x + y, c_y + x);
+            lcd_hline (c_x - y, c_x + y, c_y - x);
+            lcd_hline (c_x - x, c_x + x, c_y + y);
+            lcd_hline (c_x - x, c_x + x, c_y - y);
         }
         else
         {
             /* Draw all 8 symmetrical points */
-            rb->lcd_drawpixel (c_x + x, c_y + y);
-            rb->lcd_drawpixel (c_x + y, c_y + x);
-            rb->lcd_drawpixel (c_x + y, c_y - x);
-            rb->lcd_drawpixel (c_x + x, c_y - y);
-            rb->lcd_drawpixel (c_x - x, c_y + y);
-            rb->lcd_drawpixel (c_x - y, c_y + x);
-            rb->lcd_drawpixel (c_x - y, c_y - x);
-            rb->lcd_drawpixel (c_x - x, c_y - y);
+            lcd_drawpixel (c_x + x, c_y + y);
+            lcd_drawpixel (c_x + y, c_y + x);
+            lcd_drawpixel (c_x + y, c_y - x);
+            lcd_drawpixel (c_x + x, c_y - y);
+            lcd_drawpixel (c_x - x, c_y + y);
+            lcd_drawpixel (c_x - y, c_y + x);
+            lcd_drawpixel (c_x - y, c_y - x);
+            lcd_drawpixel (c_x - x, c_y - y);
         }
     }
 }
@@ -364,10 +364,10 @@ void
 draw_screen_display (void)
 {
 #if LCD_DEPTH > 1
-    int saved_fg = rb->lcd_get_foreground ();
-    int saved_bg = rb->lcd_get_background ();
+    int saved_fg = lcd_get_foreground ();
+    int saved_bg = lcd_get_background ();
 #endif
-    int saved_drmode = rb->lcd_get_drawmode ();
+    int saved_drmode = lcd_get_drawmode ();
 
     if (cursor_pos != last_cursor_pos || intersection_size != last_int_size)
     {
@@ -375,40 +375,40 @@ draw_screen_display (void)
     }
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop (NULL);
+    lcd_set_backdrop (NULL);
 
-    rb->lcd_set_foreground (BOARD_COLOR);
-    rb->lcd_set_background (BACKGROUND_COLOR);
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    lcd_set_foreground (BOARD_COLOR);
+    lcd_set_background (BACKGROUND_COLOR);
+    lcd_set_drawmode (DRMODE_SOLID);
 
 #else
-    rb->lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
+    lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
 #endif
 
-    rb->lcd_clear_display ();
+    lcd_clear_display ();
 
-    rb->lcd_fillrect (pixel_x (POS (MIN_X, MIN_Y)),
+    lcd_fillrect (pixel_x (POS (MIN_X, MIN_Y)),
                       pixel_y (POS (MIN_X, MIN_Y)),
                       (MAX_X - MIN_X) * intersection_size,
                       (MAX_Y - MIN_Y) * intersection_size);
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground (LINE_COLOR);
+    lcd_set_foreground (LINE_COLOR);
 #else
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    lcd_set_drawmode (DRMODE_SOLID);
 #endif
 
     unsigned int i;
     for (i = MIN_Y; i < MAX_Y; ++i)
     {
-        rb->lcd_hline (pixel_x (POS (MIN_X, i)) + LINE_OFFSET + extend_l,
+        lcd_hline (pixel_x (POS (MIN_X, i)) + LINE_OFFSET + extend_l,
                        pixel_x (POS (MAX_X - 1, i)) + LINE_OFFSET + extend_r,
                        pixel_y (POS (MIN_X, i)) + LINE_OFFSET);
     }
 
     for (i = MIN_X; i < MAX_X; ++i)
     {
-        rb->lcd_vline (pixel_x (POS (i, MIN_Y)) + LINE_OFFSET,
+        lcd_vline (pixel_x (POS (i, MIN_Y)) + LINE_OFFSET,
                        pixel_y (POS (i, MIN_Y)) + LINE_OFFSET + extend_t,
                        pixel_y (POS (i, MAX_Y - 1)) + LINE_OFFSET + extend_b);
     }
@@ -425,13 +425,13 @@ draw_screen_display (void)
     draw_all_marks ();
 
     draw_footer ();
-    rb->lcd_update ();
+    lcd_update ();
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground (saved_fg);
-    rb->lcd_set_background (saved_bg);
+    lcd_set_foreground (saved_fg);
+    lcd_set_background (saved_bg);
 #endif
-    rb->lcd_set_drawmode (saved_drmode);
+    lcd_set_drawmode (saved_drmode);
 }
 
 
@@ -460,7 +460,7 @@ vert_string_size (char *string, int *width, int *height)
     while (*string)
     {
         temp_buffer[0] = *string;
-        rb->lcd_getstringsize (temp_buffer, &temp_width, &temp_height);
+        lcd_getstringsize (temp_buffer, &temp_width, &temp_height);
 
         ret_height += temp_height;
 
@@ -500,10 +500,10 @@ putsxy_vertical (int x, int y, int width, char *str)
     while (*str)
     {
         temp_buffer[0] = *str;
-        rb->lcd_getstringsize (temp_buffer, &temp_width, &temp_height);
+        lcd_getstringsize (temp_buffer, &temp_width, &temp_height);
         DEBUGF ("putting %s at %d %d\n", temp_buffer,
                 x + (width - temp_width) / 2, y);
-        rb->lcd_putsxy (x + (width - temp_width) / 2, y, temp_buffer);
+        lcd_putsxy (x + (width - temp_width) / 2, y, temp_buffer);
         y += temp_height;
         ++str;
     }
@@ -524,24 +524,24 @@ draw_footer (void)
     (void) vert_y;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_background (BACKGROUND_COLOR);
-    rb->lcd_set_foreground (BLACK_COLOR);
+    lcd_set_background (BACKGROUND_COLOR);
+    lcd_set_foreground (BLACK_COLOR);
 #else
-    rb->lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
+    lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
 #endif
 
-    rb->snprintf (captures_buffer, sizeof (captures_buffer),
+    snprintf (captures_buffer, sizeof (captures_buffer),
                   "%d", white_captures);
 
 
-    rb->lcd_getstringsize (captures_buffer, &size_x, &size_y);
+    lcd_getstringsize (captures_buffer, &size_x, &size_y);
 #if defined(GBN_TALL_SCREEN)
-    rb->lcd_putsxy (size_y + 2, LCD_HEIGHT - size_y, captures_buffer);
+    lcd_putsxy (size_y + 2, LCD_HEIGHT - size_y, captures_buffer);
 #else
     vert_string_size (captures_buffer, &vert_x, &vert_y);
     if (board_pixel_width + size_x <= LCD_WIDTH)
     {
-        rb->lcd_putsxy (LCD_WIDTH - size_x - 1, vert_x + 2, captures_buffer);
+        lcd_putsxy (LCD_WIDTH - size_x - 1, vert_x + 2, captures_buffer);
     }
     else
     {
@@ -551,7 +551,7 @@ draw_footer (void)
 #endif
 
 #if LCD_DEPTH == 1
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    lcd_set_drawmode (DRMODE_SOLID);
 #endif
 
 #if defined(GBN_TALL_SCREEN)
@@ -559,7 +559,7 @@ draw_footer (void)
                  LCD_HEIGHT - (size_y / 2), (size_y - 1) / 2, true);
 
 #if LCD_DEPTH == 1
-    rb->lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
+    lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
     draw_circle (size_y / 2,
                  LCD_HEIGHT - (size_y / 2), (size_y - 1) / 2, false);
 #endif /* LCD_DEPTH */
@@ -569,7 +569,7 @@ draw_footer (void)
                  (vert_x / 2), (vert_x - 1) / 2, true);
 
 #if LCD_DEPTH == 1
-    rb->lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
+    lcd_set_drawmode (DRMODE_SOLID + DRMODE_INVERSEVID);
     draw_circle (LCD_WIDTH - 1 - vert_x / 2,
                  (vert_x / 2), (vert_x - 1) / 2, false);
 #endif /* LCD_DEPTH */
@@ -578,14 +578,14 @@ draw_footer (void)
 
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground (WHITE_COLOR);
+    lcd_set_foreground (WHITE_COLOR);
 #endif
-    rb->snprintf (captures_buffer, sizeof (captures_buffer),
+    snprintf (captures_buffer, sizeof (captures_buffer),
                   "%d", black_captures);
 
-    rb->lcd_getstringsize (captures_buffer, &size_x, &size_y);
+    lcd_getstringsize (captures_buffer, &size_x, &size_y);
 #if defined(GBN_TALL_SCREEN)
-    rb->lcd_putsxy (LCD_WIDTH - (size_y + 1) - size_x,
+    lcd_putsxy (LCD_WIDTH - (size_y + 1) - size_x,
                     LCD_HEIGHT - size_y, captures_buffer);
 
     draw_circle (LCD_WIDTH - (size_y / 2),
@@ -594,7 +594,7 @@ draw_footer (void)
     vert_string_size (captures_buffer, &vert_x, &vert_y);
     if (board_pixel_width + size_x <= LCD_WIDTH)
     {
-        rb->lcd_putsxy (LCD_WIDTH - size_x - 1,
+        lcd_putsxy (LCD_WIDTH - size_x - 1,
                         LCD_HEIGHT - vert_x - size_y - 3, captures_buffer);
     }
     else
@@ -610,37 +610,37 @@ draw_footer (void)
 
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground (BLACK_COLOR);
+    lcd_set_foreground (BLACK_COLOR);
 #endif
 
     if (has_comment)
     {
-        rb->strcat (display_flags, "C");
+        strcat (display_flags, "C");
     }
 
     if (has_more_nodes_sgf ())
     {
-        rb->strcat (display_flags, "+");
+        strcat (display_flags, "+");
     }
 
     if (num_variations_sgf () > 1)
     {
-        rb->strcat (display_flags, "*");
+        strcat (display_flags, "*");
     }
 
 
 
-    rb->snprintf (captures_buffer, sizeof (captures_buffer),
+    snprintf (captures_buffer, sizeof (captures_buffer),
                   "%d%s", move_num, display_flags);
 
-    rb->lcd_getstringsize (captures_buffer, &size_x, &size_y);
+    lcd_getstringsize (captures_buffer, &size_x, &size_y);
 #if defined(GBN_TALL_SCREEN)
-    rb->lcd_putsxy ((LCD_WIDTH - size_x) / 2,
+    lcd_putsxy ((LCD_WIDTH - size_x) / 2,
                     LCD_HEIGHT - size_y, captures_buffer);
 #else
     if (board_pixel_width + size_x <= LCD_WIDTH)
     {
-        rb->lcd_putsxy (LCD_WIDTH - size_x - 1,
+        lcd_putsxy (LCD_WIDTH - size_x - 1,
                         (LCD_HEIGHT - size_y) / 2, captures_buffer);
     }
     else
@@ -652,7 +652,7 @@ draw_footer (void)
 #endif
 
 
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    lcd_set_drawmode (DRMODE_SOLID);
 }
 
 
@@ -921,22 +921,22 @@ draw_cursor (unsigned short pos)
     }
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground (CURSOR_COLOR);
+    lcd_set_foreground (CURSOR_COLOR);
 #else
-    rb->lcd_set_drawmode (DRMODE_COMPLEMENT);
+    lcd_set_drawmode (DRMODE_COMPLEMENT);
 #endif
 
-    rb->lcd_drawrect (pixel_x (pos),
+    lcd_drawrect (pixel_x (pos),
                       pixel_y (pos), intersection_size, intersection_size);
 
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    lcd_set_drawmode (DRMODE_SOLID);
 }
 
 static void
 draw_stone_raw (int pixel_x, int pixel_y, bool black)
 {
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground (black ? BLACK_COLOR : WHITE_COLOR);
+    lcd_set_foreground (black ? BLACK_COLOR : WHITE_COLOR);
 #else
     int draw_mode;
 /* check whether foreground is bright or dark */
@@ -946,7 +946,7 @@ draw_stone_raw (int pixel_x, int pixel_y, bool black)
     draw_mode = DRMODE_SOLID | (black ? 0 : DRMODE_INVERSEVID);
 #endif /* HAVE_NEGATIVE_LCD */
 
-    rb->lcd_set_drawmode (draw_mode);
+    lcd_set_drawmode (draw_mode);
 #endif
 
     draw_circle (pixel_x + LINE_OFFSET,
@@ -954,9 +954,9 @@ draw_stone_raw (int pixel_x, int pixel_y, bool black)
 
 #if defined(OUTLINE_STONES)
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground (black ? WHITE_COLOR : BLACK_COLOR);
+    lcd_set_foreground (black ? WHITE_COLOR : BLACK_COLOR);
 #else
-    rb->lcd_set_drawmode (draw_mode ^ DRMODE_INVERSEVID);
+    lcd_set_drawmode (draw_mode ^ DRMODE_INVERSEVID);
 #endif /* LCD_DEPTH > 1 */
 
     /* outline stones of background color only */
@@ -968,7 +968,7 @@ draw_stone_raw (int pixel_x, int pixel_y, bool black)
 
 #endif /* OUTLINE_STONES */
 
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    lcd_set_drawmode (DRMODE_SOLID);
 }
 
 
@@ -1025,14 +1025,14 @@ draw_hoshi (unsigned short pos)
     }
     if (intersection_size > 8)
     {
-        rb->lcd_fillrect (pixel_x (pos) + LINE_OFFSET - 1,
+        lcd_fillrect (pixel_x (pos) + LINE_OFFSET - 1,
                           pixel_y (pos) + LINE_OFFSET - 1, 3, 3);
     }
     else
     {
-        rb->lcd_drawpixel (pixel_x (pos) + LINE_OFFSET - 1,
+        lcd_drawpixel (pixel_x (pos) + LINE_OFFSET - 1,
                            pixel_y (pos) + LINE_OFFSET - 1);
-        rb->lcd_drawpixel (pixel_x (pos) + LINE_OFFSET + 1,
+        lcd_drawpixel (pixel_x (pos) + LINE_OFFSET + 1,
                            pixel_y (pos) + LINE_OFFSET + 1);
     }
 }

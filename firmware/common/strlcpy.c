@@ -17,6 +17,7 @@
  */
 
 #include <string.h>
+#include "symbols.h"
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters
@@ -48,4 +49,4 @@ strlcpy(char *dst, const char *src, size_t siz)
 
         return(s - src - 1);    /* count does not include NUL */
 }
-
+EXPORT_SYMBOL(strlcpy);

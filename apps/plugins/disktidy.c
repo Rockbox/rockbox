@@ -43,20 +43,20 @@ bool tidy_loaded_and_changed = false;
 static void add_item(const char* name, int index)
 {
     struct tidy_type *entry = &tidy_types[index];
-    rb->strcpy(entry->filestring, name);
-    if (name[rb->strlen(name)-1] == '/')
+    strcpy(entry->filestring, name);
+    if (name[strlen(name)-1] == '/')
     {
         entry->directory = true;
-        entry->filestring[rb->strlen(name)-1] = '\0';
+        entry->filestring[strlen(name)-1] = '\0';
     }
     else
         entry->directory = false;
 
-    char *a = rb->strchr(entry->filestring, '*');
+    char *a = strchr(entry->filestring, '*');
     if (a)
     {
         entry->pre = a - entry->filestring;
-        entry->post = rb->strlen(a+1);
+        entry->post = strlen(a+1);
     }
     else
     {
@@ -70,17 +70,17 @@ static int find_file_string(const char *file, char *last_group)
     char temp[MAX_PATH];
     int idx_last_group = -1;
     bool folder = false;
-    rb->strcpy(temp, file);
-    if (temp[rb->strlen(temp)-1] == '/')
+    strcpy(temp, file);
+    if (temp[strlen(temp)-1] == '/')
     {
         folder = true;
-        temp[rb->strlen(temp)-1] = '\0';
+        temp[strlen(temp)-1] = '\0';
     }
 
     for (unsigned i = 0; i < tidy_type_count; i++)
-        if (!rb->strcmp(tidy_types[i].filestring, temp) && folder == tidy_types[i].directory)
+        if (!strcmp(tidy_types[i].filestring, temp) && folder == tidy_types[i].directory)
             return i;
-        else if (!rb->strcmp(tidy_types[i].filestring, last_group))
+        else if (!strcmp(tidy_types[i].filestring, last_group))
             idx_last_group = i;
 
     if (file[0] == '<' || idx_last_group == -1)
@@ -97,7 +97,7 @@ static int find_file_string(const char *file, char *last_group)
 
     /* shift items up one */
     for (int i=tidy_type_count;i>idx_last_group;i--)
-        rb->memcpy(&tidy_types[i], &tidy_types[i-1], sizeof(struct tidy_type));
+        memcpy(&tidy_types[i], &tidy_types[i-1], sizeof(struct tidy_type));
 
     tidy_type_count++;
     add_item(file, idx_last_group+1);
@@ -106,22 +106,22 @@ static int find_file_string(const char *file, char *last_group)
 
 static void tidy_load_file(const char* file)
 {
-    int fd = rb->open(file, O_RDONLY);
+    int fd = open(file, O_RDONLY);
     char buf[MAX_PATH], *str, *remove;
     char last_group[MAX_PATH] = "";
     if (fd < 0)
         return;
 
-    while ((tidy_type_count < sizeof(tidy_types) / sizeof(tidy_types[0])) && rb->read_line(fd, buf, MAX_PATH))
+    while ((tidy_type_count < sizeof(tidy_types) / sizeof(tidy_types[0])) && read_line(fd, buf, MAX_PATH))
     {
-        if (!rb->settings_parseline(buf, &str, &remove))
+        if (!settings_parseline(buf, &str, &remove))
             continue;
 
         if (*str == '\\') /* escape first character ? */
             str++;
         unsigned i = find_file_string(str, last_group);
 
-        tidy_types[i].remove = rb->strcmp(remove, "yes");
+        tidy_types[i].remove = strcmp(remove, "yes");
 
         if (i >= tidy_type_count)
         {
@@ -130,9 +130,9 @@ static void tidy_load_file(const char* file)
             tidy_type_count++;
         }
         if (str[0] == '<')
-            rb->strcpy(last_group, str);
+            strcpy(last_group, str);
     }
-    rb->close(fd);
+    close(fd);
 }
 
 static bool match(struct tidy_type *tidy_type, const char *string, int len)
@@ -140,7 +140,7 @@ static bool match(struct tidy_type *tidy_type, const char *string, int len)
     char *pattern = tidy_type->filestring;
 
     if (tidy_type->pre < 0) /* no '*', just compare. */
-        return !rb->strcmp(pattern, string);
+        return !strcmp(pattern, string);
 
     /* pattern is too long for the string. avoid 'ab*bc' matching 'abc'. */
     if (len < tidy_type->pre + tidy_type->post)
@@ -148,14 +148,14 @@ static bool match(struct tidy_type *tidy_type, const char *string, int len)
 
     /* pattern has '*', compare former part of '*' to the begining of
        the string and compare next part of '*' to the end of string. */
-    return !rb->strncmp(pattern, string, tidy_type->pre) &&
-           !rb->strcmp(pattern + tidy_type->pre + 1, string + len - tidy_type->post);
+    return !strncmp(pattern, string, tidy_type->pre) &&
+           !strcmp(pattern + tidy_type->pre + 1, string + len - tidy_type->post);
 }
 
 static bool tidy_remove_item(const char *item, int attr)
 {
     for (struct tidy_type *t = &tidy_types[0]; t < &tidy_types[tidy_type_count]; t++)
-        if (match(t, item, rb->strlen(item)))
+        if (match(t, item, strlen(item)))
             return t->remove && ((!!(attr&ATTR_DIRECTORY)) == t->directory);
 
     return false;
@@ -164,18 +164,18 @@ static bool tidy_remove_item(const char *item, int attr)
 static void tidy_lcd_status(const char *name)
 {
     /* display status text */
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Working ...");
-    rb->lcd_puts(0, 1, name);
+    lcd_clear_display();
+    lcd_puts(0, 0, "Working ...");
+    lcd_puts(0, 1, name);
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_putsf(0, 2, "Cleaned up %d items", removed);
+    lcd_putsf(0, 2, "Cleaned up %d items", removed);
 #endif
-    rb->lcd_update();
+    lcd_update();
 }
 
 static int tidy_path_append_entry(char *path, struct dirent *entry, int *path_length)
 {
-    int name_len = rb->strlen(entry->d_name);
+    int name_len = strlen(entry->d_name);
     /* for the special case of path="/" this is one bigger but it's not a problem */
     int new_length = *path_length + name_len + 1;
 
@@ -184,15 +184,15 @@ static int tidy_path_append_entry(char *path, struct dirent *entry, int *path_le
         return 0;
 
     /* special case for path <> "/" */
-    if(rb->strcmp(path, "/") != 0)
+    if(strcmp(path, "/") != 0)
     {
-        rb->strcat(path + *path_length, "/");
+        strcat(path + *path_length, "/");
         (*path_length)++;
     }
     /* strcat is unsafe but the previous check normally avoid any problem */
     /* use path_length to optimise */
 
-    rb->strcat(path + *path_length, entry->d_name);
+    strcat(path + *path_length, entry->d_name);
     *path_length += name_len;
 
     return 1;
@@ -205,37 +205,37 @@ static void tidy_path_remove_entry(char *path, int old_path_length, int *path_le
 }
 
 /* path is assumed to be array of size MAX_PATH. */
-static enum plugin_status tidy_clean(char *path, int *path_length, bool rmdir)
+static enum plugin_status tidy_clean(char *path, int *path_length, bool remove_dir)
 {
     int old_path_length = *path_length;
 
     tidy_lcd_status(path);
 
-    DIR *dir = rb->opendir(path);
+    DIR *dir = opendir(path);
     if (!dir)
         return PLUGIN_ERROR;
 
     struct dirent *entry;
-    while ((entry = rb->readdir(dir)))
+    while ((entry = readdir(dir)))
     {
         /* check for user input and usb connect */
-        int button = rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
+        int button = get_action(CONTEXT_STD, TIMEOUT_NOBLOCK);
         if (button == ACTION_STD_CANCEL)
         {
-            rb->closedir(dir);
+            closedir(dir);
             user_abort = true;
             return PLUGIN_OK;
         }
-        if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+        if (default_event_handler(button) == SYS_USB_CONNECTED)
         {
-            rb->closedir(dir);
+            closedir(dir);
             return PLUGIN_USB_CONNECTED;
         }
 
-        rb->yield();
+        yield();
 
-        struct dirinfo info = rb->dir_get_info(dir, entry);
-        if (!rmdir && !tidy_remove_item(entry->d_name, info.attribute))
+        struct dirinfo info = dir_get_info(dir, entry);
+        if (!remove_dir && !tidy_remove_item(entry->d_name, info.attribute))
             continue;
 
         /* get absolute path, returns an error if path is too long */
@@ -245,24 +245,24 @@ static enum plugin_status tidy_clean(char *path, int *path_length, bool rmdir)
         if (info.attribute & ATTR_DIRECTORY)
         {
             /* dir ignore "." and ".." */
-            if (rb->strcmp(entry->d_name, ".") && rb->strcmp(entry->d_name, ".."))
+            if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
                 tidy_clean(path, path_length, true);
         }
         else
         {
             removed++;
-            rb->remove(path);
+            remove(path);
         }
 
         /* restore path */
         tidy_path_remove_entry(path, old_path_length, path_length);
     }
-    rb->closedir(dir);
+    closedir(dir);
 
-    if (rmdir)
+    if (remove_dir)
     {
         removed++;
-        rb->rmdir(path);
+        rmdir(path);
     }
 
     return PLUGIN_OK;
@@ -274,26 +274,26 @@ static enum plugin_status tidy_do(void)
     char path[MAX_PATH];
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
-    rb->strcpy(path, "/");
-    int path_length = rb->strlen(path);
+    strcpy(path, "/");
+    int path_length = strlen(path);
     enum plugin_status status = tidy_clean(path, &path_length, false);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     if (status == PLUGIN_OK)
     {
-        rb->lcd_clear_display();
+        lcd_clear_display();
         if (user_abort)
         {
-            rb->splash(HZ, "User aborted");
-            rb->lcd_clear_display();
+            splash(HZ, "User aborted");
+            lcd_clear_display();
         }
-        rb->splashf(HZ*2, "Cleaned up %d items", removed);
+        splashf(HZ*2, "Cleaned up %d items", removed);
     }
     return status;
 }
@@ -315,7 +315,7 @@ static const char* get_name(int selected_item, void * data,
     (void)data;
     if (tidy_types[selected_item].directory)
     {
-        rb->snprintf(buffer, buffer_len, "%s/",
+        snprintf(buffer, buffer_len, "%s/",
                      tidy_types[selected_item].filestring);
         return buffer;
     }
@@ -327,11 +327,11 @@ static int list_action_callback(int action, struct gui_synclist *lists)
     if (action != ACTION_STD_OK)
         return action;
 
-    unsigned selection = rb->gui_synclist_get_sel_pos(lists);
+    unsigned selection = gui_synclist_get_sel_pos(lists);
     if (tidy_types[selection].filestring[0] == '<')
     {
-        bool all = !rb->strcmp(tidy_types[selection].filestring, "< ALL >");
-        bool none= !rb->strcmp(tidy_types[selection].filestring, "< NONE >");
+        bool all = !strcmp(tidy_types[selection].filestring, "< ALL >");
+        bool none= !strcmp(tidy_types[selection].filestring, "< NONE >");
 
         if (all || none)
         {
@@ -358,7 +358,7 @@ static void tidy_lcd_menu(void)
                         "Files to Clean", "Quit");
 
     for(;;)
-        switch(rb->do_menu(&menu, &selection, NULL, false))
+        switch(do_menu(&menu, &selection, NULL, false))
         {
         default:
             user_abort = true;
@@ -366,11 +366,11 @@ static void tidy_lcd_menu(void)
             return; /* start cleaning */
 
         case 1:
-            rb->simplelist_info_init(&list, "Files to Clean", tidy_type_count, NULL);
+            simplelist_info_init(&list, "Files to Clean", tidy_type_count, NULL);
             list.get_icon = get_icon;
             list.get_name = get_name;
             list.action_callback = list_action_callback;
-            rb->simplelist_show_list(&list);
+            simplelist_show_list(&list);
             break;
         }
 }
@@ -380,17 +380,17 @@ static void tidy_lcd_menu(void)
 */
 static void save_config(void)
 {
-    int fd = rb->creat(CUSTOM_FILES, 0666);
+    int fd = creat(CUSTOM_FILES, 0666);
     if (fd < 0)
         return;
 
     for (unsigned i=0; i<tidy_type_count; i++)
-        rb->fdprintf(fd, "%s%s%s: %s\n", 
+        fdprintf(fd, "%s%s%s: %s\n", 
                      tidy_types[i].filestring[0] == '#' ? "\\" : "",
                      tidy_types[i].filestring,
                      tidy_types[i].directory ? "/" : "",
                      tidy_types[i].remove ? "yes" : "no");
-    rb->close(fd);
+    close(fd);
 }
 
 /* this is the plugin entry point */
@@ -402,7 +402,7 @@ enum plugin_status plugin_start(const void* parameter)
     tidy_load_file(CUSTOM_FILES);
     if (tidy_type_count == 0)
     {
-        rb->splash(3*HZ, "Missing disktidy.config file");
+        splash(3*HZ, "Missing disktidy.config file");
         return PLUGIN_ERROR;
     }
     tidy_lcd_menu();

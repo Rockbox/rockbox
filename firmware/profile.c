@@ -60,6 +60,7 @@
 #include <timer.h>
 #include "inttypes.h"
 #include "profile.h"
+#include "symbols.h"
 
 /* PFD is Profiled Function Data */
 
@@ -221,6 +222,7 @@ void profstop() {
     }
     close(fd);
 }
+EXPORT_SYMBOL(profstop);
 
 void __cyg_profile_func_exit(void *self_pc, void *call_site) {
     (void)call_site;
@@ -246,6 +248,7 @@ void __cyg_profile_func_exit(void *self_pc, void *call_site) {
     }
     profiling = PROF_ON;
 }
+EXPORT_SYMBOL(__cyg_profile_func_exit);
 
 #define ALLOCATE_PFD(temp) \
     temp = ++pfds[0].link;\
@@ -337,7 +340,7 @@ overflow:
     profiling = PROF_ERROR;
     return;
 }
-
+EXPORT_SYMBOL(__cyg_profile_func_enter);
 
 
 

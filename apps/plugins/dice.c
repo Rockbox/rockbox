@@ -79,7 +79,7 @@ enum plugin_status plugin_start(const void* parameter) {
     int action;
 
     dice_init(&dice);
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
     configfile_load(CFG_FILE, config, 2, 0);
     dice.nb_sides = nb_sides_values[sides_index];
@@ -91,7 +91,7 @@ enum plugin_status plugin_start(const void* parameter) {
     configfile_save(CFG_FILE, config, 2, 0);
     dice_roll(&dice);
     FOR_NB_SCREENS(i)
-        dice_print( &dice, rb->screens[i] );
+        dice_print( &dice, &screens[i] );
     while(true) {
         action = pluginlib_getaction(TIMEOUT_BLOCK,
                                      plugin_contexts, ARRAYLEN(plugin_contexts));
@@ -99,7 +99,7 @@ enum plugin_status plugin_start(const void* parameter) {
             case DICE_ROLL:
                 dice_roll(&dice);
                 FOR_NB_SCREENS(i)
-                    dice_print( &dice, rb->screens[i] );
+                    dice_print( &dice, &screens[i] );
                 break;
             case DICE_QUIT:
                 return PLUGIN_OK;
@@ -117,7 +117,7 @@ static void dice_roll(struct dices* dice) {
     int i;
     dice->total = 0;
     for (i=0; i<dice->nb_dices; i++) {
-        dice->values[i] = rb->rand()%dice->nb_sides + 1;
+        dice->values[i] = rand()%dice->nb_sides + 1;
         dice->total+=dice->values[i];
     }
 }
@@ -126,7 +126,7 @@ static void dice_print_string_buffer(struct dices* dice, char* buffer,
                               int start, int end){
     int i, written;
     for (i=start; i<end; i++) {
-        written=rb->snprintf(buffer, PRINT_BUFFER_LENGTH,
+        written=snprintf(buffer, PRINT_BUFFER_LENGTH,
                              " %3d", dice->values[i]);
         buffer=&(buffer[written]);
     }
@@ -166,7 +166,7 @@ static void dice_print(struct dices* dice, struct screen* display){
             start=end;
         }
     }
-    rb->snprintf(buffer, PRINT_BUFFER_LENGTH, "Total: %d", dice->total);
+    snprintf(buffer, PRINT_BUFFER_LENGTH, "Total: %d", dice->total);
     display->puts_scroll(0, current_row, buffer);
     display->update();
 }
@@ -182,19 +182,19 @@ static bool dice_menu(struct dices * dice) {
 
 
     while (!menu_quit) {
-        switch(rb->do_menu(&menu, &selection, NULL, false)){
+        switch(do_menu(&menu, &selection, NULL, false)){
             case 0:
                 menu_quit = true;
                 result = true;
                 break;
 
             case 1:
-                rb->set_int("Number of Dice", "", UNIT_INT, &(dice->nb_dices),
+                set_int("Number of Dice", "", UNIT_INT, &(dice->nb_dices),
                             NULL, 1, 1, MAX_DICES, NULL );
                 break;
 
             case 2:
-                rb->set_option("Number of Sides", &sides_index, INT, 
+                set_option("Number of Sides", &sides_index, INT, 
                                nb_sides_option,
                                sizeof(nb_sides_values)/sizeof(int), NULL);
                 dice->nb_sides=nb_sides_values[sides_index];

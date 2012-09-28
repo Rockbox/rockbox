@@ -25,6 +25,7 @@
  ****************************************************************************/
 #include "diacritic.h"
 #include "system.h"
+#include "symbols.h"
 
 #define DIAC_NUM_RANGES      (ARRAYLEN(diac_ranges))
 
@@ -239,3 +240,4 @@ Found:
 
     return (char_code < diac->base + diac->num_diacritics);
 }
+EXPORT_SYMBOL(is_diacritic);

@@ -104,6 +104,7 @@
 #include "rbunicode.h"
 #include "root_menu.h"
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
+#include "symbols.h"
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
@@ -663,7 +664,7 @@ int playlist_remove_all_tracks(struct playlist_info *playlist)
 
     return 0;
 }
-
+EXPORT_SYMBOL(playlist_remove_all_tracks);
 
 /*
  * Add track to playlist at specified position. There are seven special
@@ -2082,6 +2083,7 @@ int playlist_create(const char *dir, const char *file)
 
     return 0;
 }
+EXPORT_SYMBOL(playlist_create);
 
 #define PLAYLIST_COMMAND_SIZE (MAX_PATH+12)
 
@@ -2466,6 +2468,7 @@ int playlist_resume(void)
 
     return 0;
 }
+EXPORT_SYMBOL(playlist_resume);
 
 /*
  * Add track to in_ram playlist.  Used when playing directories.
@@ -2494,6 +2497,7 @@ int playlist_add(const char *filename)
 
     return 0;
 }
+EXPORT_SYMBOL(playlist_add);
 
 /* shuffle newly created playlist using random seed. */
 int playlist_shuffle(int random_seed, int start_index)
@@ -2513,6 +2517,7 @@ int playlist_shuffle(int random_seed, int start_index)
 
     return playlist->index;
 }
+EXPORT_SYMBOL(playlist_shuffle);
 
 /* start playing current playlist at specified index/offset */
 void playlist_start(int start_index, int offset)
@@ -2530,6 +2535,7 @@ void playlist_start(int start_index, int offset)
     sync_control(playlist, false);
     audio_play(offset);
 }
+EXPORT_SYMBOL(playlist_start);
 
 /* Returns false if 'steps' is out of bounds, else true */
 bool playlist_check(int steps)
@@ -2759,6 +2765,8 @@ int playlist_amount(void)
 {
     return playlist_amount_ex(NULL);
 }
+EXPORT_SYMBOL(playlist_amount);
+
 /* set playlist->last_shuffle_start to playlist->amount for
    PLAYLIST_INSERT_LAST_SHUFFLED command purposes*/
 void playlist_set_last_shuffled_start(void)
@@ -2933,6 +2941,7 @@ void playlist_sync(struct playlist_info* playlist)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 }
+EXPORT_SYMBOL(playlist_sync);
 
 /*
  * Insert track into playlist at specified position (or one of the special
@@ -2962,6 +2971,7 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
 
     return result;
 }
+EXPORT_SYMBOL(playlist_insert_track);
 
 /*
  * Insert all tracks from specified directory into playlist.
@@ -3023,6 +3033,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     return result;
 }
+EXPORT_SYMBOL(playlist_insert_directory);
 
 /*
  * Insert all tracks from specified playlist into dynamic playlist.

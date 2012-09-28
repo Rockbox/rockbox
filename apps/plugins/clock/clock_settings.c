@@ -52,7 +52,7 @@ struct clock_settings clock_settings;
 struct clock_settings hdd_clock_settings;
 
 static bool settings_needs_saving(struct clock_settings* settings){
-    return(rb->memcmp(settings, &hdd_clock_settings, sizeof(*settings)));
+    return(memcmp(settings, &hdd_clock_settings, sizeof(*settings)));
 }
 
 void clock_settings_reset(struct clock_settings* settings){
@@ -80,11 +80,11 @@ void clock_settings_reset(struct clock_settings* settings){
 void apply_backlight_setting(int backlight_setting)
 {
     if(backlight_setting == ALWAS_OFF)
-        rb->backlight_set_timeout(-1);
+        backlight_set_timeout(-1);
     else if(backlight_setting == ROCKBOX_SETTING)
-        rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+        backlight_set_timeout(global_settings.backlight_timeout);
     else if(backlight_setting == ALWAYS_ON)
-        rb->backlight_set_timeout(0);
+        backlight_set_timeout(0);
 }
 
 void clock_settings_skin_next(struct clock_settings* settings){
@@ -101,14 +101,14 @@ void clock_settings_skin_previous(struct clock_settings* settings){
 
 static enum settings_file_status clock_settings_load(
         struct clock_settings* settings,char* filename){
-    int fd = rb->open(filename, O_RDONLY);
+    int fd = open(filename, O_RDONLY);
     if(fd >= 0){ /* does file exist? */
         /* basic consistency check */
-        if(rb->filesize(fd) == sizeof(*settings)){
-            rb->read(fd, settings, sizeof(*settings));
-            rb->close(fd);
+        if(filesize(fd) == sizeof(*settings)){
+            read(fd, settings, sizeof(*settings));
+            close(fd);
             apply_backlight_setting(settings->general.backlight);
-            rb->memcpy(&hdd_clock_settings, settings, sizeof(*settings));
+            memcpy(&hdd_clock_settings, settings, sizeof(*settings));
             return(LOADED);
         }
     }
@@ -119,10 +119,10 @@ static enum settings_file_status clock_settings_load(
 
 static enum settings_file_status clock_settings_save(
         struct clock_settings* settings, char* filename){
-    int fd = rb->creat(filename, 0666);
+    int fd = creat(filename, 0666);
     if(fd >= 0){ /* does file exist? */
-        rb->write (fd, settings, sizeof(*settings));
-        rb->close(fd);
+        write (fd, settings, sizeof(*settings));
+        close(fd);
         return(SAVED);
     }
     return(ERRSAVE);
@@ -155,7 +155,7 @@ static void draw_message(struct screen* display, int msg, int y){
 void load_settings(void){
     struct screen* display;
     FOR_NB_SCREENS(i){
-        display=rb->screens[i];
+        display=&screens[i];
         display->clear_display();
         draw_logo(display);
         draw_message(display, MESSAGE_LOADING, 1);
@@ -166,15 +166,15 @@ void load_settings(void){
         clock_settings_load(&clock_settings, settings_filename);
 
     FOR_NB_SCREENS(i){
-        display=rb->screens[i];
+        display=&screens[i];
         if(load_status==LOADED)
             draw_message(display, MESSAGE_LOADED, 1);
         else
             draw_message(display, MESSAGE_ERRLOAD, 1);
         display->update();
     }
-    rb->storage_sleep();
-    rb->sleep(HZ);
+    storage_sleep();
+    sleep(HZ);
 }
 
 void save_settings(void){
@@ -183,7 +183,7 @@ void save_settings(void){
         return;
 
     FOR_NB_SCREENS(i){
-        display=rb->screens[i];
+        display=&screens[i];
         display->clear_display();
         draw_logo(display);
 
@@ -195,7 +195,7 @@ void save_settings(void){
         clock_settings_save(&clock_settings, settings_filename);
 
     FOR_NB_SCREENS(i){
-        display=rb->screens[i];
+        display=&screens[i];
 
         if(load_status==SAVED)
             draw_message(display, MESSAGE_SAVED, 1);
@@ -203,7 +203,7 @@ void save_settings(void){
             draw_message(display, MESSAGE_ERRSAVE, 1);
         display->update();
     }
-    rb->sleep(HZ);
+    sleep(HZ);
 }
 
 void save_settings_wo_gui(void){

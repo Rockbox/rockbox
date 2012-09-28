@@ -223,13 +223,13 @@ static char tzxheader[] = {'Z','X','T','a','p','e','!',0x1A};
 static int readbuf(void *ptr, int size, /*FILE *fp*/ int fd)
 {
     /*return (int) fread(ptr, 1, (size_t) size, tapefp);*/
-    return (int) rb->read(fd, ptr, (size_t) size);
+    return (int) read(fd, ptr, (size_t) size);
 }
 
 static void premature(struct seginfo *csp)
 {
   csp->segtype = SEG_ERROR;
-  rb->snprintf(seg_desc,DESC_LEN, "Premature end of segment");
+  snprintf(seg_desc,DESC_LEN, "Premature end of segment");
 }
 
 static int read_tzx_header(byte *hb, struct seginfo *csp)
@@ -244,7 +244,7 @@ static int read_tzx_header(byte *hb, struct seginfo *csp)
   segid = getc(tapefd);
   if(segid == EOF) {
     csp->segtype = SEG_END;
-    rb->snprintf(seg_desc,DESC_LEN, "End of Tape");
+    snprintf(seg_desc,DESC_LEN, "End of Tape");
     return 0;
   }
   
@@ -294,7 +294,7 @@ static int read_tap_header(byte *hb, struct seginfo *csp)
   if(res < 2) {
     if(res == 0) {
       csp->segtype = SEG_END;
-      rb->snprintf(seg_desc,DESC_LEN, "End of Tape");
+      snprintf(seg_desc,DESC_LEN, "End of Tape");
     }
     else premature(csp);
     return 0;
@@ -329,7 +329,7 @@ static int end_seg(struct seginfo *csp)
   if(!segbeg) {
     if(csp->len != csp->ptr) {
       /*fseek(tapefp, tf_cseg.len - tf_cseg.ptr - 1, SEEK_CUR);*/
-        rb->lseek(tapefd, tf_cseg.len - tf_cseg.ptr - 1, SEEK_CUR);
+        lseek(tapefd, tf_cseg.len - tf_cseg.ptr - 1, SEEK_CUR);
 
       if(getc(tapefd) == EOF) {
         premature(csp);
@@ -350,7 +350,7 @@ static int jump_to_segment(int newsegi, struct seginfo *csp)
     segi = 0;
     isbeg();
     /*fseek(tapefp, firstseg_offs, SEEK_SET);*/
-    rb->lseek(tapefd, firstseg_offs, SEEK_SET);
+    lseek(tapefd, firstseg_offs, SEEK_SET);
   }
   else if(!end_seg(csp)) return 0;
 
@@ -369,7 +369,7 @@ static int next_data(void)
   
   res = getc(tapefd);
   if(res == EOF) {
-    rb->snprintf(seg_desc, DESC_LEN,"Premature end of segment");
+    snprintf(seg_desc, DESC_LEN,"Premature end of segment");
     return DAT_ERR;
   }
   tf_cseg.ptr++;
@@ -379,7 +379,7 @@ static int next_data(void)
 
 static void normal_segment(struct seginfo *csp)
 {
-  rb->snprintf(seg_desc,DESC_LEN, "Data");
+  snprintf(seg_desc,DESC_LEN, "Data");
   csp->type    = ST_NORM;
   csp->segtype = SEG_DATA;
   csp->pulse   = 2168;   /* 2016 */
@@ -410,7 +410,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     break;
     
   case 0x11:
-    rb->snprintf(seg_desc,DESC_LEN, "Turbo Data");
+    snprintf(seg_desc,DESC_LEN, "Turbo Data");
     csp->type    = ST_NORM;
     csp->segtype = SEG_DATA_TURBO;
     csp->pulse   = DBYTE(hip, 0x00);
@@ -424,7 +424,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     break;
     
   case 0x12:
-    rb->snprintf(seg_desc,DESC_LEN, "Pure Tone");
+    snprintf(seg_desc,DESC_LEN, "Pure Tone");
     csp->type    = ST_NORM;
     csp->segtype = SEG_OTHER;
     csp->pulse   = DBYTE(hip, 0x00);
@@ -438,14 +438,14 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     break;
     
   case 0x13:
-    rb->snprintf(seg_desc,DESC_LEN, "Pulse Sequence");
+    snprintf(seg_desc,DESC_LEN, "Pulse Sequence");
     csp->type    = ST_PSEQ;
     csp->segtype = SEG_OTHER;
     csp->pause   = 0;
     break;
     
   case 0x14:
-    rb->snprintf(seg_desc,DESC_LEN, "Pure Data");
+    snprintf(seg_desc,DESC_LEN, "Pure Data");
     csp->type    = ST_NORM;
     csp->segtype = SEG_DATA_PURE;
     csp->zerop   = DBYTE(hip, 0x00);
@@ -459,7 +459,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     break;
     
   case 0x15:
-    rb->snprintf(seg_desc,DESC_LEN, "Direct Recording");
+    snprintf(seg_desc,DESC_LEN, "Direct Recording");
     csp->type    = ST_DIRE;
     csp->segtype = SEG_OTHER; 
     csp->pulse   = DBYTE(hip, 0x00);
@@ -479,13 +479,13 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     csp->type = ST_NORM;
     csp->segtype = SEG_PAUSE;
       }
-      rb->snprintf(seg_desc,DESC_LEN, "Stop the Tape Mark");
+      snprintf(seg_desc,DESC_LEN, "Stop the Tape Mark");
     }
     else {
       csp->pause = dtmp;
       csp->type = ST_NORM;
       csp->segtype = SEG_PAUSE;
-      rb->snprintf(seg_desc,DESC_LEN, "Pause for %i.%03is", 
+      snprintf(seg_desc,DESC_LEN, "Pause for %i.%03is", 
           csp->pause / 1000, csp->pause % 1000);
     }
     csp->pulse   = 0;
@@ -508,14 +508,14 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     csp->ptr += csp->len;
     {
       int blen;
-      rb->snprintf(seg_desc,DESC_LEN, "Begin Group: ");
-      blen = (int) rb->strlen(seg_desc);
-      rb->strlcpy(seg_desc+blen, (char *) rbuf, (unsigned) csp->len + 1);
+      snprintf(seg_desc,DESC_LEN, "Begin Group: ");
+      blen = (int) strlen(seg_desc);
+      strlcpy(seg_desc+blen, (char *) rbuf, (unsigned) csp->len + 1);
     }
     break;
 
   case 0x22:
-    rb->snprintf(seg_desc,DESC_LEN, "End Group");
+    snprintf(seg_desc,DESC_LEN, "End Group");
     csp->type    = ST_MISC;
     csp->segtype = SEG_GRP_END;
     break;
@@ -523,21 +523,21 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
   case 0x23:
     offs = (signed short) DBYTE(hip, 0x00);
     if(offs == 0) {
-      rb->snprintf(seg_desc,DESC_LEN, "Infinite loop");
+      snprintf(seg_desc,DESC_LEN, "Infinite loop");
       csp->type = ST_MISC;
       csp->segtype = SEG_STOP;
     }
     else {
       csp->type = ST_MISC;
       csp->segtype = SEG_SKIP;
-      rb->snprintf(seg_desc,DESC_LEN, "Jump to %i", segi+offs);
+      snprintf(seg_desc,DESC_LEN, "Jump to %i", segi+offs);
       jump_to_segment(segi + offs, csp);
     }
     break;
 
   case 0x24:
     loopctr = DBYTE(hip, 0x00);
-    rb->snprintf(seg_desc,DESC_LEN, "Loop %i times", loopctr);
+    snprintf(seg_desc,DESC_LEN, "Loop %i times", loopctr);
     loopbeg = segi+1;
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
@@ -549,9 +549,9 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     if(loopctr) loopctr--;
     if(loopctr) {
       jump_to_segment(loopbeg, csp);
-      rb->snprintf(seg_desc,DESC_LEN, "Loop to: %i", loopbeg);
+      snprintf(seg_desc,DESC_LEN, "Loop to: %i", loopbeg);
     }
-    else rb->snprintf(seg_desc,DESC_LEN, "Loop End");
+    else snprintf(seg_desc,DESC_LEN, "Loop End");
     break;
 
   case 0x26:
@@ -562,7 +562,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
       int offset;
       callbeg = segi;
       /*fseek(tapefp, callctr*2, SEEK_CUR);*/
-      rb->lseek(tapefd, callctr*2, SEEK_CUR);
+      lseek(tapefd, callctr*2, SEEK_CUR);
       csp->ptr += callctr*2;
       res = readbuf(rbuf, 2, tapefd);
       if(res != 2) {
@@ -571,37 +571,37 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
       }
       csp->ptr += 2;
       offset = (signed short) DBYTE(rbuf, 0x00);
-      rb->snprintf(seg_desc,DESC_LEN, "Call to %i", segi+offset);
+      snprintf(seg_desc,DESC_LEN, "Call to %i", segi+offset);
       jump_to_segment(segi+offset, csp);
       callctr++;
     }
     else {
       callctr = 0;
-      rb->snprintf(seg_desc,DESC_LEN, "Call Sequence End");
+      snprintf(seg_desc,DESC_LEN, "Call Sequence End");
     }
     break;
 
   case 0x27:
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
-    rb->snprintf(seg_desc,DESC_LEN, "Return");
+    snprintf(seg_desc,DESC_LEN, "Return");
     if(callctr > 0) jump_to_segment(callbeg, csp);
     break;
 
   case 0x28:
-    rb->snprintf(seg_desc,DESC_LEN, "Selection (Not yet supported)");
+    snprintf(seg_desc,DESC_LEN, "Selection (Not yet supported)");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
     break;
 
   case 0x2A:
     if(tapeopt.machine == MACHINE_48) { 
-      rb->snprintf(seg_desc,DESC_LEN, "Stop the Tape in 48k Mode (Stopped)");
+      snprintf(seg_desc,DESC_LEN, "Stop the Tape in 48k Mode (Stopped)");
       csp->type = ST_MISC;
       csp->segtype = SEG_STOP;
     }
     else {
-      rb->snprintf(seg_desc,DESC_LEN, "Stop the Tape in 48k Mode (Not Stopped)");
+      snprintf(seg_desc,DESC_LEN, "Stop the Tape in 48k Mode (Not Stopped)");
       csp->type = ST_MISC;
       csp->segtype = SEG_SKIP;
     }
@@ -617,7 +617,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
       return 0;
     }
     csp->ptr += csp->len;
-    rb->strlcpy(seg_desc, (char *) rbuf, (unsigned) csp->len + 1);
+    strlcpy(seg_desc, (char *) rbuf, (unsigned) csp->len + 1);
     break;
 
   case 0x32:
@@ -647,38 +647,38 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     break;
     
   case 0x33:
-    rb->snprintf(seg_desc,DESC_LEN, "Hardware Information (Not yet supported)");
+    snprintf(seg_desc,DESC_LEN, "Hardware Information (Not yet supported)");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
     break;
 
   case 0x34:
-    rb->snprintf(seg_desc, DESC_LEN,"Emulation Information (Not yet supported)");
+    snprintf(seg_desc, DESC_LEN,"Emulation Information (Not yet supported)");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
     break;
 
   case 0x35:
-    rb->snprintf(seg_desc,DESC_LEN, "Custom Information (Not yet supported)");
+    snprintf(seg_desc,DESC_LEN, "Custom Information (Not yet supported)");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
     break;
 
   case 0x40:
-    rb->snprintf(seg_desc, DESC_LEN,"Snapshot (Not yet supported)");
+    snprintf(seg_desc, DESC_LEN,"Snapshot (Not yet supported)");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
     break;
 
   case 0x5A:
-    rb->snprintf(seg_desc, DESC_LEN,"Tapefile Concatenation Point");
+    snprintf(seg_desc, DESC_LEN,"Tapefile Concatenation Point");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
     
   default:
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
-    rb->snprintf(seg_desc,DESC_LEN, "Unknown TZX block (id: %02X, version: %i.%02i)", 
+    snprintf(seg_desc,DESC_LEN, "Unknown TZX block (id: %02X, version: %i.%02i)", 
         segid, tf_tpi.tzxmajver, tf_tpi.tzxminver);
     break;
   }
@@ -742,7 +742,7 @@ int next_imps(unsigned short *impbuf, int buflen, long timelen)
     lead_pause --;
       }
       else if(lead_pause > 10) {
-    if(tapeopt.blanknoise && !(rb->rand() % 64)) 
+    if(tapeopt.blanknoise && !(rand() % 64)) 
       DPULSE(IMP_1MS * 10 - 1000, 1000); 
     else 
       DPULSE(IMP_1MS * 10, 0);
@@ -954,7 +954,7 @@ void close_tapefile(void)
 {
   if(tapefd != -1) {
     playstate = PL_NONE;
-    rb->close(tapefd);
+    close(tapefd);
     tapefd = -1;
   }
 }
@@ -968,14 +968,14 @@ int open_tapefile(char *name, int type)
   currlev = 0;
 
   if(type != TAP_TAP && type != TAP_TZX) {
-    rb->snprintf(seg_desc,DESC_LEN, "Illegal tape type");
+    snprintf(seg_desc,DESC_LEN, "Illegal tape type");
     return 0;
   }
 
   /*tapefp = fopen(name, "rb");*/
-  tapefd = rb->open(name, O_RDONLY);
+  tapefd = open(name, O_RDONLY);
   if(tapefd < 0 ) {
-    /*rb->snprintf(seg_desc,DESC_LEN, "Could not open `%s': %s", name, strerror(errno));*/
+    /*snprintf(seg_desc,DESC_LEN, "Could not open `%s': %s", name, strerror(errno));*/
     return 0;
   }
   
@@ -994,19 +994,19 @@ int open_tapefile(char *name, int type)
     
     firstseg_offs = 10;
     res = readbuf(rbuf, 10, tapefd);
-    if(res == 10 && rb->strncasecmp((char *)rbuf, tzxheader, 8) == 0) {
+    if(res == 10 && strncasecmp((char *)rbuf, tzxheader, 8) == 0) {
       tf_tpi.tzxmajver = rbuf[8];
       tf_tpi.tzxminver = rbuf[9];
       
       if(tf_tpi.tzxmajver > TZXMAJPROG) {
-    rb->snprintf(seg_desc, DESC_LEN,
+    snprintf(seg_desc, DESC_LEN,
         "Cannot handle TZX file version (%i.%02i)", 
         tf_tpi.tzxmajver, tf_tpi.tzxminver);
     ok = 0;
       }
     }
     else {
-      rb->snprintf(seg_desc,DESC_LEN, "Illegal TZX file header");
+      snprintf(seg_desc,DESC_LEN, "Illegal TZX file header");
       ok = 0;
     }
   }
@@ -1040,6 +1040,6 @@ long get_segpos(void)
 
 void set_tapefile_options(struct tape_options *to)
 {
-  rb->memcpy(&tapeopt, to, sizeof(tapeopt));
+  memcpy(&tapeopt, to, sizeof(tapeopt));
 }
 

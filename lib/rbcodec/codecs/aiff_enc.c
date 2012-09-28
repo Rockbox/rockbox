@@ -82,7 +82,7 @@ static void uint32_h_to_ieee754_extended_be(uint8_t f[10], uint32_t l)
 {
     int32_t exp;
 
-    ci->memset(f, 0, 10);
+    memset(f, 0, 10);
 
     if (l == 0)
         return;
@@ -119,12 +119,12 @@ static inline bool on_write_chunk(struct enc_file_event_data *data)
     if (data->chunk->enc_data == NULL)
     {
 #ifdef ROCKBOX_HAS_LOGF
-        ci->logf("aiff enc: NULL data");
+        logf("aiff enc: NULL data");
 #endif
         return true;
     }
 
-    if (ci->write(data->rec_file, data->chunk->enc_data,
+    if (write(data->rec_file, data->chunk->enc_data,
                   data->chunk->enc_size) != (ssize_t)data->chunk->enc_size)
         return false;
 
@@ -137,7 +137,7 @@ static bool on_start_file(struct enc_file_event_data *data)
     if ((data->chunk->flags & CHUNKF_ERROR) || *data->filename == '\0')
         return false;
 
-    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
+    data->rec_file = open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
 
     if (data->rec_file < 0)
         return false;
@@ -146,7 +146,7 @@ static bool on_start_file(struct enc_file_event_data *data)
     data->num_pcm_samples = 0;
 
     /* write template headers */
-    if (ci->write(data->rec_file, &aiff_header, sizeof (aiff_header))
+    if (write(data->rec_file, &aiff_header, sizeof (aiff_header))
             != sizeof (aiff_header))
     {
         return false;
@@ -165,8 +165,8 @@ static bool on_end_file(struct enc_file_event_data *data)
     if (!is_file_data_ok(data))
         return false;
 
-    if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
-        ci->read(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr))
+    if (lseek(data->rec_file, 0, SEEK_SET) != 0 ||
+        read(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr))
     {
         return false;
     }
@@ -184,9 +184,9 @@ static bool on_end_file(struct enc_file_event_data *data)
     /* 'SSND' chunk */
     hdr.ssnd_size         = htobe32(data_size + 8);
 
-    if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
-        ci->write(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr) ||
-        ci->close(data->rec_file) != 0)
+    if (lseek(data->rec_file, 0, SEEK_SET) != 0 ||
+        write(data->rec_file, &hdr, sizeof (hdr)) != sizeof (hdr) ||
+        close(data->rec_file) != 0)
     {
         return false;
     }
@@ -302,7 +302,7 @@ static void chunk_to_aiff_format(uint32_t *src, uint32_t *dst)
         /*  |LLLLLLLLllllllll|RRRRRRRRrrrrrrrr| =>
          *  |LLLLLLLLllllllll|RRRRRRRRrrrrrrrr|
          */
-        ci->memcpy(dst, src, PCM_CHUNK_SIZE);
+        memcpy(dst, src, PCM_CHUNK_SIZE);
 #else
         /*  |llllllllLLLLLLLL|rrrrrrrrRRRRRRRR| =>
          *  |LLLLLLLLllllllll|RRRRRRRRrrrrrrrr|
@@ -330,14 +330,14 @@ static bool init_encoder(void)
     struct enc_inputs     inputs;
     struct enc_parameters params;
 
-    if (ci->enc_get_inputs         == NULL ||
-        ci->enc_set_parameters     == NULL ||
-        ci->enc_get_chunk          == NULL ||
-        ci->enc_finish_chunk       == NULL ||
-        ci->enc_get_pcm_data       == NULL )
+    if (enc_get_inputs         == NULL ||
+        enc_set_parameters     == NULL ||
+        enc_get_chunk          == NULL ||
+        enc_finish_chunk       == NULL ||
+        enc_get_pcm_data       == NULL )
         return false;
 
-    ci->enc_get_inputs(&inputs);
+    enc_get_inputs(&inputs);
 
     if (inputs.config->afmt != AFMT_AIFF)
         return false;
@@ -347,14 +347,14 @@ static bool init_encoder(void)
     rec_mono_mode = inputs.rec_mono_mode;
     err          = 0;
 
-    /* configure the buffer system */
+    /* codec_configure the buffer system */
     params.afmt            = AFMT_AIFF;
     enc_size               = PCM_CHUNK_SIZE*inputs.num_channels / 2;
     params.chunk_size      = enc_size;
     params.enc_sample_rate = sample_rate;
     params.reserve_bytes   = 0;
     params.events_callback = enc_events_callback;
-    ci->enc_set_parameters(&params);
+    enc_set_parameters(&params);
 
     return true;
 } /* init_encoder */
@@ -368,7 +368,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     }
     else if (reason == CODEC_UNLOAD) {
         /* reset parameters to initial state */
-        ci->enc_set_parameters(NULL);
+        enc_set_parameters(NULL);
     }
 
     return CODEC_OK;
@@ -378,22 +378,22 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 enum codec_status codec_run(void)
 {
     /* main encoding loop */
-    while (ci->get_command(NULL) != CODEC_ACTION_HALT)
+    while (codec_get_command(NULL) != CODEC_ACTION_HALT)
     {
-        uint32_t *src = (uint32_t *)ci->enc_get_pcm_data(PCM_CHUNK_SIZE);
+        uint32_t *src = (uint32_t *)enc_get_pcm_data(PCM_CHUNK_SIZE);
         struct enc_chunk_hdr *chunk;
 
         if (src == NULL)
             continue;
 
-        chunk           = ci->enc_get_chunk();
+        chunk           = enc_get_chunk();
         chunk->enc_size = enc_size;
         chunk->num_pcm  = PCM_SAMP_PER_CHUNK;
         chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
 
         chunk_to_aiff_format(src, (uint32_t *)chunk->enc_data);
 
-        ci->enc_finish_chunk();
+        enc_finish_chunk();
     }
 
     return CODEC_OK;

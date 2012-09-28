@@ -254,21 +254,21 @@ RB_WRAP(set_viewport)
 {
     struct viewport *vp = opt_viewport(L, 1, NULL);
     int screen = luaL_optint(L, 2, SCREEN_MAIN);
-    rb->screens[screen]->set_viewport(vp);
+    screens[screen].set_viewport(vp);
     return 0;
 }
 
 RB_WRAP(clear_viewport)
 {
     int screen = luaL_optint(L, 1, SCREEN_MAIN);
-    rb->screens[screen]->clear_viewport();
+    screens[screen].clear_viewport();
     return 0;
 }
 
 #ifdef HAVE_LCD_BITMAP
 RB_WRAP(lcd_framebuffer)
 {
-    rli_wrap(L, rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
+    rli_wrap(L, lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
     return 1;
 }
 
@@ -284,7 +284,7 @@ RB_WRAP(lcd_mono_bitmap_part)
     int height = luaL_checkint(L, 8);
     int screen = luaL_optint(L, 9, SCREEN_MAIN);
 
-    rb->screens[screen]->mono_bitmap_part((const unsigned char *)src->data, src_x, src_y, stride, x, y, width, height);
+    screens[screen].mono_bitmap_part((const unsigned char *)src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -297,7 +297,7 @@ RB_WRAP(lcd_mono_bitmap)
     int height = luaL_checkint(L, 5);
     int screen = luaL_optint(L, 6, SCREEN_MAIN);
 
-    rb->screens[screen]->mono_bitmap((const unsigned char *)src->data, x, y, width, height);
+    screens[screen].mono_bitmap((const unsigned char *)src->data, x, y, width, height);
     return 0;
 }
 
@@ -314,7 +314,7 @@ RB_WRAP(lcd_bitmap_part)
     int height = luaL_checkint(L, 8);
     int screen = luaL_optint(L, 9, SCREEN_MAIN);
 
-    rb->screens[screen]->bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
+    screens[screen].bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -327,13 +327,13 @@ RB_WRAP(lcd_bitmap)
     int height = luaL_checkint(L, 5);
     int screen = luaL_optint(L, 6, SCREEN_MAIN);
 
-    rb->screens[screen]->bitmap(src->data, x, y, width, height);
+    screens[screen].bitmap(src->data, x, y, width, height);
     return 0;
 }
 
 RB_WRAP(lcd_get_backdrop)
 {
-    fb_data* backdrop = rb->lcd_get_backdrop();
+    fb_data* backdrop = lcd_get_backdrop();
     if(backdrop == NULL)
         lua_pushnil(L);
     else
@@ -356,7 +356,7 @@ RB_WRAP(lcd_bitmap_transparent_part)
     int height = luaL_checkint(L, 8);
     int screen = luaL_optint(L, 9, SCREEN_MAIN);
 
-    rb->screens[screen]->transparent_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
+    screens[screen].transparent_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -369,7 +369,7 @@ RB_WRAP(lcd_bitmap_transparent)
     int height = luaL_checkint(L, 5);
     int screen = luaL_optint(L, 6, SCREEN_MAIN);
 
-    rb->screens[screen]->transparent_bitmap(src->data, x, y, width, height);
+    screens[screen].transparent_bitmap(src->data, x, y, width, height);
     return 0;
 }
 #endif /* LCD_DEPTH == 16 */
@@ -378,7 +378,7 @@ RB_WRAP(lcd_bitmap_transparent)
 
 RB_WRAP(current_tick)
 {
-    lua_pushinteger(L, *rb->current_tick);
+    lua_pushinteger(L, current_tick);
     return 1;
 }
 
@@ -386,7 +386,7 @@ RB_WRAP(current_tick)
 RB_WRAP(action_get_touchscreen_press)
 {
     short x, y;
-    int result = rb->action_get_touchscreen_press(&x, &y);
+    int result = action_get_touchscreen_press(&x, &y);
 
     lua_pushinteger(L, result);
     lua_pushinteger(L, x);
@@ -404,11 +404,11 @@ RB_WRAP(kbd_input)
     char *buffer = luaL_prepbuffer(&b);
 
     if(input != NULL)
-        rb->strlcpy(buffer, input, LUAL_BUFFERSIZE);
+        strlcpy(buffer, input, LUAL_BUFFERSIZE);
     else
         buffer[0] = '\0';
 
-    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE))
+    if(!kbd_input(buffer, LUAL_BUFFERSIZE))
     {
         luaL_addsize(&b, strlen(buffer));
         luaL_pushresult(&b);
@@ -423,12 +423,12 @@ RB_WRAP(kbd_input)
 RB_WRAP(touchscreen_set_mode)
 {
     enum touchscreen_mode mode = luaL_checkint(L, 1);
-    rb->touchscreen_set_mode(mode);
+    touchscreen_set_mode(mode);
     return 0;
 }
 RB_WRAP(touchscreen_get_mode)
 {
-    lua_pushinteger(L, rb->touchscreen_get_mode());
+    lua_pushinteger(L, touchscreen_get_mode());
     return 1;
 }
 #endif
@@ -440,11 +440,11 @@ RB_WRAP(font_getstringsize)
     int w, h;
 
     if (fontnumber == FONT_UI)
-        fontnumber = rb->global_status->font_id[SCREEN_MAIN];
+        fontnumber = global_status.font_id[SCREEN_MAIN];
     else
         fontnumber = FONT_SYSFIXED;
 
-    int result = rb->font_getstringsize(str, &w, &h, fontnumber);
+    int result = font_getstringsize(str, &w, &h, fontnumber);
     lua_pushinteger(L, result);
     lua_pushinteger(L, w);
     lua_pushinteger(L, h);
@@ -487,12 +487,12 @@ RB_WRAP(read_bmp_file)
     if(transparent)
         format |= FORMAT_TRANSPARENT;
 
-    int result = rb->read_bmp_file(filename, &bm, 0, format | FORMAT_RETURN_SIZE, NULL);
+    int result = read_bmp_file(filename, &bm, 0, format | FORMAT_RETURN_SIZE, NULL);
 
     if(result > 0)
     {
         bm.data = (unsigned char*) rli_alloc(L, bm.width, bm.height);
-        if(rb->read_bmp_file(filename, &bm, result, format, NULL) < 0)
+        if(read_bmp_file(filename, &bm, result, format, NULL) < 0)
         {
             /* Error occured, drop newly allocated image from stack */
             lua_pop(L, 1);
@@ -546,7 +546,7 @@ RB_WRAP(gui_syncyesno_run)
     if(!lua_isnoneornil(L, 3))
         fill_text_message(L, (no = &no_message), 3);
 
-    enum yesno_res result = rb->gui_syncyesno_run(&main_message, yes, no);
+    enum yesno_res result = gui_syncyesno_run(&main_message, yes, no);
 
     dlfree(main_message.message_lines);
     if(yes)
@@ -585,7 +585,7 @@ RB_WRAP(do_menu)
     menu.flags |= MENU_ITEM_COUNT(n);
     menu_desc.desc = (unsigned char*) title;
 
-    int result = rb->do_menu(&menu, &start_selected, NULL, false);
+    int result = do_menu(&menu, &start_selected, NULL, false);
 
     dlfree(items);
 
@@ -596,14 +596,14 @@ RB_WRAP(do_menu)
 RB_WRAP(playlist_sync)
 {
     /* just pass NULL to work with the current playlist */
-    rb->playlist_sync(NULL);
+    playlist_sync(NULL);
     return 1;
 }
 
 RB_WRAP(playlist_remove_all_tracks)
 {
     /* just pass NULL to work with the current playlist */
-    int result = rb->playlist_remove_all_tracks(NULL);
+    int result = playlist_remove_all_tracks(NULL);
     lua_pushinteger(L, result);
     return 1;
 }
@@ -621,7 +621,7 @@ RB_WRAP(playlist_insert_track)
     queue = lua_toboolean(L, 3); /* default to false */
     sync = lua_toboolean(L, 4); /* default to false */
 
-    int result = rb->playlist_insert_track(NULL, filename, position,
+    int result = playlist_insert_track(NULL, filename, position,
         queue, sync);
 
     lua_pushinteger(L, result);
@@ -639,7 +639,7 @@ RB_WRAP(playlist_insert_directory)
     queue = lua_toboolean(L, 3); /* default to false */
     recurse = lua_toboolean(L, 4); /* default to false */
 
-    int result = rb->playlist_insert_directory(NULL, dirname, position,
+    int result = playlist_insert_directory(NULL, dirname, position,
         queue, recurse);
 
     lua_pushinteger(L, result);

@@ -62,9 +62,9 @@ void update_screen(void)
     if ( settings.showfps ) {
         int percent=0;
         int TPF = HZ/50;/* ticks per frame */
-        if ((*rb->current_tick-start_time) > TPF )
-            percent = 100*video_frames/((*rb->current_tick-start_time)/TPF);
-        rb->snprintf(str,sizeof(str),"%d %%",percent);
+        if ((current_tick-start_time) > TPF )
+            percent = 100*video_frames/((current_tick-start_time)/TPF);
+        snprintf(str,sizeof(str),"%d %%",percent);
 #if defined USE_BUFFERED_GREY
         grey_putsxy(0,0,str);
 #else

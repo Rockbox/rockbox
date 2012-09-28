@@ -37,7 +37,7 @@ void *my_malloc(size_t size)
     if (!audio_bufferbase)
     {
         audio_bufferbase = audio_bufferpointer
-            = rb->plugin_get_audio_buffer(&audio_buffer_free);
+            = plugin_get_audio_buffer(&audio_buffer_free);
         audio_bufferpointer+=3;
         audio_bufferpointer=(void *)(((long)audio_bufferpointer)&~3);
         audio_buffer_free-=audio_bufferpointer-audio_bufferbase;
@@ -67,28 +67,28 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* now go ahead and have fun! */
     PUTS("SearchEngine v0.1");
-    parsefd=rb->open(parameter,O_RDONLY);
+    parsefd=open(parameter,O_RDONLY);
     if(parsefd<0) {
-        rb->splash(2*HZ,"Unable to open search tokenstream");
+        splash(2*HZ,"Unable to open search tokenstream");
         return PLUGIN_ERROR;    
     }
     result=parse(parsefd);
-    rb->snprintf(buf,250,"Retval: 0x%x",result);
+    snprintf(buf,250,"Retval: 0x%x",result);
     PUTS(buf);
-    rb->close(parsefd);
+    close(parsefd);
     hits=0;
     if(result!=0) {
-        int fd=rb->open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+        int fd=open("/search.m3u", O_WRONLY|O_CREAT|O_TRUNC, 0666);
         int i;
-        for(i=0;i<rb->tagdbheader->filecount;i++)
+        for(i=0;i<tagdbheader->filecount;i++)
             if(result[i]) {
                 hits++;
-                rb->fdprintf(fd,"%s\n",getfilename(i));
+                fdprintf(fd,"%s\n",getfilename(i));
             }
-        rb->close(fd);
+        close(fd);
     }
-    rb->snprintf(buf,250,"Hits: %d",hits);
-    rb->splash(HZ*3,buf);
+    snprintf(buf,250,"Hits: %d",hits);
+    splash(HZ*3,buf);
     if (result!=0) {
         /* Return PLUGIN_USB_CONNECTED to force a file-tree refresh */
         return PLUGIN_USB_CONNECTED;

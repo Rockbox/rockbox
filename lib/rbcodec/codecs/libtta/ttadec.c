@@ -81,12 +81,12 @@ static unsigned char *bitpos    IBSS_ATTR;
 static size_t tta_fread(void *ptr, size_t size, size_t nobj)
 {
     size_t read_size;
-    unsigned char *buffer = ci->request_buffer(&read_size, size * nobj);
+    unsigned char *buffer = codec_request_buffer(&read_size, size * nobj);
 
     if (read_size > 0)
     {
-        ci->memcpy(ptr, buffer, read_size);
-        ci->advance_buffer(read_size);
+        memcpy(ptr, buffer, read_size);
+        codec_advance_buffer(read_size);
     }
     return read_size;
 }
@@ -96,13 +96,13 @@ static int tta_fseek(long offset, int origin)
     switch (origin)
     {
         case SEEK_CUR:
-            ci->advance_buffer(offset);
+            codec_advance_buffer(offset);
             break;
         case SEEK_SET:
-            ci->seek_buffer(offset);
+            codec_seek_buffer(offset);
             break;
         case SEEK_END:
-            ci->seek_buffer(offset + ci->id3->filesize);
+            codec_seek_buffer(offset + ci.id3->filesize);
             break;
         default:
             return -1;
@@ -207,13 +207,13 @@ static int done_buffer_read(void) {
     rbytes = iso_buffers_end - bitpos;
 
     if (rbytes < sizeof(int)) {
-        ci->memcpy(isobuffers, bitpos, 4);
+        memcpy(isobuffers, bitpos, 4);
         if (!tta_fread(isobuffers + rbytes, 1, ISO_BUFFERS_SIZE - rbytes))
             return -1;
         bitpos = isobuffers;
     }
 
-    ci->memcpy(&crc32, bitpos, 4);
+    memcpy(&crc32, bitpos, 4);
     crc32 = ENDSWAP_INT32(crc32);
     bitpos += sizeof(int);
     
@@ -248,10 +248,10 @@ int set_tta_info (tta_info *info)
     tta_hdr ttahdr;
 
     /* clear the memory */
-    ci->memset (info, 0, sizeof(tta_info));
+    memset (info, 0, sizeof(tta_info));
 
     /* skip id3v2 tags */
-    tta_fseek(ci->id3->id3v2len, SEEK_SET);
+    tta_fseek(ci.id3->id3v2len, SEEK_SET);
 
     /* read TTA header */
     if (tta_fread (&ttahdr, 1, sizeof (ttahdr)) == 0) {
@@ -309,8 +309,8 @@ int set_tta_info (tta_info *info)
     info->DATALENGTH = ttahdr.DataLength;
     info->FRAMELEN = (int) MULTIPLY_FRAME_TIME(ttahdr.SampleRate);
     info->LENGTH = ttahdr.DataLength / ttahdr.SampleRate;
-    info->DATAPOS = ci->id3->id3v2len;
-    info->FILESIZE = ci->id3->filesize;
+    info->DATAPOS = ci.id3->id3v2len;
+    info->FILESIZE = ci.id3->filesize;
 
     datasize = info->FILESIZE - info->DATAPOS;
     origsize = info->DATALENGTH * info->BSIZE * info->NCH;
@@ -542,7 +542,7 @@ int get_samples (int32_t *buffer) {
         if (abs(value) > maxvalue) {
             unsigned int tail =
                 pcm_buffer_size / (ttainfo->BSIZE * ttainfo->NCH) - res;
-            ci->memset(buffer, 0, pcm_buffer_size * sizeof(int32_t));
+            memset(buffer, 0, pcm_buffer_size * sizeof(int32_t));
             data_cur += tail; res += tail;
             break;
         }

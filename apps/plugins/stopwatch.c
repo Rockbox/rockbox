@@ -327,7 +327,7 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
     cs = ticks;
     if (!lap)
     {
-        rb->snprintf(buf, buflen,
+        snprintf(buf, buflen,
                      "%2d:%02d:%02d.%02d",
                      hours, minutes, seconds, cs);
     }
@@ -346,14 +346,14 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
             last_ticks -= (HZ * last_seconds);
             last_cs = last_ticks;
 
-            rb->snprintf(buf, buflen,
+            snprintf(buf, buflen,
                          "%2d %2d:%02d:%02d.%02d [%2d:%02d:%02d.%02d]",
                          lap, hours, minutes, seconds, cs, last_hours,
                          last_minutes, last_seconds, last_cs);
         }
         else
         {
-            rb->snprintf(buf, buflen,
+            snprintf(buf, buflen,
                          "%2d %2d:%02d:%02d.%02d",
                          lap, hours, minutes, seconds, cs);
         }
@@ -367,7 +367,7 @@ static void load_stopwatch(void)
 {
     int fd;
     
-    fd = rb->open(STOPWATCH_FILE, O_RDONLY);
+    fd = open(STOPWATCH_FILE, O_RDONLY);
     
     if (fd < 0)
     {
@@ -378,15 +378,15 @@ static void load_stopwatch(void)
      * temporarily in main loop
      */
     
-    rb->read(fd, &start_at, sizeof(start_at));
-    rb->read(fd, &prev_total, sizeof(prev_total));
-    rb->read(fd, &counting, sizeof(counting));
-    rb->read(fd, &curr_lap, sizeof(curr_lap));
-    rb->read(fd, &lap_scroll, sizeof(lap_scroll));
-    rb->read(fd, &lap_start, sizeof(lap_start));
-    rb->read(fd, lap_times, sizeof(lap_times));
+    read(fd, &start_at, sizeof(start_at));
+    read(fd, &prev_total, sizeof(prev_total));
+    read(fd, &counting, sizeof(counting));
+    read(fd, &curr_lap, sizeof(curr_lap));
+    read(fd, &lap_scroll, sizeof(lap_scroll));
+    read(fd, &lap_start, sizeof(lap_start));
+    read(fd, lap_times, sizeof(lap_times));
     
-    if (counting && start_at > *rb->current_tick)
+    if (counting && start_at > current_tick)
     {
         /* Stopwatch started in the future? Unlikely; probably started on a
          * previous session and powered off in-between.  We'll keep
@@ -397,7 +397,7 @@ static void load_stopwatch(void)
         counting = false;
     }
     
-    rb->close(fd);
+    close(fd);
 }
 
 /* 
@@ -407,7 +407,7 @@ static void save_stopwatch(void)
 {
     int fd;
     
-    fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC, 0666);
+    fd = open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC, 0666);
     
     if (fd < 0)
     {
@@ -418,15 +418,15 @@ static void save_stopwatch(void)
      * temporarily in main loop
      */
     
-    rb->write(fd, &start_at, sizeof(start_at));
-    rb->write(fd, &prev_total, sizeof(prev_total));
-    rb->write(fd, &counting, sizeof(counting));
-    rb->write(fd, &curr_lap, sizeof(curr_lap));
-    rb->write(fd, &lap_scroll, sizeof(lap_scroll));
-    rb->write(fd, &lap_start, sizeof(lap_start));
-    rb->write(fd, lap_times, sizeof(lap_times));
+    write(fd, &start_at, sizeof(start_at));
+    write(fd, &prev_total, sizeof(prev_total));
+    write(fd, &counting, sizeof(counting));
+    write(fd, &curr_lap, sizeof(curr_lap));
+    write(fd, &lap_scroll, sizeof(lap_scroll));
+    write(fd, &lap_start, sizeof(lap_start));
+    write(fd, lap_times, sizeof(lap_times));
     
-    rb->close(fd);
+    close(fd);
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -442,8 +442,8 @@ enum plugin_status plugin_start(const void* parameter)
 
 #ifdef HAVE_LCD_BITMAP
     int h;
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("M", NULL, &h);
+    lcd_setfont(FONT_UI);
+    lcd_getstringsize("M", NULL, &h);
     lines = (LCD_HEIGHT / h) - (LAP_Y);
 #else
     lines = 1;
@@ -451,13 +451,13 @@ enum plugin_status plugin_start(const void* parameter)
 
     load_stopwatch();
     
-    rb->lcd_clear_display();
+    lcd_clear_display();
     
     while (!done)
     {
         if (counting)
         {
-            stopwatch = prev_total + *rb->current_tick - start_at;
+            stopwatch = prev_total + current_tick - start_at;
         }
         else
         {
@@ -465,7 +465,7 @@ enum plugin_status plugin_start(const void* parameter)
         }
 
         ticks_to_string(stopwatch,0,32,buf);
-        rb->lcd_puts(0, TIMER_Y, buf);
+        lcd_puts(0, TIMER_Y, buf);
 
         if(update_lap)
         {
@@ -475,30 +475,30 @@ enum plugin_status plugin_start(const void* parameter)
                 if (lap > 0)
                 {
                     ticks_to_string(lap_times[(lap-1)%MAX_LAPS],lap,32,buf);
-                    rb->lcd_puts_scroll(0, LAP_Y + lap_start - lap, buf);
+                    lcd_puts_scroll(0, LAP_Y + lap_start - lap, buf);
                 }
                 else
                 {
-                    rb->lcd_puts(0, LAP_Y + lap_start - lap,
+                    lcd_puts(0, LAP_Y + lap_start - lap,
                                  "                  ");
                 }
             }
             update_lap = false;
         }
 
-        rb->lcd_update();
+        lcd_update();
 
         if (! counting)
         {
-            button = rb->button_get(true);
+            button = button_get(true);
         }
         else
         {
-            button = rb->button_get_w_tmo(10);
+            button = button_get_w_tmo(10);
 
             /* Make sure that the jukebox isn't powered off
                automatically */
-            rb->reset_poweroff_timer();
+            reset_poweroff_timer();
         }
         switch (button)
         {
@@ -517,12 +517,12 @@ enum plugin_status plugin_start(const void* parameter)
                  counting = ! counting;
                  if (counting)
                  {
-                     start_at = *rb->current_tick;
-                     stopwatch = prev_total + *rb->current_tick - start_at;
+                     start_at = current_tick;
+                     stopwatch = prev_total + current_tick - start_at;
                  }
                  else
                  {
-                     prev_total += *rb->current_tick - start_at;
+                     prev_total += current_tick - start_at;
                      stopwatch = prev_total;
                  }
                  break;
@@ -549,8 +549,8 @@ enum plugin_status plugin_start(const void* parameter)
                  else
                  {
                      counting = ! counting;
-                     start_at = *rb->current_tick;
-                     stopwatch = prev_total + *rb->current_tick - start_at;
+                     start_at = current_tick;
+                     stopwatch = prev_total + current_tick - start_at;
                  }
                  break;
 
@@ -574,7 +574,7 @@ enum plugin_status plugin_start(const void* parameter)
                  break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }

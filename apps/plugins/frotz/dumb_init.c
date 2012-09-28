@@ -53,7 +53,7 @@ int os_random_seed (void)
 {
   if (user_random_seed == -1)
     /* Use the rockbox tick as seed value */
-    return ((int)*rb->current_tick) & 0x7fff;
+    return ((int)current_tick) & 0x7fff;
   else return user_random_seed;
 }
 
@@ -61,7 +61,7 @@ void os_restart_game (int stage) { (void)stage; }
 
 void os_fatal (const char *s)
 {
-  rb->splash(HZ*10, s);
+  splash(HZ*10, s);
   exit(1);
 }
 

@@ -3236,11 +3236,11 @@ static const struct riff_header header_template =
 void i2c_random_write(int addr, int cmd, const unsigned char* data, int size)
 {
     plug_buf[0] = cmd;
-    rb->memcpy(plug_buf+1, data, size);
+    memcpy(plug_buf+1, data, size);
 
-    rb->i2c_begin();
-    rb->i2c_write(addr, plug_buf, size+1);
-    rb->i2c_end();
+    i2c_begin();
+    i2c_write(addr, plug_buf, size+1);
+    i2c_end();
 }
 
 void mas_freeze(void)
@@ -3252,14 +3252,14 @@ void mas_freeze(void)
     /* mas_run(0); in core implementation */
 
     /* stop all internal transfers */
-    rb->mas_writereg(0x3b, 0x00318); /* stopdma 1 */
-    rb->mas_writereg(0x43, 0x00300); /* stopdma 2 */
-    rb->mas_writereg(0x4b, 0);       /* stopdma 3 */
-    rb->mas_writereg(0x53, 0x00318); /* stopdma 4 */
-    rb->mas_writereg(0x6b, 0);       /* stopdma 5 */
-    rb->mas_writereg(0xbb, 0x00318); /* stopdma 6 */
-    rb->mas_writereg(0xc3, 0x00300); /* stopdma 7 */
-    rb->mas_writereg(0x06, 0);       /* stopdma 8 */
+    mas_writereg(0x3b, 0x00318); /* stopdma 1 */
+    mas_writereg(0x43, 0x00300); /* stopdma 2 */
+    mas_writereg(0x4b, 0);       /* stopdma 3 */
+    mas_writereg(0x53, 0x00318); /* stopdma 4 */
+    mas_writereg(0x6b, 0);       /* stopdma 5 */
+    mas_writereg(0xbb, 0x00318); /* stopdma 6 */
+    mas_writereg(0xc3, 0x00300); /* stopdma 7 */
+    mas_writereg(0x06, 0);       /* stopdma 8 */
 }
 
 void mas_download_pcm(void)
@@ -3273,7 +3273,7 @@ void mas_download_pcm(void)
     for ( i = 0; i < (sizeof(maspcm)/sizeof(struct i2c_block)); i++ )
         i2c_random_write(MAS_ADR, MAS_DATA_WRITE, maspcm[i].data, maspcm[i].len);
 
-    rb->mas_writereg(0x6b, 0xc0000);  /* Reconfigure data to program memory */
+    mas_writereg(0x6b, 0xc0000);  /* Reconfigure data to program memory */
 
     /* Start execution at D0:1000 */
     i2c_random_write(MAS_ADR, MAS_DATA_WRITE, runi2s, sizeof(runi2s));
@@ -3288,15 +3288,15 @@ void mas_restore(void)
     
     i2c_random_write(MAS_ADR, MAS_CONTROL, resetdsp, sizeof(resetdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8d00); in core implementation */
-    rb->sleep(1);
+    sleep(1);
     i2c_random_write(MAS_ADR, MAS_CONTROL, initdsp, sizeof(initdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8c00); in core implementation */
     
     /* Stop the current application */
     val = 0;
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
-        rb->mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     while(val);
 
 #ifdef HAVE_SPDIF_OUT
@@ -3304,15 +3304,15 @@ void mas_restore(void)
 #else
     val = 0x002d; /* Disable SDO and SDI, disable S/PDIF output */
 #endif
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_INTERFACE_CONTROL, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_INTERFACE_CONTROL, &val, 1);
 
     val = 0x0025; /* Set Demand mode and validate all settings */
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val, 1);
 
     val = 0x000c; /* Start the Layer2/3 decoder applications */
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
-        rb->mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     while((val & 0x000c) != 0x000c);
 }
 
@@ -3452,11 +3452,11 @@ static bool update_wav_header(char *filename, int sample_rate,
     int fd;
     bool ret;
     
-    fd = rb->open(filename, O_RDWR);
+    fd = open(filename, O_RDWR);
     if (fd < 0)
         return false;
         
-    rb->memcpy(&hdr, &header_template, sizeof (struct riff_header));
+    memcpy(&hdr, &header_template, sizeof (struct riff_header));
 
     /* "RIFF" header */
     hdr.riff_size    = htole32(RIFF_FMT_HEADER_SIZE + RIFF_FMT_DATA_SIZE
@@ -3471,9 +3471,9 @@ static bool update_wav_header(char *filename, int sample_rate,
     /* data header */
     hdr.data_size    = htole32(num_bytes);
 
-    ret = (rb->write(fd, &hdr, sizeof (struct riff_header)) 
+    ret = (write(fd, &hdr, sizeof (struct riff_header)) 
            == sizeof (struct riff_header));
-    rb->close(fd);
+    close(fd);
     return ret;
 }
 
@@ -3491,72 +3491,72 @@ static int record_file(char *filename)
         {8, 32000}, {9, 44100}, {10, 48000}
     };
 
-    fd = rb->open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
+    fd = open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
     if (fd < 0)
     {
-        rb->splash(2*HZ, "Couldn't create WAV file");
+        splash(2*HZ, "Couldn't create WAV file");
         return PLUGIN_ERROR;
     }
     /* write template header */
-    if (rb->write(fd, &header_template, sizeof (struct riff_header)) 
+    if (write(fd, &header_template, sizeof (struct riff_header)) 
         != sizeof (struct riff_header))
     {
-        rb->close(fd);
-        rb->splash(2*HZ, "Write error");
+        close(fd);
+        splash(2*HZ, "Write error");
         return PLUGIN_ERROR;
     }
 
-    rb->sound_set_pitch(PITCH_SPEED_100);  /* reset pitch */
+    sound_set_pitch(PITCH_SPEED_100);  /* reset pitch */
     mas_download_pcm();
     num_rec_bytes = 0;
     bytes_written = 0;
     
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, filename);
+    lcd_clear_display();
+    lcd_puts(0, 0, filename);
 
     switch (reccfg.source)
     {
         case WAV_SRC_LINE:
-            rb->mas_codec_writereg(0, (rb->global_settings->rec_left_gain << 12)
-                                    | (rb->global_settings->rec_right_gain << 8)
+            mas_codec_writereg(0, (global_settings.rec_left_gain << 12)
+                                    | (global_settings.rec_right_gain << 8)
                                     | 0x07);
-            rb->mas_codec_writereg(8, 0);
+            mas_codec_writereg(8, 0);
             break;
 
         case WAV_SRC_MIC:
-            rb->mas_codec_writereg(0, (rb->global_settings->rec_mic_gain << 4)
+            mas_codec_writereg(0, (global_settings.rec_mic_gain << 4)
                                     | 0x0d);
-            rb->mas_codec_writereg(8, 0x8000); /* Copy left channel to right */
+            mas_codec_writereg(8, 0x8000); /* Copy left channel to right */
             break;
 
 #ifdef HAVE_SPDIF_REC
         case WAV_SRC_SPDIF:
-            rb->mas_codec_writereg(0, 0x01);
+            mas_codec_writereg(0, 0x01);
             break;
 #endif
     }
 
 #ifdef HAVE_SPDIF_REC
     if (reccfg.source == WAV_SRC_SPDIF)
-        rb->lcd_putsf(0, 1, "16bit %s", channel_str[reccfg.channels]);
+        lcd_putsf(0, 1, "16bit %s", channel_str[reccfg.channels]);
     else
 #endif
-        rb->lcd_putsf(0, 1, "%sHz 16bit %s",
+        lcd_putsf(0, 1, "%sHz 16bit %s",
              samplerate_str[reccfg.samplerate], channel_str[reccfg.channels]);
 
-    rb->lcd_update();
+    lcd_update();
     
     mas = 0x0060                /* no framing, little endian */
         | ((reccfg.channels == 0) ? 0x10 : 0) /* mono/stereo */
         | sampr[reccfg.samplerate][0];
-    rb->mas_writemem(MAS_BANK_D0, PCM_SAMPLE_RATE, &mas, 1);
+    mas_writemem(MAS_BANK_D0, PCM_SAMPLE_RATE, &mas, 1);
 
 #ifdef HAVE_SPDIF_OUT
     mas = 0x0009;   /* Disable SDO and SDI, low impedance S/PDIF outputs */
 #else
     mas = 0x002d;   /* Disable SDO and SDI, disable S/PDIF output */
 #endif
-    rb->mas_writemem(MAS_BANK_D0, PCM_IF_STATUS_CONTROL, &mas, 1);
+    mas_writemem(MAS_BANK_D0, PCM_IF_STATUS_CONTROL, &mas, 1);
 
 #ifdef HAVE_SPDIF_IN
     if (reccfg.source == AUDIO_SRC_SPDIF)
@@ -3564,11 +3564,11 @@ static int record_file(char *filename)
     else
 #endif
         mas = 0x2125;   /* recording, ADC input, validate */
-    rb->mas_writemem(MAS_BANK_D0, PCM_MAIN_IO_CONTROL, &mas, 1);
+    mas_writemem(MAS_BANK_D0, PCM_MAIN_IO_CONTROL, &mas, 1);
     
     mas = 0x80001; /* avoid distortion (overflow on full-range input samples) */
-    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_IN_LL, &mas, 1); /* LL */
-    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_IN_RR, &mas, 1); /* RR */
+    mas_writemem(MAS_BANK_D0, PCM_VOL_IN_LL, &mas, 1); /* LL */
+    mas_writemem(MAS_BANK_D0, PCM_VOL_IN_RR, &mas, 1); /* RR */
 
     hijack_interrupts(true);
     rec_tick_enable(true);
@@ -3590,9 +3590,9 @@ static int record_file(char *filename)
             {
                 rec_tick_enable(false);
 #if (CONFIG_STORAGE & STORAGE_MMC)
-                rb->splash(HZ, "Data overrun (slow MMC)");
+                splash(HZ, "Data overrun (slow MMC)");
 #else
-                rb->splash(HZ, "Data overrun");
+                splash(HZ, "Data overrun");
 #endif
                 recording = false;
                 saving = false;
@@ -3604,11 +3604,11 @@ static int record_file(char *filename)
 #else
             write_now = MIN(write_now, 1024*1024);
 #endif
-            result = rb->write(fd, aud_buf + aud_read, write_now);
+            result = write(fd, aud_buf + aud_read, write_now);
             if (result < 0)
             {
                 rec_tick_enable(false);
-                rb->splash(HZ, "Write error");
+                splash(HZ, "Write error");
                 recording = false;
                 saving = false;
                 break;
@@ -3617,7 +3617,7 @@ static int record_file(char *filename)
             if (result != write_now)
             {
                 rec_tick_enable(false);
-                rb->splash(HZ, "Disk full");
+                splash(HZ, "Disk full");
                 recording = false;
                 saving = false;
                 break;
@@ -3625,7 +3625,7 @@ static int record_file(char *filename)
             if (bytes_written >= 0x7fe00000)
             {
                 rec_tick_enable(false);
-                rb->splash(HZ, "Max file size reached");
+                splash(HZ, "Max file size reached");
                 recording = false;
                 saving = false;
                 break;
@@ -3637,12 +3637,12 @@ static int record_file(char *filename)
             if (to_save == write_now)
                 saving = false;
 
-            rb->yield();
-            button = rb->button_get(false);
+            yield();
+            button = button_get(false);
         }
         else
         {
-            button = rb->button_get_w_tmo(HZ/2);
+            button = button_get_w_tmo(HZ/2);
             if (aud_size - (num_rec_bytes - bytes_written) < low_water)
                 saving = true;
         }
@@ -3652,17 +3652,17 @@ static int record_file(char *filename)
             recording = false;
             saving = true;
         }
-        rb->lcd_putsf(0, 2, "Bytes: %d", num_rec_bytes);
-        rb->lcd_update();
+        lcd_putsf(0, 2, "Bytes: %d", num_rec_bytes);
+        lcd_update();
     }
     /* read sample rate from MAS */
-    rb->mas_readmem(MAS_BANK_D0, PCM_SAMPLE_RATE_STATUS, &mas, 1);
-    rb->close(fd);
+    mas_readmem(MAS_BANK_D0, PCM_SAMPLE_RATE_STATUS, &mas, 1);
+    close(fd);
 
     hijack_interrupts(false);
     mas_restore();
-    rb->sound_set(SOUND_CHANNELS, rb->global_settings->channel_config);
-    rb->sound_set(SOUND_STEREO_WIDTH, rb->global_settings->stereo_width);
+    sound_set(SOUND_CHANNELS, global_settings.channel_config);
+    sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
 
     for (i = 0; i < 9; i++)
     {
@@ -3672,7 +3672,7 @@ static int record_file(char *filename)
     if (!(update_wav_header(filename, sampr[i][1],
                             (reccfg.channels + 1), bytes_written)))
     {
-        rb->splash(HZ, "Updating WAV header failed");
+        splash(HZ, "Updating WAV header failed");
     }
 
     return PLUGIN_OK;
@@ -3712,23 +3712,23 @@ static int recording_menu(void)
 
     while (!done)
     {
-        switch (rb->do_menu(&menu, &menupos, NULL, false))
+        switch (do_menu(&menu, &menupos, NULL, false))
         {
             case 0: /* Set sample rate */
-                rb->set_option("Sample rate", &reccfg.samplerate, INT, freqs, 9, NULL);
+                set_option("Sample rate", &reccfg.samplerate, INT, freqs, 9, NULL);
                 break;
 
             case 1: /* Set channels */
-                rb->set_option("Channels", &reccfg.channels, INT, chans, 2, NULL);
+                set_option("Channels", &reccfg.channels, INT, chans, 2, NULL);
                 break;
 
             case 2: /* Set source */
-                rb->set_option("Source", &reccfg.source, INT, srcs, WAV_NUM_SRC, NULL);
+                set_option("Source", &reccfg.source, INT, srcs, WAV_NUM_SRC, NULL);
                 break;
 
             case 3: /* Start recording */
-                rb->create_numbered_filename(recfilename, 
-                                             rb->global_settings->rec_directory,
+                create_numbered_filename(recfilename, 
+                                             global_settings.rec_directory,
                                              "rec_", ".wav", 4
                                              IF_CNFN_NUM_(, NULL));
                 rc = record_file(recfilename);
@@ -3759,26 +3759,26 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)parameter;
     
-    plug_buf = rb->plugin_get_buffer(&buf_size);
+    plug_buf = plugin_get_buffer(&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
     {
-        rb->splash(HZ, "Out of memory.");
+        splash(HZ, "Out of memory.");
         return PLUGIN_ERROR;
     }
     
-    recbasedir = rb->global_settings->rec_directory;
-    if (rb->strcmp(recbasedir, "/") && !rb->dir_exists(recbasedir))
+    recbasedir = global_settings.rec_directory;
+    if (strcmp(recbasedir, "/") && !dir_exists(recbasedir))
     {
-        rc = rb->mkdir(recbasedir);
+        rc = mkdir(recbasedir);
         if (rc < 0)
         {
-            rb->splashf(HZ*2, "Can't create directory %s. Error %d.",
+            splashf(HZ*2, "Can't create directory %s. Error %d.",
                        recbasedir, rc);
             return PLUGIN_ERROR;
         }
     }
 
-    aud_buf = rb->plugin_get_audio_buffer(&buf_size);
+    aud_buf = plugin_get_audio_buffer(&buf_size);
     aud_size = buf_size;
     align = (-(long)aud_buf) & 3;
     aud_buf += align;
@@ -3788,13 +3788,13 @@ enum plugin_status plugin_start(const void* parameter)
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);
-    rb->memcpy(&reccfg, &reccfg_disk, sizeof(reccfg));   /* copy to running config */
+    memcpy(&reccfg, &reccfg_disk, sizeof(reccfg));   /* copy to running config */
 
     rc = recording_menu();
 
-    if (rb->memcmp(&reccfg, &reccfg_disk, sizeof(reccfg))) /* save settings if changed */
+    if (memcmp(&reccfg, &reccfg_disk, sizeof(reccfg))) /* save settings if changed */
     {
-        rb->memcpy(&reccfg_disk, &reccfg, sizeof(reccfg));
+        memcpy(&reccfg_disk, &reccfg, sizeof(reccfg));
         configfile_save(cfg_filename, disk_config,
                         sizeof(disk_config) / sizeof(disk_config[0]),
                         CFGFILE_VERSION);

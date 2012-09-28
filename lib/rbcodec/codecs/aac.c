@@ -37,8 +37,8 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 29);
     }
 
     return CODEC_OK;
@@ -82,14 +82,14 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    file_offset = ci->id3->offset;
+    file_offset = ci.id3->offset;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-    codec_set_replaygain(ci->id3);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
+    codec_set_replaygain(ci.id3);
 
-    stream_create(&input_stream,ci);
+    stream_create(&input_stream,&ci);
 
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    codec_seek_buffer(ci.id3->first_frame_offset);
 
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
@@ -118,7 +118,7 @@ enum codec_status codec_run(void)
 
 #ifdef SBR_DEC
     /* Check for need of special handling for seek/resume and elapsed time. */
-    if (ci->id3->needs_upsampling_correction) {
+    if (ci.id3->needs_upsampling_correction) {
         sbr_fac = 2;
     } else {
         sbr_fac = 1;
@@ -142,17 +142,17 @@ enum codec_status codec_run(void)
         sound_samples_done = 0;
     }
 
-    elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
-    ci->set_elapsed(elapsed_time);
+    elapsed_time = (sound_samples_done * 10) / (ci.id3->frequency / 100);
+    audio_codec_update_elapsed(elapsed_time);
     
     if (i == 0) 
     {
-        lead_trim = ci->id3->lead_trim;
+        lead_trim = ci.id3->lead_trim;
     }
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -164,20 +164,20 @@ enum codec_status codec_run(void)
              * m4a_seek and the resulting sound_samples_done must be expanded 
              * by a factor 2. This is done via using sbr_fac. */
             if (m4a_seek(&demux_res, &input_stream,
-                          (param/10/sbr_fac)*(ci->id3->frequency/100),
+                          (param/10/sbr_fac)*(ci.id3->frequency/100),
                           &sound_samples_done, (int*) &i)) {
                 sound_samples_done *= sbr_fac;
-                elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
-                ci->set_elapsed(elapsed_time);
+                elapsed_time = (sound_samples_done * 10) / (ci.id3->frequency / 100);
+                audio_codec_update_elapsed(elapsed_time);
                 seek_idx = 0;
 
                 if (i == 0) 
                 {
-                    lead_trim = ci->id3->lead_trim;
+                    lead_trim = ci.id3->lead_trim;
                 }
             }
             NeAACDecPostSeekReset(decoder, i);
-            ci->seek_complete();
+            codec_seek_complete();
         }
 
         /* There can be gaps between chunks, so skip ahead if needed. It
@@ -188,9 +188,9 @@ enum codec_status codec_run(void)
          */
         file_offset = m4a_check_sample_offset(&demux_res, i, &seek_idx);
 
-        if (file_offset > ci->curpos)
+        if (file_offset > ci.curpos)
         {
-            ci->advance_buffer(file_offset - ci->curpos);
+            codec_advance_buffer(file_offset - ci.curpos);
         }
         else if (file_offset == 0)
         {
@@ -199,7 +199,7 @@ enum codec_status codec_run(void)
         }
         
         /* Request the required number of bytes from the input buffer */
-        buffer=ci->request_buffer(&n, FAAD_BYTE_BUFFER_SIZE);
+        buffer=codec_request_buffer(&n, FAAD_BYTE_BUFFER_SIZE);
 
         /* Decode one block - returned samples will be host-endian */
         ret = NeAACDecDecode(decoder, &frame_info, buffer, n);
@@ -210,11 +210,11 @@ enum codec_status codec_run(void)
             return CODEC_ERROR;
         }
 
-        /* Advance codec buffer (no need to call set_offset because of this) */
-        ci->advance_buffer(frame_info.bytesconsumed);
+        /* Advance codec buffer (no need to call audio_codec_update_offset because of this) */
+        codec_advance_buffer(frame_info.bytesconsumed);
 
         /* Output the audio */
-        ci->yield();
+        yield();
         
         frame_samples = frame_info.samples >> 1;
 
@@ -245,7 +245,7 @@ enum codec_status codec_run(void)
             /* Currently limited to at most one frame of tail_trim.
              * Seems to be enough.
              */
-            if (ci->id3->tail_trim == 0 && sample_duration < frame_samples)
+            if (ci.id3->tail_trim == 0 && sample_duration < frame_samples)
             {
                 /* Subtract lead_trim just in case we decode a file with only
                  * one audio frame with actual data (lead_trim is usually zero
@@ -255,20 +255,20 @@ enum codec_status codec_run(void)
             }
             else
             {
-                framelength -= ci->id3->tail_trim;
+                framelength -= ci.id3->tail_trim;
             }
         }
 
         if (framelength > 0)
         {
-            ci->pcmbuf_insert(&decoder->time_out[0][lead_trim],
+            codec_pcmbuf_insert(&decoder->time_out[0][lead_trim],
                               &decoder->time_out[1][lead_trim],
                               framelength);
             sound_samples_done += framelength;
             /* Update the elapsed-time indicator */
             elapsed_time = ((uint64_t) sound_samples_done * 1000) /
-                ci->id3->frequency;
-            ci->set_elapsed(elapsed_time);
+                ci.id3->frequency;
+            audio_codec_update_elapsed(elapsed_time);
         }
 
         if (lead_trim > 0)

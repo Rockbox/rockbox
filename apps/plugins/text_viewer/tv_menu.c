@@ -37,7 +37,7 @@ static struct tv_preferences new_prefs;
 #ifdef HAVE_LCD_BITMAP
 static bool tv_horizontal_scrollbar_setting(void)
 {
-   return rb->set_bool("Horizontal Scrollbar", &new_prefs.horizontal_scrollbar);
+   return set_bool("Horizontal Scrollbar", &new_prefs.horizontal_scrollbar);
 }
 #endif
 
@@ -48,7 +48,7 @@ static bool tv_horizontal_scroll_mode_setting(void)
         {"Scroll by Column", -1},
     };
 
-    return rb->set_option("Scroll Mode", &new_prefs.horizontal_scroll_mode, INT,
+    return set_option("Scroll Mode", &new_prefs.horizontal_scroll_mode, INT,
                           names, 2, NULL);
 }
 
@@ -73,7 +73,7 @@ MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
 static bool tv_vertical_scrollbar_setting(void)
 {
-    return rb->set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar);
+    return set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar);
 }
 #endif
 
@@ -84,18 +84,18 @@ static bool tv_vertical_scroll_mode_setting(void)
         {"Scroll by Line", -1},
     };
 
-    return rb->set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, INT,
+    return set_option("Scroll Mode", &new_prefs.vertical_scroll_mode, INT,
                           names, 2, NULL);
 }
 
 static bool tv_overlap_page_mode_setting(void)
 {
-    return rb->set_bool("Overlap Pages", &new_prefs.overlap_page_mode);
+    return set_bool("Overlap Pages", &new_prefs.overlap_page_mode);
 }
 
 static bool tv_autoscroll_speed_setting(void)
 {
-    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, 
+    return set_int("Auto-scroll Speed", "", UNIT_INT, 
                        &new_prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
 }
 
@@ -106,7 +106,7 @@ static bool tv_narrow_mode_setting(void)
         {"Top/Bottom Page",    -1},
     };
 
-    return rb->set_option("Left/Right Key", &new_prefs.narrow_mode, INT,
+    return set_option("Left/Right Key", &new_prefs.narrow_mode, INT,
                           names, 2, NULL);
 }
 
@@ -149,11 +149,11 @@ static bool tv_encoding_setting(void)
 
     for (idx = 0; idx < NUM_CODEPAGES; idx++)
     {
-        names[idx].string = rb->get_codepage_name(idx);
+        names[idx].string = get_codepage_name(idx);
         names[idx].voice_id = -1;
     }
 
-    return rb->set_option("Encoding", &new_prefs.encoding, INT, names,
+    return set_option("Encoding", &new_prefs.encoding, INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 
@@ -164,7 +164,7 @@ static bool tv_word_wrap_setting(void)
         {"Off (Chop Words)", -1},
     };
 
-    return rb->set_option("Word Wrap", &new_prefs.word_mode, INT,
+    return set_option("Word Wrap", &new_prefs.word_mode, INT,
                           names, 2, NULL);
 }
 
@@ -177,13 +177,13 @@ static bool tv_line_mode_setting(void)
         {"Reflow Lines", -1},
     };
 
-    return rb->set_option("Line Mode", &new_prefs.line_mode, INT, names,
+    return set_option("Line Mode", &new_prefs.line_mode, INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 
 static bool tv_windows_setting(void)
 {
-    return rb->set_int("Screens Per Page", "", UNIT_INT, 
+    return set_int("Screens Per Page", "", UNIT_INT, 
                        &new_prefs.windows, NULL, 1, 1, 5, NULL);
 }
 
@@ -194,24 +194,24 @@ static bool tv_alignment_setting(void)
         {"Right", -1},
     };
 
-    return rb->set_option("Alignment", &new_prefs.alignment, INT,
+    return set_option("Alignment", &new_prefs.alignment, INT,
                            names , 2, NULL);
 }
 
 #ifdef HAVE_LCD_BITMAP
 static bool tv_header_setting(void)
 {
-    return rb->set_bool("Show Header", &new_prefs.header_mode);
+    return set_bool("Show Header", &new_prefs.header_mode);
 }
 
 static bool tv_footer_setting(void)
 {
-    return rb->set_bool("Show Footer", &new_prefs.footer_mode);
+    return set_bool("Show Footer", &new_prefs.footer_mode);
 }
 
 static bool tv_statusbar_setting(void)
 {
-    return rb->set_bool("Show Statusbar", &new_prefs.statusbar);
+    return set_bool("Show Statusbar", &new_prefs.statusbar);
 }
 
 static bool tv_font_setting(void)
@@ -219,22 +219,22 @@ static bool tv_font_setting(void)
     struct browse_context browse;
     char font[MAX_PATH], name[MAX_FILENAME+10];
 
-    rb->snprintf(name, sizeof(name), "%s.fnt", new_prefs.font_name);
-    rb->browse_context_init(&browse, SHOW_FONT,
+    snprintf(name, sizeof(name), "%s.fnt", new_prefs.font_name);
+    browse_context_init(&browse, SHOW_FONT,
                             BROWSE_SELECTONLY|BROWSE_NO_CONTEXT_MENU,
                             "Font", Icon_Menu_setting, FONT_DIR, name);
 
     browse.buf = font;
     browse.bufsize = sizeof(font);
 
-    rb->rockbox_browse(&browse);
+    rockbox_browse(&browse);
 
     if (browse.flags & BROWSE_SELECTED)
     {
-        char *name = rb->strrchr(font, '/')+1;
-        char *p = rb->strrchr(name, '.');
+        char *name = strrchr(font, '/')+1;
+        char *p = strrchr(name, '.');
         if (p) *p = 0;
-        rb->strlcpy(new_prefs.font_name, name, MAX_PATH);
+        strlcpy(new_prefs.font_name, name, MAX_PATH);
     }
 
     return false;
@@ -243,7 +243,7 @@ static bool tv_font_setting(void)
 
 static bool tv_indent_spaces_setting(void)
 {
-    return rb->set_int("Indent Spaces", "", UNIT_INT, 
+    return set_int("Indent Spaces", "", UNIT_INT, 
                        &new_prefs.indent_spaces, NULL, 1, 0, 5, NULL);
 }
 
@@ -282,7 +282,7 @@ static unsigned tv_options_menu(void)
 {
     unsigned result = TV_MENU_RESULT_EXIT_MENU;
 
-    if (rb->do_menu(&option_menu, NULL, NULL, false) == MENU_ATTACHED_USB)
+    if (do_menu(&option_menu, NULL, NULL, false) == MENU_ATTACHED_USB)
         result = TV_MENU_RESULT_ATTACHED_USB;
 
     return result;
@@ -297,7 +297,7 @@ unsigned tv_display_menu(void)
                         "Show Playback Menu", "Select Bookmark",
                         "Global Settings", "Quit");
 
-    switch (rb->do_menu(&menu, NULL, NULL, false))
+    switch (do_menu(&menu, NULL, NULL, false))
     {
         case 0: /* return */
             break;

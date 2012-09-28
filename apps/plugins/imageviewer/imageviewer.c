@@ -135,15 +135,15 @@ static enum image_type image_type = IMAGE_UNKNOWN;
 /* Read directory contents for scrolling. */
 static void get_pic_list(void)
 {
-    struct tree_context *tree = rb->tree_get_context();
-    struct entry *dircache = rb->tree_get_entries(tree);
+    struct tree_context *tree = tree_get_context();
+    struct entry *dircache = tree_get_entries(tree);
     int i;
     char *pname;
 
     file_pt = (char **) buf;
 
     /* Remove path and leave only the name.*/
-    pname = rb->strrchr(np_file,'/');
+    pname = strrchr(np_file,'/');
     pname++;
 
     for (i = 0; i < tree->filesindir && buf_size > sizeof(char**); i++)
@@ -153,7 +153,7 @@ static void get_pic_list(void)
         {
             file_pt[entries] = dircache[i].name;
             /* Set Selected File. */
-            if (!rb->strcmp(file_pt[entries], pname))
+            if (!strcmp(file_pt[entries], pname))
                 curfile = entries;
             entries++;
 
@@ -188,11 +188,11 @@ static int change_filename(int direct)
 
     if (entries == 0)
     {
-        rb->splash(HZ, "No supported files");
+        splash(HZ, "No supported files");
         return PLUGIN_ERROR;
     }
 
-    rb->strcpy(rb->strrchr(np_file, '/')+1, file_pt[curfile]);
+    strcpy(strrchr(np_file, '/')+1, file_pt[curfile]);
 
     return PLUGIN_OTHER;
 }
@@ -210,7 +210,7 @@ static void cleanup(void *parameter)
 static bool set_option_grayscale(void)
 {
     bool gray = settings.jpeg_colour_mode == COLOURMODE_GRAY;
-    rb->set_bool("Grayscale (Jpeg)", &gray);
+    set_bool("Grayscale (Jpeg)", &gray);
     settings.jpeg_colour_mode = gray ? COLOURMODE_GRAY : COLOURMODE_COLOUR;
     return false;
 }
@@ -223,7 +223,7 @@ static bool set_option_dithering(void)
         [DITHER_DIFFUSION] = { "Diffusion", -1 },
     };
 
-    rb->set_option("Dithering (Jpeg)", &settings.jpeg_dither_mode, INT,
+    set_option("Dithering (Jpeg)", &settings.jpeg_dither_mode, INT,
                    dithering, DITHER_NUM_MODES, NULL);
     return false;
 }
@@ -237,7 +237,7 @@ MAKE_MENU(display_menu, "Display Options", NULL, Icon_NOICON,
 
 static void display_options(void)
 {
-    rb->do_menu(&display_menu, NULL, NULL, false);
+    do_menu(&display_menu, NULL, NULL, false);
 }
 #endif /* HAVE_LCD_COLOR */
 
@@ -275,18 +275,18 @@ static int show_menu(void) /* return 1 to quit */
         { "Enable", -1 },
     };
 
-    result=rb->do_menu(&menu, NULL, NULL, false);
+    result=do_menu(&menu, NULL, NULL, false);
 
     switch (result)
     {
         case MIID_RETURN:
             break;
         case MIID_TOGGLE_SS_MODE:
-            rb->set_option("Toggle Slideshow", &iv_api.slideshow_enabled, BOOL,
+            set_option("Toggle Slideshow", &iv_api.slideshow_enabled, BOOL,
                            slideshow , 2, NULL);
             break;
         case MIID_CHANGE_SS_MODE:
-            rb->set_int("Slideshow Time", "s", UNIT_SEC,
+            set_int("Slideshow Time", "s", UNIT_SEC,
                         &settings.ss_timeout, NULL, 1,
                         SS_MIN_TIMEOUT, SS_MAX_TIMEOUT, NULL);
             break;
@@ -299,7 +299,7 @@ static int show_menu(void) /* return 1 to quit */
             }
             else
             {
-                rb->splash(HZ, "Cannot restart playback");
+                splash(HZ, "Cannot restart playback");
             }
             break;
 #endif
@@ -316,16 +316,16 @@ static int show_menu(void) /* return 1 to quit */
 #ifdef DISK_SPINDOWN
     /* change ata spindown time based on slideshow time setting */
     iv_api.immediate_ata_off = false;
-    rb->storage_spindown(rb->global_settings->disk_spindown);
+    storage_spindown(global_settings.disk_spindown);
 
     if (iv_api.slideshow_enabled)
     {
         if(settings.ss_timeout < 10)
         {
             /* slideshow times < 10s keep disk spinning */
-            rb->storage_spindown(0);
+            storage_spindown(0);
         }
-        else if (!rb->mp3_is_playing())
+        else if (!mp3_is_playing())
         {
             /* slideshow times > 10s and not playing: ata_off after load */
             iv_api.immediate_ata_off = true;
@@ -333,11 +333,11 @@ static int show_menu(void) /* return 1 to quit */
     }
 #endif
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
 #endif
-    rb->lcd_clear_display();
+    lcd_clear_display();
     return 0;
 }
 
@@ -348,25 +348,25 @@ static int ask_and_get_audio_buffer(const char *filename)
 #if defined(IMGVIEW_ZOOM_PRE)
     int lastbutton = BUTTON_NONE;
 #endif
-    rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
-    rb->lcd_puts(0, 1, "Not enough plugin memory!");
-    rb->lcd_puts(0, 2, "Zoom In: Stop playback.");
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+    lcd_puts(0, 0, strrchr(filename,'/')+1);
+    lcd_puts(0, 1, "Not enough plugin memory!");
+    lcd_puts(0, 2, "Zoom In: Stop playback.");
     if(entries > 1)
-        rb->lcd_puts(0, 3, "Left/Right: Skip File.");
-    rb->lcd_puts(0, 4, "Show Menu: Quit.");
-    rb->lcd_update();
-    rb->lcd_setfont(FONT_UI);
+        lcd_puts(0, 3, "Left/Right: Skip File.");
+    lcd_puts(0, 4, "Show Menu: Quit.");
+    lcd_update();
+    lcd_setfont(FONT_UI);
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (1)
     {
         if (iv_api.slideshow_enabled)
-            button = rb->button_get_w_tmo(settings.ss_timeout * HZ);
+            button = button_get_w_tmo(settings.ss_timeout * HZ);
         else
-            button = rb->button_get(true);
+            button = button_get(true);
 
         switch(button)
         {
@@ -376,7 +376,7 @@ static int ask_and_get_audio_buffer(const char *filename)
                     break;
 #endif
                 iv_api.plug_buf = false;
-                buf = rb->plugin_get_audio_buffer(&buf_size);
+                buf = plugin_get_audio_buffer(&buf_size);
                 /*try again this file, now using the audio buffer */
                 return PLUGIN_OTHER;
 #ifdef IMGVIEW_RC_MENU
@@ -391,7 +391,7 @@ static int ask_and_get_audio_buffer(const char *filename)
             case IMGVIEW_LEFT:
                 if(entries>1)
                 {
-                    rb->lcd_clear_display();
+                    lcd_clear_display();
                     return change_filename(DIR_PREV);
                 }
                 break;
@@ -399,20 +399,20 @@ static int ask_and_get_audio_buffer(const char *filename)
             case IMGVIEW_RIGHT:
                 if(entries>1)
                 {
-                    rb->lcd_clear_display();
+                    lcd_clear_display();
                     return change_filename(DIR_NEXT);
                 }
                 break;
             case BUTTON_NONE:
                 if(entries>1)
                 {
-                    rb->lcd_clear_display();
+                    lcd_clear_display();
                     return change_filename(direction);
                 }
                 break;
 
             default:
-                if(rb->default_event_handler_ex(button, cleanup, NULL)
+                if(default_event_handler_ex(button, cleanup, NULL)
                         == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
         }
@@ -427,7 +427,7 @@ static int ask_and_get_audio_buffer(const char *filename)
 /* callback updating a progress meter while image decoding */
 static void cb_progress(int current, int total)
 {
-    rb->yield(); /* be nice to the other threads */
+    yield(); /* be nice to the other threads */
 #ifndef USEGSLIB
     /* in slideshow mode, keep gui interference to a minimum */
     const int size = (!iv_api.running_slideshow ? 8 : 4);
@@ -436,10 +436,10 @@ static void cb_progress(int current, int total)
     if(!iv_api.running_slideshow)
 #endif
     {
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],
                             0, LCD_HEIGHT-size, LCD_WIDTH, size,
                             total, 0, current, HORIZONTAL);
-        rb->lcd_update_rect(0, LCD_HEIGHT-size, LCD_WIDTH, size);
+        lcd_update_rect(0, LCD_HEIGHT-size, LCD_WIDTH, size);
     }
 }
 
@@ -524,8 +524,8 @@ static void pan_view_down(struct image_info *info)
                image data that had an error history when it was drawn.
              */
             move++, info->y--;
-            rb->memcpy(rgb_linebuf,
-                    rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+            memcpy(rgb_linebuf,
+                    lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
                     LCD_WIDTH*sizeof (fb_data));
         }
 #endif
@@ -538,7 +538,7 @@ static void pan_view_down(struct image_info *info)
          && settings.jpeg_dither_mode == DITHER_DIFFUSION)
         {
             /* Cover the first row drawn with previous image data. */
-            rb->memcpy(rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+            memcpy(lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
                         rgb_linebuf, LCD_WIDTH*sizeof (fb_data));
             info->y++;
         }
@@ -558,9 +558,9 @@ static int scroll_bmp(struct image_info *info)
     while (true)
     {
         if (iv_api.slideshow_enabled)
-            button = rb->button_get_w_tmo(settings.ss_timeout * HZ);
+            button = button_get_w_tmo(settings.ss_timeout * HZ);
         else
-            button = rb->button_get(true);
+            button = button_get(true);
 
         iv_api.running_slideshow = false;
 
@@ -668,7 +668,7 @@ static int scroll_bmp(struct image_info *info)
 #endif
 
         default:
-            if (rb->default_event_handler_ex(button, cleanup, NULL)
+            if (default_event_handler_ex(button, cleanup, NULL)
                 == SYS_USB_CONNECTED)
                 return PLUGIN_USB_CONNECTED;
             break;
@@ -746,7 +746,7 @@ static int load_and_show(char* filename, struct image_info *info)
     int cx, cy;
     ssize_t remaining;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* suppress warning while running slideshow */
     status = get_image_type(filename, iv_api.running_slideshow);
@@ -775,10 +775,10 @@ static int load_and_show(char* filename, struct image_info *info)
         }
 #endif
     }
-    rb->memset(info, 0, sizeof(*info));
+    memset(info, 0, sizeof(*info));
     remaining = buf_size;
 
-    if (rb->button_get(false) == IMGVIEW_MENU)
+    if (button_get(false) == IMGVIEW_MENU)
         status = PLUGIN_ABORT;
     else
         status = imgdec->load_image(filename, info, buf, &remaining);
@@ -793,7 +793,7 @@ static int load_and_show(char* filename, struct image_info *info)
         else
 #endif
         {
-            rb->splash(HZ, "Out of Memory");
+            splash(HZ, "Out of Memory");
             file_pt[curfile] = NULL;
             return change_filename(direction);
         }
@@ -804,7 +804,7 @@ static int load_and_show(char* filename, struct image_info *info)
         return change_filename(direction);
     }
     else if (status == PLUGIN_ABORT) {
-        rb->splash(HZ, "Aborted");
+        splash(HZ, "Aborted");
         return PLUGIN_OK;
     }
 
@@ -826,7 +826,7 @@ static int load_and_show(char* filename, struct image_info *info)
         else
 #endif
         {
-            rb->splash(HZ, "Too large");
+            splash(HZ, "Too large");
             file_pt[curfile] = NULL;
             return change_filename(direction);
         }
@@ -851,8 +851,8 @@ static int load_and_show(char* filename, struct image_info *info)
 
         if(!iv_api.running_slideshow)
         {
-            rb->lcd_putsf(0, 3, "showing %dx%d", info->width, info->height);
-            rb->lcd_update();
+            lcd_putsf(0, 3, "showing %dx%d", info->width, info->height);
+            lcd_update();
         }
 
         mylcd_ub_clear_display();
@@ -905,11 +905,11 @@ static int load_and_show(char* filename, struct image_info *info)
 #ifdef USEGSLIB
         grey_show(false); /* switch off overlay */
 #endif
-        rb->lcd_clear_display();
+        lcd_clear_display();
     }
     while (status > PLUGIN_OTHER);
 #ifdef USEGSLIB
-    rb->lcd_update();
+    lcd_update();
 #endif
     return status;
 }
@@ -925,18 +925,18 @@ enum plugin_status plugin_start(const void* parameter)
 
     if(!parameter) return PLUGIN_ERROR;
 
-    rb->strcpy(np_file, parameter);
+    strcpy(np_file, parameter);
     if (get_image_type(np_file, false) == IMAGE_UNKNOWN)
     {
-        rb->splash(HZ*2, "Unsupported file");
+        splash(HZ*2, "Unsupported file");
         return PLUGIN_ERROR;
     }
 
 #ifdef USE_PLUG_BUF
-    buf = rb->plugin_get_buffer(&buf_size);
+    buf = plugin_get_buffer(&buf_size);
 #else
-    decoder_buf = rb->plugin_get_buffer(&decoder_buf_size);
-    buf = rb->plugin_get_audio_buffer(&buf_size);
+    decoder_buf = plugin_get_buffer(&decoder_buf_size);
+    buf = plugin_get_audio_buffer(&buf_size);
 #endif
 
     get_pic_list();
@@ -947,7 +947,7 @@ enum plugin_status plugin_start(const void* parameter)
     if (!grey_init(buf, buf_size, GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
-        rb->splash(HZ, "grey buf error");
+        splash(HZ, "grey buf error");
         return PLUGIN_ERROR;
     }
     buf += greysize;
@@ -957,10 +957,10 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef USE_PLUG_BUF
     decoder_buf = buf;
     decoder_buf_size = buf_size;
-    if(!rb->audio_status())
+    if(!audio_status())
     {
         iv_api.plug_buf = false;
-        buf = rb->plugin_get_audio_buffer(&buf_size);
+        buf = plugin_get_audio_buffer(&buf_size);
     }
 #endif
 
@@ -968,15 +968,15 @@ enum plugin_status plugin_start(const void* parameter)
        just been loaded from disk and the drive should be spinning */
     configfile_load(IMGVIEW_CONFIGFILE, config,
                     ARRAYLEN(config), IMGVIEW_SETTINGS_MINVERSION);
-    rb->memcpy(&old_settings, &settings, sizeof (settings));
+    memcpy(&old_settings, &settings, sizeof (settings));
 
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
 #endif
 
     do
@@ -985,17 +985,17 @@ enum plugin_status plugin_start(const void* parameter)
     } while (condition >= PLUGIN_OTHER);
     release_decoder();
 
-    if (rb->memcmp(&settings, &old_settings, sizeof (settings)))
+    if (memcmp(&settings, &old_settings, sizeof (settings)))
     {
         /* Just in case drive has to spin, keep it from looking locked */
-        rb->splash(0, "Saving Settings");
+        splash(0, "Saving Settings");
         configfile_save(IMGVIEW_CONFIGFILE, config,
                         ARRAYLEN(config), IMGVIEW_SETTINGS_VERSION);
     }
 
 #ifdef DISK_SPINDOWN
     /* set back ata spindown time in case we changed it */
-    rb->storage_spindown(rb->global_settings->disk_spindown);
+    storage_spindown(global_settings.disk_spindown);
 #endif
 
     /* Turn on backlight timeout (revert to settings) */

@@ -161,7 +161,7 @@ bool stream_set_callback(long id, void * fn);
 static inline void stream_keep_disk_active(void)
 {
 #ifdef HAVE_DISK_STORAGE
-    rb->storage_spin();
+    storage_spin();
 #endif
     }
 

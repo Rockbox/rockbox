@@ -232,24 +232,24 @@ static void reversi_gui_init(void) {
  */
 static void reversi_gui_display_cursor(int row, int col) {
     int old_mode, x, y;
-    old_mode = rb->lcd_get_drawmode();
+    old_mode = lcd_get_drawmode();
     x = CELL_X(col);
     y = CELL_Y(row);
 
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_drawline(x+CURSOR_MARGIN, y+CURSOR_MARGIN,
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_drawline(x+CURSOR_MARGIN, y+CURSOR_MARGIN,
             x+CELL_WIDTH-CURSOR_MARGIN, y+CELL_HEIGHT-CURSOR_MARGIN);
-    rb->lcd_drawline(x+CURSOR_MARGIN, y+CELL_HEIGHT-CURSOR_MARGIN,
+    lcd_drawline(x+CURSOR_MARGIN, y+CELL_HEIGHT-CURSOR_MARGIN,
             x+CELL_WIDTH-CURSOR_MARGIN, y+CURSOR_MARGIN);
 
     /* Draw the shadows */
-    rb->lcd_hline(x, x+CELL_WIDTH-1, YOFS-3);
-    rb->lcd_hline(x, x+CELL_WIDTH-1, YOFS+BOARD_HEIGHT+3);
-    rb->lcd_vline(XOFS-3, y, y+CELL_HEIGHT-1);
-    rb->lcd_vline(XOFS+BOARD_WIDTH+3, y, y+CELL_HEIGHT-1);
+    lcd_hline(x, x+CELL_WIDTH-1, YOFS-3);
+    lcd_hline(x, x+CELL_WIDTH-1, YOFS+BOARD_HEIGHT+3);
+    lcd_vline(XOFS-3, y, y+CELL_HEIGHT-1);
+    lcd_vline(XOFS+BOARD_WIDTH+3, y, y+CELL_HEIGHT-1);
 
-    rb->lcd_set_drawmode(old_mode);
-    rb->lcd_update();
+    lcd_set_drawmode(old_mode);
+    lcd_update();
 }
 
 
@@ -259,7 +259,7 @@ static void reversi_gui_draw_cell(int x, int y, int color) {
     int i;
     if (color == WHITE) {
         for (i = 0; i < CELL_LINE_THICKNESS; i++) {
-            rb->lcd_drawrect(
+            lcd_drawrect(
                     x+STONE_MARGIN+i, 
                     y+STONE_MARGIN+i,
                     CELL_WIDTH+1-2*(STONE_MARGIN+i), 
@@ -267,7 +267,7 @@ static void reversi_gui_draw_cell(int x, int y, int color) {
                 );
         }
     } else if (color == BLACK) {
-        rb->lcd_fillrect(x+STONE_MARGIN, y+STONE_MARGIN,
+        lcd_fillrect(x+STONE_MARGIN, y+STONE_MARGIN,
                 CELL_WIDTH-STONE_MARGIN-1, CELL_HEIGHT-1-STONE_MARGIN);
     } else {
         /* Cell is free -> nothing to do */
@@ -283,17 +283,17 @@ static void reversi_gui_display_board(void) {
     char buf[8];
 
     /* Clear the display buffer */
-    rb->lcd_clear_display();
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_clear_display();
+    lcd_set_drawmode(DRMODE_FG);
 
     /* Thicker board box */
-    rb->lcd_drawrect(XOFS-1, YOFS-1, BOARD_WIDTH+3, BOARD_HEIGHT+3);
+    lcd_drawrect(XOFS-1, YOFS-1, BOARD_WIDTH+3, BOARD_HEIGHT+3);
 
     /* Draw the gridlines */
     for (r=0, x=XOFS, y=YOFS; r<=BOARD_SIZE;
             r++, x+=CELL_WIDTH, y+=CELL_HEIGHT) {
-        rb->lcd_hline(XOFS, XOFS+BOARD_WIDTH, y);
-        rb->lcd_vline(x, YOFS, YOFS+BOARD_HEIGHT);
+        lcd_hline(XOFS, XOFS+BOARD_WIDTH, y);
+        lcd_vline(x, YOFS, YOFS+BOARD_HEIGHT);
     }
 
     /* Draw the stones. This is not the most efficient way but more readable */
@@ -310,14 +310,14 @@ static void reversi_gui_display_board(void) {
 
     /* Draw the current score */
     reversi_count_occupied_cells(&game, &r, &c);
-    rb->lcd_getstringsize("x", &x_width, &x_height);
+    lcd_getstringsize("x", &x_width, &x_height);
 
     x = LEGEND_X(0);
     y = LEGEND_Y(0);
     reversi_gui_draw_cell(x, y+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2, BLACK);
-    rb->snprintf(buf, sizeof(buf), "%01d", c);
+    snprintf(buf, sizeof(buf), "%01d", c);
 
-    rb->viewport_set_defaults(&tempvp, SCREEN_MAIN);
+    viewport_set_defaults(&tempvp, SCREEN_MAIN);
     
     tempvp.x=x+CELL_WIDTH+2;
     tempvp.y=y;
@@ -328,31 +328,31 @@ static void reversi_gui_display_board(void) {
     tempvp.bg_pattern = LCD_WHITE;
 #endif
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&tempvp);
-    rb->lcd_puts_scroll(0, 0, buf);
-    rb->screens[SCREEN_MAIN]->set_viewport(NULL);
+    screens[SCREEN_MAIN].set_viewport(&tempvp);
+    lcd_puts_scroll(0, 0, buf);
+    screens[SCREEN_MAIN].set_viewport(NULL);
 
     y = LEGEND_Y(1);
     
     reversi_gui_draw_cell(x, y+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2, WHITE);
-    rb->snprintf(buf, sizeof(buf), "%01d", r);
+    snprintf(buf, sizeof(buf), "%01d", r);
     
     tempvp.y=y;
-    rb->screens[SCREEN_MAIN]->set_viewport(&tempvp);
-    rb->lcd_puts_scroll(0, 0, buf);
-    rb->screens[SCREEN_MAIN]->set_viewport(NULL);
+    screens[SCREEN_MAIN].set_viewport(&tempvp);
+    lcd_puts_scroll(0, 0, buf);
+    screens[SCREEN_MAIN].set_viewport(NULL);
 
     /* Draw the box around the current player */
     r = (cur_player == BLACK ? 0 : 1);
     y = LEGEND_Y(r)+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2;
-    rb->lcd_drawrect(x, y, CELL_WIDTH+1, CELL_HEIGHT+1);
+    lcd_drawrect(x, y, CELL_WIDTH+1, CELL_HEIGHT+1);
 
 #if defined(HAVE_TOUCHSCREEN)
     touchbutton_draw(reversi_buttons, TOUCHBUTTON_COUNT);
 #endif
 
     /* Update the screen */
-    rb->lcd_update();
+    lcd_update();
 }
 
 
@@ -403,7 +403,7 @@ static bool reversi_gui_choose_strategy(
     }
     
     result = 
-        rb->set_option(prompt, &index, INT, strategy_settings, num_items, NULL);
+        set_option(prompt, &index, INT, strategy_settings, num_items, NULL);
         
     (*player) = strategy_values[index];
 
@@ -424,7 +424,7 @@ static bool reversi_gui_menu(void) {
                         MENU_TEXT_STRAT_BLACK, MENU_TEXT_STRAT_WHITE,
                         MENU_TEXT_WRAP_MODE, "Playback Control", "Quit");
 
-    result = rb->do_menu(&menu, NULL, NULL, false);
+    result = do_menu(&menu, NULL, NULL, false);
 
     switch (result) {
         case 0: /* Start a new game */
@@ -453,7 +453,7 @@ static bool reversi_gui_menu(void) {
                     break;
                 }
             }
-            rb->set_option(MENU_TEXT_WRAP_MODE, &index, INT,
+            set_option(MENU_TEXT_WRAP_MODE, &index, INT,
                     cursor_wrap_mode_settings, 3, NULL);
             cursor_wrap_mode = cursor_wrap_mode_values[index];
             break;
@@ -602,22 +602,22 @@ enum plugin_status plugin_start(const void *parameter) {
     int w_cnt, b_cnt;
     
     /* Initialize Font Width and height */
-    rb->lcd_getstringsize("0", &font_width, &font_height);
+    lcd_getstringsize("0", &font_width, &font_height);
     
 #ifdef HAVE_TOUCHSCREEN
-    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
 #endif
 
     /* Avoid compiler warnings */
     (void)parameter;
 
-    rb->srand(*rb->current_tick); /* Some AIs use rand() */
+    srand(current_tick); /* Some AIs use rand() */
     white_strategy = &strategy_human;
     black_strategy = &strategy_human;
 
@@ -657,7 +657,7 @@ enum plugin_status plugin_start(const void *parameter) {
             /* TODO: Don't duplicate end of game check */
             if (reversi_game_is_finished(&game, cur_player)) {
                 reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
-                rb->splashf(HZ*2, "Game over. %s won.",
+                splashf(HZ*2, "Game over. %s won.",
                         (w_cnt>b_cnt?"WHITE":"BLACK"));
                 draw_screen = true; /* Must update screen after splash */
                 game_finished = true;
@@ -668,7 +668,7 @@ enum plugin_status plugin_start(const void *parameter) {
         /***********************************************************************
          * Button handling code happens below here
          **********************************************************************/
-        button = rb->button_get(true);
+        button = button_get(true);
         
         /* The touchscreen buttons can act as true buttons so OR them in */
 #ifdef HAVE_TOUCHSCREEN
@@ -685,7 +685,7 @@ enum plugin_status plugin_start(const void *parameter) {
 
 #ifdef HAVE_TOUCHSCREEN
             if(button&BUTTON_TOUCHSCREEN) {
-                button_x = rb->button_get_data();
+                button_x = button_get_data();
                 button_y = button_x & 0xffff;
                 button_x >>= 16;
 
@@ -727,17 +727,17 @@ enum plugin_status plugin_start(const void *parameter) {
                     cur_player = reversi_flipped_color(cur_player);
                     if (reversi_game_is_finished(&game, cur_player)) {
                         reversi_count_occupied_cells(&game, &w_cnt, &b_cnt);
-                        rb->splashf(HZ*2, "Game over. %s won.",
+                        splashf(HZ*2, "Game over. %s won.",
                                 (w_cnt>b_cnt?"WHITE":"BLACK"));
                         draw_screen = true; /* Must update screen after splash */
                         game_finished = true;
                     }
                 } else {
                     /* An attempt to make an invalid move */
-                    rb->splash(HZ/2, "Illegal move!");
+                    splash(HZ/2, "Illegal move!");
                     draw_screen = true;
                     /* Ignore any button presses during the splash */
-                    rb->button_clear_queue();
+                    button_clear_queue();
                 }
             }
         }
@@ -770,7 +770,7 @@ enum plugin_status plugin_start(const void *parameter) {
             }
         }
 
-        if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+        if (default_event_handler(button) == SYS_USB_CONNECTED) {
             /* Quit if USB has been connected */
             return PLUGIN_USB_CONNECTED;
         }

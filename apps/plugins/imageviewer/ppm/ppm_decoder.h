@@ -28,7 +28,7 @@
 
 #define PPM_OVERALLMAXVAL 65535
 
-#define ppm_error(...) rb->splashf(HZ*2, __VA_ARGS__ )
+#define ppm_error(...) splashf(HZ*2, __VA_ARGS__ )
 
 struct ppm_info {
     int x;

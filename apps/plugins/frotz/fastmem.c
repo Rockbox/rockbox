@@ -230,12 +230,12 @@ void init_memory (void)
 
     /* Open story file */
 
-    if ((story_fp = rb->open(story_name, O_RDONLY)) < 0)
+    if ((story_fp = open(story_name, O_RDONLY)) < 0)
     os_fatal ("Cannot open story file");
 
     /* Allocate memory for story header */
 
-    zmp = rb->plugin_get_buffer(&buf_size);
+    zmp = plugin_get_buffer(&buf_size);
 
     /* Load header into memory */
 
@@ -334,10 +334,10 @@ void init_memory (void)
 
     if ((size_t)story_size > buf_size)
     {
-    audiobuf = rb->plugin_get_audio_buffer(&buf_size);
+    audiobuf = plugin_get_audio_buffer(&buf_size);
     if ((size_t)story_size > buf_size)
         os_fatal ("Out of memory");
-    rb->memcpy(audiobuf, zmp, 64);
+    memcpy(audiobuf, zmp, 64);
     zmp = audiobuf;
     }
 
@@ -603,7 +603,7 @@ void z_restore (void)
 
     /* Open auxilary file */
 
-    if ((gfp = rb->open (new_name, O_RDONLY)) < 0)
+    if ((gfp = open (new_name, O_RDONLY)) < 0)
         goto finished;
 
     /* Load auxilary file */
@@ -625,7 +625,7 @@ void z_restore (void)
 
     /* Open game file */
 
-    if ((gfp = rb->open (new_name, O_RDONLY)) < 0)
+    if ((gfp = open (new_name, O_RDONLY)) < 0)
         goto finished;
 
     success = restore_quetzal (gfp, story_fp);
@@ -835,7 +835,7 @@ void z_save (void)
 
     /* Open auxilary file */
 
-    if ((gfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
+    if ((gfp = open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
         goto finished;
 
     /* Write auxilary file */
@@ -857,7 +857,7 @@ void z_save (void)
 
     /* Open game file */
 
-    if ((gfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
+    if ((gfp = open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
         goto finished;
 
     success = save_quetzal (gfp, story_fp);

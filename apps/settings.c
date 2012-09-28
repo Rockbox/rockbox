@@ -72,12 +72,16 @@
 #include "viewport.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
+#include "symbols.h"
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
 struct user_settings global_settings;
+EXPORT_SYMBOL(global_settings);
+
 struct system_status global_status;
+EXPORT_SYMBOL(global_status);
 
 #if CONFIG_CODEC == SWCODEC
 #include "dsp_proc_settings.h"
@@ -1107,6 +1111,8 @@ const struct settings_list* find_setting(const void* variable, int *id)
     }
     return NULL;
 }
+EXPORT_SYMBOL(find_setting);
+
 const struct settings_list* find_setting_by_cfgname(const char* name, int *id)
 {
     int i;
@@ -1129,7 +1135,7 @@ bool set_bool(const char* string, const bool* variable )
                             (char *)STR(LANG_SET_BOOL_NO),
                             NULL);
 }
-
+EXPORT_SYMBOL(set_bool);
 
 bool set_bool_options(const char* string, const bool* variable,
                       const char* yes_str, int yes_voice,
@@ -1146,6 +1152,7 @@ bool set_bool_options(const char* string, const bool* variable,
                         (void (*)(int))function);
     return result;
 }
+EXPORT_SYMBOL(set_bool_options);
 
 bool set_int(const unsigned char* string,
              const char* unit,
@@ -1160,6 +1167,7 @@ bool set_int(const unsigned char* string,
     return set_int_ex(string, unit, voice_unit, variable, function,
                       step, min, max, formatter, NULL);
 }
+EXPORT_SYMBOL(set_int);
 
 bool set_int_ex(const unsigned char* string,
                 const char* unit,
@@ -1231,6 +1239,7 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
     }
     return true;
 }
+EXPORT_SYMBOL(set_option);
 
 /*
  * Takes filename, removes the directory and the extension,

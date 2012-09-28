@@ -110,7 +110,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, PCM_OUTPUT_DEPTH-1);
     }
 
     return CODEC_OK;
@@ -136,18 +136,18 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
     
-    /* Need to save offset for later use (cleared indirectly by advance_buffer) */
-    bytesdone = ci->id3->offset;
+    /* Need to save offset for later use (cleared indirectly by codec_advance_buffer) */
+    bytesdone = ci.id3->offset;
 
-    ci->memset(&format, 0, sizeof(struct pcm_format));
+    memset(&format, 0, sizeof(struct pcm_format));
     format.is_signed = true;
     format.is_little_endian = false;
 
     /* set format */
-    ci->seek_buffer(0);
-    buf = ci->request_buffer(&n, 24);
+    codec_seek_buffer(0);
+    buf = codec_request_buffer(&n, 24);
     if (n < 24 || (memcmp(buf, ".snd", 4) != 0))
     {
         /*
@@ -161,7 +161,7 @@ enum codec_status codec_run(void)
         format.formattag     = AU_FORMAT_MULAW;
         format.channels      = 1;
         format.bitspersample = 8;
-        format.numbytes      = ci->id3->filesize;
+        format.numbytes      = ci.id3->filesize;
     }
     else
     {
@@ -177,7 +177,7 @@ enum codec_status codec_run(void)
         /* data size */
         format.numbytes = get_be32(buf + 8);
         if (format.numbytes == (uint32_t)0xffffffff)
-            format.numbytes = ci->id3->filesize - offset;
+            format.numbytes = ci.id3->filesize - offset;
         /* encoding */
         format.formattag = convert_au_format(get_be32(buf + 12), &format);
         if (format.formattag == AU_FORMAT_UNSUPPORT)
@@ -190,7 +190,7 @@ enum codec_status codec_run(void)
     }
 
     /* advance to first WAVE chunk */
-    ci->advance_buffer(offset);
+    codec_advance_buffer(offset);
 
     firstblockposn = offset;
 
@@ -225,11 +225,11 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
     if (format.channels == 2) {
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (format.channels == 1) {
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels\n");
         return CODEC_ERROR;
@@ -243,7 +243,7 @@ enum codec_status codec_run(void)
 
         if (newpos->pos > format.numbytes)
             goto done;
-        if (ci->seek_buffer(firstblockposn + newpos->pos))
+        if (codec_seek_buffer(firstblockposn + newpos->pos))
         {
             bytesdone      = newpos->pos;
             decodedsamples = newpos->samples;
@@ -253,13 +253,13 @@ enum codec_status codec_run(void)
         bytesdone = 0;
     }
 
-    ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
+    audio_codec_update_elapsed(decodedsamples*1000LL/ci.id3->frequency);
 
     /* The main decoder loop */
     endofstream = 0;
 
     while (!endofstream) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -270,22 +270,22 @@ enum codec_status codec_run(void)
 
             if (newpos->pos > format.numbytes)
             {
-                ci->set_elapsed(ci->id3->length);
-                ci->seek_complete();
+                audio_codec_update_elapsed(ci.id3->length);
+                codec_seek_complete();
                 break;
             }
 
-            if (ci->seek_buffer(firstblockposn + newpos->pos))
+            if (codec_seek_buffer(firstblockposn + newpos->pos))
             {
                 bytesdone      = newpos->pos;
                 decodedsamples = newpos->samples;
             }
 
-            ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
-            ci->seek_complete();
+            audio_codec_update_elapsed(decodedsamples*1000LL/ci.id3->frequency);
+            codec_seek_complete();
         }
 
-        aubuf = (uint8_t *)ci->request_buffer(&n, format.chunksize);
+        aubuf = (uint8_t *)codec_request_buffer(&n, format.chunksize);
         if (n == 0)
             break; /* End of stream */
         if (bytesdone + n > format.numbytes) {
@@ -299,14 +299,14 @@ enum codec_status codec_run(void)
             return CODEC_ERROR;
         }
 
-        ci->pcmbuf_insert(samples, NULL, bufcount);
-        ci->advance_buffer(n);
+        codec_pcmbuf_insert(samples, NULL, bufcount);
+        codec_advance_buffer(n);
         bytesdone += n;
         decodedsamples += bufcount;
 
         if (bytesdone >= format.numbytes)
             endofstream = 1;
-        ci->set_elapsed(decodedsamples*1000LL/ci->id3->frequency);
+        audio_codec_update_elapsed(decodedsamples*1000LL/ci.id3->frequency);
     }
 
 done:

@@ -249,7 +249,7 @@ int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec)
     }
     else
     {
-        rb->memset (mpeg2dec->new_quantizer_matrix[1], 16, 64);
+        memset (mpeg2dec->new_quantizer_matrix[1], 16, 64);
     }
 
     sequence->profile_level_id = 0x80;
@@ -561,10 +561,10 @@ int mpeg2_guess_aspect (const mpeg2_sequence_t * sequence,
 
 static void copy_matrix (mpeg2dec_t * mpeg2dec, int index)
 {
-    if (rb->memcmp (mpeg2dec->quantizer_matrix[index],
+    if (memcmp (mpeg2dec->quantizer_matrix[index],
                 mpeg2dec->new_quantizer_matrix[index], 64))
     {
-        rb->memcpy (mpeg2dec->quantizer_matrix[index],
+        memcpy (mpeg2dec->quantizer_matrix[index],
                 mpeg2dec->new_quantizer_matrix[index], 64);
 
         mpeg2dec->scaled[index] = -1;
@@ -582,7 +582,7 @@ static void finalize_matrix (mpeg2dec_t * mpeg2dec)
             copy_matrix (mpeg2dec, i);
 
         if ((mpeg2dec->copy_matrix & (4 << i)) &&
-            rb->memcmp(mpeg2dec->quantizer_matrix[i],
+            memcmp(mpeg2dec->quantizer_matrix[i],
                        mpeg2dec->new_quantizer_matrix[i+2], 64))
         {
             copy_matrix (mpeg2dec, i + 2);
@@ -652,7 +652,7 @@ void mpeg2_header_sequence_finalize (mpeg2dec_t * mpeg2dec)
             return;
         }
 
-        mpeg2dec->state = rb->memcmp(&mpeg2dec->sequence, sequence,
+        mpeg2dec->state = memcmp(&mpeg2dec->sequence, sequence,
                                  sizeof (mpeg2_sequence_t)) ?
                             STATE_SEQUENCE_MODIFIED :
                             STATE_SEQUENCE_REPEATED;

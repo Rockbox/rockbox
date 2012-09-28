@@ -24,6 +24,7 @@
 #include "config.h"
 #include "limits.h"
 #include "bmp.h"
+#include "symbols.h"
 
 /* calculates the start and size of the knob */
 static void scrollbar_helper(int min_shown, int max_shown, int items,
@@ -178,6 +179,7 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
 
     screen->fillrect(inner_x, inner_y, inner_wd, inner_ht);
 }
+EXPORT_SYMBOL(gui_scrollbar_draw);
 
 void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm, int x, int y,
                         int width, int height, int items,

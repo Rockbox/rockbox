@@ -94,7 +94,7 @@ static int* newfile (lua_State *L) {
 */
 static int io_fclose (lua_State *L) {
   int *p = tofile(L);
-  int ok = (rb->close(*p) == 0);
+  int ok = (close(*p) == 0);
   *p = -1;
   return pushresult(L, ok, NULL);
 }
@@ -156,9 +156,9 @@ static int io_open (lua_State *L) {
             flags = O_WRONLY | O_APPEND; break;
     }
   }
-  if((*mode == 'w' || *mode == 'a') && !rb->file_exists(filename))
+  if((*mode == 'w' || *mode == 'a') && !file_exists(filename))
     flags |= O_CREAT;
-  *pf = rb->open(filename, flags, 0666);
+  *pf = open(filename, flags, 0666);
   return (*pf < 0) ? pushresult(L, 0, filename) : 1;
 }
 
@@ -178,7 +178,7 @@ static int g_iofile (lua_State *L, int f, int flags) {
     const char *filename = lua_tostring(L, 1);
     if (filename) {
       int *pf = newfile(L);
-      *pf = rb->open(filename, flags);
+      *pf = open(filename, flags);
       if (*pf < 0)
         fileerror(L, 1, filename);
     }
@@ -230,7 +230,7 @@ static int io_lines (lua_State *L) {
   else {
     const char *filename = luaL_checkstring(L, 1);
     int *pf = newfile(L);
-    *pf = rb->open(filename, O_RDONLY);
+    *pf = open(filename, O_RDONLY);
     if (*pf < 0)
       fileerror(L, 1, filename);
     aux_lines(L, lua_gettop(L), 1);
@@ -256,9 +256,9 @@ static int read_number (lua_State *L, int *f) {
 
 
 static int test_eof (lua_State *L, int *f) {
-  ssize_t s = rb->lseek(*f, 0, SEEK_CUR);
+  ssize_t s = lseek(*f, 0, SEEK_CUR);
   lua_pushlstring(L, NULL, 0);
-  return s != rb->filesize(*f);
+  return s != filesize(*f);
 }
 
 
@@ -270,7 +270,7 @@ static int _read_line (lua_State *L, int *f) {
     size_t l;
     size_t r;
     char *p = luaL_prepbuffer(&b);
-    r = rb->read_line(*f, p, LUAL_BUFFERSIZE);
+    r = read_line(*f, p, LUAL_BUFFERSIZE);
     l = strlen(p);
     if (l == 0 || p[l-1] != '\n')
       luaL_addsize(&b, l);
@@ -296,7 +296,7 @@ static int read_chars (lua_State *L, int *f, size_t n) {
   do {
     char *p = luaL_prepbuffer(&b);
     if (rlen > n) rlen = n;  /* cannot read more than asked */
-    nr = rb->read(*f, p, rlen);
+    nr = read(*f, p, rlen);
     luaL_addsize(&b, nr);
     n -= nr;  /* still have to read `n' chars */
   } while (n > 0 && nr == rlen);  /* until end of count or eof */
@@ -386,12 +386,12 @@ static int g_write (lua_State *L, int *f, int arg) {
     if (lua_type(L, arg) == LUA_TNUMBER) {
       /* optimization: could be done exactly as for strings */
       status = status &&
-          rb->fdprintf(*f, LUA_NUMBER_FMT, lua_tonumber(L, arg)) > 0;
+          fdprintf(*f, LUA_NUMBER_FMT, lua_tonumber(L, arg)) > 0;
     }
     else {
       size_t l;
       const char *s = luaL_checklstring(L, arg, &l);
-      status = status && (rb->write(*f, s, l) == (ssize_t)l);
+      status = status && (write(*f, s, l) == (ssize_t)l);
     }
   }
   return pushresult(L, status, NULL);
@@ -414,11 +414,11 @@ static int f_seek (lua_State *L) {
   int f = *tofile(L);
   int op = luaL_checkoption(L, 2, "cur", modenames);
   long offset = luaL_optlong(L, 3, 0);
-  op = rb->lseek(f, offset, mode[op]);
+  op = lseek(f, offset, mode[op]);
   if (op)
     return pushresult(L, 0, NULL);  /* error */
   else {
-    lua_pushinteger(L, rb->lseek(f, 0, SEEK_CUR));
+    lua_pushinteger(L, lseek(f, 0, SEEK_CUR));
     return 1;
   }
 }

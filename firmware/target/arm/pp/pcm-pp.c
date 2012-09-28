@@ -27,6 +27,7 @@
 #include "pcm.h"
 #include "pcm_sampr.h"
 #include "pcm-internal.h"
+#include "symbols.h"
 
 /** DMA **/
 
@@ -441,6 +442,7 @@ void pcm_play_lock(void)
 
     restore_fiq(status);
 }
+EXPORT_SYMBOL(pcm_play_lock);
 
 void pcm_play_unlock(void)
 {
@@ -452,6 +454,7 @@ void pcm_play_unlock(void)
 
     restore_fiq(status);
 }
+EXPORT_SYMBOL(pcm_play_unlock);
 
 static void play_start_pcm(void)
 {
@@ -510,6 +513,7 @@ size_t pcm_get_bytes_waiting(void)
 {
     return dma_play_data.size & ~3;
 }
+EXPORT_SYMBOL(pcm_get_bytes_waiting);
 
 void pcm_play_dma_init(void)
 {

@@ -742,15 +742,15 @@ typedef struct
 
 static void draw_cursor( int x, int y )
 {
-    rb->lcd_set_drawmode( DRMODE_COMPLEMENT );
-    rb->lcd_fillrect( x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
+    lcd_set_drawmode( DRMODE_COMPLEMENT );
+    lcd_fillrect( x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
 #ifdef LARGE_CARD
-    rb->lcd_drawpixel( x+1, y+1 );
-    rb->lcd_drawpixel( x+1, y+CARD_HEIGHT-2 );
-    rb->lcd_drawpixel( x+CARD_WIDTH-2, y+1 );
-    rb->lcd_drawpixel( x+CARD_WIDTH-2, y+CARD_HEIGHT-2 );
+    lcd_drawpixel( x+1, y+1 );
+    lcd_drawpixel( x+1, y+CARD_HEIGHT-2 );
+    lcd_drawpixel( x+CARD_WIDTH-2, y+1 );
+    lcd_drawpixel( x+CARD_WIDTH-2, y+CARD_HEIGHT-2 );
 #endif
-    rb->lcd_set_drawmode( DRMODE_SOLID );
+    lcd_set_drawmode( DRMODE_SOLID );
 }
 
 /* Draw a card's border, select it if it's selected and draw the cursor
@@ -758,38 +758,38 @@ static void draw_cursor( int x, int y )
 static void draw_card_ext( int x, int y, bool selected, bool cursor )
 {
 #if LCD_DEPTH > 1
-    int oldfg = rb->lcd_get_foreground();
+    int oldfg = lcd_get_foreground();
 
-    rb->lcd_set_foreground( LCD_BLACK );
+    lcd_set_foreground( LCD_BLACK );
 #endif
 #ifdef LARGE_CARD
-    rb->lcd_hline( x+2, x+CARD_WIDTH-3, y );
-    rb->lcd_hline( x+2, x+CARD_WIDTH-3, y+CARD_HEIGHT-1 );
-    rb->lcd_vline( x, y+2, y+CARD_HEIGHT-3 );
-    rb->lcd_vline( x+CARD_WIDTH-1, y+2, y+CARD_HEIGHT-3 );
-    rb->lcd_drawpixel( x+1, y+1 );
-    rb->lcd_drawpixel( x+1, y+CARD_HEIGHT-2 );
-    rb->lcd_drawpixel( x+CARD_WIDTH-2, y+1 );
-    rb->lcd_drawpixel( x+CARD_WIDTH-2, y+CARD_HEIGHT-2 );
+    lcd_hline( x+2, x+CARD_WIDTH-3, y );
+    lcd_hline( x+2, x+CARD_WIDTH-3, y+CARD_HEIGHT-1 );
+    lcd_vline( x, y+2, y+CARD_HEIGHT-3 );
+    lcd_vline( x+CARD_WIDTH-1, y+2, y+CARD_HEIGHT-3 );
+    lcd_drawpixel( x+1, y+1 );
+    lcd_drawpixel( x+1, y+CARD_HEIGHT-2 );
+    lcd_drawpixel( x+CARD_WIDTH-2, y+1 );
+    lcd_drawpixel( x+CARD_WIDTH-2, y+CARD_HEIGHT-2 );
 #else
-    rb->lcd_hline( x+1, x+CARD_WIDTH-2, y );
-    rb->lcd_hline( x+1, x+CARD_WIDTH-2, y+CARD_HEIGHT-1 );
-    rb->lcd_vline( x, y+1, y+CARD_HEIGHT-2 );
-    rb->lcd_vline( x+CARD_WIDTH-1, y+1, y+CARD_HEIGHT-2 );
+    lcd_hline( x+1, x+CARD_WIDTH-2, y );
+    lcd_hline( x+1, x+CARD_WIDTH-2, y+CARD_HEIGHT-1 );
+    lcd_vline( x, y+1, y+CARD_HEIGHT-2 );
+    lcd_vline( x+CARD_WIDTH-1, y+1, y+CARD_HEIGHT-2 );
 #endif
 
     if( selected )
     {
 #if LCD_DEPTH > 1
-        rb->lcd_set_foreground( FRAME_COLOR );
+        lcd_set_foreground( FRAME_COLOR );
 #endif
-        rb->lcd_drawrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
+        lcd_drawrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
 #ifdef LARGE_CARD
-        rb->lcd_drawrect( x+2, y+2, CARD_WIDTH-4, CARD_HEIGHT-4 );
+        lcd_drawrect( x+2, y+2, CARD_WIDTH-4, CARD_HEIGHT-4 );
 #endif
     }
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground( oldfg );
+    lcd_set_foreground( oldfg );
 #endif
 
     if( cursor )
@@ -804,7 +804,7 @@ static void draw_card( card_t *card, int x, int y,
 {
     if( card->known )
     {
-        rb->lcd_bitmap_part( card_deck, CARD_GFX_WIDTH * card->num,
+        lcd_bitmap_part( card_deck, CARD_GFX_WIDTH * card->num,
                              CARD_GFX_HEIGHT * card->suit, 
                              STRIDE(SCREEN_MAIN, 
                                     BMPWIDTH_card_deck, BMPHEIGHT_card_deck),
@@ -812,7 +812,7 @@ static void draw_card( card_t *card, int x, int y,
     }
     else
     {
-        rb->lcd_bitmap( card_back, x+1, y+1,
+        lcd_bitmap( card_back, x+1, y+1,
                         CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
     }
     draw_card_ext( x, y, selected, cursor );
@@ -821,7 +821,7 @@ static void draw_card( card_t *card, int x, int y,
 /* Draw an empty stack */
 static void draw_empty_stack( int s, int x, int y, bool cursor )
 {
-    rb->lcd_bitmap_part( solitaire_suitsi, 0,
+    lcd_bitmap_part( solitaire_suitsi, 0,
                  CARD_GFX_HEIGHT * s, 
                  STRIDE( SCREEN_MAIN,
                          BMPWIDTH_solitaire_suitsi, BMPHEIGHT_solitaire_suitsi),
@@ -916,7 +916,7 @@ static int solitaire_menu(bool in_game)
 
     while (result < 0)
     {
-        switch (rb->do_menu(&menu, &selected, NULL, false))
+        switch (do_menu(&menu, &selected, NULL, false))
         {
             default:
                 result = MENU_RESUME;
@@ -936,7 +936,7 @@ static int solitaire_menu(bool in_game)
                 break;
 
             case 2:
-                if (rb->set_option("Draw Cards Option", &sol.draw_type,
+                if (set_option("Draw Cards Option", &sol.draw_type,
                                    INT, drawcards, 2, NULL))
                     result = MENU_USB;
                 break;
@@ -1000,7 +1000,7 @@ static int next_random_card( card_t *deck )
 {
     int i,r;
 
-    r = rb->rand()%(NUM_CARDS)+1;
+    r = rand()%(NUM_CARDS)+1;
     i = 0;
 
     while( r>0 )
@@ -1332,9 +1332,9 @@ static int bouncing_cards( void )
     int i, j, x, vx, y, fp_y, fp_vy, button;
 
     /* flush the button queue */
-    while( ( button = rb->button_get( false ) ) != BUTTON_NONE )
+    while( ( button = button_get( false ) ) != BUTTON_NONE )
     {
-        if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+        if( default_event_handler( button ) == SYS_USB_CONNECTED )
             return SOLITAIRE_USB;
     }
 
@@ -1347,16 +1347,16 @@ static int bouncing_cards( void )
             fp_y = MARGIN<<16;
 
 #if LCD_WIDTH > 200
-            vx = rb->rand() % (4*BC_MXSPEED/3-2) - BC_MXSPEED;
+            vx = rand() % (4*BC_MXSPEED/3-2) - BC_MXSPEED;
             if( vx >= -1 )
                 vx += 3;
 #else
-            vx = rb->rand() % (4*BC_MXSPEED/3) - BC_MXSPEED;
+            vx = rand() % (4*BC_MXSPEED/3) - BC_MXSPEED;
             if( vx >= 0 )
                 vx++;
 #endif
 
-            fp_vy = -rb->rand() % BC_MYSPEED;
+            fp_vy = -rand() % BC_MYSPEED;
 
             while( x < LCD_WIDTH && x + CARD_WIDTH > 0 )
             {
@@ -1371,11 +1371,11 @@ static int bouncing_cards( void )
                 y = fp_y >> 16;
                 draw_card( &deck[j*CARDS_PER_SUIT+i], x, y,
                            false, false );
-                rb->lcd_update_rect( x<0?0:x, y<0?0:y,
+                lcd_update_rect( x<0?0:x, y<0?0:y,
                                      CARD_WIDTH, CARD_HEIGHT );
 
-                button = rb->button_get_w_tmo( 2 );
-                if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+                button = button_get_w_tmo( 2 );
+                if( default_event_handler( button ) == SYS_USB_CONNECTED )
                     return SOLITAIRE_USB;
                 if( button == SOL_QUIT || button == SOL_MOVE )
                     return SOLITAIRE_WIN;
@@ -1391,13 +1391,13 @@ static int bouncing_cards( void )
 static void get_save_filename( char *buf )
 {
 #ifdef APPLICATION
-    rb->snprintf(buf, sizeof(buf), PLUGIN_DATA_DIR "/sol.save");
+    snprintf(buf, sizeof(buf), PLUGIN_DATA_DIR "/sol.save");
 #else
     char *s;
-    rb->strcpy( buf, rb->plugin_get_current_filename() );
-    s = rb->strrchr( buf, '/' ) + 1;
+    strcpy( buf, plugin_get_current_filename() );
+    s = strrchr( buf, '/' ) + 1;
     *s = '\0';
-    rb->strcat( s, "sol.save" );
+    strcat( s, "sol.save" );
 #endif
 }
 
@@ -1405,14 +1405,14 @@ static int open_save_file( int flags )
 {
     char buf[MAX_PATH];
     get_save_filename( buf );
-    return rb->open( buf, flags, 0666);
+    return open( buf, flags, 0666);
 }
 
 static void delete_save_file( void )
 {
     char buf[MAX_PATH];
     get_save_filename( buf );
-    rb->remove( buf );
+    remove( buf );
 }
 
 #ifdef write
@@ -1421,7 +1421,7 @@ static void delete_save_file( void )
 static int save_write( int fd, const void *buf, size_t count, int *checksum )
 {
     size_t i;
-    if( rb->write( fd, buf, count ) < (ssize_t)count )
+    if( write( fd, buf, count ) < (ssize_t)count )
         return 1;
     for( i = 0; i < count; i++ )
         *checksum += (int)(((const char *)buf)[i]);
@@ -1434,7 +1434,7 @@ static int save_write( int fd, const void *buf, size_t count, int *checksum )
 static int save_read( int fd, void *buf, size_t count, int *checksum )
 {
     size_t i;
-    if( rb->read( fd, buf, count ) < (ssize_t)count )
+    if( read( fd, buf, count ) < (ssize_t)count )
         return 1;
     for( i = 0; i < count; i++ )
         *checksum -= (int)(((const char *)buf)[i]);
@@ -1457,13 +1457,13 @@ static int save_game( void )
         || save_write( fd, &cards_per_draw, sizeof( int ), &checksum )
         || save_write( fd, cols, COL_NUM * sizeof( int ), &checksum )
         || save_write( fd, stacks, SUITS * sizeof( int ), &checksum )
-        || ( rb->write( fd, &checksum, sizeof( int ) ) < (ssize_t)(sizeof( int ) ) ) )
+        || ( write( fd, &checksum, sizeof( int ) ) < (ssize_t)(sizeof( int ) ) ) )
     {
-        rb->close( fd );
-        rb->splash( 2*HZ, "Error while saving game. Aborting." );
+        close( fd );
+        splash( 2*HZ, "Error while saving game. Aborting." );
         return -2;
     }
-    rb->close( fd );
+    close( fd );
     return 0;
 }
 
@@ -1476,9 +1476,9 @@ static int load_game( void )
         return -1;
     
     retval = 0; /* Assume good case */
-    if(    ( rb->lseek( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
-        || ( rb->read( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
-        || ( rb->lseek( fd, 0, SEEK_SET ) == -1 )
+    if(    ( lseek( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
+        || ( read( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
+        || ( lseek( fd, 0, SEEK_SET ) == -1 )
         || save_read( fd, &cur_card, sizeof( int ), &checksum )
         || save_read( fd, &cur_col, sizeof( int ), &checksum )
         || save_read( fd, &sel_card, sizeof( int ), &checksum )
@@ -1490,16 +1490,16 @@ static int load_game( void )
         || save_read( fd, cols, COL_NUM * sizeof( int ), &checksum )
         || save_read( fd, stacks, SUITS * sizeof( int ), &checksum ) )
     {
-        rb->splash( 2*HZ, "Error while loading saved game. Aborting." );
+        splash( 2*HZ, "Error while loading saved game. Aborting." );
         retval = -2;
     }
     else if( checksum != 42 )
     {
-        rb->splash( 2*HZ, "Save file was corrupted. Aborting." );
+        splash( 2*HZ, "Save file was corrupted. Aborting." );
         retval = -3;
     }
     
-    rb->close( fd );
+    close( fd );
     delete_save_file();
     return retval;
 }
@@ -1522,7 +1522,7 @@ static int solitaire( int skipmenu )
     int c,h,prevcard;
     int biggest_col_length;
 
-    rb->srand( *rb->current_tick );
+    srand( current_tick );
     if( skipmenu != SOLITAIRE_QUIT )
     {
         switch( solitaire_menu(false) )
@@ -1538,7 +1538,7 @@ static int solitaire( int skipmenu )
 
     while( true )
     {
-        rb->lcd_clear_display();
+        lcd_clear_display();
 
         /* get the biggest column length so that display can be "optimized" */
         biggest_col_length = 0;
@@ -1579,8 +1579,8 @@ static int solitaire( int skipmenu )
         /* if there aren't any, that means you won :) */
         if( biggest_col_length == 0 && rem == NOT_A_CARD )
         {
-            rb->lcd_update();
-            rb->splash( HZ, "You Won :)" );
+            lcd_update();
+            splash( HZ, "You Won :)" );
             return bouncing_cards();
         }
 
@@ -1687,10 +1687,10 @@ static int solitaire( int skipmenu )
             draw_cursor( CARD_WIDTH+2*MARGIN+1, MARGIN );
         }
 
-        rb->lcd_update();
+        lcd_update();
 
         /* what to do when a key is pressed ... */
-        button = rb->button_get( true );
+        button = button_get( true );
 #if (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_FUZE_PAD)
         if (button&(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD))
             button = button & (~BUTTON_REPEAT);
@@ -2001,7 +2001,7 @@ static int solitaire( int skipmenu )
                 return SOLITAIRE_SAVE_AND_QUIT;
 
             default:
-                if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+                if( default_event_handler( button ) == SYS_USB_CONNECTED )
                     return SOLITAIRE_USB;
                 break;
         }
@@ -2020,7 +2020,7 @@ static int solitaire( int skipmenu )
             && find_last_card( cur_col ) != NOT_A_CARD )
             cur_card = find_last_card( cur_col );
 
-        rb->yield();
+        yield();
     }
 }
 
@@ -2037,11 +2037,11 @@ enum plugin_status plugin_start(const void* parameter )
 
     configfile_load(CONFIG_FILENAME, config,
                     sizeof(config) / sizeof(config[0]), CFGFILE_VERSION);
-    rb->memcpy(&sol, &sol_disk, sizeof(sol));   /* copy to running config */
+    memcpy(&sol, &sol_disk, sizeof(sol));   /* copy to running config */
 
     if( load_game() == 0 )
     {
-        rb->splash( HZ, "Resuming saved game." );
+        splash( HZ, "Resuming saved game." );
         result = SOLITAIRE_QUIT;
     }
     else
@@ -2056,9 +2056,9 @@ enum plugin_status plugin_start(const void* parameter )
         /* result == SOLITAIRE_USB || result == SOLITAIRE_SAVE_AND_QUIT */
         save_game();
 
-    if (rb->memcmp(&sol, &sol_disk, sizeof(sol))) /* save settings if changed */
+    if (memcmp(&sol, &sol_disk, sizeof(sol))) /* save settings if changed */
     {
-        rb->memcpy(&sol_disk, &sol, sizeof(sol));
+        memcpy(&sol_disk, &sol, sizeof(sol));
         configfile_save(CONFIG_FILENAME, config,
                         sizeof(config) / sizeof(config[0]), CFGFILE_VERSION);
     }

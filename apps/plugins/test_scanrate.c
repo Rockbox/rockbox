@@ -110,11 +110,11 @@ static bool need_refresh = false;
 
 static void timer_isr(void)
 {
-    rb->lcd_blit_mono(bitbuffer[curbuf][0], 0, 0, BUF_WIDTH, BUF_HEIGHT, BUF_WIDTH);
+    lcd_blit_mono(bitbuffer[curbuf][0], 0, 0, BUF_WIDTH, BUF_HEIGHT, BUF_WIDTH);
     curbuf = (curbuf + 1) & 1;
     if (need_refresh)
     {
-        rb->lcd_update_rect(TEXT_X, TEXT_Y, LCD_WIDTH-TEXT_X, 8);
+        lcd_update_rect(TEXT_X, TEXT_Y, LCD_WIDTH-TEXT_X, 8);
         need_refresh = false;
     }
 }
@@ -125,27 +125,27 @@ int plugin_main(void)
     bool done = false;
     bool change = true;
     
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
-    rb->lcd_putsxy(TEXT_X, TEXT_Y+12, "Adjust Frequ.");
-    rb->lcd_putsxy(TEXT_X, TEXT_Y+20, "so the block");
-    rb->lcd_putsxy(TEXT_X, TEXT_Y+28, "stops moving.");
+    lcd_putsxy(TEXT_X, TEXT_Y+12, "Adjust Frequ.");
+    lcd_putsxy(TEXT_X, TEXT_Y+20, "so the block");
+    lcd_putsxy(TEXT_X, TEXT_Y+28, "stops moving.");
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) \
  || (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-    rb->lcd_putsxy(TEXT_X, TEXT_Y+40, "Scroll: Coarse");
+    lcd_putsxy(TEXT_X, TEXT_Y+40, "Scroll: Coarse");
 #else
-    rb->lcd_putsxy(TEXT_X, TEXT_Y+40, "U/D: Coarse");
+    lcd_putsxy(TEXT_X, TEXT_Y+40, "U/D: Coarse");
 #endif
-    rb->lcd_putsxy(TEXT_X, TEXT_Y+48, "L/R: Fine");
-    rb->lcd_update();
+    lcd_putsxy(TEXT_X, TEXT_Y+48, "L/R: Fine");
+    lcd_update();
 
-    rb->memset(bitbuffer[0], 0, sizeof(bitbuffer[0]));
-    rb->memset(bitbuffer[1], 0xff, sizeof(bitbuffer[1]));
+    memset(bitbuffer[0], 0, sizeof(bitbuffer[0]));
+    memset(bitbuffer[1], 0xff, sizeof(bitbuffer[1]));
 #ifdef NEED_BOOST
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
     /* The actual frequency is twice the displayed value */
-    rb->timer_register(1, NULL, TIMER_FREQ * 5 / scan_rate,
+    timer_register(1, NULL, TIMER_FREQ * 5 / scan_rate,
                        timer_isr IF_COP(, CPU));
 
     while (!done)
@@ -153,8 +153,8 @@ int plugin_main(void)
         if (change)
         {
             /* The actual frequency is twice the displayed value */
-            rb->timer_set_period(TIMER_FREQ * 5 / scan_rate);
-            rb->lcd_putsxyf(TEXT_X, TEXT_Y, "f: %d.%d Hz", scan_rate / 10,
+            timer_set_period(TIMER_FREQ * 5 / scan_rate);
+            lcd_putsxyf(TEXT_X, TEXT_Y, "f: %d.%d Hz", scan_rate / 10,
                          scan_rate % 10);
             need_refresh = true;
             change = false;
@@ -193,12 +193,12 @@ int plugin_main(void)
             break;
         }
     }
-    rb->timer_unregister();
+    timer_unregister();
 #ifdef NEED_BOOST
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 
     return PLUGIN_OK;
 }

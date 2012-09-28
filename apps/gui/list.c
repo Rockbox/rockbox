@@ -41,6 +41,7 @@
 #include "viewport.h"
 #include "appevents.h"
 #include "statusbar-skinned.h"
+#include "symbols.h"
 
 /* The minimum number of pending button events in queue before starting
  * to limit list drawing interval.
@@ -203,6 +204,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->callback_get_item_color = NULL;
 #endif
 }
+EXPORT_SYMBOL(gui_synclist_init);
 
 /* this toggles the selection bar or cursor */
 void gui_synclist_hide_selection_marker(struct gui_synclist * lists, bool hide)
@@ -263,6 +265,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
             list_draw(&screens[i], gui_list);
     }
 }
+EXPORT_SYMBOL(gui_synclist_draw);
 
 /* sets up the list so the selection is shown correctly on the screen */
 static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
@@ -367,6 +370,7 @@ void gui_synclist_select_item(struct gui_synclist * gui_list, int item_number)
     FOR_NB_SCREENS(i)
         gui_list_put_selection_on_screen(gui_list, i);
 }
+EXPORT_SYMBOL(gui_synclist_select_item);
 
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset)
@@ -467,6 +471,7 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
 #endif
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
+EXPORT_SYMBOL(gui_synclist_set_title);
 
 void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
 {
@@ -478,19 +483,25 @@ void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
     }
 #endif
 }
+EXPORT_SYMBOL(gui_synclist_set_nb_items);
+
 int gui_synclist_get_nb_items(struct gui_synclist * lists)
 {
     return lists->nb_items;
 }
+
 int  gui_synclist_get_sel_pos(struct gui_synclist * lists)
 {
     return lists->selected_item;
 }
+EXPORT_SYMBOL(gui_synclist_get_sel_pos);
+
 void gui_synclist_set_icon_callback(struct gui_synclist * lists,
                                     list_get_icon icon_callback)
 {
     lists->callback_get_item_icon = icon_callback;
 }
+EXPORT_SYMBOL(gui_synclist_set_icon_callback);
 
 void gui_synclist_set_voice_callback(struct gui_synclist * lists,
                                      list_speak_item voice_callback)
@@ -541,6 +552,7 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
 {
     lists->limit_scroll = scroll;
 }
+EXPORT_SYMBOL(gui_synclist_limit_scroll);
 
 #ifdef HAVE_LCD_BITMAP
 /*
@@ -789,6 +801,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         _gui_synclist_speak_item(lists);
     return false;
 }
+EXPORT_SYMBOL(gui_synclist_do_button);
 
 int list_do_action_timeout(struct gui_synclist *lists, int timeout)
 /* Returns the lowest of timeout or the delay until a postponed
@@ -973,6 +986,7 @@ bool simplelist_show_list(struct simplelist_info *info)
         viewportmanager_theme_undo(i, false);
     return false;
 }
+EXPORT_SYMBOL(simplelist_show_list);
 
 void simplelist_info_init(struct simplelist_info *info, char* title,
                           int count, void* data)
@@ -995,3 +1009,4 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->callback_data = data;
     simplelist_line_count = 0;
 }
+EXPORT_SYMBOL(simplelist_info_init);

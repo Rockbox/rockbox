@@ -440,9 +440,9 @@ enum plugin_status plugin_start(const void* parameter)
     settings.round_time = 10;
 
     /* now go ahead and have fun! */
-    rb->splash(HZ, "Chess Clock");
+    splash(HZ, "Chess Clock");
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     i=0;
     while (1) {
         int res;
@@ -538,16 +538,16 @@ static void show_pause_mode(bool enabled)
     static const char pause_icon[] = {0x00,0x7f,0x7f,0x00,0x7f,0x7f,0x00};
 
     if (enabled)
-        rb->lcd_mono_bitmap((unsigned char *)pause_icon, 52, 0, 7, 8);
+        lcd_mono_bitmap((unsigned char *)pause_icon, 52, 0, 7, 8);
     else
     {
-        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(52, 0, 7, 8);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(52, 0, 7, 8);
+        lcd_set_drawmode(DRMODE_SOLID);
     }
 }
 #else
-#define show_pause_mode(enabled)  rb->lcd_icon(ICON_PAUSE, enabled)
+#define show_pause_mode(enabled)  lcd_icon(ICON_PAUSE, enabled)
 #endif
 
 static int run_timer(int nr)
@@ -567,47 +567,47 @@ static int run_timer(int nr)
         max_ticks=settings.round_time*HZ;
         round_time=true;
     }
-    rb->snprintf(player_info, sizeof(player_info), "Player %d", nr+1);
-    rb->lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
-    last_tick=*rb->current_tick;
+    snprintf(player_info, sizeof(player_info), "Player %d", nr+1);
+    lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
+    last_tick=current_tick;
 
     while (!done) {
         int button;
         long now;
         if (ticks>=max_ticks) {
             if (round_time)
-                rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"ROUND UP!");
+                lcd_puts(0, FIRST_LINE+1, (unsigned char *)"ROUND UP!");
             else
-                rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"TIME OUT!");
-            rb->backlight_on();
+                lcd_puts(0, FIRST_LINE+1, (unsigned char *)"TIME OUT!");
+            backlight_on();
             ticks = max_ticks;
         } else {
-            now=*rb->current_tick;
+            now=current_tick;
             if (!chesspause) {
                 ticks+=now-last_tick;
                 if ((max_ticks-ticks)/HZ == 10) {
                      /* Backlight on if 10 seconds remain */
-                    rb->backlight_on();
+                    backlight_on();
                 }
             }
             last_tick=now;
             if (round_time) {
-                rb->snprintf(buf, sizeof(buf), "%s/",
+                snprintf(buf, sizeof(buf), "%s/",
                              show_time((max_ticks-ticks+HZ-1)/HZ));
                 /* Append total time */
-                rb->strcpy(&buf[rb->strlen(buf)],
+                strcpy(&buf[strlen(buf)],
                            show_time((timer_holder[nr].total_time*HZ-
                                       timer_holder[nr].used_time-
                                       ticks+HZ-1)/HZ));
-                rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)buf);
+                lcd_puts(0, FIRST_LINE+1, (unsigned char *)buf);
             } else {
-                rb->lcd_puts(0, FIRST_LINE+1,
+                lcd_puts(0, FIRST_LINE+1,
                              (unsigned char *)show_time((max_ticks-ticks+HZ-1)/HZ));
             }
         }
-        rb->lcd_update();
+        lcd_update();
 
-        button = rb->button_get(false);
+        button = button_get(false);
         switch (button) {
             /* OFF/ON key to exit */
             case CHC_QUIT:
@@ -633,7 +633,7 @@ static int run_timer(int nr)
                                     "Playback Control");
 
                 int val, res;
-                switch(rb->do_menu(&menu, NULL, NULL, false))
+                switch(do_menu(&menu, NULL, NULL, false))
                 {
                     case 0:
                         /* delete player */
@@ -644,7 +644,7 @@ static int run_timer(int nr)
                     case 1:
                         /* restart */
                         ticks=0;
-                        last_tick=*rb->current_tick;
+                        last_tick=current_tick;
                         break;
                     case 2:
                         /* set round time */
@@ -657,7 +657,7 @@ static int run_timer(int nr)
                             done=true;
                         } else if (res==CHCL_OK) {
                             ticks=max_ticks-val*HZ;
-                            last_tick=*rb->current_tick;
+                            last_tick=current_tick;
                         }
                         break;
                     case 3:
@@ -682,9 +682,9 @@ static int run_timer(int nr)
                         done=true;
                         break;
                 }
-                rb->lcd_clear_display();
+                lcd_clear_display();
                 show_pause_mode(chesspause);
-                rb->lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
+                lcd_puts(0, FIRST_LINE, (unsigned char *)player_info);
             }
             break;
 
@@ -701,13 +701,13 @@ static int run_timer(int nr)
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                if (default_event_handler(button) == SYS_USB_CONNECTED) {
                     retval = CHCL_USB;
                     done = true;
                 }
                 break;
         }
-        rb->sleep(HZ/4); /* Sleep 1/4 of a second */
+        sleep(HZ/4); /* Sleep 1/4 of a second */
     }
 
     timer_holder[nr].used_time+=ticks;
@@ -725,19 +725,19 @@ static int chessclock_set_int(char* string,
     bool done = false;
     int button;
 
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, FIRST_LINE, (unsigned char *)string);
+    lcd_clear_display();
+    lcd_puts_scroll(0, FIRST_LINE, (unsigned char *)string);
 
     while (!done) {
         char str[32];
         if (flags & FLAGS_SET_INT_SECONDS)
-            rb->snprintf(str, sizeof str,"%s (m:s)", show_time(*variable));
+            snprintf(str, sizeof str,"%s (m:s)", show_time(*variable));
         else
-            rb->snprintf(str, sizeof str,"%d", *variable);
-        rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)str);
-        rb->lcd_update();
+            snprintf(str, sizeof str,"%d", *variable);
+        lcd_puts(0, FIRST_LINE+1, (unsigned char *)str);
+        lcd_update();
 
-        button = rb->button_get(true);
+        button = button_get(true);
         switch(button) {
             case CHC_SETTINGS_INC:
             case CHC_SETTINGS_INC | BUTTON_REPEAT:
@@ -764,7 +764,7 @@ static int chessclock_set_int(char* string,
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return CHCL_USB;
                 break;
 
@@ -776,7 +776,7 @@ static int chessclock_set_int(char* string,
             *variable = min;
 
     }
-    rb->lcd_stop_scroll();
+    lcd_stop_scroll();
 
     return CHCL_OK;
 }
@@ -784,7 +784,7 @@ static int chessclock_set_int(char* string,
 static char * show_time(int seconds)
 {
     static char buf[]="00:00";
-    rb->snprintf(buf, sizeof(buf), "%02d:%02d", seconds/60, seconds%60);
+    snprintf(buf, sizeof(buf), "%02d:%02d", seconds/60, seconds%60);
     return buf;
 }
 

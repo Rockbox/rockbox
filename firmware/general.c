@@ -31,6 +31,7 @@
 #include "system.h"
 #include "time.h"
 #include "timefuncs.h"
+#include "symbols.h"
 
 #if CONFIG_CODEC == SWCODEC
 int round_value_to_list32(unsigned long value,
@@ -65,6 +66,7 @@ int round_value_to_list32(unsigned long value,
 
     return idmin;
 } /* round_value_to_list32 */
+EXPORT_SYMBOL(round_value_to_list32);
 
 /* Number of bits set in src_mask should equal src_list length */
 int make_list_from_caps32(unsigned long src_mask,
@@ -164,7 +166,7 @@ char *create_numbered_filename(char *buffer, const char *path,
 
     return buffer;
 }
-
+EXPORT_SYMBOL(create_numbered_filename);
 
 #if CONFIG_RTC
 /* Create a filename with a date+time part.
@@ -213,6 +215,7 @@ void ** find_array_ptr(void **arr, void *ptr)
     for (curr = *arr; curr != NULL && curr != ptr; curr = *(++arr));
     return arr;
 }
+EXPORT_SYMBOL(find_array_ptr);
 
 /* Remove a pointer from a pointer array if it exists. Compacts it so that
  * no gaps exist. Returns 0 on success and -1 if the element wasn't found. */
@@ -234,3 +237,4 @@ int remove_array_ptr(void **arr, void *ptr)
 
     return 0;
 }
+EXPORT_SYMBOL(remove_array_ptr);

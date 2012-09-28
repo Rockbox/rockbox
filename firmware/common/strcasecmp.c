@@ -1,6 +1,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include "symbols.h"
 
 #ifndef strcasecmp
 int strcasecmp(const char *s1, const char *s2)
@@ -12,6 +13,7 @@ int strcasecmp(const char *s1, const char *s2)
 
     return tolower(*(unsigned char *) s1) - tolower(*(unsigned char *) s2);
 }
+EXPORT_SYMBOL(strcasecmp);
 #endif
 
 #ifndef strncasecmp
@@ -29,4 +31,5 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
     
     return d;
 }
+EXPORT_SYMBOL(strncasecmp);
 #endif

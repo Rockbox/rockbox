@@ -160,7 +160,7 @@ void InitMD5( struct md5_s *p_md5 )
     p_md5->p_digest[ 2 ] = 0x98badcfe;
     p_md5->p_digest[ 3 ] = 0x10325476;
 
-    rb->memset( p_md5->p_data, 0, 64 );
+    memset( p_md5->p_data, 0, 64 );
     p_md5->i_bits = 0;
 }
 
@@ -180,7 +180,7 @@ void AddMD5( struct md5_s *p_md5, const void *p_src, size_t i_len )
      * resulting buffer to the MD5 message */
     if( i_len >= (64 - i_current) )
     {
-        rb->memcpy( ((uint8_t *)p_md5->p_data) + i_current, p_src,
+        memcpy( ((uint8_t *)p_md5->p_data) + i_current, p_src,
                 (64 - i_current) );
         DigestMD5( p_md5, p_md5->p_data );
 
@@ -193,14 +193,14 @@ void AddMD5( struct md5_s *p_md5, const void *p_src, size_t i_len )
     while( i_len >= 64 )
     {
         uint32_t p_tmp[ 16 ];
-        rb->memcpy( p_tmp, ((const uint8_t *)p_src) + i_offset, 64 );
+        memcpy( p_tmp, ((const uint8_t *)p_src) + i_offset, 64 );
         DigestMD5( p_md5, p_tmp );
         i_offset += 64;
         i_len -= 64;
     }
 
     /* Copy our remaining data to the message's spare buffer */
-    rb->memcpy( ((uint8_t *)p_md5->p_data) + i_current,
+    memcpy( ((uint8_t *)p_md5->p_data) + i_current,
                 ((const uint8_t *)p_src) + i_offset, i_len );
 }
 
@@ -225,14 +225,14 @@ void EndMD5( struct md5_s *p_md5 )
      * our length at the end of the next block. */
     if( i_current > 56 )
     {
-        rb->memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (64 - i_current) );
+        memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (64 - i_current) );
         DigestMD5( p_md5, p_md5->p_data );
         i_current = 0;
     }
 
     /* Fill the unused space in our last block with zeroes and put the
      * message length at the end. */
-    rb->memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (56 - i_current) );
+    memset( ((uint8_t *)p_md5->p_data) + i_current, 0, (56 - i_current) );
     p_md5->p_data[ 14 ] = p_md5->i_bits & 0xffffffff;
     p_md5->p_data[ 15 ] = (p_md5->i_bits >> 32);
     REVERSE( &p_md5->p_data[ 14 ], 2 );
@@ -245,7 +245,7 @@ void psz_md5_hash( char *psz, struct md5_s *md5_s )
     int i;
     for ( i = 0; i < 4; i++ )
     {
-        rb->snprintf( &psz[8*i], 9, "%02x%02x%02x%02x",
+        snprintf( &psz[8*i], 9, "%02x%02x%02x%02x",
             (unsigned int)(md5_s->p_digest[i] & 0xff),
             (unsigned int)(( md5_s->p_digest[i] >> 8 ) & 0xff),
             (unsigned int)(( md5_s->p_digest[i] >> 16 ) & 0xff),

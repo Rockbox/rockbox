@@ -37,6 +37,7 @@
 #include "rbunicode.h"
 #include "bidi.h"
 #include "scroll_engine.h"
+#include "symbols.h"
 
 #define ROW_INC LCD_WIDTH
 #define COL_INC 1
@@ -141,6 +142,7 @@ void lcd_hline(int x1, int x2, int y)
         break;
     }
 }
+EXPORT_SYMBOL(lcd_hline);
 
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
@@ -198,6 +200,7 @@ void lcd_vline(int x, int y1, int y2)
     }
     while (dst <= dst_end);
 }
+EXPORT_SYMBOL(lcd_vline);
 
 /* Draw a partial native bitmap */
 void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
@@ -271,6 +274,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     }
     while (--height > 0);
 }
+EXPORT_SYMBOL(lcd_bitmap_part);
 
 /* Draw a partial native bitmap with transparency and foreground colors */
 void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
@@ -390,3 +394,4 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     while (--height > 0);
 #endif
 }
+EXPORT_SYMBOL(lcd_bitmap_transparent_part);

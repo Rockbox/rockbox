@@ -32,6 +32,7 @@
 #include "debug.h"
 #include "rbunicode.h"
 #include "rbpaths.h"
+#include "symbols.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -171,6 +172,7 @@ unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
 
     return utf8;
 }
+EXPORT_SYMBOL(utf8encode);
 
 /* Recode an iso encoded string to UTF-8 */
 unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
@@ -244,6 +246,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
     }
     return utf8;
 }
+EXPORT_SYMBOL(iso_decode);
 
 /* Recode a UTF-16 string with little-endian byte ordering to UTF-8 */
 unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8,
@@ -267,6 +270,7 @@ unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8,
     }
     return utf8;
 }
+EXPORT_SYMBOL(utf16LEdecode);
 
 /* Recode a UTF-16 string with big-endian byte ordering to UTF-8 */
 unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8,
@@ -289,6 +293,7 @@ unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8,
     }
     return utf8;
 }
+EXPORT_SYMBOL(utf16BEdecode);
 
 #if 0 /* currently unused */
 /* Recode any UTF-16 string to UTF-8 */
@@ -322,6 +327,7 @@ unsigned long utf8length(const unsigned char *utf8)
 
     return l;
 }
+EXPORT_SYMBOL(utf8length);
 
 /* Decode 1 UTF-8 char and return a pointer to the next char. */
 const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
@@ -368,6 +374,7 @@ const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
     *ucs = (code < 0x10000) ? code : 0xfffd;
     return utf8;
 }
+EXPORT_SYMBOL(utf8decode);
 
 void set_codepage(int cp)
 {
@@ -388,6 +395,7 @@ int utf8seek(const unsigned char* utf8, int offset)
     }
     return pos;
 }
+EXPORT_SYMBOL(utf8seek);
 
 const char* get_codepage_name(int cp)
 {
@@ -395,3 +403,4 @@ const char* get_codepage_name(int cp)
         return name_codepages[NUM_CODEPAGES];
     return name_codepages[cp];
 }
+EXPORT_SYMBOL(get_codepage_name);

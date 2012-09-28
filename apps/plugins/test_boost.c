@@ -30,35 +30,35 @@ enum plugin_status plugin_start(const void* parameter)
     bool boost = false;
     int count = 0;
     int last_count = 0;
-    int last_tick = *rb->current_tick;
+    int last_tick = current_tick;
     int per_sec = 0;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     while (!done)
     {
         int j,x;
         for (j=1; j<100000; j++)
             x = j*11;
-        rb->screens[0]->clear_display();
-        rb->screens[0]->putsf(0, 0, "%s: %d",boost?"boost":"normal",count);
-        if (TIME_AFTER(*rb->current_tick, last_tick+HZ))
+        screens[0]->clear_display();
+        screens[0]->putsf(0, 0, "%s: %d",boost?"boost":"normal",count);
+        if (TIME_AFTER(current_tick, last_tick+HZ))
         {
-            last_tick = *rb->current_tick;
+            last_tick = current_tick;
             per_sec = count-last_count;
             last_count = count;
         }
-        rb->screens[0]->putsf(0, 1, "loops/s: %d", per_sec);
-        rb->screens[0]->update();
+        screens[0]->putsf(0, 1, "loops/s: %d", per_sec);
+        screens[0]->update();
         count++;
 
-        switch (rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK))
+        switch (get_action(CONTEXT_STD, TIMEOUT_NOBLOCK))
         {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             case ACTION_STD_PREV:
                 if (!boost)
                 {
-                    rb->cpu_boost(true);
+                    cpu_boost(true);
                     boost = true;
                 }
                 break;
@@ -66,7 +66,7 @@ enum plugin_status plugin_start(const void* parameter)
             case ACTION_STD_NEXT:
                 if (boost)
                 {
-                    rb->cpu_boost(false);
+                    cpu_boost(false);
                     boost = false;
                 }
                 break;

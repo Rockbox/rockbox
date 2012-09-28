@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "font.h"
 #include "gcc_extensions.h"
+#include "symbols.h"
 
 #include <get_sp.h>
 #include <backtrace.h>
@@ -96,6 +97,11 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
      * memory regions which cause abort
      */
     static bool triggered = false;
+    unsigned int spsr;
+
+    asm volatile ("mrs %[SPSR], spsr \n"
+                  : [SPSR] "=r" (spsr)
+                 );
 
 #if LCD_DEPTH > 1
     lcd_set_backdrop(NULL);
@@ -108,7 +114,8 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
     lcd_clear_display();
-    lcd_putsf(0, line++, "%s at %08x" IF_COP(" (%d)"), uiename[num], pc IF_COP(, CURRENT_CORE));
+    lcd_putsf(0, line++, "%s", uiename[num]);
+    lcd_putsf(0, line++, "at %08x" IF_COP(" (%d)") "  %s", pc IF_COP(, CURRENT_CORE), (spsr & (1<<5)) ? "T" : "A");
 
 #if !defined(CPU_ARM7TDMI) && (CONFIG_CPU != RK27XX) /* arm7tdmi has no MPU/MMU */
     if(num == 1 || num == 2) /* prefetch / data abort */
@@ -170,3 +177,4 @@ void __attribute__((naked)) __div0(void)
         "b      UIE         \r\n"
     );
 }
+EXPORT_SYMBOL(__div0);

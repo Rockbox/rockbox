@@ -20,11 +20,11 @@ static void set_codec_track(int t, int multitrack) {
     Nsf_start_track(&nsf_emu, t); 
 
     /* for REPEAT_ONE we disable track limits */
-    if (!ci->loop_track()) {
+    if (!codec_loop_track()) {
         Track_set_fade(&nsf_emu, Track_length( &nsf_emu, t ) - 4000, 4000);
     }
-    if (multitrack) ci->set_elapsed(t*1000); /* t is track no to display */
-    else ci->set_elapsed(0);
+    if (multitrack) audio_codec_update_elapsed(t*1000); /* t is track no to display */
+    else audio_codec_update_elapsed(0);
 }
 
 /* this is the codec entry point */
@@ -32,11 +32,11 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* we only render 16 bits */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 16);
 
         /* 44 Khz, Interleaved stereo */
-        ci->configure(DSP_SET_FREQUENCY, 44100);
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+        codec_configure(DSP_SET_FREQUENCY, 44100);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
 
         Nsf_init(&nsf_emu);
         Nsf_set_sample_rate(&nsf_emu, 44100);
@@ -63,18 +63,18 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }  
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
         
     /* Read the entire file */
     DEBUGF("NSF: request file\n");
-    ci->seek_buffer(0);
-    buf = ci->request_buffer(&n, ci->filesize);
-    if (!buf || n < (size_t)ci->filesize) {
+    codec_seek_buffer(0);
+    buf = codec_request_buffer(&n, ci.filesize);
+    if (!buf || n < (size_t)ci.filesize) {
         DEBUGF("NSF: file load failed\n");
         return CODEC_ERROR;
     }
    
-    if ((err = Nsf_load_mem(&nsf_emu, buf, ci->filesize))) {
+    if ((err = Nsf_load_mem(&nsf_emu, buf, ci.filesize))) {
         DEBUGF("NSF: Nsf_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
     }
@@ -90,7 +90,7 @@ next_track:
 
     /* The main decoder loop */
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -98,18 +98,18 @@ next_track:
         if (action == CODEC_ACTION_SEEK_TIME) {
             if (is_multitrack) {
                 track = param/1000;
-                ci->seek_complete();
+                codec_seek_complete();
                 if (track >= nsf_emu.track_count) break;
                 goto next_track;
             }
 
-            ci->set_elapsed(param);
+            audio_codec_update_elapsed(param);
             elapsed_time = param;
             Track_seek(&nsf_emu, param);
-            ci->seek_complete();
+            codec_seek_complete();
             
             /* Set fade again */
-            if (!ci->loop_track()) {
+            if (!codec_loop_track()) {
                 Track_set_fade(&nsf_emu, Track_length( &nsf_emu, track ), 4000);
             }
         }
@@ -122,12 +122,12 @@ next_track:
             goto next_track;
         }
 
-        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
+        codec_pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
 
         /* Set elapsed time for one track files */
         if (is_multitrack == 0) {
             elapsed_time += (CHUNK_SIZE / 2) * 10 / 441;
-            ci->set_elapsed(elapsed_time);
+            audio_codec_update_elapsed(elapsed_time);
         }
     }
 

@@ -127,7 +127,7 @@ hybrid_filter (fltst *fs, int *in) {
 
 static inline void
 filter_init (fltst *fs, int shift) {
-    ci->memset (fs, 0, sizeof(fltst));
+    memset (fs, 0, sizeof(fltst));
     fs->shift = shift;
     fs->round = 1 << (shift - 1);
     fs->index = 0;

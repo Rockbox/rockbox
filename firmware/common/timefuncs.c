@@ -26,6 +26,7 @@
 #include "rtc.h"
 #include "timefuncs.h"
 #include "debug.h"
+#include "symbols.h"
 
 static struct tm tm;
 
@@ -81,6 +82,7 @@ struct tm *get_time(void)
 #endif /* RTC */
     return &tm;
 }
+EXPORT_SYMBOL(get_time);
 
 int set_time(const struct tm *tm)
 {

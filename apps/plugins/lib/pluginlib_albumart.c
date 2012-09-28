@@ -22,6 +22,5 @@
 ****************************************************************************/
 
 #include <plugin.h>
-#include "wrappers.h"
 
 #include "../../recorder/albumart.c"

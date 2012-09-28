@@ -44,7 +44,7 @@ static int get_more_data(spx_ogg_sync_state *oy)
 
     buffer = (char *)spx_ogg_sync_buffer(oy,CHUNKSIZE);
 
-    bytes = ci->read_filebuf(buffer, sizeof(char)*CHUNKSIZE);
+    bytes = codec_read_filebuf(buffer, sizeof(char)*CHUNKSIZE);
 
     spx_ogg_sync_wrote(oy,bytes);
 
@@ -56,12 +56,12 @@ static int get_more_data(spx_ogg_sync_state *oy)
 static spx_int64_t get_next_page(spx_ogg_sync_state *oy,spx_ogg_page *og,
                                  spx_int64_t boundary)
 {
-    spx_int64_t localoffset = ci->curpos;
+    spx_int64_t localoffset = ci.curpos;
     long more;
     long ret;
 
     if (boundary > 0)
-        boundary += ci->curpos;
+        boundary += ci.curpos;
 
     while (1) {
         more = spx_ogg_sync_pageseek(oy,og);
@@ -98,7 +98,7 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
 {
     spx_int64_t crofs;
     spx_int64_t *curoffset=&crofs;
-    *curoffset=ci->curpos;
+    *curoffset=ci.curpos;
     spx_int64_t begin=*curoffset;
     spx_int64_t end=begin;
     spx_int64_t ret;
@@ -124,7 +124,7 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
 
         *curoffset = begin;
 
-        ci->seek_buffer(*curoffset);
+        codec_seek_buffer(*curoffset);
 
         spx_ogg_sync_reset(oy);
 
@@ -192,7 +192,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
 
     spx_int64_t crofs;
     spx_int64_t *curbyteoffset = &crofs;
-    *curbyteoffset = ci->curpos;
+    *curbyteoffset = ci.curpos;
     spx_int64_t curoffset;
     curoffset = *curbyteoffset;
     spx_int64_t offset = 0;
@@ -214,7 +214,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
 
         //spx_int64_t toffset=curoffset;
 
-        ci->seek_buffer(curoffset);
+        codec_seek_buffer(curoffset);
 
         spx_ogg_sync_reset(oy);
 
@@ -223,22 +223,22 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
         if (offset < 0) { /* could not find new page,use old offset */
             LOGF("Seek/guess/fault:%lld->-<-%d,%lld:%lld,%d,%ld,%d\n",
                  curpos,0,pos,offset,0,
-                 ci->curpos,/*stream_length*/0);
+                 ci.curpos,/*stream_length*/0);
 
             curoffset = *curbyteoffset;
 
-            ci->seek_buffer(curoffset);
+            codec_seek_buffer(curoffset);
 
             spx_ogg_sync_reset(oy);
         } else {
             if (spx_ogg_page_granulepos(&og) == 0 && pos > 5000) {
                 LOGF("SEEK/guess/fault:%lld->-<-%lld,%lld:%lld,%d,%ld,%d\n",
                      curpos,spx_ogg_page_granulepos(&og),pos,
-                     offset,0,ci->curpos,/*stream_length*/0);
+                     offset,0,ci.curpos,/*stream_length*/0);
 
                 curoffset = *curbyteoffset;
 
-                ci->seek_buffer(curoffset);
+                codec_seek_buffer(curoffset);
 
                 spx_ogg_sync_reset(oy);
             } else {
@@ -283,7 +283,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
         }
     }
 
-    ci->seek_buffer(*curbyteoffset);
+    codec_seek_buffer(*curbyteoffset);
 
     spx_ogg_sync_reset(oy);
 
@@ -393,7 +393,7 @@ enum codec_status codec_run(void)
     int eos = 0;
     SpeexStereoState *stereo;
     int channels = -1;
-    int samplerate = ci->id3->frequency;
+    int samplerate = ci.id3->frequency;
     int extra_headers = 0;
     int stream_init = 0;
     /* rockbox: comment 'set but unused' variables
@@ -403,7 +403,7 @@ enum codec_status codec_run(void)
     int packet_count = 0;
     int lookahead;
     int headerssize = 0;
-    unsigned long strtoffset = ci->id3->offset;
+    unsigned long strtoffset = ci.id3->offset;
     void *st = NULL;
     int j = 0;
     intptr_t param;
@@ -416,18 +416,18 @@ enum codec_status codec_run(void)
         goto exit;
     }
 
-    ci->seek_buffer(0);
-    ci->set_elapsed(0);
+    codec_seek_buffer(0);
+    audio_codec_update_elapsed(0);
 
     stereo = speex_stereo_state_init();
     spx_ogg_sync_init(&oy);
     spx_ogg_alloc_buffer(&oy,2*CHUNKSIZE);
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     eof = 0;
     while (!eof) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -446,8 +446,8 @@ enum codec_status codec_run(void)
                                         page_granule, &oy, headerssize);
             }
 
-            ci->set_elapsed(param);
-            ci->seek_complete();
+            audio_codec_update_elapsed(param);
+            codec_seek_complete();
         }
 
 next_page:
@@ -490,12 +490,12 @@ next_page:
                         goto done;
                     }
 
-                    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
-                    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+                    codec_configure(DSP_SET_FREQUENCY, ci.id3->frequency);
+                    codec_configure(DSP_SET_SAMPLE_DEPTH, 16);
                     if (channels == 2) {
-                        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+                        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
                     } else if (channels == 1) {
-                        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+                        codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
                     }
 
                     /* Speex header in its own page, add the whole page
@@ -510,7 +510,7 @@ next_page:
                 } else {
                     if (packet_count <= 2+extra_headers) {
                         if (strtoffset) {
-                            ci->seek_buffer(strtoffset);
+                            codec_seek_buffer(strtoffset);
                             spx_ogg_sync_reset(&oy);
                             packet_count++;
                             goto next_page;
@@ -547,15 +547,15 @@ next_page:
 
                             if (channels == 2)
                                 frame_start += lookahead;
-                            ci->pcmbuf_insert(frame_start, NULL,
+                            codec_pcmbuf_insert(frame_start, NULL,
                                               frame_size - lookahead);
                             lookahead = 0;
                             /* 2 bytes/sample */
                             cur_granule += frame_size / 2;
 
-                            ci->set_offset((long) ci->curpos);
+                            audio_codec_update_offset((long) ci.curpos);
 
-                            ci->set_elapsed((samplerate == 0) ? 0 :
+                            audio_codec_update_elapsed((samplerate == 0) ? 0 :
                                              cur_granule * 1000 / samplerate);
                          }
                     }

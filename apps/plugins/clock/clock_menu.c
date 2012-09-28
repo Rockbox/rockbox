@@ -61,7 +61,7 @@ static const struct opt_items hour_format_text[] = {
 static bool menu_mode_selector(void){
     MENUITEM_STRINGLIST(menu,"Mode Selector",NULL, "Analog",
                         "Digital", "Binary");
-    if(rb->do_menu(&menu, &clock_settings.mode, NULL, false) >=0)
+    if(do_menu(&menu, &clock_settings.mode, NULL, false) >=0)
         return(true);
     return(false);
 }
@@ -77,19 +77,19 @@ static void menu_analog_settings(void)
                         "Show Second Hand","Show Border");
 
     while(result>=0){
-        result=rb->do_menu(&menu, &selection, NULL, false);
+        result=do_menu(&menu, &selection, NULL, false);
         switch(result){
             case 0:
-                rb->set_option("Show Date", &clock_settings.analog.show_date,
+                set_option("Show Date", &clock_settings.analog.show_date,
                                BOOL, noyes_text, 2, NULL);
                 break;
             case 1:
-                rb->set_option("Show Second Hand",
+                set_option("Show Second Hand",
                                &clock_settings.analog.show_seconds,
                                BOOL, noyes_text, 2, NULL);
                 break;
             case 2:
-                rb->set_option("Show Border",
+                set_option("Show Border",
                                &clock_settings.analog.show_border,
                                BOOL, noyes_text, 2, NULL);
                 break;
@@ -107,15 +107,15 @@ static void menu_digital_settings(void){
                         "Blinking Colon");
 
     while(result>=0){
-        result=rb->do_menu(&menu, &selection, NULL, false);
+        result=do_menu(&menu, &selection, NULL, false);
         switch(result){
             case 0:
-                rb->set_option("Show Seconds",
+                set_option("Show Seconds",
                                &clock_settings.digital.show_seconds,
                                BOOL, noyes_text, 2, NULL);
                 break;
             case 1:
-                rb->set_option("Blinking Colon",
+                set_option("Blinking Colon",
                                &clock_settings.digital.blinkcolon,
                                BOOL, noyes_text, 2, NULL);
                 break;
@@ -129,14 +129,14 @@ static void menu_digital_settings(void){
 static void confirm_reset(void){
     int result=0;
 
-    rb->set_option("Reset all settings?", &result, INT, noyes_text, 2, NULL);
+    set_option("Reset all settings?", &result, INT, noyes_text, 2, NULL);
 
     if(result == 1){ /* reset! */
         clock_settings_reset(&clock_settings);
-        rb->splash(HZ, "Settings reset!");
+        splash(HZ, "Settings reset!");
     }
     else
-        rb->splash(HZ, "Settings NOT reset.");
+        splash(HZ, "Settings NOT reset.");
 }
 
 /************************************
@@ -152,20 +152,20 @@ static void menu_general_settings(void){
                         "Idle Poweroff (temporary)");
 
     while(result>=0){
-        result=rb->do_menu(&menu, &selection, NULL, false);
+        result=do_menu(&menu, &selection, NULL, false);
         switch(result){
             case 0:
-                rb->set_option("Hour format",
+                set_option("Hour format",
                                &clock_settings.general.hour_format,
                                INT, hour_format_text, 2, NULL);
                 break;
             case 1:
-                rb->set_option("Date format",
+                set_option("Date format",
                                &clock_settings.general.date_format,
                                INT, date_format_text, 4, NULL);
                 break;
             case 2:
-                rb->set_option("Show Counter", &clock_settings.general.show_counter,
+                set_option("Show Counter", &clock_settings.general.show_counter,
                                BOOL, noyes_text, 2, NULL);
                 break;
             case 3:
@@ -174,11 +174,11 @@ static void menu_general_settings(void){
 
             case 4:
                 save_settings_wo_gui();
-                rb->splash(HZ, "Settings saved");
+                splash(HZ, "Settings saved");
                 break;
 
             case 5:
-                rb->set_option("Save On Exit",
+                set_option("Save On Exit",
                                &clock_settings.general.save_settings,
                                BOOL, noyes_text, 2, NULL);
 
@@ -188,14 +188,14 @@ static void menu_general_settings(void){
                     save_settings_wo_gui();
                 break;
             case 6:
-                rb->set_option("Backlight Settings",
+                set_option("Backlight Settings",
                                &clock_settings.general.backlight,
                                INT, backlight_settings_text, 3, NULL);
                 apply_backlight_setting(clock_settings.general.backlight);
                 break;
 
             case 7:
-                rb->set_option("Idle Poweroff (temporary)",
+                set_option("Idle Poweroff (temporary)",
                                &clock_settings.general.idle_poweroff,
                                BOOL, idle_poweroff_text, 2, NULL);
                 break;
@@ -216,7 +216,7 @@ bool main_menu(void){
                         "Quit");
 
     while(!done){
-        switch(rb->do_menu(&menu, &selection, NULL, false)){
+        switch(do_menu(&menu, &selection, NULL, false)){
             case 0:
                 done = true;
                 break;

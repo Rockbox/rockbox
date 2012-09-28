@@ -323,7 +323,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #include "lib/read_image.h"
 #define READ_IMAGE read_image_file
 #else
-#define READ_IMAGE rb->read_bmp_file
+#define READ_IMAGE read_bmp_file
 #endif
 
 #include "pluginbitmaps/sliding_puzzle.h"
@@ -389,12 +389,12 @@ static const char * initial_bmp_path=NULL;
 #ifdef HAVE_ALBUMART
 static const char * get_albumart_bmp_path(void)
 {
-    struct mp3entry* track = rb->audio_current_track();
+    struct mp3entry* track = audio_current_track();
 
     if (!track || !track->path || track->path[0] == '\0')
         return NULL;
 
-    if (!rb->search_albumart_files(track, "", albumart_path, MAX_PATH ) )
+    if (!search_albumart_files(track, "", albumart_path, MAX_PATH ) )
         return NULL;
 
     albumart_path[ MAX_PATH ] = '\0';
@@ -443,14 +443,14 @@ static bool load_resize_bitmap(void)
     if( filename != NULL )
     {
         /* if we already loaded image before, don't touch disk */
-        if( 0 == rb->strcmp( filename, img_buf_path ) )
+        if( 0 == strcmp( filename, img_buf_path ) )
         {
             puzzle_bmp_ptr = (const fb_data *)img_buf;
             return true;
         }
 
         struct bitmap main_bitmap;
-        rb->memset(&main_bitmap,0,sizeof(struct bitmap));
+        memset(&main_bitmap,0,sizeof(struct bitmap));
         main_bitmap.data = img_buf;
 
         main_bitmap.width = IMAGE_WIDTH;
@@ -463,7 +463,7 @@ static bool load_resize_bitmap(void)
         if( rc > 0 )
         {
             puzzle_bmp_ptr = (const fb_data *)img_buf;
-            rb->strcpy( img_buf_path, filename );
+            strcpy( img_buf_path, filename );
             return true;
         }
     }
@@ -486,37 +486,37 @@ static void draw_spot(int p, int x, int y)
 #if LCD_DEPTH==1
         /* the bottom-right cell of the default sliding_puzzle image is
            an appropriate hole graphic */
-        rb->lcd_bitmap_part(sliding_puzzle, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
+        lcd_bitmap_part(sliding_puzzle, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
                     ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
                     STRIDE( SCREEN_MAIN, 
                             BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle),
                     x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
 #else
         /* just draw a black rectangle */
-        int old_fg = rb->lcd_get_foreground();
-        rb->lcd_set_foreground(LCD_BLACK);
-        rb->lcd_fillrect(x,y,SPOTS_WIDTH,SPOTS_HEIGHT);
-        rb->lcd_set_foreground(LCD_WHITE);
-        rb->lcd_drawrect(x,y,SPOTS_WIDTH,SPOTS_HEIGHT);
-        rb->lcd_set_foreground(old_fg);
+        int old_fg = lcd_get_foreground();
+        lcd_set_foreground(LCD_BLACK);
+        lcd_fillrect(x,y,SPOTS_WIDTH,SPOTS_HEIGHT);
+        lcd_set_foreground(LCD_WHITE);
+        lcd_drawrect(x,y,SPOTS_WIDTH,SPOTS_HEIGHT);
+        lcd_set_foreground(old_fg);
 #endif
     }
     else if (picmode != PICMODE_NUMERALS)
     {
-        rb->lcd_bitmap_part( puzzle_bmp_ptr, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
+        lcd_bitmap_part( puzzle_bmp_ptr, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
                      ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
                      STRIDE( SCREEN_MAIN, 
                              BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle), 
                      x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
     } else {
-        rb->lcd_drawrect(x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
-        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(x+1, y+1, SPOTS_WIDTH-2, SPOTS_HEIGHT-2);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->snprintf(s, sizeof(s), "%d", p);
-        rb->lcd_setfont(num_font);
-        rb->lcd_getstringsize(s, &w, &h);
-        rb->lcd_putsxy(x + (SPOTS_WIDTH/2) - w / 2,
+        lcd_drawrect(x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(x+1, y+1, SPOTS_WIDTH-2, SPOTS_HEIGHT-2);
+        lcd_set_drawmode(DRMODE_SOLID);
+        snprintf(s, sizeof(s), "%d", p);
+        lcd_setfont(num_font);
+        lcd_getstringsize(s, &w, &h);
+        lcd_putsxy(x + (SPOTS_WIDTH/2) - w / 2,
                        y + (SPOTS_HEIGHT/2) - h / 2, s);
     }
 }
@@ -538,15 +538,15 @@ static void move_spot(int x, int y)
     spots[hole] = spots[hole-x-SPOTS_X*y];
     hole -= (x+SPOTS_X*y);
     moves++;
-    rb->lcd_setfont(moves_font);
+    lcd_setfont(moves_font);
 #if LCD_WIDTH > LCD_HEIGHT
-    rb->snprintf(s, sizeof(s), "%d", moves);
-    w = rb->lcd_getstringsize(s, NULL, NULL);
-    rb->lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
+    snprintf(s, sizeof(s), "%d", moves);
+    w = lcd_getstringsize(s, NULL, NULL);
+    lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
                    moves_y, s);
 #else
     (void)w;
-    rb->lcd_putsxyf(3, moves_y, "Moves: %d", moves);
+    lcd_putsxyf(3, moves_y, "Moves: %d", moves);
 #endif
     for(i=1;i<=4;i++)
     {
@@ -556,8 +556,8 @@ static void move_spot(int x, int y)
        draw_spot(spots[hole],
                  (hole%SPOTS_X)*SPOTS_WIDTH + (i*x*SPOTS_WIDTH)/5,
                  (hole/SPOTS_X)*SPOTS_HEIGHT + (i*y*SPOTS_HEIGHT)/5);
-       rb->lcd_update();
-       rb->sleep(HZ/50);
+       lcd_update();
+       sleep(HZ/50);
     }
     draw_spot(HOLE_ID,
               (hole%SPOTS_X)*SPOTS_WIDTH,
@@ -565,7 +565,7 @@ static void move_spot(int x, int y)
     draw_spot(spots[hole],
               ((hole%SPOTS_X)+x)*SPOTS_WIDTH,
               ((hole/SPOTS_X)+y)*SPOTS_HEIGHT);
-    rb->lcd_update();
+    lcd_update();
 
     spots[hole] = HOLE_ID;
 }
@@ -574,28 +574,28 @@ static void draw_playfield(void)
 {
     int i, w;
 
-    rb->lcd_clear_display();
-    rb->lcd_setfont(moves_font);
+    lcd_clear_display();
+    lcd_setfont(moves_font);
 #if LCD_WIDTH > LCD_HEIGHT
-    rb->lcd_vline(IMAGE_WIDTH, 0, LCD_HEIGHT-1);
-    w = rb->lcd_getstringsize("Moves", NULL, NULL);
-    rb->lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
+    lcd_vline(IMAGE_WIDTH, 0, LCD_HEIGHT-1);
+    w = lcd_getstringsize("Moves", NULL, NULL);
+    lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
                    10, "Moves");
-    rb->snprintf(s, sizeof(s), "%d", moves);
-    w = rb->lcd_getstringsize(s, NULL, NULL);
-    rb->lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
+    snprintf(s, sizeof(s), "%d", moves);
+    w = lcd_getstringsize(s, NULL, NULL);
+    lcd_putsxy((IMAGE_WIDTH+1+(LCD_WIDTH-IMAGE_WIDTH-1)/2) - w / 2,
                    moves_y, s);
 #else
     (void)w;
-    rb->lcd_hline(0, LCD_WIDTH-1, IMAGE_HEIGHT);
-    rb->lcd_putsxyf(3, moves_y, "Moves: %d", moves);
+    lcd_hline(0, LCD_WIDTH-1, IMAGE_HEIGHT);
+    lcd_putsxyf(3, moves_y, "Moves: %d", moves);
 #endif
 
     /* draw spots to the lcd */
     for (i=0; i<NUM_SPOTS; i++)
         draw_spot(spots[i], (i%SPOTS_X)*SPOTS_WIDTH, (i/SPOTS_X)*SPOTS_HEIGHT);
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 /* initializes the puzzle */
@@ -607,7 +607,7 @@ static void puzzle_init(void)
 
     /* shuffle spots */
     for (i=NUM_SPOTS-1; i>=0; i--) {
-        r = (rb->rand() % (i+1));
+        r = (rand() % (i+1));
 
         temp = spots[r];
         spots[r] = spots[i];
@@ -664,7 +664,7 @@ static int puzzle_loop(void)
 
     puzzle_init();
     while(true) {
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button) {
 #ifdef PUZZLE_RC_QUIT
             case PUZZLE_RC_QUIT:
@@ -701,7 +701,7 @@ static int puzzle_loop(void)
                 while( !load_success );
 
                 /* tell the user what mode we picked in the end! */
-                rb->splash(HZ,picmode_descriptions[ picmode ] );
+                splash(HZ,picmode_descriptions[ picmode ] );
                 draw_playfield();
                 break;
 
@@ -726,7 +726,7 @@ static int puzzle_loop(void)
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -743,7 +743,7 @@ enum plugin_status plugin_start(
     int i, w, h;
 
     initial_bmp_path=(const char *)parameter;
-    img_buf = rb->plugin_get_buffer(&img_buf_len);
+    img_buf = plugin_get_buffer(&img_buf_len);
     picmode = PICMODE_INITIAL_PICTURE;
     img_buf_path[0] = '\0';
 
@@ -755,123 +755,123 @@ enum plugin_status plugin_start(
         picmode = PICMODE_DEFAULT_PICTURE;
 
         /* print title */
-        rb->lcd_getstringsize((unsigned char *)"Sliding Puzzle", &w, &h);
+        lcd_getstringsize((unsigned char *)"Sliding Puzzle", &w, &h);
         w = (w+1)/2;
         h = (h+1)/2;
-        rb->lcd_clear_display();
-        rb->lcd_putsxy(LCD_WIDTH/2-w, (LCD_HEIGHT/2)-h,
+        lcd_clear_display();
+        lcd_putsxy(LCD_WIDTH/2-w, (LCD_HEIGHT/2)-h,
                        (unsigned char *)"Sliding Puzzle");
-        rb->lcd_update();
-        rb->sleep(HZ);
+        lcd_update();
+        sleep(HZ);
 
         /* print instructions */
-        rb->lcd_clear_display();
-        rb->lcd_setfont(FONT_SYSFIXED);
+        lcd_clear_display();
+        lcd_setfont(FONT_SYSFIXED);
 #if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ARCHOS_AV300_PAD
-        rb->lcd_putsxy(3, 18, "[OFF] to stop");
-        rb->lcd_putsxy(3, 28, "[F1] shuffle");
-        rb->lcd_putsxy(3, 38, "[F2] change pic");
+        lcd_putsxy(3, 18, "[OFF] to stop");
+        lcd_putsxy(3, 28, "[F1] shuffle");
+        lcd_putsxy(3, 38, "[F2] change pic");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_putsxy(0, 18, "[OFF] to stop");
-        rb->lcd_putsxy(0, 28, "[MODE..] shuffle");
-        rb->lcd_putsxy(0, 38, "[MODE] change pic");
+        lcd_putsxy(0, 18, "[OFF] to stop");
+        lcd_putsxy(0, 28, "[MODE..] shuffle");
+        lcd_putsxy(0, 38, "[MODE] change pic");
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-        rb->lcd_putsxy(0, 18, "[S-MENU] to stop");
-        rb->lcd_putsxy(0, 28, "[S-LEFT] shuffle");
-        rb->lcd_putsxy(0, 38, "[S-RIGHT] change pic");
+        lcd_putsxy(0, 18, "[S-MENU] to stop");
+        lcd_putsxy(0, 28, "[S-LEFT] shuffle");
+        lcd_putsxy(0, 38, "[S-RIGHT] change pic");
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-        rb->lcd_putsxy(0, 18, "[STOP] to stop");
-        rb->lcd_putsxy(0, 28, "[SELECT] shuffle");
-        rb->lcd_putsxy(0, 38, "[PLAY] change pic");
+        lcd_putsxy(0, 18, "[STOP] to stop");
+        lcd_putsxy(0, 28, "[SELECT] shuffle");
+        lcd_putsxy(0, 38, "[PLAY] change pic");
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-        rb->lcd_putsxy(0, 18, "[OFF] to stop");
-        rb->lcd_putsxy(0, 28, "[REC] shuffle");
-        rb->lcd_putsxy(0, 38, "[PLAY] change pic");
+        lcd_putsxy(0, 18, "[OFF] to stop");
+        lcd_putsxy(0, 28, "[REC] shuffle");
+        lcd_putsxy(0, 38, "[PLAY] change pic");
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-        rb->lcd_putsxy(0, 18, "[POWER] to stop");
-        rb->lcd_putsxy(0, 28, "[SELECT] shuffle");
-        rb->lcd_putsxy(0, 38, "[A] change pic");
+        lcd_putsxy(0, 18, "[POWER] to stop");
+        lcd_putsxy(0, 28, "[SELECT] shuffle");
+        lcd_putsxy(0, 38, "[A] change pic");
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
       (CONFIG_KEYPAD == SANSA_C200_PAD)
-        rb->lcd_putsxy(0, 18, "[OFF] to stop");
-        rb->lcd_putsxy(0, 28, "[REC] shuffle");
-        rb->lcd_putsxy(0, 38, "[SELECT] change pic");
+        lcd_putsxy(0, 18, "[OFF] to stop");
+        lcd_putsxy(0, 28, "[REC] shuffle");
+        lcd_putsxy(0, 38, "[SELECT] change pic");
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-        rb->lcd_putsxy(0, 18, "[OFF] to stop");
-        rb->lcd_putsxy(0, 28, "[REW] shuffle");
-        rb->lcd_putsxy(0, 38, "[PLAY] change pic");
+        lcd_putsxy(0, 18, "[OFF] to stop");
+        lcd_putsxy(0, 28, "[REW] shuffle");
+        lcd_putsxy(0, 38, "[PLAY] change pic");
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD || \
       CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-        rb->lcd_putsxy(0, 18, "[BACK] to stop");
-        rb->lcd_putsxy(0, 28, "[SELECT] shuffle");
-        rb->lcd_putsxy(0, 38, "[MENU] change pic");
+        lcd_putsxy(0, 18, "[BACK] to stop");
+        lcd_putsxy(0, 28, "[SELECT] shuffle");
+        lcd_putsxy(0, 38, "[MENU] change pic");
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-        rb->lcd_putsxy(0, 18, "[REC] to stop");
-        rb->lcd_putsxy(0, 28, "[MODE] shuffle");
-        rb->lcd_putsxy(0, 38, "[MENU] change pic");
+        lcd_putsxy(0, 18, "[REC] to stop");
+        lcd_putsxy(0, 28, "[MODE] shuffle");
+        lcd_putsxy(0, 38, "[MENU] change pic");
 #endif
 #ifdef HAVE_TOUCHSCREEN
-        rb->lcd_putsxy(0, 18, PUZZLE_QUIT_TEXT " to stop");
-        rb->lcd_putsxy(0, 28, PUZZLE_SHUFFLE_TEXT " shuffle");
-        rb->lcd_putsxy(0, 38, PUZZLE_PICTURE_TEXT " change pic");
+        lcd_putsxy(0, 18, PUZZLE_QUIT_TEXT " to stop");
+        lcd_putsxy(0, 28, PUZZLE_SHUFFLE_TEXT " shuffle");
+        lcd_putsxy(0, 38, PUZZLE_PICTURE_TEXT " change pic");
 #endif
 #ifdef HAVE_ALBUMART
-        rb->lcd_putsxy(0,48,"    pic->albumart->num");
+        lcd_putsxy(0,48,"    pic->albumart->num");
 #else
-        rb->lcd_putsxy(0,48,"    pic<->num");
+        lcd_putsxy(0,48,"    pic<->num");
 #endif
-        rb->lcd_update();
-        rb->button_get_w_tmo(HZ*2);
+        lcd_update();
+        button_get_w_tmo(HZ*2);
     }
 
     hole = INITIAL_HOLE;
 
     if( !load_resize_bitmap() )
     {
-        rb->lcd_clear_display();
-        rb->splash(HZ*2,"Failed to load bitmap!");
+        lcd_clear_display();
+        splash(HZ*2,"Failed to load bitmap!");
         return PLUGIN_OK;
     }
 
     /* Calculate possible font sizes and text positions */
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("15", &w, &h);
+    lcd_setfont(FONT_UI);
+    lcd_getstringsize("15", &w, &h);
     if ((w > (SPOTS_WIDTH-2)) || (h > (SPOTS_HEIGHT-2)))
         num_font = FONT_SYSFIXED;
 
 #if LCD_WIDTH > LCD_HEIGHT
-    rb->lcd_getstringsize("Moves", &w, &h);
+    lcd_getstringsize("Moves", &w, &h);
     if (w > (LCD_WIDTH-IMAGE_WIDTH-1))
         moves_font = FONT_SYSFIXED;
-    rb->lcd_setfont(moves_font);
-    rb->lcd_getstringsize("Moves", &w, &h);
+    lcd_setfont(moves_font);
+    lcd_getstringsize("Moves", &w, &h);
     moves_y = 10 + h;
 #else
-    rb->lcd_getstringsize("Moves: 999", &w, &h);
+    lcd_getstringsize("Moves: 999", &w, &h);
     if ((w > LCD_WIDTH) || (h > (LCD_HEIGHT-IMAGE_HEIGHT-1)))
         moves_font = FONT_SYSFIXED;
-    rb->lcd_setfont(moves_font);
-    rb->lcd_getstringsize("Moves: 999", &w, &h);
+    lcd_setfont(moves_font);
+    lcd_getstringsize("Moves: 999", &w, &h);
     moves_y = (IMAGE_HEIGHT+1+(LCD_HEIGHT-IMAGE_HEIGHT-1)/2) - h / 2;
 #endif
     for (i=0; i<NUM_SPOTS; i++)
         spots[i]=(i+1);
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_backdrop(NULL);
 #elif LCD_DEPTH > 1
-    rb->lcd_set_background(LCD_WHITE);
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_background(LCD_WHITE);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_backdrop(NULL);
 #endif
 
     draw_playfield();
-    rb->sleep(HZ*2);
+    sleep(HZ*2);
 
     return puzzle_loop();
 }

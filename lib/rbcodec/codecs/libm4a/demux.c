@@ -278,7 +278,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
           j=qtmovie->stream->ci->curpos+sub_chunk_len-8;
           if (read_chunk_esds(qtmovie,sub_chunk_len)) {
              if (j!=qtmovie->stream->ci->curpos) {
-               DEBUGF("curpos=%ld, j=%d - Skipping %ld bytes\n",qtmovie->stream->ci->curpos,j,j-qtmovie->stream->ci->curpos);
+               DEBUGF("curpos=%ld, j=%d - Skipping %ld bytes\n",qtmovie->stream->ci.curpos,j,j-qtmovie->stream->ci.curpos);
                stream_skip(qtmovie->stream,j-qtmovie->stream->ci->curpos);
              }
              got_codec_data = true;

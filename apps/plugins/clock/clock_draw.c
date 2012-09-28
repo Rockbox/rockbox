@@ -71,17 +71,17 @@ static void skin_restore_background(struct screen* display, int mode, int skin){
 
 void clock_draw_set_colors(void){
     FOR_NB_SCREENS(i)
-        skin_set_background(rb->screens[i],
+        skin_set_background(&screens[i],
                             clock_settings.mode,
                             clock_settings.skin[clock_settings.mode]);
 }
 
 void clock_draw_restore_colors(void){
     FOR_NB_SCREENS(i){
-            skin_restore_background(rb->screens[i],
+            skin_restore_background(&screens[i],
                                     clock_settings.mode,
                                     clock_settings.skin[clock_settings.mode]);
-            rb->screens[i]->update();
+            screens[i].update();
     }
 }
 

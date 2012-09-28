@@ -402,7 +402,7 @@ int rb_fscanf_f(int fd, float* f)
     char buf[FSCANF_F_BUFSIZE];
 
     /* Read line from file. */
-    int bytes_read = rb->read_line(fd, buf, FSCANF_F_BUFSIZE-1);
+    int bytes_read = read_line(fd, buf, FSCANF_F_BUFSIZE-1);
 
     /* Terminate string. */
     if(bytes_read >= FSCANF_F_BUFSIZE)

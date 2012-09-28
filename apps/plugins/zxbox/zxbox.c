@@ -58,16 +58,16 @@ long start_time IBSS_ATTR = 0;
 enum plugin_status plugin_start(const void* parameter)
 {
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
-    rb->splash(HZ, "Welcome to ZXBox");
+    splash(HZ, "Welcome to ZXBox");
 
 
     sp_init();
 
 #ifdef USE_GREY
     /* get the remainder of the plugin buffer */
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *) plugin_get_buffer(&gbuf_size);
 #ifdef USE_BUFFERED_GREY
     grey_init(gbuf, gbuf_size, GREY_BUFFERED|GREY_ON_COP, LCD_WIDTH,
               LCD_HEIGHT, NULL);
@@ -80,23 +80,23 @@ enum plugin_status plugin_start(const void* parameter)
 
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
-    start_time = *rb->current_tick;
+    start_time = current_tick;
 
 #ifdef RB_PROFILE
-   rb->profile_thread();
+   profile_thread();
 #endif
 
     start_spectemu(parameter);
 
 #ifdef RB_PROFILE
-   rb->profstop();
+   profstop();
 #endif
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
 #ifdef USE_GREY
@@ -105,7 +105,7 @@ grey_release();
 #endif 
 
 #if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
-    rb->pcm_play_stop();
+    pcm_play_stop();
 #endif
 
 return PLUGIN_OK;
@@ -124,10 +124,10 @@ void spkb_process_events( int evenframe )
         int ki;
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-        if (rb->button_hold())
+        if (button_hold())
         {
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-            rb->cpu_boost(false);
+            cpu_boost(false);
 #endif
             exit_requested=1;
 #ifdef USE_GREY
@@ -136,7 +136,7 @@ void spkb_process_events( int evenframe )
             return;
         }
 #endif
-        int buttons = rb->button_status();
+        int buttons = button_status();
         if ( buttons == previous_state )
             return;
         previous_state = buttons;
@@ -145,7 +145,7 @@ void spkb_process_events( int evenframe )
         if (buttons & ZX_MENU)
         {
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-            rb->cpu_boost(false);
+            cpu_boost(false);
 #endif
             exit_requested=1;
 #ifdef USE_GREY

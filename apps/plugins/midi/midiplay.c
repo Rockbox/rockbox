@@ -318,7 +318,7 @@ static inline void synthbuf(void)
 #ifndef SYNC
         /* synthbuf is called in interrupt context is SYNC is defined so it cannot yield
            that bug causing the sim to crach when not using SYNC should really be fixed */
-        rb->yield();
+        yield();
 #endif
         if (tick() == 0)
             quit = true;
@@ -367,13 +367,13 @@ static int midimain(const void * filename)
         ROCKBOX_DIR "/patchset/drums.cfg") == -1)
         return -1;
 
-    rb->pcm_play_stop();
+    pcm_play_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE); /* 44100 22050 11025 */
+    pcm_set_frequency(SAMPLE_RATE); /* 44100 22050 11025 */
 
     /*
         * tick() will do one MIDI clock tick. Then, there's a loop here that
@@ -405,30 +405,30 @@ static int midimain(const void * filename)
     samples_this_second = 0;
 
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+    pcm_play_data(&get_more, NULL, NULL, 0);
 
     while (!quit)
     {
     #ifndef SYNC
         synthbuf();
     #endif
-        rb->yield();
+        yield();
 
         /* Prevent idle poweroff */
-        rb->reset_poweroff_timer();
+        reset_poweroff_timer();
 
         /* Code taken from Oscilloscope plugin */
-        switch (rb->button_get(false))
+        switch (button_get(false))
         {
             case BTN_UP:
             case BTN_UP | BUTTON_REPEAT:
             {
-                vol = rb->global_settings->volume;
-                if (vol < rb->sound_max(SOUND_VOLUME))
+                vol = global_settings.volume;
+                if (vol < sound_max(SOUND_VOLUME))
                 {
                     vol++;
-                    rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    sound_set(SOUND_VOLUME, vol);
+                    global_settings.volume = vol;
                 }
                 break;
             }
@@ -436,12 +436,12 @@ static int midimain(const void * filename)
             case BTN_DOWN:
             case BTN_DOWN | BUTTON_REPEAT:
             {
-                vol = rb->global_settings->volume;
-                if (vol > rb->sound_min(SOUND_VOLUME))
+                vol = global_settings.volume;
+                if (vol > sound_min(SOUND_VOLUME))
                 {
                     vol--;
-                    rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    sound_set(SOUND_VOLUME, vol);
+                    global_settings.volume = vol;
                 }
                 break;
             }
@@ -450,21 +450,21 @@ static int midimain(const void * filename)
             {
                 /* Rewinding is tricky. Basically start the file over */
                 /* but run through the tracks without the synth running */
-                rb->pcm_play_stop();
+                pcm_play_stop();
                 seekBackward(5);
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    pcm_play_data(&get_more, NULL, NULL, 0);
                 break;
             }
 
             case BTN_RIGHT:
             {
-                rb->pcm_play_stop();
+                pcm_play_stop();
                 seekForward(5);
                 midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    pcm_play_data(&get_more, NULL, NULL, 0);
                 break;
             }
 
@@ -474,12 +474,12 @@ static int midimain(const void * filename)
                 {
                     midi_debug("Paused at %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = false;
-                    rb->pcm_play_stop();
+                    pcm_play_stop();
                 } else
                 {
                     midi_debug("Playing from %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = true;
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    pcm_play_data(&get_more, NULL, NULL, 0);
                 }
                 break;
             }
@@ -500,35 +500,35 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter == NULL)
     {
-        rb->splash(HZ*2, " Play .MID file ");
+        splash(HZ*2, " Play .MID file ");
         return PLUGIN_OK;
     }
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     midi_debug("%s", parameter);
-    /*   rb->splash(HZ, true, parameter); */
+    /*   splash(HZ, true, parameter); */
 
 #ifdef RB_PROFILE
-    rb->profile_thread();
+    profile_thread();
 #endif
 
     retval = midimain(parameter);
 
 #ifdef RB_PROFILE
-    rb->profstop();
+    profstop();
 #endif
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_play_stop();
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
-    rb->splash(HZ, "FINISHED PLAYING");
+    splash(HZ, "FINISHED PLAYING");
 
     if (retval == -1)
         return PLUGIN_ERROR;

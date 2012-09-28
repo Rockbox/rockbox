@@ -1044,6 +1044,6 @@ out_of_time:
 
 void CPU_Init( THIS )
 {
-    ci->memcpy( this->cycle_table, cycle_table, sizeof cycle_table );
+    memcpy( this->cycle_table, cycle_table, sizeof cycle_table );
 }
 

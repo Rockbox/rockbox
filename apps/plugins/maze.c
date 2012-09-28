@@ -253,8 +253,8 @@ struct coord_stack
 
 static void coord_stack_init(struct coord_stack* stack)
 {
-    rb->memset(stack->x, 0, sizeof(stack->x));
-    rb->memset(stack->y, 0, sizeof(stack->y));
+    memset(stack->x, 0, sizeof(stack->x));
+    memset(stack->y, 0, sizeof(stack->y));
     stack->stp = 0;
 }
 
@@ -308,7 +308,7 @@ static int maze_pick_random_neighbour_cell_with_walls(struct maze* maze,
 
     /* then choose one */
     if (n > 0){
-        i = rb->rand() % n;
+        i = rand() % n;
         *pnx = px[i];
         *pny = py[i];
     }
@@ -360,8 +360,8 @@ static void maze_generate(struct maze* maze)
 
     coord_stack_init(&done_cells);
 
-    x = rb->rand()%MAZE_WIDTH;
-    y = rb->rand()%MAZE_HEIGHT;
+    x = rand()%MAZE_WIDTH;
+    y = rand()%MAZE_HEIGHT;
 
     visited_cells = 1;
     while (visited_cells < total_cells){
@@ -401,7 +401,7 @@ static void maze_solve(struct maze* maze)
         return;
 
     /* work on a copy of the maze */
-    rb->memcpy(solved_maze, maze->maze, sizeof(maze->maze));
+    memcpy(solved_maze, maze->maze, sizeof(maze->maze));
 
     /* remove walls on start and end point */
     solved_maze[0][0] &= ~WALL_N;
@@ -420,7 +420,7 @@ static void maze_solve(struct maze* maze)
         dead_ends = 0;
         /* scan for dead ends */
         for(y=0; y<MAZE_HEIGHT; y++){
-            rb->yield();
+            yield();
             for(x=0; x<MAZE_WIDTH; x++){
                 cell = solved_maze[x][y];
                 wall = cell & WALL_ALL;
@@ -502,20 +502,20 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_ignore_timeout();
 
     /* Seed the RNG */
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
     FOR_NB_SCREENS(i)
-        rb->screens[i]->set_viewport(NULL);
+        screens[i].set_viewport(NULL);
 
     /* Draw the background */
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #if LCD_DEPTH >= 16
-    rb->lcd_set_foreground(LCD_RGBPACK( 0, 0, 0));
-    rb->lcd_set_background(LCD_RGBPACK(182, 198, 229)); /* rockbox blue */
+    lcd_set_foreground(LCD_RGBPACK( 0, 0, 0));
+    lcd_set_background(LCD_RGBPACK(182, 198, 229)); /* rockbox blue */
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(0);
-    rb->lcd_set_background(LCD_DEFAULT_BG);
+    lcd_set_foreground(0);
+    lcd_set_background(LCD_DEFAULT_BG);
 #endif
 #endif
 
@@ -523,14 +523,14 @@ enum plugin_status plugin_start(const void* parameter)
     maze_init(&maze);
     maze_generate(&maze);
     FOR_NB_SCREENS(i)
-        maze_draw(&maze, rb->screens[i]);
+        maze_draw(&maze, &screens[i]);
 
     while(!quit) {
 #ifdef __PLUGINLIB_ACTIONS_H__
         button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
                 ARRAYLEN(plugin_contexts));
 #else
-        button = rb->button_get(true);
+        button = button_get(true);
 #endif
         switch(button) {
         case MAZE_NEW:
@@ -541,43 +541,43 @@ enum plugin_status plugin_start(const void* parameter)
             maze_init(&maze);
             maze_generate(&maze);
             FOR_NB_SCREENS(i)
-                maze_draw(&maze, rb->screens[i]);
+                maze_draw(&maze, &screens[i]);
             break;
         case MAZE_SOLVE:
             maze_solve(&maze);
             FOR_NB_SCREENS(i)
-                maze_draw(&maze, rb->screens[i]);
+                maze_draw(&maze, &screens[i]);
             break;
         case MAZE_UP:
         case MAZE_UP_REPEAT:
             maze_move_player_up(&maze);
             FOR_NB_SCREENS(i)
-                maze_draw(&maze, rb->screens[i]);
+                maze_draw(&maze, &screens[i]);
             break;
         case MAZE_RIGHT:
         case MAZE_RIGHT_REPEAT:
             maze_move_player_right(&maze);
             FOR_NB_SCREENS(i)
-                maze_draw(&maze, rb->screens[i]);
+                maze_draw(&maze, &screens[i]);
             break;
         case MAZE_DOWN:
         case MAZE_DOWN_REPEAT:
             maze_move_player_down(&maze);
             FOR_NB_SCREENS(i)
-                maze_draw(&maze, rb->screens[i]);
+                maze_draw(&maze, &screens[i]);
             break;
         case MAZE_LEFT:
         case MAZE_LEFT_REPEAT:
             maze_move_player_left(&maze);
             FOR_NB_SCREENS(i)
-                maze_draw(&maze, rb->screens[i]);
+                maze_draw(&maze, &screens[i]);
             break;
         case MAZE_QUIT:
             /* quit plugin */
             quit=1;
             break;
         default:
-            if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+            if (default_event_handler(button) == SYS_USB_CONNECTED) {
                 /* quit plugin */
                 quit=2;
             }

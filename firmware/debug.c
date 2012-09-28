@@ -255,4 +255,4 @@ void debugf(const char *fmt, ...)
     (void)fmt;
 #endif
 }
-
+EXPORT_SYMBOL(debugf);

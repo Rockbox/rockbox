@@ -57,8 +57,8 @@ static void fill_buffer(int pos){
     int found = false ;
     const char crlf = '\n';
 
-    rb->lseek(fd, pos+bomsize, SEEK_SET);
-    numread = rb->read(fd, buffer, MIN(BUFFER_SIZE, file_size-pos));
+    lseek(fd, pos+bomsize, SEEK_SET);
+    numread = read(fd, buffer, MIN(BUFFER_SIZE, file_size-pos));
 
     buffer[numread] = 0;
     line_end = 0;
@@ -74,9 +74,9 @@ static void fill_buffer(int pos){
 
                 if (found){
                     /* write to playlist */
-                    rb->write(fdw, &buffer[line_end],
-                              rb->strlen( &buffer[line_end] ));
-                    rb->write(fdw, &crlf, 1);
+                    write(fdw, &buffer[line_end],
+                              strlen( &buffer[line_end] ));
+                    write(fdw, &crlf, 1);
 
                     found = false ;
                     results++ ;
@@ -104,37 +104,37 @@ static void search_buffer(void){
 
 static void clear_display(void){
     FOR_NB_SCREENS(i){
-        rb->screens[i]->clear_display();
+        screens[i].clear_display();
     }
 }
 
 static bool search_init(const char* file){
-    rb->memset(search_string, 0, sizeof(search_string));
+    memset(search_string, 0, sizeof(search_string));
 
-    if (!rb->kbd_input(search_string,sizeof search_string)){
+    if (!kbd_input(search_string,sizeof search_string)){
         clear_display();
-        rb->splash(0, "Searching...");
-        fd = rb->open_utf8(file, O_RDONLY);
+        splash(0, "Searching...");
+        fd = open_utf8(file, O_RDONLY);
         if (fd < 0)
             return false;
 
-        bomsize = rb->lseek(fd, 0, SEEK_CUR);
+        bomsize = lseek(fd, 0, SEEK_CUR);
         if (bomsize)
-            fdw = rb->open_utf8(resultfile, O_WRONLY|O_CREAT|O_TRUNC);
+            fdw = open_utf8(resultfile, O_WRONLY|O_CREAT|O_TRUNC);
         else
-            fdw = rb->open(resultfile, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+            fdw = open(resultfile, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
         if (fdw < 0) {
 #ifdef HAVE_LCD_BITMAP
-            rb->splash(HZ, "Failed to create result file!");
+            splash(HZ, "Failed to create result file!");
 #else
-            rb->splash(HZ, "File creation failed");
+            splash(HZ, "File creation failed");
 #endif
-            rb->close(fd);
+            close(fd);
             return false;
         }
 
-        file_size = rb->lseek(fd, 0, SEEK_END) - bomsize;
+        file_size = lseek(fd, 0, SEEK_END) - bomsize;
 
         return true;
     }
@@ -150,32 +150,32 @@ enum plugin_status plugin_start(const void* parameter)
     char *p;
     if(!parameter) return PLUGIN_ERROR;
 
-    DEBUGF("%s - %s\n", (char *)parameter, &filename[rb->strlen(filename)-4]);
+    DEBUGF("%s - %s\n", (char *)parameter, &filename[strlen(filename)-4]);
     /* Check the extension. We only allow .m3u files. */
-    if (!(p = rb->strrchr(filename, '.')) ||
-        (rb->strcasecmp(p, ".m3u") && rb->strcasecmp(p, ".m3u8")))
+    if (!(p = strrchr(filename, '.')) ||
+        (strcasecmp(p, ".m3u") && strcasecmp(p, ".m3u8")))
     {
-        rb->splash(HZ, "Not a .m3u or .m3u8 file");
+        splash(HZ, "Not a .m3u or .m3u8 file");
         return PLUGIN_ERROR;
     }
 
-    rb->strcpy(path, filename);
+    strcpy(path, filename);
 
-    p = rb->strrchr(path, '/');
+    p = strrchr(path, '/');
     if(p)
         *p = 0;
 
-    rb->snprintf(resultfile, MAX_PATH, "%s/search_result.m3u", path);
+    snprintf(resultfile, MAX_PATH, "%s/search_result.m3u", path);
     ok = search_init(parameter);
     if (!ok)
         return PLUGIN_ERROR;
     search_buffer();
 
     clear_display();
-    rb->splash(HZ, "Done");
-    rb->close(fdw);
-    rb->close(fd);
-    rb->reload_directory();
+    splash(HZ, "Done");
+    close(fdw);
+    close(fd);
+    reload_directory();
 
     return PLUGIN_OK;
 }

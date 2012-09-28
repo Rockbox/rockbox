@@ -38,7 +38,7 @@
 /* A normal read without any byte-swapping */
 void stream_read(stream_t *stream, size_t size, void *buf)
 {
-    stream->ci->read_filebuf(buf,size);
+    codec_read_filebuf(buf,size);
     if (stream->ci->curpos >= stream->ci->filesize) { stream->eof=1; }
 }
 
@@ -86,12 +86,14 @@ uint8_t stream_read_uint8(stream_t *stream)
 
 void stream_skip(stream_t *stream, size_t skip)
 {
-    stream->ci->advance_buffer(skip);
+    (void)stream;
+    codec_advance_buffer(skip);
 }
 
 void stream_seek(stream_t *stream, size_t offset)
 {
-    stream->ci->seek_buffer(offset);
+    (void)stream;
+    codec_seek_buffer(offset);
 }
 
 int stream_eof(stream_t *stream)
@@ -153,6 +155,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
     uint32_t sound_sample_loc, uint32_t* sound_samples_done, 
     int* current_sample)
 {
+    (void)stream;
     uint32_t i = 0;
     uint32_t tmp_var, tmp_cnt, tmp_dur;
     uint32_t new_sample = 0;       /* Holds the amount of chunks/frames. */
@@ -190,7 +193,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
     gather_offset(demux_res, &new_sample, &new_pos);
 
     /* We know the new file position, so let's try to seek to it */
-    if (stream->ci->seek_buffer(new_pos))
+    if (codec_seek_buffer(new_pos))
     {
         *sound_samples_done = new_sound_sample;
         *current_sample = new_sample;
@@ -219,6 +222,7 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
     uint32_t file_loc, uint32_t* sound_samples_done, 
     int* current_sample)
 {
+    (void)stream;
     uint32_t i;
     uint32_t chunk_sample     = 0;
     uint32_t total_samples    = 0;
@@ -256,7 +260,7 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
     }
 
     /* Go to the new file position. */
-    if (stream->ci->seek_buffer(new_pos)) 
+    if (codec_seek_buffer(new_pos)) 
     {
         *sound_samples_done = new_sound_sample;
         *current_sample = chunk_sample;

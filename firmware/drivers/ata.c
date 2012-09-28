@@ -35,6 +35,7 @@
 #include "ata-driver.h"
 #include "ata-defines.h"
 #include "storage.h"
+#include "symbols.h"
 
 #define SECTOR_SIZE     512
 
@@ -814,6 +815,7 @@ void ata_spindown(int seconds)
 {
     sleep_timeout = seconds * HZ;
 }
+EXPORT_SYMBOL(ata_spindown);
 
 bool ata_disk_is_active(void)
 {
@@ -851,6 +853,7 @@ void ata_sleep(void)
 {
     queue_post(&ata_queue, Q_SLEEP, 0);
 }
+EXPORT_SYMBOL(ata_sleep);
 
 void ata_sleepnow(void)
 {
@@ -867,6 +870,7 @@ void ata_spin(void)
 {
     last_user_activity = current_tick;
 }
+EXPORT_SYMBOL(ata_spin);
 
 static void ata_thread(void)
 {

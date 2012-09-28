@@ -72,12 +72,12 @@ void hms_format(char *buf, size_t bufsize, struct hms *hms)
     /* Only display hours if nonzero */
     if (hms->hrs != 0)
     {
-        rb->snprintf(buf, bufsize, "%u:%02u:%02u",
+        snprintf(buf, bufsize, "%u:%02u:%02u",
                      hms->hrs, hms->min, hms->sec);
     }
     else
     {
-        rb->snprintf(buf, bufsize, "%u:%02u",
+        snprintf(buf, bufsize, "%u:%02u",
                      hms->min, hms->sec);
     }
 }
@@ -115,20 +115,20 @@ bool list_is_empty(void **list)
 /* Is the item inserted into a particular list? */
 bool list_is_member(void **list, void *item)
 {
-    return *rb->find_array_ptr(list, item) != NULL;
+    return *find_array_ptr(list, item) != NULL;
 }
 
 /* Removes an item from a list - returns true if item was found
  * and thus removed. */
 bool list_remove_item(void **list, void *item)
 {
-    return rb->remove_array_ptr(list, item) != -1;
+    return remove_array_ptr(list, item) != -1;
 }
 
 /* Adds a list item, insert last, if not already present. */
 void list_add_item(void **list, void *item)
 {
-    void **item_p = rb->find_array_ptr(list, item);
+    void **item_p = find_array_ptr(list, item);
     if (*item_p == NULL)
         *item_p = item;
 }
@@ -201,7 +201,7 @@ void mpeg_sysevent_handle(void)
 {
     long id = mpeg_sysevent();
     if (id != 0)
-        rb->default_event_handler(id);
+        default_event_handler(id);
 }
 
 
@@ -212,11 +212,11 @@ int mpeg_button_get(int timeout)
     int button;
 
     mpeg_sysevent_clear();
-    button = timeout == TIMEOUT_BLOCK ? rb->button_get(true) :
-                rb->button_get_w_tmo(timeout);
+    button = timeout == TIMEOUT_BLOCK ? button_get(true) :
+                button_get_w_tmo(timeout);
 
     /* Produce keyclick */
-    rb->keyclick_click(true, button);
+    keyclick_click(true, button);
 
     return mpeg_sysevent_callback(button, NULL);
 }

@@ -889,9 +889,9 @@ static void spr_scan(void)
 void lcd_begin(void)
 {
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    vdest=(unsigned char*)rb->lcd_framebuffer;
+    vdest=(unsigned char*)lcd_framebuffer;
 #else
-    vdest=rb->lcd_framebuffer;
+    vdest=lcd_framebuffer;
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -1109,28 +1109,28 @@ void lcd_refreshline(void)
         if(options.showstats)
         {
             if(options.showstats==1) {
-                rb->lcd_putsxyf(0,LCD_HEIGHT-10," %d %d ",
+                lcd_putsxyf(0,LCD_HEIGHT-10," %d %d ",
                         options.fps, options.frameskip);
             } else {
-                rb->lcd_putsxyf(0,LCD_HEIGHT-10," FPS: %d Frameskip: %d ",
+                lcd_putsxyf(0,LCD_HEIGHT-10," FPS: %d Frameskip: %d ",
                         options.fps, options.frameskip);
             }
-            rb->lcd_update_rect(0,LCD_HEIGHT-10, LCD_WIDTH, 10);
+            lcd_update_rect(0,LCD_HEIGHT-10, LCD_WIDTH, 10);
         }
 
         hpt=0x8000;
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
         if(options.scaling==3) {
-            rb->lcd_blit_pal256((unsigned char*)rb->lcd_framebuffer,(LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
+            lcd_blit_pal256((unsigned char*)lcd_framebuffer,(LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
         } else {
-            rb->lcd_blit_pal256((unsigned char*)rb->lcd_framebuffer,0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
+            lcd_blit_pal256((unsigned char*)lcd_framebuffer,0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
         }
 #else
         if(options.scaling==3) {
-            rb->lcd_update_rect( (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
+            lcd_update_rect( (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
         } else {
-            rb->lcd_update();
+            lcd_update();
         }
 #endif
     }
@@ -1180,7 +1180,7 @@ static void updatepalette(int i)
     {
         PAL[i] = c;
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        rb->lcd_pal256_update_pal(PAL);
+        lcd_pal256_update_pal(PAL);
 #endif
     }
 }

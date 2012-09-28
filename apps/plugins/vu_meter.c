@@ -499,7 +499,7 @@ static void calc_scales(void)
 
         analog_db_scale[i-1] = z;
         /* play nice */
-        rb->yield();
+        yield();
 
         /* y values (analog needle co-ords) */
         j = i - (int)(half_width/2);
@@ -507,43 +507,43 @@ static void calc_scales(void)
 
         /* fsqrt+1 seems to give a closer approximation */
         y_values[i-1] = LCD_HEIGHT - (fp_sqrt(k, 16)>>8) - 1;
-        rb->yield();
+        yield();
     }
 }
 
 static void load_settings(void) {
-    int fp = rb->open(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", O_RDONLY);
+    int fp = open(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", O_RDONLY);
     if(fp>=0) {
-            rb->read(fp, &vumeter_settings, sizeof(struct saved_settings));
-            rb->close(fp);
+            read(fp, &vumeter_settings, sizeof(struct saved_settings));
+            close(fp);
     }
     else {
         reset_settings();
-        rb->splash(HZ, "Press " LABEL_HELP " for help");
+        splash(HZ, "Press " LABEL_HELP " for help");
     }
 }
 
 static void save_settings(void) {
-    int fp = rb->creat(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", 0666);
+    int fp = creat(PLUGIN_DEMOS_DATA_DIR "/.vu_meter", 0666);
     if(fp >= 0) {
-        rb->write (fp, &vumeter_settings, sizeof(struct saved_settings));
-        rb->close(fp);
+        write (fp, &vumeter_settings, sizeof(struct saved_settings));
+        close(fp);
     }
 }
 
 static void change_volume(int delta) {
-    int minvol = rb->sound_min(SOUND_VOLUME);
-    int maxvol = rb->sound_max(SOUND_VOLUME);
-    int vol = rb->global_settings->volume + delta;
+    int minvol = sound_min(SOUND_VOLUME);
+    int maxvol = sound_max(SOUND_VOLUME);
+    int vol = global_settings.volume + delta;
 
     if (vol > maxvol) vol = maxvol;
     else if (vol < minvol) vol = minvol;
-    if (vol != rb->global_settings->volume) {
-        rb->sound_set(SOUND_VOLUME, vol);
-        rb->global_settings->volume = vol;
-        rb->lcd_putsxyf(0,0, "%d", vol);
-        rb->lcd_update();
-        rb->sleep(HZ/12);
+    if (vol != global_settings.volume) {
+        sound_set(SOUND_VOLUME, vol);
+        global_settings.volume = vol;
+        lcd_putsxyf(0,0, "%d", vol);
+        lcd_update();
+        sleep(HZ/12);
     }
 }
 
@@ -573,22 +573,22 @@ static bool vu_meter_menu(void)
     };
 
     while (!menu_quit) {
-        switch(rb->do_menu(&menu, &selection, NULL, false))
+        switch(do_menu(&menu, &selection, NULL, false))
         {
             case 0:
-                rb->set_option("Meter Type", &vumeter_settings.meter_type, INT,
+                set_option("Meter Type", &vumeter_settings.meter_type, INT,
                                meter_type_option, 2, NULL);
                 break;
                 
             case 1:
                 if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_bool_options("Scale", &vumeter_settings.analog_use_db_scale,
+                    set_bool_options("Scale", &vumeter_settings.analog_use_db_scale,
                                          "dBfs", -1, "Linear", -1, NULL);
                 }
                 else
                 {
-                    rb->set_bool_options("Scale", &vumeter_settings.digital_use_db_scale,
+                    set_bool_options("Scale", &vumeter_settings.digital_use_db_scale,
                                          "dBfs", -1, "Linear", -1, NULL);
                 }
                 break;
@@ -596,12 +596,12 @@ static bool vu_meter_menu(void)
             case 2:
                 if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_bool("Enable Minimeters",
+                    set_bool("Enable Minimeters",
                                  &vumeter_settings.analog_minimeters);
                 }
                 else
                 {
-                    rb->set_bool("Enable Minimeters",
+                    set_bool("Enable Minimeters",
                                  &vumeter_settings.digital_minimeters);
                 }
                 break;
@@ -609,12 +609,12 @@ static bool vu_meter_menu(void)
             case 3:
                 if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_option("Decay Speed", &vumeter_settings.analog_decay, INT, 
+                    set_option("Decay Speed", &vumeter_settings.analog_decay, INT, 
                                decay_speed_option, 7, NULL);
                 }
                 else
                 {
-                    rb->set_option("Decay Speed", &vumeter_settings.digital_decay, INT, 
+                    set_option("Decay Speed", &vumeter_settings.digital_decay, INT, 
                                decay_speed_option, 7, NULL);
                 }
                 break;
@@ -632,80 +632,80 @@ static bool vu_meter_menu(void)
         }
     }
     /* the menu uses the userfont, set it back to sysfont */
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
     return exit;
 }
 
 static void draw_analog_minimeters(void) {
-    rb->lcd_mono_bitmap(sound_speaker, quarter_width-28, 12, 4, 8);
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_mono_bitmap(sound_speaker, quarter_width-28, 12, 4, 8);
+    lcd_set_drawmode(DRMODE_FG);
     if(analog_mini_1<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_low_level, quarter_width-23, 12, 2, 8);
+        lcd_mono_bitmap(sound_low_level, quarter_width-23, 12, 2, 8);
     if(analog_mini_2<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_med_level, quarter_width-21, 12, 2, 8);
+        lcd_mono_bitmap(sound_med_level, quarter_width-21, 12, 2, 8);
     if(analog_mini_3<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_high_level, quarter_width-19, 12, 2, 8);
+        lcd_mono_bitmap(sound_high_level, quarter_width-19, 12, 2, 8);
     if(analog_mini_4<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_max_level, quarter_width-16, 12, 3, 8);
+        lcd_mono_bitmap(sound_max_level, quarter_width-16, 12, 3, 8);
 
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_mono_bitmap(sound_speaker, quarter_width+half_width-30, 12, 4, 8);
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_mono_bitmap(sound_speaker, quarter_width+half_width-30, 12, 4, 8);
+    lcd_set_drawmode(DRMODE_FG);
     if(analog_mini_1<(right_needle_top_x-half_width))
-        rb->lcd_mono_bitmap(sound_low_level, quarter_width+half_width-25, 12, 2, 8);
+        lcd_mono_bitmap(sound_low_level, quarter_width+half_width-25, 12, 2, 8);
     if(analog_mini_2<(right_needle_top_x-half_width))
-        rb->lcd_mono_bitmap(sound_med_level, quarter_width+half_width-23, 12, 2, 8);
+        lcd_mono_bitmap(sound_med_level, quarter_width+half_width-23, 12, 2, 8);
     if(analog_mini_3<(right_needle_top_x-half_width))
-        rb->lcd_mono_bitmap(sound_high_level, quarter_width+half_width-21, 12, 2, 8);
+        lcd_mono_bitmap(sound_high_level, quarter_width+half_width-21, 12, 2, 8);
     if(analog_mini_4<(right_needle_top_x-half_width))
-        rb->lcd_mono_bitmap(sound_max_level, quarter_width+half_width-18, 12, 3, 8);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_mono_bitmap(sound_max_level, quarter_width+half_width-18, 12, 3, 8);
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 
 static void draw_digital_minimeters(void) {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * num_left_leds, 0));
+    lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * num_left_leds, 0));
 #endif
-    rb->lcd_mono_bitmap(sound_speaker, 34, half_height-8, 4, 8);
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_mono_bitmap(sound_speaker, 34, half_height-8, 4, 8);
+    lcd_set_drawmode(DRMODE_FG);
     if(1<num_left_leds)
-        rb->lcd_mono_bitmap(sound_low_level, 39, half_height-8, 2, 8);
+        lcd_mono_bitmap(sound_low_level, 39, half_height-8, 2, 8);
     if(2<num_left_leds)
-        rb->lcd_mono_bitmap(sound_med_level, 41, half_height-8, 2, 8);
+        lcd_mono_bitmap(sound_med_level, 41, half_height-8, 2, 8);
     if(5<num_left_leds)
-        rb->lcd_mono_bitmap(sound_high_level, 43, half_height-8, 2, 8);
+        lcd_mono_bitmap(sound_high_level, 43, half_height-8, 2, 8);
     if(8<num_left_leds)
-        rb->lcd_mono_bitmap(sound_max_level, 46, half_height-8, 3, 8);
+        lcd_mono_bitmap(sound_max_level, 46, half_height-8, 3, 8);
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * num_right_leds, 0));
+    lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * num_right_leds, 0));
 #endif
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_mono_bitmap(sound_speaker, 34, half_height+8, 4, 8);
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_mono_bitmap(sound_speaker, 34, half_height+8, 4, 8);
+    lcd_set_drawmode(DRMODE_FG);
     if(1<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_low_level, 39, half_height+8, 2, 8);
+        lcd_mono_bitmap(sound_low_level, 39, half_height+8, 2, 8);
     if(2<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_med_level, 41, half_height+8, 2, 8);
+        lcd_mono_bitmap(sound_med_level, 41, half_height+8, 2, 8);
     if(5<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_high_level, 43, half_height+8, 2, 8);
+        lcd_mono_bitmap(sound_high_level, 43, half_height+8, 2, 8);
     if(8<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_max_level, 46, half_height+8, 3, 8);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_mono_bitmap(sound_max_level, 46, half_height+8, 3, 8);
+    lcd_set_drawmode(DRMODE_SOLID);
     
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(screen_foreground);
+    lcd_set_foreground(screen_foreground);
 #endif
 }
 
 static void analog_meter(void) {
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
+    int left_peak = mas_codec_readreg(0xC);
+    int right_peak = mas_codec_readreg(0xD);
 #elif (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
-    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+    mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
     #define left_peak peaks.left
     #define right_peak peaks.right
@@ -733,39 +733,39 @@ static void analog_meter(void) {
     right_needle_top_y = y_values[right_needle_top_x-half_width];
 
     /* Needles */
-    rb->lcd_drawline(quarter_width, LCD_HEIGHT-1, left_needle_top_x, left_needle_top_y);
-    rb->lcd_drawline((quarter_width+half_width), LCD_HEIGHT-1, right_needle_top_x, right_needle_top_y);
+    lcd_drawline(quarter_width, LCD_HEIGHT-1, left_needle_top_x, left_needle_top_y);
+    lcd_drawline((quarter_width+half_width), LCD_HEIGHT-1, right_needle_top_x, right_needle_top_y);
 
     if(vumeter_settings.analog_minimeters)
         draw_analog_minimeters();
 
     /* Needle covers */
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_mono_bitmap(needle_cover, quarter_width-6, LCD_HEIGHT-5, 13, 5);
-    rb->lcd_mono_bitmap(needle_cover, half_width+quarter_width-6, LCD_HEIGHT-5, 13, 5);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_FG);
+    lcd_mono_bitmap(needle_cover, quarter_width-6, LCD_HEIGHT-5, 13, 5);
+    lcd_mono_bitmap(needle_cover, half_width+quarter_width-6, LCD_HEIGHT-5, 13, 5);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     /* Show Left/Right */
-    rb->lcd_putsxy(quarter_width-12, 12, "Left");
-    rb->lcd_putsxy(half_width+quarter_width-12, 12, "Right");
+    lcd_putsxy(quarter_width-12, 12, "Left");
+    lcd_putsxy(half_width+quarter_width-12, 12, "Right");
 
     /* Line above/below  the Left/Right text */
-    rb->lcd_hline(0,LCD_WIDTH-1,9);
-    rb->lcd_hline(0,LCD_WIDTH-1,21);
+    lcd_hline(0,LCD_WIDTH-1,9);
+    lcd_hline(0,LCD_WIDTH-1,21);
 
     for(i=0; i<half_width; i++) {
-        rb->lcd_drawpixel(i, (y_values[i])-2);
-        rb->lcd_drawpixel(i+half_width, (y_values[i])-2);
+        lcd_drawpixel(i, (y_values[i])-2);
+        lcd_drawpixel(i+half_width, (y_values[i])-2);
     }
 }
 
 static void digital_meter(void) {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
+    int left_peak = mas_codec_readreg(0xC);
+    int right_peak = mas_codec_readreg(0xD);
 #elif (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
-    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+    mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
     #define left_peak peaks.left
     #define right_peak peaks.right
@@ -788,46 +788,46 @@ static void digital_meter(void) {
     last_num_left_leds = num_left_leds;
     last_num_right_leds = num_right_leds;
 
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_set_drawmode(DRMODE_FG);
     /* LEDS */
     for(i=0; i<num_left_leds; i++) {
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * i, 0));
+        lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * i, 0));
 #endif
-        rb->lcd_fillrect((digital_lead + (i*digital_block_width)),
+        lcd_fillrect((digital_lead + (i*digital_block_width)),
             14, digital_block_width - digital_block_gap, digital_block_height);
     }
 
     for(i=0; i<num_right_leds; i++) {
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * i, 0));
+        lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * i, 0));
 #endif
-        rb->lcd_fillrect((digital_lead + (i*digital_block_width)),
+        lcd_fillrect((digital_lead + (i*digital_block_width)),
             (half_height + 20), digital_block_width - digital_block_gap, 
             digital_block_height);
     }
     
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(screen_foreground);
+    lcd_set_foreground(screen_foreground);
 #endif
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     if(vumeter_settings.digital_minimeters)
         draw_digital_minimeters();
 
     /* Lines above/below where the LEDS are */
-    rb->lcd_hline(0,LCD_WIDTH-1,12);
-    rb->lcd_hline(0,LCD_WIDTH-1,half_height-12);
+    lcd_hline(0,LCD_WIDTH-1,12);
+    lcd_hline(0,LCD_WIDTH-1,half_height-12);
 
-    rb->lcd_hline(0,LCD_WIDTH-1,half_height+18);
-    rb->lcd_hline(0,LCD_WIDTH-1,LCD_HEIGHT-6);
+    lcd_hline(0,LCD_WIDTH-1,half_height+18);
+    lcd_hline(0,LCD_WIDTH-1,LCD_HEIGHT-6);
 
     /* Show Left/Right */
-    rb->lcd_putsxy(2, half_height-8, "Left");
-    rb->lcd_putsxy(2, half_height+8, "Right");
+    lcd_putsxy(2, half_height-8, "Left");
+    lcd_putsxy(2, half_height+8, "Right");
 
     /* Line in the middle */
-    rb->lcd_hline(0,LCD_WIDTH-1,half_height+3);
+    lcd_hline(0,LCD_WIDTH-1,half_height+3);
 }
 
 enum plugin_status plugin_start(const void* parameter) {
@@ -841,25 +841,25 @@ enum plugin_status plugin_start(const void* parameter) {
     calc_scales();
 
     load_settings();
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
-    screen_foreground = rb->lcd_get_foreground();
+    screen_foreground = lcd_get_foreground();
 #endif
 
     while (1)
     {
-        rb->lcd_clear_display();
+        lcd_clear_display();
 
-        rb->lcd_putsxy(half_width-23, 0, "VU Meter");
+        lcd_putsxy(half_width-23, 0, "VU Meter");
 
         if(vumeter_settings.meter_type==ANALOG)
             analog_meter();
         else
             digital_meter();
 
-        rb->lcd_update();
+        lcd_update();
 
-        button = rb->button_get_w_tmo(1);
+        button = button_get_w_tmo(1);
         switch (button)
         {
 #ifdef VUMETER_RC_QUIT
@@ -875,12 +875,12 @@ enum plugin_status plugin_start(const void* parameter) {
                 if (lastbutton != VUMETER_HELP_PRE)
                     break;
 #endif
-                rb->lcd_clear_display();
-                rb->lcd_puts(0, 0, LABEL_QUIT ": Exit");
-                rb->lcd_puts(0, 1, LABEL_MENU ": Settings");
-                rb->lcd_puts(0, 2, LABEL_VOLUME ": Volume");
-                rb->lcd_update();
-                rb->sleep(HZ*3);
+                lcd_clear_display();
+                lcd_puts(0, 0, LABEL_QUIT ": Exit");
+                lcd_puts(0, 1, LABEL_MENU ": Settings");
+                lcd_puts(0, 2, LABEL_VOLUME ": Volume");
+                lcd_update();
+                sleep(HZ*3);
                 break;
 
             case VUMETER_MENU:
@@ -908,7 +908,7 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
 
             default:
-                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }

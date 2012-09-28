@@ -566,7 +566,7 @@ static void draw_update_rect(int x, int y, int width, int height)
 static void draw_clear_area(int x, int y, int width, int height)
 {
 #ifdef HAVE_LCD_COLOR
-    rb->screen_clear_area(rb->screens[SCREEN_MAIN], __X, __Y, __W, __H);
+    screen_clear_area(&screens[SCREEN_MAIN], __X, __Y, __W, __H);
 #else
     int oldmode = grey_get_drawmode();
     grey_set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
@@ -669,14 +669,14 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
     if (height <= 0)
         return; /* nothing left to do */
 
-    fg_pattern =     rb->lcd_get_foreground();
-    /*bg_pattern =*/ rb->lcd_get_background();
+    fg_pattern =     lcd_get_foreground();
+    /*bg_pattern =*/ lcd_get_background();
 
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
 
-    dst = rb->lcd_framebuffer + (LCD_WIDTH - y) + x*LCD_WIDTH;
+    dst = lcd_framebuffer + (LCD_WIDTH - y) + x*LCD_WIDTH;
     do
     {
         const unsigned char *src_col = src++;
@@ -784,10 +784,10 @@ static void draw_oriented_alpha_bitmap_part(const unsigned char *src,
     /* initialize blending */
     BLEND_INIT;
 
-    fg_pattern =    rb->lcd_get_foreground();
-    /*bg_pattern=*/ rb->lcd_get_background();
+    fg_pattern =    lcd_get_foreground();
+    /*bg_pattern=*/ lcd_get_background();
 
-    dst_start = rb->lcd_framebuffer + (LCD_WIDTH - y - 1) + x*LCD_WIDTH;
+    dst_start = lcd_framebuffer + (LCD_WIDTH - y - 1) + x*LCD_WIDTH;
     int col, row = height;
     unsigned data, pixels;
     unsigned skip_end = (stride - width);
@@ -880,9 +880,9 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
     unsigned short ch;
     unsigned short *ucs;
     int ofs = MIN(x, 0);
-    struct font* pf = rb->font_get(osd.font);
+    struct font* pf = font_get(osd.font);
 
-    ucs = rb->bidi_l2v(str, 1);
+    ucs = bidi_l2v(str, 1);
 
     x += osd.x;
     y += osd.y;
@@ -893,14 +893,14 @@ static void draw_putsxy_oriented(int x, int y, const char *str)
         const unsigned char *bits;
 
         /* get proportional width and glyph bits */
-        width = rb->font_get_width(pf, ch);
+        width = font_get_width(pf, ch);
 
         if (ofs > width) {
             ofs -= width;
             continue;
         }
 
-        bits = rb->font_get_bits(pf, ch);
+        bits = font_get_bits(pf, ch);
 
         if (pf->depth)
             draw_oriented_alpha_bitmap_part(bits, ofs, 0, width, x, y,
@@ -988,7 +988,7 @@ static void fps_refresh(void)
     int w, h, sw;
     long tick;
 
-    tick = *rb->current_tick;
+    tick = current_tick;
 
     if (TIME_BEFORE(tick, fps.update_tick))
         return;
@@ -997,7 +997,7 @@ static void fps_refresh(void)
 
     stream_video_stats(&stats);
 
-    rb->snprintf(str, FPS_BUFSIZE, FPS_FORMAT,
+    snprintf(str, FPS_BUFSIZE, FPS_FORMAT,
                  stats.fps / 100, stats.fps % 100);
 
     w = fps.rect.r - fps.rect.l;
@@ -1015,7 +1015,7 @@ static void fps_refresh(void)
 /* Initialize the FPS display */
 static void fps_init(void)
 {
-    fps.update_tick = *rb->current_tick;
+    fps.update_tick = current_tick;
     fps.rect.l = fps.rect.t = 0;
     mylcd_getstringsize(FPS_DIMSTR, &fps.rect.r, &fps.rect.b);
     vo_rect_offset(&fps.rect, -osd.x, -osd.y);
@@ -1029,7 +1029,7 @@ static void fps_init(void)
 static void osd_lcd_enable_hook(void* param)
 {
     (void)param;
-    rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_1, 0);
+    queue_post(&button_queue, LCD_ENABLE_EVENT_1, 0);
 }
 #endif
 
@@ -1039,11 +1039,11 @@ static void osd_backlight_on_video_mode(bool video_on)
         /* Turn off backlight timeout */
         backlight_ignore_timeout();
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        rb->remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
+        remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif
     } else {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        rb->add_event(LCD_EVENT_ACTIVATION, false, osd_lcd_enable_hook);
+        add_event(LCD_EVENT_ACTIVATION, false, osd_lcd_enable_hook);
 #endif
         /* Revert to user's backlight settings */
         backlight_use_settings();
@@ -1108,9 +1108,9 @@ static void osd_text_init(void)
 
     osd.dur_rect = osd.time_rect;
 
-    phys = rb->sound_val2phys(SOUND_VOLUME, rb->sound_min(SOUND_VOLUME));
-    rb->snprintf(buf, sizeof(buf), "%d%s", phys,
-                 rb->sound_unit(SOUND_VOLUME));
+    phys = sound_val2phys(SOUND_VOLUME, sound_min(SOUND_VOLUME));
+    snprintf(buf, sizeof(buf), "%d%s", phys,
+                 sound_unit(SOUND_VOLUME));
 
     mylcd_getstringsize(" ", &spc_width, NULL);
     mylcd_getstringsize(buf, &osd.vol_rect.r, &osd.vol_rect.b);
@@ -1160,7 +1160,7 @@ static void osd_init(void)
     osd.curr_time = 0;
     osd.status = OSD_STATUS_STOPPED;
     osd.auto_refresh = OSD_REFRESH_TIME;
-    osd.next_auto_refresh = *rb->current_tick;
+    osd.next_auto_refresh = current_tick;
     osd_text_init();
     fps_init();
 }
@@ -1179,7 +1179,7 @@ static void osd_set_hp_pause_flag(bool set)
 
 static void osd_schedule_refresh(unsigned refresh)
 {
-    long tick = *rb->current_tick;
+    long tick = current_tick;
 
     if (refresh & OSD_REFRESH_VIDEO)
         osd.print_tick = tick + osd.print_delay;
@@ -1273,10 +1273,10 @@ static void osd_refresh_volume(void)
     char buf[32];
     int width;
 
-    int volume = rb->global_settings->volume;
-    rb->snprintf(buf, sizeof (buf), "%d%s",
-                 rb->sound_val2phys(SOUND_VOLUME, volume),
-                 rb->sound_unit(SOUND_VOLUME));
+    int volume = global_settings.volume;
+    snprintf(buf, sizeof (buf), "%d%s",
+                 sound_val2phys(SOUND_VOLUME, volume),
+                 sound_unit(SOUND_VOLUME));
     mylcd_getstringsize(buf, &width, NULL);
 
     /* Right-justified */
@@ -1373,7 +1373,7 @@ static void osd_refresh(int hint)
     long tick;
     unsigned oldbg, oldfg;
 
-    tick = *rb->current_tick;
+    tick = current_tick;
 
     if (settings.showfps)
         fps_refresh();
@@ -1384,7 +1384,7 @@ static void osd_refresh(int hint)
         /* Make sure Rockbox doesn't turn off the player because of
            too little activity */
         if (osd.status == OSD_STATUS_PLAYING)
-            rb->reset_poweroff_timer();
+            reset_poweroff_timer();
 
         /* Redraw the current or possibly extract a new video frame */
         if ((osd.auto_refresh & OSD_REFRESH_VIDEO) &&
@@ -1492,7 +1492,7 @@ static void osd_show(unsigned show)
     if (((show ^ osd.flags) & OSD_SHOW) == 0)
     {
         if (show & OSD_SHOW) {
-            osd.hide_tick = *rb->current_tick + osd.show_for;
+            osd.hide_tick = current_tick + osd.show_for;
         }
         return;
     }
@@ -1563,8 +1563,8 @@ static int osd_get_status(void)
  */
 static int osd_ff_rw(int btn, unsigned refresh, uint32_t *new_time)
 {
-    unsigned int step = TS_SECOND*rb->global_settings->ff_rewind_min_step;
-    const long ff_rw_accel = (rb->global_settings->ff_rewind_accel + 3);
+    unsigned int step = TS_SECOND*global_settings.ff_rewind_min_step;
+    const long ff_rw_accel = (global_settings.ff_rewind_accel + 3);
     uint32_t start;
     uint32_t time = stream_get_seek_time(&start);
     const uint32_t duration = stream_get_duration();
@@ -1681,27 +1681,27 @@ static int osd_stream_status(void)
 /* Change the current audio volume by a specified amount */
 static void osd_set_volume(int delta)
 {
-    int vol = rb->global_settings->volume;
+    int vol = global_settings.volume;
     int limit;
 
     vol += delta;
 
     if (delta < 0) {
         /* Volume down - clip to lower limit */
-        limit = rb->sound_min(SOUND_VOLUME);
+        limit = sound_min(SOUND_VOLUME);
         if (vol < limit)
             vol = limit;
     } else {
         /* Volume up - clip to upper limit */
-        limit = rb->sound_max(SOUND_VOLUME);
+        limit = sound_max(SOUND_VOLUME);
         if (vol > limit)
             vol = limit;
     }
 
     /* Sync the global settings */
-    if (vol != rb->global_settings->volume) {
-        rb->sound_set(SOUND_VOLUME, vol);
-        rb->global_settings->volume = vol;
+    if (vol != global_settings.volume) {
+        sound_set(SOUND_VOLUME, vol);
+        global_settings.volume = vol;
     }
 
     /* Update the volume display */
@@ -1769,8 +1769,8 @@ static int osd_pause(void)
     osd_backlight_on_video_mode(false);
     /* Leave brightness alone and restore it when OSD is hidden */
 
-    if (stream_can_seek() && rb->global_settings->pause_rewind) {
-        stream_seek(-rb->global_settings->pause_rewind*TS_SECOND,
+    if (stream_can_seek() && global_settings.pause_rewind) {
+        stream_seek(-global_settings.pause_rewind*TS_SECOND,
                     SEEK_CUR);
         osd_schedule_refresh(OSD_REFRESH_VIDEO);
         /* Update time display now */
@@ -1901,7 +1901,7 @@ static bool is_videofile(const char* file)
         "mpg", "mpeg", "mpv", "m2v"
     };
 
-    const char* ext = rb->strrchr(file, '.');
+    const char* ext = strrchr(file, '.');
     int i;
 
     if (!ext)
@@ -1909,7 +1909,7 @@ static bool is_videofile(const char* file)
 
     for (i = ARRAYLEN(extensions) - 1; i >= 0; i--)
     {
-        if (!rb->strcasecmp(ext + 1, extensions[i]))
+        if (!strcasecmp(ext + 1, extensions[i]))
             break;
     }
 
@@ -1920,10 +1920,10 @@ static bool is_videofile(const char* file)
    returns false if there is none. */
 static bool get_videofile(int direction, char* videofile, size_t bufsize)
 {
-    struct tree_context *tree = rb->tree_get_context();
-    struct entry *dircache = rb->tree_get_entries(tree);
+    struct tree_context *tree = tree_get_context();
+    struct entry *dircache = tree_get_entries(tree);
     int i, step, end, found = 0;
-    char *videoname = rb->strrchr(videofile, '/') + 1;
+    char *videoname = strrchr(videofile, '/') + 1;
     size_t rest = bufsize - (videoname - videofile) - 1;
 
     if (direction == VIDEO_NEXT) {
@@ -1938,14 +1938,14 @@ static bool get_videofile(int direction, char* videofile, size_t bufsize)
     for (; i != end; i += step)
     {
         const char* name = dircache[i].name;
-        if (!rb->strcmp(name, videoname)) {
+        if (!strcmp(name, videoname)) {
             found = 1;
             continue;
         }
-        if (found && rb->strlen(name) <= rest &&
+        if (found && strlen(name) <= rest &&
             !(dircache[i].attr & ATTR_DIRECTORY) && is_videofile(name))
         {
-            rb->strcpy(videoname, name);
+            strcpy(videoname, name);
             return true;
         }
     }
@@ -1957,7 +1957,7 @@ static bool get_videofile(int direction, char* videofile, size_t bufsize)
 /* Handle SYS_PHONE_PLUGGED/UNPLUGGED */
 static void osd_handle_phone_plug(bool inserted)
 {
-    if (rb->global_settings->unplug_mode == 0)
+    if (global_settings.unplug_mode == 0)
         return;
 
     /* Wait for any incomplete state transition to complete first */
@@ -1966,7 +1966,7 @@ static void osd_handle_phone_plug(bool inserted)
     int status = osd_stream_status();
 
     if (inserted) {
-        if (rb->global_settings->unplug_mode > 1) {
+        if (global_settings.unplug_mode > 1) {
             if (status == STREAM_PAUSED &&
                 (osd.flags & OSD_HP_PAUSE)) {
                 osd_resume();
@@ -1986,23 +1986,23 @@ static int button_loop(void)
 {
     int next_action = (settings.play_mode == 0) ? VIDEO_STOP : VIDEO_NEXT;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
 #endif
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
-    rb->lcd_set_mode(LCD_MODE_YUV);
+    lcd_set_mode(LCD_MODE_YUV);
 #endif
 
     osd_init();
 
     /* Start playback at the specified starting time */
     if (osd_play(settings.resume_time) < STREAM_OK) {
-        rb->splash(HZ*2, "Playback failed");
+        splash(HZ*2, "Playback failed");
         return VIDEO_STOP;
     }
 
@@ -2072,7 +2072,7 @@ static int button_loop(void)
             osd_backlight_brightness_video_mode(false);
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
-            rb->lcd_set_mode(LCD_MODE_RGB565);
+            lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
             result = mpeg_menu();
@@ -2082,13 +2082,13 @@ static int button_loop(void)
             fps_update_post_frame_callback();
 
             /* The menu can change the font, so restore */
-            rb->lcd_setfont(FONT_SYSFIXED);
+            lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(LCD_WHITE);
-            rb->lcd_set_background(LCD_BLACK);
+            lcd_set_foreground(LCD_WHITE);
+            lcd_set_background(LCD_BLACK);
 #endif
-            rb->lcd_clear_display();
-            rb->lcd_update();
+            lcd_clear_display();
+            lcd_update();
 
             switch (result)
             {
@@ -2099,7 +2099,7 @@ static int button_loop(void)
 
             default:
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
-                rb->lcd_set_mode(LCD_MODE_YUV);
+                lcd_set_mode(LCD_MODE_YUV);
 #endif
                 /* If not stopped, show video again */
                 if (state != STREAM_STOPPED) {
@@ -2195,7 +2195,7 @@ static int button_loop(void)
             if (button == ACTION_STD_CANCEL)
                 goto cancel_playback; /* jump to stop handling above */
 
-            rb->default_event_handler(button);
+            default_event_handler(button);
             break;
             } /* MPEG_RW: */
 
@@ -2224,7 +2224,7 @@ static int button_loop(void)
             if (button == ACTION_STD_CANCEL)
                 goto cancel_playback; /* jump to stop handling above */
 
-            rb->default_event_handler(button);
+            default_event_handler(button);
             break;
             } /* MPEG_FF: */
 
@@ -2240,12 +2240,12 @@ static int button_loop(void)
         default:
         {
             osd_refresh(OSD_REFRESH_DEFAULT);
-            rb->default_event_handler(button);
+            default_event_handler(button);
             break;
             } /* default: */
         }
 
-        rb->yield();
+        yield();
     } /* end while */
 
     osd_stop();
@@ -2253,10 +2253,10 @@ static int button_loop(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
     /* Be sure hook is removed before exiting since the stop will put it
      * back because of the backlight restore. */
-    rb->remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
+    remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 
     return next_action;
 }
@@ -2269,23 +2269,23 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter == NULL) {
         /* No file = GTFO */
-        rb->splash(HZ*2, "No File");
+        splash(HZ*2, "No File");
         return PLUGIN_ERROR;
     }
 
     /* Disable all talking before initializing IRAM */
-    rb->talk_disable(true);
+    talk_disable(true);
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
 #endif
 
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
 
-    rb->strcpy(videofile, (const char*) parameter);
+    strcpy(videofile, (const char*) parameter);
 
     if (stream_init() < STREAM_OK) {
         /* Fatal because this should not fail */
@@ -2304,8 +2304,8 @@ enum plugin_status plugin_start(const void* parameter)
 
             if (result >= STREAM_OK) {
                 /* start menu */
-                rb->lcd_clear_display();
-                rb->lcd_update();
+                lcd_clear_display();
+                lcd_update();
                 result = mpeg_start_menu(stream_get_duration());
 
                 next_action = VIDEO_STOP;
@@ -2318,8 +2318,8 @@ enum plugin_status plugin_start(const void* parameter)
 
                 stream_close();
 
-                rb->lcd_clear_display();
-                rb->lcd_update();
+                lcd_clear_display();
+                lcd_update();
 
                 save_settings();
             } else {
@@ -2338,14 +2338,14 @@ enum plugin_status plugin_start(const void* parameter)
                     errstring = "Error opening file: %d";
                 }
 
-                tick = *rb->current_tick + HZ*2;
+                tick = current_tick + HZ*2;
 
-                rb->splashf(0, errstring, result);
+                splashf(0, errstring, result);
 
                 /* Be sure it doesn't get stuck in an unbreakable loop of bad
                  * files, just in case! Otherwise, keep searching in the
                  * chosen direction until a good one is found. */
-                while (!quit && TIME_BEFORE(*rb->current_tick, tick))
+                while (!quit && TIME_BEFORE(current_tick, tick))
                 {
                     int button = mpeg_button_get(HZ*2);
 
@@ -2374,7 +2374,7 @@ enum plugin_status plugin_start(const void* parameter)
                         break;
 
                     default:
-                        rb->default_event_handler(button);
+                        default_event_handler(button);
                     } /* switch */
                 } /* while */
             }
@@ -2391,7 +2391,7 @@ enum plugin_status plugin_start(const void* parameter)
 
                 if (manual_skip)
                 {
-                    rb->system_sound_play(get_videofile_says ?
+                    system_sound_play(get_videofile_says ?
                                           SOUND_TRACK_SKIP : SOUND_TRACK_NO_MORE);
                 }
 
@@ -2405,7 +2405,7 @@ enum plugin_status plugin_start(const void* parameter)
 
                 if (manual_skip)
                 {
-                    rb->system_sound_play(get_videofile_says ?
+                    system_sound_play(get_videofile_says ?
                                           SOUND_TRACK_SKIP : SOUND_TRACK_NO_MORE);
                 }
 
@@ -2421,12 +2421,12 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_YUV)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
+    lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
     stream_exit();
 
-    rb->talk_disable(false);
+    talk_disable(false);
 
     /* Actually handle delayed processing of system events of interest
      * that were captured in other button loops */

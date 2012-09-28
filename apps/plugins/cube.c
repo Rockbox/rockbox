@@ -416,7 +416,7 @@ static struct my_lcd *mylcd = &greyfuncs;
 #define MYLCD(fn) mylcd->fn
 
 #else
-#define MYLCD(fn) rb->lcd_ ## fn
+#define MYLCD(fn) lcd_ ## fn
 #endif
 
 #if CONFIG_LCD == LCD_SSD1815
@@ -642,7 +642,7 @@ static void cube_draw(void)
 
       case HIDDEN_LINES:
 
-        rb->memset(lines_drawn, 0, sizeof(lines_drawn));
+        memset(lines_drawn, 0, sizeof(lines_drawn));
         for (i = 0; i < 6; i++)
         {
             /* backface culling; if the shape winds counter-clockwise, we are
@@ -714,19 +714,19 @@ enum plugin_status plugin_start(const void* parameter)
 
 #ifdef HAVE_LCD_BITMAP
 #if defined(USEGSLIB)
-    gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *)plugin_get_buffer(&gbuf_size);
     if (!grey_init(gbuf, gbuf_size, GREY_BUFFERED,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
-        rb->splash(HZ, "Couldn't init greyscale display");
+        splash(HZ, "Couldn't init greyscale display");
         return PLUGIN_ERROR;
     }
 
     /* init lcd_ function pointers */
-    lcdfuncs.update =        rb->lcd_update;
-    lcdfuncs.clear_display = rb->lcd_clear_display;
-    lcdfuncs.drawline =      rb->lcd_drawline;
-    lcdfuncs.putsxy =        rb->lcd_putsxy;
+    lcdfuncs.update =        lcd_update;
+    lcdfuncs.clear_display = lcd_clear_display;
+    lcdfuncs.drawline =      lcd_drawline;
+    lcdfuncs.putsxy =        lcd_putsxy;
 
 #ifdef MROBE_100
     grey_set_background(GREY_BLACK);
@@ -734,11 +734,11 @@ enum plugin_status plugin_start(const void* parameter)
 
     grey_setfont(FONT_SYSFIXED);
 #endif
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #else /* LCD_CHARCELLS */
     if (!pgfx_init(4, 2))
     {
-        rb->splash(HZ*2, "Old LCD :(");
+        splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
     pgfx_display(0, 0);
@@ -761,10 +761,10 @@ enum plugin_status plugin_start(const void* parameter)
         {
             char buffer[30];
             t_disp--;
-            rb->snprintf(buffer, sizeof(buffer), "%s: %d %s",
-                         axes[curr].label,
-                         paused ? axes[curr].angle : axes[curr].speed,
-                         highspeed ? "(hs)" : "");
+            snprintf(buffer, sizeof(buffer), "%s: %d %s",
+                     axes[curr].label,
+                     paused ? axes[curr].angle : axes[curr].speed,
+                     highspeed ? "(hs)" : "");
             MYLCD(putsxy)(0, LCD_HEIGHT-8, buffer);
             if (t_disp == 0)
                 redraw = true;
@@ -774,15 +774,15 @@ enum plugin_status plugin_start(const void* parameter)
         {
             if (t_disp == DISP_TIME)
             {
-                rb->lcd_puts(5, 0, axes[curr].label);
-                rb->lcd_putsf(5, 1, "%d %c",
-                             paused ? axes[curr].angle : axes[curr].speed,
-                             highspeed ? 'H' : ' ');
+                lcd_puts(5, 0, axes[curr].label);
+                lcd_putsf(5, 1, "%d %c",
+                          paused ? axes[curr].angle : axes[curr].speed,
+                          highspeed ? 'H' : ' ');
             }
             t_disp--;
             if (t_disp == 0)
             {
-                rb->lcd_clear_display();
+                lcd_clear_display();
                 pgfx_display(0, 0);
             }
         }
@@ -811,14 +811,14 @@ enum plugin_status plugin_start(const void* parameter)
             redraw = true;
 
             if (highspeed)
-                rb->yield();
+                yield();
             else
-                rb->sleep(HZ/25);
-            button = rb->button_get(false);
+                sleep(HZ/25);
+            button = button_get(false);
         }
         else
         {
-            button = rb->button_get_w_tmo(HZ/25);
+            button = button_get_w_tmo(HZ/25);
         }
 
         switch (button)

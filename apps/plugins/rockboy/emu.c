@@ -34,13 +34,13 @@ static void emu_step(void)
  * make things work in the mean time. */
 void emu_run(void)
 {
-    int framesin=0,frames=0,timeten=*rb->current_tick, timehun=*rb->current_tick;
+    int framesin=0,frames=0,timeten=current_tick, timehun=current_tick;
 
     setvidmode();
     vid_begin();
     lcd_begin();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 #ifdef HAVE_LCD_COLOR
     set_pal();
@@ -69,15 +69,15 @@ void emu_run(void)
         while (R_LY > 0) /* wait for next frame */
         {
             emu_step();
-            rb->yield();
+            yield();
         }
 
         frames++;
         framesin++;
 
-        if(*rb->current_tick-timeten>=10)
+        if(current_tick-timeten>=10)
         {
-            timeten=*rb->current_tick;
+            timeten=current_tick;
             if(framesin<6) options.frameskip++;
             if(framesin>6) options.frameskip--;
             if(options.frameskip>options.maxskip) options.frameskip=options.maxskip;
@@ -86,15 +86,15 @@ void emu_run(void)
         }
 
         if(options.showstats)
-            if(*rb->current_tick-timehun>=100)
+            if(current_tick-timehun>=100)
             {
                 options.fps=frames;
                 frames=0;
-                timehun=*rb->current_tick;
+                timehun=current_tick;
             }
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 }

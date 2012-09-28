@@ -144,13 +144,13 @@ static inline bool stop_game(void) {
 }
 
 static void fill_color_rect(int x, int y, int w, int h, int color) {
-    rb->lcd_set_foreground(color);
-    rb->lcd_fillrect(x, y, w, h);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_foreground(color);
+    lcd_fillrect(x, y, w, h);
+    lcd_set_foreground(LCD_WHITE);
 }
 
 static void overfill_rect(int x, int y, int w, int h) {
-    rb->lcd_fillrect(x - 2, y - 2, w + 4, h + 4);
+    lcd_fillrect(x - 2, y - 2, w + 4, h + 4);
 }
 
 static void draw_piece(int x, int y, int w, int h, int color_id, bool emph) {
@@ -165,19 +165,19 @@ static void draw_piece(int x, int y, int w, int h, int color_id, bool emph) {
         overfill_rect(x, y, w, h);
 
     if (color_id == -1) /* Uninitialised color */
-        rb->lcd_drawrect(x, y, w, h);
+        lcd_drawrect(x, y, w, h);
     else
         fill_color_rect(x, y, w, h, color);
 
     if (!emph && settings.framing)
-        rb->lcd_drawrect(x, y, w, h);
+        lcd_drawrect(x, y, w, h);
 
     if (settings.labeling && color_id >= 0) {
         char text[2];
-        rb->snprintf(text, sizeof(text), "%d", color_id);
+        snprintf(text, sizeof(text), "%d", color_id);
 
-        int fw, fh; rb->font_getstringsize(text, &fw, &fh, FONT_SYSFIXED);
-        rb->lcd_putsxy(x + get_margin(fw, w), y + get_margin(fh, h), text);
+        int fw, fh; font_getstringsize(text, &fw, &fh, FONT_SYSFIXED);
+        lcd_putsxy(x + get_margin(fw, w), y + get_margin(fh, h), text);
     }
 }
 
@@ -256,7 +256,7 @@ static void draw_score(int line, struct mm_line* guess) {
 }
 
 static void draw_board(int cur_guess, int cur_piece) {
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     int line = 0;
     for (; line < guesses_count; line++) {
@@ -282,7 +282,7 @@ static void draw_board(int cur_guess, int cur_piece) {
     else
         draw_guess(line, &hidden, cur_guess, cur_piece, false);
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 static void init_vars(void) {
@@ -321,7 +321,7 @@ static void init_board(void) {
 static void randomize_solution(void) {
     int piece_id;
     for (piece_id = 0; piece_id < pieces_count; piece_id++)
-        solution.pieces[piece_id] = rb->rand() % colors_count;
+        solution.pieces[piece_id] = rand() % colors_count;
 }
 
 static void settings_menu(void) {
@@ -334,24 +334,24 @@ static void settings_menu(void) {
 
     while(!menu_quit) {
 
-        switch(rb->do_menu(&settings_menu, &cur_item, NULL, false)) {
+        switch(do_menu(&settings_menu, &cur_item, NULL, false)) {
             case 0:
-                rb->set_int("Number of colours", "", UNIT_INT, &settings.colors,
+                set_int("Number of colours", "", UNIT_INT, &settings.colors,
                             NULL, -1, MAX_COLORS_COUNT, 1, NULL);
                 break;
             case 1:
-                rb->set_int("Number of pegs", "", UNIT_INT, &settings.pieces,
+                set_int("Number of pegs", "", UNIT_INT, &settings.pieces,
                             NULL, -1, MAX_PIECES_COUNT, 1, NULL);
                 break;
             case 2:
-                rb->set_int("Number of guesses", "", UNIT_INT, &settings.guesses,
+                set_int("Number of guesses", "", UNIT_INT, &settings.guesses,
                             NULL, -1, MAX_GUESSES_COUNT, 1, NULL);
                 break;
             case 3:
-                rb->set_bool("Display labels", &settings.labeling);
+                set_bool("Display labels", &settings.labeling);
                 break;
             case 4:
-                rb->set_bool("Display frames", &settings.framing);
+                set_bool("Display frames", &settings.framing);
                 break;
             case GO_TO_PREVIOUS:
                 menu_quit = true;
@@ -380,7 +380,7 @@ static void main_menu(void) {
 
     while(!menu_quit) {
 
-        switch(rb->do_menu(&main_menu, &cur_item, NULL, false)) {
+        switch(do_menu(&main_menu, &cur_item, NULL, false)) {
             case 0:
                 resume = true;
                 menu_quit = true;
@@ -410,14 +410,14 @@ static void main_menu(void) {
 enum plugin_status plugin_start(const void* parameter) {
     (void)parameter;
 
-    rb->srand(*rb->current_tick);
-    rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+    srand(current_tick);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
 
     configfile_load(CONFIG_FILE_NAME, config, ARRAYLEN(config), 0);
-    rb->memcpy(&old_settings, &settings, sizeof(settings));
+    memcpy(&old_settings, &settings, sizeof(settings));
 
     main_menu();
     while (!quit) {
@@ -481,7 +481,7 @@ enum plugin_status plugin_start(const void* parameter) {
                         break;
 
                     default:
-                        if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                        if (default_event_handler(button) == SYS_USB_CONNECTED)
                             quit = usb = true;
                 }
 
@@ -506,12 +506,12 @@ enum plugin_status plugin_start(const void* parameter) {
             draw_board(guess, piece);
 
             if (found)
-                rb->splash(HZ, "Well done :)");
+                splash(HZ, "Well done :)");
             else
-                rb->splash(HZ, "Wooops :(");
+                splash(HZ, "Wooops :(");
             do {
-                button = rb->button_get(true);
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                button = button_get(true);
+                if (default_event_handler(button) == SYS_USB_CONNECTED) {
                     quit = usb = true;
                 }
             } while( ( button == BUTTON_NONE )
@@ -519,9 +519,9 @@ enum plugin_status plugin_start(const void* parameter) {
             main_menu();
         }
     }
-    if (rb->memcmp(&old_settings, &settings, sizeof(settings)))
+    if (memcmp(&old_settings, &settings, sizeof(settings)))
         configfile_save(CONFIG_FILE_NAME, config, ARRAYLEN(config), 0);
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     return (usb) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }

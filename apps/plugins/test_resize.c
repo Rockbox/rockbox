@@ -65,19 +65,19 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    b = rb->lcd_framebuffer;
+    b = lcd_framebuffer;
 
-    rb->lcd_set_background(LCD_RGBPACK(0,0,0));
-    rb->lcd_clear_display(); // TODO: Optimizes this by e.g. invalidating rects
+    lcd_set_background(LCD_RGBPACK(0,0,0));
+    lcd_clear_display(); // TODO: Optimizes this by e.g. invalidating rects
 
     input_bmp.data = (char*)input_bmp_data;
     output_bmp.data = (char*)output_bmp_data;
 
-    int ret = rb->read_bmp_file("/test.bmp", &input_bmp, sizeof(input_bmp_data),
+    int ret = read_bmp_file("/test.bmp", &input_bmp, sizeof(input_bmp_data),
                                 FORMAT_NATIVE, NULL);
 
     if (ret < 0) {
-        rb->splash(HZ, "Could not load /test.bmp");
+        splash(HZ, "Could not load /test.bmp");
         return PLUGIN_ERROR;
     }
 
@@ -91,24 +91,24 @@ enum plugin_status plugin_start(const void* parameter)
     int scale_algorithm = 0;
 
     while(1) {
-        rb->lcd_clear_display();
-        rb->lcd_bitmap(input_bmp_data, 0, 0, input_bmp.width, input_bmp.height);
+        lcd_clear_display();
+        lcd_bitmap(input_bmp_data, 0, 0, input_bmp.width, input_bmp.height);
 
         switch ( scale_algorithm ) {
             case 0:
                 smooth_resize_bitmap(&input_bmp, &output_bmp);
-                rb->lcd_putsxy(0,0,"smooth_resize_bitmap");
+                lcd_putsxy(0,0,"smooth_resize_bitmap");
                 break;
             case 1:
                 simple_resize_bitmap(&input_bmp, &output_bmp);
-                rb->lcd_putsxy(0,0,"simple_resize_bitmap");
+                lcd_putsxy(0,0,"simple_resize_bitmap");
                 break;
         }
 
-        rb->lcd_bitmap(output_bmp_data, 0, 100, output_bmp.width,
+        lcd_bitmap(output_bmp_data, 0, 100, output_bmp.width,
                        output_bmp.height);
 
-        rb->lcd_update();
+        lcd_update();
         button = pluginlib_getaction(HZ, plugin_contexts,
                         ARRAYLEN(plugin_contexts));
         switch (button) {

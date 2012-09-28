@@ -33,6 +33,7 @@
 #include "rbunicode.h"
 #include "bidi.h"
 #include "scroll_engine.h"
+#include "symbols.h"
 
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
@@ -119,6 +120,7 @@ void LCDFN(set_drawmode)(int mode)
 {
     current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
+EXPORT_SYMBOL(lcd_set_drawmode);
 
 int LCDFN(get_drawmode)(void)
 {
@@ -149,6 +151,7 @@ int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
 {
     return font_getstringsize(str, w, h, current_vp->font);
 }
+EXPORT_SYMBOL(lcd_getstringsize);
 
 /*** low-level drawing functions ***/
 
@@ -247,6 +250,7 @@ void LCDFN(clear_display)(void)
     memset(LCDFN(framebuffer), bits, FBSIZE);
     LCDFN(scroll_info).lines = 0;
 }
+EXPORT_SYMBOL(lcd_clear_display);
 
 /* Clear the current viewport */
 void LCDFN(clear_viewport)(void)

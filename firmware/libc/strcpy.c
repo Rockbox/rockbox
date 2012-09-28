@@ -35,6 +35,7 @@ QUICKREF
 #include <string.h>
 #include <limits.h>
 #include "_ansi.h" /* for _DEFUN */
+#include "symbols.h"
 
 /*SUPPRESS 560*/
 /*SUPPRESS 530*/
@@ -98,3 +99,4 @@ _DEFUN (strcpy, (dst0, src0),
   return dst0;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }
+EXPORT_SYMBOL(strcpy);

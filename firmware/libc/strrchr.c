@@ -35,6 +35,7 @@ QUICKREF
 
 #include <string.h>
 #include "_ansi.h" /* for _DEFUN */
+#include "symbols.h"
 
 char *
 _DEFUN (strrchr, (s, i),
@@ -58,3 +59,4 @@ _DEFUN (strrchr, (s, i),
                   
   return (char *) last;
 }
+EXPORT_SYMBOL(strrchr);

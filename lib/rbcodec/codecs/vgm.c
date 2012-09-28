@@ -30,11 +30,11 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* we only render 16 bits */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 16);
 
         /* 32 Khz, Interleaved stereo */
-        ci->configure(DSP_SET_FREQUENCY, 44100);
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+        codec_configure(DSP_SET_FREQUENCY, 44100);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
 
         Vgm_init(&vgm_emu);
         Vgm_set_sample_rate(&vgm_emu, 44100);
@@ -58,12 +58,12 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* Read the entire file */
     DEBUGF("VGM: request file\n");
-    ci->seek_buffer(0);
-    buf = ci->request_buffer(&n, ci->filesize);
+    codec_seek_buffer(0);
+    buf = codec_request_buffer(&n, ci.filesize);
     if (!buf) {
         DEBUGF("VGM: file load failed\n");
         return CODEC_ERROR;
@@ -72,7 +72,7 @@ enum codec_status codec_run(void)
     /* If couldn't get the whole buffer
         will trim file and put and 'end_command'
         at the end*/
-    if (n < (size_t)ci->filesize) {
+    if (n < (size_t)ci.filesize) {
         DEBUGF("VGM: file was trimmed\n");
     }
     
@@ -95,7 +95,7 @@ enum codec_status codec_run(void)
 
         /* Since metadata parser doesn't support VGZ 
              will set song length here */
-        ci->id3->length = Track_get_length( &vgm_emu );
+        ci.id3->length = Track_get_length( &vgm_emu );
     }
     else if ((err = Vgm_load_mem(&vgm_emu, buf, n, false))) {
         DEBUGF("VGM: Vgm_load failed_mem (%s)\n", err);
@@ -105,37 +105,37 @@ enum codec_status codec_run(void)
     Vgm_start_track(&vgm_emu); 
 
     /* for REPEAT_ONE we disable track limits */
-    if (!ci->loop_track()) {
-        Track_set_fade(&vgm_emu, ci->id3->length - 4000, 4000);
+    if (!codec_loop_track()) {
+        Track_set_fade(&vgm_emu, ci.id3->length - 4000, 4000);
     }
     
-    ci->set_elapsed(0);
+    audio_codec_update_elapsed(0);
 
     /* The main decoder loop */
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
-            ci->set_elapsed(param);
+            audio_codec_update_elapsed(param);
             elapsed_time = param;
             Track_seek(&vgm_emu, param);
-            ci->seek_complete();
+            codec_seek_complete();
             
             /* Set fade again in case we seek to start of song */
-            Track_set_fade(&vgm_emu, ci->id3->length - 4000, 4000);
+            Track_set_fade(&vgm_emu, ci.id3->length - 4000, 4000);
         }
 
         /* Generate audio buffer */
         err = Vgm_play(&vgm_emu, CHUNK_SIZE, samples);
         if (err || Track_ended(&vgm_emu)) break;
 
-        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
+        codec_pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
 
         elapsed_time += (CHUNK_SIZE / 2) * 10 / 441;
-        ci->set_elapsed(elapsed_time);
+        audio_codec_update_elapsed(elapsed_time);
     }
 
     return CODEC_OK;

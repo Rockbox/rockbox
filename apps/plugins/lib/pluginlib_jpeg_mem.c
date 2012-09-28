@@ -24,7 +24,6 @@
 
 #include <plugin.h>
 #include "jpeg_mem.h"
-#include "wrappers.h"
 #define JPEG_FROM_MEM
 
 #include "../../recorder/jpeg_load.c"

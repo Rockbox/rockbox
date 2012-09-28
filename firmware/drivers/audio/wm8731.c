@@ -37,6 +37,7 @@
 #include "wmcodec.h"
 #include "sound.h"
 
+#include "symbols.h"
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
@@ -147,6 +148,7 @@ int sound_val2phys(int setting, int value)
 
     return result;
 }
+EXPORT_SYMBOL(sound_val2phys);
 
 static void audiohw_mute(bool mute)
 {

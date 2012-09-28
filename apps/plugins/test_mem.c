@@ -150,13 +150,13 @@ static const char tests[][7] = {
 };
 
 static int line;
-#define TEST_MEM_PRINTF(...) rb->screens[0]->putsf(0, line++, __VA_ARGS__)
+#define TEST_MEM_PRINTF(...) screens[0]->putsf(0, line++, __VA_ARGS__)
 
 static int test(volatile int *buf, int buf_size, int loop_cnt,
                 enum test_type type)
 {    
     int delta, dMB;
-    int last_tick = *rb->current_tick;
+    int last_tick = current_tick;
     int ret = 0;
 
     switch(type)
@@ -167,7 +167,7 @@ static int test(volatile int *buf, int buf_size, int loop_cnt,
         case MEMCPY: memcpy_test(buf, buf_size, loop_cnt); break;
     }
     
-    delta = *rb->current_tick - last_tick;
+    delta = current_tick - last_tick;
 
     if (delta <= 20)
     {
@@ -195,21 +195,21 @@ enum plugin_status plugin_start(const void* parameter)
     int count = 0;
 
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #endif
     
-    rb->screens[0]->clear_display();
+    screens[0]->clear_display();
     TEST_MEM_PRINTF("patience, may take some seconds...");
-    rb->screens[0]->update();
+    screens[0]->update();
 
     while (!done)
     {
         line = 0;
         int ret;
-        rb->screens[0]->clear_display();
+        screens[0]->clear_display();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         TEST_MEM_PRINTF("%s", boost?"boosted":"unboosted");
-        TEST_MEM_PRINTF("clock: %d Hz", *rb->cpu_frequency);
+        TEST_MEM_PRINTF("clock: %d Hz", *cpu_frequency);
 #endif
         TEST_MEM_PRINTF("loop#: %d", ++count);
 
@@ -232,15 +232,15 @@ enum plugin_status plugin_start(const void* parameter)
         if (ret != 0) loop_repeat_iram *= 2;
 #endif
 
-        rb->screens[0]->update();
+        screens[0]->update();
 
-        switch (rb->get_action(CONTEXT_STD, HZ/5))
+        switch (get_action(CONTEXT_STD, HZ/5))
         {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             case ACTION_STD_PREV:
                 if (!boost)
                 {
-                    rb->cpu_boost(true);
+                    cpu_boost(true);
                     boost = true;
                 }
                 break;
@@ -248,7 +248,7 @@ enum plugin_status plugin_start(const void* parameter)
             case ACTION_STD_NEXT:
                 if (boost)
                 {
-                    rb->cpu_boost(false);
+                    cpu_boost(false);
                     boost = false;
                 }
                 break;

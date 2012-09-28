@@ -22,6 +22,7 @@
 #include "cpu.h"
 #include "audio.h"
 #include "sound.h"
+#include "symbols.h"
 
 #if INPUT_SRC_CAPS != 0
 void audio_set_output_source(int source)
@@ -133,3 +134,4 @@ void audio_input_mux(int source, unsigned flags)
     last_source = source;
 } /* audio_input_mux */
 #endif /* INPUT_SRC_CAPS != 0 */
+EXPORT_SYMBOL(audio_set_output_source);

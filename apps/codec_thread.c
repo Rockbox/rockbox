@@ -36,6 +36,8 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
+#include "symbols.h"
+
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
@@ -193,6 +195,7 @@ const char * get_codec_filename(int cod_spec)
 
     return fname;
 }
+EXPORT_SYMBOL(get_codec_filename);
 
 /* Borrow the codec thread and return the ID */
 void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
@@ -206,11 +209,11 @@ void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
     LOGFQUEUE("codec >| Q_CODEC_DO_CALLBACK");
     codec_queue_send(Q_CODEC_DO_CALLBACK, (intptr_t)fn);
 }
-
+EXPORT_SYMBOL(codec_thread_do_callback);
 
 /** --- codec API callbacks --- **/
 
-static void codec_pcmbuf_insert_callback(
+void codec_pcmbuf_insert(
         const void *ch1, const void *ch2, int count)
 {
     struct dsp_buffer src;
@@ -250,6 +253,7 @@ static void codec_pcmbuf_insert_callback(
         }
     }    
 }
+EXPORT_SYMBOL(codec_pcmbuf_insert);
 
 /* helper function, not a callback */
 static bool codec_advance_buffer_counters(size_t amount)
@@ -265,7 +269,7 @@ static bool codec_advance_buffer_counters(size_t amount)
 }
 
 /* copy up-to size bytes into ptr and return the actual size copied */
-static size_t codec_filebuf_callback(void *ptr, size_t size)
+size_t codec_read_filebuf(void *ptr, size_t size)
 {
     ssize_t copy_n = bufread(ci.audio_hid, size, ptr);
 
@@ -279,8 +283,9 @@ static size_t codec_filebuf_callback(void *ptr, size_t size)
     /* Return the actual amount of data copied to the buffer */
     return copy_n;
 }
+EXPORT_SYMBOL(codec_read_filebuf);
 
-static void * codec_request_buffer_callback(size_t *realsize, size_t reqsize)
+void * codec_request_buffer(size_t *realsize, size_t reqsize)
 {
     size_t copy_n = reqsize;
     ssize_t ret;
@@ -298,16 +303,18 @@ static void * codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     *realsize = copy_n;
     return ptr;
 }
+EXPORT_SYMBOL(codec_request_buffer);
 
-static void codec_advance_buffer_callback(size_t amount)
+void codec_advance_buffer(size_t amount)
 {
     if (!codec_advance_buffer_counters(amount))
         return;
 
     audio_codec_update_offset(ci.curpos);
 }
+EXPORT_SYMBOL(codec_advance_buffer);
 
-static bool codec_seek_buffer_callback(size_t newpos)
+bool codec_seek_buffer(size_t newpos)
 {
     logf("codec_seek_buffer_callback");
 
@@ -320,8 +327,9 @@ static bool codec_seek_buffer_callback(size_t newpos)
 
     return false;
 }
+EXPORT_SYMBOL(codec_seek_buffer);
 
-static void codec_seek_complete_callback(void)
+void codec_seek_complete(void)
 {
     logf("seek_complete");
 
@@ -341,14 +349,16 @@ static void codec_seek_complete_callback(void)
     }
     while (codec_check_queue__have_msg() == 0);
 }
+EXPORT_SYMBOL(codec_seek_complete);
 
-static void codec_configure_callback(int setting, intptr_t value)
+void codec_configure(int setting, intptr_t value)
 {
     dsp_configure(ci.dsp, setting, value);
 }
+EXPORT_SYMBOL(codec_configure);
 
-static enum codec_command_action
-    codec_get_command_callback(intptr_t *param)
+enum codec_command_action
+    codec_get_command(intptr_t *param)
 {
     yield();
 
@@ -401,12 +411,13 @@ static enum codec_command_action
         return action;
     }
 }
+EXPORT_SYMBOL(codec_get_command);
 
-static bool codec_loop_track_callback(void)
+bool codec_loop_track(void)
 {
     return global_settings.repeat_mode == REPEAT_ONE;
 }
-
+EXPORT_SYMBOL(codec_loop_track);
 
 /** --- CODEC THREAD --- **/
 
@@ -519,7 +530,7 @@ static void seek_codec(unsigned long time)
     {
         logf("no codec to seek");
         codec_queue_ack(Q_CODEC_SEEK);
-        codec_seek_complete_callback();
+        codec_seek_complete();
         return;
     }
 
@@ -608,19 +619,20 @@ void codec_thread_init(void)
 {
     /* Init API */
     ci.dsp              = dsp_get_config(CODEC_IDX_AUDIO);
-    ci.codec_get_buffer = codec_get_buffer_callback;
-    ci.pcmbuf_insert    = codec_pcmbuf_insert_callback;
-    ci.set_elapsed      = audio_codec_update_elapsed;
-    ci.read_filebuf     = codec_filebuf_callback;
-    ci.request_buffer   = codec_request_buffer_callback;
-    ci.advance_buffer   = codec_advance_buffer_callback;
-    ci.seek_buffer      = codec_seek_buffer_callback;
-    ci.seek_complete    = codec_seek_complete_callback;
-    ci.set_offset       = audio_codec_update_offset;
-    ci.configure        = codec_configure_callback;
-    ci.get_command      = codec_get_command_callback;
-    ci.loop_track       = codec_loop_track_callback;
-
+#if 0
++    ci.codec_get_buffer = codec_get_buffer_callback;
++    ci.pcmbuf_insert    = codec_pcmbuf_insert_callback;
++    ci.set_elapsed      = audio_codec_update_elapsed;
++    ci.read_filebuf     = codec_filebuf_callback;
++    ci.request_buffer   = codec_request_buffer_callback;
++    ci.advance_buffer   = codec_advance_buffer_callback;
++    ci.seek_buffer      = codec_seek_buffer_callback;
++    ci.seek_complete    = codec_seek_complete_callback;
++    ci.set_offset       = audio_codec_update_offset;
++    ci.configure        = codec_configure_callback;
++    ci.get_command      = codec_get_command_callback;
+*    ci.loop_track       = codec_loop_track_callback;
+#endif
     /* Init threading */
     queue_init(&codec_queue, false);
     codec_thread_id = create_thread(

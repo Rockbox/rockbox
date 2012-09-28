@@ -39,7 +39,7 @@ static RMPacket pkt;
 
 static void init_rm(RMContext *rmctx)
 {
-    memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
+    memcpy(rmctx, (void*)(( (intptr_t)ci.id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
 }
 
 /* used outside liba52 */
@@ -48,8 +48,8 @@ static uint8_t buf[3840] IBSS_ATTR;
 /* The following two functions, a52_decode_data and output_audio are taken from a52.c */
 static inline void output_audio(sample_t *samples)
 {
-    ci->yield();
-    ci->pcmbuf_insert(&samples[0], &samples[256], 256);
+    yield();
+    codec_pcmbuf_insert(&samples[0], &samples[256], 256);
 }
 
 static void a52_decode_data(uint8_t *start, uint8_t *end)
@@ -111,7 +111,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                     output_audio(a52_samples(state));
                     samplesdone += 256;
                 }
-                ci->set_elapsed(samplesdone/(frequency/1000));
+                audio_codec_update_elapsed(samplesdone/(frequency/1000));
                 bufptr = buf;
                 bufpos = buf + 7;
                 continue;
@@ -129,8 +129,8 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 28);
     }
     else if (reason == CODEC_UNLOAD) {
         if (state)
@@ -155,17 +155,17 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    resume_offset = ci->id3->offset;
+    resume_offset = ci.id3->offset;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-    codec_set_replaygain(ci->id3);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
+    codec_set_replaygain(ci.id3);
 
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    codec_seek_buffer(ci.id3->first_frame_offset);
 
     /* Intializations */
     state = a52_init(0);
-    ci->memset(&rmctx,0,sizeof(RMContext)); 
-    ci->memset(&pkt,0,sizeof(RMPacket));
+    memset(&rmctx,0,sizeof(RMContext)); 
+    memset(&pkt,0,sizeof(RMPacket));
     init_rm(&rmctx);
 
     samplesdone = 0;
@@ -180,31 +180,31 @@ enum codec_status codec_run(void)
     }
     else {
         /* Seek to the first packet */
-        ci->set_elapsed(0);
-        ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE );
+        audio_codec_update_elapsed(0);
+        codec_advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE );
     }
 
     /* The main decoding loop */
     while((unsigned)rmctx.audio_pkt_cnt < rmctx.nb_packets) {
         if (action == CODEC_ACTION_NULL)
-            action = ci->get_command(&param);
+            action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
             packet_offset = param / ((rmctx.block_align*8*1000)/rmctx.bit_rate);
-            ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE +
+            codec_seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE +
                             packet_offset*(rmctx.block_align + PACKET_HEADER_SIZE));
             rmctx.audio_pkt_cnt = packet_offset;
             samplesdone = (rmctx.sample_rate/1000 * param);
-            ci->set_elapsed(samplesdone/(frequency/1000));
-            ci->seek_complete();
+            audio_codec_update_elapsed(samplesdone/(frequency/1000));
+            codec_seek_complete();
         }
 
         action = CODEC_ACTION_NULL;
 
-        filebuf = ci->request_buffer(&n, rmctx.block_align + PACKET_HEADER_SIZE);
+        filebuf = codec_request_buffer(&n, rmctx.block_align + PACKET_HEADER_SIZE);
         consumed = rm_get_packet(&filebuf, &rmctx, &pkt);
 
         if(consumed < 0 && playback_on != 0) {
@@ -220,7 +220,7 @@ enum codec_status codec_run(void)
 
         playback_on = 1;
         a52_decode_data(filebuf, filebuf + rmctx.block_align);
-        ci->advance_buffer(pkt.length);
+        codec_advance_buffer(pkt.length);
     }
 
     return CODEC_OK;

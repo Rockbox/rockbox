@@ -33,11 +33,13 @@
 #include "rbunicode.h"
 #include "bidi.h"
 #include "scroll_engine.h"
+#include "symbols.h"
 
 /*** globals ***/
 
 fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER;
 fb_data *lcd_framebuffer = &lcd_static_framebuffer[0][0];
+EXPORT_SYMBOL(lcd_framebuffer);
 
 const unsigned char lcd_dibits[16] ICONST_ATTR = {
     0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F,
@@ -132,33 +134,39 @@ void lcd_set_drawmode(int mode)
 {
     current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
+EXPORT_SYMBOL(lcd_set_drawmode);
 
 int lcd_get_drawmode(void)
 {
     return current_vp->drawmode;
 }
+EXPORT_SYMBOL(lcd_get_drawmode);
 
 void lcd_set_foreground(unsigned brightness)
 {
     current_vp->fg_pattern = brightness;
     fg_pattern = 0x55 * (~brightness & 3);
 }
+EXPORT_SYMBOL(lcd_set_foreground);
 
 unsigned lcd_get_foreground(void)
 {
     return current_vp->fg_pattern;
 }
+EXPORT_SYMBOL(lcd_get_foreground);
 
 void lcd_set_background(unsigned brightness)
 {
     current_vp->bg_pattern = brightness;
     bg_pattern = 0x55 * (~brightness & 3);
 }
+EXPORT_SYMBOL(lcd_set_background);
 
 unsigned lcd_get_background(void)
 {
     return current_vp->bg_pattern;
 }
+EXPORT_SYMBOL(lcd_get_background);
 
 void lcd_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness)
 {
@@ -181,6 +189,7 @@ void lcd_setfont(int newfont)
 {
     current_vp->font = newfont;
 }
+EXPORT_SYMBOL(lcd_setfont);
 
 int lcd_getfont(void)
 {
@@ -378,12 +387,13 @@ void lcd_set_backdrop(fb_data* backdrop)
         lcd_blockfuncs = lcd_blockfuncs_bgcolor;
     }
 }
+EXPORT_SYMBOL(lcd_set_backdrop);
 
 fb_data* lcd_get_backdrop(void)
 {
     return lcd_backdrop;
 }
-
+EXPORT_SYMBOL(lcd_get_backdrop);
 
 static inline void setblock(fb_data *address, unsigned mask, unsigned bits)
 {
@@ -412,6 +422,7 @@ void lcd_clear_display(void)
 
     lcd_scroll_info.lines = 0;
 }
+EXPORT_SYMBOL(lcd_clear_display);
 
 /* Clear the current viewport */
 void lcd_clear_viewport(void)
@@ -450,6 +461,7 @@ void lcd_drawpixel(int x, int y)
         )
         lcd_pixelfuncs[current_vp->drawmode](current_vp->x + x, current_vp->y + y);
 }
+EXPORT_SYMBOL(lcd_drawpixel);
 
 /* Draw a line */
 void lcd_drawline(int x1, int y1, int x2, int y2)
@@ -598,6 +610,7 @@ void lcd_hline(int x1, int x2, int y)
         bfunc(dst++, mask, 0xFFu);
     while (dst < dst_end);
 }
+EXPORT_SYMBOL(lcd_hline);
 
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
@@ -660,6 +673,7 @@ void lcd_vline(int x, int y1, int y2)
     mask &= mask_bottom;
     bfunc(dst, mask, 0xFFu);
 }
+EXPORT_SYMBOL(lcd_vline);
 
 /* Draw a rectangular box */
 void lcd_drawrect(int x, int y, int width, int height)
@@ -675,6 +689,7 @@ void lcd_drawrect(int x, int y, int width, int height)
     lcd_hline(x, x2, y);
     lcd_hline(x, x2, y2);
 }
+EXPORT_SYMBOL(lcd_drawrect);
 
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
@@ -786,6 +801,7 @@ void lcd_fillrect(int x, int y, int width, int height)
         while (dst < dst_end);
     }
 }
+EXPORT_SYMBOL(lcd_fillrect);
 
 /* About Rockbox' internal monochrome bitmap format:
  *
@@ -978,12 +994,14 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
         while (dst < dst_end);
     }
 }
+EXPORT_SYMBOL(lcd_mono_bitmap_part);
 
 /* Draw a full monochrome bitmap */
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
     lcd_mono_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
+EXPORT_SYMBOL(lcd_mono_bitmap);
 
 /* About Rockbox' internal native bitmap format:
  *
@@ -1133,11 +1151,13 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
         while (dst < dst_end);
     }
 }
+EXPORT_SYMBOL(lcd_bitmap_part);
 
 /* Draw a full native bitmap */
 void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
 {
     lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
+EXPORT_SYMBOL(lcd_bitmap);
 
 #include "lcd-bitmap-common.c"

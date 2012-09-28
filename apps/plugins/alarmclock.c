@@ -39,9 +39,9 @@ static inline int get_button(void)
 
 static int rem_seconds(void)
 {
-    int seconds = (((alarm[0] - rb->get_time()->tm_hour) * 3600)
-                  +((alarm[1] - rb->get_time()->tm_min)  * 60)
-                  -(rb->get_time()->tm_sec));
+    int seconds = (((alarm[0] - get_time()->tm_hour) * 3600)
+                  +((alarm[1] - get_time()->tm_min)  * 60)
+                  -(get_time()->tm_sec));
 
     /* The tomorrow flag means that the alarm should ring on the next day */
     if (seconds > prev_tick) tomorrow = false;
@@ -56,7 +56,7 @@ static void draw_centered_string(struct screen * display, char * string)
     display->getstringsize(string, &w, &h);
 
     if (w > display->lcdwidth || h > display->lcdheight) {
-        rb->splash(0, string);
+        splash(0, string);
     } else {
         display->putsxy((display->lcdwidth - w) / 2,
                         (display->lcdheight - h) / 2,
@@ -73,16 +73,16 @@ static void draw(struct screen * display)
     int secs = rem_seconds();
 
     if (waiting)
-        rb->snprintf(info, sizeof(info), "Next alarm in %02dh,"
+        snprintf(info, sizeof(info), "Next alarm in %02dh,"
                                          " %02dmn, and %02ds.",
                            secs / 3600, (secs / 60) % 60, secs % 60);
     else {
         if (current == 0)
-            rb->snprintf(info, sizeof(info), "Set alarm at [%02d]:%02d.",
+            snprintf(info, sizeof(info), "Set alarm at [%02d]:%02d.",
                                                                  alarm[0],
                                                                  alarm[1]);
         else
-            rb->snprintf(info, sizeof(info), "Set alarm at %02d:[%02d].",
+            snprintf(info, sizeof(info), "Set alarm at %02d:[%02d].",
                                                                  alarm[0],
                                                                  alarm[1]);
     }
@@ -91,12 +91,12 @@ static void draw(struct screen * display)
 
 static bool can_play(void)
 {
-    int audio_status = rb->audio_status();
-    if ((!audio_status && rb->global_status->resume_index != -1)
-        && (rb->playlist_resume() != -1)) {
+    int status = audio_status();
+    if ((!status && global_status.resume_index != -1)
+        && (playlist_resume() != -1)) {
         return true;
     }
-    else if (audio_status & AUDIO_STATUS_PLAY)
+    else if (status & AUDIO_STATUS_PLAY)
         return true;
 
     return false;
@@ -104,21 +104,21 @@ static bool can_play(void)
 
 static void play(void)
 {
-    int audio_status = rb->audio_status();
-    if (!audio_status && rb->global_status->resume_index != -1) {
-        if (rb->playlist_resume() != -1) {
-            rb->playlist_start(rb->global_status->resume_index,
-                rb->global_status->resume_offset);
+    int status = audio_status();
+    if (!status && global_status.resume_index != -1) {
+        if (playlist_resume() != -1) {
+            playlist_start(global_status.resume_index,
+                global_status.resume_offset);
         }
     }
-    else if (audio_status & AUDIO_STATUS_PLAY)
-        rb->audio_resume();
+    else if (status & AUDIO_STATUS_PLAY)
+        audio_resume();
 }
 
 static void pause(void)
 {
-    if (rb->audio_status() & AUDIO_STATUS_PLAY)
-        rb->audio_pause();
+    if (audio_status() & AUDIO_STATUS_PLAY)
+        audio_pause();
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -127,7 +127,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
     if (!can_play()) {
-        rb->splash(HZ*2, "No track to resume! "
+        splash(HZ*2, "No track to resume! "
                          "Play or pause one first.");
         return PLUGIN_ERROR;
     }
@@ -140,7 +140,7 @@ enum plugin_status plugin_start(const void* parameter)
             quit = true;
 
         FOR_NB_SCREENS(i) {
-            draw(rb->screens[i]);
+            draw(&screens[i]);
         }
         if (waiting) {
             if (rem_seconds() <= 0) {
@@ -185,7 +185,7 @@ enum plugin_status plugin_start(const void* parameter)
                 }
 
                 default:
-                    if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    if (default_event_handler(button) == SYS_USB_CONNECTED)
                         quit = usb = true;
                     break;
             }

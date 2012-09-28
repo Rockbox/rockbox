@@ -3154,11 +3154,11 @@ static int low_water = (256*1024);
 void i2c_random_write(int addr, int cmd, const unsigned char* data, int size)
 {
     plug_buf[0] = cmd;
-    rb->memcpy(plug_buf+1, data, size);
+    memcpy(plug_buf+1, data, size);
 
-    rb->i2c_begin();
-    rb->i2c_write(addr, plug_buf, size+1);
-    rb->i2c_end();
+    i2c_begin();
+    i2c_write(addr, plug_buf, size+1);
+    i2c_end();
 }
 
 void mas_freeze(void)
@@ -3170,14 +3170,14 @@ void mas_freeze(void)
     /* mas_run(0); in core implementation */
 
     /* stop all internal transfers */
-    rb->mas_writereg(0x3b, 0x00318); /* stopdma 1 */
-    rb->mas_writereg(0x43, 0x00300); /* stopdma 2 */
-    rb->mas_writereg(0x4b, 0);       /* stopdma 3 */
-    rb->mas_writereg(0x53, 0x00318); /* stopdma 4 */
-    rb->mas_writereg(0x6b, 0);       /* stopdma 5 */
-    rb->mas_writereg(0xbb, 0x00318); /* stopdma 6 */
-    rb->mas_writereg(0xc3, 0x00300); /* stopdma 7 */
-    rb->mas_writereg(0x06, 0);       /* stopdma 8 */
+    mas_writereg(0x3b, 0x00318); /* stopdma 1 */
+    mas_writereg(0x43, 0x00300); /* stopdma 2 */
+    mas_writereg(0x4b, 0);       /* stopdma 3 */
+    mas_writereg(0x53, 0x00318); /* stopdma 4 */
+    mas_writereg(0x6b, 0);       /* stopdma 5 */
+    mas_writereg(0xbb, 0x00318); /* stopdma 6 */
+    mas_writereg(0xc3, 0x00300); /* stopdma 7 */
+    mas_writereg(0x06, 0);       /* stopdma 8 */
 }
 
 void mas_download_pcm(void)
@@ -3191,7 +3191,7 @@ void mas_download_pcm(void)
     for ( i = 0; i < (sizeof(maspcm)/sizeof(struct i2c_block)); i++ )
         i2c_random_write(MAS_ADR, MAS_DATA_WRITE, maspcm[i].data, maspcm[i].len);
 
-    rb->mas_writereg(0x6b, 0xc0000);  /* Reconfigure data to program memory */
+    mas_writereg(0x6b, 0xc0000);  /* Reconfigure data to program memory */
 
     /* Start execution at D0:1000 */
     i2c_random_write(MAS_ADR, MAS_DATA_WRITE, runi2s, sizeof(runi2s));
@@ -3206,15 +3206,15 @@ void mas_restore(void)
     
     i2c_random_write(MAS_ADR, MAS_CONTROL, resetdsp, sizeof(resetdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8d00); in core implementation */
-    rb->sleep(1);
+    sleep(1);
     i2c_random_write(MAS_ADR, MAS_CONTROL, initdsp, sizeof(initdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8c00); in core implementation */
     
     /* Stop the current application */
     val = 0;
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
-        rb->mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     while(val);
 
 #ifdef HAVE_SPDIF_OUT
@@ -3222,15 +3222,15 @@ void mas_restore(void)
 #else
     val = 0x002d; /* Disable SDO and SDI, disable S/PDIF output */
 #endif
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_INTERFACE_CONTROL, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_INTERFACE_CONTROL, &val, 1);
 
     val = 0x0025; /* Set Demand mode and validate all settings */
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val, 1);
 
     val = 0x000c; /* Start the Layer2/3 decoder applications */
-    rb->mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
+    mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
     do
-        rb->mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
+        mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     while((val & 0x000c) != 0x000c);
 }
 
@@ -3303,10 +3303,10 @@ void pcm_channel_config(int channel_config, int stereo_width)
 
     }
 
-    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_LL, &val_ll, 1); /* LL */
-    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_LR, &val_lr, 1); /* LR */
-    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_RL, &val_rl, 1); /* RL */
-    rb->mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_RR, &val_rr, 1); /* RR */
+    mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_LL, &val_ll, 1); /* LL */
+    mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_LR, &val_lr, 1); /* LR */
+    mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_RL, &val_rl, 1); /* RL */
+    mas_writemem(MAS_BANK_D0, PCM_VOL_OUT_RR, &val_rr, 1); /* RR */
 }
 
 /** Basic playback system **/
@@ -3442,14 +3442,14 @@ void cleanup(void *fd)
     hijack_interrupts(false);
     
     mas_restore();
-    rb->sound_set(SOUND_CHANNELS, rb->global_settings->channel_config);
-    rb->sound_set(SOUND_STEREO_WIDTH, rb->global_settings->stereo_width);
+    sound_set(SOUND_CHANNELS, global_settings.channel_config);
+    sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
 
     /* reconfigure SCI */
     while (!(SSR0 & SCI_TEND)); /* wait for end of transfer */
     BRR0 = 2;                   /* ~1 MBit/s */
 
-    rb->close(*(int*)fd);
+    close(*(int*)fd);
 }
 
 int play_file(char* filename)
@@ -3461,60 +3461,60 @@ int play_file(char* filename)
     unsigned rate = 0;                                      
     unsigned long mas;
 
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splash(2*HZ, "Couldn't open WAV file");
+        splash(2*HZ, "Couldn't open WAV file");
         return PLAY_ERROR;
     }
 
     /* Process WAV header */
     wanted = 44;
-    got = rb->read(fd, aud_buf, wanted); /* wav header */
+    got = read(fd, aud_buf, wanted); /* wav header */
     if (got < 0)
     {
-        rb->splash(2*HZ, "Read error");
-        rb->close(fd);
+        splash(2*HZ, "Read error");
+        close(fd);
         return PLAY_ERROR;
     }
     else if (got < wanted)
     {
-        rb->splash(2*HZ, "File too short");
-        rb->close(fd);
+        splash(2*HZ, "File too short");
+        close(fd);
         return PLAY_ERROR;
     }
 
-    if (rb->memcmp(aud_buf, "RIFF", 4)
-        || rb->memcmp(aud_buf + 8, "WAVE", 4)
-        || rb->memcmp(aud_buf + 12, "fmt ", 4)
-        || rb->memcmp(aud_buf + 36, "data", 4))
+    if (memcmp(aud_buf, "RIFF", 4)
+        || memcmp(aud_buf + 8, "WAVE", 4)
+        || memcmp(aud_buf + 12, "fmt ", 4)
+        || memcmp(aud_buf + 36, "data", 4))
     {
-        rb->splash(2*HZ, "No canonical WAV file");
-        rb->close(fd);
+        splash(2*HZ, "No canonical WAV file");
+        close(fd);
         return PLAY_ERROR;
     }
 
     format = letoh16(*(uint16_t *)(aud_buf + 20));
     if (format != 1)
     {
-        rb->splashf(2*HZ, "Unsupported format: %d", format);
-        rb->close(fd);
+        splashf(2*HZ, "Unsupported format: %d", format);
+        close(fd);
         return PLAY_ERROR;
     }
 
     channels = letoh16(*(uint16_t *)(aud_buf + 22));
     if (channels > 2)
     {
-        rb->splashf(2*HZ, "Too many channels: %d", channels);
-        rb->close(fd);
+        splashf(2*HZ, "Too many channels: %d", channels);
+        close(fd);
         return PLAY_ERROR;
     }
 
     samplebits = letoh16(*(uint16_t *)(aud_buf + 34));
     if (samplebits != 16)
     {
-        rb->splashf(2*HZ, "Unsupported sample depth: %dbit", samplebits);
-        rb->close(fd);
+        splashf(2*HZ, "Unsupported sample depth: %dbit", samplebits);
+        close(fd);
         return PLAY_ERROR;
     }
 
@@ -3531,39 +3531,39 @@ int play_file(char* filename)
         case 44100:  rate =  9; break;
         case 48000:  rate = 10; break;
         default:
-            rb->splashf(2*HZ, "Unsupported samplerate: %dHz", samplerate);
-            rb->close(fd);
+            splashf(2*HZ, "Unsupported samplerate: %dHz", samplerate);
+            close(fd);
             return PLAY_ERROR;
     }
     bytes = letoh32(*(uint32_t *)(aud_buf + 40));
     time = bytes / (samplerate * 2 * channels);
 
-    rb->lcd_puts(0, 0, "Playing WAV file");
-    rb->lcd_putsf(0, 1, "%dHz %s", samplerate,
+    lcd_puts(0, 0, "Playing WAV file");
+    lcd_putsf(0, 1, "%dHz %s", samplerate,
                  (channels == 1) ? "mono" : "stereo");
-    rb->lcd_putsf(0, 2, "Length: %d:%02d", time / 60, time % 60);
-    rb->lcd_update();
+    lcd_putsf(0, 2, "Length: %d:%02d", time / 60, time % 60);
+    lcd_update();
 
-    rb->sound_set_pitch(PITCH_SPEED_100);  /* reset pitch */
+    sound_set_pitch(PITCH_SPEED_100);  /* reset pitch */
     mas_download_pcm();  /* Download PCM codec */
 
     /* Configure PCM codec */
-    pcm_channel_config(rb->global_settings->channel_config,
-                       rb->global_settings->stereo_width);
+    pcm_channel_config(global_settings.channel_config,
+                       global_settings.stereo_width);
 #ifdef HAVE_SPDIF_OUT
     mas = 0x0009;   /* Disable SDO and SDI, low impedance S/PDIF outputs */
 #else
     mas = 0x002d;   /* Disable SDO and SDI, disable S/PDIF output */
 #endif
-    rb->mas_writemem(MAS_BANK_D0, PCM_IF_STATUS_CONTROL, &mas, 1);
+    mas_writemem(MAS_BANK_D0, PCM_IF_STATUS_CONTROL, &mas, 1);
 
     mas = 0x0060                         /* no framing, little endian */
           | ((channels == 1) ? 0x10 : 0) /* mono or stereo */
           | rate;                        /* bitrate */
-    rb->mas_writemem(MAS_BANK_D0, PCM_SAMPLE_RATE, &mas, 1);
+    mas_writemem(MAS_BANK_D0, PCM_SAMPLE_RATE, &mas, 1);
 
     mas = 0x1025;   /* playback, SIBC clock invert, validate */
-    rb->mas_writemem(MAS_BANK_D0, PCM_MAIN_IO_CONTROL, &mas, 1);
+    mas_writemem(MAS_BANK_D0, PCM_MAIN_IO_CONTROL, &mas, 1);
 
     /* configure SCI */
     while (!(SSR0 & SCI_TEND)); /* wait for end of transfer */
@@ -3593,7 +3593,7 @@ int play_file(char* filename)
             if (free_space <= 0)
             {
                 filling = false;
-                rb->storage_sleep();
+                storage_sleep();
             }
             else
             {
@@ -3606,11 +3606,11 @@ int play_file(char* filename)
                 if (available() < low_water)
                     wanted = MIN(wanted, LOW_WATER_CHUNKSIZE);
 
-                got = rb->read(fd, aud_buf + aud_write, wanted);
+                got = read(fd, aud_buf + aud_write, wanted);
 
                 if (got > 0)
                 {
-                    rb->bitswap(aud_buf + aud_write, got);
+                    bitswap(aud_buf + aud_write, got);
 
                     aud_write += got;
                     if (aud_write >= aud_size)
@@ -3624,17 +3624,17 @@ int play_file(char* filename)
                 if (((available() >= low_water) || !filling) && !playing)
                     pcm_start();
             }
-            button = rb->button_get(false);
+            button = button_get(false);
         }
         else
         {
-            button = rb->button_get_w_tmo(HZ/2);
+            button = button_get_w_tmo(HZ/2);
             if ((available() < low_water) && (got > 0))
                 filling = true;
         }
         if (button == WAVPLAY_QUIT)
             break;
-        else if (rb->default_event_handler_ex(button, cleanup, &fd) == SYS_USB_CONNECTED)
+        else if (default_event_handler_ex(button, cleanup, &fd) == SYS_USB_CONNECTED)
             return PLAY_GOT_USB;
             
 
@@ -3650,18 +3650,18 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (!parameter)
     {
-        rb->splash(HZ, "Play WAV file!");
+        splash(HZ, "Play WAV file!");
         return PLUGIN_OK;
     }
 
-    plug_buf = rb->plugin_get_buffer(&buf_size);
+    plug_buf = plugin_get_buffer(&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
     {
-        rb->splash(HZ, "Out of memory.");
+        splash(HZ, "Out of memory.");
         return PLUGIN_ERROR;
     }
 
-    aud_buf = rb->plugin_get_audio_buffer(&buf_size);
+    aud_buf = plugin_get_audio_buffer(&buf_size);
     aud_size = buf_size;
 
     switch (play_file((char*)parameter))

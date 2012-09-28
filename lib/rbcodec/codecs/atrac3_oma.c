@@ -28,8 +28,8 @@
 
 CODEC_HEADER
 
-#define FRAMESIZE ci->id3->bytesperframe
-#define BITRATE   ci->id3->bitrate
+#define FRAMESIZE ci.id3->bytesperframe
+#define BITRATE   ci.id3->bitrate
 
 static ATRAC3Context q IBSS_ATTR;
 
@@ -57,76 +57,76 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    resume_offset = ci->id3->offset;
+    resume_offset = ci.id3->offset;
 
-    codec_set_replaygain(ci->id3);
-    ci->memset(&q,0,sizeof(ATRAC3Context));
+    codec_set_replaygain(ci.id3);
+    memset(&q,0,sizeof(ATRAC3Context));
  
-    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
-    ci->configure(DSP_SET_STEREO_MODE, ci->id3->channels == 1 ?
+    codec_configure(DSP_SET_FREQUENCY, ci.id3->frequency);
+    codec_configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
+    codec_configure(DSP_SET_STEREO_MODE, ci.id3->channels == 1 ?
         STEREO_MONO : STEREO_NONINTERLEAVED);
 
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
 
-    res = atrac3_decode_init(&q, ci->id3);
+    res = atrac3_decode_init(&q, ci.id3);
     if(res < 0) {
         DEBUGF("failed to initialize OMA atrac decoder\n");
         return CODEC_ERROR;
     }
 
-    total_frames = (ci->id3->filesize - ci->id3->first_frame_offset) / FRAMESIZE;
+    total_frames = (ci.id3->filesize - ci.id3->first_frame_offset) / FRAMESIZE;
     frame_counter = 0;
     
     /* check for a mid-track resume and force a seek time accordingly */
-    if(resume_offset > ci->id3->first_frame_offset) {
-        resume_offset -= ci->id3->first_frame_offset;
+    if(resume_offset > ci.id3->first_frame_offset) {
+        resume_offset -= ci.id3->first_frame_offset;
         /* calculate resume_offset in frames */
         resume_offset = (int)resume_offset / FRAMESIZE;
         param = (int)resume_offset * ((FRAMESIZE * 8)/BITRATE);
         action = CODEC_ACTION_SEEK_TIME;
     }
     else {
-        ci->set_elapsed(0);
-        ci->seek_buffer(ci->id3->first_frame_offset);
+        audio_codec_update_elapsed(0);
+        codec_seek_buffer(ci.id3->first_frame_offset);
     }
 
     /* The main decoder loop */  
     while(frame_counter < total_frames)
     {
         if (action == CODEC_ACTION_NULL)
-            action = ci->get_command(&param);
+            action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
-        bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, FRAMESIZE);
+        bit_buffer = (uint8_t *) codec_request_buffer(&buff_size, FRAMESIZE);
 
         if (action == CODEC_ACTION_SEEK_TIME) {
             /* Do not allow seeking beyond the file's length */
-            if ((unsigned) param > ci->id3->length) {
-                ci->set_elapsed(ci->id3->length);
-                ci->seek_complete();
+            if ((unsigned) param > ci.id3->length) {
+                audio_codec_update_elapsed(ci.id3->length);
+                codec_seek_complete();
                 break;
             }       
 
             /* Seek to the start of the track */
             if (param == 0) {
                 elapsed = 0;
-                ci->set_elapsed(0);
-                ci->seek_buffer(ci->id3->first_frame_offset);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_buffer(ci.id3->first_frame_offset);
+                codec_seek_complete();
                 action = CODEC_ACTION_NULL;
                 continue;           
             }                                                                
 
             seek_frame_offset = (param * BITRATE) / (8 * FRAMESIZE);
             frame_counter = seek_frame_offset;
-            ci->seek_buffer(ci->id3->first_frame_offset + seek_frame_offset* FRAMESIZE);
-            bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, FRAMESIZE);
+            codec_seek_buffer(ci.id3->first_frame_offset + seek_frame_offset* FRAMESIZE);
+            bit_buffer = (uint8_t *) codec_request_buffer(&buff_size, FRAMESIZE);
             elapsed = param;
-            ci->set_elapsed(elapsed);
-            ci->seek_complete(); 
+            audio_codec_update_elapsed(elapsed);
+            codec_seek_complete(); 
         }
 
         action = CODEC_ACTION_NULL;
@@ -139,13 +139,13 @@ enum codec_status codec_run(void)
         }
 
         if(datasize)
-            ci->pcmbuf_insert(q.outSamples, q.outSamples + 1024,
-                              q.samples_per_frame / ci->id3->channels);
+            codec_pcmbuf_insert(q.outSamples, q.outSamples + 1024,
+                              q.samples_per_frame / ci.id3->channels);
 
         elapsed += (FRAMESIZE * 8) / BITRATE;
-        ci->set_elapsed(elapsed);
+        audio_codec_update_elapsed(elapsed);
 
-        ci->advance_buffer(FRAMESIZE);
+        codec_advance_buffer(FRAMESIZE);
         frame_counter++;
     }
 

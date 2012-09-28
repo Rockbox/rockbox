@@ -33,22 +33,22 @@ int highscore_save(char *filename, struct highscore *scores, int num_scores)
     if(!highscore_updated)
         return 1;
 
-    fd = rb->open(filename, O_WRONLY|O_CREAT, 0666);
+    fd = open(filename, O_WRONLY|O_CREAT, 0666);
     if(fd < 0)
         return -1;
     
     for(i = 0;i < num_scores;i++)
     {
-        rb->snprintf(buf, sizeof(buf), "%d:%d:%s\n",
+        snprintf(buf, sizeof(buf), "%d:%d:%s\n",
                      scores[i].score, scores[i].level, scores[i].name);
-        rc = rb->write(fd, buf, rb->strlen(buf));
+        rc = write(fd, buf, strlen(buf));
         if(rc < 0)
         {
-            rb->close(fd);
+            close(fd);
             return -2;
         }
     }
-    rb->close(fd);
+    close(fd);
     highscore_updated = false;
     return 0;
 }
@@ -60,28 +60,28 @@ int highscore_load(char *filename, struct highscore *scores, int num_scores)
     char buf[80];
     char *score, *level, *name;
 
-    rb->memset(scores, 0, sizeof(struct highscore)*num_scores);
+    memset(scores, 0, sizeof(struct highscore)*num_scores);
 
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if(fd < 0)
         return -1;
 
     i = 0;
-    while(rb->read_line(fd, buf, sizeof(buf)) > 0 && i < num_scores)
+    while(read_line(fd, buf, sizeof(buf)) > 0 && i < num_scores)
     {
         DEBUGF("%s\n", buf);
 
-        if ( !rb->settings_parseline(buf, &score, &level) )
+        if ( !settings_parseline(buf, &score, &level) )
             continue;
-        if ( !rb->settings_parseline(level, &level, &name) )
+        if ( !settings_parseline(level, &level, &name) )
             continue;
 
-        scores[i].score = rb->atoi(score);
-        scores[i].level = rb->atoi(level);
-        rb->strlcpy(scores[i].name, name, sizeof(scores[i].name));
+        scores[i].score = atoi(score);
+        scores[i].level = atoi(level);
+        strlcpy(scores[i].name, name, sizeof(scores[i].name));
         i++;
     }
-    rb->close(fd);
+    close(fd);
     highscore_updated = false;
     return 0;
 }
@@ -99,7 +99,7 @@ int highscore_update(int score, int level, const char *name,
     while (pos > 0 && score > scores[pos-1].score)
     {
         /* move down one */
-        rb->memcpy((void *)&scores[pos], (void *)&scores[pos-1],
+        memcpy((void *)&scores[pos], (void *)&scores[pos-1],
                    sizeof(struct highscore));
         pos--;
     }
@@ -107,7 +107,7 @@ int highscore_update(int score, int level, const char *name,
     entry = scores + pos;
     entry->score = score;
     entry->level = level;
-    rb->strlcpy(entry->name, name, sizeof(entry->name));
+    strlcpy(entry->name, name, sizeof(entry->name));
 
     highscore_updated = true;
     return pos;
@@ -126,57 +126,57 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
 {
     int i, w, h;
 #ifdef HAVE_LCD_COLOR
-    unsigned bgcolor = rb->lcd_get_background();
-    unsigned fgcolor = rb->lcd_get_foreground();
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    unsigned bgcolor = lcd_get_background();
+    unsigned fgcolor = lcd_get_foreground();
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_getstringsize("High Scores", &w, &h);
+    lcd_setfont(FONT_UI);
+    lcd_getstringsize("High Scores", &w, &h);
     /* check wether it fits on screen */
     if ((4*h + h*(num_scores-1) + MARGIN) > LCD_HEIGHT) {
-        rb->lcd_setfont(FONT_SYSFIXED);
-        rb->lcd_getstringsize("High Scores", &w, &h);
+        lcd_setfont(FONT_SYSFIXED);
+        lcd_getstringsize("High Scores", &w, &h);
     }
-    rb->lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
-    rb->lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
+    lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
+    lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
     
     if(show_level) {
-        rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
+        lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
     }
 
     for (i = 0; i<num_scores; i++)
     {
 #ifdef HAVE_LCD_COLOR
         if (i == position) {
-            rb->lcd_set_foreground(LCD_RGBPACK(245,0,0));
+            lcd_set_foreground(LCD_RGBPACK(245,0,0));
         }
 #endif
-        rb->lcd_putsxyf (MARGIN,3*h + h*i, "%d)", i+1);
-        rb->lcd_putsxyf (LCD_WIDTH/4-w/4,3*h + h*i, "%d", scores[i].score);
+        lcd_putsxyf (MARGIN,3*h + h*i, "%d)", i+1);
+        lcd_putsxyf (LCD_WIDTH/4-w/4,3*h + h*i, "%d", scores[i].score);
         
         if(show_level) {
-            rb->lcd_putsxyf (LCD_WIDTH*3/4-w/4,3*h + h*i, "%d", scores[i].level);
+            lcd_putsxyf (LCD_WIDTH*3/4-w/4,3*h + h*i, "%d", scores[i].level);
         }
         
         if(i == position) {
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(LCD_WHITE);
+            lcd_set_foreground(LCD_WHITE);
 #else
-            rb->lcd_hline(MARGIN, LCD_WIDTH-MARGIN*2, 3*h + h*(i+1) - 1);
+            lcd_hline(MARGIN, LCD_WIDTH-MARGIN*2, 3*h + h*(i+1) - 1);
 #endif
         }
     }
-    rb->lcd_update();
-    rb->sleep(HZ/2);
-    rb->button_clear_queue();
-    rb->button_get(true);
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_update();
+    sleep(HZ/2);
+    button_clear_queue();
+    button_get(true);
+    lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(bgcolor);
-    rb->lcd_set_foreground(fgcolor);
+    lcd_set_background(bgcolor);
+    lcd_set_foreground(fgcolor);
 #endif
 }
 #else
@@ -190,12 +190,12 @@ static const char* get_score(int selected, void * data,
 {
     struct scoreinfo *scoreinfo = (struct scoreinfo *) data;
     int len;
-    len = rb->snprintf(buffer, buffer_len, "%c%d) %4d",
+    len = snprintf(buffer, buffer_len, "%c%d) %4d",
                         (scoreinfo->position == selected?'*':' '),
                         selected+1, scoreinfo->scores[selected].score);
 
     if (scoreinfo->show_level)
-        rb->snprintf(buffer + len, buffer_len - len, " %d",
+        snprintf(buffer + len, buffer_len - len, " %d",
                      scoreinfo->scores[selected].level);
     return buffer;
 }
@@ -205,11 +205,11 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
 {
     struct simplelist_info info;
     struct scoreinfo scoreinfo = {scores, position, show_level};
-    rb->simplelist_info_init(&info, "High Scores", num_scores, &scoreinfo);
+    simplelist_info_init(&info, "High Scores", num_scores, &scoreinfo);
     if (position >= 0)
         info.selection = position;
     info.hide_selection = true;
     info.get_name = get_score;
-    rb->simplelist_show_list(&info);
+    simplelist_show_list(&info);
 }
 #endif /* HAVE_LCD_BITMAP */

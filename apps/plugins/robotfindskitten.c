@@ -527,11 +527,11 @@ const unsigned colors[NUM_COLORS] = {
 #endif /* HAVE_LCD_COLOR */
 
 /*Macros for generating numbers in different ranges*/
-#define randx() (rb->rand() % X_MAX) + 1
-#define randy() (rb->rand() % (Y_MAX-Y_MIN+1))+Y_MIN /*I'm feeling randy()!*/
-#define randchar() rb->rand() % (126-'!'+1)+'!';
-#define randcolor() rb->rand() % NUM_COLORS
-#define randbold() (rb->rand() % 2 ? true:false)
+#define randx() (rand() % X_MAX) + 1
+#define randy() (rand() % (Y_MAX-Y_MIN+1))+Y_MIN /*I'm feeling randy()!*/
+#define randchar() rand() % (126-'!'+1)+'!';
+#define randcolor() rand() % NUM_COLORS
+#define randbold() (rand() % 2 ? true:false)
 
 /*Row constants for the animation*/
 #define ADV_ROW 1
@@ -600,17 +600,17 @@ int screen[X_MAX + 1][Y_MAX + 1];
 
 static inline void drawchar(int x, int y, char c)
 {
-  rb->lcd_putsxyf(x*SYSFONT_WIDTH, y*SYSFONT_HEIGHT, "%c", c);
+  lcd_putsxyf(x*SYSFONT_WIDTH, y*SYSFONT_HEIGHT, "%c", c);
 }
 
 static void draw(struct screen_object o)
 {
 #if LCD_DEPTH > 1
   unsigned oldforeground;
-  oldforeground = rb->lcd_get_foreground();
-  rb->lcd_set_foreground(o.color);
+  oldforeground = lcd_get_foreground();
+  lcd_set_foreground(o.color);
   drawchar(o.x, o.y, o.character);
-  rb->lcd_set_foreground(oldforeground);
+  lcd_set_foreground(oldforeground);
 #else
   drawchar(o.x, o.y, o.character);
 #endif
@@ -618,12 +618,12 @@ static void draw(struct screen_object o)
 
 static void message(char * str)
 {
-  rb->lcd_puts_scroll(0, ADV_ROW, str);
+  lcd_puts_scroll(0, ADV_ROW, str);
 }
 
 static void refresh(void)
 {
-  rb->lcd_update();
+  lcd_update();
 }
 
 /*
@@ -701,7 +701,7 @@ static void process_input(int input)
    * Clear textline
    * disabled because it breaks the scrolling for some reason
    */
-  /* rb->lcd_puts_scroll(0, ADV_ROW, " "); */
+  /* lcd_puts_scroll(0, ADV_ROW, " "); */
   
   /*Check for collision*/
   if (screen[check_x][check_y] != EMPTY)
@@ -746,9 +746,9 @@ static void finish(int sig)
 static void rfkpause()
 {
   int button;
-  rb->lcd_update();
+  lcd_update();
   do {
-    button = rb->button_get(true);
+    button = button_get(true);
   }
   while( ( button == BUTTON_NONE )
       || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
@@ -772,7 +772,7 @@ static void play_animation(int input)
   struct screen_object left;
   struct screen_object right;
   /*The grand cinema scene.*/
-  rb->lcd_puts_scroll(0, ADV_ROW, " ");
+  lcd_puts_scroll(0, ADV_ROW, " ");
 
   if (input == RFK_RIGHT || input == RFK_DOWN ||
       input == RFK_RRIGHT || input == RFK_RDOWN)
@@ -799,7 +799,7 @@ static void play_animation(int input)
     draw(left);
     draw(right);
     refresh();
-    rb->sleep(HZ);
+    sleep(HZ);
   }
 
   message("You found kitten! Way to go, robot!");
@@ -927,7 +927,7 @@ static void initialize_bogus()
       
         /*Find a message for this object.*/
         do {
-            index = rb->rand() % MESSAGES;
+            index = rand() % MESSAGES;
         } while (used_messages[index] != false);
         bogus_messages[counter] = index;
         used_messages[index] = true;
@@ -944,10 +944,10 @@ static void initialize_screen()
   /*
    *Print the status portion of the screen.
    */
-  rb->lcd_clear_display();
-  rb->lcd_setfont(FONT_SYSFIXED);
-  rb->snprintf(buf, sizeof(buf), "robotfindskitten %s", RFK_VERSION);
-  rb->lcd_puts_scroll(0, 0, buf);
+  lcd_clear_display();
+  lcd_setfont(FONT_SYSFIXED);
+  snprintf(buf, sizeof(buf), "robotfindskitten %s", RFK_VERSION);
+  lcd_puts_scroll(0, 0, buf);
   refresh();
   
   /*Draw a line across the screen.*/
@@ -978,7 +978,7 @@ enum plugin_status plugin_start(const void* parameter)
 
   exit_rfk = false;
 
-  rb->srand(*rb->current_tick);
+  srand(current_tick);
 
   initialize_arrays();
 
@@ -993,9 +993,9 @@ enum plugin_status plugin_start(const void* parameter)
    * Set up white-on-black screen on color targets
    */
 #if LCD_DEPTH >= 16
-  rb->lcd_set_backdrop(NULL);
-  rb->lcd_set_foreground(LCD_WHITE);
-  rb->lcd_set_background(LCD_BLACK);
+  lcd_set_backdrop(NULL);
+  lcd_set_foreground(LCD_WHITE);
+  lcd_set_background(LCD_BLACK);
 #endif
 
   /*
@@ -1007,6 +1007,6 @@ enum plugin_status plugin_start(const void* parameter)
 
   play_game();
 
-  rb->lcd_setfont(FONT_UI);
+  lcd_setfont(FONT_UI);
   return PLUGIN_OK;
 }

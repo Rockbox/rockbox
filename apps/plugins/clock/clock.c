@@ -64,12 +64,12 @@ static void cleanup(void)
         save_settings();
 
     /* restore set backlight timeout */
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    backlight_set_timeout(global_settings.backlight_timeout);
 }
 
 /* puts the current time into the time struct */
 static void clock_update_time( struct time* time){
-    struct tm* current_time = rb->get_time();
+    struct tm* current_time = get_time();
     time->hour = current_time->tm_hour;
     time->minute = current_time->tm_min;
     time->second = current_time->tm_sec;
@@ -86,15 +86,15 @@ static void clock_update_time( struct time* time){
 void format_date(char* buffer, struct time* time, enum date_format format){
     switch(format){
         case JAPANESE:
-            rb->snprintf(buffer, 20, "%04d/%02d/%02d",
+            snprintf(buffer, 20, "%04d/%02d/%02d",
                          time->year, time->month, time->day);
             break;
         case EUROPEAN:
-            rb->snprintf(buffer, 20, "%02d/%02d/%04d",
+            snprintf(buffer, 20, "%02d/%02d/%04d",
                          time->day, time->month, time->year);
             break;
         case ENGLISH:
-            rb->snprintf(buffer, 20, "%02d/%02d/%04d",
+            snprintf(buffer, 20, "%02d/%02d/%04d",
                          time->month, time->day, time->year);
             break;
         case NONE:
@@ -117,7 +117,7 @@ enum plugin_status plugin_start(const void* parameter){
     atexit(cleanup);
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     load_settings();
@@ -130,7 +130,7 @@ enum plugin_status plugin_start(const void* parameter){
         clock_update_time(&time);
 
         if(!clock_settings.general.idle_poweroff)
-            rb->reset_poweroff_timer();
+            reset_poweroff_timer();
 
         /*************************
          * Scan for button presses
@@ -186,7 +186,7 @@ enum plugin_status plugin_start(const void* parameter){
         if(redraw){
             clock_draw_set_colors();
             FOR_NB_SCREENS(i)
-                clock_draw(rb->screens[i], &time, &counter);
+                clock_draw(&screens[i], &time, &counter);
             redraw=false;
         }
     }

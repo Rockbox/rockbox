@@ -14,14 +14,14 @@ extern jmp_buf rb_jump_buf;
 void ogg_malloc_init(void)
 {
     size_t bufsize;
-    void* buf = ci->codec_get_buffer(&bufsize);
+    void* buf = codec_get_buffer(&bufsize);
     init_memory_pool(bufsize, buf);
 }
 
 void ogg_malloc_destroy()
 {
     size_t bufsize;
-    void* buf = ci->codec_get_buffer(&bufsize);
+    void* buf = codec_get_buffer(&bufsize);
     destroy_memory_pool(buf);
 }
 

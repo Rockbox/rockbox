@@ -336,7 +336,7 @@ short pscore[3];
   if (hung[xside] > 1) pscore[xside] += HUNGX;
   
   *score = mtl[side] - mtl[xside] + pscore[side] - pscore[xside] + 10;
-  if (dither) *score += rb->rand() % dither;
+  if (dither) *score += rand() % dither;
   
   if (*score > 0 && pmtl[side] == 0) {
     if (emtl[side] < valueR) {
@@ -1157,7 +1157,7 @@ void OpeningBook()
   unsigned r,r0;
   int o_c=0 , m_c=0 ;
 
-  rb->srand ( *rb->current_tick ) ;
+  srand ( current_tick ) ;
   r0 = 0;
   m = 0;
   while ( o_c < MAX_OPENING )  {
@@ -1168,7 +1168,7 @@ void OpeningBook()
       }
       /* I added ( m != OBook[o_c][m_c] ) trying to get more random games */
       if ( ( j > GameCnt ) && ( m != OBook[o_c][m_c] ) ) {
-          r=rb->rand();
+          r=rand();
           if ( r > r0 ) {
                   r0 = r; m = OBook[o_c][m_c];
                   hint = OBook[o_c][m_c+1];
@@ -1228,7 +1228,7 @@ unsigned short mv,nxtline[maxdepth];
 struct leaf *node,tmp;
 
   /* this is the only place we need to yield */
-  rb->yield();
+  yield();
   /* and check for user interaction */
   callback();
 
@@ -2173,7 +2173,7 @@ void ElapsedTime(iop)
 short iop;
 {
   /*et = time((long *)0) - time0;*/
-  et = *(rb->current_tick) / HZ - time0;
+  et = current_tick / HZ - time0;
   if (et < 0) et = 0;
   ETnodes += 50;
   if (et > et0 || iop == 1)
@@ -2183,7 +2183,7 @@ short iop;
       if (iop == 1)
         {
           /*time0 = time((long *)0);*/
-		  time0 = *(rb->current_tick) / HZ ;
+		  time0 = current_tick / HZ ;
 		  et0 = 0;
         }
       /*(void) times(&tmbuf2);
@@ -2256,8 +2256,8 @@ short opponent_player = (player == white)?black:white;
     {
       node = &Tree[pnt++];
       algbr(node->f,node->t,node->flags & cstlmask);
-      if (rb->strcmp(s,mvstr1) == 0 || rb->strcmp(s,mvstr2) == 0 ||
-          rb->strcmp(s,mvstr3) == 0)
+      if (strcmp(s,mvstr1) == 0 || strcmp(s,mvstr2) == 0 ||
+          strcmp(s,mvstr3) == 0)
         {
           cnt++; xnode = *node;
         }
@@ -2338,16 +2338,16 @@ void NewGame()  {
     for (p = pawn; p <= king; p++)
       for (l = 0; l < 64; l++)
         {
-          hashcode[c][p][l].key = (unsigned short)rb->rand();
-          hashcode[c][p][l].bd = ((unsigned long)rb->rand() << 16) +
-                                 (unsigned long)rb->rand();
+          hashcode[c][p][l].key = (unsigned short)rand();
+          hashcode[c][p][l].bd = ((unsigned long)rand() << 16) +
+                                 (unsigned long)rand();
         }
   if (TCflag) SetTimeControl();
   /*else if (Level == 0) SelectLevel();*/
   /*UpdateDisplay(0,0,1,0);*/
   InitializeStats();
   /*time0 = time((long *)0);*/
-  time0 = *(rb->current_tick) / HZ ;
+  time0 = current_tick / HZ ;
   ElapsedTime(1);
   withbook = true;
 }
@@ -2376,9 +2376,9 @@ short f,t,flag;
   mvstr1[4] = '\0'; mvstr2[3] = '\0';
   if (flag) {
     if (t > f) {
-	  rb->strcpy(mvstr2,"o-o");
+	  strcpy(mvstr2,"o-o");
     } else {
-	  rb->memcpy(mvstr2,"o-o-o", 5);
+	  memcpy(mvstr2,"o-o-o", 5);
 	}
   }
   

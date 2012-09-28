@@ -36,8 +36,8 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-        ci->configure(DSP_SET_SAMPLE_DEPTH, ALAC_OUTPUT_DEPTH-1);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, ALAC_OUTPUT_DEPTH-1);
     }
 
     return CODEC_OK;
@@ -64,16 +64,16 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-    codec_set_replaygain(ci->id3);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
+    codec_set_replaygain(ci.id3);
 
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
 
-    stream_create(&input_stream,ci);
+    stream_create(&input_stream,&ci);
 
-    /* Read from ci->id3->offset before calling qtmovie_read. */
-    samplesdone = (uint32_t)(((uint64_t)(ci->id3->offset) * ci->id3->frequency) /  
-                  (ci->id3->bitrate*128));
+    /* Read from ci.id3->offset before calling qtmovie_read. */
+    samplesdone = (uint32_t)(((uint64_t)(ci.id3->offset) * ci.id3->frequency) /  
+                  (ci.id3->bitrate*128));
   
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
@@ -90,53 +90,53 @@ enum codec_status codec_run(void)
     if (samplesdone > 0) {
         if (m4a_seek(&demux_res, &input_stream, samplesdone,
                       &samplesdone, (int*) &i)) {
-            elapsedtime = (samplesdone * 10) / (ci->id3->frequency / 100);
-            ci->set_elapsed(elapsedtime);
+            elapsedtime = (samplesdone * 10) / (ci.id3->frequency / 100);
+            audio_codec_update_elapsed(elapsedtime);
         } else {
             samplesdone = 0;
         }
     }
 
-    ci->set_elapsed(elapsedtime);
+    audio_codec_update_elapsed(elapsedtime);
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         /* Request the required number of bytes from the input buffer */
-        buffer=ci->request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
+        buffer=codec_request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
 
         /* Deal with any pending seek requests */
         if (action == CODEC_ACTION_SEEK_TIME) {
             if (m4a_seek(&demux_res, &input_stream,
-                         (param/10) * (ci->id3->frequency/100),
+                         (param/10) * (ci.id3->frequency/100),
                          &samplesdone, (int *)&i)) {
-                elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+                elapsedtime=(samplesdone*10)/(ci.id3->frequency/100);
             }
-            ci->set_elapsed(elapsedtime);
-            ci->seek_complete();
+            audio_codec_update_elapsed(elapsedtime);
+            codec_seek_complete();
         }
 
         /* Request the required number of bytes from the input buffer */
-        buffer=ci->request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
+        buffer=codec_request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
 
         /* Decode one block - returned samples will be host-endian */
-        samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, ci->yield);
-        ci->yield();
+        samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, yield);
+        yield();
 
         /* Advance codec buffer by amount of consumed bytes */
-        ci->advance_buffer(alac.bytes_consumed);
+        codec_advance_buffer(alac.bytes_consumed);
 
         /* Output the audio */
-        ci->pcmbuf_insert(outputbuffer[0], outputbuffer[1], samplesdecoded);
+        codec_pcmbuf_insert(outputbuffer[0], outputbuffer[1], samplesdecoded);
 
         /* Update the elapsed-time indicator */
         samplesdone+=samplesdecoded;
-        elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
-        ci->set_elapsed(elapsedtime);
+        elapsedtime=(samplesdone*10)/(ci.id3->frequency/100);
+        audio_codec_update_elapsed(elapsedtime);
 
         i++;
     }

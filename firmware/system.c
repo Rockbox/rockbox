@@ -25,6 +25,7 @@
 #include "thread.h"
 #include "string.h"
 #include "file.h"
+#include "symbols.h"
 
 #ifndef CPU_FREQ
 #define CPU_FREQ (-1)
@@ -143,6 +144,7 @@ void cpu_boost(bool on_off)
 
     corelock_unlock(&boostctrl_cl);
 }
+EXPORT_SYMBOL(cpu_boost);
 
 void cpu_idle_mode(bool on_off)
 {

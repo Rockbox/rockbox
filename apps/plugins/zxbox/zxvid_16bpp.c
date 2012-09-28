@@ -58,7 +58,7 @@ void update_screen(void)
     byte *scrptr;
     scrptr = (byte *) SPNM(image);
     */
-    frameb = rb->lcd_framebuffer;
+    frameb = lcd_framebuffer;
     for ( y = 0 ; y < HEIGHT*WIDTH; y++ ){
         frameb[y] = _16bpp_colors[(unsigned)sp_image[y]];
     }
@@ -68,7 +68,7 @@ void update_screen(void)
     int srcx, srcy=0;     /* x / y coordinates in source image */
     unsigned char* image;
     image = sp_image + ( (Y_OFF)*(WIDTH) ) + X_OFF;
-    frameb = rb->lcd_framebuffer;
+    frameb = lcd_framebuffer;
     for(y = 0; y < LCD_HEIGHT; y++)
     {
         srcx = 0;           /* reset our x counter before each row... */
@@ -87,9 +87,9 @@ void update_screen(void)
     if ( settings.showfps ) {
         int percent=0;
         int TPF = HZ/50;/* ticks per frame */
-        if ((*rb->current_tick-start_time) > TPF )
-            percent = 100*video_frames/((*rb->current_tick-start_time)/TPF);
-        rb->lcd_putsxyf(0,0,"%d %%",percent);
+        if ((current_tick-start_time) > TPF )
+            percent = 100*video_frames/((current_tick-start_time)/TPF);
+        lcd_putsxyf(0,0,"%d %%",percent);
     }
     rb -> lcd_update();
 }

@@ -188,7 +188,7 @@ GREY_INFO_STRUCT
 #define BUFFER_HEIGHT _grey_info.height
 typedef unsigned char pix_t;
 #else   /* LCD_DEPTH >= 8 */
-#define LCD_BUF rb->lcd_framebuffer
+#define LCD_BUF lcd_framebuffer
 #define G_PIX LCD_RGBPACK
 #define N_PIX LCD_RGBPACK
 #define G_BRIGHT(y) LCD_RGBPACK(y,y,y)
@@ -750,10 +750,10 @@ static void init_scroll_lines(void)
         100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
     };
 
-    scroll_line_info.ticks = scroll_tick_table[rb->global_settings->scroll_speed];
-    scroll_line_info.step = rb->global_settings->scroll_step;
-    scroll_line_info.delay = rb->global_settings->scroll_delay / (HZ / 10);
-    scroll_line_info.next_scroll = *rb->current_tick;
+    scroll_line_info.ticks = scroll_tick_table[global_settings.scroll_speed];
+    scroll_line_info.step = global_settings.scroll_step;
+    scroll_line_info.delay = global_settings.scroll_delay / (HZ / 10);
+    scroll_line_info.next_scroll = current_tick;
     for (i = 0; i < PF_MAX_SCROLL_LINES; i++)
         scroll_lines[i].step = 0;
 }
@@ -764,7 +764,7 @@ static void set_scroll_line(const char *str, enum pf_scroll_line_type type)
     s->width = mylcd_getstringsize(str, NULL, NULL);
     s->step = 0;
     s->offset = 0;
-    s->start_tick = *rb->current_tick + scroll_line_info.delay;
+    s->start_tick = current_tick + scroll_line_info.delay;
     if (LCD_WIDTH - s->width < 0)
         s->step = scroll_line_info.step;
     else
@@ -780,15 +780,15 @@ static void update_scroll_lines(void)
 {
     int i;
 
-    if (TIME_BEFORE(*rb->current_tick, scroll_line_info.next_scroll))
+    if (TIME_BEFORE(current_tick, scroll_line_info.next_scroll))
         return;
 
-    scroll_line_info.next_scroll = *rb->current_tick + scroll_line_info.ticks;
+    scroll_line_info.next_scroll = current_tick + scroll_line_info.ticks;
 
     for (i = 0; i < PF_MAX_SCROLL_LINES; i++)
     {
         struct pf_scroll_line *s = &scroll_lines[i];
-        if (s->step && TIME_BEFORE(s->start_tick, *rb->current_tick))
+        if (s->step && TIME_BEFORE(s->start_tick, current_tick))
         {
             s->offset -= s->step;
 
@@ -796,13 +796,13 @@ static void update_scroll_lines(void)
                 /* at beginning of line */
                 s->offset = 0;
                 s->step = scroll_line_info.step;
-                s->start_tick = *rb->current_tick + scroll_line_info.delay * 2;
+                s->start_tick = current_tick + scroll_line_info.delay * 2;
             }
             if (s->offset <= LCD_WIDTH - s->width) {
                 /* at end of line */
                 s->offset = LCD_WIDTH - s->width;
                 s->step = -scroll_line_info.step;
-                s->start_tick = *rb->current_tick + scroll_line_info.delay * 2;
+                s->start_tick = current_tick + scroll_line_info.delay * 2;
             }
         }
     }
@@ -825,12 +825,12 @@ static void init_reflect_table(void)
 static int create_album_index(void)
 {
     album = ((struct album_data *)(buf_size + (char *) buf)) - 1;
-    rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
+    memset(&tcs, 0, sizeof(struct tagcache_search) );
     album_count = 0;
-    rb->tagcache_search(&tcs, tag_album);
+    tagcache_search(&tcs, tag_album);
     unsigned int l, name_idx = 0;
     album_names = buf;
-    while (rb->tagcache_get_next(&tcs))
+    while (tagcache_get_next(&tcs))
     {
         buf_size -= sizeof(struct album_data);
         l = tcs.result_len;
@@ -840,14 +840,14 @@ static int create_album_index(void)
             /* not enough memory */
             return ERROR_BUFFER_FULL;
 
-        rb->strcpy(buf, tcs.result);
+        strcpy(buf, tcs.result);
         buf_size -= l;
         buf = l + (char *)buf;
         album[-album_count].seek = tcs.result_seek;
         name_idx += l;
         album_count++;
     }
-    rb->tagcache_search_finish(&tcs);
+    tagcache_search_finish(&tcs);
     ALIGN_BUFFER(buf, buf_size, 4);
     int i;
     struct album_data* tmp_album = (struct album_data*)buf;
@@ -887,12 +887,12 @@ static char* get_track_filename(const int track_index)
 
 static int get_wps_current_index(void)
 {
-    struct mp3entry *id3 = rb->audio_current_track();
+    struct mp3entry *id3 = audio_current_track();
     if(id3 && id3->album) {
         int i;
         for( i=0; i < album_count; i++ )
         {
-            if(!rb->strcmp(album_names + album[i].name_idx, id3->album))
+            if(!strcmp(album_names + album[i].name_idx, id3->album))
                 return i;
         }
     }
@@ -918,25 +918,25 @@ static void create_track_index(const int slide_index)
         return;
     track_index = slide_index;
 
-    if (!rb->tagcache_search(&tcs, tag_title))
+    if (!tagcache_search(&tcs, tag_title))
         goto fail;
 
-    rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
+    tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
     track_count=0;
     int string_index = 0, track_num;
     int disc_num;
     size_t out = 0;
-    track_names = rb->buflib_buffer_out(&buf_ctx, &out);
+    track_names = buflib_buffer_out(&buf_ctx, &out);
     borrowed += out;
     int avail = borrowed;
     tracks = (struct track_data*)(track_names + borrowed);
-    while (rb->tagcache_get_next(&tcs))
+    while (tagcache_get_next(&tcs))
     {
         int len = 0, fn_idx = 0;
 
         avail -= sizeof(struct track_data);
-        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
-        disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
+        track_num = tagcache_get_numeric(&tcs, tag_tracknumber);
+        disc_num = tagcache_get_numeric(&tcs, tag_discnumber);
 
         if (disc_num < 0)
             disc_num = 0;
@@ -944,16 +944,16 @@ retry:
         if (track_num > 0)
         {
             if (disc_num)
-                fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
+                fn_idx = 1 + snprintf(track_names + string_index , avail,
                     "%d.%02d: %s", disc_num, track_num, tcs.result);
             else
-                fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
+                fn_idx = 1 + snprintf(track_names + string_index , avail,
                     "%d: %s", track_num, tcs.result);
         }
         else
         {
             track_num = 0;
-            fn_idx = 1 + rb->snprintf(track_names + string_index, avail,
+            fn_idx = 1 + snprintf(track_names + string_index, avail,
                 "%s", tcs.result);
         }
         if (fn_idx <= 0)
@@ -962,9 +962,9 @@ retry:
         int remain = avail - fn_idx;
         if (remain >= MAX_PATH)
         {   /* retrieve filename for building the playlist */
-            rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
+            tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
                     track_names + string_index + fn_idx, remain);
-            len = fn_idx + rb->strlen(track_names + string_index + fn_idx) + 1;
+            len = fn_idx + strlen(track_names + string_index + fn_idx) + 1;
             /* make sure track name and file name are really split by a \0, else
              * get_track_name might fail */
             *(track_names + string_index + fn_idx -1) = '\0';
@@ -982,14 +982,14 @@ retry:
                 if (!free_slide_prio(0))
                     goto fail;
                 out = 0;
-                rb->buflib_buffer_out(&buf_ctx, &out);
+                buflib_buffer_out(&buf_ctx, &out);
                 avail += out;
                 borrowed += out;
 
                 struct track_data *new_tracks = (struct track_data *)(out + (uintptr_t)tracks);
                 unsigned int bytes = track_count * sizeof(struct track_data);
                 if (track_count)
-                    rb->memmove(new_tracks, tracks, bytes);
+                    memmove(new_tracks, tracks, bytes);
                 tracks = new_tracks;
             }
             goto retry;
@@ -1007,10 +1007,10 @@ retry:
         string_index += len;
     }
 
-    rb->tagcache_search_finish(&tcs);
+    tagcache_search_finish(&tcs);
 
     /* now fix the track list order */
-    rb->qsort(tracks, track_count, sizeof(struct track_data), compare_tracks);
+    qsort(tracks, track_count, sizeof(struct track_data), compare_tracks);
     return;
 fail:
     track_count = 0;
@@ -1028,31 +1028,31 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 {
     if ( slide_index == -1 )
     {
-        rb->strlcpy( buf, EMPTY_SLIDE, buflen );
+        strlcpy( buf, EMPTY_SLIDE, buflen );
     }
 
-    if (!rb->tagcache_search(&tcs, tag_filename))
+    if (!tagcache_search(&tcs, tag_filename))
         return false;
 
     bool result;
     /* find the first track of the album */
-    rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
+    tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
 
-    if ( rb->tagcache_get_next(&tcs) ) {
+    if ( tagcache_get_next(&tcs) ) {
         struct mp3entry id3;
         int fd;
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-        if (rb->tagcache_fill_tags(&id3, tcs.result))
+        if (tagcache_fill_tags(&id3, tcs.result))
         {
-            rb->strlcpy(id3.path, tcs.result, sizeof(id3.path));
+            strlcpy(id3.path, tcs.result, sizeof(id3.path));
         }
         else
 #endif
         {
-            fd = rb->open(tcs.result, O_RDONLY);
-            rb->get_metadata(&id3, fd, tcs.result);
-            rb->close(fd);
+            fd = open(tcs.result, O_RDONLY);
+            get_metadata(&id3, fd, tcs.result);
+            close(fd);
         }
         if ( search_albumart_files(&id3, ":", buf, buflen) )
             result = true;
@@ -1063,7 +1063,7 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
         /* did not find a matching track */
         result = false;
     }
-    rb->tagcache_search_finish(&tcs);
+    tagcache_search_finish(&tcs);
     return result;
 }
 
@@ -1074,7 +1074,7 @@ static void draw_splashscreen(void)
 {
     unsigned char * buf_tmp = buf;
     size_t buf_tmp_size = buf_size;
-    struct screen* display = rb->screens[SCREEN_MAIN];
+    struct screen* display = &screens[SCREEN_MAIN];
 #if FB_DATA_SZ > 1
     ALIGN_BUFFER(buf_tmp, buf_tmp_size, sizeof(fb_data));
 #endif
@@ -1088,29 +1088,29 @@ static void draw_splashscreen(void)
 #endif
         .data = buf_tmp
     };
-    int ret = rb->read_bmp_file(SPLASH_BMP, &logo, buf_tmp_size,
+    int ret = read_bmp_file(SPLASH_BMP, &logo, buf_tmp_size,
                                 FORMAT_NATIVE, NULL);
 #if LCD_DEPTH > 1
-    rb->lcd_set_background(N_BRIGHT(0));
-    rb->lcd_set_foreground(N_BRIGHT(255));
+    lcd_set_background(N_BRIGHT(0));
+    lcd_set_foreground(N_BRIGHT(255));
 #else
-    rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
+    lcd_set_drawmode(PICTUREFLOW_DRMODE);
 #endif
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     if (ret > 0)
     {
 #if LCD_DEPTH == 1  /* Mono LCDs need the logo inverted */
-        rb->lcd_set_drawmode(PICTUREFLOW_DRMODE ^ DRMODE_INVERSEVID);
+        lcd_set_drawmode(PICTUREFLOW_DRMODE ^ DRMODE_INVERSEVID);
 #endif
         display->bitmap(logo.data, (LCD_WIDTH - logo.width) / 2, 10,
             logo.width, logo.height);
 #if LCD_DEPTH == 1  /* Mono LCDs need the logo inverted */
-        rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
+        lcd_set_drawmode(PICTUREFLOW_DRMODE);
 #endif
     }
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 
@@ -1124,27 +1124,27 @@ static void draw_progressbar(int step)
     const int w = LCD_WIDTH - 20;
     const int x = 10;
 
-    rb->lcd_getstringsize("Preparing album artwork", &txt_w, &txt_h);
+    lcd_getstringsize("Preparing album artwork", &txt_w, &txt_h);
 
     int y = (LCD_HEIGHT - txt_h)/2;
 
-    rb->lcd_putsxy((LCD_WIDTH - txt_w)/2, y, "Preparing album artwork");
+    lcd_putsxy((LCD_WIDTH - txt_w)/2, y, "Preparing album artwork");
     y += (txt_h + 5);
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(N_BRIGHT(100));
+    lcd_set_foreground(N_BRIGHT(100));
 #endif
-    rb->lcd_drawrect(x, y, w+2, bar_height);
+    lcd_drawrect(x, y, w+2, bar_height);
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(N_PIX(165, 231, 82));
+    lcd_set_foreground(N_PIX(165, 231, 82));
 #endif
 
-    rb->lcd_fillrect(x+1, y+1, step * w / album_count, bar_height-2);
+    lcd_fillrect(x+1, y+1, step * w / album_count, bar_height-2);
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(N_BRIGHT(255));
+    lcd_set_foreground(N_BRIGHT(255));
 #endif
-    rb->lcd_update();
-    rb->yield();
+    lcd_update();
+    yield();
 }
 
 /* Calculate modified FNV hash of string 
@@ -1173,17 +1173,17 @@ static bool save_pfraw(char* filename, struct bitmap *bm)
     struct pfraw_header bmph;
     bmph.width = bm->width;
     bmph.height = bm->height;
-    int fh = rb->creat( filename , 0666);
+    int fh = creat( filename , 0666);
     if( fh < 0 ) return false;
-    rb->write( fh, &bmph, sizeof( struct pfraw_header ) );
+    write( fh, &bmph, sizeof( struct pfraw_header ) );
     pix_t *data = (pix_t*)( bm->data );
     int y;
     for( y = 0; y < bm->height; y++ )
     {
-        rb->write( fh, data , sizeof( pix_t ) * bm->width );
+        write( fh, data , sizeof( pix_t ) * bm->width );
         data += bm->width;
     }
-    rb->close( fh );
+    close( fh );
     return true;
 }
 
@@ -1208,18 +1208,18 @@ static bool create_albumart_cache(void)
     {
         draw_progressbar(i);
 
-        rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%x.pfraw",
+        snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%x.pfraw",
                      mfnv(get_album_name(i)));
         /* delete existing cache, so it's a true rebuild */
-        if(rb->file_exists(pfraw_file)) {
+        if(file_exists(pfraw_file)) {
             if(update) {
                 slides++;
                 continue;
             }
-            rb->remove(pfraw_file);
+            remove(pfraw_file);
         }
         if (!get_albumart_for_index_from_db(i, albumart_file, MAX_PATH))
-            rb->strcpy(albumart_file, EMPTY_SLIDE_BMP);
+            strcpy(albumart_file, EMPTY_SLIDE_BMP);
 
         input_bmp.data = buf;
         input_bmp.width = DISPLAY_WIDTH;
@@ -1227,8 +1227,8 @@ static bool create_albumart_cache(void)
         ret = read_image_file(albumart_file, &input_bmp, buf_size,
                                 format, &format_transposed);
         if (ret <= 0) {
-            rb->splashf(HZ, "Album art is bad: %s", get_album_name(i));
-            rb->strcpy(albumart_file, EMPTY_SLIDE_BMP);
+            splashf(HZ, "Album art is bad: %s", get_album_name(i));
+            strcpy(albumart_file, EMPTY_SLIDE_BMP);
             ret = read_image_file(albumart_file, &input_bmp, buf_size,
                                     format, &format_transposed);
             if(ret <= 0)
@@ -1236,16 +1236,16 @@ static bool create_albumart_cache(void)
         }
         if (!save_pfraw(pfraw_file, &input_bmp))
         {
-            rb->splash(HZ, "Could not write bmp");
+            splash(HZ, "Could not write bmp");
             continue;
         }
         slides++;
-        if ( rb->button_get(false) == PF_MENU ) return false;
+        if ( button_get(false) == PF_MENU ) return false;
     }
     draw_progressbar(i);
     if ( slides == 0 ) {
         /* Warn the user that we couldn't find any albumart */
-        rb->splash(2*HZ, "No album art found");
+        splash(2*HZ, "No album art found");
         return false;
     }
     return true;
@@ -1257,7 +1257,7 @@ static bool create_albumart_cache(void)
  */
 static int create_empty_slide(bool force)
 {
-    if ( force || ! rb->file_exists( EMPTY_SLIDE ) )  {
+    if ( force || ! file_exists( EMPTY_SLIDE ) )  {
         struct bitmap input_bmp;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
@@ -1284,7 +1284,7 @@ static void thread(void)
     long sleep_time = 5 * HZ;
     struct queue_event ev;
     while (1) {
-        rb->queue_wait_w_tmo(&thread_q, &ev, sleep_time);
+        queue_wait_w_tmo(&thread_q, &ev, sleep_time);
         switch (ev.id) {
             case EV_EXIT:
                 return;
@@ -1294,7 +1294,7 @@ static void thread(void)
         }
         if(ev.id != SYS_TIMEOUT)
           while ( load_new_slide() ) {
-            rb->yield();
+            yield();
             switch (ev.id) {
                 case EV_EXIT:
                     return;
@@ -1310,10 +1310,10 @@ static void thread(void)
 static void end_pf_thread(void)
 {
     if ( thread_is_running ) {
-        rb->queue_post(&thread_q, EV_EXIT, 0);
-        rb->thread_wait(thread_id);
+        queue_post(&thread_q, EV_EXIT, 0);
+        thread_wait(thread_id);
         /* remove the thread's queue from the broadcast list */
-        rb->queue_delete(&thread_q);
+        queue_delete(&thread_q);
         thread_is_running = false;
     }
 }
@@ -1325,8 +1325,8 @@ static void end_pf_thread(void)
 static bool create_pf_thread(void)
 {
     /* put the thread's queue in the bcast list */
-    rb->queue_init(&thread_q, true);
-    if ((thread_id = rb->create_thread(
+    queue_init(&thread_q, true);
+    if ((thread_id = create_thread(
                            thread,
                            thread_stack,
                            sizeof(thread_stack),
@@ -1339,7 +1339,7 @@ static bool create_pf_thread(void)
         return false;
     }
     thread_is_running = true;
-    rb->queue_post(&thread_q, EV_WAKEUP, 0);
+    queue_post(&thread_q, EV_WAKEUP, 0);
     return true;
 }
 
@@ -1459,7 +1459,7 @@ static inline void lla_insert_before(int *head, int i, int p)
 static inline void free_slide(int i)
 {
     if (cache[i].hid != empty_slide_hid)
-        rb->buflib_free(&buf_ctx, cache[i].hid);
+        buflib_free(&buf_ctx, cache[i].hid);
     cache[i].index = -1;
     lla_pop_item(&cache_used, i);
     lla_insert_tail(&cache_free, i);
@@ -1511,29 +1511,29 @@ static bool free_slide_prio(int prio)
 static int read_pfraw(char* filename, int prio)
 {
     struct pfraw_header bmph;
-    int fh = rb->open(filename, O_RDONLY);
+    int fh = open(filename, O_RDONLY);
     if( fh < 0 ) {
         cache_version = CACHE_UPDATE;
         return empty_slide_hid;
     }
     else
-        rb->read(fh, &bmph, sizeof(struct pfraw_header));
+        read(fh, &bmph, sizeof(struct pfraw_header));
 
     int size =  sizeof(struct dim) +
                 sizeof( pix_t ) * bmph.width * bmph.height;
 
     int hid;
     do {
-        hid = rb->buflib_alloc(&buf_ctx, size);
+        hid = buflib_alloc(&buf_ctx, size);
     } while (hid < 0 && free_slide_prio(prio));
 
     if (hid < 0) {
-        rb->close( fh );
+        close( fh );
         return 0;
     }
 
-    rb->yield(); /* allow audio to play when fast scrolling */
-    struct dim *bm = rb->buflib_get_data(&buf_ctx, hid);
+    yield(); /* allow audio to play when fast scrolling */
+    struct dim *bm = buflib_get_data(&buf_ctx, hid);
 
     bm->width = bmph.width;
     bm->height = bmph.height;
@@ -1542,10 +1542,10 @@ static int read_pfraw(char* filename, int prio)
     int y;
     for( y = 0; y < bm->height; y++ )
     {
-        rb->read( fh, data , sizeof( pix_t ) * bm->width );
+        read( fh, data , sizeof( pix_t ) * bm->width );
         data += bm->width;
     }
-    rb->close( fh );
+    close( fh );
     return hid;
 }
 
@@ -1558,7 +1558,7 @@ static inline bool load_and_prepare_surface(const int slide_index,
                                             const int prio)
 {
     char pfraw_file[MAX_PATH];
-    rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%x.pfraw",
+    snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%x.pfraw",
                  mfnv(get_album_name(slide_index)));
 
     int hid = read_pfraw(pfraw_file, prio);
@@ -1698,7 +1698,7 @@ static inline struct dim *get_slide(const int hid)
 
     struct dim *bmp;
 
-    bmp = rb->buflib_get_data(&buf_ctx, hid);
+    bmp = buflib_get_data(&buf_ctx, hid);
 
     return bmp;
 }
@@ -1863,7 +1863,7 @@ static void render_slide(struct slide_data *slide, const int alpha)
     uint8_t reftab[REFLECT_HEIGHT]; /* on stack, which is in IRAM on several targets */
 
     if (alpha == 256) { /* opaque -> copy table */
-        rb->memcpy(reftab, reflect_table, sizeof(reftab));
+        memcpy(reftab, reflect_table, sizeof(reftab));
     } else {            /* precalculate faded table */
         int i, lalpha;
         for (i = 0; i < REFLECT_HEIGHT; i++) {
@@ -1968,7 +1968,7 @@ static void render_slide(struct slide_data *slide, const int alpha)
 
     }
     /* let the music play... */
-    rb->yield();
+    yield();
     return;
 }
 
@@ -1981,7 +1981,7 @@ static inline void set_current_slide(const int slide_index)
     step = 0;
     center_index = fbound(slide_index, 0, number_of_slides - 1);
     if (old_center_index != center_index)
-        rb->queue_post(&thread_q, EV_WAKEUP, 0);
+        queue_post(&thread_q, EV_WAKEUP, 0);
     target = center_index;
     slide_frame = slide_index << 16;
     reset_slides();
@@ -2129,7 +2129,7 @@ static void update_scroll_animation(void)
         index++;
     if (center_index != index) {
         center_index = index;
-        rb->queue_post(&thread_q, EV_WAKEUP, 0);
+        queue_post(&thread_q, EV_WAKEUP, 0);
         slide_frame = index << 16;
         center_slide.slide_index = center_index;
         for (i = 0; i < num_slides; i++)
@@ -2197,7 +2197,7 @@ static void update_scroll_animation(void)
 static void cleanup(void)
 {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
     end_pf_thread();
     /* Turn on backlight timeout (revert to settings) */
@@ -2237,15 +2237,15 @@ static int settings_menu(void)
     };
 
     do {
-        selection=rb->do_menu(&settings_menu,&selection, NULL, false);
+        selection=do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
-                rb->set_bool("Show FPS", &show_fps);
+                set_bool("Show FPS", &show_fps);
                 reset_track_list();
                 break;
 
             case 1:
-                rb->set_int("Spacing between slides", "", 1,
+                set_int("Spacing between slides", "", 1,
                             &slide_spacing,
                             NULL, 1, 0, 100, NULL );
                 recalc_offsets();
@@ -2253,7 +2253,7 @@ static int settings_menu(void)
                 break;
 
             case 2:
-                rb->set_int("Centre margin", "", 1,
+                set_int("Centre margin", "", 1,
                             &center_margin,
                             NULL, 1, 0, 80, NULL );
                 recalc_offsets();
@@ -2261,20 +2261,20 @@ static int settings_menu(void)
                 break;
 
             case 3:
-                rb->set_int("Number of slides", "", 1, &num_slides,
+                set_int("Number of slides", "", 1, &num_slides,
                             NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
                 recalc_offsets();
                 reset_slides();
                 break;
 
             case 4:
-                rb->set_int("Zoom", "", 1, &zoom,
+                set_int("Zoom", "", 1, &zoom,
                             NULL, 1, 10, 300, NULL );
                 recalc_offsets();
                 reset_slides();
                 break;
             case 5:
-                rb->set_option("Show album title", &show_album_name,
+                set_option("Show album title", &show_album_name,
                                INT, album_name_options, 3, NULL);
                 reset_track_list();
                 recalc_offsets();
@@ -2282,22 +2282,22 @@ static int settings_menu(void)
                 break;
             case 6:
                 old_val = resize;
-                rb->set_bool("Resize Covers", &resize);
+                set_bool("Resize Covers", &resize);
                 if (old_val == resize) /* changed? */
                     break;
                 /* fallthrough if changed, since cache needs to be rebuilt */
             case 7:
                 cache_version = CACHE_REBUILD;
-                rb->remove(EMPTY_SLIDE);
+                remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
-                rb->splash(HZ, "Cache will be rebuilt on next restart");
+                splash(HZ, "Cache will be rebuilt on next restart");
                 break;
             case 8:
-                rb->set_option("WPS Integration", &auto_wps, INT, wps_options, 3, NULL);
+                set_option("WPS Integration", &auto_wps, INT, wps_options, 3, NULL);
                 break;
             case 9:
-                rb->set_option("Backlight", &backlight_mode, INT, backlight_options, 2, NULL);
+                set_option("Backlight", &backlight_mode, INT, backlight_options, 2, NULL);
                 break;
 
             case MENU_ATTACHED_USB:
@@ -2327,7 +2327,7 @@ static int main_menu(void)
     int result;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(N_BRIGHT(255));
+    lcd_set_foreground(N_BRIGHT(255));
 #endif
 
     MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
@@ -2337,14 +2337,14 @@ static int main_menu(void)
 #endif
                                             "Settings", "Return", "Quit");
     while (1)  {
-        switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
+        switch (do_menu(&main_menu,&selection, NULL, false)) {
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
             case PF_MENU_CLEAR_PLAYLIST: 
-                if(rb->playlist_remove_all_tracks(NULL) == 0) {
-                    rb->playlist_create(NULL, NULL);
-                    rb->splash(HZ*2, "Playlist Cleared");
+                if(playlist_remove_all_tracks(NULL) == 0) {
+                    playlist_create(NULL, NULL);
+                    splash(HZ*2, "Playlist Cleared");
                 }
                 break;
             case PF_MENU_PLAYBACK_CONTROL: /* Playback Control */
@@ -2461,7 +2461,7 @@ static void track_list_yh(int char_height)
  */
 void reset_track_list(void)
 {
-    int char_height = rb->screens[SCREEN_MAIN]->getcharheight();
+    int char_height = screens[SCREEN_MAIN].getcharheight();
     int total_height;
     track_list_yh(char_height);
     track_list_visible_entries = fmin( track_list_h/char_height , track_count );
@@ -2490,7 +2490,7 @@ static void show_track_list(void)
         reset_track_list();
     }
     int titletxt_w, titletxt_x, color, titletxt_h;
-    titletxt_h = rb->screens[SCREEN_MAIN]->getcharheight();
+    titletxt_h = screens[SCREEN_MAIN].getcharheight();
 
     int titletxt_y = track_list_y;
     int track_i;
@@ -2545,7 +2545,7 @@ static void start_playback(bool append)
     static int old_playlist = -1, old_shuffle = 0;
     int count = 0;
     int position = selected_track;
-    int shuffle = rb->global_settings->playlist_shuffle;
+    int shuffle = global_settings.playlist_shuffle;
     /* reuse existing playlist if possible
      * regenerate if shuffle is on or changed, since playlist index and
      * selected track are "out of sync" */
@@ -2555,28 +2555,28 @@ static void start_playback(bool append)
         goto play;
     }
     /* First, replace the current playlist with a new one */
-    else if (append || (rb->playlist_remove_all_tracks(NULL) == 0
-            && rb->playlist_create(NULL, NULL) == 0))
+    else if (append || (playlist_remove_all_tracks(NULL) == 0
+            && playlist_create(NULL, NULL) == 0))
     {
         do {
-            rb->yield();
-            if (rb->playlist_insert_track(NULL, get_track_filename(count),
+            yield();
+            if (playlist_insert_track(NULL, get_track_filename(count),
                     PLAYLIST_INSERT_LAST, false, true) < 0)
                 break;
         } while(++count < track_count);
-        rb->playlist_sync(NULL);
+        playlist_sync(NULL);
     }
     else
         return;
 
-    if (rb->global_settings->playlist_shuffle)
-        position = rb->playlist_shuffle(*rb->current_tick, selected_track);
+    if (global_settings.playlist_shuffle)
+        position = playlist_shuffle(current_tick, selected_track);
 play:
     /* TODO: can we adjust selected_track if !play_selected ?
      * if shuffle, we can't predict the playing track easily, and for either
      * case the track list doesn't get auto scrolled*/
     if(!append)
-        rb->playlist_start(position, 0);
+        playlist_start(position, 0);
     old_playlist = center_slide.slide_index;
     old_shuffle = shuffle;
 }
@@ -2621,7 +2621,7 @@ static void draw_album_text(void)
         prev_albumtxt_index = albumtxt_index;
     }
 
-    char_height = rb->screens[SCREEN_MAIN]->getcharheight();
+    char_height = screens[SCREEN_MAIN].getcharheight();
     if (show_album_name == ALBUM_NAME_TOP)
         albumtxt_y = char_height / 2;
     else
@@ -2636,10 +2636,10 @@ static void draw_album_text(void)
 */
 static void error_wait(const char *message)
 {
-    rb->splashf(0, "%s. Press any button to continue.", message);
-    while (rb->get_action(CONTEXT_STD, 1) == ACTION_NONE)
-        rb->yield();
-    rb->sleep(2 * HZ);
+    splashf(0, "%s. Press any button to continue.", message);
+    while (get_action(CONTEXT_STD, 1) == ACTION_NONE)
+        yield();
+    sleep(2 * HZ);
 }
 
 /**
@@ -2650,10 +2650,10 @@ static int pictureflow_main(void)
 {
     int ret;
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 
-    if ( ! rb->dir_exists( CACHE_PREFIX ) ) {
-        if ( rb->mkdir( CACHE_PREFIX ) < 0 ) {
+    if ( ! dir_exists( CACHE_PREFIX ) ) {
+        if ( mkdir( CACHE_PREFIX ) < 0 ) {
             error_wait("Could not create directory " CACHE_PREFIX);
             return PLUGIN_ERROR;
         }
@@ -2701,7 +2701,7 @@ static int pictureflow_main(void)
         configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     }
 
-    rb->buflib_init(&buf_ctx, (void *)buf, buf_size);
+    buflib_init(&buf_ctx, (void *)buf, buf_size);
 
     if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
     {
@@ -2745,7 +2745,7 @@ static int pictureflow_main(void)
     int button;
 
     int frames = 0;
-    long last_update = *rb->current_tick;
+    long last_update = current_tick;
     long current_update;
     long update_interval = 100;
     int fps = 0;
@@ -2756,9 +2756,9 @@ static int pictureflow_main(void)
     grey_show(true);
     grey_set_drawmode(DRMODE_FG);
 #endif
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_set_drawmode(DRMODE_FG);
     while (true) {
-        current_update = *rb->current_tick;
+        current_update = current_tick;
         frames++;
 
         /* Initial rendering */
@@ -2805,10 +2805,10 @@ static int pictureflow_main(void)
 #else
             mylcd_set_foreground(G_PIX(255,0,0));
 #endif
-            rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
+            snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
             if (show_album_name == ALBUM_NAME_TOP)
                 fpstxt_y = LCD_HEIGHT -
-                           rb->screens[SCREEN_MAIN]->getcharheight();
+                           screens[SCREEN_MAIN].getcharheight();
             else
                 fpstxt_y = 0;
             mylcd_putsxy(0, fpstxt_y, fpstxt);
@@ -2818,10 +2818,10 @@ static int pictureflow_main(void)
 
         /* Copy offscreen buffer to LCD and give time to other threads */
         mylcd_update();
-        rb->yield();
+        yield();
 
         /*/ Handle buttons */
-        button = rb->get_custom_action(CONTEXT_PLUGIN
+        button = get_custom_action(CONTEXT_PLUGIN
 #ifndef USE_CORE_PREVNEXT
             |(pf_state == pf_show_tracks ? 1 : 0)
 #endif
@@ -2836,7 +2836,7 @@ static int pictureflow_main(void)
         case PF_BACK:
             if ( pf_state == pf_show_tracks )
             {
-                rb->buflib_buffer_in(&buf_ctx, borrowed);
+                buflib_buffer_in(&buf_ctx, borrowed);
                 borrowed = 0;
                 track_index = -1;
                 pf_state = pf_cover_out;
@@ -2880,13 +2880,13 @@ static int pictureflow_main(void)
                     create_track_index(center_slide.slide_index);
                     reset_track_list();
                     start_playback(true);
-                    rb->splash(HZ*2, "Added to playlist");
+                    splash(HZ*2, "Added to playlist");
                 }
                 else if( pf_state == pf_show_tracks ) {
-                    rb->playlist_insert_track(NULL, get_track_filename(selected_track),
+                    playlist_insert_track(NULL, get_track_filename(selected_track),
                                                     PLAYLIST_INSERT_LAST, false, true);
-                    rb->playlist_sync(NULL);
-                    rb->splash(HZ*2, "Added to playlist");
+                    playlist_sync(NULL);
+                    splash(HZ*2, "Added to playlist");
                 }
             }
             break;
@@ -2936,12 +2936,12 @@ enum plugin_status plugin_start(const void *parameter)
     atexit(cleanup);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 #if PF_PLAYBACK_CAPABLE
-    buf = rb->plugin_get_buffer(&buf_size);
+    buf = plugin_get_buffer(&buf_size);
 #else
-    buf = rb->plugin_get_audio_buffer(&buf_size);
+    buf = plugin_get_audio_buffer(&buf_size);
 #ifndef SIMULATOR
     if ((uintptr_t)buf < (uintptr_t)plugin_start_addr)
     {
@@ -2969,7 +2969,7 @@ enum plugin_status plugin_start(const void *parameter)
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
         {
-            rb->splash(HZ, "Error writing config.");
+            splash(HZ, "Error writing config.");
             ret = PLUGIN_ERROR;
         }
     }

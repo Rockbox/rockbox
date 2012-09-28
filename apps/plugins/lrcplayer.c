@@ -181,9 +181,9 @@ static int lrc_set_time(const char *title, const char *unit, long *pval,
     }
     pos = pos_min;
 
-    rb->button_clear_queue();
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, LST_OFF_Y, title);
+    button_clear_queue();
+    lcd_clear_display();
+    lcd_puts_scroll(0, LST_OFF_Y, title);
     while (ret == 10)
     {
         int len = 0;
@@ -207,38 +207,38 @@ static int lrc_set_time(const char *title, const char *unit, long *pval,
         {
             if (pos == i)
             {
-                rb->lcd_getstringsize(buffer, &x, &y);
+                lcd_getstringsize(buffer, &x, &y);
                 p_start = len;
             }
-            rb->snprintf(&buffer[len], 32-len, formats[i], segvals[i]);
-            len += rb->strlen(&buffer[len]);
+            snprintf(&buffer[len], 32-len, formats[i], segvals[i]);
+            len += strlen(&buffer[len]);
             if (pos == i)
                 p_end = len;
         }
         buffer[len-1] = 0; /* remove last separater */
         if (unit != NULL)
         {
-            rb->snprintf(&buffer[len], 32-len, " (%s)", unit);
+            snprintf(&buffer[len], 32-len, " (%s)", unit);
         }
-        rb->lcd_puts(0, LST_OFF_Y+1, buffer);
+        lcd_puts(0, LST_OFF_Y+1, buffer);
         if (pos_min != pos_max)
         {
             /* draw cursor */
             buffer[p_end-1] = 0;
 #ifdef HAVE_LCD_BITMAP
-            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            rb->lcd_putsxy(x, y*(1+LST_OFF_Y), &buffer[p_start]);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
+            lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lcd_putsxy(x, y*(1+LST_OFF_Y), &buffer[p_start]);
+            lcd_set_drawmode(DRMODE_SOLID);
 #else
-            rb->lcd_put_cursor(x+rb->utf8length(&buffer[p_start])-1, y, 0x7F);
+            lcd_put_cursor(x+utf8length(&buffer[p_start])-1, y, 0x7F);
 #endif
         }
-        rb->lcd_update();
+        lcd_update();
         int button = pluginlib_getaction(TIMEOUT_BLOCK, lst_contexts, ARRAYLEN(lst_contexts));
         int mult = 1;
 #ifdef HAVE_LCD_CHARCELLS
         if (pos_min != pos_max)
-            rb->lcd_remove_cursor();
+            lcd_remove_cursor();
 #endif
         switch (button)
         {
@@ -276,17 +276,17 @@ static int lrc_set_time(const char *title, const char *unit, long *pval,
                 break;
             case PLA_CANCEL:
             case PLA_EXIT:
-                rb->splash(HZ, "Cancelled");
+                splash(HZ, "Cancelled");
                 ret = -1;
                 break;
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     ret = 1;
                 break;
         }
     }
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
     return ret;
 }
 
@@ -315,11 +315,11 @@ static void reset_current_data(void)
 static char *lrcbufadd(const char*str, bool join)
 {
     if (join) lrc_buffer_used--;
-    size_t siz = rb->strlen(str)+1;
+    size_t siz = strlen(str)+1;
     char *pos = &lrc_buffer[lrc_buffer_used];
     if (lrc_buffer_used + siz > lrc_buffer_end)
         return NULL;
-    rb->strcpy(pos, str);
+    strcpy(pos, str);
     lrc_buffer_used += siz;
     return pos;
 }
@@ -398,7 +398,7 @@ static void set_time_start(struct lrc_line *lrc_line, long time_start)
 
 static int format_time_tag(char *buf, long t)
 {
-    return rb->snprintf(buf, 16, "%02ld:%02ld.%02ld",
+    return snprintf(buf, 16, "%02ld:%02ld.%02ld",
                         t/60000, (t/1000)%60, (t/10)%100);
 }
 /* find start of next line */
@@ -425,8 +425,8 @@ static bool isbrchr(const unsigned char *str, int len)
 
     while(*p)
     {
-        int n = rb->utf8seek(p, 1);
-        if (len == n && !rb->strncmp(p, str, len))
+        int n = utf8seek(p, 1);
+        if (len == n && !strncmp(p, str, len))
             return true;
         p += n;
     }
@@ -442,8 +442,8 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
     struct lrc_word *lrc_word;
     int nlrcbrpos = 0, max_lrcbrpos;
 #ifdef HAVE_LCD_BITMAP
-    uifont = rb->screens[0]->getuifont();
-    struct font* pf = rb->font_get(uifont);
+    uifont = screens[0].getuifont();
+    struct font* pf = font_get(uifont);
     unsigned short ch;
 #endif
     struct snap {
@@ -542,18 +542,18 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
 
             int c, w;
 #ifdef HAVE_LCD_CHARCELLS
-            c = rb->utf8seek(cr.str, 1);
+            c = utf8seek(cr.str, 1);
             w = 1;
 #else
-            c = ((long)rb->utf8decode(cr.str, &ch) - (long)cr.str);
-            if (rb->is_diacritic(ch, NULL))
+            c = ((long)utf8decode(cr.str, &ch) - (long)cr.str);
+            if (is_diacritic(ch, NULL))
                 w = 0;
             else
-                w = rb->font_get_width(pf, ch);
+                w = font_get_width(pf, ch);
             if (cr.count && prefs.wrap && isbrchr(cr.str, c))
             {
                 /* remember position of last space */
-                rb->memcpy(&sp, &cr, sizeof(struct snap));
+                memcpy(&sp, &cr, sizeof(struct snap));
                 sp.word_count = lrc_word->count;
                 sp.word_width = lrc_word->width;
                 if (!isspace(*cr.str) && cr.width+w <= vp_lyrics[i].width)
@@ -569,7 +569,7 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
             {
                 if (sp.str != NULL) /* wrap */
                 {
-                    rb->memcpy(&cr, &sp, sizeof(struct snap));
+                    memcpy(&cr, &sp, sizeof(struct snap));
                     lrc_word = lrc_line->words+cr.nword;
                     lrc_word->count = sp.word_count;
                     lrc_word->width = sp.word_width;
@@ -688,7 +688,7 @@ static void fix_filename(char* name)
             return;
         if (*name == '"')
             *name = '\'';
-        else if (rb->strchr(invalid_chars, *name))
+        else if (strchr(invalid_chars, *name))
             *name = '_';
         name++;
     }
@@ -704,14 +704,14 @@ static bool find_lrc_file_helper(const char *base_dir)
      */
 
     /* assuming file name starts with '/' */
-    rb->strcpy(temp_buf, current.mp3_file);
+    strcpy(temp_buf, current.mp3_file);
     /* get file name and remove extension */
-    names[0] = rb->strrchr(temp_buf, '/')+1;
-    if ((p = rb->strrchr(names[0], '.')) != NULL)
+    names[0] = strrchr(temp_buf, '/')+1;
+    if ((p = strrchr(names[0], '.')) != NULL)
         *p = 0;
-    if (current.id3->title && rb->strcmp(names[0], current.id3->title))
+    if (current.id3->title && strcmp(names[0], current.id3->title))
     {
-        rb->strlcpy(fname, current.id3->title, sizeof(fname));
+        strlcpy(fname, current.id3->title, sizeof(fname));
         fix_filename(fname);
         names[1] = fname;
     }
@@ -725,7 +725,7 @@ static bool find_lrc_file_helper(const char *base_dir)
         {
             if (n == 0)
             {
-                len = rb->snprintf(current.lrc_file, MAX_PATH, "%s%s/",
+                len = snprintf(current.lrc_file, MAX_PATH, "%s%s/",
                                     base_dir, dir);
             }
             else if (n == 1)
@@ -734,7 +734,7 @@ static bool find_lrc_file_helper(const char *base_dir)
                  * in the directory of mp3 file. */
                 if (prefs.lrc_directory[0] == '/')
                 {
-                    len = rb->snprintf(current.lrc_file, MAX_PATH, "%s%s/",
+                    len = snprintf(current.lrc_file, MAX_PATH, "%s%s/",
                                         dir, prefs.lrc_directory);
                 }
                 else
@@ -743,15 +743,15 @@ static bool find_lrc_file_helper(const char *base_dir)
             else
                 break;
             DEBUGF("check file in %s\n", current.lrc_file);
-            if (!rb->dir_exists(current.lrc_file))
+            if (!dir_exists(current.lrc_file))
                 continue;
             for (current.type = 0; current.type < NUM_TYPES; current.type++)
             {
                 for (i = 0; names[i] != NULL; i++)
                 {
-                    rb->snprintf(&current.lrc_file[len], MAX_PATH-len,
+                    snprintf(&current.lrc_file[len], MAX_PATH-len,
                             "%s%s", names[i], extentions[current.type]);
-                    if (rb->file_exists(current.lrc_file))
+                    if (file_exists(current.lrc_file))
                     {
                         DEBUGF("found: `%s'\n", current.lrc_file);
                         return true;
@@ -759,7 +759,7 @@ static bool find_lrc_file_helper(const char *base_dir)
                 }
             }
         }
-    } while ((p = rb->strrchr(dir, '/')) != NULL);
+    } while ((p = strrchr(dir, '/')) != NULL);
     return false;
 }
 
@@ -772,7 +772,7 @@ static bool find_lrc_file(void)
     /* find .lrc file */
     if (find_lrc_file_helper(""))
         return true;
-    if (prefs.lrc_directory[0] == '/' && rb->dir_exists(prefs.lrc_directory))
+    if (prefs.lrc_directory[0] == '/' && dir_exists(prefs.lrc_directory))
     {
         if (find_lrc_file_helper(prefs.lrc_directory))
             return true;
@@ -794,7 +794,7 @@ static bool find_lrc_file(void)
  */
 static char *parse_int(char *ptr, int *val)
 {
-    *val = rb->atoi(ptr);
+    *val = atoi(ptr);
     while (isdigit(*ptr)) ptr++;
     return ptr;
 }
@@ -806,21 +806,21 @@ static long get_time_value(char *tag, bool read_id_tags, off_t file_offset)
 
     if (read_id_tags)
     {
-        if (!rb->strncmp(tag, "ti:", 3))
+        if (!strncmp(tag, "ti:", 3))
         {
-            if (!current.id3->title || rb->strcmp(&tag[3], current.id3->title))
+            if (!current.id3->title || strcmp(&tag[3], current.id3->title))
                 current.title = lrcbufadd(&tag[3], false);
             return -1;
         }
-        if (!rb->strncmp(tag, "ar:", 3))
+        if (!strncmp(tag, "ar:", 3))
         {
-            if (!current.id3->artist || rb->strcmp(&tag[3], current.id3->artist))
+            if (!current.id3->artist || strcmp(&tag[3], current.id3->artist))
                 current.artist = lrcbufadd(&tag[3], false);
             return -1;
         }
-        if (!rb->strncmp(tag, "offset:", 7))
+        if (!strncmp(tag, "offset:", 7))
         {
-            current.offset = rb->atoi(&tag[7]);
+            current.offset = atoi(&tag[7]);
             current.offset_file_offset = file_offset;
             return -1;
         }
@@ -869,7 +869,7 @@ static bool parse_lrc_line(char *line, off_t file_offset)
     while (1)
     {
         if (*str != '[') break;
-        tagend = rb->strchr(str, ']');
+        tagend = strchr(str, ']');
         if (tagend == NULL) break;
         *tagend = 0;
         time = get_time_value(str+1, !lrc_line, file_offset);
@@ -902,9 +902,9 @@ static bool parse_lrc_line(char *line, off_t file_offset)
     tagstart = str;
     while (*tagstart)
     {
-        tagstart = rb->strchr(tagstart, '<');
+        tagstart = strchr(tagstart, '<');
         if (!tagstart) break;
-        tagend = rb->strchr(tagstart, '>');
+        tagend = strchr(tagstart, '>');
         if (!tagend) break;
         *tagend = 0;
         time = get_time_value(tagstart+1, false,
@@ -957,8 +957,8 @@ static bool parse_snc_line(char *line, off_t file_offset)
 
     /* SNC_TAG can be dencoded, so use
      * temp_buf which contains native data */
-    if (!rb->memcmp(temp_buf, SNC_TAG_START, 2)
-     && !rb->memcmp(temp_buf+10, SNC_TAG_END, 2)) /* time tag */
+    if (!memcmp(temp_buf, SNC_TAG_START, 2)
+     && !memcmp(temp_buf+10, SNC_TAG_END, 2)) /* time tag */
     {
         const char *pos = temp_buf+2; /* skip SNC_TAG_START */
         int hh, mm, ss, xx;
@@ -982,11 +982,11 @@ static bool parse_snc_line(char *line, off_t file_offset)
             return true;
 
         /* encode rest of line and add to buffer */
-        rb->iso_decode(pos, line, prefs.encoding, rb->strlen(pos)+1);
+        iso_decode(pos, line, prefs.encoding, strlen(pos)+1);
     }
     if (current.ll_head)
     {
-        rb->strcat(line, "\n");
+        strcat(line, "\n");
         if (lrcbufadd(line, true) == NULL)
             return false;
     }
@@ -1033,7 +1033,7 @@ static void load_lrc_file(void)
             return;
     }
 
-    fd = rb->open(current.lrc_file, O_RDONLY);
+    fd = open(current.lrc_file, O_RDONLY);
     if (fd < 0) return;
 
     {
@@ -1043,22 +1043,22 @@ static void load_lrc_file(void)
         unsigned char header[BOM_SIZE];
         unsigned char* (*utf_decode)(const unsigned char *,
                                      unsigned char *, int) = NULL;
-        rb->read(fd, header, BOM_SIZE);
-        if (!rb->memcmp(header, BOM, BOM_SIZE))      /* UTF-8 */
+        read(fd, header, BOM_SIZE);
+        if (!memcmp(header, BOM, BOM_SIZE))      /* UTF-8 */
         {
             encoding = UTF_8;
         }
-        else if (!rb->memcmp(header, "\xff\xfe", 2)) /* UTF-16LE */
+        else if (!memcmp(header, "\xff\xfe", 2)) /* UTF-16LE */
         {
-            utf_decode = rb->utf16LEdecode;
+            utf_decode = utf16LEdecode;
         }
-        else if (!rb->memcmp(header, "\xfe\xff", 2)) /* UTF-16BE */
+        else if (!memcmp(header, "\xfe\xff", 2)) /* UTF-16BE */
         {
-            utf_decode = rb->utf16BEdecode;
+            utf_decode = utf16BEdecode;
         }
         else
         {
-            rb->lseek(fd, 0, SEEK_SET);
+            lseek(fd, 0, SEEK_SET);
         }
 
         if (utf_decode)
@@ -1066,41 +1066,41 @@ static void load_lrc_file(void)
             /* convert encoding of file from UTF-16 to UTF-8 */
             char temp_file[MAX_PATH];
             int fe;
-            rb->lseek(fd, 2, SEEK_SET);
-            rb->snprintf(temp_file, MAX_PATH, "%s~", current.lrc_file);
-            fe = rb->creat(temp_file, 0666);
+            lseek(fd, 2, SEEK_SET);
+            snprintf(temp_file, MAX_PATH, "%s~", current.lrc_file);
+            fe = creat(temp_file, 0666);
             if (fe < 0)
             {
-                rb->close(fd);
+                close(fd);
                 return;
             }
-            rb->write(fe, BOM, BOM_SIZE);
-            while ((readsize = rb->read(fd, temp_buf, MAX_LINE_LEN)) > 0)
+            write(fe, BOM, BOM_SIZE);
+            while ((readsize = read(fd, temp_buf, MAX_LINE_LEN)) > 0)
             {
                 char *end = utf_decode(temp_buf, utf8line, readsize/2);
-                rb->write(fe, utf8line, end-utf8line);
+                write(fe, utf8line, end-utf8line);
             }
-            rb->close(fe);
-            rb->close(fd);
-            rb->remove(current.lrc_file);
-            rb->rename(temp_file, current.lrc_file);
-            fd = rb->open(current.lrc_file, O_RDONLY);
+            close(fe);
+            close(fd);
+            remove(current.lrc_file);
+            rename(temp_file, current.lrc_file);
+            fd = open(current.lrc_file, O_RDONLY);
             if (fd < 0) return;
-            rb->lseek(fd, BOM_SIZE, SEEK_SET); /* skip bom */
+            lseek(fd, BOM_SIZE, SEEK_SET); /* skip bom */
             encoding = UTF_8;
         }
     }
 
-    file_offset = rb->lseek(fd, 0, SEEK_CUR); /* used in line_parser */
-    while ((readsize = rb->read_line(fd, temp_buf, MAX_LINE_LEN)) > 0)
+    file_offset = lseek(fd, 0, SEEK_CUR); /* used in line_parser */
+    while ((readsize = read_line(fd, temp_buf, MAX_LINE_LEN)) > 0)
     {
         /* note: parse_snc_line() reads temp_buf for native data. */
-        rb->iso_decode(temp_buf, utf8line, encoding, readsize+1);
+        iso_decode(temp_buf, utf8line, encoding, readsize+1);
         if (!line_parser(utf8line, file_offset))
             break;
         file_offset += readsize;
     }
-    rb->close(fd);
+    close(fd);
 
     current.loaded_lrc = true;
     calc_brpos(NULL, 0);
@@ -1122,7 +1122,7 @@ static unsigned long unsync(unsigned long b0, unsigned long b1,
             ((long)(b3 & 0x7F) << (0*7)));
 }
 
-static unsigned long bytes2int(unsigned long b0, unsigned long b1,
+static unsigned long _bytes2int(unsigned long b0, unsigned long b1,
                                unsigned long b2, unsigned long b3)
 {
     return (((long)(b0 & 0xFF) << (3*8)) |
@@ -1172,7 +1172,7 @@ static int read_unsynched(int fd, void *buf, int len, bool *ff_found)
     wp = buf;
 
     while(remaining) {
-        rc = rb->read(fd, wp, remaining);
+        rc = read(fd, wp, remaining);
         if(rc <= 0)
             return rc;
 
@@ -1187,8 +1187,8 @@ static int read_unsynched(int fd, void *buf, int len, bool *ff_found)
 static unsigned char* utf8cpy(const unsigned char *src,
                               unsigned char *dst, int count)
 {
-    rb->strlcpy(dst, src, count+1);
-    return dst+rb->strlen(dst);
+    strlcpy(dst, src, count+1);
+    return dst+strlen(dst);
 }
 
 static void parse_id3v2(int fd)
@@ -1213,7 +1213,7 @@ static void parse_id3v2(int fd)
         return;
 
     /* Read the ID3 tag version from the header */
-    if(10 != rb->read(fd, header, 10))
+    if(10 != read(fd, header, 10))
         return;
 
     /* Get the total ID3 tag size */
@@ -1245,19 +1245,19 @@ static void parse_id3v2(int fd)
     if(global_flags & 0x40) {
 
         if(version == ID3_VER_2_3) {
-            if(10 != rb->read(fd, header, 10))
+            if(10 != read(fd, header, 10))
                 return;
             /* The 2.3 extended header size doesn't include the header size
                field itself. Also, it is not unsynched. */
             framelen =
-                bytes2int(header[0], header[1], header[2], header[3]) + 4;
+                _bytes2int(header[0], header[1], header[2], header[3]) + 4;
 
             /* Skip the rest of the header */
-            rb->lseek(fd, framelen - 10, SEEK_CUR);
+            lseek(fd, framelen - 10, SEEK_CUR);
         }
 
         if(version >= ID3_VER_2_4) {
-            if(4 != rb->read(fd, header, 4))
+            if(4 != read(fd, header, 4))
                 return;
 
             /* The 2.4 extended header size does include the entire header,
@@ -1265,7 +1265,7 @@ static void parse_id3v2(int fd)
             framelen = unsync(header[0], header[1],
                               header[2], header[3]);
 
-            rb->lseek(fd, framelen - 4, SEEK_CUR);
+            lseek(fd, framelen - 4, SEEK_CUR);
         }
     }
 
@@ -1284,13 +1284,13 @@ static void parse_id3v2(int fd)
             if(global_unsynch && version <= ID3_VER_2_3)
                 rc = read_unsynched(fd, header, 10, &global_ff_found);
             else
-                rc = rb->read(fd, header, 10);
+                rc = read(fd, header, 10);
             if(rc != 10)
                 return;
             /* Adjust for the 10 bytes we read */
             size -= 10;
 
-            flags = bytes2int(0, 0, header[8], header[9]);
+            flags = _bytes2int(0, 0, header[8], header[9]);
 
             if (version >= ID3_VER_2_4) {
                 framelen = unsync(header[4], header[5],
@@ -1298,16 +1298,16 @@ static void parse_id3v2(int fd)
             } else {
                 /* version .3 files don't use synchsafe ints for
                  * size */
-                framelen = bytes2int(header[4], header[5],
+                framelen = _bytes2int(header[4], header[5],
                                      header[6], header[7]);
             }
         } else {
-            if(6 != rb->read(fd, header, 6))
+            if(6 != read(fd, header, 6))
                 return;
             /* Adjust for the 6 bytes we read */
             size -= 6;
 
-            framelen = bytes2int(0, header[3], header[4], header[5]);
+            framelen = _bytes2int(0, header[3], header[4], header[5]);
         }
 
         if(framelen == 0){
@@ -1323,12 +1323,12 @@ static void parse_id3v2(int fd)
         {
             if (version >= ID3_VER_2_4) {
                 if(flags & 0x0040) { /* Grouping identity */
-                    rb->lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
+                    lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
                     framelen--;
                 }
             } else {
                 if(flags & 0x0020) { /* Grouping identity */
-                    rb->lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
+                    lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
                     framelen--;
                 }
             }
@@ -1337,7 +1337,7 @@ static void parse_id3v2(int fd)
             {
                 /* Skip it */
                 size -= framelen;
-                rb->lseek(fd, framelen, SEEK_CUR);
+                lseek(fd, framelen, SEEK_CUR);
                 continue;
             }
 
@@ -1346,7 +1346,7 @@ static void parse_id3v2(int fd)
 
             if (version >= ID3_VER_2_4) {
                 if(flags & 0x0001) { /* Data length indicator */
-                    if(4 != rb->read(fd, tmp, 4))
+                    if(4 != read(fd, tmp, 4))
                         return;
 
                     /* We don't need the data length */
@@ -1361,15 +1361,15 @@ static void parse_id3v2(int fd)
         if (framelen < 0)
             return;
 
-        if(!rb->memcmp( header, "SLT", 3 ) ||
-           !rb->memcmp( header, "SYLT", 4 ))
+        if(!memcmp( header, "SLT", 3 ) ||
+           !memcmp( header, "SYLT", 4 ))
         {
             /* found a supported tag */
             type = SYLT;
             break;
         }
-        else if(!rb->memcmp( header, "ULT", 3 ) ||
-                !rb->memcmp( header, "USLT", 4 ))
+        else if(!memcmp( header, "ULT", 3 ) ||
+                !memcmp( header, "USLT", 4 ))
         {
             /* found a supported tag */
             type = USLT;
@@ -1382,7 +1382,7 @@ static void parse_id3v2(int fd)
                 size -= read_unsynched(fd, lrc_buffer, framelen, &global_ff_found);
             } else {
                 size -= framelen;
-                if( rb->lseek(fd, framelen, SEEK_CUR) == -1 )
+                if( lseek(fd, framelen, SEEK_CUR) == -1 )
                     return;
             }
         }
@@ -1401,7 +1401,7 @@ static void parse_id3v2(int fd)
     if(global_unsynch && version <= ID3_VER_2_3)
         bytesread = read_unsynched(fd, tag, framelen, &global_ff_found);
     else
-        bytesread = rb->read(fd, tag, framelen);
+        bytesread = read(fd, tag, framelen);
 
     if( bytesread != framelen )
         return;
@@ -1427,10 +1427,10 @@ static void parse_id3v2(int fd)
             /* Now check if there is a BOM
                (zero-width non-breaking space, 0xfeff)
                and if it is in little or big endian format */
-            if(!rb->memcmp(p, "\xff\xfe", 2)) { /* Little endian? */
-                utf_decode = rb->utf16LEdecode;
-            } else if(!rb->memcmp(p, "\xfe\xff", 2)) { /* Big endian? */
-                utf_decode = rb->utf16BEdecode;
+            if(!memcmp(p, "\xff\xfe", 2)) { /* Little endian? */
+                utf_decode = utf16LEdecode;
+            } else if(!memcmp(p, "\xfe\xff", 2)) { /* Big endian? */
+                utf_decode = utf16BEdecode;
             } else
                 utf_decode = NULL;
 
@@ -1448,27 +1448,27 @@ static void parse_id3v2(int fd)
                 encoding = UTF_8;
             else
                 encoding = prefs.encoding;
-            p += rb->strlen(p)+1;
+            p += strlen(p)+1;
             chsiz = 1;
             break;
     }
     if(encoding == NUM_CODEPAGES)
     {
         /* check if there is a BOM */
-        if(!rb->memcmp(p, "\xff\xfe", 2)) { /* Little endian? */
-            utf_decode = rb->utf16LEdecode;
+        if(!memcmp(p, "\xff\xfe", 2)) { /* Little endian? */
+            utf_decode = utf16LEdecode;
             p += 2;
-        } else if(!rb->memcmp(p, "\xfe\xff", 2)) { /* Big endian? */
-            utf_decode = rb->utf16BEdecode;
+        } else if(!memcmp(p, "\xfe\xff", 2)) { /* Big endian? */
+            utf_decode = utf16BEdecode;
             p += 2;
         } else if(!utf_decode) {
             /* If there is no BOM (which is a specification violation),
                let's try to guess it. If one of the bytes is 0x00, it is
                probably the most significant one. */
             if(p[1] == 0)
-                utf_decode = rb->utf16LEdecode;
+                utf_decode = utf16LEdecode;
             else
-                utf_decode = rb->utf16BEdecode;
+                utf_decode = utf16BEdecode;
         }
     }
     bytesread -= (long)p - (long)tag;
@@ -1512,13 +1512,13 @@ static void parse_id3v2(int fd)
         }
         else
         {
-            size = rb->strlen(tag)+1;
-            rb->iso_decode(tag, utf8line, encoding, size);
+            size = strlen(tag)+1;
+            iso_decode(tag, utf8line, encoding, size);
             p = tag+size;
         }
 
         if(type == SYLT) { /* timestamp */
-            lrc_line->time_start = bytes2int(p[0], p[1], p[2], p[3]);
+            lrc_line->time_start = _bytes2int(p[0], p[1], p[2], p[3]);
             lrc_line->old_time_start = lrc_line->time_start;
             p += 4;
             utf_decode(p, tmp, 1);
@@ -1536,7 +1536,7 @@ static void parse_id3v2(int fd)
     }
 
     current.type = ID3_SYLT-SYLT+type;
-    rb->strcpy(current.lrc_file, current.mp3_file);
+    strcpy(current.lrc_file, current.mp3_file);
 
     current.loaded_lrc = true;
     calc_brpos(NULL, 0);
@@ -1554,11 +1554,11 @@ static bool read_id3(void)
     && current.id3->codectype != AFMT_MPA_L3)
         return false;
 
-    fd = rb->open(current.mp3_file, O_RDONLY);
+    fd = open(current.mp3_file, O_RDONLY);
     if(fd < 0) return false;
     current.loaded_lrc = false;
     parse_id3v2(fd);
-    rb->close(fd);
+    close(fd);
     return current.loaded_lrc;
 }
 #endif /* LRC_SUPPORT_ID3 */
@@ -1590,13 +1590,13 @@ static void display_state(void)
 
         if (artist != NULL && title != NULL)
         {
-            rb->snprintf(temp_buf, MAX_LINE_LEN, "%s/%s", title, artist);
+            snprintf(temp_buf, MAX_LINE_LEN, "%s/%s", title, artist);
             info = temp_buf;
         }
         else if (title != NULL)
             info = title;
         else if (current.mp3_file[0] == '/')
-            info = rb->strrchr(current.mp3_file, '/')+1;
+            info = strrchr(current.mp3_file, '/')+1;
         else
             info = "(no info)";
     }
@@ -1605,7 +1605,7 @@ static void display_state(void)
     struct screen* display;
     FOR_NB_SCREENS(i)
     {
-        display = rb->screens[i];
+        display = &screens[i];
         display->set_viewport(&vp_info[i]);
         display->clear_viewport();
         if (info)
@@ -1628,27 +1628,27 @@ static void display_state(void)
     }
 #else
     /* there is no place to display title or artist. */
-    rb->lcd_clear_display();
+    lcd_clear_display();
     if (str)
-        rb->lcd_puts_scroll(0, 0, str);
-    rb->lcd_update();
+        lcd_puts_scroll(0, 0, str);
+    lcd_update();
 #endif /* HAVE_LCD_BITMAP */
 }
 
 static void display_time(void)
 {
-    rb->snprintf(temp_buf, MAX_LINE_LEN, "%ld:%02ld/%ld:%02ld",
+    snprintf(temp_buf, MAX_LINE_LEN, "%ld:%02ld/%ld:%02ld",
                             current.elapsed/60000, (current.elapsed/1000)%60,
                             current.length/60000, (current.length)/1000%60);
 #ifdef HAVE_LCD_BITMAP
     int y = (prefs.display_title? font_ui_height:0);
     FOR_NB_SCREENS(i)
     {
-        struct screen* display = rb->screens[i];
+        struct screen* display = &screens[i];
         display->set_viewport(&vp_info[i]);
         display->setfont(FONT_SYSFIXED);
         display->putsxy(0, y, temp_buf);
-        rb->gui_scrollbar_draw(display, 0, y+SYSFONT_HEIGHT+1,
+        gui_scrollbar_draw(display, 0, y+SYSFONT_HEIGHT+1,
                                vp_info[i].width, SYSFONT_HEIGHT-2,
                                current.length, 0, current.elapsed, HORIZONTAL);
         display->update_viewport_rect(0, y, vp_info[i].width, SYSFONT_HEIGHT*2);
@@ -1656,8 +1656,8 @@ static void display_time(void)
         display->set_viewport(NULL);
     }
 #else
-    rb->lcd_puts(0, 0, temp_buf);
-    rb->lcd_update();
+    lcd_puts(0, 0, temp_buf);
+    lcd_update();
 #endif /* HAVE_LCD_BITMAP */
 }
 
@@ -1704,7 +1704,7 @@ static inline void set_to_inactive(struct screen *display)
 
 static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
 {
-    struct screen *display = rb->screens[i];
+    struct screen *display = &screens[i];
     struct lrc_word *lrc_word;
     struct lrc_brpos *lrc_brpos;
     long time_start, time_end, elapsed;
@@ -1813,7 +1813,7 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
                 display->set_drawmode(DRMODE_INVERSEVID);
 #endif
             }
-            rb->strlcpy(temp_buf, str, c+1);
+            strlcpy(temp_buf, str, c+1);
             display->putsxy(xpos, ypos, temp_buf);
             str += c;
             xpos += w;
@@ -1865,7 +1865,7 @@ static void display_lrcs(void)
     struct screen *display;
     FOR_NB_SCREENS(i)
     {
-        display = rb->screens[i];
+        display = &screens[i];
         /* display current line at the center of the viewport */
         display->set_viewport(&vp_lyrics[i]);
         display->clear_viewport();
@@ -1933,14 +1933,14 @@ static void display_lrcs(void)
                 lrc_brpos++;
             }
         }
-        rb->strlcpy(temp_buf, str, lrc_brpos->count+1);
+        strlcpy(temp_buf, str, lrc_brpos->count+1);
 
         x -= elapsed;
         if (x < 0)
-            display->puts(0, y, temp_buf + rb->utf8seek(temp_buf, -x));
+            display->puts(0, y, temp_buf + utf8seek(temp_buf, -x));
         else
             display->puts(x, y, temp_buf);
-        x += rb->utf8length(temp_buf)+1;
+        x += utf8length(temp_buf)+1;
         lrc_line = lrc_line->next;
         if (!lrc_line && x < vp_lyrics[i].width)
         {
@@ -1980,7 +1980,7 @@ static const char *get_lrc_timeline(int selected, void *data,
     if (lrc_line)
     {
         format_time_tag(temp_buf, get_time_start(lrc_line));
-        rb->snprintf(buffer, buffer_len, "[%s]%s",
+        snprintf(buffer, buffer_len, "[%s]%s",
                      temp_buf, get_lrc_str(lrc_line));
         return buffer;
     }
@@ -1994,21 +1994,21 @@ static void save_changes(void)
     int fd, fe;
     if (!current.changed_lrc)
         return;
-    rb->splash(HZ/2, "Saving changes...");
+    splash(HZ/2, "Saving changes...");
     if (current.type == TXT || current.type > NUM_TYPES)
     {
         /* save changes to new .lrc file */
-        rb->strcpy(new_file, current.lrc_file);
-        p = rb->strrchr(new_file, '.');
-        rb->strcpy(p, extentions[LRC]);
+        strcpy(new_file, current.lrc_file);
+        p = strrchr(new_file, '.');
+        strcpy(p, extentions[LRC]);
     }
     else
     {
         /* file already exists. use temp file. */
-        rb->snprintf(new_file, MAX_PATH, "%s~", current.lrc_file);
+        snprintf(new_file, MAX_PATH, "%s~", current.lrc_file);
     }
-    fd = rb->creat(new_file, 0666);
-    fe = rb->open(current.lrc_file, O_RDONLY);
+    fd = creat(new_file, 0666);
+    fe = open(current.lrc_file, O_RDONLY);
     if (fd >= 0 && fe >= 0)
     {
         struct lrc_line *lrc_line, *temp_lrc;
@@ -2025,10 +2025,10 @@ static void save_changes(void)
         if (current.type > NUM_TYPES)
         {
             curr = -1;
-            rb->write(fd, BOM, BOM_SIZE);
+            write(fd, BOM, BOM_SIZE);
         }
         else
-            size = rb->filesize(fe);
+            size = filesize(fe);
         while (curr < size)
         {
             /* find offset of next tag */
@@ -2060,9 +2060,9 @@ static void save_changes(void)
                     ssize_t count = next-curr;
                     if (count > MAX_LINE_LEN)
                         count = MAX_LINE_LEN;
-                    if (rb->read(fe, temp_buf, count)!=count)
+                    if (read(fe, temp_buf, count)!=count)
                         break;
-                    rb->write(fd, temp_buf, count);
+                    write(fd, temp_buf, count);
                     curr += count;
                 }
                 if (curr < next || curr >= size) break;
@@ -2070,57 +2070,57 @@ static void save_changes(void)
             /* write tag to new file and skip tag in backup */
             if (lrc_line != NULL)
             {
-                lrc_line->file_offset = rb->lseek(fd, 0, SEEK_CUR);
+                lrc_line->file_offset = lseek(fd, 0, SEEK_CUR);
                 lrc_line->old_time_start = lrc_line->time_start;
                 long t = lrc_line->time_start;
                 if (current.type == SNC)
                 {
-                    rb->fdprintf(fd, "%02ld%02ld%02ld%02ld", (t/3600000)%100,
+                    fdprintf(fd, "%02ld%02ld%02ld%02ld", (t/3600000)%100,
                                      (t/60000)%60, (t/1000)%60, (t/10)%100);
                     /* skip time tag */
-                    curr += rb->read(fe, temp_buf, 8);
+                    curr += read(fe, temp_buf, 8);
                 }
                 else /* LRC || LRC8 */
                 {
                     format_time_tag(temp_buf, t);
-                    rb->fdprintf(fd, "[%s]", temp_buf);
+                    fdprintf(fd, "[%s]", temp_buf);
                 }
                 if (next == -1)
                 {
-                    rb->fdprintf(fd, "%s\n", get_lrc_str(lrc_line));
+                    fdprintf(fd, "%s\n", get_lrc_str(lrc_line));
                 }
             }
             if (current.type == LRC || current.type == LRC8)
             {
                 /* skip both time tag and offset tag */
-                while (curr++<size && rb->read(fe, temp_buf, 1)==1)
+                while (curr++<size && read(fe, temp_buf, 1)==1)
                     if (temp_buf[0]==']') break;
             }
         }
         success = (curr>=size);
     }
-    if (fe >= 0) rb->close(fe);
-    if (fd >= 0) rb->close(fd);
+    if (fe >= 0) close(fe);
+    if (fd >= 0) close(fd);
 
     if (success)
     {
         if (current.type == TXT || current.type > NUM_TYPES)
         {
             current.type = LRC;
-            rb->strcpy(current.lrc_file, new_file);
+            strcpy(current.lrc_file, new_file);
         }
         else
         {
-            rb->remove(current.lrc_file);
-            rb->rename(new_file, current.lrc_file);
+            remove(current.lrc_file);
+            rename(new_file, current.lrc_file);
         }
     }
     else
     {
-        rb->remove(new_file);
-        rb->splash(HZ, "Could not save changes.");
+        remove(new_file);
+        splash(HZ, "Could not save changes.");
     }
-    rb->reload_directory();
+    reload_directory();
     current.changed_lrc = false;
 }
 static int timetag_editor(void)
@@ -2132,7 +2132,7 @@ static int timetag_editor(void)
 
     if (current.id3 == NULL || !current.ll_head)
     {
-        rb->splash(HZ, "No lyrics");
+        splash(HZ, "No lyrics");
         return LRC_GOTO_MAIN;
     }
 
@@ -2148,34 +2148,34 @@ static int timetag_editor(void)
             selected = idx;
     }
 
-    rb->gui_synclist_init(&gui_editor, &get_lrc_timeline, NULL, false, 1, NULL);
-    rb->gui_synclist_set_nb_items(&gui_editor, current.nlrcline);
-    rb->gui_synclist_set_icon_callback(&gui_editor, get_icon);
-    rb->gui_synclist_set_title(&gui_editor, "Timetag Editor",
+    gui_synclist_init(&gui_editor, &get_lrc_timeline, NULL, false, 1, NULL);
+    gui_synclist_set_nb_items(&gui_editor, current.nlrcline);
+    gui_synclist_set_icon_callback(&gui_editor, get_icon);
+    gui_synclist_set_title(&gui_editor, "Timetag Editor",
                                Icon_Menu_functioncall);
-    rb->gui_synclist_select_item(&gui_editor, selected);
-    rb->gui_synclist_draw(&gui_editor);
+    gui_synclist_select_item(&gui_editor, selected);
+    gui_synclist_draw(&gui_editor);
 
     while (!exit)
     {
-        button = rb->get_action(CONTEXT_TREE, TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&gui_editor, &button,
+        button = get_action(CONTEXT_TREE, TIMEOUT_BLOCK);
+        if (gui_synclist_do_button(&gui_editor, &button,
                                       LIST_WRAP_UNLESS_HELD))
             continue;
 
         switch (button)
         {
             case ACTION_STD_OK:
-                idx = rb->gui_synclist_get_sel_pos(&gui_editor);
+                idx = gui_synclist_get_sel_pos(&gui_editor);
                 lrc_line = get_lrc_line(idx);
                 if (lrc_line)
                 {
                     set_time_start(lrc_line, current.id3->elapsed-500);
-                    rb->gui_synclist_draw(&gui_editor);
+                    gui_synclist_draw(&gui_editor);
                 }
                 break;
             case ACTION_STD_CONTEXT:
-                idx = rb->gui_synclist_get_sel_pos(&gui_editor);
+                idx = gui_synclist_get_sel_pos(&gui_editor);
                 lrc_line = get_lrc_line(idx);
                 if (lrc_line)
                 {
@@ -2185,7 +2185,7 @@ static int timetag_editor(void)
                                      LST_SET_MSEC|LST_SET_SEC|LST_SET_MIN) == 1)
                         return PLUGIN_USB_CONNECTED;
                     set_time_start(lrc_line, temp_time);
-                    rb->gui_synclist_draw(&gui_editor);
+                    gui_synclist_draw(&gui_editor);
                 }
                 break;
             case ACTION_TREE_STOP:
@@ -2193,14 +2193,14 @@ static int timetag_editor(void)
                 exit = true;
                 break;
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
     }
 
     FOR_NB_SCREENS(idx)
-        rb->screens[idx]->stop_scroll();
+        screens[idx].stop_scroll();
 
     if (current.changed_lrc)
     {
@@ -2210,7 +2210,7 @@ static int timetag_editor(void)
         exit = false;
         while (!exit)
         {
-            switch (rb->do_menu(&save_menu, &button, NULL, false))
+            switch (do_menu(&save_menu, &button, NULL, false))
             {
                 case 0:
                     sort_lrcs();
@@ -2273,7 +2273,7 @@ static void load_or_save_settings(bool save)
     {
         /* initialize setting */
 #if LCD_DEPTH > 1
-        prefs.active_color = rb->lcd_get_foreground();
+        prefs.active_color = lcd_get_foreground();
         prefs.inactive_color = LCD_LIGHTGRAY;
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -2289,17 +2289,17 @@ static void load_or_save_settings(bool save)
 #ifdef LRC_SUPPORT_ID3
         prefs.read_id3 = true;
 #endif
-        rb->strcpy(prefs.lrc_directory, "/Lyrics");
+        strcpy(prefs.lrc_directory, "/Lyrics");
         prefs.encoding = -1; /* default codepage */
 
         configfile_load(config_file, config, ARRAYLEN(config), 0);
     }
-    else if (rb->memcmp(&old_prefs, &prefs, sizeof(prefs)))
+    else if (memcmp(&old_prefs, &prefs, sizeof(prefs)))
     {
-        rb->splash(0, "Saving Settings");
+        splash(0, "Saving Settings");
         configfile_save(config_file, config, ARRAYLEN(config), 0);
     }
-    rb->memcpy(&old_prefs, &prefs, sizeof(prefs));
+    memcpy(&old_prefs, &prefs, sizeof(prefs));
 }
 
 static bool lrc_theme_menu(void)
@@ -2331,27 +2331,27 @@ static bool lrc_theme_menu(void)
 
     while (!exit && !usb)
     {
-        switch (rb->do_menu(&menu, &selected, NULL, false))
+        switch (do_menu(&menu, &selected, NULL, false))
         {
 #ifdef HAVE_LCD_BITMAP
             case LRC_MENU_STATUSBAR:
-                usb = rb->set_bool("Show Statusbar", &prefs.statusbar_on);
+                usb = set_bool("Show Statusbar", &prefs.statusbar_on);
                 break;
             case LRC_MENU_DISP_TITLE:
-                usb = rb->set_bool("Display Title", &prefs.display_title);
+                usb = set_bool("Display Title", &prefs.display_title);
                 break;
 #endif
             case LRC_MENU_DISP_TIME:
-                usb = rb->set_bool("Display Time", &prefs.display_time);
+                usb = set_bool("Display Time", &prefs.display_time);
                 break;
 #ifdef HAVE_LCD_COLOR
             case LRC_MENU_INACTIVE_COLOR:
-                usb = rb->set_color(NULL, "Inactive Colour",
+                usb = set_color(NULL, "Inactive Colour",
                                     &prefs.inactive_color, -1);
                 break;
 #endif
             case LRC_MENU_BACKLIGHT:
-                usb = rb->set_bool("Backlight Always On", &prefs.backlight_on);
+                usb = set_bool("Backlight Always On", &prefs.backlight_on);
                 break;
             case MENU_ATTACHED_USB:
                 usb = true;
@@ -2388,20 +2388,20 @@ static bool lrc_display_menu(void)
 
     while (!exit && !usb)
     {
-        switch (rb->do_menu(&menu, &selected, NULL, false))
+        switch (do_menu(&menu, &selected, NULL, false))
         {
             case LRC_MENU_WRAP:
-                usb = rb->set_bool("Wrap", &prefs.wrap);
+                usb = set_bool("Wrap", &prefs.wrap);
                 break;
             case LRC_MENU_WIPE:
-                usb = rb->set_bool("Wipe", &prefs.wipe);
+                usb = set_bool("Wipe", &prefs.wipe);
                 break;
             case LRC_MENU_ALIGN:
-                usb = rb->set_option("Alignment", &prefs.align, INT,
+                usb = set_option("Alignment", &prefs.align, INT,
                                      align_names, 3, NULL);
                 break;
             case LRC_MENU_LINE_MODE:
-                usb = rb->set_bool("Activate Only Current Line",
+                usb = set_bool("Activate Only Current Line",
                                         &prefs.active_one_line);
                 break;
             case MENU_ATTACHED_USB:
@@ -2444,18 +2444,18 @@ static bool lrc_lyrics_menu(void)
     cp_names[0].voice_id = -1;
     for (old_val = 1; old_val < NUM_CODEPAGES+1; old_val++)
     {
-        cp_names[old_val].string = rb->get_codepage_name(old_val-1);
+        cp_names[old_val].string = get_codepage_name(old_val-1);
         cp_names[old_val].voice_id = -1;
     }
 
     while (!exit && !usb)
     {
-        switch (rb->do_menu(&menu, &selected, NULL, false))
+        switch (do_menu(&menu, &selected, NULL, false))
         {
             case LRC_MENU_ENCODING:
                 prefs.encoding++;
                 old_val = prefs.encoding;
-                usb = rb->set_option("Encoding", &prefs.encoding, INT,
+                usb = set_option("Encoding", &prefs.encoding, INT,
                                      cp_names, NUM_CODEPAGES+1, NULL);
                 if (prefs.encoding != old_val)
                 {
@@ -2470,13 +2470,13 @@ static bool lrc_lyrics_menu(void)
                 break;
 #ifdef LRC_SUPPORT_ID3
             case LRC_MENU_READ_ID3:
-                usb = rb->set_bool("Read ID3 tag", &prefs.read_id3);
+                usb = set_bool("Read ID3 tag", &prefs.read_id3);
                 break;
 #endif
             case LRC_MENU_LRC_DIR:
-                rb->strcpy(temp_buf, prefs.lrc_directory);
-                if (!rb->kbd_input(temp_buf, sizeof(prefs.lrc_directory)))
-                    rb->strcpy(prefs.lrc_directory, temp_buf);
+                strcpy(temp_buf, prefs.lrc_directory);
+                if (!kbd_input(temp_buf, sizeof(prefs.lrc_directory)))
+                    strcpy(prefs.lrc_directory, temp_buf);
                 break;
             case MENU_ATTACHED_USB:
                 usb = true;
@@ -2498,26 +2498,26 @@ static const char* lrc_debug_data(int selected, void * data,
     switch (selected)
     {
         case 0:
-            rb->strlcpy(buffer, current.mp3_file, buffer_len);
+            strlcpy(buffer, current.mp3_file, buffer_len);
             break;
         case 1:
-            rb->strlcpy(buffer, current.lrc_file, buffer_len);
+            strlcpy(buffer, current.lrc_file, buffer_len);
             break;
         case 2:
-            rb->snprintf(buffer, buffer_len, "buf usage: %d,%d/%d",
+            snprintf(buffer, buffer_len, "buf usage: %d,%d/%d",
                             (int)lrc_buffer_used, (int)lrc_buffer_end,
                             (int)lrc_buffer_size);
             break;
         case 3:
-            rb->snprintf(buffer, buffer_len, "line count: %d,%d",
+            snprintf(buffer, buffer_len, "line count: %d,%d",
                             current.nlrcline, current.nlrcbrpos);
             break;
         case 4:
-            rb->snprintf(buffer, buffer_len, "loaded lrc? %s",
+            snprintf(buffer, buffer_len, "loaded lrc? %s",
                             current.loaded_lrc?"yes":"no");
             break;
         case 5:
-            rb->snprintf(buffer, buffer_len, "too many lines? %s",
+            snprintf(buffer, buffer_len, "too many lines? %s",
                             current.too_many_lines?"yes":"no");
             break;
         default:
@@ -2529,11 +2529,11 @@ static const char* lrc_debug_data(int selected, void * data,
 static bool lrc_debug_menu(void)
 {
     struct simplelist_info info;
-    rb->simplelist_info_init(&info, "Debug Menu", 6, NULL);
+    simplelist_info_init(&info, "Debug Menu", 6, NULL);
     info.hide_selection = true;
     info.scroll_all = true;
     info.get_name = lrc_debug_data;
-    return rb->simplelist_show_list(&info);
+    return simplelist_show_list(&info);
 }
 #endif
 
@@ -2572,7 +2572,7 @@ static int lrc_menu(void)
 
     while (ret == LRC_GOTO_MENU)
     {
-        switch (rb->do_menu(&menu, &selected, NULL, false))
+        switch (do_menu(&menu, &selected, NULL, false))
         {
             case LRC_MENU_THEME:
                 usb = lrc_theme_menu();
@@ -2628,8 +2628,8 @@ static bool check_audio_status(void)
 {
     static int last_audio_status = 0;
     if (current.ff_rewind == -1)
-        current.audio_status = rb->audio_status();
-    current.id3 = rb->audio_current_track();
+        current.audio_status = audio_status();
+    current.id3 = audio_current_track();
     if ((last_audio_status^current.audio_status)&AUDIO_STATUS_PLAY)
     {
         last_audio_status = current.audio_status;
@@ -2637,7 +2637,7 @@ static bool check_audio_status(void)
     }
     if (AUDIO_STOP || current.id3 == NULL)
         return false;
-    if (rb->strcmp(current.mp3_file, current.id3->path))
+    if (strcmp(current.mp3_file, current.id3->path))
     {
         return true;
     }
@@ -2650,12 +2650,12 @@ static void ff_rewind(long time, bool resume)
         if (!AUDIO_PAUSE)
         {
             resume = true;
-            rb->audio_pause();
+            audio_pause();
         }
-        rb->audio_ff_rewind(time);
-        rb->sleep(HZ/10); /* take affect seeking */
+        audio_ff_rewind(time);
+        sleep(HZ/10); /* take affect seeking */
         if (resume)
-            rb->audio_resume();
+            audio_resume();
     }
 }
 
@@ -2663,7 +2663,7 @@ static int handle_button(void)
 {
     int ret = LRC_GOTO_MAIN;
     static int step = 0;
-    int limit, button = rb->get_action(CONTEXT_WPS, HZ/10);
+    int limit, button = get_action(CONTEXT_WPS, HZ/10);
     switch (button)
     {
         case ACTION_WPS_BROWSE:
@@ -2678,18 +2678,18 @@ static int handle_button(void)
             ret = PLUGIN_OK;
             break;
         case ACTION_WPS_PLAY:
-            if (AUDIO_STOP && rb->global_status->resume_index != -1)
+            if (AUDIO_STOP && global_status.resume_index != -1)
             {
-                if (rb->playlist_resume() != -1)
+                if (playlist_resume() != -1)
                 {
-                    rb->playlist_start(rb->global_status->resume_index,
-                        rb->global_status->resume_offset);
+                    playlist_start(global_status.resume_index,
+                        global_status.resume_offset);
                 }
             }
             else if (AUDIO_PAUSE)
-                rb->audio_resume();
+                audio_resume();
             else
-                rb->audio_pause();
+                audio_pause();
             break;
         case ACTION_WPS_SEEKFWD:
         case ACTION_WPS_SEEKBACK:
@@ -2719,14 +2719,14 @@ static int handle_button(void)
                     current.ff_rewind = 0;
 
                 /* smooth seeking by multiplying step by: 1 + (2 ^ -accel) */
-                step += step >> (rb->global_settings->ff_rewind_accel + 3);
+                step += step >> (global_settings.ff_rewind_accel + 3);
             }
             else
             {
                 current.ff_rewind = current.elapsed;
                 if (!AUDIO_PAUSE)
-                    rb->audio_pause();
-                step = 1000 * rb->global_settings->ff_rewind_min_step;
+                    audio_pause();
+                step = 1000 * global_settings.ff_rewind_min_step;
             }
             break;
         case ACTION_WPS_STOPSEEK:
@@ -2737,25 +2737,25 @@ static int handle_button(void)
             current.ff_rewind = -1;
             break;
         case ACTION_WPS_SKIPNEXT:
-            rb->audio_next();
+            audio_next();
             break;
         case ACTION_WPS_SKIPPREV:
             if (current.elapsed < 3000)
-                rb->audio_prev();
+                audio_prev();
             else
                 ff_rewind(0, false);
             break;
         case ACTION_WPS_VOLDOWN:
-            limit = rb->sound_min(SOUND_VOLUME);
-            if (--rb->global_settings->volume < limit)
-                rb->global_settings->volume = limit;
-            rb->sound_set(SOUND_VOLUME, rb->global_settings->volume);
+            limit = sound_min(SOUND_VOLUME);
+            if (--global_settings.volume < limit)
+                global_settings.volume = limit;
+            sound_set(SOUND_VOLUME, global_settings.volume);
             break;
         case ACTION_WPS_VOLUP:
-            limit = rb->sound_max(SOUND_VOLUME);
-            if (++rb->global_settings->volume > limit)
-                rb->global_settings->volume = limit;
-            rb->sound_set(SOUND_VOLUME, rb->global_settings->volume);
+            limit = sound_max(SOUND_VOLUME);
+            if (++global_settings.volume > limit)
+                global_settings.volume = limit;
+            sound_set(SOUND_VOLUME, global_settings.volume);
             break;
         case ACTION_WPS_CONTEXT:
             ret = LRC_GOTO_EDITOR;
@@ -2764,7 +2764,7 @@ static int handle_button(void)
             ret = LRC_GOTO_MENU;
             break;
         default:
-            if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            if(default_event_handler(button) == SYS_USB_CONNECTED)
                 ret = PLUGIN_USB_CONNECTED;
             break;
     }
@@ -2787,13 +2787,13 @@ static int lrc_main(void)
     FOR_NB_SCREENS(i)
     {
 #ifdef HAVE_LCD_BITMAP
-        rb->viewportmanager_theme_enable(i, prefs.statusbar_on, &vp_info[i]);
+        viewportmanager_theme_enable(i, prefs.statusbar_on, &vp_info[i]);
         vp_lyrics[i] = vp_info[i];
         vp_lyrics[i].flags &= ~VP_FLAG_ALIGNMENT_MASK;
         vp_lyrics[i].y += h;
         vp_lyrics[i].height -= h;
 #else
-        rb->viewport_set_defaults(&vp_lyrics[i], i);
+        viewport_set_defaults(&vp_lyrics[i], i);
         if (prefs.display_time)
         {
             vp_lyrics[i].y += 1; /* time */
@@ -2822,12 +2822,12 @@ static int lrc_main(void)
                 current.id3 = NULL;
                 id3_timeout = 0;
             }
-            else if (rb->strcmp(current.mp3_file, current.id3->path))
+            else if (strcmp(current.mp3_file, current.id3->path))
             {
                 save_changes();
                 reset_current_data();
-                rb->strcpy(current.mp3_file, current.id3->path);
-                id3_timeout = *rb->current_tick+HZ*3;
+                strcpy(current.mp3_file, current.id3->path);
+                id3_timeout = current_tick+HZ*3;
                 current.found_lrc = false;
             }
         }
@@ -2852,7 +2852,7 @@ static int lrc_main(void)
         }
 
         if (current.id3 && id3_timeout &&
-            (TIME_AFTER(*rb->current_tick, id3_timeout) ||
+            (TIME_AFTER(current_tick, id3_timeout) ||
                 current.id3->artist))
         {
             update_display_state = true;
@@ -2898,7 +2898,7 @@ static int lrc_main(void)
 
 #ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_undo(i, false);
+        viewportmanager_theme_undo(i, false);
 #endif
     if (prefs.backlight_on)
         backlight_use_settings();
@@ -2915,11 +2915,11 @@ enum plugin_status plugin_start(const void* parameter)
     load_or_save_settings(false);
 
 #ifdef HAVE_LCD_BITMAP
-    uifont = rb->screens[0]->getuifont();
-    font_ui_height = rb->font_get(uifont)->height;
+    uifont = screens[0].getuifont();
+    font_ui_height = font_get(uifont)->height;
 #endif
 
-    lrc_buffer = rb->plugin_get_buffer(&lrc_buffer_size);
+    lrc_buffer = plugin_get_buffer(&lrc_buffer_size);
     lrc_buffer = (void *)(((long)lrc_buffer+3)&~3); /* 4 bytes aligned */
     lrc_buffer_size = (lrc_buffer_size - 4)&~3;
 
@@ -2932,24 +2932,24 @@ enum plugin_status plugin_start(const void* parameter)
     if (parameter && check_audio_status())
     {
         const char *ext;
-        rb->strcpy(current.mp3_file, current.id3->path);
+        strcpy(current.mp3_file, current.id3->path);
         /* use passed parameter as lrc file. */
-        rb->strcpy(current.lrc_file, parameter);
-        if (!rb->file_exists(current.lrc_file))
+        strcpy(current.lrc_file, parameter);
+        if (!file_exists(current.lrc_file))
         {
-            rb->splash(HZ, "Specified file dose not exist.");
+            splash(HZ, "Specified file dose not exist.");
             return PLUGIN_ERROR;
         }
-        ext = rb->strrchr(current.lrc_file, '.');
+        ext = strrchr(current.lrc_file, '.');
         if (!ext) ext = current.lrc_file;
         for (current.type = 0; current.type < NUM_TYPES; current.type++)
         {
-            if (!rb->strcasecmp(ext, extentions[current.type]))
+            if (!strcasecmp(ext, extentions[current.type]))
                 break;
         }
         if (current.type == NUM_TYPES)
         {
-            rb->splashf(HZ, "%s is not supported", ext);
+            splashf(HZ, "%s is not supported", ext);
             return PLUGIN_ERROR;
         }
         current.found_lrc = true;

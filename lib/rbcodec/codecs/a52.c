@@ -39,8 +39,8 @@ static uint8_t buf[3840] IBSS_ATTR;
 
 static inline void output_audio(sample_t *samples)
 {
-    ci->yield();
-    ci->pcmbuf_insert(&samples[0], &samples[256], 256);
+    yield();
+    codec_pcmbuf_insert(&samples[0], &samples[256], 256);
 }
 
 static void a52_decode_data(uint8_t *start, uint8_t *end)
@@ -102,7 +102,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                     output_audio(a52_samples(state));
                     samplesdone += 256;
                 }
-                ci->set_elapsed(samplesdone/(frequency/1000));
+                audio_codec_update_elapsed(samplesdone/(frequency/1000));
                 bufptr = buf;
                 bufpos = buf + 7;
                 continue;
@@ -120,8 +120,8 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 28);
     }
     else if (reason == CODEC_UNLOAD) {
         if (state)
@@ -142,8 +142,8 @@ enum codec_status codec_run(void)
     if (codec_init())
         return CODEC_ERROR;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-    codec_set_replaygain(ci->id3);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
+    codec_set_replaygain(ci.id3);
     
     /* Intialise the A52 decoder and check for success */
     state = a52_init(0);
@@ -151,41 +151,41 @@ enum codec_status codec_run(void)
     samplesdone = 0;
 
     /* The main decoding loop */
-    if (ci->id3->offset) {
-        if (ci->seek_buffer(ci->id3->offset)) {
-            samplesdone = (ci->id3->offset / ci->id3->bytesperframe) *
+    if (ci.id3->offset) {
+        if (codec_seek_buffer(ci.id3->offset)) {
+            samplesdone = (ci.id3->offset / ci.id3->bytesperframe) *
                 A52_SAMPLESPERFRAME;
-            ci->set_elapsed(samplesdone/(ci->id3->frequency / 1000));
+            audio_codec_update_elapsed(samplesdone/(ci.id3->frequency / 1000));
         }
     }
     else {
-        ci->seek_buffer(ci->id3->first_frame_offset);
-        ci->set_elapsed(0);
+        codec_seek_buffer(ci.id3->first_frame_offset);
+        audio_codec_update_elapsed(0);
     }
 
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
-            sample_loc = param/1000 * ci->id3->frequency;
+            sample_loc = param/1000 * ci.id3->frequency;
 
-            if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*ci->id3->bytesperframe)) {
+            if (codec_seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*ci.id3->bytesperframe)) {
                 samplesdone = sample_loc;
-                ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
+                audio_codec_update_elapsed(samplesdone/(ci.id3->frequency/1000));
             }
-            ci->seek_complete();
+            codec_seek_complete();
         }
 
-        filebuf = ci->request_buffer(&n, BUFFER_SIZE);
+        filebuf = codec_request_buffer(&n, BUFFER_SIZE);
 
         if (n == 0) /* End of Stream */
             break;
   
         a52_decode_data(filebuf, filebuf + n);
-        ci->advance_buffer(n);
+        codec_advance_buffer(n);
     }
 
     return CODEC_OK;

@@ -59,7 +59,7 @@ static struct pcm_pos *get_seek_pos(uint32_t seek_val, int seek_mode,
 {
     static struct pcm_pos newpos;
     uint32_t newblock = (seek_mode == PCM_SEEK_TIME) ?
-                        ((uint64_t)seek_val * ci->id3->frequency / 1000LL)
+                        ((uint64_t)seek_val * ci.id3->frequency / 1000LL)
                                             / fmt->samplesperblock :
                         seek_val / fmt->blockalign;
 

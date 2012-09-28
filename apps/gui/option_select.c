@@ -35,7 +35,7 @@
 #include "splash.h"
 #include "menu.h"
 #include "quickscreen.h"
-
+#include "symbols.h"
 
 static int selection_to_val(const struct settings_list *setting, int selection);
 int option_value_as_int(const struct settings_list *setting)
@@ -574,6 +574,7 @@ bool option_screen(const struct settings_list *setting,
     pop_current_activity();
     return false;
 }
+EXPORT_SYMBOL(option_screen);
 
 int get_setting_info_for_bar(int setting_id, int *count, int *val)
 {

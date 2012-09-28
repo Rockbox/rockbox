@@ -115,10 +115,10 @@ void gui_thread(void)
         if(update)
             pd_gui_draw(widget, widgets);
 
-        rb->sleep(1);
+        sleep(1);
     }
 
-    rb->thread_exit();
+    thread_exit();
 }
 
 /* Core thread */
@@ -146,10 +146,10 @@ void core_thread(void)
         while(sys_send_dacs() != SENDDACS_NO)
             sched_tick(sys_time + sys_time_per_dsp_tick);
 
-        rb->sleep(1);
+        sleep(1);
     }
 
-    rb->thread_exit();
+    thread_exit();
 }
 
 
@@ -165,15 +165,15 @@ enum plugin_status plugin_start(const void* parameter)
     filename = (char*) parameter;
     if(strlen(filename) == 0)
     {
-        rb->splash(HZ, "Play a .pd file!");
+        splash(HZ, "Play a .pd file!");
         return PLUGIN_ERROR;
     }
 
     /* Initialize memory pool. */
-    mem_pool = rb->plugin_get_audio_buffer(&mem_size);
+    mem_pool = plugin_get_audio_buffer(&mem_size);
     if(mem_size < MIN_MEM_SIZE)
     {
-        rb->splash(HZ, "Not enough memory!");
+        splash(HZ, "Not enough memory!");
         return PLUGIN_ERROR;
     }
 
@@ -212,18 +212,18 @@ enum plugin_status plugin_start(const void* parameter)
     gui_stack = getbytes(GUISTACKSIZE);
     if(core_stack == NULL || gui_stack == NULL)
     {
-        rb->splash(HZ, "Not enough memory!");
+        splash(HZ, "Not enough memory!");
         return PLUGIN_ERROR;
     }
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     /* Boost CPU. */
-    rb->trigger_cpu_boost();
+    trigger_cpu_boost();
 #endif
 
     /* Start threads. */
     core_thread_id =
-        rb->create_thread(&core_thread,
+        create_thread(&core_thread,
                           core_stack,
                           CORESTACKSIZE,
                           0, /* FIXME Which flags? */
@@ -232,7 +232,7 @@ enum plugin_status plugin_start(const void* parameter)
                           IF_COP(, COP));
 
     gui_thread_id =
-        rb->create_thread(&gui_thread,
+        create_thread(&gui_thread,
                           gui_stack,
                           GUISTACKSIZE,
                           0, /* FIXME Which flags? */
@@ -254,19 +254,19 @@ enum plugin_status plugin_start(const void* parameter)
         runningtime += (1000 / HZ);
 
         /* Sleep to the next time slice. */
-        rb->sleep(1);
+        sleep(1);
     }
     
     /* Restore backlight. */
     backlight_use_settings();
 
     /* Wait for threads to complete. */
-    rb->thread_wait(gui_thread_id);
-    rb->thread_wait(core_thread_id);
+    thread_wait(gui_thread_id);
+    thread_wait(core_thread_id);
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     /* Unboost CPU. */
-    rb->cancel_cpu_boost();
+    cancel_cpu_boost();
 #endif
 
     /* Close audio subsystem. */

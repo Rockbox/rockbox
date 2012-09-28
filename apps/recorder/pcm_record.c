@@ -38,6 +38,7 @@
 #ifdef HAVE_SPDIF_IN
 #include "spdif.h"
 #endif
+#include "symbols.h"
 
 /***************************************************************************/
 
@@ -487,6 +488,7 @@ void audio_set_recording_gain(int left, int right, int type)
     //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
     audiohw_set_recvol(left, right, type);
 } /* audio_set_recording_gain */
+EXPORT_SYMBOL(audio_set_recording_gain);
 
 /** Information about current state **/
 
@@ -1557,6 +1559,7 @@ void enc_get_inputs(struct enc_inputs *inputs)
     inputs->rec_mono_mode = rec_mono_mode;
     inputs->config       = &enc_config;
 } /* enc_get_inputs */
+EXPORT_SYMBOL(enc_get_inputs);
 
 /* set the encoder dimensions (called by encoder codec at initialization and
    termination) */
@@ -1668,6 +1671,7 @@ void enc_set_parameters(struct enc_parameters *params)
 
     logf("enc_set_parameters done");
 } /* enc_set_parameters */
+EXPORT_SYMBOL(enc_set_parameters);
 
 /* return encoder chunk at current write position  -
    NOTE: can be called by pcmrec thread when splitting streams */
@@ -1690,6 +1694,7 @@ struct enc_chunk_hdr * enc_get_chunk(void)
 
     return chunk;
 } /* enc_get_chunk */
+EXPORT_SYMBOL(enc_get_chunk);
 
 /* releases the current chunk into the available chunks - 
    NOTE: can be called by pcmrec thread when splitting streams */
@@ -1738,6 +1743,7 @@ void enc_finish_chunk(void)
         INC_ENC_INDEX(enc_rd_index);
     }
 } /* enc_finish_chunk */
+EXPORT_SYMBOL(enc_finish_chunk);
 
 /* passes a pointer to next chunk of unprocessed wav data */
 /* TODO: this really should give the actual size returned */
@@ -1787,6 +1793,7 @@ unsigned char * enc_get_pcm_data(size_t size)
 
     return NULL;
 } /* enc_get_pcm_data */
+EXPORT_SYMBOL(enc_get_pcm_data);
 
 /* puts some pcm data back in the queue */
 size_t enc_unget_pcm_data(size_t size)
@@ -1811,3 +1818,4 @@ size_t enc_unget_pcm_data(size_t size)
 
     return 0;
 } /* enc_unget_pcm_data */
+EXPORT_SYMBOL(enc_unget_pcm_data);

@@ -76,6 +76,7 @@ PORTABILITY
 
 #include <_ansi.h>
 #include <stdlib.h>
+#include "symbols.h"
 
 #ifndef __GNUC__
 #define inline
@@ -220,3 +221,4 @@ loop:   SWAPINIT(a, es);
         }
 /*              qsort(pn - r, r / es, es, cmp);*/
 }
+EXPORT_SYMBOL(qsort);

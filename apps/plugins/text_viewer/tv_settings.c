@@ -141,7 +141,7 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
     else if (version == 1)
         read_size -= 16;
 
-    if (rb->read(pfd, buf, read_size) < 0)
+    if (read(pfd, buf, read_size) < 0)
         return false;
 
     prefs->word_mode = *p++;
@@ -216,9 +216,9 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
         prefs->statusbar = (*p++ != 0);
 
 #ifdef HAVE_LCD_BITMAP
-    rb->strlcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
+    strlcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
 
-    prefs->font_id = rb->global_status->font_id[SCREEN_MAIN];
+    prefs->font_id = global_status.font_id[SCREEN_MAIN];
 #endif
 
     return true;
@@ -228,7 +228,7 @@ static void tv_serialize_preferences(unsigned char *buf, const struct tv_prefere
 {
     unsigned char *p = buf;
 
-    rb->memset(buf, 0, TV_PREFERENCES_SIZE);
+    memset(buf, 0, TV_PREFERENCES_SIZE);
     *p++ = prefs->word_mode;
     *p++ = prefs->line_mode;
     *p++ = prefs->windows;
@@ -249,7 +249,7 @@ static void tv_serialize_preferences(unsigned char *buf, const struct tv_prefere
     *p++ = prefs->statusbar;
 
 #ifdef HAVE_LCD_BITMAP
-    rb->strlcpy(buf + 28, prefs->font_name, MAX_PATH);
+    strlcpy(buf + 28, prefs->font_name, MAX_PATH);
 #endif
 }
 
@@ -259,7 +259,7 @@ static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
     
     tv_serialize_preferences(buf, prefs);
 
-    return (rb->write(pfd, buf, TV_PREFERENCES_SIZE) >= 0);
+    return (write(pfd, buf, TV_PREFERENCES_SIZE) >= 0);
 }
 
 /* ----------------------------------------------------------------------------
@@ -275,13 +275,13 @@ static bool tv_convert_settings(int sfd, int dfd, int old_ver)
     unsigned char buf[MAX_PATH + 2];
     int settings_size;
 
-    rb->read(sfd, buf, MAX_PATH + 2);
-    rb->write(dfd, buf, MAX_PATH + 2);
+    read(sfd, buf, MAX_PATH + 2);
+    write(dfd, buf, MAX_PATH + 2);
 
     settings_size = (buf[MAX_PATH] << 8) | buf[MAX_PATH + 1];
 
-    old_pos = rb->lseek(sfd, 0, SEEK_CUR);
-    new_pos = rb->lseek(dfd, 0, SEEK_CUR);
+    old_pos = lseek(sfd, 0, SEEK_CUR);
+    new_pos = lseek(dfd, 0, SEEK_CUR);
 
     /*
      * when the settings size != preferences size + bookmarks size,
@@ -296,20 +296,20 @@ static bool tv_convert_settings(int sfd, int dfd, int old_ver)
     if (!tv_write_preferences(dfd, &new_prefs))
         return false;
 
-    settings_size -= (rb->lseek(sfd, 0, SEEK_CUR) - old_pos);
+    settings_size -= (lseek(sfd, 0, SEEK_CUR) - old_pos);
 
     if (settings_size > 0)
     {
-        rb->read(sfd, buf, settings_size);
-        rb->write(dfd, buf, settings_size);
+        read(sfd, buf, settings_size);
+        write(dfd, buf, settings_size);
     }
 
-    settings_size = rb->lseek(dfd, 0, SEEK_CUR) - new_pos;
+    settings_size = lseek(dfd, 0, SEEK_CUR) - new_pos;
     buf[0] = settings_size >> 8;
     buf[1] = settings_size;
-    rb->lseek(dfd, new_pos - 2, SEEK_SET);
-    rb->write(dfd, buf, 2);
-    rb->lseek(dfd, settings_size, SEEK_CUR);
+    lseek(dfd, new_pos - 2, SEEK_SET);
+    write(dfd, buf, 2);
+    lseek(dfd, settings_size, SEEK_CUR);
     return true;
 }
 
@@ -323,22 +323,22 @@ static void tv_convert_settings_file(void)
     int version;
     bool res = false;
 
-    if ((sfd = rb->open(VIEWER_SETTINGS_FILE, O_RDONLY)) < 0)
+    if ((sfd = open(VIEWER_SETTINGS_FILE, O_RDONLY)) < 0)
         return;
 
-    if ((tfd = rb->open(TV_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
+    if ((tfd = open(TV_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
     {
-        rb->close(sfd);
+        close(sfd);
         return;
     }
 
-    if (rb->read(sfd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0)
+    if (read(sfd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0)
     {
         version = buf[TV_SETTINGS_HEADER_SIZE - 1] - TV_SETTINGS_FIRST_VERSION;
         fcount  = (buf[TV_SETTINGS_HEADER_SIZE] << 8) | buf[TV_SETTINGS_HEADER_SIZE + 1];
         buf[TV_SETTINGS_HEADER_SIZE - 1] = TV_SETTINGS_VERSION;
 
-        if (rb->write(tfd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0)
+        if (write(tfd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0)
         {
             res = true;
             for (i = 0; i < fcount; i++)
@@ -352,13 +352,13 @@ static void tv_convert_settings_file(void)
         }
     }
 
-    rb->close(sfd);
-    rb->close(tfd);
+    close(sfd);
+    close(tfd);
 
     if (res)
-        rb->rename(TV_SETTINGS_TMP_FILE, TV_SETTINGS_FILE);
+        rename(TV_SETTINGS_TMP_FILE, TV_SETTINGS_FILE);
     else
-        rb->remove(TV_SETTINGS_TMP_FILE);
+        remove(TV_SETTINGS_TMP_FILE);
 
     return;
 }
@@ -379,18 +379,18 @@ bool tv_load_global_settings(struct tv_preferences *prefs)
      * the viewer.rock's setting file read when the text_viewer.rock's setting file
      * does not read.
      */
-    if ((fd = rb->open(TV_GLOBAL_SETTINGS_FILE, O_RDONLY)) < 0)
-        fd = rb->open(VIEWER_GLOBAL_SETTINGS_FILE, O_RDONLY);
+    if ((fd = open(TV_GLOBAL_SETTINGS_FILE, O_RDONLY)) < 0)
+        fd = open(VIEWER_GLOBAL_SETTINGS_FILE, O_RDONLY);
 
     if (fd >= 0)
     {
-        if ((rb->read(fd, buf, TV_GLOBAL_SETTINGS_HEADER_SIZE) > 0) &&
-            (rb->memcmp(buf, TV_GLOBAL_SETTINGS_HEADER, TV_GLOBAL_SETTINGS_HEADER_SIZE - 1) == 0))
+        if ((read(fd, buf, TV_GLOBAL_SETTINGS_HEADER_SIZE) > 0) &&
+            (memcmp(buf, TV_GLOBAL_SETTINGS_HEADER, TV_GLOBAL_SETTINGS_HEADER_SIZE - 1) == 0))
         {
             version = buf[TV_GLOBAL_SETTINGS_HEADER_SIZE - 1] - TV_GLOBAL_SETTINGS_FIRST_VERSION;
             res = tv_read_preferences(fd, version, prefs);
         }
-        rb->close(fd);
+        close(fd);
     }
     return res;
 }
@@ -401,23 +401,23 @@ bool tv_save_global_settings(const struct tv_preferences *prefs)
     int fd;
     bool res;
 
-    if ((fd = rb->open(TV_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
+    if ((fd = open(TV_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
          return false;
 
-    rb->memcpy(buf, TV_GLOBAL_SETTINGS_HEADER, TV_GLOBAL_SETTINGS_HEADER_SIZE - 1);
+    memcpy(buf, TV_GLOBAL_SETTINGS_HEADER, TV_GLOBAL_SETTINGS_HEADER_SIZE - 1);
     buf[TV_GLOBAL_SETTINGS_HEADER_SIZE - 1] = TV_GLOBAL_SETTINGS_VERSION;
 
-    res = (rb->write(fd, buf, TV_GLOBAL_SETTINGS_HEADER_SIZE) >= 0) &&
+    res = (write(fd, buf, TV_GLOBAL_SETTINGS_HEADER_SIZE) >= 0) &&
           (tv_write_preferences(fd, prefs));
-    rb->close(fd);
+    close(fd);
 
     if (res)
     {
-        rb->remove(TV_GLOBAL_SETTINGS_FILE);
-        rb->rename(TV_SETTINGS_TMP_FILE, TV_GLOBAL_SETTINGS_FILE);
+        remove(TV_GLOBAL_SETTINGS_FILE);
+        rename(TV_SETTINGS_TMP_FILE, TV_GLOBAL_SETTINGS_FILE);
     }
     else
-        rb->remove(TV_SETTINGS_TMP_FILE);
+        remove(TV_SETTINGS_TMP_FILE);
 
     return res;
 }
@@ -439,25 +439,25 @@ bool tv_load_settings(const unsigned char *file_name)
     struct tv_preferences prefs;
     off_t current_pref_offset;
 
-    if (!rb->file_exists(TV_SETTINGS_FILE))
+    if (!file_exists(TV_SETTINGS_FILE))
         tv_convert_settings_file();
 
-    if ((fd = rb->open(TV_SETTINGS_FILE, O_RDONLY)) >= 0)
+    if ((fd = open(TV_SETTINGS_FILE, O_RDONLY)) >= 0)
     {
-        if ((rb->read(fd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0) &&
-            (rb->memcmp(buf, TV_SETTINGS_HEADER, TV_SETTINGS_HEADER_SIZE - 1) == 0))
+        if ((read(fd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0) &&
+            (memcmp(buf, TV_SETTINGS_HEADER, TV_SETTINGS_HEADER_SIZE - 1) == 0))
         {
             version = buf[TV_SETTINGS_HEADER_SIZE - 1] - TV_SETTINGS_FIRST_VERSION;
             fcount = (buf[TV_SETTINGS_HEADER_SIZE] << 8) | buf[TV_SETTINGS_HEADER_SIZE+1];
             
-            current_pref_offset = rb->lseek(fd, 0, SEEK_CUR);
+            current_pref_offset = lseek(fd, 0, SEEK_CUR);
 
             for (i = 0; i < fcount; i++)
             {
-                if (rb->read(fd, buf, MAX_PATH+2) >= 0)
+                if (read(fd, buf, MAX_PATH+2) >= 0)
                 {
                     size = (buf[MAX_PATH] << 8) | buf[MAX_PATH+1];
-                    if (rb->strcmp(buf, file_name) == 0)
+                    if (strcmp(buf, file_name) == 0)
                     {
                         if (tv_read_preferences(fd, version, &prefs))
                             res = tv_deserialize_bookmarks(fd);
@@ -469,16 +469,16 @@ bool tv_load_settings(const unsigned char *file_name)
 
                         break;
                     }
-                    current_pref_offset = rb->lseek(fd, size, SEEK_CUR);
+                    current_pref_offset = lseek(fd, size, SEEK_CUR);
                 }
             }
-            rb->close(fd);
+            close(fd);
         }
         else
         {
             /* when the settings file is illegal, removes it */
-            rb->close(fd);
-            rb->remove(TV_SETTINGS_FILE);
+            close(fd);
+            remove(TV_SETTINGS_FILE);
         }
     }
     if (!res)
@@ -487,7 +487,7 @@ bool tv_load_settings(const unsigned char *file_name)
         if (!tv_load_global_settings(&prefs))
             tv_set_default_preferences(&prefs);
     }
-    rb->strlcpy(prefs.file_name, file_name, MAX_PATH);
+    strlcpy(prefs.file_name, file_name, MAX_PATH);
     return tv_set_preferences(&prefs);
 }
 
@@ -508,8 +508,8 @@ bool tv_save_settings(void)
     tv_create_system_bookmark();
 
     /* storing preferences record in memory */
-    rb->memset(preferences_buf, 0, MAX_PATH);
-    rb->strlcpy(preferences_buf, preferences->file_name, MAX_PATH);
+    memset(preferences_buf, 0, MAX_PATH);
+    strlcpy(preferences_buf, preferences->file_name, MAX_PATH);
     preferences_buf_size = MAX_PATH + 2;
 
     tv_serialize_preferences(preferences_buf + preferences_buf_size, preferences);
@@ -524,77 +524,77 @@ bool tv_save_settings(void)
     if ( (stored_preferences_offset > 0) && (stored_preferences_size == size) )
     {
         DEBUGF("Saving preferences: overwriting\n");
-        if ((tfd = rb->open(TV_SETTINGS_FILE, O_WRONLY)) < 0)
+        if ((tfd = open(TV_SETTINGS_FILE, O_WRONLY)) < 0)
             return false;
-        rb->lseek(tfd, stored_preferences_offset, SEEK_SET);
-        res = (rb->write(tfd, preferences_buf, preferences_buf_size) >= 0);
-        rb->close(tfd);
+        lseek(tfd, stored_preferences_offset, SEEK_SET);
+        res = (write(tfd, preferences_buf, preferences_buf_size) >= 0);
+        close(tfd);
         return res;
     }
 
 
-    if (!rb->file_exists(TV_SETTINGS_FILE))
+    if (!file_exists(TV_SETTINGS_FILE))
         tv_convert_settings_file();
 
     
     /* Try appending preferences */
     if ( (stored_preferences_offset == 0) &&
-         ( (tfd = rb->open(TV_SETTINGS_FILE, O_RDWR)) >= 0) )
+         ( (tfd = open(TV_SETTINGS_FILE, O_RDWR)) >= 0) )
     {
         DEBUGF("Saving preferences: appending\n");
-        rb->lseek(tfd, 0, SEEK_END);
-        if (rb->write(tfd, preferences_buf, preferences_buf_size) < 0)
+        lseek(tfd, 0, SEEK_END);
+        if (write(tfd, preferences_buf, preferences_buf_size) < 0)
             return false;
 
-        rb->lseek(tfd, TV_SETTINGS_HEADER_SIZE, SEEK_SET);
-        rb->read(tfd, buf, 2);
+        lseek(tfd, TV_SETTINGS_HEADER_SIZE, SEEK_SET);
+        read(tfd, buf, 2);
         fcount = (buf[0] << 8) | buf[1];
         fcount ++;
         buf[0] = fcount >> 8;
         buf[1] = fcount;
-        rb->lseek(tfd, TV_SETTINGS_HEADER_SIZE, SEEK_SET);
-        res = rb->write(tfd, buf, 2) >= 0;
+        lseek(tfd, TV_SETTINGS_HEADER_SIZE, SEEK_SET);
+        res = write(tfd, buf, 2) >= 0;
 
-        rb->close(tfd);
+        close(tfd);
         return res;
     }
 
     /* create header for the temporary file */
-    rb->memcpy(buf, TV_SETTINGS_HEADER, TV_SETTINGS_HEADER_SIZE - 1);
+    memcpy(buf, TV_SETTINGS_HEADER, TV_SETTINGS_HEADER_SIZE - 1);
     buf[TV_SETTINGS_HEADER_SIZE - 1] = TV_SETTINGS_VERSION;
 
-    if ((tfd = rb->open(TV_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
+    if ((tfd = open(TV_SETTINGS_TMP_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0)
         return false;
 
-    if (rb->write(tfd, buf, TV_SETTINGS_HEADER_SIZE + 2) < 0)
+    if (write(tfd, buf, TV_SETTINGS_HEADER_SIZE + 2) < 0)
     {
-        rb->close(tfd);
+        close(tfd);
         return false;
     }
 
-    if ((ofd = rb->open(TV_SETTINGS_FILE, O_RDONLY)) >= 0)
+    if ((ofd = open(TV_SETTINGS_FILE, O_RDONLY)) >= 0)
     {
-        res = ((rb->read(ofd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0) &&
-               (rb->memcmp(buf, TV_SETTINGS_HEADER, TV_SETTINGS_HEADER_SIZE - 1) == 0));
+        res = ((read(ofd, buf, TV_SETTINGS_HEADER_SIZE + 2) >= 0) &&
+               (memcmp(buf, TV_SETTINGS_HEADER, TV_SETTINGS_HEADER_SIZE - 1) == 0));
 
         if (res)
         {
             fcount = (buf[TV_SETTINGS_HEADER_SIZE] << 8) | buf[TV_SETTINGS_HEADER_SIZE + 1];
             for (i = 0; i < fcount; i++)
             {
-                if (rb->read(ofd, buf, MAX_PATH + 2) < 0)
+                if (read(ofd, buf, MAX_PATH + 2) < 0)
                 {
                     res = false;
                     break;
                 }
 
                 size = (buf[MAX_PATH] << 8) | buf[MAX_PATH + 1];
-                if (rb->strcmp(buf, preferences->file_name) == 0)
-                    rb->lseek(ofd, size, SEEK_CUR);
+                if (strcmp(buf, preferences->file_name) == 0)
+                    lseek(ofd, size, SEEK_CUR);
                 else
                 {
-                    if ((rb->read(ofd, buf + (MAX_PATH + 2), size) < 0) ||
-                        (rb->write(tfd, buf, size + MAX_PATH + 2) < 0))
+                    if ((read(ofd, buf + (MAX_PATH + 2), size) < 0) ||
+                        (write(tfd, buf, size + MAX_PATH + 2) < 0))
                     {
                         res = false;
                         break;
@@ -603,7 +603,7 @@ bool tv_save_settings(void)
                 }
             }
         }
-        rb->close(ofd);
+        close(ofd);
     }
 
     if (res)
@@ -611,25 +611,25 @@ bool tv_save_settings(void)
         /* save to current read file's preferences and bookmarks */
         res = false;
 
-        if (rb->write(tfd, preferences_buf, preferences_buf_size) >= 0)
+        if (write(tfd, preferences_buf, preferences_buf_size) >= 0)
         {
-            rb->lseek(tfd, TV_SETTINGS_HEADER_SIZE, SEEK_SET);
+            lseek(tfd, TV_SETTINGS_HEADER_SIZE, SEEK_SET);
 
             new_fcount++;
             buf[0] = new_fcount >> 8;
             buf[1] = new_fcount;
-            res = (rb->write(tfd, buf, 2) >= 0);
+            res = (write(tfd, buf, 2) >= 0);
         }
     }
-    rb->close(tfd);
+    close(tfd);
 
     if (res)
     {
-        rb->remove(TV_SETTINGS_FILE);
-        rb->rename(TV_SETTINGS_TMP_FILE, TV_SETTINGS_FILE);
+        remove(TV_SETTINGS_FILE);
+        rename(TV_SETTINGS_TMP_FILE, TV_SETTINGS_FILE);
     }
     else
-        rb->remove(TV_SETTINGS_TMP_FILE);
+        remove(TV_SETTINGS_TMP_FILE);
 
     return res;
 }

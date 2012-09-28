@@ -110,7 +110,7 @@ static void shades_generate(int time)
         r++; g++; b++;
     }
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_pal256_update_pal(colours);
+    lcd_pal256_update_pal(colours);
 #endif
 }
 #else
@@ -133,7 +133,7 @@ static void cleanup(void)
 {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (boosted)
-        rb->cpu_boost(false);
+        cpu_boost(false);
 #endif
 #ifndef HAVE_LCD_COLOR
     grey_release();
@@ -141,7 +141,7 @@ static void cleanup(void)
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
+    lcd_set_mode(LCD_MODE_RGB565);
 #endif
 }
 
@@ -156,7 +156,7 @@ int main(void)
     int action, x, y;
     unsigned char p1,p2,p3,p4,t1,t2,t3,t4, z,z0;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    long last_tick = *rb->current_tick;
+    long last_tick = current_tick;
     int delay;
     int cumulated_lag = 0;
 #endif
@@ -178,11 +178,11 @@ int main(void)
     shades_generate();  /* statically */
 
     /* get the remainder of the plugin buffer */
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *) plugin_get_buffer(&gbuf_size);
 
     if (!grey_init(gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL))
     {
-        rb->splash(HZ, "Couldn't init greyscale display");
+        splash(HZ, "Couldn't init greyscale display");
         return PLUGIN_ERROR;
     }
     /* switch on greyscale overlay */
@@ -199,9 +199,9 @@ int main(void)
 #ifdef HAVE_LCD_COLOR
         shades_generate(time++); /* dynamically */
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        ptr = (unsigned char*)rb->lcd_framebuffer;
+        ptr = (unsigned char*)lcd_framebuffer;
 #else
-        ptr = rb->lcd_framebuffer;
+        ptr = lcd_framebuffer;
 #endif
 
 #else
@@ -227,7 +227,7 @@ int main(void)
             }
             t1+=2;
             t2+=1;
-            rb->yield();
+            yield();
         }
         p1+=sp1;
         p2-=sp2;
@@ -235,29 +235,29 @@ int main(void)
         p4-=sp4;
 #ifdef HAVE_LCD_COLOR
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        rb->lcd_blit_pal256(    (unsigned char*)rb->lcd_framebuffer,
+        lcd_blit_pal256(    (unsigned char*)lcd_framebuffer,
                                 0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
 #else
-        rb->lcd_update();
+        lcd_update();
 #endif
 #else
         grey_ub_gray_bitmap(greybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        delay = last_tick - *rb->current_tick + HZ/33;
+        delay = last_tick - current_tick + HZ/33;
         if (!boosted && delay < 0)
         {
             cumulated_lag -= delay;     /* proportional increase */
             if (cumulated_lag >= HZ)
-                rb->cpu_boost(boosted = true);
+                cpu_boost(boosted = true);
         }
         else if (boosted && delay > 1)  /* account for jitter */
         {
             if (--cumulated_lag <= 0)   /* slow decrease */
-                rb->cpu_boost(boosted = false);
+                cpu_boost(boosted = false);
         }
-        last_tick = *rb->current_tick;
+        last_tick = current_tick;
 #endif
         action = pluginlib_getaction(0, plugin_contexts,
                         ARRAYLEN(plugin_contexts));
@@ -293,12 +293,12 @@ int main(void)
                 break;
 #ifdef HAVE_LCD_COLOR
             case PLA_SELECT:
-                redfactor=rb->rand()%4;
-                greenfactor=rb->rand()%4;
-                bluefactor=rb->rand()%4;
-                redphase=rb->rand()%256;
-                greenphase=rb->rand()%256;
-                bluephase=rb->rand()%256;
+                redfactor=rand()%4;
+                greenfactor=rand()%4;
+                bluefactor=rand()%4;
+                redphase=rand()%256;
+                greenphase=rand()%256;
+                bluephase=rand()%256;
                 break;
 #endif
 
@@ -315,13 +315,13 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_PAL256);
+    lcd_set_mode(LCD_MODE_PAL256);
 #endif
     return main();
 }

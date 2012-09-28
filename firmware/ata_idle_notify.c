@@ -24,6 +24,7 @@
 #include "ata_idle_notify.h"
 #include "kernel.h"
 #include "string.h"
+#include "symbols.h"
 
 void register_storage_idle_func(void (*function)(void *data))
 {
@@ -36,6 +37,7 @@ void register_storage_idle_func(void (*function)(void *data))
    the callback will be run before this function exits, so before the var is set */
 #endif
 }
+EXPORT_SYMBOL(register_storage_idle_func);
 
 #if USING_STORAGE_CALLBACK
 void unregister_storage_idle_func(void (*func)(void *data), bool run)
@@ -45,6 +47,7 @@ void unregister_storage_idle_func(void (*func)(void *data), bool run)
     if (run)
         func(NULL);
 }
+EXPORT_SYMBOL(unregister_storage_idle_func);
 
 bool call_storage_idle_notifys(bool force)
 {

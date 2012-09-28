@@ -40,6 +40,7 @@
 #include "rbunicode.h"
 #include "diacritic.h"
 #include "rbpaths.h"
+#include "symbols.h"
 
 #define MAX_FONTSIZE_FOR_16_BIT_OFFSETS 0xFFDB
 
@@ -581,6 +582,7 @@ int font_load(const char *path)
 {
     return font_load_ex(path, MAX_FONT_SIZE, GLYPHS_TO_CACHE);
 }
+EXPORT_SYMBOL(font_load);
 
 void font_unload(int font_id)
 {
@@ -606,6 +608,7 @@ void font_unload(int font_id)
 
     }
 }
+EXPORT_SYMBOL(font_unload);
 
 void font_unload_all(void)
 {
@@ -646,6 +649,7 @@ struct font* font_get(int font)
             return &sysfont;
     }
 }
+EXPORT_SYMBOL(font_get);
 
 /*
  * Reads an entry into cache entry
@@ -733,6 +737,7 @@ int font_get_width(struct font* pf, unsigned short char_code)
         font_cache_get(&pf->cache,char_code,load_cache_entry,pf)->width:
         pf->width? pf->width[char_code]: pf->maxwidth;
 }
+EXPORT_SYMBOL(font_get_width);
 
 const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 {
@@ -764,6 +769,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 
     return bits;
 }
+EXPORT_SYMBOL(font_get_bits);
 
 static void font_path_to_glyph_path( const char *font_path, char *glyph_path)
 {
@@ -984,6 +990,7 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
     font_lock( fontnumber, false );
     return width;
 }
+EXPORT_SYMBOL(font_getstringsize);
 
 /* -----------------------------------------------------------------
  * vim: et sw=4 ts=8 sts=4 tw=78

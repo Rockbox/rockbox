@@ -45,13 +45,13 @@
 
 #include "gcc_extensions.h"
 #include "load_code.h"
-
+#include "general.h" /* for round_value_to_list32() */
 #ifdef CODEC
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
-#define DEBUGF  ci->debugf
+#define DEBUGF  debugf
 #undef LDEBUGF
-#define LDEBUGF ci->debugf
+#define LDEBUGF debugf
 #else
 #define DEBUGF(...)
 #define LDEBUGF(...)
@@ -59,7 +59,7 @@
 
 #ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
-#define LOGF ci->logf
+#define LOGF logf
 #else
 #define LOGF(...)
 #endif
@@ -105,15 +105,16 @@ enum codec_command_action {
          version
  */
 struct codec_api {
-    off_t  filesize;          /* Total file length */
-    off_t  curpos;            /* Current buffer position */
+    off_t  filesize;          /* Total file length         + */
+    off_t  curpos;            /* Current buffer position   + */
     
-    struct mp3entry *id3;     /* TAG metadata pointer */
-    int    audio_hid;         /* Current audio handle */
+    struct mp3entry *id3;     /* TAG metadata pointer      + */
+    int    audio_hid;         /* Current audio handle      + */
     
-    /* The dsp instance to be used for audio output */
+    /* The dsp instance to be used for audio output        + */
     struct dsp_config *dsp;
-    
+
+#if 0    
     /* Returns buffer to malloc array. Only codeclib should need this. */
     void* (*codec_get_buffer)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
@@ -221,7 +222,10 @@ struct codec_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+#endif
 };
+
+extern struct codec_api ci;
 
 /* codec header */
 struct codec_header {
@@ -242,14 +246,14 @@ extern unsigned char plugin_end_addr[];
         __attribute__ ((section (".header")))= { \
         { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
         plugin_start_addr, plugin_end_addr }, codec_start, \
-        codec_run, &ci };
+        codec_run, NULL }; //&ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
         plugin_start_addr, plugin_end_addr }, codec_start, \
-        codec_run, &ci };
+        codec_run, NULL }; //&ci };
 
 #else /* def SIMULATOR */
 /* decoders */
@@ -271,7 +275,7 @@ extern unsigned char plugin_end_addr[];
 void codec_get_full_path(char *path, const char *codec_root_fn);
 
 /* Returns pointer to and size of free codec RAM */
-void *codec_get_buffer_callback(size_t *size);
+void *codec_get_buffer(size_t *size);
 
 /* defined by the codec loader (codec.c) */
 int codec_load_buf(int hid, struct codec_api *api);
@@ -279,6 +283,20 @@ int codec_load_file(const char* codec, struct codec_api *api);
 int codec_run_proc(void);
 int codec_halt(void);
 int codec_close(void);
+
+/* interface defined in codec_thread.c */
+void codec_pcmbuf_insert(const void *ch1, const void *ch2, int count);
+size_t codec_read_filebuf(void *ptr, size_t size);
+void * codec_request_buffer(size_t *realsize, size_t reqsize);
+void codec_advance_buffer(size_t amount);
+bool codec_seek_buffer(size_t newpos);
+void codec_seek_complete(void);
+void codec_configure(int setting, intptr_t value);
+enum codec_command_action codec_get_command(intptr_t *param);
+bool codec_loop_track(void);
+/* interface defined in apps/playback.c */
+void audio_codec_update_elapsed(unsigned long elapsed);
+void audio_codec_update_offset(size_t offset);
 
 /* defined by the codec */
 enum codec_status codec_start(enum codec_entry_call_reason reason);

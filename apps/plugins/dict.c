@@ -70,7 +70,7 @@ enum plugin_status plugin_start(const void* parameter)
     char *description; /* pointer to description buffer */
     struct stWord word; /* the struct to read into */
     int fIndex, fData; /* files */
-    int filesize, high, low, probe;
+    int file_size, high, low, probe;
     char *buffer;
     size_t buffer_size;
 
@@ -78,11 +78,11 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
     /* allocate buffer. */
-    buffer = rb->plugin_get_buffer(&buffer_size);
+    buffer = plugin_get_buffer(&buffer_size);
     if (buffer == NULL || buffer_size < MIN_DESC_BUF_SIZE)
     {
         DEBUGF("Err: Failed to allocate buffer.\n");
-        rb->splash(HZ*2, "Failed to allocate buffer.");
+        splash(HZ*2, "Failed to allocate buffer.");
         return PLUGIN_ERROR;
     }
 
@@ -92,24 +92,24 @@ enum plugin_status plugin_start(const void* parameter)
     searchword[0] = '\0';
 
     /* get the word to search */
-    if (rb->kbd_input(searchword, sizeof(searchword)) < 0)
+    if (kbd_input(searchword, sizeof(searchword)) < 0)
         return PLUGIN_OK; /* input cancelled */
 
-    fIndex = rb->open(DICT_INDEX, O_RDONLY); /* index file */
+    fIndex = open(DICT_INDEX, O_RDONLY); /* index file */
     if (fIndex < 0)
     {
         DEBUGF("Err: Failed to open index file.\n");
-        rb->splash(HZ*2, "Failed to open index.");
+        splash(HZ*2, "Failed to open index.");
         return PLUGIN_ERROR;
     }
 
-    filesize = rb->filesize(fIndex); /* get filesize */
+    file_size = filesize(fIndex); /* get filesize */
 
-    DEBUGF("Filesize: %d bytes = %d words \n", filesize,
-           (filesize / (int)sizeof(struct stWord)));
+    DEBUGF("Filesize: %d bytes = %d words \n", file_size,
+           (file_size / (int)sizeof(struct stWord)));
 
     /* for the searching algorithm */
-    high = filesize / sizeof( struct stWord );
+    high = file_size / sizeof( struct stWord );
     low = -1;
 
     while (high - low > 1)
@@ -117,11 +117,11 @@ enum plugin_status plugin_start(const void* parameter)
         probe = (high + low) / 2;
 
         /* Jump to word pointed by probe, and read it. */
-        rb->lseek(fIndex, sizeof(struct stWord) * probe, SEEK_SET);
-        rb->read(fIndex, &word, sizeof(struct stWord));
+        lseek(fIndex, sizeof(struct stWord) * probe, SEEK_SET);
+        read(fIndex, &word, sizeof(struct stWord));
 
         /* jump according to the found word. */
-        if (rb->strcasecmp(searchword, word.word) < 0)
+        if (strcasecmp(searchword, word.word) < 0)
         {
             high = probe;
         }
@@ -132,39 +132,39 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
     /* read in the word */
-    rb->lseek(fIndex, sizeof(struct stWord) * low, SEEK_SET);
-    rb->read(fIndex, &word, sizeof(struct stWord));
-    rb->close(fIndex);
+    lseek(fIndex, sizeof(struct stWord) * low, SEEK_SET);
+    read(fIndex, &word, sizeof(struct stWord));
+    close(fIndex);
 
     /* Check if we found something */
-    if (low == -1 || rb->strcasecmp(searchword, word.word) != 0)
+    if (low == -1 || strcasecmp(searchword, word.word) != 0)
     {
         DEBUGF("Not found.\n");
-        rb->splash(HZ*2, "Not found.");
+        splash(HZ*2, "Not found.");
         return PLUGIN_OK;
     }
 
     DEBUGF("Found %s at offset %ld\n", word.word, reverse(word.offset));
 
     /* now open the description file */
-    fData = rb->open(DICT_DESC, O_RDONLY);
+    fData = open(DICT_DESC, O_RDONLY);
     if (fData < 0)
     {
         DEBUGF("Err: Failed to open description file.\n");
-        rb->splash(HZ*2, "Failed to open descriptions.");
+        splash(HZ*2, "Failed to open descriptions.");
         return PLUGIN_ERROR;
     }
 
     /* seek to the right offset */
-    rb->lseek(fData, (off_t)reverse(word.offset), SEEK_SET);
+    lseek(fData, (off_t)reverse(word.offset), SEEK_SET);
 
     /* Read in the description */
-    rb->read_line(fData, description, buffer_size);
+    read_line(fData, description, buffer_size);
 
     /* And print it to debug. */
     DEBUGF("Description: %s\n", description);
 
-    rb->close(fData);
+    close(fData);
 
     /* display description. */
     view_text(searchword, description);

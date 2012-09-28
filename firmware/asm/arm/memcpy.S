@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "symbols.h"
 
 /*
  * Endian independent macros for shifting bytes within registers.
@@ -174,3 +175,4 @@ memcpy:
 
 18:     forward_copy_shift  pull=24 push=8
 
+EXPORT_SYMBOL(memcpy)

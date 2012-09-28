@@ -27,45 +27,45 @@ void metadata_summary (void)
 {
     char buffer[256] = "";
 
-    if (rb->strlen (header.black) ||
-        rb->strlen (header.white) ||
-        rb->strlen (header.black_rank) ||
-        rb->strlen (header.white_rank))
-    rb->snprintf (buffer, sizeof(buffer),
+    if (strlen (header.black) ||
+        strlen (header.white) ||
+        strlen (header.black_rank) ||
+        strlen (header.white_rank))
+    snprintf (buffer, sizeof(buffer),
                   "%s [%s] v. %s [%s] ",
                   header.black, header.black_rank,
                   header.white, header.white_rank);
 
     if (header.handicap > 1)
     {
-        rb->snprintf (buffer + rb->strlen(buffer),
-                      sizeof (buffer) - rb->strlen (buffer),
+        snprintf (buffer + strlen(buffer),
+                      sizeof (buffer) - strlen (buffer),
                       "%d stones ", header.handicap);
     }
 
     if (header.komi != 0 && !(header.komi == 1 && header.handicap > 1))
     {
-        snprint_fixed (buffer + rb->strlen(buffer),
-                        sizeof (buffer) - rb->strlen (buffer),
+        snprint_fixed (buffer + strlen(buffer),
+                        sizeof (buffer) - strlen (buffer),
                         header.komi);
-        rb->snprintf (buffer + rb->strlen(buffer),
-                      sizeof (buffer) - rb->strlen (buffer),
+        snprintf (buffer + strlen(buffer),
+                      sizeof (buffer) - strlen (buffer),
                       " komi ");
     }
 
-    if (rb->strlen(header.result))
+    if (strlen(header.result))
     {
-        rb->snprintf (buffer + rb->strlen(buffer),
-                      sizeof (buffer) - rb->strlen (buffer),
+        snprintf (buffer + strlen(buffer),
+                      sizeof (buffer) - strlen (buffer),
                       "(%s)", header.result);
     }
 
     /* waiting for user input messes up the testing code, so ifdef it*/
 #if !defined(GBN_TEST)
-    if (rb->strlen(buffer))
+    if (strlen(buffer))
     {
-        rb->splash(0, buffer);
-        rb->action_userabort(TIMEOUT_BLOCK);
+        splash(0, buffer);
+        action_userabort(TIMEOUT_BLOCK);
     }
 #endif
 }
@@ -126,7 +126,7 @@ push_stack (struct stack_t * stack, void *buffer, size_t buffer_size)
         return false;
     }
 
-    rb->memcpy (&stack->buffer[stack->sp], buffer, buffer_size);
+    memcpy (&stack->buffer[stack->sp], buffer, buffer_size);
 
     stack->sp += buffer_size;
 
@@ -154,7 +154,7 @@ peek_stack (struct stack_t * stack, void *buffer, size_t buffer_size)
         return false;
     }
 
-    rb->memcpy (buffer, &stack->buffer[stack->sp - buffer_size], buffer_size);
+    memcpy (buffer, &stack->buffer[stack->sp - buffer_size], buffer_size);
 
     return true;
 }
@@ -219,13 +219,13 @@ create_or_open_file (const char *filename)
 {
     int fd;
 
-    if (!rb->file_exists (filename))
+    if (!file_exists (filename))
     {
-        fd = rb->creat(filename, 0666);
+        fd = creat(filename, 0666);
     }
     else
     {
-        fd = rb->open (filename, O_RDWR);
+        fd = open (filename, O_RDWR);
     }
 
     return fd;
@@ -235,7 +235,7 @@ create_or_open_file (const char *filename)
 int
 snprint_fixed (char *buffer, int buffer_size, int fixed)
 {
-    return rb->snprintf (buffer, buffer_size, "%s%d.%d",
+    return snprintf (buffer, buffer_size, "%s%d.%d",
                          fixed < 0 ? "-" : "",
                          abs (fixed) >> 1, 5 * (fixed & 1));
 }
@@ -246,14 +246,14 @@ peek_char (int fd)
 {
     char peeked_char;
 
-    int result = rb->read (fd, &peeked_char, 1);
+    int result = read (fd, &peeked_char, 1);
 
     if (result != 1)
     {
         return -1;
     }
 
-    result = rb->lseek (fd, -1, SEEK_CUR);
+    result = lseek (fd, -1, SEEK_CUR);
 
     if (result < 0)
     {
@@ -269,7 +269,7 @@ read_char (int fd)
 {
     char read_char;
 
-    int result = rb->read (fd, &read_char, 1);
+    int result = read (fd, &read_char, 1);
 
     if (result != 1)
     {
@@ -302,7 +302,7 @@ write_file (int fd, const void *buf, size_t count)
 
     while (count)
     {
-        result = rb->write (fd, buffer, count);
+        result = write (fd, buffer, count);
 
         if (result < 0)
         {
@@ -325,7 +325,7 @@ read_file (int fd, void *buf, size_t count)
 
     while (count)
     {
-        result = rb->read (fd, buffer, count);
+        result = read (fd, buffer, count);
 
         if (result <= 0)
         {
@@ -368,7 +368,7 @@ close_file (int *fd)
 {
     if (*fd >= 0)
     {
-        rb->close (*fd);
+        close (*fd);
     }
 
     *fd = -1;
@@ -525,12 +525,12 @@ get_header_string_and_size (struct header_t *header,
  *
  * I'm sure there's a way to make it better, but it's not really worth it.
  */
-#define gbn_assert(test) if (test) {DEBUGF("%d passed\n", __LINE__);} else {DEBUGF("%d FAILED!\n", __LINE__); rb->splashf(10 * HZ, "Test on line %d of util.c failed!", __LINE__); return;}
+#define gbn_assert(test) if (test) {DEBUGF("%d passed\n", __LINE__);} else {DEBUGF("%d FAILED!\n", __LINE__); splashf(10 * HZ, "Test on line %d of util.c failed!", __LINE__); return;}
 
 void
 run_tests (void)
 {
-    rb->splash (3 * HZ, "Running tests.  Failures will stop testing.");
+    splash (3 * HZ, "Running tests.  Failures will stop testing.");
 
 
 
@@ -801,8 +801,8 @@ run_tests (void)
     gbn_assert (play_move_sgf (POS (0, 0), WHITE));
     gbn_assert (write_comment_sgf (some_comment) > 0);
     gbn_assert (play_move_sgf (POS (0, 1), BLACK));
-    rb->strcpy (header.black, "Jack Black");
-    rb->strcpy (header.white, "Jill White");
+    strcpy (header.black, "Jack Black");
+    strcpy (header.white, "Jill White");
 
     gbn_assert (save_game (DEFAULT_SAVE_DIR "/head.sgf"));
 
@@ -812,11 +812,11 @@ run_tests (void)
     gbn_assert (header.komi == -20 && header.handicap == 5);
     gbn_assert (board_width == MAX_BOARD_SIZE
                 && board_height == MAX_BOARD_SIZE);
-    gbn_assert (rb->strcmp (header.black, "Jack Black") == 0);
-    gbn_assert (rb->strcmp (header.white, "Jill White") == 0);
+    gbn_assert (strcmp (header.black, "Jack Black") == 0);
+    gbn_assert (strcmp (header.white, "Jill White") == 0);
     gbn_assert (redo_node_sgf ());
     gbn_assert (read_comment_sgf (read_buffer, sizeof (read_buffer)));
-    gbn_assert (rb->strcmp (read_buffer, some_comment) == 0);
+    gbn_assert (strcmp (read_buffer, some_comment) == 0);
     gbn_assert (redo_node_sgf ());
     gbn_assert (get_point_board (POS (0, 0)) == WHITE);
     gbn_assert (get_point_board (POS (0, 1)) == BLACK);
@@ -880,6 +880,6 @@ run_tests (void)
     gbn_assert (get_point_board (POS (1, 2)) == EMPTY);
     gbn_assert (get_point_board (POS (1, 3)) == EMPTY);
 
-    rb->splash (10 * HZ, "All tests passed.  Exiting");
+    splash (10 * HZ, "All tests passed.  Exiting");
 }
 #endif /* GBN_TEST */

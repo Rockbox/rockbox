@@ -55,6 +55,8 @@
 #include "pcf50606.h"
 #endif
 
+#include "symbols.h"
+
 /** Shared by sim **/
 int last_sent_battery_level = 100;
 /* battery level (0-100%) */
@@ -203,6 +205,7 @@ int battery_time(void)
 #endif
     return _battery_time();
 }
+EXPORT_SYMBOL(battery_time);
 
 /* Returns battery level in percent */
 int battery_level(void)
@@ -213,6 +216,7 @@ int battery_level(void)
 #endif
     return battery_percent;
 }
+EXPORT_SYMBOL(battery_level);
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void)
@@ -229,6 +233,7 @@ bool battery_level_safe(void)
     return battery_millivolts > battery_level_dangerous[battery_type];
 #endif
 }
+EXPORT_SYMBOL(battery_level_safe);
 
 /* look into the percent_to_volt_* table and get a realistic battery level */
 static int voltage_to_percent(int voltage, const short* table)
@@ -465,6 +470,7 @@ bool charger_inserted(void)
 {
     return power_thread_inputs & POWER_INPUT_CHARGER;
 }
+EXPORT_SYMBOL(charger_inserted);
 
 /* Returns true if any power input is connected - charging-capable
  * or not. */
@@ -535,6 +541,7 @@ int battery_voltage(void)
 {
     return battery_millivolts;
 }
+EXPORT_SYMBOL(battery_voltage);
 
 static void average_init(void)
 {
@@ -805,6 +812,7 @@ void reset_poweroff_timer(void)
     if (sleeptimer_active && sleeptimer_key_restarts)
         set_sleep_timer(sleeptimer_duration);
 }
+EXPORT_SYMBOL(reset_poweroff_timer);
 
 void sys_poweroff(void)
 {

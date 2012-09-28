@@ -44,5 +44,5 @@ void draw_string(struct screen* display, const struct picture* bitmaps,
 
 void getstringsize(const struct picture* bitmaps, char* str, int *w, int *h ){
     *h=bitmaps->slide_height;
-    *w=rb->strlen(str)*bitmaps->width;
+    *w=strlen(str)*bitmaps->width;
 }

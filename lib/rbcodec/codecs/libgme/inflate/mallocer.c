@@ -16,7 +16,7 @@ size_t buffersize[MEMPOOL_MAX];
 int wpw_init_mempool(unsigned char mempool)
 {
     memory_ptr[mempool] = 0;
-    mallocbuffer[mempool] = (unsigned char *)ci->codec_get_buffer(&buffersize[mempool]);
+    mallocbuffer[mempool] = (unsigned char *)codec_get_buffer(&buffersize[mempool]);
     // memset(mallocbuf[mempool], 0, bufsize[mempool]);
     return 0;
 }

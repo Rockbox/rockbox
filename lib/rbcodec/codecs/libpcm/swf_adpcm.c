@@ -87,7 +87,7 @@ static struct pcm_pos *get_seek_pos(uint32_t seek_val, int seek_mode,
     static struct pcm_pos newpos;
     uint32_t chunkbits  = blockbits;
     uint32_t seekblocks = (seek_mode == PCM_SEEK_TIME)?
-                          ((uint64_t)seek_val * ci->id3->frequency)
+                          ((uint64_t)seek_val * ci.id3->frequency)
                                               / (1000LL * fmt->samplesperblock) :
                           ((seek_val << 3) - 2) / blockbits;
     uint32_t seekbits   = seekblocks * blockbits + 2;

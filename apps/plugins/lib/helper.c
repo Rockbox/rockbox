@@ -39,30 +39,29 @@ const unsigned bit_n_table[32] = {
 /* Force the backlight on */
 void backlight_force_on(void)
 {
-    rb->backlight_set_timeout(0);
+    backlight_set_timeout(0);
 #if CONFIG_CHARGING
-    rb->backlight_set_timeout_plugged(0);
+    backlight_set_timeout_plugged(0);
 #endif /* CONFIG_CHARGING */
 }
 
 /* Turn off backlight timeout */
 void backlight_ignore_timeout(void)
 {
-    if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(0);
+    if (global_settings.backlight_timeout > 0)
+        backlight_set_timeout(0);
 #if CONFIG_CHARGING
-    if (rb->global_settings->backlight_timeout_plugged > 0)
-        rb->backlight_set_timeout_plugged(0);
+    if (global_settings.backlight_timeout_plugged > 0)
+        backlight_set_timeout_plugged(0);
 #endif /* CONFIG_CHARGING */
 }
 
 /*  Reset backlight operation to its settings */
 void backlight_use_settings(void)
 {
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+    backlight_set_timeout(global_settings.backlight_timeout);
 #if CONFIG_CHARGING
-    rb->backlight_set_timeout_plugged(rb->global_settings->
-                                      backlight_timeout_plugged);
+    backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
 }
 
@@ -70,31 +69,29 @@ void backlight_use_settings(void)
 /*  Force the backlight on */
 void remote_backlight_force_on(void)
 {
-    rb->remote_backlight_set_timeout(0);
+    remote_backlight_set_timeout(0);
 #if CONFIG_CHARGING
-    rb->remote_backlight_set_timeout_plugged(0);
+    remote_backlight_set_timeout_plugged(0);
 #endif /* CONFIG_CHARGING */
 }
 
 /* Turn off backlight timeout */
 void remote_backlight_ignore_timeout(void)
 {
-    if (rb->global_settings->remote_backlight_timeout > 0)
-        rb->remote_backlight_set_timeout(0);
+    if (global_settings.remote_backlight_timeout > 0)
+        remote_backlight_set_timeout(0);
 #if CONFIG_CHARGING
-    if (rb->global_settings->remote_backlight_timeout_plugged > 0)
-        rb->remote_backlight_set_timeout_plugged(0);
+    if (global_settings.remote_backlight_timeout_plugged > 0)
+        remote_backlight_set_timeout_plugged(0);
 #endif /* CONFIG_CHARGING */
 }
 
 /*  Reset backlight operation to its settings */
 void remote_backlight_use_settings(void)
 {
-    rb->remote_backlight_set_timeout(rb->global_settings->
-                                     remote_backlight_timeout);
+    remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
 #if CONFIG_CHARGING
-    rb->remote_backlight_set_timeout_plugged(rb->global_settings-> 
-                                             remote_backlight_timeout_plugged);
+    remote_backlight_set_timeout_plugged(global_settings.remote_backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
 }
 #endif /* HAVE_REMOTE_LCD */
@@ -103,43 +100,43 @@ void remote_backlight_use_settings(void)
 /*  Force the buttonlight on */
 void buttonlight_force_on(void)
 {
-    rb->buttonlight_set_timeout(0);
+    buttonlight_set_timeout(0);
 }
 
 /* Turn off backlight timeout */
 void buttonlight_ignore_timeout(void)
 {
-    if (rb->global_settings->buttonlight_timeout > 0)
-        rb->buttonlight_set_timeout(0);
+    if (global_settings.buttonlight_timeout > 0)
+        buttonlight_set_timeout(0);
 }
 
 /*  Reset buttonlight operation to its settings */
 void buttonlight_use_settings(void)
 {
-    rb->buttonlight_set_timeout(rb->global_settings->buttonlight_timeout);
+    buttonlight_set_timeout(global_settings.buttonlight_timeout);
 }
 #endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_brightness_set(int brightness)
 {
-    rb->backlight_set_brightness(brightness);
+    backlight_set_brightness(brightness);
 }
 
 void backlight_brightness_use_setting(void)
 {
-    rb->backlight_set_brightness(rb->global_settings->brightness);
+    backlight_set_brightness(global_settings.brightness);
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
 void buttonlight_brightness_set(int brightness)
 {
-    rb->buttonlight_set_brightness(brightness);
+    buttonlight_set_brightness(brightness);
 }
 
 void buttonlight_brightness_use_setting(void)
 {
-    rb->buttonlight_set_brightness(rb->global_settings->buttonlight_brightness);
+    buttonlight_set_brightness(global_settings.buttonlight_brightness);
 }
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */

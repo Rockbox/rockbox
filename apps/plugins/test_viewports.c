@@ -151,78 +151,78 @@ enum plugin_status plugin_start(const void* parameter)
     char buf[80];
     int i,y;
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
-    rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Viewport testing plugin - this is a scrolling title");
+    screens[SCREEN_MAIN]->set_viewport(&vp0);
+    screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN]->puts_scroll(0,0,"Viewport testing plugin - this is a scrolling title");
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp1);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN]->set_viewport(&vp1);
+    screens[SCREEN_MAIN]->clear_viewport();
 
     for (i = 0 ; i < 3; i++)
     {
-        rb->snprintf(buf,sizeof(buf),"Left text, scrolling_line %d",i);
-        rb->screens[SCREEN_MAIN]->puts_scroll(0,i,buf);
+        snprintf(buf,sizeof(buf),"Left text, scrolling_line %d",i);
+        screens[SCREEN_MAIN]->puts_scroll(0,i,buf);
     }
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp2);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN]->set_viewport(&vp2);
+    screens[SCREEN_MAIN]->clear_viewport();
     for (i = 1 ; i < 3; i++)
     {
-        rb->snprintf(buf,sizeof(buf),"Right text, scrolling line %d",i);
-        rb->screens[SCREEN_MAIN]->puts_scroll(1,i,buf);
+        snprintf(buf,sizeof(buf),"Right text, scrolling line %d",i);
+        screens[SCREEN_MAIN]->puts_scroll(1,i,buf);
     }
 
     y = -10;
     for (i = -10; i < vp2.width + 10; i += 5)
     {
-        rb->screens[SCREEN_MAIN]->drawline(i, y, i, vp2.height - y);
+        screens[SCREEN_MAIN]->drawline(i, y, i, vp2.height - y);
     }
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp3);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN]->set_viewport(&vp3);
+    screens[SCREEN_MAIN]->clear_viewport();
     for (i = 1 ; i < 2; i++)
     {
-        rb->snprintf(buf,sizeof(buf),"Bottom text, a scrolling line %d",i);
-        rb->screens[SCREEN_MAIN]->puts_scroll(2,i,buf);
+        snprintf(buf,sizeof(buf),"Bottom text, a scrolling line %d",i);
+        screens[SCREEN_MAIN]->puts_scroll(2,i,buf);
     }
-    rb->screens[SCREEN_MAIN]->puts_scroll(4,i,"Short line");
-    rb->screens[SCREEN_MAIN]->update();
+    screens[SCREEN_MAIN]->puts_scroll(4,i,"Short line");
+    screens[SCREEN_MAIN]->update();
 
 
 #ifdef HAVE_REMOTE_LCD
-    rb->screens[SCREEN_REMOTE]->set_viewport(&rvp0);
-    rb->screens[SCREEN_REMOTE]->clear_viewport();
+    screens[SCREEN_REMOTE]->set_viewport(&rvp0);
+    screens[SCREEN_REMOTE]->clear_viewport();
 
     for (i = 0 ; i < 5; i++)
     {
-        rb->snprintf(buf,sizeof(buf),"Left text, scrolling_line %d",i);
-        rb->screens[SCREEN_REMOTE]->puts_scroll(0,i,buf);
+        snprintf(buf,sizeof(buf),"Left text, scrolling_line %d",i);
+        screens[SCREEN_REMOTE]->puts_scroll(0,i,buf);
     }
-    rb->screens[SCREEN_REMOTE]->puts(1,i,"Static");
+    screens[SCREEN_REMOTE]->puts(1,i,"Static");
 
-    rb->screens[SCREEN_REMOTE]->set_viewport(&rvp1);
-    rb->screens[SCREEN_REMOTE]->clear_viewport();
+    screens[SCREEN_REMOTE]->set_viewport(&rvp1);
+    screens[SCREEN_REMOTE]->clear_viewport();
     for (i = 1 ; i < 3; i++)
     {
-        rb->snprintf(buf,sizeof(buf),"Right text, scrolling line %d",i);
-        rb->screens[SCREEN_REMOTE]->puts_scroll(1,i,buf);
+        snprintf(buf,sizeof(buf),"Right text, scrolling line %d",i);
+        screens[SCREEN_REMOTE]->puts_scroll(1,i,buf);
     }
 
     y = -10;
     for (i = -10; i < rvp1.width + 10; i += 5)
     {
-        rb->screens[SCREEN_REMOTE]->drawline(i, y, i, rvp1.height - y);
+        screens[SCREEN_REMOTE]->drawline(i, y, i, rvp1.height - y);
     }
 
-    rb->screens[SCREEN_REMOTE]->update();
+    screens[SCREEN_REMOTE]->update();
 #endif
 
-    rb->button_get(true);
+    button_get(true);
 
     /* Restore the default viewport */
-    rb->screens[SCREEN_MAIN]->set_viewport(NULL);
+    screens[SCREEN_MAIN]->set_viewport(NULL);
 #ifdef HAVE_REMOTE_LCD
-    rb->screens[SCREEN_REMOTE]->set_viewport(NULL);
+    screens[SCREEN_REMOTE]->set_viewport(NULL);
 #endif
 
     return PLUGIN_OK;
@@ -262,24 +262,24 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
-    rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Rockbox");
+    screens[SCREEN_MAIN]->set_viewport(&vp0);
+    screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN]->puts_scroll(0,0,"Rockbox");
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp1);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
-    rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Viewports");
+    screens[SCREEN_MAIN]->set_viewport(&vp1);
+    screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN]->puts_scroll(0,0,"Viewports");
 
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp2);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
-    rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Demonstration");
+    screens[SCREEN_MAIN]->set_viewport(&vp2);
+    screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN]->puts_scroll(0,0,"Demonstration");
 
-    rb->screens[SCREEN_MAIN]->update();
+    screens[SCREEN_MAIN]->update();
 
-    rb->button_get(true);
+    button_get(true);
 
     /* Restore the default viewport */
-    rb->screens[SCREEN_MAIN]->set_viewport(NULL);
+    screens[SCREEN_MAIN]->set_viewport(NULL);
 
     return PLUGIN_OK;
 }

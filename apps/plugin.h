@@ -48,6 +48,7 @@
 
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
+char* plugin_get_current_filename(void);
 
 #ifndef __PCTOOL__
 #include "config.h"
@@ -59,6 +60,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "button.h"
 #include "action.h"
 #include "load_code.h"
+#include "elfload.h"
 #include "usb.h"
 #include "font.h"
 #include "lcd.h"
@@ -128,6 +130,26 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "usbstack/usb_hid_usage_tables.h"
 #endif
 
+/* forwarding prototypes */
+#include "backlight.h"
+#include "file.h"
+#include "option_select.h"
+#include "diacritic.h"
+#include "power.h"
+#include "powermgmt.h"
+#include "splash.h"
+#include "keyboard.h"
+#include "version.h"
+#include "mp3data.h"
+#ifdef USB_ENABLE_HID
+#include "usbstack/usb_hid.h"
+#endif
+#include "storage.h"
+#include "led.h"
+
+#ifdef HAVE_LCD_BITMAP
+#include "bidi.h"
+#endif
 
 #ifdef PLUGIN
 
@@ -526,7 +548,11 @@ struct plugin_api {
     void (*commit_discard_idcache)(void);
 
     /* load code api for overlay */
+#if defined(USE_ELFLOADER)
+    void* (*elf_open)(const char *filename, struct load_info_t *l);
+#else
     void* (*lc_open)(const char *filename, unsigned char *buf, size_t buf_size);
+#endif
     void* (*lc_open_from_mem)(void* addr, size_t blob_size);
     void* (*lc_get_header)(void *handle);
     void  (*lc_close)(void *handle);
@@ -955,6 +981,7 @@ struct plugin_api {
     int  (*semaphore_wait)(struct semaphore *s, int timeout);
     void (*semaphore_release)(struct semaphore *s);
 #endif
+
 
     const char *rbversion;
 

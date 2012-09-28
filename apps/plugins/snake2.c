@@ -452,31 +452,31 @@ static int load_all_levels(void)
 
     /* Init the level_cache pointer and
        calculate how many levels that will fit */
-    level_cache = rb->plugin_get_buffer(&size);
+    level_cache = plugin_get_buffer(&size);
     max_levels = size / (HEIGHT*WIDTH);
 
     num_levels = 0;
 
     /* open file */
-    if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0)
+    if ((fd = open(LEVELS_FILE, O_RDONLY)) < 0)
     {
         return -1;
     }
 
-    while(rb->read_line(fd, buf, 64) > 0)
+    while(read_line(fd, buf, 64) > 0)
     {
-        if(rb->strlen(buf) == 0) /* Separator? */
+        if(strlen(buf) == 0) /* Separator? */
         {
             num_levels++;
             if(num_levels > max_levels)
             {
-                rb->splash(HZ, "Too many levels in file");
+                splash(HZ, "Too many levels in file");
                 break;
             }
             continue;
         }
 
-        rb->memcpy(level_cache[num_levels][linecnt], buf, WIDTH);
+        memcpy(level_cache[num_levels][linecnt], buf, WIDTH);
         linecnt++;
         if(linecnt == HEIGHT)
         {
@@ -484,7 +484,7 @@ static int load_all_levels(void)
         }
     }
 
-    rb->close(fd);
+    close(fd);
     return 0;
 }
 
@@ -612,14 +612,14 @@ static void init_snake(void)
 #if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
 static void draw_frame_bitmap(int header_type)
 {
-    rb->lcd_bitmap(header_type==1? snake2_header1: snake2_header2, 0, 0,
+    lcd_bitmap(header_type==1? snake2_header1: snake2_header2, 0, 0,
                    BMPWIDTH_snake2_header, BMPHEIGHT_snake2_header);
-    rb->lcd_bitmap(snake2_left, 0, BMPHEIGHT_snake2_header,
+    lcd_bitmap(snake2_left, 0, BMPHEIGHT_snake2_header,
                    BMPWIDTH_snake2_left, BMPHEIGHT_snake2_left);
-    rb->lcd_bitmap(snake2_right,
+    lcd_bitmap(snake2_right,
                    LCD_WIDTH - BMPWIDTH_snake2_right, BMPHEIGHT_snake2_header,
                    BMPWIDTH_snake2_right, BMPHEIGHT_snake2_right);
-    rb->lcd_bitmap(snake2_bottom,
+    lcd_bitmap(snake2_bottom,
                    0, BMPHEIGHT_snake2_header + BMPHEIGHT_snake2_left,
                    BMPWIDTH_snake2_bottom, BMPHEIGHT_snake2_bottom);
 }
@@ -631,9 +631,9 @@ static void draw_frame_bitmap(int header_type)
 */
 static void draw_apple_bit(int x, int y)
 {
-    rb->lcd_fillrect((CENTER_X+x*MULTIPLIER)+1, CENTER_Y+y*MULTIPLIER,
+    lcd_fillrect((CENTER_X+x*MULTIPLIER)+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_1);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, (CENTER_Y+y*MULTIPLIER)+1,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER, (CENTER_Y+y*MULTIPLIER)+1,
                      MODIFIER_1, MODIFIER_2);
 }
 
@@ -644,21 +644,21 @@ static void draw_apple( void )
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
     draw_frame_bitmap(2);
 
-    rb->snprintf(strbuf, sizeof(strbuf), "%d", applecount);
-    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-    rb->lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
+    snprintf(strbuf, sizeof(strbuf), "%d", applecount);
+    lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
 
-    rb->snprintf(strbuf, sizeof(strbuf), "%d", score);
-    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-    rb->lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
+    snprintf(strbuf, sizeof(strbuf), "%d", score);
+    lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
 #endif
 
     if (!apple)
     {
         do
         {
-            x = (rb->rand() % (WIDTH-1))+1;
-            y = (rb->rand() % (HEIGHT-1))+1;
+            x = (rand() % (WIDTH-1))+1;
+            y = (rand() % (HEIGHT-1))+1;
         } while (board[x][y]);
         apple = 1;
         board[x][y] = -1;
@@ -675,7 +675,7 @@ static void draw_apple( void )
 */
 static void draw_vertical_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_1);
 }
 
@@ -687,7 +687,7 @@ static void draw_vertical_bit(int x, int y)
 */
 static void draw_horizontal_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
                      MODIFIER_1, MODIFIER_2);
 }
 
@@ -699,9 +699,9 @@ static void draw_horizontal_bit(int x, int y)
 */
 static void draw_n_to_e_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER+2,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER+2,
                      MODIFIER_2, MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+2, CENTER_Y+y*MULTIPLIER+1,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER+2, CENTER_Y+y*MULTIPLIER+1,
                      MODIFIER_2, MODIFIER_2);
 }
 
@@ -724,9 +724,9 @@ static void draw_w_to_s_bit(int x, int y)
 */
 static void draw_n_to_w_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
                      MODIFIER_2, MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER+2,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER+2,
                      MODIFIER_2, MODIFIER_2);
 }
 
@@ -749,9 +749,9 @@ static void draw_e_to_s_bit(int x, int y)
 */
 static void draw_s_to_e_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+2, CENTER_Y+y*MULTIPLIER+1,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER+2, CENTER_Y+y*MULTIPLIER+1,
                      MODIFIER_2, MODIFIER_2);
 }
 
@@ -774,9 +774,9 @@ static void draw_w_to_n_bit(int x, int y)
 */
 static void draw_e_to_n_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER+1, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_2, MODIFIER_2);
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER+1,
                      MODIFIER_2, MODIFIER_2);
 }
 
@@ -793,7 +793,7 @@ static void draw_s_to_w_bit(int x, int y)
 
 static void draw_head_bit(int x, int y)
 {
-    rb->lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER,
+    lcd_fillrect(CENTER_X+x*MULTIPLIER, CENTER_Y+y*MULTIPLIER,
                      MODIFIER_1, MODIFIER_1);
 }
 
@@ -837,11 +837,11 @@ static void redraw (void)
     int x,y;
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
 #endif
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     for (x = 0; x < WIDTH; x++)
     {
@@ -875,13 +875,13 @@ static void redraw (void)
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
     draw_frame_bitmap(2);
 
-    rb->snprintf(strbuf, sizeof(strbuf), "%d", applecount);
-    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-    rb->lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
+    snprintf(strbuf, sizeof(strbuf), "%d", applecount);
+    lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
 
-    rb->snprintf(strbuf, sizeof(strbuf), "%d", score);
-    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-    rb->lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
+    snprintf(strbuf, sizeof(strbuf), "%d", score);
+    lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
 #endif
 }
 
@@ -891,9 +891,9 @@ static void redraw (void)
 */
 static void draw_snake_bit(int currentbit, int previousbit, int x, int y)
 {
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     draw_head_bit(x, y);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     switch(currentbit)
     {
@@ -1023,41 +1023,41 @@ static void die (void)
     int button;
     bool done=false;
 
-    rb->splash(HZ*2, "Oops!");
+    splash(HZ*2, "Oops!");
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     applecount=0;
 
-    rb->lcd_getstringsize("You died!",&strwdt,&strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt,"You died!");
+    lcd_getstringsize("You died!",&strwdt,&strhgt);
+    lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt,"You died!");
 
-    rb->snprintf(strbuf, sizeof(strbuf), "Your score: %d", score);
-    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 2 + 2, strbuf);
+    snprintf(strbuf, sizeof(strbuf), "Your score: %d", score);
+    lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 2 + 2, strbuf);
 
     if (highscore_update(score, level_from_file, game_type==0?"Type A":"Type B",
                          highscores, NUM_SCORES) == 0)
     {
-        rb->lcd_getstringsize("New high score!",&strwdt,&strhgt);
-        rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt * 4 + 2,"New high score!");
+        lcd_getstringsize("New high score!",&strwdt,&strhgt);
+        lcd_putsxy((LCD_WIDTH - strwdt)/2,strhgt * 4 + 2,"New high score!");
     }
     else
     {
-        rb->snprintf(strbuf, sizeof(strbuf), "High score: %d", highscores[0].score);
-        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-        rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 5, strbuf);
+        snprintf(strbuf, sizeof(strbuf), "High score: %d", highscores[0].score);
+        lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 5, strbuf);
     }
 
-    rb->snprintf(strbuf, sizeof(strbuf), "Press %s...", SNAKE2_PLAYPAUSE_TEXT);
-    rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 7, strbuf);
+    snprintf(strbuf, sizeof(strbuf), "Press %s...", SNAKE2_PLAYPAUSE_TEXT);
+    lcd_getstringsize(strbuf, &strwdt, &strhgt);
+    lcd_putsxy((LCD_WIDTH - strwdt)/2, strhgt * 7, strbuf);
 
-    rb->lcd_update();
+    lcd_update();
 
     while(!done)
     {
-        button=rb->button_get(true);
+        button=button_get(true);
         switch(button)
         {
             case SNAKE2_PLAYPAUSE:
@@ -1103,10 +1103,10 @@ static void collision ( int x, int y )
                         num_apples_to_get+=2;
                         game_b_level++;
                     }
-                    rb->splash(HZ, "Level Completed!");
+                    splash(HZ, "Level Completed!");
                     new_level(level_from_file);
                     redraw();
-                    rb->lcd_update();
+                    lcd_update();
                 }
                 else
                     num_apples_to_got++;
@@ -1166,9 +1166,9 @@ static void move( void )
     /*clear tail*/
     if(applecountdown <= 0)
     {
-        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         draw_head_bit(tailx, taily);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_set_drawmode(DRMODE_SOLID);
 
         taildir = board[tailx][taily];
         board[tailx][taily] = 0;
@@ -1261,29 +1261,29 @@ static void frame (void)
 
     collision(headx, heady);
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 static void game_pause (void)
 {
     int button;
 
-    rb->lcd_clear_display();
-    rb->lcd_getstringsize("Paused",&strwdt,&strhgt);
-    rb->lcd_putsxy((LCD_WIDTH - strwdt)/2,LCD_HEIGHT/2,"Paused");
+    lcd_clear_display();
+    lcd_getstringsize("Paused",&strwdt,&strhgt);
+    lcd_putsxy((LCD_WIDTH - strwdt)/2,LCD_HEIGHT/2,"Paused");
 
-    rb->lcd_update();
+    lcd_update();
     while (1)
     {
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button)
         {
             case SNAKE2_PLAYPAUSE:
                 redraw();
                 redraw_snake();
                 draw_head_bit(headx, heady);
-                rb->lcd_update();
-                rb->sleep(HZ/2);
+                lcd_update();
+                sleep(HZ/2);
                 return;
 
 #ifdef SNAKE2_RC_QUIT
@@ -1295,7 +1295,7 @@ static void game_pause (void)
                 return;
 
             default:
-                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                if (default_event_handler(button)==SYS_USB_CONNECTED) {
                     dead = 1;
                     quit = 2;
                     return;
@@ -1310,7 +1310,7 @@ static void game (void)
     int button;
 
     redraw();
-    rb->lcd_update();
+    lcd_update();
     /*main loop:*/
     while (1)
     {
@@ -1341,12 +1341,12 @@ static void game (void)
 
         draw_apple();
 
-        rb->sleep(HZ/speed);
+        sleep(HZ/speed);
 
-        button = rb->button_get(false);
+        button = button_get(false);
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold())
+        if (button_hold())
             button = SNAKE2_PLAYPAUSE;
 #endif
 
@@ -1384,7 +1384,7 @@ static void game (void)
                 break;
 
             default:
-                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                if (default_event_handler(button)==SYS_USB_CONNECTED) {
                     quit = 2;
                     return;
                 }
@@ -1401,39 +1401,39 @@ static void select_maze(void)
     clear_board();
     load_level( level_from_file );
     redraw();
-    rb->lcd_update();
+    lcd_update();
 
     while (1)
     {
 #if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
         draw_frame_bitmap(1);
 
-        rb->snprintf(strbuf, sizeof(strbuf), "%d", level);
-        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-        rb->lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
+        snprintf(strbuf, sizeof(strbuf), "%d", level);
+        lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        lcd_putsxy(TOP_X3 - strwdt/2, TOP_Y2, strbuf);
 
-        rb->snprintf(strbuf, sizeof(strbuf), "%d", level_from_file);
-        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-        rb->lcd_putsxy(TOP_X2 - strwdt/2, TOP_Y1, strbuf);
+        snprintf(strbuf, sizeof(strbuf), "%d", level_from_file);
+        lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        lcd_putsxy(TOP_X2 - strwdt/2, TOP_Y1, strbuf);
 
-        rb->strcpy(strbuf, game_type==0? "A": "B");
-        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-        rb->lcd_putsxy(TOP_X1, TOP_Y1, strbuf);
+        strcpy(strbuf, game_type==0? "A": "B");
+        lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        lcd_putsxy(TOP_X1, TOP_Y1, strbuf);
 
-        rb->snprintf(strbuf, sizeof(strbuf), "%d", highscores[0].score);
-        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-        rb->lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
+        snprintf(strbuf, sizeof(strbuf), "%d", highscores[0].score);
+        lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        lcd_putsxy(TOP_X4 - strwdt/2, TOP_Y2, strbuf);
 
 #else
-        rb->snprintf(strbuf, sizeof(strbuf), "Maze:  %d", level_from_file);
-        rb->lcd_getstringsize(strbuf, &strwdt, &strhgt);
-        rb->lcd_putsxy((WIDTH*MULTIPLIER - strwdt)/2,
+        snprintf(strbuf, sizeof(strbuf), "Maze:  %d", level_from_file);
+        lcd_getstringsize(strbuf, &strwdt, &strhgt);
+        lcd_putsxy((WIDTH*MULTIPLIER - strwdt)/2,
                        (HEIGHT*MULTIPLIER - strhgt)/2, strbuf);
 #endif
 
-        rb->lcd_update();
+        lcd_update();
 
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button)
         {
             case SNAKE2_QUIT:
@@ -1459,7 +1459,7 @@ static void select_maze(void)
                 redraw();
                 break;
             default:
-                if (rb->default_event_handler(button)==SYS_USB_CONNECTED) {
+                if (default_event_handler(button)==SYS_USB_CONNECTED) {
                     quit = 2;
                     return;
                 }
@@ -1484,7 +1484,7 @@ static void game_init(void)
                         "High Scores",
                         "Playback Control", "Quit");
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     dead = 0;
     apple = 0;
@@ -1492,12 +1492,12 @@ static void game_init(void)
     applecount = 0;
 
     while (1) {
-        switch (rb->do_menu(&menu, &selection, NULL, false)) {
+        switch (do_menu(&menu, &selection, NULL, false)) {
             case 0:
                 speed = level*20;
                 return;
             case 1:
-                rb->set_option("Game Type", &game_type, INT,
+                set_option("Game Type", &game_type, INT,
                                type_options, 2, NULL);
                 break;
             case 2:
@@ -1505,7 +1505,7 @@ static void game_init(void)
                 if(quit) return;
                 break;
             case 3:
-                rb->set_int("Speed", "", UNIT_INT, &level,
+                set_int("Speed", "", UNIT_INT, &level,
                             NULL, 1, 1, 10, NULL);
                 break;
             case 4:
@@ -1531,15 +1531,15 @@ enum plugin_status plugin_start(const void* parameter)
     (void)(parameter);
 
     /* Lets use the default font */
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     load_all_levels();
 
     if (num_levels == 0) {
-        rb->splash(HZ*2, "Failed loading levels!");
+        splash(HZ*2, "Failed loading levels!");
         return PLUGIN_OK;
     }
 
@@ -1551,7 +1551,7 @@ enum plugin_status plugin_start(const void* parameter)
         if(quit)
             break;
 
-        rb->lcd_clear_display();
+        lcd_clear_display();
         frames=1;
 
         init_snake();

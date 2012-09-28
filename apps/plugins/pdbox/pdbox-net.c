@@ -42,8 +42,8 @@ void net_init(void)
         datagrams[i].used = false;
 
     /* Initialize and register message queues. */
-    rb->queue_init(&gui_to_core, true);
-    rb->queue_init(&core_to_gui, true);
+    queue_init(&gui_to_core, true);
+    queue_init(&core_to_gui, true);
 }
 
 /* Send datagram. */
@@ -75,7 +75,7 @@ bool send_datagram(struct event_queue* route,
     datagrams[i].used = true;
 
     /* Send event via route. */
-    rb->queue_post(route, port, (intptr_t) &datagrams[i]);
+    queue_post(route, port, (intptr_t) &datagrams[i]);
 
     /* Everything went ok. */
     return true;
@@ -89,11 +89,11 @@ bool receive_datagram(struct event_queue* route,
     struct queue_event event;
 
     /* If route queue empty, abort. */
-    if(rb->queue_empty(route))
+    if(queue_empty(route))
         return false;
 
     /* Receive event. */
-    rb->queue_wait(route, &event);
+    queue_wait(route, &event);
 
     /* If wrong port, abort.
        NOTE: Event is removed from the queue in any case! */
@@ -119,7 +119,7 @@ bool receive_datagram(struct event_queue* route,
 void net_destroy(void)
 {
     /* Remove message queues. */
-    rb->queue_delete(&gui_to_core);
-    rb->queue_delete(&core_to_gui);
+    queue_delete(&gui_to_core);
+    queue_delete(&core_to_gui);
 }
 

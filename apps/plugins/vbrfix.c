@@ -29,8 +29,8 @@ char tmpname[MAX_PATH];
 
 static void xingupdate(int percent)
 {
-    rb->lcd_putsf(0, 1, "%d%%", percent);
-    rb->lcd_update();
+    lcd_putsf(0, 1, "%d%%", percent);
+    lcd_update();
 }
 
 static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_bytes)
@@ -39,72 +39,72 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
     int rc;
     int orig_fd, fd;
     
-    rb->snprintf(tmpname, MAX_PATH, "%s.tmp", fname);
+    snprintf(tmpname, MAX_PATH, "%s.tmp", fname);
 
-    orig_fd = rb->open(fname, O_RDONLY);
+    orig_fd = open(fname, O_RDONLY);
     if(orig_fd < 0) {
         return 10*orig_fd - 1;
     }
 
-    fd = rb->creat(tmpname, 0666);
+    fd = creat(tmpname, 0666);
     if(fd < 0) {
-        rb->close(orig_fd);
+        close(orig_fd);
         return 10*fd - 2;
     }
 
     /* First, copy the initial portion (the ID3 tag) */
     if(fpos) {
-        readlen = rb->read(orig_fd, audiobuf, fpos);
+        readlen = read(orig_fd, audiobuf, fpos);
         if(readlen < 0) {
-            rb->close(fd);
-            rb->close(orig_fd);
+            close(fd);
+            close(orig_fd);
             return 10*readlen - 3;
         }
         
-        rc = rb->write(fd, audiobuf, readlen);
+        rc = write(fd, audiobuf, readlen);
         if(rc < 0) {
-            rb->close(fd);
-            rb->close(orig_fd);
+            close(fd);
+            close(orig_fd);
             return 10*rc - 4;
         }
     }
     
     /* Now insert the data into the file */
-    rc = rb->write(fd, buf, num_bytes);
+    rc = write(fd, buf, num_bytes);
     if(rc < 0) {
-        rb->close(orig_fd);
-        rb->close(fd);
+        close(orig_fd);
+        close(fd);
         return 10*rc - 5;
     }
 
     /* Copy the file */
     do {
-        readlen = rb->read(orig_fd, audiobuf, audiobuflen);
+        readlen = read(orig_fd, audiobuf, audiobuflen);
         if(readlen < 0) {
-            rb->close(fd);
-            rb->close(orig_fd);
+            close(fd);
+            close(orig_fd);
             return 10*readlen - 7;
         }
 
-        rc = rb->write(fd, audiobuf, readlen);
+        rc = write(fd, audiobuf, readlen);
         if(rc < 0) {
-            rb->close(fd);
-            rb->close(orig_fd);
+            close(fd);
+            close(orig_fd);
             return 10*rc - 8;
         }
     } while(readlen > 0);
     
-    rb->close(fd);
-    rb->close(orig_fd);
+    close(fd);
+    close(orig_fd);
 
     /* Remove the old file */
-    rc = rb->remove(fname);
+    rc = remove(fname);
     if(rc < 0) {
         return 10*rc - 9;
     }
 
     /* Replace the old file with the new */
-    rc = rb->rename(tmpname, fname);
+    rc = rename(tmpname, fname);
     if(rc < 0) {
         return 10*rc - 9;
     }
@@ -114,7 +114,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
 
 static void fileerror(int rc)
 {
-    rb->splashf(HZ*2, "File error: %d", rc);
+    splashf(HZ*2, "File error: %d", rc);
 }
 
 static const unsigned char empty_id3_header[] =
@@ -134,35 +134,35 @@ static bool vbr_fix(const char *selected_file)
     int framelen;
     int unused_space;
 
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, selected_file);
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, selected_file);
+    lcd_update();
 
     xingupdate(0);
 
-    rc = rb->mp3info(&entry, selected_file);
+    rc = mp3info(&entry, selected_file);
     if(rc < 0) {
         fileerror(rc);
         return true;
     }
     
-    fd = rb->open(selected_file, O_RDWR);
+    fd = open(selected_file, O_RDWR);
     if(fd < 0) {
         fileerror(fd);
         return true;
     }
 
-    flen = rb->lseek(fd, 0, SEEK_END);
+    flen = lseek(fd, 0, SEEK_END);
 
     xingupdate(0);
 
-    num_frames = rb->count_mp3_frames(fd, entry.first_frame_offset,
+    num_frames = count_mp3_frames(fd, entry.first_frame_offset,
                                       flen, xingupdate, audiobuf, audiobuflen);
 
     if(num_frames) {
         /* Note: We don't need to pass a template header because it will be
            taken from the mpeg stream */
-        framelen = rb->create_xing_header(fd, entry.first_frame_offset,
+        framelen = create_xing_header(fd, entry.first_frame_offset,
                                           flen, xingbuf, num_frames, 0,
                                           0, xingupdate, true,
                                           audiobuf, audiobuflen);
@@ -175,9 +175,9 @@ static bool vbr_fix(const char *selected_file)
             DEBUGF("Using existing space between ID3 and first frame\n");
 
             /* Seek to the beginning of the unused space */
-            rc = rb->lseek(fd, entry.id3v2len, SEEK_SET);
+            rc = lseek(fd, entry.id3v2len, SEEK_SET);
             if(rc < 0) {
-                rb->close(fd);
+                close(fd);
                 fileerror(rc);
                 return true;
             }
@@ -189,30 +189,30 @@ static bool vbr_fix(const char *selected_file)
                and write it to the file */
             if(unused_space)
             {
-                rb->memset(audiobuf, 0, unused_space);
-                rc = rb->write(fd, audiobuf, unused_space);
+                memset(audiobuf, 0, unused_space);
+                rc = write(fd, audiobuf, unused_space);
                 if(rc < 0) {
-                    rb->close(fd);
+                    close(fd);
                     fileerror(rc);
                     return true;
                 }
             }
 
             /* Then write the Xing header */
-            rc = rb->write(fd, xingbuf, framelen);
+            rc = write(fd, xingbuf, framelen);
             if(rc < 0) {
-                rb->close(fd);
+                close(fd);
                 fileerror(rc);
                 return true;
             }
             
-            rb->close(fd);
+            close(fd);
         } else {
             /* If not, insert some space. If there is an ID3 tag in the
                file we only insert just enough to squeeze the Xing header
                in. If not, we insert an additional empty ID3 tag of 4K. */
             
-            rb->close(fd);
+            close(fd);
             
             /* Nasty trick alert! The insert_data_in_file() function
                uses the MP3 buffer when copying the data. We assume
@@ -226,15 +226,15 @@ static bool vbr_fix(const char *selected_file)
                 DEBUGF("Inserting 4096+%d bytes\n", framelen);
                 numbytes = 4096 + framelen;
                 
-                rb->memset(audiobuf + 0x100000, 0, numbytes);
+                memset(audiobuf + 0x100000, 0, numbytes);
                 
                 /* Insert the ID3 header */
-                rb->memcpy(audiobuf + 0x100000, empty_id3_header,
+                memcpy(audiobuf + 0x100000, empty_id3_header,
                            sizeof(empty_id3_header));
             }
             
             /* Copy the Xing header */
-            rb->memcpy(audiobuf + 0x100000 + numbytes - framelen,
+            memcpy(audiobuf + 0x100000 + numbytes - framelen,
                        xingbuf, framelen);
             
             rc = insert_data_in_file(selected_file,
@@ -253,7 +253,7 @@ static bool vbr_fix(const char *selected_file)
     {
         /* Not a VBR file */
         DEBUGF("Not a VBR file\n");
-        rb->splash(HZ*2, "Not a VBR file");
+        splash(HZ*2, "Not a VBR file");
     }
 
     return false;
@@ -265,16 +265,16 @@ enum plugin_status plugin_start(const void *parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
+    audiobuf = plugin_get_audio_buffer(&audiobuflen);
     
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     vbr_fix(parameter);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
     return PLUGIN_OK;
 }

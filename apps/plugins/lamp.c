@@ -82,9 +82,9 @@ enum plugin_status plugin_start(const void* parameter)
 #endif /* HAVE_LCD_COLOR */
 
 #if LCD_DEPTH > 1
-    unsigned bg_color = rb->lcd_get_background();
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_background(LCD_WHITE);
+    unsigned bg_color = lcd_get_background();
+    lcd_set_backdrop(NULL);
+    lcd_set_background(LCD_WHITE);
 #endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
@@ -97,9 +97,9 @@ enum plugin_status plugin_start(const void* parameter)
 
 #ifdef HAVE_LCD_INVERT
 #ifdef HAVE_NEGATIVE_LCD
-    rb->lcd_set_invert_display(true);
+    lcd_set_invert_display(true);
 #else
-    rb->lcd_set_invert_display(false);
+    lcd_set_invert_display(false);
 #endif /* HAVE_NEGATIVE_LCD */
 #endif /* HAVE_LCD_INVERT */
 
@@ -108,8 +108,8 @@ enum plugin_status plugin_start(const void* parameter)
     buttonlight_force_on();
 #endif /* HAVE_BUTTON_LIGHT */
 
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
 
     do
     {
@@ -120,9 +120,9 @@ enum plugin_status plugin_start(const void* parameter)
                 cs = NUM_COLORSETS-1;
             if(cs >= NUM_COLORSETS)
                 cs = 0;
-            rb->lcd_set_background(colorset[cs]);
-            rb->lcd_clear_display();
-            rb->lcd_update();
+            lcd_set_background(colorset[cs]);
+            lcd_clear_display();
+            lcd_update();
             update = false;
         }
 #endif /* HAVE_LCD_COLOR */
@@ -170,13 +170,13 @@ enum plugin_status plugin_start(const void* parameter)
                 /* time out */
                 break;
             default:
-                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {
                     status = PLUGIN_USB_CONNECTED;
                     quit = true;
                 }
         }
-        rb->reset_poweroff_timer();
+        reset_poweroff_timer();
     } while (!quit);
 
     /* restore */
@@ -186,7 +186,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_LCD_INVERT
-    rb->lcd_set_invert_display(rb->global_settings->invert);
+    lcd_set_invert_display(global_settings.invert);
 #endif /* HAVE_LCD_INVERT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
@@ -197,7 +197,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_background(bg_color);
+    lcd_set_background(bg_color);
 #endif
     return status;
 }

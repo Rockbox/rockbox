@@ -40,6 +40,8 @@
 #include "settings.h"
 #endif
 
+#include "symbols.h"
+
 /** Firmware callback interface **/
 
 /* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
@@ -183,6 +185,7 @@ void sound_set_pitch(int32_t percent)
     struct sample_io_data *data = (void *)dsp;
     dsp_configure(dsp, DSP_SWITCH_FREQUENCY, data->format.codec_frequency);
 }
+EXPORT_SYMBOL(sound_set_pitch);
 #endif /* HAVE_PITCHCONTROL */
 
 /* This is a null-processing stage that monitors as an enabled stage but never

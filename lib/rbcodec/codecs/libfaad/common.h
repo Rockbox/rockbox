@@ -35,18 +35,18 @@ extern "C" {
 #include "faad_config.h"
 #include "codeclib.h"
 
-extern struct codec_api* ci;
+//extern struct codec_api* ci;
 
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
-#define DEBUGF ci->debugf
+#define DEBUGF debugf
 #else
 #define DEBUGF(...)
 #endif
 
 #ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
-#define LOGF ci->logf
+#define LOGF logf
 #else
 #define LOGF(...)
 #endif

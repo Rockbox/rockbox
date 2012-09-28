@@ -66,7 +66,7 @@ static int create_particle(void)
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (!particle_exists(i)) {
-            particles[i][0]=(rb->rand()%SNOW_WIDTH);
+            particles[i][0]=(rand()%SNOW_WIDTH);
             particles[i][1]=0;
             return i;
         }
@@ -78,14 +78,14 @@ static void snow_move(void)
 {
     int i;
 
-    if (!(rb->rand()%2))
+    if (!(rand()%2))
         create_particle();
 
     for (i=0; i<NUM_PARTICLES; i++) {
         if (particle_exists(i)) {
             mylcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
 #ifdef HAVE_LCD_BITMAP
-            rb->lcd_fillrect(particles[i][0],particles[i][1],
+            lcd_fillrect(particles[i][0],particles[i][1],
                              FLAKE_WIDTH,FLAKE_WIDTH);
 #else
             pgfx_drawpixel(particles[i][0],particles[i][1]);
@@ -94,13 +94,13 @@ static void snow_move(void)
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
-                rb->lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                rb->lcd_remote_fillrect(particles[i][0],particles[i][1],
+                lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                lcd_remote_fillrect(particles[i][0],particles[i][1],
                                         FLAKE_WIDTH,FLAKE_WIDTH);
-                rb->lcd_remote_set_drawmode(DRMODE_SOLID);
+                lcd_remote_set_drawmode(DRMODE_SOLID);
             }
 #endif
-            switch ((rb->rand()%7)) {
+            switch ((rand()%7)) {
                 case 0:
                     particles[i][0]++;
                     break;
@@ -118,7 +118,7 @@ static void snow_move(void)
             }
             if (particle_exists(i))
 #ifdef HAVE_LCD_BITMAP
-                rb->lcd_mono_bitmap(flake,particles[i][0],particles[i][1],
+                lcd_mono_bitmap(flake,particles[i][0],particles[i][1],
                                     FLAKE_WIDTH,FLAKE_WIDTH);
 #else
                 pgfx_drawpixel(particles[i][0],particles[i][1]);
@@ -126,7 +126,7 @@ static void snow_move(void)
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
-                rb->lcd_remote_mono_bitmap(flake,particles[i][0],particles[i][1],
+                lcd_remote_mono_bitmap(flake,particles[i][0],particles[i][1],
                                            FLAKE_WIDTH,FLAKE_WIDTH);
             }
 #endif
@@ -150,7 +150,7 @@ static void snow_init(void)
 #endif
     mylcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_clear_display();
+    lcd_remote_clear_display();
 #endif
 }
 
@@ -162,23 +162,23 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_LCD_CHARCELLS
     if (!pgfx_init(4, 2))
     {
-        rb->splash(HZ*2, "Old LCD :(");
+        splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
 #endif
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_clear_display();
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_DEFAULT_BG);
+    lcd_clear_display();
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_DEFAULT_BG);
 #endif
     snow_init();
     while (1) {
         snow_move();
         mylcd_update();
 #ifdef HAVE_REMOTE_LCD
-        rb->lcd_remote_update();
+        lcd_remote_update();
 #endif
-        rb->sleep(HZ/20);
+        sleep(HZ/20);
         
                 /*We get button from PLA this way */
         button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
@@ -192,7 +192,7 @@ enum plugin_status plugin_start(const void* parameter)
             return PLUGIN_OK;
         }
         else
-            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            if (default_event_handler(button) == SYS_USB_CONNECTED)
             {
 #ifdef HAVE_LCD_CHARCELLS
                 pgfx_release();

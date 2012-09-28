@@ -40,6 +40,7 @@
 #include <profile.h>
 #endif
 #include "gcc_extensions.h"
+#include "symbols.h"
 
 /****************************************************************************
  *                              ATTENTION!!                                 *
@@ -1055,6 +1056,7 @@ void profile_thread(void)
 {
     profstart(cores[CURRENT_CORE].running - threads);
 }
+EXPORT_SYMBOL(profile_thread);
 #endif
 
 /*---------------------------------------------------------------------------
@@ -1515,6 +1517,7 @@ unsigned int thread_self(void)
 {
     return cores[CURRENT_CORE].running->id;
 }
+EXPORT_SYMBOL(thread_self);
 
 /*---------------------------------------------------------------------------
  * Return the thread entry of the calling thread.
@@ -1635,6 +1638,7 @@ unsigned int create_thread(void (*function)(void),
 
     return i;
 }
+EXPORT_SYMBOL(create_thread);
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 /*---------------------------------------------------------------------------
@@ -1656,12 +1660,14 @@ void trigger_cpu_boost(void)
     struct thread_entry *current = cores[CURRENT_CORE].running;
     boost_thread(current, true);
 }
+EXPORT_SYMBOL(trigger_cpu_boost);
 
 void cancel_cpu_boost(void)
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
     boost_thread(current, false);
 }
+EXPORT_SYMBOL(cancel_cpu_boost);
 #endif /* HAVE_SCHEDULER_BOOSTCTRL */
 
 /*---------------------------------------------------------------------------
@@ -1696,6 +1702,7 @@ void thread_wait(unsigned int thread_id)
 
     corelock_unlock(&thread->waiter_cl);
 }
+EXPORT_SYMBOL(thread_wait);
 
 /*---------------------------------------------------------------------------
  * Exit the current thread. The Right Way to Do Things (TM).
@@ -1772,6 +1779,7 @@ void thread_exit(void)
     /* Do final cleanup and remove the thread */
     thread_final_exit(current);
 }
+EXPORT_SYMBOL(thread_exit);
 
 #ifdef ALLOW_REMOVE_THREAD
 /*---------------------------------------------------------------------------
@@ -2089,6 +2097,7 @@ int thread_set_priority(unsigned int thread_id, int priority)
 
     return old_base_priority;
 }
+EXPORT_SYMBOL(thread_set_priority);
 
 /*---------------------------------------------------------------------------
  * Returns the current base priority for a thread.
@@ -2144,6 +2153,7 @@ void thread_thaw(unsigned int thread_id)
     UNLOCK_THREAD(thread);
     restore_irq(oldlevel);
 }
+EXPORT_SYMBOL(thread_thaw);
 
 #if NUM_CORES > 1
 /*---------------------------------------------------------------------------

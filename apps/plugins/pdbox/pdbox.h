@@ -161,9 +161,9 @@ void pd_init(void);
 /* Redefinitons of ANSI C functions. */
 #include "lib/wrappers.h"
 
-#define strncmp rb->strncmp
-#define atoi rb->atoi
-#define write rb->write
+#define strncmp strncmp
+#define atoi atoi
+#define write write
 
 #undef strncat
 #define strncat rb_strncat
@@ -194,8 +194,8 @@ void pd_init(void);
 
 #define ftoan rb_ftoan
 #undef strtok_r
-#define strtok_r rb->strtok_r
-#define strstr rb->strcasestr
+#define strtok_r strtok_r
+#define strstr strcasestr
 
 
 /* PdPod GUI declarations. */

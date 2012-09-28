@@ -32,8 +32,8 @@ static bool wait_key_press(void)
 {
     int button;
     do {
-        button = rb->button_get(true);
-        if ( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+        button = button_get(true);
+        if ( default_event_handler( button ) == SYS_USB_CONNECTED )
             return true;
     } while( ( button == BUTTON_NONE )
             || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
@@ -58,23 +58,24 @@ bool display_text(unsigned short words, char** text, struct style_text* style,
         vp_width = vp_text->width;
         vp_height = vp_text->height;
     }
-    rb->screens[SCREEN_MAIN]->set_viewport(vp_text);
+    screens[SCREEN_MAIN].set_viewport(vp_text);
 #ifdef HAVE_LCD_BITMAP
-    prev_drawmode = rb->lcd_get_drawmode();
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    prev_drawmode = lcd_get_drawmode();
+    lcd_set_drawmode(DRMODE_SOLID);
 #endif
 #ifdef HAVE_LCD_COLOR
-    standard_fgcolor = rb->lcd_get_foreground();
+    standard_fgcolor = lcd_get_foreground();
 #endif
-    rb->screens[SCREEN_MAIN]->clear_viewport();
+    screens[SCREEN_MAIN].clear_viewport();
+
     x = MARGIN;
     y = MARGIN;
-    rb->button_clear_queue();
-    rb->lcd_getstringsize(" ", &space_w, &height);
+    button_clear_queue();
+    lcd_getstringsize(" ", &space_w, &height);
     for (i = 0; i < words; i++) {
-        rb->lcd_getstringsize(text[i], &width, NULL);
+        lcd_getstringsize(text[i], &width, NULL);
         /* skip to next line if the word is an empty string */
-        if (rb->strcmp(text[i], "")==0) {
+        if (strcmp(text[i], "")==0) {
             x = MARGIN;
             y = y + height;
             continue;
@@ -86,14 +87,14 @@ bool display_text(unsigned short words, char** text, struct style_text* style,
         /* display the remaining text by button click or exit */
         if (y + height > vp_height - MARGIN) {
             y = MARGIN;
-            rb->screens[SCREEN_MAIN]->update_viewport();
+            screens[SCREEN_MAIN].update_viewport();
             if (wait_key_press())
                 return true;
-            rb->screens[SCREEN_MAIN]->clear_viewport();
+            screens[SCREEN_MAIN].clear_viewport();
         }
         /* no text formatting available */
         if (style==NULL || style[style_index].index != i) {
-            rb->lcd_putsxy(x, y, text[i]);
+            lcd_putsxy(x, y, text[i]);
         } else {
             /* set align */
             if (style[style_index].flags&TEXT_CENTER) {
@@ -103,43 +104,43 @@ bool display_text(unsigned short words, char** text, struct style_text* style,
 #ifdef HAVE_LCD_COLOR
             switch (style[style_index].flags&TEXT_COLOR_MASK) {
                 case C_RED:
-                    rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));
+                    lcd_set_foreground(LCD_RGBPACK(255,0,0));
                     break;
                 case C_YELLOW:
-                    rb->lcd_set_foreground(LCD_RGBPACK(255,255,0));
+                    lcd_set_foreground(LCD_RGBPACK(255,255,0));
                     break;
                 case C_GREEN:
-                    rb->lcd_set_foreground(LCD_RGBPACK(0,192,0));
+                    lcd_set_foreground(LCD_RGBPACK(0,192,0));
                     break;
                 case C_BLUE:
-                    rb->lcd_set_foreground(LCD_RGBPACK(0,0,255));
+                    lcd_set_foreground(LCD_RGBPACK(0,0,255));
                     break;
                 case C_ORANGE:
-                    rb->lcd_set_foreground(LCD_RGBPACK(255,192,0));
+                    lcd_set_foreground(LCD_RGBPACK(255,192,0));
                     break;
                 case STANDARD:
                 default:
-                    rb->lcd_set_foreground(standard_fgcolor);
+                    lcd_set_foreground(standard_fgcolor);
                     break;
             }
 #endif
-            rb->lcd_putsxy(x, y, text[i]);
+            lcd_putsxy(x, y, text[i]);
             /* underline the word */
 #ifdef HAVE_LCD_BITMAP
             if (style[style_index].flags&TEXT_UNDERLINE) {
-                rb->lcd_hline(x, x+width, y+height-1);
+                lcd_hline(x, x+width, y+height-1);
             }
 #endif
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(standard_fgcolor);
+            lcd_set_foreground(standard_fgcolor);
 #endif
             style_index++;
         }
         x += width + space_w;
     }
-    rb->screens[SCREEN_MAIN]->update_viewport();
+    screens[SCREEN_MAIN].update_viewport();
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_set_drawmode(prev_drawmode);
+    lcd_set_drawmode(prev_drawmode);
 #endif
     if (wait_key)
     {

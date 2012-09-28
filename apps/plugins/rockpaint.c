@@ -571,7 +571,7 @@ static void buffer_mono_bitmap_part(
 {
     const unsigned char *src_end;
     fb_data *dst, *dst_end;
-    unsigned fgcolor = rb->lcd_get_foreground();
+    unsigned fgcolor = lcd_get_foreground();
 
     /* nothing to draw? */
     if( ( width <= 0 ) || ( height <= 0 ) || ( x >= buf_width )
@@ -684,7 +684,7 @@ static void buffer_alpha_bitmap_part(
                               int stride, int x, int y, int width, int height )
 {
     fb_data *dst;
-    unsigned fg_pattern = rb->lcd_get_foreground();
+    unsigned fg_pattern = lcd_get_foreground();
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= buf_width) ||
@@ -808,10 +808,10 @@ static void buffer_putsxyofs( fb_data *buf, int buf_width, int buf_height,
     unsigned short ch;
     unsigned short *ucs;
 
-    struct font *pf = rb->font_get( FONT_UI );
-    if( !pf ) pf = rb->font_get( FONT_SYSFIXED );
+    struct font *pf = font_get( FONT_UI );
+    if( !pf ) pf = font_get( FONT_SYSFIXED );
 
-    ucs = rb->bidi_l2v( str, 1 );
+    ucs = bidi_l2v( str, 1 );
 
     while( (ch = *ucs++) != 0 && x < buf_width )
     {
@@ -819,7 +819,7 @@ static void buffer_putsxyofs( fb_data *buf, int buf_width, int buf_height,
         const unsigned char *bits;
 
         /* get proportional width and glyph bits */
-        width = rb->font_get_width( pf, ch );
+        width = font_get_width( pf, ch );
 
         if( ofs > width )
         {
@@ -827,7 +827,7 @@ static void buffer_putsxyofs( fb_data *buf, int buf_width, int buf_height,
             continue;
         }
 
-        bits = rb->font_get_bits( pf, ch );
+        bits = font_get_bits( pf, ch );
 
         if (pf->depth)
             buffer_alpha_bitmap_part( buf, buf_width, buf_height, bits, ofs, 0,
@@ -895,22 +895,22 @@ static int draw_window( int height, int width,
                          const char *title )
 {
     int fh;
-    rb->lcd_getstringsize( title, NULL, &fh );
+    lcd_getstringsize( title, NULL, &fh );
     fh++;
 
     const int _top = ( LCD_HEIGHT - height ) / 2;
     const int _left = ( LCD_WIDTH - width ) / 2;
     if( top ) *top = _top;
     if( left ) *left = _left;
-    rb->lcd_set_background(COLOR_BLUE);
-    rb->lcd_set_foreground(COLOR_LIGHTGRAY);
-    rb->lcd_fillrect( _left, _top, width, height );
-    rb->lcd_set_foreground(COLOR_BLUE);
-    rb->lcd_fillrect( _left, _top, width, fh+4 );
-    rb->lcd_set_foreground(COLOR_WHITE);
-    rb->lcd_putsxy( _left+2, _top+2, title );
-    rb->lcd_set_foreground(COLOR_BLACK);
-    rb->lcd_drawrect( _left, _top, width, height );
+    lcd_set_background(COLOR_BLUE);
+    lcd_set_foreground(COLOR_LIGHTGRAY);
+    lcd_fillrect( _left, _top, width, height );
+    lcd_set_foreground(COLOR_BLUE);
+    lcd_fillrect( _left, _top, width, fh+4 );
+    lcd_set_foreground(COLOR_WHITE);
+    lcd_putsxy( _left+2, _top+2, title );
+    lcd_set_foreground(COLOR_BLACK);
+    lcd_drawrect( _left, _top, width, height );
     return _top+fh+4;
 }
 
@@ -924,8 +924,8 @@ struct tree_context *tree = NULL;
 
 static bool check_extention(const char *filename, const char *ext)
 {
-    const char *p = rb->strrchr( filename, '.' );
-    return ( p != NULL && !rb->strcasecmp( p, ext ) );
+    const char *p = strrchr( filename, '.' );
+    return ( p != NULL && !strcasecmp( p, ext ) );
 }
 
 /* only displayes directories and .bmp files */
@@ -944,7 +944,7 @@ static bool browse( char *dst, int dst_size, const char *start )
 {
     struct browse_context browse;
 
-    rb->browse_context_init(&browse, SHOW_ALL,
+    browse_context_init(&browse, SHOW_ALL,
                             BROWSE_SELECTONLY|BROWSE_NO_CONTEXT_MENU,
                             NULL, NOICON, start, NULL);
 
@@ -952,7 +952,7 @@ static bool browse( char *dst, int dst_size, const char *start )
     browse.buf = dst;
     browse.bufsize = dst_size;
 
-    rb->rockbox_browse(&browse);
+    rockbox_browse(&browse);
 
     return (browse.flags & BROWSE_SELECTED);
 }
@@ -1009,22 +1009,22 @@ static bool browse_fonts( char *dst, int dst_size )
     int cache_first = 0, cache_last = -1;
     char *a;
 
-    rb->snprintf( bbuf_s, MAX_PATH, FONT_DIR "/%s.fnt",
-                  rb->global_settings->font_file );
+    snprintf( bbuf_s, MAX_PATH, FONT_DIR "/%s.fnt",
+                  global_settings.font_file );
 
-    tree = rb->tree_get_context();
+    tree = tree_get_context();
     backup = *tree;
-    dc = rb->tree_get_entries(tree);
-    a = backup.currdir+rb->strlen(backup.currdir)-1;
+    dc = tree_get_entries(tree);
+    a = backup.currdir+strlen(backup.currdir)-1;
     if( *a != '/' )
     {
         *++a = '/';
     }
-    rb->strcpy( a+1, dc[tree->selected_item].name );
+    strcpy( a+1, dc[tree->selected_item].name );
     tree->dirfilter = &dirfilter;
     tree->browse = NULL;
-    rb->strcpy( bbuf, FONT_DIR "/" );
-    rb->set_current_file( bbuf );
+    strcpy( bbuf, FONT_DIR "/" );
+    set_current_file( bbuf );
 
     if( buffer->text.initialized )
     {
@@ -1042,21 +1042,21 @@ static bool browse_fonts( char *dst, int dst_size )
         {
             /* we don't need to redraw ... but we need to unselect
              * the previously selected item */
-            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, font_preview->height );
-            rb->lcd_set_drawmode(DRMODE_SOLID);
+            lcd_set_drawmode(DRMODE_COMPLEMENT);
+            lcd_fillrect( 10, sp, LCD_WIDTH-10, font_preview->height );
+            lcd_set_drawmode(DRMODE_SOLID);
         }
 
         if( need_redraw )
         {
             need_redraw = false;
 
-            rb->lcd_set_foreground(COLOR_BLACK);
-            rb->lcd_set_background(COLOR_LIGHTGRAY);
-            rb->lcd_clear_display();
+            lcd_set_foreground(COLOR_BLACK);
+            lcd_set_background(COLOR_LIGHTGRAY);
+            lcd_clear_display();
 
-            rb->font_getstringsize( "Fonts", NULL, &fh, FONT_UI );
-            rb->lcd_putsxy( 2, 2, "Fonts" );
+            font_getstringsize( "Fonts", NULL, &fh, FONT_UI );
+            lcd_putsxy( 2, 2, "Fonts" );
             top = fh + 4 + LINE_SPACE;
 
             font_preview = (struct font_preview *) cache;
@@ -1081,8 +1081,8 @@ static bool browse_fonts( char *dst, int dst_size )
                 {
                     size_t siz;
                     reset_font = true;
-                    rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s", e->name );
-                    rb->font_getstringsize( e->name, &fw, &fh, FONT_UI );
+                    snprintf( bbuf, MAX_PATH, FONT_DIR "/%s", e->name );
+                    font_getstringsize( e->name, &fw, &fh, FONT_UI );
                     if( fw > LCD_WIDTH ) fw = LCD_WIDTH;
                     siz = (sizeof(struct font_preview) + fw*fh*FB_DATA_SZ+3) & ~3;
                     if( i < cache_first )
@@ -1099,7 +1099,7 @@ static bool browse_fonts( char *dst, int dst_size )
                         }
                         cache_last = cache_first-1;
                         cache_first = i;
-                        rb->memmove( cache+siz, cache, cache_used );
+                        memmove( cache+siz, cache, cache_used );
                         font_preview = (struct font_preview *) cache;
                     }
                     else /* i > cache_last */
@@ -1113,7 +1113,7 @@ static bool browse_fonts( char *dst, int dst_size )
                             cache_first++;
                         }
                         cache_last = i;
-                        rb->memmove( cache, font_preview, cache_used );
+                        memmove( cache, font_preview, cache_used );
                         font_preview = (struct font_preview *) (cache + cache_used);
                     }
                     cache_used += siz;
@@ -1139,7 +1139,7 @@ static bool browse_fonts( char *dst, int dst_size )
                     nvih = fh;
                     break;
                 }
-                rb->lcd_bitmap( font_preview->preview, 10, cp, fw, fh );
+                lcd_bitmap( font_preview->preview, 10, cp, fw, fh );
                 cp += fh + LINE_SPACE;
                 i++;
                 font_preview = PREVIEW_NEXT(font_preview);
@@ -1148,18 +1148,18 @@ static bool browse_fonts( char *dst, int dst_size )
             li = tree->filesindir-1;
             if( reset_font )
             {
-             // fixme   rb->font_load(NULL, bbuf_s );
+             // fixme   font_load(NULL, bbuf_s );
                 reset_font = false;
             }
             if( lvi-fvi+1 < tree->filesindir )
             {
-                rb->gui_scrollbar_draw( rb->screens[SCREEN_MAIN], 0, top,
+                gui_scrollbar_draw(&screens[SCREEN_MAIN], 0, top,
                                        9, LCD_HEIGHT-top,
                                        tree->filesindir, fvi, lvi+1, VERTICAL );
             }
         }
 
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
         sp = top;
         font_preview = (struct font_preview *) cache;
         for( i = cache_first; i < si; i++ )
@@ -1168,12 +1168,12 @@ static bool browse_fonts( char *dst, int dst_size )
                 sp += font_preview->height + LINE_SPACE;
             font_preview = PREVIEW_NEXT(font_preview);
         }
-        rb->lcd_fillrect( 10, sp, LCD_WIDTH-10, font_preview->height );
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_fillrect( 10, sp, LCD_WIDTH-10, font_preview->height );
+        lcd_set_drawmode(DRMODE_SOLID);
 
-        rb->lcd_update();
+        lcd_update();
 
-        switch( rb->button_get(true) )
+        switch( button_get(true) )
         {
             case ROCKPAINT_UP:
             case ROCKPAINT_UP|BUTTON_REPEAT:
@@ -1204,7 +1204,7 @@ static bool browse_fonts( char *dst, int dst_size )
             case ROCKPAINT_RIGHT:
             case ROCKPAINT_DRAW:
                 ret = true;
-                rb->snprintf( dst, dst_size, FONT_DIR "/%s", dc[si].name );
+                snprintf( dst, dst_size, FONT_DIR "/%s", dc[si].name );
                 /* fall through */
             case ROCKPAINT_LEFT:
             case ROCKPAINT_QUIT:
@@ -1214,7 +1214,7 @@ static bool browse_fonts( char *dst, int dst_size )
                 buffer->text.fvi = fvi;
                 buffer->text.si = si;
                 *tree = backup;
-                rb->set_current_file( backup.currdir );
+                set_current_file( backup.currdir );
                 return ret;
         }
     }
@@ -1264,28 +1264,28 @@ static unsigned int color_chooser( unsigned int color )
         for( i=0; i<100; i++ )
         {
             hsv2rgb( i*36, saturation, value, &r, &g, &b );
-            rb->lcd_set_foreground( LCD_RGBPACK( r, g, b ) );
-            rb->lcd_vline( left+15+i, top+20, top+27 );
+            lcd_set_foreground( LCD_RGBPACK( r, g, b ) );
+            lcd_vline( left+15+i, top+20, top+27 );
             hsv2rgb( hue, i*255/100, value, &r, &g, &b );
-            rb->lcd_set_foreground( LCD_RGBPACK( r, g, b ) );
-            rb->lcd_vline( left+15+i, top+30, top+37 );
+            lcd_set_foreground( LCD_RGBPACK( r, g, b ) );
+            lcd_vline( left+15+i, top+30, top+37 );
             hsv2rgb( hue, saturation, i*255/100, &r, &g, &b );
-            rb->lcd_set_foreground( LCD_RGBPACK( r, g, b ) );
-            rb->lcd_vline( left+15+i, top+40, top+47 );
-            rb->lcd_set_foreground( LCD_RGBPACK( i*255/100, green, blue ) );
-            rb->lcd_vline( left+15+i, top+50, top+57 );
-            rb->lcd_set_foreground( LCD_RGBPACK( red, i*255/100, blue ) );
-            rb->lcd_vline( left+15+i, top+60, top+67 );
-            rb->lcd_set_foreground( LCD_RGBPACK( red, green, i*255/100 ) );
-            rb->lcd_vline( left+15+i, top+70, top+77 );
+            lcd_set_foreground( LCD_RGBPACK( r, g, b ) );
+            lcd_vline( left+15+i, top+40, top+47 );
+            lcd_set_foreground( LCD_RGBPACK( i*255/100, green, blue ) );
+            lcd_vline( left+15+i, top+50, top+57 );
+            lcd_set_foreground( LCD_RGBPACK( red, i*255/100, blue ) );
+            lcd_vline( left+15+i, top+60, top+67 );
+            lcd_set_foreground( LCD_RGBPACK( red, green, i*255/100 ) );
+            lcd_vline( left+15+i, top+70, top+77 );
         }
 
-        rb->lcd_set_foreground(COLOR_BLACK);
+        lcd_set_foreground(COLOR_BLACK);
 #define POSITION( a, i ) \
-        rb->lcd_drawpixel( left+14+i, top + 19 + a ); \
-        rb->lcd_drawpixel( left+16+i, top + 19 + a ); \
-        rb->lcd_drawpixel( left+14+i, top + 28 + a ); \
-        rb->lcd_drawpixel( left+16+i, top + 28 + a );
+        lcd_drawpixel( left+14+i, top + 19 + a ); \
+        lcd_drawpixel( left+16+i, top + 19 + a ); \
+        lcd_drawpixel( left+14+i, top + 28 + a ); \
+        lcd_drawpixel( left+16+i, top + 28 + a );
         POSITION( 0, hue/36 );
         POSITION( 10, saturation*99/255 );
         POSITION( 20, value*99/255 );
@@ -1293,30 +1293,30 @@ static unsigned int color_chooser( unsigned int color )
         POSITION( 40, green*99/255 );
         POSITION( 50, blue*99/255 );
 #undef POSITION
-        rb->lcd_set_background(COLOR_LIGHTGRAY);
-        rb->lcd_setfont( FONT_SYSFIXED );
-        rb->lcd_putsxyf( left + 117, top + 20, "%d", hue/10 );
-        rb->lcd_putsxyf( left + 117, top + 30, "%d.%d",
+        lcd_set_background(COLOR_LIGHTGRAY);
+        lcd_setfont( FONT_SYSFIXED );
+        lcd_putsxyf( left + 117, top + 20, "%d", hue/10 );
+        lcd_putsxyf( left + 117, top + 30, "%d.%d",
                 saturation/255, ((saturation*100)/255)%100 );
-        rb->lcd_putsxyf( left + 117, top + 40, "%d.%d",
+        lcd_putsxyf( left + 117, top + 40, "%d.%d",
                 value/255, ((value*100)/255)%100 );
-        rb->lcd_putsxyf( left + 117, top + 50, "%d", red );
-        rb->lcd_putsxyf( left + 117, top + 60, "%d", green );
-        rb->lcd_putsxyf( left + 117, top + 70, "%d", blue );
-        rb->lcd_setfont( FONT_UI );
+        lcd_putsxyf( left + 117, top + 50, "%d", red );
+        lcd_putsxyf( left + 117, top + 60, "%d", green );
+        lcd_putsxyf( left + 117, top + 70, "%d", blue );
+        lcd_setfont( FONT_UI );
 
 #define CURSOR( l ) \
-        rb->lcd_bitmap_transparent_part( rockpaint_hsvrgb, 1, 1, 16, left+l+1, top+20, 6, 58 ); \
-        rb->lcd_bitmap_transparent_part( rockpaint_hsvrgb, 8, 10*current, 16, left+l, top+19+10*current, 8, 10 );
+        lcd_bitmap_transparent_part( rockpaint_hsvrgb, 1, 1, 16, left+l+1, top+20, 6, 58 ); \
+        lcd_bitmap_transparent_part( rockpaint_hsvrgb, 8, 10*current, 16, left+l, top+19+10*current, 8, 10 );
         CURSOR( 5 );
 #undef CURSOR
 
-        rb->lcd_set_foreground( color );
-        rb->lcd_fillrect( left+15, top+85, 100, 8 );
+        lcd_set_foreground( color );
+        lcd_fillrect( left+15, top+85, 100, 8 );
 
-        rb->lcd_update();
+        lcd_update();
 
-        switch( button = rb->button_get(true) )
+        switch( button = button_get(true) )
         {
             case ROCKPAINT_UP:
                 current = ( current + 5 )%6;
@@ -1414,23 +1414,23 @@ static void draw_pixel(int x,int y)
             save_buffer[ x+y*COLS ] = rp_colors[drawcolor];
         }
     }
-    rb->lcd_drawpixel(x,y);
+    lcd_drawpixel(x,y);
 }
 
 static void color_picker( int x, int y )
 {
     if( preview )
     {
-        rb->lcd_set_foreground( save_buffer[ x+y*COLS ] );
+        lcd_set_foreground( save_buffer[ x+y*COLS ] );
 #define PSIZE 12
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
         if( x >= COLS - PSIZE ) x -= PSIZE + 2;
         if( y >= ROWS - PSIZE ) y -= PSIZE + 2;
-        rb->lcd_drawrect( x + 2, y + 2, PSIZE - 2, PSIZE - 2 );
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_fillrect( x + 3, y + 3, PSIZE - 4, PSIZE - 4 );
+        lcd_drawrect( x + 2, y + 2, PSIZE - 2, PSIZE - 2 );
+        lcd_set_drawmode(DRMODE_SOLID);
+        lcd_fillrect( x + 3, y + 3, PSIZE - 4, PSIZE - 4 );
 #undef PSIZE
-        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        lcd_set_foreground( rp_colors[ drawcolor ] );
     }
     else
     {
@@ -1454,29 +1454,29 @@ static void draw_select_rectangle( int x1, int y1, int x2, int y2 )
         y1 = y2;
         y2 = i;
     }
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
     i = 0;
     for( a = x1; a < x2; a++, i++ )
         if( i%2 )
-            rb->lcd_drawpixel( a, y1 );
+            lcd_drawpixel( a, y1 );
     for( a = y1; a < y2; a++, i++ )
         if( i%2 )
-            rb->lcd_drawpixel( x2, a );
+            lcd_drawpixel( x2, a );
     if( y2 != y1 )
         for( a = x2; a > x1; a--, i++ )
             if( i%2 )
-                rb->lcd_drawpixel( a, y2 );
+                lcd_drawpixel( a, y2 );
     if( x2 != x1 )
         for( a = y2; a > y1; a--, i++ )
             if( i%2 )
-                rb->lcd_drawpixel( x1, a );
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+                lcd_drawpixel( x1, a );
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 
 static void copy_to_clipboard( void )
 {
     /* This needs to be optimised ... but i'm lazy ATM */
-    rb->memcpy( buffer->clipboard, save_buffer, COLS*ROWS*sizeof( fb_data ) );
+    memcpy( buffer->clipboard, save_buffer, COLS*ROWS*sizeof( fb_data ) );
 }
 
 /* no preview mode handling atm ... do we need it ? (one if) */
@@ -1496,9 +1496,9 @@ static void draw_invert( int x1, int y1, int x2, int y2 )
         y2 = i;
     }
 
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect( x1, y1, x2-x1+1, y2-y1+1 );
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_fillrect( x1, y1, x2-x1+1, y2-y1+1 );
+    lcd_set_drawmode(DRMODE_SOLID);
 
     for( ; y1<=y2; y1++ )
     {
@@ -1507,7 +1507,7 @@ static void draw_invert( int x1, int y1, int x2, int y2 )
             save_buffer[ y1*COLS + i ] = ~save_buffer[ y1*COLS + i ];
         }
     }
-    /*if( update )*/ rb->lcd_update();
+    /*if( update )*/ lcd_update();
 }
 
 static void draw_hflip( int x1, int y1, int x2, int y2 )
@@ -1530,12 +1530,12 @@ static void draw_hflip( int x1, int y1, int x2, int y2 )
 
     for( i = 0; i <= y2 - y1; i++ )
     {
-        rb->memcpy( save_buffer+(y1+i)*COLS+x1,
+        memcpy( save_buffer+(y1+i)*COLS+x1,
                     buffer->clipboard+(y2-i)*COLS+x1,
                     (x2-x1+1)*sizeof( fb_data ) );
     }
     restore_screen();
-    rb->lcd_update();
+    lcd_update();
 }
 
 static void draw_vflip( int x1, int y1, int x2, int y2 )
@@ -1564,7 +1564,7 @@ static void draw_vflip( int x1, int y1, int x2, int y2 )
         }
     }
     restore_screen();
-    rb->lcd_update();
+    lcd_update();
 }
 
 /* direction: -1 = left, 1 = right */
@@ -1632,7 +1632,7 @@ static void draw_rot_90_deg( int x1, int y1, int x2, int y2, int direction )
         }
     }
     restore_screen();
-    rb->lcd_update();
+    lcd_update();
 }
 
 static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
@@ -1666,13 +1666,13 @@ static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
     if( y1 + height > ROWS )
         height = ROWS - y1;
 
-    rb->lcd_bitmap_part( buffer->clipboard, src_x1, src_y1, COLS,
+    lcd_bitmap_part( buffer->clipboard, src_x1, src_y1, COLS,
                          x1, y1, width, height );
     if( !preview )
     {
         for( i = 0; i < height; i++ )
         {
-            rb->memcpy( save_buffer+(y1+i)*COLS+x1,
+            memcpy( save_buffer+(y1+i)*COLS+x1,
                         buffer->clipboard+(src_y1+i)*COLS+src_x1,
                         width*sizeof( fb_data ) );
         }
@@ -1684,54 +1684,54 @@ static void show_grid( bool update )
     int i;
     if( gridsize > 0 )
     {
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
         for( i = gridsize; i < img_width; i+= gridsize )
         {
-            rb->lcd_vline( i, 0, img_height-1 );
+            lcd_vline( i, 0, img_height-1 );
         }
         for( i = gridsize; i < img_height; i+= gridsize )
         {
-            rb->lcd_hline( 0, img_width-1, i );
+            lcd_hline( 0, img_width-1, i );
         }
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        if( update ) rb->lcd_update();
+        lcd_set_drawmode(DRMODE_SOLID);
+        if( update ) lcd_update();
     }
 }
 
 static void draw_text( int x, int y )
 {
     int selected = 0;
-    int current_font_id = rb->global_status->font_id[SCREEN_MAIN];
+    int current_font_id = global_status.font_id[SCREEN_MAIN];
     buffer->text.text[0] = '\0';
     buffer->text.font[0] = '\0';
     while( 1 )
     {
-        switch( rb->do_menu( &text_menu, &selected, NULL, NULL ) )
+        switch( do_menu( &text_menu, &selected, NULL, NULL ) )
         {
             case TEXT_MENU_TEXT:
-                rb->lcd_set_foreground(COLOR_BLACK);
-                rb->kbd_input( buffer->text.text, MAX_TEXT );
+                lcd_set_foreground(COLOR_BLACK);
+                kbd_input( buffer->text.text, MAX_TEXT );
                 break;
 
             case TEXT_MENU_FONT:
-                if (current_font_id != rb->global_status->font_id[SCREEN_MAIN])
-                    rb->font_unload(current_font_id);
+                if (current_font_id != global_status.font_id[SCREEN_MAIN])
+                    font_unload(current_font_id);
                 if(browse_fonts( buffer->text.font, MAX_PATH ) )
                 {
-                    current_font_id = rb->font_load(buffer->text.font );
-                    rb->lcd_setfont(current_font_id);
+                    current_font_id = font_load(buffer->text.font );
+                    lcd_setfont(current_font_id);
                 }
                 break;
 
             case TEXT_MENU_PREVIEW:
-                rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+                lcd_set_foreground( rp_colors[ drawcolor ] );
                 while( 1 )
                 {
                     int button;
                     restore_screen();
-                    rb->lcd_putsxy( x, y, buffer->text.text );
-                    rb->lcd_update();
-                    switch( button = rb->button_get( true ) )
+                    lcd_putsxy( x, y, buffer->text.text );
+                    lcd_update();
+                    switch( button = button_get( true ) )
                     {
                         case ROCKPAINT_LEFT:
                         case ROCKPAINT_LEFT | BUTTON_REPEAT:
@@ -1752,7 +1752,7 @@ static void draw_text( int x, int y )
                         case ROCKPAINT_DRAW:
                             break;
                         default:
-                            if(rb->default_event_handler(button)
+                            if(default_event_handler(button)
                                 == SYS_USB_CONNECTED)
                                 button = ROCKPAINT_DRAW;
                             break;
@@ -1762,7 +1762,7 @@ static void draw_text( int x, int y )
                 break;
 
             case TEXT_MENU_APPLY:
-                rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+                lcd_set_foreground( rp_colors[ drawcolor ] );
                 buffer_putsxyofs( save_buffer, COLS, ROWS, x, y, 0,
                                   buffer->text.text );
             case TEXT_MENU_CANCEL:
@@ -1770,12 +1770,12 @@ static void draw_text( int x, int y )
                 restore_screen();
                 if( buffer->text.font[0] )
                 {
-                    rb->snprintf( buffer->text.font, MAX_PATH,
+                    snprintf( buffer->text.font, MAX_PATH,
                                   FONT_DIR "/%s.fnt",
-                                  rb->global_settings->font_file );
-                    if (current_font_id != rb->global_status->font_id[SCREEN_MAIN])
-                        rb->font_unload(current_font_id);
-                    rb->lcd_setfont(FONT_UI);
+                                  global_settings.font_file );
+                    if (current_font_id != global_status.font_id[SCREEN_MAIN])
+                        font_unload(current_font_id);
+                    lcd_setfont(FONT_UI);
                 }
                 return;
         }
@@ -1873,18 +1873,18 @@ static void draw_curve( int x1, int y1, int x2, int y2,
 
 //    if( preview )
     {
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
         if( xa == -1 || ya == -1 )
         {
-            rb->lcd_drawline( x1, y1, xb, yb );
-            rb->lcd_drawline( x2, y2, xb, yb );
+            lcd_drawline( x1, y1, xb, yb );
+            lcd_drawline( x2, y2, xb, yb );
         }
         else
         {
-            rb->lcd_drawline( x1, y1, xa, ya );
-            rb->lcd_drawline( x2, y2, xb, yb );
+            lcd_drawline( x1, y1, xa, ya );
+            lcd_drawline( x2, y2, xb, yb );
         }
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_set_drawmode(DRMODE_SOLID);
     }
 
     if( xa == -1 || ya == -1 )
@@ -2009,11 +2009,11 @@ static void togglebg( void )
 {
     if( isbg )
     {
-        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        lcd_set_foreground( rp_colors[ drawcolor ] );
     }
     else
     {
-        rb->lcd_set_foreground( rp_colors[ bgdrawcolor ] );
+        lcd_set_foreground( rp_colors[ bgdrawcolor ] );
     }
     isbg = !isbg;
 }
@@ -2215,7 +2215,7 @@ static void line_gradient( int x1, int y1, int x2, int y2 )
                      v2+((v1-v2)*i)/delta,
                      &r, &g, &b );
             rp_colors[ drawcolor ] = LCD_RGBPACK( r, g, b );
-            rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+            lcd_set_foreground( rp_colors[ drawcolor ] );
             draw_pixel(x1, y1);
             x1 += xstep;
             err -= yerr;
@@ -2236,7 +2236,7 @@ static void line_gradient( int x1, int y1, int x2, int y2 )
                      v2+((v1-v2)*i)/delta,
                      &r, &g, &b );
             rp_colors[ drawcolor ] = LCD_RGBPACK( r, g, b );
-            rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+            lcd_set_foreground( rp_colors[ drawcolor ] );
             draw_pixel(x1, y1);
             y1 += ystep;
             err -= xerr;
@@ -2337,7 +2337,7 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
             PUSH2( x, y );
             rp_colors[ drawcolor ] = mark_color;
         }
-        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        lcd_set_foreground( rp_colors[ drawcolor ] );
         draw_pixel( x, y );
 
         if( x > 0 && save_buffer[x-1+y*COLS] == prev_color )
@@ -2362,7 +2362,7 @@ static void linear_gradient( int x1, int y1, int x2, int y2 )
         /* correct color. */
         POP2( x, y );
         rp_colors[ drawcolor ] = prev_color;
-        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        lcd_set_foreground( rp_colors[ drawcolor ] );
         draw_pixel( x, y );
     }
     rp_colors[ drawcolor ] = color;
@@ -2433,7 +2433,7 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
             PUSH2( x, y );
             rp_colors[ drawcolor ] = mark_color;
         }
-        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        lcd_set_foreground( rp_colors[ drawcolor ] );
         draw_pixel( x, y );
 
         if( x > 0 && save_buffer[x-1+y*COLS] == prev_color )
@@ -2458,7 +2458,7 @@ static void radial_gradient( int x1, int y1, int x2, int y2 )
         /* correct color. */
         POP2( x, y );
         rp_colors[ drawcolor ] = prev_color;
-        rb->lcd_set_foreground( rp_colors[ drawcolor ] );
+        lcd_set_foreground( rp_colors[ drawcolor ] );
         draw_pixel( x, y );
     }
     rp_colors[ drawcolor ] = color;
@@ -2473,61 +2473,61 @@ static void draw_toolbars(bool update)
 {
     int i;
 #define TOP (LCD_HEIGHT-TB_HEIGHT)
-    rb->lcd_set_background( COLOR_LIGHTGRAY );
-    rb->lcd_set_foreground( COLOR_LIGHTGRAY );
-    rb->lcd_fillrect( 0, TOP, LCD_WIDTH, TB_HEIGHT );
-    rb->lcd_set_foreground( COLOR_BLACK );
-    rb->lcd_drawrect( 0, TOP, LCD_WIDTH, TB_HEIGHT );
+    lcd_set_background( COLOR_LIGHTGRAY );
+    lcd_set_foreground( COLOR_LIGHTGRAY );
+    lcd_fillrect( 0, TOP, LCD_WIDTH, TB_HEIGHT );
+    lcd_set_foreground( COLOR_BLACK );
+    lcd_drawrect( 0, TOP, LCD_WIDTH, TB_HEIGHT );
 
-    rb->lcd_set_foreground( rp_colors[ bgdrawcolor ] );
-    rb->lcd_fillrect( TB_SC_BG_LEFT, TOP+TB_SC_BG_TOP,
+    lcd_set_foreground( rp_colors[ bgdrawcolor ] );
+    lcd_fillrect( TB_SC_BG_LEFT, TOP+TB_SC_BG_TOP,
                       TB_SC_SIZE, TB_SC_SIZE );
-    rb->lcd_set_foreground(ROCKPAINT_PALETTE);
-    rb->lcd_drawrect( TB_SC_BG_LEFT, TOP+TB_SC_BG_TOP,
+    lcd_set_foreground(ROCKPAINT_PALETTE);
+    lcd_drawrect( TB_SC_BG_LEFT, TOP+TB_SC_BG_TOP,
                       TB_SC_SIZE, TB_SC_SIZE );
-    rb->lcd_set_foreground( rp_colors[ drawcolor ] );
-    rb->lcd_fillrect( TB_SC_FG_LEFT, TOP+TB_SC_FG_TOP,
+    lcd_set_foreground( rp_colors[ drawcolor ] );
+    lcd_fillrect( TB_SC_FG_LEFT, TOP+TB_SC_FG_TOP,
                       TB_SC_SIZE, TB_SC_SIZE );
-    rb->lcd_set_foreground(ROCKPAINT_PALETTE);
-    rb->lcd_drawrect( TB_SC_FG_LEFT, TOP+TB_SC_FG_TOP,
+    lcd_set_foreground(ROCKPAINT_PALETTE);
+    lcd_drawrect( TB_SC_FG_LEFT, TOP+TB_SC_FG_TOP,
                       TB_SC_SIZE, TB_SC_SIZE );
 
     for( i=0; i<18; i++ )
     {
-        rb->lcd_set_foreground( rp_colors[i] );
-        rb->lcd_fillrect(
+        lcd_set_foreground( rp_colors[i] );
+        lcd_fillrect(
                 TB_PL_LEFT+(i%9)*( TB_PL_COLOR_SIZE+TB_PL_COLOR_SPACING ),
                 TOP+TB_PL_TOP+(i/9)*( TB_PL_COLOR_SIZE+TB_PL_COLOR_SPACING),
                 TB_PL_COLOR_SIZE, TB_PL_COLOR_SIZE );
-        rb->lcd_set_foreground( ROCKPAINT_PALETTE );
-        rb->lcd_drawrect(
+        lcd_set_foreground( ROCKPAINT_PALETTE );
+        lcd_drawrect(
                 TB_PL_LEFT+(i%9)*( TB_PL_COLOR_SIZE+TB_PL_COLOR_SPACING ),
                 TOP+TB_PL_TOP+(i/9)*( TB_PL_COLOR_SIZE+TB_PL_COLOR_SPACING),
                 TB_PL_COLOR_SIZE, TB_PL_COLOR_SIZE );
     }
 
 #define SEPARATOR( x, y ) \
-    rb->lcd_set_foreground( COLOR_WHITE ); \
-    rb->lcd_vline( x, TOP+y, TOP+y+TB_PL_HEIGHT-1 ); \
-    rb->lcd_set_foreground( COLOR_DARKGRAY ); \
-    rb->lcd_vline( x+1, TOP+y, TOP+y+TB_PL_HEIGHT-1 );
+    lcd_set_foreground( COLOR_WHITE ); \
+    lcd_vline( x, TOP+y, TOP+y+TB_PL_HEIGHT-1 ); \
+    lcd_set_foreground( COLOR_DARKGRAY ); \
+    lcd_vline( x+1, TOP+y, TOP+y+TB_PL_HEIGHT-1 );
     SEPARATOR( TB_PL_LEFT + TB_PL_WIDTH - 1 + TB_SP_MARGIN, TB_PL_TOP );
 
-    rb->lcd_bitmap_transparent( rockpaint, TB_TL_LEFT, TOP+TB_TL_TOP,
+    lcd_bitmap_transparent( rockpaint, TB_TL_LEFT, TOP+TB_TL_TOP,
                                 TB_TL_WIDTH, TB_TL_HEIGHT );
-    rb->lcd_set_foreground(ROCKPAINT_PALETTE);
-    rb->lcd_drawrect( TB_TL_LEFT+(TB_TL_SIZE+TB_TL_SPACING)*(tool/2),
+    lcd_set_foreground(ROCKPAINT_PALETTE);
+    lcd_drawrect( TB_TL_LEFT+(TB_TL_SIZE+TB_TL_SPACING)*(tool/2),
                       TOP+TB_TL_TOP+(TB_TL_SIZE+TB_TL_SPACING)*(tool%2),
                       TB_TL_SIZE, TB_TL_SIZE );
 
     SEPARATOR( TB_TL_LEFT + TB_TL_WIDTH - 1 + TB_SP_MARGIN, TB_TL_TOP );
 
-    rb->lcd_setfont( FONT_SYSFIXED );
-    rb->lcd_putsxy( TB_MENU_LEFT, TOP+TB_MENU_TOP, "Menu" );
-    rb->lcd_setfont( FONT_UI );
+    lcd_setfont( FONT_SYSFIXED );
+    lcd_putsxy( TB_MENU_LEFT, TOP+TB_MENU_TOP, "Menu" );
+    lcd_setfont( FONT_UI );
 #undef TOP
 
-    if( update ) rb->lcd_update();
+    if( update ) lcd_update();
 }
 
 static void toolbar( void )
@@ -2539,7 +2539,7 @@ static void toolbar( void )
     inv_cursor( true );
     while( 1 )
     {
-        switch( button = rb->button_get( true ) )
+        switch( button = button_get( true ) )
         {
             case ROCKPAINT_DRAW:
 #define TOP ( LCD_HEIGHT - TB_HEIGHT )
@@ -2639,25 +2639,25 @@ static void toolbar( void )
 
 static void inv_cursor(bool update)
 {
-    rb->lcd_set_foreground(COLOR_BLACK);
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_set_foreground(COLOR_BLACK);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
     /* cross painting */
-    rb->lcd_hline(x-4,x+4,y);
-    rb->lcd_vline(x,y-4,y+4);
-    rb->lcd_set_foreground(rp_colors[drawcolor]);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_hline(x-4,x+4,y);
+    lcd_vline(x,y-4,y+4);
+    lcd_set_foreground(rp_colors[drawcolor]);
+    lcd_set_drawmode(DRMODE_SOLID);
 
-    if( update ) rb->lcd_update();
+    if( update ) lcd_update();
 }
 
 static void restore_screen(void)
 {
-    rb->lcd_bitmap( save_buffer, 0, 0, COLS, ROWS );
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_vline( img_width, 0, ROWS );
-    rb->lcd_hline( 0, COLS, img_height );
-    rb->lcd_drawpixel( img_width, img_height );
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_bitmap( save_buffer, 0, 0, COLS, ROWS );
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_vline( img_width, 0, ROWS );
+    lcd_hline( 0, COLS, img_height );
+    lcd_drawpixel( img_width, img_height );
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 
 static void clear_drawing(void)
@@ -2665,9 +2665,9 @@ static void clear_drawing(void)
     init_buffer();
     img_height = ROWS;
     img_width = COLS;
-    rb->lcd_set_foreground( rp_colors[ bgdrawcolor ] );
-    rb->lcd_fillrect( 0, 0, COLS, ROWS );
-    rb->lcd_update();
+    lcd_set_foreground( rp_colors[ bgdrawcolor ] );
+    lcd_fillrect( 0, 0, COLS, ROWS );
+    lcd_update();
 }
 
 static void goto_menu(void)
@@ -2677,7 +2677,7 @@ static void goto_menu(void)
 
     while( 1 )
     {
-        switch( rb->do_menu( &main_menu, &selected, NULL, false ) )
+        switch( do_menu( &main_menu, &selected, NULL, false ) )
         {
             case MAIN_MENU_NEW:
                 clear_drawing();
@@ -2688,13 +2688,13 @@ static void goto_menu(void)
                 {
                     if( load_bitmap( filename ) <= 0 )
                     {
-                        rb->splashf( 1*HZ, "Error while loading %s",
+                        splashf( 1*HZ, "Error while loading %s",
                                     filename );
                         clear_drawing();
                     }
                     else
                     {
-                        rb->splashf( 1*HZ, "Image loaded (%s)", filename );
+                        splashf( 1*HZ, "Image loaded (%s)", filename );
                         restore_screen();
                         inv_cursor(true);
                         return;
@@ -2703,30 +2703,30 @@ static void goto_menu(void)
                 break;
 
             case MAIN_MENU_SAVE:
-                rb->lcd_set_foreground(COLOR_BLACK);
+                lcd_set_foreground(COLOR_BLACK);
                 if (!filename[0])
-                    rb->strcpy(filename,"/");
-                if( !rb->kbd_input( filename, MAX_PATH ) )
+                    strcpy(filename,"/");
+                if( !kbd_input( filename, MAX_PATH ) )
                 {
                     if( !check_extention( filename, ".bmp" ) )
-                        rb->strcat(filename, ".bmp");
+                        strcat(filename, ".bmp");
                     save_bitmap( filename );
-                    rb->splashf( 1*HZ, "File saved (%s)", filename );
+                    splashf( 1*HZ, "File saved (%s)", filename );
                 }
                 break;
 
             case MAIN_MENU_SET_WIDTH:
-                rb->set_int( "Set Width", "px", UNIT_INT, &img_width,
+                set_int( "Set Width", "px", UNIT_INT, &img_width,
                              NULL, 1, 1, COLS, NULL );
                 break;
             case MAIN_MENU_SET_HEIGHT:
-                rb->set_int( "Set Height", "px", UNIT_INT, &img_height,
+                set_int( "Set Height", "px", UNIT_INT, &img_height,
                              NULL, 1, 1, ROWS, NULL );
                 break;
             case MAIN_MENU_BRUSH_SIZE:
                 for(multi = 0; multi<4; multi++)
                     if(bsize == times_list[multi]) break;
-                rb->set_option( "Brush Size", &multi, INT, times_options, 4, NULL );
+                set_option( "Brush Size", &multi, INT, times_options, 4, NULL );
                 if( multi >= 0 )
                     bsize = times_list[multi];
                 break;
@@ -2734,7 +2734,7 @@ static void goto_menu(void)
             case MAIN_MENU_BRUSH_SPEED:
                 for(multi = 0; multi<3; multi++)
                     if(bspeed == times_list[multi]) break;
-                rb->set_option( "Brush Speed", &multi, INT, times_options, 3, NULL );
+                set_option( "Brush Speed", &multi, INT, times_options, 3, NULL );
                 if( multi >= 0 ) {
                     bspeed = times_list[multi];
                     incdec_x.step[0] = bspeed;
@@ -2751,7 +2751,7 @@ static void goto_menu(void)
             case MAIN_MENU_GRID_SIZE:
                 for(multi = 0; multi<4; multi++)
                     if(gridsize == gridsize_list[multi]) break;
-                rb->set_option( "Grid Size", &multi, INT, gridsize_options, 4, NULL );
+                set_option( "Grid Size", &multi, INT, gridsize_options, 4, NULL );
                 if( multi >= 0 )
                     gridsize = gridsize_list[multi];
                 break;
@@ -2760,7 +2760,7 @@ static void goto_menu(void)
                 if (!audio_buf)
                     playback_control( NULL );
                 else
-                    rb->splash(HZ, "Cannot restart playback");
+                    splash(HZ, "Cannot restart playback");
                 break;
 
             case MAIN_MENU_EXIT:
@@ -2823,7 +2823,7 @@ static void state_func_select(void)
     }
     else if( state == State1 )
     {
-        mode = rb->do_menu( &select_menu, NULL, NULL, false );
+        mode = do_menu( &select_menu, NULL, NULL, false );
         switch( mode )
         {
             case SELECT_MENU_CUT:
@@ -3055,7 +3055,7 @@ static bool rockpaint_loop( void )
     inv_cursor(true);
 
     while (!quit) {
-        button = rb->button_get(true);
+        button = button_get(true);
         bigstep = (button & BUTTON_REPEAT) && !(tool == Brush && state == State1);
 
         switch(button)
@@ -3069,7 +3069,7 @@ static bool rockpaint_loop( void )
                 }
                 else
                 {
-                    rb->lcd_set_drawmode(DRMODE_SOLID);
+                    lcd_set_drawmode(DRMODE_SOLID);
                     return PLUGIN_OK;
                 }
                 break;
@@ -3138,7 +3138,7 @@ static bool rockpaint_loop( void )
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -3172,7 +3172,7 @@ static int load_bitmap( const char *file )
     fb_data color = rp_colors[ bgdrawcolor ];
 
     bm.data = (char*)save_buffer;
-    ret = rb->read_bmp_file( file, &bm, ROWS*COLS*sizeof( fb_data ),
+    ret = read_bmp_file( file, &bm, ROWS*COLS*sizeof( fb_data ),
                              FORMAT_NATIVE, NULL );
 
     if((bm.width > COLS ) || ( bm.height > ROWS ))
@@ -3182,7 +3182,7 @@ static int load_bitmap( const char *file )
     img_height = bm.height;
     for( i = bm.height-1; i >= 0; i-- )
     {
-        rb->memmove( save_buffer+i*COLS, save_buffer+i*bm.width,
+        memmove( save_buffer+i*COLS, save_buffer+i*bm.width,
                         sizeof( fb_data )*bm.width );
         for( j = bm.width; j < COLS; j++ )
             save_buffer[j+i*COLS] = color;
@@ -3199,7 +3199,7 @@ static int save_bitmap( char *file )
     int i;
     for(i = 0; i < img_height; i++)
     {
-        rb->memcpy( buffer->clipboard+i*img_width, save_buffer+i*COLS,
+        memcpy( buffer->clipboard+i*img_width, save_buffer+i*COLS,
                         sizeof( fb_data )*img_width );
     }
     bm.data = (char*)buffer->clipboard;
@@ -3213,26 +3213,26 @@ enum plugin_status plugin_start(const void* parameter)
 {
     size_t buffer_size;
     unsigned char *temp;
-    temp = rb->plugin_get_buffer(&buffer_size);
+    temp = plugin_get_buffer(&buffer_size);
     if (buffer_size < sizeof(*buffer) + 3)
     {
         /* steal from audiobuffer if plugin buffer is too small */
-        temp = rb->plugin_get_audio_buffer(&buffer_size);
+        temp = plugin_get_audio_buffer(&buffer_size);
         if (buffer_size < sizeof(*buffer) + 3)
         {
-            rb->splash(HZ, "Not enough memory");
+            splash(HZ, "Not enough memory");
             return PLUGIN_ERROR;
         }
         audio_buf = true;
     }
     buffer = (union buf*) (((uintptr_t)temp + 3) & ~3);
 
-    rb->lcd_set_foreground(COLOR_WHITE);
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_fillrect(0,0,LCD_WIDTH,LCD_HEIGHT);
-    rb->splash( HZ/2, "Rock Paint");
+    lcd_set_foreground(COLOR_WHITE);
+    lcd_set_backdrop(NULL);
+    lcd_fillrect(0,0,LCD_WIDTH,LCD_HEIGHT);
+    splash( HZ/2, "Rock Paint");
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     filename[0] = '\0';
 
@@ -3240,14 +3240,14 @@ enum plugin_status plugin_start(const void* parameter)
     {
         if( load_bitmap( parameter ) <= 0 )
         {
-            rb->splash( 1*HZ, "File Open Error");
+            splash( 1*HZ, "File Open Error");
             clear_drawing();
         }
         else
         {
-            rb->splashf( 1*HZ, "Image loaded (%s)", (char *)parameter );
+            splashf( 1*HZ, "Image loaded (%s)", (char *)parameter );
             restore_screen();
-            rb->strcpy( filename, parameter );
+            strcpy( filename, parameter );
         }
     }
     else

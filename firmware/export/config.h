@@ -913,7 +913,7 @@ Lyre prototype 1 */
     (CONFIG_CPU == IMX233 && !defined(PLUGIN) && !defined(CODEC)) || /* IMX233: core only */ \
     defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
     (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) /* Jz4740: core only */
-#define ICODE_ATTR      __attribute__ ((section(".icode")))
+#define ICODE_ATTR      __attribute__ ((section(".icode,\"ax\",%progbits\n\t#")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
@@ -984,7 +984,7 @@ Lyre prototype 1 */
 /* Attributes to place data in uncached DRAM */
 /* These are useful beyond dual-core and ultimately beyond PP since they may
  * be used for DMA buffers and such without cache maintenence calls. */
-#define NOCACHEBSS_ATTR     __attribute__((section(".ncbss"),nocommon))
+#define NOCACHEBSS_ATTR     __attribute__((section(".ncbss,\"wa\",%nobits\n\t#")))
 #define NOCACHEDATA_ATTR    __attribute__((section(".ncdata"),nocommon))
 
 #if !defined(FORCE_SINGLE_CORE)
@@ -1006,7 +1006,7 @@ Lyre prototype 1 */
 #endif /* CPU_PP */
 
 #if CONFIG_CPU == IMX31L || CONFIG_CPU == IMX233
-#define NOCACHEBSS_ATTR     __attribute__((section(".ncbss"),nocommon))
+#define NOCACHEBSS_ATTR     __attribute__((section(".ncbss,\"wa\",%nobits\n\t#")))
 #define NOCACHEDATA_ATTR    __attribute__((section(".ncdata"),nocommon))
 #endif
 
@@ -1138,5 +1138,4 @@ Lyre prototype 1 */
     && !defined(__PCTOOL__) && (CONFIG_CODEC == SWCODEC)
 #define ROCKBOX_HAS_LOGDISKF
 #endif
-
 #endif /* __CONFIG_H__ */

@@ -35,8 +35,8 @@ static inline void remote_control_setcolors(void);
 static inline void remote_control_setcolors(void)
 {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(181, 181, 222));
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_RGBPACK(181, 181, 222));
+    lcd_set_foreground(LCD_BLACK);
 #endif
 }
 
@@ -50,7 +50,7 @@ static int menu_desktop(void)
     {
         int id = HID_GENERIC_DESKTOP_UNDEFINED;
 
-        switch (rb->do_menu(&menu, &selection, NULL, false))
+        switch (do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Escape */
                 id = HID_KEYBOARD_ESCAPE;
@@ -77,7 +77,7 @@ static int menu_desktop(void)
         }
 
         if (id != HID_GENERIC_DESKTOP_UNDEFINED)
-            rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, id);
+            usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, id);
     }
 }
 
@@ -92,7 +92,7 @@ static int menu_presentation(void)
     {
         int id = HID_GENERIC_DESKTOP_UNDEFINED;
 
-        switch (rb->do_menu(&menu, &selection, NULL, false))
+        switch (do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Next Slide */
                 id = HID_KEYBOARD_N;
@@ -121,7 +121,7 @@ static int menu_presentation(void)
         }
 
         if (id != HID_GENERIC_DESKTOP_UNDEFINED)
-            rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, id);
+            usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, id);
     }
 }
 
@@ -135,7 +135,7 @@ static int menu_media_player(void)
     {
         int id = HID_CONSUMER_USAGE_UNASSIGNED;
 
-        switch (rb->do_menu(&menu, &selection, NULL, false))
+        switch (do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Play */
                 id = HID_CONSUMER_USAGE_PLAY_PAUSE;
@@ -167,7 +167,7 @@ static int menu_media_player(void)
         }
 
         if (id != HID_CONSUMER_USAGE_UNASSIGNED)
-            rb->usb_hid_send(HID_USAGE_PAGE_CONSUMER, id);
+            usb_hid_send(HID_USAGE_PAGE_CONSUMER, id);
     }
 }
 
@@ -181,12 +181,12 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)parameter;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     remote_control_setcolors();
 
@@ -194,7 +194,7 @@ enum plugin_status plugin_start(const void* parameter)
             "Media Player", "Quit");
     while(rc == PLUGIN_CONTINUE)
     {
-        switch (rb->do_menu(&menu, &selection, NULL, false))
+        switch (do_menu(&menu, &selection, NULL, false))
         {
             case 0: /* Desktop */
                 rc = menu_desktop();
@@ -216,7 +216,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
         }
     }
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 
     return rc;
 }

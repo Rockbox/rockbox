@@ -206,7 +206,7 @@ static enum color get_band_rtoc(int in_val)
 static char *get_tolerance_str(enum color color)
 {
     static char tolerance_str [14];
-    rb->snprintf(tolerance_str, sizeof(tolerance_str), "%d%% tolerance",
+    snprintf(tolerance_str, sizeof(tolerance_str), "%d%% tolerance",
                  band_data[color].tolerance);
     return tolerance_str;
 }
@@ -219,48 +219,48 @@ static void draw_resistor(enum color firstband_color,
 {
     unsigned int fg;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     display->set_viewport(&bitmap_vp);
-    rb->lcd_bitmap_transparent(resistor, RESISTOR_BMP_X, 0, 
+    lcd_bitmap_transparent(resistor, RESISTOR_BMP_X, 0, 
                                BMPWIDTH_resistor, BMPHEIGHT_resistor);
 
-    fg = rb->lcd_get_foreground();
+    fg = lcd_get_foreground();
         
     if(firstband_color != RES_NONE) {
-        rb->lcd_set_foreground(band_data[firstband_color].color_value);
-        rb->lcd_fillrect(first_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(band_data[firstband_color].color_value);
+        lcd_fillrect(first_band_x, universal_y, band_width, band_height);
     } else {
-        rb->lcd_set_foreground(LCD_BLACK);
-        rb->lcd_drawrect(first_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(LCD_BLACK);
+        lcd_drawrect(first_band_x, universal_y, band_width, band_height);
     }
           
     if(secondband_color != RES_NONE) {
-        rb->lcd_set_foreground(band_data[secondband_color].color_value);
-        rb->lcd_fillrect(second_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(band_data[secondband_color].color_value);
+        lcd_fillrect(second_band_x, universal_y, band_width, band_height);
     } else {
-        rb->lcd_set_foreground(LCD_BLACK);
-        rb->lcd_drawrect(second_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(LCD_BLACK);
+        lcd_drawrect(second_band_x, universal_y, band_width, band_height);
     }
     
     if(thirdband_color != RES_NONE) {        
-        rb->lcd_set_foreground(band_data[thirdband_color].color_value);
-        rb->lcd_fillrect(third_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(band_data[thirdband_color].color_value);
+        lcd_fillrect(third_band_x, universal_y, band_width, band_height);
     } else {
-        rb->lcd_set_foreground(LCD_BLACK);
-        rb->lcd_drawrect(third_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(LCD_BLACK);
+        lcd_drawrect(third_band_x, universal_y, band_width, band_height);
     }
     
     if(fourthband_color != RES_NONE) {        
-        rb->lcd_set_foreground(band_data[fourthband_color].color_value);
-        rb->lcd_fillrect(fourth_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(band_data[fourthband_color].color_value);
+        lcd_fillrect(fourth_band_x, universal_y, band_width, band_height);
     } else {
-        rb->lcd_set_foreground(LCD_BLACK);
-        rb->lcd_drawrect(fourth_band_x, universal_y, band_width, band_height);
+        lcd_set_foreground(LCD_BLACK);
+        lcd_drawrect(fourth_band_x, universal_y, band_width, band_height);
     }
     
-    rb->lcd_set_foreground(fg);
+    lcd_set_foreground(fg);
             
-    rb->lcd_update();
+    lcd_update();
     return;
 }
 #endif
@@ -272,13 +272,13 @@ static void draw_resistor_text(enum color firstband_color,
 {
     char resistance_vals_str[64];
     display->set_viewport(&text_vp);
-    rb->snprintf(resistance_vals_str, sizeof(resistance_vals_str),
+    snprintf(resistance_vals_str, sizeof(resistance_vals_str),
                  "%s - %s - %s - %s", band_data[firstband_color].name,
                                       band_data[secondband_color].name,
                                       band_data[thirdband_color].name,
                                       band_data[fourthband_color].name);
-    rb->lcd_puts_scroll(resistance_val_x, lineno++, resistance_vals_str);
-    rb->lcd_update();
+    lcd_puts_scroll(resistance_val_x, lineno++, resistance_vals_str);
+    lcd_update();
 }
     
 
@@ -304,7 +304,7 @@ static enum color do_first_band_menu(void)
     MENUITEM_STRINGLIST(colors_menu_first, "First band colour:", NULL, 
                         "Black", "Brown", "Red", "Orange", "Yellow",
                          "Green", "Blue", "Violet", "Grey", "White");
-    band_selection = rb->do_menu(&colors_menu_first, &band_selection, NULL, 
+    band_selection = do_menu(&colors_menu_first, &band_selection, NULL, 
                                 false);
     switch(band_selection) {
         case 0: /* Black */
@@ -352,7 +352,7 @@ static enum color do_second_band_menu(void)
     MENUITEM_STRINGLIST(colors_menu_second, "Second band colour:", NULL, 
                         "Black", "Brown", "Red", "Orange", "Yellow", 
                         "Green", "Blue", "Violet", "Grey", "White");
-    band_selection = rb->do_menu(&colors_menu_second, &band_selection, NULL, 
+    band_selection = do_menu(&colors_menu_second, &band_selection, NULL, 
                                 false);
     switch(band_selection) {
         case 0: /* Black */
@@ -401,7 +401,7 @@ static enum color do_third_band_menu(void)
                         "Black", "Brown", "Red", "Orange", "Yellow",
                          "Green", "Blue", "Violet", "Grey", "White",
                          "Silver", "Gold");
-    band_selection = rb->do_menu(&colors_menu_third, &band_selection, NULL, 
+    band_selection = do_menu(&colors_menu_third, &band_selection, NULL, 
                                 false);
     switch(band_selection) {
         case 0: /* Black */
@@ -454,7 +454,7 @@ static enum color do_fourth_band_menu(void)
             
     MENUITEM_STRINGLIST(colors_menu_fourth, "Fourth band colour:", NULL, 
                         "Gold", "Brown", "Red", "Silver", "(none)");
-    band_selection = rb->do_menu(&colors_menu_fourth, &band_selection, NULL, 
+    band_selection = do_menu(&colors_menu_fourth, &band_selection, NULL, 
                                 false);
     switch(band_selection) {
         case 0: /* Gold */
@@ -481,7 +481,7 @@ static enum color do_fourth_band_menu(void)
 
 static void display_helpfile(void)
 {
-    rb->lcd_clear_display();
+    lcd_clear_display();
     /* some information obtained from wikipedia */
     static char * helpfile_text[] = {
         "Resistor Calculator Helpfile", "", "",
@@ -600,7 +600,7 @@ static void led_resistance_calc(void)
     enum color multiplier;
     enum color fourth_band = RES_NONE;
     
-    rb->lcd_clear_display();
+    lcd_clear_display();
     
     MENUITEM_STRINGLIST(voltage_menu, "Select LED voltage:", NULL,
                         "2v (Common red, orange)", "1.5v (IR)", "2.1v (Yellow)",
@@ -612,19 +612,19 @@ static void led_resistance_calc(void)
     
     while(!quit) {
         int ret;
-        ret = voltage_menu_selection = rb->do_menu(&voltage_menu, 
+        ret = voltage_menu_selection = do_menu(&voltage_menu, 
                       &voltage_menu_selection, NULL, false);
         if(ret<0) break;
-        ret = fwd_current_selection = rb->do_menu(&fwd_current_menu, 
+        ret = fwd_current_selection = do_menu(&fwd_current_menu, 
                       &fwd_current_selection,  NULL, false);
         if(ret<0) break;
-        rb->lcd_clear_display();
+        lcd_clear_display();
 
 
-        rb->splash(HZ*2, "(First) Input the supply voltage:");
+        splash(HZ*2, "(First) Input the supply voltage:");
         memset(kbd_buffer,0,sizeof(kbd_buffer));
-        rb->kbd_input(kbd_buffer, sizeof(kbd_buffer));
-        input_voltage = rb->atoi(kbd_buffer);
+        kbd_input(kbd_buffer, sizeof(kbd_buffer));
+        input_voltage = atoi(kbd_buffer);
         if(input_voltage == 0) break;
 
         if(input_voltage != (int)input_voltage) {
@@ -657,17 +657,17 @@ static void led_resistance_calc(void)
                 foreward_current = 2; /* 20mA * 100 */
                 break;
             case 1:
-                rb->lcd_clear_display();
-                rb->splash(HZ*2, "Input the foreward current, in mA");
+                lcd_clear_display();
+                splash(HZ*2, "Input the foreward current, in mA");
                 memset(fwd_kbd_buffer,0,sizeof(fwd_kbd_buffer));
-                rb->kbd_input(fwd_kbd_buffer, sizeof(fwd_kbd_buffer));
-                foreward_current = ((rb->atoi(fwd_kbd_buffer))/10);
+                kbd_input(fwd_kbd_buffer, sizeof(fwd_kbd_buffer));
+                foreward_current = ((atoi(fwd_kbd_buffer))/10);
                 break;
         }
         
         if(foreward_current == 0) break;
 
-        rb->lcd_clear_display();
+        lcd_clear_display();
         
         resistance = (input_voltage - led_voltage) / foreward_current;
         out_int = resistance;
@@ -676,7 +676,7 @@ static void led_resistance_calc(void)
         int total_power_values = 9;
         
         if(led_voltage > input_voltage) {
-            rb->splash(HZ, "Problem: LED voltage is higher than the source.");
+            splash(HZ, "Problem: LED voltage is higher than the source.");
             break;
         }
         
@@ -699,7 +699,7 @@ static void led_resistance_calc(void)
             
         if(rounded_resistance == 0) 
         {
-            rb->splash(HZ, "Problem: Input voltage too high.");
+            splash(HZ, "Problem: Input voltage too high.");
             break;
         }
         power_rating_in = ((input_voltage/100)*(input_voltage/100)*1000 / rounded_resistance);
@@ -732,35 +732,35 @@ static void led_resistance_calc(void)
         second_band = get_band_rtoc(second_band_int);
         multiplier = get_band_rtoc(power_ten);
     
-        rb->lcd_clear_display();
+        lcd_clear_display();
         lineno = INITIAL_TEXT_Y;
 #ifndef USE_TEXT_ONLY
         draw_resistor(first_band, second_band, multiplier, fourth_band);
 #endif
         draw_resistor_text(first_band, second_band, multiplier, fourth_band);
     
-        rb->snprintf(current_out_str, sizeof(current_out_str), "%d mA", 
+        snprintf(current_out_str, sizeof(current_out_str), "%d mA", 
                          (foreward_current*10));
         
-        rb->snprintf(true_current_out_str, sizeof(true_current_out_str), 
+        snprintf(true_current_out_str, sizeof(true_current_out_str), 
                      "Input: %dv, %d Ohms @ %s", (input_voltage/100), 
                      out_int, current_out_str);
-        rb->snprintf(rounded_resistance_out_str, 
+        snprintf(rounded_resistance_out_str, 
                      sizeof(rounded_resistance_out_str), 
                      "Rounded/displayed: [%d %s]", rounded_resistance, 
                      band_data[multiplier].unit);
-        rb->snprintf(power_rating_out_str, sizeof(power_rating_out_str), 
+        snprintf(power_rating_out_str, sizeof(power_rating_out_str), 
                      "Recommended: %s or greater",
                      get_power_rating_str(rounded_power_rating));
 
         display->set_viewport(&text_vp);
-        rb->lcd_puts_scroll(resistance_val_x, lineno++, true_current_out_str);
-        rb->lcd_puts_scroll(resistance_val_x, lineno++, rounded_resistance_out_str);
-        rb->lcd_puts_scroll(resistance_val_x, lineno++, power_rating_out_str);
+        lcd_puts_scroll(resistance_val_x, lineno++, true_current_out_str);
+        lcd_puts_scroll(resistance_val_x, lineno++, rounded_resistance_out_str);
+        lcd_puts_scroll(resistance_val_x, lineno++, power_rating_out_str);
 
-        rb->lcd_update();
+        lcd_update();
         
-        while ((button_press = rb->button_get(true)) & BUTTON_REL);
+        while ((button_press = button_get(true)) & BUTTON_REL);
         switch(button_press) {
             case PLA_SELECT:
                 break;
@@ -771,9 +771,9 @@ static void led_resistance_calc(void)
         }
     }
     display->set_viewport(&text_vp);
-    rb->lcd_stop_scroll();
+    lcd_stop_scroll();
     display->set_viewport(&screen_vp);
-    rb->lcd_clear_display();
+    lcd_clear_display();
 }
 
         
@@ -803,8 +803,8 @@ static void resistance_to_color(void)
 
     memset(kbd_buffer,0,sizeof(kbd_buffer));
     /* This cleans out the mysterious garbage that appears */
-    rb->lcd_clear_display();
-    rb->splash(HZ/2, "Resistance to Colour");
+    lcd_clear_display();
+    splash(HZ/2, "Resistance to Colour");
     MENUITEM_STRINGLIST(r_to_c_menu, "Select unit to use:", NULL, 
                         "Ohms", "Kiloohms (KOhms)", "Megaohms (MOhms)",
                         "Gigaohms (GOhms)");
@@ -813,14 +813,14 @@ static void resistance_to_color(void)
       
     while(!quit) {
         int ret;
-        ret=menu_selection = rb->do_menu(&r_to_c_menu, &menu_selection,
+        ret=menu_selection = do_menu(&r_to_c_menu, &menu_selection,
                                      NULL, false);
         if(ret<0) break;
         
-        rb->kbd_input(kbd_buffer, sizeof(kbd_buffer));
+        kbd_input(kbd_buffer, sizeof(kbd_buffer));
         /* As stated above somewhere, we (I) need to make a calculator-like
            keypad, that keyboard isn't all that fun to use. */
-        ret = rb->do_menu(&r_to_c_menu_tol, &menu_selection_tol,
+        ret = do_menu(&r_to_c_menu_tol, &menu_selection_tol,
                                          NULL, false);
         if(ret<0) break;
 
@@ -842,7 +842,7 @@ static void resistance_to_color(void)
                 break;
         }
             
-        kbd_input_int = rb->atoi(kbd_buffer);
+        kbd_input_int = atoi(kbd_buffer);
         in_resistance_int = kbd_input_int;
         
         switch(menu_selection) {
@@ -879,25 +879,25 @@ static void resistance_to_color(void)
         if( first_band == RES_INVALID
          || second_band == RES_INVALID
          || multiplier == RES_INVALID) {
-            rb->splashf(HZ, "%d %s can not be represented",
+            splashf(HZ, "%d %s can not be represented",
                         in_resistance_int,band_data[units_used].unit);
             return;
         }
         
-        rb->lcd_clear_display();
+        lcd_clear_display();
         lineno = INITIAL_TEXT_Y;
 #ifndef USE_TEXT_ONLY
         draw_resistor(first_band, second_band, multiplier, fourth_band);
 #endif                     
         draw_resistor_text(first_band, second_band, multiplier, fourth_band);
         
-        rb->snprintf(out_str, sizeof(out_str), "Input: %d %s", in_resistance_int,
+        snprintf(out_str, sizeof(out_str), "Input: %d %s", in_resistance_int,
                      band_data[units_used].unit);
         display->set_viewport(&text_vp);
-        rb->lcd_puts_scroll(r_to_c_out_str_x, lineno++, out_str);
-        rb->lcd_update();
+        lcd_puts_scroll(r_to_c_out_str_x, lineno++, out_str);
+        lcd_update();
         
-        button_press = rb->button_get(true);
+        button_press = button_get(true);
         switch(button_press) {
             case PLA_SELECT:
                 break;
@@ -908,9 +908,9 @@ static void resistance_to_color(void)
         }
     }
     display->set_viewport(&text_vp);
-    rb->lcd_stop_scroll();
+    lcd_stop_scroll();
     display->set_viewport(&screen_vp);
-    rb->lcd_clear_display();
+    lcd_clear_display();
 }
     
 static void color_to_resistance(void) 
@@ -928,8 +928,8 @@ static void color_to_resistance(void)
     int total_resistance_centiunits = 0;
     char total_resistance_str [35];
             
-    rb->splash(HZ/2, "Colour to resistance");
-    rb->lcd_clear_display();
+    splash(HZ/2, "Colour to resistance");
+    lcd_clear_display();
             
     while(!quit) {
         first_band = do_first_band_menu();
@@ -948,7 +948,7 @@ static void color_to_resistance(void)
                                                            second_band,
                                                            third_band);
 
-        rb->lcd_clear_display();
+        lcd_clear_display();
         lineno = INITIAL_TEXT_Y;
 #ifndef USE_TEXT_ONLY
         draw_resistor(first_band, second_band, third_band, fourth_band);
@@ -957,26 +957,26 @@ static void color_to_resistance(void)
 
         if(total_resistance_centiunits % 100 == 0) {
             /* No decimals */
-            rb->snprintf(total_resistance_str, sizeof(total_resistance_str), 
+            snprintf(total_resistance_str, sizeof(total_resistance_str), 
                          "Resistance: %d %s",
                          total_resistance_centiunits/100,
                          unit_abbrev);
         }
         else {
-            rb->snprintf(total_resistance_str, sizeof(total_resistance_str), 
+            snprintf(total_resistance_str, sizeof(total_resistance_str), 
                          "Resistance: %d.%2.2d %s",
                          total_resistance_centiunits/100,
                          total_resistance_centiunits%100,
                          unit_abbrev);
         }
         display->set_viewport(&text_vp);
-        rb->lcd_puts_scroll(total_resistance_str_x, lineno++,
+        lcd_puts_scroll(total_resistance_str_x, lineno++,
                             total_resistance_str);
-        rb->lcd_puts_scroll(tolerance_str_x, lineno++,
+        lcd_puts_scroll(tolerance_str_x, lineno++,
                             get_tolerance_str(fourth_band));
-        rb->lcd_update();
+        lcd_update();
                     
-        button_input = rb->button_get(true);
+        button_input = button_get(true);
         switch(button_input) {
             case PLA_RIGHT:
                 break;
@@ -989,24 +989,24 @@ static void color_to_resistance(void)
         }                   
     }
     display->set_viewport(&text_vp);
-    rb->lcd_stop_scroll();
+    lcd_stop_scroll();
     display->set_viewport(&screen_vp);
-    rb->lcd_clear_display();
+    lcd_clear_display();
     return;
 }
 
 enum plugin_status plugin_start(const void* nothing) 
 {
     (void)nothing;
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
     int main_menu_selection = 0;
     bool menuquit = false;
 
-    display = rb->screens[0];
-    rb->viewport_set_defaults(&screen_vp,0);
-    rb->viewport_set_defaults(&text_vp,0);
-    rb->viewport_set_defaults(&bitmap_vp,0);
+    display = &screens[0];
+    viewport_set_defaults(&screen_vp,0);
+    viewport_set_defaults(&text_vp,0);
+    viewport_set_defaults(&bitmap_vp,0);
 #ifndef USE_TEXT_ONLY
     bitmap_vp.y = RESISTOR_BMP_Y + screen_vp.y;
     bitmap_vp.height = BMPHEIGHT_resistor;
@@ -1019,7 +1019,7 @@ enum plugin_status plugin_start(const void* nothing)
                         "LED resistor calculator", "Help", "Exit");
     while (!menuquit) {
         display->set_viewport(&screen_vp);
-        main_menu_selection = rb->do_menu(&main_menu, &main_menu_selection, 
+        main_menu_selection = do_menu(&main_menu, &main_menu_selection, 
                                           NULL, false);
         switch(main_menu_selection) {
             case 0:

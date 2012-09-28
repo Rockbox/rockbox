@@ -495,8 +495,8 @@ static bool resume_file = false;
 ******************************************************************************/
 static inline void jewels_setcolors(void) {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(49, 26, 26));
-    rb->lcd_set_foreground(LCD_RGBPACK(210, 181, 181));
+    lcd_set_background(LCD_RGBPACK(49, 26, 26));
+    lcd_set_foreground(LCD_RGBPACK(210, 181, 181));
 #endif
 }
 
@@ -509,23 +509,23 @@ static bool jewels_loadgame(struct game_context* bj)
     bool loaded = false;
 
     /* open game file */
-    fd = rb->open(SAVE_FILE, O_RDONLY);
+    fd = open(SAVE_FILE, O_RDONLY);
     if(fd < 0) return loaded;
 
     /* read in saved game */
     while(true) {
-        if(rb->read(fd, &bj->tmp_type, sizeof(bj->tmp_type)) <= 0) break;
-        if(rb->read(fd, &bj->type, sizeof(bj->type)) <= 0) break;
-        if(rb->read(fd, &bj->score, sizeof(bj->score)) <= 0) break;
-        if(rb->read(fd, &bj->level, sizeof(bj->level)) <= 0) break;
-        if(rb->read(fd, &bj->segments, sizeof(bj->segments)) <= 0) break;
-        if(rb->read(fd, &bj->num_jewels, sizeof(bj->num_jewels)) <= 0) break;
-        if(rb->read(fd, bj->playboard, sizeof(bj->playboard)) <= 0) break;
+        if(read(fd, &bj->tmp_type, sizeof(bj->tmp_type)) <= 0) break;
+        if(read(fd, &bj->type, sizeof(bj->type)) <= 0) break;
+        if(read(fd, &bj->score, sizeof(bj->score)) <= 0) break;
+        if(read(fd, &bj->level, sizeof(bj->level)) <= 0) break;
+        if(read(fd, &bj->segments, sizeof(bj->segments)) <= 0) break;
+        if(read(fd, &bj->num_jewels, sizeof(bj->num_jewels)) <= 0) break;
+        if(read(fd, bj->playboard, sizeof(bj->playboard)) <= 0) break;
         loaded = true;
         break;
     }
 
-    rb->close(fd);
+    close(fd);
 
     return loaded;
 }
@@ -537,17 +537,17 @@ static void jewels_savegame(struct game_context* bj)
 {
     int fd;
     /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
     if(fd < 0) return;
 
-    rb->write(fd, &bj->tmp_type, sizeof(bj->tmp_type));
-    rb->write(fd, &bj->type, sizeof(bj->type));
-    rb->write(fd, &bj->score, sizeof(bj->score));
-    rb->write(fd, &bj->level, sizeof(bj->level));
-    rb->write(fd, &bj->segments, sizeof(bj->segments));
-    rb->write(fd, &bj->num_jewels, sizeof(bj->num_jewels));
-    rb->write(fd, bj->playboard, sizeof(bj->playboard));
-    rb->close(fd);
+    write(fd, &bj->tmp_type, sizeof(bj->tmp_type));
+    write(fd, &bj->type, sizeof(bj->type));
+    write(fd, &bj->score, sizeof(bj->score));
+    write(fd, &bj->level, sizeof(bj->level));
+    write(fd, &bj->segments, sizeof(bj->segments));
+    write(fd, &bj->num_jewels, sizeof(bj->num_jewels));
+    write(fd, bj->playboard, sizeof(bj->playboard));
+    close(fd);
 }
 
 /*****************************************************************************
@@ -570,23 +570,23 @@ static void jewels_drawboard(struct game_context* bj) {
     }
 
     /* clear screen */
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* dispay playing board */
     for(i=0; i<BJ_HEIGHT-1; i++){
         for(j=0; j<BJ_WIDTH; j++){
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(jewels_bkgd[(i+j)%2]);
-            rb->lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
+            lcd_set_foreground(jewels_bkgd[(i+j)%2]);
+            lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                                 TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_transparent_part(jewels,
+            lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
                            STRIDE(  SCREEN_MAIN, 
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels), 
                            j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
 #else
-            rb->lcd_bitmap_part(jewels,
+            lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
                            STRIDE(  SCREEN_MAIN, 
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
@@ -600,45 +600,45 @@ static void jewels_drawboard(struct game_context* bj) {
 
     /* draw separator lines */
     jewels_setcolors();
-    rb->lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, LCD_HEIGHT-1);
+    lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, LCD_HEIGHT-1);
 
-    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, 18);
-    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, LCD_HEIGHT-10);
+    lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, 18);
+    lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, LCD_HEIGHT-10);
     
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
+    lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
 #endif
-    rb->lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
+    lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*
                          tempscore/size),
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
                      ((LCD_HEIGHT-10)-18)*tempscore/size);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
-    rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4+1,
+    lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
+    lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4+1,
                      (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*
                          tempscore/size)+1,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-2,
                      ((LCD_HEIGHT-10)-18)*tempscore/size-1);
     jewels_setcolors();
-    rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
+    lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*tempscore/size),
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
                      ((LCD_HEIGHT-10)-18)*tempscore/size+1);
 #endif
     
     /* print text */
-    rb->lcd_getstringsize(title, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 1, title);
-    rb->snprintf(str, 4, "%d", bj->level);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 10, str);
+    lcd_getstringsize(title, &w, &h);
+    lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 1, title);
+    snprintf(str, 4, "%d", bj->level);
+    lcd_getstringsize(str, &w, &h);
+    lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 10, str);
 
     if (bj->type == GAME_TYPE_NORMAL) {
-        rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
-        rb->lcd_getstringsize(str, &w, &h);
-        rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2,
+        snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+        lcd_getstringsize(str, &w, &h);
+        lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2,
                        LCD_HEIGHT-8, str);
     }
 
@@ -646,38 +646,38 @@ static void jewels_drawboard(struct game_context* bj) {
 
     /* draw separator lines */
     jewels_setcolors();
-    rb->lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
-    rb->lcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-14);
-    rb->lcd_vline(LCD_WIDTH/2, LCD_HEIGHT-14, LCD_HEIGHT-1);
+    lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
+    lcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-14);
+    lcd_vline(LCD_WIDTH/2, LCD_HEIGHT-14, LCD_HEIGHT-1);
     
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
+    lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
 #endif
-    rb->lcd_fillrect(0, (8*TILE_HEIGHT+YOFS)
+    lcd_fillrect(0, (8*TILE_HEIGHT+YOFS)
                     +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
                      LCD_WIDTH*tempscore/size,
                      (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
-    rb->lcd_drawrect(1, (8*TILE_HEIGHT+YOFS)
+    lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
+    lcd_drawrect(1, (8*TILE_HEIGHT+YOFS)
                     +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4+1,
                      LCD_WIDTH*tempscore/size-1,
                      (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2-2);
     jewels_setcolors();
-    rb->lcd_drawrect(0, (8*TILE_HEIGHT+YOFS)
+    lcd_drawrect(0, (8*TILE_HEIGHT+YOFS)
                     +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
                      LCD_WIDTH*tempscore/size+1,
                      (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2);
 #endif
     
     /* print text */
-    rb->lcd_putsxyf(1, LCD_HEIGHT-10, "%s %d", title, bj->level);
+    lcd_putsxyf(1, LCD_HEIGHT-10, "%s %d", title, bj->level);
     
     if (bj->type == GAME_TYPE_NORMAL) {
-        rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
-        rb->lcd_getstringsize(str, &w, &h);
-        rb->lcd_putsxy((LCD_WIDTH-2)-w, LCD_HEIGHT-10, str);
+        snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+        lcd_getstringsize(str, &w, &h);
+        lcd_putsxy((LCD_WIDTH-2)-w, LCD_HEIGHT-10, str);
     }
 
 
@@ -685,27 +685,27 @@ static void jewels_drawboard(struct game_context* bj) {
 
     /* draw separator lines */
     jewels_setcolors();
-    rb->lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
-    rb->lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, 8*TILE_HEIGHT+YOFS);
-    rb->lcd_vline(LCD_WIDTH/2, 8*TILE_HEIGHT+YOFS, LCD_HEIGHT-1);
+    lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
+    lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, 8*TILE_HEIGHT+YOFS);
+    lcd_vline(LCD_WIDTH/2, 8*TILE_HEIGHT+YOFS, LCD_HEIGHT-1);
 
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
+    lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
 #endif
-    rb->lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
+    lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)*tempscore/size,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
                      (8*TILE_HEIGHT+YOFS)*tempscore/size);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
-    rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4+1,
+    lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
+    lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4+1,
                      (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
                         *tempscore/size+1,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-2,
                      (8*TILE_HEIGHT+YOFS)*tempscore/size-1);
     jewels_setcolors();
-    rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
+    lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
                         *tempscore/size,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
@@ -713,19 +713,19 @@ static void jewels_drawboard(struct game_context* bj) {
 #endif
 
     /* print text */
-    rb->lcd_putsxyf(1, LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3,"%s %d",
+    lcd_putsxyf(1, LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3,"%s %d",
                    title, bj->level);
     
     if (bj->type == GAME_TYPE_NORMAL) {
-        rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
-        rb->lcd_getstringsize(str, &w, &h);
-        rb->lcd_putsxy((LCD_WIDTH-2)-w,
+        snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+        lcd_getstringsize(str, &w, &h);
+        lcd_putsxy((LCD_WIDTH-2)-w,
                        LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3, str);
     }
 
 #endif /* layout */
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 /*****************************************************************************
@@ -744,7 +744,7 @@ static void jewels_putjewels(struct game_context* bj){
         done = true;
         for(j=0; j<BJ_WIDTH; j++) {
             if(bj->playboard[1][j].type == 0) {
-                bj->playboard[0][j].type = rb->rand()%bj->num_jewels+1;
+                bj->playboard[0][j].type = rand()%bj->num_jewels+1;
             }
             for(i=BJ_HEIGHT-2; i>=0; i--) {
                 if(!mark && bj->playboard[i+1][j].type == 0) {
@@ -754,7 +754,7 @@ static void jewels_putjewels(struct game_context* bj){
                 if(mark) bj->playboard[i][j].falling = true;
             }
             /*if(bj->playboard[1][j].falling) {
-                bj->playboard[0][j].type = rb->rand()%bj->num_jewels+1;
+                bj->playboard[0][j].type = rand()%bj->num_jewels+1;
                 bj->playboard[0][j].falling = true;
             }*/
             mark = false;
@@ -764,7 +764,7 @@ static void jewels_putjewels(struct game_context* bj){
         if(done) break;
 
         /* animate falling jewels */
-        lasttick = *rb->current_tick;
+        lasttick = current_tick;
 
         for(k=1; k<=8; k++) {
             for(i=BJ_HEIGHT-2; i>=0; i--) {
@@ -774,31 +774,31 @@ static void jewels_putjewels(struct game_context* bj){
                         /* clear old position */
 #ifdef HAVE_LCD_COLOR
                         if(i == 0 && YOFS) {
-                            rb->lcd_set_foreground(rb->lcd_get_background());
+                            lcd_set_foreground(lcd_get_background());
                         } else {
-                            rb->lcd_set_foreground(jewels_bkgd[(i-1+j)%2]);
+                            lcd_set_foreground(jewels_bkgd[(i-1+j)%2]);
                         }
-                        rb->lcd_fillrect(j*TILE_WIDTH, (i-1)*TILE_HEIGHT+YOFS,
+                        lcd_fillrect(j*TILE_WIDTH, (i-1)*TILE_HEIGHT+YOFS,
                                             TILE_WIDTH, TILE_HEIGHT);
                         if(bj->playboard[i+1][j].type == 0) {
-                            rb->lcd_set_foreground(jewels_bkgd[(i+j)%2]);
-                            rb->lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
+                            lcd_set_foreground(jewels_bkgd[(i+j)%2]);
+                            lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                                             TILE_WIDTH, TILE_HEIGHT);
                         }
 #else
-                        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                        rb->lcd_fillrect(j*TILE_WIDTH, (i-1)*TILE_HEIGHT+YOFS,
+                        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                        lcd_fillrect(j*TILE_WIDTH, (i-1)*TILE_HEIGHT+YOFS,
                                             TILE_WIDTH, TILE_HEIGHT);
                         if(bj->playboard[i+1][j].type == 0) {
-                            rb->lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
+                            lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                                             TILE_WIDTH, TILE_HEIGHT);
                         }
-                        rb->lcd_set_drawmode(DRMODE_SOLID);
+                        lcd_set_drawmode(DRMODE_SOLID);
 #endif
 
                         /* draw new position */
 #ifdef HAVE_LCD_COLOR
-                        rb->lcd_bitmap_transparent_part(jewels, 0,
+                        lcd_bitmap_transparent_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
                                        STRIDE(  SCREEN_MAIN, 
                                                 BMPWIDTH_jewels, 
@@ -808,7 +808,7 @@ static void jewels_putjewels(struct game_context* bj){
                                            ((((TILE_HEIGHT<<10)*k)/8)>>10),
                                        TILE_WIDTH, TILE_HEIGHT);
 #else
-                        rb->lcd_bitmap_part(jewels, 0,
+                        lcd_bitmap_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
                                        STRIDE(  SCREEN_MAIN, 
                                                 BMPWIDTH_jewels, 
@@ -822,15 +822,15 @@ static void jewels_putjewels(struct game_context* bj){
                 }
             }
 
-            rb->lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
+            lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
             jewels_setcolors();
 
             /* framerate limiting */
-            currenttick = *rb->current_tick;
+            currenttick = current_tick;
             if(currenttick-lasttick < HZ/MAX_FPS) {
-                rb->sleep((HZ/MAX_FPS)-(currenttick-lasttick));
+                sleep((HZ/MAX_FPS)-(currenttick-lasttick));
             } else {
-                rb->yield();
+                yield();
             }
             lasttick = currenttick;
         }
@@ -1003,33 +1003,33 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
     }
 
     while(true) {
-        lasttick = *rb->current_tick;
+        lasttick = current_tick;
 
         /* animate swapping jewels */
         for(k=0; k<=8; k++) {
             /* clear old position */
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(jewels_bkgd[(x+y)%2]);
-            rb->lcd_fillrect(x*TILE_WIDTH,
+            lcd_set_foreground(jewels_bkgd[(x+y)%2]);
+            lcd_fillrect(x*TILE_WIDTH,
                              y*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_set_foreground(jewels_bkgd[(x+horzmod+y+vertmod)%2]);
-            rb->lcd_fillrect((x+horzmod)*TILE_WIDTH,
+            lcd_set_foreground(jewels_bkgd[(x+horzmod+y+vertmod)%2]);
+            lcd_fillrect((x+horzmod)*TILE_WIDTH,
                              (y+vertmod)*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
 #else
-            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            rb->lcd_fillrect(x*TILE_WIDTH,
+            lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            lcd_fillrect(x*TILE_WIDTH,
                              y*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_fillrect((x+horzmod)*TILE_WIDTH,
+            lcd_fillrect((x+horzmod)*TILE_WIDTH,
                              (y+vertmod)*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
+            lcd_set_drawmode(DRMODE_SOLID);
 #endif
             /* draw new position */
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_bitmap_transparent_part(jewels,
+            lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type),
                            STRIDE(  SCREEN_MAIN, 
@@ -1039,7 +1039,7 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
                            (y+vertmod)*TILE_HEIGHT-vertmod*
                                ((((movelen<<10)*k)/8)>>10)+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_transparent_part(jewels,
+            lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
                            STRIDE(  SCREEN_MAIN, 
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
@@ -1049,7 +1049,7 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
                                ((((movelen<<10)*k)/8)>>10)+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
 #else
-            rb->lcd_bitmap_part(jewels,
+            lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type),
                            STRIDE(  SCREEN_MAIN, 
@@ -1059,8 +1059,8 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
                            (y+vertmod)*TILE_HEIGHT-vertmod*
                                ((((movelen<<10)*k)/8)>>10)+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_set_drawmode(DRMODE_FG);
-            rb->lcd_bitmap_part(jewels,
+            lcd_set_drawmode(DRMODE_FG);
+            lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
                            STRIDE(  SCREEN_MAIN, 
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
@@ -1069,18 +1069,18 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
                            y*TILE_HEIGHT+vertmod*
                                ((((movelen<<10)*k)/8)>>10)+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
+            lcd_set_drawmode(DRMODE_SOLID);
 #endif
 
-            rb->lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
+            lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
             jewels_setcolors();
 
             /* framerate limiting */
-            currenttick = *rb->current_tick;
+            currenttick = current_tick;
             if(currenttick-lasttick < HZ/MAX_FPS) {
-                rb->sleep((HZ/MAX_FPS)-(currenttick-lasttick));
+                sleep((HZ/MAX_FPS)-(currenttick-lasttick));
             } else {
-                rb->yield();
+                yield();
             }
             lasttick = currenttick;
         }
@@ -1261,7 +1261,7 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
 
             for(i=0; i<BJ_HEIGHT; i++) {
                 for(j=0; j<BJ_WIDTH; j++) {
-                    bj->playboard[i][j].type = (rb->rand()%bj->num_jewels)+1;
+                    bj->playboard[i][j].type = (rand()%bj->num_jewels)+1;
                     bj->playboard[i][j].falling = false;
                     bj->playboard[i][j].delete = false;
                 }
@@ -1289,7 +1289,7 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
 ******************************************************************************/
 static void jewels_init(struct game_context* bj) {
     /* seed the rand generator */
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
     bj->type = bj->tmp_type;
     bj->level = 1;
@@ -1299,7 +1299,7 @@ static void jewels_init(struct game_context* bj) {
     jewels_setcolors();
 
     /* clear playing board */
-    rb->memset(bj->playboard, 0, sizeof(bj->playboard));
+    memset(bj->playboard, 0, sizeof(bj->playboard));
     do {
         bj->score += jewels_initlevel(bj);
     } while(!jewels_movesavail(bj));
@@ -1319,14 +1319,14 @@ static void jewels_nextlevel(struct game_context* bj) {
             while(bj->score >= LEVEL_PTS) {
                 bj->score -= LEVEL_PTS;
                 bj->level++;
-                rb->splashf(HZ*2, "Level %d", bj->level);
+                splashf(HZ*2, "Level %d", bj->level);
                 jewels_drawboard(bj);
             }
 
             /* randomly clear some jewels */
             for(i=0; i<16; i++) {
-                x = rb->rand()%8;
-                y = rb->rand()%8;
+                x = rand()%8;
+                y = rand()%8;
 
                 if(bj->playboard[y][x].type != 0) {
                     points++;
@@ -1337,7 +1337,7 @@ static void jewels_nextlevel(struct game_context* bj) {
 
         case GAME_TYPE_PUZZLE:
             bj->level++;
-            rb->splashf(HZ*2, "Level %d", bj->level);
+            splashf(HZ*2, "Level %d", bj->level);
             break;
     }
 
@@ -1371,10 +1371,10 @@ static bool jewels_help(void)
         LAST_STYLE_ITEM
     };
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     return false;
 }
@@ -1393,7 +1393,7 @@ static int jewels_menu_cb(int action, const struct menu_item_ex *this_item)
 ******************************************************************************/
 static int jewels_game_menu(struct game_context* bj, bool ingame)
 {
-    rb->button_clear_queue();
+    button_clear_queue();
     int choice = 0;
 
     _ingame = ingame;
@@ -1414,17 +1414,17 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                              "Quit");
 
     while (1) {
-        switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
+        switch (do_menu(&main_menu, &choice, NULL, false)) {
             case 0:
                 jewels_setcolors();
                 if(resume_file)
-                    rb->remove(SAVE_FILE);
+                    remove(SAVE_FILE);
                 return 0;
             case 1:
                 jewels_init(bj);
                 return 0;
             case 2:
-                rb->set_option("Mode", &bj->tmp_type, INT, mode, 2, NULL);
+                set_option("Mode", &bj->tmp_type, INT, mode, 2, NULL);
                 break;
             case 3:
                 if(jewels_help())
@@ -1440,7 +1440,7 @@ static int jewels_game_menu(struct game_context* bj, bool ingame)
                 return 1;
             case 7:
                 if (ingame) {
-                    rb->splash(HZ*1, "Saving game ...");
+                    splash(HZ*1, "Saving game ...");
                     jewels_savegame(bj);
                 }
                 return 1;
@@ -1470,20 +1470,20 @@ static int jewels_main(struct game_context* bj) {
 
         /* display the cursor */
         if(selected) {
-            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+            lcd_set_drawmode(DRMODE_COMPLEMENT);
+            lcd_fillrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
+            lcd_set_drawmode(DRMODE_SOLID);
         } else {
-            rb->lcd_drawrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+            lcd_drawrect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
         }
-        rb->lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
+        lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
                             TILE_WIDTH, TILE_HEIGHT);
 
         /* handle game button presses */
-        rb->yield();
-        button = rb->button_get(true);
+        yield();
+        button = button_get(true);
         switch(button){
             case JEWELS_LEFT:             /* move cursor left */
             case (JEWELS_LEFT|BUTTON_REPEAT):
@@ -1560,7 +1560,7 @@ static int jewels_main(struct game_context* bj) {
                 break;
 
             default:
-                if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
+                if (default_event_handler (button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -1575,8 +1575,8 @@ static int jewels_main(struct game_context* bj) {
                     if (bj->level < NUM_PUZZLE_LEVELS) {
                         jewels_nextlevel(bj);
                     } else {
-                        rb->splash(2*HZ, "Congratulations!");
-                        rb->splash(2*HZ, "You have finished the game!");
+                        splash(2*HZ, "Congratulations!");
+                        splash(2*HZ, "You have finished the game!");
                         if (jewels_game_menu(bj, false)!=0) {
                             return 0;
                         }
@@ -1588,20 +1588,20 @@ static int jewels_main(struct game_context* bj) {
         if (!jewels_movesavail(bj)) {
             switch(bj->type) {
                 case GAME_TYPE_NORMAL:
-                    rb->splash(HZ*2, "Game Over!");
-                    rb->lcd_clear_display();
+                    splash(HZ*2, "Game Over!");
+                    lcd_clear_display();
                     bj->score += (bj->level-1)*LEVEL_PTS;
                     position=highscore_update(bj->score, bj->level, "",
                                               highscores, NUM_SCORES);
                     if (position != -1)
                     {
                         if (position == 0)
-                            rb->splash(HZ*2, "New High Score");
+                            splash(HZ*2, "New High Score");
                         highscore_show(position, highscores, NUM_SCORES, true);
                     }
                     break;
                 case GAME_TYPE_PUZZLE:
-                    rb->splash(2*HZ, "Game Over");
+                    splash(2*HZ, "Game Over");
                     break;
             }
             if (jewels_game_menu(bj, false)!=0) {
@@ -1619,16 +1619,16 @@ enum plugin_status plugin_start(const void* parameter)
     /* load high scores */
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     struct game_context bj;
     bj.tmp_type = GAME_TYPE_NORMAL;
     jewels_main(&bj);
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 
     return PLUGIN_OK;
 }

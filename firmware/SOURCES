@@ -31,7 +31,11 @@ logf.c
 #endif /* ROCKBOX_HAS_LOGF */
 kernel.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(USE_ELFLOADER)
+elfload.c
+#else
 load_code.c
+#endif
 #ifdef RB_PROFILE
 profile.c
 #endif /* RB_PROFILE */

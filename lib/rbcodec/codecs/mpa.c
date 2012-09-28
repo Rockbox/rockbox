@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include "codecs.h"
 #include "codeclib.h"
 #include <codecs/libmad/mad.h>
 #include <inttypes.h>
@@ -58,9 +59,9 @@ static int mpeg_framesize[3] = {384, 1152, 1152};
 
 static void init_mad(void)
 {
-    ci->memset(&stream, 0, sizeof(struct mad_stream));
-    ci->memset(&frame , 0, sizeof(struct mad_frame));
-    ci->memset(&synth , 0, sizeof(struct mad_synth));
+    memset(&stream, 0, sizeof(struct mad_stream));
+    memset(&frame , 0, sizeof(struct mad_frame));
+    memset(&synth , 0, sizeof(struct mad_synth));
 
 #ifdef MPA_SYNTH_ON_COP
     frame.sbsample_prev = &sbsample_prev;
@@ -87,7 +88,7 @@ static void init_mad(void)
 static int get_file_pos(int newtime)
 {
     int pos = -1;
-    struct mp3entry *id3 = ci->id3;
+    struct mp3entry *id3 = ci.id3;
 
     if (id3->vbr) {
         /* Convert newtime and id3->length to seconds to
@@ -194,7 +195,7 @@ static void set_elapsed(struct mp3entry* id3)
             elapsed = offset / (id3->bitrate / 8);
     }
 
-    ci->set_elapsed(elapsed);
+    audio_codec_update_elapsed(elapsed);
 }
 
 #ifdef MPA_SYNTH_ON_COP
@@ -212,8 +213,8 @@ static unsigned int mad_synth_thread_id = 0;
 static void mad_synth_thread(void)
 {
     while(1) {
-        ci->semaphore_release(&synth_done_sem);
-        ci->semaphore_wait(&synth_pending_sem, TIMEOUT_BLOCK);
+        semaphore_release(&synth_done_sem);
+        semaphore_wait(&synth_pending_sem, TIMEOUT_BLOCK);
         
         if(die)
             break;
@@ -226,14 +227,14 @@ static void mad_synth_thread(void)
  * synthesized */
 static inline void mad_synth_thread_wait_pcm(void)
 {
-    ci->semaphore_wait(&synth_done_sem, TIMEOUT_BLOCK);
+    semaphore_wait(&synth_done_sem, TIMEOUT_BLOCK);
 }
 
 /* increment the done semaphore - used after a wait for idle to preserve the
  * semaphore count */
 static inline void mad_synth_thread_unwait_pcm(void)
 {
-    ci->semaphore_release(&synth_done_sem);
+    semaphore_release(&synth_done_sem);
 }
 
 /* after synth thread has gone idle - switch decoded frames and commence
@@ -247,15 +248,15 @@ static void mad_synth_thread_ready(void)
     frame.sbsample = frame.sbsample_prev;
     frame.sbsample_prev=temp;
 
-    ci->semaphore_release(&synth_pending_sem);
+    semaphore_release(&synth_pending_sem);
 }
 
 static bool mad_synth_thread_create(void)
 {
-    ci->semaphore_init(&synth_done_sem, 1, 0);
-    ci->semaphore_init(&synth_pending_sem, 1, 0);
+    semaphore_init(&synth_done_sem, 1, 0);
+    semaphore_init(&synth_pending_sem, 1, 0);
        
-    mad_synth_thread_id = ci->create_thread(mad_synth_thread, 
+    mad_synth_thread_id = create_thread(mad_synth_thread, 
                             mad_synth_thread_stack,
                             sizeof(mad_synth_thread_stack), 0,
                             mad_synth_thread_name 
@@ -272,9 +273,9 @@ static void mad_synth_thread_quit(void)
 {
     /* mop up COP thread */
     die = 1;
-    ci->semaphore_release(&synth_pending_sem);
-    ci->thread_wait(mad_synth_thread_id);
-    ci->commit_discard_dcache();
+    semaphore_release(&synth_pending_sem);
+    thread_wait(mad_synth_thread_id);
+    commit_discard_dcache();
 }
 #else
 static inline void mad_synth_thread_ready(void)
@@ -308,7 +309,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
         if (codec_init())
             return CODEC_ERROR;
 
-        ci->configure(DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
 
         /* does nothing on 1 processor systems except return true */
         if(!mad_synth_thread_create())
@@ -342,25 +343,25 @@ enum codec_status codec_run(void)
 
     file_end = 0;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
-    current_frequency = ci->id3->frequency;
-    codec_set_replaygain(ci->id3);
+    codec_configure(DSP_SWITCH_FREQUENCY, ci.id3->frequency);
+    current_frequency = ci.id3->frequency;
+    codec_set_replaygain(ci.id3);
     
-    if (ci->id3->offset) {
-        ci->seek_buffer(ci->id3->offset);
-        set_elapsed(ci->id3);
+    if (ci.id3->offset) {
+        codec_seek_buffer(ci.id3->offset);
+        set_elapsed(ci.id3);
     }
     else
-        ci->seek_buffer(ci->id3->first_frame_offset);
+        codec_seek_buffer(ci.id3->first_frame_offset);
 
-    if (ci->id3->lead_trim >= 0 && ci->id3->tail_trim >= 0) {
-        stop_skip = ci->id3->tail_trim - mpeg_latency[ci->id3->layer];
+    if (ci.id3->lead_trim >= 0 && ci.id3->tail_trim >= 0) {
+        stop_skip = ci.id3->tail_trim - mpeg_latency[ci.id3->layer];
         if (stop_skip < 0) stop_skip = 0;
-        start_skip = ci->id3->lead_trim + mpeg_latency[ci->id3->layer];
+        start_skip = ci.id3->lead_trim + mpeg_latency[ci.id3->layer];
     } else {
         stop_skip = 0;
         /* We want to skip this amount anyway */
-        start_skip = mpeg_latency[ci->id3->layer];
+        start_skip = mpeg_latency[ci.id3->layer];
     }
 
     /* Libmad will not decode the last frame without 8 bytes of extra padding
@@ -368,14 +369,14 @@ enum codec_status codec_run(void)
        if we are to skip it entirely and then cut the appropriate samples from
        final frame that we did decode. Note, if all tags (ID3, APE) are not
        properly stripped from the end of the file, this trick will not work. */
-    if (stop_skip >= mpeg_framesize[ci->id3->layer]) {
+    if (stop_skip >= mpeg_framesize[ci.id3->layer]) {
         padding = 0;
-        stop_skip -= mpeg_framesize[ci->id3->layer];
+        stop_skip -= mpeg_framesize[ci.id3->layer];
     } else {
         padding = MAD_BUFFER_GUARD;
     }
 
-    samplesdone = ((int64_t)ci->id3->elapsed) * current_frequency / 1000;
+    samplesdone = ((int64_t)ci.id3->elapsed) * current_frequency / 1000;
 
     /* Don't skip any samples unless we start at the beginning. */
     if (samplesdone > 0)
@@ -387,7 +388,7 @@ enum codec_status codec_run(void)
 
     /* This is the decoding loop. */
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -402,28 +403,28 @@ enum codec_status codec_run(void)
             samplesdone = ((int64_t)param)*current_frequency/1000;
 
             if (param == 0) {
-                newpos = ci->id3->first_frame_offset;
+                newpos = ci.id3->first_frame_offset;
                 samples_to_skip = start_skip;
             } else {
                 newpos = get_file_pos(param);
                 samples_to_skip = 0;
             }
 
-            if (!ci->seek_buffer(newpos))
+            if (!codec_seek_buffer(newpos))
             {
-                ci->seek_complete();
+                codec_seek_complete();
                 break;
             }
 
-            ci->set_elapsed((samplesdone * 1000) / current_frequency);
-            ci->seek_complete();
+            audio_codec_update_elapsed((samplesdone * 1000) / current_frequency);
+            codec_seek_complete();
             init_mad();
             framelength = 0;
         }
 
         /* Lock buffers */
         if (stream.error == 0) {
-            inputbuffer = ci->request_buffer(&size, INPUT_CHUNK_SIZE);
+            inputbuffer = codec_request_buffer(&size, INPUT_CHUNK_SIZE);
             if (size == 0 || inputbuffer == NULL)
                 break;
             mad_stream_buffer(&stream, (unsigned char *)inputbuffer,
@@ -438,9 +439,9 @@ enum codec_status codec_run(void)
 
                 /* Fill the buffer */
                 if (stream.next_frame)
-                    ci->advance_buffer(stream.next_frame - stream.buffer);
+                    codec_advance_buffer(stream.next_frame - stream.buffer);
                 else
-                    ci->advance_buffer(size);
+                    codec_advance_buffer(size);
                 stream.error = 0; /* Must get new inputbuffer next time */
                 file_end++;
                 continue;
@@ -461,7 +462,7 @@ enum codec_status codec_run(void)
         if (framelength > 0) {
             
             /* In case of a mono file, the second array will be ignored. */
-            ci->pcmbuf_insert(&synth.pcm.samples[0][samples_to_skip],
+            codec_pcmbuf_insert(&synth.pcm.samples[0][samples_to_skip],
                               &synth.pcm.samples[1][samples_to_skip],
                               framelength);
 
@@ -475,24 +476,24 @@ enum codec_status codec_run(void)
         /* Check if sample rate and stereo settings changed in this frame. */
         if (frame.header.samplerate != current_frequency) {
             current_frequency = frame.header.samplerate;
-            ci->configure(DSP_SWITCH_FREQUENCY, current_frequency);
+            codec_configure(DSP_SWITCH_FREQUENCY, current_frequency);
         }
         if (MAD_NCHANNELS(&frame.header) == 2) {
             if (current_stereo_mode != STEREO_NONINTERLEAVED) {
-                ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+                codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
                 current_stereo_mode = STEREO_NONINTERLEAVED;
             }
         } else {
             if (current_stereo_mode != STEREO_MONO) {
-                ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+                codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
                 current_stereo_mode = STEREO_MONO;
             }
         }
 
         if (stream.next_frame)
-            ci->advance_buffer(stream.next_frame - stream.buffer);
+            codec_advance_buffer(stream.next_frame - stream.buffer);
         else
-            ci->advance_buffer(size);
+            codec_advance_buffer(size);
         stream.error = 0; /* Must get new inputbuffer next time */
         file_end = 0;
 
@@ -503,7 +504,7 @@ enum codec_status codec_run(void)
         }
 
         samplesdone += framelength;
-        ci->set_elapsed((samplesdone * 1000) / current_frequency);
+        audio_codec_update_elapsed((samplesdone * 1000) / current_frequency);
     }
 
     /* wait for synth idle - MT only*/
@@ -513,7 +514,7 @@ enum codec_status codec_run(void)
     /* Finish the remaining decoded frame.
        Cut the required samples from the end. */
     if (framelength > stop_skip){
-        ci->pcmbuf_insert(synth.pcm.samples[0], synth.pcm.samples[1],
+        codec_pcmbuf_insert(synth.pcm.samples[0], synth.pcm.samples[1],
                           framelength - stop_skip);
     }
 

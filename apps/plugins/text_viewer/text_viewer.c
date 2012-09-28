@@ -41,21 +41,21 @@ enum plugin_status plugin_start(const void* file)
     size_t size;
     unsigned char *plugin_buf;
 
-    old_tick = *rb->current_tick;
+    old_tick = current_tick;
 
     if (!file)
         return PLUGIN_ERROR;
 
     /* get the plugin buffer */
-    plugin_buf = rb->plugin_get_buffer(&size);
+    plugin_buf = plugin_get_buffer(&size);
 
     if (!tv_init_action(&plugin_buf, &size)) {
-        rb->splash(HZ, "Error initialize");
+        splash(HZ, "Error initialize");
         return PLUGIN_ERROR;
     }
 
     if (!tv_load_file(file)) {
-        rb->splash(HZ, "Error opening file");
+        splash(HZ, "Error opening file");
         return PLUGIN_ERROR;
     }
 
@@ -63,7 +63,7 @@ enum plugin_status plugin_start(const void* file)
     while (!done) {
 #ifdef HAVE_LCD_BITMAP
         if (preferences->statusbar)
-            rb->send_event(GUI_EVENT_ACTIONUPDATE, NULL);
+            send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 #endif
 
         if (display_update)
@@ -71,7 +71,7 @@ enum plugin_status plugin_start(const void* file)
 
         display_update = true;
 
-        button = rb->button_get_w_tmo(HZ/10);
+        button = button_get_w_tmo(HZ/10);
 
         switch (button) {
             case TV_MENU:
@@ -108,7 +108,7 @@ enum plugin_status plugin_start(const void* file)
             case TV_SCROLL_UP2 | BUTTON_REPEAT:
 #endif
                 tv_scroll_up(TV_VERTICAL_SCROLL_PREFS);
-                old_tick = *rb->current_tick;
+                old_tick = current_tick;
                 break;
 
             case TV_SCROLL_DOWN:
@@ -118,7 +118,7 @@ enum plugin_status plugin_start(const void* file)
             case TV_SCROLL_DOWN2 | BUTTON_REPEAT:
 #endif
                 tv_scroll_down(TV_VERTICAL_SCROLL_PREFS);
-                old_tick = *rb->current_tick;
+                old_tick = current_tick;
                 break;
 
             case TV_SCREEN_LEFT:
@@ -168,14 +168,14 @@ enum plugin_status plugin_start(const void* file)
             case TV_LINE_UP | BUTTON_REPEAT:
                 /* Scroll up one line */
                 tv_scroll_up(TV_VERTICAL_SCROLL_LINE);
-                old_tick = *rb->current_tick;
+                old_tick = current_tick;
                 break;
 
             case TV_LINE_DOWN:
             case TV_LINE_DOWN | BUTTON_REPEAT:
                 /* Scroll down one line */
                 tv_scroll_down(TV_VERTICAL_SCROLL_LINE);
-                old_tick = *rb->current_tick;
+                old_tick = current_tick;
                 break;
 #endif
 #ifdef TV_COLUMN_LEFT
@@ -216,14 +216,14 @@ enum plugin_status plugin_start(const void* file)
 #if defined(TV_AUTOSCROLL_PRE) 
             lastbutton = button;
 #endif
-            rb->yield();
+            yield();
         }
         if (autoscroll)
         {
-            if(old_tick <= *rb->current_tick - (110 - preferences->autoscroll_speed * 10))
+            if(old_tick <= current_tick - (110 - preferences->autoscroll_speed * 10))
             {
                 tv_scroll_down(TV_VERTICAL_SCROLL_PREFS);
-                old_tick = *rb->current_tick;
+                old_tick = current_tick;
                 display_update = true;
             }
         }

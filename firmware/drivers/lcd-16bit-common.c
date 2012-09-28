@@ -38,6 +38,7 @@ enum fill_opt {
 fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
 fb_data *lcd_framebuffer = &lcd_static_framebuffer[0][0];
+EXPORT_SYMBOL(lcd_framebuffer);
 
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
@@ -201,31 +202,37 @@ void lcd_set_drawmode(int mode)
 {
     current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
+EXPORT_SYMBOL(lcd_set_drawmode);
 
 int lcd_get_drawmode(void)
 {
     return current_vp->drawmode;
 }
+EXPORT_SYMBOL(lcd_get_drawmode);
 
 void lcd_set_foreground(unsigned color)
 {
     current_vp->fg_pattern = color;
 }
+EXPORT_SYMBOL(lcd_set_foreground);
 
 unsigned lcd_get_foreground(void)
 {
     return current_vp->fg_pattern;
 }
+EXPORT_SYMBOL(lcd_get_foreground);
 
 void lcd_set_background(unsigned color)
 {
     current_vp->bg_pattern = color;
 }
+EXPORT_SYMBOL(lcd_set_background);
 
 unsigned lcd_get_background(void)
 {
     return current_vp->bg_pattern;
 }
+EXPORT_SYMBOL(lcd_get_background);
 
 void lcd_set_selector_start(unsigned color)
 {
@@ -263,6 +270,7 @@ void lcd_setfont(int newfont)
 {
     current_vp->font = newfont;
 }
+EXPORT_SYMBOL(lcd_setfont);
 
 int lcd_getfont(void)
 {
@@ -273,6 +281,7 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 {
     return font_getstringsize(str, w, h, current_vp->font);
 }
+EXPORT_SYMBOL(lcd_getstringsize);
 
 /*** low-level drawing functions ***/
 
@@ -327,11 +336,13 @@ void lcd_set_backdrop(fb_data* backdrop)
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
     }
 }
+EXPORT_SYMBOL(lcd_set_backdrop);
 
 fb_data* lcd_get_backdrop(void)
 {
     return lcd_backdrop;
 }
+EXPORT_SYMBOL(lcd_get_backdrop);
 
 /* Clear the whole display */
 void lcd_clear_display(void)
@@ -344,6 +355,7 @@ void lcd_clear_display(void)
 
     current_vp = old_vp;
 }
+EXPORT_SYMBOL(lcd_clear_display);
 
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
@@ -357,6 +369,7 @@ void lcd_drawpixel(int x, int y)
         )
         lcd_fastpixelfuncs[current_vp->drawmode](FBADDR(current_vp->x+x, current_vp->y+y));
 }
+EXPORT_SYMBOL(lcd_drawpixel);
 
 /* Draw a line */
 void lcd_drawline(int x1, int y1, int x2, int y2)
@@ -446,6 +459,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
         }
     }
 }
+EXPORT_SYMBOL(lcd_drawline);
 
 /* Draw a rectangular box */
 void lcd_drawrect(int x, int y, int width, int height)
@@ -461,6 +475,7 @@ void lcd_drawrect(int x, int y, int width, int height)
     lcd_hline(x, x2, y);
     lcd_hline(x, x2, y2);
 }
+EXPORT_SYMBOL(lcd_drawrect);
 
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
@@ -577,6 +592,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     }
     while (dst <= dst_end);
 }
+EXPORT_SYMBOL(lcd_fillrect);
 
 /* About Rockbox' internal monochrome bitmap format:
  *
@@ -773,12 +789,14 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     }
     while (src < src_end);
 }
+EXPORT_SYMBOL(lcd_mono_bitmap_part);
+
 /* Draw a full monochrome bitmap */
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
     lcd_mono_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
-
+EXPORT_SYMBOL(lcd_mono_bitmap);
 
 /* About Rockbox' internal alpha channel format (for ALPHA_COLOR_FONT_DEPTH == 2)
  *
@@ -1125,6 +1143,7 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
 {
     lcd_bitmap_part(src, 0, 0, STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
 }
+EXPORT_SYMBOL(lcd_bitmap);
 
 /* Draw a full native bitmap with a transparent color */
 void lcd_bitmap_transparent(const fb_data *src, int x, int y,
@@ -1133,6 +1152,7 @@ void lcd_bitmap_transparent(const fb_data *src, int x, int y,
     lcd_bitmap_transparent_part(src, 0, 0,
                                 STRIDE(SCREEN_MAIN, width, height), x, y, width, height);
 }
+EXPORT_SYMBOL(lcd_bitmap_transparent);
 
 /* draw alpha bitmap for anti-alias font */
 void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,

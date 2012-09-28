@@ -96,7 +96,7 @@ static bool set_format(struct pcm_format *format)
     }
 
     /* check exists block header */
-    if (fmt->blockalign == ((ci->id3->frequency / 60) + 4) * fmt->channels)
+    if (fmt->blockalign == ((ci.id3->frequency / 60) + 4) * fmt->channels)
     {
         has_block_header = true;
 
@@ -115,10 +115,10 @@ static bool set_format(struct pcm_format *format)
         fmt->samplesperblock = 2;
 
         /* chunksize = about 1/32[sec] data */
-        blocksperchunk = ci->id3->frequency >> 6;
+        blocksperchunk = ci.id3->frequency >> 6;
         fmt->chunksize = blocksperchunk * fmt->blockalign;
 
-        max_chunk_count = (uint64_t)ci->id3->length * ci->id3->frequency
+        max_chunk_count = (uint64_t)ci.id3->length * ci.id3->frequency
                                       / (2000LL * fmt->chunksize / fmt->channels);
 
         /* initialize seek table */
@@ -219,7 +219,7 @@ static struct pcm_pos *get_seek_pos(uint32_t seek_val, int seek_mode,
 {
     static struct pcm_pos newpos;
     uint32_t new_count = (seek_mode == PCM_SEEK_TIME)?
-                         ((uint64_t)seek_val * ci->id3->frequency / 1000LL)
+                         ((uint64_t)seek_val * ci.id3->frequency / 1000LL)
                                              / (blocksperchunk * fmt->samplesperblock) :
                          seek_val / (unsigned long)fmt->chunksize;
 

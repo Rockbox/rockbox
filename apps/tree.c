@@ -76,6 +76,8 @@
 
 #include "root_menu.h"
 
+#include "symbols.h"
+
 static const struct filetype *filetypes;
 static int filetypes_count;
 
@@ -108,6 +110,7 @@ struct entry* tree_get_entries(struct tree_context *t)
 {
     return core_get_data(t->cache.entries_handle);
 }
+EXPORT_SYMBOL(tree_get_entries);
 
 struct entry* tree_get_entry_at(struct tree_context *t, int index)
 {
@@ -311,6 +314,7 @@ struct tree_context* tree_get_context(void)
 {
     return &tc;
 }
+EXPORT_SYMBOL(tree_get_context);
 
 /*
  * Returns the position of a given file in the current directory
@@ -516,6 +520,7 @@ void reload_directory(void)
 {
     reload_dir = true;
 }
+EXPORT_SYMBOL(reload_directory);
 
 char* get_current_file(char* buffer, size_t buffer_len)
 {
@@ -547,6 +552,7 @@ void set_dirfilter(int l_dirfilter)
 {
     *tc.dirfilter = l_dirfilter;
 }
+EXPORT_SYMBOL(set_dirfilter);
 
 /* Selects a file and update tree context properly */
 void set_current_file(const char *path)
@@ -600,7 +606,7 @@ void set_current_file(const char *path)
         tc.selected_item = tree_get_file_position(lastfile);
     }
 }
-
+EXPORT_SYMBOL(set_current_file);
 
 /* main loop, handles key events */
 static int dirbrowse(void)
@@ -942,6 +948,7 @@ void browse_context_init(struct browse_context *browse,
     browse->buf = NULL;
     browse->bufsize = 0;
 }
+EXPORT_SYMBOL(browse_context_init);
 
 #define NUM_TC_BACKUP   3
 static struct tree_context backups[NUM_TC_BACKUP];
@@ -1003,6 +1010,7 @@ int rockbox_browse(struct browse_context *browse)
         tc = backups[backup_count];
     return ret_val;
 }
+EXPORT_SYMBOL(rockbox_browse);
 
 static int move_callback(int handle, void* current, void* new)
 {

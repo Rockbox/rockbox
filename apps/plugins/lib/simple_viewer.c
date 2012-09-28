@@ -48,8 +48,8 @@ static bool isbrchr(const unsigned char *str, int len)
 
     while(*p)
     {
-        int n = rb->utf8seek(p, 1);
-        if (len == n && !rb->strncmp(p, str, len))
+        int n = utf8seek(p, 1);
+        if (len == n && !strncmp(p, str, len))
             return true;
         p += n;
     }
@@ -65,15 +65,15 @@ static const char* get_next_line(const char *text, struct view_info *info)
     while(*ptr)
     {
 #ifdef HAVE_LCD_CHARCELLS
-        n = rb->utf8seek(ptr, 1);
+        n = utf8seek(ptr, 1);
         w = 1;
 #else
         unsigned short ch;
-        n = ((long)rb->utf8decode(ptr, &ch) - (long)ptr);
-        if (rb->is_diacritic(ch, NULL))
+        n = ((long)utf8decode(ptr, &ch) - (long)ptr);
+        if (is_diacritic(ch, NULL))
             w = 0;
         else
-            w = rb->font_get_width(info->pf, ch);
+            w = font_get_width(info->pf, ch);
 #endif
         if (isbrchr(ptr, n))
             space = ptr+(isspace(*ptr) || total + w <= info->vp.width? n: 0);
@@ -108,9 +108,9 @@ static void calc_line_count(struct view_info *info)
             ptr = info->text;
             i = 0;
             info->scrollbar_vp = info->vp;
-            info->scrollbar_vp.width = rb->global_settings->scrollbar_width;
+            info->scrollbar_vp.width = global_settings.scrollbar_width;
             info->vp.width -= info->scrollbar_vp.width;
-            if (rb->global_settings->scrollbar != SCROLLBAR_RIGHT)
+            if (global_settings.scrollbar != SCROLLBAR_RIGHT)
                 info->vp.x = info->scrollbar_vp.width;
             else
                 info->scrollbar_vp.x = info->vp.width;
@@ -148,9 +148,9 @@ static void calc_first_line(struct view_info *info, int line)
 static int init_view(struct view_info *info,
                      const char *title, const char *text)
 {
-    rb->viewport_set_defaults(&info->vp, SCREEN_MAIN);
+    viewport_set_defaults(&info->vp, SCREEN_MAIN);
 #ifdef HAVE_LCD_BITMAP
-    info->pf = rb->font_get(FONT_UI);
+    info->pf = font_get(FONT_UI);
     info->display_lines = info->vp.height / info->pf->height;
 #else
     info->display_lines = info->vp.height;
@@ -190,7 +190,7 @@ static void draw_text(struct view_info *info)
     static char output[OUTPUT_SIZE];
     const char *text, *ptr;
     int max_show, line;
-    struct screen* display = rb->screens[SCREEN_MAIN];
+    struct screen* display = &screens[SCREEN_MAIN];
 
     /* clear screen */
     display->clear_display();
@@ -215,7 +215,7 @@ static void draw_text(struct view_info *info)
         len = ptr-text;
         while(len > 0 && isspace(text[len-1]))
             len--;
-        rb->memcpy(output, text, len);
+        memcpy(output, text, len);
         output[len] = 0;
         display->puts(0, line, output);
         text = ptr;
@@ -224,7 +224,7 @@ static void draw_text(struct view_info *info)
     if (info->line_count > info->display_lines)
     {
         display->set_viewport(&info->scrollbar_vp);
-        rb->gui_scrollbar_draw(display, (info->scrollbar_vp.width? 0: 1), 0,
+        gui_scrollbar_draw(display, (info->scrollbar_vp.width? 0: 1), 0,
                 info->scrollbar_vp.width - 1, info->scrollbar_vp.height,
                 info->line_count, info->line, info->line + max_show,
                 VERTICAL);
@@ -321,7 +321,7 @@ int view_text(const char *title, const char *text)
         case PLA_CANCEL:
             return PLUGIN_OK;
         default:
-            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            if (default_event_handler(button) == SYS_USB_CONNECTED)
                 return PLUGIN_USB_CONNECTED;
             break;
         }

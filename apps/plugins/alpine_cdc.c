@@ -211,7 +211,7 @@ struct
 /* setup static timer registers and values */
 void timer_init(unsigned hz, unsigned to)
 {
-    rb->memset(&gTimer, 0, sizeof(gTimer));
+    memset(&gTimer, 0, sizeof(gTimer));
     
     gTimer.transmit = TIMER_FREQ / hz; /* time for bit transitions */
     gTimer.timeout = TIMER_FREQ / to; /* time for receive timeout */
@@ -226,17 +226,17 @@ void timer_set_mode(int mode)
 
     if (mode == TM_RX_TIMEOUT)
     {
-        rb->timer_register(1, NULL, gTimer.timeout, timer4_isr IF_COP(, CPU));
+        timer_register(1, NULL, gTimer.timeout, timer4_isr IF_COP(, CPU));
         IPRD = (IPRD & 0xFF0F) | 11 << 4;  /* interrupt priority */
     }
     else if (mode == TM_TRANSMIT)
     {
-        rb->timer_register(1, NULL, gTimer.transmit, timer4_isr IF_COP(, CPU));
+        timer_register(1, NULL, gTimer.transmit, timer4_isr IF_COP(, CPU));
         IPRD = (IPRD & 0xFF0F) | 14 << 4;  /* interrupt priority */
     }
     else
     {
-        rb->timer_unregister();
+        timer_unregister();
     }
 }
 
@@ -250,7 +250,7 @@ void timer4_isr(void) /* IMIA4 */
         break;
     case TM_RX_TIMEOUT:
         receive_timeout_isr();
-        rb->timer_unregister(); /* single shot */
+        timer_unregister(); /* single shot */
         break;
     default:
         timer_set_mode(TM_OFF); /* spurious interrupt */
@@ -382,7 +382,7 @@ void uart_init(unsigned baudrate)
                  
     IPRE = (IPRE & ~0xf000) | 0xc000; /* interrupt on level 12 */
 
-    rb->sleep(1); /* hardware needs to settle for at least one bit interval */
+    sleep(1); /* hardware needs to settle for at least one bit interval */
 
     and_b(~(SCI_RDRF | SCI_ORER | SCI_FER | SCI_PER), &SSR1); /* clear any receiver flag */
     or_b(SCI_RE | SCI_RIE , &SCR1); /* enable the receiver with interrupt */
@@ -508,11 +508,11 @@ unsigned char calc_checksum(unsigned char* p_msg, int digits)
 void mbus_init(void)
 {
     /* init the send object */
-    rb->memset(&gSendIRQ, 0, sizeof(gSendIRQ));
+    memset(&gSendIRQ, 0, sizeof(gSendIRQ));
     timer_init(MBUS_STEP_FREQ, (MBUS_BIT_FREQ*10)/15); /* setup frequency and timeout (1.5 bit) */
 
     /* init receiver */
-    rb->memset(&gRcvIRQ, 0, sizeof(gRcvIRQ));
+    memset(&gRcvIRQ, 0, sizeof(gRcvIRQ));
     uart_init(MBUS_BAUDRATE);
 }
 
@@ -522,10 +522,10 @@ int mbus_send(unsigned char* p_msg, int digits)
 {
     /* wait for previous transmit/receive to end */
     while(gTimer.mode != TM_OFF) /* wait for "free line" */
-        rb->sleep(1);
+        sleep(1);
     
     /* fill in our part */
-    rb->memcpy(gSendIRQ.send_buf, p_msg, digits);
+    memcpy(gSendIRQ.send_buf, p_msg, digits);
 
     /* add checksum */
     gSendIRQ.send_buf[digits] = calc_checksum(p_msg, digits);
@@ -552,16 +552,16 @@ int mbus_send(unsigned char* p_msg, int digits)
 
     /* last chance to wait for a new detected receive to end */
     while(gTimer.mode != TM_OFF) /* wait for "free line" */
-        rb->sleep(1);
+        sleep(1);
     
     and_b(~0x30, PBCR1_ADDR+1); /* GPIO for PB10 */
     timer_set_mode(TM_TRANSMIT); /* run */
 
     /* make the call blocking until sent out */
-    rb->sleep(digits*4*HZ/MBUS_BIT_FREQ); /* should take this long */
+    sleep(digits*4*HZ/MBUS_BIT_FREQ); /* should take this long */
 
     while(gSendIRQ.busy) /* poll in case it lasts longer */
-        rb->sleep(1); /* (should not happen) */
+        sleep(1); /* (should not happen) */
 
     /* debug output, to be removed */
     if (gTread.foreground)
@@ -587,7 +587,7 @@ int mbus_receive(unsigned char* p_msg, unsigned bufsize, int timeout)
 
             if (p_entry->error == RX_RECEIVED)
             {   /* seems valid */
-                rb->memcpy(p_msg, p_entry->buf, MIN(p_entry->size, bufsize));
+                memcpy(p_msg, p_entry->buf, MIN(p_entry->size, bufsize));
                 retval = p_entry->size; /* return message size */
             }
             else
@@ -608,7 +608,7 @@ int mbus_receive(unsigned char* p_msg, unsigned bufsize, int timeout)
             if (timeout != -1 && timeout != 0) /* if not infinite or expired */
                 timeout--;
     
-            rb->sleep(1); /* wait a while */
+            sleep(1); /* wait a while */
         }
 
     } while (timeout != 0 || gTimer.mode != TM_OFF);
@@ -632,19 +632,19 @@ void print_scroll(char* string)
     if (pos >= LINES)
     {   /* need to scroll first */
         int i;
-        rb->lcd_clear_display();
+        lcd_clear_display();
         screentop++;
         for (i=0; i<LINES-1; i++)
-            rb->lcd_puts(0, i, screen[(i+screentop) % LINES]);
+            lcd_puts(0, i, screen[(i+screentop) % LINES]);
 
         pos = LINES-1;
     }
     
     /* no strncpy avail. */
-    rb->snprintf(screen[(pos+screentop) % LINES], sizeof(screen[0]), "%s", string);
+    snprintf(screen[(pos+screentop) % LINES], sizeof(screen[0]), "%s", string);
 
-    rb->lcd_puts(0, pos, screen[(pos+screentop) % LINES]);
-    rb->lcd_update();
+    lcd_puts(0, pos, screen[(pos+screentop) % LINES]);
+    lcd_update();
     pos++;
 }
 
@@ -681,7 +681,7 @@ void bit_set(unsigned char* buf, unsigned bit, bool val)
 
 void emu_init(void)
 {
-    rb->memset(&gEmu, 0, sizeof(gEmu));
+    memset(&gEmu, 0, sizeof(gEmu));
 
     gEmu.poll_interval = HZ;
 
@@ -694,7 +694,7 @@ void emu_init(void)
     gEmu.changemsg[10] = 0x1;
 
     /* init the disk status message to 9C1019999990 */
-    rb->memset(&gEmu.diskmsg, 0x9, sizeof(gEmu.diskmsg));
+    memset(&gEmu.diskmsg, 0x9, sizeof(gEmu.diskmsg));
     gEmu.diskmsg[1] = 0xC;
     gEmu.diskmsg[2] = gEmu.diskmsg[4] = 0x1;
     gEmu.diskmsg[3] = gEmu.diskmsg[11] = 0x0;
@@ -780,13 +780,13 @@ void emu_process_packet(unsigned char* mbus_msg, int msg_size)
         {   /* changing track */
             if (mbus_msg[4] == 0xA && mbus_msg[5] == 0x3)
             {    /* next random */
-                gEmu.playmsg[3] = rb->rand() % 10; /* ToDo */
-                gEmu.playmsg[4] = rb->rand() % 10;
+                gEmu.playmsg[3] = rand() % 10; /* ToDo */
+                gEmu.playmsg[4] = rand() % 10;
             }
             else if  (mbus_msg[4] == 0xB && mbus_msg[5] == 0x3)
             {   /* previous random */
-                gEmu.playmsg[3] = rb->rand() % 10; /* ToDo */
-                gEmu.playmsg[4] = rb->rand() % 10;
+                gEmu.playmsg[3] = rand() % 10; /* ToDo */
+                gEmu.playmsg[4] = rand() % 10;
             }
             else
             {   /* normal track select */
@@ -812,7 +812,7 @@ void emu_process_packet(unsigned char* mbus_msg, int msg_size)
 
     if (playmsg_dirty)
     {
-        rb->yield(); /* give the audio thread a chance to process */
+        yield(); /* give the audio thread a chance to process */
         get_playmsg(); /* force update */
         mbus_send(gEmu.playmsg, sizeof(gEmu.playmsg));
     }
@@ -871,7 +871,7 @@ void get_playmsg(void)
 
     if (gEmu.set_state != EMU_FF && gEmu.set_state != EMU_FR)
     {
-        switch(rb->audio_status())
+        switch(audio_status())
         {
         case AUDIO_STATUS_PLAY:
             print_scroll("AudioStat Play");
@@ -926,7 +926,7 @@ void get_playmsg(void)
 /* update the disk status message with Rockbox info */
 void get_diskmsg(void)
 {
-    int tracks = rb->playlist_amount();
+    int tracks = playlist_amount();
     if (tracks > 99)
         tracks = 99;
     gEmu.diskmsg[5] = tracks / 10;
@@ -938,7 +938,7 @@ int get_playtime(void)
 {
     struct mp3entry* p_mp3entry;
 
-    p_mp3entry = rb->audio_current_track();
+    p_mp3entry = audio_current_track();
     if (p_mp3entry == NULL)
         return 0;
 
@@ -950,7 +950,7 @@ int get_tracklength(void)
 {
     struct mp3entry* p_mp3entry;
 
-    p_mp3entry = rb->audio_current_track();
+    p_mp3entry = audio_current_track();
     if (p_mp3entry == NULL)
         return 0;
 
@@ -963,12 +963,12 @@ void set_track(int selected)
     if (selected > get_track())
     {
         print_scroll("audio_next");
-        rb->audio_next();
+        audio_next();
     }
     else if (selected < get_track())
     {
         print_scroll("audio_prev");
-        rb->audio_prev();
+        audio_prev();
     }
 }
 
@@ -977,7 +977,7 @@ int get_track(void)
 {
     struct mp3entry* p_mp3entry;
 
-    p_mp3entry = rb->audio_current_track();
+    p_mp3entry = audio_current_track();
     if (p_mp3entry == NULL)
         return 0;
 
@@ -987,48 +987,48 @@ int get_track(void)
 /* start or resume playback */
 void set_play(void)
 {
-    if (rb->audio_status() == AUDIO_STATUS_PLAY)
+    if (audio_status() == AUDIO_STATUS_PLAY)
         return;
 
-    if (rb->audio_status() == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE))
+    if (audio_status() == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE))
     {
         print_scroll("audio_resume");
-        rb->audio_resume();
+        audio_resume();
     }
     else
     {
         print_scroll("audio_play(0)");
-        rb->audio_play(0);
+        audio_play(0);
     }
 }
 
 /* pause playback */
 void set_pause(void)
 {
-    if (rb->audio_status() == AUDIO_STATUS_PLAY)
+    if (audio_status() == AUDIO_STATUS_PLAY)
     {
         print_scroll("audio_pause");
-        rb->audio_pause();
+        audio_pause();
     }
 }
 
 /* stop playback */
 void set_stop(void)
 {
-    if (rb->audio_status() & AUDIO_STATUS_PLAY)
+    if (audio_status() & AUDIO_STATUS_PLAY)
     {
         print_scroll("audio_stop");
-        rb->audio_stop();
+        audio_stop();
     }
 }
 
 /* seek */
 void set_position(int seconds)
 {
-    if (rb->audio_status() & AUDIO_STATUS_PLAY)
+    if (audio_status() & AUDIO_STATUS_PLAY)
     {
         print_scroll("audio_ff_rewind");
-        rb->audio_ff_rewind(seconds * 1000);
+        audio_ff_rewind(seconds * 1000);
     }
 }
 
@@ -1037,28 +1037,28 @@ void set_position(int seconds)
 /* set to everything flat and 0 dB volume */
 void sound_neutral(void)
 {    /* neutral sound settings */
-    rb->sound_set(SOUND_BASS, 0);
-    rb->sound_set(SOUND_TREBLE, 0);
-    rb->sound_set(SOUND_BALANCE, 0);
-    rb->sound_set(SOUND_VOLUME, 0);
+    sound_set(SOUND_BASS, 0);
+    sound_set(SOUND_TREBLE, 0);
+    sound_set(SOUND_BALANCE, 0);
+    sound_set(SOUND_VOLUME, 0);
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    rb->sound_set(SOUND_LOUDNESS, 0);
-    rb->sound_set(SOUND_SUPERBASS, 0);
-    rb->sound_set(SOUND_AVC, 0);
+    sound_set(SOUND_LOUDNESS, 0);
+    sound_set(SOUND_SUPERBASS, 0);
+    sound_set(SOUND_AVC, 0);
 #endif
 }
 
 /* return to user settings */
 void sound_normal(void)
 {   /* restore sound settings */
-    rb->sound_set(SOUND_BASS, rb->global_settings->bass);
-    rb->sound_set(SOUND_TREBLE, rb->global_settings->treble);
-    rb->sound_set(SOUND_BALANCE, rb->global_settings->balance);
-    rb->sound_set(SOUND_VOLUME, rb->global_settings->volume);
+    sound_set(SOUND_BASS, global_settings.bass);
+    sound_set(SOUND_TREBLE, global_settings.treble);
+    sound_set(SOUND_BALANCE, global_settings.balance);
+    sound_set(SOUND_VOLUME, global_settings.volume);
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    rb->sound_set(SOUND_LOUDNESS, rb->global_settings->loudness);
-    rb->sound_set(SOUND_SUPERBASS, rb->global_settings->superbass);
-    rb->sound_set(SOUND_AVC, rb->global_settings->avc);
+    sound_set(SOUND_LOUDNESS, global_settings.loudness);
+    sound_set(SOUND_SUPERBASS, global_settings.superbass);
+    sound_set(SOUND_AVC, global_settings.avc);
 #endif
 }
 
@@ -1069,7 +1069,7 @@ void thread(void)
     unsigned char mbus_msg[MBUS_MAX_SIZE];
     char buf[32];
     bool connected = false;
-    long last_tick = *rb->current_tick; /* for 1 sec tick */
+    long last_tick = current_tick; /* for 1 sec tick */
 
     do
     {
@@ -1098,11 +1098,11 @@ void thread(void)
         }
         else if (msg_size < 0 && gTread.foreground)
         {   /* error */
-            rb->snprintf(buf, sizeof(buf), "rcv error %d", msg_size);
+            snprintf(buf, sizeof(buf), "rcv error %d", msg_size);
             print_scroll(buf);
         }
 
-        if (*rb->current_tick - last_tick >= gEmu.poll_interval)
+        if (current_tick - last_tick >= gEmu.poll_interval)
         {   /* call the emulation regulary */
             emu_tick();
             last_tick += gEmu.poll_interval;
@@ -1117,7 +1117,7 @@ static bool exit_tsr(bool reenter)
     if (reenter)
         return false; /* dont let it start again */
     gTread.exiting = true; /* tell the thread to end */
-    rb->thread_wait(gTread.thread);  /* wait until it did */
+    thread_wait(gTread.thread);  /* wait until it did */
 
     uart_init(BAUDRATE); /* return to standard baudrate */
     IPRE = (IPRE & ~0xF000); /* UART interrupt off */
@@ -1143,7 +1143,7 @@ int main(const void* parameter)
     mbus_init(); /* init the M-Bus layer */
     emu_init(); /* init emulator */
 
-    rb->splash(HZ/5, "Alpine CDC"); /* be quick on autostart */
+    splash(HZ/5, "Alpine CDC"); /* be quick on autostart */
 
 #ifdef DEBUG
     print_scroll("Alpine M-Bus Test");
@@ -1151,34 +1151,34 @@ int main(const void* parameter)
 #endif
 
     /* init the worker thread */
-    stack = rb->plugin_get_buffer(&buf_size); /* use the rest as stack */
+    stack = plugin_get_buffer(&buf_size); /* use the rest as stack */
     stacksize = buf_size;
     stack = (void*)(((unsigned int)stack + 100) & ~3); /* a bit away, 32 bit align */
     stacksize = (stacksize - 100) & ~3;
     if (stacksize < DEFAULT_STACK_SIZE)
     {
-        rb->splash(HZ*2, "Out of memory");
+        splash(HZ*2, "Out of memory");
         return -1;
     }
 
-    rb->memset(&gTread, 0, sizeof(gTread));
+    memset(&gTread, 0, sizeof(gTread));
     gTread.foreground = true;
-    gTread.thread = rb->create_thread(thread, stack, stacksize, 0, "CDC"
+    gTread.thread = create_thread(thread, stack, stacksize, 0, "CDC"
                                       IF_PRIO(, PRIORITY_BACKGROUND)
                                       IF_COP(, CPU));
 
 #ifdef DEBUG
     do
     {
-        button = rb->button_get(true);
+        button = button_get(true);
     } while (button & BUTTON_REL);
 #endif
 
     gTread.foreground = false; /* we're in the background now */
-    rb->plugin_tsr(exit_tsr); /* stay resident */
+    plugin_tsr(exit_tsr); /* stay resident */
     
 #ifdef DEBUG
-    return rb->default_event_handler(button);
+    return default_event_handler(button);
 #else
     return 0;
 #endif

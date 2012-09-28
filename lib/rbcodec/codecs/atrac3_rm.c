@@ -35,10 +35,10 @@ static ATRAC3Context q  IBSS_ATTR;
 static void init_rm(RMContext *rmctx)
 {
     /* initialize the RMContext */
-    memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
+    memcpy(rmctx, (void*)(( (intptr_t)ci.id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
 
     /* and atrac3 expects extadata in id3v2buf, so we shall give it that */
-    memcpy(ci->id3->id3v2buf, (char*)rmctx->codec_extradata, rmctx->extradata_size*sizeof(char));
+    memcpy(ci.id3->id3v2buf, (char*)rmctx->codec_extradata, rmctx->extradata_size*sizeof(char));
 }
 
 /* this is the codec entry point */
@@ -68,19 +68,19 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    resume_offset = ci->id3->offset;
+    resume_offset = ci.id3->offset;
 
-    codec_set_replaygain(ci->id3);
-    ci->memset(&rmctx,0,sizeof(RMContext));
-    ci->memset(&pkt,0,sizeof(RMPacket));
-    ci->memset(&q,0,sizeof(ATRAC3Context));
+    codec_set_replaygain(ci.id3);
+    memset(&rmctx,0,sizeof(RMContext));
+    memset(&pkt,0,sizeof(RMPacket));
+    memset(&q,0,sizeof(ATRAC3Context));
 
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
     init_rm(&rmctx);
  
-    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
-    ci->configure(DSP_SET_STEREO_MODE, rmctx.nb_channels == 1 ?
+    codec_configure(DSP_SET_FREQUENCY, ci.id3->frequency);
+    codec_configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
+    codec_configure(DSP_SET_STEREO_MODE, rmctx.nb_channels == 1 ?
         STEREO_MONO : STEREO_NONINTERLEAVED);
 
     packet_count = rmctx.nb_packets;
@@ -91,7 +91,7 @@ enum codec_status codec_run(void)
     h = rmctx.sub_packet_h;
     scrambling_unit_size = h * (fs + PACKET_HEADER_SIZE);
     
-    res = atrac3_decode_init(&q, ci->id3);
+    res = atrac3_decode_init(&q, ci.id3);
     if(res < 0) {
         DEBUGF("failed to initialize RM atrac decoder\n");
         return CODEC_ERROR;
@@ -107,16 +107,16 @@ enum codec_status codec_run(void)
         action = CODEC_ACTION_SEEK_TIME;
     }
     else {
-        ci->set_elapsed(0);
+        audio_codec_update_elapsed(0);
     }
 
-    ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
+    codec_advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
 
     /* The main decoder loop */  
 seek_start :         
     while((unsigned)elapsed < rmctx.duration)
     {  
-        bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);
+        bit_buffer = (uint8_t *) codec_request_buffer(&buff_size, scrambling_unit_size);
         consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
         if(consumed < 0 && playback_on != 0) {
             if(playback_on == -1) {
@@ -131,34 +131,34 @@ seek_start :
         for(i = 0; i < rmctx.audio_pkt_cnt*(fs/sps) ; i++)
         { 
             if (action == CODEC_ACTION_NULL)
-                action = ci->get_command(&param);
+                action = codec_get_command(&param);
 
             if (action == CODEC_ACTION_HALT)
                 return CODEC_OK;
 
             if (action == CODEC_ACTION_SEEK_TIME) {
                 /* Do not allow seeking beyond the file's length */
-                if ((unsigned) param > ci->id3->length) {
-                    ci->set_elapsed(ci->id3->length);
-                    ci->seek_complete();
+                if ((unsigned) param > ci.id3->length) {
+                    audio_codec_update_elapsed(ci.id3->length);
+                    codec_seek_complete();
                     return CODEC_OK;
                 }       
 
-                ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
+                codec_seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
                 packet_count = rmctx.nb_packets;
                 rmctx.audio_pkt_cnt = 0;
                 rmctx.frame_number = 0;
 
                 /* Seek to the start of the track */
                 if (param == 0) {
-                    ci->set_elapsed(0);
-                    ci->seek_complete();
+                    audio_codec_update_elapsed(0);
+                    codec_seek_complete();
                     action = CODEC_ACTION_NULL;
                     goto seek_start;           
                 }                                                                
                 num_units = (param/(sps*1000*8/rmctx.bit_rate))/(h*(fs/sps));                    
-                ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + consumed * num_units);
-                bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);
+                codec_seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + consumed * num_units);
+                bit_buffer = (uint8_t *) codec_request_buffer(&buff_size, scrambling_unit_size);
                 consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
                 if(consumed < 0 && playback_on != 0) {
                     if(playback_on == -1) {
@@ -174,8 +174,8 @@ seek_start :
                 rmctx.frame_number = (param/(sps*1000*8/rmctx.bit_rate)); 
                 while(rmctx.audiotimestamp > (unsigned) param) {
                     rmctx.audio_pkt_cnt = 0;
-                    ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + consumed * (num_units-1));
-                    bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size); 
+                    codec_seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + consumed * (num_units-1));
+                    bit_buffer = (uint8_t *) codec_request_buffer(&buff_size, scrambling_unit_size); 
                     consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);                                                                             
                     packet_count += rmctx.audio_pkt_cnt;
                     num_units--;
@@ -183,8 +183,8 @@ seek_start :
                 time_offset = param - rmctx.audiotimestamp;
                 i = (time_offset/((sps * 8 * 1000)/rmctx.bit_rate));
                 elapsed = rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i;
-                ci->set_elapsed(elapsed);
-                ci->seek_complete(); 
+                audio_codec_update_elapsed(elapsed);
+                codec_seek_complete(); 
             }
 
             action = CODEC_ACTION_NULL;
@@ -200,15 +200,15 @@ seek_start :
             }
 
             if(datasize)
-                ci->pcmbuf_insert(q.outSamples, q.outSamples + 1024, q.samples_per_frame / rmctx.nb_channels);
+                codec_pcmbuf_insert(q.outSamples, q.outSamples + 1024, q.samples_per_frame / rmctx.nb_channels);
             playback_on = 1;
             elapsed = rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i;
-            ci->set_elapsed(elapsed);
+            audio_codec_update_elapsed(elapsed);
             rmctx.frame_number++;
         }
         packet_count -= rmctx.audio_pkt_cnt;
         rmctx.audio_pkt_cnt = 0;
-        ci->advance_buffer(consumed);
+        codec_advance_buffer(consumed);
     }
 
     return CODEC_OK;

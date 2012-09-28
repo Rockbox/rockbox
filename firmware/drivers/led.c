@@ -24,6 +24,7 @@
 #include "led.h"
 #include "system.h"
 #include "kernel.h"
+#include "symbols.h"
 
 #if (CONFIG_LED == LED_REAL)
 
@@ -66,3 +67,4 @@ void led(bool on)
     (void)on;
 }
 #endif /* CONFIG_LED, HAVE_REMOTE_LCD */
+EXPORT_SYMBOL(led);

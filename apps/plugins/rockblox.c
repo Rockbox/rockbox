@@ -885,12 +885,12 @@ struct highscore highscores[NUM_SCORES];
 /* get random number from (0) to (range-1) */
 static int t_rand (int range)
 {
-    return rb->rand () % range;
+    return rand () % range;
 }
 
 static inline void show_game_over (void)
 {
-    rb->splash(HZ,"Game over!");
+    splash(HZ,"Game over!");
 }
 
 /* init the board array to have no blocks */
@@ -907,16 +907,16 @@ static void show_details (void)
 {
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
-    rb->lcd_set_foreground (LCD_BLACK);
-    rb->lcd_set_background (LCD_WHITE);
+    lcd_set_foreground (LCD_BLACK);
+    lcd_set_background (LCD_WHITE);
 #endif
-    rb->lcd_putsxyf (LABEL_X, SCORE_Y, "%d", rockblox_status.score);
-    rb->lcd_putsxyf (LEVEL_X, LEVEL_Y, "%d", rockblox_status.level);
-    rb->lcd_putsxyf (LINES_X, LINES_Y, "%d", rockblox_status.lines);
+    lcd_putsxyf (LABEL_X, SCORE_Y, "%d", rockblox_status.score);
+    lcd_putsxyf (LEVEL_X, LEVEL_Y, "%d", rockblox_status.level);
+    lcd_putsxyf (LINES_X, LINES_Y, "%d", rockblox_status.lines);
 #else  /* HAVE_LCD_CHARCELLS */
-    rb->lcd_putsf (5, 0, "L%d/%d", rockblox_status.level,
+    lcd_putsf (5, 0, "L%d/%d", rockblox_status.level,
             rockblox_status.lines);
-    rb->lcd_putsf (5, 1, "S%d", rockblox_status.score);
+    lcd_putsf (5, 1, "S%d", rockblox_status.score);
 #endif
 }
 
@@ -926,7 +926,7 @@ static void show_highscores (void)
     int i;
 
     for (i = 0; i<NUM_SCORES; i++)
-        rb->lcd_putsxyf (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * i),
+        lcd_putsxyf (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * i),
             "%06d" _SPACE "L%1d", highscores[i].score, highscores[i].level);
 }
 #endif
@@ -937,18 +937,18 @@ static void load_game(void)
 
     resume = false;
 
-    fd = rb->open(RESUME_FILE, O_RDONLY);
+    fd = open(RESUME_FILE, O_RDONLY);
     if (fd < 0) return;
 
-    if (rb->read(fd, &rockblox_status, sizeof(struct _rockblox_status))
+    if (read(fd, &rockblox_status, sizeof(struct _rockblox_status))
             < (ssize_t)sizeof(struct _rockblox_status))
     {
-        rb->splash(HZ/2, "Loading Rockblox resume info failed");
+        splash(HZ/2, "Loading Rockblox resume info failed");
     } else {
         resume = true;
     }
 
-    rb->close(fd);
+    close(fd);
 
     return;
 }
@@ -957,21 +957,21 @@ static void dump_resume(void)
 {
     int fd;
 
-    fd = rb->open(RESUME_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = open(RESUME_FILE, O_WRONLY|O_CREAT, 0666);
     if (fd < 0)
         goto fail;
 
-    if (rb->write(fd, &rockblox_status, sizeof(struct _rockblox_status))
+    if (write(fd, &rockblox_status, sizeof(struct _rockblox_status))
             <= 0)
     {
-        rb->close(fd);
+        close(fd);
         goto fail;
     }
-    rb->close(fd);
+    close(fd);
     return;
 
 fail:
-    rb->splash(HZ/2, "Writing Rockblox resume info failed");
+    splash(HZ/2, "Writing Rockblox resume info failed");
     return;
 }
 
@@ -980,18 +980,18 @@ static void init_rockblox (bool resume)
     char score_name[50];
     struct tm* tm;
 
-    tm = rb->get_time();
-    rb->snprintf(score_name, sizeof(score_name), "%04d%02d%02d %02d%02d%02d",
+    tm = get_time();
+    snprintf(score_name, sizeof(score_name), "%04d%02d%02d %02d%02d%02d",
             tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
             tm->tm_hour, tm->tm_min, tm->tm_sec);
 
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #else  /* HAVE_LCD_CHARCELLS */
     pgfx_display (0, 0);
     pgfx_display_block (3, 0, 3, 1);
     pgfx_display_block (4, 0, 3, 0);
-    rb->lcd_puts(4, 1, " ");
+    lcd_puts(4, 1, " ");
     pgfx_clear_display();
     pgfx_fillrect (3, 0, 2, 14);
     pgfx_fillrect (15, 7, 2, 7);
@@ -1061,7 +1061,7 @@ static void refresh_board (void)
     int i, j, x, y, block;
 
 #if LCD_DEPTH >= 2
-    rb->lcd_set_foreground (LCD_BLACK);
+    lcd_set_foreground (LCD_BLACK);
 #elif LCD_DEPTH == 1
     mylcd_set_drawmode (DRMODE_SOLID | DRMODE_INVERSEVID);
 #endif
@@ -1080,29 +1080,29 @@ static void refresh_board (void)
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
                 /* middle drawing */
-                rb->lcd_set_foreground (figures[block].color[1]);
+                lcd_set_foreground (figures[block].color[1]);
 #endif
-                rb->lcd_fillrect (BOARD_X + i * BLOCK_WIDTH,
+                lcd_fillrect (BOARD_X + i * BLOCK_WIDTH,
                                   BOARD_Y + j * BLOCK_HEIGHT,
                                   BLOCK_WIDTH, BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
                 /* light drawing */
-                rb->lcd_set_foreground (figures[block].color[0]);
+                lcd_set_foreground (figures[block].color[0]);
 #endif
-                rb->lcd_vline (BOARD_X + i * BLOCK_WIDTH,
+                lcd_vline (BOARD_X + i * BLOCK_WIDTH,
                                BOARD_Y + j * BLOCK_HEIGHT,
                                BOARD_Y + (j + 1) * BLOCK_HEIGHT - 2);
-                rb->lcd_hline (BOARD_X + i * BLOCK_WIDTH,
+                lcd_hline (BOARD_X + i * BLOCK_WIDTH,
                                BOARD_X + (i + 1) * BLOCK_WIDTH - 2,
                                BOARD_Y + j * BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
                 /* shadow drawing */
-                rb->lcd_set_foreground (figures[block].color[2]);
+                lcd_set_foreground (figures[block].color[2]);
 #endif
-                rb->lcd_vline (BOARD_X + (i + 1) * BLOCK_WIDTH - 1,
+                lcd_vline (BOARD_X + (i + 1) * BLOCK_WIDTH - 1,
                                BOARD_Y + j * BLOCK_HEIGHT + 1,
                                BOARD_Y + (j + 1) * BLOCK_HEIGHT - 1);
-                rb->lcd_hline (BOARD_X + i * BLOCK_WIDTH + 1,
+                lcd_hline (BOARD_X + i * BLOCK_WIDTH + 1,
                                BOARD_X + (i + 1) * BLOCK_WIDTH - 1,
                                BOARD_Y + (j + 1) * BLOCK_HEIGHT - 1);
 #else  /* HAVE_LCD_CHARCELLS */
@@ -1119,28 +1119,28 @@ static void refresh_board (void)
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
         /* middle drawing */
-        rb->lcd_set_foreground (figures[rockblox_status.cf].color[1]);
+        lcd_set_foreground (figures[rockblox_status.cf].color[1]);
 #endif
-        rb->lcd_fillrect (BOARD_X + x * BLOCK_WIDTH,
+        lcd_fillrect (BOARD_X + x * BLOCK_WIDTH,
                           BOARD_Y + y * BLOCK_HEIGHT,
                           BLOCK_WIDTH, BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
         /* light drawing */
-        rb->lcd_set_foreground (figures[rockblox_status.cf].color[0]);
+        lcd_set_foreground (figures[rockblox_status.cf].color[0]);
 #endif
-        rb->lcd_vline (BOARD_X + x * BLOCK_WIDTH, BOARD_Y + y * BLOCK_HEIGHT,
+        lcd_vline (BOARD_X + x * BLOCK_WIDTH, BOARD_Y + y * BLOCK_HEIGHT,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 2);
-        rb->lcd_hline (BOARD_X + x * BLOCK_WIDTH,
+        lcd_hline (BOARD_X + x * BLOCK_WIDTH,
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 2,
                        BOARD_Y + y * BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
         /* shadow drawing */
-        rb->lcd_set_foreground (figures[rockblox_status.cf].color[2]);
+        lcd_set_foreground (figures[rockblox_status.cf].color[2]);
 #endif
-        rb->lcd_vline (BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
+        lcd_vline (BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + y * BLOCK_HEIGHT + 1,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 1);
-        rb->lcd_hline (BOARD_X + x * BLOCK_WIDTH + 1,
+        lcd_hline (BOARD_X + x * BLOCK_WIDTH + 1,
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 1);
 #else /* HAVE_LCD_CHARCELLS */
@@ -1170,7 +1170,7 @@ static void draw_next_block (void)
     int i, rx, ry;
     /* clear preview window first */
 #if LCD_DEPTH >= 2
-    rb->lcd_set_foreground (LCD_BLACK);
+    lcd_set_foreground (LCD_BLACK);
 #elif LCD_DEPTH == 1
     mylcd_set_drawmode (DRMODE_SOLID | DRMODE_INVERSEVID);
 #endif
@@ -1184,15 +1184,15 @@ static void draw_next_block (void)
 
     /* draw the lightgray rectangles */
 #if LCD_DEPTH >= 16
-    rb->lcd_set_foreground (LCD_RGBPACK (40, 40, 40));
+    lcd_set_foreground (LCD_RGBPACK (40, 40, 40));
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground (LCD_DARKGRAY);
+    lcd_set_foreground (LCD_DARKGRAY);
 #endif
 
 #if LCD_DEPTH >= 2
     for (rx = 0; rx < 4; rx++)
         for (ry = 0; ry < 4; ry++)
-            rb->lcd_drawrect (PREVIEW_X + rx * BLOCK_WIDTH,
+            lcd_drawrect (PREVIEW_X + rx * BLOCK_WIDTH,
                               PREVIEW_Y + ry * BLOCK_HEIGHT, BLOCK_WIDTH,
                               BLOCK_HEIGHT);
 #endif
@@ -1203,27 +1203,27 @@ static void draw_next_block (void)
         ry = getRelativeY (rockblox_status.nf, i, 0) + 2;
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[rockblox_status.nf].color[1]);  /* middle drawing */
+        lcd_set_foreground (figures[rockblox_status.nf].color[1]);  /* middle drawing */
 #endif
-        rb->lcd_fillrect (PREVIEW_X + rx * BLOCK_WIDTH,
+        lcd_fillrect (PREVIEW_X + rx * BLOCK_WIDTH,
                           PREVIEW_Y + ry * BLOCK_HEIGHT,
                           BLOCK_WIDTH, BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[rockblox_status.nf].color[0]);  /* light drawing */
+        lcd_set_foreground (figures[rockblox_status.nf].color[0]);  /* light drawing */
 #endif
-        rb->lcd_vline (PREVIEW_X + rx * BLOCK_WIDTH,
+        lcd_vline (PREVIEW_X + rx * BLOCK_WIDTH,
                        PREVIEW_Y + ry * BLOCK_HEIGHT,
                        PREVIEW_Y + (ry + 1) * BLOCK_HEIGHT - 2);
-        rb->lcd_hline (PREVIEW_X + rx * BLOCK_WIDTH,
+        lcd_hline (PREVIEW_X + rx * BLOCK_WIDTH,
                        PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 2,
                        PREVIEW_Y + ry * BLOCK_HEIGHT);
 #if LCD_DEPTH >= 2
-        rb->lcd_set_foreground (figures[rockblox_status.nf].color[2]);  /* shadow drawing */
+        lcd_set_foreground (figures[rockblox_status.nf].color[2]);  /* shadow drawing */
 #endif
-        rb->lcd_vline (PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 1,
+        lcd_vline (PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 1,
                        PREVIEW_Y + ry * BLOCK_HEIGHT + 1,
                        PREVIEW_Y + (ry + 1) * BLOCK_HEIGHT - 1);
-        rb->lcd_hline (PREVIEW_X + rx * BLOCK_WIDTH + 1,
+        lcd_hline (PREVIEW_X + rx * BLOCK_WIDTH + 1,
                        PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 1,
                        PREVIEW_Y + (ry + 1) * BLOCK_HEIGHT - 1);
 #else /* HAVE_LCD_CHARCELLS */
@@ -1330,16 +1330,16 @@ static bool rockblox_help(void)
     };
 
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 #endif
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #endif
 
     return false;
@@ -1363,12 +1363,12 @@ static int rockblox_menu(void)
                         "Help", "High Scores", "Playback Control",
                         "Quit without Saving", "Quit");
 
-    rb->button_clear_queue();
+    button_clear_queue();
     while (true) {
-        switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
+        switch (do_menu(&main_menu, &selected, NULL, false)) {
             case 0:
                 if(resume_file)
-                    rb->remove(RESUME_FILE);
+                    remove(RESUME_FILE);
                 init_rockblox(true);
                 return 0;
             case 1:
@@ -1389,7 +1389,7 @@ static int rockblox_menu(void)
                 return 1;
             case 6:
                 if (resume) {
-                    rb->splash(HZ*1, "Saving game ...");
+                    splash(HZ*1, "Saving game ...");
                     dump_resume();
                 }
                 return 1;
@@ -1409,7 +1409,7 @@ static int rockblox_loop (void)
 #if defined(ROCKBLOX_OFF_PRE) || defined(ROCKBLOX_DROP_PRE)
     int lastbutton = BUTTON_NONE;
 #endif
-    long next_down_tick = *rb->current_tick + level_speed(rockblox_status.level);
+    long next_down_tick = current_tick + level_speed(rockblox_status.level);
 
     if (rockblox_menu()) {
         return 1;
@@ -1419,18 +1419,18 @@ static int rockblox_loop (void)
 
     while (1) {
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold ()) {
+        if (button_hold ()) {
             /* Turn on backlight timeout (revert to settings) */
             backlight_use_settings();
-            rb->splash(0, "Paused");
-            while (rb->button_hold ())
-                rb->sleep(HZ/10);
+            splash(0, "Paused");
+            while (button_hold ())
+                sleep(HZ/10);
 
             /* Turn off backlight timeout */
             backlight_ignore_timeout();
 
             /* get rid of the splash text */
-            rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+            lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
             show_details ();
 #ifdef HIGH_SCORE_Y
             show_highscores ();
@@ -1440,7 +1440,7 @@ static int rockblox_loop (void)
         }
 #endif
 
-        button = rb->button_get_w_tmo (MAX(next_down_tick - *rb->current_tick, 1));
+        button = button_get_w_tmo (MAX(next_down_tick - current_tick, 1));
         switch (button) {
 #ifdef ROCKBLOX_RC_OFF
             case ROCKBLOX_RC_OFF:
@@ -1516,13 +1516,13 @@ static int rockblox_loop (void)
                 break;
 #ifdef ROCKBLOX_RESTART
             case ROCKBLOX_RESTART:
-                rb->splash (HZ * 1, "Restarting...");
+                splash (HZ * 1, "Restarting...");
                 init_rockblox (false);
                 break;
 #endif
 
             default:
-                if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
+                if (default_event_handler (button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -1557,18 +1557,18 @@ static int rockblox_loop (void)
         }
 #endif
 
-        if (TIME_AFTER(*rb->current_tick, next_down_tick)) {
+        if (TIME_AFTER(current_tick, next_down_tick)) {
             move_down ();
             next_down_tick += level_speed(rockblox_status.level);
-            if (TIME_AFTER(*rb->current_tick, next_down_tick))
+            if (TIME_AFTER(current_tick, next_down_tick))
                 /* restart time "raster" when we had to wait longer than usual
                  * (pause, game restart etc) */
-                next_down_tick = *rb->current_tick + level_speed(rockblox_status.level);
+                next_down_tick = current_tick + level_speed(rockblox_status.level);
         }
 
         if (rockblox_status.gameover) {
 #if LCD_DEPTH >= 2
-            rb->lcd_set_foreground (LCD_BLACK);
+            lcd_set_foreground (LCD_BLACK);
 #endif
             show_game_over();
             resume = false;
@@ -1586,21 +1586,21 @@ enum plugin_status plugin_start (const void *parameter)
 
     (void) parameter;
 
-    rb->srand (*rb->current_tick);
+    srand (current_tick);
 
     /* Load HighScore if any */
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_setfont (FONT_SYSFIXED);
+    lcd_setfont (FONT_SYSFIXED);
 #else
     if (!pgfx_init(4, 2))
     {
-        rb->splash(HZ*2, "Old LCD :(");
+        splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
 #endif
@@ -1615,7 +1615,7 @@ enum plugin_status plugin_start (const void *parameter)
                                             highscores, NUM_SCORES);
             if (position != -1) {
                 if (position == 0)
-                    rb->splash(HZ*2, "New High Score");
+                    splash(HZ*2, "New High Score");
                 highscore_show(position, highscores, NUM_SCORES, true);
             }
         }

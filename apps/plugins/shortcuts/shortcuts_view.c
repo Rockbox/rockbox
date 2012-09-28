@@ -54,13 +54,13 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc)
 {
     int button;
 
-    rb->gui_synclist_draw(gui_sc);
+    gui_synclist_draw(gui_sc);
 
     while (true) {
         /* user input */
-        button = rb->get_action(CONTEXT_LIST, HZ);
+        button = get_action(CONTEXT_LIST, HZ);
         /* HZ so the status bar redraws corectly */
-        if (rb->gui_synclist_do_button(gui_sc, &button,
+        if (gui_synclist_do_button(gui_sc, &button,
                                             LIST_WRAP_UNLESS_HELD)) {
             /* automatic handling of user input.
             * _UNLESS_HELD can be _ON or _OFF also
@@ -82,7 +82,7 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc)
             case ACTION_STD_CANCEL:
                 return SCLA_NONE;
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                if (default_event_handler(button) == SYS_USB_CONNECTED) {
                     return SCLA_USB;
                 }
         }
@@ -99,7 +99,7 @@ static const char* build_sc_list(int selected_item, void *data,
         return NULL;
     }
     sc_entry_t *entry = file->entries + selected_item;
-    rb->snprintf(buffer, buffer_len, "%s", entry->disp);
+    snprintf(buffer, buffer_len, "%s", entry->disp);
     return buffer;
 }
 
@@ -112,12 +112,12 @@ bool list_sc(void)
 
     /* Setup the GUI list object, draw it to the screen,
      * and then handle the user input to it */
-    rb->gui_synclist_init(&gui_sc, &build_sc_list, &sc_file, false, 1, NULL);
-    rb->gui_synclist_set_title(&gui_sc,
+    gui_synclist_init(&gui_sc, &build_sc_list, &sc_file, false, 1, NULL);
+    gui_synclist_set_title(&gui_sc,
         (user_file?"Shortcuts (sealed)":"Shortcuts (editable)"), NOICON);
-    rb->gui_synclist_set_nb_items(&gui_sc, sc_file.entry_cnt);
-    rb->gui_synclist_limit_scroll(&gui_sc, false);
-    rb->gui_synclist_select_item(&gui_sc, 0);
+    gui_synclist_set_nb_items(&gui_sc, sc_file.entry_cnt);
+    gui_synclist_limit_scroll(&gui_sc, false);
+    gui_synclist_select_item(&gui_sc, 0);
 
     /* Draw the prepared widget to the LCD now */
     action = draw_sc_list(&gui_sc);
@@ -127,11 +127,11 @@ bool list_sc(void)
     }
 
     /* which item do we action? */
-    selected_item = rb->gui_synclist_get_sel_pos(&gui_sc);
+    selected_item = gui_synclist_get_sel_pos(&gui_sc);
 
     if (!is_valid_index(&sc_file, selected_item)) {
         /* This should never happen */
-        rb->splash(HZ*2, "Bad entry selected!");
+        splash(HZ*2, "Bad entry selected!");
         return true;
     }
 
@@ -142,7 +142,7 @@ bool list_sc(void)
         case SCLA_SELECT:
             return goto_entry(sc_file.entries[selected_item].path);
         case SCLA_DELETE:
-            rb->splashf(HZ, "Deleting %s", sc_file.entries[selected_item].disp);
+            splashf(HZ, "Deleting %s", sc_file.entries[selected_item].disp);
             remove_entry(&sc_file, selected_item);
             dump_sc_file(&sc_file, link_filename);
             return (sc_file.entry_cnt == 0);
@@ -161,35 +161,35 @@ bool goto_entry(char *file_or_dir)
     char *what;
     if (is_dir) {
         what = "Directory";
-        exists = rb->dir_exists(file_or_dir);
+        exists = dir_exists(file_or_dir);
     } else {
         what = "File";
-        exists = rb->file_exists(file_or_dir);
+        exists = file_exists(file_or_dir);
     }
 
     if (!exists) {
-        rb->splashf(HZ*2, "%s %s no longer exists on disk", what, file_or_dir);
+        splashf(HZ*2, "%s %s no longer exists on disk", what, file_or_dir);
         return false;
     }
     /* Set the browsers dirfilter to the global setting
      * This is required in case the plugin was launched
      * from the plugins browser, in which case the
      * dirfilter is set to only display .rock files */
-    rb->set_dirfilter(rb->global_settings->dirfilter);
+    set_dirfilter(global_settings.dirfilter);
 
     /* Change directory to the entry selected by the user */
-    rb->set_current_file(file_or_dir);
+    set_current_file(file_or_dir);
     return true;
 }
 
 
 bool ends_with(char *string, char *suffix)
 {
-    unsigned int str_len = rb->strlen(string);
-    unsigned int sfx_len = rb->strlen(suffix);
+    unsigned int str_len = strlen(string);
+    unsigned int sfx_len = strlen(suffix);
     if (str_len < sfx_len)
         return false;
-    return (rb->strncmp(string + str_len - sfx_len, suffix, sfx_len) == 0);
+    return (strncmp(string + str_len - sfx_len, suffix, sfx_len) == 0);
 }
 
 
@@ -199,11 +199,11 @@ enum plugin_status plugin_start(const void* void_parameter)
 
     /* This is a viewer, so a parameter must have been specified */
     if (void_parameter == NULL) {
-        rb->splash(HZ*2, "No parameter specified!");
+        splash(HZ*2, "No parameter specified!");
         return PLUGIN_ERROR;
     }
     link_filename = (char*)void_parameter;
-    user_file = (rb->strcmp(link_filename, SHORTCUTS_FILENAME) != 0);
+    user_file = (strcmp(link_filename, SHORTCUTS_FILENAME) != 0);
 
     allocate_memory(&memory_buf, &memory_bufsize);
 
@@ -213,7 +213,7 @@ enum plugin_status plugin_start(const void* void_parameter)
         return PLUGIN_ERROR;
     }
     if (sc_file.entry_cnt==0) {
-        rb->splash(HZ*2, "No shortcuts in the file!");
+        splash(HZ*2, "No shortcuts in the file!");
         return PLUGIN_OK;
     } else if ((sc_file.entry_cnt==1) && user_file) {
         /* if there's only one entry in the user .link file,
@@ -225,7 +225,7 @@ enum plugin_status plugin_start(const void* void_parameter)
 
 #ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_enable(i, true, NULL);
+        viewportmanager_theme_enable(i, true, NULL);
 #endif
 
     do {
@@ -235,7 +235,7 @@ enum plugin_status plugin_start(const void* void_parameter)
 
 #ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
-        rb->viewportmanager_theme_undo(i, false);
+        viewportmanager_theme_undo(i, false);
 #endif
 
     return usb_connected ? PLUGIN_USB_CONNECTED : PLUGIN_OK;

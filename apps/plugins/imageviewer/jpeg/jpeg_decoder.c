@@ -30,8 +30,8 @@
 #include "jpeg_decoder.h"
 
 /* for portability of below JPEG code */
-#define MEMSET(p,v,c) rb->memset(p,v,c)
-#define MEMCPY(d,s,c) rb->memcpy(d,s,c)
+#define MEMSET(p,v,c) memset(p,v,c)
+#define MEMCPY(d,s,c) memcpy(d,s,c)
 #define INLINE static inline
 #define ENDIAN_SWAP16(n) n /* only for poor little endian machines */
 

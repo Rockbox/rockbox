@@ -38,6 +38,7 @@ QUICKREF
 
 #include <string.h>
 #include "_ansi.h" /* for _DEFUN */
+#include "symbols.h"
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED(X, Y) \
@@ -110,4 +111,4 @@ _DEFUN (memcmp, (m1, m2, n),
   return 0;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }
-
+EXPORT_SYMBOL(memcmp);

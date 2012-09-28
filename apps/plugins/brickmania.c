@@ -1260,29 +1260,29 @@ static void brickmania_loadgame(void)
     resume = false;
 
     /* open game file */
-    fd = rb->open(SAVE_FILE, O_RDONLY);
+    fd = open(SAVE_FILE, O_RDONLY);
     if(fd < 0) return;
 
     /* read in saved game */
-    if((rb->read(fd, &pad_pos_x, sizeof(pad_pos_x)) <= 0) ||
-        (rb->read(fd, &life, sizeof(life)) <= 0) ||
-        (rb->read(fd, &game_state, sizeof(game_state)) <= 0) ||
-        (rb->read(fd, &paddle_type, sizeof(paddle_type)) <= 0) ||
-        (rb->read(fd, &score, sizeof(score)) <= 0) ||
-        (rb->read(fd, &flip_sides, sizeof(flip_sides)) <= 0) ||
-        (rb->read(fd, &level, sizeof(level)) <= 0) ||
-        (rb->read(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
-        (rb->read(fd, &used_balls, sizeof(used_balls)) <= 0) ||
-        (rb->read(fd, &used_fires, sizeof(used_fires)) <= 0) ||
-        (rb->read(fd, &used_powers, sizeof(used_powers)) <= 0) ||
-        (rb->read(fd, &pad_width, sizeof(pad_width)) <= 0) ||
-        (rb->read(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
-        (rb->read(fd, &brick, sizeof(brick)) <= 0) ||
-        (rb->read(fd, &ball, sizeof(ball)) <= 0) ||
-        (rb->read(fd, &fire, sizeof(fire)) <= 0) ||
-        (rb->read(fd, &power, sizeof(power)) <= 0))
+    if((read(fd, &pad_pos_x, sizeof(pad_pos_x)) <= 0) ||
+        (read(fd, &life, sizeof(life)) <= 0) ||
+        (read(fd, &game_state, sizeof(game_state)) <= 0) ||
+        (read(fd, &paddle_type, sizeof(paddle_type)) <= 0) ||
+        (read(fd, &score, sizeof(score)) <= 0) ||
+        (read(fd, &flip_sides, sizeof(flip_sides)) <= 0) ||
+        (read(fd, &level, sizeof(level)) <= 0) ||
+        (read(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
+        (read(fd, &used_balls, sizeof(used_balls)) <= 0) ||
+        (read(fd, &used_fires, sizeof(used_fires)) <= 0) ||
+        (read(fd, &used_powers, sizeof(used_powers)) <= 0) ||
+        (read(fd, &pad_width, sizeof(pad_width)) <= 0) ||
+        (read(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
+        (read(fd, &brick, sizeof(brick)) <= 0) ||
+        (read(fd, &ball, sizeof(ball)) <= 0) ||
+        (read(fd, &fire, sizeof(fire)) <= 0) ||
+        (read(fd, &power, sizeof(power)) <= 0))
     {
-        rb->splash(HZ/2, "Failed to load game");
+        splash(HZ/2, "Failed to load game");
     }
     else
     {
@@ -1290,7 +1290,7 @@ static void brickmania_loadgame(void)
         resume = true;
     }
 
-    rb->close(fd);
+    close(fd);
 
     return;
 }
@@ -1300,34 +1300,34 @@ static void brickmania_savegame(void)
     int fd;
 
     /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
     if(fd < 0) return;
 
-    if ((rb->write(fd, &pad_pos_x, sizeof(pad_pos_x)) <= 0) ||
-            (rb->write(fd, &life, sizeof(life)) <= 0) ||
-            (rb->write(fd, &game_state, sizeof(game_state)) <= 0) ||
-            (rb->write(fd, &paddle_type, sizeof(paddle_type)) <= 0) ||
-            (rb->write(fd, &score, sizeof(score)) <= 0) ||
-            (rb->write(fd, &flip_sides, sizeof(flip_sides)) <= 0) ||
-            (rb->write(fd, &level, sizeof(level)) <= 0) ||
-            (rb->write(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
-            (rb->write(fd, &used_balls, sizeof(used_balls)) <= 0) ||
-            (rb->write(fd, &used_fires, sizeof(used_fires)) <= 0) ||
-            (rb->write(fd, &used_powers, sizeof(used_powers)) <= 0) ||
-            (rb->write(fd, &pad_width, sizeof(pad_width)) <= 0) ||
-            (rb->write(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
-            (rb->write(fd, &brick, sizeof(brick)) <= 0) ||
-            (rb->write(fd, &ball, sizeof(ball)) <= 0) ||
-            (rb->write(fd, &fire, sizeof(fire)) <= 0) ||
-            (rb->write(fd, &power, sizeof(power)) <= 0))
+    if ((write(fd, &pad_pos_x, sizeof(pad_pos_x)) <= 0) ||
+            (write(fd, &life, sizeof(life)) <= 0) ||
+            (write(fd, &game_state, sizeof(game_state)) <= 0) ||
+            (write(fd, &paddle_type, sizeof(paddle_type)) <= 0) ||
+            (write(fd, &score, sizeof(score)) <= 0) ||
+            (write(fd, &flip_sides, sizeof(flip_sides)) <= 0) ||
+            (write(fd, &level, sizeof(level)) <= 0) ||
+            (write(fd, &brick_on_board, sizeof(brick_on_board)) <= 0) ||
+            (write(fd, &used_balls, sizeof(used_balls)) <= 0) ||
+            (write(fd, &used_fires, sizeof(used_fires)) <= 0) ||
+            (write(fd, &used_powers, sizeof(used_powers)) <= 0) ||
+            (write(fd, &pad_width, sizeof(pad_width)) <= 0) ||
+            (write(fd, &flip_sides_delay, sizeof(flip_sides_delay)) <= 0) ||
+            (write(fd, &brick, sizeof(brick)) <= 0) ||
+            (write(fd, &ball, sizeof(ball)) <= 0) ||
+            (write(fd, &fire, sizeof(fire)) <= 0) ||
+            (write(fd, &power, sizeof(power)) <= 0))
     {
-        rb->close(fd);
-        rb->remove(SAVE_FILE);
-        rb->splash(HZ/2, "Failed to save game");
+        close(fd);
+        remove(SAVE_FILE);
+        splash(HZ/2, "Failed to save game");
         return;
     }
 
-    rb->close(fd);
+    close(fd);
 }
 
 /* brickmania_sleep timer counting the score */
@@ -1341,8 +1341,8 @@ static void brickmania_sleep(int secs)
     while (!done)
     {
         if (count == 0)
-            count = *rb->current_tick + HZ*secs;
-        if ( (TIME_AFTER(*rb->current_tick, count)) && (vscore == score) )
+            count = current_tick + HZ*secs;
+        if ( (TIME_AFTER(current_tick, count)) && (vscore == score) )
             done = true;
 
         if(vscore != score)
@@ -1351,12 +1351,12 @@ static void brickmania_sleep(int secs)
                 vscore++;
             if (vscore>score)
                 vscore--;
-            rb->snprintf(s, sizeof(s), "%d", vscore);
-            rb->lcd_getstringsize(s, &sw, &w);
-            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
-            rb->lcd_update_rect(0,0,LCD_WIDTH,w+2);
+            snprintf(s, sizeof(s), "%d", vscore);
+            lcd_getstringsize(s, &sw, &w);
+            lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
+            lcd_update_rect(0,0,LCD_WIDTH,w+2);
         }
-        rb->yield();
+        yield();
     }
 }
 
@@ -1431,14 +1431,14 @@ static int brickmania_help(void)
         LAST_STYLE_ITEM
     };
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return 1;
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     return 0;
 }
@@ -1463,7 +1463,7 @@ static int brickmania_menu(void)
 
 #ifdef HAVE_TOUCHSCREEN
     /* Entering Menu, set the touchscreen to the global setting */
-    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+    touchscreen_set_mode(global_settings.touch_mode);
 #endif
 
     MENUITEM_STRINGLIST(main_menu, "Brickmania Menu", brickmania_menu_cb,
@@ -1472,14 +1472,14 @@ static int brickmania_menu(void)
                         "Playback Control",
                         "Quit without Saving", "Quit");
 
-    rb->button_clear_queue();
+    button_clear_queue();
     while (true) {
-        switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
+        switch (do_menu(&main_menu, &selected, NULL, false)) {
             case 0:
                 if(game_state!=ST_READY)
                     game_state = ST_PAUSE;
                 if(resume_file)
-                    rb->remove(SAVE_FILE);
+                    remove(SAVE_FILE);
                 return 0;
             case 1:
                 score=0;
@@ -1489,7 +1489,7 @@ static int brickmania_menu(void)
                 brickmania_init_game(true);
                 return 0;
             case 2:
-                rb->set_option("Difficulty", &difficulty, INT,
+                set_option("Difficulty", &difficulty, INT,
                                     options, 2, NULL);
                 break;
             case 3:
@@ -1507,7 +1507,7 @@ static int brickmania_menu(void)
                 return 1;
             case 7:
                 if (resume) {
-                    rb->splash(HZ*1, "Saving game ...");
+                    splash(HZ*1, "Saving game ...");
                     brickmania_savegame();
                 }
                 return 1;
@@ -1518,7 +1518,7 @@ static int brickmania_menu(void)
         }
     }
 #ifdef HAVE_TOUCHSCREEN
-    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
 }
 
@@ -1539,7 +1539,7 @@ static void brick_hit(int i, int j)
         brick[i][j].used=false;
         if (used_powers<MAX_POWERS)
         {
-            int ran = rb->rand()%POWER_RAND;
+            int ran = rand()%POWER_RAND;
 
             if (ran<NUMBER_OF_POWERUPS)
             {
@@ -1578,76 +1578,76 @@ static int brickmania_game_loop(void)
     resume_file = false;
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_clear_display();
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_clear_display();
 #endif
 
     while(true) {
         /* Convert CYCLETIME (in ms) to HZ */
-        end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+        end = current_tick + (CYCLETIME * HZ) / 1000;
 
         if (life >= 0) {
-            rb->lcd_clear_display();
+            lcd_clear_display();
 
             if (flip_sides)
             {
-                if (TIME_AFTER(*rb->current_tick, sec_count))
+                if (TIME_AFTER(current_tick, sec_count))
                 {
-                    sec_count=*rb->current_tick+HZ;
+                    sec_count=current_tick+HZ;
                     if (flip_sides_delay > 1)
                         flip_sides_delay--;
                     else
                         flip_sides=false;
                 }
-                rb->snprintf(s, sizeof(s), "%d", flip_sides_delay);
-                rb->lcd_getstringsize(s, &sw, NULL);
-                rb->lcd_putsxy(LCD_WIDTH/2-2, INT3(STRINGPOS_FLIP), s);
+                snprintf(s, sizeof(s), "%d", flip_sides_delay);
+                lcd_getstringsize(s, &sw, NULL);
+                lcd_putsxy(LCD_WIDTH/2-2, INT3(STRINGPOS_FLIP), s);
             }
 
 
             if (vscore<score) vscore++;
-            rb->snprintf(s, sizeof(s), "%d", vscore);
-            rb->lcd_getstringsize(s, &sw, NULL);
-            rb->lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
+            snprintf(s, sizeof(s), "%d", vscore);
+            lcd_getstringsize(s, &sw, NULL);
+            lcd_putsxy(LCD_WIDTH/2-sw/2, 0, s);
 
             /* write life num */
-            rb->snprintf(s, sizeof(s), "Life: %d", life);
+            snprintf(s, sizeof(s), "Life: %d", life);
 
             /* hijack i */
             i = sw;
-            rb->lcd_getstringsize(s, &sw, NULL);
+            lcd_getstringsize(s, &sw, NULL);
             if (sw >= (LCD_WIDTH/2-i/2))
-                rb->snprintf(s, sizeof(s), "L: %d", life);
-            rb->lcd_putsxy(0, 0, s);
+                snprintf(s, sizeof(s), "L: %d", life);
+            lcd_putsxy(0, 0, s);
 
             /* write level */
-            rb->snprintf(s, sizeof(s), "Level %d", level+1);
-            rb->lcd_getstringsize(s, &sw, NULL);
+            snprintf(s, sizeof(s), "Level %d", level+1);
+            lcd_getstringsize(s, &sw, NULL);
 
             if (LCD_WIDTH-sw <= (LCD_WIDTH/2+i/2)+1)
             {
-                rb->snprintf(s, sizeof(s), "Lvl %d", level+1);
-                rb->lcd_getstringsize(s, &sw, NULL);
+                snprintf(s, sizeof(s), "Lvl %d", level+1);
+                lcd_getstringsize(s, &sw, NULL);
             }
 
-            rb->lcd_putsxy(LCD_WIDTH-sw, 0, s);
+            lcd_putsxy(LCD_WIDTH-sw, 0, s);
             i = 0;
 
             /* continue game */
             if (game_state == ST_PAUSE)
             {
-                rb->snprintf(s, sizeof(s), CONTINUE_TEXT);
-                rb->lcd_getstringsize(s, &sw, NULL);
-                rb->lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_NAVI), s);
+                snprintf(s, sizeof(s), CONTINUE_TEXT);
+                lcd_getstringsize(s, &sw, NULL);
+                lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_NAVI), s);
 
-                sec_count=*rb->current_tick+HZ;
+                sec_count=current_tick+HZ;
             }
 
             /* draw the ball */
             for(i=0;i<used_balls;i++)
-                rb->lcd_bitmap(brickmania_ball,
+                lcd_bitmap(brickmania_ball,
                     INT3(ball[i].pos_x - HALFBALL),
                     INT3(ball[i].pos_y - HALFBALL),
                     INT3(BALL), INT3(BALL));
@@ -1762,7 +1762,7 @@ static int brickmania_game_loop(void)
                                     break;
                                 case POWER_TYPE_PADDLE_FLIP:
                                     score += SCORE_POWER_FLIP;
-                                    sec_count = *rb->current_tick+HZ;
+                                    sec_count = current_tick+HZ;
                                     flip_sides_delay = FLIP_SIDES_DELAY;
                                     flip_sides = true;
                                     break;
@@ -1771,7 +1771,7 @@ static int brickmania_game_loop(void)
                                     if(used_balls<MAX_BALLS)
                                     {
                                         /* Set the speed */
-                                        if(rb->rand()%2 == 0)
+                                        if(rand()%2 == 0)
                                             ball[used_balls].speedx=-SPEED_4Q_X;
                                         else
                                             ball[used_balls].speedx= SPEED_4Q_X;
@@ -1837,14 +1837,14 @@ static int brickmania_game_loop(void)
             /* draw the fires */
             for(k=0;k<used_fires;k++)
             {
-                rb->lcd_vline(INT3(fire[k].x_pos), INT3(fire[k].top),
+                lcd_vline(INT3(fire[k].x_pos), INT3(fire[k].top),
                         INT3(fire[k].top + FIRE_LENGTH));
             }
 
             /* draw the powerups */
             for(k=0;k<used_powers;k++)
             {
-                rb->lcd_bitmap_part(brickmania_powerups,0,
+                lcd_bitmap_part(brickmania_powerups,0,
                     INT3(POWERUP_HEIGHT)*power[k].type,
                     STRIDE(SCREEN_MAIN, BMPWIDTH_brickmania_powerups,
                         BMPHEIGHT_brickmania_powerups),
@@ -1875,7 +1875,7 @@ static int brickmania_game_loop(void)
                         brick_rect.bottom_right.y = bricky + BRICK_HEIGHT;
 
                         /* Draw the brick */
-                        rb->lcd_bitmap_part(brickmania_bricks,0,
+                        lcd_bitmap_part(brickmania_bricks,0,
                             INT3(BRICK_HEIGHT)*brick[i][j].color,
                             STRIDE( SCREEN_MAIN,
                                     BMPWIDTH_brickmania_bricks,
@@ -1886,7 +1886,7 @@ static int brickmania_game_loop(void)
 
 #ifdef HAVE_LCD_COLOR  /* No transparent effect for greyscale lcds for now */
                         if (brick[i][j].hiteffect > 0)
-                            rb->lcd_bitmap_transparent_part(brickmania_break,0,
+                            lcd_bitmap_transparent_part(brickmania_break,0,
                                 INT3(BRICK_HEIGHT)*brick[i][j].hiteffect,
                                 STRIDE( SCREEN_MAIN,
                                         BMPWIDTH_brickmania_break,
@@ -1966,7 +1966,7 @@ static int brickmania_game_loop(void)
             /* draw the paddle according to the PAD_WIDTH */
             if( pad_width == PAD_WIDTH ) /* Normal width */
             {
-                rb->lcd_bitmap_part(
+                lcd_bitmap_part(
                     brickmania_pads,
                     0, paddle_type*INT3(PAD_HEIGHT),
                     STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_pads,
@@ -1976,7 +1976,7 @@ static int brickmania_game_loop(void)
             }
             else if( pad_width == LONG_PAD_WIDTH ) /* Long Pad */
             {
-                rb->lcd_bitmap_part(
+                lcd_bitmap_part(
                     brickmania_long_pads,
                     0,paddle_type*INT3(PAD_HEIGHT),
                     STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_long_pads,
@@ -1986,7 +1986,7 @@ static int brickmania_game_loop(void)
             }
             else /* Short pad */
             {
-                rb->lcd_bitmap_part(
+                lcd_bitmap_part(
                     brickmania_short_pads,
                     0,paddle_type*INT3(PAD_HEIGHT),
                     STRIDE( SCREEN_MAIN, BMPWIDTH_brickmania_short_pads,
@@ -2064,7 +2064,7 @@ static int brickmania_game_loop(void)
                                 /* No lives left reset game */
                                 brickmania_init_game(false);
                                 brickmania_sleep(2);
-                                rb->button_clear_queue();
+                                button_clear_queue();
                             }
                         }
                     }
@@ -2213,7 +2213,7 @@ static int brickmania_game_loop(void)
                 } /* for k */
             }
 
-            rb->lcd_update();
+            lcd_update();
 
             if (brick_on_board < 0)
             {
@@ -2224,36 +2224,36 @@ static int brickmania_game_loop(void)
                         score+=SCORE_LEVEL_COMPLETED;
                     brickmania_init_game(true);
                     brickmania_sleep(2);
-                    rb->button_clear_queue();
+                    button_clear_queue();
                 }
                 else
                 {
-                    rb->lcd_getstringsize("Congratulations!", &sw, &sh);
-                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_FINISH) - 2 * sh,
+                    lcd_getstringsize("Congratulations!", &sw, &sh);
+                    lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_FINISH) - 2 * sh,
                                    "Congratulations!");
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-                    rb->lcd_getstringsize("No more levels", &sw, NULL);
-                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_FINISH),
+                    lcd_getstringsize("No more levels", &sw, NULL);
+                    lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_FINISH),
                                    "No more levels");
 #else
-                    rb->lcd_getstringsize("You have finished the game!",
+                    lcd_getstringsize("You have finished the game!",
                                           &sw, NULL);
-                    rb->lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_FINISH),
+                    lcd_putsxy(LCD_WIDTH/2-sw/2, INT3(STRINGPOS_FINISH),
                                    "You have finished the game!");
 #endif
                     vscore=score;
-                    rb->lcd_update();
+                    lcd_update();
                     brickmania_sleep(2);
                     return 0;
                 }
             }
 
-            int button=rb->button_get(false);
-            int move_button = rb->button_status();
+            int button=button_get(false);
+            int move_button = button_status();
 
 #if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
             /* FIXME: Should probably check remote hold here */
-            if (rb->button_hold())
+            if (button_hold())
                 button = QUIT;
 #endif
 
@@ -2262,7 +2262,7 @@ static int brickmania_game_loop(void)
             {
                 int data;
                 short touch_x;
-                rb->button_status_wdata(&data);
+                button_status_wdata(&data);
                 touch_x = FIXED3(data >> 16);
 
                 if(flip_sides)
@@ -2400,7 +2400,7 @@ static int brickmania_game_loop(void)
                     break;
 
                 default:
-                    if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                    if(default_event_handler(button) == SYS_USB_CONNECTED)
                         return 1;
                     break;
             }
@@ -2410,31 +2410,31 @@ static int brickmania_game_loop(void)
             resume = false;
             if(resume_file)
             {
-                rb->remove(SAVE_FILE);
+                remove(SAVE_FILE);
                 resume_file = false;
             }
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_bitmap_transparent(brickmania_gameover,
+            lcd_bitmap_transparent(brickmania_gameover,
                            (LCD_WIDTH - INT3(GAMEOVER_WIDTH))/2,
                            INT3(GAMESCREEN_HEIGHT - GAMEOVER_HEIGHT)/2,
                            INT3(GAMEOVER_WIDTH),INT3(GAMEOVER_HEIGHT));
 #else /* greyscale and mono */
-            rb->lcd_bitmap(brickmania_gameover,(LCD_WIDTH -
+            lcd_bitmap(brickmania_gameover,(LCD_WIDTH -
                             INT3(GAMEOVER_WIDTH))/2,
                            INT3(GAMESCREEN_HEIGHT - GAMEOVER_HEIGHT)/2,
                            INT3(GAMEOVER_WIDTH),INT3(GAMEOVER_HEIGHT) );
 #endif
-            rb->lcd_update();
+            lcd_update();
             brickmania_sleep(2);
             return 0;
         }
 
         /* Game always needs to yield for other threads */
-        rb->yield();
+        yield();
 
         /* Sleep for a bit if there is time to spare */
-        if (TIME_BEFORE(*rb->current_tick, end))
-            rb->sleep(end-*rb->current_tick);
+        if (TIME_BEFORE(current_tick, end))
+            sleep(end-current_tick);
     }
     return 0;
 }
@@ -2450,18 +2450,18 @@ enum plugin_status plugin_start(const void* parameter)
     last_difficulty = difficulty;
 
 #ifdef HAVE_TOUCHSCREEN
-    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
     /* now go ahead and have fun! */
-    rb->srand( *rb->current_tick );
+    srand( current_tick );
     brickmania_loadgame();
     resume_file = resume;
     while(!brickmania_game_loop())
@@ -2473,7 +2473,7 @@ enum plugin_status plugin_start(const void* parameter)
             if (position != -1)
             {
                 if (position == 0)
-                    rb->splash(HZ*2, "New High Score");
+                    splash(HZ*2, "New High Score");
                 highscore_show(position, highscores, NUM_SCORES, true);
             }
             else
@@ -2487,7 +2487,7 @@ enum plugin_status plugin_start(const void* parameter)
     if(last_difficulty != difficulty)
         configfile_save(CONFIG_FILE_NAME,config,1,0);
     /* Restore user's original backlight setting */
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
 

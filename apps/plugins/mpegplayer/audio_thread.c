@@ -142,7 +142,7 @@ static void audio_queue_reset(void)
     audio_queue.used = 0;
     audio_queue.read = 0;
     audio_queue.write = 0;
-    rb->memset(audio_queue.descs, 0, sizeof (audio_queue.descs));
+    memset(audio_queue.descs, 0, sizeof (audio_queue.descs));
     audio_queue.curr = audiodesc_queue_head();
 }
 
@@ -206,18 +206,18 @@ static int audio_buffer(struct stream *str, enum stream_parse_mode type)
         /* Slide any remainder over to beginning */
         if (audio_queue.ptr > audio_queue.start && audio_queue.used > 0)
         {
-            rb->memmove(audio_queue.start, audio_queue.ptr,
+            memmove(audio_queue.start, audio_queue.ptr,
                         audio_queue.used);
         }
 
         /* Splice this packet onto any remainder */
-        rb->memcpy(audio_queue.start + audio_queue.used,
+        memcpy(audio_queue.start + audio_queue.used,
                    str->curr_packet, len);
 
         audio_queue.used += len;
         audio_queue.ptr = audio_queue.start;
 
-        rb->yield();
+        yield();
     }
 
     return ret;
@@ -333,7 +333,7 @@ static int audio_sync(struct audio_thread_data *td,
         audio_queue_advance_pos(stream.next_frame - audio_queue.ptr);
         audio_queue.curr->time += duration;
 
-        rb->yield();
+        yield();
     }
 
 sync_data_end:
@@ -469,25 +469,25 @@ static void audio_thread(void)
     struct audio_thread_data td;
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* Up the priority since the core DSP over-yields internally */
-    int old_priority = rb->thread_set_priority(rb->thread_self(),
+    int old_priority = thread_set_priority(thread_self(),
                                                PRIORITY_PLAYBACK-4);
 #endif
 
-    rb->memset(&td, 0, sizeof (td));
+    memset(&td, 0, sizeof (td));
     td.status = STREAM_STOPPED;
     td.state = TSTATE_EOS;
 
     /* We need this here to init the EMAC for Coldfire targets */
     init_mad();
 
-    td.dsp = rb->dsp_get_config(CODEC_IDX_AUDIO);
+    td.dsp = dsp_get_config(CODEC_IDX_AUDIO);
 #ifdef HAVE_PITCHCONTROL
-    rb->sound_set_pitch(PITCH_SPEED_100);
-    rb->dsp_set_timestretch(PITCH_SPEED_100);
+    sound_set_pitch(PITCH_SPEED_100);
+    dsp_set_timestretch(PITCH_SPEED_100);
 #endif
-    rb->dsp_configure(td.dsp, DSP_RESET, 0);
-    rb->dsp_configure(td.dsp, DSP_FLUSH, 0);
-    rb->dsp_configure(td.dsp, DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
+    dsp_configure(td.dsp, DSP_RESET, 0);
+    dsp_configure(td.dsp, DSP_FLUSH, 0);
+    dsp_configure(td.dsp, DSP_SET_SAMPLE_DEPTH, MAD_F_FRACBITS);
 
     goto message_wait;
 
@@ -516,7 +516,7 @@ static void audio_thread(void)
             default:
             {
 #ifdef HAVE_PRIORITY_SCHEDULING
-                rb->thread_set_priority(rb->thread_self(), old_priority);
+                thread_set_priority(thread_self(), old_priority);
 #endif
                 return;
                 }
@@ -585,7 +585,7 @@ static void audio_thread(void)
                 if (++td.mad_errors <= MPA_MAX_FRAME_SIZE)
                 {
                     stream.error = 0;
-                    rb->yield();
+                    yield();
                     continue;
                 }
                 DEBUGF("audio: Too many errors\n");
@@ -593,7 +593,7 @@ static void audio_thread(void)
             else if (MAD_RECOVERABLE(stream.error))
             {
                 /* libmad says it can recover - just keep on decoding */
-                rb->yield();
+                yield();
                 continue;
             }
             else
@@ -621,14 +621,14 @@ static void audio_thread(void)
         if (frame.header.samplerate != td.samplerate)
         {
             td.samplerate = frame.header.samplerate;
-            rb->dsp_configure(td.dsp, DSP_SWITCH_FREQUENCY,
+            dsp_configure(td.dsp, DSP_SWITCH_FREQUENCY,
                               td.samplerate);
         }
 
         if (MAD_NCHANNELS(&frame.header) != td.nchannels)
         {
             td.nchannels = MAD_NCHANNELS(&frame.header);
-            rb->dsp_configure(td.dsp, DSP_SET_STEREO_MODE,
+            dsp_configure(td.dsp, DSP_SET_STEREO_MODE,
                               td.nchannels == 1 ?
                                 STEREO_MONO : STEREO_NONINTERLEAVED);
         }
@@ -642,7 +642,7 @@ static void audio_thread(void)
 
         /* Add a frame of audio to the pcm buffer. Maximum is 1152 samples. */
     render_wait:
-        rb->yield();
+        yield();
 
         while (1)
         {
@@ -663,7 +663,7 @@ static void audio_thread(void)
             }
 
             dst.bufcount = size / (2 * sizeof (int16_t));
-            rb->dsp_process(td.dsp, &td.src, &dst);
+            dsp_process(td.dsp, &td.src, &dst);
 
             if (dst.remcount > 0)
             {
@@ -694,12 +694,12 @@ bool audio_thread_init(void)
 
     /* Start the audio thread */
     audio_str.hdr.q = &audio_str_queue;
-    rb->queue_init(audio_str.hdr.q, false);
+    queue_init(audio_str.hdr.q, false);
 
     /* We steal the codec thread for audio */
-    rb->codec_thread_do_callback(audio_thread, &audio_str.thread);
+    codec_thread_do_callback(audio_thread, &audio_str.thread);
 
-    rb->queue_enable_queue_send(audio_str.hdr.q, &audio_str_queue_send,
+    queue_enable_queue_send(audio_str.hdr.q, &audio_str_queue_send,
                                 audio_str.thread);
 
     /* Wait for thread to initialize */
@@ -714,7 +714,7 @@ void audio_thread_exit(void)
     if (audio_str.thread != 0)
     {
         str_post_msg(&audio_str, STREAM_QUIT, 0);
-        rb->codec_thread_do_callback(NULL, NULL);
+        codec_thread_do_callback(NULL, NULL);
         audio_str.thread = 0;
     }
 }

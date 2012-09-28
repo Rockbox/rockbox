@@ -31,10 +31,10 @@ void spti_init(void){
 }
 void spti_sleep(unsigned long usecs){
 /*	unsigned long now,need;
-	now = *rb->current_tick;
+	now = current_tick;
 	need = now + usecs;
 	rb -> sleep ( need - now );*/
-    rb->sleep ( usecs );
+    sleep ( usecs );
 }
 void spti_reset(void){
 	shouldbe_tick = *rb -> current_tick;

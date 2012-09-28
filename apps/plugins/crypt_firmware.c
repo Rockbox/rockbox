@@ -156,66 +156,66 @@ enum plugin_status plugin_start(const void* parameter)
     uint32_t hash[0x200];
     char outputfilename[MAX_PATH];
 
-    fd = rb->open(parameter,O_RDONLY);
+    fd = open(parameter,O_RDONLY);
 
     if (fd < 0) {
-        rb->splash(HZ*2, "Cannot open file");
+        splash(HZ*2, "Cannot open file");
         return PLUGIN_ERROR;
     }
 
-    length = rb->filesize(fd);
+    length = filesize(fd);
 
     if (length < 12) {
-        rb->splash(HZ*2, "File too small");
+        splash(HZ*2, "File too small");
         return PLUGIN_ERROR;
     }
 
     /* Get the audio buffer */
-    buf = rb->plugin_get_audio_buffer((size_t *)&buf_size);
+    buf = plugin_get_audio_buffer((size_t *)&buf_size);
 
     /* Use uncached alias for buf - equivalent to buf |= 0x40000000 */
     buf += 0x10000000;
 
     if (length > buf_size) {
-        rb->splash(HZ*2, "File too big");
+        splash(HZ*2, "File too big");
         return PLUGIN_ERROR;
     }
 
-    n = rb->read(fd, buf, length);
+    n = read(fd, buf, length);
     if (n < length) {
-        rb->splash(HZ*2, "Cannot read file");
+        splash(HZ*2, "Cannot read file");
         return PLUGIN_ERROR;
     }
-    rb->close(fd);
+    close(fd);
 
     size = length - 8;  /* Size of firmware image */
 
     if (calc_checksum(MODEL_NUMBER, (unsigned char*)(buf + 2), size) != 
         get_uint32be((unsigned char*)buf)) {
-        rb->splash(HZ*2, "Bad checksum in input file");
+        splash(HZ*2, "Bad checksum in input file");
         return PLUGIN_ERROR;
     }
 
-    n = rb->strlen(parameter);
+    n = strlen(parameter);
     if (memcmp(buf+1,"nn2g",4)==0) {
         /* Encrypting - Input file should be .ipod, output file is .ipodx */
 
-        if ((n < 6) || (rb->strcmp(parameter+n-5,".ipod") != 0)) {
-            rb->splash(HZ*2, "Input filename must be .ipod");
+        if ((n < 6) || (strcmp(parameter+n-5,".ipod") != 0)) {
+            splash(HZ*2, "Input filename must be .ipod");
             return PLUGIN_ERROR;
         }
 
         if (n + 2 > MAX_PATH) {
-            rb->splash(HZ*2, "Filename too long");
+            splash(HZ*2, "Filename too long");
             return PLUGIN_ERROR;
         }
 
         size = (size + 0x3f) & ~0x3f;  /* Pad to multiple of 64 bytes */
         if (size > (length - 8)) {
-            rb->memset(&buf[length/4], 0, size - (length - 8));
+            memset(&buf[length/4], 0, size - (length - 8));
         }
 
-        rb->strlcpy(outputfilename, parameter, MAX_PATH);
+        strlcpy(outputfilename, parameter, MAX_PATH);
         outputfilename[n] = 'x';
         outputfilename[n+1] = 0;
 
@@ -223,7 +223,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         /* 1 - Calculate hashes */
 
-        rb->memset(hash, 0, sizeof(hash));
+        memset(hash, 0, sizeof(hash));
 
         hash[1] = 2;
         hash[2] = 1;
@@ -235,7 +235,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         /* 2 - Do the encryption */
 
-        rb->splash(0, "Encrypting...");
+        splash(0, "Encrypting...");
         aes_encrypt(buf + 2, size);
 
         /* 3 - Update the Rockbox header */
@@ -246,27 +246,27 @@ enum plugin_status plugin_start(const void* parameter)
         memcpy(buf + 1, "nn2x", 4);
 
         /* 4 - Write to disk */
-        fd = rb->open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
+        fd = open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
         if (fd < 0) {
-            rb->splash(HZ*2, "Could not open output file");
+            splash(HZ*2, "Could not open output file");
             return PLUGIN_ERROR;
         }
 
-    n = rb->write(fd, buf, 8);
-    n = rb->write(fd, hash, sizeof(hash));
-    n = rb->write(fd, buf + 2, size);
+    n = write(fd, buf, 8);
+    n = write(fd, hash, sizeof(hash));
+    n = write(fd, buf + 2, size);
 
-        rb->close(fd);
+        close(fd);
     } else if (memcmp(buf + 1,"nn2x",4)==0) {
         /* Decrypting - Input file should be .ipodx, output file is .ipod */
 
-        if ((n < 7) || (rb->strcmp(parameter+n-6,".ipodx") != 0)) {
-            rb->splash(HZ*2, "Input filename must be .ipodx");
+        if ((n < 7) || (strcmp(parameter+n-6,".ipodx") != 0)) {
+            splash(HZ*2, "Input filename must be .ipodx");
             return PLUGIN_ERROR;
         }
 
-        rb->strlcpy(outputfilename, parameter, MAX_PATH);
+        strlcpy(outputfilename, parameter, MAX_PATH);
         outputfilename[n-1] = 0;  /* Remove "x" at end of filename */
 
         /* Everything is OK, now do the decryption */
@@ -275,16 +275,16 @@ enum plugin_status plugin_start(const void* parameter)
 
         /* 1 - Decrypt */
 
-        rb->splash(0, "Decrypting...");
+        splash(0, "Decrypting...");
 
         aes_decrypt(&buf[0x202], size);
 
         /* 2 - Calculate hashes to verify decryption */
 
-        rb->lcd_clear_display();
-        rb->splash(0, "Calculating hash...");
+        lcd_clear_display();
+        splash(0, "Calculating hash...");
 
-        rb->memset(hash, 0, sizeof(hash));
+        memset(hash, 0, sizeof(hash));
 
         hash[1] = 2;
         hash[2] = 1;
@@ -296,7 +296,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         if ((memcmp(hash + 7, buf + 9, 20) != 0) ||
             (memcmp(hash + 75, buf + 77, 20) != 0)) {
-            rb->splash(HZ*2, "Decryption failed - bad hash");
+            splash(HZ*2, "Decryption failed - bad hash");
             return PLUGIN_ERROR;
         }
 
@@ -307,19 +307,19 @@ enum plugin_status plugin_start(const void* parameter)
         memcpy(buf + 1, "nn2g", 4);
 
         /* 4 - Write to disk */
-        fd = rb->open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
+        fd = open(outputfilename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
         if (fd < 0) {
-            rb->splash(HZ*2, "Could not open output file");
+            splash(HZ*2, "Could not open output file");
             return PLUGIN_ERROR;
         }
 
-        n = rb->write(fd, buf, 8);
-        n = rb->write(fd, &buf[0x202], size);
+        n = write(fd, buf, 8);
+        n = write(fd, &buf[0x202], size);
 
-        rb->close(fd);
+        close(fd);
     } else {
-        rb->splash(HZ*2,"Invalid input file");
+        splash(HZ*2,"Invalid input file");
         return PLUGIN_ERROR;
     }
 

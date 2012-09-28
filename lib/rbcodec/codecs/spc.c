@@ -239,12 +239,12 @@ static struct
 static inline void samples_release_wrbuf(void)
 {
     sample_queue.tail++;
-    ci->semaphore_release(&sample_queue.emu_sem_head);
+    semaphore_release(&sample_queue.emu_sem_head);
 }
 
 static inline struct sample_queue_chunk * samples_get_wrbuf(void)
 {
-    ci->semaphore_wait(&sample_queue.emu_sem_tail, TIMEOUT_BLOCK);
+    semaphore_wait(&sample_queue.emu_sem_tail, TIMEOUT_BLOCK);
     return &sample_queue.wav_chunk[sample_queue.tail & WAV_CHUNK_MASK];
 }
 
@@ -254,12 +254,12 @@ static inline void samples_release_rdbuf(void)
         sample_queue.head++;
     }
 
-    ci->semaphore_release(&sample_queue.emu_sem_tail);
+    semaphore_release(&sample_queue.emu_sem_tail);
 }
 
 static inline int32_t * samples_get_rdbuf(void)
 {
-    ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_BLOCK);
+    semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_BLOCK);
     return sample_queue.wav_chunk[sample_queue.head & WAV_CHUNK_MASK].audio;
 }
 
@@ -267,7 +267,7 @@ static intptr_t emu_thread_send_msg(long id, intptr_t data)
 {
     struct sample_queue_chunk *chunk;
     /* Grab an audio output buffer */
-    ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_BLOCK);
+    semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_BLOCK);
     chunk = &sample_queue.wav_chunk[sample_queue.head & WAV_CHUNK_MASK];
     /* Place a message in it instead of audio */
     chunk->id = id;
@@ -277,7 +277,7 @@ static intptr_t emu_thread_send_msg(long id, intptr_t data)
 
     if (id != SPC_EMU_QUIT) {
         /* Wait for a response */
-        ci->semaphore_wait(&sample_queue.emu_evt_reply, TIMEOUT_BLOCK);
+        semaphore_wait(&sample_queue.emu_evt_reply, TIMEOUT_BLOCK);
     }
 
     return sample_queue.retval;    
@@ -295,20 +295,20 @@ static bool emu_thread_process_msg(struct sample_queue_chunk *chunk)
     if (id == SPC_EMU_LOAD)
     {
         struct spc_load *ld = (struct spc_load *)chunk->data;
-        ci->commit_discard_dcache();
+        commit_discard_dcache();
         SPC_Init(&spc_emu);
         sample_queue.retval = SPC_load_spc(&spc_emu, ld->buf, ld->size);
 
         /* Empty the audio queue */
-        ci->semaphore_release(&sample_queue.emu_sem_tail);
-        ci->semaphore_release(&sample_queue.emu_sem_tail);
-        ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_NOBLOCK);
-        ci->semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_NOBLOCK);
+        semaphore_release(&sample_queue.emu_sem_tail);
+        semaphore_release(&sample_queue.emu_sem_tail);
+        semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_NOBLOCK);
+        semaphore_wait(&sample_queue.emu_sem_head, TIMEOUT_NOBLOCK);
         sample_queue.head = sample_queue.tail = 0;
     }
 
     if (id != SPC_EMU_QUIT) {
-        ci->semaphore_release(&sample_queue.emu_evt_reply);
+        semaphore_release(&sample_queue.emu_evt_reply);
     }
 
     return ret;
@@ -338,13 +338,13 @@ static void spc_emu_thread(void)
 
         /* done so release it to output */
         samples_release_wrbuf();
-        ci->yield();
+        yield();
     }
 }
 
 static bool spc_emu_start(void)
 {
-    emu_thread_id = ci->create_thread(spc_emu_thread, spc_emu_thread_stack,
+    emu_thread_id = create_thread(spc_emu_thread, spc_emu_thread_stack,
                            sizeof(spc_emu_thread_stack), CREATE_THREAD_FROZEN,
                            spc_emu_thread_name IF_PRIO(, PRIORITY_PLAYBACK), COP);
 
@@ -353,14 +353,14 @@ static bool spc_emu_start(void)
 
     /* Initialize audio queue as full to prevent emu thread from trying to run the
        emulator before loading something */
-    ci->semaphore_init(&sample_queue.emu_evt_reply, 1, 0);
-    ci->semaphore_init(&sample_queue.emu_sem_tail, 2, 0);
-    ci->semaphore_init(&sample_queue.emu_sem_head, 2, 2);
+    semaphore_init(&sample_queue.emu_evt_reply, 1, 0);
+    semaphore_init(&sample_queue.emu_sem_tail, 2, 0);
+    semaphore_init(&sample_queue.emu_sem_head, 2, 2);
     sample_queue.head = 0;
     sample_queue.tail = 2;
 
     /* Start it running */
-    ci->thread_thaw(emu_thread_id);
+    thread_thaw(emu_thread_id);
     return true;
 }
 
@@ -368,7 +368,7 @@ static bool spc_emu_start(void)
 static inline int load_spc_buffer(uint8_t *buf, size_t size)
 {
     struct spc_load ld = { buf, size };
-    ci->commit_dcache();
+    commit_dcache();
     return emu_thread_send_msg(SPC_EMU_LOAD, (intptr_t)&ld);
 }
 
@@ -377,8 +377,8 @@ static inline void spc_emu_quit(void)
     if (emu_thread_id != 0) {
         emu_thread_send_msg(SPC_EMU_QUIT, 0);
         /* Wait for emu thread to be killed */
-        ci->thread_wait(emu_thread_id);
-        ci->commit_discard_dcache();
+        thread_wait(emu_thread_id);
+        commit_discard_dcache();
     }
 }
 
@@ -390,7 +390,7 @@ static inline int32_t * spc_play_get_samples(void)
 
 static inline void spc_play_send_samples(int32_t *samples)
 {
-    ci->pcmbuf_insert(samples, samples+WAV_CHUNK_SIZE, WAV_CHUNK_SIZE);
+    codec_pcmbuf_insert(samples, samples+WAV_CHUNK_SIZE, WAV_CHUNK_SIZE);
     /* done with chunk so release it to emu thread */
     samples_release_rdbuf();
 }
@@ -418,7 +418,7 @@ static inline bool spc_emu_start(void)
 
 static inline void spc_play_send_samples(int32_t *samples)
 {
-    ci->pcmbuf_insert(samples, samples+WAV_CHUNK_SIZE, WAV_CHUNK_SIZE);
+    codec_pcmbuf_insert(samples, samples+WAV_CHUNK_SIZE, WAV_CHUNK_SIZE);
 }
 
 #define spc_emu_quit()
@@ -453,7 +453,7 @@ static int play_track( void )
 
     while ( 1 )
     {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -463,13 +463,13 @@ static int play_track( void )
             DEBUGF("seek to %ld\ncurrently at %d\n", (long)param, curtime);
             if (param < curtime) {
                 DEBUGF("seek backwards = reset\n");
-                ci->set_elapsed(0);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_complete();
                 return 1;
             }
 
-            ci->set_elapsed(curtime);
-            ci->seek_complete();
+            audio_codec_update_elapsed(curtime);
+            codec_seek_complete();
         }
 
         int32_t *samples = spc_play_get_samples();
@@ -477,7 +477,7 @@ static int play_track( void )
         sampleswritten += WAV_CHUNK_SIZE;
 
         /* is track timed? */
-        if (!ci->loop_track() && ci->id3->length) {
+        if (!codec_loop_track() && ci.id3->length) {
             unsigned long curtime = sampleswritten*1000LL/SAMPLE_RATE;
             unsigned long lasttimesample = (sampleswritten-WAV_CHUNK_SIZE);
 
@@ -513,10 +513,10 @@ static int play_track( void )
 
         spc_play_send_samples(samples);
 
-        if (ci->loop_track())
-            ci->set_elapsed(0);
+        if (codec_loop_track())
+            audio_codec_update_elapsed(0);
         else
-            ci->set_elapsed(sampleswritten*1000LL/SAMPLE_RATE);
+            audio_codec_update_elapsed(sampleswritten*1000LL/SAMPLE_RATE);
     }
     
     EXIT_TIMER(total);
@@ -530,9 +530,9 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
         if (!spc_emu_start())
             return CODEC_ERROR;
 
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 24);
-        ci->configure(DSP_SET_FREQUENCY, SAMPLE_RATE);
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 24);
+        codec_configure(DSP_SET_FREQUENCY, SAMPLE_RATE);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     }
     else if (reason == CODEC_UNLOAD) {
         spc_emu_quit();
@@ -549,18 +549,18 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     DEBUGF("SPC: after init\n");
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* Read the entire file */
     DEBUGF("SPC: request initial buffer\n");
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
     size_t buffersize;
-    uint8_t* buffer = ci->request_buffer(&buffersize, ci->filesize);
+    uint8_t* buffer = codec_request_buffer(&buffersize, ci.filesize);
     if (!buffer)
         return CODEC_ERROR;
 
     DEBUGF("SPC: read size = 0x%lx\n",(unsigned long)buffersize);
-    ci->set_elapsed(0);
+    audio_codec_update_elapsed(0);
 
     do
     {
@@ -571,7 +571,7 @@ enum codec_status codec_run(void)
 
         LoadID666(buffer+0x2e);
 
-        if (!ci->loop_track() && ID666.length==0) {
+        if (!codec_loop_track() && ID666.length==0) {
             ID666.length=3*60*1000; /* 3 minutes */
             ID666.fade=5*1000; /* 5 seconds */
         }
@@ -580,7 +580,7 @@ enum codec_status codec_run(void)
     }
     while ( play_track() );
 
-    print_timers(ci->id3->path);
+    print_timers(ci.id3->path);
 
     return CODEC_OK;
 }

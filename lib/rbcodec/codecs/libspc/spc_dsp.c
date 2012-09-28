@@ -1561,7 +1561,7 @@ void DSP_reset( struct Spc_Dsp* this )
     this->r.g.flags   = 0xE0; /* reset, mute, echo off */
     this->r.g.key_ons = 0;
     
-    ci->memset( this->voice_state, 0, sizeof this->voice_state );
+    memset( this->voice_state, 0, sizeof this->voice_state );
     
     int i;
     for ( i = VOICE_COUNT; --i >= 0; )
@@ -1580,13 +1580,13 @@ void DSP_reset( struct Spc_Dsp* this )
 #if defined(CPU_COLDFIRE)
     this->fir_ptr = fir_buf;
     this->last_fir_ptr = &fir_buf [7];
-    ci->memset( fir_buf, 0, sizeof fir_buf );
+    memset( fir_buf, 0, sizeof fir_buf );
 #elif defined (CPU_ARM)
     this->fir_ptr = fir_buf;
-    ci->memset( fir_buf, 0, sizeof fir_buf );
+    memset( fir_buf, 0, sizeof fir_buf );
 #else
     this->fir_pos = 0;
-    ci->memset( this->fir_buf, 0, sizeof this->fir_buf );
+    memset( this->fir_buf, 0, sizeof this->fir_buf );
 #endif
 
     assert( offsetof (struct globals_t,unused9 [2]) == REGISTER_COUNT );

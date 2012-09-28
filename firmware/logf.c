@@ -49,7 +49,7 @@
 #include "file.h"
 #include "rbpaths.h"
 #include "ata_idle_notify.h"
-
+#include "symbols.h"
 unsigned char logdiskfbuffer[MAX_LOGDISKF_SIZE];
 int logdiskfindex;
 #endif
@@ -252,6 +252,7 @@ void _logf(const char *fmt, ...)
 
     displayremote();
 }
+EXPORT_SYMBOL(_logf);
 #endif
 
 #endif

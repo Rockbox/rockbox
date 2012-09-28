@@ -23,6 +23,7 @@
  *
  ****************************************************************************/
 
+#include "codecs.h"
 #include "codeclib.h"
 #include "inttypes.h"
 #include "libopus/opus.h"
@@ -52,7 +53,7 @@ static int get_more_data(ogg_sync_state *oy)
     char *buffer;
 
     buffer = (char *)ogg_sync_buffer(oy, CHUNKSIZE);
-    bytes = ci->read_filebuf(buffer, CHUNKSIZE);
+    bytes = codec_read_filebuf(buffer, CHUNKSIZE);
     ogg_sync_wrote(oy,bytes);
 
     return bytes;
@@ -61,12 +62,12 @@ static int get_more_data(ogg_sync_state *oy)
 static int64_t get_next_page(ogg_sync_state *oy, ogg_page *og,
                                  int64_t boundary)
 {
-    int64_t localoffset = ci->curpos;
+    int64_t localoffset = ci.curpos;
     long more;
     long ret;
 
     if (boundary > 0)
-        boundary += ci->curpos;
+        boundary += ci.curpos;
 
     while (1) {
         more = ogg_sync_pageseek(oy,og);
@@ -103,7 +104,7 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
 {
     int64_t crofs;
     int64_t *curoffset=&crofs;
-    *curoffset=ci->curpos;
+    *curoffset=ci.curpos;
     int64_t begin=*curoffset;
     int64_t end=begin;
     int64_t ret;
@@ -129,7 +130,7 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
 
         *curoffset = begin;
 
-        ci->seek_buffer(*curoffset);
+        codec_seek_buffer(*curoffset);
 
         ogg_sync_reset(oy);
 
@@ -197,7 +198,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
 
     int64_t crofs;
     int64_t *curbyteoffset = &crofs;
-    *curbyteoffset = ci->curpos;
+    *curbyteoffset = ci.curpos;
     int64_t curoffset;
     curoffset = *curbyteoffset;
     int64_t offset = 0;
@@ -219,7 +220,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
 
         //int64_t toffset=curoffset;
 
-        ci->seek_buffer(curoffset);
+        codec_seek_buffer(curoffset);
 
         ogg_sync_reset(oy);
 
@@ -228,22 +229,22 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
         if (offset < 0) { /* could not find new page,use old offset */
             LOGF("Seek/guess/fault:%lld->-<-%d,%lld:%lld,%d,%ld,%d\n",
                  curpos,0,pos,offset,0,
-                 ci->curpos,/*stream_length*/0);
+                 ci.curpos,/*stream_length*/0);
 
             curoffset = *curbyteoffset;
 
-            ci->seek_buffer(curoffset);
+            codec_seek_buffer(curoffset);
 
             ogg_sync_reset(oy);
         } else {
             if (ogg_page_granulepos(&og) == 0 && pos > 5000) {
                 LOGF("SEEK/guess/fault:%lld->-<-%lld,%lld:%lld,%d,%ld,%d\n",
                      curpos,ogg_page_granulepos(&og),pos,
-                     offset,0,ci->curpos,/*stream_length*/0);
+                     offset,0,ci.curpos,/*stream_length*/0);
 
                 curoffset = *curbyteoffset;
 
-                ci->seek_buffer(curoffset);
+                codec_seek_buffer(curoffset);
 
                 ogg_sync_reset(oy);
             } else {
@@ -288,7 +289,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
         }
     }
 
-    ci->seek_buffer(*curbyteoffset);
+    codec_seek_buffer(*curbyteoffset);
 
     ogg_sync_reset(oy);
 
@@ -321,7 +322,7 @@ enum codec_status codec_run(void)
     OpusDecoder *st = NULL;
     OpusHeader header;
     int ret;
-    unsigned long strtoffset = ci->id3->offset;
+    unsigned long strtoffset = ci.id3->offset;
     int skip = 0;
     int64_t seek_target;
     uint64_t granule_pos;
@@ -346,11 +347,11 @@ enum codec_status codec_run(void)
     /* allocate output buffer */
     uint16_t *output = (uint16_t*) codec_malloc(MAX_FRAME_SIZE*sizeof(uint16_t));
 
-    ci->seek_buffer(0);
-    ci->set_elapsed(0);
+    codec_seek_buffer(0);
+    audio_codec_update_elapsed(0);
 
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -367,8 +368,8 @@ enum codec_status codec_run(void)
                 speex_seek_page_granule(seek_target, page_granule, &oy, 0);
             }
 
-            ci->set_elapsed(param);
-            ci->seek_complete();
+            audio_codec_update_elapsed(param);
+            codec_seek_complete();
         }
 
         /*Get the ogg buffer for writing*/
@@ -406,27 +407,27 @@ enum codec_status codec_run(void)
                     }
                     LOGF("Decoder inited");
 
-                    codec_set_replaygain(ci->id3);
+                    codec_set_replaygain(ci.id3);
 
                     opus_decoder_ctl(st, OPUS_SET_GAIN(header.gain));
 
-                    ci->configure(DSP_SET_FREQUENCY, sample_rate);
-                    ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
-                    ci->configure(DSP_SET_STEREO_MODE, (header.channels == 2) ?
+                    codec_configure(DSP_SET_FREQUENCY, sample_rate);
+                    codec_configure(DSP_SET_SAMPLE_DEPTH, 16);
+                    codec_configure(DSP_SET_STEREO_MODE, (header.channels == 2) ?
                         STEREO_INTERLEAVED : STEREO_MONO);
 
                 } else if (op.packetno == 1) {
                     /* Comment header */
                 } else {
                     if (strtoffset) {
-                        ci->seek_buffer(strtoffset);
+                        codec_seek_buffer(strtoffset);
                         ogg_sync_reset(&oy);
                         strtoffset = 0;
                         break;//next page
                     }
 
                     /* report progress */
-                    ci->set_elapsed((granule_pos - header.preskip) / 48);
+                    audio_codec_update_elapsed((granule_pos - header.preskip) / 48);
 
                     /* Decode audio packets */
                     ret = opus_decode(st, op.packet, op.bytes, output, MAX_FRAME_SIZE, 0);
@@ -440,12 +441,12 @@ enum codec_status codec_run(void)
                             } else {
                                 /* part of output buffer is played */
                                 ret -= skip;
-                                ci->pcmbuf_insert(&output[skip * header.channels], NULL, ret);
+                                codec_pcmbuf_insert(&output[skip * header.channels], NULL, ret);
                                 skip = 0;
                             }
                         } else {
                             /* entire buffer is played */
-                            ci->pcmbuf_insert(output, NULL, ret);
+                            codec_pcmbuf_insert(output, NULL, ret);
                         }
                         granule_pos += ret;
                     } else {

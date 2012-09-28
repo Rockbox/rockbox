@@ -31,7 +31,7 @@
  * available.
  */
 #if defined(HAVE_ALBUMART) && defined(HAVE_JPEG)
-#define search_albumart_files rb->search_albumart_files
+#define search_albumart_files search_albumart_files
 #endif
 
 /* This should only be used when loading scaled bitmaps, or using custom output
@@ -39,16 +39,16 @@
  * on targets with LCD_DEPTH > 1
  */
 #ifdef HAVE_BMP_SCALING
-#define scaled_read_bmp_file rb->read_bmp_file
-#define scaled_read_bmp_fd rb->read_bmp_fd
+#define scaled_read_bmp_file read_bmp_file
+#define scaled_read_bmp_fd read_bmp_fd
 #else
 #define scaled_read_bmp_file read_bmp_file
 #define scaled_read_bmp_fd read_bmp_fd
 #endif
 
 #ifdef HAVE_JPEG
-#define read_jpeg_file rb->read_jpeg_file
-#define read_jpeg_fd rb->read_jpeg_fd
+#define read_jpeg_file read_jpeg_file
+#define read_jpeg_fd read_jpeg_fd
 #else
 #endif
 

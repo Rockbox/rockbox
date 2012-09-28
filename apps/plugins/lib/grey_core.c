@@ -428,16 +428,16 @@ static inline void _deferred_update(void)
     int y2 = MIN(_grey_info.y + _grey_info.height, LCD_HEIGHT);
 
     if (y1 > 0)  /* refresh part above overlay, full width */
-        rb->lcd_update_rect(0, 0, LCD_WIDTH, y1);
+        lcd_update_rect(0, 0, LCD_WIDTH, y1);
 
     if (y2 < LCD_HEIGHT) /* refresh part below overlay, full width */
-        rb->lcd_update_rect(0, y2, LCD_WIDTH, LCD_HEIGHT - y2);
+        lcd_update_rect(0, y2, LCD_WIDTH, LCD_HEIGHT - y2);
 
     if (x1 > 0) /* refresh part to the left of overlay */
-        rb->lcd_update_rect(0, y1, x1, y2 - y1);
+        lcd_update_rect(0, y1, x1, y2 - y1);
 
     if (x2 < LCD_WIDTH) /* refresh part to the right of overlay */
-        rb->lcd_update_rect(x2, y1, LCD_WIDTH - x2, y2 - y1);
+        lcd_update_rect(x2, y1, LCD_WIDTH - x2, y2 - y1);
 }
 
 #ifdef SIMULATOR
@@ -470,7 +470,7 @@ static unsigned long _grey_get_pixel(int x, int y)
 static void _timer_isr(void)
 {
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-    unsigned long check = rb->is_backlight_on(true)
+    unsigned long check = is_backlight_on(true)
                         ? 0 : _GREY_BACKLIGHT_ON;
     
     if ((_grey_info.flags & (_GREY_BACKLIGHT_ON|GREY_RAWMAPPED)) == check)
@@ -481,12 +481,12 @@ static void _timer_isr(void)
     }
 #endif
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    rb->lcd_blit_grey_phase(_grey_info.values, _grey_info.phases,
+    lcd_blit_grey_phase(_grey_info.values, _grey_info.phases,
                                        _grey_info.bx, _grey_info.y,
                                        _grey_info.bwidth, _grey_info.height,
                                        _grey_info.width);
 #else /* vertical packing or vertical interleaved */
-    rb->lcd_blit_grey_phase(_grey_info.values, _grey_info.phases,
+    lcd_blit_grey_phase(_grey_info.values, _grey_info.phases,
                                        _grey_info.x, _grey_info.by,
                                        _grey_info.width, _grey_info.bheight,
                                        _grey_info.width);
@@ -653,7 +653,7 @@ bool grey_init(unsigned char *gbuf, long gbuf_size,
         return false;
 
     /* Init to white */
-    rb->memset(_grey_info.values, 0x80, plane_size);
+    memset(_grey_info.values, 0x80, plane_size);
 
 #ifndef SIMULATOR
     /* Init phases with random bits */
@@ -661,7 +661,7 @@ bool grey_init(unsigned char *gbuf, long gbuf_size,
     end = (unsigned*)(_grey_info.phases + plane_size);
 
     do
-        *dst++ = rb->rand();
+        *dst++ = rand();
     while (dst < end);
 #endif
 
@@ -695,7 +695,7 @@ bool grey_init(unsigned char *gbuf, long gbuf_size,
     else
     {
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-        if (rb->is_backlight_on(true))
+        if (is_backlight_on(true))
             _grey_info.flags |= _GREY_BACKLIGHT_ON;
 #endif
         fill_gvalues();
@@ -730,39 +730,39 @@ void grey_show(bool enable)
     {
         _grey_info.flags |= _GREY_RUNNING;
 #ifdef SIMULATOR
-        rb->sim_lcd_ex_init(_grey_get_pixel);
-        rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+        sim_lcd_ex_init(_grey_get_pixel);
+        sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
                                    _grey_info.width, _grey_info.height);
 #else /* !SIMULATOR */
 #ifdef NEED_BOOST
-        rb->cpu_boost(true);
+        cpu_boost(true);
 #endif
 #if NUM_CORES > 1
-        rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE,
+        timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE,
                                       _timer_isr,
                                       (_grey_info.flags & GREY_ON_COP) ? COP : CPU);
 #else
-        rb->timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE, _timer_isr);
+        timer_register(1, NULL, TIMER_FREQ / LCD_SCANRATE, _timer_isr);
 #endif
 #endif /* !SIMULATOR */
-        rb->screen_dump_set_hook(grey_screendump_hook);
+        screen_dump_set_hook(grey_screendump_hook);
     }
     else if (!enable && (_grey_info.flags & _GREY_RUNNING))
     {
 #ifdef SIMULATOR
-        rb->sim_lcd_ex_init(NULL);
+        sim_lcd_ex_init(NULL);
 #else /* !SIMULATOR */
-        rb->timer_unregister();
+        timer_unregister();
 #if NUM_CORES > 1  /* Make sure the ISR has finished before calling lcd_update() */
-        rb->sleep(HZ/100);
+        sleep(HZ/100);
 #endif
 #ifdef NEED_BOOST
-        rb->cpu_boost(false);
+        cpu_boost(false);
 #endif
 #endif /* !SIMULATOR */
         _grey_info.flags &= ~_GREY_RUNNING;
-        rb->screen_dump_set_hook(NULL);
-        rb->lcd_update(); /* restore whatever there was before */
+        screen_dump_set_hook(NULL);
+        lcd_update(); /* restore whatever there was before */
     }
 }
 
@@ -779,7 +779,7 @@ void grey_update(void)
                              0, 0, _grey_info.width, _grey_info.height);
 }
 
-/* Do an lcd_update() to show changes done by rb->lcd_xxx() functions
+/* Do an lcd_update() to show changes done by lcd_xxx() functions
    (in areas of the screen not covered by the greyscale overlay). */
 void grey_deferred_lcd_update(void)
 {
@@ -792,7 +792,7 @@ void grey_deferred_lcd_update(void)
 #endif
     }
     else
-        rb->lcd_update();
+        lcd_update();
 }
 
 /*** Screenshot ***/
@@ -858,10 +858,10 @@ static void grey_screendump_hook(int fd)
     unsigned char *dst, *dst_end;
     unsigned char linebuf[MAX(4*NUM_SHADES,BMP_LINESIZE)];
 
-    rb->write(fd, bmpheader, sizeof(bmpheader));  /* write header */
+    write(fd, bmpheader, sizeof(bmpheader));  /* write header */
 
     /* build clut */
-    rb->memset(linebuf, 0, 4*NUM_SHADES);
+    memset(linebuf, 0, 4*NUM_SHADES);
     dst = linebuf;
 
     for (i = 0; i < NUM_SHADES; i++)
@@ -877,7 +877,7 @@ static void grey_screendump_hook(int fd)
                  + RED_CMP(LCD_BL_DARKCOLOR);
         dst++;
     }
-    rb->write(fd, linebuf, 4*NUM_SHADES);
+    write(fd, linebuf, 4*NUM_SHADES);
 
 #ifdef HAVE_LCD_SPLIT
     dst = linebuf;
@@ -895,19 +895,19 @@ static void grey_screendump_hook(int fd)
                  + RED_CMP(LCD_BL_DARKCOLOR_2);
         dst++;
     }
-    rb->write(fd, linebuf, 4*NUM_SHADES);
+    write(fd, linebuf, 4*NUM_SHADES);
 #endif
 
     /* BMP image goes bottom -> top */
     for (y = LCD_HEIGHT - 1; y >= 0; y--)
     {
-        rb->memset(linebuf, 0, BMP_LINESIZE);
+        memset(linebuf, 0, BMP_LINESIZE);
 
 #if defined(HAVE_LCD_SPLIT) && (LCD_SPLIT_LINES == 2)
         if (y == LCD_SPLIT_POS - 1)
         {
-            rb->write(fd, linebuf, BMP_LINESIZE);
-            rb->write(fd, linebuf, BMP_LINESIZE);
+            write(fd, linebuf, BMP_LINESIZE);
+            write(fd, linebuf, BMP_LINESIZE);
         }
 #endif
 
@@ -920,7 +920,7 @@ static void grey_screendump_hook(int fd)
         gsrc = _grey_info.values + _GREY_MULUQ(_grey_info.width, gy);
 
 #if LCD_DEPTH == 2
-        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_FBWIDTH, y);
+        src = lcd_framebuffer + _GREY_MULUQ(LCD_FBWIDTH, y);
         
         do
         {
@@ -951,7 +951,7 @@ static void grey_screendump_hook(int fd)
 
 #if LCD_DEPTH == 1
         mask = BIT_N(y & 7);
-        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
+        src = lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
 
         do
         {
@@ -983,7 +983,7 @@ static void grey_screendump_hook(int fd)
 
 #elif LCD_DEPTH == 2
         shift = 2 * (y & 3);
-        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 2);
+        src = lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 2);
         
         do
         {
@@ -1008,7 +1008,7 @@ static void grey_screendump_hook(int fd)
 
 #if LCD_DEPTH == 2
         shift = y & 7;
-        src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
+        src = lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
         
         do
         {
@@ -1030,6 +1030,6 @@ static void grey_screendump_hook(int fd)
 #endif /* LCD_DEPTH */
 #endif /* LCD_PIXELFORMAT */
 
-        rb->write(fd, linebuf, BMP_LINESIZE);
+        write(fd, linebuf, BMP_LINESIZE);
     }
 }

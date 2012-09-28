@@ -52,7 +52,7 @@ bool pgfx_init(int cwidth, int cheight)
 
     for (i = 0; i < cwidth * cheight; i++)
     {
-        if ((gfx_chars[i] = rb->lcd_get_locked_pattern()) == 0)
+        if ((gfx_chars[i] = lcd_get_locked_pattern()) == 0)
         {
             pgfx_release();
             return false;
@@ -69,7 +69,7 @@ void pgfx_release(void)
     
     for (i = 0; i < 8; i++)
         if (gfx_chars[i])
-            rb->lcd_unlock_pattern(gfx_chars[i]);
+            lcd_unlock_pattern(gfx_chars[i]);
 }
 
 /* place the display */
@@ -81,12 +81,12 @@ void pgfx_display(int cx, int cy)
 
     for (i = 0; i < width; i++)
         for (j = 0; j < height; j++)
-            rb->lcd_putc(cx + i, cy + j, gfx_chars[char_height * i + j]);
+            lcd_putc(cx + i, cy + j, gfx_chars[char_height * i + j]);
 }
 
 void pgfx_display_block(int cx, int cy, int x, int y)
 {
-    rb->lcd_putc(cx, cy, gfx_chars[char_height * x + y]);
+    lcd_putc(cx, cy, gfx_chars[char_height * x + y]);
 }
 
 
@@ -97,9 +97,9 @@ void pgfx_update(void)
     int i;
 
     for (i = 0; i < char_width * char_height; i++)
-        rb->lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
+        lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
     
-    rb->lcd_update();
+    lcd_update();
 }
 
 /*** Parameter handling ***/
@@ -200,7 +200,7 @@ void pgfx_clear_display(void)
 {
     unsigned bits = (drawmode & DRMODE_INVERSEVID) ? 0x1F : 0;
 
-    rb->memset(gfx_buffer, bits, char_width * pixel_height);
+    memset(gfx_buffer, bits, char_width * pixel_height);
 }
 
 /* Set a single pixel */

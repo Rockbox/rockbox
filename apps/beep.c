@@ -28,6 +28,7 @@
 
 /** Beep generation, CPU optimized **/
 #include "asm/beep.c"
+#include "symbols.h"
 
 static uint32_t beep_phase;     /* Phase of square wave generator */
 static uint32_t beep_step;      /* Step of square wave generator on each sample */
@@ -98,3 +99,4 @@ void beep_play(unsigned int frequency, unsigned int duration,
                             beep_count ? beep_get_more : NULL,
                             start, size);
 }
+EXPORT_SYMBOL(beep_play);

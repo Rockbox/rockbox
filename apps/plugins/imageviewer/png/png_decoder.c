@@ -2095,7 +2095,7 @@ void LodePNG_decode(LodePNG_Decoder* decoder,
     if (pf_progress != NULL)
         pf_progress(0, 100);
 
-    long time = *rb->current_tick;
+    long time = current_tick;
     /* put decoded png data (pure 2D array of pixels in format
      * defined by PNG header at the end of the allocated buffer
      */
@@ -2167,7 +2167,7 @@ void LodePNG_decode(LodePNG_Decoder* decoder,
     }
 #endif /* (LCD_PIXEL_ASPECT_HEIGHT != 1 || LCD_PIXEL_ASPECT_WIDTH != 1) */
 
-    time = *rb->current_tick - time;
+    time = current_tick - time;
     if (pf_progress) pf_progress(100, 100);
 }
 

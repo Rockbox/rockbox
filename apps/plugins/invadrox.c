@@ -713,12 +713,12 @@ bool aliens_down, aliens_right, hit_left_border, hit_right_border;
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 static inline fb_data get_pixel(int x, int y)
 {
-    return rb->lcd_framebuffer[x*LCD_HEIGHT+y];
+    return lcd_framebuffer[x*LCD_HEIGHT+y];
 }
 #else
 static inline fb_data get_pixel(int x, int y)
 {
-    return rb->lcd_framebuffer[ytab[y] + x];
+    return lcd_framebuffer[ytab[y] + x];
 }
 #endif
 
@@ -731,7 +731,7 @@ static const unsigned char shifts[4] = {
 /* Horizontal packing */
 static inline fb_data get_pixel(int x, int y)
 {
-    return (rb->lcd_framebuffer[ytab[y] + (x >> 2)] >> shifts[x & 3]) & 3;
+    return (lcd_framebuffer[ytab[y] + (x >> 2)] >> shifts[x & 3]) & 3;
 }
 #else
 /* Vertical packing */
@@ -740,7 +740,7 @@ static const unsigned char shifts[4] = {
 };
 static inline fb_data get_pixel(int x, int y)
 {
-    return (rb->lcd_framebuffer[ytab[y] + x] >> shifts[y & 3]) & 3;
+    return (lcd_framebuffer[ytab[y] + x] >> shifts[y & 3]) & 3;
 }
 #endif /* Horizontal/Vertical packing */
 
@@ -758,7 +758,7 @@ static void draw_number(int x, int y, int num, int digits)
     for (i = digits - 1; i >= 0; i--) {
         d = num % 10;
         num = num / 10;
-        rb->lcd_bitmap_part(invadrox_numbers, d * NUMBERS_WIDTH, 0,
+        lcd_bitmap_part(invadrox_numbers, d * NUMBERS_WIDTH, 0,
                             STRIDE( SCREEN_MAIN, 
                                     BMPWIDTH_invadrox_numbers, 
                                     BMPHEIGHT_invadrox_numbers),
@@ -766,7 +766,7 @@ static void draw_number(int x, int y, int num, int digits)
                             NUMBERS_WIDTH, FONT_HEIGHT);
     }
     /* Update lcd */
-    rb->lcd_update_rect(x, y, 4 * NUMBERS_WIDTH + 3 * NUM_SPACING, FONT_HEIGHT);
+    lcd_update_rect(x, y, 4 * NUMBERS_WIDTH + 3 * NUM_SPACING, FONT_HEIGHT);
 }
 
 
@@ -790,7 +790,7 @@ static void draw_lives(void)
 {
     int i;
     /* Lives num */
-    rb->lcd_bitmap_part(invadrox_numbers, lives * NUMBERS_WIDTH, 0,
+    lcd_bitmap_part(invadrox_numbers, lives * NUMBERS_WIDTH, 0,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_invadrox_numbers, 
                                 BMPHEIGHT_invadrox_numbers), 
@@ -799,7 +799,7 @@ static void draw_lives(void)
 
     /* Ships */
     for (i = 0; i < (lives - 1); i++) {
-        rb->lcd_bitmap_part(invadrox_ships, 0, 0, 
+        lcd_bitmap_part(invadrox_ships, 0, 0, 
                             STRIDE( SCREEN_MAIN, 
                                     BMPWIDTH_invadrox_ships, 
                                     BMPHEIGHT_invadrox_ships),
@@ -809,11 +809,11 @@ static void draw_lives(void)
 
     /* Erase ship to the right (if less than MAX_LIVES) */
     if (lives < MAX_LIVES) {
-        rb->lcd_fillrect(PLAYFIELD_X + LIVES_X + SHIP_WIDTH + i * (SHIP_WIDTH + NUM_SPACING),
+        lcd_fillrect(PLAYFIELD_X + LIVES_X + SHIP_WIDTH + i * (SHIP_WIDTH + NUM_SPACING),
                          PLAYFIELD_Y + 1, SHIP_WIDTH, SHIP_HEIGHT);
     }
     /* Update lives (and level) part of screen */
-    rb->lcd_update_rect(PLAYFIELD_X + LIVES_X, PLAYFIELD_Y + 1,
+    lcd_update_rect(PLAYFIELD_X + LIVES_X, PLAYFIELD_Y + 1,
                         PLAYFIELD_WIDTH - 2 * LIVES_X, MAX(FONT_HEIGHT + 1, SHIP_HEIGHT + 1));
 }
 
@@ -823,7 +823,7 @@ static inline void draw_aliens(void)
     int i;
 
     for (i = 0; i < 5 * ALIENS; i++) {
-        rb->lcd_bitmap_part(invadrox_aliens, aliens[i].x & 1 ? ALIEN_WIDTH : 0, 
+        lcd_bitmap_part(invadrox_aliens, aliens[i].x & 1 ? ALIEN_WIDTH : 0, 
                             aliens[i].type * ALIEN_HEIGHT,
                             STRIDE( SCREEN_MAIN, 
                                     BMPWIDTH_invadrox_aliens, 
@@ -949,22 +949,22 @@ static bool move_aliens(void)
     y = ALIEN_START_Y + old_y * ALIEN_HEIGHT;
     if (aliens[curr_alien].y != old_y) {
         /* Moved in y-dir. Erase whole alien. */
-        rb->lcd_fillrect(x, y, ALIEN_WIDTH, ALIEN_HEIGHT);
+        lcd_fillrect(x, y, ALIEN_WIDTH, ALIEN_HEIGHT);
     } else {
         if (aliens_right) {
             /* Erase left edge */
-            rb->lcd_fillrect(x, y, ALIEN_SPEED, ALIEN_HEIGHT);
+            lcd_fillrect(x, y, ALIEN_SPEED, ALIEN_HEIGHT);
         } else {
             /* Erase right edge */
             x += ALIEN_WIDTH - ALIEN_SPEED;
-            rb->lcd_fillrect(x, y, ALIEN_SPEED, ALIEN_HEIGHT);
+            lcd_fillrect(x, y, ALIEN_SPEED, ALIEN_HEIGHT);
         }
     }
 
     /* Draw alien at new pos */
     x = PLAYFIELD_X + LIVES_X + aliens[curr_alien].x * ALIEN_SPEED;
     y = ALIEN_START_Y + aliens[curr_alien].y * ALIEN_HEIGHT;
-    rb->lcd_bitmap_part(invadrox_aliens,
+    lcd_bitmap_part(invadrox_aliens,
                         aliens[curr_alien].x & 1 ? ALIEN_WIDTH : 0, 
                         aliens[curr_alien].type * ALIEN_HEIGHT,
                         STRIDE( SCREEN_MAIN, 
@@ -990,14 +990,14 @@ static inline void draw_ship(void)
     /* Erase old ship */
     if (old_ship_x < ship_x) {
         /* Move right. Erase leftmost part of ship. */
-        rb->lcd_fillrect(old_ship_x, SHIP_Y, ship_x - old_ship_x, SHIP_HEIGHT);
+        lcd_fillrect(old_ship_x, SHIP_Y, ship_x - old_ship_x, SHIP_HEIGHT);
     } else if (old_ship_x > ship_x) {
         /* Move left. Erase rightmost part of ship. */
-        rb->lcd_fillrect(ship_x + SHIP_WIDTH, SHIP_Y, old_ship_x - ship_x, SHIP_HEIGHT);
+        lcd_fillrect(ship_x + SHIP_WIDTH, SHIP_Y, old_ship_x - ship_x, SHIP_HEIGHT);
     }
 
     /* Draw ship */
-    rb->lcd_bitmap_part(invadrox_ships, 0, ship_frame * SHIP_HEIGHT,
+    lcd_bitmap_part(invadrox_ships, 0, ship_frame * SHIP_HEIGHT,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_invadrox_ships,
                                 BMPHEIGHT_invadrox_ships), 
@@ -1021,15 +1021,15 @@ static inline void draw_ship(void)
 
 static inline void fire_alpha(int xc, int yc, fb_data color)
 {
-    int oldmode = rb->lcd_get_drawmode();
+    int oldmode = lcd_get_drawmode();
 
-    rb->lcd_set_foreground(color);
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_set_foreground(color);
+    lcd_set_drawmode(DRMODE_FG);
     
-    rb->lcd_mono_bitmap(invadrox_fire, xc - (FIRE_WIDTH/2), yc, FIRE_WIDTH, FIRE_HEIGHT);
+    lcd_mono_bitmap(invadrox_fire, xc - (FIRE_WIDTH/2), yc, FIRE_WIDTH, FIRE_HEIGHT);
 
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_drawmode(oldmode);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_drawmode(oldmode);
 }
 
 
@@ -1050,7 +1050,7 @@ static void move_fire(void)
         aliens_paralyzed++;
         if (aliens_paralyzed == 0) {
             /* Erase exploding_alien */
-            rb->lcd_fillrect(PLAYFIELD_X + LIVES_X + aliens[exploding_alien].x * ALIEN_SPEED,
+            lcd_fillrect(PLAYFIELD_X + LIVES_X + aliens[exploding_alien].x * ALIEN_SPEED,
                              ALIEN_START_Y + aliens[exploding_alien].y * ALIEN_HEIGHT,
                              ALIEN_EXPLODE_WIDTH, ALIEN_HEIGHT);
             fire = S_IDLE;
@@ -1068,7 +1068,7 @@ static void move_fire(void)
     if (fire == S_ACTIVE) {
 
         /* Erase */
-        rb->lcd_vline(fire_x, fire_y, fire_y + SHOT_HEIGHT);
+        lcd_vline(fire_x, fire_y, fire_y + SHOT_HEIGHT);
 
         /* Check top */
         if (fire_y <= SCORENUM_Y + FONT_HEIGHT + 4) {
@@ -1093,7 +1093,7 @@ static void move_fire(void)
                 fire_target = TARGET_UFO;
                 /* Center explosion */
                 ufo_x -= (UFO_EXPLODE_WIDTH - UFO_WIDTH) / 2;
-                rb->lcd_bitmap(invadrox_ufo_explode, ufo_x, UFO_Y - 1,
+                lcd_bitmap(invadrox_ufo_explode, ufo_x, UFO_Y - 1,
                                UFO_EXPLODE_WIDTH, UFO_EXPLODE_HEIGHT);
                 return;
             }
@@ -1106,7 +1106,7 @@ static void move_fire(void)
                 if ((ABS(bombs[i].x - fire_x) < BOMB_WIDTH) &&
                     (fire_y - bombs[i].y < BOMB_HEIGHT)) {
                     /* Erase bomb */
-                    rb->lcd_fillrect(bombs[i].x, bombs[i].y, BOMB_WIDTH, BOMB_HEIGHT);
+                    lcd_fillrect(bombs[i].x, bombs[i].y, BOMB_WIDTH, BOMB_HEIGHT);
                     bombs[i].state = S_IDLE;
                     /* Explode ship fire */
                     fire = S_EXPLODE;
@@ -1172,17 +1172,17 @@ static void move_fire(void)
                     score += scores[aliens[i].type];
                     draw_score();
                     /* Update score part of screen */
-                    rb->lcd_update_rect(SCORENUM_X, SCORENUM_Y,
+                    lcd_update_rect(SCORENUM_X, SCORENUM_Y,
                                         PLAYFIELD_WIDTH - 2 * NUMBERS_WIDTH, FONT_HEIGHT);
 
                     /* Paralyze aliens S_EXPLODE frames */
                     aliens_paralyzed = S_EXPLODE;
-                    rb->lcd_bitmap(invadrox_alien_explode,
+                    lcd_bitmap(invadrox_alien_explode,
                                         PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
                                         ALIEN_START_Y + aliens[i].y * ALIEN_HEIGHT,
                                         ALIEN_EXPLODE_WIDTH, ALIEN_EXPLODE_HEIGHT);
                     /* Since alien is 1 pixel taller than explosion sprite, erase bottom line */
-                    rb->lcd_hline(PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
+                    lcd_hline(PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED,
                                   PLAYFIELD_X + LIVES_X + aliens[i].x * ALIEN_SPEED + ALIEN_WIDTH,
                                   ALIEN_START_Y + (aliens[i].y + 1) * ALIEN_HEIGHT - 1);
                     return;
@@ -1191,16 +1191,16 @@ static void move_fire(void)
         }
 
         /* Draw shot */
-        rb->lcd_set_foreground(LCD_WHITE);
-        rb->lcd_vline(fire_x, fire_y, fire_y + SHOT_HEIGHT);
-        rb->lcd_set_foreground(LCD_BLACK);
+        lcd_set_foreground(LCD_WHITE);
+        lcd_vline(fire_x, fire_y, fire_y + SHOT_HEIGHT);
+        lcd_set_foreground(LCD_BLACK);
     } else if (fire < S_IDLE) {
         /* Count up towards S_IDLE, then erase explosion */
         fire++;
         if (fire == S_IDLE) {
             /* Erase explosion */
             if (fire_target == TARGET_TOP) {
-                rb->lcd_fillrect(fire_x - (FIRE_WIDTH / 2), fire_y, FIRE_WIDTH, FIRE_HEIGHT);
+                lcd_fillrect(fire_x - (FIRE_WIDTH / 2), fire_y, FIRE_WIDTH, FIRE_HEIGHT);
             } else if (fire_target == TARGET_SHIELD) {
                 /* Draw explosion with black pixels */
                 fire_alpha(fire_x, fire_y, LCD_BLACK);
@@ -1216,7 +1216,7 @@ static inline int random_bomber(void)
     int i, col;
 
     /* TODO: Weigh higher probability near ship */
-    col = rb->rand() % ALIENS;
+    col = rand() % ALIENS;
     for (i = col + 4 * ALIENS; i >= 0; i -= ALIENS) {
         if (aliens[i].state == BOMBER) {
             return i;
@@ -1239,7 +1239,7 @@ static inline int random_bomber(void)
 
 static inline void draw_bomb(int i)
 {
-    rb->lcd_bitmap_part(invadrox_bombs, bombs[i].type * BOMB_WIDTH,
+    lcd_bitmap_part(invadrox_bombs, bombs[i].type * BOMB_WIDTH,
                         bombs[i].frame * BOMB_HEIGHT,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_invadrox_bombs,
@@ -1292,7 +1292,7 @@ static void move_bombs(void)
             }
 
             /* Passed, set type */
-            bombs[i].type = rb->rand() % 3;
+            bombs[i].type = rand() % 3;
             bombs[i].frame = 0;
             if (bombs[i].type == 0) {
                 bombs[i].frames = 3;
@@ -1311,7 +1311,7 @@ static void move_bombs(void)
 
         case S_ACTIVE:
             /* Erase old position */
-            rb->lcd_fillrect(bombs[i].x, bombs[i].y, BOMB_WIDTH, BOMB_HEIGHT);
+            lcd_fillrect(bombs[i].x, bombs[i].y, BOMB_WIDTH, BOMB_HEIGHT);
 
             /* Move */
             bombs[i].y += BOMB_SPEED;
@@ -1343,7 +1343,7 @@ static void move_bombs(void)
                         ship_frame_counter = 0;
                         bombs[i].state = S_EXPLODE * 4;
                         bombs[i].target = TARGET_SHIP;
-                        rb->lcd_bitmap_part(invadrox_ships, 0, 1 * SHIP_HEIGHT,
+                        lcd_bitmap_part(invadrox_ships, 0, 1 * SHIP_HEIGHT,
                                             STRIDE( SCREEN_MAIN, 
                                                     BMPWIDTH_invadrox_ships,
                                                     BMPHEIGHT_invadrox_ships), 
@@ -1375,8 +1375,8 @@ static void move_bombs(void)
             if (bombs[i].state == S_IDLE) {
                 if (ship_hit) {
                     /* Erase explosion */
-                    rb->lcd_fillrect(ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
-                    rb->lcd_update_rect(ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
+                    lcd_fillrect(ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
+                    lcd_update_rect(ship_x, SHIP_Y, SHIP_WIDTH, SHIP_HEIGHT);
                     ship_hit = false;
                     ship_frame = 0;
                     ship_x = PLAYFIELD_X + 2 * LIVES_X;
@@ -1387,7 +1387,7 @@ static void move_bombs(void)
                     }
                     draw_lives();
                     /* Sleep 1s to give player time to examine lives left */
-                    rb->sleep(HZ);
+                    sleep(HZ);
                 }
                 /* Erase explosion (even if ship hit, might be another bomb) */
                 fire_alpha(bombs[i].x, bombs[i].y, LCD_BLACK);
@@ -1430,12 +1430,12 @@ static void move_ufo(void)
 
     case S_IDLE:
 
-        if (rb->rand() % 500 == 0) {
+        if (rand() % 500 == 0) {
             /* Uh-oh, it's time to launch a mystery UFO */
 
             /* TODO: Play UFO sound */
 
-            if (rb->rand() % 2) {
+            if (rand() % 2) {
                 ufo_speed = UFO_SPEED;
                 ufo_x = PLAYFIELD_X;
             } else {
@@ -1449,7 +1449,7 @@ static void move_ufo(void)
 
     case S_ACTIVE:
         /* Erase old pos */
-        rb->lcd_fillrect(ufo_x, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
+        lcd_fillrect(ufo_x, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
         /* Move */
         ufo_x += ufo_speed;
         /* Check bounds */
@@ -1458,14 +1458,14 @@ static void move_ufo(void)
             break;
         }
         /* Draw new pos */
-        rb->lcd_bitmap(invadrox_ufo, ufo_x, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
+        lcd_bitmap(invadrox_ufo, ufo_x, UFO_Y, UFO_WIDTH, UFO_HEIGHT);
         break;
 
     case S_SHOWSCORE:
         counter++;
         if (counter == S_IDLE) {
             /* Erase mystery number */
-            rb->lcd_fillrect(ufo_x, UFO_Y, 3 * NUMBERS_WIDTH + 2 * NUM_SPACING, FONT_HEIGHT);
+            lcd_fillrect(ufo_x, UFO_Y, 3 * NUMBERS_WIDTH + 2 * NUM_SPACING, FONT_HEIGHT);
             ufo_state = S_IDLE;
         }
         break;
@@ -1475,11 +1475,11 @@ static void move_ufo(void)
         ufo_state++;
         if (ufo_state == S_IDLE) {
             /* Erase explosion */
-            rb->lcd_fillrect(ufo_x, UFO_Y - 1, UFO_EXPLODE_WIDTH, UFO_EXPLODE_HEIGHT);
+            lcd_fillrect(ufo_x, UFO_Y - 1, UFO_EXPLODE_WIDTH, UFO_EXPLODE_HEIGHT);
             ufo_state = S_SHOWSCORE;
             counter = S_EXPLODE * 4;
             /* Draw mystery_score, sleep, increase score and continue */
-            mystery_score = 50 + (rb->rand() % 6) * 50;
+            mystery_score = 50 + (rand() % 6) * 50;
             if (mystery_score < 100) {
                 draw_number(ufo_x, UFO_Y, mystery_score, 2);
             } else {
@@ -1496,8 +1496,8 @@ static void move_ufo(void)
 static void draw_background(void)
 {
 
-    rb->lcd_bitmap(invadrox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
-    rb->lcd_update();
+    lcd_bitmap(invadrox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_update();
 }
 
 
@@ -1578,16 +1578,16 @@ static void new_level(void)
 
     /* 4 shields */
     for (i = 1; i <= 4; i++) {
-        rb->lcd_bitmap(invadrox_shield,
+        lcd_bitmap(invadrox_shield,
                             PLAYFIELD_X + i * PLAYFIELD_WIDTH / 5 - SHIELD_WIDTH / 2,
                             SHIELD_Y, SHIELD_WIDTH, SHIELD_HEIGHT);
     }
 
     /* Bottom line */
-    rb->lcd_set_foreground(SLIME_GREEN);
-    rb->lcd_hline(PLAYFIELD_X, LCD_WIDTH - PLAYFIELD_X, PLAYFIELD_Y);
+    lcd_set_foreground(SLIME_GREEN);
+    lcd_hline(PLAYFIELD_X, LCD_WIDTH - PLAYFIELD_X, PLAYFIELD_Y);
     /* Restore foreground to black (for fast erase later). */
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 
     ship_x = PLAYFIELD_X + 2 * LIVES_X;
     if (level == 1) {
@@ -1610,7 +1610,7 @@ static void new_level(void)
 
     draw_aliens();
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 
@@ -1619,7 +1619,7 @@ static void init_invadrox(void)
     int i;
 
     /* Seed random number generator with a "random" number */
-    rb->srand(rb->get_time()->tm_sec + rb->get_time()->tm_min * 60);
+    srand(get_time()->tm_sec + get_time()->tm_min * 60);
 
     /* Precalculate start of each scanline */
     for (i = 0; i < LCD_HEIGHT; i++) {
@@ -1634,12 +1634,12 @@ static void init_invadrox(void)
 #endif
     }
 
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 
     if (highscore_load(HISCOREFILE, &hiscore, 1) < 0) {
         /* Init hiscore to 0 */
-        rb->strlcpy(hiscore.name, "Invader", sizeof(hiscore.name));
+        strlcpy(hiscore.name, "Invader", sizeof(hiscore.name));
         hiscore.score = 0;
         hiscore.level = 1;
     }
@@ -1657,33 +1657,33 @@ static void init_invadrox(void)
 
 
     /* Save screen white color */
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_drawpixel(0, 0);
-    rb->lcd_update_rect(0, 0, 1, 1);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_drawpixel(0, 0);
+    lcd_update_rect(0, 0, 1, 1);
     screen_white = get_pixel(0, 0);
 
     /* Save screen green color */
-    rb->lcd_set_foreground(SLIME_GREEN);
-    rb->lcd_drawpixel(0, 0);
-    rb->lcd_update_rect(0, 0, 1, 1);
+    lcd_set_foreground(SLIME_GREEN);
+    lcd_drawpixel(0, 0);
+    lcd_update_rect(0, 0, 1, 1);
     screen_green = get_pixel(0, 0);
 
     /* Restore black foreground */
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 
     new_level();
 
     /* Flash score at start */
     for (i = 0; i < 5; i++) {
-        rb->lcd_fillrect(SCORENUM_X, SCORENUM_Y,
+        lcd_fillrect(SCORENUM_X, SCORENUM_Y,
                          4 * NUMBERS_WIDTH + 3 * NUM_SPACING,
                          FONT_HEIGHT);
-        rb->lcd_update_rect(SCORENUM_X, SCORENUM_Y,
+        lcd_update_rect(SCORENUM_X, SCORENUM_Y,
                             4 * NUMBERS_WIDTH + 3 * NUM_SPACING,
                             FONT_HEIGHT);
-        rb->sleep(HZ / 10);
+        sleep(HZ / 10);
         draw_number(SCORENUM_X, SCORENUM_Y, score, 4);
-        rb->sleep(HZ / 10);
+        sleep(HZ / 10);
     }
 }
 
@@ -1698,7 +1698,7 @@ static inline bool handle_buttons(void)
         /* Don't allow ship movement during explosion */
         newbuttonstate = 0;
     } else {
-        newbuttonstate = rb->button_status();
+        newbuttonstate = button_status();
     }
     if(newbuttonstate == oldbuttonstate) {
         if (newbuttonstate == 0) {
@@ -1738,7 +1738,7 @@ static inline bool handle_buttons(void)
             }
         }
         if (pressed & ACTION_QUIT) {
-            rb->splash(HZ * 1, "Quit");
+            splash(HZ * 1, "Quit");
             return true;
         }
     }
@@ -1758,7 +1758,7 @@ static inline bool handle_buttons(void)
 check_usb:
 
     /* Quit if USB is connected */
-    if (rb->button_get(false) == SYS_USB_CONNECTED) {
+    if (button_get(false) == SYS_USB_CONNECTED) {
         return true;
     }
 
@@ -1778,7 +1778,7 @@ static void game_loop(void)
 
     while (1) {
         /* Convert CYCLETIME (in ms) to HZ */
-        end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+        end = current_tick + (CYCLETIME * HZ) / 1000;
 
         if (handle_buttons()) {
             return;
@@ -1814,16 +1814,16 @@ static void game_loop(void)
         }
 
         /* Update "playfield" rect */
-        rb->lcd_update_rect(PLAYFIELD_X, SCORENUM_Y + FONT_HEIGHT,
+        lcd_update_rect(PLAYFIELD_X, SCORENUM_Y + FONT_HEIGHT,
                             PLAYFIELD_WIDTH,
                             PLAYFIELD_Y + 1 - SCORENUM_Y - FONT_HEIGHT);
 
         /* Wait until next frame */
-        DBG("%ld (%d)\n", end - *rb->current_tick, (CYCLETIME * HZ) / 1000);
-        if (TIME_BEFORE(*rb->current_tick, end)) {
-            rb->sleep(end - *rb->current_tick);
+        DBG("%ld (%d)\n", end - current_tick, (CYCLETIME * HZ) / 1000);
+        if (TIME_BEFORE(current_tick, end)) {
+            sleep(end - current_tick);
         } else {
-            rb->yield();
+            yield();
         }
 
     } /* end while */
@@ -1833,7 +1833,7 @@ static void game_loop(void)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(UNUSED const void* parameter)
 {
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
@@ -1842,7 +1842,7 @@ enum plugin_status plugin_start(UNUSED const void* parameter)
 
     /* Game Over. */
     /* TODO: Play game over sound */
-    rb->splash(HZ * 2, "Game Over");
+    splash(HZ * 2, "Game Over");
     if (score > hiscore.score) {
         /* Save new hiscore */
         highscore_update(score, level, "Invader", &hiscore, 1);
@@ -1850,7 +1850,7 @@ enum plugin_status plugin_start(UNUSED const void* parameter)
     }
 
     /* Restore user's original backlight setting */
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
 

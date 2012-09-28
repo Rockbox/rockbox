@@ -22,6 +22,7 @@
 
 #include <time.h>
 #include "config.h"
+#include "symbols.h"
 
 #if CONFIG_RTC
 /* mktime() code taken from lynx-2.8.5 source, written
@@ -58,4 +59,5 @@ time_t mktime(struct tm *t)
     result += t->tm_sec;
     return(result);
 }
+EXPORT_SYMBOL(mktime);
 #endif

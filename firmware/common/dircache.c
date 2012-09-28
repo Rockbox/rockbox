@@ -47,7 +47,7 @@
 #include "timefuncs.h"
 #endif
 #include "rbpaths.h"
-
+#include "symbols.h"
 
 /* Queue commands. */
 #define DIRCACHE_BUILD 1
@@ -1564,6 +1564,7 @@ DIR_CACHED* opendir_cached(const char* name)
 
     return pdir;
 }
+EXPORT_SYMBOL(opendir_cached);
 
 struct dirent_cached* readdir_cached(DIR_CACHED* dir)
 {
@@ -1608,6 +1609,7 @@ struct dirent_cached* readdir_cached(DIR_CACHED* dir)
     //logf("-> %s", ce->d_name);
     return &dir->theent;
 }
+EXPORT_SYMBOL(readdir_cached);
 
 int closedir_cached(DIR_CACHED* dir)
 {
@@ -1620,6 +1622,7 @@ int closedir_cached(DIR_CACHED* dir)
     
     return 0;
 }
+EXPORT_SYMBOL(closedir_cached);
 
 int mkdir_cached(const char *name)
 {
@@ -1628,6 +1631,7 @@ int mkdir_cached(const char *name)
         dircache_mkdir(name);
     return(rc);
 }
+EXPORT_SYMBOL(mkdir_cached);
 
 int rmdir_cached(const char* name)
 {
@@ -1636,3 +1640,4 @@ int rmdir_cached(const char* name)
         dircache_rmdir(name);
     return(rc);
 }
+EXPORT_SYMBOL(rmdir_cached);

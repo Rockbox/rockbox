@@ -23,10 +23,10 @@ static void set_codec_track(int t) {
     Sgc_start_track(&sgc_emu, t); 
 
     /* for REPEAT_ONE we disable track limits */
-    if (!ci->loop_track()) {
+    if (!codec_loop_track()) {
         Track_set_fade(&sgc_emu, Track_get_length( &sgc_emu, t ), 4000);
     }
-    ci->set_elapsed(t*1000); /* t is track no to display */
+    audio_codec_update_elapsed(t*1000); /* t is track no to display */
 }
 
 /* this is the codec entry point */
@@ -34,21 +34,21 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* we only render 16 bits */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 16);
 
         /* 44 Khz, Interleaved stereo */
-        ci->configure(DSP_SET_FREQUENCY, 44100);
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+        codec_configure(DSP_SET_FREQUENCY, 44100);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
 
         Sgc_init(&sgc_emu);
         Sgc_set_sample_rate(&sgc_emu, 44100);
 
         /* set coleco bios, should be named coleco_bios.rom */
         /* Colecovision not supported yet
-        int fd = ci->open("/coleco_bios.rom", O_RDONLY);
+        int fd = open("/coleco_bios.rom", O_RDONLY);
         if ( fd >= 0 ) {
-            ci->read(fd, coleco_bios, 0x2000);
-            ci->close(fd);
+            read(fd, coleco_bios, 0x2000);
+            close(fd);
             set_coleco_bios( &sgc_emu, coleco_bios );
         }
         */
@@ -71,18 +71,18 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* Read the entire file */
     DEBUGF("SGC: request file\n");
-    ci->seek_buffer(0);
-    buf = ci->request_buffer(&n, ci->filesize);
-    if (!buf || n < (size_t)ci->filesize) {
+    codec_seek_buffer(0);
+    buf = codec_request_buffer(&n, ci.filesize);
+    if (!buf || n < (size_t)ci.filesize) {
         DEBUGF("SGC: file load failed\n");
         return CODEC_ERROR;
     }
    
-    if ((err = Sgc_load_mem(&sgc_emu, buf, ci->filesize))) {
+    if ((err = Sgc_load_mem(&sgc_emu, buf, ci.filesize))) {
         DEBUGF("SGC: Sgc_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
     }
@@ -96,14 +96,14 @@ next_track:
 
     /* The main decoder loop */
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
             track = param/1000;
-            ci->seek_complete();
+            codec_seek_complete();
             if (track >= sgc_emu.track_count) break;
             goto next_track;
         }
@@ -116,7 +116,7 @@ next_track:
             goto next_track;
         }
 
-        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
+        codec_pcmbuf_insert(samples, NULL, CHUNK_SIZE >> 1);
     }
 
     return CODEC_OK;

@@ -47,7 +47,7 @@ static int button_yield(void *ctx)
 {
     long *button = (long *)ctx;
 
-    *button = rb->button_get(false);
+    *button = button_get(false);
     switch (*button)
     {
         case FRACTAL_QUIT:
@@ -106,12 +106,12 @@ enum plugin_status plugin_start(const void* parameter)
 
 #ifdef USEGSLIB
     /* get the remainder of the plugin buffer */
-    gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *)plugin_get_buffer(&gbuf_size);
 
     /* initialize the greyscale buffer.*/
     if (!grey_init(gbuf, gbuf_size, GREY_ON_COP, LCD_WIDTH, LCD_HEIGHT, NULL))
     {
-        rb->splash(HZ, "Couldn't init greyscale display");
+        splash(HZ, "Couldn't init greyscale display");
         return PLUGIN_ERROR;
     }
     grey_show(true); /* switch on greyscale overlay */
@@ -120,7 +120,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* release greylib on exit */
     atexit(cleanup);
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     ops->init();
@@ -133,7 +133,7 @@ enum plugin_status plugin_start(const void* parameter)
         if (redraw != REDRAW_NONE)
         {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(true);
+            cpu_boost(true);
 #endif
             switch (redraw)
             {
@@ -151,14 +151,14 @@ enum plugin_status plugin_start(const void* parameter)
             /* paint all rects */
             rects_calc_all(ops->calc, button_yield, (void *)&button);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-            rb->cpu_boost(false);
+            cpu_boost(false);
 #endif
             /* not interrupted by button press - screen is fully drawn */
             redraw = (button == BUTTON_NONE) ? REDRAW_NONE : REDRAW_PARTIAL;
         }
 
         if (button == BUTTON_NONE)
-            button = rb->button_get(true);
+            button = button_get(true);
 
         switch (button)
         {

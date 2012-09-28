@@ -140,7 +140,7 @@ unknown)
     }
     else
     {
-        rb->snprintf (dest, size, "%d minute%s", menu_item,
+        snprintf (dest, size, "%d minute%s", menu_item,
                       menu_item == 1 ? "" : "s");
         return dest;
     }
@@ -194,13 +194,13 @@ time_formatter (char *dest, size_t size, int menu_item, const char *unknown)
         {
             if (i == 0 || i == 1 || i == min_set)
             {
-                rb->snprintf (dest, size, "%d", time_values[i]);
+                snprintf (dest, size, "%d", time_values[i]);
             }
             else
             {
-                rb->snprintf (dest, size, "%02d", time_values[i]);
+                snprintf (dest, size, "%02d", time_values[i]);
             }
-            temp = rb->strlen (dest);
+            temp = strlen (dest);
             dest += temp;
             size -= temp;
         }
@@ -211,29 +211,29 @@ time_formatter (char *dest, size_t size, int menu_item, const char *unknown)
 
         if (i == 0)             /* days */
         {
-            rb->snprintf (dest, size, " d ");
+            snprintf (dest, size, " d ");
         }
         else if (i == 3)        /* seconds, print the final units */
         {
             if (min_set == 0 || min_set == 1)
             {
-                rb->snprintf (dest, size, " h");
+                snprintf (dest, size, " h");
             }
             else if (min_set == 2)
             {
-                rb->snprintf (dest, size, " m");
+                snprintf (dest, size, " m");
             }
             else
             {
-                rb->snprintf (dest, size, " s");
+                snprintf (dest, size, " s");
             }
         }
         else if (i != max_set)
         {
-            rb->snprintf (dest, size, ":");
+            snprintf (dest, size, ":");
         }
 
-        temp = rb->strlen (dest);
+        temp = strlen (dest);
         dest += temp;
         size -= temp;
     }
@@ -245,7 +245,7 @@ plugin_start (const void *parameter)
 {
     int btn;
 
-    rb->mkdir (DEFAULT_SAVE_DIR);
+    mkdir (DEFAULT_SAVE_DIR);
 
     global_setup ();
 
@@ -258,12 +258,12 @@ plugin_start (const void *parameter)
     {
         if (parameter)
         {
-            rb->splashf (2 * HZ, "Loading %s failed.", (char *) parameter);
+            splashf (2 * HZ, "Loading %s failed.", (char *) parameter);
         }
 
         if (!load_game (DEFAULT_SAVE))
         {
-            rb->strcpy (save_file, DEFAULT_SAVE);
+            strcpy (save_file, DEFAULT_SAVE);
 
             if (!setup_game (MAX_BOARD_SIZE, MAX_BOARD_SIZE, 0, 0))
             {
@@ -274,12 +274,12 @@ plugin_start (const void *parameter)
     else
     {
         /* game loaded */
-        if (rb->strcmp (save_file, DEFAULT_SAVE))
+        if (strcmp (save_file, DEFAULT_SAVE))
         {
             /* delete the scratch file if we loaded a game and it wasn't
              * from the scratch file
              */
-            rb->remove (DEFAULT_SAVE);
+            remove (DEFAULT_SAVE);
         }
     }
 
@@ -288,12 +288,12 @@ plugin_start (const void *parameter)
     autosave_counter = 0;
     for (;;)
     {
-        btn = rb->button_get_w_tmo (HZ * 30);
+        btn = button_get_w_tmo (HZ * 30);
 
         if (disable_shutdown)
         {
             /* tell rockbox we're not idle */
-            rb->reset_poweroff_timer ();
+            reset_poweroff_timer ();
         }
 
         bool is_idle = false;
@@ -307,13 +307,13 @@ plugin_start (const void *parameter)
             if (nav_mode == NAV_MODE_TREE)
             {
                 nav_mode = NAV_MODE_BOARD;
-                rb->splash (2 * HZ / 3, "board navigation mode");
+                splash (2 * HZ / 3, "board navigation mode");
                 draw_screen_display ();
             }
             else
             {
                 nav_mode = NAV_MODE_TREE;
-                rb->splash (2 * HZ / 3, "tree navigation mode");
+                splash (2 * HZ / 3, "tree navigation mode");
                 draw_screen_display ();
             }
             break;
@@ -326,7 +326,7 @@ plugin_start (const void *parameter)
             {
                 if (!redo_node_sgf ())
                 {
-                    rb->splash (2 * HZ, "redo failed");
+                    splash (2 * HZ, "redo failed");
                 }
                 draw_screen_display ();
             }
@@ -340,7 +340,7 @@ plugin_start (const void *parameter)
             {
                 if (!undo_node_sgf ())
                 {
-                    rb->splash (3 * HZ / 2, "Undo Failed");
+                    splash (3 * HZ / 2, "Undo Failed");
                 }
                 draw_screen_display ();
             }
@@ -352,68 +352,68 @@ plugin_start (const void *parameter)
             {
                 if (!play_move_sgf (cursor_pos, current_player))
                 {
-                    rb->splash (HZ / 3, "Illegal Move");
+                    splash (HZ / 3, "Illegal Move");
                 }
             }
             else if (play_mode == MODE_ADD_BLACK)
             {
                 if (!add_stone_sgf (cursor_pos, BLACK))
                 {
-                    rb->splash (HZ / 3, "Illegal");
+                    splash (HZ / 3, "Illegal");
                 }
             }
             else if (play_mode == MODE_ADD_WHITE)
             {
                 if (!add_stone_sgf (cursor_pos, WHITE))
                 {
-                    rb->splash (HZ / 3, "Illegal");
+                    splash (HZ / 3, "Illegal");
                 }
             }
             else if (play_mode == MODE_REMOVE)
             {
                 if (!add_stone_sgf (cursor_pos, EMPTY))
                 {
-                    rb->splash (HZ / 3, "Illegal");
+                    splash (HZ / 3, "Illegal");
                 }
             }
             else if (play_mode == MODE_MARK)
             {
                 if (!add_mark_sgf (cursor_pos, PROP_MARK))
                 {
-                    rb->splash (HZ / 3, "Couldn't Mark");
+                    splash (HZ / 3, "Couldn't Mark");
                 }
             }
             else if (play_mode == MODE_CIRCLE)
             {
                 if (!add_mark_sgf (cursor_pos, PROP_CIRCLE))
                 {
-                    rb->splash (HZ / 3, "Couldn't Mark");
+                    splash (HZ / 3, "Couldn't Mark");
                 }
             }
             else if (play_mode == MODE_SQUARE)
             {
                 if (!add_mark_sgf (cursor_pos, PROP_SQUARE))
                 {
-                    rb->splash (HZ / 3, "Couldn't Mark");
+                    splash (HZ / 3, "Couldn't Mark");
                 }
             }
             else if (play_mode == MODE_TRIANGLE)
             {
                 if (!add_mark_sgf (cursor_pos, PROP_TRIANGLE))
                 {
-                    rb->splash (HZ / 3, "Couldn't Mark");
+                    splash (HZ / 3, "Couldn't Mark");
                 }
             }
             else if (play_mode == MODE_LABEL)
             {
                 if (!add_mark_sgf (cursor_pos, PROP_LABEL))
                 {
-                    rb->splash (HZ / 3, "Couldn't Label");
+                    splash (HZ / 3, "Couldn't Label");
                 }
             }
             else
             {
-                rb->splash (HZ, "mode not implemented");
+                splash (HZ, "mode not implemented");
             }
 
             draw_screen_display ();
@@ -428,7 +428,7 @@ plugin_start (const void *parameter)
                 {
                     if (!redo_node_sgf ())
                     {
-                        rb->splash (2 * HZ, "Redo Failed");
+                        splash (2 * HZ, "Redo Failed");
                     }
                     draw_screen_display ();
                 }
@@ -452,7 +452,7 @@ plugin_start (const void *parameter)
                 {
                     if (!undo_node_sgf ())
                     {
-                        rb->splash (2 * HZ, "Undo Failed");
+                        splash (2 * HZ, "Undo Failed");
                     }
                     draw_screen_display ();
                 }
@@ -506,7 +506,7 @@ plugin_start (const void *parameter)
             if ((temp = next_variation_sgf ()) >= 0)
             {
                 draw_screen_display ();
-                rb->splashf (2 * HZ / 3, "%d of %d", temp,
+                splashf (2 * HZ / 3, "%d of %d", temp,
                              num_variations_sgf ());
                 draw_screen_display ();
             }
@@ -514,7 +514,7 @@ plugin_start (const void *parameter)
             {
                 if (num_variations_sgf () > 1)
                 {
-                    rb->splashf (HZ, "Error %d in next_variation_sgf", temp);
+                    splashf (HZ, "Error %d in next_variation_sgf", temp);
                 }
                 draw_screen_display ();
             }
@@ -525,7 +525,7 @@ plugin_start (const void *parameter)
         case BUTTON_NONE:
             is_idle = true;
         default:
-            if (rb->default_event_handler (btn) == SYS_USB_CONNECTED)
+            if (default_event_handler (btn) == SYS_USB_CONNECTED)
             {
                 return PLUGIN_USB_CONNECTED;
             }
@@ -543,7 +543,7 @@ plugin_start (const void *parameter)
                  */
             {
                 DEBUGF("autosaving\n");
-                rb->splash(HZ / 4, "Autosaving...");
+                splash(HZ / 4, "Autosaving...");
                 save_game(DEFAULT_SAVE);
                 draw_screen_display();
                 autosave_counter = 0;
@@ -632,16 +632,16 @@ do_main_menu (void)
 
     while (!done)
     {
-        selection = rb->do_menu (&menu, &selection, NULL, false);
+        selection = do_menu (&menu, &selection, NULL, false);
 
         switch (selection)
         {
         case MAIN_NEW:
-            rb->set_int ("board size", "lines", UNIT_INT,
+            set_int ("board size", "lines", UNIT_INT,
                          &new_bs, NULL, 1, MIN_BOARD_SIZE, MAX_BOARD_SIZE,
                          NULL);
 
-            rb->set_int ("handicap", "stones", UNIT_INT,
+            set_int ("handicap", "stones", UNIT_INT,
                          &new_handi, NULL, 1, 0, 9, NULL);
 
             if (new_handi > 0)
@@ -653,7 +653,7 @@ do_main_menu (void)
                 new_komi = 13;
             }
 
-            rb->set_int ("komi", "moku", UNIT_INT, &new_komi, NULL,
+            set_int ("komi", "moku", UNIT_INT, &new_komi, NULL,
                          1, -300, 300, &komi_formatter);
 
             setup_game (new_bs, new_bs, new_handi, new_komi);
@@ -664,32 +664,32 @@ do_main_menu (void)
         case MAIN_SAVE:
             if (!save_game (save_file))
             {
-                rb->splash (2 * HZ, "Save Failed!");
+                splash (2 * HZ, "Save Failed!");
             }
             else
             {
-                rb->splash (2 * HZ / 3, "Saved");
+                splash (2 * HZ / 3, "Saved");
             }
             done = true;
             draw_screen_display ();
             break;
 
         case MAIN_SAVE_AS:
-            rb->strcpy (new_save_file, save_file);
+            strcpy (new_save_file, save_file);
 
-            if (!rb->kbd_input (new_save_file, SAVE_FILE_LENGTH))
+            if (!kbd_input (new_save_file, SAVE_FILE_LENGTH))
             {
                 break;
             }
 
             if (!save_game (new_save_file))
             {
-                rb->splash (2 * HZ, "Save Failed!");
+                splash (2 * HZ, "Save Failed!");
             }
             else
             {
-                rb->strcpy (save_file, new_save_file);
-                rb->splash (2 * HZ / 3, "Saved");
+                strcpy (save_file, new_save_file);
+                splash (2 * HZ / 3, "Saved");
             }
 
             done = true;
@@ -707,7 +707,7 @@ do_main_menu (void)
             }
             else
             {
-                rb->splash (1 * HZ, "Audio has been disabled!");
+                splash (1 * HZ, "Audio has been disabled!");
             }
             break;
 
@@ -750,7 +750,7 @@ zoom_preview (int current)
 {
     set_zoom_display (current);
     draw_screen_display ();
-    rb->splash (0, "Preview");
+    splash (0, "Preview");
 }
 
 static bool
@@ -770,19 +770,19 @@ do_zoom (void)
     zoom_preview (zoom_level);
     while (!done)
     {
-        switch (action = rb->get_action (CONTEXT_LIST, TIMEOUT_BLOCK))
+        switch (action = get_action (CONTEXT_LIST, TIMEOUT_BLOCK))
         {
         case ACTION_STD_OK:
             set_zoom_display (zoom_level);
             done = true;
-            rb->splash (HZ / 2, "Zoom Set");
+            splash (HZ / 2, "Zoom Set");
             saved_circle_size = intersection_size;
             break;
 
         case ACTION_STD_CANCEL:
             set_zoom_display (old_val);
             done = true;
-            rb->splash (HZ / 2, "Cancelled");
+            splash (HZ / 2, "Cancelled");
             break;
 
         case ACTION_STD_CONTEXT:
@@ -823,7 +823,7 @@ do_zoom (void)
             break;
 
         default:
-            if (rb->default_event_handler (action) == SYS_USB_CONNECTED)
+            if (default_event_handler (action) == SYS_USB_CONNECTED)
             {
                 return true;
             }
@@ -896,7 +896,7 @@ do_gameinfo_menu (void)
 
     while (!done)
     {
-        selection = rb->do_menu (&gameinfo_menu, &selection, NULL, false);
+        selection = do_menu (&gameinfo_menu, &selection, NULL, false);
 
         switch (selection)
         {
@@ -917,11 +917,11 @@ do_gameinfo_menu (void)
                                              (selection), &gameinfo_string,
                                              &gameinfo_string_size))
             {
-                rb->splash (3 * HZ, "Couldn't get header string");
+                splash (3 * HZ, "Couldn't get header string");
                 break;
             }
 
-            rb->kbd_input (gameinfo_string, gameinfo_string_size);
+            kbd_input (gameinfo_string, gameinfo_string_size);
             sanitize_string (gameinfo_string);
             set_game_modified();
             break;
@@ -934,29 +934,29 @@ do_gameinfo_menu (void)
             break;
 
         case GINFO_TIME_LIMIT:
-            rb->set_int ("Time Limit", "", UNIT_INT, &header.time_limit,
+            set_int ("Time Limit", "", UNIT_INT, &header.time_limit,
                          NULL, 60, 0, 24 * 60 * 60, &time_formatter);
             set_game_modified();
             break;
 
         case GINFO_HANDICAP:
-            rb->splashf (0, "%d stones.  Start a new game to set handicap",
+            splashf (0, "%d stones.  Start a new game to set handicap",
                          header.handicap);
-            rb->action_userabort(TIMEOUT_BLOCK);
+            action_userabort(TIMEOUT_BLOCK);
             break;
 
         case GINFO_KOMI:
-            rb->set_int ("Komi", "moku", UNIT_INT, &header.komi, NULL,
+            set_int ("Komi", "moku", UNIT_INT, &header.komi, NULL,
                          1, -300, 300, &komi_formatter);
             set_game_modified();
             break;
 
         case GINFO_RULESET:
             new_ruleset = 0;
-            rb->set_int ("Ruleset", "", UNIT_INT, &new_ruleset, NULL,
+            set_int ("Ruleset", "", UNIT_INT, &new_ruleset, NULL,
                          1, 0, NUM_RULESETS - 1, &ruleset_formatter);
 
-            rb->strcpy (header.ruleset, ruleset_names[new_ruleset]);
+            strcpy (header.ruleset, ruleset_names[new_ruleset]);
             set_game_modified();
             break;
 
@@ -1014,7 +1014,7 @@ do_context_menu (void)
 
     while (!done)
     {
-        selection = rb->do_menu (&context_menu, &selection, NULL, false);
+        selection = do_menu (&context_menu, &selection, NULL, false);
 
         switch (selection)
         {
@@ -1041,7 +1041,7 @@ do_context_menu (void)
         case CTX_PASS:
             if (!play_move_sgf (PASS_POS, current_player))
             {
-                rb->splash (HZ, "Error while passing!");
+                splash (HZ, "Error while passing!");
             }
             done = true;
             break;
@@ -1050,7 +1050,7 @@ do_context_menu (void)
             if ((temp = next_variation_sgf ()) >= 0)
             {
                 draw_screen_display ();
-                rb->splashf (2 * HZ / 3, "%d of %d", temp,
+                splashf (2 * HZ / 3, "%d of %d", temp,
                              num_variations_sgf ());
                 draw_screen_display ();
             }
@@ -1058,11 +1058,11 @@ do_context_menu (void)
             {
                 if (num_variations_sgf () > 1)
                 {
-                    rb->splashf (HZ, "Error %d in next_variation_sgf", temp);
+                    splashf (HZ, "Error %d in next_variation_sgf", temp);
                 }
                 else
                 {
-                    rb->splash (HZ, "No next variation");
+                    splash (HZ, "No next variation");
                 }
             }
             break;
@@ -1101,7 +1101,7 @@ do_context_menu (void)
             if (!do_comment_edit ())
             {
                 DEBUGF ("Editing comment failed\n");
-                rb->splash (HZ, "Read or write failed!\n");
+                splash (HZ, "Read or write failed!\n");
             }
             done = true;
             break;
@@ -1139,12 +1139,12 @@ do_options_menu (void)
 
     while (!done)
     {
-        selection = rb->do_menu (&options_menu, &selection, NULL, false);
+        selection = do_menu (&options_menu, &selection, NULL, false);
 
         switch (selection)
         {
         case OMENU_SHOW_VARIATIONS:
-            rb->set_bool("Draw Variations?", &draw_variations);
+            set_bool("Draw Variations?", &draw_variations);
             clear_marks_display ();
             set_all_marks_sgf ();
             if (draw_variations)
@@ -1154,18 +1154,18 @@ do_options_menu (void)
             break;
 
         case OMENU_DISABLE_POWEROFF:
-            rb->set_bool("Disable Idle Poweroff?", &disable_shutdown);
+            set_bool("Disable Idle Poweroff?", &disable_shutdown);
             break;
 
         case OMENU_AUTOSAVE_TIME:
-            rb->set_int("Idle Autosave Time", "minutes", UNIT_INT,
+            set_int("Idle Autosave Time", "minutes", UNIT_INT,
                         &autosave_time, NULL, 1, 0, MAX_AUTOSAVE,
                         &autosave_formatter);
             autosave_counter = 0;
             break;
 
         case OMENU_AUTO_COMMENT:
-            rb->set_bool("Auto Show Comments?", &auto_show_comments);
+            set_bool("Auto Show Comments?", &auto_show_comments);
             break;
 
         case GO_TO_ROOT:
@@ -1184,14 +1184,14 @@ do_comment_edit (void)
 {
     char cbuffer[512];
 
-    rb->memset (cbuffer, 0, sizeof (cbuffer));
+    memset (cbuffer, 0, sizeof (cbuffer));
 
     if (read_comment_sgf (cbuffer, sizeof (cbuffer)) < 0)
     {
         return false;
     }
 
-    if (!rb->kbd_input (cbuffer, sizeof (cbuffer)))
+    if (!kbd_input (cbuffer, sizeof (cbuffer)))
     {
         /* user didn't edit, no reason to write it back */
         return true;

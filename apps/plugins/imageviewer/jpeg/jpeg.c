@@ -113,64 +113,64 @@ static int load_image(char *filename, struct image_info *info,
                       unsigned char *buf, ssize_t *buf_size)
 {
     int fd;
-    int filesize;
+    int file_size;
     unsigned char* buf_jpeg; /* compressed JPEG image */
     int status;
     struct jpeg *p_jpg = &jpg;
 
-    rb->memset(&disp, 0, sizeof(disp));
-    rb->memset(&jpg, 0, sizeof(jpg));
+    memset(&disp, 0, sizeof(disp));
+    memset(&jpg, 0, sizeof(jpg));
 
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splashf(HZ, "err opening %s: %d", filename, fd);
+        splashf(HZ, "err opening %s: %d", filename, fd);
         return PLUGIN_ERROR;
     }
-    filesize = rb->filesize(fd);
+    file_size = filesize(fd);
 
     /* allocate JPEG buffer */
     buf_jpeg = buf;
 
     /* we can start the decompressed images behind it */
-    buf_images = buf_root = buf + filesize;
-    buf_images_size = root_size = *buf_size - filesize;
+    buf_images = buf_root = buf + file_size;
+    buf_images_size = root_size = *buf_size - file_size;
 
     if (buf_images_size <= 0)
     {
-        rb->close(fd);
+        close(fd);
         return PLUGIN_OUTOFMEM;
     }
 
     if(!iv->running_slideshow)
     {
-        rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
-        rb->lcd_putsf(0, 1, "loading %d bytes", filesize);
-        rb->lcd_update();
+        lcd_puts(0, 0, strrchr(filename,'/')+1);
+        lcd_putsf(0, 1, "loading %d bytes", file_size);
+        lcd_update();
     }
 
-    rb->read(fd, buf_jpeg, filesize);
-    rb->close(fd);
+    read(fd, buf_jpeg, file_size);
+    close(fd);
 
     if(!iv->running_slideshow)
     {
-        rb->lcd_puts(0, 2, "decoding markers");
-        rb->lcd_update();
+        lcd_puts(0, 2, "decoding markers");
+        lcd_update();
     }
 #ifdef DISK_SPINDOWN
     else if(iv->immediate_ata_off)
     {
         /* running slideshow and time is long enough: power down disk */
-        rb->storage_sleep();
+        storage_sleep();
     }
 #endif
 
     /* process markers, unstuffing */
-    status = process_markers(buf_jpeg, filesize, p_jpg);
+    status = process_markers(buf_jpeg, file_size, p_jpg);
 
     if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
-        rb->splashf(HZ, "unsupported %d", status);
+        splashf(HZ, "unsupported %d", status);
         return PLUGIN_ERROR;
     }
 
@@ -180,8 +180,8 @@ static int load_image(char *filename, struct image_info *info,
 
     if(!iv->running_slideshow)
     {
-        rb->lcd_putsf(0, 2, "image %dx%d", p_jpg->x_size, p_jpg->y_size);
-        rb->lcd_update();
+        lcd_putsf(0, 2, "image %dx%d", p_jpg->x_size, p_jpg->y_size);
+        lcd_update();
     }
 
     info->x_size = p_jpg->x_size;
@@ -252,35 +252,35 @@ static int get_image(struct image_info *info, int ds)
 
     if(!iv->running_slideshow)
     {
-        rb->lcd_putsf(0, 3, "decoding %d*%d", info->width, info->height);
-        rb->lcd_update();
+        lcd_putsf(0, 3, "decoding %d*%d", info->width, info->height);
+        lcd_update();
     }
 
     /* update image properties */
     p_disp->stride = p_jpg->x_phys / ds; /* use physical size for stride */
 
     /* the actual decoding */
-    time = *rb->current_tick;
+    time = current_tick;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
     status = jpeg_decode(p_jpg, p_disp->bitmap, ds, iv->cb_progress);
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #else
     status = jpeg_decode(p_jpg, p_disp->bitmap, ds, iv->cb_progress);
 #endif
     if (status)
     {
-        rb->splashf(HZ, "decode error %d", status);
+        splashf(HZ, "decode error %d", status);
         return PLUGIN_ERROR;
     }
-    time = *rb->current_tick - time;
+    time = current_tick - time;
 
     if(!iv->running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), " %ld.%02ld sec ", time/HZ, time%HZ);
-        rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
-        rb->lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
-        rb->lcd_update();
+        snprintf(print, sizeof(print), " %ld.%02ld sec ", time/HZ, time%HZ);
+        lcd_getstringsize(print, &w, &h); /* centered in progress bar */
+        lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
+        lcd_update();
     }
 
     return PLUGIN_OK;

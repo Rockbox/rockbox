@@ -39,9 +39,9 @@
 #define READ_TIMER(name) (spc_timer_##name##_total)
 #define RESET_TIMER(name) spc_timer_##name##_total=0
 
-#define PRINT_TIMER_PCT(bname,tname,nstr) ci->fdprintf( \
+#define PRINT_TIMER_PCT(bname,tname,nstr) fdprintf( \
     logfd,"%10ld ",READ_TIMER(bname));\
-    ci->fdprintf(logfd,"(%3d%%) " nstr "\t",\
+    fdprintf(logfd,"(%3d%%) " nstr "\t",\
     ((uint64_t)READ_TIMER(bname))*100/READ_TIMER(tname))
 
 CREATE_TIMER(total);

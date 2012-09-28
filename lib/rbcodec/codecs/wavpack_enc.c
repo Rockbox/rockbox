@@ -203,7 +203,7 @@ static inline bool on_write_chunk(struct enc_file_event_data *data)
     if (data->chunk->enc_data == NULL)
     {
 #ifdef ROCKBOX_HAS_LOGF
-        ci->logf("wvpk enc: NULL data");
+        logf("wvpk enc: NULL data");
 #endif
         return true;
     }
@@ -212,7 +212,7 @@ static inline bool on_write_chunk(struct enc_file_event_data *data)
     ((WavpackHeader *)data->chunk->enc_data)->block_index =
             htole32(data->num_pcm_samples);
 
-    if (ci->write(data->rec_file, data->chunk->enc_data,
+    if (write(data->rec_file, data->chunk->enc_data,
                   data->chunk->enc_size) != (ssize_t)data->chunk->enc_size)
         return false;
 
@@ -225,7 +225,7 @@ static bool on_start_file(struct enc_file_event_data *data)
     if ((data->chunk->flags & CHUNKF_ERROR) || *data->filename == '\0')
         return false;
 
-    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
+    data->rec_file = open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
 
     if (data->rec_file < 0)
         return false;
@@ -234,9 +234,9 @@ static bool on_start_file(struct enc_file_event_data *data)
     data->num_pcm_samples = 0;
 
     /* write template headers */
-    if (ci->write(data->rec_file, &wvpk_mdh, sizeof (wvpk_mdh)) 
+    if (write(data->rec_file, &wvpk_mdh, sizeof (wvpk_mdh)) 
             != sizeof (wvpk_mdh) ||
-        ci->write(data->rec_file, &riff_header, sizeof (riff_header))
+        write(data->rec_file, &riff_header, sizeof (riff_header))
             != sizeof (riff_header))
     {
         return false;
@@ -263,8 +263,8 @@ static bool on_end_file(struct enc_file_event_data *data)
     /* always _try_ to write the file header, even on error */
 
     /* read template headers at start */
-    if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
-        ci->read(data->rec_file, &h, sizeof (h)) != sizeof (h))
+    if (lseek(data->rec_file, 0, SEEK_SET) != 0 ||
+        read(data->rec_file, &h, sizeof (h)) != sizeof (h))
         return false;
 
     data_size = data->num_pcm_samples*config.num_channels*PCM_DEPTH_BYTES;
@@ -289,15 +289,15 @@ static bool on_end_file(struct enc_file_event_data *data)
     h.wph.total_samples = htole32(data->num_pcm_samples);
 
     /* MDH|RIFF|WVPK => WVPK|MDH|RIFF */
-    if (ci->lseek(data->rec_file, 0, SEEK_SET)
+    if (lseek(data->rec_file, 0, SEEK_SET)
             != 0 ||
-        ci->write(data->rec_file, &h.wph, sizeof (h.wph))
+        write(data->rec_file, &h.wph, sizeof (h.wph))
             != sizeof (h.wph) ||
-        ci->write(data->rec_file, &h.wpmdh, sizeof (h.wpmdh))
+        write(data->rec_file, &h.wpmdh, sizeof (h.wpmdh))
             != sizeof (h.wpmdh) ||
-        ci->write(data->rec_file, &h.rhdr, sizeof (h.rhdr))
+        write(data->rec_file, &h.rhdr, sizeof (h.rhdr))
             != sizeof (h.rhdr) ||
-        ci->close(data->rec_file) != 0 )
+        close(data->rec_file) != 0 )
     {
         return false;
     }
@@ -347,15 +347,15 @@ static bool init_encoder(void)
     
     codec_init();
 
-    if (ci->enc_get_inputs         == NULL ||
-        ci->enc_set_parameters     == NULL ||
-        ci->enc_get_chunk          == NULL ||
-        ci->enc_finish_chunk       == NULL ||
-        ci->enc_get_pcm_data       == NULL ||
-        ci->enc_unget_pcm_data     == NULL )
+    if (enc_get_inputs         == NULL ||
+        enc_set_parameters     == NULL ||
+        enc_get_chunk          == NULL ||
+        enc_finish_chunk       == NULL ||
+        enc_get_pcm_data       == NULL ||
+        enc_unget_pcm_data     == NULL )
         return false;
 
-    ci->enc_get_inputs(&inputs);
+    enc_get_inputs(&inputs);
 
     if (inputs.config->afmt != AFMT_WAVPACK)
         return false;
@@ -373,7 +373,7 @@ static bool init_encoder(void)
 
     err = 0;
 
-    /* configure the buffer system */
+    /* codec_configure the buffer system */
     params.afmt            = AFMT_WAVPACK;
     input_size             = PCM_CHUNK_SIZE*inputs.num_channels / 2;
     data_size              = 105*input_size / 100;
@@ -384,7 +384,7 @@ static bool init_encoder(void)
     params.reserve_bytes   = 0;
     params.events_callback = enc_events_callback;
 
-    ci->enc_set_parameters(&params);
+    enc_set_parameters(&params);
 
     return true;
 } /* init_encoder */
@@ -399,7 +399,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     }
     else if (reason == CODEC_UNLOAD) {
         /* reset parameters to initial state */
-        ci->enc_set_parameters(NULL);
+        enc_set_parameters(NULL);
     }
 
     return CODEC_OK;
@@ -409,9 +409,9 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 enum codec_status codec_run(void)
 {
     /* main encoding loop */
-    while(ci->get_command(NULL) != CODEC_ACTION_HALT)
+    while(codec_get_command(NULL) != CODEC_ACTION_HALT)
     {
-        uint8_t *src = (uint8_t *)ci->enc_get_pcm_data(PCM_CHUNK_SIZE);
+        uint8_t *src = (uint8_t *)enc_get_pcm_data(PCM_CHUNK_SIZE);
         struct enc_chunk_hdr *chunk;
         bool abort_chunk;
         uint8_t *dst;
@@ -420,7 +420,7 @@ enum codec_status codec_run(void)
         if(src == NULL)
             continue;
 
-        chunk = ci->enc_get_chunk();
+        chunk = enc_get_chunk();
 
         /* reset counts and pointer */
         chunk->enc_size = 0;
@@ -443,7 +443,7 @@ enum codec_status codec_run(void)
                                    PCM_SAMP_PER_CHUNK/4))
             {
                 chunk->num_pcm += PCM_SAMP_PER_CHUNK/4;
-                ci->yield();
+                yield();
                 /* could've been stopped in some way */
                 abort_chunk = chunk->flags & CHUNKF_ABORT;
             }
@@ -456,10 +456,10 @@ enum codec_status codec_run(void)
         {
             chunk->enc_data = dst;
             if (chunk->num_pcm < PCM_SAMP_PER_CHUNK)
-                ci->enc_unget_pcm_data(PCM_CHUNK_SIZE - chunk->num_pcm*4);
+                enc_unget_pcm_data(PCM_CHUNK_SIZE - chunk->num_pcm*4);
             /* finish the chunk and store chunk size info */
             chunk->enc_size = WavpackFinishBlock(wpc);
-            ci->enc_finish_chunk();
+            enc_finish_chunk();
         }
     }
 

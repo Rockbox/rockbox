@@ -34,7 +34,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, WMAPRO_DSP_SAMPLE_DEPTH);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, WMAPRO_DSP_SAMPLE_DEPTH);
     }
 
     return CODEC_OK;
@@ -63,12 +63,12 @@ restart_track:
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This
        saves us from parsing it again here. */
-    memcpy(&wfx, ci->id3->toc, sizeof(wfx));
+    memcpy(&wfx, ci.id3->toc, sizeof(wfx));
     
-    ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
-    ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
+    codec_configure(DSP_SWITCH_FREQUENCY, wfx.rate);
+    codec_configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
     
     if (decode_init(&wfx) < 0) {
         LOGF("(WMA PRO) Error: Unsupported or corrupt file\n");
@@ -76,16 +76,16 @@ restart_track:
     }
 
     /* Now advance the file position to the first frame */
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    codec_seek_buffer(ci.id3->first_frame_offset);
     
     elapsedtime = 0;
-    ci->set_elapsed(0);
+    audio_codec_update_elapsed(0);
     
     /* The main decoding loop */
 
     while (pktcnt < wfx.numpackets)
     { 
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -93,20 +93,20 @@ restart_track:
         /* Deal with any pending seek requests */
         if (action == CODEC_ACTION_SEEK_TIME) {
             if (param == 0) {
-                ci->set_elapsed(0);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_complete();
                 goto restart_track; /* Pretend you never saw this... */
             }
 
             elapsedtime = asf_seek(param, &wfx);
             if (elapsedtime < 1){
-                ci->set_elapsed(0);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_complete();
                 break;
             }
 
-            ci->set_elapsed(elapsedtime);
-            ci->seek_complete();
+            audio_codec_update_elapsed(elapsedtime);
+            codec_seek_complete();
         }
 
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
@@ -132,19 +132,19 @@ restart_track:
                 data += res;
                 size -= res;
                 if(outlen) {
-                    ci->yield ();
+                    yield ();
                     outlen /= (wfx.channels);
-                    ci->pcmbuf_insert(dec[0], dec[1], outlen );
+                    codec_pcmbuf_insert(dec[0], dec[1], outlen );
                     elapsedtime += outlen*10/(wfx.rate/100);
-                    ci->set_elapsed(elapsedtime);
-                    ci->yield ();
+                    audio_codec_update_elapsed(elapsedtime);
+                    yield ();
                 }
             }
 
         }
 
         /* Advance to the next logical packet */
-        ci->advance_buffer(packetlength);
+        codec_advance_buffer(packetlength);
     }
 
     return CODEC_OK;

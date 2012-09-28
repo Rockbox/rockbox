@@ -926,8 +926,8 @@ static void make_food(int index)
     do {
         /* make coordinates for a new food so that
            the entire food lies within the FIELD */
-        x = rb->rand() % (FIELD_RECT_WIDTH  - food_size);
-        y = rb->rand() % (FIELD_RECT_HEIGHT - food_size);
+        x = rand() % (FIELD_RECT_WIDTH  - food_size);
+        y = rand() % (FIELD_RECT_HEIGHT - food_size);
         collisionDetected = false;
         /* Ensure that the new food doesn't collide with any
            existing foods or arghs.
@@ -967,11 +967,11 @@ static void make_food(int index)
 static void clear_food(int index)
 {
     /* remove the old food from the screen */
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(foodx[index] + FIELD_RECT_X,
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(foodx[index] + FIELD_RECT_X,
                      foody[index] + FIELD_RECT_Y,
                      food_size, food_size);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /**
@@ -984,18 +984,18 @@ static void draw_food(int index)
 {
     /* draw the food object */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_FOOD);
+    lcd_set_foreground(COLOR_FOOD);
 #endif
-    rb->lcd_fillrect(foodx[index] + FIELD_RECT_X,
+    lcd_fillrect(foodx[index] + FIELD_RECT_X,
                      foody[index] + FIELD_RECT_Y,
                      food_size, food_size);
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(foodx[index] + FIELD_RECT_X + 1,
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(foodx[index] + FIELD_RECT_X + 1,
                      foody[index] + FIELD_RECT_Y + 1,
                      food_size - 2, food_size - 2);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_FG);
+    lcd_set_foreground(COLOR_FG);
 #endif
 }
 
@@ -1015,8 +1015,8 @@ static void make_argh(int index)
     do {
         /* make coordinates for a new argh so that
            the entire food lies within the FIELD */
-        x = rb->rand() % (FIELD_RECT_WIDTH  - argh_size);
-        y = rb->rand() % (FIELD_RECT_HEIGHT - argh_size);
+        x = rand() % (FIELD_RECT_WIDTH  - argh_size);
+        y = rand() % (FIELD_RECT_HEIGHT - argh_size);
         collisionDetected = false;
         /* Ensure that the new argh doesn't intersect with any
            existing foods or arghs.
@@ -1056,13 +1056,13 @@ static void draw_argh(int index)
 {
     /* draw the new argh */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_ARGH);
+    lcd_set_foreground(COLOR_ARGH);
 #endif
-    rb->lcd_fillrect(arghx[index] + FIELD_RECT_X,
+    lcd_fillrect(arghx[index] + FIELD_RECT_X,
                      arghy[index] + FIELD_RECT_Y,
                      argh_size, argh_size);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_FG);
+    lcd_set_foreground(COLOR_FG);
 #endif
 }
 
@@ -1175,7 +1175,7 @@ static void init_wormlet(void)
     }
 
     /* Needed when the game is restarted using BTN_STOPRESET */
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* make and display some food and argh */
     argh_count = MAX_FOOD;
@@ -1187,13 +1187,13 @@ static void init_wormlet(void)
     }
 
     /* draw the game field */
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(0, 0, FIELD_RECT_WIDTH + 2, FIELD_RECT_HEIGHT + 2);
-    rb->lcd_fillrect(1, 1, FIELD_RECT_WIDTH, FIELD_RECT_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_fillrect(0, 0, FIELD_RECT_WIDTH + 2, FIELD_RECT_HEIGHT + 2);
+    lcd_fillrect(1, 1, FIELD_RECT_WIDTH, FIELD_RECT_HEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     /* make everything visible */
-    rb->lcd_update();
+    lcd_update();
 }
 
 
@@ -1285,23 +1285,23 @@ static void draw_worm(struct worm *w)
     int x = w->x[w->head];
     int y = w->y[w->head];
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_WORM);
+    lcd_set_foreground(COLOR_WORM);
 #endif
     if (x >= 0 && x < FIELD_RECT_WIDTH && y >= 0 && y < FIELD_RECT_HEIGHT) {
-        rb->lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
+        lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
     }
 
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
 
     /* clear the space behind the worm */
     x = w->x[w->tail] ;
     y = w->y[w->tail] ;
     if (x >= 0 && x < FIELD_RECT_WIDTH && y >= 0 && y < FIELD_RECT_HEIGHT) {
-        rb->lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
+        lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_FG);
+    lcd_set_foreground(COLOR_FG);
 #endif
 }
 
@@ -1615,10 +1615,10 @@ static void score_board(void)
 {
     int i;
     int y = 0;
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(FIELD_RECT_WIDTH + 2, 0,
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(FIELD_RECT_WIDTH + 2, 0,
                      LCD_WIDTH - FIELD_RECT_WIDTH - 2, LCD_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
     for (i = 0; i < worm_count; i++) {
         int score = get_score(&worms[i]);
         int collision = check_collision(&worms[i]);
@@ -1643,21 +1643,21 @@ static void score_board(void)
         }
 
         /* length */
-        rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, y  , "Len:%d", score);
-        rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, y+8, state_str);
+        lcd_putsxyf(FIELD_RECT_WIDTH + 3, y  , "Len:%d", score);
+        lcd_putsxyf(FIELD_RECT_WIDTH + 3, y+8, state_str);
 
         if (!worms[i].alive){
-            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-            rb->lcd_fillrect(FIELD_RECT_WIDTH + 2, y,
+            lcd_set_drawmode(DRMODE_COMPLEMENT);
+            lcd_fillrect(FIELD_RECT_WIDTH + 2, y,
                              LCD_WIDTH - FIELD_RECT_WIDTH - 2, 17);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
+            lcd_set_drawmode(DRMODE_SOLID);
         }
         y += 19;
     }
 #ifdef DEBUG_WORMLET
-    rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, "ticks %d", max_cycle);
+    lcd_putsxyf(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, "ticks %d", max_cycle);
 #else
-    rb->lcd_putsxyf(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, "Hs: %d", highscore);
+    lcd_putsxyf(FIELD_RECT_WIDTH + 3, LCD_HEIGHT - 8, "Hs: %d", highscore);
 #endif
 }
 
@@ -1735,7 +1735,7 @@ static int run(void)
     /* initialize the board and so on */
     init_wormlet();
 
-    cycle_start = *rb->current_tick;
+    cycle_start = current_tick;
     /* change the direction of the worm */
     while (!wormDead)
     {
@@ -1743,7 +1743,7 @@ static int run(void)
         long cycle_duration=0;
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold())
+        if (button_hold())
         paused = true;
 #endif
 
@@ -1829,7 +1829,7 @@ static int run(void)
                 draw_worm(w);
             }
             score_board();
-            rb->lcd_update();
+            lcd_update();
             if (button == BTN_STOPRESET) {
                 wormDead = true;
             }
@@ -1837,7 +1837,7 @@ static int run(void)
             /* here the wormlet game cycle ends
                thus the current tick is stored
                as end time */
-            cycle_end = *rb->current_tick;
+            cycle_end = current_tick;
 
             /* The duration of the game cycle */
             cycle_duration = cycle_end - cycle_start;
@@ -1860,11 +1860,11 @@ static int run(void)
         /* adjust the number of ticks to wait for a button.
            This ensures that a complete game cycle including
            user input runs in constant time */
-        button = rb->button_get_w_tmo(speed - cycle_duration);
-        cycle_start = *rb->current_tick;
+        button = button_get_w_tmo(speed - cycle_duration);
+        cycle_start = current_tick;
     }
 
-    rb->splash(HZ*2, "Game Over!");
+    splash(HZ*2, "Game Over!");
 
     return 2; /* back to menu */
 }
@@ -1879,7 +1879,7 @@ static void test_worm_food_collision(void)
 {
     int collision_count = 0;
     int i;
-    rb->lcd_clear_display();
+    lcd_clear_display();
     init_worm(&worms[0], 10, 10);
     add_growing(&worms[0], 10);
     set_worm_dir(&worms[0], EAST);
@@ -1904,11 +1904,11 @@ static void test_worm_food_collision(void)
         if (collision) {
             collision_count++;
         }
-        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
-        rb->lcd_update();
+        lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
+        lcd_update();
     }
     if (collision_count != food_size) {
-        rb->button_get(true);
+        button_get(true);
     }
 
 
@@ -1921,11 +1921,11 @@ static void test_worm_food_collision(void)
         if (collision) {
             collision_count ++;
         }
-        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
-        rb->lcd_update();
+        lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
+        lcd_update();
     }
     if (collision_count != food_size * 2) {
-        rb->button_get(true);
+        button_get(true);
     }
 
 }
@@ -1949,7 +1949,7 @@ static void test_worm_argh_collision(void)
     int i;
     int dir;
     int collision_count = 0;
-    rb->lcd_clear_display();
+    lcd_clear_display();
     init_worm(&worms[0], 10, 10);
     add_growing(&worms[0], 40);
     for (dir = 0; dir < 4; dir++) {
@@ -1968,11 +1968,11 @@ static void test_worm_argh_collision(void)
         if (collision) {
             collision_count ++;
         }
-        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
-        rb->lcd_update();
+        lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
+        lcd_update();
     }
     if (collision_count != argh_size * 2) {
-        rb->button_get(true);
+        button_get(true);
     }
 
     arghy[0] = 12;
@@ -1983,11 +1983,11 @@ static void test_worm_argh_collision(void)
         if (collision) {
             collision_count ++;
         }
-        rb->lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
-        rb->lcd_update();
+        lcd_putsxyf(0, LCD_HEIGHT -8, "collisions: %d", collision_count);
+        lcd_update();
     }
     if (collision_count != argh_size * 4) {
-        rb->button_get(true);
+        button_get(true);
     }
 }
 
@@ -2008,11 +2008,11 @@ static int testline_in_rect(void)
 
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_update();
-        rb->lcd_putsxy(0, 0, "failed 1");
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_update();
+        lcd_putsxy(0, 0, "failed 1");
+        button_get(true);
         testfailed = 1;
     }
 
@@ -2020,11 +2020,11 @@ static int testline_in_rect(void)
     y2 = 20;
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 2");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 2");
+        lcd_update();
+        button_get(true);
         testfailed = 2;
     }
 
@@ -2032,11 +2032,11 @@ static int testline_in_rect(void)
     y1 = 30;
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 3");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 3");
+        lcd_update();
+        button_get(true);
         testfailed = 3;
     }
 
@@ -2044,11 +2044,11 @@ static int testline_in_rect(void)
     y2 = 45;
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 4");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 4");
+        lcd_update();
+        button_get(true);
         testfailed = 4;
     }
 
@@ -2056,11 +2056,11 @@ static int testline_in_rect(void)
     y1 = 50;
     if (line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) ||
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 5");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 5");
+        lcd_update();
+        button_get(true);
         testfailed = 5;
     }
 
@@ -2069,11 +2069,11 @@ static int testline_in_rect(void)
     y2 = 7;
     if (line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) ||
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 6");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 6");
+        lcd_update();
+        button_get(true);
         testfailed = 6;
     }
 
@@ -2084,11 +2084,11 @@ static int testline_in_rect(void)
     y2 = 20;
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 7");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 7");
+        lcd_update();
+        button_get(true);
         testfailed = 7;
     }
 
@@ -2096,11 +2096,11 @@ static int testline_in_rect(void)
     x2 = 12;
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 8");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 8");
+        lcd_update();
+        button_get(true);
         testfailed = 8;
     }
 
@@ -2108,11 +2108,11 @@ static int testline_in_rect(void)
     x1 = 25;
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 9");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 9");
+        lcd_update();
+        button_get(true);
         testfailed = 9;
     }
 
@@ -2120,11 +2120,11 @@ static int testline_in_rect(void)
     x2 = 37;
     if (!line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
         !line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 10");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 10");
+        lcd_update();
+        button_get(true);
         testfailed = 10;
     }
 
@@ -2132,11 +2132,11 @@ static int testline_in_rect(void)
     x1 = 42;
     if (line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) ||
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 11");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 11");
+        lcd_update();
+        button_get(true);
         testfailed = 11;
     }
 
@@ -2145,11 +2145,11 @@ static int testline_in_rect(void)
     x2 = 7;
     if (line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) ||
         line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh)) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 12");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 12");
+        lcd_update();
+        button_get(true);
         testfailed = 12;
     }
 
@@ -2165,11 +2165,11 @@ static int testline_in_rect(void)
     y2 = 20;
     if (!(line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
           line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh))) {
-        rb->lcd_drawrect(rx, ry, rw, rh);
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_putsxy(0, 0, "failed 13");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawrect(rx, ry, rw, rh);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_putsxy(0, 0, "failed 13");
+        lcd_update();
+        button_get(true);
         testfailed = 13;
     }
 
@@ -2185,15 +2185,15 @@ static int testline_in_rect(void)
     y2 = 19;
     if (!(line_in_rect(x1, y1, x2, y2, rx, ry, rw, rh) &&
           line_in_rect(x2, y2, x1, y1, rx, ry, rw, rh))) {
-        rb->lcd_drawline(x1, y1, x2, y2);
-        rb->lcd_invertrect(rx, ry, rw, rh);
-        rb->lcd_putsxy(0, 0, "failed 14");
-        rb->lcd_update();
-        rb->button_get(true);
+        lcd_drawline(x1, y1, x2, y2);
+        lcd_invertrect(rx, ry, rw, rh);
+        lcd_putsxy(0, 0, "failed 14");
+        lcd_update();
+        button_get(true);
         testfailed = 14;
     }
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     return testfailed;
 }
@@ -2207,7 +2207,7 @@ static int test_specific_worm_collision(void)
     int dir;
     int x = 0;
     int y = 0;
-    rb->lcd_clear_display();
+    lcd_clear_display();
     init_worm(&worms[0], 10, 20);
     add_growing(&worms[0], 20 - INITIAL_WORM_LENGTH);
 
@@ -2227,13 +2227,13 @@ static int test_specific_worm_collision(void)
             if (specific_worm_collision(&worms[0], x, y) != -1) {
                 collisions ++;
             }
-            rb->lcd_invertpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
-            rb->lcd_putsxyf(0, LCD_HEIGHT - 8, "collisions %d", collisions);
-            rb->lcd_update();
+            lcd_invertpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
+            lcd_putsxyf(0, LCD_HEIGHT - 8, "collisions %d", collisions);
+            lcd_update();
         }
     }
     if (collisions != 21) {
-        rb->button_get(true);
+        button_get(true);
     }
     return collisions;
 }
@@ -2246,7 +2246,7 @@ static void test_make_argh(void)
     int failures = 0;
     int last_failures = 0;
     int i, worm_idx;
-    rb->lcd_clear_display();
+    lcd_clear_display();
     worm_count = 3;
 
     for (worm_idx = 0; worm_idx < worm_count; worm_idx++) {
@@ -2266,39 +2266,39 @@ static void test_make_argh(void)
         }
     }
 
-    rb->lcd_update();
+    lcd_update();
 
     for (seed = 0; hit < 20; seed += 2) {
         int x, y;
-        rb->srand(seed);
-        x = rb->rand() % (FIELD_RECT_WIDTH  - argh_size);
-        y = rb->rand() % (FIELD_RECT_HEIGHT - argh_size);
+        srand(seed);
+        x = rand() % (FIELD_RECT_WIDTH  - argh_size);
+        y = rand() % (FIELD_RECT_HEIGHT - argh_size);
 
         for (worm_idx = 0; worm_idx < worm_count; worm_idx++){
             if (expensive_worm_in_rect(&worms[worm_idx], x, y, argh_size, argh_size)) {
                 int tries = 0;
-                rb->srand(seed);
+                srand(seed);
 
                 tries = make_argh(0);
                 if ((x == arghx[0] && y == arghy[0]) || tries < 2) {
                     failures ++;
                 }
 
-                rb->lcd_putsxyf(0, LCD_HEIGHT - 8, "(%d;%d) fail%d try%d",
+                lcd_putsxyf(0, LCD_HEIGHT - 8, "(%d;%d) fail%d try%d",
                              x, y, failures, tries);
-                rb->lcd_update();
-                rb->lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y,
+                lcd_update();
+                lcd_invertrect(x + FIELD_RECT_X, y+ FIELD_RECT_Y,
                                    argh_size, argh_size);
-                rb->lcd_update();
+                lcd_update();
                 draw_argh(0);
-                rb->lcd_update();
-                rb->lcd_invertrect(x + FIELD_RECT_X, y + FIELD_RECT_Y,
+                lcd_update();
+                lcd_invertrect(x + FIELD_RECT_X, y + FIELD_RECT_Y,
                                    argh_size, argh_size);
-                rb->lcd_clearrect(arghx[0] + FIELD_RECT_X, arghy[0] + FIELD_RECT_Y,
+                lcd_clearrect(arghx[0] + FIELD_RECT_X, arghy[0] + FIELD_RECT_Y,
                                   argh_size, argh_size);
 
                 if (failures > last_failures) {
-                    rb->button_get(true);
+                    button_get(true);
                 }
                 last_failures = failures;
                 hit ++;
@@ -2310,7 +2310,7 @@ static void test_make_argh(void)
 static void test_worm_argh_collision_in_moves(void) {
     int hit_count = 0;
     int i;
-    rb->lcd_clear_display();
+    lcd_clear_display();
     init_worm(&worms[0], 10, 20);
 
     arghx[0] = 20;
@@ -2324,11 +2324,11 @@ static void test_worm_argh_collision_in_moves(void) {
         if (worm_argh_collision_in_moves(&worms[0], 0, 5)){
             hit_count ++;
         }
-        rb->lcd_putsxyf(0, LCD_HEIGHT - 8, "in 5 moves hits: %d", hit_count);
-        rb->lcd_update();
+        lcd_putsxyf(0, LCD_HEIGHT - 8, "in 5 moves hits: %d", hit_count);
+        lcd_update();
     }
     if (hit_count != argh_size + 5) {
-        rb->button_get(true);
+        button_get(true);
     }
 }
 #endif /* DEBUG_WORMLET */
@@ -2356,7 +2356,7 @@ static bool launch_wormlet(void)
 {
     int game_result = 1;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
@@ -2400,12 +2400,12 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(COLOR_FG);
-    rb->lcd_set_background(COLOR_BG);
+    lcd_set_foreground(COLOR_FG);
+    lcd_set_background(COLOR_BG);
 #endif
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
 #ifdef DEBUG_WORMLET
@@ -2454,17 +2454,17 @@ enum plugin_status plugin_start(const void* parameter)
                         "Argh Size","Food Size","Revert to Default Settings",
                         "Playback Control", "Quit");
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit) {
-        switch(rb->do_menu(&menu, &result, NULL, false))
+        switch(do_menu(&menu, &result, NULL, false))
         {
             case 0:
-                rb->lcd_setfont(FONT_SYSFIXED);
+                lcd_setfont(FONT_SYSFIXED);
                 launch_wormlet();
                 break;
             case 1:
-                rb->set_int("Number of Worms", "", UNIT_INT, &worm_count, NULL,
+                set_int("Number of Worms", "", UNIT_INT, &worm_count, NULL,
                             1, 1, 3, NULL);
                 if (worm_count < players) {
                     worm_count = players;
@@ -2472,10 +2472,10 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             case 2:
 #ifdef MULTIPLAYER
-                rb->set_int("Number of Players", "", UNIT_INT, &players, NULL,
+                set_int("Number of Players", "", UNIT_INT, &players, NULL,
                             1, 0, 4, NULL);
 #else
-                rb->set_int("Number of Players", "", UNIT_INT, &players, NULL,
+                set_int("Number of Players", "", UNIT_INT, &players, NULL,
                             1, 0, 2, NULL);
 #endif
                 if (players > worm_count) {
@@ -2488,53 +2488,53 @@ enum plugin_status plugin_start(const void* parameter)
             case 3:
                 switch(players) {
                     case 0:
-                        rb->set_option("Control Style",&use_remote,INT,
+                        set_option("Control Style",&use_remote,INT,
                                        nokey_option, 1, NULL);
                         break;
                     case 1:
-                        rb->set_option("Control Style",&use_remote,INT,
+                        set_option("Control Style",&use_remote,INT,
                                        key24_option, 2, NULL);
                         break;
                     case 2:
 #ifdef REMOTE
-                        rb->set_option("Control Style",&use_remote,INT,
+                        set_option("Control Style",&use_remote,INT,
                                        remote_option, 2, NULL);
 #else
-                        rb->set_option("Control Style",&use_remote,INT,
+                        set_option("Control Style",&use_remote,INT,
                                        key2_option, 1, NULL);
 #endif
                         break;
                     case 3:
-                        rb->set_option("Control Style",&use_remote,INT,
+                        set_option("Control Style",&use_remote,INT,
                                        remoteonly_option, 1, NULL);
                         break;
                 }
                 break;
             case 4:
-                rb->set_int("Worm Growth Per Food", "", UNIT_INT, &worm_food,
+                set_int("Worm Growth Per Food", "", UNIT_INT, &worm_food,
                             NULL, 1, 0, 15, NULL);
                 break;
             case 5:
                 new_setting = 20 - speed;
-                rb->set_int("Worm Speed", "", UNIT_INT, &new_setting,
+                set_int("Worm Speed", "", UNIT_INT, &new_setting,
                             NULL, 1, 0, 20, NULL);
                 speed = 20 - new_setting;
                 break;
             case 6:
-                rb->set_int("Arghs Per Food", "", UNIT_INT, &arghs_per_food,
+                set_int("Arghs Per Food", "", UNIT_INT, &arghs_per_food,
                             NULL, 1, 0, 8, NULL);
                 break;
             case 7:
-                rb->set_int("Argh Size", "", UNIT_INT, &argh_size,
+                set_int("Argh Size", "", UNIT_INT, &argh_size,
                             NULL, 1, 2, 10, NULL);
                 break;
             case 8:
-                rb->set_int("Food Size", "", UNIT_INT, &food_size,
+                set_int("Food Size", "", UNIT_INT, &food_size,
                             NULL, 1, 2, 10, NULL);
                 break;
             case 9:
                 new_setting = 0;
-                rb->set_option("Reset Settings?", &new_setting, INT, noyes , 2, NULL);
+                set_option("Reset Settings?", &new_setting, INT, noyes , 2, NULL);
                 if (new_setting == 1)
                     default_settings();
                 break;

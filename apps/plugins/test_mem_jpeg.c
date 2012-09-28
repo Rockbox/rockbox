@@ -41,7 +41,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     size_t plugin_buf_len;
     unsigned char * plugin_buf =
-        (unsigned char *)rb->plugin_get_buffer(&plugin_buf_len);
+        (unsigned char *)plugin_get_buffer(&plugin_buf_len);
     static char filename[MAX_PATH];
     struct bitmap bm = {
         .width = LCD_WIDTH,
@@ -51,30 +51,30 @@ enum plugin_status plugin_start(const void* parameter)
 
     if(!parameter) return PLUGIN_ERROR;
 
-    rb->strcpy(filename, parameter);
+    strcpy(filename, parameter);
 
 #ifdef USEGSLIB
     long greysize;
     if (!grey_init(plugin_buf, plugin_buf_len, GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
-        rb->splash(HZ, "grey buf error");
+        splash(HZ, "grey buf error");
         return PLUGIN_ERROR;
     }
     plugin_buf += greysize;
     plugin_buf_len -= greysize;
 #endif
-    int fd = rb->open(filename, O_RDONLY);
+    int fd = open(filename, O_RDONLY);
     if (fd < 0)
         return PLUGIN_ERROR;
-    unsigned long filesize = rb->filesize(fd);
+    unsigned long filesize = filesize(fd);
     if (filesize > plugin_buf_len)
         return PLUGIN_ERROR;
     plugin_buf_len -= filesize;
     unsigned char *jpeg_buf = plugin_buf;
     plugin_buf += filesize;
-    rb->read(fd, jpeg_buf, filesize);
-    rb->close(fd);
+    read(fd, jpeg_buf, filesize);
+    close(fd);
     bm.data = plugin_buf;
     ret = decode_jpeg_mem(jpeg_buf, filesize, &bm, plugin_buf_len,
                           FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
@@ -86,11 +86,11 @@ enum plugin_status plugin_start(const void* parameter)
     grey_ub_gray_bitmap((const unsigned char *)bm.data, (LCD_WIDTH - bm.width) >> 1,
         (LCD_HEIGHT - bm.height) >> 1, bm.width, bm.height);
 #else
-    rb->lcd_bitmap((fb_data *)bm.data, (LCD_WIDTH - bm.width) >> 1,
+    lcd_bitmap((fb_data *)bm.data, (LCD_WIDTH - bm.width) >> 1,
         (LCD_HEIGHT - bm.height) >> 1, bm.width, bm.height);
 #endif
     mylcd_ub_update();
-    while (rb->get_action(CONTEXT_STD,1) != ACTION_STD_OK) rb->yield();
+    while (get_action(CONTEXT_STD,1) != ACTION_STD_OK) yield();
 #ifdef USEGSLIB
     grey_release();
 #endif

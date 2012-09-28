@@ -55,6 +55,12 @@ SECTIONS
         *(.rodata*)
         *(.rodata.str1.1)
         *(.rodata.str1.4)
+
+        __core_symarray_start = .;
+        *(SORT(__symtab.*))
+        __core_symarray_end = .;
+
+        *(__symtab_str)
         . = ALIGN(0x4);
     } > DRAM
 

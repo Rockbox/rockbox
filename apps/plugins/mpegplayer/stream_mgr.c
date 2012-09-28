@@ -46,37 +46,37 @@ struct str_broadcast_data
 
 static inline void stream_mgr_lock(void)
 {
-    rb->mutex_lock(&stream_mgr.str_mtx);
+    mutex_lock(&stream_mgr.str_mtx);
 }
 
 static inline void stream_mgr_unlock(void)
 {
-    rb->mutex_unlock(&stream_mgr.str_mtx);
+    mutex_unlock(&stream_mgr.str_mtx);
 }
 
 static inline void actl_lock(void)
 {
-    rb->mutex_lock(&stream_mgr.actl_mtx);
+    mutex_lock(&stream_mgr.actl_mtx);
 }
 
 static inline void actl_unlock(void)
 {
-    rb->mutex_unlock(&stream_mgr.actl_mtx);
+    mutex_unlock(&stream_mgr.actl_mtx);
 }
 
 static inline void stream_mgr_post_msg(long id, intptr_t data)
 {
-    rb->queue_post(stream_mgr.q, id, data);
+    queue_post(stream_mgr.q, id, data);
 }
 
 static inline intptr_t stream_mgr_send_msg(long id, intptr_t data)
 {
-    return rb->queue_send(stream_mgr.q, id, data);
+    return queue_send(stream_mgr.q, id, data);
 }
 
 static inline void stream_mgr_reply_msg(intptr_t retval)
 {
-    rb->queue_reply(stream_mgr.q, retval);
+    queue_reply(stream_mgr.q, retval);
 }
 
 int str_next_data_not_ready(struct stream *str)
@@ -936,7 +936,7 @@ static void stream_mgr_thread(void)
 
     while (1)
     {
-        rb->queue_wait(stream_mgr.q, &ev);
+        queue_wait(stream_mgr.q, &ev);
 
         switch (ev.id)
         {
@@ -1059,14 +1059,14 @@ int stream_init(void)
     stream_mgr_init_state();
 
     /* Initialize our window to the outside world first */
-    rb->mutex_init(&stream_mgr.str_mtx);
-    rb->mutex_init(&stream_mgr.actl_mtx);
+    mutex_init(&stream_mgr.str_mtx);
+    mutex_init(&stream_mgr.actl_mtx);
 
     stream_mgr.q = &stream_mgr_queue;
-    rb->queue_init(stream_mgr.q, false);
+    queue_init(stream_mgr.q, false);
 
     /* sets audiosize and returns buffer pointer */
-    mem = rb->plugin_get_audio_buffer(&memsize);
+    mem = plugin_get_audio_buffer(&memsize);
 
     /* Initialize non-allocator blocks first */
 #ifndef HAVE_LCD_COLOR
@@ -1076,7 +1076,7 @@ int stream_init(void)
     if (!grey_init(mem, memsize, GREY_BUFFERED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, &greysize))
     {
-        rb->splash(HZ, "greylib init failed!");
+        splash(HZ, "greylib init failed!");
         return STREAM_ERROR;
     }
 
@@ -1086,16 +1086,16 @@ int stream_init(void)
     grey_clear_display();
 #endif /* !HAVE_LCD_COLOR */
 
-    stream_mgr.thread = rb->create_thread(stream_mgr_thread,
+    stream_mgr.thread = create_thread(stream_mgr_thread,
         stream_mgr_thread_stack, sizeof(stream_mgr_thread_stack),
         0, "mpgstream_mgr" IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
 
-    rb->queue_enable_queue_send(stream_mgr.q, &stream_mgr_queue_send,
+    queue_enable_queue_send(stream_mgr.q, &stream_mgr_queue_send,
                                 stream_mgr.thread);
 
     if (stream_mgr.thread == 0)
     {
-        rb->splash(HZ, "Could not create stream manager thread!");
+        splash(HZ, "Could not create stream manager thread!");
         return STREAM_ERROR;
     }
 
@@ -1105,29 +1105,29 @@ int stream_init(void)
     /* Initialise our malloc buffer */
     if (!mpeg_alloc_init(mem, memsize))
     {
-        rb->splash(HZ, "Out of memory in stream_init");
+        splash(HZ, "Out of memory in stream_init");
     }
     /* These inits use the allocator */
     else if (!pcm_output_init())
     {
-        rb->splash(HZ, "Could not initialize PCM!");
+        splash(HZ, "Could not initialize PCM!");
     }
     else if (!audio_thread_init())
     {
-        rb->splash(HZ, "Cannot create audio thread!");
+        splash(HZ, "Cannot create audio thread!");
     }
     else if (!video_thread_init())
     {
-        rb->splash(HZ, "Cannot create video thread!");
+        splash(HZ, "Cannot create video thread!");
     }
     /* Disk buffer takes max allotment of what's left so it must be last */
     else if (!disk_buf_init())
     {
-        rb->splash(HZ, "Cannot create buffering thread!");
+        splash(HZ, "Cannot create buffering thread!");
     }
     else if (!parser_init())
     {
-        rb->splash(HZ, "Parser init failed!");
+        splash(HZ, "Parser init failed!");
     }
     else
     {    
@@ -1151,7 +1151,7 @@ void stream_exit(void)
     if (stream_mgr.thread != 0)
     {
         stream_mgr_post_msg(STREAM_QUIT, 0);
-        rb->thread_wait(stream_mgr.thread);
+        thread_wait(stream_mgr.thread);
         stream_mgr.thread = 0;
     }
 

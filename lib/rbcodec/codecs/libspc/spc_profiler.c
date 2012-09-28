@@ -45,21 +45,21 @@ void reset_profile_timers(void)
 
 void print_timers(char * path)
 {
-    int logfd = ci->open("/spclog.txt",O_WRONLY|O_CREAT|O_APPEND, 0666);
-    ci->fdprintf(logfd,"%s:\t",path);
-    ci->fdprintf(logfd,"%10ld total\t",READ_TIMER(total));
+    int logfd = open("/spclog.txt",O_WRONLY|O_CREAT|O_APPEND, 0666);
+    fdprintf(logfd,"%s:\t",path);
+    fdprintf(logfd,"%10ld total\t",READ_TIMER(total));
     PRINT_TIMER_PCT(render,total,"render");
 #if 0
     PRINT_TIMER_PCT(cpu,total,"CPU");
     PRINT_TIMER_PCT(dsp,total,"DSP");
-    ci->fdprintf(logfd,"(");
+    fdprintf(logfd,"(");
     PRINT_TIMER_PCT(dsp_pregen,dsp,"pregen");
     PRINT_TIMER_PCT(dsp_gen,dsp,"gen");
     PRINT_TIMER_PCT(dsp_mix,dsp,"mix");
 #endif
-    ci->fdprintf(logfd,"\n");
+    fdprintf(logfd,"\n");
     
-    ci->close(logfd);
+    close(logfd);
     logfd=-1;
 }
 

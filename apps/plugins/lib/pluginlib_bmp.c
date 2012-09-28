@@ -59,10 +59,10 @@ int save_bmp_file( char* filename, struct bitmap *bm )
     int fh;
     int x,y;
     if( bm->format != FORMAT_NATIVE ) return -1;
-    fh = rb->creat( filename , 0666);
+    fh = creat( filename , 0666);
     if( fh < 0 ) return -1;
 
-    rb->write( fh, header, sizeof( header ) );
+    write( fh, header, sizeof( header ) );
     for( y = bm->height-1; y >= 0; y-- )
     {
         for( x = 0; x <  bm->width; x++ )
@@ -74,15 +74,15 @@ int save_bmp_file( char* filename, struct bitmap *bm )
                 RGB_UNPACK_GREEN( *d ),
                 RGB_UNPACK_RED( *d )
             };
-            rb->write( fh, c, 3 );
+            write( fh, c, 3 );
         }
         if(padsize != 0)
         {
             unsigned int c = 0; /* padsize is at most 3. */
-            rb->write( fh, &c, padsize );
+            write( fh, &c, padsize );
         }
     }
-    rb->close( fh );
+    close( fh );
     return 1;
 }
 #endif /* HAVE_LCD_COLOR */
@@ -160,8 +160,6 @@ void grey_resize_bitmap(struct bitmap *src, struct bitmap *dst)
 }
 #endif
 
-
-#include "wrappers.h"
 
 /* import the core bmp loader */
 #include "recorder/bmp.c"

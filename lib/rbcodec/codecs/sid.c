@@ -1235,11 +1235,11 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Make use of 44.1khz */
-        ci->configure(DSP_SWITCH_FREQUENCY, SAMPLE_RATE);
+        codec_configure(DSP_SWITCH_FREQUENCY, SAMPLE_RATE);
         /* Sample depth is 28 bit host endian */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 28);
         /* Mono output */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     }
 
     return CODEC_OK;
@@ -1258,12 +1258,12 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
     
-    /* Load SID file the read_filebuf callback will return the full requested
+    /* Load SID file the codec_read_filebuf callback will return the full requested
      * size if at all possible, so there is no need to loop */
-    ci->seek_buffer(0);
-    sidfile = ci->request_buffer(&filesize, SID_BUFFER_SIZE);
+    codec_seek_buffer(0);
+    sidfile = codec_request_buffer(&filesize, SID_BUFFER_SIZE);
 
     if (filesize == 0) {
         return CODEC_ERROR;
@@ -1277,11 +1277,11 @@ enum codec_status codec_run(void)
     
 
     /* Set the elapsed time to the current subsong (in seconds) */
-    ci->set_elapsed(subSong*1000);
+    audio_codec_update_elapsed(subSong*1000);
 
     /* The main decoder loop */    
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -1299,8 +1299,8 @@ enum codec_status codec_run(void)
             nSamplesToRender = 0;       /* Start the rendering from scratch */
 
             /* Set the elapsed time to the current subsong (in seconds) */
-            ci->set_elapsed(subSong*1000);
-            ci->seek_complete();
+            audio_codec_update_elapsed(subSong*1000);
+            codec_seek_complete();
         }
         
         nSamplesRendered = 0;
@@ -1333,7 +1333,7 @@ enum codec_status codec_run(void)
             } 
         }
         
-        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE);
+        codec_pcmbuf_insert(samples, NULL, CHUNK_SIZE);
     }
 
     return CODEC_OK;

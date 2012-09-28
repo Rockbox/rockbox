@@ -41,7 +41,7 @@ void init_logdiskf(void);
 extern unsigned char logdiskfbuffer[MAX_LOGDISKF_SIZE];
 extern int logfdiskindex;
 
-#define LOGDISK_LEVEL 1
+#define LOGDISK_LEVEL 3 /* log everything */
 
 #if LOGDISK_LEVEL > 0       /*serious errors or problems*/
  #define ERRORF(...) _logdiskf(__func__,'E', __VA_ARGS__)

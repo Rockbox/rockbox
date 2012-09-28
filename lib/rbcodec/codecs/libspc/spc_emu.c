@@ -65,7 +65,7 @@ static void SPC_enable_rom( THIS, int enable )
     if ( this->rom_enabled != enable )
     {
         this->rom_enabled = enable;
-        ci->memcpy( RAM + ROM_ADDR, (enable ? this->boot_rom : this->extra_ram), ROM_SIZE );
+        memcpy( RAM + ROM_ADDR, (enable ? this->boot_rom : this->extra_ram), ROM_SIZE );
         /* TODO: ROM can still get overwritten when DSP writes to echo buffer */
     }
 }
@@ -77,13 +77,13 @@ void SPC_Init( THIS )
     this->timer [2].shift = 4; /* 8 kHz */
     
     /* Put STOP instruction around memory to catch PC underflow/overflow. */
-    ci->memset( ram.padding1, 0xFF, sizeof ram.padding1 );
-    ci->memset( ram.padding2, 0xFF, sizeof ram.padding2 );
+    memset( ram.padding1, 0xFF, sizeof ram.padding1 );
+    memset( ram.padding2, 0xFF, sizeof ram.padding2 );
     
     /* A few tracks read from the last four bytes of IPL ROM */
     this->boot_rom [sizeof this->boot_rom - 2] = 0xC0;
     this->boot_rom [sizeof this->boot_rom - 1] = 0xFF;
-    ci->memset( this->boot_rom, 0, sizeof this->boot_rom - 2 );
+    memset( this->boot_rom, 0, sizeof this->boot_rom - 2 );
 
     /* Have DSP in a defined state in case EMU is run and hasn't loaded
      * a program yet */
@@ -93,11 +93,11 @@ void SPC_Init( THIS )
 static void SPC_load_state( THIS, struct cpu_regs_t const* cpu_state,
         const void* new_ram, const void* dsp_state )
 {
-    ci->memcpy(&(this->r),cpu_state,sizeof this->r);
+    memcpy(&(this->r),cpu_state,sizeof this->r);
         
     /* ram */
-    ci->memcpy( RAM, new_ram, sizeof RAM );
-    ci->memcpy( this->extra_ram, RAM + ROM_ADDR, sizeof this->extra_ram );
+    memcpy( RAM, new_ram, sizeof RAM );
+    memcpy( this->extra_ram, RAM + ROM_ADDR, sizeof this->extra_ram );
     
     /* boot rom (have to force enable_rom() to update it) */
     this->rom_enabled = !(RAM [0xF1] & 0x80);
@@ -153,7 +153,7 @@ static void clear_echo( THIS )
         size_t max_size = sizeof RAM - addr;
         if ( size > max_size )
             size = sizeof RAM - addr;
-        ci->memset( RAM + addr, 0xFF, size );
+        memset( RAM + addr, 0xFF, size );
     }
 }
 
@@ -165,7 +165,7 @@ int SPC_load_spc( THIS, const void* data, long size )
     if ( size < SPC_FILE_SIZE )
         return -1;
     
-    if ( ci->memcmp( spc->signature, "SNES-SPC700 Sound File Data", 27 ) != 0 )
+    if ( memcmp( spc->signature, "SNES-SPC700 Sound File Data", 27 ) != 0 )
         return -1;
     
     regs.pc     = spc->pc [1] * 0x100 + spc->pc [0];
@@ -176,7 +176,7 @@ int SPC_load_spc( THIS, const void* data, long size )
     regs.sp     = spc->sp;
     
     if ( (unsigned long) size >= sizeof *spc )
-        ci->memcpy( this->boot_rom, spc->ipl_rom, sizeof this->boot_rom );
+        memcpy( this->boot_rom, spc->ipl_rom, sizeof this->boot_rom );
     
     SPC_load_state( this, &regs, spc->ram, spc->dsp );
     

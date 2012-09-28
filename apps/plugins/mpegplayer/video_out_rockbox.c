@@ -61,21 +61,21 @@ static struct mutex vo_mtx SHAREDBSS_ATTR;
 static inline void video_lock_init(void)
 {
 #if NUM_CORES > 1
-    rb->mutex_init(&vo_mtx);
+    mutex_init(&vo_mtx);
 #endif
 }
 
 static inline void video_lock(void)
 {
 #if NUM_CORES > 1
-    rb->mutex_lock(&vo_mtx);
+    mutex_lock(&vo_mtx);
 #endif
 }
 
 static inline void video_unlock(void)
 {
 #if NUM_CORES > 1
-    rb->mutex_unlock(&vo_mtx);
+    mutex_unlock(&vo_mtx);
 #endif
 }
 
@@ -128,7 +128,7 @@ static inline void yuv_blit(uint8_t * const * buf, int src_x, int src_y,
     video_lock();
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_blit_yuv(buf, src_x, src_y, stride, x, y , width, height);
+    lcd_blit_yuv(buf, src_x, src_y, stride, x, y , width, height);
 #else
     grey_ub_gray_bitmap_part(buf[0], src_x, src_y, stride, x, y, width, height);
 #endif

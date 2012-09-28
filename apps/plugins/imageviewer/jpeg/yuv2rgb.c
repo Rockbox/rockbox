@@ -239,12 +239,12 @@ static fb_data (* const pixel_funcs[COLOUR_NUM_MODES][DITHER_NUM_MODES])(void) =
 
 /* These defines are used fornormal horizontal strides and vertical strides. */
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define LCDADDR(x, y)   (rb->lcd_framebuffer + LCD_HEIGHT*(x) + (y))
+#define LCDADDR(x, y)   (lcd_framebuffer + LCD_HEIGHT*(x) + (y))
 #define ROWENDOFFSET    (width*LCD_HEIGHT)
 #define ROWOFFSET       (1)
 #define COLOFFSET       (LCD_HEIGHT)
 #else
-#define LCDADDR(x, y) (rb->lcd_framebuffer + LCD_WIDTH*(y) + (x))
+#define LCDADDR(x, y) (lcd_framebuffer + LCD_WIDTH*(y) + (x))
 #define ROWENDOFFSET    (width)
 #define ROWOFFSET       (LCD_WIDTH)
 #define COLOFFSET       (1)
@@ -296,7 +296,7 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
         /* Reset error terms. */
         px.e = rgb_err_buffers;
         px.ce[RED] = px.ce[GRN] = px.ce[BLU] = 0;
-        rb->memset(px.e, 0, 3*sizeof (struct rgb_err));
+        memset(px.e, 0, 3*sizeof (struct rgb_err));
     }
 
     do

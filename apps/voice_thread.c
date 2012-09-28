@@ -31,6 +31,7 @@
 #include "pcm.h"
 #include "pcm_mixer.h"
 #include "codecs/libspeex/speex/speex.h"
+#include "symbols.h"
 
 /* Default number of native-frequency PCM frames to queue - adjust as
    necessary per-target */
@@ -281,6 +282,7 @@ void mp3_play_data(const void *start, size_t size,
         queue_send(&voice_queue, Q_VOICE_PLAY, (intptr_t)&voice_clip);
     }
 }
+EXPORT_SYMBOL(mp3_play_data);
 
 /* Stop current voice clip from playing */
 void mp3_play_stop(void)
@@ -291,18 +293,21 @@ void mp3_play_stop(void)
         queue_send(&voice_queue, Q_VOICE_STOP, 0);
     }
 }
+EXPORT_SYMBOL(mp3_play_stop);
 
 void mp3_play_pause(bool play)
 {
     /* a dummy */
     (void)play;
 }
+EXPORT_SYMBOL(mp3_play_pause);
 
 /* Tell if voice is still in a playing state */
 bool mp3_is_playing(void)
 {
     return quiet_counter != 0;
 }
+EXPORT_SYMBOL(mp3_is_playing);
 
 /* This function is meant to be used by the buffer request functions to
    ensure the codec is no longer active */

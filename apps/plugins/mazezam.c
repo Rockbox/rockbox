@@ -245,9 +245,9 @@ static void store_lcd_settings(void)
 {
     /* Store the old settings */
 #if LCD_DEPTH > 1
-    lcd_settings.backdrop = rb->lcd_get_backdrop();
-    lcd_settings.foreground = rb->lcd_get_foreground();
-    lcd_settings.background = rb->lcd_get_background();
+    lcd_settings.backdrop = lcd_get_backdrop();
+    lcd_settings.foreground = lcd_get_foreground();
+    lcd_settings.background = lcd_get_background();
 #endif
 }
 
@@ -260,9 +260,9 @@ static void restore_lcd_settings(void) {
 
     /* Restore the old settings */
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(lcd_settings.foreground);
-    rb->lcd_set_background(lcd_settings.background);
-    rb->lcd_set_backdrop(lcd_settings.backdrop);
+    lcd_set_foreground(lcd_settings.foreground);
+    lcd_set_background(lcd_settings.background);
+    lcd_set_backdrop(lcd_settings.backdrop);
 #endif
 }
 
@@ -275,11 +275,11 @@ static void plugin_lcd_settings(void) {
 
     /* Set the new settings */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(MAZEZAM_BG_COLOR);
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_background(MAZEZAM_BG_COLOR);
+    lcd_set_backdrop(NULL);
 #elif LCD_DEPTH > 1
-    rb->lcd_set_background(MAZEZAM_BG_GRAY);
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_background(MAZEZAM_BG_GRAY);
+    lcd_set_backdrop(NULL);
 #endif
 }
 
@@ -338,25 +338,25 @@ static void draw_walls(
         short exit)
 {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(MAZEZAM_WALL_COLOR);
+    lcd_set_foreground(MAZEZAM_WALL_COLOR);
 #elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(MAZEZAM_WALL_GRAY);
+    lcd_set_foreground(MAZEZAM_WALL_GRAY);
 #endif
     /* draw the upper wall */
-    rb->lcd_fillrect(0,0,xOff,yOff+(size*entrance));
-    rb->lcd_fillrect(xOff,0,size*width,yOff);
-    rb->lcd_fillrect(xOff+(size*width),0,LCD_WIDTH-xOff-(size*width),
+    lcd_fillrect(0,0,xOff,yOff+(size*entrance));
+    lcd_fillrect(xOff,0,size*width,yOff);
+    lcd_fillrect(xOff+(size*width),0,LCD_WIDTH-xOff-(size*width),
                      yOff+(size*exit));
 
     /* draw the lower wall */
-    rb->lcd_fillrect(0,yOff+(size*entrance)+size,xOff,
+    lcd_fillrect(0,yOff+(size*entrance)+size,xOff,
                      LCD_HEIGHT-yOff-(size*entrance)-size);
-    rb->lcd_fillrect(xOff,yOff+(size*height),size*width,
+    lcd_fillrect(xOff,yOff+(size*height),size*width,
                      LCD_HEIGHT-yOff-(size*height));
     /* Note: the exit is made one pixel thinner than necessary as a visual
      * clue that chunks cannot be pushed into it
      */
-    rb->lcd_fillrect(xOff+(size*width),yOff+(size*exit)+size-1,
+    lcd_fillrect(xOff+(size*width),yOff+(size*exit)+size-1,
                      LCD_WIDTH-xOff+(size*width),
                      LCD_HEIGHT-yOff-(size*exit)-size+1);
 }
@@ -388,46 +388,46 @@ static void draw_row(
     /* adding width to i should have a fixed, but randomising effect on
      * the choice of the colours of the top line of chunks
      */
-    rb->lcd_set_foreground(chunk_colors[(i+width) % 
+    lcd_set_foreground(chunk_colors[(i+width) % 
                            MAZEZAM_NUM_CHUNK_COLORS]);
 #endif
     for (j = 0; j<cd->l_num[i]; j++) {
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_fillrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+        lcd_fillrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
                          yOff+size*i, cd->c_width[i][j]*size,size);
 #elif LCD_DEPTH > 1
-        rb->lcd_set_foreground(MAZEZAM_CHUNK_EDGE_GRAY);
-        rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+        lcd_set_foreground(MAZEZAM_CHUNK_EDGE_GRAY);
+        lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
                          yOff+size*i, cd->c_width[i][j]*size,size);
 
         /* draw shade */
-        rb->lcd_set_foreground(chunk_gray_shade[(i+width) %
+        lcd_set_foreground(chunk_gray_shade[(i+width) %
                                MAZEZAM_NUM_CHUNK_GRAYS]);
-        rb->lcd_hline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,
+        lcd_hline(xOff+size*shift[i]+size*cd->c_inset[i][j]+1,
                       xOff+size*shift[i]+size*cd->c_inset[i][j]+
                                                    cd->c_width[i][j]*size-3,
                       yOff+size*i+size-2);
-        rb->lcd_vline(xOff+size*shift[i]+size*cd->c_inset[i][j]+
+        lcd_vline(xOff+size*shift[i]+size*cd->c_inset[i][j]+
                                                    cd->c_width[i][j]*size-2,
                       yOff+size*i,
                       yOff+size*i+size-2);
 
         /* draw fill */
-        rb->lcd_set_foreground(chunk_gray[(i+width) %
+        lcd_set_foreground(chunk_gray[(i+width) %
                                MAZEZAM_NUM_CHUNK_GRAYS]);
         for (k = yOff+size*i+2; k <  yOff+size*i+size-2; k += 2)
-            rb->lcd_hline(xOff+size*shift[i]+size*cd->c_inset[i][j]+2,
+            lcd_hline(xOff+size*shift[i]+size*cd->c_inset[i][j]+2,
                           xOff+size*shift[i]+size*cd->c_inset[i][j]+
                                                 cd->c_width[i][j]*size-3,k);
 #else
-        rb->lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
+        lcd_drawrect(xOff+size*shift[i]+size*cd->c_inset[i][j],
                          yOff+size*i, cd->c_width[i][j]*size,size);
         for (k = xOff+size*shift[i]+size*cd->c_inset[i][j]+2;
              k < xOff+size*shift[i]+size*cd->c_inset[i][j]+
                                                      cd->c_width[i][j]*size;
              k += 2 + (i & 1))
             for (l = yOff+size*i+2; l <  yOff+size*i+size; l += 2 + (i & 1))
-                 rb->lcd_drawpixel(k, l);
+                 lcd_drawpixel(k, l);
 #endif
     }
 }
@@ -449,15 +449,15 @@ static void draw_player(
 
     /* draw the player (mostly copied from the sokoban plugin) */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(MAZEZAM_PLAYER_COLOR);
+    lcd_set_foreground(MAZEZAM_PLAYER_COLOR);
 #elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(MAZEZAM_PLAYER_GRAY);
+    lcd_set_foreground(MAZEZAM_PLAYER_GRAY);
 #endif
-    rb->lcd_hline(xOff+size*x, xOff+size*x+max, yOff+size*y+middle);
-    rb->lcd_vline(xOff+size*x+middle, yOff+size*y, yOff+size*y+max-ldelta);
-    rb->lcd_drawline(xOff+size*x+middle, yOff+size*y+max-ldelta,
+    lcd_hline(xOff+size*x, xOff+size*x+max, yOff+size*y+middle);
+    lcd_vline(xOff+size*x+middle, yOff+size*y, yOff+size*y+max-ldelta);
+    lcd_drawline(xOff+size*x+middle, yOff+size*y+max-ldelta,
                      xOff+size*x+middle-ldelta, yOff+size*y+max);
-    rb->lcd_drawline(xOff+size*x+middle, yOff+size*y+max-ldelta,
+    lcd_drawline(xOff+size*x+middle, yOff+size*y+max-ldelta,
                      xOff+size*x+middle+ldelta, yOff+size*y+max);
 }
 
@@ -473,15 +473,15 @@ static void draw_gate(
     short third = size / 3;
     short twothirds = (2 * size) / 3;
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(MAZEZAM_GATE_COLOR);
+    lcd_set_foreground(MAZEZAM_GATE_COLOR);
 #elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(MAZEZAM_GATE_GRAY);
+    lcd_set_foreground(MAZEZAM_GATE_GRAY);
 #endif
-    rb->lcd_hline(xOff-size,xOff-1,yOff+entrance*size+third);
-    rb->lcd_hline(xOff-size,xOff-1,yOff+entrance*size+twothirds);
-    rb->lcd_vline(xOff-size+third,yOff+entrance*size,
+    lcd_hline(xOff-size,xOff-1,yOff+entrance*size+third);
+    lcd_hline(xOff-size,xOff-1,yOff+entrance*size+twothirds);
+    lcd_vline(xOff-size+third,yOff+entrance*size,
                   yOff+entrance*size+size-1);
-    rb->lcd_vline(xOff-size+twothirds,yOff+entrance*size,
+    lcd_vline(xOff-size+twothirds,yOff+entrance*size,
                   yOff+entrance*size+size-1);
 }
 
@@ -505,7 +505,7 @@ static void draw_level(
     short yOff = (LCD_HEIGHT - (size*li->height))/2;
     short i;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     draw_walls(size,xOff,yOff,li->width, li->height, li->entrance, li->exit);
 
@@ -531,7 +531,7 @@ static void welldone_screen(void)
     MENUITEM_STRINGLIST(menu,MAZEZAM_TEXT_WELLDONE_TITLE,NULL,
                           MAZEZAM_TEXT_WELLDONE_OPTION);
 
-    switch(rb->do_menu(&menu, &start_selection, NULL, true)){
+    switch(do_menu(&menu, &start_selection, NULL, true)){
         case MENU_ATTACHED_USB:
             state = STATE_USB_CONNECTED;
             break;
@@ -549,12 +549,12 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
 
     while (state >= STATE_IN_LEVEL) {
         draw_level(li, shift, *x, *y);
-        rb->lcd_update();
+        lcd_update();
 #ifdef __PLUGINLIB_ACTIONS_H__
         button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
                 ARRAYLEN(plugin_contexts));
 #else
-        button = rb->button_get(true);
+        button = button_get(true);
 #endif
         blocked = false;
 
@@ -622,7 +622,7 @@ static void level_loop(struct level_info* li, short* shift, short *x, short *y)
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     state = STATE_USB_CONNECTED;
                 break;
         }
@@ -644,7 +644,7 @@ static void in_game_menu(void)
                          MAZEZAM_TEXT_QUIT);
 
     /* Don't show the status bar */
-    switch(rb->do_menu(&menu, &start_selection, NULL, false)){
+    switch(do_menu(&menu, &start_selection, NULL, false)){
         case 1: /* retry */
             state = STATE_FAILED;
             break;
@@ -705,13 +705,13 @@ static void play_level(short level, short lives, bool new_level)
     y = li.entrance;
 
     plugin_lcd_settings();
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     draw_level(&li, shift, x, y);
 
     /* If we've just reached a checkpoint, then alert the player */
     if (new_level && at_checkpoint(level)) {
-        rb->splash(MAZEZAM_DELAY_CHECKPOINT, MAZEZAM_TEXT_CHECKPOINT);
+        splash(MAZEZAM_DELAY_CHECKPOINT, MAZEZAM_TEXT_CHECKPOINT);
         /* Clear the splash */
         draw_level(&li, shift, x, y);
     }
@@ -720,13 +720,13 @@ static void play_level(short level, short lives, bool new_level)
     /* Splash text seems to use the remote display by
      * default. I suppose I better keep it tidy!
      */
-    rb->lcd_remote_clear_display();
+    lcd_remote_clear_display();
 #endif
-    rb->splashf(MAZEZAM_DELAY_LIVES, MAZEZAM_TEXT_LIVES,
+    splashf(MAZEZAM_DELAY_LIVES, MAZEZAM_TEXT_LIVES,
                level+1, lives);
 
     /* ensure keys pressed during the splash screen are ignored */
-    rb->button_clear_queue();
+    button_clear_queue();
 
     /* this little loop just ensures we return to the game if the player
      * doesn't perform an interesting action during the in game menu */
@@ -795,9 +795,9 @@ static void game_loop(struct resume_data *r)
             /* Splash text seems to use the remote display by
              * default. I suppose I better keep it tidy!
              */
-            rb->lcd_remote_clear_display();
+            lcd_remote_clear_display();
 #endif
-            rb->splash(MAZEZAM_DELAY_GAME_OVER, MAZEZAM_TEXT_GAME_OVER);
+            splash(MAZEZAM_DELAY_GAME_OVER, MAZEZAM_TEXT_GAME_OVER);
             break;
 
         case STATE_WELLDONE:
@@ -878,7 +878,7 @@ static void main_menu(void)
 
     while (state >= STATE_IN_APPLICATION) {
         have_continue = (r_data.level != 0);
-        choice = rb->do_menu(&menu, &start_selection, NULL, false);
+        choice = do_menu(&menu, &start_selection, NULL, false);
 
         switch(choice) {
             case 0: /* Continue */

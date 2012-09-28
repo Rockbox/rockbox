@@ -1283,11 +1283,11 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Make use of 44.1khz */
-        ci->configure(DSP_SET_FREQUENCY, 44100);
+        codec_configure(DSP_SET_FREQUENCY, 44100);
         /* Sample depth is 28 bit host endian */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 28);
         /* Stereo output */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     }
 
     return CODEC_OK;
@@ -1306,12 +1306,12 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* Load MOD file */
-    ci->seek_buffer(0);
-    modfile = ci->request_buffer(&n, ci->filesize);
-    if (!modfile || n < (size_t)ci->filesize) {
+    codec_seek_buffer(0);
+    modfile = codec_request_buffer(&n, ci.filesize);
+    if (!modfile || n < (size_t)ci.filesize) {
         return CODEC_ERROR;
     }
 
@@ -1319,12 +1319,12 @@ enum codec_status codec_run(void)
     loadmod(modfile);
 
     /* The main decoder loop */
-    ci->set_elapsed(0);
+    audio_codec_update_elapsed(0);
     bytesdone = 0;
     old_patterntableposition = 0;
 
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -1333,11 +1333,11 @@ enum codec_status codec_run(void)
             /* New time is ready in param */
             modplayer.patterntableposition = param/1000;
             modplayer.currentline = 0;
-            ci->seek_complete();
+            codec_seek_complete();
         }
 
         if(old_patterntableposition != modplayer.patterntableposition) {
-          ci->set_elapsed(modplayer.patterntableposition*1000);
+          audio_codec_update_elapsed(modplayer.patterntableposition*1000);
           old_patterntableposition=modplayer.patterntableposition;
         }
 
@@ -1345,7 +1345,7 @@ enum codec_status codec_run(void)
 
         bytesdone += CHUNK_SIZE;
 
-        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE/2);
+        codec_pcmbuf_insert(samples, NULL, CHUNK_SIZE/2);
 
     }
 

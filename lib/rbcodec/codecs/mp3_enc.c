@@ -33,6 +33,7 @@
 //    Library General Public License for more details.
 
 #include <inttypes.h>
+#include "codecs.h"
 #include "codeclib.h"
 
 CODEC_ENC_HEADER
@@ -48,8 +49,6 @@ CODEC_ENC_HEADER
 #define SAMPL2                576
 #define SBLIMIT                32
 #define HTN                    16
-#define memcpy      ci->memcpy
-#define memset      ci->memset
 #define putlong(c, s)  if(s+sz <= 32) { cc = (cc << s) | c;      sz+= s; } \
                        else           { putbits(cc, sz); cc = c; sz = s; }
 
@@ -1957,14 +1956,14 @@ static int find_bitrate_index(int type, int bitrate, bool stereo)
     if (type == 1 && !stereo && bitrate > 160)
         bitrate = 160;
 
-    return ci->round_value_to_list32(bitrate,
+    return round_value_to_list32(bitrate,
         &bitr_index[type][1], 14, true) + 1;
 }
 
 static int find_samplerate_index(long freq, int *mp3_type)
 {
     int mpeg = freq >= (32000+24000)/2 ? 1 : 0;
-    int i = ci->round_value_to_list32(freq, sampr_index[mpeg], 3, true);
+    int i = round_value_to_list32(freq, sampr_index[mpeg], 3, true);
     *mp3_type = mpeg;
     return i;    
 }
@@ -2399,7 +2398,7 @@ static inline bool on_write_chunk(struct enc_file_event_data *data)
     if (data->chunk->enc_data == NULL)
     {
 #ifdef ROCKBOX_HAS_LOGF
-        ci->logf("mp3 enc: NULL data");
+        logf("mp3 enc: NULL data");
 #endif
         return true;
     }
@@ -2407,7 +2406,7 @@ static inline bool on_write_chunk(struct enc_file_event_data *data)
     /* if current chunk doesn't fit => write collected data */
     if (mp3_data_len + data->chunk->enc_size > sizeof(mp3_data))
     {
-        if (ci->write(data->rec_file, mp3_data,
+        if (write(data->rec_file, mp3_data,
                     mp3_data_len) != (ssize_t)mp3_data_len)
             return false;
 
@@ -2428,7 +2427,7 @@ static bool on_start_file(struct enc_file_event_data *data)
     if ((data->chunk->flags & CHUNKF_ERROR) || *data->filename == '\0')
         return false;
 
-    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
+    data->rec_file = open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
 
     if (data->rec_file < 0)
         return false;
@@ -2448,7 +2447,7 @@ static bool on_end_file(struct enc_file_event_data *data)
         return false; /* file already closed, nothing more we can do */
 
     /* write the remaining mp3_data */
-    if (ci->write(data->rec_file, mp3_data, mp3_data_len)
+    if (write(data->rec_file, mp3_data, mp3_data_len)
                    != (ssize_t)mp3_data_len)
         return false;
 
@@ -2456,7 +2455,7 @@ static bool on_end_file(struct enc_file_event_data *data)
     mp3_data_len = 0;
 
     /* always _try_ to write the file header, even on error */
-    if (ci->close(data->rec_file) != 0)
+    if (close(data->rec_file) != 0)
         return false;
 
     data->rec_file = -1;
@@ -2484,8 +2483,8 @@ static void on_rec_new_stream(struct enc_buffer_event_data *data)
             encode_frame(res_buffer, data->chunk);
             data->chunk->num_pcm = samp_per_frame;
 
-            ci->enc_finish_chunk();
-            data->chunk = ci->enc_get_chunk();
+            enc_finish_chunk();
+            data->chunk = enc_get_chunk();
         }
     }
     else if (data->flags & CHUNKF_PRERECORD)
@@ -2547,15 +2546,15 @@ static bool enc_init(void)
     struct enc_inputs     inputs;
     struct enc_parameters params;
 
-    if (ci->enc_get_inputs         == NULL ||
-        ci->enc_set_parameters     == NULL ||
-        ci->enc_get_chunk          == NULL ||
-        ci->enc_finish_chunk       == NULL ||
-        ci->enc_get_pcm_data       == NULL ||
-        ci->enc_unget_pcm_data     == NULL )
+    if (enc_get_inputs         == NULL ||
+        enc_set_parameters     == NULL ||
+        enc_get_chunk          == NULL ||
+        enc_finish_chunk       == NULL ||
+        enc_get_pcm_data       == NULL ||
+        enc_unget_pcm_data     == NULL )
         return false;
 
-    ci->enc_get_inputs(&inputs);
+    enc_get_inputs(&inputs);
 
     if (inputs.config->afmt != AFMT_MPA_L3)
         return false;
@@ -2565,7 +2564,7 @@ static bool enc_init(void)
 
     err = 0;
 
-    /* configure the buffer system */
+    /* codec_configure the buffer system */
     params.afmt            = AFMT_MPA_L3;
     params.chunk_size      = cfg.byte_per_frame + 1;
     params.enc_sample_rate = cfg.samplerate;
@@ -2573,7 +2572,7 @@ static bool enc_init(void)
        for padding and flushing */
     params.reserve_bytes   = ENC_CHUNK_HDR_SIZE + pcm_chunk_size;
     params.events_callback = enc_events_callback;
-    ci->enc_set_parameters(&params);
+    enc_set_parameters(&params);
 
     res_buffer             = params.reserve_buffer;
 
@@ -2593,7 +2592,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     }
     else if (reason == CODEC_UNLOAD) {
         /* reset parameters to initial state */
-        ci->enc_set_parameters(NULL);
+        enc_set_parameters(NULL);
     }
 
     return CODEC_OK;
@@ -2603,26 +2602,26 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 enum codec_status codec_run(void)
 {
     /* main encoding loop */
-    while(ci->get_command(NULL) != CODEC_ACTION_HALT)
+    while(codec_get_command(NULL) != CODEC_ACTION_HALT)
     {
-        char *buffer = buffer = ci->enc_get_pcm_data(pcm_chunk_size);
+        char *buffer = buffer = enc_get_pcm_data(pcm_chunk_size);
         struct enc_chunk_hdr *chunk;
 
         if(buffer == NULL)
             continue;
 
-        chunk           = ci->enc_get_chunk();
+        chunk           = enc_get_chunk();
         chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
 
         encode_frame(buffer, chunk);
 
         if (chunk->num_pcm < samp_per_frame)
         {
-            ci->enc_unget_pcm_data(pcm_chunk_size - chunk->num_pcm*4);
+            enc_unget_pcm_data(pcm_chunk_size - chunk->num_pcm*4);
             chunk->num_pcm = samp_per_frame;
         }
 
-        ci->enc_finish_chunk();
+        enc_finish_chunk();
     }
 
     return CODEC_OK;

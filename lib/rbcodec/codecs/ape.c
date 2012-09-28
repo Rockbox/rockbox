@@ -114,7 +114,7 @@ static void ape_resume(struct ape_ctx_t* ape_ctx, size_t resume_offset,
     *firstbyte = 3 - (newfilepos & 3);
     newfilepos &= ~3;
 
-    ci->seek_buffer(newfilepos);
+    codec_seek_buffer(newfilepos);
 
     /* We estimate where we were in the current frame, based on the
        byte offset */
@@ -131,7 +131,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, APE_OUTPUT_DEPTH-1);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, APE_OUTPUT_DEPTH-1);
     }
 
     return CODEC_OK;
@@ -164,10 +164,10 @@ enum codec_status codec_run(void)
 
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
-    resume_offset = ci->id3->offset;
+    resume_offset = ci.id3->offset;
 
-    ci->seek_buffer(0);
-    inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
+    codec_seek_buffer(0);
+    inbuffer = codec_request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
     /* Read the file headers to populate the ape_ctx struct */
     if (ape_parseheaderbuf(inbuffer,&ape_ctx) < 0) {
@@ -179,11 +179,11 @@ enum codec_status codec_run(void)
     ape_ctx.seektable = seektablebuf;
     ape_ctx.numseekpoints = MIN(MAX_SEEKPOINTS,ape_ctx.numseekpoints);
 
-    ci->advance_buffer(ape_ctx.seektablefilepos);
+    codec_advance_buffer(ape_ctx.seektablefilepos);
 
     /* The seektable may be bigger than the guard buffer (32KB), so we
        do a read() */
-    ci->read_filebuf(ape_ctx.seektable, ape_ctx.numseekpoints * sizeof(uint32_t));
+    codec_read_filebuf(ape_ctx.seektable, ape_ctx.numseekpoints * sizeof(uint32_t));
 
 #ifdef ROCKBOX_BIG_ENDIAN
     /* Byte-swap the little-endian seekpoints */
@@ -196,14 +196,14 @@ enum codec_status codec_run(void)
 #endif
 
     /* Now advance the file position to the first frame */
-    ci->advance_buffer(ape_ctx.firstframe - 
+    codec_advance_buffer(ape_ctx.firstframe - 
                        (ape_ctx.seektablefilepos +
                         ape_ctx.numseekpoints * sizeof(uint32_t)));
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ape_ctx.samplerate);
-    ci->configure(DSP_SET_STEREO_MODE, ape_ctx.channels == 1 ?
+    codec_configure(DSP_SWITCH_FREQUENCY, ape_ctx.samplerate);
+    codec_configure(DSP_SET_STEREO_MODE, ape_ctx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* The main decoding loop */
 
@@ -221,10 +221,10 @@ enum codec_status codec_run(void)
     }
 
     elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
-    ci->set_elapsed(elapsedtime);
+    audio_codec_update_elapsed(elapsedtime);
 
     /* Initialise the buffer */
-    inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
+    inbuffer = codec_request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
     /* The main decoding loop - we decode the frames a small chunk at a time */
     while (currentframe < ape_ctx.totalframes)
@@ -241,13 +241,13 @@ frame_start:
         /* Initialise the frame decoder */
         init_frame_decoder(&ape_ctx, inbuffer, &firstbyte, &bytesconsumed);
 
-        ci->advance_buffer(bytesconsumed);
-        inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
+        codec_advance_buffer(bytesconsumed);
+        inbuffer = codec_request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
         /* Decode the frame a chunk at a time */
         while (nblocks > 0)
         {
-            enum codec_command_action action = ci->get_command(&param);
+            enum codec_command_action action = codec_get_command(&param);
 
             if (action == CODEC_ACTION_HALT)
                 goto done;
@@ -256,7 +256,7 @@ frame_start:
             if (action == CODEC_ACTION_SEEK_TIME) 
             {
                 if (ape_calc_seekpos(&ape_ctx,
-                    (param/10) * (ci->id3->frequency/100),
+                    (param/10) * (ci.id3->frequency/100),
                     &currentframe,
                     &newfilepos,
                     &samplestoskip))
@@ -267,16 +267,16 @@ frame_start:
                     firstbyte = 3 - (newfilepos & 3);
                     newfilepos &= ~3;
 
-                    ci->seek_buffer(newfilepos);
-                    inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
+                    codec_seek_buffer(newfilepos);
+                    inbuffer = codec_request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
                     elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
-                    ci->set_elapsed(elapsedtime);
-                    ci->seek_complete();
+                    audio_codec_update_elapsed(elapsedtime);
+                    codec_seek_complete();
                     goto frame_start;  /* Sorry... */
                 }
 
-                ci->seek_complete();
+                codec_seek_complete();
             }
 
             blockstodecode = MIN(BLOCKS_PER_LOOP, nblocks);
@@ -291,11 +291,11 @@ frame_start:
                 return CODEC_ERROR;
             }
 
-            ci->yield();
+            yield();
 
             if (samplestoskip > 0) {
                 if (samplestoskip < blockstodecode) {
-                    ci->pcmbuf_insert(decoded0 + samplestoskip, 
+                    codec_pcmbuf_insert(decoded0 + samplestoskip, 
                                       decoded1 + samplestoskip, 
                                       blockstodecode - samplestoskip);
                     samplestoskip = 0;
@@ -303,7 +303,7 @@ frame_start:
                     samplestoskip -= blockstodecode;
                 }
             } else {
-                ci->pcmbuf_insert(decoded0, decoded1, blockstodecode);
+                codec_pcmbuf_insert(decoded0, decoded1, blockstodecode);
             }
         
             samplesdone += blockstodecode;
@@ -311,11 +311,11 @@ frame_start:
             if (!samplestoskip) {
                 /* Update the elapsed-time indicator */
                 elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
-                ci->set_elapsed(elapsedtime);
+                audio_codec_update_elapsed(elapsedtime);
             }
 
-            ci->advance_buffer(bytesconsumed);
-            inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
+            codec_advance_buffer(bytesconsumed);
+            inbuffer = codec_request_buffer(&bytesleft, INPUT_CHUNKSIZE);
 
             /* Decrement the block count */
             nblocks -= blockstodecode;

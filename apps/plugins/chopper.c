@@ -304,35 +304,35 @@ static void chopDrawPlayer(int x,int y) /* These are SCREEN coords, not world!*/
 {
 
 #if LCD_DEPTH > 2
-    rb->lcd_set_foreground(LCD_RGBPACK(50,50,200));
+    lcd_set_foreground(LCD_RGBPACK(50,50,200));
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_DARKGRAY);
+    lcd_set_foreground(LCD_DARKGRAY);
 #endif
-    rb->lcd_fillrect(SCALE(x+6), SCALE(y+2), SCALE(12), SCALE(9));
-    rb->lcd_fillrect(SCALE(x-3), SCALE(y+6), SCALE(20), SCALE(3));
+    lcd_fillrect(SCALE(x+6), SCALE(y+2), SCALE(12), SCALE(9));
+    lcd_fillrect(SCALE(x-3), SCALE(y+6), SCALE(20), SCALE(3));
 
 #if LCD_DEPTH > 2
-    rb->lcd_set_foreground(LCD_RGBPACK(50,50,50));
+    lcd_set_foreground(LCD_RGBPACK(50,50,50));
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_DARKGRAY);
+    lcd_set_foreground(LCD_DARKGRAY);
 #endif
-    rb->lcd_fillrect(SCALE(x+10), SCALE(y), SCALE(2), SCALE(3));
-    rb->lcd_fillrect(SCALE(x+10), SCALE(y), SCALE(1), SCALE(3));
+    lcd_fillrect(SCALE(x+10), SCALE(y), SCALE(2), SCALE(3));
+    lcd_fillrect(SCALE(x+10), SCALE(y), SCALE(1), SCALE(3));
 
 #if LCD_DEPTH > 2
-    rb->lcd_set_foreground(LCD_RGBPACK(40,40,100));
+    lcd_set_foreground(LCD_RGBPACK(40,40,100));
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 #endif
-    rb->lcd_drawline(SCALE(x), SCALE(y+iRotorOffset), SCALE(x+20),
+    lcd_drawline(SCALE(x), SCALE(y+iRotorOffset), SCALE(x+20),
                      SCALE(y-iRotorOffset));
 
 #if LCD_DEPTH > 2
-    rb->lcd_set_foreground(LCD_RGBPACK(20,20,50));
+    lcd_set_foreground(LCD_RGBPACK(20,20,50));
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 #endif
-    rb->lcd_fillrect(SCALE(x - 2), SCALE(y + 5), SCALE(2), SCALE(5));
+    lcd_fillrect(SCALE(x - 2), SCALE(y + 5), SCALE(2), SCALE(5));
 
 }
 
@@ -344,7 +344,7 @@ static void chopClearTerrain(struct CTerrain *ter)
 
 static int iR(int low,int high)
 {
-    return low+rb->rand()%(high-low+1);
+    return low+rand()%(high-low+1);
 }
 
 static void chopCopyTerrain(struct CTerrain *src, struct CTerrain *dest,
@@ -603,14 +603,14 @@ static void chopKillPlayer(void)
     iPlayerAlive--;
 
     if (iPlayerAlive == 0) {
-        rb->splash(HZ, "Game Over");
+        splash(HZ, "Game Over");
 
         if (score > highscore) {
             char scoretext[30];
             highscore = score;
-            rb->snprintf(scoretext, sizeof(scoretext), "New High Score: %d",
+            snprintf(scoretext, sizeof(scoretext), "New High Score: %d",
                          highscore);
-            rb->splash(HZ*2, scoretext);
+            splash(HZ*2, scoretext);
         }
     } else
         chopper_load(false);
@@ -659,11 +659,11 @@ static void chopDrawParticle(struct CParticle *mParticle)
     int iPosX = (mParticle->iWorldX - iCameraPosX);
     int iPosY = (mParticle->iWorldY);
 #if LCD_DEPTH > 2
-    rb->lcd_set_foreground(LCD_RGBPACK(192,192,192));
+    lcd_set_foreground(LCD_RGBPACK(192,192,192));
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_LIGHTGRAY);
+    lcd_set_foreground(LCD_LIGHTGRAY);
 #endif
-    rb->lcd_fillrect(SCALE(iPosX), SCALE(iPosY), SCALE(3), SCALE(3));
+    lcd_fillrect(SCALE(iPosX), SCALE(iPosY), SCALE(3), SCALE(3));
 
 }
 
@@ -672,50 +672,50 @@ static void chopDrawScene(void)
     char s[30];
     int w;
 #if LCD_DEPTH > 2
-    rb->lcd_set_background(LCD_BLACK);
+    lcd_set_background(LCD_BLACK);
 #elif LCD_DEPTH == 2
-    rb->lcd_set_background(LCD_WHITE);
+    lcd_set_background(LCD_WHITE);
 #endif
-    rb->lcd_clear_display();
+    lcd_clear_display();
     chopDrawTheWorld();
     chopDrawPlayer(iPlayerPosX - iCameraPosX, iPlayerPosY);
 
     score = -20 + iPlayerPosX/3;
 
 #if LCD_DEPTH == 1
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
 #else
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_set_drawmode(DRMODE_FG);
 #endif
 
 #if LCD_DEPTH > 2
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_foreground(LCD_WHITE);
 #endif
     
 #if LCD_WIDTH <= 128
-    rb->snprintf(s, sizeof(s), "Dist: %d", score);
+    snprintf(s, sizeof(s), "Dist: %d", score);
 #else
-    rb->snprintf(s, sizeof(s), "Distance: %d", score);
+    snprintf(s, sizeof(s), "Distance: %d", score);
 #endif
-    rb->lcd_getstringsize(s, &w, NULL);
-    rb->lcd_putsxy(2, 2, s);
+    lcd_getstringsize(s, &w, NULL);
+    lcd_putsxy(2, 2, s);
     if (score < highscore)
     {
         int w2;
 #if LCD_WIDTH <= 128
-        rb->snprintf(s, sizeof(s), "Hi: %d", highscore);
+        snprintf(s, sizeof(s), "Hi: %d", highscore);
 #else
-        rb->snprintf(s, sizeof(s), "Best: %d", highscore);
+        snprintf(s, sizeof(s), "Best: %d", highscore);
 #endif
-        rb->lcd_getstringsize(s, &w2, NULL);
+        lcd_getstringsize(s, &w2, NULL);
         if (LCD_WIDTH - 2 - w2 > w + 2)
-            rb->lcd_putsxy(LCD_WIDTH - 2 - w2, 2, s);
+            lcd_putsxy(LCD_WIDTH - 2 - w2, 2, s);
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 static bool _ingame;
@@ -743,18 +743,18 @@ static int chopMenu(int menunum)
     _ingame = (menunum!=0);
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
 #endif
 
-    rb->lcd_clear_display();
-    rb->button_clear_queue();
+    lcd_clear_display();
+    button_clear_queue();
 
     while (!menu_quit) {
-        switch(rb->do_menu(&menu, &result, NULL, false))
+        switch(do_menu(&menu, &result, NULL, false))
         {
             case 0:     /* Resume Game */
                 menu_quit=true;
@@ -766,7 +766,7 @@ static int chopMenu(int menunum)
                 res = -1;
                 break;
             case 2:
-                rb->set_option("Level", &iLevelMode, INT, levels, 2, NULL);
+                set_option("Level", &iLevelMode, INT, levels, 2, NULL);
                 break;
             case 3:
                 playback_control(NULL);
@@ -781,7 +781,7 @@ static int chopMenu(int menunum)
                 break;
         }
     }
-    rb->lcd_clear_display();
+    lcd_clear_display();
     return res;
 }
 
@@ -803,7 +803,7 @@ static int chopGameLoop(void)
 
     while (!exit) {
 
-        end = *rb->current_tick + CYCLETIME;
+        end = current_tick + CYCLETIME;
 
         if(chopUpdateTerrainRecycling(&mGround) == 1)
             /* mirror the sky if we've changed the ground */
@@ -836,8 +836,8 @@ static int chopGameLoop(void)
             chopGenerateBlockIfNeeded();
 
 
-        move_button=rb->button_status();
-        if (rb->button_get(false) == QUIT) {
+        move_button=button_status();
+        if (button_get(false) == QUIT) {
             ret = chopMenu(1);
             if (ret != -1)
                 return PLUGIN_OK;
@@ -871,7 +871,7 @@ static int chopGameLoop(void)
                 if (bdelay == 0)
                     iPlayerSpeedY = 4;
 
-                if (rb->default_event_handler(move_button) == SYS_USB_CONNECTED)
+                if (default_event_handler(move_button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -917,10 +917,10 @@ static int chopGameLoop(void)
                         return ret;
                 }
 
-        if (TIME_BEFORE(*rb->current_tick, end))
-            rb->sleep(end - *rb->current_tick); /* wait until time is over */
+        if (TIME_BEFORE(current_tick, end))
+            sleep(end - current_tick); /* wait until time is over */
         else
-            rb->yield();
+            yield();
 
     }
     return PLUGIN_OK;
@@ -931,11 +931,11 @@ static void chopDrawBlock(struct CBlock *mBlock)
     int iPosX = (mBlock->iWorldX - iCameraPosX);
     int iPosY = (mBlock->iWorldY);
 #if LCD_DEPTH > 2
-    rb->lcd_set_foreground(LCD_RGBPACK(100,255,100));
+    lcd_set_foreground(LCD_RGBPACK(100,255,100));
 #elif LCD_DEPTH == 2
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 #endif
-    rb->lcd_fillrect(SCALE(iPosX), SCALE(iPosY), SCALE(mBlock->iSizeX),
+    lcd_fillrect(SCALE(iPosX), SCALE(iPosY), SCALE(mBlock->iSizeX),
                      SCALE(mBlock->iSizeY));
 }
 
@@ -969,12 +969,12 @@ static void chopRenderTerrain(struct CTerrain *ter, bool isground)
             ay = y2;
         }
 #if LCD_DEPTH > 2
-        rb->lcd_set_foreground(LCD_RGBPACK(100,255,100));
+        lcd_set_foreground(LCD_RGBPACK(100,255,100));
 #elif LCD_DEPTH == 2
-        rb->lcd_set_foreground(LCD_DARKGRAY);
+        lcd_set_foreground(LCD_DARKGRAY);
 #endif
 
-        rb->lcd_drawline(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2));
+        lcd_drawline(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2));
 
         xlcd_filltriangle(SCALE(x), SCALE(y), SCALE(x2), SCALE(y2),
                           SCALE(ax), SCALE(ay));
@@ -990,7 +990,7 @@ static void chopRenderTerrain(struct CTerrain *ter, bool isground)
             y2 = ay;
         }
         if (y2-y > 0)
-            rb->lcd_fillrect(SCALE(x), SCALE(y), SCALE(x2-x)+1, SCALE(y2-y)+1);
+            lcd_fillrect(SCALE(x), SCALE(y), SCALE(x2-x)+1, SCALE(y2-y)+1);
 
         oldx = x;
         i++;
@@ -1049,19 +1049,19 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     int ret;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
 
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
-    rb->srand( *rb->current_tick );
+    srand( current_tick );
 
     configfile_load(CFG_FILE, config, 1, 0);
 
@@ -1070,7 +1070,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     configfile_save(CFG_FILE, config, 1, 0);
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
 

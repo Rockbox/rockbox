@@ -33,7 +33,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Generic codec initialisation */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 29);
     }
 
     return CODEC_OK;
@@ -56,7 +56,7 @@ enum codec_status codec_run(void)
 
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
-    resume_offset = ci->id3->offset;
+    resume_offset = ci.id3->offset;
 
 restart_track:
 
@@ -70,41 +70,41 @@ restart_track:
 
     /* Copy the format metadata we've stored in the id3 TOC field.  This
        saves us from parsing it again here. */
-    memcpy(&wfx, ci->id3->toc, sizeof(wfx));
+    memcpy(&wfx, ci.id3->toc, sizeof(wfx));
 
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    codec_seek_buffer(ci.id3->first_frame_offset);
     if (wma_decode_init(&wmadec,&wfx) < 0) {
         LOGF("WMA: Unsupported or corrupt file\n");
         return CODEC_ERROR;
     }
 
-    if (resume_offset > ci->id3->first_frame_offset)
+    if (resume_offset > ci.id3->first_frame_offset)
     {
         /* Get start of current packet */
-        int packet_offset = (resume_offset - ci->id3->first_frame_offset)
+        int packet_offset = (resume_offset - ci.id3->first_frame_offset)
             % wfx.packet_size;
-        ci->seek_buffer(resume_offset - packet_offset);
+        codec_seek_buffer(resume_offset - packet_offset);
         elapsedtime = asf_get_timestamp(&i);
     }
     else
     {
         /* Now advance the file position to the first frame */
-        ci->seek_buffer(ci->id3->first_frame_offset);
+        codec_seek_buffer(ci.id3->first_frame_offset);
         elapsedtime = 0;
     }
 
-    ci->set_elapsed(elapsedtime);
+    audio_codec_update_elapsed(elapsedtime);
 
     resume_offset = 0;
-    ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
-    ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
+    codec_configure(DSP_SWITCH_FREQUENCY, wfx.rate);
+    codec_configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* The main decoding loop */
     while (res >= 0)
     {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -122,21 +122,21 @@ restart_track:
                 sizeof(fixed32) * MAX_CHANNELS * BLOCK_MAX_SIZE * 2);
 
             if (param == 0) {
-                ci->set_elapsed(0);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_complete();
                 goto restart_track; /* Pretend you never saw this... */
             }
 
             elapsedtime = asf_seek(param, &wfx);
             if (elapsedtime < 1){
-                ci->set_elapsed(0);
-                ci->seek_complete();
+                audio_codec_update_elapsed(0);
+                codec_seek_complete();
                 break;
             }
             /*DEBUGF("Seek returned %d\n", (int)elapsedtime);*/
 
-            ci->set_elapsed(elapsedtime);
-            ci->seek_complete();
+            audio_codec_update_elapsed(elapsedtime);
+            codec_seek_complete();
         }
         errcount = 0;
 new_packet:
@@ -157,7 +157,7 @@ new_packet:
             if (errcount > 5) {
                 return CODEC_ERROR;
             } else {
-                ci->advance_buffer(packetlength);
+                codec_advance_buffer(packetlength);
                 goto new_packet;
             }
         } else if (res > 0) {
@@ -168,7 +168,7 @@ new_packet:
                 wmares = wma_decode_superframe_frame(&wmadec,
                                                      audiobuf, audiobufsize);
 
-                ci->yield ();
+                yield ();
 
                 if (wmares < 0) {
                     /* Do the above, but for errors in decode. */
@@ -177,18 +177,18 @@ new_packet:
                     if (errcount > 5) {
                         return CODEC_ERROR;
                     } else {
-                        ci->advance_buffer(packetlength);
+                        codec_advance_buffer(packetlength);
                         goto new_packet;
                     }
                 } else if (wmares > 0) {
-                    ci->pcmbuf_insert((*wmadec.frame_out)[0], (*wmadec.frame_out)[1], wmares);
+                    codec_pcmbuf_insert((*wmadec.frame_out)[0], (*wmadec.frame_out)[1], wmares);
                     elapsedtime += (wmares*10)/(wfx.rate/100);
-                    ci->set_elapsed(elapsedtime);
+                    audio_codec_update_elapsed(elapsedtime);
                 }
             }
         }
 
-        ci->advance_buffer(packetlength);
+        codec_advance_buffer(packetlength);
     }
 
     /*LOGF("WMA: Decoded %ld samples\n",elapsedtime*wfx.rate/1000);*/

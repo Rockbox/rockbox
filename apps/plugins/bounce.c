@@ -285,21 +285,21 @@ static void addclock(void)
     int hour;
     int minute;
 
-    struct tm* current_time = rb->get_time();
+    struct tm* current_time = get_time();
     hour = current_time->tm_hour;
     minute = current_time->tm_min;
 
-    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2,
-                     xminute[minute], yminute[minute]);
+    lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2,
+                 xminute[minute], yminute[minute]);
 
     hour = (hour % 12) * 5 + minute / 12;
 
-    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[hour], yhour[hour]);
+    lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[hour], yhour[hour]);
 
     /* draw a circle */
     for(i = 1; i < 60; i += 3) 
-        rb->lcd_drawline(xminute[i], yminute[i],
-                         xminute[(i+1)%60], yminute[(i+1)%60]);
+        lcd_drawline(xminute[i], yminute[i],
+                     xminute[(i+1)%60], yminute[(i+1)%60]);
 }
 #endif /* CONFIG_RTC */
 
@@ -325,13 +325,13 @@ static int scrollit(void)
     unsigned int textpos=0;
 
     char* rock="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
-    unsigned int rocklen = rb->strlen(rock);
+    unsigned int rocklen = strlen(rock);
     int letter;
 #if LCD_DEPTH > 1
     unsigned prev_color;
 #endif
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     while(1)
     {
         b = pluginlib_getaction(HZ/10, plugin_contexts,
@@ -344,33 +344,33 @@ static int scrollit(void)
             case BOUNCE_MODE :
                 return 1;
             default:
-                if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
+                if ( default_event_handler(b) == SYS_USB_CONNECTED )
                     return -1;
         }
-        rb->lcd_clear_display();
+        lcd_clear_display();
 #if CONFIG_RTC
         addclock();
 #endif
 
 #if LCD_DEPTH > 1
-        prev_color = rb->lcd_get_foreground();
+        prev_color = lcd_get_foreground();
 #endif
 
         for(i=0, yy=y, xx=x; xx < LCD_WIDTH; i++) {
             letter = rock[(i+textpos) % rocklen ];
 #if LCD_DEPTH > 1
-            rb->lcd_set_foreground(face_colors[letter % 3]);
+            lcd_set_foreground(face_colors[letter % 3]);
 #endif
-            rb->lcd_mono_bitmap(char_gen_12x16[letter-0x20],
-                                xx, ytable[yy % TABLE_SIZE],
-                                LETTER_WIDTH, LETTER_HEIGHT);
+            lcd_mono_bitmap(char_gen_12x16[letter-0x20],
+                            xx, ytable[yy % TABLE_SIZE],
+                            LETTER_WIDTH, LETTER_HEIGHT);
             yy += YADD;
             xx += LETTER_WIDTH;
         }
 #if LCD_DEPTH > 1
-        rb->lcd_set_foreground(prev_color);
+        lcd_set_foreground(prev_color);
 #endif
-        rb->lcd_update();
+        lcd_update();
 
         x-= XSPEED;
 
@@ -395,12 +395,12 @@ static int loopit(void)
     unsigned int xsanke=0;
 
     char* rock="ROCKbox";
-    unsigned int rocklen = rb->strlen(rock);
+    unsigned int rocklen = strlen(rock);
 
     int show=0;
     int timeout=0;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     while(1)
     {
         b = pluginlib_getaction(HZ/10, plugin_contexts,
@@ -411,7 +411,7 @@ static int loopit(void)
         if ( b == BOUNCE_MODE )
             return 1;
 
-        if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
+        if (default_event_handler(b) == SYS_USB_CONNECTED )
             return -1;
 
         if ( b != BUTTON_NONE )
@@ -420,7 +420,7 @@ static int loopit(void)
         y+= speed[ysanke&15] + values[NUM_YADD].num;
         x+= speed[xsanke&15] + values[NUM_XADD].num;
 
-        rb->lcd_clear_display();
+        lcd_clear_display();
 #if CONFIG_RTC
         addclock();
 #endif
@@ -445,18 +445,18 @@ static int loopit(void)
                       show=NUM_LAST-1;
                   break;
             }
-            rb->lcd_putsxyf(0, LCD_HEIGHT -  8, "%s: %d",
-                         values[show].what, values[show].num);
+            lcd_putsxyf(0, LCD_HEIGHT -  8, "%s: %d",
+                        values[show].what, values[show].num);
             timeout--;
         }
         for(i=0, yy=y, xx=x;
             i<rocklen;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
-            rb->lcd_mono_bitmap(char_gen_12x16[rock[i]-0x20],
-                                xtable[xx % TABLE_SIZE],
-                                ytable[yy % TABLE_SIZE],
-                                LETTER_WIDTH, LETTER_HEIGHT);
-        rb->lcd_update();
+            lcd_mono_bitmap(char_gen_12x16[rock[i]-0x20],
+                            xtable[xx % TABLE_SIZE],
+                            ytable[yy % TABLE_SIZE],
+                            LETTER_WIDTH, LETTER_HEIGHT);
+        lcd_update();
 
         ysanke+= values[NUM_YSANKE].num;
         xsanke+= values[NUM_XSANKE].num;
@@ -471,22 +471,22 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)(parameter);
 
-    rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
 
     /* Get horizontel centering for text */
-    rb->lcd_getstringsize((unsigned char *)SS_TITLE, &w, &h);
-    rb->lcd_putsxy((LCD_WIDTH/2) - w / 2, (LCD_HEIGHT/2) - h / 2,
-                   (unsigned char *)SS_TITLE);
+    lcd_getstringsize((unsigned char *)SS_TITLE, &w, &h);
+    lcd_putsxy((LCD_WIDTH/2) - w / 2, (LCD_HEIGHT/2) - h / 2,
+               (unsigned char *)SS_TITLE);
 
     /* Get horizontel centering for text */
-    rb->lcd_getstringsize((unsigned char *)off, &w, &h);
-    rb->lcd_putsxy((LCD_WIDTH/2) - w / 2, LCD_HEIGHT - 2 * h,
-                    (unsigned char *)off);
+    lcd_getstringsize((unsigned char *)off, &w, &h);
+    lcd_putsxy((LCD_WIDTH/2) - w / 2, LCD_HEIGHT - 2 * h,
+               (unsigned char *)off);
 
-    rb->lcd_update();
-    rb->sleep(HZ);
-    rb->lcd_set_drawmode(DRMODE_FG);
+    lcd_update();
+    sleep(HZ);
+    lcd_set_drawmode(DRMODE_FG);
     init_tables();
 #if CONFIG_RTC
     init_clock();
@@ -498,8 +498,8 @@ enum plugin_status plugin_start(const void* parameter)
             h = scrollit();
     } while(h > 0);
 
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_setfont(FONT_UI);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_setfont(FONT_UI);
 
     return (h == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }

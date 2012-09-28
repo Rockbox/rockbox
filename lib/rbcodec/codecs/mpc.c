@@ -31,25 +31,25 @@ static MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
 static mpc_int32_t read_impl(mpc_reader *reader, void *ptr, mpc_int32_t size)
 {
     (void)reader;
-    return ((mpc_int32_t)(ci->read_filebuf(ptr, size)));
+    return ((mpc_int32_t)(codec_read_filebuf(ptr, size)));
 }
 
 static mpc_bool_t seek_impl(mpc_reader *reader, mpc_int32_t offset)
 {
     (void)reader;
-    return ci->seek_buffer(offset);
+    return codec_seek_buffer(offset);
 }
 
 static mpc_int32_t tell_impl(mpc_reader *reader)
 {
     (void)reader;
-    return ci->curpos;
+    return ci.curpos;
 }
 
 static mpc_int32_t get_size_impl(mpc_reader *reader)
 {
     (void)reader;
-    return ci->filesize;
+    return ci.filesize;
 }
 
 /* this is the codec entry point */
@@ -58,7 +58,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     if (reason == CODEC_LOAD) {
         /* musepack's sample representation is 18.14
          * DSP_SET_SAMPLE_DEPTH = 14 (FRACT) + 16 (NATIVE) - 1 (SIGN) = 29 */
-        ci->configure(DSP_SET_SAMPLE_DEPTH, 29);
+        codec_configure(DSP_SET_SAMPLE_DEPTH, 29);
     }
 
     return CODEC_OK;
@@ -90,7 +90,7 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
 
     /* Prep position */
-    ci->seek_buffer(0);
+    codec_seek_buffer(0);
 
     /* Initialize demux/decoder. */
     demux = mpc_demux_init(&reader);
@@ -102,25 +102,25 @@ enum codec_status codec_run(void)
     
     byterate  = (mpc_uint32_t)(info.average_bitrate) / 8;
     frequency = info.sample_freq / 100; /* 0.1 kHz accuracy */
-    ci->configure(DSP_SWITCH_FREQUENCY, info.sample_freq);
+    codec_configure(DSP_SWITCH_FREQUENCY, info.sample_freq);
 
     /* Remark: rockbox offset is the file offset in bytes. So, estimate the 
      * sample seek position from the file offset, the sampling frequency and
      * the bitrate. As the saved position is exactly calculated the reverse way 
      * there is no loss of information except rounding. */
-    samplesdone = 100 * (((mpc_uint64_t)ci->id3->offset * frequency) / byterate);
+    samplesdone = 100 * (((mpc_uint64_t)ci.id3->offset * frequency) / byterate);
         
     /* Set up digital signal processing for correct number of channels */
     /* NOTE: current musepack format only allows for stereo files
        but code is here to handle other configurations anyway */
     if      (info.channels == 2)
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     else if (info.channels == 1)
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+        codec_configure(DSP_SET_STEREO_MODE, STEREO_MONO);
     else
         return CODEC_ERROR;
     
-    codec_set_replaygain(ci->id3);
+    codec_set_replaygain(ci.id3);
 
     /* Resume to saved sample offset. */
     elapsed_time = 0;
@@ -137,12 +137,12 @@ enum codec_status codec_run(void)
         }
     }
 
-    ci->set_elapsed(elapsed_time);
+    audio_codec_update_elapsed(elapsed_time);
 
     /* This is the decoding loop. */
     do 
     {
-        enum codec_command_action action = ci->get_command(&param);
+        enum codec_command_action action = codec_get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             return CODEC_OK;
@@ -157,13 +157,13 @@ enum codec_status codec_run(void)
             }
 
             elapsed_time = (samplesdone*10)/frequency;
-            ci->set_elapsed(elapsed_time);
-            ci->seek_complete();
+            audio_codec_update_elapsed(elapsed_time);
+            codec_seek_complete();
         }
 
         /* Decode one frame. */
         status = mpc_demux_decode(demux, &frame);
-        ci->yield();
+        yield();
         if (frame.bits == -1)
         {
             /* Decoding error, exit decoding loop. */
@@ -172,15 +172,15 @@ enum codec_status codec_run(void)
         else 
         {
             /* Decoding passed, insert samples to PCM buffer. */
-            ci->pcmbuf_insert(frame.buffer,
+            codec_pcmbuf_insert(frame.buffer,
                               frame.buffer + MPC_FRAME_LENGTH,
                               frame.samples);
             samplesdone += frame.samples;
             elapsed_time = (samplesdone*10)/frequency;
-            ci->set_elapsed(elapsed_time);
+            audio_codec_update_elapsed(elapsed_time);
             /* Remark: rockbox offset is the file offset in bytes. So estimate 
              * this offset from the samples, sampling frequency and bitrate */
-            ci->set_offset( (samplesdone * byterate)/(frequency*100) );
+            audio_codec_update_offset( (samplesdone * byterate)/(frequency*100) );
         }
     } while (true);
 }

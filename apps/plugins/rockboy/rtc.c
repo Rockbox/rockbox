@@ -88,7 +88,7 @@ void rtc_save_internal(int fd)
     int rt = 0;
     
 #if CONFIG_RTC
-    rt = rb->mktime(rb->get_time());
+    rt = mktime(get_time());
 #endif
     fdprintf(fd, "%d %d %d %d %d %d %d %d\n", rtc.carry, rtc.stop, rtc.d, rtc.h,
              rtc.m, rtc.s, rtc.t, rt);
@@ -99,7 +99,7 @@ void rtc_load_internal(int fd)
     int rt = 0;
     char buf[32];
     
-    rb->read_line(fd, buf, sizeof(buf));
+    read_line(fd, buf, sizeof(buf));
     sscanf(buf, "%d %d %d %d %d %d %d %d\n", &rtc.carry, &rtc.stop, &rtc.d, 
            &rtc.h, &rtc.m, &rtc.s, &rtc.t, &rt);    
     
@@ -112,7 +112,7 @@ void rtc_load_internal(int fd)
 	rtc.carry &= 1;
 
 #if CONFIG_RTC    
-    if (rt) rt = (rb->mktime(rb->get_time()) - rt) * 60;
+    if (rt) rt = (mktime(get_time()) - rt) * 60;
 #endif
     while (rt-- > 0) rtc_tick();
 

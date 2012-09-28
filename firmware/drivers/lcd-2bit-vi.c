@@ -35,6 +35,7 @@
 #include "rbunicode.h"
 #include "bidi.h"
 #include "scroll_engine.h"
+#include "symbols.h"
 
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
@@ -153,6 +154,7 @@ void LCDFN(set_drawmode)(int mode)
 {
     current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
+EXPORT_SYMBOL(lcd_set_drawmode);
 
 int LCDFN(get_drawmode)(void)
 {
@@ -164,11 +166,13 @@ void LCDFN(set_foreground)(unsigned brightness)
     current_vp->fg_pattern = brightness;
     fg_pattern = patterns[brightness & 3];
 }
+EXPORT_SYMBOL(lcd_set_foreground);
 
 unsigned LCDFN(get_foreground)(void)
 {
     return current_vp->fg_pattern;
 }
+EXPORT_SYMBOL(lcd_get_foreground);
 
 void LCDFN(set_background)(unsigned brightness)
 {
@@ -212,6 +216,7 @@ int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
 {
     return font_getstringsize(str, w, h, current_vp->font);
 }
+EXPORT_SYMBOL(lcd_getstringsize);
 
 /*** low-level drawing functions ***/
 
@@ -437,6 +442,7 @@ void LCDFN(clear_display)(void)
 
     LCDFN(scroll_info).lines = 0;
 }
+EXPORT_SYMBOL(lcd_clear_display);
 
 /* Clear the current viewport */
 void LCDFN(clear_viewport)(void)
@@ -985,6 +991,7 @@ void LCDFN(mono_bitmap)(const unsigned char *src, int x, int y, int width,
 {
     LCDFN(mono_bitmap_part)(src, 0, 0, width, x, y, width, height);
 }
+EXPORT_SYMBOL(lcd_mono_bitmap);
 
 /* About Rockbox' internal native bitmap format:
  *

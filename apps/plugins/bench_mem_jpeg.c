@@ -59,8 +59,8 @@ static int font_h;
 
 #define lcd_printf(...) \
 do { \
-    rb->lcd_putsxyf(0, output_y, __VA_ARGS__); \
-    rb->lcd_update_rect(0, output_y, LCD_WIDTH, font_h); \
+    lcd_putsxyf(0, output_y, __VA_ARGS__); \
+    lcd_update_rect(0, output_y, LCD_WIDTH, font_h); \
     output_y += font_h; \
 } while (0)
 
@@ -69,7 +69,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     size_t plugin_buf_len;
     unsigned char * plugin_buf =
-        (unsigned char *)rb->plugin_get_buffer(&plugin_buf_len);
+        (unsigned char *)plugin_get_buffer(&plugin_buf_len);
     static char filename[MAX_PATH];
     struct bitmap bm = {
         .width = LCD_WIDTH,
@@ -79,18 +79,18 @@ enum plugin_status plugin_start(const void* parameter)
 
     if(!parameter) return PLUGIN_ERROR;
 
-    rb->strcpy(filename, parameter);
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_getstringsize("A", NULL, &font_h);
-    int fd = rb->open(filename, O_RDONLY);
+    strcpy(filename, parameter);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_getstringsize("A", NULL, &font_h);
+    int fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
         lcd_printf("file open failed: %d", fd);
         goto wait;
     }
-    unsigned long filesize = rb->filesize(fd);
+    unsigned long filesize = filesize(fd);
     if (filesize > plugin_buf_len)
     {
         lcd_printf("file too large");
@@ -99,8 +99,8 @@ enum plugin_status plugin_start(const void* parameter)
     plugin_buf_len -= filesize;
     unsigned char *jpeg_buf = plugin_buf;
     plugin_buf += filesize;
-    rb->read(fd, jpeg_buf, filesize);
-    rb->close(fd);
+    read(fd, jpeg_buf, filesize);
+    close(fd);
     bm.data = plugin_buf;
     struct dim jpeg_size;
     get_jpeg_dim_mem(jpeg_buf, filesize, &jpeg_size);
@@ -119,15 +119,15 @@ enum plugin_status plugin_start(const void* parameter)
         {
             long t1, t2, t_end;
             int count = 0;
-            t2 = *(rb->current_tick);
-            while (t2 != (t1 = *(rb->current_tick)));
+            t2 = *(current_tick);
+            while (t2 != (t1 = *(current_tick)));
             t_end = t1 + 10 * HZ;
             do {
                 decode_jpeg_mem(jpeg_buf, filesize, &bm, plugin_buf_len,
                                 FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
                                 &format_null);
                 count++;
-                t2 = *(rb->current_tick);
+                t2 = *(current_tick);
             } while (TIME_BEFORE(t2, t_end) || count < 10);
             t2 -= t1;
             t2 *= 10;
@@ -145,6 +145,6 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
 wait:
-    while (rb->get_action(CONTEXT_STD,1) != ACTION_STD_OK) rb->yield();
+    while (get_action(CONTEXT_STD,1) != ACTION_STD_OK) yield();
     return PLUGIN_OK;
 }

@@ -29,18 +29,18 @@ static int getbutton(char *text)
 {
     int fw, fh;
     int button;
-    rb->lcd_clear_display();
-    rb->font_getstringsize(text, &fw, &fh,0);
-    rb->lcd_putsxy(LCD_WIDTH/2-fw/2, LCD_HEIGHT/2-fh/2, text);
-    rb->lcd_update();
-    rb->sleep(30);
+    lcd_clear_display();
+    font_getstringsize(text, &fw, &fh,0);
+    lcd_putsxy(LCD_WIDTH/2-fw/2, LCD_HEIGHT/2-fh/2, text);
+    lcd_update();
+    sleep(30);
 
-    while (rb->button_get(false) != BUTTON_NONE)
-        rb->yield();
+    while (button_get(false) != BUTTON_NONE)
+        yield();
 
     while(true)
     {
-        button = rb->button_get(true);
+        button = button_get(true);
         button = button&(BUTTON_MAIN|BUTTON_REMOTE);
 
         return button;
@@ -76,18 +76,18 @@ int do_user_menu(void) {
     int time = 0;
     
 #if CONFIG_RTC    
-    time = rb->mktime(rb->get_time());
+    time = mktime(get_time());
 #endif
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
+    lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
     backlight_use_settings();
 
     /* Clean out the button Queue */
-    while (rb->button_get(false) != BUTTON_NONE) 
-        rb->yield();
+    while (button_get(false) != BUTTON_NONE) 
+        yield();
 
     MENUITEM_STRINGLIST(menu, "Rockboy Menu", NULL,
                         "Load Game", "Save Game",
@@ -97,7 +97,7 @@ int do_user_menu(void) {
 
     while(!done)
     {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -125,17 +125,17 @@ int do_user_menu(void) {
         }
     }
 
-    rb->lcd_setfont(FONT_SYSFIXED); /* Reset the font */
-    rb->lcd_clear_display(); /* Clear display for screen size changes */
+    lcd_setfont(FONT_SYSFIXED); /* Reset the font */
+    lcd_clear_display(); /* Clear display for screen size changes */
     
     /* Keep the RTC in sync */
 #if CONFIG_RTC
-    time = (rb->mktime(rb->get_time()) - time) * 60;
+    time = (mktime(get_time()) - time) * 60;
 #endif
     while (time-- > 0) rtc_tick();
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_PAL256);
+    lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
     /* ignore backlight time out */
@@ -207,7 +207,7 @@ static bool do_file(char *path, char *desc, bool is_load) {
         loadstate(fd);
     
         /* print out a status message so the user knows the state loaded */
-        rb->splashf(HZ * 1, "Loaded state from \"%s\"", path);
+        splashf(HZ * 1, "Loaded state from \"%s\"", path);
     }
     else
     {
@@ -276,7 +276,7 @@ static bool do_slot(int slot_id, bool is_load) {
     if (!is_load)
     {
         slot_info(desc_buf, sizeof(desc_buf), slot_id, false);
-        if ( rb->kbd_input(desc_buf, sizeof(desc_buf)) < 0 )
+        if ( kbd_input(desc_buf, sizeof(desc_buf)) < 0 )
             return false;
         if ( !strlen(desc_buf) )
             strlcpy(desc_buf, "Untitled", sizeof(desc_buf));
@@ -323,13 +323,13 @@ static void do_slot_menu(bool is_load) {
     for (i = 0; i < SLOT_COUNT; i++)
         slot_info(items[i], sizeof(*items), i, true);
 
-    rb->simplelist_info_init(&info, NULL, SLOT_COUNT, (void *)items);
+    simplelist_info_init(&info, NULL, SLOT_COUNT, (void *)items);
     info.get_name = slot_get_name;
     info.action_callback = list_action_callback;
 
     while(!done)
     {
-        if(rb->simplelist_show_list(&info))
+        if(simplelist_show_list(&info))
             break;
 
         result = info.selection;
@@ -428,48 +428,48 @@ static void do_opt_menu(void)
     options.dirty=1; /* Assume that the settings have been changed */
 
     struct viewport *parentvp = NULL;
-    const struct settings_list* vol = rb->find_setting(&rb->global_settings->volume, NULL);
+    const struct settings_list* vol = find_setting(&global_settings.volume, NULL);
 
     while(!done)
     {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
             case 0: /* Frameskip */
-                rb->set_option("Max Frameskip", &options.maxskip, INT, frameskip, 
+                set_option("Max Frameskip", &options.maxskip, INT, frameskip, 
                     sizeof(frameskip)/sizeof(*frameskip), NULL );
                 break;
             case 1: /* Autosave */
-                rb->set_option("Autosave", &options.autosave, INT, onoff, 2, NULL );
+                set_option("Autosave", &options.autosave, INT, onoff, 2, NULL );
                 break;
             case 2: /* Sound */
                 if(options.sound>1) options.sound=1;
-                rb->set_option("Sound", &options.sound, INT, onoff, 2, NULL );
+                set_option("Sound", &options.sound, INT, onoff, 2, NULL );
                 if(options.sound) sound_dirty();
                 break;
             case 3: /* Volume */
-                rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
+                option_screen((struct settings_list*)vol, parentvp, false, "Volume");
                 break;
             case 4: /* Stats */
-                rb->set_option("Stats", &options.showstats, INT, stats, 3, NULL );
+                set_option("Stats", &options.showstats, INT, stats, 3, NULL );
                 break;
             case 5: /* Keys */
                 setupkeys();
                 break;
 #ifdef HAVE_LCD_COLOR
             case 6: /* Screen Size */
-                rb->set_option("Screen Size", &options.scaling, INT, scaling,
+                set_option("Screen Size", &options.scaling, INT, scaling,
                     sizeof(scaling)/sizeof(*scaling), NULL );
                 setvidmode();
                 break;
             case 7: /* Screen rotate */
-                rb->set_option("Screen Rotate", &options.rotate, INT, rotate,
+                set_option("Screen Rotate", &options.rotate, INT, rotate,
                     sizeof(rotate)/sizeof(*rotate), NULL );
                 setvidmode();
                 break;
             case 8: /* Palette */
-                rb->set_option("Set Palette", &options.pal, INT, palette, 17, NULL );
+                set_option("Set Palette", &options.pal, INT, palette, 17, NULL );
                 set_pal();
                 break;
 #endif

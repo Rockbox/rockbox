@@ -61,6 +61,8 @@
 /* #define LOGF_ENABLE */
 #include "logf.h"
 
+#include "symbols.h"
+
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
@@ -1152,6 +1154,7 @@ bool bufclose(int handle_id)
     LOGFQUEUE("buffering >| Q_CLOSE_HANDLE %d", handle_id);
     return queue_send(&buffering_queue, Q_CLOSE_HANDLE, handle_id);
 }
+EXPORT_SYMBOL(bufclose);
 
 /* Backend to bufseek and bufadvance. Call only in response to
    Q_REBUFFER_HANDLE! */
@@ -1273,6 +1276,7 @@ int bufseek(int handle_id, size_t newpos)
 
     return seek_handle(h, newpos);
 }
+EXPORT_SYMBOL(bufseek);
 
 /* Advance the reading index in a handle (relatively to its current position).
    Return 0 for success and for failure:
@@ -1289,6 +1293,7 @@ int bufadvance(int handle_id, off_t offset)
     size_t newpos = h->offset + ringbuf_sub(h->ridx, h->data) + offset;
     return seek_handle(h, newpos);
 }
+EXPORT_SYMBOL(bufadvance);
 
 /* Get the read position from the start of the file
    Returns the offset from byte 0 of the file and for failure:
@@ -1480,7 +1485,7 @@ ssize_t bufcuttail(int handle_id, size_t size)
 
     return adjusted_size;
 }
-
+EXPORT_SYMBOL(bufcuttail);
 
 /*
 SECONDARY EXPORTED FUNCTIONS
@@ -1509,6 +1514,7 @@ ssize_t buf_handle_offset(int handle_id)
         return ERR_HANDLE_NOT_FOUND;
     return h->offset;
 }
+EXPORT_SYMBOL(buf_handle_offset);
 
 void buf_set_base_handle(int handle_id)
 {
@@ -1516,6 +1522,7 @@ void buf_set_base_handle(int handle_id)
     base_handle_id = handle_id;
     mutex_unlock(&llist_mutex);
 }
+EXPORT_SYMBOL(buf_set_base_handle);
 
 enum data_type buf_handle_data_type(int handle_id)
 {
@@ -1574,6 +1581,7 @@ size_t buf_used(void)
 {
     return BUF_USED;
 }
+EXPORT_SYMBOL(buf_used);
 
 void buf_set_watermark(size_t bytes)
 {

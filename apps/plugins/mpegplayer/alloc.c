@@ -149,7 +149,7 @@ bool mpeg_alloc_init(unsigned char *buf, size_t mallocsize)
         return false;
     }
 
-    IF_COP(rb->commit_discard_dcache());
+    IF_COP(commit_discard_dcache());
     return true;
 }
 
@@ -160,7 +160,7 @@ void * mpeg2_malloc(unsigned size, mpeg2_alloc_t reason)
                                      mpeg2_bufsize, size, reason);
     /* libmpeg2 expects zero-initialized allocations */
     if (ptr)
-        rb->memset(ptr, 0, size);
+        memset(ptr, 0, size);
 
     return ptr;
 }
@@ -204,7 +204,7 @@ void * codec_malloc(size_t size)
                                 bufsize, size, MPEG_ALLOC_CODEC_MALLOC);
 
     if (ptr)
-        rb->memset(ptr,0,size);
+        memset(ptr,0,size);
 
     return ptr;
 }
@@ -218,7 +218,7 @@ void * codec_calloc(size_t nmemb, size_t size)
                                MPEG_ALLOC_CODEC_CALLOC);
 
     if (ptr)
-        rb->memset(ptr,0,size);
+        memset(ptr,0,size);
 
     return ptr;
 }

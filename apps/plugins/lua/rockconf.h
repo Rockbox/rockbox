@@ -56,13 +56,6 @@ long lpow(long x, long y);
 /* Simple substitutions */
 #define realloc  dlrealloc
 #define free     dlfree
-#define memchr   rb->memchr
-#define snprintf rb->snprintf
-#define strcat   rb->strcat
-#define strchr   rb->strchr
-#define strcmp   rb->strcmp
-#define strcpy   rb->strcpy
-#define strlen   rb->strlen
 
 #endif /* _ROCKCONF_H_ */
 

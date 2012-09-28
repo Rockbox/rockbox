@@ -30,7 +30,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #define ONEDROCKBLOX_QUIT              PLA_EXIT
 #define ONEDROCKBLOX_QUIT2             PLA_CANCEL
 
-#define mrand(max) (short)(rb->rand()%max)
+#define mrand(max) (short)(rand()%max)
 
 #define TILES 11
 
@@ -85,12 +85,12 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 static void draw_brick(int pos, int length) {
     int i = pos;
-    rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(CENTER_X, CENTER_Y, WIDTH, WIDTH * TILES + TILES);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
+    lcd_fillrect(CENTER_X, CENTER_Y, WIDTH, WIDTH * TILES + TILES);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     for (i = pos; i < length + pos; ++i) {
-        if (i >= 0) rb->lcd_fillrect(CENTER_X, CENTER_Y+i+(WIDTH*i), WIDTH, WIDTH);
+        if (i >= 0) lcd_fillrect(CENTER_X, CENTER_Y+i+(WIDTH*i), WIDTH, WIDTH);
     }
 }
 
@@ -115,76 +115,76 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_backdrop(NULL);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
     
-    rb->lcd_getstringsize("100000000", &f_width, &f_height);
+    lcd_getstringsize("100000000", &f_width, &f_height);
     
-    rb->lcd_clear_display();
+    lcd_clear_display();
     
     /***********
     ** Draw EVERYTHING
     */
     
     /* Playing filed box */
-    rb->lcd_vline(CENTER_X-2, CENTER_Y, CENTER_Y + (WIDTH*TILES+TILES));
-    rb->lcd_vline(CENTER_X + WIDTH + 1, CENTER_Y,
+    lcd_vline(CENTER_X-2, CENTER_Y, CENTER_Y + (WIDTH*TILES+TILES));
+    lcd_vline(CENTER_X + WIDTH + 1, CENTER_Y,
                   CENTER_Y + (WIDTH*TILES+TILES));
-    rb->lcd_hline(CENTER_X-2, CENTER_X + WIDTH + 1, 
+    lcd_hline(CENTER_X-2, CENTER_X + WIDTH + 1, 
                   CENTER_Y + (WIDTH*TILES+TILES));
 
     /* Score box */
 #if (LCD_WIDTH > LCD_HEIGHT)
-    rb->lcd_drawrect(SCORE_X-4, SCORE_Y-5, f_width+8, f_height+9);
-    rb->lcd_putsxy(SCORE_X-4, SCORE_Y-6-f_height, "score");
+    lcd_drawrect(SCORE_X-4, SCORE_Y-5, f_width+8, f_height+9);
+    lcd_putsxy(SCORE_X-4, SCORE_Y-6-f_height, "score");
 #else
-    rb->lcd_hline(0, LCD_WIDTH, SCORE_Y-5);
-    rb->lcd_putsxy(2, SCORE_Y-6-f_height, "score");
+    lcd_hline(0, LCD_WIDTH, SCORE_Y-5);
+    lcd_putsxy(2, SCORE_Y-6-f_height, "score");
 #endif
     score_x = SCORE_X;
     
     /* Next box */
-    rb->lcd_getstringsize("next", &f_width, NULL);
+    lcd_getstringsize("next", &f_width, NULL);
 #if (LCD_WIDTH > LCD_HEIGHT) && !(LCD_WIDTH > 132)
-    rb->lcd_drawrect(NEXT_X-5, NEXT_Y-5, WIDTH+10, NEXT_H+10);
-    rb->lcd_putsxy(score_x-4, NEXT_Y-5, "next");
+    lcd_drawrect(NEXT_X-5, NEXT_Y-5, WIDTH+10, NEXT_H+10);
+    lcd_putsxy(score_x-4, NEXT_Y-5, "next");
 #else
-    rb->lcd_drawrect(NEXT_X-5, NEXT_Y-5, WIDTH+10, NEXT_H+10);
-    rb->lcd_putsxy(NEXT_X-5, NEXT_Y-5-f_height-1, "next");
+    lcd_drawrect(NEXT_X-5, NEXT_Y-5, WIDTH+10, NEXT_H+10);
+    lcd_putsxy(NEXT_X-5, NEXT_Y-5-f_height-1, "next");
 #endif
 
     /***********
     ** GAMELOOP
     */
-    rb->srand( *rb->current_tick );
+    srand( current_tick );
     
     type_cur_brick = 2 + mrand(3);
     type_next_brick = 2 + mrand(3);
     
     do {
-        end = *rb->current_tick + (cycletime * HZ) / 1000;
+        end = current_tick + (cycletime * HZ) / 1000;
         
         draw_brick(pos_cur_brick, type_cur_brick);
 
         /* Draw next brick */
-        rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(NEXT_X, NEXT_Y, WIDTH, WIDTH * 4 + 4);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
+        lcd_fillrect(NEXT_X, NEXT_Y, WIDTH, WIDTH * 4 + 4);
+        lcd_set_drawmode(DRMODE_SOLID);
 
         for (i = 0; i < type_next_brick; ++i) {
-            rb->lcd_fillrect(NEXT_X, 
+            lcd_fillrect(NEXT_X, 
                              NEXT_Y + ((type_next_brick % 2) ? (int)(WIDTH/2) : ((type_next_brick == 2) ? (WIDTH+1) : 0)) + (WIDTH*i) + i,
                              WIDTH, WIDTH);
         } 
 
         /* Score box */
-        rb->lcd_putsxyf(score_x, SCORE_Y, "%8ld0", score);
+        lcd_putsxyf(score_x, SCORE_Y, "%8ld0", score);
 
-        rb->lcd_update();
+        lcd_update();
 
         /*We get button from PLA this way */
         button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
@@ -201,7 +201,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             default:
                 cycletime = 300;
-                if(rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                if(default_event_handler(button) == SYS_USB_CONNECTED) {
                     quit = true;
                 }
         }
@@ -215,10 +215,10 @@ enum plugin_status plugin_start(const void* parameter)
             ++pos_cur_brick;
         }
 
-        if (TIME_BEFORE(*rb->current_tick, end))
-            rb->sleep(end-*rb->current_tick);
+        if (TIME_BEFORE(current_tick, end))
+            sleep(end-current_tick);
         else
-            rb->yield();
+            yield();
 
     } while (!quit);
  
