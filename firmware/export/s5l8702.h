@@ -24,6 +24,10 @@
 
 #include <inttypes.h>
 
+/* S5L8702 have 256KB of IRAM */
+#define PLUGIN_IRAMORIG (0x00000000 + (56*1024))
+#define PLUGIN_IRAMSIZE (200*1024)
+
 #define REG8_PTR_T  volatile uint8_t *
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
