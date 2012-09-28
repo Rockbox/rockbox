@@ -40,8 +40,8 @@ PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
 ### build data / rules
 ifndef APP_TYPE
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
-PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
-PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
+PLUGIN_LDS := $(APPSDIR)/plugins/plugin_elf.lds
+PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin_elf.link
 OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
 endif
 OTHER_SRC += $(ROOTDIR)/apps/plugins/plugin_crt0.c
@@ -116,11 +116,14 @@ endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
 $(BUILDDIR)/%.rock:
-	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $@ \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
-		-lgcc $(PLUGINLDFLAGS)
-	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
+		-lgcc $(PLUGINLDFLAGS) -Wl,-n -Wl,-r -Wl,--sort-common
+
+	$(call PRINTS,STRIP $(subst $(ROOTDIR)/,,$@))$(STRIP) \
+		--strip-unneeded --strip-debug \
+		-R .comment -R .ARM.attributes $@
 
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/

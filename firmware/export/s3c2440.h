@@ -21,6 +21,9 @@
 #ifndef __S3C2440_H__
 #define __S3C2440_H__
 
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 #define CACHEALIGN_BITS (5)
 
 #define LCD_BUFFER_SIZE (320*240*2)
