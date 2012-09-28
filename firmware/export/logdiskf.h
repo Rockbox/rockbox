@@ -67,19 +67,14 @@ extern int logfdiskindex;
 void _logdiskf(const char* file, const char level,
                 const char *format, ...) ATTRIBUTE_PRINTF(3, 4);
 
-#else /* !ROCKBOX_HAS_LOGF */
+#else /* !ROCKBOX_HAS_LOGDISKF */
 
 /* built without logdiskf() support enabled, replace logdiskf() by DEBUGF() */
-#define logdiskf(f,args...) DEBUGF(f"\n",##args)
-
-#endif /* !ROCKBOX_HAS_LOGDISKF */
-
-#else
-
 #define ERRORF DEBUGF
 #define WARNF DEBUGF
 #define NOTEF DEBUGF
 
+#endif
 #endif /* LOGDISKF_H */
     
     
