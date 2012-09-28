@@ -40,8 +40,8 @@ PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
 ### build data / rules
 ifndef APP_TYPE
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
-PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
-PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
+PLUGIN_LDS := $(APPSDIR)/plugins/plugin_elf.lds
+PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin_elf.link
 OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
 endif
 OTHER_SRC += $(ROOTDIR)/apps/plugins/plugin_crt0.c
@@ -99,12 +99,12 @@ endif
 # special pattern rule for compiling plugin lib (with function and data sections)
 $(BUILDDIR)/apps/plugins/lib/%.o: $(ROOTDIR)/apps/plugins/lib/%.c
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINLIBFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINLIBFLAGS) -c -mlong-calls $< -o $@
 
 # special pattern rule for compiling plugins with extra flags
 $(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINFLAGS) -c -mlong-calls $< -o $@
 
 ifdef APP_TYPE
  PLUGINLDFLAGS = $(SHARED_LDFLAG) -Wl,-Map,$*.map
@@ -116,11 +116,12 @@ endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
 $(BUILDDIR)/%.rock:
-	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.rock \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
-		-lgcc $(PLUGINLDFLAGS)
-	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
+		-lgcc $(PLUGINLDFLAGS) -Wl,-n -Wl,-r
+
+#	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
 
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/

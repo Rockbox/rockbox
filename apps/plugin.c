@@ -43,6 +43,8 @@
 #include "filefuncs.h"
 #include "load_code.h"
 
+#include "elfload.h"
+
 #if CONFIG_CHARGING
 #include "power.h"
 #endif
@@ -798,6 +800,14 @@ int plugin_load(const char* plugin, const void* parameter)
     struct plugin_header *p_hdr;
     struct lc_header     *hdr;
 
+    /* get rid of dependency on plugin.lds */
+    struct mem_info_t mem_info;
+    mem_info.dram = (void *)plugin_get_buffer(&mem_info.dram_size);
+
+    /* to be changed later */
+    mem_info.iram = (void *)PLUGIN_IRAMORIG;
+    mem_info.iram_size = (size_t)PLUGIN_IRAMSIZE;
+
     if (current_plugin_handle && pfn_tsr_exit)
     {    /* if we have a resident old plugin and a callback */
         if (pfn_tsr_exit(!strcmp(current_plugin, plugin)) == false )
@@ -812,7 +822,19 @@ int plugin_load(const char* plugin, const void* parameter)
     splash(0, ID2P(LANG_WAIT));
     strcpy(current_plugin, plugin);
 
-    current_plugin_handle = lc_open(plugin, pluginbuf, PLUGIN_BUFFER_SIZE);
+#if NUM_CORES > 1
+    /* Make sure COP cache is flushed and invalidated before loading */
+    {
+        int my_core = switch_core(CURRENT_CORE ^ 1);
+        switch_core(my_core);
+    }
+#endif
+
+#ifdef PLUGIN_USE_IRAM
+    audio_stop();
+#endif
+
+    current_plugin_handle = elf_open(plugin, &mem_info);
     if (current_plugin_handle == NULL) {
         splashf(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return -1;
@@ -826,10 +848,10 @@ int plugin_load(const char* plugin, const void* parameter)
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
         || hdr->target_id != TARGET_ID
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-        || hdr->load_addr != pluginbuf
-        || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE
-#endif
+//#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+//        || hdr->load_addr != pluginbuf
+//        || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE
+//#endif
         )
     {
         lc_close(current_plugin_handle);
