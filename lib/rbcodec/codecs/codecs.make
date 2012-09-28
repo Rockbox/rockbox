@@ -122,7 +122,7 @@ endif
 
 ifndef APP_TYPE
   CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
-  CODEC_LDS := $(APPSDIR)/plugins/plugin.lds # codecs and plugins use same file
+  CODEC_LDS := $(APPSDIR)/plugins/plugin_elf.lds # codecs and plugins use same file
   CODECLINK_LDS := $(CODECDIR)/codec.link
 endif
 
@@ -192,7 +192,7 @@ ifdef APP_TYPE
  CODECLDFLAGS = $(SHARED_LDFLAG) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
  CODECFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else
- CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
+ CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-r -Wl,-e,0 -Wl,-Map,$(CODECDIR)/$*.map
  CODECFLAGS += -UDEBUG -DNDEBUG
 endif
 CODECLDFLAGS += $(GLOBAL_LDOPTS)
@@ -204,8 +204,13 @@ $(CODECDIR)/%-pre.map: $(CODEC_CRT0) $(CODECLINK_LDS) $(CODECDIR)/%.o $(CODECS_L
 		-lgcc $(subst .map,-pre.map,$(CODECLDFLAGS))
 
 $(CODECDIR)/%.codec: $(CODECDIR)/%.o
-	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*.elf \
+	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $@ \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(CODECLDFLAGS)
-	$(SILENT)$(call objcopy,$(CODECDIR)/$*.elf,$@)
+
+	$(call PRINTS,STRIP $(subst $(ROOTDIR)/,,$@))$(STRIP) \
+		--strip-unneeded \
+		-R .comment -R .ARM.attributes \
+		-R .reginfo -R .mdebug.abi32 \
+		-R .gnu.attributes -R .pdr $@

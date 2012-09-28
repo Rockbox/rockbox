@@ -114,7 +114,7 @@ extern unsigned char pluginbuf[];
 #endif
 
 /* for actual plugins only, not for codecs */
-static int  plugin_size = 0;
+static size_t  plugin_size = 0;
 static bool (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
 static char current_plugin[MAX_PATH];
 /* NULL if no plugin is loaded, otherwise the handle that lc_open() returned */
@@ -787,6 +787,8 @@ static const struct plugin_api rockbox_api = {
     semaphore_release,
 #endif
 
+    elf_open,
+
     rbversion,
 
     /* new stuff at the end, sort into place next time
@@ -797,6 +799,23 @@ int plugin_load(const char* plugin, const void* parameter)
 {
     struct plugin_header *p_hdr;
     struct lc_header     *hdr;
+
+    /* get rid of dependency on plugin.lds */
+    struct load_info_t load;
+
+    memset(&load, 0, sizeof(load));
+
+    load.mem[DRAM].addr = (void *)plugin_get_buffer(&load.mem[DRAM].size);
+
+    /* CACHEALIGN_SIZE align obtained buffer
+     * this isn't needed yet but I place it here to not
+     * forget later when it will be really needed
+     */
+    ALIGN_BUFFER(load.mem[DRAM].addr, load.mem[DRAM].size, CACHEALIGN_SIZE);
+
+    /* to be changed later */
+    load.mem[IRAM].addr = (void *)PLUGIN_IRAMORIG;
+    load.mem[IRAM].size = (size_t)PLUGIN_IRAMSIZE;
 
     if (current_plugin_handle && pfn_tsr_exit)
     {    /* if we have a resident old plugin and a callback */
@@ -812,8 +831,30 @@ int plugin_load(const char* plugin, const void* parameter)
     splash(0, ID2P(LANG_WAIT));
     strcpy(current_plugin, plugin);
 
-    current_plugin_handle = lc_open(plugin, pluginbuf, PLUGIN_BUFFER_SIZE);
-    if (current_plugin_handle == NULL) {
+#if NUM_CORES > 1
+    /* Make sure COP cache is flushed and invalidated before loading */
+    {
+        int my_core = switch_core(CURRENT_CORE ^ 1);
+        switch_core(my_core);
+    }
+#endif
+
+    current_plugin_handle = elf_open(plugin, &load);
+
+    /* We failed due to lack of DRAM memory */
+    if ((current_plugin_handle == NULL) &&
+        (load.mem[DRAM].runtime_use > load.mem[DRAM].size))
+    {
+        /* Not enough memory, try to load it into audio buffer */
+        load.mem[DRAM].addr = (void *)plugin_get_audio_buffer(&load.mem[DRAM].size);
+
+        ALIGN_BUFFER(load.mem[DRAM].addr, load.mem[DRAM].size, CACHEALIGN_SIZE);
+
+        current_plugin_handle = elf_open(plugin, &load);
+    }
+
+    if (current_plugin_handle == NULL)
+    {
         splashf(HZ*2, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return -1;
     }
@@ -826,10 +867,12 @@ int plugin_load(const char* plugin, const void* parameter)
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
         || hdr->target_id != TARGET_ID
+/*
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         || hdr->load_addr != pluginbuf
         || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE
 #endif
+*/
         )
     {
         lc_close(current_plugin_handle);
@@ -953,12 +996,14 @@ void* plugin_get_buffer(size_t *buffer_size)
 {
     int buffer_pos;
 
-    if (current_plugin_handle)
+    /* Check if plugin is loaded in audiobuf or in pluginbuf */
+    if ((current_plugin_handle >= (void *)pluginbuf) &&
+        (current_plugin_handle <= (void *)(pluginbuf + PLUGIN_BUFFER_SIZE)))
     {
         if (plugin_size >= PLUGIN_BUFFER_SIZE)
             return NULL;
 
-        *buffer_size = PLUGIN_BUFFER_SIZE-plugin_size;
+        *buffer_size = PLUGIN_BUFFER_SIZE - plugin_size;
         buffer_pos = plugin_size;
     }
     else
@@ -967,7 +1012,7 @@ void* plugin_get_buffer(size_t *buffer_size)
         buffer_pos = 0;
     }
 
-    return &pluginbuf[buffer_pos];
+    return (void *)(pluginbuf + buffer_pos);
 }
 
 /* Returns a pointer to the mp3 buffer.
@@ -976,8 +1021,31 @@ void* plugin_get_buffer(size_t *buffer_size)
  */
 void* plugin_get_audio_buffer(size_t *buffer_size)
 {
+    char *audiobuf;
+    int buffer_pos;
+    size_t audiobuf_size;
+
     audio_stop();
-    return audio_get_buffer(true, buffer_size);
+
+    audiobuf = (char *)audio_get_buffer(true, &audiobuf_size);
+
+    /* Check if plugin is loaded in audiobuf or in pluginbuf */
+    if ((current_plugin_handle >= (void *)audiobuf) &&
+        (current_plugin_handle < (void *)(audiobuf + audiobuf_size)))
+    {
+        if (plugin_size >= audiobuf_size)
+            return NULL;
+
+        *buffer_size = audiobuf_size - plugin_size;
+        buffer_pos = plugin_size;
+    }
+    else
+    {
+        *buffer_size = audiobuf_size;
+        buffer_pos = 0;
+    }
+
+    return (void *)(audiobuf + buffer_pos);
 }
 
 /* The plugin wants to stay resident after leaving its main function, e.g.

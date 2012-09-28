@@ -52,6 +52,8 @@
 #include "general.h"
 #include "rbpaths.h"
 
+#include "elfload.h"
+
 #define LOGF_ENABLE
 #include "logf.h"
 
@@ -69,7 +71,8 @@ static unsigned char codecbuf[CODEC_SIZE];
 extern unsigned char codecbuf[];
 #endif
 
-static size_t codec_size;
+static size_t codec_size = 0;
+static void *curr_handle = NULL;
 
 extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
@@ -182,7 +185,7 @@ void *codec_get_buffer_callback(size_t *size)
     ssize_t s = CODEC_SIZE - codec_size;
 
     if (s <= 0)
-        return NULL;
+         return NULL;
 
     *size = s;
     ALIGN_BUFFER(buf, *size, CACHEALIGN_SIZE);
@@ -191,7 +194,6 @@ void *codec_get_buffer_callback(size_t *size)
 }
 
 /** codec loading and call interface **/
-static void *curr_handle = NULL;
 static struct codec_header *c_hdr = NULL;
 
 static int codec_load_ram(struct codec_api *api)
@@ -209,8 +211,8 @@ static int codec_load_ram(struct codec_api *api)
             )
         || hdr->target_id != TARGET_ID
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-        || hdr->load_addr != codecbuf
-        || hdr->end_addr > codecbuf + CODEC_SIZE
+//        || hdr->load_addr != codecbuf
+//        || hdr->end_addr > codecbuf + CODEC_SIZE
 #endif
         )
     {
@@ -262,10 +264,19 @@ int codec_load_buf(int hid, struct codec_api *api)
 int codec_load_file(const char *plugin, struct codec_api *api)
 {
     char path[MAX_PATH];
+    struct load_info_t load;
+
+    memset(&load, 0, sizeof(load));
+
+    load.mem[DRAM].addr = codec_get_buffer_callback(&load.mem[DRAM].size);
+
+    load.mem[IRAM].addr = (void *)PLUGIN_IRAMORIG;
+    load.mem[IRAM].size = (size_t)PLUGIN_IRAMSIZE;
 
     codec_get_full_path(path, plugin);
 
-    curr_handle = lc_open(path, codecbuf, CODEC_SIZE);
+    /* curr_handle = lc_open(path, codecbuf, CODEC_SIZE); */
+    curr_handle = elf_open(path, &load);
 
     if (curr_handle == NULL) {
         logf("Codec: cannot read file");

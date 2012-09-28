@@ -63,38 +63,6 @@ enum plugin_status plugin__start(const void *param)
     int exit_ret;
     enum plugin_status ret;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-
-/* IRAM must be copied before clearing the BSS ! */
-#ifdef PLUGIN_USE_IRAM
-    extern char iramcopy[], iramstart[], iramend[], iedata[], iend[];
-    size_t iram_size = iramend - iramstart;
-    size_t ibss_size = iend - iedata;
-    if (iram_size > 0 || ibss_size > 0)
-    {
-        /* We need to stop audio playback in order to use codec IRAM */
-        rb->audio_stop();
-        rb->memcpy(iramstart, iramcopy, iram_size);
-        rb->memset(iedata, 0, ibss_size);
-        /* make the icache (if it exists) up to date with the new code */
-        rb->commit_discard_idcache();
-
-        /* barrier to prevent reordering iram copy and BSS clearing,
-         * because the BSS segment alias the IRAM copy.
-         */
-        asm volatile ("" ::: "memory");
-    }
-#endif /* PLUGIN_USE_IRAM */
-
-    /* zero out the bss section */
-    rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
-
-    /* Some parts of bss may be used via a no-cache alias (at least
-     * portalplayer has this). If we don't clear the cache, those aliases
-     * may read garbage */
-    rb->commit_dcache();
-#endif
-
     /* we come back here if exit() was called or the plugin returned normally */
     exit_ret = setjmp(__exit_env);
     if (exit_ret == 0)
