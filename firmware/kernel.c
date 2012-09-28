@@ -579,6 +579,13 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     int oldlevel;
     unsigned int rd, wr;
 
+    /* this function works only with a positive number (or zero) of ticks */
+    if (ticks == TIMEOUT_BLOCK)
+    {
+        queue_wait(q, ev);
+        return;
+    }
+
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
                   QUEUE_GET_THREAD(q) == thread_self_entry(),
