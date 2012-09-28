@@ -63,9 +63,9 @@ enum plugin_status plugin__start(const void *param)
     int exit_ret;
     enum plugin_status ret;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(USE_ELFLOADER))
 
-/* IRAM must be copied before clearing the BSS ! */
+    /* IRAM must be copied before clearing the BSS ! */
 #ifdef PLUGIN_USE_IRAM
     extern char iramcopy[], iramstart[], iramend[], iedata[], iend[];
     size_t iram_size = iramend - iramstart;
@@ -85,14 +85,14 @@ enum plugin_status plugin__start(const void *param)
         asm volatile ("" ::: "memory");
     }
 #endif /* PLUGIN_USE_IRAM */
-
+ 
     /* zero out the bss section */
     rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
-
+ 
     /* Some parts of bss may be used via a no-cache alias (at least
      * portalplayer has this). If we don't clear the cache, those aliases
      * may read garbage */
-    rb->commit_dcache();
+     rb->commit_dcache();
 #endif
 
     /* we come back here if exit() was called or the plugin returned normally */

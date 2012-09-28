@@ -35,6 +35,125 @@
 /* no optimized byteswap functions implemented for mips, yet */
 #define NEED_GENERIC_BYTESWAPS
 
+/* static inline functions moved off jz4740.h */
+/* PLL output frequency */
+static __inline__ unsigned int __cpm_get_pllout(void)
+{
+    unsigned long m, n, no, pllout;
+    unsigned long cppcr = REG_CPM_CPPCR;
+    unsigned long od[4] = {1, 2, 2, 4};
+    
+    if ((cppcr & CPM_CPPCR_PLLEN) && !(cppcr & CPM_CPPCR_PLLBP))
+    {
+        m = __cpm_get_pllm() + 2;
+        n = __cpm_get_plln() + 2;
+        no = od[__cpm_get_pllod()];
+        pllout = ((JZ_EXTAL) / (n * no)) * m;
+    }
+    else
+        pllout = JZ_EXTAL;
+    
+    return pllout;
+}
+
+/* PLL output frequency for MSC/I2S/LCD/USB */
+static __inline__ unsigned int __cpm_get_pllout2(void)
+{
+    if (REG_CPM_CPCCR & CPM_CPCCR_PCS)
+        return __cpm_get_pllout();
+    else
+        return __cpm_get_pllout()/2;
+}
+
+/* CPU core clock */
+static __inline__ unsigned int __cpm_get_cclk(void)
+{
+    int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
+
+    return __cpm_get_pllout() / div[__cpm_get_cdiv()];
+}
+
+/* AHB system bus clock */
+static __inline__ unsigned int __cpm_get_hclk(void)
+{
+    int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
+
+    return __cpm_get_pllout() / div[__cpm_get_hdiv()];
+}
+
+/* Memory bus clock */
+static __inline__ unsigned int __cpm_get_mclk(void)
+{
+    int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
+
+    return __cpm_get_pllout() / div[__cpm_get_mdiv()];
+}
+
+/* APB peripheral bus clock */
+static __inline__ unsigned int __cpm_get_pclk(void)
+{
+    int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
+
+    return __cpm_get_pllout() / div[__cpm_get_pdiv()];
+}
+
+/* LCDC module clock */
+static __inline__ unsigned int __cpm_get_lcdclk(void)
+{
+    return __cpm_get_pllout2() / (__cpm_get_ldiv() + 1);
+}
+
+/* LCD pixel clock */
+static __inline__ unsigned int __cpm_get_pixclk(void)
+{
+    return __cpm_get_pllout2() / (__cpm_get_pixdiv() + 1);
+}
+
+/* I2S clock */
+static __inline__ unsigned int __cpm_get_i2sclk(void)
+{
+    if (REG_CPM_CPCCR & CPM_CPCCR_I2CS)
+        return __cpm_get_pllout2() / (__cpm_get_i2sdiv() + 1);
+    else
+        return JZ_EXTAL;
+}
+
+/* USB clock */
+static __inline__ unsigned int __cpm_get_usbclk(void)
+{
+    if (REG_CPM_CPCCR & CPM_CPCCR_UCS)
+        return __cpm_get_pllout2() / (__cpm_get_udiv() + 1);
+    else
+        return JZ_EXTAL;
+}
+
+/* MSC clock */
+static __inline__ unsigned int __cpm_get_mscclk(void)
+{
+    return __cpm_get_pllout2() / (__cpm_get_mscdiv() + 1);
+}
+
+/* EXTAL clock for UART,I2C,SSI,TCU,USB-PHY */
+static __inline__ unsigned int __cpm_get_extalclk(void)
+{
+    return JZ_EXTAL;
+}
+
+/* RTC clock for CPM,INTC,RTC,TCU,WDT */
+static __inline__ unsigned int __cpm_get_rtcclk(void)
+{
+    return JZ_EXTAL2;
+}
+
+static __inline__ int __dmac_get_irq(void)
+{
+    int i;
+    for (i = 0; i < MAX_DMA_NUM; i++)
+        if (__dmac_channel_irq_detected(i))
+            return i;
+    return -1;
+}
+
 /* This one returns the old status */
 static inline int set_interrupt_status(int status, int mask)
 {

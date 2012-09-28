@@ -288,6 +288,7 @@ SECTIONS
 
 #if defined(IRAMSIZE) && IRAMSIZE != 0
     .iram IRAMORIG : AT ( iramcopy)
+/*    .iram : */
     {
         iramstart = .;
         *(.icode)

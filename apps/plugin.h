@@ -59,6 +59,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "button.h"
 #include "action.h"
 #include "load_code.h"
+#include "elfload.h"
 #include "usb.h"
 #include "font.h"
 #include "lcd.h"
@@ -526,7 +527,11 @@ struct plugin_api {
     void (*commit_discard_idcache)(void);
 
     /* load code api for overlay */
+#if defined(USE_ELFLOADER)
+    void* (*elf_open)(const char *filename, struct load_info_t *l);
+#else
     void* (*lc_open)(const char *filename, unsigned char *buf, size_t buf_size);
+#endif
     void* (*lc_open_from_mem)(void* addr, size_t blob_size);
     void* (*lc_get_header)(void *handle);
     void  (*lc_close)(void *handle);
@@ -955,6 +960,7 @@ struct plugin_api {
     int  (*semaphore_wait)(struct semaphore *s, int timeout);
     void (*semaphore_release)(struct semaphore *s);
 #endif
+
 
     const char *rbversion;
 

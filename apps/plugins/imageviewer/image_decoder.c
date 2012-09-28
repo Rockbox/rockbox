@@ -130,7 +130,19 @@ const struct image_decoder *load_decoder(struct loader_info *loader_info)
     rb->snprintf(filename, MAX_PATH, VIEWERS_DIR "/%s.ovl", name);
 
     /* load decoder to the buffer. */
+#if defined(USE_ELFLOADER)
+    struct load_info_t load;
+
+    memset(&load, 0, sizeof(load));
+
+    load.mem[DRAM].addr = loader_info->buffer;
+    load.mem[DRAM].size = loader_info->size;
+
+    decoder_handle = rb->elf_open(filename, &load);
+#else
     decoder_handle = rb->lc_open(filename, loader_info->buffer, loader_info->size);
+#endif
+
     if (!decoder_handle)
     {
         rb->splashf(2*HZ, "Can't open %s", filename);
