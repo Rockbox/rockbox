@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "file.h"
 #include "filefuncs.h"
+#include "symbols.h"
 
 #ifndef __PCTOOL__
 #ifdef HAVE_MULTIVOLUME
@@ -80,6 +81,7 @@ bool file_exists(const char *file)
     close(fd);
     return true;
 }
+EXPORT_SYMBOL(file_exists);
 
 bool dir_exists(const char *path)
 {
@@ -89,7 +91,7 @@ bool dir_exists(const char *path)
     closedir(d);
     return true;
 }
-
+EXPORT_SYMBOL(dir_exists);
 
 #if (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
@@ -97,4 +99,5 @@ struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
     (void)parent;
     return entry->info;
 }
+EXPORT_SYMBOL(dir_get_info);
 #endif

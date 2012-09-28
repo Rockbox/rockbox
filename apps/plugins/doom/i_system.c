@@ -91,7 +91,7 @@ int  I_GetTime (void)
    return doomtimer;
 #else
 #if HZ==100
-   return ((7*(*rb->current_tick))/20);
+   return ((7*(current_tick))/20);
 #else
    #error FIX - I assumed HZ was 100
 #endif
@@ -109,7 +109,7 @@ int  I_GetTime (void)
 void I_Init (void)
 {
 #if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
-   rb->timer_register(1, NULL, TIMER_FREQ/TICRATE, doomtime IF_COP(, CPU));
+   timer_register(1, NULL, TIMER_FREQ/TICRATE, doomtime IF_COP(, CPU));
 #endif
    I_InitSound();
 }
@@ -124,14 +124,14 @@ void I_Quit (void)
    I_ShutdownMusic();
    I_ShutdownGraphics();
 #if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
-   rb->timer_unregister();
+   timer_unregister();
 #endif
    doomexit=1;
 }
 
 void I_WaitVBL(int count)
 {
-   rb->sleep(count);
+   sleep(count);
 }
 
 //
@@ -155,5 +155,5 @@ void I_Error (char *error, ...)
       G_CheckDemoStatus();
 
    I_Quit();
-   rb->sleep(HZ*2);
+   sleep(HZ*2);
 }

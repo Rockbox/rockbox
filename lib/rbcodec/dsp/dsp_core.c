@@ -34,6 +34,8 @@
 #define DSP_PROC_DB_CREATE
 #include "dsp_proc_entry.h"
 
+#include "symbols.h"
+
 /* Linked lists give fewer loads in processing loop compared to some index
  * list, which is more important than keeping occasionally executed code
  * simple */
@@ -467,6 +469,7 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
 
     DSP_PROCESS_END();
 }
+EXPORT_SYMBOL(dsp_process);
 
 intptr_t dsp_configure(struct dsp_config *dsp, unsigned int setting,
                        intptr_t value)
@@ -474,6 +477,7 @@ intptr_t dsp_configure(struct dsp_config *dsp, unsigned int setting,
     dsp_sample_io_configure(&dsp->io_data, setting, value);
     return proc_broadcast(dsp, setting, value);
 }
+EXPORT_SYMBOL(dsp_configure);
 
 struct dsp_config * dsp_get_config(enum dsp_ids id)
 {
@@ -482,6 +486,7 @@ struct dsp_config * dsp_get_config(enum dsp_ids id)
 
     return &dsp_conf[id];
 }
+EXPORT_SYMBOL(dsp_get_config);
 
 /* Return the id given a dsp pointer (or even via something within
    the struct itself) */

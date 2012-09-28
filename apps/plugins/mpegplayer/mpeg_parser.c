@@ -978,7 +978,7 @@ bool parser_prepare_image(uint32_t time)
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true); /* No interference with trigger_cpu_boost */
+    cpu_boost(true); /* No interference with trigger_cpu_boost */
 #endif
 
     str_send_msg(&video_str, STREAM_RESET, 0);
@@ -1035,7 +1035,7 @@ try_again:
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     return result > STREAM_OK;

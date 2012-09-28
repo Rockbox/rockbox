@@ -36,6 +36,7 @@ QUICKREF
 #include <string.h>
 #include <limits.h>
 #include "_ansi.h" /* for _DEFUN */
+#include "symbols.h"
 
 /* Nonzero if X is not aligned on a "long" boundary.  */
 #define UNALIGNED(X) ((long)X & (sizeof (long) - 1))
@@ -115,3 +116,4 @@ _DEFUN (memchr, (s1, i, n),
   return NULL;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }
+EXPORT_SYMBOL(memchr);

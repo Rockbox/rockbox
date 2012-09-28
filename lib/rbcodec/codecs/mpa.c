@@ -58,9 +58,9 @@ static int mpeg_framesize[3] = {384, 1152, 1152};
 
 static void init_mad(void)
 {
-    ci->memset(&stream, 0, sizeof(struct mad_stream));
-    ci->memset(&frame , 0, sizeof(struct mad_frame));
-    ci->memset(&synth , 0, sizeof(struct mad_synth));
+    memset(&stream, 0, sizeof(struct mad_stream));
+    memset(&frame , 0, sizeof(struct mad_frame));
+    memset(&synth , 0, sizeof(struct mad_synth));
 
 #ifdef MPA_SYNTH_ON_COP
     frame.sbsample_prev = &sbsample_prev;
@@ -212,8 +212,8 @@ static unsigned int mad_synth_thread_id = 0;
 static void mad_synth_thread(void)
 {
     while(1) {
-        ci->semaphore_release(&synth_done_sem);
-        ci->semaphore_wait(&synth_pending_sem, TIMEOUT_BLOCK);
+        semaphore_release(&synth_done_sem);
+        semaphore_wait(&synth_pending_sem, TIMEOUT_BLOCK);
         
         if(die)
             break;
@@ -226,14 +226,14 @@ static void mad_synth_thread(void)
  * synthesized */
 static inline void mad_synth_thread_wait_pcm(void)
 {
-    ci->semaphore_wait(&synth_done_sem, TIMEOUT_BLOCK);
+    semaphore_wait(&synth_done_sem, TIMEOUT_BLOCK);
 }
 
 /* increment the done semaphore - used after a wait for idle to preserve the
  * semaphore count */
 static inline void mad_synth_thread_unwait_pcm(void)
 {
-    ci->semaphore_release(&synth_done_sem);
+    semaphore_release(&synth_done_sem);
 }
 
 /* after synth thread has gone idle - switch decoded frames and commence
@@ -247,15 +247,15 @@ static void mad_synth_thread_ready(void)
     frame.sbsample = frame.sbsample_prev;
     frame.sbsample_prev=temp;
 
-    ci->semaphore_release(&synth_pending_sem);
+    semaphore_release(&synth_pending_sem);
 }
 
 static bool mad_synth_thread_create(void)
 {
-    ci->semaphore_init(&synth_done_sem, 1, 0);
-    ci->semaphore_init(&synth_pending_sem, 1, 0);
+    semaphore_init(&synth_done_sem, 1, 0);
+    semaphore_init(&synth_pending_sem, 1, 0);
        
-    mad_synth_thread_id = ci->create_thread(mad_synth_thread, 
+    mad_synth_thread_id = create_thread(mad_synth_thread, 
                             mad_synth_thread_stack,
                             sizeof(mad_synth_thread_stack), 0,
                             mad_synth_thread_name 
@@ -272,9 +272,9 @@ static void mad_synth_thread_quit(void)
 {
     /* mop up COP thread */
     die = 1;
-    ci->semaphore_release(&synth_pending_sem);
-    ci->thread_wait(mad_synth_thread_id);
-    ci->commit_discard_dcache();
+    semaphore_release(&synth_pending_sem);
+    thread_wait(mad_synth_thread_id);
+    commit_discard_dcache();
 }
 #else
 static inline void mad_synth_thread_ready(void)

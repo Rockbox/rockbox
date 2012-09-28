@@ -92,21 +92,21 @@ enum plugin_status plugin_start(const void* parameter) {
 
 #ifdef HAVE_LCD_CHARCELLS
     if (!pgfx_init(4, 2)) {
-        rb->splash(HZ*2, "Old LCD :(");
+        splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
 #endif
-    rb->srand(*rb->current_tick);
-    dx = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
-    dy = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
+    srand(current_tick);
+    dx = rand()%(2*RAND_SCALE+1) - RAND_SCALE;
+    dy = rand()%(2*RAND_SCALE+1) - RAND_SCALE;
 
     while (1) {
 #ifdef HAVE_LCD_BITMAP
-        rb->lcd_clear_display();
-        rb->lcd_bitmap(LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT);
+        lcd_clear_display();
+        lcd_bitmap(LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT);
 #ifdef REMOTE_LOGO
-        rb->lcd_remote_clear_display();
-        rb->lcd_remote_bitmap(REMOTE_LOGO,
+        lcd_remote_clear_display();
+        lcd_remote_bitmap(REMOTE_LOGO,
                 (x * (REMOTE_WIDTH - REMOTE_LOGO_WIDTH)) / (DISPLAY_WIDTH - LOGO_WIDTH),
                 (y * (REMOTE_HEIGHT - REMOTE_LOGO_HEIGHT)) / (DISPLAY_HEIGHT - LOGO_HEIGHT),
                 REMOTE_LOGO_WIDTH, REMOTE_LOGO_HEIGHT);
@@ -138,19 +138,19 @@ enum plugin_status plugin_start(const void* parameter) {
         }
 
 #ifdef HAVE_LCD_BITMAP
-        rb->lcd_update();
+        lcd_update();
 #ifdef REMOTE_LOGO
-        rb->lcd_remote_update();
+        lcd_remote_update();
 #endif
 #else
         if (cpos != old_cpos) {
-            rb->lcd_clear_display();
+            lcd_clear_display();
             pgfx_display(cpos, 0);
             old_cpos = cpos;
         }
         pgfx_update();
 #endif
-        rb->sleep(HZ/timer);
+        sleep(HZ/timer);
 
 
 
@@ -185,7 +185,7 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
                 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                if (default_event_handler(button) == SYS_USB_CONNECTED) {
 #ifdef HAVE_LCD_CHARCELLS
                     pgfx_release();
 #endif

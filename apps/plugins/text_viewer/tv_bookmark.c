@@ -141,13 +141,13 @@ void tv_toggle_bookmark(void)
     if (idx < 0)
     {
         if (tv_add_bookmark(pos) >= 0)
-            rb->splash(HZ/2, "Bookmark add");
+            splash(HZ/2, "Bookmark add");
         else
-            rb->splash(HZ/2, "No more add bookmark");
+            splash(HZ/2, "No more add bookmark");
         return;
     }
     tv_remove_bookmark(idx);
-    rb->splash(HZ/2, "Bookmark remove");
+    splash(HZ/2, "Bookmark remove");
 }
 
 void tv_create_system_bookmark(void)
@@ -170,7 +170,7 @@ static const char* get_bookmark_name(int selected, void * data,
 {
     (void)data;
     struct tv_bookmark_info *bookmark = &bookmarks[selected];
-    rb->snprintf(buffer, buffer_len,
+    snprintf(buffer, buffer_len,
 #ifdef HAVE_LCD_BITMAP
                  "%cPage: %d  Line: %d",
 #else
@@ -210,13 +210,13 @@ void tv_select_bookmark(void)
     {
         struct simplelist_info info;
 
-        rb->qsort(bookmarks, bookmark_count, sizeof(struct tv_bookmark_info), bm_comp);
+        qsort(bookmarks, bookmark_count, sizeof(struct tv_bookmark_info), bm_comp);
 
-        rb->simplelist_info_init(&info, "Select bookmark",
+        simplelist_info_init(&info, "Select bookmark",
                                  bookmark_count, bookmarks);
         info.get_name = get_bookmark_name;
         info.action_callback = list_action_callback;
-        rb->simplelist_show_list(&info);
+        simplelist_show_list(&info);
 
         if (info.selection >= 0 && info.selection < bookmark_count)
             select_pos = bookmarks[info.selection].pos;
@@ -226,9 +226,9 @@ void tv_select_bookmark(void)
             tv_copy_screen_pos(&select_pos);
 
             if (select_pos.file_pos == 0)
-                rb->splash(HZ, "Start the first page");
+                splash(HZ, "Start the first page");
             else
-                rb->splash(HZ, "Return to the current page");
+                splash(HZ, "Return to the current page");
         }
     }
 
@@ -254,7 +254,7 @@ static bool tv_read_bookmark_info(int fd, struct tv_bookmark_info *b)
 {
     unsigned char buf[SERIALIZE_BOOKMARK_SIZE];
 
-    if (rb->read(fd, buf, sizeof(buf)) < 0)
+    if (read(fd, buf, sizeof(buf)) < 0)
         return false;
 
     b->pos.file_pos = (buf[0] << 24)|(buf[1] << 16)|(buf[2] << 8)|buf[3];
@@ -270,7 +270,7 @@ bool tv_deserialize_bookmarks(int fd)
     int i;
     bool res = true;
 
-    if (rb->read(fd, &bookmark_count, 1) < 0)
+    if (read(fd, &bookmark_count, 1) < 0)
         return false;
 
     for (i = 0; i < bookmark_count; i++)

@@ -35,6 +35,7 @@
 #include "backlight.h"
 #include "screen_access.h"
 #include "backdrop.h"
+#include "symbols.h"
 
 /* some helper functions to calculate metrics on the fly */
 static int screen_helper_getcharwidth(void)
@@ -369,6 +370,7 @@ struct screen screens[NB_SCREENS] =
     }
 #endif /* NB_SCREENS == 2 */
 };
+EXPORT_SYMBOL(screens);
 
 #ifdef HAVE_LCD_BITMAP
 void screen_clear_area(struct screen * display, int xstart, int ystart,
@@ -378,4 +380,5 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
     display->fillrect(xstart, ystart, width, height);
     display->set_drawmode(DRMODE_SOLID);
 }
+EXPORT_SYMBOL(screen_clear_area);
 #endif

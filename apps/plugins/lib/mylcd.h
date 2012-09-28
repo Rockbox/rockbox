@@ -28,12 +28,12 @@
  * lcd and xlcd and most of the time the caller need not be concerned with
  * which is actually called, making code nicer to read and maintain.
  *
- * Unbuffered routines revert to standard rb->lcd_XXXX funtions on color
+ * Unbuffered routines revert to standard lcd_XXXX funtions on color
  * targets. On color, mylcd_ub_update_XXXX refer to the proper update
  * functions, otherwise they are no-ops.
  *
  * lib/playergfx.h or lib/grey.h should be included before including this
- * header. For bitmap LCD's, defaults to rb->lcd_XXXX otherwise.
+ * header. For bitmap LCD's, defaults to lcd_XXXX otherwise.
  */
 #if defined (HAVE_LCD_CHARCELLS) && defined(__PGFX_H__)
 #define MYLCD_CFG_PGFX              /* using PGFX */
@@ -57,9 +57,9 @@
 
 #elif defined (HAVE_LCD_BITMAP)
 #define MYLCD_CFG_RB_XLCD           /* using standard (X)LCD routines */
-#define mylcd_(fn)                  rb->lcd_##fn
+#define mylcd_(fn)                  lcd_##fn
 #define myxlcd_(fn)                 xlcd_##fn
-#define mylcd_ub_(fn)               rb->lcd_##fn
+#define mylcd_ub_(fn)               lcd_##fn
 #define myxlcd_ub_(fn)              xlcd_##fn
 
 /* Common colors */
@@ -99,8 +99,8 @@ static inline void mylcd_ub_update_rect(int x, int y, int w, int h)
     { (void)x; (void)y; (void)w; (void)h; }
 
 #else /* color or RB default */
-#define mylcd_ub_update             rb->lcd_update
-#define mylcd_ub_update_rect        rb->lcd_update_rect
+#define mylcd_ub_update             lcd_update
+#define mylcd_ub_update_rect        lcd_update_rect
 #endif
 
 /* Parameter handling */

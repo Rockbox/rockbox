@@ -56,7 +56,7 @@ static void wvupdate (int32_t start_tick,
                       uint32_t bytes_read,
                       uint32_t bytes_written)
 {
-    int32_t elapsed_ticks = *rb->current_tick - start_tick;
+    int32_t elapsed_ticks = current_tick - start_tick;
     int compression = 0, progress = 0, realtime = 0;
 
     if (total_samples)
@@ -71,14 +71,14 @@ static void wvupdate (int32_t start_tick,
         compression = (int)(((int64_t)(bytes_read - bytes_written) * 100 +
             (bytes_read/2)) / bytes_read);
 
-    rb->lcd_putsf(0, 2, "elapsed time: %ld secs",
+    lcd_putsf(0, 2, "elapsed time: %ld secs",
                  (long)(elapsed_ticks + (HZ/2)) / HZ);
-    rb->lcd_putsf(0, 4, "progress: %d%%", progress);
-    rb->lcd_putsf(0, 6, "realtime: %d%%  ", realtime);
-    rb->lcd_putsf(0, 8, "compression: %d%%  ", compression);
+    lcd_putsf(0, 4, "progress: %d%%", progress);
+    lcd_putsf(0, 6, "realtime: %d%%  ", realtime);
+    lcd_putsf(0, 8, "compression: %d%%  ", compression);
 
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_update();
+    lcd_update();
 #endif
 }
 
@@ -100,49 +100,49 @@ static int wav2wv(const char *infile)
     WavpackContext *wpc;
     int32_t start_tick;
 
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, (unsigned char *)infile);
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, (unsigned char *)infile);
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_update();
+    lcd_update();
 #endif
 
-    last_buttons = rb->button_status ();
-    start_tick = *rb->current_tick;
-    inextension = infile + rb->strlen(infile) - 3;
-    if (rb->strcasecmp (inextension, "wav")) {
-        rb->splash(HZ*2, "only for wav files!");
+    last_buttons = button_status ();
+    start_tick = current_tick;
+    inextension = infile + strlen(infile) - 3;
+    if (strcasecmp (inextension, "wav")) {
+        splash(HZ*2, "only for wav files!");
         return 1;
     }
 
-    in_fd = rb->open(infile, O_RDONLY);
+    in_fd = open(infile, O_RDONLY);
 
     if (in_fd < 0) {
-        rb->splash(HZ*2, "could not open file!");
+        splash(HZ*2, "could not open file!");
         return true;
     }
 
-    if (rb->read (in_fd, &raw_header, sizeof (raw_header)) != sizeof (raw_header)) {
-        rb->splash(HZ*2, "could not read file!");
-        rb->close (in_fd);
+    if (read (in_fd, &raw_header, sizeof (raw_header)) != sizeof (raw_header)) {
+        splash(HZ*2, "could not read file!");
+        close (in_fd);
         return true;
     }
 
     total_bytes_read += sizeof (raw_header);
-    rb->memcpy (&native_header, &raw_header, sizeof (raw_header));
+    memcpy (&native_header, &raw_header, sizeof (raw_header));
     little_endian_to_native (&native_header, WAV_HEADER_FORMAT);
 
-    if (rb->strncmp (native_header.ckID, "RIFF", 4) ||
-        rb->strncmp (native_header.fmt_ckID, "fmt ", 4) ||
-        rb->strncmp (native_header.data_ckID, "data", 4) ||
+    if (strncmp (native_header.ckID, "RIFF", 4) ||
+        strncmp (native_header.fmt_ckID, "fmt ", 4) ||
+        strncmp (native_header.data_ckID, "data", 4) ||
         native_header.FormatTag != 1 || native_header.BitsPerSample != 16) {
-            rb->splash(HZ*2, "incompatible wav file!");
-            rb->close (in_fd);
+            splash(HZ*2, "incompatible wav file!");
+            close (in_fd);
             return true;
     }
 
     wpc = WavpackOpenFileOutput ();
 
-    rb->memset (&config, 0, sizeof (config));
+    memset (&config, 0, sizeof (config));
     config.bits_per_sample = 16;
     config.bytes_per_sample = 2;
     config.sample_rate = native_header.SampleRate;
@@ -152,22 +152,22 @@ static int wav2wv(const char *infile)
 /*  config.flags |= CONFIG_HIGH_FLAG; */
 
     if (!WavpackSetConfiguration (wpc, &config, total_samples)) {
-        rb->splash(HZ*2, "internal error!");
-        rb->close (in_fd);
+        splash(HZ*2, "internal error!");
+        close (in_fd);
         return true;
     }
 
     WavpackAddWrapper (wpc, &raw_header, sizeof (raw_header));
 
-    rb->strcpy(outfile, infile);
-    outextension = outfile + rb->strlen(outfile) - 3; 
+    strcpy(outfile, infile);
+    outextension = outfile + strlen(outfile) - 3; 
     outextension[1] = outextension[2];
     outextension[2] = 0;
-    out_fd = rb->creat(outfile, 0666);
+    out_fd = creat(outfile, 0666);
 
     if (out_fd < 0) {
-        rb->splash(HZ*2, "could not create file!");
-        rb->close (in_fd);
+        splash(HZ*2, "could not create file!");
+        close (in_fd);
         return true;
     }
 
@@ -186,8 +186,8 @@ static int wav2wv(const char *infile)
 
         bytes_count = samples_count * num_chans * 2;
 
-        if (rb->read (in_fd, input_buffer, bytes_count) != (int32_t) bytes_count) {
-            rb->splash(HZ*2, "could not read file!");
+        if (read (in_fd, input_buffer, bytes_count) != (int32_t) bytes_count) {
+            splash(HZ*2, "could not read file!");
             error = true;
             break;
         }
@@ -223,7 +223,7 @@ static int wav2wv(const char *infile)
                 } 
 
             if (!WavpackPackSamples (wpc, temp_buffer, samples_this_pass)) {
-                rb->splash(HZ*2, "internal error!");
+                splash(HZ*2, "internal error!");
                 error = true;
                 break;
             }
@@ -236,8 +236,8 @@ static int wav2wv(const char *infile)
 
         bytes_count = WavpackFinishBlock (wpc);
 
-        if (rb->write (out_fd, output_buffer, bytes_count) != (int32_t) bytes_count) {
-            rb->splash(HZ*2, "could not write file!");
+        if (write (out_fd, output_buffer, bytes_count) != (int32_t) bytes_count) {
+            splash(HZ*2, "could not write file!");
             error = true;
             break;
         }
@@ -248,10 +248,10 @@ static int wav2wv(const char *infile)
         wvupdate (start_tick, native_header.SampleRate, total_samples,
             total_samples - samples_remaining, total_bytes_read, total_bytes_written);
 
-        buttons = rb->button_status ();
+        buttons = button_status ();
 
         if (last_buttons == BUTTON_NONE && buttons != BUTTON_NONE) {
-            rb->splash(HZ*2, "operation aborted!");
+            splash(HZ*2, "operation aborted!");
             error = true;
             break;
         }
@@ -259,16 +259,16 @@ static int wav2wv(const char *infile)
             last_buttons = buttons;
     }
 
-    rb->close (out_fd);
-    rb->close (in_fd);
+    close (out_fd);
+    close (in_fd);
 
     if (error) {
-        rb->remove (outfile);
+        remove (outfile);
     }
     else
-        rb->splash(HZ*3, "operation successful");
+        splash(HZ*3, "operation successful");
 
-    rb->reload_directory();
+    reload_directory();
     return error;
 }
 
@@ -277,21 +277,21 @@ enum plugin_status plugin_start(const void *parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuflen);
+    audiobuf = plugin_get_audio_buffer((size_t *)&audiobuflen);
 
     if (audiobuflen < 0x200000) {
-        rb->splash(HZ*2, "not enough memory!");
+        splash(HZ*2, "not enough memory!");
         return PLUGIN_ERROR;
     }
     
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     wav2wv (parameter);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
     return PLUGIN_OK;
 }

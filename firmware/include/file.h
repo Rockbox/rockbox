@@ -36,7 +36,7 @@
 #define MAX_PATH 260
 #define MAX_OPEN_FILES 11
 
-#if !defined(PLUGIN) && !defined(CODEC)
+//#if !defined(PLUGIN) && !defined(CODEC)
 #if defined(APPLICATION) && !defined(__PCTOOL__)
 #   define open(x, ...)    app_open(x, __VA_ARGS__)
 #   define creat(x,m)      app_creat(x, m)
@@ -76,19 +76,19 @@ typedef ssize_t (*write_func)(int fd, const void *buf, size_t count);
 typedef void (*qsort_func)(void *base, size_t nmemb,  size_t size,
                            int(*_compar)(const void *, const void *));
 
-extern int file_open(const char* pathname, int flags);
+extern int open(const char* pathname, int flags, ...);
 extern int close(int fd);
 extern int fsync(int fd);
 extern ssize_t read(int fd, void *buf, size_t count);
 extern off_t lseek(int fildes, off_t offset, int whence);
-extern int file_creat(const char *pathname);
+extern int creat(const char *pathname, ...);
 #if ((CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(__PCTOOL__)) || \
     defined(TEST_FAT)
-#define creat(x, y) file_creat(x)
+//#define creat(x, y) file_creat(x)
 
-#if !defined(CODEC) && !defined(PLUGIN)
-#define open(x, y, ...) file_open(x,y)
-#endif
+//#if !defined(CODEC) && !defined(PLUGIN)
+//#define open(x, y, ...) file_open(x,y)
+//#endif
 #endif
 
 extern ssize_t write(int fd, const void *buf, size_t count);
@@ -98,5 +98,5 @@ extern int ftruncate(int fd, off_t length);
 extern off_t filesize(int fd);
 extern int release_files(int volume);
 int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
-#endif /* !CODEC && !PLUGIN */
+//#endif /* !CODEC && !PLUGIN */
 #endif

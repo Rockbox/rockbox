@@ -36,6 +36,7 @@
 #include "icon.h"
 #include "color_picker.h"
 #include "viewport.h"
+#include "symbols.h"
 
 /* structure for color info */
 struct rgb_pick
@@ -481,3 +482,4 @@ bool set_color(struct screen *display, char *title,
 
     return false;
 }
+EXPORT_SYMBOL(set_color);

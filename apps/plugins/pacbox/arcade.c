@@ -147,7 +147,7 @@ void init_PacmanMachine(int dip)
 
     /* Initialize the CPU and the RAM */
     z80_reset();
-    rb->memset( &ram_[0x4000], 0xFF, 0x1000 );
+    memset( &ram_[0x4000], 0xFF, 0x1000 );
 
     /* Initialize the WSG3 */
     wsg3_init(SoundClock);
@@ -200,10 +200,10 @@ void reset_PacmanMachine(void)
     output_devices_ = 0;
     interrupt_vector_ = 0;
 
-    rb->memset( ram_+0x4000, 0, 0x1000 );
-    rb->memset( color_mem_, 0, sizeof(color_mem_) );
-    rb->memset( video_mem_, 0, sizeof(video_mem_) );
-    rb->memset( dirty_, 0, sizeof(dirty_) );
+    memset( ram_+0x4000, 0, 0x1000 );
+    memset( color_mem_, 0, sizeof(color_mem_) );
+    memset( video_mem_, 0, sizeof(video_mem_) );
+    memset( dirty_, 0, sizeof(dirty_) );
 
     for( i=0; i<8; i++ ) {
         sprites_[i].color = 0;
@@ -351,7 +351,7 @@ void decodeROMs(void)
     }
     
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_pal256_update_pal(palette);
+    lcd_pal256_update_pal(palette);
 #endif
 }
 
@@ -473,7 +473,7 @@ static inline void drawChar( unsigned char * buffer, int index, int ox, int oy, 
     {
         for( y=7; y>=0; y-- )
         {
-            rb->memset( buffer, 0, 8 );
+            memset( buffer, 0, 8 );
             buffer += ScreenWidth;
         };
         return;

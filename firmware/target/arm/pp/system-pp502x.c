@@ -28,6 +28,7 @@
 #endif
 #include "button-target.h"
 #include "usb_drv.h"
+#include "symbols.h"
 
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 extern void TIMER1(void);
@@ -214,6 +215,7 @@ void ICODE_ATTR commit_dcache(void)
         nop; nop; nop; nop;
     }
 }
+EXPORT_SYMBOL(commit_dcache);
 
 void ICODE_ATTR commit_discard_idcache(void)
 {
@@ -224,8 +226,10 @@ void ICODE_ATTR commit_discard_idcache(void)
         nop; nop; nop; nop;
     }
 }
+EXPORT_SYMBOL(commit_discard_idcache);
 
 void commit_discard_dcache(void) __attribute__((alias("commit_discard_idcache")));
+EXPORT_SYMBOL(commit_discard_dcache);
 
 static void init_cache(void)
 {
@@ -601,4 +605,4 @@ int system_memory_guard(int newmode)
     (void)newmode;
     return 0;
 }
-
+EXPORT_SYMBOL(system_memory_guard);

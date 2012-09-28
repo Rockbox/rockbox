@@ -25,26 +25,26 @@
 #if defined(CPU_ARM) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 void __attribute__((naked)) __div0(void)
 {
-    asm volatile("bx %0" : : "r"(rb->__div0));
+    asm volatile("bx %0" : : "r"(__div0));
 }
 #endif
 
 void *memcpy(void *dest, const void *src, size_t n)
 {
-    return rb->memcpy(dest, src, n);
+    return memcpy(dest, src, n);
 }
 
 void *memset(void *dest, int c, size_t n)
 {
-    return rb->memset(dest, c, n);
+    return memset(dest, c, n);
 }
 
 void *memmove(void *dest, const void *src, size_t n)
 {
-    return rb->memmove(dest, src, n);
+    return memmove(dest, src, n);
 }
 
 int memcmp(const void *s1, const void *s2, size_t n)
 {
-    return rb->memcmp(s1, s2, n);
+    return memcmp(s1, s2, n);
 }

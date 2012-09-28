@@ -31,10 +31,10 @@ enum plugin_status plugin_start(const void* parameter)
        this to avoid the compiler warning about it */
     (void)parameter;
 
-    /* "rb->" marks a plugin api call. Rockbox offers many of its built-in
+    /* "" marks a plugin api call. Rockbox offers many of its built-in
      * functions to plugins */
     /* now go ahead and have fun! */
-    rb->splash(HZ*2, "Hello world!");
+    splash(HZ*2, "Hello world!");
 
     /* tell Rockbox that we have completed successfully */
     return PLUGIN_OK;

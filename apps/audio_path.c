@@ -34,6 +34,7 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
+#include "symbols.h"
 
 /* Some audio sources may require a boosted CPU */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -98,6 +99,7 @@ void audio_set_input_source(int source, unsigned flags)
     /* set hardware inputs */
     audio_input_mux(source, flags);
 } /* audio_set_source */
+EXPORT_SYMBOL(audio_set_input_source);
 
 #ifdef HAVE_SPDIF_IN
 /**

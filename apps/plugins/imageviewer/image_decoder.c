@@ -69,7 +69,7 @@ enum image_type get_image_type(const char *name, bool quiet)
     };
 
     enum image_type type = IMAGE_UNKNOWN;
-    const char *ext = rb->strrchr(name, '.');
+    const char *ext = strrchr(name, '.');
     int i, fd;
     char buf[12];
 
@@ -78,7 +78,7 @@ enum image_type get_image_type(const char *name, bool quiet)
     {
         for (i = 0; i < (int)ARRAYLEN(ext_list); i++)
         {
-            if (!rb->strcasecmp(ext, ext_list[i].ext))
+            if (!strcasecmp(ext, ext_list[i].ext))
             {
                 type = ext_list[i].type;
                 break;
@@ -87,20 +87,20 @@ enum image_type get_image_type(const char *name, bool quiet)
     }
 
     /* check magic value in the file */
-    fd = rb->open(name, O_RDONLY);
+    fd = open(name, O_RDONLY);
     if (fd >= 0)
     {
-        rb->memset(buf, 0, sizeof buf);
-        rb->read(fd, buf, sizeof buf);
-        rb->close(fd);
+        memset(buf, 0, sizeof buf);
+        read(fd, buf, sizeof buf);
+        close(fd);
         for (i = 0; i < (int)ARRAYLEN(magic_list); i++)
         {
-            if (!rb->memcmp(buf, magic_list[i].magic, magic_list[i].length))
+            if (!memcmp(buf, magic_list[i].magic, magic_list[i].length))
             {
                 if (!quiet && type != magic_list[i].type)
                 {
                     /* file extension is wrong. */
-                    rb->splashf(HZ*1, "Note: File extension is not correct");
+                    splashf(HZ*1, "Note: File extension is not correct");
                 }
                 type = magic_list[i].type;
                 break;
@@ -120,40 +120,52 @@ const struct image_decoder *load_decoder(struct loader_info *loader_info)
 
     if (loader_info->type < 0 || loader_info->type >= MAX_IMAGE_TYPES)
     {
-        rb->splashf(2*HZ, "Unknown type: %d", loader_info->type);
+        splashf(2*HZ, "Unknown type: %d", loader_info->type);
         goto error;
     }
 
     release_decoder();
 
     name = decoder_names[loader_info->type];
-    rb->snprintf(filename, MAX_PATH, VIEWERS_DIR "/%s.ovl", name);
+    snprintf(filename, MAX_PATH, VIEWERS_DIR "/%s.ovl", name);
 
     /* load decoder to the buffer. */
-    decoder_handle = rb->lc_open(filename, loader_info->buffer, loader_info->size);
+#if defined(USE_ELFLOADER)
+    struct load_info_t load;
+
+    memset(&load, 0, sizeof(load));
+
+    load.mem[DRAM].addr = loader_info->buffer;
+    load.mem[DRAM].size = loader_info->size;
+
+    decoder_handle = elf_open(filename, &load);
+#else
+    decoder_handle = lc_open(filename, loader_info->buffer, loader_info->size);
+#endif
+
     if (!decoder_handle)
     {
-        rb->splashf(2*HZ, "Can't open %s", filename);
+        splashf(2*HZ, "Can't open %s", filename);
         goto error;
     }
 
-    hdr = rb->lc_get_header(decoder_handle);
+    hdr = lc_get_header(decoder_handle);
     if (!hdr)
     {
-        rb->splash(2*HZ, "Can't get header");
+        splash(2*HZ, "Can't get header");
         goto error_close;
     }
     lc_hdr = &hdr->lc_hdr;
 
     if (lc_hdr->magic != PLUGIN_MAGIC || lc_hdr->target_id != TARGET_ID)
     {
-        rb->splashf(2*HZ, "%s decoder: Incompatible model.", name);
+        splashf(2*HZ, "%s decoder: Incompatible model.", name);
         goto error_close;
     }
 
     if (lc_hdr->api_version != IMGDEC_API_VERSION)
     {
-        rb->splashf(2*HZ, "%s decoder: Incompatible version.", name);
+        splashf(2*HZ, "%s decoder: Incompatible version.", name);
         goto error_close;
     }
 
@@ -178,7 +190,7 @@ void release_decoder(void)
 {
     if (decoder_handle != NULL)
     {
-        rb->lc_close(decoder_handle);
+        lc_close(decoder_handle);
         decoder_handle = NULL;
     }
 }

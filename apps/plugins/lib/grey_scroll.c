@@ -50,9 +50,9 @@ void grey_scroll_left(int count)
 
     do
     {
-        rb->memmove(data, data + count, length);
+        memmove(data, data + count, length);
         data += length;
-        rb->memset(data, blank, count);
+        memset(data, blank, count);
         data += count;
     }
     while (data < data_end);
@@ -78,8 +78,8 @@ void grey_scroll_right(int count)
 
     do
     {
-        rb->memmove(data + count, data, length);
-        rb->memset(data, blank, count);
+        memmove(data + count, data, length);
+        memset(data, blank, count);
         data += _grey_info.width;
     }
     while (data < data_end);
@@ -102,9 +102,9 @@ void grey_scroll_up(int count)
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_brightness : _grey_info.bg_brightness;
 
-    rb->memmove(_grey_info.buffer, _grey_info.buffer + shift,
+    memmove(_grey_info.buffer, _grey_info.buffer + shift,
                            length);
-    rb->memset(_grey_info.buffer + length, blank, shift);
+    memset(_grey_info.buffer + length, blank, shift);
 }
 
 /* Scroll down */
@@ -124,9 +124,9 @@ void grey_scroll_down(int count)
     blank = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
              _grey_info.fg_brightness : _grey_info.bg_brightness;
 
-    rb->memmove(_grey_info.buffer + shift, _grey_info.buffer,
+    memmove(_grey_info.buffer + shift, _grey_info.buffer,
                            length);
-    rb->memset(_grey_info.buffer, blank, shift);
+    memset(_grey_info.buffer, blank, shift);
 }
 
 /*** Unbuffered scrolling functions ***/
@@ -152,14 +152,14 @@ void grey_ub_scroll_left(int count)
                               _grey_info.bg_brightness];
     do
     {
-        rb->memmove(data, data + count, length);
+        memmove(data, data + count, length);
         data += length;
-        rb->memset(data, blank, count);
+        memset(data, blank, count);
         data += count;
     }
     while (data < data_end);
 #ifdef SIMULATOR
-    rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+    sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
                                           _grey_info.width, _grey_info.height);
 #endif
 }
@@ -185,13 +185,13 @@ void grey_ub_scroll_right(int count)
                               _grey_info.bg_brightness];
     do
     {
-        rb->memmove(data + count, data, length);
-        rb->memset(data, blank, count);
+        memmove(data + count, data, length);
+        memset(data, blank, count);
         data += _grey_info.width << _GREY_BSHIFT;
     }
     while (data < data_end);
 #ifdef SIMULATOR
-    rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+    sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
                                           _grey_info.width, _grey_info.height);
 #endif
 }
@@ -261,12 +261,12 @@ void grey_ub_scroll_up(int count)
         int blen = _GREY_MULUQ(_grey_info.height - count, _grey_info.width);
 
         src = dst + _GREY_MULUQ(count, _grey_info.width);
-        rb->memmove(dst, src, blen);
+        memmove(dst, src, blen);
         dst += blen;
     }
-    rb->memset(dst, blank, end - dst); /* Fill remainder at once. */
+    memset(dst, blank, end - dst); /* Fill remainder at once. */
 #ifdef SIMULATOR
-    rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+    sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
                                           _grey_info.width, _grey_info.height);
 #endif
 }
@@ -340,12 +340,12 @@ void grey_ub_scroll_down(int count)
         int blen = _GREY_MULUQ(_grey_info.height - count, _grey_info.width);
 
         dst -= blen;
-        rb->memmove(dst, start, blen);
+        memmove(dst, start, blen);
     }
-    rb->memset(start, blank, dst - start);
+    memset(start, blank, dst - start);
     /* Fill remainder at once. */
 #ifdef SIMULATOR
-    rb->sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
+    sim_lcd_ex_update_rect(_grey_info.x, _grey_info.y,
                                           _grey_info.width, _grey_info.height);
 #endif
 }

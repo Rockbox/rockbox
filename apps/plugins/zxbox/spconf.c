@@ -96,7 +96,7 @@ static int find_extension(const char *ext)
 {
   int i;
   for(i = 0; extensions[i].ext != NULL; i++)
-    if(rb->strcasecmp(extensions[i].ext, ext) == 0) return i;
+    if(strcasecmp(extensions[i].ext, ext) == 0) return i;
 
   return -1;
 }
@@ -107,11 +107,11 @@ void spcf_read_command_line(const void* parameter)
 {
   int ix;
 
-  ix = find_extension( parameter - 3 + rb->strlen (parameter) );
+  ix = find_extension( parameter - 3 + strlen (parameter) );
       
   file_type = extensions[ix].type;
   file_subtype = extensions[ix].subtype;
-  rb->strlcpy(filenamebuf, parameter, MAXFILENAME - 10 + 1);
+  strlcpy(filenamebuf, parameter, MAXFILENAME - 10 + 1);
   if(file_type < 0) file_subtype = -1;
   if(!spcf_find_file_type(filenamebuf, &file_type, &file_subtype))
     return;

@@ -171,15 +171,15 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
         int (*button_yield_cb)(void *), void *button_yield_ctx)
 {
 #ifndef USEGSLIB
-    long next_update = *rb->current_tick;
+    long next_update = current_tick;
     int last_px = rect->px_min;
 #endif
     unsigned n_iter;
     long a32, b32;
     short x, x2, y, y2, a, b;
     int p_x, p_y;
-    unsigned long last_yield = *rb->current_tick;
-    unsigned long last_button_yield = *rb->current_tick;
+    unsigned long last_yield = current_tick;
+    unsigned long last_button_yield = current_tick;
 
     a32 = x_min + x_step * rect->px_min;
 
@@ -214,19 +214,19 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
 
             /* be nice to other threads:
              * if at least one tick has passed, yield */
-            if  (TIME_AFTER(*rb->current_tick, last_yield))
+            if  (TIME_AFTER(current_tick, last_yield))
             {
-                rb->yield();
-                last_yield = *rb->current_tick;
+                yield();
+                last_yield = current_tick;
             }
 
-            if (TIME_AFTER(*rb->current_tick, last_button_yield))
+            if (TIME_AFTER(current_tick, last_button_yield))
             {
                 if (button_yield_cb(button_yield_ctx))
                 {
 #ifndef USEGSLIB
                     /* update screen part that was changed since last yield */
-                    rb->lcd_update_rect(last_px, rect->py_min,
+                    lcd_update_rect(last_px, rect->py_min,
                             p_x - last_px + 1, rect->py_max - rect->py_min);
 #endif
                     rect->px_min = (p_x == 0) ? 0 : p_x - 1;
@@ -234,7 +234,7 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
                     return 1;
                 }
 
-                last_button_yield = *rb->current_tick + BUTTON_YIELD_TIMEOUT;
+                last_button_yield = current_tick + BUTTON_YIELD_TIMEOUT;
             }
 
             b32 += y_step;
@@ -243,16 +243,16 @@ static int mandelbrot_calc_low_prec(struct fractal_rect *rect,
         grey_ub_gray_bitmap_part(imgbuffer, 0, rect->py_min, 1,
                 p_x, rect->py_min, 1, rect->py_max - rect->py_min);
 #else
-        rb->lcd_bitmap_part(imgbuffer, 0, rect->py_min, 1,
+        lcd_bitmap_part(imgbuffer, 0, rect->py_min, 1,
                 p_x, rect->py_min, 1, rect->py_max - rect->py_min);
 
         if ((p_x == rect->px_max - 1) ||
-                TIME_AFTER(*rb->current_tick, next_update))
+                TIME_AFTER(current_tick, next_update))
         {
-            next_update = *rb->current_tick + UPDATE_FREQ;
+            next_update = current_tick + UPDATE_FREQ;
 
             /* update screen part that was changed since last yield */
-            rb->lcd_update_rect(last_px, rect->py_min,
+            lcd_update_rect(last_px, rect->py_min,
                     p_x - last_px + 1, rect->py_max - rect->py_min);
             last_px = p_x;
         }
@@ -270,14 +270,14 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
         int (*button_yield_cb)(void *), void *button_yield_ctx)
 {
 #ifndef USEGSLIB
-    long next_update = *rb->current_tick;
+    long next_update = current_tick;
     int last_px = rect->px_min;
 #endif
     unsigned n_iter;
     long x, x2, y, y2, a, b;
     int p_x, p_y;
-    unsigned long last_yield = *rb->current_tick;
-    unsigned long last_button_yield = *rb->current_tick;
+    unsigned long last_yield = current_tick;
+    unsigned long last_button_yield = current_tick;
 
     MULS32_INIT();
 
@@ -311,19 +311,19 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
 
             /* be nice to other threads:
              * if at least one tick has passed, yield */
-            if  (TIME_AFTER(*rb->current_tick, last_yield))
+            if  (TIME_AFTER(current_tick, last_yield))
             {
-                rb->yield();
-                last_yield = *rb->current_tick;
+                yield();
+                last_yield = current_tick;
             }
 
-            if (TIME_AFTER(*rb->current_tick, last_button_yield))
+            if (TIME_AFTER(current_tick, last_button_yield))
             {
                 if (button_yield_cb(button_yield_ctx))
                 {
 #ifndef USEGSLIB
                     /* update screen part that was changed since last yield */
-                    rb->lcd_update_rect(last_px, rect->py_min,
+                    lcd_update_rect(last_px, rect->py_min,
                             p_x - last_px + 1, rect->py_max - rect->py_min);
 #endif
                     rect->px_min = (p_x == 0) ? 0 : p_x - 1;
@@ -331,7 +331,7 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
                     return 1;
                 }
 
-                last_button_yield = *rb->current_tick + BUTTON_YIELD_TIMEOUT;
+                last_button_yield = current_tick + BUTTON_YIELD_TIMEOUT;
             }
 
             b += y_step;
@@ -340,16 +340,16 @@ static int mandelbrot_calc_high_prec(struct fractal_rect *rect,
         grey_ub_gray_bitmap_part(imgbuffer, 0, rect->py_min, 1,
                 p_x, rect->py_min, 1, rect->py_max - rect->py_min);
 #else
-        rb->lcd_bitmap_part(imgbuffer, 0, rect->py_min, 1,
+        lcd_bitmap_part(imgbuffer, 0, rect->py_min, 1,
                 p_x, rect->py_min, 1, rect->py_max - rect->py_min);
 
         if ((p_x == rect->px_max - 1) ||
-                TIME_AFTER(*rb->current_tick, next_update))
+                TIME_AFTER(current_tick, next_update))
         {
-            next_update = *rb->current_tick + UPDATE_FREQ;
+            next_update = current_tick + UPDATE_FREQ;
 
             /* update screen part that was changed since last yield */
-            rb->lcd_update_rect(last_px, rect->py_min,
+            lcd_update_rect(last_px, rect->py_min,
                     p_x - last_px + 1, rect->py_max - rect->py_min);
             last_px = p_x;
         }

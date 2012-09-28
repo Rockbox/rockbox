@@ -35,6 +35,7 @@ QUICKREF
 #include "_ansi.h"
 #include <string.h>
 #include <limits.h>
+#include "symbols.h"
 
 #define LBLOCKSIZE   (sizeof (long))
 #define UNALIGNED(X) ((long)X & (LBLOCKSIZE - 1))
@@ -91,3 +92,4 @@ _DEFUN (strlen, (str),
   return str - start;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }
+EXPORT_SYMBOL(strlen);

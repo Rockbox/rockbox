@@ -96,6 +96,7 @@ void* codec_realloc(void* ptr, size_t size)
     return(x);
 }
 
+#if 0
 size_t strlen(const char *s)
 {
     return(ci->strlen(s));
@@ -146,6 +147,7 @@ void qsort(void *base, size_t nmemb, size_t size,
 {
     ci->qsort(base,nmemb,size,compar);
 }
+#endif
 
 /* From ffmpeg - libavutil/common.h */
 const uint8_t bs_log2_tab[256] ICONST_ATTR = {

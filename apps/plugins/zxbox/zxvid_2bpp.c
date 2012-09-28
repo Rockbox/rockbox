@@ -51,7 +51,7 @@ void update_screen(void)
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     for(y = 0; y < LCD_HEIGHT; y++)
     {
-        frameb = rb->lcd_framebuffer + (y) * FB_WIDTH;
+        frameb = lcd_framebuffer + (y) * FB_WIDTH;
         srcx = 0;           /* reset our x counter before each row... */
         for(x = 0; x < LCD_WIDTH; x++)
         {
@@ -67,7 +67,7 @@ void update_screen(void)
     int shift;
     for(y = 0; y < LCD_HEIGHT; y++)
     {
-        frameb = rb->lcd_framebuffer + (y/4) * LCD_WIDTH;
+        frameb = lcd_framebuffer + (y/4) * LCD_WIDTH;
         srcx = 0;           /* reset our x counter before each row... */
         shift = ((y & 3 ) * 2 );
         mask = ~pixmask[y & 3];
@@ -84,7 +84,7 @@ void update_screen(void)
     int shift;
     for(y = 0; y < LCD_HEIGHT; y++)
     {
-        frameb = rb->lcd_framebuffer + (y/8) * LCD_WIDTH;
+        frameb = lcd_framebuffer + (y/8) * LCD_WIDTH;
         srcx = 0;           /* reset our x counter before each row... */
         shift = (y & 7);
         mask = ~pixmask[y & 7];
@@ -102,9 +102,9 @@ void update_screen(void)
     if ( settings.showfps ) {
         int percent=0;
         int TPF = HZ/50;/* ticks per frame */
-        if ((*rb->current_tick-start_time) > TPF )
-            percent = 100*video_frames/((*rb->current_tick-start_time)/TPF);
-        rb->lcd_putsxyf(0,0,"%d %%",percent);
+        if ((current_tick-start_time) > TPF )
+            percent = 100*video_frames/((current_tick-start_time)/TPF);
+        lcd_putsxyf(0,0,"%d %%",percent);
     }
 
 

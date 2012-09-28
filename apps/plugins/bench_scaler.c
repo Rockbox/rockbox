@@ -76,8 +76,8 @@ const struct custom_format format_null = {
 
 #define lcd_printf(...) \
 do { \
-    rb->lcd_putsxyf(0, output_y, __VA_ARGS__); \
-    rb->lcd_update_rect(0, output_y, LCD_WIDTH, font_h); \
+    lcd_putsxyf(0, output_y, __VA_ARGS__); \
+    lcd_update_rect(0, output_y, LCD_WIDTH, font_h); \
     output_y += font_h; \
 } while (0)
 
@@ -85,7 +85,7 @@ do { \
 enum plugin_status plugin_start(const void* parameter)
 {
     size_t plugin_buf_len;
-    plugin_buf = (unsigned char *)rb->plugin_get_buffer(&plugin_buf_len);
+    plugin_buf = (unsigned char *)plugin_get_buffer(&plugin_buf_len);
     struct bitmap bm;
     struct dim in_dim;
     struct rowset rset = {
@@ -94,10 +94,10 @@ enum plugin_status plugin_start(const void* parameter)
     };
     (void)parameter;
 
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_getstringsize("A", NULL, &font_h);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_getstringsize("A", NULL, &font_h);
     bm.data = plugin_buf;
     int in, out;
     for (in = 64; in < 1025; in <<= 2)
@@ -109,15 +109,15 @@ enum plugin_status plugin_start(const void* parameter)
             lcd_printf("timing %dx%d->%dx>%d scale", in, in, out, out);
             long t1, t2, t_end;
             int count = 0;
-            t2 = *(rb->current_tick);
+            t2 = *(current_tick);
             in_dim.width = in_dim.height = in;
             bm.width = bm.height = rset.rowstop = out;
-            while (t2 != (t1 = *(rb->current_tick)));
+            while (t2 != (t1 = *(current_tick)));
             t_end = t1 + 10 * HZ;
             do {
                 resize_on_load(&bm, false, &in_dim, &rset, (unsigned char *)plugin_buf, plugin_buf_len, &format_null, IF_PIX_FMT(0,) store_part_null, NULL);
                 count++;
-                t2 = *(rb->current_tick);
+                t2 = *(current_tick);
             } while (TIME_BEFORE(t2, t_end) || count < 10);
             t2 -= t1;
             t2 *= 10;
@@ -131,6 +131,6 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-    while (rb->get_action(CONTEXT_STD,1) != ACTION_STD_OK) rb->yield();
+    while (get_action(CONTEXT_STD,1) != ACTION_STD_OK) yield();
     return PLUGIN_OK;
 }

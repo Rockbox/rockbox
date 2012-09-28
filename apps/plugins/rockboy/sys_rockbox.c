@@ -67,7 +67,7 @@ static inline unsigned int read_scroll_wheel(void)
        posted */
     do
     {
-        btn = rb->button_get_w_tmo(0);
+        btn = button_get_w_tmo(0);
         buttons |= btn;
     }
     while (btn != BUTTON_NONE);
@@ -79,7 +79,7 @@ static inline unsigned int read_scroll_wheel(void)
 void ev_poll(void)
 {
     event_t ev;
-    newbuttonstate = rb->button_status();
+    newbuttonstate = button_status();
 #ifdef ROCKBOY_SCROLLWHEEL
     newbuttonstate |= read_scroll_wheel();
 #endif
@@ -87,9 +87,9 @@ void ev_poll(void)
     pressed = newbuttonstate & ~oldbuttonstate;
     oldbuttonstate = newbuttonstate;
 #if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
-    if (rb->button_hold()&~holdbutton)
+    if (button_hold()&~holdbutton)
         fb.mode=(fb.mode+1)%4;
-    holdbutton=rb->button_hold();
+    holdbutton=button_hold();
 #elif CONFIG_KEYPAD == RECORDER_PAD
     if (pressed & BUTTON_ON)
         fb.mode=(fb.mode+1)%4;
@@ -97,7 +97,7 @@ void ev_poll(void)
 
 #ifdef HAVE_WHEEL_POSITION
     /* Get the current wheel position - 0..95 or -1 for untouched */
-    wheel = rb->wheel_status(); 
+    wheel = wheel_status(); 
 
     /* Convert to number from 0 to 7 - clockwise from top */
     if ( wheel > 0 ){
@@ -215,13 +215,13 @@ void ev_poll(void)
         }
 #endif
 #if CONFIG_KEYPAD == IPOD_4G_PAD
-        if(rb->button_hold()) {
+        if(button_hold()) {
 #else
         if(pressed & options.MENU) {
 #endif
 #if (CONFIG_KEYPAD != RECORDER_PAD)
 #ifdef HAVE_WHEEL_POSITION
-            rb->wheel_send_events(true);
+            wheel_send_events(true);
 #endif
             if (do_user_menu() == USER_MENU_QUIT) 
 #endif
@@ -230,7 +230,7 @@ void ev_poll(void)
                 cleanshut=1;
             }
 #ifdef HAVE_WHEEL_POSITION
-            rb->wheel_send_events(false);
+            wheel_send_events(false);
 #endif
         }
 
@@ -285,7 +285,7 @@ void vid_update(int scanline)
     else if (fb.mode==2)
         scanline-=8;
     scanline_remapped = (scanline / 16 + 7) % 8;
-    frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
+    frameb = lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         balance += LCD_WIDTH;
         if (balance > 0)
@@ -353,14 +353,14 @@ void vid_update(int scanline)
         }
         cnt ++;
     }
-    rb->lcd_update_rect(0, (scanline/2) & ~7, LCD_WIDTH, 8);
+    lcd_update_rect(0, (scanline/2) & ~7, LCD_WIDTH, 8);
 #elif (LCD_HEIGHT == 128) && (LCD_DEPTH == 2) /* iriver H1x0, Samsung YH920 */
     if (fb.mode==1)
         scanline-=16;
     else if (fb.mode==2)
         scanline-=8;
     scanline_remapped = scanline / 4;
-    frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
+    frameb = lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         *(frameb++) = (scan.buf[0][cnt]&0x3) |
                       ((scan.buf[1][cnt]&0x3)<<2) |
@@ -368,7 +368,7 @@ void vid_update(int scanline)
                       ((scan.buf[3][cnt]&0x3)<<6);
         cnt++;
     }
-    rb->lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
+    lcd_update_rect(0, scanline & ~3, LCD_WIDTH, 4);
 #elif defined(HAVE_LCD_COLOR)
     /* handled in lcd.c now */
 #endif /* LCD_HEIGHT */

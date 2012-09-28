@@ -298,25 +298,25 @@ static bool exit_tsr(bool reenter)
 {
     long button;
     (void)reenter;
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
-    rb->lcd_puts_scroll(0, 1, "Press " BATTERY_OFF_TXT " to cancel the test");
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
+    lcd_puts_scroll(0, 1, "Press " BATTERY_OFF_TXT " to cancel the test");
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_puts_scroll(0, 2, "Anything else will resume");
+    lcd_puts_scroll(0, 2, "Anything else will resume");
 #endif
-    rb->lcd_update();
+    lcd_update();
 
     while (1)
     {
-        button = rb->button_get(true);
+        button = button_get(true);
         if (IS_SYSEVENT(button))
             continue;
         if (button == BATTERY_OFF)
         {
-            rb->queue_post(&thread_q, EV_EXIT, 0);
-            rb->thread_wait(thread_id);
+            queue_post(&thread_q, EV_EXIT, 0);
+            thread_wait(thread_id);
             /* remove the thread's queue from the broadcast list */
-            rb->queue_delete(&thread_q);
+            queue_delete(&thread_q);
             return true;
         }
         else return false;
@@ -333,19 +333,19 @@ static bool exit_tsr(bool reenter)
 static unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
 
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
-static unsigned int charge_state(void)
+static unsigned int charge_info(void)
 {
     unsigned int ret = 0;
 #if CONFIG_CHARGING
-    if (rb->charger_inserted())
+    if (charger_inserted())
         ret = BIT_CHARGER;
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    if (rb->charging_state())
+    if (charging_state())
         ret |= BIT_CHARGING;
 #endif
 #endif
 #ifdef HAVE_USB_POWER
-    if (rb->usb_powered())
+    if (usb_powered())
         ret |= BIT_USB_POWER;
 #endif
     return ret; 
@@ -363,13 +363,13 @@ static void flush_buffer(void* data)
     if (in_usb_mode || (buf_idx == 0))
         return;
 
-    fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND, 0666);
+    fd = open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND, 0666);
     if (fd < 0)
         return;
 
     for (i = 0; i < buf_idx; i++)
     {
-        rb->fdprintf(fd,
+        fdprintf(fd,
                 "%02d:%02d:%02d,  %05d,     %03d%%,     "
                 "%02d:%02d,         %04d,   "
 #if CONFIG_CHARGING
@@ -397,7 +397,7 @@ static void flush_buffer(void* data)
 #endif
         );
     }
-    rb->close(fd);
+    close(fd);
 
     buf_idx = 0;
 }
@@ -419,16 +419,16 @@ static void thread(void)
         /* add data to buffer */
         if (buf_idx < BUF_ELEMENTS)
         {
-            bat[buf_idx].secs = (*rb->current_tick - start_tick) / HZ;
-            bat[buf_idx].level = rb->battery_level();
-            bat[buf_idx].eta = rb->battery_time();
-            bat[buf_idx].voltage = rb->battery_voltage();
+            bat[buf_idx].secs = (current_tick - start_tick) / HZ;
+            bat[buf_idx].level = battery_level();
+            bat[buf_idx].eta = battery_time();
+            bat[buf_idx].voltage = battery_voltage();
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
-            bat[buf_idx].flags = charge_state();
+            bat[buf_idx].flags = charge_info();
 #endif
             buf_idx++;
 #if USING_STORAGE_CALLBACK
-            rb->register_storage_idle_func(flush_buffer);
+            register_storage_idle_func(flush_buffer);
 #endif
         }
         
@@ -443,12 +443,12 @@ static void thread(void)
         }
         
         /* sleep some time until next measurement */
-        rb->queue_wait_w_tmo(&thread_q, &ev, sleep_time);
+        queue_wait_w_tmo(&thread_q, &ev, sleep_time);
         switch (ev.id)
         {
             case SYS_USB_CONNECTED: 
                 in_usb_mode = true;
-                rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 break;
             case SYS_USB_DISCONNECTED:
                 in_usb_mode = false;
@@ -459,9 +459,9 @@ static void thread(void)
                 break;
             case EV_EXIT:
 #ifdef HAVE_LCD_BITMAP
-                rb->splash(HZ, "Exiting battery_bench...");
+                splash(HZ, "Exiting battery_bench...");
 #else
-                rb->splash(HZ, "bench exit");
+                splash(HZ, "bench exit");
 #endif
                 exit_reason = "plugin exit";
                 exit = true;
@@ -471,17 +471,17 @@ static void thread(void)
 
 #if USING_STORAGE_CALLBACK
     /* unregister flush callback and flush to disk */
-    rb->unregister_storage_idle_func(flush_buffer, true);
+    unregister_storage_idle_func(flush_buffer, true);
 #else
     flush_buffer(NULL);
 #endif
     
     /* log end of bench and exit reason */
-    fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND, 0666);
+    fd = open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND, 0666);
     if (fd >= 0)
     {
-        rb->fdprintf(fd, "--Battery bench ended, reason: %s--\n", exit_reason);
-        rb->close(fd);
+        fdprintf(fd, "--Battery bench ended, reason: %s--\n", exit_reason);
+        close(fd);
     }
 }
 
@@ -492,7 +492,7 @@ typedef void (*plcdfunc)(int x, int y, const unsigned char *str);
 static void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, int line)
 {
     int strwdt, strhgt;
-    rb->lcd_getstringsize(str, &strwdt, &strhgt);
+    lcd_getstringsize(str, &strwdt, &strhgt);
     putsxy((lcd_width - strwdt)/2, line*(strhgt), str);
 }
 #endif
@@ -502,39 +502,39 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     int button, fd;
     bool on = false;
-    start_tick = *rb->current_tick;
+    start_tick = current_tick;
 #ifdef HAVE_LCD_BITMAP
     int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
                            "for more info", BATTERY_ON_TXT, BATTERY_OFF_TXT " - quit" };
 #endif    
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_clear_display();
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
 
     for (i = 0; i<(int)(sizeof(msgs)/sizeof(char *)); i++)
-        put_centered_str(msgs[i],rb->lcd_putsxy,LCD_WIDTH,i+1);
+        put_centered_str(msgs[i],lcd_putsxy,LCD_WIDTH,i+1);
 #else
-    rb->lcd_puts_scroll(0, 0, "Batt.Bench.");
-    rb->lcd_puts_scroll(0, 1, "PLAY/STOP");
+    lcd_puts_scroll(0, 0, "Batt.Bench.");
+    lcd_puts_scroll(0, 1, "PLAY/STOP");
 #endif
-    rb->lcd_update();
+    lcd_update();
     
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_clear_display();
-    put_centered_str(msgs[0],rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,0);
+    lcd_remote_clear_display();
+    put_centered_str(msgs[0],lcd_remote_putsxy,LCD_REMOTE_WIDTH,0);
     put_centered_str(msgs[sizeof(msgs)/sizeof(char*)-2],
-                    rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,1);
+                    lcd_remote_putsxy,LCD_REMOTE_WIDTH,1);
     put_centered_str(msgs[sizeof(msgs)/sizeof(char*)-1],
-                    rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,2);
-    rb->lcd_remote_update();
+                    lcd_remote_putsxy,LCD_REMOTE_WIDTH,2);
+    lcd_remote_update();
 #endif
     
     do
     {
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button)
         {
             case BATTERY_ON:
@@ -550,18 +550,18 @@ enum plugin_status plugin_start(const void* parameter)
                 return PLUGIN_OK;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
         }
     }while(!on);
     
-    fd = rb->open(BATTERY_LOG, O_RDONLY);
+    fd = open(BATTERY_LOG, O_RDONLY);
     if (fd < 0)
     {
-        fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT, 0666);
+        fd = open(BATTERY_LOG, O_RDWR | O_CREAT, 0666);
         if (fd >= 0)
         {
-            rb->fdprintf(fd,
+            fdprintf(fd,
                 "# This plugin will log your battery performance in a\n"
                 "# file (%s) every minute.\n"
                 "# To properly test your battery:\n"
@@ -577,17 +577,17 @@ enum plugin_status plugin_start(const void* parameter)
                 "# P.S: You can decide how you will make your tests.\n"
                 "# Just don't open another plugin to be sure that your log "
                 "will continue.\n\n",BATTERY_LOG);
-            rb->fdprintf(fd,
+            fdprintf(fd,
                 "# Battery bench run for %s version %s\n\n"
-                ,MODEL_NAME,rb->rbversion);
+                ,MODEL_NAME,rbversion);
 
-            rb->fdprintf(fd, "# Battery type: %d mAh      Buffer Entries: %d\n",
-                rb->global_settings->battery_capacity, (int)BUF_ELEMENTS);
+            fdprintf(fd, "# Battery type: %d mAh      Buffer Entries: %d\n",
+                global_settings.battery_capacity, (int)BUF_ELEMENTS);
 
-            rb->fdprintf(fd, "# Rockbox has been running for %02d:%02d:%02d\n",
+            fdprintf(fd, "# Rockbox has been running for %02d:%02d:%02d\n",
                 HMS((unsigned)start_tick/HZ));
 
-            rb->fdprintf(fd,
+            fdprintf(fd,
                 "# Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:"
 #if CONFIG_CHARGING
                 ", C:"
@@ -599,38 +599,38 @@ enum plugin_status plugin_start(const void* parameter)
                 ", U:"
 #endif
                 "\n");
-            rb->close(fd);
+            close(fd);
         }
         else
         {
-            rb->splash(HZ / 2, "Cannot create file!");
+            splash(HZ / 2, "Cannot create file!");
             return PLUGIN_ERROR;
         }
     }
     else
     {
-        rb->close(fd);
-        fd = rb->open(BATTERY_LOG, O_RDWR | O_APPEND);
-        rb->fdprintf(fd, "\n# --File already present. Resuming Benchmark--\n");
-        rb->fdprintf(fd,
+        close(fd);
+        fd = open(BATTERY_LOG, O_RDWR | O_APPEND);
+        fdprintf(fd, "\n# --File already present. Resuming Benchmark--\n");
+        fdprintf(fd,
             "# Battery bench run for %s version %s\n\n"
-            ,MODEL_NAME,rb->rbversion);
-        rb->fdprintf(fd, "# Rockbox has been running for %02d:%02d:%02d\n",
+            ,MODEL_NAME,rbversion);
+        fdprintf(fd, "# Rockbox has been running for %02d:%02d:%02d\n",
             HMS((unsigned)start_tick/HZ));
-        rb->close(fd);
+        close(fd);
     }
     
-    rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
-    if ((thread_id = rb->create_thread(thread, thread_stack,
+    queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
+    if ((thread_id = create_thread(thread, thread_stack,
         sizeof(thread_stack), 0, "Battery Benchmark" 
         IF_PRIO(, PRIORITY_BACKGROUND)
         IF_COP(, CPU))) == 0)
     {
-        rb->splash(HZ, "Cannot create thread!");
+        splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;
     }
             
-    rb->plugin_tsr(exit_tsr);
+    plugin_tsr(exit_tsr);
     
     return PLUGIN_OK;
 }

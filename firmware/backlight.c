@@ -36,6 +36,7 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "screendump.h"
+#include "symbols.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -138,17 +139,20 @@ void buttonlight_on(void)
     queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
     queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
 }
+EXPORT_SYMBOL(buttonlight_on);
 
 void buttonlight_off(void)
 {
     queue_post(&backlight_queue, BUTTON_LIGHT_OFF, 0);
 }
+EXPORT_SYMBOL(buttonlight_off);
 
 void buttonlight_set_timeout(int value)
 {
     buttonlight_timeout = HZ * value;
     queue_post(&backlight_queue, BUTTON_LIGHT_TMO_CHANGED, 0);
 }
+EXPORT_SYMBOL(buttonlight_set_timeout);
 
 int buttonlight_get_current_timeout(void)
 {
@@ -764,11 +768,13 @@ void backlight_on(void)
     queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
     queue_post(&backlight_queue, BACKLIGHT_ON, 0);
 }
+EXPORT_SYMBOL(backlight_on);
 
 void backlight_off(void)
 {
     queue_post(&backlight_queue, BACKLIGHT_OFF, 0);
 }
+EXPORT_SYMBOL(backlight_off);
 
 /* returns true when the backlight is on,
  * and optionally when it's set to always off. */
@@ -779,6 +785,7 @@ bool is_backlight_on(bool ignore_always_off)
         || (timeout == 0) /* always on */
         || ((timeout < 0) && !ignore_always_off);
 }
+EXPORT_SYMBOL(is_backlight_on);
 
 /* return value in ticks; 0 means always on, <0 means always off */
 int backlight_get_current_timeout(void)
@@ -808,6 +815,7 @@ void backlight_set_timeout(int value)
     backlight_timeout_normal = HZ * value;
     queue_post(&backlight_queue, BACKLIGHT_TMO_CHANGED, 0);
 }
+EXPORT_SYMBOL(backlight_set_timeout);
 
 #if CONFIG_CHARGING
 void backlight_set_timeout_plugged(int value)
@@ -815,6 +823,7 @@ void backlight_set_timeout_plugged(int value)
     backlight_timeout_plugged = HZ * value;
     queue_post(&backlight_queue, BACKLIGHT_TMO_CHANGED, 0);
 }
+EXPORT_SYMBOL(backlight_set_timeout_plugged);
 #endif /* CONFIG_CHARGING */
 
 #ifdef HAS_BUTTON_HOLD
@@ -942,6 +951,7 @@ void backlight_set_brightness(int val)
 
     queue_post(&backlight_queue, BACKLIGHT_BRIGHTNESS_CHANGED, val);
 }
+EXPORT_SYMBOL(backlight_set_brightness);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
@@ -954,6 +964,7 @@ void buttonlight_set_brightness(int val)
 
      queue_post(&backlight_queue, BUTTON_LIGHT_BRIGHTNESS_CHANGED, val);
 }
+EXPORT_SYMBOL(buttonlight_set_brightness);
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #else /* !defined(HAVE_BACKLIGHT) || !defined(BACKLIGHT_FULL_INIT)

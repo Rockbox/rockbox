@@ -680,29 +680,29 @@ int bpm_step_counter = 0;
 
 #if CONFIG_CODEC != SWCODEC
 
-#define MET_IS_PLAYING rb->mp3_is_playing()
-#define MET_PLAY_STOP rb->mp3_play_stop()
+#define MET_IS_PLAYING mp3_is_playing()
+#define MET_PLAY_STOP mp3_play_stop()
 
 static void callback(const void** start, size_t* size)
 {
     (void)start; /* unused parameter, avoid warning */
     *size = 0; /* end of data */
     sound_active = false;
-    rb->led(0);
+    led(0);
 }
 
 static void play_tock(void)
 {
     sound_active = true;
-    rb->led(1);
-    rb->mp3_play_data(sound, sizeof(sound), callback);
-    rb->mp3_play_pause(true); /* kickoff audio */ 
+    led(1);
+    mp3_play_data(sound, sizeof(sound), callback);
+    mp3_play_pause(true); /* kickoff audio */ 
 }
 
 #else /*  CONFIG_CODEC == SWCODEC */
 
-#define MET_IS_PLAYING rb->pcm_is_playing()
-#define MET_PLAY_STOP rb->audio_stop()
+#define MET_IS_PLAYING pcm_is_playing()
+#define MET_PLAY_STOP audio_stop()
 
 
 bool need_to_play = false;
@@ -721,7 +721,7 @@ static void prepare_tock(void)
 
 static void play_tock(void)
 {
-    rb->pcm_play_data(NULL, NULL, sndbuf, sizeof(sndbuf));
+    pcm_play_data(NULL, NULL, sndbuf, sizeof(sndbuf));
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */
@@ -753,15 +753,15 @@ static void metronome_draw(struct screen* display)
 #endif
 #endif /* HAVE_LCD_BITMAP */
 
-    rb->snprintf(buffer, sizeof(buffer), "BPM: %d ",bpm);
+    snprintf(buffer, sizeof(buffer), "BPM: %d ",bpm);
 #ifdef HAVE_LCD_BITMAP
     display->puts(0,3, buffer);
 #else
     display->puts(0,0, buffer);
 #endif /* HAVE_LCD_BITMAP */
 
-    rb->snprintf(buffer, sizeof(buffer), "Vol: %d",
-                 rb->global_settings->volume);
+    snprintf(buffer, sizeof(buffer), "Vol: %d",
+                 global_settings.volume);
 #ifdef HAVE_LCD_BITMAP
     display->puts(10, 3, buffer);
 #else
@@ -782,22 +782,22 @@ static void metronome_draw(struct screen* display)
 static void draw_display(void)
 {
     FOR_NB_SCREENS(i)
-        metronome_draw(rb->screens[i]);
+        metronome_draw(&screens[i]);
 }
 
 /* helper function to change the volume by a certain amount, +/-
    ripped from video.c */
 static void change_volume(int delta)
 {
-    int minvol = rb->sound_min(SOUND_VOLUME);
-    int maxvol = rb->sound_max(SOUND_VOLUME);
-    int vol = rb->global_settings->volume + delta;
+    int minvol = sound_min(SOUND_VOLUME);
+    int maxvol = sound_max(SOUND_VOLUME);
+    int vol = global_settings.volume + delta;
 
     if (vol > maxvol) vol = maxvol;
     else if (vol < minvol) vol = minvol;
-    if (vol != rb->global_settings->volume) {
-        rb->sound_set(SOUND_VOLUME, vol);
-        rb->global_settings->volume = vol;
+    if (vol != global_settings.volume) {
+        sound_set(SOUND_VOLUME, vol);
+        global_settings.volume = vol;
         draw_display();
     }
 }
@@ -832,7 +832,7 @@ static void timer_callback(void)
 #else
             play_tock();
 #endif
-            rb->reset_poweroff_timer();
+            reset_poweroff_timer();
         }
     }
     else {
@@ -848,11 +848,11 @@ static void timer_callback(void)
 
 static void cleanup(void)
 {
-    rb->timer_unregister();
+    timer_unregister();
     MET_PLAY_STOP; /* stop audio ISR */
-    rb->led(0);
+    led(0);
 #if CONFIG_CODEC == SWCODEC
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
 #endif
 }
 
@@ -894,19 +894,19 @@ enum plugin_status plugin_start(const void* parameter)
         MET_PLAY_STOP; /* stop audio IS */
 
 #if CONFIG_CODEC != SWCODEC
-    rb->bitswap(sound, sizeof(sound));
+    bitswap(sound, sizeof(sound));
 #else
     prepare_tock();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPR_44);
+    pcm_set_frequency(SAMPR_44);
 #endif /* CONFIG_CODEC != SWCODEC */
 
     calc_period();
-    rb->timer_register(1, NULL, TIMER_FREQ/1024, timer_callback IF_COP(, CPU));
+    timer_register(1, NULL, TIMER_FREQ/1024, timer_callback IF_COP(, CPU));
 
     draw_display();
 
@@ -990,7 +990,7 @@ enum plugin_status plugin_start(const void* parameter)
         if (reset_tap) {
             tap_count = 0;
         }
-        rb->yield();
+        yield();
     }
 }
 

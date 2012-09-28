@@ -39,6 +39,7 @@
 #include "core_alloc.h"
 #include "icons.h"
 #include "logf.h"
+#include "symbols.h"
 
 /* max filetypes (plugins & icons stored here) */
 #if CONFIG_CODEC == SWCODEC
@@ -456,6 +457,7 @@ int filetype_get_attr(const char* file)
         return (filetypes[i].attr<<8)&FILE_ATTR_MASK;
     return 0;
 }
+EXPORT_SYMBOL(filetype_get_attr);
 
 static int find_attr(int attr)
 {

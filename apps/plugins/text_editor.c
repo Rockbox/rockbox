@@ -51,9 +51,9 @@ static char* _do_action(int action, char* str, int line);
 static char* do_action(int action, char* str, int line)
 {
     char *r;
-    rb->cpu_boost(1);
+    cpu_boost(1);
     r = _do_action(action,str,line);
-    rb->cpu_boost(0);
+    cpu_boost(0);
     return r;
 }
 #endif
@@ -69,17 +69,17 @@ static char* _do_action(int action, char* str, int line)
     }
     while (i<line && i<line_count)
     {
-        c += rb->strlen(&buffer[c])+1;
+        c += strlen(&buffer[c])+1;
         i++;
     }
     switch (action)
     {
         case ACTION_INSERT:
-            len = rb->strlen(str)+1;
+            len = strlen(str)+1;
             if ( char_count+ len > buffer_size )
                 return NULL;
-            rb->memmove(&buffer[c+len],&buffer[c],char_count-c);
-            rb->strcpy(&buffer[c],str);
+            memmove(&buffer[c+len],&buffer[c],char_count-c);
+            strcpy(&buffer[c],str);
             char_count += len;
             line_count++;
             break;
@@ -90,26 +90,26 @@ static char* _do_action(int action, char* str, int line)
         case ACTION_REMOVE:
             if (line > line_count)
                 return NULL;
-            len = rb->strlen(&buffer[c])+1;
-            rb->memmove(&buffer[c],&buffer[c+len],char_count-c-len);
+            len = strlen(&buffer[c])+1;
+            memmove(&buffer[c],&buffer[c+len],char_count-c-len);
             char_count -= len;
             line_count--;
             break;
         case ACTION_UPDATE:
             if (line > line_count)
                 return NULL;
-            len = rb->strlen(&buffer[c])+1;
-            lennew = rb->strlen(str)+1;
+            len = strlen(&buffer[c])+1;
+            lennew = strlen(str)+1;
             if ( char_count+ lennew-len > buffer_size )
                 return NULL;
-            rb->memmove(&buffer[c+lennew],&buffer[c+len],char_count-c-len);
-            rb->strcpy(&buffer[c],str);
+            memmove(&buffer[c+lennew],&buffer[c+len],char_count-c-len);
+            strcpy(&buffer[c],str);
             char_count += lennew-len;
             break;
         case ACTION_CONCAT:
             if (line > line_count)
                 return NULL;
-            rb->memmove(&buffer[c-1],&buffer[c],char_count-c);
+            memmove(&buffer[c-1],&buffer[c],char_count-c);
             char_count--;
             line_count--;
             break;
@@ -126,9 +126,9 @@ static const char* list_get_name_cb(int selected_item, void* data,
     (void)data;
     char *b = do_action(ACTION_GET, 0, selected_item);
     /* strlcpy(dst, src, siz) returns strlen(src) */
-    if (rb->strlcpy(buf, b, buf_len) >= buf_len)
+    if (strlcpy(buf, b, buf_len) >= buf_len)
     {
-        rb->strcpy(&buf[buf_len-10], " ...");
+        strcpy(&buf[buf_len-10], " ...");
     }
     return buf;
 }
@@ -139,30 +139,30 @@ static void get_eol_string(char* fn)
     char t;
 
     /* assume LF first */
-    rb->strcpy(eol,"\n");
+    strcpy(eol,"\n");
 
     if (!fn || !fn[0])
         return;
-    fd = rb->open(fn,O_RDONLY);
+    fd = open(fn,O_RDONLY);
     if (fd<0)
         return;
 
     while (1)
     {
-        if (!rb->read(fd,&t,1) || t == '\n')
+        if (!read(fd,&t,1) || t == '\n')
         {
             break;
         }
         if (t == '\r')
         {
-            if (rb->read(fd,&t,1) && t=='\n')
-                rb->strcpy(eol,"\r\n");
+            if (read(fd,&t,1) && t=='\n')
+                strcpy(eol,"\r\n");
             else
-                rb->strcpy(eol,"\r");
+                strcpy(eol,"\r");
             break;
         }
     }
-    rb->close(fd);
+    close(fd);
     return;
 }
 
@@ -173,37 +173,37 @@ static bool save_changes(int overwrite)
 
     if (newfile || !overwrite)
     {
-        if(rb->kbd_input(filename,MAX_PATH) < 0)
+        if(kbd_input(filename,MAX_PATH) < 0)
         {
             newfile = true;
             return false;
         }
     }
 
-    fd = rb->open(filename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
+    fd = open(filename,O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if (fd < 0)
     {
         newfile = true;
-        rb->splash(HZ*2, "Changes NOT saved");
+        splash(HZ*2, "Changes NOT saved");
         return false;
     }
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(1);
+    cpu_boost(1);
 #endif
     for (i=0;i<line_count;i++)
     {
-        rb->fdprintf(fd,"%s%s", do_action(ACTION_GET, 0, i), eol);
+        fdprintf(fd,"%s%s", do_action(ACTION_GET, 0, i), eol);
     }
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(0);
+    cpu_boost(0);
 #endif
-    rb->close(fd);
+    close(fd);
 
     if (newfile || !overwrite)
         /* current directory may have changed */
-        rb->reload_directory();
+        reload_directory();
 
     newfile = false;
     return true;
@@ -211,12 +211,12 @@ static bool save_changes(int overwrite)
 
 static void setup_lists(struct gui_synclist *lists, int sel)
 {
-    rb->gui_synclist_init(lists,list_get_name_cb,0, false, 1, NULL);
-    rb->gui_synclist_set_icon_callback(lists,NULL);
-    rb->gui_synclist_set_nb_items(lists,line_count);
-    rb->gui_synclist_limit_scroll(lists,true);
-    rb->gui_synclist_select_item(lists, sel);
-    rb->gui_synclist_draw(lists);
+    gui_synclist_init(lists,list_get_name_cb,0, false, 1, NULL);
+    gui_synclist_set_icon_callback(lists,NULL);
+    gui_synclist_set_nb_items(lists,line_count);
+    gui_synclist_limit_scroll(lists,true);
+    gui_synclist_select_item(lists, sel);
+    gui_synclist_draw(lists);
 }
 
 enum {
@@ -233,21 +233,21 @@ static int do_item_menu(int cur_sel)
                         "Concat To Above",
                         "Save", "Playback Control");
 
-    switch (rb->do_menu(&menu, NULL, NULL, false))
+    switch (do_menu(&menu, NULL, NULL, false))
     {
         case 0: /* cut */
-            rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
+            strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
                         MAX_LINE_LEN);
             do_action(ACTION_REMOVE, 0, cur_sel);
             ret = MENU_RET_UPDATE;
         break;
         case 1: /* copy */
-            rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
+            strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
                         MAX_LINE_LEN);
             ret = MENU_RET_NO_UPDATE;
         break;
         case 2: /* insert above */
-            if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN))
+            if (!kbd_input(copy_buffer,MAX_LINE_LEN))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel);
                 copy_buffer[0]='\0';
@@ -255,7 +255,7 @@ static int do_item_menu(int cur_sel)
             }
         break;
         case 3: /* insert below */
-            if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN))
+            if (!kbd_input(copy_buffer,MAX_LINE_LEN))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel+1);
                 copy_buffer[0]='\0';
@@ -276,7 +276,7 @@ static int do_item_menu(int cur_sel)
             if (!audio_buf)
                 playback_control(NULL);
             else
-                rb->splash(HZ, "Cannot restart playback");
+                splash(HZ, "Cannot restart playback");
             ret = MENU_RET_NO_UPDATE;
         break;
         default:
@@ -296,7 +296,7 @@ static int my_hex_to_rgb(const char* hex, int* color)
     int i;
     int red, green, blue;
 
-    if (rb->strlen(hex) == 6) {
+    if (strlen(hex) == 6) {
         for (i=0; i < 6; i++ ) {
             if (!isxdigit(hex[i])) {
                 ok=0;
@@ -334,75 +334,75 @@ enum plugin_status plugin_start(const void* parameter)
     copy_buffer[0]='\0';
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
-    buffer = rb->plugin_get_buffer(&buffer_size);
+    buffer = plugin_get_buffer(&buffer_size);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(1);
+    cpu_boost(1);
 #endif
     if (parameter)
     {
 #ifdef HAVE_LCD_COLOR
         char *c = NULL;
 #endif
-        rb->strlcpy(filename, (char*)parameter, MAX_PATH);
+        strlcpy(filename, (char*)parameter, MAX_PATH);
         get_eol_string(filename);
-        fd = rb->open(filename,O_RDONLY);
+        fd = open(filename,O_RDONLY);
         if (fd<0)
         {
-            rb->splashf(HZ*2, "Couldnt open file: %s", filename);
+            splashf(HZ*2, "Couldnt open file: %s", filename);
             return PLUGIN_ERROR;
         }
 #ifdef HAVE_LCD_COLOR
-        c = rb->strrchr(filename, '.');
-        if (c && !rb->strcmp(c, ".colours"))
+        c = strrchr(filename, '.');
+        if (c && !strcmp(c, ".colours"))
             edit_colors_file = true;
 #endif
-        if (buffer_size <= (size_t)rb->filesize(fd) + 0x400)
+        if (buffer_size <= (size_t)filesize(fd) + 0x400)
         {
-            buffer = rb->plugin_get_audio_buffer(&buffer_size);
+            buffer = plugin_get_audio_buffer(&buffer_size);
             audio_buf = true;
         }
         /* read in the file */
-        while (rb->read_line(fd,temp_line,MAX_LINE_LEN) > 0)
+        while (read_line(fd,temp_line,MAX_LINE_LEN) > 0)
         {
             if (!do_action(ACTION_INSERT,temp_line,line_count))
             {
-                rb->splashf(HZ*2,"Error reading file: %s",(char*)parameter);
-                rb->close(fd);
+                splashf(HZ*2,"Error reading file: %s",(char*)parameter);
+                close(fd);
                 return PLUGIN_ERROR;
             }
         }
-        rb->close(fd);
+        close(fd);
         newfile = false;
     }
     else
     {
-        rb->strcpy(filename,"/");
-        rb->strcpy(eol,"\n");
+        strcpy(filename,"/");
+        strcpy(eol,"\n");
         newfile = true;
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(0);
+    cpu_boost(0);
 #endif
     /* now dump it in the list */
     setup_lists(&lists,0);
-    rb->lcd_update();
+    lcd_update();
     while (!exit)
     {
-        rb->gui_synclist_draw(&lists);
-        cur_sel = rb->gui_synclist_get_sel_pos(&lists);
-        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&lists,&button,LIST_WRAP_UNLESS_HELD))
+        gui_synclist_draw(&lists);
+        cur_sel = gui_synclist_get_sel_pos(&lists);
+        button = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        if (gui_synclist_do_button(&lists,&button,LIST_WRAP_UNLESS_HELD))
             continue;
         switch (button)
         {
             case ACTION_STD_OK:
             {
                 if (line_count)
-                    rb->strlcpy(temp_line, do_action(ACTION_GET, 0, cur_sel),
+                    strlcpy(temp_line, do_action(ACTION_GET, 0, cur_sel),
                                 MAX_LINE_LEN);
 #ifdef HAVE_LCD_COLOR
                 if (edit_colors_file && line_count)
@@ -415,28 +415,28 @@ enum plugin_status plugin_start(const void* parameter)
                     MENUITEM_STRINGLIST(menu, "Edit What?", NULL,
                                         "Extension", "Colour");
 
-                    rb->settings_parseline(temp_line, &name, &value);
-                    rb->strlcpy(extension, name, sizeof(extension));
+                    settings_parseline(temp_line, &name, &value);
+                    strlcpy(extension, name, sizeof(extension));
                     if (value)
                         my_hex_to_rgb(value, &color);
                     else
                         color = 0;
 
-                    switch (rb->do_menu(&menu, NULL, NULL, false))
+                    switch (do_menu(&menu, NULL, NULL, false))
                     {
                         case 0:
-                            temp_changed = !rb->kbd_input(extension, sizeof(extension));
+                            temp_changed = !kbd_input(extension, sizeof(extension));
                             break;
                         case 1:
                             old_color = color;
-                            rb->set_color(rb->screens[SCREEN_MAIN], name, &color, -1);
+                            set_color(&screens[SCREEN_MAIN], name, &color, -1);
                             temp_changed = (value == NULL) || (color != old_color);
                             break;
                     }
 
                     if (temp_changed)
                     {
-                        rb->snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
+                        snprintf(temp_line, MAX_LINE_LEN, "%s: %02X%02X%02X",
                                      extension, RGB_UNPACK_RED(color),
                                      RGB_UNPACK_GREEN(color),
                                      RGB_UNPACK_BLUE(color));
@@ -446,7 +446,7 @@ enum plugin_status plugin_start(const void* parameter)
                 }
                 else
 #endif
-                if (!rb->kbd_input(temp_line,MAX_LINE_LEN))
+                if (!kbd_input(temp_line,MAX_LINE_LEN))
                 {
                     if (line_count)
                         do_action(ACTION_UPDATE,temp_line,cur_sel);
@@ -458,7 +458,7 @@ enum plugin_status plugin_start(const void* parameter)
             break;
             case ACTION_STD_CONTEXT:
                 if (!line_count) break;
-                rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
+                strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
                             MAX_LINE_LEN);
                 do_action(ACTION_REMOVE, 0, cur_sel);
                 changed = true;
@@ -488,7 +488,7 @@ enum plugin_status plugin_start(const void* parameter)
                                         "Playback Control", "Save Changes",
                                         "Save As...", "Save and Exit",
                                         "Ignore Changes and Exit");
-                    switch (rb->do_menu(&menu, NULL, NULL, false))
+                    switch (do_menu(&menu, NULL, NULL, false))
                     {
                         case 0:
                         break;
@@ -496,7 +496,7 @@ enum plugin_status plugin_start(const void* parameter)
                             if (!audio_buf)
                                 playback_control(NULL);
                             else
-                                rb->splash(HZ, "Cannot restart playback");
+                                splash(HZ, "Cannot restart playback");
                         break;
                         case 2: //save to disk
                             if(save_changes(1))
@@ -518,9 +518,9 @@ enum plugin_status plugin_start(const void* parameter)
                 else exit=1;
             break;
         }
-        rb->gui_synclist_set_nb_items(&lists,line_count);
+        gui_synclist_set_nb_items(&lists,line_count);
         if(line_count > 0 && line_count <= cur_sel)
-            rb->gui_synclist_select_item(&lists,line_count-1);
+            gui_synclist_select_item(&lists,line_count-1);
     }
     return PLUGIN_OK;
 }

@@ -26,6 +26,7 @@
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
 #include "dsp_core.h" /* For NATIVE_FREQUENCY */
+#include "symbols.h"
 
 /* Channels use standard-style PCM callback interface but a latency of one
    frame by double-buffering is introduced in order to facilitate mixing and
@@ -308,6 +309,7 @@ void mixer_channel_play_data(enum pcm_mixer_channel channel,
 
     pcm_play_unlock();
 }
+EXPORT_SYMBOL(mixer_channel_play_data);
 
 /* Pause or resume a channel (when started) */
 void mixer_channel_play_pause(enum pcm_mixer_channel channel, bool play)
@@ -334,6 +336,7 @@ void mixer_channel_play_pause(enum pcm_mixer_channel channel, bool play)
 
     pcm_play_unlock();
 }
+EXPORT_SYMBOL(mixer_channel_play_pause);
 
 /* Stop playback on a channel */
 void mixer_channel_stop(enum pcm_mixer_channel channel)
@@ -344,6 +347,7 @@ void mixer_channel_stop(enum pcm_mixer_channel channel)
     channel_stopped(chan);
     pcm_play_unlock();
 }
+EXPORT_SYMBOL(mixer_channel_stop);
 
 /* Set channel's amplitude factor */
 void mixer_channel_set_amplitude(enum pcm_mixer_channel channel,
@@ -351,18 +355,21 @@ void mixer_channel_set_amplitude(enum pcm_mixer_channel channel,
 {
     channels[channel].amplitude = MIN(amplitude, MIX_AMP_UNITY);
 }
+EXPORT_SYMBOL(mixer_channel_set_amplitude);
 
 /* Return channel's playback status */
 enum channel_status mixer_channel_status(enum pcm_mixer_channel channel)
 {
     return channels[channel].status;
 }
+EXPORT_SYMBOL(mixer_channel_status);
 
 /* Returns amount data remaining in channel before next callback */
 size_t mixer_channel_get_bytes_waiting(enum pcm_mixer_channel channel)
 {
     return channels[channel].size;
 }
+EXPORT_SYMBOL(mixer_channel_get_bytes_waiting);
 
 /* Return pointer to channel's playing audio data and the size remaining */
 const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count)
@@ -383,6 +390,7 @@ const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count
     *count = 0;
     return NULL;
 }
+EXPORT_SYMBOL(mixer_channel_get_buffer);
 
 /* Calculate peak values for channel */
 void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
@@ -395,6 +403,7 @@ void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
                             channels[channel].status == CHANNEL_PLAYING,
                             addr, count);
 }
+EXPORT_SYMBOL(mixer_channel_calculate_peaks);
 
 /* Adjust channel pointer by a given offset to support movable buffers */
 void mixer_adjust_channel_address(enum pcm_mixer_channel channel,

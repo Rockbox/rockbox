@@ -81,9 +81,9 @@ struct line_color
 static int get_new_step(int step)
 {
     if(step>0)
-        return -(MIN_STEP_RANGE + rb->rand() % (MAX_STEP_RANGE-MIN_STEP_RANGE));
+        return -(MIN_STEP_RANGE + rand() % (MAX_STEP_RANGE-MIN_STEP_RANGE));
     else
-        return (MIN_STEP_RANGE + rb->rand() % (MAX_STEP_RANGE-MIN_STEP_RANGE));
+        return (MIN_STEP_RANGE + rand() % (MAX_STEP_RANGE-MIN_STEP_RANGE));
 }
 
 /*
@@ -113,8 +113,8 @@ static void polygon_init(struct polygon * polygon, struct screen * display)
     int i;
     for(i=0;i<NB_POINTS;++i)
     {
-        polygon->points[i].x=(rb->rand() % (display->getwidth()));
-        polygon->points[i].y=(rb->rand() % (display->getheight()));
+        polygon->points[i].x=(rand() % (display->getwidth()));
+        polygon->points[i].y=(rand() % (display->getheight()));
     }
 }
 
@@ -226,7 +226,7 @@ static void fifo_push(struct polygon_fifo * fifo, struct polygon * polygon)
      * Workaround for gcc (which uses memcpy internally) to avoid link error
      * fifo->tab[fifo->fifo_head]=polygon
      */
-    rb->memcpy(&(fifo->tab[fifo->fifo_head]), polygon, sizeof(struct polygon));
+    memcpy(&(fifo->tab[fifo->fifo_head]), polygon, sizeof(struct polygon));
     ++(fifo->fifo_head);
     if(fifo->fifo_head>=MAX_POLYGONS)
         fifo->fifo_head=0;
@@ -271,9 +271,9 @@ static void cleanup(void)
 #ifdef HAVE_LCD_COLOR
 static void color_randomize(struct line_color * color)
 {
-    color->r = rb->rand()%255;
-    color->g = rb->rand()%255;
-    color->b = rb->rand()%255;
+    color->r = rand()%255;
+    color->g = rand()%255;
+    color->b = rand()%255;
 }
 
 static void color_init(struct line_color * color)
@@ -334,13 +334,13 @@ static int plugin_main(void)
     FOR_NB_SCREENS(i)
     {
 #ifdef HAVE_LCD_COLOR
-        struct screen *display = rb->screens[i];
+        struct screen *display = &screens[i];
         if (display->is_color)
             display->set_background(LCD_BLACK);
 #endif
         fifo_init(&polygons[i]);
         polygon_move_init(&move[i]);
-        polygon_init(&leading_polygon[i], rb->screens[i]);
+        polygon_init(&leading_polygon[i], &screens[i]);
     }
 
 #ifdef HAVE_LCD_COLOR
@@ -352,7 +352,7 @@ static int plugin_main(void)
     {
         FOR_NB_SCREENS(i)
         {
-            struct screen * display=rb->screens[i];
+            struct screen * display=&screens[i];
             if(polygons[i].nb_items>nb_wanted_polygons)
             {   /* We have too many polygons, we must drop some of them */
                 fifo_pop(&polygons[i]);
@@ -384,9 +384,9 @@ static int plugin_main(void)
 #endif
         /* Speed handling*/
         if (sleep_time<0)/* full speed */
-            rb->yield();
+            yield();
         else
-            rb->sleep(sleep_time);
+            sleep(sleep_time);
         action = pluginlib_getaction(TIMEOUT_NOBLOCK,
                                      plugin_contexts, ARRAYLEN(plugin_contexts));
         switch(action)
@@ -434,7 +434,7 @@ enum plugin_status plugin_start(const void* parameter)
     atexit(cleanup);
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
     backlight_ignore_timeout();
 #ifdef HAVE_REMOTE_LCD

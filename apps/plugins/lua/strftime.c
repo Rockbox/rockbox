@@ -82,7 +82,7 @@ again:
         case 's': {
             time_t t =
 #if CONFIG_RTC
-                rb->mktime((struct tm*)tm)
+                mktime((struct tm*)tm)
 #else
                 0
 #endif

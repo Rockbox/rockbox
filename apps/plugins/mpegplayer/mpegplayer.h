@@ -23,12 +23,6 @@
 #ifndef MPEGPLAYER_H
 #define MPEGPLAYER_H
 
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-#define trigger_cpu_boost rb->trigger_cpu_boost
-#define cancel_cpu_boost  rb->cancel_cpu_boost
-#endif
-/* #else function-like empty macros are defined in the headers */
-
 /* Should be enough for now */
 #define MPEGPLAYER_MAX_STREAMS 4
 
@@ -64,7 +58,7 @@
 #define DISK_GUARDBUF_SIZE     ALIGN_UP(65535+6, 4)
 
 #ifdef HAVE_LCD_COLOR
-#define mylcd_splash         rb->splash
+#define mylcd_splash         splash
 #else
 #include "lib/grey.h"
 #define mylcd_splash         grey_splash

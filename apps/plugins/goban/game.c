@@ -52,15 +52,15 @@ set_game_modified (void)
 bool
 load_game (const char *filename)
 {
-    rb->memset (&header, 0, sizeof (header));
+    memset (&header, 0, sizeof (header));
 
-    if (rb->strlen (filename) + 1 > SAVE_FILE_LENGTH)
+    if (strlen (filename) + 1 > SAVE_FILE_LENGTH)
     {
         DEBUGF ("file name too long\n");
         return false;
     }
 
-    if (!rb->file_exists (filename))
+    if (!file_exists (filename))
     {
         DEBUGF ("file doesn't exist!\n");
         return false;
@@ -68,18 +68,18 @@ load_game (const char *filename)
 
     pre_game_setup ();
 
-    rb->strcpy (save_file, filename);
+    strcpy (save_file, filename);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost (true);
+    cpu_boost (true);
 #endif
 
-    rb->splash (0, "Loading...");
+    splash (0, "Loading...");
 
     bool parse_failed = false;
     if (!parse_sgf (save_file))
     {
-        rb->splash (3 * HZ, "Unable to parse SGF file.  Will overwrite.");
+        splash (3 * HZ, "Unable to parse SGF file.  Will overwrite.");
         parse_failed = true;
     }
 
@@ -87,7 +87,7 @@ load_game (const char *filename)
     autosave_dirty = false;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost (false);
+    cpu_boost (false);
 #endif
 
     if (header.handicap >= 2)
@@ -100,7 +100,7 @@ load_game (const char *filename)
     if (!parse_failed)
     {
         draw_screen_display();
-        if (rb->strcmp(filename, DEFAULT_SAVE))
+        if (strcmp(filename, DEFAULT_SAVE))
         {
             metadata_summary();
         }
@@ -113,7 +113,7 @@ load_game (const char *filename)
 bool
 save_game (const char *filename)
 {
-    if (rb->strlen (filename) + 1 > SAVE_FILE_LENGTH)
+    if (strlen (filename) + 1 > SAVE_FILE_LENGTH)
     {
         return false;
     }
@@ -124,17 +124,17 @@ save_game (const char *filename)
        If the game isn't dirty and we're being asked to save to default,
        we also don't have to do anything.*/
     if (!game_dirty &&
-        (rb->strcmp (filename, save_file) == 0 ||
-         rb->strcmp (filename, DEFAULT_SAVE) == 0))
+        (strcmp (filename, save_file) == 0 ||
+         strcmp (filename, DEFAULT_SAVE) == 0))
     {
         return true;
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost (true);
+    cpu_boost (true);
 #endif
 
-    rb->splash (0, "Saving...");
+    splash (0, "Saving...");
 
     if (output_sgf (filename))
     {
@@ -144,8 +144,8 @@ save_game (const char *filename)
          * (so autosaves won't prevent legitimate saves to a Save As or
          * loaded file)
          */
-        if (rb->strcmp (filename, DEFAULT_SAVE) ||
-            rb->strcmp (save_file, DEFAULT_SAVE) == 0)
+        if (strcmp (filename, DEFAULT_SAVE) ||
+            strcmp (save_file, DEFAULT_SAVE) == 0)
         {
             game_dirty = false;
         }
@@ -154,15 +154,15 @@ save_game (const char *filename)
         autosave_dirty = false;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost (false);
+        cpu_boost (false);
 #endif
         /* The save succeeded.  Now, if we saved to an actual file (not to the
          * DEFAULT_SAVE), then we should delete the DEFAULT_SAVE file because
          * the changes stored in it are no longer unsaved.
          */
-        if (rb->strcmp (filename, DEFAULT_SAVE))
+        if (strcmp (filename, DEFAULT_SAVE))
         {
-            rb->remove(DEFAULT_SAVE);
+            remove(DEFAULT_SAVE);
         }
 
         return true;
@@ -170,7 +170,7 @@ save_game (const char *filename)
     else
     {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost (false);
+        cpu_boost (false);
 #endif
         return false;
     }
@@ -180,7 +180,7 @@ save_game (const char *filename)
 static void
 pre_game_setup (void)
 {
-    rb->memset (&header, 0, sizeof (header));
+    memset (&header, 0, sizeof (header));
 
     clear_caches_sgf ();
     free_tree_sgf ();
@@ -194,7 +194,7 @@ pre_game_setup (void)
 
     play_mode = MODE_PLAY;
 
-    rb->strcpy (save_file, DEFAULT_SAVE);
+    strcpy (save_file, DEFAULT_SAVE);
 
     header_marked = false;
 }

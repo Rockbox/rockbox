@@ -41,7 +41,7 @@
 #ifdef HAVE_TOUCHSCREEN
 #include "statusbar-skinned.h"
 #endif
-
+#include "symbols.h"
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
 static intptr_t last_data = 0;
@@ -406,12 +406,14 @@ int get_action(int context, int timeout)
 #endif
     return button;
 }
+EXPORT_SYMBOL(get_action);
 
 int get_custom_action(int context,int timeout,
                       const struct button_mapping* (*get_context_map)(int))
 {
     return get_action_worker(context,timeout,get_context_map);
 }
+EXPORT_SYMBOL(get_custom_action);
 
 bool action_userabort(int timeout)
 {
@@ -423,6 +425,7 @@ bool action_userabort(int timeout)
     }
     return ret;
 }
+EXPORT_SYMBOL(action_userabort);
 
 #ifndef HAS_BUTTON_HOLD
 bool is_keys_locked(void)

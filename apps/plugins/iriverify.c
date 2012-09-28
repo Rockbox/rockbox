@@ -37,14 +37,14 @@ int read_buffer(int offset)
 {
     int fd;
     
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if(fd < 0)
         return 10 * fd - 1;
 
     /* Fill the buffer from the file */
-    rb->lseek(fd, offset, SEEK_SET);
-    readsize = rb->read(fd, stringbuffer, buf_size);
-    rb->close(fd);
+    lseek(fd, offset, SEEK_SET);
+    readsize = read(fd, stringbuffer, buf_size);
+    close(fd);
 
     if(readsize < 0)
         return readsize * 10 - 2;
@@ -65,9 +65,9 @@ static int write_file(void)
 
     /* Create a temporary file */
     
-    rb->snprintf(tmpfilename, MAX_PATH+1, "%s.tmp", filename);
+    snprintf(tmpfilename, MAX_PATH+1, "%s.tmp", filename);
     
-    fd = rb->creat(tmpfilename, 0666);
+    fd = creat(tmpfilename, 0666);
     if(fd < 0)
         return 10 * fd - 1;
 
@@ -88,15 +88,15 @@ static int write_file(void)
         *buf_ptr = 0;
 
         /* Write our new string */
-        rc = rb->write(fd, str_begin, rb->strlen(str_begin));
+        rc = write(fd, str_begin, strlen(str_begin));
         if(rc < 0) {
-        rb->close(fd);
+        close(fd);
         return 10 * rc - 2;
         }
         /* Write CR/LF */
-        rc = rb->write(fd, crlf, 2);
+        rc = write(fd, crlf, 2);
         if(rc < 0) {
-        rb->close(fd);
+        close(fd);
         return 10 * rc - 3;
         }
 
@@ -113,16 +113,16 @@ static int write_file(void)
     /* Next char, until ... */
     } while(buf_ptr++ < stringbuffer + readsize);
 
-    rb->close(fd);
+    close(fd);
 
     /* Remove the original file */
-    rc = rb->remove(filename);
+    rc = remove(filename);
     if(rc < 0) {
         return 10 * rc - 4;
     }
 
     /* Replace the old file with the new */
-    rc = rb->rename(tmpfilename, filename);
+    rc = rename(tmpfilename, filename);
     if(rc < 0) {
         return 10 * rc - 5;
     }
@@ -137,33 +137,33 @@ enum plugin_status plugin_start(const void* parameter)
     if(!parameter) return PLUGIN_ERROR;
     filename = (char *)parameter;
 
-    buf = rb->plugin_get_audio_buffer((size_t *)&buf_size); /* start munching memory */
+    buf = plugin_get_audio_buffer((size_t *)&buf_size); /* start munching memory */
 
     stringbuffer = buf;
 
     FOR_NB_SCREENS(i)
-        rb->screens[i]->clear_display();
-    rb->splash(0, "Converting...");
+        screens[i]->clear_display();
+    splash(0, "Converting...");
     
     rc = read_buffer(0);
     FOR_NB_SCREENS(i)
-        rb->screens[i]->clear_display();
+        screens[i]->clear_display();
     if(rc == 0) {
-        rb->splash(0, "Writing...");
+        splash(0, "Writing...");
         rc = write_file();
 
         FOR_NB_SCREENS(i)
-            rb->screens[i]->clear_display();
+            screens[i]->clear_display();
         if(rc < 0) {
-            rb->splashf(HZ, "Can't write file: %d", rc);
+            splashf(HZ, "Can't write file: %d", rc);
         } else {
-            rb->splash(HZ, "Done");
+            splash(HZ, "Done");
         }
     } else {
         if(rc < 0) {
-            rb->splashf(HZ, "Can't read file: %d", rc);
+            splashf(HZ, "Can't read file: %d", rc);
         } else {
-            rb->splash(HZ, "The file is too big");
+            splash(HZ, "The file is too big");
         }
     }
 

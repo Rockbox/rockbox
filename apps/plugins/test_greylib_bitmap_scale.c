@@ -31,7 +31,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #if LCD_DEPTH == 1
 #define BMP_LOAD read_bmp_file
 #else
-#define BMP_LOAD rb->read_bmp_file
+#define BMP_LOAD read_bmp_file
 #endif
 
 
@@ -55,7 +55,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     if(!parameter) return PLUGIN_ERROR;
 
-    rb->strcpy(filename, parameter);
+    strcpy(filename, parameter);
 
     ret = BMP_LOAD(filename, &grey_bm, sizeof(grey_bm_buf),
                    FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
@@ -63,15 +63,15 @@ enum plugin_status plugin_start(const void* parameter)
     
     if(ret < 1)
     {
-        rb->splash(HZ*2, "failed to load bitmap");
+        splash(HZ*2, "failed to load bitmap");
         return PLUGIN_ERROR;
     }
 
-    plugin_buf = rb->plugin_get_buffer(&plugin_buf_len);
+    plugin_buf = plugin_get_buffer(&plugin_buf_len);
     if(!grey_init(plugin_buf, plugin_buf_len, 0, LCD_WIDTH, LCD_HEIGHT,
                   NULL))
     {
-        rb->splash(HZ*2,"grey init failed");
+        splash(HZ*2,"grey init failed");
         return PLUGIN_ERROR;
     }
     grey_ub_clear_display();

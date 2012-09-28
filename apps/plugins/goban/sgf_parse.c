@@ -50,7 +50,7 @@ parse_sgf (const char *filename)
 
     close_file (&sgf_fd);
 
-    sgf_fd = rb->open (filename, O_RDONLY);
+    sgf_fd = open (filename, O_RDONLY);
 
     if (sgf_fd < 0)
     {
@@ -78,7 +78,7 @@ parse_sgf (const char *filename)
         }
     }
 
-    push_int_stack (&parse_stack, rb->lseek (sgf_fd, 0, SEEK_CUR));
+    push_int_stack (&parse_stack, lseek (sgf_fd, 0, SEEK_CUR));
     push_int_stack (&parse_stack, current_node);
 
     while (pop_int_stack (&parse_stack, &first_handle) &&
@@ -86,7 +86,7 @@ parse_sgf (const char *filename)
     {
         /* DEBUGF("poped off %d\n", file_position); */
 
-        rb->yield ();
+        yield ();
 
         current_node = first_handle;
 
@@ -114,7 +114,7 @@ parse_sgf (const char *filename)
             push_int_stack (&parse_stack, -1);
             push_int_stack (&parse_stack, first_handle);
 
-            rb->lseek (sgf_fd, file_position, SEEK_SET);
+            lseek (sgf_fd, file_position, SEEK_SET);
 
 
             /* we're at the start of a gametree here, right at the '(' */
@@ -147,7 +147,7 @@ parse_sgf (const char *filename)
                     }
                     else
                     {
-                        rb->splash (2 * HZ, "Out of memory while parsing!");
+                        splash (2 * HZ, "Out of memory while parsing!");
                         return false;
                     }
                 }
@@ -167,9 +167,9 @@ parse_sgf (const char *filename)
             else if (temp == '(')
             {
                 /*
-                   DEBUGF ("adding %d\n", (int) rb->lseek (sgf_fd, 0,
+                   DEBUGF ("adding %d\n", (int) lseek (sgf_fd, 0,
                    SEEK_CUR)); */
-                push_int_stack (&parse_stack, rb->lseek (sgf_fd, 0, SEEK_CUR));
+                push_int_stack (&parse_stack, lseek (sgf_fd, 0, SEEK_CUR));
                 push_int_stack (&parse_stack, current_node);
 
                 break;
@@ -283,7 +283,7 @@ parse_prop (void)
         }
         else
         {
-            start_of_prop = rb->lseek (sgf_fd, 0, SEEK_CUR);
+            start_of_prop = lseek (sgf_fd, 0, SEEK_CUR);
             temp_type = parse_prop_type ();
         }
     }
@@ -296,7 +296,7 @@ parse_prop_type (void)
     int pos = 0;
     int temp;
 
-    rb->memset (buffer, 0, sizeof (buffer));
+    memset (buffer, 0, sizeof (buffer));
 
     while (1)
     {
@@ -349,7 +349,7 @@ parse_prop_type (void)
     int i;
     for (i = 0; i < PROP_NAMES_SIZE; ++i)
     {
-        if (rb->strcmp (buffer, prop_names[i]) == 0)
+        if (strcmp (buffer, prop_names[i]) == 0)
         {
             return (enum prop_type_t) i;
         }
@@ -365,7 +365,7 @@ read_prop_value (char *buffer, size_t buffer_size)
     int bytes_read = 0;
 
     /* make it a string, the lazy way */
-    rb->memset (buffer, 0, buffer_size);
+    memset (buffer, 0, buffer_size);
     --buffer_size;
 
     if (peek_char (sgf_fd) == '[')
@@ -458,9 +458,9 @@ handle_prop_value (enum prop_type_t type)
     if (!is_handled_sgf (type) || type == PROP_COMMENT)
     {
         /* DEBUGF("unhandled prop %d\n", (int) type); */
-        rb->lseek (sgf_fd, start_of_prop, SEEK_SET);
+        lseek (sgf_fd, start_of_prop, SEEK_SET);
 
-        temp_data.number = rb->lseek (unhandled_fd, 0, SEEK_CUR);
+        temp_data.number = lseek (unhandled_fd, 0, SEEK_CUR);
         /* absolute_position(&unhandled_prop_list); */
 
         add_prop_sgf (current_node,
@@ -633,7 +633,7 @@ handle_prop_value (enum prop_type_t type)
         temp = read_prop_value (buffer, PROP_HANDLER_BUFFER_SIZE);
         if (temp != 1 || buffer[0] != '1')
         {
-            rb->splash (2 * HZ, "This isn't a Go SGF!!  Parsing stopped.");
+            splash (2 * HZ, "This isn't a Go SGF!!  Parsing stopped.");
             DEBUGF ("incorrect game type loaded!\n");
 
             close_file (&sgf_fd);
@@ -644,7 +644,7 @@ handle_prop_value (enum prop_type_t type)
         temp = read_prop_value (buffer, PROP_HANDLER_BUFFER_SIZE);
         if (temp != 1 || (buffer[0] != '3' && buffer[0] != '4'))
         {
-            rb->splash (2 * HZ, "Wrong SGF file version! Parsing stopped.");
+            splash (2 * HZ, "Wrong SGF file version! Parsing stopped.");
             DEBUGF ("can't handle file format %c\n", buffer[0]);
 
             close_file (&sgf_fd);
@@ -661,11 +661,11 @@ handle_prop_value (enum prop_type_t type)
         temp = read_prop_value (buffer, PROP_HANDLER_BUFFER_SIZE);
         if (temp == 0)
         {
-            rb->splash (HZ, "Invalid board size specified in file.");
+            splash (HZ, "Invalid board size specified in file.");
         }
         else
         {
-            temp_width = rb->atoi (buffer);
+            temp_width = atoi (buffer);
             while (*buffer != ':' && *buffer != '\0')
             {
                 ++buffer;
@@ -674,7 +674,7 @@ handle_prop_value (enum prop_type_t type)
             if (*buffer != '\0')
             {
                 ++buffer;
-                temp_height = rb->atoi (buffer);
+                temp_height = atoi (buffer);
             }
             else
             {
@@ -684,7 +684,7 @@ handle_prop_value (enum prop_type_t type)
 
             if (!set_size_board (temp_width, temp_height))
             {
-                rb->splashf (HZ,
+                splashf (HZ,
                              "Board too big/small! (%dx%d) Stopping parse.",
                              temp_width, temp_height);
                 close_file (&sgf_fd);
@@ -706,7 +706,7 @@ handle_prop_value (enum prop_type_t type)
         }
         else
         {
-            header.komi = rb->atoi (buffer) << 1;
+            header.komi = atoi (buffer) << 1;
             while (*buffer != '.' && *buffer != ',' && *buffer != '\0')
             {
                 ++buffer;
@@ -750,7 +750,7 @@ handle_prop_value (enum prop_type_t type)
         if (!get_header_string_and_size
             (&header, type, &temp_buffer, &temp_size))
         {
-            rb->splash (5 * HZ,
+            splash (5 * HZ,
                         "Error getting header string.  Report this.");
         }
         else
@@ -765,7 +765,7 @@ handle_prop_value (enum prop_type_t type)
     else if (type == PROP_TIME_LIMIT)
     {
         temp = read_prop_value (buffer, PROP_HANDLER_BUFFER_SIZE);
-        header.time_limit = rb->atoi (buffer);
+        header.time_limit = atoi (buffer);
         DEBUGF ("setting time: %d (%s)\n", header.time_limit, buffer);
     }
     else if (type == PROP_HANDICAP)
@@ -773,10 +773,10 @@ handle_prop_value (enum prop_type_t type)
         temp = read_prop_value (buffer, PROP_HANDLER_BUFFER_SIZE);
         if (start_node == tree_head)
         {
-            if (rb->atoi (buffer) >= 2)
+            if (atoi (buffer) >= 2)
             {
                 start_node = current_node;
-                temp_data.number = header.handicap = rb->atoi (buffer);
+                temp_data.number = header.handicap = atoi (buffer);
                 add_prop_sgf (current_node, type, temp_data);
                 DEBUGF ("setting handicap: %d\n", header.handicap);
             }
@@ -787,13 +787,13 @@ handle_prop_value (enum prop_type_t type)
         }
         else
         {
-            rb->splash (HZ, "extraneous HAndicap prop present in file!\n");
+            splash (HZ, "extraneous HAndicap prop present in file!\n");
         }
     }
     else
     {
         DEBUGF ("UNHANDLED PROP TYPE!!!\n");
-        rb->splash (3 * HZ,
+        splash (3 * HZ,
                     "A SGF prop was not dealt with.  Please report this");
         read_prop_value (NULL, 0);
     }

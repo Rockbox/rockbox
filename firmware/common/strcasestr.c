@@ -31,6 +31,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include "symbols.h"
 
 typedef unsigned chartype;
 
@@ -120,3 +121,4 @@ char* strcasestr (const char* phaystack, const char* pneedle)
   ret0:
     return 0;
 }
+EXPORT_SYMBOL(strcasestr);

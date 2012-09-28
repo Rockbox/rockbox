@@ -35,60 +35,18 @@ int fileexists(const char * fname);
 char *my_strtok( char * s, const char * delim );
 #undef  alloca
 #define alloca             __builtin_alloca
-#undef  fdprintf
-#define fdprintf(...)      rb->fdprintf(__VA_ARGS__)
-#undef  vsnprintf
-#define vsnprintf(...)     rb->vsnprintf(__VA_ARGS__)
-#undef  read_line
-#define read_line(a,b,c)   rb->read_line((a),(b),(c))
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #define open(a, ...)       rb->open((a), __VA_ARGS__)
 #define close(a)           rb->close((a))
 #else
-int my_open(const char *file, int flags, ...);
-int my_close(int id);
-#define open(a, ...)       my_open((a), __VA_ARGS__)
-#define close(a)           my_close((a))
+//int my_open(const char *file, int flags, ...);
+//int my_close(int id);
+//#define open(a, ...)       my_open((a), __VA_ARGS__)
+//#define close(a)           my_close((a))
 #endif
-
-#define lseek(a,b,c)       rb->lseek((a),(b),(c))
-#define filesize(a)        rb->filesize((a))
-#define read(a,b,c)        rb->read((a),(b),(c))
-#define write(a,b,c)       rb->write((a),(b),(c))
 #undef  strtok
 #define strtok(a,b)        my_strtok((a),(b))
-#undef  strcat
-#define strcat(a,b)        rb->strcat((a),(b))
-#undef  memset
-#define memset(a,b,c)      rb->memset((a),(b),(c))
-#undef  memmove
-#define memmove(a,b,c)     rb->memmove((a),(b),(c))
-#undef  memcmp
-#define memcmp(a,b,c)      rb->memcmp((a),(b),(c))
-#undef  memchr
-#define memchr(a,b,c)      rb->memchr((a),(b),(c))
-#undef  strcpy
-#define strcpy(a,b)        rb->strcpy((a),(b))
-#undef  strlen
-#define strlen(a)          rb->strlen((a))
-#undef  strcmp
-#define strcmp(a,b)        rb->strcmp((a),(b))
-#undef  strncmp
-#define strncmp(a,b,c)     rb->strncmp((a),(b),(c))
-#undef  strchr
-#define strchr(a,b)        rb->strchr((a),(b))
-#undef  strrchr
-#define strrchr(a,b)       rb->strrchr((a),(b))
-#undef  strcasecmp
-#define strcasecmp(a,b)    rb->strcasecmp((a),(b))
-#undef  strncasecmp
-#define strncasecmp(a,b,c) rb->strncasecmp((a),(b),(c))
-#define srand(a)           rb->srand((a))
-#define rand()             rb->rand()
-#define atoi(a)            rb->atoi((a))
-#define strcat(a,b)        rb->strcat((a),(b))
-#define snprintf           rb->snprintf
 
 #define PACKEDATTR __attribute__((packed)) // Needed for a few things
 #define GAMEBASE ROCKBOX_DIR "/doom/"

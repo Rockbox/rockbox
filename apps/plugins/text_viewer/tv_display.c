@@ -49,12 +49,12 @@
  * |statusbar (6)            |
  * +-------------------------+
  *
- * (1) displays when rb->global_settings->statusbar == STATUSBAR_TOP.
+ * (1) displays when global_settings.statusbar == STATUSBAR_TOP.
  * (2) displays when preferences->header_mode is HD_PATH.
  * (3) displays when preferences->vertical_scrollbar is SB_ON.
  * (4) displays when preferences->horizontal_scrollbar is SB_ON.
  * (5) displays when preferences->footer_mode is FT_PAGE.
- * (6) displays when rb->global_settings->statusbar == STATUSBAR_BOTTOM.
+ * (6) displays when global_settings.statusbar == STATUSBAR_BOTTOM.
  *
  *
  * when isn't defined HAVE_LCD_BITMAP
@@ -66,7 +66,7 @@
  * (7) bookmark
  */
 
-#define TV_SCROLLBAR_WIDTH  rb->global_settings->scrollbar_width
+#define TV_SCROLLBAR_WIDTH  global_settings.scrollbar_width
 #define TV_SCROLLBAR_HEIGHT 4
 
 #ifndef HAVE_LCD_BITMAP
@@ -122,9 +122,9 @@ static void tv_show_footer(const struct tv_screen_pos *pos)
     if (preferences->footer_mode)
     {
         if (pos->line == 0)
-            rb->snprintf(buf, sizeof(buf), "%d", pos->page + 1);
+            snprintf(buf, sizeof(buf), "%d", pos->page + 1);
         else
-            rb->snprintf(buf, sizeof(buf), "%d - %d", pos->page + 1, pos->page + 2);
+            snprintf(buf, sizeof(buf), "%d - %d", pos->page + 1, pos->page + 2);
         display->putsxy(footer.x, footer.y + 1, buf);
     }
 }
@@ -141,7 +141,7 @@ static void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
         min_shown = window * display_columns + col;
         max_shown = min_shown + display_columns;
 
-        rb->gui_scrollbar_draw(display,
+        gui_scrollbar_draw(display,
                                horizontal_scrollbar.x, horizontal_scrollbar.y + 1,
                                horizontal_scrollbar.w, TV_SCROLLBAR_HEIGHT,
                                items, min_shown, max_shown, HORIZONTAL);
@@ -153,7 +153,7 @@ static void tv_show_scrollbar(int window, int col, off_t cur_pos, int size)
         min_shown = (int) cur_pos;
         max_shown = min_shown + size;
 
-        rb->gui_scrollbar_draw(display,
+        gui_scrollbar_draw(display,
                                vertical_scrollbar.x, vertical_scrollbar.y,
                                TV_SCROLLBAR_WIDTH, vertical_scrollbar.h,
                                items, min_shown, max_shown, VERTICAL);
@@ -236,7 +236,7 @@ void tv_start_display(void)
 #endif
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
     display->clear_viewport();
 }
@@ -255,7 +255,7 @@ void tv_set_layout(bool show_scrollbar)
     int scrollbar_height = (show_scrollbar && preferences->horizontal_scrollbar)?
                            TV_SCROLLBAR_HEIGHT + 1 : 0;
 
-    row_height = rb->font_get(preferences->font_id)->height;
+    row_height = font_get(preferences->font_id)->height;
 
     header.x = 0;
     header.y = 0;
@@ -315,17 +315,17 @@ static void tv_change_viewport(void)
     bool show_statusbar = preferences->statusbar;
 
     if (is_initialized_vp)
-        rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+        viewportmanager_theme_undo(SCREEN_MAIN, false);
     else
         is_initialized_vp = true;
 
-    rb->viewportmanager_theme_enable(SCREEN_MAIN, show_statusbar, &vp_info);
+    viewportmanager_theme_enable(SCREEN_MAIN, show_statusbar, &vp_info);
     vp_info.flags &= ~VP_FLAG_ALIGNMENT_MASK;
     display->set_viewport(&vp_info);
 #else
     if (!is_initialized_vp)
     {
-        rb->viewport_set_defaults(&vp_info, SCREEN_MAIN);
+        viewport_set_defaults(&vp_info, SCREEN_MAIN);
         is_initialized_vp = true;
     }
 #endif
@@ -337,14 +337,14 @@ static bool tv_set_font(const unsigned char *font)
     unsigned char path[MAX_PATH];
     if (font != NULL && *font != '\0')
     {
-        rb->snprintf(path, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
+        snprintf(path, MAX_PATH, "%s/%s.fnt", FONT_DIR, font);
         if (preferences->font_id >= 0 &&
-            (preferences->font_id != rb->global_status->font_id[SCREEN_MAIN]))
-            rb->font_unload(preferences->font_id);
-        tv_change_fontid(rb->font_load(path));
+            (preferences->font_id != global_status.font_id[SCREEN_MAIN]))
+            font_unload(preferences->font_id);
+        tv_change_fontid(font_load(path));
         if (preferences->font_id < 0)
         {
-            rb->splash(HZ/2, "font load failed");
+            splash(HZ/2, "font load failed");
             return false;
         }
     }
@@ -360,27 +360,27 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
     const unsigned char *font_str;
     struct tv_preferences new_prefs;
 
-    font_str = (oldp && !font_changing)? oldp->font_name : rb->global_settings->font_file;
+    font_str = (oldp && !font_changing)? oldp->font_name : global_settings.font_file;
 
     /* change font */
-    if (font_changing || rb->strcmp(font_str, preferences->font_name))
+    if (font_changing || strcmp(font_str, preferences->font_name))
     {
         if (!tv_set_font(preferences->font_name))
         {
             /*
-             * tv_set_font(rb->global_settings->font_file) doesn't fail usually.
+             * tv_set_font(global_settings.font_file) doesn't fail usually.
              * if it fails, a fatal problem occurs in Rockbox. 
              */
-            if (!rb->strcmp(preferences->font_name, rb->global_settings->font_file))
+            if (!strcmp(preferences->font_name, global_settings.font_file))
                 return TV_CALLBACK_ERROR;
 
             font_changing = true;
             tv_copy_preferences(&new_prefs);
-            rb->strlcpy(new_prefs.font_name, font_str, MAX_PATH);
+            strlcpy(new_prefs.font_name, font_str, MAX_PATH);
 
             return (tv_set_preferences(&new_prefs))? TV_CALLBACK_STOP : TV_CALLBACK_ERROR;
         }
-        col_width = 2 * rb->font_get_width(rb->font_get(preferences->font_id), ' ');
+        col_width = 2 * font_get_width(font_get(preferences->font_id), ' ');
         font_changing = false;
     }
 #else
@@ -395,7 +395,7 @@ bool tv_init_display(unsigned char **buf, size_t *size)
     (void)buf;
     (void)size;
 
-    display = rb->screens[SCREEN_MAIN];
+    display = &screens[SCREEN_MAIN];
     display->clear_viewport();
 
     tv_add_preferences_change_listner(tv_change_preferences);
@@ -408,14 +408,14 @@ void tv_finalize_display(void)
 #ifdef HAVE_LCD_BITMAP
     /* restore font */
     if (preferences->font_id >= 0 &&
-        (preferences->font_id != rb->global_status->font_id[SCREEN_MAIN]))
+        (preferences->font_id != global_status.font_id[SCREEN_MAIN]))
     {
-        rb->font_unload(preferences->font_id);
+        font_unload(preferences->font_id);
     }
 
     /* undo viewport */
     if (is_initialized_vp)
-        rb->viewportmanager_theme_undo(SCREEN_MAIN, false);
+        viewportmanager_theme_undo(SCREEN_MAIN, false);
 #endif
 }
 

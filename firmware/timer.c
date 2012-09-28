@@ -25,6 +25,7 @@
 #include "system.h"
 #include "timer.h"
 #include "logf.h"
+#include "symbols.h"
 
 static int timer_prio = -1;
 void SHAREDBSS_ATTR (*pfn_timer)(void) = NULL;      /* timer callback */
@@ -47,11 +48,13 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
 
     return timer_start(IF_COP(core));
 }
+EXPORT_SYMBOL(timer_register);
 
 bool timer_set_period(long cycles)
 {
     return timer_set(cycles, false);
 }
+EXPORT_SYMBOL(timer_set_period);
 
 void timer_unregister(void)
 {
@@ -61,4 +64,4 @@ void timer_unregister(void)
     pfn_unregister = NULL;
     timer_prio = -1;
 }
-
+EXPORT_SYMBOL(timer_unregister);

@@ -49,7 +49,7 @@ static void *alloc(int size)
 
     if (offset == NULL)
     {
-        offset = rb->plugin_get_audio_buffer(&totalSize);
+        offset = plugin_get_audio_buffer(&totalSize);
     }
 
     if (size + 4 > (int)totalSize)
@@ -84,7 +84,7 @@ void *alloc(int size)
 
     if (offset == NULL)
     {
-        offset = rb->plugin_get_audio_buffer((size_t *)&totalSize);
+        offset = plugin_get_audio_buffer((size_t *)&totalSize);
     }
 
     if (size + 4 > totalSize)
@@ -110,25 +110,25 @@ void * my_malloc(int size)
 unsigned char readChar(int file)
 {
     char buf[2];
-    rb->read(file, &buf, 1);
+    read(file, &buf, 1);
     return buf[0];
 }
 
 void * readData(int file, int len)
 {
     void * dat = malloc(len);
-    rb->read(file, dat, len);
+    read(file, dat, len);
     return dat;
 }
 
 int eof(int fd)
 {
-    int curPos = rb->lseek(fd, 0, SEEK_CUR);
+    int curPos = lseek(fd, 0, SEEK_CUR);
 
-    int size = rb->lseek(fd, 0, SEEK_END);
+    int size = lseek(fd, 0, SEEK_END);
 
-    rb->lseek(fd, curPos, SEEK_SET);
-    return size+1 == rb->lseek(fd, 0, SEEK_CUR);
+    lseek(fd, curPos, SEEK_SET);
+    return size+1 == lseek(fd, 0, SEEK_CUR);
 }
 
 /* Here is a hacked up printf command to get the output from the game. */
@@ -139,7 +139,7 @@ int midi_debug(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    rb->vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
+    vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
     va_end(ap);
 
     int i=0;
@@ -149,14 +149,14 @@ int midi_debug(const char *fmt, ...)
         if(p_buf[i] == '\n')
             p_buf[i] = ' ';
 
-    rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
-    rb->lcd_update();
+    lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
+    lcd_update();
 
     p_xtpt+=8;
     if(p_xtpt>LCD_HEIGHT-8)
     {
         p_xtpt=0;
-        rb->lcd_clear_display();
+        lcd_clear_display();
     }
     return 1;
 }

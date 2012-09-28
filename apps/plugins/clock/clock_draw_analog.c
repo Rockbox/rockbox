@@ -111,8 +111,8 @@ static void draw_hand(struct screen* display, int angle,
     polar_to_cartesian_screen_centered(display, (angle+240)%360,
         radius/40+thickness, &x3, &y3);
     xlcd_filltriangle_screen(display, x1, y1, x2, y2, x3, y3);
-    rb->lcd_drawline(x1, y1, x2, y2);
-    rb->lcd_drawline(x1, y1, x3, y3);
+    lcd_drawline(x1, y1, x2, y2);
+    lcd_drawline(x1, y1, x3, y3);
 }
 
 static void draw_hands(struct screen* display, int hour, int minute, int second,
@@ -136,14 +136,14 @@ static void draw_counter(struct screen* display, struct counter* counter)
         &(smalldigits[display->screen_type]);
     struct time counter_time;
     counter_get_elapsed_time(counter, &counter_time);
-    rb->snprintf(buffer, 10, "%02d:%02d",
+    snprintf(buffer, 10, "%02d:%02d",
                     counter_time.hour, counter_time.minute);
     getstringsize(smalldigits_bitmaps, buffer, &hour_str_w, &str_h);
     draw_string(display, smalldigits_bitmaps, buffer,
                 display->getwidth()-hour_str_w,
                 display->getheight()-2*str_h);
 
-    rb->snprintf(buffer, 10, "%02d", counter_time.second);
+    snprintf(buffer, 10, "%02d", counter_time.second);
     getstringsize(smalldigits_bitmaps, buffer, &second_str_w, &str_h);
     draw_string(display, smalldigits_bitmaps, buffer,
                 display->getwidth()-(hour_str_w+second_str_w)/2,
@@ -159,15 +159,15 @@ static void draw_date(struct screen* display, struct time* time, int date_format
     const struct picture* smalldigits_bitmaps =
         &(smalldigits[display->screen_type]);
     if(date_format==ENGLISH || date_format==JAPANESE){
-        rb->snprintf(buffer, 10, "%02d/%02d", time->month, time->day);
+        snprintf(buffer, 10, "%02d/%02d", time->month, time->day);
     }else{
-        rb->snprintf(buffer, 10, "%02d/%02d", time->day, time->month);
+        snprintf(buffer, 10, "%02d/%02d", time->day, time->month);
     }
     /* draws month and day */
     getstringsize(smalldigits_bitmaps, buffer, &monthday_str_w, &str_h);
     draw_string(display, smalldigits_bitmaps, buffer,
                 0, display->getheight()-year_line*str_h);
-    rb->snprintf(buffer, 10, "%04d", time->year);
+    snprintf(buffer, 10, "%04d", time->year);
 
     /* draws year */
     getstringsize(smalldigits_bitmaps, buffer, &year_str_w, &str_h);

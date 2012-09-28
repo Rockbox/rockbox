@@ -27,13 +27,13 @@
 #undef ARTISTENTRY_SIZE
 #undef FILERECORD2OFFSET
 
-#define SONGENTRY_SIZE    (rb->tagdbheader->songlen+12+rb->tagdbheader->genrelen+12)
-#define FILEENTRY_SIZE    (rb->tagdbheader->filelen+12)
-#define ALBUMENTRY_SIZE   (rb->tagdbheader->albumlen+4+rb->tagdbheader->songarraylen*4)
-#define ARTISTENTRY_SIZE  (rb->tagdbheader->artistlen+rb->tagdbheader->albumarraylen*4)
+#define SONGENTRY_SIZE    (tagdbheader->songlen+12+tagdbheader->genrelen+12)
+#define FILEENTRY_SIZE    (tagdbheader->filelen+12)
+#define ALBUMENTRY_SIZE   (tagdbheader->albumlen+4+tagdbheader->songarraylen*4)
+#define ARTISTENTRY_SIZE  (tagdbheader->artistlen+tagdbheader->albumarraylen*4)
 #define RUNDBENTRY_SIZE   20
 
-#define FILERECORD2OFFSET(_x_) (rb->tagdbheader->filestart + _x_ * FILEENTRY_SIZE)
+#define FILERECORD2OFFSET(_x_) (tagdbheader->filestart + _x_ * FILEENTRY_SIZE)
 
 struct dbentry *currententry;
 struct dbglobals dbglobal;
@@ -43,13 +43,13 @@ int database_init() {
     char *p;
     unsigned int i;
     // allocate room for all entries
-    entryarray=(struct dbentry *)my_malloc(sizeof(struct dbentry)*rb->tagdbheader->filecount);
+    entryarray=(struct dbentry *)my_malloc(sizeof(struct dbentry)*tagdbheader->filecount);
     p=(char *)entryarray;
     // zero all entries.
-    for(i=0;i<sizeof(struct dbentry)*rb->tagdbheader->filecount;i++) 
+    for(i=0;i<sizeof(struct dbentry)*tagdbheader->filecount;i++) 
         *(p++)=0;
-    if(!*rb->tagdb_initialized) {
-        if(!rb->tagdb_init()) {
+    if(!*tagdb_initialized) {
+        if(!tagdb_init()) {
             // failed loading db
             return -1;
         }
@@ -62,7 +62,7 @@ int database_init() {
 
 long readlong(int fd) {
     long num;
-    rb->read(fd,&num,4);
+    read(fd,&num,4);
 #ifdef ROCKBOX_LITTLE_ENDIAN
     num=BE32(num);
 #endif
@@ -71,7 +71,7 @@ long readlong(int fd) {
 
 short readshort(int fd) {
     short num;
-    rb->read(fd,&num,2);
+    read(fd,&num,2);
 #ifdef ROCKBOX_LITTLE_ENDIAN
     num=BE16(num);
 #endif
@@ -81,12 +81,12 @@ short readshort(int fd) {
 
 void loadentry(int filerecord) {
     if(entryarray[filerecord].loadedfiledata==0) {
-        rb->lseek(*rb->tagdb_fd,FILERECORD2OFFSET(filerecord),SEEK_SET);
-        entryarray[filerecord].filename=(char *)my_malloc(rb->tagdbheader->filelen);
-        rb->read(*rb->tagdb_fd,entryarray[filerecord].filename,rb->tagdbheader->filelen);
-        entryarray[filerecord].hash=readlong(*rb->tagdb_fd);
-        entryarray[filerecord].songentry=readlong(*rb->tagdb_fd);
-        entryarray[filerecord].rundbentry=readlong(*rb->tagdb_fd);
+        lseek(*tagdb_fd,FILERECORD2OFFSET(filerecord),SEEK_SET);
+        entryarray[filerecord].filename=(char *)my_malloc(tagdbheader->filelen);
+        read(*tagdb_fd,entryarray[filerecord].filename,tagdbheader->filelen);
+        entryarray[filerecord].hash=readlong(*tagdb_fd);
+        entryarray[filerecord].songentry=readlong(*tagdb_fd);
+        entryarray[filerecord].rundbentry=readlong(*tagdb_fd);
         entryarray[filerecord].loadedfiledata=1;
     }
     currententry=&entryarray[filerecord];
@@ -96,35 +96,35 @@ void loadentry(int filerecord) {
 void loadsongdata() {
     if(currententry->loadedsongdata) 
         return;
-    currententry->title=(char *)my_malloc(rb->tagdbheader->songlen);
-    currententry->genre=(char *)my_malloc(rb->tagdbheader->genrelen);
-    rb->lseek(*rb->tagdb_fd,currententry->songentry,SEEK_SET);
-    rb->read(*rb->tagdb_fd,currententry->title,rb->tagdbheader->songlen);
-    currententry->artistoffset=readlong(*rb->tagdb_fd);
-    currententry->albumoffset=readlong(*rb->tagdb_fd);
-    rb->lseek(*rb->tagdb_fd,4,SEEK_CUR);
-    rb->read(*rb->tagdb_fd,currententry->genre,rb->tagdbheader->genrelen);
-    currententry->bitrate=readshort(*rb->tagdb_fd);
-    currententry->year=readshort(*rb->tagdb_fd);
-    currententry->playtime=readlong(*rb->tagdb_fd);
-    currententry->track=readshort(*rb->tagdb_fd);
-    currententry->samplerate=readshort(*rb->tagdb_fd);
+    currententry->title=(char *)my_malloc(tagdbheader->songlen);
+    currententry->genre=(char *)my_malloc(tagdbheader->genrelen);
+    lseek(*tagdb_fd,currententry->songentry,SEEK_SET);
+    read(*tagdb_fd,currententry->title,tagdbheader->songlen);
+    currententry->artistoffset=readlong(*tagdb_fd);
+    currententry->albumoffset=readlong(*tagdb_fd);
+    lseek(*tagdb_fd,4,SEEK_CUR);
+    read(*tagdb_fd,currententry->genre,tagdbheader->genrelen);
+    currententry->bitrate=readshort(*tagdb_fd);
+    currententry->year=readshort(*tagdb_fd);
+    currententry->playtime=readlong(*tagdb_fd);
+    currententry->track=readshort(*tagdb_fd);
+    currententry->samplerate=readshort(*tagdb_fd);
     currententry->loadedsongdata=1;
 }
 
 void loadrundbdata() {
     currententry->loadedrundbdata=1;
-    if(!*rb->rundb_initialized) 
+    if(!*rundb_initialized) 
         return;
     if(currententry->rundbentry==-1)
         return;
-    rb->lseek(*rb->rundb_fd,currententry->rundbentry,SEEK_SET);
-    currententry->rundbfe=readlong(*rb->rundb_fd);
-    currententry->rundbhash=readlong(*rb->rundb_fd);
-    currententry->rating=readshort(*rb->rundb_fd);
-    currententry->voladj=readshort(*rb->rundb_fd);
-    currententry->playcount=readlong(*rb->rundb_fd);
-    currententry->lastplayed=readlong(*rb->rundb_fd);
+    lseek(*rundb_fd,currententry->rundbentry,SEEK_SET);
+    currententry->rundbfe=readlong(*rundb_fd);
+    currententry->rundbhash=readlong(*rundb_fd);
+    currententry->rating=readshort(*rundb_fd);
+    currententry->voladj=readshort(*rundb_fd);
+    currententry->playcount=readlong(*rundb_fd);
+    currententry->lastplayed=readlong(*rundb_fd);
 }
 
 void loadartistname() {
@@ -134,9 +134,9 @@ void loadartistname() {
    if(currententry->loadedartistname)
        return;
    loadsongdata();
-   currententry->artistname=(char *)my_malloc(rb->tagdbheader->artistlen);
-   rb->lseek(*rb->tagdb_fd,currententry->artistoffset,SEEK_SET);
-   rb->read(*rb->tagdb_fd,currententry->artistname,rb->tagdbheader->artistlen);
+   currententry->artistname=(char *)my_malloc(tagdbheader->artistlen);
+   lseek(*tagdb_fd,currententry->artistoffset,SEEK_SET);
+   read(*tagdb_fd,currententry->artistname,tagdbheader->artistlen);
    currententry->loadedartistname=1;
 }
 
@@ -145,9 +145,9 @@ void loadalbumname() {
    if(currententry->loadedalbumname)
        return;      
    loadsongdata();
-   currententry->albumname=(char *)my_malloc(rb->tagdbheader->albumlen);
-   rb->lseek(*rb->tagdb_fd,currententry->albumoffset,SEEK_SET);
-   rb->read(*rb->tagdb_fd,currententry->albumname,rb->tagdbheader->albumlen);
+   currententry->albumname=(char *)my_malloc(tagdbheader->albumlen);
+   lseek(*tagdb_fd,currententry->albumoffset,SEEK_SET);
+   read(*tagdb_fd,currententry->albumname,tagdbheader->albumlen);
    currententry->loadedalbumname=1;
 }
 

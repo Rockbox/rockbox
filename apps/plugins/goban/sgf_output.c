@@ -55,8 +55,8 @@ output_sgf (const char *filename)
 
     empty_stack (&parse_stack);
 
-    rb->lseek (sgf_fd, 0, SEEK_SET);
-    rb->ftruncate (sgf_fd, 0);
+    lseek (sgf_fd, 0, SEEK_SET);
+    ftruncate (sgf_fd, 0);
 
     if (sgf_fd < 0)
     {
@@ -110,7 +110,7 @@ output_sgf (const char *filename)
                                  PROP_VARIATION_TO_PROCESS, temp_data);
         }
 
-        rb->yield ();
+        yield ();
 
         /* now we did the setup for sibling varaitions to be processed so
            do the actual outputting of a game tree branch */
@@ -130,29 +130,29 @@ output_header_props (void)
 {
     char buffer[128];
 
-    rb->strlcpy (buffer, "GM[1]FF[4]CA[UTF-8]AP[Rockbox Goban:1.0]ST[2]\n\n",
+    strlcpy (buffer, "GM[1]FF[4]CA[UTF-8]AP[Rockbox Goban:1.0]ST[2]\n\n",
                  sizeof (buffer));
-    write_file (sgf_fd, buffer, rb->strlen (buffer));
+    write_file (sgf_fd, buffer, strlen (buffer));
 
     /* board size */
     if (board_width != board_height)
     {
-        rb->snprintf (buffer, sizeof (buffer), "%s[%d:%d]",
+        snprintf (buffer, sizeof (buffer), "%s[%d:%d]",
                       prop_names[PROP_SIZE], board_width, board_height);
     }
     else
     {
-        rb->snprintf (buffer, sizeof (buffer), "%s[%d]",
+        snprintf (buffer, sizeof (buffer), "%s[%d]",
                       prop_names[PROP_SIZE], board_width);
     }
 
-    write_file (sgf_fd, buffer, rb->strlen (buffer));
+    write_file (sgf_fd, buffer, strlen (buffer));
 
-    rb->snprintf (buffer, sizeof (buffer), "%s[", prop_names[PROP_KOMI]);
-    write_file (sgf_fd, buffer, rb->strlen (buffer));
+    snprintf (buffer, sizeof (buffer), "%s[", prop_names[PROP_KOMI]);
+    write_file (sgf_fd, buffer, strlen (buffer));
 
     snprint_fixed (buffer, sizeof (buffer), header.komi);
-    write_file (sgf_fd, buffer, rb->strlen (buffer));
+    write_file (sgf_fd, buffer, strlen (buffer));
 
     write_char (sgf_fd, ']');
 
@@ -172,9 +172,9 @@ output_header_props (void)
 
     if (output_header_helper (PROP_OVERTIME) || header.time_limit != 0)
     {
-        rb->snprintf (buffer, sizeof (buffer), "%s[%d]",
+        snprintf (buffer, sizeof (buffer), "%s[%d]",
                       prop_names[PROP_TIME_LIMIT], header.time_limit);
-        write_file (sgf_fd, buffer, rb->strlen (buffer));
+        write_file (sgf_fd, buffer, strlen (buffer));
     }
 
     write_char (sgf_fd, '\n');
@@ -194,18 +194,18 @@ output_header_helper (enum prop_type_t type)
         return false;
     }
 
-    if (rb->strlen (buffer))
+    if (strlen (buffer))
     {
-        rb->snprintf (temp_buffer, sizeof (temp_buffer), "%s[",
+        snprintf (temp_buffer, sizeof (temp_buffer), "%s[",
                       prop_names[type]);
 
-        write_file (sgf_fd, temp_buffer, rb->strlen (temp_buffer));
+        write_file (sgf_fd, temp_buffer, strlen (temp_buffer));
 
-        write_file (sgf_fd, buffer, rb->strlen (buffer));
+        write_file (sgf_fd, buffer, strlen (buffer));
 
-        rb->strcpy (temp_buffer, "]");
+        strcpy (temp_buffer, "]");
 
-        write_file (sgf_fd, temp_buffer, rb->strlen (temp_buffer));
+        write_file (sgf_fd, temp_buffer, strlen (temp_buffer));
 
         return true;
     }
@@ -294,19 +294,19 @@ output_prop (int prop_handle)
 
         if (temp_type == PROP_HANDICAP)
         {
-            rb->snprintf (buffer, sizeof (buffer), "%d",
+            snprintf (buffer, sizeof (buffer), "%d",
                           get_prop (prop_handle)->data.number);
-            write_file (sgf_fd, buffer, rb->strlen (buffer));
+            write_file (sgf_fd, buffer, strlen (buffer));
         }
         else if (temp_type == PROP_LABEL)
         {
             pos_to_sgf (get_prop (prop_handle)->data.position, buffer);
             buffer[2] = '\0';
 
-            rb->snprintf (&buffer[2], sizeof (buffer) - 2, ":%c",
+            snprintf (&buffer[2], sizeof (buffer) - 2, ":%c",
                           get_prop (prop_handle)->data.label_extra);
 
-            write_file (sgf_fd, buffer, rb->strlen (buffer));
+            write_file (sgf_fd, buffer, strlen (buffer));
         }
         else
         {
@@ -328,7 +328,7 @@ output_prop (int prop_handle)
         int temp;
         bool done = false;
 
-        rb->lseek (unhandled_fd, get_prop (prop_handle)->data.number,
+        lseek (unhandled_fd, get_prop (prop_handle)->data.number,
                    SEEK_SET);
 
         while (!done)

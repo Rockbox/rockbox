@@ -28,15 +28,15 @@
 void checkbox(int x, int y, int width, int height, bool checked)
 {
     /* draw box */
-    rb->lcd_drawrect(x, y, width, height);
+    lcd_drawrect(x, y, width, height);
 
     /* clear inner area */
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(x + 1, y + 1, width - 2, height - 2);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(x + 1, y + 1, width - 2, height - 2);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     if (checked){
-        rb->lcd_drawline(x + 2, y + 2, x + width - 2 - 1 , y + height - 2 - 1);
-        rb->lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
+        lcd_drawline(x + 2, y + 2, x + width - 2 - 1 , y + height - 2 - 1);
+        lcd_drawline(x + 2, y + height - 2 - 1, x + width - 2 - 1, y + 2);
     }
 }

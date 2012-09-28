@@ -28,6 +28,7 @@
 #include "panic.h"
 #include "debug.h"
 #include "general.h"
+#include "symbols.h"
 
 /* Make this nonzero to enable more elaborate checks on objects */
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -51,6 +52,7 @@
 #if !defined(CPU_PP) || !defined(BOOTLOADER) || \
     defined(HAVE_BOOTLOADER_USB_MODE)
 volatile long current_tick SHAREDDATA_ATTR = 0;
+EXPORT_SYMBOL(current_tick);
 #endif
 
 /* Unless otherwise defined, do nothing */
@@ -247,6 +249,7 @@ unsigned sleep(unsigned ticks)
     switch_thread();
     return 0;
 }
+EXPORT_SYMBOL(sleep);
 
 /* Elects another thread to run or, if no other thread may be made ready to
  * run, immediately returns control back to the calling thread.
@@ -260,6 +263,7 @@ void yield(void)
 
     switch_thread();
 }
+EXPORT_SYMBOL(yield);
 
 /****************************************************************************
  * Queue handling stuff
@@ -378,6 +382,7 @@ void queue_enable_queue_send(struct event_queue *q,
 
     (void)owner_id;
 }
+EXPORT_SYMBOL(queue_enable_queue_send);
 
 /* Unblock a blocked thread at a given event index */
 static inline void queue_do_unblock_sender(struct queue_sender_list *send,
@@ -477,6 +482,7 @@ void queue_init(struct event_queue *q, bool register_queue)
 
     restore_irq(oldlevel);
 }
+EXPORT_SYMBOL(queue_init);
 
 /* Queue must not be available for use during this call */
 void queue_delete(struct event_queue *q)
@@ -512,6 +518,7 @@ void queue_delete(struct event_queue *q)
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
 }
+EXPORT_SYMBOL(queue_delete);
 
 /* NOTE: multiple threads waiting on a queue head cannot have a well-
    defined release order if timeouts are used. If multiple threads must
@@ -573,6 +580,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
 }
+EXPORT_SYMBOL(queue_wait);
 
 void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 {
@@ -645,6 +653,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
 }
+EXPORT_SYMBOL(queue_wait_w_tmo);
 
 void queue_post(struct event_queue *q, long id, intptr_t data)
 {
@@ -671,6 +680,7 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
 }
+EXPORT_SYMBOL(queue_post);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 /* IRQ handlers are not allowed use of this function - we only aim to
@@ -732,6 +742,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     
     return 0;
 }
+EXPORT_SYMBOL(queue_send);
 
 #if 0 /* not used now but probably will be later */
 /* Query if the last message dequeued was added by queue_send or not */
@@ -775,6 +786,7 @@ void queue_reply(struct event_queue *q, intptr_t retval)
         restore_irq(oldlevel);
     }
 }
+EXPORT_SYMBOL(queue_reply);
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -951,6 +963,7 @@ bool queue_empty(const struct event_queue* q)
 {
     return ( q->read == q->write );
 }
+EXPORT_SYMBOL(queue_empty);
 
 void queue_clear(struct event_queue* q)
 {
@@ -1041,6 +1054,7 @@ void mutex_init(struct mutex *m)
     m->no_preempt = false;
 #endif
 }
+EXPORT_SYMBOL(mutex_init);
 
 /* Gain ownership of a mutex object or block until it becomes free */
 void mutex_lock(struct mutex *m)
@@ -1079,6 +1093,7 @@ void mutex_lock(struct mutex *m)
     /* ...and turn control over to next thread */
     switch_thread();
 }
+EXPORT_SYMBOL(mutex_lock);
 
 /* Release ownership of a mutex object - only owning thread must call this */
 void mutex_unlock(struct mutex *m)
@@ -1125,6 +1140,7 @@ void mutex_unlock(struct mutex *m)
 #endif
     }
 }
+EXPORT_SYMBOL(mutex_unlock);
 
 /****************************************************************************
  * Simple semaphore functions ;)
@@ -1142,6 +1158,7 @@ void semaphore_init(struct semaphore *s, int max, int start)
     s->count = start;
     corelock_init(&s->cl);
 }
+EXPORT_SYMBOL(semaphore_init);
 
 /* Down the semaphore's count or wait for 'timeout' ticks for it to go up if
  * it is already 0. 'timeout' as TIMEOUT_NOBLOCK (0) will not block and may
@@ -1196,6 +1213,7 @@ int semaphore_wait(struct semaphore *s, int timeout)
 
     return ret;
 }
+EXPORT_SYMBOL(semaphore_wait);
 
 /* Up the semaphore's count and release any thread waiting at the head of the
  * queue. The count is saturated to the value of the 'max' parameter specified
@@ -1236,4 +1254,5 @@ void semaphore_release(struct semaphore *s)
 #endif
     (void)result;
 }
+EXPORT_SYMBOL(semaphore_release);
 #endif /* HAVE_SEMAPHORE_OBJECTS */

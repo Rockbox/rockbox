@@ -440,8 +440,8 @@
 #define COL_ASTEROID LCD_RGBPACK(ASTEROID_R,ASTEROID_G,ASTEROID_B)
 #define COL_TEXT     LCD_RGBPACK(200,200,255)
 #define COL_ENEMY    LCD_RGBPACK(ENEMY_R,ENEMY_G,ENEMY_B)
-#define SET_FG       rb->lcd_set_foreground
-#define SET_BG       rb->lcd_set_background
+#define SET_FG       lcd_set_foreground
+#define SET_BG       lcd_set_background
 #else
 #define SET_FG(x)
 #define SET_BG(x)
@@ -690,7 +690,7 @@ static bool is_point_within_rectangle(struct Point* rect, struct Point* p,
     int dx = p->x - rect->x;
     int dy = p->y - rect->y;
 #if SHOW_COL
-    rb->lcd_drawrect((rect->x - size)/SCALE, (rect->y - size)/SCALE,
+    lcd_drawrect((rect->x - size)/SCALE, (rect->y - size)/SCALE,
                      (size*2+1)/SCALE, (size*2+1)/SCALE);
 #endif
     if (dx < -SCALED_WIDTH/2) dx += SCALED_WIDTH;
@@ -764,12 +764,12 @@ static void draw_polygon(struct Point* vertices, int num_vertices,
         new_x = (p->x + px)/SCALE;
         new_y = (p->y + py)/SCALE;
 
-        rb->lcd_drawline(old_x, old_y, new_x, new_y);
+        lcd_drawline(old_x, old_y, new_x, new_y);
         if (draw_wrap)
         {
-            rb->lcd_drawline(old_x + LCD_WIDTH, old_y, new_x + LCD_WIDTH, new_y);
-            rb->lcd_drawline(old_x, old_y + LCD_HEIGHT, new_x, new_y + LCD_HEIGHT);
-            rb->lcd_drawline(old_x + LCD_WIDTH, old_y + LCD_HEIGHT,
+            lcd_drawline(old_x + LCD_WIDTH, old_y, new_x + LCD_WIDTH, new_y);
+            lcd_drawline(old_x, old_y + LCD_HEIGHT, new_x, new_y + LCD_HEIGHT);
+            lcd_drawline(old_x + LCD_WIDTH, old_y + LCD_HEIGHT,
                              new_x + LCD_WIDTH, new_y + LCD_HEIGHT);
         }
         old_x = new_x;
@@ -808,8 +808,8 @@ static void create_ship_trail(struct TrailPoint* tpoint)
 
 static void create_explosion_trail(struct TrailPoint* tpoint)
 {
-    tpoint->position.dx = (rb->rand()%5001)-2500;
-    tpoint->position.dy = (rb->rand()%5001)-2500;
+    tpoint->position.dx = (rand()%5001)-2500;
+    tpoint->position.dy = (rand()%5001)-2500;
 }
 
 static void create_trail_blaze(int colour, struct Point* position)
@@ -838,8 +838,8 @@ static void create_trail_blaze(int colour, struct Point* position)
         if (tpoint->alive <= 0)
         {
             /* take a random point near the position. */
-            tpoint->position.x = (rb->rand()%18000)-9000 + position->x;
-            tpoint->position.y = (rb->rand()%18000)-9000 + position->y;
+            tpoint->position.x = (rand()%18000)-9000 + position->x;
+            tpoint->position.y = (rand()%18000)-9000 + position->y;
 
             switch(colour)
             {
@@ -925,7 +925,7 @@ static void draw_and_move_trail_blaze(void)
 #endif
             }
             SET_FG(LCD_RGBPACK(tpoint->r, tpoint->g, tpoint->b));
-            rb->lcd_drawpixel(tpoint->position.x/SCALE, tpoint->position.y/SCALE);
+            lcd_drawpixel(tpoint->position.x/SCALE, tpoint->position.y/SCALE);
         }
         tpoint++;
     }
@@ -961,7 +961,7 @@ static void initialise_asteroid(struct Asteroid* asteroid,
     asteroid->radius = (int)type*SCALE*3;
 
     /* shall we move Clockwise and Fast */
-    n = rb->rand()%100;
+    n = rand()%100;
     if (n < 25)
     {
         asteroid->speed_cos = FAST_ROT_CW_COS;
@@ -983,7 +983,7 @@ static void initialise_asteroid(struct Asteroid* asteroid,
         asteroid->speed_sin = SLOW_ROT_CW_SIN;
     }
 
-    n = rb->rand()%99;
+    n = rand()%99;
     if (n < 33)
         asteroid_vertices = asteroid_one;
     else if (n < 66)
@@ -1008,8 +1008,8 @@ static void initialise_asteroid(struct Asteroid* asteroid,
     {
         do {
             /* Set the position randomly: */
-            asteroid->position.x = (rb->rand()%SCALED_WIDTH);
-            asteroid->position.y = (rb->rand()%SCALED_HEIGHT);
+            asteroid->position.x = (rand()%SCALED_WIDTH);
+            asteroid->position.y = (rand()%SCALED_HEIGHT);
         } while (is_point_within_rectangle(&ship.position, &asteroid->position,
                                            SPACE_CHECK_SIZE));
     }
@@ -1020,11 +1020,11 @@ static void initialise_asteroid(struct Asteroid* asteroid,
     }
 
     do {
-        asteroid->position.dx = (rb->rand()%ASTEROID_SPEED)-ASTEROID_SPEED/2;
+        asteroid->position.dx = (rand()%ASTEROID_SPEED)-ASTEROID_SPEED/2;
     } while (asteroid->position.dx == 0);
 
     do {
-        asteroid->position.dy = (rb->rand()%ASTEROID_SPEED)-ASTEROID_SPEED/2;
+        asteroid->position.dy = (rand()%ASTEROID_SPEED)-ASTEROID_SPEED/2;
     } while (asteroid->position.dy == 0);
 
     asteroid->position.dx *= SCALE/10;
@@ -1034,7 +1034,7 @@ static void initialise_asteroid(struct Asteroid* asteroid,
     asteroid->rotation.y = 0;
 
     /* Now rotate the asteroid a bit, so they all look a bit different */
-    for(n = (rb->rand()%30)+2; n--; )
+    for(n = (rand()%30)+2; n--; )
         rotate_asteroid(asteroid);
 
     /* great, we've created an asteroid, don't forget to increment the total: */
@@ -1256,8 +1256,8 @@ static void hyperspace(void)
     if (ship.exists)
     {
         ship.position.dx = ship.position.dy = 0;
-        ship.position.x = (rb->rand()%SCALED_WIDTH);
-        ship.position.y = (rb->rand()%SCALED_HEIGHT);
+        ship.position.x = (rand()%SCALED_WIDTH);
+        ship.position.y = (rand()%SCALED_HEIGHT);
     }
 }
 
@@ -1367,7 +1367,7 @@ static void initialise_enemy(void)
     int n;
     int size;
 
-    if (rb->rand()%100 > enemy.size_probability)
+    if (rand()%100 > enemy.size_probability)
     {
         size = BIG_SHIP;
         enemy.size_probability++;
@@ -1446,7 +1446,7 @@ static void draw_and_move_enemy(void)
             if (enemy.position.y < 0)
                 enemy.position.y += SCALED_HEIGHT;
 
-            if ((rb->rand()%1000) < 10)
+            if ((rand()%1000) < 10)
                 enemy.position.dy = -enemy.position.dy;
         }
         else if (enemy.explode_countdown > 0)
@@ -1457,7 +1457,7 @@ static void draw_and_move_enemy(void)
         {
             if (enemy.appear_countdown > 0)
                 enemy.appear_countdown--;
-            else if (rb->rand()%100 >= enemy.appear_probability)
+            else if (rand()%100 >= enemy.appear_probability)
                 initialise_enemy();
         }
     }
@@ -1467,7 +1467,7 @@ static void draw_and_move_enemy(void)
         /* if no missile and the enemy is here and not exploding..
            then shoot baby! */
         if (enemy.exists && ship.exists &&
-            game_state == PLAY_MODE && (rb->rand()%10) >= 5 )
+            game_state == PLAY_MODE && (rand()%10) >= 5 )
         {
             int dx = ship.position.x - enemy.position.x;
             int dy = ship.position.y - enemy.position.y;
@@ -1498,8 +1498,8 @@ static void draw_and_move_enemy(void)
             while (enemy_missile.position.dx == 0 &&
                    enemy_missile.position.dy == 0)
             {
-                enemy_missile.position.dx = rb->rand()%2-1;
-                enemy_missile.position.dy = rb->rand()%2-1;
+                enemy_missile.position.dx = rand()%2-1;
+                enemy_missile.position.dy = rand()%2-1;
             }
 
             enemy_missile.position.dx *= SCALE;
@@ -1509,7 +1509,7 @@ static void draw_and_move_enemy(void)
     }
     else
     {
-        rb->lcd_fillrect( enemy_missile.position.x/SCALE,
+        lcd_fillrect( enemy_missile.position.x/SCALE,
                           enemy_missile.position.y/SCALE,
                           POINT_SIZE, POINT_SIZE );
         if (game_state != PAUSE_MODE)
@@ -1731,8 +1731,8 @@ static void create_stars(void)
     n = NUM_STARS;
     while (n--)
     {
-        p->x = (rb->rand()%LCD_WIDTH);
-        p->y = (rb->rand()%LCD_HEIGHT);
+        p->x = (rand()%LCD_WIDTH);
+        p->y = (rand()%LCD_HEIGHT);
         p++;
     }
 }
@@ -1748,7 +1748,7 @@ static void drawstars(void)
     n = NUM_STARS;
     while (n--)
     {
-        rb->lcd_drawpixel(p->x , p->y);
+        lcd_drawpixel(p->x , p->y);
         p++;
     }
 }
@@ -1832,12 +1832,12 @@ static bool spacerocks_help(void)
         LAST_STYLE_ITEM
     };
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     SET_BG(LCD_BLACK);
     SET_FG(LCD_WHITE);
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     return false;
 }
@@ -1859,11 +1859,11 @@ static int spacerocks_menu(void)
                         "Resume Game", "Start New Game",
                         "Help", "High Scores",
                         "Playback Control", "Quit");
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (1)
     {
-        switch (rb->do_menu(&main_menu, &selection, NULL, false))
+        switch (do_menu(&main_menu, &selection, NULL, false))
         {
             case 0:
                 return PLUGIN_OTHER;
@@ -1905,29 +1905,29 @@ static int spacerocks_game_loop(void)
     ingame = true;
     while (true)
     {
-        end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
-        rb->lcd_clear_display();
+        end = current_tick + (CYCLETIME * HZ) / 1000;
+        lcd_clear_display();
         SET_FG(COL_TEXT);
         switch(game_state)
         {
             case GAME_OVER:
                 ingame = false;
-                rb->splash (HZ * 2, "Game Over");
-                rb->lcd_clear_display();
+                splash (HZ * 2, "Game Over");
+                lcd_clear_display();
                 position = highscore_update(current_score, current_level, "",
                                             highscores, NUM_SCORES);
                 if (position != -1)
                 {
                     if (position == 0)
-                        rb->splash(HZ*2, "New High Score");
+                        splash(HZ*2, "New High Score");
                     highscore_show(position, highscores, NUM_SCORES, true);
                 }
                 return PLUGIN_OTHER;
                 break;
 
             case PAUSE_MODE:
-                rb->lcd_putsxyf(1,LCD_HEIGHT-8, "score %d ", current_score);
-                rb->lcd_putsxy(CENTER_LCD_X - 15,
+                lcd_putsxyf(1,LCD_HEIGHT-8, "score %d ", current_score);
+                lcd_putsxy(CENTER_LCD_X - 15,
                                CENTER_LCD_Y + CENTER_LCD_Y/2 - 4, "pause");
                 draw_and_move_missiles();
                 draw_lives();
@@ -1935,7 +1935,7 @@ static int spacerocks_game_loop(void)
                 break;
 
             case PLAY_MODE:
-                rb->lcd_putsxyf(1, LCD_HEIGHT-8, "score %d ", current_score);
+                lcd_putsxyf(1, LCD_HEIGHT-8, "score %d ", current_score);
                 draw_and_move_missiles();
                 draw_lives();
                 check_collisions();
@@ -1943,8 +1943,8 @@ static int spacerocks_game_loop(void)
                 break;
 
             case SHOW_LEVEL:
-                rb->lcd_putsxyf(1, LCD_HEIGHT-8, "score %d ", current_score);
-                rb->lcd_putsxyf(CENTER_LCD_X - 20,
+                lcd_putsxyf(1, LCD_HEIGHT-8, "score %d ", current_score);
+                lcd_putsxyf(CENTER_LCD_X - 20,
                                CENTER_LCD_Y + CENTER_LCD_Y/2 - 4,
                                "stage %d ", current_level);
                 draw_lives();
@@ -1962,13 +1962,13 @@ static int spacerocks_game_loop(void)
         draw_and_move_asteroids();
         draw_and_move_enemy();
 
-        rb->lcd_update();
+        lcd_update();
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold() && game_state == PLAY_MODE)
+        if (button_hold() && game_state == PLAY_MODE)
             game_state = PAUSE_MODE;
 #endif
-        button = rb->button_get(false);
+        button = button_get(false);
         switch(button)
         {
             case(AST_QUIT):
@@ -2027,7 +2027,7 @@ static int spacerocks_game_loop(void)
                 break;
 
             default:
-                if (rb->default_event_handler(button)==SYS_USB_CONNECTED)
+                if (default_event_handler(button)==SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -2038,10 +2038,10 @@ static int spacerocks_game_loop(void)
         if (next_thrust_count > 0)
             next_thrust_count--;
 
-        if (TIME_BEFORE(*rb->current_tick, end))
-            rb->sleep(end-*rb->current_tick);
+        if (TIME_BEFORE(current_tick, end))
+            sleep(end-current_tick);
         else
-            rb->yield();
+            yield();
     }
 }
 
@@ -2051,14 +2051,14 @@ enum plugin_status plugin_start(const void* parameter)
     int ret = PLUGIN_OTHER;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
     /* universal font */
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
     /* create stars once, and once only: */
     create_stars();
@@ -2066,7 +2066,7 @@ enum plugin_status plugin_start(const void* parameter)
     while (ret == PLUGIN_OTHER)
         ret = spacerocks_game_loop();
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();

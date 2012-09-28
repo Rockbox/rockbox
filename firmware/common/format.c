@@ -26,6 +26,7 @@
 #include <string.h>
 #include "file.h"
 #include "format.h"
+#include "symbols.h"
 
 static const char hexdigit[] = "0123456789ABCDEF";
 
@@ -260,6 +261,7 @@ int fdprintf(int fd, const char *fmt, ...)
 
     return fpr.bytes; /* return 0 on error */
 }
+EXPORT_SYMBOL(fdprintf);
 
 void vuprintf(int (*push)(void *userp, unsigned char data), void *userp, const char *fmt, va_list ap)
 {

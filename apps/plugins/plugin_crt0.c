@@ -63,9 +63,9 @@ enum plugin_status plugin__start(const void *param)
     int exit_ret;
     enum plugin_status ret;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(USE_ELFLOADER))
 
-/* IRAM must be copied before clearing the BSS ! */
+    /* IRAM must be copied before clearing the BSS ! */
 #ifdef PLUGIN_USE_IRAM
     extern char iramcopy[], iramstart[], iramend[], iedata[], iend[];
     size_t iram_size = iramend - iramstart;
@@ -73,11 +73,11 @@ enum plugin_status plugin__start(const void *param)
     if (iram_size > 0 || ibss_size > 0)
     {
         /* We need to stop audio playback in order to use codec IRAM */
-        rb->audio_stop();
-        rb->memcpy(iramstart, iramcopy, iram_size);
-        rb->memset(iedata, 0, ibss_size);
+        audio_stop();
+        memcpy(iramstart, iramcopy, iram_size);
+        memset(iedata, 0, ibss_size);
         /* make the icache (if it exists) up to date with the new code */
-        rb->commit_discard_idcache();
+        commit_discard_idcache();
 
         /* barrier to prevent reordering iram copy and BSS clearing,
          * because the BSS segment alias the IRAM copy.
@@ -85,14 +85,14 @@ enum plugin_status plugin__start(const void *param)
         asm volatile ("" ::: "memory");
     }
 #endif /* PLUGIN_USE_IRAM */
-
+ 
     /* zero out the bss section */
-    rb->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
-
+    memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+ 
     /* Some parts of bss may be used via a no-cache alias (at least
      * portalplayer has this). If we don't clear the cache, those aliases
      * may read garbage */
-    rb->commit_dcache();
+     commit_dcache();
 #endif
 
     /* we come back here if exit() was called or the plugin returned normally */
@@ -138,7 +138,7 @@ void exit_on_usb(int button)
      *
      * if not usb, then the handler will only be called if powering off
      * if poweroff, the plugin doesn't want to run any further so exit as well*/
-    long result = rb->default_event_handler_ex(button, cleanup_wrapper, NULL);
+    long result = default_event_handler_ex(button, cleanup_wrapper, NULL);
     if (result == SYS_USB_CONNECTED)
         _exit(PLUGIN_USB_CONNECTED);
     else if (result == SYS_POWEROFF)

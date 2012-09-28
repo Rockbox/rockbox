@@ -35,6 +35,7 @@
 #include "lcd-charcell.h"
 #include "rbunicode.h"
 #include "scroll_engine.h"
+#include "symbols.h"
 
 /** definitions **/
 
@@ -138,6 +139,7 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
         
     return width;
 }
+EXPORT_SYMBOL(lcd_getstringsize);
 
 /** low-level functions **/
 
@@ -351,6 +353,7 @@ void lcd_clear_display(void)
 
     current_vp = old_vp;
 }
+EXPORT_SYMBOL(lcd_clear_display);
 
 /* Clear the current viewport */
 void lcd_clear_viewport(void)
@@ -448,6 +451,7 @@ void lcd_putsxy(int x, int y, const unsigned char *str)
 
     lcd_putsxyofs(x, y, 0, str);
 }
+EXPORT_SYMBOL(lcd_putsxy);
 
 /* Formatting version of lcd_putsxy */
 void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...)
@@ -459,6 +463,7 @@ void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...)
     va_end(ap);
     lcd_putsxy(x, y, buf);
 }
+EXPORT_SYMBOL(lcd_putsxyf);
 
 /*** Line oriented text output ***/
 
@@ -467,6 +472,7 @@ void lcd_puts(int x, int y, const unsigned char *str)
 {
     lcd_puts_offset(x, y, str, 0);
 }
+EXPORT_SYMBOL(lcd_puts);
 
 /* Formatting version of lcd_puts */
 void lcd_putsf(int x, int y, const unsigned char *fmt, ...)
@@ -478,6 +484,7 @@ void lcd_putsf(int x, int y, const unsigned char *fmt, ...)
     va_end(ap);
     lcd_puts(x, y, buf);
 }
+EXPORT_SYMBOL(lcd_putsf);
 
 /* Put a string at a given char position,  skipping first offset chars */
 void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)

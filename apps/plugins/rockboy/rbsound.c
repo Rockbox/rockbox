@@ -50,23 +50,23 @@ void rockboy_pcm_init(void)
         memset(buf, 0,  pcm.len * N_BUFS*sizeof(short));
     }
 
-    rb->pcm_play_stop();
+    pcm_play_stop();
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
    
-    rb->pcm_set_frequency(pcm.hz); /* 44100 22050 11025 */
+    pcm_set_frequency(pcm.hz); /* 44100 22050 11025 */
 }
 
 void rockboy_pcm_close(void)
 {
     memset(&pcm, 0, sizeof pcm);    
     newly_started = true;   
-    rb->pcm_play_stop();    
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_play_stop();    
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
 int rockboy_pcm_submit(void)
@@ -76,12 +76,12 @@ int rockboy_pcm_submit(void)
 
     if(newly_started)
     {
-        rb->pcm_play_data(&get_more, NULL, NULL,0);
+        pcm_play_data(&get_more, NULL, NULL,0);
         newly_started = false;
     }
 
     while (!doneplay)
-    {rb->yield();}
+    {yield();}
 
     doneplay=0;
 

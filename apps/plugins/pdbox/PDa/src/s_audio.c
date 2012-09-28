@@ -11,7 +11,7 @@
 #include "../../pdbox.h"
 #include "m_pd.h"
 #include "s_stuff.h"
-#define snprintf rb->snprintf
+#define snprintf snprintf
 #else /* ROCKBOX */
 #include "m_pd.h"
 #include "s_stuff.h"

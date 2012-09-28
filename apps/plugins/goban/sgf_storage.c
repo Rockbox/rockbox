@@ -119,7 +119,7 @@ clear_storage_buffer (int index)
 
 
     /* everything starts free */
-    rb->memset (storage_free_list[index],
+    memset (storage_free_list[index],
                 (unsigned char) 0xFF,
                 storage_free_list_size[index]);
 
@@ -150,7 +150,7 @@ free_tree_sgf (void)
 
     if (tree_head < 0)
     {
-        rb->splash (5 * HZ,
+        splash (5 * HZ,
                     "Error allocating first node!  Please exit immediately.");
     }
 
@@ -181,10 +181,10 @@ alloc_storage_sgf (void)
     {
         if (!storage_initialized[1])
         {
-            rb->splash (2 * HZ, "Stopping music playback to get more space");
+            splash (2 * HZ, "Stopping music playback to get more space");
             DEBUGF ("stealing audio buffer: %d\n", (int) total_storage_size);
 
-            new_storage_buffer = rb->plugin_get_audio_buffer (&size);
+            new_storage_buffer = plugin_get_audio_buffer (&size);
             setup_storage_buffer (new_storage_buffer, size);
 
             DEBUGF ("after stealing: %d\n", (int) total_storage_size);
@@ -235,7 +235,7 @@ free_storage_sgf (int handle)
         {
             handle -= storage_buffer_size[index++];
         }
-        rb->memset (&storage_buffer[index][handle], 0xFF,
+        memset (&storage_buffer[index][handle], 0xFF,
                     sizeof (union storage_t));
         set_free (index, handle, true);
     }
@@ -321,21 +321,21 @@ setup_sgf (void)
     size_t size;
     char *temp_buffer;
 
-    temp_buffer = rb->plugin_get_buffer (&size);
+    temp_buffer = plugin_get_buffer (&size);
     setup_storage_buffer (temp_buffer, size);
 
     if (total_storage_size < MIN_STORAGE_BUFFER_SIZE)
     {
-        rb->splash (1 * HZ, "Stopping music playback to get more space");
+        splash (1 * HZ, "Stopping music playback to get more space");
         DEBUGF ("storage_buffer_size < MIN!!: %d\n", (int) total_storage_size);
 
-        temp_buffer = rb->plugin_get_audio_buffer (&size);
+        temp_buffer = plugin_get_audio_buffer (&size);
         setup_storage_buffer (temp_buffer, size);
     }
 
     if (total_storage_size < MIN_STORAGE_BUFFER_SIZE)
     {
-        rb->splash (1 * HZ, "Low memory.  Large files may not load.");
+        splash (1 * HZ, "Low memory.  Large files may not load.");
 
         DEBUGF ("storage_buffer_size < MIN!!!!: %d\n",
                 (int) total_storage_size);
@@ -351,8 +351,8 @@ setup_sgf (void)
         return false;
     }
 
-    rb->lseek (unhandled_fd, 0, SEEK_SET);
-    rb->ftruncate (unhandled_fd, 0);
+    lseek (unhandled_fd, 0, SEEK_SET);
+    ftruncate (unhandled_fd, 0);
 
     empty_stack (&parse_stack);
 
@@ -365,8 +365,8 @@ clear_caches_sgf (void)
 {
     empty_stack (&parse_stack);
 
-    rb->lseek (unhandled_fd, 0, SEEK_SET);
-    rb->ftruncate (unhandled_fd, 0);
+    lseek (unhandled_fd, 0, SEEK_SET);
+    ftruncate (unhandled_fd, 0);
 }
 
 void
@@ -374,8 +374,8 @@ cleanup_sgf (void)
 {
     empty_stack (&parse_stack);
 
-    rb->lseek (unhandled_fd, 0, SEEK_SET);
-    rb->ftruncate (unhandled_fd, 0);
+    lseek (unhandled_fd, 0, SEEK_SET);
+    ftruncate (unhandled_fd, 0);
     close_file (&unhandled_fd);
 
     close_file (&sgf_fd);
@@ -445,7 +445,7 @@ setup_storage_buffer (char *temp_buffer, size_t size)
     if (size < storage_free_list_size[index])
     {
         DEBUGF ("Big problem on line %d in sgf.c\n", __LINE__);
-        rb->splashf (5 * HZ,
+        splashf (5 * HZ,
                 "Error in allocating storage buffer! Exit and report this!\n");
         return false;
     }

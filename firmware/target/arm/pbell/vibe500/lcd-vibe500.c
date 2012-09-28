@@ -24,6 +24,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "system.h"
+#include "symbols.h"
 
 /** Initialized in lcd_init_device() **/
 /* Is the power turned on? */
@@ -136,6 +137,7 @@ void lcd_set_contrast(int val)
     /* VCOMG=1, VDV4-0=xxxxx, VCM4-0=11000 */
     lcd_write_reg(R_POWER_CONTROL5, 0x2018 | lcd_contrast);
 }
+EXPORT_SYMBOL(lcd_set_contrast);
 
 void lcd_set_invert_display(bool yesno)
 {
@@ -150,6 +152,7 @@ void lcd_set_invert_display(bool yesno)
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=11 */
     lcd_write_reg(R_DISP_CONTROL, 0x0033 | disp_control_rev);
 }
+EXPORT_SYMBOL(lcd_set_invert_display);
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
@@ -449,6 +452,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     while (yuv_src[0] < ysrc_max);
     lcd_write_reg(R_ENTRY_MODE,0x1008);
 }
+EXPORT_SYMBOL(lcd_blit_yuv);
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x0, int y0, int width, int height)
@@ -493,6 +497,7 @@ void lcd_update_rect(int x0, int y0, int width, int height)
         addr += LCD_WIDTH - width;
     }
 }
+EXPORT_SYMBOL(lcd_update_rect);
 
 /* Update the display.
    This must be called after all other LCD 
@@ -501,3 +506,4 @@ void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
+EXPORT_SYMBOL(lcd_update);

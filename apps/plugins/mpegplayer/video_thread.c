@@ -114,7 +114,7 @@ static int video_str_scan(struct video_thread_data *td,
     while (1)
     {
         mpeg2_state_t mp2state = mpeg2_parse(td->mpeg2dec);
-        rb->yield();
+        yield();
 
         switch (mp2state)
         {
@@ -438,7 +438,7 @@ static int sync_decoder(struct video_thread_data *td,
             break;
         }
 
-        rb->yield();
+        yield();
     } /* end while */
 
 sync_finished:
@@ -550,9 +550,9 @@ static void video_thread_msg(struct video_thread_data *td)
             }
             else
             {
-                IF_COP(rb->commit_discard_dcache());
+                IF_COP(commit_discard_dcache());
                 vo_lock();
-                rb->lcd_update();
+                lcd_update();
                 vo_unlock();
             }
 #endif
@@ -574,7 +574,7 @@ static void video_thread_msg(struct video_thread_data *td)
             td->num_picture = 0;
             td->num_intra = 0;
             td->group_est = DEFAULT_GOP_SIZE;
-            td->last_render = *rb->current_tick - HZ;
+            td->last_render = current_tick - HZ;
             video_num_drawn = 0;
             video_num_skipped = 0;
 
@@ -918,7 +918,7 @@ static void video_thread(void)
              * avoid looking stuck.
              */
             if (td.skip_level > 0 &&
-                TIME_BEFORE(*rb->current_tick, td.last_render + HZ/2))
+                TIME_BEFORE(current_tick, td.last_render + HZ/2))
             {
                 /* Frame skip was set previously but either there wasn't anything
                    dropped yet or not dropped enough. So we quit at least rendering 
@@ -962,7 +962,7 @@ static void video_thread(void)
                 else
                 {
                     /* Just a little left - spin and be accurate */
-                    rb->yield();
+                    yield();
                     if (str_have_msg(&video_str))
                         goto message_wait;
                 }
@@ -972,7 +972,7 @@ static void video_thread(void)
        
         picture_draw:
             /* Record last frame time */
-            td.last_render = *rb->current_tick;
+            td.last_render = current_tick;
 
             vo_draw_frame(td.info->display_fbuf->buf);
             video_num_drawn++;
@@ -994,7 +994,7 @@ static void video_thread(void)
             break;
         }
 
-        rb->yield();
+        yield();
     } /* end while */
 
 video_exit:
@@ -1007,17 +1007,17 @@ bool video_thread_init(void)
 {
     intptr_t rep;
 
-    IF_COP(rb->commit_dcache());
+    IF_COP(commit_dcache());
 
     video_str.hdr.q = &video_str_queue;
-    rb->queue_init(video_str.hdr.q, false);
+    queue_init(video_str.hdr.q, false);
 
     /* We put the video thread on another processor for multi-core targets. */
-    video_str.thread = rb->create_thread(
+    video_str.thread = create_thread(
         video_thread, video_stack, VIDEO_STACKSIZE, 0,
         "mpgvideo" IF_PRIO(,PRIORITY_PLAYBACK) IF_COP(, COP));
 
-    rb->queue_enable_queue_send(video_str.hdr.q, &video_str_queue_send,
+    queue_enable_queue_send(video_str.hdr.q, &video_str_queue_send,
                                 video_str.thread);
 
     if (video_str.thread == 0)
@@ -1025,7 +1025,7 @@ bool video_thread_init(void)
 
     /* Wait for thread to initialize */
     rep = str_send_msg(&video_str, STREAM_NULL, 0);
-    IF_COP(rb->commit_discard_dcache());
+    IF_COP(commit_discard_dcache());
 
     return rep == 0; /* Normally STREAM_NULL should be ignored */
 }
@@ -1036,8 +1036,8 @@ void video_thread_exit(void)
     if (video_str.thread != 0)
     {
         str_post_msg(&video_str, STREAM_QUIT, 0);
-        rb->thread_wait(video_str.thread);
-        IF_COP(rb->commit_discard_dcache());
+        thread_wait(video_str.thread);
+        IF_COP(commit_discard_dcache());
         video_str.thread = 0;
     }
 }

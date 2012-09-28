@@ -33,12 +33,12 @@ void *rocklua_morecore(int size)
         size = size + 4 - (size % 4);
         
         if (sbrk_top == NULL) {
-            sbrk_top = rb->plugin_get_buffer((size_t *) &total_size);
+            sbrk_top = plugin_get_buffer((size_t *) &total_size);
         }
         
         if (sbrk_top == NULL || size + 4 > abs(total_size)) {
             /* Try the audio buffer */
-            sbrk_top = rb->plugin_get_audio_buffer((size_t *) &total_size);
+            sbrk_top = plugin_get_audio_buffer((size_t *) &total_size);
 
             if(sbrk_top == NULL || size + 4 > abs(total_size)) {
                 printf("malloc failed for %d!\n", size);

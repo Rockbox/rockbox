@@ -81,14 +81,14 @@ struct star
 
 static inline void star_init(struct star * star, int z_move, bool color)
 {
-    star->velocity=rb->rand() % STAR_MAX_VELOCITY+1;
+    star->velocity=rand() % STAR_MAX_VELOCITY+1;
     /* choose x between -MAX_INIT_STAR_X and MAX_INIT_STAR_X */
-    star->x=rb->rand() % (2*MAX_INIT_STAR_X)-MAX_INIT_STAR_X;
-    star->y=rb->rand() % (2*MAX_INIT_STAR_Y)-MAX_INIT_STAR_Y;
+    star->x=rand() % (2*MAX_INIT_STAR_X)-MAX_INIT_STAR_X;
+    star->y=rand() % (2*MAX_INIT_STAR_Y)-MAX_INIT_STAR_Y;
 #ifdef HAVE_LCD_COLOR
     if(color)
-        star->color=LCD_RGBPACK(rb->rand()%128+128,rb->rand()%128+128,
-                                rb->rand()%128+128);
+        star->color=LCD_RGBPACK(rand()%128+128,rand()%128+128,
+                                rand()%128+128);
     else
         star->color=LCD_WHITE;
 #else
@@ -97,7 +97,7 @@ static inline void star_init(struct star * star, int z_move, bool color)
     if(z_move>=0)
         star->z=Z_MAX_DIST;
     else
-        star->z=rb->rand() %Z_MAX_DIST/2+1;
+        star->z=rand() %Z_MAX_DIST/2+1;
 }
 
 static inline void star_move(struct star * star, int z_move, bool color)
@@ -128,18 +128,18 @@ static inline void star_draw(struct star * star, int z_move, bool color)
     }
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(star->color);
+    lcd_set_foreground(star->color);
 #endif
 
-    rb->lcd_drawpixel(x_draw, y_draw);
+    lcd_drawpixel(x_draw, y_draw);
     if(star->z<5*Z_MAX_DIST/6)
     {
-        rb->lcd_drawpixel(x_draw, y_draw - 1);
-        rb->lcd_drawpixel(x_draw - 1, y_draw);
+        lcd_drawpixel(x_draw, y_draw - 1);
+        lcd_drawpixel(x_draw - 1, y_draw);
         if(star->z<Z_MAX_DIST/2)
         {
-            rb->lcd_drawpixel(x_draw + 1, y_draw);
-            rb->lcd_drawpixel(x_draw, y_draw + 1);
+            lcd_drawpixel(x_draw + 1, y_draw);
+            lcd_drawpixel(x_draw, y_draw + 1);
         }
     }
 }
@@ -203,22 +203,22 @@ static int plugin_main(void)
     int button, avg_peak, t_disp=0;
     int font_h, font_w;
     bool pulse __attribute__ ((unused)) = true; /* 'unused' resolves warnings */
-    rb->lcd_getstringsize("A", &font_w, &font_h);
+    lcd_getstringsize("A", &font_w, &font_h);
     starfield_init(&starfield);
     starfield_add_stars(&starfield, INIT_STARS);
 
 #if LCD_DEPTH > 1
-     rb->lcd_set_backdrop(NULL);
+     lcd_set_backdrop(NULL);
 #endif
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
 
     while (true)
     {
-        rb->sleep(1);
-        rb->lcd_clear_display();
+        sleep(1);
+        lcd_clear_display();
 
 #if ((CONFIG_CODEC == SWCODEC)  || !defined(SIMULATOR) && \
     ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)))
@@ -229,13 +229,13 @@ static int plugin_main(void)
             /* Get the peaks. ( Borrowed from vu_meter ) */
 #if (CONFIG_CODEC == SWCODEC)
             static struct pcm_peaks peaks;
-            rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+            mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                               &peaks);
             #define left_peak peaks.left
             #define right_peak peaks.right
 #else
-            int left_peak = rb->mas_codec_readreg(0xC);
-            int right_peak = rb->mas_codec_readreg(0xD);
+            int left_peak = mas_codec_readreg(0xC);
+            int right_peak = mas_codec_readreg(0xD);
 #endif
             /* Devide peak data by 4098 to bring the max
                value down from ~32k to 8 */
@@ -267,7 +267,7 @@ static int plugin_main(void)
         starfield_move_and_draw(&starfield);
 
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_set_foreground(LCD_WHITE);
+        lcd_set_foreground(LCD_WHITE);
 #endif
 
         /* if a parameter is updated (by the user), we must print it */
@@ -275,12 +275,12 @@ static int plugin_main(void)
         {
             --t_disp;
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(LCD_WHITE);
+            lcd_set_foreground(LCD_WHITE);
 #endif
-            rb->lcd_putsxyf(0, LCD_HEIGHT-font_h, "star:%d speed:%d",
+            lcd_putsxyf(0, LCD_HEIGHT-font_h, "star:%d speed:%d",
                            starfield.nb_stars, starfield.z_move);
         }
-        rb->lcd_update();
+        lcd_update();
 
         /*We get button from PLA this way */
         button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,

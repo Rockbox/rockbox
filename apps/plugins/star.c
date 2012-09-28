@@ -45,11 +45,11 @@
 /* sleep time between two frames */
 #if (LCD_HEIGHT * LCD_WIDTH >= 70000) && defined(IPOD_ARCH)
 /* iPod 5G LCD is *slow* */
-#define STAR_SLEEP rb->yield();
+#define STAR_SLEEP yield();
 #elif (LCD_HEIGHT * LCD_WIDTH >= 30000)
-#define STAR_SLEEP rb->sleep(0);
+#define STAR_SLEEP sleep(0);
 #else
-#define STAR_SLEEP rb->sleep(1);
+#define STAR_SLEEP sleep(1);
 #endif
 
 /* value of ball and block control */
@@ -835,13 +835,13 @@ static void star_transition_update(void)
         }
         if( x )
         {
-            rb->lcd_update_rect(center_x - x, center_y - y, x*2, step);
-            rb->lcd_update_rect(center_x - x, center_y + y - step, x*2, step);
+            lcd_update_rect(center_x - x, center_y - y, x*2, step);
+            lcd_update_rect(center_x - x, center_y + y - step, x*2, step);
         }
         if( y )
         {
-            rb->lcd_update_rect(center_x - x, center_y - y, step, y*2);
-            rb->lcd_update_rect(center_x + x - step, center_y - y, step, y*2);
+            lcd_update_rect(center_x - x, center_y - y, step, y*2);
+            lcd_update_rect(center_x + x - step, center_y - y, step, y*2);
         }
         STAR_SLEEP
     }
@@ -859,18 +859,18 @@ static void star_transition_update(void)
         }
         if( x )
         {
-            rb->lcd_update_rect(center_x - x, center_y - y, x * 2, 1);
-            rb->lcd_update_rect(center_x - x, center_y + y - 1, x * 2, 1);
+            lcd_update_rect(center_x - x, center_y - y, x * 2, 1);
+            lcd_update_rect(center_x - x, center_y + y - 1, x * 2, 1);
         }
         if( y )
         {
-            rb->lcd_update_rect(center_x - x, center_y - y, 1, y * 2);
-            rb->lcd_update_rect(center_x + x - 1, center_y - y, 1, y * 2);
+            lcd_update_rect(center_x - x, center_y - y, 1, y * 2);
+            lcd_update_rect(center_x + x - 1, center_y - y, 1, y * 2);
         }
         STAR_SLEEP
     }
 #endif
-    rb->lcd_update();
+    lcd_update();
 }
 
 /**
@@ -891,20 +891,20 @@ static void star_display_board_info(int current_level)
         tile_pos_y = label_pos_y + (char_height - TILE_HEIGHT) / 2;
     }
 
-    rb->lcd_putsxyf(STAR_OFFSET_X, label_pos_y, "L:%02d", current_level + 1);
-    rb->lcd_putsxyf(LCD_WIDTH/2 - 2 * char_width, label_pos_y, "S:%02d",
+    lcd_putsxyf(STAR_OFFSET_X, label_pos_y, "L:%02d", current_level + 1);
+    lcd_putsxyf(LCD_WIDTH/2 - 2 * char_width, label_pos_y, "S:%02d",
                   star_count);
-    rb->lcd_putsxy(STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH - 2 * char_width,
+    lcd_putsxy(STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH - 2 * char_width,
                    label_pos_y, "C:");
 
-    rb->lcd_bitmap_part(star_tiles, 0, control == STAR_CONTROL_BALL ?
+    lcd_bitmap_part(star_tiles, 0, control == STAR_CONTROL_BALL ?
                         BALL*TILE_HEIGHT : BLOCK*TILE_HEIGHT, 
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH,
                         tile_pos_y, TILE_WIDTH, TILE_HEIGHT);
 
-    rb->lcd_update_rect(0, MIN(label_pos_y, tile_pos_y), LCD_WIDTH,
+    lcd_update_rect(0, MIN(label_pos_y, tile_pos_y), LCD_WIDTH,
                         MAX(TILE_HEIGHT, char_height));
 }
 
@@ -927,7 +927,7 @@ static int star_load_level(int current_level)
     control = STAR_CONTROL_BALL;
     star_count = 0;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     for (y = 0 ; y < STAR_HEIGHT ; y++)
     {
@@ -937,7 +937,7 @@ static int star_load_level(int current_level)
             switch (*ptr_tab)
             {
 #   define DRAW_TILE( a )                                   \
-    rb->lcd_bitmap_part( star_tiles, 0,                     \
+    lcd_bitmap_part( star_tiles, 0,                     \
                          a*TILE_HEIGHT,                     \
                          STRIDE(    SCREEN_MAIN,            \
                                     BMPWIDTH_star_tiles,    \
@@ -991,15 +991,15 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         for (i = 1 ; i <= TILE_WIDTH ; i++)
         {
             STAR_SLEEP
-            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
+            lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT,
+            lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x + delta_x * i, start_y, TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_update_rect(start_x + delta_x * i - (delta_x>0?1:0),
+            lcd_update_rect(start_x + delta_x * i - (delta_x>0?1:0),
                                 start_y, TILE_WIDTH + 1, TILE_HEIGHT);
         }
     }
@@ -1008,15 +1008,15 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         for (i = 1 ; i <= TILE_HEIGHT ; i++)
         {
             STAR_SLEEP
-            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
+            lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT, 
+            lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT, 
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y + delta_y * i, TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_update_rect(start_x, start_y + delta_y * i - (delta_y>0?1:0),
+            lcd_update_rect(start_x, start_y + delta_y * i - (delta_y>0?1:0),
                                 TILE_WIDTH, TILE_HEIGHT + 1);
         }
     }
@@ -1046,7 +1046,7 @@ static int star_run_game(int current_level)
 
         while ((move_x == 0) && (move_y == 0))
         {
-            key = rb->button_get(true);
+            key = button_get(true);
             switch (key)
             {
 #ifdef STAR_RC_QUIT
@@ -1115,7 +1115,7 @@ static int star_run_game(int current_level)
                     break;
 
                 default:
-                    if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
+                    if (default_event_handler(key) == SYS_USB_CONNECTED)
                     {
                         usb_detected = true;
                         return 0;
@@ -1172,9 +1172,9 @@ static int star_run_game(int current_level)
             current_level++;
             if (current_level == STAR_LEVEL_COUNT)
             {
-                rb->lcd_clear_display();
-                rb->splash(HZ*2, "Congratulations!");
-                rb->lcd_update();
+                lcd_clear_display();
+                splash(HZ*2, "Congratulations!");
+                lcd_update();
 
                 /* There is no such level as STAR_LEVEL_COUNT so it can't be the
                  * current_level */
@@ -1211,14 +1211,14 @@ static bool star_help(void)
         LAST_STYLE_ITEM
     };
 #if LCD_DEPTH > 1 && !defined(HAVE_LCD_COLOR)
-    rb->lcd_set_background(LCD_WHITE);
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
+    lcd_set_foreground(LCD_BLACK);
 #endif
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
 #if LCD_DEPTH > 1 && !defined(HAVE_LCD_COLOR)
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
     return false;
 }
@@ -1237,17 +1237,17 @@ static int star_menu(void)
 
     while(!menu_quit)
     {
-        switch(rb->do_menu(&menu, &selection, NULL, false))
+        switch(do_menu(&menu, &selection, NULL, false))
         {
             case 0:
                 /* use system font and get the size of char */
-                rb->lcd_setfont(FONT_SYSFIXED);
-                rb->lcd_getstringsize("a", &char_width, &char_height);
+                lcd_setfont(FONT_SYSFIXED);
+                lcd_getstringsize("a", &char_width, &char_height);
                 star_run_game(level-1);
-                rb->lcd_setfont(FONT_UI);
+                lcd_setfont(FONT_UI);
                 break;
             case 1:
-                rb->set_int("Level", "", UNIT_INT, &level,
+                set_int("Level", "", UNIT_INT, &level,
                             NULL, 1, 1, STAR_LEVEL_COUNT, NULL );
                 break;
             case 2:
@@ -1276,9 +1276,9 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_background( LCD_BLACK );
-    rb->lcd_set_foreground( LCD_WHITE );
+    lcd_set_backdrop(NULL);
+    lcd_set_background( LCD_BLACK );
+    lcd_set_foreground( LCD_WHITE );
 #endif
 
     /* display choice menu */

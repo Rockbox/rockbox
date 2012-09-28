@@ -60,6 +60,7 @@
 #include "statusbar-skinned.h"
 #include "skin_engine/skin_engine.h"
 #include "debug.h"
+#include "symbols.h"
 
 #define VPSTACK_DEPTH 16
 struct viewport_stack_item
@@ -204,6 +205,7 @@ void viewportmanager_theme_enable(enum screen_type screen, bool enable,
     if (viewport)
         viewport_set_defaults(viewport, screen);
 }
+EXPORT_SYMBOL(viewportmanager_theme_enable);
 
 void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw)
 {
@@ -213,7 +215,7 @@ void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw)
     
     toggle_theme(screen, force_redraw);
 }
-
+EXPORT_SYMBOL(viewportmanager_theme_undo);
 
 static bool is_theme_enabled(enum screen_type screen)
 {
@@ -368,7 +370,7 @@ void viewport_set_defaults(struct viewport *vp,
 #endif /* HAVE_LCD_BITMAP */
         viewport_set_fullscreen(vp, screen);
 }
-
+EXPORT_SYMBOL(viewport_set_defaults);
 
 #ifdef HAVE_LCD_BITMAP
 

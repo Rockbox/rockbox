@@ -53,7 +53,7 @@ struct GWaveform waveforms[256] IBSS_ATTR;
 static struct GWaveform * loadWaveform(int file)
 {
     struct GWaveform * wav = &waveforms[curr_waveform++];
-    rb->memset(wav, 0, sizeof(struct GWaveform));
+    memset(wav, 0, sizeof(struct GWaveform));
 
     wav->name=readData(file, 7);
 /*    printf("\nWAVE NAME = [%s]", wav->name); */
@@ -156,15 +156,15 @@ static int selectWaveform(struct GPatch * pat, int midiNote)
 struct GPatch * gusload(char * filename)
 {
     struct GPatch * gp = (struct GPatch *)malloc(sizeof(struct GPatch));
-    rb->memset(gp, 0, sizeof(struct GPatch));
+    memset(gp, 0, sizeof(struct GPatch));
 
-    int file = rb->open(filename, O_RDONLY);
+    int file = open(filename, O_RDONLY);
 
     if(file < 0)
     {
         char message[50];
-        rb->snprintf(message, 50, "Error opening %s", filename);
-        rb->splash(HZ*2, message);
+        snprintf(message, 50, "Error opening %s", filename);
+        splash(HZ*2, message);
         return NULL;
     }
 
@@ -207,7 +207,7 @@ struct GPatch * gusload(char * filename)
     {
         gp->noteTable[a] = selectWaveform(gp, a);
     }
-    rb->close(file);
+    close(file);
 
     return gp;
 }

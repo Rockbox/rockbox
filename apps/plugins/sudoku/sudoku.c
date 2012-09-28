@@ -289,7 +289,7 @@ static void sudoku_solve(struct sudoku_state_t* state)
     bool ret = sudoku_solve_board(state);
 
     if (!ret) {
-        rb->splash(HZ*2, "Solve failed");
+        splash(HZ*2, "Solve failed");
     }
 
     return;
@@ -298,10 +298,10 @@ static void sudoku_solve(struct sudoku_state_t* state)
 /* Copies the current to the saved board */
 static void save_state(struct sudoku_state_t *state)
 {
-    rb->memcpy(state->savedboard, state->currentboard,
+    memcpy(state->savedboard, state->currentboard,
             sizeof(state->savedboard));
 #ifdef SUDOKU_BUTTON_POSSIBLE
-    rb->memcpy(state->savedpossible, state->possiblevals,
+    memcpy(state->savedpossible, state->possiblevals,
             sizeof(state->savedpossible));
 #endif
 }
@@ -309,10 +309,10 @@ static void save_state(struct sudoku_state_t *state)
 /* Copies the saved to the current board */
 static void restore_state(struct sudoku_state_t *state)
 {
-    rb->memcpy(state->currentboard, state->savedboard,
+    memcpy(state->currentboard, state->savedboard,
             sizeof(state->savedboard));
 #ifdef SUDOKU_BUTTON_POSSIBLE
-    rb->memcpy(state->possiblevals, state->savedpossible,
+    memcpy(state->possiblevals, state->savedpossible,
             sizeof(state->possiblevals));
 #endif
 }
@@ -321,7 +321,7 @@ static void default_state(struct sudoku_state_t* state)
 {
     int r,c;
 
-    rb->strlcpy(state->filename,GAME_FILE,MAX_PATH);
+    strlcpy(state->filename,GAME_FILE,MAX_PATH);
     for (r=0;r<9;r++) {
         for (c=0;c<9;c++) {
             state->startboard[r][c]=default_game[r][c];
@@ -344,7 +344,7 @@ static void clear_state(struct sudoku_state_t* state)
 {
     int r,c;
 
-    rb->strlcpy(state->filename,GAME_FILE,MAX_PATH);
+    strlcpy(state->filename,GAME_FILE,MAX_PATH);
     for (r=0;r<9;r++) {
         for (c=0;c<9;c++) {
             state->startboard[r][c]='0';
@@ -431,18 +431,18 @@ static bool load_sudoku(struct sudoku_state_t* state, char* filename)
     int valid=0;
     char buf[500]; /* A buffer to read a sudoku board from */
 
-    fd=rb->open(filename, O_RDONLY);
+    fd=open(filename, O_RDONLY);
     if (fd < 0) {
         LOGF("Invalid sudoku file: %s\n",filename);
         return(false);
     }
 
-    rb->strlcpy(state->filename,filename,MAX_PATH);
-    n=rb->read(fd,buf,500);
+    strlcpy(state->filename,filename,MAX_PATH);
+    n=read(fd,buf,500);
     if (n <= 0) {
         return(false);
     }
-    rb->close(fd);
+    close(fd);
     r=0;
     c=0;
     i=0;
@@ -533,13 +533,13 @@ static bool save_sudoku(struct sudoku_state_t* state)
 #endif
     char sep[13]="-----------\r\n";
 
-    rb->splash(0, "Saving...");
+    splash(0, "Saving...");
 
     if (state->filename[0]==0) {
         return false;
     }
 
-    fd=rb->open(state->filename, O_WRONLY|O_CREAT, 0666);
+    fd=open(state->filename, O_WRONLY|O_CREAT, 0666);
     if (fd >= 0) {
         for (r=0;r<9;r++) {
             i=0;
@@ -565,15 +565,15 @@ static bool save_sudoku(struct sudoku_state_t* state)
                 line[i++] = x + 'a';
             }
 #endif
-            rb->write(fd,line,sizeof(line));
+            write(fd,line,sizeof(line));
             if ((r==2) || (r==5)) {
-                rb->write(fd,sep,sizeof(sep));
+                write(fd,sep,sizeof(sep));
             }
         }
         /* Add a blank line at end */
-        rb->write(fd,"\r\n",2);
-        rb->close(fd);
-        rb->reload_directory();
+        write(fd,"\r\n",2);
+        close(fd);
+        reload_directory();
         /* Save a copy of the saved state - so we can reload without
            using the disk */
         save_state(state);
@@ -605,20 +605,20 @@ static void update_cell(struct sudoku_state_t* state, int r, int c)
     */
 
     if ((r==state->y) && (c==state->x)) {
-        rb->lcd_bitmap_part(sudoku_inverse,NUMBER_TYPE,
+        lcd_bitmap_part(sudoku_inverse,NUMBER_TYPE,
                             BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),
                             BITMAP_STRIDE,
                             XOFS+cellxpos[c],YOFS+cellypos[r],CELL_WIDTH,
                             CELL_HEIGHT);
     } else {
         if (state->startboard[r][c]!='0') {
-            rb->lcd_bitmap_part(sudoku_start,NUMBER_TYPE,
+            lcd_bitmap_part(sudoku_start,NUMBER_TYPE,
                                 BITMAP_HEIGHT*(state->startboard[r][c]-'0'),
                                 BITMAP_STRIDE,
                                 XOFS+cellxpos[c],YOFS+cellypos[r],
                                 CELL_WIDTH,CELL_HEIGHT);
         } else {
-            rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,
+            lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,
                                 BITMAP_HEIGHT*(state->currentboard[r][c]-'0'),
                                 BITMAP_STRIDE,
                                 XOFS+cellxpos[c],YOFS+cellypos[r],
@@ -626,7 +626,7 @@ static void update_cell(struct sudoku_state_t* state, int r, int c)
         }
     }
 
-    rb->lcd_update_rect(cellxpos[c],cellypos[r],CELL_WIDTH,CELL_HEIGHT);
+    lcd_update_rect(cellxpos[c],cellypos[r],CELL_WIDTH,CELL_HEIGHT);
 }
 
 
@@ -638,7 +638,7 @@ static void display_board(struct sudoku_state_t* state)
 #endif
 
     /* Clear the display buffer */
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* Draw the gridlines - differently for different targets */
 
@@ -647,113 +647,113 @@ static void display_board(struct sudoku_state_t* state)
     for (r=0;r<9;r++) {
         if ((r % 3)==0) {
             /* Solid Line */
-            rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-1);
-            rb->lcd_vline(XOFS+cellxpos[r]-1,YOFS,YOFS+BOARD_HEIGHT-1);
+            lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-1);
+            lcd_vline(XOFS+cellxpos[r]-1,YOFS,YOFS+BOARD_HEIGHT-1);
         } else {
             /* Dotted line */
             for (c=XOFS;c<XOFS+BOARD_WIDTH;c+=2) {
-                rb->lcd_drawpixel(c,YOFS+cellypos[r]-1);
+                lcd_drawpixel(c,YOFS+cellypos[r]-1);
             }
             for (c=YOFS;c<YOFS+BOARD_HEIGHT;c+=2) {
-                rb->lcd_drawpixel(XOFS+cellxpos[r]-1,c);
+                lcd_drawpixel(XOFS+cellxpos[r]-1,c);
             }
         }
     }
-    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT);
-    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFS,YOFS+BOARD_HEIGHT-1);
+    lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT);
+    lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFS,YOFS+BOARD_HEIGHT-1);
 #else
     /* Large targets - draw single/double lines */
     for (r=0;r<9;r++) {
-        rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-1);
-        rb->lcd_vline(XOFS+cellxpos[r]-1,YOFS,YOFS+BOARD_HEIGHT-1);
+        lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-1);
+        lcd_vline(XOFS+cellxpos[r]-1,YOFS,YOFS+BOARD_HEIGHT-1);
         if ((r % 3)==0) { 
-            rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-2);
-            rb->lcd_vline(XOFS+cellxpos[r]-2,YOFS,YOFS+BOARD_HEIGHT-1);
+            lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-2);
+            lcd_vline(XOFS+cellxpos[r]-2,YOFS,YOFS+BOARD_HEIGHT-1);
         }
     }
-    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT);
-    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT+1);
-    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFS,YOFS+BOARD_HEIGHT-1);
-    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
+    lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT);
+    lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT+1);
+    lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFS,YOFS+BOARD_HEIGHT-1);
+    lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
 #endif
 
 #ifdef SUDOKU_BUTTON_POSSIBLE
 #ifdef VERTICAL_LAYOUT
-    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFSSCRATCHPAD);
-    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFSSCRATCHPAD+CELL_HEIGHT+1);
+    lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFSSCRATCHPAD);
+    lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFSSCRATCHPAD+CELL_HEIGHT+1);
     for (r=0;r<9;r++) {
 #ifdef SMALL_BOARD
         /* Small targets - draw dotted/single lines */
         if ((r % 3)==0) {
             /* Solid Line */
-            rb->lcd_vline(XOFS+cellxpos[r]-1,YOFSSCRATCHPAD,
+            lcd_vline(XOFS+cellxpos[r]-1,YOFSSCRATCHPAD,
                           YOFSSCRATCHPAD+CELL_HEIGHT+1);
         } else {
             /* Dotted line */
             for (c=YOFSSCRATCHPAD;c<YOFSSCRATCHPAD+CELL_HEIGHT+1;c+=2) {
-                rb->lcd_drawpixel(XOFS+cellxpos[r]-1,c);
+                lcd_drawpixel(XOFS+cellxpos[r]-1,c);
             }
         }
 #else
         /* Large targets - draw single/double lines */
-        rb->lcd_vline(XOFS+cellxpos[r]-1,YOFSSCRATCHPAD,
+        lcd_vline(XOFS+cellxpos[r]-1,YOFSSCRATCHPAD,
                       YOFSSCRATCHPAD+CELL_HEIGHT+1);
         if ((r % 3)==0)
-            rb->lcd_vline(XOFS+cellxpos[r]-2,YOFSSCRATCHPAD,
+            lcd_vline(XOFS+cellxpos[r]-2,YOFSSCRATCHPAD,
                           YOFSSCRATCHPAD+CELL_HEIGHT+1);
 #endif
         if ((r>0) && state->possiblevals[state->y][state->x]&BIT_N(r))
-            rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+            lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                                 BITMAP_STRIDE,XOFS+cellxpos[r-1],
                                 YOFSSCRATCHPAD+1,CELL_WIDTH,CELL_HEIGHT);
     }
-    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFSSCRATCHPAD,
+    lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFSSCRATCHPAD,
                   YOFSSCRATCHPAD+CELL_HEIGHT+1);
 #ifndef SMALL_BOARD
-    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFSSCRATCHPAD,
+    lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFSSCRATCHPAD,
                   YOFSSCRATCHPAD+CELL_HEIGHT+1);
 #endif
     if (state->possiblevals[state->y][state->x]&BIT_N(r))
-        rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+        lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                             BITMAP_STRIDE,XOFS+cellxpos[8],YOFSSCRATCHPAD+1,
                             CELL_WIDTH,CELL_HEIGHT);
 #else /* Horizontal layout */
-    rb->lcd_vline(XOFSSCRATCHPAD,YOFS,YOFS+BOARD_HEIGHT-1);
-    rb->lcd_vline(XOFSSCRATCHPAD+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
+    lcd_vline(XOFSSCRATCHPAD,YOFS,YOFS+BOARD_HEIGHT-1);
+    lcd_vline(XOFSSCRATCHPAD+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
     for (r=0;r<9;r++) {
 #ifdef SMALL_BOARD
         /* Small targets - draw dotted/single lines */
         if ((r % 3)==0) {
             /* Solid Line */
-            rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+            lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                           YOFS+cellypos[r]-1);
         } else {
             /* Dotted line */
             for (c=XOFSSCRATCHPAD;c<XOFSSCRATCHPAD+CELL_WIDTH+1;c+=2) {
-                rb->lcd_drawpixel(c,YOFS+cellypos[r]-1);
+                lcd_drawpixel(c,YOFS+cellypos[r]-1);
             }
         }
 #else
         /* Large targets - draw single/double lines */
-        rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+        lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                       YOFS+cellypos[r]-1);
         if ((r % 3)==0)
-            rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+            lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                           YOFS+cellypos[r]-2);
 #endif
         if ((r>0) && state->possiblevals[state->y][state->x]&BIT_N(r))
-            rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+            lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                                 BITMAP_STRIDE,XOFSSCRATCHPAD+1,
                                 YOFS+cellypos[r-1],CELL_WIDTH,CELL_HEIGHT);
     }
-    rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+    lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                   YOFS+cellypos[8]+CELL_HEIGHT);
 #ifndef SMALL_BOARD
-    rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+    lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                   YOFS+cellypos[8]+CELL_HEIGHT+1);
 #endif
     if (state->possiblevals[state->y][state->x]&BIT_N(r))
-        rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
+        lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,BITMAP_HEIGHT*r,
                             BITMAP_STRIDE,XOFSSCRATCHPAD+1,YOFS+cellypos[8],
                             CELL_WIDTH,CELL_HEIGHT);
 #endif /* Layout */
@@ -769,7 +769,7 @@ static void display_board(struct sudoku_state_t* state)
             */
 
             if ((r==state->y) && (c==state->x)) {
-                rb->lcd_bitmap_part(sudoku_inverse,NUMBER_TYPE,
+                lcd_bitmap_part(sudoku_inverse,NUMBER_TYPE,
                                     BITMAP_HEIGHT*(state->currentboard[r][c]-
                                                    '0'),
                                     BITMAP_STRIDE,
@@ -777,14 +777,14 @@ static void display_board(struct sudoku_state_t* state)
                                     CELL_WIDTH,CELL_HEIGHT);
             } else {
                 if (state->startboard[r][c]!='0') {
-                    rb->lcd_bitmap_part(sudoku_start,NUMBER_TYPE,
+                    lcd_bitmap_part(sudoku_start,NUMBER_TYPE,
                                         BITMAP_HEIGHT*(state->startboard[r][c]-
                                                        '0'),
                                         BITMAP_STRIDE,
                                         XOFS+cellxpos[c],YOFS+cellypos[r],
                                         CELL_WIDTH,CELL_HEIGHT);
                 } else {
-                    rb->lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,
+                    lcd_bitmap_part(sudoku_normal,NUMBER_TYPE,
                                         BITMAP_HEIGHT*
                                         (state->currentboard[r][c]-'0'),
                                         BITMAP_STRIDE,
@@ -800,16 +800,16 @@ static void display_board(struct sudoku_state_t* state)
                         if(state->possiblevals[r][c]&(2<<i)) {
 #if LCD_DEPTH > 1
                             /* draw markings in dark grey */
-                            rb->lcd_set_foreground(LCD_DARKGRAY);
+                            lcd_set_foreground(LCD_DARKGRAY);
 #endif
-                            rb->lcd_fillrect(XOFS+cellxpos[c]+MARK_OFFS
+                            lcd_fillrect(XOFS+cellxpos[c]+MARK_OFFS
                                              +(i%3)*(MARK_SIZE+MARK_SPACE),
                                              YOFS+cellypos[r]+MARK_OFFS
                                              +(i/3)*(MARK_SIZE+MARK_SPACE),
                                              MARK_SIZE,
                                              MARK_SIZE);
 #if LCD_DEPTH > 1
-                            rb->lcd_set_foreground(LCD_BLACK);
+                            lcd_set_foreground(LCD_BLACK);
 #endif
                         }
                     }
@@ -820,7 +820,7 @@ static void display_board(struct sudoku_state_t* state)
     }
 
     /* update the screen */
-    rb->lcd_update();
+    lcd_update();
 }
 
 static bool sudoku_generate(struct sudoku_state_t* state)
@@ -832,27 +832,27 @@ static bool sudoku_generate(struct sudoku_state_t* state)
 
     clear_state(&new_state);
     display_board(&new_state);
-    rb->splash(0, "Generating...");
+    splash(0, "Generating...");
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     res = sudoku_generate_board(&new_state,&difficulty);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     if (res) {
-        rb->memcpy(state,&new_state,sizeof(new_state));
-        rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
+        memcpy(state,&new_state,sizeof(new_state));
+        snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
         display_board(state);
-        rb->splash(HZ*3, str);
-        rb->strlcpy(state->filename,GAME_FILE,MAX_PATH);
+        splash(HZ*3, str);
+        strlcpy(state->filename,GAME_FILE,MAX_PATH);
     } else {
         display_board(&new_state);
-        rb->splash(HZ*2, "Aborted");
+        splash(HZ*2, "Aborted");
     }
     /* initialize the saved board so reload function works */
     save_state(state);
@@ -867,7 +867,7 @@ static bool numdisplay_setting(void)
         {"Coloured",  -1},
     };
 
-    return rb->set_option("Number Display", &sudcfg.number_display, INT, names,
+    return set_option("Number Display", &sudcfg.number_display, INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 #endif
@@ -880,7 +880,7 @@ static bool showmarkings_setting(void)
         {"Show",  -1},
     };
 
-    return rb->set_option("Show Markings", &sudcfg.show_markings, INT, names,
+    return set_option("Show Markings", &sudcfg.show_markings, INT, names,
                           sizeof(names) / sizeof(names[0]), NULL);
 }
 #endif
@@ -917,7 +917,7 @@ static int sudoku_menu(struct sudoku_state_t* state)
                         "Save", "Reload", "Clear", "Solve",
                         "Generate", "New", "Quit");
 
-    result = rb->do_menu(&menu, NULL, NULL, false);
+    result = do_menu(&menu, NULL, NULL, false);
 
     switch (result) {
         case SM_AUDIO_PLAYBACK:
@@ -979,15 +979,15 @@ static int sudoku_edit_menu(struct sudoku_state_t* state)
     MENUITEM_STRINGLIST(menu, "Edit Menu", NULL,
                         "Save as", "Quit");
 
-    result = rb->do_menu(&menu, NULL, NULL, false);
+    result = do_menu(&menu, NULL, NULL, false);
 
     switch (result) {
         case 0: /* Save new game */
-            rb->kbd_input(state->filename,MAX_PATH);
+            kbd_input(state->filename,MAX_PATH);
             if (save_sudoku(state)) {
                 state->editmode=0;
             } else {
-                rb->splash(HZ*2, "Save failed");
+                splash(HZ*2, "Save failed");
             }
             break;
 
@@ -1007,9 +1007,9 @@ static void move_cursor(struct sudoku_state_t* state, int newx, int newy)
 
     /* Check that the character at the cursor position is legal */
     if (check_status(state)) {
-        rb->splash(HZ*2, "Illegal move!");
+        splash(HZ*2, "Illegal move!");
         /* Ignore any button presses during the splash */
-        rb->button_clear_queue();
+        button_clear_queue();
         return;
     }
 
@@ -1041,13 +1041,13 @@ enum plugin_status plugin_start(const void* parameter)
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);
-    rb->memcpy(&sudcfg, &sudcfg_disk, sizeof(sudcfg)); /* copy to running config */
+    memcpy(&sudcfg, &sudcfg_disk, sizeof(sudcfg)); /* copy to running config */
 #endif
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
 #endif
 
     clear_state(&state);
@@ -1060,7 +1060,7 @@ enum plugin_status plugin_start(const void* parameter)
         }
     } else {
         if (!load_sudoku(&state,(char*)parameter)) {
-            rb->splash(HZ*2, "Load error");
+            splash(HZ*2, "Load error");
             return(PLUGIN_ERROR);
         }
     }
@@ -1072,16 +1072,16 @@ enum plugin_status plugin_start(const void* parameter)
     exit=false;
     ticks=0;
     while(!exit) {
-        button = rb->button_get(true);
+        button = button_get(true);
 
         switch(button){
 #ifdef SUDOKU_BUTTON_QUIT
             /* Exit game */
             case SUDOKU_BUTTON_QUIT:
                 if (check_status(&state)) {
-                    rb->splash(HZ*2, "Illegal move!");
+                    splash(HZ*2, "Illegal move!");
                     /* Ignore any button presses during the splash */
-                    rb->button_clear_queue();
+                    button_clear_queue();
                 } else {
                     save_sudoku(&state);
                     exit=true;
@@ -1095,7 +1095,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
             case SUDOKU_BUTTON_TOGGLE | BUTTON_REPEAT:
                 /* Slow down the repeat speed to 1/3 second */
-                if ((*rb->current_tick-ticks) < (HZ/3)) {
+                if ((current_tick-ticks) < (HZ/3)) {
                     break;
                 }
 
@@ -1109,7 +1109,7 @@ enum plugin_status plugin_start(const void* parameter)
                     break;
 #endif
                 /* Increment digit */
-                ticks=*rb->current_tick;
+                ticks=current_tick;
                 if (state.editmode) {
                     if (state.startboard[state.y][state.x]=='9') { 
                         state.startboard[state.y][state.x]='0';
@@ -1133,13 +1133,13 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef SUDOKU_BUTTON_TOGGLEBACK
             case SUDOKU_BUTTON_TOGGLEBACK | BUTTON_REPEAT:
                 /* Slow down the repeat speed to 1/3 second */
-                if ((*rb->current_tick-ticks) < (HZ/3)) {
+                if ((current_tick-ticks) < (HZ/3)) {
                     break;
                 }
 
             case SUDOKU_BUTTON_TOGGLEBACK:
                 /* Decrement digit */
-                ticks=*rb->current_tick;
+                ticks=current_tick;
                 if (state.editmode) {
                     if (state.startboard[state.y][state.x]=='0') { 
                         state.startboard[state.y][state.x]='9';
@@ -1244,9 +1244,9 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
                 /* Don't let the user leave a game in a bad state */
                 if (check_status(&state)) {
-                    rb->splash(HZ*2, "Illegal move!");
+                    splash(HZ*2, "Illegal move!");
                     /* Ignore any button presses during the splash */
-                    rb->button_clear_queue();
+                    button_clear_queue();
                 } else {
                     if (state.editmode) {
                         res = sudoku_edit_menu(&state);
@@ -1284,7 +1284,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 #endif
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                if (default_event_handler(button) == SYS_USB_CONNECTED) {
                     /* Quit if USB has been connected */
                     rc = PLUGIN_USB_CONNECTED;
                     exit = true;
@@ -1299,9 +1299,9 @@ enum plugin_status plugin_start(const void* parameter)
         display_board(&state);
     }
 #if defined(HAVE_LCD_COLOR) || defined(SUDOKU_BUTTON_POSSIBLE)
-    if (rb->memcmp(&sudcfg, &sudcfg_disk, sizeof(sudcfg))) /* save settings if changed */
+    if (memcmp(&sudcfg, &sudcfg_disk, sizeof(sudcfg))) /* save settings if changed */
     {
-        rb->memcpy(&sudcfg_disk, &sudcfg, sizeof(sudcfg));
+        memcpy(&sudcfg_disk, &sudcfg, sizeof(sudcfg));
         configfile_save(cfg_filename, disk_config,
                         sizeof(disk_config) / sizeof(disk_config[0]),
                         CFGFILE_VERSION);

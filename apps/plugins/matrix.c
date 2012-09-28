@@ -85,7 +85,7 @@ static void matrix_init(void) {
     int i,j;
 
     /* Seed rand */
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
     /* Make the matrix */
     for (i = 0; i < ROWS; i++) {
@@ -97,16 +97,16 @@ static void matrix_init(void) {
 
     for (j = 0; j < COLS; j++) {
         /* Set up spaces[] array of how many spaces to skip */
-        spaces[j] = rb->rand() % ROWS + 1;
+        spaces[j] = rand() % ROWS + 1;
 
         /* And length of the stream */
-        length[j] = rb->rand() % (ROWS - 3) + 3;
+        length[j] = rand() % (ROWS - 3) + 3;
 
         /* Sentinel value for creation of new objects */
         matrix[1][j].val = 129;
 
         /* And set updates[] array for update speed. */
-        updates[j] = rb->rand() % 3 + 1;
+        updates[j] = rand() % 3 + 1;
     }
 }
 
@@ -116,13 +116,13 @@ static void matrix_blit_char(const int row, const int col, int cha)
         cha = 0;
 
     if (matrix[row][col].bold == 1) {
-        rb->lcd_bitmap_part(matrix_bold, cha*COL_W, 0, 
+        lcd_bitmap_part(matrix_bold, cha*COL_W, 0, 
                 STRIDE( SCREEN_MAIN, 
                         BMPWIDTH_matrix_bold, BMPHEIGHT_matrix_bold),
                 col*COL_W + LEFTMARGIN, row*COL_H + TOPMARGIN, COL_W, COL_H);
     }
     else {
-        rb->lcd_bitmap_part(matrix_normal, cha*COL_W, 0, 
+        lcd_bitmap_part(matrix_normal, cha*COL_W, 0, 
                 STRIDE( SCREEN_MAIN, 
                         BMPWIDTH_matrix_normal, BMPHEIGHT_matrix_normal),
                 col*COL_W + LEFTMARGIN, row*COL_H + TOPMARGIN, COL_W, COL_H);
@@ -147,11 +147,11 @@ static void matrix_loop(void)
                 matrix[0][j].val = -1;
                 spaces[j]--;
             } else if (matrix[0][j].val == -1 && matrix[1][j].val == 129){
-                length[j] = rb->rand() % (ROWS - 3) + 3;
-                matrix[0][j].val = rb->rand() % (MAXCHARS-1) + 1;
-                if (rb->rand() % 2 == 1)
+                length[j] = rand() % (ROWS - 3) + 3;
+                matrix[0][j].val = rand() % (MAXCHARS-1) + 1;
+                if (rand() % 2 == 1)
                     matrix[0][j].bold = 2;
-                spaces[j] = rb->rand() % ROWS + 1;
+                spaces[j] = rand() % ROWS + 1;
             }
             i = 0;
             y = 0;
@@ -165,7 +165,7 @@ static void matrix_loop(void)
                     i++;
 */
     /* A little more random now for spaces */
-               if (rb->rand() % randomness == 1){
+               if (rand() % randomness == 1){
                while (i <= ROWS && (matrix[i][j].val == 129 ||
                             matrix[i][j].val == -1)){
                     i++;
@@ -198,7 +198,7 @@ static void matrix_loop(void)
                     continue;
                 }
 
-                matrix[i][j].val = rb->rand() % (MAXCHARS-1) + 1;
+                matrix[i][j].val = rand() % (MAXCHARS-1) + 1;
 
                 if (matrix[i - 1][j].bold == 2) {
                     matrix[i - 1][j].bold = 1;
@@ -238,21 +238,21 @@ static void matrix_loop(void)
 
 enum plugin_status plugin_start(const void* parameter) {
     int button;
-    int sleep = SLEEP;
+    int sleep_time = SLEEP;
     bool frozen = false;
 
     (void)parameter;
 
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_clear_display();
+    lcd_set_background(LCD_BLACK);
+    lcd_set_backdrop(NULL);
+    lcd_clear_display();
     matrix_init();
 
     while (1) {
         if (!frozen) {
             matrix_loop();
-            rb->lcd_update();
-            rb->sleep(sleep);
+            lcd_update();
+            sleep(sleep_time);
         }
 
         button = pluginlib_getaction(frozen ? TIMEOUT_BLOCK : TIMEOUT_NOBLOCK,
@@ -269,16 +269,16 @@ enum plugin_status plugin_start(const void* parameter) {
             case MATRIX_SLEEP_MORE:
             case MATRIX_SLEEP_MORE_REPEAT:
                 /* Sleep longer */
-                sleep += SLEEP;
+                sleep_time += SLEEP;
                 break;
             case MATRIX_SLEEP_LESS:
             case MATRIX_SLEEP_LESS_REPEAT:
                 /* Sleep less */
-                sleep -= SLEEP;
-                if (sleep < 0) sleep = 0;
+                sleep_time -= SLEEP;
+                if (sleep_time < 0) sleep_time = 0;
                 break;
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                if (default_event_handler(button) == SYS_USB_CONNECTED) {
                     return PLUGIN_USB_CONNECTED;
                 }
                 break;

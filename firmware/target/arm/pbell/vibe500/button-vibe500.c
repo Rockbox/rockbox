@@ -25,6 +25,7 @@
 #include "backlight.h"
 #include "powermgmt.h"
 #include "synaptics-mep.h"
+#include "symbols.h"
 
 static int int_btn = BUTTON_NONE;
 static int old_pos = -1;
@@ -141,3 +142,4 @@ bool button_hold(void)
     /* GPIOK 01000000B - HOLD when bit not set */
     return (GPIOK_INPUT_VAL & 0x40)?false:true;
 }
+EXPORT_SYMBOL(button_hold);

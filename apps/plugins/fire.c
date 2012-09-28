@@ -116,7 +116,7 @@ static void color_palette_init(fb_data* palette)
         palette[i + 224]=LCD_RGBPACK(255, 255, 224 + i);
     }
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_pal256_update_pal(palette);
+    lcd_pal256_update_pal(palette);
 #endif
 }
 
@@ -128,7 +128,7 @@ static void tab_init_rand(unsigned char *tab, unsigned int tab_size,
     unsigned char *end = tab + tab_size;
 
     while(tab < end)
-        *tab++ = (unsigned char)rb->rand() % rand_max;
+        *tab++ = (unsigned char)rand() % rand_max;
 }
 
 struct fire {
@@ -148,7 +148,7 @@ static inline void fire_convolve(struct fire* fire)
     unsigned char *ptr, *end, *cool;
     unsigned int mult=fire->mult;
 
-    rb->yield();
+    yield();
     /* Convolve the pixels and handle cooling (to add nice shapes effects later) */
     cool = &fire->cooling_map[0][0];
     ptr = &fire->fire[0][0];
@@ -199,7 +199,7 @@ static inline void fire_convolve(struct fire* fire)
             default: /* We should never reach this */
                 break;
     }
-    rb->yield();
+    yield();
 }
 
 static void fire_generate_bottom_seed(struct fire* fire)
@@ -208,7 +208,7 @@ static void fire_generate_bottom_seed(struct fire* fire)
     ptr = &fire->fire[LCD_HEIGHT][0];
     end = ptr + FIRE_WIDTH;
     do{
-        *ptr++ = (MIN_FLAME_VALUE + rb->rand() % (256-MIN_FLAME_VALUE));
+        *ptr++ = (MIN_FLAME_VALUE + rand() % (256-MIN_FLAME_VALUE));
     }while (ptr < end);
 }
 
@@ -227,7 +227,7 @@ static void fire_init(struct fire* fire)
     fire->mult = 261;
     fire->flames_type=0;
     fire->moving=true;
-    rb->memset(&fire->fire[0][0], 0, sizeof(fire->fire));
+    memset(&fire->fire[0][0], 0, sizeof(fire->fire));
     tab_init_rand(&fire->cooling_map[0][0], LCD_HEIGHT*FIRE_WIDTH, COOL_MAX);
     fire_generate_bottom_seed(fire);
 }
@@ -235,7 +235,7 @@ static void fire_init(struct fire* fire)
 static inline void fire_draw(struct fire* fire)
 {
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_blit_pal256((unsigned char*)&fire->fire[0][0],0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
+    lcd_blit_pal256((unsigned char*)&fire->fire[0][0],0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
 #else
     int y;
     unsigned char *src = &fire->fire[0][0];
@@ -250,7 +250,7 @@ static inline void fire_draw(struct fire* fire)
 #ifndef HAVE_LCD_COLOR
         dest = draw_buffer;
 #else
-        dest = rb->lcd_framebuffer + LCD_WIDTH * y + FIRE_XPOS;
+        dest = lcd_framebuffer + LCD_WIDTH * y + FIRE_XPOS;
 #endif
         end = dest + FIRE_WIDTH;
 
@@ -262,7 +262,7 @@ static inline void fire_draw(struct fire* fire)
 #endif
     }
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_update();
+    lcd_update();
 #endif
 
 #endif
@@ -272,7 +272,7 @@ static void cleanup(void *parameter)
 {
     (void)parameter;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 #ifndef HAVE_LCD_COLOR
     grey_release();
@@ -289,11 +289,11 @@ static int init_grey(void)
     size_t gbuf_size = 0;
 
     /* get the remainder of the plugin buffer */
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *) plugin_get_buffer(&gbuf_size);
 
     if (!grey_init(gbuf, gbuf_size, GREY_ON_COP,
                    FIRE_WIDTH, LCD_HEIGHT, NULL)){
-        rb->splash(HZ, "not enough memory");
+        splash(HZ, "not enough memory");
         return PLUGIN_ERROR;
     }
     /* switch on greyscale overlay */
@@ -314,14 +314,14 @@ int main(void)
     color_palette_init(palette);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     fire_init(&fire);
     while (true){
         fire_step(&fire);
         fire_draw(&fire);
-        rb->yield();
+        yield();
 
         action = pluginlib_getaction(0, plugin_contexts,
                         ARRAYLEN(plugin_contexts));
@@ -349,7 +349,7 @@ int main(void)
                 break;
 
             default:
-                if (rb->default_event_handler_ex(action, cleanup, NULL)
+                if (default_event_handler_ex(action, cleanup, NULL)
                     == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
         }
@@ -364,19 +364,19 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)parameter;
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_PAL256);
+    lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
     ret = main();
     
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
+    lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
     return ret;

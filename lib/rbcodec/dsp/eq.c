@@ -30,6 +30,7 @@
 #include "pga.h"
 #include "replaygain.h"
 #include <string.h>
+#include "symbols.h"
 
 /**
  * Current setup is one lowshelf filters three peaking filters and one
@@ -131,6 +132,7 @@ void dsp_eq_enable(bool enable)
     if (enable && eq_data.enabled != 0)
         dsp_proc_activate(dsp, DSP_PROC_EQUALIZER, true);
 }
+EXPORT_SYMBOL(dsp_eq_enable);
 
 /* Apply EQ filters to those bands that have got it switched on. */
 static void eq_process(struct dsp_proc_entry *this,

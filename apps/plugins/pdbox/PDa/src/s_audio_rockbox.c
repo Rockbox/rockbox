@@ -54,17 +54,17 @@ void rockbox_open_audio(int rate)
     playing = false;
 
     /* Stop playing to reconfigure audio settings. */
-    rb->pcm_play_stop();
+    pcm_play_stop();
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
 
     /* Set sample rate of the audio buffer. */
-    rb->pcm_set_frequency(rate);
-    rb->pcm_apply_settings();
+    pcm_set_frequency(rate);
+    pcm_apply_settings();
 
     /* Initialize output buffer. */
     for(i = 0; i < OUTBUFSIZE; i++)
@@ -79,14 +79,14 @@ void rockbox_open_audio(int rate)
 void rockbox_close_audio(void)
 {
     /* Stop playback. */
-    rb->pcm_play_stop();
+    pcm_play_stop();
 
     /* Reset playing status. */
     playing = false;
 
     /* Restore default sampling rate. */
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
-    rb->pcm_apply_settings();
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_apply_settings();
 }
 
 /* Rockbox audio callback. */
@@ -183,7 +183,7 @@ int rockbox_send_dacs(void)
     if(!playing && outbuf_fill > 0)
     {
         /* Start playing. */
-        rb->pcm_play_data(pdbox_get_more, NULL, NULL, 0);
+        pcm_play_data(pdbox_get_more, NULL, NULL, 0);
 
         /* Set status flag. */
         playing = true;

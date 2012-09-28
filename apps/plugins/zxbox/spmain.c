@@ -141,10 +141,10 @@ static void set_keys(void){
                         "Map Up key", "Map Down key", "Map Left key",
                         "Map Right key", "Map Fire/Jump key");
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit) {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
@@ -193,23 +193,23 @@ static void select_keymap(void){
     MENUITEM_STRINGLIST(menu, "Predefined keymap", NULL,
                         "2w90z", "qaopS", "7658S");
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit) {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
             case 0:
-                rb->memcpy ( (void*)&settings.keymap[0] , (void*)"2w90z" , 5);
+                memcpy ( (void*)&settings.keymap[0] , (void*)"2w90z" , 5);
                 menu_quit=1;
                 break;
             case 1:
-                rb->memcpy ( (void*)&settings.keymap[0] , (void*)"qaopS" , 5);
+                memcpy ( (void*)&settings.keymap[0] , (void*)"qaopS" , 5);
                 menu_quit=1;
                 break;
             case 2:
-                rb->memcpy ( (void*)&settings.keymap[0] , (void*)"7658S" , 5);
+                memcpy ( (void*)&settings.keymap[0] , (void*)"7658S" , 5);
                 menu_quit=1;
                 break;
             default:
@@ -248,55 +248,55 @@ static void options_menu(void){
        };
 
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit) {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
             case 0:
                 new_setting=settings.kempston;
-                rb->set_option("Map Keys to kempston",&new_setting,INT, 
+                set_option("Map Keys to kempston",&new_setting,INT, 
                                no_yes, 2, NULL);
                 if (new_setting != settings.kempston )
                     settings.kempston=new_setting;
                 break;
             case 1:
                 new_setting = settings.showfps;
-                rb->set_option("Display Speed",&new_setting,INT, 
+                set_option("Display Speed",&new_setting,INT, 
                                no_yes, 2, NULL);
                 if (new_setting != settings.showfps )
                     settings.showfps=new_setting;
                 break;
             case 2:
                 new_setting = settings.invert_colors;
-                rb->set_option("Invert Colors",&new_setting,INT, 
+                set_option("Invert Colors",&new_setting,INT, 
                                no_yes, 2, NULL);
                 if (new_setting != settings.invert_colors )
                     settings.invert_colors=new_setting;
-                rb->splash(HZ, "Restart to see effect");
+                splash(HZ, "Restart to see effect");
                 break;
             case 3:
                 new_setting = settings.frameskip;
-                rb->set_option("Frameskip",&new_setting,INT, 
+                set_option("Frameskip",&new_setting,INT, 
                                frameskip_items, 10, NULL);
                 if (new_setting != settings.frameskip )
                     settings.frameskip=new_setting;
                 break;
             case 4:
                 new_setting = settings.sound;
-                rb->set_option("Sound",&new_setting,INT, 
+                set_option("Sound",&new_setting,INT, 
                                no_yes, 2, NULL);
                 if (new_setting != settings.sound )
                     settings.sound=new_setting;
 #if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
-                rb->pcm_play_stop();
+                pcm_play_stop();
 #endif
                 break;
             case 5:
                 new_setting = 9 - settings.volume;
-                rb->set_option("Volume",&new_setting,INT, 
+                set_option("Volume",&new_setting,INT, 
                                frameskip_items, 10, NULL);
                 new_setting = 9 - new_setting;
                 if (new_setting != settings.volume )
@@ -319,7 +319,7 @@ static void options_menu(void){
 static bool zxbox_menu(void)
 {
 #if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
-    rb->pcm_play_stop();
+    pcm_play_stop();
 #endif
     int selected=0;
     int result;
@@ -332,10 +332,10 @@ static bool zxbox_menu(void)
                         "Save Snapshot", "Toggle \"fast\" mode",
                         "Options", "Quit");
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit) {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
@@ -380,7 +380,7 @@ static bool zxbox_menu(void)
     }
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     int i;
@@ -430,11 +430,11 @@ static void run_singlemode(void)
       if(exit_requested){
           if (zxbox_menu()){
               /* Save the user settings if they have changed */
-                if (rb->memcmp(&settings,&old_settings,sizeof(settings))!=0) {
+                if (memcmp(&settings,&old_settings,sizeof(settings))!=0) {
 #ifdef USE_GREY
                     grey_show(false);
 #endif
-                    rb->splash(0, "Saving settings...");
+                    splash(0, "Saving settings...");
                     configfile_save(GLOBALCFG, config,sizeof(config)/sizeof(*config),SETTINGS_VERSION);
                 }
 
@@ -442,7 +442,7 @@ static void run_singlemode(void)
           }
           exit_requested = 0;
           video_frames=-1;
-          start_time = *rb->current_tick;
+          start_time = current_tick;
           sound_on = settings.sound;
           showframe = settings.frameskip+1;
           spti_reset();
@@ -498,7 +498,7 @@ static void init_load(const void *parameter)
   check_params(parameter);
   if(spcf_init_snapshot != NULL) {
 #ifndef USE_GREY
-    rb->splashf(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
+    splashf(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
 #endif
     
     load_snapshot_file_type(spcf_init_snapshot, spcf_init_snapshot_type);

@@ -25,10 +25,10 @@
 
 #define EXTERN static
 #define STATIC static
-#define memset rb->memset
-#define memcpy rb->memcpy
+#define memset memset
+#define memcpy memcpy
 #define printf DEBUGF
-#define rand rb->rand
+#define rand rand
 /* #define CHIP8_DEBUG */
 
 #if (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 64)
@@ -1302,7 +1302,7 @@ static void chip8_sound_on (void)
 {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (!is_playing)
-        rb->mp3_play_pause(true); /* kickoff audio */
+        mp3_play_pause(true); /* kickoff audio */
 #endif
 }
 
@@ -1313,7 +1313,7 @@ static void chip8_sound_off (void)
 { 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (!is_playing)
-        rb->mp3_play_pause(false); /* pause audio */
+        mp3_play_pause(false); /* pause audio */
 #endif
 }
 
@@ -1352,12 +1352,12 @@ static void chip8_update_display(void)
         }
     }
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) || (LCD_DEPTH >= 4)
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_mono_bitmap(lcd_framebuf[0], CHIP8_X, CHIP8_Y, CHIP8_LCDWIDTH,
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_mono_bitmap(lcd_framebuf[0], CHIP8_X, CHIP8_Y, CHIP8_LCDWIDTH,
                         CHIP8_HEIGHT);
-    rb->lcd_update();
+    lcd_update();
 #else
-    rb->lcd_blit_mono(lcd_framebuf[0], CHIP8_X, CHIP8_Y>>3, CHIP8_LCDWIDTH,
+    lcd_blit_mono(lcd_framebuf[0], CHIP8_X, CHIP8_Y>>3, CHIP8_LCDWIDTH,
                       CHIP8_HEIGHT>>3, CHIP8_LCDWIDTH);
 #endif
 }
@@ -1365,7 +1365,7 @@ static void chip8_update_display(void)
 static void chip8_keyboard(void)
 {
     int i;
-    int button = rb->button_get(false);
+    int button = button_get(false);
     switch (button)
     {
 #ifdef CHIP8_RC_OFF
@@ -1403,7 +1403,7 @@ static void chip8_keyboard(void)
 #endif
 
     default:
-        if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+        if (default_event_handler(button) == SYS_USB_CONNECTED)
             chip8_running = 2; /* indicates stopped because of USB */
         break;
     }
@@ -1417,7 +1417,6 @@ static void chip8_keyboard(void)
 /****************************************************************************/
 static void chip8_interrupt (void)
 {
-    unsigned long current_tick;
     unsigned long timer, runtime;
 
     chip8_update_display();
@@ -1425,14 +1424,13 @@ static void chip8_interrupt (void)
     cycles ++;
     runtime = cycles * HZ / 50;
     timer = starttimer + runtime;
-    current_tick = *rb->current_tick;
     if (TIME_AFTER(timer, current_tick))
     {
-        rb->sleep(timer - current_tick);
+        sleep(timer - current_tick);
     }
     else
     {
-        rb->yield();
+        yield();
     }
 }
 
@@ -1443,37 +1441,37 @@ static bool chip8_init(const char* file)
     int len;
     int i;
 
-    fd = rb->open(file, O_RDONLY);
+    fd = open(file, O_RDONLY);
     if (fd < 0) {
-        rb->lcd_puts(0, 6, "File Error.");
+        lcd_puts(0, 6, "File Error.");
         return false;
     }
-    numread = rb->read(fd, chip8_mem+0x200, 4096-0x200);
-    rb->close(fd);
+    numread = read(fd, chip8_mem+0x200, 4096-0x200);
+    close(fd);
     if (numread==-1) {
-        rb->lcd_puts(0, 6, "I/O Error.");
+        lcd_puts(0, 6, "I/O Error.");
         return false;
     }
 
     /* is there a c8k file (chip8 keys) ? */
     char c8kname[MAX_PATH];
-    rb->strcpy(c8kname, file);
+    strcpy(c8kname, file);
     for(i=0; i<16; i++) {
         chip8_virtual_keys[i] = 0;
         chip8_keymap[i] = i;
     }
-    len = rb->strlen(c8kname);
+    len = strlen(c8kname);
     c8kname[len-2] = '8';
     c8kname[len-1] = 'k';
-    fd = rb->open(c8kname, O_RDONLY);
+    fd = open(c8kname, O_RDONLY);
     if (fd >= 0) {
-        rb->lcd_puts(0, 6, "File&Keymap OK.");
-        numread = rb->read(fd, chip8_keymap, 16);
-        rb->close(fd);
+        lcd_puts(0, 6, "File&Keymap OK.");
+        numread = read(fd, chip8_keymap, 16);
+        close(fd);
     }
     else
     {
-        rb->lcd_puts(0, 6, "File OK.");
+        lcd_puts(0, 6, "File OK.");
     }
     for(i=0; i<16; i++) {
         if (chip8_keymap[i] >= '0'
@@ -1495,33 +1493,33 @@ static bool chip8_run(const char* file)
 {
     int ok;
 
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "SChip8 Emulator");
-    rb->lcd_puts(0, 1, "    (c) by     ");
-    rb->lcd_puts(0, 2, "Marcel de Kogel");
-    rb->lcd_puts(0, 3, "    Rockbox:   ");
-    rb->lcd_puts(0, 4, "  Blueloop/Fdy ");
-    rb->lcd_puts(0, 5, "---------------");
+    lcd_clear_display();
+    lcd_puts(0, 0, "SChip8 Emulator");
+    lcd_puts(0, 1, "    (c) by     ");
+    lcd_puts(0, 2, "Marcel de Kogel");
+    lcd_puts(0, 3, "    Rockbox:   ");
+    lcd_puts(0, 4, "  Blueloop/Fdy ");
+    lcd_puts(0, 5, "---------------");
     ok = chip8_init(file);
-    rb->lcd_update();
-    rb->sleep(HZ*1);
+    lcd_update();
+    sleep(HZ*1);
     if (!ok)
         return false;
-    rb->lcd_clear_display();
+    lcd_clear_display();
 #if (CHIP8_X > 0) && (CHIP8_Y > 0)
-    rb->lcd_drawrect(CHIP8_X-1,CHIP8_Y-1,CHIP8_LCDWIDTH+2,CHIP8_HEIGHT+2);
+    lcd_drawrect(CHIP8_X-1,CHIP8_Y-1,CHIP8_LCDWIDTH+2,CHIP8_HEIGHT+2);
 #endif
-    rb->lcd_update();
+    lcd_update();
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     /* init sound */
-    is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
+    is_playing = mp3_is_playing(); /* would we disturb playback? */
     if (!is_playing) /* no? then we can make sound */
     {   /* prepare */
-        rb->mp3_play_data(beep, sizeof(beep), callback);
+        mp3_play_data(beep, sizeof(beep), callback);
     }
 #endif
-    starttimer = *rb->current_tick;
+    starttimer = current_tick;
 
     chip8_iperiod=15;
     cycles = 0;
@@ -1530,13 +1528,13 @@ static bool chip8_run(const char* file)
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (!is_playing)
     {   /* stop it if we used audio */
-        rb->mp3_play_stop(); /* Stop audio playback */
+        mp3_play_stop(); /* Stop audio playback */
     }
 #endif
 
     if (chip8_running == 3) {
         /* unsupported instruction */
-        rb->splash(HZ, "Error: Unsupported"
+        splash(HZ, "Error: Unsupported"
 #ifndef CHIP8_SUPER
         " CHIP-8 instruction. (maybe S-CHIP)"
 #else
@@ -1558,7 +1556,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter == NULL)
     {
-        rb->splash(HZ, "Play a .ch8 file!");
+        splash(HZ, "Play a .ch8 file!");
         return PLUGIN_ERROR;
     }
     else

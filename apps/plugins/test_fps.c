@@ -48,31 +48,31 @@ static void log_init(void)
 {
     int h;
 
-    rb->lcd_getstringsize("A", NULL, &h);
+    lcd_getstringsize("A", NULL, &h);
     max_line = LCD_HEIGHT / h;
     line = 0;
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_getstringsize("A", NULL, &h);
+    lcd_remote_getstringsize("A", NULL, &h);
     remote_max_line = LCD_REMOTE_HEIGHT / h;
     remote_line = 0;
-    rb->lcd_remote_clear_display();
-    rb->lcd_remote_update();
+    lcd_remote_clear_display();
+    lcd_remote_update();
 #endif
 }
 
 static void log_text(char *text)
 {
-    rb->lcd_puts(0, line, text);
+    lcd_puts(0, line, text);
     if (++line >= max_line)
         line = 0;
-    rb->lcd_update();
+    lcd_update();
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_puts(0, remote_line, text);
+    lcd_remote_puts(0, remote_line, text);
     if (++remote_line >= remote_max_line)
         remote_line = 0;
-    rb->lcd_remote_update();
+    lcd_remote_update();
 #endif
 }
 
@@ -98,28 +98,28 @@ static void time_main_update(void)
 
     /* Test 1: full LCD update */
     frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
+    sleep(0); /* sync to tick */
+    time_start = current_tick;
+    while((time_end = current_tick) - time_start < DURATION)
     {
-        rb->lcd_update();
+        lcd_update();
         frame_count++;
     }
     fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+    snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
     log_text(str);
 
     /* Test 2: quarter LCD update */
     frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
+    sleep(0); /* sync to tick */
+    time_start = current_tick;
+    while((time_end = current_tick) - time_start < DURATION)
     {
-        rb->lcd_update_rect(part14_x, part14_y, part14_w, part14_h);
+        lcd_update_rect(part14_x, part14_y, part14_w, part14_h);
         frame_count++;
     }
     fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
+    snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
     log_text(str);
 }
 
@@ -155,8 +155,8 @@ static void make_gradient_rect(int width, int height)
         vline[x] = (x << 8) / width;
     for (y = 0; y < height; y++)
     {
-        rb->memset(udata[y], (y << 8) / height, width);
-        rb->memcpy(vdata[y], vline, width);
+        memset(udata[y], (y << 8) / height, width);
+        memcpy(vdata[y], vline, width);
     }
 }
 
@@ -175,38 +175,38 @@ static void time_main_yuv(void)
     
     log_text("Main LCD YUV");
 
-    rb->memset(ydata, 128, sizeof(ydata)); /* medium grey */
+    memset(ydata, 128, sizeof(ydata)); /* medium grey */
 
     /* Test 1: full LCD update */
     make_gradient_rect(YUV_WIDTH, YUV_HEIGHT);
 
     frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
+    sleep(0); /* sync to tick */
+    time_start = current_tick;
+    while((time_end = current_tick) - time_start < DURATION)
     {
-        rb->lcd_blit_yuv(yuvbuf, 0, 0, YUV_WIDTH,
+        lcd_blit_yuv(yuvbuf, 0, 0, YUV_WIDTH,
                          0, 0, YUV_WIDTH, YUV_HEIGHT);
         frame_count++;
     }
     fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+    snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
     log_text(str);
 
     /* Test 2: quarter LCD update */
     make_gradient_rect(YUV_WIDTH/2, YUV_HEIGHT/2);
 
     frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
+    sleep(0); /* sync to tick */
+    time_start = current_tick;
+    while((time_end = current_tick) - time_start < DURATION)
     {
-        rb->lcd_blit_yuv(yuvbuf, 0, 0, YUV_WIDTH,
+        lcd_blit_yuv(yuvbuf, 0, 0, YUV_WIDTH,
                          part14_x, part14_y, part14_w, part14_h);
         frame_count++;
     }
     fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
+    snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
     log_text(str);
 }
 #endif
@@ -229,28 +229,28 @@ static void time_remote_update(void)
 
     /* Test 1: full LCD update */
     frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
+    sleep(0); /* sync to tick */
+    time_start = current_tick;
+    while((time_end = current_tick) - time_start < DURATION)
     {
-        rb->lcd_remote_update();
+        lcd_remote_update();
         frame_count++;
     }
     fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+    snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
     log_text(str);
 
     /* Test 2: quarter LCD update */
     frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
+    sleep(0); /* sync to tick */
+    time_start = current_tick;
+    while((time_end = current_tick) - time_start < DURATION)
     {
-        rb->lcd_remote_update_rect(part14_x, part14_y, part14_w, part14_h);
+        lcd_remote_update_rect(part14_x, part14_y, part14_w, part14_h);
         frame_count++;
     }
     fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
+    snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
     log_text(str);
 }
 #endif
@@ -268,7 +268,7 @@ static void make_grey_rect(int width, int height)
     for (x = 0; x < width; x++)
         vline[x] = (x << 8) / width;
     for (y = 0; y < height; y++)
-        rb->memcpy(greydata[y], vline, width);
+        memcpy(greydata[y], vline, width);
 }
 
 static void time_greyscale(void)
@@ -280,13 +280,13 @@ static void time_greyscale(void)
     int frames_1, frames_2;
     int fps, load;
     size_t gbuf_size;
-    unsigned char *gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    unsigned char *gbuf = (unsigned char *) plugin_get_buffer(&gbuf_size);
 
 #if NUM_CORES > 1
     int i;
     for (i = 0; i < NUM_CORES; i++)
     {
-        rb->snprintf(str, sizeof(str), "Greyscale (%s)",
+        snprintf(str, sizeof(str), "Greyscale (%s)",
                      (i > 0) ? "COP" : "CPU");
         log_text(str);
 #else
@@ -305,9 +305,9 @@ static void time_greyscale(void)
 
         /* Test 1 - greyscale overlay not yet enabled */
         frames_1 = 0;
-        rb->sleep(0); /* sync to tick */
-        time_start = *rb->current_tick;
-        while((time_end = *rb->current_tick) - time_start < DURATION)
+        sleep(0); /* sync to tick */
+        time_start = current_tick;
+        while((time_end = current_tick) - time_start < DURATION)
         {
             grey_ub_gray_bitmap(greydata[0], 0, 0, LCD_WIDTH, LCD_HEIGHT);
             frames_1++;
@@ -317,9 +317,9 @@ static void time_greyscale(void)
         /* Test 2 - greyscale overlay enabled */
         grey_show(true);
         frames_2 = 0;
-        rb->sleep(0); /* sync to tick */
-        time_start = *rb->current_tick;
-        while((time_end = *rb->current_tick) - time_start < DURATION)
+        sleep(0); /* sync to tick */
+        time_start = current_tick;
+        while((time_end = current_tick) - time_start < DURATION)
         {
             grey_ub_gray_bitmap(greydata[0], 0, 0, LCD_WIDTH, LCD_HEIGHT);
             frames_2++;
@@ -329,12 +329,12 @@ static void time_greyscale(void)
         grey_release();
         fps = calc_tenth_fps(frames_2, time_2);
         load = 100 - (100 * frames_2 * time_1) / (frames_1 * time_2);
-        rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
+        snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
         log_text(str);
 
         if (load > 0 && load < 100)
         {
-            rb->snprintf(str, sizeof(str), "CPU load: %d%%", load);
+            snprintf(str, sizeof(str), "CPU load: %d%%", load);
             log_text(str);
         }
         else
@@ -352,8 +352,8 @@ void plugin_quit(void)
             /* .vp runtime initialized, rest false/NULL */
     }};
     struct viewport *vp = &button[0].vp;
-    struct screen *lcd = rb->screens[SCREEN_MAIN];
-    rb->viewport_set_defaults(vp, SCREEN_MAIN);
+    struct screen *lcd = screens[SCREEN_MAIN];
+    viewport_set_defaults(vp, SCREEN_MAIN);
     const int border = 10;
     const int height = 50;
 
@@ -366,7 +366,7 @@ void plugin_quit(void)
 
     touchbutton_draw(button, ARRAYLEN(button));
     lcd->update_viewport();
-    if (rb->touchscreen_get_mode() == TOUCHSCREEN_POINT)
+    if (touchscreen_get_mode() == TOUCHSCREEN_POINT)
     {
         while(touchbutton_get(button, ARRAYLEN(button)) != ACTION_STD_OK);
     }
@@ -394,17 +394,17 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     
 #ifdef HAVE_TOUCHSCREEN
-    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+    touchscreen_set_mode(global_settings.touch_mode);
 #endif
 
     log_init();
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
+    cpu_freq = *cpu_frequency; /* remember CPU frequency */
 #endif
     backlight_ignore_timeout();
 
     time_main_update();
-    rb->sleep(HZ);
+    sleep(HZ);
 #if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
     time_main_yuv();
 #endif
@@ -416,10 +416,10 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    if (*rb->cpu_frequency != cpu_freq)
-        rb->snprintf(str, sizeof(str), "CPU clock changed!");
+    if (*cpu_frequency != cpu_freq)
+        snprintf(str, sizeof(str), "CPU clock changed!");
     else
-        rb->snprintf(str, sizeof(str), "CPU: %d MHz",
+        snprintf(str, sizeof(str), "CPU: %d MHz",
                      (cpu_freq + 500000) / 1000000);
     log_text(str);
 #endif

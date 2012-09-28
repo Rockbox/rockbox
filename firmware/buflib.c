@@ -31,6 +31,7 @@
 #include "string-extra.h" /* strlcpy() */
 #include "debug.h"
 #include "system.h" /* for ALIGN_*() */
+#include "symbols.h"
 
 /* The main goal of this design is fast fetching of the pointer for a handle.
  * For that reason, the handles are stored in a table at the end of the buffer
@@ -116,6 +117,7 @@ buflib_init(struct buflib_context *ctx, void *buf, size_t size)
     BDEBUGF("buflib initialized with %lu.%2lu kiB",
             (unsigned long)size / 1024, ((unsigned long)size%1000)/10);
 }
+EXPORT_SYMBOL(buflib_init);
 
 /* Allocate a new handle, returning 0 on failure */
 static inline
@@ -421,6 +423,7 @@ buflib_buffer_out(struct buflib_context *ctx, size_t *size)
     buflib_buffer_shift(ctx, avail);
     return ret;
 }
+EXPORT_SYMBOL(buflib_buffer_out);
 
 /* Shift buffered items down by size bytes */
 void
@@ -429,6 +432,7 @@ buflib_buffer_in(struct buflib_context *ctx, int size)
     size /= sizeof(union buflib_data);
     buflib_buffer_shift(ctx, -size);
 }
+EXPORT_SYMBOL(buflib_buffer_in);
 
 /* Allocate a buffer of size bytes, returning a handle for it */
 int
@@ -436,6 +440,7 @@ buflib_alloc(struct buflib_context *ctx, size_t size)
 {
     return buflib_alloc_ex(ctx, size, "<anonymous>", NULL);
 }
+EXPORT_SYMBOL(buflib_alloc);
 
 /* Allocate a buffer of size bytes, returning a handle for it.
  *
@@ -640,6 +645,7 @@ buflib_free(struct buflib_context *ctx, int handle_num)
 
     return 0; /* unconditionally */
 }
+EXPORT_SYMBOL(buflib_free);
 
 static size_t
 free_space_at_end(struct buflib_context* ctx)

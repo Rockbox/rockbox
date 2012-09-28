@@ -2141,6 +2141,42 @@ static bool dbg_pic(void)
 }
 #endif
 
+extern unsigned char __core_symarray_start[];
+extern unsigned char __core_symarray_end[];
+
+#include "symbols.h"
+static bool dbg_core_symbols(void)
+{
+    struct symtab_item_t *sym_item;
+    int n = (__core_symarray_end - __core_symarray_start)/sizeof(struct symtab_item_t);
+    int line = 0;
+    int i;
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    lcd_putsf(0, line++, "__core_symarray_start: 0x%0x", (unsigned int)__core_symarray_start);
+    lcd_putsf(0, line++, "__core_symarray_end: 0x%0x", (unsigned int)__core_symarray_end);
+    lcd_putsf(0, line++, "no of symbols: %d", n);
+    lcd_update();
+
+    while(1)
+    {
+        for (i = 0; i<n; i++)
+        {
+            sym_item = ((struct symtab_item_t *)__core_symarray_start) + i;
+            lcd_putsf(0, line++, "%s : 0x%0x", sym_item->name, (unsigned int)sym_item->addr);
+            lcd_update();
+        }
+
+        switch(button_get_w_tmo(HZ/20))
+        {
+            case BUTTON_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+    }
+
+}
 
 /****** The menu *********/
 static const struct {
@@ -2248,6 +2284,7 @@ static const struct {
      && !defined(IPOD_MINI) && !defined(SIMULATOR))
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
+        {"Core symbols", dbg_core_symbols },
 };
 
 static int menu_action_callback(int btn, struct gui_synclist *lists)

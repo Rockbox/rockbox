@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "pcm_sampr.h"
+#include "symbols.h"
 
 /* Master list of all "standard" rates supported. */
 const unsigned long audio_master_sampr_list[SAMPR_NUM_FREQ] =
@@ -56,6 +57,7 @@ const unsigned long hw_freq_sampr[HW_NUM_FREQ] =
     HW_HAVE_11_([HW_FREQ_11] = SAMPR_11,)
     HW_HAVE_8_( [HW_FREQ_8 ] = SAMPR_8 ,)
 };
+EXPORT_SYMBOL(hw_freq_sampr);
 
 #ifdef HAVE_RECORDING
 /* List of recording supported sample rates (set or subset of master list) */
@@ -75,4 +77,5 @@ const unsigned long rec_freq_sampr[REC_NUM_FREQ] =
     REC_HAVE_11_([REC_FREQ_11] = SAMPR_11,)
     REC_HAVE_8_( [REC_FREQ_8 ] = SAMPR_8 ,)
 };
+EXPORT_SYMBOL(rec_freq_sampr);
 #endif /* HAVE_RECORDING */

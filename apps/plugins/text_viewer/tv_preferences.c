@@ -62,9 +62,9 @@ static bool tv_notify_change_preferences(const struct tv_preferences *oldp)
         (oldp->header_mode          != preferences->header_mode)          ||
         (oldp->footer_mode          != preferences->footer_mode)          ||
         (oldp->statusbar            != preferences->statusbar)            ||
-        (rb->strcmp(oldp->font_name, preferences->font_name))             ||
+        (strcmp(oldp->font_name, preferences->font_name))             ||
 #endif
-        (rb->strcmp(oldp->file_name, preferences->file_name)))
+        (strcmp(oldp->file_name, preferences->file_name)))
     {
         /* callback functions are called as FILO */
         for (i = listner_count - 1; i >= 0; i--)
@@ -84,18 +84,18 @@ bool tv_set_preferences(const struct tv_preferences *new_prefs)
         tv_copy_preferences((oldp = &old_prefs));
     is_initialized = true;
 
-    rb->memcpy(&prefs, new_prefs, sizeof(struct tv_preferences));
+    memcpy(&prefs, new_prefs, sizeof(struct tv_preferences));
     return tv_notify_change_preferences(oldp);
 }
 
 void tv_copy_preferences(struct tv_preferences *copy_prefs)
 {
-    rb->memcpy(copy_prefs, preferences, sizeof(struct tv_preferences));
+    memcpy(copy_prefs, preferences, sizeof(struct tv_preferences));
 }
 
 bool tv_compare_preferences(struct tv_preferences *copy_prefs)
 {
-    return rb->memcmp(copy_prefs, preferences, sizeof(struct tv_preferences)) != 0;
+    return memcmp(copy_prefs, preferences, sizeof(struct tv_preferences)) != 0;
 }
 
 void tv_set_default_preferences(struct tv_preferences *p)
@@ -113,8 +113,8 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->header_mode = true;
     p->footer_mode = true;
     p->statusbar   = true;
-    rb->strlcpy(p->font_name, rb->global_settings->font_file, MAX_PATH);
-    p->font_id = rb->global_status->font_id[SCREEN_MAIN];
+    strlcpy(p->font_name, global_settings.font_file, MAX_PATH);
+    p->font_id = global_status.font_id[SCREEN_MAIN];
 #else
     p->header_mode = false;
     p->footer_mode = false;
@@ -124,7 +124,7 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->narrow_mode = NM_PAGE;
     p->indent_spaces = 2;
     /* Set codepage to system default */
-    p->encoding = rb->global_settings->default_codepage;
+    p->encoding = global_settings.default_codepage;
     p->file_name[0] = '\0';
 }
 

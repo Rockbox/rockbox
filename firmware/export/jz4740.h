@@ -40,6 +40,10 @@
 #ifndef __JZ4740_H__
 #define __JZ4740_H__
 
+/* The bit of IRAM that is available is used in the core */
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 #ifndef __ASSEMBLY__
 
 #define REG8(addr)     (*(volatile unsigned char  *)(addr))
@@ -3372,6 +3376,7 @@ do {                        \
 #endif
 #define JZ_EXTAL2       32768 /* RTC clock */
 
+#if 0
 /* PLL output frequency */
 static __inline__ unsigned int __cpm_get_pllout(void)
 {
@@ -3512,7 +3517,7 @@ static __inline__ void __cpm_select_msc_hs_clk(int sd)
 
     REG_CPM_MSCCDR = div - 1;
 }
-
+#endif
 /***************************************************************************
  * TCU
  ***************************************************************************/
@@ -3780,6 +3785,7 @@ do {                                \
 #define __dmac_channel_irq_detected(n)  ( REG_DMAC_DMAIPR & (1 << (n)) )
 #define __dmac_channel_ack_irq(n)       ( REG_DMAC_DMAIPR &= ~(1 << (n)) )
 
+#if 0
 static __inline__ int __dmac_get_irq(void)
 {
     int i;
@@ -3788,7 +3794,7 @@ static __inline__ int __dmac_get_irq(void)
             return i;
     return -1;
 }
-
+#endif
 
 /***************************************************************************
  * AIC (AC'97 & I2S Controller)
@@ -4986,6 +4992,7 @@ do{                                 \
 #define IPU_V_BASE  0xB3080000
 #define IPU__SIZE   0x00001000
 
+#if 0
 struct ipu_module
 {
     unsigned int reg_ctrl;             // 0x0
@@ -5022,7 +5029,7 @@ struct Ration2m
     float ratio;
     int n, m;
 };
-
+#endif
 
 // Register offset
 #define  REG_CTRL           0x0

@@ -288,17 +288,17 @@ static struct configdata config[] = {
 
 static void snake_die (void)
 {
-    rb->lcd_clear_display();
-    rb->lcd_puts(0,0,"Oops...");
-    rb->lcd_putsf(0,1,"Your score: %d",score);
+    lcd_clear_display();
+    lcd_puts(0,0,"Oops...");
+    lcd_putsf(0,1,"Your score: %d",score);
     if (highscore_update(score, level, "", highscores, NUM_SCORES) == 0) {
-        rb->lcd_puts(0,2,"New High Score!");
+        lcd_puts(0,2,"New High Score!");
     }
     else {
-        rb->lcd_putsf(0,2,"High Score: %d", highscores[0].score);
+        lcd_putsf(0,2,"High Score: %d", highscores[0].score);
     }
-    rb->lcd_update();
-    rb->sleep(3*HZ);
+    lcd_update();
+    sleep(3*HZ);
     dead=true;
 }
 
@@ -342,29 +342,29 @@ static void snake_move_head (short x, short y)
     if (dead)
         return;
     board[x][y]=1;
-    rb->lcd_fillrect(x*4,y*4,4,4);
+    lcd_fillrect(x*4,y*4,4,4);
 }
 
 static void snake_redraw (void)
 {
     short x,y;
-    rb->lcd_clear_display();
+    lcd_clear_display();
     for (x=0; x<BOARD_WIDTH; x++) {
         for (y=0; y<BOARD_HEIGHT; y++) {
             switch (board[x][y]) {
                 case -1:
-                    rb->lcd_fillrect((x*4)+1,y*4,2,4);
-                    rb->lcd_fillrect(x*4,(y*4)+1,4,2);
+                    lcd_fillrect((x*4)+1,y*4,2,4);
+                    lcd_fillrect(x*4,(y*4)+1,4,2);
                     break;
                 case 0:
                     break;
                 default:
-                    rb->lcd_fillrect(x*4,y*4,4,4);
+                    lcd_fillrect(x*4,y*4,4,4);
                     break;
             }
         }
     }
-    rb->lcd_update();
+    lcd_update();
 }
 
 static void snake_frame (void)
@@ -389,9 +389,9 @@ static void snake_frame (void)
                 default:
                     if (board[x][y]==snakelength) {
                         board[x][y]=0;
-                        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                        rb->lcd_fillrect(x*4,y*4,4,4);
-                        rb->lcd_set_drawmode(DRMODE_SOLID);
+                        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                        lcd_fillrect(x*4,y*4,4,4);
+                        lcd_set_drawmode(DRMODE_SOLID);
                     }
                     else
                         board[x][y]++;
@@ -399,12 +399,12 @@ static void snake_frame (void)
             }
         }
     }
-    rb->lcd_update();
+    lcd_update();
 }
 
 static void snake_game_init(void) {
     short x,y;
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     for (x=0; x<BOARD_WIDTH; x++) {
         for (y=0; y<BOARD_HEIGHT; y++) {
@@ -438,10 +438,10 @@ static int snake_game_menu(void)
                         "Quit");
     int selected = 0;
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (true) {
-        switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
+        switch (do_menu(&main_menu, &selected, NULL, false)) {
             case 0:
                 snake_redraw();
                 return 0;
@@ -449,12 +449,12 @@ static int snake_game_menu(void)
                 snake_game_init();
                 return 0;
             case 2:
-                rb->set_int("Snake Speed", "", UNIT_INT, &level,
+                set_int("Snake Speed", "", UNIT_INT, &level,
                             NULL, 1, 1, 9, NULL);
                 break;
             case 3:
                 highscore_show(-1, highscores, NUM_SCORES, true);
-                rb->lcd_setfont(FONT_UI);
+                lcd_setfont(FONT_UI);
                 break;
             case 4:
                 playback_control(NULL);
@@ -487,22 +487,22 @@ static int snake_game_loop (void) {
             }
             if (!apple) {
                 do {
-                    x=rb->rand() % BOARD_WIDTH;
-                    y=rb->rand() % BOARD_HEIGHT;
+                    x=rand() % BOARD_WIDTH;
+                    y=rand() % BOARD_HEIGHT;
                 } while (board[x][y]);
                 apple=true;
                 board[x][y]=-1;
-                rb->lcd_fillrect((x*4)+1,y*4,2,4);
-                rb->lcd_fillrect(x*4,(y*4)+1,4,2);
+                lcd_fillrect((x*4)+1,y*4,2,4);
+                lcd_fillrect(x*4,(y*4)+1,4,2);
             }
 
-            rb->sleep(HZ/level);
+            sleep(HZ/level);
         }
 
-        button=rb->button_get(false);
+        button=button_get(false);
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold() && !pause)
+        if (button_hold() && !pause)
             button = SNAKE_PLAYPAUSE;
 #endif
         switch (button) {
@@ -521,7 +521,7 @@ static int snake_game_loop (void) {
             case SNAKE_PLAYPAUSE:
                 pause = !pause;
                 if (pause)
-                    rb->splash (HZ, "Paused");
+                    splash (HZ, "Paused");
                 else
                     snake_redraw();
                 break;
@@ -532,7 +532,7 @@ static int snake_game_loop (void) {
                 return 0;
                 break;
             default:
-                if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
+                if (default_event_handler (button) == SYS_USB_CONNECTED)
                     return 1;
                 break;
         }
@@ -545,7 +545,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     configfile_load(CONFIG_FILE_NAME, config, 1, 0);
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
-    rb->lcd_clear_display();
+    lcd_clear_display();
     ingame = false;
     while(snake_game_loop() == 0)
         ;

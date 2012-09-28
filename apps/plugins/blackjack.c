@@ -606,7 +606,7 @@ static struct highscore highscores[NUM_SCORES];
 ******************************************************************************/
 static void blackjack_init(struct game_context* bj) {
     /* seed the rand generator */
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
     /* reset card positions */
     dealer_x = 4;
@@ -637,35 +637,35 @@ static void blackjack_drawtable(struct game_context* bj) {
     char str[10];
 
 #if LCD_HEIGHT <= 64
-    rb->lcd_getstringsize("Bet", &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, 2*h + 1, "Bet");
-    rb->snprintf(str, 9, "$%d", bj->current_bet);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, 3*h + 1, str);
+    lcd_getstringsize("Bet", &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, 2*h + 1, "Bet");
+    snprintf(str, 9, "$%d", bj->current_bet);
+    lcd_getstringsize(str, &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, 3*h + 1, str);
     y_loc = LCD_HEIGHT/2;
 #else
-    rb->lcd_getstringsize("Bet", &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, 5*h / 2, "Bet");
-    rb->snprintf(str, 9, "$%d", bj->current_bet);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, 7*h / 2, str);
-    rb->lcd_hline(0, LCD_WIDTH, LCD_HEIGHT/2);
+    lcd_getstringsize("Bet", &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, 5*h / 2, "Bet");
+    snprintf(str, 9, "$%d", bj->current_bet);
+    lcd_getstringsize(str, &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, 7*h / 2, str);
+    lcd_hline(0, LCD_WIDTH, LCD_HEIGHT/2);
     y_loc = LCD_HEIGHT/2 + h;
 #endif
 
-    rb->lcd_putsxy(0,0, "Dealer");
-    rb->lcd_getstringsize("Player", &w, &h);
-    rb->lcd_putsxy(0, y_loc, "Player");
-    rb->lcd_getstringsize("Total", &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, y_loc, "Total");
-    rb->lcd_getstringsize("Money", &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, 0, "Money");
-    rb->snprintf(str, 9, "$%d", bj->player_money - bj->current_bet);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, h + 1, str);
-    rb->snprintf(str, 3, "%d", bj->player_total);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH - w, y_loc + h, str);
+    lcd_putsxy(0,0, "Dealer");
+    lcd_getstringsize("Player", &w, &h);
+    lcd_putsxy(0, y_loc, "Player");
+    lcd_getstringsize("Total", &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, y_loc, "Total");
+    lcd_getstringsize("Money", &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, 0, "Money");
+    snprintf(str, 9, "$%d", bj->player_money - bj->current_bet);
+    lcd_getstringsize(str, &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, h + 1, str);
+    snprintf(str, 3, "%d", bj->player_total);
+    lcd_getstringsize(str, &w, &h);
+    lcd_putsxy(LCD_WIDTH - w, y_loc + h, str);
 }
 
 /*****************************************************************************
@@ -689,36 +689,36 @@ static unsigned int find_value(unsigned int number) {
 static void draw_card(struct card temp_card, bool shown,
                       unsigned int x, unsigned int y) {
     if(shown)
-        rb->lcd_bitmap_part(card_deck, CARD_WIDTH*temp_card.num,
+        lcd_bitmap_part(card_deck, CARD_WIDTH*temp_card.num,
                             CARD_HEIGHT*temp_card.suit,
                             STRIDE( SCREEN_MAIN, BMPWIDTH_card_deck,
                                     BMPHEIGHT_card_deck),
                             x+1, y+1, CARD_WIDTH, CARD_HEIGHT);
     else
-        rb->lcd_bitmap(card_back, x+1, y+1,CARD_WIDTH, CARD_HEIGHT);
+        lcd_bitmap(card_back, x+1, y+1,CARD_WIDTH, CARD_HEIGHT);
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 #endif
 
     /* Print outlines */
 #if CARD_WIDTH >= 26
-    rb->lcd_hline(x+2, x+CARD_WIDTH-1, y);
-    rb->lcd_hline(x+2, x+CARD_WIDTH-1, y+CARD_HEIGHT+1);
-    rb->lcd_vline(x, y+2, y+CARD_HEIGHT-3);
-    rb->lcd_vline(x+CARD_WIDTH+1, y+2, y+CARD_HEIGHT-1);
-    rb->lcd_drawpixel(x+1, y+1);
-    rb->lcd_drawpixel(x+1, y+CARD_HEIGHT);
-    rb->lcd_drawpixel(x+CARD_WIDTH, y+1);
-    rb->lcd_drawpixel(x+CARD_WIDTH, y+CARD_HEIGHT);
+    lcd_hline(x+2, x+CARD_WIDTH-1, y);
+    lcd_hline(x+2, x+CARD_WIDTH-1, y+CARD_HEIGHT+1);
+    lcd_vline(x, y+2, y+CARD_HEIGHT-3);
+    lcd_vline(x+CARD_WIDTH+1, y+2, y+CARD_HEIGHT-1);
+    lcd_drawpixel(x+1, y+1);
+    lcd_drawpixel(x+1, y+CARD_HEIGHT);
+    lcd_drawpixel(x+CARD_WIDTH, y+1);
+    lcd_drawpixel(x+CARD_WIDTH, y+CARD_HEIGHT);
 #else
-    rb->lcd_hline(x+1, x+CARD_WIDTH, y);
-    rb->lcd_hline(x+1, x+CARD_WIDTH, y+CARD_HEIGHT+1);
-    rb->lcd_vline(x, y+1, y+CARD_HEIGHT);
-    rb->lcd_vline(x+CARD_WIDTH+1, y+1, y+CARD_HEIGHT);
+    lcd_hline(x+1, x+CARD_WIDTH, y);
+    lcd_hline(x+1, x+CARD_WIDTH, y+CARD_HEIGHT+1);
+    lcd_vline(x, y+1, y+CARD_HEIGHT);
+    lcd_vline(x+CARD_WIDTH+1, y+1, y+CARD_HEIGHT);
 #endif
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(FG_COLOR);
+    lcd_set_foreground(FG_COLOR);
 #endif
 }
 
@@ -727,8 +727,8 @@ static void draw_card(struct card temp_card, bool shown,
 ******************************************************************************/
 static struct card new_card(void) {
     struct card new_card;
-    new_card.suit = rb->rand()%4; /* Random number 0-3 */
-    new_card.num = rb->rand()%13; /* Random number 0-12 */
+    new_card.suit = rand()%4; /* Random number 0-3 */
+    new_card.num = rand()%13; /* Random number 0-12 */
     new_card.value = find_value(new_card.num);
     new_card.is_soft_ace = (new_card.num == 0);
     return new_card;
@@ -764,7 +764,7 @@ static void deal_init_cards(struct game_context* bj) {
 ******************************************************************************/
 static void redraw_board(struct game_context* bj) {
     unsigned int i, n, upper_bound;
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     blackjack_drawtable(bj);
     player_x = 4;
@@ -806,13 +806,13 @@ static void redraw_board(struct game_context* bj) {
 static void update_total(struct game_context* bj) {
     char total[3];
     unsigned int w, h;
-    rb->snprintf(total, 3, "%d", bj->player_total);
-    rb->lcd_getstringsize(total, &w, &h);
+    snprintf(total, 3, "%d", bj->player_total);
+    lcd_getstringsize(total, &w, &h);
 #if LCD_HEIGHT > 64
     h *= 2;
 #endif
-    rb->lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 + h, total);
-    rb->lcd_update_rect(LCD_WIDTH - w, LCD_HEIGHT/2 + h, w, h);
+    lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 + h, total);
+    lcd_update_rect(LCD_WIDTH - w, LCD_HEIGHT/2 + h, w, h);
 }
 
 
@@ -898,38 +898,38 @@ static void finish_game(struct game_context* bj) {
     rValue = check_totals(bj);
 
     if (rValue == 0) {
-        rb->snprintf(str, sizeof(str), " Bust! ");
+        snprintf(str, sizeof(str), " Bust! ");
         bj->player_money -= bj->current_bet;
     }
     else if (rValue == 1) {
-        rb->snprintf(str, sizeof(str), " Sorry, you lost. ");
+        snprintf(str, sizeof(str), " Sorry, you lost. ");
         bj->player_money -= bj->current_bet;
     }
     else if (rValue == 2) {
-        rb->snprintf(str, sizeof(str), " Push ");
+        snprintf(str, sizeof(str), " Push ");
     }
     else if (rValue == 3) {
-        rb->snprintf(str, sizeof(str), " You won! ");
+        snprintf(str, sizeof(str), " You won! ");
         bj->player_money+= bj->current_bet;
     }
     else {
-        rb->snprintf(str, sizeof(str), " Blackjack! ");
+        snprintf(str, sizeof(str), " Blackjack! ");
         bj->player_money += bj->current_bet * 3 / 2;
     }
-    rb->lcd_getstringsize(str, &w, &h);
+    lcd_getstringsize(str, &w, &h);
 
 #if LCD_HEIGHT <= 64
-    rb->lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, LCD_HEIGHT/2, LCD_WIDTH, LCD_HEIGHT/2);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + h, str);
-    rb->snprintf(str, 12, "You have %d", bj->player_total);
-    rb->lcd_getstringsize(str, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2, str);
+    lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
+    lcd_fillrect(0, LCD_HEIGHT/2, LCD_WIDTH, LCD_HEIGHT/2);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + h, str);
+    snprintf(str, 12, "You have %d", bj->player_total);
+    lcd_getstringsize(str, &w, &h);
+    lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2, str);
 #else
-    rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h/2, str);
+    lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h/2, str);
 #endif
-    rb->lcd_update();
+    lcd_update();
 }
 
 /*****************************************************************************
@@ -940,17 +940,17 @@ static bool blackjack_loadgame(struct game_context* bj) {
     bool loaded = false;
 
     /* open game file */
-    fd = rb->open(SAVE_FILE, O_RDONLY);
+    fd = open(SAVE_FILE, O_RDONLY);
     if(fd < 0) return false;
 
     /* read in saved game */
-    if(rb->read(fd, bj, sizeof(struct game_context))
+    if(read(fd, bj, sizeof(struct game_context))
             == (long)sizeof(struct game_context))
     {
         loaded = true;
     }
 
-    rb->close(fd);
+    close(fd);
 
     return loaded;
 }
@@ -964,11 +964,11 @@ static void blackjack_savegame(struct game_context* bj) {
     if(!resume)
         return;
     /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
     if(fd < 0)
         return;
-    rb->write(fd, bj, sizeof(struct game_context));
-    rb->close(fd);
+    write(fd, bj, sizeof(struct game_context));
+    close(fd);
 }
 
 /*****************************************************************************
@@ -980,11 +980,11 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
     bool breakout = false;
     char message_yes[24], message_no[24];
 
-    rb->strcpy(message_yes, message);
-    rb->strcpy(message_no, message);
-    rb->strcat(message_yes, " Yes");
-    rb->strcat(message_no, "  No");
-    rb->lcd_getstringsize(message_yes, &w, &h);
+    strcpy(message_yes, message);
+    strcpy(message_no, message);
+    strcat(message_yes, " Yes");
+    strcat(message_no, "  No");
+    lcd_getstringsize(message_yes, &w, &h);
     const char *stg[] = {message_yes, message_no};
 
 #if LCD_HEIGHT <= 64
@@ -994,21 +994,21 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
 #endif
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_fillrect(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + b, w+1, h+3);
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(LCD_WHITE);
+    lcd_fillrect(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + b, w+1, h+3);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
 #else
-    rb->lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
-    rb->lcd_fillrect(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + b, w+1, h+3);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
+    lcd_fillrect(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + b, w+1, h+3);
+    lcd_set_drawmode(DRMODE_SOLID);
 #endif
-    rb->lcd_drawrect(LCD_WIDTH/2 - w/2 - 1, LCD_HEIGHT/2 + b - 1, w+3, h+4);
+    lcd_drawrect(LCD_WIDTH/2 - w/2 - 1, LCD_HEIGHT/2 + b - 1, w+3, h+4);
 
     while(!breakout) {
-        rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + b +1, stg[choice]);
-        rb->lcd_update_rect(LCD_WIDTH/2 - w/2 - 1, LCD_HEIGHT/2 + b -1,
+        lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + b +1, stg[choice]);
+        lcd_update_rect(LCD_WIDTH/2 - w/2 - 1, LCD_HEIGHT/2 + b -1,
                             w+3, h+4);
-        button = rb->button_get(true);
+        button = button_get(true);
 
         switch(button) {
             case BJACK_LEFT:
@@ -1026,8 +1026,8 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
     }
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(FG_COLOR);
-    rb->lcd_set_background(BG_COLOR);
+    lcd_set_foreground(FG_COLOR);
+    lcd_set_background(BG_COLOR);
 #endif
     return choice;
 }
@@ -1043,7 +1043,7 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
     unsigned int w, h;
     signed int amount;
 
-    rb->lcd_getstringsize("A", &w, &h); /* find the size of one character */
+    lcd_getstringsize("A", &w, &h); /* find the size of one character */
 
     if (start > upper_limit)
         amount = upper_limit;
@@ -1053,28 +1053,28 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
         amount = start;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_background(LCD_WHITE);
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_WHITE);
+    lcd_set_foreground(LCD_BLACK);
 #endif
 
 #if LCD_HEIGHT <= 64
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 1, message);
-    rb->lcd_putsf(0, 2, "$%d", amount);
-    rb->lcd_puts(0, 3, "RIGHT: +1");
-    rb->lcd_puts(0, 4, "LEFT:  -1");
-    rb->lcd_puts(0, 5, "UP:   +10");
-    rb->lcd_puts(0, 6, "DOWN: -10");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts(0, 1, message);
+    lcd_putsf(0, 2, "$%d", amount);
+    lcd_puts(0, 3, "RIGHT: +1");
+    lcd_puts(0, 4, "LEFT:  -1");
+    lcd_puts(0, 5, "UP:   +10");
+    lcd_puts(0, 6, "DOWN: -10");
+    lcd_update();
 #else
-    rb->lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
-    rb->lcd_fillrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
+    lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
+    lcd_fillrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
                      37*w / 2, 8*h -3);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_drawrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_drawrect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
                      37*w / 2, 8*h -3);
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 4*h - 1, message);
-    rb->lcd_putsxyf(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, "$%d", amount);
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 4*h - 1, message);
+    lcd_putsxyf(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, "$%d", amount);
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD) || \
@@ -1082,27 +1082,27 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
       (CONFIG_KEYPAD == SANSA_FUZE_PAD) || \
       (CONFIG_KEYPAD == SANSA_CONNECT_PAD) || \
       (CONFIG_KEYPAD == MPIO_HD300_PAD)
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, " >>|:     +1");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, " |<<:     -1");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "SCROLL+: +10");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + 2*h + 1, "SCROLL-: -10");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, " >>|:     +1");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, " |<<:     -1");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "SCROLL+: +10");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + 2*h + 1, "SCROLL-: -10");
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, "RIGHT:    +1");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, "LEFT:     -1");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "SCROLL+: +10");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + 2*h + 1, "SCROLL-: -10");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, "RIGHT:    +1");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, "LEFT:     -1");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "SCROLL+: +10");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + 2*h + 1, "SCROLL-: -10");
 #else
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, "RIGHT: +1");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, "LEFT:  -1");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "UP:   +10");
-    rb->lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + 2*h + 1, "DOWN: -10");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - h-2, "RIGHT: +1");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 1, "LEFT:  -1");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + h, "UP:   +10");
+    lcd_putsxy(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 + 2*h + 1, "DOWN: -10");
 #endif
-    rb->lcd_update_rect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
+    lcd_update_rect(LCD_WIDTH/2 - 9*w - 1, LCD_HEIGHT/2 - 4*h - 3,
                         37*w / 2, 8*h -3);
 #endif
 
     while(!breakout) {
-        button = rb->button_get(true);
+        button = button_get(true);
 
         switch(button) {
             case BJACK_UP:
@@ -1156,24 +1156,24 @@ static signed int blackjack_get_amount(char message[20], signed int lower_limit,
 
         if(changed) {
 #if LCD_HEIGHT <= 64
-            rb->lcd_putsf(0, 2, "$%d", amount);
-            rb->lcd_update();
+            lcd_putsf(0, 2, "$%d", amount);
+            lcd_update();
 #else
-            rb->lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
-            rb->lcd_fillrect(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, 5*w, h);
-            rb->lcd_set_drawmode(DRMODE_SOLID);
-            rb->lcd_putsxyf(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, "$%d", amount);
-            rb->lcd_update_rect(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, 5*w, h);
+            lcd_set_drawmode(DRMODE_BG+DRMODE_INVERSEVID);
+            lcd_fillrect(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, 5*w, h);
+            lcd_set_drawmode(DRMODE_SOLID);
+            lcd_putsxyf(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, "$%d", amount);
+            lcd_update_rect(LCD_WIDTH/2 - 9*w, LCD_HEIGHT/2 - 3*h, 5*w, h);
 #endif
             changed = false;
         }
     }
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(FG_COLOR);
-    rb->lcd_set_background(BG_COLOR);
+    lcd_set_foreground(FG_COLOR);
+    lcd_set_background(BG_COLOR);
 #endif
-    rb->lcd_clear_display();
+    lcd_clear_display();
     return amount;
 }
 
@@ -1259,14 +1259,14 @@ static bool blackjack_help(void) {
         LAST_STYLE_ITEM
     };
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     return false;
 }
@@ -1294,11 +1294,11 @@ static unsigned int blackjack_menu(void) {
                         "Quit without Saving", "Quit");
 
     while(!breakout) {
-        switch(rb->do_menu(&menu, &selection, NULL, false)) {
+        switch(do_menu(&menu, &selection, NULL, false)) {
             case 0:
                 breakout = true;
                 if(resume_file)
-                    rb->remove(SAVE_FILE);
+                    remove(SAVE_FILE);
                 resume_file = false;
                 break;
             case 1:
@@ -1353,8 +1353,8 @@ static int blackjack(struct game_context* bj) {
         return temp_var;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_background(BG_COLOR);
-    rb->lcd_set_foreground(FG_COLOR);
+    lcd_set_background(BG_COLOR);
+    lcd_set_foreground(FG_COLOR);
 #endif
 
     /********************
@@ -1387,12 +1387,12 @@ static int blackjack(struct game_context* bj) {
         blackjack_get_bet(bj);
         if (bj->current_bet == 0)
             return -1;
-        rb->lcd_clear_display();
+        lcd_clear_display();
         deal_init_cards(bj);
         blackjack_drawtable(bj);
     }
 
-    rb->lcd_update();
+    lcd_update();
 
     breakout = false;
 
@@ -1406,7 +1406,7 @@ static int blackjack(struct game_context* bj) {
                 !bj->asked_insurance) {
             temp_var = insurance(bj);
             if (bj->dealer_total == 21) {
-                rb->splash(HZ, "Dealer has blackjack");
+                splash(HZ, "Dealer has blackjack");
                 bj->player_money += temp_var;
                 bj->end_hand = true;
                 breakout = true;
@@ -1414,18 +1414,18 @@ static int blackjack(struct game_context* bj) {
                 finish_game(bj);
             }
             else {
-                rb->splash(HZ, "Dealer does not have blackjack");
+                splash(HZ, "Dealer does not have blackjack");
                 bj->player_money -= temp_var;
                 breakout = true;
                 redraw_board(bj);
-                rb->lcd_update();
+                lcd_update();
             }
         }
         if(!bj->end_hand && bj->split_status == 0 &&
            bj->player_cards[0][0].num == bj->player_cards[0][1].num) {
             split(bj);
             redraw_board(bj);
-            rb->lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH, LCD_HEIGHT/2);
+            lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH, LCD_HEIGHT/2);
             if (bj->split_status == 2) {
                 todo++;
                 player_x = bj->num_player_cards[0] * 10 + 4;
@@ -1433,7 +1433,7 @@ static int blackjack(struct game_context* bj) {
         }
 
         while(!bj->end_hand && done < todo) {
-            button = rb->button_get(true);
+            button = button_get(true);
 
             switch(button) {
                 case BJACK_SELECT:
@@ -1443,16 +1443,16 @@ static int blackjack(struct game_context* bj) {
                     bj->num_player_cards[done]++;
                     if (bj->num_player_cards[done] == MAX_CARDS + 1) {
                         redraw_board(bj);
-                        rb->lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH,
+                        lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH,
                                             LCD_HEIGHT/2);
                     }
                     else if (bj->num_player_cards[done]>MAX_CARDS || todo > 1) {
-                        rb->lcd_update_rect(player_x, player_y, CARD_WIDTH+2,
+                        lcd_update_rect(player_x, player_y, CARD_WIDTH+2,
                                             CARD_HEIGHT+2);
                         player_x += 10;
                     }
                     else {
-                        rb->lcd_update_rect(player_x, player_y, CARD_WIDTH+2,
+                        lcd_update_rect(player_x, player_y, CARD_WIDTH+2,
                                             CARD_HEIGHT+2);
                         player_x += CARD_WIDTH + 4;
                     }
@@ -1475,9 +1475,9 @@ static int blackjack(struct game_context* bj) {
                     }
                     else if((signed int)bj->current_bet * 2 >
                             bj->player_money){
-                        rb->splash(HZ, "Not enough money to double down.");
+                        splash(HZ, "Not enough money to double down.");
                         redraw_board(bj);
-                        rb->lcd_update();
+                        lcd_update();
                     }
                     break;
 
@@ -1510,23 +1510,23 @@ static int blackjack(struct game_context* bj) {
                         bj->player_total = temp_var;
                         temp_var = temp;
                         finish_game(bj);
-                        rb->lcd_getstringsize(" Split 1 ", &w, &h);
-                        rb->lcd_putsxy(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
+                        lcd_getstringsize(" Split 1 ", &w, &h);
+                        lcd_putsxy(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                        " Split 1 ");
-                        rb->lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
+                        lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                             w,h);
                         bj->current_bet /= 2;
-                        rb->lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
+                        lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                             w,h);
-                        rb->sleep(HZ*2);
+                        sleep(HZ*2);
                         bj->player_total = temp_var;
                         finish_game(bj);
-                        rb->lcd_getstringsize(" Split 2 ", &w, &h);
-                        rb->lcd_putsxy(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
+                        lcd_getstringsize(" Split 2 ", &w, &h);
+                        lcd_putsxy(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                        " Split 2 ");
-                        rb->lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
+                        lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                             w,h);
-                        rb->sleep(HZ*2);
+                        sleep(HZ*2);
                     }
                     else {
                         bj->end_hand = false;
@@ -1536,7 +1536,7 @@ static int blackjack(struct game_context* bj) {
                         update_total(bj);
                         redraw_board(bj);
                         player_x += 10;
-                        rb->lcd_update();
+                        lcd_update();
                     }
                 }
                 else
@@ -1545,7 +1545,7 @@ static int blackjack(struct game_context* bj) {
         }
 
         if (bj->player_money < 10) {
-            rb->sleep(HZ);
+            sleep(HZ);
             return BJ_LOSE;
         }
 
@@ -1557,7 +1557,7 @@ static int blackjack(struct game_context* bj) {
                 temp = bj->current_bet;
                 bj->current_bet = 0;
                 redraw_board(bj);
-                rb->lcd_update();
+                lcd_update();
                 bj->current_bet = temp;
                 if(dbl_down) {
                     bj->current_bet /= 2;
@@ -1571,7 +1571,7 @@ static int blackjack(struct game_context* bj) {
                     return BJ_END;
                 deal_init_cards(bj);
                 blackjack_drawtable(bj);
-                rb->lcd_update();
+                lcd_update();
             }
         }
     }
@@ -1590,7 +1590,7 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     /* load high scores */
@@ -1598,12 +1598,12 @@ enum plugin_status plugin_start(const void* parameter)
     resume = blackjack_loadgame(&bj);
     resume_file = resume;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     while(!exit) {
         switch(blackjack(&bj)){
             case BJ_LOSE:
-                rb->splash(HZ, "Not enough money to continue");
+                splash(HZ, "Not enough money to continue");
                 /* fall through to BJ_END */
 
             case BJ_END:
@@ -1614,7 +1614,7 @@ enum plugin_status plugin_start(const void* parameter)
                     if (position != -1)
                     {
                         if (position==0)
-                            rb->splash(HZ*2, "New High Score");
+                            splash(HZ*2, "New High Score");
                         highscore_show(position, highscores, NUM_SCORES, false);
                     }
                 }
@@ -1625,7 +1625,7 @@ enum plugin_status plugin_start(const void* parameter)
                 return PLUGIN_USB_CONNECTED;
 
             case BJ_QUIT:
-                rb->splash(HZ*1, "Saving game...");
+                splash(HZ*1, "Saving game...");
                 blackjack_savegame(&bj);
                 /* fall through */
 

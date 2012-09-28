@@ -183,16 +183,16 @@ static int show_mess(const char *text, const char *file)
     static char buf[MAX_PATH*2];
 
     if (file)
-        rb->snprintf(buf, sizeof(buf), "%s: %s", text, file);
+        snprintf(buf, sizeof(buf), "%s: %s", text, file);
     else
-        rb->snprintf(buf, sizeof(buf), "%s", text);
+        snprintf(buf, sizeof(buf), "%s", text);
 
     DEBUGF("%s\n", buf);
     if (log_fd >= 0)
-        rb->fdprintf(log_fd, "%s\n", buf);
+        fdprintf(log_fd, "%s\n", buf);
 
-    rb->splash(0, buf);
-    rb->sleep(HZ/4);
+    splash(0, buf);
+    sleep(HZ/4);
 
     return 0;
 }
@@ -202,14 +202,14 @@ static void set_file_name(char *buf, const char*file,
                           struct remove_setting *setting)
 {
     int len1, len2;
-    if (rb->strncasecmp(file, setting->prefix, rb->strlen(setting->prefix)))
-        rb->snprintf(buf, MAX_PATH, "%s%s", setting->prefix, file);
+    if (strncasecmp(file, setting->prefix, strlen(setting->prefix)))
+        snprintf(buf, MAX_PATH, "%s%s", setting->prefix, file);
     else
-        rb->strlcpy(buf, file, MAX_PATH);
-    len1 = rb->strlen(buf);
-    len2 = rb->strlen(setting->suffix);
-    if (rb->strcasecmp(buf+len1-len2, setting->suffix))
-        rb->strlcpy(&buf[len1], setting->suffix, MAX_PATH-len1);
+        strlcpy(buf, file, MAX_PATH);
+    len1 = strlen(buf);
+    len2 = strlen(setting->suffix);
+    if (strcasecmp(buf+len1-len2, setting->suffix))
+        strlcpy(&buf[len1], setting->suffix, MAX_PATH-len1);
 }
 
 /* taken from apps/onplay.c */
@@ -218,9 +218,9 @@ static int remove_dir(char* dirname, int len)
 {
     int result = 0;
     DIR* dir;
-    int dirlen = rb->strlen(dirname);
+    int dirlen = strlen(dirname);
 
-    dir = rb->opendir(dirname);
+    dir = opendir(dirname);
     if (!dir)
         return -1; /* open error */
 
@@ -228,20 +228,20 @@ static int remove_dir(char* dirname, int len)
     {
         struct dirent* entry;
         /* walk through the directory content */
-        entry = rb->readdir(dir);
+        entry = readdir(dir);
         if (!entry)
             break;
 
         dirname[dirlen] ='\0';
 
         /* append name to current directory */
-        rb->snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
-        struct dirinfo info = rb->dir_get_info(dir, entry);
+        snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
+        struct dirinfo info = dir_get_info(dir, entry);
         if (info.attribute & ATTR_DIRECTORY)
         {
             /* remove a subdirectory */
-            if (!rb->strcmp((char *)entry->d_name, ".") ||
-                !rb->strcmp((char *)entry->d_name, ".."))
+            if (!strcmp((char *)entry->d_name, ".") ||
+                !strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
 
             result = remove_dir(dirname, len); /* recursion */
@@ -251,22 +251,22 @@ static int remove_dir(char* dirname, int len)
         else
         {
             /* remove a file */
-            result = rb->remove(dirname);
+            result = remove(dirname);
         }
-        if (ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK))
+        if (ACTION_STD_CANCEL == get_action(CONTEXT_STD, TIMEOUT_NOBLOCK))
         {
             show_mess("Canceled", NULL);
             result = -1;
             break;
         }
     }
-    rb->closedir(dir);
+    closedir(dir);
 
     if (!result)
     {   /* remove the now empty directory */
         dirname[dirlen] = '\0'; /* terminate to original length */
 
-        result = rb->rmdir(dirname);
+        result = rmdir(dirname);
         show_mess("Removed", dirname);
     }
 
@@ -277,10 +277,10 @@ static int remove_wps(struct remove_setting *setting)
 {
     char bmpdir[MAX_PATH];
     char *p;
-    rb->strcpy(bmpdir, setting->value);
-    p = rb->strrchr(bmpdir, '.');
+    strcpy(bmpdir, setting->value);
+    p = strrchr(bmpdir, '.');
     if (p) *p = 0;
-    if (!rb->dir_exists(bmpdir))
+    if (!dir_exists(bmpdir))
         return 0;
     return remove_dir(bmpdir, MAX_PATH);
 }
@@ -290,15 +290,15 @@ static int remove_icons(struct remove_setting *setting)
 {
     char path[MAX_PATH];
     char *p;
-    rb->strcpy(path, setting->value);
-    p = rb->strrchr(path, '.');
-    rb->strlcpy(p, ".icons", path+MAX_PATH-p);
+    strcpy(path, setting->value);
+    p = strrchr(path, '.');
+    strlcpy(p, ".icons", path+MAX_PATH-p);
 
-    if (!rb->file_exists(path))
+    if (!file_exists(path))
     {
         return 0;
     }
-    if (rb->remove(path))
+    if (remove(path))
     {
         show_mess("Failed", path);
         return 1;
@@ -324,7 +324,7 @@ static bool is_deny_file(const char *file)
     const char **p = deny_files;
     while ( *p )
     {
-        if (!rb->strcmp(file, *p))
+        if (!strcmp(file, *p))
             return true;
         p++;
     }
@@ -335,29 +335,29 @@ static void check_whether_used_in_setting(void)
 {
     const char *setting_files[] = {
 #ifdef HAVE_LCD_BITMAP
-        rb->global_settings->font_file,
+        global_settings.font_file,
 #endif
-        rb->global_settings->wps_file,
+        global_settings.wps_file,
 #ifdef HAVE_LCD_BITMAP
-        rb->global_settings->sbs_file,
+        global_settings.sbs_file,
 #endif
 #ifdef HAVE_REMOTE_LCD
-        rb->global_settings->rwps_file,
-        rb->global_settings->rsbs_file,
+        global_settings.rwps_file,
+        global_settings.rsbs_file,
 #endif
 #if LCD_DEPTH > 1
-        rb->global_settings->backdrop_file,
+        global_settings.backdrop_file,
 #endif
 #ifdef HAVE_LCD_BITMAP
-        rb->global_settings->icon_file,
-        rb->global_settings->viewers_icon_file,
+        global_settings.icon_file,
+        global_settings.viewers_icon_file,
 #endif
 #ifdef HAVE_REMOTE_LCD
-        rb->global_settings->remote_icon_file,
-        rb->global_settings->remote_viewers_icon_file,
+        global_settings.remote_icon_file,
+        global_settings.remote_viewers_icon_file,
 #endif
 #ifdef HAVE_LCD_COLOR
-        rb->global_settings->colors_file,
+        global_settings.colors_file,
 #endif
     };
     char tempfile[MAX_PATH];
@@ -368,7 +368,7 @@ static void check_whether_used_in_setting(void)
         if (setting->value[0])
         {
             set_file_name(tempfile, setting_files[i], setting);
-            if (!rb->strcasecmp(tempfile, setting->value))
+            if (!strcasecmp(tempfile, setting->value))
                 setting->used = true;
         }
     }
@@ -382,36 +382,36 @@ static void check_whether_used_in_file(const char *cfgfile)
     char *name, *value;
     int i;
 
-    if (!rb->strcasecmp(themefile, cfgfile))
+    if (!strcasecmp(themefile, cfgfile))
         return;
-    fd = rb->open(cfgfile, O_RDONLY);
+    fd = open(cfgfile, O_RDONLY);
     if (fd < 0)
         return;
-    while (rb->read_line(fd, line, sizeof(line)) > 0)
+    while (read_line(fd, line, sizeof(line)) > 0)
     {
-        if (!rb->settings_parseline(line, &name, &value))
+        if (!settings_parseline(line, &name, &value))
             continue;
         /* remove trailing spaces. */
-        p = value+rb->strlen(value)-1;
+        p = value+strlen(value)-1;
         while (*p == ' ') *p-- = 0;
-        if (*value == 0 || !rb->strcmp(value, "-"))
+        if (*value == 0 || !strcmp(value, "-"))
             continue;
         for (i=0; i<NUM_REMOVE_ITEMS; i++)
         {
             struct remove_setting *setting = &remove_list[i];
-            if (!rb->strcmp(name, setting->name))
+            if (!strcmp(name, setting->name))
             {
                 if (setting->value[0])
                 {
                     set_file_name(settingfile, value, setting);
-                    if (!rb->strcasecmp(settingfile, setting->value))
+                    if (!strcasecmp(settingfile, setting->value))
                         setting->used = true;
                 }
                 break;
             }
         }
     }
-    rb->close(fd);
+    close(fd);
 }
 static void check_whether_used(void)
 {
@@ -426,7 +426,7 @@ static void check_whether_used(void)
         check_whether_used_in_file(RB_FONTS_CONFIG);
 #endif
 
-    dir = rb->opendir(THEME_DIR);
+    dir = opendir(THEME_DIR);
     if (!dir)
         return; /* open error */
 
@@ -436,14 +436,14 @@ static void check_whether_used(void)
         char *p;
         int i;
         /* walk through the directory content */
-        entry = rb->readdir(dir);
+        entry = readdir(dir);
         if (!entry)
             break;
-        p = rb->strrchr(entry->d_name, '.');
-        if (!p || rb->strcmp(p, ".cfg"))
+        p = strrchr(entry->d_name, '.');
+        if (!p || strcmp(p, ".cfg"))
             continue;
 
-        rb->snprintf(cfgfile, MAX_PATH, "%s/%s", THEME_DIR, entry->d_name);
+        snprintf(cfgfile, MAX_PATH, "%s/%s", THEME_DIR, entry->d_name);
         check_whether_used_in_file(cfgfile);
         /* break the loop if all files need to be checked in the theme
          * turned out to be used. */
@@ -459,12 +459,12 @@ static void check_whether_used(void)
         if (i == NUM_REMOVE_ITEMS)
             break;
     }
-    rb->closedir(dir);
+    closedir(dir);
 }
 
 static int remove_file(struct remove_setting *setting)
 {
-    if (!rb->file_exists(setting->value))
+    if (!file_exists(setting->value))
     {
         show_mess("Doesn't exist", setting->value);
         return 0;
@@ -494,7 +494,7 @@ static int remove_file(struct remove_setting *setting)
         {
             const char *message_lines[] = { "Delete?", setting->value };
             const struct text_message text_message = { message_lines, 2 };
-            if (rb->gui_syncyesno_run(&text_message, NULL, NULL) != YESNO_YES)
+            if (gui_syncyesno_run(&text_message, NULL, NULL) != YESNO_YES)
             {
                 show_mess("Skipped", setting->value);
                 return 0;
@@ -502,7 +502,7 @@ static int remove_file(struct remove_setting *setting)
         }
             break;
     }
-    if (rb->remove(setting->value))
+    if (remove(setting->value))
     {
         show_mess("Failed", setting->value);
         return -1;
@@ -525,21 +525,21 @@ static int remove_theme(void)
         remove_list[i].value[0] = 0;
 
     /* load settings */
-    fd = rb->open(themefile, O_RDONLY);
+    fd = open(themefile, O_RDONLY);
     if (fd < 0) return fd;
-    while (rb->read_line(fd, line, sizeof(line)) > 0)
+    while (read_line(fd, line, sizeof(line)) > 0)
     {
-        if (!rb->settings_parseline(line, &name, &value))
+        if (!settings_parseline(line, &name, &value))
             continue;
         /* remove trailing spaces. */
-        char *p = value+rb->strlen(value)-1;
+        char *p = value+strlen(value)-1;
         while (*p == ' ') *p-- = 0;
-        if (*value == 0 || !rb->strcmp(value, "-"))
+        if (*value == 0 || !strcmp(value, "-"))
             continue;
         for (i=0; i<NUM_REMOVE_ITEMS; i++)
         {
             struct remove_setting *setting = &remove_list[i];
-            if (!rb->strcmp(name, setting->name))
+            if (!strcmp(name, setting->name))
             {
                 set_file_name(setting->value, value, setting);
                 if(setting->option == REMOVE_IF_NOT_USED)
@@ -548,7 +548,7 @@ static int remove_theme(void)
             }
         }
     }
-    rb->close(fd);
+    close(fd);
 
     if(needs_to_check_whether_used)
         check_whether_used();
@@ -568,11 +568,11 @@ static int remove_theme(void)
     /* remove the setting file iff it is in theme directory to protect
      * aginst accidental removal of non theme cfg file. if the file is
      * not in the theme directory, the file may not be a theme cfg file. */
-    if (rb->strncasecmp(themefile, THEME_DIR "/", sizeof(THEME_DIR "/")-1))
+    if (strncasecmp(themefile, THEME_DIR "/", sizeof(THEME_DIR "/")-1))
     {
         show_mess("Skipped", themefile);
     }
-    else if (rb->remove(themefile))
+    else if (remove(themefile))
     {
         show_mess("Failed", themefile);
         return -1;
@@ -580,7 +580,7 @@ static int remove_theme(void)
     else
     {
         show_mess("Removed", themefile);
-        rb->reload_directory();
+        reload_directory();
         num_removed++;
     }
     return num_removed;
@@ -623,12 +623,12 @@ static bool option_menu(void)
 
     while (1)
     {
-        result = rb->do_menu(&option_menu, &selected, NULL, false);
+        result = do_menu(&option_menu, &selected, NULL, false);
         if (result >= 0 && result < NUM_REMOVE_ITEMS)
         {
             struct remove_setting *setting = &remove_list[result];
             int prev_option = setting->option;
-            if (rb->set_option(option_menu_[result], &setting->option, INT,
+            if (set_option(option_menu_[result], &setting->option, INT,
                                remove_names, NUM_REMOVE_OPTION, NULL))
                 return true;
             if (prev_option != setting->option)
@@ -637,7 +637,7 @@ static bool option_menu(void)
         else if (result == NUM_REMOVE_ITEMS)
         {
             bool prev_value = create_log;
-            if(rb->set_bool("Create Log File", &create_log))
+            if(set_bool("Create Log File", &create_log))
                 return true;
             if (prev_value != create_log)
                 option_changed = true;
@@ -664,32 +664,32 @@ enum plugin_status plugin_start(const void* parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    rb->snprintf(title, sizeof(title), "Remove %s",
-                 rb->strrchr(parameter, '/')+1);
-    if((p = rb->strrchr(title, '.')))
+    snprintf(title, sizeof(title), "Remove %s",
+                 strrchr(parameter, '/')+1);
+    if((p = strrchr(title, '.')))
         *p = 0;
 
 #ifdef HAVE_LCD_BITMAP
-    rb->snprintf(font_file, MAX_PATH, FONT_DIR "/%s.fnt",
-                    rb->global_settings->font_file);
+    snprintf(font_file, MAX_PATH, FONT_DIR "/%s.fnt",
+                    global_settings.font_file);
 #endif
-    rb->strlcpy(themefile, parameter, MAX_PATH);
-    if (!rb->file_exists(themefile))
+    strlcpy(themefile, parameter, MAX_PATH);
+    if (!file_exists(themefile))
     {
-        rb->splash(HZ, "File open error!");
+        splash(HZ, "File open error!");
         return PLUGIN_ERROR;
     }
     configfile_load(CONFIG_FILENAME, config, nb_config, 0);
     while (!exit)
     {
-        switch (rb->do_menu(&menu, &selected, NULL, false))
+        switch (do_menu(&menu, &selected, NULL, false))
         {
             case 0:
                 if(create_log)
                 {
-                    log_fd = rb->open(LOG_FILENAME, O_WRONLY|O_CREAT|O_APPEND, 0666);
+                    log_fd = open(LOG_FILENAME, O_WRONLY|O_CREAT|O_APPEND, 0666);
                     if(log_fd >= 0)
-                        rb->fdprintf(log_fd, "---- %s ----\n", title);
+                        fdprintf(log_fd, "---- %s ----\n", title);
                     else
                         show_mess("Couldn't open log file.", NULL);
                 }
@@ -698,15 +698,15 @@ enum plugin_status plugin_start(const void* parameter)
                 show_mess(p, NULL);
                 if(log_fd >= 0)
                 {
-                    rb->fdprintf(log_fd, "----------------\n");
-                    rb->close(log_fd);
+                    fdprintf(log_fd, "----------------\n");
+                    close(log_fd);
                     log_fd = -1;
                 }
-                rb->lcd_clear_display();
-                rb->lcd_update();
-                rb->splashf(0, "%s %s", p, "Press any key to exit.");
-                rb->button_clear_queue();
-                rb->button_get(true);
+                lcd_clear_display();
+                lcd_update();
+                splashf(0, "%s %s", p, "Press any key to exit.");
+                button_clear_queue();
+                button_get(true);
                 exit = true;
                 break;
             case 1:

@@ -127,7 +127,7 @@ static void init_grid(char *pgrid){
 /*fill grid with pattern from file (viewer mode)*/
 static bool load_cellfile(const char *file, char *pgrid){
     int fd;
-    fd = rb->open(file, O_RDONLY);
+    fd = open(file, O_RDONLY);
     if (fd<0)
         return false;
 
@@ -143,7 +143,7 @@ static bool load_cellfile(const char *file, char *pgrid){
     comment = false;
 
     while (true) {
-        nc = rb->read(fd, &c, 1);
+        nc = read(fd, &c, 1);
         if (nc <= 0)
             break;
 
@@ -170,7 +170,7 @@ static bool load_cellfile(const char *file, char *pgrid){
             break;
         }
     }
-    rb->close(fd);
+    close(fd);
     return true;
 }
 
@@ -183,7 +183,7 @@ static void setup_grid(char *pgrid, int pattern){
 
     switch(pattern){
     case PATTERN_RANDOM:
-        rb->splash(HZ, "Random");
+        splash(HZ, "Random");
 #if 0 /* two oscilators, debug pattern */
         set_cell( 0,  1 , pgrid);
         set_cell( 1,  1 , pgrid);
@@ -196,12 +196,12 @@ static void setup_grid(char *pgrid, int pattern){
 
         /* fill screen randomly */
         for(n=0; n<(max>>2); n++)
-            pgrid[rb->rand()%max] = 1;
+            pgrid[rand()%max] = 1;
 
         break;
 
     case PATTERN_GROWTH_1:
-        rb->splash(HZ, "Growth");
+        splash(HZ, "Growth");
         xmid = (GRID_W>>1) - 2;
         ymid = (GRID_H>>1) - 2;
         set_cell(xmid + 6, ymid + 0 , pgrid);
@@ -216,7 +216,7 @@ static void setup_grid(char *pgrid, int pattern){
         set_cell(xmid + 2, ymid + 5 , pgrid);
         break;
     case PATTERN_ACORN:
-        rb->splash(HZ, "Acorn");
+        splash(HZ, "Acorn");
         xmid = (GRID_W>>1) - 3;
         ymid = (GRID_H>>1) - 1;
         set_cell(xmid + 1, ymid + 0 , pgrid);
@@ -228,7 +228,7 @@ static void setup_grid(char *pgrid, int pattern){
         set_cell(xmid + 6, ymid + 2 , pgrid);
         break;
     case PATTERN_GROWTH_2:
-        rb->splash(HZ, "Growth 2");
+        splash(HZ, "Growth 2");
         xmid = (GRID_W>>1) - 4;
         ymid = (GRID_H>>1) - 1;
         set_cell(xmid + 0, ymid + 0 , pgrid);
@@ -246,7 +246,7 @@ static void setup_grid(char *pgrid, int pattern){
         set_cell(xmid + 4, ymid + 4 , pgrid);
         break;
     case PATTERN_GLIDER_GUN:
-        rb->splash(HZ, "Glider Gun");
+        splash(HZ, "Glider Gun");
         set_cell( 24, 0, pgrid);
         set_cell( 22, 1, pgrid);
         set_cell( 24, 1, pgrid);
@@ -292,27 +292,27 @@ static void show_grid(char *pgrid){
     int x, y;
     unsigned char age;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     for(y=0; y<GRID_H; y++){
         for(x=0; x<GRID_W; x++){
             age = get_cell(x, y, pgrid);
             if(age){
 #if LCD_DEPTH >= 16
-                rb->lcd_set_foreground( LCD_RGBPACK( age, age, age ));
+                lcd_set_foreground( LCD_RGBPACK( age, age, age ));
 #elif LCD_DEPTH == 2
-                rb->lcd_set_foreground(age>>7);
+                lcd_set_foreground(age>>7);
 #endif
-                rb->lcd_drawpixel(x, y);
+                lcd_drawpixel(x, y);
             }
         }
     }
     if(status_line){
 #if LCD_DEPTH > 1
-        rb->lcd_set_foreground( LCD_BLACK );
+        lcd_set_foreground( LCD_BLACK );
 #endif
-        rb->lcd_putsf(0, 0, "g:%d p:%d", generation, population);
+        lcd_putsf(0, 0, "g:%d p:%d", generation, population);
     }
-    rb->lcd_update();
+    lcd_update();
 }
 
 
@@ -368,7 +368,7 @@ static void next_generation(char *pgrid, char *pnext_grid){
     unsigned char age;
     unsigned char n[9];
 
-    rb->memset(n, 0, sizeof(n));
+    memset(n, 0, sizeof(n));
 
     /*
      * cell is (4) with 8 neighbours
@@ -475,11 +475,11 @@ enum plugin_status plugin_start(const void* parameter)
 
     backlight_ignore_timeout();
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(182, 198, 229)); /* rockbox blue */
+    lcd_set_background(LCD_RGBPACK(182, 198, 229)); /* rockbox blue */
 #else
-    rb->lcd_set_background(LCD_DEFAULT_BG);
+    lcd_set_background(LCD_DEFAULT_BG);
 #endif /* HAVE_LCD_COLOR */
 #endif /* LCD_DEPTH > 1 */
 
@@ -497,11 +497,11 @@ enum plugin_status plugin_start(const void* parameter)
     {
         if( load_cellfile(parameter, pgrid) )
         {
-            rb->splashf( 1*HZ, "Cells loaded (%s)", (char *)parameter );
+            splashf( 1*HZ, "Cells loaded (%s)", (char *)parameter );
         }
         else
         {
-            rb->splash( 1*HZ, "File Open Error");
+            splash( 1*HZ, "File Open Error");
             setup_grid(pgrid, pattern++);  /* fall back to stored patterns */
         }
     }
@@ -533,7 +533,7 @@ enum plugin_status plugin_start(const void* parameter)
                 pgrid = pnext_grid;
                 pnext_grid = ptemp;
                 /* show new generation */
-                rb->yield();
+                yield();
                 show_grid(pgrid);
                 button = pluginlib_getaction(0, plugin_contexts, ARRAYLEN(plugin_contexts));
                 switch(button) {
@@ -542,14 +542,14 @@ enum plugin_status plugin_start(const void* parameter)
                     stop = 1;
                     break;
                 default:
-                    if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                    if (default_event_handler(button) == SYS_USB_CONNECTED) {
                         stop = 1;
                         quit = 1;
                         usb = 1;
                     }
                     break;
                 }
-                rb->yield();
+                yield();
             }
             break;
         case ROCKLIFE_INIT:
@@ -568,13 +568,13 @@ enum plugin_status plugin_start(const void* parameter)
             quit = 1;
             break;
         default:
-            if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+            if (default_event_handler(button) == SYS_USB_CONNECTED) {
                 quit = 1;
                 usb = 1;
             }
             break;
         }
-        rb->yield();
+        yield();
     }
 
     backlight_use_settings();

@@ -45,27 +45,27 @@ enum plugin_status plugin_start(const void* parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     FOR_NB_SCREENS(i)
-        rb->viewport_set_defaults(&vp[i], i);
+        viewport_set_defaults(&vp[i], i);
 
     story_name = parameter;
     strcpy(save_name, story_name);
-    ext = rb->strrchr(save_name, '.');
+    ext = strrchr(save_name, '.');
     if (ext)
         *ext = '\0';
     strcpy(auxilary_name, save_name);
     strcpy(script_name, save_name);
     strcpy(command_name, save_name);
-    rb->strlcat(save_name, ".sav", MAX_PATH);
-    rb->strlcat(auxilary_name, ".aux", MAX_PATH);
-    rb->strlcat(script_name, ".scr", MAX_PATH);
-    rb->strlcat(command_name, ".rec", MAX_PATH);
+    strlcat(save_name, ".sav", MAX_PATH);
+    strlcat(auxilary_name, ".aux", MAX_PATH);
+    strlcat(script_name, ".scr", MAX_PATH);
+    strlcat(command_name, ".rec", MAX_PATH);
 
     frotz_main();
 
@@ -90,7 +90,7 @@ MENUITEM_STRINGLIST(ingame_menu, "Frotz", NULL, "Resume", "Undo", "Restart",
 
 zchar menu(void)
 {
-    switch (rb->do_menu(&ingame_menu, NULL, vp, true))
+    switch (do_menu(&ingame_menu, NULL, vp, true))
     {
     case 0:
     default:
@@ -149,7 +149,7 @@ zchar do_input(int timeout, bool show_cursor)
     else
         timeout = TIMEOUT_BLOCK;
 
-    timeout_at = *rb->current_tick + timeout;
+    timeout_at = current_tick + timeout;
 
     for (;;)
     {
@@ -164,7 +164,7 @@ zchar do_input(int timeout, bool show_cursor)
             menu_ret = menu();
             if (menu_ret != ZC_BAD)
                 return menu_ret;
-            timeout_at = *rb->current_tick + timeout;
+            timeout_at = current_tick + timeout;
             break;
 
         case PLA_SELECT:
@@ -175,7 +175,7 @@ zchar do_input(int timeout, bool show_cursor)
 
         default:
             if (timeout != TIMEOUT_BLOCK && 
-                    !TIME_BEFORE(*rb->current_tick, timeout_at))
+                    !TIME_BEFORE(current_tick, timeout_at))
                 return ZC_TIME_OUT;
         }
     }
@@ -195,12 +195,12 @@ zchar os_read_key(int timeout, bool show_cursor)
             return zkey;
 
         inputbuf[0] = '\0';
-        r = rb->kbd_input(inputbuf, 5);
-        rb->lcd_setfont(FONT_SYSFIXED);
+        r = kbd_input(inputbuf, 5);
+        lcd_setfont(FONT_SYSFIXED);
         dumb_dump_screen();
         if (!r)
         {
-            rb->utf8decode(inputbuf, &key);
+            utf8decode(inputbuf, &key);
             if (key > 0 && key < 256)
                 return (zchar)key;
         }
@@ -226,8 +226,8 @@ zchar os_read_line(int max, zchar *buf, int timeout, int width, int continued)
         if (max > width)
             max = width;
         strcpy(inputbuf, buf);
-        r = rb->kbd_input(inputbuf, 256);
-        rb->lcd_setfont(FONT_SYSFIXED);
+        r = kbd_input(inputbuf, 256);
+        lcd_setfont(FONT_SYSFIXED);
         dumb_dump_screen();
         if (!r)
         {
@@ -235,7 +235,7 @@ zchar os_read_line(int max, zchar *buf, int timeout, int width, int continued)
             out = buf;
             while (*in && max)
             {
-                in = rb->utf8decode(in, &key);
+                in = utf8decode(in, &key);
                 if (key > 0 && key < 256)
                 {
                     *out++ = key;
@@ -255,10 +255,10 @@ bool read_yes_or_no(const char *s)
     const char *message_lines[] = {message_line};
     const struct text_message message = {message_lines, 1};
 
-    rb->strlcpy(message_line, s, 49);
-    rb->strcat(message_line, "?");
+    strlcpy(message_line, s, 49);
+    strcat(message_line, "?");
 
-    if (rb->gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
+    if (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
         return TRUE;
     else
         return FALSE;
@@ -278,7 +278,7 @@ int os_read_file_name(char *file_name, const char *default_name, int flag)
 
 void os_beep(int volume)
 {
-    rb->splashf(HZ/2, "[%s-PITCHED BEEP]", (volume==1) ? "HIGH" : "LOW");
+    splashf(HZ/2, "[%s-PITCHED BEEP]", (volume==1) ? "HIGH" : "LOW");
 }
 
 static unsigned char unget_buf;
@@ -299,7 +299,7 @@ int frotz_fgetc(int f)
         unget_file = -1;
         return unget_buf;
     }
-    if (rb->read(f, &cb, 1) != 1)
+    if (read(f, &cb, 1) != 1)
         return EOF;
     return cb;
 }
@@ -307,7 +307,7 @@ int frotz_fgetc(int f)
 int frotz_fputc(int c, int f)
 {
     unsigned char cb = c;
-    if (rb->write(f, &cb, 1) != 1)
+    if (write(f, &cb, 1) != 1)
         return EOF;
     return cb;
 }

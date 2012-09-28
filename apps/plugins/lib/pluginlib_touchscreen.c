@@ -53,8 +53,8 @@ int touchbutton_check_button(int button, struct touchbutton *data, int num_butto
     /* Get the x/y location of the button press, this is set by button_get when
      *  a button is pulled from the queue.
      */
-    x = rb->button_get_data() >> 16;
-    y = (short) rb->button_get_data();
+    x = button_get_data() >> 16;
+    y = (short) button_get_data();
     struct viewport *v;
 
     int i;
@@ -90,7 +90,7 @@ int touchbutton_check_button(int button, struct touchbutton *data, int num_butto
  */
 int touchbutton_get_w_tmo(int tmo, struct touchbutton *data, int num_buttons)
 {
-    int btn = rb->button_get_w_tmo(tmo);
+    int btn = button_get_w_tmo(tmo);
     int result = touchbutton_check_button(btn, data, num_buttons);
     exit_on_usb(result);
     return result;
@@ -129,7 +129,7 @@ int touchbutton_get(struct touchbutton *data, int num_buttons)
  */
 void touchbutton_draw(struct touchbutton *data, int num_buttons) {
     int i;
-    struct screen *lcd = rb->screens[SCREEN_MAIN];
+    struct screen *lcd = screens[SCREEN_MAIN];
 
     /* Loop over all the elements in data */
     for(i=0; i<num_buttons; i++) {

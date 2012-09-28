@@ -142,7 +142,7 @@ void I_ShutdownGraphics(void)
 {
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_set_mode(LCD_MODE_RGB565);
+	lcd_set_mode(LCD_MODE_RGB565);
 #endif
 #endif
 
@@ -535,7 +535,7 @@ static inline unsigned int read_scroll_wheel(void)
        posted */
     do
     {
-        btn = rb->button_get_w_tmo(0);
+        btn = button_get_w_tmo(0);
         buttons |= btn;
     }
     while (btn != BUTTON_NONE);
@@ -555,7 +555,7 @@ static inline void getkey()
 #ifdef HAS_BUTTON_HOLD
    static unsigned int holdbutton IDATA_ATTR=0;
    static bool hswitch IDATA_ATTR=0;
-   if (rb->button_hold()&~holdbutton)
+   if (button_hold()&~holdbutton)
    {
       if(hswitch==0)
       {
@@ -577,13 +577,13 @@ static inline void getkey()
 #endif
       D_PostEvent(&event);
    }
-   holdbutton=rb->button_hold();
+   holdbutton=button_hold();
 #endif
 
 #ifdef DOOMBUTTON_SCROLLWHEEL
    /* use button_get(false) for clickwheel checks */
    int button; /* move me */
-   button = rb->button_get(false);
+   button = button_get(false);
    switch(button){
    case DOOMBUTTON_SCROLLWHEEL_CC | BUTTON_REPEAT:
    case DOOMBUTTON_SCROLLWHEEL_CC:
@@ -600,7 +600,7 @@ static inline void getkey()
          break;
    }
 #endif   
-   newbuttonstate = rb->button_status();
+   newbuttonstate = button_status();
 #ifdef DOOMBUTTON_SCROLLWHEEL
    newbuttonstate |= read_scroll_wheel();
 #endif
@@ -795,7 +795,7 @@ static void I_UploadNewPalette(int pal)
 
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_pal256_update_pal(paldata+256*pal);
+	lcd_pal256_update_pal(paldata+256*pal);
 #endif
 #endif
 }
@@ -914,7 +914,7 @@ void I_FinishUpdate (void)
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
     (void) count;
-	rb->lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+	lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 #elif defined(HAVE_LCD_COLOR)
 #if(LCD_HEIGHT>LCD_WIDTH)
@@ -924,7 +924,7 @@ void I_FinishUpdate (void)
 
         for (y = 1; y <= SCREENHEIGHT; y++)
         {
-            fb_data *dst = rb->lcd_framebuffer + LCD_WIDTH - y;
+            fb_data *dst = lcd_framebuffer + LCD_WIDTH - y;
             count = SCREENWIDTH;
 
             do
@@ -938,14 +938,14 @@ void I_FinishUpdate (void)
     else
 #endif
     {
-        fb_data *dst = rb->lcd_framebuffer;
+        fb_data *dst = lcd_framebuffer;
         count = SCREENWIDTH*SCREENHEIGHT;
 
         do
             *dst++ = palette[*src++];
         while (--count);
     }
-    rb->lcd_update(); 
+    lcd_update(); 
 #else /* !HAVE_LCD_COLOR */
 
     unsigned char *dst;
@@ -993,7 +993,7 @@ void I_InitGraphics(void)
    
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_set_mode(LCD_MODE_PAL256);
+	lcd_set_mode(LCD_MODE_PAL256);
 #endif
 #endif
 

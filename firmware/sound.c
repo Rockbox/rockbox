@@ -26,6 +26,7 @@
 #include "logf.h"
 #include "system.h"
 #include "i2c.h"
+#include "symbols.h"
 
 /* TODO
  * find a nice way to handle 1.5db steps -> see wm8751 ifdef in sound_set_bass/treble
@@ -37,6 +38,7 @@ const char *sound_unit(int setting)
 {
     return audiohw_settings[setting].unit;
 }
+EXPORT_SYMBOL(sound_unit);
 
 int sound_numdecimals(int setting)
 {
@@ -52,16 +54,19 @@ int sound_min(int setting)
 {
     return audiohw_settings[setting].minval;
 }
+EXPORT_SYMBOL(sound_min);
 
 int sound_max(int setting)
 {
     return audiohw_settings[setting].maxval;
 }
+EXPORT_SYMBOL(sound_max);
 
 int sound_default(int setting)
 {
     return audiohw_settings[setting].defaultval;
 }
+EXPORT_SYMBOL(sound_default);
 
 static sound_set_type * const sound_set_fns[] =
 {
@@ -665,6 +670,7 @@ void sound_set(int setting, int value)
     if (sound_set_val)
         sound_set_val(value);
 }
+EXPORT_SYMBOL(sound_set);
 
 #if (!defined(HAVE_AS3514) && !defined(HAVE_WM8975) \
   && !defined(HAVE_WM8758) && !defined(HAVE_TSC2100) \

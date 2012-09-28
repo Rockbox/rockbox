@@ -684,7 +684,7 @@ static void draw(const unsigned char* message)
     if(message != NULL)
     {
         last_message = message;
-        show_message_tick = (*rb->current_tick + HZ) | 1;
+        show_message_tick = (current_tick + HZ) | 1;
     }
 
     /* maybe take additional actions depending upon the changed setting */
@@ -751,7 +751,7 @@ static void draw(const unsigned char* message)
 
     if(show_message_tick != 0)
     {
-        if(TIME_BEFORE(*rb->current_tick, show_message_tick))
+        if(TIME_BEFORE(current_tick, show_message_tick))
         {
     		/* We have a message to show */
             draw_message_string(last_message, true);
@@ -1183,7 +1183,7 @@ static void draw_spectrogram_horizontal(void)
 /****************************** FFT functions ********************************/
 static bool is_playing(void)
 {
-    return rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_PLAYING;
+    return mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_PLAYING;
 }
 
 /** functions use in single/multi configuration **/
@@ -1205,7 +1205,7 @@ static inline bool fft_get_fft(void)
 {
     int count;
     const int16_t *value =
-        rb->mixer_channel_get_buffer(PCM_MIXER_CHAN_PLAYBACK, &count);
+        mixer_channel_get_buffer(PCM_MIXER_CHAN_PLAYBACK, &count);
     /* This block can introduce discontinuities in our data. Meaning, the
      * FFT will not be done a continuous segment of the signal. Which can
      * be bad. Or not.
@@ -1233,11 +1233,11 @@ static inline bool fft_get_fft(void)
 
     apply_window_func(graph_settings.window_func);
 
-    rb->yield();
+    yield();
 
     kiss_fft(fft_state, input, output[output_tail]);
 
-    rb->yield();
+    yield();
 
     return true;
 }
@@ -1265,18 +1265,18 @@ static void fft_thread_entry(void)
 	{
         if (!is_playing())
         {
-            rb->sleep(HZ/5);
+            sleep(HZ/5);
             continue;
         }
 
         if (!fft_get_fft())
         {
-            rb->sleep(0);    /* not enough - ease up */
+            sleep(0);    /* not enough - ease up */
             continue;
         }
 
         /* write back output for other processor and invalidate for next frame read */
-        rb->commit_discard_dcache();
+        commit_discard_dcache();
 
         int new_tail = output_tail ^ 1;
 
@@ -1289,7 +1289,7 @@ static void fft_thread_entry(void)
                 break;
             }
 
-            rb->sleep(0);
+            sleep(0);
         }
 	}
 }
@@ -1308,25 +1308,25 @@ static inline void fft_free_fft_output(void)
 static bool fft_init_fft(void)
 {
     /* create worker thread - on the COP for dual-core targets */
-    fft_thread = rb->create_thread(fft_thread_entry,
+    fft_thread = create_thread(fft_thread_entry,
             fft_thread_stack, sizeof(fft_thread_stack), 0, "fft output thread"
             IF_PRIO(, PRIORITY_USER_INTERFACE+1) IF_COP(, COP));
 
     if(fft_thread == 0)
     {
-        rb->splash(HZ, "FFT thread failed create");
+        splash(HZ, "FFT thread failed create");
         return false;
     }
 
     /* wait for it to indicate 'ready' */
     while(fft_thread_run == false)
-        rb->sleep(0);
+        sleep(0);
 
     if(output_tail == -1)
     {
         /* FFT thread bailed-out like The Fed */
-        rb->thread_wait(fft_thread);
-        rb->splash(HZ, "FFT thread failed to init");
+        thread_wait(fft_thread);
+        splash(HZ, "FFT thread failed to init");
         return false;
     }
 
@@ -1337,8 +1337,8 @@ static void fft_close_fft(void)
 {
     /* Handle our FFT thread. */
     fft_thread_run = false;
-    rb->thread_wait(fft_thread);
-    rb->commit_discard_dcache();
+    thread_wait(fft_thread);
+    commit_discard_dcache();
 }
 #else /* NUM_CORES == 1 */
 /* everything serialize on single-core and FFT gets to use IRAM main stack if
@@ -1378,13 +1378,13 @@ enum plugin_status plugin_start(const void* parameter)
     unsigned char *gbuf;
     size_t  gbuf_size = 0;
     /* get the remainder of the plugin buffer */
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *) plugin_get_buffer(&gbuf_size);
 
     /* initialize the greyscale buffer.*/
     if (!grey_init(gbuf, gbuf_size, GREY_ON_COP | GREY_BUFFERED,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
-        rb->splash(HZ, "Couldn't init greyscale display");
+        splash(HZ, "Couldn't init greyscale display");
         fft_close_fft();
         return PLUGIN_ERROR;
     }
@@ -1394,21 +1394,21 @@ enum plugin_status plugin_start(const void* parameter)
     logarithmic_plot_init();
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
     mylcd_clear_display();
     mylcd_update();
 #endif
     backlight_ignore_timeout();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     while (run)
     {
         /* Unless otherwise specified, HZ/50 is around the window length
          * and quite fast. We want to be done with drawing by this time. */
-        long next_frame_tick = *rb->current_tick + HZ/50;
+        long next_frame_tick = current_tick + HZ/50;
         int button;
 
         while (!fft_have_fft())
@@ -1439,7 +1439,7 @@ enum plugin_status plugin_start(const void* parameter)
              * but watching for buttons. Music might not be playing or things
              * just aren't going well for picking up buffers so keys are
              * scanned to avoid lockup.  */
-             button = rb->button_get_w_tmo(timeout);
+             button = button_get_w_tmo(timeout);
              if (button != BUTTON_NONE)
                  goto read_button;
 		}
@@ -1448,18 +1448,18 @@ enum plugin_status plugin_start(const void* parameter)
 
         fft_free_fft_output(); /* COP only */
 
-        long tick = *rb->current_tick;
+        long tick = current_tick;
         if(TIME_BEFORE(tick, next_frame_tick))
         {
             tick = next_frame_tick - tick;
         }
         else
         {
-            rb->yield(); /* tmo = 0 won't yield */
+            yield(); /* tmo = 0 won't yield */
             tick = 0;
         }
 
-		button = rb->button_get_w_tmo(tick);
+		button = button_get_w_tmo(tick);
     read_button:
         switch (button)
         {
@@ -1509,7 +1509,7 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             }
             default: {
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
             }
 
@@ -1519,7 +1519,7 @@ enum plugin_status plugin_start(const void* parameter)
     fft_close_fft();	
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 #ifndef HAVE_LCD_COLOR
     grey_release();

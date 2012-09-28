@@ -34,6 +34,7 @@
 #include "lcd-remote.h"
 #endif
 #include "scroll_engine.h"
+#include "symbols.h"
 
 static const char scroll_tick_table[18] = {
  /* Hz values [f(x)=100.8/(x+.048)]:
@@ -84,6 +85,7 @@ void lcd_stop_scroll(void)
 {
     lcd_scroll_info.lines = 0;
 }
+EXPORT_SYMBOL(lcd_stop_scroll);
 
 /* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
 void lcd_scroll_stop_line(const struct viewport* current_vp, int y)

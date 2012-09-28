@@ -233,18 +233,18 @@ static void init_explode(int x, int y, int firework, int points)
 
     for(i=0; i<points; i++)
     {
-        rb->srand(*rb->current_tick * i);
+        srand(current_tick * i);
 
         firework_xpoints[firework][i] = x;
         firework_ypoints[firework][i] = y;
 
-        firework_xspeed[firework][i] = (rb->rand() % FIREWORK_MOVEMENT_RANGE)
+        firework_xspeed[firework][i] = (rand() % FIREWORK_MOVEMENT_RANGE)
                                             - FIREWORK_MOVEMENT_RANGE/2;
-        firework_yspeed[firework][i] = (rb->rand() % FIREWORK_MOVEMENT_RANGE)
+        firework_yspeed[firework][i] = (rand() % FIREWORK_MOVEMENT_RANGE)
                                             - FIREWORK_MOVEMENT_RANGE/2;
 
 #ifdef HAVE_LCD_COLOR
-        firework_color[firework][i] = rb->rand() % 7;
+        firework_color[firework][i] = rand() % 7;
 #endif
     }
 }
@@ -253,17 +253,17 @@ static void init_explode(int x, int y, int firework, int points)
  * prepares said rocket to start moving towards its destination. */
 static void init_rocket(int rocket)
 {
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
-    rocket_xpos[rocket] = rb->rand() % LCD_WIDTH;
+    rocket_xpos[rocket] = rand() % LCD_WIDTH;
     rocket_ypos[rocket] = LCD_HEIGHT;
 
-    rocket_xspeed[rocket] = (rb->rand() % ROCKET_MOVEMENT_RANGE)
+    rocket_xspeed[rocket] = (rand() % ROCKET_MOVEMENT_RANGE)
                                 - ROCKET_MOVEMENT_RANGE/2;
     rocket_yspeed[rocket] = 3;
 
     rocket_phase[rocket] = 0;
-    rocket_targetphase[rocket] = (ROCKET_LIFE + (rb->rand() % ROCKET_LIFE_VAR))
+    rocket_targetphase[rocket] = (ROCKET_LIFE + (rand() % ROCKET_LIFE_VAR))
                                     / rocket_yspeed[rocket];
 }
 
@@ -273,64 +273,64 @@ static void fireworks_menu(void)
     int selected = 0, result;
     bool menu_quit = false;
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while(!menu_quit)
     {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
             case 0:
-                rb->lcd_setfont(FONT_SYSFIXED);
+                lcd_setfont(FONT_SYSFIXED);
 
 #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_background(LCD_BLACK);
-                rb->lcd_set_foreground(LCD_WHITE);
+                lcd_set_background(LCD_BLACK);
+                lcd_set_foreground(LCD_WHITE);
 #endif
 
-                rb->lcd_clear_display();
-                rb->lcd_update();
+                lcd_clear_display();
+                lcd_update();
 
                 init_all();
                 menu_quit = true;
                 break;
 
             case 1:
-                rb->set_option("Auto-Fire", &autofire_delay, INT,
+                set_option("Auto-Fire", &autofire_delay, INT,
                                 autofire_delay_settings, 15, NULL);
                 break;
 
             case 2:
-                rb->set_option("Particles Per Firework", &particles_per_firework,
+                set_option("Particles Per Firework", &particles_per_firework,
                                 INT, particle_settings, 8, NULL);
                 break;
 
             case 3:
-                rb->set_option("Particle Life", &particle_life, INT,
+                set_option("Particle Life", &particle_life, INT,
                                 particle_life_settings, 9, NULL);
                 break;
 
             case 4:
-                rb->set_option("Gravity", &gravity, INT,
+                set_option("Gravity", &gravity, INT,
                                 gravity_settings, 4, NULL);
                 break;
 
             case 5:
-                rb->set_option("Show Rockets", &show_rockets, INT,
+                set_option("Show Rockets", &show_rockets, INT,
                                 rocket_settings, 3, NULL);
                 break;
 
             case 6:
-                rb->set_option("FPS (Speed)", &frames_per_second, INT,
+                set_option("FPS (Speed)", &frames_per_second, INT,
                                 fps_settings, 9, NULL);
                 break;
 
@@ -360,22 +360,22 @@ enum plugin_status plugin_start(const void* parameter)
        white-text-on-black-background. */
     backlight_ignore_timeout();
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_backdrop(NULL);
+    lcd_set_background(LCD_BLACK);
+    lcd_set_foreground(LCD_WHITE);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     fireworks_menu();
 
-    start_tick = *rb->current_tick;
+    start_tick = current_tick;
 
     while(!quit_plugin)
     {
-        rb->lcd_clear_display();
+        lcd_clear_display();
 
         /* loop through every possible rocket */
         for(j=0; j<MAX_ROCKETS; j++)
@@ -387,11 +387,11 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_LCD_COLOR /* draw trail, if requested */
                 if(show_rockets==2)
                 {
-                    rb->lcd_set_foreground(LCD_RGBPACK(128,128,128));
-                    rb->lcd_fillrect(rocket_xpos[j], rocket_ypos[j],
+                    lcd_set_foreground(LCD_RGBPACK(128,128,128));
+                    lcd_fillrect(rocket_xpos[j], rocket_ypos[j],
                                      ROCKET_SIZE, ROCKET_SIZE);
-                    rb->lcd_set_foreground(LCD_RGBPACK(64,64,64));
-                    rb->lcd_fillrect(rocket_xpos[j]-rocket_xspeed[j],
+                    lcd_set_foreground(LCD_RGBPACK(64,64,64));
+                    lcd_fillrect(rocket_xpos[j]-rocket_xspeed[j],
                                      rocket_ypos[j]+rocket_yspeed[j],
                                      ROCKET_SIZE, ROCKET_SIZE);
                 }
@@ -402,10 +402,10 @@ enum plugin_status plugin_start(const void* parameter)
                 rocket_ypos[j] -= rocket_yspeed[j];
 
 #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(LCD_WHITE);
+                lcd_set_foreground(LCD_WHITE);
 #endif
                 if(show_rockets==2 || show_rockets==1)
-                    rb->lcd_fillrect(rocket_xpos[j], rocket_ypos[j],
+                    lcd_fillrect(rocket_xpos[j], rocket_ypos[j],
                                     ROCKET_SIZE, ROCKET_SIZE);
 
                 /* if(rocket isn't "there" yet) keep moving
@@ -435,36 +435,36 @@ enum plugin_status plugin_start(const void* parameter)
                                                     /gravity_values[gravity];
 
 #ifdef HAVE_LCD_COLOR
-                    rb->lcd_set_foreground(
+                    lcd_set_foreground(
                         firework_darkest_colors[firework_color[j][i]]);
-                    rb->lcd_fillrect(firework_xpoints[j][i]-1,
+                    lcd_fillrect(firework_xpoints[j][i]-1,
                                      firework_ypoints[j][i]-1,
                                      FIREWORK_SIZE+2, FIREWORK_SIZE+2);
 
                     int phase_left = particle_life_values[particle_life]
                                         - firework_phase[j];
                     if(phase_left > 10)
-                        rb->lcd_set_foreground(
+                        lcd_set_foreground(
                             firework_colors[firework_color[j][i]]);
                     else if(phase_left > 7)
-                        rb->lcd_set_foreground(
+                        lcd_set_foreground(
                             firework_dark_colors[firework_color[j][i]]);
                     else if(phase_left > 3)
-                        rb->lcd_set_foreground(
+                        lcd_set_foreground(
                             firework_darker_colors[firework_color[j][i]]);
                     else
-                        rb->lcd_set_foreground(
+                        lcd_set_foreground(
                             firework_darkest_colors[firework_color[j][i]]);
 #endif
-                    rb->lcd_fillrect(firework_xpoints[j][i],
+                    lcd_fillrect(firework_xpoints[j][i],
                                      firework_ypoints[j][i],
                                      FIREWORK_SIZE, FIREWORK_SIZE);
 /* WIP - currently ugly explosion effect
 #ifdef HAVE_LCD_COLOR
                     if(firework_phase[j] < 10)
                     {
-                        rb->lcd_set_foreground(EXPLOSION_COLOR);
-                        rb->lcd_fillrect(rocket_xpos[j]-firework_phase[j],
+                        lcd_set_foreground(EXPLOSION_COLOR);
+                        lcd_fillrect(rocket_xpos[j]-firework_phase[j],
                                          rocket_ypos[j]-firework_phase[j],
                                          firework_phase[j]*2, firework_phase[j]*2);
                     }
@@ -472,7 +472,7 @@ enum plugin_status plugin_start(const void* parameter)
                 }
 
 #ifdef HAVE_LCD_COLOR
-                    rb->lcd_set_foreground(LCD_WHITE);
+                    lcd_set_foreground(LCD_WHITE);
 #endif
 
                 /* firework at its destination age?
@@ -487,7 +487,7 @@ enum plugin_status plugin_start(const void* parameter)
         /* is autofire on? */
         if(autofire_delay != 0)
         {
-            elapsed_tick = *rb->current_tick - start_tick;
+            elapsed_tick = current_tick - start_tick;
 
             if(elapsed_tick > autofire_delay_values[autofire_delay])
             {
@@ -495,11 +495,11 @@ enum plugin_status plugin_start(const void* parameter)
                 if(++thisrocket == MAX_ROCKETS)
                     thisrocket = 0;
 
-                start_tick = *rb->current_tick;
+                start_tick = current_tick;
             }
         }
 
-        rb->lcd_update();
+        lcd_update();
 
         button = pluginlib_getaction(HZ/fps_values[frames_per_second], plugin_contexts,
                                ARRAYLEN(plugin_contexts));
@@ -526,7 +526,7 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_use_settings();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     return PLUGIN_OK;

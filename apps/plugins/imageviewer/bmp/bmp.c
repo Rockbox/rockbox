@@ -75,7 +75,7 @@ static void draw_image_rect(struct image_info *info,
 {
     struct t_disp* pdisp = (struct t_disp*)info->data;
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_bitmap_part(
+    lcd_bitmap_part(
         (fb_data*)pdisp->bitmap, info->x + x, info->y + y,
         STRIDE(SCREEN_MAIN, info->width, info->height),
         x + MAX(0, (LCD_WIDTH-info->width)/2),
@@ -113,18 +113,18 @@ static int load_image(char *filename, struct image_info *info,
     const struct custom_format *cformat = &format_native;
 #endif
 
-    rb->memset(&disp, 0, sizeof(disp));
-    rb->memset(&bmp, 0, sizeof(bmp)); /* clear info struct */
+    memset(&disp, 0, sizeof(disp));
+    memset(&bmp, 0, sizeof(bmp)); /* clear info struct */
 
     if ((intptr_t)buf & 3)
     {
         *buf_size -= 4-((intptr_t)buf&3);
         buf += 4-((intptr_t)buf&3);
     }
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->splashf(HZ, "err opening %s: %d", filename, fd);
+        splashf(HZ, "err opening %s: %d", filename, fd);
         return PLUGIN_ERROR;
     }
     int ds = 1;
@@ -152,65 +152,65 @@ static int load_image(char *filename, struct image_info *info,
             ds *= 2;
             bmp.width /= 2;
             bmp.height /= 2;
-            rb->lseek(fd, 0, SEEK_SET);
+            lseek(fd, 0, SEEK_SET);
             size = scaled_read_bmp_fd(fd, &bmp, 0, format | FORMAT_RETURN_SIZE, cformat);
         }
     }
     if (size <= 0)
     {
-        rb->close(fd);
-        rb->splashf(HZ, "read error %d", size);
+        close(fd);
+        splashf(HZ, "read error %d", size);
         return PLUGIN_ERROR;
     }
 
     if (size > *buf_size)
     {
-        rb->close(fd);
+        close(fd);
         return PLUGIN_OUTOFMEM;
     }
 
     if (!iv->running_slideshow)
     {
-        rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
-        rb->lcd_putsf(0, 1, "loading %dx%d%s",
+        lcd_puts(0, 0, strrchr(filename,'/')+1);
+        lcd_putsf(0, 1, "loading %dx%d%s",
                         bmp.width, bmp.height, ds == 1?"":"(resize on load)");
-        rb->lcd_update();
+        lcd_update();
     }
 
     /* allocate bitmap buffer */
     bmp.data = buf;
 
     /* actual loading */
-    time = *rb->current_tick;
-    rb->lseek(fd, 0, SEEK_SET);
+    time = current_tick;
+    lseek(fd, 0, SEEK_SET);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
     size = scaled_read_bmp_fd(fd, &bmp, *buf_size, format, cformat);
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #else
     size = scaled_read_bmp_fd(fd, &bmp, *buf_size, format, cformat);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
-    rb->close(fd);
-    time = *rb->current_tick - time;
+    close(fd);
+    time = current_tick - time;
 
     if (size <= 0)
     {
-        rb->splashf(HZ, "load error %d", size);
+        splashf(HZ, "load error %d", size);
         return PLUGIN_ERROR;
     }
 
     if (!iv->running_slideshow)
     {
-        rb->snprintf(print, sizeof(print), " %ld.%02ld sec ", time/HZ, time%HZ);
-        rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
-        rb->lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
-        rb->lcd_update();
+        snprintf(print, sizeof(print), " %ld.%02ld sec ", time/HZ, time%HZ);
+        lcd_getstringsize(print, &w, &h); /* centered in progress bar */
+        lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
+        lcd_update();
     }
 #ifdef DISK_SPINDOWN
     else if(iv->immediate_ata_off)
     {
         /* running slideshow and time is long enough: power down disk */
-        rb->storage_sleep();
+        storage_sleep();
     }
 #endif
 
@@ -220,8 +220,8 @@ static int load_image(char *filename, struct image_info *info,
 
     if (!iv->running_slideshow)
     {
-        rb->lcd_putsf(0, 2, "image %dx%d", bmp.width, bmp.height);
-        rb->lcd_update();
+        lcd_putsf(0, 2, "image %dx%d", bmp.width, bmp.height);
+        lcd_update();
     }
 
     info->x_size = bmp.width;
@@ -267,17 +267,17 @@ static int get_image(struct image_info *info, int ds)
 
         if (!iv->running_slideshow)
         {
-            rb->lcd_putsf(0, 3, "resizing %d*%d", info->width, info->height);
-            rb->lcd_update();
+            lcd_putsf(0, 3, "resizing %d*%d", info->width, info->height);
+            lcd_update();
         }
 
         bmp_dst.width = info->width;
         bmp_dst.height = info->height;
         bmp_dst.data = p_disp->bitmap;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost(true);
+        cpu_boost(true);
         resize_bitmap(&bmp, &bmp_dst);
-        rb->cpu_boost(false);
+        cpu_boost(false);
 #else
         resize_bitmap(&bmp, &bmp_dst);
 #endif /*HAVE_ADJUSTABLE_CPU_FREQ*/

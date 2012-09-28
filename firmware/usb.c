@@ -42,6 +42,7 @@
 #endif
 #include "logf.h"
 #include "screendump.h"
+#include "symbols.h"
 
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || (CONFIG_CPU == SH7034) || \
@@ -656,6 +657,7 @@ void usb_acknowledge(long id)
 {
     queue_post(&usb_queue, id, 0);
 }
+EXPORT_SYMBOL(usb_acknowledge);
 
 void usb_init(void)
 {
@@ -763,6 +765,7 @@ bool usb_powered(void)
 {
     return usb_state == USB_POWERED;
 }
+EXPORT_SYMBOL(usb_powered);
 #endif /* HAVE_USB_POWER */
 
 #ifdef USB_ENABLE_HID

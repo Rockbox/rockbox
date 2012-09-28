@@ -56,6 +56,8 @@
 #endif
 #endif
 
+#include "symbols.h"
+
 /* TODO: The audio thread really is doing multitasking of acting like a
          consumer and producer of tracks. It may be advantageous to better
          logically separate the two functions. I won't go that far just yet. */
@@ -1227,6 +1229,7 @@ static void audio_ff_rewind_end(void)
         }
     }
 }
+EXPORT_SYMBOL(audio_ff_rewind);
 
 /* Complete the codec seek */
 static void audio_complete_codec_seek(void)
@@ -3368,6 +3371,7 @@ int audio_status(void)
 
     return (int)ret;
 }
+EXPORT_SYMBOL(audio_status);
 
 /* Clear all accumulated audio errors for playback and recording */
 void audio_error_clear(void)
@@ -3422,6 +3426,7 @@ struct mp3entry * audio_current_track(void)
 
     return id3;
 }
+EXPORT_SYMBOL(audio_current_track);
 
 /* Obtains the mp3entry for the next track from the current */
 struct mp3entry * audio_next_track(void)
@@ -3471,6 +3476,7 @@ void audio_stop(void)
     LOGFQUEUE("audio >| audio Q_AUDIO_STOP");
     audio_queue_send(Q_AUDIO_STOP, 0);
 }
+EXPORT_SYMBOL(audio_stop);
 
 /* Pause playback if playing */
 void audio_pause(void)
@@ -3478,6 +3484,7 @@ void audio_pause(void)
     LOGFQUEUE("audio >| audio Q_AUDIO_PAUSE");
     audio_queue_send(Q_AUDIO_PAUSE, true);
 }
+EXPORT_SYMBOL(audio_pause);
 
 /* This sends a stop message and the audio thread will dump all its
    subsequent messages */
@@ -3499,6 +3506,7 @@ void audio_resume(void)
     LOGFQUEUE("audio >| audio Q_AUDIO_PAUSE resume");
     audio_queue_send(Q_AUDIO_PAUSE, false);
 }
+EXPORT_SYMBOL(audio_resume);
 
 /* Skip the specified number of tracks forward or backward from the current */
 void audio_skip(int offset)
@@ -3551,12 +3559,14 @@ void audio_next(void)
 {
     audio_skip(1);
 }
+EXPORT_SYMBOL(audio_next);
 
 /* Skip one track backward from the current */
 void audio_prev(void)
 {
     audio_skip(-1);
 }
+EXPORT_SYMBOL(audio_prev);
 
 /* Move one directory forward */
 void audio_next_dir(void)
@@ -3592,6 +3602,7 @@ void audio_flush_and_reload_tracks(void)
     LOGFQUEUE("audio > audio Q_AUDIO_FLUSH");
     audio_queue_post(Q_AUDIO_FLUSH, 0);
 }
+EXPORT_SYMBOL(audio_flush_and_reload_tracks);
 
 /* Return the pointer to the main audio buffer, optionally preserving
    voicing */
@@ -3793,6 +3804,7 @@ int audio_get_file_pos(void)
 {
     return 0;
 }
+EXPORT_SYMBOL(audio_get_file_pos);
 
 /* Return the elapsed time of the track previous to the current */
 unsigned long audio_prev_elapsed(void)

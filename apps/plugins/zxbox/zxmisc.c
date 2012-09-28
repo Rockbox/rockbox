@@ -43,8 +43,8 @@ int check_ext(const char *filename, const char *ext)
   int flen, elen;
   int i;
 
-  flen = (int) rb->strlen(filename);
-  elen = (int) rb->strlen(ext);
+  flen = (int) strlen(filename);
+  elen = (int) strlen(ext);
 
   if(flen <= elen + 1) return 0;
   
@@ -61,7 +61,7 @@ void add_extension(char *filename, const char *ext)
   int i;
   int upper;
 
-  i = (int) rb->strlen(filename);
+  i = (int) strlen(filename);
   if(filename[i] > 64 && filename[i] < 96) upper = 1;
   else upper = 0;
   
@@ -77,9 +77,9 @@ int file_exist(const char *filename)
   /*FILE *fp;*/
   int fd;
 
-  fd = rb->open(filename, O_RDONLY);
+  fd = open(filename, O_RDONLY);
   if(fd >= 0) {
-    rb->close(fd);
+    close(fd);
     return 1;
   }
   else return 0;
@@ -91,7 +91,7 @@ int try_extension(char *filename, const char *ext)
 {
   int tend;
   
-  tend = (int) rb->strlen(filename);
+  tend = (int) strlen(filename);
   add_extension(filename, ext);
   if(file_exist(filename)) return 1;
 
@@ -114,8 +114,8 @@ void *malloc_err(size_t size)
 char *make_string(char *ostr, const char *nstr)
 {
   if(ostr != NULL) /*free(ostr)*/ostr=0;
-  ostr = malloc_err(rb->strlen(nstr) + 1);
-  rb->strcpy(ostr, nstr);
+  ostr = malloc_err(strlen(nstr) + 1);
+  strcpy(ostr, nstr);
   return ostr;
 }
 

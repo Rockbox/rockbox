@@ -30,6 +30,7 @@
 #include "splash.h"
 #include "viewport.h"
 #include "strtok_r.h"
+#include "symbols.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -213,6 +214,7 @@ void splashf(int ticks, const char *fmt, ...)
     if (ticks)
         sleep(ticks);
 }
+EXPORT_SYMBOL(splashf);
 
 void splash(int ticks, const char *str)
 {
@@ -226,3 +228,4 @@ void splash(int ticks, const char *str)
 #endif
     splashf(ticks, "%s", P2STR((const unsigned char*)str));
 }
+EXPORT_SYMBOL(splash);

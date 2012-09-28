@@ -27,6 +27,7 @@
 #include "dsp-util.h"
 #include "dsp_proc_entry.h"
 #include "tdspeed.h"
+#include "symbols.h"
 
 #ifndef assert
 #define assert(cond)
@@ -407,6 +408,7 @@ void dsp_set_timestretch(int32_t percent)
 
     dsp_configure(st->dsp, TIMESTRETCH_SET_FACTOR, percent);
 }
+EXPORT_SYMBOL(dsp_set_timestretch);
 
 /* Return the timestretch ratio */
 int32_t dsp_get_timestretch(void)

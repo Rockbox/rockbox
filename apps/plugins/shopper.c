@@ -60,7 +60,7 @@ static const char *list_get_name_cb(int selected_item, void* data,
                                     char* buf, size_t buf_len)
 {
     (void)data;
-    rb->strlcpy(buf, items_list[view_id_list[selected_item]].desc, buf_len);
+    strlcpy(buf, items_list[view_id_list[selected_item]].desc, buf_len);
     return buf;
 }
 
@@ -80,16 +80,16 @@ static bool save_changes(void)
     int fd;
     int i;
 
-    fd = rb->open(filename,O_WRONLY|O_CREAT|O_TRUNC);
+    fd = open(filename,O_WRONLY|O_CREAT|O_TRUNC);
     if (fd < 0)
     {
-        rb->splash(HZ*2, "Changes NOT saved");
+        splash(HZ*2, "Changes NOT saved");
         return false;
     }
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(1);
+    cpu_boost(1);
 #endif
     for (i = 0;i < total_item_count; i++)
     {
@@ -97,28 +97,28 @@ static bool save_changes(void)
         {
             case FL_CATEGORY:
             {
-                rb->fdprintf(fd,"#%s\n",items_list[i].desc);
+                fdprintf(fd,"#%s\n",items_list[i].desc);
                 break;
             }
             case FL_SET:
             {
-                rb->fdprintf(fd,"!%s\n",items_list[i].desc);
+                fdprintf(fd,"!%s\n",items_list[i].desc);
                 break;
             }
             case FL_CLEARED:
             {
-                rb->fdprintf(fd," %s\n",items_list[i].desc);
+                fdprintf(fd," %s\n",items_list[i].desc);
                 break;
             }
         }
     }
     /* save current view */
-    rb->fdprintf(fd,"$%d%d\n",view, show_categories);
+    fdprintf(fd,"$%d%d\n",view, show_categories);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(0);
+    cpu_boost(0);
 #endif
-    rb->close(fd);
+    close(fd);
 
     return true;
 }
@@ -138,7 +138,7 @@ static void create_view(struct gui_synclist *lists)
                     view_id_list[cnt++] = i;
             }
             view_item_count = cnt;
-            rb->gui_synclist_set_title(lists,"Select items",Icon_Playlist);
+            gui_synclist_set_title(lists,"Select items",Icon_Playlist);
             break;
         }
         case VIEW_SHOPPING_LIST:
@@ -162,7 +162,7 @@ static void create_view(struct gui_synclist *lists)
                     view_id_list[cnt++] = i;
             }
             view_item_count = cnt;
-            rb->gui_synclist_set_title(lists,"Shopping list",Icon_Playlist);
+            gui_synclist_set_title(lists,"Shopping list",Icon_Playlist);
             break;
         }
     }
@@ -182,9 +182,9 @@ static bool toggle(int selected_item)
 static void update_category_string(void)
 {
     if (show_categories)
-        rb->strcpy(category_string,"Hide categories");
+        strcpy(category_string,"Hide categories");
     else
-        rb->strcpy(category_string,"Show categories");
+        strcpy(category_string,"Show categories");
 }
 
 static enum plugin_status load_file(void)
@@ -196,20 +196,20 @@ static enum plugin_status load_file(void)
     int linelen;
     total_item_count = 0;
 
-    fd = rb->open(filename,O_RDONLY);
+    fd = open(filename,O_RDONLY);
     if (fd < 0)
     {
-        rb->splashf(HZ*2,"Couldn't open file: %s",filename);
+        splashf(HZ*2,"Couldn't open file: %s",filename);
         return PLUGIN_ERROR;
     }
 
     /* read in the file */
-    while (rb->read_line(fd,temp_line,MAX_LINE_LEN))
+    while (read_line(fd,temp_line,MAX_LINE_LEN))
     {
-        if (rb->strncmp(temp_line, "$", 1) == 0)
+        if (strncmp(temp_line, "$", 1) == 0)
         {
             /* read view preferences */
-            linelen = rb->strlen(temp_line);
+            linelen = strlen(temp_line);
             if (linelen >= 2)
             {
                 unsigned int val = temp_line[1] - '0';
@@ -231,44 +231,44 @@ static enum plugin_status load_file(void)
         else
         {
             new_item.id = count;
-            if (rb->strncmp(temp_line, " ", 1) == 0)
+            if (strncmp(temp_line, " ", 1) == 0)
             {
                 /* read description, flag = cleared */
                 new_item.flag = FL_CLEARED;
-                rb->memcpy(new_item.desc, &temp_line[1], DESC_SIZE);
+                memcpy(new_item.desc, &temp_line[1], DESC_SIZE);
             }
-            else if (rb->strncmp(temp_line, "!", 1) == 0)
+            else if (strncmp(temp_line, "!", 1) == 0)
             {
                 /* read description, flag = set */
                 new_item.flag = FL_SET;
-                rb->memcpy(new_item.desc, &temp_line[1], DESC_SIZE);
+                memcpy(new_item.desc, &temp_line[1], DESC_SIZE);
             }
-            else if (rb->strncmp(temp_line, "#", 1) == 0)
+            else if (strncmp(temp_line, "#", 1) == 0)
             {
                 /* read description, flag = category */
                 new_item.flag = FL_CATEGORY;
-                rb->memcpy(new_item.desc, &temp_line[1], DESC_SIZE);
+                memcpy(new_item.desc, &temp_line[1], DESC_SIZE);
             }
             else
             {
                 /* read description, flag = cleared */
                 new_item.flag = FL_CLEARED;
-                rb->memcpy(new_item.desc, temp_line, DESC_SIZE);
+                memcpy(new_item.desc, temp_line, DESC_SIZE);
             }
             items_list[total_item_count] = new_item;
             total_item_count++;
             if (total_item_count == MAX_LIST_SIZE)
             {
                 total_item_count = MAX_LIST_SIZE - 1;
-                rb->splashf(HZ*2, "Truncating shopping list to %d items",
+                splashf(HZ*2, "Truncating shopping list to %d items",
                             MAX_LIST_SIZE - 1);
                 changed = true;
-                rb->close(fd);
+                close(fd);
                 return PLUGIN_OK;
             }
         }
     }
-    rb->close(fd);
+    close(fd);
     changed = false;
     return PLUGIN_OK;
 }
@@ -282,15 +282,15 @@ enum plugin_status plugin_start(const void* parameter)
     int cur_sel = 0;
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(1);
+    cpu_boost(1);
 #endif
     if (parameter)
     {
-        rb->strcpy(filename,(char*)parameter);
+        strcpy(filename,(char*)parameter);
 
         if (load_file() == PLUGIN_ERROR)
             return PLUGIN_ERROR;
@@ -299,24 +299,24 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(0);
+    cpu_boost(0);
 #endif
     /* now dump it in the list */
-    rb->gui_synclist_init(&lists,list_get_name_cb,0, false, 1, NULL);
-    rb->gui_synclist_set_icon_callback(&lists, list_get_icon_cb);
-    rb->gui_synclist_limit_scroll(&lists,true);
+    gui_synclist_init(&lists,list_get_name_cb,0, false, 1, NULL);
+    gui_synclist_set_icon_callback(&lists, list_get_icon_cb);
+    gui_synclist_limit_scroll(&lists,true);
     create_view(&lists);
-    rb->gui_synclist_set_nb_items(&lists,view_item_count);
-    rb->gui_synclist_select_item(&lists, 0);
-    rb->gui_synclist_draw(&lists);
-    rb->lcd_update();
+    gui_synclist_set_nb_items(&lists,view_item_count);
+    gui_synclist_select_item(&lists, 0);
+    gui_synclist_draw(&lists);
+    lcd_update();
 
     while (!exit)
     {
-        rb->gui_synclist_draw(&lists);
-        cur_sel = rb->gui_synclist_get_sel_pos(&lists);
-        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&lists,&button,LIST_WRAP_UNLESS_HELD))
+        gui_synclist_draw(&lists);
+        cur_sel = gui_synclist_get_sel_pos(&lists);
+        button = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        if (gui_synclist_do_button(&lists,&button,LIST_WRAP_UNLESS_HELD))
             continue;
         switch (button)
         {
@@ -340,7 +340,7 @@ enum plugin_status plugin_start(const void* parameter)
                                                   "Revert to saved",
                                                   "Show Playback Menu",);
 
-                        switch (rb->do_menu(&menu, NULL, NULL, false))
+                        switch (do_menu(&menu, NULL, NULL, false))
                         {
                             case 0:
                             {
@@ -411,7 +411,7 @@ enum plugin_status plugin_start(const void* parameter)
                                                   "Revert to saved",
                                                   "Show Playback Menu",);
 
-                        switch (rb->do_menu(&menu, NULL, NULL, false))
+                        switch (do_menu(&menu, NULL, NULL, false))
                         {
                             case 0:
                             {
@@ -474,9 +474,9 @@ enum plugin_status plugin_start(const void* parameter)
         }
 
         create_view(&lists);
-        rb->gui_synclist_set_nb_items(&lists,view_item_count);
+        gui_synclist_set_nb_items(&lists,view_item_count);
         if (view_item_count > 0 && view_item_count <= cur_sel)
-            rb->gui_synclist_select_item(&lists,view_item_count-1);
+            gui_synclist_select_item(&lists,view_item_count-1);
     }
     return PLUGIN_OK;
 }

@@ -28,7 +28,7 @@
 #include "talk.h"
 #include "settings.h"
 #include "viewport.h"
-
+#include "symbols.h"
 
 struct gui_yesno
 {
@@ -237,7 +237,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 
     return(result);
 }
-
+EXPORT_SYMBOL(gui_syncyesno_run);
 
 /* Function to manipulate all yesno dialogues.
    This function needs the output text as an argument. */

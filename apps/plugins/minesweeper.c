@@ -402,14 +402,14 @@ extern const fb_data minesweeper_tiles[];
 #define CorrectFlag  14
 
 #define draw_tile( num, x, y ) \
-    rb->lcd_bitmap_part( minesweeper_tiles, 0, num * TileSize, \
+    lcd_bitmap_part( minesweeper_tiles, 0, num * TileSize, \
                          TileSize, left+x*TileSize, top+y*TileSize, \
                          TileSize, TileSize )
 
 #define invert_tile( x, y ) \
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT); \
-    rb->lcd_fillrect( left+x*TileSize, top+y*TileSize, TileSize, TileSize ); \
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_COMPLEMENT); \
+    lcd_fillrect( left+x*TileSize, top+y*TileSize, TileSize, TileSize ); \
+    lcd_set_drawmode(DRMODE_SOLID);
 
 
 /* the tile struct
@@ -563,7 +563,7 @@ static bool discover( int y, int x, bool explore_neighbors )
 /* Reset the whole board for a new game. */
 static void minesweeper_init( void )
 {
-    rb->memset(minefield, 0, sizeof(minefield));
+    memset(minefield, 0, sizeof(minefield));
     no_mines = true;
     tiles_left = width*height;
 }
@@ -583,7 +583,7 @@ static void minesweeper_putmines( int p, int x, int y )
     {
         for( j = 0; j < width; j++ )
         {
-            if( rb->rand()%100 < p
+            if( rand()%100 < p
                 && !( i>=y-1 && i<=y+1 && j>=x-1 && j<=x+1 ) )
             {
                 minefield[i][j].mine = 1;
@@ -662,10 +662,10 @@ static void mine_show( void )
             }
         }
     }
-    rb->lcd_update();
+    lcd_update();
 
     do
-        button = rb->button_get(true);
+        button = button_get(true);
     while( ( button == BUTTON_NONE )
            || ( button & (BUTTON_REL|BUTTON_REPEAT) ) );
 #ifdef HAVE_TOUCHSCREEN
@@ -706,13 +706,13 @@ static enum minesweeper_status menu( void )
                          "Number of Columns", "Playback Control", "Quit" );
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground( rb->global_settings->fg_color );
-    rb->lcd_set_background( rb->global_settings->bg_color );
+    lcd_set_foreground( global_settings.fg_color );
+    lcd_set_background( global_settings.bg_color );
 #endif
 
     while( !menu_quit )
     {
-        switch( rb->do_menu( &menu, &selection, NULL, false ) )
+        switch( do_menu( &menu, &selection, NULL, false ) )
         {
             case 0:
                 result = MINESWEEPER_WIN; /* start playing */
@@ -720,17 +720,17 @@ static enum minesweeper_status menu( void )
                 break;
 
             case 1:
-                rb->set_int( "Mine Percentage", "%", UNIT_INT, &percent, NULL,
+                set_int( "Mine Percentage", "%", UNIT_INT, &percent, NULL,
                              1, 2, 98, NULL );
                 break;
 
             case 2:
-                rb->set_int( "Number of Rows", "", UNIT_INT, &height, NULL,
+                set_int( "Number of Rows", "", UNIT_INT, &height, NULL,
                              1, 1, MAX_HEIGHT, NULL );
                 break;
 
             case 3:
-                rb->set_int( "Number of Columns", "", UNIT_INT, &width, NULL,
+                set_int( "Number of Columns", "", UNIT_INT, &width, NULL,
                              1, 1, MAX_WIDTH, NULL );
                 break;
 
@@ -778,7 +778,7 @@ static enum minesweeper_status minesweeper( void )
     mine_raster.height = height*TileSize;
 #endif
 
-    rb->srand( *rb->current_tick );
+    srand( current_tick );
     minesweeper_init();
     x = 0;
     y = 0;
@@ -791,9 +791,9 @@ static enum minesweeper_status minesweeper( void )
 
         /* clear the screen buffer */
 #ifdef HAVE_LCD_COLOR
-        rb->lcd_set_background( BackgroundColor );
+        lcd_set_background( BackgroundColor );
 #endif
-        rb->lcd_clear_display();
+        lcd_clear_display();
 
         /* display the mine field */
         for( i = 0; i < height; i++ )
@@ -819,14 +819,14 @@ static enum minesweeper_status minesweeper( void )
         invert_tile( x, y );
 
         /* update the screen */
-        rb->lcd_update();
+        lcd_update();
 
-        button = rb->button_get(true);
+        button = button_get(true);
 #ifdef HAVE_TOUCHSCREEN
         if(button & BUTTON_TOUCHSCREEN)
         {
             struct ts_raster_result res;
-            if(touchscreen_map_raster(&mine_raster, rb->button_get_data() >> 16, rb->button_get_data() & 0xffff, &res) == 1)
+            if(touchscreen_map_raster(&mine_raster, button_get_data() >> 16, button_get_data() & 0xffff, &res) == 1)
             {
                 button &= ~BUTTON_TOUCHSCREEN;
                 lastbutton &= ~BUTTON_TOUCHSCREEN;
@@ -946,18 +946,18 @@ static enum minesweeper_status minesweeper( void )
                     break;
                 int flags_used = count_flags();
                 if (flags_used == 1) {
-                    rb->splashf( HZ*2, "You marked 1 field. There are %d mines.",
+                    splashf( HZ*2, "You marked 1 field. There are %d mines.",
                                 mine_num );
                 }
                 else
                 {
-                    rb->splashf( HZ*2, "You marked %d fields. There are %d mines.",
+                    splashf( HZ*2, "You marked %d fields. There are %d mines.",
                                 flags_used, mine_num );
                 }
                 break;
 
             default:
-                if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+                if( default_event_handler( button ) == SYS_USB_CONNECTED )
                     return MINESWEEPER_USB;
                 break;
         }
@@ -976,7 +976,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)parameter;
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     while( !exit )
@@ -984,14 +984,14 @@ enum plugin_status plugin_start(const void* parameter)
         switch( minesweeper() )
         {
             case MINESWEEPER_WIN:
-                rb->splash( HZ, "You Win!" );
-                rb->lcd_clear_display();
+                splash( HZ, "You Win!" );
+                lcd_clear_display();
                 mine_show();
                 break;
 
             case MINESWEEPER_LOSE:
-                rb->splash( HZ, "You Lose!" );
-                rb->lcd_clear_display();
+                splash( HZ, "You Lose!" );
+                lcd_clear_display();
                 mine_show();
                 break;
 

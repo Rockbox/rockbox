@@ -150,13 +150,13 @@ bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID, UINT8* pDeviceID)
     pBase[0x5555] = 0xAA; /* enter command mode */
     pBase[0x2AAA] = 0x55;
     pBase[0x5555] = 0x90; /* ID command */
-    rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
+    sleep(HZ/50); /* Atmel wants 20ms pause here */
     
     manu = pBase[0];
     id   = pBase[1];
     
     pBase[0] = 0xF0; /* reset flash (back to normal read mode) */
-    rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
+    sleep(HZ/50); /* Atmel wants 20ms pause here */
     
     /* I assume success if the obtained values are different from
     the normal flash content. This is not perfectly bulletproof, they 
@@ -228,7 +228,7 @@ inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 /* this returns true if supported and fills the info struct */
 bool GetFlashInfo(tFlashInfo* pInfo)
 {
-    rb->memset(pInfo, 0, sizeof(tFlashInfo));
+    memset(pInfo, 0, sizeof(tFlashInfo));
     
     if (!ReadID(FB, &pInfo->manufacturer, &pInfo->id))
         return false;
@@ -238,13 +238,13 @@ bool GetFlashInfo(tFlashInfo* pInfo)
         if (pInfo->id == 0xD6)
         {
             pInfo->size = 256* 1024; /* 256k */
-            rb->strcpy(pInfo->name, "SST39VF020");
+            strcpy(pInfo->name, "SST39VF020");
             return true;
         }
         else if (pInfo->id == 0xD7)
         {
             pInfo->size = 512* 1024; /* 512k */
-            rb->strcpy(pInfo->name, "SST39VF040");
+            strcpy(pInfo->name, "SST39VF040");
             return true;
         }
         else
@@ -300,19 +300,19 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
     unsigned file_crc; /* CRC value read from file */
     bool has_crc;
     
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
         return eFileNotFound;
     
-    fileleft = rb->filesize(fd);
+    fileleft = filesize(fd);
     if (fileleft > chipsize)
     {
-        rb->close(fd);
+        close(fd);
         return eTooBig;
     }
     else if (fileleft < 20000) /* give it some reasonable lower limit */
     {
-        rb->close(fd);
+        close(fd);
         return eTooSmall;
     }
     
@@ -328,30 +328,30 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
 
     /* do some sanity checks */
     
-    got_now = rb->read(fd, sector, SEC_SIZE); /* read first sector */
+    got_now = read(fd, sector, SEC_SIZE); /* read first sector */
     fileread += got_now;
     fileleft -= got_now;
     if (got_now != SEC_SIZE)
     {
-        rb->close(fd);
+        close(fd);
         return eReadErr;
     }
 
     /* version number in file plausible with this hardware? */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(sector + VERSION_ADR)))
     {
-        rb->close(fd);
+        close(fd);
         return eBadPlatform;
     }
     
     if (has_crc)
     {
-        crc32 = rb->crc_32(sector, SEC_SIZE, crc32); /* checksum */
+        crc32 = crc_32(sector, SEC_SIZE, crc32); /* checksum */
         
         /* in addition to the CRC, my files also have a platform ID */
         if (sector[PLATFORM_ADR] != PLATFORM_ID) /* for our hardware? */
         {
-            rb->close(fd);
+            close(fd);
             return eBadPlatform;
         }
     }
@@ -360,7 +360,7 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
     {   /* in this case, there is not much we can check */
         if (*(UINT32*)sector != 0x00000200) /* reset vector */
         {
-            rb->close(fd);
+            close(fd);
             return eBadContent;
         }
     }
@@ -369,7 +369,7 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
         /* compare some bytes which have to be identical */
         if (*(UINT32*)sector != 0x41524348) /* "ARCH" */
         {
-            rb->close(fd);
+            close(fd);
             return eBadContent;
         }
     
@@ -377,7 +377,7 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
         {
             if (sector[i] != FB[i])
             {
-                rb->close(fd);
+                close(fd);
                 return eBadContent;
             }
         }
@@ -387,35 +387,35 @@ tCheckResult CheckFirmwareFile(char* filename, int chipsize, bool is_romless)
     do
     {
         read_now = MIN(SEC_SIZE, fileleft);
-        got_now = rb->read(fd, sector, read_now);
+        got_now = read(fd, sector, read_now);
         fileread += got_now;
         fileleft -= got_now;
 
         if (read_now != got_now)
         {
-            rb->close(fd);
+            close(fd);
             return eReadErr;
         }
 
         if (has_crc)
         {
-            crc32 = rb->crc_32(sector, got_now, crc32); /* checksum */
+            crc32 = crc_32(sector, got_now, crc32); /* checksum */
         }
     } while (fileleft);
 
     if (has_crc)
     {
-        got_now = rb->read(fd, &file_crc, sizeof(file_crc));
+        got_now = read(fd, &file_crc, sizeof(file_crc));
         if (got_now != sizeof(file_crc))
         {
-            rb->close(fd);
+            close(fd);
             return eReadErr;
         }
     }
     
     /*  must be EOF now */
-    got_now = rb->read(fd, sector, SEC_SIZE);
-    rb->close(fd);
+    got_now = read(fd, sector, SEC_SIZE);
+    close(fd);
     if (got_now != 0)
         return eReadErr;
 
@@ -435,7 +435,7 @@ unsigned ProgramFirmwareFile(char* filename, int chipsize)
     UINT16 keep = *(UINT16*)(FB + KEEP); /* we must keep this! */
     unsigned failures = 0;
     
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
         return false;
     
@@ -448,7 +448,7 @@ unsigned ProgramFirmwareFile(char* filename, int chipsize)
         
         if (read == SEC_SIZE) /* not EOF yet */
         {
-            read = rb->read(fd, sector, SEC_SIZE);
+            read = read(fd, sector, SEC_SIZE);
             if (i==0)
             {   /* put original value back in */
                 *(UINT16*)(sector + KEEP) = keep;
@@ -464,7 +464,7 @@ unsigned ProgramFirmwareFile(char* filename, int chipsize)
         }
     }
     
-    rb->close(fd);
+    close(fd);
     
     return failures;
 }
@@ -478,13 +478,13 @@ unsigned VerifyFirmwareFile(char* filename)
     int read = SEC_SIZE; /* how many for this sector */
     unsigned failures = 0;
     
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
         return false;
     
     do
     {
-        read = rb->read(fd, sector, SEC_SIZE);
+        read = read(fd, sector, SEC_SIZE);
         
         for (j=0; j<read; j++)
         {
@@ -498,7 +498,7 @@ unsigned VerifyFirmwareFile(char* filename)
     }
     while (read == SEC_SIZE);
     
-    rb->close(fd);
+    close(fd);
     
     return failures;
 }
@@ -514,7 +514,7 @@ tCheckROM CheckBootROM(void)
     unsigned* pRom = (unsigned*)0x0;
     unsigned i;
 
-    boot_crc = rb->crc_32((unsigned char*)0x0, 64*1024, 0xFFFFFFFF);
+    boot_crc = crc_32((unsigned char*)0x0, 64*1024, 0xFFFFFFFF);
     if (boot_crc == 0x56DBA4EE  /* the known boot ROM */
 #if PLATFORM_ID == ID_PLAYER
         /* alternative boot ROM found in one single player so far */
@@ -544,7 +544,7 @@ int WaitForButton(void)
     
     do
     {
-        button = rb->button_get(true);
+        button = button_get(true);
     } while (IS_SYSEVENT(button) || (button & BUTTON_REL));
     
     return button;
@@ -558,28 +558,28 @@ void ShowFlashInfo(tFlashInfo* pInfo)
 {
     if (!pInfo->manufacturer)
     {
-        rb->lcd_puts(0, 0, "Flash: M=?? D=??");
-        rb->lcd_puts(0, 1, "Impossible to program");
+        lcd_puts(0, 0, "Flash: M=?? D=??");
+        lcd_puts(0, 1, "Impossible to program");
     }
     else
     {
-        rb->lcd_putsf(0, 0, "Flash: M=%02x D=%02x",
+        lcd_putsf(0, 0, "Flash: M=%02x D=%02x",
             pInfo->manufacturer, pInfo->id);
         
         
         if (pInfo->size)
         {
-            rb->lcd_puts(0, 1, pInfo->name);
-            rb->lcd_putsf(0, 2, "Size: %d KB", pInfo->size / 1024);
+            lcd_puts(0, 1, pInfo->name);
+            lcd_putsf(0, 2, "Size: %d KB", pInfo->size / 1024);
         }
         else
         {
-            rb->lcd_puts(0, 1, "Unsupported chip");
+            lcd_puts(0, 1, "Unsupported chip");
         }
         
     }
     
-    rb->lcd_update();
+    lcd_update();
 }
 
 
@@ -597,21 +597,21 @@ void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, "Not from ROM");
+        splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
-        rb->splash(HZ*3, "Wrong plugin");
+        splash(HZ*3, "Wrong plugin");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
-    if (!rb->battery_level_safe())
+    if (!battery_level_safe())
     {
-        rb->splash(HZ*3, "Battery too low!");
+        splash(HZ*3, "Battery too low!");
         return; /* exit */
     }
     
@@ -619,7 +619,7 @@ void DoUserDialog(char* filename)
     result = CheckBootROM();
     if (result == eUnknown)
     {   /* no support for any other yet */
-        rb->splash(HZ*3, "Wrong boot ROM");
+        splash(HZ*3, "Wrong boot ROM");
         return; /* exit */
     }
     is_romless = (result == eROMless);
@@ -627,7 +627,7 @@ void DoUserDialog(char* filename)
     /* compose filename if none given */
     if (filename == NULL)
     {
-        rb->snprintf(
+        snprintf(
             default_filename, 
             sizeof(default_filename),
             "/firmware_%s%s.bin",
@@ -637,28 +637,28 @@ void DoUserDialog(char* filename)
     }
 
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = plugin_get_buffer(&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, "Out of memory");
+        splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     rc = GetFlashInfo(&FlashInfo);
     ShowFlashInfo(&FlashInfo);
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, "Sorry!");
+        splash(HZ*3, "Sorry!");
         return; /* exit */
     }
     
-    rb->lcd_puts(0, 3, "using file:");
-    rb->lcd_puts_scroll(0, 4, filename);
-    rb->lcd_puts(0, 6, KEYNAME1 " to check file");
-    rb->lcd_puts(0, 7, "other key to exit");
-    rb->lcd_update();
+    lcd_puts(0, 3, "using file:");
+    lcd_puts_scroll(0, 4, filename);
+    lcd_puts(0, 6, KEYNAME1 " to check file");
+    lcd_puts(0, 7, "other key to exit");
+    lcd_update();
     
     button = WaitForButton();
     if (button != KEY1)
@@ -666,62 +666,62 @@ void DoUserDialog(char* filename)
         return;
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "checking...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts(0, 0, "checking...");
+    lcd_update();
     
     rc = CheckFirmwareFile(filename, FlashInfo.size, is_romless);
-    rb->lcd_puts(0, 0, "checked:");
+    lcd_puts(0, 0, "checked:");
     switch (rc)
     {
     case eOK:
-        rb->lcd_puts(0, 1, "File OK.");
+        lcd_puts(0, 1, "File OK.");
         break;
     case eFileNotFound:
-        rb->lcd_puts(0, 1, "File not found.");
-        rb->lcd_puts(0, 2, "Put this in root:");
-        rb->lcd_puts_scroll(0, 4, filename);
+        lcd_puts(0, 1, "File not found.");
+        lcd_puts(0, 2, "Put this in root:");
+        lcd_puts_scroll(0, 4, filename);
         break;
     case eTooBig:
-        rb->lcd_puts(0, 1, "File too big,");
-        rb->lcd_puts(0, 2, "larger than chip.");
+        lcd_puts(0, 1, "File too big,");
+        lcd_puts(0, 2, "larger than chip.");
         break;
     case eTooSmall:
-        rb->lcd_puts(0, 1, "File too small.");
-        rb->lcd_puts(0, 2, "Incomplete?");
+        lcd_puts(0, 1, "File too small.");
+        lcd_puts(0, 2, "Incomplete?");
         break;
     case eReadErr:
-        rb->lcd_puts(0, 1, "Read error.");
+        lcd_puts(0, 1, "Read error.");
         break;
     case eBadContent:
-        rb->lcd_puts(0, 1, "File invalid.");
-        rb->lcd_puts(0, 2, "Sanity check fail.");
+        lcd_puts(0, 1, "File invalid.");
+        lcd_puts(0, 2, "Sanity check fail.");
         break;
     case eCrcErr:
-        rb->lcd_puts(0, 1, "File invalid.");
-        rb->lcd_puts(0, 2, "CRC check failed,");
-        rb->lcd_puts(0, 3, "checksum mismatch.");
+        lcd_puts(0, 1, "File invalid.");
+        lcd_puts(0, 2, "CRC check failed,");
+        lcd_puts(0, 3, "checksum mismatch.");
         break;
     case eBadPlatform:
-        rb->lcd_puts(0, 1, "Wrong file for");
-        rb->lcd_puts(0, 2, "this hardware.");
+        lcd_puts(0, 1, "Wrong file for");
+        lcd_puts(0, 2, "this hardware.");
         break;
     default:
-        rb->lcd_puts(0, 1, "Check failed.");
+        lcd_puts(0, 1, "Check failed.");
         break;
     }
     
     if (rc == eOK)
     {
-        rb->lcd_puts(0, 6, KEYNAME2 " to program");
-        rb->lcd_puts(0, 7, "other key to exit");
+        lcd_puts(0, 6, KEYNAME2 " to program");
+        lcd_puts(0, 7, "other key to exit");
     }
     else
     {   /* error occured */
-        rb->lcd_puts(0, 6, "Any key to exit");
+        lcd_puts(0, 6, "Any key to exit");
     }
     
-    rb->lcd_update();
+    lcd_update();
     
     button = WaitForButton();
     if (button != KEY2 || rc != eOK)
@@ -729,16 +729,16 @@ void DoUserDialog(char* filename)
         return;
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Program all Flash?");
-    rb->lcd_puts(0, 1, "Are you sure?");
-    rb->lcd_puts(0, 2, "If it goes wrong,");
-    rb->lcd_puts(0, 3, "it kills your box!");
-    rb->lcd_puts(0, 4, "See documentation.");
+    lcd_clear_display();
+    lcd_puts(0, 0, "Program all Flash?");
+    lcd_puts(0, 1, "Are you sure?");
+    lcd_puts(0, 2, "If it goes wrong,");
+    lcd_puts(0, 3, "it kills your box!");
+    lcd_puts(0, 4, "See documentation.");
     
-    rb->lcd_puts(0, 6, KEYNAME3 " to proceed");
-    rb->lcd_puts(0, 7, "other key to exit");
-    rb->lcd_update();
+    lcd_puts(0, 6, KEYNAME3 " to proceed");
+    lcd_puts(0, 7, "other key to exit");
+    lcd_update();
     
     button = WaitForButton();
     if (button != KEY3)
@@ -746,40 +746,40 @@ void DoUserDialog(char* filename)
         return;
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Programming...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts(0, 0, "Programming...");
+    lcd_update();
     
     rc = ProgramFirmwareFile(filename, FlashInfo.size);
     if (rc)
     {   /* errors */
-        rb->lcd_clear_display();
-        rb->lcd_puts(0, 0, "Panic:");
-        rb->lcd_puts(0, 1, "Programming fail!");
-        rb->lcd_putsf(0, 2, "%d errors", rc);
-        rb->lcd_update();
+        lcd_clear_display();
+        lcd_puts(0, 0, "Panic:");
+        lcd_puts(0, 1, "Programming fail!");
+        lcd_putsf(0, 2, "%d errors", rc);
+        lcd_update();
         button = WaitForButton();
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Verifying...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts(0, 0, "Verifying...");
+    lcd_update();
     
     rc = VerifyFirmwareFile(filename);
     
-    rb->lcd_clear_display();
+    lcd_clear_display();
     if (rc == 0)
     {
-        rb->lcd_puts(0, 0, "Verify OK.");
+        lcd_puts(0, 0, "Verify OK.");
     }
     else
     {
-        rb->lcd_puts(0, 0, "Panic:");
-        rb->lcd_puts(0, 1, "Verify fail!");
-        rb->lcd_putsf(0, 2, "%d errors", rc);
+        lcd_puts(0, 0, "Panic:");
+        lcd_puts(0, 1, "Verify fail!");
+        lcd_putsf(0, 2, "%d errors", rc);
     }
-    rb->lcd_puts(0, 7, "Any key to exit");
-    rb->lcd_update();
+    lcd_puts(0, 7, "Any key to exit");
+    lcd_update();
     
     button = WaitForButton();
 }
@@ -794,27 +794,27 @@ void ShowFlashInfo(tFlashInfo* pInfo)
     
     if (!pInfo->manufacturer)
     {
-        rb->lcd_puts_scroll(0, 0, "Flash: M=? D=?");
-        rb->lcd_puts_scroll(0, 1, "Impossible to program");
-        rb->lcd_update();
+        lcd_puts_scroll(0, 0, "Flash: M=? D=?");
+        lcd_puts_scroll(0, 1, "Impossible to program");
+        lcd_update();
         WaitForButton();
     }
     else
     {
-        rb->snprintf(buf, sizeof(buf), "Flash: M=%02x D=%02x",
+        snprintf(buf, sizeof(buf), "Flash: M=%02x D=%02x",
             pInfo->manufacturer, pInfo->id);
-        rb->lcd_puts_scroll(0, 0, buf);
+        lcd_puts_scroll(0, 0, buf);
         
         if (pInfo->size)
         {
-            rb->snprintf(buf, sizeof(buf), "Size: %d KB", pInfo->size / 1024);
-            rb->lcd_puts_scroll(0, 1, buf);
-            rb->lcd_update();
+            snprintf(buf, sizeof(buf), "Size: %d KB", pInfo->size / 1024);
+            lcd_puts_scroll(0, 1, buf);
+            lcd_update();
         }
         else
         {
-            rb->lcd_puts_scroll(0, 1, "Unsupported chip");
-            rb->lcd_update();
+            lcd_puts_scroll(0, 1, "Unsupported chip");
+            lcd_update();
             WaitForButton();
         }
     }
@@ -835,21 +835,21 @@ void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, "Not from ROM");
+        splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* test if the user is running the correct plugin for this box */
     if (!CheckPlatform(PLATFORM_ID, *(UINT16*)(FB + VERSION_ADR)))
     {
-        rb->splash(HZ*3, "Wrong version");
+        splash(HZ*3, "Wrong version");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
-    if (!rb->battery_level_safe())
+    if (!battery_level_safe())
     {
-        rb->splash(HZ*3, "Batt. too low!");
+        splash(HZ*3, "Batt. too low!");
         return; /* exit */
     }
     
@@ -857,7 +857,7 @@ void DoUserDialog(char* filename)
     result = CheckBootROM();
     if (result == eUnknown)
     {   /* no support for any other yet */
-        rb->splash(HZ*3, "Wrong boot ROM");
+        splash(HZ*3, "Wrong boot ROM");
         return; /* exit */
     }
     is_romless = (result == eROMless);
@@ -865,7 +865,7 @@ void DoUserDialog(char* filename)
     /* compose filename if none given */
     if (filename == NULL)
     {
-        rb->snprintf(
+        snprintf(
             default_filename, 
             sizeof(default_filename),
             "/firmware_%s%s.bin",
@@ -875,10 +875,10 @@ void DoUserDialog(char* filename)
     }
 
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = plugin_get_buffer(&memleft);
     if (memleft < SEC_SIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, "Out of memory");
+        splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 
@@ -890,9 +890,9 @@ void DoUserDialog(char* filename)
         return; /* exit */
     }
     
-    rb->lcd_puts_scroll(0, 0, filename);
-    rb->lcd_puts_scroll(0, 1, "[Menu] to check");
-    rb->lcd_update();
+    lcd_puts_scroll(0, 0, filename);
+    lcd_puts_scroll(0, 1, "[Menu] to check");
+    lcd_update();
 
     button = WaitForButton();
     if (button != BUTTON_MENU)
@@ -900,57 +900,57 @@ void DoUserDialog(char* filename)
         return;
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Checking...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts(0, 0, "Checking...");
+    lcd_update();
 
     rc = CheckFirmwareFile(filename, FlashInfo.size, is_romless);
-    rb->lcd_puts(0, 0, "Checked:");
+    lcd_puts(0, 0, "Checked:");
     switch (rc)
     {
     case eOK:
-        rb->lcd_puts(0, 1, "File OK.");
+        lcd_puts(0, 1, "File OK.");
         break;
     case eFileNotFound:
-        rb->lcd_puts_scroll(0, 0, "File not found:");
-        rb->lcd_puts_scroll(0, 1, filename);
+        lcd_puts_scroll(0, 0, "File not found:");
+        lcd_puts_scroll(0, 1, filename);
         break;
     case eTooBig:
-        rb->lcd_puts_scroll(0, 0, "File too big,");
-        rb->lcd_puts_scroll(0, 1, "larger than chip.");
+        lcd_puts_scroll(0, 0, "File too big,");
+        lcd_puts_scroll(0, 1, "larger than chip.");
         break;
     case eTooSmall:
-        rb->lcd_puts_scroll(0, 0, "File too small.");
-        rb->lcd_puts_scroll(0, 1, "Incomplete?");
+        lcd_puts_scroll(0, 0, "File too small.");
+        lcd_puts_scroll(0, 1, "Incomplete?");
         break;
     case eReadErr:
-        rb->lcd_puts_scroll(0, 0, "Read error.");
+        lcd_puts_scroll(0, 0, "Read error.");
         break;
     case eBadContent:
-        rb->lcd_puts_scroll(0, 0, "File invalid.");
-        rb->lcd_puts_scroll(0, 1, "Sanity check failed.");
+        lcd_puts_scroll(0, 0, "File invalid.");
+        lcd_puts_scroll(0, 1, "Sanity check failed.");
         break;
     case eCrcErr:
-        rb->lcd_puts_scroll(0, 0, "File invalid.");
-        rb->lcd_puts_scroll(0, 1, "CRC check failed.");
+        lcd_puts_scroll(0, 0, "File invalid.");
+        lcd_puts_scroll(0, 1, "CRC check failed.");
         break;
     case eBadPlatform:
-        rb->lcd_puts_scroll(0, 0, "Wrong file for");
-        rb->lcd_puts_scroll(0, 1, "this hardware.");
+        lcd_puts_scroll(0, 0, "Wrong file for");
+        lcd_puts_scroll(0, 1, "this hardware.");
         break;
     default:
-        rb->lcd_puts_scroll(0, 0, "Check failed.");
+        lcd_puts_scroll(0, 0, "Check failed.");
         break;
     }
-    rb->lcd_update();
+    lcd_update();
 
-    rb->sleep(HZ*3);
+    sleep(HZ*3);
 
     if (rc == eOK)
     {
-        rb->lcd_puts_scroll(0, 0, "[On] to program,");
-        rb->lcd_puts_scroll(0, 1, "other key to exit.");
-        rb->lcd_update();
+        lcd_puts_scroll(0, 0, "[On] to program,");
+        lcd_puts_scroll(0, 1, "other key to exit.");
+        lcd_update();
     }
     else
     {   /* error occured */
@@ -964,10 +964,10 @@ void DoUserDialog(char* filename)
         return;
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Are you sure?");
-    rb->lcd_puts_scroll(0, 1, "[+] to proceed.");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Are you sure?");
+    lcd_puts_scroll(0, 1, "[+] to proceed.");
+    lcd_update();
 
     button = WaitForButton();
     
@@ -976,42 +976,42 @@ void DoUserDialog(char* filename)
         return;
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Programming...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Programming...");
+    lcd_update();
 
     rc = ProgramFirmwareFile(filename, FlashInfo.size);
     
     if (rc)
     {   /* errors */
-        rb->lcd_clear_display();
-        rb->lcd_puts_scroll(0, 0, "Programming failed!");
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
-        rb->lcd_puts_scroll(0, 1, buf);
-        rb->lcd_update();
+        lcd_clear_display();
+        lcd_puts_scroll(0, 0, "Programming failed!");
+        snprintf(buf, sizeof(buf), "%d errors", rc);
+        lcd_puts_scroll(0, 1, buf);
+        lcd_update();
         WaitForButton();
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Verifying...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Verifying...");
+    lcd_update();
 
     rc = VerifyFirmwareFile(filename);
     
-    rb->lcd_clear_display();
+    lcd_clear_display();
     
     if (rc == 0)
     {
-        rb->lcd_puts_scroll(0, 0, "Verify OK.");
+        lcd_puts_scroll(0, 0, "Verify OK.");
     }
     else
     {
-        rb->snprintf(buf, sizeof(buf), "Verify failed! %d errors", rc);
-        rb->lcd_puts_scroll(0, 0, buf);
+        snprintf(buf, sizeof(buf), "Verify failed! %d errors", rc);
+        lcd_puts_scroll(0, 0, buf);
     }
 
-    rb->lcd_puts_scroll(0, 1, "Press any key to exit.");
-    rb->lcd_update();
+    lcd_puts_scroll(0, 1, "Press any key to exit.");
+    lcd_update();
     WaitForButton();
 }
 
@@ -1025,9 +1025,9 @@ enum plugin_status plugin_start(const void* parameter)
     int oldmode;
 
     /* now go ahead and have fun! */
-    oldmode = rb->system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
+    oldmode = system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
     DoUserDialog((char*) parameter);
-    rb->system_memory_guard(oldmode);              /* re-enable memory guard */
+    system_memory_guard(oldmode);              /* re-enable memory guard */
 
     return PLUGIN_OK;
 }

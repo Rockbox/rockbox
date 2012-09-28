@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "config.h"
+#include "symbols.h"
 
     .section    .icode,"ax",%progbits
 
@@ -96,3 +97,4 @@ memset:
         bx      lr
 .end:
         .size   memset,.end-memset
+EXPORT_SYMBOL(memset)

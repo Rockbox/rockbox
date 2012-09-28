@@ -357,7 +357,7 @@ static bool mpeg_set_option(const char* string,
     mpeg_sysevent_clear();
 
     /* This eats SYS_POWEROFF - :\ */
-    bool usb = rb->set_option(string, variable, type, options, numoptions,
+    bool usb = set_option(string, variable, type, options, numoptions,
                               function);
 
     if (usb)
@@ -376,7 +376,7 @@ static bool mpeg_set_int(const char *string, const char *unit,
 {
     mpeg_sysevent_clear();
 
-    bool usb = rb->set_int(string, unit, voice_unit, variable, function,
+    bool usb = set_int(string, unit, voice_unit, variable, function,
                            step, min, max, formatter);
 
     if (usb)
@@ -413,7 +413,7 @@ static const char* backlight_brightness_formatter(char *buf, size_t length,
     if (value < 0)
         return BACKLIGHT_OPTION_DEFAULT;
     else
-        rb->snprintf(buf, length, "%d", value + MIN_BRIGHTNESS_SETTING);
+        snprintf(buf, length, "%d", value + MIN_BRIGHTNESS_SETTING);
     return buf;
 }
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
@@ -425,51 +425,51 @@ static void sync_audio_setting(int setting, bool global)
     {
     case MPEG_AUDIO_TONE_CONTROLS:
     #ifdef AUDIOHW_HAVE_BASS
-        rb->sound_set(SOUND_BASS, (global || settings.tone_controls)
-            ? rb->global_settings->bass
-            : rb->sound_default(SOUND_BASS));
+        sound_set(SOUND_BASS, (global || settings.tone_controls)
+            ? global_settings.bass
+            : sound_default(SOUND_BASS));
     #endif
     #ifdef AUDIOHW_HAVE_TREBLE
-        rb->sound_set(SOUND_TREBLE, (global || settings.tone_controls)
-            ? rb->global_settings->treble
-            : rb->sound_default(SOUND_TREBLE));
+        sound_set(SOUND_TREBLE, (global || settings.tone_controls)
+            ? global_settings.treble
+            : sound_default(SOUND_TREBLE));
     #endif
 
     #ifdef AUDIOHW_HAVE_EQ
         for (int band = 0;; band++)
         {
-            int setting = rb->sound_enum_hw_eq_band_setting(band, AUDIOHW_EQ_GAIN);
+            int setting = sound_enum_hw_eq_band_setting(band, AUDIOHW_EQ_GAIN);
 
             if (setting == -1)
                 break;
 
-            rb->sound_set(setting, (global || settings.tone_controls)
-                    ? rb->global_settings->hw_eq_bands[band].gain
-                    : rb->sound_default(setting));
+            sound_set(setting, (global || settings.tone_controls)
+                    ? global_settings.hw_eq_bands[band].gain
+                    : sound_default(setting));
         }
     #endif /* AUDIOHW_HAVE_EQ */
         break;
 
     case MPEG_AUDIO_CHANNEL_MODES:
-        rb->sound_set(SOUND_CHANNELS, (global || settings.channel_modes)
-                ? rb->global_settings->channel_config
+        sound_set(SOUND_CHANNELS, (global || settings.channel_modes)
+                ? global_settings.channel_config
                 : SOUND_CHAN_STEREO);
         break;
 
     case MPEG_AUDIO_CROSSFEED:
-        rb->dsp_set_crossfeed_type((global || settings.crossfeed) ?
-                                   rb->global_settings->crossfeed :
+        dsp_set_crossfeed_type((global || settings.crossfeed) ?
+                                   global_settings.crossfeed :
                                    CROSSFEED_TYPE_NONE);
         break;
 
     case MPEG_AUDIO_EQUALIZER:
-        rb->dsp_eq_enable((global || settings.equalizer) ?
-                          rb->global_settings->eq_enabled : false);
+        dsp_eq_enable((global || settings.equalizer) ?
+                          global_settings.eq_enabled : false);
         break;
 
     case MPEG_AUDIO_DITHERING:
-        rb->dsp_dither_enable((global || settings.dithering) ?
-                              rb->global_settings->dithering_enabled : false);
+        dsp_dither_enable((global || settings.dithering) ?
+                              global_settings.dithering_enabled : false);
        break;
     }
 }
@@ -504,7 +504,7 @@ static void grey_splash(int ticks, const unsigned char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
 
-    rb->vsnprintf(buffer, sizeof (buffer), fmt, ap);
+    vsnprintf(buffer, sizeof (buffer), fmt, ap);
 
     va_end(ap);
 
@@ -532,7 +532,7 @@ static void grey_splash(int ticks, const unsigned char *fmt, ...)
     grey_update();
 
     if (ticks > 0)
-        rb->sleep(ticks);
+        sleep(ticks);
 }
 #endif /* !HAVE_LCD_COLOR */
 
@@ -680,7 +680,7 @@ static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
 static void get_start_time_lcd_enable_hook(void *param)
 {
     (void)param;
-    rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_0, 0);
+    queue_post(&button_queue, LCD_ENABLE_EVENT_0, 0);
 }
 #endif /* HAVE_LCD_ENABLE */
 
@@ -698,7 +698,7 @@ static int get_start_time(uint32_t duration)
     mylcd_update();
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    rb->add_event(LCD_EVENT_ACTIVATION, false, get_start_time_lcd_enable_hook);
+    add_event(LCD_EVENT_ACTIVATION, false, get_start_time_lcd_enable_hook);
 #endif
 
     draw_slider(0, 100, &rc_bound);
@@ -856,8 +856,8 @@ static int get_start_time(uint32_t duration)
 #endif
 
         default:
-            rb->default_event_handler(button);
-            rb->yield();
+            default_event_handler(button);
+            yield();
             continue;
         }
 
@@ -881,11 +881,11 @@ static int get_start_time(uint32_t duration)
             break;
         }
 
-        rb->yield();
+        yield();
     }
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    rb->remove_event(LCD_EVENT_ACTIVATION, get_start_time_lcd_enable_hook);
+    remove_event(LCD_EVENT_ACTIVATION, get_start_time_lcd_enable_hook);
 #endif
 #ifndef HAVE_LCD_COLOR
     stream_gray_show(false);
@@ -915,15 +915,15 @@ static int show_start_menu(uint32_t duration)
 
     ts_to_hms(settings.resume_time, &hms);
     hms_format(hms_str, sizeof(hms_str), &hms);
-    rb->snprintf(resume_str, sizeof (resume_str),
+    snprintf(resume_str, sizeof (resume_str),
                      "Resume at: %s", hms_str);
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit)
     {
         mpeg_sysevent_clear();
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -939,7 +939,7 @@ static int show_start_menu(uint32_t duration)
         case MPEG_START_SEEK:
             if (!stream_can_seek())
             {
-                rb->splash(HZ, "Unavailable");
+                splash(HZ, "Unavailable");
                 break;
             }
 
@@ -998,11 +998,11 @@ int mpeg_menu(void)
     MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_sysevent_callback,
                         "Settings", "Resume playback", "Quit mpegplayer");
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     mpeg_sysevent_clear();
 
-    result = rb->do_menu(&menu, NULL, NULL, false);
+    result = do_menu(&menu, NULL, NULL, false);
 
     switch (result)
     {
@@ -1042,12 +1042,12 @@ static void display_options(void)
 #endif
                         );
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit)
     {
         mpeg_sysevent_clear();
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -1058,7 +1058,7 @@ static void display_options(void)
             settings.displayoptions =
                 (settings.displayoptions & ~LCD_YUV_DITHER)
                       | ((result != 0) ? LCD_YUV_DITHER : 0);
-            rb->lcd_yuv_set_options(settings.displayoptions);
+            lcd_yuv_set_options(settings.displayoptions);
             break;
 #endif /* MPEG_OPTION_DITHERING_ENABLED */
 
@@ -1110,12 +1110,12 @@ static void audio_options(void)
                         "Tone Controls", "Channel Modes", "Crossfeed",
                         "Equalizer", "Dithering");
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit)
     {
         mpeg_sysevent_clear();
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -1194,17 +1194,17 @@ static void mpeg_settings(void)
                         "Display Options", "Audio Options",
                         "Resume Options", "Play Mode", clear_str);
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (!menu_quit)
     {
         mpeg_sysevent_clear();
 
         /* Format and add resume option to the menu display */
-        rb->snprintf(clear_str, sizeof(clear_str),
+        snprintf(clear_str, sizeof(clear_str),
                      "Clear all resumes: %u", settings.resume_count);
 
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -1268,7 +1268,7 @@ void init_settings(const char* filename)
                         SETTINGS_VERSION);
     }
 
-    rb->strlcpy(settings.resume_filename, filename, MAX_PATH);
+    strlcpy(settings.resume_filename, filename, MAX_PATH);
 
     /* get the resume time for the current mpeg if it exists */
     if ((settings.resume_time = configfile_get_value
@@ -1278,7 +1278,7 @@ void init_settings(const char* filename)
     }
 
 #if MPEG_OPTION_DITHERING_ENABLED
-    rb->lcd_yuv_set_options(settings.displayoptions);
+    lcd_yuv_set_options(settings.displayoptions);
 #endif
 
     /* Set our audio options */

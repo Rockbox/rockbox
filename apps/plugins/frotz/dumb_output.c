@@ -74,12 +74,12 @@ static void dumb_display_cell(int row, int col)
       c = ' ';
   char style = cell_style(cel);
   char s[5];
-  char *end = rb->utf8encode(c, s);
+  char *end = utf8encode(c, s);
   *end = 0;
   if (style & REVERSE_STYLE)
-    rb->lcd_set_drawmode(DRMODE_INVERSEVID);
-  rb->lcd_putsxy(col * SYSFONT_WIDTH, row * SYSFONT_HEIGHT, s);
-  rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_INVERSEVID);
+  lcd_putsxy(col * SYSFONT_WIDTH, row * SYSFONT_HEIGHT, s);
+  lcd_set_drawmode(DRMODE_SOLID);
 }
 
 /* put a character in the cell at the cursor and advance the cursor.  */
@@ -131,10 +131,10 @@ void os_erase_area (int top, int left, int bottom, int right)
   int row;
   top--; left--; bottom--; right--;
   if (left == 0 && right == h_screen_cols - 1)
-    rb->memset(dumb_row(top), 0, (bottom - top + 1) * h_screen_cols * sizeof(cell));
+    memset(dumb_row(top), 0, (bottom - top + 1) * h_screen_cols * sizeof(cell));
   else
     for (row = top; row <= bottom; row++)
-      rb->memset(dumb_row(row) + left, 0, (right - left + 1) * sizeof(cell));
+      memset(dumb_row(row) + left, 0, (right - left + 1) * sizeof(cell));
 }
 
 void os_scroll_area (int top, int left, int bottom, int right, int units)
@@ -143,13 +143,13 @@ void os_scroll_area (int top, int left, int bottom, int right, int units)
   top--; left--; bottom--; right--;
   if (units > 0) {
     for (row = top; row <= bottom - units; row++)
-      rb->memcpy(dumb_row(row) + left,
+      memcpy(dumb_row(row) + left,
               dumb_row(row + units) + left,
               (right - left + 1) * sizeof(cell));
     os_erase_area(bottom - units + 2, left + 1, bottom + 1, right + 1);
   } else if (units < 0) {
     for (row = bottom; row >= top - units; row--)
-      rb->memcpy(dumb_row(row) + left,
+      memcpy(dumb_row(row) + left,
               dumb_row(row + units) + left,
               (right - left + 1) * sizeof(cell));
     os_erase_area(top + 1, left + 1, top - units, right + 1);
@@ -171,11 +171,11 @@ void os_set_font (int x) { (void)x; }
 void dumb_dump_screen(void)
 {
   int r, c;
-  rb->lcd_clear_display();
+  lcd_clear_display();
   for (r = 0; r < h_screen_height; r++)
     for (c = 0; c < h_screen_width; c++)
       dumb_display_cell(r, c);
-  rb->lcd_update();
+  lcd_update();
 }
 
 /* Show the current screen contents. */

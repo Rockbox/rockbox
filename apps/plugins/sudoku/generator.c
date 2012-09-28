@@ -131,8 +131,8 @@ static
 void
 reset( void )
 {
-    rb->memset( board, 0x00, sizeof( board ) );
-    rb->memset( history, 0x00, sizeof( history ) );
+    memset( board, 0x00, sizeof( board ) );
+    memset( history, 0x00, sizeof( history ) );
     idx_history = 0;
     pass = 0;
 }
@@ -230,7 +230,7 @@ reapply( void )
 {
     int digit, idx, j;
     int allok = 0;
-    rb->memset( board, 0x00, sizeof( board ) );
+    memset( board, 0x00, sizeof( board ) );
     for( j = 0 ; j < idx_history ; ++j )
         if( !( history[ j ] & IGNORED ) && 0 != GET_DIGIT( history[ j ] ) )
         {
@@ -279,7 +279,7 @@ void
 count_set_digits( int el, int (*idx_fn)( int, int ) )
 {
     int i;
-    rb->memset( counts, 0x00, sizeof( counts ) );
+    memset( counts, 0x00, sizeof( counts ) );
     for( i = 0 ; i < 9 ; ++i )
         digits[ i ] = numset( board[ (*idx_fn)( el, i ) ] );
 }
@@ -356,7 +356,7 @@ findmoves( void )
 {
     int i;
 
-    rb->yield();
+    yield();
 
     idx_possible = 0;
     for( i = 0 ; i < 9 ; ++i )
@@ -394,7 +394,7 @@ pairs( int el, int (*idx_fn)( int, int ) )
 {
     int i, j, k, mask, idx;
 
-    rb->yield();
+    yield();
 
     for( i = 0 ; i < 8 ; ++i )
         if( 7 == digits[ i ] ) /* 2 digits unknown */
@@ -423,7 +423,7 @@ exmask( int mask, int block, int el, int (*idx_fn)( int, int ) )
 {
     int i, idx;
 
-    rb->yield();
+    yield();
 
     for( i = 0 ; i < 9 ; ++i )
     {
@@ -440,7 +440,7 @@ exblock( int block, int el, int (*idx_fn)( int, int ) )
 {
     int i, idx, mask;
 
-    rb->yield();
+    yield();
 
     /* By assumption, all unknown squares in the block appear in the
      * same row/column, so to construct a mask for these squares, it
@@ -463,7 +463,7 @@ block( int el )
 {
     int i, idx = 0, row, col;
 
-    rb->yield();
+    yield();
 
     /* Find first unknown square */
     for( i = 0 ; i < 9 && !IS_EMPTY( idx = idx_block( el, i ) ) ; ++i )
@@ -497,7 +497,7 @@ common( int el )
 {
     int i, idx, row, col, digit, mask;
 
-    rb->yield();
+    yield();
 
     for( digit = 1 ; digit <= 9 ; ++digit )
     {
@@ -537,7 +537,7 @@ position2( int el )
 {
     int digit, digit2, i, mask, mask2, posn, count, idx;
 
-    rb->yield();
+    yield();
 
     /* Calculate positions of each digit within block */
     for( digit = 1 ; digit <= 9 ; ++digit )
@@ -588,7 +588,7 @@ allmoves( void )
 {
     int i, n;
 
-    rb->yield();
+    yield();
 
     n = findmoves( );
     if( 0 < n )
@@ -636,7 +636,7 @@ findhints( void )
 {
     int i, n, mutated = 0;
 
-    rb->yield();
+    yield();
 
     n = findmoves( );
     if( n < 2 )
@@ -674,7 +674,7 @@ findhints( void )
     {
         int i, j;
 
-        rb->qsort( possible, n, sizeof( int ), cmpindex );
+        qsort( possible, n, sizeof( int ), cmpindex );
         for( i = 0, j = 1 ; j < n ; ++j )
         {
             if( GET_INDEX( possible[ i ] ) == GET_INDEX( possible[ j ] ) )
@@ -707,7 +707,7 @@ deterministic( void )
 {
     int i, n;
 
-    rb->yield();
+    yield();
 
     n = allmoves( );
     while( 0 < n )
@@ -743,7 +743,7 @@ choice( void )
 {
     int i, n;
 
-    rb->yield();
+    yield();
 
     for( n = i = 0 ; i < 81 ; ++i )
         if( IS_EMPTY( i ) )
@@ -759,7 +759,7 @@ choice( void )
     if( 0 == n )
         return -1;      /* All squares known */
 
-    rb->qsort( possible, n, sizeof( possible[ 0 ] ), cmp );
+    qsort( possible, n, sizeof( possible[ 0 ] ), cmp );
     return GET_INDEX( possible[ 0 ] );
 }
 
@@ -771,7 +771,7 @@ static
 int
 choose( int idx, int digit )
 {
-    rb->yield();
+    yield();
 
     for( ; digit <= 9 ; ++digit )
         if( !DISALLOWED( idx, digit ) )
@@ -797,7 +797,7 @@ backtrack( void )
 {
     int digit, idx;
 
-    rb->yield();
+    yield();
 
     for( ; 0 <= --idx_history ; )
         if( history[ idx_history ] & CHOICE )
@@ -825,7 +825,7 @@ solve( void )
 {
     int idx;
 
-    rb->yield();
+    yield();
 
     while( 1 )
     {
@@ -901,7 +901,7 @@ classify( void )
 {
     int i, score;
 
-    rb->yield();
+    yield();
 
     pass = 0;
     clear_moves( );
@@ -1034,7 +1034,7 @@ shuffle( int * a, int len )
     i = len;
     while( 1 <= i )
     {
-        j = rb->rand( ) % i;
+        j = rand( ) % i;
         tmp = a[ --i ];
         a[ i ] = a[ j ];
         a[ j ] = tmp;
@@ -1053,13 +1053,13 @@ static
 void
 select_template( void )
 {
-    int i = rb->rand( ) % NUM_TEMPLATES;
+    int i = rand( ) % NUM_TEMPLATES;
     init_template( i );
 }
 
 static bool check_buttons(void)
 {
-    int button = rb->button_get(false);
+    int button = button_get(false);
     return (button && (!(button & BUTTON_REL)) && (!(button & BUTTON_REPEAT)));
 }
 
@@ -1079,11 +1079,11 @@ start:
     for( i = 0 ; i < 9 ; ++i )
         digits[ i ] = i + 1;
 
-    rotate( digits, 9, 1 + rb->rand( ) % 8 );
+    rotate( digits, 9, 1 + rand( ) % 8 );
     shuffle( digits, 9 );
     select_template( );
 
-    rotate( tmplt, len_tmplt, 1 + rb->rand( ) % ( len_tmplt - 1 ) );
+    rotate( tmplt, len_tmplt, 1 + rand( ) % ( len_tmplt - 1 ) );
     shuffle( tmplt, len_tmplt );
 
     reset( );  /* construct a new board */
@@ -1095,7 +1095,7 @@ start:
     if (check_buttons())
         return false;
 
-    rb->yield();
+    yield();
 
     if( 0 != solve( ) || idx_history < 81 )
         goto start;
@@ -1104,7 +1104,7 @@ start:
     if (check_buttons())
         return false;
 
-    rb->yield();
+    yield();
 
     for( i = 0 ; i < len_tmplt ; ++i )
         board[ tmplt[ i ] ] |= FIXED;
@@ -1131,9 +1131,9 @@ bool sudoku_generate_board(struct sudoku_state_t* state, char** difficulty)
 {
     int r,c,i;
 
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
-    rb->button_clear_queue();
+    button_clear_queue();
 
     if (!generate()) {
         /* User has aborted with a button press */

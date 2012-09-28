@@ -149,7 +149,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter == NULL)
     {
-        rb->splash(HZ, "Play a .lua file!");
+        splash(HZ, "Play a .lua file!");
         return PLUGIN_ERROR;
     }
     else
@@ -161,7 +161,7 @@ enum plugin_status plugin_start(const void* parameter)
         rocklua_openlibs(L);
         status = luaL_loadfile(L, filename);
         if (!status) {
-            rb->lcd_clear_display();
+            lcd_clear_display();
             status = docall(L);
         }
 
@@ -169,7 +169,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         if (status) {
             DEBUGF("%s\n", lua_tostring(L, -1));
-            rb->splashf(5 * HZ, "%s", lua_tostring(L, -1));
+            splashf(5 * HZ, "%s", lua_tostring(L, -1));
             lua_pop(L, 1);
         }
 

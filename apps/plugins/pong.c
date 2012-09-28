@@ -310,12 +310,12 @@ struct pong {
 static void singlepad(int x, int y, int set)
 {
     if(set) {
-        rb->lcd_fillrect(x, y, PAD_WIDTH, PAD_HEIGHT);
+        lcd_fillrect(x, y, PAD_WIDTH, PAD_HEIGHT);
     }
     else {
-        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(x, y, PAD_WIDTH, PAD_HEIGHT);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        lcd_fillrect(x, y, PAD_WIDTH, PAD_HEIGHT);
+        lcd_set_drawmode(DRMODE_SOLID);
     }
 }
 
@@ -422,7 +422,7 @@ static void bounce(struct pong *p, int pad, int info)
         }
     }
 
-    p->ball.speedy += rb->rand()%21-10;
+    p->ball.speedy += rand()%21-10;
 
 #if 0
     fprintf(stderr, "INFO: %d YSPEED: %d\n", info, p->ball.speedy);
@@ -432,15 +432,15 @@ static void bounce(struct pong *p, int pad, int info)
 static void score(struct pong *p, int pad)
 {
     if(pad)
-        rb->splash(HZ/4, "right scores!");
+        splash(HZ/4, "right scores!");
     else
-        rb->splash(HZ/4, "left scores!");
-    rb->lcd_clear_display();
+        splash(HZ/4, "left scores!");
+    lcd_clear_display();
     p->player[pad].score++;
 
     /* then move the X-speed of the ball and give it a random Y position */
     p->ball.speedx = -p->ball.speedx;
-    p->ball.y = rb->rand()%((LCD_HEIGHT-BALL_HEIGHT)*RES);
+    p->ball.y = rand()%((LCD_HEIGHT-BALL_HEIGHT)*RES);
 
     /* avoid hitting the pad with the new ball */
     p->ball.x = (p->ball.x < 0) ?
@@ -498,12 +498,12 @@ static void ball(struct pong *p)
     newy = p->ball.y/RES;
 
     /* clear old position */
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(oldx, oldy, BALL_WIDTH, BALL_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(oldx, oldy, BALL_WIDTH, BALL_HEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     /* draw the new ball position */
-    rb->lcd_fillrect(newx, newy, BALL_WIDTH, BALL_HEIGHT);
+    lcd_fillrect(newx, newy, BALL_WIDTH, BALL_HEIGHT);
 }
 
 static void padmove(int *pos, int dir)
@@ -533,7 +533,7 @@ static void key_pad(struct pong *p, int pad, int up, int down)
             /* if player presses control keys stop cpu player */
             player->iscpu = false;
             p->player[0].score = p->player[1].score = 0; /* reset the score */
-            rb->lcd_clear_display(); /* get rid of the text */
+            lcd_clear_display(); /* get rid of the text */
         }
     }
     else {
@@ -558,19 +558,19 @@ static int keys(struct pong *p)
 #else
     int time = 1;
 #endif
-    int start = *rb->current_tick;
+    int start = current_tick;
     int end = start + time;
 
-    while(TIME_BEFORE(*rb->current_tick, end)) {
-        key = rb->button_get_w_tmo(end - *rb->current_tick);
+    while(TIME_BEFORE(current_tick, end)) {
+        key = button_get_w_tmo(end - current_tick);
 
 #ifdef HAVE_TOUCHSCREEN
         short touch_x, touch_y;
         if(key & BUTTON_TOUCHSCREEN)
         {
             struct player *player;
-            touch_x = rb->button_get_data() >> 16;
-            touch_y = rb->button_get_data() & 0xFFFF;
+            touch_x = button_get_data() >> 16;
+            touch_y = button_get_data() & 0xFFFF;
 
             player = &p->player[0];
             if(touch_x >= player->xpos && touch_x <= player->xpos+(PAD_WIDTH*4))
@@ -580,7 +580,7 @@ static int keys(struct pong *p)
                     /* if left player presses control keys stop cpu player */
                     player->iscpu = false;
                     p->player[0].score = p->player[1].score = 0; /* reset the score */
-                    rb->lcd_clear_display(); /* get rid of the text */
+                    lcd_clear_display(); /* get rid of the text */
                 }
             }
 
@@ -592,14 +592,14 @@ static int keys(struct pong *p)
                     /* if right player presses control keys stop cpu player */
                     player->iscpu = false;
                     p->player[0].score = p->player[1].score = 0; /* reset the score */
-                    rb->lcd_clear_display(); /* get rid of the text */
+                    lcd_clear_display(); /* get rid of the text */
                 }
             }
         }
 #endif
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold())
+        if (button_hold())
             return 2; /* Pause game */
 #endif
 
@@ -617,12 +617,12 @@ static int keys(struct pong *p)
             return 2; /* Pause game */
 #endif
 
-        key = rb->button_status(); /* ignore BUTTON_REPEAT */
+        key = button_status(); /* ignore BUTTON_REPEAT */
 
         key_pad(p, 0, (key & PONG_LEFT_UP), (key & PONG_LEFT_DOWN));
         key_pad(p, 1, (key & PONG_RIGHT_UP), (key & PONG_RIGHT_DOWN));
 
-        if(rb->default_event_handler(key) == SYS_USB_CONNECTED)
+        if(default_event_handler(key) == SYS_USB_CONNECTED)
             return -1; /* exit game because of USB */
     }
     return 1; /* return 0 to exit game */
@@ -633,10 +633,10 @@ static void showscore(struct pong *p)
     static char buffer[20];
     int w;
 
-    rb->snprintf(buffer, sizeof(buffer), "%d - %d",
+    snprintf(buffer, sizeof(buffer), "%d - %d",
         p->player[0].score, p->player[1].score);
-    w = rb->lcd_getstringsize((unsigned char *)buffer, NULL, NULL);
-    rb->lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), 0, (unsigned char *)buffer);
+    w = lcd_getstringsize((unsigned char *)buffer, NULL, NULL);
+    lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), 0, (unsigned char *)buffer);
 }
 
 static void blink_demo(void)
@@ -644,10 +644,10 @@ static void blink_demo(void)
     static char buffer[30];
     int w;
 
-    rb->snprintf(buffer, sizeof(buffer), "Press Key To Play");
-    w = rb->lcd_getstringsize((unsigned char *)buffer, NULL, NULL);
+    snprintf(buffer, sizeof(buffer), "Press Key To Play");
+    w = lcd_getstringsize((unsigned char *)buffer, NULL, NULL);
     if(LCD_WIDTH > ( (w/8)*7 ) ) /* make sure text isn't too long for screen */
-        rb->lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), (LCD_HEIGHT / 2),
+        lcd_putsxy( (LCD_WIDTH / 2) - (w / 2), (LCD_HEIGHT / 2),
                         (unsigned char *)buffer);
 }
 
@@ -687,15 +687,15 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
     /* Clear screen */
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* go go go */
     while(game > 0) {
         if (game == 2) { /* Game Paused */
-            rb->splash(0, "PAUSED");
+            splash(0, "PAUSED");
             while(game == 2)
                 game = keys(&pong); /* short circuit */
-            rb->lcd_clear_display();
+            lcd_clear_display();
         }
 
         if( pong.player[0].iscpu && pong.player[1].iscpu ) {
@@ -711,7 +711,7 @@ enum plugin_status plugin_start(const void* parameter)
                 blink_demo();
             }
             else {
-                rb->lcd_clear_display();
+                lcd_clear_display();
             }
         }
 
@@ -720,7 +720,7 @@ enum plugin_status plugin_start(const void* parameter)
         pad(&pong, 1); /* draw right pad */
         ball(&pong); /* move and draw ball */
 
-        rb->lcd_update();
+        lcd_update();
 
         game = keys(&pong); /* deal with keys */
     }

@@ -12,7 +12,7 @@
 #include "m_pd.h"
 #include "g_canvas.h"
 #include "g_all_guis.h"
-#define snprintf rb->snprintf
+#define snprintf snprintf
 #else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>

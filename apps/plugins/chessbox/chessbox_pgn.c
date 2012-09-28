@@ -57,7 +57,7 @@ static void *pl_malloc(size_t size)
 /* init function for pl_malloc() */
 static void pl_malloc_init(void)
 {
-    bufptr = rb->plugin_get_buffer(&bufleft);
+    bufptr = plugin_get_buffer(&bufleft);
 }
 
 static void process_tag(struct pgn_game_node* game, char* buffer){
@@ -81,17 +81,17 @@ static void process_tag(struct pgn_game_node* game, char* buffer){
     }
     tag_value[pos2] = '\0';
 
-    if (rb->strcmp(tag_type,"White") == 0){
-        rb->strcpy(game->white_player, tag_value);
+    if (strcmp(tag_type,"White") == 0){
+        strcpy(game->white_player, tag_value);
     }
-    if (rb->strcmp(tag_type,"Black") == 0){
-        rb->strcpy(game->black_player, tag_value);
+    if (strcmp(tag_type,"Black") == 0){
+        strcpy(game->black_player, tag_value);
     }
-    if (rb->strcmp(tag_type,"Result") == 0){
-        rb->strcpy(game->result, tag_value);
+    if (strcmp(tag_type,"Result") == 0){
+        strcpy(game->result, tag_value);
     }
-    if (rb->strcmp(tag_type,"Date") == 0){
-        rb->strcpy(game->game_date, tag_value);
+    if (strcmp(tag_type,"Date") == 0){
+        strcpy(game->game_date, tag_value);
     }
 }
 
@@ -160,9 +160,9 @@ static char pgn_from_piece(unsigned short piece, unsigned short color){
 }
 
 static void pgn_to_coords(struct pgn_ply_node* ply){
-    unsigned short str_length = rb->strlen(ply->pgn_text);
+    unsigned short str_length = strlen(ply->pgn_text);
     char str[10];
-    rb->strcpy(str,ply->pgn_text);
+    strcpy(str,ply->pgn_text);
     ply->column_from = 0xFF;
     ply->row_from = 0xFF;
     ply->column_to = 0xFF;
@@ -342,9 +342,9 @@ static void pgn_to_coords(struct pgn_ply_node* ply){
     /* leave a very complete log of the parsing of the game while it gets stable */
     for (i=0;i<8;i++){
         for (j=0;j<8;j++) {
-            rb->fdprintf(loghandler,"%c",pgn_from_piece(board[locn[7-i][j]],color[locn[7-i][j]]));
+            fdprintf(loghandler,"%c",pgn_from_piece(board[locn[7-i][j]],color[locn[7-i][j]]));
         }
-        rb->fdprintf(loghandler,"\n");
+        fdprintf(loghandler,"\n");
     }
 
     /* update the board */
@@ -366,17 +366,17 @@ static void coords_to_pgn(struct pgn_ply_node* ply){
         /* check castling */
         if (ply->column_from == 4 && ply->column_to == 6){
             /* castling kingside */
-            rb->strcpy(ply->pgn_text,"O-O");
+            strcpy(ply->pgn_text,"O-O");
             ply->castle = true;
         } else if (ply->column_from == 4 && ply->column_to == 2){
             /* castling queenside */
-            rb->strcpy(ply->pgn_text,"O-O-O");
+            strcpy(ply->pgn_text,"O-O-O");
         } else {
             if (board[locn[ply->row_to][ply->column_to]] != no_piece){
-                rb->snprintf(ply->pgn_text,10,"Kx%c%c",'a'+ply->column_to,
+                snprintf(ply->pgn_text,10,"Kx%c%c",'a'+ply->column_to,
                                    '1'+ply->row_to);
             } else {
-                rb->snprintf(ply->pgn_text,10,"K%c%c",'a'+ply->column_to,
+                snprintf(ply->pgn_text,10,"K%c%c",'a'+ply->column_to,
                                    '1'+ply->row_to);
             }
         }
@@ -390,10 +390,10 @@ static void coords_to_pgn(struct pgn_ply_node* ply){
             if (ply->row_to == 0 || ply->row_to == 7) {
                 ply->promotion = true;
                 ply->promotion_piece = queen;
-                rb->snprintf(ply->pgn_text,10,"%cx%c%c=D", 'a'+ply->column_from,
+                snprintf(ply->pgn_text,10,"%cx%c%c=D", 'a'+ply->column_from,
                                    'a'+ply->column_to,'1'+ply->row_to);
             } else {
-                rb->snprintf(ply->pgn_text,10,"%cx%c%c", 'a'+ply->column_from,
+                snprintf(ply->pgn_text,10,"%cx%c%c", 'a'+ply->column_from,
                                    'a'+ply->column_to,'1'+ply->row_to);
             }
         } else {
@@ -401,10 +401,10 @@ static void coords_to_pgn(struct pgn_ply_node* ply){
             if (ply->row_to == 0 || ply->row_to == 7) {
                 ply->promotion = true;
                 ply->promotion_piece = queen;
-                rb->snprintf(ply->pgn_text,10,"%c%c=D", 'a'+ply->column_to,
+                snprintf(ply->pgn_text,10,"%c%c=D", 'a'+ply->column_to,
                                    '1'+ply->row_to);
             } else {
-                rb->snprintf(ply->pgn_text,10,"%c%c", 'a'+ply->column_to,
+                snprintf(ply->pgn_text,10,"%c%c", 'a'+ply->column_to,
                                    '1'+ply->row_to);
             }
         }
@@ -487,22 +487,22 @@ static void coords_to_pgn(struct pgn_ply_node* ply){
          */
         if (unambiguous_position == '\0'){
             if (board[locn[ply->row_to][ply->column_to]] != no_piece){
-                rb->snprintf(ply->pgn_text,10,"%cx%c%c",
+                snprintf(ply->pgn_text,10,"%cx%c%c",
                                    pgn_from_piece(moving_piece,white) ,
                                    'a'+ply->column_to, '1'+ply->row_to);
             } else {
-                rb->snprintf(ply->pgn_text,10,"%c%c%c",
+                snprintf(ply->pgn_text,10,"%c%c%c",
                                    pgn_from_piece(moving_piece,white) ,
                                    'a'+ply->column_to, '1'+ply->row_to);
             }
         } else {
             if (board[locn[ply->row_to][ply->column_to]] != no_piece){
-                rb->snprintf(ply->pgn_text,10,"%c%cx%c%c",
+                snprintf(ply->pgn_text,10,"%c%cx%c%c",
                                    pgn_from_piece(moving_piece,white) ,
                                    unambiguous_position, 'a'+ply->column_to,
                                    '1'+ply->row_to);
             } else {
-                rb->snprintf(ply->pgn_text,10,"%c%c%c%c",
+                snprintf(ply->pgn_text,10,"%c%c%c%c",
                                    pgn_from_piece(moving_piece,white) ,
                                    unambiguous_position, 'a'+ply->column_to,
                                    '1'+ply->row_to);
@@ -510,7 +510,7 @@ static void coords_to_pgn(struct pgn_ply_node* ply){
         }
     }
     /* update the board */
-    rb->snprintf(alg_move,5,"%c%c%c%c",'a' + ply->column_from, '1' + ply->row_from,
+    snprintf(alg_move,5,"%c%c%c%c",'a' + ply->column_from, '1' + ply->row_from,
                 'a' + ply->column_to, '1' + ply->row_to);
     /* The function returns false if the move is invalid, but since we're
      * replaying the game, that should not be posible
@@ -539,19 +539,19 @@ static const char* get_game_text(int selected_item, void *data,
     if (temp_node == NULL){
         return NULL;
     }
-    rb->snprintf(buffer, buffer_len,"%s vs. %s (%s)", temp_node->white_player,
+    snprintf(buffer, buffer_len,"%s vs. %s (%s)", temp_node->white_player,
                          temp_node->black_player, temp_node->game_date);
 
     return buffer;
 }
 
 static void write_pgn_token(int fhandler, char *buffer, size_t *line_length){
-    if (*line_length + rb->strlen(buffer) + 1 > 80){
-        rb->fdprintf(fhandler,"\n");
+    if (*line_length + strlen(buffer) + 1 > 80){
+        fdprintf(fhandler,"\n");
         *line_length = 0;
     }
-    rb->fdprintf(fhandler,"%s ",buffer);
-    *line_length += (rb->strlen(buffer) + 1);
+    fdprintf(fhandler,"%s ",buffer);
+    *line_length += (strlen(buffer) + 1);
 }
 
 /* ---- api functions ---- */
@@ -564,12 +564,12 @@ struct pgn_game_node* pgn_list_games(const char* filename){
     int line_count = 0;
     bool header_start = true, game_start = false;
 
-    if ( (fhandler = rb->open(filename, O_RDONLY)) < 0 ) return NULL;
+    if ( (fhandler = open(filename, O_RDONLY)) < 0 ) return NULL;
 
     if (bufptr == NULL){
         pl_malloc_init();
     }
-    while (rb->read_line(fhandler, line_buffer, sizeof line_buffer) > 0){
+    while (read_line(fhandler, line_buffer, sizeof line_buffer) > 0){
         line_count++;
         /* looking for a game header */
         if (header_start) {
@@ -608,7 +608,7 @@ struct pgn_game_node* pgn_list_games(const char* filename){
             }
         }
     }
-    rb->close(fhandler);
+    close(fhandler);
     return first_game;
 }
 
@@ -624,18 +624,18 @@ struct pgn_game_node* pgn_show_game_list(struct pgn_game_node* first_game){
     }
 
 
-    rb->gui_synclist_init(&games_list, &get_game_text, first_game, false, 1, NULL);
-    rb->gui_synclist_set_title(&games_list, "Games", NOICON);
-    rb->gui_synclist_set_icon_callback(&games_list, NULL);
-    rb->gui_synclist_set_nb_items(&games_list, i);
-    rb->gui_synclist_limit_scroll(&games_list, true);
-    rb->gui_synclist_select_item(&games_list, 0);
+    gui_synclist_init(&games_list, &get_game_text, first_game, false, 1, NULL);
+    gui_synclist_set_title(&games_list, "Games", NOICON);
+    gui_synclist_set_icon_callback(&games_list, NULL);
+    gui_synclist_set_nb_items(&games_list, i);
+    gui_synclist_limit_scroll(&games_list, true);
+    gui_synclist_select_item(&games_list, 0);
 
     while (true) {
-        rb->gui_synclist_draw(&games_list);
-        curr_selection = rb->gui_synclist_get_sel_pos(&games_list);
-        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&games_list,&button,LIST_WRAP_OFF)){
+        gui_synclist_draw(&games_list);
+        curr_selection = gui_synclist_get_sel_pos(&games_list);
+        button = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        if (gui_synclist_do_button(&games_list,&button,LIST_WRAP_OFF)){
             continue;
         }
         switch (button) {
@@ -663,23 +663,23 @@ void pgn_parse_game(const char* filename,
     unsigned short pos;
     unsigned short curr_player = white;
 
-    fhandler = rb->open(filename, O_RDONLY);
+    fhandler = open(filename, O_RDONLY);
 
     /* seek the line where the pgn of the selected game starts */
     for (i=1;i<selected_game->pgn_line;i++){
-        rb->read_line(fhandler, line_buffer, sizeof line_buffer);
+        read_line(fhandler, line_buffer, sizeof line_buffer);
     }
 
-    loghandler = rb->open(LOG_FILE, O_WRONLY | O_CREAT, 0666);
+    loghandler = open(LOG_FILE, O_WRONLY | O_CREAT, 0666);
 
     GNUChess_Initialize();
 
-    while (rb->read_line(fhandler, line_buffer, sizeof line_buffer) > 0){
+    while (read_line(fhandler, line_buffer, sizeof line_buffer) > 0){
         if (line_buffer[0] == '\r' || line_buffer[0] == '\n' || line_buffer[0] == '\0'){
             break;
         }
         pos = 0;
-        while (pos < rb->strlen(line_buffer)){
+        while (pos < strlen(line_buffer)){
             pos = get_next_token(line_buffer, pos, token_buffer);
             if ((token_buffer[0] >= 'A' && token_buffer[0] <= 'Z')
                 || (token_buffer[0] >= 'a' && token_buffer[0] <= 'z')
@@ -687,7 +687,7 @@ void pgn_parse_game(const char* filename,
                 temp_ply = (struct pgn_ply_node *)pl_malloc(sizeof size_ply);
                 temp_ply->player = curr_player;
                 curr_player = (curr_player==white)?black:white;
-                rb->strcpy(temp_ply->pgn_text, token_buffer);
+                strcpy(temp_ply->pgn_text, token_buffer);
                 pgn_to_coords(temp_ply);
                 temp_ply->prev_node = NULL;
                 temp_ply->next_node = NULL;
@@ -698,7 +698,7 @@ void pgn_parse_game(const char* filename,
                     temp_ply->prev_node = curr_node;
                     curr_node = temp_ply;
                 }
-                rb->fdprintf(loghandler,
+                fdprintf(loghandler,
                     "player: %u; pgn: %s; from: %u,%u; to: %u,%u; taken: %u.\n",
                              temp_ply->player, temp_ply->pgn_text, temp_ply->row_from,
                              temp_ply->column_from, temp_ply->row_to,
@@ -707,7 +707,7 @@ void pgn_parse_game(const char* filename,
         }
     }
 
-    rb->close(loghandler);
+    close(loghandler);
 
     /* additional dummy ply to represent end of file without
      *loosing the previous node's pointer
@@ -719,7 +719,7 @@ void pgn_parse_game(const char* filename,
         curr_node->next_node = temp_ply;
     }
     selected_game->first_ply = first_ply;
-    rb->close(fhandler);
+    close(fhandler);
 }
 
 struct pgn_game_node* pgn_init_game(void){
@@ -733,6 +733,9 @@ struct pgn_game_node* pgn_init_game(void){
 
     /* create an "end of game" dummy ply and assign defaults */
     ply = (struct pgn_ply_node *)pl_malloc(sizeof ply_size);
+    if (ply == NULL)
+        return NULL;
+
     ply->player = neutral;
     ply->pgn_text[0] = '\0';
     ply->prev_node = NULL;
@@ -740,17 +743,20 @@ struct pgn_game_node* pgn_init_game(void){
 
     /* create the game and assign defaults */
     game = (struct pgn_game_node *)pl_malloc(sizeof game_size);
+    if (game == NULL)
+        return NULL;
+
     game->game_number = 0;
-    rb->strcpy(game->white_player,"Player");
-    rb->strcpy(game->black_player,"GnuChess");
-    current_time = rb->get_time();
+    strcpy(game->white_player,"Player");
+    strcpy(game->black_player,"GnuChess");
+    current_time = get_time();
     if (current_time->tm_year < 100){
-        rb->snprintf(game->game_date,11,"????.??.??");
+        snprintf(game->game_date,11,"????.??.??");
     } else {
-        rb->snprintf(game->game_date,11,"%4u.%2u.%2u",current_time->tm_year + 1900,
+        snprintf(game->game_date,11,"%4u.%2u.%2u",current_time->tm_year + 1900,
                      current_time->tm_mon + 1, current_time->tm_mday);
     }
-    rb->strcpy(game->result,"*");
+    strcpy(game->result,"*");
     game->pgn_line = 0;
     game->first_ply = ply;
     game->next_node = NULL;
@@ -817,42 +823,42 @@ void pgn_store_game(struct pgn_game_node* game){
         coords_to_pgn(ply);
         if (ply->checkmate){
             if (ply->player == white){
-                rb->strcpy(game->result,"1-0");
+                strcpy(game->result,"1-0");
             } else {
-                rb->strcpy(game->result,"0-1");
+                strcpy(game->result,"0-1");
             }
         }
         if (ply->draw){
-            rb->strcpy(game->result,"1/2-1/2");
+            strcpy(game->result,"1/2-1/2");
         }
         ply=ply->next_node;
         ply_count++;
     }
 
-    fhandler = rb->open(PGN_FILE, O_WRONLY|O_CREAT|O_APPEND, 0666);
+    fhandler = open(PGN_FILE, O_WRONLY|O_CREAT|O_APPEND, 0666);
 
 
     /* the first 7 tags are mandatory according to the PGN specification so we
      * have to include them even if the values don't make much sense
      */
-    rb->fdprintf(fhandler,"[Event \"Casual Game\"]\n");
-    rb->fdprintf(fhandler,"[Site \"?\"]\n");
-    rb->fdprintf(fhandler,"[Date \"%s\"]\n",game->game_date);
-    rb->fdprintf(fhandler,"[Round \"?\"]\n");
-    rb->fdprintf(fhandler,"[White \"%s\"]\n",game->white_player);
-    rb->fdprintf(fhandler,"[Black \"%s\"]\n",game->black_player);
-    rb->fdprintf(fhandler,"[Result \"%s\"]\n",game->result);
-    rb->fdprintf(fhandler,"[PlyCount \"%u\"]\n",ply_count);
+    fdprintf(fhandler,"[Event \"Casual Game\"]\n");
+    fdprintf(fhandler,"[Site \"?\"]\n");
+    fdprintf(fhandler,"[Date \"%s\"]\n",game->game_date);
+    fdprintf(fhandler,"[Round \"?\"]\n");
+    fdprintf(fhandler,"[White \"%s\"]\n",game->white_player);
+    fdprintf(fhandler,"[Black \"%s\"]\n",game->black_player);
+    fdprintf(fhandler,"[Result \"%s\"]\n",game->result);
+    fdprintf(fhandler,"[PlyCount \"%u\"]\n",ply_count);
 
     /* leave a blank line between the tag section and the game section */
-    rb->fdprintf(fhandler,"\n");
+    fdprintf(fhandler,"\n");
 
     /* write the plies in several lines of up to 80 characters */
     for (ply_count=0, ply=game->first_ply;ply->next_node!=NULL;
          ply=ply->next_node,ply_count++){
         /* write the move number */
         if (ply->player == white){
-            rb->snprintf(buffer,10,"%u.",(ply_count/2)+1);
+            snprintf(buffer,10,"%u.",(ply_count/2)+1);
             write_pgn_token(fhandler, buffer, &line_length);
         }
         /* write the actual move */
@@ -876,7 +882,7 @@ void pgn_store_game(struct pgn_game_node* game){
     }
 
     /* leave a blank line between the tag section and the game section */
-    rb->fdprintf(fhandler,"\n\n");
+    fdprintf(fhandler,"\n\n");
 
-    rb->close(fhandler);    
+    close(fhandler);    
 }

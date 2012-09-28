@@ -101,7 +101,7 @@ clear_board (void)
     unsigned int x, y;
 
     /* for the borders */
-    rb->memset(board_data, INVALID, sizeof(board_data));
+    memset(board_data, INVALID, sizeof(board_data));
 
     /* now make the actual board part */
     for (y = 0; y < board_height; ++y)

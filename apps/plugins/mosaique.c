@@ -62,7 +62,7 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_LCD_CHARCELLS
     if (!pgfx_init(4, 2))
     {
-        rb->splash(HZ*2, "Old LCD :(");
+        splash(HZ*2, "Old LCD :(");
         return PLUGIN_OK;
     }
     pgfx_display(3, 0);
@@ -103,7 +103,7 @@ enum plugin_status plugin_start(const void* parameter)
         mylcd_fillrect(GFX_X+x, GFX_Y-y+1, 1, 2*y-1);
         mylcd_update();
 
-        rb->sleep(HZ/timer);
+        sleep(HZ/timer);
 
         /*We get button from PLA this way */
         button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
@@ -130,8 +130,8 @@ enum plugin_status plugin_start(const void* parameter)
 
             case MOSAIQUE_RESTART:
 
-                sx = rb->rand() % (GFX_HEIGHT/2) + 1;
-                sy = rb->rand() % (GFX_HEIGHT/2) + 1;
+                sx = rand() % (GFX_HEIGHT/2) + 1;
+                sy = rand() % (GFX_HEIGHT/2) + 1;
                 x=0;
                 y=0;
                 mylcd_clear_display();
@@ -139,7 +139,7 @@ enum plugin_status plugin_start(const void* parameter)
 
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                 {
                     mylcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_LCD_CHARCELLS

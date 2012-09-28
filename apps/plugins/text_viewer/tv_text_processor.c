@@ -92,10 +92,10 @@ static int tv_glyph_width(int ch)
 
 #ifdef HAVE_LCD_BITMAP
     /* the width of the diacritics charcter is 0 */
-    if (rb->is_diacritic(ch, NULL))
+    if (is_diacritic(ch, NULL))
         return 0;
 
-    return rb->font_get_width(rb->font_get(preferences->font_id), ch);
+    return font_get_width(font_get(preferences->font_id), ch);
 #else
     return 1;
 #endif
@@ -136,7 +136,7 @@ static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
     }
 
     if (preferences->encoding == UTF_8)
-        return (unsigned char*)rb->utf8decode(str, ch);
+        return (unsigned char*)utf8decode(str, ch);
 
 #ifdef HAVE_LCD_BITMAP
     if ((*str >= 0x80) &&
@@ -152,8 +152,8 @@ static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
         count = 2;
     }
 #endif
-    rb->iso_decode(str, utf8_tmp, preferences->encoding, count);
-    rb->utf8decode(utf8_tmp, ch);
+    iso_decode(str, utf8_tmp, preferences->encoding, count);
+    utf8decode(utf8_tmp, ch);
     return (unsigned char *)str + count;
 }
 
@@ -162,7 +162,7 @@ static void tv_decode2utf8(const unsigned short *ucs, int count)
     int i;
 
     for (i = 0; i < count; i++)
-        outbuf = rb->utf8encode(ucs[i], outbuf);
+        outbuf = utf8encode(ucs[i], outbuf);
 
     *outbuf = '\0';
 }
@@ -271,7 +271,7 @@ static int tv_form_reflow_line(unsigned short *ucs, int chars)
         }
     }
 
-    rb->memcpy(ucs, new_ucs, sizeof(unsigned short) * TV_MAX_CHARS_PER_BLOCK);
+    memcpy(ucs, new_ucs, sizeof(unsigned short) * TV_MAX_CHARS_PER_BLOCK);
     return indent_chars + nonspace_chars + expand_spaces;
 }
 
@@ -343,9 +343,9 @@ static void tv_align_right(int *block_chars)
 
             if (break_pos < prev_chars)
             {
-                rb->memmove(cur_text + prev_chars - break_pos,
+                memmove(cur_text + prev_chars - break_pos,
                             cur_text, block_chars[cur_block] * sizeof(unsigned short));
-                rb->memcpy(cur_text, prev_text + break_pos,
+                memcpy(cur_text, prev_text + break_pos,
                            (prev_chars - break_pos) * sizeof(unsigned short));
 
                 block_chars[prev_block]  = break_pos;

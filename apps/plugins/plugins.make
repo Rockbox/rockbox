@@ -40,9 +40,15 @@ PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
 ### build data / rules
 ifndef APP_TYPE
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
+ifdef USE_ELFLOADER
+PLUGIN_LDS := $(APPSDIR)/plugins/plugin_elf.lds
+PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin_elf.link
+OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
+else
 PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
 PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
 OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
+endif
 endif
 OTHER_SRC += $(ROOTDIR)/apps/plugins/plugin_crt0.c
 PLUGIN_CRT0 := $(BUILDDIR)/apps/plugins/plugin_crt0.o
@@ -110,17 +116,35 @@ ifdef APP_TYPE
  PLUGINLDFLAGS = $(SHARED_LDFLAG) -Wl,-Map,$*.map
  PLUGINFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else
- PLUGINLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$*.map
+ ifdef USE_ELFLOADER
+  PLUGINLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-n -Wl,-r -Wl,-e,0 -Wl,--sort-common -Wl,-Map,$*.map
+ else
+  PLUGINLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$*.map
+ endif
+
  OVERLAYLDFLAGS = -T$(OVERLAYREF_LDS) -Wl,--gc-sections -Wl,-Map,$*.refmap
 endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
 $(BUILDDIR)/%.rock:
+ifdef USE_ELFLOADER
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $@ \
+		$(filter %.o, $^) \
+		$(filter %.a, $+) \
+		-lgcc $(PLUGINLDFLAGS)
+
+	$(call PRINTS,STRIP $(subst $(ROOTDIR)/,,$@))$(STRIP) \
+		--strip-unneeded \
+		-R .comment -R .ARM.attributes \
+		-R .reginfo -R .mdebug.abi32 \
+		-R .gnu.attributes -R .pdr $@
+else
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(PLUGINLDFLAGS)
 	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
+endif
 
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/

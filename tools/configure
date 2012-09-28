@@ -61,6 +61,7 @@ prefixtools () {
  AR=${prefix}ar
  AS=${prefix}as
  OC=${prefix}objcopy
+ STRIP=${prefix}strip
 }
 
 app_set_paths () {
@@ -1157,6 +1158,11 @@ help() {
     --thumb           Build with -mthumb (for ARM builds)
     --no-thumb        The opposite of --thumb (don't use thumb even for targets
                       where this is the default
+
+    --elfloader       Build plugins and codecs as relocatable ELFs and use new
+                      loader.
+    --no-elfloader    Use legacy loader code for plugins and codecs.
+
     --sdl-threads     Force use of SDL threads. They have inferior performance,
                       but are better debuggable with GDB
     --no-sdl-threads  Disallow use of SDL threads. This prevents the default
@@ -1181,6 +1187,7 @@ ARG_TTSOPTS=
 ARG_TYPE=
 ARG_VOICE=
 ARG_ARM_THUMB=
+ARG_USE_ELFLOADER=
 ARG_PREFIX="$PREFIX"
 ARG_THREAD_SUPPORT=
 err=            
@@ -1201,6 +1208,8 @@ for arg in "$@"; do
 		--voice=*)    ARG_VOICE=`echo "$arg" | cut -d = -f 2`;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
+                --elfloader)  ARG_USE_ELFLOADER=1;;
+                --no-elfloader) ARG_USE_ELFLOADER=0;;
         --sdl-threads)ARG_THREAD_SUPPORT=1;;
         --no-sdl-threads)
                       ARG_THREAD_SUPPORT=0;;
@@ -3734,6 +3743,7 @@ LD=`findtool ${LD} --lit`
 AR=`findtool ${AR} --lit`
 AS=`findtool ${AS} --lit`
 OC=`findtool ${OC} --lit`
+STRIP=`findtool ${STRIP} --lit`
 WINDRES=`findtool ${WINDRES} --lit`
 DLLTOOL=`findtool ${DLLTOOL} --lit`
 DLLWRAP=`findtool ${DLLWRAP} --lit`
@@ -3787,6 +3797,13 @@ fi
 if test "$ARG_ARM_THUMB" = "1"; then
   extradefines="$extradefines -DUSE_THUMB"
   CC="$toolsdir/thumb-cc.py $CC"
+fi
+
+if test "$ARG_USE_ELFLOADER" = "1"; then
+  extradefines="$extradefines -DUSE_ELFLOADER"
+  use_elfloader="1"
+else
+  use_elfloader=
 fi
 
 if test "X$endian" = "Xbig"; then
@@ -3976,6 +3993,7 @@ export LD=${LD}
 export AR=${AR}
 export AS=${AS}
 export OC=${OC}
+export STRIP=${STRIP}
 export WINDRES=${WINDRES}
 export DLLTOOL=${DLLTOOL}
 export DLLWRAP=${DLLWRAP}
@@ -3983,6 +4001,7 @@ export RANLIB=${RANLIB}
 export PREFIX=${ARG_PREFIX}
 export PROFILE_OPTS=${PROFILE_OPTS}
 export APP_TYPE=${app_type}
+export USE_ELFLOADER=${use_elfloader}
 export APPLICATION=${application}
 export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export GCCOPTS=${GCCOPTS}

@@ -1338,7 +1338,7 @@ static int  bubbles(struct game_context* bb);
 static void bubbles_init(struct game_context* bb) {
     bubbles_setcolors();
     /* seed the rand generator */
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 
     /* check for resumed game */
     if (resume)
@@ -1368,7 +1368,7 @@ static bool bubbles_nextlevel(struct game_context* bb) {
         highlevel = bb->level-1;
 
     /* set up the play board */
-    rb->memset(bb->playboard, 0, sizeof(bb->playboard));
+    memset(bb->playboard, 0, sizeof(bb->playboard));
     for(i=0; i<BB_LEVEL_HEIGHT; i++) {
         for(j=0; j<BB_WIDTH; j++) {
             pos = (int)level[bb->level-1][i][j];
@@ -1388,7 +1388,7 @@ static bool bubbles_nextlevel(struct game_context* bb) {
     /* fill first bubbles in shot queue */
     bubbles_getonboard(bb);
     for(i=0; i<NUM_QUEUE; i++) {
-        bb->queue[i] = bb->onboard[rb->rand()%bb->onboardcnt];
+        bb->queue[i] = bb->onboard[rand()%bb->onboardcnt];
     }
 
     bb->angle = 0;
@@ -1409,7 +1409,7 @@ static void bubbles_getonboard(struct game_context* bb) {
     bool found;
 
     bb->onboardcnt = 0;
-    rb->memset(bb->onboard, -1, sizeof(bb->onboard));
+    memset(bb->onboard, -1, sizeof(bb->onboard));
 
     for(i=0; i<BB_HEIGHT; i++) {
         for(j=0; j<BB_WIDTH; j++) {
@@ -1451,12 +1451,12 @@ static void bubbles_drawboard(struct game_context* bb) {
     char str[11];
 
     /* clear screen */
-    rb->lcd_clear_display();
-    int font = rb->screens[SCREEN_MAIN]->getuifont();
-    h = rb->font_get(font)->height + 1;
+    lcd_clear_display();
+    int font = screens[SCREEN_MAIN].getuifont();
+    h = font_get(font)->height + 1;
     /* draw background */
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_bitmap(bubbles_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_bitmap(bubbles_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 
     /* display play board */
@@ -1472,80 +1472,80 @@ static void bubbles_drawboard(struct game_context* bb) {
 
         for(j=0; j<colmax; j++) {
             if(bb->playboard[i][j].type >= 0 && !bb->playboard[i][j].delete) {
-                rb->lcd_bitmap_part(bubbles_emblem,
+                lcd_bitmap_part(bubbles_emblem,
                   0, EMBLEM_HEIGHT*bb->playboard[i][j].type,
                   STRIDE(   SCREEN_MAIN,
                             BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                   XOFS+indent+BUBBLE_WIDTH*j+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                   YOFS+ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+bb->compress*ROW_HEIGHT,
                   EMBLEM_WIDTH, EMBLEM_HEIGHT);
-                rb->lcd_set_drawmode(DRMODE_FG);
-                rb->lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
+                lcd_set_drawmode(DRMODE_FG);
+                lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
                                     XOFS+indent+BUBBLE_WIDTH*j,
                                     YOFS+ROW_HEIGHT*i+bb->compress*ROW_HEIGHT,
                                     BUBBLE_WIDTH, BUBBLE_HEIGHT);
-                rb->lcd_set_drawmode(DRMODE_SOLID);
+                lcd_set_drawmode(DRMODE_SOLID);
             }
         }
     }
 
     /* display bubble to be shot */
-    rb->lcd_bitmap_part(bubbles_emblem,
+    lcd_bitmap_part(bubbles_emblem,
                0, EMBLEM_HEIGHT*bb->queue[bb->nextinq],
                STRIDE(  SCREEN_MAIN,
                         BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                SHOTX+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                SHOTY+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
                EMBLEM_WIDTH, EMBLEM_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
+    lcd_set_drawmode(DRMODE_FG);
+    lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
                         SHOTX, SHOTY,
                         BUBBLE_WIDTH, BUBBLE_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     /* display next bubble to be shot */
 #ifndef NEXT_BB_X
-    rb->lcd_bitmap_part(bubbles_emblem,
+    lcd_bitmap_part(bubbles_emblem,
                0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE],
                STRIDE(  SCREEN_MAIN,
                         BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                XOFS/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                SHOTY+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
                EMBLEM_WIDTH, EMBLEM_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
+    lcd_set_drawmode(DRMODE_FG);
+    lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
                         XOFS/2-BUBBLE_WIDTH/2, SHOTY,
                         BUBBLE_WIDTH, BUBBLE_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 #else
-    rb->lcd_bitmap_part(bubbles_emblem,
+    lcd_bitmap_part(bubbles_emblem,
                0, EMBLEM_HEIGHT*bb->queue[(bb->nextinq+1)%NUM_QUEUE],
                STRIDE(  SCREEN_MAIN,
                         BMPWIDTH_bubbles_emblem, BMPHEIGHT_bubbles_emblem),
                NEXT_BB_X + NEXT_BB_WIDTH/2-BUBBLE_WIDTH/2+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                NEXT_BB_Y + (BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2 + h,
                EMBLEM_WIDTH, EMBLEM_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
+    lcd_set_drawmode(DRMODE_FG);
+    lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
                         NEXT_BB_X + NEXT_BB_WIDTH/2-BUBBLE_WIDTH/2, NEXT_BB_Y + h,
                         BUBBLE_WIDTH, BUBBLE_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 #endif
 
     /* draw bounding lines */
 #ifndef HAVE_LCD_COLOR
-    rb->lcd_vline(XOFS-1, 0, LCD_HEIGHT);
-    rb->lcd_vline(XOFS+BUBBLE_WIDTH*BB_WIDTH, 0, LCD_HEIGHT);
+    lcd_vline(XOFS-1, 0, LCD_HEIGHT);
+    lcd_vline(XOFS+BUBBLE_WIDTH*BB_WIDTH, 0, LCD_HEIGHT);
 #endif
-    rb->lcd_hline(XOFS, XOFS+BUBBLE_WIDTH*BB_WIDTH-1, YOFS+bb->compress*ROW_HEIGHT-1);
-    rb->lcd_hline(XOFS, XOFS+BUBBLE_WIDTH*BB_WIDTH-1,
+    lcd_hline(XOFS, XOFS+BUBBLE_WIDTH*BB_WIDTH-1, YOFS+bb->compress*ROW_HEIGHT-1);
+    lcd_hline(XOFS, XOFS+BUBBLE_WIDTH*BB_WIDTH-1,
                   YOFS+ROW_HEIGHT*(BB_HEIGHT-2)+BUBBLE_HEIGHT);
 
     /* draw arrow */
     tipx = SHOTX+BUBBLE_WIDTH/2+(((fp14_sin(bb->angle)>>4)*BUBBLE_WIDTH*3/2)>>10);
     tipy = SHOTY+BUBBLE_HEIGHT/2-(((fp14_cos(bb->angle)>>4)*BUBBLE_HEIGHT*3/2)>>10);
 
-    rb->lcd_drawline(SHOTX+BUBBLE_WIDTH/2+(((fp14_sin(bb->angle)>>4)*BUBBLE_WIDTH/2)>>10),
+    lcd_drawline(SHOTX+BUBBLE_WIDTH/2+(((fp14_sin(bb->angle)>>4)*BUBBLE_WIDTH/2)>>10),
                      SHOTY+BUBBLE_HEIGHT/2-(((fp14_cos(bb->angle)>>4)*BUBBLE_HEIGHT/2)>>10),
                      tipx, tipy);
     xlcd_filltriangle(tipx, tipy,
@@ -1555,43 +1555,43 @@ static void bubbles_drawboard(struct game_context* bb) {
                       tipy-(((fp14_cos(bb->angle+135)>>4)*BUBBLE_HEIGHT/3)>>10));
 
     /* draw text */
-    rb->snprintf(str, 4, "%d", bb->level);
-    rb->lcd_getstringsize(level, &w1, NULL);
-    rb->lcd_getstringsize(str, &w2, NULL);
+    snprintf(str, 4, "%d", bb->level);
+    lcd_getstringsize(level, &w1, NULL);
+    lcd_getstringsize(str, &w2, NULL);
 #ifndef LEVEL_TXT_X
-    rb->lcd_putsxy(XOFS/2-w1/2, 2, level);
-    rb->lcd_putsxy(XOFS/2-w2/2, 2+h, str);
+    lcd_putsxy(XOFS/2-w1/2, 2, level);
+    lcd_putsxy(XOFS/2-w2/2, 2+h, str);
 #else
-    rb->lcd_putsxy(LEVEL_TXT_X+(LEVEL_TXT_WIDTH/2-w1/2), LEVEL_TXT_Y, level);
-    rb->lcd_putsxy(LEVEL_TXT_X+(LEVEL_TXT_WIDTH/2-w2/2), LEVEL_TXT_Y+h, str);
+    lcd_putsxy(LEVEL_TXT_X+(LEVEL_TXT_WIDTH/2-w1/2), LEVEL_TXT_Y, level);
+    lcd_putsxy(LEVEL_TXT_X+(LEVEL_TXT_WIDTH/2-w2/2), LEVEL_TXT_Y+h, str);
 #endif
 
-    rb->snprintf(str, 10, "%d", bb->score);
-    rb->lcd_getstringsize(score, &w1,NULL);
-    rb->lcd_getstringsize(str, &w2, NULL);
+    snprintf(str, 10, "%d", bb->score);
+    lcd_getstringsize(score, &w1,NULL);
+    lcd_getstringsize(str, &w2, NULL);
 #ifndef SCORE_TXT_X
-    rb->lcd_putsxy(XOFS/2-w1/2, 29, score);
-    rb->lcd_putsxy(XOFS/2-w2/2, 29+h, str);
+    lcd_putsxy(XOFS/2-w1/2, 29, score);
+    lcd_putsxy(XOFS/2-w2/2, 29+h, str);
 #else
-    rb->lcd_putsxy(SCORE_TXT_X+(SCORE_TXT_WIDTH/2-w1/2), SCORE_TXT_Y, score);
-    rb->lcd_putsxy(SCORE_TXT_X+(SCORE_TXT_WIDTH/2-w2/2), SCORE_TXT_Y+h, str);
+    lcd_putsxy(SCORE_TXT_X+(SCORE_TXT_WIDTH/2-w1/2), SCORE_TXT_Y, score);
+    lcd_putsxy(SCORE_TXT_X+(SCORE_TXT_WIDTH/2-w2/2), SCORE_TXT_Y+h, str);
 #endif
 
-    rb->lcd_getstringsize(next, &w1, NULL);
+    lcd_getstringsize(next, &w1, NULL);
 #ifndef NEXT_BB_X
-    rb->lcd_putsxy(XOFS/2-w1/2, SHOTY-h, next);
+    lcd_putsxy(XOFS/2-w1/2, SHOTY-h, next);
 #else
-    rb->lcd_putsxy(NEXT_BB_X+(NEXT_BB_WIDTH/2-w1/2), NEXT_BB_Y, next);
+    lcd_putsxy(NEXT_BB_X+(NEXT_BB_WIDTH/2-w1/2), NEXT_BB_Y, next);
 #endif
 
 
     if(bb->elapsedshot >= (MAX_SHOTTIME*7)/10) {
-        rb->lcd_getstringsize(hurry, &w1, &h);
+        lcd_getstringsize(hurry, &w1, &h);
         /* screen is too small for the message to be centered (Clip Zip) */
         #if (LCD_WIDTH <= 96)
-            rb->lcd_putsxy(LCD_WIDTH/2-w1/2+LCD_WIDTH/6, LCD_HEIGHT/2-h/2, hurry);
+            lcd_putsxy(LCD_WIDTH/2-w1/2+LCD_WIDTH/6, LCD_HEIGHT/2-h/2, hurry);
         #else
-            rb->lcd_putsxy(LCD_WIDTH/2-w1/2, LCD_HEIGHT/2-h/2, hurry);
+            lcd_putsxy(LCD_WIDTH/2-w1/2, LCD_HEIGHT/2-h/2, hurry);
         #endif
     }
 }
@@ -1620,13 +1620,13 @@ static int bubbles_fire(struct game_context* bb) {
     shotxofs = shotyofs = 0;
 
     /* advance the queue */
-    bb->queue[bb->nextinq] = bb->onboard[rb->rand()%bb->onboardcnt];
+    bb->queue[bb->nextinq] = bb->onboard[rand()%bb->onboardcnt];
     bb->nextinq = (bb->nextinq+1)%NUM_QUEUE;
     bubbles_drawboard(bb);
-    rb->lcd_update_rect(0, 0, XOFS, LCD_HEIGHT);
+    lcd_update_rect(0, 0, XOFS, LCD_HEIGHT);
 
     /* move the bubble across the play board */
-    lasttick = *rb->current_tick;
+    lasttick = current_tick;
 
     while(true) {
         /* move the bubble one step */
@@ -1648,19 +1648,19 @@ static int bubbles_fire(struct game_context* bb) {
 
         /* display shot */
         bubbles_drawboard(bb);
-        rb->lcd_bitmap_part(bubbles_emblem, 0, EMBLEM_HEIGHT*bubblecur,
+        lcd_bitmap_part(bubbles_emblem, 0, EMBLEM_HEIGHT*bubblecur,
                        STRIDE(  SCREEN_MAIN,
                                 BMPWIDTH_bubbles_emblem,
                                 BMPHEIGHT_bubbles_emblem),
                        SHOTX+tempxofs+(BUBBLE_WIDTH-EMBLEM_WIDTH)/2,
                        SHOTY+tempyofs+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2,
                        EMBLEM_WIDTH, EMBLEM_HEIGHT);
-        rb->lcd_set_drawmode(DRMODE_FG);
-        rb->lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
+        lcd_set_drawmode(DRMODE_FG);
+        lcd_mono_bitmap((const unsigned char *)bubbles_bubble,
                             SHOTX+tempxofs, SHOTY+tempyofs,
                             BUBBLE_WIDTH, BUBBLE_HEIGHT);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_update_rect(XOFS, 0, BB_WIDTH*BUBBLE_WIDTH, LCD_HEIGHT);
+        lcd_set_drawmode(DRMODE_SOLID);
+        lcd_update_rect(XOFS, 0, BB_WIDTH*BUBBLE_WIDTH, LCD_HEIGHT);
 
         /* find nearest position */
         nearrow = ((SHOTY+tempyofs)-
@@ -1707,17 +1707,17 @@ static int bubbles_fire(struct game_context* bb) {
         if(buttonres != BB_NONE) return buttonres;
 
         /* framerate limiting */
-        currenttick = *rb->current_tick;
+        currenttick = current_tick;
         if(currenttick-lasttick < HZ/MAX_FPS) {
-            rb->sleep((HZ/MAX_FPS)-(currenttick-lasttick));
+            sleep((HZ/MAX_FPS)-(currenttick-lasttick));
         } else {
-            rb->yield();
+            yield();
         }
         lasttick = currenttick;
     }
 
     bubbles_drawboard(bb);
-    rb->lcd_update();
+    lcd_update();
 
     /* clear appropriate bubbles from playing board */
     if(bubbles_ingroup(bb, lastrow, lastcol)) {
@@ -2083,8 +2083,8 @@ static int bubbles_fall(struct game_context* bb) {
     for(i=0; i<BB_HEIGHT; i++) {
         for(j=0; j<BB_WIDTH; j++) {
             if(bb->playboard[i][j].delete) {
-                bb->playboard[i][j].fallx = rb->rand()%25 - 12;
-                bb->playboard[i][j].fallvel = rb->rand()%5 + 6;
+                bb->playboard[i][j].fallx = rand()%25 - 12;
+                bb->playboard[i][j].fallvel = rand()%5 + 6;
             }
         }
     }
@@ -2092,7 +2092,7 @@ static int bubbles_fall(struct game_context* bb) {
     /* draw bubbles falling off the screen
      * follows y=x^2-8x scaled to bubble size
      */
-    lasttick = *rb->current_tick;
+    lasttick = current_tick;
 
     for(count=1; ;count++) {
         onscreen = false;
@@ -2111,7 +2111,7 @@ static int bubbles_fall(struct game_context* bb) {
                        <= LCD_HEIGHT) {
                         onscreen = true;
 
-                        rb->lcd_bitmap_part(bubbles_emblem, 0,
+                        lcd_bitmap_part(bubbles_emblem, 0,
                                 EMBLEM_HEIGHT*bb->playboard[i][j].type,
                                 STRIDE( SCREEN_MAIN,
                                         BMPWIDTH_bubbles_emblem,
@@ -2121,19 +2121,19 @@ static int bubbles_fall(struct game_context* bb) {
                                 YOFS+ROW_HEIGHT*i+(BUBBLE_HEIGHT-EMBLEM_HEIGHT)/2+
                                     bb->compress*ROW_HEIGHT+yofs,
                                 EMBLEM_WIDTH, EMBLEM_HEIGHT);
-                        rb->lcd_set_drawmode(DRMODE_FG);
-                        rb->lcd_mono_bitmap(
+                        lcd_set_drawmode(DRMODE_FG);
+                        lcd_mono_bitmap(
                                 (const unsigned char *)bubbles_bubble,
                                 XOFS+indent+BUBBLE_WIDTH*j+xofs,
                                 YOFS+ROW_HEIGHT*i+bb->compress*ROW_HEIGHT+yofs,
                                 BUBBLE_WIDTH, BUBBLE_HEIGHT);
-                        rb->lcd_set_drawmode(DRMODE_SOLID);
+                        lcd_set_drawmode(DRMODE_SOLID);
                     }
                 }
             }
         }
 
-        rb->lcd_update();
+        lcd_update();
 
         /* break out if all bubbles are off the screen */
         if(!onscreen) break;
@@ -2143,11 +2143,11 @@ static int bubbles_fall(struct game_context* bb) {
         if(buttonres != BB_NONE) return buttonres;
 
         /* framerate limiting */
-        currenttick = *rb->current_tick;
+        currenttick = current_tick;
         if(currenttick-lasttick < HZ/MAX_FPS) {
-            rb->sleep((HZ/MAX_FPS)-(currenttick-lasttick));
+            sleep((HZ/MAX_FPS)-(currenttick-lasttick));
         } else {
-            rb->yield();
+            yield();
         }
         lasttick = currenttick;
     }
@@ -2164,7 +2164,7 @@ static int bubbles_checklevel(struct game_context* bb) {
     char str[13];
 
     bubbles_drawboard(bb);
-    rb->lcd_update();
+    lcd_update();
 
     /* check for bubbles below cut off point */
     for(i=0; i<=bb->compress; i++) {
@@ -2188,8 +2188,8 @@ static int bubbles_checklevel(struct game_context* bb) {
         points = 0;
     }
 
-    rb->snprintf(str, 12, "%d points", points);
-    rb->splash(HZ, str);
+    snprintf(str, 12, "%d points", points);
+    splash(HZ, str);
 
     /* advance to the next level */
     if(!bubbles_nextlevel(bb)) {
@@ -2197,11 +2197,11 @@ static int bubbles_checklevel(struct game_context* bb) {
     }
 
     bubbles_drawboard(bb);
-    rb->lcd_update();
-    rb->snprintf(str, 12, "Level %d", bb->level);
-    rb->splash(HZ, str);
+    lcd_update();
+    snprintf(str, 12, "Level %d", bb->level);
+    splash(HZ, str);
     bubbles_drawboard(bb);
-    rb->lcd_update();
+    lcd_update();
 
     return BB_NONE;
 }
@@ -2219,7 +2219,7 @@ static void bubbles_recordscore(struct game_context* bb) {
     if (position != -1)
     {
         if (position == 0)
-            rb->splash(HZ*2, "New High Score");
+            splash(HZ*2, "New High Score");
         highscore_show(position, highscores, NUM_SCORES, true);
     }
 }
@@ -2232,11 +2232,11 @@ static void bubbles_loaddata(void) {
 
     last_highlevel = highlevel = 0;
     /* open data file */
-    fd = rb->open(DATA_FILE, O_RDONLY);
+    fd = open(DATA_FILE, O_RDONLY);
     if (fd < 0) return;
 
     /* read in saved game */
-    if (rb->read(fd, &highlevel, sizeof(highlevel)) < (long)sizeof(highlevel))
+    if (read(fd, &highlevel, sizeof(highlevel)) < (long)sizeof(highlevel))
     {
         highlevel = 0;
     }
@@ -2244,7 +2244,7 @@ static void bubbles_loaddata(void) {
         highlevel = NUM_LEVELS-1;
     last_highlevel = highlevel;
 
-    rb->close(fd);
+    close(fd);
 }
 
 /*****************************************************************************
@@ -2256,12 +2256,12 @@ static void bubbles_savedata(void) {
     if (last_highlevel >= highlevel) /* no need to save */
         return;
 
-    fd = rb->open(DATA_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = open(DATA_FILE, O_WRONLY|O_CREAT, 0666);
     if (fd < 0) return;
 
-    rb->write(fd, &highlevel, sizeof(highlevel));
+    write(fd, &highlevel, sizeof(highlevel));
 
-    rb->close(fd);
+    close(fd);
 }
 
 /*****************************************************************************
@@ -2272,17 +2272,17 @@ static bool bubbles_loadgame(struct game_context* bb) {
 
     bool ret = true;
     /* open game file */
-    fd = rb->open(SAVE_FILE, O_RDONLY);
+    fd = open(SAVE_FILE, O_RDONLY);
     if(fd < 0) return false;
 
     /* read in saved game */
-    if(rb->read(fd, bb, sizeof(struct game_context))
+    if(read(fd, bb, sizeof(struct game_context))
             < (long)sizeof(struct game_context))
     {
         ret = false;
     }
 
-    rb->close(fd);
+    close(fd);
 
     return ret;
 }
@@ -2296,18 +2296,18 @@ static void bubbles_savegame(struct game_context* bb) {
     if (!resume) /* nothing to save */
         return;
     /* write out the game state to the save file */
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
     if (fd < 0)
     {
-        rb->splash(HZ/2, "Failed to save game");
+        splash(HZ/2, "Failed to save game");
         return;
     }
-    if (rb->write(fd, bb, sizeof(struct game_context)) <= 0)
+    if (write(fd, bb, sizeof(struct game_context)) <= 0)
     {
-        rb->splash(HZ/2, "Failed to save game");
+        splash(HZ/2, "Failed to save game");
     }
 
-    rb->close(fd);
+    close(fd);
 }
 
 /*****************************************************************************
@@ -2315,8 +2315,8 @@ static void bubbles_savegame(struct game_context* bb) {
 ******************************************************************************/
 static inline void bubbles_setcolors(void) {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(LCD_RGBPACK(181,181,222));
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(LCD_RGBPACK(181,181,222));
+    lcd_set_foreground(LCD_BLACK);
 #endif
 }
 
@@ -2349,7 +2349,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     button = pluginlib_getaction(timeout,plugin_contexts,ARRAYLEN(plugin_contexts));
 #if defined(HAS_BUTTON_HOLD) && !defined(HAVE_REMOTE_LCD_AS_MAIN)
     /* FIXME: Should probably check remote hold here */
-    if (rb->button_hold())
+    if (button_hold())
         button = BUBBLES_PAUSE;
 #endif
 
@@ -2375,20 +2375,20 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
                 if(buttonres != BB_NONE) return buttonres;
                 buttonres = bubbles_checklevel(bb);
                 if(buttonres != BB_NONE) return buttonres;
-                bb->startedshot = *rb->current_tick;
+                bb->startedshot = current_tick;
             }
             break;
 
         case BUBBLES_PAUSE:  /* pause the game */
-            start = *rb->current_tick;
-            rb->splash(0, "Paused");
+            start = current_tick;
+            splash(0, "Paused");
 
             while(pluginlib_getaction(TIMEOUT_BLOCK,plugin_contexts,
                     ARRAYLEN(plugin_contexts))
                  != BUBBLES_PAUSE);
-            bb->startedshot += *rb->current_tick-start;
+            bb->startedshot += current_tick-start;
             bubbles_drawboard(bb);
-            rb->lcd_update();
+            lcd_update();
             break;
 
         case BUBBLES_QUIT1:
@@ -2404,7 +2404,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             break;
 
         default:
-            if(rb->default_event_handler_ex(button, bubbles_callback,
+            if(default_event_handler_ex(button, bubbles_callback,
                (void*) bb) == SYS_USB_CONNECTED)
                 return BB_USB;
             break;
@@ -2436,12 +2436,12 @@ static int bubbles_menu(struct game_context* bb) {
                         "Quit without Saving", "Quit");
 
     while(!startgame){
-        switch (rb->do_menu(&menu, &selected, NULL, false))
+        switch (do_menu(&menu, &selected, NULL, false))
         {
             case 0: /* resume game */
                 startgame = true;
                 if(resume_file)
-                    rb->remove(SAVE_FILE);
+                    remove(SAVE_FILE);
                 resume_file = false;
                 break;
             case 1: /* new game */
@@ -2452,7 +2452,7 @@ static int bubbles_menu(struct game_context* bb) {
                 break;
             case 2: /* choose level */
                 startlevel++;
-                rb->set_int("Choose start level", "", UNIT_INT, &startlevel,
+                set_int("Choose start level", "", UNIT_INT, &startlevel,
                             NULL, 1, 1, highlevel+1, NULL);
                 startlevel--;
                 break;
@@ -2493,20 +2493,20 @@ static int bubbles(struct game_context* bb) {
     ********************/
     bubbles_init(bb);
     bubbles_drawboard(bb);
-    rb->lcd_update();
+    lcd_update();
 
     /**********************
     *        play         *
     **********************/
-    bb->startedshot = *rb->current_tick;
+    bb->startedshot = current_tick;
 
     while(true) {
         /* refresh the board */
         bubbles_drawboard(bb);
-        rb->lcd_update();
+        lcd_update();
 
         /* manange idle framerate */
-        bb->elapsedshot = *rb->current_tick-bb->startedshot;
+        bb->elapsedshot = current_tick-bb->startedshot;
 
         if(MAX_SHOTTIME-bb->elapsedshot < HZ/2) {
             timeout = MAX_SHOTTIME-bb->elapsedshot;
@@ -2519,7 +2519,7 @@ static int bubbles(struct game_context* bb) {
         if(buttonres != BB_NONE) return buttonres;
 
         /* handle timing */
-        bb->elapsedshot = *rb->current_tick-bb->startedshot;
+        bb->elapsedshot = current_tick-bb->startedshot;
 
         if(bb->elapsedshot > MAX_SHOTTIME) {
             bb->elapsedlvl += bb->elapsedshot;
@@ -2528,7 +2528,7 @@ static int bubbles(struct game_context* bb) {
             if(buttonres != BB_NONE) return buttonres;
             buttonres = bubbles_checklevel(bb);
             if(buttonres != BB_NONE) return buttonres;
-            bb->startedshot = *rb->current_tick;
+            bb->startedshot = current_tick;
         }
     }
 }
@@ -2548,18 +2548,18 @@ enum plugin_status plugin_start(const void* parameter) {
     resume_file = resume;
     bubbles_loaddata();
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     /* start app */
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     while(!exit) {
         switch(bubbles(&bb)){
             case BB_WIN:
-                rb->splash(HZ*2, "You Win!");
+                splash(HZ*2, "You Win!");
                 /* record high level */
                 highlevel = NUM_LEVELS-1;
                 /* record high score */
@@ -2568,7 +2568,7 @@ enum plugin_status plugin_start(const void* parameter) {
 
             case BB_LOSE:
                 resume = false;
-                rb->splash(HZ*2, "Game Over");
+                splash(HZ*2, "Game Over");
                 /* record high score */
                 bubbles_recordscore(&bb);
                 /* fall through to BB_END */
@@ -2582,7 +2582,7 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
 
             case BB_QUIT:
-                rb->splash(HZ/3, "Saving game data ...");
+                splash(HZ/3, "Saving game data ...");
                 bubbles_savegame(&bb);
                 bubbles_savedata();
                 highscore_save(SCORE_FILE, highscores, NUM_SCORES);
@@ -2596,6 +2596,6 @@ enum plugin_status plugin_start(const void* parameter) {
                 break;
         }
     }
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     return ret;
 }

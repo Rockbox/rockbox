@@ -36,11 +36,13 @@
 #include "rbunicode.h"
 #include "bidi.h"
 #include "scroll_engine.h"
+#include "symbols.h"
 
 /*** globals ***/
 
 unsigned char lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH] IRAM_LCDFRAMEBUFFER;
 unsigned char *lcd_framebuffer = &lcd_static_framebuffer[0][0];
+EXPORT_SYMBOL(lcd_framebuffer);
 
 static const unsigned char pixmask[4] ICONST_ATTR = {
     0xC0, 0x30, 0x0C, 0x03
@@ -129,33 +131,39 @@ void lcd_set_drawmode(int mode)
 {
     current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
+EXPORT_SYMBOL(lcd_set_drawmode);
 
 int lcd_get_drawmode(void)
 {
     return current_vp->drawmode;
 }
+EXPORT_SYMBOL(lcd_get_drawmode);
 
 void lcd_set_foreground(unsigned brightness)
 {
     current_vp->fg_pattern = brightness;
     fg_pattern = 0x55 * (~brightness & 3);
 }
+EXPORT_SYMBOL(lcd_set_foreground);
 
 unsigned lcd_get_foreground(void)
 {
     return current_vp->fg_pattern;
 }
+EXPORT_SYMBOL(lcd_get_foreground);
 
 void lcd_set_background(unsigned brightness)
 {
     current_vp->bg_pattern = brightness;
     bg_pattern = 0x55 * (~brightness & 3);
 }
+EXPORT_SYMBOL(lcd_set_background);
 
 unsigned lcd_get_background(void)
 {
     return current_vp->bg_pattern;
 }
+EXPORT_SYMBOL(lcd_get_background);
 
 void lcd_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness)
 {
@@ -178,6 +186,7 @@ void lcd_setfont(int newfont)
 {
     current_vp->font = newfont;
 }
+EXPORT_SYMBOL(lcd_setfont);
 
 int lcd_getfont(void)
 {
@@ -188,6 +197,7 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 {
     return font_getstringsize(str, w, h, current_vp->font);
 }
+EXPORT_SYMBOL(lcd_getstringsize);
 
 /*** low-level drawing functions ***/
 
@@ -375,12 +385,13 @@ void lcd_set_backdrop(fb_data* backdrop)
         lcd_blockfuncs = lcd_blockfuncs_bgcolor;
     }
 }
+EXPORT_SYMBOL(lcd_set_backdrop);
 
 fb_data* lcd_get_backdrop(void)
 {
     return lcd_backdrop;
 }
-
+EXPORT_SYMBOL(lcd_get_backdrop);
 
 static inline void setblock(fb_data *address, unsigned mask, unsigned bits)
 {
@@ -409,6 +420,7 @@ void lcd_clear_display(void)
 
     lcd_scroll_info.lines = 0;
 }
+EXPORT_SYMBOL(lcd_clear_display);
 
 /* Clear the current viewport */
 void lcd_clear_viewport(void)
@@ -447,6 +459,7 @@ void lcd_drawpixel(int x, int y)
         )
         lcd_pixelfuncs[current_vp->drawmode](current_vp->x + x, current_vp->y + y);
 }
+EXPORT_SYMBOL(lcd_drawpixel);
 
 /* Draw a line */
 void lcd_drawline(int x1, int y1, int x2, int y2)
@@ -597,6 +610,7 @@ void lcd_hline(int x1, int x2, int y)
     mask &= mask_right;
     bfunc(dst, mask, 0xFFu);
 }
+EXPORT_SYMBOL(lcd_hline);
 
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
@@ -656,6 +670,7 @@ void lcd_vline(int x, int y1, int y2)
     }
     while (dst <= dst_end);
 }
+EXPORT_SYMBOL(lcd_vline);
 
 /* Draw a rectangular box */
 void lcd_drawrect(int x, int y, int width, int height)
@@ -671,6 +686,7 @@ void lcd_drawrect(int x, int y, int width, int height)
     lcd_hline(x, x2, y);
     lcd_hline(x, x2, y2);
 }
+EXPORT_SYMBOL(lcd_drawrect);
 
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
@@ -760,6 +776,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     }
     while (dst < dst_end);
 }
+EXPORT_SYMBOL(lcd_fillrect);
 
 /* About Rockbox' internal monochrome bitmap format:
  *
@@ -967,12 +984,14 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     }
     while (src < src_end);
 }
+EXPORT_SYMBOL(lcd_mono_bitmap_part);
 
 /* Draw a full monochrome bitmap */
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
     lcd_mono_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
+EXPORT_SYMBOL(lcd_mono_bitmap);
 
 /* About Rockbox' internal native bitmap format:
  *
@@ -1089,11 +1108,13 @@ void ICODE_ATTR lcd_bitmap_part(const unsigned char *src, int src_x,
     }
     while (dst < dst_end);
 }
+EXPORT_SYMBOL(lcd_bitmap_part);
 
 /* Draw a full native bitmap */
 void lcd_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
     lcd_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
+EXPORT_SYMBOL(lcd_bitmap);
 
 #include "lcd-bitmap-common.c"

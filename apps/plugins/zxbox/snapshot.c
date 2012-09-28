@@ -61,7 +61,7 @@ static int snread(void *ptr, int size, SNFILE *snfp)
   byte *dest;
 
   if(snfp->isfile)
-        return (int) rb->read( snfp->fd,ptr, (size_t) size);
+        return (int) read( snfp->fd,ptr, (size_t) size);
 
   dest = (byte *) ptr;
   for(i = 0; snfp->len && size; i++, snfp->len--, size--) 
@@ -276,10 +276,10 @@ static void snsh_z80_save(int fd)
                         Bit 5  : 1=Block of data is compressed
                         Bit 6-7: No meaning
 */
-  rb->write(fd,&z80,z80_145_size);
+  write(fd,&z80,z80_145_size);
 
   if(!to_comp)
-      rb->write(fd,z80_proc.mem + 0x4000,0xC000);    
+      write(fd,z80_proc.mem + 0x4000,0xC000);    
   else {
     memptr = 0x4000;
     savfd = fd;
@@ -317,8 +317,8 @@ static void snsh_sna_save(int fd)
 
   sna.im = z80_proc.it_mode & 0x03;
 
-  rb->write(fd,&sna, sna_size);
-  rb->write(fd,z80_proc.mem + 0x4000, 0xC000);
+  write(fd,&sna, sna_size);
+  write(fd,z80_proc.mem + 0x4000, 0xC000);
 
   if(SP > 0x4000) {
     z80_proc.mem[SP] = saves1;
@@ -582,9 +582,9 @@ static void snsh_sna_load(SNFILE *fp)
 static void save_snapshot_file_type(char *name, int type)
 {
   int snsh;
-  snsh = rb->open(name, O_WRONLY);
+  snsh = open(name, O_WRONLY);
   if(snsh < 0) {
-      snsh = rb->creat(name, 0666);
+      snsh = creat(name, 0666);
       if(snsh < 0) {
         put_msg("Could not create snapshot file");
         return;
@@ -594,14 +594,14 @@ static void save_snapshot_file_type(char *name, int type)
   if(type == SN_SNA) snsh_sna_save(snsh);
   else if(type == SN_Z80) snsh_z80_save(snsh);
 
-  rb->close(snsh);
+  close(snsh);
 }
 
 void save_snapshot_file(char *name)
 {
   int type;
 
-  rb->strlcpy(filenamebuf, name, MAXFILENAME-10 + 1);
+  strlcpy(filenamebuf, name, MAXFILENAME-10 + 1);
 
   type = SN_Z80;
   if(check_ext(filenamebuf, "z80")) type = SN_Z80;
@@ -613,7 +613,7 @@ void save_snapshot_file(char *name)
 
   save_snapshot_file_type(filenamebuf, type);
   char msgbuf [MAXFILENAME];
-  rb->snprintf(msgbuf,MAXFILENAME, "Saved snapshot to file %s", filenamebuf);
+  snprintf(msgbuf,MAXFILENAME, "Saved snapshot to file %s", filenamebuf);
   put_msg(msgbuf);
 }
 
@@ -628,7 +628,7 @@ void save_snapshot(void)
   name[0]='/';
   name[1]='\0';
   put_msg("Enter name of snapshot file to save:");
-  if (!rb->kbd_input((char*)&name, sizeof name))
+  if (!kbd_input((char*)&name, sizeof name))
     save_snapshot_file(&name[0]);
 }
 
@@ -639,15 +639,15 @@ void load_snapshot_file_type(char *name, int type)
   int snsh;
   SNFILE snfil;
 
-  rb->strlcpy(filenamebuf, name, MAXFILENAME-10 + 1);
+  strlcpy(filenamebuf, name, MAXFILENAME-10 + 1);
 
   spcf_find_file_type(filenamebuf, &filetype, &type);
   if(type < 0) type = SN_Z80;
 
-  snsh = rb->open(filenamebuf, O_RDONLY);
+  snsh = open(filenamebuf, O_RDONLY);
   if(snsh < 0) {
 #ifndef USE_GRAY
-  rb->splashf(HZ, "Could not open snapshot file `%s'",filenamebuf);
+  splashf(HZ, "Could not open snapshot file `%s'",filenamebuf);
 #endif
     return;
   }
@@ -658,7 +658,7 @@ void load_snapshot_file_type(char *name, int type)
   if(type == SN_SNA) snsh_sna_load(&snfil);
   else if(type == SN_Z80) snsh_z80_load(&snfil);
 
-  rb->close(snsh);
+  close(snsh);
 }
 
 void snsh_z80_load_intern(byte *p, unsigned len)
@@ -675,13 +675,13 @@ void snsh_z80_load_intern(byte *p, unsigned len)
 void load_quick_snapshot(void)
 {
   int  qsnap;
-  qsnap = rb->open(quick_snap_file,O_RDONLY);
+  qsnap = open(quick_snap_file,O_RDONLY);
   if(qsnap < 0) {
     put_msg("No quick snapshot saved yet");
     return;
   }
   else
-	  rb->close ( qsnap );
+	  close ( qsnap );
   load_snapshot_file_type(quick_snap_file, SN_Z80);
 }
 

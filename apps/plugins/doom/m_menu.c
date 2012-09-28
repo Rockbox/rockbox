@@ -816,7 +816,7 @@ void M_DrawReadThis2(void)
 //
 void M_DrawSound(void)
 {
-   int sysmax=(rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME));
+   int sysmax=(sound_max(SOUND_VOLUME)-sound_min(SOUND_VOLUME));
    V_DrawNamePatch(60, 38, 0, "M_SVOL", CR_DEFAULT, VPT_STRETCH);
 
    M_DrawThermo(SoundDef.x,SoundDef.y+LINEHEIGHT*(sfx_vol+1),
@@ -874,19 +874,19 @@ void M_SystemVol(int choice)
    switch(choice)
    {
    case 0:
-      if (systemvol-5>rb->sound_min(SOUND_VOLUME))
+      if (systemvol-5>sound_min(SOUND_VOLUME))
       {
          systemvol-=5;
-         rb->sound_set(SOUND_VOLUME, systemvol);
-         rb->global_settings->volume = systemvol;
+         sound_set(SOUND_VOLUME, systemvol);
+         global_settings.volume = systemvol;
       }
       break;
    case 1:
-      if (systemvol+5<rb->sound_max(SOUND_VOLUME))
+      if (systemvol+5<sound_max(SOUND_VOLUME))
       {
          systemvol+=5;
-         rb->sound_set(SOUND_VOLUME, systemvol);
-         rb->global_settings->volume = systemvol;
+         sound_set(SOUND_VOLUME, systemvol);
+         global_settings.volume = systemvol;
       }
       break;
    }

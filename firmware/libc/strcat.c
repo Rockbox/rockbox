@@ -1,4 +1,5 @@
 #include <string.h>
+#include "symbols.h"
 
 char *strcat(char *s1,
              const char *s2)
@@ -12,3 +13,4 @@ char *strcat(char *s1,
     ;
   return s;
 }
+EXPORT_SYMBOL(strcat);

@@ -90,11 +90,11 @@ static void put_seg_desc(void)
     len = get_seglen();
     
     me = msgbuf;
-    rb->snprintf(me,MAXDESCLEN, "%4d: ", currseg);
-    me = me+rb->strlen(me);
+    snprintf(me,MAXDESCLEN, "%4d: ", currseg);
+    me = me+strlen(me);
     if(segtype >= SEG_DATA && len) {
-      rb->snprintf(me,MAXDESCLEN, "%5ld bytes, ", len);
-      me = me+rb->strlen(me);
+      snprintf(me,MAXDESCLEN, "%5ld bytes, ", len);
+      me = me+strlen(me);
     }
     
     ml = 0;
@@ -104,8 +104,8 @@ static void put_seg_desc(void)
         put_msg(msgbuf);
         
         me = msgbuf;
-        rb->snprintf(me,MAXDESCLEN, "      ");
-        me = me+rb->strlen(me);
+        snprintf(me,MAXDESCLEN, "      ");
+        me = me+strlen(me);
         ml = 0;
       }
       else {
@@ -117,7 +117,7 @@ static void put_seg_desc(void)
     put_msg(msgbuf);
       }
       else {
-    rb->snprintf(msgbuf,MAXDESCLEN, "%4d:", currseg);
+    snprintf(msgbuf,MAXDESCLEN, "%4d:", currseg);
     put_tmp_msg(msgbuf);
       }
     }
@@ -312,9 +312,9 @@ void play_tape(void)
     
     datak = (int) (get_segpos() / 1000);
     if(datak > lastdatak) {
-      if(ingroup) rb->snprintf(msgbuf,MAXDESCLEN, "%4d: ", currseg);
-      else        rb->snprintf(msgbuf,MAXDESCLEN,  "      ");
-      rb->snprintf(msgbuf+rb->strlen(msgbuf),MAXDESCLEN,  "%3dk", datak);
+      if(ingroup) snprintf(msgbuf,MAXDESCLEN, "%4d: ", currseg);
+      else        snprintf(msgbuf,MAXDESCLEN,  "      ");
+      snprintf(msgbuf+strlen(msgbuf),MAXDESCLEN,  "%3dk", datak);
       put_tmp_msg(msgbuf);
 
       lastdatak = datak;
@@ -534,7 +534,7 @@ static void stop_recording(void)
     free(recbuf);
     recbuf = NULL;
 
-    rb->close(tapefp);
+    close(tapefp);
   }
 #endif
 }
@@ -593,7 +593,7 @@ void start_play_file_type(char *name, int seg, int type)
 {
   int filetype = FT_TAPEFILE;
 
-  rb->strlcpy(tapename, name, MAXFILENAME-10 + 1);
+  strlcpy(tapename, name, MAXFILENAME-10 + 1);
 
   currseg = seg;
   tapetype = type;

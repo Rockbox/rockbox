@@ -162,7 +162,7 @@ static int loop_mode = LOOP_MODE_FREE;
  */
 static void format_time_ms(char* buf, int buf_size, int time)
 {
-    rb->snprintf(buf, buf_size, "%d:%02d:%03d", time / 60000,
+    snprintf(buf, buf_size, "%d:%02d:%03d", time / 60000,
         time % 60000 / 1000, (time % 60000) % 1000);
 }
 
@@ -215,15 +215,15 @@ static void update_data(void)
 
     /* split point */
     format_time_ms(timebuf, sizeof timebuf, xpos_to_time(split_x));
-    rb->snprintf(buf, sizeof buf, "Split at: %s", timebuf);
+    snprintf(buf, sizeof buf, "Split at: %s", timebuf);
 
-    rb->lcd_getstringsize(buf, &w, &h);
+    lcd_getstringsize(buf, &w, &h);
 
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, 0, LCD_WIDTH, h);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_puts(0, 0, buf);
-    rb->lcd_update_rect(0, 0, LCD_WIDTH, h);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, 0, LCD_WIDTH, h);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_puts(0, 0, buf);
+    lcd_update_rect(0, 0, LCD_WIDTH, h);
 }
 
 /**
@@ -232,13 +232,13 @@ static void update_data(void)
  */
 static void update_timebar(struct mp3entry *mp3)
 {
-    rb->gui_scrollbar_draw
+    gui_scrollbar_draw
     (
-        rb->screens[SCREEN_MAIN],0, TIMEBAR_Y, LCD_WIDTH, TIMEBAR_HEIGHT,
+        screens[SCREEN_MAIN],0, TIMEBAR_Y, LCD_WIDTH, TIMEBAR_HEIGHT,
         mp3->length, range_start, range_end,
         HORIZONTAL
     );
-    rb->lcd_update_rect(0, TIMEBAR_Y, LCD_WIDTH, TIMEBAR_HEIGHT);
+    lcd_update_rect(0, TIMEBAR_Y, LCD_WIDTH, TIMEBAR_HEIGHT);
 }
 
 /**
@@ -264,23 +264,23 @@ static int splitedit_get_loop_mode(void)
  */
 static void update_icons(void)
 {
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, LCD_HEIGHT - BMPHEIGHT, LCD_WIDTH, BMPHEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, LCD_HEIGHT - BMPHEIGHT, LCD_WIDTH, BMPHEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     /* The CUT icon */
-    rb->lcd_mono_bitmap(CUT_BMP,
+    lcd_mono_bitmap(CUT_BMP,
         LCD_WIDTH / 3 / 2 - BMPWIDTH / 2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 
     /* The loop mode icon */
-    rb->lcd_mono_bitmap(LOOP_BMP[splitedit_get_loop_mode()],
+    lcd_mono_bitmap(LOOP_BMP[splitedit_get_loop_mode()],
         LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     /* The scale icon */
-    rb->lcd_mono_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs() ? 1 : 0],
+    lcd_mono_bitmap(SCALE_BMP[peak_meter_get_use_dbfs() ? 1 : 0],
         2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 #else
@@ -288,13 +288,13 @@ static void update_icons(void)
         static int idx;
         if (idx < 0 || idx > 1) idx = 0;
         idx = 1 - idx;
-        rb->lcd_mono_bitmap(SCALE_BMP[idx],
+        lcd_mono_bitmap(SCALE_BMP[idx],
             2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
             BMPWIDTH, BMPHEIGHT);
     }
 #endif
 
-    rb->lcd_update_rect(0, LCD_HEIGHT - BMPHEIGHT, LCD_WIDTH, BMPHEIGHT);
+    lcd_update_rect(0, LCD_HEIGHT - BMPHEIGHT, LCD_WIDTH, BMPHEIGHT);
 }
 
 /**
@@ -345,7 +345,7 @@ static void redraw_osci(void)
     {
         if (osci_buffer[x] > 0)
         {
-            rb->lcd_vline
+            lcd_vline
             (
                 OSCI_X + x, OSCI_Y + OSCI_HEIGHT - 1,
                 OSCI_Y + OSCI_HEIGHT - osci_buffer[x] - 1
@@ -393,12 +393,12 @@ static void splitedit_set_split_x(int newx)
     /* remove old split point from screen, only if moved */
     if (split_x != newx)
     {
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_fillrect(minx, OSCI_Y, 5, 1);
-        rb->lcd_fillrect(split_x-1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
-        rb->lcd_fillrect(split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_update_rect(minx, OSCI_Y, 5, OSCI_HEIGHT);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_fillrect(minx, OSCI_Y, 5, 1);
+        lcd_fillrect(split_x-1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
+        lcd_fillrect(split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
+        lcd_set_drawmode(DRMODE_SOLID);
+        lcd_update_rect(minx, OSCI_Y, 5, OSCI_HEIGHT);
     }
 
     if (newx >= OSCI_X && newx < OSCI_X + OSCI_WIDTH)
@@ -413,12 +413,12 @@ static void splitedit_set_split_x(int newx)
 
     /* display new split point */
     minx = split_x - 2 > 0 ? split_x - 2: 0;
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(minx, OSCI_Y, 5, 1);
-    rb->lcd_fillrect(split_x - 1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
-    rb->lcd_fillrect(split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_update_rect(minx, OSCI_Y, 5, OSCI_HEIGHT);
+    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    lcd_fillrect(minx, OSCI_Y, 5, 1);
+    lcd_fillrect(split_x - 1 > 0 ? split_x - 1: 0, OSCI_Y + 1, 3, 1);
+    lcd_fillrect(split_x, OSCI_Y + 2, 1, OSCI_HEIGHT - 2);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_update_rect(minx, OSCI_Y, 5, OSCI_HEIGHT);
 }
 
 /**
@@ -434,12 +434,12 @@ static int splitedit_get_split_x(void)
  */
 static void update_osci(void)
 {
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
     redraw_osci();
     splitedit_set_split_x(splitedit_get_split_x());
-    rb->lcd_update_rect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
+    lcd_update_rect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
 }
 
 /**
@@ -459,7 +459,7 @@ static void zoom(struct mp3entry *mp3, int counter, int denominator)
     int split;
 
     /* for stretching / shrinking a second buffer is needed */
-    rb->memcpy(&oldbuf, &osci_buffer, sizeof osci_buffer);
+    memcpy(&oldbuf, &osci_buffer, sizeof osci_buffer);
 
     /* recalculate the new range and split point */
     oldsplitx = split_x;
@@ -494,7 +494,7 @@ static void zoom(struct mp3entry *mp3, int counter, int denominator)
 static void scroll(struct mp3entry *mp3)
 {
     zoom(mp3, 1, 1);
-    rb->lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
+    lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
     update_osci();
     update_data();
 }
@@ -504,11 +504,11 @@ static void scroll(struct mp3entry *mp3)
  */
 static void splitedit_zoom_in(struct mp3entry *mp3)
 {
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(OSCI_X, OSCI_Y, OSCI_WIDTH, OSCI_HEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
     zoom(mp3, 3, 4);
-    rb->lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
+    lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
     update_osci();
     update_data();
 }
@@ -518,11 +518,11 @@ static void splitedit_zoom_in(struct mp3entry *mp3)
  */
 static void splitedit_zoom_out(struct mp3entry *mp3)
 {
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
+    lcd_set_drawmode(DRMODE_SOLID);
     zoom(mp3, 4, 3);
-    rb->lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
+    lcd_update_rect(OSCI_X, OSCI_Y, LCD_WIDTH, OSCI_HEIGHT);
     update_osci();
     update_data();
 }
@@ -532,11 +532,11 @@ static void splitedit_zoom_out(struct mp3entry *mp3)
  */
 static void generateFileName(char* file_name, int part_no)
 {
-    if (rb->strlen(file_name) <MAX_PATH)
+    if (strlen(file_name) <MAX_PATH)
     {
-        int len = rb->strlen(file_name);
-        int ext_len = rb->strlen(".mp3");
-        if (rb->strcasecmp(
+        int len = strlen(file_name);
+        int ext_len = strlen(".mp3");
+        if (strcasecmp(
             &file_name[len - ext_len],
             ".mp3") == 0)
         {
@@ -550,16 +550,16 @@ static void generateFileName(char* file_name, int part_no)
         }
         else
         {
-            rb->splash(0, "wrong extension");
-            rb->button_get(true);
-            rb->button_get(true);
+            splash(0, "wrong extension");
+            button_get(true);
+            button_get(true);
         }
     }
     else
     {
-        rb->splash(0, "name too long");
-        rb->button_get(true);
-        rb->button_get(true);
+        splash(0, "name too long");
+        button_get(true);
+        button_get(true);
 
     }
 
@@ -581,39 +581,39 @@ static int copy_file(
     unsigned int i = 0;
     ssize_t bytes_read = 1; /* ensure the for loop is executed */
     size_t buffer_size;
-    buffer = rb->plugin_get_buffer(&buffer_size);
+    buffer = plugin_get_buffer(&buffer_size);
 
     for (i = 0; i < bytes && bytes_read > 0; i += bytes_read)
     {
         ssize_t bytes_written;
         unsigned int bytes_to_read =
             bytes - i > buffer_size ? buffer_size : bytes - i;
-        bytes_read = rb->read(src, buffer, bytes_to_read);
-        bytes_written = rb->write(dest, buffer, bytes_read);
+        bytes_read = read(src, buffer, bytes_to_read);
+        bytes_written = write(dest, buffer, bytes_read);
 
         if (bytes_written < 0) {
-            rb->splash(0, "Write failed in copy.");
-            rb->button_get(true);
-            rb->button_get(true);
+            splash(0, "Write failed in copy.");
+            button_get(true);
+            button_get(true);
             return -1;
         }
 
-        button = rb->button_get(false);
+        button = button_get(false);
 
         if (button == SPLITEDIT_QUIT
 #ifdef SPLITEDIT_RC_QUIT
             || button == SPLITEDIT_RC_QUIT:
 #endif
         ) {
-            rb->splash(0, "Aborting copy.");
-            rb->button_get(true);
-            rb->button_get(true);
+            splash(0, "Aborting copy.");
+            button_get(true);
+            button_get(true);
             return -1;
         }
 
-        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, prg_y, LCD_WIDTH,
+        gui_scrollbar_draw(screens[SCREEN_MAIN],0, prg_y, LCD_WIDTH,
                                  prg_h, bytes, 0, i, HORIZONTAL);
-        rb->lcd_update_rect(0, prg_y, LCD_WIDTH, prg_h);
+        lcd_update_rect(0, prg_y, LCD_WIDTH, prg_h);
     }
 
     return 0;
@@ -635,13 +635,13 @@ static int save(
     /* Verify that file 1 doesn't exit yet */
     if (file_name1 != NULL)
     {
-        file1 = rb->open(file_name1, O_RDONLY);
+        file1 = open(file_name1, O_RDONLY);
         if (file1 >= 0)
         {
-            rb->close(file1);
-            rb->splash(0, "File 1 exists. Please rename.");
-            rb->button_get(true);
-            rb->button_get(true);
+            close(file1);
+            splash(0, "File 1 exists. Please rename.");
+            button_get(true);
+            button_get(true);
             return -1;
         }
     }
@@ -649,130 +649,130 @@ static int save(
     /* Verify that file 2 doesn't exit yet */
     if (file_name2 != NULL)
     {
-        file2 = rb->open(file_name2, O_RDONLY);
+        file2 = open(file_name2, O_RDONLY);
         if (file2 >= 0)
         {
-            rb->close(file2);
-            rb->splash(0, "File 2 exists. Please rename.");
-            rb->button_get(true);
-            rb->button_get(true);
+            close(file2);
+            splash(0, "File 2 exists. Please rename.");
+            button_get(true);
+            button_get(true);
             return -2;
         }
     }
 
     /* find the file position of the split point */
-    rb->audio_pause();
-    rb->audio_ff_rewind(splittime);
-    rb->yield();
-    rb->yield();
-    end = rb->audio_get_file_pos();
+    audio_pause();
+    audio_ff_rewind(splittime);
+    yield();
+    yield();
+    end = audio_get_file_pos();
 
     /* open the source file */
-    src_file = rb->open(mp3->path, O_RDONLY);
+    src_file = open(mp3->path, O_RDONLY);
     if (src_file >= 0)
     {
         int close_stat = 0;
         int x, y;
         long offset;
-        unsigned long last_header = rb->mpeg_get_last_header();
+        unsigned long last_header = mpeg_get_last_header();
 
-        rb->lcd_getstringsize("M", &x, &y);
+        lcd_getstringsize("M", &x, &y);
 
         /* Find the next frame boundary */
-        rb->lseek(src_file, end, SEEK_SET);
-        rb->find_next_frame(src_file, &offset, 8000, last_header);
-        rb->lseek(src_file, 0, SEEK_SET);
+        lseek(src_file, end, SEEK_SET);
+        find_next_frame(src_file, &offset, 8000, last_header);
+        lseek(src_file, 0, SEEK_SET);
         end += offset;
         
         /* write the file 1 */
         if (file_name1 != NULL)
         {
-            file1 = rb->open (file_name1, O_WRONLY | O_CREAT, 0666);
+            file1 = open (file_name1, O_WRONLY | O_CREAT, 0666);
             if (file1 >= 0)
             {
                 int rc = copy_file(file1, src_file, end, y*2 + 1, y -1);
-                close_stat = rb->close(file1);
+                close_stat = close(file1);
 
                 if (close_stat != 0)
                 {
-                    rb->splashf(0, "failed closing file1: error %d", close_stat);
-                    rb->button_get(true);
-                    rb->button_get(true);
+                    splashf(0, "failed closing file1: error %d", close_stat);
+                    button_get(true);
+                    button_get(true);
                 } else {
                     /* If there was an error, cleanup */
                     if (rc) {
-                        rb->remove(file_name1);
+                        remove(file_name1);
                     }
                 }
             }
             else
             {
-                rb->splashf(0, "Can't write File1: error %d", file1);
-                rb->button_get(true);
-                rb->button_get(true);
+                splashf(0, "Can't write File1: error %d", file1);
+                button_get(true);
+                button_get(true);
                 retval = -1;
             }
         }
         /* if file1 hasn't been written we're not at the split point yet */
         else
         {
-            if (rb->lseek(src_file, end, SEEK_SET) < (off_t)end)
+            if (lseek(src_file, end, SEEK_SET) < (off_t)end)
             {
-                rb->splashf(0, "Src file to short: error %d", src_file);
-                rb->button_get(true);
-                rb->button_get(true);
+                splashf(0, "Src file to short: error %d", src_file);
+                button_get(true);
+                button_get(true);
             }
         }
 
         if (file_name2 != NULL)
         {
             /* write file 2 */
-            file2 = rb->open (file_name2, O_WRONLY | O_CREAT, 0666);
+            file2 = open (file_name2, O_WRONLY | O_CREAT, 0666);
             if (file2 >= 0)
             {
                 end = mp3->filesize - end;
                 int rc = copy_file(file2, src_file, end, y * 5 + 1, y -1);
-                close_stat = rb->close(file2);
+                close_stat = close(file2);
 
                 if (close_stat != 0)
                 {
-                    rb->splashf(0, "failed: closing file2: error %d",
+                    splashf(0, "failed: closing file2: error %d",
                                close_stat);
-                    rb->button_get(true);
-                    rb->button_get(true);
+                    button_get(true);
+                    button_get(true);
                 } else {
                     /* If there was an error, cleanup */
                     if (rc) {
-                        rb->remove(file_name2);
+                        remove(file_name2);
                     }
                 }
             }
             else
             {
-                rb->splashf(0, "Can't write File2: error %d", file2);
-                rb->button_get(true);
-                rb->button_get(true);
+                splashf(0, "Can't write File2: error %d", file2);
+                button_get(true);
+                button_get(true);
                 retval = -2;
             }
         }
 
-        close_stat = rb->close(src_file);
+        close_stat = close(src_file);
         if (close_stat != 0)
         {
-            rb->splashf(0, "failed: closing src: error %d", close_stat);
-            rb->button_get(true);
-            rb->button_get(true);
+            splashf(0, "failed: closing src: error %d", close_stat);
+            button_get(true);
+            button_get(true);
         }
     }
     else
     {
-        rb->splash(0, "Source file not found");
-        rb->button_get(true);
-        rb->button_get(true);
+        splash(0, "Source file not found");
+        button_get(true);
+        button_get(true);
         retval = -3;
     }
 
-    rb->audio_resume();
+    audio_resume();
 
     return retval;
 }
@@ -791,24 +791,24 @@ static void save_editor(struct mp3entry *mp3, int splittime)
     bool part2_save = true;
 
     /* file name for left part */
-    rb->strlcpy(part1_name, mp3->path, MAX_PATH);
+    strlcpy(part1_name, mp3->path, MAX_PATH);
     generateFileName(part1_name, 1);
 
     /* file name for right part */
-    rb->strlcpy(part2_name, mp3->path, MAX_PATH);
+    strlcpy(part2_name, mp3->path, MAX_PATH);
     generateFileName(part2_name, 2);
 
     while (!exit_request)
     {
         int pos;
-        rb->lcd_clear_display();
+        lcd_clear_display();
 
         /* Save file1? */
-        rb->lcd_puts_style(0, 0, "Save part 1?", choice == SE_PART1_SAVE);
-        rb->lcd_puts(13, 0, part1_save?"yes":"no");
+        lcd_puts_style(0, 0, "Save part 1?", choice == SE_PART1_SAVE);
+        lcd_puts(13, 0, part1_save?"yes":"no");
 
         /* trim to display the filename without path */
-        for (pos = rb->strlen(part1_name); pos > 0; pos--)
+        for (pos = strlen(part1_name); pos > 0; pos--)
         {
             if (part1_name[pos] == '/')
                 break;
@@ -816,15 +816,15 @@ static void save_editor(struct mp3entry *mp3, int splittime)
         pos++;
 
         /* File name 1 */
-        rb->lcd_puts_scroll_style(0, 1,
+        lcd_puts_scroll_style(0, 1,
             &part1_name[pos], choice == SE_PART1_NAME);
 
         /* Save file2? */
-        rb->lcd_puts_style(0, 3, "Save part 2?", choice == SE_PART2_SAVE);
-        rb->lcd_puts(13, 3, part2_save?"yes":"no");
+        lcd_puts_style(0, 3, "Save part 2?", choice == SE_PART2_SAVE);
+        lcd_puts(13, 3, part2_save?"yes":"no");
 
         /* trim to display the filename without path */
-        for (pos = rb->strlen(part2_name); pos > 0; pos --)
+        for (pos = strlen(part2_name); pos > 0; pos --)
         {
             if (part2_name[pos] == '/')
                 break;
@@ -832,16 +832,16 @@ static void save_editor(struct mp3entry *mp3, int splittime)
         pos++;
 
         /* File name 2 */
-        rb->lcd_puts_scroll_style(0, 4,
+        lcd_puts_scroll_style(0, 4,
             &part2_name[pos], choice == SE_PART2_NAME);
 
         /* Save */
-        rb->lcd_puts_style(0, 6, "Save", choice == SE_SAVE);
+        lcd_puts_style(0, 6, "Save", choice == SE_SAVE);
 
-        rb->lcd_update();
+        lcd_update();
 
 
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button)
         {
         case BUTTON_UP:
@@ -862,7 +862,7 @@ static void save_editor(struct mp3entry *mp3, int splittime)
                 break;
 
             case SE_PART1_NAME:
-                rb->kbd_input(part1_name, MAX_PATH);
+                kbd_input(part1_name, MAX_PATH);
                 break;
 
             case SE_PART2_SAVE:
@@ -870,14 +870,14 @@ static void save_editor(struct mp3entry *mp3, int splittime)
                 break;
 
             case SE_PART2_NAME:
-                rb->kbd_input(part2_name, MAX_PATH);
+                kbd_input(part2_name, MAX_PATH);
                 break;
 
             case SE_SAVE:
-                rb->lcd_stop_scroll();
-                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                rb->lcd_fillrect(0, 6*8, LCD_WIDTH, LCD_HEIGHT);
-                rb->lcd_set_drawmode(DRMODE_SOLID);
+                lcd_stop_scroll();
+                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                lcd_fillrect(0, 6*8, LCD_WIDTH, LCD_HEIGHT);
+                lcd_set_drawmode(DRMODE_SOLID);
                 saved = save
                 (
                     mp3,
@@ -902,7 +902,7 @@ static void save_editor(struct mp3entry *mp3, int splittime)
             break;
 
         default:
-            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            if (default_event_handler(button) == SYS_USB_CONNECTED)
             {
                 splitedit_exit_code = PLUGIN_USB_CONNECTED;
                 exit_request = true;
@@ -950,10 +950,10 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 /* read volume info */
                 unsigned short volume;
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-                volume = rb->mas_codec_readreg(0x0c);
-                volume += rb->mas_codec_readreg(0x0d);
+                volume = mas_codec_readreg(0x0c);
+                volume += mas_codec_readreg(0x0d);
                 volume = volume / 2;
-                volume = rb->peak_meter_scale_value(volume, OSCI_HEIGHT);
+                volume = peak_meter_scale_value(volume, OSCI_HEIGHT);
 #else
                 volume = OSCI_HEIGHT / 2;
 #endif
@@ -975,16 +975,16 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 }
 
                 /* make room */
-                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-                rb->lcd_fillrect(lastx + 1, OSCI_Y, x - lastx, OSCI_HEIGHT);
-                rb->lcd_set_drawmode(DRMODE_SOLID);
+                lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                lcd_fillrect(lastx + 1, OSCI_Y, x - lastx, OSCI_HEIGHT);
+                lcd_set_drawmode(DRMODE_SOLID);
                 /* draw a value */
                 if (osci_buffer[x - OSCI_X] > 0)
                 {
                     int i;
                     for (i = lastx +1; i <= x; i++)
                     {
-                        rb->lcd_vline
+                        lcd_vline
                             (
                             i, OSCI_Y + OSCI_HEIGHT - 1,
                             OSCI_Y + OSCI_HEIGHT - osci_buffer[i - OSCI_X]-1
@@ -995,10 +995,10 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 /* mark the current position */
                 if (lastx != x)
                 {
-                    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-                    rb->lcd_fillrect(lastx, OSCI_Y, 1, OSCI_HEIGHT);
-                    rb->lcd_fillrect(x, OSCI_Y, 1, OSCI_HEIGHT);
-                    rb->lcd_set_drawmode(DRMODE_SOLID);
+                    lcd_set_drawmode(DRMODE_COMPLEMENT);
+                    lcd_fillrect(lastx, OSCI_Y, 1, OSCI_HEIGHT);
+                    lcd_fillrect(x, OSCI_Y, 1, OSCI_HEIGHT);
+                    lcd_set_drawmode(DRMODE_SOLID);
                 }
 
                 /* mark the split point */
@@ -1006,31 +1006,31 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 {
                     if ((lastx < split_x) && (x >= split_x))
                     {
-                        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-                        rb->lcd_fillrect
+                        lcd_set_drawmode(DRMODE_COMPLEMENT);
+                        lcd_fillrect
                         (
                             split_x, OSCI_Y + 2,
                             1, OSCI_HEIGHT - 2
                         );
-                        rb->lcd_set_drawmode(DRMODE_SOLID);
+                        lcd_set_drawmode(DRMODE_SOLID);
                     }
-                    rb->lcd_hline(split_x -2, split_x + 2, OSCI_Y);
-                    rb->lcd_hline(split_x-1, split_x +1,OSCI_Y+1);
+                    lcd_hline(split_x -2, split_x + 2, OSCI_Y);
+                    lcd_hline(split_x-1, split_x +1,OSCI_Y+1);
                 }
 
                 /* make visible */
                 if (lastx <= x)
                 {
-                    rb->lcd_update_rect(lastx, OSCI_Y, x-lastx+1, OSCI_HEIGHT);
+                    lcd_update_rect(lastx, OSCI_Y, x-lastx+1, OSCI_HEIGHT);
                 }
                 else
                 {
-                    rb->lcd_update_rect
+                    lcd_update_rect
                     (
                         lastx, OSCI_Y,
                         OSCI_X + OSCI_WIDTH - lastx, OSCI_HEIGHT
                     );
-                    rb->lcd_update_rect(0, OSCI_Y, x + 1, OSCI_HEIGHT);
+                    lcd_update_rect(0, OSCI_Y, x + 1, OSCI_HEIGHT);
                 }
 
                 lastx = x;
@@ -1047,27 +1047,27 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 
                     case LOOP_MODE_ALL:
                     case LOOP_MODE_TO:
-                        rb->audio_pause();
-                        rb->audio_ff_rewind(range_start);
+                        audio_pause();
+                        audio_ff_rewind(range_start);
 #if (CONFIG_STORAGE & STORAGE_MMC)
 /* MMC is slow - wait some time to allow track reload to finish */
-                        rb->sleep(HZ/20);
+                        sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */
-                            rb->splash(10*HZ, "Wait - reloading");
+                            splash(10*HZ, "Wait - reloading");
 #endif
-                        rb->audio_resume();
+                        audio_resume();
                         break;
 
                     case LOOP_MODE_FROM:
-                        rb->audio_pause();
-                        rb->audio_ff_rewind(xpos_to_time(split_x));
+                        audio_pause();
+                        audio_ff_rewind(xpos_to_time(split_x));
 #if (CONFIG_STORAGE & STORAGE_MMC)
 /* MMC is slow - wait some time to allow track reload to finish */
-                        rb->sleep(HZ/20);
+                        sleep(HZ/20);
                         if (mp3->elapsed > play_end) /* reload in progress */
-                            rb->splash(10*HZ, "Wait - reloading");
+                            splash(10*HZ, "Wait - reloading");
 #endif
-                        rb->audio_resume();
+                        audio_resume();
                         break;
 
                     case LOOP_MODE_FREE:
@@ -1077,16 +1077,16 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 
                         /* play_end und play_start anpassen */
                         splitedit_set_loop_mode(LOOP_MODE_FREE);
-                        rb->memset(osci_buffer, 0, sizeof osci_buffer);
+                        memset(osci_buffer, 0, sizeof osci_buffer);
                         update_osci();
-                        rb->lcd_update();
+                        lcd_update();
                         break;
                     }
                 }
             }
 
-            button = rb->button_get(false);
-            rb->yield();
+            button = button_get(false);
+            yield();
 
             /* here the evaluation of the key scheme starts.
             All functions the user triggers are called from
@@ -1099,9 +1099,9 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 if (lastbutton != SPLITEDIT_PLAY_PRE)
                     break;
 #endif
-                rb->audio_pause();
-                rb->audio_ff_rewind(xpos_to_time(split_x));
-                rb->audio_resume();
+                audio_pause();
+                audio_ff_rewind(xpos_to_time(split_x));
+                audio_resume();
                 break;
 
             case BUTTON_UP:
@@ -1117,17 +1117,17 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #ifdef SPLITEDIT_SPEED100
             case SPLITEDIT_SPEED150:
-                rb->sound_set_pitch(150L*PITCH_SPEED_PRECISION);
+                sound_set_pitch(150L*PITCH_SPEED_PRECISION);
                 splitedit_invalidate_osci();
                 break;
 
             case SPLITEDIT_SPEED100:
-                rb->sound_set_pitch(PITCH_SPEED_100);
+                sound_set_pitch(PITCH_SPEED_100);
                 splitedit_invalidate_osci();
                 break;
 
             case SPLITEDIT_SPEED50:
-                rb->sound_set_pitch(50L*PITCH_SPEED_PRECISION);
+                sound_set_pitch(50L*PITCH_SPEED_PRECISION);
                 splitedit_invalidate_osci();
                 break;
 #endif
@@ -1161,7 +1161,7 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 
             case SPLITEDIT_SAVE:
                 save_editor(mp3, xpos_to_time(split_x));
-                rb->lcd_clear_display();
+                lcd_clear_display();
                 update_osci();
                 update_timebar(mp3);
                 update_icons();
@@ -1174,7 +1174,7 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
 
             case SPLITEDIT_SCALE:
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-                rb->peak_meter_set_use_dbfs(!rb->peak_meter_get_use_dbfs());
+                peak_meter_set_use_dbfs(!peak_meter_get_use_dbfs());
 #endif
                 splitedit_invalidate_osci();
                 update_icons();
@@ -1188,7 +1188,7 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                 {
                     splitedit_exit_code = PLUGIN_USB_CONNECTED;
                     exit_request = true;
@@ -1224,30 +1224,30 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
             }
             update_data();
 
-            if (mp3 != rb->audio_current_track())
+            if (mp3 != audio_current_track())
             {
-                struct mp3entry *new_mp3 = rb->audio_current_track();
-                if (rb->strncasecmp(path_mp3, new_mp3->path,
+                struct mp3entry *new_mp3 = audio_current_track();
+                if (strncasecmp(path_mp3, new_mp3->path,
                                     sizeof (path_mp3)))
                 {
-                    rb->splash(0, "Abort due to file change");
-                    rb->button_get(true);
-                    rb->button_get(true);
+                    splash(0, "Abort due to file change");
+                    button_get(true);
+                    button_get(true);
                     exit_request = true;
                 }
                 else
                 {
                     mp3 = new_mp3;
-                    rb->audio_pause();
-                    rb->audio_flush_and_reload_tracks();
-                    rb->audio_ff_rewind(range_start);
-                    rb->audio_resume();
+                    audio_pause();
+                    audio_flush_and_reload_tracks();
+                    audio_ff_rewind(range_start);
+                    audio_resume();
                 }
             }
         }
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 #ifdef SPLITEDIT_SPEED100
-        rb->sound_set_pitch(1000); /* make sure to reset pitch */
+        sound_set_pitch(1000); /* make sure to reset pitch */
 #endif
 #endif
 
@@ -1260,22 +1260,22 @@ enum plugin_status plugin_start(const void* parameter)
     struct mp3entry* mp3;
 
     (void)parameter;
-    rb->lcd_clear_display();
-    rb->lcd_update();
-    mp3 = rb->audio_current_track();
+    lcd_clear_display();
+    lcd_update();
+    mp3 = audio_current_track();
     if (mp3 != NULL)
     {
-        if (rb->audio_status() & AUDIO_STATUS_PAUSE)
+        if (audio_status() & AUDIO_STATUS_PAUSE)
         {
-            rb->audio_resume();
+            audio_resume();
         }
         splitedit_editor(mp3, mp3->elapsed, MIN_RANGE_SIZE * 8);
     }
     else
     {
-        rb->splash(0, "Play or pause a mp3 file first.");
-        rb->button_get(true);
-        rb->button_get(true);
+        splash(0, "Play or pause a mp3 file first.");
+        button_get(true);
+        button_get(true);
     }
     return splitedit_exit_code;
 }

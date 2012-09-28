@@ -54,24 +54,24 @@ enum plugin_status run_overlay(const void* parameter,
     struct lc_header     *hdr;
     enum plugin_status retval = PLUGIN_ERROR;
 
-    audiobuf = rb->plugin_get_audio_buffer(&audiobuf_size);
+    audiobuf = plugin_get_audio_buffer(&audiobuf_size);
     if (!audiobuf)
     {
-        rb->splash(2*HZ, "Can't obtain memory");
+        splash(2*HZ, "Can't obtain memory");
         goto error;
     }
 
-    handle = rb->lc_open(filename, audiobuf, audiobuf_size);
+    handle = lc_open(filename, audiobuf, audiobuf_size);
     if (!handle)
     {
-        rb->splashf(2*HZ, "Can't open %s", filename);
+        splashf(2*HZ, "Can't open %s", filename);
         goto error;
     }
 
-    p_hdr = rb->lc_get_header(handle);
+    p_hdr = lc_get_header(handle);
     if (!p_hdr)
     {
-        rb->splash(2*HZ, "Can't get header");
+        splash(2*HZ, "Can't get header");
         goto error_close;
     }
     else
@@ -79,7 +79,7 @@ enum plugin_status run_overlay(const void* parameter,
 
     if (hdr->magic != PLUGIN_MAGIC || hdr->target_id != TARGET_ID)
     {
-        rb->splashf(2*HZ, "%s overlay: Incompatible model.", name);
+        splashf(2*HZ, "%s overlay: Incompatible model.", name);
         goto error_close;
     }
 
@@ -87,7 +87,7 @@ enum plugin_status run_overlay(const void* parameter,
     if (hdr->api_version > PLUGIN_API_VERSION
         || hdr->api_version < PLUGIN_MIN_API_VERSION)
     {
-        rb->splashf(2*HZ, "%s overlay: Incompatible version.", name);
+        splashf(2*HZ, "%s overlay: Incompatible version.", name);
         goto error_close;
     }
 
@@ -95,7 +95,7 @@ enum plugin_status run_overlay(const void* parameter,
     retval = p_hdr->entry_point(parameter);
     /* fall through */
 error_close:
-    rb->lc_close(handle);
+    lc_close(handle);
 error:
     return retval;
 }

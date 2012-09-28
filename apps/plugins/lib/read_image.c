@@ -28,8 +28,8 @@
 int read_image_file(const char* filename, struct bitmap *bm, int maxsize,
                     int format, const struct custom_format *cformat)
 {
-    int namelen = rb->strlen(filename);
-    if (rb->strcmp(filename + namelen - 4, ".bmp"))
+    int namelen = strlen(filename);
+    if (strcmp(filename + namelen - 4, ".bmp"))
         return read_jpeg_file(filename, bm, maxsize, format, cformat);
     else
         return scaled_read_bmp_file(filename, bm, maxsize, format, cformat);

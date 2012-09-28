@@ -27,6 +27,7 @@
  *
  ****************************************************************************/
 
+#include "plugin.h"
 #include "d_main.h"
 #include "doomdef.h"
 #include "settings.h"
@@ -59,6 +60,7 @@ int fileexists(const char * fname)
    return -1;
 }
 
+#if 0
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 int my_open(const char *file, int flags, ...)
 {
@@ -69,11 +71,11 @@ int my_open(const char *file, int flags, ...)
    {
       va_list ap;
       va_start(ap, flags);
-      filearray[fpoint]=rb->open(file, flags, va_arg(ap, unsigned int));
+      filearray[fpoint]=open(file, flags, va_arg(ap, unsigned int));
       va_end(ap);
    }
    else
-      filearray[fpoint]=rb->open(file, flags);
+      filearray[fpoint]=open(file, flags);
    if(filearray[fpoint]<0)
       return filearray[fpoint];
 
@@ -95,7 +97,7 @@ int my_close(int id)
       return -9;
    }
 #undef close
-   rb->close(id);
+   close(id);
 
    for(; i<fpoint-1; i++)
       filearray[i]=filearray[i+1];
@@ -103,6 +105,7 @@ int my_close(int id)
    fpoint--;
    return 0;
 }
+#endif
 #endif
 #define MAXARGVS  100
 
@@ -114,23 +117,23 @@ int printf(const char *fmt, ...)
 {
    static int p_xtpt;
    char p_buf[50];
-   rb->yield();
+   yield();
    va_list ap;
 
    va_start(ap, fmt);
    vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
    va_end(ap);
 
-   rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
+   lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
    if (!noprintf)
-      rb->lcd_update();
+      lcd_update();
 
    p_xtpt+=8;
    if(p_xtpt>LCD_HEIGHT-8)
    {
       p_xtpt=0;
       if (!noprintf)
-         rb->lcd_clear_display();
+         lcd_clear_display();
    }
    return 1;
 }
@@ -328,7 +331,7 @@ int Dbuild_filelistm(char ***names, char *firstentry, char *directory, char *str
    char           *startpt;
    char           **temp;
 
-   filedir=rb->opendir(directory);
+   filedir=opendir(directory);
 
    if(filedir==NULL)
    {
@@ -339,21 +342,21 @@ int Dbuild_filelistm(char ***names, char *firstentry, char *directory, char *str
    }
 
    // Get the total number of entries
-   while((dptr=rb->readdir(filedir)))
+   while((dptr=readdir(filedir)))
       i++;
 
    // Reset the directory
-   rb->closedir(filedir);
-   filedir=rb->opendir(directory);
+   closedir(filedir);
+   filedir=opendir(directory);
 
    i++;
    temp=malloc(i*sizeof(char *));
    temp[0]=firstentry;
    i=1;
 
-   while((dptr=rb->readdir(filedir)))
+   while((dptr=readdir(filedir)))
    {
-      if(rb->strcasestr(dptr->d_name, stringmatch))
+      if(strcasestr(dptr->d_name, stringmatch))
       {
          startpt=malloc(strlen(dptr->d_name)*sizeof(char));
          strcpy(startpt,dptr->d_name);
@@ -361,7 +364,7 @@ int Dbuild_filelistm(char ***names, char *firstentry, char *directory, char *str
          i++;
       }
    }
-   rb->closedir(filedir);
+   closedir(filedir);
    *names=temp;
    return i;
 }
@@ -484,13 +487,13 @@ int Oset_keys()
 
     while(!menuquit)
     {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
         if(result<0)
             menuquit=1;
         else
         {
             *keys[result]=translatekey(*keys[result]);
-            rb->set_option(menu_[result], keys[result], INT, doomkeys, numdoomkeys, NULL );
+            set_option(menu_[result], keys[result], INT, doomkeys, numdoomkeys, NULL );
             *keys[result]=translatekey(*keys[result]);
         }
    }
@@ -536,11 +539,11 @@ static bool Doptions()
 
     while(!menuquit)
     {
-        result = rb->do_menu(&menu, &selected, NULL, false);
+        result = do_menu(&menu, &selected, NULL, false);
         if(result==0) 
             Oset_keys();
         else if (result > 0)
-            rb->set_option(menu_[result], options[result-1], INT, onoff, 2, NULL );
+            set_option(menu_[result], options[result-1], INT, onoff, 2, NULL );
         else
             menuquit=1;
     }
@@ -568,11 +571,11 @@ int list_action_callback(int action, struct gui_synclist *lists)
 bool menuchoice(char **names, int count, int *selected)
 {
    struct simplelist_info info;
-   rb->simplelist_info_init(&info, NULL, count, (void*)names);
+   simplelist_info_init(&info, NULL, count, (void*)names);
    info.selection = *selected;
    info.get_name = choice_get_name;
    info.action_callback = list_action_callback;
-   if(rb->simplelist_show_list(&info))
+   if(simplelist_show_list(&info))
       return true;
 
    if(info.selection<count && info.selection>=0)
@@ -598,7 +601,7 @@ int doom_menu()
 
    if( (status=Dbuild_base(names)) == 0 ) // Build up the base wad files (select last added file)
    {
-      rb->splash(HZ*2, "Missing Base WAD!");
+      splash(HZ*2, "Missing Base WAD!");
       return -2;
    }
 
@@ -612,15 +615,15 @@ int doom_menu()
    gamever=status-1;
 
     /* Clean out the button Queue */
-    while (rb->button_get(false) != BUTTON_NONE) 
-        rb->yield();
+    while (button_get(false) != BUTTON_NONE) 
+        yield();
 
    while(!menuquit)
    {
-      result = rb->do_menu(&menu, &selected, NULL, false);
+      result = do_menu(&menu, &selected, NULL, false);
       switch (result) {
          case 0: /* Game picker */
-            rb->set_option("Game WAD", &gamever, INT, names, status, NULL );
+            set_option("Game WAD", &gamever, INT, names, status, NULL );
             break;
 
          case 1: /* Addon picker */
@@ -657,17 +660,17 @@ extern int systemvol;
 enum plugin_status plugin_start(const void* parameter)
 {
    /* Disable all talking before initializing IRAM */
-   rb->talk_disable(true);
+   talk_disable(true);
 
    (void)parameter;
 
    doomexit=0;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-   rb->cpu_boost(true);
+   cpu_boost(true);
 #endif
 
-   rb->lcd_setfont(FONT_SYSFIXED);
+   lcd_setfont(FONT_SYSFIXED);
 
    // We're using doom's memory management since it implements a proper free (and re-uses the memory)
    // and now with prboom's code: realloc and calloc
@@ -677,20 +680,20 @@ enum plugin_status plugin_start(const void* parameter)
    printf ("M_LoadDefaults: Load system defaults.\n");
    M_LoadDefaults ();              // load before initing other systems
 
-   rb->splash(HZ*2, "Welcome to RockDoom");
+   splash(HZ*2, "Welcome to RockDoom");
 
    myargv =0;
    myargc=0;
 
-   rb->lcd_clear_display();
+   lcd_clear_display();
 
    int result = doom_menu();
    if (result < 0)
    {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-       rb->cpu_boost(false);
+       cpu_boost(false);
 #endif
-       rb->talk_disable(false);
+       talk_disable(false);
        if( result == -1 )
            return PLUGIN_OK; // Quit was selected
        else
@@ -712,29 +715,29 @@ enum plugin_status plugin_start(const void* parameter)
 
    Dhandle_ver( namemap[ result ] );
 
-   rb->lcd_setfont(FONT_SYSFIXED);
+   lcd_setfont(FONT_SYSFIXED);
 
-   rb->lcd_clear_display();
+   lcd_clear_display();
 
-   int mod = (rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15;
+   int mod = (sound_max(SOUND_VOLUME)-sound_min(SOUND_VOLUME))/15;
    if(mod == 0)
-       mod = rb->global_settings->volume;
-   systemvol= rb->global_settings->volume-rb->global_settings->volume%mod;
+       mod = global_settings.volume;
+   systemvol= global_settings.volume-global_settings.volume%mod;
    general_translucency = default_translucency;                    // phares
 
    backlight_ignore_timeout();
 #ifdef RB_PROFILE
-   rb->profile_thread();
+   profile_thread();
 #endif
 
 #if LCD_DEPTH>1
-   rb->lcd_set_backdrop(NULL);
+   lcd_set_backdrop(NULL);
 #endif
 
    D_DoomMain ();
 
 #ifdef RB_PROFILE
-   rb->profstop();
+   profstop();
 #endif
    backlight_use_settings();
 
@@ -748,15 +751,15 @@ enum plugin_status plugin_start(const void* parameter)
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
       close(filearray[fpoint]);
 #else
-      rb->close(filearray[fpoint]);
+      close(filearray[fpoint]);
 #endif
       fpoint--;
    }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-   rb->cpu_boost(false);
+   cpu_boost(false);
 #endif
 
-   rb->talk_disable(false);
+   talk_disable(false);
    return PLUGIN_OK;
 }

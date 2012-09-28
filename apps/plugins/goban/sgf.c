@@ -106,8 +106,8 @@ play_move_sgf (unsigned short pos, unsigned char color)
 
         bool suicide_allowed = false;
 
-        if (rb->strcmp (header.ruleset, "NZ") == 0 ||
-            rb->strcmp (header.ruleset, "GOE") == 0)
+        if (strcmp (header.ruleset, "NZ") == 0 ||
+            strcmp (header.ruleset, "GOE") == 0)
         {
             suicide_allowed = true;
         }
@@ -140,7 +140,7 @@ play_move_sgf (unsigned short pos, unsigned char color)
                doens't matter much since we're out of memory, but
                whatever
                free_storage_sgf(handle); */
-            rb->splash (2 * HZ,
+            splash (2 * HZ,
                         "Out of memory led to invalid state.  Please exit.");
             current_node = saved;
             return false;
@@ -369,7 +369,7 @@ add_stone_sgf (unsigned short pos, unsigned char color)
 
         if (handle < 0)
         {
-            rb->splash (2 * HZ, "Out of memory!");
+            splash (2 * HZ, "Out of memory!");
             return false;
         }
 
@@ -397,7 +397,7 @@ add_stone_sgf (unsigned short pos, unsigned char color)
                doens't matter much since we're out of memory, but
                whatever
                free_storage_sgf(handle); */
-            rb->splash (2 * HZ, "Out of memory!");
+            splash (2 * HZ, "Out of memory!");
             return false;
         }
 
@@ -659,7 +659,7 @@ redo_node_sgf (void)
 
         if (pos == PASS_POS)
         {
-            rb->splashf (HZ / 2, "%s Passes",
+            splashf (HZ / 2, "%s Passes",
                          color == BLACK ? "Black" : "White");
         }
         else
@@ -785,7 +785,7 @@ redo_node_sgf_succeeded:
         unsigned int i;
         for (i = 0; i < sizeof (comment_buffer); ++i)
         {
-            /* newlines display badly in rb->splash, so replace them
+            /* newlines display badly in splash, so replace them
              * with spaces
              */
             if (comment_buffer[i] == '\n' ||
@@ -799,9 +799,9 @@ redo_node_sgf_succeeded:
             }
         }
         draw_screen_display();
-        rb->splash(HZ / 3, comment_buffer);
-        rb->button_clear_queue();
-        rb->action_userabort(TIMEOUT_BLOCK);
+        splash(HZ / 3, comment_buffer);
+        button_clear_queue();
+        action_userabort(TIMEOUT_BLOCK);
     }
 #else
     (void) comment_buffer;
@@ -1254,7 +1254,7 @@ read_comment_sgf (char *buffer, size_t buffer_size)
         return 0;
     }
 
-    if (rb->lseek (unhandled_fd, get_prop (prop_handle)->data.number,
+    if (lseek (unhandled_fd, get_prop (prop_handle)->data.number,
                    SEEK_SET) < 0)
     {
         DEBUGF ("couldn't seek in unhandled_fd\n");
@@ -1269,7 +1269,7 @@ read_comment_sgf (char *buffer, size_t buffer_size)
     }
 
     /* make output a string, the lazy way */
-    rb->memset (buffer, 0, buffer_size);
+    memset (buffer, 0, buffer_size);
     ++bytes_read;
 
     bool done = false;
@@ -1339,7 +1339,7 @@ write_comment_sgf (char *string)
 
     if (prop_handle >= 0)
     {
-        if ((start_of_comment = rb->lseek (unhandled_fd,
+        if ((start_of_comment = lseek (unhandled_fd,
                                            get_prop (prop_handle)->data.number,
                                            SEEK_SET)) < 0)
         {
@@ -1369,7 +1369,7 @@ write_comment_sgf (char *string)
     }
     else
     {
-        start_of_comment = rb->lseek (unhandled_fd, 0, SEEK_END);
+        start_of_comment = lseek (unhandled_fd, 0, SEEK_END);
 
         if (start_of_comment < 0)
         {
@@ -2078,7 +2078,7 @@ setup_handicap_sgf (void)
     if ((board_width != 19 && board_width != 13 && board_width != 9) ||
         board_width != board_height || header.handicap > 9)
     {
-        rb->splashf (5 * HZ,
+        splashf (5 * HZ,
                      "Use the 'Add Black' tool to add %d handicap stones!",
                      header.handicap);
         return;

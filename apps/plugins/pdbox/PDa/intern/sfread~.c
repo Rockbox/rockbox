@@ -78,7 +78,7 @@ void sfread_open(t_sfread *x,t_symbol *filename)
 
      /* get the size */
 #ifdef ROCKBOX
-     x->x_size = rb->filesize(x->x_fd);
+     x->x_size = filesize(x->x_fd);
 #else
      fstat(x->x_fd,&fstate);
      x->x_size = fstate.st_size;

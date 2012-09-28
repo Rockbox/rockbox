@@ -221,27 +221,27 @@ static void DrawBuf(void)
 {
     int ypos, fill, video, audio;
 
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+    lcd_set_drawmode(DRMODE_SOLID);
     
     ypos = gBuf.osd_ypos + gBuf.osd_height/2 - 3; /* center vertically */
 
-    rb->lcd_hline(1, LCD_WIDTH-2, ypos + 3);
-    rb->lcd_vline(0, ypos, ypos + 6);
-    rb->lcd_vline(LCD_WIDTH-1, ypos, ypos + 6);
+    lcd_hline(1, LCD_WIDTH-2, ypos + 3);
+    lcd_vline(0, ypos, ypos + 6);
+    lcd_vline(LCD_WIDTH-1, ypos, ypos + 6);
 
     /* calculate new tick positions */
     fill = 1 + ((gBuf.pBufFill - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
     video = 1 + ((gBuf.pReadVideo - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
     audio = 1 + ((gBuf.pReadAudio - gBuf.pBufStart) * (LCD_WIDTH-2)) / gBuf.bufsize;
 
-    rb->lcd_drawpixel(fill, ypos + 4);
-    rb->lcd_drawpixel(video, ypos + 2);
-    rb->lcd_drawpixel(audio, ypos + 1);
+    lcd_drawpixel(fill, ypos + 4);
+    lcd_drawpixel(video, ypos + 2);
+    lcd_drawpixel(audio, ypos + 1);
 
     if (gPlay.state == paused) /* we have to draw ourselves */
-        rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+        lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
     else
         gPlay.bDirtyOSD = true; /* redraw it with next timer IRQ */
 }
@@ -255,28 +255,28 @@ static void DrawPosition(int pos, int total)
     int sec; /* estimated seconds */
     int ypos;
 
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     /* print the estimated position */
     sec = pos / (gFileHdr.bps_average/8);
     if (sec < 100*60) /* fits into mm:ss format */
-        rb->snprintf(gPrint, sizeof(gPrint), "%02d:%02dm", sec/60, sec%60);
+        snprintf(gPrint, sizeof(gPrint), "%02d:%02dm", sec/60, sec%60);
     else /* a very long clip, hh:mm format */
-        rb->snprintf(gPrint, sizeof(gPrint), "%02d:%02dh", sec/3600, (sec/60)%60);
+        snprintf(gPrint, sizeof(gPrint), "%02d:%02dh", sec/3600, (sec/60)%60);
 
-    rb->lcd_getstringsize(gPrint, &w, &h);
+    lcd_getstringsize(gPrint, &w, &h);
     w++;
     ypos = gBuf.osd_ypos + (gBuf.osd_height - h) / 2;
-    rb->lcd_putsxy(0, ypos, gPrint);
+    lcd_putsxy(0, ypos, gPrint);
 
     /* draw a slider over the rest of the line */
-    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN], w, ypos, LCD_WIDTH-w,
+    gui_scrollbar_draw(screens[SCREEN_MAIN], w, ypos, LCD_WIDTH-w,
                              h, total, 0, pos, HORIZONTAL);
 
     if (gPlay.state == paused) /* we have to draw ourselves */
-        rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+        lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
     else /* let the display time do it */
     {
         gPlay.nTimeOSD = FPS;
@@ -289,16 +289,16 @@ static void osd_show_text(void)
 {
     int h, ypos;
 
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+    lcd_set_drawmode(DRMODE_SOLID);
 
-    rb->lcd_getstringsize(gPrint, NULL, &h);
+    lcd_getstringsize(gPrint, NULL, &h);
     ypos = gBuf.osd_ypos + (gBuf.osd_height - h) / 2;
-    rb->lcd_putsxy(0, ypos, gPrint);
+    lcd_putsxy(0, ypos, gPrint);
 
     if (gPlay.state == paused) /* we have to draw ourselves */
-        rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+        lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
     else /* let the display time do it */
     {
         gPlay.nTimeOSD = FPS; /* display it for 1 sec */
@@ -309,18 +309,18 @@ static void osd_show_text(void)
 /* helper function to change the volume by a certain amount, +/- */
 static void ChangeVolume(int delta)
 {
-    int minvol = rb->sound_min(SOUND_VOLUME);
-    int maxvol = rb->sound_max(SOUND_VOLUME);
-    int vol = rb->global_settings->volume + delta;
+    int minvol = sound_min(SOUND_VOLUME);
+    int maxvol = sound_max(SOUND_VOLUME);
+    int vol = global_settings.volume + delta;
 
     if (vol > maxvol) vol = maxvol;
     else if (vol < minvol) vol = minvol;
-    if (vol != rb->global_settings->volume)
+    if (vol != global_settings.volume)
     {
-        rb->sound_set(SOUND_VOLUME, vol);
-        rb->global_settings->volume = vol;
+        sound_set(SOUND_VOLUME, vol);
+        global_settings.volume = vol;
         
-        rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d dB", vol);
+        snprintf(gPrint, sizeof(gPrint), "Vol: %d dB", vol);
         osd_show_text();
     }
 }
@@ -333,17 +333,17 @@ static void ChangeContrast(int delta)
     int contrast; /* updated value */
 
     if (mycontrast == -1)
-        mycontrast = rb->global_settings->contrast;
+        mycontrast = global_settings.contrast;
 
     contrast = mycontrast + delta;
     if (contrast > 63) contrast = 63;
     else if (contrast < 5) contrast = 5;
     if (contrast != mycontrast)
     {
-        rb->lcd_set_contrast(contrast);
+        lcd_set_contrast(contrast);
         mycontrast = contrast;
 
-        rb->snprintf(gPrint, sizeof(gPrint), "Contrast: %d", contrast);
+        snprintf(gPrint, sizeof(gPrint), "Contrast: %d", contrast);
         osd_show_text();
     }
 }
@@ -386,12 +386,12 @@ static void timer4_isr(void)
         height = MIN(gBuf.osd_ypos, height);
         if (gPlay.bDirtyOSD)
         {
-            rb->lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
+            lcd_update_rect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
             gPlay.bDirtyOSD = false;
         }
     }
 
-    rb->lcd_blit_mono(gBuf.pReadVideo, 0, 0,
+    lcd_blit_mono(gBuf.pReadVideo, 0, 0,
         gFileHdr.video_width, height/8, gFileHdr.video_width);
 
     available = Available(gBuf.pReadVideo);
@@ -414,7 +414,7 @@ static void timer4_isr(void)
             else
             {
                 gPlay.bVideoUnderrun = true;
-                rb->timer_unregister(); /* disable ourselves */
+                timer_unregister(); /* disable ourselves */
                 return; /* no data available */
             }
         }
@@ -484,8 +484,8 @@ static int WaitForButton(void)
     
     do
     {
-        button = rb->button_get(true);
-        rb->default_event_handler(button);
+        button = button_get(true);
+        default_event_handler(button);
     } while ((button & BUTTON_REL) && button != SYS_USB_CONNECTED);
     
     return button;
@@ -496,13 +496,13 @@ static bool WantResume(int fd)
 {
     int button;
 
-    rb->lcd_puts(0, 0, "Resume to this");
-    rb->lcd_puts(0, 1, "last position?");
-    rb->lcd_puts(0, 2, "PLAY = yes");
-    rb->lcd_puts(0, 3, "Any Other = no");
-    rb->lcd_puts(0, 4, " (plays from start)");
-    DrawPosition(gFileHdr.resume_pos, rb->filesize(fd));
-    rb->lcd_update();
+    lcd_puts(0, 0, "Resume to this");
+    lcd_puts(0, 1, "last position?");
+    lcd_puts(0, 2, "PLAY = yes");
+    lcd_puts(0, 3, "Any Other = no");
+    lcd_puts(0, 4, " (plays from start)");
+    DrawPosition(gFileHdr.resume_pos, filesize(fd));
+    lcd_update();
 
     button = WaitForButton();
     return (button == VIDEO_RESUME);
@@ -514,18 +514,18 @@ static int SeekTo(int fd, int nPos)
     int read_now, got_now;
 
     if (gPlay.bHasAudio)
-        rb->mp3_play_stop(); /* stop audio ISR */
+        mp3_play_stop(); /* stop audio ISR */
     if (gPlay.bHasVideo)
-        rb->timer_unregister(); /* stop the timer */
+        timer_unregister(); /* stop the timer */
 
-    rb->lseek(fd, nPos, SEEK_SET);
+    lseek(fd, nPos, SEEK_SET);
 
     gBuf.pBufFill = gBuf.pBufStart; /* all empty */
     gBuf.pReadVideo = gBuf.pReadAudio = gBuf.pBufStart;
 
     read_now = gBuf.low_water - 1; /* less than low water, so loading will continue */
     read_now -= read_now % gBuf.granularity; /* round down to granularity */
-    got_now = rb->read(fd, gBuf.pBufFill, read_now);
+    got_now = read(fd, gBuf.pBufFill, read_now);
     gBuf.bEOF = (read_now != got_now);
     gBuf.pBufFill += got_now;
 
@@ -555,19 +555,19 @@ static int SeekTo(int fd, int nPos)
     if (gPlay.bHasAudio)
     {
         gPlay.bAudioUnderrun = false;
-        rb->mp3_play_data(gBuf.pReadAudio + gFileHdr.audio_headersize,
+        mp3_play_data(gBuf.pReadAudio + gFileHdr.audio_headersize,
                 gFileHdr.blocksize - gFileHdr.audio_headersize, GetMoreMp3);
-        rb->mp3_play_pause(true); /* kickoff audio */
+        mp3_play_pause(true); /* kickoff audio */
     }
     if (gPlay.bHasVideo)
     {
         gPlay.bVideoUnderrun = false;
         /* start display interrupt */
 #if FREQ == 12000000 /* Ondio speed kludge */
-        rb->timer_register(1, NULL, gPlay.nFrameTimeAdjusted,
+        timer_register(1, NULL, gPlay.nFrameTimeAdjusted,
                            timer4_isr IF_COP(, CPU));
 #else
-        rb->timer_register(1, NULL, gFileHdr.video_frametime,
+        timer_register(1, NULL, gFileHdr.video_frametime,
                            timer4_isr IF_COP(, CPU));
 #endif
     }
@@ -578,19 +578,19 @@ static int SeekTo(int fd, int nPos)
 /* called from default_event_handler_ex() or at end of playback */
 static void Cleanup(void *fd)
 {
-    rb->close(*(int*)fd); /* close the file */
+    close(*(int*)fd); /* close the file */
 
     if (gPlay.bHasVideo)
-        rb->timer_unregister(); /* stop video ISR, now I can use the display again */
+        timer_unregister(); /* stop video ISR, now I can use the display again */
 
     if (gPlay.bHasAudio)
-        rb->mp3_play_stop(); /* stop audio ISR */
+        mp3_play_stop(); /* stop audio ISR */
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
 
     /* restore normal contrast */
-    rb->lcd_set_contrast(rb->global_settings->contrast);
+    lcd_set_contrast(global_settings.contrast);
 }
 
 /* returns >0 if continue, =0 to stop, <0 to abort (USB) */
@@ -622,8 +622,8 @@ static int PlayTick(int fd)
         if (gFileHdr.resume_pos)
         {   /* we played til the end, clear resume position */
             gFileHdr.resume_pos = 0;
-            rb->lseek(fd, 0, SEEK_SET); /* save resume position */
-            rb->write(fd, &gFileHdr, sizeof(gFileHdr));
+            lseek(fd, 0, SEEK_SET); /* save resume position */
+            write(fd, &gFileHdr, sizeof(gFileHdr));
         }
         Cleanup(&fd);
         return 0; /* all expired */
@@ -631,7 +631,7 @@ static int PlayTick(int fd)
 
     if (!gPlay.bRefilling || gBuf.bEOF)
     {   /* nothing to do */
-        button = rb->button_get_w_tmo(HZ/10);
+        button = button_get_w_tmo(HZ/10);
     }
     else
     {   /* refill buffer */
@@ -654,9 +654,9 @@ static int PlayTick(int fd)
         if (read_now == buf_free)
             gPlay.bRefilling = false; /* last piece requested */
 
-        spinup = *rb->current_tick; /* in case this is interesting below */
+        spinup = current_tick; /* in case this is interesting below */
         
-        got_now = rb->read(fd, gBuf.pBufFill, read_now);
+        got_now = read(fd, gBuf.pBufFill, read_now);
         if (got_now != read_now || read_now == 0)
         {
             gBuf.bEOF = true;
@@ -665,7 +665,7 @@ static int PlayTick(int fd)
 
         if (gPlay.bDiskSleep) /* statistics about the spinup time */
         {
-            spinup = *rb->current_tick - spinup;
+            spinup = current_tick - spinup;
             gPlay.bDiskSleep = false;
             if (spinup > gStats.maxSpinup)
                 gStats.maxSpinup = spinup;
@@ -679,11 +679,11 @@ static int PlayTick(int fd)
 
         if (!gPlay.bRefilling
 #ifdef HAVE_DISK_STORAGE
-            && rb->global_settings->disk_spindown < 20  /* condition for test only */
+            && global_settings.disk_spindown < 20  /* condition for test only */
 #endif
             )
         {
-            rb->storage_sleep(); /* no point in leaving the disk run til timeout */
+            storage_sleep(); /* no point in leaving the disk run til timeout */
             gPlay.bDiskSleep = true;
         }
 
@@ -691,15 +691,15 @@ static int PlayTick(int fd)
         if (gBuf.pBufFill >= gBuf.pBufEnd)
             gBuf.pBufFill = gBuf.pBufStart; /* wrap */
 
-        rb->yield(); /* have mercy with the other threads */
-        button = rb->button_get(false);
+        yield(); /* have mercy with the other threads */
+        button = button_get(false);
     }
 
     /* check keypresses */
 
     if (button != BUTTON_NONE)
     {
-        filepos = rb->lseek(fd, 0, SEEK_CUR);
+        filepos = lseek(fd, 0, SEEK_CUR);
 
         if (gPlay.bHasVideo) /* video position is more accurate */
             filepos -= Available(gBuf.pReadVideo); /* take video position */
@@ -712,8 +712,8 @@ static int PlayTick(int fd)
                 && !(gFileHdr.flags & FLAG_LOOP)) /* not for stills */
             {
                 gFileHdr.resume_pos = filepos;
-                rb->lseek(fd, 0, SEEK_SET); /* save resume position */
-                rb->write(fd, &gFileHdr, sizeof(gFileHdr));
+                lseek(fd, 0, SEEK_SET); /* save resume position */
+                write(fd, &gFileHdr, sizeof(gFileHdr));
             }
             Cleanup(&fd);
             retval = 0; /* signal "stopped" to caller */
@@ -733,9 +733,9 @@ static int PlayTick(int fd)
             {
                 gPlay.state = paused;
                 if (gPlay.bHasAudio)
-                    rb->mp3_play_pause(false); /* pause audio */
+                    mp3_play_pause(false); /* pause audio */
                 if (gPlay.bHasVideo)
-                    rb->timer_unregister(); /* stop the timer */
+                    timer_unregister(); /* stop the timer */
             }
             else if (gPlay.state == paused)
             {
@@ -744,15 +744,15 @@ static int PlayTick(int fd)
                 {
                     if (gPlay.bHasVideo)
                         SyncVideo();
-                    rb->mp3_play_pause(true); /* play audio */
+                    mp3_play_pause(true); /* play audio */
                 }
                 if (gPlay.bHasVideo)
                 {   /* start the video */
 #if FREQ == 12000000 /* Ondio speed kludge */
-                    rb->timer_register(1, NULL,
+                    timer_register(1, NULL,
                         gPlay.nFrameTimeAdjusted, timer4_isr);
 #else
-                    rb->timer_register(1, NULL,
+                    timer_register(1, NULL,
                         gFileHdr.video_frametime, timer4_isr);
 #endif
                 }
@@ -813,7 +813,7 @@ static int PlayTick(int fd)
                 ChangeContrast(1);
             break;
         default:
-            if (rb->default_event_handler_ex(button, Cleanup, &fd)
+            if (default_event_handler_ex(button, Cleanup, &fd)
                 == SYS_USB_CONNECTED)
                 retval = -1; /* signal "aborted" to caller */
             break;
@@ -835,12 +835,12 @@ static int PlayTick(int fd)
         gPlay.nSeekPos += gPlay.nSeekAcc * gBuf.nSeekChunk;
         if (gPlay.nSeekPos < 0)
             gPlay.nSeekPos = 0;
-        if (gPlay.nSeekPos > rb->filesize(fd) - gBuf.granularity)
+        if (gPlay.nSeekPos > filesize(fd) - gBuf.granularity)
         {
-            gPlay.nSeekPos = rb->filesize(fd);
+            gPlay.nSeekPos = filesize(fd);
             gPlay.nSeekPos -= gPlay.nSeekPos % gBuf.granularity;
         }
-        DrawPosition(gPlay.nSeekPos, rb->filesize(fd));
+        DrawPosition(gPlay.nSeekPos, filesize(fd));
     }
 
 
@@ -849,7 +849,7 @@ static int PlayTick(int fd)
     if ((gPlay.bAudioUnderrun || gPlay.bVideoUnderrun) && !gBuf.bEOF)
     {
         gBuf.spinup_safety += HZ/2; /* add extra spinup time for the future */
-        filepos = rb->lseek(fd, 0, SEEK_CUR);
+        filepos = lseek(fd, 0, SEEK_CUR);
 
         if (gPlay.bHasVideo && gPlay.bVideoUnderrun)
         {
@@ -878,47 +878,47 @@ static int main(char* filename)
     int retval;
 
     /* try to open the file */
-    fd = rb->open(filename, O_RDWR);
+    fd = open(filename, O_RDWR);
     if (fd < 0)
         return PLUGIN_ERROR;
-    file_size =  rb->filesize(fd);
+    file_size =  filesize(fd);
     
     /* reset pitch value to ensure synchronous playback */
-    rb->sound_set_pitch(PITCH_SPEED_100);
+    sound_set_pitch(PITCH_SPEED_100);
 
     /* init statistics */
-    rb->memset(&gStats, 0, sizeof(gStats));
+    memset(&gStats, 0, sizeof(gStats));
     gStats.minAudioAvail = gStats.minVideoAvail = INT_MAX;
     gStats.minSpinup = INT_MAX;
 
     /* init playback state */
-    rb->memset(&gPlay, 0, sizeof(gPlay));
+    memset(&gPlay, 0, sizeof(gPlay));
 
     /* init buffer */
-    rb->memset(&gBuf, 0, sizeof(gBuf));
-    gBuf.pBufStart = rb->plugin_get_audio_buffer((size_t *)&gBuf.bufsize);
+    memset(&gBuf, 0, sizeof(gBuf));
+    gBuf.pBufStart = plugin_get_audio_buffer((size_t *)&gBuf.bufsize);
     /*gBuf.bufsize = 1700*1024; // test, like 2MB version!!!! */
     gBuf.pBufFill = gBuf.pBufStart; /* all empty */
     
     /* init OSD */
-    rb->lcd_getstringsize("X", NULL, &retval);
+    lcd_getstringsize("X", NULL, &retval);
     gBuf.osd_height = (retval + 7) & ~7;
     gBuf.osd_ypos = LCD_HEIGHT - gBuf.osd_height;
 
     /* load file header */
     read_now = sizeof(gFileHdr);
-    got_now = rb->read(fd, &gFileHdr, read_now);
-    rb->lseek(fd, 0, SEEK_SET); /* rewind to restart sector-aligned */
+    got_now = read(fd, &gFileHdr, read_now);
+    lseek(fd, 0, SEEK_SET); /* rewind to restart sector-aligned */
     if (got_now != read_now)
     {
-        rb->close(fd);
+        close(fd);
         return (PLUGIN_ERROR);
     }
 
     /* check header */
     if (gFileHdr.magic != HEADER_MAGIC)
     {   /* old file, use default info */
-        rb->memset(&gFileHdr, 0, sizeof(gFileHdr));
+        memset(&gFileHdr, 0, sizeof(gFileHdr));
         gFileHdr.blocksize = SCREENSIZE;
         if (file_size < SCREENSIZE * FPS) /* less than a second */
             gFileHdr.flags |= FLAG_LOOP;
@@ -947,7 +947,7 @@ static int main(char* filename)
         gBuf.high_water = 1; /* never fill buffer completely, would appear empty */
     gBuf.nReadChunk = (CHUNK + gBuf.granularity - 1); /* round up */
     gBuf.nReadChunk -= gBuf.nReadChunk % gBuf.granularity;/* and align */
-    gBuf.nSeekChunk = rb->filesize(fd) / FF_TICKS;
+    gBuf.nSeekChunk = filesize(fd) / FF_TICKS;
     gBuf.nSeekChunk += gBuf.granularity - 1; /* round up */
     gBuf.nSeekChunk -= gBuf.nSeekChunk % gBuf.granularity; /* and align */
 
@@ -987,25 +987,25 @@ static int main(char* filename)
 #endif
     {
         /* display statistics */
-        rb->lcd_clear_display();
-        rb->snprintf(gPrint, sizeof(gPrint), "%d Audio Underruns", gStats.nAudioUnderruns);
-        rb->lcd_puts(0, 0, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "%d Video Underruns", gStats.nVideoUnderruns);
-        rb->lcd_puts(0, 1, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "%d MinAudio bytes", gStats.minAudioAvail);
-        rb->lcd_puts(0, 2, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "%d MinVideo bytes", gStats.minVideoAvail);
-        rb->lcd_puts(0, 3, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "MinSpinup %ld.%02ld", gStats.minSpinup/HZ, gStats.minSpinup%HZ);
-        rb->lcd_puts(0, 4, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "MaxSpinup %ld.%02ld", gStats.maxSpinup/HZ, gStats.maxSpinup%HZ);
-        rb->lcd_puts(0, 5, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "LowWater: %d", gBuf.low_water);
-        rb->lcd_puts(0, 6, gPrint);
-        rb->snprintf(gPrint, sizeof(gPrint), "HighWater: %d", gBuf.high_water);
-        rb->lcd_puts(0, 7, gPrint);
+        lcd_clear_display();
+        snprintf(gPrint, sizeof(gPrint), "%d Audio Underruns", gStats.nAudioUnderruns);
+        lcd_puts(0, 0, gPrint);
+        snprintf(gPrint, sizeof(gPrint), "%d Video Underruns", gStats.nVideoUnderruns);
+        lcd_puts(0, 1, gPrint);
+        snprintf(gPrint, sizeof(gPrint), "%d MinAudio bytes", gStats.minAudioAvail);
+        lcd_puts(0, 2, gPrint);
+        snprintf(gPrint, sizeof(gPrint), "%d MinVideo bytes", gStats.minVideoAvail);
+        lcd_puts(0, 3, gPrint);
+        snprintf(gPrint, sizeof(gPrint), "MinSpinup %ld.%02ld", gStats.minSpinup/HZ, gStats.minSpinup%HZ);
+        lcd_puts(0, 4, gPrint);
+        snprintf(gPrint, sizeof(gPrint), "MaxSpinup %ld.%02ld", gStats.maxSpinup/HZ, gStats.maxSpinup%HZ);
+        lcd_puts(0, 5, gPrint);
+        snprintf(gPrint, sizeof(gPrint), "LowWater: %d", gBuf.low_water);
+        lcd_puts(0, 6, gPrint);
+        snprintf(gPrint, sizeof(gPrint), "HighWater: %d", gBuf.high_water);
+        lcd_puts(0, 7, gPrint);
  
-        rb->lcd_update();
+        lcd_update();
         button = WaitForButton();
     }
     return (button == SYS_USB_CONNECTED) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
@@ -1018,7 +1018,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     if (parameter == NULL)
     {
-        rb->splash(HZ*2, "Play .rvf file!");
+        splash(HZ*2, "Play .rvf file!");
         return PLUGIN_ERROR;
     }
 

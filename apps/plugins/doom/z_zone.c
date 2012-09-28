@@ -241,7 +241,7 @@ void Z_Init(void)
 
    // Allocate the memory
 
-   zonebase=rb->plugin_get_audio_buffer(&size);
+   zonebase=plugin_get_audio_buffer(&size);
    size-=2*(HEADER_SIZE + CACHE_ALIGN);  // Leave space for header and CACHE_ALIGN
    size = (size+CHUNK_SIZE-1) & ~(CHUNK_SIZE-1);  // round to chunk size
    size += HEADER_SIZE + CACHE_ALIGN;
@@ -399,7 +399,7 @@ void *(Z_Malloc)(size_t size, int tag, void **user
       }
    } else { // We don't have enough contiguous free blocks
       I_Error ("Z_Malloc: Failure trying to allocate %d bytes",(unsigned long) size);
-      rb->sleep(300);
+      sleep(300);
    }
 
 #ifdef INSTRUMENTED

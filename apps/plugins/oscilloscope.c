@@ -479,7 +479,7 @@ static void anim_horizontal(int cur_left, int cur_right)
 {
     int cur_x, x;
     int left, right, dl, dr;
-    long cur_tick = *rb->current_tick;
+    long cur_tick = current_tick;
     long d = (cur_tick - last_tick) / osc.delay;
     bool full_update = false;
 
@@ -511,18 +511,18 @@ static void anim_horizontal(int cur_left, int cur_right)
             cur_x -= LCD_WIDTH;
         }
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
 
     if (cur_x > last_pos)
     {
-        rb->lcd_fillrect(last_pos + 1, 0, d, LCD_HEIGHT);
+        lcd_fillrect(last_pos + 1, 0, d, LCD_HEIGHT);
     }
     else
     {
-        rb->lcd_fillrect(last_pos + 1, 0, LCD_WIDTH - last_pos, LCD_HEIGHT);
-        rb->lcd_fillrect(0, 0, cur_x + 1, LCD_HEIGHT);
+        lcd_fillrect(last_pos + 1, 0, LCD_WIDTH - last_pos, LCD_HEIGHT);
+        lcd_fillrect(0, 0, cur_x + 1, LCD_HEIGHT);
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     switch (osc.draw)
     {
@@ -540,9 +540,9 @@ static void anim_horizontal(int cur_left, int cur_right)
                 left  += dl;
                 right += dr;
 
-                rb->lcd_vline(x, LCD_HEIGHT/2-1,
+                lcd_vline(x, LCD_HEIGHT/2-1,
                               LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16));
-                rb->lcd_vline(x, LCD_HEIGHT/2+1,
+                lcd_vline(x, LCD_HEIGHT/2+1,
                               LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16));
             }
             break;
@@ -550,11 +550,11 @@ static void anim_horizontal(int cur_left, int cur_right)
         case DRAW_LINE:
             if (cur_x > last_pos)
             {
-                rb->lcd_drawline(
+                lcd_drawline(
                     last_pos, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * last_left) >> 16),
                     cur_x, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * cur_left) >> 16)
                 );
-                rb->lcd_drawline(
+                lcd_drawline(
                     last_pos, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * last_right) >> 16),
                     cur_x, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * cur_right) >> 16)
                 );
@@ -566,21 +566,21 @@ static void anim_horizontal(int cur_left, int cur_right)
                 right = last_right 
                       + (LCD_WIDTH - last_pos) * (last_right - cur_right) / d;
 
-                rb->lcd_drawline(
+                lcd_drawline(
                     last_pos, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * last_left) >> 16),
                     LCD_WIDTH, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16)
                 );
-                rb->lcd_drawline(
+                lcd_drawline(
                     last_pos, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * last_right) >> 16),
                     LCD_WIDTH, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16)
                 );
                 if (cur_x > 0)
                 {
-                    rb->lcd_drawline(
+                    lcd_drawline(
                         0, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16),
                         cur_x, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * cur_left) >> 16)
                     );
-                    rb->lcd_drawline(
+                    lcd_drawline(
                         0, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16),
                         cur_x, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * cur_right) >> 16)
                     );
@@ -602,8 +602,8 @@ static void anim_horizontal(int cur_left, int cur_right)
                 left  += dl;
                 right += dr;
 
-                rb->lcd_drawpixel(x, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16));
-                rb->lcd_drawpixel(x, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16));
+                lcd_drawpixel(x, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16));
+                lcd_drawpixel(x, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16));
             }
             break;
 
@@ -615,9 +615,9 @@ static void anim_horizontal(int cur_left, int cur_right)
     {
         int width;
         
-        rb->lcd_getstringsize(message, &width, NULL);
+        lcd_getstringsize(message, &width, NULL);
         last_pos -= width - 1;
-        rb->lcd_putsxy(last_pos, 0, message);
+        lcd_putsxy(last_pos, 0, message);
         displaymsg = false;
 
         if (last_pos < 0)
@@ -626,28 +626,28 @@ static void anim_horizontal(int cur_left, int cur_right)
 
     if (full_update)
     {
-        rb->lcd_update();
+        lcd_update();
     }
     else
     {
 #if LCD_DEPTH > 1                 /* cursor bar */    
-        rb->lcd_set_foreground(CURSOR_COLOR);
-        rb->lcd_vline(cur_x + 1, 0, LCD_HEIGHT-1); 
-        rb->lcd_set_foreground(GRAPH_COLOR);
+        lcd_set_foreground(CURSOR_COLOR);
+        lcd_vline(cur_x + 1, 0, LCD_HEIGHT-1); 
+        lcd_set_foreground(GRAPH_COLOR);
 #else
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_vline(cur_x + 1, 0, LCD_HEIGHT-1);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_vline(cur_x + 1, 0, LCD_HEIGHT-1);
+        lcd_set_drawmode(DRMODE_SOLID);
 #endif
 
         if (cur_x > last_pos)
         {
-            rb->lcd_update_rect(last_pos, 0, cur_x - last_pos + 2, LCD_HEIGHT);
+            lcd_update_rect(last_pos, 0, cur_x - last_pos + 2, LCD_HEIGHT);
         }
         else
         {
-            rb->lcd_update_rect(last_pos, 0, LCD_WIDTH - last_pos, LCD_HEIGHT);
-            rb->lcd_update_rect(0, 0, cur_x + 2, LCD_HEIGHT);
+            lcd_update_rect(last_pos, 0, LCD_WIDTH - last_pos, LCD_HEIGHT);
+            lcd_update_rect(0, 0, cur_x + 2, LCD_HEIGHT);
         }
     }
     last_pos = cur_x;
@@ -657,7 +657,7 @@ static void anim_vertical(int cur_left, int cur_right)
 {
     int cur_y, y;
     int left, right, dl, dr;
-    long cur_tick = *rb->current_tick;
+    long cur_tick = current_tick;
     long d = (cur_tick - last_tick) / osc.delay;
     bool full_update = false;
 
@@ -689,18 +689,18 @@ static void anim_vertical(int cur_left, int cur_right)
             cur_y -= LCD_HEIGHT;
         }
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
 
     if (cur_y > last_pos)
     {
-        rb->lcd_fillrect(0, last_pos + 1, LCD_WIDTH, d);
+        lcd_fillrect(0, last_pos + 1, LCD_WIDTH, d);
     }
     else
     {
-        rb->lcd_fillrect(0, last_pos + 1, LCD_WIDTH, LCD_HEIGHT - last_pos);
-        rb->lcd_fillrect(0, 0, LCD_WIDTH, cur_y + 1);
+        lcd_fillrect(0, last_pos + 1, LCD_WIDTH, LCD_HEIGHT - last_pos);
+        lcd_fillrect(0, 0, LCD_WIDTH, cur_y + 1);
     }
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_drawmode(DRMODE_SOLID);
 
     switch (osc.draw)
     {
@@ -718,9 +718,9 @@ static void anim_vertical(int cur_left, int cur_right)
                 left  += dl;
                 right += dr;
 
-                rb->lcd_hline(LCD_WIDTH/2-1,
+                lcd_hline(LCD_WIDTH/2-1,
                               LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), y);
-                rb->lcd_hline(LCD_WIDTH/2+1,
+                lcd_hline(LCD_WIDTH/2+1,
                               LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), y);
             }
             break;
@@ -728,11 +728,11 @@ static void anim_vertical(int cur_left, int cur_right)
         case DRAW_LINE:
             if (cur_y > last_pos)
             {
-                rb->lcd_drawline(
+                lcd_drawline(
                     LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * last_left) >> 16), last_pos,
                     LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * cur_left) >> 16), cur_y
                 );
-                rb->lcd_drawline(
+                lcd_drawline(
                     LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * last_right) >> 16), last_pos,
                     LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * cur_right) >> 16), cur_y
                 );
@@ -744,21 +744,21 @@ static void anim_vertical(int cur_left, int cur_right)
                 right = last_right
                       + (LCD_HEIGHT - last_pos) * (last_right - cur_right) / d;
 
-                rb->lcd_drawline(
+                lcd_drawline(
                     LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * last_left) >> 16), last_pos,
                     LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), LCD_HEIGHT
                 );
-                rb->lcd_drawline(
+                lcd_drawline(
                     LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * last_right) >> 16), last_pos,
                     LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), LCD_HEIGHT
                 );
                 if (cur_y > 0)
                 {
-                    rb->lcd_drawline(
+                    lcd_drawline(
                         LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), 0,
                         LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * cur_left) >> 16), cur_y
                     );
-                    rb->lcd_drawline(
+                    lcd_drawline(
                         LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), 0,
                         LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * cur_right) >> 16), cur_y
                     );
@@ -780,8 +780,8 @@ static void anim_vertical(int cur_left, int cur_right)
                 left  += dl;
                 right += dr;
 
-                rb->lcd_drawpixel(LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), y);
-                rb->lcd_drawpixel(LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), y);
+                lcd_drawpixel(LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), y);
+                lcd_drawpixel(LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), y);
             }
             break;
 
@@ -792,7 +792,7 @@ static void anim_vertical(int cur_left, int cur_right)
     if (displaymsg)
     {
         last_pos -= font_height - 1;
-        rb->lcd_putsxy(0, last_pos, message);
+        lcd_putsxy(0, last_pos, message);
         displaymsg = false;
 
         if (last_pos < 0)
@@ -801,28 +801,28 @@ static void anim_vertical(int cur_left, int cur_right)
 
     if (full_update)
     {
-        rb->lcd_update();
+        lcd_update();
     }
     else
     {
 #if LCD_DEPTH > 1               /* cursor bar */
-        rb->lcd_set_foreground(CURSOR_COLOR);
-        rb->lcd_hline(0, LCD_WIDTH-1, cur_y + 1); 
-        rb->lcd_set_foreground(GRAPH_COLOR);
+        lcd_set_foreground(CURSOR_COLOR);
+        lcd_hline(0, LCD_WIDTH-1, cur_y + 1); 
+        lcd_set_foreground(GRAPH_COLOR);
 #else
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_hline(0, LCD_WIDTH-1, cur_y + 1);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_hline(0, LCD_WIDTH-1, cur_y + 1);
+        lcd_set_drawmode(DRMODE_SOLID);
 #endif
 
         if (cur_y > last_pos)
         {
-            rb->lcd_update_rect(0, last_pos, LCD_WIDTH, cur_y - last_pos + 2);
+            lcd_update_rect(0, last_pos, LCD_WIDTH, cur_y - last_pos + 2);
         }
         else
         {
-            rb->lcd_update_rect(0, last_pos, LCD_WIDTH, LCD_HEIGHT - last_pos);
-            rb->lcd_update_rect(0, 0, LCD_WIDTH, cur_y + 2);
+            lcd_update_rect(0, last_pos, LCD_WIDTH, LCD_HEIGHT - last_pos);
+            lcd_update_rect(0, 0, LCD_WIDTH, cur_y + 2);
         }
     }
     last_pos = cur_y;
@@ -831,8 +831,8 @@ static void anim_vertical(int cur_left, int cur_right)
 static void cleanup(void)
 {
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_DEFAULT_FG);
-    rb->lcd_set_background(LCD_DEFAULT_BG);
+    lcd_set_foreground(LCD_DEFAULT_FG);
+    lcd_set_background(LCD_DEFAULT_BG);
 #endif
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
@@ -854,20 +854,20 @@ enum plugin_status plugin_start(const void* parameter)
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);
-    rb->memcpy(&osc, &osc_disk, sizeof(osc));   /* copy to running config */
+    memcpy(&osc, &osc_disk, sizeof(osc));   /* copy to running config */
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(GRAPH_COLOR);
-    rb->lcd_set_background(BACKG_COLOR);
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_set_foreground(GRAPH_COLOR);
+    lcd_set_background(BACKG_COLOR);
+    lcd_set_backdrop(NULL);
+    lcd_clear_display();
+    lcd_update();
 #endif
 
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
-    rb->lcd_getstringsize("A", NULL, &font_height);
+    lcd_getstringsize("A", NULL, &font_height);
 
     while (!exit)
     {
@@ -875,14 +875,14 @@ enum plugin_status plugin_start(const void* parameter)
         {
             int left, right;
 
-            rb->sleep(MAX(last_tick + osc.delay - *rb->current_tick - 1, 0));
+            sleep(MAX(last_tick + osc.delay - current_tick - 1, 0));
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-            left = rb->mas_codec_readreg(0xC);
-            right = rb->mas_codec_readreg(0xD);
+            left = mas_codec_readreg(0xC);
+            right = mas_codec_readreg(0xD);
 #elif (CONFIG_CODEC == SWCODEC)
             static struct pcm_peaks peaks;
-            rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
+            mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                               &peaks);
             left = peaks.left; right = peaks.right;
 #endif
@@ -893,7 +893,7 @@ enum plugin_status plugin_start(const void* parameter)
         }
 
         tell_speed = false;
-        button = rb->button_get(paused);
+        button = button_get(paused);
         switch (button)
         {
 #ifdef OSCILLOSCOPE_RC_QUIT
@@ -927,8 +927,8 @@ enum plugin_status plugin_start(const void* parameter)
                 last_pos = 0;
                 last_tick = 0;
                 displaymsg = false;
-                rb->lcd_clear_display();
-                rb->lcd_update();
+                lcd_clear_display();
+                lcd_update();
                 break;
 
             case OSCILLOSCOPE_PAUSE:
@@ -953,23 +953,23 @@ enum plugin_status plugin_start(const void* parameter)
 
             case OSCILLOSCOPE_VOL_UP:
             case OSCILLOSCOPE_VOL_UP | BUTTON_REPEAT:
-                vol = rb->global_settings->volume;
-                if (vol < rb->sound_max(SOUND_VOLUME))
+                vol = global_settings.volume;
+                if (vol < sound_max(SOUND_VOLUME))
                 {
                     vol++;
-                    rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    sound_set(SOUND_VOLUME, vol);
+                    global_settings.volume = vol;
                 }
                 break;
 
             case OSCILLOSCOPE_VOL_DOWN:
             case OSCILLOSCOPE_VOL_DOWN | BUTTON_REPEAT:
-                vol = rb->global_settings->volume;
-                if (vol > rb->sound_min(SOUND_VOLUME))
+                vol = global_settings.volume;
+                if (vol > sound_min(SOUND_VOLUME))
                 {
                     vol--;
-                    rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
+                    sound_set(SOUND_VOLUME, vol);
+                    global_settings.volume = vol;
                 }
                 break;
 
@@ -984,15 +984,15 @@ enum plugin_status plugin_start(const void* parameter)
 
         if (tell_speed)
         {
-            rb->snprintf(message, sizeof(message), "%s%d", 
+            snprintf(message, sizeof(message), "%s%d", 
                         (osc.orientation == OSC_VERT) ? "Speed: " : "",
                         100 / osc.delay);
             displaymsg = true;
         }
     }
-    if (rb->memcmp(&osc, &osc_disk, sizeof(osc))) /* save settings if changed */
+    if (memcmp(&osc, &osc_disk, sizeof(osc))) /* save settings if changed */
     {
-        rb->memcpy(&osc_disk, &osc, sizeof(osc));
+        memcpy(&osc_disk, &osc, sizeof(osc));
         configfile_save(cfg_filename, disk_config,
                         sizeof(disk_config) / sizeof(disk_config[0]),
                         CFGFILE_VERSION);

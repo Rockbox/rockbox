@@ -245,59 +245,59 @@ static void display(longlong_t euro, longlong_t home, bool pos)
 
     if (pos)
     {   /*Edit the second line*/
-        rb->strcpy(s1," %6d.%02d");
+        strcpy(s1," %6d.%02d");
         if (nb_digit[country]==2)
-            rb->strcpy(s2,"\xee\x84\x90%06d.%02d");
+            strcpy(s2,"\xee\x84\x90%06d.%02d");
         else
-            rb->strcpy(s2,"\xee\x84\x90%09d");
+            strcpy(s2,"\xee\x84\x90%09d");
     }
     else
     {
-        rb->strcpy(s1,"\xee\x84\x90%06d.%02d");
+        strcpy(s1,"\xee\x84\x90%06d.%02d");
         if (nb_digit[country]==2)
-            rb->strcpy(s2," %6d.%02d");
+            strcpy(s2," %6d.%02d");
         else
-            rb->strcpy(s2," %9d");
+            strcpy(s2," %9d");
     }
 
-    rb->lcd_remove_cursor();
+    lcd_remove_cursor();
     /*First line*/
-    rb->lcd_putc(0,0,heuro);
+    lcd_putc(0,0,heuro);
     split(euro,&i,&f);
     if (pos)
         round(&i,&f,2);
-    rb->snprintf(str,sizeof(str),s1,(int)i,(int)f);
+    snprintf(str,sizeof(str),s1,(int)i,(int)f);
 
     if (!pos)
     {
-        rb->lcd_puts(1,0,str);
-        rb->lcd_put_cursor(10-cur_pos,0,0x5F);
+        lcd_puts(1,0,str);
+        lcd_put_cursor(10-cur_pos,0,0x5F);
     }
     else
-        rb->lcd_puts_scroll(1,0,str);
+        lcd_puts_scroll(1,0,str);
 
     /*Second line*/
-    rb->lcd_putc(0,1,hhome);
+    lcd_putc(0,1,hhome);
     split(home,&i,&f);
     if (!pos)
         round(&i,&f,nb_digit[country]);
-    rb->snprintf(str,sizeof(str),s2,(int)i,(int)f);
+    snprintf(str,sizeof(str),s2,(int)i,(int)f);
     if (pos)
     {
-        rb->lcd_puts(1,1,str);
-        rb->lcd_put_cursor(10-cur_pos,1,0x5F);
+        lcd_puts(1,1,str);
+        lcd_put_cursor(10-cur_pos,1,0x5F);
     }
     else
-        rb->lcd_puts_scroll(1,1,str);
+        lcd_puts_scroll(1,1,str);
         
-    rb->lcd_update();
+    lcd_update();
 }
 
 
 /* Show country Abbreviation */
 static void show_abbrev(void)
 {
-    rb->splash(HZ*3/4,abbrev_str[country]);
+    splash(HZ*3/4,abbrev_str[country]);
 }
 
 
@@ -320,13 +320,13 @@ static void currency_menu(void)
 {
     int c=country;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     while (true)
     {
-        rb->lcd_puts(0,0,"Currency:");
-        rb->lcd_puts(0,1,currency_str[c]);
-        rb->lcd_update();
-        switch (rb->button_get(true))
+        lcd_puts(0,0,"Currency:");
+        lcd_puts(0,1,currency_str[c]);
+        lcd_update();
+        switch (button_get(true))
         {
             case BUTTON_RIGHT|BUTTON_REL:
                 c++;
@@ -358,13 +358,13 @@ static int euro_menu(void)
 
     while (true)
     {
-        rb->lcd_clear_display();
-        rb->lcd_puts(0,0," Currency");
-        rb->lcd_puts(0,1," Exit");
-        rb->lcd_putc(0,c,0xe110);
-        rb->lcd_update();
+        lcd_clear_display();
+        lcd_puts(0,0," Currency");
+        lcd_puts(0,1," Exit");
+        lcd_putc(0,c,0xe110);
+        lcd_update();
 
-        switch (rb->button_get(true))
+        switch (button_get(true))
         {
             case BUTTON_RIGHT|BUTTON_REL:
                 c=1;
@@ -389,12 +389,12 @@ static int euro_menu(void)
 static void euro_exit(void)
 {
     //Restore the old pattern (i don't find another way to do this. An idea?)
-    rb->lcd_unlock_pattern(heuro);
-    rb->lcd_unlock_pattern(hhome);
+    lcd_unlock_pattern(heuro);
+    lcd_unlock_pattern(hhome);
 
     //Clear the screen
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
 }
 
 
@@ -411,10 +411,10 @@ enum plugin_status plugin_start(const void* parameter)
     atexit(euro_exit);
 
     /*Get the pattern handle*/
-    heuro=rb->lcd_get_locked_pattern();
-    hhome=rb->lcd_get_locked_pattern();
-    rb->lcd_define_pattern(heuro, pattern_euro);
-    rb->lcd_define_pattern(hhome, pattern_home);
+    heuro=lcd_get_locked_pattern();
+    hhome=lcd_get_locked_pattern();
+    lcd_define_pattern(heuro, pattern_euro);
+    lcd_define_pattern(hhome, pattern_home);
 
     h=0;
     e=0;
@@ -427,7 +427,7 @@ enum plugin_status plugin_start(const void* parameter)
     load_config();
 
     /*Empty the event queue*/
-    rb->button_clear_queue();
+    button_clear_queue();
 
     display(e,h,false);
     show_abbrev();
@@ -436,7 +436,7 @@ enum plugin_status plugin_start(const void* parameter)
     /*Main loop*/
     while(end!=true)
     {
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button)
         {
             case BUTTON_MENU|BUTTON_REL:

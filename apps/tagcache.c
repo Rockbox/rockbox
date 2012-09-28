@@ -88,6 +88,8 @@
 #include "eeprom_settings.h"
 #endif
 
+#include "symbols.h"
+
 #ifdef __PCTOOL__
 #define yield() do { } while(0)
 #define sim_sleep(timeout) do { } while(0)
@@ -912,6 +914,7 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     
     return check_virtual_tags(tag, tcs->idx_id, &idx);
 }
+EXPORT_SYMBOL(tagcache_get_numeric);
 
 inline static bool str_ends_with(const char *str1, const char *str2)
 {
@@ -1372,6 +1375,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     
     return true;
 }
+EXPORT_SYMBOL(tagcache_search);
 
 void tagcache_search_set_uniqbuf(struct tagcache_search *tcs,
                                  void *buffer, long length)
@@ -1396,6 +1400,7 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
 
     return true;
 }
+EXPORT_SYMBOL(tagcache_search_add_filter);
 
 bool tagcache_search_add_clause(struct tagcache_search *tcs,
                                 struct tagcache_search_clause *clause)
@@ -1609,6 +1614,7 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     
     return false;
 }
+EXPORT_SYMBOL(tagcache_get_next);
 
 bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
                        int tag, char *buf, long size)
@@ -1621,6 +1627,7 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     
     return retrieve(tcs, &idx, tag, buf, size);
 }
+EXPORT_SYMBOL(tagcache_retrieve);
 
 static bool update_master_header(void)
 {
@@ -1673,6 +1680,7 @@ void tagcache_search_finish(struct tagcache_search *tcs)
     if (write_lock > 0)
         write_lock--;
 }
+EXPORT_SYMBOL(tagcache_search_finish);
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static struct tagfile_entry *get_tag(const struct index_entry *entry, int tag)
@@ -1760,6 +1768,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     
     return true;
 }
+EXPORT_SYMBOL(tagcache_fill_tags);
 #endif
 
 static inline void write_item(const char *item)

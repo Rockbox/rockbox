@@ -136,7 +136,7 @@ static const char* kb_list_cb(int selected_item, void *data,
     if (!entry)
         return NULL;
 
-    rb->snprintf(buffer, buffer_len, "%s", entry->title);
+    snprintf(buffer, buffer_len, "%s", entry->title);
 
     return buffer;
 }
@@ -171,7 +171,7 @@ static void delete_entry(int selected_item)
     entry2->password[0] = '\0';
     entry2->next = NULL;
 
-    rb->gui_synclist_set_nb_items(&kb_list, --pw_list.num_entries);
+    gui_synclist_set_nb_items(&kb_list, --pw_list.num_entries);
     if(!pw_list.num_entries)
         init_ll();
     data_changed = true;
@@ -186,26 +186,26 @@ static void add_entry(int selected_item)
 
     if (MAX_ENTRIES == i)
     {
-        rb->splash(HZ, "Password list full");
+        splash(HZ, "Password list full");
         return;
     }
 
-    rb->splash(HZ, "Enter title");
+    splash(HZ, "Enter title");
     pw_list.entries[i].title[0] = '\0';
-    if (rb->kbd_input(pw_list.entries[i].title, FIELD_LEN) < 0)
+    if (kbd_input(pw_list.entries[i].title, FIELD_LEN) < 0)
         return;
 
-    rb->splash(HZ, "Enter name");
+    splash(HZ, "Enter name");
     pw_list.entries[i].name[0] = '\0';
-    if (rb->kbd_input(pw_list.entries[i].name, FIELD_LEN) < 0)
+    if (kbd_input(pw_list.entries[i].name, FIELD_LEN) < 0)
     {
         pw_list.entries[i].title[0] = '\0';
         return;
     }
 
-    rb->splash(HZ, "Enter password");
+    splash(HZ, "Enter password");
     pw_list.entries[i].password[0] = '\0';
-    if (rb->kbd_input(pw_list.entries[i].password, FIELD_LEN) < 0)
+    if (kbd_input(pw_list.entries[i].password, FIELD_LEN) < 0)
     {
         pw_list.entries[i].title[0] = '\0';
         pw_list.entries[i].name[0] = '\0';
@@ -218,7 +218,7 @@ static void add_entry(int selected_item)
             entry = entry->next;
     }
 
-    rb->gui_synclist_set_nb_items(&kb_list, ++pw_list.num_entries);
+    gui_synclist_set_nb_items(&kb_list, ++pw_list.num_entries);
 
     pw_list.entries[i].used = true;
     pw_list.entries[i].next = entry->next;
@@ -240,7 +240,7 @@ static void edit_title(int selected_item)
         if (entry->next)
             entry = entry->next;
     }
-    if (rb->kbd_input(entry->title, FIELD_LEN) == 0)
+    if (kbd_input(entry->title, FIELD_LEN) == 0)
         data_changed = true;
 }
 
@@ -253,7 +253,7 @@ static void edit_name(int selected_item)
         if (entry->next)
             entry = entry->next;
     }
-    if (rb->kbd_input(entry->name, FIELD_LEN) == 0)
+    if (kbd_input(entry->name, FIELD_LEN) == 0)
         data_changed = true;
 }
 
@@ -266,7 +266,7 @@ static void edit_pw(int selected_item)
         if (entry->next)
             entry = entry->next;
     }
-    if (rb->kbd_input(entry->password, FIELD_LEN) == 0)
+    if (kbd_input(entry->password, FIELD_LEN) == 0)
         data_changed = true;
 }
 
@@ -276,7 +276,7 @@ static void context_menu(int selected_item)
     bool exit = false;
 
     do {
-        result = rb->do_menu(&context_m, &selection, NULL, false);
+        result = do_menu(&context_m, &selection, NULL, false);
         switch (result) {
         case 0:
             add_entry(selected_item);
@@ -300,7 +300,7 @@ static void context_menu(int selected_item)
             exit = true;
             break;
         }
-        rb->yield();
+        yield();
     } while (!exit);
 }
 
@@ -315,10 +315,10 @@ static void splash_pw(int selected_item)
             entry = entry->next;
     }
     if (entry->name != '\0')
-        rb->splashf(0, "%s  %s", entry->name, entry->password);
+        splashf(0, "%s  %s", entry->name, entry->password);
     else
-        rb->splashf(0, "%s", entry->password);
-    rb->get_action(CONTEXT_STD, TIMEOUT_BLOCK);
+        splashf(0, "%s", entry->password);
+    get_action(CONTEXT_STD, TIMEOUT_BLOCK);
 }
 
 static void hash_pw(union hash *out)
@@ -327,7 +327,7 @@ static void hash_pw(union hash *out)
     struct md5_s pw_md5;
 
     InitMD5(&pw_md5);
-    AddMD5(&pw_md5, master_pw, rb->strlen(master_pw));
+    AddMD5(&pw_md5, master_pw, strlen(master_pw));
     EndMD5(&pw_md5);
 
     for (i = 0; i < 4; i++)
@@ -339,14 +339,14 @@ static void make_key(void)
     int i;
     char buf[sizeof(master_pw) + sizeof(salt) + 1] = {0};
     struct md5_s key_md5;
-    size_t len = rb->strlen(master_pw);
+    size_t len = strlen(master_pw);
 
-    rb->strlcpy(buf, master_pw, sizeof(buf));
+    strlcpy(buf, master_pw, sizeof(buf));
 
-    rb->memcpy(&buf[len], &salt, sizeof(salt));
+    memcpy(&buf[len], &salt, sizeof(salt));
 
     InitMD5(&key_md5);
-    AddMD5(&key_md5, buf, rb->strlen(buf));
+    AddMD5(&key_md5, buf, strlen(buf));
     EndMD5(&key_md5);
 
     for (i = 0; i < 4; i++)
@@ -360,7 +360,7 @@ static void decrypt_buffer(char *buf, size_t size, uint32_t *key)
 
     for (i = 0; i < size/BLOCK_SIZE; i++)
     {
-        rb->memcpy(&block[0], &buf[i*BLOCK_SIZE], sizeof(block));
+        memcpy(&block[0], &buf[i*BLOCK_SIZE], sizeof(block));
 
         block[0] = letoh32(block[0]);
         block[1] = letoh32(block[1]);
@@ -371,7 +371,7 @@ static void decrypt_buffer(char *buf, size_t size, uint32_t *key)
         block[0] = letoh32(block[0]);
         block[1] = letoh32(block[1]);
 
-        rb->memcpy(&buf[i*BLOCK_SIZE], &block[0], sizeof(block));
+        memcpy(&buf[i*BLOCK_SIZE], &block[0], sizeof(block));
     }
 }
 
@@ -382,7 +382,7 @@ static void encrypt_buffer(char *buf, size_t size, uint32_t *key)
 
     for (i = 0; i < size/BLOCK_SIZE; i++)
     {
-        rb->memcpy(&block[0], &buf[i*BLOCK_SIZE], sizeof(block));
+        memcpy(&block[0], &buf[i*BLOCK_SIZE], sizeof(block));
 
         /* byte swap one block */
         block[0] = htole32(block[0]);
@@ -393,7 +393,7 @@ static void encrypt_buffer(char *buf, size_t size, uint32_t *key)
         block[0] = htole32(block[0]);
         block[1] = htole32(block[1]);
 
-        rb->memcpy(&buf[i*BLOCK_SIZE], &block[0], sizeof(block));
+        memcpy(&buf[i*BLOCK_SIZE], &block[0], sizeof(block));
     }
 }
 
@@ -405,46 +405,46 @@ static int parse_buffer(void)
     char *start, *end;
     start = &buffer[HEADER_LEN];
 
-    rb->memcpy(&salt, &buffer[0], sizeof(salt));
+    memcpy(&salt, &buffer[0], sizeof(salt));
     make_key();
 
     decrypt_buffer(&buffer[8], bytes_read - 8, &key.words[0]);
 
-    if (rb->memcmp(&buffer[8], &pwhash, sizeof(union hash)))
+    if (memcmp(&buffer[8], &pwhash, sizeof(union hash)))
     {
-        rb->splash(HZ*2, "Wrong password");
+        splash(HZ*2, "Wrong password");
         return -1;
     }
 
     for (i = 0; i < MAX_ENTRIES; i++)
     {
-        end = rb->strchr(start, '\0'); /* find eol */
+        end = strchr(start, '\0'); /* find eol */
         len = end - &buffer[HEADER_LEN];
         if ((len > bytes_read + HEADER_LEN) || start == end)
         {
             break;
         }
 
-        rb->strlcpy(entry->title, start, FIELD_LEN);
+        strlcpy(entry->title, start, FIELD_LEN);
         start = end + 1;
 
-        end = rb->strchr(start, '\0'); /* find eol */
+        end = strchr(start, '\0'); /* find eol */
         len = end - &buffer[HEADER_LEN];
         if (len > bytes_read + HEADER_LEN)
         {
             break;
         }
 
-        rb->strlcpy(entry->name, start, FIELD_LEN);
+        strlcpy(entry->name, start, FIELD_LEN);
         start = end + 1;
 
-        end = rb->strchr(start, '\0'); /* find eol */
+        end = strchr(start, '\0'); /* find eol */
         len = end - &buffer[HEADER_LEN];
         if (len > bytes_read + HEADER_LEN)
         {
             break;
         }
-        rb->strlcpy(entry->password, start, FIELD_LEN);
+        strlcpy(entry->password, start, FIELD_LEN);
         start = end + 1;
         entry->used = true;
         if (i + 1 < MAX_ENTRIES - 1)
@@ -459,7 +459,7 @@ static int parse_buffer(void)
     }
     entry->next = NULL;
     pw_list.num_entries = i;
-    rb->gui_synclist_set_nb_items(&kb_list, pw_list.num_entries);
+    gui_synclist_set_nb_items(&kb_list, pw_list.num_entries);
     return 0;
 }
 
@@ -469,19 +469,19 @@ static void write_output(int fd)
     size_t len, size;
     char *p = &buffer[HEADER_LEN]; /* reserve space for salt + hash */
 
-    rb->memcpy(&buffer[8], &pwhash, sizeof(union hash));
+    memcpy(&buffer[8], &pwhash, sizeof(union hash));
     struct pw_entry *entry = pw_list.first.next;
 
     for (i = 0; i < pw_list.num_entries; i++)
     {
-        len = rb->strlen(entry->title);
-        rb->strlcpy(p, entry->title, len+1);
+        len = strlen(entry->title);
+        strlcpy(p, entry->title, len+1);
         p += len+1;
-        len = rb->strlen(entry->name);
-        rb->strlcpy(p, entry->name, len+1);
+        len = strlen(entry->name);
+        strlcpy(p, entry->name, len+1);
         p += len+1;
-        len = rb->strlen(entry->password);
-        rb->strlcpy(p, entry->password, len+1);
+        len = strlen(entry->password);
+        strlcpy(p, entry->password, len+1);
         p += len+1;
         if (entry->next)
             entry = entry->next;
@@ -491,46 +491,46 @@ static void write_output(int fd)
     /* round up to a number divisible by BLOCK_SIZE */
     size = ((p - buffer + BLOCK_SIZE - 1) / BLOCK_SIZE) * BLOCK_SIZE;
 
-    salt = rb->rand();
+    salt = rand();
     make_key();
 
     encrypt_buffer(&buffer[8], size, &key.words[0]);
-    rb->memcpy(&buffer[0], &salt, sizeof(salt));
+    memcpy(&buffer[0], &salt, sizeof(salt));
 
-    rb->write(fd, &buffer, size);
+    write(fd, &buffer, size);
 }
 
 static int enter_pw(char *pw_buf, size_t buflen, bool new_pw)
 {
     char buf[2][sizeof(master_pw)];
-    rb->memset(buf, 0, sizeof(buf));
-    rb->memset(master_pw, 0, sizeof(master_pw));
+    memset(buf, 0, sizeof(buf));
+    memset(master_pw, 0, sizeof(master_pw));
 
     if (new_pw)
     {
-        rb->splash(HZ, "Enter new master password");
-        if (rb->kbd_input(buf[0], sizeof(buf[0])) < 0)
+        splash(HZ, "Enter new master password");
+        if (kbd_input(buf[0], sizeof(buf[0])) < 0)
             return -1;
 
-        rb->splash(HZ, "Confirm master password");
-        if (rb->kbd_input(buf[1], sizeof(buf[1])) < 0)
+        splash(HZ, "Confirm master password");
+        if (kbd_input(buf[1], sizeof(buf[1])) < 0)
             return -1;
 
-        if (rb->strcmp(buf[0], buf[1]))
+        if (strcmp(buf[0], buf[1]))
         {
-            rb->splash(HZ, "Password mismatch");
+            splash(HZ, "Password mismatch");
             return -1;
         }
         else
         {
-            rb->strlcpy(pw_buf, buf[0], buflen);
+            strlcpy(pw_buf, buf[0], buflen);
             hash_pw(&pwhash);
             return 0;
         }
     }
 
-    rb->splash(HZ, "Enter master password");
-    if (rb->kbd_input(pw_buf, buflen) < 0)
+    splash(HZ, "Enter master password");
+    if (kbd_input(pw_buf, buflen) < 0)
         return -1;
     hash_pw(&pwhash);
     return 0;
@@ -539,7 +539,7 @@ static int enter_pw(char *pw_buf, size_t buflen, bool new_pw)
 static int keybox(void)
 {
     int button, fd;
-    bool new_file = !rb->file_exists(KEYBOX_FILE);
+    bool new_file = !file_exists(KEYBOX_FILE);
     bool done = false;
 
     if (enter_pw(master_pw, sizeof (master_pw), new_file))
@@ -548,12 +548,12 @@ static int keybox(void)
     /* Read the existing file */
     if (!new_file)
     {
-        fd = rb->open(KEYBOX_FILE, O_RDONLY);
+        fd = open(KEYBOX_FILE, O_RDONLY);
         if (fd < 0)
             return FILE_OPEN_ERROR;
-        bytes_read = rb->read(fd, &buffer, sizeof(buffer));
+        bytes_read = read(fd, &buffer, sizeof(buffer));
 
-        rb->close(fd);
+        close(fd);
 
         if (parse_buffer())
             return 0;
@@ -561,33 +561,33 @@ static int keybox(void)
 
     while (!done)
     {
-        rb->gui_synclist_draw(&kb_list);
-        button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&kb_list, &button, LIST_WRAP_ON))
+        gui_synclist_draw(&kb_list);
+        button = get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
+        if (gui_synclist_do_button(&kb_list, &button, LIST_WRAP_ON))
             continue;
 
         switch (button)
         {
             case ACTION_STD_OK:
-                splash_pw(rb->gui_synclist_get_sel_pos(&kb_list));
+                splash_pw(gui_synclist_get_sel_pos(&kb_list));
                 break;
             case ACTION_STD_CONTEXT:
-                context_menu(rb->gui_synclist_get_sel_pos(&kb_list));
+                context_menu(gui_synclist_get_sel_pos(&kb_list));
                 break;
             case ACTION_STD_CANCEL:
                 done = true;
                 break;
         }
-        rb->yield();
+        yield();
     }
 
     if (data_changed)
     {
-        fd = rb->open(KEYBOX_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        fd = open(KEYBOX_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0)
             return FILE_OPEN_ERROR;
         write_output(fd);
-        rb->close(fd);
+        close(fd);
     }
 
     return 0;
@@ -602,12 +602,12 @@ static void reset(void)
     static const struct text_message message={message_lines, 2};
     static const struct text_message yes_message={yes_lines, 1};
 
-    if(rb->gui_syncyesno_run(&message, &yes_message, NULL) == YESNO_YES)
+    if(gui_syncyesno_run(&message, &yes_message, NULL) == YESNO_YES)
     {
-        rb->remove(KEYBOX_FILE);
-        rb->memset(&buffer, 0, sizeof(buffer));
-        rb->memset(&pw_list, 0, sizeof(pw_list));
-        rb->gui_synclist_set_nb_items(&kb_list, 0);
+        remove(KEYBOX_FILE);
+        memset(&buffer, 0, sizeof(buffer));
+        memset(&pw_list, 0, sizeof(pw_list));
+        gui_synclist_set_nb_items(&kb_list, 0);
         init_ll();
     }
 }
@@ -622,7 +622,7 @@ static int main_menu(void)
                         "Playback Control", "Exit");
 
     do {
-        result = rb->do_menu(&menu, &selection, NULL, false);
+        result = do_menu(&menu, &selection, NULL, false);
         switch (result) {
         case 0:
             ret = keybox();
@@ -639,7 +639,7 @@ static int main_menu(void)
             exit = true;
             break;
         }
-        rb->yield();
+        yield();
     } while (!exit);
 
     return 0;
@@ -650,13 +650,13 @@ enum plugin_status plugin_start(const void *parameter)
     (void)parameter;
     int ret;
 
-    rb->gui_synclist_init(&kb_list, &kb_list_cb, NULL, false, 1, NULL);
+    gui_synclist_init(&kb_list, &kb_list_cb, NULL, false, 1, NULL);
 
-    rb->gui_synclist_set_title(&kb_list, "Keybox", NOICON);
-    rb->gui_synclist_set_icon_callback(&kb_list, NULL);
-    rb->gui_synclist_set_nb_items(&kb_list, 0);
-    rb->gui_synclist_limit_scroll(&kb_list, false);
-    rb->gui_synclist_select_item(&kb_list, 0);
+    gui_synclist_set_title(&kb_list, "Keybox", NOICON);
+    gui_synclist_set_icon_callback(&kb_list, NULL);
+    gui_synclist_set_nb_items(&kb_list, 0);
+    gui_synclist_limit_scroll(&kb_list, false);
+    gui_synclist_select_item(&kb_list, 0);
 
     init_ll();
     ret = main_menu();
@@ -664,7 +664,7 @@ enum plugin_status plugin_start(const void *parameter)
     switch (ret)
     {
         case FILE_OPEN_ERROR:
-            rb->splash(HZ*2, "Error opening file");
+            splash(HZ*2, "Error opening file");
             return PLUGIN_ERROR;
     }
 

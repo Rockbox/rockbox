@@ -179,23 +179,23 @@ void audio_thread_exit(void);
 
 /* For stream use only */
 static inline bool str_have_msg(struct stream *str)
-    { return !rb->queue_empty(str->hdr.q); }
+    { return !queue_empty(str->hdr.q); }
 
 static inline void str_get_msg(struct stream *str, struct queue_event *ev)
-    { rb->queue_wait(str->hdr.q, ev); }
+    { queue_wait(str->hdr.q, ev); }
 
 static inline void str_get_msg_w_tmo(struct stream *str, struct queue_event *ev,
                                      int timeout)
-    { rb->queue_wait_w_tmo(str->hdr.q, ev, timeout); }
+    { queue_wait_w_tmo(str->hdr.q, ev, timeout); }
 
 static inline void str_reply_msg(struct stream *str, intptr_t reply)
-    { rb->queue_reply(str->hdr.q, reply); }
+    { queue_reply(str->hdr.q, reply); }
 
 /* Public use */
 static inline intptr_t str_send_msg(struct stream *str, long id, intptr_t data)
-    { return rb->queue_send(str->hdr.q, id, data); }
+    { return queue_send(str->hdr.q, id, data); }
 
 static inline void str_post_msg(struct stream *str, long id, intptr_t data)
-    { rb->queue_post(str->hdr.q, id, data); }
+    { queue_post(str->hdr.q, id, data); }
 
 #endif /* STREAM_THREAD_H */

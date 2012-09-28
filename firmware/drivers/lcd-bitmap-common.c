@@ -286,6 +286,7 @@ void LCDFN(putsxy)(int x, int y, const unsigned char *str)
 {
     LCDFN(putsxyofs)(x, y, 0, str);
 }
+EXPORT_SYMBOL(lcd_putsxy);
 
 /* Formatting version of LCDFN(putsxy) */
 void LCDFN(putsxyf)(int x, int y, const unsigned char *fmt, ...)
@@ -297,6 +298,7 @@ void LCDFN(putsxyf)(int x, int y, const unsigned char *fmt, ...)
     va_end(ap);
     LCDFN(putsxy)(x, y, buf);
 }
+EXPORT_SYMBOL(lcd_putsxyf);
 
 static void LCDFN(putsxyofs_style)(int xpos, int ypos,
                                    const unsigned char *str, int style,
@@ -385,6 +387,7 @@ void LCDFN(puts)(int x, int y, const unsigned char *str)
 {
     LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, 0);
 }
+EXPORT_SYMBOL(lcd_puts);
 
 /* Formatting version of LCDFN(puts) */
 void LCDFN(putsf)(int x, int y, const unsigned char *fmt, ...)
@@ -396,11 +399,13 @@ void LCDFN(putsf)(int x, int y, const unsigned char *fmt, ...)
     va_end(ap);
     LCDFN(puts)(x, y, buf);
 }
+EXPORT_SYMBOL(lcd_putsf);
 
 void LCDFN(puts_style)(int x, int y, const unsigned char *str, int style)
 {
     LCDFN(puts_style_offset)(x, y, str, style, 0);
 }
+EXPORT_SYMBOL(lcd_puts_style);
 
 void LCDFN(puts_offset)(int x, int y, const unsigned char *str, int offset)
 {
@@ -510,12 +515,14 @@ void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 {
     LCDFN(puts_scroll_style)(x, y, string, STYLE_DEFAULT);
 }
+EXPORT_SYMBOL(lcd_puts_scroll);
 
 void LCDFN(puts_scroll_style)(int x, int y, const unsigned char *string,
                               int style)
 {
      LCDFN(puts_scroll_style_offset)(x, y, string, style, 0);
 }
+EXPORT_SYMBOL(lcd_puts_scroll_style);
 
 void LCDFN(puts_scroll_offset)(int x, int y, const unsigned char *string,
                                int offset)

@@ -112,13 +112,13 @@ enum plugin_status plugin_start(const void* parameter)
     /* standard stuff */
     (void)parameter;
     
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
+    gbuf = (unsigned char *) plugin_get_buffer(&gbuf_size);
 
     if (!grey_init(gbuf, gbuf_size,
                    GREY_BUFFERED|GREY_RAWMAPPED|GREY_ON_COP,
                    LCD_WIDTH, LCD_HEIGHT, NULL))
     {
-        rb->splash(HZ, "Not enough memory.");
+        splash(HZ, "Not enough memory.");
         return PLUGIN_ERROR;
     }
     for (i = 0; i <= STEPS; i++)
@@ -130,7 +130,7 @@ enum plugin_status plugin_start(const void* parameter)
     grey_clear_display();
     grey_show(true);
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     while (!done)
     {
@@ -188,28 +188,28 @@ enum plugin_status plugin_start(const void* parameter)
             case GREY_OK:
 
                 /* dump result in form suitable for lcdlinear[] */
-                rb->create_numbered_filename(filename, HOME_DIR, "test_grey_",
+                create_numbered_filename(filename, HOME_DIR, "test_grey_",
                                              ".txt", 2 IF_CNFN_NUM_(, NULL));
-                fd = rb->open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
+                fd = open(filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
                 if (fd >= 0)
                 {
-                    rb->fdprintf(fd, "Adjusted grey shades\n");
+                    fdprintf(fd, "Adjusted grey shades\n");
                     for (i = 0; i <= STEPS; i++)
-                         rb->fdprintf(fd, "%3d: %3d\n", input_levels[i],
+                         fdprintf(fd, "%3d: %3d\n", input_levels[i],
                                       lcd_levels[i]);
-                    rb->fdprintf(fd,"\n\nInterpolated lcdlinear matrix\n");
+                    fdprintf(fd,"\n\nInterpolated lcdlinear matrix\n");
 
                     for (i = 1; i <= STEPS; i++)
                     {
                         for (j=0; j < STEPS; j++)
                         {
-                            rb->fdprintf(fd, "%3d, ", 
+                            fdprintf(fd, "%3d, ", 
                                 lcd_levels[i-1] + 
                                 ((lcd_levels[i] - lcd_levels[i-1])*j)/STEPS);
                         }
-                        rb->fdprintf(fd, "\n");
+                        fdprintf(fd, "\n");
                     }
-                    rb->close(fd);
+                    close(fd);
                 }
                 /* fall through */
 

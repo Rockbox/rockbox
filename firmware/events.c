@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include "events.h"
 #include "panic.h"
+#include "symbols.h"
 
 #define MAX_SYS_EVENTS 28
 
@@ -59,6 +60,7 @@ bool add_event(unsigned short id, bool oneshot, void (*handler)(void *data))
     panicf("event line full");
     return false;
 }
+EXPORT_SYMBOL(add_event);
 
 void remove_event(unsigned short id, void (*handler)(void *data))
 {
@@ -73,6 +75,7 @@ void remove_event(unsigned short id, void (*handler)(void *data))
         }
     }
 }
+EXPORT_SYMBOL(remove_event);
 
 void send_event(unsigned short id, void *data)
 {
@@ -89,4 +92,4 @@ void send_event(unsigned short id, void *data)
         }
     }
 }
-
+EXPORT_SYMBOL(send_event);

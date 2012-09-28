@@ -102,6 +102,7 @@ void lcd_hline(int x1, int x2, int y)
     }
     while (dst <= dst_end);
 }
+EXPORT_SYMBOL(lcd_hline);
 
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
@@ -198,6 +199,7 @@ void lcd_vline(int x, int y1, int y2)
         break;
     }
 }
+EXPORT_SYMBOL(lcd_vline);
 
 /* Draw a partial native bitmap */
 void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
@@ -272,6 +274,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     }
     while (dst < dst_end);
 }
+EXPORT_SYMBOL(lcd_bitmap_part);
 
 /* Draw a partial native bitmap */
 void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
@@ -353,3 +356,4 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     }
     while (dst < dst_end);
 }
+EXPORT_SYMBOL(lcd_bitmap_transparent_part);

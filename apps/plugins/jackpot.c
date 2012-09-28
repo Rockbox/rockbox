@@ -113,7 +113,7 @@ static void patterns_deinit(struct screen* display)
 static void jackpot_exit(void)
 {
 #ifdef HAVE_LCD_CHARCELLS
-    patterns_deinit(rb->screens[SCREEN_MAIN]);
+    patterns_deinit(screens[SCREEN_MAIN]);
 #endif /* HAVE_LCD_CHARCELLS */
 }
 
@@ -121,7 +121,7 @@ static void jackpot_init(struct jackpot* game)
 {
     game->money=20;
     for(int i=0;i<NB_SLOTS;i++){
-        game->slot_state[i]=(rb->rand()%NB_PICTURES)*PICTURE_ROTATION_STEPS;
+        game->slot_state[i]=(rand()%NB_PICTURES)*PICTURE_ROTATION_STEPS;
         FOR_NB_SCREENS(j)
             game->state_y[j][i]=-1;
     }
@@ -202,11 +202,11 @@ static void jackpot_display_slot_machine(struct jackpot* game, struct screen* di
     }
     if(changes){
 #ifdef HAVE_LCD_CHARCELLS
-        rb->snprintf(str,sizeof(str),"$%d", game->money);
+        snprintf(str,sizeof(str),"$%d", game->money);
         display->putchar(++i, 0, ']');
         display->puts(++i, 0, str);
 #else
-        rb->snprintf(str,sizeof(str),"money : $%d", game->money);
+        snprintf(str,sizeof(str),"money : $%d", game->money);
         display->puts(0, 0, str);
 #endif
         display->update();
@@ -224,7 +224,7 @@ static void jackpot_info_message(struct screen* display, char* message)
     display->getstringsize(message, &message_width, &message_height);
     xpos=(display->getwidth()-message_width)/2;
     ypos=display->getheight()-message_height;
-    rb->screen_clear_area(display, 0, ypos, display->getwidth(),
+    screen_clear_area(display, 0, ypos, display->getwidth(),
                           message_height);
     display->putsxy(xpos,ypos,message);
     display->update();
@@ -243,7 +243,7 @@ static void jackpot_print_turn_result(struct jackpot* game,
     }
     else
     {
-        rb->snprintf(str,sizeof(str),"You win %d$",gain);
+        snprintf(str,sizeof(str),"You win %d$",gain);
         jackpot_info_message(display, str);
     }
     display->update();
@@ -259,13 +259,13 @@ static void jackpot_play_turn(struct jackpot* game)
     game->money--;
     for(int i=0;i<NB_SLOTS;i++)
     {
-        nb_turns[i]=(rb->rand()%15+5)*PICTURE_ROTATION_STEPS;
+        nb_turns[i]=(rand()%15+5)*PICTURE_ROTATION_STEPS;
         turns_remaining+=nb_turns[i];
     }
     FOR_NB_SCREENS(d)
     {
-        rb->screens[d]->clear_display();
-        jackpot_info_message(rb->screens[d],"Good luck");
+        screens[d].clear_display();
+        jackpot_info_message(&screens[d],"Good luck");
     }
     /* Jackpot Animation */
     while(turns_remaining>0)
@@ -282,14 +282,14 @@ static void jackpot_play_turn(struct jackpot* game)
             }
         }
         FOR_NB_SCREENS(d)
-            jackpot_display_slot_machine(game, rb->screens[d]);
-        rb->sleep(SLEEP_TIME);
+            jackpot_display_slot_machine(game, &screens[d]);
+        sleep(SLEEP_TIME);
     }
     gain=jackpot_get_gain(game);
     if(gain!=0)
         game->money+=gain;
     FOR_NB_SCREENS(d)
-        jackpot_print_turn_result(game, gain, rb->screens[d]);
+        jackpot_print_turn_result(game, gain, &screens[d]);
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -298,18 +298,18 @@ enum plugin_status plugin_start(const void* parameter)
     struct jackpot game;
     (void)parameter;
     atexit(jackpot_exit);
-    rb->srand(*rb->current_tick);
+    srand(current_tick);
 #ifdef HAVE_LCD_CHARCELLS
-    patterns_init(rb->screens[SCREEN_MAIN]);
+    patterns_init(screens[SCREEN_MAIN]);
 #endif /* HAVE_LCD_CHARCELLS */
     jackpot_init(&game);
 
     FOR_NB_SCREENS(i){
-        rb->screens[i]->clear_display();
-        jackpot_display_slot_machine(&game, rb->screens[i]);
+        screens[i].clear_display();
+        jackpot_display_slot_machine(&game, &screens[i]);
     }
     /*Empty the event queue*/
-    rb->button_clear_queue();
+    button_clear_queue();
     while (true)
     {
         action = pluginlib_getaction(TIMEOUT_BLOCK,

@@ -74,17 +74,17 @@ static bool loadFile( const char * name, unsigned char * buf, int len )
 {
     char filename[MAX_PATH];
 
-    rb->snprintf(filename,sizeof(filename), ROCKBOX_DIR "/pacman/%s",name);
+    snprintf(filename,sizeof(filename), ROCKBOX_DIR "/pacman/%s",name);
 
-    int fd = rb->open( filename, O_RDONLY);
+    int fd = open( filename, O_RDONLY);
 
     if( fd < 0 ) {
         return false;
     }
 
-    int n = rb->read( fd, buf, len);
+    int n = read( fd, buf, len);
 
-    rb->close( fd );
+    close( fd );
 
     if( n != len ) {
         return false;
@@ -192,20 +192,20 @@ static bool pacbox_menu(void)
                         "Ghost Names", "Display FPS", "Sound",
                         "Restart", "Quit");
 
-    rb->button_clear_queue();
+    button_clear_queue();
     
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
+    lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
     while (!menu_quit) {
-        result=rb->do_menu(&menu, &selected, NULL, false);
+        result=do_menu(&menu, &selected, NULL, false);
 
         switch(result)
         {
             case PBMI_DIFFICULTY:
                 new_setting=settings.difficulty;
-                rb->set_option("Difficulty", &new_setting, INT,
+                set_option("Difficulty", &new_setting, INT,
                                difficulty_options , 2, NULL);
                 if (new_setting != settings.difficulty) {
                     settings.difficulty=new_setting;
@@ -214,7 +214,7 @@ static bool pacbox_menu(void)
                 break;
             case PBMI_PACMEN_PER_GAME:
                 new_setting=settings.numlives;
-                rb->set_option("Pacmen Per Game", &new_setting, INT,
+                set_option("Pacmen Per Game", &new_setting, INT,
                                numlives_options , 4, NULL);
                 if (new_setting != settings.numlives) {
                     settings.numlives=new_setting;
@@ -223,7 +223,7 @@ static bool pacbox_menu(void)
                 break;
             case PBMI_BONUS_LIFE:
                 new_setting=settings.bonus;
-                rb->set_option("Bonus Life", &new_setting, INT,
+                set_option("Bonus Life", &new_setting, INT,
                                bonus_options , 4, NULL);
                 if (new_setting != settings.bonus) {
                     settings.bonus=new_setting;
@@ -232,7 +232,7 @@ static bool pacbox_menu(void)
                 break;
             case PBMI_GHOST_NAMES:
                 new_setting=settings.ghostnames;
-                rb->set_option("Ghost Names", &new_setting, INT,
+                set_option("Ghost Names", &new_setting, INT,
                                ghostname_options , 2, NULL);
                 if (new_setting != settings.ghostnames) {
                     settings.ghostnames=new_setting;
@@ -240,11 +240,11 @@ static bool pacbox_menu(void)
                 }
                 break;
             case PBMI_DISPLAY_FPS:
-                rb->set_option("Display FPS",&settings.showfps,INT,
+                set_option("Display FPS",&settings.showfps,INT,
                                noyes, 2, NULL);
                 break;
             case PBMI_SOUND:
-                rb->set_option("Sound",&settings.sound, INT,
+                set_option("Sound",&settings.sound, INT,
                                noyes, 2, NULL);
                 break;
             case PBMI_RESTART:
@@ -258,7 +258,7 @@ static bool pacbox_menu(void)
     }
     
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_PAL256);
+    lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
     if (need_restart) {
@@ -322,24 +322,24 @@ static void start_sound(void)
 
 #ifndef PLUGIN_USE_IRAM    
     /* Ensure control of PCM - stopping music isn't obligatory */
-    rb->plugin_get_audio_buffer(NULL);
+    plugin_get_audio_buffer(NULL);
 #endif
 
     /* Get the closest rate >= to what is preferred */
-    sr_index = rb->round_value_to_list32(PREFERRED_SAMPLING_RATE,
-                        rb->hw_freq_sampr, HW_NUM_FREQ, false);
+    sr_index = round_value_to_list32(PREFERRED_SAMPLING_RATE,
+                        hw_freq_sampr, HW_NUM_FREQ, false);
 
-    if (rb->hw_freq_sampr[sr_index] < PREFERRED_SAMPLING_RATE
+    if (hw_freq_sampr[sr_index] < PREFERRED_SAMPLING_RATE
         && sr_index > 0)
     {
         /* Round up */
         sr_index--;
     }
 
-    wsg3_set_sampling_rate(rb->hw_freq_sampr[sr_index]);
+    wsg3_set_sampling_rate(hw_freq_sampr[sr_index]);
 
-    rb->pcm_set_frequency(rb->hw_freq_sampr[sr_index]);
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    pcm_set_frequency(hw_freq_sampr[sr_index]);
+    pcm_play_data(get_more, NULL, NULL, 0);
 
     sound_playing = true;
 }
@@ -352,8 +352,8 @@ static void stop_sound(void)
     if (!sound_playing)
         return;
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_play_stop();
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
 
     sound_playing = false;
 }
@@ -380,10 +380,10 @@ static int gameProc( void )
         frame_counter++;
 
         /* Check the button status */
-        status = rb->button_status();
+        status = button_status();
 
 #ifdef HAS_BUTTON_HOLD
-        if (rb->button_hold())
+        if (button_hold())
         status = PACMAN_MENU;
 #endif
 
@@ -394,16 +394,16 @@ static int gameProc( void )
         ) {
             bool menu_res;
 
-            end_time = *rb->current_tick;
+            end_time = current_tick;
 
             stop_sound();
 
             menu_res = pacbox_menu();
 
-            rb->lcd_clear_display();
+            lcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
-            rb->lcd_remote_clear_display();
-            rb->lcd_remote_update();
+            lcd_remote_clear_display();
+            lcd_remote_update();
 #endif
             if (menu_res)
                 return 1;
@@ -411,7 +411,7 @@ static int gameProc( void )
             if (settings.sound)
                 start_sound();
 
-            start_time += *rb->current_tick-end_time;
+            start_time += current_tick-end_time;
         }
 
 #ifdef PACMAN_HAS_REMOTE
@@ -445,7 +445,7 @@ static int gameProc( void )
 
             if (yield_counter == FPS) {
                 yield_counter = 0;
-                rb->yield ();
+                yield ();
             }
 
             /* The following functions render the Pacman screen from the 
@@ -457,26 +457,26 @@ static int gameProc( void )
             renderSprites( video_buffer );
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-            rb->lcd_blit_pal256(    video_buffer, 0, 0, XOFS, YOFS, 
+            lcd_blit_pal256(    video_buffer, 0, 0, XOFS, YOFS, 
                                     ScreenWidth, ScreenHeight);
 #else
-            blit_display(rb->lcd_framebuffer,video_buffer);
+            blit_display(lcd_framebuffer,video_buffer);
 #endif
 
             if (settings.showfps) {
-                fps = (video_frames*HZ*100) / (*rb->current_tick-start_time);
-                rb->lcd_putsxyf(0,0,"%d.%02d / %d fps  ",fps/100,fps%100,FPS);
+                fps = (video_frames*HZ*100) / (current_tick-start_time);
+                lcd_putsxyf(0,0,"%d.%02d / %d fps  ",fps/100,fps%100,FPS);
             }
 
 #if !defined(HAVE_LCD_MODES) || \
     defined(HAVE_LCD_MODES) && !(HAVE_LCD_MODES & LCD_MODE_PAL256)
-            rb->lcd_update();
+            lcd_update();
 #endif
 
             /* Keep the framerate at Pacman's 60fps */
             end_time = start_time + (video_frames*HZ)/FPS;
-            while (TIME_BEFORE(*rb->current_tick,end_time)) {
-                rb->sleep(1);
+            while (TIME_BEFORE(current_tick,end_time)) {
+                sleep(1);
             }
         }
     }
@@ -491,13 +491,13 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_clear_display();
+    lcd_update();
 
     /* Set the default settings */
     settings.difficulty = 0; /* Normal */
@@ -527,32 +527,32 @@ enum plugin_status plugin_start(const void* parameter)
     init_PacmanMachine(settings_to_dip(settings));
     
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_PAL256);
+    lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
     /* Load the romset */
     if (loadROMS()) {
-        start_time = *rb->current_tick-1;
+        start_time = current_tick-1;
 
         gameProc();
 
         /* Save the user settings if they have changed */
-        if (rb->memcmp(&settings,&old_settings,sizeof(settings))!=0) {
-            rb->splash(0, "Saving settings...");
+        if (memcmp(&settings,&old_settings,sizeof(settings))!=0) {
+            splash(0, "Saving settings...");
             configfile_save(SETTINGS_FILENAME, config,
                             sizeof(config)/sizeof(*config),
                             SETTINGS_VERSION);
         }
     } else {
-        rb->splashf(HZ*2, "No ROMs in %s/pacman/", ROCKBOX_DIR);
+        splashf(HZ*2, "No ROMs in %s/pacman/", ROCKBOX_DIR);
     }
     
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    rb->lcd_set_mode(LCD_MODE_RGB565);
+    lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     return PLUGIN_OK;

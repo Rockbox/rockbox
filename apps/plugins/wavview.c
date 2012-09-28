@@ -115,50 +115,50 @@ static int readwavpeaks(const char *filename)
     uint32_t peakcount = 0;
     struct peakstruct* peak = NULL;
 
-    if(rb->strcasecmp (filename + rb->strlen (filename) - 3, "wav"))
+    if(strcasecmp (filename + strlen (filename) - 3, "wav"))
     {
-        rb->splash(HZ*2, "Only for wav files!");
+        splash(HZ*2, "Only for wav files!");
         return -1;
     }
 
-    file = rb->open(filename, O_RDONLY);
+    file = open(filename, O_RDONLY);
 
     if(file < 0)
     {
-        rb->splash(HZ*2, "Could not open file!");
+        splash(HZ*2, "Could not open file!");
         return -1;
     }
 
-    if(rb->read(file, &header, sizeof (header)) != sizeof (header))
+    if(read(file, &header, sizeof (header)) != sizeof (header))
     {
-        rb->splash(HZ*2, "Could not read file!");
-        rb->close (file);
+        splash(HZ*2, "Could not read file!");
+        close (file);
         return -1;
     }
 
     total_bytes_read += sizeof (header);
     little_endian_to_native(&header, WAV_HEADER_FORMAT);
 
-    if (rb->strncmp(header.chunkid, "RIFF", 4) ||
-        rb->strncmp(header.formatchunkid, "fmt ", 4) ||
-        rb->strncmp(header.datachunkid, "data", 4) ||
+    if (strncmp(header.chunkid, "RIFF", 4) ||
+        strncmp(header.formatchunkid, "fmt ", 4) ||
+        strncmp(header.datachunkid, "data", 4) ||
         (header.bitspersample != 16) ||
         header.audioformat != 1)
     {
-            rb->splash(HZ*2, "Incompatible wav file!");
-            rb->close (file);
+            splash(HZ*2, "Incompatible wav file!");
+            close (file);
             return -1;
     }
 
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "Viewing file:");
-    rb->lcd_puts_scroll(0, 1, (unsigned char *)filename);
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts(0, 0, "Viewing file:");
+    lcd_puts_scroll(0, 1, (unsigned char *)filename);
+    lcd_update();
 
-    rb->lcd_putsf(0, 2, "Channels: %s",
+    lcd_putsf(0, 2, "Channels: %s",
                            header.numchannels == 1 ? "mono" : "stereo");
-    rb->lcd_putsf(0, 3, "Bits/sample: %d", header.bitspersample);
-    rb->lcd_putsf(0, 4, "Samplerate: %"PRIu32" Hz", header.samplerate);
+    lcd_putsf(0, 3, "Bits/sample: %d", header.bitspersample);
+    lcd_putsf(0, 4, "Samplerate: %"PRIu32" Hz", header.samplerate);
 
     seconds = header.datachunksize / header.byterate;
     hours = seconds / 3600;
@@ -166,11 +166,11 @@ static int readwavpeaks(const char *filename)
     minutes = seconds / 60;
     seconds -= minutes * 60;
 
-    rb->lcd_putsf(0, 5, "Length (hh:mm:ss): %02d:%02d:%02d", hours,
+    lcd_putsf(0, 5, "Length (hh:mm:ss): %02d:%02d:%02d", hours,
                                                              minutes,
                                                              seconds);
-    rb->lcd_puts(0, 6, "Searching for peaks... ");
-    rb->lcd_update();
+    lcd_puts(0, 6, "Searching for peaks... ");
+    lcd_update();
 
     /* calculate room for peaks */
     filepeakcount = header.datachunksize /
@@ -184,19 +184,19 @@ static int readwavpeaks(const char *filename)
     while(total_bytes_read < (header.datachunksize +
                               sizeof(struct wav_header)))
     {
-        bytes_read = rb->read(file, &samples, sizeof(samples));
+        bytes_read = read(file, &samples, sizeof(samples));
         total_bytes_read += bytes_read;
 
         if(0 == bytes_read)
         {
-            rb->splash(HZ*2, "File read error!");
-            rb->close (file);
+            splash(HZ*2, "File read error!");
+            close (file);
             return -1;
         }
         if(((bytes_read/4)*4) != bytes_read)
         {
-            rb->splashf(HZ*2, "bytes_read/*4 err: %ld",(long int)bytes_read);
-            rb->close (file);
+            splashf(HZ*2, "bytes_read/*4 err: %ld",(long int)bytes_read);
+            close (file);
             return -1;
         }
 
@@ -240,24 +240,24 @@ static int readwavpeaks(const char *filename)
         }
 
         /* update progress */
-        rb->lcd_putsf(0, 6, "Searching for peaks... %"PRIu32"%%",
+        lcd_putsf(0, 6, "Searching for peaks... %"PRIu32"%%",
             (total_bytes_read / ((header.datachunksize +
                                  sizeof(struct wav_header)) / 100)));
-        rb->lcd_update();
+        lcd_update();
 
         /* allow user to abort */
-        if(ACTION_KBD_ABORT == rb->get_action(CONTEXT_KEYBOARD,TIMEOUT_NOBLOCK))
+        if(ACTION_KBD_ABORT == get_action(CONTEXT_KEYBOARD,TIMEOUT_NOBLOCK))
         {
-            rb->splash(HZ*2, "ABORTED");
-            rb->close (file);
+            splash(HZ*2, "ABORTED");
+            close (file);
             return -1;
         }
     }
 
-    rb->lcd_puts(0, 6, "Searching for peaks... done");
-    rb->lcd_update();
+    lcd_puts(0, 6, "Searching for peaks... done");
+    lcd_update();
 
-    rb->close (file);
+    close (file);
 
     return 0;
 }
@@ -273,28 +273,28 @@ static int displaypeaks(void)
     struct peakstruct* peak = (struct peakstruct*)audiobuf + leftmargin;
 
 #if LCD_DEPTH > 1
-    unsigned org_forecolor = rb->lcd_get_foreground();
-    rb->lcd_set_foreground(LCD_LIGHTGRAY);
+    unsigned org_forecolor = lcd_get_foreground();
+    lcd_set_foreground(LCD_LIGHTGRAY);
 #endif
 
     if(!zoomlevel) zoomlevel = 1;
     ppp = (mempeakcount / LCD_WIDTH) / zoomlevel;  /* peaks per pixel */
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
-    rb->lcd_hline(0, LCD_WIDTH-1, LEFTZERO - (0x8000 / YSCALE));
-    rb->lcd_hline(0, LCD_WIDTH-1, LEFTZERO);
-    rb->lcd_hline(0, LCD_WIDTH-1, LEFTZERO + (0x8000 / YSCALE));
-    rb->lcd_hline(0, LCD_WIDTH-1, RIGHTZERO - (0x8000 / YSCALE));
-    rb->lcd_hline(0, LCD_WIDTH-1, RIGHTZERO);
-    rb->lcd_hline(0, LCD_WIDTH-1, RIGHTZERO + (0x8000 / YSCALE));
+    lcd_hline(0, LCD_WIDTH-1, LEFTZERO - (0x8000 / YSCALE));
+    lcd_hline(0, LCD_WIDTH-1, LEFTZERO);
+    lcd_hline(0, LCD_WIDTH-1, LEFTZERO + (0x8000 / YSCALE));
+    lcd_hline(0, LCD_WIDTH-1, RIGHTZERO - (0x8000 / YSCALE));
+    lcd_hline(0, LCD_WIDTH-1, RIGHTZERO);
+    lcd_hline(0, LCD_WIDTH-1, RIGHTZERO + (0x8000 / YSCALE));
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_BLACK);
+    lcd_set_foreground(LCD_BLACK);
 #endif
 
     /* draw zoombar */
-    rb->lcd_hline(leftmargin / (mempeakcount / LCD_WIDTH),
+    lcd_hline(leftmargin / (mempeakcount / LCD_WIDTH),
                   (leftmargin / (mempeakcount / LCD_WIDTH)) +
                         (LCD_WIDTH / zoomlevel),
                   LCD_HEIGHT / 2);
@@ -313,22 +313,22 @@ static int displaypeaks(void)
         if(0 == (peakcount % ppp))
         {
             /* drawing time */
-            rb->lcd_vline(x, LEFTZERO - (lymax / YSCALE),
+            lcd_vline(x, LEFTZERO - (lymax / YSCALE),
                           LEFTZERO - (lymin / YSCALE));
-            rb->lcd_vline(x, RIGHTZERO - (rymax / YSCALE),
+            lcd_vline(x, RIGHTZERO - (rymax / YSCALE),
                           RIGHTZERO - (rymin / YSCALE));
             lymin = INT_MAX;
             lymax = INT_MIN;
             rymin = INT_MAX;
             rymax = INT_MIN;
             x++;
-            rb->lcd_update();
+            lcd_update();
         }
         peakcount++;
     }
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(org_forecolor);
+    lcd_set_foreground(org_forecolor);
 #endif
 
     return 0;
@@ -336,13 +336,13 @@ static int displaypeaks(void)
 
 static void show_help(void)
 {
-    rb->lcd_clear_display();
-    rb->lcd_puts(0, 0, "WAVVIEW USAGE:");
-    rb->lcd_puts(0, 2, "up/down: zoom out/in");
-    rb->lcd_puts(0, 3, "left/right: pan left/right");
-    rb->lcd_puts(0, 4, "select: refresh/continue");
-    rb->lcd_puts(0, 5, "stop/off: quit");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts(0, 0, "WAVVIEW USAGE:");
+    lcd_puts(0, 2, "up/down: zoom out/in");
+    lcd_puts(0, 3, "left/right: pan left/right");
+    lcd_puts(0, 4, "select: refresh/continue");
+    lcd_puts(0, 5, "stop/off: quit");
+    lcd_update();
 }
 
 enum plugin_status plugin_start(const void *parameter)
@@ -355,22 +355,22 @@ enum plugin_status plugin_start(const void *parameter)
     if (!parameter)
         return PLUGIN_ERROR;
 
-    audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
+    audiobuf = plugin_get_audio_buffer(&audiobuflen);
 
     if (!audiobuf)
     {
-        rb->splash(HZ*2, "unable to get audio buffer!");
+        splash(HZ*2, "unable to get audio buffer!");
         return PLUGIN_ERROR;
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
     retval = readwavpeaks(parameter); /* read WAV file and create peaks array */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     if(retval)
@@ -379,7 +379,7 @@ enum plugin_status plugin_start(const void *parameter)
     /* press any key to continue */
     while(1)
     {
-        retval = rb->get_action(CONTEXT_KEYBOARD,TIMEOUT_BLOCK);
+        retval = get_action(CONTEXT_KEYBOARD,TIMEOUT_BLOCK);
         if(ACTION_KBD_ABORT == retval)
             return 0;
         else if(ACTION_KBD_SELECT == retval)
@@ -411,29 +411,29 @@ enum plugin_status plugin_start(const void *parameter)
         }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost(true);
+        cpu_boost(true);
 #endif
         if(dodisplay)
             displaypeaks();
         dodisplay = 1;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost(false);
+        cpu_boost(false);
 #endif
 
-        action = rb->get_action(CONTEXT_KEYBOARD, TIMEOUT_BLOCK);
+        action = get_action(CONTEXT_KEYBOARD, TIMEOUT_BLOCK);
         switch(action)
         {
         case ACTION_KBD_UP:
             /* zoom out */
             if(zoomlevel > 1)
                 zoomlevel /= 2;
-            rb->splashf(HZ/2, "ZOOM: %dx",(int)zoomlevel);
+            splashf(HZ/2, "ZOOM: %dx",(int)zoomlevel);
             break;
         case ACTION_KBD_DOWN:
             if(zoomlevel < (mempeakcount / LCD_WIDTH / 2))
                 zoomlevel *= 2;
-            rb->splashf(HZ/2, "ZOOM: %dx",(int)zoomlevel);
+            splashf(HZ/2, "ZOOM: %dx",(int)zoomlevel);
             break;
         case ACTION_KBD_LEFT:
             center -= 10 * (mempeakcount / LCD_WIDTH) / zoomlevel;
@@ -452,7 +452,7 @@ enum plugin_status plugin_start(const void *parameter)
             show_help();
             while(1)
             {
-                retval = rb->get_action(CONTEXT_KEYBOARD,TIMEOUT_BLOCK);
+                retval = get_action(CONTEXT_KEYBOARD,TIMEOUT_BLOCK);
                 if((ACTION_KBD_SELECT == retval) ||
                    (ACTION_KBD_ABORT == retval))
                    break;

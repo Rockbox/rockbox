@@ -35,6 +35,8 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
+#include "symbols.h"
+
 #if defined(HAVE_JPEG) || defined(PLUGIN)
 #define USE_JPEG_COVER
 #endif
@@ -270,6 +272,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
     logf("Album art found: %s", path);
     return true;
 }
+EXPORT_SYMBOL(search_albumart_files);
 
 #ifndef PLUGIN
 /* Look for albumart bitmap in the same dir as the track and in its parent dir.

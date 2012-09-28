@@ -371,11 +371,11 @@ static void clix_init_new_level(struct clix_game_state_t* state)
     state->y = BOARD_HEIGHT / 2;
     state->x = BOARD_WIDTH / 2;
 
-    rb->srand( *rb->current_tick);
+    srand( current_tick);
     /* create a random colored board, according to the current level */
     for(i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; ++i)
     {
-        r = rb->rand() % (state->level + 1);
+        r = rand() % (state->level + 1);
         state->board[i] = r;
     }
 }
@@ -403,52 +403,52 @@ static void clix_draw_cell(struct clix_game_state_t* state, const int x, const i
     realy += y * (CELL_SIZE + 1);
 
     if (state->blink && state->board_selected[ XYPOS( x, y)]) {
-        rb->lcd_set_foreground(LCD_WHITE);
+        lcd_set_foreground(LCD_WHITE);
     } else {
         switch (state->board[ XYPOS( x, y)])
         {
             case CC_BLUE:
-                rb->lcd_set_foreground( LCD_RGBPACK( 25, 25, 255));
+                lcd_set_foreground( LCD_RGBPACK( 25, 25, 255));
             break;
             case CC_GREEN:
-                rb->lcd_set_foreground( LCD_RGBPACK( 25, 255, 25));
+                lcd_set_foreground( LCD_RGBPACK( 25, 255, 25));
             break;
             case CC_RED:
-                rb->lcd_set_foreground( LCD_RGBPACK( 255, 25, 25));
+                lcd_set_foreground( LCD_RGBPACK( 255, 25, 25));
             break;
             case CC_YELLOW:
-                rb->lcd_set_foreground( LCD_RGBPACK( 225, 225, 25));
+                lcd_set_foreground( LCD_RGBPACK( 225, 225, 25));
             break;
             case CC_ORANGE:
-                rb->lcd_set_foreground( LCD_RGBPACK( 230, 140, 15));
+                lcd_set_foreground( LCD_RGBPACK( 230, 140, 15));
             break;
             case CC_CYAN:
-                rb->lcd_set_foreground( LCD_RGBPACK( 25, 245, 230));
+                lcd_set_foreground( LCD_RGBPACK( 25, 245, 230));
             break;
             case CC_BROWN:
-                rb->lcd_set_foreground( LCD_RGBPACK(139, 69, 19));
+                lcd_set_foreground( LCD_RGBPACK(139, 69, 19));
             break;
             case CC_PINK:
-                rb->lcd_set_foreground( LCD_RGBPACK(255, 105, 180));
+                lcd_set_foreground( LCD_RGBPACK(255, 105, 180));
             break;
             case CC_DARK_GREEN:
-                rb->lcd_set_foreground( LCD_RGBPACK( 0, 100, 0));
+                lcd_set_foreground( LCD_RGBPACK( 0, 100, 0));
             break;
             case CC_DARK_BLUE:
-                rb->lcd_set_foreground( LCD_RGBPACK( 280, 32, 144));
+                lcd_set_foreground( LCD_RGBPACK( 280, 32, 144));
             break;
             default:
-                rb->lcd_set_foreground( LCD_BLACK);
+                lcd_set_foreground( LCD_BLACK);
             break;
         }
     }
 
-    rb->lcd_fillrect( realx, realy, CELL_SIZE, CELL_SIZE);
+    lcd_fillrect( realx, realy, CELL_SIZE, CELL_SIZE);
 
     /* draw cursor */
     if ( x == state->x && y == state->y) {
-        rb->lcd_set_foreground( LCD_WHITE);
-        rb->lcd_drawrect( realx - 1, realy - 1, CELL_SIZE + 2, CELL_SIZE + 2);
+        lcd_set_foreground( LCD_WHITE);
+        lcd_drawrect( realx - 1, realy - 1, CELL_SIZE + 2, CELL_SIZE + 2);
     }
 }
 
@@ -458,17 +458,17 @@ static void clix_draw(struct clix_game_state_t* state)
     int i,j;
 
     /* Clear screen */
-    rb->lcd_clear_display();
-    rb->lcd_set_foreground( LCD_WHITE);
+    lcd_clear_display();
+    lcd_set_foreground( LCD_WHITE);
 
-    rb->lcd_putsxy( MARGIN, MARGIN, "Score:");
-    rb->lcd_putsxyf( 43, MARGIN, "%d", state->score);
+    lcd_putsxy( MARGIN, MARGIN, "Score:");
+    lcd_putsxyf( 43, MARGIN, "%d", state->score);
 #if LCD_WIDTH <= 100
-    rb->lcd_putsxy( 75, MARGIN, "L:");
-    rb->lcd_putsxyf( 90, MARGIN, "%d", state->level);
+    lcd_putsxy( 75, MARGIN, "L:");
+    lcd_putsxyf( 90, MARGIN, "%d", state->level);
 #else
-    rb->lcd_putsxy( 75, MARGIN, "Level:");
-    rb->lcd_putsxyf( 113, MARGIN, "%d", state->level);
+    lcd_putsxy( 75, MARGIN, "Level:");
+    lcd_putsxyf( 113, MARGIN, "%d", state->level);
 #endif
     for( i = 0; i < BOARD_WIDTH; ++i)
     {
@@ -478,8 +478,8 @@ static void clix_draw(struct clix_game_state_t* state)
         }
     }
 
-    rb->lcd_update();
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_update();
+    lcd_set_foreground(LCD_WHITE);
 }
 
 static void clix_move_cursor(struct clix_game_state_t* state, const bool left)
@@ -639,11 +639,11 @@ static bool clix_help(void)
         LAST_STYLE_ITEM
     };
 
-    rb->lcd_setfont(FONT_UI);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_setfont(FONT_UI);
+    lcd_set_foreground(LCD_WHITE);
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     return false;
 }
@@ -659,7 +659,7 @@ static int clix_menu_cb(int action, const struct menu_item_ex *this_item)
 
 static int clix_menu(struct clix_game_state_t* state, bool ingame)
 {
-    rb->button_clear_queue();
+    button_clear_queue();
     int choice = 0;
     bool leave_menu=false;
     int ret=0;
@@ -676,7 +676,7 @@ static int clix_menu(struct clix_game_state_t* state, bool ingame)
 
     while (!leave_menu) {
 
-        switch (rb->do_menu(&main_menu, &choice, NULL, false)) {
+        switch (do_menu(&main_menu, &choice, NULL, false)) {
             case 0:
                 leave_menu=true;
                 ret = 0;
@@ -723,35 +723,35 @@ static int clix_click(struct clix_game_state_t* state)
             state->score += state->level * 100;
             clix_draw( state);
             if (state->level < NUM_LEVELS) {
-                rb->splash(HZ*2, "Great! Next Level!");
+                splash(HZ*2, "Great! Next Level!");
                 state->level++;
                 clix_init_new_level( state);
                 clix_update_selected( state);
             }
             else {
-                rb->splash(HZ*2, "Congratulation!!!");
-                rb->splash(HZ*2, "You have finished the game.");
+                splash(HZ*2, "Congratulation!!!");
+                splash(HZ*2, "You have finished the game.");
                 if(clix_menu(state, 0))
                     return 1;
             }
         break;
         case CLIX_GAMEOVER:
             clix_draw( state);
-            rb->splash(HZ*2, "Game Over!");
-            rb->lcd_clear_display();
+            splash(HZ*2, "Game Over!");
+            lcd_clear_display();
             position = highscore_update(state->score, state->level, "",
                                         highscores, NUM_SCORES);
             if (position != -1)
             {
                 if (position == 0)
-                    rb->splash(HZ*2, "New High Score");
+                    splash(HZ*2, "New High Score");
                 highscore_show(position, highscores, NUM_SCORES, true);
             }
             if(clix_menu(state, 0))
                 return 1;
         break;
         default:
-            rb->sleep(10);  /* prevent repeating clicks */
+            sleep(10);  /* prevent repeating clicks */
         break;
     }
     return 0;
@@ -760,7 +760,7 @@ static int clix_click(struct clix_game_state_t* state)
 static int clix_handle_game(struct clix_game_state_t* state)
 {
     int button;
-    int blink_tick = *rb->current_tick + BLINK_TICKCOUNT;
+    int blink_tick = current_tick + BLINK_TICKCOUNT;
 
     int time;
     int start;
@@ -772,25 +772,25 @@ static int clix_handle_game(struct clix_game_state_t* state)
 
     while(true)
     {
-        if (TIME_AFTER(*rb->current_tick, blink_tick)) {
+        if (TIME_AFTER(current_tick, blink_tick)) {
             state->blink = !state->blink;
-            blink_tick = *rb->current_tick + BLINK_TICKCOUNT;
+            blink_tick = current_tick + BLINK_TICKCOUNT;
         }
 
         time = 6; /* number of ticks this function will loop reading keys */
-        start = *rb->current_tick;
+        start = current_tick;
         end = start + time;
-        while(TIME_BEFORE(*rb->current_tick, end))
+        while(TIME_BEFORE(current_tick, end))
         {
             oldx = state->x;
             oldy = state->y;
 
-            button = rb->button_get_w_tmo(end - *rb->current_tick);
+            button = button_get_w_tmo(end - current_tick);
 #ifdef HAVE_TOUCHSCREEN
             if(button & BUTTON_TOUCHSCREEN)
             {
-                int x = rb->button_get_data() >> 16;
-                int y = rb->button_get_data() & 0xffff;
+                int x = button_get_data() >> 16;
+                int y = button_get_data() & 0xffff;
 
                 x -= XOFS;
                 y -= YOFS;
@@ -874,7 +874,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
 
                 case CLIX_BUTTON_QUIT:
                     if (clix_menu(state, 1) != 0) {
-                        rb->button_clear_queue();
+                        button_clear_queue();
                         return 1;
                     }
                 break;
@@ -891,7 +891,7 @@ static int clix_handle_game(struct clix_game_state_t* state)
                 clix_update_selected(state);
             }
             clix_draw(state);
-            rb->sleep(time);
+            sleep(time);
         }
     }
 }
@@ -901,12 +901,12 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_set_backdrop(NULL);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_setfont(FONT_SYSFIXED);
 #ifdef HAVE_TOUCHSCREEN
-    rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
 
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);

@@ -220,21 +220,21 @@ bool pcm_output_empty(void)
 /* Flushes the buffer - clock keeps counting */
 void pcm_output_flush(void)
 {
-    rb->pcm_play_lock();
+    pcm_play_lock();
 
-    enum channel_status status = rb->mixer_channel_status(MPEG_PCM_CHANNEL);
+    enum channel_status status = mixer_channel_status(MPEG_PCM_CHANNEL);
 
     /* Stop PCM to clear current buffer */
     if (status != CHANNEL_STOPPED)
-        rb->mixer_channel_stop(MPEG_PCM_CHANNEL);
+        mixer_channel_stop(MPEG_PCM_CHANNEL);
 
-    rb->pcm_play_unlock();
+    pcm_play_unlock();
 
     pcm_reset_buffer();
 
     /* Restart if playing state was current */
     if (status == CHANNEL_PLAYING)
-        rb->mixer_channel_play_data(MPEG_PCM_CHANNEL,
+        mixer_channel_play_data(MPEG_PCM_CHANNEL,
                                     get_more, NULL, 0);
 }
 
@@ -243,13 +243,13 @@ void pcm_output_flush(void)
    buffer should be empty */
 void pcm_output_set_clock(uint32_t time)
 {
-    rb->pcm_play_lock();
+    pcm_play_lock();
 
     clock_start = time;
     clock_tick = time;
     clock_time = time;
 
-    rb->pcm_play_unlock();
+    pcm_play_unlock();
 }
 
 /* Return the clock as synchronized by audio frame timestamps */
@@ -265,11 +265,11 @@ uint32_t pcm_output_get_clock(void)
     do
     {
         time = clock_time;
-        rem = rb->mixer_channel_get_bytes_waiting(MPEG_PCM_CHANNEL) >> 2;
+        rem = mixer_channel_get_bytes_waiting(MPEG_PCM_CHANNEL) >> 2;
     }
     while (UNLIKELY(time != clock_time ||
         (rem == 0 &&
-         rb->mixer_channel_status(MPEG_PCM_CHANNEL) == CHANNEL_PLAYING))
+         mixer_channel_status(MPEG_PCM_CHANNEL) == CHANNEL_PLAYING))
     );
 
     return time - rem;
@@ -286,11 +286,11 @@ uint32_t pcm_output_get_ticks(uint32_t *start)
     do
     {
         tick = clock_tick;
-        rem = rb->mixer_channel_get_bytes_waiting(MPEG_PCM_CHANNEL) >> 2;
+        rem = mixer_channel_get_bytes_waiting(MPEG_PCM_CHANNEL) >> 2;
     }
     while (UNLIKELY(tick != clock_tick ||
         (rem == 0 &&
-         rb->mixer_channel_status(MPEG_PCM_CHANNEL) == CHANNEL_PLAYING))
+         mixer_channel_status(MPEG_PCM_CHANNEL) == CHANNEL_PLAYING))
     );
 
     if (start)
@@ -302,21 +302,21 @@ uint32_t pcm_output_get_ticks(uint32_t *start)
 /* Pauses/Starts pcm playback - and the clock */
 void pcm_output_play_pause(bool play)
 {
-    rb->pcm_play_lock();
+    pcm_play_lock();
 
-    if (rb->mixer_channel_status(MPEG_PCM_CHANNEL) != CHANNEL_STOPPED)
+    if (mixer_channel_status(MPEG_PCM_CHANNEL) != CHANNEL_STOPPED)
     {
-        rb->mixer_channel_play_pause(MPEG_PCM_CHANNEL, play);
-        rb->pcm_play_unlock();
+        mixer_channel_play_pause(MPEG_PCM_CHANNEL, play);
+        pcm_play_unlock();
     }
     else
     {
-        rb->pcm_play_unlock();
+        pcm_play_unlock();
 
         if (play)
         {
-            rb->mixer_channel_set_amplitude(MPEG_PCM_CHANNEL, MIX_AMP_UNITY);
-            rb->mixer_channel_play_data(MPEG_PCM_CHANNEL,
+            mixer_channel_set_amplitude(MPEG_PCM_CHANNEL, MIX_AMP_UNITY);
+            mixer_channel_play_data(MPEG_PCM_CHANNEL,
                                         get_more, NULL, 0);
         }
     }
@@ -325,12 +325,12 @@ void pcm_output_play_pause(bool play)
 /* Stops all playback and resets the clock */
 void pcm_output_stop(void)
 {
-    rb->pcm_play_lock();
+    pcm_play_lock();
 
-    if (rb->mixer_channel_status(MPEG_PCM_CHANNEL) != CHANNEL_STOPPED)
-        rb->mixer_channel_stop(MPEG_PCM_CHANNEL);
+    if (mixer_channel_status(MPEG_PCM_CHANNEL) != CHANNEL_STOPPED)
+        mixer_channel_stop(MPEG_PCM_CHANNEL);
 
-    rb->pcm_play_unlock();
+    pcm_play_unlock();
 
     pcm_output_flush();
     pcm_output_set_clock(0);
@@ -339,9 +339,9 @@ void pcm_output_stop(void)
 /* Drains any data if the start threshold hasn't been reached */
 void pcm_output_drain(void)
 {
-    rb->pcm_play_lock();
+    pcm_play_lock();
     pcmbuf_threshold = PCMOUT_LOW_WM;
-    rb->pcm_play_unlock();
+    pcm_play_unlock();
 }
 
 bool pcm_output_init(void)
@@ -356,8 +356,8 @@ bool pcm_output_init(void)
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
 
 #if SILENCE_TEST_TONE

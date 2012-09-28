@@ -208,6 +208,7 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LI
 		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) \
 		-lgcc $(BOOTBOXLDOPTS) $(GLOBAL_LDOPTS) \
 		-T$(LINKRAM) -Wl,-Map,$(BUILDDIR)/rockbox.map
+	$(call PRINTS,SYMTAB_HASHGEN $(@F))$(TOOLSDIR)/symtab_hashgen $@
 
 $(BUILDDIR)/rombox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \

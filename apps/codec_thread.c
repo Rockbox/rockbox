@@ -36,6 +36,8 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
+#include "symbols.h"
+
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
@@ -193,6 +195,7 @@ const char * get_codec_filename(int cod_spec)
 
     return fname;
 }
+EXPORT_SYMBOL(get_codec_filename);
 
 /* Borrow the codec thread and return the ID */
 void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
@@ -206,7 +209,7 @@ void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
     LOGFQUEUE("codec >| Q_CODEC_DO_CALLBACK");
     codec_queue_send(Q_CODEC_DO_CALLBACK, (intptr_t)fn);
 }
-
+EXPORT_SYMBOL(codec_thread_do_callback);
 
 /** --- codec API callbacks --- **/
 

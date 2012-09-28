@@ -24,20 +24,20 @@
 static void get_cfg_filename(char* buf, int buf_len, const char* filename)
 {
 #ifdef APPLICATION
-    rb->snprintf(buf, buf_len, PLUGIN_DATA_DIR "/%s", filename);
+    snprintf(buf, buf_len, PLUGIN_DATA_DIR "/%s", filename);
 #else
     char *s;
-    rb->strcpy(buf, rb->plugin_get_current_filename());
-    s = rb->strrchr(buf, '/');
+    strcpy(buf, plugin_get_current_filename());
+    s = strrchr(buf, '/');
     if (!s) /* should never happen */
     {
-        rb->snprintf(buf, buf_len, PLUGIN_DATA_DIR "/%s", filename);
+        snprintf(buf, buf_len, PLUGIN_DATA_DIR "/%s", filename);
     }
     else
     {
         s++;
         *s = '\0';
-        rb->strcat(s, filename);
+        strcat(s, filename);
     }
 #endif
 }
@@ -50,36 +50,36 @@ int configfile_save(const char *filename, struct configdata *cfg,
     char buf[MAX_PATH];
 
     get_cfg_filename(buf, MAX_PATH, filename);
-    fd = rb->creat(buf, 0666);
+    fd = creat(buf, 0666);
     if(fd < 0)
         return fd*10 - 1;
 
     /* pre-allocate 10 bytes for INT */
-    rb->fdprintf(fd, "file version: %10d\n", version);
+    fdprintf(fd, "file version: %10d\n", version);
     
     for(i = 0;i < num_items;i++) {
         switch(cfg[i].type) {
             case TYPE_INT:
                 /* pre-allocate 10 bytes for INT */
-                rb->fdprintf(fd, "%s: %10d\n",
+                fdprintf(fd, "%s: %10d\n",
                                 cfg[i].name,
                                 *cfg[i].int_p);
                 break;
 
             case TYPE_BOOL:
-                rb->fdprintf(fd, "%s: %10d\n",
+                fdprintf(fd, "%s: %10d\n",
                                 cfg[i].name,
                                 (int)*cfg[i].bool_p);
                 break;
 
             case TYPE_ENUM:
-                rb->fdprintf(fd, "%s: %s\n",
+                fdprintf(fd, "%s: %s\n",
                                 cfg[i].name,
                                 cfg[i].values[*cfg[i].int_p]);
                 break;
 
             case TYPE_STRING:
-                rb->fdprintf(fd, "%s: %s\n",
+                fdprintf(fd, "%s: %s\n",
                                 cfg[i].name,
                                 cfg[i].string);
                 break;
@@ -87,7 +87,7 @@ int configfile_save(const char *filename, struct configdata *cfg,
         }
     }
 
-    rb->close(fd);
+    close(fd);
     return 0;
 }
 
@@ -103,54 +103,54 @@ int configfile_load(const char *filename, struct configdata *cfg,
     int tmp;
 
     get_cfg_filename(buf, MAX_PATH, filename);
-    fd = rb->open(buf, O_RDONLY);
+    fd = open(buf, O_RDONLY);
     if(fd < 0)
         return fd*10 - 1;
 
-    while(rb->read_line(fd, buf, MAX_PATH) > 0) {
-        rb->settings_parseline(buf, &name, &val);
+    while(read_line(fd, buf, MAX_PATH) > 0) {
+        settings_parseline(buf, &name, &val);
 
         /* Bail out if the file version is too old */
-        if(!rb->strcmp("file version", name)) {
-            file_version = rb->atoi(val);
+        if(!strcmp("file version", name)) {
+            file_version = atoi(val);
             if(file_version < min_version) {
-                rb->close(fd);
+                close(fd);
                 return -1;
             }
         }
         
         for(i = 0;i < num_items;i++) {
-            if(!rb->strcmp(cfg[i].name, name)) {
+            if(!strcmp(cfg[i].name, name)) {
                 switch(cfg[i].type) {
                     case TYPE_INT:
-                        tmp = rb->atoi(val);
+                        tmp = atoi(val);
                         /* Only set it if it's within range */
                         if(tmp >= cfg[i].min && tmp <= cfg[i].max)
                             *cfg[i].int_p = tmp;
                         break;
 
                     case TYPE_BOOL:
-                        tmp = rb->atoi(val);
+                        tmp = atoi(val);
                         *cfg[i].bool_p = (bool)tmp;
                         break;
 
                     case TYPE_ENUM:
                         for(j = 0;j < cfg[i].max;j++) {
-                            if(!rb->strcmp(cfg[i].values[j], val)) {
+                            if(!strcmp(cfg[i].values[j], val)) {
                                 *cfg[i].int_p = j;
                             }
                         }
                         break;
 
                     case TYPE_STRING:
-                        rb->strlcpy(cfg[i].string, val, cfg[i].max);
+                        strlcpy(cfg[i].string, val, cfg[i].max);
                         break;
                 }
             }
         }
     }
     
-    rb->close(fd);
+    close(fd);
     return 0;
 }
 
@@ -162,21 +162,21 @@ int configfile_get_value(const char* filename, const char* name)
     char buf[MAX_PATH];
 
     get_cfg_filename(buf, MAX_PATH, filename);
-    fd = rb->open(buf, O_RDONLY);
+    fd = open(buf, O_RDONLY);
     if(fd < 0)
         return -1;
 
-    while(rb->read_line(fd, buf, MAX_PATH) > 0)
+    while(read_line(fd, buf, MAX_PATH) > 0)
     {
-        rb->settings_parseline(buf, &pname, &pval);
-        if(!rb->strcmp(name, pname))
+        settings_parseline(buf, &pname, &pval);
+        if(!strcmp(name, pname))
         {
-          rb->close(fd);
-          return rb->atoi(pval);
+          close(fd);
+          return atoi(pval);
         }
     }
 
-    rb->close(fd);
+    close(fd);
     return -1;
 }
 
@@ -193,20 +193,20 @@ int configfile_update_entry(const char* filename, const char* name, int val)
     
     /* open the current config file */
     get_cfg_filename(path, MAX_PATH, filename);
-    fd = rb->open(path, O_RDWR);
+    fd = open(path, O_RDWR);
     if(fd < 0)
         return -1;
     
     /* read in the current stored settings */
-    while((line_len = rb->read_line(fd, buf, 256)) > 0)
+    while((line_len = read_line(fd, buf, 256)) > 0)
     {
-        rb->settings_parseline(buf, &pname, &pval);
-        if(!rb->strcmp(name, pname))
+        settings_parseline(buf, &pname, &pval);
+        if(!strcmp(name, pname))
         {
             found = 1;
-            rb->lseek(fd, pos, SEEK_SET);
+            lseek(fd, pos, SEEK_SET);
             /* pre-allocate 10 bytes for INT */
-            rb->fdprintf(fd, "%s: %10d\n", pname, val);
+            fdprintf(fd, "%s: %10d\n", pname, val);
             break;
         }
         pos += line_len;
@@ -215,9 +215,9 @@ int configfile_update_entry(const char* filename, const char* name, int val)
     /* if (name/val) is a new entry just append to file */
     if (found == 0)
         /* pre-allocate 10 bytes for INT */
-        rb->fdprintf(fd, "%s: %10d\n", name, val);
+        fdprintf(fd, "%s: %10d\n", name, val);
     
-    rb->close(fd);
+    close(fd);
     
     return found;
 }

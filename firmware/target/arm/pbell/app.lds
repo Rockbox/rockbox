@@ -58,6 +58,13 @@ SECTIONS
         . = ALIGN(0x4);
     } > DRAM
 
+    .symtab_hashtable :
+    {
+        __core_symarray_start = .;
+        *(SORT(__symtab.*))
+        __core_symarray_end = .;
+    } > DRAM
+
     .data :
     {
         *(.data*)
@@ -176,6 +183,11 @@ SECTIONS
         audiobuffer = .;
     } > DRAM
     
+    .symtab_str :
+    {
+        *(SORT(__symtab_str.*))
+    } > DRAM
+
     .audiobufend ENDAUDIOADDR (NOLOAD) :
     {
         audiobufend = .;

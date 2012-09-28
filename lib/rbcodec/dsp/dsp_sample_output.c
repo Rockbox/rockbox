@@ -25,6 +25,7 @@
 #include "dsp_sample_io.h"
 #include "dsp-util.h"
 #include <string.h>
+#include "symbols.h"
 
 #if 0
 #include <debug.h>
@@ -212,3 +213,4 @@ void dsp_dither_enable(bool enable)
     dither_data.enabled = enable;
     data->output_samples[0] = dsp_sample_output_format_change;
 }
+EXPORT_SYMBOL(dsp_dither_enable);

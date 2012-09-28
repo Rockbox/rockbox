@@ -31,7 +31,7 @@ static void readTextBlock(int file, char * buf)
         c = readChar(file);
     } while(c == '\n' || c == ' ' || c=='\t');
 
-    rb->lseek(file, -1, SEEK_CUR);
+    lseek(file, -1, SEEK_CUR);
     int cp = 0;
     do
     {
@@ -40,7 +40,7 @@ static void readTextBlock(int file, char * buf)
         cp++;
     } while (c != '\n' && c != ' ' && c != '\t' && !eof(file));
     buf[cp-1]=0;
-    rb->lseek(file, -1, SEEK_CUR);
+    lseek(file, -1, SEEK_CUR);
 }
 
 void resetControllers()
@@ -104,7 +104,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
             if(mf->tracks[a] == NULL)
             {
                 midi_debug("NULL TRACK !!!");
-                rb->splash(HZ*2, "Null Track in loader.");
+                splash(HZ*2, "Null Track in loader.");
                 return -1;
             }
 
@@ -126,7 +126,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
     }
 
-    int file = rb->open(filename, O_RDONLY);
+    int file = open(filename, O_RDONLY);
     if(file < 0)
     {
         midi_debug("");
@@ -134,7 +134,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         midi_debug("Please install the instruments.");
         midi_debug("See Rockbox page for more info.");
 
-        rb->splash(HZ*2, "No Instruments");
+        splash(HZ*2, "No Instruments");
         return -1;
     }
 
@@ -150,7 +150,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         while(readChar(file)!=' ' && !eof(file));
         readTextBlock(file, name);
 
-        rb->snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
+        snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
 /*        midi_debug("\nLOADING: <%s> ", fn); */
 
         if(patchUsed[a]==1)
@@ -164,12 +164,12 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         while((c != '\n'))
             c = readChar(file);
     }
-    rb->close(file);
+    close(file);
 
-    file = rb->open(drumConfig, O_RDONLY);
+    file = open(drumConfig, O_RDONLY);
     if(file < 0)
     {
-        rb->splash(HZ*2, "Bad drum config. Did you install the patchset?");
+        splash(HZ*2, "Bad drum config. Did you install the patchset?");
         return -1;
     }
 
@@ -181,9 +181,9 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     {
         readTextBlock(file, number);
         readTextBlock(file, name);
-        rb->snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
+        snprintf(fn, 40, ROCKBOX_DIR "/patchset/%s.pat", name);
 
-        idx = rb->atoi(number);
+        idx = atoi(number);
         if(idx == 0)
             break;
 
@@ -197,7 +197,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         while((c != '\n') && (c != 255) && (!eof(file)))
             c = readChar(file);
     }
-    rb->close(file);
+    close(file);
     return 0;
 }
 
@@ -458,7 +458,7 @@ void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
         int i;
         struct SynthObject *voicept;
 
-        rb->memset(samp_buf, 0, num_samples*4);
+        memset(samp_buf, 0, num_samples*4);
 
         for(i=0; i < MAX_VOICES; i++)
         {
@@ -469,7 +469,7 @@ void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
             }
         }
 
-        rb->memcpy(buf_ptr, samp_buf, num_samples*4);
+        memcpy(buf_ptr, samp_buf, num_samples*4);
     }
 
     /* TODO: Automatic Gain Control, anyone? */

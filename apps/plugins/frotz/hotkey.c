@@ -66,7 +66,7 @@ static bool hot_key_debugging (void)
 static bool hot_key_playback (void)
 {
 
-    rb->splash(HZ, "Playback on");
+    splash(HZ, "Playback on");
 
     if (!istream_replay)
 	replay_open ();
@@ -86,13 +86,13 @@ static bool hot_key_recording (void)
 {
 
     if (istream_replay) {
-	rb->splash(HZ, "Playback off");
+	splash(HZ, "Playback off");
 	replay_close ();
     } else if (ostream_record) {
-	rb->splash(HZ, "Recording off");
+	splash(HZ, "Recording off");
 	record_close ();
     } else {
-	rb->splash(HZ, "Recording on");
+	splash(HZ, "Recording on");
 	record_open ();
     }
 
@@ -141,7 +141,7 @@ static bool hot_key_undo (void)
 	    return FALSE;		/* and continue input    */
 	}
 
-    } else rb->splash(HZ, "No undo information available.");
+    } else splash(HZ, "No undo information available.");
 
     return FALSE;
 

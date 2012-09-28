@@ -59,17 +59,17 @@ void PRNM(init)(void)
 
   DANM(mem) = a64kmalloc(NUM64KSEGS);
 
-  rb->srand((unsigned int)( rb->get_time()->tm_sec+rb->get_time()->tm_min*60 + rb->get_time()->tm_hour*3600));
-  for(i = 0; i < 0x10000; i++) DANM(mem)[i] = (byte) rb->rand();
+  srand((unsigned int)( get_time()->tm_sec+get_time()->tm_min*60 + get_time()->tm_hour*3600));
+  for(i = 0; i < 0x10000; i++) DANM(mem)[i] = (byte) rand();
 
   for(i = 0; i < NUMDREGS; i++) {
     DANM(nr)[i].p = DANM(mem);
-    DANM(nr)[i].d.d = (dbyte) rb->rand();
+    DANM(nr)[i].d.d = (dbyte) rand();
   }
 
   for(i = 0; i < BACKDREGS; i++) {
     DANM(br)[i].p = DANM(mem);
-    DANM(br)[i].d.d = (dbyte) rb->rand();
+    DANM(br)[i].d.d = (dbyte) rand();
   }
 
   for(i = 0; i < PORTNUM; i++) PRNM(inports)[i] = PRNM(outports)[i] = 0;

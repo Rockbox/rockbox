@@ -29,22 +29,22 @@ static bool append_entry_to_file(sc_file_t *file, char *path, bool is_dir)
 {
     sc_entry_t entry;
 
-    unsigned int required_len = rb->strlen(path);
+    unsigned int required_len = strlen(path);
     if (is_dir) {
         required_len += PATH_SEPARATOR_LEN; /* Add 1 for the trailing / */
     }
     if (required_len >= sizeof(entry.path)) {
         /* no attempt to print it: it will also be so too long for the splash */
-        rb->splash(HZ*2, "Can't append shortcut, it's too long");
+        splash(HZ*2, "Can't append shortcut, it's too long");
         return false;
     }
     entry.explicit_disp = false;
-    rb->strcpy(entry.path, path);
+    strcpy(entry.path, path);
     if (is_dir) {
-        rb->strcat(entry.path, PATH_SEPARATOR);
+        strcat(entry.path, PATH_SEPARATOR);
     }
     if (!append_entry(file, &entry)) {
-        rb->splash(HZ*2, "Too many entries!");
+        splash(HZ*2, "Too many entries!");
         return false;
     }
     return true;
@@ -58,7 +58,7 @@ enum plugin_status plugin_start(const void* void_parameter)
     
     /* This is a viewer, so a parameter must have been specified */
     if (void_parameter == NULL) {
-        rb->splash(HZ*2, "No parameter specified!");
+        splash(HZ*2, "No parameter specified!");
         return PLUGIN_ERROR;
     }
     char *parameter = (char*)void_parameter;
@@ -71,9 +71,9 @@ enum plugin_status plugin_start(const void* void_parameter)
      * if it's a dir and then file (not vice versa) since
      * open() can also open a dir */
     found = true;
-    if (rb->dir_exists(parameter)) {
+    if (dir_exists(parameter)) {
         its_a_dir = true;
-    } else if (rb->file_exists(parameter)) {
+    } else if (file_exists(parameter)) {
         its_a_dir = false;
     } else {
         found = false;
@@ -84,7 +84,7 @@ enum plugin_status plugin_start(const void* void_parameter)
     if (!found) {
         /* Something's gone properly pear shaped -
          * we couldn't even find the entry */
-        rb->splashf(HZ*2, "File/Dir not found: %s", parameter);
+        splashf(HZ*2, "File/Dir not found: %s", parameter);
         return PLUGIN_ERROR;
     }
 

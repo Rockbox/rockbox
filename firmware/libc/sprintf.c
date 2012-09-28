@@ -31,6 +31,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include "format.h"
+#include "symbols.h"
 
 /* ALSA library requires a more advanced snprintf, so let's not
    override it in simulator for Linux.  Note that Cygwin requires
@@ -73,6 +74,7 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
     
     return pr.bytes;
 }
+EXPORT_SYMBOL(snprintf);
 
 int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 {
@@ -89,3 +91,4 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
     
     return pr.bytes;
 }
+EXPORT_SYMBOL(vsnprintf);

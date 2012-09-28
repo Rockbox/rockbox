@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "storage.h"
 #include "kernel.h"
+#include "symbols.h"
 
 #ifdef CONFIG_STORAGE_MULTI
 
@@ -300,6 +301,7 @@ void storage_sleep(void)
     ramdisk_sleep();
 #endif
 }
+EXPORT_SYMBOL(storage_sleep);
 
 void storage_sleepnow(void)
 {
@@ -427,6 +429,7 @@ void storage_spin(void)
     ramdisk_spin();
 #endif
 }
+EXPORT_SYMBOL(storage_spin);
 
 void storage_spindown(int seconds)
 {

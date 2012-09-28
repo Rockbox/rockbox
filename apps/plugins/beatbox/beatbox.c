@@ -265,14 +265,14 @@ enum plugin_status plugin_start(const void* parameter)
 {
     int retval = 0;
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
 #ifdef RB_PROFILE
-    rb->profile_thread();
+    profile_thread();
 #endif
     if (initSynth(NULL, ROCKBOX_DIR "/patchset/patchset.cfg",
         ROCKBOX_DIR "/patchset/drums.cfg") == -1)
@@ -281,26 +281,26 @@ enum plugin_status plugin_start(const void* parameter)
         return -1;
     }
 //#ifndef SIMULATOR
-    rb->pcm_play_stop();
+    pcm_play_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
+    pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
 
 
     retval = beatboxmain();
 
 #ifdef RB_PROFILE
-    rb->profstop();
+    profstop();
 #endif
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_play_stop();
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
 
@@ -391,8 +391,8 @@ void sendEvents()
 #define NAME_POSY 100
 void showDrumName(int trackNum)
 {
-    rb->lcd_set_foreground(COLOR_NAME_TEXT);
-    rb->lcd_putsxy(NAME_POSX, NAME_POSY, drumNames[trackMap[trackNum]-35]);
+    lcd_set_foreground(COLOR_NAME_TEXT);
+    lcd_putsxy(NAME_POSX, NAME_POSY, drumNames[trackMap[trackNum]-35]);
 }
 
 void updateDisplay()
@@ -454,16 +454,16 @@ void drawGrid()
 {
     int i, j;
 
-    rb->lcd_set_foreground(COLOR_GRID);
+    lcd_set_foreground(COLOR_GRID);
 
     for(i=0; i<H_NUMCELLS+1; i++)
-        rb->lcd_vline(i*CELL_XSIZE+GRID_XPOS, GRID_YPOS, GRID_YPOS+CELL_YSIZE*V_NUMCELLS);
+        lcd_vline(i*CELL_XSIZE+GRID_XPOS, GRID_YPOS, GRID_YPOS+CELL_YSIZE*V_NUMCELLS);
 
     for(i=0; i<V_NUMCELLS+1; i++)
-        rb->lcd_hline(GRID_XPOS, GRID_XPOS+CELL_XSIZE*H_NUMCELLS, GRID_YPOS+i*CELL_YSIZE);
+        lcd_hline(GRID_XPOS, GRID_XPOS+CELL_XSIZE*H_NUMCELLS, GRID_YPOS+i*CELL_YSIZE);
 
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 void drawCell(int i, int j)
@@ -473,19 +473,19 @@ void drawCell(int i, int j)
     cellX = GRID_XPOS + CELL_XSIZE*i+1;
     cellY = GRID_YPOS + CELL_YSIZE*j+1;
 
-    rb->lcd_set_foreground(pattern[i][j].color);
-    rb->lcd_fillrect(cellX, cellY, CELL_XSIZE-1, CELL_YSIZE-1);
+    lcd_set_foreground(pattern[i][j].color);
+    lcd_fillrect(cellX, cellY, CELL_XSIZE-1, CELL_YSIZE-1);
 
-    rb->lcd_set_foreground(0);
+    lcd_set_foreground(0);
 
     if(pattern[i][j].val == VAL_LOOP)
     {
-        rb->lcd_drawline(cellX, cellY, cellX+CELL_XSIZE-2, cellY+CELL_YSIZE-2);
+        lcd_drawline(cellX, cellY, cellX+CELL_XSIZE-2, cellY+CELL_YSIZE-2);
     }
 
     if(pattern[i][j].val == VAL_ENABLED)
     {
-        rb->lcd_fillrect(cellX+1, cellY+1, CELL_XSIZE-3, CELL_YSIZE-3);
+        lcd_fillrect(cellX+1, cellY+1, CELL_XSIZE-3, CELL_YSIZE-3);
     }
 
 }
@@ -506,7 +506,7 @@ void redrawScreen(unsigned char force)
             }
         }
     }
-    rb->lcd_update();
+    lcd_update();
 }
 
 void get_more(const void** start, size_t* size)
@@ -537,10 +537,10 @@ int beatboxmain()
 
     numberOfSamples=44100/10;
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+    pcm_play_data(&get_more, NULL, NULL, 0);
 
-    rb->lcd_set_background(0x000000);
-    rb->lcd_clear_display();
+    lcd_set_background(0x000000);
+    lcd_clear_display();
 
     resetPosition();
 
@@ -579,7 +579,7 @@ int beatboxmain()
     #ifndef SYNC
         synthbuf();
     #endif
-        rb->yield();
+        yield();
 
         if(stepFlag)
         {
@@ -591,31 +591,31 @@ int beatboxmain()
         }
 
         /* Prevent idle poweroff */
-        rb->reset_poweroff_timer();
+        reset_poweroff_timer();
 
         /* Code taken from Oscilloscope plugin */
-        switch(rb->button_get(false))
+        switch(button_get(false))
         {
         /*
                 case BTN_UP:
                 case BTN_UP | BUTTON_REPEAT:
-                    vol = rb->global_settings->volume;
-                    if (vol < rb->sound_max(SOUND_VOLUME))
+                    vol = global_settings->volume;
+                    if (vol < sound_max(SOUND_VOLUME))
                     {
                         vol++;
-                        rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_settings->volume = vol;
+                        sound_set(SOUND_VOLUME, vol);
+                        global_settings->volume = vol;
                     }
                     break;
 
                 case BTN_DOWN:
                 case BTN_DOWN | BUTTON_REPEAT:
-                    vol = rb->global_settings->volume;
-                    if (vol > rb->sound_min(SOUND_VOLUME))
+                    vol = global_settings->volume;
+                    if (vol > sound_min(SOUND_VOLUME))
                     {
                         vol--;
-                        rb->sound_set(SOUND_VOLUME, vol);
-                        rb->global_settings->volume = vol;
+                        sound_set(SOUND_VOLUME, vol);
+                        global_settings->volume = vol;
                     }
                     break;
 

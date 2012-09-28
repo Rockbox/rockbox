@@ -46,6 +46,7 @@
 */
  
 #include <stdlib.h>
+#include "symbols.h"
 
 /* Period parameters */
 #define N            624
@@ -77,6 +78,7 @@ void srand(unsigned int seed)
     }
     left = 1;
 }
+EXPORT_SYMBOL(srand);
 
 static void next_state(void)
 {
@@ -117,3 +119,4 @@ int rand(void)
 
     return ((unsigned int)y) >> 1;
 }
+EXPORT_SYMBOL(rand);

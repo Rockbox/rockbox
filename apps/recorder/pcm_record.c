@@ -38,6 +38,7 @@
 #ifdef HAVE_SPDIF_IN
 #include "spdif.h"
 #endif
+#include "symbols.h"
 
 /***************************************************************************/
 
@@ -487,6 +488,7 @@ void audio_set_recording_gain(int left, int right, int type)
     //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
     audiohw_set_recvol(left, right, type);
 } /* audio_set_recording_gain */
+EXPORT_SYMBOL(audio_set_recording_gain);
 
 /** Information about current state **/
 

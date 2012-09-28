@@ -48,7 +48,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* standard stuff */
     (void)parameter;
     
-    rb->touchscreen_set_mode(mode);
+    touchscreen_set_mode(mode);
 
     /* wait until user closes plugin */
     do
@@ -57,7 +57,7 @@ enum plugin_status plugin_start(const void* parameter)
         short y = 0;
         bool draw_rect = false;
         
-        button = rb->button_get(true);
+        button = button_get(true);
 
         if (button & BUTTON_TOPLEFT)
         {
@@ -108,38 +108,38 @@ enum plugin_status plugin_start(const void* parameter)
         if (button & TOUCHSCREEN_TOGGLE && (button & BUTTON_REL))
         {
             mode = (mode == TOUCHSCREEN_POINT) ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT;
-            rb->touchscreen_set_mode(mode);
+            touchscreen_set_mode(mode);
         }
         
         if (button & BUTTON_REL) draw_rect = false;
 
-        rb->lcd_clear_display();
+        lcd_clear_display();
 
         if (draw_rect)
         {
-            rb->lcd_set_foreground(LCD_RGBPACK(0xc0, 0, 0));
-            rb->lcd_fillrect(x, y, LCD_WIDTH/3, LCD_HEIGHT/3);
+            lcd_set_foreground(LCD_RGBPACK(0xc0, 0, 0));
+            lcd_fillrect(x, y, LCD_WIDTH/3, LCD_HEIGHT/3);
         }
 
         if (draw_rect || button & BUTTON_TOUCHSCREEN)
         {
-            intptr_t button_data = rb->button_get_data();
+            intptr_t button_data = button_get_data();
             x = button_data >> 16;
             y = button_data & 0xffff;
 
-            rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0xc0));
-            rb->lcd_fillrect(x-7, y-7, 14, 14);
+            lcd_set_foreground(LCD_RGBPACK(0, 0, 0xc0));
+            lcd_fillrect(x-7, y-7, 14, 14);
             
             /* in stylus mode, show REL position in black */
             if (mode == TOUCHSCREEN_POINT && (button & BUTTON_REL))
-                rb->lcd_set_foreground(LCD_BLACK);
+                lcd_set_foreground(LCD_BLACK);
             else
-                rb->lcd_set_foreground(LCD_WHITE);
+                lcd_set_foreground(LCD_WHITE);
 
-            rb->lcd_hline(x-5, x+5, y);
-            rb->lcd_vline(x, y-5, y+5);
+            lcd_hline(x-5, x+5, y);
+            lcd_vline(x, y-5, y+5);
         }
-        rb->lcd_update();
+        lcd_update();
 
     } while (button != TOUCHSCREEN_QUIT);
 

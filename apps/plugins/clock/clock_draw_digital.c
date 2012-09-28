@@ -29,7 +29,7 @@ const struct picture* digits_skin[]={digits,segments};
 const struct picture* smalldigits_skin[]={smalldigits,smallsegments};
 
 #define buffer_printf(buffer, buffer_pos, ... ) \
-    buffer_pos+=rb->snprintf(&buffer[buffer_pos], sizeof(buffer)-buffer_pos, __VA_ARGS__);
+    buffer_pos+=snprintf(&buffer[buffer_pos], sizeof(buffer)-buffer_pos, __VA_ARGS__);
 
 void digital_clock_draw(struct screen* display,
                         struct time* time, 
@@ -84,7 +84,7 @@ void digital_clock_draw(struct screen* display,
     if(counter){
         struct time counter_time;
         counter_get_elapsed_time(counter, &counter_time);
-        rb->snprintf(buffer, 20, "%02d:%02d:%02d",
+        snprintf(buffer, 20, "%02d:%02d:%02d",
                      counter_time.hour, counter_time.minute, counter_time.second);
         getstringsize(smalldigits_bitmaps, buffer, &str_w, &str_h);
         draw_string(display, smalldigits_bitmaps, buffer,

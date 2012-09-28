@@ -37,8 +37,8 @@ unsigned char *parse(int fd) {
     parse_fd=fd;
     currentlevel=0;
     if(nofilter==0) {
-        nofilter=my_malloc(sizeof(unsigned char)*rb->tagdbheader->filecount);
-        rb->memset(nofilter,1,rb->tagdbheader->filecount);
+        nofilter=my_malloc(sizeof(unsigned char)*tagdbheader->filecount);
+        memset(nofilter,1,tagdbheader->filecount);
     }
     for(i=0;i<20;i++)
         filter[i]=nofilter;
@@ -49,7 +49,7 @@ unsigned char *parse(int fd) {
     ret=parseMExpr();
     if(syntaxerror) {
         PUTS("Syntaxerror");
-        rb->splash(HZ*3,errormsg);
+        splash(HZ*3,errormsg);
     }
     parser_accept(TOKEN_EOF);
     return ret;
@@ -57,13 +57,13 @@ unsigned char *parse(int fd) {
 
 void parser_acceptIt(void) {
     if(syntaxerror) return;
-    rb->read(parse_fd,&curtoken,sizeof(struct token));
+    read(parse_fd,&curtoken,sizeof(struct token));
 }
 
 int parser_accept(unsigned char kind) {
     if(currentToken->kind!=kind) {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where '%d' expected\n",currentToken->kind,kind);
+        snprintf(errormsg,250,"'%d' found where '%d' expected\n",currentToken->kind,kind);
         return 0;
     }
     else {
@@ -81,12 +81,12 @@ unsigned char *parseCompareNum() {
     PUTS("parseCompareNum");
     if(currentToken->kind==TOKEN_NUM ||
         currentToken->kind==TOKEN_NUMIDENTIFIER) {
-        rb->memcpy(&number1,currentToken,sizeof(struct token));
+        memcpy(&number1,currentToken,sizeof(struct token));
         parser_acceptIt();
     }
     else {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where NUM/NUMID expected\n",currentToken->kind);
+        snprintf(errormsg,250,"'%d' found where NUM/NUMID expected\n",currentToken->kind);
         return 0;
     }
     if(currentToken->kind>=TOKEN_GT && currentToken->kind <= TOKEN_NE) {
@@ -95,25 +95,25 @@ unsigned char *parseCompareNum() {
     }
     else {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where NUMOP expected\n",currentToken->kind);
+        snprintf(errormsg,250,"'%d' found where NUMOP expected\n",currentToken->kind);
         return 0;
     }
     if(currentToken->kind==TOKEN_NUM ||
          currentToken->kind==TOKEN_NUMIDENTIFIER) {
-        rb->memcpy(&number2,currentToken,sizeof(struct token));
+        memcpy(&number2,currentToken,sizeof(struct token));
         parser_acceptIt();
     }
     else {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where NUM/NUMID expected\n",currentToken->kind);
+        snprintf(errormsg,250,"'%d' found where NUM/NUMID expected\n",currentToken->kind);
         return 0;
     }
-    ret=my_malloc(sizeof(unsigned char)*rb->tagdbheader->filecount);
+    ret=my_malloc(sizeof(unsigned char)*tagdbheader->filecount);
     if(number1.kind==TOKEN_NUM)
         n1=getvalue(&number1);
     if(number2.kind==TOKEN_NUM)
         n2=getvalue(&number2);
-    for(i=0;i<rb->tagdbheader->filecount;i++) 
+    for(i=0;i<tagdbheader->filecount;i++) 
         if(filter[currentlevel][i]) {
             loadentry(i);
             if(number1.kind==TOKEN_NUMIDENTIFIER)
@@ -154,12 +154,12 @@ unsigned char *parseCompareString() {
     PUTS("parseCompareString");
     if(currentToken->kind==TOKEN_STRING ||
           currentToken->kind==TOKEN_STRINGIDENTIFIER) {
-        rb->memcpy(&string1,currentToken,sizeof(struct token));
+        memcpy(&string1,currentToken,sizeof(struct token));
         parser_acceptIt();
     }
     else {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where STRING/STRINGID expected\n",currentToken->kind);
+        snprintf(errormsg,250,"'%d' found where STRING/STRINGID expected\n",currentToken->kind);
         return 0;
     }
     op=currentToken->kind;
@@ -167,25 +167,25 @@ unsigned char *parseCompareString() {
         parser_acceptIt();
     } else {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where STROP expected\n",op);
+        snprintf(errormsg,250,"'%d' found where STROP expected\n",op);
         return 0;
     }
     if(currentToken->kind==TOKEN_STRING ||
           currentToken->kind==TOKEN_STRINGIDENTIFIER) {
-        rb->memcpy(&string2,currentToken,sizeof(struct token));
+        memcpy(&string2,currentToken,sizeof(struct token));
         parser_acceptIt();
     }
     else {
         syntaxerror=1;
-        rb->snprintf(errormsg,250,"'%d' found where STRING/STRINGID expected\n",currentToken->kind);
+        snprintf(errormsg,250,"'%d' found where STRING/STRINGID expected\n",currentToken->kind);
         return 0;
     }
-    ret=my_malloc(sizeof(unsigned char)*rb->tagdbheader->filecount);
+    ret=my_malloc(sizeof(unsigned char)*tagdbheader->filecount);
     if(string1.kind==TOKEN_STRING)
         s1=getstring(&string1);
     if(string2.kind==TOKEN_STRING)
         s2=getstring(&string2);
-    for(i=0;i<rb->tagdbheader->filecount;i++) 
+    for(i=0;i<tagdbheader->filecount;i++) 
         if(filter[currentlevel][i]) {
             loadentry(i);
             if(string1.kind==TOKEN_STRINGIDENTIFIER)
@@ -194,17 +194,17 @@ unsigned char *parseCompareString() {
                 s2=getstring(&string2);
             switch(op) {
                 case TOKEN_CONTAINS:
-                    ret[i]=rb->strcasestr(s1,s2)!=0;
+                    ret[i]=strcasestr(s1,s2)!=0;
                     break;
                 case TOKEN_EQUALS:
-                    ret[i]=rb->strcasecmp(s1,s2)==0;
+                    ret[i]=strcasecmp(s1,s2)==0;
                     break;
                 case TOKEN_STARTSWITH:
-                    ret[i]=rb->strncasecmp(s1,s2,rb->strlen(s2))==0;
+                    ret[i]=strncasecmp(s1,s2,strlen(s2))==0;
                     break;
                 case TOKEN_ENDSWITH:
-                    i2=rb->strlen(s2);
-                    ret[i]=rb->strncasecmp(s1+rb->strlen(s1)-i2,s2,i2)==0;
+                    i2=strlen(s2);
+                    ret[i]=strncasecmp(s1+strlen(s1)-i2,s2,i2)==0;
                     break;
             }
         }
@@ -222,7 +222,7 @@ unsigned char *parseExpr() {
             PUTS("parseNot");
             ret = parseExpr();
             if(ret==NULL) return 0;
-            for(i=0;i<rb->tagdbheader->filecount;i++)
+            for(i=0;i<tagdbheader->filecount;i++)
                 if(filter[currentlevel][i])
                     ret[i]=!ret[i];
             break;
@@ -247,7 +247,7 @@ unsigned char *parseExpr() {
         default:
             // error, unexpected symbol
             syntaxerror=1;
-            rb->snprintf(errormsg,250,"unexpected '%d' found at parseExpr\n",currentToken->kind);
+            snprintf(errormsg,250,"unexpected '%d' found at parseExpr\n",currentToken->kind);
             ret=0;
             break;
     }
@@ -265,11 +265,11 @@ unsigned char *parseMExpr() {
         PUTS("parseOr");
         ret2 = parseLExpr();
         if(ret2==NULL) return 0;
-        for(i=0;i<rb->tagdbheader->filecount;i++)
+        for(i=0;i<tagdbheader->filecount;i++)
             if(filter[currentlevel][i]) // this should always be true
                 ret[i]=ret[i] || ret2[i];
             else
-                rb->splash(HZ*2,"An or is having a filter, bad.");
+                splash(HZ*2,"An or is having a filter, bad.");
     }
     return ret;
 }
@@ -287,7 +287,7 @@ unsigned char *parseLExpr() {
         PUTS("parseAnd");
         ret2 = parseExpr();
         if(ret2==NULL) return 0;
-        for(i=0;i<rb->tagdbheader->filecount;i++)
+        for(i=0;i<tagdbheader->filecount;i++)
             ret[i]=ret[i] && ret2[i];
     }
     filter[currentlevel]=nofilter;

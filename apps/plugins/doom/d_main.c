@@ -331,7 +331,7 @@ static void D_DoomLoop (void)
       D_Display();
 
       // Give the system some time
-      rb->yield();
+      yield();
    }
 }
 

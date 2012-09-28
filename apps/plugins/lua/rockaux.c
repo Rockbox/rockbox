@@ -70,7 +70,7 @@ long rb_pow(long x, long n)
 
 int strcoll(const char * str1, const char * str2)
 {
-    return rb->strcmp(str1, str2);
+    return strcmp(str1, str2);
 }
 
 const char* get_current_path(lua_State *L, int level)
@@ -85,7 +85,7 @@ const char* get_current_path(lua_State *L, int level)
         lua_getinfo(L, "S", &ar);
 
         char* curfile = (char*) &ar.source[1];
-        char* pos = rb->strrchr(curfile, '/');
+        char* pos = strrchr(curfile, '/');
         if(pos != NULL)
         {
             unsigned int len = (unsigned int)(pos - curfile);

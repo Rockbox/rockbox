@@ -31,10 +31,10 @@
 static void reversi_copy_board(reversi_board_t *dst,
         const reversi_board_t *src) {
     int i;
-    rb->memcpy(dst->history,src->history,
+    memcpy(dst->history,src->history,
                     (BOARD_SIZE*BOARD_SIZE - INIT_STONES)*sizeof(move_t));
     for(i=0;i<BOARD_SIZE;i++) {
-        rb->memcpy(dst->board[i],src->board[i],BOARD_SIZE*sizeof(int));
+        memcpy(dst->board[i],src->board[i],BOARD_SIZE*sizeof(int));
     }
 }
 
@@ -91,7 +91,7 @@ static move_t simple_move_func(const reversi_board_t *game, int player) {
     if(!count) return MOVE_INVALID;
 
     /* chose one of the moves which scores highest */
-    r = rb->rand()%count;
+    r = rand()%count;
     row = 0;
     col = 0;
     while(true) {

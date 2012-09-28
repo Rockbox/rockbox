@@ -37,6 +37,8 @@
 
 #include "metadata/metadata_common.h"
 
+#include "symbols.h"
+
 static bool get_shn_metadata(int fd, struct mp3entry *id3)
 {
     /* TODO: read the id3v2 header if it exists */
@@ -410,6 +412,7 @@ bool mp3info(struct mp3entry *entry, const char *filename)
 
     return result;
 }
+EXPORT_SYMBOL(mp3info);
 
 /* Get metadata for track - return false if parsing showed problems with the
  * file that would prevent playback.
@@ -460,6 +463,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     /* We have successfully read the metadata from the file */
     return true;
 }
+EXPORT_SYMBOL(get_metadata);
 
 #ifndef __PCTOOL__
 #if CONFIG_CODEC == SWCODEC

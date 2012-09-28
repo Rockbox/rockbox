@@ -121,7 +121,7 @@ static void cb_drawboard (void) {
     short l , piece , p_color ;
     int b_color=1;
     
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     for (r = 0; r < 8; r++) {
         for (c = 0; c < 8; c++) {
@@ -130,7 +130,7 @@ static void cb_drawboard (void) {
             p_color = color[l] ;
             cr2xy ( c , r , &x , &y );
             if ( piece == no_piece ) {
-                rb->lcd_bitmap_part ( chessbox_pieces , 0 ,
+                lcd_bitmap_part ( chessbox_pieces , 0 ,
                                       TILE_HEIGHT * b_color ,
                                       STRIDE(   SCREEN_MAIN, 
                                                 BMPWIDTH_chessbox_pieces, 
@@ -140,7 +140,7 @@ static void cb_drawboard (void) {
                                       TILE_WIDTH ,
                                       TILE_HEIGHT );
             } else {
-                rb->lcd_bitmap_part ( chessbox_pieces ,
+                lcd_bitmap_part ( chessbox_pieces ,
                                       0 ,
                                       2 * TILE_HEIGHT +
                                           4 * TILE_HEIGHT * ( piece - 1 ) +
@@ -161,26 +161,26 @@ static void cb_drawboard (void) {
     
     /* draw board limits */
 #if (LCD_WIDTH > TILE_WIDTH*8) && (LCD_HEIGHT > TILE_HEIGHT*8)
-    rb->lcd_drawrect(XOFS - 1, YOFS - 1, TILE_WIDTH*8 + 2, TILE_HEIGHT*8 + 2);
+    lcd_drawrect(XOFS - 1, YOFS - 1, TILE_WIDTH*8 + 2, TILE_HEIGHT*8 + 2);
 #elif LCD_WIDTH > TILE_WIDTH*8
-    rb->lcd_vline(XOFS - 1, 0, LCD_HEIGHT - 1);
-    rb->lcd_vline(XOFS + 8*TILE_WIDTH, 0, LCD_HEIGHT - 1);
+    lcd_vline(XOFS - 1, 0, LCD_HEIGHT - 1);
+    lcd_vline(XOFS + 8*TILE_WIDTH, 0, LCD_HEIGHT - 1);
 #elif LCD_HEIGHT > TILE_HEIGHT*8
-    rb->lcd_hline(0, LCD_WIDTH - 1, YOFS - 1);
-    rb->lcd_hline(0, LCD_WIDTH - 1, YOFS + TILE_HEIGHT*8);
+    lcd_hline(0, LCD_WIDTH - 1, YOFS - 1);
+    lcd_hline(0, LCD_WIDTH - 1, YOFS + TILE_HEIGHT*8);
 #endif
 
-    rb->lcd_update();
+    lcd_update();
 }
 
 /* ---- Switch mark on board ---- */
 static void cb_switch ( short x , short y ) {
-    rb->lcd_set_drawmode ( DRMODE_COMPLEMENT );
-    rb->lcd_drawrect ( XOFS + x*TILE_WIDTH + 1 ,
+    lcd_set_drawmode ( DRMODE_COMPLEMENT );
+    lcd_drawrect ( XOFS + x*TILE_WIDTH + 1 ,
                        YOFS + ( 7 - y )*TILE_HEIGHT +1 ,
                        TILE_WIDTH-2 , TILE_HEIGHT-2 );
-    rb->lcd_update();
-    rb->lcd_set_drawmode ( DRMODE_SOLID );
+    lcd_update();
+    lcd_set_drawmode ( DRMODE_SOLID );
 }
 
 /* ---- callback for capturing interaction while thinking ---- */
@@ -188,7 +188,7 @@ static void cb_wt_callback ( void ) {
     int button = BUTTON_NONE;
     
     wt_command = COMMAND_NOP;
-    button = rb->button_get(false);
+    button = button_get(false);
     switch (button) {
 #ifdef CB_RC_QUIT
         case CB_RC_QUIT:
@@ -262,7 +262,7 @@ static void cb_levelup ( void ) {
         cb_setlevel ( 1 );
     else
         cb_setlevel ( Level+1 );
-    rb->splash ( HZ/2 , level_string[Level-1] );
+    splash ( HZ/2 , level_string[Level-1] );
 };
 
 /* ---- Save current position ---- */
@@ -271,51 +271,51 @@ static void cb_saveposition ( void ) {
     short sq,i,c;
     unsigned short temp;
     
-    rb->splash ( 0 , "Saving position" );
+    splash ( 0 , "Saving position" );
 
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
 
-    computer++; rb->write(fd, &(computer), sizeof(computer)); computer--;
-    opponent++; rb->write(fd, &(opponent), sizeof(opponent)); opponent--;
-    rb->write(fd, &(Game50), sizeof(Game50));
+    computer++; write(fd, &(computer), sizeof(computer)); computer--;
+    opponent++; write(fd, &(opponent), sizeof(opponent)); opponent--;
+    write(fd, &(Game50), sizeof(Game50));
 
-    rb->write(fd, &(castld[white]), sizeof(castld[white]));
-    rb->write(fd, &(castld[black]), sizeof(castld[black]));
-    rb->write(fd, &(kingmoved[white]), sizeof(kingmoved[white]));
-    rb->write(fd, &(kingmoved[black]), sizeof(kingmoved[black]));
+    write(fd, &(castld[white]), sizeof(castld[white]));
+    write(fd, &(castld[black]), sizeof(castld[black]));
+    write(fd, &(kingmoved[white]), sizeof(kingmoved[white]));
+    write(fd, &(kingmoved[black]), sizeof(kingmoved[black]));
 
-    rb->write(fd, &(withbook), sizeof(withbook));
-    rb->write(fd, &(Level), sizeof(Level));
-    rb->write(fd, &(TCflag), sizeof(TCflag));
-    rb->write(fd, &(OperatorTime), sizeof(OperatorTime));
+    write(fd, &(withbook), sizeof(withbook));
+    write(fd, &(Level), sizeof(Level));
+    write(fd, &(TCflag), sizeof(TCflag));
+    write(fd, &(OperatorTime), sizeof(OperatorTime));
 
-    rb->write(fd, &(TimeControl.clock[white]),
+    write(fd, &(TimeControl.clock[white]),
               sizeof(TimeControl.clock[white]) );
-    rb->write(fd, &(TimeControl.clock[black]),
+    write(fd, &(TimeControl.clock[black]),
               sizeof(TimeControl.clock[black]) );
-    rb->write(fd, &(TimeControl.moves[white]),
+    write(fd, &(TimeControl.moves[white]),
               sizeof(TimeControl.moves[white]) );
-    rb->write(fd, &(TimeControl.moves[black]),
+    write(fd, &(TimeControl.moves[black]),
               sizeof(TimeControl.moves[black]) );
     for (sq = 0; sq < 64; sq++) {
         if (color[sq] == neutral) c = 0; else c = color[sq]+1;
         temp = 256*board[sq] + c ;
-        rb->write(fd, &(temp), sizeof(temp));
+        write(fd, &(temp), sizeof(temp));
     }
     for (i = 0; i <= GameCnt; i++) {
         if (GameList[i].color == neutral)
             c = 0;
         else
             c = GameList[i].color + 1;
-        rb->write(fd, &(GameList[i].gmove), sizeof(GameList[i].gmove));
-        rb->write(fd, &(GameList[i].score), sizeof(GameList[i].score));
-        rb->write(fd, &(GameList[i].depth), sizeof(GameList[i].depth));
-        rb->write(fd, &(GameList[i].nodes), sizeof(GameList[i].nodes));
-        rb->write(fd, &(GameList[i].time), sizeof(GameList[i].time));
-        rb->write(fd, &(GameList[i].piece), sizeof(GameList[i].piece));
-        rb->write(fd, &(c), sizeof(c));
+        write(fd, &(GameList[i].gmove), sizeof(GameList[i].gmove));
+        write(fd, &(GameList[i].score), sizeof(GameList[i].score));
+        write(fd, &(GameList[i].depth), sizeof(GameList[i].depth));
+        write(fd, &(GameList[i].nodes), sizeof(GameList[i].nodes));
+        write(fd, &(GameList[i].time), sizeof(GameList[i].time));
+        write(fd, &(GameList[i].piece), sizeof(GameList[i].piece));
+        write(fd, &(c), sizeof(c));
     }
-    rb->close(fd);
+    close(fd);
 }
 
 /* ---- Restore saved position ---- */
@@ -324,32 +324,32 @@ static void cb_restoreposition ( void ) {
     short sq;
     unsigned short m;
     
-    if ( (fd = rb->open(SAVE_FILE, O_RDONLY)) >= 0 ) {
-        rb->splash ( 0 , "Loading position" );
-        rb->read(fd, &(computer), sizeof(computer));
-        rb->read(fd, &(opponent), sizeof(opponent));
-        rb->read(fd, &(Game50), sizeof(Game50));
+    if ( (fd = open(SAVE_FILE, O_RDONLY)) >= 0 ) {
+        splash ( 0 , "Loading position" );
+        read(fd, &(computer), sizeof(computer));
+        read(fd, &(opponent), sizeof(opponent));
+        read(fd, &(Game50), sizeof(Game50));
 
-        rb->read(fd, &(castld[white]), sizeof(castld[white]));
-        rb->read(fd, &(castld[black]), sizeof(castld[black]));
-        rb->read(fd, &(kingmoved[white]), sizeof(kingmoved[white]));
-        rb->read(fd, &(kingmoved[black]), sizeof(kingmoved[black]));
+        read(fd, &(castld[white]), sizeof(castld[white]));
+        read(fd, &(castld[black]), sizeof(castld[black]));
+        read(fd, &(kingmoved[white]), sizeof(kingmoved[white]));
+        read(fd, &(kingmoved[black]), sizeof(kingmoved[black]));
 
-        rb->read(fd, &(withbook), sizeof(withbook));
-        rb->read(fd, &(Level), sizeof(Level));
-        rb->read(fd, &(TCflag), sizeof(TCflag));
-        rb->read(fd, &(OperatorTime), sizeof(OperatorTime));
+        read(fd, &(withbook), sizeof(withbook));
+        read(fd, &(Level), sizeof(Level));
+        read(fd, &(TCflag), sizeof(TCflag));
+        read(fd, &(OperatorTime), sizeof(OperatorTime));
 
-        rb->read(fd, &(TimeControl.clock[white]),
+        read(fd, &(TimeControl.clock[white]),
                  sizeof(TimeControl.clock[white]));
-        rb->read(fd, &(TimeControl.clock[black]),
+        read(fd, &(TimeControl.clock[black]),
                  sizeof(TimeControl.clock[black]));
-        rb->read(fd, &(TimeControl.moves[white]),
+        read(fd, &(TimeControl.moves[white]),
                  sizeof(TimeControl.moves[white]));
-        rb->read(fd, &(TimeControl.moves[black]),
+        read(fd, &(TimeControl.moves[black]),
                  sizeof(TimeControl.moves[black]));
         for (sq = 0; sq < 64; sq++) {
-            rb->read(fd, &(m), sizeof(m));
+            read(fd, &(m), sizeof(m));
             board[sq] = (m >> 8); color[sq] = (m & 0xFF);
             if (color[sq] == 0)
                 color[sq] = neutral;
@@ -357,19 +357,19 @@ static void cb_restoreposition ( void ) {
                 --color[sq];
         }
         GameCnt = -1;
-        while (rb->read(fd, &(GameList[++GameCnt].gmove),
+        while (read(fd, &(GameList[++GameCnt].gmove),
                         sizeof(GameList[GameCnt].gmove)) > 0) {
-            rb->read(fd, &(GameList[GameCnt].score),
+            read(fd, &(GameList[GameCnt].score),
                      sizeof(GameList[GameCnt].score));
-            rb->read(fd, &(GameList[GameCnt].depth),
+            read(fd, &(GameList[GameCnt].depth),
                      sizeof(GameList[GameCnt].depth));
-            rb->read(fd, &(GameList[GameCnt].nodes),
+            read(fd, &(GameList[GameCnt].nodes),
                      sizeof(GameList[GameCnt].nodes));
-            rb->read(fd, &(GameList[GameCnt].time),
+            read(fd, &(GameList[GameCnt].time),
                      sizeof(GameList[GameCnt].time));
-            rb->read(fd, &(GameList[GameCnt].piece),
+            read(fd, &(GameList[GameCnt].piece),
                      sizeof(GameList[GameCnt].piece));
-            rb->read(fd, &(GameList[GameCnt].color),
+            read(fd, &(GameList[GameCnt].color),
                          sizeof(GameList[GameCnt].color));
             if (GameList[GameCnt].color == 0)
                 GameList[GameCnt].color = neutral;
@@ -381,7 +381,7 @@ static void cb_restoreposition ( void ) {
             TCflag = true;
         computer--; opponent--;
     }
-    rb->close(fd);
+    close(fd);
     cb_setlevel(Level);
     InitializeStats();
     Sdepth = 0;
@@ -399,7 +399,7 @@ static int cb_menu_viewer(void)
     
     while(!menu_quit)
     {
-        switch(rb->do_menu(&menu, &selection, NULL, false))
+        switch(do_menu(&menu, &selection, NULL, false))
         {
             case 0:
                 menu_quit = true;
@@ -425,7 +425,7 @@ static struct cb_command cb_get_viewer_command (void) {
     
     /* main loop */
     while ( true ) {
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button) {
 #ifdef CB_RC_QUIT
             case CB_RC_QUIT:
@@ -456,7 +456,7 @@ static void cb_start_viewer(char* filename){
 
     first_game = pgn_list_games(filename);
     if (first_game == NULL){
-        rb->splash ( HZ*2 , "No games found !" );
+        splash ( HZ*2 , "No games found !" );
         return;
     }
 
@@ -486,7 +486,7 @@ static void cb_start_viewer(char* filename){
                         if (curr_ply->prev_node != NULL){
                             curr_ply = curr_ply->prev_node;
                         } else {
-                            rb->splash ( HZ*2 , "At the begining of the game" );
+                            splash ( HZ*2 , "At the begining of the game" );
                             break;
                         }
                         board[locn[curr_ply->row_from][curr_ply->column_from]] 
@@ -532,7 +532,7 @@ static void cb_start_viewer(char* filename){
                     case COMMAND_NEXT:
                         /* apply the current move */
                         if (curr_ply->player == neutral){
-                            rb->splash ( HZ*2 , "At the end of the game" );
+                            splash ( HZ*2 , "At the end of the game" );
                             break;
                         }
                         board[locn[curr_ply->row_to][curr_ply->column_to]]
@@ -584,7 +584,7 @@ static void cb_start_viewer(char* filename){
                 }
             } while (!exit_game && !exit_viewer);
         } else {
-            rb->splash ( HZ*2 , "Error parsing game !");
+            splash ( HZ*2 , "Error parsing game !");
         }
     } while (!exit_viewer);
 }
@@ -605,7 +605,7 @@ static int cb_menu(void)
     
     while(!menu_quit)
     {
-        switch(rb->do_menu(&menu, &selection, NULL, false))
+        switch(do_menu(&menu, &selection, NULL, false))
         {
             case 0:
                 menu_quit = true;
@@ -652,7 +652,7 @@ static struct cb_command cb_getcommand (void) {
     cb_switch ( x , y );
     /* main loop */
     while ( true ) {
-        button = rb->button_get(true);
+        button = button_get(true);
         switch (button) {
 #ifdef CB_RC_QUIT
             case CB_RC_QUIT:
@@ -788,6 +788,8 @@ static void cb_play_game(void) {
 
     /* init PGN history data structures */
     game = pgn_init_game();
+    if (game == NULL)
+        return;
     
     /* restore saved position, if saved */
     cb_restoreposition();
@@ -799,18 +801,21 @@ static void cb_play_game(void) {
 
     while (!exit) {
         if ( mate ) {
-            rb->splash ( HZ*3 , "Checkmate!" );
-            rb->button_get(true);
+            splash ( HZ*3 , "Checkmate!" );
+            button_get(true);
             pgn_store_game(game);
             GNUChess_Initialize();
             game = pgn_init_game();
+            if (game == NULL)
+                return;
+
             cb_drawboard();
         }
         command = cb_getcommand ();
         switch (command.type) {
             case COMMAND_MOVE:
                 if ( ! VerifyMove (opponent, command.mv_s , 0 , &command.mv, move_buffer ) ) {
-                    rb->splash ( HZ/2 , "Illegal move!" );
+                    splash ( HZ/2 , "Illegal move!" );
                     cb_drawboard();
                 } else {
                     cb_drawboard();
@@ -818,13 +823,13 @@ static void cb_play_game(void) {
                     /* Add the ply to the PGN history (in algebraic notation) */
                     pgn_append_ply(game, opponent, move_buffer, mate);
 
-                    rb->splash ( 0 , "Thinking..." );
+                    splash ( 0 , "Thinking..." );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                    rb->cpu_boost ( true );
+                    cpu_boost ( true );
 #endif
                     SelectMove ( computer , 0 , cb_wt_callback, move_buffer);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                    rb->cpu_boost ( false );
+                    cpu_boost ( false );
 #endif
                     /* Add the ply to the PGN history (in algebraic notation) and check
                      * for the result of the game which is only calculated in SelectMove
@@ -846,6 +851,9 @@ static void cb_play_game(void) {
             case COMMAND_RESTART:
                 GNUChess_Initialize();
                 game = pgn_init_game();
+                if (game == NULL)
+                    return;
+
                 cb_drawboard();
                 break;
 #endif
@@ -864,6 +872,8 @@ static void cb_play_game(void) {
 
                 /* init PGN history data structures */
                 game = pgn_init_game();
+                if (game == NULL)
+                    return;
 
                 /* restore saved position, if saved */
                 cb_restoreposition();
@@ -878,14 +888,14 @@ static void cb_play_game(void) {
                     opponent = white;
                     computer = black;
                 }
-                rb->splash ( 0 , "Thinking..." );
+                splash ( 0 , "Thinking..." );
                 ElapsedTime(1);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost ( true );
+                cpu_boost ( true );
 #endif
                 SelectMove ( computer , 0 , cb_wt_callback , move_buffer );
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cpu_boost ( false );
+                cpu_boost ( false );
 #endif
 
                 /* Add the ply to the PGN history (in algebraic notation) and check
@@ -915,7 +925,7 @@ static void cb_play_game(void) {
     
     cb_saveposition();
     /* TODO: save/restore the PGN history of unfinished games */
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 
 }
 
@@ -927,7 +937,7 @@ enum plugin_status plugin_start(const void* parameter) {
     /* plugin init */
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 
     /* end of plugin init */

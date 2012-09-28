@@ -28,6 +28,7 @@
 #include "dircache.h"
 #include "filefuncs.h"
 #include "system.h"
+#include "symbols.h"
 
 /*
   These functions provide a roughly POSIX-compatible file IO API.
@@ -55,10 +56,11 @@ static struct filedesc openfiles[MAX_OPEN_FILES] CACHEALIGN_ATTR;
 
 static int flush_cache(int fd);
 
-int file_creat(const char *pathname)
+int creat(const char *pathname, ...)
 {
     return open(pathname, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 }
+EXPORT_SYMBOL(creat);
 
 static int open_internal(const char* pathname, int flags, bool use_cache)
 {
@@ -230,11 +232,12 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     return fd;
 }
 
-int file_open(const char* pathname, int flags)
+int open(const char* pathname, int flags, ...)
 {
     /* By default, use the dircache if available. */
     return open_internal(pathname, flags, true);
 }
+EXPORT_SYMBOL(open);
 
 int close(int fd)
 {
@@ -264,6 +267,7 @@ int close(int fd)
     file->busy = false;
     return 0;
 }
+EXPORT_SYMBOL(close);
 
 int fsync(int fd)
 {
@@ -339,6 +343,7 @@ int remove(const char* name)
 
     return 0;
 }
+EXPORT_SYMBOL(remove);
 
 int rename(const char* path, const char* newpath)
 {
@@ -437,6 +442,7 @@ int rename(const char* path, const char* newpath)
 
     return 0;
 }
+EXPORT_SYMBOL(rename);
 
 int ftruncate(int fd, off_t size)
 {
@@ -466,6 +472,7 @@ int ftruncate(int fd, off_t size)
 
     return 0;
 }
+EXPORT_SYMBOL(ftruncate);
 
 static int flush_cache(int fd)
 {
@@ -707,12 +714,13 @@ ssize_t write(int fd, const void* buf, size_t count)
     }
     return readwrite(fd, (void *)buf, count, true);
 }
+EXPORT_SYMBOL(write);
 
 ssize_t read(int fd, void* buf, size_t count)
 {
     return readwrite(fd, buf, count, false);
 }
-
+EXPORT_SYMBOL(read);
 
 off_t lseek(int fd, off_t offset, int whence)
 {
@@ -796,6 +804,7 @@ off_t lseek(int fd, off_t offset, int whence)
 
     return pos;
 }
+EXPORT_SYMBOL(lseek);
 
 off_t filesize(int fd)
 {
@@ -812,7 +821,7 @@ off_t filesize(int fd)
 
     return file->size;
 }
-
+EXPORT_SYMBOL(filesize);
 
 /* release all file handles on a given volume "by force", to avoid leaks */
 int release_files(int volume)

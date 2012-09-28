@@ -27,6 +27,7 @@
 #include "usb_class_driver.h"
 /*#define LOGF_ENABLE*/
 #include "logf.h"
+#include "symbols.h"
 
 /* Documents avaiable here: http://www.usb.org/developers/devclass_docs/ */
 
@@ -827,3 +828,4 @@ void usb_hid_send(usage_page_t usage_page, int id)
 
     usb_hid_try_send_drv();
 }
+EXPORT_SYMBOL(usb_hid_send);

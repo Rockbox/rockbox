@@ -41,8 +41,10 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#include "symbols.h"
 
 struct event_queue button_queue SHAREDBSS_ATTR;
+EXPORT_SYMBOL(button_queue);
 
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */
@@ -371,6 +373,7 @@ int button_queue_count( void )
 {
     return queue_count(&button_queue);
 }
+EXPORT_SYMBOL(button_queue_count);
 
 long button_get(bool block)
 {
@@ -395,6 +398,7 @@ long button_get(bool block)
     
     return BUTTON_NONE;
 }
+EXPORT_SYMBOL(button_get);
 
 long button_get_w_tmo(int ticks)
 {
@@ -415,6 +419,7 @@ long button_get_w_tmo(int ticks)
         button_data = ev.data;
     return ev.id;
 }
+EXPORT_SYMBOL(button_get_w_tmo);
 
 intptr_t button_get_data(void)
 {
@@ -608,6 +613,7 @@ int button_status(void)
 {
     return lastbtn;
 }
+EXPORT_SYMBOL(button_status);
 
 #ifdef HAVE_BUTTON_DATA
 int button_status_wdata(int *pdata)
@@ -621,6 +627,7 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
+EXPORT_SYMBOL(button_clear_queue);
 
 #ifdef HAVE_TOUCHSCREEN
 int touchscreen_last_touch(void)

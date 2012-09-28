@@ -74,7 +74,7 @@ static ssize_t tv_read(unsigned char *buf, ssize_t reqsize)
     if (buf - reader_buffer + reqsize > buffer_size)
         reqsize = buffer_size - (buf - reader_buffer);
 
-    return rb->read(fd, buf, reqsize);
+    return read(fd, buf, reqsize);
 }
 
 void tv_seek(off_t offset, int whence)
@@ -101,7 +101,7 @@ void tv_seek(off_t offset, int whence)
                     buf_pos  -= block_size;
                     file_pos += block_size;
                     size = read_size - block_size;
-                    rb->memcpy(reader_buffer, reader_buffer + block_size, size);
+                    memcpy(reader_buffer, reader_buffer + block_size, size);
                     read_size = tv_read(reader_buffer + block_size, block_size);
                     if (read_size < 0)
                         read_size = 0;
@@ -125,7 +125,7 @@ void tv_seek(off_t offset, int whence)
         else if (file_pos > file_size)
             file_pos = file_size;
 
-        rb->lseek(fd, file_pos + start_file_pos, SEEK_SET);
+        lseek(fd, file_pos + start_file_pos, SEEK_SET);
         buf_pos = 0;
         read_size = tv_read(reader_buffer, buffer_size);
     }
@@ -136,16 +136,16 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
     bool change_file = false;
 
     /* open the new file */
-    if (oldp == NULL || rb->strcmp(oldp->file_name, preferences->file_name))
+    if (oldp == NULL || strcmp(oldp->file_name, preferences->file_name))
     {
         if (fd >= 0)
-            rb->close(fd);
+            close(fd);
 
-        fd = rb->open(preferences->file_name, O_RDONLY);
+        fd = open(preferences->file_name, O_RDONLY);
         if (fd < 0)
             return TV_CALLBACK_ERROR;
 
-        file_size = rb->filesize(fd);
+        file_size = filesize(fd);
         change_file = true;
     }
 
@@ -168,9 +168,9 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
         {
             unsigned char bom[BOM_SIZE];
 
-            rb->lseek(fd, 0, SEEK_SET);
-            rb->read(fd, bom, BOM_SIZE);
-            if (rb->memcmp(bom, BOM, BOM_SIZE) == 0)
+            lseek(fd, 0, SEEK_SET);
+            read(fd, bom, BOM_SIZE);
+            if (memcmp(bom, BOM, BOM_SIZE) == 0)
                 start_file_pos = BOM_SIZE;
         }
 
@@ -202,5 +202,5 @@ bool tv_init_reader(unsigned char **buf, size_t *size)
 void tv_finalize_reader(void)
 {
     if (fd >= 0)
-        rb->close(fd);
+        close(fd);
 }

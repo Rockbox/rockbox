@@ -331,33 +331,33 @@ int zx_kbd_input(char* text/*, int buflen*/)
             param[l].curfont = FONT_SYSFIXED;
             p = param[l].default_kbd;
             while (*p != 0)
-                p = rb->utf8decode(p, &param[l].kbd_buf[i++]);
+                p = utf8decode(p, &param[l].kbd_buf[i++]);
             param[l].nchars = i;
 /*            param[l].curfont = FONT_UI;*/
     }
     FOR_NB_SCREENS(l)
     {
-        param[l].font = rb->font_get(param[l].curfont);
+        param[l].font = font_get(param[l].curfont);
         param[l].font_h = param[l].font->height;
 
             /* check if FONT_UI fits the screen */
         if (2*param[l].font_h+3 + BUTTONBAR_HEIGHT >
-            rb->screens[l]->getheight()) {
-            param[l].font = rb->font_get(FONT_SYSFIXED);
+            screens[l].getheight()) {
+            param[l].font = font_get(FONT_SYSFIXED);
             param[l].font_h = param[l].font->height;
             param[l].curfont = FONT_SYSFIXED;
         }
 
-        rb->screens[l]->setfont(param[l].curfont);
+        screens[l].setfont(param[l].curfont);
         /* find max width of keyboard glyphs */
         for (i=0; i<param[l].nchars; i++) {
-            w = rb->font_get_width(param[l].font, param[l].kbd_buf[i]);
+            w = font_get_width(param[l].font, param[l].kbd_buf[i]);
             if (w > param[l].font_w)
                 param[l].font_w = w;
         }
         /* Since we're going to be adding spaces, make sure that we check
          * their width too */
-        w = rb->font_get_width( param[l].font, ' ' );
+        w = font_get_width( param[l].font, ' ' );
         if( w > param[l].font_w )
             param[l].font_w = w;
     }
@@ -369,9 +369,9 @@ int zx_kbd_input(char* text/*, int buflen*/)
         {
             if( param[l].kbd_buf[i] == '\n' )
             {
-                k = ( rb->screens[l]->getwidth() / param[l].font_w ) -
-                    i % ( rb->screens[l]->getwidth() / param[l].font_w ) - 1;
-                if( k == ( rb->screens[l]->getwidth() / param[l].font_w ) - 1 )
+                k = ( screens[l].getwidth() / param[l].font_w ) -
+                    i % ( screens[l].getwidth() / param[l].font_w ) - 1;
+                if( k == ( screens[l].getwidth() / param[l].font_w ) - 1 )
                 {
                     param[l].nchars--;
                     for( j = i; j < param[l].nchars; j++ )
@@ -408,22 +408,22 @@ int zx_kbd_input(char* text/*, int buflen*/)
     {
         text_w = param[l].font_w;
         while (*utf8) {
-            utf8 = (unsigned char*)rb->utf8decode(utf8, &ch);
-            w = rb->font_get_width(param[l].font, ch);
+            utf8 = (unsigned char*)utf8decode(utf8, &ch);
+            w = font_get_width(param[l].font, ch);
             if (w > text_w)
                 text_w = w;
         }
-        param[l].max_chars_text = rb->screens[l]->getwidth() / text_w - 2;
+        param[l].max_chars_text = screens[l].getwidth() / text_w - 2;
 
     /* calculate keyboard grid size */
-        param[l].max_chars = rb->screens[l]->getwidth() / param[l].font_w;
+        param[l].max_chars = screens[l].getwidth() / param[l].font_w;
         if (!kbd_loaded) {
             param[l].lines = param[l].DEFAULT_LINES;
             param[l].keyboard_margin = DEFAULT_MARGIN;
         } else {
-            param[l].lines = (rb->screens[l]->lcdheight - BUTTONBAR_HEIGHT -
+            param[l].lines = (screens[l].lcdheight - BUTTONBAR_HEIGHT -
                              statusbar_size) / param[l].font_h - 1;
-            param[l].keyboard_margin = rb->screens[l]->lcdheight -
+            param[l].keyboard_margin = screens[l].lcdheight -
                                        BUTTONBAR_HEIGHT - statusbar_size -
                                        (param[l].lines+1)*param[l].font_h;
             if (param[l].keyboard_margin < 3) {
@@ -445,28 +445,28 @@ int zx_kbd_input(char* text/*, int buflen*/)
 
     }
 #ifdef ZX_WRITE_OUT_TEXT
-    editpos = rb->utf8length(text);
+    editpos = utf8length(text);
 #endif
 
     while(!done)
     {
 #ifdef ZX_WRITE_OUT_TEXT
-        len_utf8 = rb->utf8length(text);
+        len_utf8 = utf8length(text);
 #endif
         FOR_NB_SCREENS(l)
-            rb->screens[l]->clear_display();
+            screens[l].clear_display();
 
 
             /* draw page */
             FOR_NB_SCREENS(l)
             {
-                rb->screens[l]->setfont(param[l].curfont);
+                screens[l].setfont(param[l].curfont);
                 k = param[l].page*param[l].max_chars*param[l].lines;
                 for (i=j=0; j < param[l].lines && k < param[l].nchars; k++) {
-                    utf8 = rb->utf8encode(param[l].kbd_buf[k], outline);
+                    utf8 = utf8encode(param[l].kbd_buf[k], outline);
                     *utf8 = 0;
-                    rb->screens[l]->getstringsize(outline, &w, NULL);
-                    rb->screens[l]->putsxy(i*param[l].font_w + (param[l].font_w-w)/2, j*param[l].font_h
+                    screens[l].getstringsize(outline, &w, NULL);
+                    screens[l].putsxy(i*param[l].font_w + (param[l].font_w-w)/2, j*param[l].font_h
                           + statusbar_size, outline);
                     if (++i == param[l].max_chars) {
                         i = 0;
@@ -479,18 +479,18 @@ int zx_kbd_input(char* text/*, int buflen*/)
         /* separator */
         FOR_NB_SCREENS(l)
         {
-            rb->screens[l]->hline(0, rb->screens[l]->getwidth() - 1,
+            screens[l].hline(0, screens[l].getwidth() - 1,
                                   param[l].main_y - param[l].keyboard_margin);
 
         /* write out the text */
 #ifdef ZX_WRITE_OUT_TEXT
-            rb->screens[l]->setfont(param[l].curfont);
+            screens[l].setfont(param[l].curfont);
 
             i=j=0;
             param[l].curpos = MIN(editpos, param[l].max_chars_text
                                 - MIN(len_utf8 - editpos, 2));
             param[l].leftpos = editpos - param[l].curpos;
-            utf8 = text + rb->utf8seek(text, param[l].leftpos);
+            utf8 = text + utf8seek(text, param[l].leftpos);
 
             text_w = param[l].font_w;
             while (*utf8 && i < param[l].max_chars_text) {
@@ -499,25 +499,25 @@ int zx_kbd_input(char* text/*, int buflen*/)
                     outline[j] = 0;
                     j=0;
                     i++;
-                    rb->screens[l]->getstringsize(outline, &w, NULL);
-                    rb->screens[l]->putsxy(i*text_w + (text_w-w)/2, param[l].main_y, outline);
+                    screens[l].getstringsize(outline, &w, NULL);
+                    screens[l].putsxy(i*text_w + (text_w-w)/2, param[l].main_y, outline);
                 }
             }
 
             if (param[l].leftpos) {
-                rb->screens[l]->getstringsize("<", &w, NULL);
-                rb->screens[l]->putsxy(text_w - w, param[l].main_y, "<");
+                screens[l].getstringsize("<", &w, NULL);
+                screens[l].putsxy(text_w - w, param[l].main_y, "<");
             }
             if (len_utf8 - param[l].leftpos > param[l].max_chars_text)
-                rb->screens[l]->putsxy(rb->screens[l]->width - text_w, param[l].main_y, ">");
+                screens[l].putsxy(screens[l].width - text_w, param[l].main_y, ">");
 
             /* cursor */
             i = (param[l].curpos + 1) * text_w;
             if (cur_blink)
-                rb->screens[l]->vline(i, param[l].main_y, param[l].main_y + param[l].font_h-1);
+                screens[l].vline(i, param[l].main_y, param[l].main_y + param[l].font_h-1);
 
             if (hangul) /* draw underbar */
-                rb->screens[l]->hline(param[l].curpos*text_w, (param[l].curpos+1)*text_w,
+                screens[l].hline(param[l].curpos*text_w, (param[l].curpos+1)*text_w,
                                        param[l].main_y+param[l].font_h-1);
 #endif
         }
@@ -527,23 +527,23 @@ int zx_kbd_input(char* text/*, int buflen*/)
             /* highlight the key that has focus */
             FOR_NB_SCREENS(l)
             {
-                rb->screens[l]->set_drawmode(DRMODE_COMPLEMENT);
-                rb->screens[l]->fillrect(param[l].font_w * param[l].x,
+                screens[l].set_drawmode(DRMODE_COMPLEMENT);
+                screens[l].fillrect(param[l].font_w * param[l].x,
                                         statusbar_size + param[l].font_h * param[l].y,
                                         param[l].font_w, param[l].font_h);
-                rb->screens[l]->set_drawmode(DRMODE_SOLID);
+                screens[l].set_drawmode(DRMODE_SOLID);
             }
         
         FOR_NB_SCREENS(l)
-        rb->screens[l]->update();
+        screens[l].update();
 
-        button = rb->button_get_w_tmo(HZ/2);
+        button = button_get_w_tmo(HZ/2);
 
         switch ( button ) {
 
             case KBD_ABORT:
                 FOR_NB_SCREENS(l)
-                    rb->screens[l]->setfont(FONT_UI);
+                    screens[l].setfont(FONT_UI);
 
                 return -1;
                 break;
@@ -645,9 +645,9 @@ int zx_kbd_input(char* text/*, int buflen*/)
 
 
             default:
-                if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if(default_event_handler(button) == SYS_USB_CONNECTED)
                     FOR_NB_SCREENS(l)
-                        rb->screens[l]->setfont(FONT_SYSFIXED);
+                        screens[l].setfont(FONT_SYSFIXED);
                 break;
 
         }
@@ -657,6 +657,6 @@ int zx_kbd_input(char* text/*, int buflen*/)
         }
     }
     FOR_NB_SCREENS(l)
-        rb->screens[l]->setfont(FONT_UI);
+        screens[l].setfont(FONT_UI);
     return 0;
 }

@@ -102,6 +102,8 @@
 #include "piezo.h"
 #endif
 
+#include "symbols.h"
+
 /* units used with output_dyn_value */
 const unsigned char * const byte_units[] =
 {
@@ -252,6 +254,7 @@ bool settings_parseline(char* line, char** name, char** value)
     *value = ptr;
     return true;
 }
+EXPORT_SYMBOL(settings_parseline);
 
 static void system_flush(void)
 {
@@ -687,11 +690,13 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
     }
     return 0;
 }
+EXPORT_SYMBOL(default_event_handler_ex);
 
 long default_event_handler(long event)
 {
     return default_event_handler_ex(event, NULL, NULL);
 }
+EXPORT_SYMBOL(default_event_handler);
 
 int show_logo( void )
 {
@@ -741,6 +746,7 @@ int show_logo( void )
 
     return 0;
 }
+EXPORT_SYMBOL(show_logo);
 
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF) || defined(HAVE_HOTSWAP_STORAGE_AS_MAIN)
@@ -853,6 +859,7 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
 
     return buffer;
 }
+EXPORT_SYMBOL(strip_extension);
 
 #if CONFIG_CODEC == SWCODEC
 /* Play a standard sound */
@@ -885,6 +892,7 @@ void system_sound_play(enum system_sound sound)
                   params->amplitude * *params->setting);
     }
 }
+EXPORT_SYMBOL(system_sound_play);
 
 static keyclick_callback keyclick_current_callback = NULL;
 static void* keyclick_data = NULL;
@@ -960,6 +968,7 @@ void keyclick_click(bool rawbutton, int action)
 #endif
     }
 }
+EXPORT_SYMBOL(keyclick_click);
 
 /* Return the ReplayGain mode adjusted by other relevant settings */
 static int replaygain_setting_mode(int type)
@@ -1038,7 +1047,7 @@ int read_line(int fd, char* buffer, int buffer_size)
 
     return errno ? -1 : num_read;
 }
-
+EXPORT_SYMBOL(read_line);
 
 char* skip_whitespace(char* const str)
 {
@@ -1135,7 +1144,7 @@ int open_utf8(const char* pathname, int flags)
     }
     return fd;
 }
-
+EXPORT_SYMBOL(open_utf8);
 
 #ifdef HAVE_LCD_COLOR
 /*

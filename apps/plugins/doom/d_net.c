@@ -125,7 +125,7 @@ void TryRunTics (void)
       if (!runtics) {
 //         if (server) I_WaitForPacket(ms_to_next_tick);
 //         else I_uSleep(ms_to_next_tick*1000);
-//         rb->sleep(ms_to_next_tick);
+//         sleep(ms_to_next_tick);
          if (I_GetTime() - entertime > 10) {
             remotesend--;
 //            {

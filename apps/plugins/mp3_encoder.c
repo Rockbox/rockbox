@@ -843,18 +843,18 @@ static bool checkString(int fd, char *string)
 {
   char temp[4];
 
-  rb->read(fd, temp, 4);
+  read(fd, temp, 4);
 
   /* return 1 on match, 0 on no match */
-  return !rb->memcmp(temp, string, 4);
+  return !memcmp(temp, string, 4);
 }
 
 static int Read16BitsLowHigh(int fd)
 {
   char first, second;
 
-  rb->read(fd, &first,  1);
-  rb->read(fd, &second, 1);
+  read(fd, &first,  1);
+  read(fd, &second, 1);
 
   return ((int)second << 8) | (first & 0xff);
 }
@@ -878,7 +878,7 @@ static int wave_open(void)
   unsigned short  bits_per_samp;
   long            header_size;
 
-  if((wavfile = rb->open(wav_filename, O_RDONLY)) < 0)
+  if((wavfile = open(wav_filename, O_RDONLY)) < 0)
     return -1;
   
   if(!checkString(wavfile,"RIFF")) return -2;
@@ -906,8 +906,8 @@ static int wave_open(void)
      (cfg.samplerate != 44100) && (cfg.samplerate != 48000))    return -9;
   
   header_size = 0x28;
-  wav_size = rb->filesize(wavfile);
-  rb->lseek(wavfile, header_size, SEEK_SET);
+  wav_size = filesize(wavfile);
+  lseek(wavfile, header_size, SEEK_SET);
   
   return 0;
 }
@@ -916,7 +916,7 @@ static int read_samples(uint16_t *buffer, int num_samples)
 {
   uint16_t tmpbuf[MAX_SAMP_PER_FRAME*2]; /*  SAMP_PER_FRAME*MAX_CHANNELS */
   int byte_per_sample = cfg.channels * 2; /* requires bits_per_sample==16 */
-  int s, samples = rb->read(wavfile, tmpbuf, byte_per_sample * num_samples) / byte_per_sample;
+  int s, samples = read(wavfile, tmpbuf, byte_per_sample * num_samples) / byte_per_sample;
   /* Pad last sample with zeros */
   memset(tmpbuf + samples*cfg.channels, 0, (num_samples-samples)*cfg.channels);
 
@@ -2171,10 +2171,10 @@ static void compress(void)
   while(1)
   {
     if((frames & 7) == 0)
-    { rb->lcd_clear_display();
-      rb->lcd_putsxyf(4, 20, "Frame %d / %d", frames, 
+    { lcd_clear_display();
+      lcd_putsxyf(4, 20, "Frame %d / %d", frames, 
           wav_size/cfg.smpl_per_frm/cfg.channels/2);
-      rb->lcd_update();
+      lcd_update();
     }
     /* encode one mp3 frame in this loop */
     memset(CodedData.bbuf, 0, sizeof(CodedData.bbuf));
@@ -2352,7 +2352,7 @@ static void compress(void)
     if(enc_chunk + enc_size > (int)enc_buffer_size)
     {
       /* copy iram mp3 buffer to sdram/file */
-      rb->write(mp3file, enc_buffer, enc_chunk & ~3);
+      write(mp3file, enc_buffer, enc_chunk & ~3);
       memcpy(enc_buffer, enc_buffer + (enc_chunk >> 2), enc_chunk & 3);
       enc_chunk &= 3;
     }
@@ -2362,7 +2362,7 @@ static void compress(void)
     frames++;
   }
   /* write last chunks to disk */
-  rb->write(mp3file, enc_buffer, enc_chunk);
+  write(mp3file, enc_buffer, enc_chunk);
 }
 
 
@@ -2371,8 +2371,8 @@ char mp3_name[80];
 
 static void get_mp3_filename(const char *wav_name)
 {
-    rb->strlcpy(mp3_name, wav_name, sizeof(mp3_name));
-    rb->strlcpy(mp3_name + rb->strlen(mp3_name) - 4, ".mp3", 5);
+    strlcpy(mp3_name, wav_name, sizeof(mp3_name));
+    strlcpy(mp3_name + strlen(mp3_name) - 4, ".mp3", 5);
 }
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD
@@ -2556,23 +2556,23 @@ enum plugin_status plugin_start(const void* parameter)
     if (parameter == NULL)
         return PLUGIN_ERROR;
 
-    enc_buffer = rb->plugin_get_audio_buffer(&enc_buffer_size);
+    enc_buffer = plugin_get_audio_buffer(&enc_buffer_size);
 
 #ifdef CPU_COLDFIRE
     coldfire_set_macsr(0); /* integer mode */
 #endif
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
-    rb->button_clear_queue();
+    button_clear_queue();
 
     nrat = 9;
     srat = 4; /* set 128kBit as default */
 
-    while(cont && (butt = rb->button_get_w_tmo(HZ/10)) != MP3ENC_SELECT)
+    while(cont && (butt = button_get_w_tmo(HZ/10)) != MP3ENC_SELECT)
     {
         switch(butt)
         {
@@ -2583,15 +2583,15 @@ enum plugin_status plugin_start(const void* parameter)
             case MP3ENC_NEXT:   if(srat < nrat) srat++; break;
         }
 
-        rb->lcd_clear_display();
-        rb->lcd_putsxy(2, 2, "-- Select Bitrate --");
+        lcd_clear_display();
+        lcd_putsxy(2, 2, "-- Select Bitrate --");
 
         for(rat=0; rat<=nrat; rat++)
-            rb->lcd_putsxy(2, 12 + rat*8, bstrg[rat]);
-        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_fillrect(0, 12 + srat*8, 127, 8);
-        rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_update();
+            lcd_putsxy(2, 12 + rat*8, bstrg[rat]);
+        lcd_set_drawmode(DRMODE_COMPLEMENT);
+        lcd_fillrect(0, 12 + srat*8, 127, 8);
+        lcd_set_drawmode(DRMODE_SOLID);
+        lcd_update();
     }
 
     wav_filename = parameter;
@@ -2603,38 +2603,38 @@ enum plugin_status plugin_start(const void* parameter)
         {
             init_mp3_encoder_engine((cfg.channels==2), brate[srat], cfg.samplerate);
             get_mp3_filename(wav_filename);
-            mp3file = rb->open(mp3_name , O_WRONLY|O_CREAT|O_TRUNC, 0666);
+            mp3file = open(mp3_name , O_WRONLY|O_CREAT|O_TRUNC, 0666);
             frames  = 0;
 
-            tim = *rb->current_tick;
+            tim = current_tick;
             compress();
-            tim = *rb->current_tick - tim;
+            tim = current_tick - tim;
 
-            rb->close(wavfile);
-            rb->close(mp3file);
-            rb->reload_directory();
+            close(wavfile);
+            close(mp3file);
+            reload_directory();
         }
         else
         {
-            rb->close(wavfile);
-            rb->lcd_clear_display();
-            rb->lcd_putsxyf(0, 20, "WaveOpen failed %d", ret);
-            rb->lcd_putsxyf(0, 30, "%s", mp3_enc_err[-ret]);
-            rb->lcd_update();
-            rb->sleep(5*HZ);
+            close(wavfile);
+            lcd_clear_display();
+            lcd_putsxyf(0, 20, "WaveOpen failed %d", ret);
+            lcd_putsxyf(0, 30, "%s", mp3_enc_err[-ret]);
+            lcd_update();
+            sleep(5*HZ);
         }
 
-        rb->lcd_clear_display();
-        rb->lcd_putsxyf(0, 30, "  Conversion: %ld.%02lds    ", tim/100, tim%100);
+        lcd_clear_display();
+        lcd_putsxyf(0, 30, "  Conversion: %ld.%02lds    ", tim/100, tim%100);
         tim = frames * cfg.smpl_per_frm * 100 / cfg.samplerate; /* unit=.01s */
-        rb->lcd_putsxyf(0, 20, "  WAV-Length: %ld.%02lds    ", tim/100, tim%100);
-        rb->lcd_update();
-        rb->sleep(5*HZ);
+        lcd_putsxyf(0, 20, "  WAV-Length: %ld.%02lds    ", tim/100, tim%100);
+        lcd_update();
+        sleep(5*HZ);
     }
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
     return PLUGIN_OK;
 }

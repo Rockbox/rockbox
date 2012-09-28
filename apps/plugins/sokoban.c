@@ -875,7 +875,7 @@ static bool redo(void)
 
 static void init_boards(void)
 {
-    rb->strlcpy(buffered_boards.filename, SOKOBAN_LEVELS_FILE,
+    strlcpy(buffered_boards.filename, SOKOBAN_LEVELS_FILE,
                 sizeof(buffered_boards.filename));
 
     current_info.level.index = 0;
@@ -910,13 +910,13 @@ static bool read_levels(bool initialize)
     else
         buffered_boards.start = 0;
 
-    if ((fd = rb->open(buffered_boards.filename, O_RDONLY)) < 0) {
-        rb->splashf(HZ*2, "Unable to open %s", buffered_boards.filename);
+    if ((fd = open(buffered_boards.filename, O_RDONLY)) < 0) {
+        splashf(HZ*2, "Unable to open %s", buffered_boards.filename);
         return false;
     }
 
     do {
-        len = rb->read_line(fd, buf, sizeof(buf));
+        len = read_line(fd, buf, sizeof(buf));
 
         /* Correct len when trailing \r's or \n's are counted */
         if (len > 2 && buf[len - 2] == '\0')
@@ -937,7 +937,7 @@ static bool read_levels(bool initialize)
                 }
                 /* Copy buffer to board data */
                 if (i + level_len + len < MAX_LEVEL_DATA) {
-                    rb->memcpy(&buffered_boards.data[i + level_len], buf, len);
+                    memcpy(&buffered_boards.data[i + level_len], buf, len);
                     buffered_boards.data[i + level_len + len] = '\n';
                 }
             }
@@ -972,7 +972,7 @@ static bool read_levels(bool initialize)
         buffered_boards.prebuffered_boards = buffered_boards.end/2;
     }
 
-    rb->close(fd);
+    close(fd);
 
     return true;
 }
@@ -1091,16 +1091,16 @@ static void update_screen(void)
 #define STAT_Y (LCD_HEIGHT - STAT_HEIGHT)
 #define BOARD_WIDTH LCD_WIDTH
 #define BOARD_HEIGHT (LCD_HEIGHT - STAT_HEIGHT)
-    rb->lcd_putsxy(STAT_X + 4, STAT_Y + 4, "Level");
-    rb->lcd_putsxyf(STAT_X + 7, STAT_Y + 14, "%d", current_info.level.index + 1);
-    rb->lcd_putsxy(STAT_X + 41, STAT_Y + 4, "Moves");
-    rb->lcd_putsxyf(STAT_X + 44, STAT_Y + 14, "%d", current_info.level.moves);
-    rb->lcd_putsxy(STAT_X + 79, STAT_Y + 4, "Pushes");
-    rb->lcd_putsxyf(STAT_X + 82, STAT_Y + 14, "%d", current_info.level.pushes);
+    lcd_putsxy(STAT_X + 4, STAT_Y + 4, "Level");
+    lcd_putsxyf(STAT_X + 7, STAT_Y + 14, "%d", current_info.level.index + 1);
+    lcd_putsxy(STAT_X + 41, STAT_Y + 4, "Moves");
+    lcd_putsxyf(STAT_X + 44, STAT_Y + 14, "%d", current_info.level.moves);
+    lcd_putsxy(STAT_X + 79, STAT_Y + 4, "Pushes");
+    lcd_putsxyf(STAT_X + 82, STAT_Y + 14, "%d", current_info.level.pushes);
 
-    rb->lcd_drawrect(STAT_X, STAT_Y, 38, STAT_HEIGHT);
-    rb->lcd_drawrect(STAT_X + 37, STAT_Y, 39, STAT_HEIGHT);
-    rb->lcd_drawrect(STAT_X + 75, STAT_Y, 45, STAT_HEIGHT);
+    lcd_drawrect(STAT_X, STAT_Y, 38, STAT_HEIGHT);
+    lcd_drawrect(STAT_X + 37, STAT_Y, 39, STAT_HEIGHT);
+    lcd_drawrect(STAT_X + 75, STAT_Y, 45, STAT_HEIGHT);
 #else
 #if LCD_WIDTH - (COLS*SOKOBAN_TILESIZE) > 40
 #define STAT_X (LCD_WIDTH - 40)
@@ -1111,20 +1111,20 @@ static void update_screen(void)
 #define STAT_WIDTH (LCD_WIDTH - STAT_X)
 #define BOARD_WIDTH (LCD_WIDTH - STAT_WIDTH)
 #define BOARD_HEIGHT LCD_HEIGHT
-    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 2, "Level");
-    rb->lcd_putsxyf(STAT_X + 4, STAT_Y + 12, "%d", current_info.level.index + 1);
-    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 23, "Moves");
-    rb->lcd_putsxyf(STAT_X + 4, STAT_Y + 33, "%d", current_info.level.moves);
+    lcd_putsxy(STAT_X + 1, STAT_Y + 2, "Level");
+    lcd_putsxyf(STAT_X + 4, STAT_Y + 12, "%d", current_info.level.index + 1);
+    lcd_putsxy(STAT_X + 1, STAT_Y + 23, "Moves");
+    lcd_putsxyf(STAT_X + 4, STAT_Y + 33, "%d", current_info.level.moves);
 #if STAT_WIDTH < 38
-    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Push");
+    lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Push");
 #else
-    rb->lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Pushes");
+    lcd_putsxy(STAT_X + 1, STAT_Y + 44, "Pushes");
 #endif
-    rb->lcd_putsxyf(STAT_X + 4, STAT_Y + 54, "%d", current_info.level.pushes);
+    lcd_putsxyf(STAT_X + 4, STAT_Y + 54, "%d", current_info.level.pushes);
 
-    rb->lcd_drawrect(STAT_X, STAT_Y + 0, STAT_WIDTH, 64);
-    rb->lcd_hline(STAT_X, LCD_WIDTH - 1, STAT_Y + 21);
-    rb->lcd_hline(STAT_X, LCD_WIDTH - 1, STAT_Y + 42);
+    lcd_drawrect(STAT_X, STAT_Y + 0, STAT_WIDTH, 64);
+    lcd_hline(STAT_X, LCD_WIDTH - 1, STAT_Y + 21);
+    lcd_hline(STAT_X, LCD_WIDTH - 1, STAT_Y + 42);
 
 #endif
 
@@ -1141,7 +1141,7 @@ static void update_screen(void)
                     break;
 
                 case ' ': /* floor */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 0*SOKOBAN_TILESIZE,
+                    lcd_bitmap_part(sokoban_tiles, 0, 0*SOKOBAN_TILESIZE,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_sokoban_tiles,
                                 BMPHEIGHT_sokoban_tiles), 
@@ -1149,7 +1149,7 @@ static void update_screen(void)
                     break;
 
                 case '#': /* wall */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 1*SOKOBAN_TILESIZE,
+                    lcd_bitmap_part(sokoban_tiles, 0, 1*SOKOBAN_TILESIZE,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_sokoban_tiles, 
                                 BMPHEIGHT_sokoban_tiles),
@@ -1157,7 +1157,7 @@ static void update_screen(void)
                     break;
 
                 case '$': /* box */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 2*SOKOBAN_TILESIZE,
+                    lcd_bitmap_part(sokoban_tiles, 0, 2*SOKOBAN_TILESIZE,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_sokoban_tiles, 
                                 BMPHEIGHT_sokoban_tiles),
@@ -1165,7 +1165,7 @@ static void update_screen(void)
                     break;
 
                 case '*': /* box on goal */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 3*SOKOBAN_TILESIZE,
+                    lcd_bitmap_part(sokoban_tiles, 0, 3*SOKOBAN_TILESIZE,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_sokoban_tiles, 
                                 BMPHEIGHT_sokoban_tiles),
@@ -1173,7 +1173,7 @@ static void update_screen(void)
                     break;
 
                 case '.': /* goal */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 4*SOKOBAN_TILESIZE,
+                    lcd_bitmap_part(sokoban_tiles, 0, 4*SOKOBAN_TILESIZE,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_sokoban_tiles, 
                                 BMPHEIGHT_sokoban_tiles),
@@ -1181,7 +1181,7 @@ static void update_screen(void)
                     break;
 
                 case '@': /* player */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 5*SOKOBAN_TILESIZE,
+                    lcd_bitmap_part(sokoban_tiles, 0, 5*SOKOBAN_TILESIZE,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_sokoban_tiles, 
                                 BMPHEIGHT_sokoban_tiles),
@@ -1189,7 +1189,7 @@ static void update_screen(void)
                     break;
 
                 case '+': /* player on goal */
-                    rb->lcd_bitmap_part(sokoban_tiles, 0, 6*SOKOBAN_TILESIZE,
+                    lcd_bitmap_part(sokoban_tiles, 0, 6*SOKOBAN_TILESIZE,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_sokoban_tiles, 
                                 BMPHEIGHT_sokoban_tiles),
@@ -1200,13 +1200,13 @@ static void update_screen(void)
     }
 
     /* print out the screen */
-    rb->lcd_update();
+    lcd_update();
 }
 
 static void draw_level(void)
 {
     load_level();
-    rb->lcd_clear_display();
+    lcd_clear_display();
     update_screen();
 }
 
@@ -1217,38 +1217,38 @@ static bool save(char *filename, bool solution)
     DIR *dir;
     char dirname[MAX_PATH];
 
-    rb->splash(0, "Saving...");
+    splash(0, "Saving...");
 
     /* Create dir if it doesn't exist */
-    if ((loc = rb->strrchr(filename, '/')) != NULL) {
-        rb->strlcpy(dirname, filename, loc - filename + 1);
+    if ((loc = strrchr(filename, '/')) != NULL) {
+        strlcpy(dirname, filename, loc - filename + 1);
 
-        if(!(dir = rb->opendir(dirname)))
-            rb->mkdir(dirname);
+        if(!(dir = opendir(dirname)))
+            mkdir(dirname);
         else
-            rb->closedir(dir);
+            closedir(dir);
     }
 
     if (filename[0] == '\0' ||
-        (fd = rb->open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0) {
-        rb->splashf(HZ*2, "Unable to open %s", filename);
+        (fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0) {
+        splashf(HZ*2, "Unable to open %s", filename);
         return false;
     }
 
     /* Sokoban: S/P for solution/progress : level number : current undo */
-    rb->snprintf(buf, sizeof(buf), "Sokoban:%c:%d:%d\n", (solution ? 'S' : 'P'),
+    snprintf(buf, sizeof(buf), "Sokoban:%c:%d:%d\n", (solution ? 'S' : 'P'),
                  current_info.level.index + 1, undo_info.current);
-    rb->write(fd, buf, rb->strlen(buf));
+    write(fd, buf, strlen(buf));
 
     /* Filename of levelset */
-    rb->write(fd, buffered_boards.filename,
-              rb->strlen(buffered_boards.filename));
-    rb->write(fd, "\n", 1);
+    write(fd, buffered_boards.filename,
+              strlen(buffered_boards.filename));
+    write(fd, "\n", 1);
 
     /* Full undo history */
-    rb->write(fd, undo_info.history, undo_info.max);
+    write(fd, undo_info.history, undo_info.max);
 
-    rb->close(fd);
+    close(fd);
 
     return true;
 }
@@ -1264,20 +1264,20 @@ static bool load(char *filename, bool silent)
     unsigned short speed = 2;
     int delay[] = {HZ/2, HZ/3, HZ/4, HZ/6, HZ/8, HZ/12, HZ/16, HZ/25};
 
-    if (filename[0] == '\0' || (fd = rb->open(filename, O_RDONLY)) < 0) {
+    if (filename[0] == '\0' || (fd = open(filename, O_RDONLY)) < 0) {
         if (!silent)
-            rb->splashf(HZ*2, "Unable to open %s", filename);
+            splashf(HZ*2, "Unable to open %s", filename);
         return false;
     }
 
     /* Read header, level number, & current undo */
-    rb->read_line(fd, buf, sizeof(buf));
+    read_line(fd, buf, sizeof(buf));
 
     /* If we're opening a level file, not a solution/progress file */
-    if (rb->strncmp(buf, "Sokoban", 7) != 0) {
-        rb->close(fd);
+    if (strncmp(buf, "Sokoban", 7) != 0) {
+        close(fd);
 
-        rb->strlcpy(buffered_boards.filename, filename,
+        strlcpy(buffered_boards.filename, filename,
                     sizeof(buffered_boards.filename));
 
         if (!read_levels(true))
@@ -1291,18 +1291,18 @@ static bool load(char *filename, bool silent)
         if (current_info.level.boxes_to_go == 0 ||
             current_info.player.row == 0 || current_info.player.col == 0) {
             if (!silent)
-                rb->splash(HZ*2, "File is not a Sokoban level file");
+                splash(HZ*2, "File is not a Sokoban level file");
             return false;
         }
 
     } else {
 
         /* Read filename of levelset */
-        rb->read_line(fd, buffered_boards.filename,
+        read_line(fd, buffered_boards.filename,
                       sizeof(buffered_boards.filename));
 
         /* Read full undo history */
-        len = rb->read_line(fd, undo_info.history, MAX_UNDOS);
+        len = read_line(fd, undo_info.history, MAX_UNDOS);
 
         /* Correct len when trailing \r's or \n's are counted */
         if (len > 2 && undo_info.history[len - 2] == '\0')
@@ -1310,7 +1310,7 @@ static bool load(char *filename, bool silent)
         else if (len > 1 && undo_info.history[len - 1] == '\0')
             len--;
 
-        rb->close(fd);
+        close(fd);
 
         /* Check to see if we're going to play a solution or resume progress */
         play_solution = (buf[8] == 'S');
@@ -1329,23 +1329,23 @@ static bool load(char *filename, bool silent)
 
         if (current_info.level.index < 0) {
             if (!silent)
-                rb->splash(HZ*2, "Error loading level");
+                splash(HZ*2, "Error loading level");
             return false;
         }
         if (!read_levels(true))
             return false;
         if (current_info.level.index >= current_info.max_level) {
             if (!silent)
-                rb->splash(HZ*2, "Error loading level");
+                splash(HZ*2, "Error loading level");
             return false;
         }
 
         load_level();
 
         if (play_solution) {
-            rb->lcd_clear_display();
+            lcd_clear_display();
             update_screen();
-            rb->sleep(2*delay[speed]);
+            sleep(2*delay[speed]);
 
             /* Replay solution until menu button is pressed */
             i = 0;
@@ -1355,15 +1355,15 @@ static bool load(char *filename, bool silent)
                         n = i;
                         break;
                     }
-                    rb->lcd_clear_display();
+                    lcd_clear_display();
                     update_screen();
                     i++;
                 } else
                     paused = true;
 
-                rb->sleep(delay[speed]);
+                sleep(delay[speed]);
 
-                while ((button = rb->button_get(false)) || paused) {
+                while ((button = button_get(false)) || paused) {
                     switch (button) {
                         case SOKOBAN_MENU:
                             /* Pretend the level is complete so we'll quit */
@@ -1381,7 +1381,7 @@ static bool load(char *filename, bool silent)
                             if (paused) {
                                 if (undo())
                                     i--;
-                                rb->lcd_clear_display();
+                                lcd_clear_display();
                                 update_screen();
                             }
                             break;
@@ -1392,7 +1392,7 @@ static bool load(char *filename, bool silent)
                             if (paused) {
                                 if (redo())
                                     i++;
-                                rb->lcd_clear_display();
+                                lcd_clear_display();
                                 update_screen();
                             }
                             break;
@@ -1412,13 +1412,13 @@ static bool load(char *filename, bool silent)
                     }
 
                     if (paused)
-                        rb->sleep(HZ/33);
+                        sleep(HZ/33);
                 }
             }
 
             /* If level is complete, wait for keypress before quitting */
             if (current_info.level.boxes_to_go == 0)
-                rb->button_get(true);
+                button_get(true);
 
         } else {
             /* Advance to current undo */
@@ -1429,8 +1429,8 @@ static bool load(char *filename, bool silent)
                 }
             }
 
-            rb->button_clear_queue();
-            rb->lcd_clear_display();
+            button_clear_queue();
+            lcd_clear_display();
         }
 
         undo_info.current = n;
@@ -1454,7 +1454,7 @@ static int sokoban_menu(void)
 
     do {
         menu_quit = true;
-        selection = rb->do_menu(&menu, &start_selected, NULL, false);
+        selection = do_menu(&menu, &start_selected, NULL, false);
 
         switch (selection) {
             case 0: /* Resume */
@@ -1462,7 +1462,7 @@ static int sokoban_menu(void)
 
             case 1: /* Select level */
                 current_info.level.index++;
-                rb->set_int("Select Level", "", UNIT_INT,
+                set_int("Select Level", "", UNIT_INT,
                             &current_info.level.index, NULL, 1, 1,
                             current_info.max_level, NULL);
                 current_info.level.index--;
@@ -1480,97 +1480,97 @@ static int sokoban_menu(void)
 
             case 3: /* Keys */
                 FOR_NB_SCREENS(i)
-                    rb->screens[i]->clear_display();
-                rb->lcd_setfont(SOKOBAN_FONT);
+                    screens[i].clear_display();
+                lcd_setfont(SOKOBAN_FONT);
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || \
     (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
-                rb->lcd_putsxy(3,  6, "[OFF] Menu");
-                rb->lcd_putsxy(3, 16, "[ON] Undo");
-                rb->lcd_putsxy(3, 26, "[PLAY] Redo");
-                rb->lcd_putsxy(3, 36, "[F1] Down a Level");
-                rb->lcd_putsxy(3, 46, "[F2] Restart Level");
-                rb->lcd_putsxy(3, 56, "[F3] Up a Level");
+                lcd_putsxy(3,  6, "[OFF] Menu");
+                lcd_putsxy(3, 16, "[ON] Undo");
+                lcd_putsxy(3, 26, "[PLAY] Redo");
+                lcd_putsxy(3, 36, "[F1] Down a Level");
+                lcd_putsxy(3, 46, "[F2] Restart Level");
+                lcd_putsxy(3, 56, "[F3] Up a Level");
 #elif CONFIG_KEYPAD == ONDIO_PAD
-                rb->lcd_putsxy(3,  6, "[OFF] Menu");
-                rb->lcd_putsxy(3, 16, "[MODE] Undo");
-                rb->lcd_putsxy(3, 26, "[MODE+DOWN] Redo");
-                rb->lcd_putsxy(3, 36, "[MODE+LEFT] Previous Level");
-                rb->lcd_putsxy(3, 46, "[MODE+UP] Restart Level");
-                rb->lcd_putsxy(3, 56, "[MODE+RIGHT] Up Level");
+                lcd_putsxy(3,  6, "[OFF] Menu");
+                lcd_putsxy(3, 16, "[MODE] Undo");
+                lcd_putsxy(3, 26, "[MODE+DOWN] Redo");
+                lcd_putsxy(3, 36, "[MODE+LEFT] Previous Level");
+                lcd_putsxy(3, 46, "[MODE+UP] Restart Level");
+                lcd_putsxy(3, 56, "[MODE+RIGHT] Up Level");
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-                rb->lcd_putsxy(3,  6, "[STOP] Menu");
-                rb->lcd_putsxy(3, 16, "[REC] Undo");
-                rb->lcd_putsxy(3, 26, "[MODE] Redo");
-                rb->lcd_putsxy(3, 36, "[PLAY+DOWN] Previous Level");
-                rb->lcd_putsxy(3, 46, "[PLAY] Restart Level");
-                rb->lcd_putsxy(3, 56, "[PLAY+UP] Next Level");
+                lcd_putsxy(3,  6, "[STOP] Menu");
+                lcd_putsxy(3, 16, "[REC] Undo");
+                lcd_putsxy(3, 26, "[MODE] Redo");
+                lcd_putsxy(3, 36, "[PLAY+DOWN] Previous Level");
+                lcd_putsxy(3, 46, "[PLAY] Restart Level");
+                lcd_putsxy(3, 56, "[PLAY+UP] Next Level");
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-                rb->lcd_putsxy(3,  6, "[SELECT+MENU] Menu");
-                rb->lcd_putsxy(3, 16, "[SELECT] Undo");
-                rb->lcd_putsxy(3, 26, "[SELECT+PLAY] Redo");
-                rb->lcd_putsxy(3, 36, "[SELECT+LEFT] Previous Level");
-                rb->lcd_putsxy(3, 46, "[SELECT+RIGHT] Next Level");
+                lcd_putsxy(3,  6, "[SELECT+MENU] Menu");
+                lcd_putsxy(3, 16, "[SELECT] Undo");
+                lcd_putsxy(3, 26, "[SELECT+PLAY] Redo");
+                lcd_putsxy(3, 36, "[SELECT+LEFT] Previous Level");
+                lcd_putsxy(3, 46, "[SELECT+RIGHT] Next Level");
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-                rb->lcd_putsxy(3,  6, "[POWER] Menu");
-                rb->lcd_putsxy(3, 16, "[SELECT] Undo");
-                rb->lcd_putsxy(3, 26, "[PLAY] Redo");
-                rb->lcd_putsxy(3, 36, "[REC] Restart Level");
+                lcd_putsxy(3,  6, "[POWER] Menu");
+                lcd_putsxy(3, 16, "[SELECT] Undo");
+                lcd_putsxy(3, 26, "[PLAY] Redo");
+                lcd_putsxy(3, 36, "[REC] Restart Level");
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-                rb->lcd_putsxy(3,  6, "[POWER] Menu");
-                rb->lcd_putsxy(3, 16, "[REW] Undo");
-                rb->lcd_putsxy(3, 26, "[FF] Redo");
-                rb->lcd_putsxy(3, 36, "[PLAY+DOWN] Previous Level");
-                rb->lcd_putsxy(3, 46, "[PLAY+RIGHT] Restart Level");
-                rb->lcd_putsxy(3, 56, "[PLAY+UP] Next Level");
+                lcd_putsxy(3,  6, "[POWER] Menu");
+                lcd_putsxy(3, 16, "[REW] Undo");
+                lcd_putsxy(3, 26, "[FF] Redo");
+                lcd_putsxy(3, 36, "[PLAY+DOWN] Previous Level");
+                lcd_putsxy(3, 46, "[PLAY+RIGHT] Restart Level");
+                lcd_putsxy(3, 56, "[PLAY+UP] Next Level");
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-                rb->lcd_putsxy(3,  6, "[POWER] Menu");
-                rb->lcd_putsxy(3, 16, "[SELECT] Undo");
-                rb->lcd_putsxy(3, 26, "[A] Redo");
-                rb->lcd_putsxy(3, 36, "[VOL-] Previous Level");
-                rb->lcd_putsxy(3, 46, "[MENU] Restart Level");
-                rb->lcd_putsxy(3, 56, "[VOL+] Next Level");
+                lcd_putsxy(3,  6, "[POWER] Menu");
+                lcd_putsxy(3, 16, "[SELECT] Undo");
+                lcd_putsxy(3, 26, "[A] Redo");
+                lcd_putsxy(3, 36, "[VOL-] Previous Level");
+                lcd_putsxy(3, 46, "[MENU] Restart Level");
+                lcd_putsxy(3, 56, "[VOL+] Next Level");
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
-                rb->lcd_putsxy(3,  6, "[POWER] Menu");
-                rb->lcd_putsxy(3, 16, "[SELECT] Undo");
-                rb->lcd_putsxy(3, 26, "[REC] Redo");
-                rb->lcd_putsxy(3, 36, "[SELECT+DOWN] Previous Level");
-                rb->lcd_putsxy(3, 46, "[SELECT+RIGHT] Restart Level");
-                rb->lcd_putsxy(3, 56, "[SELECT+UP] Next Level");
+                lcd_putsxy(3,  6, "[POWER] Menu");
+                lcd_putsxy(3, 16, "[SELECT] Undo");
+                lcd_putsxy(3, 26, "[REC] Redo");
+                lcd_putsxy(3, 36, "[SELECT+DOWN] Previous Level");
+                lcd_putsxy(3, 46, "[SELECT+RIGHT] Restart Level");
+                lcd_putsxy(3, 56, "[SELECT+UP] Next Level");
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
-                rb->lcd_putsxy(3,  6, "[MENU] Menu");
-                rb->lcd_putsxy(3, 16, "[VOL+] Undo");
-                rb->lcd_putsxy(3, 26, "[VOL-] Redo");
-                rb->lcd_putsxy(3, 36, "[PREV] Previous Level");
-                rb->lcd_putsxy(3, 46, "[PLAY] Restart Level");
-                rb->lcd_putsxy(3, 56, "[NEXT] Next Level");
+                lcd_putsxy(3,  6, "[MENU] Menu");
+                lcd_putsxy(3, 16, "[VOL+] Undo");
+                lcd_putsxy(3, 26, "[VOL-] Redo");
+                lcd_putsxy(3, 36, "[PREV] Previous Level");
+                lcd_putsxy(3, 46, "[PLAY] Restart Level");
+                lcd_putsxy(3, 56, "[NEXT] Next Level");
 #elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
-                rb->lcd_putsxy(3,  6, "[POWER] Menu");
-                rb->lcd_putsxy(3, 16, "[PREV] Undo");
-                rb->lcd_putsxy(3, 26, "[NEXT] Redo");
-                rb->lcd_putsxy(3, 36, "[VOL-] Previous Level");
-                rb->lcd_putsxy(3, 46, "[NEXT+PREV] Restart Level");
-                rb->lcd_putsxy(3, 56, "[VOL+] Next Level");
+                lcd_putsxy(3,  6, "[POWER] Menu");
+                lcd_putsxy(3, 16, "[PREV] Undo");
+                lcd_putsxy(3, 26, "[NEXT] Redo");
+                lcd_putsxy(3, 36, "[VOL-] Previous Level");
+                lcd_putsxy(3, 46, "[NEXT+PREV] Restart Level");
+                lcd_putsxy(3, 56, "[VOL+] Next Level");
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-                rb->lcd_putsxy(3,  6, SOKOBAN_MENU_NAME " Menu");
-                rb->lcd_putsxy(3, 16, SOKOBAN_UNDO_NAME " Undo");
-                rb->lcd_putsxy(3, 26, SOKOBAN_REDO_NAME " Redo");
-                rb->lcd_putsxy(3, 36, SOKOBAN_PAUSE_NAME " Pause");
-                rb->lcd_putsxy(3, 46, SOKOBAN_LEVEL_REPEAT_NAME " Restart Level");
+                lcd_putsxy(3,  6, SOKOBAN_MENU_NAME " Menu");
+                lcd_putsxy(3, 16, SOKOBAN_UNDO_NAME " Undo");
+                lcd_putsxy(3, 26, SOKOBAN_REDO_NAME " Redo");
+                lcd_putsxy(3, 36, SOKOBAN_PAUSE_NAME " Pause");
+                lcd_putsxy(3, 46, SOKOBAN_LEVEL_REPEAT_NAME " Restart Level");
 #endif
 
                 FOR_NB_SCREENS(i)
-                    rb->screens[i]->update();
+                    screens[i].update();
 
                 /* Display until keypress */
                 do {
-                    rb->sleep(HZ/20);
-                    button = rb->button_get(false);
+                    sleep(HZ/20);
+                    button = button_get(false);
                 } while (!button || button & BUTTON_REL ||
                          button & BUTTON_REPEAT);
 
@@ -1589,17 +1589,17 @@ static int sokoban_menu(void)
 
             case 6: /* Save & quit */
                 save(SOKOBAN_SAVE_FILE, false);
-                rb->reload_directory();
+                reload_directory();
         }
 
     } while (!menu_quit);
 
     /* Restore font */
-    rb->lcd_setfont(SOKOBAN_FONT);
+    lcd_setfont(SOKOBAN_FONT);
 
     FOR_NB_SCREENS(i) {
-        rb->screens[i]->clear_display();
-        rb->screens[i]->update();
+        screens[i].clear_display();
+        screens[i].update();
     }
 
     return selection;
@@ -1618,7 +1618,7 @@ static bool sokoban_loop(void)
     while (true) {
         moved = false;
 
-        button = rb->button_get(true);
+        button = button_get(true);
 
         switch(button)
         {
@@ -1642,7 +1642,7 @@ static bool sokoban_loop(void)
             case SOKOBAN_UNDO | BUTTON_REPEAT:
 #endif
                 undo();
-                rb->lcd_clear_display();
+                lcd_clear_display();
                 update_screen();
                 break;
 
@@ -1650,7 +1650,7 @@ static bool sokoban_loop(void)
             case SOKOBAN_REDO:
             case SOKOBAN_REDO | BUTTON_REPEAT:
                 moved = redo();
-                rb->lcd_clear_display();
+                lcd_clear_display();
                 update_screen();
                 break;
 #endif
@@ -1709,7 +1709,7 @@ static bool sokoban_loop(void)
                 break;
 
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                if (default_event_handler(button) == SYS_USB_CONNECTED)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
@@ -1718,7 +1718,7 @@ static bool sokoban_loop(void)
 #endif
 
         if (moved) {
-            rb->lcd_clear_display();
+            lcd_clear_display();
             update_screen();
         }
 
@@ -1726,39 +1726,39 @@ static bool sokoban_loop(void)
         if (current_info.level.boxes_to_go == 0) {
 
             if (moved) {
-                rb->lcd_clear_display();
+                lcd_clear_display();
 
                 /* Show level complete message & stats */
-                rb->snprintf(buf, sizeof(buf), "Level %d Complete!",
+                snprintf(buf, sizeof(buf), "Level %d Complete!",
                              current_info.level.index + 1);
-                rb->lcd_getstringsize(buf, &w, &h);
-                rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h*3, buf);
+                lcd_getstringsize(buf, &w, &h);
+                lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h*3, buf);
 
-                rb->snprintf(buf, sizeof(buf), "%4d Moves ",
+                snprintf(buf, sizeof(buf), "%4d Moves ",
                              current_info.level.moves);
-                rb->lcd_getstringsize(buf, &w, &h);
-                rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h, buf);
+                lcd_getstringsize(buf, &w, &h);
+                lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h, buf);
 
-                rb->snprintf(buf, sizeof(buf), "%4d Pushes",
+                snprintf(buf, sizeof(buf), "%4d Pushes",
                              current_info.level.pushes);
-                rb->lcd_getstringsize(buf, &w, &h);
-                rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2, buf);
+                lcd_getstringsize(buf, &w, &h);
+                lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2, buf);
 
                 if (undo_info.count < MAX_UNDOS) {
-                    rb->snprintf(buf, sizeof(buf), "%s: Save solution",
+                    snprintf(buf, sizeof(buf), "%s: Save solution",
                                  BUTTON_SAVE_NAME);
-                    rb->lcd_getstringsize(buf, &w, &h);
-                    rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + h*2, buf);
+                    lcd_getstringsize(buf, &w, &h);
+                    lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 + h*2, buf);
                 }
 
-                rb->lcd_update();
-                rb->sleep(HZ/4);
-                rb->button_clear_queue();
+                lcd_update();
+                sleep(HZ/4);
+                button_clear_queue();
 
                 /* Display for 4 seconds or until new keypress */
                 for (i = 0; i < 80; i++) {
-                    rb->sleep(HZ/20);
-                    button = rb->button_get(false);
+                    sleep(HZ/20);
+                    button = button_get(false);
                     if (button && !(button & BUTTON_REL) &&
                         !(button & BUTTON_REPEAT))
                         break;
@@ -1769,35 +1769,35 @@ static bool sokoban_loop(void)
                         /* Set filename to current levelset plus level number
                          * and .sok extension. Use SAVE_FOLDER if using the
                          * default levelset, since it's in a hidden folder. */
-                        if (rb->strcmp(buffered_boards.filename,
+                        if (strcmp(buffered_boards.filename,
                                        SOKOBAN_LEVELS_FILE) == 0) {
-                            rb->snprintf(buf, sizeof(buf),
+                            snprintf(buf, sizeof(buf),
                                          "%s/sokoban.%d.sok",
                                          SOKOBAN_SAVE_FOLDER,
                                          current_info.level.index + 1);
                         } else {
-                            if ((loc = rb->strrchr(buffered_boards.filename,
+                            if ((loc = strrchr(buffered_boards.filename,
                                                    '.')) != NULL)
                                 *loc = '\0';
-                            rb->snprintf(buf, sizeof(buf), "%s.%d.sok",
+                            snprintf(buf, sizeof(buf), "%s.%d.sok",
                                          buffered_boards.filename,
                                          current_info.level.index + 1);
                             if (loc != NULL)
                                 *loc = '.';
                         }
 
-                        if (!rb->kbd_input(buf, MAX_PATH))
+                        if (!kbd_input(buf, MAX_PATH))
                             save(buf, true);
                     } else
-                        rb->splash(HZ*2, "Solution too long to save");
+                        splash(HZ*2, "Solution too long to save");
 
-                    rb->lcd_setfont(SOKOBAN_FONT); /* Restore font */
+                    lcd_setfont(SOKOBAN_FONT); /* Restore font */
                 }
             }
 
             FOR_NB_SCREENS(i) {
-                rb->screens[i]->clear_display();
-                rb->screens[i]->update();
+                screens[i].clear_display();
+                screens[i].update();
             }
 
             current_info.level.index++;
@@ -1807,22 +1807,22 @@ static bool sokoban_loop(void)
 
             if (current_info.level.index >= current_info.max_level) {
                 /* Show levelset complete message */
-                rb->snprintf(buf, sizeof(buf), "You WIN!!");
-                rb->lcd_getstringsize(buf, &w, &h);
-                rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h/2, buf);
+                snprintf(buf, sizeof(buf), "You WIN!!");
+                lcd_getstringsize(buf, &w, &h);
+                lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h/2, buf);
 
-                rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+                lcd_set_drawmode(DRMODE_COMPLEMENT);
                 /* Display for 4 seconds or until keypress */
                 for (i = 0; i < 80; i++) {
-                    rb->lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-                    rb->lcd_update();
-                    rb->sleep(HZ/10);
+                    lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+                    lcd_update();
+                    sleep(HZ/10);
 
-                    button = rb->button_get(false);
+                    button = button_get(false);
                     if (button && !(button & BUTTON_REL))
                         break;
                 }
-                rb->lcd_set_drawmode(DRMODE_SOLID);
+                lcd_set_drawmode(DRMODE_SOLID);
 
                 /* Reset to first level & show quit menu */
                 current_info.level.index = 0;
@@ -1850,13 +1850,13 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)(parameter);
 
-    rb->lcd_setfont(SOKOBAN_FONT);
+    lcd_setfont(SOKOBAN_FONT);
 
-    rb->lcd_clear_display();
-    rb->lcd_getstringsize(SOKOBAN_TITLE, &w, &h);
-    rb->lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h/2, SOKOBAN_TITLE);
-    rb->lcd_update();
-    rb->sleep(HZ); /* Show title for 1 second */
+    lcd_clear_display();
+    lcd_getstringsize(SOKOBAN_TITLE, &w, &h);
+    lcd_putsxy(LCD_WIDTH/2 - w/2, LCD_HEIGHT/2 - h/2, SOKOBAN_TITLE);
+    lcd_update();
+    sleep(HZ); /* Show title for 1 second */
 
     init_boards();
 
@@ -1879,7 +1879,7 @@ enum plugin_status plugin_start(const void* parameter)
             return PLUGIN_OK;
     }
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     update_screen();
 
     return sokoban_loop();

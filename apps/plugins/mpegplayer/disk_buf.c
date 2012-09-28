@@ -34,12 +34,12 @@ static void *nf_list[MPEGPLAYER_MAX_STREAMS+1];
 
 static inline void disk_buf_lock(void)
 {
-    rb->mutex_lock(&disk_buf_mtx);
+    mutex_lock(&disk_buf_mtx);
 }
 
 static inline void disk_buf_unlock(void)
 {
-    rb->mutex_unlock(&disk_buf_mtx);
+    mutex_unlock(&disk_buf_mtx);
 }
 
 static inline void disk_buf_on_clear_data_notify(struct stream_hdr *sh)
@@ -170,7 +170,7 @@ static inline void disk_buf_buffer(void)
             wm : AVERAGE(disk_buf.low_wm, wm, 16);
 
 #if 0
-        rb->splashf(0, "*%10ld %10ld", disk_buf.low_wm,
+        splashf(0, "*%10ld %10ld", disk_buf.low_wm,
                    disk_buf.win_right - sw.right);
 #endif
 
@@ -190,7 +190,7 @@ static inline void disk_buf_buffer(void)
         if (!stream_get_window(&sw))
         {
             disk_buf.state = TSTATE_DATA;
-            rb->storage_sleep();
+            storage_sleep();
             break;
         }
 
@@ -205,7 +205,7 @@ static inline void disk_buf_buffer(void)
             /* Free space is less than one page */
             disk_buf.state = TSTATE_DATA;
             disk_buf.low_wm = DISK_BUF_LOW_WATERMARK;
-            rb->storage_sleep();
+            storage_sleep();
             break;
         }
 
@@ -217,24 +217,24 @@ static inline void disk_buf_buffer(void)
         {
             if (disk_buf.need_seek)
             {
-                rb->lseek(disk_buf.in_file, disk_buf.win_right, SEEK_SET);
+                lseek(disk_buf.in_file, disk_buf.win_right, SEEK_SET);
                 disk_buf.need_seek = false;
             }
 
-            n = rb->read(disk_buf.in_file, disk_buf.tail, DISK_BUF_PAGE_SIZE);
+            n = read(disk_buf.in_file, disk_buf.tail, DISK_BUF_PAGE_SIZE);
 
             if (n <= 0)
             {
                 /* Error or end of stream */
                 disk_buf.state = TSTATE_EOS;
-                rb->storage_sleep();
+                storage_sleep();
                 break;
             }
 
             if (len < DISK_GUARDBUF_SIZE)
             {
                 /* Autoguard guard-o-rama - maintain guardbuffer coherency */
-                rb->memcpy(disk_buf.end + len, disk_buf.tail,
+                memcpy(disk_buf.end + len, disk_buf.tail,
                            MIN(DISK_GUARDBUF_SIZE - len, n));
             }
 
@@ -265,7 +265,7 @@ static inline void disk_buf_buffer(void)
         disk_buf.win_right = len;
 
         /* Continue buffering until filled or file end */
-        rb->yield();
+        yield();
         } /* TSTATE_BUFFERING: */
 
     case TSTATE_EOS:
@@ -351,7 +351,7 @@ static void disk_buf_on_reset(ssize_t pos)
            disk_buf.win_left, disk_buf.win_right);
 
     /* Next read position is at right edge */
-    rb->lseek(disk_buf.in_file, disk_buf.win_right, SEEK_SET);
+    lseek(disk_buf.in_file, disk_buf.win_right, SEEK_SET);
     disk_buf.need_seek = false;
 
     disk_buf_reply_msg(disk_buf.win_right - disk_buf.win_left);
@@ -400,7 +400,7 @@ static int disk_buf_on_load_range(struct dbuf_range *rng)
     int page = rng->pg_start;
 
     /* Check if a seek is required */
-    bool need_seek = rb->lseek(disk_buf.in_file, 0, SEEK_CUR)
+    bool need_seek = lseek(disk_buf.in_file, 0, SEEK_CUR)
                         != (off_t)(tag << DISK_BUF_PAGE_SHIFT);
 
     do
@@ -414,13 +414,13 @@ static int disk_buf_on_load_range(struct dbuf_range *rng)
 
             if (need_seek)
             {
-                rb->lseek(disk_buf.in_file, tag << DISK_BUF_PAGE_SHIFT,
+                lseek(disk_buf.in_file, tag << DISK_BUF_PAGE_SHIFT,
                           SEEK_SET);
                 need_seek = false;
             }
 
             o = page << DISK_BUF_PAGE_SHIFT;
-            n = rb->read(disk_buf.in_file, disk_buf.start + o,
+            n = read(disk_buf.in_file, disk_buf.start + o,
                          DISK_BUF_PAGE_SIZE);
 
             if (n < 0)
@@ -438,7 +438,7 @@ static int disk_buf_on_load_range(struct dbuf_range *rng)
             if (o < DISK_GUARDBUF_SIZE)
             {
                 /* Autoguard guard-o-rama - maintain guardbuffer coherency */
-                rb->memcpy(disk_buf.end + o, disk_buf.start + o,
+                memcpy(disk_buf.end + o, disk_buf.start + o,
                            MIN(DISK_GUARDBUF_SIZE - o, n));
             }
 
@@ -471,14 +471,14 @@ static void disk_buf_thread(void)
         if (disk_buf.state != TSTATE_EOS)
         {
             /* Poll buffer status and messages */
-            rb->queue_wait_w_tmo(disk_buf.q, &ev,
+            queue_wait_w_tmo(disk_buf.q, &ev,
                                  disk_buf.state == TSTATE_BUFFERING ?
                                     0 : HZ/5);
         }
         else
         {
             /* Sit idle and wait for commands */
-            rb->queue_wait(disk_buf.q, &ev);
+            queue_wait(disk_buf.q, &ev);
         }
 
         switch (ev.id)
@@ -592,7 +592,7 @@ static ssize_t disk_buf_probe(off_t start, size_t length, void **p)
             rng.tag_end = tag_end;
             rng.pg_start = page;
             
-            result = rb->queue_send(disk_buf.q, DISK_BUF_CACHE_RANGE,
+            result = queue_send(disk_buf.q, DISK_BUF_CACHE_RANGE,
                                     (intptr_t)&rng);
 
             return result == DISK_BUF_NOTIFY_OK ? (ssize_t)length : -1;
@@ -683,7 +683,7 @@ ssize_t _disk_buf_getbuffer_l2(struct dbuf_l2_cache *l2,
 
     if (l2_size != (size_t)-1)
     {
-        rb->memcpy(l2->data, l2_p, l2_size);
+        memcpy(l2->data, l2_p, l2_size);
 
         l2->addr = l2_addr;
         l2->size = l2_size;
@@ -720,14 +720,14 @@ ssize_t disk_buf_read(void *buffer, size_t size)
         {
             /* Read wraps */
             size_t nowrap = (disk_buf.end + DISK_GUARDBUF_SIZE) - p;
-            rb->memcpy(buffer, p, nowrap);
-            rb->memcpy(buffer + nowrap, disk_buf.start + DISK_GUARDBUF_SIZE,
+            memcpy(buffer, p, nowrap);
+            memcpy(buffer + nowrap, disk_buf.start + DISK_GUARDBUF_SIZE,
                        size - nowrap);
         }
         else
         {
             /* Read wasn't wrapped or guardbuffer holds it */
-            rb->memcpy(buffer, p, size);
+            memcpy(buffer, p, size);
         }
 
         disk_buf.offset += size;
@@ -848,11 +848,11 @@ void disk_buf_close(void)
 
     if (disk_buf.in_file >= 0)
     {
-        rb->close(disk_buf.in_file);
+        close(disk_buf.in_file);
         disk_buf.in_file = -1;
 
         /* Invalidate entire cache */
-        rb->memset(disk_buf.cache, 0xff,
+        memset(disk_buf.cache, 0xff,
                    disk_buf.pgcount*sizeof (*disk_buf.cache));
         disk_buf.file_pages = 0;
         disk_buf.filesize = 0;
@@ -870,21 +870,21 @@ int disk_buf_open(const char *filename)
 
     disk_buf_close();
 
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
 
     if (fd >= 0)
     {
-        ssize_t filesize = rb->filesize(fd);
+        ssize_t file_size = filesize(fd);
 
-        if (filesize <= 0)
+        if (file_size <= 0)
         {
-            rb->close(disk_buf.in_file);
+            close(disk_buf.in_file);
         }
         else
         {
-            disk_buf.filesize = filesize;
+            disk_buf.filesize = file_size;
             /* Number of file pages rounded up toward +inf */
-            disk_buf.file_pages = ((size_t)filesize + DISK_BUF_PAGE_SIZE-1)
+            disk_buf.file_pages = ((size_t)file_size + DISK_BUF_PAGE_SIZE-1)
                                     / DISK_BUF_PAGE_SIZE;
             disk_buf.in_file = fd;
         }
@@ -897,27 +897,27 @@ int disk_buf_open(const char *filename)
 
 intptr_t disk_buf_send_msg(long id, intptr_t data)
 {
-    return rb->queue_send(disk_buf.q, id, data);
+    return queue_send(disk_buf.q, id, data);
 }
 
 void disk_buf_post_msg(long id, intptr_t data)
 {
-    rb->queue_post(disk_buf.q, id, data);
+    queue_post(disk_buf.q, id, data);
 }
 
 void disk_buf_reply_msg(intptr_t retval)
 {
-    rb->queue_reply(disk_buf.q, retval);
+    queue_reply(disk_buf.q, retval);
 }
 
 bool disk_buf_init(void)
 {
     disk_buf.thread = 0;
 
-    rb->mutex_init(&disk_buf_mtx);
+    mutex_init(&disk_buf_mtx);
 
     disk_buf.q = &disk_buf_queue;
-    rb->queue_init(disk_buf.q, false);
+    queue_init(disk_buf.q, false);
 
     disk_buf.state  = TSTATE_EOS;
     disk_buf.status = STREAM_STOPPED;
@@ -959,14 +959,14 @@ bool disk_buf_init(void)
            "  size:       %ld\n",
            disk_buf.pgcount, (long)disk_buf.size);
 
-    rb->memset(disk_buf.cache, 0xff,
+    memset(disk_buf.cache, 0xff,
                disk_buf.pgcount*sizeof (*disk_buf.cache));
 
-    disk_buf.thread = rb->create_thread(
+    disk_buf.thread = create_thread(
         disk_buf_thread, disk_buf_stack, sizeof(disk_buf_stack), 0,
         "mpgbuffer" IF_PRIO(, PRIORITY_BUFFERING) IF_COP(, CPU));
 
-    rb->queue_enable_queue_send(disk_buf.q, &disk_buf_queue_send,
+    queue_enable_queue_send(disk_buf.q, &disk_buf_queue_send,
                                 disk_buf.thread);
 
     if (disk_buf.thread == 0)
@@ -982,8 +982,8 @@ void disk_buf_exit(void)
 {
     if (disk_buf.thread != 0)
     {
-        rb->queue_post(disk_buf.q, STREAM_QUIT, 0);
-        rb->thread_wait(disk_buf.thread);
+        queue_post(disk_buf.q, STREAM_QUIT, 0);
+        thread_wait(disk_buf.thread);
         disk_buf.thread = 0;
     }
 }

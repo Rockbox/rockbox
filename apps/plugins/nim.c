@@ -63,21 +63,21 @@ static bool end;    /*If true game is finished*/
 /*Display that the action it's impossible*/
 static void impossible(void)
 {
-    rb->lcd_puts(0,1,"Impossible!");
-    rb->lcd_update();
-    rb->sleep(HZ);
+    lcd_puts(0,1,"Impossible!");
+    lcd_update();
+    sleep(HZ);
     return;
 }
 
 /*Display that the CPU lose :) */
 static void lose(void)
 {
-    rb->lcd_define_pattern(hsmile,smile);
-    rb->lcd_puts(0,1,"You Win!!");
-    rb->lcd_putc(8,1,hsmile);
-    rb->lcd_update();
+    lcd_define_pattern(hsmile,smile);
+    lcd_puts(0,1,"You Win!!");
+    lcd_putc(8,1,hsmile);
+    lcd_update();
     end=true;
-    rb->sleep(HZ*2);
+    sleep(HZ*2);
     return;
 }
 
@@ -85,12 +85,12 @@ static void lose(void)
 /* Display that the CPU win :( */
 static void win(void)
 {
-    rb->lcd_define_pattern(hcry,cry);
-    rb->lcd_puts(0,1,"You Lose!!");
-    rb->lcd_putc(9,1,hcry);
-    rb->lcd_update();
+    lcd_define_pattern(hcry,cry);
+    lcd_puts(0,1,"You Lose!!");
+    lcd_putc(9,1,hcry);
+    lcd_update();
     end=true;
-    rb->sleep(HZ*2);
+    sleep(HZ*2);
     return;
 }
 
@@ -100,21 +100,21 @@ static void display_first_line(int x)
 {
     int i;
 
-    rb->lcd_putsf(0,0,"       =%d",x);
+    lcd_putsf(0,0,"       =%d",x);
 
-    rb->lcd_define_pattern(h1,pattern3);
+    lcd_define_pattern(h1,pattern3);
     for (i=0;i<x/3;i++)
-        rb->lcd_putc(i,0,h1);
+        lcd_putc(i,0,h1);
 
     if (x%3==2)
     {
-        rb->lcd_define_pattern(h2,pattern2);
-        rb->lcd_putc(i,0,h2);
+        lcd_define_pattern(h2,pattern2);
+        lcd_putc(i,0,h2);
     }
     if (x%3==1)
     {
-        rb->lcd_define_pattern(h2,pattern1);
-        rb->lcd_putc(i,0,h2);
+        lcd_define_pattern(h2,pattern1);
+        lcd_putc(i,0,h2);
     }
 }
 
@@ -122,14 +122,14 @@ static void display_first_line(int x)
 static void nim_exit(void)
 {
     /*Restore the old pattern*/
-    rb->lcd_unlock_pattern(h1);
-    rb->lcd_unlock_pattern(h2);
-    rb->lcd_unlock_pattern(hsmile);
-    rb->lcd_unlock_pattern(hcry);
+    lcd_unlock_pattern(h1);
+    lcd_unlock_pattern(h2);
+    lcd_unlock_pattern(hsmile);
+    lcd_unlock_pattern(hcry);
 
     /*Clear the screen*/
-    rb->lcd_clear_display();
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_update();
 }
 
 /* this is the plugin entry point */
@@ -146,14 +146,14 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
 
     /*Get the pattern handle*/
-    h1=rb->lcd_get_locked_pattern();
-    h2=rb->lcd_get_locked_pattern();
-    hcry=rb->lcd_get_locked_pattern();
-    hsmile=rb->lcd_get_locked_pattern();
+    h1=lcd_get_locked_pattern();
+    h2=lcd_get_locked_pattern();
+    hcry=lcd_get_locked_pattern();
+    hsmile=lcd_get_locked_pattern();
 
 
-    rb->splash(HZ, "NIM V1.2");
-    rb->lcd_clear_display();
+    splash(HZ, "NIM V1.2");
+    lcd_clear_display();
 
     /* Main loop */
     while (1)
@@ -166,7 +166,7 @@ enum plugin_status plugin_start(const void* parameter)
         min=0;
 
         /*Empty the event queue*/
-        rb->button_clear_queue();
+        button_clear_queue();
 
         /* Game loop */
         while(end!=true)
@@ -177,13 +177,13 @@ enum plugin_status plugin_start(const void* parameter)
                 y=1;
                 display_first_line(x);
 
-                rb->lcd_putsf(0,1,"[%d..%d]?=%d",min,v,y);
-                rb->lcd_update();
+                lcd_putsf(0,1,"[%d..%d]?=%d",min,v,y);
+                lcd_update();
 
                 go=false;
                 while (!go)
                 {
-                    button = rb->button_get(true);
+                    button = button_get(true);
                     switch ( button )
                     {
                         case BUTTON_STOP|BUTTON_REL:
@@ -212,8 +212,8 @@ enum plugin_status plugin_start(const void* parameter)
                             break;
                     }
                     display_first_line(x);
-                    rb->lcd_putsf(0,1,"[%d..%d]?=%d",min,v,y);
-                    rb->lcd_update();
+                    lcd_putsf(0,1,"[%d..%d]?=%d",min,v,y);
+                    lcd_update();
                 }
 
                 if ( (y==0) && (x<21))
@@ -272,9 +272,9 @@ enum plugin_status plugin_start(const void* parameter)
                 }
                 v=y*2;
                 x-=y;
-                rb->lcd_putsf(0,1,"I take=%d",y);
-                rb->lcd_update();
-                rb->sleep(HZ);
+                lcd_putsf(0,1,"I take=%d",y);
+                lcd_update();
+                sleep(HZ);
             }
             if ((x==1)&&(!end))
                 win();

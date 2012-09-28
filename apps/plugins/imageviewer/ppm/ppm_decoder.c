@@ -27,7 +27,7 @@
 static int ppm_read_magic_number(int fd)
 {
     unsigned char i1, i2;
-    if(rb->read(fd, &i1, 1) < 1 || rb->read(fd, &i2, 1) < 1)
+    if(read(fd, &i1, 1) < 1 || read(fd, &i2, 1) < 1)
     {
         ppm_error( "Error reading magic number from ppm image stream. "\
                    "Most often, this means your input file is empty." );
@@ -40,14 +40,14 @@ static int ppm_getc(int fd)
 {
     unsigned char ch;
 
-    if (rb->read(fd, &ch, 1) < 1) {
+    if (read(fd, &ch, 1) < 1) {
         ppm_error("EOF. Read error reading a byte");
         return PLUGIN_ERROR;
     }
 
     if (ch == '#') {
         do {
-            if (rb->read(fd, &ch, 1) < 1) {
+            if (read(fd, &ch, 1) < 1) {
                 ppm_error("EOF. Read error reading a byte");
                 return PLUGIN_ERROR;
             }
@@ -96,7 +96,7 @@ static int ppm_getrawbyte(int fd)
 {
     unsigned char by;
 
-    if (rb->read(fd, &by, 1) < 1) {
+    if (read(fd, &by, 1) < 1) {
         ppm_error("EOF. Read error while reading a one-byte sample.");
         return PLUGIN_ERROR;
     }
@@ -113,7 +113,7 @@ static int ppm_getrawsample(int fd, int const maxval)
         /* The sample is two bytes. Read both. */
         unsigned char byte_pair[2];
 
-        if (rb->read(fd, byte_pair, 2) < 2) {
+        if (read(fd, byte_pair, 2) < 2) {
             ppm_error("EOF. Read error while reading a long sample.");
             return PLUGIN_ERROR;
         }

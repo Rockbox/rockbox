@@ -321,7 +321,7 @@ static struct tuner_settings hdd_settings;
 
 static bool settings_needs_saving(void)
 {
-    return(rb->memcmp(&settings, &hdd_settings, sizeof(settings)));
+    return(memcmp(&settings, &hdd_settings, sizeof(settings)));
 }
 
 /*---------------------------------------------------------------------*/
@@ -330,7 +330,7 @@ static void tuner_settings_reset(void)
 {
     settings = (struct tuner_settings) {
         .volume_threshold = VOLUME_THRESHOLD,
-        .record_gain = rb->global_settings->rec_mic_gain,
+        .record_gain = global_settings.rec_mic_gain,
         .sample_size = BUFFER_SIZE,
         .lowest_freq = period2freq(BUFFER_SIZE / 4),
         .yin_threshold = DEFAULT_YIN_THRESHOLD,
@@ -345,7 +345,7 @@ static void tuner_settings_reset(void)
 
 static void load_settings(void)
 {
-    int fd = rb->open(SETTINGS_FILENAME, O_RDONLY);
+    int fd = open(SETTINGS_FILENAME, O_RDONLY);
     if(fd < 0){ /* file doesn't exist */
         /* Initializes the settings with default values at least */
         tuner_settings_reset();
@@ -353,15 +353,15 @@ static void load_settings(void)
     }
 
     /* basic consistency check */
-    if(rb->filesize(fd) == sizeof(settings)){
-        rb->read(fd, &settings, sizeof(settings));
-        rb->memcpy(&hdd_settings, &settings, sizeof(settings));
+    if(filesize(fd) == sizeof(settings)){
+        read(fd, &settings, sizeof(settings));
+        memcpy(&hdd_settings, &settings, sizeof(settings));
     }
     else{
         tuner_settings_reset();
     }
 
-    rb->close(fd);
+    close(fd);
 }
 
 /*---------------------------------------------------------------------*/
@@ -371,10 +371,10 @@ static void save_settings(void)
     if(!settings_needs_saving())
         return;
 
-    int fd = rb->creat(SETTINGS_FILENAME, 0666);
+    int fd = creat(SETTINGS_FILENAME, 0666);
     if(fd >= 0){ /* does file exist? */
-        rb->write (fd, &settings, sizeof(settings));
-        rb->close(fd);
+        write (fd, &settings, sizeof(settings));
+        close(fd);
     }
 }
 
@@ -460,7 +460,7 @@ static bool main_menu(void)
 
     backlight_use_settings();
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-    rb->cancel_cpu_boost();
+    cancel_cpu_boost();
 #endif
 
     MENUITEM_STRINGLIST(menu,"Tuner Settings",NULL,
@@ -478,29 +478,29 @@ static bool main_menu(void)
 
     while(!done)
     {
-        choice = rb->do_menu(&menu, &selection, NULL, false);
+        choice = do_menu(&menu, &selection, NULL, false);
         switch(choice)
         {
             case 1:
-                rb->set_int("Volume Threshold", "%", UNIT_INT,
+                set_int("Volume Threshold", "%", UNIT_INT,
                                &settings.volume_threshold,
                                NULL, 5, 5, 95, NULL);
                 break;
             case 2:
-                rb->set_int("Listening Volume", "%", UNIT_INT,
+                set_int("Listening Volume", "%", UNIT_INT,
                                &settings.record_gain,
-                               NULL, 1, rb->sound_min(SOUND_MIC_GAIN),
-                               rb->sound_max(SOUND_MIC_GAIN), NULL);
+                               NULL, 1, sound_min(SOUND_MIC_GAIN),
+                               sound_max(SOUND_MIC_GAIN), NULL);
                 break;
             case 3:
-                rb->set_int("Lowest Frequency", "Hz", UNIT_INT,
+                set_int("Lowest Frequency", "Hz", UNIT_INT,
                                &settings.lowest_freq, set_min_freq, 1,
                                /* Range depends on the size of the buffer */
                                sample_rate / (BUFFER_SIZE / 4),
                                sample_rate / (SAMPLE_SIZE_MIN / 4), NULL);
                 break;
             case 4:
-                rb->set_option(
+                set_option(
                     "Algorithm Pickiness (Lower -> more discriminating)",
                     &settings.yin_threshold,
                     INT, yin_threshold_text,
@@ -508,22 +508,22 @@ static bool main_menu(void)
                     NULL);
                 break;
             case 5:
-                rb->set_option("Display Accidentals As",
+                set_option("Display Accidentals As",
                                &settings.use_sharps,
                                BOOL, accidental_text, 2, NULL);
                 break;
             case 6:
-                rb->set_option("Key Transposition",
+                set_option("Key Transposition",
                               &settings.key_transposition,
                               INT, transpose_text, 12, NULL);
                 break;
             case 7:
-                rb->set_bool("Display Frequency (Hz)",
+                set_bool("Display Frequency (Hz)",
                              &settings.display_hz);
                 break;
             case 8:
                 freq_val = freq_A[settings.freq_A].frequency;
-                rb->set_int("Frequency of A (Hz)",
+                set_int("Frequency of A (Hz)",
                     "Hz", UNIT_INT, &freq_val, NULL,
                     1, freq_A[0].frequency, freq_A[NUM_FREQ_A-1].frequency,
                     NULL);
@@ -531,7 +531,7 @@ static bool main_menu(void)
                 break;
             case 9:
                 reset = false;
-                rb->set_bool("Reset Tuner Settings?", &reset);
+                set_bool("Reset Tuner Settings?", &reset);
                 if (reset)
                     tuner_settings_reset();
                 break;
@@ -622,7 +622,7 @@ static void draw_note(const char *note)
             accidental_index = NOTE_INDEX_FLAT;
         }
 
-        vertical_picture_draw_sprite(rb->screens[0],
+        vertical_picture_draw_sprite(&screens[0],
                                      &note_bitmaps,
                                      accidental_index,
                                      LCD_WIDTH / 2,
@@ -630,7 +630,7 @@ static void draw_note(const char *note)
         note_x = LCD_WIDTH / 2 - BMPWIDTH_pitch_notes;
     }
 
-    vertical_picture_draw_sprite(rb->screens[0], &note_bitmaps, i,
+    vertical_picture_draw_sprite(&screens[0], &note_bitmaps, i,
                                  note_x,
                                  note_y);
 }
@@ -642,13 +642,13 @@ static void draw_bar(fixed wrong_by_cents)
     int x;
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(255,255,255)); /* Color screens */
+    lcd_set_foreground(LCD_RGBPACK(255,255,255)); /* Color screens */
 #elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_BLACK);      /* Greyscale screens */
+    lcd_set_foreground(LCD_BLACK);      /* Greyscale screens */
 #endif
 
-    rb->lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y);
-    rb->lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y2);
+    lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y);
+    lcd_hline(0,LCD_WIDTH-1, BAR_HLINE_Y2);
 
     /* Draw graduation lines on the off-by readout */
     for(n = 0; n <= GRADUATION; n++)
@@ -656,32 +656,32 @@ static void draw_bar(fixed wrong_by_cents)
         x = (LCD_WIDTH * n + GRADUATION / 2) / GRADUATION;
         if (x >= LCD_WIDTH)
             x = LCD_WIDTH - 1;
-        rb->lcd_vline(x, BAR_HLINE_Y, BAR_HLINE_Y2);
+        lcd_vline(x, BAR_HLINE_Y, BAR_HLINE_Y2);
     }
 
 #if LCD_DEPTH > 1
-    rb->lcd_set_foreground(front_color);
+    lcd_set_foreground(front_color);
 #endif
-    rb->lcd_putsxyf(lbl_x_minus_50    ,bar_grad_y, "%d", -50);
-    rb->lcd_putsxyf(lbl_x_minus_20    ,bar_grad_y, "%d", -20);
-    rb->lcd_putsxyf(lbl_x_0           ,bar_grad_y, "%d",   0);
-    rb->lcd_putsxyf(lbl_x_20          ,bar_grad_y, "%d",  20);
-    rb->lcd_putsxyf(lbl_x_50          ,bar_grad_y, "%d",  50);
+    lcd_putsxyf(lbl_x_minus_50    ,bar_grad_y, "%d", -50);
+    lcd_putsxyf(lbl_x_minus_20    ,bar_grad_y, "%d", -20);
+    lcd_putsxyf(lbl_x_0           ,bar_grad_y, "%d",   0);
+    lcd_putsxyf(lbl_x_20          ,bar_grad_y, "%d",  20);
+    lcd_putsxyf(lbl_x_50          ,bar_grad_y, "%d",  50);
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));   /* Color screens */
+    lcd_set_foreground(LCD_RGBPACK(255,0,0));   /* Color screens */
 #elif LCD_DEPTH > 1
-    rb->lcd_set_foreground(LCD_DARKGRAY);           /* Greyscale screens */
+    lcd_set_foreground(LCD_DARKGRAY);           /* Greyscale screens */
 #endif
 
     if (fp_gt(wrong_by_cents, FP_ZERO))
     {
-        rb->lcd_fillrect(bar_x_0, BAR_Y,
+        lcd_fillrect(bar_x_0, BAR_Y,
             fixed2int(fp_mul(wrong_by_cents, LCD_FACTOR)), BAR_HEIGHT);
     }
     else
     {
-        rb->lcd_fillrect(bar_x_0 + fixed2int(fp_mul(wrong_by_cents,LCD_FACTOR)),
+        lcd_fillrect(bar_x_0 + fixed2int(fp_mul(wrong_by_cents,LCD_FACTOR)),
                          BAR_Y,
                          fixed2int(fp_mul(wrong_by_cents, LCD_FACTOR)) * -1,
                          BAR_HEIGHT);
@@ -733,7 +733,7 @@ static void display_frequency (fixed freq)
 
     ldf = fp_mul(int2fixed(1200), log(fp_div(freq,nfreq)));
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     draw_bar(ldf);                /* The red bar */
     if(fp_round(freq) != 0)
     {
@@ -747,15 +747,15 @@ static void display_frequency (fixed freq)
         if(settings.display_hz)
         {
 #if LCD_DEPTH > 1
-            rb->lcd_set_foreground(front_color);
+            lcd_set_foreground(front_color);
 #endif
-            rb->lcd_putsxyf(0, HZ_Y, "%s : %d cents (%d.%02dHz)",
+            lcd_putsxyf(0, HZ_Y, "%s : %d cents (%d.%02dHz)",
                          notes[note].name, fp_round(ldf) ,fixed2int(orig_freq),
                          fp_round(fp_mul(fp_frac(orig_freq),
                                          int2fixed(DISPLAY_HZ_PRECISION))));
         }
     }
-    rb->lcd_update();
+    lcd_update();
 }
 
 #ifndef SIMULATOR
@@ -971,7 +971,7 @@ static void record_data(void)
 {
 #ifndef SIMULATOR
     /* Always record full buffer, even if not required */
-    rb->pcm_record_data(recording_callback, NULL,
+    pcm_record_data(recording_callback, NULL,
                         audio_data[audio_tail],
                         BUFFER_SIZE * sizeof (int16_t));
 #endif
@@ -1013,7 +1013,7 @@ static void record_and_get_pitch(void)
                     break;
 
                 case PLA_CANCEL:
-                    rb->pcm_stop_recording();
+                    pcm_stop_recording();
                     quit = main_menu();
                     if(!quit)
                     {
@@ -1032,16 +1032,16 @@ static void record_and_get_pitch(void)
             /* Only do the heavy lifting if the volume is high enough */
             if(buffer_magnitude(audio_data[audio_head]) >
                 sqr(settings.volume_threshold *
-                    rb->sound_max(SOUND_MIC_GAIN)))
+                    sound_max(SOUND_MIC_GAIN)))
             {
                 waiting = false;
                 redraw = false;
 
             #ifdef HAVE_SCHEDULER_BOOSTCTRL
-                rb->trigger_cpu_boost();
+                trigger_cpu_boost();
             #endif
 #ifdef PLUGIN_USE_IRAM
-                rb->memcpy(iram_audio_data, audio_data[audio_head],
+                memcpy(iram_audio_data, audio_data[audio_head],
                            settings.sample_size * sizeof (int16_t));
 #endif
                 /* This returns the period of the detected pitch in samples */
@@ -1062,7 +1062,7 @@ static void record_and_get_pitch(void)
                 redraw = false;
                 display_frequency(FP_ZERO);
             #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                rb->cancel_cpu_boost();
+                cancel_cpu_boost();
             #endif
             }
 
@@ -1076,10 +1076,10 @@ static void record_and_get_pitch(void)
 #endif
         }
     }
-    rb->pcm_close_recording();
-    rb->pcm_set_frequency(HW_SAMPR_RESET | SAMPR_TYPE_REC);
+    pcm_close_recording();
+    pcm_set_frequency(HW_SAMPR_RESET | SAMPR_TYPE_REC);
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-    rb->cancel_cpu_boost();
+    cancel_cpu_boost();
 #endif
 
     backlight_use_settings();
@@ -1089,30 +1089,30 @@ static void record_and_get_pitch(void)
 static void init_everything(void)
 {
     /* Disable all talking before initializing IRAM */
-    rb->talk_disable(true);
+    talk_disable(true);
 
     load_settings();
-    rb->storage_sleep();
+    storage_sleep();
 
     /* Stop all playback */
-    rb->plugin_get_audio_buffer(NULL);
+    plugin_get_audio_buffer(NULL);
 
     /* --------- Init the audio recording ----------------- */
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
-    rb->audio_set_input_source(INPUT_TYPE, SRCF_RECORDING);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_input_source(INPUT_TYPE, SRCF_RECORDING);
 
     /* set to maximum gain */
-    rb->audio_set_recording_gain(settings.record_gain,
+    audio_set_recording_gain(settings.record_gain,
                                  settings.record_gain,
                                  AUDIO_GAIN_MIC);
 
     /* Highest C on piano is approx 4.186 kHz, so we need just over
      * 8.372 kHz to pass it. */
-    sample_rate = rb->round_value_to_list32(9000, rb->rec_freq_sampr,
+    sample_rate = round_value_to_list32(9000, rec_freq_sampr,
                                             REC_NUM_FREQ, false);
-    sample_rate = rb->rec_freq_sampr[sample_rate];
-    rb->pcm_set_frequency(sample_rate | SAMPR_TYPE_REC);
-    rb->pcm_init_recording();
+    sample_rate = rec_freq_sampr[sample_rate];
+    pcm_set_frequency(sample_rate | SAMPR_TYPE_REC);
+    pcm_init_recording();
 
     /* avoid divsion by zero */
     if(settings.lowest_freq == 0)
@@ -1120,9 +1120,9 @@ static void init_everything(void)
 
     /* GUI */
 #if LCD_DEPTH > 1
-    front_color = rb->lcd_get_foreground();
+    front_color = lcd_get_foreground();
 #endif
-    rb->lcd_getstringsize("X", &font_w, &font_h);
+    lcd_getstringsize("X", &font_w, &font_h);
 
     bar_x_0  = LCD_WIDTH / 2;
     lbl_x_minus_50 = 0;
@@ -1137,7 +1137,7 @@ static void init_everything(void)
     /* Put the note right between the top and bottom text elements */
     note_y = ((font_h + bar_grad_y - note_bitmaps.slide_height) / 2);
 
-    rb->talk_disable(false);
+    talk_disable(false);
 }
 
 enum plugin_status plugin_start(const void* parameter)

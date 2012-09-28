@@ -28,11 +28,11 @@
  * changed to int, and references to NULL into -1, but there are less of those
  */
 #undef ferror
-#define fread(ptr, size, nmemb, stream) rb->read(stream, ptr, size*nmemb)
-#define fwrite(ptr, size, nmemb, stream) rb->write(stream, ptr, size*nmemb)
-#define fclose(stream) rb->close(stream)
-#define fseek(stream, offset, whence) rb->lseek(stream, offset, whence)
-#define ftell(stream) rb->lseek(stream, 0, SEEK_CUR)
+#define fread(ptr, size, nmemb, stream) read(stream, ptr, size*nmemb)
+#define fwrite(ptr, size, nmemb, stream) write(stream, ptr, size*nmemb)
+#define fclose(stream) close(stream)
+#define fseek(stream, offset, whence) lseek(stream, offset, whence)
+#define ftell(stream) lseek(stream, 0, SEEK_CUR)
 #define ferror(stream) 0
 
 /*
@@ -54,7 +54,5 @@ extern void wait_for_key(void);
 /*
  * wrappers
  */
-#define strchr(s, c) rb->strchr(s, c)
-#define strcpy(dest, src) rb->strcpy(dest, src)
 
 #endif /* _FROTZPLUGIN_H_ */

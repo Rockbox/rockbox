@@ -46,6 +46,7 @@
 #include "structec.h"
 #include "plugin.h" /* plugin_get_buffer() */
 #include "debug.h"
+#include "symbols.h"
 
 /* Memory layout varies between targets because the
    Archos (MASCODEC) devices cannot mix voice and audio playback
@@ -1256,6 +1257,7 @@ void talk_disable(bool disable)
     else 
         talk_temp_disable_count--;
 }
+EXPORT_SYMBOL(talk_disable);
 
 void talk_setting(const void *global_settings_variable)
 {

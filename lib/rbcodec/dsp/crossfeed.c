@@ -30,6 +30,7 @@
 #include "dsp_filter.h"
 #include "crossfeed.h"
 #include <string.h>
+#include "symbols.h"
 
 /* Implemented here or in target assembly code */
 void crossfeed_process(struct dsp_proc_entry *this,
@@ -146,6 +147,7 @@ void dsp_set_crossfeed_type(int type)
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_proc_enable(dsp, DSP_PROC_CROSSFEED, type != CROSSFEED_TYPE_NONE);
 }
+EXPORT_SYMBOL(dsp_set_crossfeed_type);
 
 /* Set the gain of the dry mix */
 void dsp_set_crossfeed_direct_gain(int gain)

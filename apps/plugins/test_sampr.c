@@ -106,7 +106,7 @@ static void get_more(const void **start, size_t *size)
 
 static void ICODE_ATTR gen_thread_func(void)
 {
-    uint32_t gen_random = *rb->current_tick;
+    uint32_t gen_random = current_tick;
     uint32_t gen_phase = 0;
 
     while (!gen_quit)
@@ -116,7 +116,7 @@ static void ICODE_ATTR gen_thread_func(void)
 
         while (output_tail - output_head >= OUTPUT_CHUNK_COUNT)
         {
-            rb->sleep(0);
+            sleep(0);
             if (gen_quit)
                 return;
         }
@@ -138,7 +138,7 @@ static void ICODE_ATTR gen_thread_func(void)
 
         output_tail++;
 
-        rb->yield();
+        yield();
     }
 }
 
@@ -149,41 +149,41 @@ static void update_gen_step(void)
 
 static void output_clear(void)
 {
-    rb->pcm_play_lock();
+    pcm_play_lock();
 
-    rb->memset(output_buf, 0, sizeof (output_buf));
+    memset(output_buf, 0, sizeof (output_buf));
     output_head = 0;
     output_tail = 0;
 
-    rb->pcm_play_unlock();
+    pcm_play_unlock();
 }
 
 /* Called to switch samplerate on the fly */
 static void set_frequency(int index)
 {
     hw_freq = index;
-    hw_sampr = rb->hw_freq_sampr[index];
+    hw_sampr = hw_freq_sampr[index];
 
     output_clear();
     update_gen_step();
 
-    rb->pcm_set_frequency(hw_sampr);
-    rb->pcm_apply_settings();
+    pcm_set_frequency(hw_sampr);
+    pcm_apply_settings();
 }
 
 #ifndef HAVE_VOLUME_IN_LIST
 static void set_volume(int value)
 {
-    rb->global_settings->volume = value;
-    rb->sound_set(SOUND_VOLUME, value);
+    global_settings.volume = value;
+    sound_set(SOUND_VOLUME, value);
 }
 
 static const char *format_volume(char *buf, size_t len, int value,
                                  const char *unit)
 {
     (void)unit;
-    rb->snprintf(buf, len, "%d %s", rb->sound_val2phys(SOUND_VOLUME, value),
-                 rb->sound_unit(SOUND_VOLUME));
+    snprintf(buf, len, "%d %s", sound_val2phys(SOUND_VOLUME, value),
+                 sound_unit(SOUND_VOLUME));
     return buf;
 }
 #endif /* HAVE_VOLUME_IN_LIST */
@@ -208,66 +208,66 @@ static void play_tone(bool volume_set)
 
     int freq = hw_freq;
 
-    rb->audio_stop();
+    audio_stop();
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+    audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+    cpu_boost(true);
 #endif
 
-    rb->pcm_set_frequency(rb->hw_freq_sampr[freq]);
+    pcm_set_frequency(hw_freq_sampr[freq]);
 
 #if INPUT_SRC_CAPS != 0
     /* Recordable targets can play back from other sources */
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
 
     gen_quit = false;
     output_clear();
     update_gen_step();
 
-    gen_thread_id = rb->create_thread(gen_thread_func, gen_thread_stack,
+    gen_thread_id = create_thread(gen_thread_func, gen_thread_stack,
                                       sizeof(gen_thread_stack), 0,
                                       "test_sampr generator"
                                       IF_PRIO(, PRIORITY_PLAYBACK)
                                       IF_COP(, CPU));
 
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    pcm_play_data(get_more, NULL, NULL, 0);
 
 #ifndef HAVE_VOLUME_IN_LIST
     if (volume_set)
     {
-        int volume = rb->global_settings->volume;
+        int volume = global_settings.volume;
 
-        rb->set_int("Volume", NULL, -1, &volume,
-                    set_volume, 1, rb->sound_min(SOUND_VOLUME),
-                    rb->sound_max(SOUND_VOLUME), format_volume);
+        set_int("Volume", NULL, -1, &volume,
+                    set_volume, 1, sound_min(SOUND_VOLUME),
+                    sound_max(SOUND_VOLUME), format_volume);
     }
     else
 #endif /* HAVE_VOLUME_IN_LIST */
     {
-        rb->set_option("Sample Rate", &freq, INT, names,
+        set_option("Sample Rate", &freq, INT, names,
                        HW_NUM_FREQ, set_frequency);
         (void)volume_set;
     }
 
     gen_quit = true;
 
-    rb->thread_wait(gen_thread_id);
+    thread_wait(gen_thread_id);
 
-    rb->pcm_play_stop();
+    pcm_play_stop();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    cpu_boost(false);
 #endif
 
     /* restore default - user of apis is responsible for restoring
        default state - normally playback at 44100Hz */
-    rb->pcm_set_frequency(HW_FREQ_DEFAULT);
+    pcm_set_frequency(HW_FREQ_DEFAULT);
 }
 
 /* Tests hardware sample rate switching */
@@ -294,11 +294,11 @@ enum plugin_status plugin_start(const void *parameter)
     int selected = 0;
 
     /* Disable all talking before initializing IRAM */
-    rb->talk_disable(true);
+    talk_disable(true);
 
     while (!exit)
     {
-        int result = rb->do_menu(&menu, &selected, NULL, false);
+        int result = do_menu(&menu, &selected, NULL, false);
 
         switch (result)
         {
@@ -317,7 +317,7 @@ enum plugin_status plugin_start(const void *parameter)
         }
     }
 
-    rb->talk_disable(false);
+    talk_disable(false);
 
     return PLUGIN_OK;
     (void)parameter;

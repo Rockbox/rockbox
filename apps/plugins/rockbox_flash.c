@@ -115,13 +115,13 @@ static bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID,
     pBase[0x5555] = 0xAA; /* enter command mode */
     pBase[0x2AAA] = 0x55;
     pBase[0x5555] = 0x90; /* ID command */
-    rb->sleep(HZ/50);     /* Atmel wants 20ms pause here */
+    sleep(HZ/50);     /* Atmel wants 20ms pause here */
 
     manu = pBase[0];
     id   = pBase[1];
     
     pBase[0] = 0xF0;  /* reset flash (back to normal read mode) */
-    rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
+    sleep(HZ/50); /* Atmel wants 20ms pause here */
 
     /* I assume success if the obtained values are different from
        the normal flash content. This is not perfectly bulletproof, they 
@@ -192,7 +192,7 @@ static inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 /* this returns true if supported and fills the info struct */
 static bool GetFlashInfo(tFlashInfo* pInfo)
 {
-    rb->memset(pInfo, 0, sizeof(tFlashInfo));
+    memset(pInfo, 0, sizeof(tFlashInfo));
 
     if (!ReadID(FB, &pInfo->manufacturer, &pInfo->id))
         return false;
@@ -202,13 +202,13 @@ static bool GetFlashInfo(tFlashInfo* pInfo)
         if (pInfo->id == 0xD6)
         {
             pInfo->size = 256* 1024; /* 256k */
-            rb->strcpy(pInfo->name, "SST39VF020");
+            strcpy(pInfo->name, "SST39VF020");
             return true;
         }
         else if (pInfo->id == 0xD7)
         {
             pInfo->size = 512* 1024; /* 512k */
-            rb->strcpy(pInfo->name, "SST39VF040");
+            strcpy(pInfo->name, "SST39VF040");
             return true;
         }
         else
@@ -286,29 +286,29 @@ tCheckResult CheckImageFile(char* filename, int space,
     static const UINT8 magic[8] = { 0x00,0xe9,0x55,0x43,0x4c,0xff,0x01,0x1a };
     UINT8 ucl_header[UCL_HEADER];
 
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
         return eFileNotFound;
 
-    filesize = rb->filesize(fd);
+    filesize = filesize(fd);
     if (filesize - (int)sizeof(ucl_header) - 8 > space)
     {
-        rb->close(fd);
+        close(fd);
         return eTooBig;
     }
     else if (filesize < 10000) /* give it some reasonable lower limit */
     {
-        rb->close(fd);
+        close(fd);
         return eTooSmall;
     }
 
     /* do some sanity checks */
 
-    read = rb->read(fd, ucl_header, sizeof(ucl_header));
+    read = read(fd, ucl_header, sizeof(ucl_header));
     fileread += read;
     if (read != sizeof(ucl_header))
     {
-        rb->close(fd);
+        close(fd);
         return eReadErr;
     }
 
@@ -317,7 +317,7 @@ tCheckResult CheckImageFile(char* filename, int space,
     {
         if (ucl_header[i] != magic[i])
         {
-            rb->close(fd);
+            close(fd);
             return eNotUCL;
         }
     }
@@ -325,7 +325,7 @@ tCheckResult CheckImageFile(char* filename, int space,
     pHeader->size = Read32(ucl_header + 22); /* compressed size */
     if (pHeader->size != filesize - sizeof(ucl_header) - 8)
     {
-        rb->close(fd);
+        close(fd);
         return eMultiBlocks;
     }
 
@@ -341,7 +341,7 @@ tCheckResult CheckImageFile(char* filename, int space,
         /* check for supported algorithm */
         if (ucl_header[12] != 0x2E)
         {
-            rb->close(fd);
+            close(fd);
             return eWrongAlgorithm;
         }
     }
@@ -351,11 +351,11 @@ tCheckResult CheckImageFile(char* filename, int space,
 
         pHeader->flags = 0x00000000; /* uncompressed */
 
-        read = rb->read(fd, &reset_vector, sizeof(reset_vector));
+        read = read(fd, &reset_vector, sizeof(reset_vector));
         fileread += read;
         if (read != sizeof(reset_vector))
         {
-            rb->close(fd);
+            close(fd);
             return eReadErr;
         }
         if (reset_vector >= (UINT32)FB 
@@ -368,16 +368,16 @@ tCheckResult CheckImageFile(char* filename, int space,
                but the link address, for us to check the position */
             if(pHeader->destination != reset_vector) /* compare link addr. */
             {
-                rb->close(fd);
+                close(fd);
                 return eBadRomLink; /* not matching the start address */
             }
 
             /* read the now following reset vector */
-            read = rb->read(fd, &reset_vector, sizeof(reset_vector));
+            read = read(fd, &reset_vector, sizeof(reset_vector));
             fileread += read;
             if (read != sizeof(reset_vector))
             {
-                rb->close(fd);
+                close(fd);
                 return eReadErr;
             }
         }
@@ -388,11 +388,11 @@ tCheckResult CheckImageFile(char* filename, int space,
     /* check if we can read the whole file */
     do
     {
-        read = rb->read(fd, sector, SECTORSIZE);
+        read = read(fd, sector, SECTORSIZE);
         fileread += read;
     } while (read == SECTORSIZE);
     
-    rb->close(fd);
+    close(fd);
 
     if (fileread != filesize)
         return eReadErr;
@@ -411,17 +411,17 @@ static unsigned ProgramImageFile(char* filename, UINT8* pos,
     int read; /* how many for this sector */
     unsigned failures = 0;
 
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
         return false;
 
     /* no error checking necessary here, we checked for minimum size
        already */
-    rb->lseek(fd, start, SEEK_SET); /* go to start position */
+    lseek(fd, start, SEEK_SET); /* go to start position */
 
     *(tImageHeader*)sector = *pImageHeader; /* copy header into sector
                                                buffer */
-    read = rb->read(fd, sector + sizeof(tImageHeader),
+    read = read(fd, sector + sizeof(tImageHeader),
                     SECTORSIZE - sizeof(tImageHeader)); /* payload behind */
     size -= read;
     read += sizeof(tImageHeader); /* to be programmed, but not part of the
@@ -442,12 +442,12 @@ static unsigned ProgramImageFile(char* filename, UINT8* pos,
         }
 
         pos += SECTORSIZE;
-        read = rb->read(fd, sector, (size > SECTORSIZE) ? SECTORSIZE : size);
+        read = read(fd, sector, (size > SECTORSIZE) ? SECTORSIZE : size);
         /* payload for next sector */
         size -= read;
     } while (read > 0);
     
-    rb->close(fd);
+    close(fd);
 
     return failures;
 }
@@ -462,17 +462,17 @@ static unsigned VerifyImageFile(char* filename, UINT8* pos,
     int read; /* how many for this sector */
     unsigned failures = 0;
 
-    fd = rb->open(filename, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
         return false;
 
     /* no error checking necessary here, we checked for minimum size
        already */
-    rb->lseek(fd, start, SEEK_SET); /* go to start position */
+    lseek(fd, start, SEEK_SET); /* go to start position */
 
     *(tImageHeader*)sector = *pImageHeader; /* copy header into sector
                                                buffer */
-    read = rb->read(fd, sector + sizeof(tImageHeader),
+    read = read(fd, sector + sizeof(tImageHeader),
                     SECTORSIZE - sizeof(tImageHeader)); /* payload behind */
 
     size -= read;
@@ -490,12 +490,12 @@ static unsigned VerifyImageFile(char* filename, UINT8* pos,
         }
         
         pos += SECTORSIZE;
-        read = rb->read(fd, sector, (size > SECTORSIZE) ? SECTORSIZE : size);
+        read = read(fd, sector, (size > SECTORSIZE) ? SECTORSIZE : size);
         /* payload for next sector */
         size -= read;
     } while (read);
     
-    rb->close(fd);
+    close(fd);
     
     return failures;
 }
@@ -509,7 +509,7 @@ static int WaitForButton(void)
     
     do
     {
-        button = rb->button_get(true);
+        button = button_get(true);
     } while (IS_SYSEVENT(button) || (button & BUTTON_REL));
     
     return button;
@@ -523,32 +523,32 @@ static void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
 
     if (!pInfo->manufacturer)
     {
-        rb->lcd_puts_scroll(0, 0, "Flash: M=?? D=??");
+        lcd_puts_scroll(0, 0, "Flash: M=?? D=??");
     }
     else
     {
         if (pInfo->size)
         {
-            rb->snprintf(buf, sizeof(buf), "Flash size: %d KB",
+            snprintf(buf, sizeof(buf), "Flash size: %d KB",
                          pInfo->size / 1024);
-            rb->lcd_puts_scroll(0, 0, buf);
+            lcd_puts_scroll(0, 0, buf);
         }
         else
         {
-            rb->lcd_puts_scroll(0, 0, "Unsupported chip");
+            lcd_puts_scroll(0, 0, "Unsupported chip");
         }
         
     }
 
     if (pImageHeader)
     {
-        rb->snprintf(buf, sizeof(buf), "Image at %d KB",
+        snprintf(buf, sizeof(buf), "Image at %d KB",
                      ((UINT8*)pImageHeader - FB) / 1024);
-        rb->lcd_puts_scroll(0, 1, buf);
+        lcd_puts_scroll(0, 1, buf);
     }
     else
     {
-        rb->lcd_puts_scroll(0, 1, "No image found!");
+        lcd_puts_scroll(0, 1, "No image found!");
     }
 }
 
@@ -570,41 +570,41 @@ static void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, "Not from ROM");
+        splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
-    if (!rb->battery_level_safe())
+    if (!battery_level_safe())
     {
-        rb->splash(HZ*3, "Battery too low!");
+        splash(HZ*3, "Battery too low!");
         return; /* exit */
     }
     
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, "Out of memory");
+        splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     pos = (void*)GetSecondImage();
     rc = GetFlashInfo(&FlashInfo);
 
     ShowFlashInfo(&FlashInfo, (void*)pos);
-    rb->lcd_update();
+    lcd_update();
 
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, "Not flashable");
+        splash(HZ*3, "Not flashable");
         return; /* exit */
     }
     else if (pos == 0)
     {
-        rb->splash(HZ*3, "No image");
+        splash(HZ*3, "No image");
         return; /* exit */
     }
 
@@ -614,25 +614,25 @@ static void DoUserDialog(char* filename)
 #if !defined(ARCHOS_FMRECORDER) && !defined(ARCHOS_RECORDERV2)
     if (bl_version < LATEST_BOOTLOADER_VERSION)
     {
-        rb->lcd_putsf(0, 0, "Bootloader V%d", bl_version);
-        rb->lcd_puts(0, 1, "Hint: You're not  ");
-        rb->lcd_puts(0, 2, "using the latest  ");
-        rb->lcd_puts(0, 3, "bootloader.       ");
-        rb->lcd_puts(0, 4, "A full reflash is ");
-        rb->lcd_puts(0, 5, "recommended.      ");
-        rb->lcd_puts(0, 6, "Press " KEYNAME1 " to ignore");
-        rb->lcd_update();
+        lcd_putsf(0, 0, "Bootloader V%d", bl_version);
+        lcd_puts(0, 1, "Hint: You're not  ");
+        lcd_puts(0, 2, "using the latest  ");
+        lcd_puts(0, 3, "bootloader.       ");
+        lcd_puts(0, 4, "A full reflash is ");
+        lcd_puts(0, 5, "recommended.      ");
+        lcd_puts(0, 6, "Press " KEYNAME1 " to ignore");
+        lcd_update();
 
         if (WaitForButton() != KEY1)
         {
             return;
         }
-        rb->lcd_clear_display();
+        lcd_clear_display();
     }
 #endif
     
-    rb->lcd_puts(0, show_greet ? 0 : 3, "Checking...");
-    rb->lcd_update();
+    lcd_puts(0, show_greet ? 0 : 3, "Checking...");
+    lcd_update();
 
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
@@ -640,72 +640,72 @@ static void DoUserDialog(char* filename)
     rc = CheckImageFile(filename, space, &ImageHeader, pos);
     if (rc != eOK)
     {
-        rb->lcd_clear_display(); /* make room for error message */
+        lcd_clear_display(); /* make room for error message */
         show_greet = true; /* verbose */
     }
 
-    rb->lcd_puts(0, show_greet ? 0 : 3, "Checked:");
+    lcd_puts(0, show_greet ? 0 : 3, "Checked:");
     switch (rc) {
         case eOK:
-            rb->lcd_puts(0, show_greet ? 0 : 4, "File OK.");
+            lcd_puts(0, show_greet ? 0 : 4, "File OK.");
             break;
     case eNotUCL:
-            rb->lcd_puts(0, 1, "File not UCL ");
-            rb->lcd_puts(0, 2, "compressed.");
-            rb->lcd_puts(0, 3, "Use uclpack --2e");
-            rb->lcd_puts(0, 4, " --10 rockbox.bin");
+            lcd_puts(0, 1, "File not UCL ");
+            lcd_puts(0, 2, "compressed.");
+            lcd_puts(0, 3, "Use uclpack --2e");
+            lcd_puts(0, 4, " --10 rockbox.bin");
             break;
     case eWrongAlgorithm:
-            rb->lcd_puts(0, 1, "Wrong algorithm");
-            rb->lcd_puts(0, 2, "for compression.");
-            rb->lcd_puts(0, 3, "Use uclpack --2e");
-            rb->lcd_puts(0, 4, " --10 rockbox.bin");
+            lcd_puts(0, 1, "Wrong algorithm");
+            lcd_puts(0, 2, "for compression.");
+            lcd_puts(0, 3, "Use uclpack --2e");
+            lcd_puts(0, 4, " --10 rockbox.bin");
             break;
     case eFileNotFound:
-            rb->lcd_puts(0, 1, "File not found:");
-            rb->lcd_puts_scroll(0, 2, filename);
+            lcd_puts(0, 1, "File not found:");
+            lcd_puts_scroll(0, 2, filename);
             break;
     case eTooBig:
-            rb->lcd_puts(0, 1, "File too big,");
-            rb->lcd_puts(0, 2, "won't fit in chip.");
+            lcd_puts(0, 1, "File too big,");
+            lcd_puts(0, 2, "won't fit in chip.");
             if (bl_version < LATEST_BOOTLOADER_VERSION)
             {
-                rb->lcd_puts(0, 3, "Upgrade bootloader");
+                lcd_puts(0, 3, "Upgrade bootloader");
             }
             break;
     case eTooSmall:
-            rb->lcd_puts(0, 1, "File too small.");
-            rb->lcd_puts(0, 2, "Incomplete?");
+            lcd_puts(0, 1, "File too small.");
+            lcd_puts(0, 2, "Incomplete?");
             break;
     case eReadErr:
-            rb->lcd_puts(0, 1, "File read error.");
+            lcd_puts(0, 1, "File read error.");
             break;
     case eMultiBlocks:
-            rb->lcd_puts(0, 1, "File invalid.");
-            rb->lcd_puts(0, 2, "Blocksize");
-            rb->lcd_puts(0, 3, " too small?");
+            lcd_puts(0, 1, "File invalid.");
+            lcd_puts(0, 2, "Blocksize");
+            lcd_puts(0, 3, " too small?");
             break;
     case eBadRomLink:
-            rb->lcd_puts(0, 1, "Bootloader not");
-            rb->lcd_puts(0, 2, "compatible with");
-            rb->lcd_puts(0, 3, "RomBox. Start");
-            rb->lcd_puts(0, 4, "address mismatch.");
+            lcd_puts(0, 1, "Bootloader not");
+            lcd_puts(0, 2, "compatible with");
+            lcd_puts(0, 3, "RomBox. Start");
+            lcd_puts(0, 4, "address mismatch.");
             break;
     default:
-            rb->lcd_puts(0, 1, "Check failed.");
+            lcd_puts(0, 1, "Check failed.");
             break;
     }
 
     if (rc == eOK)
     {    /* was OK */
-        rb->lcd_puts(0, 6, "[" KEYNAME2 "] to program");
-        rb->lcd_puts(0, 7, "other key to exit");
+        lcd_puts(0, 6, "[" KEYNAME2 "] to program");
+        lcd_puts(0, 7, "other key to exit");
     }
     else
     { /* error occured */
-        rb->lcd_puts(0, 6, "Any key to exit");
+        lcd_puts(0, 6, "Any key to exit");
     }
-    rb->lcd_update();
+    lcd_update();
 
     button = WaitForButton();
     if (rc != eOK || button != KEY2)
@@ -721,43 +721,43 @@ static void DoUserDialog(char* filename)
     ImageHeader.size = aligned_size; /* increase image size such that we reach
                                         the next sector */
     
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Programming...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Programming...");
+    lcd_update();
 
     rc = ProgramImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
     if (rc)
     {   /* errors */
-        rb->lcd_clear_display();
-        rb->lcd_puts(0, 0, "Error:");
-        rb->lcd_puts(0, 1, "Programming fail!");
-        rb->lcd_putsf(0, 2, "%d errors", rc);
-        rb->lcd_update();
+        lcd_clear_display();
+        lcd_puts(0, 0, "Error:");
+        lcd_puts(0, 1, "Programming fail!");
+        lcd_putsf(0, 2, "%d errors", rc);
+        lcd_update();
         button = WaitForButton();
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Verifying...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Verifying...");
+    lcd_update();
 
     rc = VerifyImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     if (rc == 0)
     {
-        rb->lcd_puts(0, 0, "Verify OK.");
+        lcd_puts(0, 0, "Verify OK.");
     }
     else
     {
-        rb->lcd_puts(0, 0, "Error:");
-        rb->lcd_puts(0, 1, "Verify fail!");
-        rb->lcd_putsf(0, 2, "%d errors", rc);
-        rb->lcd_puts(0, 3, "Use safe image");
-        rb->lcd_puts(0, 4, "if booting hangs:");
-        rb->lcd_puts(0, 5, "F1 during power-on");
+        lcd_puts(0, 0, "Error:");
+        lcd_puts(0, 1, "Verify fail!");
+        lcd_putsf(0, 2, "%d errors", rc);
+        lcd_puts(0, 3, "Use safe image");
+        lcd_puts(0, 4, "if booting hangs:");
+        lcd_puts(0, 5, "F1 during power-on");
     }
-    rb->lcd_puts(0, 7, "Any key to exit");
-    rb->lcd_update();
+    lcd_puts(0, 7, "Any key to exit");
+    lcd_update();
     WaitForButton();
 }
 
@@ -779,22 +779,22 @@ static void DoUserDialog(char* filename)
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
-        rb->splash(HZ*3, "Not from ROM");
+        splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
 
     /* refuse to work if the power may fail meanwhile */
-    if (!rb->battery_level_safe())
+    if (!battery_level_safe())
     {
-        rb->splash(HZ*3, "Batt. too low!");
+        splash(HZ*3, "Batt. too low!");
         return; /* exit */
     }
     
     /* "allocate" memory */
-    sector = rb->plugin_get_buffer(&memleft);
+    sector = plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
     {
-        rb->splash(HZ*3, "Out of memory");
+        splash(HZ*3, "Out of memory");
         return; /* exit */
     }
 
@@ -803,93 +803,93 @@ static void DoUserDialog(char* filename)
 
     if (FlashInfo.size == 0) /* no valid chip */
     {
-        rb->splash(HZ*3, "Not flashable");
+        splash(HZ*3, "Not flashable");
         return; /* exit */
     }
     else if (pos == 0)
     {
-        rb->splash(HZ*3, "No image");
+        splash(HZ*3, "No image");
         return; /* exit */
     }
     
     bl_version = BootloaderVersion();
     if (bl_version < LATEST_BOOTLOADER_VERSION)
     {
-        rb->lcd_puts_scroll(0, 0, "Hint: You're not using the latest bootloader. A full reflash is recommended, but not required.");
-        rb->lcd_puts_scroll(0, 1, "Press [Menu] to ignore");
-        rb->lcd_update();
+        lcd_puts_scroll(0, 0, "Hint: You're not using the latest bootloader. A full reflash is recommended, but not required.");
+        lcd_puts_scroll(0, 1, "Press [Menu] to ignore");
+        lcd_update();
 
         if (WaitForButton() != BUTTON_MENU)
         {
             return;
         }
-        rb->lcd_clear_display();
+        lcd_clear_display();
     }
 
-    rb->lcd_puts(0, 0, "Checking...");
-    rb->lcd_update();
+    lcd_puts(0, 0, "Checking...");
+    lcd_update();
 
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
     
     rc = CheckImageFile(filename, space, &ImageHeader, pos);
-    rb->lcd_puts(0, 0, "Checked:");
+    lcd_puts(0, 0, "Checked:");
     switch (rc) {
         case eOK:
-            rb->lcd_puts(0, 1, "File OK.");
-            rb->sleep(HZ*1);
+            lcd_puts(0, 1, "File OK.");
+            sleep(HZ*1);
             break;
     case eNotUCL:
-            rb->lcd_puts_scroll(0, 1, "File not UCL compressed.");
+            lcd_puts_scroll(0, 1, "File not UCL compressed.");
             break;
     case eWrongAlgorithm:
-            rb->lcd_puts_scroll(0, 1, "Wrong compression algorithm.");
+            lcd_puts_scroll(0, 1, "Wrong compression algorithm.");
             break;
     case eFileNotFound:
-            rb->lcd_puts_scroll(0, 1, "File not found.");
+            lcd_puts_scroll(0, 1, "File not found.");
             break;
     case eTooBig:
             if (bl_version < LATEST_BOOTLOADER_VERSION)
             {
-                rb->lcd_puts_scroll(0, 1, "File too big, upgrade bootloader.");
+                lcd_puts_scroll(0, 1, "File too big, upgrade bootloader.");
             }
             else
             {
-                rb->lcd_puts_scroll(0, 1, "File too big.");
+                lcd_puts_scroll(0, 1, "File too big.");
             }
             break;
     case eTooSmall:
-            rb->lcd_puts_scroll(0, 1, "File too small. Incomplete?");
+            lcd_puts_scroll(0, 1, "File too small. Incomplete?");
             break;
     case eReadErr:
-            rb->lcd_puts_scroll(0, 1, "File read error.");
+            lcd_puts_scroll(0, 1, "File read error.");
             break;
     case eMultiBlocks:
-            rb->lcd_puts_scroll(0, 1, "File invalid. Blocksize too small?");
+            lcd_puts_scroll(0, 1, "File invalid. Blocksize too small?");
             break;
     case eBadRomLink:
-            rb->lcd_puts_scroll(0, 1, "Bootloader not compatible with RomBox.");
+            lcd_puts_scroll(0, 1, "Bootloader not compatible with RomBox.");
             break;
     default:
-            rb->lcd_puts_scroll(0, 1, "Check failed.");
+            lcd_puts_scroll(0, 1, "Check failed.");
             break;
     }
-    rb->lcd_update();
+    lcd_update();
 
     if (rc == eOK)
     {    /* was OK */
-        rb->lcd_clear_display();
-        rb->lcd_puts_scroll(0, 0, "[ON] to program,");
-        rb->lcd_puts_scroll(0, 1, "other key to exit.");
+        lcd_clear_display();
+        lcd_puts_scroll(0, 0, "[ON] to program,");
+        lcd_puts_scroll(0, 1, "other key to exit.");
     }
     else
     { /* error occured */
         WaitForButton();
-        rb->lcd_clear_display();
-        rb->lcd_puts_scroll(0, 0, "Flash failed.");
-        rb->lcd_puts_scroll(0, 1, "Any key to exit.");
+        lcd_clear_display();
+        lcd_puts_scroll(0, 0, "Flash failed.");
+        lcd_puts_scroll(0, 1, "Any key to exit.");
     }
-    rb->lcd_update();
+    lcd_update();
 
     button = WaitForButton();
     if (rc != eOK || button != BUTTON_ON)
@@ -905,39 +905,39 @@ static void DoUserDialog(char* filename)
     ImageHeader.size = aligned_size; /* increase image size such that we reach
                                         the next sector */
     
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Programming...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Programming...");
+    lcd_update();
 
     rc = ProgramImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
     if (rc)
     {   /* errors */
-        rb->lcd_clear_display();
-        rb->snprintf(buf, sizeof(buf), "%d errors", rc);
-        rb->lcd_puts_scroll(0, 0, "Programming failed!");
-        rb->lcd_puts_scroll(0, 1, buf);
-        rb->lcd_update();
+        lcd_clear_display();
+        snprintf(buf, sizeof(buf), "%d errors", rc);
+        lcd_puts_scroll(0, 0, "Programming failed!");
+        lcd_puts_scroll(0, 1, buf);
+        lcd_update();
         button = WaitForButton();
     }
     
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Verifying...");
-    rb->lcd_update();
+    lcd_clear_display();
+    lcd_puts_scroll(0, 0, "Verifying...");
+    lcd_update();
 
     rc = VerifyImageFile(filename, pos, &ImageHeader, UCL_HEADER, true_size);
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
     if (rc == 0)
     {
-        rb->lcd_puts(0, 0, "Verify OK.");
-        rb->lcd_update();
+        lcd_puts(0, 0, "Verify OK.");
+        lcd_update();
     }
     else
     {
-        rb->snprintf(buf, sizeof(buf), "Verify fail! %d errors", rc);
-        rb->lcd_puts_scroll(0, 0, buf);
-        rb->lcd_puts_scroll(0, 1, "Use safe image if booting hangs: [-] during power-on");
-        rb->lcd_update();
+        snprintf(buf, sizeof(buf), "Verify fail! %d errors", rc);
+        lcd_puts_scroll(0, 0, buf);
+        lcd_puts_scroll(0, 1, "Use safe image if booting hangs: [-] during power-on");
+        lcd_update();
         button = WaitForButton();
     }
 }
@@ -954,14 +954,14 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter == NULL)
     {
-        rb->splash(HZ*3, "Play .ucl file!");
+        splash(HZ*3, "Play .ucl file!");
         return PLUGIN_OK;
     }
 
     /* now go ahead and have fun! */
-    oldmode = rb->system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
+    oldmode = system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
     DoUserDialog((char*) parameter);
-    rb->system_memory_guard(oldmode);              /* re-enable memory guard */
+    system_memory_guard(oldmode);              /* re-enable memory guard */
 
     return PLUGIN_OK;
 }

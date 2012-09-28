@@ -908,28 +908,28 @@ static void pegbox_draw_board(struct game_context* pb)
     unsigned int r, c, type;
     pb->num_left = 0;
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 #ifdef WIDE_LAYOUT
-    rb->lcd_bitmap(pegbox_header,LCD_WIDTH-HEADER_WIDTH,0,
+    lcd_bitmap(pegbox_header,LCD_WIDTH-HEADER_WIDTH,0,
                    HEADER_WIDTH,LCD_HEIGHT);
 #else
-    rb->lcd_bitmap(pegbox_header,(LCD_WIDTH-HEADER_WIDTH)/2,0,
+    lcd_bitmap(pegbox_header,(LCD_WIDTH-HEADER_WIDTH)/2,0,
                    HEADER_WIDTH, HEADER_HEIGHT);
 #endif /* WIDE_LAYOUT */
 
 #if ((BOARD_HEIGHT + HEADER_HEIGHT + 4) <= LCD_HEIGHT)
-    rb->lcd_drawrect(BOARD_X-2,BOARD_Y-2,BOARD_WIDTH+4,BOARD_HEIGHT+4);
+    lcd_drawrect(BOARD_X-2,BOARD_Y-2,BOARD_WIDTH+4,BOARD_HEIGHT+4);
 #endif /* enough space for a frame? */
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_foreground(LCD_WHITE);
 #if ((BOARD_HEIGHT + HEADER_HEIGHT + 2) <= LCD_HEIGHT)
-    rb->lcd_fillrect(BOARD_X-1,BOARD_Y-1,BOARD_WIDTH+2,BOARD_HEIGHT+2);
+    lcd_fillrect(BOARD_X-1,BOARD_Y-1,BOARD_WIDTH+2,BOARD_HEIGHT+2);
 #else
-    rb->lcd_fillrect(BOARD_X,BOARD_Y,BOARD_WIDTH,BOARD_HEIGHT);
+    lcd_fillrect(BOARD_X,BOARD_Y,BOARD_WIDTH,BOARD_HEIGHT);
 #endif
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(TEXT_BG);
+    lcd_set_foreground(LCD_BLACK);
+    lcd_set_background(TEXT_BG);
 #endif
 
     for (r=0 ; r < ROWS ; r++) {
@@ -938,7 +938,7 @@ static void pegbox_draw_board(struct game_context* pb)
             type = pb->playboard[r][c];
 
             if(type != SPACE) {
-                rb->lcd_bitmap_part(pegbox_pieces, 0, (type-1)*PIECE_HEIGHT,
+                lcd_bitmap_part(pegbox_pieces, 0, (type-1)*PIECE_HEIGHT,
                         STRIDE( SCREEN_MAIN, 
                                 BMPWIDTH_pegbox_pieces,BMPHEIGHT_pegbox_pieces),
                         c * PIECE_WIDTH + BOARD_X,
@@ -956,19 +956,19 @@ static void pegbox_draw_board(struct game_context* pb)
     }
 
 #ifdef WIDE_LAYOUT
-    rb->lcd_putsxyf(TEXT_X, LEVEL_TEXT_Y, "%d", pb->level);
-    rb->lcd_putsxyf(TEXT_X, PEGS_TEXT_Y, "%d", pb->num_left);
+    lcd_putsxyf(TEXT_X, LEVEL_TEXT_Y, "%d", pb->level);
+    lcd_putsxyf(TEXT_X, PEGS_TEXT_Y, "%d", pb->num_left);
 #else
-    rb->lcd_putsxyf(LEVEL_TEXT_X, TEXT_Y, "%d", pb->level);
-    rb->lcd_putsxyf(PEGS_TEXT_X, TEXT_Y, "%d", pb->num_left);
+    lcd_putsxyf(LEVEL_TEXT_X, TEXT_Y, "%d", pb->level);
+    lcd_putsxyf(PEGS_TEXT_X, TEXT_Y, "%d", pb->num_left);
 #endif /*WIDE_LAYOUT*/
 
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_background(BG_COLOR);
-    rb->lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(BG_COLOR);
+    lcd_set_foreground(LCD_WHITE);
 #endif
     /* print out the screen */
-    rb->lcd_update();
+    lcd_update();
 }
 
 /*****************************************************************************
@@ -998,7 +998,7 @@ static void pegbox_new_piece(struct game_context* pb, unsigned int x_loc,
 
     while (!exit) {
         pegbox_draw_board(pb);
-        button = rb->button_get(true);
+        button = button_get(true);
 #ifdef HAVE_TOUCHSCREEN
         if(button & BUTTON_TOUCHSCREEN)
         {
@@ -1007,8 +1007,8 @@ static void pegbox_new_piece(struct game_context* pb, unsigned int x_loc,
 
             struct ts_raster_button_result ret =
                   touchscreen_raster_map_button(&pegbox_raster_btn,
-                                                rb->button_get_data() >> 16,
-                                                rb->button_get_data() & 0xffff,
+                                                button_get_data() >> 16,
+                                                button_get_data() & 0xffff,
                                                 button);
             if(ret.action == TS_ACTION_TWO_D_MOVEMENT)
             {
@@ -1084,7 +1084,7 @@ static void pegbox_move_player(struct game_context* pb, signed int x_dir,
 
     if (type1 == HOLE) {
         pegbox_draw_board(pb);
-        rb->splash(HZ*2, "You fell down a hole!");
+        splash(HZ*2, "You fell down a hole!");
         pegbox_load_level(pb);
     }
     else if (type1 == SPACE)
@@ -1109,7 +1109,7 @@ static void pegbox_move_player(struct game_context* pb, signed int x_dir,
                 pb->playboard[r2][c2] = SPACE;
         }
         else {
-            rb->splash(HZ*2, "Illegal Move!");
+            splash(HZ*2, "Illegal Move!");
             pegbox_load_level(pb);
         }
     }
@@ -1143,10 +1143,10 @@ static bool pegbox_help(void)
         LAST_STYLE_ITEM
     };
 
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 
     return false;
 }
@@ -1176,10 +1176,10 @@ static unsigned int pegbox_menu(struct game_context* pb, bool ingame)
                          "Select Level", "Help",
                          "Playback Control", "Quit");
     _ingame = ingame;
-    rb->button_clear_queue();
+    button_clear_queue();
 
     while (true) {
-        switch (rb->do_menu(&main_menu, &selected, NULL, false)) {
+        switch (do_menu(&main_menu, &selected, NULL, false)) {
             case 0:
                 pb->level = last_level;
                 pegbox_draw_board(pb);
@@ -1190,7 +1190,7 @@ static unsigned int pegbox_menu(struct game_context* pb, bool ingame)
                 pegbox_draw_board(pb);
                 return 0;
             case 3:
-                if(rb->set_int("Select Level", "", UNIT_INT, &pb->level,
+                if(set_int("Select Level", "", UNIT_INT, &pb->level,
                                NULL, 1, 1, pb->highlevel, NULL))
                     return 1;
                 break;
@@ -1224,7 +1224,7 @@ static int pegbox_main(struct game_context* pb)
     }
 
     while (true) {
-        button = rb->button_get(true);
+        button = button_get(true);
 #ifdef HAVE_TOUCHSCREEN
         if(button & BUTTON_TOUCHSCREEN)
         {
@@ -1233,8 +1233,8 @@ static int pegbox_main(struct game_context* pb)
 
             struct ts_raster_button_result ret =
                   touchscreen_raster_map_button(&pegbox_raster_btn,
-                                                rb->button_get_data() >> 16,
-                                                rb->button_get_data() & 0xffff,
+                                                button_get_data() >> 16,
+                                                button_get_data() & 0xffff,
                                                 button);
             if(ret.action == TS_ACTION_TWO_D_MOVEMENT)
                 pegbox_move_player(pb, ret.to.x - ret.from.x, ret.to.y - ret.from.y);
@@ -1302,11 +1302,11 @@ static int pegbox_main(struct game_context* pb)
         }
 
         if (pb->num_left == 0) {
-            rb->splash(HZ*2, "Nice Pegging!");
+            splash(HZ*2, "Nice Pegging!");
             if (pb->level == NUM_LEVELS) {
                 pegbox_draw_board(pb);
-                rb->splash(HZ*2, "Congratulations!");
-                rb->splash(HZ*2, "You have finished the game!");
+                splash(HZ*2, "Congratulations!");
+                splash(HZ*2, "You have finished the game!");
                 if (pegbox_menu(pb,false)==1) {
                     return 1;
                 }
@@ -1332,15 +1332,15 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 #ifdef HAVE_LCD_BITMAP
-    rb->lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
+    lcd_set_backdrop(NULL);
 #endif
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(BG_COLOR);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(BG_COLOR);
 #endif
-    rb->lcd_clear_display();
+    lcd_clear_display();
 
     struct game_context pb;
     pb.level=1;
@@ -1352,7 +1352,7 @@ enum plugin_status plugin_start(const void* parameter)
     configfile_load(CONFIG_FILE_NAME,config,2,0);
     pegbox_main(&pb);
     configfile_save(CONFIG_FILE_NAME,config,2,0);
-    rb->lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_UI);
 #endif /* HAVE_LCD_BITMAP */
 
     return PLUGIN_OK;

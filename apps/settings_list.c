@@ -60,6 +60,7 @@
 #ifdef HAVE_HOTKEY
 #include "onplay.h"
 #endif
+#include "symbols.h"
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -1959,3 +1960,4 @@ const struct settings_list* get_settings_list(int*count)
     *count = nb_settings;
     return settings;
 }
+EXPORT_SYMBOL(get_settings_list);

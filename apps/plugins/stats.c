@@ -41,9 +41,9 @@ static const char *video_exts[] = {"mpg","mpeg","mpv","m2v"};
 
 static void prn(const char *str, int y)
 {
-    rb->lcd_puts(0,y,str);
+    lcd_puts(0,y,str);
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_puts(0,y,str);
+    lcd_remote_puts(0,y,str);
 #endif
 }
 
@@ -51,36 +51,36 @@ static void update_screen(void)
 {
     char buf[32];
 
-    rb->lcd_clear_display();
+    lcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_clear_display();
+    lcd_remote_clear_display();
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-    rb->snprintf(buf, sizeof(buf), "Total Files: %d", files);
+    snprintf(buf, sizeof(buf), "Total Files: %d", files);
     prn(buf,0);
-    rb->snprintf(buf, sizeof(buf), "Audio: %d", audiofiles);
+    snprintf(buf, sizeof(buf), "Audio: %d", audiofiles);
     prn(buf,1);
-    rb->snprintf(buf, sizeof(buf), "Playlists: %d", m3ufiles);
+    snprintf(buf, sizeof(buf), "Playlists: %d", m3ufiles);
     prn(buf,2);
-    rb->snprintf(buf, sizeof(buf), "Images: %d", imagefiles);
+    snprintf(buf, sizeof(buf), "Images: %d", imagefiles);
     prn(buf,3);
-    rb->snprintf(buf, sizeof(buf), "Videos: %d", videofiles);
+    snprintf(buf, sizeof(buf), "Videos: %d", videofiles);
     prn(buf,4);
-    rb->snprintf(buf, sizeof(buf), "Directories: %d", dirs);
+    snprintf(buf, sizeof(buf), "Directories: %d", dirs);
     prn(buf,5);
-    rb->snprintf(buf, sizeof(buf), "Max files in Dir: %d", largestdir);
+    snprintf(buf, sizeof(buf), "Max files in Dir: %d", largestdir);
     prn(buf,6);
 #else
-    rb->snprintf(buf, sizeof(buf), "Files:%5d", files);
+    snprintf(buf, sizeof(buf), "Files:%5d", files);
     prn(buf,0);
-    rb->snprintf(buf, sizeof(buf), "Dirs: %5d", dirs);
+    snprintf(buf, sizeof(buf), "Dirs: %5d", dirs);
     prn(buf,1);
 #endif
 
-    rb->lcd_update();
+    lcd_update();
 #ifdef HAVE_REMOTE_LCD
-    rb->lcd_remote_update();
+    lcd_remote_update();
 #endif
 }
 
@@ -92,17 +92,17 @@ static void traversedir(char* location, char* name)
     char fullpath[MAX_PATH];
     int files_in_dir = 0;
 
-    rb->snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
-    dir = rb->opendir(fullpath);
+    snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
+    dir = opendir(fullpath);
     if (dir) {
-        entry = rb->readdir(dir);
+        entry = readdir(dir);
         while (entry) {
             if (cancel)
                 break;
             /* Skip .. and . */
-            if (rb->strcmp(entry->d_name, ".") && rb->strcmp(entry->d_name, ".."))
+            if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
             {
-                struct dirinfo info = rb->dir_get_info(dir, entry);
+                struct dirinfo info = dir_get_info(dir, entry);
                 if (info.attribute & ATTR_DIRECTORY) {
                     traversedir(fullpath, entry->d_name);
                     dirs++;
@@ -111,7 +111,7 @@ static void traversedir(char* location, char* name)
                     files_in_dir++; files++;
 
                     /* get the filetype from the filename */
-                    int attr = rb->filetype_get_attr(entry->d_name);
+                    int attr = filetype_get_attr(entry->d_name);
                     switch (attr & FILE_ATTR_MASK)
                     {
                     case FILE_ATTR_AUDIO:
@@ -127,12 +127,12 @@ static void traversedir(char* location, char* name)
                         /* use hardcoded filetype_exts to count
                          * image and video files until we get
                          * new attributes added to filetypes.h */
-                        char *ptr = rb->strrchr(entry->d_name,'.');
+                        char *ptr = strrchr(entry->d_name,'.');
                         if(ptr) {
                             unsigned i;
                             ptr++;
                             for(i=0;i<ARRAYLEN(image_exts);i++) {
-                                if(!rb->strcasecmp(ptr,image_exts[i])) {
+                                if(!strcasecmp(ptr,image_exts[i])) {
                                     imagefiles++; break;
                                 }
                             }
@@ -140,7 +140,7 @@ static void traversedir(char* location, char* name)
                             if (i >= ARRAYLEN(image_exts)) {
                                 /* not found above - try video files */
                                 for(i=0;i<ARRAYLEN(video_exts);i++) {
-                                    if(!rb->strcasecmp(ptr,video_exts[i])) {
+                                    if(!strcasecmp(ptr,video_exts[i])) {
                                         videofiles++; break;
                                     }
                                 }
@@ -151,9 +151,9 @@ static void traversedir(char* location, char* name)
                 }
             }
 
-            if (*rb->current_tick - lasttick > (HZ/2)) {
+            if (current_tick - lasttick > (HZ/2)) {
                 update_screen();
-                lasttick = *rb->current_tick;
+                lasttick = current_tick;
                 button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
                                ARRAYLEN(plugin_contexts));
                 if (button == STATS_STOP) {
@@ -162,9 +162,9 @@ static void traversedir(char* location, char* name)
                 }
             }
 
-            entry = rb->readdir(dir);
+            entry = readdir(dir);
         }
-        rb->closedir(dir);
+        closedir(dir);
     }
     if (largestdir < files_in_dir)
         largestdir = files_in_dir;
@@ -186,21 +186,21 @@ enum plugin_status plugin_start(const void* parameter)
     largestdir = 0;
     cancel = false;
 
-    rb->splash(HZ, "Counting...");
+    splash(HZ, "Counting...");
     update_screen();
-    lasttick = *rb->current_tick;
+    lasttick = current_tick;
 
     traversedir("", "");
     if (cancel) {
-        rb->splash(HZ, "Aborted");
+        splash(HZ, "Aborted");
         return PLUGIN_OK;
     }
     update_screen();
 #ifdef HAVE_REMOTE_LCD
-    rb->remote_backlight_on();
+    remote_backlight_on();
 #endif
-    rb->backlight_on();
-    rb->splash(HZ, "Done");
+    backlight_on();
+    splash(HZ, "Done");
     update_screen();
     while (1) {
 
@@ -212,7 +212,7 @@ enum plugin_status plugin_start(const void* parameter)
                 return PLUGIN_OK;
                 break;
             default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
+                if (default_event_handler(button) == SYS_USB_CONNECTED) {
                     return PLUGIN_USB_CONNECTED;
                 }
                 break;
