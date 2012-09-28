@@ -40,6 +40,10 @@
 #ifndef __JZ4740_H__
 #define __JZ4740_H__
 
+/* The bit of IRAM that is available is used in the core */
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+
 #ifndef __ASSEMBLY__
 
 #define REG8(addr)     (*(volatile unsigned char  *)(addr))

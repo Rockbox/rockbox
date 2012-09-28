@@ -22,6 +22,9 @@
 #ifndef __PNX0101_H__
 #define __PNX0101_H__
 
+#define PLUGIN_IRAMORIG 0x407000
+#define PLUGIN_IRAMSIZE 0x9000
+
 #define GPIO0_READ (*(volatile unsigned long *)0x80003000)
 #define GPIO0_SET  (*(volatile unsigned long *)0x80003014)
 #define GPIO0_CLR  (*(volatile unsigned long *)0x80003018)
