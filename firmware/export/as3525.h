@@ -37,6 +37,13 @@
 #define DRAM_SIZE (MEMORYSIZE * 0x100000)
 #define IRAM_SIZE 0x50000
 
+#if defined(AMS_LOWMEM)
+#define PLUGIN_IRAMORIG 0
+#define PLUGIN_IRAMSIZE 0
+#else
+#define PLUGIN_IRAMORIG (IRAM_ORIG + 0x20000)
+#define PLUGIN_IRAMSIZE (IRAM_ORIG + IRAM_SIZE - PLUGIN_IRAMORIG)
+#endif
 
 /* AS352X only supports 512 Byte HW ECC */
 #define ECCSIZE 512
