@@ -46,6 +46,7 @@ onplay.c
 playlist.c
 playlist_catalog.c
 playlist_viewer.c
+elfload.c
 plugin.c
 root_menu.c
 screens.c

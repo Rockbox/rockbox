@@ -40,8 +40,8 @@ PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
 ### build data / rules
 ifndef APP_TYPE
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
-PLUGIN_LDS := $(APPSDIR)/plugins/plugin.lds
-PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin.link
+PLUGIN_LDS := $(APPSDIR)/plugins/plugin_elf.lds
+PLUGINLINK_LDS := $(BUILDDIR)/apps/plugins/plugin_elf.link
 OVERLAYREF_LDS := $(BUILDDIR)/apps/plugins/overlay_ref.link
 endif
 OTHER_SRC += $(ROOTDIR)/apps/plugins/plugin_crt0.c
@@ -61,7 +61,7 @@ $(foreach dir,$(PLUGINSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
 OTHER_INC += -I$(APPSDIR)/plugins -I$(APPSDIR)/plugins/lib
 
 # special compile flags for plugins:
-PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS)
+PLUGINFLAGS = -I$(APPSDIR)/plugins -DPLUGIN $(CFLAGS) -mlong-calls
 
 # single-file plugins depend on their respective .o
 $(ROCKS1): $(BUILDDIR)/%.rock: $(BUILDDIR)/%.o
@@ -99,7 +99,7 @@ endif
 # special pattern rule for compiling plugin lib (with function and data sections)
 $(BUILDDIR)/apps/plugins/lib/%.o: $(ROOTDIR)/apps/plugins/lib/%.c
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINLIBFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINLIBFLAGS) -c -mlong-calls $< -o $@
 
 # special pattern rule for compiling plugins with extra flags
 $(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c
@@ -116,11 +116,12 @@ endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
 $(BUILDDIR)/%.rock:
-	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $@ \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
-		-lgcc $(PLUGINLDFLAGS)
-	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
+		-lgcc $(PLUGINLDFLAGS) -Wl,-n -Wl,-r
+
+	$(call PRINTS,STRIP $(subst $(ROOTDIR)/,,$@))$(STRIP) --strip-unneeded --strip-debug $@
 
 $(BUILDDIR)/apps/plugins/%.lua: $(ROOTDIR)/apps/plugins/%.lua
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $(BUILDDIR)/apps/plugins/
