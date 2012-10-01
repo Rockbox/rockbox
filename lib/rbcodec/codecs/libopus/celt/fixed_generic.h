@@ -58,7 +58,7 @@ static inline int32_t MULT16_32_Q15(int32_t a, int32_t b)
 static inline int32_t MULT16_32_Q15(int32_t a, int32_t b)
 {
   int32_t lo, hi;
-  asm volatile("smull %[lo], %[hi], %[a], %[b] \n\t"
+  asm volatile("smull %[lo], %[hi], %[b], %[a] \n\t"
                "mov %[lo], %[lo], lsr #15 \n\t"
                "orr %[hi], %[lo], %[hi], lsl #17 \n\t"
                : [lo] "=&r" (lo), [hi] "=&r" (hi)
