@@ -208,22 +208,34 @@ void clt_mdct_forward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scalar
 }
 #endif
 
+#define S_F_BUF_SIZE (1920>>1) /* N = 1920 for static modes */
+static kiss_fft_scalar s_f2[S_F_BUF_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scalar * OPUS_RESTRICT out,
       const opus_val16 * OPUS_RESTRICT window, int overlap, int shift, int stride)
 {
    int i;
    int N, N2, N4;
    kiss_twiddle_scalar sine;
-/*   VARDECL(kiss_fft_scalar, f); */
+   VARDECL(kiss_fft_scalar, f);
    VARDECL(kiss_fft_scalar, f2);
    SAVE_STACK;
-   N = l->n; /* static modes => N = 1920 */
+   N = l->n;
    N >>= shift;
    N2 = N>>1;
    N4 = N>>2;
-/*   ALLOC(f, N2, kiss_fft_scalar); */
-   kiss_fft_scalar f[N2]; /* worst case 3840b */
-   ALLOC(f2, N2, kiss_fft_scalar);
+   kiss_fft_scalar s_f[S_F_BUF_SIZE];
+
+   if (S_F_BUF_SIZE >= N2)
+   {
+      f  = s_f;
+      f2 = s_f2;
+   }
+   else
+   {
+      ALLOC(f , N2, kiss_fft_scalar);
+      ALLOC(f2, N2, kiss_fft_scalar);
+   }
+
    /* sin(x) ~= x here */
 #ifdef FIXED_POINT
    sine = TRIG_UPSCALE*(QCONST16(0.7853981f, 15)+N2)/N;
