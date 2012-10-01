@@ -2296,6 +2296,9 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, opus_val16 * OPUS_R
    RESTORE_STACK;
 }
 
+#define FREQ_X_BUF_SIZE (2*8*120) /* stereo * nbShortMdcts * shortMdctSize */
+static celt_sig s_freq[FREQ_X_BUF_SIZE] IBSS_ATTR MEM_ALIGN_ATTR; /* 7680 byte */
+static celt_norm s_X[FREQ_X_BUF_SIZE] IBSS_ATTR MEM_ALIGN_ATTR; /* 3840 byte */
 int celt_decode_with_ec(CELTDecoder * OPUS_RESTRICT st, const unsigned char *data, int len, opus_val16 * OPUS_RESTRICT pcm, int frame_size, ec_dec *dec)
 {
    int c, i, N;
@@ -2398,8 +2401,18 @@ int celt_decode_with_ec(CELTDecoder * OPUS_RESTRICT st, const unsigned char *dat
    if (effEnd > st->mode->effEBands)
       effEnd = st->mode->effEBands;
 
-   ALLOC(freq, IMAX(CC,C)*N, celt_sig); /**< Interleaved signal MDCTs */
-   ALLOC(X, C*N, celt_norm);   /**< Interleaved normalised MDCTs */
+   /**< Interleaved signal MDCTs */
+   if (FREQ_X_BUF_SIZE >= IMAX(CC,C)*N)
+      freq = s_freq;
+   else
+      ALLOC(freq, IMAX(CC,C)*N, celt_sig);
+
+   /**< Interleaved normalised MDCTs */
+   if (FREQ_X_BUF_SIZE >= C*N)
+      X = s_X;
+   else
+      ALLOC(X, C*N, celt_norm);
+
    ALLOC(bandE, st->mode->nbEBands*C, celt_ener);
    c=0; do
       for (i=0;i<M*st->mode->eBands[st->start];i++)
