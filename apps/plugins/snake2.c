@@ -121,6 +121,12 @@ Head and Tail are stored
     #define TOP_X4 114
     #define TOP_Y1 4
     #define TOP_Y2 25
+#elif (LCD_WIDTH == 96) && (LCD_HEIGHT == 96)
+    #define MULTIPLIER 3
+    #define MODIFIER_1 4
+    #define MODIFIER_2 2
+    #define CENTER_X 6
+    #define CENTER_Y 12
 #else
     #define MULTIPLIER 4
     #define MODIFIER_1 4
