@@ -211,7 +211,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
         ic->handle_locked = 0;
 
         /* free unused alpha channel, if any */
-        core_shrink(ic->handle, ic->bmp.data, size_read);
+        core_shrink(ic->handle, &ic->bmp.data, size_read);
 
         if (size_read <= 0)
             ic->handle = core_free(ic->handle);

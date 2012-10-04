@@ -858,14 +858,12 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     filebuflen = size;
     switch (hints & BUFLIB_SHRINK_POS_MASK)
     {
-        case BUFLIB_SHRINK_POS_BACK:
-            core_shrink(handle, start, size);
-            audio_reset_buffer_noalloc(start, buffer_state);
-            break;
         case BUFLIB_SHRINK_POS_FRONT:
-            core_shrink(handle, start + wanted_size, size);
-            audio_reset_buffer_noalloc(start + wanted_size,
-                                       buffer_state);
+            start += wanted_size;
+            /* fall through */
+        case BUFLIB_SHRINK_POS_BACK:
+            core_shrink(handle, &start, size);
+            audio_reset_buffer_noalloc(start, buffer_state);
             break;
     }
     if (playing || play_queued)

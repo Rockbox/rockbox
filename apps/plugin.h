@@ -629,7 +629,7 @@ struct plugin_api {
     void*  (*buflib_buffer_out)(struct buflib_context* ctx, size_t* size);
     int    (*buflib_free)(struct buflib_context* ctx, int handle);
     bool   (*buflib_shrink)(struct buflib_context* ctx, int handle,
-                            void* new_start, size_t new_size);
+                            void** new_start, size_t new_size);
     void*  (*buflib_get_data)(struct buflib_context* ctx, int handle);
     const char* (*buflib_get_name)(struct buflib_context* ctx, int handle);
 

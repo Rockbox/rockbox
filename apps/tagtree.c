@@ -1142,6 +1142,7 @@ static bool parse_menu(const char *filename)
 
 void tagtree_init(void)
 {
+    void *p;
     format_count = 0;
     menu_count = 0;
     menu = NULL;
@@ -1164,7 +1165,8 @@ void tagtree_init(void)
     add_event(PLAYBACK_EVENT_TRACK_BUFFER, false, tagtree_buffer_event);
     add_event(PLAYBACK_EVENT_TRACK_FINISH, false, tagtree_track_finish_event);
 
-    core_shrink(tagtree_handle, core_get_data(tagtree_handle), tagtree_buf_used);
+    p = core_get_data(tagtree_handle);
+    core_shrink(tagtree_handle, &p, tagtree_buf_used);
 }
 
 static bool show_search_progress(bool init, int count)
