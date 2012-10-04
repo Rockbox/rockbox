@@ -35,6 +35,7 @@
 #include "cwrs.h"
 #include "mathops.h"
 #include "arch.h"
+#include "rate.h"
 
 #ifdef CUSTOM_MODES
 
@@ -632,11 +633,12 @@ void decode_pulses(int *_y,int _n,int _k,ec_dec *_dec)
     default:
     {
 #endif
-      VARDECL(opus_uint32,u);
+/*      VARDECL(opus_uint32,u);
       SAVE_STACK;
-      ALLOC(u,_k+2U,opus_uint32);
+      ALLOC(u,_k+2U,opus_uint32); */
+      opus_uint32 u[MAX_PULSES+2];
       cwrsi(_n,_k,ec_dec_uint(_dec,ncwrs_urow(_n,_k,u)),_y,u);
-      RESTORE_STACK;
+/*      RESTORE_STACK; */
 #ifndef SMALL_FOOTPRINT
     }
     break;

@@ -325,12 +325,16 @@ unsigned alg_unquant(celt_norm *X, int N, int K, int spread, int B,
    int i;
    opus_val32 Ryy;
    unsigned collapse_mask;
-   VARDECL(int, iy);
-   SAVE_STACK;
+/*   VARDECL(int, iy);
+   SAVE_STACK; */
+
+   /* the difference between the last two values of eband5ms shifted by maxLM
+      which is 22 << 3 with the static mode */
+   int iy[176];
 
    celt_assert2(K>0, "alg_unquant() needs at least one pulse");
    celt_assert2(N>1, "alg_unquant() needs at least two dimensions");
-   ALLOC(iy, N, int);
+/*   ALLOC(iy, N, int); */
    decode_pulses(iy, N, K, dec);
    Ryy = 0;
    i=0;
@@ -340,7 +344,7 @@ unsigned alg_unquant(celt_norm *X, int N, int K, int spread, int B,
    normalise_residual(iy, X, N, Ryy, gain);
    exp_rotation(X, N, -1, B, K, spread);
    collapse_mask = extract_collapse_mask(iy, N, B);
-   RESTORE_STACK;
+/*   RESTORE_STACK; */
    return collapse_mask;
 }
 
