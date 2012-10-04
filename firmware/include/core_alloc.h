@@ -13,7 +13,7 @@ void core_allocator_init(void) INIT_ATTR;
 int core_alloc(const char* name, size_t size);
 int core_alloc_ex(const char* name, size_t size, struct buflib_callbacks *ops);
 int core_alloc_maximum(const char* name, size_t *size, struct buflib_callbacks *ops);
-bool core_shrink(int handle, void* new_start, size_t new_size);
+bool core_shrink(int handle, void** new_start, size_t new_size);
 int core_free(int handle);
 size_t core_available(void);
 size_t core_allocatable(void);

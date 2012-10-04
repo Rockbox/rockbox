@@ -231,17 +231,23 @@ static inline void* buflib_get_data(struct buflib_context *context, int handle)
  * with buflib_alloc_maximum().
  *
  * Note that you must move/copy data around yourself before calling this,
- * buflib will not do this as part of shrinking.
+ * buflib will not do this as part of shrinking (except in the below case).
+ * 
+ * The new_start paramter should point to a pointer that points inside the
+ * allocation to signify the new start. If a new buffer was allocated, newstart
+ * will be updated with the new buffer. In this case, the contents of
+ * the buffer is preserved (similar to realloc()).
  *
  * handle: The handle identifying this allocation
  * new_start: the new start of the allocation
  * new_size: the new size of the allocation
  *
- * Returns: true if shrinking was successful. Otherwise it returns false,
- * without having modified memory.
+ * Returns: true if shrinking was successful. new_start might point to a new
+ * buffer that it is at least new_size bytes. Otherwise it returns false,
+ * without having any modified memory.
  *
  */
-bool buflib_shrink(struct buflib_context *ctx, int handle, void* newstart, size_t new_size);
+bool buflib_shrink(struct buflib_context *ctx, int handle, void** new_start, size_t new_size);
 
 /**
  * Frees memory associated with the given handle
