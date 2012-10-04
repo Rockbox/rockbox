@@ -350,6 +350,8 @@ void read_viewer_theme_file(void)
 
 void  filetype_init(void)
 {
+    int fd;
+    void *start;
     /* set the directory item first */
     filetypes[0].extension = NULL;
     filetypes[0].plugin = NULL;
@@ -360,7 +362,7 @@ void  filetype_init(void)
     viewer_count = 0;
     filetype_count = 1;
 
-    int fd = open(VIEWERS_CONFIG, O_RDONLY);
+    fd = open(VIEWERS_CONFIG, O_RDONLY);
     if (fd < 0)
         return;
 
@@ -380,7 +382,8 @@ void  filetype_init(void)
 #ifdef HAVE_LCD_COLOR
     read_color_theme_file();
 #endif
-    core_shrink(strdup_handle, core_get_data(strdup_handle), strdup_cur_idx);
+    start = core_get_data(strdup_handle);
+    core_shrink(strdup_handle, &start, strdup_cur_idx);
 }
 
 /* remove all white spaces from string */
