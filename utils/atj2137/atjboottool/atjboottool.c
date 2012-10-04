@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include "misc.h"
 #include "elf.h"
+#include <sys/stat.h>
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
@@ -19,6 +20,7 @@
 
 bool g_debug = false;
 char *g_out_prefix = NULL;
+char *g_in_file = NULL;
 bool g_force = false;
 
 #define let_the_force_flow(x) do { if(!g_force) return x; } while(0)
@@ -872,6 +874,37 @@ static int do_sthg_fwu_v3(uint8_t *buf, int *size, uint8_t *unk, uint8_t *block)
     return 0;
 }
 
+/* [add]: string to add when there is no extension
+ * [replace]: string to replace extension */
+static void build_out_prefix(char *add, char *replace, bool slash)
+{
+    if(g_out_prefix)
+        return;
+    /** copy input filename with extra space */
+    g_out_prefix = malloc(strlen(g_in_file) + strlen(add) + 16);
+    strcpy(g_out_prefix, g_in_file);
+    /** remove extension and add '/' */
+    char *filename = strrchr(g_out_prefix, '/');
+    // have p points to the beginning or after the last '/'
+    filename = (filename == NULL) ? g_out_prefix : filename + 1;
+    // extension ?
+    char *dot = strrchr(filename, '.');
+    if(dot)
+    {
+        *dot = 0; // cut at the dot
+        strcat(dot, replace);
+    }
+    else
+        strcat(filename, add); // add extra string
+
+    if(slash)
+    {
+        strcat(filename, "/");
+        /** make sure the directory exists */
+        mkdir(g_out_prefix, S_IRWXU | S_IRGRP | S_IROTH);
+    }
+}
+
 static int do_fwu(uint8_t *buf, int size)
 {
     struct fwu_hdr_t *hdr = (void *)buf;
@@ -931,6 +964,8 @@ static int do_fwu(uint8_t *buf, int size)
         let_the_force_flow(__LINE__);
     }
 
+    build_out_prefix(".afi", ".afi", false);
+
     if(g_version[ver].version == 3)
     {
         uint8_t unk[32];
@@ -940,15 +975,16 @@ static int do_fwu(uint8_t *buf, int size)
         int ret = do_sthg_fwu_v3(buf, &size, unk, block);
         continue_the_force(ret);
 
-        if(g_out_prefix)
+        cprintf(GREY, "Descrambling to %s... ", g_out_prefix);
+        FILE *f = fopen(g_out_prefix, "wb");
+        if(f)
         {
-            FILE *f = fopen(g_out_prefix, "wb");
-            if(f)
-            {
-                fwrite(buf, size, 1, f);
-                fclose(f);
-            }
+            fwrite(buf, size, 1, f);
+            fclose(f);
+            cprintf(RED, "Ok\n");
         }
+        else
+            cprintf(RED, "Failed: %m\n");
     }
     
     return 0;
@@ -1096,6 +1132,8 @@ static int do_afi(uint8_t *buf, int size)
     cprintf_field("  Reserved: ", "%x %x %x\n", afi->hdr.res[0],
         afi->hdr.res[1], afi->hdr.res[2]);
 
+    build_out_prefix(".fw", "", true);
+    
     cprintf(BLUE, "Entries\n");
     for(int i = 0; i < AFI_ENTRIES; i++)
     {
@@ -1117,17 +1155,19 @@ static int do_afi(uint8_t *buf, int size)
         uint32_t chk = afi_checksum(buf + entry->offset, entry->size);
         cprintf(RED, "%s\n", chk == entry->checksum ? "Ok" : "Mismatch");
 
-        if(g_out_prefix)
+        char *name = malloc(strlen(g_out_prefix) + strlen(filename) + 16);
+        sprintf(name, "%s%s", g_out_prefix, filename);
+        
+        cprintf(GREY, "Unpacking to %s... ", name);
+        FILE *f = fopen(name, "wb");
+        if(f)
         {
-            char *name = malloc(strlen(g_out_prefix) + strlen(filename) + 16);
-            sprintf(name, "%s%s", g_out_prefix, filename);
-            FILE *f = fopen(name, "wb");
-            if(f)
-            {
-                fwrite(buf + entry->offset, entry->size, 1, f);
-                fclose(f);
-            }
+            fwrite(buf + entry->offset, entry->size, 1, f);
+            fclose(f);
+            cprintf(RED, "Ok\n");
         }
+        else
+            cprintf(RED, "Failed: %m\n");
     }
 
     cprintf(BLUE, "Post Header\n");
@@ -1260,6 +1300,8 @@ static int do_fw(uint8_t *buf, int size)
     cprintf_field("  MTP PID: ", "0x%x\n", hdr->mtp_pid);
     cprintf_field("  FW Version: ", "%.64s\n", hdr->fw_ver);
 
+    build_out_prefix(".unpack", "", true);
+    
     cprintf(BLUE, "Entries\n");
     for(int i = 0; i < AFI_ENTRIES; i++)
     {
@@ -1280,12 +1322,17 @@ static int do_fw(uint8_t *buf, int size)
         {
             char *name = malloc(strlen(g_out_prefix) + strlen(filename) + 16);
             sprintf(name, "%s%s", g_out_prefix, filename);
+            
+            cprintf(GREY, "Unpacking to %s... ", name);
             FILE *f = fopen(name, "wb");
             if(f)
             {
                 fwrite(buf + (entry->block_offset << 9), entry->size, 1, f);
                 fclose(f);
+                cprintf(RED, "Ok\n");
             }
+            else
+            cprintf(RED, "Failed: %m\n");
         }
     }
 
@@ -1315,6 +1362,7 @@ static void usage(void)
     printf("  --fw\tUnpack a FW archive file\n");
     printf("The default is to try to guess the format.\n");
     printf("If several formats are specified, all are tried.\n");
+    printf("If no output prefix is specified, a default one is picked.\n");
     exit(1);
 }
 
@@ -1380,7 +1428,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    FILE *fin = fopen(argv[optind], "r");
+    g_in_file = argv[optind];
+    FILE *fin = fopen(g_in_file, "r");
     if(fin == NULL)
     {
         perror("Cannot open boot file");
