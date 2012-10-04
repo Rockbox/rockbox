@@ -4,7 +4,11 @@
 ata_idle_notify.c
 events.c
 backlight.c
+#ifdef APPLICATION
+buflib_malloc.c
+#else
 buflib.c
+#endif
 core_alloc.c
 general.c
 powermgmt.c

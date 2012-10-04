@@ -982,7 +982,7 @@ int dircache_build(int last_size)
     allocated_size = (d_names_end - buf);
     reserve_used = 0;
 
-    core_shrink(dircache_handle, dircache_root, allocated_size);
+    core_shrink(dircache_handle, (void **)&dircache_root, allocated_size);
     return res;
 fail:
     dircache_disable();

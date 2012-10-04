@@ -819,13 +819,14 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
  * must be within the original allocation
  */
 bool
-buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t new_size)
+buflib_shrink(struct buflib_context* ctx, int handle, void** new_start, size_t new_size)
 {
+    /* we never make a new allocation */
+    char* oldstart = buflib_get_data(ctx, handle);
+    char* newstart = *new_start;
+    char* newend = newstart + new_size;
     union buflib_data *crc_slot;
     int cookie_size;
-    char* oldstart = buflib_get_data(ctx, handle);
-    char* newstart = new_start;
-    char* newend = newstart + new_size;
 
     /* newstart must be higher and new_size not "negative" */
     if (newstart < oldstart || newend < newstart)
