@@ -199,6 +199,7 @@ viewers iconset.240x400x16:  icons/tango_icons_viewers.16x16.bmp
 viewers iconset.96x96x16:    icons/tango_icons_viewers.8x8.bmp
 viewers iconset..+x2:        icons/tango_small_viewers_mono.bmp
 
+show icons: on
 statusbar: top
 ui viewport: -
 </main>

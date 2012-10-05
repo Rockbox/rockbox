@@ -64,6 +64,7 @@ my $selecttype;
 my $iconset;
 my $remoteiconset;
 my $viewericon;
+my $showicons;
 my $remoteviewericon;
 my $lineselecttextcolor;
 my $filetylecolor;
@@ -295,6 +296,7 @@ MOO
     push @out, "statusbar: $statusbar\n"        if (defined($statusbar));
     push @out, "iconset: $iconset\n"            if (defined($iconset));
     push @out, "viewers iconset: $viewericon\n" if (defined($viewericon));
+    push @out, "show icons: $showicons\n"       if (defined($viewericon) && defined($showicons));
     push @out, "ui viewport: $listviewport\n"   if (defined($listviewport));
 
     if ($has_remote) {
@@ -411,6 +413,7 @@ while(<WPS>) {
         undef $iconset;
         undef $remoteiconset;
         undef $viewericon;
+        undef $showicons;
         undef $remoteviewericon;
         undef $lineselecttextcolor;
         undef $filetylecolor;
@@ -486,6 +489,9 @@ while(<WPS>) {
             }
             elsif($_ = check_res($l, "viewers iconset")) {
                 $viewericon = $_;
+            }
+            elsif($l =~ /^show icons: *(.*)/i) {
+                $showicons = $1;
             }
             elsif($l =~ /^line selector text color: *(.*)/i) {
                 $lineselecttextcolor = $1;
