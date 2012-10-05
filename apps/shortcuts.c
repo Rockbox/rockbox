@@ -528,7 +528,7 @@ int do_shortcut_menu(void *ignored)
 #endif
                     {
                         char timer_buf[10];
-                        set_sleep_timer(sc->u.timedata.sleep_timeout * 60);
+                        set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
                         splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER), 
                                 sleep_timer_formatter(timer_buf, sizeof(timer_buf),
                                                       sc->u.timedata.sleep_timeout, NULL));

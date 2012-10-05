@@ -438,8 +438,8 @@ static int sleep_timer_voice(int selected_item, void*data)
 /* If a sleep timer is running, cancel it, otherwise start one */
 static int toggle_sleeptimer(void)
 {
-    set_sleep_timer(get_sleep_timer() ? 0
-                    : global_settings.sleeptimer_duration * 60);
+    set_sleeptimer_duration(get_sleep_timer() ? 0
+                    : global_settings.sleeptimer_duration);
     return 0;
 }
 
