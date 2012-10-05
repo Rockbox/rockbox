@@ -60,6 +60,7 @@ int last_sent_battery_level = 100;
 /* battery level (0-100%) */
 int battery_percent = -1;
 void send_battery_level_event(void);
+static void set_sleep_timer(int seconds);
 
 static bool sleeptimer_active = false;
 static long sleeptimer_endtick;
@@ -863,7 +864,12 @@ void send_battery_level_event(void)
     }
 }
 
-void set_sleep_timer(int seconds)
+void set_sleeptimer_duration(int minutes)
+{
+    set_sleep_timer(minutes * 60);
+}
+
+static void set_sleep_timer(int seconds)
 {
     if (seconds) {
         sleeptimer_active  = true;

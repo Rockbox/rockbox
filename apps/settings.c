@@ -842,7 +842,7 @@ void settings_apply(bool read_disk)
 #endif
     set_poweroff_timeout(global_settings.poweroff);
     if (global_settings.sleeptimer_on_startup)
-        set_sleep_timer(global_settings.sleeptimer_duration * 60);
+        set_sleeptimer_duration(global_settings.sleeptimer_duration);
     set_keypress_restarts_sleep_timer(
         global_settings.keypress_restarts_sleeptimer);
 
