@@ -19,9 +19,14 @@ extern unsigned char audiobufend[];
 /* defined in linker script */
 extern unsigned char audiobuffer[];
 #else /* PLATFORM_HOSTED */
+#ifdef SIMULATOR
 unsigned char audiobuffer[(MEMORYSIZE*1024-256)*1024];
 unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
-extern unsigned char *audiobufend;
+#else /* APPLICATION */
+/* buflib uses malloc backend. create with fake buffer */
+unsigned char audiobuffer[1];
+unsigned char *audiobufend = audiobuffer + (MEMORYSIZE*1024*1024);
+#endif
 #endif
 
 /* debug test alloc */
