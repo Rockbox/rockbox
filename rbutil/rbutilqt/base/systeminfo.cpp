@@ -159,11 +159,11 @@ QMap<QString, QStringList> SystemInfo::languages(void)
 }
 
 
-QMap<int, QString> SystemInfo::usbIdMap(enum MapType type)
+QMap<int, QStringList> SystemInfo::usbIdMap(enum MapType type)
 {
     ensureSystemInfoExists();
 
-    QMap<int, QString> map;
+    QMap<int, QStringList> map;
     // get a list of ID -> target name
     QStringList platforms;
     systemInfos->beginGroup("platforms");
@@ -191,9 +191,18 @@ QMap<int, QString> SystemInfo::usbIdMap(enum MapType type)
         systemInfos->beginGroup(target);
         QStringList ids = systemInfos->value(t).toStringList();
         int j = ids.size();
-        while(j--)
-            map.insert(ids.at(j).toInt(0, 16), target);
-
+        while(j--) {
+            QStringList l;
+            int id = ids.at(j).toInt(0, 16);
+            if(id == 0) {
+                continue;
+            }
+            if(map.keys().contains(id)) {
+                l = map.take(id);
+            }
+            l.append(target);
+            map.insert(id, l);
+        }
         systemInfos->endGroup();
     }
     return map;

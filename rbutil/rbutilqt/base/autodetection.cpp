@@ -43,12 +43,12 @@ bool Autodetection::detect()
 
     // Try detection via rockbox.info / rbutil.log
     QStringList mounts = Utils::mountpoints();
+    qDebug() << "[Autodetect] paths to check:" << mounts;
 
     for(int i=0; i< mounts.size();i++)
     {
         // do the file checking
         QDir dir(mounts.at(i));
-        qDebug() << "[Autodetect] paths to check:" << mounts;
         if(dir.exists())
         {
             // check logfile first.
@@ -205,9 +205,9 @@ bool Autodetection::detectUsb()
     // usbids holds the mapping in the form
     // ((VID<<16)|(PID)), targetname
     // the ini file needs to hold the IDs as hex values.
-    QMap<int, QString> usbids = SystemInfo::usbIdMap(SystemInfo::MapDevice);
-    QMap<int, QString> usberror = SystemInfo::usbIdMap(SystemInfo::MapError);
-    QMap<int, QString> usbincompat = SystemInfo::usbIdMap(SystemInfo::MapIncompatible);
+    QMap<int, QStringList> usbids = SystemInfo::usbIdMap(SystemInfo::MapDevice);
+    QMap<int, QStringList> usberror = SystemInfo::usbIdMap(SystemInfo::MapError);
+    QMap<int, QStringList> usbincompat = SystemInfo::usbIdMap(SystemInfo::MapIncompatible);
 
     // usb pid detection
     QList<uint32_t> attached;
@@ -216,12 +216,12 @@ bool Autodetection::detectUsb()
     int i = attached.size();
     while(i--) {
         if(usbids.contains(attached.at(i))) {
-            m_device = usbids.value(attached.at(i));
+            m_device = usbids.value(attached.at(i)).at(0);
             qDebug() << "[USB] detected supported player" << m_device;
             return true;
         }
         if(usberror.contains(attached.at(i))) {
-            m_errdev = usberror.value(attached.at(i));
+            m_errdev = usberror.value(attached.at(i)).at(0);
             qDebug() << "[USB] detected problem with player" << m_errdev;
             return true;
         }
