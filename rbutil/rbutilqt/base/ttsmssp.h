@@ -26,10 +26,9 @@
 
 class TTSMssp: public TTSSapi
 {
-    //! Enum to identify the settings
     Q_OBJECT
     public:
-        TTSMssp(QObject* parent=NULL)
+        TTSMssp(QObject* parent=NULL) : TTSSapi(parent)
         {
             m_TTSTemplate = "cscript //nologo \"%exe\" "
                 "/language:%lang /voice:\"%voice\" "

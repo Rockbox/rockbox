@@ -788,6 +788,9 @@ bool Utils::ejectDevice(QString device)
         return true;
 
 #endif
+#if defined(Q_OS_LINUX)
+    (void)device;
+#endif
     return false;
 }
 

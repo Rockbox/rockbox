@@ -67,9 +67,6 @@ class TTSCarbon : public TTSBase
         unsigned int extended2int(unsigned char* buf);
         int convertAiffToWav(const char* aiff, const char* wav);
 
-
-    protected:
-       // static QMap<QString,QString> ttsList;
 };
 
 #endif // TTSCARBON_H

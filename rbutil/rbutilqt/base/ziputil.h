@@ -46,7 +46,6 @@ class ZipUtil : public QObject
     private:
         QList<QuaZipFileInfo> contentProperties();
         QuaZip* m_zip;
-        QuaZipFile* m_file;
 
 };
 #endif
