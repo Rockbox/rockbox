@@ -466,16 +466,21 @@ static void deemphasis(celt_sig *in[], opus_val16 *pcm, int N, int C, /* int dow
       int j;
       celt_sig * OPUS_RESTRICT x;
       opus_val16  * OPUS_RESTRICT y;
+      opus_val16 coef0 = coef[0];
+#ifdef CUSTOM_MODES
+      opus_val16 coef1 = coef[1];
+      opus_val16 coef3 = coef[3];
+#endif
       celt_sig m = mem[c];
       x =in[c];
       y = pcm+c;
       for (j=0;j<N;j++)
       {
          celt_sig tmp = *x + m;
-         m = MULT16_32_Q15(coef[0], tmp);
+         m = MULT16_32_Q15(coef0, tmp);
 #ifdef CUSTOM_MODES
-         m -= MULT16_32_Q15(coef[1], *x);
-         tmp = SHL32(MULT16_32_Q15(coef[3], tmp), 2);
+         m -= MULT16_32_Q15(coef1, *x);
+         tmp = SHL32(MULT16_32_Q15(coef3, tmp), 2);
 #endif
          x++;
          /* Technically the store could be moved outside of the if because
