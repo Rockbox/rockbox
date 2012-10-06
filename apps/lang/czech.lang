@@ -13003,3 +13003,31 @@
     swcodec: "Vlastní"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Vybrat jeden nebo více adresářů"
+  </dest>
+  <voice>
+    *: "Vybrat jeden nebo více adresářů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Vybrat adresáře pro prohledávání"
+  </dest>
+  <voice>
+    *: "Vybrat adresáře pro prohledávání"
+  </voice>
+</phrase>
