@@ -71,9 +71,23 @@ static inline int32_t MULT16_32_Q15(int32_t a, int32_t b)
 #define MULT16_32_Q15(a,b) ADD32(SHL(MULT16_16((a),SHR((b),16)),1), SHR(MULT16_16SU((a),((b)&0x0000ffff)),15))
 #endif
 
-/** 32x32 multiplication, followed by a 31-bit shift right. Results fits in 32 bits */
-#define MULT32_32_Q31(a,b) ADD32(ADD32(SHL(MULT16_16(SHR((a),16),SHR((b),16)),1), SHR(MULT16_16SU(SHR((a),16),((b)&0x0000ffff)),15)), SHR(MULT16_16SU(SHR((b),16),((a)&0x0000ffff)),15))
+#if defined(CPU_ARM)
+static inline int32_t MULT32_32_Q31(int32_t a, int32_t b)
+{
+  int32_t lo, hi;
+  asm volatile("smull %[lo], %[hi], %[a], %[b] \n\t"
+               "mov %[lo], %[lo], lsr #31 \n\t"
+               "orr %[hi], %[lo], %[hi], lsl #1 \n\t"
+               : [lo] "=&r" (lo), [hi] "=&r" (hi)
+               : [a] "r" (a), [b] "r" (b) );
+  return(hi);
+}
 
+#else
+/** 32x32 multiplication, followed by a 31-bit shift right. Results fits in 32 bits */
+//#define MULT32_32_Q31(a,b) ADD32(ADD32(SHL(MULT16_16(SHR((a),16),SHR((b),16)),1), SHR(MULT16_16SU(SHR((a),16),((b)&0x0000ffff)),15)), SHR(MULT16_16SU(SHR((b),16),((a)&0x0000ffff)),15))
+#define MULT32_32_Q31(a,b) (opus_val32)((((int64_t)(a)) * ((int64_t)(b)))>>31)
+#endif
 /** Compile-time conversion of float constant to 16-bit value */
 #define QCONST16(x,bits) ((opus_val16)(.5+(x)*(((opus_val32)1)<<(bits))))
 
