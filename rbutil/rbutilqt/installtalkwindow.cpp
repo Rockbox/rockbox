@@ -87,12 +87,20 @@ void InstallTalkWindow::change()
 
 void InstallTalkWindow::accept()
 {
+    saveSettings();
+    QStringList foldersToTalk
+        = RbSettings::value(RbSettings::TalkFolders).toStringList();
+    if(foldersToTalk.size() == 0) {
+        QMessageBox::information(this, tr("Empty selection"),
+                tr("No files or folders selected. Please select files or "
+                    "folders first."));
+        return;
+    }
+
     logger = new ProgressLoggerGui(this);
 
-    saveSettings();
     connect(logger,SIGNAL(closed()),this,SLOT(close()));
     logger->show();
-    saveSettings();
 
     talkcreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
 
@@ -108,8 +116,6 @@ void InstallTalkWindow::accept()
     connect(talkcreator, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
     connect(logger,SIGNAL(aborted()),talkcreator,SLOT(abort()));
 
-    QStringList foldersToTalk
-        = RbSettings::value(RbSettings::TalkFolders).toStringList();
     for(int i = 0; i < foldersToTalk.size(); i++) {
         qDebug() << "[InstallTalkWindow] creating talk files for folder"
                  << foldersToTalk.at(i);
