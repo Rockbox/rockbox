@@ -111,7 +111,10 @@ HEADERS += \
  base/encttssettings.h \
  base/ttsbase.h \
  base/ttsexes.h \
+ base/ttsespeak.h \
+ base/ttsflite.h \
  base/ttsfestival.h \
+ base/ttsswift.h \
  base/ttssapi.h \
  base/ttssapi4.h \
  base/ttsmssp.h \

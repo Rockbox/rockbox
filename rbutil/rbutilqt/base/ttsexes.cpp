@@ -16,23 +16,24 @@
 *
 ****************************************************************************/
 
+#include <QtCore>
 #include "ttsexes.h"
 #include "utils.h"
 #include "rbsettings.h"
 
-TTSExes::TTSExes(QString name,QObject* parent) : TTSBase(parent)
+TTSExes::TTSExes(QObject* parent) : TTSBase(parent)
 {
-    m_name = name;
-
-    m_TemplateMap["espeak"] = "\"%exe\" %options -w \"%wavfile\" -- \"%text\"";
-    m_TemplateMap["flite"] = "\"%exe\" %options -o \"%wavfile\" -t \"%text\"";
-    m_TemplateMap["swift"] = "\"%exe\" %options -o \"%wavfile\" -- \"%text\"";
-
+    /* default to espeak */
+    m_name = "espeak";
+    m_capabilities = TTSBase::CanSpeak;
+    m_TTSTemplate = "\"%exe\" %options -w \"%wavfile\" -- \"%text\"";
+    m_TTSSpeakTemplate = "\"%exe\" %options -- \"%text\"";
 }
+
 
 TTSBase::Capabilities TTSExes::capabilities()
 {
-    return RunInParallel;
+    return m_capabilities;
 }
 
 void TTSExes::generateSettings()
@@ -46,9 +47,9 @@ void TTSExes::generateSettings()
 
 void TTSExes::saveSettings()
 {
-    RbSettings::setSubValue(m_name,RbSettings::TtsPath,
+    RbSettings::setSubValue(m_name, RbSettings::TtsPath,
             getSetting(eEXEPATH)->current().toString());
-    RbSettings::setSubValue(m_name,RbSettings::TtsOptions,
+    RbSettings::setSubValue(m_name, RbSettings::TtsOptions,
             getSetting(eOPTIONS)->current().toString());
     RbSettings::sync();
 }
@@ -56,16 +57,15 @@ void TTSExes::saveSettings()
 
 void TTSExes::loadSettings(void)
 {
-    m_TTSexec = RbSettings::subValue(m_name,RbSettings::TtsPath).toString();
+    m_TTSexec = RbSettings::subValue(m_name, RbSettings::TtsPath).toString();
     if(m_TTSexec.isEmpty()) m_TTSexec = Utils::findExecutable(m_name);
-    m_TTSOpts = RbSettings::subValue(m_name,RbSettings::TtsOptions).toString();
+    m_TTSOpts = RbSettings::subValue(m_name, RbSettings::TtsOptions).toString();
 }
 
 
 bool TTSExes::start(QString *errStr)
 {
     loadSettings();
-    m_TTSTemplate = m_TemplateMap.value(m_name);
 
     QFileInfo tts(m_TTSexec);
     if(tts.exists())
@@ -79,10 +79,26 @@ bool TTSExes::start(QString *errStr)
     }
 }
 
-TTSStatus TTSExes::voice(QString text,QString wavfile, QString *errStr)
+TTSStatus TTSExes::voice(QString text, QString wavfile, QString *errStr)
 {
     (void) errStr;
-    QString execstring = m_TTSTemplate;
+    QString execstring;
+    if(wavfile.isEmpty() && m_capabilities & TTSBase::CanSpeak) {
+        if(m_TTSSpeakTemplate.isEmpty()) {
+            qDebug() << "[TTSExes] internal error: TTS announces CanSpeak "
+                        "but template empty!";
+            return FatalError;
+        }
+        execstring = m_TTSSpeakTemplate;
+    }
+    else if(wavfile.isEmpty()) {
+        qDebug() << "[TTSExes] no output file passed to voice() "
+                    "but TTS can't speak directly.";
+        return FatalError;
+    }
+    else {
+        execstring = m_TTSTemplate;
+    }
 
     execstring.replace("%exe",m_TTSexec);
     execstring.replace("%options",m_TTSOpts);
@@ -91,7 +107,7 @@ TTSStatus TTSExes::voice(QString text,QString wavfile, QString *errStr)
 
     QProcess::execute(execstring);
 
-    if(!QFileInfo(wavfile).isFile()) {
+    if(!wavfile.isEmpty() && !QFileInfo(wavfile).isFile()) {
         qDebug() << "[TTSExes] output file does not exist:" << wavfile;
         return FatalError;
     }

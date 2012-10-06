@@ -6,7 +6,7 @@
 *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 *                     \/            \/     \/    \/            \/
 *
-*   Copyright (C) 2009 by Dominik Wenger
+*   Copyright (C) 2012 by Dominik Riebeling
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -18,44 +18,23 @@
 *
 ****************************************************************************/
 
-#ifndef TTSEXES_H
-#define TTSEXES_H
+#ifndef TTSSWIFT_H
+#define TTSSWIFT_H
 
 #include <QtCore>
-#include "ttsbase.h"
+#include "ttsexes.h"
 
-class TTSExes : public TTSBase
+class TTSSwift : public TTSExes
 {
-    enum ESettings
-    {
-        eEXEPATH,
-        eOPTIONS
-    };
-
     Q_OBJECT
     public:
-        TTSExes(QObject* parent=NULL);
-        TTSStatus voice(QString text, QString wavfile, QString *errStr);
-        bool start(QString *errStr);
-        bool stop() {return true;}
-        QString voiceVendor(void) { return QString(); }
-        Capabilities capabilities();
-
-        // for settings
-        void generateSettings();
-        void saveSettings();
-        bool configOk();
-
-    private:
-        void loadSettings(void);
-
-    protected:
-        QString m_TTSTemplate;
-        QString m_TTSSpeakTemplate;
-        QString m_name;
-        QString m_TTSexec;
-        QString m_TTSOpts;
-        TTSBase::Capabilities m_capabilities;
+        TTSSwift(QObject* parent=NULL) : TTSExes(parent)
+        {
+            m_name = "swift";
+            m_TTSTemplate = "\"%exe\" %options -o \"%wavfile\" -- \"%text\"";
+            m_TTSSpeakTemplate = "";
+            m_capabilities = TTSBase::None;
+        }
 };
 
 #endif

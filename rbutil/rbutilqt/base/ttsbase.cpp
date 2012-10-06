@@ -16,6 +16,7 @@
  *
  ****************************************************************************/
 
+#include <QtCore>
 #include "ttsbase.h"
 
 #include "ttsfestival.h"
@@ -23,6 +24,9 @@
 #include "ttssapi4.h"
 #include "ttsmssp.h"
 #include "ttsexes.h"
+#include "ttsespeak.h"
+#include "ttsflite.h"
+#include "ttsswift.h"
 #if defined(Q_OS_MACX)
 #include "ttscarbon.h"
 #endif
@@ -32,7 +36,6 @@ QMap<QString,QString> TTSBase::ttsList;
 
 TTSBase::TTSBase(QObject* parent): EncTtsSettingInterface(parent)
 {
-
 }
 
 // static functions
@@ -80,9 +83,15 @@ TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
         tts = new TTSCarbon(parent);
     else
 #endif
-    // fix for OS other than WIN or LINUX
-    if (true)
-        tts = new TTSExes(ttsName, parent);
+    if(ttsName == "espeak")
+        tts = new TTSEspeak(parent);
+    else if(ttsName == "flite")
+        tts = new TTSFlite(parent);
+    else if(ttsName == "swift")
+        tts = new TTSSwift(parent);
+    else if(ttsName == "user")
+        tts = new TTSExes(parent);
+
     return tts;
 }
 

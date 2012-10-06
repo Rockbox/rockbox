@@ -39,7 +39,7 @@ class TTSCarbon : public TTSBase
         TTSCarbon(QObject *parent = NULL);
 
         //! Child class should generate a clip
-        TTSStatus voice(QString text,QString wavfile, QString* errStr);
+        TTSStatus voice(QString text, QString wavfile, QString* errStr);
         //! Child class should do startup
         bool start(QString *errStr);
         //! child class should stop
@@ -51,7 +51,7 @@ class TTSCarbon : public TTSBase
         bool configOk();
          //! Child class should generate and insertSetting(..) its settings
         void generateSettings();
-        //! Chlid class should commit the Settings to permanent storage
+        //! Child class should commit the Settings to permanent storage
         void saveSettings();
 
         Capabilities capabilities();
