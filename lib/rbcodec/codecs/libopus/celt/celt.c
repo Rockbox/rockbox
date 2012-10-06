@@ -448,12 +448,16 @@ static void compute_inv_mdcts(const CELTMode *mode, int shortBlocks, celt_sig *X
          clt_mdct_backward(&mode->mdct, &X[b+c*N2*B], x+N2*b, mode->window, overlap, shortBlocks ? mode->maxLM : mode->maxLM-LM, B);
       }
 
-      for (j=0;j<overlap;j++)
-         out_mem[c][j] = x[j] + overlap_mem[c][j];
-      for (;j<N;j++)
-         out_mem[c][j] = x[j];
-      for (j=0;j<overlap;j++)
-         overlap_mem[c][j] = x[N+j];
+      /* overlap can be divided by 4 */
+      for (j=0;j<overlap;j+=4)
+      {
+         out_mem[c][j  ] = x[j  ] + overlap_mem[c][j  ];
+         out_mem[c][j+1] = x[j+1] + overlap_mem[c][j+1];
+         out_mem[c][j+2] = x[j+2] + overlap_mem[c][j+2];
+         out_mem[c][j+3] = x[j+3] + overlap_mem[c][j+3];
+      }
+      OPUS_COPY(out_mem[c]+overlap, x+overlap, N-overlap);
+      OPUS_COPY(overlap_mem[c]    , x+N      ,   overlap);
    } while (++c<C);
    RESTORE_STACK;
 }
