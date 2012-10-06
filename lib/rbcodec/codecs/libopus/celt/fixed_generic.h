@@ -71,7 +71,19 @@ static inline int32_t MULT16_32_Q15(int32_t a, int32_t b)
 #define MULT16_32_Q15(a,b) ADD32(SHL(MULT16_16((a),SHR((b),16)),1), SHR(MULT16_16SU((a),((b)&0x0000ffff)),15))
 #endif
 
-#if defined(CPU_ARM)
+#if defined(CPU_COLDFIRE)
+static inline int32_t MULT32_32_Q31(int32_t a, int32_t b)
+{
+  int32_t r;
+  asm volatile ("mac.l %[a], %[b], %%acc0;"
+                "movclr.l %%acc0, %[r];"
+                : [r] "=r" (r)
+                : [a] "r" (a), [b] "r" (b)
+                : "cc");
+  return r;
+}
+
+#elif defined(CPU_ARM)
 static inline int32_t MULT32_32_Q31(int32_t a, int32_t b)
 {
   int32_t lo, hi;
