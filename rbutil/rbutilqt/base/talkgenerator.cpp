@@ -35,12 +35,19 @@ TalkGenerator::Status TalkGenerator::process(QList<TalkEntry>* list,int wavtrimt
     bool warnings = false;
 
     //tts
-    emit logItem(tr("Starting TTS Engine"),LOGINFO);
-    m_tts = TTSBase::getTTS(this,RbSettings::value(RbSettings::Tts).toString());
+    emit logItem(tr("Starting TTS Engine"), LOGINFO);
+    m_tts = TTSBase::getTTS(this, RbSettings::value(RbSettings::Tts).toString());
+    if(!m_tts)
+    {
+        qDebug() << "[TalkGenerator] getting the TTS object failed!";
+        emit logItem(tr("Init of TTS engine failed"), LOGERROR);
+        emit done(true);
+        return eERROR;
+    }
     if(!m_tts->start(&errStr))
     {
         emit logItem(errStr.trimmed(),LOGERROR);
-        emit logItem(tr("Init of TTS engine failed"),LOGERROR);
+        emit logItem(tr("Init of TTS engine failed"), LOGERROR);
         emit done(true);
         return eERROR;
     }
@@ -278,6 +285,11 @@ void TalkGenerator::setLang(QString name)
 
     QString engine = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this,RbSettings::value(RbSettings::Tts).toString());
+    if(!tts)
+    {
+        qDebug() << "[TalkGenerator] getting the TTS object failed!";
+        return;
+    }
     QString vendor = tts->voiceVendor();
     delete tts;
 

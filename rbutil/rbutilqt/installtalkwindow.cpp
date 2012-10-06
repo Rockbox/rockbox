@@ -130,6 +130,12 @@ void InstallTalkWindow::updateSettings(void)
     QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
     QString ttsName = RbSettings::value(RbSettings::Tts).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
+    if(!tts)
+    {
+        QMessageBox::critical(this, tr("TTS error"),
+            tr("The selected TTS failed to initialize. You can't use this TTS."));
+        return;
+    }
     if(tts->configOk())
         ui.labelTtsProfile->setText(QString("<b>%1</b>")
             .arg(TTSBase::getTTSName(ttsName)));

@@ -418,6 +418,13 @@ void Config::updateTtsState(int index)
     QString ttsName = ui.comboTts->itemData(index).toString();
     TTSBase* tts = TTSBase::getTTS(this,ttsName);
 
+    if(!tts)
+    {
+        QMessageBox::critical(this, tr("TTS error"),
+            tr("The selected TTS failed to initialize. You can't use this TTS."));
+        return;
+    }
+
     if(tts->configOk())
     {
         ui.configTTSstatus->setText(tr("Configuration OK"));
@@ -837,9 +844,14 @@ void Config::testTts()
     QString errstr;
     int index = ui.comboTts->currentIndex();
     TTSBase* tts;
-
-    ui.testTTS->setEnabled(false);
     tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
+    if(!tts)
+    {
+        QMessageBox::critical(this, tr("TTS error"),
+            tr("The selected TTS failed to initialize. You can't use this TTS."));
+        return;
+    }
+    ui.testTTS->setEnabled(false);
     if(!tts->configOk())
     {
         QMessageBox::warning(this,tr("TTS configuration invalid"),
