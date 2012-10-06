@@ -497,43 +497,69 @@ static void comb_filter(opus_val32 *y, opus_val32 *x, int T0, int T1, int N,
       opus_val16 g0, opus_val16 g1, int tapset0, int tapset1,
       const opus_val16 *window, int overlap)
 {
-   int i;
-   /* printf ("%d %d %f %f\n", T0, T1, g0, g1); */
-   opus_val16 g00, g01, g02, g10, g11, g12;
-   static const opus_val16 gains[3][3] = {
+   /* Multiply-adds are only needed if g0 or g1 are non-zero. In all other cases a simple
+    * copy of vector x to y is possible. */
+   if (g0!=0 || g1!=0)
+   {
+      int i;
+      opus_val16 g00, g01, g02, g10, g11, g12, idx0, idx1;
+      static const opus_val16 gains[3][3] = {
          {QCONST16(0.3066406250f, 15), QCONST16(0.2170410156f, 15), QCONST16(0.1296386719f, 15)},
          {QCONST16(0.4638671875f, 15), QCONST16(0.2680664062f, 15), QCONST16(0.f, 15)},
          {QCONST16(0.7998046875f, 15), QCONST16(0.1000976562f, 15), QCONST16(0.f, 15)}};
-   g00 = MULT16_16_Q15(g0, gains[tapset0][0]);
-   g01 = MULT16_16_Q15(g0, gains[tapset0][1]);
-   g02 = MULT16_16_Q15(g0, gains[tapset0][2]);
-   g10 = MULT16_16_Q15(g1, gains[tapset1][0]);
-   g11 = MULT16_16_Q15(g1, gains[tapset1][1]);
-   g12 = MULT16_16_Q15(g1, gains[tapset1][2]);
-   for (i=0;i<overlap;i++)
-   {
-      opus_val16 f;
-      f = MULT16_16_Q15(window[i],window[i]);
-      y[i] = x[i]
-               + MULT16_32_Q15(MULT16_16_Q15((Q15ONE-f),g00),x[i-T0])
-               + MULT16_32_Q15(MULT16_16_Q15((Q15ONE-f),g01),x[i-T0-1])
-               + MULT16_32_Q15(MULT16_16_Q15((Q15ONE-f),g01),x[i-T0+1])
-               + MULT16_32_Q15(MULT16_16_Q15((Q15ONE-f),g02),x[i-T0-2])
-               + MULT16_32_Q15(MULT16_16_Q15((Q15ONE-f),g02),x[i-T0+2])
-               + MULT16_32_Q15(MULT16_16_Q15(f,g10),x[i-T1])
-               + MULT16_32_Q15(MULT16_16_Q15(f,g11),x[i-T1-1])
-               + MULT16_32_Q15(MULT16_16_Q15(f,g11),x[i-T1+1])
-               + MULT16_32_Q15(MULT16_16_Q15(f,g12),x[i-T1-2])
-               + MULT16_32_Q15(MULT16_16_Q15(f,g12),x[i-T1+2]);
-
+      g00 = MULT16_16_Q15(g0, gains[tapset0][0]);
+      g01 = MULT16_16_Q15(g0, gains[tapset0][1]);
+      g02 = MULT16_16_Q15(g0, gains[tapset0][2]);
+      g10 = MULT16_16_Q15(g1, gains[tapset1][0]);
+      g11 = MULT16_16_Q15(g1, gains[tapset1][1]);
+      g12 = MULT16_16_Q15(g1, gains[tapset1][2]);
+      /* printf("g0 %d g1 %d\n", g0,g1); */
+      idx0 = -T0;
+      idx1 = -T1;
+      for (i=0;i<overlap;i++,idx0++,idx1++)
+      {
+         opus_val16 f0, f1;
+         f1 = MULT16_16_Q15(window[i],window[i]);
+         f0 = Q15ONE - f1;
+         y[i] = x[i]
+               + MULT16_32_Q15(MULT16_16_Q15(f0,g02), x[idx0-2])
+               + MULT16_32_Q15(MULT16_16_Q15(f0,g01), x[idx0-1])
+               + MULT16_32_Q15(MULT16_16_Q15(f0,g00), x[idx0  ])
+               + MULT16_32_Q15(MULT16_16_Q15(f0,g01), x[idx0+1])
+               + MULT16_32_Q15(MULT16_16_Q15(f0,g02), x[idx0+2])
+               + MULT16_32_Q15(MULT16_16_Q15(f1,g12), x[idx1-2])
+               + MULT16_32_Q15(MULT16_16_Q15(f1,g11), x[idx1-1])
+               + MULT16_32_Q15(MULT16_16_Q15(f1,g10), x[idx1  ])
+               + MULT16_32_Q15(MULT16_16_Q15(f1,g11), x[idx1+1])
+               + MULT16_32_Q15(MULT16_16_Q15(f1,g12), x[idx1+2]);
+      }
+      /* No multiply-add required if g1=0 as all multiplicants are =0. */
+      if (g1!=0)
+      {
+         idx1 = overlap-T1;
+         for (i=overlap;i<N;i++,idx1++)
+         {
+            y[i] = x[i]
+                  + MULT16_32_Q15(g12, x[idx1-2])
+                  + MULT16_32_Q15(g11, x[idx1-1])
+                  + MULT16_32_Q15(g10, x[idx1  ])
+                  + MULT16_32_Q15(g11, x[idx1+1])
+                  + MULT16_32_Q15(g12, x[idx1+2]);
+         }
+      }
+      /* Only perform vector copy if source and destination are not same. */
+      else if (x != y)
+      {
+         /* Copy part of vector from x[overlap..N] to y[overlap..N] */
+         OPUS_COPY(y+overlap, x+overlap, N-overlap);
+      }
    }
-   for (i=overlap;i<N;i++)
-      y[i] = x[i]
-               + MULT16_32_Q15(g10,x[i-T1])
-               + MULT16_32_Q15(g11,x[i-T1-1])
-               + MULT16_32_Q15(g11,x[i-T1+1])
-               + MULT16_32_Q15(g12,x[i-T1-2])
-               + MULT16_32_Q15(g12,x[i-T1+2]);
+   /* Only perform vector copy if source and destination are not same. */
+   else if (x != y)
+   {
+      /* Copy full vector from x[0..N] to y[0..N] */
+      OPUS_COPY(y, x, N);
+   }
 }
 
 static const signed char tf_select_table[4][8] = {
