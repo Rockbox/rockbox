@@ -305,12 +305,11 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
       kiss_fft_scalar * OPUS_RESTRICT yp1 = out+N4-overlap/2;
       const opus_val16 * OPUS_RESTRICT wp1 = window;
       const opus_val16 * OPUS_RESTRICT wp2 = window+overlap-1;
-      for(i = 0; i< N4-overlap/2; i++)
-      {
-         *xp1 = *fp1;
-         xp1--;
-         fp1--;
-      }
+
+      i = N4-overlap/2;
+      xp1 -= N4-overlap/2;
+      fp1 -= N4-overlap/2;
+      OPUS_COPY(xp1+1, fp1+1, N4-overlap/2);
       for(; i < N4; i++)
       {
          kiss_fft_scalar x1;
@@ -327,12 +326,11 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
       kiss_fft_scalar * OPUS_RESTRICT yp2 = out+N-1-(N4-overlap/2);
       const opus_val16 * OPUS_RESTRICT wp1 = window;
       const opus_val16 * OPUS_RESTRICT wp2 = window+overlap-1;
-      for(i = 0; i< N4-overlap/2; i++)
-      {
-         *xp2 = *fp2;
-         xp2++;
-         fp2++;
-      }
+
+      i = N4-overlap/2;
+      OPUS_COPY(xp2, fp2, N4-overlap/2);
+      xp2 += N4-overlap/2;
+      fp2 += N4-overlap/2;
       for(; i < N4; i++)
       {
          kiss_fft_scalar x2;
