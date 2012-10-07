@@ -11,7 +11,7 @@
 #endif
 
 #include "m_pd.h"
-#include <math.h>
+#include "../../math.h"
 #define LOGTEN 2.302585092994
 
 float mtof(float f)

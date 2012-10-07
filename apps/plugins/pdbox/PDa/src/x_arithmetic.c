@@ -12,7 +12,7 @@ inputs to int and their outputs back to float. */
 #endif
 
 #include "m_pd.h"
-#include <math.h>
+#include "../../math.h"
 
 
 /* MSW and OSX don't appear to have single-precision ANSI math */

@@ -170,7 +170,7 @@ void pd_init(void);
 
 //#ifndef SIMULATOR
 /*FIXME: is it a correct replacement??? */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
+/* #if !(CONFIG_PLATFORM & PLATFORM_HOSTED) */
 #define floor rb_floor
 #define atof rb_atof
 #define atol rb_atol
@@ -186,9 +186,11 @@ void pd_init(void);
 #define atan2 rb_atan2
 #define sinh rb_sinh
 #define tan rb_tan
+/*
 #else
 #include <math.h>
 #endif
+*/
 
 #define ftoan rb_ftoan
 #undef strtok_r

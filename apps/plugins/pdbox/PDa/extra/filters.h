@@ -12,7 +12,7 @@
 #define __GGEE_FILTERS_H__
 
 #ifdef ROCKBOX
-#include "math.h"
+#include "../../math.h"
 #else
 #include <math.h>
 #endif

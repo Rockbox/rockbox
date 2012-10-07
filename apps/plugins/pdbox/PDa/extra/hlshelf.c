@@ -5,7 +5,7 @@
 #include "plugin.h"
 #include "../../pdbox.h"
 #include "../src/m_pd.h"
-#include "math.h"
+#include "../../math.h"
 #else /* ROCKBOX */
 #include "../src/m_pd.h"
 #include <math.h>
