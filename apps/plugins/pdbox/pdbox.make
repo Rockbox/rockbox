@@ -26,16 +26,9 @@ ifdef APP_TYPE
 PDBOXLDFLAGS += -lm
 endif
 
+$(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ)
+
 # Compile PDBox with extra flags (adapted from ZXBox)
 $(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PDBOXFLAGS) -c $< -o $@
-
-$(PDBOXBUILDDIR)/pdbox.rock:
-	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $*.elf \
-		$(filter %.o, $^) \
-		$(filter %.a, $+) \
-		-lgcc $(PDBOXLDFLAGS)
-	$(SILENT)$(call objcopy,$*.elf,$@)
-
-
