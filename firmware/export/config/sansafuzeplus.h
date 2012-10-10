@@ -192,6 +192,9 @@
 /* Define this if you have adjustable CPU frequency */
 //#define HAVE_ADJUSTABLE_CPU_FREQ
 
+/* Virtual LED (icon) */
+#define CONFIG_LED LED_VIRTUAL
+
 #define BOOTFILE_EXT    "sansa"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"

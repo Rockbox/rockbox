@@ -33,6 +33,7 @@
 #include "debug.h"
 #include "string.h"
 #include "ata_idle_notify.h"
+#include "led.h"
 
 /** NOTE For convenience, this drivers relies on the many similar commands
  * between SD and MMC. The following assumptions are made:
@@ -501,6 +502,13 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
     return ret;
 }
 
+static void do_led(int delta)
+{
+    static int level = 0;
+    level += delta;
+    led(level > 0);
+}
+
 static int transfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
 {
     int ret = 0;
@@ -510,6 +518,9 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
 
     /* lock per-drive mutex */
     mutex_lock(&mutex[drive]);
+
+    /* update led status */
+    do_led(1);
 
     /* for SD cards, init if necessary */
 #if CONFIG_STORAGE & STORAGE_SD
@@ -604,6 +615,8 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
         ret = -23;
     Lend:
+    /* update led status */
+    do_led(-1);
     /* release per-drive mutex */
     mutex_unlock(&mutex[drive]);
     return ret;
