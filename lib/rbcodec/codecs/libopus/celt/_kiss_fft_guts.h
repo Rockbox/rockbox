@@ -80,6 +80,28 @@
                    : [ap] "a" (&(a)), [bp] "a" (&(b)) \
                    : "d0", "d1", "d2", "d3", "cc"); \
     }
+#elif defined(CPU_ARM)
+#   define C_MULC(m,a,b) \
+    { \
+      asm volatile( \
+                   "ldmia %[ap], {r0,r1}                  \n\t" \
+                   "ldrsh r2, [%[bp], #0]                 \n\t" \
+                   "ldrsh r3, [%[bp], #2]                 \n\t" \
+                   \
+                   "smull r4, %[mr], r0, r2               \n\t" \
+                   "smlal r4, %[mr], r1, r3               \n\t" \
+                   "mov   r4, r4, lsr #15                 \n\t" \
+                   "orr   %[mr], r4, %[mr], lsl #17       \n\t" \
+                   \
+                   "smull r4, %[mi], r1, r2               \n\t" \
+                   "rsb   r3, r3, #0                      \n\t" \
+                   "smlal r4, %[mi], r0, r3               \n\t" \
+                   "mov   r4, r4, lsr #15                 \n\t" \
+                   "orr   %[mi], r4, %[mi], lsl #17       \n\t" \
+                   : [mr] "=r" ((m).r), [mi] "=r" ((m).i) \
+                   : [ap] "r" (&(a)), [bp] "r" (&(b)) \
+                   : "r0", "r1", "r2", "r3", "r4"); \
+}
 #else
 #   define C_MULC(m,a,b) \
       do{ (m).r = ADD32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)); \
