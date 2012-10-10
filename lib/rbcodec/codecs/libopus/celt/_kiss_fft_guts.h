@@ -61,9 +61,30 @@
       do{ (m).r = SUB32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)); \
           (m).i = ADD32(S_MUL((a).r,(b).i) , S_MUL((a).i,(b).r)); }while(0)
 
+#if defined (CPU_COLDFIRE)
+#   define C_MULC(m,a,b) \
+    { \
+      asm volatile("move.l (%[bp]), %%d2;" \
+                   "clr.l %%d3;" \
+                   "move.w %%d2, %%d3;" \
+                   "swap %%d3;" \
+                   "clr.w %%d2;" \
+                   "movem.l (%[ap]), %%d0-%%d1;" \
+                   "mac.l %%d0, %%d2, %%acc0;" \
+                   "mac.l %%d1, %%d3, %%acc0;" \
+                   "mac.l %%d1, %%d2, %%acc1;" \
+                   "msac.l %%d0, %%d3, %%acc1;" \
+                   "movclr.l %%acc0, %[mr];" \
+                   "movclr.l %%acc1, %[mi];" \
+                   : [mr] "=r" ((m).r), [mi] "=r" ((m).i) \
+                   : [ap] "a" (&(a)), [bp] "a" (&(b)) \
+                   : "d0", "d1", "d2", "d3", "cc"); \
+    }
+#else
 #   define C_MULC(m,a,b) \
       do{ (m).r = ADD32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)); \
           (m).i = SUB32(S_MUL((a).i,(b).r) , S_MUL((a).r,(b).i)); }while(0)
+#endif
 
 #   define C_MUL4(m,a,b) \
       do{ (m).r = SHR32(SUB32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)),2); \
