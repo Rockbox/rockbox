@@ -550,9 +550,34 @@ bool dbg_hw_info_pinctrl(void)
     }
 }
 
+struct
+{
+    const char *name;
+    volatile uint32_t *addr;
+} dbg_ocotp[] =
+{
+#define E(n,v) { .name = n, .addr = &v }
+    E("CUST0", HW_OCOTP_CUSTx(0)), E("CUST1", HW_OCOTP_CUSTx(1)),
+    E("CUST2", HW_OCOTP_CUSTx(2)), E("CUST0", HW_OCOTP_CUSTx(3)),
+    E("HWCAP0", HW_OCOTP_HWCAPx(0)), E("HWCAP1", HW_OCOTP_HWCAPx(1)),
+    E("HWCAP2", HW_OCOTP_HWCAPx(2)), E("HWCAP3", HW_OCOTP_HWCAPx(3)),
+    E("HWCAP4", HW_OCOTP_HWCAPx(4)), E("HWCAP5", HW_OCOTP_HWCAPx(5)),
+    E("SWCAP", HW_OCOTP_SWCAP), E("CUSTCAP", HW_OCOTP_CUSTCAP),
+    E("OPS0", HW_OCOTP_OPSx(0)), E("OPS1", HW_OCOTP_OPSx(1)),
+    E("OPS2", HW_OCOTP_OPSx(2)), E("OPS2", HW_OCOTP_OPSx(3)),
+    E("UN0", HW_OCOTP_UNx(0)), E("UN1", HW_OCOTP_UNx(1)),
+    E("UN2", HW_OCOTP_UNx(2)),
+    E("ROM0", HW_OCOTP_ROMx(0)), E("ROM1", HW_OCOTP_ROMx(1)),
+    E("ROM2", HW_OCOTP_ROMx(2)), E("ROM3", HW_OCOTP_ROMx(3)),
+    E("ROM4", HW_OCOTP_ROMx(4)), E("ROM5", HW_OCOTP_ROMx(5)),
+    E("ROM6", HW_OCOTP_ROMx(6)), E("ROM7", HW_OCOTP_ROMx(7)),
+};
+
 bool dbg_hw_info_ocotp(void)
 {
     lcd_setfont(FONT_SYSFIXED);
+
+    unsigned top_user = 0;
 
     while(1)
     {
@@ -560,7 +585,12 @@ bool dbg_hw_info_ocotp(void)
         switch(button)
         {
             case ACTION_STD_NEXT:
+                top_user++;
+                break;
             case ACTION_STD_PREV:
+                if(top_user > 0)
+                    top_user--;
+                break;
             case ACTION_STD_OK:
             case ACTION_STD_MENU:
                 lcd_setfont(FONT_UI);
@@ -571,8 +601,21 @@ bool dbg_hw_info_ocotp(void)
         }
 
         lcd_clear_display();
-        for(int i = 0; i < 4; i++)
-            lcd_putsf(0, i, "OPS%d=%08x", i, imx233_ocotp_read(&HW_OCOTP_OPSx(i)));
+        unsigned cur_line = 0;
+        unsigned last_line = lcd_getheight() / font_get(lcd_getfont())->height;
+        unsigned i = 0;
+
+        for(i = 0; i < ARRAYLEN(dbg_ocotp); i++)
+        {
+            if(i >= top_user && cur_line < last_line)
+            {
+                lcd_putsf(0, cur_line, "%s", dbg_ocotp[i].name);
+                lcd_putsf(8, cur_line++, "%x", imx233_ocotp_read(dbg_ocotp[i].addr));
+            }
+        }
+        if(i < top_user)
+            top_user = i - 1;
+        
         lcd_update();
         yield();
     }
