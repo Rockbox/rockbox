@@ -141,6 +141,9 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+/* Has microSD slot */
+#define HAVE_HOTSWAP
+
 /* Define this if you have adjustable CPU frequency
  * NOTE: We could do that on this device, but it's probably better
  * to let linux do it (we set ondemand governor before loading Rockbox) */

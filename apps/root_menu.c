@@ -126,6 +126,7 @@ static int browser(void* param)
             {
 #ifdef HAVE_HOTSWAP
                 bool in_hotswap = false;
+#ifndef SAMSUNG_YPR0
                 /* handle entering an ejected drive */
                 int i;
                 for (i = 0; i < NUM_VOLUMES; i++)
@@ -136,8 +137,15 @@ static int browser(void* param)
                     /* VOL_NAMES contains a %d */
                     snprintf(vol_string, sizeof(vol_string), "/"VOL_NAMES, i);
                     /* test whether we would browse the external card */
+#endif
+#ifdef SAMSUNG_YPR0
+                {
+                    if (!microSD_inserted() &&
+                            (strstr(last_folder, "/mnt/mmc")
+#else
                     if (!storage_present(i) &&
                             (strstr(last_folder, vol_string)
+#endif
 #ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
                                                                 || (i == 0)
 #endif
