@@ -24,5 +24,10 @@
 #include "kernel-unix.h"
 #include "system-hosted.h"
 
+bool mount_microSD(void);
+bool umount_microSD(void);
+bool microSD_inserted(void);
+void sdsense_init(void);
+
 #define NEED_GENERIC_BYTESWAPS
 #endif /* __SYSTEM_TARGET_H__ */

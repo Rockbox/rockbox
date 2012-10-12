@@ -384,6 +384,9 @@ static void init(void)
     sb_skin_init();
     viewportmanager_init();
 
+#ifdef SAMSUNG_YPR0
+    sdsense_init();
+#endif
     storage_init();
 #if CONFIG_CODEC == SWCODEC
     dsp_init();

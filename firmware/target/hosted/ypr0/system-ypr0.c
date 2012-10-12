@@ -25,13 +25,16 @@
 #include "system.h"
 #include "panic.h"
 #include "debug.h"
+#include "kernel.h"
 
 #if defined(HAVE_SDL_AUDIO) || defined(HAVE_SDL_THREADS) || defined(HAVE_SDL)
 #include <SDL.h>
 #endif
 
+#include <sys/mount.h>
 #include "ascodec.h"
 #include "gpio_ypr0.h"
+#include "backlight.h"
 
 void power_off(void)
 {
@@ -55,6 +58,11 @@ void system_init(void)
     /* Here begins our platform specific initilization for various things */
     ascodec_init();
     gpio_init();
+    /* Some ROMs could mount SD card without the sync and/or other proper options
+     * Then unmount and remount microSD, even if it is useless, pretty light operation!
+     */
+    umount_microSD();
+    mount_microSD();
 }
 
 
@@ -66,6 +74,74 @@ void system_reboot(void)
 void system_exception_wait(void)
 {
     system_reboot();
+}
+
+/* MicroSD card removal / insertion management */
+
+static int microSD_stack[DEFAULT_STACK_SIZE];
+bool microSD_state = false;
+
+bool mount_microSD(void) {
+    int ret = mount("/dev/mmcblk0p1", "/mnt/mmc", "vfat", MS_MGC_VAL | MS_SYNCHRONOUS | MS_RELATIME, "iocharset=utf8");
+    if (ret < 0) {
+        return false;
+    }
+    return true;
+}
+bool umount_microSD(void) {
+    int ret = umount2("/mnt/mmc", MNT_FORCE);
+    if (ret < 0) {
+        return false;
+    }
+    return true;
+}
+
+bool microSD_inserted(void) {
+    /* Active LOW */
+    return (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_SD_SENSE, 0, 0));
+}
+
+static inline void microSD_check(void)
+{
+    bool microsd_init = false;
+    if (microSD_inserted()) {
+        if (!microSD_state) {
+            queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+            backlight_on();
+            /* Wait for the kernel to load microSD device */
+            sleep(HZ);
+            microsd_init = mount_microSD();
+            microSD_state = true;
+        }
+    }
+    else {
+        if (microSD_state) {
+            queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+            backlight_on();
+            microsd_init = umount_microSD();
+            microSD_state = false;
+        }
+    }
+    if (microsd_init)  
+        queue_broadcast(SYS_FS_CHANGED, 0);
+    sleep(HZ);
+}
+
+static void NORETURN_ATTR microSD_thread(void)
+{
+    while (1) {
+        microSD_check();
+    }
+}
+
+void sdsense_init(void) {
+    /* Setup GPIO pin for microSD sense, copied from OF */
+    gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_SD_SENSE, CONFIG_DEFAULT, 0);
+    gpio_control(DEV_CTRL_GPIO_SET_INPUT, GPIO_SD_SENSE, CONFIG_DEFAULT, 0);
+    
+    microSD_state = microSD_inserted();
+    create_thread(microSD_thread, microSD_stack, sizeof(microSD_stack), 0, "microSD"
+        IF_PRIO(, PRIORITY_BACKGROUND) IF_COP(, CPU));
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
