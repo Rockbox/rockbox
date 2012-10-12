@@ -2180,6 +2180,10 @@ static const struct {
 #ifdef __linux__
         { "View CPU stats", dbg_cpuinfo },
 #endif
+#ifdef SAMSUNG_YPR0
+        { "Mount microSD", mount_microSD},
+        { "Unmount microSD", umount_microSD},
+#endif
 #ifdef HAVE_LCD_BITMAP
 #if (CONFIG_BATTERY_MEASURE != 0) && !defined(SIMULATOR)
         { "View battery", view_battery },
