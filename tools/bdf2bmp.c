@@ -97,7 +97,7 @@ void checkEndian(void);
 void dwrite(const void *ptrP, int n, FILE *outP);
 void writeBmpFile(unsigned char *bitmapP, int spacing, int colchar, FILE *bmpP);
 void assignBitmap(unsigned char *bitmapP, char *glyphP, int sizeglyphP, struct boundingbox glyph, int dw);
-int getline(char* lineP, int max, FILE* inputP);
+int getfontline(char* lineP, int max, FILE* inputP);
 unsigned char *readBdfFile(unsigned char *bitmapP, FILE *readP);
 void printhelp(void);
 int main(int argc, char *argv[]);
@@ -454,7 +454,7 @@ void assignBitmap(unsigned char *bitmapP, char *glyphP, int sizeglyphP, struct b
 /*
  * read oneline from textfile
  */
-int getline(char* lineP, int max, FILE* inputP){
+int getfontline(char* lineP, int max, FILE* inputP){
         if (fgets(lineP, max, inputP) == NULL)
                 return 0;
         else
@@ -479,7 +479,7 @@ unsigned char *readBdfFile(unsigned char *bitmapP, FILE *readP){
         static int bdfflag = OFF; /* the given bdf-file is valid or not */
 
         while(1){
-                length = getline(sP, LINE_CHARMAX, readP);
+                length = getfontline(sP, LINE_CHARMAX, readP);
                 if((bdfflag == OFF) && (length == 0)){
                         /* given input-file is not a bdf-file */
                         printf("error: input-file is not a bdf file\n");
