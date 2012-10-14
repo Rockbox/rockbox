@@ -33,6 +33,24 @@
       "revId": "fa167f5675f6a3bc0f636fdc0fbc75e032860217",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///4g\u003d",
+        "filename": "apps/elfload.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 636,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-10-14T21:26:26Z",
+      "side": 1,
+      "message": "AFAIK there is no switch for ld to not emit this relocs. We could process elf ourself with custom tool though.",
+      "parentUuid": "AAAASX///4s\u003d",
+      "revId": "fa167f5675f6a3bc0f636fdc0fbc75e032860217",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
