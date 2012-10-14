@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///4o\u003d",
+        "filename": "apps/elfload.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2012-10-14T14:59:24Z",
+      "side": 1,
+      "message": "Plugins probably shouldn\u0027t have to check the alignment of returned buffers; our allocation functions should return aligned memory. malloc() is usually 8 byte aligned on 32-bit platforms and 16 byte aligned on 64-bit.",
+      "revId": "fa167f5675f6a3bc0f636fdc0fbc75e032860217",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///4s\u003d",
+        "filename": "apps/elfload.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 636,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2012-10-14T14:59:24Z",
+      "side": 1,
+      "message": "Can we get the linker to not bother emitting V4BX relocs, or strip them? We won\u0027t ever need them, since we don\u0027t run binaries on processors they weren\u0027t compiled for.",
+      "revId": "fa167f5675f6a3bc0f636fdc0fbc75e032860217",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
