@@ -24,7 +24,7 @@ OUTPUT = mkrk27boot
 
 # inputs
 LIBSOURCES := $(DRIVERS)fat.c $(FIRMWARE)libc/ctype.c  $(FIRMWARE)libc/strtok.c \
-    $(FIRWARE)libc/errno.c$(FIRMWARE)common/strlcpy.c $(FIRMWARE)common/unicode.c \
+    $(FIRWARE)libc/errno.c $(FIRMWARE)common/strlcpy.c $(FIRMWARE)common/unicode.c \
     $(FIRMWARE)common/file.c $(FIRMWARE)common/dir_uncached.c $(FIRMWARE)common/disk.c ata-sim.c mkrk27boot.c
 
 SOURCES := $(LIBSOURCES) main.c
