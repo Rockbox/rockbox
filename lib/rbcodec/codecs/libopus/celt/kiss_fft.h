@@ -128,7 +128,7 @@ kiss_fft_state *opus_fft_alloc(int nfft,void * mem,size_t * lenmem);
     f[k].r and f[k].i
  * */
 void opus_fft(const kiss_fft_state *cfg,const kiss_fft_cpx *fin,kiss_fft_cpx *fout);
-void opus_ifft(const kiss_fft_state *cfg,const kiss_fft_cpx *fin,kiss_fft_cpx *fout);
+void opus_ifft(const kiss_fft_state *cfg,const kiss_fft_cpx *fin,kiss_fft_cpx *fout) ICODE_ATTR;
 
 void opus_fft_free(const kiss_fft_state *cfg);
 

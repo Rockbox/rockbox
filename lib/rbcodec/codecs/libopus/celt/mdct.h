@@ -65,6 +65,6 @@ void clt_mdct_forward(const mdct_lookup *l, kiss_fft_scalar *in,
     (scales implicitly by 1/2) */
 void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in,
       kiss_fft_scalar * OPUS_RESTRICT out,
-      const opus_val16 * OPUS_RESTRICT window, int overlap, int shift, int stride);
+      const opus_val16 * OPUS_RESTRICT window, int overlap, int shift, int stride) ICODE_ATTR;
 
 #endif
