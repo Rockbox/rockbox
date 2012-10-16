@@ -249,17 +249,20 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
       const kiss_fft_scalar * OPUS_RESTRICT xp1 = in;
       const kiss_fft_scalar * OPUS_RESTRICT xp2 = in+stride*(N2-1);
       kiss_fft_scalar * OPUS_RESTRICT yp = f2;
-      const kiss_twiddle_scalar *t = &l->trig[0];
+      const kiss_twiddle_scalar *t0 = &l->trig[0];
+      const kiss_twiddle_scalar *t1 = &l->trig[N4<<shift];
       for(i=0;i<N4;i++)
       {
          kiss_fft_scalar yr, yi;
-         yr = -S_MUL(*xp2, t[i<<shift]) + S_MUL(*xp1,t[(N4-i)<<shift]);
-         yi =  -S_MUL(*xp2, t[(N4-i)<<shift]) - S_MUL(*xp1,t[i<<shift]);
+         yr = -S_MUL(*xp2, *t0) + S_MUL(*xp1, *t1);
+         yi = -S_MUL(*xp2, *t1) - S_MUL(*xp1, *t0);
          /* works because the cos is nearly one */
          *yp++ = yr - S_MUL(yi,sine);
          *yp++ = yi + S_MUL(yr,sine);
          xp1+=2*stride;
          xp2-=2*stride;
+         t0 += stride;
+         t1 -= stride;
       }
    }
 
@@ -269,19 +272,21 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
    /* Post-rotate */
    {
       kiss_fft_scalar * OPUS_RESTRICT fp = f;
-      const kiss_twiddle_scalar *t = &l->trig[0];
-
+      const kiss_twiddle_scalar *t0 = &l->trig[0];
+      const kiss_twiddle_scalar *t1 = &l->trig[N4<<shift];
       for(i=0;i<N4;i++)
       {
          kiss_fft_scalar re, im, yr, yi;
          re = fp[0];
          im = fp[1];
          /* We'd scale up by 2 here, but instead it's done when mixing the windows */
-         yr = S_MUL(re,t[i<<shift]) - S_MUL(im,t[(N4-i)<<shift]);
-         yi = S_MUL(im,t[i<<shift]) + S_MUL(re,t[(N4-i)<<shift]);
+         yr = S_MUL(re, *t0) - S_MUL(im, *t1);
+         yi = S_MUL(im, *t0) + S_MUL(re, *t1);
          /* works because the cos is nearly one */
          *fp++ = yr - S_MUL(yi,sine);
          *fp++ = yi + S_MUL(yr,sine);
+         t0 += stride;
+         t1 -= stride;
       }
    }
    /* De-shuffle the components for the middle of the window only */
