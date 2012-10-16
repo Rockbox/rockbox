@@ -215,6 +215,7 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
 {
    int i;
    int N, N2, N4;
+   int tstride = 1<<shift;
    kiss_twiddle_scalar sine;
    VARDECL(kiss_fft_scalar, f);
    VARDECL(kiss_fft_scalar, f2);
@@ -261,8 +262,8 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
          *yp++ = yi + S_MUL(yr,sine);
          xp1+=2*stride;
          xp2-=2*stride;
-         t0 += stride;
-         t1 -= stride;
+         t0 += tstride;
+         t1 -= tstride;
       }
    }
 
@@ -285,8 +286,8 @@ void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_scala
          /* works because the cos is nearly one */
          *fp++ = yr - S_MUL(yi,sine);
          *fp++ = yi + S_MUL(yr,sine);
-         t0 += stride;
-         t1 -= stride;
+         t0 += tstride;
+         t1 -= tstride;
       }
    }
    /* De-shuffle the components for the middle of the window only */
