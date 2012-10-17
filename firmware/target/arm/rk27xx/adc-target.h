@@ -25,7 +25,12 @@
 
 #define ADC_BATTERY     0
 #define ADC_BUTTONS     1
-#define ADC_UNKNOWN     2
+
+/* HiFiMAN HM-801 usually use this channel for second battery,
+   but some of them use it for buttons.
+ */
+#define ADC_EXTRA       2
+
 #define ADC_VREF        3 /* that is what datasheet says */
 
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
