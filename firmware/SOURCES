@@ -675,7 +675,7 @@ target/arm/ipod/lcd-color_nano.c
 target/arm/ipod/lcd-gray.c
 #elif CONFIG_LCD == LCD_GIGABEATS
 target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
-#elif CONFIG_LCD == LCD_GIGABEAT
+#elif CONFIG_LCD == LCD_GIGABEAT || CONFIG_LCD == LCD_MINI2440
 target/arm/s3c2440/lcd-s3c2440.c
 #endif
 
