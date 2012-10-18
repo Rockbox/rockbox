@@ -129,7 +129,7 @@ int const c10 = 0x10; // cz
 
 	#ifdef BLARGG_BIG_ENDIAN
 		#define R8( n ) (reg.r8_ [n]) 
-	#elif BLARGG_LITTLE_ENDIAN
+	#elif defined(BLARGG_LITTLE_ENDIAN)
 		#define R8( n ) (reg.r8_ [(n) ^ 1]) 
 	#else
 		// Be sure "blargg_endian.h" has been #included in the file that #includes this

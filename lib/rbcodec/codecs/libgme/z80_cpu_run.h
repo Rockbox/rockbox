@@ -131,7 +131,7 @@ int const C01 = 0x01;
 
 #ifdef BLARGG_BIG_ENDIAN
 	#define R8( n, offset ) ((r.r8_ - offset) [n]) 
-#elif BLARGG_LITTLE_ENDIAN
+#elif defined(BLARGG_LITTLE_ENDIAN)
 	#define R8( n, offset ) ((r.r8_ - offset) [(n) ^ 1]) 
 #else
 	#error "Byte order of CPU must be known"
