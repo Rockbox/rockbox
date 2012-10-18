@@ -1584,6 +1584,21 @@ static int parse_touchregion(struct skin_element *element,
 }
 #endif
 
+static int parse_file_exists(struct skin_element *element,
+                               struct wps_token *token,
+                               struct wps_data *wps_data)
+{
+    char *path = get_param_text(element, 0);
+    void *data = struct skin_var_lastchange *data
+            = skin_buffer_alloc(strlen(path));
+
+    if (!data)
+        return -1;
+
+    token->value.data = PTRTOSKINOFFSET(skin_buffer, data);
+    return 0;
+}
+
 static bool check_feature_tag(const int type)
 {
     switch (type)
@@ -2218,6 +2233,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     function = parse_skinvar;
                     break;
 #endif
+                case SKIN_TOKEN_FILE_EXISTS:
+                    function = parse_file_exists;
+                    break;
                 default:
                     break;
             }

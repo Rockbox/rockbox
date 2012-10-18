@@ -243,6 +243,8 @@ enum skin_token_type {
     /* hold */
     SKIN_TOKEN_MAIN_HOLD,
     SKIN_TOKEN_REMOTE_HOLD,
+    /* misc */
+    SKIN_TOKEN_FILE_EXISTS,
 
     /* Setting option */
     SKIN_TOKEN_SETTING,

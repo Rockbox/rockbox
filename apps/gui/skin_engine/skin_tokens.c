@@ -913,6 +913,24 @@ const char *get_token_value(struct gui_wps *gwps,
             return truecount ? "true" : NULL;
         }
         break;
+        case SKIN_TOKEN_FILE_EXISTS:
+        {
+            char *path = SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
+
+            if (!path || !*path)
+                return NULL;
+
+            if (*path == '/')
+                return file_exists(path) ? "y" : NULL;
+            else
+            {
+                // do some magic here to append the current track filename
+                // with the requested path
+                return NULL;
+            }
+        }
+        break;
+                
         case SKIN_TOKEN_SUBSTRING:
         {
             struct substring *ss = SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
