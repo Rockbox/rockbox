@@ -284,7 +284,7 @@ struct rknano_stage_header_t
 
 /*
  * The [code_pa,code_pa+code_sz[ and [data_pa,data_pa+data_sz[ ranges
- * are consitent: they never overlap and have no gaps and fill the
+ * are consistent: they never overlap and have no gaps and fill the
  * entire space. Furthermore they match the code sequences so it's
  * reasonable to assume these fields are correct.
  * The other fields are still quite unsure. */
@@ -411,12 +411,16 @@ struct rknano_boot_desc_t
 struct rknano_boot_header_t
 {
     char magic[MAGIC_BOOT_SIZE];
-    uint16_t field_4;
-    uint32_t field_6;
-    uint32_t field_A;
-    uint16_t field_E;
-    uint8_t field_10[5];
-    uint32_t field_15;
+    uint16_t hdr_size;
+    uint32_t version;
+    uint32_t unk;
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    uint32_t chip;
     struct rknano_boot_desc_t desc_1;
     struct rknano_boot_desc_t desc_2;
     struct rknano_boot_desc_t desc_4;
@@ -564,8 +568,6 @@ static int do_boot_desc(uint8_t *buf, unsigned long size,
 
 static int do_boot_image(uint8_t *buf, unsigned long size)
 {
-    if(sizeof(struct rknano_boot_header_t) != 0x38)
-        printf("aie");
     if(size < sizeof(struct rknano_boot_header_t))
         return 1;
     struct rknano_boot_header_t *hdr = (void *)buf;
@@ -579,16 +581,29 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
         cprintf(RED, "OK\n");
     else
         cprintf(RED, "Mismatch\n");
+
+    cprintf(GREEN, "  Header Size: ");
+    cprintf(YELLOW, "%#x ", hdr->hdr_size);
+    if(hdr->hdr_size >= sizeof(struct rknano_boot_header_t))
+        cprintf(RED, "OK\n");
+    else
+        cprintf(RED, "Mismatch\n");
+    
 #define print(str, name) cprintf(GREEN, "  "str": ");cprintf(YELLOW, "%#x\n", (unsigned)hdr->name)
 #define print_arr(str, name, sz) \
     cprintf(GREEN, "  "str":");for(int i = 0; i < sz; i++)cprintf(YELLOW, " %#x", (unsigned)hdr->name[i]);printf("\n")
 
-    print("field_4", field_4);
-    print("field_6", field_6);
-    print("field_A", field_A);
-    print("field_E", field_E);
-    print_arr("field_10", field_10, 5);
-    print("field_15", field_15);
+    cprintf(GREEN, "  Version: ");
+    cprintf(YELLOW, "%x.%x.%x\n", (hdr->version >> 24) & 0xff,
+        (hdr->version >> 16) & 0xff, hdr->version & 0xffff);
+
+    cprintf(GREEN, "  Date: ");
+    cprintf(YELLOW, "%d/%d/%d %02d:%02d:%02d\n", hdr->day, hdr->month, hdr->year,
+        hdr->hour, hdr->minute, hdr->second);
+
+    cprintf(GREEN, "  Chip: ");
+    cprintf(YELLOW, "%#x\n", hdr->chip);
+    
     print_arr("field_2A", field_2B, 9);
     print("field_34", field_34);
 
@@ -623,21 +638,22 @@ struct rkfw_header_t
 {
     char magic[MAGIC_RKFW_SIZE];
     uint16_t hdr_size; // UNSURE
-    uint32_t field_6;
-    uint32_t field_A;
-    uint16_t field_E;
-    uint8_t field_10[5];
-    uint32_t field_15;
+    uint32_t version;
+    uint32_t code;
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    uint32_t chip;
     rkfw_blob_t loader;
     rkfw_blob_t update;
-    uint8_t pad[60];
-    uint8_t field_65;
+    uint8_t pad[61];
 } __attribute__((packed));
 
 static int do_rkfw_image(uint8_t *buf, unsigned long size)
 {
-    if(sizeof(struct rkfw_header_t) != 0x66)
-        printf("aie");
     if(size < sizeof(struct rkfw_header_t))
         return 1;
     struct rkfw_header_t *hdr = (void *)buf;
@@ -652,6 +668,26 @@ static int do_rkfw_image(uint8_t *buf, unsigned long size)
     else
         cprintf(RED, "Mismatch\n");
 
+    cprintf(GREEN, "  Header size: ");
+    cprintf(YELLOW, " %#x ", hdr->hdr_size);
+    if(hdr->hdr_size == sizeof(struct rkfw_header_t))
+        cprintf(RED, "OK\n");
+    else
+        cprintf(RED, "Mismatch\n");
+    cprintf(GREEN, "  Version: ");
+    cprintf(YELLOW, "%x.%x.%x\n", (hdr->version >> 24) & 0xff,
+        (hdr->version >> 16) & 0xff, hdr->version & 0xffff);
+
+    cprintf(GREEN, "  Code: ");
+    cprintf(YELLOW, "%#x\n", hdr->code);
+
+    cprintf(GREEN, "  Date: ");
+    cprintf(YELLOW, "%d/%d/%d %02d:%02d:%02d\n", hdr->day, hdr->month, hdr->year,
+        hdr->hour, hdr->minute, hdr->second);
+
+    cprintf(GREEN, "  Chip: ");
+    cprintf(YELLOW, "%#x\n", hdr->chip);
+    
     cprintf(GREEN, "  Loader: ");
     print_blob_interval(&hdr->loader);
     cprintf(OFF, "\n");
@@ -662,14 +698,42 @@ static int do_rkfw_image(uint8_t *buf, unsigned long size)
     cprintf(OFF, "\n");
     save_blob(&hdr->update, buf, size, "update", 0, NO_ENC);
 
-    print("hdr_size", hdr_size);
-    print("field_6", field_6);
-    print("field_A", field_A);
-    print("field_E", field_E);
-    print_arr("field_10", field_10, 5);
-    print("field_15", field_15);
-    print_arr("pad", pad, 60);
-    print("field_65", field_65);
+    print_arr("pad", pad, 61);
+
+    return 0;
+}
+
+static int do_rkencode_image(uint8_t *buf, unsigned long size)
+{
+    void *ptr = malloc(size);
+    int len = size;
+    uint8_t *buff_ptr = buf;
+    uint8_t *out_ptr = ptr;
+    int enc_mode = PAGE_ENC;
+    if(enc_mode == PAGE_ENC)
+    {
+        while(len >= 0x200)
+        {
+            encode_page(buff_ptr, out_ptr, 0x200);
+            buff_ptr += 0x200;
+            out_ptr += 0x200;
+            len -= 0x200;
+        }
+    }
+    encode_page(buff_ptr, out_ptr, len);
+
+    if(g_out_prefix)
+    {
+        FILE *f = fopen(g_out_prefix, "wb");
+        if(f)
+        {
+            fwrite(buff_ptr, 1, size, f);
+            fclose(f);
+        }
+        else
+            printf("Cannot open output file: %m\n");
+    }
+    free(ptr);
 
     return 0;
 }
@@ -682,6 +746,7 @@ static void usage(void)
     printf("  --rknanofw\tUnpack a regular RknanoFW file\n");
     printf("  --rkboot\tUnpack a BOOT file\n");
     printf("  --rknanostage\tUnpack a RknanoFW stage file\n");
+    printf("  --rkencode\tEncode a raw file\n");
     printf("  -o <prefix>\tSet output prefix\n");
     printf("The default is to try to guess the format.\n");
     printf("If several formats are specified, all are tried.\n");
@@ -694,6 +759,7 @@ int main(int argc, char **argv)
     bool try_rkfw = false;
     bool try_boot = false;
     bool try_nanostage = false;
+    bool try_rkencode = false;
 
     while(1)
     {
@@ -704,12 +770,13 @@ int main(int argc, char **argv)
             {"rkfw", no_argument, 0, '9'},
             {"rknanofw", no_argument, 0, 'n'},
             {"rknanostage", no_argument, 0, 's'},
+            {"rkencode", no_argument, 0, 'e'},
             {"rkboot", no_argument, 0, 'b'},
             {"no-color", no_argument, 0, 'c'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?d9nscbo:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?d9nscbeo:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -740,7 +807,11 @@ int main(int argc, char **argv)
             case 's':
                 try_nanostage = true;
                 break;
+            case 'e':
+                try_rkencode = true;
+                break;
             default:
+                printf("Invalid argument '%c'\n", c);
                 abort();
         }
     }
@@ -751,7 +822,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if(!try_nanostage && !try_rkfw && !try_nanofw && !try_boot)
+    if(!try_nanostage && !try_rkfw && !try_nanofw && !try_boot && !try_rkencode)
         try_nanostage = try_rkfw = try_nanofw = try_boot = true;
 
     FILE *fin = fopen(argv[optind], "r");
@@ -786,6 +857,8 @@ int main(int argc, char **argv)
     if(try_boot && !do_boot_image(buf, size))
         goto Lsuccess;
     if(try_nanostage && !do_nanostage_image(buf, size))
+        goto Lsuccess;
+    if(try_rkencode && !do_rkencode_image(buf, size))
         goto Lsuccess;
     cprintf(GREY, "No valid format found!\n");
     Lsuccess:
