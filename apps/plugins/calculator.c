@@ -823,6 +823,41 @@ static double mySqrt(double square)
 
     return root;
 }
+
+/*Uses the sequence sum(x^k/k!) that tends to exp(x)*/
+static double myExp (double x) {
+    unsigned int k=0;
+    double res=0, xPow=1,fact=1,toAdd;
+
+    do {
+        toAdd = xPow/fact;
+        res += toAdd;
+        xPow *= x; //xPow = x^k
+        k++;
+        fact*=k; //fact = k!
+    } while (ABS(toAdd) > MINIMUM && xPow<1e302);
+    return res;
+}
+
+/*myLn : uses the series ln⁡(a) = 2 * ∑(1/(2n+1) * ((a-1)/(a+1))^(2k+1) )*/
+static double myLn (double a) {
+    unsigned int k=1;
+    double res=0,xPow,xSquare,fract=1,toAdd;
+
+    xPow = (a-1)/(a+1);
+    xSquare = xPow*xPow;
+
+    do {
+        toAdd = fract*xPow;
+        res += toAdd;
+        xPow *= xSquare; // ((a-1)/(a+1))^k
+        k+=2;
+        fract=1./k;
+    } while (ABS(toAdd) > MINIMUM);
+    return res * 2;
+}
+
+
 /* -----------------------------------------------------------------------
    transcendFunc uses CORDIC (COordinate Rotation DIgital Computer) method
    transcendFunc can do sin,cos,log,exp
@@ -951,6 +986,7 @@ Handles all one operand calculations
 static void oneOperand(void)
 {
     int k = 0;
+
     if (buttonGroup == basicButtons){
         switch(CAL_BUTTON){
             case btn_sqr:
@@ -1022,6 +1058,40 @@ static void oneOperand(void)
                         }
                         calStatus = cal_normal;
                     }
+                }
+                break;
+            case sci_exp:
+                /*Uses the sequence (1+a/n)^n -> exp(a) */
+                if (power>3 || result > 1e3) calStatus = cal_error;
+                else {
+                    while(power < 0) {
+                            result /= 10;
+                            power++;
+                    }
+                    while (power > 0){
+                        power--;
+                        result*=10;
+                    }
+                    result = myExp(result);
+                    calStatus = cal_normal;
+                }
+                break;
+            case sci_ln:
+                if (result<=0) calStatus = cal_error;
+                else {
+               //ln(a*10^n) = ln(a) + n*ln(10), with ln(10) ≈  2.30
+                    result = myLn(result) + power * 2.302585092994046;
+                    power=0;
+                    calStatus = cal_normal;
+                }
+                break;
+            case sci_log:
+                if (result<=0) calStatus = cal_error;
+                else {
+               //log10(a+10^n) = ln(a)/ln(10) + n, with ln(10) ≈  2.30
+                    result = myLn(result)/2.302585092994046 + power;
+                    power=0;
+                    calStatus = cal_normal;
                 }
                 break;
             default:
@@ -1601,7 +1671,10 @@ static void sciButtonsProcess(void){
                     calStatus = cal_normal;
                     break;
 
-                case sci_xy:  break;
+                case sci_xy:
+                    /*Not implemented yet
+                    Maybe it could use x^y = exp(y*ln(x))*/
+                    break;
 
                 case sci_sci:
                     buttonGroup = basicButtons;
