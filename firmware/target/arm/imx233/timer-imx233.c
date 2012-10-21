@@ -58,7 +58,7 @@ bool timer_set(long cycles, bool start)
 bool timer_start(IF_COP_VOID(int core))
 {
     imx233_setup_timer(USER_TIMER_NR, true, timer_cycles,
-        HW_TIMROT_TIMCTRL__SELECT_TICK_ALWAYS, HW_TIMROT_TIMCTRL__PRESCALE_1,
+        HW_TIMROT_TIMCTRL__SELECT_32KHZ_XTAL, HW_TIMROT_TIMCTRL__PRESCALE_1,
             false, &timer_fn);
     return true;
 }

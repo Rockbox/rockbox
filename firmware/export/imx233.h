@@ -61,8 +61,8 @@
 #define FRAME_PHYS_ADDR (DRAM_ORIG + DRAM_SIZE - TTB_SIZE - FRAME_SIZE)
 #define FRAME           ((void *)(FRAME_PHYS_ADDR - UNCACHED_DRAM_ADDR + BUFFERED_DRAM_ADDR))
 
-/* Timer runs at APBX speed which is derived from ref_xtal@24MHz */
-#define TIMER_FREQ      24000000
+/* Timer runs at 32KHz, derived from clk32k@32KHz */
+#define TIMER_FREQ      32000
 
 /* USBOTG */
 #define USB_QHARRAY_ATTR    __attribute__((section(".qharray"),nocommon,aligned(2048)))
