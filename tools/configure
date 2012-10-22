@@ -3707,6 +3707,12 @@ if test "$CC" = "sh-elf-gcc"; then
       echo "WARNING: You use an unpatched gcc compiler: $gccver"
       echo "WARNING: http://www.rockbox.org/twiki/bin/view/Main/CrossCompiler"
     fi
+
+    if test "$gccnum" -ge "406"; then
+        echo "Enabling link-time optimization"
+        GCCOPTS="$GCCOPTS -flto"
+    fi
+
   fi
 fi
 
