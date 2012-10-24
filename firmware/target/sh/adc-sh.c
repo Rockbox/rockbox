@@ -59,7 +59,7 @@ static void adc_tick(void)
     ADCSR = ADCSR_ADST | ADCSR_ADIE | ADCSR_SCAN | 3;
 }
 
-void ADITI(void) __attribute__((interrupt_handler)) USED_ATTR;
+void ADITI(void) __attribute__((interrupt_handler));
 void ADITI(void)
 {
     if(ADCSR & ADCSR_ADF)

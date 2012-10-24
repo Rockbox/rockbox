@@ -55,7 +55,7 @@ void tick_start(unsigned int interval_in_ms)
     TSTR |= 0x01; /* Start timer 1 */
 }
 
-void IMIA0(void) __attribute__ ((interrupt_handler)) USED_ATTR;
+void IMIA0(void) __attribute__ ((interrupt_handler));
 void IMIA0(void)
 {
     /* Run through the list of tick tasks */

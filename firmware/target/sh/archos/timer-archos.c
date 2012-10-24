@@ -23,7 +23,7 @@
 #include "system.h"
 #include "timer.h"
 
-void IMIA4(void) __attribute__((interrupt_handler)) USED_ATTR;
+void IMIA4(void) __attribute__((interrupt_handler));
 void IMIA4(void)
 {
     if (pfn_timer != NULL)

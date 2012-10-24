@@ -29,22 +29,22 @@ void __attribute__((naked)) __div0(void)
 }
 #endif
 
-void USED_ATTR *memcpy(void *dest, const void *src, size_t n)
+void *memcpy(void *dest, const void *src, size_t n)
 {
     return rb->memcpy(dest, src, n);
 }
 
-void USED_ATTR *memset(void *dest, int c, size_t n)
+void *memset(void *dest, int c, size_t n)
 {
     return rb->memset(dest, c, n);
 }
 
-void USED_ATTR *memmove(void *dest, const void *src, size_t n)
+void *memmove(void *dest, const void *src, size_t n)
 {
     return rb->memmove(dest, src, n);
 }
 
-int USED_ATTR memcmp(const void *s1, const void *s2, size_t n)
+int memcmp(const void *s1, const void *s2, size_t n)
 {
     return rb->memcmp(s1, s2, n);
 }

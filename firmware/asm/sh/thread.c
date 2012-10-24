@@ -30,7 +30,6 @@ static void USED_ATTR __start_thread(void)
 {
     /* r8 = context */
     asm volatile (
-    ".global _start_thread \n"
     "_start_thread:            \n" /* Start here - no naked attribute */
         "mov.l  @(4, r8), r0   \n" /* Fetch thread function pointer */
         "mov.l  @(28, r8), r15 \n" /* Set initial sp */
