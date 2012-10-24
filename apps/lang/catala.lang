@@ -12992,3 +12992,31 @@
     *: "Només a les carpetes personalitzades"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Seleccionar un o més directoris"
+  </dest>
+  <voice>
+    *: "Seleccionar un o més directoris"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Seleccionar directoris a escanejar"
+  </dest>
+  <voice>
+    *: "Seleccionar directoris a escanejar"
+  </voice>
+</phrase>
