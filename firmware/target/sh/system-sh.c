@@ -180,6 +180,7 @@ asm (
  * Must go into the same section as the UIE() handler */
 
     "\t.text\n"
+    ".global\t_UIE4\n"
     "_UIE4:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
     "_UIE5:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
     "_UIE6:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
@@ -286,13 +287,17 @@ asm (
     "_UIE107:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
     "_UIE108:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
     "_UIE109:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
-
+    "_UIE:\tmov.l\t__UIE_k,r0\n"
+    "jmp\t@r0\n"
+    "nop\n"
+    ".align\t4\n"
+    "__UIE_k:\t.long\t__UIE\n"
 );
 
 extern void UIE4(void); /* needed for calculating the UIE number */
 
-void UIE (unsigned int pc) __attribute__((section(".text")));
-void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
+void _UIE (unsigned int pc) __attribute__((section(".text"))) USED_ATTR;
+void _UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
     unsigned int n;
 

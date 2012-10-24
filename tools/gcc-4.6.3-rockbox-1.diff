@@ -1,0 +1,44 @@
+diff -ru gcc-4.6.2-orig/gcc/config/sh/sh.h gcc-4.6.2/gcc/config/sh/sh.h
+--- gcc-4.6.2-orig/gcc/config/sh/sh.h	2010-12-22 07:06:01.000000000 -0500
++++ gcc-4.6.2/gcc/config/sh/sh.h	2011-12-07 19:32:19.077218981 -0500
+@@ -1939,12 +1939,15 @@
+ #define CASE_VECTOR_MODE ((! optimize || TARGET_BIGTABLE) ? SImode : HImode)
+ 
+ #define CASE_VECTOR_SHORTEN_MODE(MIN_OFFSET, MAX_OFFSET, BODY) \
+-((MIN_OFFSET) >= 0 && (MAX_OFFSET) <= 127 \
++((MIN_OFFSET) >= 0 && (MAX_OFFSET) <= 126 \
+  ? (ADDR_DIFF_VEC_FLAGS (BODY).offset_unsigned = 0, QImode) \
+- : (MIN_OFFSET) >= 0 && (MAX_OFFSET) <= 255 \
++ : (MIN_OFFSET) >= 0 && (MAX_OFFSET) <= 254 \
+  ? (ADDR_DIFF_VEC_FLAGS (BODY).offset_unsigned = 1, QImode) \
+  : (MIN_OFFSET) >= -32768 && (MAX_OFFSET) <= 32767 ? HImode \
+  : SImode)
++/* Note: The maximum range for byte-sized offsets was reduced by 1 to work
++   around a bug in final.c I don't know how to fix properly (jump table
++   length calculation should take alignment into account). -- Jens Arnold */
+ 
+ /* Define as C expression which evaluates to nonzero if the tablejump
+    instruction expects the table to contain offsets from the address of the
+diff -ru gcc-4.6.2-orig/gcc/config.gcc gcc-4.6.2/gcc/config.gcc
+--- gcc-4.6.2-orig/gcc/config.gcc	2011-07-22 12:44:50.000000000 -0400
++++ gcc-4.6.2/gcc/config.gcc	2011-12-07 19:32:19.085219120 -0500
+@@ -2454,7 +2454,7 @@
+ 		esac
+ 		tm_defines="$tm_defines STRICT_NOFPU=1"
+ 	fi
+-	sh_cpu_default="`echo $with_cpu|sed s/^m/sh/|tr A-Z_ a-z-`"
++	sh_cpu_default="`echo $with_cpu|sed s/^m/sh/|tr [A-Z]_ [a-z]-`"
+ 	case $sh_cpu_default in
+ 	sh5-64media-nofpu | sh5-64media | \
+ 	  sh5-32media-nofpu | sh5-32media | sh5-compact-nofpu | sh5-compact | \
+Only in gcc-4.6.2/gcc: config.gcc.orig
+diff -ru gcc-4.6.2-orig/gcc/version.c gcc-4.6.2/gcc/version.c
+--- gcc-4.6.2-orig/gcc/version.c	2009-04-21 15:03:23.000000000 -0400
++++ gcc-4.6.2/gcc/version.c	2011-12-07 19:32:45.677661343 -0500
+@@ -32,5 +32,5 @@
+    BASEVER, DATESTAMP, DEVPHASE, and REVISION are defined by the
+    Makefile.  */
+ 
+-const char version_string[] = BASEVER DATESTAMP DEVPHASE REVISION;
++const char version_string[] = BASEVER DATESTAMP DEVPHASE REVISION " (rockbox preliminary patch #1)";
+ const char pkgversion_string[] = PKGVERSION;
