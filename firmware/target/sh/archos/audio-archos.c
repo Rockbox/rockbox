@@ -153,7 +153,7 @@ static void play_tick(void)
     }
 }
 
-void DEI3(void) __attribute__((interrupt_handler));
+void DEI3(void) __attribute__((interrupt_handler)) USED_ATTR;
 void DEI3(void)
 {
     const void* start;
@@ -177,7 +177,7 @@ void DEI3(void)
     CHCR3 &= ~0x0002; /* Clear DMA interrupt */
 }
 
-void IMIA1(void) __attribute__((interrupt_handler));
+void IMIA1(void) __attribute__((interrupt_handler)) USED_ATTR;
 void IMIA1(void) /* Timer 1 interrupt */
 {
     if(playing)
@@ -189,14 +189,14 @@ void IMIA1(void) /* Timer 1 interrupt */
 #endif
 }
 
-void IRQ6(void) __attribute__((interrupt_handler));
+void IRQ6(void) __attribute__((interrupt_handler)) USED_ATTR;
 void IRQ6(void) /* PB14: MAS stop demand IRQ */
 {
     SCR0 &= ~0x80;
 }
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-void IRQ3(void) __attribute__((interrupt_handler));
+void IRQ3(void) __attribute__((interrupt_handler)) USED_ATTR;
 void IRQ3(void) /* PA15: MAS demand IRQ */
 {
     /* Begin with setting the IRQ to edge sensitive */
