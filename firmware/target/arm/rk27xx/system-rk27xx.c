@@ -218,11 +218,15 @@ static void __attribute__((noinline)) cache_invalidate_way(int way)
 
 void commit_discard_idcache(void)
 {
+    DEVID &= ~(1<<31); /* disable cache */
+
     /* invalidate cache way 0 */
     cache_invalidate_way(0);
 
     /* invalidate cache way 1 */
     cache_invalidate_way(1);
+
+    DEVID |= (1<<31); /* enable cache */
 }
 void commit_discard_dcache (void) __attribute__((alias("commit_discard_idcache")));
 
