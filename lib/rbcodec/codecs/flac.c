@@ -483,7 +483,7 @@ enum codec_status codec_run(void)
 
     flac_seek_offset(&fc, samplesdone);
     samplesdone=fc.samplenumber+fc.blocksize;
-    elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+    elapsedtime=((uint64_t)samplesdone*1000)/(ci->id3->frequency);
     ci->set_elapsed(elapsedtime);
 
     /* The main decoding loop */
@@ -523,7 +523,7 @@ enum codec_status codec_run(void)
 
         /* Update the elapsed-time indicator */
         samplesdone=fc.samplenumber+fc.blocksize;
-        elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+        elapsedtime=((uint64_t)samplesdone*1000)/(ci->id3->frequency);
         ci->set_elapsed(elapsedtime);
 
         ci->advance_buffer(consumed);
