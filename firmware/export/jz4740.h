@@ -3546,8 +3546,8 @@ static __inline__ void __cpm_select_msc_hs_clk(int sd)
 #define __tcu_set_pwm_output_shutdown_graceful(n)    ( REG_TCU_TCSR((n)) &= ~TCU_TCSR_PWM_SD )
 #define __tcu_set_pwm_output_shutdown_abrupt(n)        ( REG_TCU_TCSR((n)) |= TCU_TCSR_PWM_SD )
 
-#define __tcu_start_counter(n)        ( REG_TCU_TESR |= (1 << (n)) )
-#define __tcu_stop_counter(n)        ( REG_TCU_TECR |= (1 << (n)) )
+#define __tcu_start_counter(n)        ( REG_TCU_TESR = (1 << (n)) )
+#define __tcu_stop_counter(n)        ( REG_TCU_TECR = (1 << (n)) )
 
 #define __tcu_half_match_flag(n)    ( REG_TCU_TFR & (1 << ((n) + 16)) )
 #define __tcu_full_match_flag(n)    ( REG_TCU_TFR & (1 << (n)) )
