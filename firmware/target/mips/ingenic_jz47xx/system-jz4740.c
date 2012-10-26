@@ -137,7 +137,7 @@ static void dis_irq(unsigned int irq)
         if (!gpio_irq_mask[t])
             __intc_mask_irq(IRQ_GPIO0 - t);
     }
-    else if ((irq >= IRQ_DMA_0) && (irq <= IRQ_DMA_0 + NUM_DMA))
+    else if ((irq >= IRQ_DMA_0) && (irq < IRQ_DMA_0 + NUM_DMA))
     {
         __dmac_channel_disable_irq(irq - IRQ_DMA_0);
         dma_irq_mask &= ~(1 << (irq - IRQ_DMA_0));
