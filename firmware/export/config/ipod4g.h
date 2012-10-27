@@ -228,7 +228,7 @@
 /* DMA is used only for reading on PP502x because although reads are ~8x faster
  * writes appear to be ~25% slower.
  */
-/* Switched off due to reported instabilities. #define HAVE_ATA_DMA */
+#define HAVE_ATA_DMA
 
 /* Define this, if you can switch on/off the lineout */
 #define HAVE_LINEOUT_POWEROFF
