@@ -219,9 +219,26 @@ void ICODE_ATTR commit_discard_idcache(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
-        CACHE_OPERATION |= CACHE_OP_FLUSH | CACHE_OP_INVALIDATE;
-        while ((CACHE_CTL & CACHE_CTL_BUSY) != 0);
-        nop; nop; nop; nop;
+        register int istat = disable_interrupt_save(IRQ_FIQ_STATUS);
+
+        commit_dcache();
+
+        /* Cache lines which are not marked as valid can cause memory
+         * corruption when there are many writes to and code fetches from
+         * cached memory. This workaround points all cache status words past
+         * end of RAM and marks them as valid, but not dirty. Since that area
+         * is never accessed, the cache lines don't affect anything, and
+         * they're effectively discarded. Interrupts must be disabled here
+         * because any change they make to cached memory could be discarded.
+         */
+
+        register volatile unsigned long *p;
+        for (p = &CACHE_STATUS_BASE;
+             p < (&CACHE_STATUS_BASE) + 512*16/sizeof(*p);
+             p += 16/sizeof(*p))
+            *p = ((MEMORYSIZE*0x100000) >> 11) | 0x800000;
+
+        restore_interrupt(istat);
     }
 }
 
@@ -253,6 +270,13 @@ static void init_cache(void)
     /* enable cache */
     CACHE_CTL |= CACHE_CTL_INIT | CACHE_CTL_ENABLE | CACHE_CTL_RUN;
     nop; nop; nop; nop;
+
+    /* Ensure all cache lines are valid for the next flush. Since this
+     * can run from cached RAM, rewriting of cache status words may not
+     * be safe and the cache is filled instead by reading. */
+    register volatile char *p;
+    for (p = (volatile char *)0; p < (volatile char *)0x2000; p += 0x10)
+        (void)*p;
 }
 #endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
 
