@@ -97,7 +97,7 @@ void irq_handler(void)
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
     int irq_no = INTC_ISR & 0x1f;
-    
+
     irqvector[irq_no]();
 
     /* clear interrupt */
@@ -200,14 +200,7 @@ void udelay(unsigned usecs)
     );
 }
 
-/* Invalidating both cache lines from single function
- * gives sometimes strange data aborts.
- * This version resembles how OF invalidates cache.
- * noinline attribute is to guarantee that future
- * gcc change will not decide to inline this call (although
- * current arm-eabi version from our toolchain doesn't do that
- */
-static void __attribute__((noinline)) cache_invalidate_way(int way)
+static void cache_invalidate_way(int way)
 {
     /* Issue invalidata way command to the cache controler */
     CACHEOP = ((way<<31)|0x2);
@@ -218,15 +211,13 @@ static void __attribute__((noinline)) cache_invalidate_way(int way)
 
 void commit_discard_idcache(void)
 {
-    DEVID &= ~(1<<31); /* disable cache */
+    int old_irq = disable_irq_save();
 
-    /* invalidate cache way 0 */
     cache_invalidate_way(0);
 
-    /* invalidate cache way 1 */
     cache_invalidate_way(1);
 
-    DEVID |= (1<<31); /* enable cache */
+    restore_irq(old_irq);
 }
 void commit_discard_dcache (void) __attribute__((alias("commit_discard_idcache")));
 
@@ -234,6 +225,8 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
 {
     int cnt = size + ((unsigned long)base & 0x1f);
     unsigned long opcode = ((unsigned long)base & 0xffffffe0) | 0x01;
+
+    int old_irq = disable_irq_save();
 
     while (cnt > 0)
     {
@@ -244,6 +237,8 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
         cnt -= 32;
         opcode += 32;
     }
+
+    restore_irq(old_irq);
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
