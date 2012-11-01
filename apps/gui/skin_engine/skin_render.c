@@ -327,6 +327,49 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             }
             break;
 #endif
+        case SKIN_TOKEN_METADATA_USERTEXT:
+            {
+                struct skin_viewport *metadata_vp = NULL;
+                struct skin_element *element;
+                char *old_skin_buffer = skin_buffer;
+                struct gui_wps *metadata_wps = skin_get_gwps(METADATA, SCREEN_MAIN);
+                char name[16];
+                int i = viewport_get_nb_lines(vp);
+
+                if (!metadata_wps)
+                    break;
+
+                while (i > 0 && !metadata_vp)
+                {
+                    snprintf(name, 16, "%s_%d", token->next ? "next" : "this", i);
+                    metadata_vp = skin_find_item(name, SKIN_FIND_VP, metadata_wps->data);
+                    i--;
+                }
+
+                if (metadata_vp)
+                {
+                    metadata_vp->parsed_fontid = info->skin_vp->parsed_fontid;
+                    i++;
+                    skin_buffer = get_skin_buffer(metadata_wps->data);
+                    memcpy(&metadata_vp->vp, vp, sizeof(*vp));
+                    metadata_vp->vp.height = i *
+                            (metadata_vp->vp.height / viewport_get_nb_lines(vp));
+                    
+                    element = SKINOFFSETTOPTR(skin_buffer, metadata_vp->element);
+                    if (element->children_count)
+                    {
+                        skin_render_viewport(get_child(element->children, 0),
+                                metadata_wps, metadata_vp, info->refresh_type);
+                        /*
+                         * tell the calling _render_viewport how many lines we drew.
+                         * i - 1 because it does ++ later anyway.
+                         */
+                        info->line_number += i - 1;
+                    }
+                    skin_buffer = old_skin_buffer;
+                }
+            }
+            break;
         default:
             return false;
     }

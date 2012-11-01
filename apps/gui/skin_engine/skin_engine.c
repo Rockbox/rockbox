@@ -246,6 +246,10 @@ static char* get_skin_filename(char *buf, size_t buf_size,
             }
             break;
 #endif
+        case METADATA:
+            setting = "metadata";
+            ext = "txt";
+            break;
         default:
             return NULL;
     }
