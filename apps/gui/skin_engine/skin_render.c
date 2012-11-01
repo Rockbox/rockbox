@@ -327,6 +327,37 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             }
             break;
 #endif
+        case SKIN_TOKEN_METADATA_USERTEXT:
+            {
+                struct skin_viewport *metadata_vp = NULL;
+                struct skin_element *element;
+                char name[16];
+                int i = viewport_get_nb_lines(vp);
+
+                while (i > 0 && !metadata_vp)
+                {
+                    snprintf(name, 16, "%s_%d", token->next ? "next" : "this", i);
+                    metadata_vp = skin_find_item(name, SKIN_FIND_VP, data);
+                    i--;
+                }
+
+                if (metadata_vp)
+                {
+                    memcpy(&metadata_vp->vp, vp, sizeof(*vp));
+                    element = SKINOFFSETTOPTR(skin_buffer, metadata_vp->element);
+                    if (element->children_count)
+                    {
+                        skin_render_viewport(get_child(element->children, 0),
+                                gwps, metadata_vp, info->refresh_type);
+                        /*
+                         * tell the caling _render_viewport how many lines we drew.
+                         * i - 1 because it does ++ later anyway.
+                         */
+                        info->line_number -= i;
+                    }
+                }
+            }
+            break;
         default:
             return false;
     }

@@ -1936,6 +1936,7 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     skin_vp->label = PTRTOSKINOFFSET(skin_buffer, NULL);
     skin_vp->is_infovp = false;
     skin_vp->parsed_fontid = 1;
+    skin_vp->element = PTRTOSKINOFFSET(skin_buffer, element);
     element->data = PTRTOSKINOFFSET(skin_buffer, skin_vp);
     curr_vp = skin_vp;
     curr_viewport_element = element;
