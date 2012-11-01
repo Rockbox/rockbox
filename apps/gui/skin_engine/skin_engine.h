@@ -33,6 +33,7 @@ enum skinnable_screens {
 #ifdef HAVE_LCD_BITMAP
     CUSTOM_STATUSBAR,
 #endif
+    METADATA,
     WPS,
 #if CONFIG_TUNER
     FM_SCREEN,

@@ -183,6 +183,7 @@ struct skin_viewport {
     struct gradient_config start_gradient;
 #endif
 #endif
+    OFFSETTYPE(struct skin_element*) element;
 };
 struct viewport_colour {
     OFFSETTYPE(struct viewport *) vp;
@@ -330,6 +331,7 @@ struct skin_var_changer {
    viewable content of a wps */
 struct wps_data
 {
+    int skin_type;
     int buflib_handle;
 
     OFFSETTYPE(struct skin_element *) tree;
@@ -365,6 +367,8 @@ struct wps_data
     bool full_line_progressbar;
 #endif
     bool wps_loaded;
+    int usertext_count;
+    int nextusertext_count;
 };
 
 #ifndef __PCTOOL__

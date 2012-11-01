@@ -101,6 +101,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_METADATA_VERSION,      "iv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_YEAR,         "iy", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMMENT,      "iC", "", SKIN_REFRESH_STATIC },
+    { SKIN_TOKEN_METADATA_USERTEXT,     "iu", "|S", SKIN_REFRESH_STATIC },
     
     { SKIN_TOKEN_METADATA_ARTIST,       "Ia", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMPOSER,     "Ic", "", SKIN_REFRESH_STATIC },
@@ -114,6 +115,9 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_METADATA_VERSION,      "Iv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_YEAR,         "Iy", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMMENT,      "IC", "", SKIN_REFRESH_STATIC },
+    { SKIN_TOKEN_METADATA_USERTEXT,     "Iu", "|S", SKIN_REFRESH_STATIC },
+
+    { SKIN_TOKEN_METADATA_USERTEXTCOUNT, "uc", "", SKIN_REFRESH_STATIC },
     
     { SKIN_TOKEN_SOUND_PITCH,           "Sp", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_SOUND_SPEED,           "Ss", "", SKIN_REFRESH_DYNAMIC },
@@ -210,6 +214,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "S[IP][IP][ip][ip]i", 0 },
     { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "s[IP][IP][ip][ip]i", 0 },
     { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "[IP][IP][ip][ip]i", 0 },
+    { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vu" , "si", 0, },
     
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK },
     /* This uses the bar tag params also but the first item can be a string

@@ -535,6 +535,37 @@ static int parse_viewport_gradient_setup(struct skin_element *element,
 }
 #endif
 
+static int parse_usertext(struct skin_element *element,
+                           struct wps_token *token,
+                           struct wps_data *wps_data)
+{
+    (void)wps_data;
+    if (element->params_count == 0)
+        token->value.l = SKIN_TOKEN_NO_TOKEN;
+    else
+    {
+        switch (get_param_text(element, 0)[0])
+        {
+            case 'l':
+            case 'L':
+                token->value.l = SKIN_TOKEN_ALIGN_LEFT_RTL;
+                break;
+            case 'c':
+            case 'C':
+                token->value.l = SKIN_TOKEN_ALIGN_CENTER;
+                break;
+            case 'r':
+            case 'R':
+                token->value.l = SKIN_TOKEN_ALIGN_RIGHT_RTL;
+                break;
+            default:
+                return -1;
+        }
+    }
+
+    return 0;
+}
+
 static int parse_listitem(struct skin_element *element,
                         struct wps_token *token,
                         struct wps_data *wps_data)
@@ -1711,6 +1742,7 @@ static void skin_data_reset(struct wps_data *wps_data)
     wps_data->full_line_progressbar = false;
 #endif
     wps_data->wps_loaded = false;
+    wps_data->usertext_count = 0;
 }
 
 #ifdef HAVE_LCD_BITMAP
@@ -1940,6 +1972,7 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     skin_vp->label = PTRTOSKINOFFSET(skin_buffer, NULL);
     skin_vp->is_infovp = false;
     skin_vp->parsed_fontid = 1;
+    skin_vp->element = PTRTOSKINOFFSET(skin_buffer, element);
     element->data = PTRTOSKINOFFSET(skin_buffer, skin_vp);
     curr_vp = skin_vp;
     curr_viewport_element = element;
@@ -1966,6 +1999,24 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         if (data->tree < 0) /* first viewport in the skin */
             data->tree = PTRTOSKINOFFSET(skin_buffer, element);
         skin_vp->label = VP_DEFAULT_LABEL;
+        return CALLBACK_OK;
+    }
+
+    if (element->params_count == 2)
+    {
+        char newname[16], *nameptr = get_param_text(element, 0);
+        int len;
+
+        if (strcmp(nameptr, "this") && strcmp(nameptr, "next"))
+            return CALLBACK_ERROR;
+        else if (data->skin_type != METADATA)
+            return CALLBACK_ERROR;
+
+        len = snprintf(newname, 16, "%s_%d", get_param_text(element, 0),
+            get_param(element, 1)->data.number);
+        nameptr = skin_buffer_alloc(len);
+        strcpy(nameptr, newname);
+        skin_vp->label = PTRTOSKINOFFSET(skin_buffer, nameptr);
         return CALLBACK_OK;
     }
 
@@ -2223,6 +2274,9 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     function = parse_skinvar;
                     break;
 #endif
+                case SKIN_TOKEN_METADATA_USERTEXT:
+                    function = parse_usertext;
+                    break;
                 default:
                     break;
             }

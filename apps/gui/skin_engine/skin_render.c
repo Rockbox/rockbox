@@ -84,6 +84,7 @@ static void skin_render_playlistviewer(struct playlistviewer* viewer,
 #endif
 
 static char* skin_buffer;
+static enum skin_token_type current_forced_alignment;
 
 static inline struct skin_element*
 get_child(OFFSETTYPE(struct skin_element**) children, int child)
@@ -328,6 +329,60 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             }
             break;
 #endif
+        case SKIN_TOKEN_METADATA_USERTEXT:
+            {
+                struct skin_viewport *metadata_vp = NULL;
+                struct skin_element *element;
+                char *old_skin_buffer = skin_buffer;
+                struct gui_wps *metadata_wps = skin_get_gwps(METADATA, SCREEN_MAIN);
+                char name[16];
+                int i = viewport_get_nb_lines(vp);
+                int line_height = vp->height / i;
+
+                i -= info->line_number;
+
+                if (!metadata_wps)
+                    break;
+
+                while (i > 0 && !metadata_vp)
+                {
+                    snprintf(name, 16, "%s_%d", token->next ? "next" : "this", i);
+                    metadata_vp = skin_find_item(name, SKIN_FIND_VP, metadata_wps->data);
+                    i--;
+                }
+
+                if (metadata_vp)
+                {
+                    if (token->next)
+                        metadata_wps->data->usertext_count = gwps->data->nextusertext_count++;
+                    else
+                        metadata_wps->data->usertext_count = gwps->data->usertext_count++;
+
+                    metadata_vp->parsed_fontid = info->skin_vp->parsed_fontid;
+                    i++;
+                    skin_buffer = get_skin_buffer(metadata_wps->data);
+                    memcpy(&metadata_vp->vp, vp, sizeof(*vp));
+                    metadata_vp->vp.y += line_height * info->line_number;
+                    metadata_vp->vp.height = i * line_height;
+                    
+                    element = SKINOFFSETTOPTR(skin_buffer, metadata_vp->element);
+                    if (element->children_count)
+                    {
+                        current_forced_alignment = token->value.l;
+                        gwps->display->set_viewport(&metadata_vp->vp);
+                        skin_render_viewport(get_child(element->children, 0),
+                                metadata_wps, metadata_vp, info->refresh_type);
+                        gwps->display->set_viewport(vp);
+                        /*
+                         * tell the calling _render_viewport how many lines we drew.
+                         * i - 1 because it does ++ later anyway.
+                         */
+                        info->line_number += i - 1;
+                    }
+                    skin_buffer = old_skin_buffer;
+                }
+            }
+            break;
         default:
             return false;
     }
@@ -455,11 +510,12 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
     }
 }
     
-static void fix_line_alignment(struct skin_draw_info *info, struct skin_element *element)
+static void fix_line_alignment(struct skin_draw_info *info,
+        enum skin_token_type type)
 {
     struct align_pos *align = &info->align;
     char *cur_pos = info->cur_align_start + strlen(info->cur_align_start);
-    switch (element->tag->type)
+    switch (type)
     {
         case SKIN_TOKEN_ALIGN_LEFT:
             *cur_pos = '\0'; cur_pos++; *cur_pos = '\0';
@@ -564,7 +620,7 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 if (child->tag->type == SKIN_TOKEN_SUBLINE_SCROLL)
                     info->line_scrolls = true;
                 
-                fix_line_alignment(info, child);
+                fix_line_alignment(info, child->tag->type);
                 
                 if (!SKINOFFSETTOPTR(skin_buffer, child->data))
                 {
@@ -758,6 +814,10 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         align->center = NULL;
         align->right = NULL;
         
+        if (info.gwps->data->skin_type == METADATA)
+        {
+            fix_line_alignment(&info, current_forced_alignment);
+        }
         
         if (line->type == LINE_ALTERNATOR)
             func = skin_render_alternator;
@@ -814,6 +874,8 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     }
 #endif
 
+    data->usertext_count = 0;
+    data->nextusertext_count = 0;
     viewport = SKINOFFSETTOPTR(skin_buffer, data->tree);
     skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
     label = SKINOFFSETTOPTR(skin_buffer, skin_viewport->label);
