@@ -238,7 +238,8 @@ int check_viewport(const char* document)
 
     if(document[2] != ARGLISTOPENSYM
        && document[2] != 'l'
-       && document[2] != 'i')
+       && document[2] != 'i'
+       && document[2] != 'u')
         return 0;
 
     return 1;

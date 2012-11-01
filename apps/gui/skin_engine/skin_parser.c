@@ -1936,6 +1936,7 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     skin_vp->label = PTRTOSKINOFFSET(skin_buffer, NULL);
     skin_vp->is_infovp = false;
     skin_vp->parsed_fontid = 1;
+    skin_vp->element = PTRTOSKINOFFSET(skin_buffer, element);
     element->data = PTRTOSKINOFFSET(skin_buffer, skin_vp);
     curr_vp = skin_vp;
     curr_viewport_element = element;
@@ -1962,6 +1963,22 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         if (data->tree < 0) /* first viewport in the skin */
             data->tree = PTRTOSKINOFFSET(skin_buffer, element);
         skin_vp->label = VP_DEFAULT_LABEL;
+        return CALLBACK_OK;
+    }
+
+    if (element->params_count == 2)
+    {
+        char newname[16], *nameptr = get_param_text(element, 0);
+        int len;
+
+        if (strcmp(nameptr, "this") && strcmp(nameptr, "next"))
+            return CALLBACK_ERROR;
+
+        len = snprintf(newname, 16, "%s_%d", get_param_text(element, 0),
+            get_param(element, 1)->data.number);
+        nameptr = skin_buffer_alloc(len);
+        strcpy(nameptr, newname);
+        skin_vp->label = PTRTOSKINOFFSET(skin_buffer, nameptr);
         return CALLBACK_OK;
     }
 

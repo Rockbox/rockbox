@@ -182,6 +182,7 @@ struct skin_viewport {
     struct gradient_config start_gradient;
 #endif
 #endif
+    OFFSETTYPE(struct skin_element*) element;
 };
 struct viewport_colour {
     OFFSETTYPE(struct viewport *) vp;

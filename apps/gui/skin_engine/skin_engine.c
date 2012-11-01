@@ -42,6 +42,7 @@
 void skin_data_free_buflib_allocs(struct wps_data *wps_data);
 char* wps_default_skin(enum screen_type screen);
 char* default_radio_skin(enum screen_type screen);
+static char* default_metadata_skin(enum screen_type screen);
 static bool skins_initialised = false;
 
 static char* get_skin_filename(char *buf, size_t buf_size,
@@ -59,8 +60,9 @@ static struct gui_skin_helper {
 #endif
     [WPS] = { NULL, NULL, wps_default_skin, true },
 #if CONFIG_TUNER
-    [FM_SCREEN] = { NULL, NULL, default_radio_skin, false }
+    [FM_SCREEN] = { NULL, NULL, default_radio_skin, false },
 #endif
+    [METADATA] = { NULL, NULL, default_metadata_skin, true }
 };
 
 static struct gui_skin {
@@ -246,6 +248,10 @@ static char* get_skin_filename(char *buf, size_t buf_size,
             }
             break;
 #endif
+        case METADATA:
+            setting = "metadata";
+            ext = "txt";
+            break;
         default:
             return NULL;
     }
@@ -265,6 +271,10 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         return &skins[skin][screen].gui_wps;
 #endif
 
+#if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1
+    if (skin == METADATA && screen == SCREEN_REMOTE)
+        return NULL;
+#endif
     if (skins[skin][screen].data.wps_loaded == false)
     {
         char filename[MAX_PATH];
@@ -298,3 +308,19 @@ void skin_request_full_update(enum skinnable_screens skin)
     FOR_NB_SCREENS(i)
         skins[skin][i].needs_full_update = true;
 }
+
+static char* default_metadata_skin(enum screen_type screen)
+{
+    (void)screen;
+    static char *default_text =
+        "%Vu(this, 3)\n"
+        "%s%ac%?it<%it|%fn> hehe\n"
+        "%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>> hoho\n"
+        "%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>\n"
+        "%Vu(next, 1)\n"
+        "%s%ac%Sx(Next:) %?It<%It|%Fn>\n"
+        ;
+
+    return default_text;
+}
+
