@@ -101,6 +101,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_METADATA_VERSION,      "iv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_YEAR,         "iy", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMMENT,      "iC", "", SKIN_REFRESH_STATIC },
+    { SKIN_TOKEN_METADATA_USERTEXT,     "iu", "", SKIN_REFRESH_STATIC },
     
     { SKIN_TOKEN_METADATA_ARTIST,       "Ia", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMPOSER,     "Ic", "", SKIN_REFRESH_STATIC },
@@ -114,6 +115,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_METADATA_VERSION,      "Iv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_YEAR,         "Iy", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMMENT,      "IC", "", SKIN_REFRESH_STATIC },
+    { SKIN_TOKEN_METADATA_USERTEXT,     "Iu", "", SKIN_REFRESH_STATIC },
     
     { SKIN_TOKEN_SOUND_PITCH,           "Sp", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_SOUND_SPEED,           "Ss", "", SKIN_REFRESH_DYNAMIC },
