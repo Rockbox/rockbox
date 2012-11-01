@@ -953,8 +953,14 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             return NULL;
         }
-        break;        
-            
+        break;
+
+        case SKIN_TOKEN_METADATA_USERTEXTCOUNT:
+            snprintf(buf, buf_size, "%d", data->usertext_count);
+            if (intval)
+                *intval = data->usertext_count;
+            return buf;
+
         case SKIN_TOKEN_CHARACTER:
             if (token->value.c == '\n')
                 return NULL;
