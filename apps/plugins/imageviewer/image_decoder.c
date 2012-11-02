@@ -28,8 +28,9 @@ static const char *decoder_names[MAX_IMAGE_TYPES] = {
     "jpeg",
     "png",
 #ifdef HAVE_LCD_COLOR
-    "ppm"
+    "ppm",
 #endif
+    "gif"
 };
 
 /* Check file type by magic number or file extension
@@ -53,6 +54,7 @@ enum image_type get_image_type(const char *name, bool quiet)
 #ifdef HAVE_LCD_COLOR
         { ".ppm",   IMAGE_PPM  },
 #endif
+        { ".gif",   IMAGE_GIF  },
     };
     static const struct {
         char *magic;    /* magic number */
@@ -66,6 +68,8 @@ enum image_type get_image_type(const char *name, bool quiet)
         { "P3", 2, IMAGE_PPM },
         { "P6", 2, IMAGE_PPM },
 #endif
+        { "GIF87a", 6, IMAGE_GIF },
+        { "GIF89a", 6, IMAGE_GIF },
     };
 
     enum image_type type = IMAGE_UNKNOWN;
