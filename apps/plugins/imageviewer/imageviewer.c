@@ -555,10 +555,14 @@ static int scroll_bmp(struct image_info *info)
     int lastbutton = BUTTON_NONE;
 #endif
 
+    long frame_timeout = *rb->current_tick + info->delay;
+
     while (true)
     {
         if (iv_api.slideshow_enabled)
             button = rb->button_get_w_tmo(settings.ss_timeout * HZ);
+        else if (info->frames_count && info->delay)
+            button = rb->button_get_w_tmo(info->delay);
         else
             button = rb->button_get(true);
 
@@ -678,6 +682,9 @@ static int scroll_bmp(struct image_info *info)
         if (button != BUTTON_NONE)
             lastbutton = button;
 #endif
+
+        if (TIME_AFTER(*rb->current_tick, frame_timeout))
+            return NEXT_FRAME;
     } /* while (true) */
 }
 
@@ -838,9 +845,11 @@ static int load_and_show(char* filename, struct image_info *info)
     cx = info->x_size/ds/2; /* center the view */
     cy = info->y_size/ds/2;
 
+    /* used to loop through subimages in animated gifs */
+    int frame = 0;
     do  /* loop the image prepare and decoding when zoomed */
     {
-        status = imgdec->get_image(info, ds); /* decode or fetch from cache */
+        status = imgdec->get_image(info, frame, ds); /* decode or fetch from cache */
         if (status == PLUGIN_ERROR)
         {
             file_pt[curfile] = NULL;
@@ -849,7 +858,7 @@ static int load_and_show(char* filename, struct image_info *info)
 
         set_view(info, cx, cy);
 
-        if(!iv_api.running_slideshow)
+        if(!iv_api.running_slideshow && (info->frames_count == 1))
         {
             rb->lcd_putsf(0, 3, "showing %dx%d", info->width, info->height);
             rb->lcd_update();
@@ -870,6 +879,7 @@ static int load_and_show(char* filename, struct image_info *info)
         while (1)
         {
             status = scroll_bmp(info);
+
             if (status == ZOOM_IN)
             {
                 if (ds > ds_min || (imgdec->unscaled_avail && ds > 1))
@@ -901,6 +911,8 @@ static int load_and_show(char* filename, struct image_info *info)
             }
             break;
         }
+
+        frame = (frame + 1)%info->frames_count;
 
 #ifdef USEGSLIB
         grey_show(false); /* switch off overlay */
