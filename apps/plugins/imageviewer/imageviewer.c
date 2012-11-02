@@ -550,17 +550,38 @@ static void pan_view_down(struct image_info *info)
 /* interactively scroll around the image */
 static int scroll_bmp(struct image_info *info)
 {
+    static long ss_timeout = 0;
+
     int button;
 #if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE)
     int lastbutton = BUTTON_NONE;
 #endif
 
+    if (!ss_timeout && iv_api.slideshow_enabled)
+        ss_timeout = *rb->current_tick + settings.ss_timeout * HZ;
+
     while (true)
     {
         if (iv_api.slideshow_enabled)
-            button = rb->button_get_w_tmo(settings.ss_timeout * HZ);
+        {
+            if (info->frames_count > 1 && info->delay &&
+                settings.ss_timeout * HZ > info->delay)
+            {
+                /* animated content and delay between subsequent frames
+                 * is shorter then slideshow delay
+                 */
+                button = rb->button_get_w_tmo(info->delay);
+            }
+            else
+                button = rb->button_get_w_tmo(settings.ss_timeout * HZ);
+        }
         else
-            button = rb->button_get(true);
+        {
+            if (info->frames_count > 1 && info->delay)
+                button = rb->button_get_w_tmo(info->delay);
+            else
+                button = rb->button_get(true);
+        }
 
         iv_api.running_slideshow = false;
 
@@ -595,9 +616,28 @@ static int scroll_bmp(struct image_info *info)
         case BUTTON_NONE:
             if (iv_api.slideshow_enabled && entries > 1)
             {
-                iv_api.running_slideshow = true;
-                return change_filename(DIR_NEXT);
+                if (info->frames_count > 1)
+                {
+                    /* animations */
+                    if (TIME_AFTER(*rb->current_tick, ss_timeout))
+                    {
+                        iv_api.running_slideshow = true;
+                        ss_timeout = 0;
+                        return change_filename(DIR_NEXT);
+                    }
+                    else
+                        return NEXT_FRAME;
+                }
+                else
+                {
+                    /* still picture */
+                    iv_api.running_slideshow = true;
+                    return change_filename(DIR_NEXT);
+                }
             }
+            else
+                return NEXT_FRAME;
+
             break;
 
 #ifdef IMGVIEW_SLIDE_SHOW
@@ -838,9 +878,11 @@ static int load_and_show(char* filename, struct image_info *info)
     cx = info->x_size/ds/2; /* center the view */
     cy = info->y_size/ds/2;
 
+    /* used to loop through subimages in animated gifs */
+    int frame = 0;
     do  /* loop the image prepare and decoding when zoomed */
     {
-        status = imgdec->get_image(info, ds); /* decode or fetch from cache */
+        status = imgdec->get_image(info, frame, ds); /* decode or fetch from cache */
         if (status == PLUGIN_ERROR)
         {
             file_pt[curfile] = NULL;
@@ -849,7 +891,7 @@ static int load_and_show(char* filename, struct image_info *info)
 
         set_view(info, cx, cy);
 
-        if(!iv_api.running_slideshow)
+        if(!iv_api.running_slideshow && (info->frames_count == 1))
         {
             rb->lcd_putsf(0, 3, "showing %dx%d", info->width, info->height);
             rb->lcd_update();
@@ -870,6 +912,7 @@ static int load_and_show(char* filename, struct image_info *info)
         while (1)
         {
             status = scroll_bmp(info);
+
             if (status == ZOOM_IN)
             {
                 if (ds > ds_min || (imgdec->unscaled_avail && ds > 1))
@@ -899,16 +942,19 @@ static int load_and_show(char* filename, struct image_info *info)
                 else
                     continue;
             }
+
+            /* next frame in animated content */
+            if (status == NEXT_FRAME)
+                frame = (frame + 1)%info->frames_count;
+
             break;
         }
 
-#ifdef USEGSLIB
-        grey_show(false); /* switch off overlay */
-#endif
         rb->lcd_clear_display();
     }
     while (status > PLUGIN_OTHER);
 #ifdef USEGSLIB
+    grey_show(false); /* switch off overlay */
     rb->lcd_update();
 #endif
     return status;

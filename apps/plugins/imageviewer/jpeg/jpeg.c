@@ -190,8 +190,9 @@ static int load_image(char *filename, struct image_info *info,
     return PLUGIN_OK;
 }
 
-static int get_image(struct image_info *info, int ds)
+static int get_image(struct image_info *info, int frame, int ds)
 {
+    (void)frame;
     int w, h; /* used to center output */
     int size; /* decompressed image size */
     long time; /* measured ticks */

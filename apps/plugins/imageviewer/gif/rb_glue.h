@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * load image decoder.
+ * Copyright (c) 2012 Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,35 +18,27 @@
  *
  ****************************************************************************/
 
-#ifndef _IMAGE_DECODER_H
-#define _IMAGE_DECODER_H
+#include "plugin.h"
+#include <tlsf.h>
 
-#include "imageviewer.h"
+#undef  memset
+#define memset(a,b,c)      rb->memset((a),(b),(c))
+#undef  memmove
+#define memmove(a,b,c)     rb->memmove((a),(b),(c))
+#undef  memcmp
+#define memcmp(a,b,c)      rb->memcmp((a),(b),(c))
+#undef  strncmp
+#define strncmp(a,b,c)     rb->strncmp((a),(b),(c))
 
-enum image_type {
-    IMAGE_UNKNOWN = -1,
-    IMAGE_BMP = 0,
-    IMAGE_JPEG,
-    IMAGE_PNG,
-#ifdef HAVE_LCD_COLOR
-    IMAGE_PPM,
+#define fread(ptr, size, nmemb, stream) rb->read(stream, ptr, size*nmemb)
+#define fclose(stream) rb->close(stream)
+#define fdopen(a,b) ((a))
+
+#define malloc(a) tlsf_malloc((a))
+#define free(a)   tlsf_free((a))
+#define realloc(a, b) tlsf_realloc((a),(b))
+#define calloc(a,b) tlsf_calloc((a),(b))
+
+#ifndef SIZE_MAX
+#define SIZE_MAX INT_MAX
 #endif
-    IMAGE_GIF,
-    MAX_IMAGE_TYPES
-};
-
-struct loader_info {
-    enum image_type type;
-    const struct imgdec_api *iv;
-    unsigned char* buffer;
-    size_t size;
-};
-
-/* Check file type by magic number or file extension */
-enum image_type get_image_type(const char *name, bool quiet);
-/* Load image decoder */
-const struct image_decoder *load_decoder(struct loader_info *loader_info);
-/* Release the loaded decoder */
-void release_decoder(void);
-
-#endif /* _IMAGE_DECODER_H */
