@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * load image decoder.
+ * Copyright (c) 2012 Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,35 +18,20 @@
  *
  ****************************************************************************/
 
-#ifndef _IMAGE_DECODER_H
-#define _IMAGE_DECODER_H
+#define GIF_MAX_FRAMES 32
 
-#include "imageviewer.h"
-
-enum image_type {
-    IMAGE_UNKNOWN = -1,
-    IMAGE_BMP = 0,
-    IMAGE_JPEG,
-    IMAGE_PNG,
-#ifdef HAVE_LCD_COLOR
-    IMAGE_PPM,
-#endif
-    IMAGE_GIF,
-    MAX_IMAGE_TYPES
+struct gif_decoder {
+    unsigned char *mem;
+    size_t mem_size;
+    int width;
+    int height;
+    int frames_count;
+    int delay;
+    size_t native_img_size;
+    int error;
 };
 
-struct loader_info {
-    enum image_type type;
-    const struct imgdec_api *iv;
-    unsigned char* buffer;
-    size_t size;
-};
+void gif_decoder_init(struct gif_decoder *decoder, void *mem, size_t size);
+void gif_open(char *filename, struct gif_decoder *d);
+void gif_decode(struct gif_decoder *d, void (*pf_progress)(int current, int total));
 
-/* Check file type by magic number or file extension */
-enum image_type get_image_type(const char *name, bool quiet);
-/* Load image decoder */
-const struct image_decoder *load_decoder(struct loader_info *loader_info);
-/* Release the loaded decoder */
-void release_decoder(void);
-
-#endif /* _IMAGE_DECODER_H */
