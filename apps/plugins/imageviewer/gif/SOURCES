@@ -1,0 +1,6 @@
+dumb_alloc.c
+dgif_lib.c
+gifalloc.c
+gif_decoder.c
+gif.c
+gif_err.c
