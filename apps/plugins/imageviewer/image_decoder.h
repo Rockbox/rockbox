@@ -32,6 +32,7 @@ enum image_type {
 #ifdef HAVE_LCD_COLOR
     IMAGE_PPM,
 #endif
+    IMAGE_GIF,
     MAX_IMAGE_TYPES
 };
 
