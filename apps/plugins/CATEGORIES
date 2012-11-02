@@ -70,6 +70,7 @@ pictureflow,demos
 pitch_detector,apps
 plasma,demos
 png,viewers
+gif,viewers
 pong,games
 ppm,viewers
 properties,viewers

@@ -5,17 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$id $
  *
- * Copyright (C) 2009 by Christophe Gouiran <bechris13250 -at- gmail -dot- com>
- *
- * Based on lodepng, a lightweight png decoder/encoder
- * (c) 2005-2008 Lode Vandevenne
- *
- * Copyright (c) 2010 Marcin Bukat
- *  - pixel format conversion & transparency handling
- *  - adaptation of tinf (tiny inflate library)
- *  - code refactoring & cleanups
+ * Copyright (c) 2012 Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,18 +21,19 @@
 #include "plugin.h"
 #include "lcd.h"
 #include <lib/pluginlib_bmp.h>
-#include "tinf.h"
 #include "../imageviewer.h"
-#include "png_decoder.h"
 #include "bmp.h"
+#include "gif_decoder.h"
+#include "gif_lib.h"
 
 /* decoder context struct */
-static LodePNG_Decoder decoder;
+static struct gif_decoder decoder;
 
 static char print[32]; /* use a common snprintf() buffer */
 
 /* decompressed image in the possible sizes (1,2,4,8), wasting the other */
-static unsigned char *disp[9];
+/* max 32 frames */
+static unsigned char *disp[GIF_MAX_FRAMES][9];
 static unsigned char *disp_buf;
 
 #if defined(HAVE_LCD_COLOR)
@@ -77,27 +69,19 @@ static void draw_image_rect(struct image_info *info,
 
 static int img_mem(int ds)
 {
-    LodePNG_Decoder *p_decoder = &decoder;
-
-#ifdef USEGSLIB
-    return (p_decoder->infoPng.width/ds) * (p_decoder->infoPng.height/ds);
-#else
-    return (p_decoder->infoPng.width/ds) * 
-           (p_decoder->infoPng.height/ds) * 
-           FB_DATA_SZ;
-#endif
+    struct gif_decoder *p_decoder = &decoder;
+    return p_decoder->native_img_size/ds;
 }
 
 static int load_image(char *filename, struct image_info *info,
                       unsigned char *buf, ssize_t *buf_size)
 {
-    int fd;
+    int w, h;
     long time = 0; /* measured ticks */
-    int w, h; /* used to center output */
-    LodePNG_Decoder *p_decoder = &decoder;
+    struct gif_decoder *p_decoder = &decoder;
 
-    unsigned char *memory, *memory_max, *image;
-    size_t memory_size, file_size;
+    unsigned char *memory, *memory_max;
+    size_t memory_size;
 
     /* cleanup */
     memset(&disp, 0, sizeof(disp));
@@ -107,83 +91,48 @@ static int load_image(char *filename, struct image_info *info,
     memory_max = (unsigned char *)((intptr_t)(memory + *buf_size) & ~3);
     memory_size = memory_max - memory;
 
-    fd = rb->open(filename, O_RDONLY);
-    if (fd < 0)
-    {
-        rb->splashf(HZ, "err opening %s: %d", filename, fd);
-        return PLUGIN_ERROR;
-    }
-    file_size = rb->filesize(fd);
-
-    DEBUGF("reading file '%s'\n", filename);
-
-    if (!iv->running_slideshow) {
-        rb->lcd_puts(0, 0, rb->strrchr(filename,'/')+1);
-        rb->lcd_update();
-    }
-
-    if (file_size > memory_size) {
-        p_decoder->error = FILE_TOO_LARGE;
-        rb->close(fd);
-
-    } else {
-        if (!iv->running_slideshow) {
-            rb->lcd_putsf(0, 1, "loading %zu bytes", file_size);
-            rb->lcd_update();
-        }
-
-        /* load file to the end of the buffer */
-        image = memory_max - file_size;
-        rb->read(fd, image, file_size);
-        rb->close(fd);
-
-        if (!iv->running_slideshow) {
-            rb->lcd_puts(0, 2, "decoding image");
-            rb->lcd_update();
-        }
 #ifdef DISK_SPINDOWN
-        else if (iv->immediate_ata_off) {
+        if (iv->running_slideshow && iv->immediate_ata_off) {
             /* running slideshow and time is long enough: power down disk */
             rb->storage_sleep();
         }
 #endif
 
-        /* Initialize decoder context struct, set buffer decoder is free
+        /* initialize decoder context struct, set buffer decoder is free 
          * to use.
-         * Decoder assumes that raw image file is loaded at the very
-         * end of the allocated buffer
          */
-        LodePNG_Decoder_init(p_decoder, memory, memory_size);
+        gif_decoder_init(p_decoder, memory, memory_size);
 
-        /* read file header; file is loaded at the end
-         * of the allocated buffer
-         */
-        LodePNG_inspect(p_decoder, image, file_size);
+        /* populate internal data from gif file control structs */
+        gif_open(filename, p_decoder);
 
-        if (!p_decoder->error) {
+        if (!p_decoder->error)
+        {
 
-            if (!iv->running_slideshow) {
+            if (!iv->running_slideshow)
+            {
                 rb->lcd_putsf(0, 2, "image %dx%d",
-                              p_decoder->infoPng.width,
-                              p_decoder->infoPng.height);
+                              p_decoder->width,
+                              p_decoder->height);
                 rb->lcd_putsf(0, 3, "decoding %d*%d",
-                              p_decoder->infoPng.width,
-                              p_decoder->infoPng.height);
+                              p_decoder->width,
+                              p_decoder->height);
                 rb->lcd_update();
             }
 
             /* the actual decoding */
             time = *rb->current_tick;
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
-            LodePNG_decode(p_decoder, image, file_size, iv->cb_progress);
+#endif
+            gif_decode(p_decoder, iv->cb_progress);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(false);
-#else
-            LodePNG_decode(p_decoder, image, file_size, iv->cb_progress);
-#endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
+#endif
             time = *rb->current_tick - time;
         }
-    }
 
     if (!iv->running_slideshow && !p_decoder->error)
     {
@@ -193,34 +142,21 @@ static int load_image(char *filename, struct image_info *info,
         rb->lcd_update();
     }
 
-    if (p_decoder->error) {
-        if (p_decoder->error == FILE_TOO_LARGE ||
-            p_decoder->error == OUT_OF_MEMORY)
-        {
-            return PLUGIN_OUTOFMEM;
-        }
-
-        if (LodePNG_perror(p_decoder) != NULL)
-        {
-            rb->splash(HZ, LodePNG_perror(p_decoder));
-        }
-        else if (p_decoder->error == TINF_DATA_ERROR)
-        {
-            rb->splash(HZ, "Zlib decompressor error");
-        }
-        else
-        {
-            rb->splashf(HZ, "other error : %ld", p_decoder->error);
-        }
-
+    if (p_decoder->error)
+    {
+        rb->splashf(HZ, "%s", GifErrorString(p_decoder->error));
         return PLUGIN_ERROR;
     }
 
-    info->x_size = p_decoder->infoPng.width;
-    info->y_size = p_decoder->infoPng.height;
+    info->x_size = p_decoder->width;
+    info->y_size = p_decoder->height;
+    info->frames_count = p_decoder->frames_count;
+    info->delay = p_decoder->delay;
 
-    p_decoder->native_img_size = (p_decoder->native_img_size + 3) & ~3;
-    disp_buf = p_decoder->buf + p_decoder->native_img_size;
+    //p_decoder->native_img_size = (p_decoder->native_img_size + 3) & ~3;
+    disp_buf = p_decoder->mem + 
+               ((p_decoder->native_img_size*p_decoder->frames_count + 3) & ~3);
+
     *buf_size = memory_max - disp_buf;
 
     return PLUGIN_OK;
@@ -228,12 +164,11 @@ static int load_image(char *filename, struct image_info *info,
 
 static int get_image(struct image_info *info, int frame, int ds)
 {
-    (void)frame;
-    unsigned char **p_disp = &disp[ds]; /* short cut */
-    LodePNG_Decoder *p_decoder = &decoder;
+    unsigned char **p_disp = &disp[frame][ds]; /* short cut */
+    struct gif_decoder *p_decoder = &decoder;
 
-    info->width = p_decoder->infoPng.width / ds;
-    info->height = p_decoder->infoPng.height / ds;
+    info->width = p_decoder->width / ds;
+    info->height = p_decoder->height / ds;
     info->data = p_disp;
 
     if (*p_disp != NULL)
@@ -243,7 +178,8 @@ static int get_image(struct image_info *info, int frame, int ds)
     }
 
     /* assign image buffer */
-    if (ds > 1) {
+    if (ds > 1)
+    {
         if (!iv->running_slideshow)
         {
             rb->lcd_putsf(0, 3, "resizing %d*%d", info->width, info->height);
@@ -251,37 +187,44 @@ static int get_image(struct image_info *info, int frame, int ds)
         }
         struct bitmap bmp_src, bmp_dst;
 
+        /* size of the scalled image */
         int size = img_mem(ds);
 
-        if (disp_buf + size >= p_decoder->buf + p_decoder->buf_size) {
+        if (disp_buf + size >= p_decoder->mem + p_decoder->mem_size)
+        {
             /* have to discard the current */
             int i;
             for (i=1; i<=8; i++)
-                disp[i] = NULL; /* invalidate all bitmaps */
+                disp[frame][i] = NULL; /* invalidate all bitmaps */
 
             /* start again from the beginning of the buffer */
-            disp_buf = p_decoder->buf + p_decoder->native_img_size;
+            disp_buf = p_decoder->mem +
+                       p_decoder->native_img_size*p_decoder->frames_count;
         }
 
         *p_disp = disp_buf;
         disp_buf += size;
 
-        bmp_src.width = p_decoder->infoPng.width;
-        bmp_src.height = p_decoder->infoPng.height;
-        bmp_src.data = p_decoder->buf;
+        bmp_src.width = p_decoder->width;
+        bmp_src.height = p_decoder->height;
+        bmp_src.data = p_decoder->mem + p_decoder->native_img_size*frame;
 
         bmp_dst.width = info->width;
         bmp_dst.height = info->height;
         bmp_dst.data = *p_disp;
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(true);
+#endif
         resize_bitmap(&bmp_src, &bmp_dst);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(false);
-#else
-        resize_bitmap(&bmp_src, &bmp_dst);
-#endif /*HAVE_ADJUSTABLE_CPU_FREQ*/
-    } else {
-        *p_disp = p_decoder->buf;
+#endif
+    }
+    else
+    {
+        *p_disp = p_decoder->mem + p_decoder->native_img_size*frame;
     }
 
     return PLUGIN_OK;

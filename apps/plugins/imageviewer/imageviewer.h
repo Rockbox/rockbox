@@ -58,6 +58,7 @@ enum {
 
     ZOOM_IN,
     ZOOM_OUT,
+    NEXT_FRAME,
 };
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_DISK_STORAGE)
@@ -82,6 +83,8 @@ struct image_info {
     int x_size, y_size; /* set size of loaded image in load_image(). */
     int width, height;  /* set size of resized image in get_image(). */
     int x, y;           /* display position */
+    int frames_count;   /* number of subframes */
+    int delay;          /* delay expressed in ticks between frames */
     void *data;         /* use freely in decoder. not touched in ui. */
 };
 
@@ -115,6 +118,7 @@ struct image_decoder {
     /* return needed size of buffer to store downscaled image by ds.
      * this is used to calculate min downscale. */
     int (*img_mem)(int ds);
+
     /* load image from filename. use the passed buffer to store loaded, decoded
      * or resized image later, so save it to local variables if needed.
      * set width and height of info properly. also, set buf_size to remaining
@@ -125,7 +129,8 @@ struct image_decoder {
     /* downscale loaded image by ds. use the buffer passed to load_image to
      * reszie image and/or store resized image.
      * return PLUGIN_ERROR for error. ui will skip to next image. */
-    int (*get_image)(struct image_info *info, int ds);
+    int (*get_image)(struct image_info *info, int frame, int ds);
+
     /* draw part of image */
     void (*draw_image_rect)(struct image_info *info,
                             int x, int y, int width, int height);

@@ -4,3 +4,4 @@ png
 #ifdef HAVE_LCD_COLOR
 ppm
 #endif
+gif
