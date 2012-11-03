@@ -10,7 +10,7 @@ all: $(BINS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-scsitool: scsitool.o misc.o
+scsitool: scsitool.o misc.o para_noise.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:

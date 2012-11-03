@@ -35,6 +35,7 @@
 #include <scsi/sg_lib.h>
 #include <scsi/sg_pt.h>
 #include "misc.h"
+#include "para_noise.h"
 
 bool g_debug = false;
 bool g_force = false;
@@ -151,22 +152,27 @@ int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_
 
 int do_sense_analysis(int status, uint8_t *sense, int sense_size)
 {
-    cprintf_field("Status:", " "); fflush(stdout);
-    sg_print_scsi_status(status);
-    cprintf_field("\nSense:", " "); fflush(stdout);
-    sg_print_sense(NULL, sense, sense_size, 0);
+    if(status != GOOD || g_debug)
+    {
+        cprintf_field("Status:", " "); fflush(stdout);
+        sg_print_scsi_status(status);
+        cprintf_field("\nSense:", " "); fflush(stdout);
+        sg_print_sense(NULL, sense, sense_size, 0);
+    }
     if(status == GOOD)
         return 0;
     return status;
 }
 
-int do_dnk_cmd(uint32_t cmd, uint8_t sub_cmd, void *buffer, int *buffer_size)
+int do_dnk_cmd(uint32_t cmd, uint8_t sub_cmd, uint16_t arg, void *buffer, int *buffer_size)
 {
     uint8_t cdb[12] = {0xdd, 0, 0, 0, 0, 0, 0, 0xbc, 0, 0, 0, 0};
     cdb[10] = cmd;
     cdb[11] = sub_cmd;
     cdb[8] = (*buffer_size) >> 8;
     cdb[9] = (*buffer_size) & 0xff;
+    cdb[4] = (arg >> 8) & 0xff;
+    cdb[5] = arg & 0xff;
     
     uint8_t sense[32];
     int sense_size = 32;
@@ -242,7 +248,7 @@ int get_dnk_prop(int argc, char **argv)
 
     char *buffer = buffer_alloc(prop.size + 1);
     int buffer_size = prop.size;
-    int ret = do_dnk_cmd(prop.cmd, prop.subcmd, buffer, &buffer_size);
+    int ret = do_dnk_cmd(prop.cmd, prop.subcmd, 0, buffer, &buffer_size);
     if(ret)
         return ret;
     if(buffer_size == 0)
@@ -263,6 +269,189 @@ int get_dnk_prop(int argc, char **argv)
     else
     {
         cprintf(GREEN, "Property:\n");
+        print_hex(buffer, buffer_size);
+    }
+    return 0;
+}
+
+#define NVP_EXACT_LENGTH    (1 << 0)
+#define NVP_STRING          (1 << 1)
+#define NVP_UINT32          (1 << 2)
+
+struct nvp_prop_t
+{
+    const char *name;
+    const char *desc;
+    uint8_t node;
+    int size;
+    unsigned flags;
+};
+
+#define NVP_ENTRY(node, name,desc,size,flag) { name, desc, node, size, flag }
+
+struct nvp_prop_t nvp_prop_list[] =
+{
+    NVP_ENTRY(1, "bti", "boot image", 262144, 0),
+    NVP_ENTRY(2, "hdi", "hold image", 262144, 0),
+    NVP_ENTRY(3, "cng", "aad key", 704, 0),
+    NVP_ENTRY(4, "ser", "serial number", 16, NVP_STRING),
+    NVP_ENTRY(5, "app", "application parameter", 4096, 0),
+    NVP_ENTRY(6, "eri", "update error image", 262144, 0),
+    NVP_ENTRY(7, "dcc", "secure clock", 20, 0),
+    NVP_ENTRY(8, "mdl", "middleware parameter", 8, 0),
+    NVP_ENTRY(9, "fup", "firmware update flag", 4, 0),
+    NVP_ENTRY(10, "bok", "beep ok flag", 4, 0),
+    NVP_ENTRY(11, "shp", "ship information", 32, 0),
+    NVP_ENTRY(12, "dba", "aad icv", 160, 0),
+    NVP_ENTRY(13, "dbv", "empr key", 520, 0),
+    NVP_ENTRY(14, "tr0", "EKB 0", 16384, 0),
+    NVP_ENTRY(15, "tr1", "EKB 1", 16384, 0),
+    NVP_ENTRY(16, "mid", "model id", 64, 0),
+    NVP_ENTRY(17, "tst", "test mode flag", 4, 0),
+    NVP_ENTRY(18, "gty", "getty mode flag", 4, 0),
+    NVP_ENTRY(19, "fui", "update image", 262144, 0),
+    NVP_ENTRY(20, "lbi", "low battery image", 262144, 0),
+    NVP_ENTRY(21, "dor", "key mode (debug/release)", 4, 0),
+    NVP_ENTRY(22, "edw", "quick shutdown flag", 4, 0),
+    NVP_ENTRY(23, "ubp", "u-boot password", 32, 0),
+    NVP_ENTRY(24, "syi", "system information", 4, 0),
+    NVP_ENTRY(25, "exm", "exception monitor mode", 4, 0),
+    NVP_ENTRY(26, "pcd", "product code", 5, 0),
+    NVP_ENTRY(27, "btc", "battery calibration", 4, 0),
+    NVP_ENTRY(28, "rnd", "wmt key", 64, 0),
+    NVP_ENTRY(29, "ufn", "update file name", 8, 0),
+    NVP_ENTRY(30, "sdp", "sound driver parameter", 64, 0),
+    NVP_ENTRY(31, "ncp", "noise cancel driver parameter", 64, 0),
+    NVP_ENTRY(32, "kas", "key and signature", 64, 0),
+    NVP_ENTRY(33, "sfi", "starfish id", 64, 0),
+    NVP_ENTRY(34, "rtc", "rtc alarm", 16, 0),
+    NVP_ENTRY(35, "bpr", "bluetooth address", 2048, 0),
+    NVP_ENTRY(36, "e00", "EMPR  0", 1024, 0),
+    NVP_ENTRY(37, "e01", "EMPR  1", 1024, 0),
+    NVP_ENTRY(38, "e02", "EMPR  2", 1024, 0),
+    NVP_ENTRY(39, "e03", "EMPR  3", 1024, 0),
+    NVP_ENTRY(40, "e04", "EMPR  4", 1024, 0),
+    NVP_ENTRY(41, "e05", "EMPR  5", 1024, 0),
+    NVP_ENTRY(42, "e06", "EMPR  6", 1024, 0),
+    NVP_ENTRY(43, "e07", "EMPR  7", 1024, 0),
+    NVP_ENTRY(44, "e08", "EMPR  8", 1024, 0),
+    NVP_ENTRY(45, "e09", "EMPR  9", 1024, 0),
+    NVP_ENTRY(46, "e10", "EMPR 10", 1024, 0),
+    NVP_ENTRY(47, "e11", "EMPR 11", 1024, 0),
+    NVP_ENTRY(48, "e12", "EMPR 12", 1024, 0),
+    NVP_ENTRY(49, "e13", "EMPR 13", 1024, 0),
+    NVP_ENTRY(50, "e14", "EMPR 14", 1024, 0),
+    NVP_ENTRY(51, "e15", "EMPR 15", 1024, 0),
+    NVP_ENTRY(52, "e16", "EMPR 16", 1024, 0),
+    NVP_ENTRY(53, "e17", "EMPR 17", 1024, 0),
+    NVP_ENTRY(54, "e18", "EMPR 18", 1024, 0),
+    NVP_ENTRY(55, "e19", "EMPR 19", 1024, 0),
+    NVP_ENTRY(56, "e20", "EMPR 20", 1024, 0),
+    NVP_ENTRY(57, "e21", "EMPR 21", 1024, 0),
+    NVP_ENTRY(58, "e22", "EMPR 22", 1024, 0),
+    NVP_ENTRY(59, "e23", "EMPR 23", 1024, 0),
+    NVP_ENTRY(60, "e24", "EMPR 24", 1024, 0),
+    NVP_ENTRY(61, "e25", "EMPR 25", 1024, 0),
+    NVP_ENTRY(62, "e26", "EMPR 26", 1024, 0),
+    NVP_ENTRY(63, "e27", "EMPR 27", 1024, 0),
+    NVP_ENTRY(64, "e28", "EMPR 28", 1024, 0),
+    NVP_ENTRY(65, "e29", "EMPR 29", 1024, 0),
+    NVP_ENTRY(66, "e30", "EMPR 30", 1024, 0),
+    NVP_ENTRY(67, "e31", "EMPR 31", 1024, 0),
+    NVP_ENTRY(68, "clv", "color variation", 4, 0),
+    NVP_ENTRY(69, "slp", "time out to sleep", 4, 0),
+    NVP_ENTRY(70, "ipt", "disable iptable flag", 4, 0),
+    NVP_ENTRY(71, "mtm", "marlin time", 64, 0),
+    NVP_ENTRY(72, "mcr", "marlin crl", 16384, 0),
+    NVP_ENTRY(73, "mdk", "marlin device key", 33024, 0),
+    NVP_ENTRY(74, "muk", "marlin user key", 24576, 0),
+    NVP_ENTRY(75, "pts", "wifi protected setup", 4, 0),
+    NVP_ENTRY(76, "skt", "slacker time", 16, 0),
+    NVP_ENTRY(77, "mac", "wifi mac address", 6, 0),
+    NVP_ENTRY(78, "apd", "application debug mode flag", 4, 0),
+    NVP_ENTRY(79, "blf", "browser log mode flag", 4, 0),
+    NVP_ENTRY(80, "hld", "hold mode", 4, 0),
+    NVP_ENTRY(81, "skd", "slacker id file", 8224, 0),
+    NVP_ENTRY(82, "fmp", "fm parameter", 16, 0),
+    NVP_ENTRY(83, "sps", "speaker ship info", 4, 0),
+    NVP_ENTRY(84, "msc", "mass storage class mode", 4, 0),
+    NVP_ENTRY(85, "vrt", "europe vol regulation flag", 4, 0),
+    NVP_ENTRY(86, "psk", "bluetooth pskey", 512, 0),
+    NVP_ENTRY(87, "bml", "btmw log mode flag", 4, 0),
+    NVP_ENTRY(88, "bfd", "btmw factory scdb", 512, 0),
+    NVP_ENTRY(89, "bfp", "btmw factory pair info", 512, 0),
+};
+
+#define NR_NVP_PROPS   (sizeof(nvp_prop_list) / sizeof(nvp_prop_list[0]))
+
+int get_dnk_nvp(int argc, char **argv)
+{
+    if(argc != 1 && argc != 3)
+    {
+        printf("You must specify a known nvp node or a full node specification:\n");
+        printf("Full usage: <node> <size> <flags>\n");
+        printf("Node usage: <node>\n");
+        printf("Nodes:\n");
+        for(unsigned i = 0; i < NR_NVP_PROPS; i++)
+            printf("  %s\t%s", nvp_prop_list[i].name, nvp_prop_list[i].desc);
+        printf("\n");
+        return 1;
+    }
+
+    struct nvp_prop_t prop;
+    memset(&prop, 0, sizeof(prop));
+    if(argc == 1)
+    {
+        for(unsigned i = 0; i < NR_NVP_PROPS; i++)
+            if(strcmp(nvp_prop_list[i].name, argv[0]) == 0)
+                prop = nvp_prop_list[i];
+        if(prop.name == NULL)
+        {
+            cprintf(GREY, "Unknown node '%s'\n", argv[0]);
+            return 1;
+        }
+    }
+    else
+    {
+        prop.node = strtoul(argv[0], NULL, 0);
+        prop.size = strtoul(argv[1], NULL, 0);
+        prop.flags = strtoul(argv[2], NULL, 0);
+    }
+
+    int buffer_size = prop.size + 4;
+    uint8_t *buffer = buffer_alloc(buffer_size + 1);
+    int ret = do_dnk_cmd(0x23, 10, prop.node, buffer, &buffer_size);
+    if(ret)
+        return ret;
+    if(buffer_size <= 4)
+    {
+        cprintf(GREY, "Device didn't send any data\n");
+        return 1;
+    }
+    if(buffer[0] != 0 || buffer[2] != 0 || buffer[3] != prop.node)
+    {
+        cprintf(GREY, "Device responded with invalid data\n");
+        return 1;
+    }
+
+    for(int i = 4, idx = buffer[1]; i < buffer_size; i++, idx++)
+        buffer[i] ^= para_noise[idx];
+    buffer[buffer_size] = 0;
+    buffer += 4;
+    buffer_size -= 4;
+    if((prop.flags & DNK_EXACT_LENGTH) && buffer_size != prop.size)
+    {
+        cprintf(GREY, "Device didn't send the expected amount of data\n");
+        return 2;
+    }
+    
+    if(prop.flags & DNK_STRING)
+        cprintf_field("Node: ", "%s\n", buffer);
+    else if(prop.flags & DNK_UINT32)
+        cprintf_field("Node: ", "0x%x\n", *(uint32_t *)buffer);
+    else
+    {
+        cprintf(GREEN, "Node:\n");
         print_hex(buffer, buffer_size);
     }
     return 0;
@@ -419,6 +608,7 @@ struct cmd_t
 struct cmd_t cmd_list[] =
 {
     { "get_dnk_prop", "Get DNK property", get_dnk_prop },
+    { "get_dnk_nvp", "Get DNK NVP content", get_dnk_nvp },
     { "get_dpcc_prop", "Get DPCC property", get_dpcc_prop },
     { "get_user_time", "Get user time", get_user_time },
     { "get_dev_info", "Get device info", get_dev_info },
