@@ -279,6 +279,7 @@ int nvp_read_data(int shadow, int area, int zone, int offset, void *buf, int siz
 {
     int large = nvp_area_info[area].kind == NVP_AREA_LARGE_KIND;
     int unit_size = large ? NVP_LARGE_AREA_SIZE : NVP_SMALL_AREA_SIZE;
+    int read_size = 0;
 
     while(size > 0)
     {
@@ -288,17 +289,23 @@ int nvp_read_data(int shadow, int area, int zone, int offset, void *buf, int siz
             nvp_get_cluster_number(shadow, area, zone, index) :
             nvp_get_sector_number(shadow, area, zone, index);
         if(sec_cluster == 0)
-            return -1;
-        //cprintf(GREY, "[sec_cluster=%d]", sec_cluster);
+            break;
         int read = MIN(size, unit_size - unit_offset);
+        //cprintf(GREY, "[sec_cluster=%d read=%d]", sec_cluster, read);
         int ret = nvp_read(sec_cluster * unit_size, read, buf);
         if(ret)
             return ret;
         buf += read;
         offset += read;
         size -= read;
+        read_size += read;
     }
-    return 0;
+    return read_size;
+}
+
+bool nvp_is_valid_node(int node)
+{
+    return node >= 0 && node < nr_nodes && node_info[node].area != -1;
 }
 
 struct nvp_node_info_t nvp_get_node_info(int node)
@@ -527,16 +534,18 @@ int nvp_info(void)
             cprintf_field("    Zone ", "%s", zones[j].name);
             cprintf(BLUE, " ->");
             uint8_t buf[0x20];
-            int ret = nvp_read_data(0, i, j, 0, buf, MIN(0x20, zones[j].size));
-            if(ret)
+            int sz = 0x20;
+            int ret = nvp_read_data(0, i, j, 0, buf, MIN(sz, zones[j].size));
+            if(ret <= 0)
             {
                 cprintf(RED, " No data\n");
                 continue;
             }
-            for(int i = 0; i < MIN(0x20, zones[j].size); i++)
+            sz = MIN(sz, ret);
+            for(int i = 0; i < MIN(sz, zones[j].size); i++)
                 cprintf(YELLOW, " %02x", buf[i]);
             cprintf(BLUE, " -> ");
-            for(int i = 0; i < MIN(0x20, zones[j].size); i++)
+            for(int i = 0; i < MIN(sz, zones[j].size); i++)
                 cprintf(YELLOW, "%c", isprint(buf[i]) ? buf[i] : '.');
             printf("\n");
         }

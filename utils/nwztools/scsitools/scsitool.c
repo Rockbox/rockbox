@@ -393,8 +393,7 @@ int get_dnk_nvp(int argc, char **argv)
         printf("Node usage: <node>\n");
         printf("Nodes:\n");
         for(unsigned i = 0; i < NR_NVP_PROPS; i++)
-            printf("  %s\t%s", nvp_prop_list[i].name, nvp_prop_list[i].desc);
-        printf("\n");
+            printf("  %s\t%s\n", nvp_prop_list[i].name, nvp_prop_list[i].desc);
         return 1;
     }
 

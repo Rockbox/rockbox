@@ -32,9 +32,10 @@
 #include "nvp.h"
 
 bool g_debug = false;
-char *g_out_prefix = NULL;
-FILE *g_in_file = NULL;
+static char *g_out_prefix = NULL;
+static FILE *g_in_file = NULL;
 bool g_force = false;
+static int g_nvp_node = -1;
 
 #define let_the_force_flow(x) do { if(!g_force) return x; } while(0)
 #define continue_the_force(x) if(x) let_the_force_flow(x)
@@ -164,15 +165,52 @@ static int do_emmc(void)
     return 0;
 }
 
+static int do_nvp_extract(void)
+{
+    if(!g_out_prefix)
+    {
+        cprintf(GREY, "You must specify an output prefix to extract a NVP node\n");
+        return 1;
+    }
+    if(!nvp_is_valid_node(g_nvp_node))
+    {
+        cprintf(GREY, "Invalid NVP node %d\n", g_nvp_node);
+        return 3;
+    }
+    
+    FILE *f = fopen(g_out_prefix, "wb");
+    if(!f)
+    {
+        cprintf(GREY, "Cannot open output file: %m\n");
+        return 2;
+    }
+
+    int size = nvp_get_node_size(g_nvp_node);
+    void *buffer = malloc(size);
+    int ret = nvp_read_node(g_nvp_node, 0, buffer, size);
+    if(ret < 0)
+        cprintf(GREY, "NVP read error: %d\n", ret);
+    else
+    {
+        cprintf(YELLOW, "%d ", ret);
+        cprintf(GREEN, "bytes written\n");
+        fwrite(buffer, 1, ret, f);
+    }
+    free(buffer);
+    fclose(f);
+    return 0;
+}
+
 static void usage(void)
 {
     printf("Usage: emmctool [options] img\n");
     printf("Options:\n");
-    printf("  -o <prefix>\tSet output prefix\n");
-    printf("  -f/--force\tForce to continue on errors\n");
-    printf("  -?/--help\tDisplay this message\n");
-    printf("  -d/--debug\tDisplay debug messages\n");
-    printf("  -c/--no-color\tDisable color output\n");
+    printf("  -o <prefix>\t\tSet output prefix\n");
+    printf("  -f/--force\t\tForce to continue on errors\n");
+    printf("  -?/--help\t\tDisplay this message\n");
+    printf("  -d/--debug\t\tDisplay debug messages\n");
+    printf("  -c/--no-color\t\tDisable color output\n");
+    printf("  -e/--nvp-ex <node>\tExtract a NVP node\n");
     exit(1);
 }
 
@@ -186,10 +224,11 @@ int main(int argc, char **argv)
             {"debug", no_argument, 0, 'd'},
             {"no-color", no_argument, 0, 'c'},
             {"force", no_argument, 0, 'f'},
+            {"nvp-ex", required_argument, 0, 'e'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcfo:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dcfo:e:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -210,6 +249,9 @@ int main(int argc, char **argv)
                 break;
             case 'o':
                 g_out_prefix = optarg;
+                break;
+            case 'e':
+                g_nvp_node = strtoul(optarg, NULL, 0);
                 break;
             default:
                 abort();
@@ -232,6 +274,8 @@ int main(int argc, char **argv)
     int ret = nvp_init(EMMC_NVP_SIZE, &nvp_read, g_debug);
     if(ret) return ret;
     ret = do_emmc();
+    if(ret == 0 && g_nvp_node >= 0)
+        ret = do_nvp_extract();
 
     fclose(g_in_file);
 

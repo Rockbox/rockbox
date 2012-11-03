@@ -74,6 +74,7 @@ extern struct nvp_area_info_entry_t nvp_area_info[NVP_NR_AREAS];
 typedef int (*nvp_read_fn_t)(uint32_t offset, uint32_t size, void *buf);
 
 int nvp_init(int nvp_size, nvp_read_fn_t read, bool debug);
+bool nvp_is_valid_node(int node);
 struct nvp_node_info_t nvp_get_node_info(int node);
 int nvp_get_node_size(int node);
 const char *nvp_get_node_name(int node);
@@ -88,6 +89,7 @@ int nvp_get_sector_status(int sector);
 int nvp_set_sector_status(int sector, int status);
 int nvp_get_cluster_number(int shadow, int area, int zone, int index);
 int nvp_get_sector_number(int shadow, int area, int zone, int index);
+/* returns amount of read data or -1 */
 int nvp_read_data(int shadow, int area, int zone, int offset, void *buffer, int size);
 
 #endif /* __NVP_H__ */
