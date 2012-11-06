@@ -666,47 +666,38 @@ androidcc () {
         exit
     fi
     buildhost=$(uname | tr "[:upper:]" "[:lower:]")
-    gccchoice="4.4.3"
-    gcctarget="arm-linux-androideabi-"
+    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+    LDOPTS=" $LDOPTS -shared -ldl -llog"
+    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
+    thread_support="HAVE_SIGALTSTACK_THREADS" # force for all archs
+    ANDROID_ARCH=$1 # for android.make too
+    # arch dependant stuff
+    case $ANDROID_ARCH in
+        armeabi)
+            endian="little"
+            gccchoice="4.4.3"
+            gcctarget="arm-linux-androideabi-"
+            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
+                    --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
+            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
+            ;;
+        mips)
+            endian="little"
+            gccchoice="4.4.3"
+            gcctarget="mipsel-linux-android-"
+            GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer \
+                    --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips -fPIC"
+            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips"
+            ;;
+        *)
+            echo "ERROR: androidcc(): Unknown target architecture"
+            exit
+            ;;
+    esac
+    echo "Application environment deemed $endian endian"
     gccprefix=$ANDROID_NDK_PATH/toolchains/$gcctarget$gccchoice/prebuilt/$buildhost-x86
     PATH=$PATH:$gccprefix/bin
     prefixtools $gcctarget
-    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
-    GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
-		--sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
-    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
-    LDOPTS="-shared -ldl -llog --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm $LDOPTS"
-    endian="little"
-    SHARED_LDFLAG="-shared"
-    ANDROID_ARCH=armeabi
-}
-
-androidmipscc () {
-    if [ -z "$ANDROID_SDK_PATH" ]; then
-        echo "ERROR: You need the Android SDK installed and have the ANDROID_SDK_PATH"
-        echo "environment variable point to the root directory of the Android SDK."
-        exit
-    fi
-    if [ -z "$ANDROID_NDK_PATH" ]; then
-        echo "ERROR: You need the Android NDK installed (r5 or higher) and have the ANDROID_NDK_PATH"
-        echo "environment variable point to the root directory of the Android NDK."
-        exit
-    fi
-    buildhost=$(uname | tr "[:upper:]" "[:lower:]")
-    gccchoice="4.4.3"
-    gcctarget="mipsel-linux-android-"
-    gccprefix=$ANDROID_NDK_PATH/toolchains/$gcctarget$gccchoice/prebuilt/$buildhost-x86
-    thread_support="HAVE_SIGALTSTACK_THREADS"
-    PATH=$PATH:$gccprefix/bin
-    prefixtools $gcctarget
-    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
-    GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer \
-		--sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips -fPIC"
-    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
-    LDOPTS="-shared -ldl -llog --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips $LDOPTS"
-    endian="little"
-    SHARED_LDFLAG="-shared"
-    ANDROID_ARCH=mips
 }
 
 whichadvanced () {
@@ -3223,7 +3214,7 @@ fi
     libdir="/data/data/org.rockbox/app_rockbox"
     memory=8
     uname=`uname`
-    androidcc
+    androidcc armeabi
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -3355,7 +3346,7 @@ fi
     libdir="/data/data/org.rockbox/app_rockbox"
     memory=8
     uname=`uname`
-    androidmipscc
+    androidcc mips
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
