@@ -500,8 +500,6 @@ arm7ejscc () {
 }
 
 mipselcc () {
- arch="mips"
- arch_version=32 # FIXME: autodetect version (32 or 64)
  prefixtools mipsel-elf-
  # mips is predefined, but we want it for paths. use __mips instead
  GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -Umips"
@@ -698,7 +696,6 @@ androidmipscc () {
     gccchoice="4.4.3"
     gcctarget="mipsel-linux-android-"
     gccprefix=$ANDROID_NDK_PATH/toolchains/$gcctarget$gccchoice/prebuilt/$buildhost-x86
-    arch_version=32 # FIXME: autodetect version (32 or 64)
     thread_support="HAVE_SIGALTSTACK_THREADS"
     PATH=$PATH:$gccprefix/bin
     prefixtools $gcctarget
@@ -3751,7 +3748,8 @@ if [ -z "$arch" ]; then
         # cpp defines like "#define __ARM_ARCH_4TE__ 1" (where we want to extract the 4)
         arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,')"
     elif [ -n "$(echo $cpp_defines | grep -w __mips__)" ]; then
-        arch="mips" # FIXME: autodetect version (32 or 64)
+        arch="mips"
+        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep _MIPS_ARCH_MIPS | sed -e 's,.*\([0-9][0-9]\).*,\1,')"
     elif [ -n "$(echo $cpp_defines | grep -w __i386__)" ]; then
         arch="x86"
     elif [ -n "$(echo $cpp_defines | grep -w __x86_64__)" ]; then
@@ -3835,7 +3833,7 @@ cat > autoconf.h <<EOF
 
 /* Define target machine architecture */
 #define ARCH ${arch}
-/* Optinally define architecture version */
+/* Optionally define architecture version */
 ${Darch_version}
 
 /* Define endianess for the target or simulator platform */
