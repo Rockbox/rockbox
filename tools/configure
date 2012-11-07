@@ -669,7 +669,6 @@ androidcc () {
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     LDOPTS="$LDOPTS -Wl,-soname,librockbox.so -shared -ldl -llog"
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack -shared"
-    thread_support="HAVE_SIGALTSTACK_THREADS" # force for all archs
     ANDROID_ARCH=$1 # for android.make too
     # arch dependant stuff
     case $ANDROID_ARCH in
@@ -677,6 +676,9 @@ androidcc () {
             endian="little"
             gccchoice="4.4.3"
             gcctarget="arm-linux-androideabi-"
+            # sigaltstack is not available in pre-android-9, however asm
+            # threads work fine so far
+            thread_support="ASSEMBLER_THREADS"
             GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
                     --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
             LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
@@ -685,6 +687,7 @@ androidcc () {
             endian="little"
             gccchoice="4.4.3"
             gcctarget="mipsel-linux-android-"
+            thread_support="HAVE_SIGALTSTACK_THREADS"
             GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer \
                     --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips -fPIC"
             LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips"
@@ -694,6 +697,7 @@ androidcc () {
             gccchoice="4.4.3"
             gcctarget="i686-linux-android-"
             gccdir=x86-$gccchoice
+            thread_support="HAVE_SIGALTSTACK_THREADS"
             GCCOPTS="$GCCOPTS -Wa,--noexecstack -ffunction-sections -fomit-frame-pointer\
                     --sysroot=$ANDROID_NDK_PATH/platforms/android-9/arch-x86"
             LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-9/arch-x86"
