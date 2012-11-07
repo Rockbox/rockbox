@@ -704,13 +704,11 @@ androidcc () {
             ;;
     esac
     echo "Application environment deemed $endian endian"
-    echo $gccdir
     if [ -z "$gccdir" ]; then
         gccdir=$gcctarget$gccchoice
     fi
     gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86
     PATH=$PATH:$gccprefix/bin
-    echo $PATH
     prefixtools $gcctarget
 }
 
