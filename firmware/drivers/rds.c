@@ -149,7 +149,7 @@ static bool handle_rt(int pos, char c)
 static bool handle_group2(uint16_t data[4])
 {
     int abflag, segment, version, pos;
-    bool done;
+    bool done = false;
 
     /* remove obsolete segments */
     for(int i = 0; i < 16; i++)
