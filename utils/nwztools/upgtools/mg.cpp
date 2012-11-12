@@ -33,6 +33,8 @@ namespace
 
     inline int dec_des_ecb(void *in, int size, void *out, uint8_t *key)
     {
+        if(size % 8)
+            return 42;
         g_dec.SetKey(key, 8);
         g_dec.ProcessData((byte*)out, (byte*)in, size);
         return 0;
@@ -40,6 +42,8 @@ namespace
 
     inline int enc_des_ecb(void *in, int size, void *out, uint8_t *key)
     {
+        if(size % 8)
+            return 42;
         g_enc.SetKey(key, 8);
         g_enc.ProcessData((byte*)out, (byte*)in, size);
         return 0;

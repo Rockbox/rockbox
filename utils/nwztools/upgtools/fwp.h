@@ -34,6 +34,7 @@ extern "C" {
 #define NWZ_DES_BLOCK   8
 
 int fwp_read(void *in, int size, void *out, uint8_t *key);
+int fwp_write(void *in, int size, void *out, uint8_t *key);
 void fwp_setkey(char key[8]);
 int fwp_crypt(void *buf, int size, int mode);
 

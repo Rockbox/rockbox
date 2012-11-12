@@ -50,7 +50,6 @@ static char *g_sig = NULL;
 
 enum keysig_search_method_t g_keysig_search = KEYSIG_SEARCH_NONE;
 
-
 #define let_the_force_flow(x) do { if(!g_force) return x; } while(0)
 #define continue_the_force(x) if(x) let_the_force_flow(x)
 
@@ -76,6 +75,8 @@ static void print_hex(void *p, int size, int unit)
             printf(" %08x", *p32);
     }
 }
+
+static void usage(void);
 
 /* key and signature */
 struct nwz_kas_t
@@ -106,7 +107,7 @@ struct upg_header_t
 {
     char sig[8];
     uint32_t nr_files;
-    uint32_t unk;
+    uint32_t pad; // make sure structure size is a multiple of 8
 } __attribute__((packed));
 
 struct upg_entry_t
@@ -186,7 +187,7 @@ static int do_upg(void *buf, long size)
     if(g_model_index == -1 && g_keysig_search == KEYSIG_SEARCH_NONE && g_key == NULL && g_kas == NULL)
     {
         cprintf(GREY, "A KAS or a keysig is needed to decrypt the firmware\n");
-        cprintf(GREY, "You have the following options(see hel for more details):\n");
+        cprintf(GREY, "You have the following options(see help for more details):\n");
         cprintf(GREY, "- select a model with a known KAS\n");
         cprintf(GREY, "- specify an explicit KAS or key(+optional sig)\n");
         cprintf(GREY, "- let me try to find the keysig(slow !)\n");
@@ -327,7 +328,7 @@ static int do_upg(void *buf, long size)
     else
         cprintf(RED, " Can't check\n");
     cprintf_field("  Files: ", "%d\n", hdr->nr_files);
-    cprintf_field("  Unk: ", "0x%x\n", hdr->unk);
+    cprintf_field("  Pad: ", "0x%x\n", hdr->pad);
 
     cprintf(BLUE, "Files\n");
     struct upg_entry_t *entry = (void *)(hdr + 1);
@@ -344,14 +345,17 @@ static int do_upg(void *buf, long size)
         if(g_out_prefix)
         {
             char *str = malloc(strlen(g_out_prefix) + 32);
-            sprintf(str, "%s/%d.bin", g_out_prefix, i);
+            sprintf(str, "%s%d.bin", g_out_prefix, i);
             FILE *f = fopen(str, "wb");
             if(f)
             {
-                int ret = fwp_read(buf + entry->offset, entry->size,
+                // round up size, there is some padding done with random data
+                int crypt_size = ROUND_UP(entry->size, 8);
+                int ret = fwp_read(buf + entry->offset, crypt_size,
                     buf + entry->offset, (void *)g_key);
                 if(ret)
                     return ret;
+                // but write the *good* amount of data
                 fwrite(buf + entry->offset, 1, entry->size, f);
                 
                 fclose(f);
@@ -364,10 +368,276 @@ static int do_upg(void *buf, long size)
     return 0;
 }
 
+static int extract_upg(int argc, char **argv)
+{
+    if(argc == 0 || argc > 1)
+    {
+        if(argc == 0)
+            printf("You must specify a firmware file\n");
+        else
+            printf("Extra arguments after firmware file\n");
+        usage();
+    }
+
+    g_in_file = argv[0];
+    FILE *fin = fopen(g_in_file, "r");
+    if(fin == NULL)
+    {
+        perror("Cannot open boot file");
+        return 1;
+    }
+    fseek(fin, 0, SEEK_END);
+    long size = ftell(fin);
+    fseek(fin, 0, SEEK_SET);
+
+    void *buf = malloc(size);
+    if(buf == NULL)
+    {
+        perror("Cannot allocate memory");
+        return 1;
+    }
+
+    if(fread(buf, size, 1, fin) != 1)
+    {
+        perror("Cannot read file");
+        return 1;
+    }
+
+    fclose(fin);
+
+    int ret = do_upg(buf, size);
+    if(ret != 0)
+    {
+        cprintf(GREY, "Error: %d", ret);
+        if(!g_force)
+            cprintf(GREY, " (use --force to force processing)");
+        printf("\n");
+        ret = 2;
+    }
+    free(buf);
+
+    return ret;
+}
+
+static long filesize(FILE *f)
+{
+    long pos = ftell(f);
+    fseek(f, 0, SEEK_END);
+    long size = ftell(f);
+    fseek(f, pos, SEEK_SET);
+    return size;
+}
+
+static int create_upg(int argc, char **argv)
+{
+    if(argc == 0)
+    {
+        printf("You must specify a firmware filename\n");
+        usage();
+    }
+    
+    if(g_model_index == -1 && (g_key == NULL || g_sig == NULL) && g_kas == NULL)
+    {
+        cprintf(GREY, "A KAS or a keysig is needed to encrypt the firmware\n");
+        cprintf(GREY, "You have the following options(see help for more details):\n");
+        cprintf(GREY, "- select a model with a known KAS\n");
+        cprintf(GREY, "- specify an explicit KAS or key+sig\n");
+        return 1;
+    }
+
+    struct nwz_kas_t kas;
+    char keysig[NWZ_KEYSIG_SIZE];
+
+    memset(kas.kas, '?', NWZ_KAS_SIZE);
+    memset(keysig, '?', NWZ_KEYSIG_SIZE);
+    keysig[32] = keysig[41] = keysig[50] = 0;
+
+    if(g_kas)
+    {
+        if(strlen(g_kas) != NWZ_KAS_SIZE)
+        {
+            cprintf(GREY, "The specified KAS has wrong length (must be %d hex digits)\n", NWZ_KAS_SIZE);
+            return 4;
+        }
+        memcpy(keysig, g_kas, NWZ_KAS_SIZE);
+        decrypt_keysig(keysig);
+        g_kas = keysig;
+        g_key = keysig + 33;
+        g_sig = keysig + 42;
+    }
+    else if(g_key)
+    {
+        if(strlen(g_key) != 8)
+        {
+            cprintf(GREY, "The specified key has wrong length (must be 8 hex digits)\n");
+            return 4;
+        }
+        if(strlen(g_sig) != 8)
+        {
+            cprintf(GREY, "The specified sig has wrong length (must be 8 hex digits)\n");
+            return 5;
+        }
+
+        memcpy(keysig + 33, g_key, 8);
+        if(!g_sig)
+            cprintf(GREY, "Warning: you have specified a key but no sig, I won't be able to do any checks\n");
+        else
+            memcpy(keysig + 42, g_sig, 8);
+        g_key = keysig + 33;
+        g_sig = keysig + 42;
+    }
+    else if(g_model_index != -1)
+    {
+        if(g_model_list[g_model_index].flags & HAS_KAS)
+            g_kas = g_model_list[g_model_index].kas.kas;
+        if(g_model_list[g_model_index].flags & HAS_KEY)
+            g_key = g_model_list[g_model_index].key;
+        if(g_model_list[g_model_index].flags & HAS_SIG)
+            g_sig = g_model_list[g_model_index].sig;
+
+        if(g_key && g_sig)
+        {
+            memcpy(keysig + 33, g_key, 8);
+            g_key = keysig + 33;
+            memcpy(keysig + 42, g_sig, 8);
+            g_sig = keysig + 42;
+        }
+        else if(g_kas)
+        {
+            memcpy(keysig, g_kas, NWZ_KAS_SIZE);
+            decrypt_keysig(keysig);
+            g_kas = keysig;
+            g_key = keysig + 33;
+            g_sig = keysig + 42;
+        }
+        else
+        {
+            printf("Target doesn't have enough information to get key and sig\n");
+            return 1;
+        }
+    }
+    else
+    {
+        printf("Kill me\n");
+        return 1;
+    }
+
+    if(!g_kas)
+    {
+        g_kas = keysig;
+        fwp_setkey("ed295076");
+        memcpy(kas.kas, g_key, 8);
+        fwp_crypt(kas.kas, 8, 0);
+        for(int i = 0; i < 8; i++)
+        {
+            g_kas[2 * i] = hex_digit((kas.kas[i] >> 4) & 0xf);
+            g_kas[2 * i + 1] = hex_digit(kas.kas[i] & 0xf);
+        }
+        memcpy(kas.kas + 8, g_sig, 8);
+        fwp_crypt(kas.kas + 8, 8, 0);
+        for(int i = 8; i < 16; i++)
+        {
+            g_kas[2 * i] = hex_digit((kas.kas[i] >> 4) & 0xf);
+            g_kas[2 * i + 1] = hex_digit(kas.kas[i] & 0xf);
+        }
+    }
+
+    cprintf(BLUE, "Keys\n");
+    cprintf_field("  KAS: ", "%."STR(NWZ_KAS_SIZE)"s\n", g_kas);
+    cprintf_field("  Key: ", "%s\n", g_key);
+    if(g_sig)
+        cprintf_field("  Sig: ", "%s\n", g_sig);
+
+    FILE *fout = fopen(argv[0], "wb");
+    if(fout == NULL)
+    {
+        printf("Cannot open output firmware file: %m\n");
+        return 1;
+    }
+
+    int nr_files = argc - 1;
+    FILE **files = malloc(nr_files * sizeof(FILE *));
+
+    for(int i = 0; i < nr_files; i++)
+    {
+        files[i] = fopen(argv[1 + i], "rb");
+        if(files[i] == NULL)
+        {
+            printf("Cannot open input file '%s': %m\n", argv[i + 1]);
+            return 1;
+        }
+    }
+
+    struct upg_md5_t md5;
+    memset(&md5, 0, sizeof(md5));
+    MD5_CTX c;
+    MD5_Init(&c);
+    // output a dummy md5 sum
+    fwrite(&md5, 1, sizeof(md5), fout);
+    // output the encrypted signature
+    struct upg_header_t hdr;
+    memcpy(hdr.sig, g_sig, 8);
+    hdr.nr_files = nr_files;
+    hdr.pad = 0;
+    
+    int ret = fwp_write(&hdr, sizeof(hdr), &hdr, (void *)g_key);
+    if(ret)
+        return ret;
+    MD5_Update(&c, &hdr, sizeof(hdr));
+    fwrite(&hdr, 1, sizeof(hdr), fout);
+
+    // output file headers
+    long offset = sizeof(md5) + sizeof(hdr) + nr_files * sizeof(struct upg_entry_t);
+    for(int i = 0; i < nr_files; i++)
+    {
+        struct upg_entry_t entry;
+        entry.offset = offset;
+        entry.size = filesize(files[i]);
+        offset += ROUND_UP(entry.size, 8); // do it before encryption !!
+        
+        ret = fwp_write(&entry, sizeof(entry), &entry, (void *)g_key);
+        if(ret)
+            return ret;
+        MD5_Update(&c, &entry, sizeof(entry));
+        fwrite(&entry, 1, sizeof(entry), fout);
+    }
+
+    cprintf(BLUE, "Files\n");
+    for(int i = 0; i < nr_files; i++)
+    {
+        long size = filesize(files[i]);
+        long r_size = ROUND_UP(size, 8);
+        cprintf(GREY, "  File");
+        cprintf(RED, " %d\n", i);
+        cprintf_field("    Offset: ", "0x%lx\n", ftell(fout));
+        cprintf_field("    Size: ", "0x%lx\n", size);
+
+        void *buf = malloc(r_size);
+        memset(buf, 0, r_size);
+        fread(buf, 1, size, files[i]);
+        fclose(files[i]);
+
+        ret = fwp_write(buf, r_size, buf, (void *)g_key);
+        if(ret)
+            return ret;
+        MD5_Update(&c, buf, r_size);
+        fwrite(buf, 1, r_size, fout);
+
+        free(buf);
+    }
+
+    fseek(fout, 0, SEEK_SET);
+    MD5_Final(md5.md5, &c);
+    fwrite(&md5, 1, sizeof(md5), fout);
+    fclose(fout);
+
+    return 0;
+}
+
 static void usage(void)
 {
     color(OFF);
-    printf("Usage: upgtool [options] firmware\n");
+    printf("Usage: upgtool [options] firmware [files...]\n");
     printf("Options:\n");
     printf("  -o <prefix>\t\tSet output prefix\n");
     printf("  -f/--force\t\tForce to continue on errors\n");
@@ -375,10 +645,12 @@ static void usage(void)
     printf("  -d/--debug\t\tDisplay debug messages\n");
     printf("  -c/--no-color\t\tDisable color output\n");
     printf("  -m/--model <model>\tSelect model (or ? to list them)\n");
-    printf("  -l/--search <method>\tTry to find the keysig\n");
+    printf("  -l/--search <method>\tTry to find the keysig (implies -e)\n");
     printf("  -a/--kas <kas>\tForce KAS\n");
     printf("  -k/--key <key>\tForce key\n");
     printf("  -s/--sig <sig>\tForce sig\n");
+    printf("  -e/--extract\t\tExtract a UPG archive\n");
+    printf("  -c/--create\t\tCreate a UPG archive\n");
     printf("keysig search method:\n");
     for(int i = KEYSIG_SEARCH_FIRST; i < KEYSIG_SEARCH_LAST; i++)
         printf("  %s\t%s\n", keysig_search_desc[i].name, keysig_search_desc[i].comment);
@@ -387,30 +659,38 @@ static void usage(void)
 
 int main(int argc, char **argv)
 {
+    bool extract = false;
+    bool create = false;
+
+    if(argc <= 1)
+        usage();
+    
     while(1)
     {
         static struct option long_options[] =
         {
             {"help", no_argument, 0, '?'},
             {"debug", no_argument, 0, 'd'},
-            {"no-color", no_argument, 0, 'c'},
+            {"no-color", no_argument, 0, 'n'},
             {"force", no_argument, 0, 'f'},
             {"model", required_argument, 0, 'm'},
             {"search", required_argument, 0, 'l'},
             {"kas", required_argument, 0, 'a'},
             {"key", required_argument, 0, 'k'},
             {"sig", required_argument, 0, 's'},
+            {"extract", no_argument, 0, 'e'},
+            {"create", no_argument, 0 ,'c'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcfo:m:l:a:k:s:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dnfo:m:l:a:k:s:ec", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
         {
             case -1:
                 break;
-            case 'c':
+            case 'n':
                 enable_color(false);
                 break;
             case 'd':
@@ -438,6 +718,7 @@ int main(int argc, char **argv)
                     cprintf(GREY, "Unknown keysig search method '%s'\n", optarg);
                     return 1;
                 }
+                extract = true;
                 break;
             case 'a':
                 g_kas = optarg;
@@ -447,6 +728,12 @@ int main(int argc, char **argv)
                 break;
             case 's':
                 g_sig = optarg;
+                break;
+            case 'e':
+                extract = true;
+                break;
+            case 'c':
+                create = true;
                 break;
             default:
                 abort();
@@ -492,48 +779,28 @@ int main(int argc, char **argv)
             cprintf(GREY, "Warning: unknown model %s\n", g_model);
     }
 
-    if(argc - optind != 1)
+    if(!create && !extract)
     {
-        usage();
+        printf("You must specify an action (extract or create)\n");
         return 1;
     }
 
-    g_in_file = argv[optind];
-    FILE *fin = fopen(g_in_file, "r");
-    if(fin == NULL)
+    if(create && extract)
     {
-        perror("Cannot open boot file");
-        return 1;
-    }
-    fseek(fin, 0, SEEK_END);
-    long size = ftell(fin);
-    fseek(fin, 0, SEEK_SET);
-
-    void *buf = malloc(size);
-    if(buf == NULL)
-    {
-        perror("Cannot allocate memory");
+        printf("You cannot specify both create and extract\n");
         return 1;
     }
 
-    if(fread(buf, size, 1, fin) != 1)
+    int ret = 0;
+    if(create)
+        ret = create_upg(argc - optind, argv + optind);
+    else if(extract)
+        ret = extract_upg(argc - optind, argv + optind);
+    else
     {
-        perror("Cannot read file");
-        return 1;
+        printf("Die from lack of action\n");
+        ret = 1;
     }
-    
-    fclose(fin);
-
-    int ret = do_upg(buf, size);
-    if(ret != 0)
-    {
-        cprintf(GREY, "Error: %d", ret);
-        if(!g_force)
-            cprintf(GREY, " (use --force to force processing)");
-        printf("\n");
-        ret = 2;
-    }
-    free(buf);
 
     color(OFF);
 

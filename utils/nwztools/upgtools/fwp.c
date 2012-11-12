@@ -29,6 +29,11 @@ int fwp_read(void *in, int size, void *out, uint8_t *key)
     return mg_decrypt_fw(in, size, out, key);
 }
 
+int fwp_write(void *in, int size, void *out, uint8_t *key)
+{
+    return mg_encrypt_fw(in, size, out, key);
+}
+
 static uint8_t g_key[NWZ_KEY_SIZE];
 
 void fwp_setkey(char key[NWZ_KEY_SIZE])
