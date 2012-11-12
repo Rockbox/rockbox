@@ -263,6 +263,7 @@ int nvp_get_sector_number(int shadow, int area, int zone, int index)
         return -1;
     }
     uint8_t *ptr = shadow ? nvp_shadow : nvp_table;
+    //cprintf(GREY, "[offset: 0x%x]", area * NVP_AREA_TABLE_SIZE + (start + index) * 4);
     uint32_t sector = *(uint32_t *)&ptr[area * NVP_AREA_TABLE_SIZE + (start + index) * 4];
     if(sector == 0)
         return 0;
@@ -291,7 +292,7 @@ int nvp_read_data(int shadow, int area, int zone, int offset, void *buf, int siz
         if(sec_cluster == 0)
             break;
         int read = MIN(size, unit_size - unit_offset);
-        //cprintf(GREY, "[sec_cluster=%d read=%d]", sec_cluster, read);
+        //cprintf(GREY, "[sec_cluster=%d unit_size=%d read=%d]", sec_cluster, unit_size, read);
         int ret = nvp_read(sec_cluster * unit_size, read, buf);
         if(ret)
             return ret;
