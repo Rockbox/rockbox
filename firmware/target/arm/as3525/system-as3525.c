@@ -272,10 +272,6 @@ void system_init(void)
     CGU_PERI &= ~0x7f;      /* pclk 24 MHz */
 #endif
 
-    /*this saves a tiny bit of power but seems to leave the processor in
-      a bad state if it manages to reboot without the clock reenabled*/
-    /*CGU_PERI &= ~CGU_ROM_ENABLE;*/   /*disable built in boot rom clock*/
-
     /* bits 31:30 should be set to 0 in arm926-ejs */
     asm volatile(
         "mrc p15, 0, r0, c1, c0   \n"      /* control register */
@@ -307,6 +303,8 @@ void system_init(void)
                  (AS3525_PCLK_DIV1 << 6) |
 #endif
                   AS3525_PCLK_SEL);
+
+    CGU_PERI |= CGU_ROM_ENABLE; /* needed for rebooting */
 
     set_cpu_frequency(CPUFREQ_DEFAULT);
 
@@ -365,9 +363,6 @@ void system_reboot(void)
     _backlight_off();
 
     disable_irq();
-
-    /* re-enable internal ROM so that we don't hard lock on power up*/
-    CGU_PERI |= CGU_ROM_ENABLE; /*should always be on, but to be safe...*/
 
     /* use watchdog to reset */
     CGU_PERI |= (CGU_WDOCNT_CLOCK_ENABLE | CGU_WDOIF_CLOCK_ENABLE);
