@@ -1768,6 +1768,18 @@ static bool dbg_save_roms(void)
 
     return false;
 }
+#elif CONFIG_CPU == AS3525v2 || CONFIG_CPU == AS3525
+static bool dbg_save_roms(void)
+{
+    int fd = creat("/rom.bin", 0666);
+    if(fd >= 0)
+    {
+        write(fd, (void *)0x80000000, 0x20000);
+        close(fd);
+    }
+
+    return false;
+}
 #elif CONFIG_CPU == IMX31L
 bool __dbg_dvfs_dptc(void);
 static bool dbg_save_roms(void)
@@ -2149,7 +2161,8 @@ static const struct {
 } menuitems[] = {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
     (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)) || \
-    CONFIG_CPU == IMX31L || defined(CPU_TCC780X)
+    CONFIG_CPU == IMX31L || defined(CPU_TCC780X) || CONFIG_CPU == AS3525v2 || \
+    CONFIG_CPU == AS3525
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \
