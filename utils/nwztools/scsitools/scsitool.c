@@ -595,6 +595,29 @@ int get_dev_info(int argc, char **argv)
     return 0;
 }
 
+int do_fw_upgrade(int argc, char **argv)
+{
+    (void) argc;
+    (void )argv;
+    uint8_t cdb[12] = {0xfc, 0, 0x04, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
+
+    char *buffer = buffer_alloc(0x81);
+    int buffer_size = 0x80;
+    uint8_t sense[32];
+    int sense_size = 32;
+
+    int ret = do_scsi(cdb, 12, DO_READ, sense, &sense_size, buffer, &buffer_size);
+    if(ret < 0)
+        return ret;
+    ret = do_sense_analysis(ret, sense, sense_size);
+    if(ret)
+        return ret;
+    buffer[buffer_size] = 0;
+    cprintf_field("Result:", "\n");
+    print_hex(buffer, buffer_size);
+    return 0;
+}
+
 typedef int (*cmd_fn_t)(int argc, char **argv);
 
 struct cmd_t
@@ -611,6 +634,7 @@ struct cmd_t cmd_list[] =
     { "get_dpcc_prop", "Get DPCC property", get_dpcc_prop },
     { "get_user_time", "Get user time", get_user_time },
     { "get_dev_info", "Get device info", get_dev_info },
+    { "do_fw_upgrade", "Do a firmware upgrade", do_fw_upgrade },
 };
 
 #define NR_CMDS (sizeof(cmd_list) / sizeof(cmd_list[0]))
