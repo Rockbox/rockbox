@@ -38,7 +38,10 @@ static volatile struct scroll_state_t {
     signed char dir;
     long timeout;
     bool rel;
-} scroll;
+} scroll = { .dir = BUTTON_UP,
+             .timeout = SLIDER_REL_TIMEOUT,
+             .rel = false,
+           };
 
 static inline void disable_scrollstrip_interrupts(void)
 {
