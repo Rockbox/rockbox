@@ -1805,6 +1805,38 @@ static bool dbg_save_roms(void)
 
     return false;
 }
+#elif CONFIG_CPU == RK27XX
+static bool dbg_save_roms(void)
+{
+    char buf[0x200];
+
+    int fd = creat("/rom.bin", 0666);
+    if(fd < 0)
+        return false;
+
+    for(int addr = 0; addr < 0x2000; addr += sizeof(buf))
+    {
+        int old_irq = disable_irq_save();
+
+        /* map rom at 0 */
+        SCU_REMAP = 0;
+        commit_discard_idcache();
+
+        /* copy rom */
+        memcpy((void *)buf, (void *)addr, sizeof(buf));
+
+        /* map iram back at 0 */
+        SCU_REMAP = 0xdeadbeef;
+        commit_discard_idcache();
+
+        restore_irq(old_irq);
+
+        write(fd, (void *)buf, sizeof(buf));
+    }
+    close(fd);
+
+    return false;
+}
 #endif /* CPU */
 
 #ifndef SIMULATOR
@@ -2162,7 +2194,7 @@ static const struct {
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
     (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)) || \
     CONFIG_CPU == IMX31L || defined(CPU_TCC780X) || CONFIG_CPU == AS3525v2 || \
-    CONFIG_CPU == AS3525
+    CONFIG_CPU == AS3525 || CONFIG_CPU == RK27XX
         { "Dump ROM contents", dbg_save_roms },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \
