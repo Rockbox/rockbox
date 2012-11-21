@@ -22,7 +22,7 @@ $(GIFBUILDDIR)/gif.link: $(PLUGIN_LDS) $(GIFBUILDDIR)/gif.refmap
 $(GIFBUILDDIR)/gif.ovl: $(GIF_OBJ)
 
 #-Os breaks decoder - dunno why
-GIFFLAGS = $(IMGDECFLAGS) -O0
+GIFFLAGS = $(IMGDECFLAGS) -O2
 
 # Compile PNG plugin with extra flags (adapted from ZXBox)
 $(GIFBUILDDIR)/%.o: $(GIFSRCDIR)/%.c $(GIFSRCDIR)/gif.make
