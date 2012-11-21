@@ -86,9 +86,10 @@ aware:
                 \\
         }
         
-        \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonLeft}
+        \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen,SANSA_FUZEPLUS_PAD}{\ButtonLeft}
         \opt{MPIO_HD200_PAD}{\ButtonRec}
         \opt{MPIO_HD300_PAD}{\ButtonMenu}
+        \opt{SANSA_FUZEPLUS_PAD}{\ButtonLeft{} or \ButtonBack}
         \opt{touchscreen}{
             \opt{COWON_D2_PAD}{\ButtonPower{} or}
             \TouchBottomRight}
@@ -99,7 +100,8 @@ aware:
         Exit track list
             \\
 
-        \nopt{IAUDIO_M3_PAD}{\ActionStdMenu}
+        \nopt{IAUDIO_M3_PAD,SANSA_FUZEPLUS_PAD}{\ActionStdMenu}
+            \opt{SANSA_FUZEPLUS_PAD}{long \ButtonSelect}
             &
         \opt{HAVEREMOTEKEYMAP}{
             \opt{IAUDIO_M3_PAD,GIGABEAT_RC_PAD}{\ActionRCStdMenu}
@@ -110,7 +112,7 @@ aware:
         \nopt{IAUDIO_M3_PAD}{%
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
             \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD%
-                ,MROBE100_PAD}{\ButtonPower}
+                ,MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
             \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonMenu}
             \opt{SANSA_FUZE_PAD}{Long \ButtonHome} 
