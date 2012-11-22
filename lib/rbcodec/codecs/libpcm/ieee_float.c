@@ -38,7 +38,7 @@ static bool set_format(struct pcm_format *format)
         return false;
     }
 
-    if (fmt->bitspersample != 32 && fmt->bitspersample != 64)
+    if (fmt->bitspersample != 16 && fmt->bitspersample != 32 && fmt->bitspersample != 64)
     {
         DEBUGF("CODEC_ERROR: ieee float must be 32 or 64 bitspersample: %d\n",
                              fmt->bitspersample);
@@ -113,6 +113,33 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
             inbuf += 4;
         }
         *outbufsize = inbufsize >> 2;
+    }
+    else if (fmt->bitspersample == 16)
+    {
+        for (i = 0; i < inbufsize; i += 2)
+        { 
+            pcm = inbuf[0]|((inbuf[1]&0x03)<<8);
+            exp = ((inbuf[1]&0x7c)>>2)-15;
+            sgn = (inbuf[1] & 0x80)>>7;
+      
+	    if(exp == -15)
+	         pcm =0;
+	    else
+	    {
+	        pcm+=1<<10;
+	        exp+=2; /*shift by 2 for rockbox fixed format*/
+	        if(exp>=0)
+	            pcm <<= (exp); 
+            else
+	            pcm >>= (-exp);             
+
+        	if (sgn)
+        	    pcm = -pcm;
+		}
+        outbuf[i/2] = pcm;
+        inbuf += 2;
+        }
+        *outbufsize = inbufsize >> 1;
     }
     else
     {
