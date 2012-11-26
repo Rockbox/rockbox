@@ -354,6 +354,10 @@ static void end_search(void)
     search_dir = 0;
 }
 
+#ifndef HAS_BUTTON_HOLD
+int soft_hold_enable = 0;
+#endif
+
 void radio_screen(void)
 {
     bool done = false;
@@ -475,6 +479,15 @@ void radio_screen(void)
             cpu_idle_mode(false);
             button_timeout = current_tick + (2*HZ);
         }
+#endif
+
+#ifndef HAS_BUTTON_HOLD
+        if (button == ACTION_STD_KEYLOCK)
+        {
+            soft_hold_enable = !soft_hold_enable;
+        }
+        if(soft_hold_enable)
+            break;
 #endif
         switch(button)
         {
