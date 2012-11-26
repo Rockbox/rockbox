@@ -10,7 +10,7 @@ all: $(BINS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-sbtoelf: sbtoelf.o crc.o crypto.o aes128.o sha1.o elf.o misc.o sb.o
+sbtoelf: sbtoelf.o crc.o crypto.o aes128.o sha1.o xorcrypt.o elf.o misc.o sb.o sb1.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 elftosb: elftosb.o crc.o crypto.o aes128.o sha1.o elf.o dbparser.o misc.o sb.o

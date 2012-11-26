@@ -47,6 +47,7 @@ enum crypto_method_t
 {
     CRYPTO_NONE, /* disable */
     CRYPTO_KEY, /* key */
+    CRYPTO_XOR_KEY, /* XOR key */
     CRYPTO_USBOTP, /* use usbotp device */
 };
 
@@ -73,6 +74,12 @@ int crypto_apply(
     byte (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
     int encrypt);
 
+union xorcrypt_key_t
+{
+    uint8_t key[64];
+    uint32_t k[16];
+};
+
 /* all-in-one function */
 struct crypto_key_t
 {
@@ -80,6 +87,7 @@ struct crypto_key_t
     union
     {
         byte key[16];
+        union xorcrypt_key_t xor_key[2];
         uint32_t vid_pid;
         byte param[0];
     }u;
@@ -111,5 +119,11 @@ void sha_1_block(struct sha_1_params_t *params, uint32_t cur_hash[5], byte *data
 void sha_1_update(struct sha_1_params_t *params, byte *buffer, int size);
 void sha_1_finish(struct sha_1_params_t *params);
 void sha_1_output(struct sha_1_params_t *params, byte *out);
+
+/* xorcrypt.c */
+
+// WARNING those functions modifies the keys !!
+uint32_t xor_encrypt(union xorcrypt_key_t keys[2], void *data, int size);
+uint32_t xor_decrypt(union xorcrypt_key_t keys[2], void *data, int size);
 
 #endif /* __CRYPTO_H__ */

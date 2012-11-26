@@ -28,6 +28,7 @@
 
 static enum crypto_method_t cur_method = CRYPTO_NONE;
 static byte key[16];
+static union xorcrypt_key_t xor_key[2];
 static uint16_t usb_vid, usb_pid;
 
 void crypto_setup(enum crypto_method_t method, void *param)

@@ -40,6 +40,7 @@
 #include "crypto.h"
 #include "elf.h"
 #include "sb.h"
+#include "sb1.h"
 #include "misc.h"
 
 /* all blocks are sized as a multiple of 0x1ff */
@@ -156,6 +157,15 @@ static void extract_sb_file(struct sb_file_t *file)
         extract_sb_section(&file->sections[i]);
 }
 
+static void extract_sb1_file(struct sb1_file_t *file)
+{
+    FILE *f = fopen(g_out_prefix, "wb");
+    if(f == NULL)
+        bugp("Cannot open %s for writing\n", g_out_prefix);
+    fwrite(file->data, file->data_size, 1, f);
+    fclose(f);
+}
+
 static void usage(void)
 {
     printf("Usage: sbtoelf [options] sb-file\n");
@@ -170,6 +180,8 @@ static void usage(void)
     printf("  -n/--no-color\tDisable output colors\n");
     printf("  -l/--loopback <file>\tProduce sb file out of extracted description*\n");
     printf("  -f/--force\tForce reading even without a key*\n");
+    printf("  -1/--v1\tForce to read file as a version 1 file\n");
+    printf("  -2/--v2\tForce to read file as a version 2 file\n");
     printf("Options marked with a * are for debug purpose only\n");
     exit(1);
 }
@@ -191,11 +203,72 @@ static struct crypto_key_t g_zero_key =
     .u.key = {0}
 };
 
+static struct crypto_key_t g_default_xor_key =
+{
+    .method = CRYPTO_XOR_KEY,
+    .u.xor_key =
+    {
+        {.k = {0x67ECAEF6, 0xB31FB961, 0x118A9F4C, 0xA32A97DA,
+        0x6CC39617, 0x5BC00314, 0x9D430685, 0x4D7DB502,
+        0xA347685E, 0x3C87E86C, 0x8987AAA0, 0x24B78EF1,
+        0x893B9605, 0x9BB8C2BE, 0x6D9544E2, 0x375B525C}},
+        {.k = {0x3F424704, 0x53B5A331, 0x6AD345A5, 0x20DCEC51,
+        0x743C8D3B, 0x444B3792, 0x0AF429569, 0xB7EE1111,
+        0x583BF768, 0x9683BF9A, 0x0B032D799, 0xFE4E78ED,
+        0xF20D08C2, 0xFA0BE4A2, 0x4D89C317, 0x887B2D6F}}
+    }
+};
+
+enum sb_version_guess_t
+{
+    SB_VERSION_1,
+    SB_VERSION_2,
+    SB_VERSION_UNK,
+};
+
+enum sb_version_guess_t guess_sb_version(const char *filename)
+{
+    FILE *f = fopen(filename, "rb");
+    if(f == NULL)
+        bugp("Cannot open file for reading\n");
+    // check signature
+    uint8_t sig[4];
+    if(fseek(f, 20, SEEK_SET))
+        return SB_VERSION_UNK;
+    if(fread(sig, 4, 1, f) != 1)
+        return SB_VERSION_UNK;
+    if(memcmp(sig, "STMP", 4) != 0)
+        return SB_VERSION_UNK;
+    // check header size (v1)
+    uint32_t hdr_size;
+    if(fseek(f, 8, SEEK_SET))
+        return SB_VERSION_UNK;
+    if(fread(&hdr_size, 4, 1, f) != 1)
+        return SB_VERSION_UNK;
+    if(hdr_size == 0x34)
+        return SB_VERSION_1;
+    // check header size (v2)
+    if(fseek(f, 32, SEEK_SET))
+        return SB_VERSION_UNK;
+    if(fread(&hdr_size, 4, 1, f) != 1)
+        return SB_VERSION_UNK;
+    if(hdr_size == 0xc)
+        return SB_VERSION_2;
+    return SB_VERSION_UNK;
+}
+
 int main(int argc, char **argv)
 {
     bool raw_mode = false;
     const char *loopback = NULL;
-    
+    bool force_sb1 = false;
+    bool force_sb2 = false;
+
+    /* decrypt the xor key which is xor'ed */
+    for(int i = 0; i < 2; i++)
+        for(int j = 0; j < 16; j++)
+            g_default_xor_key.u.xor_key[i].k[j] ^= 0xaa55aa55;
+
     while(1)
     {
         static struct option long_options[] =
@@ -205,11 +278,13 @@ int main(int argc, char **argv)
             {"add-key", required_argument, 0, 'a'},
             {"no-color", no_argument, 0, 'n'},
             {"loopback", required_argument, 0, 'l'},
-            {"force", no_argument, 0, 'f' },
+            {"force", no_argument, 0, 'f'},
+            {"v1", no_argument, 0, '1'},
+            {"v2", no_argument, 0, '2'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:k:zra:nl:f", long_options, NULL);
+        int c = getopt_long(argc, argv, "?do:k:zra:nl:f12x", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -243,10 +318,11 @@ int main(int argc, char **argv)
                 break;
             }
             case 'z':
-            {
                 add_keys(&g_zero_key, 1);
                 break;
-            }
+            case 'x':
+                add_keys(&g_default_xor_key, 1);
+                break;
             case 'r':
                 raw_mode = true;
                 break;
@@ -261,10 +337,19 @@ int main(int argc, char **argv)
                 add_keys(&key, 1);
                 break;
             }
+            case '1':
+                force_sb1 = true;
+                break;
+            case '2':
+                force_sb2 = true;
+                break;
             default:
                 abort();
         }
     }
+
+    if(force_sb1 && force_sb2)
+        bug("You cannot force both version 1 and 2\n");
 
     if(argc - optind != 1)
     {
@@ -274,34 +359,70 @@ int main(int argc, char **argv)
 
     const char *sb_filename = argv[optind];
 
-    enum sb_error_t err;
-    struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_printf, &err);
-    if(file == NULL)
+    enum sb_version_guess_t ver = guess_sb_version(sb_filename);
+
+    if(force_sb2 || ver == SB_VERSION_2)
+    {
+        enum sb_error_t err;
+        struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_printf, &err);
+        if(file == NULL)
+        {
+            color(OFF);
+            printf("SB read failed: %d\n", err);
+            return 1;
+        }
+
+        color(OFF);
+        if(g_out_prefix)
+            extract_sb_file(file);
+        if(g_debug)
+        {
+            color(GREY);
+            printf("[Debug output]\n");
+            sb_dump(file, NULL, sb_printf);
+        }
+        if(loopback)
+        {
+            /* sb_read_file will fill real key and IV but we don't want to override
+            * them when looping back otherwise the output will be inconsistent and
+            * garbage */
+            file->override_real_key = false;
+            file->override_crypto_iv = false;
+            sb_write_file(file, loopback);
+        }
+        sb_free(file);
+    }
+    else if(force_sb1 || ver == SB_VERSION_1)
+    {
+        enum sb1_error_t err;
+        struct sb1_file_t *file = sb1_read_file(sb_filename, NULL, sb_printf, &err);
+        if(file == NULL)
+        {
+            color(OFF);
+            printf("SB read failed: %d\n", err);
+            return 1;
+        }
+
+        color(OFF);
+        if(g_out_prefix)
+            extract_sb1_file(file);
+        if(g_debug)
+        {
+            color(GREY);
+            printf("[Debug output]\n");
+            sb1_dump(file, NULL, sb_printf);
+        }
+        if(loopback)
+            sb1_write_file(file, loopback);
+        
+        sb1_free(file);
+    }
+    else
     {
         color(OFF);
-        printf("SB read failed: %d\n", err);
+        printf("Cannot guess file type, are you sure it's a valid image ?\n");
         return 1;
     }
-    
-    color(OFF);
-    if(g_out_prefix)
-        extract_sb_file(file);
-    if(g_debug)
-    {
-        color(GREY);
-        printf("[Debug output]\n");
-        sb_dump(file, NULL, sb_printf);
-    }
-    if(loopback)
-    {
-        /* sb_read_file will fill real key and IV but we don't want to override
-         * them when looping back otherwise the output will be inconsistent and
-         * garbage */
-        file->override_real_key = false;
-        file->override_crypto_iv = false;
-        sb_write_file(file, loopback);
-    }
-    sb_free(file);
     clear_keys();
     
     return 0;
