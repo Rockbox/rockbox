@@ -192,7 +192,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     }
 }
 
-/* Blit a YUV bitmap directly to the LCD */
+/* Blit a YUV bitmap directly to the LCD
+ * provided by generic fallback in lcd-16bit-common.c
+ */
+#if 0
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
@@ -206,3 +209,4 @@ void lcd_blit_yuv(unsigned char * const src[3],
     (void)width;
     (void)height;
 }
+#endif
