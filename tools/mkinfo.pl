@@ -95,6 +95,7 @@ printf O ("Manufacturer: %s\n", $ENV{'MANUFACTURER'});
 # Variables identifying Rockbox and bootloader properties. Possibly changing
 # every software upgrade.
 printf O ("Version: %s", `$ENV{TOOLSDIR}/version.sh $ENV{ROOTDIR}`);
+printf O ("Master Version: %s", `sh $ENV{TOOLSDIR}/masterversion.sh $ENV{ROOTDIR}`);
 printf O ("Binary: %s\n", $ENV{'BINARY'});
 printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
 printf O ("Voice format: %s\n", definescan("$ENV{APPSDIR}/talk.h", "VOICE_VERSION"));
