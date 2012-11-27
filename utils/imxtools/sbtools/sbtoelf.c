@@ -157,12 +157,56 @@ static void extract_sb_file(struct sb_file_t *file)
         extract_sb_section(&file->sections[i]);
 }
 
+static void extract_elf(struct elf_params_t *elf, int count)
+{
+    char *filename = xmalloc(strlen(g_out_prefix) + 32);
+    sprintf(filename, "%s.%d.elf", g_out_prefix, count);
+    if(g_debug)
+        printf("Write boot content to %s\n", filename);
+
+    FILE *fd = fopen(filename, "wb");
+    free(filename);
+
+    if(fd == NULL)
+        return ;
+    elf_simplify(elf);
+    elf_write_file(elf, elf_write, elf_printf, fd);
+    fclose(fd);
+}
+
 static void extract_sb1_file(struct sb1_file_t *file)
 {
-    FILE *f = fopen(g_out_prefix, "wb");
-    if(f == NULL)
-        bugp("Cannot open %s for writing\n", g_out_prefix);
-    fclose(f);
+    int elf_count = 0;
+    struct elf_params_t elf;
+    elf_init(&elf);
+
+    for(int i = 0; i < file->nr_insts; i++)
+    {
+        struct sb1_inst_t *inst = &file->insts[i];
+        switch(inst->cmd)
+        {
+            case SB1_INST_LOAD:
+                elf_add_load_section(&elf, inst->addr, inst->size, inst->data);
+                break;
+            case SB1_INST_FILL:
+                elf_add_fill_section(&elf, inst->addr, inst->size, inst->pattern);
+                break;
+            case SB1_INST_CALL:
+            case SB1_INST_JUMP:
+                elf_set_start_addr(&elf, inst->addr);
+                extract_elf(&elf, elf_count++);
+                elf_release(&elf);
+                elf_init(&elf);
+                break;
+            default:
+                /* ignore mode and nop */
+                break;
+        }
+    }
+
+    if(!elf_is_empty(&elf))
+        extract_elf(&elf, elf_count);
+    elf_release(&elf);
 }
 
 static void usage(void)
