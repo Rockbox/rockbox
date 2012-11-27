@@ -57,7 +57,8 @@
 
 /* globals */
 
-char *g_out_prefix;
+static char *g_out_prefix;
+static bool g_elf_simplify = true;
 
 static void elf_printf(void *user, bool error, const char *fmt, ...)
 {
@@ -90,8 +91,9 @@ static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id
     free(filename);
     
     if(fd == NULL)
-        return ;
-    elf_simplify(elf);
+        return;
+    if(g_elf_simplify)
+        elf_simplify(elf);
     elf_write_file(elf, elf_write, elf_printf, fd);
     fclose(fd);
 }
@@ -169,8 +171,9 @@ static void extract_elf(struct elf_params_t *elf, int count)
     free(filename);
 
     if(fd == NULL)
-        return ;
-    elf_simplify(elf);
+        return;
+    if(g_elf_simplify)
+        elf_simplify(elf);
     elf_write_file(elf, elf_write, elf_printf, fd);
     fclose(fd);
 }
@@ -226,6 +229,8 @@ static void usage(void)
     printf("  -f/--force\tForce reading even without a key*\n");
     printf("  -1/--v1\tForce to read file as a version 1 file\n");
     printf("  -2/--v2\tForce to read file as a version 2 file\n");
+    printf("  -s/--no-simpl\tPrevent elf files from being simplified*\n");
+    printf("  -x\t\tUse default sb1 key\n");
     printf("Options marked with a * are for debug purpose only\n");
     exit(1);
 }
@@ -327,10 +332,11 @@ int main(int argc, char **argv)
             {"force", no_argument, 0, 'f'},
             {"v1", no_argument, 0, '1'},
             {"v2", no_argument, 0, '2'},
+            {"no-simpl", no_argument, 0, 's'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:k:zra:nl:f12x", long_options, NULL);
+        int c = getopt_long(argc, argv, "?do:k:zra:nl:f12xs", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -388,6 +394,9 @@ int main(int argc, char **argv)
                 break;
             case '2':
                 force_sb2 = true;
+                break;
+            case 's':
+                g_elf_simplify = false;
                 break;
             default:
                 abort();
