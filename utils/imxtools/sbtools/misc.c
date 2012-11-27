@@ -239,6 +239,12 @@ void print_key(struct crypto_key_t *key, bool newline)
         case CRYPTO_NONE:
             printf("none");
             break;
+        case CRYPTO_XOR_KEY:
+            print_hex(&key->u.xor_key[0].key[0], 64, false);
+            print_hex(&key->u.xor_key[1].key[0], 64, false);
+            break;
+        default:
+            printf("unknown");
     }
     if(newline)
         printf("\n");

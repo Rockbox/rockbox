@@ -162,7 +162,6 @@ static void extract_sb1_file(struct sb1_file_t *file)
     FILE *f = fopen(g_out_prefix, "wb");
     if(f == NULL)
         bugp("Cannot open %s for writing\n", g_out_prefix);
-    fwrite(file->data, file->data_size, 1, f);
     fclose(f);
 }
 
@@ -228,33 +227,35 @@ enum sb_version_guess_t
 
 enum sb_version_guess_t guess_sb_version(const char *filename)
 {
+#define ret(x) do { fclose(f); return x; } while(0)
     FILE *f = fopen(filename, "rb");
     if(f == NULL)
         bugp("Cannot open file for reading\n");
     // check signature
     uint8_t sig[4];
     if(fseek(f, 20, SEEK_SET))
-        return SB_VERSION_UNK;
+        ret(SB_VERSION_UNK);
     if(fread(sig, 4, 1, f) != 1)
-        return SB_VERSION_UNK;
+        ret(SB_VERSION_UNK);
     if(memcmp(sig, "STMP", 4) != 0)
-        return SB_VERSION_UNK;
+        ret(SB_VERSION_UNK);
     // check header size (v1)
     uint32_t hdr_size;
     if(fseek(f, 8, SEEK_SET))
-        return SB_VERSION_UNK;
+        ret(SB_VERSION_UNK);
     if(fread(&hdr_size, 4, 1, f) != 1)
-        return SB_VERSION_UNK;
+        ret(SB_VERSION_UNK);
     if(hdr_size == 0x34)
-        return SB_VERSION_1;
+        ret(SB_VERSION_1);
     // check header size (v2)
     if(fseek(f, 32, SEEK_SET))
-        return SB_VERSION_UNK;
+        ret(SB_VERSION_UNK);
     if(fread(&hdr_size, 4, 1, f) != 1)
-        return SB_VERSION_UNK;
+        ret(SB_VERSION_UNK);
     if(hdr_size == 0xc)
-        return SB_VERSION_2;
-    return SB_VERSION_UNK;
+        ret(SB_VERSION_2);
+    ret(SB_VERSION_UNK);
+#undef ret
 }
 
 int main(int argc, char **argv)

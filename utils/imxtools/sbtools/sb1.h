@@ -58,11 +58,19 @@ struct sb1_cmd_header_t
     uint32_t addr;
 } __attribute__((packed));
 
+#define SB1_CMD_MAX_SIZE        0x1ff8
+
 #define SB1_CMD_SIZE(cmd)       ((cmd) >> 21)
 #define SB1_CMD_CRITICAL(cmd)   !!(cmd & (1 << 20))
 #define SB1_CMD_BYTES(cmd)      (((cmd) >> 6) & 0x3fff)
 #define SB1_CMD_DATATYPE(cmd)   (((cmd) >> 4) & 0x3)
 #define SB1_CMD_BOOT(cmd)       ((cmd) & 0xf)
+
+#define SB1_ADDR_SDRAM_CS(addr) ((addr) & 0x3)
+#define SB1_ADDR_SDRAM_SZ(addr) ((addr) >> 16)
+
+int sb1_sdram_size_by_index(int index); // returns - 1 on error
+int sb1_sdram_index_by_size(int size); // returns -1 on error
 
 #define SB1_INST_LOAD   0x1
 #define SB1_INST_FILL   0x2
@@ -71,12 +79,46 @@ struct sb1_cmd_header_t
 #define SB1_INST_MODE   0x5
 #define SB1_INST_SDRAM  0x6
 
+#define SB1_DATATYPE_UINT32 0
+#define SB1_DATATYPE_UINT16 1
+#define SB1_DATATYPE_UINT8  2
+
+/*******
+ * API *
+ *******/
+
+struct sb1_inst_t
+{
+    uint8_t cmd;
+    uint16_t size;
+    // <union>
+    struct
+    {
+        uint8_t chip_select;
+        uint8_t size_index;
+    }sdram;
+    uint8_t mode;
+    uint32_t addr;
+    // </union>
+    uint8_t datatype;
+    uint8_t critical;
+    // <union>
+    void *data;
+    uint32_t pattern;
+    // </union>
+};
+
 struct sb1_file_t
 {
+    uint32_t rom_version;
+    uint32_t pad2; // unknown meaning but copy it anyway !
+    uint32_t drive_tag;
     struct sb1_version_t product_ver;
     struct sb1_version_t component_ver;
-    void *data;
-    int data_size;
+    int nr_insts;
+    struct sb1_inst_t *insts;
+    void *userdata;
+    int userdata_size;
 };
 
 enum sb1_error_t

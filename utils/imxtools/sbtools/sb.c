@@ -1138,7 +1138,7 @@ void sb_dump(struct sb_file_t *file, void *u, sb_color_printf cprintf)
     #define TEXT2   BLUE
     #define SEP     OFF
     
-    printf(HEADER, "SB File\n");
+    printf(BLUE, "SB File\n");
     printf(TREE, "+-");
     printf(HEADER, "Version: ");
     printf(TEXT, "1.%d\n", file->minor_version);

@@ -26,6 +26,25 @@
 #include "crypto.h"
 #include "sb1.h"
 
+static int sdram_size_table[] = {2, 8, 16, 32, 64};
+
+#define NR_SDRAM_ENTRIES    (int)(sizeof(sdram_size_table) / sizeof(sdram_size_table[0]))
+
+int sb1_sdram_size_by_index(int index)
+{
+    if(index < 0 || index >= NR_SDRAM_ENTRIES)
+        return -1;
+    return sdram_size_table[index];
+}
+
+int sb1_sdram_index_by_size(int size)
+{
+    for(int i = 0; i < NR_SDRAM_ENTRIES; i++)
+        if(sdram_size_table[i] == size)
+            return i;
+    return -1;
+}
+
 static uint16_t swap16(uint16_t t)
 {
     return (t << 8) | (t >> 8);
@@ -96,23 +115,34 @@ static const char *sb1_cmd_name(int cmd)
     }
 }
 
+static const char *sb1_datatype_name(int cmd)
+{
+    switch(cmd)
+    {
+        case SB1_DATATYPE_UINT32: return "uint32";
+        case SB1_DATATYPE_UINT16: return "uint16";
+        case SB1_DATATYPE_UINT8: return "uint8";
+        default: return "unknown";
+    }
+}
+
 struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
     sb1_color_printf cprintf, enum sb1_error_t *err)
 {
-    struct sb1_file_t *sb1_file = NULL;
+    struct sb1_file_t *file = NULL;
     uint8_t *buf = _buf;
 
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     #define fatal(e, ...) \
         do { if(err) *err = e; \
             cprintf(u, true, GREY, __VA_ARGS__); \
-            sb1_free(sb1_file); \
+            sb1_free(file); \
             return NULL; } while(0)
     #define print_hex(c, p, len, nl) \
         do { printf(c, ""); print_hex(p, len, nl); } while(0)
 
-    sb1_file = xmalloc(sizeof(struct sb1_file_t));
-    memset(sb1_file, 0, sizeof(struct sb1_file_t));
+    file = xmalloc(sizeof(struct sb1_file_t));
+    memset(file, 0, sizeof(struct sb1_file_t));
     struct sb1_header_t *header = (struct sb1_header_t *)buf;
 
     if(memcmp(header->signature, "STMP", 4) != 0)
@@ -136,9 +166,6 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
     struct sb1_version_t component_ver = header->component_ver;
     fix_version(&component_ver);
 
-    memcpy(&sb1_file->product_ver, &product_ver, sizeof(product_ver));
-    memcpy(&sb1_file->component_ver, &component_ver, sizeof(component_ver));
-
     printf(GREEN, "  Product version: ");
     printf(YELLOW, "%X.%X.%X\n", product_ver.major, product_ver.minor, product_ver.revision);
     printf(GREEN, "  Component version: ");
@@ -146,6 +173,14 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
     
     printf(GREEN, "  Drive tag: ");
     printf(YELLOW, "%x\n", header->drive_tag);
+
+    /* copy rom version, padding and drive tag */
+    /* copy versions */
+    memcpy(&file->product_ver, &product_ver, sizeof(product_ver));
+    memcpy(&file->component_ver, &component_ver, sizeof(component_ver));
+    file->rom_version = header->rom_version;
+    file->pad2 = header->pad2;
+    file->drive_tag = header->drive_tag;
 
     /* reduce size w.r.t to userdata part */
     uint32_t userdata_size = 0;
@@ -217,6 +252,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
         if(mark != *(uint32_t *)(ptr + size))
             fatal(SB1_CHECKSUM_ERROR, "Crypto mark mismatch\n");
         memmove(copy_ptr, ptr, size);
+
         ptr += size + 4;
         copy_ptr += size;
         offset = 0;
@@ -236,13 +272,54 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
         printf(YELLOW, "    Critical:");
         printf(RED, " %d\n", SB1_CMD_CRITICAL(cmd->cmd));
         printf(YELLOW, "    Data Type:");
-        printf(RED, " %#x\n", SB1_CMD_DATATYPE(cmd->cmd));
+        printf(RED, " %#x ", SB1_CMD_DATATYPE(cmd->cmd));
+        printf(GREEN, "(%s)\n", sb1_datatype_name(SB1_CMD_DATATYPE(cmd->cmd)));
         printf(YELLOW, "    Bytes:");
         printf(RED, " %#x\n", SB1_CMD_BYTES(cmd->cmd));
         printf(YELLOW, "    Boot:");
-        printf(RED, " %#x (%s)\n", SB1_CMD_BOOT(cmd->cmd), sb1_cmd_name(SB1_CMD_BOOT(cmd->cmd)));
+        printf(RED, " %#x ", SB1_CMD_BOOT(cmd->cmd));
+        printf(GREEN, "(%s)\n", sb1_cmd_name(SB1_CMD_BOOT(cmd->cmd)));
         printf(YELLOW, "    Addr:");
-        printf(RED, " %#x\n", cmd->addr);
+        printf(RED, " %#x", cmd->addr);
+
+        if(SB1_CMD_BOOT(cmd->cmd) == SB1_INST_SDRAM)
+            printf(GREEN, " (Chip Select=%d, Size=%d)", SB1_ADDR_SDRAM_CS(cmd->addr),
+                    sb1_sdram_size_by_index(SB1_ADDR_SDRAM_SZ(cmd->addr)));
+        printf(OFF, "\n");
+        if(SB1_CMD_BOOT(cmd->cmd) == SB1_INST_FILL)
+        {
+            printf(YELLOW, "    Pattern:");
+            printf(RED, " %#x\n", *(uint32_t *)(cmd + 1));
+        }
+
+        /* copy command */
+        struct sb1_inst_t inst;
+        memset(&inst, 0, sizeof(inst));
+        inst.cmd = SB1_CMD_BOOT(cmd->cmd);
+        inst.critical = SB1_CMD_CRITICAL(cmd->cmd);
+        inst.datatype = SB1_CMD_DATATYPE(cmd->cmd);
+        inst.size = SB1_CMD_BYTES(cmd->cmd);
+
+        switch(SB1_CMD_BOOT(cmd->cmd))
+        {
+            case SB1_INST_SDRAM:
+                inst.sdram.chip_select = SB1_ADDR_SDRAM_CS(cmd->addr);
+                inst.sdram.size_index = SB1_ADDR_SDRAM_SZ(cmd->addr);
+                break;
+            case SB1_INST_MODE:
+                inst.mode = cmd->addr;
+                break;
+            case SB1_INST_LOAD:
+                inst.data = malloc(inst.size);
+                memcpy(inst.data, cmd + 1, inst.size);
+                /* fallthrough */
+            default:
+                inst.addr = cmd->addr;
+                break;
+        }
+
+        file->insts = augment_array(file->insts, sizeof(inst), file->nr_insts, &inst, 1);
+        file->nr_insts++;
 
         /* last instruction ? */
         if(SB1_CMD_BOOT(cmd->cmd) == SB1_INST_JUMP ||
@@ -252,11 +329,15 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
         cmd = (void *)cmd + 4 + 4 * SB1_CMD_SIZE(cmd->cmd);
     }
 
-    sb1_file->data_size = header->image_size - header->header_size;
-    sb1_file->data = malloc(sb1_file->data_size);
-    memcpy(sb1_file->data, header + 1, sb1_file->data_size);
+    /* copy userdata */
+    file->userdata_size = userdata_size;
+    if(userdata_size > 0)
+    {
+        file->userdata = malloc(userdata_size);
+        memcpy(file->userdata, (void *)header + header->userdata_offset, userdata_size);
+    }
 
-    return sb1_file;
+    return file;
     #undef printf
     #undef fatal
     #undef print_hex
@@ -266,7 +347,10 @@ void sb1_free(struct sb1_file_t *file)
 {
     if(!file) return;
 
-    free(file->data);
+    for(int i = 0; i < file->nr_insts; i++)
+        free(file->insts[i].data);
+    free(file->insts);
+    free(file->userdata);
     free(file);
 }
 
@@ -280,7 +364,85 @@ void sb1_dump(struct sb1_file_t *file, void *u, sb1_color_printf cprintf)
     #define HEADER  GREEN
     #define TEXT    YELLOW
     #define TEXT2   BLUE
+    #define TEXT3   RED
     #define SEP     OFF
+
+    printf(BLUE, "SB1 File\n");
+    printf(TREE, "+-");
+    printf(HEADER, "Rom Ver: ");
+    printf(TEXT, "%x\n", file->rom_version);
+    printf(TREE, "+-");
+    printf(HEADER, "Pad: ");
+    printf(TEXT, "%x\n", file->pad2);
+    printf(TREE, "+-");
+    printf(HEADER, "Drive Tag: ");
+    printf(TEXT, "%x\n", file->drive_tag);
+    printf(TREE, "+-");
+    printf(HEADER, "Product Version: ");
+    printf(TEXT, "%X.%X.%X\n", file->product_ver.major, file->product_ver.minor,
+        file->product_ver.revision);
+    printf(TREE, "+-");
+    printf(HEADER, "Component Version: ");
+    printf(TEXT, "%X.%X.%X\n", file->component_ver.major, file->component_ver.minor,
+        file->component_ver.revision);
+
+    for(int j = 0; j < file->nr_insts; j++)
+    {
+        struct sb1_inst_t *inst = &file->insts[j];
+        printf(TREE, "+-");
+        printf(HEADER, "Command\n");
+        printf(TREE, "|  +-");
+        switch(inst->cmd)
+        {
+            case SB1_INST_CALL:
+            case SB1_INST_JUMP:
+                printf(HEADER, "%s", inst->cmd == SB1_INST_CALL ? "CALL" : "JUMP");
+                printf(SEP, " | ");
+                printf(TEXT3, "crit=%d", inst->critical);
+                printf(SEP, " | ");
+                printf(TEXT, "addr=0x%08x\n", inst->addr);
+                break;
+            case SB1_INST_LOAD:
+                printf(HEADER, "LOAD");
+                printf(SEP, " | ");
+                printf(TEXT3, "crit=%d", inst->critical);
+                printf(SEP, " | ");
+                printf(TEXT, "addr=0x%08x", inst->addr);
+                printf(SEP, " | ");
+                printf(TEXT2, "len=0x%08x\n", inst->size);
+                break;
+            case SB1_INST_FILL:
+                printf(HEADER, "FILL");
+                printf(SEP, " | ");
+                printf(TEXT3, "crit=%d", inst->critical);
+                printf(SEP, " | ");
+                printf(TEXT, "addr=0x%08x", inst->addr);
+                printf(SEP, " | ");
+                printf(TEXT2, "len=0x%08x", inst->size);
+                printf(SEP, " | ");
+                printf(TEXT2, "pattern=0x%08x\n", inst->pattern);
+                break;
+            case SB1_INST_MODE:
+                printf(HEADER, "MODE");
+                printf(SEP, " | ");
+                printf(TEXT3, "crit=%d", inst->critical);
+                printf(SEP, " | ");
+                printf(TEXT, "mode=0x%08x\n", inst->addr);
+                break;
+            case SB1_INST_SDRAM:
+                printf(HEADER, "SRAM");
+                printf(SEP, " | ");
+                printf(TEXT3, "crit=%d", inst->critical);
+                printf(SEP, " | ");
+                printf(TEXT, "chip_select=%d", inst->sdram.chip_select);
+                printf(SEP, " | ");
+                printf(TEXT2, "chip_size=%d\n", sb1_sdram_size_by_index(inst->sdram.size_index));
+                break;
+            default:
+                printf(GREY, "[Unknown instruction %x]\n", inst->cmd);
+                break;
+        }
+    }
 
     #undef printf
     #undef print_hex
