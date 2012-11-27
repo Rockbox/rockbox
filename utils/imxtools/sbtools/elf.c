@@ -217,9 +217,99 @@ void elf_add_fill_section(struct elf_params_t *params,
     sec->pattern = pattern;
 }
 
+/* sort by increasing type and then increasing address */
+static int elf_simplify_compare(const void *a, const void *b)
+{
+    const struct elf_section_t *sa = a;
+    const struct elf_section_t *sb = b;
+    if(sa->type != sb->type)
+        return sa->type - sb->type;
+    return sa->addr - sb->addr;
+}
+
 void elf_simplify(struct elf_params_t *params)
 {
+    /** find all sections of the same times which are contiguous and merge them */
+
+    /* count sections */
+    int nr_sections = 0;
+    struct elf_section_t *cur_sec = params->first_section;
+    while(cur_sec)
+    {
+        nr_sections++;
+        cur_sec = cur_sec->next;
+    }
     
+    /* put all sections in an array and free list */
+    struct elf_section_t *sections = malloc(sizeof(struct elf_section_t) * nr_sections);
+    cur_sec = params->first_section;
+    for(int i = 0; i < nr_sections; i++)
+    {
+        memcpy(&sections[i], cur_sec, sizeof(struct elf_section_t));
+        struct elf_section_t *old = cur_sec;
+        cur_sec = cur_sec->next;
+        free(old);
+    }
+
+    /* sort them by type and increasing addresses */
+    qsort(sections, nr_sections, sizeof(struct elf_section_t), &elf_simplify_compare);
+
+    /* merge them ! */
+    cur_sec = &sections[0];
+    for(int i = 1; i < nr_sections; i++)
+    {
+        /* different type => no */
+        if(sections[i].type != cur_sec->type)
+            goto Lnext;
+        /* (for fill) different pattern => no */
+        if(sections[i].type == EST_FILL && sections[i].pattern != cur_sec->pattern)
+            goto Lnext;
+        /* not contiguous => no */
+        if(sections[i].addr != cur_sec->addr + cur_sec->size)
+            goto Lnext;
+        /* merge !! */
+        if(sections[i].type == EST_FILL)
+        {
+            cur_sec->size += sections[i].size;
+            sections[i].size = 0; // will be ignored by rebuilding (see below)
+        }
+        else if(sections[i].type == EST_LOAD)
+        {
+            // merge data also
+            void *data = malloc(cur_sec->size + sections[i].size);
+            memcpy(data, cur_sec->section, cur_sec->size);
+            memcpy(data + cur_sec->size, sections[i].section, sections[i].size);
+            free(cur_sec->section);
+            free(sections[i].section);
+            cur_sec->section = data;
+            cur_sec->size += sections[i].size;
+            sections[i].size = 0; // will be ignored by rebuilding (see below)
+        }
+        continue;
+
+        /* update current section to consider */
+        Lnext:
+        cur_sec = &sections[i];
+    }
+
+    /* put back on a list and free array */
+    struct elf_section_t **prev_ptr = &params->first_section;
+    struct elf_section_t *prev_sec = NULL;
+    for(int i = 0; i < nr_sections; i++)
+    {
+        /* skip empty sections produced by simplification */
+        if(sections[i].size == 0)
+            continue;
+
+        struct elf_section_t *sec = malloc(sizeof(struct elf_section_t));
+        memcpy(sec, &sections[i], sizeof(struct elf_section_t));
+        *prev_ptr = sec;
+        prev_ptr = &sec->next;
+        prev_sec = sec;
+    }
+    *prev_ptr = NULL;
+    params->last_section = prev_sec;
+    free(sections);
 }
 
 void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
