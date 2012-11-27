@@ -91,6 +91,7 @@ static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id
     
     if(fd == NULL)
         return ;
+    elf_simplify(elf);
     elf_write_file(elf, elf_write, elf_printf, fd);
     fclose(fd);
 }
