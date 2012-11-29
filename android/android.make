@@ -138,6 +138,7 @@ $(KEYSTORE):
 	$(call PRINTS,KEYTOOL debug.keystore)keytool -genkey \
 		-alias androiddebugkey -keystore $@ \
 		-storepass android -keypass android -validity 365 \
+		-sigalg MD5withRSA -keyalg RSA -keysize 1024 \
 		-dname "CN=Android Debug,O=Android,C=US"
 
 ifdef NODEPS
