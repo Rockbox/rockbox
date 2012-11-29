@@ -159,32 +159,20 @@ static void lcd_v1_enable (bool on)
 
     LCDC_CTRL &= ~RGB24B;
 }
-static void lcd_v1_set_gram_area(int x, int y, int width, int height)
+
+static void lcd_v1_set_gram_area(int x_start, int y_start, int x_end, int y_end)
 {
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
-    
-    lcd_write_reg(0x03, x);
-    lcd_write_reg(0x05, width-1);
-    lcd_write_reg(0x07, y);
-    lcd_write_reg(0x09, height-1);
-    
+
+    lcd_write_reg(0x03, x_start);
+    lcd_write_reg(0x05, x_end);
+    lcd_write_reg(0x07, y_start);
+    lcd_write_reg(0x09, y_end);
+
     lcd_cmd(0x22);
     LCDC_CTRL &= ~RGB24B;
 }
-
-static void lcd_v1_update_rect(int x, int y, int width, int height)
-{
-    int px = x, py = y;
-    int pxmax = x + width, pymax = y + height;
-
-    lcd_v1_set_gram_area(x, y, pxmax, pymax);
-
-    for (py=y; py<pymax; py++)
-        for (px=x; px<pxmax; px++)     
-            LCD_DATA = (*FBADDR(px, py));
-}
-
 
 #ifdef HM60X
 
@@ -269,25 +257,16 @@ static void lcd_v2_enable (bool on)
     display_on = on;
 }
 
-static void lcd_v2_set_gram_area(int x, int y, int width, int height)
+static void lcd_v2_set_gram_area(int x_start, int y_start, int x_end, int y_end)
 {
-    (void) x;
-    (void) y;
-    (void) width;
-    (void) height;
+    (void) x_start;
+    (void) y_start;
+    (void) x_end;
+    (void) y_end;
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
     lcd_cmd(0x22);
     LCDC_CTRL &= ~RGB24B;
-}
-
-static void lcd_v2_update_rect(int x, int y, int width, int height)
-{
-    (void) x;
-    (void) y;
-    (void) width;
-    (void) height;
-    lcd_update();
 }
 
 void lcd_display_init(void)
@@ -308,23 +287,13 @@ void lcd_enable (bool on)
         lcd_v2_enable(on);
 }
 
-void lcd_set_gram_area(int x, int y, int width, int height)
+void lcd_set_gram_area(int x_start, int y_start, int x_end, int y_end)
 {
    if (lcd_type == LCD_V1)
-        lcd_v1_set_gram_area(x, y, width, height);
+        lcd_v1_set_gram_area(x_start, y_start, x_end, y_end);
     else
-        lcd_v2_set_gram_area(x, y, width, height);
+        lcd_v2_set_gram_area(x_start, y_start, x_end, y_end);
 }
-
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    if (lcd_type == LCD_V1)
-        lcd_v1_update_rect(x, y, width, height);
-    else
-        lcd_v2_update_rect(x, y, width, height);
-}
-
-
 
 #else /* HM801 */
 
@@ -339,14 +308,9 @@ void lcd_enable (bool on)
     lcd_v1_enable(on);
 }
 
-void lcd_set_gram_area(int x, int y, int width, int height)
+void lcd_set_gram_area(int x_start, int y_start, int x_end, int y_end)
 {
-    lcd_v1_set_gram_area(x, y, width, height);
-}
-
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    lcd_v1_update_rect(x, y, width, height);
+    lcd_v1_set_gram_area(x_start, y_start, x_end, y_end);
 }
 
 #endif
