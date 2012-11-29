@@ -161,23 +161,28 @@ void lcd_display_init(void)
     lcd_sleep(false);
 }
 
-void lcd_set_gram_area(int x, int y, int width, int height)
+void lcd_set_gram_area(int x_start, int y_start, int x_end, int y_end)
 {
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
 
-    /* addresses setup */
-    lcd_write_reg(WINDOW_H_START,  y);
-    lcd_write_reg(WINDOW_H_END,    height-1);
-    lcd_write_reg(WINDOW_V_START,  x);
-    lcd_write_reg(WINDOW_V_END,    width-1);
-    lcd_write_reg(GRAM_H_ADDR,     y);
-    lcd_write_reg(GRAM_V_ADDR,     x);
+    /* setup update window*/
+    lcd_write_reg(WINDOW_H_START, y_start);
+    lcd_write_reg(WINDOW_H_END,   y_end);
+    lcd_write_reg(WINDOW_V_START, x_start);
+    lcd_write_reg(WINDOW_V_END,   x_end);
 
+    /* GRAM start address */
+    lcd_write_reg(GRAM_H_ADDR,    y_start);
+    lcd_write_reg(GRAM_V_ADDR,    x_start);
+
+    /* prepare lcd to receive data */
     lcd_cmd(GRAM_WRITE);
+
     LCDC_CTRL &= ~RGB24B;
 }
 
+#if 0
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int px = x, py = y;
@@ -195,7 +200,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 /* Blit a YUV bitmap directly to the LCD
  * provided by generic fallback in lcd-16bit-common.c
  */
-#if 0
+
 void lcd_blit_yuv(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
