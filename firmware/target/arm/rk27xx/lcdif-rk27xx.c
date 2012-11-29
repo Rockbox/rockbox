@@ -50,22 +50,38 @@ static uint32_t lcd_data_transform(uint32_t data)
 {
     unsigned int r, g, b;
 
-#if defined(RK27_GENERIC)
+#if (LCD_DATABUS_WIDTH == LCDIF_18BIT)
     /* 18 bit interface */
     r = (data & 0x0000fc00)<<8;
     /* g = ((data & 0x00000300) >> 2) | ((data & 0x000000e0) >> 3); */
     g = ((data & 0x00000300) << 6) | ((data & 0x000000e0) << 5);
     b = (data & 0x00000001f) << 3;
-#elif defined(HM60X) || defined(HM801) || defined(MA9)
+#else
     /* 16 bit interface */
     r = (data & 0x0000f800) << 8;
     g = (data & 0x000007e0) << 5;
     b = (data & 0x0000001f) << 3;
-#else
-#error "Unknown target"
 #endif
 
     return (r | g | b);
+}
+
+static void lcdctrl_buff_setup(int width, int height)
+{
+    HOR_ACT = width + 3;        /* define horizonatal active region */
+    VERT_ACT = height;          /* define vertical active region */
+
+    width = width  >> 1;
+
+    LINE0_YADDR = 0;
+    LINE1_YADDR = 1 * width;
+    LINE2_YADDR = 2 * width;
+    LINE3_YADDR = 3 * width;
+
+    LINE0_UVADDR = LINE0_YADDR + 1;
+    LINE1_UVADDR = LINE1_YADDR + 1;
+    LINE2_UVADDR = LINE2_YADDR + 1;
+    LINE3_UVADDR = LINE3_YADDR + 1;
 }
 
 static void lcdctrl_init(void)
@@ -119,17 +135,15 @@ static void lcdctrl_init(void)
     MCU_CTRL = MCU_CTRL_RS_HIGH|MCU_CTRL_BUFF_WRITE|MCU_CTRL_BUFF_START;
 }
 
-/* configure pins to drive lcd in 18bit mode (16bit mode for HiFiMAN's) */
-static void iomux_lcd(enum lcdif_mode_t mode)
+/* configure pins to drive lcd in 18bit or 16bit mode */
+static void iomux_lcd(void)
 {
     unsigned long muxa;
 
     muxa = SCU_IOMUXA_CON & ~(IOMUX_LCD_VSYNC|IOMUX_LCD_DEN|0xff);
-
-    if (mode == LCDIF_18BIT)
-    {
-        muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
-    }
+#if (LCD_DATABUS_WIDTH == LCDIF_18BIT)
+    muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
+#endif
 
     SCU_IOMUXA_CON = muxa;
     SCU_IOMUXB_CON |= IOMUX_LCD_D815;
@@ -187,18 +201,20 @@ static void dwdma_start(uint8_t ch, struct llp_t *llp, uint8_t handshake)
    DWDMA_DMA_CHEN = (0x101<<ch);
 }
 
-static void create_llp(void)
+static void create_llp(int x, int y, int width, int height)
 {
     int i;
 
-    /* build LLPs */
-    for (i=0; i<LCD_HEIGHT; i++)
-        llp_setup((void *)FBADDR(0,i),
-                  (void*)(LCD_BUFF+((i%4)*4*LCD_WIDTH/2)),
-                  &(scr_llp[i]),
-                  LCD_WIDTH/2);
+    width = width>>1;
 
-    llp_end(&scr_llp[LCD_HEIGHT-1]);
+    /* build LLPs */
+    for (i=0; i<height; i++)
+        llp_setup((void *)FBADDR(x,y+i),
+                  (void*)(LCD_BUFF+((i%4)*4*width)),
+                  &(scr_llp[i]),
+                  width);
+
+    llp_end(&scr_llp[height-1]);
 }
 
 /* Public functions */
@@ -241,21 +257,35 @@ void lcd_write_reg(unsigned int reg, unsigned int val)
 /* rockbox API functions */
 void lcd_init_device(void)
 {
-    iomux_lcd(LCD_DATABUS_WIDTH);   /* setup pins for lcd interface */
-    dwdma_init();                   /* init dwdma module */
-    create_llp();                   /* build LLPs for screen update dma */
-    lcdctrl_init();                 /* basic lcdc module configuration */
+    iomux_lcd();       /* setup pins for lcd interface */
+    dwdma_init();      /* init dwdma module */
+    lcdctrl_init();    /* basic lcdc module configuration */
 }
 
-void lcd_update()
+void lcd_update_rect(int x, int y, int width, int height)
 {
-    lcd_set_gram_area(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    int x_end, y_end, x_align, y_align;
+
+    /* min alowed transfer seems to be 4x4 pixels */
+    x_align = x & 3;
+    y_align = y & 3;
+    x = x - x_align;
+    y = y - y_align;
+    width = (width + x_align + 3) & ~3;
+    height = (height + y_align + 3) & ~3;
+    x_end = x + width - 1;
+    y_end = y + height - 1;
+
+    lcd_set_gram_area(x, y, x_end, y_end);
+    create_llp(x, y, width, height);
     lcdctrl_bypass(0);
 
+    /* whole framebuffer for now */
     commit_discard_dcache_range(FBADDR(0,0), 2*LCD_WIDTH*LCD_HEIGHT);
 
     while (!(LCDC_STA & LCDC_MCU_IDLE));
 
+    lcdctrl_buff_setup(width, height);
     dwdma_start(0, scr_llp, 6);
     udelay(10);
 
@@ -264,4 +294,9 @@ void lcd_update()
 
     /* Wait for DMA transfer to finish */
     while (DWDMA_CTL_L(0) & (1<<27));
+}
+
+void lcd_update()
+{
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
