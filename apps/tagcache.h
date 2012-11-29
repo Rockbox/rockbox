@@ -145,7 +145,9 @@ struct tagcache_stat {
     // const char *uimessage;   /* Pending error message. Implement soon. */
 };
 
-enum source_type {source_constant, 
+enum source_type {source_constant,
+                  source_prev_clause_value, /* Reference to the previous
+                                             valid clause */
                   source_runtime, 
                   source_current_path /* dont add items after this.
                                        it is used as an index 

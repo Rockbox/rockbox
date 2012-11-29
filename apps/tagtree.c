@@ -86,6 +86,7 @@ static const struct id3_to_search_mapping {
     size_t id3_offset;
 } id3_to_search_mapping[] = {
     { "",  0 },              /* offset n/a */
+    { "#prev#",  0 },        /* offset n/a */
     { "#directory#",  0 },   /* offset n/a */
     { "#title#",  offsetof(struct mp3entry, title) },
     { "#artist#", offsetof(struct mp3entry, artist) },
@@ -1733,6 +1734,30 @@ int tagtree_enter(struct tree_context* c)
                             e = strrchr(searchstring, '/');
                             if (e)
                                 *e = '\0';
+                        }
+                        else if (source == source_prev_clause_value)
+                        {
+							/* Find the previous clause with a valid value */
+							int clause_idx;
+							for (clause_idx = j - 1; clause_idx >= 0;
+							--clause_idx) {
+								if (csi->clause[i][clause_idx] != NULL) {
+									break;
+								}
+							}
+
+							/* Copy from previous clause to the current */
+							if (clause_idx >= 0) {
+								struct tagcache_search_clause *prev_clause =
+										csi->clause[i][clause_idx];
+
+								/* Copy textual and numeric values*/
+								strcpy(searchstring, prev_clause->str);
+								if (prev_clause->numeric) {
+									csi->clause[i][j]->numeric_data =\
+											prev_clause->numeric_data;
+								}
+							}
                         }
                         else if (source > source_runtime && id3)
                         {
