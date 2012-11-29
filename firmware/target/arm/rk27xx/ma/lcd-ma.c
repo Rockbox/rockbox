@@ -151,39 +151,25 @@ void lcd_enable (bool on)
     LCDC_CTRL &= ~RGB24B;
 }
 
-void lcd_set_gram_area(int x, int y, int width, int height)
+void lcd_set_gram_area(int x_start, int y_start, int x_end, int y_end)
 {
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
 
     lcd_cmd(0x002A);
-    lcd_data((x&0xff00)>>8);
-    lcd_data(x&0x00ff);
-    lcd_data(((width-1)&0xff00)>>8);
-    lcd_data((width-1)&0x00ff);
+    lcd_data((x_start&0xff00)>>8);
+    lcd_data(x_start&0x00ff);
+    lcd_data((x_end&0xff00)>>8);
+    lcd_data(x_end&0x00ff);
     lcd_cmd(0x002B);
-    lcd_data((y&0xff00)>>8);
-    lcd_data(y&0x00ff);
-    lcd_data(((height-1)&0xff00)>>8);
-    lcd_data((height-1)&0x00ff);
+    lcd_data((y_start&0xff00)>>8);
+    lcd_data(y_start&0x00ff);
+    lcd_data((y_end&0xff00)>>8);
+    lcd_data(y_end&0x00ff);
 
     lcd_cmd(0x2c);
     LCDC_CTRL &= ~RGB24B;
 }
-
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    int px = x, py = y;
-    int pxmax = x + width, pymax = y + height;
-
-    lcd_set_gram_area(x, y, pxmax, pymax);
-
-    for (py = y; py < pymax; py++)
-        for (px = x; px < pxmax; px++)
-            LCD_DATA = (*FBADDR(px, py));
-
-}
-
 
 bool lcd_active()
 {
