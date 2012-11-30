@@ -316,7 +316,13 @@ static void button_tick(void)
                            )
                             button_try_post(btn, data);
                         else
+                        {
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+                            /* propagate the backlight_on() up the queue with a dummy event */
+                            button_try_post(BUTTON_NONE, 0);
+#endif
                             skip_release = true;
+                        }
 #else /* no backlight, nothing to skip */
                     button_try_post(btn, data);
 #endif
