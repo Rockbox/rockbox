@@ -150,6 +150,19 @@ static bool in_screen = false;
 
 static void radio_off(void);
 
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+/*
+ * Similar as in wps.
+ * timeout for buttons is infinite if display is off,
+ * add a dummy event to start updating after reactivating.
+ */
+static void fm_lcd_activation_hook(void *param)
+{
+    (void)param;
+    queue_post(&button_queue, BUTTON_NONE, 0);
+}
+#endif
+
 bool radio_scan_mode(void)
 {
     return radio_mode == RADIO_SCAN_MODE;
@@ -443,6 +456,9 @@ void radio_screen(void)
 
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(true);
+#endif
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+    add_event(LCD_EVENT_ACTIVATION, false, fm_lcd_activation_hook);
 #endif
 
     while(!done)
@@ -798,6 +814,9 @@ void radio_screen(void)
         }
 #endif
     } /*while(!done)*/
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+    remove_event(LCD_EVENT_ACTIVATION, fm_lcd_activation_hook);
+#endif
 
 #ifndef SIMULATOR
 #if CONFIG_CODEC != SWCODEC
