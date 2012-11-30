@@ -145,8 +145,10 @@ struct tagcache_stat {
     // const char *uimessage;   /* Pending error message. Implement soon. */
 };
 
-enum source_type {source_constant, 
-                  source_runtime, 
+enum source_type {source_constant,
+                  source_runtime,
+                  source_prev_clause_value, /* Reference to the previous
+                                             valid clause */
                   source_current_path /* dont add items after this.
                                        it is used as an index 
                                        into id3_to_search_mapping */

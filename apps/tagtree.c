@@ -86,6 +86,7 @@ static const struct id3_to_search_mapping {
     size_t id3_offset;
 } id3_to_search_mapping[] = {
     { "",  0 },              /* offset n/a */
+    { "#prev#",  0 },        /* offset n/a */
     { "#directory#",  0 },   /* offset n/a */
     { "#title#",  offsetof(struct mp3entry, title) },
     { "#artist#", offsetof(struct mp3entry, artist) },
@@ -1733,6 +1734,32 @@ int tagtree_enter(struct tree_context* c)
                             e = strrchr(searchstring, '/');
                             if (e)
                                 *e = '\0';
+                        }
+                        else if (source == source_prev_clause_value)
+                        {
+                            /* Find the previous clause with a valid value */
+                            int prev_idx;
+                            struct tagcache_search_clause *prev;
+                            for (prev_idx = j - 1; prev_idx >= 0; --prev_idx)
+                            {
+                                prev = csi->clause[i][prev_idx];
+                                if (prev->type == clause_logical_or)
+                                    continue;
+
+                                /* Copy data to the current clause */
+                                if (prev->str != NULL)
+                                {
+                                    strlcpy(searchstring, prev->str,
+                                           SEARCHSTR_SIZE);
+                                    if (prev->numeric)
+                                    {
+                                        csi->clause[i][j]->numeric_data =\
+                                                prev->numeric_data;
+                                        csi->clause[i][j]->numeric = true;
+                                    }
+                                    break;
+                                }
+                            }
                         }
                         else if (source > source_runtime && id3)
                         {
