@@ -264,10 +264,12 @@ static inline void usb_slave_mode(bool on)
 }
 #endif /* USE_ROCKBOX_USB */
 
+extern volatile uint32_t ep0_read;
 void usb_signal_transfer_completion(
     struct usb_transfer_completion_event_data* event_data)
 {
     queue_post(&usb_queue, USB_TRANSFER_COMPLETION, (intptr_t)event_data);
+    ep0_read = 111;
 }
 
 #else  /* !HAVE_USBSTACK */

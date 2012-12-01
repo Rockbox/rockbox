@@ -98,6 +98,13 @@ static struct endpoint_t endpoints[16] = {
     {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* IIN15  */
 };
 
+volatile uint32_t udc_irq[8] = {0,0,0,0,0,0,0,0};
+volatile uint32_t udc_irq_idx = 0;
+volatile uint32_t udc_setup = 0;
+volatile uint32_t ep0out_irq = 0;
+volatile uint32_t ep0_write = 0;
+volatile uint32_t ep0_read = 0;
+
 static void setup_received(void)
 {
     static uint32_t setup_data[2];
@@ -140,20 +147,8 @@ static void ctr_write(void)
      */
     ctrlep[DIR_IN].cnt -= 64;
     ctrlep[DIR_IN].buf += xfer_size;
-}
 
-static void ctr_read(void)
-{
-    int xfer_size = RX0STAT & 0xffff;
-    
-    /* clear NAK bit */
-    RX0CON &= ~(1<<3);
-    
-    ctrlep[DIR_OUT].cnt -= xfer_size;
-    ctrlep[DIR_OUT].buf += xfer_size;
-    
-    RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf;
-    RX0DMACTLO = (1<<0);
+    ep0_write++;
 }
 
 static void blk_write(int ep)
@@ -229,17 +224,35 @@ static void int_write(int ep)
     endpoints[ep_num].buf += xfer_size;
 }
 
+static void udc_phy_reset(void)
+{
+    DEV_CTL |= (1<<7); // SOFT POR
+    udelay(10000);
+    DEV_CTL &= ~(1<<7);
+}
+
+static void udc_soft_connect(void)
+{
+    DEV_CTL |= (1<<8) | /* Configure CSR done */
+               (1<<4) | /* Device soft connect */
+               (1<<3);  /* Device self power */
+}
+
 /* UDC ISR function */
 void INT_UDC(void)
 {
     uint32_t txstat, rxstat;
     int tmp, ep_num;
-    
+
     /* read what caused UDC irq */
     uint32_t intsrc = INT2FLAG & 0x7fffff;
-    
+   
+    udc_irq[udc_irq_idx & 7] = intsrc;
+    udc_irq_idx++;
+ 
     if (intsrc & (1<<1)) /* setup interrupt */
     {
+        udc_setup++;
         setup_received();
     }
     else if (intsrc & (1<<2)) /* ep0 in interrupt */
@@ -276,7 +289,21 @@ void INT_UDC(void)
         if (rxstat & (1<<18)) /* RxACK */
         {
             if (ctrlep[DIR_OUT].cnt > 0)
-                ctr_read();
+            {
+                int xfer_size = rxstat & 0xffff;
+
+                /* clear NAK bit */
+                RX0CON &= ~(1<<3);
+
+                if (xfer_size)
+                {
+                    ctrlep[DIR_OUT].cnt -= xfer_size;
+                    ctrlep[DIR_OUT].buf += xfer_size;
+                }
+ep0out_irq++;
+                RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf;
+                RX0DMACTLO = (1<<0);
+            }
             else
                 usb_core_transfer_complete(0,                    /* ep */
                                            USB_DIR_OUT,          /* dir */
@@ -286,7 +313,25 @@ void INT_UDC(void)
     }
     else if (intsrc & (1<<4)) /* usb reset */
     {
-        usb_drv_init();
+    EN_INT = (1<<6) |  /* Enable Suspend Interrupt */
+             (1<<5) |  /* Enable Resume Interrupt */
+             (1<<4) |  /* Enable USB Reset Interrupt */
+             (1<<3) |  /* Enable OUT Token receive Interrupt EP0 */
+             (1<<2) |  /* Enable IN Token transmits Interrupt EP0 */
+             (1<<1);   /* Enable SETUP Packet Receive Interrupt */
+
+    INTCON = (1<<2) |  /* interrupt high active */
+             (1<<0);   /* enable EP0 interrupts */
+
+    TX0CON = (1<<6) |  /* Set as one to enable the EP0 tx irq */
+             (1<<2);   /* Set as one to response NAK handshake */
+
+    RX0CON = (1<<7) |
+             (1<<4) |  /* Endpoint 0 Enable. When cleared the endpoint does
+                        * not respond to an SETUP or OUT token
+                        */
+
+             (1<<3);   /* Set as one to response NAK handshake */
     }
     else if (intsrc & (1<<5)) /* usb resume */
     {
@@ -300,6 +345,9 @@ void INT_UDC(void)
     }
     else if (intsrc & (1<<7)) /* usb connect */
     {
+        udc_phy_reset();
+        udelay(10000);
+        udc_soft_connect();
     }
     else
     {
@@ -513,8 +561,12 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     if (ep_num == 0)
     {
         ep = &ctrlep[DIR_OUT];
-        
-        ctr_read();
+
+        /* clear NAK bit */
+        RX0CON &= ~(1<<3);
+
+        RX0DMAOUTLMADDR = (uint32_t)ptr;
+        RX0DMACTLO = (1<<0);
     }
     else
     {
@@ -529,6 +581,7 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     ep->buf = ptr;
     ep->len = ep->cnt = length;
 
+    ep0_read++;
     return 0;
 }
 
@@ -641,9 +694,6 @@ void usb_drv_init(void)
 {
     int ep_num;
         
-    /* enable USB clock */
-    SCU_CLKCFG &= ~(1<<6);
-    
     /* 1. do soft disconnect */
     DEV_CTL = (1<<3); /* DEV_SELF_PWR */
 
@@ -657,14 +707,14 @@ void usb_drv_init(void)
     /* 4. clear SOFT_POR bit */
     DEV_CTL  &= ~(1<<7);
     
-    /* 5. configure minimal EN_INT */
+     /* 5. configure minimal EN_INT */
     EN_INT = (1<<6) |  /* Enable Suspend Interrupt */
              (1<<5) |  /* Enable Resume Interrupt */
              (1<<4) |  /* Enable USB Reset Interrupt */
              (1<<3) |  /* Enable OUT Token receive Interrupt EP0 */
              (1<<2) |  /* Enable IN Token transmits Interrupt EP0 */
              (1<<1);   /* Enable SETUP Packet Receive Interrupt */
-             
+            
     /* 6. configure INTCON */
     INTCON = (1<<2) |  /* interrupt high active */
              (1<<0);   /* enable EP0 interrupts */
@@ -681,8 +731,8 @@ void usb_drv_init(void)
              (1<<3);   /* Set as one to response NAK handshake */
              
     /* 8. write final bits to DEV_CTL */
-    DEV_CTL = (1<<8) | /* Configure CSR done */
-              (1<<6) | /* 16-bit data path enabled. udc_clk = 30MHz */
+    DEV_CTL |= (1<<8) | /* Configure CSR done */
+    //          (1<<6) | /* 16-bit data path enabled. udc_clk = 30MHz */
               (1<<4) | /* Device soft connect */
               (1<<3);  /* Device self power */
 
@@ -707,16 +757,18 @@ void usb_drv_init(void)
             BIN_TXCON(ep_num) |= (ep_num<<8)|(1<<3)|(1<<2); /* ep_num, enable, NAK */
         }
     }
+
+
 }
 
 /* turn off usb core */
 void usb_drv_exit(void)
 {
-    DEV_CTL = (1<<3); /* DEV_SELF_PWR */
+//    DEV_CTL = (1<<3); /* DEV_SELF_PWR */
     
     /* disable USB interrupts in interrupt controller */
-    INTC_IMR &= ~(1<<16);
-    INTC_IECR &= ~(1<<16);
+//    INTC_IMR &= ~(1<<16);
+//    INTC_IECR &= ~(1<<16);
     
     /* we cannot disable UDC clock since this causes data abort
      * when reading DEV_INFO in order to check usb connect event

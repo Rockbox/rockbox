@@ -43,6 +43,12 @@
 extern unsigned long sd_debug_time_rd;
 extern unsigned long sd_debug_time_wr;
 
+extern volatile uint32_t udc_irq[8];
+extern volatile uint32_t udc_setup;
+extern volatile uint32_t ep0out_irq;
+extern volatile uint32_t ep0_write;
+extern volatile uint32_t ep0_read;
+
 bool dbg_hw_info(void)
 {
     int line;
@@ -62,6 +68,15 @@ bool dbg_hw_info(void)
         _DEBUG_PRINTF("SCU_DIVCON1: 0x%0x", SCU_DIVCON1);
         _DEBUG_PRINTF("SCU_CLKCFG:  0x%0x", SCU_CLKCFG);
         _DEBUG_PRINTF("SCU_CHIPCFG: 0x%0x", SCU_CHIPCFG);
+        _DEBUG_PRINTF("EN_INT: 0x%0x", EN_INT);
+        _DEBUG_PRINTF("udc_irq[] 1:0x%0x 2:0x%0x 3:0x%0x 4:0x%0x 5:0x%0x 6:0x%0x 7:0x%0x", udc_irq[0],udc_irq[1],udc_irq[2],udc_irq[3],udc_irq[4],udc_irq[5],udc_irq[6],udc_irq[7]);
+        _DEBUG_PRINTF("udc_setup: %d", udc_setup);
+        _DEBUG_PRINTF("SETUP1: 0x%x", SETUP1);
+        _DEBUG_PRINTF("SETUP1: 0x%x", SETUP2);
+
+        _DEBUG_PRINTF("ep0out_irq: %d", ep0out_irq);
+        _DEBUG_PRINTF("ep0_write: %d", ep0_write);
+        _DEBUG_PRINTF("ep0_read: %d", ep0_read);
         line++;
         _DEBUG_PRINTF("sd_debug_time_rd: %d", sd_debug_time_rd);
         _DEBUG_PRINTF("sd_debug_time_wr: %d", sd_debug_time_wr);
