@@ -1475,7 +1475,6 @@ void main(uint32_t arg)
     qh_array[1].max_pkt_length = 1 << 29 | MAX_PKT_SIZE_EP0 << 16;
     qh_array[2].max_pkt_length = 1 << 29 | MAX_PKT_SIZE << 16;
     qh_array[3].max_pkt_length = 1 << 29 | MAX_PKT_SIZE << 16;
-    qh_array[5].max_pkt_length = 1 << 29 | MAX_PKT_SIZE << 16;
     /* setup qh */
     REG_ENDPOINTLISTADDR = (unsigned int)qh_array;
     /* clear setup status */
