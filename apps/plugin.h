@@ -155,7 +155,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 220
+#define PLUGIN_API_VERSION 221
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -960,6 +960,19 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#ifdef HAVE_LCD_BITMAP
+#if CONFIG_CODEC == SWCODEC
+    void (*mixer_channel_set_buffer_hook)(enum pcm_mixer_channel channel,
+                                          chan_buffer_hook_fn_type fn);
+#endif
+    void (*lcd_set_viewport)(struct viewport* vp);
+    void (*viewport_set_fullscreen)(struct viewport *vp,
+                                    const enum screen_type screen);
+    void (*lcd_set_framebuffer)(fb_data *fb);
+    void (*lcd_bmp_part)(const struct bitmap *bm, int src_x, int src_y,
+                         int x, int y, int width, int height);
+#endif
 };
 
 /* plugin header */
