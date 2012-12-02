@@ -52,6 +52,7 @@ pluginlib_jpeg_load.c
 #endif
 
 checkbox.c
+osd.c
 picture.c
 xlcd_core.c
 xlcd_draw.c

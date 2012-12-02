@@ -106,7 +106,8 @@ enum channel_status mixer_channel_status(enum pcm_mixer_channel channel);
 size_t mixer_channel_get_bytes_waiting(enum pcm_mixer_channel channel);
 
 /* Return pointer to channel's playing audio data and the size remaining */
-const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count);
+const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel,
+                                      int *count);
 
 /* Calculate peak values for channel */
 void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
@@ -115,6 +116,13 @@ void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
 /* Adjust channel pointer by a given offset to support movable buffers */
 void mixer_adjust_channel_address(enum pcm_mixer_channel channel,
                                   off_t offset);
+
+/* Set a hook that is called upon getting a new source buffer for a channel
+   NOTE: Called for each buffer, not each mixer chunk */
+typedef void (*chan_buffer_hook_fn_type)(const void *start, size_t size);
+
+void mixer_channel_set_buffer_hook(enum pcm_mixer_channel channel,
+                                   chan_buffer_hook_fn_type fn);
 
 /* Stop ALL channels and PCM and reset state */
 void mixer_reset(void);
