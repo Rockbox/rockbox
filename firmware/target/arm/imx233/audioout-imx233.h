@@ -86,7 +86,13 @@
 #define HW_AUDIOOUT_PWRDN__SPEAKER          (1 << 24)
 
 #define HW_AUDIOOUT_REFCTRL     (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0x80))
-#define HW_AUDIOOUT_REFCTRL__LOW_PWR    (1 << 19)
+#define HW_AUDIOOUT_REFCTRL__BIAS_CTRL_BP   16
+#define HW_AUDIOOUT_REFCTRL__BIAS_CTRL_BM   (3 << 16)
+#define HW_AUDIOOUT_REFCTRL__LOW_PWR        (1 << 19)
+#define HW_AUDIOOUT_REFCTRL__VBG_ADJ_BP     20
+#define HW_AUDIOOUT_REFCTRL__VBG_ADJ_BM     (3 << 20)
+#define HW_AUDIOOUT_REFCTRL__XTAL_BGR_BIAS  (1 << 24)
+#define HW_AUDIOOUT_REFCTRL__RAISE_REF      (1 << 25)
 
 #define HW_AUDIOOUT_ANACTRL     (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0x90))
 #define HW_AUDIOOUT_ANACTRL__HP_CLASSAB         (1 << 4)
@@ -97,6 +103,14 @@
 #define HW_AUDIOOUT_ANACTRL__SHORTMODE_CM_BM    (3 << 20)
 #define HW_AUDIOOUT_ANACTRL__SHORT_LR_STS       (1 << 24)
 #define HW_AUDIOOUT_ANACTRL__SHORT_CM_STS       (1 << 28)
+
+#define HW_AUDIOOUT_TEST        (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0xa0))
+#define HW_AUDIOOUT_TEST__HP_I1_ADJ_BM      (3 << 22)
+#define HW_AUDIOOUT_TEST__HP_I1_ADJ_BP      22
+#define HW_AUDIOOUT_TEST__HP_I1_ADJ_NOMINAL (0 << 22)
+#define HW_AUDIOOUT_TEST__HP_I1_ADJ_M_50    (1 << 22)
+#define HW_AUDIOOUT_TEST__HP_I1_ADJ_P_100   (2 << 22)
+#define HW_AUDIOOUT_TEST__HP_I1_ADJ_P_50    (3 << 22)
 
 #define HW_AUDIOOUT_ANACLKCTRL  (*(volatile uint32_t *)(HW_AUDIOOUT_BASE + 0xe0))
 #define HW_AUDIOOUT_ANACLKCTRL__DACDIV_BP   0
