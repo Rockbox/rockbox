@@ -26,6 +26,10 @@
 
 #include "misc.h"
 
+/**
+ * Low-Level
+ **/
+
 #define RSRC_SECTOR_SIZE    2048
 
 #define RSRC_TABLE_ENTRY_TYPE(e)    ((e) >> 28)
@@ -38,10 +42,25 @@
 #define RSRC_TYPE_AUDIO     4 /* audio entry */
 #define RSRC_TYPE_DATA      5 /* data entry */
 
+/**
+ * API
+ **/
+
+struct rsrc_entry_t
+{
+    uint32_t id;
+    uint32_t offset; // contains value of RSRC_TYPE_VALUE
+    int size;
+};
+
 struct rsrc_file_t
 {
     void *data;
     int size;
+
+    int nr_entries;
+    int capacity;
+    struct rsrc_entry_t *entries;
 };
 
 enum rsrc_error_t

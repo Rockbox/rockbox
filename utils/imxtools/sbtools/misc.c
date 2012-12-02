@@ -84,6 +84,26 @@ void *augment_array(void *arr, size_t elem_sz, size_t cnt, void *aug, size_t aug
     return p;
 }
 
+void augment_array_ex(void **arr, size_t elem_sz, int *cnt, int *capacity,
+    void *aug, int aug_cnt)
+{
+    /* if capacity is not large enough, double it */
+    if(*cnt + aug_cnt > *capacity)
+    {
+        if(*capacity == 0)
+            *capacity = 1;
+        while(*cnt + aug_cnt > *capacity)
+            *capacity *= 2;
+        void *p = xmalloc(elem_sz * (*capacity));
+        memcpy(p, *arr, elem_sz * (*cnt));
+        free(*arr);
+        *arr = p;
+    }
+    /* copy elements */
+    memcpy(*arr + elem_sz * (*cnt), aug, elem_sz * aug_cnt);
+    *cnt += aug_cnt;
+}
+
 /**
  * Key file parsing
  */

@@ -103,7 +103,7 @@ static const char *rsrc_table_entry_type_str(int type)
     }
 }
 
-static bool read_entries(void *buf, int filesize, void *u,
+static bool read_entries(struct rsrc_file_t *f, void *u,
     rsrc_color_printf cprintf, enum rsrc_error_t *err,
     int offset, uint32_t base_index, int level, char *prefix)
 {
@@ -113,24 +113,37 @@ static bool read_entries(void *buf, int filesize, void *u,
             cprintf(u, true, GREY, __VA_ARGS__); \
             return e; } while(0)
 
-    if(offset >= filesize)
+    if(offset >= f->size)
         fatal(RSRC_FORMAT_ERROR, "Out of bounds at off=%x base=%x level=%d\n ouch\n");
     if(level < 0)
         fatal(RSRC_FORMAT_ERROR, "Out of levels at off=%x base=%x level=%d\n aie\n");
     for(int i = 0; i < 256; i++)
     {
-        uint32_t te = *(uint32_t *)(buf + offset + 4 * i);
+        uint32_t te = *(uint32_t *)(f->data + offset + 4 * i);
         if(RSRC_TABLE_ENTRY_TYPE(te) == RSRC_TYPE_NONE)
             continue;
         uint32_t sz = 0;
+        uint32_t off_off = 0;
         if(RSRC_TABLE_ENTRY_TYPE(te) == RSRC_TYPE_VALUE)
             sz = 2;
         else if(RSRC_TABLE_ENTRY_TYPE(te) == RSRC_TYPE_NESTED)
             sz = 4 * 256;
         else
-            sz = *(uint32_t *)(buf + RSRC_TABLE_ENTRY_OFFSET(te));
+        {
+            sz = *(uint32_t *)(f->data + RSRC_TABLE_ENTRY_OFFSET(te));
+            off_off = 4;
+        }
 
         uint32_t index =  base_index | i << (level * 8);
+
+        struct rsrc_entry_t ent;
+        memset(&ent, 0, sizeof(ent));
+        ent.id = index;
+        ent.offset = RSRC_TABLE_ENTRY_OFFSET(te) + off_off;
+        ent.size = sz;
+
+        augment_array_ex((void **)&f->entries, sizeof(ent), &f->nr_entries, &f->capacity, &ent, 1);
+
         printf(OFF, "%s+-%s%#08x %s[%s]%s[size=%#x]\n", prefix, YELLOW, index, BLUE,
             rsrc_table_entry_type_str(RSRC_TABLE_ENTRY_TYPE(te)),
             GREEN, sz);
@@ -140,7 +153,7 @@ static bool read_entries(void *buf, int filesize, void *u,
             char *p = prefix + strlen(prefix);
             sprintf(p, "%s|  ", RED);
             
-            bool ok = read_entries(buf, filesize, u, cprintf, err,
+            bool ok = read_entries(f, u, cprintf, err,
                 RSRC_TABLE_ENTRY_OFFSET(te), index,
                 level - 1, prefix);
             if(!ok)
@@ -183,17 +196,16 @@ struct rsrc_file_t *rsrc_read_memory(void *_buf, size_t filesize, void *u,
             fatal(RSRC_FORMAT_ERROR, "Missing RSRC signature\n");
     }
 
-    printf(BLUE, "Entries\n");
-    char prefix[1024];
-    sprintf(prefix, "%s", RED);
-    bool ok = read_entries(buf, filesize, u, cprintf, err,
-        RSRC_SECTOR_SIZE, 0, 3, prefix);
-    if(!ok)
-        fatal(*err, "Error while parsing rsrc table\n");
-
     rsrc_file->data = malloc(filesize);
     memcpy(rsrc_file->data, _buf, filesize);
     rsrc_file->size = filesize;
+
+    printf(BLUE, "Entries\n");
+    char prefix[1024];
+    sprintf(prefix, "%s", RED);
+    bool ok = read_entries(rsrc_file, u, cprintf, err, RSRC_SECTOR_SIZE, 0, 3, prefix);
+    if(!ok)
+        fatal(*err, "Error while parsing rsrc table\n");
     
     return rsrc_file;
     #undef printf
@@ -204,6 +216,8 @@ struct rsrc_file_t *rsrc_read_memory(void *_buf, size_t filesize, void *u,
 void rsrc_free(struct rsrc_file_t *file)
 {
     if(!file) return;
+    free(file->data);
+    free(file->entries);
     free(file);
 }
 

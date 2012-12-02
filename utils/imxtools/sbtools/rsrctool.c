@@ -52,7 +52,7 @@ char *g_out_prefix;
 
 static void extract_rsrc_file(struct rsrc_file_t *file)
 {
-    
+    (void) file;
 }
 
 static void usage(void)
@@ -76,6 +76,8 @@ static void rsrc_printf(void *user, bool error, color_t c, const char *fmt, ...)
 {
     (void) user;
     (void) error;
+    if(!g_debug)
+        return;
     va_list args;
     va_start(args, fmt);
     color(c);
@@ -176,6 +178,8 @@ int main(int argc, char **argv)
         printf("RSRC read failed: %d\n", err);
         return 1;
     }
+    if(g_debug)
+        printf("%d entries read from file\n", file->nr_entries);
 
     color(OFF);
     if(g_out_prefix)

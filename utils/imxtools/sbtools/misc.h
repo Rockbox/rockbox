@@ -41,6 +41,8 @@ key_array_t g_key_array;
 
 void *memdup(const void *p, size_t len);
 void *augment_array(void *arr, size_t elem_sz, size_t cnt, void *aug, size_t aug_cnt);
+void augment_array_ex(void **arr, size_t elem_sz, int *cnt, int *capacity,
+    void *aug, int aug_cnt);
 void generate_random_data(void *buf, size_t sz);
 void *xmalloc(size_t s);
 int convxdigit(char digit, byte *val);
