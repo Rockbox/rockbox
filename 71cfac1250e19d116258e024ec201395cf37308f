@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///uk\u003d",
+        "filename": "bootloader/gigabeat-s.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-12-03T14:01:46Z",
+      "side": 1,
+      "message": "it should stay rc \u003c 0 as 0 sized firmware is not bootable anyway",
+      "parentUuid": "AAAASX///vE\u003d",
+      "revId": "71cfac1250e19d116258e024ec201395cf37308f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///vA\u003d",
         "filename": "bootloader/ipodnano2g.c",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2012-12-03T12:27:42Z",
       "side": 1,
       "message": "rc \u003c\u003d 0",
+      "revId": "71cfac1250e19d116258e024ec201395cf37308f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///ug\u003d",
+        "filename": "bootloader/ipodnano2g.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2012-12-03T14:01:46Z",
+      "side": 1,
+      "message": "As I said elsewehere 0 sized firmware is not bootable anyway",
+      "parentUuid": "AAAASX///vA\u003d",
       "revId": "71cfac1250e19d116258e024ec201395cf37308f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
