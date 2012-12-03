@@ -336,6 +336,7 @@ static int parse_image_display(struct skin_element *element,
     {
         return WPS_ERROR_INVALID_PARAM;
     }
+    printf("imag: %s\n", img->bm.data);
     id->label = img->label;
     id->offset = 0;
     id->token = PTRTOSKINOFFSET(skin_buffer, NULL);
@@ -343,6 +344,9 @@ static int parse_image_display(struct skin_element *element,
     {
         token->type = SKIN_TOKEN_IMAGE_DISPLAY_LISTICON;
     }
+
+    if (token->type == SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT)
+        img->is_9_segment = true;
 
     if (element->params_count > 1)
     {
@@ -417,6 +421,7 @@ static int parse_image_load(struct skin_element *element,
     img->display = -1;
     img->using_preloaded_icons = false;
     img->buflib_handle = -1;
+    img->is_9_segment = false;
 
     /* save current viewport */
     img->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
@@ -2181,6 +2186,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     token->value.data = get_param(element, 0)->data.text;
                     break;
                 case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
+                case SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT:
                     function = parse_image_display;
                     break;
                 case SKIN_TOKEN_IMAGE_PRELOAD:

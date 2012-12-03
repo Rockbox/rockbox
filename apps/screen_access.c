@@ -195,6 +195,7 @@ struct screen screens[NB_SCREENS] =
 #endif
         .bmp = &lcd_bmp,
         .bmp_part = &lcd_bmp_part,
+        .nine_segment_bmp = &lcd_nine_segment_bmp,
 #if LCD_DEPTH > 1
 #if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1
         .color_to_native=&lcd_color_to_native,

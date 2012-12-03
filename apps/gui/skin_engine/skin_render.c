@@ -231,6 +231,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         break;
         case SKIN_TOKEN_IMAGE_DISPLAY_LISTICON:
         case SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY:
+        case SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT:
         {
             struct image_display *id = SKINOFFSETTOPTR(skin_buffer, token->value.data);
             const char* label = SKINOFFSETTOPTR(skin_buffer, id->label);
