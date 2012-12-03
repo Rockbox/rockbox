@@ -34,7 +34,6 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb);
 void draw_playlist_viewer_list(struct gui_wps *gwps, struct playlistviewer *viewer);
 /* clears the area where the image was shown */
 void clear_image_pos(struct gui_wps *gwps, struct gui_img *img);
-void wps_draw_image(struct gui_wps *gwps, struct gui_img *img, int subimage);
 void wps_display_images(struct gui_wps *gwps, struct viewport* vp);
 
 

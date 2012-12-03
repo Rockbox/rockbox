@@ -167,6 +167,10 @@ struct screen
             unsigned start, unsigned end);
 #endif
 #endif
+#if defined(HAVE_LCD_BITMAP)
+    void (*nine_segment_bmp)(const struct bitmap* bm, int x, int y,
+                                int width, int height);
+#endif
 };
 
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)

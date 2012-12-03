@@ -403,6 +403,13 @@ Examples:
           use the first subimage when \config{\%mh} is on and the second when it is off\newline
           \config{offset}: (optional) Add this number to the value from the \config{tag} when 
           chosing the subimage (may be negative)\\
+    \config{\%x9(n)}
+        & Display an image as a 9-patch bitmap covering the entire viewport.\newline
+          9-patch images are bitmaps split into 9 segments where the four corners
+          are unscaled, the four middle sections are scaled along one axis and the middle
+          section is scaled on both axis.\newline
+          \config{n}: image ID\\
+          
   \end{tagmap}
 
 Examples:

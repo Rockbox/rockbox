@@ -615,3 +615,48 @@ void LCDFN(bmp)(const struct bitmap* bm, int x, int y)
 }
 
 #endif
+
+void LCDFN(nine_segment_bmp)(const struct bitmap* bm, int x, int y,
+                                int width, int height)
+{
+    int seg_w = bm->width / 3;
+    int seg_h = bm->height / 3;
+    int src_x, src_y, dst_x, dst_y;
+
+    /* top */
+    src_x = seg_w; src_y = 0;
+    dst_x = seg_w; dst_y = 0;
+    for (; dst_x < width - seg_w; dst_x += seg_w)
+        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
+    /* bottom */
+    src_x = seg_w; src_y = bm->height - seg_h;
+    dst_x = seg_w; dst_y = height - seg_h;
+    for (; dst_x < width - seg_w; dst_x += seg_w)
+        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
+        
+    /* left */
+    src_x = 0; src_y = seg_h;
+    dst_x = 0; dst_y = seg_h;
+    for (; dst_y < height - seg_h; dst_y += seg_h)
+        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
+    /* right */
+    src_x = bm->width - seg_w; src_y = seg_h;
+    dst_x = width - seg_w; dst_y = seg_h;
+    for (; dst_y < height - seg_h; dst_y += seg_h)
+        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
+    /* center */
+    dst_y = seg_h; src_y = seg_h; src_x = seg_w;
+    for (; dst_y < height - seg_h; dst_y += seg_h)
+    {
+        dst_x = seg_w;
+        for (; dst_x < width - seg_w; dst_x += seg_w)
+            LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
+    }
+
+    /* 4 corners */
+    LCDFN(bmp_part)(bm, 0, 0, x, y, seg_w, seg_h);
+    LCDFN(bmp_part)(bm, bm->width - seg_w, 0, width - seg_w, 0, seg_w, seg_h);
+    LCDFN(bmp_part)(bm, 0, bm->width - seg_h, 0, height - seg_h, seg_w, seg_h);
+    LCDFN(bmp_part)(bm, bm->width - seg_w, bm->width - seg_h,
+            width - seg_w, height - seg_h, seg_w, seg_h);
+}

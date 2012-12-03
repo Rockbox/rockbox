@@ -568,6 +568,8 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 extern void lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
                             int x, int y, int width, int height);
 extern void lcd_bmp(const struct bitmap* bm, int x, int y);
+extern void lcd_nine_segment_bmp(const struct bitmap* bm, int x, int y,
+                                int width, int height);
 #endif /* HAVE_LCD_BITMAP */
 
 
