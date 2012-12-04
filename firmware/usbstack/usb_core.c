@@ -22,7 +22,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "string.h"
-/*#define LOGF_ENABLE*/
+#define LOGF_ENABLE
 #include "logf.h"
 
 #include "usb.h"
@@ -439,7 +439,7 @@ void usb_core_handle_transfer_completion(
 
     switch(ep) {
         case EP_CONTROL:
-            logf("ctrl handled %ld",current_tick);
+            logf("ctrl handled %ld req=0x%x",current_tick, ((struct usb_ctrlrequest*)event->data)->bRequest);
             usb_core_control_request_handler(
                 (struct usb_ctrlrequest*)event->data);
             break;
@@ -948,7 +948,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     completion_event->data = (void*)req;
     completion_event->status = 0;
     completion_event->length = 0;
-    logf("ctrl received %ld", current_tick);
+    logf("ctrl received %ld, req=0x%x", current_tick, req->bRequest);
     usb_signal_transfer_completion(completion_event);
 }
 
