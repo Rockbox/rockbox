@@ -753,6 +753,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned int block_size_mult = 1;
 
     if(letoh32(cbw->signature) != CBW_SIGNATURE) {
+        logf("ums: bad cbw signature (%x)", cbw->signature);
         usb_drv_stall(ep_in, true,true);
         usb_drv_stall(ep_out, true,false);
         return;
@@ -1151,6 +1152,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
+            usb_drv_stall(ep_in, true,true);
             send_csw(UMS_STATUS_FAIL);
             cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
             cur_sense_data.asc=ASC_INVALID_COMMAND;
