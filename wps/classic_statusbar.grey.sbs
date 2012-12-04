@@ -1,29 +1,30 @@
+# Classic Statusbar
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
 #
 # Classic statusbar adapted to skin engine
 #
-# Bar at the top.. very easy to change to the bottom (change the y positions from 0 to -8
+# Status bar position can be changed from top to bottom by changing the y positions from 0 to -8
 #
-
-# specify the UI area viewport... everything but a bar 8 pixels high at the top
+# Specify the UI area viewport... everything but a bar 8 pixels high at the top
 %Vi(-,0,8,-,-,1)%Vf(0)%Vb(3)
 
-##############################################################
+###################################################################
 # Options: 
-# you can use icons or text for the volume and battery display
+# You can use icons or text for the volume and battery display
 # Just comment out the line for the one you dont want!
 
-# comment out the next line if you dont want battery icons
+# Comment out the next line if you dont want battery icons
 %Vd(a)%Vd(e)
 
-# comment out the next line if you dont want battery number as text
+# Comment out the next line if you dont want battery number as text
 # %Vd(b)
 
-# comment out the next line if you dont want volume icons
+# Comment out the next line if you dont want volume icons
 %Vd(c)
-# comment out the next line if you dont want volume number as text
+# Comment out the next line if you dont want volume number as text
 # %Vd(d)
  
-################################################################
+##################################################################
 
 # Load some bitmaps
 %xl(B,battery.bmp,0,0,16)

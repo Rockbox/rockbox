@@ -1,8 +1,7 @@
-# cabbie 2.0
-# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
-# (C) 2009, Maurus Cuelenaere (mcuelenaere) ported to Onda VX747
-# derived from "cabbie" (C) Yohann Misquitta
-
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
 %wd
 %X(wpsbackdrop-240x400x16.bmp)
 %Cl(55,50,130,130,c,c)

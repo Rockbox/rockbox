@@ -1,3 +1,7 @@
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
 %V(0,0,32,32,1)
 %?mp<|%Vd(music)%?C<%Vd(music_aa)|%Vd(music_no_aa)>>
 %T(0,0,32,32,menu)

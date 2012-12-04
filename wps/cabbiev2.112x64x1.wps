@@ -1,5 +1,6 @@
-# cabbie 2.0 default for the Archos Series by Marianne Arnold
-# derived from cabbie 2.0 default (C) 2007, Johannes Voggenthaler (Zinc Alloy)
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
 #
 # Disable Status Bar
 %wd

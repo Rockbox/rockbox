@@ -1,8 +1,7 @@
-# cabbie 2.0
-# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
-# (C) 2010, Thomas Martitz ported to 320x480 touchscreens
-# derived from "cabbie" (C) Yohann Misquitta
-
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
 # TODO:
 #  * images for battery, hold button
 %wd
