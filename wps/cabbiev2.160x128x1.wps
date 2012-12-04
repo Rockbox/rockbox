@@ -1,8 +1,7 @@
-# cabbie 2.0 default
-# 160*128 greyscale port by Mark Fawcus (yapper)
-# works with 64*64 album art if present
-# (C) 2007, Johannes Voggenthaler (Zinc Alloy)
-# derived from "cabbie" (C) Yohann Misquitta
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
 %wd
 %x(z,wpsbackdrop-160x128x1.bmp,0,0)
 %xl(A,lock-160x128x1.bmp,48,114,2)
