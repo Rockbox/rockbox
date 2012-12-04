@@ -1,7 +1,6 @@
-# cabbie 2.0
-# (C) 20077, Johannes Voggenthaler (Zinc Alloy)
-# (C) Keith Perri (kperri) ported to (Gigabeat)
-#derived from "cabbie" (C) Yohann Misquitta
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
 #
 # Disable Status Bar
 %wd

@@ -1,7 +1,7 @@
-# cabbie 2.0 default
-# (C) 2007-2010 Johannes Voggenthaler (Zinc Alloy)
-#derived from "cabbie" (C) Yohann Misquitta
-#Ported to GoGear SA9200 by Michael Carr (Strife89)
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
 %wd
 #Load Images
 %X(wpsbackdrop-128x160x16.bmp)

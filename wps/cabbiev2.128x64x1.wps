@@ -1,5 +1,6 @@
-# cabbie 2.0 default rwps for Iriver Players by Johannes Voggenthaler (Zinc Alloy)
-# derived from cabbie 2.0 default rwps (C) 2007, Marc Guay
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/ATHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
 #
 # Disable Status Bar
 %wd
