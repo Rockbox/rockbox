@@ -190,8 +190,8 @@ or \config{\%D(2)}), produce the information for the next file to be played.
     \config{\%ps} & ``s'' if shuffle mode is enabled\\
     \config{\%pt} & Total track time\\
     \config{\%pv} & Current volume (in dB). Can also be used in a conditional:
-           \config{\%?pv<0|1|2|\ldots|N>}\newline
-           0 is used for mute, the last option is used for values greater than zero.
+           \config{\%?pv<Mute|\ldots|0 dB|Above 0 dB>}\newline
+           Mute is 0\% volume, \ldots is the values between Mute and max, 0 dB is max volume, and Above 0 dB is amplified volume
          \opt{lcd_bitmap}{This can also be used like \%pb to provide a continuous scale:
          \config{\%pv(x,y,[width],[height],image.bmp)}} \\
     \config{\%pS} & Track is starting. An optional number gives how many seconds
