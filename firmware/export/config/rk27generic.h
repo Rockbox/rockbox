@@ -54,7 +54,7 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-#define CONFIG_STORAGE (STORAGE_SD | STORAGE_NAND)
+#define CONFIG_STORAGE (STORAGE_SD /*| STORAGE_NAND*/)
 
 #define CONFIG_NAND NAND_RK27XX
 #define HAVE_SW_TONE_CONTROLS
