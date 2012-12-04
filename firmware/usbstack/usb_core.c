@@ -22,7 +22,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "string.h"
-/*#define LOGF_ENABLE*/
+#define LOGF_ENABLE
 #include "logf.h"
 
 #include "usb.h"
@@ -439,7 +439,7 @@ void usb_core_handle_transfer_completion(
 
     switch(ep) {
         case EP_CONTROL:
-            logf("ctrl handled %ld",current_tick);
+            logf("ctrl handled %ld req=0x%x",current_tick, ((struct usb_ctrlrequest*)event->data)->bRequest);
             usb_core_control_request_handler(
                 (struct usb_ctrlrequest*)event->data);
             break;
@@ -686,6 +686,16 @@ static void usb_core_do_set_config(uint8_t config)
     #endif
 }
 
+static void usb_core_do_clear_feature(int recip, int recip_nr, int feature)
+{
+    logf("usb_core: CLEAR FEATURE (%d,%d,%d)", recip, recip_nr, feature);
+    if(recip == USB_RECIP_ENDPOINT)
+    {
+        if(feature == USB_ENDPOINT_HALT)
+            usb_drv_stall(EP_NUM(recip_nr), false, EP_DIR(recip_nr));
+    }
+}
+
 static void request_handler_device(struct usb_ctrlrequest* req)
 {
     switch(req->bRequest) {
@@ -808,12 +818,11 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
 {
     switch (req->bRequest) {
         case USB_REQ_CLEAR_FEATURE:
-            if(req->wValue == USB_ENDPOINT_HALT)
-                usb_drv_stall(EP_NUM(req->wIndex), false, EP_DIR(req->wIndex));
-            
+            usb_core_do_clear_feature(USB_RECIP_ENDPOINT, req->wIndex, req->wValue);
             usb_drv_send(EP_CONTROL, NULL, 0);
             break;
         case USB_REQ_SET_FEATURE:
+            logf("usb_core: SET FEATURE (%d)", req->wValue);
             if(req->wValue == USB_ENDPOINT_HALT)
                usb_drv_stall(EP_NUM(req->wIndex), true, EP_DIR(req->wIndex));
             
@@ -948,7 +957,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     completion_event->data = (void*)req;
     completion_event->status = 0;
     completion_event->length = 0;
-    logf("ctrl received %ld", current_tick);
+    logf("ctrl received %ld, req=0x%x", current_tick, req->bRequest);
     usb_signal_transfer_completion(completion_event);
 }
 
