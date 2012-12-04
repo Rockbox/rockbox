@@ -23,7 +23,7 @@
 #include "usb_core.h"
 #include "usb_drv.h"
 #include "usb_class_driver.h"
-/*#define LOGF_ENABLE*/
+#define LOGF_ENABLE
 #include "logf.h"
 #include "storage.h"
 #include "disk.h"
