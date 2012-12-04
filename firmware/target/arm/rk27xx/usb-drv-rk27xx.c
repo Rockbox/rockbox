@@ -35,6 +35,7 @@
 #include <inttypes.h>
 #include "power.h"
 
+#define LOGF_ENABLE
 #include "logf.h"
 
 typedef volatile uint32_t reg32;
@@ -97,6 +98,8 @@ static struct endpoint_t endpoints[16] = {
     {USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* BIN14  */
     {USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false, {0, 0, 0}},  /* IIN15  */
 };
+
+volatile uint32_t udc_conn = 0;
 
 static void setup_received(void)
 {
@@ -229,6 +232,75 @@ static void int_write(int ep)
     endpoints[ep_num].buf += xfer_size;
 }
 
+static void udc_phy_reset(void)
+{
+    DEV_CTL |= SOFT_POR;
+    udelay(10000);
+    DEV_CTL &= ~SOFT_POR;
+}
+
+static void udc_soft_connect(void)
+{
+    DEV_CTL |= CSR_DONE    |
+               DEV_SOFT_CN |
+               DEV_SELF_PWR;
+}
+
+void udc_tick_task(void)
+{
+    uint32_t dev_info = DEV_INFO;
+    static struct usb_ctrlrequest req_addr, req_conf;
+    static bool set_address = false;
+    static bool set_configuration = false;
+
+    /* This tick task polls for DEV_EN bit set in DEV_INFO  register
+     * as well as tracks current requested configuration
+     * (DEV_INFO [11:8]). On state change it notifies usb stack
+     * about it.
+     *
+     * It is registered on usb connection and removed on usb
+     * extraction.
+     */
+
+    /* SET ADDRESS request */
+    if (set_address == false)
+        if ((dev_info & 0x7f))
+        {
+            udc_conn = (dev_info & 0x7f);
+            set_address = true;
+
+            req_addr.bRequestType = USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_DEVICE;
+            req_addr.bRequest = USB_REQ_SET_ADDRESS;
+            req_addr.wValue = (dev_info & 0x7f);
+            req_addr.wIndex = 0;
+            req_addr.wLength = 0;
+
+            logf("udc_tick_task() %ld, ctrl req=%x",current_tick, req_addr.bRequest);
+            usb_core_control_request(&req_addr);
+        }
+
+    /* SET CONFIGURATION request */
+    if (set_configuration == false)
+    if (dev_info & DEV_EN)
+    {
+        set_configuration = true;
+
+        req_conf.bRequestType = USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_DEVICE;
+        req_conf.bRequest = USB_REQ_SET_CONFIGURATION;
+        req_conf.wValue = ((dev_info >> 8) & 0x0f) + 1;
+        req_conf.wIndex = 0;
+        req_conf.wLength = 0;
+
+        /* Notify usb stack somehow */
+        logf("udc_tick_task() %ld, ctrl req=%x",current_tick, req_conf.bRequest);
+        usb_core_control_request(&req_conf);
+
+        tick_remove_task(udc_tick_task);
+ 
+        set_address = false;     
+    }
+}
+
 /* UDC ISR function */
 void INT_UDC(void)
 {
@@ -242,7 +314,8 @@ void INT_UDC(void)
     {
         setup_received();
     }
-    else if (intsrc & IN0_INTR) /* ep0 in interrupt */
+
+    if (intsrc & IN0_INTR) /* ep0 in interrupt */
     {
         txstat = TX0STAT; /* read clears flags */
         
@@ -268,7 +341,8 @@ void INT_UDC(void)
             }
         }
     }
-    else if (intsrc & OUT0_INTR) /* ep0 out interrupt */
+
+    if (intsrc & OUT0_INTR) /* ep0 out interrupt */
     {
         rxstat = RX0STAT;
 
@@ -284,32 +358,69 @@ void INT_UDC(void)
                                            ctrlep[DIR_OUT].len); /* length */                
         }
     }
-    else if (intsrc & USBRST_INTR) /* usb reset */
+
+    if (intsrc & USBRST_INTR) /* usb reset */
     {
-        usb_drv_init();
+        EN_INT = EN_SUSP_INTR   |  /* Enable Suspend Interrupt */
+                 EN_RESUME_INTR |  /* Enable Resume Interrupt */
+                 EN_USBRST_INTR |  /* Enable USB Reset Interrupt */
+                 EN_OUT0_INTR   |  /* Enable OUT Token receive Interrupt EP0 */
+                 EN_IN0_INTR    |  /* Enable IN Token transmits Interrupt EP0 */
+                 EN_SETUP_INTR;    /* Enable SETUP Packet Receive Interrupt */
+
+        INTCON = UDC_INTHIGH_ACT |  /* interrupt high active */
+                 UDC_INTEN;         /* enable EP0 interrupts */
+
+        TX0CON = TXACKINTEN |  /* Set as one to enable the EP0 tx irq */
+                 TXNAK;        /* Set as one to response NAK handshake */
+
+        RX0CON = RXACKINTEN |
+                 RXEPEN     |  /* Endpoint 0 Enable. When cleared the endpoint does
+                                * not respond to an SETUP or OUT token */
+                 RXNAK;        /* Set as one to response NAK handshake */
+
+
     }
-    else if (intsrc & RESUME_INTR) /* usb resume */
+
+    if (intsrc & RESUME_INTR) /* usb resume */
     {
         TX0CON |=  TXCLR;  /* TxClr */
         TX0CON &= ~TXCLR;
         RX0CON |=  RXCLR; /* RxClr */
         RX0CON &= ~RXCLR;
     }
-    else if (intsrc & SUSP_INTR) /* usb suspend */
+
+    if (intsrc & SUSP_INTR) /* usb suspend */
     {
     }
-    else if (intsrc & CONN_INTR) /* usb connect */
+
+    if (intsrc & CONN_INTR) /* usb connect */
     {
+//        if (DEV_INFO & VBUS_STS)
+//        {
+            udc_phy_reset();
+            udelay(10000);
+            udc_soft_connect();
+            udc_conn = 1;
+            usb_status_event(USB_INSERTED);
+            tick_add_task(udc_tick_task);
+
+//        }
+//        else
+//            udc_conn = 0;
     }
-    else
+
+    /* TODO this needs rework */
+    if (intsrc & 0x7fff00)
     {
         /* lets figure out which ep generated irq */
-        tmp = intsrc >> 7;
+        tmp = intsrc >> 8;
         for (ep_num=1; ep_num < 15; ep_num++)
         {
-            tmp >>= ep_num;
             if (tmp & 0x01)
                 break;
+
+            tmp >>= 1;
         }
         
         if (intsrc & ((1<<8)|(1<<11)|(1<<14)|(1<<17)|(1<<20)))
@@ -318,7 +429,7 @@ void INT_UDC(void)
             rxstat = BOUT_RXSTAT(ep_num);
             
             /* TODO handle errors */
-            if (rxstat & (1<<18)) /* RxACK */
+            if (rxstat & RXACK) /* RxACK */
             {
                 if (endpoints[ep_num].cnt > 0)
                     blk_read(ep_num);
@@ -335,7 +446,7 @@ void INT_UDC(void)
             txstat = BIN_TXSTAT(ep_num);
             
             /* TODO handle errors */
-            if (txstat & (1<<18)) /* check TxACK flag */
+            if (txstat & TXACK) /* check TxACK flag */
             {
                 if (endpoints[ep_num].cnt >= 0)
                 {
@@ -402,7 +513,7 @@ int usb_drv_request_endpoint(int type, int dir)
     ep_dir = EP_DIR(dir);
     ep_type = type & USB_ENDPOINT_XFERTYPE_MASK;
 
-    logf("req: %s %s", XFER_DIR_STR(ep_dir), XFER_TYPE_STR(ep_type));
+//    logf("req: %s %s", XFER_DIR_STR(ep_dir), XFER_TYPE_STR(ep_type));
     
     /* Find an available ep/dir pair */
     for (ep_num=1;ep_num<USB_NUM_ENDPOINTS;ep_num++)
@@ -640,10 +751,8 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
 void usb_drv_init(void)
 {
     int ep_num;
-        
-    /* enable USB clock */
-    SCU_CLKCFG &= ~(1<<6);
-    
+
+#if 0        
     /* 1. do soft disconnect */
     DEV_CTL = DEV_SELF_PWR;
 
@@ -685,7 +794,7 @@ void usb_drv_init(void)
               DEV_PHY16BIT | /* 16-bit data path enabled. udc_clk = 30MHz */
               DEV_SOFT_CN  | /* Device soft connect */
               DEV_SELF_PWR;  /* Device self power */
-
+#endif
     /* init semaphore of ep0 */
     semaphore_init(&ctrlep[DIR_OUT].complete, 1, 0);
     semaphore_init(&ctrlep[DIR_IN].complete, 1, 0);
@@ -713,14 +822,6 @@ void usb_drv_init(void)
 void usb_drv_exit(void)
 {
     DEV_CTL = DEV_SELF_PWR;
-    
-    /* disable USB interrupts in interrupt controller */
-    INTC_IMR &= ~(1<<16);
-    INTC_IECR &= ~(1<<16);
-    
-    /* we cannot disable UDC clock since this causes data abort
-     * when reading DEV_INFO in order to check usb connect event
-     */
 }
 
 int usb_detect(void)

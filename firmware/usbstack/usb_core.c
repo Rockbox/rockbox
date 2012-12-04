@@ -22,7 +22,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "string.h"
-/*#define LOGF_ENABLE*/
+#define LOGF_ENABLE
 #include "logf.h"
 
 #include "usb.h"
@@ -439,7 +439,7 @@ void usb_core_handle_transfer_completion(
 
     switch(ep) {
         case EP_CONTROL:
-            logf("ctrl handled %ld",current_tick);
+            logf("ctrl handled %ld req=0x%x",current_tick, ((struct usb_ctrlrequest*)event->data)->bRequest);
             usb_core_control_request_handler(
                 (struct usb_ctrlrequest*)event->data);
             break;
@@ -663,6 +663,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
     }
 }
 
+extern volatile uint32_t udc_conn;
 static void request_handler_device(struct usb_ctrlrequest* req)
 {
     int i;
@@ -676,8 +677,9 @@ static void request_handler_device(struct usb_ctrlrequest* req)
                 break;
             }
         case USB_REQ_SET_CONFIGURATION: {
+                //udc_conn = 100;
                 logf("usb_core: SET_CONFIG");
-                usb_drv_cancel_all_transfers();
+                //usb_drv_cancel_all_transfers();
                 if(req->wValue) {
                     usb_state = CONFIGURED;
                     for(i = 0; i < USB_NUM_DRIVERS; i++)
@@ -686,17 +688,18 @@ static void request_handler_device(struct usb_ctrlrequest* req)
                 }
                 else
                     usb_state = ADDRESS;
-                usb_drv_send(EP_CONTROL, NULL, 0);
+                //usb_drv_send(EP_CONTROL, NULL, 0);
 #ifdef HAVE_USB_CHARGING_ENABLE
                 usb_charging_maxcurrent_change(usb_charging_maxcurrent());
 #endif
                 break;
             }
         case USB_REQ_SET_ADDRESS: {
+                udc_conn = 200;
                 unsigned char address = req->wValue;
                 logf("usb_core: SET_ADR %d", address);
-                usb_drv_send(EP_CONTROL, NULL, 0);
-                usb_drv_cancel_all_transfers();
+                //usb_drv_send(EP_CONTROL, NULL, 0);
+                //usb_drv_cancel_all_transfers();
                 usb_address = address;
                 usb_drv_set_address(usb_address);
                 usb_state = ADDRESS;
@@ -924,7 +927,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     completion_event->data = (void*)req;
     completion_event->status = 0;
     completion_event->length = 0;
-    logf("ctrl received %ld", current_tick);
+    logf("ctrl received %ld, req=0x%x", current_tick, req->bRequest);
     usb_signal_transfer_completion(completion_event);
 }
 

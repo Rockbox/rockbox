@@ -40,6 +40,7 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
+#define LOGF_ENABLE
 #include "logf.h"
 #include "screendump.h"
 
@@ -267,6 +268,7 @@ static inline void usb_slave_mode(bool on)
 void usb_signal_transfer_completion(
     struct usb_transfer_completion_event_data* event_data)
 {
+    logf("usb_signal_transfer_completion %ld, req=0x%x", current_tick, ((struct usb_ctrlrequest *)(event_data->data))->bRequest);
     queue_post(&usb_queue, USB_TRANSFER_COMPLETION, (intptr_t)event_data);
 }
 
@@ -439,6 +441,7 @@ static void NORETURN_ATTR usb_thread(void)
             usb_set_host_present(true);
 #endif
 
+            logf("usb_thread() %ld, req=0x%x", current_tick, ((struct usb_ctrlrequest *)(((struct usb_transfer_completion_event_data*)ev.data)->data))->bRequest);
             usb_core_handle_transfer_completion(
                 (struct usb_transfer_completion_event_data*)ev.data);
             break;
