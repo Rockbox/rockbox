@@ -45,7 +45,7 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-#define CONFIG_STORAGE (STORAGE_SD | STORAGE_NAND)
+#define CONFIG_STORAGE (STORAGE_SD) /* | STORAGE_NAND) */
 
 #define CONFIG_NAND NAND_RK27XX
 #define HAVE_SW_TONE_CONTROLS
@@ -53,7 +53,7 @@
 /* commented for now */
 /* #define HAVE_HOTSWAP */
 
-#define NUM_DRIVES 2
+#define NUM_DRIVES 1
 #define SECTOR_SIZE 512
 
 /* for small(ish) SD cards */
