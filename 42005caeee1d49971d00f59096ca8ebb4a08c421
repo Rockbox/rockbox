@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///t8\u003d",
+        "filename": "wps/AUTHORS",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-12-04T07:39:30Z",
+      "side": 1,
+      "message": "fix whitespace",
+      "revId": "42005caeee1d49971d00f59096ca8ebb4a08c421",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///t4\u003d",
+        "filename": "wps/AUTHORS",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2012-12-04T07:39:30Z",
+      "side": 1,
+      "message": "remove this section... the file doesnt have any content",
+      "revId": "42005caeee1d49971d00f59096ca8ebb4a08c421",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
