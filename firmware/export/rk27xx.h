@@ -555,8 +555,19 @@
 #define PHY_TEST_EN            (*(volatile unsigned long *)(AHB0_UDC + 0x00))
 #define PHY_TEST               (*(volatile unsigned long *)(AHB0_UDC + 0x04))
 #define DEV_CTL                (*(volatile unsigned long *)(AHB0_UDC + 0x08))
+#define DEV_RMTWKP             (1<<2)
+#define DEV_SELF_PWR           (1<<3)
+#define DEV_SOFT_CN            (1<<4)
+#define DEV_RESUME             (1<<5)
+#define DEV_PHY16BIT           (1<<6)
+#define SOFT_POR               (1<<7)
+#define CSR_DONE               (1<<8)
 
 #define DEV_INFO               (*(volatile unsigned long *)(AHB0_UDC + 0x10))
+#define DEV_EN                 (1<<7)
+#define VBUS_STS               (1<<20)
+#define DEV_SPEED              (3<<21)
+
 #define EN_INT                 (*(volatile unsigned long *)(AHB0_UDC + 0x14))
 #define EN_SOF_INTR            (1<<0)
 #define EN_SETUP_INTR          (1<<1)
@@ -592,7 +603,7 @@
 #define USBRST_INTR           (1<<4)
 #define RESUME_INTR           (1<<5)
 #define SUSP_INTR             (1<<6)
-/* bit 7 reserved */
+#define CONN_INTR             (1<<7) /* marked as reserved in DS */
 #define BOUT1_INTR            (1<<8)
 #define BIN2_INTR             (1<<9)
 #define IIN3_INTR             (1<<10)
@@ -612,44 +623,21 @@
 /* bits 27-31 reserved */
 
 #define INTCON                 (*(volatile unsigned long *)(AHB0_UDC + 0x1C))
+#define UDC_INTEN              (1<<0)
+#define UDC_INTEDGE_TRIG       (1<<1)
+#define UDC_INTHIGH_ACT        (1<<2)
+
 #define SETUP1                 (*(volatile unsigned long *)(AHB0_UDC + 0x20))
 #define SETUP2                 (*(volatile unsigned long *)(AHB0_UDC + 0x24))
 #define AHBCON                 (*(volatile unsigned long *)(AHB0_UDC + 0x28))
-
 #define RX0STAT                (*(volatile unsigned long *)(AHB0_UDC + 0x30))
 #define RX0CON                 (*(volatile unsigned long *)(AHB0_UDC + 0x34))
-#define RX0FFRC                (1<<0)
-#define RX0CLR                 (1<<1)
-#define RX0STALL               (1<<2)
-#define RX0NAK                 (1<<3)
-#define EP0EN                  (1<<4)
-#define RX0VOIDINTEN           (1<<5)
-#define RX0ERRINTEN            (1<<6)
-#define RX0ACKINTEN            (1<<7)
-/* bits 8-31 reserved */
-
 #define RX0DMACTLO             (*(volatile unsigned long *)(AHB0_UDC + 0x38))
 #define RX0DMAOUTLMADDR        (*(volatile unsigned long *)(AHB0_UDC + 0x3C))
 #define TX0STAT                (*(volatile unsigned long *)(AHB0_UDC + 0x40))
 #define TX0CON                 (*(volatile unsigned long *)(AHB0_UDC + 0x44))
-#define TX0CLR                 (1<<0)
-#define TX0STALL               (1<<1)
-#define TX0NAK                 (1<<2)
-/* bit 3 reserved */
-#define TX0VOIDINTEN           (1<<4)
-#define TX0ERRINTEN            (1<<5)
-#define TX0ACKINTEN            (1<<6)
-/* bits 7-31 reserved */
-
 #define TX0BUF                 (*(volatile unsigned long *)(AHB0_UDC + 0x48))
-#define TX0FULL                (1<<0)
-#define TX0URF                 (1<<1)
-/* bits 2-31 reserved */
-
 #define TX0DMAINCTL            (*(volatile unsigned long *)(AHB0_UDC + 0x4C))
-#define TX0DMAINSTA            (1<<0)
-/* bits 1-31 reserved */
-
 #define TX0DMALM_IADDR         (*(volatile unsigned long *)(AHB0_UDC + 0x50))
 #define RX1STAT                (*(volatile unsigned long *)(AHB0_UDC + 0x54))
 #define RX1CON                 (*(volatile unsigned long *)(AHB0_UDC + 0x58))
@@ -721,6 +709,62 @@
 #define TX15BUF                (*(volatile unsigned long *)(AHB0_UDC + 0x160))
 #define TX15DMAINCTL           (*(volatile unsigned long *)(AHB0_UDC + 0x164))
 #define TX15DMALM_IADDR        (*(volatile unsigned long *)(AHB0_UDC + 0x168))
+
+/* RXnSTAT bits */
+/* bits 10:0 RXLEN */
+/* bits 15:11 reserved */
+#define RXVOID                 (1<<16)
+#define RXERR                  (1<<17)
+#define RXACK                  (1<<18)
+#define RXCFINT                (1<<19) /* reserved for EP0 */
+/* bits 23:20 reserved */
+#define RXFULL                 (1<<24)
+#define RXOVF                  (1<<25)
+/* bits 31:26 reserved */
+
+/* RXnCON bits */
+#define RXFFRC                 (1<<0)
+#define RXCLR                  (1<<1)
+#define RXSTALL                (1<<2)
+#define RXNAK                  (1<<3)
+#define RXEPEN                 (1<<4)
+#define RXVOIDINTEN            (1<<5)
+#define RXERRINTEN             (1<<6)
+#define RXACKINTEN             (1<<7)
+/* bits 31:8 reserved for EP0 */
+/* bits 31:14 reserved for others */
+
+/* TxnSTAT */
+/* bits 10:0 TXLEN */
+/* bits 15:11 reserved */
+#define TXVOID                 (1<<16)
+#define TXERR                  (1<<17)
+#define TXACK                  (1<<18)
+#define TXDMADN                (1<<19) /* reserved for EP0 */
+#define TXCFINT                (1<<20) /* reserved for EP0 */
+/* bits 31:21 reserved */
+
+/* TXnCON bits */
+#define TXCLR                  (1<<0)
+#define TXSTALL                (1<<1)
+#define TXNAK                  (1<<2)
+#define TXEPEN                 (1<<3) /* reserved for EP0 */
+#define TXVOIDINTEN            (1<<4)
+#define TXERRINTEN             (1<<5)
+#define TXACKINTEN             (1<<6)
+#define TXDMADNEN              (1<<7) /* reserved for EP0 */
+/* bits 31:8 reserved */
+
+/* TXnBUF bits */
+#define TXFULL                 (1<<0)
+#define TXURF                  (1<<1)
+#define TXDS0                  (1<<2) /* reserved for EP0 */
+#define TXDS1                  (1<<3) /* reserved for EP0 */
+/* bits 31:4 reserved */
+
+/* DMA bits */
+#define DMA_START              (1<<0)
+/* bits 31:1 reserved */
 
 /* USB host controller */
 #define AHB0_UHC               (ARM_BUS0_BASE + 0x000A4000)

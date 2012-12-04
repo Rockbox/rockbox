@@ -120,16 +120,16 @@ static void ctr_write(void)
     int xfer_size = (ctrlep[DIR_IN].cnt > 64) ? 64 : ctrlep[DIR_IN].cnt;
     unsigned int timeout = current_tick + HZ/10;
     
-    while (TX0BUF & (1<<0)) /* TX0FULL flag */
+    while (TX0BUF & TXFULL) /* TX0FULL flag */
     {
         if(TIME_AFTER(current_tick, timeout))
             break;
     }
 
-    TX0STAT = xfer_size;                          /* size of the transfer */
-    TX0DMALM_IADDR = (uint32_t)ctrlep[DIR_IN].buf;    /* local buffer address */
-    TX0DMAINCTL = (1<<1);                         /* start DMA */
-    TX0CON &= ~(1<<2);                            /* clear NAK */
+    TX0STAT = xfer_size;                           /* size of the transfer */
+    TX0DMALM_IADDR = (uint32_t)ctrlep[DIR_IN].buf; /* local buffer address */
+    TX0DMAINCTL = DMA_START;                       /* start DMA */
+    TX0CON &= ~TXNAK;                              /* clear NAK */
     
     /* Decrement by max packet size is intentional.
      * This way if we have final packet short one we will get negative len
@@ -147,13 +147,13 @@ static void ctr_read(void)
     int xfer_size = RX0STAT & 0xffff;
     
     /* clear NAK bit */
-    RX0CON &= ~(1<<3);
+    RX0CON &= ~RXNAK;
     
     ctrlep[DIR_OUT].cnt -= xfer_size;
     ctrlep[DIR_OUT].buf += xfer_size;
     
-    RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf;
-    RX0DMACTLO = (1<<0);
+    RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf; /* buffer address */
+    RX0DMACTLO = DMA_START;                          /* start DMA */
 }
 
 static void blk_write(int ep)
@@ -163,16 +163,16 @@ static void blk_write(int ep)
     int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;  
     unsigned int timeout = current_tick + HZ/10;
     
-    while (BIN_TXBUF(ep_num) & (1<<0)) /* TXFULL flag */
+    while (BIN_TXBUF(ep_num) & TXFULL) /* TXFULL flag */
     {
         if(TIME_AFTER(current_tick, timeout))
             break;
     }
     
-    BIN_TXSTAT(ep_num) = xfer_size;           /* size of the transfer */
+    BIN_TXSTAT(ep_num) = xfer_size;                            /* size */
     BIN_DMAINLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf; /* buf address */
-    BIN_DMAINCTL(ep_num) = (1<<0);            /* start DMA */
-    BIN_TXCON(ep_num) &= ~(1<<2);             /* clear NAK */
+    BIN_DMAINCTL(ep_num) = DMA_START;                          /* start DMA */
+    BIN_TXCON(ep_num) &= ~TXNAK;                               /* clear NAK */
     
     /* Decrement by max packet size is intentional.
      * This way if we have final packet short one we will get negative len
@@ -191,13 +191,13 @@ static void blk_read(int ep)
     int xfer_size = BOUT_RXSTAT(ep_num) & 0xffff;
     
     /* clear NAK bit */
-    BOUT_RXCON(ep_num) &= ~(1<<3);
+    BOUT_RXCON(ep_num) &= ~RXNAK;
     
     endpoints[ep_num].cnt -= xfer_size;
     endpoints[ep_num].buf += xfer_size;
     
     BOUT_DMAOUTLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf;
-    BOUT_DMAOUTCTL(ep_num) = (1<<1);
+    BOUT_DMAOUTCTL(ep_num) = DMA_START;
 }
 
 static void int_write(int ep)
@@ -207,16 +207,16 @@ static void int_write(int ep)
     int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;  
     unsigned int timeout = current_tick + HZ/10;
     
-    while (IIN_TXBUF(ep_num) & (1<<0)) /* TXFULL flag */
+    while (IIN_TXBUF(ep_num) & TXFULL) /* TXFULL flag */
     {
         if(TIME_AFTER(current_tick, timeout))
             break;
     }
     
-    IIN_TXSTAT(ep_num) = xfer_size;           /* size of the transfer */
+    IIN_TXSTAT(ep_num) = xfer_size;                            /* size */
     IIN_DMAINLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf; /* buf address */
-    IIN_DMAINCTL(ep_num) = (1<<0);            /* start DMA */
-    IIN_TXCON(ep_num) &= ~(1<<2);             /* clear NAK */
+    IIN_DMAINCTL(ep_num) = DMA_START;                          /* start DMA */
+    IIN_TXCON(ep_num) &= ~TXNAK;                               /* clear NAK */
     
     /* Decrement by max packet size is intentional.
      * This way if we have final packet short one we will get negative len
@@ -238,16 +238,16 @@ void INT_UDC(void)
     /* read what caused UDC irq */
     uint32_t intsrc = INT2FLAG & 0x7fffff;
     
-    if (intsrc & (1<<1)) /* setup interrupt */
+    if (intsrc & SETUP_INTR) /* setup interrupt */
     {
         setup_received();
     }
-    else if (intsrc & (1<<2)) /* ep0 in interrupt */
+    else if (intsrc & IN0_INTR) /* ep0 in interrupt */
     {
         txstat = TX0STAT; /* read clears flags */
         
         /* TODO handle errors */
-        if (txstat & (1<<18)) /* check TxACK flag */
+        if (txstat & TXACK) /* check TxACK flag */
         {
             if (ctrlep[DIR_IN].cnt >= 0)
             {
@@ -268,12 +268,12 @@ void INT_UDC(void)
             }
         }
     }
-    else if (intsrc & (1<<3)) /* ep0 out interrupt */
+    else if (intsrc & OUT0_INTR) /* ep0 out interrupt */
     {
         rxstat = RX0STAT;
 
         /* TODO handle errors */
-        if (rxstat & (1<<18)) /* RxACK */
+        if (rxstat & RXACK) /* RxACK */
         {
             if (ctrlep[DIR_OUT].cnt > 0)
                 ctr_read();
@@ -284,21 +284,21 @@ void INT_UDC(void)
                                            ctrlep[DIR_OUT].len); /* length */                
         }
     }
-    else if (intsrc & (1<<4)) /* usb reset */
+    else if (intsrc & USBRST_INTR) /* usb reset */
     {
         usb_drv_init();
     }
-    else if (intsrc & (1<<5)) /* usb resume */
+    else if (intsrc & RESUME_INTR) /* usb resume */
     {
-        TX0CON |= (1<<0); /* TxClr */
-        TX0CON &= ~(1<<0);
-        RX0CON |= (1<<1); /* RxClr */
-        RX0CON &= (1<<1);
+        TX0CON |=  TXCLR;  /* TxClr */
+        TX0CON &= ~TXCLR;
+        RX0CON |=  RXCLR; /* RxClr */
+        RX0CON &= ~RXCLR;
     }
-    else if (intsrc & (1<<6)) /* usb suspend */
+    else if (intsrc & SUSP_INTR) /* usb suspend */
     {
     }
-    else if (intsrc & (1<<7)) /* usb connect */
+    else if (intsrc & CONN_INTR) /* usb connect */
     {
     }
     else
@@ -362,7 +362,7 @@ void INT_UDC(void)
             txstat = IIN_TXSTAT(ep_num);
 
             /* TODO handle errors */
-            if (txstat & (1<<18)) /* check TxACK flag */
+            if (txstat & TXACK) /* check TxACK flag */
             {
                 if (endpoints[ep_num].cnt >= 0)
                 {
@@ -389,7 +389,7 @@ void INT_UDC(void)
 /* return port speed FS=0, HS=1 */
 int usb_drv_port_speed(void)
 {
-    return ((DEV_INFO & (3<<21)) == 0) ? 0 : 1;
+    return ((DEV_INFO & DEV_SPEED) == 0) ? 0 : 1;
 }
 
 /* Reserve endpoint */
@@ -521,9 +521,9 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
         ep = &endpoints[ep_num];
         
         /* clear NAK bit */
-        BOUT_RXCON(ep_num) &= ~(1<<3);
+        BOUT_RXCON(ep_num) &= ~RXNAK;
         BOUT_DMAOUTLMADDR(ep_num) = (uint32_t)ptr;
-        BOUT_DMAOUTCTL(ep_num) = (1<<1);
+        BOUT_DMAOUTCTL(ep_num) = DMA_START;
     }
        
     ep->buf = ptr;
@@ -557,23 +557,23 @@ bool usb_drv_stalled(int endpoint, bool in)
     {
         case USB_ENDPOINT_XFER_CONTROL:
             if (in)
-                return (TX0CON & (1<<1)) ? true : false;
+                return (TX0CON & TXSTALL) ? true : false;
             else
-                return (RX0CON & (1<<2)) ? true : false;
+                return (RX0CON & RXSTALL) ? true : false;
 
             break;
 
         case USB_ENDPOINT_XFER_BULK:
             if (in)
-                return (BIN_TXCON(ep_num) & (1<<1)) ? true : false;
+                return (BIN_TXCON(ep_num) & TXSTALL) ? true : false;
             else
-                return (BOUT_RXCON(ep_num) & (1<<2)) ? true : false;
+                return (BOUT_RXCON(ep_num) & RXSTALL) ? true : false;
 
             break;
             
         case USB_ENDPOINT_XFER_INT:
             if (in)
-                return (IIN_TXCON(ep_num) & (1<<1)) ? true : false;
+                return (IIN_TXCON(ep_num) & TXSTALL) ? true : false;
             else
                 return false;    /* we don't have such endpoint anyway */
                 
@@ -594,16 +594,16 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
             if (in)
             {
                 if (stall)
-                    TX0CON |= (1<<1);
+                    TX0CON |=  TXSTALL;
                 else
-                    TX0CON &= ~(1<<1);
+                    TX0CON &= ~TXSTALL;
             }
             else
             {
                 if (stall)
-                    RX0CON |= (1<<2);
+                    RX0CON |=  RXSTALL;
                 else
-                    RX0CON &= ~(1<<2); /* doc says Auto clear by UDC 2.0 */
+                    RX0CON &= ~RXSTALL; /* doc says Auto clear by UDC 2.0 */
             }
             break;
 
@@ -611,16 +611,16 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
             if (in)
             {
                 if (stall)
-                    BIN_TXCON(ep_num) |= (1<<1);
+                    BIN_TXCON(ep_num) |=  TXSTALL;
                 else
-                    BIN_TXCON(ep_num) &= ~(1<<1);
+                    BIN_TXCON(ep_num) &= ~TXSTALL;
             }
             else
             {
                 if (stall)
-                    BOUT_RXCON(ep_num) |= (1<<2);
+                    BOUT_RXCON(ep_num) |=  RXSTALL;
                 else
-                    BOUT_RXCON(ep_num) &= ~(1<<2);
+                    BOUT_RXCON(ep_num) &= ~RXSTALL;
             }
             break;
             
@@ -628,9 +628,9 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
             if (in)
             {
                 if (stall)
-                    IIN_TXCON(ep_num) |= (1<<1);
+                    IIN_TXCON(ep_num) |=  TXSTALL;
                 else
-                    IIN_TXCON(ep_num) &= ~(1<<1);
+                    IIN_TXCON(ep_num) &= ~TXSTALL;
             }
             break;
     }
@@ -645,46 +645,46 @@ void usb_drv_init(void)
     SCU_CLKCFG &= ~(1<<6);
     
     /* 1. do soft disconnect */
-    DEV_CTL = (1<<3); /* DEV_SELF_PWR */
+    DEV_CTL = DEV_SELF_PWR;
 
     /* 2. do power on reset to PHY */
-    DEV_CTL = (1<<3) | /* DEV_SELF_PWR */
-              (1<<7);  /* SOFT_POR */
+    DEV_CTL = DEV_SELF_PWR |
+              SOFT_POR;
     
     /* 3. wait more than 10ms */
     udelay(20000);
     
     /* 4. clear SOFT_POR bit */
-    DEV_CTL  &= ~(1<<7);
+    DEV_CTL  &= ~SOFT_POR;
     
     /* 5. configure minimal EN_INT */
-    EN_INT = (1<<6) |  /* Enable Suspend Interrupt */
-             (1<<5) |  /* Enable Resume Interrupt */
-             (1<<4) |  /* Enable USB Reset Interrupt */
-             (1<<3) |  /* Enable OUT Token receive Interrupt EP0 */
-             (1<<2) |  /* Enable IN Token transmits Interrupt EP0 */
-             (1<<1);   /* Enable SETUP Packet Receive Interrupt */
+    EN_INT = EN_SUSP_INTR   |  /* Enable Suspend Interrupt */
+             EN_RESUME_INTR |  /* Enable Resume Interrupt */
+             EN_USBRST_INTR |  /* Enable USB Reset Interrupt */
+             EN_OUT0_INTR   |  /* Enable OUT Token receive Interrupt EP0 */
+             EN_IN0_INTR    |  /* Enable IN Token transmits Interrupt EP0 */
+             EN_SETUP_INTR;    /* Enable SETUP Packet Receive Interrupt */
              
     /* 6. configure INTCON */
-    INTCON = (1<<2) |  /* interrupt high active */
-             (1<<0);   /* enable EP0 interrupts */
+    INTCON = UDC_INTHIGH_ACT |  /* interrupt high active */
+             UDC_INTEN;         /* enable EP0 interrupts */
     
     /* 7. configure EP0 control registers */
-    TX0CON = (1<<6) |  /* Set as one to enable the EP0 tx irq */
-             (1<<2);   /* Set as one to response NAK handshake */
+    TX0CON = TXACKINTEN |  /* Set as one to enable the EP0 tx irq */
+             TXNAK;        /* Set as one to response NAK handshake */
              
-    RX0CON = (1<<7) |
-             (1<<4) |  /* Endpoint 0 Enable. When cleared the endpoint does
-                        * not respond to an SETUP or OUT token
-                        */
+    RX0CON = RXACKINTEN |
+             RXEPEN     |  /* Endpoint 0 Enable. When cleared the endpoint does
+                            * not respond to an SETUP or OUT token
+                            */
 
-             (1<<3);   /* Set as one to response NAK handshake */
+             RXNAK;        /* Set as one to response NAK handshake */
              
     /* 8. write final bits to DEV_CTL */
-    DEV_CTL = (1<<8) | /* Configure CSR done */
-              (1<<6) | /* 16-bit data path enabled. udc_clk = 30MHz */
-              (1<<4) | /* Device soft connect */
-              (1<<3);  /* Device self power */
+    DEV_CTL = CSR_DONE     | /* Configure CSR done */
+              DEV_PHY16BIT | /* 16-bit data path enabled. udc_clk = 30MHz */
+              DEV_SOFT_CN  | /* Device soft connect */
+              DEV_SELF_PWR;  /* Device self power */
 
     /* init semaphore of ep0 */
     semaphore_init(&ctrlep[DIR_OUT].complete, 1, 0);
@@ -696,15 +696,15 @@ void usb_drv_init(void)
         
         if (ep_num%3 == 0) /* IIN 3, 6, 9, 12, 15 */
         {
-            IIN_TXCON(ep_num) |= (ep_num<<8)|(1<<3)|(1<<2); /* ep_num, enable, NAK */
+            IIN_TXCON(ep_num) |= (ep_num<<8)|TXEPEN|TXNAK; /* ep_num, enable, NAK */
         }
         else if (ep_num%3 == 1) /* BOUT 1, 4, 7, 10, 13 */
         {
-            BOUT_RXCON(ep_num) |= (ep_num<<8)|(1<<4)|(1<<3); /* ep_num, NAK, enable */
+            BOUT_RXCON(ep_num) |= (ep_num<<8)|RXEPEN|RXNAK; /* ep_num, NAK, enable */
         }
         else if (ep_num%3 == 2) /* BIN 2, 5, 8, 11, 14 */
         {
-            BIN_TXCON(ep_num) |= (ep_num<<8)|(1<<3)|(1<<2); /* ep_num, enable, NAK */
+            BIN_TXCON(ep_num) |= (ep_num<<8)|TXEPEN|TXNAK; /* ep_num, enable, NAK */
         }
     }
 }
@@ -712,7 +712,7 @@ void usb_drv_init(void)
 /* turn off usb core */
 void usb_drv_exit(void)
 {
-    DEV_CTL = (1<<3); /* DEV_SELF_PWR */
+    DEV_CTL = DEV_SELF_PWR;
     
     /* disable USB interrupts in interrupt controller */
     INTC_IMR &= ~(1<<16);
@@ -725,7 +725,7 @@ void usb_drv_exit(void)
 
 int usb_detect(void)
 {
-    if (DEV_INFO & (1<<20))
+    if (DEV_INFO & VBUS_STS)
         return USB_INSERTED;
     else
         return USB_EXTRACTED;
