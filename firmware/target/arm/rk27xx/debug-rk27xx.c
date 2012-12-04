@@ -62,6 +62,9 @@ bool dbg_hw_info(void)
         _DEBUG_PRINTF("SCU_DIVCON1: 0x%0x", SCU_DIVCON1);
         _DEBUG_PRINTF("SCU_CLKCFG:  0x%0x", SCU_CLKCFG);
         _DEBUG_PRINTF("SCU_CHIPCFG: 0x%0x", SCU_CHIPCFG);
+        _DEBUG_PRINTF("EN_INT: 0x%0x", EN_INT);
+        _DEBUG_PRINTF("SETUP1: 0x%x", SETUP1);
+        _DEBUG_PRINTF("SETUP2: 0x%x", SETUP2);
         line++;
         _DEBUG_PRINTF("sd_debug_time_rd: %d", sd_debug_time_rd);
         _DEBUG_PRINTF("sd_debug_time_wr: %d", sd_debug_time_wr);

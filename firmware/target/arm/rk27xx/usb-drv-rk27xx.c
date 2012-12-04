@@ -229,6 +229,20 @@ static void int_write(int ep)
     endpoints[ep_num].buf += xfer_size;
 }
 
+static void udc_phy_reset(void)
+{
+    DEV_CTL |= SOFT_POR;
+    udelay(10000);
+    DEV_CTL &= ~SOFT_POR;
+}
+
+static void udc_soft_connect(void)
+{
+    DEV_CTL |= CSR_DONE    |
+               DEV_SOFT_CN |
+               DEV_SELF_PWR;
+}
+
 /* UDC ISR function */
 void INT_UDC(void)
 {
@@ -242,7 +256,8 @@ void INT_UDC(void)
     {
         setup_received();
     }
-    else if (intsrc & IN0_INTR) /* ep0 in interrupt */
+
+    if (intsrc & IN0_INTR) /* ep0 in interrupt */
     {
         txstat = TX0STAT; /* read clears flags */
         
@@ -268,7 +283,8 @@ void INT_UDC(void)
             }
         }
     }
-    else if (intsrc & OUT0_INTR) /* ep0 out interrupt */
+
+    if (intsrc & OUT0_INTR) /* ep0 out interrupt */
     {
         rxstat = RX0STAT;
 
@@ -284,32 +300,58 @@ void INT_UDC(void)
                                            ctrlep[DIR_OUT].len); /* length */                
         }
     }
-    else if (intsrc & USBRST_INTR) /* usb reset */
+
+    if (intsrc & USBRST_INTR) /* usb reset */
     {
-        usb_drv_init();
+        EN_INT = EN_SUSP_INTR   |  /* Enable Suspend Interrupt */
+                 EN_RESUME_INTR |  /* Enable Resume Interrupt */
+                 EN_USBRST_INTR |  /* Enable USB Reset Interrupt */
+                 EN_OUT0_INTR   |  /* Enable OUT Token receive Interrupt EP0 */
+                 EN_IN0_INTR    |  /* Enable IN Token transmits Interrupt EP0 */
+                 EN_SETUP_INTR;    /* Enable SETUP Packet Receive Interrupt */
+
+        INTCON = UDC_INTHIGH_ACT |  /* interrupt high active */
+                 UDC_INTEN;         /* enable EP0 interrupts */
+
+        TX0CON = TXACKINTEN |  /* Set as one to enable the EP0 tx irq */
+                 TXNAK;        /* Set as one to response NAK handshake */
+
+        RX0CON = RXACKINTEN |
+                 RXEPEN     |  /* Endpoint 0 Enable. When cleared the endpoint does
+                                * not respond to an SETUP or OUT token */
+                 RXNAK;        /* Set as one to response NAK handshake */
     }
-    else if (intsrc & RESUME_INTR) /* usb resume */
+
+    if (intsrc & RESUME_INTR) /* usb resume */
     {
         TX0CON |=  TXCLR;  /* TxClr */
         TX0CON &= ~TXCLR;
         RX0CON |=  RXCLR; /* RxClr */
         RX0CON &= ~RXCLR;
     }
-    else if (intsrc & SUSP_INTR) /* usb suspend */
+
+    if (intsrc & SUSP_INTR) /* usb suspend */
     {
     }
-    else if (intsrc & CONN_INTR) /* usb connect */
+
+    if (intsrc & CONN_INTR) /* usb connect */
     {
+        udc_phy_reset();
+        udelay(10000);
+        udc_soft_connect();
     }
-    else
+
+    /* TODO this needs rework */
+    if (intsrc & 0x7fff00)
     {
         /* lets figure out which ep generated irq */
-        tmp = intsrc >> 7;
+        tmp = intsrc >> 8;
         for (ep_num=1; ep_num < 15; ep_num++)
         {
-            tmp >>= ep_num;
             if (tmp & 0x01)
                 break;
+
+            tmp >>= 1;
         }
         
         if (intsrc & ((1<<8)|(1<<11)|(1<<14)|(1<<17)|(1<<20)))
@@ -318,7 +360,7 @@ void INT_UDC(void)
             rxstat = BOUT_RXSTAT(ep_num);
             
             /* TODO handle errors */
-            if (rxstat & (1<<18)) /* RxACK */
+            if (rxstat & RXACK) /* RxACK */
             {
                 if (endpoints[ep_num].cnt > 0)
                     blk_read(ep_num);
@@ -335,7 +377,7 @@ void INT_UDC(void)
             txstat = BIN_TXSTAT(ep_num);
             
             /* TODO handle errors */
-            if (txstat & (1<<18)) /* check TxACK flag */
+            if (txstat & TXACK) /* check TxACK flag */
             {
                 if (endpoints[ep_num].cnt >= 0)
                 {
@@ -713,14 +755,6 @@ void usb_drv_init(void)
 void usb_drv_exit(void)
 {
     DEV_CTL = DEV_SELF_PWR;
-    
-    /* disable USB interrupts in interrupt controller */
-    INTC_IMR &= ~(1<<16);
-    INTC_IECR &= ~(1<<16);
-    
-    /* we cannot disable UDC clock since this causes data abort
-     * when reading DEV_INFO in order to check usb connect event
-     */
 }
 
 int usb_detect(void)

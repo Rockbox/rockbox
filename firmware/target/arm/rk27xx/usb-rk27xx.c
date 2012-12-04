@@ -32,6 +32,9 @@ int usb_status = USB_EXTRACTED;
 
 void usb_init_device(void)
 {
+    /* enable UDC interrupt */
+    INTC_IMR |= (1<<16);
+    INTC_IECR |= (1<<16);
 }
 
 void usb_attach(void)
