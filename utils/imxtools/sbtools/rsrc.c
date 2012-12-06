@@ -26,6 +26,10 @@
 #include "crypto.h"
 #include "rsrc.h"
 
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
 const char crypto_key[16] = "SanDiskSlotRadi";
 
 static void rsrc_crypt(void *buf, int size)
@@ -144,9 +148,19 @@ static bool read_entries(struct rsrc_file_t *f, void *u,
 
         augment_array_ex((void **)&f->entries, sizeof(ent), &f->nr_entries, &f->capacity, &ent, 1);
 
-        printf(OFF, "%s+-%s%#08x %s[%s]%s[size=%#x]\n", prefix, YELLOW, index, BLUE,
+        printf(OFF, "%s+-%s%#08x %s[%s]%s[size=%#x]", prefix, YELLOW, index, BLUE,
             rsrc_table_entry_type_str(RSRC_TABLE_ENTRY_TYPE(te)),
             GREEN, sz);
+
+        if(RSRC_TABLE_ENTRY_TYPE(te) != RSRC_TYPE_VALUE &&
+                RSRC_TABLE_ENTRY_TYPE(te) == RSRC_TYPE_NESTED)
+        {
+            uint8_t *p = f->data + ent.offset;
+            printf(OFF, "  ");
+            for(int i = 0; i < MIN(sz, 16); i++)
+                printf(RED, "%c", isprint(p[i]) ? p[i] : '.');
+        }
+        printf(OFF, "\n");
         
         if(RSRC_TABLE_ENTRY_TYPE(te) == RSRC_TYPE_NESTED)
         {
