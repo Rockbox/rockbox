@@ -117,6 +117,57 @@ struct samsung_firmware_t *samsung_read(samsung_read_t read,
     return fw;
 }
 
+enum samsung_error_t samsung_write(samsung_write_t write, samsung_printf_t printf,
+    void *user, struct samsung_firmware_t *fw)
+{
+    struct yp_header_t yp_hdr;
+    struct yp_md5_t yp_md5;
+
+    // write header
+    strncpy(yp_hdr.signature, YP_SIGNATURE, sizeof(yp_hdr.signature));
+    strncpy(yp_hdr.version, fw->version, sizeof(yp_hdr.version));
+    strncpy(yp_hdr.region, fw->region, sizeof(yp_hdr.region));
+    strncpy(yp_hdr.extra, fw->extra, sizeof(yp_hdr.extra));
+    strncpy(yp_hdr.model, fw->model, sizeof(yp_hdr.model));
+    yp_hdr.datasize = fw->data_size;
+
+    printf(user, false, "Model: %s\n", yp_hdr.model);
+    printf(user, false, "Version: %s %s %s\n", yp_hdr.version, yp_hdr.region, yp_hdr.extra);
+
+    if(write(user, 0, &yp_hdr, sizeof(yp_hdr)) != sizeof(yp_hdr))
+    {
+        printf(user, true, "Cannot write header\n");
+        return SAMSUNG_WRITE_ERROR;
+    }
+
+    // encrypt data
+    cyclic_xor(fw->data, fw->data_size, g_yp_key, sizeof(g_yp_key));
+    // compute MD5
+    MD5_CTX c;
+    MD5_Init(&c);
+    MD5_Update(&c, fw->data, fw->data_size);
+    MD5_Final(yp_md5.md5, &c);
+
+    // write data
+    if(write(user, sizeof(yp_hdr), fw->data, fw->data_size) != fw->data_size)
+    {
+        // decrypt data so that the firmware data is the same after the call
+        cyclic_xor(fw->data, fw->data_size, g_yp_key, sizeof(g_yp_key));
+        printf(user, true, "Cannot write data\n");
+        return SAMSUNG_WRITE_ERROR;
+    }
+    // decrypt data so that the firmware data is the same after the call
+    cyclic_xor(fw->data, fw->data_size, g_yp_key, sizeof(g_yp_key));
+    // write md5
+    if(write(user, sizeof(yp_hdr) + fw->data_size, &yp_md5, sizeof(yp_md5)) != sizeof(yp_md5))
+    {
+        printf(user, true, "Cannot write md5\n");
+        return SAMSUNG_WRITE_ERROR;
+    }
+
+    return SAMSUNG_SUCCESS;
+}
+
 void samsung_free(struct samsung_firmware_t *fw)
 {
     if(fw)

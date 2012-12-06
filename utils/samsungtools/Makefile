@@ -3,7 +3,7 @@ CC=gcc
 LD=gcc
 CFLAGS=-g -std=c99 -W -Wall $(DEFINES) `pkg-config --cflags openssl`
 LDFLAGS=`pkg-config --libs openssl`
-BINS=fwdecrypt
+BINS=fwdecrypt fwcrypt
 
 all: $(BINS)
 
@@ -11,6 +11,9 @@ all: $(BINS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 fwdecrypt: fwdecrypt.o samsung.o
+	$(LD) -o $@ $^ $(LDFLAGS)
+
+fwcrypt: fwcrypt.o samsung.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:

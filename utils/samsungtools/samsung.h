@@ -66,13 +66,17 @@ enum samsung_error_t
     SAMSUNG_READ_ERROR = -1,
     SAMSUNG_FORMAT_ERROR = -2,
     SAMSUNG_MD5_ERROR = -3,
+    SAMSUNG_WRITE_ERROR = -4,
 };
 
 typedef int (*samsung_read_t)(void *user, int offset, void *buffer, int size);
+typedef int (*samsung_write_t)(void *user, int offset, void *buffer, int size);
 typedef void (*samsung_printf_t)(void *user, bool error, const char *fmt, ...);
 
 struct samsung_firmware_t *samsung_read(samsung_read_t read,
     samsung_printf_t printf, void *user, enum samsung_error_t *err);
+enum samsung_error_t samsung_write(samsung_write_t write, samsung_printf_t printf,
+    void *user, struct samsung_firmware_t *fw);
 void samsung_free(struct samsung_firmware_t *fw);
 
 #endif /* __SAMSUNG_H__ */
