@@ -44,6 +44,8 @@ enum
 #endif
 #ifdef HAVE_USBSTACK
     USB_TRANSFER_COMPLETION, /* Event */
+    USB_NOTIFY_SET_ADDR,     /* Event */
+    USB_NOTIFY_SET_CONFIG,   /* Event */
 #endif
 #ifdef USB_FIREWIRE_HANDLING
     USB_REQUEST_REBOOT,      /* Event */
@@ -130,6 +132,7 @@ void usb_charger_update(void);
 #ifdef HAVE_USBSTACK
 void usb_signal_transfer_completion(
     struct usb_transfer_completion_event_data *event_data);
+void usb_signal_notify(long id, intptr_t data);
 bool usb_driver_enabled(int driver);
 bool usb_exclusive_storage(void); /* storage is available for usb */
 #endif

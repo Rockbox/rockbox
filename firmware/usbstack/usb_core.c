@@ -663,10 +663,31 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
     }
 }
 
+static void usb_core_do_set_addr(uint8_t address)
+{
+    logf("usb_core: SET_ADR %d", address);
+    usb_address = address;
+    usb_state = ADDRESS;
+}
+
+static void usb_core_do_set_config(uint8_t config)
+{
+    logf("usb_core: SET_CONFIG");
+    if(config) {
+        usb_state = CONFIGURED;
+        for(int i = 0; i < USB_NUM_DRIVERS; i++)
+            if(drivers[i].enabled && drivers[i].init_connection)
+                drivers[i].init_connection();
+    }
+    else
+        usb_state = ADDRESS;
+    #ifdef HAVE_USB_CHARGING_ENABLE
+    usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+    #endif
+}
+
 static void request_handler_device(struct usb_ctrlrequest* req)
 {
-    int i;
-
     switch(req->bRequest) {
         case USB_REQ_GET_CONFIGURATION: {
                 logf("usb_core: GET_CONFIG");
@@ -676,20 +697,9 @@ static void request_handler_device(struct usb_ctrlrequest* req)
                 break;
             }
         case USB_REQ_SET_CONFIGURATION: {
-                logf("usb_core: SET_CONFIG");
                 usb_drv_cancel_all_transfers();
-                if(req->wValue) {
-                    usb_state = CONFIGURED;
-                    for(i = 0; i < USB_NUM_DRIVERS; i++)
-                        if(drivers[i].enabled && drivers[i].init_connection)
-                            drivers[i].init_connection();
-                }
-                else
-                    usb_state = ADDRESS;
+                usb_core_do_set_config(req->wValue);
                 usb_drv_send(EP_CONTROL, NULL, 0);
-#ifdef HAVE_USB_CHARGING_ENABLE
-                usb_charging_maxcurrent_change(usb_charging_maxcurrent());
-#endif
                 break;
             }
         case USB_REQ_SET_ADDRESS: {
@@ -697,9 +707,8 @@ static void request_handler_device(struct usb_ctrlrequest* req)
                 logf("usb_core: SET_ADR %d", address);
                 usb_drv_send(EP_CONTROL, NULL, 0);
                 usb_drv_cancel_all_transfers();
-                usb_address = address;
-                usb_drv_set_address(usb_address);
-                usb_state = ADDRESS;
+                usb_drv_set_address(address);
+                usb_core_do_set_addr(address);
                 break;
             }
         case USB_REQ_GET_DESCRIPTOR:
@@ -913,6 +922,21 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
     }
 }
 
+void usb_core_handle_notify(long id, intptr_t data)
+{
+    switch(id)
+    {
+        case USB_NOTIFY_SET_ADDR:
+            usb_core_do_set_addr(data);
+            break;
+        case USB_NOTIFY_SET_CONFIG:
+            usb_core_do_set_config(data);
+            break;
+        default:
+            break;
+    }
+}
+
 /* called by usb_drv_int() */
 void usb_core_control_request(struct usb_ctrlrequest* req)
 {
@@ -926,6 +950,18 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     completion_event->length = 0;
     logf("ctrl received %ld", current_tick);
     usb_signal_transfer_completion(completion_event);
+}
+
+void usb_core_notify_set_address(uint8_t addr)
+{
+    logf("notify set addr received %ld", current_tick);
+    usb_signal_notify(USB_NOTIFY_SET_ADDR, addr);
+}
+
+void usb_core_notify_set_config(uint8_t config)
+{
+    logf("notify set config received %ld", current_tick);
+    usb_signal_notify(USB_NOTIFY_SET_CONFIG, config);
 }
 
 #ifdef HAVE_USB_CHARGING_ENABLE

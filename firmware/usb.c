@@ -270,6 +270,11 @@ void usb_signal_transfer_completion(
     queue_post(&usb_queue, USB_TRANSFER_COMPLETION, (intptr_t)event_data);
 }
 
+void usb_signal_notify(long id, intptr_t data)
+{
+    queue_post(&usb_queue, id, data);
+}
+
 #else  /* !HAVE_USBSTACK */
 
 static inline void usb_stack_enable(bool enable)
@@ -431,6 +436,12 @@ static void NORETURN_ATTR usb_thread(void)
         /*** Main USB thread duties ***/
 
 #ifdef HAVE_USBSTACK
+        case USB_NOTIFY_SET_ADDR:
+        case USB_NOTIFY_SET_CONFIG:
+            if(usb_state <= USB_EXTRACTED)
+                break;
+            usb_core_handle_notify(ev.id, ev.data);
+            break;
         case USB_TRANSFER_COMPLETION:
             if(usb_state <= USB_EXTRACTED)
                 break;
