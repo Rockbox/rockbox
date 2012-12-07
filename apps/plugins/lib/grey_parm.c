@@ -28,6 +28,9 @@
 #include "plugin.h"
 #include "grey.h"
 
+/* Default greylib viewport struct */
+struct viewport _grey_default_vp;
+
 /* Set position of the top left corner of the greyscale overlay
    Note that depending on the target LCD, either x or y gets rounded
    to the nearest multiple of 4 or 8 */
@@ -64,37 +67,37 @@ void grey_set_position(int x, int y)
 /* Set the draw mode for subsequent drawing operations */
 void grey_set_drawmode(int mode)
 {
-    _grey_info.drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
+    _grey_info.vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
 
 /* Return the current draw mode */
 int  grey_get_drawmode(void)
 {
-    return _grey_info.drawmode;
+    return _grey_info.vp->drawmode;
 }
 
 /* Set the foreground shade for subsequent drawing operations */
 void grey_set_foreground(unsigned brightness)
 {
-    _grey_info.fg_brightness = brightness;
+    _GREY_FG_BRIGHTNESS(_grey_info.vp) = brightness;
 }
 
 /* Return the current foreground shade */
 unsigned grey_get_foreground(void)
 {
-    return _grey_info.fg_brightness;
+    return _GREY_FG_BRIGHTNESS(_grey_info.vp);
 }
 
 /* Set the background shade for subsequent drawing operations */
 void grey_set_background(unsigned brightness)
 {
-    _grey_info.bg_brightness = brightness;
+    _GREY_BG_BRIGHTNESS(_grey_info.vp) = brightness;
 }
 
 /* Return the current background shade */
 unsigned grey_get_background(void)
 {
-    return _grey_info.bg_brightness;
+    return _GREY_BG_BRIGHTNESS(_grey_info.vp);
 }
 
 /* Set draw mode, foreground and background shades at once */
@@ -108,11 +111,151 @@ void grey_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness)
 /* Set font for the text output routines */
 void grey_setfont(int newfont)
 {
-    _grey_info.curfont = newfont;
+    _grey_info.vp->font = newfont;
 }
 
 /* Get width and height of a text when printed with the current font */
-int  grey_getstringsize(const unsigned char *str, int *w, int *h)
+int grey_getstringsize(const unsigned char *str, int *w, int *h)
 {
-    return rb->font_getstringsize(str, w, h, _grey_info.curfont);
+    return rb->font_getstringsize(str, w, h, _grey_info.vp->font);
 }
+
+/* Helper to establish visible area between viewport and framebuffer */
+static void grey_update_clip_rect(void)
+{
+    if (!(_grey_info.flags & GREY_BUFFERED))
+        return; /* no chunky buffer */
+
+    struct viewport *vp = _grey_info.vp;
+
+    if (!vp || !_grey_info.curbuffer)
+        return;
+
+    /* Get overall intersection of framebuffer and viewport in viewport
+       coordinates so that later clipping of drawing is kept as simple as
+       possible. If l <= r and/or b <= t after intersecting, draw routines
+       will see this as an empty area. */
+    _grey_info.clip_l = _grey_info.cb_x - vp->x;
+    _grey_info.clip_t = _grey_info.cb_y - vp->y;
+    _grey_info.clip_r = _grey_info.clip_l + _grey_info.cb_width;
+    _grey_info.clip_b = _grey_info.clip_t + _grey_info.cb_height;
+
+    if (_grey_info.clip_l < 0)
+        _grey_info.clip_l = 0;
+
+    if (_grey_info.clip_t < 0)
+        _grey_info.clip_t = 0;
+
+    if (_grey_info.clip_r > vp->width)
+        _grey_info.clip_r = vp->width;
+
+    if (_grey_info.clip_b > vp->height)
+        _grey_info.clip_b = vp->height;
+}
+
+/* Set current grey viewport for draw routines */
+void grey_set_viewport(struct viewport *vp)
+{
+    if (vp == NULL)
+        vp = &_grey_default_vp;
+
+    if (_grey_info.vp != vp)
+    {
+        _grey_info.vp = vp;
+        grey_update_clip_rect();
+    }
+}
+
+/* Set viewport to default settings */
+void grey_viewport_set_fullscreen(struct viewport *vp,
+                                  const enum screen_type screen)
+{
+    if (vp == NULL)
+        vp = &_grey_default_vp;
+
+    vp->x = 0;
+    vp->y = 0;
+    vp->width = _grey_info.width;
+    vp->height = _grey_info.height;
+    _GREY_FG_BRIGHTNESS(vp) = 0;
+    _GREY_BG_BRIGHTNESS(vp) = 255;
+    vp->drawmode = DRMODE_SOLID;
+    vp->font = FONT_SYSFIXED;
+
+    if (vp == _grey_info.vp)
+        grey_update_clip_rect(); /* is current one in use */
+
+    (void)screen;
+}
+
+void grey_viewport_set_pos(struct viewport *vp,
+                           int x, int y, int width, int height)
+{
+    if (vp == NULL || vp == &_grey_default_vp)
+        return; /* Cannot be moved or resized */
+
+    if (width < 0)
+        width = 0; /* 'tis okay */
+
+    if (height < 0)
+        height = 0;
+
+    vp->x = x;
+    vp->y = y;
+    vp->width = width;
+    vp->height = height;
+
+    if (vp == _grey_info.vp)
+        grey_update_clip_rect(); /* is current one in use */
+}
+
+/* Set current grey chunky buffer for draw routines */
+void grey_set_framebuffer(unsigned char *buffer)
+{
+    if (!(_grey_info.flags & GREY_BUFFERED))
+        return; /* no chunky buffer */
+
+    if (buffer == NULL)
+        buffer = _grey_info.buffer; /* Default */
+
+    if (buffer != _grey_info.curbuffer)
+    {
+        _grey_info.curbuffer = buffer;
+
+        if (buffer == _grey_info.buffer)
+        {
+            /* Setting to default fb resets dimensions */
+            grey_framebuffer_set_pos(0, 0, 0, 0);
+        }
+    }
+}
+
+/* Specify the dimensions of the current framebuffer */
+void grey_framebuffer_set_pos(int x, int y, int width, int height)
+{
+    if (!(_grey_info.flags & GREY_BUFFERED))
+        return; /* no chunky buffer */
+
+    if (_grey_info.curbuffer == _grey_info.buffer)
+    {
+        /* This cannot be moved or resized */
+        x = 0;
+        y = 0;
+        width = _grey_info.width;
+        height = _grey_info.height;
+    }
+    else if (width <= 0 || height <= 0)
+        return;
+
+    if (x == _grey_info.cb_x && y == _grey_info.cb_y &&
+        width == _grey_info.cb_width && height == _grey_info.cb_height)
+        return; /* No change */
+
+    _grey_info.cb_x = x;
+    _grey_info.cb_y = y;
+    _grey_info.cb_width = width;
+    _grey_info.cb_height = height;
+
+    grey_update_clip_rect();    
+}
+

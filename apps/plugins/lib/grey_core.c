@@ -677,10 +677,11 @@ bool grey_init(unsigned char *gbuf, long gbuf_size,
     _grey_info.bheight = bdim;
 #endif
     _grey_info.flags = features & 0xff;
-    _grey_info.fg_brightness = 0;
-    _grey_info.bg_brightness = 255;
-    _grey_info.drawmode = DRMODE_SOLID;
-    _grey_info.curfont = FONT_SYSFIXED;
+
+    /* default viewport and settings */
+    grey_set_viewport(NULL);
+    grey_viewport_set_fullscreen(NULL, SCREEN_MAIN);
+    grey_set_framebuffer(NULL);
 
     /* precalculate the value -> pattern index conversion table, taking
        linearisation and gamma correction into account */

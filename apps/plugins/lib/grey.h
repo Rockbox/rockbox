@@ -60,6 +60,16 @@ void grey_release(void);
 void grey_show(bool enable);
 void grey_deferred_lcd_update(void);
 
+/* Viewports and framebuffers */
+void grey_clear_viewport(void);
+void grey_set_viewport(struct viewport *vp);
+void grey_viewport_set_fullscreen(struct viewport *vp,
+                                  const enum screen_type screen);
+void grey_viewport_set_pos(struct viewport *vp,
+                           int x, int y, int width, int height);
+void grey_set_framebuffer(unsigned char *buffer);
+void grey_framebuffer_set_pos(int x, int y, int width, int height);
+
 /* Update functions */
 void grey_update(void);
 void grey_update_rect(int x, int y, int width, int height);
@@ -175,12 +185,22 @@ struct _grey_info
     unsigned char *values;       /* start of greyscale pixel values */
     unsigned char *phases;       /* start of greyscale pixel phases */
     unsigned char *buffer;       /* start of chunky pixel buffer (for buffered mode) */
+    unsigned char *curbuffer;    /* start of current framebuffer (for buffered mode) */
+    int           cb_x;          /* horizontal position of current framebuffer (for buffered mode) */
+    int           cb_y;          /* vertical position of current framebuffer (for buffered mode) */
+    int           cb_width;      /* width of current framebuffer (for buffered mode) */
+    int           cb_height;     /* height of current framebuffer (for buffered mode) */
+    int           clip_l;
+    int           clip_t;
+    int           clip_r;
+    int           clip_b;
     unsigned char gvalue[256];   /* calculated brightness -> greyvalue table */
-    int fg_brightness;           /* current foreground brightness */
-    int bg_brightness;           /* current background brightness */
-    int drawmode;                /* current draw mode */
-    int curfont;                 /* current selected font */
+    struct viewport *vp;         /* current viewport in use */
 };
+
+/* Stuff these here for now. LCD depth of 1 has no 'pattern' members. */
+#define _GREY_FG_BRIGHTNESS(vp)  ((vp)->flags)
+#define _GREY_BG_BRIGHTNESS(vp)  ((vp)->line_height)
 
 /* Global variable, defined in the plugin */
 extern struct _grey_info _grey_info;

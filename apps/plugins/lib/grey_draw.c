@@ -28,16 +28,18 @@
 #include "plugin.h"
 #include "grey.h"
 
+extern struct viewport _grey_default_vp;
+
 /*** low-level drawing functions ***/
 
 static void setpixel(unsigned char *address)
 {
-    *address = _grey_info.fg_brightness;
+    *address = _GREY_FG_BRIGHTNESS(_grey_info.vp);
 }
 
 static void clearpixel(unsigned char *address)
 {
-    *address = _grey_info.bg_brightness;
+    *address = _GREY_BG_BRIGHTNESS(_grey_info.vp);
 }
 
 static void flippixel(unsigned char *address)
@@ -57,35 +59,56 @@ void (* const _grey_pixelfuncs[8])(unsigned char *address) = {
 
 /*** Drawing functions ***/
 
+/* Clear the current viewport */
+void grey_clear_viewport(void)
+{
+    struct viewport *vp = _grey_info.vp;
+    int drawmode = vp->drawmode;
+    vp->drawmode = DRMODE_SOLID | DRMODE_INVERSEVID;
+    grey_fillrect(0, 0, vp->width, vp->height);
+    vp->drawmode = drawmode;
+}
+
 /* Clear the whole display */
 void grey_clear_display(void)
 {
-    int value = (_grey_info.drawmode & DRMODE_INVERSEVID) ?
-                 _grey_info.fg_brightness : _grey_info.bg_brightness;
+    struct viewport *vp = &_grey_default_vp;
 
-    rb->memset(_grey_info.buffer, value,
-                          _GREY_MULUQ(_grey_info.width, _grey_info.height));
+    int value = (vp->drawmode & DRMODE_INVERSEVID) ?
+                 _GREY_FG_BRIGHTNESS(vp) : _GREY_BG_BRIGHTNESS(vp);
+
+    rb->memset(_grey_info.curbuffer, value,
+               _GREY_MULUQ(_grey_info.cb_width, _grey_info.cb_height));
 }
 
 /* Set a single pixel */
 void grey_drawpixel(int x, int y)
 {
-    if (((unsigned)x < (unsigned)_grey_info.width)
-        && ((unsigned)y < (unsigned)_grey_info.height))
-        _grey_pixelfuncs[_grey_info.drawmode](&_grey_info.buffer[_GREY_MULUQ(
-                                               _grey_info.width, y) + x]);
+    if (x >= _grey_info.clip_l && x < _grey_info.clip_r &&
+        y >= _grey_info.clip_t && y < _grey_info.clip_b)
+    {
+        int dst_stride = _grey_info.cb_width;
+        struct viewport *vp = _grey_info.vp;
+        _grey_pixelfuncs[vp->drawmode](
+                &_grey_info.curbuffer[
+                    _GREY_MULUQ(dst_stride, vp->y - _grey_info.cb_y + y) +
+                    vp->x - _grey_info.cb_x + x]);
+    }
 }
 
 /* Draw a line */
 void grey_drawline(int x1, int y1, int x2, int y2)
 {
+    struct viewport *vp = _grey_info.vp;
     int numpixels;
     int i;
     int deltax, deltay;
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    void (*pfunc)(unsigned char *address) = _grey_pixelfuncs[_grey_info.drawmode];
+    void (*pfunc)(unsigned char *address) = _grey_pixelfuncs[vp->drawmode];
+    int dwidth;
+    int xoffs, yoffs;
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -127,11 +150,18 @@ void grey_drawline(int x1, int y1, int x2, int y2)
     x = x1;
     y = y1;
 
+    dwidth = _grey_info.cb_width;
+    xoffs  = vp->x - _grey_info.cb_x;
+    yoffs  = vp->y - _grey_info.cb_y;
+
     for (i = 0; i < numpixels; i++)
     {
-        if (((unsigned)x < (unsigned)_grey_info.width)
-            && ((unsigned)y < (unsigned)_grey_info.height))
-            pfunc(&_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x]);
+        if (x >= _grey_info.clip_l && x < _grey_info.clip_r &&
+            y >= _grey_info.clip_t && y < _grey_info.clip_b)
+        {
+            pfunc(&_grey_info.curbuffer[_GREY_MULUQ(dwidth, yoffs + y) +
+                                        xoffs + x]);
+        }
 
         if (d < 0)
         {
@@ -151,10 +181,12 @@ void grey_drawline(int x1, int y1, int x2, int y2)
 /* Draw a horizontal line (optimised) */
 void grey_hline(int x1, int x2, int y)
 {
+    struct viewport *vp = _grey_info.vp;
     int x;
     int value = 0;
     unsigned char *dst;
     bool fillopt = false;
+    int dwidth;
 
     /* direction flip */
     if (x2 < x1)
@@ -165,37 +197,40 @@ void grey_hline(int x1, int x2, int y)
     }
 
     /* nothing to draw? */
-    if (((unsigned)y >= (unsigned)_grey_info.height)
-        || (x1 >= _grey_info.width) || (x2 < 0))
+    if (y < _grey_info.clip_t || y >= _grey_info.clip_b ||
+        x1 >= _grey_info.clip_r || x2 < _grey_info.clip_l)
         return;  
     
     /* drawmode and optimisation */
-    if (_grey_info.drawmode & DRMODE_INVERSEVID)
+    if (vp->drawmode & DRMODE_INVERSEVID)
     {
-        if (_grey_info.drawmode & DRMODE_BG)
+        if (vp->drawmode & DRMODE_BG)
         {
             fillopt = true;
-            value = _grey_info.bg_brightness;
+            value = _GREY_BG_BRIGHTNESS(vp);
         }
     }
     else
     {
-        if (_grey_info.drawmode & DRMODE_FG)
+        if (vp->drawmode & DRMODE_FG)
         {
             fillopt = true;
-            value = _grey_info.fg_brightness;
+            value = _GREY_FG_BRIGHTNESS(vp);
         }
     }
-    if (!fillopt && _grey_info.drawmode != DRMODE_COMPLEMENT)
+    if (!fillopt && vp->drawmode != DRMODE_COMPLEMENT)
         return;
 
     /* clipping */
-    if (x1 < 0)
-        x1 = 0;
-    if (x2 >= _grey_info.width)
-        x2 = _grey_info.width - 1;
+    if (x1 < _grey_info.clip_l)
+        x1 = _grey_info.clip_l;
+    if (x2 >= _grey_info.clip_r)
+        x2 = _grey_info.clip_r - 1;
 
-    dst   = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x1];
+    dwidth = _grey_info.cb_width;
+    dst    = &_grey_info.curbuffer[
+                    _GREY_MULUQ(dwidth, vp->y - _grey_info.cb_y + y) +
+                    vp->x - _grey_info.cb_x + x1];
 
     if (fillopt)
         rb->memset(dst, value, x2 - x1 + 1);
@@ -211,9 +246,11 @@ void grey_hline(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void grey_vline(int x, int y1, int y2)
 {
+    struct viewport *vp = _grey_info.vp;
     int y;
     unsigned char *dst, *dst_end;
     void (*pfunc)(unsigned char *address);
+    int dwidth;
     
     /* direction flip */
     if (y2 < y1)
@@ -224,24 +261,27 @@ void grey_vline(int x, int y1, int y2)
     }
 
     /* nothing to draw? */
-    if (((unsigned)x >= (unsigned)_grey_info.width)
-        || (y1 >= _grey_info.height) || (y2 < 0))
+    if (x < _grey_info.clip_l || x >= _grey_info.clip_r ||
+        y1 >= _grey_info.clip_b || y2 < _grey_info.clip_t)
         return;
     
     /* clipping */
-    if (y1 < 0)
-        y1 = 0;
-    if (y2 >= _grey_info.height)
-        y2 = _grey_info.height - 1;
+    if (y1 < _grey_info.clip_t)
+        y1 = _grey_info.clip_t;
+    if (y2 >= _grey_info.clip_b)
+        y2 = _grey_info.clip_b - 1;
 
-    pfunc = _grey_pixelfuncs[_grey_info.drawmode];
-    dst   = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y1) + x];
+    dwidth = _grey_info.cb_width;
+    pfunc  = _grey_pixelfuncs[vp->drawmode];
+    dst    = &_grey_info.curbuffer[
+                    _GREY_MULUQ(dwidth, vp->y - _grey_info.cb_y + y1) +
+                                vp->x - _grey_info.cb_x + x];
 
-    dst_end = dst + _GREY_MULUQ(_grey_info.width, y2 - y1);
+    dst_end = dst + _GREY_MULUQ(dwidth, y2 - y1);
     do
     {
         pfunc(dst);
-        dst += _grey_info.width;
+        dst += dwidth;
     }
     while (dst <= dst_end);
 }
@@ -334,53 +374,63 @@ void grey_drawrect(int x, int y, int width, int height)
 /* Fill a rectangular area */
 void grey_fillrect(int x, int y, int width, int height)
 {
+    struct viewport *vp = _grey_info.vp;
     int value = 0;
     unsigned char *dst, *dst_end;
     bool fillopt = false;
-
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
-        || (y >= _grey_info.height) || (x + width <= 0) || (y + height <= 0))
-        return;
+    int dwidth;
 
     /* drawmode and optimisation */
-    if (_grey_info.drawmode & DRMODE_INVERSEVID)
+    if (vp->drawmode & DRMODE_INVERSEVID)
     {
-        if (_grey_info.drawmode & DRMODE_BG)
+        if (vp->drawmode & DRMODE_BG)
         {
             fillopt = true;
-            value = _grey_info.bg_brightness;
+            value = _GREY_BG_BRIGHTNESS(vp);
         }
     }
     else
     {
-        if (_grey_info.drawmode & DRMODE_FG)
+        if (vp->drawmode & DRMODE_FG)
         {
             fillopt = true;
-            value = _grey_info.fg_brightness;
+            value = _GREY_FG_BRIGHTNESS(vp);
+
         }
     }
-    if (!fillopt && _grey_info.drawmode != DRMODE_COMPLEMENT)
+    if (!fillopt && vp->drawmode != DRMODE_COMPLEMENT)
         return;
 
     /* clipping */
-    if (x < 0)
+    if (x < _grey_info.clip_l)
     {
-        width += x;
-        x = 0;
+        width += x - _grey_info.clip_l;
+        x = _grey_info.clip_l;
     }
-    if (y < 0)
+
+    if (x + width > _grey_info.clip_r)
+        width = _grey_info.clip_r - x;
+
+    if (width <= 0)
+        return;
+
+    if (y < _grey_info.clip_t)
     {
-        height += y;
-        y = 0;
+        height += y - _grey_info.clip_t;
+        y = _grey_info.clip_t;
     }
-    if (x + width > _grey_info.width)
-        width = _grey_info.width - x;
-    if (y + height > _grey_info.height)
-        height = _grey_info.height - y;
+
+    if (y + height > _grey_info.clip_b)
+        height = _grey_info.clip_b - y;
+
+    if (height <= 0)
+        return;
     
-    dst   = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x];
-    dst_end = dst + _GREY_MULUQ(_grey_info.width, height);
+    dwidth  = _grey_info.cb_width;
+    dst     = &_grey_info.curbuffer[
+                _GREY_MULUQ(dwidth, _grey_info.vp->y - _grey_info.cb_y + y) +
+                _grey_info.vp->x - _grey_info.cb_x + x];
+    dst_end = dst + _GREY_MULUQ(dwidth, height);
 
     do
     {
@@ -395,7 +445,7 @@ void grey_fillrect(int x, int y, int width, int height)
                 *dst_row = ~(*dst_row);
             while (++dst_row < row_end);
         }
-        dst += _grey_info.width;
+        dst += dwidth;
     }
     while (dst < dst_end);
 }
@@ -413,40 +463,49 @@ void grey_fillrect(int x, int y, int width, int height)
 void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height)
 {
+    struct viewport *vp = _grey_info.vp;
     const unsigned char *src_end;
     unsigned char *dst, *dst_end;
     unsigned dmask = 0x100; /* bit 8 == sentinel */
-    int drmode = _grey_info.drawmode;
+    int drmode = vp->drawmode;
     int dwidth;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
-        || (y >= _grey_info.height) || (x + width <= 0) || (y + height <= 0))
-        return;
-        
     /* clipping */
-    if (x < 0)
+    if (x < _grey_info.clip_l)
     {
-        width += x;
-        src_x -= x;
-        x = 0;
+        int dx = x - _grey_info.clip_l;
+        width += dx;
+        src_x -= dx;
+        x = _grey_info.clip_l;
     }
-    if (y < 0)
+
+    if (x + width > _grey_info.clip_r)
+        width = _grey_info.clip_r - x;
+
+    if (width <= 0)
+        return;
+
+    if (y < _grey_info.clip_t)
     {
-        height += y;
-        src_y -= y;
-        y = 0;
+        int dy = y - _grey_info.clip_t;
+        height += dy;
+        src_y  += dy;
+        y = _grey_info.clip_t;
     }
-    if (x + width > _grey_info.width)
-        width = _grey_info.width - x;
-    if (y + height > _grey_info.height)
-        height = _grey_info.height - y;
+
+    if (y + height > _grey_info.clip_b)
+        height = _grey_info.clip_b - y;
+
+    if (height <= 0)
+        return;
 
     src    += _GREY_MULUQ(stride, src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
-    dwidth  = _grey_info.width;
-    dst     = &_grey_info.buffer[_GREY_MULUQ(dwidth, y) + x];
+    dwidth  = _grey_info.cb_width;
+    dst     = &_grey_info.curbuffer[
+                        _GREY_MULUQ(dwidth, vp->y - _grey_info.cb_y + y) +
+                                    vp->x - _grey_info.cb_x + x];
     dst_end = dst + _GREY_MULUQ(dwidth, height);
 
     if (drmode & DRMODE_INVERSEVID)
@@ -485,7 +544,7 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             break;
 
           case DRMODE_BG:
-            bg = _grey_info.bg_brightness;
+            bg = _GREY_BG_BRIGHTNESS(vp);
             do
             {
                 if (!(data & 0x01))
@@ -498,7 +557,7 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             break;
 
           case DRMODE_FG:
-            fg = _grey_info.fg_brightness;
+            fg = _GREY_FG_BRIGHTNESS(vp);
             do
             {
                 if (data & 0x01)
@@ -511,8 +570,8 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             break;
 
           case DRMODE_SOLID:
-            fg = _grey_info.fg_brightness;
-            bg = _grey_info.bg_brightness;
+            fg = _GREY_FG_BRIGHTNESS(vp);
+            bg = _GREY_BG_BRIGHTNESS(vp);
             do
             {
                 *dst_col = (data & 0x01) ? fg : bg;
@@ -537,38 +596,48 @@ void grey_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height)
 {
     unsigned char *dst, *dst_end;
-
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= _grey_info.width)
-        || (y >= _grey_info.height) || (x + width <= 0) || (y + height <= 0))
-        return;
+    int dwidth;
 
     /* clipping */
-    if (x < 0)
+    if (x < _grey_info.clip_l)
     {
-        width += x;
-        src_x -= x;
-        x = 0;
+        int dx = x - _grey_info.clip_l;
+        width += dx;
+        src_x -= dx;
+        x = _grey_info.clip_l;
     }
+
+    if (x + width > _grey_info.clip_r)
+        width = _grey_info.clip_r - x;
+
+    if (width <= 0)
+        return;
+
     if (y < 0)
     {
-        height += y;
-        src_y -= y;
-        y = 0;
+        int dy = y - _grey_info.clip_t;
+        height += dy;
+        src_y -= dy;
+        y = _grey_info.clip_t;
     }
-    if (x + width > _grey_info.width)
-        width = _grey_info.width - x;
-    if (y + height > _grey_info.height)
-        height = _grey_info.height - y;
 
-    src    += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */
-    dst     = &_grey_info.buffer[_GREY_MULUQ(_grey_info.width, y) + x];
-    dst_end = dst + _GREY_MULUQ(_grey_info.width, height);
+    if (y + height > _grey_info.clip_b)
+        height = _grey_info.clip_b - y;
+
+    if (height <= 0)
+        return;
+
+    dwidth = _grey_info.cb_width;
+    src   += _GREY_MULUQ(stride, src_y) + src_x; /* move starting point */
+    dst    = &_grey_info.curbuffer[
+                _GREY_MULUQ(dwidth, _grey_info.vp->y - _grey_info.cb_y + y) +
+                _grey_info.vp->x - _grey_info.cb_x + x];
+    dst_end = dst + _GREY_MULUQ(dwidth, height);
 
     do
     {
         rb->memcpy(dst, src, width);
-        dst += _grey_info.width;
+        dst += dwidth;
         src += stride;
     }
     while (dst < dst_end);
@@ -586,11 +655,15 @@ void grey_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 {
     int ch;
     unsigned short *ucs;
-    struct font* pf = rb->font_get(_grey_info.curfont);
-    
+    struct font* pf;
+
+    if (_grey_info.clip_b <= _grey_info.clip_t)
+        return;
+
+    pf = rb->font_get(_grey_info.vp->font);
     ucs = rb->bidi_l2v(str, 1);
 
-    while ((ch = *ucs++) != 0 && x < _grey_info.width)
+    while ((ch = *ucs++) != 0 && x < _grey_info.clip_r)
     {
         int width;
         const unsigned char *bits;
@@ -624,9 +697,10 @@ void grey_putsxy(int x, int y, const unsigned char *str)
 /* Clear the greyscale display (sets all pixels to white) */
 void grey_ub_clear_display(void)
 {
-    int value = _grey_info.gvalue[(_grey_info.drawmode & DRMODE_INVERSEVID) ?
-                                  _grey_info.fg_brightness :
-                                  _grey_info.bg_brightness];
+    struct viewport *vp = &_grey_default_vp;
+    int value = _grey_info.gvalue[(vp->drawmode & DRMODE_INVERSEVID) ?
+                                  _GREY_FG_BRIGHTNESS(vp) :
+                                  _GREY_BG_BRIGHTNESS(vp)];
 
     rb->memset(_grey_info.values, value,
                           _GREY_MULUQ(_grey_info.width, _grey_info.height));

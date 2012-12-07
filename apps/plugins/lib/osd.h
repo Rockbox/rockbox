@@ -23,6 +23,10 @@
 #ifndef OSD_H
 #define OSD_H
 
+#ifndef HAVE_LCD_BITMAP
+#error OSD requires bitmapped LCD
+#endif
+
 /* At this time: assumes use of the default viewport for normal drawing */
 
 /* Callback implemented by user. Paramters are OSD vp-relative coordinates */
@@ -30,8 +34,20 @@ typedef void (* osd_draw_cb_fn_t)(int x, int y, int width, int height);
 
 /* Initialize the OSD, set its backbuffer, update callback and enable it if
  * the call succeeded. */
-bool osd_init(void *backbuf, size_t backbuf_size,
-              osd_draw_cb_fn_t draw_cb);
+enum osd_init_flags
+{
+    OSD_INIT_MAJOR_WIDTH = 0x0,  /* Width guides buffer dims (default) */
+    OSD_INIT_MAJOR_HEIGHT = 0x1, /* Height guides buffer dims */
+    OSD_INIT_MINOR_MIN = 0x2,    /* Treat minor axis dim as a minimum */
+    OSD_INIT_MINOR_MAX = 0x4,    /* Treat minor axis dim as a maximum */
+    /* To get exact minor size, combine min/max flags */
+};
+bool osd_init(unsigned flags, void *backbuf, size_t backbuf_size,
+              osd_draw_cb_fn_t draw_cb, int *width,
+              int *height, size_t *bufused);
+
+/* Destroy the OSD, rendering it disabled */
+void osd_destroy(void);
 
 enum
 {
@@ -90,5 +106,47 @@ void osd_lcd_update(void);
 
 /* Update a part of the screen and restore OSD if it is visible */
 void osd_lcd_update_rect(int x, int y, int width, int height);
+
+#if LCD_DEPTH < 4
+/* Like other functions but for greylib surface (requires GREY_BUFFERED) */
+bool osd_grey_init(unsigned flags, void *backbuf, size_t backbuf_size,
+                   osd_draw_cb_fn_t draw_cb, int *width,
+                   int *height, size_t *bufused);
+void osd_grey_destroy(void);
+bool osd_grey_show(unsigned flags);
+bool osd_grey_update(void);
+bool osd_grey_update_rect(int x, int y, int width, int height);
+bool osd_grey_update_pos(int x, int y, int width, int height);
+void osd_grey_monitor_timeout(void);
+void osd_grey_set_timeout(long timeout);
+struct viewport * osd_grey_get_viewport(void);
+void osd_grey_get_max_dims(int *maxwidth, int *maxheight);
+bool osd_grey_enabled(void);
+void osd_grey_lcd_update_prepare(void);
+void osd_grey_lcd_update(void);
+void osd_grey_lcd_update_rect(int x, int y, int width, int height);
+#endif /* LCD_DEPTH < 4 */
+
+/* MYLCD-style helper defines to compile with different graphics libs */
+#ifdef __GREY_H__
+#define myosd_(fn)                  osd_grey_##fn
+#else
+#define myosd_(fn)                  osd_##fn
+#endif
+
+#define myosd_init                  myosd_(init)
+#define myosd_destroy               myosd_(destroy)
+#define myosd_show                  myosd_(show)
+#define myosd_update                myosd_(update)
+#define myosd_update_rect           myosd_(update_rect)
+#define myosd_update_pos            myosd_(update_pos)
+#define myosd_monitor_timeout       myosd_(monitor_timeout)
+#define myosd_set_timeout           myosd_(set_timeout)
+#define myosd_get_viewport          myosd_(get_viewport)
+#define myosd_get_max_dims          myosd_(get_max_dims)
+#define myosd_enabled               myosd_(enabled)
+#define myosd_lcd_update_prepare    myosd_(lcd_update_prepare)
+#define myosd_lcd_update            myosd_(lcd_update)
+#define myosd_lcd_update_rect       myosd_(lcd_update_rect)
 
 #endif /* OSD_H */

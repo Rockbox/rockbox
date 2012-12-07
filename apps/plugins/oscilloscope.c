@@ -727,7 +727,14 @@ static void osc_osd_init(void)
     /* Grab the plugin buffer for the OSD back buffer */
     size_t bufsize;
     void *buf = rb->plugin_get_buffer(&bufsize);
-    osd_init(buf, bufsize, osd_lcd_draw_cb);
+
+    int width, height;
+    rb->lcd_setfont(FONT_UI);
+    rb->lcd_getstringsize("M", NULL, &height);
+    width = LCD_WIDTH;
+    height += 2 + 2*OSC_OSD_MARGIN_SIZE;
+    osd_init(OSD_INIT_MAJOR_HEIGHT | OSD_INIT_MINOR_MAX, buf, bufsize,
+             osd_lcd_draw_cb, &width, &height, NULL);
 }
 
 /* Format a message by ID and show the OSD */
@@ -1826,7 +1833,7 @@ static long oscilloscope_draw(void)
 
 static void osc_cleanup(void)
 {
-    osd_init(NULL, 0, NULL);
+    osd_destroy();
 
 #ifdef OSCILLOSCOPE_GRAPHMODE
     anim_waveform_exit();

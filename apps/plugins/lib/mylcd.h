@@ -40,12 +40,13 @@
 #define mylcd_(fn)                  pgfx_##fn
 #define mylcd_ub_(fn)               pgfx_##fn
 
-#elif defined (HAVE_LCD_BITMAP) && (LCD_DEPTH < 8) && defined(__GREY_H__)
+#elif defined (HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && defined(__GREY_H__)
 #define MYLCD_CFG_GREYLIB           /* using greylib */
 #define mylcd_(fn)                  grey_##fn
 #define myxlcd_(fn)                 grey_##fn
 #define mylcd_ub_(fn)               grey_ub_##fn
 #define myxlcd_ub_(fn)              grey_ub_##fn
+#define mylcd_viewport_(fn)         grey_viewport_##fn
 
 /* Common colors */
 #define MYLCD_BLACK                 GREY_BLACK
@@ -61,6 +62,7 @@
 #define myxlcd_(fn)                 xlcd_##fn
 #define mylcd_ub_(fn)               rb->lcd_##fn
 #define myxlcd_ub_(fn)              xlcd_##fn
+#define mylcd_viewport_(fn)         rb->viewport_##fn
 
 /* Common colors */
 #define MYLCD_BLACK                 LCD_BLACK
@@ -178,6 +180,13 @@ static inline void mylcd_ub_update_rect(int x, int y, int w, int h)
 #define mylcd_ub_scroll_right       myxlcd_ub_(scroll_right)
 #define mylcd_ub_scroll_up          myxlcd_ub_(scroll_up)
 #define mylcd_ub_scroll_down        myxlcd_ub_(scroll_down)
+#endif /* HAVE_LCD_BITMAP */
+
+/* Viewports */
+#ifdef HAVE_LCD_BITMAP
+#define mylcd_clear_viewport          mylcd_(clear_viewport)
+#define mylcd_set_viewport            mylcd_(set_viewport)
+#define mylcd_viewport_set_fullscreen mylcd_viewport_(set_fullscreen)
 #endif /* HAVE_LCD_BITMAP */
 
 #endif /* MYLCD_H */
