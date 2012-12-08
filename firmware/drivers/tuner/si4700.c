@@ -40,7 +40,24 @@
 #define SI4700_USE_MO_ST_I
 #endif
 
-#define SEEK_THRESHOLD 0x16
+/* Si470x Seek Algorithm:
+ * RSSI >= SEEK_THRESHOLD && !AFC_RAIL
+ * && (!SEEK_SNR || ChannelSNR >= SEEK_SNR)
+ * && (!SEEK_CNT || FMImpulses <= SEEK_CNT)
+ *
+ * Recommendations:
+ * Type         THRESH  SNR  CNT
+ * Default        0x19  0x0  0x0
+ * Recommended    0x19  0x4  0x8
+ * More Stations   0xC  0x4  0x8
+ * Good Quality    0xC  0x7  0xF
+ * Most Stations   0x0  0x4  0xF
+ *
+ * source: http://www.silabs.com/Support%20Documents/TechnicalDocs/AN230.pdf
+ */
+#define SEEK_THRESHOLD 0xC
+#define SEEK_SNR 0x4
+#define SEEK_CNT 0x8
 
 #define I2C_ADR 0x20
 
@@ -339,6 +356,11 @@ static void si4700_sleep(int snooze)
                             SYSCONFIG2_SKEETHw(SEEK_THRESHOLD) |
                             SYSCONFIG2_VOLUMEw(0xF),
                             SYSCONFIG2_VOLUME | SYSCONFIG2_SEEKTH);
+
+        si4700_write_masked(SYSCONFIG3,
+                            SYSCONFIG3_SKSNRw(SEEK_SNR) |
+                            SYSCONFIG3_SKCNTw(SEEK_CNT),
+                            SYSCONFIG3_SKSNR | SYSCONFIG3_SKCNT);
 
 #ifdef HAVE_RDS_CAP
         /* enable RDS and RDS interrupt if supported (bit 9 of CHIPID) */
