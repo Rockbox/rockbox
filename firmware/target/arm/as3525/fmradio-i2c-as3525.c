@@ -189,6 +189,49 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 static struct semaphore rds_sema;
 static uint32_t rds_stack[DEFAULT_STACK_SIZE/sizeof(uint32_t)];
 
+#ifdef RDS_POLLING
+static struct event_queue rds_queue;
+
+enum { Q_POWERUP };
+
+#define STATUSRSSI  0xA
+#define STATUSRSSI_RDSR     (0x1 << 15)
+static uint16_t si4700_read_reg(int reg);
+
+/* Poll for RDS data and process it
+ * Cf. firmware/target/hosted/ypr0/radio-ypr0.c */
+static void rds_thread(void)
+{
+    uint16_t rds_data[4], rds_data_old[4];
+
+    int timeout = TIMEOUT_BLOCK; /* start up frozen */
+    struct queue_event ev;
+
+    int type = tuner_detect_type();
+    if (type == SI4700) {
+        while (true) {
+            queue_wait_w_tmo(&rds_queue, &ev, timeout);
+            switch (ev.id) {
+                case Q_POWERUP:
+                    /* power up: timeout after 1 tick, else block indefinitely */
+                    timeout = ev.data ? 1 : TIMEOUT_BLOCK;
+                    break;
+                case SYS_TIMEOUT:
+                    /* Captures RDS data and processes it */
+                    if (si4700_get(RADIO_RDS_READY) && si4700_rds_read_raw(rds_data)) {
+                        /* only process if it's a new packet */
+                        if (memcmp(rds_data, rds_data_old, 4 * sizeof(uint16_t))) {
+                            if (rds_process(rds_data))
+                                si4700_rds_set_event();
+                            memcpy(rds_data_old, rds_data, 4 * sizeof(uint16_t));
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
+#else
 /* RDS GPIO interrupt handler */
 void tuner_isr(void)
 {
@@ -211,12 +254,17 @@ static void NORETURN_ATTR rds_thread(void)
         }
     }
 }
+#endif /* RDS_POLLING */
 
 /* Called with on=true after full radio power up, and with on=false before
    powering down */
 void si4700_rds_powerup(bool on)
 {
     GPIOA_IE &= ~(1<<4);    /* disable GPIO interrupt */
+
+#ifdef RDS_POLLING
+    queue_post(&rds_queue, Q_POWERUP, on);
+#endif
 
     if (on) {
         GPIOA_DIR &= ~(1<<4);   /* input */
@@ -231,6 +279,9 @@ void si4700_rds_powerup(bool on)
 /* One-time RDS init at startup */
 void si4700_rds_init(void)
 {
+#ifdef RDS_POLLING
+    queue_init(&rds_queue, false);
+#endif
     semaphore_init(&rds_sema, 1, 0);
     rds_init();
     create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"

@@ -50,6 +50,9 @@ enum
     RADIO_RSSI,
     RADIO_RSSI_MIN,
     RADIO_RSSI_MAX,
+#ifdef RDS_POLLING
+    RADIO_RDS_READY,
+#endif
 
     /* Put new general-purpose readback values above this line */
     __RADIO_GET_STANDARD_LAST

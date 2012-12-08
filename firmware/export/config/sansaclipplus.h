@@ -127,6 +127,8 @@
 
 /* FM Tuner */
 #define CONFIG_TUNER (SI4700|RDA5802) /* in fact SI4702 */
+#define HAVE_RDS_CAP
+#define RDS_POLLING
 //#define HAVE_TUNER_PWR_CTRL
 
 /* Define this for LCD backlight available */

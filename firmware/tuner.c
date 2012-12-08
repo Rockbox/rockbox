@@ -51,7 +51,25 @@ int (*tuner_get)(int setting);
 #else
 #define TUNER_TYPE_CASE(type, set, get, ...)         \
         __VA_ARGS__;
+
 #endif /* CONFIG_TUNER_MULTI */
+
+#ifdef CONFIG_TUNER_MULTI
+char* tuner_get_rds_info(int setting)
+{
+    static char buf[100];
+    char *ret;
+    switch (tuner_detect_type())
+    {
+    #if (CONFIG_TUNER & SI4700)
+        case SI4700:
+            return si4700_get_rds_info(setting);
+    #endif
+        default:
+            return NULL;
+    }
+}
+#endif
 
 void tuner_init(void)
 {

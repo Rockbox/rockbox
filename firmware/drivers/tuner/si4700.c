@@ -564,7 +564,12 @@ int si4700_get(int setting)
         #endif
             break;
             }
+#ifdef RDS_POLLING
+        case RADIO_RDS_READY:
+            val = (si4700_read_reg(STATUSRSSI) & STATUSRSSI_RDSR) >> 8;
+            break;
 #endif
+#endif /* HAVE_RDS_CAP */
     }
 
     mutex_unlock(&fmr_mutex);

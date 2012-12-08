@@ -171,7 +171,7 @@ void INT_GPIOA(void)
     void button_gpioa_isr(void);
     button_gpioa_isr();
 #endif
-#ifdef HAVE_RDS_CAP
+#if defined(HAVE_RDS_CAP) && !defined(RDS_POLLING)
     void tuner_isr(void);
     tuner_isr();
 #endif
