@@ -142,7 +142,7 @@
 
 /* SYSCONFIG2 (0x5) */
 #define SYSCONFIG2_SEEKTH   (0xff << 8)
-    #define SYSCONFIG2_SKEETHw(x) (((x) << 8) & SYSCONFIG2_SEEKTH)
+    #define SYSCONFIG2_SEEKTHw(x) (((x) << 8) & SYSCONFIG2_SEEKTH)
 #define SYSCONFIG2_BAND     (0x3 << 6)
     #define SYSCONFIG2_BANDw(x)   (((x) << 6) & SYSCONFIG2_BAND)
     #define SYSCONFIG2_BANDr(x)   (((x) & SYSCONFIG2_BAND) >> 6)
@@ -336,7 +336,7 @@ static void si4700_sleep(int snooze)
                             SYSCONFIG1_BLNDADJ);
 
         si4700_write_masked(SYSCONFIG2,
-                            SYSCONFIG2_SKEETHw(SEEK_THRESHOLD) |
+                            SYSCONFIG2_SEEKTHw(SEEK_THRESHOLD) |
                             SYSCONFIG2_VOLUMEw(0xF),
                             SYSCONFIG2_VOLUME | SYSCONFIG2_SEEKTH);
 
