@@ -155,6 +155,9 @@ static const struct plugin_api rockbox_api = {
     lcd_double_height,
 #else
     &lcd_static_framebuffer[0][0],
+    lcd_set_viewport,
+    lcd_set_framebuffer,
+    lcd_bmp_part,
     lcd_update_rect,
     lcd_set_drawmode,
     lcd_get_drawmode,
@@ -287,6 +290,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_LCD_BITMAP
     viewportmanager_theme_enable,
     viewportmanager_theme_undo,
+    viewport_set_fullscreen,
 #endif
     
     /* list */
@@ -583,6 +587,7 @@ static const struct plugin_api rockbox_api = {
     mixer_channel_stop,
     mixer_channel_set_amplitude,
     mixer_channel_get_bytes_waiting,
+    mixer_channel_set_buffer_hook,
 
     system_sound_play,
     keyclick_click,
@@ -590,6 +595,7 @@ static const struct plugin_api rockbox_api = {
     /* playback control */
     playlist_amount,
     playlist_resume,
+    playlist_resume_track,
     playlist_start,
     playlist_add,
     playlist_sync,
@@ -792,14 +798,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef HAVE_LCD_BITMAP
-#if CONFIG_CODEC == SWCODEC
-    mixer_channel_set_buffer_hook,
-#endif
-    lcd_set_viewport,
-    viewport_set_fullscreen,
-    lcd_set_framebuffer,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)

@@ -131,6 +131,9 @@ int playlist_create(const char *dir, const char *file);
 int playlist_resume(void);
 int playlist_add(const char *filename);
 int playlist_shuffle(int random_seed, int start_index);
+unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
+                                         int index);
+void playlist_resume_track(int start_index, unsigned int crc, int offset);
 void playlist_start(int start_index, int offset);
 bool playlist_check(int steps);
 const char *playlist_peek(int steps, char* buf, size_t buf_size);

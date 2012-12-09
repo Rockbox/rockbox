@@ -207,6 +207,10 @@ struct plugin_api {
     void (*lcd_double_height)(bool on);
 #else /* HAVE_LCD_BITMAP */
     fb_data* lcd_framebuffer;
+    void (*lcd_set_viewport)(struct viewport* vp);
+    void (*lcd_set_framebuffer)(fb_data *fb);
+    void (*lcd_bmp_part)(const struct bitmap *bm, int src_x, int src_y,
+                         int x, int y, int width, int height);
     void (*lcd_update_rect)(int x, int y, int width, int height);
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
@@ -372,6 +376,8 @@ struct plugin_api {
     void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
                                          struct viewport *viewport);
     void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
+    void (*viewport_set_fullscreen)(struct viewport *vp,
+                                    const enum screen_type screen);
 #endif
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
@@ -707,6 +713,8 @@ struct plugin_api {
     void (*mixer_channel_set_amplitude)(enum pcm_mixer_channel channel,
                                         unsigned int amplitude);
     size_t (*mixer_channel_get_bytes_waiting)(enum pcm_mixer_channel channel);
+    void (*mixer_channel_set_buffer_hook)(enum pcm_mixer_channel channel,
+                                          chan_buffer_hook_fn_type fn);
 
     void (*system_sound_play)(enum system_sound sound);
     void (*keyclick_click)(bool rawbutton, int action);
@@ -715,6 +723,7 @@ struct plugin_api {
     /* playback control */
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
+    void (*playlist_resume_track)(int start_index, unsigned int crc, int offset);
     void (*playlist_start)(int start_index, int offset);
     int (*playlist_add)(const char *filename);
     void (*playlist_sync)(struct playlist_info* playlist);
@@ -961,16 +970,6 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef HAVE_LCD_BITMAP
-#if CONFIG_CODEC == SWCODEC
-    void (*mixer_channel_set_buffer_hook)(enum pcm_mixer_channel channel,
-                                          chan_buffer_hook_fn_type fn);
-#endif
-    void (*lcd_set_viewport)(struct viewport* vp);
-    void (*viewport_set_fullscreen)(struct viewport *vp,
-                                    const enum screen_type screen);
-    void (*lcd_set_framebuffer)(fb_data *fb);
-#endif
 };
 
 /* plugin header */
