@@ -303,6 +303,7 @@ struct screen screens[NB_SCREENS] =
 #endif
         .bmp = &lcd_remote_bmp,
         .bmp_part = &lcd_remote_bmp_part,
+        .nine_segment_bmp = &lcd_remote_nine_segment_bmp,
 #if LCD_REMOTE_DEPTH > 1
 #if defined(HAVE_LCD_COLOR)
         .color_to_native=&lcd_remote_color_to_native,

@@ -139,6 +139,8 @@ extern void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x,
                                    int width, int height);
 extern void lcd_remote_bitmap(const fb_remote_data *src, int x, int y,
                               int width, int height);
+extern void lcd_remote_nine_segment_bmp(const struct bitmap* bm, int x, int y,
+                                int width, int height);
 
 /* Low-level drawing function types */
 typedef void lcd_remote_pixelfunc_type(int x, int y);
