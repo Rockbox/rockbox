@@ -381,13 +381,13 @@ Examples:
     }%
     \config{\%x(n,filename[,x,y])}
         & Load and display an image\newline
-          \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\newline
+          \config{n}: image ID for later referencing in \config{\%xd}\newline
           \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
           \config{x}: x coordinate (defaults to 0 if both x and y are not specified)\newline
           \config{y}: y coordinate. (defaults to 0 if both x and y are not specified)\\
     \config{\%xl(n,filename,[x,y],\tabnlindent[nimages])}
         & Preload an image for later display (useful for when your images are displayed conditionally).\newline
-          \config{n}: image ID (a-z and A-Z) for later referencing in \config{\%xd}\newline
+          \config{n}: image ID for later referencing in \config{\%xd}\newline
           \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
             If the filename is ``\_\_list\_icons\_\_'' the list icon bitmap will be used instead\newline
           \config{x}: x coordinate (defaults to 0 if both x and y are not specified)\newline
@@ -395,9 +395,9 @@ Examples:
           \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
           contained in the bitmap. Default is 1.\\
     \config{\%xd(n[i] [,tag] [,offset])} & Display a preloaded image.
-          \config{n}: image ID (a-z and A-Z) as it was specified in \config{\%x} or \config{\%xl}\newline
+          \config{n}: image ID  as it was specified in \config{\%x} or \config{\%xl}\newline
           \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52). 
-          (ignored when \config{tag} is used)
+          (ignored when \config{tag} is used). Only useable if the ID is a single letter.
           By default the first (i.e. top most) sub-image will be used.\newline
           \config{tag}: (optional) Another tag to calculate the subimage from e.g \config{\%xd(A, \%mh)} would
           use the first subimage when \config{\%mh} is on and the second when it is off\newline
@@ -428,7 +428,7 @@ with image ID ``M'', and then reference the individual sub-images in a condition
   \begin{itemize}
   \item The images must be in BMP format
   \item The image tag must be on its own line
-  \item The ID is case sensitive, giving 52 different ID's
+  \item The ID is case sensitive
   \item The size of the LCD screen for each \dap{} varies. See table below 
         for appropriate sizes of each device. The x and y coordinates must 
         respect each of the \daps{} limits.
