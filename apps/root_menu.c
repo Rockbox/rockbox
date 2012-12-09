@@ -297,12 +297,14 @@ static int wpsscrn(void* param)
     }
     else if ( global_status.resume_index != -1 )
     {
-        DEBUGF("Resume index %X offset %lX\n",
+        DEBUGF("Resume index %X crc32 %lX offset %lX\n",
                global_status.resume_index,
+               (unsigned long)global_status.resume_crc32,
                (unsigned long)global_status.resume_offset);
         if (playlist_resume() != -1)
         {
-            playlist_start(global_status.resume_index,
+            playlist_resume_track(global_status.resume_index,
+                global_status.resume_crc32,
                 global_status.resume_offset);
             ret_val = gui_wps_show();
         }

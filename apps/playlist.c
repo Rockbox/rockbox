@@ -2514,6 +2514,44 @@ int playlist_shuffle(int random_seed, int start_index)
     return playlist->index;
 }
 
+/* returns the crc32 of the filename of the track at the specified index */
+unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
+                                         int index)
+{
+    struct playlist_track_info track_info;
+    if (playlist_get_track_info(playlist, index, &track_info) == -1)
+        return -1;
+
+    return crc_32(track_info.filename, strlen(track_info.filename), -1);
+}
+
+/* resume a playlist track with the given crc_32 of the track name. */
+void playlist_resume_track(int start_index, unsigned int crc, int offset)
+{
+    int i;
+    unsigned int tmp_crc;
+    struct playlist_info* playlist = &current_playlist;
+    tmp_crc = playlist_get_filename_crc32(playlist, start_index);
+    if (tmp_crc == crc)
+    {
+        playlist_start(start_index, offset);
+        return;
+    }
+
+    for (i = 0 ; i < playlist->amount; i++)
+    {
+        tmp_crc = playlist_get_filename_crc32(playlist, i);
+        if (tmp_crc == crc)
+        {
+            playlist_start(i, offset);
+            return;
+        }
+    }
+
+    /* If we got here the file wasnt found, so start from the beginning */
+    playlist_start(0,0);
+}
+
 /* start playing current playlist at specified index/offset */
 void playlist_start(int start_index, int offset)
 {
@@ -2726,7 +2764,9 @@ int playlist_update_resume_info(const struct mp3entry* id3)
         if (global_status.resume_index  != playlist->index ||
             global_status.resume_offset != id3->offset)
         {
+            unsigned int crc = crc_32(id3->path, strlen(id3->path), -1);
             global_status.resume_index  = playlist->index;
+            global_status.resume_crc32 = crc;
             global_status.resume_offset = id3->offset;
             status_save();
         }
@@ -2734,6 +2774,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
     else
     {
         global_status.resume_index  = -1;
+        global_status.resume_crc32 = -1;
         global_status.resume_offset = -1;
         status_save();
     }
