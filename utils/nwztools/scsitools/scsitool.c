@@ -650,7 +650,7 @@ int process_cmd(const char *cmd, int argc, char **argv)
 
 static void usage(void)
 {
-    printf("Usage: emmctool [options] <dev> <command> [arguments]\n");
+    printf("Usage: scsitool [options] <dev> <command> [arguments]\n");
     printf("Options:\n");
     printf("  -o <prefix>\tSet output prefix\n");
     printf("  -f/--force\tForce to continue on errors\n");
