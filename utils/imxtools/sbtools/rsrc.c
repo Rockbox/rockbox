@@ -157,7 +157,7 @@ static bool read_entries(struct rsrc_file_t *f, void *u,
         {
             uint8_t *p = f->data + ent.offset;
             printf(OFF, "  ");
-            for(int i = 0; i < MIN(sz, 16); i++)
+            for(unsigned i = 0; i < MIN(sz, 16); i++)
                 printf(RED, "%c", isprint(p[i]) ? p[i] : '.');
         }
         printf(OFF, "\n");
@@ -248,6 +248,7 @@ void rsrc_dump(struct rsrc_file_t *file, void *u, rsrc_color_printf cprintf)
     #define SEP     OFF
 
     printf(HEADER, "RSRC File\n");
+    (void) file;
 
     #undef printf
     #undef print_hex
