@@ -40,26 +40,99 @@ void put32be(uint8_t *buf, uint32_t i)
     *buf++ = i & 0xff;
 }
 
+enum dev_type_t
+{
+    HID_DEVICE,
+    RECOVERY_DEVICE,
+};
+
 struct dev_info_t
 {
     uint16_t vendor_id;
     uint16_t product_id;
     unsigned xfer_size;
+    enum dev_type_t dev_type;
 };
 
 struct dev_info_t g_dev_info[] =
 {
-    {0x066f, 0x3780, 1024}, /* i.MX233 / STMP3780 */
-    {0x066f, 0x3770, 48}, /* STMP3770 */
-    {0x15A2, 0x004F, 1024}, /* i.MX28 */
+    {0x066f, 0x3780, 1024, HID_DEVICE}, /* i.MX233 / STMP3780 */
+    {0x066f, 0x3770, 48, HID_DEVICE}, /* STMP3770 */
+    {0x15A2, 0x004F, 1024, HID_DEVICE}, /* i.MX28 */
+    {0x066f, 0x3600, 4096, RECOVERY_DEVICE}, /* STMP36xx */
 };
+
+int send_hid(libusb_device_handle *dev, int xfer_size, uint8_t *data, int size, int nr_xfers)
+{
+    libusb_detach_kernel_driver(dev, 0);
+    libusb_detach_kernel_driver(dev, 4);
+
+    libusb_claim_interface (dev, 0);
+    libusb_claim_interface (dev, 4);
+
+    uint8_t *xfer_buf = malloc(1 + xfer_size);
+    uint8_t *p = xfer_buf;
+
+    *p++ = 0x01;         /* Report id */
+
+    /* Command block wrapper */
+    *p++ = 'B';          /* Signature */
+    *p++ = 'L';
+    *p++ = 'T';
+    *p++ = 'C';
+    put32le(p, 0x1);     /* Tag */
+    p += 4;
+    put32le(p, size);    /* Payload size */
+    p += 4;
+    *p++ = 0;            /* Flags (host to device) */
+    p += 2;              /* Reserved */
+
+    /* Command descriptor block */
+    *p++ = 0x02;         /* Firmware download */
+    put32be(p, size);    /* Download size */
+
+    int ret = libusb_control_transfer(dev,
+        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, 0x9, 0x201, 0,
+        xfer_buf, xfer_size + 1, 1000);
+    if(ret < 0)
+    {
+        printf("transfer error at init step\n");
+        return 1;
+    }
+
+    for(int i = 0; i < nr_xfers; i++)
+    {
+        xfer_buf[0] = 0x2;
+        memcpy(&xfer_buf[1], &data[i * xfer_size], xfer_size);
+
+        ret = libusb_control_transfer(dev,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE,
+            0x9, 0x202, 0, xfer_buf, xfer_size + 1, 1000);
+        if(ret < 0)
+        {
+            printf("transfer error at send step %d\n", i);
+            return 1;
+        }
+    }
+
+    int recv_size;
+    ret = libusb_interrupt_transfer(dev, 0x81, xfer_buf, xfer_size, &recv_size,
+        1000);
+    if(ret < 0)
+    {
+        printf("transfer error at final stage\n");
+        return 1;
+    }
+
+    return ret;
+}
+
+int send_recovery(libusb_device_handle *dev, int xfer_size, uint8_t *data, int size, int nr_xfers)
+{
+}
 
 int main(int argc, char **argv)
 {
-    int ret;
-    FILE *f;
-    int i, xfer_size, nr_xfers, recv_size;
-
     if(argc != 3)
     {
         printf("usage: %s <xfer size> <file>\n", argv[0]);
@@ -68,7 +141,7 @@ int main(int argc, char **argv)
     }
 
     char *end;
-    xfer_size = strtol(argv[1], &end, 0);
+    int xfer_size = strtol(argv[1], &end, 0);
     if(end != (argv[1] + strlen(argv[1])))
     {
         printf("Invalid transfer size !\n");
@@ -81,7 +154,8 @@ int main(int argc, char **argv)
     
     libusb_set_debug(NULL, 3);
 
-    for(unsigned i = 0; i < sizeof(g_dev_info) / sizeof(g_dev_info[0]); i++)
+    unsigned i;
+    for(i = 0; i < sizeof(g_dev_info) / sizeof(g_dev_info[0]); i++)
     {
         dev = libusb_open_device_with_vid_pid(NULL,
             g_dev_info[i].vendor_id, g_dev_info[i].product_id);
@@ -98,20 +172,8 @@ int main(int argc, char **argv)
         printf("Cannot open device\n");
         return 1;
     }
-    
-    libusb_detach_kernel_driver(dev, 0);
-    libusb_detach_kernel_driver(dev, 4);
-    
-    libusb_claim_interface (dev, 0);
-    libusb_claim_interface (dev, 4);
-    
-    if(!dev)
-    {
-        printf("No dev\n");
-        exit(1);
-    }
 
-    f = fopen(argv[2], "r");
+    FILE *f = fopen(argv[2], "r");
     if(f == NULL)
     {
         perror("cannot open file");
@@ -122,7 +184,7 @@ int main(int argc, char **argv)
     fseek(f, 0, SEEK_SET);
 
     printf("Transfer size: %d\n", xfer_size);
-    nr_xfers = (size + xfer_size - 1) / xfer_size;
+    int nr_xfers = (size + xfer_size - 1) / xfer_size;
     uint8_t *file_buf = malloc(nr_xfers * xfer_size);
     memset(file_buf, 0xff, nr_xfers * xfer_size); // pad with 0xff
     if(fread(file_buf, size, 1, f) != 1)
@@ -132,62 +194,20 @@ int main(int argc, char **argv)
         return 1;
     }
     fclose(f);
-    
-    uint8_t *xfer_buf = malloc(1 + xfer_size);
-    uint8_t *p = xfer_buf;
-    
-    *p++ = 0x01;         /* Report id */
-    
-    /* Command block wrapper */
-    *p++ = 'B';          /* Signature */
-    *p++ = 'L';
-    *p++ = 'T';
-    *p++ = 'C';
-    put32le(p, 0x1);     /* Tag */
-    p += 4;
-    put32le(p, size);    /* Payload size */
-    p += 4;
-    *p++ = 0;            /* Flags (host to device) */
-    p += 2;              /* Reserved */
-    
-    /* Command descriptor block */
-    *p++ = 0x02;         /* Firmware download */
-    put32be(p, size);    /* Download size */
-    
-    ret = libusb_control_transfer(dev, 
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, 0x9, 0x201, 0,
-        xfer_buf, xfer_size + 1, 1000);
-    if(ret < 0)
+
+    switch(g_dev_info[i].dev_type)
     {
-        printf("transfer error at init step\n");
-        return 1;
+        case HID_DEVICE:
+            send_hid(dev, xfer_size, file_buf, size, nr_xfers);
+            break;
+        case RECOVERY_DEVICE:
+            send_recovery(dev, xfer_size, file_buf, size, nr_xfers);
+            break;
+        default:
+            printf("unknown device type\n");
+            break;
     }
 
-    for(i = 0; i < nr_xfers; i++)
-    {
-        xfer_buf[0] = 0x2;
-        memcpy(&xfer_buf[1], &file_buf[i * xfer_size], xfer_size);
-        
-        ret = libusb_control_transfer(dev, 
-            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, 
-            0x9, 0x202, 0, xfer_buf, xfer_size + 1, 1000);
-        if(ret < 0)
-        {
-            printf("transfer error at send step %d\n", i);
-            return 1;
-        }
-    }
-
-    ret = libusb_interrupt_transfer(dev, 0x81, xfer_buf, xfer_size, &recv_size,
-        1000);
-    if(ret < 0)
-    {
-        printf("transfer error at final stage\n");
-        return 1;
-    }
-    
-    printf("ret %i\n", ret);
-    
     return 0;
 }
 
