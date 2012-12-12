@@ -165,7 +165,7 @@ int do_sense_analysis(int status, uint8_t *sense, int sense_size)
 
 int stmp_inquiry(uint8_t *dev_type, char vendor[9], char product[17])
 {
-    unsigned char buffer[56];
+    unsigned char buffer[36];
     uint8_t cdb[10];
     memset(cdb, 0, sizeof(cdb));
     cdb[0] = 0x12;
