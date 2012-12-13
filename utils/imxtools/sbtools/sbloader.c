@@ -24,6 +24,10 @@
 #include <libusb.h>
 #include <stdint.h>
 
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
 void put32le(uint8_t *buf, uint32_t i)
 {
     *buf++ = i & 0xff;
@@ -67,8 +71,8 @@ int send_hid(libusb_device_handle *dev, int xfer_size, uint8_t *data, int size, 
     libusb_detach_kernel_driver(dev, 0);
     libusb_detach_kernel_driver(dev, 4);
 
-    libusb_claim_interface (dev, 0);
-    libusb_claim_interface (dev, 4);
+    libusb_claim_interface(dev, 0);
+    libusb_claim_interface(dev, 4);
 
     uint8_t *xfer_buf = malloc(1 + xfer_size);
     uint8_t *p = xfer_buf;
@@ -129,6 +133,30 @@ int send_hid(libusb_device_handle *dev, int xfer_size, uint8_t *data, int size, 
 
 int send_recovery(libusb_device_handle *dev, int xfer_size, uint8_t *data, int size, int nr_xfers)
 {
+    (void) nr_xfers;
+    // there should be no kernel driver attached but in doubt...
+    libusb_detach_kernel_driver(dev, 0);
+    libusb_claim_interface(dev, 0);
+
+    int sent = 0;
+    while(sent < size)
+    {
+        int xfered;
+        int len = MIN(size - sent, xfer_size);
+        int ret = libusb_bulk_transfer(dev, 1, data + sent, len, &xfered, 1000);
+        if(ret < 0)
+        {
+            printf("transfer error at send offset %d\n", sent);
+            return 1;
+        }
+        if(xfered == 0)
+        {
+            printf("empty transfer at step offset %d\n", sent);
+            return 2;
+        }
+        sent += xfered;
+    }
+    return 0;
 }
 
 int main(int argc, char **argv)
