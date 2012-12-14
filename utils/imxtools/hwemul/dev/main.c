@@ -780,91 +780,6 @@ static void udelay(unsigned us)
 
 /**
  *
- * PWM
- *
- */
-
-#define HW_PWM_BASE     0x80064000
-
-#define HW_PWM_CTRL         (*(volatile uint32_t *)(HW_PWM_BASE + 0x0))
-#define HW_PWM_CTRL__PWMx_ENABLE(x) (1 << (x))
-
-#define HW_PWM_ACTIVEx(x)   (*(volatile uint32_t *)(HW_PWM_BASE + 0x10 + (x) * 0x20))
-#define HW_PWM_ACTIVEx__ACTIVE_BP   0
-#define HW_PWM_ACTIVEx__ACTIVE_BM   0xffff
-#define HW_PWM_ACTIVEx__INACTIVE_BP 16
-#define HW_PWM_ACTIVEx__INACTIVE_BM 0xffff0000
-
-#define HW_PWM_PERIODx(x)   (*(volatile uint32_t *)(HW_PWM_BASE + 0x20 + (x) * 0x20))
-#define HW_PWM_PERIODx__PERIOD_BP   0
-#define HW_PWM_PERIODx__PERIOD_BM   0xffff
-#define HW_PWM_PERIODx__ACTIVE_STATE_BP     16
-#define HW_PWM_PERIODx__ACTIVE_STATE_BM     (0x3 << 16)
-#define HW_PWM_PERIODx__INACTIVE_STATE_BP   18
-#define HW_PWM_PERIODx__INACTIVE_STATE_BM   (0x3 << 18)
-#define HW_PWM_PERIODx__CDIV_BP     20
-#define HW_PWM_PERIODx__CDIV_BM     (0x7 << 20)
-#define HW_PWM_PERIODx__CDIV__DIV_1     0
-#define HW_PWM_PERIODx__CDIV__DIV_2     1
-#define HW_PWM_PERIODx__CDIV__DIV_4     2
-#define HW_PWM_PERIODx__CDIV__DIV_8     3
-#define HW_PWM_PERIODx__CDIV__DIV_16    4
-#define HW_PWM_PERIODx__CDIV__DIV_64    5
-#define HW_PWM_PERIODx__CDIV__DIV_256   6
-#define HW_PWM_PERIODx__CDIV__DIV_1024  7
-
-#define HW_PWM_PERIODx__STATE__HI_Z 0
-#define HW_PWM_PERIODx__STATE__LOW  2
-#define HW_PWM_PERIODx__STATE__HIGH 3
-
-#define IMX233_PWM_PIN_BANK(channel)    2
-#define IMX233_PWM_PIN(channel) (0 + (channel))
-
-static void imx233_pwm_init(void)
-{
-    //__REG_SET(HW_PWM_CTRL) = __BLOCK_SFTRST;
-    __REG_CLR(HW_PWM_CTRL) = __BLOCK_SFTRST | __BLOCK_CLKGATE;
-    while(HW_PWM_CTRL & __BLOCK_CLKGATE);
-    __REG_CLR(HW_CLKCTRL_XTAL) = HW_CLKCTRL_XTAL__PWM_CLK24M_GATE;
-}
-
-static bool imx233_pwm_is_channel_enable(int channel)
-{
-    return HW_PWM_CTRL & HW_PWM_CTRL__PWMx_ENABLE(channel);
-}
-
-static void imx233_pwm_enable_channel(int channel, bool enable)
-{
-    if(enable)
-        __REG_SET(HW_PWM_CTRL) = HW_PWM_CTRL__PWMx_ENABLE(channel);
-    else
-        __REG_CLR(HW_PWM_CTRL) = HW_PWM_CTRL__PWMx_ENABLE(channel);
-}
-
-static void imx233_pwm_setup_channel(int channel, int period, int cdiv, int active,
-    int active_state, int inactive, int inactive_state)
-{
-    /* stop */
-    bool enable = imx233_pwm_is_channel_enable(channel);
-    if(enable)
-        imx233_pwm_enable_channel(channel, false);
-    /* setup pin */
-    imx233_set_pin_function(IMX233_PWM_PIN_BANK(channel), IMX233_PWM_PIN(channel),
-        PINCTRL_FUNCTION_MAIN);
-    imx233_set_pin_drive_strength(IMX233_PWM_PIN_BANK(channel), IMX233_PWM_PIN(channel),
-        PINCTRL_DRIVE_4mA);
-    /* watch the order ! active THEN period */
-    HW_PWM_ACTIVEx(channel) = active << HW_PWM_ACTIVEx__ACTIVE_BP |
-        inactive << HW_PWM_ACTIVEx__INACTIVE_BP;
-    HW_PWM_PERIODx(channel) = period | active_state << HW_PWM_PERIODx__ACTIVE_STATE_BP |
-        inactive_state << HW_PWM_PERIODx__INACTIVE_STATE_BP |
-        cdiv << HW_PWM_PERIODx__CDIV_BP;
-    /* restore */
-    imx233_pwm_enable_channel(channel, enable);
-}
-
-/**
- *
  * USB PHY
  *
  */
@@ -1430,13 +1345,6 @@ static void handle_class_req(struct usb_ctrlrequest *req)
  * 
  */
 
-static void flash_pwm(int chan, int v1, int v2)
-{
-    imx233_pwm_setup_channel(chan, 500, HW_PWM_PERIODx__CDIV__DIV_256,
-        v1, HW_PWM_PERIODx__STATE__HIGH,
-        v2, HW_PWM_PERIODx__STATE__LOW);
-}
-
 void main(uint32_t arg)
 {
     usb_buffer_size = oc_buffersize;
@@ -1444,13 +1352,6 @@ void main(uint32_t arg)
     logf("hwemul %d.%d.%d\n", HWEMUL_VERSION_MAJOR, HWEMUL_VERSION_MINOR,
          HWEMUL_VERSION_REV);
     logf("argument: 0x%08x\n", arg);
-
-    imx233_pwm_init();
-
-    flash_pwm(2, 0, 500);
-    flash_pwm(4, 0, 0);
-
-    udelay(HZ / 2);
 
     /* we don't know if USB was connected or not. In USB recovery mode it will
      * but in other cases it might not be. In doubt, disconnect */
@@ -1481,9 +1382,6 @@ void main(uint32_t arg)
     REG_ENDPTSETUPSTAT = EPSETUP_STATUS_EP0;
     /* run! */
     REG_USBCMD |= USBCMD_RUN;
-    /* infinite loop */
-    flash_pwm(2, 0, 0);
-    flash_pwm(4, 0, 500);
     
     while(1)
     {
