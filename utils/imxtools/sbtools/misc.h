@@ -27,6 +27,10 @@
 #define _STR(a) #a
 #define STR(a) _STR(a)
 
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
 #define bug(...) do { fprintf(stderr,"["__FILE__":"STR(__LINE__)"]ERROR: "__VA_ARGS__); exit(1); } while(0)
 #define bugp(...) do { fprintf(stderr, __VA_ARGS__); perror(" "); exit(1); } while(0)
 
