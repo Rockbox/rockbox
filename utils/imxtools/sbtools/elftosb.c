@@ -36,7 +36,6 @@
 #include "sb.h"
 #include "dbparser.h"
 #include "misc.h"
-#include "sb.h"
 
 char **g_extern;
 int g_extern_count;
