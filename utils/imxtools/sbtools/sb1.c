@@ -59,7 +59,123 @@ static void fix_version(struct sb1_version_t *ver)
 
 enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
 {
-    return SB1_ERROR;
+    /* compute image size (without userdata) */
+    uint32_t image_size = 0;
+    image_size += sizeof(struct sb1_header_t);
+    for(int i = 0; i < sb->nr_insts; i++)
+    {
+        switch(sb->insts[i].cmd)
+        {
+            case SB1_INST_LOAD:
+                image_size += 8 + ROUND_UP(sb->insts[i].size, 4);
+                break;
+            case SB1_INST_FILL:
+            case SB1_INST_JUMP:
+            case SB1_INST_CALL:
+                image_size += 12;
+                break;
+            case SB1_INST_MODE:
+            case SB1_INST_SDRAM:
+                image_size += 8;
+                break;
+            default:
+                bugp("Unknown SB instruction: %#x\n", sb->insts[i].cmd);
+        }
+    }
+    // now take crypto marks and sector size into account:
+    // there is one crypto mark per sector, ie 4 bytes for 508 = 512 (sector)
+    image_size += 4 * ((image_size + SECTOR_SIZE - 5) / (SECTOR_SIZE - 4));
+    image_size = ROUND_UP(image_size, SECTOR_SIZE);
+
+    /* allocate buffer and fill it (ignoring crypto for now) */
+    void *buf = xmalloc(image_size);
+    struct sb1_header_t *header = buf;
+    memset(buf, 0, image_size);
+    header->rom_version = sb->rom_version;
+    header->image_size = image_size + sb->userdata_size;
+    header->header_size = sizeof(struct sb1_header_t);
+    header->userdata_offset = sb->userdata ? image_size : 0;
+    memcpy(&header->product_ver, &sb->product_ver, sizeof(sb->product_ver));
+    memcpy(&header->component_ver, &sb->component_ver, sizeof(sb->component_ver));
+    header->drive_tag = sb->drive_tag;
+    strncpy((void *)header->signature, "STMP", 4);
+
+    struct sb1_cmd_header_t *cmd = (void *)(header + 1);
+    for(int i = 0; i < sb->nr_insts; i++)
+    {
+        int bytes = 0;
+        switch(sb->insts[i].cmd)
+        {
+            case SB1_INST_LOAD:
+                bytes = sb->insts[i].size;
+                cmd->addr = sb->insts[i].addr;
+                memcpy(cmd + 1, sb->insts[i].data, sb->insts[i].size);
+                memset((void *)(cmd + 1) + sb->insts[i].size, 0,
+                    bytes - sb->insts[i].size);
+                break;
+            case SB1_INST_FILL:
+                bytes = 4;
+                memcpy(cmd + 1, &sb->insts[i].pattern, 4);
+                cmd->addr = sb->insts[i].addr;
+                break;
+            case SB1_INST_JUMP:
+            case SB1_INST_CALL:
+                bytes = 4;
+                cmd->addr = sb->insts[i].addr;
+                memcpy(cmd + 1, &sb->insts[i].argument, 4);
+                break;
+            case SB1_INST_MODE:
+                bytes = 4;
+                cmd->addr = sb->insts[i].mode;
+                break;
+            case SB1_INST_SDRAM:
+                bytes = 0;
+                cmd->addr = SB1_MK_ADDR_SDRAM(sb->insts[i].sdram.chip_select,
+                    sb->insts[i].sdram.size_index);
+                break;
+            default:
+                bugp("Unknown SB instruction: %#x\n", sb->insts[i].cmd);
+        }
+
+        cmd->cmd = SB1_MK_CMD(sb->insts[i].cmd, sb->insts[i].datatype,
+            bytes, sb->insts[i].critical,
+            ROUND_UP(bytes, 4) / 4 + 1);
+
+        cmd = (void *)cmd + 8 + ROUND_UP(bytes, 4);
+    }
+
+    /* move everything to prepare crypto marks (start at the end !) */
+    for(int i = image_size / SECTOR_SIZE - 1; i >= 0; i--)
+        memmove(buf + i * SECTOR_SIZE, buf + i * (SECTOR_SIZE - 4), SECTOR_SIZE - 4);
+
+    union xorcrypt_key_t key[2];
+    memcpy(key, sb->key, sizeof(sb->key));
+    void *ptr = header + 1;
+    int offset = header->header_size;
+    for(unsigned i = 0; i < image_size / SECTOR_SIZE; i++)
+    {
+        int size = SECTOR_SIZE - 4 - offset;
+        uint32_t mark = xor_encrypt(key, ptr, size);
+        *(uint32_t *)(ptr + size) = mark;
+
+        ptr += size + 4;
+        offset = 0;
+    }
+
+    FILE *fd = fopen(filename, "wb");
+    if(fd == NULL)
+        return SB1_OPEN_ERROR;
+    if(fwrite(buf, image_size, 1, fd) != 1)
+    {
+        free(buf);
+        return SB1_WRITE_ERROR;
+    }
+    free(buf);
+    if(sb->userdata)
+        fwrite(sb->userdata, sb->userdata_size, 1, fd);
+    fclose(fd);
+    
+    return SB1_SUCCESS;
 }
 
 struct sb1_file_t *sb1_read_file(const char *filename, void *u,
@@ -237,6 +353,8 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
             }
         }
     }
+
+    memcpy(file->key, key, sizeof(key));
     
     if(!valid_key)
         fatal(SB1_NO_VALID_KEY, "No valid key found\n");
@@ -279,18 +397,6 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
         printf(YELLOW, "    Boot:");
         printf(RED, " %#x ", SB1_CMD_BOOT(cmd->cmd));
         printf(GREEN, "(%s)\n", sb1_cmd_name(SB1_CMD_BOOT(cmd->cmd)));
-        printf(YELLOW, "    Addr:");
-        printf(RED, " %#x", cmd->addr);
-
-        if(SB1_CMD_BOOT(cmd->cmd) == SB1_INST_SDRAM)
-            printf(GREEN, " (Chip Select=%d, Size=%d)", SB1_ADDR_SDRAM_CS(cmd->addr),
-                    sb1_sdram_size_by_index(SB1_ADDR_SDRAM_SZ(cmd->addr)));
-        printf(OFF, "\n");
-        if(SB1_CMD_BOOT(cmd->cmd) == SB1_INST_FILL)
-        {
-            printf(YELLOW, "    Pattern:");
-            printf(RED, " %#x\n", *(uint32_t *)(cmd + 1));
-        }
 
         /* copy command */
         struct sb1_inst_t inst;
@@ -305,16 +411,42 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
             case SB1_INST_SDRAM:
                 inst.sdram.chip_select = SB1_ADDR_SDRAM_CS(cmd->addr);
                 inst.sdram.size_index = SB1_ADDR_SDRAM_SZ(cmd->addr);
+                printf(YELLOW, "    Ram:");
+                printf(RED, " %#x", inst.addr);
+                printf(GREEN, " (Chip Select=%d, Size=%d)\n", SB1_ADDR_SDRAM_CS(cmd->addr),
+                    sb1_sdram_size_by_index(SB1_ADDR_SDRAM_SZ(cmd->addr)));
                 break;
             case SB1_INST_MODE:
                 inst.mode = cmd->addr;
+                printf(YELLOW, "    Mode:");
+                printf(RED, " %#x\n", inst.mode);
                 break;
             case SB1_INST_LOAD:
                 inst.data = malloc(inst.size);
                 memcpy(inst.data, cmd + 1, inst.size);
-                /* fallthrough */
-            default:
                 inst.addr = cmd->addr;
+                printf(YELLOW, "    Addr:");
+                printf(RED, " %#x\n", inst.addr);
+                break;
+            case SB1_INST_FILL:
+                inst.addr = cmd->addr;
+                inst.pattern = *(uint32_t *)(cmd + 1);
+                printf(YELLOW, "    Addr:");
+                printf(RED, " %#x\n", cmd->addr);
+                printf(YELLOW, "    Pattern:");
+                printf(RED, " %#x\n", inst.pattern);
+                break;
+            case SB1_INST_CALL:
+            case SB1_INST_JUMP:
+                inst.addr = cmd->addr;
+                inst.argument = *(uint32_t *)(cmd + 1);
+                printf(YELLOW, "    Addr:");
+                printf(RED, " %#x\n", cmd->addr);
+                printf(YELLOW, "    Argument:");
+                printf(RED, " %#x\n", inst.pattern);
+                break;
+            default:
+                printf(GREY, "WARNING: unknown SB command !\n");
                 break;
         }
 
@@ -447,4 +579,28 @@ void sb1_dump(struct sb1_file_t *file, void *u, sb1_color_printf cprintf)
     #undef printf
     #undef print_hex
 }
- 
+
+static struct crypto_key_t g_default_xor_key =
+{
+    .method = CRYPTO_XOR_KEY,
+    .u.xor_key =
+    {
+        {.k = {0x67ECAEF6, 0xB31FB961, 0x118A9F4C, 0xA32A97DA,
+        0x6CC39617, 0x5BC00314, 0x9D430685, 0x4D7DB502,
+        0xA347685E, 0x3C87E86C, 0x8987AAA0, 0x24B78EF1,
+        0x893B9605, 0x9BB8C2BE, 0x6D9544E2, 0x375B525C}},
+        {.k = {0x3F424704, 0x53B5A331, 0x6AD345A5, 0x20DCEC51,
+        0x743C8D3B, 0x444B3792, 0x0AF429569, 0xB7EE1111,
+        0x583BF768, 0x9683BF9A, 0x0B032D799, 0xFE4E78ED,
+        0xF20D08C2, 0xFA0BE4A2, 0x4D89C317, 0x887B2D6F}}
+    }
+};
+
+void sb1_get_default_key(struct crypto_key_t *key)
+{
+    memcpy(key, &g_default_xor_key, sizeof(g_default_xor_key));
+    /* decrypt the xor key which is xor'ed */
+    for(int i = 0; i < 2; i++)
+        for(int j = 0; j < 16; j++)
+            key->u.xor_key[i].k[j] ^= 0xaa55aa55;
+}

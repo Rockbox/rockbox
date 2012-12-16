@@ -66,8 +66,13 @@ struct sb1_cmd_header_t
 #define SB1_CMD_DATATYPE(cmd)   (((cmd) >> 4) & 0x3)
 #define SB1_CMD_BOOT(cmd)       ((cmd) & 0xf)
 
+#define SB1_MK_CMD(boot,data,bytes,crit,size) \
+    ((boot) | (data) << 4 | (bytes) << 6 | (crit) << 20 | (size) << 21)
+
 #define SB1_ADDR_SDRAM_CS(addr) ((addr) & 0x3)
 #define SB1_ADDR_SDRAM_SZ(addr) ((addr) >> 16)
+
+#define SB1_MK_ADDR_SDRAM(cs,sz)    ((cs) | (sz) << 16)
 
 int sb1_sdram_size_by_index(int index); // returns - 1 on error
 int sb1_sdram_index_by_size(int size); // returns -1 on error
@@ -105,6 +110,7 @@ struct sb1_inst_t
     // <union>
     void *data;
     uint32_t pattern;
+    uint32_t argument;
     // </union>
 };
 
@@ -119,6 +125,7 @@ struct sb1_file_t
     struct sb1_inst_t *insts;
     void *userdata;
     int userdata_size;
+    union xorcrypt_key_t key[2];
 };
 
 enum sb1_error_t
@@ -145,6 +152,8 @@ struct sb1_file_t *sb1_read_file_ex(const char *filename, size_t offset, size_t 
     void *u, sb1_color_printf printf, enum sb1_error_t *err);
 struct sb1_file_t *sb1_read_memory(void *buffer, size_t size, void *u,
     sb1_color_printf printf, enum sb1_error_t *err);
+
+void sb1_get_default_key(struct crypto_key_t *key);
 
 void sb1_dump(struct sb1_file_t *file, void *u, sb1_color_printf printf);
 void sb1_free(struct sb1_file_t *file);
