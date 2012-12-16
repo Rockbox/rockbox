@@ -182,6 +182,9 @@
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
+/* Virtual LED (icon) */
+#define CONFIG_LED LED_VIRTUAL
+
 #define RKW_FORMAT
 #define BOOTFILE_EXT "rkw"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

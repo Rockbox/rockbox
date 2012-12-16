@@ -730,10 +730,12 @@ void sd_enable(bool on)
     if (on)
     {
         SCU_CLKCFG &= ~(1<<22);
+        led(true);
     }
     else
     {
         SCU_CLKCFG |= (1<<22);
+        led(false);
     }
 }
 
