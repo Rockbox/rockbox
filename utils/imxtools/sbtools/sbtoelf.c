@@ -252,21 +252,7 @@ static struct crypto_key_t g_zero_key =
     .u.key = {0}
 };
 
-static struct crypto_key_t g_default_xor_key =
-{
-    .method = CRYPTO_XOR_KEY,
-    .u.xor_key =
-    {
-        {.k = {0x67ECAEF6, 0xB31FB961, 0x118A9F4C, 0xA32A97DA,
-        0x6CC39617, 0x5BC00314, 0x9D430685, 0x4D7DB502,
-        0xA347685E, 0x3C87E86C, 0x8987AAA0, 0x24B78EF1,
-        0x893B9605, 0x9BB8C2BE, 0x6D9544E2, 0x375B525C}},
-        {.k = {0x3F424704, 0x53B5A331, 0x6AD345A5, 0x20DCEC51,
-        0x743C8D3B, 0x444B3792, 0x0AF429569, 0xB7EE1111,
-        0x583BF768, 0x9683BF9A, 0x0B032D799, 0xFE4E78ED,
-        0xF20D08C2, 0xFA0BE4A2, 0x4D89C317, 0x887B2D6F}}
-    }
-};
+
 
 enum sb_version_guess_t
 {
@@ -314,11 +300,6 @@ int main(int argc, char **argv)
     const char *loopback = NULL;
     bool force_sb1 = false;
     bool force_sb2 = false;
-
-    /* decrypt the xor key which is xor'ed */
-    for(int i = 0; i < 2; i++)
-        for(int j = 0; j < 16; j++)
-            g_default_xor_key.u.xor_key[i].k[j] ^= 0xaa55aa55;
 
     while(1)
     {
@@ -373,8 +354,12 @@ int main(int argc, char **argv)
                 add_keys(&g_zero_key, 1);
                 break;
             case 'x':
-                add_keys(&g_default_xor_key, 1);
+            {
+                struct crypto_key_t key;
+                sb1_get_default_key(&key);
+                add_keys(&key, 1);
                 break;
+            }
             case 'r':
                 raw_mode = true;
                 break;
