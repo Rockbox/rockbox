@@ -3,7 +3,7 @@ CC=gcc
 LD=gcc
 CFLAGS=-g -std=c99 -W -Wall `pkg-config --cflags libusb-1.0` $(DEFINES)
 LDFLAGS=`pkg-config --libs libusb-1.0`
-BINS=elftosb sbtoelf sbloader rsrctool
+BINS=elftosb sbtoelf sbloader rsrctool elftosb1
 
 all: $(BINS)
 
@@ -14,6 +14,9 @@ sbtoelf: sbtoelf.o crc.o crypto.o aes128.o sha1.o xorcrypt.o elf.o misc.o sb.o s
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 elftosb: elftosb.o crc.o crypto.o aes128.o sha1.o elf.o dbparser.o misc.o sb.o
+	$(LD) -o $@ $^ $(LDFLAGS)
+
+elftosb1: elftosb1.o xorcrypt.o elf.o misc.o sb1.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 sbloader: sbloader.o
