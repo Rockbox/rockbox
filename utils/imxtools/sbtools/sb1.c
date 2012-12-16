@@ -98,7 +98,9 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
     header->header_size = sizeof(struct sb1_header_t);
     header->userdata_offset = sb->userdata ? image_size : 0;
     memcpy(&header->product_ver, &sb->product_ver, sizeof(sb->product_ver));
+    fix_version(&header->product_ver);
     memcpy(&header->component_ver, &sb->component_ver, sizeof(sb->component_ver));
+    fix_version(&header->component_ver);
     header->drive_tag = sb->drive_tag;
     strncpy((void *)header->signature, "STMP", 4);
 
