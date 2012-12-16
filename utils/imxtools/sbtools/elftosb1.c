@@ -377,7 +377,7 @@ static int load_elf(struct sb1_file_t *sb, const char *filename, int act)
     fclose(fd);
     if(!loaded)
         bug("error loading elf file '%s'\n", filename);
-    //elf_translate_addresses(&elf);
+    elf_translate_addresses(&elf);
     elf_sort_by_address(&elf);
 
     struct elf_section_t *esec = elf.first_section;
