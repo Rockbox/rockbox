@@ -239,6 +239,31 @@ static void *load_file(const char *filename, int *size)
     return data;
 }
 
+static bool parse_sb_sub_version(uint16_t *ver, char *str)
+{
+    *ver = 0;
+    for(int i = 0; str[i]; i++)
+    {
+        if(i >= 4)
+            return false;
+        if(str[i] < '0' || str[i] > '9')
+            return false;
+        *ver = *ver << 4 | (str[i] - '0');
+    }
+    return true;
+}
+
+static bool parse_sb_version(struct sb1_version_t *ver, char *str)
+{
+    char *p = strchr(str, '.');
+    char *q = strchr(p + 1, '.');
+    if(p == NULL || q == NULL) return false;
+    *p = *q = 0;
+    return parse_sb_sub_version(&ver->major, str) &&
+            parse_sb_sub_version(&ver->minor, p + 1) &&
+            parse_sb_sub_version(&ver->revision, q + 1);
+}
+
 /**
  * Command line parsing 
  */
@@ -421,6 +446,26 @@ CMD_FN(cmd_loadjumpreturn)
     return load_elf(sb, args[0].str, SB1_INST_CALL);
 }
 
+CMD_FN(cmd_rom)
+{
+    sb->rom_version = args[0].uint;
+    return 0;
+}
+
+CMD_FN(cmd_product)
+{
+    if(!parse_sb_version(&sb->product_ver, args[0].str))
+        bug("Invalid version string '%s'\n", args[0].str);
+    return 0;
+}
+
+CMD_FN(cmd_component)
+{
+    if(!parse_sb_version(&sb->component_ver, args[0].str))
+        bug("Invalid version string '%s'\n", args[0].str);
+    return 0;
+}
+
 #define CMD(name,fn,nr_args,...) {name,nr_args,{__VA_ARGS__},fn},
 struct cmd_entry_t g_cmds[] =
 {
@@ -450,6 +495,12 @@ struct cmd_entry_t g_cmds[] =
     CMD("-loadjumpreturn", cmd_loadjumpreturn, 1, ARG_STR)
     CMD("-j", cmd_loadjump, 1, ARG_STR)
     CMD("-loadjump", cmd_loadjump, 1, ARG_STR)
+    CMD("-R", cmd_rom, 1, ARG_UINT)
+    CMD("-rom", cmd_rom, 1, ARG_UINT)
+    CMD("-p", cmd_product, 1, ARG_STR)
+    CMD("-product", cmd_product, 1, ARG_STR)
+    CMD("-v", cmd_component, 1, ARG_STR)
+    CMD("-component", cmd_component, 1, ARG_STR)
 };
 #undef CMD
 
