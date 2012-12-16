@@ -83,6 +83,7 @@ void elf_add_fill_section(struct elf_params_t *params,
 uint32_t elf_translate_virtual_address(struct elf_params_t *params, uint32_t addr);
 void elf_translate_addresses(struct elf_params_t *params);
 void elf_simplify(struct elf_params_t *params);
+void elf_sort_by_address(struct elf_params_t *params);
 void elf_write_file(struct elf_params_t *params, elf_write_fn_t write, elf_printf_fn_t printf, void *user);
 bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read, elf_printf_fn_t printf,
     void *user);
