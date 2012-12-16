@@ -58,7 +58,8 @@ struct sb1_cmd_header_t
     uint32_t addr;
 } __attribute__((packed));
 
-#define SB1_CMD_MAX_SIZE        0x1ff8
+#define SB1_CMD_MAX_LOAD_SIZE   0x1ff8
+#define SB1_CMD_MAX_FILL_SIZE   0x3fff
 
 #define SB1_CMD_SIZE(cmd)       ((cmd) >> 21)
 #define SB1_CMD_CRITICAL(cmd)   !!(cmd & (1 << 20))
@@ -125,7 +126,7 @@ struct sb1_file_t
     struct sb1_inst_t *insts;
     void *userdata;
     int userdata_size;
-    union xorcrypt_key_t key[2];
+    struct crypto_key_t key;
 };
 
 enum sb1_error_t

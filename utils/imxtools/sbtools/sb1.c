@@ -59,6 +59,8 @@ static void fix_version(struct sb1_version_t *ver)
 
 enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
 {
+    if(sb->key.method != CRYPTO_XOR_KEY)
+        return SB1_NO_VALID_KEY;
     /* compute image size (without userdata) */
     uint32_t image_size = 0;
     image_size += sizeof(struct sb1_header_t);
@@ -104,6 +106,7 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
     for(int i = 0; i < sb->nr_insts; i++)
     {
         int bytes = 0;
+        int size = 0;
         switch(sb->insts[i].cmd)
         {
             case SB1_INST_LOAD:
@@ -114,7 +117,8 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
                     bytes - sb->insts[i].size);
                 break;
             case SB1_INST_FILL:
-                bytes = 4;
+                bytes = sb->insts[i].size;
+                size = 2;
                 memcpy(cmd + 1, &sb->insts[i].pattern, 4);
                 cmd->addr = sb->insts[i].addr;
                 break;
@@ -125,7 +129,7 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
                 memcpy(cmd + 1, &sb->insts[i].argument, 4);
                 break;
             case SB1_INST_MODE:
-                bytes = 4;
+                bytes = 0;
                 cmd->addr = sb->insts[i].mode;
                 break;
             case SB1_INST_SDRAM:
@@ -137,11 +141,15 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
                 bugp("Unknown SB instruction: %#x\n", sb->insts[i].cmd);
         }
 
+        /* handle most common cases */
+        if(size == 0)
+            size = ROUND_UP(bytes, 4) / 4 + 1;
+
         cmd->cmd = SB1_MK_CMD(sb->insts[i].cmd, sb->insts[i].datatype,
             bytes, sb->insts[i].critical,
-            ROUND_UP(bytes, 4) / 4 + 1);
+            size);
 
-        cmd = (void *)cmd + 8 + ROUND_UP(bytes, 4);
+        cmd = (void *)cmd + 4 + size * 4;
     }
 
     /* move everything to prepare crypto marks (start at the end !) */
@@ -149,7 +157,7 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
         memmove(buf + i * SECTOR_SIZE, buf + i * (SECTOR_SIZE - 4), SECTOR_SIZE - 4);
 
     union xorcrypt_key_t key[2];
-    memcpy(key, sb->key, sizeof(sb->key));
+    memcpy(key, sb->key.u.xor_key, sizeof(sb->key));
     void *ptr = header + 1;
     int offset = header->header_size;
     for(unsigned i = 0; i < image_size / SECTOR_SIZE; i++)
@@ -354,7 +362,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
         }
     }
 
-    memcpy(file->key, key, sizeof(key));
+    memcpy(file->key.u.xor_key, key, sizeof(key));
     
     if(!valid_key)
         fatal(SB1_NO_VALID_KEY, "No valid key found\n");
