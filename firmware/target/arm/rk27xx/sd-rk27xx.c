@@ -401,7 +401,7 @@ static void init_controller(void)
     SCU_IOMUXA_CON |= IOMUX_SD;
 
     /* enable and unmask SD interrupts in interrupt controller */
-    SCU_CLKCFG &= ~(1<<22);
+    SCU_CLKCFG &= ~CLKCFG_SD;
     INTC_IMR |= (1<<10);
     INTC_IECR |= (1<<10);
 
@@ -729,12 +729,12 @@ void sd_enable(bool on)
     /* enable or disable clock signal for SD module */
     if (on)
     {
-        SCU_CLKCFG &= ~(1<<22);
+        SCU_CLKCFG &= ~CLKCFG_SD;
         led(true);
     }
     else
     {
-        SCU_CLKCFG |= (1<<22);
+        SCU_CLKCFG |= CLKCFG_SD;
         led(false);
     }
 }

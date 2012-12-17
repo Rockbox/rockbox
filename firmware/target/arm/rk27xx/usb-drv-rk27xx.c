@@ -642,7 +642,7 @@ void usb_drv_init(void)
     int ep_num;
         
     /* enable USB clock */
-    SCU_CLKCFG &= ~(1<<6);
+    SCU_CLKCFG &= ~CLKCFG_UDC;
     
     /* 1. do soft disconnect */
     DEV_CTL = DEV_SELF_PWR;

@@ -130,20 +130,20 @@ void system_init(void)
     MCSDR_T_RCD = 1;               /* active to RD/WR delay */
 
     /* turn off clock for unused modules */
-    SCU_CLKCFG |= (1<<31) |        /* WDT pclk */
-                  (1<<30) |        /* RTC pclk */
-                  (1<<26) |        /* HS_ADC clock */
-                  (1<<25) |        /* HS_ADC HCLK */
-                  (1<<21) |        /* SPI clock */
-                  (1<<19) |        /* UART1 clock */
-                  (1<<18) |        /* UART0 clock */
-                  (1<<15) |        /* VIP clock */
-                  (1<<14) |        /* VIP HCLK */
-                  (1<<13) |        /* LCDC clock */
-                   (1<<9) |        /* NAND HCLK */
-                   (1<<5) |        /* USB host HCLK */
-                   (1<<1) |        /* DSP clock */
-                   (1<<0);         /* OTP clock (dunno what it is */
+    SCU_CLKCFG |= CLKCFG_WDT        |        /* WDT pclk */
+                  CLKCFG_RTC        |        /* RTC pclk */
+                  CLKCFG_HSADC      |        /* HS_ADC clock */
+                  CLKCFG_HCLK_HSADC |        /* HS_ADC HCLK */
+                  CLKCFG_SPI        |        /* SPI clock */
+                  CLKCFG_UART1      |        /* UART1 clock */
+                  CLKCFG_UART0      |        /* UART0 clock */
+                  CLKCFG_VIP        |        /* VIP clock */
+                  CLKCFG_HCLK_VIP   |        /* VIP HCLK */
+                  CLKCFG_LCDC       |        /* LCDC clock */
+                  CLKCFG_NAND       |        /* NAND HCLK */
+                  CLKCFG_UHC        |        /* USB host HCLK */
+                  CLKCFG_DSP        |        /* DSP clock */
+                  CLKCFG_OTP;                /* OTP clock (dunno what it is */
 
     /* turn off DSP pll */
     SCU_PLLCON2 |= (1<<22);
@@ -157,7 +157,7 @@ void system_init(void)
 void system_reboot(void)
 {
     /* use Watchdog to reset */
-    SCU_CLKCFG &= ~(1<<31);
+    SCU_CLKCFG &= ~CLKCFG_WDT;
     WDTLR = 1;
     WDTCON = (1<<4) | (1<<3);
 

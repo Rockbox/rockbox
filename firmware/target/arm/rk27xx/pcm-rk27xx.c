@@ -61,7 +61,7 @@ void pcm_play_dma_stop(void)
 
 static void hdma_i2s_transfer(const void *addr, size_t size)
 {
-    SCU_CLKCFG &= ~(1<<3); /* enable HDMA clock */
+    SCU_CLKCFG &= ~CLKCFG_HDMA; /* enable HDMA clock */
 
     commit_discard_dcache_range(addr, size);
 
@@ -117,12 +117,12 @@ void pcm_play_dma_pause(bool pause)
 {
     if(pause)
     {
-        SCU_CLKCFG |= (1<<3);
+        SCU_CLKCFG |= CLKCFG_HDMA;
         locked = 1;
     }
     else
     {
-        SCU_CLKCFG &= ~(1<<3);
+        SCU_CLKCFG &= ~CLKCFG_HDMA;
         locked = 0;
     }
 }
@@ -148,8 +148,7 @@ static void i2s_init(void)
 #endif
 
     /* enable i2s clocks */
-    SCU_CLKCFG &= ~((1<<17) | /* i2s_pclk */
-                    (1<<16)); /* i2s_clk */
+    SCU_CLKCFG &= ~(CLKCFG_PCLK_I2S | CLKCFG_I2S);
     
     /* configure I2S module */
     I2S_IER = 0; /* disable all i2s interrupts */

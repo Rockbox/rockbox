@@ -97,7 +97,7 @@ void _backlight_on(void)
     lcd_enable(true);
 #endif
     /* enable PWM clock */
-    SCU_CLKCFG &= ~(1<<29);
+    SCU_CLKCFG &= ~CLKCFG_PWM;
 
     /* set output pin as PWM pin */
     SCU_IOMUXB_CON |= (1<<11); /* type<<11<<channel */
@@ -115,7 +115,7 @@ void _backlight_off(void)
     PWMT0_CTRL &= ~(1<<3) | (1<<0);
 
     /* disable PWM clock */
-    SCU_CLKCFG |= (1<<29);
+    SCU_CLKCFG |= CLKCFG_PWM;
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false);
 #endif

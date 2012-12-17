@@ -31,7 +31,7 @@ unsigned short adc_read(int channel)
     unsigned short result;
 
     /* ungate lsadc clocks */
-    SCU_CLKCFG &= ~(3<<23);
+    SCU_CLKCFG &= ~(CLKCFG_LSADC|CLKCFG_PCLK_LSADC);
 
     /* wait a bit for clock to stabilize */
     udelay(10);
@@ -51,7 +51,7 @@ unsigned short adc_read(int channel)
     result = (ADC_DATA & 0x3ff);
 
     /* turn off lsadc clock when not in use */
-    SCU_CLKCFG |= (3<<23);
+    SCU_CLKCFG |= (CLKCFG_LSADC|CLKCFG_PCLK_LSADC);
 
     return result; 
 }

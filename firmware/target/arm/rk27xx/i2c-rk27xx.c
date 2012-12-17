@@ -123,7 +123,7 @@ void i2c_init(void)
 
 
     /* ungate i2c module clock */
-    SCU_CLKCFG &= ~(1<< 20);
+    SCU_CLKCFG &= ~CLKCFG_I2C;
 
     I2C_OPR |= (1<<7); /* reset state machine */
     sleep(HZ/100);
@@ -146,7 +146,7 @@ void i2c_init(void)
     I2C_OPR |= (1<<6); /* enable i2c core */
 
     /* turn off i2c module clock until we need to comunicate */
-    SCU_CLKCFG |= (1<< 20);
+    SCU_CLKCFG |= CLKCFG_I2C;
 }
 
 int i2c_write(unsigned char slave, int address, int len,
@@ -159,7 +159,7 @@ int i2c_write(unsigned char slave, int address, int len,
     i2c_iomux(slave);
 
     /* ungate i2c clock */
-    SCU_CLKCFG &= ~(1<<20);
+    SCU_CLKCFG &= ~CLKCFG_I2C;
 
     /* clear all flags */
     I2C_ISR = 0x00;
@@ -200,7 +200,7 @@ int i2c_write(unsigned char slave, int address, int len,
 
 end:
     mutex_unlock(&i2c_mtx);
-    SCU_CLKCFG |= (1<<20);
+    SCU_CLKCFG |= CLKCFG_I2C;
     return ret;
 }
 
@@ -213,7 +213,7 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
     i2c_iomux(slave);
 
     /* ungate i2c module clock */
-    SCU_CLKCFG &= ~(1<<20);
+    SCU_CLKCFG &= ~CLKCFG_I2C;
 
     /* clear all flags */
     I2C_ISR = 0x00;
@@ -270,6 +270,6 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
 
 end:
     mutex_unlock(&i2c_mtx);
-    SCU_CLKCFG |= (1<<20);
+    SCU_CLKCFG |= CLKCFG_I2C;
     return ret;
 }
