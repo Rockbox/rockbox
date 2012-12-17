@@ -31,6 +31,10 @@
 #include <cstdlib>
 #include <stdio.h>
 
+#if defined(Q_OS_FREEBSD)
+#include <sys/param.h>
+#include <sys/mount.h>
+#endif
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 #include <sys/statvfs.h>
 #endif
@@ -40,7 +44,7 @@
 #if defined(Q_OS_LINUX)
 #include <mntent.h>
 #endif
-#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD) || defined(Q_OS_FREEBSD)
 #include <sys/param.h>
 #include <sys/ucred.h>
 #include <sys/mount.h>
@@ -214,6 +218,22 @@ qulonglong Utils::filesystemClusterSize(QString path)
 qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 {
     qlonglong size = 0;
+#if defined(Q_OS_FREEBSD)
+    struct statfs fs;
+    int ret;
+    ret = statfs(qPrintable(path), &fs);
+    if(ret == 0) {
+        if(type == FilesystemFree) {
+            size = (qulonglong)fs.f_bsize * (qulonglong)fs.f_bavail;
+        }
+        if(type == FilesystemTotal) {
+            size = (qulonglong)fs.f_bsize * (qulonglong)fs.f_blocks;
+        }
+        if(type == FilesystemClusterSize) {
+            size = (qulonglong)fs.f_bsize;
+        }
+    }
+#endif
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX) 
     // the usage of statfs() is deprecated by the LSB so use statvfs().
     struct statvfs fs;
@@ -268,7 +288,7 @@ QString Utils::findExecutable(QString name)
 {
     QString exepath;
     //try autodetect tts   
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD) || defined(Q_OS_FREEBSD)
     QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
 #elif defined(Q_OS_WIN)
     QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
@@ -442,7 +462,7 @@ QString Utils::resolveDevicename(QString path)
 
 #endif
 
-#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD) || defined(Q_OS_FREEBSD)
     int num;
     struct statfs *mntinf;
 
@@ -525,7 +545,7 @@ QString Utils::resolveMountPoint(QString device)
 
 #endif
 
-#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD) || defined(Q_OS_FREEBSD)
     int num;
     struct statfs *mntinf;
 
@@ -579,7 +599,7 @@ QStringList Utils::mountpoints()
         qDebug() << "[Utils] Mounted on" << list.at(i).absolutePath();
     }
 
-#elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD) || defined(Q_OS_FREEBSD)
     int num;
     struct statfs *mntinf;
 

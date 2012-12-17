@@ -136,7 +136,7 @@ tags.depends = $(SOURCES)
 QMAKE_EXTRA_TARGETS += tags
 
 # add a custom rule for making the translations
-lrelease.commands = $$[QT_INSTALL_BINS]/lrelease -silent $$_PRO_FILE_
+lrelease.commands = $$[QT_INSTALL_BINS]/lrelease-qt4 -silent $$_PRO_FILE_
 QMAKE_EXTRA_TARGETS += lrelease
 !dbg {
     PRE_TARGETDEPS += lrelease
@@ -197,11 +197,16 @@ win32 {
 win32:static {
     QMAKE_LFLAGS += -static-libgcc -static-libstdc++
 }
-unix:!static:!libusb0:!macx {
+unix:!static:!libusb:!libusb0:!macx {
     DEFINES += LIBUSB1
     LIBS += -lusb-1.0
 }
-unix:!static:libusb0:!macx {
+# FreeBSD has a combo libusb v0.1 and v1.0 library
+unix:!static:libusb:!macx {
+    DEFINES += LIBUSB1
+    LIBS += -lusb
+}
+unix:!static:!libusb:libusb0:!macx {
     LIBS += -lusb
 }
 
