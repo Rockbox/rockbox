@@ -157,6 +157,21 @@
 #define CLKCFG_WDT             (1<<31)
 
 #define SCU_RSTCFG             (*(volatile unsigned long *)(APB0_SCU + 0x1C))
+#define RSTCFG_UHC             (1<<0)
+#define RSTCFG_UDC             (1<<1)
+#define RSTCFG_LCDC            (1<<2)
+#define RSTCFG_VIP             (1<<3)
+#define RSTCFG_DSP_CORE        (1<<4)
+#define RSTCFG_DSP_PERI        (1<<5)
+#define RSTCFG_CODEC           (1<<6)
+#define RSTCFG_LSADC           (1<<7)
+#define RSTCFG_HSADC           (1<<8)
+#define RSTCFG_SD              (1<<9)
+#define RSTCFG_MAILBOX         (1<<10)
+#define RSTCFG_ECT             (1<<11)
+#define RSTCFG_ARM_CORE        (1<<12)
+/* 13 - 31 reserved */
+
 #define SCU_PWM                (*(volatile unsigned long *)(APB0_SCU + 0x20))
 #define SCU_CPUPD              (*(volatile unsigned long *)(APB0_SCU + 0x24))
 #define SCU_CHIPCFG            (*(volatile unsigned long *)(APB0_SCU + 0x28))

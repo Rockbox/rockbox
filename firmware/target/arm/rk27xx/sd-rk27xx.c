@@ -393,9 +393,9 @@ static void sd_thread(void)
 static void init_controller(void)
 {
     /* reset SD module */
-    SCU_RSTCFG |= (1<<9);
+    SCU_RSTCFG |= RSTCFG_SD;
     sleep(1);
-    SCU_RSTCFG &= ~(1<<9);
+    SCU_RSTCFG &= ~RSTCFG_SD;
 
     /* set pins functions as SD signals */
     SCU_IOMUXA_CON |= IOMUX_SD;
