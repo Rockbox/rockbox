@@ -402,8 +402,8 @@ static void init_controller(void)
 
     /* enable and unmask SD interrupts in interrupt controller */
     SCU_CLKCFG &= ~CLKCFG_SD;
-    INTC_IMR |= (1<<10);
-    INTC_IECR |= (1<<10);
+    INTC_IMR |= IRQ_ARM_SD;
+    INTC_IECR |= IRQ_ARM_SD;
 
     SD_CTRL = SD_PWR_CPU | SD_DETECT_MECH | SD_CLOCK_EN | 0x7D;
     SD_INT = CMD_RES_INT_EN | DATA_XFER_INT_EN;

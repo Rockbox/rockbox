@@ -46,9 +46,9 @@ void tick_start(unsigned int interval_in_ms)
     TMR0CON = (1<<8) | (1<<7) | (1<<1); /* periodic, 1/1, interrupt enable */
 
     /* unmask timer0 interrupt */
-    INTC_IMR |= 0x04;
+    INTC_IMR |= IRQ_ARM_TIMER0;
 
     /* enable timer0 interrupt */
-    INTC_IECR |= 0x04;
+    INTC_IECR |= IRQ_ARM_TIMER0;
 }
 

@@ -52,10 +52,10 @@ bool timer_set(long cycles, bool start)
     TMR1CON = (1<<7) | (1<<1); /* periodic, 1/1 */
 
     /* unmask timer1 interrupt */
-    INTC_IMR |= (1<<3);
+    INTC_IMR |= IRQ_ARM_TIMER1;
 
     /* enable timer1 interrupt */
-    INTC_IECR |= (1<<3);
+    INTC_IECR |= IRQ_ARM_TIMER1;
 
     return true;
 }
@@ -70,5 +70,9 @@ bool timer_start(void)
 void timer_stop(void)
 {
     TMR1CON &= ~(1 << 8);       /* timer1 disable */
+
+    /* disable timer1 interrupt */
+    INTC_IMR &= ~IRQ_ARM_TIMER1;
+    INTC_IECR &= ~IRQ_ARM_TIMER1;
 }
 

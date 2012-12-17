@@ -715,8 +715,8 @@ void usb_drv_exit(void)
     DEV_CTL = DEV_SELF_PWR;
     
     /* disable USB interrupts in interrupt controller */
-    INTC_IMR &= ~(1<<16);
-    INTC_IECR &= ~(1<<16);
+    INTC_IMR &= ~IRQ_ARM_UDC;
+    INTC_IECR &= ~IRQ_ARM_UDC;
     
     /* we cannot disable UDC clock since this causes data abort
      * when reading DEV_INFO in order to check usb connect event

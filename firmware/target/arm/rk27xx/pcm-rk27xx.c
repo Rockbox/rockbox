@@ -35,7 +35,7 @@ void pcm_play_lock(void)
     if (++locked == 1)
     {
         int old = disable_irq_save();
-        INTC_IMR &= ~(1<<12); /* mask HDMA interrupt */ 
+        INTC_IMR &= ~IRQ_ARM_HDMA; /* mask HDMA interrupt */ 
         restore_irq(old);
     }
 }
@@ -46,7 +46,7 @@ void pcm_play_unlock(void)
     if(--locked == 0)
     {
         int old = disable_irq_save();
-        INTC_IMR |= (1<<12); /* unmask HDMA interrupt */
+        INTC_IMR |= IRQ_ARM_HDMA; /* unmask HDMA interrupt */
         restore_irq(old);
     }
 }
@@ -241,8 +241,8 @@ static void set_codec_freq(unsigned int freq)
 void pcm_play_dma_init(void)
 {
     /* unmask HDMA interrupt in INTC */
-    INTC_IMR |= (1<<12);
-    INTC_IECR |= (1<<12);
+    INTC_IMR |= IRQ_ARM_HDMA;
+    INTC_IECR |= IRQ_ARM_HDMA;
 
     audiohw_preinit();
     
