@@ -13000,3 +13000,31 @@
     *: "Ограничи ауто-промену"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Изаберите један или више директоријума"
+  </dest>
+  <voice>
+    *: "Изаберите један или више директоријума"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Изаберите директоријуме за скенирање"
+  </dest>
+  <voice>
+    *: "Изаберите директоријуме за скенирање"
+  </voice>
+</phrase>
