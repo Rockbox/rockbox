@@ -23,6 +23,7 @@
 #include "system.h"
 #include "dsp_core.h"
 #include "dsp_sample_io.h"
+#include "dsp_proc_entry.h"
 #include "dsp-util.h"
 #include <string.h>
 
@@ -159,9 +160,8 @@ void sample_output_dithered(struct sample_io_data *this,
 }
 
 /* Initialize the output function for settings and format */
-static void dsp_sample_output_format_change(struct sample_io_data *this,
-                                            struct dsp_buffer *src,
-                                            struct dsp_buffer *dst)
+void dsp_sample_output_format_change(struct sample_io_data *this,
+                                     struct sample_format *format)
 {
     static const sample_output_fn_type fns[2][2] =
     {
@@ -171,25 +171,20 @@ static void dsp_sample_output_format_change(struct sample_io_data *this,
           sample_output_dithered },
     };
 
-    struct sample_format *format = &src->format;
     bool dither = dsp_get_id((void *)this) == CODEC_IDX_AUDIO &&
                   dither_data.enabled;
     int channels = format->num_channels;
 
-    DSP_PRINT_FORMAT(DSP Output, -1, *format);
+    DSP_PRINT_FORMAT(DSP Output, *format);
 
-    this->output_samples[0] = fns[dither ? 1 : 0][channels - 1];
-    format_change_ack(format); /* always ack, we're last */
-
-    /* The real function mustn't be called with no data */
-    if (this->outcount > 0)
-        this->output_samples[0](this, src, dst);
+    this->output_samples = fns[dither ? 1 : 0][channels - 1];
+    this->output_version = format->version;
 }
 
-void dsp_sample_output_init(struct sample_io_data *this)
+void INIT_ATTR dsp_sample_output_init(struct sample_io_data *this)
 {
-    this->output_samples[0] = sample_output_stereo;
-    this->output_samples[1] = dsp_sample_output_format_change;
+    this->output_version = 0;
+    this->output_samples = sample_output_stereo;
 }
 
 /* Flush the dither history */
@@ -199,6 +194,7 @@ void dsp_sample_output_flush(struct sample_io_data *this)
         memset(dither_data.state, 0, sizeof (dither_data.state));
 }
 
+
 /** Output settings **/
 
 /* Set the tri-pdf dithered output */
@@ -207,8 +203,11 @@ void dsp_dither_enable(bool enable)
     if (enable == dither_data.enabled)
         return;
 
-    struct sample_io_data *data = (void *)dsp_get_config(CODEC_IDX_AUDIO);
-    dsp_sample_output_flush(data);
     dither_data.enabled = enable;
-    data->output_samples[0] = dsp_sample_output_format_change;
+    struct sample_io_data *data = (void *)dsp_get_config(CODEC_IDX_AUDIO);
+
+    if (enable)
+        dsp_sample_output_flush(data);
+
+    data->output_version = 0; /* Force format update */
 }

@@ -49,29 +49,13 @@ static struct channel_mode_data
 {
     long  sw_gain;   /* 00h: for mode: custom */
     long  sw_cross;  /* 04h: for mode: custom */
-    struct dsp_config *dsp;
     int   mode;
-    const dsp_proc_fn_type fns[SOUND_CHAN_NUM_MODES];
 } channel_mode_data =
 {
     .sw_gain = 0,
     .sw_cross = 0,
-    .mode = SOUND_CHAN_STEREO,
-    .fns =
-    {
-        [SOUND_CHAN_STEREO]     = NULL,
-        [SOUND_CHAN_MONO]       = channel_mode_proc_mono,
-        [SOUND_CHAN_CUSTOM]     = channel_mode_proc_custom,
-        [SOUND_CHAN_MONO_LEFT]  = channel_mode_proc_mono_left,
-        [SOUND_CHAN_MONO_RIGHT] = channel_mode_proc_mono_right,
-        [SOUND_CHAN_KARAOKE]    = channel_mode_proc_karaoke,
-    },
+    .mode = SOUND_CHAN_STEREO
 };
-
-static dsp_proc_fn_type get_process_fn(void)
-{
-    return channel_mode_data.fns[channel_mode_data.mode];
-}
 
 #if 0
 /* SOUND_CHAN_STEREO mode is a noop so has no function - just outline one for
@@ -166,33 +150,6 @@ void channel_mode_proc_mono_right(struct dsp_proc_entry *this,
     (void)this;
 }
 
-/* This is the initial function pointer when first enabled/changed in order
- * to facilitate verification of the format compatibility at the proper time
- * This gets called for changes even if stage is inactive. */
-static void channel_mode_process_new_format(struct dsp_proc_entry *this,
-                                            struct dsp_buffer **buf_p)
-{
-    struct channel_mode_data *data = (void *)this->data;
-    struct dsp_buffer *buf = *buf_p;
-
-    DSP_PRINT_FORMAT(DSP_PROC_CHANNEL_MODE, DSP_PROC_CHANNEL_MODE,
-                     buf->format);
-
-    bool active = buf->format.num_channels >= 2;
-    dsp_proc_activate(data->dsp, DSP_PROC_CHANNEL_MODE, active);
-
-    if (!active)
-    {
-        /* Can't do this. Sleep until next change. */
-        DEBUGF("  DSP_PROC_CHANNEL_MODE- deactivated\n");
-        return;
-    }
-
-    /* Switch to the real function and call it once */
-    this->process[0] = get_process_fn();
-    dsp_proc_call(this, buf_p, (unsigned)buf->format.changed - 1);
-}
-
 void channel_mode_set_config(int value)
 {
     if (value < 0 || value >= SOUND_CHAN_NUM_MODES)
@@ -228,34 +185,65 @@ void channel_mode_custom_set_width(int value)
     channel_mode_data.sw_cross = cross << 8;
 }
 
+static void update_process_fn(struct dsp_proc_entry *this)
+{
+    static const dsp_proc_fn_type fns[SOUND_CHAN_NUM_MODES] =
+    {
+        [SOUND_CHAN_STEREO]     = NULL,
+        [SOUND_CHAN_MONO]       = channel_mode_proc_mono,
+        [SOUND_CHAN_CUSTOM]     = channel_mode_proc_custom,
+        [SOUND_CHAN_MONO_LEFT]  = channel_mode_proc_mono_left,
+        [SOUND_CHAN_MONO_RIGHT] = channel_mode_proc_mono_right,
+        [SOUND_CHAN_KARAOKE]    = channel_mode_proc_karaoke,
+    };
+
+    this->process = fns[((struct channel_mode_data *)this->data)->mode];
+}
+
+/* Handle format changes and verify the format compatibility */
+static intptr_t channel_mode_new_format(struct dsp_proc_entry *this,
+                                        struct dsp_config *dsp,
+                                        struct sample_format *format)
+{
+    DSP_PRINT_FORMAT(DSP_PROC_CHANNEL_MODE, format);
+
+    bool active = format->num_channels >= 2;
+    dsp_proc_activate(dsp, DSP_PROC_CHANNEL_MODE, active);
+
+    if (active)
+        return PROC_NEW_FORMAT_OK;
+
+    /* Can't do this. Sleep until next change. */
+    DEBUGF("  DSP_PROC_CHANNEL_MODE- deactivated\n");
+    return PROC_NEW_FORMAT_DEACTIVATED;
+
+    (void)this;
+}
+
 /* DSP message hook */
 static intptr_t channel_mode_configure(struct dsp_proc_entry *this,
                                        struct dsp_config *dsp,
                                        unsigned int setting,
                                        intptr_t value)
 {
+    intptr_t retval = 0;
+
     switch (setting)
     {
     case DSP_PROC_INIT:
         if (value == 0)
-        {
-            /* New object */
             this->data = (intptr_t)&channel_mode_data;
-            this->process[1] = channel_mode_process_new_format;
-            ((struct channel_mode_data *)this->data)->dsp = dsp;
-        }
 
-        /* Force format change call each time */
-        this->process[0] = channel_mode_process_new_format;
-        dsp_proc_activate(dsp, DSP_PROC_CHANNEL_MODE, true);
+        update_process_fn(this);
         break;
 
-    case DSP_PROC_CLOSE:
-        ((struct channel_mode_data *)this->data)->dsp = NULL;
+    case DSP_PROC_NEW_FORMAT:
+        retval = channel_mode_new_format(this, dsp,
+                                         (struct sample_format *)value);
         break;
     }
 
-    return 1;
+    return retval;
 }
 
 /* Database entry */

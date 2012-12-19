@@ -51,9 +51,8 @@ static struct resample_data
     int32_t  last_sample[2]; /* 08h: Last samples for interpolation (L+R) */
                              /* 10h */
     int32_t  frequency;      /* Virtual samplerate */
-    struct dsp_config *dsp;  /* The DSP for this resampler */
     struct dsp_buffer resample_buf; /* Buffer descriptor for resampled data */
-    int32_t *resample_buf_arr[2]; /* Actual output data pointers */
+    int32_t *resample_out_p[2];     /* Actual output buffer pointers */
 } resample_data[DSP_COUNT] IBSS_ATTR;
 
 /* Actual worker function. Implemented here or in target assembly code. */
@@ -75,9 +74,9 @@ static void lin_resample_flush(struct dsp_proc_entry *this)
 }
 
 static bool lin_resample_new_delta(struct resample_data *data,
-                                   struct dsp_buffer *buf)
+                                   struct sample_format *format)
 {
-    int32_t frequency = buf->format.frequency; /* virtual samplerate */
+    int32_t frequency = format->frequency; /* virtual samplerate */
 
     data->frequency = frequency;
     data->delta = fp_div(frequency, NATIVE_FREQUENCY, 16);
@@ -169,8 +168,8 @@ static void lin_resample_process(struct dsp_proc_entry *this,
         return; /* data still remains */
 
     dst->remcount = 0;
-    dst->p32[0] = data->resample_buf_arr[0];
-    dst->p32[1] = data->resample_buf_arr[1];
+    dst->p32[0] = data->resample_out_p[0];
+    dst->p32[1] = data->resample_out_p[1];
 
     if (src->remcount > 0)
     {
@@ -189,63 +188,44 @@ static void lin_resample_process(struct dsp_proc_entry *this,
 }
 
 /* Finish draining old samples then switch format or shut off */
-static void lin_resample_new_format(struct dsp_proc_entry *this,
-                                    struct dsp_buffer **buf_p)
+static intptr_t lin_resample_new_format(struct dsp_proc_entry *this,
+                                        struct dsp_config *dsp,
+                                        struct sample_format *format)
 {
     struct resample_data *data = (void *)this->data;
-    struct dsp_buffer *src = *buf_p;
     struct dsp_buffer *dst = &data->resample_buf;
 
     if (dst->remcount > 0)
-    {
-        *buf_p = dst;
-        return; /* data still remains */
-    }
+        return PROC_NEW_FORMAT_TRANSITION;
 
-    DSP_PRINT_FORMAT(DSP_PROC_RESAMPLE, DSP_PROC_RESAMPLE, src->format);
+    DSP_PRINT_FORMAT(DSP_PROC_RESAMPLE, *format);
 
-    struct dsp_config *dsp = data->dsp;
     int32_t frequency = data->frequency;
     bool active = dsp_proc_active(dsp, DSP_PROC_RESAMPLE);
 
-    if (src->format.frequency != frequency)
+    if (format->frequency != frequency)
     {
         DEBUGF("  DSP_PROC_RESAMPLE- new delta\n");
-        active = lin_resample_new_delta(data, src);
+        active = lin_resample_new_delta(data, format);
         dsp_proc_activate(dsp, DSP_PROC_RESAMPLE, active);
     }
 
     /* Everything after us is NATIVE_FREQUENCY */
-    struct sample_format f = src->format;
-    f.frequency = NATIVE_FREQUENCY;
-    f.codec_frequency = NATIVE_FREQUENCY;
+    dst->format = *format;
+    dst->format.frequency = NATIVE_FREQUENCY;
+    dst->format.codec_frequency = NATIVE_FREQUENCY;
 
-    if (!active)
-    {
-        DEBUGF("  DSP_PROC_RESAMPLE- not active\n");
-        dst->format = f; /* Keep track */
-        return; /* No resampling required */
-    }
+    if (active)
+        return PROC_NEW_FORMAT_OK;
 
-    format_change_ack(&src->format);
-
-    if (EQU_SAMPLE_FORMAT(f, dst->format))
-    {
-        DEBUGF("  DSP_PROC_RESAMPLE- same dst format\n");
-        format_change_ack(&f); /* Nothing changed that matters downstream */
-    }
-
-    dst->format = f;
-    dsp_proc_call(this, buf_p, 0);
+    /* No longer needed */
+    DEBUGF("  DSP_PROC_RESAMPLE- deactivated\n");
+    return PROC_NEW_FORMAT_DEACTIVATED;
 }
 
-static void lin_resample_init(struct dsp_config *dsp,
-                              enum dsp_ids dsp_id)
+static void INIT_ATTR lin_resample_dsp_init(struct dsp_config *dsp,
+                                            enum dsp_ids dsp_id)
 {
-    /* Always enable resampler so that format changes may be monitored and
-     * it self-activated when required */
-    dsp_proc_enable(dsp, DSP_PROC_RESAMPLE, true);
-
     int32_t *lbuf, *rbuf;
 
     switch (dsp_id)
@@ -265,8 +245,19 @@ static void lin_resample_init(struct dsp_config *dsp,
         return;
     }
 
-    resample_data[dsp_id].resample_buf_arr[0] = lbuf;
-    resample_data[dsp_id].resample_buf_arr[1] = rbuf;
+    /* Always enable resampler so that format changes may be monitored and
+     * it self-activated when required */
+    dsp_proc_enable(dsp, DSP_PROC_RESAMPLE, true);
+    resample_data[dsp_id].resample_out_p[0] = lbuf;
+    resample_data[dsp_id].resample_out_p[1] = rbuf;
+}
+
+static void INIT_ATTR lin_resample_proc_init(struct dsp_proc_entry *this,
+                                             struct dsp_config *dsp)
+{
+    dsp_proc_set_in_place(dsp, DSP_PROC_RESAMPLE, false);
+    this->data = (intptr_t)&resample_data[dsp_get_id(dsp)];
+    this->process = lin_resample_process;
 }
 
 /* DSP message hook */
@@ -275,10 +266,12 @@ static intptr_t lin_resample_configure(struct dsp_proc_entry *this,
                                        unsigned int setting,
                                        intptr_t value)
 {
+    intptr_t retval = 0;
+
     switch (setting)
     {
     case DSP_INIT:
-        lin_resample_init(dsp, (enum dsp_ids)value);
+        lin_resample_dsp_init(dsp, (enum dsp_ids)value);
         break;
 
     case DSP_FLUSH:
@@ -286,21 +279,21 @@ static intptr_t lin_resample_configure(struct dsp_proc_entry *this,
         break;
 
     case DSP_PROC_INIT:
-        this->data = (intptr_t)&resample_data[dsp_get_id(dsp)];
-        this->ip_mask = 0; /* Not in-place */
-        this->process[0] = lin_resample_process;
-        this->process[1] = lin_resample_new_format;
-        ((struct resample_data *)this->data)->dsp = dsp;
+        lin_resample_proc_init(this, dsp);
         break;
 
     case DSP_PROC_CLOSE:
         /* This stage should be enabled at all times */
         DEBUGF("DSP_PROC_RESAMPLE- Error: Closing!\n");
         break;
+
+    case DSP_PROC_NEW_FORMAT:
+        retval = lin_resample_new_format(this, dsp,
+                                         (struct sample_format *)value);
+        break;
     }
 
-    return 1;
-    (void)value;
+    return retval;
 }
 
 /* Database entry */

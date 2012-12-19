@@ -90,7 +90,7 @@ static void tone_process(struct dsp_proc_entry *this,
                          struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *buf = *buf_p;
-    filter_process((void *)this->data, buf->p32, buf->remcount,
+    filter_process((struct dsp_filter *)this->data, buf->p32, buf->remcount,
                    buf->format.num_channels);
 }
 
@@ -104,15 +104,17 @@ static intptr_t tone_configure(struct dsp_proc_entry *this,
     {
     case DSP_PROC_INIT:
         if (value != 0)
-            break;
+            break; /* Already enabled */
+
         this->data = (intptr_t)&tone_filters[dsp_get_id(dsp)];
-        this->process[0] = tone_process;
+        this->process = tone_process;
+        /* Fall-through */
     case DSP_FLUSH:
         filter_flush((struct dsp_filter *)this->data);
         break;
     }
 
-    return 1;
+    return 0;
 }
 
 /* Database entry */

@@ -34,6 +34,13 @@
 #define DSP_PROC_DB_CREATE
 #include "dsp_proc_entry.h"
 
+#ifndef DSP_PROCESS_START
+/* These do nothing if not previously defined */
+#define DSP_PROCESS_START()
+#define DSP_PROCESS_LOOP()
+#define DSP_PROCESS_END()
+#endif /* !DSP_PROCESS_START */
+
 /* Linked lists give fewer loads in processing loop compared to some index
  * list, which is more important than keeping occasionally executed code
  * simple */
@@ -41,23 +48,22 @@
 struct dsp_config
 {
     /** General DSP-local data **/
-    struct sample_io_data io_data; /* Sample input-output data (first) */
-    uint32_t slot_free_mask;       /* Mask of free slots for this DSP */
-    uint32_t proc_masks[2];        /* Mask of active/enabled stages */
+    struct sample_io_data io_data;  /* Sample input-output data (first) */
+    uint32_t slot_free_mask;        /* Mask of free slots for this DSP */
+    uint32_t proc_mask_enabled;     /* Mask of enabled stages */
+    uint32_t proc_mask_active;      /* Mask of active stages */
     struct dsp_proc_slot
     {
         struct dsp_proc_entry proc_entry; /* This enabled stage */
-        struct dsp_proc_slot *next[2]; /* [0]=active next, [1]=enabled next */
-        const struct dsp_proc_db_entry *db_entry;
-    } *proc_slots[2];              /* Pointer to first in list of
-                                      active/enabled stages */
-
-    /** Misc. extra stuff **/
-#if 0 /* Not needed now but enable if something must know this */
-    bool processing;               /* DSP is processing (to thwart inopportune
-                                      buffer moves) */
-#endif
+        struct dsp_proc_slot *next; /* Next enabled slot */
+        uint32_t mask;              /* In place operation mask/flag */
+        uint8_t version;            /* Sample format version */
+        uint8_t db_index;           /* Index in database array */
+    } *proc_slots;                  /* Pointer to first in list of enabled
+                                       stages */
 };
+
+#define NACT_BIT    BIT_N(___DSP_PROC_ID_RESERVED)
 
 /* Pool of slots for stages - supports 32 or fewer combined as-is atm. */
 static struct dsp_proc_slot
@@ -67,6 +73,11 @@ dsp_proc_slot_arr[DSP_NUM_PROC_STAGES+DSP_VOICE_NUM_PROC_STAGES] IBSS_ATTR;
 static struct dsp_config dsp_conf[DSP_COUNT] IBSS_ATTR;
 
 /** Processing stages support functions **/
+static const struct dsp_proc_db_entry *
+proc_db_entry(const struct dsp_proc_slot *s)
+{
+    return dsp_proc_database[s->db_index];
+}
 
 /* Find the slot for a given enabled id */
 static struct dsp_proc_slot * find_proc_slot(struct dsp_config *dsp,
@@ -74,17 +85,17 @@ static struct dsp_proc_slot * find_proc_slot(struct dsp_config *dsp,
 {
     const uint32_t mask = BIT_N(id);
 
-    if ((dsp->proc_masks[1] & mask) == 0)
+    if (!(dsp->proc_mask_enabled & mask))
         return NULL; /* Not enabled */
 
-    struct dsp_proc_slot *s = dsp->proc_slots[1];
+    struct dsp_proc_slot *s = dsp->proc_slots;
 
-    while (1) /* In proc_masks == it must be there */
+    while (1) /* In proc_mask_enabled == it must be there */
     {
-        if (BIT_N(s->db_entry->id) == mask)
+        if (BIT_N(proc_db_entry(s)->id) == mask)
             return s;
 
-        s = s->next[1];
+        s = s->next;
     }
 }
 
@@ -94,52 +105,21 @@ static intptr_t proc_broadcast(struct dsp_config *dsp, unsigned int setting,
                                intptr_t value)
 {
     bool multi = setting < DSP_PROC_SETTING;
-    struct dsp_proc_slot *s = multi ?
-        dsp->proc_slots[1] : find_proc_slot(dsp, setting - DSP_PROC_SETTING);
+    struct dsp_proc_slot *s = multi ? dsp->proc_slots :
+        find_proc_slot(dsp, setting - DSP_PROC_SETTING);
 
     while (s != NULL)
     {
-        intptr_t ret = s->db_entry->configure(&s->proc_entry, dsp, setting,
-                                              value);
+        intptr_t ret = proc_db_entry(s)->configure(
+                            &s->proc_entry, dsp, setting, value);
+
         if (!multi)
             return ret;
 
-        s = s->next[1];
+        s = s->next;
     }
 
     return multi ? 1 : 0;
-}
-
-/* Generic handler for this->process[0] */
-static void dsp_process_null(struct dsp_proc_entry *this,
-                             struct dsp_buffer **buf_p)
-{
-    (void)this; (void)buf_p;
-}
-
-/* Generic handler for this->process[1] */
-static void dsp_format_change_process(struct dsp_proc_entry *this,
-                                      struct dsp_buffer **buf_p)
-{
-    enum dsp_proc_ids id =
-        TYPE_FROM_MEMBER(struct dsp_proc_slot, this, proc_entry)->db_entry->id;
-
-    DSP_PRINT_FORMAT(<Default Handler>, id, (*buf_p)->format);
-
-    /* We don't keep back references to the DSP, so just search for it */
-    struct dsp_config *dsp;
-    for (unsigned int i = 0; (dsp = dsp_get_config(i)); i++)
-    {
-        /* Found one with the id, check if it's this one
-           (NULL return doesn't matter) */
-        if (&find_proc_slot(dsp, id)->proc_entry == this)
-        {
-            if (dsp_proc_active(dsp, id))
-                dsp_proc_call(this, buf_p, 0);
-
-            break;
-        }
-    }
 }
 
 /* Add an item to the enabled list */
@@ -156,44 +136,42 @@ dsp_proc_enable_enlink(struct dsp_config *dsp, uint32_t mask)
         return NULL;
     }
 
-    const struct dsp_proc_db_entry *db_entry_prev = NULL;
-    const struct dsp_proc_db_entry *db_entry;
+    unsigned int db_index = 0, db_index_prev = DSP_NUM_PROC_STAGES;
 
     /* Order of enabled list is same as DB array */
-    for (unsigned int i = 0;; i++)
+    while (1)
     {
-        if (i >= DSP_NUM_PROC_STAGES)
-            return NULL;
-
-        db_entry = dsp_proc_database[i];
-
-        uint32_t m = BIT_N(db_entry->id);
+        uint32_t m = BIT_N(dsp_proc_database[db_index]->id);
 
         if (m == mask)
             break; /* This is the one */
 
-        if (dsp->proc_masks[1] & m)
-            db_entry_prev = db_entry;
+        if (dsp->proc_mask_enabled & m)
+            db_index_prev = db_index;
+
+        if (++db_index >= DSP_NUM_PROC_STAGES)
+            return NULL;
     }
 
     struct dsp_proc_slot *s = &dsp_proc_slot_arr[slot];
 
-    if (db_entry_prev != NULL)
+    if (db_index_prev < DSP_NUM_PROC_STAGES)
     {
-        struct dsp_proc_slot *prev = find_proc_slot(dsp, db_entry_prev->id);
-        s->next[0] = prev->next[0];
-        s->next[1] = prev->next[1];
-        prev->next[1] = s;
+        struct dsp_proc_slot *prev =
+            find_proc_slot(dsp, dsp_proc_database[db_index_prev]->id);
+        s->next = prev->next;
+        prev->next = s;
     }
     else
     {
-        s->next[0] = dsp->proc_slots[0];
-        s->next[1] = dsp->proc_slots[1];
-        dsp->proc_slots[1] = s;
+        s->next = dsp->proc_slots;
+        dsp->proc_slots = s;
     }
 
-    s->db_entry = db_entry; /* record DB entry */
-    dsp->proc_masks[1] |= mask;
+    s->mask = mask | NACT_BIT;
+    s->version = 0;
+    s->db_index = db_index;
+    dsp->proc_mask_enabled |= mask;
     dsp->slot_free_mask &= ~BIT_N(slot);
 
     return s;
@@ -203,33 +181,33 @@ dsp_proc_enable_enlink(struct dsp_config *dsp, uint32_t mask)
 static struct dsp_proc_slot *
 dsp_proc_enable_delink(struct dsp_config *dsp, uint32_t mask)
 {
-    struct dsp_proc_slot *s = dsp->proc_slots[1];
+    struct dsp_proc_slot *s = dsp->proc_slots;
     struct dsp_proc_slot *prev = NULL;
 
-    while (1) /* In proc_masks == it must be there */
+    while (1) /* In proc_mask_enabled == it must be there */
     {
-        if (BIT_N(s->db_entry->id) == mask)
+        if (BIT_N(proc_db_entry(s)->id) == mask)
         {
             if (prev)
-                prev->next[1] = s->next[1];
+                prev->next = s->next;
             else
-                dsp->proc_slots[1] = s->next[1];
+                dsp->proc_slots = s->next;
 
-            dsp->proc_masks[1] &= ~mask;
+            dsp->proc_mask_enabled &= ~mask;
             dsp->slot_free_mask |= BIT_N(s - dsp_proc_slot_arr);
             return s;
         }
 
         prev = s;
-        s = s->next[1];
+        s = s->next;
     }
 }
 
 void dsp_proc_enable(struct dsp_config *dsp, enum dsp_proc_ids id,
                      bool enable)
 {
-    uint32_t mask = BIT_N(id);
-    bool enabled = dsp->proc_masks[1] & mask;
+    const uint32_t mask = BIT_N(id);
+    bool enabled = dsp->proc_mask_enabled & mask;
 
     if (enable)
     {
@@ -247,13 +225,11 @@ void dsp_proc_enable(struct dsp_config *dsp, enum dsp_proc_ids id,
         {
             /* New entry - set defaults */
             s->proc_entry.data = 0;
-            s->proc_entry.ip_mask = mask;
-            s->proc_entry.process[0] = dsp_process_null;
-            s->proc_entry.process[1] = dsp_format_change_process;
+            s->proc_entry.process = NULL;
         }
 
-        enabled = s->db_entry->configure(&s->proc_entry, dsp, DSP_PROC_INIT,
-                                         enabled) >= 0;
+        enabled = proc_db_entry(s)->configure(&s->proc_entry, dsp,
+                                              DSP_PROC_INIT, enabled) >= 0;
         if (enabled)
             return;
 
@@ -267,38 +243,7 @@ void dsp_proc_enable(struct dsp_config *dsp, enum dsp_proc_ids id,
 
     dsp_proc_activate(dsp, id, false); /* Deactivate it first */
     struct dsp_proc_slot *s = dsp_proc_enable_delink(dsp, mask);
-    s->db_entry->configure(&s->proc_entry, dsp, DSP_PROC_CLOSE, 0);
-}
-
-/* Maintain the list structure for the active list where each enabled entry
- * has a link to the next active item, even if not active which facilitates
- * switching out of format change mode by a stage during a format change.
- * When that happens, the iterator must jump over inactive but enabled
- * stages after its current position. */
-static struct dsp_proc_slot *
-dsp_proc_activate_link(struct dsp_config *dsp, uint32_t mask,
-                       struct dsp_proc_slot *s)
-{
-    uint32_t m = BIT_N(s->db_entry->id);
-    uint32_t mor = m | mask;
-
-    if (mor == m) /* Only if same single bit in common */
-    {
-        dsp->proc_masks[0] |= mask;
-        return s;
-    }
-    else if (~mor == 0) /* Only if bits complement */
-    {
-        dsp->proc_masks[0] &= mask;
-        return s->next[0];
-    }
-
-    struct dsp_proc_slot *next = s->next[1];
-    next = dsp_proc_activate_link(dsp, mask, next);
-
-    s->next[0] = next;
-
-    return (m & dsp->proc_masks[0]) ? s : next;
+    proc_db_entry(s)->configure(&s->proc_entry, dsp, DSP_PROC_CLOSE, 0);
 }
 
 /* Activate or deactivate a stage */
@@ -307,55 +252,109 @@ void dsp_proc_activate(struct dsp_config *dsp, enum dsp_proc_ids id,
 {
     const uint32_t mask = BIT_N(id);
 
-    if (!(dsp->proc_masks[1] & mask))
+    if (!(dsp->proc_mask_enabled & mask))
         return; /* Not enabled */
 
-    if (activate != !(dsp->proc_masks[0] & mask))
+    if (activate != !(dsp->proc_mask_active & mask))
         return; /* No change in state */
 
-    /* Send mask bit if activating and ones complement if deactivating */
-    dsp->proc_slots[0] = dsp_proc_activate_link(
-            dsp, activate ? mask : ~mask, dsp->proc_slots[1]);
+    struct dsp_proc_slot *s = find_proc_slot(dsp, id);
+
+    if (activate)
+    {
+        dsp->proc_mask_active |= mask;
+        s->mask &= ~NACT_BIT;
+    }        
+    else
+    {
+        dsp->proc_mask_active &= ~mask;
+        s->mask |= NACT_BIT;
+    }
 }
 
 /* Is the stage specified by the id currently active? */
 bool dsp_proc_active(struct dsp_config *dsp, enum dsp_proc_ids id)
 {
-    return (dsp->proc_masks[0] & BIT_N(id)) != 0;
+    return (dsp->proc_mask_active & BIT_N(id)) != 0;
+}
+
+/* Force the specified stage to receive a format update before the next
+ * buffer is sent to process() */
+void dsp_proc_want_format_update(struct dsp_config *dsp,
+                                 enum dsp_proc_ids id)
+{
+    struct dsp_proc_slot *s = find_proc_slot(dsp, id);
+
+    if (s)
+        s->version = 0; /* Set invalid */
+}
+
+/* Set or unset in-place operation */
+void dsp_proc_set_in_place(struct dsp_config *dsp, enum dsp_proc_ids id,
+                           bool in_place)
+{
+    struct dsp_proc_slot *s = find_proc_slot(dsp, id);
+
+    if (!s)
+        return;
+
+    const uint32_t mask = BIT_N(id);
+
+    if (in_place)
+        s->mask |= mask;
+    else
+        s->mask &= ~mask;
 }
 
 /* Determine by the rules if the processing function should be called */
-static FORCE_INLINE bool dsp_proc_should_call(struct dsp_proc_entry *this,
-                                              struct dsp_buffer *buf,
-                                              unsigned int fmt)
+static NO_INLINE bool dsp_proc_new_format(struct dsp_proc_slot *s,
+                                          struct dsp_config *dsp,
+                                          struct dsp_buffer *buf)
 {
-    uint32_t ip_mask = this->ip_mask;
+    struct dsp_proc_entry *this = &s->proc_entry;
+    struct sample_format *format = &buf->format;
 
-    return UNLIKELY(fmt != 0) || /* Also pass override value */
-           ip_mask == 0 || /* Not in-place */
-           ((ip_mask & buf->proc_mask) == 0 &&
-            (buf->proc_mask |= ip_mask, buf->remcount > 0));
+    switch (proc_db_entry(s)->configure(
+                this, dsp, DSP_PROC_NEW_FORMAT, (intptr_t)format))
+    {
+    case PROC_NEW_FORMAT_OK:
+        s->version = format->version;
+        return true;
+
+    case PROC_NEW_FORMAT_TRANSITION:
+        return true;
+
+    case PROC_NEW_FORMAT_DEACTIVATED:
+        s->version = format->version;
+        return false;
+
+    default:
+        return false;
+    }
 }
 
-/* Call this->process[fmt] according to the rules (for external call) */
-bool dsp_proc_call(struct dsp_proc_entry *this, struct dsp_buffer **buf_p,
-                   unsigned int fmt)
+static FORCE_INLINE void dsp_proc_call(struct dsp_proc_slot *s,
+                                       struct dsp_config *dsp,
+                                       struct dsp_buffer **buf_p)
 {
-    if (dsp_proc_should_call(this, *buf_p, fmt))
+    struct dsp_buffer *buf = *buf_p;
+
+    if (UNLIKELY(buf->format.version != s->version))
     {
-        this->process[fmt == (0u-1u) ? 0 : fmt](this, buf_p);
-        return true;
+        if (!dsp_proc_new_format(s, dsp, buf))
+            return;
     }
 
-    return false;
-}
+    if (s->mask)
+    {
+        if ((s->mask & (buf->proc_mask | NACT_BIT)) || buf->remcount <= 0)
+            return;
 
-#ifndef DSP_PROCESS_START
-/* These do nothing if not previously defined */
-#define DSP_PROCESS_START()
-#define DSP_PROCESS_LOOP()
-#define DSP_PROCESS_END()
-#endif /* !DSP_PROCESS_START */
+        buf->proc_mask |= s->mask;
+    }
+
+    s->proc_entry.process(&s->proc_entry, buf_p);
+}
 
 /**
  * dsp_process:
@@ -411,9 +410,6 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
     }
 
     DSP_PROCESS_START();
-#if 0 /* Not needed now but enable if something must know this */
-    dsp->processing = true;
-#endif
 
     /* Tag input with codec-specified sample format */
     src->format = dsp->io_data.format;
@@ -423,36 +419,29 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
         /* Out-of-place-processing stages take the current buf as input
          * and switch the buffer to their own output buffer */
         struct dsp_buffer *buf = src;
-        unsigned int fmt = buf->format.changed;
+
+        if (UNLIKELY(buf->format.version != dsp->io_data.sample_buf.format.version))
+            dsp_sample_input_format_change(&dsp->io_data, &buf->format);
 
         /* Convert input samples to internal format */
-        dsp->io_data.input_samples[fmt](&dsp->io_data, &buf);
-        fmt = buf->format.changed;
-
-        struct dsp_proc_slot *s = dsp->proc_slots[fmt];
+        dsp->io_data.input_samples(&dsp->io_data, &buf);
 
         /* Call all active/enabled stages depending if format is
            same/changed on the last output buffer */
-        while (s != NULL)
-        {
-            if (dsp_proc_should_call(&s->proc_entry, buf, fmt))
-            {
-                s->proc_entry.process[fmt](&s->proc_entry, &buf);
-                fmt = buf->format.changed;
-            }
-
-            /* The buffer may have changed along with the format flag */
-            s = s->next[fmt];
-        }
+        for (struct dsp_proc_slot *s = dsp->proc_slots; s; s = s->next)
+            dsp_proc_call(s, dsp, &buf);
 
         /* Don't overread/write src/destination */
         int outcount = MIN(dst->bufcount, buf->remcount);
 
-        if (fmt == 0 && outcount <= 0)
+        if (outcount <= 0)
             break; /* Output full or purged internal buffers */
 
+        if (UNLIKELY(buf->format.version != dsp->io_data.output_version))
+            dsp_sample_output_format_change(&dsp->io_data, &buf->format);
+
         dsp->io_data.outcount = outcount;
-        dsp->io_data.output_samples[fmt](&dsp->io_data, buf, dst);
+        dsp->io_data.output_samples(&dsp->io_data, buf, dst);
 
         /* Advance buffers by what output consumed and produced */
         dsp_advance_buffer32(buf, outcount);
@@ -460,10 +449,6 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
 
         DSP_PROCESS_LOOP();
     } /* while */
-
-#if 0 /* Not needed now but enable if something must know this */
-    dsp->process = false;
-#endif
 
     DSP_PROCESS_END();
 }
@@ -494,13 +479,6 @@ enum dsp_ids dsp_get_id(const struct dsp_config *dsp)
 
     return (enum dsp_ids)id;
 }
-
-#if 0 /* Not needed now but enable if something must know this */
-bool dsp_is_busy(const struct dsp_config *dsp)
-{
-    return dsp->processing;
-}
-#endif /* 0 */
 
 /* Do what needs initializing before enable/disable calls can be made.
  * Must be done before changing settings for the first time. */

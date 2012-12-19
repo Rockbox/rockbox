@@ -53,7 +53,6 @@ enum tdspeed_ops
 static struct tdspeed_state_s
 {
     struct dsp_proc_entry *this; /* this stage */
-    struct dsp_config *dsp; /* the DSP we use */
     int channels;           /* number of audio channels */
     int32_t samplerate;     /* current samplerate of input data */
     int32_t factor;         /* stretch factor (perdecimille) */
@@ -131,6 +130,10 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
     st->samplerate = samplerate;
     st->factor     = factor;
 
+    /* just discard remaining input data */
+    st->ovl_size = 0;
+    st->ovl_shift = 0;
+
     /* Check parameters */
     if (factor == PITCH_SPEED_100)
         return false;
@@ -160,10 +163,6 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
     st->src_step = st->dst_step * factor / PITCH_SPEED_100;
     st->shift_max = (st->dst_step > st->src_step) ?
                         st->dst_step : st->src_step;
-
-    /* just discard remaining input data */
-    st->ovl_size = 0;
-    st->ovl_shift = 0;
 
     st->ovl_buff[0] = overlap_buffer[0];
     st->ovl_buff[1] = overlap_buffer[1]; /* ignored if mono */
@@ -378,17 +377,14 @@ skip:;
 
 /** DSP interface **/
 
-static void tdspeed_process_new_format(struct dsp_proc_entry *this,
-                                       struct dsp_buffer **buf_p);
-
 /* Enable or disable the availability of timestretch */
 void dsp_timestretch_enable(bool enabled)
 {
     if (enabled != !tdspeed_state.this)
         return; /* No change */
 
-    dsp_proc_enable(dsp_get_config(CODEC_IDX_AUDIO), DSP_PROC_TIMESTRETCH,
-                    enabled);
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    dsp_proc_enable(dsp, DSP_PROC_TIMESTRETCH, enabled);
 }
 
 /* Set the timestretch ratio */
@@ -405,7 +401,8 @@ void dsp_set_timestretch(int32_t percent)
     if (percent == st->factor)
         return; /* no change */
 
-    dsp_configure(st->dsp, TIMESTRETCH_SET_FACTOR, percent);
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    dsp_configure(dsp, TIMESTRETCH_SET_FACTOR, percent);
 }
 
 /* Return the timestretch ratio */
@@ -459,27 +456,22 @@ static void tdspeed_process(struct dsp_proc_entry *this,
 }
 
 /* Process format changes and settings changes */
-static void tdspeed_process_new_format(struct dsp_proc_entry *this,
-                                       struct dsp_buffer **buf_p)
+static intptr_t tdspeed_new_format(struct dsp_proc_entry *this,
+                                   struct dsp_config *dsp,
+                                   struct sample_format *format)
 {
-    struct dsp_buffer *src = *buf_p;
     struct dsp_buffer *dst = &dsp_outbuf;
 
     if (dst->remcount > 0)
-    {
-        *buf_p = dst;
-        return; /* output remains from an earlier call */
-    }
+        return PROC_NEW_FORMAT_TRANSITION;
 
-    DSP_PRINT_FORMAT(DSP_PROC_TIMESTRETCH, DSP_PROC_TIMESTRETCH, src->format);
+    DSP_PRINT_FORMAT(DSP_PROC_TIMESTRETCH, *format);
 
+    bool active = dsp_proc_active(dsp, DSP_PROC_TIMESTRETCH);
     struct tdspeed_state_s *st = &tdspeed_state;
-    struct dsp_config *dsp = st->dsp;
-    struct sample_format *format = &src->format;
     int channels = format->num_channels;
 
-    if (format->codec_frequency != st->samplerate ||
-        !dsp_proc_active(dsp, DSP_PROC_TIMESTRETCH))
+    if (format->codec_frequency != st->samplerate)
     {
         /* relevent parameters are changing - all overlap will be discarded */
         st->channels = channels;
@@ -489,17 +481,10 @@ static void tdspeed_process_new_format(struct dsp_proc_entry *this,
                channels,
                format->codec_frequency,
                st->factor / 100, st->factor % 100);
-        bool active = tdspeed_update(format->codec_frequency, st->factor);
+        active = tdspeed_update(format->codec_frequency, st->factor);
         dsp_proc_activate(dsp, DSP_PROC_TIMESTRETCH, active);
-
-        if (!active)
-        {
-            DEBUGF("  DSP_PROC_RESAMPLE- not active\n");
-            dst->format = src->format; /* Keep track */
-            return; /* no more for now */
-        }
     }
-    else if (channels != st->channels)
+    else if (active && channels != st->channels)
     {
         /* channel count transistion - have to make old data in overlap
            buffer compatible with new format */
@@ -525,20 +510,25 @@ static void tdspeed_process_new_format(struct dsp_proc_entry *this,
         }
     }
 
-    struct sample_format f = *format;
-    format_change_ack(format);
+    dst->format = *format;
 
-    if (EQU_SAMPLE_FORMAT(f, dst->format))
-    {
-        DEBUGF("  DSP_PROC_TIMESTRETCH- same dst format\n");
-        format_change_ack(&f); /* nothing changed that matters downstream */
-    }
+    if (active)
+        return PROC_NEW_FORMAT_OK;
 
-    dst->format = f;
+    /* Nothing to do */
+    DEBUGF("  DSP_PROC_RESAMPLE- deactivated\n");
+    return PROC_NEW_FORMAT_DEACTIVATED;
 
-    /* return to normal processing */
-    this->process[0] = tdspeed_process;
-    dsp_proc_call(this, buf_p, 0);
+    (void)this;
+}
+
+static void INIT_ATTR tdspeed_dsp_init(struct tdspeed_state_s *st,
+                                       enum dsp_ids dsp_id)
+{
+    /* everything is at 100% until dsp_set_timestretch is called with
+       some other value and timestretch is enabled at the time */
+    if (dsp_id == CODEC_IDX_AUDIO)
+        st->factor = PITCH_SPEED_100;
 }
 
 /* DSP message hook */
@@ -547,15 +537,14 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
                                   unsigned int setting,
                                   intptr_t value)
 {
+    intptr_t retval = 0;
+
     struct tdspeed_state_s *st = &tdspeed_state;
 
     switch (setting)
     {
     case DSP_INIT:
-        /* everything is at 100% until dsp_set_timestretch is called with
-           some other value and timestretch is enabled at the time */
-        if (value == CODEC_IDX_AUDIO)
-            st->factor = PITCH_SPEED_100;
+        tdspeed_dsp_init(st, (enum dsp_ids)value);
         break;
 
     case DSP_FLUSH:
@@ -567,10 +556,8 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
             return -1; /* fail the init */
 
         st->this = this;
-        st->dsp = dsp;
-        this->ip_mask = 0; /* not in-place */
-        this->process[0] = tdspeed_process;
-        this->process[1] = tdspeed_process_new_format;
+        dsp_proc_set_in_place(dsp, DSP_PROC_TIMESTRETCH, false);
+        this->process = tdspeed_process;
         break;
 
     case DSP_PROC_CLOSE:
@@ -580,17 +567,18 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
         tdspeed_free_buffers(buffers, NBUFFERS);
         break;
 
+    case DSP_PROC_NEW_FORMAT:
+        retval = tdspeed_new_format(this, dsp, (struct sample_format *)value);
+        break;
+
     case TIMESTRETCH_SET_FACTOR:
-        /* force update as a format change */
         st->samplerate = 0;
         st->factor = (int32_t)value;
-        st->this->process[0] = tdspeed_process_new_format;
-        dsp_proc_activate(st->dsp, DSP_PROC_TIMESTRETCH, true);
+        dsp_proc_want_format_update(dsp, DSP_PROC_TIMESTRETCH);
         break;
     }
 
-    return 1;
-    (void)value;
+    return retval;
 }
 
 void tdspeed_move(int i, void* current, void* new)

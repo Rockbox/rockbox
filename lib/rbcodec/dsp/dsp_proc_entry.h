@@ -79,7 +79,7 @@ struct dsp_proc_db_entry;
 #define DSP_PROC_DB_START \
     enum dsp_proc_ids             \
     {                             \
-        ___DSP_PROC_ID_FIRST = -1,
+        ___DSP_PROC_ID_RESERVED = 0,
 
 #define DSP_PROC_DB_ITEM(name) \
     DSP_PROC_##name,
@@ -102,19 +102,24 @@ typedef void (*dsp_proc_fn_type)(struct dsp_proc_entry *this,
  * The structure allocated to every stage when enabled.
  *
  * default settings:
- *  .data       = 0
- *  .ip_mask    = BIT_N(dsp_proc_db_entry.id)
- *  .process[0] = dsp_process_null
- *  .process[1] = dsp_format_change_process
+ *  .data    = 0
+ *  .process = NULL
  *
  * DSP_PROC_INIT handler just has to change what it needs to change. It may
  * also be modified at any time to implement the stage's demands.
  */
 struct dsp_proc_entry
 {
-    intptr_t data;    /* 00h: any value, at beginning for easy asm use */
-    uint32_t ip_mask; /* In-place id bit (0 or id bit flag if in-place) */
-    dsp_proc_fn_type process[2]; /* Processing normal/format changes */
+    intptr_t         data;    /* 00h: any value, used by asm */
+    dsp_proc_fn_type process; /* Processing vector */
+};
+
+/* Return values for DSP_PROC_NEW_FORMAT setting */
+enum
+{
+    PROC_NEW_FORMAT_OK = 0,      /* Acks, calls process() (default) */
+    PROC_NEW_FORMAT_DEACTIVATED, /* Acks, does not call process() */
+    PROC_NEW_FORMAT_TRANSITION   /* Does not ack, calls process() */
 };
 
 /* DSP transform configure function prototype */
@@ -137,10 +142,24 @@ void dsp_proc_activate(struct dsp_config *dsp, enum dsp_proc_ids id,
 /* Is the specified stage active on the DSP? */
 bool dsp_proc_active(struct dsp_config *dsp, enum dsp_proc_ids id);
 
-/* Call this->process[fmt] according to the rules
- * pass (unsigned)-1 to call function 0 with no restriction */
-bool dsp_proc_call(struct dsp_proc_entry *this, struct dsp_buffer **buf_p,
-                   unsigned int fmt);
+/* Force the specified stage to receive a format update before the next
+ * buffer is sent to process() */
+void dsp_proc_want_format_update(struct dsp_config *dsp,
+                                 enum dsp_proc_ids id);
+
+/* Set or unset in-place operation */
+void dsp_proc_set_in_place(struct dsp_config *dsp, enum dsp_proc_ids id,
+                           bool in_place);
+
+#define DSP_PRINT_FORMAT(id, format) \
+    DEBUGF("DSP format- " #id "\n"                      \
+           "  ver:%u ch:%u fb:%u os:%u hz:%u chz:%u\n", \
+           (unsigned int)(format).version               \
+           (unsigned int)(format).num_channels,         \
+           (unsigned int)(format).frac_bits,            \
+           (unsigned int)(format).output_scale,         \
+           (unsigned int)(format).frequency,            \
+           (unsigned int)(format).codec_frequency);
 
 struct dsp_proc_db_entry
 {

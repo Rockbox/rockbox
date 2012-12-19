@@ -21,12 +21,12 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include "fixedpoint.h"
 #include "dsp_core.h"
 #include "dsp_sample_io.h"
+#include "dsp_proc_entry.h"
 
-#if 1
-#include <debug.h>
-#else
+#if 0
 #undef DEBUGF
 #define DEBUGF(...)
 #endif
@@ -50,6 +50,8 @@
 
 extern void dsp_sample_output_init(struct sample_io_data *this);
 extern void dsp_sample_output_flush(struct sample_io_data *this);
+extern void dsp_sample_output_format_change(struct sample_io_data *this,
+                                            struct sample_format *format);
 
 #define SAMPLE_BUF_COUNT 128 /* Per channel, per DSP */
 /* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
@@ -75,8 +77,8 @@ static FORCE_INLINE int sample_input_setup(struct sample_io_data *this,
     int count = MIN(s->remcount, SAMPLE_BUF_COUNT);
 
     d->remcount  = count;
-    d->p32[0]    = this->sample_buf_arr[0];
-    d->p32[1]    = this->sample_buf_arr[channels - 1];
+    d->p32[0]    = this->sample_buf_p[0];
+    d->p32[1]    = this->sample_buf_p[channels - 1];
     d->proc_mask = s->proc_mask;
 
     return count;
@@ -210,9 +212,9 @@ static void sample_input_ni_stereo32(struct sample_io_data *this,
 }
 
 /* set the to-native sample conversion function based on dsp sample
- * parameters */
-static void dsp_sample_input_format_change(struct sample_io_data *this,
-                                           struct dsp_buffer **buf_p)
+ * parameters - depends upon stereo_mode and sample_depth */
+void dsp_sample_input_format_change(struct sample_io_data *this,
+                                    struct sample_format *format)
 {
     static const sample_input_fn_type fns[STEREO_NUM_MODES][2] =
     {
@@ -227,33 +229,35 @@ static void dsp_sample_input_format_change(struct sample_io_data *this,
               sample_input_mono32 },
     };
 
-    struct dsp_buffer *src = *buf_p;
-    struct dsp_buffer *dst = &this->sample_buf;
+    if (this->sample_buf.remcount > 0)
+        return;
 
-    /* Ack configured format change */
-    format_change_ack(&this->format);
+    DSP_PRINT_FORMAT(DSP Input, this->format);
 
-    if (dst->remcount > 0)
-    {
-        *buf_p = dst;
-        return; /* data still remains */
-    }
-
-    DSP_PRINT_FORMAT(DSP Input, -1, src->format);
-
-    /* new format - remember it and pass it along */
-    dst->format = src->format;
-    this->input_samples[0] = fns[this->stereo_mode]
-                                [this->sample_depth > NATIVE_DEPTH ? 1 : 0];
-
-    this->input_samples[0](this, buf_p);
-
-    if (*buf_p == dst) /* buffer switch? */
-        format_change_ack(&src->format);
+    this->format_dirty = 0;
+    this->sample_buf.format = *format;
+    this->input_samples = fns[this->stereo_mode]
+                             [this->sample_depth > NATIVE_DEPTH ? 1 : 0];
 }
 
-static void dsp_sample_input_init(struct sample_io_data *this,
-                                  enum dsp_ids dsp_id)
+/* increment the format version counter */
+static void format_change_set(struct sample_io_data *this)
+{
+    if (this->format_dirty)
+        return;
+
+    this->format.version = (uint8_t)(this->format.version + 1) ?: 1;
+    this->format_dirty = 1;
+}
+
+/* discard the sample buffer */
+static void dsp_sample_input_flush(struct sample_io_data *this)
+{
+    this->sample_buf.remcount = 0;
+}
+
+static void INIT_ATTR dsp_sample_input_init(struct sample_io_data *this,
+                                            enum dsp_ids dsp_id)
 {
     int32_t *lbuf, *rbuf;
 
@@ -274,17 +278,15 @@ static void dsp_sample_input_init(struct sample_io_data *this,
         return;
     }
 
-    this->sample_buf_arr[0] = lbuf;
-    this->sample_buf_arr[1] = rbuf;
-
-    this->input_samples[0] = sample_input_ni_stereo32;
-    this->input_samples[1] = dsp_sample_input_format_change;
+    this->sample_buf_p[0] = lbuf;
+    this->sample_buf_p[1] = rbuf;
 }
 
-/* discard the sample buffer */
-static void dsp_sample_input_flush(struct sample_io_data *this)
+static void INIT_ATTR dsp_sample_io_init(struct sample_io_data *this,
+                                         enum dsp_ids dsp_id)
 {
-    this->sample_buf.remcount = 0;
+    dsp_sample_input_init(this, dsp_id);
+    dsp_sample_output_init(this);
 }
 
 void dsp_sample_io_configure(struct sample_io_data *this,
@@ -294,13 +296,12 @@ void dsp_sample_io_configure(struct sample_io_data *this,
     switch (setting)
     {
     case DSP_INIT:
-        dsp_sample_input_init(this, (enum dsp_ids)value);
-        dsp_sample_output_init(this);
+        dsp_sample_io_init(this, (enum dsp_ids)value);
         break;
 
     case DSP_RESET:
         /* Reset all sample descriptions to default */
-        format_change_set(&this->format);
+        format_change_set(this);
         this->format.num_channels = 2;
         this->format.frac_bits = WORD_FRACBITS;
         this->format.output_scale = WORD_FRACBITS + 1 - NATIVE_DEPTH;
@@ -311,14 +312,14 @@ void dsp_sample_io_configure(struct sample_io_data *this,
         break;
 
     case DSP_SET_FREQUENCY:
+        format_change_set(this);
         value = value > 0 ? value : NATIVE_FREQUENCY;
-        format_change_set(&this->format);
         this->format.frequency = value;
         this->format.codec_frequency = value;
         break;
 
     case DSP_SET_SAMPLE_DEPTH:
-        format_change_set(&this->format);
+        format_change_set(this);
         this->format.frac_bits =
             value <= NATIVE_DEPTH ? WORD_FRACBITS : value;
         this->format.output_scale =
@@ -327,7 +328,7 @@ void dsp_sample_io_configure(struct sample_io_data *this,
         break;
 
     case DSP_SET_STEREO_MODE:
-        format_change_set(&this->format);
+        format_change_set(this);
         this->format.num_channels = value == STEREO_MONO ? 1 : 2;
         this->stereo_mode = value;
         break;
@@ -335,6 +336,13 @@ void dsp_sample_io_configure(struct sample_io_data *this,
     case DSP_FLUSH:
         dsp_sample_input_flush(this);
         dsp_sample_output_flush(this);
+        break;
+
+    case DSP_SET_PITCH:
+        format_change_set(this);
+        value = value > 0 ? value : (1 << 16);
+        this->format.frequency =
+            fp_mul(value, this->format.codec_frequency, 16);
         break;
     }
 }

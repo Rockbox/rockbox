@@ -156,8 +156,10 @@ static intptr_t eq_configure(struct dsp_proc_entry *this,
     {
     case DSP_PROC_INIT:
         if (value != 0)
-            break;
-        this->process[0] = eq_process;
+            break; /* Already enabled */
+
+        this->process = eq_process;
+        /* Fall-through */
     case DSP_PROC_CLOSE:
         pga_enable_gain(PGA_EQ_PRECUT, setting == DSP_PROC_INIT);
         break;
@@ -167,7 +169,7 @@ static intptr_t eq_configure(struct dsp_proc_entry *this,
         break;
     }
 
-    return 1;
+    return 0;
     (void)dsp;
 }
 

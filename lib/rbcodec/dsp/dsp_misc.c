@@ -26,7 +26,6 @@
 #include "fixedpoint.h"
 #include "replaygain.h"
 #include "dsp_proc_entry.h"
-#include "dsp_sample_io.h"
 #include "dsp_misc.h"
 #include "pga.h"
 #include "channel_mode.h"
@@ -113,20 +112,21 @@ static int32_t pitch_ratio = PITCH_SPEED_100;
 
 static void dsp_pitch_update(struct dsp_config *dsp)
 {
-    /* Account for playback speed adjustment when setting dsp->frequency
-       if we're called from the main audio thread. Voice playback thread
-       does not support this feature. */
-    struct sample_io_data *data = (void *)dsp;
-    data->format.frequency =
-        (int64_t)pitch_ratio * data->format.codec_frequency / PITCH_SPEED_100;
+    dsp_configure(dsp, DSP_SET_PITCH,
+                  fp_div(pitch_ratio, PITCH_SPEED_100, 16));
 }
 
 static void dsp_set_pitch(int32_t percent)
 {
-    pitch_ratio = percent > 0 ? percent : PITCH_SPEED_100;
-    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
-    struct sample_io_data *data = (void *)dsp;
-    dsp_configure(dsp, DSP_SWITCH_FREQUENCY, data->format.codec_frequency);
+    if (percent <= 0)
+        percent = PITCH_SPEED_100;
+
+    if (percent == pitch_ratio)
+        return;
+
+    pitch_ratio = percent;
+
+    dsp_pitch_update(dsp_get_config(CODEC_IDX_AUDIO));
 }
 #endif /* HAVE_PITCHCONTROL */
 
@@ -173,6 +173,13 @@ int dsp_callback(int msg, intptr_t param)
     return retval;
 }
 
+static void INIT_ATTR misc_dsp_init(struct dsp_config *dsp,
+                                    enum dsp_ids dsp_id)
+{
+    /* Enable us for the audio DSP at startup */
+    if (dsp_id == CODEC_IDX_AUDIO)
+        dsp_proc_enable(dsp, DSP_PROC_MISC_HANDLER, true);
+}
 
 /* This is a null-processing stage that monitors as an enabled stage but never
  * becomes active in processing samples. It only hooks messages. */
@@ -186,9 +193,7 @@ static intptr_t misc_handler_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_INIT:
-        /* Enable us for the audio DSP at startup */
-        if (value == CODEC_IDX_AUDIO)
-            dsp_proc_enable(dsp, DSP_PROC_MISC_HANDLER, true);
+        misc_dsp_init(dsp, (enum dsp_ids)value);
         break;
 
     case DSP_PROC_CLOSE:
@@ -212,7 +217,7 @@ static intptr_t misc_handler_configure(struct dsp_proc_entry *this,
 #endif
     }
 
-    return 1;
+    return 0;
     (void)this;
 }
 

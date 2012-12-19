@@ -42,15 +42,24 @@ typedef void (*sample_output_fn_type)(struct sample_io_data *this,
 /* This becomes part of the DSP aggregate */
 struct sample_io_data
 {
-    int outcount;                /* 00h: Output count */
-    struct sample_format format; /* General format info */
-    int sample_depth; /* Codec-specified sample depth */           
-    int stereo_mode;  /* Codec-specified input format */
-    sample_input_fn_type input_samples[2]; /* input functions */
+    int outcount;                 /* 00h: Output count */
+    struct sample_format format;  /* Format for next dsp_process call */
+    int sample_depth;             /* Codec-specified sample depth */           
+    int stereo_mode;              /* Codec-specified channel format */
+    sample_input_fn_type input_samples; /* Initial input function */
     struct dsp_buffer sample_buf; /* Buffer descriptor for converted samples */
-    int32_t *sample_buf_arr[2];   /* Internal format buffer pointers */
-    sample_output_fn_type output_samples[2]; /* Final output functions */
+    int32_t *sample_buf_p[2];     /* Internal format buffer pointers */
+    sample_output_fn_type output_samples; /* Final output function */
+    uint8_t format_dirty;         /* Format change set, avoids superfluous
+                                     increments before carrying it out */
+    uint8_t output_version;       /* Format version of src buffer at output */
 };
+
+void dsp_sample_input_format_change(struct sample_io_data *this,
+                                    struct sample_format *format);
+
+void dsp_sample_output_format_change(struct sample_io_data *this,
+                                     struct sample_format *format);
 
 /* Sample IO watches the format setting from the codec */
 void dsp_sample_io_configure(struct sample_io_data *this,

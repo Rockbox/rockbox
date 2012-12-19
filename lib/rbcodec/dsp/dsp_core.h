@@ -39,8 +39,10 @@ enum dsp_settings
     DSP_SET_SAMPLE_DEPTH,
     DSP_SET_STEREO_MODE,
     DSP_FLUSH,
+    DSP_SET_PITCH,
     DSP_PROC_INIT,
     DSP_PROC_CLOSE,
+    DSP_PROC_NEW_FORMAT,
     DSP_PROC_SETTING, /* stage-specific should be this + id */
 };
 
@@ -54,10 +56,13 @@ enum dsp_stereo_modes
     STEREO_NUM_MODES,
 };
 
-/* Format into for the buffer (if .valid == true) */
+/* Format into for the buffer */
 struct sample_format
 {
-    uint8_t changed;         /* 00h: 0=no change, 1=changed (is also index) */
+    uint8_t version;         /* 00h: format version number (never == 0,
+                                     0 is used to detect format calls for
+                                     individual stages, such as when they
+                                     are newly enabled) */
     uint8_t num_channels;    /* 01h: number of channels of data */
     uint8_t frac_bits;       /* 02h: number of fractional bits */
     uint8_t output_scale;    /* 03h: output scaling shift */
@@ -65,16 +70,6 @@ struct sample_format
     int32_t codec_frequency; /* 08h: codec-specifed sample rate */
                              /* 0ch */
 };
-
-/* Compare format data only */
-#define EQU_SAMPLE_FORMAT(f1, f2) \
-    (!memcmp(&(f1).num_channels, &(f2).num_channels, \
-             sizeof (f1) - sizeof ((f1).changed)))
-
-static inline void format_change_set(struct sample_format *f)
-    { f->changed = 1; }
-static inline void format_change_ack(struct sample_format *f)
-    { f->changed = 0; }
 
 /* Used by ASM routines - keep field order or else fix the functions */
 struct dsp_buffer
@@ -133,29 +128,11 @@ static inline void dsp_advance_buffer32(struct dsp_buffer *buf,
     buf->p32[1] += by_count;
 }
 
-/** For use by processing stages **/
-
-#define DSP_PRINT_FORMAT(name, id, format) \
-    DEBUGF("DSP format- " #name "\n"                          \
-           "  id:%d chg:%c ch:%u fb:%u os:%u hz:%u chz:%u\n", \
-           (int)id,                                           \
-           (format).changed ? 'y' : 'n',                      \
-           (unsigned int)(format).num_channels,               \
-           (unsigned int)(format).frac_bits,                  \
-           (unsigned int)(format).output_scale,               \
-           (unsigned int)(format).frequency,                  \
-           (unsigned int)(format).codec_frequency);
-
 /* Get DSP pointer */
 struct dsp_config * dsp_get_config(enum dsp_ids id);
 
 /* Get DSP id */
 enum dsp_ids dsp_get_id(const struct dsp_config *dsp);
-
-#if 0 /* Not needed now but enable if something must know this */
-/* Is the DSP processing a buffer? */
-bool dsp_is_busy(const struct dsp_config *dsp);
-#endif /* 0 */
 
 /** General DSP processing **/
 

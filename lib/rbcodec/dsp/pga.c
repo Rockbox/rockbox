@@ -129,13 +129,14 @@ static intptr_t pga_configure(struct dsp_proc_entry *this,
     {
     case DSP_PROC_INIT:
         if (value != 0)
-            break; /* Already initialized */
+            break; /* Already enabled */
+
         this->data = (intptr_t)&pga_data;
-        this->process[0] = pga_process;
+        this->process = pga_process;
         break;
     }
 
-    return 1;
+    return 0;
     (void)dsp;
 }
 

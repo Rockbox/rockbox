@@ -68,8 +68,7 @@ static struct crossfeed_state
         };
     };
     int32_t *index;         /* 88h: Current pointer into the delay line */
-    struct dsp_config *dsp; /* 8ch: Current DSP */
-                            /* 90h */
+                            /* 8ch */
 } crossfeed_state IBSS_ATTR;
 
 static int crossfeed_type = CROSSFEED_TYPE_NONE;
@@ -79,61 +78,20 @@ static void crossfeed_flush(struct dsp_proc_entry *this)
 {
     struct crossfeed_state *state = (void *)this->data;
 
-    if (crossfeed_type == CROSSFEED_TYPE_CUSTOM)
+    if (crossfeed_type != CROSSFEED_TYPE_CUSTOM)
+    {
+        state->vcl = state->vcr = state->vdiff = 0;
+    }
+    else
     {
         memset(state->history, 0,
             sizeof (state->history) + sizeof (state->delay));
         state->index = state->delay;
     }
-    else
-    {
-        state->vcl = state->vcr = state->vdiff = 0;
-    }
 }
 
 
 /** DSP interface **/
-
-/* Crossfeed boot/format change function */
-static void crossfeed_process_new_format(struct dsp_proc_entry *this,
-                                         struct dsp_buffer **buf_p)
-{
-    struct crossfeed_state *state = (void *)this->data;
-    struct dsp_buffer *buf = *buf_p;
-
-    DSP_PRINT_FORMAT(DSP_PROC_CROSSFEED, DSP_PROC_CROSSFEED, buf->format);
-
-    bool was_active = dsp_proc_active(state->dsp, DSP_PROC_CROSSFEED);
-    bool active = buf->format.num_channels >= 2;
-    dsp_proc_activate(state->dsp, DSP_PROC_CROSSFEED, active);
-
-    if (!active)
-    {
-        /* Can't do this. Sleep until next change */
-        DEBUGF("  DSP_PROC_CROSSFEED- deactivated\n");
-        return;
-    }
-
-    dsp_proc_fn_type fn = crossfeed_process;
-
-    if (crossfeed_type != CROSSFEED_TYPE_CUSTOM)
-    {
-        /* 1 / (F.Rforward.C) */
-        state->coef1 = (0x7fffffff / NATIVE_FREQUENCY) * 2128;
-        /* 1 / (F.Rcross.C) */
-        state->coef2 = (0x7fffffff / NATIVE_FREQUENCY) * 1000;
-        fn = crossfeed_meier_process;
-    }
-
-    if (!was_active || this->process[0] != fn)
-    {
-        crossfeed_flush(this); /* Going online or actual type change */
-        this->process[0] = fn; /* Set real function */
-    }
-
-    /* Call it once */
-    dsp_proc_call(this, buf_p, (unsigned)buf->format.changed - 1);
-}
 
 /* Set the type of crossfeed to use */
 void dsp_set_crossfeed_type(int type)
@@ -273,39 +231,83 @@ void crossfeed_meier_process(struct dsp_proc_entry *this,
 }
 #endif /* CPU */
 
+/* Update the processing function according to crossfeed type */
+static void update_process_fn(struct dsp_proc_entry *this,
+                              struct dsp_config *dsp)
+{
+    struct crossfeed_state *state = (struct crossfeed_state *)this->data;
+    dsp_proc_fn_type fn = crossfeed_process;
+
+    if (crossfeed_type != CROSSFEED_TYPE_CUSTOM)
+    {
+        /* Set up for Meier */
+        /* 1 / (F.Rforward.C) */
+        state->coef1 = (0x7fffffff / NATIVE_FREQUENCY) * 2128;
+        /* 1 / (F.Rcross.C) */
+        state->coef2 = (0x7fffffff / NATIVE_FREQUENCY) * 1000;
+        fn = crossfeed_meier_process;
+    }
+
+    if (this->process != fn)
+    {
+        this->process = fn;    /* Set proper function */
+        if (dsp_proc_active(dsp, DSP_PROC_CROSSFEED))
+            crossfeed_flush(this);
+    }
+}
+
+/* Crossfeed boot/format change function */
+static intptr_t crossfeed_new_format(struct dsp_proc_entry *this,
+                                     struct dsp_config *dsp,
+                                     struct sample_format *format)
+{
+    DSP_PRINT_FORMAT(DSP_PROC_CROSSFEED, format);
+
+    bool was_active = dsp_proc_active(dsp, DSP_PROC_CROSSFEED);
+    bool active = format->num_channels >= 2;
+    dsp_proc_activate(dsp, DSP_PROC_CROSSFEED, active);
+
+    if (active)
+    {
+        if (!was_active)
+            crossfeed_flush(this); /* Going online */
+
+        return PROC_NEW_FORMAT_OK;
+    }
+
+    /* Can't do this. Sleep until next change */
+    DEBUGF("  DSP_PROC_CROSSFEED- deactivated\n");
+    return PROC_NEW_FORMAT_DEACTIVATED;
+}
+
 /* DSP message hook */
 static intptr_t crossfeed_configure(struct dsp_proc_entry *this,
                                     struct dsp_config *dsp,
                                     unsigned int setting,
                                     intptr_t value)
 {
+    intptr_t retval = 0;
+
     switch (setting)
     {
     case DSP_PROC_INIT:
         if (value == 0)
-        {
-            /* New object */
             this->data = (intptr_t)&crossfeed_state;
-            this->process[1] = crossfeed_process_new_format;
-            ((struct crossfeed_state *)this->data)->dsp = dsp;
-        }
 
-        /* Force format change call each time */
-        this->process[0] = crossfeed_process_new_format;
-        dsp_proc_activate(dsp, DSP_PROC_CROSSFEED, true);
+        update_process_fn(this, dsp);
         break;
 
     case DSP_FLUSH:
         crossfeed_flush(this);
         break;
 
-    case DSP_PROC_CLOSE:
-        ((struct crossfeed_state *)this->data)->dsp = NULL;
+    case DSP_PROC_NEW_FORMAT:
+        retval = crossfeed_new_format(this, dsp,
+                                      (struct sample_format *)value);
         break;
     }
 
-    return 1;
-    (void)value;
+    return retval;
 }
 
 /* Database entry */

@@ -386,14 +386,16 @@ static intptr_t compressor_configure(struct dsp_proc_entry *this,
     case DSP_PROC_INIT:
         if (value != 0)
             break; /* Already enabled */
-        this->process[0] = compressor_process;
+
+        this->process = compressor_process;
+        /* Fall-through */
     case DSP_RESET:
     case DSP_FLUSH:
         release_gain = UNITY;
         break;
     }
 
-    return 1;
+    return 0;
     (void)dsp;
 }
 
