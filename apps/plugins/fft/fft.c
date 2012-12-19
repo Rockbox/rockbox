@@ -1,5 +1,5 @@
 /***************************************************************************
-*             __________               __   ___.
+ *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -21,6 +21,8 @@
 #include "plugin.h"
 
 #include "lib/helper.h"
+#include "lib/pluginlib_exit.h"
+#include "lib/configfile.h"
 #include "lib/xlcd.h"
 #include "math.h"
 #include "fracmul.h"
@@ -28,6 +30,7 @@
 #include "lib/grey.h"
 #endif
 #include "lib/mylcd.h"
+#include "lib/osd.h"
 
 
 
@@ -318,6 +321,9 @@ GREY_INFO_STRUCT
 #include "_kiss_fft_guts.h" /* sizeof(struct kiss_fft_state) */
 #include "const.h"
 
+
+/******************************* FFT globals *******************************/
+
 #define LCD_SIZE MAX(LCD_WIDTH, LCD_HEIGHT)
 
 #if (LCD_SIZE <= 511)
@@ -331,14 +337,14 @@ GREY_INFO_STRUCT
 #define ARRAYLEN_IN (FFT_SIZE)
 #define ARRAYLEN_OUT (FFT_SIZE)
 #define ARRAYLEN_PLOT (FFT_SIZE/2-1) /* FFT is symmetric, ignore DC */
-#define BUFSIZE_FFT (sizeof(struct kiss_fft_state)+sizeof(kiss_fft_cpx)*(FFT_SIZE-1))
+#define BUFSIZE_FFT (sizeof(struct kiss_fft_state)+\
+                     sizeof(kiss_fft_cpx)*(FFT_SIZE-1))
 
 #define __COEFF(type,size) type##_##size
-#define _COEFF(x, y) __COEFF(x,y) /* force the preprocessor to evaluate FFT_SIZE) */
+#define _COEFF(x, y) __COEFF(x,y) /* force CPP evaluation of FFT_SIZE */
 #define HANN_COEFF _COEFF(hann, FFT_SIZE)
 #define HAMMING_COEFF _COEFF(hamming, FFT_SIZE)
 
-/****************************** Globals ****************************/
 /* cacheline-aligned buffers with COP, otherwise word-aligned */
 /* CPU/COP only applies when compiled for more than one core */
 
@@ -370,74 +376,155 @@ static kiss_fft_cfg fft_state SHAREDBSS_ATTR;
 static char fft_buffer[CACHEALIGN_UP_SIZE(char, BUFSIZE_FFT)]
                 CACHEALIGN_AT_LEAST_ATTR(4);
 /* CPU */
-static int32_t plot_history[ARRAYLEN_PLOT];
-static int32_t plot[ARRAYLEN_PLOT];
+static uint32_t linf_magnitudes[ARRAYLEN_PLOT]; /* ling freq bin plot */
+static uint32_t logf_magnitudes[ARRAYLEN_PLOT]; /* log freq plot output */
+static uint32_t *plot;                          /* use this to plot */
 static struct
 {
     int16_t bin;   /* integer bin number */
     uint16_t frac; /* interpolation fraction */
 } binlog[ARRAYLEN_PLOT] __attribute__((aligned(4)));
 
-enum fft_window_func
+/**************************** End of FFT globals ***************************/
+
+
+/********************************* Settings ********************************/
+
+enum fft_orientation
 {
-    FFT_WF_FIRST = 0,
-    FFT_WF_HAMMING = 0,
-    FFT_WF_HANN,
+    FFT_MIN_OR = 0,
+    FFT_OR_VERT = 0, /* Amplitude vertical, frequency horizontal * */
+    FFT_OR_HORZ,     /* Amplitude horizontal, frequency vertical */
+    FFT_MAX_OR,
 };
-#define FFT_WF_COUNT (FFT_WF_HANN+1)
 
 enum fft_display_mode
 {
-    FFT_DM_FIRST = 0,
-    FFT_DM_LINES = 0,
-    FFT_DM_BARS,
-    FFT_DM_SPECTROGRAPH,
+    FFT_MIN_DM = 0,
+    FFT_DM_LINES = 0,   /* Bands are displayed as single-pixel lines * */
+    FFT_DM_BARS,        /* Bands are combined into wide bars */
+    FFT_DM_SPECTROGRAM, /* Band amplitudes are denoted by color */
+    FFT_MAX_DM,
 };
-#define FFT_DM_COUNT (FFT_DM_SPECTROGRAPH+1)
 
-static const unsigned char* const modes_text[FFT_DM_COUNT] =
-{ "Lines", "Bars", "Spectrogram" };
+enum fft_amp_scale
+{
+    FFT_MIN_AS = 0,
+    FFT_AS_LOG = 0, /* Amplitude is plotted on log scale * */
+    FFT_AS_LIN,     /* Amplitude is plotted on linear scale */
+    FFT_MAX_AS,
+};
 
-static const unsigned char* const amp_scales_text[2] =
-{ "Linear amplitude", "Logarithmic amplitude" };
+enum fft_freq_scale
+{
+    FFT_MIN_FS = 0,
+    FFT_FS_LOG = 0, /* Frequency is plotted on log scale * */
+    FFT_FS_LIN,     /* Frequency is plotted on linear scale */
+    FFT_MAX_FS
+};
 
-static const unsigned char* const freq_scales_text[2] =
-{ "Linear frequency", "Logarithmic frequency" };
+enum fft_window_func
+{
+    FFT_MIN_WF = 0,
+    FFT_WF_HAMMING = 0, /* Hamming window applied to each input frame * */
+    FFT_WF_HANN,        /* Hann window applied to each input frame */
+    FFT_MAX_WF,
+};
 
-static const unsigned char* const window_text[FFT_WF_COUNT] =
-{ "Hamming window", "Hann window" };
-
-static struct {
-    bool orientation_vertical;
-    enum fft_display_mode mode;
-    bool logarithmic_amp;
-    bool logarithmic_freq;
-    enum fft_window_func window_func;
-    int spectrogram_pos; /* row or column - only used by one at a time */
-    union
-    {
-        struct
-        {
-            bool orientation : 1;
-            bool mode        : 1;
-            bool amp_scale   : 1;
-            bool freq_scale  : 1;
-            bool window_func : 1;
-            bool do_clear    : 1;
-        };
-        bool clear_all; /* Write 'false' to clear all above */
-    } changed;
-} graph_settings SHAREDDATA_ATTR = 
+static struct fft_config
+{
+    int orientation;
+    int drawmode;
+    int amp_scale;
+    int freq_scale;
+    int window_func;
+} fft_disk = 
 {
      /* Defaults */
-    .orientation_vertical = true,
-    .mode                 = FFT_DM_LINES,
-    .logarithmic_amp      = true,
-    .logarithmic_freq     = true,
-    .window_func          = FFT_WF_HAMMING,
-    .spectrogram_pos      = 0,
-    .changed              = { .clear_all = false },
+    .orientation = FFT_OR_VERT,
+    .drawmode    = FFT_DM_LINES,
+    .amp_scale   = FFT_AS_LOG,
+    .freq_scale  = FFT_FS_LOG,
+    .window_func = FFT_WF_HAMMING,
 };
+
+#define CFGFILE_VERSION    0
+#define CFGFILE_MINVERSION 0
+
+static const char cfg_filename[] =  "fft.cfg";
+static struct configdata disk_config[] =
+{
+   { TYPE_ENUM, FFT_MIN_OR, FFT_MAX_OR,
+     { .int_p = &fft_disk.orientation }, "orientation",
+        (char * []){ [FFT_OR_VERT] = "vertical",
+                     [FFT_OR_HORZ] = "horizontal" } },
+   { TYPE_ENUM, FFT_MIN_DM, FFT_MAX_DM,
+     { .int_p = &fft_disk.drawmode }, "drawmode",
+        (char * []){ [FFT_DM_LINES]       = "lines",
+                     [FFT_DM_BARS]        = "bars",
+                     [FFT_DM_SPECTROGRAM] = "spectrogram" } },
+   { TYPE_ENUM, FFT_MIN_AS, FFT_MAX_AS,
+     { .int_p = &fft_disk.amp_scale }, "amp scale",
+        (char * []){ [FFT_AS_LOG] = "logarithmic",
+                     [FFT_AS_LIN] = "linear" } },
+   { TYPE_ENUM, FFT_MIN_FS, FFT_MAX_FS,
+     { .int_p = &fft_disk.freq_scale }, "freq scale",
+        (char * []){ [FFT_FS_LOG] = "logarithmic",
+                     [FFT_FS_LIN] = "linear" } },
+   { TYPE_ENUM, FFT_MIN_WF, FFT_MAX_WF,
+     { .int_p = &fft_disk.window_func }, "window function",
+        (char * []){ [FFT_WF_HAMMING] = "hamming",
+                     [FFT_WF_HANN]    = "hann" } },
+};
+
+/* Hint flags for setting changes */
+enum fft_setting_flags
+{
+    FFT_SETF_OR = 1 << 0,
+    FFT_SETF_DM = 1 << 1,
+    FFT_SETF_AS = 1 << 2,
+#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
+    FFT_SETF_FS = 1 << 3,
+#endif
+    FFT_SETF_WF = 1 << 4,
+    FFT_SETF_ALL = 0x1f
+};
+
+/***************************** End of settings *****************************/
+
+
+/**************************** Operational data *****************************/
+
+#define COLOR_DEFAULT_FG    MYLCD_DEFAULT_FG
+#define COLOR_DEFAULT_BG    MYLCD_DEFAULT_BG
+
+#ifdef HAVE_LCD_COLOR
+#define COLOR_MESSAGE_FRAME LCD_RGBPACK(0xc6, 0x00, 0x00)
+#define COLOR_MESSAGE_BG    LCD_BLACK
+#define COLOR_MESSAGE_FG    LCD_WHITE
+#else
+#define COLOR_MESSAGE_FRAME GREY_DARKGRAY
+#define COLOR_MESSAGE_BG    GREY_WHITE
+#define COLOR_MESSAGE_FG    GREY_BLACK
+#endif
+
+#define FFT_OSD_MARGIN_SIZE 1
+
+#define FFT_PERIOD  (HZ/50) /* How fast to try to go */
+
+/* Based on feeding-in a 0db sinewave at FS/4 */
+#define QLOG_MAX 0x0009154B
+/* Fudge it a little or it's not very visbile */
+#define QLIN_MAX (0x00002266 >> 1)
+
+static struct fft_config fft;
+typedef void (* fft_drawfn_t)(unsigned, unsigned);
+static fft_drawfn_t fft_drawfn = NULL; /* plotting function */
+static int fft_spectrogram_pos = -1; /* row or column - only used by one at a time */
+static uint32_t fft_graph_scale = 0; /* max level over time, for scaling display */
+static int fft_message_id = -1; /* current message id displayed */
+static char fft_osd_message[32]; /* current message string displayed */
+static long fft_next_frame_tick = 0; /* next tick to attempt drawing */
 
 #ifdef HAVE_LCD_COLOR
 #define SHADES BMPWIDTH_fft_colors
@@ -447,121 +534,103 @@ static struct {
 #define SPECTROGRAPH_PALETTE(index) (255 - (index))
 #endif
 
-/************************* End of globals *************************/
+/************************* End of operational data *************************/
 
-/************************* Math functions *************************/
 
-/* Based on feeding-in a 0db sinewave at FS/4 */
-#define QLOG_MAX 0x0009154B
-/* fudge it a little or it's not very visbile */
-#define QLIN_MAX (0x00002266 >> 1)
+/***************************** Math functions ******************************/
 
 /* Apply window function to input */
 static void apply_window_func(enum fft_window_func mode)
 {
-    int i;
-
-    switch(mode)
+    static const int16_t * const coefs[] =
     {
-        case FFT_WF_HAMMING:
-            for(i = 0; i < ARRAYLEN_IN; ++i)
-            {
-                input[i].r = (input[i].r * HAMMING_COEFF[i] + 16384) >> 15;
-            } 
-            break;
+        [FFT_WF_HAMMING] = HAMMING_COEFF,
+        [FFT_WF_HANN]    = HANN_COEFF,
+    };
 
-        case FFT_WF_HANN:
-            for(i = 0; i < ARRAYLEN_IN; ++i)
-            {
-                input[i].r = (input[i].r * HANN_COEFF[i] + 16384) >> 15;
-            }
-            break;
-    }
+    const int16_t * const c = coefs[mode];
+
+    for(int i = 0; i < ARRAYLEN_IN; ++i)
+        input[i].r = (input[i].r * c[i] + 16384) >> 15;
 }
 
 /* Calculates the magnitudes from complex numbers and returns the maximum */
-static int32_t calc_magnitudes(bool logarithmic_amp)
+static unsigned calc_magnitudes(enum fft_amp_scale scale)
 {
     /* A major assumption made when calculating the Q*MAX constants 
      * is that the maximum magnitude is 29 bits long. */
-    uint32_t max = 0;
+    unsigned this_max = 0;
     kiss_fft_cpx *this_output = output[output_head] + 1; /* skip DC */
-    int i;
 
     /* Calculate the magnitude, discarding the phase. */
-    for(i = 0; i < ARRAYLEN_PLOT; ++i)
+    for(int i = 0; i < ARRAYLEN_PLOT; ++i)
     {
         int32_t re = this_output[i].r;
         int32_t im = this_output[i].i;
 
-        uint32_t tmp = re*re + im*im;
+        uint32_t d = re*re + im*im;
 
-        if(tmp > 0)
+        if(d > 0)
         {
-            if(tmp > 0x7FFFFFFF) /* clip */
+            if(d > 0x7FFFFFFF) /* clip */
             {
-                tmp = 0x7FFFFFFF; /* if our assumptions are correct,
-                                     this should never happen. It's just
-                                     a safeguard. */
+                d = 0x7FFFFFFF; /* if our assumptions are correct,
+                                   this should never happen. It's just
+                                   a safeguard. */
             }
 
-            if(logarithmic_amp)
+            if(scale == FFT_AS_LOG)
             {
-                if(tmp < 0x8000) /* be more precise */
+                if(d < 0x8000) /* be more precise */
                 {
                     /* ln(x ^ .5) = .5*ln(x) */
-                    tmp = fp16_log(tmp << 16) >> 1;
+                    d = fp16_log(d << 16) >> 1;
                 }
                 else
                 {
-                    tmp = isqrt(tmp); /* linear scaling, nothing
-                                         bad should happen */
-                    tmp = fp16_log(tmp << 16); /* the log function
-                                                  expects s15.16 values */
+                    d = isqrt(d); /* linear scaling, nothing
+                                     bad should happen */
+                    d = fp16_log(d << 16); /* the log function
+                                              expects s15.16 values */
                 }
             }
             else
             {
-                tmp = isqrt(tmp); /* linear scaling, nothing
-                                     bad should happen */
+                d = isqrt(d); /* linear scaling, nothing
+                                 bad should happen */
             }
         }
 
         /* Length 2 moving average - last transform and this one */
-        tmp = (plot_history[i] + tmp) >> 1;
-        plot[i] = tmp;
-        plot_history[i] = tmp;
+        linf_magnitudes[i] = (linf_magnitudes[i] + d) >> 1;
 
-        if(tmp > max)
-            max = tmp;
+        if(d > this_max)
+            this_max = d;
     }
 
-    return max;
+    return this_max;
 }
 
 /* Move plot bins into a logarithmic scale by sliding them towards the
  * Nyquist bin according to the translation in the binlog array. */
-static void logarithmic_plot_translate(void)
+static void log_plot_translate(void)
 {
-    int i;
-
-    for(i = ARRAYLEN_PLOT-1; i > 0; --i)
+    for(int i = ARRAYLEN_PLOT-1; i > 0; --i)
     {
-        int bin;
         int s = binlog[i].bin;
         int e = binlog[i-1].bin;
-        int frac = binlog[i].frac;
+        unsigned frac = binlog[i].frac;
 
-        bin = plot[s];
+        int bin = linf_magnitudes[s];
 
         if(frac)
         {
             /* slope < 1, Interpolate stretched bins (linear for now) */
-            int diff = plot[s+1] - bin;
+            int diff = linf_magnitudes[s+1] - bin;
 
             do
             {
-                plot[i] = bin + FRACMUL(frac << 15, diff);
+                logf_magnitudes[i] = bin + FRACMUL(frac << 15, diff);
                 frac = binlog[--i].frac;
             }
             while(frac);
@@ -571,33 +640,32 @@ static void logarithmic_plot_translate(void)
             /* slope > 1, Find peak of two or more bins */
             while(--s > e)
             {
-                int val = plot[s];
+                int val = linf_magnitudes[s];
 
                 if (val > bin)
                     bin = val;
             }
         }
 
-        plot[i] = bin;
+        logf_magnitudes[i] = bin;
     }
 }
 
 /* Calculates the translation for logarithmic plot bins */
 static void logarithmic_plot_init(void)
 {
-    int i, j;
     /*
      * log: y = round(n * ln(x) / ln(n))
      * anti: y = round(exp(x * ln(n) / n))
      */
-    j = fp16_log((ARRAYLEN_PLOT - 1) << 16);
-    for(i = 0; i < ARRAYLEN_PLOT; ++i)
+    int j = fp16_log((ARRAYLEN_PLOT - 1) << 16);
+    for(int i = 0; i < ARRAYLEN_PLOT; ++i)
     {
         binlog[i].bin = (fp16_exp(i * j / (ARRAYLEN_PLOT - 1)) + 32768) >> 16;
     }
 
     /* setup fractions for interpolation of stretched bins */
-    for(i = 0; i < ARRAYLEN_PLOT-1; i = j)
+    for(int i = 0; i < ARRAYLEN_PLOT-1; i = j)
     {
         j = i + 1;
 
@@ -619,192 +687,13 @@ static void logarithmic_plot_init(void)
     }
 }
 
-/************************ End of math functions ***********************/
+/************************** End of math functions **************************/
 
-/********************* Plotting functions (modes) *********************/
-static void draw_lines_vertical(void);
-static void draw_lines_horizontal(void);
-static void draw_bars_vertical(void);
-static void draw_bars_horizontal(void);
-static void draw_spectrogram_vertical(void);
-static void draw_spectrogram_horizontal(void);
 
-#define COLOR_DEFAULT_FG    MYLCD_DEFAULT_FG
-#define COLOR_DEFAULT_BG    MYLCD_DEFAULT_BG
+/*********************** Plotting functions (modes) ************************/
 
-#ifdef HAVE_LCD_COLOR
-#define COLOR_MESSAGE_FRAME LCD_RGBPACK(0xc6, 0x00, 0x00)
-#define COLOR_MESSAGE_BG    LCD_BLACK
-#define COLOR_MESSAGE_FG    LCD_WHITE
-#else
-#define COLOR_MESSAGE_FRAME GREY_DARKGRAY
-#define COLOR_MESSAGE_BG    GREY_WHITE
-#define COLOR_MESSAGE_FG    GREY_BLACK
-#endif
-
-#define POPUP_HPADDING      3 /* 3 px of horizontal padding and */
-#define POPUP_VPADDING      2 /* 2 px of vertical padding */
-
-static void draw_message_string(const unsigned char *message, bool active)
+static void draw_lines_vertical(unsigned this_max, unsigned graph_max)
 {
-    int x, y;
-    mylcd_getstringsize(message, &x, &y);
-
-    /* x and y give the size of the box for the popup */
-    x += POPUP_HPADDING*2;
-    y += POPUP_VPADDING*2;
-
-    /* In vertical spectrogram mode, leave space for the popup
-     * before actually drawing it (if space is needed) */
-    if(active &&
-       graph_settings.mode == FFT_DM_SPECTROGRAPH &&
-       graph_settings.orientation_vertical &&
-       graph_settings.spectrogram_pos >= LCD_WIDTH - x) 
-    {
-        mylcd_scroll_left(graph_settings.spectrogram_pos -
-                          LCD_WIDTH + x);
-        graph_settings.spectrogram_pos = LCD_WIDTH - x - 1;
-    }
-
-    mylcd_set_foreground(COLOR_MESSAGE_FRAME);
-    mylcd_fillrect(LCD_WIDTH - x, 0, LCD_WIDTH - 1, y);
-
-    mylcd_set_foreground(COLOR_MESSAGE_FG);
-    mylcd_set_background(COLOR_MESSAGE_BG);
-    mylcd_putsxy(LCD_WIDTH - x + POPUP_HPADDING,
-                 POPUP_VPADDING, message);
-    mylcd_set_foreground(COLOR_DEFAULT_FG);
-    mylcd_set_background(COLOR_DEFAULT_BG);
-}
-
-static void draw(const unsigned char* message)
-{
-    static long show_message_tick = 0;
-    static const unsigned char* last_message = 0;
-
-    if(message != NULL)
-    {
-        last_message = message;
-        show_message_tick = (*rb->current_tick + HZ) | 1;
-    }
-
-    /* maybe take additional actions depending upon the changed setting */
-    if(graph_settings.changed.orientation)
-    {
-       graph_settings.changed.amp_scale = true;
-       graph_settings.changed.do_clear = true;
-    }
-
-    if(graph_settings.changed.mode)
-    {
-        graph_settings.changed.amp_scale = true;
-        graph_settings.changed.do_clear = true;
-    }
-
-    if(graph_settings.changed.amp_scale)
-        memset(plot_history, 0, sizeof (plot_history));
-
-    if(graph_settings.changed.freq_scale)
-        graph_settings.changed.freq_scale = true;
-
-    mylcd_set_foreground(COLOR_DEFAULT_FG);
-    mylcd_set_background(COLOR_DEFAULT_BG);
-
-    switch (graph_settings.mode)
-    {
-        default:
-        case FFT_DM_LINES: {
-
-            mylcd_clear_display();
-
-            if (graph_settings.orientation_vertical)
-                draw_lines_vertical();
-            else
-                draw_lines_horizontal();
-            break;
-        }
-        case FFT_DM_BARS: {
-
-            mylcd_clear_display();
-
-            if(graph_settings.orientation_vertical)
-                draw_bars_vertical();
-            else
-                draw_bars_horizontal();
-
-            break;
-        }
-        case FFT_DM_SPECTROGRAPH: {
-
-            if(graph_settings.changed.do_clear)
-            {
-                graph_settings.spectrogram_pos = 0;
-                mylcd_clear_display();
-            }
-
-            if(graph_settings.orientation_vertical)
-                draw_spectrogram_vertical();
-            else
-                draw_spectrogram_horizontal();
-            break;
-        }
-    }
-
-    if(show_message_tick != 0)
-    {
-        if(TIME_BEFORE(*rb->current_tick, show_message_tick))
-        {
-    		/* We have a message to show */
-            draw_message_string(last_message, true);
-        }
-        else
-        {
-            /* Stop drawing message */
-            show_message_tick = 0;
-        }
-    }
-    else if(last_message != NULL)
-    {
-        if(graph_settings.mode == FFT_DM_SPECTROGRAPH)
-        {
-    		/* Spectrogram mode - need to erase the popup */
-			int x, y;
-			mylcd_getstringsize(last_message, &x, &y);
-			/* Recalculate the size */
-			x += POPUP_HPADDING*2;
-			y += POPUP_VPADDING*2;
-
-			if(!graph_settings.orientation_vertical)
-			{
-				/* In horizontal spectrogram mode, just scroll up by Y lines */
-				mylcd_scroll_up(y);
-				graph_settings.spectrogram_pos -= y;
-				if(graph_settings.spectrogram_pos < 0)
-					graph_settings.spectrogram_pos = 0;
-			}
-			else
-			{
-				/* In vertical spectrogram mode, erase the popup */
-                mylcd_set_foreground(COLOR_DEFAULT_BG);
-				mylcd_fillrect(graph_settings.spectrogram_pos + 1, 0,
-                               LCD_WIDTH, y);
-                mylcd_set_foreground(COLOR_DEFAULT_FG);
-			}
-        }
-        /* else These modes clear the screen themselves */
-			
-        last_message = NULL;
-    }
-
-    mylcd_update();
-
-    graph_settings.changed.clear_all = false;
-}
-
-static void draw_lines_vertical(void)
-{
-    static int max = 0;
-
 #if LCD_WIDTH < ARRAYLEN_PLOT /* graph compression */
     const int offset = 0;
     const int plotwidth = LCD_WIDTH;
@@ -813,13 +702,7 @@ static void draw_lines_vertical(void)
     const int plotwidth = ARRAYLEN_PLOT;
 #endif
 
-    int this_max;
-    int i, x;
-
-    if(graph_settings.changed.amp_scale)
-        max = 0; /* reset the graph on scaling mode change */
-
-    this_max = calc_magnitudes(graph_settings.logarithmic_amp);
+    mylcd_clear_display();
 
     if(this_max == 0)
     {
@@ -827,21 +710,16 @@ static void draw_lines_vertical(void)
         return;
     }
 
-    if(graph_settings.logarithmic_freq)
-        logarithmic_plot_translate();
-
-    /* take the maximum of neighboring bins if we have to scale the graph
-     * horizontally */
+    /* take the maximum of neighboring bins if we have to scale down the
+     * graph horizontally */
     if(LCD_WIDTH < ARRAYLEN_PLOT) /* graph compression */
     {
         int bins_acc = LCD_WIDTH / 2;
-        int bins_max = 0;
+        unsigned bins_max = 0;
         
-        i = 0, x = 0;
-
-        for(;;)
+        for(int i = 0, x = 0; i < ARRAYLEN_PLOT; ++i)
         {
-            int bin = plot[i++];
+            unsigned bin = plot[i];
 
             if(bin > bins_max)
                 bins_max = bin;
@@ -850,14 +728,10 @@ static void draw_lines_vertical(void)
 
             if(bins_acc >= ARRAYLEN_PLOT)
             {
-                plot[x] = bins_max;
-                
-                if(bins_max > max)
-                    max = bins_max;
+                int h = LCD_HEIGHT*bins_max / graph_max;
+                mylcd_vline(x, LCD_HEIGHT - h, LCD_HEIGHT-1);
 
-                if(++x >= LCD_WIDTH)
-                    break;
-
+                x++;
                 bins_acc -= ARRAYLEN_PLOT;
                 bins_max = 0;
             }
@@ -865,21 +739,16 @@ static void draw_lines_vertical(void)
     }
     else
     {
-        if(this_max > max)
-            max = this_max;
-    }
-
-    for(x = 0; x < plotwidth; ++x)
-    {
-        int h = LCD_HEIGHT*plot[x] / max;
-        mylcd_vline(x + offset, LCD_HEIGHT - h, LCD_HEIGHT-1);
+        for(int i = 0; i < plotwidth; ++i)
+        {
+            int h = LCD_HEIGHT*plot[i] / graph_max;
+            mylcd_vline(i + offset, LCD_HEIGHT - h, LCD_HEIGHT-1);
+        }
     }
 }
 
-static void draw_lines_horizontal(void)
+static void draw_lines_horizontal(unsigned this_max, unsigned graph_max)
 {
-    static int max = 0;
-
 #if LCD_WIDTH < ARRAYLEN_PLOT /* graph compression */
     const int offset = 0;
     const int plotwidth = LCD_HEIGHT;
@@ -888,13 +757,7 @@ static void draw_lines_horizontal(void)
     const int plotwidth = ARRAYLEN_PLOT;
 #endif
 
-    int this_max;
-    int y;
-
-    if(graph_settings.changed.amp_scale)
-        max = 0; /* reset the graph on scaling mode change */
-
-    this_max = calc_magnitudes(graph_settings.logarithmic_amp);
+    mylcd_clear_display();
 
     if(this_max == 0)
     {
@@ -902,38 +765,28 @@ static void draw_lines_horizontal(void)
         return;
     }
 
-    if(graph_settings.logarithmic_freq)
-        logarithmic_plot_translate();
-
     /* take the maximum of neighboring bins if we have to scale the graph
      * horizontally */
     if(LCD_HEIGHT < ARRAYLEN_PLOT) /* graph compression */
     {
         int bins_acc = LCD_HEIGHT / 2;
-        int bins_max = 0;
-        int i = 0;
+        unsigned bins_max = 0;
 
-        y = 0;
-
-        for(;;)
+        for(int i = 0, y = 0; i < ARRAYLEN_PLOT; ++i)
         {
-            int bin = plot[i++];
+            unsigned bin = plot[i];
 
-            if (bin > bins_max)
+            if(bin > bins_max)
                 bins_max = bin;
 
             bins_acc += LCD_HEIGHT;
 
             if(bins_acc >= ARRAYLEN_PLOT)
             {
-                plot[y] = bins_max;
+                int w = LCD_WIDTH*bins_max / graph_max;
+                mylcd_hline(0, w - 1, y);
 
-                if(bins_max > max)
-                    max = bins_max;
-
-                if(++y >= LCD_HEIGHT)
-                    break;
-
+                y++;
                 bins_acc -= ARRAYLEN_PLOT;
                 bins_max = 0;
             }
@@ -941,21 +794,16 @@ static void draw_lines_horizontal(void)
     }
     else
     {
-        if(this_max > max)
-            max = this_max;
-    }
-
-    for(y = 0; y < plotwidth; ++y)
-    {
-        int w = LCD_WIDTH*plot[y] / max;
-        mylcd_hline(0, w - 1, y + offset);
+        for(int i = 0; i < plotwidth; ++i)
+        {
+            int w = LCD_WIDTH*plot[i] / graph_max;
+            mylcd_hline(0, w - 1, i + offset);
+        }
     }
 }
 
-static void draw_bars_vertical(void)
+static void draw_bars_vertical(unsigned this_max, unsigned graph_max)
 {
-    static int max = 0;
-
 #if LCD_WIDTH < LCD_HEIGHT
     const int bars = 15;
 #else
@@ -964,26 +812,20 @@ static void draw_bars_vertical(void)
     const int border = 2;
     const int barwidth = LCD_WIDTH / (bars + border);
     const int width = barwidth - border;
-    const int offset = (LCD_WIDTH - bars*barwidth) / 2;
+    const int offset = (LCD_WIDTH - bars*barwidth + border) / 2;
 
-    if(graph_settings.changed.amp_scale)
-        max = 0; /* reset the graph on scaling mode change */
-
+    mylcd_clear_display();
     mylcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-1); /* Draw baseline */
 
-    if(calc_magnitudes(graph_settings.logarithmic_amp) == 0)
+    if(this_max == 0)
         return; /* nothing more to draw */
 
-    if(graph_settings.logarithmic_freq)
-        logarithmic_plot_translate();
-
     int bins_acc = bars / 2;
-    int bins_max = 0;
-    int x = 0, i = 0;
+    unsigned bins_max = 0;
 
-    for(;;)
+    for(int i = 0, x = offset;; ++i)
     {
-        int bin = plot[i++];
+        unsigned bin = plot[i];
 
         if(bin > bins_max)
             bins_max = bin;
@@ -992,30 +834,21 @@ static void draw_bars_vertical(void)
 
         if(bins_acc >= ARRAYLEN_PLOT)
         {
-            plot[x] = bins_max;
+            int h = LCD_HEIGHT*bins_max / graph_max;
+            mylcd_fillrect(x, LCD_HEIGHT - h, width, h - 1);
 
-            if(bins_max > max)
-                max = bins_max;
-
-            if(++x >= bars)
+            if(i >= ARRAYLEN_PLOT-1)
                 break;
 
+            x += barwidth;
             bins_acc -= ARRAYLEN_PLOT;
             bins_max = 0;
         }
     }
-
-    for(i = 0, x = offset; i < bars; ++i, x += barwidth)
-    {
-        int h = LCD_HEIGHT * plot[i] / max;
-        mylcd_fillrect(x, LCD_HEIGHT - h, width, h - 1);
-    }
 }
 
-static void draw_bars_horizontal(void)
+static void draw_bars_horizontal(unsigned this_max, unsigned graph_max)
 {
-    static int max = 0;
-
 #if LCD_WIDTH < LCD_HEIGHT
     const int bars = 20;
 #else
@@ -1024,124 +857,56 @@ static void draw_bars_horizontal(void)
     const int border = 2;
     const int barwidth = LCD_HEIGHT / (bars + border);
     const int height = barwidth - border;
-    const int offset = (LCD_HEIGHT - bars*barwidth) / 2;
+    const int offset = (LCD_HEIGHT - bars*barwidth + border) / 2;
 
-    if(graph_settings.changed.amp_scale)
-        max = 0; /* reset the graph on scaling mode change */
-
+    mylcd_clear_display();
     mylcd_vline(0, 0, LCD_HEIGHT-1); /* Draw baseline */
 
-    if(calc_magnitudes(graph_settings.logarithmic_amp) == 0)
+    if(this_max == 0)
         return; /* nothing more to draw */
 
-    if(graph_settings.logarithmic_freq)
-        logarithmic_plot_translate();
-
     int bins_acc = bars / 2;
-    int bins_max = 0;
-    int y = 0, i = 0;
+    unsigned bins_max = 0;
 
-    for(;;)
+    for(int i = 0, y = offset;; ++i)
     {
-        int bin = plot[i++];
+        unsigned bin = plot[i];
 
-        if (bin > bins_max)
+        if(bin > bins_max)
             bins_max = bin;
 
         bins_acc += bars;
 
         if(bins_acc >= ARRAYLEN_PLOT)
         {
-            plot[y] = bins_max;
+            int w = LCD_WIDTH*bins_max / graph_max;
+            mylcd_fillrect(1, y, w, height);
 
-            if(bins_max > max)
-                max = bins_max;
-
-            if(++y >= bars)
+            if(i >= ARRAYLEN_PLOT-1)
                 break;
 
+            y += barwidth;
             bins_acc -= ARRAYLEN_PLOT;
             bins_max = 0;
         }
-    }
-
-    for(i = 0, y = offset; i < bars; ++i, y += barwidth)
-    {
-        int w = LCD_WIDTH * plot[i] / max;
-        mylcd_fillrect(1, y, w, height);
     }
 }
 
-static void draw_spectrogram_vertical(void)
+static void draw_spectrogram_vertical(unsigned this_max, unsigned graph_max)
 {
-    const int32_t scale_factor = MIN(LCD_HEIGHT, ARRAYLEN_PLOT);
+    const int scale_factor = MIN(LCD_HEIGHT, ARRAYLEN_PLOT);
 
-    calc_magnitudes(graph_settings.logarithmic_amp);
-
-    if(graph_settings.logarithmic_freq)
-        logarithmic_plot_translate();
-
-    int bins_acc = scale_factor / 2;
-    int bins_max = 0;
-    int y = 0, i = 0;
-
-    for(;;)
-    {
-        int bin = plot[i++];
-
-        if(bin > bins_max)
-            bins_max = bin;
-
-        bins_acc += scale_factor;
-
-        if(bins_acc >= ARRAYLEN_PLOT)
-        {
-            unsigned index;
-
-            if(graph_settings.logarithmic_amp)
-                index = (SHADES-1)*bins_max / QLOG_MAX;
-            else
-                index = (SHADES-1)*bins_max / QLIN_MAX;
-
-            /* These happen because we exaggerate the graph a little for
-             * linear mode */
-            if(index >= SHADES)
-                index = SHADES-1;
-
-            mylcd_set_foreground(SPECTROGRAPH_PALETTE(index));
-            mylcd_drawpixel(graph_settings.spectrogram_pos,
-                            scale_factor-1 - y);
-
-            if(++y >= scale_factor)
-                break;
-
-            bins_acc -= ARRAYLEN_PLOT;
-            bins_max = 0;
-        }
-    }
-
-    if(graph_settings.spectrogram_pos < LCD_WIDTH-1)
-        graph_settings.spectrogram_pos++;
+    if(fft_spectrogram_pos < LCD_WIDTH-1)
+        fft_spectrogram_pos++;
     else
         mylcd_scroll_left(1);
-}
-
-static void draw_spectrogram_horizontal(void)
-{
-    const int32_t scale_factor = MIN(LCD_WIDTH, ARRAYLEN_PLOT);
-
-    calc_magnitudes(graph_settings.logarithmic_amp);
-
-    if(graph_settings.logarithmic_freq)
-        logarithmic_plot_translate();
 
     int bins_acc = scale_factor / 2;
-    int bins_max = 0;
-    int x = 0, i = 0;
+    unsigned bins_max = 0;
 
-    for(;;)
+    for(int i = 0, y = LCD_HEIGHT-1;; ++i)
     {
-        int bin = plot[i++];
+        unsigned bin = plot[i];
 
         if(bin > bins_max)
             bins_max = bin;
@@ -1150,12 +915,7 @@ static void draw_spectrogram_horizontal(void)
 
         if(bins_acc >= ARRAYLEN_PLOT)
         {
-            unsigned index;
-
-            if(graph_settings.logarithmic_amp)
-                index = (SHADES-1)*bins_max / QLOG_MAX;
-            else
-                index = (SHADES-1)*bins_max / QLIN_MAX;
+            unsigned index = (SHADES-1)*bins_max / graph_max;
 
             /* These happen because we exaggerate the graph a little for
              * linear mode */
@@ -1163,9 +923,9 @@ static void draw_spectrogram_horizontal(void)
                 index = SHADES-1;
 
             mylcd_set_foreground(SPECTROGRAPH_PALETTE(index));
-            mylcd_drawpixel(x, graph_settings.spectrogram_pos);
+            mylcd_drawpixel(fft_spectrogram_pos, y);
 
-            if(++x >= scale_factor)
+            if(--y < 0)
                 break;
 
             bins_acc -= ARRAYLEN_PLOT;
@@ -1173,15 +933,58 @@ static void draw_spectrogram_horizontal(void)
         }
     }
 
-    if(graph_settings.spectrogram_pos < LCD_HEIGHT-1)
-        graph_settings.spectrogram_pos++;
-    else
-        mylcd_scroll_up(1);
+    (void)this_max;
 }
 
-/********************* End of plotting functions (modes) *********************/
+static void draw_spectrogram_horizontal(unsigned this_max, unsigned graph_max)
+{
+    const int scale_factor = MIN(LCD_WIDTH, ARRAYLEN_PLOT);
 
-/****************************** FFT functions ********************************/
+    if(fft_spectrogram_pos < LCD_HEIGHT-1)
+        fft_spectrogram_pos++;
+    else
+        mylcd_scroll_up(1);
+
+    int bins_acc = scale_factor / 2;
+    unsigned bins_max = 0;
+
+    for(int i = 0, x = 0;; ++i)
+    {
+        unsigned bin = plot[i];
+
+        if(bin > bins_max)
+            bins_max = bin;
+
+        bins_acc += scale_factor;
+
+        if(bins_acc >= ARRAYLEN_PLOT)
+        {
+            unsigned index = (SHADES-1)*bins_max / graph_max;
+
+            /* These happen because we exaggerate the graph a little for
+             * linear mode */
+            if(index >= SHADES)
+                index = SHADES-1;
+
+            mylcd_set_foreground(SPECTROGRAPH_PALETTE(index));
+            mylcd_drawpixel(x, fft_spectrogram_pos);
+
+            if(++x >= LCD_WIDTH)
+                break;
+
+            bins_acc -= ARRAYLEN_PLOT;
+            bins_max = 0;
+        }
+    }
+
+    (void)this_max;
+}
+
+/******************** End of plotting functions (modes) ********************/
+
+
+/***************************** FFT functions *******************************/
+
 static bool is_playing(void)
 {
     return rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_PLAYING;
@@ -1232,7 +1035,7 @@ static inline bool fft_get_fft(void)
         input[fft_idx].r = (left + right) >> 1; /* to mono */
     } while (fft_idx++, --count > 0);
 
-    apply_window_func(graph_settings.window_func);
+    apply_window_func(fft.window_func);
 
     rb->yield();
 
@@ -1246,14 +1049,14 @@ static inline bool fft_get_fft(void)
 #if NUM_CORES > 1
 /* use a worker thread if there is another processor core */
 static volatile bool fft_thread_run SHAREDDATA_ATTR = false;
-static unsigned long fft_thread;
+static unsigned long fft_thread = 0;
 
 static long fft_thread_stack[CACHEALIGN_UP(DEFAULT_STACK_SIZE*4/sizeof(long))]
                              CACHEALIGN_AT_LEAST_ATTR(4);
 
 static void fft_thread_entry(void)
 {
-    if (!fft_init_fft_lib())
+    if(!fft_init_fft_lib())
     {
         output_tail = -1; /* tell that we bailed */
         fft_thread_run = true;
@@ -1276,7 +1079,8 @@ static void fft_thread_entry(void)
             continue;
         }
 
-        /* write back output for other processor and invalidate for next frame read */
+        /* write back output for other processor and invalidate for next
+           frame read */
         rb->commit_discard_dcache();
 
         int new_tail = output_tail ^ 1;
@@ -1364,168 +1168,433 @@ static inline void fft_close_fft(void)
     /* nothing to do */
 }
 #endif /* NUM_CORES */
-/*************************** End of FFT functions ****************************/
 
-enum plugin_status plugin_start(const void* parameter)
+/************************** End of FFT functions ***************************/
+
+
+/****************************** OSD functions ******************************/
+
+/* Format a message to display */
+static void fft_osd_format_message(enum fft_setting_flags id)
 {
-    /* Defaults */
-    bool run = true;
-    bool showing_warning = false;
+    const char *msg = "";
 
-    if (!fft_init_fft())
-        return PLUGIN_ERROR;
-
-#ifndef HAVE_LCD_COLOR
-    unsigned char *gbuf;
-    size_t  gbuf_size = 0;
-    /* get the remainder of the plugin buffer */
-    gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
-
-    /* initialize the greyscale buffer.*/
-    if (!grey_init(gbuf, gbuf_size, GREY_ON_COP | GREY_BUFFERED,
-                   LCD_WIDTH, LCD_HEIGHT, NULL))
+    switch (id)
     {
-        rb->splash(HZ, "Couldn't init greyscale display");
-        fft_close_fft();
-        return PLUGIN_ERROR;
+    case FFT_SETF_DM:
+        msg = (const char * [FFT_MAX_DM]) {
+                [FFT_DM_LINES]       = "Lines",
+                [FFT_DM_BARS]        = "Bars",
+                [FFT_DM_SPECTROGRAM] = "Spectrogram",
+            }[fft.drawmode];
+        break;
+
+    case FFT_SETF_WF:
+        msg = (const char * [FFT_MAX_WF]) {
+                [FFT_WF_HAMMING] = "Hamming window",
+                [FFT_WF_HANN]    = "Hann window",
+            }[fft.window_func];
+        break;
+
+    case FFT_SETF_AS:
+        msg = (const char * [FFT_MAX_AS]) {
+                [FFT_AS_LOG] = "Logarithmic amplitude",
+                [FFT_AS_LIN] = "Linear amplitude"
+            }[fft.amp_scale];
+        break;
+
+#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
+    case FFT_SETF_FS:
+        msg = (const char * [FFT_MAX_FS]) {
+                [FFT_FS_LOG] = "Logarithmic frequency",
+                [FFT_FS_LIN] = "Linear frequency",
+            }[fft.freq_scale];
+        break;
+#endif
+
+    case FFT_SETF_OR:
+        rb->snprintf(fft_osd_message, sizeof (fft_osd_message),
+                     (const char * [FFT_MAX_OR]) {
+                        [FFT_OR_VERT] = "Vertical %s",
+                        [FFT_OR_HORZ] = "Horizontal %s",
+                     }[fft.orientation],
+                     (const char * [FFT_MAX_DM]) {
+                        [FFT_DM_LINES ... FFT_DM_BARS] = "amplitude",
+                        [FFT_DM_SPECTROGRAM] = "frequency"
+                     }[fft.drawmode]);
+        return;
+
+#if 0
+    /* Pertentially */
+    case FFT_SETF_VOLUME:
+        rb->snprintf(fft_osd_message, sizeof (fft_osd_message),
+                     "Volume: %d%s",
+                     rb->sound_val2phys(SOUND_VOLUME, global_settings.volume),
+                     rb->sound_unit(SOUND_VOLUME));
+        return;
+#endif
+
+    default:
+        break;
     }
-    grey_show(true); 
-#endif
 
-    logarithmic_plot_init();
+    /* Default action: copy string */
+    rb->strlcpy(fft_osd_message, msg, sizeof (fft_osd_message));
+}
 
+static void fft_osd_draw_cb(int x, int y, int width, int height)
+{
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-    mylcd_clear_display();
-    mylcd_update();
+    mylcd_set_foreground(COLOR_MESSAGE_FG);
+    mylcd_set_background(COLOR_MESSAGE_BG);
 #endif
-    backlight_ignore_timeout();
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
+#if FFT_OSD_MARGIN_SIZE != 0
+    mylcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    mylcd_fillrect(1, 1, width - 2, height - 2);
+    mylcd_set_drawmode(DRMODE_SOLID);
+#endif
+    mylcd_putsxy(1+FFT_OSD_MARGIN_SIZE, 1+FFT_OSD_MARGIN_SIZE,
+                 fft_osd_message);
+#if LCD_DEPTH > 1
+    mylcd_set_foreground(COLOR_MESSAGE_FRAME);
 #endif
 
-    while (run)
+    mylcd_drawrect(0, 0, width, height);
+
+    (void)x; (void)y;
+}
+
+static void fft_osd_show_message(enum fft_setting_flags id)
+{
+    fft_osd_format_message(id);
+
+    if(!myosd_enabled())
+        return;
+
+    int width, height;
+    int maxwidth, maxheight;
+
+    mylcd_set_viewport(myosd_get_viewport());
+    myosd_get_max_dims(&maxwidth, &maxheight);
+    mylcd_setfont(FONT_UI);
+    mylcd_getstringsize(fft_osd_message, &width, &height);
+    mylcd_set_viewport(NULL);
+
+    width += 2 + 2*FFT_OSD_MARGIN_SIZE;
+    if(width > maxwidth)
+        width = maxwidth;
+
+    height += 2 + 2*FFT_OSD_MARGIN_SIZE;
+    if(height > maxheight)
+        height = maxheight;
+
+    bool drawn = myosd_update_pos((LCD_WIDTH - width) / 2,
+                                  (LCD_HEIGHT - height) / 2,
+                                  width, height);
+
+    myosd_show(OSD_SHOW | (drawn ? 0 : OSD_UPDATENOW));
+}
+
+static void fft_popupmsg(enum fft_setting_flags id)
+{
+    fft_message_id = id;
+}
+
+/************************** End of OSD functions ***************************/
+
+
+static void fft_setting_update(unsigned which)
+{
+    static fft_drawfn_t fft_drawfns[FFT_MAX_DM][FFT_MAX_OR] =
     {
-        /* Unless otherwise specified, HZ/50 is around the window length
-         * and quite fast. We want to be done with drawing by this time. */
-        long next_frame_tick = *rb->current_tick + HZ/50;
-        int button;
-
-        while (!fft_have_fft())
-		{
-            int timeout;
-
-            if(!is_playing())
-            {
-                showing_warning = true;
-                mylcd_clear_display();
-                draw_message_string("No audio playing", false);
-                mylcd_update();
-                timeout = HZ/5;
-            }
-            else
-            {
-                if(showing_warning)
-                {
-                    showing_warning = false;
-                    mylcd_clear_display();
-                    mylcd_update();
-                }
-
-                timeout = HZ/100; /* 'till end of curent tick, don't use 100% CPU */
-            }
-
-            /* Make sure the FFT has produced something before doing anything
-             * but watching for buttons. Music might not be playing or things
-             * just aren't going well for picking up buffers so keys are
-             * scanned to avoid lockup.  */
-             button = rb->button_get_w_tmo(timeout);
-             if (button != BUTTON_NONE)
-                 goto read_button;
-		}
-
-	    draw(NULL);
-
-        fft_free_fft_output(); /* COP only */
-
-        long tick = *rb->current_tick;
-        if(TIME_BEFORE(tick, next_frame_tick))
+        [FFT_DM_LINES] =
         {
-            tick = next_frame_tick - tick;
+            [FFT_OR_HORZ] = draw_lines_horizontal,
+            [FFT_OR_VERT] = draw_lines_vertical,
+        },
+        [FFT_DM_BARS] =
+        {
+            [FFT_OR_HORZ] = draw_bars_horizontal,
+            [FFT_OR_VERT] = draw_bars_vertical,
+        },
+        [FFT_DM_SPECTROGRAM] = 
+        {
+            [FFT_OR_HORZ] = draw_spectrogram_horizontal,
+            [FFT_OR_VERT] = draw_spectrogram_vertical,
+        },
+    };
+
+    if(which & (FFT_SETF_DM | FFT_SETF_OR))
+    {
+        fft_drawfn = fft_drawfns[fft.drawmode]
+                                [fft.orientation];
+
+        if(fft.drawmode == FFT_DM_SPECTROGRAM)
+        {
+            fft_spectrogram_pos = -1;
+            myosd_lcd_update_prepare();
+            mylcd_clear_display();
+            myosd_lcd_update();
+        }
+    }
+
+    if(which & (FFT_SETF_DM | FFT_SETF_AS))
+    {
+        if(fft.drawmode == FFT_DM_SPECTROGRAM)
+        {
+            fft_graph_scale = fft.amp_scale == FFT_AS_LIN ?
+                QLIN_MAX : QLOG_MAX;
         }
         else
         {
-            rb->yield(); /* tmo = 0 won't yield */
-            tick = 0;
-        }
-
-		button = rb->button_get_w_tmo(tick);
-    read_button:
-        switch (button)
-        {
-            case FFT_QUIT:
-                run = false;
-                break;
-            case FFT_PREV_GRAPH: {
-                if (graph_settings.mode-- <= FFT_DM_FIRST)
-                    graph_settings.mode = FFT_DM_COUNT-1;
-                graph_settings.changed.mode = true;
-                draw(modes_text[graph_settings.mode]);
-                break;
-            }
-            case FFT_NEXT_GRAPH: {
-                if (++graph_settings.mode >= FFT_DM_COUNT)
-                    graph_settings.mode = FFT_DM_FIRST;
-                graph_settings.changed.mode = true;
-                draw(modes_text[graph_settings.mode]);
-                break;
-            }
-            case FFT_WINDOW: {
-                if(++graph_settings.window_func >= FFT_WF_COUNT)
-                    graph_settings.window_func = FFT_WF_FIRST;
-                graph_settings.changed.window_func = true;
-                draw(window_text[graph_settings.window_func]);
-                break;
-            }
-            case FFT_AMP_SCALE: {
-                graph_settings.logarithmic_amp = !graph_settings.logarithmic_amp;
-                graph_settings.changed.amp_scale = true;
-                draw(amp_scales_text[graph_settings.logarithmic_amp ? 1 : 0]);
-                break;
-            }
-#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
-            case FFT_FREQ_SCALE: {
-                graph_settings.logarithmic_freq = !graph_settings.logarithmic_freq;
-                graph_settings.changed.freq_scale = true;
-                draw(freq_scales_text[graph_settings.logarithmic_freq ? 1 : 0]);
-                break;
-            }
-#endif
-            case FFT_ORIENTATION: {
-                graph_settings.orientation_vertical =
-                    !graph_settings.orientation_vertical;
-                graph_settings.changed.orientation = true;
-                draw(NULL);
-                break;
-            }
-            default: {
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                    return PLUGIN_USB_CONNECTED;
-            }
-
+            fft_graph_scale = 0;
         }
     }
 
-    fft_close_fft();	
+#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
+    if(which & FFT_SETF_FS)
+    {
+        plot = fft.freq_scale == FFT_FS_LIN ?
+                linf_magnitudes : logf_magnitudes;
+    }
+#endif
+
+    if(which & FFT_SETF_AS)
+    {
+        memset(linf_magnitudes, 0, sizeof (linf_magnitudes));
+        memset(logf_magnitudes, 0, sizeof (logf_magnitudes));
+    }
+}
+
+static long fft_draw(void)
+{
+    long tick = *rb->current_tick;
+
+    if(fft_message_id != -1)
+    {
+        /* Show a new message */
+        fft_osd_show_message((enum fft_setting_flags)fft_message_id);
+        fft_message_id = -1;
+    }
+    else
+    {
+        /* Monitor OSD timeout */
+        myosd_monitor_timeout();
+    }
+
+    if(TIME_BEFORE(tick, fft_next_frame_tick))
+        return fft_next_frame_tick - tick; /* Too early */
+
+    unsigned this_max;
+
+    if(!fft_have_fft())
+    {
+        if(is_playing())
+            return HZ/100;
+
+        /* All magnitudes == 0 thus this_max == 0 */
+        for(int i = 0; i < ARRAYLEN_PLOT; i++)
+            linf_magnitudes[i] >>= 1; /* decay */
+
+        this_max = 0;
+    }
+    else
+    {
+        this_max = calc_magnitudes(fft.amp_scale);
+
+        fft_free_fft_output(); /* COP only */
+
+        if(fft.drawmode != FFT_DM_SPECTROGRAM &&
+           this_max > fft_graph_scale)
+        {
+            fft_graph_scale = this_max;
+        }
+    }
+
+    if (fft.freq_scale == FFT_FS_LOG)
+        log_plot_translate();
+
+    myosd_lcd_update_prepare();
+
+    mylcd_set_foreground(COLOR_DEFAULT_FG);
+    mylcd_set_background(COLOR_DEFAULT_BG);
+
+    fft_drawfn(this_max, fft_graph_scale);
+
+    myosd_lcd_update();
+
+    fft_next_frame_tick = tick + FFT_PERIOD;
+    return fft_next_frame_tick - *rb->current_tick;
+}
+
+static void fft_osd_init(void *buf, size_t bufsize)
+{
+    int width, height;
+    mylcd_setfont(FONT_UI);
+    mylcd_getstringsize("M", NULL, &height);
+    width = LCD_WIDTH;
+    height += 2 + 2*FFT_OSD_MARGIN_SIZE;
+    myosd_init(OSD_INIT_MAJOR_HEIGHT | OSD_INIT_MINOR_MAX, buf, bufsize,
+               fft_osd_draw_cb, &width, &height, NULL);
+    myosd_set_timeout(HZ);
+}
+
+static void fft_cleanup(void)
+{
+    myosd_destroy();
+
+    fft_close_fft();    
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
+    rb->cancel_cpu_boost();
 #endif
 #ifndef HAVE_LCD_COLOR
     grey_release();
 #endif
     backlight_use_settings();
+
+    /* save settings if changed */
+    if (rb->memcmp(&fft, &fft_disk, sizeof(fft)))
+    {
+        fft_disk = fft;
+        configfile_save(cfg_filename, disk_config, ARRAYLEN(disk_config),
+                        CFGFILE_VERSION);
+    }
+}
+
+static bool fft_setup(void)
+{
+    atexit(fft_cleanup);
+
+    configfile_load(cfg_filename, disk_config, ARRAYLEN(disk_config),
+                    CFGFILE_MINVERSION);
+    fft = fft_disk; /* copy to running config */
+
+    if(!fft_init_fft())
+        return false;
+
+    /* get the remainder of the plugin buffer for OSD and perhaps
+       greylib */
+    size_t bufsize = 0;
+    unsigned char *buf = rb->plugin_get_buffer(&bufsize);
+
+#ifndef HAVE_LCD_COLOR
+    /* initialize the greyscale buffer.*/
+    long grey_size;
+    if(!grey_init(buf, bufsize, GREY_ON_COP | GREY_BUFFERED,
+                  LCD_WIDTH, LCD_HEIGHT, &grey_size))
+    {
+        rb->splash(HZ, "Couldn't init greyscale display");
+        return false;
+    }
+
+    grey_show(true);
+
+    buf += grey_size;
+    bufsize -= grey_size;
+#endif /* !HAVE_LCD_COLOR */
+
+    fft_osd_init(buf, bufsize);
+
+#if LCD_DEPTH > 1
+    myosd_lcd_update_prepare();
+    rb->lcd_set_backdrop(NULL);
+    mylcd_clear_display();
+    myosd_lcd_update();
+#endif
+    backlight_ignore_timeout();
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->trigger_cpu_boost();
+#endif
+
+    logarithmic_plot_init();
+    fft_setting_update(FFT_SETF_ALL);
+    fft_next_frame_tick = *rb->current_tick;
+
+    return true;
+}
+
+enum plugin_status plugin_start(const void* parameter)
+{
+    bool run = true;
+
+    if(!fft_setup())
+        return PLUGIN_ERROR;
+
+    while(run)
+    {
+	    long delay = fft_draw();
+
+        if(delay <= 0)
+        {
+            delay = 0;
+            rb->yield(); /* tmo = 0 won't yield */
+        }
+
+		int button = rb->button_get_w_tmo(delay);
+
+        switch (button)
+        {
+            case FFT_QUIT:
+                run = false;
+                break;
+
+            case FFT_ORIENTATION:
+                if (++fft.orientation >= FFT_MAX_OR)
+                    fft.orientation = FFT_MIN_OR;
+
+                fft_setting_update(FFT_SETF_OR);
+                fft_popupmsg(FFT_SETF_OR);
+                break;
+
+            case FFT_PREV_GRAPH:
+                if (fft.drawmode-- <= FFT_MIN_DM)
+                    fft.drawmode = FFT_MAX_DM-1;
+
+                fft_setting_update(FFT_SETF_DM);
+                fft_popupmsg(FFT_SETF_DM);
+                break;
+
+            case FFT_NEXT_GRAPH:
+                if (++fft.drawmode >= FFT_MAX_DM)
+                    fft.drawmode = FFT_MIN_DM;
+
+                fft_setting_update(FFT_SETF_DM);
+                fft_popupmsg(FFT_SETF_DM);
+                break;
+
+            case FFT_AMP_SCALE:
+                if (++fft.amp_scale >= FFT_MAX_AS)
+                    fft.amp_scale = FFT_MIN_AS;
+
+                fft_setting_update(FFT_SETF_AS);
+                fft_popupmsg(FFT_SETF_AS);
+                break;
+
+#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
+            case FFT_FREQ_SCALE:
+                if (++fft.freq_scale >= FFT_MAX_FS)
+                    fft.freq_scale = FFT_MIN_FS;
+
+                fft_setting_update(FFT_SETF_FS);
+                fft_popupmsg(FFT_SETF_FS);
+                break;
+#endif
+            case FFT_WINDOW:
+                if(++fft.window_func >= FFT_MAX_WF)
+                    fft.window_func = FFT_MIN_WF;
+
+                fft_setting_update(FFT_SETF_WF);
+                fft_popupmsg(FFT_SETF_WF);
+                break;
+
+            default:
+                exit_on_usb(button);
+                break;
+        }
+    }
+
     return PLUGIN_OK;
     (void)parameter;
 }
