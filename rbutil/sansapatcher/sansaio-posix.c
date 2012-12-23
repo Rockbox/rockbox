@@ -113,10 +113,10 @@ int sansa_close(struct sansa_t* sansa)
     return 0;
 }
 
-int sansa_alloc_buffer(unsigned char** sectorbuf, int bufsize)
+int sansa_alloc_buffer(struct sansa_t *sansa, int bufsize)
 {
-    *sectorbuf=malloc(bufsize);
-    if (*sectorbuf == NULL) {
+    sansa->sectorbuf=malloc(bufsize);
+    if (sansa->sectorbuf == NULL) {
         return -1;
     }
     return 0;
@@ -139,9 +139,9 @@ int sansa_read(struct sansa_t* sansa, unsigned char* buf, int nbytes)
     return read(sansa->dh, buf, nbytes);
 }
 
-int sansa_write(struct sansa_t* sansa, unsigned char* buf, int nbytes)
+int sansa_write(struct sansa_t* sansa, int nbytes)
 {
-    return write(sansa->dh, buf, nbytes);
+    return write(sansa->dh, sansa->sectorbuf, nbytes);
 }
 #endif
 

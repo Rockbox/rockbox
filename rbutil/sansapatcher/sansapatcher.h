@@ -32,15 +32,6 @@ extern int sansa_verbose;
 /* Size of buffer for disk I/O - 8MB is large enough for any version
    of the Apple firmware, but not the Nano's RSRC image. */
 #define BUFFER_SIZE 8*1024*1024
-#ifndef _MSC_VER
-extern unsigned char* sansa_sectorbuf;
-#else
-/* MSVC needs to use dllimport to allow using it directly from a DLL.
- * See http://support.microsoft.com/kb/90530
- * Building with MSVC is only when using as DLL.
- */
-_declspec(dllimport) unsigned char* sansa_sectorbuf;
-#endif
 
 int sansa_read_partinfo(struct sansa_t* sansa, int silent);
 int is_sansa(struct sansa_t* sansa);

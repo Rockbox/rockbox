@@ -150,12 +150,12 @@ int sansa_close(struct sansa_t* sansa)
     return 0;
 }
 
-int sansa_alloc_buffer(unsigned char** sectorbuf, int bufsize)
+int sansa_alloc_buffer(struct sansa_t* sansa, int bufsize)
 {
     /* The ReadFile function requires a memory buffer aligned to a multiple of
        the disk sector size. */
-    *sectorbuf = (unsigned char*)VirtualAlloc(NULL, bufsize, MEM_COMMIT, PAGE_READWRITE);
-    if (*sectorbuf == NULL) {
+    sansa->sectorbuf = (unsigned char*)VirtualAlloc(NULL, bufsize, MEM_COMMIT, PAGE_READWRITE);
+    if (sansa->sectorbuf == NULL) {
         sansa_print_error(" Error allocating a buffer: ");
         return -1;
     }
@@ -189,11 +189,11 @@ int sansa_read(struct sansa_t* sansa, unsigned char* buf, int nbytes)
     return count;
 }
 
-int sansa_write(struct sansa_t* sansa, unsigned char* buf, int nbytes)
+int sansa_write(struct sansa_t* sansa, int nbytes)
 {
     unsigned long count;
 
-    if (!WriteFile(sansa->dh, buf, nbytes, &count, NULL)) {
+    if (!WriteFile(sansa->dh, sansa->sectorbuf, nbytes, &count, NULL)) {
         sansa_print_error(" Error writing to disk: ");
         return -1;
     }

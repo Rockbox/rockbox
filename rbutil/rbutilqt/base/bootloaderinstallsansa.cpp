@@ -27,22 +27,17 @@ BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
         : BootloaderInstallBase(parent)
 {
     (void)parent;
-    // initialize sector buffer. sansa_sectorbuf is instantiated by
-    // sansapatcher.
-    // The buffer itself is only present once, so make sure to not allocate
-    // it if it was already allocated. The application needs to take care
-    // no concurrent (i.e. multiple objects of this class running) requests
-    // are done.
-    if(sansa_sectorbuf == NULL)
-        sansa_alloc_buffer(&sansa_sectorbuf, BUFFER_SIZE);
+    // initialize sector buffer. The sector buffer is part of the sansa_t
+    // structure, so a second instance of this class will have its own buffer.
+    sansa_alloc_buffer(&sansa, BUFFER_SIZE);
 }
 
 
 BootloaderInstallSansa::~BootloaderInstallSansa()
 {
-    if(sansa_sectorbuf) {
-        free(sansa_sectorbuf);
-        sansa_sectorbuf = NULL;
+    if(sansa.sectorbuf) {
+        free(sansa.sectorbuf);
+        sansa.sectorbuf = NULL;
     }
 }
 
@@ -51,15 +46,13 @@ BootloaderInstallSansa::~BootloaderInstallSansa()
  */
 bool BootloaderInstallSansa::install(void)
 {
-    if(sansa_sectorbuf == NULL) {
+    if(sansa.sectorbuf == NULL) {
         emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
         return false;
         emit done(true);
     }
 
     emit logItem(tr("Searching for Sansa"), LOGINFO);
-
-    struct sansa_t sansa;
 
     int n = sansa_scan(&sansa);
     if(n == -1) {
@@ -95,7 +88,6 @@ bool BootloaderInstallSansa::install(void)
  */
 void BootloaderInstallSansa::installStage2(void)
 {
-    struct sansa_t sansa;
     unsigned char* buf = NULL;
     unsigned int len;
 
@@ -174,8 +166,6 @@ void BootloaderInstallSansa::installStage3(bool mounted)
  */
 bool BootloaderInstallSansa::uninstall(void)
 {
-    struct sansa_t sansa;
-
     emit logItem(tr("Uninstalling bootloader"), LOGINFO);
     QCoreApplication::processEvents();
 
@@ -222,7 +212,6 @@ bool BootloaderInstallSansa::uninstall(void)
  */
 BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
 {
-    struct sansa_t sansa;
     int num;
 
     if(!sansaInitialize(&sansa)) {

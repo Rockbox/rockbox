@@ -21,6 +21,7 @@
 
 #include <QtCore>
 #include "bootloaderinstallbase.h"
+#include "sansapatcher.h"
 
 
 // bootloader installation class for devices handled by sansapatcher.
@@ -38,6 +39,7 @@ class BootloaderInstallSansa : public BootloaderInstallBase
 
     private:
         bool sansaInitialize(struct sansa_t *);
+        struct sansa_t sansa;
 
     private slots:
         void installStage2(void);

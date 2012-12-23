@@ -167,9 +167,8 @@ bool Autodetection::detect()
 
     // try sansapatcher
     // initialize sector buffer. Needed.
-    sansa_sectorbuf = NULL;
-    sansa_alloc_buffer(&sansa_sectorbuf, BUFFER_SIZE);
     struct sansa_t sansa;
+    sansa_alloc_buffer(&sansa, BUFFER_SIZE);
     n = sansa_scan(&sansa);
     if(n == 1) {
         qDebug() << "[Autodetect] Sansa found:" << sansa.targetname << "at" << sansa.diskname;
@@ -187,8 +186,8 @@ bool Autodetection::detect()
     else {
         qDebug() << "[Autodetect] sansapatcher: no Sansa found." << n;
     }
-    free(sansa_sectorbuf);
-    sansa_sectorbuf = NULL;
+    free(sansa.sectorbuf);
+    sansa.sectorbuf = NULL;
 
     if(m_mountpoint.isEmpty() && m_device.isEmpty()
             && m_errdev.isEmpty() && m_incompat.isEmpty())

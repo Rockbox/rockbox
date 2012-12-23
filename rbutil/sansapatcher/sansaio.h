@@ -63,6 +63,7 @@ struct mi4header_t {
 
 struct sansa_t {
     HANDLE dh;
+    unsigned char* sectorbuf;
     char diskname[4096];
     int sector_size;
     struct sansa_partinfo_t pinfo[4];
@@ -77,8 +78,8 @@ int sansa_reopen_rw(struct sansa_t* sansa);
 int sansa_close(struct sansa_t* sansa);
 int sansa_seek(struct sansa_t* sansa, loff_t pos);
 int sansa_read(struct sansa_t* sansa, unsigned char* buf, int nbytes);
-int sansa_write(struct sansa_t* sansa, unsigned char* buf, int nbytes);
-int sansa_alloc_buffer(unsigned char** sectorbuf, int bufsize);
+int sansa_write(struct sansa_t* sansa, int nbytes);
+int sansa_alloc_buffer(struct sansa_t* sansa, int bufsize);
 
 #ifdef __cplusplus
 }
