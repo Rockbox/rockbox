@@ -32,16 +32,6 @@ extern "C" {
    of the Apple firmware, but not the Nano's RSRC image. */
 #define BUFFER_SIZE 8*1024*1024
 
-#ifndef _MSC_VER
-extern unsigned char* ipod_sectorbuf;
-#else
-/* MSVC needs to use dllimport to allow using it directly from a DLL.
- * See http://support.microsoft.com/kb/90530
- * Building with MSVC is only when using as DLL.
- */
-_declspec(dllimport) unsigned char* ipod_sectorbuf;
-#endif
-
 extern int ipod_verbose;
 
 #define FILETYPE_DOT_IPOD 0

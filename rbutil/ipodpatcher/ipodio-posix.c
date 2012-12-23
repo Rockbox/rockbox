@@ -358,10 +358,10 @@ int ipod_close(struct ipod_t* ipod)
     return 0;
 }
 
-int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize)
+int ipod_alloc_buffer(struct ipod_t* ipod, int bufsize)
 {
-    *sectorbuf=malloc(bufsize);
-    if (*sectorbuf == NULL) {
+    ipod->sectorbuf = malloc(bufsize);
+    if (ipod->sectorbuf== NULL) {
         return -1;
     }
     return 0;
@@ -379,14 +379,20 @@ int ipod_seek(struct ipod_t* ipod, unsigned long pos)
     return 0;
 }
 
-ssize_t ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes)
+ssize_t ipod_read(struct ipod_t* ipod, int nbytes)
 {
-    return read(ipod->dh, buf, nbytes);
+    if(ipod->sectorbuf == NULL) {
+        return -1;
+    }
+    return read(ipod->dh, ipod->sectorbuf, nbytes);
 }
 
-ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes)
+ssize_t ipod_write(struct ipod_t* ipod, int nbytes)
 {
-    return write(ipod->dh, buf, nbytes);
+    if(ipod->sectorbuf == NULL) {
+        return -1;
+    }
+    return write(ipod->dh, ipod->sectorbuf, nbytes);
 }
 
 #endif

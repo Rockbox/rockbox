@@ -137,9 +137,9 @@ bool Autodetection::detect()
     int n;
     // try ipodpatcher
     // initialize sector buffer. Needed.
-    ipod_sectorbuf = NULL;
-    ipod_alloc_buffer(&ipod_sectorbuf, BUFFER_SIZE);
     struct ipod_t ipod;
+    ipod.sectorbuf = NULL;
+    ipod_alloc_buffer(&ipod, BUFFER_SIZE);
     n = ipod_scan(&ipod);
     if(n == 1) {
         qDebug() << "[Autodetect] Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
@@ -162,8 +162,8 @@ bool Autodetection::detect()
     else {
         qDebug() << "[Autodetect] ipodpatcher: no Ipod found." << n;
     }
-    free(ipod_sectorbuf);
-    ipod_sectorbuf = NULL;
+    free(ipod.sectorbuf);
+    ipod.sectorbuf = NULL;
 
     // try sansapatcher
     // initialize sector buffer. Needed.

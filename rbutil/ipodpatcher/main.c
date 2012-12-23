@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (ipod_alloc_buffer(&ipod_sectorbuf,BUFFER_SIZE) < 0) {
+    if (ipod_alloc_buffer(&ipod,BUFFER_SIZE) < 0) {
         fprintf(stderr,"Failed to allocate memory buffer\n");
     }
 

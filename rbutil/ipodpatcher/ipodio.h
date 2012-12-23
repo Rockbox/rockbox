@@ -70,6 +70,7 @@ struct partinfo_t {
 };
 
 struct ipod_t {
+    unsigned char* sectorbuf;
     HANDLE dh;
     char diskname[4096];
     int sector_size;
@@ -103,9 +104,9 @@ int ipod_close(struct ipod_t* ipod);
 int ipod_seek(struct ipod_t* ipod, unsigned long pos);
 int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
                       unsigned char* buf, int bufsize);
-ssize_t ipod_read(struct ipod_t* ipod, unsigned char* buf, int nbytes);
-ssize_t ipod_write(struct ipod_t* ipod, unsigned char* buf, int nbytes);
-int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize);
+ssize_t ipod_read(struct ipod_t* ipod, int nbytes);
+ssize_t ipod_write(struct ipod_t* ipod, int nbytes);
+int ipod_alloc_buffer(struct ipod_t* ipod, int bufsize);
 
 /* In fat32format.c */
 int format_partition(struct ipod_t* ipod, int partition);

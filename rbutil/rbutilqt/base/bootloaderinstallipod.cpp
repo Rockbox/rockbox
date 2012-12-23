@@ -28,33 +28,32 @@ BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
         : BootloaderInstallBase(parent)
 {
     (void)parent;
-    // initialize sector buffer. ipod_sectorbuf is defined in ipodpatcher.
-    // The buffer itself is only present once, so make sure to not allocate
-    // it if it was already allocated. The application needs to take care
-    // no concurrent (i.e. multiple objects of this class running) requests
-    // are done.
-    if(ipod_sectorbuf == NULL)
-        ipod_alloc_buffer(&ipod_sectorbuf, BUFFER_SIZE);
+    // initialize sector buffer. The sector buffer is part of the ipod_t
+    // structure, so a second instance of this class will have its own buffer.
+    ipod_alloc_buffer(&ipod, BUFFER_SIZE);
 }
 
 
 BootloaderInstallIpod::~BootloaderInstallIpod()
 {
-    if(ipod_sectorbuf) {
-        free(ipod_sectorbuf);
-        ipod_sectorbuf = NULL;
+    if(ipod.sectorbuf) {
+        free(ipod.sectorbuf);
+        ipod.sectorbuf = NULL;
     }
 }
 
 
 bool BootloaderInstallIpod::install(void)
 {
-    if(ipod_sectorbuf == NULL) {
+    if(ipod.sectorbuf == NULL) {
         emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
         emit done(true);
         return false;
     }
+    // save buffer pointer before cleaning up ipod_t structure
+    unsigned char* sb = ipod.sectorbuf;
     memset(&ipod, 0, sizeof(struct ipod_t));
+    ipod.sectorbuf = sb;
 
     if(!ipodInitialize(&ipod)) {
         emit done(true);
@@ -139,7 +138,6 @@ void BootloaderInstallIpod::installStage3(bool mounted)
 
 bool BootloaderInstallIpod::uninstall(void)
 {
-    struct ipod_t ipod;
     emit logItem(tr("Uninstalling bootloader"), LOGINFO);
     QCoreApplication::processEvents();
 
@@ -190,7 +188,6 @@ bool BootloaderInstallIpod::uninstall(void)
 
 BootloaderInstallBase::BootloaderType BootloaderInstallIpod::installed(void)
 {
-    struct ipod_t ipod;
     BootloaderInstallBase::BootloaderType result = BootloaderRockbox;
 
     if(!ipodInitialize(&ipod)) {
