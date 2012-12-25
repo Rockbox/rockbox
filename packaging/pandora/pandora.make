@@ -15,6 +15,12 @@ pnd: pnddir $(PND_MAKE) $(DEPFILE) build
 	cp $(PANDORA_DIR)/rockbox_preview.jpg $(PND_BUILD_DIR)
 	cp $(PANDORA_DIR)/run_rockbox.sh $(PND_BUILD_DIR)
 
+	# Remove stuff that's broken because of missing keymapping.
+	# Otherwise the user will have a hard time to shut down rockbox
+	rm -f $(PND_BUILD_DIR)/rockbox/lib/rockbox/rocks/apps/*
+	rm -f $(PND_BUILD_DIR)/rockbox/lib/rockbox/rocks/demos/*
+	rm -f $(PND_BUILD_DIR)/rockbox/lib/rockbox/rocks/games/*
+
 	# Add docs folder
 	cp -rf $(ROOTDIR)/docs $(PND_BUILD_DIR)
 
