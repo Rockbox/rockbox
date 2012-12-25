@@ -24,5 +24,8 @@ pnd: pnddir $(PND_MAKE) $(DEPFILE) build
 	# Add docs folder
 	cp -rf $(ROOTDIR)/docs $(PND_BUILD_DIR)
 
+	# Fix up permissions
+	chmod -R a+r $(PND_BUILD_DIR)
+
 	# Invoke pndmake
 	$(PND_MAKE) -p rockbox.pnd -d $(PND_BUILD_DIR) -x $(PND_BUILD_DIR)/PXML.xml -i $(PND_BUILD_DIR)/rockbox.png -c
