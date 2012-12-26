@@ -1,3 +1,9 @@
+rockbox (2012-12-26maemo1) unstable; urgency=low
+
+  * Update to rockbox 3.12 code base (v3.12-final)
+
+ -- Thomas Jarosch <tomj@simonv.com>  Wed, 26 Dec 2012 19:00:00 +0100
+
 rockbox (2011-12-10maemo1) unstable; urgency=low
 
   * Update to rockbox 3.10 code base (r31165)
