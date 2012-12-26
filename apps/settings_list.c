@@ -1690,7 +1690,7 @@ const struct settings_list settings[] = {
 #ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(0,kbd_file,"kbd","-",ROCKBOX_DIR "/",".kbd"),
 #endif
-#ifdef HAVE_USB_CHARGING_ENABLE
+#if defined (HAVE_USBSTACK) && defined(HAVE_USB_CHARGING_ENABLE)
     CHOICE_SETTING(0, usb_charging, LANG_USB_CHARGING, 1, "usb charging",
                    "off,on,force", NULL, 3, ID2P(LANG_SET_BOOL_NO),
                    ID2P(LANG_SET_BOOL_YES), ID2P(LANG_FORCE)),
