@@ -619,7 +619,7 @@ struct user_settings
 #ifdef HAVE_SPDIF_POWER
     bool spdif_enable; /* S/PDIF power on/off */
 #endif
-#if defined (HAVE_USBSTACK) && defined(HAVE_USB_CHARGING_ENABLE)
+#ifdef HAVE_USB_CHARGING_ENABLE
     int usb_charging;
 #endif
 
