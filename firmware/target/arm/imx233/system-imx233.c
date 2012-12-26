@@ -158,16 +158,31 @@ void udelay(unsigned us)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
-    (void) frequency;
+    /* don't change the frequency if it is useless (changes are expensive) */
+    if(cpu_frequency == frequency)
+        return;
+    
+    cpu_frequency = frequency;
+    /* disable auto-slow (enable back afterwards) */
+    imx233_clkctrl_enable_auto_slow(false);
+    /* go back to a known state in safe way:
+     * clk_p@24 MHz
+     * clk_h@6 MHz
+     * WARNING: we must absolutely avoid that clk_h be too low or too high
+     * during the change. We first change the clk_p/clk_h ratio to 4 so
+     * that it cannot be too high (480/4=120 MHz max) or too low
+     * (24/4=6 MHz min). Then we switch clk_p to bypass. We chose a ratio of 4
+     * which is greater than all clk_p/clk_h ratios used below so that further
+     * changes are safe too */
+    imx233_clkctrl_set_clock_divisor(CLK_HBUS, 4);
+    imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+
     switch(frequency)
     {
         case IMX233_CPUFREQ_454_MHz:
-            /* go back to a known state: everything at 24MHz ! */
-            imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
-            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
             /* set VDDD to 1.550 mV (brownout at 1.450 mV) */
             imx233_power_set_regulator(REGULATOR_VDDD, 1550, 1450);
-            /* clk_h@clk_p/2 */
+            /* clk_h@clk_p/3 */
             imx233_clkctrl_set_clock_divisor(CLK_HBUS, 3);
             /* clk_p@ref_cpu/1*18/19 */
             imx233_clkctrl_set_fractional_divisor(CLK_CPU, 19);
@@ -180,9 +195,6 @@ void set_cpu_frequency(long frequency)
              * clk_h@130.91 MHz */
             break;
         case IMX233_CPUFREQ_261_MHz:
-            /* go back to a known state: everything at 24MHz ! */
-            imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
-            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
             /* set VDDD to 1.275 mV (brownout at 1.175 mV) */
             imx233_power_set_regulator(REGULATOR_VDDD, 1275, 1175);
             /* clk_h@clk_p/2 */
@@ -200,6 +212,9 @@ void set_cpu_frequency(long frequency)
         default:
             break;
     }
+
+    /* enable auto slow again */
+    imx233_clkctrl_enable_auto_slow(true);
 }
 #endif
 
