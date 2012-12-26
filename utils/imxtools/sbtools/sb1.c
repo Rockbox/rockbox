@@ -318,7 +318,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
 
     if(header->image_size % SECTOR_SIZE)
     {
-        if(g_force)
+        if(!g_force)
             printf(GREY, "Image size is not a multiple of sector size\n");
         else
             fatal(SB1_FORMAT_ERROR, "Image size is not a multiple of sector size\n");
@@ -326,6 +326,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
 
     /* find key */
     union xorcrypt_key_t key[2];
+    memset(key, 0, sizeof(key));
     bool valid_key = false;
     uint8_t sector[SECTOR_SIZE];
 
@@ -338,13 +339,20 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
         memcpy(sector, header + 1, SECTOR_SIZE - header->header_size);
         /* try to decrypt the first sector */
         uint32_t mark = xor_decrypt(key, sector, SECTOR_SIZE - 4 - header->header_size);
+        /* copy key again it's modified by the crypto code */
+        memcpy(key, g_key_array[i].u.xor_key, sizeof(key));
         if(mark != *(uint32_t *)&sector[SECTOR_SIZE - 4 - header->header_size])
             continue;
         /* found ! */
         valid_key = true;
-        /* copy key again it's modified by the crypto code */
-        memcpy(key, g_key_array[i].u.xor_key, sizeof(key));
         break;
+    }
+
+    if(!valid_key)
+    {
+        if(!g_force)
+            fatal(SB1_NO_VALID_KEY, "No valid key found\n");
+        printf(GREY, "No valid key found: forced to continue but this will fail\n");
     }
 
     printf(BLUE, "Crypto\n");
@@ -365,9 +373,6 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
     }
 
     memcpy(file->key.u.xor_key, key, sizeof(key));
-    
-    if(!valid_key)
-        fatal(SB1_NO_VALID_KEY, "No valid key found\n");
 
     /* decrypt image in-place (and removing crypto markers) */
     void *ptr = header + 1;
@@ -377,7 +382,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
     {
         int size = SECTOR_SIZE - 4 - offset;
         uint32_t mark = xor_decrypt(key, ptr, size);
-        if(mark != *(uint32_t *)(ptr + size))
+        if(mark != *(uint32_t *)(ptr + size) && !g_force)
             fatal(SB1_CHECKSUM_ERROR, "Crypto mark mismatch\n");
         memmove(copy_ptr, ptr, size);
 
