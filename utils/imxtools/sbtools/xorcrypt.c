@@ -54,6 +54,49 @@ static uint32_t do_round(union xorcrypt_key_t *key)
     return key->k[0];
 }
 
+static uint32_t do_unround(union xorcrypt_key_t *key)
+{
+    uint32_t k7 = key->k[6];
+    uint32_t k2 = key->k[1];
+    uint32_t k11 = key->k[10] >> 31 | key->k[10] << 1;
+    uint32_t k0 = key->k[0];
+    key->k[0] = key->k[15];
+    key->k[15] = key->k[14];
+    key->k[14] = key->k[13];
+    key->k[13] = key->k[12];
+    key->k[12] = key->k[11] ^ k11;
+    key->k[11] = k11;
+    key->k[10] = key->k[9];
+    key->k[9] = key->k[8];
+    key->k[8] = key->k[7] ^ k7;
+    key->k[7] = key->k[6];
+    key->k[6] = key->k[5];
+    key->k[5] = key->k[4];
+    key->k[4] = key->k[3];
+    key->k[3] = key->k[2] ^ k2;
+    key->k[2] = key->k[1];
+    key->k[1] = k0 ^ key->k[0] ^ key->k[5] ^ key->k[3] ^ key->k[7] ^ key->k[11] ^ key->k[13];
+    return 0;
+}
+
+static void test_round(union xorcrypt_key_t keys[2])
+{
+    union xorcrypt_key_t save[2];
+    memcpy(save, keys, sizeof(save));
+    do_round(keys);
+    do_unround(keys);
+    if(memcmp(save, keys, sizeof(save)))
+    {
+        printf("Mismatch\n");
+        for(int i = 0; i < 16; i++)
+            printf(" %s%08x", save[0].k[i] == keys[0].k[i] ? YELLOW : RED, save[0].k[i]);
+        printf("\n");
+        for(int i = 0; i < 16; i++)
+            printf(" %s%08x", save[0].k[i] == keys[0].k[i] ? YELLOW : RED, keys[0].k[i]);
+        printf("\n");
+    }
+}
+
 uint32_t xor_encrypt(union xorcrypt_key_t keys[2], void *_data, int size)
 {
     if(size % 4)
