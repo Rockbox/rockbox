@@ -29,6 +29,9 @@
 #include "pinctrl-imx233.h"
 #include "dcp-imx233.h"
 #include "logf.h"
+#include "button.h"
+#include "font.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_ENABLE
 static bool lcd_on;
@@ -761,4 +764,35 @@ void lcd_blit_yuv(unsigned char * const src[3],
     #else
     lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
     #endif
+}
+
+bool lcd_debug_screen(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        lcd_putsf(0, 0, "lcd kind: %s",
+            lcd_kind == LCD_KIND_7783 ? "st7783" :
+            lcd_kind == LCD_KIND_9325 ? "ili9325" : "unknown");
+        lcd_update();
+        yield();
+    }
+
+    return true;
 }

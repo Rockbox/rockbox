@@ -21,8 +21,9 @@
 
 #include "system.h"
 #include "button-target.h"
+#include "lcd-target.h"
 
 bool dbg_hw_target_info(void)
 {
-    return button_debug_screen();
+    return lcd_debug_screen() && button_debug_screen();
 }

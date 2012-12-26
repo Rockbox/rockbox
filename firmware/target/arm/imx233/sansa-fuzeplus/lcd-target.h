@@ -21,4 +21,6 @@
 #ifndef LCD_TARGET_H
 #define LCD_TARGET_H
 
+bool lcd_debug_screen(void);
+
 #endif /* LCD_TARGET_H */
