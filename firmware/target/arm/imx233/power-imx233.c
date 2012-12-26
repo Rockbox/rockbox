@@ -102,6 +102,8 @@ void power_init(void)
     __FIELD_SET(HW_POWER_VDDDCTRL, LINREG_OFFSET, 2);
     __FIELD_SET(HW_POWER_VDDACTRL, LINREG_OFFSET, 2);
     __FIELD_SET(HW_POWER_VDDIOCTRL, LINREG_OFFSET, 2);
+    /* enable DCDC (more efficient) */
+    __REG_SET(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__ENABLE_DCDC;
     /* enable a few bits controlling the DC-DC as recommended by Freescale */
     __REG_SET(HW_POWER_LOOPCTRL) = HW_POWER_LOOPCTRL__TOGGLE_DIF |
         HW_POWER_LOOPCTRL__EN_CM_HYST;
@@ -250,6 +252,8 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
     // compute raw values
     unsigned raw_val = (value_mv - regulator_info[reg].min) / regulator_info[reg].step;
     unsigned raw_bo_offset = (value_mv - brownout_mv) / regulator_info[reg].step;
+    // clear dc-dc ok flag
+    __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__DC_OK_IRQ;
     // update
     uint32_t reg_val = (*regulator_info[reg].reg) & ~regulator_info[reg].trg_bm;
     reg_val |= raw_val << regulator_info[reg].trg_bp;
@@ -259,6 +263,17 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
         reg_val |= raw_bo_offset << regulator_info[reg].bo_bp;
     }
     *regulator_info[reg].reg = reg_val;
+    /* Wait until regulator is stable (ie brownout condition is gone)
+     * If DC-DC is used, we can use the DCDC_OK irq
+     * Otherwise it is unreliable (doesn't work when lowering voltage on linregs)
+     * It usually takes between 0.5ms and 2.5ms */
+    if(!(HW_POWER_5VCTRL & HW_POWER_5VCTRL__ENABLE_DCDC))
+        panicf("regulator %d: wait for voltage stabilize in linreg mode !", reg);
+    unsigned timeout = current_tick + (HZ * 20) / 1000;
+    while(!(HW_POWER_CTRL & HW_POWER_CTRL__DC_OK_IRQ) || !TIME_AFTER(current_tick, timeout))
+        yield();
+    if(!(HW_POWER_CTRL & HW_POWER_CTRL__DC_OK_IRQ))
+        panicf("regulator %d: failed to stabilize", reg);
 }
 
 // offset is -1,0 or 1
