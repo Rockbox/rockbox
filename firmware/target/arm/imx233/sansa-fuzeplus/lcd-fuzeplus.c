@@ -29,9 +29,11 @@
 #include "pinctrl-imx233.h"
 #include "dcp-imx233.h"
 #include "logf.h"
+#ifndef BOOTLOADER
 #include "button.h"
 #include "font.h"
 #include "action.h"
+#endif
 
 #ifdef HAVE_LCD_ENABLE
 static bool lcd_on;
@@ -783,6 +785,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     #endif
 }
 
+#ifndef BOOTLOADER
 bool lcd_debug_screen(void)
 {
     lcd_setfont(FONT_SYSFIXED);
@@ -813,3 +816,4 @@ bool lcd_debug_screen(void)
 
     return true;
 }
+#endif
