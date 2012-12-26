@@ -26,6 +26,8 @@
 #define HAVE_LCD_BITMAP
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
+#define HAVE_LCD_FLIP
+#define HAVE_LCD_INVERT
 
 #ifndef BOOTLOADER
 #define HAVE_ALBUMART

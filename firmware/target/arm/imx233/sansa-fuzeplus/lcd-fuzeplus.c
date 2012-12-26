@@ -502,6 +502,22 @@ void lcd_enable(bool enable)
 }
 #endif
 
+#ifdef HAVE_LCD_INVERT
+void lcd_set_invert_display(bool yesno)
+{
+    /* same for both kinds */
+    lcd_write_reg(0x61, yesno ? 0 : 1);
+}
+#endif
+
+#ifdef HAVE_LCD_FLIP
+void lcd_set_flip(bool yesno)
+{
+    /* same for both kinds */
+    lcd_write_reg(3, yesno ? 0x1000 : 0x1030);
+}
+#endif
+
 void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
