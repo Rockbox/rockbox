@@ -553,7 +553,17 @@ static void usage(void)
     printf("  -drive-tag <tag>\t\tSpecify drive tag\n");
     printf("  -w/-switchdriver <driver>\tSwitch driver\n");
     printf("  -sdram <chip select> <size>\tInit SDRAM\n");
+    printf("  -jumparg <uint>\t\tSet jumpparg for jump and jumpreturn\n");
     printf("  -f/-load <file>\t\tLoad a ELF file\n");
+    printf("  -r/-loadjumpreturn <file>\tLoad a ELF file and call it\n");
+    printf("  -j/-loadjump <file>\t\tLoad a ELF file and jump to it\n");
+    printf("  -R/-rom <uint>\t\tSet ROM version\n");
+    printf("  -p/-product <ver>\t\tSet product version (xxx.xxx.xxx)\n");
+    printf("  -v/-component <ver>\t\tSet component version (xxx.xxx.xxx)\n");
+    printf("  -c/-critical\t\t\tSet critical flag\n");
+    printf("  -C/-noncritical\t\tClear critical flag\n");
+    printf("  -n/-strict\t\t\tSet strict flag\n");
+    printf("  -N/-nonstrict\t\t\tClear strict flag\n");
     
     exit(1);
 }
