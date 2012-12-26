@@ -21,6 +21,7 @@
 
 #include "icoll-imx233.h"
 #include "rtc-imx233.h"
+#include "kernel-imx233.h"
 #include "string.h"
 
 #define default_interrupt(name) \
@@ -61,6 +62,7 @@ default_interrupt(INT_ADC_DMA);
 default_interrupt(INT_ADC_ERROR);
 default_interrupt(INT_DCP);
 default_interrupt(INT_TOUCH_DETECT);
+default_interrupt(INT_RTC_1MSEC);
 
 void INT_RTC_1MSEC(void);
 
@@ -102,8 +104,8 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
     [INT_SRC_RTC_1MSEC] = INT_RTC_1MSEC,
 };
 
-#define IRQ_STORM_DELAY         1000 /* ms */
-#define IRQ_STORM_THRESHOLD     100000 /* allows irq / delay */
+#define IRQ_STORM_DELAY         100 /* ms */
+#define IRQ_STORM_THRESHOLD     10000 /* allows irq / delay */
 
 static uint32_t irq_count_old[INT_SRC_NR_SOURCES];
 static uint32_t irq_count[INT_SRC_NR_SOURCES];
@@ -116,16 +118,15 @@ struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
     return info;
 }
 
-void INT_RTC_1MSEC(void)
+static void do_irq_stat(void)
 {
     static unsigned counter = 0;
-    if(counter++ >= IRQ_STORM_DELAY)
+    if(counter++ >= HZ)
     {
         counter = 0;
         memcpy(irq_count_old, irq_count, sizeof(irq_count));
         memset(irq_count, 0, sizeof(irq_count));
     }
-    imx233_rtc_clear_msec_irq();
 }
 
 static void UIRQ(void)
@@ -140,6 +141,8 @@ void irq_handler(void)
     int irq_nr = (HW_ICOLL_VECTOR - HW_ICOLL_VBASE) / 4;
     if(irq_count[irq_nr]++ > IRQ_STORM_THRESHOLD)
         panicf("IRQ %d: storm detected", irq_nr);
+    if(irq_nr == INT_SRC_TIMER(TICK_TIMER_NR))
+        do_irq_stat();
     (*(isr_t *)HW_ICOLL_VECTOR)();
     /* acknowledge completion of IRQ (all use the same priority 0) */
     HW_ICOLL_LEVELACK = HW_ICOLL_LEVELACK__LEVEL0;
@@ -170,8 +173,5 @@ void imx233_icoll_init(void)
     HW_ICOLL_VBASE = (uint32_t)&isr_table;
     /* enable final irq bit */
     __REG_SET(HW_ICOLL_CTRL) = HW_ICOLL_CTRL__IRQ_FINAL_ENABLE;
-
-    imx233_rtc_enable_msec_irq(true);
-    imx233_icoll_enable_interrupt(INT_SRC_RTC_1MSEC, true);
 }
 
