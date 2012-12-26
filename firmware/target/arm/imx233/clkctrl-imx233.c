@@ -103,7 +103,9 @@ void imx233_clkctrl_set_clock_divisor(enum imx233_clock_t clk, int div)
             __FIELD_SET(HW_CLKCTRL_EMI, DIV_EMI, div);
             break;
         case CLK_HBUS:
-            __FIELD_SET(HW_CLKCTRL_HBUS, DIV, div);
+            /* disable frac enable at the same time */
+            HW_CLKCTRL_HBUS = div << HW_CLKCTRL_HBUS__DIV_BP |
+                (HW_CLKCTRL_HBUS & ~(HW_CLKCTRL_HBUS__DIV_FRAC_EN | HW_CLKCTRL_HBUS__DIV_BM));
             break;
         case CLK_XBUS:
             __FIELD_SET(HW_CLKCTRL_XBUS, DIV, div);
@@ -137,8 +139,9 @@ void imx233_clkctrl_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv)
     switch(clk)
     {
         case CLK_HBUS:
-            __FIELD_SET(HW_CLKCTRL_HBUS, DIV, fracdiv);
-            __REG_SET(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__DIV_FRAC_EN;
+            /* set frac enable at the same time */
+            HW_CLKCTRL_HBUS = fracdiv << HW_CLKCTRL_HBUS__DIV_BP | HW_CLKCTRL_HBUS__DIV_FRAC_EN |
+                (HW_CLKCTRL_HBUS & ~HW_CLKCTRL_HBUS__DIV_BM);
             return;
         case CLK_PIX: REG = &HW_CLKCTRL_FRAC_PIX; break;
         case CLK_IO: REG = &HW_CLKCTRL_FRAC_IO; break;
