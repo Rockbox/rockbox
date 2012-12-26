@@ -208,6 +208,7 @@ static uint32_t i80_read_register(uint32_t data_out)
 static void lcd_write_reg(uint32_t reg, uint32_t data)
 {
     uint32_t old_reg = reg;
+    imx233_lcdif_wait_ready();
     /* get back to 18-bit word length */
     imx233_lcdif_set_word_length(HW_LCDIF_CTRL__WORD_LENGTH_18_BIT);
     reg = encode_16_to_18(reg);
