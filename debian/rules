@@ -39,6 +39,12 @@ install: build
 
 	cd builddir && $(MAKE) PREFIX=$(CURDIR)/debian/rockbox/opt/rockbox fullinstall
 
+	# Remove broken plugins (keymap missing)
+	# Note: Credits and f.e. mikmod are included and working
+	rm -f $(CURDIR)/debian/rockbox/opt/rockbox/lib/rockbox/rocks/apps/*
+	rm -f $(CURDIR)/debian/rockbox/opt/rockbox/lib/rockbox/rocks/demos/*
+	rm -f $(CURDIR)/debian/rockbox/opt/rockbox/lib/rockbox/rocks/games/*
+
 	# Install icon and .desktop file
 	mkdir -p $(CURDIR)/debian/rockbox/usr/share/icons/hicolor/64x64/apps
 	cp -f debian/maemo/rockbox.png $(CURDIR)/debian/rockbox/usr/share/icons/hicolor/64x64/apps
