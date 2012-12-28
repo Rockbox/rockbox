@@ -21,6 +21,8 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
+#define HAS_BUTTON_HOLD
+
 #define BUTTON_UP          0x00000001
 #define BUTTON_POWER       0x00000002
 #define BUTTON_DOWN        0x00000004

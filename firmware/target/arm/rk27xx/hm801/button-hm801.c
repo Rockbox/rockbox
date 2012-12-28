@@ -23,6 +23,7 @@
 #include "system.h"
 #include "button.h"
 #include "adc.h"
+#include "backlight.h"
 
 enum keyboard_type_t {
     KEYBOARD_V1,
@@ -34,6 +35,12 @@ static enum keyboard_type_t kbd_type;
 void button_init_device(void) {
     /* setup button gpio as input */
     GPIO_PCCON &= ~(POWEROFF_BUTTON);
+    GPIO_PACON &= ~1;
+
+
+    /* setup button gpio as pulldown */
+    SCU_GPIOUPCON |= (1<<17) |
+                           1 ;
 
     /* identify keyboard type */
     SCU_IOMUXB_CON &= ~(1<<2);
@@ -43,6 +50,10 @@ void button_init_device(void) {
     } else {
         kbd_type = KEYBOARD_V2;
     }
+}
+
+bool button_hold() {
+    return (GPIO_PADR & 1);
 }
 
 static int button_read_device_v1(void) {
@@ -125,7 +136,21 @@ static int button_read_device_v2(void) {
 }
 
 int button_read_device(void) {
-    if (kbd_type == KEYBOARD_V1) {
+    static bool hold_button = false;
+    bool hold_button_old;
+
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+
+#ifndef BOOTLOADER
+    if (hold_button != hold_button_old) {
+        backlight_hold_changed(hold_button);
+    }
+#endif
+    
+    if (hold_button) {
+        return 0;
+    } else if (kbd_type == KEYBOARD_V1) {
         return button_read_device_v1();
     } else {
         return button_read_device_v2();

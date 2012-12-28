@@ -23,15 +23,40 @@
 #include "system.h"
 #include "button.h"
 #include "adc.h"
+#include "backlight.h"
 
 void button_init_device(void) {
     /* setup button gpio as input */
     GPIO_PCCON &= ~(POWEROFF_BUTTON);
+    GPIO_PACON &= ~(1);
+
+    /* setup button gpio as pulldown */
+    SCU_GPIOUPCON |= (1<<17) |
+                           1 ;
+}
+
+bool button_hold() {
+    return (GPIO_PADR & 1);
 }
 
 int button_read_device(void) {
     int adc_val = adc_read(ADC_BUTTONS);
     int gpio_btn = GPIO_PCDR & BUTTON_POWER;
+    static bool hold_button = false;
+    bool hold_button_old;
+    
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+    
+#ifndef BOOTLOADER
+    if (hold_button != hold_button_old) {
+        backlight_hold_changed(hold_button);
+    }
+#endif
+
+    if (hold_button) {
+        return 0;
+    }
 
     if (adc_val < 380) { /* 0 - 379 */
         if (adc_val < 250) { /* 0 - 249 */
