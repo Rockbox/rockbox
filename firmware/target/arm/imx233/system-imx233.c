@@ -171,6 +171,7 @@ void set_cpu_frequency(long frequency)
     
     cpu_frequency = frequency;
     /* disable auto-slow (enable back afterwards) */
+    bool as = imx233_clkctrl_is_auto_slow_enabled();
     imx233_clkctrl_enable_auto_slow(false);
     /* go back to a known state in safe way:
      * clk_p@24 MHz
@@ -221,7 +222,7 @@ void set_cpu_frequency(long frequency)
     }
 
     /* enable auto slow again */
-    imx233_clkctrl_enable_auto_slow(true);
+    imx233_clkctrl_enable_auto_slow(as);
 }
 #endif
 
