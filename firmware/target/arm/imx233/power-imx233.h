@@ -177,6 +177,8 @@
 #define HW_POWER_RESET__UNLOCK  0x3E770000
 #define HW_POWER_RESET__PWD     0x1
 
+void imx233_power_init(void);
+
 void imx233_power_set_charge_current(unsigned current); /* in mA */
 void imx233_power_set_stop_current(unsigned current); /* in mA */
 void imx233_power_enable_batadj(bool enable);

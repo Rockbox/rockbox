@@ -81,7 +81,7 @@ void INT_VDD5V(void)
     }
 }
 
-void power_init(void)
+void imx233_power_init(void)
 {
     /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
     __REG_CLR(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__VBUSVALID_TRSH_BM;
@@ -108,6 +108,10 @@ void power_init(void)
     __REG_SET(HW_POWER_LOOPCTRL) = HW_POWER_LOOPCTRL__TOGGLE_DIF |
         HW_POWER_LOOPCTRL__EN_CM_HYST;
     __FIELD_SET(HW_POWER_LOOPCTRL, EN_RCSCALE, HW_POWER_LOOPCTRL__EN_RCSCALE__2X);
+}
+
+void power_init(void)
+{
 }
 
 void power_off(void)
