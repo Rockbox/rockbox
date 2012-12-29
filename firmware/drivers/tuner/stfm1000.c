@@ -7,10 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 by amaury Pouly
- *
- * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
+ * Copyright (C) 2012 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
