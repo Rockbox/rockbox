@@ -81,10 +81,13 @@
                    : "d0", "d1", "d2", "d3", "cc"); \
     }
 #elif defined(CPU_ARM)
+#if (ARM_ARCH < 5)
+
+
 #   define C_MULC(m,a,b) \
     { \
       asm volatile( \
-                   "ldmia %[ap], {r0,r1}                  \n\t" \
+                   "ldm %[ap], {r0,r1}                  \n\t" \
                    "ldrsh r2, [%[bp], #0]                 \n\t" \
                    "ldrsh r3, [%[bp], #2]                 \n\t" \
                    \
@@ -102,6 +105,27 @@
                    : [ap] "r" (&(a)), [bp] "r" (&(b)) \
                    : "r0", "r1", "r2", "r3", "r4"); \
 }
+#else
+/*same as above but using armv5 packed multiplies*/
+#   define C_MULC(m,a,b) \
+    { \
+      asm volatile( \
+                   "ldm %[ap], {r0,r1}            \n\t" \
+                   "ldr r2, [%[bp], #0] 	        \n\t" \
+      				\
+                   "smulwb r4, r0, r2               \n\t"  /*r4=a.r*b.r*/    \
+                   "smlawt %[mr], r1, r2, r4        \n\t"  /*m.r=r4+a.i*b.i*/\
+                   "mov   %[mr], %[mr], lsl #1      \n\t"  /*Q15 not Q16*/   \
+                    \
+                   "smulwb r1, r1, r2               \n\t"  /*r1=a.i*b.r*/    \
+                   "smulwt r4, r0, r2               \n\t"  /*r4=a.r*b.i*/    \
+                   "sub %[mi], r1, r4               \n\t" \
+                   "mov   %[mi], %[mi], lsl #1      \n\t" \
+                   : [mr] "=r" ((m).r), [mi] "=r" ((m).i) \
+                   : [ap] "r" (&(a)), [bp] "r" (&(b)) \
+                   : "r0", "r1", "r2", "r4"); \
+}
+#endif /*ARMv5 code*/
 #else
 #   define C_MULC(m,a,b) \
       do{ (m).r = ADD32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)); \
