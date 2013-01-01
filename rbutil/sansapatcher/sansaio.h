@@ -80,6 +80,7 @@ int sansa_seek(struct sansa_t* sansa, loff_t pos);
 int sansa_read(struct sansa_t* sansa, unsigned char* buf, int nbytes);
 int sansa_write(struct sansa_t* sansa, int nbytes);
 int sansa_alloc_buffer(struct sansa_t* sansa, int bufsize);
+int sansa_dealloc_buffer(struct sansa_t* sansa);
 
 #ifdef __cplusplus
 }

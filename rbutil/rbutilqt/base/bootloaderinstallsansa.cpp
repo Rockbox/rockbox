@@ -36,8 +36,7 @@ BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
 BootloaderInstallSansa::~BootloaderInstallSansa()
 {
     if(sansa.sectorbuf) {
-        free(sansa.sectorbuf);
-        sansa.sectorbuf = NULL;
+        sansa_dealloc_buffer(&sansa);
     }
 }
 

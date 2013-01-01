@@ -162,6 +162,19 @@ int sansa_alloc_buffer(struct sansa_t* sansa, int bufsize)
     return 0;
 }
 
+int sansa_dealloc_buffer(struct sansa_t* sansa)
+{
+    if (sansa->sectorbuf == NULL) {
+        return -1;
+    }
+    if(!VirtualFree(sansa->sectorbuf, 0, MEM_RELEASE)) {
+        sansa_print_error(" Error releasing buffer ");
+        return -1;
+    }
+    sansa->sectorbuf = NULL;
+    return 0;
+}
+
 int sansa_seek(struct sansa_t* sansa, loff_t pos)
 {
     LARGE_INTEGER li;

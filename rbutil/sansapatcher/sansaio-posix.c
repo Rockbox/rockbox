@@ -122,6 +122,16 @@ int sansa_alloc_buffer(struct sansa_t *sansa, int bufsize)
     return 0;
 }
 
+int sansa_dealloc_buffer(struct sansa_t* sansa)
+{
+    if (sansa->sectorbuf == NULL) {
+        return -1;
+    }
+    free(sansa->sectorbuf);
+    sansa->sectorbuf = NULL;
+    return 0;
+}
+
 int sansa_seek(struct sansa_t* sansa, loff_t pos)
 {
     off_t res;

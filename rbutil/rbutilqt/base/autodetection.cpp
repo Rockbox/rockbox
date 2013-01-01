@@ -185,8 +185,7 @@ bool Autodetection::detect()
     else {
         qDebug() << "[Autodetect] sansapatcher: no Sansa found." << n;
     }
-    free(sansa.sectorbuf);
-    sansa.sectorbuf = NULL;
+    sansa_dealloc_buffer(&sansa);
 
     if(m_mountpoint.isEmpty() && m_device.isEmpty()
             && m_errdev.isEmpty() && m_incompat.isEmpty())

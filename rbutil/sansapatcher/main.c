@@ -404,6 +404,7 @@ int main(int argc, char* argv[])
     }
 
     sansa_close(&sansa);
+    sansa_dealloc_buffer(&sansa);
 
     if (action==INTERACTIVE) {
         printf("Press ENTER to exit sansapatcher :");
