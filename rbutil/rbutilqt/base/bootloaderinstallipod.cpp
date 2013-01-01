@@ -37,8 +37,7 @@ BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
 BootloaderInstallIpod::~BootloaderInstallIpod()
 {
     if(ipod.sectorbuf) {
-        free(ipod.sectorbuf);
-        ipod.sectorbuf = NULL;
+        ipod_dealloc_buffer(&ipod);
     }
 }
 

@@ -614,5 +614,6 @@ int main(int argc, char* argv[])
     }
 #endif
 
+    ipod_dealloc_buffer(&ipod);
     return 0;
 }

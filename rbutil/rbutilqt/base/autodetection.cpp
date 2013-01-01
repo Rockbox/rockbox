@@ -162,8 +162,7 @@ bool Autodetection::detect()
     else {
         qDebug() << "[Autodetect] ipodpatcher: no Ipod found." << n;
     }
-    free(ipod.sectorbuf);
-    ipod.sectorbuf = NULL;
+    ipod_dealloc_buffer(&ipod);
 
     // try sansapatcher
     // initialize sector buffer. Needed.

@@ -107,6 +107,7 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
 ssize_t ipod_read(struct ipod_t* ipod, int nbytes);
 ssize_t ipod_write(struct ipod_t* ipod, int nbytes);
 int ipod_alloc_buffer(struct ipod_t* ipod, int bufsize);
+int ipod_dealloc_buffer(struct ipod_t* ipod);
 
 /* In fat32format.c */
 int format_partition(struct ipod_t* ipod, int partition);

@@ -170,6 +170,19 @@ int ipod_alloc_buffer(struct ipod_t* ipod, int bufsize)
     return 0;
 }
 
+int ipod_dealloc_buffer(struct ipod_t* ipod)
+{
+    if (ipod->sectorbuf == NULL) {
+        return -1;
+    }
+    if(!VirtualFree(ipod->sectorbuf, 0, MEM_RELEASE)) {
+        ipod_print_error(" Error releasing buffer ");
+        return -1;
+    }
+    ipod->sectorbuf = NULL;
+    return 0;
+}
+
 int ipod_seek(struct ipod_t* ipod, unsigned long pos)
 {
     if (SetFilePointer(ipod->dh, pos, NULL, FILE_BEGIN)==0xffffffff) {

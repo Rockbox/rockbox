@@ -367,6 +367,16 @@ int ipod_alloc_buffer(struct ipod_t* ipod, int bufsize)
     return 0;
 }
 
+int ipod_dealloc_buffer(struct ipod_t* ipod)
+{
+    if (ipod->sectorbuf == NULL) {
+        return -1;
+    }
+    free(ipod->sectorbuf);
+    ipod->sectorbuf = NULL;
+    return 0;
+}
+
 int ipod_seek(struct ipod_t* ipod, unsigned long pos)
 {
     off_t res;
