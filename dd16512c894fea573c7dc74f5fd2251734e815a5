@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///p8\u003d",
+        "filename": "rbutil/rbutilqt/rbutilqt.pro",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-01-02T17:02:36Z",
+      "side": 1,
+      "message": "This change will break for all installations of Qt that don\u0027t use \"lrelease-qt4\" as name of lrelease. This includes Windows. By using the QT_INSTALL_BINS variable it usually works by simply picking the one in the Qt library folder (on my Linux box I have /usr/lib/qt4/bin/lrelease as well as /usr/bin/lrelease-qt4, with the former being picked by the original line).\n\nIs this different on BSD?",
+      "revId": "dd16512c894fea573c7dc74f5fd2251734e815a5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///p4\u003d",
+        "filename": "rbutil/rbutilqt/rbutilqt.pro",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-01-02T17:02:36Z",
+      "side": 1,
+      "message": "I don\u0027t like introducing yet another option just for FreeBSD. Isn\u0027t it possible to simply use libusb0 on FreeBSD? Or is that \"combo libusb\" thing rather naming the libraries libusb-0 and libusb instead of libusb and libusb-1.0?",
+      "revId": "dd16512c894fea573c7dc74f5fd2251734e815a5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
