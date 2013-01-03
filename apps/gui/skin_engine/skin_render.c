@@ -280,7 +280,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             if (do_refresh && aa)
             {
                 int handle = playback_current_aa_hid(data->playback_aa_slot);
-#if CONFIG_TUNER
+#if 0 /* FIXME: FS#12797*/
                 if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
                 {
                     struct dim dim = {aa->width, aa->height};
