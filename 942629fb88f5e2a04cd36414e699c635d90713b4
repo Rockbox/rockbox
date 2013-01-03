@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///pw\u003d",
+        "filename": "apps/radio/radio.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2013-01-03T02:21:37Z",
+      "side": 1,
+      "message": "This is incorrect, see wps.c... in fms_do_button_loop() you just need to pass ALLOW_SOFTLOCK with the context.",
+      "revId": "942629fb88f5e2a04cd36414e699c635d90713b4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
