@@ -61,8 +61,17 @@ bool ide_powered()
 #ifdef HAVE_USB_CHARGING_ENABLE
 void usb_charging_maxcurrent_change(int maxcurrent)
 {
-    bool on = (maxcurrent >= 500);
-    GPIOCMD = 0xb060e | (on ? 1 : 0);
+    bool suspend_charging = (maxcurrent < 100);
+    bool fast_charging = (maxcurrent >= 500);
+
+    /* This GPIO is connected to the LTC4066's SUSP pin */
+    /* Setting it high prevents any power being drawn over USB */
+    /* which supports USB suspend */
+    GPIOCMD = 0xb070e | (suspend_charging ? 1 : 0);
+
+    /* This GPIO is connected to the LTC4066's HPWR pin */
+    /* Setting it low limits current to 100mA, setting it high allows 500mA */
+    GPIOCMD = 0xb060e | (fast_charging ? 1 : 0);
 }
 #endif
 
