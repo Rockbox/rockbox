@@ -31,11 +31,18 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#ifndef _WIN32
 #include <scsi/scsi.h>
+#endif
 #include <scsi/sg_lib.h>
 #include <scsi/sg_pt.h>
 #include "misc.h"
 #include "para_noise.h"
+
+/* the windows port doesn't have scsi.h and GOOD */
+#ifndef GOOD
+#define GOOD                 0x00
+#endif
 
 bool g_debug = false;
 bool g_force = false;

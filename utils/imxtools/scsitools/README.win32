@@ -1,0 +1,6 @@
+This tool can be compiled under Windows with MinGW and the Windows port of sg3_util.
+Everything runs unmodified with MSYS except perhaps for
+- the library in which case you might have to change the LDFLAGS in Makefile to:
+LDFLAGS=/usr/local/lib/libsgutils2.a
+- the include directory in which case you might have to change the DEFINES in Makefile to:
+DEFINES=-I/usr/local/include
