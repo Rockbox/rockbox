@@ -27,25 +27,25 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3600
+    3500
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3350
+    3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3600, 3730, 3780, 3810, 3840, 3880, 3930, 3990, 4080, 4170, 4270 }
+    { 3500, 3670, 3720, 3750, 3770, 3800, 3860, 3920, 3980, 4070, 4170 }
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3800, 3900, 3990, 4070, 4140, 4200, 4250, 4290, 4320, 4340, 4350
+    3700, 3820, 3900, 3950, 3990, 4030, 4070, 4120, 4170, 4190, 4200
 };
 #endif /* CONFIG_CHARGING */
 

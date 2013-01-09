@@ -73,7 +73,7 @@ int pmu_read_adc(unsigned int adc)
 /* millivolts */
 int pmu_read_battery_voltage(void)
 {
-    return pmu_read_adc(0) * 6;
+    return (pmu_read_adc(1) * 2000 / 1023) + 2250;
 }
 
 /* milliamps */
