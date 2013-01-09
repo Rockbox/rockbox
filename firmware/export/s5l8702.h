@@ -807,7 +807,7 @@ struct dma_lli
 #define I2SRXCOM            (*((volatile uint32_t*)(0x3CA00034)))
 #define I2SRXDB             (*((volatile uint32_t*)(0x3CA00038)))
 #define I2SSTATUS           (*((volatile uint32_t*)(0x3CA0003C)))
-#define I2S40               (*((volatile uint32_t*)(0x3CA00040)))
+#define I2SCLKDIV           (*((volatile uint32_t*)(0x3CA00040)))
 
 
 /////CLOCK GATES/////

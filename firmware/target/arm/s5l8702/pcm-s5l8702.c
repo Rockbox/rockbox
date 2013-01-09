@@ -139,25 +139,33 @@ void pcm_play_dma_pause(bool pause)
     else  I2STXCOM &= ~1;
 }
 
+/* MCLK = 12MHz (MCLKDIV2=1), [CS42L55 DS, s4.8] */
+#define MCLK_FREQ     12000000
+
+/* set the configured PCM frequency */
+void pcm_dma_apply_settings(void)
+{
+    /* configure I2S clock ratio */
+    I2SCLKDIV = MCLK_FREQ / hw_freq_sampr[pcm_fsel];
+    /* select CS42L55 sample rate */
+    audiohw_set_frequency(pcm_fsel);
+}
+
 void pcm_play_dma_init(void)
 {
     PWRCON(0) &= ~(1 << 4);
     PWRCON(1) &= ~(1 << 7);
-    I2S40 = 0x110;
     I2STXCON = 0xb100019;
     I2SCLKCON = 1;
     VIC0INTENABLE = 1 << IRQ_DMAC0;
 
     audiohw_preinit();
+    pcm_dma_apply_settings();
 }
 
 void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
-}
-
-void pcm_dma_apply_settings(void)
-{
 }
 
 size_t pcm_get_bytes_waiting(void)
