@@ -14,21 +14,21 @@ ANDROID_DIR=$(ROOTDIR)/android
 
 # this is a glibc compatibility hack to provide a get_nprocs() replacement.
 # The NDK ships cpu-features.c which has a compatible function android_getCpuCount()
-CPUFEAT = $(ANDROID_DIR)/cpufeatures
-CPUFEAT_BUILD = $(subst $(ANDROID_DIR),$(BUILDDIR),$(CPUFEAT))
+CPUFEAT = $(ANDROID_NDK_PATH)/sources/android/cpufeatures
+CPUFEAT_BUILD = $(BUILDDIR)
 INCLUDES += -I$(CPUFEAT)
 OTHER_SRC += $(CPUFEAT)/cpu-features.c
 CLEANOBJS += $(CPUFEAT_BUILD)/cpu-features.o
 $(CPUFEAT_BUILD)/cpu-features.o: $(CPUFEAT)/cpu-features.c
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -o $@ -c $^ $(GCCOPTS) -Wno-unused
+	$(call PRINTS,CC $(subst $(CPUFEAT)/,,$<))$(CC) -o $@ -c $^ $(GCCOPTS) -Wno-unused
 
 .SECONDEXPANSION: # $$(JAVA_OBJ) is not populated until after this
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 .PHONY: apk classes clean dex dirs libs jar
 
 # API version
-ANDROID_PLATFORM_VERSION=15
+ANDROID_PLATFORM_VERSION=16
 ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSION)
 
 # android tools
@@ -62,10 +62,10 @@ LIBS 		+= $(addprefix $(BINLIB_DIR)/lib,$(patsubst %.codec,%.so,$(notdir $(CODEC
 
 TEMP_APK	:= $(BUILDDIR)/bin/_rockbox.apk
 TEMP_APK2	:= $(BUILDDIR)/bin/__rockbox.apk
-DEX		:= $(BUILDDIR)/bin/classes.dex
-JAR		:= $(BUILDDIR)/bin/classes.jar
-AP_		:= $(BUILDDIR)/bin/resources.ap_
-APK		:= $(BUILDDIR)/rockbox.apk
+DEX			:= $(BUILDDIR)/bin/classes.dex
+JAR			:= $(BUILDDIR)/bin/classes.jar
+AP_			:= $(BUILDDIR)/bin/resources.ap_
+APK			:= $(BUILDDIR)/rockbox.apk
 
 _DIRS		:= $(BUILDDIR)/___/$(PACKAGE_PATH)
 DIRS		+= $(subst ___,gen,$(_DIRS))

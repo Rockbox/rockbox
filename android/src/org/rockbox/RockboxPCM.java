@@ -40,7 +40,7 @@ public class RockboxPCM extends AudioTrack
     private static final int samplerate = 44100;
     /* should be CHANNEL_OUT_STEREO in 2.0 and above */
     private static final int channels = 
-            AudioFormat.CHANNEL_CONFIGURATION_STEREO;
+            AudioFormat.CHANNEL_OUT_STEREO;
     private static final int encoding = 
             AudioFormat.ENCODING_PCM_16BIT;
     /* 32k is plenty, but some devices may have a higher minimum */
