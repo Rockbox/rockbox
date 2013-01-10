@@ -526,6 +526,7 @@ target/arm/imx233/lradc-imx233.c
 target/arm/imx233/pwm-imx233.c
 target/arm/imx233/rtc-imx233.c
 target/arm/imx233/dcp-imx233.c
+target/arm/imx233/emi-imx233.c
 # ifdef HAVE_TOUCHSCREEN
 target/arm/imx233/touchscreen-imx233.c
 # endif

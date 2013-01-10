@@ -36,6 +36,7 @@
 #include "lradc-imx233.h"
 #include "rtc-imx233.h"
 #include "power-imx233.h"
+#include "emi-imx233.h"
 #include "lcd.h"
 #include "backlight-target.h"
 #include "button.h"
@@ -196,6 +197,8 @@ void set_cpu_frequency(long frequency)
             imx233_clkctrl_set_fractional_divisor(CLK_CPU, 19);
             imx233_clkctrl_set_clock_divisor(CLK_CPU, 1);
             imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+
+            imx233_emi_set_frequency(IMX233_EMIFREQ_130_MHz);
             /* ref_cpu@480 MHz
              * ref_emi@480 MHz
              * clk_emi@130.91 MHz
@@ -211,12 +214,30 @@ void set_cpu_frequency(long frequency)
             imx233_clkctrl_set_fractional_divisor(CLK_CPU, 33);
             imx233_clkctrl_set_clock_divisor(CLK_CPU, 1);
             imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+
+            imx233_emi_set_frequency(IMX233_EMIFREQ_130_MHz);
             /* ref_cpu@480 MHz
              * ref_emi@480 MHz
              * clk_emi@130.91 MHz
              * clk_p@261.82 MHz
              * clk_h@130.91 MHz */
             break;
+        case IMX233_CPUFREQ_64_MHz:
+            /* set VDDD to 1.050 mV (brownout at 0.975 mV) */
+            imx233_power_set_regulator(REGULATOR_VDDD, 1050, 975);
+            /* clk_h@clk_p */
+            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
+            /* clk_p@ref_cpu/5*18/27 */
+            imx233_clkctrl_set_fractional_divisor(CLK_CPU, 27);
+            imx233_clkctrl_set_clock_divisor(CLK_CPU, 5);
+            imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+
+            imx233_emi_set_frequency(IMX233_EMIFREQ_64_MHz);
+            /* ref_cpu@480 MHz
+             * ref_emi@480 MHz
+             * clk_emi@64 MHz
+             * clk_p@64 MHz
+             * clk_h@64 MHz */
         default:
             break;
     }

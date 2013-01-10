@@ -81,6 +81,7 @@
 #define HW_CLKCTRL_EMI__DIV_XTAL_BP 8
 #define HW_CLKCTRL_EMI__DIV_XTAL_BM (0xf << 8)
 #define HW_CLKCTRL_EMI__BUSY_REF_EMI    (1 << 28)
+#define HW_CLKCTRL_EMI__BUSY_REF_XTAL   (1 << 29)
 #define HW_CLKCTRL_EMI__SYNC_MODE_EN    (1 << 30)
 #define HW_CLKCTRL_EMI__CLKGATE     (1 << 31)
 
