@@ -163,6 +163,16 @@ void udelay(unsigned us)
     while(!imx233_us_elapsed(ref, us));
 }
 
+void imx233_digctl_set_arm_cache_timings(unsigned timings)
+{
+    HW_DIGCTL_ARMCACHE =
+        timings << HW_DIGCTL_ARMCACHE__ITAG_SS_BP |
+        timings << HW_DIGCTL_ARMCACHE__DTAG_SS_BP |
+        timings << HW_DIGCTL_ARMCACHE__CACHE_SS_BP |
+        timings << HW_DIGCTL_ARMCACHE__DRTY_SS_BP |
+        timings << HW_DIGCTL_ARMCACHE__VALID_SS_BP;
+}
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
@@ -185,6 +195,7 @@ void set_cpu_frequency(long frequency)
      * changes are safe too */
     imx233_clkctrl_set_clock_divisor(CLK_HBUS, 4);
     imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+    imx233_digctl_set_arm_cache_timings(0);
 
     switch(frequency)
     {
@@ -233,6 +244,7 @@ void set_cpu_frequency(long frequency)
             imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
 
             imx233_emi_set_frequency(IMX233_EMIFREQ_64_MHz);
+            imx233_digctl_set_arm_cache_timings(3);
             /* ref_cpu@480 MHz
              * ref_emi@480 MHz
              * clk_emi@64 MHz
