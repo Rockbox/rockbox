@@ -242,16 +242,35 @@ void set_cpu_frequency(long frequency)
      */
     if (frequency == CPUFREQ_MAX)
     {
+#ifdef PATCH_IPOD6G_VCORE_1100_1000
+        /* Vcore = 1.100V */
+        pmu_write(0x1e, 0x13);
+#else
         /* Vcore = 1.200V */
         pmu_write(0x1e, 0x17);
+#endif
+
+#ifdef PATCH_IPOD6G_FREQDIV_4_8_16_1
+        #ifdef PATCH_IPOD6G_FREQDIV_6_12_24_1
+        CLKCON0 = 0x3013;
+        udelay(50);
+        #endif
+        (*((volatile uint32_t*)(0x38501000))) = 1;
+        udelay(50);
+#endif
 
         /* FCLK = PLL2 / 2  (FCLK = 108MHz, HCLK = 108MHz) */
         CLKCON0 = 0x3011;
         udelay(50);
 
+#ifdef PATCH_IPOD6G_FREQDIV_4_8_16_1
+        (*((volatile uint32_t*)(0x38501000))) = 3;
+        udelay(50);
+#else
         /* HCLK = FCLK / 2  (HCLK = 54MHz) */
         CLKCON1 = 0x404101;
         udelay(50);
+#endif
 
         /* FCLK = PLL2  (FCLK = 216MHz, HCLK = 108MHz) */
         CLKCON0 = 0x3000;
@@ -263,16 +282,35 @@ void set_cpu_frequency(long frequency)
         CLKCON0 = 0x3011;
         udelay(50);
 
+#ifdef PATCH_IPOD6G_FREQDIV_4_8_16_1
+        (*((volatile uint32_t*)(0x38501000))) = 1;
+        udelay(50);
+#else
         /* HCLK = FCLK  (HCLK = 108MHz) */
         CLKCON1 = 0x4001;
         udelay(50);
+#endif
 
         /* FCLK = PLL2 / 4  (FCLK = 54MHz, HCLK = 54MHz) */
         CLKCON0 = 0x3013;
         udelay(100);
 
+#ifdef PATCH_IPOD6G_FREQDIV_4_8_16_1
+        (*((volatile uint32_t*)(0x38501000))) = 0;
+        udelay(50);
+        #ifdef PATCH_IPOD6G_FREQDIV_6_12_24_1
+        CLKCON0 = 0x3015;
+        udelay(50);
+        #endif
+#endif
+
+#ifdef PATCH_IPOD6G_VCORE_1100_1000
+        /* Vcore = 1.000V */
+        pmu_write(0x1e, 0xf);
+#else
         /* Vcore = 1.050V */
         pmu_write(0x1e, 0x11);
+#endif
     }
 
     cpu_frequency = frequency;

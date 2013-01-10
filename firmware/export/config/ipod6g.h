@@ -1,6 +1,14 @@
 /*
  * This config file is for iPod 6G / Classic
  */
+#define PATCH_IPOD6G_CLOCKING_DEBUG
+/* _FREQDIV_CPU_AHB_APB_UNK */
+#define PATCH_IPOD6G_FREQDIV_4_8_16_1
+#ifdef PATCH_IPOD6G_FREQDIV_4_8_16_1
+# define PATCH_IPOD6G_FREQDIV_6_12_24_1
+#endif
+/* _VCORE_BOOSTED_UNBOOSTED */
+#define PATCH_IPOD6G_VCORE_1100_1000
 
 #define IPOD_ARCH 1
 

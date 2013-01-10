@@ -80,6 +80,49 @@ bool dbg_hw_info(void)
 
             _DEBUG_PRINTF("capture HW: %d", rec_hw_ver);
             line++;
+
+#ifdef PATCH_IPOD6G_CLOCKING_DEBUG
+            /* detect clocks */
+            unsigned osc_clk;
+            unsigned f_clk, cpu_clk, ahb_clk, apb_clk, unk_clk, lcd_clk;
+            unsigned f_div, cpu_div, ahb_div, apb_div, unk_div, lcd_div;
+
+            if (CLKCON0 & 0x8000) { // XXX: TBC
+                osc_clk = 32768;
+                f_div = 1;
+            }
+            else {
+                osc_clk = 216000000; // TODO: use PLL
+                f_div = (CLKCON0 & 0xf) + 1;
+            }
+
+            cpu_div = (CLKCON1 & 0x40000000) ?
+                ((((CLKCON1 & 0x1f000000) >> 24) + 1) * 2) : 1;
+            ahb_div = (CLKCON1 & 0x00400000) ?
+                ((((CLKCON1 & 0x001f0000) >> 1) + 1) * 2) : 1;
+            apb_div = (CLKCON1 & 0x00004000) ?
+                ((((CLKCON1 & 0x00001f00) >> 8) + 1) * 2) : 1;
+            unk_div = ( (*((volatile uint32_t*)(0x38501000))) & 0xf ) + 1;
+            lcd_div = 1 << ((LCD_CONFIG & 7)+1);    /* divisor = 2^(value+1) */
+
+            f_clk = osc_clk / f_div;
+            cpu_clk = osc_clk / (f_div * cpu_div);
+            ahb_clk = osc_clk / (f_div * ahb_div);
+            apb_clk = osc_clk / (f_div * apb_div);
+            unk_clk = osc_clk / (f_div * ahb_div * unk_div);
+            lcd_clk = osc_clk / (f_div * ahb_div * lcd_div);
+            // TODO: i2c_clk
+
+            _DEBUG_PRINTF("Clocks (MHz)");
+            _DEBUG_PRINTF("  OSC: %d", osc_clk / 1000000);
+            _DEBUG_PRINTF("  fclk: %d", f_clk / 1000000);
+            _DEBUG_PRINTF("  CPU: %d", cpu_clk / 1000000);
+            _DEBUG_PRINTF("  AHB: %d", ahb_clk / 1000000);
+            _DEBUG_PRINTF("  APB: %d", apb_clk / 1000000);
+            _DEBUG_PRINTF("  UNK: %d", unk_clk / 1000000);
+            _DEBUG_PRINTF("  LCD: %d", lcd_clk / 1000000);
+            line++;
+#endif
         }
         else if(state==1)
         {
