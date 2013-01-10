@@ -584,6 +584,9 @@ static int ata_set_feature(uint32_t feature, uint32_t param)
 static int ata_power_up(void)
 {
     ata_set_active();
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost(true);
+#endif
     ide_power_enable(true);
     long spinup_start = current_tick;
     if (ceata)
@@ -742,6 +745,9 @@ static void ata_power_down(void)
     PCON(10) &= ~0xffff;
     PCON(11) &= ~0xf;
     ide_power_enable(false);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost(false);
+#endif
 }
 
 static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool write)

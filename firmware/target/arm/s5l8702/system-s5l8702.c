@@ -187,6 +187,7 @@ static struct clocking_mode clk_modes[] =
     { 1,    2,    2,     4 },        /* 216   108   54    27      42  */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     { 4,    4,    2,     2 },        /* 54    54    27    27      21  */
+    { 6,    6,    2,     1 },        /* 36    36    18    36      14  */
 #endif
 };
 #define N_CLK_MODES (sizeof(clk_modes) / sizeof(struct clocking_mode))
@@ -252,7 +253,11 @@ void set_cpu_frequency(long frequency)
     else
     {
         set_clocking_level(CLK_UNBOOST);
+        #if 0
         pmu_write(0x1e, 0xf);   /* Vcore = 1000 mV */
+        #else
+        pmu_write(0x1e, 0xd);   /* Vcore = 950 mV */
+        #endif
     }
 
     cpu_frequency = frequency;
