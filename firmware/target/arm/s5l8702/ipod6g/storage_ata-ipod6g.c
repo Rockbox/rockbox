@@ -552,6 +552,11 @@ static int ata_power_up(void)
 {
     ata_set_active();
     if (ata_powered) return 0;
+#ifdef PATCH_IPOD6G_FREQDIV_4_8_16_1
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost(true);
+#endif
+#endif
     ide_power_enable(true);
     long spinup_start = current_tick;
     if (ceata)
@@ -692,6 +697,11 @@ static void ata_power_down(void)
         PWRCON(0) |= (1 << 5);
     }
     ide_power_enable(false);
+#ifdef PATCH_IPOD6G_FREQDIV_4_8_16_1
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    cpu_boost(false);
+#endif
+#endif
 }
 
 static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool write)
