@@ -65,7 +65,7 @@ default_interrupt(INT_SW_INT1);
 default_interrupt(INT_SW_INT2);
 default_interrupt(INT_SW_INT3);
 
-static void (* const irqvector[])(void) =
+static void (* const irqvector[])(void) USED_ATTR =
 {
     INT_UART0,INT_UART1,INT_TIMER0,INT_TIMER1,INT_TIMER2,INT_GPIO0,INT_SW_INT0,INT_AHB0_MAILBOX,
     INT_RTC,INT_SCU,INT_SD,INT_SPI,INT_HDMA,INT_A2A_BRIDGE,INT_I2C,INT_I2S,
@@ -89,23 +89,18 @@ static void UIRQ(void)
 
 void irq_handler(void)
 {
-    /*
-     * Based on: linux/arch/arm/kernel/entry-armv.S and system-meg-fx.c
-     */
-
-    asm volatile(   "stmfd sp!, {r0-r7, ip, lr} \n"   /* Store context */
-                    "sub   sp, sp, #8           \n"); /* Reserve stack */
-
-    int irq_no = INTC_ISR & 0x1f;
-
-    irqvector[irq_no]();
-
-    /* clear interrupt */
-    INTC_ICCR = (1 << irq_no);
-
-    asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
-                    "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
-                    "subs  pc, lr, #4           \n"); /* Return from IRQ */
+    asm volatile("stmfd sp!, {r0-r5, ip, lr} \n" /* store context */
+                 "ldr   r4, =0x18080000      \n" /* INTC base */        
+                 "ldr   r5, [r4, #0x104]     \n" /* INTC_ISR */
+                 "and   r5, r5, #0x1f        \n" /* irq_no = INTC_ISR & 0x1f */
+                 "ldr   r3, =irqvector       \n"  
+                 "ldr   r3,[r3, r5, lsl #2]  \n"
+                 "blx   r3                   \n" /* irqvector[irq_no]() */
+                 "mov   r3, #1               \n"
+                 "lsl   r5, r3, r5           \n" /* clear interrupt */
+                 "str   r5, [r4, #0x118]     \n" /* INTC_ICCR = (1<<irq_no) */
+                 "ldmfd sp!, {r0-r5, ip, lr} \n" /* restore context */
+                 "subs  pc, lr, #4           \n");
 }
 
 void fiq_dummy(void)
