@@ -33,7 +33,7 @@ static char print[32]; /* use a common snprintf() buffer */
 
 /* decompressed image in the possible sizes (1,2,4,8), wasting the other */
 /* max 32 frames */
-static unsigned char *disp[GIF_MAX_FRAMES][9];
+static unsigned char **disp; /* former *disp[GIF_MAX_FRAMES][9] */
 static unsigned char *disp_buf;
 
 #if defined(HAVE_LCD_COLOR)
@@ -81,10 +81,10 @@ static int load_image(char *filename, struct image_info *info,
     struct gif_decoder *p_decoder = &decoder;
 
     unsigned char *memory, *memory_max;
-    size_t memory_size;
+    size_t memory_size, img_size, disp_size;
 
     /* cleanup */
-    memset(&disp, 0, sizeof(disp));
+    //memset(&disp, 0, sizeof(disp));
 
     /* align buffer */
     memory = (unsigned char *)((intptr_t)(buf + 3) & ~3);
@@ -153,18 +153,28 @@ static int load_image(char *filename, struct image_info *info,
     info->frames_count = p_decoder->frames_count;
     info->delay = p_decoder->delay;
 
-    //p_decoder->native_img_size = (p_decoder->native_img_size + 3) & ~3;
-    disp_buf = p_decoder->mem + 
-               ((p_decoder->native_img_size*p_decoder->frames_count + 3) & ~3);
+    /* check mem constraints */
+    img_size = (p_decoder->native_img_size*p_decoder->frames_count + 3) & ~3;
+    disp_size = (sizeof(unsigned char *)*p_decoder->frames_count*9 + 3) & ~3;
+
+    if (memory_size < img_size + disp_size)
+    {
+        rb->splashf(HZ, "%s", GifErrorString(D_GIF_ERR_NOT_ENOUGH_MEM));
+        return PLUGIN_ERROR;
+    }
+
+    disp = (unsigned char **)(p_decoder->mem + img_size);
+    disp_buf = (unsigned char *)disp + disp_size;
 
     *buf_size = memory_max - disp_buf;
 
+    memset(disp, 0, sizeof(unsigned char *)*p_decoder->frames_count*9);
     return PLUGIN_OK;
 }
 
 static int get_image(struct image_info *info, int frame, int ds)
 {
-    unsigned char **p_disp = &disp[frame][ds]; /* short cut */
+    unsigned char **p_disp = disp + frame*9 + ds;
     struct gif_decoder *p_decoder = &decoder;
 
     info->width = p_decoder->width / ds;
@@ -193,9 +203,9 @@ static int get_image(struct image_info *info, int frame, int ds)
         if (disp_buf + size >= p_decoder->mem + p_decoder->mem_size)
         {
             /* have to discard the current */
-            int i;
-            for (i=1; i<=8; i++)
-                disp[frame][i] = NULL; /* invalidate all bitmaps */
+            p_disp = disp + frame*9 + 1;
+            for (int i=1; i<=8; i++)
+                *p_disp++ = NULL;
 
             /* start again from the beginning of the buffer */
             disp_buf = p_decoder->mem +
