@@ -218,18 +218,17 @@ void commit_discard_dcache (void) __attribute__((alias("commit_discard_idcache")
 
 void commit_discard_dcache_range (const void *base, unsigned int size)
 {
-    int cnt = size + ((unsigned long)base & 0x1f);
-    unsigned long opcode = ((unsigned long)base & 0xffffffe0) | 0x01;
+    /* 0x01 is opcode for cache line commit discard */
+    uint32_t end_opcode = (uint32_t)((uintptr_t)base + size) | 0x01;
+    uint32_t opcode = (uint32_t)((uintptr_t)base & 0xffffffe0) | 0x01;
 
     int old_irq = disable_irq_save();
 
-    while (cnt > 0)
+    while (opcode <= end_opcode)
     {
-        CACHEOP = opcode;
-
         while (CACHEOP & 0x03);
 
-        cnt -= 32;
+        CACHEOP = opcode;
         opcode += 32;
     }
 
