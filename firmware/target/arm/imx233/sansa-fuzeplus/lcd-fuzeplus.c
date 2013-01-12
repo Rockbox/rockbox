@@ -51,8 +51,7 @@ static enum lcd_kind_t
 {
     LCD_KIND_7783 = 0x7783,
     LCD_KIND_9325 = 0x9325,
-    LCD_KIND_OTHER = 0,
-} lcd_kind = LCD_KIND_OTHER;
+} lcd_kind = LCD_KIND_7783;
 
 static void setup_parameters(void)
 {
@@ -516,7 +515,6 @@ void lcd_enable(bool enable)
     {
         case LCD_KIND_7783: lcd_enable_7783(enable); break;
         case LCD_KIND_9325: lcd_enable_9325(enable); break;
-        default: lcd_enable_7783(enable); break;
     }
     if(!enable)
         common_lcd_enable(false);
