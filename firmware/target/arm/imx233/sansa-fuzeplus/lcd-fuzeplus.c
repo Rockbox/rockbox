@@ -521,6 +521,7 @@ void lcd_enable(bool enable)
     else
     {
         lcd_sync_settings();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
 }
 #endif

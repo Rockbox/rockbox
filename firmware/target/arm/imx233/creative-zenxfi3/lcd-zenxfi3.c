@@ -226,6 +226,8 @@ void lcd_enable(bool enable)
     lcd_enable_seq(enable);
     if(!enable)
         common_lcd_enable(false);
+    else
+        send_event(LCD_EVENT_ACTIVATION, NULL);
 }
 #endif
 
