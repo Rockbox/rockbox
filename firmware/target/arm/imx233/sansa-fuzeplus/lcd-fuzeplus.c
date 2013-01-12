@@ -54,6 +54,7 @@ static void setup_parameters(void)
     imx233_lcdif_set_lcd_databus_width(HW_LCDIF_CTRL__LCD_DATABUS_WIDTH_18_BIT);
     imx233_lcdif_set_word_length(HW_LCDIF_CTRL__WORD_LENGTH_18_BIT);
     imx233_lcdif_set_timings(1, 2, 2, 2);
+    imx233_lcdif_enable_underflow_recover(true);
 }
 
 static void setup_lcd_pins(bool use_lcdif)

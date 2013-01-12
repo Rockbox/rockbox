@@ -23,6 +23,14 @@
 static unsigned lcdif_word_length = 0;
 static unsigned lcdif_byte_packing = 0;
 
+void imx233_lcdif_enable_underflow_recover(bool enable)
+{
+    if(enable)
+        __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RECOVER_ON_UNDERFLOW;
+    else
+        __REG_CLR(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RECOVER_ON_UNDERFLOW;
+}
+
 void imx233_lcdif_enable_bus_master(bool enable)
 {
     if(enable)

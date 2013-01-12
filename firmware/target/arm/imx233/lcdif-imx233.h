@@ -53,6 +53,7 @@
 #define HW_LCDIF_CTRL1__IRQ_BP          8
 #define HW_LCDIF_CTRL1__BYTE_PACKING_FORMAT_BM  (0xf << 16)
 #define HW_LCDIF_CTRL1__BYTE_PACKING_FORMAT_BP  16
+#define HW_LCDIF_CTRL1__RECOVER_ON_UNDERFLOW    (1 << 24)
 
 #define HW_LCDIF__VSYNC_EDGE_IRQ        1
 #define HW_LCDIF__CUR_FRAME_DONE_IRQ    2
@@ -84,6 +85,7 @@
 #define HW_LCDIF_STAT__TXFIFO_EMPTY (1 << 26)
 #define HW_LCDIF_STAT__BUSY         (1 << 25)
 
+void imx233_lcdif_enable_underflow_recover(bool enable);
 void imx233_lcdif_enable_bus_master(bool enable);
 void imx233_lcdif_enable(bool enable);
 void imx233_lcdif_reset(void);// reset lcdif block
