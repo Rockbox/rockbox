@@ -40,6 +40,12 @@ static bool lcd_on;
 #endif
 static unsigned lcd_yuv_options = 0;
 static int lcd_dcp_channel = -1;
+#ifdef HAVE_LCD_INVERT
+static int lcd_reg_0x61_val = 1; /* used to invert display */
+#endif
+#ifdef HAVE_LCD_FLIP
+static int lcd_reg_3_val = 0x1030; /* controls to flip display */
+#endif
 
 static enum lcd_kind_t
 {
@@ -367,6 +373,16 @@ static void lcd_init_seq_9325(void)
     _end_seq()
 }
 
+static void lcd_sync_settings(void)
+{
+#ifdef HAVE_LCD_INVERT
+    lcd_write_reg(0x61, lcd_reg_0x61_val);
+#endif
+#ifdef HAVE_LCD_FLIP
+    lcd_write_reg(3, lcd_reg_3_val);
+#endif
+}
+
 void lcd_init_device(void)
 {
     lcd_dcp_channel = imx233_dcp_acquire_channel(TIMEOUT_NOBLOCK);
@@ -397,6 +413,8 @@ void lcd_init_device(void)
             lcd_kind = LCD_KIND_7783;
             lcd_init_seq_7783(); break;
     }
+
+    lcd_sync_settings();
 
 #ifdef HAVE_LCD_ENABLE
     lcd_on = true;
@@ -502,22 +520,36 @@ void lcd_enable(bool enable)
     }
     if(!enable)
         common_lcd_enable(false);
+    else
+    {
+        lcd_sync_settings();
+    }
 }
 #endif
 
 #ifdef HAVE_LCD_INVERT
 void lcd_set_invert_display(bool yesno)
 {
+    lcd_reg_0x61_val = yesno ? 0 : 1;
+    #ifdef HAVE_LCD_ENABLE
+    if(!lcd_on)
+        return;
+    #endif
     /* same for both kinds */
-    lcd_write_reg(0x61, yesno ? 0 : 1);
+    lcd_write_reg(0x61, lcd_reg_0x61_val);
 }
 #endif
 
 #ifdef HAVE_LCD_FLIP
 void lcd_set_flip(bool yesno)
 {
+    lcd_reg_3_val = yesno ? 0x1000 : 0x1030;
+    #ifdef HAVE_LCD_ENABLE
+    if(!lcd_on)
+        return;
+    #endif
     /* same for both kinds */
-    lcd_write_reg(3, yesno ? 0x1000 : 0x1030);
+    lcd_write_reg(3, lcd_reg_3_val);
 }
 #endif
 
