@@ -76,8 +76,6 @@ void ThemesInstallWindow::downloadInfo()
     infoUrl.replace("%RBUTILVER%", VERSION);
     QUrl url = QUrl(infoUrl);
     qDebug() << "[Themes] Info URL:" << url << "Query:" << url.queryItems();
-    if(RbSettings::value(RbSettings::CacheOffline).toBool())
-        getter->setCache(true);
     getter->setFile(&themesInfo);
 
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));

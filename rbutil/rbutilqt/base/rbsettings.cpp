@@ -69,7 +69,6 @@ const static struct {
     { RbSettings::TtsVoice,             ":tts:/voice",          "" },
     { RbSettings::EncoderPath,          ":encoder:/encoderpath",        "" },
     { RbSettings::EncoderOptions,       ":encoder:/encoderoptions",     "" },
-    { RbSettings::CacheOffline,         "offline",              "false" },
     { RbSettings::CacheDisabled,        "cachedisable",         "false" },
     { RbSettings::TtsUseSapi4,          "sapi/useSapi4",        "false" },
     { RbSettings::EncoderNarrowBand,    ":encoder:/narrowband", "false" },

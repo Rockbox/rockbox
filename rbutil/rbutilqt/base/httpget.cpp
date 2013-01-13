@@ -24,7 +24,6 @@
 
 QDir HttpGet::m_globalCache; //< global cach path value for new objects
 QUrl HttpGet::m_globalProxy; //< global proxy value for new objects
-bool HttpGet::m_globalDumbCache = false; //< globally set cache "dumb" mode
 QString HttpGet::m_globalUserAgent; //< globally set user agent for requests
 
 HttpGet::HttpGet(QObject *parent)
@@ -32,7 +31,6 @@ HttpGet::HttpGet(QObject *parent)
 {
     outputToBuffer = true;
     m_cached = false;
-    m_dumbCache = m_globalDumbCache;
     getRequest = -1;
     headRequest = -1;
     // if a request is cancelled before a reponse is available return some
@@ -213,7 +211,7 @@ bool HttpGet::getFile(const QUrl &url)
     m_header.setValue("User-Agent", m_globalUserAgent);
     m_header.setValue("Connection", "Keep-Alive");
 
-    if(m_dumbCache || !m_usecache) {
+    if(!m_usecache) {
         getFileFinish();
     }
     else {

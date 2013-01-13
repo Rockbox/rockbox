@@ -202,7 +202,6 @@ void Config::accept()
     else // default to system temp path
         RbSettings::setValue(RbSettings::CachePath, QDir::tempPath());
     RbSettings::setValue(RbSettings::CacheDisabled, ui.cacheDisable->isChecked());
-    RbSettings::setValue(RbSettings::CacheOffline, ui.cacheOfflineMode->isChecked());
 
     // tts settings
     RbSettings::setValue(RbSettings::UseTtsCorrections, ui.ttsCorrections->isChecked());
@@ -287,7 +286,6 @@ void Config::setUserSettings()
         RbSettings::setValue(RbSettings::CachePath, QDir::tempPath());
     ui.cachePath->setText(QDir::toNativeSeparators(RbSettings::value(RbSettings::CachePath).toString()));
     ui.cacheDisable->setChecked(RbSettings::value(RbSettings::CacheDisabled).toBool());
-    ui.cacheOfflineMode->setChecked(RbSettings::value(RbSettings::CacheOffline).toBool());
     updateCacheInfo(RbSettings::value(RbSettings::CachePath).toString());
 
     // TTS tab

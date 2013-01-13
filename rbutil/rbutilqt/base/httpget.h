@@ -45,14 +45,10 @@ class HttpGet : public QObject
             { return m_cached; }
         QDateTime timestamp(void)
             { return m_serverTimestamp; }
-        void setDumbCache(bool b) //< disable checking of http header timestamp for caching
-            { m_dumbCache = b; }
         static void setGlobalCache(const QDir& d) //< set global cache path
             { m_globalCache = d; }
         static void setGlobalProxy(const QUrl& p) //< set global proxy value
             { m_globalProxy = p; }
-        static void setGlobalDumbCache(bool b) //< set "dumb" (ignore server status) caching mode
-            { m_globalDumbCache = b; }
         static void setGlobalUserAgent(const QString& u) //< set global user agent string
             { m_globalUserAgent = u; }
 
@@ -92,12 +88,10 @@ class HttpGet : public QObject
         QString m_query; //< constructed query to pass http getter
         QString m_path; //< constructed path to pass http getter
         QString m_hash; //< caching hash
-        bool m_dumbCache; //< true if caching should ignore the server header
         QHttpRequestHeader m_header;
 
         static QDir m_globalCache; //< global cache path value
         static QUrl m_globalProxy; //< global proxy value
-        static bool m_globalDumbCache; //< cache "dumb" mode global setting
         static QString m_globalUserAgent; //< global user agent string
 };
 
