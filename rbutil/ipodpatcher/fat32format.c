@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "ipodio.h"
 
@@ -465,7 +466,8 @@ int format_partition(struct ipod_t* ipod, int partition)
      */
     
     fprintf(stderr,"[INFO] Heads - %d, sectors/track = %d\n",ipod->num_heads,ipod->sectors_per_track);
-    fprintf(stderr,"[INFO] Size : %lluGB %u sectors\n", ((uint64_t)ipod->pinfo[partition].size * (uint64_t)ipod->sector_size) / (1000*1000*1000), TotalSectors );
+    fprintf(stderr,"[INFO] Size : %" PRIu64 "GB %u sectors\n",
+            ((uint64_t)ipod->pinfo[partition].size * (uint64_t)ipod->sector_size) / (1000*1000*1000), TotalSectors );
     fprintf(stderr,"[INFO] %d Bytes Per Sector, Cluster size %d bytes\n", BytesPerSect, SectorsPerCluster*BytesPerSect );
     fprintf(stderr,"[INFO] Volume ID is %x:%x\n", VolumeId>>16, VolumeId&0xffff );
     fprintf(stderr,"[INFO] %d Reserved Sectors, %d Sectors per FAT, %d fats\n", ReservedSectCount, FatSize, NumFATs );
