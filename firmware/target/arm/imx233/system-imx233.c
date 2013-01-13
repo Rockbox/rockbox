@@ -128,6 +128,8 @@ void system_init(void)
     imx233_clkctrl_set_auto_slow_divisor(AS_DIV_8);
     imx233_clkctrl_enable_auto_slow(true);
 
+    cpu_frequency = imx233_clkctrl_get_clock_freq(CLK_CPU);
+
 #if !defined(BOOTLOADER) &&(defined(SANSA_FUZEPLUS) || \
     defined(CREATIVE_ZENXFI3) || defined(CREATIVE_ZENXFI2))
     fmradio_i2c_init();
@@ -174,88 +176,88 @@ void imx233_digctl_set_arm_cache_timings(unsigned timings)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+struct cpufreq_profile_t
+{
+    /* key */
+    long cpu_freq;
+    /* parameters */
+    int vddd, vddd_bo;
+    int hbus_div;
+    int cpu_idiv, cpu_fdiv;
+    long emi_freq;
+    int arm_cache_timings;
+};
+
+static struct cpufreq_profile_t cpu_profiles[] =
+{
+    /* clk_p@454.74 MHz, clk_h@130.91 MHz, clk_emi@130.91 MHz */
+    {IMX233_CPUFREQ_454_MHz, 1550, 1450, 3, 1, 19, IMX233_EMIFREQ_130_MHz, 0},
+    /* clk_p@261.82 MHz, clk_h@130.91 MHz, clk_emi@130.91 MHz */
+    {IMX233_CPUFREQ_261_MHz, 1275, 1175, 2, 1, 33, IMX233_EMIFREQ_130_MHz, 0},
+    /* clk_p@64 MHz, clk_h@64 MHz, clk_emi@64 MHz */
+    {IMX233_CPUFREQ_64_MHz, 1050, 975, 1, 5, 27, IMX233_EMIFREQ_64_MHz, 0},
+    /* dummy */
+    {0, 0, 0, 0, 0, 0, 0, 0}
+};
+
+#define NR_CPU_PROFILES ((int)(sizeof(cpu_profiles)/sizeof(cpu_profiles[0])))
+
 void set_cpu_frequency(long frequency)
 {
     /* don't change the frequency if it is useless (changes are expensive) */
     if(cpu_frequency == frequency)
         return;
-    
-    cpu_frequency = frequency;
+
+    struct cpufreq_profile_t *prof = cpu_profiles;
+    while(prof->cpu_freq != 0 && prof->cpu_freq != frequency)
+        prof++;
+    if(prof->cpu_freq == 0)
+        return;
     /* disable auto-slow (enable back afterwards) */
     bool as = imx233_clkctrl_is_auto_slow_enabled();
     imx233_clkctrl_enable_auto_slow(false);
-    /* go back to a known state in safe way:
-     * clk_p@24 MHz
-     * clk_h@6 MHz
-     * WARNING: we must absolutely avoid that clk_h be too low or too high
-     * during the change. We first change the clk_p/clk_h ratio to 4 so
-     * that it cannot be too high (480/4=120 MHz max) or too low
-     * (24/4=6 MHz min). Then we switch clk_p to bypass. We chose a ratio of 4
-     * which is greater than all clk_p/clk_h ratios used below so that further
-     * changes are safe too */
-    imx233_clkctrl_set_clock_divisor(CLK_HBUS, 4);
-    imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
-    imx233_digctl_set_arm_cache_timings(0);
 
-    switch(frequency)
+    /* WARNING watch out the order ! */
+    if(frequency > cpu_frequency)
     {
-        case IMX233_CPUFREQ_454_MHz:
-            /* set VDDD to 1.550 mV (brownout at 1.450 mV) */
-            imx233_power_set_regulator(REGULATOR_VDDD, 1550, 1450);
-            /* clk_h@clk_p/3 */
-            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 3);
-            /* clk_p@ref_cpu/1*18/19 */
-            imx233_clkctrl_set_fractional_divisor(CLK_CPU, 19);
-            imx233_clkctrl_set_clock_divisor(CLK_CPU, 1);
-            imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
-
-            imx233_emi_set_frequency(IMX233_EMIFREQ_130_MHz);
-            /* ref_cpu@480 MHz
-             * ref_emi@480 MHz
-             * clk_emi@130.91 MHz
-             * clk_p@454.74 MHz
-             * clk_h@130.91 MHz */
-            break;
-        case IMX233_CPUFREQ_261_MHz:
-            /* set VDDD to 1.275 mV (brownout at 1.175 mV) */
-            imx233_power_set_regulator(REGULATOR_VDDD, 1275, 1175);
-            /* clk_h@clk_p/2 */
-            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 2);
-            /* clk_p@ref_cpu/1*18/33 */
-            imx233_clkctrl_set_fractional_divisor(CLK_CPU, 33);
-            imx233_clkctrl_set_clock_divisor(CLK_CPU, 1);
-            imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
-
-            imx233_emi_set_frequency(IMX233_EMIFREQ_130_MHz);
-            /* ref_cpu@480 MHz
-             * ref_emi@480 MHz
-             * clk_emi@130.91 MHz
-             * clk_p@261.82 MHz
-             * clk_h@130.91 MHz */
-            break;
-        case IMX233_CPUFREQ_64_MHz:
-            /* set VDDD to 1.050 mV (brownout at 0.975 mV) */
-            imx233_power_set_regulator(REGULATOR_VDDD, 1050, 975);
-            /* clk_h@clk_p */
-            imx233_clkctrl_set_clock_divisor(CLK_HBUS, 1);
-            /* clk_p@ref_cpu/5*18/27 */
-            imx233_clkctrl_set_fractional_divisor(CLK_CPU, 27);
-            imx233_clkctrl_set_clock_divisor(CLK_CPU, 5);
-            imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
-
-            imx233_emi_set_frequency(IMX233_EMIFREQ_64_MHz);
-            imx233_digctl_set_arm_cache_timings(3);
-            /* ref_cpu@480 MHz
-             * ref_emi@480 MHz
-             * clk_emi@64 MHz
-             * clk_p@64 MHz
-             * clk_h@64 MHz */
-        default:
-            break;
+        /* Change VDDD regulator */
+        imx233_power_set_regulator(REGULATOR_VDDD, prof->vddd, prof->vddd_bo);
+        /* Change ARM cache timings */
+        imx233_digctl_set_arm_cache_timings(prof->arm_cache_timings);
+        /* Switch CPU to crystal at 24MHz */
+        imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+        /* Program CPU divider for PLL */
+        imx233_clkctrl_set_fractional_divisor(CLK_CPU, prof->cpu_fdiv);
+        imx233_clkctrl_set_clock_divisor(CLK_CPU, prof->cpu_idiv);
+        /* Change the HBUS divider to its final value */
+        imx233_clkctrl_set_clock_divisor(CLK_HBUS, prof->hbus_div);
+        /* Switch back CPU to PLL */
+        imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+        /* Set the new EMI frequency */
+        imx233_emi_set_frequency(prof->emi_freq);
     }
-
+    else
+    {
+        /* Switch CPU to crystal at 24MHz */
+        imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+        /* Program HBUS divider to its final value */
+        imx233_clkctrl_set_clock_divisor(CLK_HBUS, prof->hbus_div);
+        /* Program CPU divider for PLL */
+        imx233_clkctrl_set_fractional_divisor(CLK_CPU, prof->cpu_fdiv);
+        imx233_clkctrl_set_clock_divisor(CLK_CPU, prof->cpu_idiv);
+        /* Switch back CPU to PLL */
+        imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+        /* Set the new EMI frequency */
+        imx233_emi_set_frequency(prof->emi_freq);
+        /* Change ARM cache timings */
+        imx233_digctl_set_arm_cache_timings(prof->arm_cache_timings);
+        /* Change VDDD regulator */
+        imx233_power_set_regulator(REGULATOR_VDDD, prof->vddd, prof->vddd_bo);
+    }
     /* enable auto slow again */
     imx233_clkctrl_enable_auto_slow(as);
+    /* update frequency */
+    cpu_frequency = frequency;
 }
 #endif
 
