@@ -118,15 +118,6 @@ QByteArray HttpGet::readAll()
 }
 
 
-/** @brief get http error
- *  @return http error
- */
-QHttp::Error HttpGet::error()
-{
-    return http.error();
-}
-
-
 void HttpGet::setProxy(const QUrl &proxy)
 {
     m_proxy = proxy;

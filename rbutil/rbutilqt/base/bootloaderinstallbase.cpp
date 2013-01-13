@@ -80,7 +80,7 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
     }
     if(error) {
         emit logItem(tr("Download error: %1")
-                .arg(m_http.error()), LOGERROR);
+                .arg(m_http.errorString()), LOGERROR);
         emit done(true);
         return;
     }

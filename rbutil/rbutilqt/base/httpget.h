@@ -35,7 +35,6 @@ class HttpGet : public QObject
         bool getFile(const QUrl &url);
         void setProxy(const QUrl &url);
         void setProxy(bool);
-        QHttp::Error error(void);
         QString errorString(void);
         void setFile(QFile*);
         void setCache(const QDir&);

@@ -224,7 +224,7 @@ void RbUtilQt::downloadInfo()
 void RbUtilQt::downloadDone(bool error)
 {
     if(error) {
-        qDebug() << "[RbUtil] network error:" << daily->error();
+        qDebug() << "[RbUtil] network error:" << daily->errorString();
         ui.statusbar->showMessage(tr("Can't get version information!"));
         QMessageBox::critical(this, tr("Network error"),
                 tr("Can't get version information.\n"
@@ -232,7 +232,7 @@ void RbUtilQt::downloadDone(bool error)
                     .arg(daily->errorString()));
         return;
     }
-    qDebug() << "[RbUtil] network status:" << daily->error();
+    qDebug() << "[RbUtil] network status:" << daily->errorString();
 
     // read info into ServerInfo object
     buildInfo.open();
@@ -655,7 +655,7 @@ void RbUtilQt::checkUpdate(void)
 void RbUtilQt::downloadUpdateDone(bool error)
 {
     if(error) {
-        qDebug() << "[RbUtil] network error:" << update->error();
+        qDebug() << "[RbUtil] network error:" << update->errorString();
     }
     else {
         QString toParse(update->readAll());
