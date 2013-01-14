@@ -1625,6 +1625,12 @@ static bool check_feature_tag(const int type)
             return false;
 #endif /* HAVE_RDS_CAP */
 #endif /* CONFIG_TUNER */
+        case SKIN_TOKEN_USB_HID_MODE:
+#ifdef USB_ENABLE_HID
+            return true;
+#else
+            return false;
+#endif
         default: /* not a tag we care about, just don't skip */
             return true;
     }

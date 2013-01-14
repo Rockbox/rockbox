@@ -1155,6 +1155,18 @@ const char *get_token_value(struct gui_wps *gwps,
                 return "u";
             return NULL;
 #endif
+        case SKIN_TOKEN_USB_CONNECTED:
+            if (get_current_activity() == ACTIVITY_USBSCREEN)
+                return "u";
+            return NULL;
+#ifdef USB_ENABLE_HID
+        case SKIN_TOKEN_USB_HID_MODE:
+            if (intval)
+                *intval = global_settings.usb_keypad_mode + 1;
+            snprintf(buf, buf_size, "%s", str(keypad_mode_name_get()));
+            return buf;
+#endif
+            
         case SKIN_TOKEN_BATTERY_SLEEPTIME:
         {
             if (get_sleep_timer() == 0)

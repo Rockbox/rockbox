@@ -202,7 +202,7 @@ void sb_skin_set_update_delay(int delay)
  */
 char* sb_create_from_settings(enum screen_type screen)
 {
-    static char buf[128];
+    static char buf[256];
     char *ptr, *ptr2;
     int len, remaining = sizeof(buf);
     int bar_position = statusbar_position(screen);
@@ -270,9 +270,15 @@ char* sb_create_from_settings(enum screen_type screen)
             default:
                 height = screens[screen].lcdheight;
         }
-        len = snprintf(ptr, remaining, "%%ax%%Vi(-,0,%d,-,%d,1)\n", 
-                       y, height);
+        len = snprintf(ptr, remaining,
+                    "%%ax%%Vi(-,0,%d,-,%d,1)\n"
+                    "%%?uc<%%Vd(usb)>\n"
+                    "%%Vl(usb,0,%d,-,%d,0)\n"
+                    "USB Connected\n"
+                    "%%?uh<%%Sx(USB Keypad Mode) %%uh>\n",
+                    y, height, y, height);
     }
+
     return buf;
 }
 
