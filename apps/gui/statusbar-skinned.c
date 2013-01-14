@@ -44,6 +44,16 @@
 #include "misc.h"
 #endif
 
+#ifndef USB_NONE
+#ifdef HAVE_LCD_BITMAP
+#include "bitmaps/usblogo.h"
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+#include "bitmaps/remote_usblogo.h"
+#endif
+#endif
+
 /* initial setup of wps_data  */
 static int update_delay = DEFAULT_UPDATE_DELAY;
 
@@ -202,7 +212,7 @@ void sb_skin_set_update_delay(int delay)
  */
 char* sb_create_from_settings(enum screen_type screen)
 {
-    static char buf[128];
+    static char buf[256];
     char *ptr, *ptr2;
     int len, remaining = sizeof(buf);
     int bar_position = statusbar_position(screen);
@@ -260,6 +270,7 @@ char* sb_create_from_settings(enum screen_type screen)
     else
     {
         int y = 0, height;
+        int usb_logo_y;
         switch (bar_position)
         {
             case STATUSBAR_TOP:
@@ -270,9 +281,20 @@ char* sb_create_from_settings(enum screen_type screen)
             default:
                 height = screens[screen].lcdheight;
         }
-        len = snprintf(ptr, remaining, "%%ax%%Vi(-,0,%d,-,%d,1)\n", 
-                       y, height);
+        usb_logo_y = y + (height - BMPHEIGHT_usblogo) / 2;
+        len = snprintf(ptr, remaining,
+                    "%%ax%%Vi(-,0,%d,-,%d,1)\n"
+                    "%%?uc<%%Vd(usb)>\n"
+                    "%%Vl(usb,0,%d,-,%d,0)\n\n"
+                    "%%Vl(usb,0,%d,-,16,0)\n"
+                    "%%?uh<%%Sx(USB Keypad Mode) %%uh>\n"
+                    "%%Vl(usb,%d,%d,-,%d,0)\n"
+                    "%%x(b,__usb compiled image__)\n",
+                    y, height, y, height, y,
+                    /* usb image */
+                    screen == SCREEN_MAIN ? -BMPWIDTH_usblogo : 0, usb_logo_y, BMPHEIGHT_usblogo);
     }
+
     return buf;
 }
 

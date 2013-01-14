@@ -37,6 +37,16 @@
 #include "skin_parser.h"
 #include "tag_table.h"
 
+#ifndef USB_NONE
+#ifdef HAVE_LCD_BITMAP
+#include "bitmaps/usblogo.h"
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+#include "bitmaps/remote_usblogo.h"
+#endif
+#endif
+
 #ifdef __PCTOOL__
 #ifdef WPSEDITOR
 #include "proxy.h"
@@ -1625,6 +1635,12 @@ static bool check_feature_tag(const int type)
             return false;
 #endif /* HAVE_RDS_CAP */
 #endif /* CONFIG_TUNER */
+        case SKIN_TOKEN_USB_HID_MODE:
+#ifdef USB_ENABLE_HID
+            return true;
+#else
+            return false;
+#endif
         default: /* not a tag we care about, just don't skip */
             return true;
     }
@@ -1814,6 +1830,17 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
             {
                 img->loaded = true;
                 token->type = SKIN_TOKEN_IMAGE_DISPLAY_LISTICON;
+            }
+            else if (!strcmp("__usb compiled image__", img->bm.data))
+            {
+                img->loaded = true;
+                if (curr_screen == SCREEN_MAIN)
+                    memcpy(&img->bm, &bm_usblogo, sizeof(struct bitmap));
+#if NB_SCREENS > 1
+                else
+                    memcpy(&img->bm, &bm_remote_usblogo, sizeof(struct bitmap));
+#endif
+                img->subimage_height = img->bm.height;
             }
             else
             {

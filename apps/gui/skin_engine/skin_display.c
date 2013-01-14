@@ -306,7 +306,8 @@ void wps_draw_image(struct gui_wps *gwps, struct gui_img *img,
                     int subimage, struct viewport* vp)
 {
     struct screen *display = gwps->display;
-    img->bm.data = core_get_data(img->buflib_handle);
+    if (img->buflib_handle >= 0)
+        img->bm.data = core_get_data(img->buflib_handle);
     display->set_drawmode(DRMODE_SOLID);
 
     if (img->is_9_segment)
