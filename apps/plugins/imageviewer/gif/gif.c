@@ -31,9 +31,11 @@ static struct gif_decoder decoder;
 
 static char print[32]; /* use a common snprintf() buffer */
 
-/* decompressed image in the possible sizes (1,2,4,8), wasting the other */
-/* max 32 frames */
-static unsigned char *disp[GIF_MAX_FRAMES][9];
+/* pointers to decompressed frame in the possible sizes ds = (1,2,4,8)
+ * basicaly equivalent to *disp[n][4] where n is the number of frames
+ * in gif file. The matrix is allocated after decoded frames.
+ */
+static unsigned char **disp;
 static unsigned char *disp_buf;
 
 #if defined(HAVE_LCD_COLOR)
@@ -81,10 +83,7 @@ static int load_image(char *filename, struct image_info *info,
     struct gif_decoder *p_decoder = &decoder;
 
     unsigned char *memory, *memory_max;
-    size_t memory_size;
-
-    /* cleanup */
-    memset(&disp, 0, sizeof(disp));
+    size_t memory_size, img_size, disp_size;
 
     /* align buffer */
     memory = (unsigned char *)((intptr_t)(buf + 3) & ~3);
@@ -153,18 +152,50 @@ static int load_image(char *filename, struct image_info *info,
     info->frames_count = p_decoder->frames_count;
     info->delay = p_decoder->delay;
 
-    //p_decoder->native_img_size = (p_decoder->native_img_size + 3) & ~3;
-    disp_buf = p_decoder->mem + 
-               ((p_decoder->native_img_size*p_decoder->frames_count + 3) & ~3);
+    /* check mem constraints
+     * each frame can have 4 scaled versions with ds = (1,2,4,8)
+     */
+    img_size = (p_decoder->native_img_size*p_decoder->frames_count + 3) & ~3;
+    disp_size = (sizeof(unsigned char *)*p_decoder->frames_count*4 + 3) & ~3;
+
+    if (memory_size < img_size + disp_size)
+    {
+        /* No memory to allocate disp matrix */
+        rb->splashf(HZ, "%s", GifErrorString(D_GIF_ERR_NOT_ENOUGH_MEM));
+        return PLUGIN_ERROR;
+    }
+
+    disp = (unsigned char **)(p_decoder->mem + img_size);
+    disp_buf = (unsigned char *)disp + disp_size;
 
     *buf_size = memory_max - disp_buf;
+
+    /* set all pointers to NULL initially */
+    memset(disp, 0, sizeof(unsigned char *)*p_decoder->frames_count*4);
 
     return PLUGIN_OK;
 }
 
+/* small helper to convert scalling factor ds
+ * into disp[frame][] array index
+ */
+static int ds2index(int ds)
+{
+    int index = 0;
+
+    ds >>= 1;
+    while (ds)
+    {
+        index++;
+        ds >>=1;
+    }
+
+    return index;
+}
+
 static int get_image(struct image_info *info, int frame, int ds)
 {
-    unsigned char **p_disp = &disp[frame][ds]; /* short cut */
+    unsigned char **p_disp = disp + frame*4 + ds2index(ds);
     struct gif_decoder *p_decoder = &decoder;
 
     info->width = p_decoder->width / ds;
@@ -192,14 +223,20 @@ static int get_image(struct image_info *info, int frame, int ds)
 
         if (disp_buf + size >= p_decoder->mem + p_decoder->mem_size)
         {
-            /* have to discard the current */
-            int i;
-            for (i=1; i<=8; i++)
-                disp[frame][i] = NULL; /* invalidate all bitmaps */
+            /* have to discard scaled versions */
+            for (int i=0; i<p_decoder->frames_count; i++)
+            {
+                /* leave unscaled pointer allone,
+                 * set rest to NULL
+                 */
+                p_disp = disp + i*4 + 1;
+                memset(p_disp, 0, 3*sizeof(unsigned char *));
+            }
 
             /* start again from the beginning of the buffer */
             disp_buf = p_decoder->mem +
-                       p_decoder->native_img_size*p_decoder->frames_count;
+                       p_decoder->native_img_size*p_decoder->frames_count +
+                       sizeof(unsigned char *)*p_decoder->frames_count*4;
         }
 
         *p_disp = disp_buf;

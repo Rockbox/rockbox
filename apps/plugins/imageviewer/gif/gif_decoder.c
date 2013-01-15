@@ -351,12 +351,6 @@ void gif_decode(struct gif_decoder *d,
                     }
 
                     d->frames_count++;
-
-                    if (d->frames_count > GIF_MAX_FRAMES)
-                    {
-                        d->error = D_GIF_ERR_NOT_ENOUGH_MEM;
-                        return;
-                    }
                 }
 
                 break;
