@@ -25,9 +25,11 @@
 #include "debug.h"
 #include "file.h"
 #include "filefuncs.h"
+#include "string-extra.h"
 
 #ifndef __PCTOOL__
 #ifdef HAVE_MULTIVOLUME
+
 /* returns on which volume this is, and copies the reduced name
    (sortof a preprocessor for volume-decorated pathnames) */
 int strip_volume(const char* name, char* namecopy)
