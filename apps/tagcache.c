@@ -4332,7 +4332,7 @@ static bool add_search_root(const char *name)
     static char abs_target[PATH_MAX];
     ssize_t len;
 
-    len = readlink(name, target, sizeof(target));
+    len = readlink(name, target, sizeof(target)-1);
     if (len < 0)
         return false;
 
