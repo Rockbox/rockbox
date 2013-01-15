@@ -445,6 +445,13 @@
 #define UI_LCD_POSX                 43
 #define UI_LCD_POSY                 65
 
+#elif defined(CREATIVE_ZENXFI2)
+#define UI_TITLE                    "Creative ZEN X-Fi2"
+#define UI_WIDTH                    324 /* width of GUI window */
+#define UI_HEIGHT                   586 /* height of GUI window */
+#define UI_LCD_POSX                 42
+#define UI_LCD_POSY                 42
+
 #elif defined(APPLICATION)
 #define UI_TITLE                    "Rockbox"
 #define UI_LCD_POSX                 0
