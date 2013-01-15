@@ -46,5 +46,6 @@ void enable_color(bool enable);
 #define cprintf(col, ...) do {color(col); printf(__VA_ARGS__); }while(0)
 
 #define cprintf_field(str1, ...) do{ cprintf(GREEN, str1); cprintf(YELLOW, __VA_ARGS__); }while(0)
+#define cprintf_field2(str1, ...) do{ cprintf(BLUE, str1); cprintf(RED, __VA_ARGS__); }while(0)
 
 #endif /* __MISC_H__ */

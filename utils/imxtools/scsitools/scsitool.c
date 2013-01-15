@@ -76,6 +76,21 @@ void *buffer_alloc(int sz)
 }
 #endif
 
+static uint16_t fix_endian16be(uint16_t w)
+{
+    return w << 8 | w >> 8;
+}
+
+static uint32_t fix_endian32be(uint32_t w)
+{
+    return __builtin_bswap32(w);
+}
+
+static uint64_t fix_endian64be(uint64_t w)
+{
+    return __builtin_bswap64(w);
+}
+
 static void print_hex(void *_buffer, int buffer_size)
 {
     uint8_t *buffer = _buffer;
@@ -158,7 +173,7 @@ int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_
 
 int do_sense_analysis(int status, uint8_t *sense, int sense_size)
 {
-    if(status != GOOD || g_debug)
+    if(status != GOOD && g_debug)
     {
         cprintf_field("Status:", " "); fflush(stdout);
         sg_print_scsi_status(status);
@@ -200,11 +215,11 @@ int stmp_inquiry(uint8_t *dev_type, char vendor[9], char product[17])
 
 static int stmp_get_protocol_version(struct scsi_stmp_protocol_version_t *ver)
 {
-    uint8_t cdb[10];
+    uint8_t cdb[16];
     memset(cdb, 0, sizeof(cdb));
     cdb[0] = SCSI_STMP_READ;
     cdb[1] = SCSI_STMP_CMD_GET_PROTOCOL_VERSION;
-    
+
     uint8_t sense[32];
     int sense_size = sizeof(sense);
 
@@ -220,6 +235,115 @@ static int stmp_get_protocol_version(struct scsi_stmp_protocol_version_t *ver)
     return 0;
 }
 
+static int stmp_get_chip_major_rev_id(struct scsi_stmp_chip_major_rev_id_t *ver)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_GET_CHIP_MAJOR_REV_ID;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int buf_sz = sizeof(struct scsi_stmp_chip_major_rev_id_t);
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, ver, &buf_sz);
+    if(ret < 0)
+        return ret;
+    ret = do_sense_analysis(ret, sense, sense_size);
+    if(ret)
+        return ret;
+    if(buf_sz != sizeof(struct scsi_stmp_chip_major_rev_id_t))
+        return -1;
+    ver->rev = fix_endian16be(ver->rev);
+    return 0;
+}
+
+static int stmp_get_rom_rev_id(struct scsi_stmp_rom_rev_id_t *ver)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_GET_ROM_REV_ID;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int buf_sz = sizeof(struct scsi_stmp_rom_rev_id_t);
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, ver, &buf_sz);
+    if(ret < 0)
+        return ret;
+    ret = do_sense_analysis(ret, sense, sense_size);
+    if(ret)
+        return ret;
+    if(buf_sz != sizeof(struct scsi_stmp_rom_rev_id_t))
+        return -1;
+    ver->rev = fix_endian16be(ver->rev);
+    return 0;
+}
+
+static int stmp_get_logical_media_info(uint8_t info, void *data, int *len)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_GET_LOGICAL_MEDIA_INFO;
+    cdb[2] = info;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
+    if(ret < 0)
+        return ret;
+    return do_sense_analysis(ret, sense, sense_size);
+}
+
+static int stmp_get_logical_table(struct scsi_stmp_logical_table_t *table, int entry_count)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_GET_LOGICAL_TABLE;
+    cdb[2] = entry_count;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int buf_sz = sizeof(struct scsi_stmp_logical_table_t) +
+        entry_count * sizeof(struct scsi_stmp_logical_table_entry_t);
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, table, &buf_sz);
+    if(ret < 0)
+        return ret;
+    ret = do_sense_analysis(ret, sense, sense_size);
+    if(ret)
+        return ret;
+    if((buf_sz - sizeof(struct scsi_stmp_logical_table_t)) % sizeof(struct scsi_stmp_logical_table_entry_t))
+        return -1;
+    table->count = fix_endian16be(table->count);
+    struct scsi_stmp_logical_table_entry_t *entry = (void *)(table + 1);
+    for(int i = 0; i < entry_count; i++)
+        entry[i].size = fix_endian64be(entry[i].size);
+    return 0;
+}
+
+static int stmp_get_logical_drive_info(uint8_t drive, uint8_t info, void *data, int *len)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_GET_LOGICAL_DRIVE_INFO;
+    cdb[2] = drive;
+    cdb[3] = info;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
+    if(ret < 0)
+        return ret;
+    return do_sense_analysis(ret, sense, sense_size);
+}
+
 static int do_work(void)
 {
     cprintf(BLUE, "Information\n");
@@ -229,16 +353,278 @@ static int do_work(void)
     char product[17];
     int ret = stmp_inquiry(&dev_type, vendor, product);
     if(ret)
-        errorf("Cannot get inquiry data: %d\n", ret);
-    cprintf_field("  Vendor: ", "%s\n", vendor);
-    cprintf_field("  Product: ", "%s\n", product);
+    {
+        cprintf(GREY, "Cannot get inquiry data: %d\n", ret);
+    }
+    else
+    {
+        cprintf_field("  Vendor: ", "%s\n", vendor);
+        cprintf_field("  Product: ", "%s\n", product);
+    }
     
     struct scsi_stmp_protocol_version_t ver;
     ret = stmp_get_protocol_version(&ver);
     if(ret)
-        errorf("Cannot get protocol version: %d\n", ret);
+        cprintf(GREY, "Cannot get protocol version: %d\n", ret);
+    else
+        cprintf_field("  Protocol: ", "%x.%x\n", ver.major, ver.minor);
+
+    do
+    {
+        union
+        {
+            uint8_t u8;
+            uint16_t u16;
+            uint32_t u32;
+            uint64_t u64;
+            uint8_t buf[52];
+        }u;
+
+        int len = 2;
+        ret = stmp_get_logical_media_info(0, &u.u16, &len);
+        if(!ret && len == 2)
+        {
+            u.u16 = fix_endian16be(u.u16);
+            cprintf_field("  Logical Media Info (0): ", "%#x\n", u.u16);
+        }
+
+        len = 4;
+        ret = stmp_get_logical_media_info(6, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("  Logical Media Info (6): ", "%#x\n", u.u32);
+        }
+
+        len = 1;
+        ret = stmp_get_logical_media_info(5, &u.u8, &len);
+        if(!ret && len == 1)
+            cprintf_field("  Logical Media Info (5): ", "%#x\n", u.u8);
+
+        len = 8;
+        ret = stmp_get_logical_media_info(1, &u.u64, &len);
+        if(!ret && len == 8)
+        {
+            u.u64 = fix_endian64be(u.u64);
+            cprintf_field("  Logical Media Info (1): ", "%#llx\n", u.u64);
+        }
+
+        len = 4;
+        ret = stmp_get_logical_media_info(7, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("  Logical Media Info (7): ", "%#x\n", u.u32);
+        }
+
+        len = 52;
+        ret = stmp_get_logical_media_info(8, &u.buf, &len);
+        if(!ret && len != 0)
+        {
+            cprintf(GREEN, "  Logical Media Info (8):");
+            /*
+            for(int i = 0; i < len; i++)
+                cprintf(YELLOW, " %02x", u.buf[i]);
+            printf("\n");
+            */
+            print_hex(u.buf, len);
+        }
+        
+        len = 1;
+        ret = stmp_get_logical_media_info(9, &u.u8, &len);
+        if(!ret && len == 1)
+            cprintf_field("  Logical Media Info (9): ", "%#x\n", u.u8);
+
+        len = 4;
+        ret = stmp_get_logical_media_info(12, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("  Logical Media Info (12): ", "%#x\n", u.u32);
+        }
+
+        len = 8;
+        ret = stmp_get_logical_media_info(13, &u.u64, &len);
+        if(!ret && len == 8)
+        {
+            u.u64 = fix_endian64be(u.u64);
+            cprintf_field("  Logical Media Info (13): ", "%#llx\n", u.u64);
+        }
+
+        len = 4;
+        ret = stmp_get_logical_media_info(11, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("  Logical Media Info (11): ", "%#x\n", u.u32);
+        }
+
+        len = 4;
+        ret = stmp_get_logical_media_info(14, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("  Logical Media Info (14): ", "%#x\n", u.u32);
+        }
+    }while(0);
     
-    cprintf_field("  Protocol: ", "%x.%x\n", ver.major, ver.minor);
+    struct scsi_stmp_chip_major_rev_id_t chip_rev;
+    ret = stmp_get_chip_major_rev_id(&chip_rev);
+    if(ret)
+        cprintf(GREY, "Cannot get chip major revision id: %d\n", ret);
+    else
+        cprintf_field("  Chip Major Rev ID: ", "%x\n", chip_rev.rev);
+    
+    struct scsi_stmp_rom_rev_id_t rom_rev;
+    ret = stmp_get_rom_rev_id(&rom_rev);
+    if(ret)
+        cprintf(GREY, "Cannot get rom revision id: %d\n", ret);
+    else
+        cprintf_field("  ROM Rev ID: ", "%x\n", rom_rev.rev);
+
+    struct
+    {
+        struct scsi_stmp_logical_table_t header;
+        struct scsi_stmp_logical_table_entry_t entry[20];
+    }table;
+
+    ret = stmp_get_logical_table(&table.header, sizeof(table.entry) / sizeof(table.entry[0]));
+    if(ret)
+        cprintf(GREY, "Cannot get logical table: %d\n", ret);
+    else
+    {
+        cprintf_field("  Logical Table: ", "%d entries\n", table.header.count);
+        for(int i = 0; i < table.header.count; i++)
+        {
+            cprintf_field2("    Drive No: ", "%2x", table.entry[i].drive_no);
+            cprintf_field2(" Type: ", "%2x", table.entry[i].type);
+            cprintf_field2(" Tag: ", "%2x", table.entry[i].tag);
+            unsigned long long size = table.entry[i].size;
+            int order = 0;
+            while(size >= 1024)
+            {
+                size /= 1024;
+                order++;
+            }
+            static const char *suffix[] = {"B", "KiB", "MiB", "GiB", "TiB"};
+            cprintf_field2(" Size: ", "%llu %s", size, suffix[order]);
+            cprintf(OFF, "\n");
+        }
+
+        for(int i = 0; i < table.header.count; i++)
+        {
+            union
+            {
+                uint8_t u8;
+                uint16_t u16;
+                uint32_t u32;
+                uint64_t u64;
+                uint8_t buf[52];
+            }u;
+            uint8_t drive = table.entry[i].drive_no;
+            cprintf_field("  Drive ", "%02x\n", drive);
+            
+            int len = 4;
+            ret = stmp_get_logical_drive_info(drive, 0, &u.u32, &len);
+            if(!ret && len == 4)
+            {
+                u.u32 = fix_endian32be(u.u32);
+                cprintf_field("    Info 0: ", "%#x\n", u.u32);
+            }
+
+            len = 4;
+            ret = stmp_get_logical_drive_info(drive, 1, &u.u32, &len);
+            if(!ret && len == 4)
+            {
+                u.u32 = fix_endian32be(u.u32);
+                cprintf_field("    Info 1: ", "%#x\n", u.u32);
+            }
+
+            len = 8;
+            ret = stmp_get_logical_drive_info(drive, 2, &u.u64, &len);
+            if(!ret && len == 8)
+            {
+                u.u64 = fix_endian64be(u.u64);
+                cprintf_field("    Info 2: ", "%#llx\n", u.u64);
+            }
+
+            len = 4;
+            ret = stmp_get_logical_drive_info(drive, 3, &u.u32, &len);
+            if(!ret && len == 4)
+            {
+                u.u32 = fix_endian32be(u.u32);
+                cprintf_field("    Info 3: ", "%#x\n", u.u32);
+            }
+
+            len = 8;
+            ret = stmp_get_logical_drive_info(drive, 4, &u.u64, &len);
+            if(!ret && len == 8)
+            {
+                u.u64 = fix_endian64be(u.u64);
+                cprintf_field("    Info 4: ", "%#llx\n", u.u64);
+            }
+
+            len = 4;
+            ret = stmp_get_logical_drive_info(drive, 5, &u.u32, &len);
+            if(!ret && len == 4)
+            {
+                u.u32 = fix_endian32be(u.u32);
+                cprintf_field("    Info 5: ", "%#x\n", u.u32);
+            }
+
+            len = 1;
+            ret = stmp_get_logical_drive_info(drive, 6, &u.u8, &len);
+            if(!ret && len == 1)
+            {
+                cprintf_field("    Info 6: ", "%#x\n", u.u8);
+            }
+
+            len = 52;
+            ret = stmp_get_logical_drive_info(drive, 7, &u.buf, &len);
+            if(!ret && len != 0)
+            {
+                cprintf(GREEN, "    Info 7:");
+                for(int i = 0; i < len; i++)
+                    cprintf(YELLOW, " %02x", u.buf[i]);
+                printf("\n");
+            }
+
+            len = 52;
+            ret = stmp_get_logical_drive_info(drive, 8, &u.buf, &len);
+            if(!ret && len != 0)
+            {
+                cprintf(GREEN, "    Info 8:");
+                for(int i = 0; i < len; i++)
+                    cprintf(YELLOW, " %02x", u.buf[i]);
+                printf("\n");
+            }
+
+            len = 1;
+            ret = stmp_get_logical_drive_info(drive, 9, &u.u8, &len);
+            if(!ret && len == 1)
+            {
+                cprintf_field("    Info 9: ", "%#x\n", u.u8);
+            }
+
+            len = 2;
+            ret = stmp_get_logical_drive_info(drive, 10, &u.u16, &len);
+            if(!ret && len == 2)
+            {
+                u.u16 = fix_endian16be(u.u16);
+                cprintf_field("    Info 10: ", "%#x\n", u.u16);
+            }
+
+            len = 52;
+            ret = stmp_get_logical_drive_info(drive, 11, &u.buf, &len);
+            if(!ret && len != 0)
+            {
+                cprintf(GREEN, "    Info 11:");
+                for(int i = 0; i < len; i++)
+                    cprintf(YELLOW, " %02x", u.buf[i]);
+                printf("\n");
+            }
+        }
+    }
 
     return 0;
 }
