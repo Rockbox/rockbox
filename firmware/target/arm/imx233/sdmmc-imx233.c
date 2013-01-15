@@ -170,6 +170,8 @@ static unsigned _mmc_num_drives;
 static int mmc_map[SDMMC_NUM_DRIVES]; /* mmc->sdmmc map */
 #endif
 
+static int init_drive(int drive);
+
 /* WARNING NOTE BUG FIXME
  * There are three numbering schemes involved in the driver:
  * - the sdmmc indexes into sdmmc_config[]
@@ -519,7 +521,7 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
 #if CONFIG_STORAGE & STORAGE_SD
     if(SDMMC_MODE(drive) == SD_MODE && SDMMC_INFO(drive).initialized <= 0)
     {
-        ret = init_sd_card(drive);
+        ret = init_drive(drive);
         if(SDMMC_INFO(drive).initialized <= 0)
             goto Lend;
     }
