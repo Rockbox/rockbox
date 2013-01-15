@@ -176,8 +176,6 @@ int button_read_device(void)
         res |= BUTTON_VOL_DOWN;
     if(!(mask & 0x100))
         res |= BUTTON_VOL_UP;
-    /* WARNING: it seems that the voltage on PSWITCH depends on whether
-     * usb is connected or not ! Thus the value of this field can be 1 or 3 */
     if(__XTRACT(HW_POWER_STS, PSWITCH) != 0 && power_ignore_counter == 0)
         res |= BUTTON_POWER;
     return res | touchpad_btns;
