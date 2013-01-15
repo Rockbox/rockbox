@@ -40,6 +40,8 @@ struct imx_md5sum_t
     enum imx_model_t model;
     /* md5sum of the file */
     char *md5sum;
+    /* Version string */
+    const char *version;
     /* Variant descriptions */
     struct imx_fw_variant_desc_t fw_variants[VARIANT_COUNT];
 };
@@ -80,24 +82,29 @@ static const struct imx_md5sum_t imx_sums[] =
 {
     {
         /* Version 2.38.6 */
-        MODEL_FUZEPLUS, "c3e27620a877dc6b200b97dcb3e0ecc7",
+        MODEL_FUZEPLUS, "c3e27620a877dc6b200b97dcb3e0ecc7", "2.38.6",
         { [VARIANT_DEFAULT] = { 0, 34652624 } }
     },
     {
         /* Version 1.23.01e */
-        MODEL_ZENXFI2, "e37e2c24abdff8e624d0a29f79157850",
+        MODEL_ZENXFI2, "e37e2c24abdff8e624d0a29f79157850", "1.23.01e",
     },
     {
         /* Version 1.23.01e */
-        MODEL_ZENXFI2, "2beff2168212d332f13cfc36ca46989d",
+        MODEL_ZENXFI2, "2beff2168212d332f13cfc36ca46989d", "1.23.01e",
         { [VARIANT_ZENXFI2_RECOVERY] = { 0x93010, 684192},
           [VARIANT_ZENXFI2_NAND] = { 0x13a0b0, 42410704 },
           [VARIANT_ZENXFI2_SD] = { 0x29ac380, 42304208 }
         }
     },
     {
+        /* Version 1.00.15e */
+        MODEL_ZENXFI3, "658a24eeef5f7186ca731085d8822a87", "1.00.15e",
+        { [VARIANT_DEFAULT] = {0, 18110576} }
+    },
+    {
         /* Version 1.00.22e */
-        MODEL_ZENXFI3, "658a24eeef5f7186ca731085d8822a87",
+        MODEL_ZENXFI3, "a5114cd45ea4554ec221f51a71083862", "1.00.22e",
         { [VARIANT_DEFAULT] = {0, 18110576} }
     },
 };
@@ -317,8 +324,8 @@ void dump_imx_dev_info(const char *prefix)
     printf("%smkimxboot mapping:\n", prefix);
     for(int i = 0; i < NR_IMX_SUMS; i++)
     {
-        printf("%s  md5sum=%s -> idx=%d\n", prefix, imx_sums[i].md5sum,
-            imx_sums[i].model);
+        printf("%s  md5sum=%s -> idx=%d, ver=%s\n", prefix, imx_sums[i].md5sum,
+            imx_sums[i].model, imx_sums[i].version);
         for(int j = 0; j < VARIANT_COUNT; j++)
             if(imx_sums[i].fw_variants[j].size)
                 printf("%s    variant=%d -> offset=%#x size=%#x\n", prefix,
@@ -398,7 +405,8 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
         model = imx_sums[i].model;
         md5_idx = i;
     }while(0);
-    printf("[INFO] File is for model %d (%s)\n", model, imx_models[model].model_name);
+    printf("[INFO] File is for model %d (%s, version %s)\n", model,
+        imx_models[model].model_name, imx_sums[md5_idx].version);
     /* load rockbox file */
     uint8_t *boot;
     size_t boot_size;
