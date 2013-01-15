@@ -1197,16 +1197,16 @@ static int parse_albumart_load(struct skin_element* element,
     /* if we got here, we parsed everything ok .. ! */
     if (aa->width < 0)
         aa->width = 0;
-    else if (aa->width > LCD_WIDTH)
-        aa->width = LCD_WIDTH;
+    else if (aa->width > curr_vp->vp.width)
+        aa->width = curr_vp->vp.width;
 
     if (aa->height < 0)
         aa->height = 0;
-    else if (aa->height > LCD_HEIGHT)
-        aa->height = LCD_HEIGHT;
+    else if (aa->height > curr_vp->vp.height)
+        aa->height = curr_vp->vp.height;
 
     if (swap_for_rtl)
-        aa->x = LCD_WIDTH - (aa->x + aa->width);
+        aa->x = (curr_vp->vp.width - aa->width - aa->x);
 
     aa->state = WPS_ALBUMART_LOAD;
     wps_data->albumart = PTRTOSKINOFFSET(skin_buffer, aa);
