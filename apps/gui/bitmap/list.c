@@ -732,7 +732,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     short x, y;
     int action, adj_x, adj_y, line, line_height, list_start_item;
     bool recurse;
-    static int last_y = -1;
+    static bool initial_touch = true;
+    static int last_y;
     
     screen = SCREEN_MAIN;
     parent = list->parent[screen];
@@ -752,67 +753,68 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     {
         case SCROLL_NONE:
         {
-            if (last_y == -1)
-            {   /* first run. register adj_y and re-run (will then take the else case) */
-                last_y = adj_y;
-                recurse = true;
-            }
-            else
+            int click_loc;
+            if (initial_touch)
             {
-                int click_loc = get_click_location(list, x, y);
-                line = 0; /* silence gcc 'used uninitialized' warning */
+                /* on the first touch last_y has to be reset to avoid
+                 * glitches with touches from long ago */
+                last_y = adj_y;
+                initial_touch = false;
+            }
+
+            line = 0; /* silence gcc 'used uninitialized' warning */
+            click_loc = get_click_location(list, x, y);
+            if (click_loc & LIST)
+            {
+                if(!skinlist_get_item(&screens[screen], list, adj_x, adj_y, &line))
+                {
+                    /* selection needs to be corrected if items are only partially visible */
+                    line = (adj_y - y_offset) / line_height;
+                    if (list_display_title(list, screen))
+                        line -= 1; /* adjust for the list title */
+                }
+                if (line >= list->nb_items)
+                    return ACTION_NONE;
+                list->selected_item = list_start_item+line;
+
+                gui_synclist_speak_item(list);
+            }
+            if (action == BUTTON_TOUCHSCREEN)
+            {
+                /* if not scrolling, the user is trying to select */
+                int diff = adj_y - last_y;
+                if ((click_loc & LIST) && swipe_scroll(list, diff))
+                    scroll_mode = SCROLL_SWIPE;
+                else if (click_loc & SCROLLBAR)
+                    scroll_mode = SCROLL_BAR;
+            }
+            else if (action == BUTTON_REPEAT)
+            {
                 if (click_loc & LIST)
                 {
-                    if(!skinlist_get_item(&screens[screen], list, adj_x, adj_y, &line))
-                    {
-                        /* selection needs to be corrected if items are only partially visible */
-                        line = (adj_y - y_offset) / line_height;
-                        if (list_display_title(list, screen))
-                            line -= 1; /* adjust for the list title */
-                    }
-                    if (line >= list->nb_items)
-                        return ACTION_NONE;
-                    list->selected_item = list_start_item+line;
-
-                    gui_synclist_speak_item(list);
+                    /* held a single line for a while, bring up the context menu */
+                    gui_synclist_select_item(list, list_start_item + line);
+                    /* don't sent context repeatedly */
+                    action_wait_for_release();
+                    initial_touch = true;
+                    return ACTION_STD_CONTEXT;
                 }
-                if (action == BUTTON_TOUCHSCREEN)
-                {
-                    /* if not scrolling, the user is trying to select */
-                    int diff = adj_y - last_y;
-                    if ((click_loc & LIST) && swipe_scroll(list, diff))
-                        scroll_mode = SCROLL_SWIPE;
-                    else if (click_loc & SCROLLBAR)
-                        scroll_mode = SCROLL_BAR;
+            }
+            else if (action & BUTTON_REL)
+            {
+                initial_touch = true;
+                if (click_loc & LIST)
+                {   /* release on list item enters it */
+                    gui_synclist_select_item(list, list_start_item + line);
+                    return ACTION_STD_OK;
                 }
-                else if (action == BUTTON_REPEAT)
-                {
-                    if (click_loc & LIST)
-                    {
-                        /* held a single line for a while, bring up the context menu */
-                        gui_synclist_select_item(list, list_start_item + line);
-                        /* don't sent context repeatedly */
-                        action_wait_for_release();
-                        last_y = -1;
-                        return ACTION_STD_CONTEXT;
-                    }
+                else if (click_loc & TITLE_TEXT)
+                {   /* clicking the title goes one level up (cancel) */
+                    return ACTION_STD_CANCEL;
                 }
-                else if (action & BUTTON_REL)
-                {
-                    last_y = -1;
-                    if (click_loc & LIST)
-                    {   /* release on list item enters it */
-                        gui_synclist_select_item(list, list_start_item + line);
-                        return ACTION_STD_OK;
-                    }
-                    else if (click_loc & TITLE_TEXT)
-                    {   /* clicking the title goes one level up (cancel) */
-                        return ACTION_STD_CANCEL;
-                    }
-                    else if (click_loc & TITLE_ICON)
-                    {   /* clicking the title icon goes back to the root */
-                        return ACTION_STD_MENU;
-                    }
+                else if (click_loc & TITLE_ICON)
+                {   /* clicking the title icon goes back to the root */
+                    return ACTION_STD_MENU;
                 }
             }
             break;
@@ -842,7 +844,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 scroll_mode = SCROLL_NONE;
 
             if (scroll_mode == SCROLL_NONE)
-                last_y = -1;
+                initial_touch = true;
             break;
         }
         case SCROLL_KINETIC:
@@ -879,8 +881,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
         }
     }
 
-    /* register y position unless forcefully reset to 1- */
-    if (last_y >= 0)
+    /* register y position unless forcefully reset */
+    if (!initial_touch)
         last_y = adj_y;
 
     return recurse ? gui_synclist_do_touchscreen(list) : ACTION_REDRAW;
