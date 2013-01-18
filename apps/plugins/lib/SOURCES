@@ -11,6 +11,7 @@ highscore.c
 simple_viewer.c
 display_text.c
 strncpy.c
+stdio_compat.c
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 grey_core.c
