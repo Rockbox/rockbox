@@ -145,6 +145,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     const int list_start_item = list->start_item[screen];
     const int icon_width = list_icon_width(screen);
     const bool scrollbar_in_left = (global_settings.scrollbar == SCROLLBAR_LEFT);
+    const bool scrollbar_in_right = (global_settings.scrollbar == SCROLLBAR_RIGHT);
     const bool show_cursor = !global_settings.cursor_style &&
                         list->show_selection_marker;
     struct viewport *parent = (list->parent[screen]);
@@ -220,7 +221,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             list_text_vp->width -= SCROLLBAR_WIDTH;
             list_text_vp->x += SCROLLBAR_WIDTH;
         }
-        else if (VP_IS_RTL(list_text_vp) && !scrollbar_in_left)
+        else if (VP_IS_RTL(list_text_vp) && scrollbar_in_right)
         {
             list_text_vp->width -= SCROLLBAR_WIDTH;
         }
