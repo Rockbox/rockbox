@@ -27,6 +27,29 @@ import android.content.DialogInterface;
 
 public class RockboxYesno
 {
+    private class Listener implements DialogInterface.OnClickListener, DialogInterface.OnDismissListener
+    {
+        /* default to "No" if onClick isn't called at all */
+        private boolean result = false;
+        
+        /* called when the user presses the Yes or the No button */
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            result = (which == DialogInterface.BUTTON_POSITIVE);
+        }
+
+        /* onDismiss is (hopefully) also called when the dialog is closed
+         * for any reason other than clicking yes or no. This should
+         * avoid the native code waiting for the result indefinitely in
+         * case the dialog just disappears  */
+        @Override
+        public void onDismiss(DialogInterface dialog)
+        {
+            put_result(result);
+        }
+    }
+    
     private void yesno_display(final String text, final String yes, final String no)
     {
         final Activity c = RockboxService.getInstance().getActivity();
@@ -34,26 +57,15 @@ public class RockboxYesno
         c.runOnUiThread(new Runnable() {
             public void run()
             {
+                Listener l = new Listener();
                 new AlertDialog.Builder(c)
                 .setTitle(R.string.KbdInputTitle)
                 .setIcon(R.drawable.icon)
-                .setCancelable(false)
                 .setMessage(text)
-                .setPositiveButton(yes, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        put_result(true);
-                    }
-                })
-                .setNegativeButton(no, new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        put_result(false);
-                    }
-                })
-                .show();
+                .setPositiveButton(yes, l)
+                .setNegativeButton(no, l)
+                .show()
+                .setOnDismissListener(l);
             }
         });
     }
