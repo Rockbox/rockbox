@@ -104,4 +104,6 @@
 
 #endif
 
+#define uintmax_t   unsigned long long
+#define intmax_t    long long
 #endif /* __STDINT_H__ */
