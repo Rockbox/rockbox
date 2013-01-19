@@ -69,4 +69,9 @@ int ata_spinup_time(void); /* ticks */
 int ata_get_dma_mode(void);
 #endif /* HAVE_ATA_DMA */
 
+#ifdef HAVE_ATA_SMART
+/* Returns current S.M.A.R.T. data */
+void* ata_read_smart(void);
+#endif
+
 #endif /* __ATA_H__ */

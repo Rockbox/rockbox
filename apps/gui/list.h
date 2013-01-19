@@ -254,8 +254,13 @@ struct simplelist_info {
     void *callback_data; /* data for callbacks */
 };
 
+#ifdef HAVE_ATA_SMART
+#define SIMPLELIST_MAX_LINES 64
+#define SIMPLELIST_MAX_LINELENGTH 48
+#else
 #define SIMPLELIST_MAX_LINES 32
 #define SIMPLELIST_MAX_LINELENGTH 32
+#endif
 
 /** The next three functions are used if the text is mostly static.
     These should be called in the action callback for the list.

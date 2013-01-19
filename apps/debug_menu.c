@@ -1396,6 +1396,216 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     return btn;
 }
 #elif  (CONFIG_STORAGE & STORAGE_ATA) 
+#ifdef HAVE_ATA_SMART
+/* headers from smartmontools-5.42 (atacmds.h) */
+/* TODO: move to storage.h?, debug_menu.h? */
+#define NUMBER_ATA_SMART_ATTRIBUTES     30
+
+struct ata_smart_attribute {
+  unsigned char id;
+  /* meaning of flag bits: see MACROS just below */
+  /* WARNING: MISALIGNED! */
+  unsigned short flags;
+  unsigned char current;
+  unsigned char worst;
+  unsigned char raw[6];
+  unsigned char reserv;
+} __attribute__((packed));
+
+/* MACROS to interpret the flags bits in the previous structure. */
+/* These have not been implemented using bitflags and a union, to make */
+/* it portable across bit/little endian and different platforms. */
+
+/* 0: Prefailure bit */
+
+/* From SFF 8035i Revision 2 page 19: Bit 0 (pre-failure/advisory bit) */
+/* - If the value of this bit equals zero, an attribute value less */
+/* than or equal to its corresponding attribute threshold indicates an */
+/* advisory condition where the usage or age of the device has */
+/* exceeded its intended design life period. If the value of this bit */
+/* equals one, an attribute value less than or equal to its */
+/* corresponding attribute threshold indicates a prefailure condition */
+/* where imminent loss of data is being predicted. */
+#define ATTRIBUTE_FLAGS_PREFAILURE(x) (x & 0x01)
+
+/* 1: Online bit  */
+
+/* From SFF 8035i Revision 2 page 19: Bit 1 (on-line data collection */
+/* bit) - If the value of this bit equals zero, then the attribute */
+/* value is updated only during off-line data collection */
+/* activities. If the value of this bit equals one, then the attribute */
+/* value is updated during normal operation of the device or during */
+/* both normal operation and off-line testing. */
+#define ATTRIBUTE_FLAGS_ONLINE(x) (x & 0x02)
+
+/* The following are (probably) IBM's, Maxtors and  Quantum's definitions for the */
+/* vendor-specific bits: */
+/* 2: Performance type bit */
+#define ATTRIBUTE_FLAGS_PERFORMANCE(x) (x & 0x04)
+
+/* 3: Errorrate type bit */
+#define ATTRIBUTE_FLAGS_ERRORRATE(x) (x & 0x08)
+
+/* 4: Eventcount bit */
+#define ATTRIBUTE_FLAGS_EVENTCOUNT(x) (x & 0x10)
+
+/* 5: Selfpereserving bit */
+#define ATTRIBUTE_FLAGS_SELFPRESERVING(x) (x & 0x20)
+
+/* 6-15: Reserved for future use */
+#define ATTRIBUTE_FLAGS_OTHER(x) ((x) & 0xffc0)
+
+struct ata_smart_values
+{
+    unsigned short int revnumber;
+    struct ata_smart_attribute vendor_attributes [NUMBER_ATA_SMART_ATTRIBUTES];
+    unsigned char offline_data_collection_status;
+    unsigned char self_test_exec_status;
+    unsigned short int total_time_to_complete_off_line;
+    unsigned char vendor_specific_366;
+    unsigned char offline_data_collection_capability;
+    unsigned short int smart_capability;
+    unsigned char errorlog_capability;
+    unsigned char vendor_specific_371;
+    unsigned char short_test_completion_time;
+    unsigned char extend_test_completion_time;
+    unsigned char conveyance_test_completion_time;
+    unsigned char reserved_375_385[11];
+    unsigned char vendor_specific_386_510[125];
+    unsigned char chksum;
+} __attribute__((packed));
+
+/* Raw attribute value print formats */
+enum ata_attr_raw_format
+{
+    RAWFMT_DEFAULT,
+    RAWFMT_RAW8,
+    RAWFMT_RAW16,
+    RAWFMT_RAW48,
+    RAWFMT_HEX48,
+    RAWFMT_RAW64,
+    RAWFMT_HEX64,
+    RAWFMT_RAW16_OPT_RAW16,
+    RAWFMT_RAW16_OPT_AVG16,
+    RAWFMT_RAW24_DIV_RAW24,
+    RAWFMT_RAW24_DIV_RAW32,
+    RAWFMT_SEC2HOUR,
+    RAWFMT_MIN2HOUR,
+    RAWFMT_HALFMIN2HOUR,
+    RAWFMT_MSEC24_HOUR32,
+    RAWFMT_TEMPMINMAX,
+    RAWFMT_TEMP10X,
+};
+
+struct ata_smart_values * smart_data = NULL;
+
+static const char * ata_smart_get_attr_name(unsigned char id)
+{
+    switch (id)
+    {
+        case 1:     return "Raw Read Error Rate";
+        case 2:     return "Throughput Performance";
+        case 3:     return "Spin-Up Time";
+        case 4:     return "Start/Stop Count";
+        case 5:     return "Reallocated Sector Count";
+        case 7:     return "Seek Error Rate";
+        case 8:     return "Seek Time Performance";
+        case 9:     return "Power-On Hours Count";
+        case 10:    return "Spin-Up Retry Count";
+        case 12:    return "Power Cycle Count";
+        case 192:   return "Power-Off Retract Count";
+        case 193:   return "Load/Unload Cycle Count";
+        case 194:   return "HDA Temperature";
+        case 196:   return "Reallocated Event Count";
+        case 197:   return "Current Pending Sector Count";
+        case 198:   return "Uncorrectable Sector Count";
+        case 199:   return "UltraDMA CRC Error Count";
+        case 220:   return "Disk Shift";
+        case 222:   return "Loaded Hours";
+        case 223:   return "Load/Unload Retry Count";
+        case 224:   return "Load Friction";
+        case 226:   return "Load-In Time";
+        case 240:   return "Transfer Error Rate";   /* Fujitsu */
+        /*case 240:   return "Head Flying Hours";*/
+        default:    return "Unknown Attribute";
+    }
+};
+
+static int ata_smart_get_attr_rawfmt(unsigned char id)
+{
+    switch (id)
+    {
+        case 3:   /* Spin-up time */
+            return RAWFMT_RAW16_OPT_AVG16;
+
+        case 5:   /* Reallocated sector count */
+        case 196: /* Reallocated event count */
+            return RAWFMT_RAW16_OPT_RAW16;
+
+        case 190: /* Airflow Temperature */
+        case 194: /* HDA Temperature */
+            return RAWFMT_TEMPMINMAX;
+
+        default:
+            return RAWFMT_RAW48;
+    }
+};
+
+static int ata_smart_attr_to_string(
+                struct ata_smart_attribute *attr, char *buf, int size)
+{
+    uint16_t w[3]; /* 3 words to store 6 bytes of raw data */
+    int len;
+
+    if (attr->id == 0)
+        return 0; /* null attribute, buffer empty */
+
+    /* align and convert raw data */
+    memcpy(w, attr->raw, 6);
+    w[0] = letoh16(w[0]);
+    w[1] = letoh16(w[1]);
+    w[2] = letoh16(w[2]);
+
+    len = snprintf(buf, size, "%d %s: %u,%u ", attr->id,
+                            ata_smart_get_attr_name(attr->id),
+                            attr->current, attr->worst);
+    if (len >= size) return 2; /* buffer full */
+
+    switch (ata_smart_get_attr_rawfmt(attr->id))
+    {
+        case RAWFMT_RAW16_OPT_RAW16:
+            len += snprintf(buf+len, size-len, "%u", w[0]);
+            if (len >= size) return 2;
+            if (w[1] || w[2])
+                snprintf(buf+len, size-len, " %u %u", w[1],w[2]);
+            break;
+
+        case RAWFMT_RAW16_OPT_AVG16:
+            len += snprintf(buf+len, size-len, "%u", w[0]);
+            if (len >= size) return 2;
+            if (w[1])
+                snprintf(buf+len, size-len, " Avg: %u", w[1]);
+            break;
+
+        case RAWFMT_TEMPMINMAX:
+            snprintf(buf+len, size-len, "%u Min/Max: %u/%u", w[0],w[1],w[2]);
+            break;
+
+        case RAWFMT_RAW48:
+        default:
+            /* shows first 4 bytes of raw data as uint32 LE,
+               and the ramaining 2 bytes as uint16 LE. */
+            snprintf(buf+len, size-len, "%lu", letoh32(*((uint32_t*)w)));
+            if (len >= size) return 2;
+            if (w[2])
+                snprintf(buf+len, size-len, " %u", w[2]);
+            break;
+    }
+
+    return 1; /* ok */
+}
+#endif /* HAVE_ATA_SMART */
+
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
@@ -1530,6 +1740,16 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                 '0' + (i & 7));
     }
 #endif /* HAVE_ATA_DMA */
+#ifdef HAVE_ATA_SMART
+    smart_data = ata_read_smart();
+    simplelist_addline(SIMPLELIST_ADD_LINE, "");
+    simplelist_addline(SIMPLELIST_ADD_LINE, "S.M.A.R.T. data:");
+    simplelist_addline(SIMPLELIST_ADD_LINE, "Id Name: Current,Worst Raw");
+    for (i = 0; i < NUMBER_ATA_SMART_ATTRIBUTES; i++)
+        if (ata_smart_attr_to_string(
+                    &smart_data->vendor_attributes[i], buf, sizeof buf))
+            simplelist_addline(SIMPLELIST_ADD_LINE, buf);
+#endif /* HAVE_ATA_SMART */
     return btn;
 }
 #else /* No SD, MMC or ATA */
@@ -1566,6 +1786,34 @@ static bool dbg_identify_info(void)
 #endif
         close(fd);
     }
+#ifdef HAVE_ATA_SMART
+    if (smart_data)
+    {
+        fd = creat("/smart_data.bin", 0666);
+        if(fd >= 0)
+        {
+            write(fd, smart_data, sizeof(struct ata_smart_values));
+            close(fd);
+        }
+
+        fd = creat("/smart_data.txt", 0666);
+        if(fd >= 0)
+        {
+            int i;
+            char buf[128];
+            for (i = 0; i < NUMBER_ATA_SMART_ATTRIBUTES; i++)
+            {
+                if (ata_smart_attr_to_string(
+                        &smart_data->vendor_attributes[i], buf, sizeof buf))
+                {
+                    write(fd, buf, strlen(buf));
+                    write(fd, "\n", 1);
+                }
+            }
+            close(fd);
+        }
+    }
+#endif /* HAVE_ATA_SMART */
     return false;
 }
 #endif
