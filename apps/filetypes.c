@@ -176,8 +176,21 @@ static struct file_type filetypes[MAX_FILETYPES];
 static int custom_filetype_icons[MAX_FILETYPES];
 static bool custom_icons_loaded = false;
 #ifdef HAVE_LCD_COLOR
-static int custom_colors[MAX_FILETYPES+1];
+static int custom_colors[MAX_FILETYPES];
 #endif
+struct filetype_unknown {
+    enum themable_icons icon;
+#ifdef HAVE_LCD_COLOR
+    int color;
+#endif
+};
+static struct filetype_unknown unknown_file = {
+    .icon = Icon_NOICON,
+#ifdef HAVE_LCD_COLOR
+    .color = -1,
+#endif
+};
+
 /* index array to filetypes used in open with list. */
 static int viewers[MAX_VIEWERS];
 static int filetype_count = 0;
@@ -253,7 +266,7 @@ void read_color_theme_file(void) {
     int fd;
     char *ext, *color;
     int i;
-    for (i = 0; i < MAX_FILETYPES+1; i++) {
+    for (i = 0; i < MAX_FILETYPES; i++) {
         custom_colors[i] = -1;
     }
     snprintf(buffer, MAX_PATH, THEME_DIR "/%s.colours",
@@ -272,7 +285,7 @@ void read_color_theme_file(void) {
         }
         if (!strcasecmp(ext, "???"))
         {
-            hex_to_rgb(color, &custom_colors[MAX_FILETYPES]);
+            hex_to_rgb(color, &unknown_file.color);
             continue;
         }
         i = find_extension(ext);
@@ -289,6 +302,7 @@ void read_viewer_theme_file(void)
     int fd;
     char *ext, *icon;
     int i;
+    int *icon_dest;
     global_status.viewer_icon_count = 0;
     custom_icons_loaded = false;
     custom_filetype_icons[0] = Icon_Folder;
@@ -308,17 +322,24 @@ void read_viewer_theme_file(void)
             continue;
         i = find_extension(ext);
         if (i >= 0)
+            icon_dest = &custom_filetype_icons[i];
+        else if (!strcmp(ext, "???"))
+            icon_dest = &unknown_file.icon;
+        else
+            icon_dest = NULL;
+
+        if (icon_dest)
         {
             if (*icon == '*')
-                custom_filetype_icons[i] = atoi(icon+1);
+                *icon_dest = atoi(icon+1);
             else if (*icon == '-')
-                custom_filetype_icons[i] = Icon_NOICON;
+                *icon_dest = Icon_NOICON;
             else if (*icon >= '0' && *icon <= '9')
             {
                 int number = atoi(icon);
                 if (number > global_status.viewer_icon_count)
                     global_status.viewer_icon_count++;
-                custom_filetype_icons[i] = Icon_Last_Themeable + number;
+                *icon_dest = Icon_Last_Themeable + number;
             }
         }
     }
@@ -424,6 +445,19 @@ static void read_config(int fd)
         *e = '\0';
         plugin = s;
 
+        if (!strcmp("???", extension))
+        {
+            /* get the icon */
+            s = e+1;
+            if (*s == '*')
+                unknown_file.icon = atoi(s+1);
+            else if (*s == '-')
+                unknown_file.icon = Icon_NOICON;
+            else if (*s >= '0' && *s <= '9')
+                unknown_file.icon = Icon_Last_Themeable + atoi(s);
+            continue;
+        }
+
         /* ok, store this plugin/extension, check icon after */
         struct file_type *file_type = &filetypes[filetype_count];
         file_type->extension = filetypes_strdup(extension);
@@ -486,7 +520,7 @@ int filetype_get_color(const char * name, int attr)
     i = find_extension(extension);
     if (i >= 0)
         return custom_colors[i];
-    return custom_colors[MAX_FILETYPES];
+    return unknown_file.color;
 }
 #endif
 
@@ -494,7 +528,7 @@ int filetype_get_icon(int attr)
 {
     int index = find_attr(attr);
     if (index < 0)
-        return Icon_NOICON;
+        return unknown_file.icon;
     if (custom_icons_loaded)
         return custom_filetype_icons[index];
     return filetypes[index].icon;
