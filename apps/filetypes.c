@@ -179,7 +179,7 @@ static bool custom_icons_loaded = false;
 static int custom_colors[MAX_FILETYPES];
 #endif
 struct filetype_unknown {
-    enum themable_icons icon;
+    int icon;
 #ifdef HAVE_LCD_COLOR
     int color;
 #endif
