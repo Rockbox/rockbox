@@ -514,7 +514,7 @@ int filetype_get_color(const char * name, int attr)
         return custom_colors[0];
     extension = strrchr(name, '.');
     if (!extension)
-        return custom_colors[MAX_FILETYPES];
+        return custom_colors[unknown_file.color];
     extension++;
 
     i = find_extension(extension);
