@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///nU\u003d",
+        "filename": "apps/menus/eq_menu.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2013-01-22T20:03:49Z",
+      "side": 1,
+      "message": "More trailing whitespace in the block above",
+      "revId": "a87e99efe3a0291f2f9e71d30e614feec810c360",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///nY\u003d",
+        "filename": "lib/rbcodec/dsp/eq.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2013-01-22T20:03:49Z",
+      "side": 1,
+      "message": "Trailing whitespace! Run!",
+      "revId": "a87e99efe3a0291f2f9e71d30e614feec810c360",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
