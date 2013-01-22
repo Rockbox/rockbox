@@ -421,7 +421,7 @@ int is_sansa(struct sansa_t* sansa)
 
     /* Load Sansa bootloader and check for "Sansa C200" magic string */
     if (sansa_seek_and_read(sansa, sansa->start + 0x200, sansa->sectorbuf, ppbl_length) < 0) {
-        fprintf(stderr,"[ERR]  Seek and read to 0x%08llx in is_sansa failed.\n",
+        fprintf(stderr,"[ERR]  Seek and read to 0x%08"PRIx64" in is_sansa failed.\n",
                        sansa->start+0x200);
         return -6;
     }
@@ -432,10 +432,10 @@ int is_sansa(struct sansa_t* sansa)
         /* E200 */
         sansa->targetname="e200";
     }
-    
+
     /* Check Main firmware header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET, sansa->sectorbuf, 0x200) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_sansa failed.\n",
+        fprintf(stderr,"[ERR]  Seek to 0x%"PRIx64" in is_sansa failed.\n",
                        sansa->start+PPMI_OFFSET);
         return -5;
     }
@@ -447,7 +447,7 @@ int is_sansa(struct sansa_t* sansa)
 
     /* Check main mi4 file header */
     if (sansa_seek_and_read(sansa, sansa->start+PPMI_OFFSET+0x200, sansa->sectorbuf, 0x200) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in is_sansa failed.\n",
+        fprintf(stderr,"[ERR]  Seek to 0x%"PRIx64" in is_sansa failed.\n",
                        sansa->start+PPMI_OFFSET+0x200);
         return -5;
     }
@@ -744,7 +744,7 @@ int sansa_add_bootloader(struct sansa_t* sansa, const unsigned char* bootloader,
     /* Now write the whole thing back to the Sansa */
 
     if (sansa_seek(sansa, sansa->start+PPMI_OFFSET) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in add_bootloader failed.\n",
+        fprintf(stderr,"[ERR]  Seek to 0x%08"PRIx64" in add_bootloader failed.\n",
                        sansa->start+PPMI_OFFSET);
         return -5;
     }
@@ -781,7 +781,7 @@ int sansa_delete_bootloader(struct sansa_t* sansa)
     /* Now write the whole thing back to the Sansa */
 
     if (sansa_seek(sansa, sansa->start+PPMI_OFFSET) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in add_bootloader failed.\n",
+        fprintf(stderr,"[ERR]  Seek to 0x%08"PRIx64" in add_bootloader failed.\n",
                        sansa->start+PPMI_OFFSET);
         return -5;
     }
@@ -812,7 +812,7 @@ int sansa_list_images(struct sansa_t* sansa)
 
     ppmi_length = le2int(sansa->sectorbuf+4);
 
-    printf("[INFO] Image 1 - %llu bytes\n",ppmi_length);
+    printf("[INFO] Image 1 - %"PRIu64" bytes\n",ppmi_length);
     num = 1;
 
     /* Look for an original firmware after the first image */
@@ -857,7 +857,7 @@ int sansa_update_of(struct sansa_t* sansa, const char* filename)
 
     if (get_mi4header(buf,&mi4header)!=0) {
         /* We don't have a valid MI4 file after a bootloader, so do nothing. */
-        fprintf(stderr,"[ERR]  No original firmware found at 0x%08llx\n",
+        fprintf(stderr,"[ERR]  No original firmware found at 0x%08"PRIx64"\n",
                     sansa->start+PPMI_OFFSET+0x200+ppmi_length);
         return -1;
     }
@@ -896,7 +896,7 @@ int sansa_update_of(struct sansa_t* sansa, const char* filename)
 
     /* Step 3 - write the OF to the Sansa */
     if (sansa_seek(sansa, sansa->start+PPMI_OFFSET+0x200+ppmi_length) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in sansa_update_of failed.\n",
+        fprintf(stderr,"[ERR]  Seek to 0x%08"PRIx64" in sansa_update_of failed.\n",
                    sansa->start+PPMI_OFFSET+0x200+ppmi_length);
         return -1;
     }
@@ -913,7 +913,7 @@ int sansa_update_of(struct sansa_t* sansa, const char* filename)
     if (strcmp(sansa->targetname,"e200") == 0) {
         printf("[INFO] Resetting Original Firmware settings\n");
         if (sansa_seek(sansa, sansa->start+NVPARAMS_OFFSET+0x200) < 0) {
-            fprintf(stderr,"[ERR]  Seek to 0x%08llx in sansa_update_of failed.\n",
+            fprintf(stderr,"[ERR]  Seek to 0x%08"PRIx64" in sansa_update_of failed.\n",
                        sansa->start+NVPARAMS_OFFSET+0x200);
             return -1;
         }
@@ -960,7 +960,7 @@ int sansa_update_ppbl(struct sansa_t* sansa, const char* filename)
 
     /* Step 3 - write the bootloader to the Sansa */
     if (sansa_seek(sansa, sansa->start) < 0) {
-        fprintf(stderr,"[ERR]  Seek to 0x%08llx in sansa_update_ppbl failed.\n", sansa->start);
+        fprintf(stderr,"[ERR]  Seek to 0x%08"PRIx64" in sansa_update_ppbl failed.\n", sansa->start);
         return -1;
     }
 
