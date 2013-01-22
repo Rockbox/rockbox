@@ -25,7 +25,7 @@
  * Menus and screens must be updated to support changing this from 5
  * without modifying other stuff (remove comment when this is no longer
  * true :-) */
-#define EQ_NUM_BANDS 5
+#define EQ_NUM_BANDS 10
 
 struct eq_band_setting
 {

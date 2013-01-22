@@ -106,6 +106,16 @@ MENUITEM_SETTING(cutoff_3, &global_settings.eq_band_settings[3].cutoff,
                  eq_setting_callback);
 MENUITEM_SETTING(cutoff_4, &global_settings.eq_band_settings[4].cutoff,
                  eq_setting_callback);
+MENUITEM_SETTING(cutoff_5, &global_settings.eq_band_settings[5].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_6, &global_settings.eq_band_settings[6].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_7, &global_settings.eq_band_settings[7].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_8, &global_settings.eq_band_settings[8].cutoff,
+                 eq_setting_callback);
+MENUITEM_SETTING(cutoff_9, &global_settings.eq_band_settings[9].cutoff,
+                 eq_setting_callback);
 
 MENUITEM_SETTING(q_0, &global_settings.eq_band_settings[0].q,
                  eq_setting_callback);
@@ -117,6 +127,16 @@ MENUITEM_SETTING(q_3, &global_settings.eq_band_settings[3].q,
                  eq_setting_callback);
 MENUITEM_SETTING(q_4, &global_settings.eq_band_settings[4].q,
                  eq_setting_callback);
+MENUITEM_SETTING(q_5, &global_settings.eq_band_settings[5].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_6, &global_settings.eq_band_settings[6].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_7, &global_settings.eq_band_settings[7].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_8, &global_settings.eq_band_settings[8].q,
+                 eq_setting_callback);
+MENUITEM_SETTING(q_9, &global_settings.eq_band_settings[9].q,
+                 eq_setting_callback);
 
 MENUITEM_SETTING(gain_0, &global_settings.eq_band_settings[0].gain,
                  eq_setting_callback);
@@ -127,6 +147,16 @@ MENUITEM_SETTING(gain_2, &global_settings.eq_band_settings[2].gain,
 MENUITEM_SETTING(gain_3, &global_settings.eq_band_settings[3].gain,
                  eq_setting_callback);
 MENUITEM_SETTING(gain_4, &global_settings.eq_band_settings[4].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_5, &global_settings.eq_band_settings[5].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_6, &global_settings.eq_band_settings[6].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_7, &global_settings.eq_band_settings[7].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_8, &global_settings.eq_band_settings[8].gain,
+                 eq_setting_callback);
+MENUITEM_SETTING(gain_9, &global_settings.eq_band_settings[9].gain,
                  eq_setting_callback);
 
 static char* gainitem_get_name(int selected_item, void * data, char *buffer)
@@ -181,14 +211,46 @@ MENUITEM_FUNCTION_DYNTEXT(gain_item_4, MENU_FUNC_USEPARAM,
                           gainitem_get_name, gainitem_speak_item,
                           &global_settings.eq_band_settings[4].cutoff,
                           NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_5, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_5,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band_settings[5].cutoff,
+                          NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_6, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_6,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band_settings[6].cutoff,
+                          NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_7, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_7,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band_settings[7].cutoff,
+                          NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_8, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_8,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band_settings[8].cutoff,
+                          NULL, Icon_NOICON);
+MENUITEM_FUNCTION_DYNTEXT(gain_item_9, MENU_FUNC_USEPARAM,
+                          do_option, (void*)&gain_9,
+                          gainitem_get_name, gainitem_speak_item,
+                          &global_settings.eq_band_settings[9].cutoff,
+                          NULL, Icon_NOICON);
                                     
 MAKE_MENU(gain_menu, ID2P(LANG_EQUALIZER_GAIN), NULL, Icon_NOICON, &gain_item_0, 
-            &gain_item_1, &gain_item_2, &gain_item_3, &gain_item_4);
+            &gain_item_1, &gain_item_2, &gain_item_3, &gain_item_4,
+            &gain_item_5, &gain_item_6, &gain_item_7, &gain_item_8,
+	    &gain_item_9);
 
-static const struct menu_item_ex *band_items[3][3] = {
+static const struct menu_item_ex *band_items[8][3] = {
     { &cutoff_1, &q_1, &gain_1 },
     { &cutoff_2, &q_2, &gain_2 },
-    { &cutoff_3, &q_3, &gain_3 }
+    { &cutoff_3, &q_3, &gain_3 },
+    { &cutoff_4, &q_4, &gain_4 },
+    { &cutoff_5, &q_5, &gain_5 },
+    { &cutoff_6, &q_6, &gain_6 },
+    { &cutoff_7, &q_7, &gain_7 },
+    { &cutoff_8, &q_8, &gain_8 }
 };
 
 static char* centerband_get_name(int selected_item, void * data, char *buffer)
@@ -240,11 +302,32 @@ MENUITEM_FUNCTION_DYNTEXT(band_3_menu, MENU_FUNC_USEPARAM,
                           do_center_band_menu, (void*)3, 
                           centerband_get_name, centerband_speak_item,
                           (void*)3, NULL, Icon_EQ);
-MAKE_MENU(band_4_menu, ID2P(LANG_EQUALIZER_BAND_HIGH_SHELF), NULL, 
-            Icon_EQ, &cutoff_4, &q_4, &gain_4);
+MENUITEM_FUNCTION_DYNTEXT(band_4_menu, MENU_FUNC_USEPARAM,
+                          do_center_band_menu, (void*)4,
+                          centerband_get_name, centerband_speak_item,
+                          (void*)4, NULL, Icon_EQ);
+MENUITEM_FUNCTION_DYNTEXT(band_5_menu, MENU_FUNC_USEPARAM,
+                          do_center_band_menu, (void*)5,
+                          centerband_get_name, centerband_speak_item,
+                          (void*)5, NULL, Icon_EQ);
+MENUITEM_FUNCTION_DYNTEXT(band_6_menu, MENU_FUNC_USEPARAM,
+                          do_center_band_menu, (void*)6,
+                          centerband_get_name, centerband_speak_item,
+                          (void*)6, NULL, Icon_EQ);
+MENUITEM_FUNCTION_DYNTEXT(band_7_menu, MENU_FUNC_USEPARAM,
+                          do_center_band_menu, (void*)7,
+                          centerband_get_name, centerband_speak_item,
+                          (void*)7, NULL, Icon_EQ);
+MENUITEM_FUNCTION_DYNTEXT(band_8_menu, MENU_FUNC_USEPARAM,
+                          do_center_band_menu, (void*)8,
+                          centerband_get_name, centerband_speak_item,
+                          (void*)8, NULL, Icon_EQ);
+MAKE_MENU(band_9_menu, ID2P(LANG_EQUALIZER_BAND_HIGH_SHELF), NULL,
+            Icon_EQ, &cutoff_9, &q_9, &gain_9);
 
 MAKE_MENU(advanced_eq_menu_, ID2P(LANG_EQUALIZER_ADVANCED), NULL, Icon_EQ,
-            &band_0_menu, &band_1_menu, &band_2_menu, &band_3_menu, &band_4_menu);
+            &band_0_menu, &band_1_menu, &band_2_menu, &band_3_menu, &band_4_menu,
+            &band_5_menu, &band_6_menu, &band_7_menu, &band_8_menu, &band_9_menu);
 
 
 enum eq_slider_mode {
@@ -300,7 +383,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     if (band == 0) {
         screen->putsxy(x1, y1, "LS: ");
         screen->getstringsize("LS:", &w, &h);
-    } else if (band == 4) {
+    } else if (band == 9) {
         screen->putsxy(x1, y1, "HS: ");
         screen->getstringsize("HS:", &w, &h);
     } else {
@@ -370,9 +453,9 @@ static void draw_eq_sliders(struct screen * screen, int x, int y,
 {
     int height = y;
 
-    start_item = MIN(start_item, 5 - nb_eq_sliders);
+    start_item = MIN(start_item, 10 - nb_eq_sliders);
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 10; i++) {
         struct eq_band_setting *setting = &global_settings.eq_band_settings[i];
         int cutoff = setting->cutoff;
         int q      = setting->q;
@@ -390,9 +473,9 @@ static void draw_eq_sliders(struct screen * screen, int x, int y,
         }
     }
 
-    if (nb_eq_sliders != 5)
+    if (nb_eq_sliders != 10)
         gui_scrollbar_draw(screen, 0, y, SCROLLBAR_SIZE - 1,
-                           screen->lcdheight - y, 5,
+                           screen->lcdheight - y, 10,
                            start_item, start_item + nb_eq_sliders,
                            VERTICAL);
     return;
@@ -431,8 +514,8 @@ bool eq_menu_graphical(void)
         if (height > screens[i].lcdheight)
             nb_eq_sliders[i]--;
 
-        if (nb_eq_sliders[i] > 5)
-            nb_eq_sliders[i] = 5;
+        if (nb_eq_sliders[i] > 10)
+            nb_eq_sliders[i] = 10;
     }
 
     y = h + 1;
@@ -489,12 +572,12 @@ bool eq_menu_graphical(void)
             }
 
             /* Draw scrollbar if needed */
-            if (nb_eq_sliders[i] != 5)
+            if (nb_eq_sliders[i] != 10)
             {
                 if (current_band == 0) {
                     start_item = 0;
-                } else if (current_band == 4) {
-                    start_item = 5 - nb_eq_sliders[i];
+                } else if (current_band == 9) {
+                    start_item = 10 - nb_eq_sliders[i];
                 } else {
                     start_item = current_band - 1;
                 }
@@ -547,13 +630,13 @@ bool eq_menu_graphical(void)
         case ACTION_STD_PREVREPEAT:
             current_band--;
             if (current_band < 0)
-                current_band = 4; /* wrap around */
+                current_band = 9; /* wrap around */
             break;
 
         case ACTION_STD_NEXT:
         case ACTION_STD_NEXTREPEAT:
             current_band++;
-            if (current_band > 4)
+            if (current_band > 9)
                 current_band = 0; /* wrap around */
             break;
 
