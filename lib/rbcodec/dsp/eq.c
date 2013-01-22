@@ -32,7 +32,7 @@
 #include <string.h>
 
 /**
- * Current setup is one lowshelf filters three peaking filters and one
+ * Current setup is one lowshelf filters eight peaking filters and one
  *  highshelf filter. Varying the number of shelving filters make no sense,
  *  but adding peaking filters is possible. Check EQ_NUM_BANDS to have
  *  2 shelving filters and EQ_NUM_BANDS-2 peaking filters.
