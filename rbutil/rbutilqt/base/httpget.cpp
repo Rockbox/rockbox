@@ -199,6 +199,7 @@ bool HttpGet::getFile(const QUrl &url)
 
     // create hash used for caching
     m_hash = QCryptographicHash::hash(url.toEncoded(), QCryptographicHash::Md5).toHex();
+    m_cachefile = m_cachedir.absolutePath() + "/rbutil-cache/" + m_hash;
     // RFC2616: the absoluteURI form must get used when the request is being
     // sent to a proxy.
     m_path.clear();
@@ -211,7 +212,7 @@ bool HttpGet::getFile(const QUrl &url)
     m_header.setValue("User-Agent", m_globalUserAgent);
     m_header.setValue("Connection", "Keep-Alive");
 
-    if(!m_usecache) {
+    if(!m_usecache || !QFileInfo(m_cachefile).exists()) {
         getFileFinish();
     }
     else {
@@ -227,7 +228,6 @@ bool HttpGet::getFile(const QUrl &url)
 
 void HttpGet::getFileFinish()
 {
-    m_cachefile = m_cachedir.absolutePath() + "/rbutil-cache/" + m_hash;
     QString indexFile = m_cachedir.absolutePath() + "/rbutil-cache/cache.txt";
     if(m_usecache) {
         // check if the file is present in cache
@@ -347,35 +347,35 @@ void HttpGet::httpFinished(int id, bool error)
         emit requestFinished(id, error);
     }
 
-    if(id == headRequest) {
-        QHttpResponseHeader h = http.lastResponse();
-
-        QString date = h.value("Last-Modified").simplified();
-        if(date.isEmpty()) {
-            m_serverTimestamp = QDateTime(); // no value = invalid
+    QHttpResponseHeader h = http.lastResponse();
+    QString date = h.value("Last-Modified").simplified();
+    if(date.isEmpty()) {
+        m_serverTimestamp = QDateTime(); // no value = invalid
+        if(id == headRequest)
             emit headerFinished();
-            return;
-        }
-        // to successfully parse the date strip weekday and timezone
-        date.remove(0, date.indexOf(" ") + 1);
-        if(date.endsWith("GMT"))
-            date.truncate(date.indexOf(" GMT"));
-        // distinguish input formats (see RFC1945)
-        // RFC 850
-        if(date.contains("-"))
-            m_serverTimestamp = QLocale::c().toDateTime(date, "dd-MMM-yy hh:mm:ss");
-        // asctime format
-        else if(date.at(0).isLetter())
-            m_serverTimestamp = QLocale::c().toDateTime(date, "MMM d hh:mm:ss yyyy");
-        // RFC 822
         else
-            m_serverTimestamp = QLocale::c().toDateTime(date, "dd MMM yyyy hh:mm:ss");
-        qDebug() << "[HTTP] HEAD finished, server date:" << date << ", parsed:" << m_serverTimestamp;
-        emit headerFinished();
+            emit requestFinished(id, error);
         return;
     }
-    if(id == getRequest)
+    // to successfully parse the date strip weekday and timezone
+    date.remove(0, date.indexOf(" ") + 1);
+    if(date.endsWith("GMT")) date.truncate(date.indexOf(" GMT"));
+    // distinguish input formats (see RFC1945)
+    if(date.contains("-")) // RFC 850
+        m_serverTimestamp = QLocale::c().toDateTime(date, "dd-MMM-yy hh:mm:ss");
+    else if(date.at(0).isLetter()) // asctime format
+        m_serverTimestamp = QLocale::c().toDateTime(date, "MMM d hh:mm:ss yyyy");
+    else // RFC 822
+        m_serverTimestamp = QLocale::c().toDateTime(date, "dd MMM yyyy hh:mm:ss");
+
+    qDebug() << "[HTTP] file server date:" << date
+             << "parsed:" << m_serverTimestamp;
+
+    if(id == headRequest)
+        emit headerFinished();
+    else
         emit requestFinished(id, error);
+    return;
 }
 
 void HttpGet::httpStarted(int id)
@@ -396,7 +396,7 @@ void HttpGet::httpResponseHeader(const QHttpResponseHeader &resp)
     // if there is a network error abort all scheduled requests for
     // this download
     m_response = resp.statusCode();
-   
+
     // 301 -- moved permanently
     // 302 -- found
     // 303 -- see other
