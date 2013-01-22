@@ -361,9 +361,7 @@ void HttpGet::httpFinished(int id, bool error)
     date.remove(0, date.indexOf(" ") + 1);
     if(date.endsWith("GMT")) date.truncate(date.indexOf(" GMT"));
     // distinguish input formats (see RFC1945)
-    if(date.contains("-")) // RFC 850
-        m_serverTimestamp = QLocale::c().toDateTime(date, "dd-MMM-yy hh:mm:ss");
-    else if(date.at(0).isLetter()) // asctime format
+    if(date.at(0).isLetter()) // asctime format
         m_serverTimestamp = QLocale::c().toDateTime(date, "MMM d hh:mm:ss yyyy");
     else // RFC 822
         m_serverTimestamp = QLocale::c().toDateTime(date, "dd MMM yyyy hh:mm:ss");
