@@ -26,7 +26,7 @@ ifdef APP_TYPE
 PDBOXLDFLAGS += -lm
 endif
 
-$(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ)
+$(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(TLSFLIB)
 
 # Compile PDBox with extra flags (adapted from ZXBox)
 $(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.make

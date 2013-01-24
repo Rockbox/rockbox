@@ -19,7 +19,7 @@ include $(RBCODECLIB_DIR)/codecs/lib/libcodec.make
 OTHER_INC += -I$(RBCODECLIB_DIR)/codecs/lib
 
 # extra libraries
-CODEC_LIBS := $(EXTRA_LIBS) $(CODECLIB)
+CODEC_LIBS := $(CODECLIB)
 
 # the codec libraries
 include $(RBCODECLIB_DIR)/codecs/demac/libdemac.make
@@ -140,7 +140,7 @@ $(CODECDIR)/spc.codec : $(CODECDIR)/libspc.a
 $(CODECDIR)/mpa.codec : $(CODECDIR)/libmad.a
 $(CODECDIR)/a52.codec : $(CODECDIR)/liba52.a
 $(CODECDIR)/flac.codec : $(CODECDIR)/libffmpegFLAC.a
-$(CODECDIR)/vorbis.codec : $(CODECDIR)/libtremor.a
+$(CODECDIR)/vorbis.codec : $(CODECDIR)/libtremor.a $(TLSFLIB) $(SETJMPLIB)
 $(CODECDIR)/speex.codec : $(CODECDIR)/libspeex.a
 $(CODECDIR)/mpc.codec : $(CODECDIR)/libmusepack.a
 $(CODECDIR)/wavpack.codec : $(CODECDIR)/libwavpack.a

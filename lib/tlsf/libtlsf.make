@@ -14,7 +14,6 @@ TLSFLIB := $(BUILDDIR)/lib/libtlsf.a
 
 OTHER_SRC += $(TLSFLIB_SRC)
 INCLUDES += -I$(TLSFLIB_DIR)/src
-EXTRA_LIBS += $(TLSFLIB)
 
 TLSFLIBFLAGS = $(CFLAGS) -fstrict-aliasing -ffunction-sections $(SHARED_CFLAGS)
 

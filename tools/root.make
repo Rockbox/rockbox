@@ -62,8 +62,8 @@ endif
 all: $(DEPFILE) build
 
 # Subdir makefiles. their primary purpose is to populate SRC, OTHER_SRC,
-# ASMDEFS_SRC, CORE_LIBS and EXTRA_LIBS. But they also define special
-# dependencies and compile rules
+# ASMDEFS_SRC and CORE_LIBS. But they also define special dependencies and
+# compile rules
 include $(TOOLSDIR)/tools.make
 
 ifeq (,$(findstring checkwps,$(APP_TYPE)))
@@ -71,7 +71,7 @@ ifeq (,$(findstring checkwps,$(APP_TYPE)))
     ifeq (,$(findstring warble,$(APP_TYPE)))
       include $(FIRMDIR)/firmware.make
       include $(ROOTDIR)/apps/bitmaps/bitmaps.make
-	  ifeq (,$(findstring bootloader,$(APPSDIR)))
+      ifeq (,$(findstring bootloader,$(APPSDIR)))
         include $(ROOTDIR)/lib/skin_parser/skin_parser.make
         include $(ROOTDIR)/lib/tlsf/libtlsf.make
       endif
