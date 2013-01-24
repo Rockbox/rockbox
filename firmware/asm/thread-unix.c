@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
+#include <signal.h>
 #include "debug.h"
 
 static volatile bool sig_handler_called;
