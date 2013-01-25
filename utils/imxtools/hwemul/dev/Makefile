@@ -1,7 +1,8 @@
-CC=arm-elf-eabi-gcc
-LD=arm-elf-eabi-gcc
-AS=arm-elf-eabi-gcc
-OC=arm-elf-eabi-objcopy
+PREFIX?=arm-elf-eabi-
+CC=$(PREFIX)gcc
+LD=$(PREFIX)gcc
+AS=$(PREFIX)gcc
+OC=$(PREFIX)objcopy
 SBTOOLS=../../sbtools/
 CFLAGS=-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99 -mcpu=arm926ej-s -fomit-frame-pointer -Wno-pointer-sign -Wno-override-init -ffunction-sections
 CFLAGS_3700=$(CFLAGS) -DHAVE_STMP3700
