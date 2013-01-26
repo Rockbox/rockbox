@@ -125,7 +125,7 @@ struct apb_dma_command_t
     uint32_t cmd;
     void *buffer;
     /* PIO words follow */
-};
+} __attribute__((packed));
 
 #define DMA_INFO_CURCMDADDR (1 << 0)
 #define DMA_INFO_NXTCMDADDR (1 << 1)
