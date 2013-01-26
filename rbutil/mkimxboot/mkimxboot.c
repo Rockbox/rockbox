@@ -76,6 +76,7 @@ static const char *imx_fw_variant[] =
     [VARIANT_ZENXFI2_RECOVERY] = "ZEN X-Fi2 Recovery",
     [VARIANT_ZENXFI2_NAND] = "ZEN X-Fi2 NAND",
     [VARIANT_ZENXFI2_SD] = "ZEN X-Fi2 eMMC/SD",
+    [VARIANT_ZENXFISTYLE_RECOVERY] = "ZEN X-Fi Style Recovery",
 };
 
 static const struct imx_md5sum_t imx_sums[] =
@@ -108,6 +109,22 @@ static const struct imx_md5sum_t imx_sums[] =
         MODEL_ZENXFI3, "a5114cd45ea4554ec221f51a71083862", "1.00.22e",
         { [VARIANT_DEFAULT] = {0, 18110576} }
     },
+    {
+        /* Version 1.03.04e */
+        MODEL_ZENXFISTYLE, "32a731b7f714e9f99a95991003759c98", "1.03.04",
+        {
+            [VARIANT_DEFAULT] = {842960, 29876944},
+            [VARIANT_ZENXFISTYLE_RECOVERY] = {610272, 232688},
+        }
+    },
+    {
+        /* Version 1.03.04e */
+        MODEL_ZENXFISTYLE, "2c7ee52d9984d85dd39aa49b3331e66c", "1.03.04e",
+        {
+            [VARIANT_DEFAULT] = {842960, 29876944},
+            [VARIANT_ZENXFISTYLE_RECOVERY] = {610272, 232688},
+        }
+    },
 };
 
 static struct crypto_key_t zero_key =
@@ -123,6 +140,8 @@ static const struct imx_model_desc_t imx_models[] =
     [MODEL_ZENXFI2] = {"Zen X-Fi2", dualboot_zenxfi2, sizeof(dualboot_zenxfi2), "zxf2", 82,
                        1, &zero_key, 0, 0x40000000 },
     [MODEL_ZENXFI3] = {"Zen X-Fi3", dualboot_zenxfi3, sizeof(dualboot_zenxfi3), "zxf3", 83,
+                       1, &zero_key, 0, 0x40000000 },
+    [MODEL_ZENXFISTYLE] = {"Zen X-Fi Style", NULL, 0, "", -1,
                        1, &zero_key, 0, 0x40000000 },
 };
 

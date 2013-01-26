@@ -58,6 +58,7 @@ enum imx_model_t
     MODEL_FUZEPLUS = 0,
     MODEL_ZENXFI2 = 1,
     MODEL_ZENXFI3 = 2,
+    MODEL_ZENXFISTYLE = 3,
     /* new models go here */
 
     NUM_MODELS
@@ -71,6 +72,8 @@ enum imx_firmware_variant_t
     VARIANT_ZENXFI2_NAND,
     VARIANT_ZENXFI2_SD,
     VARIANT_ZENXFI2_RECOVERY,
+    /* For the Creative X-Fi Style */
+    VARIANT_ZENXFISTYLE_RECOVERY,
     /* Last */
     VARIANT_COUNT
 };
