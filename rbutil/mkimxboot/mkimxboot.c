@@ -92,9 +92,10 @@ static const struct imx_md5sum_t imx_sums[] =
     {
         /* Version 1.23.01e */
         MODEL_ZENXFI2, "2beff2168212d332f13cfc36ca46989d", "1.23.01e",
-        { [VARIANT_ZENXFI2_RECOVERY] = { 0x93010, 684192},
-          [VARIANT_ZENXFI2_NAND] = { 0x13a0b0, 42410704 },
-          [VARIANT_ZENXFI2_SD] = { 0x29ac380, 42304208 }
+        {
+            [VARIANT_ZENXFI2_RECOVERY] = { 0x93010, 684192},
+            [VARIANT_ZENXFI2_NAND] = { 0x13a0b0, 42410704 },
+            [VARIANT_ZENXFI2_SD] = { 0x29ac380, 42304208 }
         }
     },
     {
