@@ -267,6 +267,9 @@ enum sb_version_guess_t guess_sb_version(const char *filename)
     FILE *f = fopen(filename, "rb");
     if(f == NULL)
         bugp("Cannot open file for reading\n");
+    fseek(f, 0, SEEK_END);
+    long file_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
     // check signature
     uint8_t sig[4];
     if(fseek(f, 20, SEEK_SET))
@@ -283,12 +286,13 @@ enum sb_version_guess_t guess_sb_version(const char *filename)
         ret(SB_VERSION_UNK);
     if(hdr_size == 0x34)
         ret(SB_VERSION_1);
-    // check header size (v2)
-    if(fseek(f, 32, SEEK_SET))
+    // check image size (v2)
+    uint32_t img_size;
+    if(fseek(f, 28, SEEK_SET))
         ret(SB_VERSION_UNK);
-    if(fread(&hdr_size, 4, 1, f) != 1)
+    if(fread(&img_size, 4, 1, f) != 1)
         ret(SB_VERSION_UNK);
-    if(hdr_size == 0xc)
+    if(img_size * 16 == (uint32_t)file_size)
         ret(SB_VERSION_2);
     ret(SB_VERSION_UNK);
 #undef ret
