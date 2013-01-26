@@ -390,7 +390,10 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
             {
                 byte a, b;
                 if(convxdigit(imx_sums[i].md5sum[2 * j], &a) || convxdigit(imx_sums[i].md5sum[2 * j + 1], &b))
-                    return false;
+                {
+                    printf("[ERR][INTERNAL] Bad checksum format: %s\n", imx_sums[i].md5sum);
+                    return IMX_ERROR;
+                }
                 md5[j] = (a << 4) | b;
             }
             if(memcmp(file_md5sum, md5, 16) == 0)
