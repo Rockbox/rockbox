@@ -495,3 +495,106 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     sb_free(sb_file);
     return ret;
 }
+
+enum imx_error_t extract_firmware(const char *infile,
+    enum imx_firmware_variant_t fw_variant, const char *outfile)
+{
+    /* Dump tables */
+    if(fw_variant > VARIANT_COUNT) {
+        return IMX_ERROR;
+    }
+    dump_imx_dev_info("[INFO] ");
+    /* compute MD5 sum of the file */
+    uint8_t file_md5sum[16];
+    FILE *f = fopen(infile, "rb");
+    if(f == NULL)
+    {
+        printf("[ERR] Cannot open input file\n");
+        return IMX_OPEN_ERROR;
+    }
+    fseek(f, 0, SEEK_END);
+    size_t sz = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    void *buf = xmalloc(sz);
+    if(fread(buf, sz, 1, f) != 1)
+    {
+        fclose(f);
+        free(buf);
+        printf("[ERR] Cannot read file\n");
+        return IMX_READ_ERROR;
+    }
+    md5_context ctx;
+    md5_starts(&ctx);
+    md5_update(&ctx, buf, sz);
+    md5_finish(&ctx, file_md5sum);
+    fclose(f);
+    
+    printf("[INFO] MD5 sum of the file: ");
+    print_hex(file_md5sum, 16, true);
+    /* find model */
+    enum imx_model_t model;
+    int md5_idx;
+    do
+    {
+        int i = 0;
+        while(i < NR_IMX_SUMS)
+        {
+            uint8_t md5[20];
+            if(strlen(imx_sums[i].md5sum) != 32)
+            {
+                printf("[INFO] Invalid MD5 sum in imx_sums\n");
+                return IMX_ERROR;
+            }
+            for(int j = 0; j < 16; j++)
+            {
+                byte a, b;
+                if(convxdigit(imx_sums[i].md5sum[2 * j], &a) || convxdigit(imx_sums[i].md5sum[2 * j + 1], &b))
+                {
+                    printf("[ERR][INTERNAL] Bad checksum format: %s\n", imx_sums[i].md5sum);
+                    free(buf);
+                    return IMX_ERROR;
+                }
+                md5[j] = (a << 4) | b;
+            }
+            if(memcmp(file_md5sum, md5, 16) == 0)
+                break;
+            i++;
+        }
+        if(i == NR_IMX_SUMS)
+        {
+            printf("[ERR] MD5 sum doesn't match any known file\n");
+            return IMX_NO_MATCH;
+        }
+        model = imx_sums[i].model;
+        md5_idx = i;
+    }while(0);
+    printf("[INFO] File is for model %d (%s, version %s)\n", model,
+        imx_models[model].model_name, imx_sums[md5_idx].version);
+
+    if(imx_sums[md5_idx].fw_variants[fw_variant].size == 0)
+    {
+        printf("[ERR] Input file does not contain variant '%s'\n", imx_fw_variant[fw_variant]);
+        free(buf);
+        return IMX_VARIANT_MISMATCH;
+    }
+
+    f = fopen(outfile, "wb");
+    if(f == NULL)
+    {
+        printf("[ERR] Cannot open input file\n");
+        free(buf);
+        return IMX_OPEN_ERROR;
+    }
+    enum imx_error_t ret = IMX_SUCCESS;
+
+    if(fwrite(buf + imx_sums[md5_idx].fw_variants[fw_variant].offset,
+            imx_sums[md5_idx].fw_variants[fw_variant].size, 1, f) != 1)
+    {
+        printf("[ERR] Cannot write file\n");
+        ret = IMX_ERROR;
+    }
+    fclose(f);
+    free(buf);
+
+    return ret;
+}

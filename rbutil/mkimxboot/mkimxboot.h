@@ -85,6 +85,8 @@ struct imx_option_t
 void dump_imx_dev_info(const char *prefix);
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt);
+enum imx_error_t extract_firmware(const char *infile,
+    enum imx_firmware_variant_t fw_variant, const char *outfile);
 
 #ifdef __cplusplus
 }
