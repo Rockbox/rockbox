@@ -159,7 +159,7 @@ bool TTSFestival::start(QString* errStr)
         
         if(prologFile.open())
         {
-          prologFile.write(voiceSelect.toAscii());
+          prologFile.write(voiceSelect.toLatin1());
           prologFile.close();
           prologPath = QFileInfo(prologFile).absoluteFilePath();
           qDebug() << "[Festival] Prolog created at " << prologPath;
@@ -192,7 +192,7 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 
     QProcess clientProcess;
     clientProcess.start(cmd);
-    clientProcess.write(QString("%1.\n").arg(text).toAscii());
+    clientProcess.write(QString("%1.\n").arg(text).toLatin1());
     clientProcess.waitForBytesWritten();
     clientProcess.closeWriteChannel();
     clientProcess.waitForReadyRead();
@@ -357,7 +357,7 @@ QString TTSFestival::queryServer(QString query, int timeout)
 
         if(socket.state() == QAbstractSocket::ConnectedState)
         {
-            socket.write(QString("%1\n").arg(query).toAscii());
+            socket.write(QString("%1\n").arg(query).toLatin1());
             socket.waitForBytesWritten();
             socket.waitForReadyRead();
 

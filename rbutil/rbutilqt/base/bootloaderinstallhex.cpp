@@ -87,7 +87,7 @@ bool BootloaderInstallHex::install(void)
     while(i--) {
         if(md5sums[i].orig == 0)
             m_model--;
-        if(!qstrcmp(md5sums[i].orig, hash.toAscii()))
+        if(!qstrcmp(md5sums[i].orig, hash.toLatin1()))
             break;
     }
     if(i < 0) {
@@ -110,8 +110,8 @@ bool BootloaderInstallHex::install(void)
     emit logItem(tr("Descrambling file"), LOGINFO);
     m_descrambled.open();
     int result;
-    result = iriver_decode(m_offile.toAscii().data(),
-        m_descrambled.fileName().toAscii().data(), FALSE, STRIP_NONE);
+    result = iriver_decode(m_offile.toLatin1().data(),
+        m_descrambled.fileName().toLatin1().data(), FALSE, STRIP_NONE);
     qDebug() << "[BootloaderInstallHex] iriver_decode" << result;
 
     if(result < 0) {

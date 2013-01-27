@@ -467,7 +467,7 @@ QString Utils::resolveDevicename(QString path)
     UCHAR buffer[0x400];
     PVOLUME_DISK_EXTENTS extents = (PVOLUME_DISK_EXTENTS)buffer;
 
-    _stprintf(uncpath, _TEXT("\\\\.\\%c:"), path.toAscii().at(0));
+    _stprintf(uncpath, _TEXT("\\\\.\\%c:"), path.toLatin1().at(0));
     h = CreateFile(uncpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
             NULL, OPEN_EXISTING, 0, NULL);
     if(h == INVALID_HANDLE_VALUE) {
@@ -711,7 +711,7 @@ bool Utils::ejectDevice(QString device)
     TCHAR volume[8];
 
     /* CreateFile */
-    _stprintf(volume, _TEXT("\\\\.\\%c:"), device.toAscii().at(0));
+    _stprintf(volume, _TEXT("\\\\.\\%c:"), device.toLatin1().at(0));
     hdl = CreateFile(volume, GENERIC_READ | GENERIC_WRITE,
             FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
             OPEN_EXISTING, 0, NULL);

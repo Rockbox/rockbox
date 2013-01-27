@@ -268,9 +268,9 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
             libusb_device_handle *dh;
             if(libusb_open(dev, &dh) == 0) {
                 libusb_get_string_descriptor_ascii(dh, descriptor.iManufacturer, buf, 256);
-                name += QString::fromAscii((char*)buf) + " ";
+                name += QString::fromLatin1((char*)buf) + " ";
                 libusb_get_string_descriptor_ascii(dh, descriptor.iProduct, buf, 256);
-                name += QString::fromAscii((char*)buf);
+                name += QString::fromLatin1((char*)buf);
                 libusb_close(dh);
             }
             if(name.isEmpty())
@@ -309,13 +309,13 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
                         res = usb_get_string_simple(dev, u->descriptor.iManufacturer,
                                                     string, sizeof(string));
                         if(res > 0)
-                            name += QString::fromAscii(string) + " ";
+                            name += QString::fromLatin1(string) + " ";
                     }
                     if(u->descriptor.iProduct) {
                         res = usb_get_string_simple(dev, u->descriptor.iProduct,
                                                     string, sizeof(string));
                         if(res > 0)
-                            name += QString::fromAscii(string);
+                            name += QString::fromLatin1(string);
                     }
                     usb_close(dev);
                 }
