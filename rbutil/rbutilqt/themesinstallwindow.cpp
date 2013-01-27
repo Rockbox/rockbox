@@ -47,12 +47,25 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     connect(ui.listThemes, SIGNAL(itemSelectionChanged()), this, SLOT(updateSize()));
     connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
 
+    if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
+        igetter.setCache(true);
+    else
+    {
+        if(infocachedir.isEmpty())
+        {
+            infocachedir = QDir::tempPath() + "rbutil-themeinfo";
+            QDir d = QDir::temp();
+            d.mkdir("rbutil-themeinfo");
+        }
+        igetter.setCache(infocachedir);
+    }
+
     logger = NULL;
 }
 
 ThemesInstallWindow::~ThemesInstallWindow()
 {
-    if(infocachedir!="")
+    if(!infocachedir.isEmpty())
         Utils::recursiveRmdir(infocachedir);
 }
 
@@ -75,7 +88,7 @@ void ThemesInstallWindow::downloadInfo()
     infoUrl.replace("%RELEASE%", installInfo.release());
     infoUrl.replace("%RBUTILVER%", VERSION);
     QUrl url = QUrl(infoUrl);
-    qDebug() << "[Themes] Info URL:" << url << "Query:" << url.queryItems();
+    qDebug() << "[Themes] Info URL:" << url;
     getter->setFile(&themesInfo);
 
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
@@ -219,21 +232,7 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     text.replace("\n", "<br/>");
     ui.themeDescription->setHtml(text);
     iniDetails.endGroup();
-
     igetter.abort();
-    if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
-        igetter.setCache(true);
-    else
-    {
-        if(infocachedir=="")
-        {
-            infocachedir = QDir::tempPath() + "rbutil-themeinfo";
-            QDir d = QDir::temp();
-            d.mkdir("rbutil-themeinfo");
-        }
-        igetter.setCache(infocachedir);
-    }
-
     igetter.getFile(img);
 }
 
