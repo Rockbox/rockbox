@@ -37,12 +37,14 @@ RCC_DIR = $$MYBUILDDIR/rcc
 }
 
 # check version of Qt installation
-VER = $$find(QT_VERSION, ^4\\.[5-9]+.*)
-isEmpty(VER) {
-    message("Qt >= 4.5 required!")
-    !isEmpty(QT_VERSION) error("Qt found:" $$[QT_VERSION])
-}
+!contains(QT_MAJOR_VERSION, 5) {
+    VER = $$find(QT_VERSION, ^4\\.[5-9]+.*)
+    isEmpty(VER) {
+        message("Qt >= 4.5 required!")
+        !isEmpty(QT_VERSION) error("Qt found:" $$[QT_VERSION])
+    }
 message("Qt version used:" $$VER)
+}
 
 MACHINEFLAGS = $$find(QMAKE_CFLAGS, -m[63][42])
 
@@ -170,6 +172,12 @@ for(rblib, RBLIBS) {
 TEMPLATE = app
 TARGET = RockboxUtility
 QT += network
+
+contains(QT_MAJOR_VERSION, 5) {
+    message("Qt5 found")
+    QT += widgets
+}
+
 dbg {
     CONFIG += debug thread qt warn_on
     DEFINES -= QT_NO_DEBUG_OUTPUT
@@ -229,7 +237,7 @@ macx {
             -framework IOKit -framework CoreFoundation -framework Carbon \
             -framework SystemConfiguration -framework CoreServices
     INCLUDEPATH += /usr/local/include
-    
+
     # rule for creating a dmg file
     dmg.commands = hdiutil create -ov -srcfolder rbutilqt.app/ rbutil.dmg
     QMAKE_EXTRA_TARGETS += dmg
