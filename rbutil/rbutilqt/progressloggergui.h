@@ -20,7 +20,7 @@
 #ifndef PROGRESSLOGGERGUI_H
 #define PROGRESSLOGGERGUI_H
 
-#include <QtGui>
+#include <QWidget>
 
 #include "progressloggerinterface.h"
 #include "ui_progressloggerfrm.h"

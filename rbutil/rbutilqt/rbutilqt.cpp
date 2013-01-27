@@ -16,7 +16,8 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QMainWindow>
+#include <QMessageBox>
 
 #include "version.h"
 #include "rbutilqt.h"

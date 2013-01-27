@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QWidget>
 #include <QDebug>
 #include "infowidget.h"
 #include "rbsettings.h"

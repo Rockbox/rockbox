@@ -16,7 +16,9 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QWidget>
+#include <QMessageBox>
+#include <QFileDialog>
 #include "selectiveinstallwidget.h"
 #include "ui_selectiveinstallwidgetfrm.h"
 #include "serverinfo.h"

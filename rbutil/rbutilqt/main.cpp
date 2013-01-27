@@ -17,7 +17,8 @@
  ****************************************************************************/
 
 
-#include <QtGui>
+#include <QCoreApplication>
+#include <QSettings>
 #include "rbutilqt.h"
 #include "systrace.h"
 

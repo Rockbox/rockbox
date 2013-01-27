@@ -16,6 +16,7 @@
  *
  ****************************************************************************/
 
+#include <QMessageBox>
 #include "createvoicewindow.h"
 #include "ui_createvoicefrm.h"
 

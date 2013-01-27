@@ -16,7 +16,8 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QFileDialog>
+#include <QScrollBar>
 #include "systrace.h"
 #include "ui_systracefrm.h"
 

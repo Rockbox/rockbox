@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QStyledItemDelegate>
 
 class ComboBoxViewDelegate : public QStyledItemDelegate
 {

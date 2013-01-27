@@ -21,7 +21,8 @@
 #ifndef CREATEVOICEWINDOW_H
 #define CREATEVOICEWINDOW_H
 
-#include <QtGui>
+#include <QDialog>
+#include <QUrl>
 
 #include "ui_createvoicefrm.h"
 #include "progressloggergui.h"

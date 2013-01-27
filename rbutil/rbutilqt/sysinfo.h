@@ -21,7 +21,8 @@
 #ifndef SYSINFO_H
 #define SYSINFO_H
 
-#include <QtGui>
+#include <QDialog>
+#include <QWidget>
 #include "ui_sysinfofrm.h"
 
 class Sysinfo : public QDialog

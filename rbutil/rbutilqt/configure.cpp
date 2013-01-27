@@ -16,7 +16,10 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QFileDialog>
+#include <QUrl>
 
 #include "version.h"
 #include "configure.h"

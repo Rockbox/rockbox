@@ -16,7 +16,8 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QDialog>
+#include <QMouseEvent>
 
 #include "preview.h"
 

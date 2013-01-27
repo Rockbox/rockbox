@@ -21,7 +21,7 @@
 #ifndef SYSTRACE_H
 #define SYSTRACE_H
 
-#include <QtGui>
+#include <QDialog>
 #include "ui_systracefrm.h"
 
 class SysTrace : public QDialog

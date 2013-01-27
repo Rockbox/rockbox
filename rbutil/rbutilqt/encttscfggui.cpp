@@ -18,7 +18,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
+#include <QSpacerItem>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
+#include <QLineEdit>
+#include <QFileDialog>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QLabel>
+#include <QCheckBox>
+#include <QProgressDialog>
 #include "encttscfggui.h"
 
 EncTtsCfgGui::EncTtsCfgGui(QDialog* parent,EncTtsSettingInterface* interface,QString name) : QDialog(parent)

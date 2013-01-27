@@ -19,7 +19,7 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
 #include "ui_infowidgetfrm.h"
 
 class InfoWidget : public QWidget

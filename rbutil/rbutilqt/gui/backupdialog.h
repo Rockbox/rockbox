@@ -19,7 +19,6 @@
 #ifndef BACKUPDIALOG_H
 #define BACKUPDIALOG_H
 
-#include <QWidget>
 #include <QDialog>
 #include "ui_backupdialogfrm.h"
 #include "progressloggergui.h"

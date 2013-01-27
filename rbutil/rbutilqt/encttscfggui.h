@@ -21,7 +21,8 @@
 #ifndef ENCTTSCFGGUI_H
 #define ENCTTSCFGGUI_H
 
-#include <QtGui>
+#include <QDialog>
+#include <QProgressDialog>
 #include "encttssettings.h"
 
 //! \brief Shows and manages a configuration gui for encoders and tts enignes

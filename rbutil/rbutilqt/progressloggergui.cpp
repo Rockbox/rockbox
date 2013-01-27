@@ -16,6 +16,7 @@
  *
  ****************************************************************************/
 
+#include <QFileDialog>
 #include "progressloggergui.h"
 
 #include "sysinfo.h"

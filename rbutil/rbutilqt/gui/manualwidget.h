@@ -19,7 +19,7 @@
 #ifndef MANUALWIDGET_H
 #define MANUALWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
 #include "ui_manualwidgetfrm.h"
 
 class ManualWidget : public QWidget

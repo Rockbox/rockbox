@@ -16,7 +16,8 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QDialog>
+#include <QMessageBox>
 
 #include "ui_themesinstallfrm.h"
 #include "themesinstallwindow.h"

@@ -16,7 +16,10 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QThread>
+#include <QDialog>
+#include <QMessageBox>
+#include <QFileDialog>
 #include "backupdialog.h"
 #include "ui_backupdialogfrm.h"
 #include "rbsettings.h"

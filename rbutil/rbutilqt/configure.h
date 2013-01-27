@@ -22,7 +22,9 @@
 #define CONFIGURE_H
 
 #include "ui_configurefrm.h"
-#include <QtGui>
+#include <QDialog>
+#include <QWidget>
+#include <QUrl>
 
 class Config : public QDialog
 {

@@ -16,7 +16,7 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QDialog>
 #include "sysinfo.h"
 #include "ui_sysinfofrm.h"
 #include "system.h"

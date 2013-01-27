@@ -16,7 +16,8 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QWidget>
+#include <QMessageBox>
 #include <QDebug>
 #include "manualwidget.h"
 #include "rbutilqt.h"

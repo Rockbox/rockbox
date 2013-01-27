@@ -21,7 +21,8 @@
 #ifndef INSTALLTALKWINDOW_H
 #define INSTALLTALKWINDOW_H
 
-#include <QtGui>
+#include <QDialog>
+#include <QFileSystemModel>
 
 #include "ui_installtalkfrm.h"
 #include "progressloggergui.h"

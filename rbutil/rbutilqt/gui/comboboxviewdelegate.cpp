@@ -16,7 +16,9 @@
  *
  ****************************************************************************/
 
-#include <QtGui>
+#include <QStyledItemDelegate>
+#include <QPainter>
+#include <QApplication>
 #include <qdebug.h>
 #include "comboboxviewdelegate.h"
 

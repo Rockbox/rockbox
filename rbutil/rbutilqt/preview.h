@@ -21,7 +21,10 @@
 #ifndef PREVIEW_H
 #define PREVIEW_H
 
-#include <QtGui>
+#include <QDialog>
+#include <QLabel>
+#include <QTimer>
+
 #include "ui_previewfrm.h"
 
 

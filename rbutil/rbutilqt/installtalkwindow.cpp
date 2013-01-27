@@ -16,6 +16,7 @@
  *
  ****************************************************************************/
 
+#include <QMessageBox>
 #include "installtalkwindow.h"
 #include "ui_installtalkfrm.h"
 
