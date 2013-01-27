@@ -116,6 +116,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     /* eject funtionality is only implemented on W32 right now. */
     ui.buttonEject->setEnabled(false);
 #endif
+    QString c = RbSettings::value(RbSettings::CachePath).toString();
+    if(c.isEmpty()) c = QDir::tempPath();
+    HttpGet::setGlobalCache(c);
     updateDevice();
     downloadInfo();
 
