@@ -93,6 +93,7 @@ void SysTrace::savePreviousTrace(void)
     return;
 }
 
+#if QT_VERSION < 0x050000
 void SysTrace::debug(QtMsgType type, const char* msg)
 {
     (void)type;
@@ -109,6 +110,25 @@ void SysTrace::debug(QtMsgType type, const char* msg)
         repeat++;
     }
 }
+#else
+void SysTrace::debug(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    (void)type;
+    QByteArray localMsg = msg.toLocal8Bit();
+    if(lastmessage != msg) {
+        lastmessage = msg;
+        flush();
+        debugbuffer.append(msg + "\n");
+#if !defined(NODEBUG)
+        fprintf(stderr, "%s\n", localMsg.constData());
+#endif
+        repeat = 1;
+    }
+    else {
+        repeat++;
+    }
+}
+#endif
 
 void SysTrace::flush(void)
 {

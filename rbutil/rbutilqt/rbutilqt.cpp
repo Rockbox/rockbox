@@ -183,7 +183,11 @@ void RbUtilQt::shutdown(void)
     // restore default message handler to prevent trace accesses during
     // object destruction -- the trace object could already be destroyed.
     // Fixes segfaults on exit.
+#if QT_VERSION < 0x050000
     qInstallMsgHandler(0);
+#else
+    qInstallMessageHandler(0);
+#endif
     SysTrace::save();
     this->close();
 }
