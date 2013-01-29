@@ -24,6 +24,8 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdbool.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 bool g_quiet = false;
 struct hwemul_device_t hwdev;
@@ -326,22 +328,20 @@ int parse_command(char *cmd)
     return syntax_error(cmd);
 }
 
-int do_command()
+void interactive_mode(void)
 {
-    char *line = NULL;
-    int size = 0;
-    getline(&line, &size, stdin);
-    char *end = strchr(line, '\n');
-    if(end)
-        *end = 0;
-    char *pch = strtok(line, " ");
-    int ret;
-    if(pch)
-        ret = parse_command(pch);
-    else
-        ret = print_help();
-    free(line);
-    return ret;
+    rl_bind_key('\t', rl_complete);
+    while(1)
+    {
+        char *input = readline("> ");
+        if(!input)
+            break;
+        add_history(input);
+        int ret = parse_command(input);
+        free(input);
+        if(ret == 0)
+            break;
+    }
 }
 
 void usage(void)
@@ -543,9 +543,9 @@ int main(int argc, char **argv)
 
     if(!g_quiet)
         printf("Starting interactive session. Type 'help' to get help.\n");
-    while(1)
-        if(!do_command())
-            break;
+
+    interactive_mode();
+
     Lerr:
     if(features.feature_mask & HWEMUL_FEATURE_LOG)
     {
