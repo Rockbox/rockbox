@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///kY\u003d",
+        "filename": "apps/plugins/lamp.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-01-29T22:56:42Z",
+      "side": 1,
+      "message": "setting color to black kind of contradicts the purpose of this plugin IMO",
+      "revId": "0b2f6376a408acaa9b2459b2fa56b43f5427b965",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
