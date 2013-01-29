@@ -267,9 +267,6 @@ enum sb_version_guess_t guess_sb_version(const char *filename)
     FILE *f = fopen(filename, "rb");
     if(f == NULL)
         bugp("Cannot open file for reading\n");
-    fseek(f, 0, SEEK_END);
-    long file_size = ftell(f);
-    fseek(f, 0, SEEK_SET);
     // check signature
     uint8_t sig[4];
     if(fseek(f, 20, SEEK_SET))
@@ -286,13 +283,20 @@ enum sb_version_guess_t guess_sb_version(const char *filename)
         ret(SB_VERSION_UNK);
     if(hdr_size == 0x34)
         ret(SB_VERSION_1);
-    // check image size (v2)
-    uint32_t img_size;
-    if(fseek(f, 28, SEEK_SET))
+    // check header params relationship
+    struct
+    {
+        uint16_t nr_keys; /* Number of encryption keys */
+        uint16_t key_dict_off; /* Offset to key dictionary (in blocks) */
+        uint16_t header_size; /* In blocks */
+        uint16_t nr_sections; /* Number of sections */
+        uint16_t sec_hdr_size; /* Section header size (in blocks) */
+    } __attribute__((packed)) u;
+    if(fseek(f, 0x28, SEEK_SET))
         ret(SB_VERSION_UNK);
-    if(fread(&img_size, 4, 1, f) != 1)
+    if(fread(&u, sizeof(u), 1, f) != 1)
         ret(SB_VERSION_UNK);
-    if(img_size * 16 == (uint32_t)file_size)
+    if(u.sec_hdr_size == 1 && u.header_size == 6 && u.key_dict_off == u.header_size + u.nr_sections)
         ret(SB_VERSION_2);
     ret(SB_VERSION_UNK);
 #undef ret
