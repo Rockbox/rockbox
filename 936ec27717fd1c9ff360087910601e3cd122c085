@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///ks\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-01-29T21:36:50Z",
+      "side": 1,
+      "message": "What does \"a few fix\" mean here? If you changed the mspack source code I think it would be better to have the changes to it as separate commit (for easier rebasing, in case we want do this some time in the future).",
+      "revId": "936ec27717fd1c9ff360087910601e3cd122c085",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///kg\u003d",
+        "filename": "rbutil/rbutilqt/base/bootloaderinstallbase.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-01-29T21:36:50Z",
+      "side": 1,
+      "message": "please follow the style the file already has, i.e. opening braces go on the same line (except for function declarations), and single line statements get braces as well.",
+      "revId": "936ec27717fd1c9ff360087910601e3cd122c085",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///kk\u003d",
+        "filename": "rbutil/rbutilqt/base/mspackutil.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-01-29T21:36:50Z",
+      "side": 1,
+      "message": "You\u0027re opening a ( in the qDebug() output but aren\u0027t closing it. I guess that\u0027s not intentional :)",
+      "revId": "936ec27717fd1c9ff360087910601e3cd122c085",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///kw\u003d",
+        "filename": "rbutil/rbutilqt/rbutil.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-01-29T21:36:50Z",
+      "side": 1,
+      "message": "Please keep this change in a separate commit -- adding support for the X-Fi3 does not require support for cab files (though it would be rather inconvenient for the user without, but it\u0027s still something separate)",
+      "revId": "936ec27717fd1c9ff360087910601e3cd122c085",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///k0\u003d",
+        "filename": "rbutil/rbutilqt/rbutilqt.pri",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-01-29T21:36:50Z",
+      "side": 1,
+      "message": "I would prefer to only compile the files we actually need -- the *c.c files are (AFAIU) the compressors, so we don\u0027t need them.\n\nFrom my previous tests we only need\n\ncabd.c lzxd.c qtmd.c system.c mszipd.c",
+      "revId": "936ec27717fd1c9ff360087910601e3cd122c085",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
