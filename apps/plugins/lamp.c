@@ -61,10 +61,17 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 #ifdef HAVE_LCD_COLOR
 /* RGB color sets */
-#define NUM_COLORSETS   2
+#define NUM_COLORSETS   9
 static unsigned colorset[NUM_COLORSETS] = {
     LCD_RGBPACK(255, 255, 255),    /* white */
     LCD_RGBPACK(255,   0,   0),    /* red */
+    LCD_RGBPACK(255, 165,   0),    /* orange */
+    LCD_RGBPACK(255, 255,   0),    /* yellow */
+    LCD_RGBPACK(  0, 255,   0),    /* green */
+    LCD_RGBPACK(  0,   0, 255),    /* blue */
+    LCD_RGBPACK( 75,   0, 130),    /* indigo */
+    LCD_RGBPACK(238, 130, 238),    /* violet */
+    LCD_RGBPACK(  0,   0,   0),    /* black */
 };
 #endif /* HAVE_LCD_COLOR */
 
