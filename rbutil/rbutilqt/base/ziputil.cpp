@@ -26,7 +26,7 @@
 #include "quazip/quazipfileinfo.h"
 
 
-ZipUtil::ZipUtil(QObject* parent) : QObject(parent)
+ZipUtil::ZipUtil(QObject* parent) : ArchiveUtil(parent)
 {
     m_zip = NULL;
 }
