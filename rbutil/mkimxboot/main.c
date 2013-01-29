@@ -55,6 +55,7 @@ static void usage(void)
     printf("  -v <v>\tSet variant\n");
     printf("  -x\t\tDump device informations\n");
     printf("  -w\tExtract the original firmware\n");
+    printf("  -p <ver>\tForce product and component version\n");
     printf("Supported variants: (default is standard)\n");
     printf("  ");
     for(size_t i = 0; i < NR_VARIANTS; i++)
@@ -77,6 +78,7 @@ int main(int argc, char *argv[])
     enum imx_output_type_t type = IMX_DUALBOOT;
     bool debug = false;
     bool extract_of = false;
+    const char *force_version = NULL;
 
     if(argc == 1)
         usage();
@@ -96,7 +98,7 @@ int main(int argc, char *argv[])
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?di:o:b:t:v:xw", long_options, NULL);
+        int c = getopt_long(argc, argv, "?di:o:b:t:v:xwp:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -156,6 +158,9 @@ int main(int argc, char *argv[])
             case 'w':
                 extract_of = true;
                 break;
+            case 'p':
+                force_version = optarg;
+                break;
             default:
                 abort();
         }
@@ -194,6 +199,7 @@ int main(int argc, char *argv[])
     opt.debug = debug;
     opt.output = type;
     opt.fw_variant = variant;
+    opt.force_version = force_version;
     enum imx_error_t err = mkimxboot(infile, bootfile, outfile, opt);
     printf("Result: %d\n", err);
     return 0;

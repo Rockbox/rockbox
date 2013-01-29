@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
 #include "mkimxboot.h"
 #include "sb.h"
 #include "dualboot.h"
@@ -279,10 +281,62 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
     }
 }
 
+static enum imx_error_t parse_subversion(const char *s, const char *end, uint16_t *ver)
+{
+    int len = (end == NULL) ? strlen(s) : end - s;
+    if(len > 4)
+    {
+        printf("[ERR] Bad subversion override '%s' (too long)\n", s);
+        return IMX_ERROR;
+    }
+    *ver = 0;
+    for(int i = 0; i < len; i++)
+    {
+        if(!isdigit(s[i]))
+        {
+            printf("[ERR] Bad subversion override '%s' (not a digit)\n", s);
+            return IMX_ERROR;
+        }
+        *ver = *ver << 4 | (s[i] - '0');
+    }
+    return IMX_SUCCESS;
+}
+
+static enum imx_error_t parse_version(const char *s, struct sb_version_t *ver)
+{
+    const char *dot1 = strchr(s, '.');
+    if(dot1 == NULL)
+    {
+        printf("[ERR] Bad version override '%s' (missing dot)\n", s);
+        return IMX_ERROR;
+    }
+    const char *dot2 = strchr(dot1 + 1, '.');
+    if(dot2 == NULL)
+    {
+        printf("[ERR] Bad version override '%s' (missing second dot)\n", s);
+        return IMX_ERROR;
+    }
+    enum imx_error_t ret = parse_subversion(s, dot1, &ver->major);
+    if(ret != IMX_SUCCESS) return ret;
+    ret = parse_subversion(dot1 + 1, dot2, &ver->minor);
+    if(ret != IMX_SUCCESS) return ret;
+    ret = parse_subversion(dot2 + 1, NULL, &ver->revision);
+    if(ret != IMX_SUCCESS) return ret;
+    return IMX_SUCCESS;
+}
+
 static enum imx_error_t patch_firmware(enum imx_model_t model,
     enum imx_firmware_variant_t variant, enum imx_output_type_t type,
-    struct sb_file_t *sb_file, void *boot, size_t boot_sz)
+    struct sb_file_t *sb_file, void *boot, size_t boot_sz,
+    const char *force_version)
 {
+    if(force_version)
+    {
+        enum imx_error_t err = parse_version(force_version, &sb_file->product_ver);
+        if(err != IMX_SUCCESS) return err;
+        err = parse_version(force_version, &sb_file->component_ver);
+        if(err != IMX_SUCCESS) return err;
+    }
     switch(model)
     {
         case MODEL_FUZEPLUS:
@@ -511,7 +565,8 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
         }
     }while(0);
     /* produce file */
-    enum imx_error_t ret = patch_firmware(model, opt.fw_variant, opt.output, sb_file, boot + 8, boot_size - 8);
+    enum imx_error_t ret = patch_firmware(model, opt.fw_variant, opt.output,
+        sb_file, boot + 8, boot_size - 8, opt.force_version);
     if(ret == IMX_SUCCESS)
         ret = sb_write_file(sb_file, outfile);
 

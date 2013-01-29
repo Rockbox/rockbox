@@ -83,6 +83,7 @@ struct imx_option_t
     bool debug;
     enum imx_output_type_t output;
     enum imx_firmware_variant_t fw_variant;
+    const char *force_version; // set to NULL to ignore
 };
 
 void dump_imx_dev_info(const char *prefix);

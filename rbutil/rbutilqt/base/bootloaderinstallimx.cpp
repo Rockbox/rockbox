@@ -47,6 +47,7 @@ void BootloaderThreadImx::run(void)
 {
     qDebug() << "[BootloaderThreadImx] Thread started.";
     struct imx_option_t opt;
+    memset(&opt, 0, sizeof(opt));
     opt.debug = false;
     opt.output = IMX_DUALBOOT;
     opt.fw_variant = VARIANT_DEFAULT;
