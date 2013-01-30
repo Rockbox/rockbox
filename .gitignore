@@ -8,6 +8,9 @@
 *.o
 *.a
 
+# autosaved copies of files
+*~
+
 # android: java build system
 /android/bin
 /android/data
