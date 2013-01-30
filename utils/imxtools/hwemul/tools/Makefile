@@ -14,7 +14,7 @@ all: $(EXEC)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 hwemul_tool: hwemul_tool.o $(HWEMUL_LIB)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -rf $(OBJ) $(LIB)
