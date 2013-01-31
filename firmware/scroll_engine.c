@@ -23,6 +23,7 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
 #include "config.h"
 #include "gcc_extensions.h"
 #include "cpu.h"
@@ -36,15 +37,19 @@
 #endif
 #include "scroll_engine.h"
 
+
+/* private helper function for the scroll engine. Do not use in apps/.
+ * defined in lcd-bitmap-common.c */
+extern struct viewport *lcd_get_viewport(bool *is_defaut);
+#ifdef HAVE_REMOTE_LCD
+extern struct viewport *lcd_remote_get_viewport(bool *is_defaut);
+#endif
+
 static const char scroll_tick_table[18] = {
  /* Hz values [f(x)=100.8/(x+.048)]:
     1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33, 49.2, 96.2 */
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3, 2, 1
 };
-
-/* imported private functions from lcd-bitmap-common.c */
-extern struct viewport *lcd_get_viewport(void);
-extern struct viewport *lcd_remote_get_viewport(void);
 
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE*3];
@@ -156,7 +161,7 @@ static void scroll_thread(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
             if (lcd_active())
 #endif
-                lcd_scroll_fn();
+                lcd_scroll_worker();
             lcd_scroll_info.last_scroll = current_tick;
         }
 
@@ -165,7 +170,7 @@ static void scroll_thread(void)
 
         if (scroll & SCROLL_LCD_REMOTE)
         {
-            lcd_remote_scroll_fn();
+            lcd_remote_scroll_worker();
             lcd_remote_scroll_info.last_scroll = current_tick;
         }
     }
@@ -179,7 +184,7 @@ static void scroll_thread(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         if (lcd_active())
 #endif
-            lcd_scroll_fn();
+            lcd_scroll_worker();
     }
 }
 #endif /* HAVE_REMOTE_LCD */
