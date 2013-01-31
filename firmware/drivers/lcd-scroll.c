@@ -54,30 +54,27 @@ void LCDFN(scroll_stop)(void)
     LCDFN(scroll_info).lines = 0;
 }
 
-/* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
-void LCDFN(scroll_stop_viewport_line)(const struct viewport *current_vp, int line)
+/* Clears scrolling lines that intersect with the area */
+void LCDFN(scroll_stop_viewport_rect)(const struct viewport *vp, int x, int y, int width, int height)
 {
     int i = 0;
-
     while (i < LCDFN(scroll_info).lines)
     {
-        struct viewport *vp = LCDFN(scroll_info).scroll[i].vp;
-        if (((vp == current_vp)) && 
-            ((line < 0) || (LCDFN(scroll_info).scroll[i].y == line)))
+        struct scrollinfo *s = &LCDFN(scroll_info).scroll[i];
+        /* check if the specified area crosses the viewport in some way */
+        if (s->vp == vp
+            && (x < (s->x+s->width) && (x+width) >= s->x)
+            && (y < (s->y+s->height) && (y+height) >= s->y))
         {
             /* If i is not the last active line in the array, then move
-               the last item to position i */
+               the last item to position i. This compacts
+               the scroll array at the same time of removing the line */
             if ((i + 1) != LCDFN(scroll_info).lines)
             {
                 LCDFN(scroll_info).scroll[i] =
                     LCDFN(scroll_info).scroll[LCDFN(scroll_info).lines-1];
             }
             LCDFN(scroll_info).lines--;
-
-            /* A line can only appear once, so we're done, 
-             * unless we are clearing the whole viewport */
-            if (line >= 0)
-                return ;
         }
         else
         {
@@ -87,9 +84,9 @@ void LCDFN(scroll_stop_viewport_line)(const struct viewport *current_vp, int lin
 }
 
 /* Stop all scrolling lines in the specified viewport */
-void LCDFN(scroll_stop_viewport)(const struct viewport *current_vp)
+void LCDFN(scroll_stop_viewport)(const struct viewport *vp)
 {
-    LCDFN(scroll_stop_viewport_line)(current_vp, -1);
+    LCDFN(scroll_stop_viewport_rect)(vp, 0, 0, vp->width, vp->height);
 }
 
 void LCDFN(scroll_speed)(int speed)
@@ -125,3 +122,89 @@ void LCDFN(jump_scroll_delay)(int ms)
     LCDFN(scroll_info).jump_scroll_delay = ms / (HZ / 10);
 }
 #endif
+
+static void LCDFN(scroll_worker)(void)
+{
+    int index, width;
+    bool makedelay;
+    static char line_buf[SCROLL_LINE_SIZE];
+    bool is_default;
+    struct scroll_screen_info *si = &LCDFN(scroll_info);
+    struct scrollinfo *s;
+    struct viewport *vp;
+
+    unsigned fg_pattern, bg_pattern, drawmode;
+
+    for ( index = 0; index < si->lines; index++ ) {
+        s = &si->scroll[index];
+
+        /* check pause */
+        if (TIME_BEFORE(current_tick, s->start_tick))
+            continue;
+
+        s->start_tick = current_tick;
+
+        /* this runs out of the ui thread, thus we need to
+         * save and restore the current viewport since the ui thread
+         * is unaware of the swapped viewports. the vp must
+         * be switched early so that lcd_getstringsize() picks the
+         * correct font */
+        vp = LCDFN(get_viewport)(&is_default);
+        LCDFN(set_viewport)(s->vp);
+
+        width = LCDFN(getstringsize)(s->linebuffer, NULL, NULL);
+        makedelay = false;
+        
+        if (s->backward)
+            s->offset -= si->step;
+        else
+            s->offset += si->step;
+
+        if (s->bidir) { /* scroll bidirectional */
+
+            s->line = s->linebuffer;
+            if (s->offset <= 0) {
+                /* at beginning of line */
+                s->offset = 0;
+                s->backward = false;
+                makedelay = true;
+            }
+            else if (s->offset >= width - (s->width - s->x)) {
+                /* at end of line */
+                s->offset = width - (s->width - s->x);
+                s->backward = true;
+                makedelay = true;
+            }
+        }
+        else {
+
+            snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
+                s->linebuffer, "   ", s->linebuffer);
+            s->line = line_buf;
+            width += LCDFN(getstringsize)("   ", NULL, NULL);
+            /* scroll forward the whole time */
+            if (s->offset >= width) {
+                s->offset = 0;
+                makedelay = true;
+            }
+        }
+
+        /* Stash and restore these three, so that the scroll_func
+         * can do whatever it likes without destroying the state */
+        fg_pattern = s->vp->fg_pattern;
+        bg_pattern = s->vp->bg_pattern;
+        drawmode   = s->vp->drawmode;
+
+        s->scroll_func(s);
+        LCDFN(update_viewport_rect)(s->x, s->y, s->width, s->height);
+
+        s->vp->fg_pattern = fg_pattern;
+        s->vp->bg_pattern = bg_pattern;
+        s->vp->drawmode = drawmode;
+
+        LCDFN(set_viewport)(vp);
+
+        if (makedelay)
+            s->start_tick += si->delay + si->ticks;
+    }
+}

@@ -149,7 +149,7 @@ struct screen
     void (*clear_viewport)(void);
     void (*scroll_stop)(void);
     void (*scroll_stop_viewport)(const struct viewport *vp);
-    void (*scroll_stop_viewport_line)(const struct viewport *vp, int line);
+    void (*scroll_stop_viewport_rect)(const struct viewport* vp, int x, int y, int width, int height);
     void (*update)(void);
     void (*update_viewport)(void);
     void (*backlight_on)(void);
