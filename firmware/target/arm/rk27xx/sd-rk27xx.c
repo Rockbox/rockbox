@@ -256,8 +256,10 @@ static int sd_init_card(void)
         if((response & 0xFFF) == 0x1AA)
             sd_v2 = true;
 
-    /* timeout for initialization is 1sec, from SD Specification 2.00 */
-    init_timeout = current_tick + HZ;
+    /* Timeout for inintialization is 2 sec.
+       According to SD Specification 2.00 it should be >= 1,
+       but it's not enough in some rare cases. */
+    init_timeout = current_tick + 2*HZ;
 
     do {
         /* this timeout is the only valid error for this loop*/
