@@ -2829,8 +2829,8 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&amp;OK</translation>
     </message>
     <message utf8="true">
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2012 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>Мастер установки и администратирования Rockbox, микропрограммы с открытым исходным кодом для цифровых аудиоплееров.&lt;br/&gt;© 2005 - 2012 Команда Rockbox.&lt;br/&gt;Раздаётся по лицензии GNU General Public License v2.&lt;br/&gt;Используются иконки из &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;проекта Tango&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2013 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Мастер установки и администратирования Rockbox, микропрограммы с открытым исходным кодом для цифровых аудиоплееров.&lt;br/&gt;© 2005 - 2013 Команда Rockbox.&lt;br/&gt;Раздаётся по лицензии GNU General Public License v2.&lt;br/&gt;Используются иконки из &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;проекта Tango&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <source>&amp;Speex License</source>

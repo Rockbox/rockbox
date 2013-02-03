@@ -3498,8 +3498,8 @@ Administrator privileges zijn nodig.&lt;/li&gt;</translation>
     </message>
     <message utf8="true">
         <location filename="../aboutbox.ui" line="54"/>
-        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2012 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio speler firmware.&lt;br/&gt;© 2005 - 2012 Het Rockbox Team&lt;br/&gt;Vrijgegeven onder GNU General Public License v2.&lt;br/&gt;Gebruikt iconen van het &lt;a href=&quot;http://tango.freedesktop.org&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
+        <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© 2005 - 2013 The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
+        <translation>Installatie en schoonmaak hulpmiddel voor de Rockbox open source digitale audio speler firmware.&lt;br/&gt;© 2005 - 2013 Het Rockbox Team&lt;br/&gt;Vrijgegeven onder GNU General Public License v2.&lt;br/&gt;Gebruikt iconen van het &lt;a href=&quot;http://tango.freedesktop.org&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../aboutbox.ui" line="74"/>
