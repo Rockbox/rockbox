@@ -3277,6 +3277,13 @@ void pcm_channel_config(int channel_config, int stereo_width)
             val_rr = 0xc0001;
             break;
 
+        case SOUND_CHAN_REV_STEREO:
+            val_ll = 0;
+            val_lr = 0x80001;
+            val_rl = 0x80001;
+            val_rr = 0;
+            break;
+
         case SOUND_CHAN_CUSTOM:
             {
                 /* fixed point variables (matching MAS internal format)
