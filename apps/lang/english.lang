@@ -882,6 +882,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CHANNEL_REVERSE_STEREO
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Reverse Stereo"
+  </source>
+  <dest>
+    *: "Reverse Stereo"
+  </dest>
+  <voice>
+    *: "Reverse Stereo"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_STEREO_WIDTH
   desc: in sound_settings
   user: core

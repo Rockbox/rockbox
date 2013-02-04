@@ -130,6 +130,13 @@ static void set_channel_config(void)
             val_rl = 0x40000;
             val_rr = 0xc0000;
             break;
+
+        case SOUND_CHAN_REV_STEREO:
+            val_ll = 0;
+            val_lr = 0x80000;
+            val_rl = 0x80000;
+            val_rr = 0;
+            break;
     }
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
