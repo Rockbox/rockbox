@@ -21,10 +21,7 @@
 #ifndef _EQ_H
 #define _EQ_H
 
-/* => support from 3 to 32 bands, inclusive
- * Menus and screens must be updated to support changing this from 5
- * without modifying other stuff (remove comment when this is no longer
- * true :-) */
+/* => support from 3 to 32 bands */
 #define EQ_NUM_BANDS 10
 
 struct eq_band_setting

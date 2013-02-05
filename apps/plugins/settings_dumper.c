@@ -37,6 +37,8 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
                                         F_EQSETTING|
                                         F_SOUNDSETTING)))
         return;
+    else if (setting->flags&F_DEPRECATED)
+        return;
     setting_count++;
     if (setting_count%10 == 0)
         rb->fdprintf(fd, "\r\n");
