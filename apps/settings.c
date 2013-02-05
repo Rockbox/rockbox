@@ -547,6 +547,8 @@ static bool settings_write_config(const char* filename, int options)
         if (settings[i].cfg_name == NULL)
             continue;
         value[0] = '\0';
+        if (settings[i].flags & F_DEPRECATED)
+            continue;
         
         switch (options)
         {
