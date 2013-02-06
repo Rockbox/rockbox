@@ -268,8 +268,15 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             else
                 indent *= display->getcharwidth();
 
-            list_icons.x += indent;
-            list_text_vp->x += indent;
+            if (VP_IS_RTL(&list_icons))
+            {
+                list_icons.x -= indent;
+            }
+            else
+            {
+                list_icons.x += indent;
+                list_text_vp->x += indent;
+            }
             list_text_vp->width -= indent;
         }
 
@@ -376,8 +383,15 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         }
         if (indent)
         {
-            list_icons.x -= indent;
-            list_text_vp->x -= indent;
+            if (VP_IS_RTL(&list_icons))
+            {
+                list_icons.x += indent;
+            }
+            else
+            {
+                list_icons.x -= indent;
+                list_text_vp->x -= indent;
+            }
             list_text_vp->width += indent;
         }
     }
