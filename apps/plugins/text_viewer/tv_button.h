@@ -472,6 +472,11 @@
 #define TV_AUTOSCROLL   BUTTON_NEXT
 #define TV_BOOKMARK     BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+#define TV_QUIT         BUTTON_POWER
+#define TV_MENU         BUTTON_VOL_UP
+#define TV_BOOKMARK     BUTTON_VOL_DOWN
+
 #else
 #error No keymap defined!
 #endif

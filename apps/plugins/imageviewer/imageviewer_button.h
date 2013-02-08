@@ -416,6 +416,9 @@
 #define IMGVIEW_MENU        BUTTON_SELECT
 #define IMGVIEW_QUIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+#define IMGVIEW_QUIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

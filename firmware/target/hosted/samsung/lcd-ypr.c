@@ -32,6 +32,7 @@
 #include "system.h"
 #include "screendump.h"
 #include "lcd.h"
+#include "lcd-target.h"
 
 static int dev_fd = 0;
 fb_data *dev_fb = 0;
@@ -93,4 +94,23 @@ void lcd_init_device(void)
         exit(4);
     }
     printf("The framebuffer device was mapped to memory successfully.\n");
+}
+
+/*TODO: see if LCD sleep could be implemented in a better way -> ie using a rockbox feature
+ * instead of a directly call to these functions when powering/disabling backlight on targets
+ */
+
+/* Turn off LCD power supply */
+void _backlight_lcd_sleep(void)
+{
+    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
+    write(fp, "1", 1);
+    close(fp);
+}
+/* Turn on LCD screen */
+void _backlight_lcd_wake(void)
+{
+    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
+    write(fp, "0", 1);
+    close(fp);
 }

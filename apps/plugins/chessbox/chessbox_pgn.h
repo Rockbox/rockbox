@@ -453,6 +453,11 @@
 #define CB_LEVEL   BUTTON_PREV
 #define CB_MENU    BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+#define CB_LEVEL   BUTTON_VOL_UP
+#define CB_RESTART BUTTON_VOL_DOWN
+#define CB_MENU    (BUTTON_POWER|BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif

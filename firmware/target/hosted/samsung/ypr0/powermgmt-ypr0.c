@@ -24,7 +24,7 @@
 #include "file.h"
 #include "adc.h"
 #include "sc900776.h"
-#include "radio-ypr0.h"
+#include "radio-ypr.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {

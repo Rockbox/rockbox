@@ -40,9 +40,9 @@
 #define ROCKBOX_DIR_LEN (sizeof(ROCKBOX_DIR)-1)
 #endif /* def __PCTOOL__ */
 
-#if !defined(APPLICATION) || defined(SAMSUNG_YPR0)
+#if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 
-#ifdef SAMSUNG_YPR0
+#if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 #define HOME_DIR "/mnt/media0"
 #else
 #define HOME_DIR "/"
@@ -83,7 +83,7 @@ extern void paths_init(void);
 #define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
 #define VIEWERS_DIR         PLUGIN_DIR "/viewers"
 
-#if defined(APPLICATION) && !defined(SAMSUNG_YPR0)
+#if defined(APPLICATION) && !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1))
 #define PLUGIN_DATA_DIR          ROCKBOX_DIR "/rocks.data"
 #define PLUGIN_GAMES_DATA_DIR    PLUGIN_DATA_DIR
 #define PLUGIN_APPS_DATA_DIR     PLUGIN_DATA_DIR

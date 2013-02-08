@@ -276,6 +276,10 @@
 #define ROCKPAINT_LEFT      BUTTON_LEFT
 #define ROCKPAINT_RIGHT     BUTTON_RIGHT
 
+#elif ( CONFIG_KEYPAD == SAMSUNG_YPR1_PAD )
+#define ROCKPAINT_QUIT      BUTTON_POWER
+#define ROCKPAINT_MENU      BUTTON_VOL_UP
+
 #else
 #error "Please define keys for this keypad"
 #endif

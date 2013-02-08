@@ -30,13 +30,18 @@
 #include <SDL.h>
 #endif
 
-#include "ascodec.h"
-#include "gpio_ypr0.h"
+#include "gpio-target.h"
+#include "pmu_ypr1.h"
+#include "r1BattIoctl.h"
+#include "audiohw.h"
+#include "button-target.h"
 
 void power_off(void)
 {
-    /* Something that we need to do before exit on our platform YPR0 */
-    ascodec_close();
+    /* Something that we need to do before exit on our platform */
+    pmu_close();
+    max17040_close();
+    button_close_device();
     gpio_close();
     exit(EXIT_SUCCESS);
 }
@@ -53,8 +58,10 @@ void system_init(void)
     SDL_Init(0); /* need this if using any SDL subsystem */
 #endif
     /* Here begins our platform specific initilization for various things */
-    ascodec_init();
+    audiohw_init();
     gpio_init();
+    max17040_init();
+    pmu_init();
 }
 
 
