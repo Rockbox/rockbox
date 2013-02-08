@@ -4,7 +4,6 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
 
 ifndef V
@@ -20,6 +19,7 @@ TARGET_DIR ?= ./
 BUILDDIR ?= $(TARGET_DIR)build
 TARGETPLATFORM ?= $(shell uname)
 
+CFLAGS += -D__PCTOOL__
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 OBJDIR = $(BUILDDIR)/$(RBARCH)/
