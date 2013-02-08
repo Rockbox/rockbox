@@ -294,7 +294,11 @@ void audiohw_postinit(void)
 
     /* Specific to HW clocking */
     wmc_write_masked(WMC_CLOCK_GEN_CTRL, WMC_BCLKDIV_4 | WMC_MS,
+#ifdef SAMSUNG_YPR1
+                     WMC_BCLKDIV_2 | WMC_MS | WMC_CLKSEL);
+#else
                      WMC_BCLKDIV | WMC_MS | WMC_CLKSEL);
+#endif
     audiohw_set_frequency(HW_FREQ_DEFAULT);
 
     audiohw_enable_headphone_jack(true);
@@ -563,7 +567,7 @@ void audiohw_enable_depth_3d(bool enable)
     audiohw_set_depth_3d(wmc_vol.enh_3d);
 }
 
-#ifdef HAVE_RECORDING
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
 void audiohw_set_recsrc(int source, bool recording)
 {
     switch (source)

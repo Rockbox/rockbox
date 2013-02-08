@@ -366,6 +366,11 @@ static void setoptions (void)
         options.SELECT = BUTTON_SELECT;
         options.MENU   = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.MENU    = BUTTON_POWER;
+
 #else
 #error No Keymap Defined!
 #endif

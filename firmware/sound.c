@@ -236,7 +236,7 @@ static void set_prescaled_volume(void)
 #endif
 
 /* ypr0 with sdl has separate volume controls */
-#if !defined(HAVE_SDL_AUDIO) || defined(SAMSUNG_YPR0)
+#if !defined(HAVE_SDL_AUDIO) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \

@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2011 by Lorenzo Miori
+ * Copyright (C) 2013 by Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,28 +22,11 @@
 #include "backlight.h"
 #include "backlight-target.h"
 #include "lcd.h"
-#include "as3514.h"
-#include "ascodec.h"
-#include <fcntl.h>
-#include "unistd.h"
+#include "lcd-target.h"
+#include "pmu_ypr1.h"
+#include "mcs5000.h"
 
 static bool backlight_on_status = true; /* Is on or off? */
-
-/*TODO: see if LCD sleep could be implemented in a better way -> ie using a rockbox feature */
-/* Turn off LCD power supply */
-static void _backlight_lcd_sleep(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "1", 1);
-    close(fp);
-}
-/* Turn on LCD screen */
-static void _backlight_lcd_power(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "0", 1);
-    close(fp);
-}
 
 bool _backlight_init(void)
 {
@@ -55,10 +38,10 @@ void _backlight_on(void)
 {
     if (!backlight_on_status)
     {
+        /* Turn on touchscreen controller */
+        mcs5000_power();
         /* Turn on lcd power before backlight */
-        _backlight_lcd_power();
-        /* Original app sets this to 0xb1 when backlight is on... */
-        ascodec_write_pmu(AS3543_BACKLIGHT, 0x1, 0xb1);
+        _backlight_lcd_wake();
     }
 
     backlight_on_status = true;
@@ -68,10 +51,10 @@ void _backlight_on(void)
 void _backlight_off(void)
 {
     if (backlight_on_status) {
-        /* Disabling the DCDC15 completely, keeps brightness register value */
-        ascodec_write_pmu(AS3543_BACKLIGHT, 0x1, 0x00);
-        /* Turn off lcd power then */
+        /* Turn off lcd power */
         _backlight_lcd_sleep();
+        /* Turn off touchscreen controller to save battery */
+        mcs5000_shutdown();
     }
 
     backlight_on_status = false;
@@ -84,5 +67,6 @@ void _backlight_set_brightness(int brightness)
         brightness = MAX_BRIGHTNESS_SETTING;
     if (brightness < MIN_BRIGHTNESS_SETTING)
         brightness = MIN_BRIGHTNESS_SETTING;
-    ascodec_write_pmu(AS3543_BACKLIGHT, 0x3, brightness << 3 & 0xf8);
+    /* Do the appropriate ioctl on the linux module */
+    pmu_ioctl(IOCTL_PMU_LCD_DIM_CTRL, &brightness);
 }

@@ -363,6 +363,9 @@ static void init(void)
     button_init();
     powermgmt_init();
     backlight_init();
+#if CONFIG_RTC
+    rtc_init();
+#endif
 #ifdef SIMULATOR
     sim_tasks_init();
 #endif

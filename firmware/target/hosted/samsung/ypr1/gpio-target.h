@@ -6,9 +6,9 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Module wrapper for GPIO, using /dev/r0GPIO (r0Gpio.ko) of Samsung YP-R0
+ * Module wrapper for GPIO, using /dev/r1GPIO (r1Gpio.ko) of Samsung YP-R1
  *
- * Copyright (c) 2011 Lorenzo Miori
+ * Copyright (c) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,43 +20,42 @@
  *
  ****************************************************************************/
 
-#ifndef GPIO_YPR0_H
-#define GPIO_YPR0_H
+#ifndef GPIO_TARGET_H
+#define GPIO_TARGET_H
 
-#include "r0GPIOIoctl.h"
+#include "r1GPIOIoctl.h"
 
-/* Some meaningful pins used in the R0 */
+/* Some meaningful pins used in the YP-R1 */
 
-#define GPIO_HEADPHONE_SENSE        GPIO1_5
-#define GPIO_EXT_PWR_SENSE          GPIO1_26
-#define GPIO_SD_SENSE               GPIO2_27
-#define GPIO_AS3543_INTERUPT        GPIO1_25
-#define GPIO_PCB_VER_DETECT         GPIO_10
-/* I2C bus for AS3543 codec */
-#define GPIO_I2C_CLK0               GPIO_1_0
-#define GPIO_I2C_DAT0               GPIO_1_1
-/* I2C bus for the SI4079 FM radio chip */
-#define GPIO_I2C_CLK1               GPIO_2_12
-#define GPIO_I2C_DAT1               GPIO_2_13
+#define GPIO_HEADPHONE_SENSE        GPIO1_31
+/* I2C bus for the SI4079 FM, WM1808 codec and RTC radio chip */
+#define GPIO_I2C_CLK1               GPIO_1_0
+#define GPIO_I2C_DAT1               GPIO_1_1
+/* I2C bus for the fuel gauge MAX17040 */
+#define GPIO_I2C_CLK2               GPIO_2_12
+#define GPIO_I2C_DAT2               GPIO_2_13
+/* SI4079 pins - powerup and interrupt */
 #define GPIO_FM_SEARCH              GPIO1_4
-#define GPIO_FM_BUS_EN              GPIO2_19
+#define GPIO_FM_BUS_EN              GPIO_10
+#define GPIO_MUTE                   GPIO2_17
+#define EXT_POWER_DET               GPIO1_26
+/* Low disabled, high enabled */
+#define TV_OUT_ENABLE               GPIO1_17
+/* Battery charging */
+#define CHARGE_ENABLE               GPIO1_18
+#define CHARGE_STATUS               GPIO_D13
+/* This should be high when connecting a special port to the board... */
+#define PBA_CHECK_ENABLED           GPIO2_1
 
 /* Keypad */
 
-#define GPIO_BACK_KEY               GPIO2_29
-#define GPIO_USER_KEY               GPIO2_30
-#define GPIO_MENU_KEY               GPIO2_31
+#define GPIO_VOL_UP_KEY             GPIO1_20
+#define GPIO_VOL_DOWN_KEY           GPIO1_21
 #define GPIO_POWER_KEY              GPIO2_16
-#define GPIO_CENTRAL_KEY            GPIO3_5
-#define GPIO_UP_KEY                 GPIO3_9
-#define GPIO_DOWN_KEY               GPIO3_8
-#define GPIO_LEFT_KEY               GPIO2_28
-#define GPIO_RIGHT_KEY              GPIO3_7
-
 
 void gpio_init(void);
 void gpio_close(void);
 int gpio_control_struct(int request, R0GPIOInfo pin);
 int gpio_control(int request, int num, int mode, int val);
 
-#endif
+#endif /* GPIO_TARGET_H */

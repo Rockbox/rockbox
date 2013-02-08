@@ -86,6 +86,9 @@ void wmc_clear(unsigned int reg, unsigned int bits);
 #define WMC_PLL_K2                      0x26
 #define WMC_PLL_K3                      0x27
 #define WMC_3D_CONTROL                  0x29
+#ifdef WM1808
+#define WMC_VMID_CONTROL                0x2a
+#endif
 #define WMC_BEEP_CONTROL                0x2b
 #define WMC_INPUT_CTRL                  0x2c
 #define WMC_LEFT_INP_PGA_GAIN_CTRL      0x2d

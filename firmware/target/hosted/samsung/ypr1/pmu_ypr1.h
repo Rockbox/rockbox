@@ -5,10 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id: button-sdl.c 30482 2011-09-08 14:53:28Z kugel $
  *
- * Module wrapper for GPIO, using /dev/r0GPIO (r0Gpio.ko) of Samsung YP-R0
- *
- * Copyright (c) 2011 Lorenzo Miori
+ * Copyright (C) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,34 +19,14 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <gpio_ypr0.h> /* includes r0GPIOioctl.h */
-#include <sys/ioctl.h>
+#ifndef __PMU_YPR1_H__
+#define __PMU_YPR1_H__
 
-static int r0_gpio_dev = 0;
+#include "r1PmuIoctl.h"
 
-void gpio_init(void)
-{
-    r0_gpio_dev = open("/dev/r0GPIO", O_RDONLY);
-    if (r0_gpio_dev < 0)
-        printf("/dev/r0GPIO open error!");
-}
+void pmu_init(void);
+void pmu_close(void);
+int get_pmu_dev(void);
+int pmu_ioctl(int request, int *data);
 
-void gpio_close(void)
-{
-    if (r0_gpio_dev < 0)
-        close(r0_gpio_dev);
-}
-
-int gpio_control_struct(int request, R0GPIOInfo r)
-{
-    return ioctl(r0_gpio_dev, request, &r);
-}
-
-int gpio_control(int request, int num, int mode, int val)
-{
-    R0GPIOInfo r = { .num = num, .mode = mode, .val = val, };
-    return ioctl(r0_gpio_dev, request, &r);
-}
+#endif

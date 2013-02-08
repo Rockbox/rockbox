@@ -326,6 +326,10 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define HK_SELECT "SELECT"
 #define HK_CANCEL "POWER"
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+#define JEWELS_CANCEL   BUTTON_POWER
+#define HK_CANCEL       "POWER"
+
 #else
 #error No keymap defined!
 #endif

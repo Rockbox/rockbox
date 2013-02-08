@@ -1,5 +1,8 @@
-#ifndef HAVE_TOUCHSCREEN
+#if !defined(HAVE_TOUCHSCREEN) || defined(SAMSUNG_YPR1)
 /* This is for devices having a keypad, running RockBox as an application */
+/* On Samsung YP-R1 there are 3 buttons, and more plugins can be used without problems
+ * like some other touchscreen targets
+ */
 #include "SUBDIRS"
 
 #else

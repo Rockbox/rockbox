@@ -286,6 +286,11 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+#define QUIT    BUTTON_POWER
+#define LEFT    BUTTON_VOL_DOWN
+#define RIGHT   BUTTON_VOL_UP
+
 #else
 #error No keymap defined!
 #endif

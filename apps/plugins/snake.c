@@ -244,6 +244,9 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define SNAKE_DOWN      BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+#define SNAKE_QUIT BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

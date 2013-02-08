@@ -361,6 +361,15 @@
 #define LABEL_MENU "LEFT"
 #define LABEL_VOLUME "UP/DOWN"
 
+#elif CONFIG_KEYPAD == SAMSUNG_YPR1_PAD
+#define VUMETER_QUIT    (BUTTON_POWER|BUTTON_REPEAT)
+#define VUMETER_MENU    (BUTTON_POWER|BUTTON_REL)
+#define VUMETER_UP      BUTTON_VOL_UP
+#define VUMETER_DOWN    BUTTON_VOL_DOWN
+#define LABEL_QUIT      "LONG POWER"
+#define LABEL_MENU      "SHORT POWER"
+#define LABEL_VOLUME    "VOL+/VOL-"
+
 #else
 #error No keymap defined!
 #endif

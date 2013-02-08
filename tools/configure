@@ -1328,6 +1328,7 @@ cat <<EOF
  205) Samsung YP-R0
  206) Android MIPS
  207) Android x86
+ 208) Samsung YP-R1
 EOF
 
   buildfor=`input`;
@@ -3406,6 +3407,30 @@ fi
     t_manufacturer="android"
     t_model="app"
     ;;
+    
+   208|samsungypr1)
+    application="yes"
+    target_id=78
+    modelname="samsungypr1"
+    target="SAMSUNG_YPR1"
+    memory=32
+    uname=`uname`
+    # Linux environment and CPU are the same as for R0, use the same gcc options
+    ypr0cc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="ypr1"
+    t_model="app"
+    ;;
 
    *)
     echo "Please select a supported target platform!"
@@ -3932,9 +3957,18 @@ if test -n "$t_cpu"; then
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
   fi
 
-  TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
+  # Special case "hybrid" port, hosted, but real player
+  if [ "$t_cpu" = "hosted" ] && ([ "$t_manufacturer" = "ypr0" ] || [ "$t_manufacturer" = "ypr1" ])
+  then
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/samsung/$t_manufacturer"
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/samsung"
+  else
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
+  fi
+  
   test -n "$t_soc" && TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_soc"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
+  
   GCCOPTS="$GCCOPTS"
 fi
 
