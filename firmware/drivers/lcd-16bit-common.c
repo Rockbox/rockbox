@@ -667,13 +667,17 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
         drmode &= DRMODE_SOLID; /* mask out inversevid */
     }
 
+    /* Use extra bit to avoid if () in the switch-cases below */
+    if ((drmode & DRMODE_BG) && lcd_backdrop)
+        drmode |= DRMODE_INT_MOD;
+
     /* go through each column and update each pixel  */
     do
     {
         const unsigned char *src_col = src++;
         unsigned data = (*src_col ^ dmask) >> src_y;
         int fg, bg;
-        long bo;
+        uintptr_t bo;
 
         dst = dst_col;
         dst_col += COL_INC;
@@ -701,33 +705,30 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             while (--row);
             break;
 
-          case DRMODE_BG:
-            if (lcd_backdrop)
+          case DRMODE_BG|DRMODE_INT_MOD:
+            bo = lcd_backdrop_offset;
+            do
             {
-                bo = lcd_backdrop_offset;
-                do
-                {
-                    if (!(data & 0x01))
-                        *dst = *(fb_data *)((long)dst + bo);
+                if (!(data & 0x01))
+                    *dst = *(fb_data *)((long)dst + bo);
 
-                    dst += ROW_INC;
-                    UPDATE_SRC;
-                }
-                while (--row);
+                dst += ROW_INC;
+                UPDATE_SRC;
             }
-            else
+            while (--row);
+            break;
+
+        case DRMODE_BG:
+            bg = current_vp->bg_pattern;
+            do
             {
-                bg = current_vp->bg_pattern;
-                do
-                {
-                    if (!(data & 0x01))
-                        *dst = bg;
+                if (!(data & 0x01))
+                    *dst = bg;
 
-                    dst += ROW_INC;
-                    UPDATE_SRC;
-                }
-                while (--row);
+                dst += ROW_INC;
+                UPDATE_SRC;
             }
+            while (--row);
             break;
 
           case DRMODE_FG:
@@ -743,31 +744,29 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             while (--row);
             break;
 
+          case DRMODE_SOLID|DRMODE_INT_MOD:
+            fg = current_vp->fg_pattern;
+            bo = lcd_backdrop_offset;
+            do
+            {
+                *dst = (data & 0x01) ? fg
+                           : *(fb_data *)((long)dst + bo);
+                dst += ROW_INC;
+                UPDATE_SRC;
+            }
+            while (--row);
+            break;
+
           case DRMODE_SOLID:
             fg = current_vp->fg_pattern;
-            if (lcd_backdrop)
+            bg = current_vp->bg_pattern;
+            do
             {
-                bo = lcd_backdrop_offset;
-                do
-                {
-                    *dst = (data & 0x01) ? fg
-                               : *(fb_data *)((long)dst + bo);
-                    dst += ROW_INC;
-                    UPDATE_SRC;
-                }
-                while (--row);
+                *dst = (data & 0x01) ? fg : bg;
+                dst += ROW_INC;
+                UPDATE_SRC;
             }
-            else
-            {
-                bg = current_vp->bg_pattern;
-                do
-                {
-                    *dst = (data & 0x01) ? fg : bg;
-                    dst += ROW_INC;
-                    UPDATE_SRC;
-                }
-                while (--row);
-            }
+            while (--row);
             break;
         }
     }
@@ -945,6 +944,9 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     {
         drmode = DRMODE_BG;
     }
+    /* Use extra bit to avoid if () in the switch-cases below */
+    if ((drmode & DRMODE_BG) && lcd_backdrop)
+        drmode |= DRMODE_INT_MOD;
 
     dst_row = FBADDR(x, y);
 
@@ -977,6 +979,8 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     /* go through the rows and update each pixel */
     do
     {
+        unsigned bg;
+        uintptr_t bo;
         col = width;
         dst = dst_row;
         dst_row += ROW_INC;
@@ -1025,33 +1029,28 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 }
                 while (--col);
                 break;
+            case DRMODE_BG|DRMODE_INT_MOD:
+                bo = lcd_backdrop_offset;
+                do
+                {
+                    fb_data c = *(fb_data *)((uintptr_t)dst +  bo);
+                    *dst = blend_two_colors(c, *image, data & ALPHA_COLOR_LOOKUP_SIZE );
+                    dst += COL_INC;
+                    image += STRIDE_MAIN(1, stride_image);
+                    UPDATE_SRC_ALPHA;
+                }
+                while (--col);
+                break;
             case DRMODE_BG:
-                if(lcd_backdrop)
+                bg = current_vp->bg_pattern;
+                do
                 {
-                    uintptr_t bo = lcd_backdrop_offset;
-                    do
-                    {
-                        *dst = blend_two_colors(*(fb_data *)((uintptr_t)dst + bo),
-                                    *image, data & ALPHA_COLOR_LOOKUP_SIZE );
-
-                        dst += COL_INC;
-                        image += STRIDE_MAIN(1, stride_image);
-                        UPDATE_SRC_ALPHA;
-                    }
-                    while (--col);
+                    *dst = blend_two_colors(bg, *image, data & ALPHA_COLOR_LOOKUP_SIZE );
+                    dst += COL_INC;
+                    image += STRIDE_MAIN(1, stride_image);
+                    UPDATE_SRC_ALPHA;
                 }
-                else
-                {
-                    do
-                    {
-                        *dst = blend_two_colors(current_vp->bg_pattern,
-                                    *image, data & ALPHA_COLOR_LOOKUP_SIZE );
-                        dst += COL_INC;
-                        image += STRIDE_MAIN(1, stride_image);
-                        UPDATE_SRC_ALPHA;
-                    }
-                    while (--col);
-                }
+                while (--col);
                 break;
             case DRMODE_FG:
                 do
@@ -1062,30 +1061,27 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 }
                 while (--col);
                 break;
+            case DRMODE_SOLID|DRMODE_INT_MOD:
+                bo = lcd_backdrop_offset;
+                do
+                {
+                    fb_data *c = (fb_data *)((uintptr_t)dst +  bo);
+                    *dst = blend_color(*c, data & ALPHA_COLOR_LOOKUP_SIZE );
+                    dst += COL_INC;
+                    UPDATE_SRC_ALPHA;
+                }
+                while (--col);
+                break;
             case DRMODE_SOLID:
-                if(lcd_backdrop)
+                bg = current_vp->bg_pattern;
+                do
                 {
-                    uintptr_t bo = lcd_backdrop_offset;
-                    do
-                    {
-                        *dst = blend_color(*(fb_data *)((uintptr_t)dst + bo),
-                                        data & ALPHA_COLOR_LOOKUP_SIZE );
-                        dst += COL_INC;
-                        UPDATE_SRC_ALPHA;
-                    }
-                    while (--col);
+                    *dst = blend_color(bg,
+                                    data & ALPHA_COLOR_LOOKUP_SIZE );
+                    dst += COL_INC;
+                    UPDATE_SRC_ALPHA;
                 }
-                else
-                {
-                    do
-                    {
-                        *dst = blend_color(current_vp->bg_pattern,
-                                        data & ALPHA_COLOR_LOOKUP_SIZE );
-                        dst += COL_INC;
-                        UPDATE_SRC_ALPHA;
-                    }
-                    while (--col);
-                }
+                while (--col);
                 break;
         }
 #ifdef ALPHA_BITMAP_READ_WORDS

@@ -289,6 +289,8 @@ extern void lcd_jump_scroll_delay(int ms);
 #define DRMODE_FG         2
 #define DRMODE_SOLID      3
 #define DRMODE_INVERSEVID 4 /* used as bit modifier for basic modes */
+/* Internal drawmode modifiers. DO NOT use with set_drawmode() */
+#define DRMODE_INT_MOD  8
 
 /* Low-level drawing function types */
 typedef void lcd_pixelfunc_type(int x, int y);
