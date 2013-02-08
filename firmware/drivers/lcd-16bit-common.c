@@ -853,12 +853,6 @@ static inline unsigned blend_two_colors(unsigned c1, unsigned c2, unsigned a)
 #endif
 }
 
-/* Blend the given color with the value from the alpha_color_lookup table */
-static inline unsigned blend_color(unsigned c, unsigned a)
-{
-    return blend_two_colors(c, current_vp->fg_pattern, a);
-}
-
 /* Blend an image with an alpha channel
  * if image is NULL, drawing will happen according to the drawmode
  * src is the alpha channel (4bit per pixel) */
@@ -979,7 +973,10 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     /* go through the rows and update each pixel */
     do
     {
-        unsigned bg;
+        /* saving current_vp->fg/bg_pattern and lcd_backdrop_offset into these
+         * temp vars just before the loop helps gcc to opimize the loop better
+         * (testing showed ~15% speedup) */
+        unsigned fg, bg;
         uintptr_t bo;
         col = width;
         dst = dst_row;
@@ -1053,9 +1050,10 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_FG:
+                fg = current_vp->fg_pattern;
                 do
                 {
-                    *dst = blend_color(*dst, data & ALPHA_COLOR_LOOKUP_SIZE );
+                    *dst = blend_two_colors(*dst, fg, data & ALPHA_COLOR_LOOKUP_SIZE );
                     dst += COL_INC;
                     UPDATE_SRC_ALPHA;
                 }
@@ -1063,10 +1061,11 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 break;
             case DRMODE_SOLID|DRMODE_INT_MOD:
                 bo = lcd_backdrop_offset;
+                fg = current_vp->fg_pattern;
                 do
                 {
                     fb_data *c = (fb_data *)((uintptr_t)dst +  bo);
-                    *dst = blend_color(*c, data & ALPHA_COLOR_LOOKUP_SIZE );
+                    *dst = blend_two_colors(*c, fg, data & ALPHA_COLOR_LOOKUP_SIZE );
                     dst += COL_INC;
                     UPDATE_SRC_ALPHA;
                 }
@@ -1074,9 +1073,10 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 break;
             case DRMODE_SOLID:
                 bg = current_vp->bg_pattern;
+                fg = current_vp->fg_pattern;
                 do
                 {
-                    *dst = blend_color(bg,
+                    *dst = blend_two_colors(bg, fg,
                                     data & ALPHA_COLOR_LOOKUP_SIZE );
                     dst += COL_INC;
                     UPDATE_SRC_ALPHA;
