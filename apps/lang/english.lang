@@ -13114,3 +13114,17 @@
     *: "Select directories to scan"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REPEAT_RANDOM
+  desc: choose next song randomly
+  user: core
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Random"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
