@@ -1138,6 +1138,13 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
             next_index = current_index;
             break;
 
+        case REPEAT_RANDOM:
+            if (steps == 1)
+            {
+                next_index = rand() % playlist->amount;
+                break;
+            }
+
         case REPEAT_ALL:
         default:
         {

@@ -96,6 +96,7 @@ enum
 #ifdef AB_REPEAT_ENABLE
     REPEAT_AB,
 #endif
+    REPEAT_RANDOM,
     NUM_REPEAT_MODES
 };
 
