@@ -788,17 +788,19 @@ const struct settings_list settings[] = {
 #ifdef AB_REPEAT_ENABLE
                    ",ab"
 #endif
+		   ",random"
                    , NULL,
 #ifdef AB_REPEAT_ENABLE
-                   5,
+                   6,
 #else
-                   4,
+                   5,
 #endif
                    ID2P(LANG_OFF), ID2P(LANG_ALL), ID2P(LANG_REPEAT_ONE),
                    ID2P(LANG_SHUFFLE)
 #ifdef AB_REPEAT_ENABLE
                    ,ID2P(LANG_REPEAT_AB)
 #endif
+		   ,ID2P(LANG_REPEAT_RANDOM)
                   ), /* CHOICE_SETTING( repeat_mode ) */
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST
