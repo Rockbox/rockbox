@@ -110,6 +110,8 @@ static void gui_skin_reset(struct gui_skin *skin)
 #endif
 }
 
+test ets
+
 void gui_sync_skin_init(void)
 {
     int j;
