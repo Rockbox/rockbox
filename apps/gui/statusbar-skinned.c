@@ -145,21 +145,21 @@ struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
 int sb_get_backdrop(enum screen_type screen)
 {
-    struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
-    if (data->wps_loaded)
-        return data->backdrop_id;
-    else
+    struct gui_wps *g_wps = skin_get_gwps(CUSTOM_STATUSBAR, screen);
+    if (!g_wps || !g_wps->data->wps_loaded)
         return -1;
+
+    return g_wps->data->backdrop_id;
 }
         
 #endif
 static bool force_waiting = false;
 void sb_skin_update(enum screen_type screen, bool force)
 {
-    struct wps_data *data = skin_get_gwps(CUSTOM_STATUSBAR, screen)->data;
+    struct gui_wps *g_wps = skin_get_gwps(CUSTOM_STATUSBAR, screen);
     static long next_update[NB_SCREENS] = {0};
     int i = screen;
-    if (!data->wps_loaded)
+    if (!g_wps || !g_wps->data->wps_loaded)
         return;
     if (TIME_AFTER(current_tick, next_update[i]) || force || force_waiting)
     {
