@@ -290,6 +290,9 @@ static int wpsscrn(void* param)
     int ret_val = GO_TO_PREVIOUS;
     (void)param;
     push_current_activity(ACTIVITY_WPS);
+    /* Slightly hacky. We need to make sure the WPS skin is swapped in or
+     * playback with immediatly stop. */
+    wps_skin_preload();
     if (audio_status())
     {
         talk_shutup();

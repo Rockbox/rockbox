@@ -1259,3 +1259,12 @@ int wps_get_ff_rewind_count(void)
     return skin_get_global_state()->ff_rewind_count;
 }
 #endif
+
+void wps_skin_preload(void)
+{
+    int i;
+
+    FOR_NB_SCREENS(i)
+        skin_get_gwps(WPS, i);
+}
+

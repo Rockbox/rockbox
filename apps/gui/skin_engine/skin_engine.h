@@ -37,10 +37,11 @@ enum skinnable_screens {
 #if CONFIG_TUNER
     FM_SCREEN,
 #endif
-    
-    
-    SKINNABLE_SCREENS_COUNT
+    SKINNABLE_SCREENS_COUNT,
+    SKIN_ID_UNSET
 };
+
+#define SKINS_KEPT_IN_RAM 2
 
 #ifdef HAVE_TOUCHSCREEN
 int skin_get_touchaction(struct wps_data *data, int* edge_offset,
@@ -81,8 +82,6 @@ void* skin_backdrop_get_buffer(int backdrop_id);
  */
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout);
 
-void skin_load(enum skinnable_screens skin, enum screen_type screen,
-               const char *buf, bool isfile);
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen);
 struct wps_state *skin_get_global_state(void);
 void gui_sync_skin_init(void);

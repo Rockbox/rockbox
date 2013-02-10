@@ -7,8 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Stuart Martin
- * RTC config saving code (C) 2002 by hessu@hes.iki.fi
+ * Copyright (C) 2010 Jonathan Gordon
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,40 +41,46 @@
 void skin_data_free_buflib_allocs(struct wps_data *wps_data);
 char* wps_default_skin(enum screen_type screen);
 char* default_radio_skin(enum screen_type screen);
-static bool skins_initialised = false;
 
 static char* get_skin_filename(char *buf, size_t buf_size,
                                enum skinnable_screens skin, enum screen_type screen);
 
 struct wps_state     wps_state               = { .id3 = NULL };
+
+#define MAX_SKIN_PRIORITY SKINS_KEPT_IN_RAM
 static struct gui_skin_helper {
     int (*preproccess)(enum screen_type screen, struct wps_data *data);
     int (*postproccess)(enum screen_type screen, struct wps_data *data);
     char* (*default_skin)(enum screen_type screen);
     bool load_on_boot;
+    int priority; /* higher number means it is less likely to be swapped out */
 } skin_helpers[SKINNABLE_SCREENS_COUNT] = {
 #ifdef HAVE_LCD_BITMAP
-    [CUSTOM_STATUSBAR] = { sb_preproccess, sb_postproccess, sb_create_from_settings, true },
+    [CUSTOM_STATUSBAR] = { sb_preproccess, sb_postproccess, sb_create_from_settings, true, MAX_SKIN_PRIORITY },
 #endif
-    [WPS] = { NULL, NULL, wps_default_skin, true },
+    [WPS] = { NULL, NULL, wps_default_skin, true, MAX_SKIN_PRIORITY - 1},
 #if CONFIG_TUNER
-    [FM_SCREEN] = { NULL, NULL, default_radio_skin, false }
+    [FM_SCREEN] = { NULL, NULL, default_radio_skin, false, 0}
 #endif
 };
 
 static struct gui_skin {
     struct gui_wps      gui_wps;
     struct wps_data     data;
+    enum skinnable_screens skin_id;
     bool                failsafe_loaded;
+    bool                loading;
 
     bool                needs_full_update;
-} skins[SKINNABLE_SCREENS_COUNT][NB_SCREENS];
+} skins[SKINS_KEPT_IN_RAM][NB_SCREENS];
 
 
 static void gui_skin_reset(struct gui_skin *skin)
 {
+    skin->loading = false;
     skin->failsafe_loaded = false;
     skin->needs_full_update = true;
+    skin->skin_id = SKIN_ID_UNSET;
     skin->gui_wps.data = &skin->data;
     memset(skin->gui_wps.data, 0, sizeof(struct wps_data));
     skin->data.wps_loaded = false;
@@ -103,7 +108,7 @@ static void gui_skin_reset(struct gui_skin *skin)
 void gui_sync_skin_init(void)
 {
     int j;
-    for(j=0; j<SKINNABLE_SCREENS_COUNT; j++)
+    for(j=0; j<SKINS_KEPT_IN_RAM; j++)
     {
         FOR_NB_SCREENS(i)
         {
@@ -128,15 +133,11 @@ void settings_apply_skins(void)
 #ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
 #endif
-    skins_initialised = true;
 
-    /* Make sure each skin is loaded */
-    for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+    for (i=0; i<SKINS_KEPT_IN_RAM; i++)
     {
         FOR_NB_SCREENS(j)
         {
-            get_skin_filename(filename, MAX_PATH, i,j);
-
             if (!first_run)
             {
                 skin_data_free_buflib_allocs(&skins[i][j].data);
@@ -147,6 +148,16 @@ void settings_apply_skins(void)
             }
             gui_skin_reset(&skins[i][j]);
             skins[i][j].gui_wps.display = &screens[j];
+        }
+    }
+
+    /* Make sure each skin is loaded */
+    for (i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+    {
+        FOR_NB_SCREENS(j)
+        {
+            get_skin_filename(filename, MAX_PATH, i,j);
+
             if (skin_helpers[i].load_on_boot)
                 skin_get_gwps(i, j);
         }
@@ -159,31 +170,76 @@ void settings_apply_skins(void)
 #endif
 }
 
-void skin_load(enum skinnable_screens skin, enum screen_type screen,
-               const char *buf, bool isfile)
+struct gui_skin *skin_find_free(enum screen_type screen)
 {
-    bool loaded = false;
+    int lowest_idx = -1, lowest_priority = MAX_SKIN_PRIORITY;
+    int i, skin_priority;
+    for (i = 0; i < SKINS_KEPT_IN_RAM; i++)
+    {
+        if (skins[i][screen].skin_id >= SKIN_ID_UNSET)
+            return &skins[i][screen];
 
+        skin_priority = skin_helpers[skins[i][screen].skin_id].priority;
+        if (skin_priority < lowest_priority)
+        {
+            lowest_priority = skin_priority;
+            lowest_idx = i;
+        }
+    }
+
+    skin_data_free_buflib_allocs(&skins[lowest_idx][screen].data);
+#ifdef HAVE_BACKDROP_IMAGE
+    if (skins[lowest_idx][screen].data.backdrop_id >= 0)
+        skin_backdrop_unload(skins[lowest_idx][screen].data.backdrop_id);
+#endif
+    gui_skin_reset(&skins[lowest_idx][screen]);
+
+    return &skins[lowest_idx][screen];
+}
+
+static struct gui_skin *skin_find(enum skinnable_screens skin, enum screen_type screen)
+{
+    int i;
+    for (i = 0; i < SKINS_KEPT_IN_RAM; i++)
+    {
+        if (skins[i][screen].skin_id == skin) {
+            return &skins[i][screen];
+        }
+    }
+
+    return NULL;
+}
+
+struct gui_skin *skin_load(enum skinnable_screens skin,
+                enum screen_type screen, const char *buf, bool isfile)
+{
+    struct gui_skin *g_skin = skin_find_free(screen);
+    bool loaded = false;
+    g_skin->loading = true;
+
+    g_skin->skin_id = skin;
     if (skin_helpers[skin].preproccess)
-        skin_helpers[skin].preproccess(screen, &skins[skin][screen].data);
+        skin_helpers[skin].preproccess(screen, &g_skin->data);
 
     if (buf && *buf)
-        loaded = skin_data_load(screen, &skins[skin][screen].data, buf, isfile);
+        loaded = skin_data_load(screen, &g_skin->data, buf, isfile);
 
     if (!loaded && skin_helpers[skin].default_skin)
     {
-        loaded = skin_data_load(screen, &skins[skin][screen].data,
+        loaded = skin_data_load(screen, &g_skin->data,
                                 skin_helpers[skin].default_skin(screen), false);
-        skins[skin][screen].failsafe_loaded = loaded;
+        g_skin->failsafe_loaded = loaded;
     }
 
-    skins[skin][screen].needs_full_update = true;
+    g_skin->needs_full_update = true;
     if (skin_helpers[skin].postproccess)
-        skin_helpers[skin].postproccess(screen, &skins[skin][screen].data);
+        skin_helpers[skin].postproccess(screen, &g_skin->data);
 #ifdef HAVE_BACKDROP_IMAGE
     if (loaded)
         skin_backdrops_preload();
 #endif
+    g_skin->loading = false;
+    return g_skin;
 }
 
 static char* get_skin_filename(char *buf, size_t buf_size,
@@ -253,20 +309,17 @@ static char* get_skin_filename(char *buf, size_t buf_size,
 
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen)
 {
-#ifdef HAVE_LCD_BITMAP
-    if (skin == CUSTOM_STATUSBAR && !skins_initialised)
-        return &skins[skin][screen].gui_wps;
-#endif
+    struct gui_skin *g_skin = skin_find(skin, screen);
 
-    if (skins[skin][screen].data.wps_loaded == false)
+    if (!g_skin || (g_skin->data.wps_loaded == false && !g_skin->loading))
     {
         char filename[MAX_PATH];
         char *buf = get_skin_filename(filename, MAX_PATH, skin, screen);
         cpu_boost(true);
-        skin_load(skin, screen, buf, true);
+        g_skin = skin_load(skin, screen, buf, true);
         cpu_boost(false);
     }
-    return &skins[skin][screen].gui_wps;
+    return &g_skin->gui_wps;
 }
 
 struct wps_state *skin_get_global_state(void)
@@ -279,14 +332,23 @@ struct wps_state *skin_get_global_state(void)
 bool skin_do_full_update(enum skinnable_screens skin,
                             enum screen_type screen)
 {
-    bool ret = skins[skin][screen].needs_full_update;
-    skins[skin][screen].needs_full_update = false;
+    struct gui_skin *g_skin = skin_find(skin, screen);
+    
+    bool ret = g_skin && g_skin->needs_full_update;
+
+    if (g_skin)
+        g_skin->needs_full_update = false;
     return ret;
 }
 
 /* tell a skin to do a full update next time */
 void skin_request_full_update(enum skinnable_screens skin)
 {
+    struct gui_skin *g_skin;
     FOR_NB_SCREENS(i)
-        skins[skin][i].needs_full_update = true;
+    {
+        g_skin = skin_find(skin, i);
+        if (g_skin)
+            g_skin->needs_full_update = true;
+    }
 }
