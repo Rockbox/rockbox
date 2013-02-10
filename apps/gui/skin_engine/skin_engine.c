@@ -64,11 +64,8 @@ static struct gui_skin_helper {
 };
 
 static struct gui_skin {
-    char                filename[MAX_PATH];
     struct gui_wps      gui_wps;
     struct wps_data     data;
-    char                *buffer_start;
-    size_t              buffer_usage;
     bool                failsafe_loaded;
 
     bool                needs_full_update;
@@ -77,8 +74,6 @@ static struct gui_skin {
 
 static void gui_skin_reset(struct gui_skin *skin)
 {
-    skin->filename[0] = '\0';
-    skin->buffer_start = NULL;
     skin->failsafe_loaded = false;
     skin->needs_full_update = true;
     skin->gui_wps.data = &skin->data;
@@ -174,8 +169,6 @@ void skin_load(enum skinnable_screens skin, enum screen_type screen,
 
     if (buf && *buf)
         loaded = skin_data_load(screen, &skins[skin][screen].data, buf, isfile);
-    if (loaded)
-        strcpy(skins[skin][screen].filename, buf);
 
     if (!loaded && skin_helpers[skin].default_skin)
     {
@@ -270,7 +263,6 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         char filename[MAX_PATH];
         char *buf = get_skin_filename(filename, MAX_PATH, skin, screen);
         cpu_boost(true);
-        skins[skin][screen].filename[0] = '\0';
         skin_load(skin, screen, buf, true);
         cpu_boost(false);
     }
