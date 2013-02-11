@@ -930,14 +930,12 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
         drmode &= DRMODE_SOLID; /* mask out inversevid */
     }
     if (drmode == DRMODE_BG)
-    {
         dmask = ~dmask;
-    }
-    /* Set to DRMODE_BG as we use its code path in the switch below */
+    /* If drawmode is FG use a separate special case that blends the image
+     * onto the current framebuffer contents. Otherwise BG is forced that
+     * blends the image with the backdrop (if any, otherwise background color )*/
     if (image != NULL)
-    {
-        drmode = DRMODE_BG;
-    }
+        drmode = (drmode == DRMODE_FG) ? DRMODE_FG|DRMODE_INT_MOD : DRMODE_BG;
     /* Use extra bit to avoid if () in the switch-cases below */
     if ((drmode & DRMODE_BG) && lcd_backdrop)
         drmode |= DRMODE_INT_MOD;
@@ -1043,6 +1041,16 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 do
                 {
                     *dst = blend_two_colors(bg, *image, data & ALPHA_COLOR_LOOKUP_SIZE );
+                    dst += COL_INC;
+                    image += STRIDE_MAIN(1, stride_image);
+                    UPDATE_SRC_ALPHA;
+                }
+                while (--col);
+                break;
+            case DRMODE_FG|DRMODE_INT_MOD:
+                do
+                {
+                    *dst = blend_two_colors(*dst, *image, data & ALPHA_COLOR_LOOKUP_SIZE );
                     dst += COL_INC;
                     image += STRIDE_MAIN(1, stride_image);
                     UPDATE_SRC_ALPHA;
