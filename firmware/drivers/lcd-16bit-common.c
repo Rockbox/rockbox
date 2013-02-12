@@ -782,13 +782,14 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
 
 /* About Rockbox' internal alpha channel format (for ALPHA_COLOR_FONT_DEPTH == 2)
  *
- * For each pixel, 4bit  of alpha information is stored in a byte-stream,
+ * For each pixel, 4bit of alpha information is stored in a byte-stream,
  * so two pixels are packed into one byte.
  * The lower nibble is the first pixel, the upper one the second. The stride is
  * horizontal. E.g row0: pixel0: byte0[0:3], pixel1: byte0[4:7], pixel2: byte1[0:3],...
  * The format is independant of the internal display orientation and color
  * representation, as to support the same font files on all displays.
- * The values go linear from 0 (fully transparent) to 15 (fully opaque).
+ * The values go linear from 0 (fully opaque) to 15 (fully transparent)
+ * (note how this is the opposite of the alpha channel in the ARGB format).
  *
  * This might suggest that rows need to have an even number of pixels.
  * However this is generally not the case. lcd_alpha_bitmap_part_mix() can deal
@@ -935,15 +936,14 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
         dmask = 0xffffffff;
         drmode &= DRMODE_SOLID; /* mask out inversevid */
     }
-    /* sourcing from an image ignore drawmode.
-     * Set to DRMODE_BG as we use its code path in the switch below */
-    if (image != NULL)
-    {
-        drmode = DRMODE_BG;
-    }
     if (drmode == DRMODE_BG)
     {
         dmask = ~dmask;
+    }
+    /* Set to DRMODE_BG as we use its code path in the switch below */
+    if (image != NULL)
+    {
+        drmode = DRMODE_BG;
     }
 
     dst_row = FBADDR(x, y);

@@ -470,8 +470,9 @@ void output_row_8_native(uint32_t row, void * row_in,
                     *dest = LCD_RGBPACK_LCD(r, g, b);
                     dest += STRIDE_MAIN(1, ctx->bm->height);
                     if (bm_alpha) {
-                        /* pack alpha channel for 2 pixels into 1 byte */
-                        unsigned alpha = qp->alpha;
+                        /* pack alpha channel for 2 pixels into 1 byte and negate
+                         * according to the interal alpha channel format */
+                        uint8_t alpha = ~qp->alpha;
                         if (col%2)
                             *bm_alpha++ |= alpha&0xf0;
                         else
