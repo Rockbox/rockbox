@@ -294,6 +294,7 @@ int main(int argc, char **argv)
     while (argv[filearg]) {
         const char* name = argv[filearg++];
         char *ext = strrchr(name, '.');
+        struct skin_stats stats;
         printf("Checking %s...\n", name);
         if (!ext)
         {
@@ -321,7 +322,7 @@ int main(int argc, char **argv)
         }
         wps_screen = &screens[screen];
 
-        res = skin_data_load(screen, &wps, name, true);
+        res = skin_data_load(screen, &wps, name, true, &stats);
 
         if (!res) {
             printf("WPS parsing failure\n");
