@@ -2188,10 +2188,13 @@ static bool dbg_pic(void)
 static bool dbg_skin_engine(void)
 {
     struct simplelist_info info;
-    int i, ref_count, total = 0;
+    int i, total = 0;
+#if defined(HAVE_BACKDROP_IMAGE)
+    int ref_count;
     char *path;
     size_t bytes;
     int path_prefix_len = strlen(ROCKBOX_DIR "/wps/");
+#endif
     simplelist_info_init(&info, "Skin engine usage", 0, NULL);
     simplelist_set_line_count(0);
     info.hide_selection = true;
@@ -2217,6 +2220,7 @@ static bool dbg_skin_engine(void)
         }
     }
     simplelist_addline("Skin total usage: %d bytes", total);
+#if defined(HAVE_BACKDROP_IMAGE)
     simplelist_addline("Backdrop Images:");
     i = 0;
     while (skin_backdrop_get_debug(i++, &path, &ref_count, &bytes)) {
@@ -2231,6 +2235,7 @@ static bool dbg_skin_engine(void)
         }
     }
     simplelist_addline("Total usage: %d bytes", total);
+#endif
     return simplelist_show_list(&info);
 }
 #endif
