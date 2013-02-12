@@ -65,11 +65,21 @@ static struct gui_skin_helper {
 static struct gui_skin {
     struct gui_wps      gui_wps;
     struct wps_data     data;
+    struct skin_stats   stats;
     bool                failsafe_loaded;
 
     bool                needs_full_update;
 } skins[SKINNABLE_SCREENS_COUNT][NB_SCREENS];
 
+int skin_get_num_skins(void)
+{
+    return SKINNABLE_SCREENS_COUNT;
+}
+
+struct skin_stats *skin_get_stats(int number, int screen)
+{
+    return &skins[number][screen].stats;
+}
 
 static void gui_skin_reset(struct gui_skin *skin)
 {
@@ -167,12 +177,14 @@ void skin_load(enum skinnable_screens skin, enum screen_type screen,
         skin_helpers[skin].preproccess(screen, &skins[skin][screen].data);
 
     if (buf && *buf)
-        loaded = skin_data_load(screen, &skins[skin][screen].data, buf, isfile);
+        loaded = skin_data_load(screen, &skins[skin][screen].data, buf, isfile,
+                                &skins[skin][screen].stats);
 
     if (!loaded && skin_helpers[skin].default_skin)
     {
         loaded = skin_data_load(screen, &skins[skin][screen].data,
-                                skin_helpers[skin].default_skin(screen), false);
+                                skin_helpers[skin].default_skin(screen), false,
+                                &skins[skin][screen].stats);
         skins[skin][screen].failsafe_loaded = loaded;
     }
 

@@ -44,6 +44,25 @@ static struct skin_backdrop {
 static int handle_being_loaded;
 static int current_lcd_backdrop[NB_SCREENS];
 
+bool skin_backdrop_get_debug(int index, char **path, int *ref_count, size_t *size)
+{
+
+    if (index + 1 >= NB_BDROPS)
+        return false;
+
+    *path = backdrops[index].name;
+    *ref_count = backdrops[index].ref_count;
+
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+    enum screen_type screen = backdrops[index].screen;
+    if (screen == SCREEN_REMOTE)
+        *size = REMOTE_LCD_BACKDROP_BYTES;
+    else
+#endif
+        *size = LCD_BACKDROP_BYTES;
+    return true;
+}
+
 static int buflib_move_callback(int handle, void* current, void* new)
 {
     if (handle == handle_being_loaded)

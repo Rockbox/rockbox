@@ -31,6 +31,17 @@
 #include "core_alloc.h"
 #endif
 
+struct skin_stats {
+    size_t buflib_handles;
+    size_t tree_size;
+    size_t images_size;
+};
+
+int skin_get_num_skins(void);
+struct skin_stats *skin_get_stats(int number, int screen);
+#define skin_clear_stats(stats) memset(stats, 0, sizeof(struct skin_stats))
+bool skin_backdrop_get_debug(int index, char **path, int *ref_count, size_t *size);
+
 /* Timeout unit expressed in HZ. In WPS, all timeouts are given in seconds
    (possibly with a decimal fraction) but stored as integer values.
    E.g. 2.5 is stored as 25. This means 25 tenth of a second, i.e. 25 units.

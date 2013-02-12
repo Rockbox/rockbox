@@ -57,7 +57,7 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
  * or from a skinfile (isfile = true)
  */
 bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
-                    const char *buf, bool isfile);
+                    const char *buf, bool isfile, struct skin_stats *stats);
 
 bool skin_has_sbs(enum screen_type screen, struct wps_data *data);
 

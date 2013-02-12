@@ -277,6 +277,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
                 list_icons.x += indent;
                 list_text_vp->x += indent;
             }
+            list_icons.width -= indent;
             list_text_vp->width -= indent;
         }
 
@@ -392,6 +393,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
                 list_icons.x -= indent;
                 list_text_vp->x -= indent;
             }
+            list_icons.width += indent;
             list_text_vp->width += indent;
         }
     }

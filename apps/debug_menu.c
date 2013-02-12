@@ -86,6 +86,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "scrollbar.h"
 #include "peakmeter.h"
+#include "skin_engine/skin_engine.h"
 #endif
 #include "logfdisp.h"
 #include "core_alloc.h"
@@ -555,8 +556,6 @@ static int bf_action_cb(int action, struct gui_synclist* list)
         }
         action = ACTION_REDRAW;
     }
-    else if (action == ACTION_NONE)
-        action = ACTION_REDRAW;
     return action;
 }
 
@@ -566,7 +565,7 @@ static bool dbg_buflib_allocs(void)
     simplelist_info_init(&info, "mem allocs", core_get_num_blocks(), NULL);
     info.get_name = bf_getname;
     info.action_callback = bf_action_cb;
-    info.timeout = TIMEOUT_BLOCK;
+    info.timeout = HZ;
     return simplelist_show_list(&info);
 }
 
@@ -2185,6 +2184,57 @@ static bool dbg_pic(void)
 }
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+static bool dbg_skin_engine(void)
+{
+    struct simplelist_info info;
+    int i, ref_count, total = 0;
+    char *path;
+    size_t bytes;
+    int path_prefix_len = strlen(ROCKBOX_DIR "/wps/");
+    simplelist_info_init(&info, "Skin engine usage", 0, NULL);
+    simplelist_set_line_count(0);
+    info.hide_selection = true;
+    FOR_NB_SCREENS(j) {
+#if NB_SCREENS > 1
+        simplelist_addline("%s display:",
+                           j == 0 ? "Main" : "Remote");
+#endif
+        for (i = 0; i < skin_get_num_skins(); i++) {
+            struct skin_stats *stats = skin_get_stats(i, j);
+            if (stats->buflib_handles)
+            {
+                simplelist_addline("Skin ID: %d, %d allocations",
+                        i, stats->buflib_handles);
+                simplelist_addline("\tskin: %d bytes",
+                        stats->tree_size);
+                simplelist_addline("\tImages: %d bytes",
+                        stats->images_size);
+                simplelist_addline("\tTotal: %d bytes",
+                        stats->tree_size + stats->images_size);
+                total += stats->tree_size + stats->images_size;
+            }
+        }
+    }
+    simplelist_addline("Skin total usage: %d bytes", total);
+    simplelist_addline("Backdrop Images:");
+    i = 0;
+    while (skin_backdrop_get_debug(i++, &path, &ref_count, &bytes)) {
+        if (ref_count > 0) {
+
+            if (!strncasecmp(path, ROCKBOX_DIR "/wps/", path_prefix_len))
+                path += path_prefix_len;
+            simplelist_addline("%s", path);
+            simplelist_addline("\tref_count: %d", ref_count);
+            simplelist_addline("\tsize: %d", bytes);
+            total += bytes;
+        }
+    }
+    simplelist_addline("Total usage: %d bytes", total);
+    return simplelist_show_list(&info);
+}
+#endif
+
 
 /****** The menu *********/
 static const struct {
@@ -2232,6 +2282,7 @@ static const struct {
 #ifndef APPLICATION
         { "Screendump", dbg_screendump },
 #endif
+        { "Skin Engine Ram usage", dbg_skin_engine },
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View HW info", dbg_hw_info },
