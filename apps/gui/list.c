@@ -831,17 +831,20 @@ bool list_do_action(int context, int timeout,
 }
 
 /* Simple use list implementation */
-static int simplelist_line_count = 0;
-static char simplelist_text[SIMPLELIST_MAX_LINES][SIMPLELIST_MAX_LINELENGTH];
+static int simplelist_line_count = 0, simplelist_line_remaining;
+static int simplelist_line_pos;
+static char simplelist_buffer[SIMPLELIST_MAX_LINES * SIMPLELIST_MAX_LINELENGTH];
+static char *simplelist_text[SIMPLELIST_MAX_LINES];
 /* set the amount of lines shown in the list */
 void simplelist_set_line_count(int lines)
 {
-    if (lines < 0)
+    if (lines <= 0) {
+        simplelist_line_pos = 0;
+        simplelist_line_remaining = sizeof(simplelist_buffer);
         simplelist_line_count = 0;
+    }
     else if (lines >= SIMPLELIST_MAX_LINES)
         simplelist_line_count = SIMPLELIST_MAX_LINES;
-    else
-        simplelist_line_count = lines;
 }
 /* get the current amount of lines shown */
 int simplelist_get_line_count(void)
@@ -851,20 +854,19 @@ int simplelist_get_line_count(void)
 /* add/edit a line in the list.
    if line_number > number of lines shown it adds the line,
    else it edits the line */
-void simplelist_addline(int line_number, const char *fmt, ...)
+void simplelist_addline(const char *fmt, ...)
 {
     va_list ap;
+    size_t len = simplelist_line_remaining;
+    int line_number = simplelist_line_count++;
 
-    if (line_number > simplelist_line_count)
-    {
-        if (simplelist_line_count < SIMPLELIST_MAX_LINES)
-            line_number = simplelist_line_count++;
-        else
-            return;
-    }
+    simplelist_text[line_number] = &simplelist_buffer[simplelist_line_pos];
     va_start(ap, fmt);
-    vsnprintf(simplelist_text[line_number], SIMPLELIST_MAX_LINELENGTH, fmt, ap);
+    len = vsnprintf(simplelist_text[line_number], simplelist_line_remaining, fmt, ap);
     va_end(ap);
+    len++;
+    simplelist_line_remaining -= len;
+    simplelist_line_pos += len;
 }
 
 static const char* simplelist_static_getname(int item,

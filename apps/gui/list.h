@@ -265,10 +265,8 @@ struct simplelist_info {
 void simplelist_set_line_count(int lines);
 /* get the current amount of lines shown */
 int simplelist_get_line_count(void);
-/* add/edit a line in the list.
-   if line_number > number of lines shown it adds the line, else it edits the line */
-#define SIMPLELIST_ADD_LINE (SIMPLELIST_MAX_LINES+1)
-void simplelist_addline(int line_number, const char *fmt, ...);
+/* add a line in the list. */
+void simplelist_addline(const char *fmt, ...);
 
 /* setup the info struct. members not setup in this function need to be assigned manually
    members set in this function:

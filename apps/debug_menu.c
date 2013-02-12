@@ -1305,11 +1305,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                 card_name[i] = card_extract_bits(card->cid, (103-8*i), 8);
             }
             strlcpy(card_name, card_name, sizeof(card_name));
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "%s Rev %d.%d", card_name,
                     (int) card_extract_bits(card->cid, 63, 4),
                     (int) card_extract_bits(card->cid, 59, 4));
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "Prod: %d/%d",
 #if (CONFIG_STORAGE & STORAGE_SD)
                     (int) card_extract_bits(card->cid, 11, 4),
@@ -1319,7 +1319,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     (int) card_extract_bits(card->cid, 11, 4) + 1997
 #endif
                     );
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
 #if (CONFIG_STORAGE & STORAGE_SD)
                     "Ser#: 0x%08lx",
                     card_extract_bits(card->cid, 55, 32)
@@ -1329,7 +1329,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 #endif
                     );
 
-            simplelist_addline(SIMPLELIST_ADD_LINE, "M=%02x, "
+            simplelist_addline("M=%02x, "
 #if (CONFIG_STORAGE & STORAGE_SD)
                     "O=%c%c",
                     (int) card_extract_bits(card->cid, 127, 8),
@@ -1344,34 +1344,34 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
             int temp = card_extract_bits(card->csd, 125, 4);
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                      "MMC v%s", temp < 5 ?
                             mmc_spec_vers[temp] : "?.?");
 #endif
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "Blocks: 0x%08lx", card->numblocks);
             output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,
                                             kbit_units, false);
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "Speed: %s", pbuf);
             output_dyn_value(pbuf, sizeof pbuf, card->taac,
                             nsec_units, false);
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "Taac: %s", pbuf);
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "Nsac: %d clk", card->nsac);
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "R2W: *%d", card->r2w_factor);
 #if (CONFIG_STORAGE & STORAGE_SD)
             int csd_structure = card_extract_bits(card->csd, 127, 2);
             if (csd_structure == 0) /* CSD version 1.0 */
 #endif
             {
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "IRmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 61, 3)],
                     i_vmax[card_extract_bits(card->csd, 58, 3)]);
-            simplelist_addline(SIMPLELIST_ADD_LINE,
+            simplelist_addline(
                     "IWmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 55, 3)],
                     i_vmax[card_extract_bits(card->csd, 52, 3)]);
@@ -1379,12 +1379,12 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         }
         else if (card->initialized == 0)
         {
-            simplelist_addline(SIMPLELIST_ADD_LINE, "Not Found!");
+            simplelist_addline("Not Found!");
         }
 #if (CONFIG_STORAGE & STORAGE_SD)
         else /* card->initialized < 0 */
         {
-            simplelist_addline(SIMPLELIST_ADD_LINE, "Init Error! (%d)", card->initialized);
+            simplelist_addline("Init Error! (%d)", card->initialized);
         }
 #endif
         snprintf(title, 16, "[" CARDTYPE " %d]", *cardnum);
@@ -1413,31 +1413,31 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     /* kill trailing space */
     for (i=39; i && buf[i]==' '; i--)
         buf[i] = 0;
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Model: %s", buf);
+    simplelist_addline("Model: %s", buf);
     for (i=0; i < 4; i++)
         ((unsigned short*)buf)[i]=htobe16(identify_info[i+23]);
     buf[8]=0;
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Firmware: %s", buf);
     snprintf(buf, sizeof buf, "%ld MB",
              ((unsigned long)identify_info[61] << 16 |
               (unsigned long)identify_info[60]) / 2048 );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Size: %s", buf);
     unsigned long free;
     fat_size( IF_MV2(0,) NULL, &free );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Free: %ld MB", free / 1024);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Spinup time: %d ms", storage_spinup_time() * (1000/HZ));
     i = identify_info[83] & (1<<3);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Power mgmt: %s", i ? "enabled" : "unsupported");
     i = identify_info[83] & (1<<9);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Noise mgmt: %s", i ? "enabled" : "unsupported");
     i = identify_info[82] & (1<<6);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Read-ahead: %s", i ? "enabled" : "unsupported");
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
@@ -1445,27 +1445,27 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         pio4[1] = 0;
         pio3[0] = (identify_info[64] & (1<<0)) ? '3' : 0;
         pio4[0] = (identify_info[64] & (1<<1)) ? '4' : 0;
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "PIO modes: 0 1 2 %s %s", pio3, pio4);
     }
     else {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "No PIO mode info");
     }
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "Cycle times %dns/%dns",
                  identify_info[67],
                  identify_info[68] );
     } else {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "No timing info");
     }
     int sector_size = 512;
     if((identify_info[106] & 0xe000) == 0x6000)
         sector_size *= BIT_N(identify_info[106] & 0x000f);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
             "Physical sector size: %d", sector_size);
 #ifdef HAVE_ATA_DMA
     if (identify_info[63] & (1<<0)) {
@@ -1474,15 +1474,15 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         mdma0[0] = (identify_info[63] & (1<<0)) ? '0' : 0;
         mdma1[0] = (identify_info[63] & (1<<1)) ? '1' : 0;
         mdma2[0] = (identify_info[63] & (1<<2)) ? '2' : 0;
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "MDMA modes: %s %s %s", mdma0, mdma1, mdma2);
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "MDMA Cycle times %dns/%dns",
                  identify_info[65],
                  identify_info[66] );
     }
     else {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                 "No MDMA mode info");
     }
     if (identify_info[53] & (1<<2)) {
@@ -1495,36 +1495,36 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         udma4[0] = (identify_info[88] & (1<<4)) ? '4' : 0;
         udma5[0] = (identify_info[88] & (1<<5)) ? '5' : 0;
         udma6[0] = (identify_info[88] & (1<<6)) ? '6' : 0;
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "UDMA modes: %s %s %s %s %s %s %s", udma0, udma1, udma2,
                                                      udma3, udma4, udma5, udma6);
     }
     else {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                 "No UDMA mode info");
     }
 #endif /* HAVE_ATA_DMA */
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
         i = identify_info[49] & (1<<11);
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
             "IORDY support: %s", i ? "yes" : "no");
         i = identify_info[49] & (1<<10);
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                 "IORDY disable: %s", i ? "yes" : "no");
     } else {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                 "No timing info");
     }
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
 #ifdef HAVE_ATA_DMA
     i = ata_get_dma_mode();
     if (i == 0) {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "DMA not enabled");
     } else {
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
                  "DMA mode: %s %c",
                 (i & 0x40) ? "UDMA" : "MDMA",
                 '0' + (i & 7));
@@ -1538,16 +1538,16 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     (void)lists;
     struct storage_info info;
     storage_get_info(0,&info);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Vendor: %s", info.vendor);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Model: %s", info.product);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Firmware: %s", info.revision);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline("Vendor: %s", info.vendor);
+    simplelist_addline("Model: %s", info.product);
+    simplelist_addline("Firmware: %s", info.revision);
+    simplelist_addline(
              "Size: %ld MB", info.num_sectors*(info.sector_size/512)/2024);
     unsigned long free;
     fat_size( IF_MV2(0,) NULL, &free );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Free: %ld MB", free / 1024);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
     return btn;
 }
@@ -1592,19 +1592,19 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
     simplelist_set_line_count(0);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Cache initialized: %s",
+    simplelist_addline("Cache initialized: %s",
              dircache_is_enabled() ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Cache size: %d B",
+    simplelist_addline("Cache size: %d B",
              dircache_get_cache_size());
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Last size: %d B",
+    simplelist_addline("Last size: %d B",
              global_status.dircache_size);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Limit: %d B",
+    simplelist_addline("Limit: %d B",
              DIRCACHE_LIMIT);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Reserve: %d/%d B",
+    simplelist_addline("Reserve: %d/%d B",
              dircache_get_reserve_used(), DIRCACHE_RESERVE);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Scanning took: %d s",
+    simplelist_addline("Scanning took: %d s",
              dircache_get_build_ticks() / HZ);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Entry count: %d",
+    simplelist_addline("Entry count: %d",
              dircache_get_entry_count());
     return btn;
 }
@@ -1630,24 +1630,24 @@ static int database_callback(int btn, struct gui_synclist *lists)
 
     simplelist_set_line_count(0);
 
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Initialized: %s",
+    simplelist_addline("Initialized: %s",
              stat->initialized ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "DB Ready: %s",
+    simplelist_addline("DB Ready: %s",
              stat->ready ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM Cache: %s",
+    simplelist_addline("RAM Cache: %s",
              stat->ramcache ? "Yes" : "No");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "RAM: %d/%d B",
+    simplelist_addline("RAM: %d/%d B",
              stat->ramcache_used, stat->ramcache_allocated);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Progress: %d%% (%d entries)",
+    simplelist_addline("Progress: %d%% (%d entries)",
              stat->progress, stat->processed_entries);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Curfile: %s",
+    simplelist_addline("Curfile: %s",
                        stat->curentry ? stat->curentry : "---");
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit step: %d",
+    simplelist_addline("Commit step: %d",
              stat->commit_step);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Commit delayed: %s",
+    simplelist_addline("Commit delayed: %s",
              stat->commit_delayed ? "Yes" : "No");
 
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Queue length: %d", 
+    simplelist_addline("Queue length: %d", 
              stat->queue_length);
     
     if (synced)
@@ -1857,36 +1857,36 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     simplelist_set_line_count(1);
 
 #if (CONFIG_TUNER & LV24020LP)
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "CTRL_STAT: %02X", lv24020lp_get(LV24020LP_CTRL_STAT) );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "RADIO_STAT: %02X", lv24020lp_get(LV24020LP_REG_STAT) );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "MSS_FM: %d kHz", lv24020lp_get(LV24020LP_MSS_FM) );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "MSS_IF: %d Hz", lv24020lp_get(LV24020LP_MSS_IF) );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "MSS_SD: %d Hz", lv24020lp_get(LV24020LP_MSS_SD) );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "if_set: %d Hz", lv24020lp_get(LV24020LP_IF_SET) );
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "sd_set: %d Hz", lv24020lp_get(LV24020LP_SD_SET) );
 #endif /* LV24020LP */
 #if (CONFIG_TUNER & S1A0903X01)
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
                         "Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
     /* This one doesn't return dynamic data atm */
 #endif /* S1A0903X01 */
 #if (CONFIG_TUNER & TEA5767)
     struct tea5767_dbg_info nfo;
     tea5767_dbg_info(&nfo);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "Philips regs:");
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline("Philips regs:");
+    simplelist_addline(
              "   Read: %02X %02X %02X %02X %02X",
              (unsigned)nfo.read_regs[0], (unsigned)nfo.read_regs[1],
              (unsigned)nfo.read_regs[2], (unsigned)nfo.read_regs[3],
              (unsigned)nfo.read_regs[4]);
-    simplelist_addline(SIMPLELIST_ADD_LINE,
+    simplelist_addline(
              "   Write: %02X %02X %02X %02X %02X",
              (unsigned)nfo.write_regs[0], (unsigned)nfo.write_regs[1],
              (unsigned)nfo.write_regs[2], (unsigned)nfo.write_regs[3],
@@ -1897,9 +1897,9 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct si4700_dbg_info nfo;
         si4700_dbg_info(&nfo);
-        simplelist_addline(SIMPLELIST_ADD_LINE, "SI4700 regs:");
+        simplelist_addline("SI4700 regs:");
         for (int i = 0; i < 16; i += 4) {
-            simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
+            simplelist_addline("%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
         }
     }
@@ -1909,9 +1909,9 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct rda5802_dbg_info nfo;
         rda5802_dbg_info(&nfo);
-        simplelist_addline(SIMPLELIST_ADD_LINE, "RDA5802 regs:");
+        simplelist_addline("RDA5802 regs:");
         for (int i = 0; i < 16; i += 4) {
-            simplelist_addline(SIMPLELIST_ADD_LINE,"%02X: %04X %04X %04X %04X",
+            simplelist_addline("%02X: %04X %04X %04X %04X",
                 i, nfo.regs[i], nfo.regs[i+1], nfo.regs[i+2], nfo.regs[i+3]);
         }
     }
@@ -1921,19 +1921,19 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct stfm1000_dbg_info nfo;
         stfm1000_dbg_info(&nfo);
-        simplelist_addline(SIMPLELIST_ADD_LINE, "STFM1000 regs:");
-        simplelist_addline(SIMPLELIST_ADD_LINE,"chipid: 0x%x", nfo.chipid);
+        simplelist_addline("STFM1000 regs:");
+        simplelist_addline("chipid: 0x%x", nfo.chipid);
     }
 #endif /* STFM1000 */
 
 #ifdef HAVE_RDS_CAP
-        simplelist_addline(SIMPLELIST_ADD_LINE, "PI:%04X PS:'%8s'",
+        simplelist_addline("PI:%04X PS:'%8s'",
                            rds_get_pi(), rds_get_ps());
-        simplelist_addline(SIMPLELIST_ADD_LINE, "RT:%s",
+        simplelist_addline("RT:%s",
                            rds_get_rt());
         time_t seconds = rds_get_ct();
         struct tm* time = gmtime(&seconds);
-        simplelist_addline(SIMPLELIST_ADD_LINE,
+        simplelist_addline(
             "CT:%4d-%02d-%02d %02d:%02d",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec);
@@ -1949,7 +1949,7 @@ static bool dbg_fm_radio(void)
     info.scroll_all = true;
     simplelist_info_init(&info, "FM Radio", 1, NULL);
     simplelist_set_line_count(0);
-    simplelist_addline(SIMPLELIST_ADD_LINE, "HW detected: %s",
+    simplelist_addline("HW detected: %s",
                        radio_hardware_present() ? "yes" : "no");
 
     info.action_callback = radio_hardware_present()?radio_callback : NULL;
