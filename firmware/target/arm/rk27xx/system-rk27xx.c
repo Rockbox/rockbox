@@ -222,8 +222,6 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
     uint32_t end_opcode = (uint32_t)((uintptr_t)base + size) | 0x01;
     uint32_t opcode = (uint32_t)((uintptr_t)base & 0xffffffe0) | 0x01;
 
-    int old_irq = disable_irq_save();
-
     while (opcode <= end_opcode)
     {
         while (CACHEOP & 0x03);
@@ -231,8 +229,6 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
         CACHEOP = opcode;
         opcode += 32;
     }
-
-    restore_irq(old_irq);
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
