@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///h8\u003d",
+        "filename": "apps/gui/skin_engine/skin_display.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1000176
+      },
+      "writtenOn": "2013-02-13T04:26:21Z",
+      "side": 1,
+      "message": "if we use width it will shrink the background image. we only need to shrink the progress bar to account for the slider.\nwidth is the \"shrunk\" value",
+      "parentUuid": "AAAASX///iE\u003d",
+      "revId": "46bdcb4c7dfbe9c35c35669f5f76fb054a1a3da5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///iI\u003d",
         "filename": "apps/gui/skin_engine/skin_display.c",
         "patchSetId": 2
