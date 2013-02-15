@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///g0\u003d",
+        "filename": "firmware/target/hosted/rtc-unix.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-15T23:42:25Z",
+      "side": 1,
+      "message": "What happened to your gettimeofday()/settimeofday() implementation?",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///g4\u003d",
+        "filename": "firmware/target/hosted/rtc-unix.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-15T23:42:25Z",
+      "side": 1,
+      "message": "Please dont use atext() (or similar). Let\u0027s use a well defined teardown procedure in e.g. power_off() or whatever (you already added stuff there).",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///go\u003d",
+        "filename": "firmware/target/hosted/samsung/lcd-ypr.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-15T23:42:25Z",
+      "side": 1,
+      "message": "I think the code was better suited in this file since it\u0027s backlight related (or isnt it?).",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///hA\u003d",
+        "filename": "firmware/target/hosted/samsung/lcd-ypr.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-15T23:42:25Z",
+      "side": 1,
+      "message": "Yes indeed, you can plug into the HAVE_LCD_ENABLE system.",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///gw\u003d",
+        "filename": "firmware/target/hosted/samsung/lcd-ypr.c~",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-15T23:42:25Z",
+      "side": 1,
+      "message": "Is this file a left-over backup or something? lcd-ypr.c already exists.",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///g8\u003d",
+        "filename": "tools/root.make",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-15T23:42:25Z",
+      "side": 1,
+      "message": "This is acceptable for now, but we need something smarter than adding this line to the file for every new port.",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
