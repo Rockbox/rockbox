@@ -154,6 +154,11 @@ struct sb1_file_t *sb1_read_file_ex(const char *filename, size_t offset, size_t 
 struct sb1_file_t *sb1_read_memory(void *buffer, size_t size, void *u,
     sb1_color_printf printf, enum sb1_error_t *err);
 
+/* do as little checks as possible, make sure the image is valid (advance use only) */
+bool sb1_is_key_valid_fast(void *buffer, size_t size, union xorcrypt_key_t key[2]);
+bool sb1_brute_force(const char *filename, void *u, sb1_color_printf printf,
+    enum sb1_error_t *err, struct crypto_key_t *key);
+
 void sb1_get_default_key(struct crypto_key_t *key);
 
 void sb1_dump(struct sb1_file_t *file, void *u, sb1_color_printf printf);

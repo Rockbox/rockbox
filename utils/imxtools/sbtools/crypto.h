@@ -125,5 +125,6 @@ void sha_1_output(struct sha_1_params_t *params, byte *out);
 // WARNING those functions modifies the keys !!
 uint32_t xor_encrypt(union xorcrypt_key_t keys[2], void *data, int size);
 uint32_t xor_decrypt(union xorcrypt_key_t keys[2], void *data, int size);
+void xor_generate_key(uint32_t laserfuse[3], union xorcrypt_key_t key[2]);
 
 #endif /* __CRYPTO_H__ */

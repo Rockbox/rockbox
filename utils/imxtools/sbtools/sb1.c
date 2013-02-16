@@ -252,6 +252,109 @@ static const char *sb1_datatype_name(int cmd)
     }
 }
 
+bool sb1_is_key_valid_fast(void *buffer, size_t size, union xorcrypt_key_t _key[2])
+{
+    struct sb1_header_t *header = (struct sb1_header_t *)buffer;
+
+    union xorcrypt_key_t key[2];
+    
+    uint8_t sector[SECTOR_SIZE];
+    /* copy key and data because it's modified by the crypto code */
+    memcpy(key, _key, sizeof(key));
+    memcpy(sector, header + 1, SECTOR_SIZE - header->header_size);
+    /* try to decrypt the first sector */
+    uint32_t mark = xor_decrypt(key, sector, SECTOR_SIZE - 4 - header->header_size);
+    /* copy key again it's modified by the crypto code */
+    return mark == *(uint32_t *)&sector[SECTOR_SIZE - 4 - header->header_size];
+}
+
+bool sb1_brute_force(const char *filename, void *u, sb1_color_printf cprintf,
+    enum sb1_error_t *err, struct crypto_key_t *key)
+{
+    #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
+    uint8_t sector[SECTOR_SIZE];
+    FILE *f = fopen(filename, "rb");
+    if(f == NULL)
+    {
+        printf("Cannot open file '%s' for reading: %m\n", filename);
+        *err = SB1_OPEN_ERROR;
+        return false;
+    }
+    if(fread(sector, sizeof(sector), 1, f) != 1)
+    {
+        printf("Cannot read file '%s': %m\n", filename);
+        *err = SB1_READ_ERROR;
+        fclose(f);
+        return false;
+    }
+    fclose(f);
+
+    printf(BLUE, "Brute forcing key...\n");
+    time_t start_time = time(NULL);
+    uint32_t laserfuse[3] = {0, 0, 0};
+    unsigned last_print = 0;
+    do
+    {
+        for(int i = 0; i < 0x10000; i++)
+        {
+            laserfuse[2] = (i & 0xff00) << 8 | (i & 0xff);
+            xor_generate_key(laserfuse, key->u.xor_key);
+            if(g_debug)
+            {
+                printf(GREEN, "Trying key");
+                printf(GREEN, "[");
+                printf(RED, "%08x", laserfuse[0]);
+                printf(GREEN, ",");
+                printf(RED, "%08x", laserfuse[1]);
+                printf(GREEN, ",");
+                printf(RED, "%08x", laserfuse[2]);
+                printf(GREEN, "]:");
+                for(int j = 0; j < 32; j++)
+                    printf(YELLOW, " %08x", key->u.xor_key[j / 16].k[j % 16]);
+            }
+            if(sb1_is_key_valid_fast(sector, SECTOR_SIZE, key->u.xor_key))
+            {
+                if(g_debug)
+                    printf(RED, " Ok\n");
+                return true;
+            }
+            else
+            {
+                if(g_debug)
+                    printf(RED, " No\n");
+            }
+        }
+        laserfuse[0]++;
+
+        if(laserfuse[0] / 1000 != last_print)
+        {
+            time_t cur_time = time(NULL);
+            float key_per_sec = laserfuse[0] / (float)(cur_time - start_time);
+            float tot = 0x1000000LL / key_per_sec;
+            time_t eta_time = start_time + tot;
+
+            printf(YELLOW, "%llu", laserfuse[0] * 0x10000LL);
+            printf(GREEN, " out of ");
+            printf(BLUE, "%llu", 0x1000000LL * 0x10000LL);
+            printf(GREEN, " tested (");
+            printf(RED, "%f%%", laserfuse[0] / (float)0x1000000LL * 100.0);
+            printf(GREEN, "), ");
+            printf(YELLOW, "%d", cur_time - start_time);
+            printf(GREEN, " seconds elapsed, ");
+            printf(BLUE, "%d", eta_time - cur_time);
+            printf(GREEN, " seconds remaining, [");
+            printf(RED, "%f", key_per_sec);
+            printf(GREEN, " keys/s], ETA ");
+            printf(YELLOW, "%s", ctime(&eta_time));
+            last_print = laserfuse[0] / 1000;
+        }
+    }while(laserfuse[0] != 0);
+
+    *err = SB1_NO_VALID_KEY;
+    return false;
+    #undef printf
+}
+
 struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
     sb1_color_printf cprintf, enum sb1_error_t *err)
 {
