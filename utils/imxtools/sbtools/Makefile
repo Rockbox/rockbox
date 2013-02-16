@@ -1,7 +1,7 @@
 DEFINES=-DCRYPTO_LIBUSB
 CC=gcc
 LD=gcc
-CFLAGS=-g -std=c99 -W -Wall `pkg-config --cflags libusb-1.0` $(DEFINES)
+CFLAGS=-O3 -g -std=c99 -W -Wall `pkg-config --cflags libusb-1.0` $(DEFINES)
 LDFLAGS=`pkg-config --libs libusb-1.0`
 BINS=elftosb sbtoelf sbloader rsrctool elftosb1
 
