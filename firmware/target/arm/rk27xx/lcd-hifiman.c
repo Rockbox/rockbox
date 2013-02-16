@@ -30,6 +30,15 @@
 
 static bool display_on = false;
 
+static void reset_lcd(void)
+{
+    GPIO_PCCON |= (1<<7);
+    GPIO_PCDR &= ~(1<<7);
+    udelay(10);
+    GPIO_PCDR |= (1<<7);
+    udelay(5000);
+}
+
 void lcd_v1_display_init(void)
 {
     unsigned int x, y;
@@ -286,6 +295,7 @@ static void lcd_v2_update_rect(int x, int y, int width, int height)
 
 void lcd_display_init(void)
 {
+    reset_lcd();
     identify_lcd();
     if (lcd_type == LCD_V1)
         lcd_v1_display_init();
@@ -323,6 +333,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 void lcd_display_init(void)
 {
+    reset_lcd();
     lcd_v1_display_init();
 }
 
