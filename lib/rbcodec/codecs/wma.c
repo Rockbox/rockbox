@@ -106,11 +106,7 @@ restart_track:
     {
         enum codec_command_action action = ci->get_command(&param);
 
-        if (action == CODEC_ACTION_HALT)
-            break;
-
-        /* Deal with any pending seek requests */
-        if (action == CODEC_ACTION_SEEK_TIME) {
+        if (action != CODEC_ACTION_NULL) {
 
             /*flush the wma decoder state*/
             wmadec.last_superframe_len = 0;
@@ -121,23 +117,31 @@ restart_track:
             memset((*(wmadec.frame_out)), 0,
                 sizeof(fixed32) * MAX_CHANNELS * BLOCK_MAX_SIZE * 2);
 
-            if (param == 0) {
-                ci->set_elapsed(0);
-                ci->seek_complete();
-                goto restart_track; /* Pretend you never saw this... */
-            }
-
-            elapsedtime = asf_seek(param, &wfx);
-            if (elapsedtime < 1){
-                ci->set_elapsed(0);
-                ci->seek_complete();
+            if (action == CODEC_ACTION_HALT)
                 break;
-            }
-            /*DEBUGF("Seek returned %d\n", (int)elapsedtime);*/
 
-            ci->set_elapsed(elapsedtime);
-            ci->seek_complete();
+            /* Deal with any pending seek requests */
+            if (action == CODEC_ACTION_SEEK_TIME) {
+
+                if (param == 0) {
+                    ci->set_elapsed(0);
+                    ci->seek_complete();
+                    goto restart_track; /* Pretend you never saw this... */
+                }
+
+                elapsedtime = asf_seek(param, &wfx);
+                if (elapsedtime < 1){
+                    ci->set_elapsed(0);
+                    ci->seek_complete();
+                    break;
+                }
+                /*DEBUGF("Seek returned %d\n", (int)elapsedtime);*/
+
+                ci->set_elapsed(elapsedtime);
+                ci->seek_complete();
+            }
         }
+
         errcount = 0;
 new_packet:
         res = asf_read_packet(&audiobuf, &audiobufsize, &packetlength, &wfx);
