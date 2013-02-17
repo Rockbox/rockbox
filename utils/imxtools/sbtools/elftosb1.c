@@ -466,6 +466,13 @@ CMD_FN(cmd_component)
     return 0;
 }
 
+CMD_FN(cmd_keyfile)
+{
+    if(!add_keys_from_file(args[0].str))
+        bug("Cannot add keys from file '%s'\n", args[0].str);
+    return 0;
+}
+
 #define CMD(name,fn,nr_args,...) {name,nr_args,{__VA_ARGS__},fn},
 struct cmd_entry_t g_cmds[] =
 {
@@ -501,6 +508,7 @@ struct cmd_entry_t g_cmds[] =
     CMD("-product", cmd_product, 1, ARG_STR)
     CMD("-v", cmd_component, 1, ARG_STR)
     CMD("-component", cmd_component, 1, ARG_STR)
+    CMD("-k", cmd_keyfile, 1, ARG_STR)
 };
 #undef CMD
 
