@@ -473,6 +473,7 @@ CMD_FN(cmd_component)
 
 CMD_FN(cmd_keyfile)
 {
+    (void) sb;
     if(!add_keys_from_file(args[0].str))
         bug("Cannot add keys from file '%s'\n", args[0].str);
     return 0;
