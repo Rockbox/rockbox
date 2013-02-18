@@ -32,7 +32,7 @@
 #define EQ_GAIN_MAX         240
 #define EQ_GAIN_STEP          5
 #define EQ_GAIN_FAST_STEP    10
-#define EQ_Q_MIN              5
+#define EQ_Q_MIN              1
 #define EQ_Q_MAX             64
 #define EQ_Q_STEP             1
 #define EQ_Q_FAST_STEP       10
