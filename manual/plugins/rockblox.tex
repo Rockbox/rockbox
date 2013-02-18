@@ -15,6 +15,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
         \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
         \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,GIGABEAT_S_PAD}{\ButtonPlay}
         \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
+        \opt{SANSA_CLIP_PAD}{\ButtonHome}
         \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}
         \opt{GIGABEAT_PAD}{\ButtonA}
         \opt{MROBE100_PAD}{\ButtonDisplay}
@@ -26,7 +27,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
             & Restart game\\
     }
     \opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
-        ,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
+        ,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
         ,IRIVER_H10_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
         {\ButtonLeft}
@@ -35,7 +36,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
        \opt{HAVEREMOTEKEYMAP}{& }
         & Move left\\
     \opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
-        ,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
+        ,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
         ,IRIVER_H10_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
         {\ButtonRight}
@@ -45,7 +46,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
         & Move right\\
     \opt{PLAYER_PAD}{\ButtonMenu}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
-        ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
+        ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
         ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
         {\ButtonDown}
     \opt{SANSA_FUZEPLUS_PAD}{\ButtonSelect}
@@ -62,7 +63,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
     \opt{scrollwheel}{\ButtonScrollBack}
     \opt{IAUDIO_X5_PAD}{\ButtonPower}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
-    \opt{SANSA_C200_PAD}{\ButtonVolDown}
+    \opt{SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonVolDown}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolUp}
     \opt{SANSA_FUZEPLUS_PAD}{\ButtonVolDown{}; \ButtonBottomLeft}
     \opt{MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
@@ -76,7 +77,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd{} / \ButtonMenu}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
-    \opt{SANSA_C200_PAD}{\ButtonVolUp/\ButtonUp}
+    \opt{SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonVolUp/\ButtonUp}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonVolDown}
     \opt{MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonPlay}
     \opt{COWON_D2_PAD}{\TouchBottomRight{} / \TouchTopMiddle }
@@ -87,7 +88,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
     \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
         ,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonSelect}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
     \opt{IRIVER_H10_PAD}{\ButtonFF}
@@ -105,7 +106,7 @@ the blocks fall faster. If the pile of blocks reaches the ceiling, the game is o
     \opt{PLAYER_PAD}{\ButtonStop}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}
-    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
     \opt{COWON_D2_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
