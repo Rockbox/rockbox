@@ -16,6 +16,24 @@
       "revId": "1789b717bab157a03ed5fcf448df035c59729cf7",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///gI\u003d",
+        "filename": "firmware/target/hosted/samsung/ypr0/backlight-ypr0.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-02-18T12:16:03Z",
+      "side": 0,
+      "message": "See the previous comment. It isn\u0027t.",
+      "parentUuid": "AAAASX///gs\u003d",
+      "revId": "1789b717bab157a03ed5fcf448df035c59729cf7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }

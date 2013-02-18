@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///gM\u003d",
+        "filename": "firmware/target/hosted/rtc-unix.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-02-18T12:16:03Z",
+      "side": 1,
+      "message": "Right. Probably I\u0027m going to change this again. I realized only after about the issue of the system time to be refreshed!",
+      "parentUuid": "AAAASX///g0\u003d",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///g4\u003d",
         "filename": "firmware/target/hosted/rtc-unix.c",
         "patchSetId": 3
@@ -47,6 +65,24 @@
       "writtenOn": "2013-02-15T23:42:25Z",
       "side": 1,
       "message": "I think the code was better suited in this file since it\u0027s backlight related (or isnt it?).",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///gU\u003d",
+        "filename": "firmware/target/hosted/samsung/lcd-ypr.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-02-18T12:16:03Z",
+      "side": 1,
+      "message": "Nope. This is not. This is a default way in Linux to turn off LCD power (at least in R0/R1, but I guess this is really standard).\nSo I\u0027m pretty sure this is the right place...\nNOTE: this may be implemented using a system call (ioctl), so I should give an eye at this since it would remove some unnecessary overhead.",
+      "parentUuid": "AAAASX///go\u003d",
       "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -87,6 +123,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///gQ\u003d",
+        "filename": "firmware/target/hosted/samsung/lcd-ypr.c~",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-02-18T12:16:03Z",
+      "side": 1,
+      "message": "Right. Need to remove this.",
+      "parentUuid": "AAAASX///gw\u003d",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///g8\u003d",
         "filename": "tools/root.make",
         "patchSetId": 3
@@ -98,6 +152,24 @@
       "writtenOn": "2013-02-15T23:42:25Z",
       "side": 1,
       "message": "This is acceptable for now, but we need something smarter than adding this line to the file for every new port.",
+      "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///gE\u003d",
+        "filename": "tools/root.make",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-02-18T12:16:03Z",
+      "side": 1,
+      "message": "Exactly. Same thing I thought about, we need some kind of automation and perhaps there is the need of another \"parameter\" to the build system since we cannot follow the classical native ports atm...",
+      "parentUuid": "AAAASX///g8\u003d",
       "revId": "b037d4cdeabd63433ce2a7f12b4dc1ac5c008863",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
