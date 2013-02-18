@@ -384,20 +384,22 @@ static int eq_do_advanced_menu(void * param)
                     setting.lang_id = LANG_EQUALIZER_BAND_CENTER;
                 setting.default_val.int_ = eq_defaults[band].cutoff;
                 setting.int_setting = &cutoff_int_setting;
+                setting.setting = &global_settings.eq_band_settings[band].cutoff;
                 break;
             case 2: /* Q */
                 setting.lang_id = LANG_EQUALIZER_BAND_Q;
                 setting.default_val.int_ = eq_defaults[band].q;
                 setting.int_setting = &q_int_setting;
+                setting.setting = &global_settings.eq_band_settings[band].q;
                 break;
             case 3: /* Gain */
                 setting.lang_id = LANG_GAIN;
                 setting.default_val.int_ = eq_defaults[band].gain;
                 setting.int_setting = &gain_int_setting;
+                setting.setting = &global_settings.eq_band_settings[band].gain;
                 break;
         }
         pcmbuf_set_low_latency(true);
-        setting.setting = &global_settings.eq_band_settings[band].gain;
         advancedmenu_item_get_name(info.selection, &selected_band, title, MAX_PATH);
 
         option_screen(&setting, NULL, false, title[0] == '\t' ? &title[1] : title);
