@@ -61,6 +61,11 @@ typedef volatile uint32_t reg32;
 
 #ifdef LOGF_ENABLE
 #define XFER_DIR_STR(dir) ((dir) ? "IN" : "OUT")
+#define XFER_TYPE_STR(type) \
+    ((type) == USB_ENDPOINT_XFER_CONTROL ? "CTRL" : \
+     ((type) == USB_ENDPOINT_XFER_ISOC ? "ISOC" : \
+      ((type) == USB_ENDPOINT_XFER_BULK ? "BULK" : \
+       ((type) == USB_ENDPOINT_XFER_INT ? "INTR" : "INVL"))))
 #endif
 
 struct endpoint_t {
