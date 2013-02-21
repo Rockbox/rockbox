@@ -254,17 +254,27 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
             case SKIN_TOKEN_METADATA_GENRE:
                 return id3->genre_string;
             case SKIN_TOKEN_METADATA_DISC_NUMBER:
-                if (id3->disc_string)
+                if (id3->disc_string) {
+                    if (intval)
+                        *intval = atoi(id3->disc_string);
                     return id3->disc_string;
+                }
                 if (id3->discnum) {
+                    if (intval)
+                        *intval = id3->discnum;
                     snprintf(buf, buf_size, "%d", id3->discnum);
                     return buf;
                 }
                 return NULL;
             case SKIN_TOKEN_METADATA_TRACK_NUMBER:
-                if (id3->track_string)
+                if (id3->track_string) {
+                    if (intval)
+                        *intval = atoi(id3->track_string);
                     return id3->track_string;
+                }
                 if (id3->tracknum) {
+                    if (intval)
+                        *intval = id3->tracknum;
                     snprintf(buf, buf_size, "%d", id3->tracknum);
                     return buf;
                 }
