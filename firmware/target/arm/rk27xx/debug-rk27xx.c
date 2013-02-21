@@ -65,6 +65,38 @@ bool dbg_hw_info(void)
         line++;
         _DEBUG_PRINTF("sd_debug_time_rd: %d", sd_debug_time_rd);
         _DEBUG_PRINTF("sd_debug_time_wr: %d", sd_debug_time_wr);
+        for(int i = 0; i < 4; i++)
+        {
+            unsigned long memmap = *(&MEMMAPA + i);
+            unsigned addr = memmap & 0xff000000;
+            unsigned size = memmap & 0xff;
+            const char *size_name;
+            switch(size)
+            {
+                case 0:
+                    size = 0;
+                    size_name = "invalid";
+                    break;
+                case 0xfe:
+                    size = 32 * 1024 * 1024;
+                    size_name = "32MB";
+                    break;
+                case 0xfc:
+                    size = 64 * 1024 * 1024;
+                    size_name = "64MB";
+                    break;
+                case 0xf8:
+                    size = 128 * 1024 * 1024;
+                    size_name = "128MB";
+                    break;
+                default:
+                    size = 0;
+                    size_name = "unk";
+                    break;
+            }
+            _DEBUG_PRINTF("Uncached %c: [0x%x,0x%x[ (size=0x%x / %s)",
+                'A' + i, addr, addr + size, size, size_name);
+        }
         lcd_update(); 
         switch(button_get_w_tmo(HZ/20))
         {
