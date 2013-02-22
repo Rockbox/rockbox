@@ -45,6 +45,7 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_F1
 #   define FFT_AMP_SCALE    BUTTON_UP
 #   define FFT_QUIT         BUTTON_OFF
+/* Need FFT_FREQ_SCALE key */
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -111,6 +112,7 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_REC
 #   define FFT_AMP_SCALE    BUTTON_SELECT
 #   define FFT_QUIT         BUTTON_POWER
+/* Need FFT_FREQ_SCALE key */
 #elif (CONFIG_KEYPAD == SANSA_M200_PAD)
 #   define FFT_PREV_GRAPH   BUTTON_LEFT
 #   define FFT_NEXT_GRAPH   BUTTON_RIGHT
@@ -118,14 +120,16 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_DOWN
 #   define FFT_AMP_SCALE    BUTTON_SELECT
 #   define FFT_QUIT         BUTTON_POWER
+/* Need FFT_FREQ_SCALE key */
 #elif (CONFIG_KEYPAD == SANSA_CLIP_PAD)
 #   define FFT_PREV_GRAPH   BUTTON_LEFT
 #   define FFT_NEXT_GRAPH   BUTTON_RIGHT
 #   define FFT_ORIENTATION  BUTTON_UP
+#   define FFT_FREQ_SCALE   BUTTON_DOWN
 #   define FFT_WINDOW       BUTTON_HOME
 #   define FFT_AMP_SCALE    BUTTON_SELECT
 #   define FFT_QUIT         BUTTON_POWER
-
+/* Need FFT_FREQ_SCALE key */
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #   define FFT_PREV_GRAPH   BUTTON_LEFT
 #   define FFT_NEXT_GRAPH   BUTTON_RIGHT
@@ -160,7 +164,7 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_RC_PLAY
 #   define FFT_AMP_SCALE    BUTTON_RC_VOL_UP
 #   define FFT_QUIT         BUTTON_RC_REC
-
+/* Need FFT_FREQ_SCALE key */
 #elif (CONFIG_KEYPAD == COWON_D2_PAD)
 #   define FFT_QUIT         BUTTON_POWER
 #   define FFT_PREV_GRAPH   BUTTON_PLUS
@@ -209,7 +213,7 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_DOWN
 #   define FFT_AMP_SCALE    BUTTON_FFWD
 #   define FFT_QUIT         BUTTON_PLAY
-
+/* Need FFT_FREQ_SCALE key */
 #elif (CONFIG_KEYPAD == MROBE500_PAD)
 #   define FFT_QUIT         BUTTON_POWER
 
@@ -226,7 +230,7 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_OK
 #   define FFT_AMP_SCALE    BUTTON_PLAY
 #   define FFT_QUIT         BUTTON_REC
-
+/* Need FFT_FREQ_SCALE key */
 #elif CONFIG_KEYPAD == MPIO_HD200_PAD
 #   define FFT_PREV_GRAPH   BUTTON_REW
 #   define FFT_NEXT_GRAPH   BUTTON_FF
@@ -234,7 +238,7 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_FUNC
 #   define FFT_AMP_SCALE    BUTTON_PLAY
 #   define FFT_QUIT        (BUTTON_REC | BUTTON_PLAY)
-
+/* Need FFT_FREQ_SCALE key */
 #elif CONFIG_KEYPAD == MPIO_HD300_PAD
 #   define FFT_PREV_GRAPH   BUTTON_REW
 #   define FFT_NEXT_GRAPH   BUTTON_FF
@@ -242,7 +246,7 @@ GREY_INFO_STRUCT
 #   define FFT_WINDOW       BUTTON_ENTER
 #   define FFT_AMP_SCALE    BUTTON_PLAY
 #   define FFT_QUIT        (BUTTON_REC | BUTTON_REPEAT)
-
+/* Need FFT_FREQ_SCALE key */
 #elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
 #   define FFT_PREV_GRAPH   BUTTON_LEFT
 #   define FFT_NEXT_GRAPH   BUTTON_RIGHT
@@ -311,6 +315,7 @@ GREY_INFO_STRUCT
 #ifndef FFT_QUIT
 #   define FFT_QUIT         BUTTON_BOTTOMLEFT
 #endif
+/* Need FFT_FREQ_SCALE key */
 #endif /* HAVE_TOUCHSCREEN */
 
 #ifdef HAVE_LCD_COLOR
@@ -483,9 +488,7 @@ enum fft_setting_flags
     FFT_SETF_OR = 1 << 0,
     FFT_SETF_DM = 1 << 1,
     FFT_SETF_AS = 1 << 2,
-#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
     FFT_SETF_FS = 1 << 3,
-#endif
     FFT_SETF_WF = 1 << 4,
     FFT_SETF_ALL = 0x1f
 };
@@ -1203,14 +1206,12 @@ static void fft_osd_format_message(enum fft_setting_flags id)
             }[fft.amp_scale];
         break;
 
-#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
     case FFT_SETF_FS:
         msg = (const char * [FFT_MAX_FS]) {
                 [FFT_FS_LOG] = "Logarithmic frequency",
                 [FFT_FS_LIN] = "Linear frequency",
             }[fft.freq_scale];
         break;
-#endif
 
     case FFT_SETF_OR:
         rb->snprintf(fft_osd_message, sizeof (fft_osd_message),
@@ -1351,13 +1352,11 @@ static void fft_setting_update(unsigned which)
         }
     }
 
-#ifdef FFT_FREQ_SCALE /* 'Till all keymaps are defined */
     if(which & FFT_SETF_FS)
     {
         plot = fft.freq_scale == FFT_FS_LIN ?
                 linf_magnitudes : logf_magnitudes;
     }
-#endif
 
     if(which & FFT_SETF_AS)
     {
