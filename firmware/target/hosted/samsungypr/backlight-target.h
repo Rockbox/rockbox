@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: backlight-target.h 19322 2008-12-04 04:16:53Z jethead71 $
+ * $Id$
  *
  * Copyright (C) 2011 by Lorenzo Miori
  *

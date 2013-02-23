@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: powermgmt-sim.c 29543 2011-03-08 19:33:30Z thomasjfox $
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +23,7 @@
 #include "file.h"
 #include "adc.h"
 #include "sc900776.h"
-#include "radio-ypr0.h"
+#include "radio-ypr.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {

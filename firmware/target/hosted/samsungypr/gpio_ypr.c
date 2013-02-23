@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <gpio_ypr0.h> /* includes r0GPIOioctl.h */
+#include <gpio-target.h> /* includes common ioctl device definitions */
 #include <sys/ioctl.h>
 
 static int r0_gpio_dev = 0;

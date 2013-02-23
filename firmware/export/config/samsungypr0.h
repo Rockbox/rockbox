@@ -12,9 +12,6 @@
 
 #define MODEL_NAME   "Samsung YP-R0"
 
-/* Indeed to check that */
-/*TODO: R0 should charge battery automatically, no software stuff to manage that. Just to know about some as3543 registers, that should be set after loading samsung's afe.ko module 
- */
 /*TODO: implement USB data transfer management -> see safe mode script and think a way to implemtent it in the code */
 #define USB_NONE
 
@@ -94,19 +91,25 @@
 #define HAVE_AS3514
 #define HAVE_AS3543
 
+/* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS
 
+/* We have the Si4709, which supports RDS */
 #define CONFIG_TUNER SI4700
 #define HAVE_TUNER_PWR_CTRL
-
 #define HAVE_RDS_CAP
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
 #define INPUT_SRC_CAPS SRC_CAP_FMRADIO
 
-/* We have a GPIO that detects it */
+/* We have a GPIO pin that detects this */
 #define HAVE_HEADPHONE_DETECTION
+
+/* FIXME
+ * Lot of people reports bad battery life and funny charging times.
+ * Check what's going on...
+ */
 
 #define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */
