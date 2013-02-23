@@ -14,7 +14,7 @@
 #define HAVE_LCD_BITMAP
 
 /* define this if you can flip your LCD */
-#define HAVE_LCD_FLIP
+//#define HAVE_LCD_FLIP
 
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT
@@ -48,7 +48,7 @@
 #define CONFIG_KEYPAD RECORDER_PAD
 
 /* Define this to enable morse code input */
-#define HAVE_MORSE_INPUT
+//#define HAVE_MORSE_INPUT
 
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_M41ST84W
