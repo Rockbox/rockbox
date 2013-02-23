@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2011 Lorenzo Miori, Thomas Martitz
+ * Copyright (C) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +23,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "string.h"
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
@@ -37,13 +37,14 @@
 static int dev_fd = 0;
 fb_data *dev_fb = 0;
 
-/* FIXME: never used! Place this into final teardown */
+#ifdef HAVE_LCD_SHUTDOWN
 void lcd_shutdown(void)
 {
     printf("FB closed.");
     munmap(dev_fb, FRAMEBUFFER_SIZE);
     close(dev_fd);
 }
+#endif
 
 void lcd_init_device(void)
 {
@@ -53,27 +54,30 @@ void lcd_init_device(void)
 
     /* Open the framebuffer device */
     dev_fd = open("/dev/fb0", O_RDWR);
-    if (dev_fd == -1) {
+    if (dev_fd == -1)
+    {
         perror("Error: cannot open framebuffer device");
         exit(1);
     }
     printf("The framebuffer device was opened successfully.\n");
 
-    /* Get the fixed properties */
+    /* Get the fixed properties, not really nedeed but we as a check */
     if (ioctl(dev_fd, FBIOGET_FSCREENINFO, &finfo) == -1) {
         perror("Error reading fixed information");
         exit(2);
     }
 
     /* Now we get the settable settings, and we set 16 bit bpp */
-    if (ioctl(dev_fd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
+    if (ioctl(dev_fd, FBIOGET_VSCREENINFO, &vinfo) == -1)
+    {
         perror("Error reading variable information");
         exit(3);
     }
 
-    vinfo.bits_per_pixel = 16;
+    vinfo.bits_per_pixel = LCD_DEPTH;
 
-    if (ioctl(dev_fd, FBIOPUT_VSCREENINFO, &vinfo)) {
+    if (ioctl(dev_fd, FBIOPUT_VSCREENINFO, &vinfo))
+    {
             perror("fbset(ioctl)");
             exit(4);
     }
@@ -90,30 +94,32 @@ void lcd_init_device(void)
 
     /* Map the device to memory */
     dev_fb = mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dev_fd, 0);
-    if ((int)dev_fb == -1) {
+    if ((int)dev_fb == -1)
+    {
         perror("Error: failed to map framebuffer device to memory");
         exit(4);
     }
     printf("The framebuffer device was mapped to memory successfully.\n");
+#ifdef HAVE_LCD_ENABLE
+    /* Be sure to turn on display at startup */
+    lcd_enable(true);
+#endif
 }
 
-/*TODO: implemented in a better way -> ie using LCD_ENABLE */
+#ifdef HAVE_LCD_ENABLE
+void lcd_enable(bool enable)
+{
+    if (lcd_active() == enable)
+        return;
 
-/* Turn off display
- * This translates - in most of the cases - in power supply off
- */
-void _backlight_lcd_sleep(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "1", 1);
-    close(fp);
+    lcd_set_active(enable);
+
+    /* Turn on or off the display using Linux interface */
+    ioctl(dev_fd, FBIOBLANK, enable ? VESA_NO_BLANKING : VESA_POWERDOWN);
+
+    if (enable)
+    {
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+    }
 }
-/* Turn on LCD screen
- * This translates - in most of the cases - in power supply on
- */
-void _backlight_lcd_wake(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "0", 1);
-    close(fp);
-}
+#endif
