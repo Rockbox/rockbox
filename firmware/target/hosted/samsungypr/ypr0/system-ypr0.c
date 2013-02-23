@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
  *                     \/            \/     \/    \/            \/ 
- * $Id: system-sdl.c 29925 2011-05-25 20:11:03Z thomasjfox $
  *
- * Copyright (C) 2006 by Daniel Everton <dan@iocaine.org>
+ * Copyright (C) 2011-2013 by Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,7 +30,7 @@
 #endif
 
 #include "ascodec.h"
-#include "gpio_ypr0.h"
+#include "gpio-target.h"
 
 void power_off(void)
 {
@@ -52,6 +51,7 @@ void system_init(void)
 #if defined(HAVE_SDL_AUDIO) || defined(HAVE_SDL_THREADS) || defined(HAVE_SDL)
     SDL_Init(0); /* need this if using any SDL subsystem */
 #endif
+
     /* Here begins our platform specific initilization for various things */
     ascodec_init();
     gpio_init();

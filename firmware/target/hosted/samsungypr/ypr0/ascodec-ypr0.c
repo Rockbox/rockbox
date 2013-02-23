@@ -5,10 +5,10 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
+ * 
  * Module wrapper for AS3543 audio codec, using /dev/afe (afe.ko) of Samsung YP-R0
  *
- * Copyright (c) 2011 Lorenzo Miori
+ * Copyright (c) 2011-2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,11 +29,10 @@
 
 #include "ascodec.h"
 
-int afe_dev = -1;
+static int afe_dev = -1;
 
-/* ioctl parameter struct */
+/* Structure used for ioctl module call */
 struct codec_req_struct {
-/* This works for every kind of afe.ko module requests */
     unsigned char reg; /* Main register address */
     unsigned char subreg; /* Set this only if you are reading/writing a PMU register*/
     unsigned char value; /* To be read if reading a register; to be set if writing to a register */
@@ -49,28 +48,31 @@ struct codec_req_struct {
 /* Read from a PMU register */
 #define IOCTL_SUBREG_READ       0x80034103
 
-
+/* Open device */
 void ascodec_init(void)
 {
     afe_dev = open("/dev/afe", O_RDWR);
 }
 
+/* Close device */
 void ascodec_close(void)
 {
-    if (afe_dev >= 0) {
+    if (afe_dev >= 0)
         close(afe_dev);
-    }
 }
 
-/* Read functions returns -1 if fail, otherwise the register's value if success */
-/* Write functions return >= 0 if success, otherwise -1 if fail */
-
+/* Write register.
+ * Returns >= 0 if success, -1 if fail
+ */
 int ascodec_write(unsigned int reg, unsigned int value)
 {
     struct codec_req_struct r = { .reg = reg, .value = value };
     return ioctl(afe_dev, IOCTL_REG_WRITE, &r);
 }
 
+/* Read register.
+ * Returns -1 if fail, otherwise the register's value if success
+ */
 int ascodec_read(unsigned int reg)
 {
     struct codec_req_struct r = { .reg = reg };
@@ -81,6 +83,7 @@ int ascodec_read(unsigned int reg)
         return retval;
 }
 
+/* Write PMU register */
 void ascodec_write_pmu(unsigned int index, unsigned int subreg,
                                      unsigned int value)
 {
@@ -88,6 +91,7 @@ void ascodec_write_pmu(unsigned int index, unsigned int subreg,
     ioctl(afe_dev, IOCTL_SUBREG_WRITE, &r);
 }
 
+/* Read PMU register */
 int ascodec_read_pmu(unsigned int index, unsigned int subreg)
 {
     struct codec_req_struct r = { .reg = index, .subreg = subreg, };
