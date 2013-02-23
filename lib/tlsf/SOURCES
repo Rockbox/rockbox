@@ -1,3 +1,1 @@
-#if CONFIG_CODEC == SWCODEC /* software codec platforms */
 src/tlsf.c
-#endif
