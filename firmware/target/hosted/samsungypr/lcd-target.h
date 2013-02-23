@@ -22,10 +22,8 @@
 
 extern fb_data *dev_fb;
 #define LCD_FRAMEBUF_ADDR(col, row) (dev_fb + row*LCD_WIDTH + col)
-
-/* Turn off LCD power supply */
-void _backlight_lcd_sleep(void);
-/* Turn on LCD screen */
-void _backlight_lcd_wake(void);
-
+#ifdef HAVE_LCD_ENABLE
+extern void lcd_set_active(bool active);
+void lcd_enable(bool enable);
+#endif
 #endif
