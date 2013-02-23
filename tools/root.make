@@ -120,7 +120,7 @@ else
   endif
 
   ifneq (,$(findstring ypr0,$(APP_TYPE)))
-    include $(ROOTDIR)/firmware/target/hosted/ypr0/ypr0.make
+    include $(ROOTDIR)/firmware/target/hosted/samsungypr/ypr0/ypr0.make
   endif
 
   ifneq (,$(findstring android, $(APP_TYPE)))

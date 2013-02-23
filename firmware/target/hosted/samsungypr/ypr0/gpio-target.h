@@ -20,8 +20,8 @@
  *
  ****************************************************************************/
 
-#ifndef GPIO_YPR0_H
-#define GPIO_YPR0_H
+#ifndef GPIO_TARGET_H
+#define GPIO_TARGET_H
 
 #include "r0GPIOIoctl.h"
 
@@ -59,4 +59,4 @@ void gpio_close(void);
 int gpio_control_struct(int request, R0GPIOInfo pin);
 int gpio_control(int request, int num, int mode, int val);
 
-#endif
+#endif /* GPIO_TARGET_H */

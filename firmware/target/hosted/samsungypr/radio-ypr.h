@@ -6,7 +6,8 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Module wrapper for SI4709 FM Radio Chip, using /dev/si470x (si4709.ko) of Samsung YP-R0
+ * Module wrapper for SI4709 FM Radio Chip, using /dev/si470x (si4709.ko) 
+ *      Samsung YP-R0 & Samsung YP-R1
  *
  * Copyright (c) 2012 Lorenzo Miori
  *
@@ -20,8 +21,8 @@
  *
  ****************************************************************************/
 
-#ifndef __RADIO_YPR0_H__
-#define __RADIO_YPR0_H__
+#ifndef __RADIO_YPR_H__
+#define __RADIO_YPR_H__
 
 #include "si4709.h"
 #include "stdint.h"
@@ -33,4 +34,4 @@ void radiodev_close(void);
 void si4709_write_reg(int addr, uint16_t value);
 uint16_t si4709_read_reg(int addr);
 
-#endif /*__RADIO-YPR0_H__*/
+#endif /*__RADIO-YPR_H__*/
