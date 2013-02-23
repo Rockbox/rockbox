@@ -17,9 +17,9 @@ OTHER_SRC += $(GIF_SRC)
 
 ROCKS += $(GIFBUILDDIR)/gif.ovl
 
-$(GIFBUILDDIR)/gif.refmap: $(GIF_OBJ)
+$(GIFBUILDDIR)/gif.refmap: $(GIF_OBJ) $(TLSFLIB)
 $(GIFBUILDDIR)/gif.link: $(PLUGIN_LDS) $(GIFBUILDDIR)/gif.refmap
-$(GIFBUILDDIR)/gif.ovl: $(GIF_OBJ)
+$(GIFBUILDDIR)/gif.ovl: $(GIF_OBJ) $(TLSFLIB)
 
 #-Os breaks decoder - dunno why
 GIFFLAGS = $(IMGDECFLAGS) -O2
