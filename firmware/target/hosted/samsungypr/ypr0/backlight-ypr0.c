@@ -39,7 +39,9 @@ void _backlight_on(void)
     if (!backlight_on_status)
     {
         /* Turn on lcd power before backlight */
-        _backlight_lcd_wake();
+#ifdef HAVE_LCD_ENABLE
+        lcd_enable(true);
+#endif
         /* Original app sets this to 0xb1 when backlight is on... */
         ascodec_write_pmu(AS3543_BACKLIGHT, 0x1, 0xb1);
     }
@@ -54,7 +56,9 @@ void _backlight_off(void)
         /* Disabling the DCDC15 completely, keeps brightness register value */
         ascodec_write_pmu(AS3543_BACKLIGHT, 0x1, 0x00);
         /* Turn off lcd power then */
-        _backlight_lcd_sleep();
+#ifdef HAVE_LCD_ENABLE
+        lcd_enable(false);
+#endif
     }
 
     backlight_on_status = false;

@@ -37,7 +37,6 @@
 static int dev_fd = 0;
 fb_data *dev_fb = 0;
 
-/* FIXME: never used! Place this into final teardown */
 void lcd_shutdown(void)
 {
     printf("FB closed.");
@@ -59,7 +58,7 @@ void lcd_init_device(void)
     }
     printf("The framebuffer device was opened successfully.\n");
 
-    /* Get the fixed properties */
+    /* Get the fixed properties, not really nedeed but we as a check */
     if (ioctl(dev_fd, FBIOGET_FSCREENINFO, &finfo) == -1) {
         perror("Error reading fixed information");
         exit(2);
@@ -71,7 +70,7 @@ void lcd_init_device(void)
         exit(3);
     }
 
-    vinfo.bits_per_pixel = 16;
+    vinfo.bits_per_pixel = LCD_DEPTH;
 
     if (ioctl(dev_fd, FBIOPUT_VSCREENINFO, &vinfo)) {
             perror("fbset(ioctl)");
@@ -95,25 +94,25 @@ void lcd_init_device(void)
         exit(4);
     }
     printf("The framebuffer device was mapped to memory successfully.\n");
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true);
+#endif
 }
 
-/*TODO: implemented in a better way -> ie using LCD_ENABLE */
+#ifdef HAVE_LCD_ENABLE
+void lcd_enable(bool enable)
+{
+    if (lcd_active() == enable)
+        return;
 
-/* Turn off display
- * This translates - in most of the cases - in power supply off
- */
-void _backlight_lcd_sleep(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "1", 1);
-    close(fp);
+    lcd_set_active(enable);
+
+    /* Turn on or off the display using Linux interface */
+    ioctl(dev_fd, FBIOBLANK, enable ? VESA_NO_BLANKING : VESA_POWERDOWN);
+
+    if (enable)
+    {
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+    }
 }
-/* Turn on LCD screen
- * This translates - in most of the cases - in power supply on
- */
-void _backlight_lcd_wake(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "0", 1);
-    close(fp);
-}
+#endif
