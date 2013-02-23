@@ -5,10 +5,12 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
+ * 
+ * Module wrapper for SI4709 FM Radio Chip, using /dev/si470x (si4709.ko) 
+ *      Samsung YP-R0 & Samsung YP-R1
  *
- * Module wrapper for SI4709 FM Radio Chip, using /dev/si470x (si4709.ko) of Samsung YP-R0
- *
- * Copyright (c) 2012 Lorenzo Miori
+ * Copyright (c) 2012-2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,28 +29,35 @@
 #include "string.h"
 #include "kernel.h"
 
-#include "radio-ypr0.h"
+#include "radio-ypr.h"
 #include "rds.h"
 #include "si4700.h"
 #include "power.h"
 
 static int radio_dev = -1;
 
-void radiodev_open(void) {
+void radiodev_open(void)
+{
     radio_dev = open("/dev/si470x", O_RDWR);
 }
 
-void radiodev_close(void) {
-    close(radio_dev);
+void radiodev_close(void)
+{
+    if (radio_dev >= 0)
+    {
+        close(radio_dev);
+    }
 }
 
 /* High-level registers access */
-void si4709_write_reg(int addr, uint16_t value) {
+void si4709_write_reg(int addr, uint16_t value)
+{
     sSi4709_t r = { .addr = addr, .value = value };
     ioctl(radio_dev, IOCTL_SI4709_WRITE_BYTE, &r);
 }
 
-uint16_t si4709_read_reg(int addr) {
+uint16_t si4709_read_reg(int addr)
+{
     sSi4709_t r = { .addr = addr, .value = 0 };
     ioctl(radio_dev, IOCTL_SI4709_READ_BYTE, &r);
     return r.value;
@@ -72,7 +81,7 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 #ifdef HAVE_RDS_CAP
 
 /* Register we are going to poll */
-#define STATUSRSSI  0xA
+#define STATUSRSSI          0xA
 #define STATUSRSSI_RDSR     (0x1 << 15)
 
 /* Low-level RDS Support */
@@ -90,9 +99,11 @@ static void NORETURN_ATTR rds_thread(void)
     int timeout = TIMEOUT_BLOCK;
     struct queue_event ev;
 
-    while (true) {
+    while (true)
+    {
         queue_wait_w_tmo(&rds_queue, &ev, timeout);
-        switch (ev.id) {
+        switch (ev.id)
+        {
             case Q_POWERUP:
                 /* power up: timeout after 1 tick, else block indefinitely */
                 timeout = ev.data ? 1 : TIMEOUT_BLOCK;

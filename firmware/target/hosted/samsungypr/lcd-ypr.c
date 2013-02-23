@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: lcd-bitmap.c 29248 2011-02-08 20:05:25Z thomasjfox $
+ * $Id$
  *
  * Copyright (C) 2011 Lorenzo Miori, Thomas Martitz
  *
@@ -32,10 +32,12 @@
 #include "system.h"
 #include "screendump.h"
 #include "lcd.h"
+#include "lcd-target.h"
 
 static int dev_fd = 0;
 fb_data *dev_fb = 0;
 
+/* FIXME: never used! Place this into final teardown */
 void lcd_shutdown(void)
 {
     printf("FB closed.");
@@ -93,4 +95,25 @@ void lcd_init_device(void)
         exit(4);
     }
     printf("The framebuffer device was mapped to memory successfully.\n");
+}
+
+/*TODO: implemented in a better way -> ie using LCD_ENABLE */
+
+/* Turn off display
+ * This translates - in most of the cases - in power supply off
+ */
+void _backlight_lcd_sleep(void)
+{
+    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
+    write(fp, "1", 1);
+    close(fp);
+}
+/* Turn on LCD screen
+ * This translates - in most of the cases - in power supply on
+ */
+void _backlight_lcd_wake(void)
+{
+    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
+    write(fp, "0", 1);
+    close(fp);
 }

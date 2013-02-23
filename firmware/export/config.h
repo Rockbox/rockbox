@@ -82,14 +82,14 @@
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
  * possible future PLATFORM_ANDROID (some OSes might need totally different
  * handling to run on them than a stand-alone application) */
-#define PLATFORM_NATIVE  (1<<0)
-#define PLATFORM_HOSTED  (1<<1)
-#define PLATFORM_ANDROID (1<<2)
-#define PLATFORM_SDL     (1<<3)
-#define PLATFORM_MAEMO4  (1<<4)
-#define PLATFORM_MAEMO5  (1<<5)
-#define PLATFORM_MAEMO   (PLATFORM_MAEMO4|PLATFORM_MAEMO5)
-#define PLATFORM_PANDORA (1<<6)
+#define PLATFORM_NATIVE         (1<<0)
+#define PLATFORM_HOSTED         (1<<1)
+#define PLATFORM_ANDROID        (1<<2)
+#define PLATFORM_SDL            (1<<3)
+#define PLATFORM_MAEMO4         (1<<4)
+#define PLATFORM_MAEMO5         (1<<5)
+#define PLATFORM_MAEMO          (PLATFORM_MAEMO4|PLATFORM_MAEMO5)
+#define PLATFORM_PANDORA        (1<<6)
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          1

@@ -5,10 +5,11 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
+ * 
+ * Module wrapper for GPIO, using /dev/r0GPIO (r0Gpio.ko) of Samsung YP-R0
  *
- * Module wrapper for SI4709 FM Radio Chip, using /dev/si470x (si4709.ko) of Samsung YP-R0
- *
- * Copyright (c) 2012 Lorenzo Miori
+ * Copyright (c) 2011 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,17 +21,34 @@
  *
  ****************************************************************************/
 
-#ifndef __RADIO_YPR0_H__
-#define __RADIO_YPR0_H__
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <gpio-target.h> /* includes common ioctl device definitions */
+#include <sys/ioctl.h>
 
-#include "si4709.h"
-#include "stdint.h"
-#include "rds.h"
-#include "si4700.h"
+static int r0_gpio_dev = 0;
 
-void radiodev_open(void);
-void radiodev_close(void);
-void si4709_write_reg(int addr, uint16_t value);
-uint16_t si4709_read_reg(int addr);
+void gpio_init(void)
+{
+    r0_gpio_dev = open("/dev/r0GPIO", O_RDONLY);
+    if (r0_gpio_dev < 0)
+        printf("/dev/r0GPIO open error!");
+}
 
-#endif /*__RADIO-YPR0_H__*/
+void gpio_close(void)
+{
+    if (r0_gpio_dev > 0)
+        close(r0_gpio_dev);
+}
+
+int gpio_control_struct(int request, R0GPIOInfo r)
+{
+    return ioctl(r0_gpio_dev, request, &r);
+}
+
+int gpio_control(int request, int num, int mode, int val)
+{
+    R0GPIOInfo r = { .num = num, .mode = mode, .val = val, };
+    return ioctl(r0_gpio_dev, request, &r);
+}

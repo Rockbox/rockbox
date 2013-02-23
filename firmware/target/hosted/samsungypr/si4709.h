@@ -5,7 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
+ * $Id$
+ * 
  * Module header for SI4709 FM Radio Chip, using /dev/si470x (si4709.ko) of Samsung YP-R0
  *
  * Copyright (c) 2012 Lorenzo Miori

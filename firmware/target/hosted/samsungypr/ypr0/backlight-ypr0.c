@@ -5,7 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
+ * $Id$
+ * 
  * Copyright (C) 2011 by Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
@@ -22,28 +23,11 @@
 #include "backlight.h"
 #include "backlight-target.h"
 #include "lcd.h"
+#include "lcd-target.h"
 #include "as3514.h"
 #include "ascodec.h"
-#include <fcntl.h>
-#include "unistd.h"
 
 static bool backlight_on_status = true; /* Is on or off? */
-
-/*TODO: see if LCD sleep could be implemented in a better way -> ie using a rockbox feature */
-/* Turn off LCD power supply */
-static void _backlight_lcd_sleep(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "1", 1);
-    close(fp);
-}
-/* Turn on LCD screen */
-static void _backlight_lcd_power(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "0", 1);
-    close(fp);
-}
 
 bool _backlight_init(void)
 {
@@ -56,7 +40,7 @@ void _backlight_on(void)
     if (!backlight_on_status)
     {
         /* Turn on lcd power before backlight */
-        _backlight_lcd_power();
+        _backlight_lcd_wake();
         /* Original app sets this to 0xb1 when backlight is on... */
         ascodec_write_pmu(AS3543_BACKLIGHT, 0x1, 0xb1);
     }

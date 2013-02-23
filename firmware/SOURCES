@@ -82,19 +82,19 @@ target/hosted/rtc.c
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
 target/hosted/lc-unix.c
-target/hosted/ypr0/button-ypr0.c
-target/hosted/ypr0/lcd-ypr0.c
-target/hosted/ypr0/system-ypr0.c
+target/hosted/samsungypr/ypr0/button-ypr0.c
+target/hosted/samsungypr/lcd-ypr.c
+target/hosted/samsungypr/ypr0/system-ypr0.c
 thread.c
 #ifdef HAVE_BACKLIGHT
-target/hosted/ypr0/backlight-ypr0.c
+target/hosted/samsungypr/ypr0/backlight-ypr0.c
 #endif
-target/hosted/ypr0/ascodec-ypr0.c
-target/hosted/ypr0/powermgmt-ypr0.c
-target/hosted/ypr0/gpio_ypr0.c
-target/hosted/ypr0/audio-ypr0.c
+target/hosted/samsungypr/ypr0/ascodec-ypr0.c
+target/hosted/samsungypr/ypr0/powermgmt-ypr0.c
+target/hosted/samsungypr/gpio_ypr.c
+target/hosted/samsungypr/ypr0/audio-ypr0.c
 #if CONFIG_TUNER
-target/hosted/ypr0/radio-ypr0.c
+target/hosted/samsungypr/radio-ypr.c
 #endif
 #endif
 

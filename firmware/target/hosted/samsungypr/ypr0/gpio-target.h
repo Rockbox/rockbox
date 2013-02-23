@@ -5,7 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
+ * $Id$
+ * 
  * Module wrapper for GPIO, using /dev/r0GPIO (r0Gpio.ko) of Samsung YP-R0
  *
  * Copyright (c) 2011 Lorenzo Miori
@@ -20,8 +21,8 @@
  *
  ****************************************************************************/
 
-#ifndef GPIO_YPR0_H
-#define GPIO_YPR0_H
+#ifndef GPIO_TARGET_H
+#define GPIO_TARGET_H
 
 #include "r0GPIOIoctl.h"
 
@@ -42,7 +43,6 @@
 #define GPIO_FM_BUS_EN              GPIO2_19
 
 /* Keypad */
-
 #define GPIO_BACK_KEY               GPIO2_29
 #define GPIO_USER_KEY               GPIO2_30
 #define GPIO_MENU_KEY               GPIO2_31
@@ -59,4 +59,4 @@ void gpio_close(void);
 int gpio_control_struct(int request, R0GPIOInfo pin);
 int gpio_control(int request, int num, int mode, int val);
 
-#endif
+#endif /* GPIO_TARGET_H */

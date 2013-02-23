@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: button-sdl.c 30482 2011-09-08 14:53:28Z kugel $
+ * $Id$
  *
  * Copyright (C) 2011 Lorenzo Miori
  *
@@ -24,38 +24,47 @@
 #include "kernel.h"
 #include "system.h"
 #include "button-target.h"
-#include <gpio_ypr0.h> /* For headphones sense and buttons */
+#include <gpio-target.h> /* For headphones sense and buttons */
 
 int button_read_device(void)
 {
     int key = BUTTON_NONE;
 
     /* Check for all the keys */
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_USER_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_USER_KEY, 0, 0))
+    {
         key |= BUTTON_USER;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_CENTRAL_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_CENTRAL_KEY, 0, 0))
+    {
         key |= BUTTON_SELECT;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_UP_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_UP_KEY, 0, 0))
+    {
         key |= BUTTON_UP;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_DOWN_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_DOWN_KEY, 0, 0))
+    {
         key |= BUTTON_DOWN;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_LEFT_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_LEFT_KEY, 0, 0))
+    {
         key |= BUTTON_LEFT;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_RIGHT_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_RIGHT_KEY, 0, 0))
+    {
         key |= BUTTON_RIGHT;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_MENU_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_MENU_KEY, 0, 0))
+    {
         key |= BUTTON_MENU;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_BACK_KEY, 0, 0)) {
+    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_BACK_KEY, 0, 0))
+    {
         key |= BUTTON_BACK;
     }
-    if (gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_POWER_KEY, 0, 0)) {
+    if (gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_POWER_KEY, 0, 0))
+    {
         key |= BUTTON_POWER;
     }
 
