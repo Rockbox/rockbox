@@ -12407,15 +12407,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Amélioration 3D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Amélioration des effets 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "Amélioration 3D"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Amélioration des effets 3D"
   </voice>
 </phrase>
 <phrase>
@@ -12805,16 +12805,16 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes (unused in UI)
+  desc: default sleep timer duration in minutes
   user: core
   <source>
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Durée par défault de la minuterie d'arrêt"
+    *: "Durée par défaut de la minuterie d'arrêt"
   </dest>
   <voice>
-    *: "Durée par défault de la minuterie d'arrêt"
+    *: "Durée par défaut de la minuterie d'arrêt"
   </voice>
 </phrase>
 <phrase>
