@@ -1198,13 +1198,9 @@ static int parse_albumart_load(struct skin_element* element,
     /* if we got here, we parsed everything ok .. ! */
     if (aa->width < 0)
         aa->width = 0;
-    else if (aa->width > curr_vp->vp.width)
-        aa->width = curr_vp->vp.width;
 
     if (aa->height < 0)
         aa->height = 0;
-    else if (aa->height > curr_vp->vp.height)
-        aa->height = curr_vp->vp.height;
 
     if (swap_for_rtl)
         aa->x = (curr_vp->vp.width - aa->width - aa->x);
