@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///ew\u003d",
+        "filename": "firmware/export/config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "You can remove that part from the patch, it now changes nothing but introduces noise in the git history.",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///e0\u003d",
+        "filename": "firmware/target/hosted/samsungypr/gpio_ypr.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "This bug fix should be a separate commit. Actually, wasn\u0027t there a already a gerrit ticket about it?",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///e4\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-target.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "Can you put the movement of these functions into a separate commit?",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///e8\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "Can you put the movement of these functions into a separate commit?",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///fE\u003d",
+        "filename": "firmware/target/hosted/samsungypr/radio-ypr.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "Just remove the braces entirely",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///fA\u003d",
+        "filename": "firmware/target/hosted/samsungypr/radio-ypr.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "Why do you change the brace style? If you don\u0027t like it let it be a separate commit.",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///fI\u003d",
+        "filename": "firmware/target/hosted/samsungypr/radio-ypr.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "Don\u0027t actually insert $Id$ lines. They are a rememenant from the SVN days and should actually be removed.",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///fM\u003d",
+        "filename": "firmware/target/hosted/samsungypr/ypr0/ascodec-ypr0.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "Simply remove the braces entirely",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///fU\u003d",
+        "filename": "firmware/target/hosted/samsungypr/ypr0/button-ypr0.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "If you already change the braces then you can remove them aloghether (single statement if). should ideally be a separate commit, though, but I won\u0027t insist on it.",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///fY\u003d",
+        "filename": "tools/configure",
+        "patchSetId": 2
+      },
+      "lineNbr": 3935,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 1,
+      "message": "Just change t_manufacturer to samsungypr and t_model to ypr0 in the large case construct instead of this special casing here.",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}

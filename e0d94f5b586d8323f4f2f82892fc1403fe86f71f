@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///fQ\u003d",
+        "filename": "firmware/target/hosted/samsungypr/ypr0/backlight-ypr0.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:48:23Z",
+      "side": 0,
+      "message": "Can you put the movement of these functions into a separate commit?",
+      "revId": "e0d94f5b586d8323f4f2f82892fc1403fe86f71f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
