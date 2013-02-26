@@ -546,7 +546,10 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         if (callback)
         {
             if (callback(element, callback_data) == CALLBACK_ERROR)
+            {
+                skin_error(GOT_CALLBACK_ERROR, cursor);
                 return 0;
+            }
         }
 #endif
         *document = cursor;
@@ -822,7 +825,10 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
     if (callback)
     {
         if (callback(element, callback_data) == CALLBACK_ERROR)
+        {
+            skin_error(GOT_CALLBACK_ERROR, *document);
             return 0;
+        }
     }
 #endif
     *document = cursor;

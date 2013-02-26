@@ -79,7 +79,8 @@ enum skin_errorcode
     DECIMAL_EXPECTED,
     SEPARATOR_EXPECTED,
     CLOSE_EXPECTED,
-    MULTILINE_EXPECTED
+    MULTILINE_EXPECTED,
+    GOT_CALLBACK_ERROR
 };
 
 /* Holds a tag parameter, either numeric or text */

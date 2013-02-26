@@ -105,6 +105,9 @@ void skin_error(enum skin_errorcode error, const char* cursor)
     case MULTILINE_EXPECTED:
         error_message = "Expected subline separator";
         break;
+    case GOT_CALLBACK_ERROR:
+        error_message = "Parser callback returned error";
+        break;
     };
 
 }

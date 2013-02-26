@@ -465,7 +465,7 @@ static int parse_font_load(struct skin_element *element,
     if (id < 2)
     {
         DEBUGF("font id must be >= 2 (%d)\n", id);
-        return 1;
+        return -1;
     }
 #if defined(DEBUG) || defined(SIMULATOR)
     if (skinfonts[id-2].name != NULL)
@@ -543,7 +543,7 @@ static int parse_listitem(struct skin_element *element,
     (void)wps_data;
     struct listitem *li = skin_buffer_alloc(sizeof(*li));
     if (!li)
-        return 1;
+        return -1;
     token->value.data = PTRTOSKINOFFSET(skin_buffer, li);
     if (element->params_count == 0)
         li->offset = 0;
@@ -2227,7 +2227,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
             }
             if (function)
             {
-                if (function(element, token, wps_data) < 0)
+                if (function(element, token, wps_data) != 0)
                     return CALLBACK_ERROR;
             }
             /* tags that start with 'F', 'I' or 'D' are for the next file */
