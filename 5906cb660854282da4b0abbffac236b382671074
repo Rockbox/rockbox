@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///ek\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:52:11Z",
+      "side": 1,
+      "message": "Why do you change the brace style? Is it because you don\u0027t like it?",
+      "revId": "5906cb660854282da4b0abbffac236b382671074",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///eo\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-02-26T10:52:11Z",
+      "side": 1,
+      "message": "Dont use braces for single-statement ifs",
+      "revId": "5906cb660854282da4b0abbffac236b382671074",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
