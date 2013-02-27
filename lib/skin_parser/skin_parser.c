@@ -152,7 +152,10 @@ static struct skin_element* skin_parse_viewport(const char** document)
     else if (callback)
     {
         if (callback(retval, callback_data) == CALLBACK_ERROR)
+        {
+            skin_error(GOT_CALLBACK_ERROR, cursor);
             return NULL;
+        }
     }
 #endif
 
@@ -329,6 +332,7 @@ static struct skin_element* skin_parse_line_optional(const char** document,
         switch (callback(retval, callback_data))
         {
             case CALLBACK_ERROR:
+                skin_error(GOT_CALLBACK_ERROR, cursor);
                 return NULL;
             default:
                 break;
@@ -475,7 +479,10 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
     if (callback)
     {
         if (callback(retval, callback_data) == CALLBACK_ERROR)
+        {
+            skin_error(GOT_CALLBACK_ERROR, *document);
             return NULL;
+        }
     }
 #endif
     *document = cursor;
@@ -896,7 +903,10 @@ static int skin_parse_text(struct skin_element* element, const char** document,
     if (callback)
     {
         if (callback(element, callback_data) == CALLBACK_ERROR)
+        {
+            skin_error(GOT_CALLBACK_ERROR, *document);
             return 0;
+        }
     }
 #endif
 
