@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///eY\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-03-02T10:09:07Z",
+      "side": 1,
+      "message": "Well, no. Simply because it was inconsistent with the style of the file...",
+      "parentUuid": "AAAASX///ek\u003d",
+      "revId": "5906cb660854282da4b0abbffac236b382671074",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///eo\u003d",
         "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2013-02-26T10:52:11Z",
       "side": 1,
       "message": "Dont use braces for single-statement ifs",
+      "revId": "5906cb660854282da4b0abbffac236b382671074",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///eU\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-03-02T10:09:07Z",
+      "side": 1,
+      "message": "Okay, received, I thought it was better...",
+      "parentUuid": "AAAASX///eo\u003d",
       "revId": "5906cb660854282da4b0abbffac236b382671074",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
