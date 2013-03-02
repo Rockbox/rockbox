@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///eI\u003d",
+        "filename": "firmware/target/hosted/samsungypr/gpio_ypr.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-03-02T22:07:09Z",
+      "side": 1,
+      "message": "Why that? It\u0027s a pretty trivial thing...I know that in this way it\u0027s difficult to track things but.\nIn any case I will do a gpio-subsystem refactoring, so okay I will include this into the new refactoring!",
+      "parentUuid": "AAAASX///e0\u003d",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///e4\u003d",
         "filename": "firmware/target/hosted/samsungypr/lcd-target.h",
         "patchSetId": 2
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///eE\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-target.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-03-02T22:07:09Z",
+      "side": 1,
+      "message": "Sure, now that there is a LCD patch that completely changes this it\u0027s logical indeed :)",
+      "parentUuid": "AAAASX///e4\u003d",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///e8\u003d",
         "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
         "patchSetId": 2
@@ -64,6 +100,24 @@
       "writtenOn": "2013-02-26T10:48:23Z",
       "side": 1,
       "message": "Can you put the movement of these functions into a separate commit?",
+      "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///eA\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2013-03-02T22:07:09Z",
+      "side": 1,
+      "message": "Sure, now that there is a LCD patch that completely changes this it\u0027s logical indeed :)",
+      "parentUuid": "AAAASX///e8\u003d",
       "revId": "9496f6830a564248027b3582f9e8e9ac62809c3d",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
