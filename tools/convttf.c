@@ -111,6 +111,7 @@ int             trim_dp     = 0; /* trim descent percent */
 int             trim_da     = 0; /* trim descnet actual  */
 int             trim_ap     = 0; /* trim ascent  precent */
 int             trim_aa     = 0; /* trim ascent  actual  */
+int             ft_load_opts = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP;
 
 struct font_header_struct {
     char header[4];                 /* magic number and version bytes */
@@ -207,6 +208,7 @@ void usage(void)
         "    -t N   Index of true type collection. It must be start from 0.(default N=0).\n"
         "    -ta    Convert all fonts in ttc (ignores outfile option)\n"
         "    -w     Don't try to make digits (0-9) equally wide\n"
+        "    -L     Use lighter hinting algorithm\n"
     };
     fprintf(stderr, "%s", help);
     exit( 1 );
@@ -543,7 +545,7 @@ FT_Long check_digit_width( FT_Face face )
     {
         FT_Glyph_Metrics* metrics;
 
-        FT_Load_Char(face, code, FT_LOAD_RENDER | FT_LOAD_NO_BITMAP);
+        FT_Load_Char(face, code, ft_load_opts);
         metrics = &face->glyph->metrics;
 
         if ((last_advance != -1 && last_advance != metrics->horiAdvance) ||
@@ -687,8 +689,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
     {
         charindex = getcharindex( face, code);
         if ( !(charindex) ) continue;
-        err = FT_Load_Glyph( face, charindex, 
-                               (FT_LOAD_RENDER | FT_LOAD_NO_BITMAP) );
+        err = FT_Load_Glyph(face, charindex, ft_load_opts);
         if ( err ) continue;
 
         w = glyph_width( face, code, digit_width );
@@ -770,8 +771,7 @@ void convttf(char* path, char* destfile, FT_Long face_index)
             continue;
         }
         
-        err = FT_Load_Glyph( face, charindex , 
-                               (FT_LOAD_RENDER | FT_LOAD_NO_BITMAP) );
+        err = FT_Load_Glyph(face, charindex, ft_load_opts);
         if ( err ) {
             continue;
         }
@@ -1253,6 +1253,9 @@ void getopts(int *pac, char ***pav)
                 digits_equally_wide = 0;
                 while (*p && *p != ' ')
                     p++;
+                break;
+            case 'L':     /* Light rendering algorithm */
+                ft_load_opts |= FT_LOAD_TARGET_LIGHT;
                 break;
 
             default:
