@@ -1497,7 +1497,7 @@ const struct settings_list settings[] = {
                   "eq enabled", NULL),
 
     INT_SETTING_NOWRAP(F_EQSETTING, eq_precut, LANG_EQUALIZER_PRECUT, 0,
-                       "eq precut", UNIT_DB, 0, 240, 5, eq_precut_format,
+                       "eq precut", UNIT_DB, 0, 240, 1, eq_precut_format,
                        get_precut_talkid, dsp_set_eq_precut),
 
     /* 0..32768 Hz */
