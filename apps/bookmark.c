@@ -435,7 +435,7 @@ bool bookmark_autoload(const char* file)
     }
     else
     {
-        select_bookmark(global_bookmark_file_name, true, &bookmark);
+        int ret = select_bookmark(global_bookmark_file_name, true, &bookmark);
         
         if (bookmark != NULL)
         {
@@ -451,7 +451,7 @@ bool bookmark_autoload(const char* file)
             return true;
         }
 
-        return false;
+        return ret != BOOKMARK_SUCCESS;
     }
 }
 
@@ -801,8 +801,9 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
                 *selected_bookmark = bookmarks->items[item - bookmarks->start];
                 return BOOKMARK_SUCCESS;
             }
-            
-            /* Else fall through */
+            exit = true;
+            ret = BOOKMARK_SUCCESS;
+            break;
 
         case ACTION_TREE_WPS:
         case ACTION_STD_CANCEL:
