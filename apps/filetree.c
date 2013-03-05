@@ -99,7 +99,7 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
         return false;
     }
 
-    if (bookmark_autoload(pathname))
+    if (bookmark_autoload(pathname, filename))
     {
         return false;
     }
@@ -468,7 +468,7 @@ int ft_enter(struct tree_context* c)
                 break;
 
             case FILE_ATTR_AUDIO:
-                if (bookmark_autoload(c->currdir))
+                if (bookmark_autoload(c->currdir, file->name))
                     break;
 
                 splash(0, ID2P(LANG_WAIT));

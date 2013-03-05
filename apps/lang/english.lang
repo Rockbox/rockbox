@@ -13156,3 +13156,17 @@
     *: "Slow"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECTED_ONLY_ASK
+  desc: Save in recent bookmarks only
+  user: core
+  <source>
+    *: "Ask - Selected track only"
+  </source>
+  <dest>
+    *: "Ask - Selected track only"
+  </dest>
+  <voice>
+    *: "Ask - Selected track only"
+  </voice>
+</phrase>
