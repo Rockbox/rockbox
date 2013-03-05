@@ -12908,54 +12908,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KEYCLICK_HARDWARE
-  desc: in keyclick settings menu
-  user: core
-  <source>
-    *: none
-    hardware_click: "Speaker Keyclick"
-  </source>
-  <dest>
-    *: none
-    hardware_click: "Clic de la touche haut-parleur"
-  </dest>
-  <voice>
-    *: none
-    hardware_click: "Clic de la touche haut-parleur"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYCLICK_SOFTWARE
-  desc: in keyclick settings menu
-  user: core
-  <source>
-    *: none
-    hardware_click: "Headphone Keyclick"
-  </source>
-  <dest>
-    *: none
-    hardware_click: "Clic de la touche écouteur"
-  </dest>
-  <voice>
-    *: none
-    hardware_click: "Clic de la touche écouteur"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHORTCUTS
-  desc: Title in the shortcuts menu
-  user: core
-  <source>
-    *: "Shortcuts"
-  </source>
-  <dest>
-    *: "Raccourcis"
-  </dest>
-  <voice>
-    *: "Raccourcis"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_STARTUP_SHUTDOWN
   desc: in the general settings menu
   user: core
@@ -12981,5 +12933,126 @@
   </dest>
   <voice>
     *: "Redémarrer la mise en veille programmable sur pression d'une touche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Sélectionnez un ou plusieurs dossier"
+  </dest>
+  <voice>
+    *: "Sélectionnez un ou plusieurs dossier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Simple (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Simple"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Démarrer la minuterie d'arrêt"
+  </dest>
+  <voice>
+    *: "Démarrer la minuterie d'arrêt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Sélectionnez les dossiers à explorer"
+  </dest>
+  <voice>
+    *: "Sélectionnez les dossiers à explorer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Europe de l'Est (CP1252)"
+  </source>
+  <dest>
+    *: "Europe de l'Est (CP1252)"
+  </dest>
+  <voice>
+    *: "Europe de l'Est"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Personnalisé"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Personnalisé"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Utiliser les raccourcis au lieu des réglages rapides"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Utiliser les raccourcis au lieu des réglages rapides"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Restreindre le changement de répertoire auto"
+  </dest>
+  <voice>
+    *: "Restreindre le changement de répertoire auto"
   </voice>
 </phrase>
