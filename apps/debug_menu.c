@@ -2287,7 +2287,7 @@ static const struct {
 #ifndef APPLICATION
         { "Screendump", dbg_screendump },
 #endif
-        { "Skin Engine Ram usage", dbg_skin_engine },
+        { "Skin Engine RAM usage", dbg_skin_engine },
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View HW info", dbg_hw_info },
