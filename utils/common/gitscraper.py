@@ -80,7 +80,7 @@ def get_lstree(repo, start, filterlist=[]):
         return objects
 
     for line in cmdout[0].decode().split('\n'):
-        regex = re.findall(b'([0-9]+)\s+([a-z]+)\s+([0-9a-f]+)\s+(\S+)',
+        regex = re.findall(b'([0-9]+)\s+([a-z]+)\s+([0-9a-f]+)\s+(.*)',
                 line.encode())
         for rf in regex:
             # filter
