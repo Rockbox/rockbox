@@ -19,6 +19,8 @@
 # - Nicolay Jordanov
 # - Hristo Kovachev
 # - Vencislav Atanasov
+#- Zahari yurukov <zahari.yurukov@gmail.com>
+
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -30,7 +32,7 @@
     *: "Да"
   </dest>
   <voice>
-    *: ""
+    *: "Да"
   </voice>
 </phrase>
 <phrase>
@@ -44,7 +46,7 @@
     *: "Не"
   </dest>
   <voice>
-    *: ""
+    *: "Не"
   </voice>
 </phrase>
 <phrase>
@@ -58,7 +60,7 @@
     *: "Включено"
   </dest>
   <voice>
-    *: ""
+    *: "Включено"
   </voice>
 </phrase>
 <phrase>
@@ -72,7 +74,7 @@
     *: "Изключено"
   </dest>
   <voice>
-    *: ""
+    *: "Изключено"
   </voice>
 </phrase>
 <phrase>
@@ -83,10 +85,10 @@
     *: "Ask"
   </source>
   <dest>
-    *: "Питане"
+    *: "Питай"
   </dest>
   <voice>
-    *: ""
+    *: "Питай"
   </voice>
 </phrase>
 <phrase>
@@ -100,7 +102,7 @@
     *: "Винаги"
   </dest>
   <voice>
-    *: ""
+    *: "Винаги"
   </voice>
 </phrase>
 <phrase>
@@ -114,7 +116,7 @@
     *: "Нормален"
   </dest>
   <voice>
-    *: ""
+    *: "Нормален"
   </voice>
 </phrase>
 <phrase>
@@ -128,7 +130,7 @@
     *: "Усилване"
   </dest>
   <voice>
-    *: ""
+    *: "Усилване"
   </voice>
 </phrase>
 <phrase>
@@ -142,7 +144,7 @@
     *: "Зареждане..."
   </dest>
   <voice>
-    *: ""
+    *: "Зареждане..."
   </voice>
 </phrase>
 <phrase>
@@ -153,7 +155,7 @@
     *: "Loading... %d%% done (%s)"
   </source>
   <dest>
-    *: "Зареждане... Завършени %d%% (%s)"
+    *: "Зареждане... %d%% готови (%s)"
   </dest>
   <voice>
     *: ""
@@ -170,7 +172,7 @@
     *: "Сканиране на диска..."
   </dest>
   <voice>
-    *: ""
+    *: "Сканиране на диска..."
   </voice>
 </phrase>
 <phrase>
@@ -184,7 +186,7 @@
     *: "Изключване..."
   </dest>
   <voice>
-    *: ""
+    *: "Изключване..."
   </voice>
 </phrase>
 <phrase>
@@ -198,7 +200,7 @@
     *: "Отказано"
   </dest>
   <voice>
-    *: ""
+    *: "Отказано"
   </voice>
 </phrase>
 <phrase>
@@ -212,7 +214,7 @@
     *: "неуспешно"
   </dest>
   <voice>
-    *: ""
+    *: "неуспешно"
   </voice>
 </phrase>
 <phrase>
@@ -226,7 +228,7 @@
     *: "Канали"
   </dest>
   <voice>
-    *: ""
+    *: "Канали"
   </voice>
 </phrase>
 <phrase>
@@ -240,7 +242,7 @@
     *: "Сигурен ли сте?"
   </dest>
   <voice>
-    *: ""
+    *: "Сигурен ли сте?"
   </voice>
 </phrase>
 <phrase>
@@ -283,7 +285,7 @@
   </dest>
   <voice>
     *: ""
-    archosplayer: ""
+    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -294,10 +296,10 @@
     *: "Rockbox"
   </source>
   <dest>
-    *: "Рокбокс"
+    *: "Rockbox"
   </dest>
   <voice>
-    *: ""
+    *: "Rockbox"
   </voice>
 </phrase>
 <phrase>
@@ -308,10 +310,10 @@
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "Скорощни отметки"
+    *: "Скорошни отметки"
   </dest>
   <voice>
-    *: ""
+    *: "Скорошни отметки"
   </voice>
 </phrase>
 <phrase>
@@ -325,7 +327,7 @@
     *: "Файлове"
   </dest>
   <voice>
-    *: ""
+    *: "Файлове"
   </voice>
 </phrase>
 <phrase>
@@ -339,7 +341,7 @@
     *: "База данни"
   </dest>
   <voice>
-    *: ""
+    *: "База данни"
   </voice>
 </phrase>
 <phrase>
@@ -353,7 +355,7 @@
     *: "В момента свири"
   </dest>
   <voice>
-    *: ""
+    *: "В момента свири"
   </voice>
 </phrase>
 <phrase>
@@ -367,7 +369,7 @@
     *: "Подновяване на свиренето"
   </dest>
   <voice>
-    *: ""
+    *: "Подновяване на свиренето"
   </voice>
 </phrase>
 <phrase>
@@ -381,7 +383,7 @@
     *: "Настройки"
   </dest>
   <voice>
-    *: ""
+    *: "Настройки"
   </voice>
 </phrase>
 <phrase>
@@ -398,7 +400,7 @@
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Запис"
   </voice>
 </phrase>
 <phrase>
@@ -414,8 +416,8 @@
     radio: "FM Радио"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "FM Радио"
   </voice>
 </phrase>
 <phrase>
@@ -443,7 +445,7 @@
     *: "Плъгини"
   </dest>
   <voice>
-    *: ""
+    *: "Плъгини"
   </voice>
 </phrase>
 <phrase>
@@ -457,7 +459,7 @@
     *: "Системни"
   </dest>
   <voice>
-    *: ""
+    *: "Системни"
   </voice>
 </phrase>
 <phrase>
@@ -471,7 +473,7 @@
     *: "Избиране на отметка"
   </dest>
   <voice>
-    *: ""
+    *: "Избиране на отметка"
   </voice>
 </phrase>
 <phrase>
@@ -485,7 +487,7 @@
     *: "<Не подновявай>"
   </dest>
   <voice>
-    *: ""
+    *: "Не подновявай"
   </voice>
 </phrase>
 <phrase>
@@ -513,7 +515,7 @@
     *: "<Невалидна отметка>"
   </dest>
   <voice>
-    *: ""
+    *: "Невалидна отметка"
   </voice>
 </phrase>
 <phrase>
@@ -527,7 +529,7 @@
     *: "Действия с отметките"
   </dest>
   <voice>
-    *: ""
+    *: "Действия с отметките"
   </voice>
 </phrase>
 <phrase>
@@ -541,7 +543,7 @@
     *: "Подновяване"
   </dest>
   <voice>
-    *: ""
+    *: "Подновяване"
   </voice>
 </phrase>
 <phrase>
@@ -555,7 +557,7 @@
     *: "Изтриване"
   </dest>
   <voice>
-    *: ""
+    *: "Изтриване"
   </voice>
 </phrase>
 <phrase>
@@ -569,7 +571,7 @@
     *: "Създаване на отметка?"
   </dest>
   <voice>
-    *: "ноне"
+    *: "Създаване на отметка?"
   </voice>
 </phrase>
 <phrase>
@@ -583,7 +585,7 @@
     *: "Отметката е създадена"
   </dest>
   <voice>
-    *: ""
+    *: "Отметката е създадена"
   </voice>
 </phrase>
 <phrase>
@@ -597,7 +599,7 @@
     *: "Неуспешна отметка!"
   </dest>
   <voice>
-    *: ""
+    *: "Неуспешна отметка!"
   </voice>
 </phrase>
 <phrase>
@@ -611,7 +613,7 @@
     *: "Отметката е празна"
   </dest>
   <voice>
-    *: ""
+    *: "Отметката е празна"
   </voice>
 </phrase>
 <phrase>
@@ -625,7 +627,7 @@
     *: "Звукови настройки"
   </dest>
   <voice>
-    *: ""
+    *: "Звукови настройки"
   </voice>
 </phrase>
 <phrase>
@@ -639,7 +641,7 @@
     *: "Сила на звука"
   </dest>
   <voice>
-    *: ""
+    *: "Сила на звука"
   </voice>
 </phrase>
 <phrase>
@@ -653,7 +655,7 @@
     *: "Бас"
   </dest>
   <voice>
-    *: ""
+    *: "Бас"
   </voice>
 </phrase>
 <phrase>
@@ -667,7 +669,7 @@
     *: "Високи"
   </dest>
   <voice>
-    *: ""
+    *: "Високи"
   </voice>
 </phrase>
 <phrase>
@@ -681,7 +683,7 @@
     *: "Баланс"
   </dest>
   <voice>
-    *: ""
+    *: "Баланс"
   </voice>
 </phrase>
 <phrase>
@@ -695,7 +697,7 @@
     *: "Конфигурация на каналите"
   </dest>
   <voice>
-    *: ""
+    *: "Конфигурация на каналите"
   </voice>
 </phrase>
 <phrase>
@@ -709,7 +711,7 @@
     *: "Стерео"
   </dest>
   <voice>
-    *: ""
+    *: "Стерео"
   </voice>
 </phrase>
 <phrase>
@@ -723,7 +725,7 @@
     *: "Моно"
   </dest>
   <voice>
-    *: ""
+    *: "Моно"
   </voice>
 </phrase>
 <phrase>
@@ -737,7 +739,7 @@
     *: "Персонално"
   </dest>
   <voice>
-    *: ""
+    *: "Персонално"
   </voice>
 </phrase>
 <phrase>
@@ -751,7 +753,7 @@
     *: "Ляво моно"
   </dest>
   <voice>
-    *: ""
+    *: "Ляво моно"
   </voice>
 </phrase>
 <phrase>
@@ -765,7 +767,7 @@
     *: "Дясно моно"
   </dest>
   <voice>
-    *: ""
+    *: "Дясно моно"
   </voice>
 </phrase>
 <phrase>
@@ -778,11 +780,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Моно ляво+дясно"
+    recording_swcodec: "Моно Ляв + Десен"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Моно ляво и дясно"
+    recording_swcodec: "Моно Ляв + Десен"
   </voice>
 </phrase>
 <phrase>
@@ -796,7 +798,7 @@
     *: "Караоке"
   </dest>
   <voice>
-    *: ""
+    *: "Караоке"
   </voice>
 </phrase>
 <phrase>
@@ -807,10 +809,10 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Широчина на стереото"
+    *: "Ширина на стереото"
   </dest>
   <voice>
-    *: ""
+    *: "Ширина на стереото"
   </voice>
 </phrase>
 <phrase>
@@ -826,8 +828,8 @@
     swcodec: "Кросфийд"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Кросфийд"
   </voice>
 </phrase>
 <phrase>
@@ -843,8 +845,8 @@
     swcodec: "Директно усилване"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Директно усилване"
   </voice>
 </phrase>
 <phrase>
@@ -857,11 +859,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Cross усилване"
+    swcodec: "Кръстосано усилване"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Кръстосано усилване"
   </voice>
 </phrase>
 <phrase>
@@ -877,8 +879,8 @@
     swcodec: "Намаляване на високите честоти"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Намаляване на високите честоти"
   </voice>
 </phrase>
 <phrase>
@@ -891,11 +893,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Горна честота на Cutoff"
+    swcodec: "Горна честота на подрязване"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Горна честота на подрязване"
   </voice>
 </phrase>
 <phrase>
@@ -911,8 +913,8 @@
     swcodec: "Еквалайзер"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Еквалайзер"
   </voice>
 </phrase>
 <phrase>
@@ -928,8 +930,8 @@
     swcodec: "Включване на EQ"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Включване на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -946,7 +948,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: none
+    swcodec: "Графичен еквалайзер"
   </voice>
 </phrase>
 <phrase>
@@ -959,11 +961,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Precut"
+    swcodec: "Преподрязване"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Преподрязване"
   </voice>
 </phrase>
 <phrase>
@@ -979,8 +981,8 @@
     swcodec: "Прости настройки на EQ"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Прости настройки на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -993,11 +995,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Разширени настройки на еквалайзера"
+    swcodec: "Разширени настройки на EQ"
   </dest>
   <voice>
     *: none
-    swcodec: none
+    swcodec: "Разширени настройки на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -1010,11 +1012,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Запазване на настройките на еквалайзера"
+    swcodec: "Запазване на настройките на EQ"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Запазване на настройките на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -1027,11 +1029,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Разглеждане на EQ настройки"
+    swcodec: "Разглеждане на EQ конфигурации"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Разглеждане на EQ конфигурации"
   </voice>
 </phrase>
 <phrase>
@@ -1047,7 +1049,7 @@
     swcodec: "Режим на редактиране: %s"
   </dest>
   <voice>
-    *: ""
+    *: none
     swcodec: ""
   </voice>
 </phrase>
@@ -1064,8 +1066,8 @@
     swcodec: "Усилване на лента %d Hz"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Усилване на лента"
   </voice>
 </phrase>
 <phrase>
@@ -1078,11 +1080,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Low Shelf филтър"
+    swcodec: "Филтър за ниски честоти"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Филтър за ниски честоти"
   </voice>
 </phrase>
 <phrase>
@@ -1095,11 +1097,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Филтър на пикове %d"
+    swcodec: "Пиков филтър %d"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Пиков филтър"
   </voice>
 </phrase>
 <phrase>
@@ -1112,11 +1114,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "High Shelf филтър"
+    swcodec: "Филтър за високи честоти"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Филтър за високи честоти"
   </voice>
 </phrase>
 <phrase>
@@ -1129,11 +1131,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Cutoff Честота"
+    swcodec: "Честота на отрязване"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Честота на отрязване"
   </voice>
 </phrase>
 <phrase>
@@ -1149,8 +1151,8 @@
     swcodec: "Централна честота"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Централна честота"
   </voice>
 </phrase>
 <phrase>
@@ -1180,11 +1182,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Dithering"
+    swcodec: "Колебание"
   </dest>
   <voice>
-    *: ""
-    swcodec: "Dithering"
+    *: none
+    swcodec: "Колебание"
   </voice>
 </phrase>
 <phrase>
@@ -1201,7 +1203,7 @@
   </dest>
   <voice>
     *: none
-    masf: none
+    masf: "Сила"
   </voice>
 </phrase>
 <phrase>
@@ -1218,7 +1220,7 @@
   </dest>
   <voice>
     *: none
-    masf: none
+    masf: "Автоматична сила на звука"
   </voice>
 </phrase>
 <phrase>
@@ -1231,11 +1233,11 @@
   </source>
   <dest>
     *: none
-    masf: "AV Decay Time"
+    masf: "Време на отслабване на AV"
   </dest>
   <voice>
     *: none
-    masf: ""
+    masf: "Време на отслабване на AV"
   </voice>
 </phrase>
 <phrase>
@@ -1251,8 +1253,8 @@
     masf: "Супер бас"
   </dest>
   <voice>
-    *: ""
-    masf: ""
+    *: none
+    masf: "Супер бас"
   </voice>
 </phrase>
 <phrase>
@@ -1268,8 +1270,8 @@
     masf: "Включване на MDB"
   </dest>
   <voice>
-    *: ""
-    masf: ""
+    *: none
+    masf: "Включване на MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1285,8 +1287,8 @@
     masf: "Сила на MDB"
   </dest>
   <voice>
-    *: ""
-    masf: ""
+    *: none
+    masf: "Сила на MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1299,11 +1301,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB Хармонични"
+    masf: "Хармоници на MDB"
   </dest>
   <voice>
-    *: ""
-    masf: ""
+    *: none
+    masf: "Хармоници на MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1316,11 +1318,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB централна честота"
+    masf: "Централна честота на MDB"
   </dest>
   <voice>
-    *: ""
-    masf: ""
+    *: none
+    masf: "Централна честота на MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1336,8 +1338,8 @@
     masf: "Форма на MDB"
   </dest>
   <voice>
-    *: ""
-    masf: ""
+    *: none
+    masf: "Форма на MDB"
   </voice>
 </phrase>
 <phrase>
@@ -1351,7 +1353,7 @@
     *: "Общи настройки"
   </dest>
   <voice>
-    *: ""
+    *: "Общи настройки"
   </voice>
 </phrase>
 <phrase>
@@ -1362,10 +1364,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Плейбек настройки"
+    *: "Настройки на възпроизвеждане"
   </dest>
   <voice>
-    *: ""
+    *: "Настройки на възпроизвеждане"
   </voice>
 </phrase>
 <phrase>
@@ -1379,7 +1381,7 @@
     *: "Разбъркване"
   </dest>
   <voice>
-    *: ""
+    *: "Разбъркване"
   </voice>
 </phrase>
 <phrase>
@@ -1393,7 +1395,7 @@
     *: "Повтаряне"
   </dest>
   <voice>
-    *: ""
+    *: "Повтаряне"
   </voice>
 </phrase>
 <phrase>
@@ -1407,7 +1409,7 @@
     *: "Всички"
   </dest>
   <voice>
-    *: ""
+    *: "Всички"
   </voice>
 </phrase>
 <phrase>
@@ -1421,7 +1423,7 @@
     *: "Една"
   </dest>
   <voice>
-    *: ""
+    *: "Една"
   </voice>
 </phrase>
 <phrase>
@@ -1446,10 +1448,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Свирене първо на избраната"
+    *: "Просвирване първо на избраната"
   </dest>
   <voice>
-    *: ""
+    *: "Просвирване първо на избраната"
   </voice>
 </phrase>
 <phrase>
@@ -1460,10 +1462,10 @@
     *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "Бързо напред/пренавиване(FF/REW)"
+    *: "Бързо напред/пренавиване"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "Бързо напред И пренавиване"
   </voice>
 </phrase>
 <phrase>
@@ -1477,7 +1479,7 @@
     *: "Напр./Наз. Минимална стъпка"
   </dest>
   <voice>
-    *: ""
+    *: "Напред/Назад Минимална стъпка"
   </voice>
 </phrase>
 <phrase>
@@ -1491,7 +1493,7 @@
     *: "Напр./Наз. ускоряване"
   </dest>
   <voice>
-    *: ""
+    *: "Напред/Назад ускоряване"
   </voice>
 </phrase>
 <phrase>
@@ -1507,7 +1509,8 @@
     flash_storage: none
   </dest>
   <voice>
-    *: ""
+    *: "Буфер против прекъсване"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -1521,7 +1524,7 @@
     *: "Затихване при стоп/пауза"
   </dest>
   <voice>
-    *: ""
+    *: "Затихване при стоп и пауза"
   </voice>
 </phrase>
 <phrase>
@@ -1532,10 +1535,10 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Режим 'парти'"
+    *: "Режим парти"
   </dest>
   <voice>
-    *: ""
+    *: "Режим парти"
   </voice>
 </phrase>
 <phrase>
@@ -1548,11 +1551,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "Кросфейд"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Кросфейд"
   </voice>
 </phrase>
 <phrase>
@@ -1565,11 +1568,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Включване на Crossfade"
+    crossfade: "Включване на  Кросфейд"
   </dest>
   <voice>
     *: none
-    crossfade: none
+    crossfade: "Включване на  Кросфейд"
   </voice>
 </phrase>
 <phrase>
@@ -1582,11 +1585,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Само при пропускане на трак"
+    crossfade: "Само при ръчно пропускане на запис"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Само при ръчно пропускане на запис"
   </voice>
 </phrase>
 <phrase>
@@ -1599,11 +1602,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Разбъркване и пропускане на трак"
+    crossfade: "Разбъркване или ръчно пропускане на запис"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Разбъркване или ръчно пропускане на запис"
   </voice>
 </phrase>
 <phrase>
@@ -1616,11 +1619,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Задържане на засилването"
+    crossfade: "Забавяне при навлизане"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Забавяне при навлизане"
   </voice>
 </phrase>
 <phrase>
@@ -1633,11 +1636,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Продължителност на постепенното започване"
+    crossfade: "Продължителност на навлизане"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Продължителност на навлизане"
   </voice>
 </phrase>
 <phrase>
@@ -1650,11 +1653,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Задържане на затихването"
+    crossfade: "Забавяне при затихване"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Забавяне при затихване"
   </voice>
 </phrase>
 <phrase>
@@ -1667,11 +1670,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Продължителност на затихването"
+    crossfade: "Продължителност на затихване"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Продължителност на затихване"
   </voice>
 </phrase>
 <phrase>
@@ -1687,8 +1690,8 @@
     crossfade: "Режим на затихване"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Режим на затихване"
   </voice>
 </phrase>
 <phrase>
@@ -1704,8 +1707,8 @@
     crossfade: "Смесване"
   </dest>
   <voice>
-    *: ""
-    crossfade: ""
+    *: none
+    crossfade: "Смесване"
   </voice>
 </phrase>
 <phrase>
@@ -1716,10 +1719,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "Усилване на записа"
   </dest>
   <voice>
-    *: ""
+    *: "Усилване на записа"
   </voice>
 </phrase>
 <phrase>
@@ -1732,11 +1735,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Предотвратяване на clipping"
+    swcodec: "Предотвратяване на смущения"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Предотвратяване на смущения"
   </voice>
 </phrase>
 <phrase>
@@ -1747,10 +1750,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Тип на Replaygain"
+    *: "Вид усилване"
   </dest>
   <voice>
-    *: ""
+    *: "Вид усилване"
   </voice>
 </phrase>
 <phrase>
@@ -1761,10 +1764,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Усилване по албум"
+    *: "По албуми"
   </dest>
   <voice>
-    *: ""
+    *: "По албуми"
   </voice>
 </phrase>
 <phrase>
@@ -1775,10 +1778,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Усилване на трак"
+    *: "По записи"
   </dest>
   <voice>
-    *: ""
+    *: "По записи"
   </voice>
 </phrase>
 <phrase>
@@ -1789,10 +1792,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Усилване на траковете ако е в режим на разбъркване"
+    *: "По записи при разбъркване"
   </dest>
   <voice>
-    *: ""
+    *: "По записи при разбъркване"
   </voice>
 </phrase>
 <phrase>
@@ -1806,7 +1809,7 @@
     *: "предусилвател"
   </dest>
   <voice>
-    *: ""
+    *: "предусилвател"
   </voice>
 </phrase>
 <phrase>
@@ -1839,8 +1842,8 @@
     swcodec: "Слабо"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Слабо"
   </voice>
 </phrase>
 <phrase>
@@ -1857,7 +1860,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: none
+    swcodec: "Средно"
   </voice>
 </phrase>
 <phrase>
@@ -1870,11 +1873,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Силен"
+    swcodec: "Силно"
   </dest>
   <voice>
     *: none
-    swcodec: none
+    swcodec: "Силно"
   </voice>
 </phrase>
 <phrase>
@@ -1891,7 +1894,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: none
+    spdif_power: "Оптичен изход"
   </voice>
 </phrase>
 <phrase>
@@ -1902,10 +1905,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Автоматична промяна на директорията"
+    *: "Автоматична промяна на папките"
   </dest>
   <voice>
-    *: ""
+    *: "Автоматична промяна на папките"
   </voice>
 </phrase>
 <phrase>
@@ -1916,10 +1919,10 @@
     *: "Random"
   </source>
   <dest>
-    *: "Случайно"
+    *: "Произволно"
   </dest>
   <voice>
-    *: ""
+    *: "Произволно"
   </voice>
 </phrase>
 <phrase>
@@ -1933,7 +1936,7 @@
     *: "Last.fm лог"
   </dest>
   <voice>
-    *: ""
+    *: "Last.fm лог"
   </voice>
 </phrase>
 <phrase>
@@ -1944,10 +1947,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Поддръжка на cuesheet"
+    *: "Поддръжка на Cuesheet"
   </dest>
   <voice>
-    *: ""
+    *: "Поддръжка на Cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -1963,8 +1966,8 @@
     headphone_detection: "Пауза при изваждане на слушалките"
   </dest>
   <voice>
-    *: ""
-    headphone_detection: ""
+    *: none
+    headphone_detection: "Пауза при изваждане на слушалките"
   </voice>
 </phrase>
 <phrase>
@@ -1977,11 +1980,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Пауза и подновяване"
+    headphone_detection: "Пауза и възобновяване"
   </dest>
   <voice>
-    *: ""
-    headphone_detection: ""
+    *: none
+    headphone_detection: "Пауза и възобновяване"
   </voice>
 </phrase>
 <phrase>
@@ -2008,11 +2011,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Подновяването при стартиране спряно, ако няма слушалки"
+    headphone_detection: "Забрани възобновяването при стартиране при извадени слушалки"
   </dest>
   <voice>
     *: none
-    headphone_detection: none
+    headphone_detection: "Забрани възобновяването при стартиране при извадени слушалки"
   </voice>
 </phrase>
 <phrase>
@@ -2026,7 +2029,7 @@
     *: "Файлове"
   </dest>
   <voice>
-    *: ""
+    *: "Файлове"
   </voice>
 </phrase>
 <phrase>
@@ -2040,7 +2043,7 @@
     *: "Големината на буквите при сортиране има значение"
   </dest>
   <voice>
-    *: ""
+    *: "Големината на буквите при сортиране има значение"
   </voice>
 </phrase>
 <phrase>
@@ -2051,10 +2054,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Сортиране на директориите"
+    *: "Сортиране на папките"
   </dest>
   <voice>
-    *: ""
+    *: "Сортиране на папките"
   </voice>
 </phrase>
 <phrase>
@@ -2068,7 +2071,7 @@
     *: "Сортиране на файловете"
   </dest>
   <voice>
-    *: ""
+    *: "Сортиране на файловете"
   </voice>
 </phrase>
 <phrase>
@@ -2082,7 +2085,7 @@
     *: "Азбучно"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Азбучно"
   </voice>
 </phrase>
 <phrase>
@@ -2096,7 +2099,7 @@
     *: "По дата"
   </dest>
   <voice>
-    *: ""
+    *: "По дата"
   </voice>
 </phrase>
 <phrase>
@@ -2110,7 +2113,7 @@
     *: "По най-нова дата"
   </dest>
   <voice>
-    *: ""
+    *: "По най-нова дата"
   </voice>
 </phrase>
 <phrase>
@@ -2124,7 +2127,7 @@
     *: "По тип"
   </dest>
   <voice>
-    *: ""
+    *: "По тип"
   </voice>
 </phrase>
 <phrase>
@@ -2138,7 +2141,7 @@
     *: "Показване на Файлове"
   </dest>
   <voice>
-    *: ""
+    *: "Показване на Файлове"
   </voice>
 </phrase>
 <phrase>
@@ -2152,7 +2155,7 @@
     *: "Поддържани"
   </dest>
   <voice>
-    *: ""
+    *: "Поддържани"
   </voice>
 </phrase>
 <phrase>
@@ -2166,7 +2169,7 @@
     *: "Музика"
   </dest>
   <voice>
-    *: ""
+    *: "Музика"
   </voice>
 </phrase>
 <phrase>
@@ -2180,7 +2183,7 @@
     *: "Следване на плейлиста"
   </dest>
   <voice>
-    *: ""
+    *: "Следване на плейлиста"
   </voice>
 </phrase>
 <phrase>
@@ -2194,7 +2197,7 @@
     *: "Показване на пътя"
   </dest>
   <voice>
-    *: ""
+    *: "Показване на пътя"
   </voice>
 </phrase>
 <phrase>
@@ -2205,10 +2208,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Само текущата директория"
+    *: "Само текущата папка"
   </dest>
   <voice>
-    *: ""
+    *: "Само текущата папка"
   </voice>
 </phrase>
 <phrase>
@@ -2219,10 +2222,10 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "Пълен път"
+    *: "Пълния път"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "Пълния път"
   </voice>
 </phrase>
 <phrase>
@@ -2248,7 +2251,7 @@
     archosplayer: "Изгр. на БД %d файла"
   </dest>
   <voice>
-    *: "намерени записа за базата данни"
+    *: "Изграждане на базата данни...  намерени записи..."
   </voice>
 </phrase>
 <phrase>
@@ -2264,8 +2267,8 @@
     tc_ramcache: "Зареждане в паметта"
   </dest>
   <voice>
-    *: ""
-    tc_ramcache: ""
+    *: none
+    tc_ramcache: "Зареждане в паметта"
   </voice>
 </phrase>
 <phrase>
@@ -2279,7 +2282,7 @@
     *: "Автоматично обновяване"
   </dest>
   <voice>
-    *: ""
+    *: "Автоматично обновяване"
   </voice>
 </phrase>
 <phrase>
@@ -2293,7 +2296,7 @@
     *: "Инициализиране сега"
   </dest>
   <voice>
-    *: ""
+    *: "Инициализиране сега"
   </voice>
 </phrase>
 <phrase>
@@ -2307,7 +2310,7 @@
     *: "Обновяване сега"
   </dest>
   <voice>
-    *: "Update Now"
+    *: "Обновяване сега"
   </voice>
 </phrase>
 <phrase>
@@ -2321,7 +2324,7 @@
     *: "Добиване на данни по време на работа"
   </dest>
   <voice>
-    *: ""
+    *: "Добиване на данни по време на работа"
   </voice>
 </phrase>
 <phrase>
@@ -2332,10 +2335,10 @@
     *: "Export Modifications"
   </source>
   <dest>
-    *: "Експорт на промените"
+    *: "Експортиране на промените"
   </dest>
   <voice>
-    *: ""
+    *: "Експортиране на промените"
   </voice>
 </phrase>
 <phrase>
@@ -2346,10 +2349,10 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "Вкарване на модификациите"
+    *: "Импортиране на промените"
   </dest>
   <voice>
-    *: ""
+    *: "Импортиране на промените"
   </voice>
 </phrase>
 <phrase>
@@ -2360,10 +2363,10 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Фоново обновяване"
+    *: "Обновяване във фонов режим"
   </dest>
   <voice>
-    *: ""
+    *: "Обновяване във фонов режим"
   </voice>
 </phrase>
 <phrase>
@@ -2374,10 +2377,10 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "Committing database"
+    *: "Предоставяне на базата данни"
   </dest>
   <voice>
-    *: "Committing database"
+    *: "Предоставяне на базата данни"
   </voice>
 </phrase>
 <phrase>
@@ -2391,7 +2394,7 @@
     *: "Базата данни не е готова"
   </dest>
   <voice>
-    *: ""
+    *: "Базата данни не е готова"
   </voice>
 </phrase>
 <phrase>
@@ -2402,10 +2405,10 @@
     *: "<All tracks>"
   </source>
   <dest>
-    *: "<Всички тракове>"
+    *: "<Всички записи>"
   </dest>
   <voice>
-    *: ""
+    *: "Всички записи"
   </voice>
 </phrase>
 <phrase>
@@ -2419,7 +2422,7 @@
     *: "Дисплей"
   </dest>
   <voice>
-    *: ""
+    *: "Дисплей"
   </voice>
 </phrase>
 <phrase>
@@ -2447,10 +2450,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "Екран за възпроизвеждане"
+    *: "Екран по време на просвирване"
   </dest>
   <voice>
-    *: "Екран за възпроизвеждане"
+    *: "Екран по време на просвирване"
   </voice>
 </phrase>
 <phrase>
@@ -2463,11 +2466,11 @@
   </source>
   <dest>
     *: none
-    remote: "Отдалечен екран за възпроизвеждане"
+    remote: "Екран по време на просвирване на дистанционното"
   </dest>
   <voice>
     *: none
-    remote: "Отдалечен екран за възпроизвеждане"
+    remote: "Екран по време на просвирване на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -2481,7 +2484,7 @@
     *: "Настройки на LCD"
   </dest>
   <voice>
-    *: ""
+    *: "Настройки на LCD"
   </voice>
 </phrase>
 <phrase>
@@ -2495,7 +2498,7 @@
     *: "Подсветка на екрана"
   </dest>
   <voice>
-    *: ""
+    *: "Подсветка на екрана"
   </voice>
 </phrase>
 <phrase>
@@ -2511,7 +2514,8 @@
     charging: "Подсветка (при зареждане)"
   </dest>
   <voice>
-    *: ""
+    *: none
+    charging: "Подсветка (при зареждане)"
   </voice>
 </phrase>
 <phrase>
@@ -2524,11 +2528,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Подсветка при hold бутон"
+    hold_button: "Подсветка при закл. клав."
   </dest>
   <voice>
-    *: ""
-    hold_button: ""
+    *: none
+    hold_button: "Подсветка при заключена клавиатура"
   </voice>
 </phrase>
 <phrase>
@@ -2542,7 +2546,7 @@
     *: "Подсветка при смяна на песен"
   </dest>
   <voice>
-    *: ""
+    *: "Подсветка при смяна на песен"
   </voice>
 </phrase>
 <phrase>
@@ -2555,11 +2559,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Постепенна подсведка при вкл"
+    backlight_fade*: "Постепенно включване на подсведката"
   </dest>
   <voice>
-    *: ""
-    backlight_fade*: ""
+    *: none
+    backlight_fade*: "Постепенно включване на подсведката"
   </voice>
 </phrase>
 <phrase>
@@ -2575,8 +2579,8 @@
     backlight_fade*: "Постепенно угасване на подсветката"
   </dest>
   <voice>
-    *: ""
-    backlight_fade*: ""
+    *: none
+    backlight_fade*: "Постепенно угасване на подсветката"
   </voice>
 </phrase>
 <phrase>
@@ -2590,7 +2594,7 @@
     *: "Първото натискане на бутон само осветява екрана"
   </dest>
   <voice>
-    *: ""
+    *: "Първото натискане на бутон само осветява екрана"
   </voice>
 </phrase>
 <phrase>
@@ -2607,7 +2611,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: none
+    lcd_sleep: "Заспиване след спиране на подсветката"
   </voice>
 </phrase>
 <phrase>
@@ -2624,7 +2628,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: none
+    lcd_sleep: "Никога"
   </voice>
 </phrase>
 <phrase>
@@ -2640,8 +2644,8 @@
     backlight_brightness: "Яркост"
   </dest>
   <voice>
-    *: ""
-    backlight_brightness: ""
+    *: none
+    backlight_brightness: "Яркост"
   </voice>
 </phrase>
 <phrase>
@@ -2655,7 +2659,7 @@
     *: "Контраст"
   </dest>
   <voice>
-    *: ""
+    *: "Контраст"
   </voice>
 </phrase>
 <phrase>
@@ -2668,11 +2672,11 @@
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD режим"
+    lcd_invert,remote_lcd_invert: "Режим на LCD"
   </dest>
   <voice>
-    *: ""
-    lcd_invert,remote_lcd_invert: ""
+    *: none
+    lcd_invert,remote_lcd_invert: "Режим на LCD"
   </voice>
 </phrase>
 <phrase>
@@ -2689,7 +2693,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "Инвертиран"
   </voice>
 </phrase>
 <phrase>
@@ -2705,8 +2709,8 @@
     lcd_bitmap: "Отгоре надолу"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Отгоре надолу"
   </voice>
 </phrase>
 <phrase>
@@ -2719,11 +2723,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Вид избирач на ред"
+    lcd_bitmap: "Вид показалец на реда"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Line Selector Type"
+    lcd_bitmap: "Вид показалец на реда"
   </voice>
 </phrase>
 <phrase>
@@ -2739,8 +2743,8 @@
     lcd_bitmap: "Стрелка"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Стрелка"
   </voice>
 </phrase>
 <phrase>
@@ -2756,8 +2760,8 @@
     lcd_bitmap: "Лента (инвертирана)"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Лента (инвертирана)"
   </voice>
 </phrase>
 <phrase>
@@ -2774,7 +2778,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: none
+    lcd_non-mono: "Изчистване на фоновото изображение"
   </voice>
 </phrase>
 <phrase>
@@ -2787,11 +2791,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Фонов цвят"
+    lcd_color: "Цвят на фона"
   </dest>
   <voice>
     *: none
-    lcd_color: none
+    lcd_color: "Цвят на фона"
   </voice>
 </phrase>
 <phrase>
@@ -2804,11 +2808,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Основен цвят"
+    lcd_color: "Цвят на текста"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Цвят на текста"
   </voice>
 </phrase>
 <phrase>
@@ -2824,8 +2828,8 @@
     lcd_color: "Възстановяване на цветовете"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Възстановяване на цветовете"
   </voice>
 </phrase>
 <phrase>
@@ -2841,8 +2845,8 @@
     lcd_color: "RGB"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "RGB"
   </voice>
 </phrase>
 <phrase>
@@ -2858,7 +2862,7 @@
     lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_color: ""
   </voice>
 </phrase>
@@ -2875,8 +2879,8 @@
     lcd_color: "Невалиден цвят"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Невалиден цвят"
   </voice>
 </phrase>
 <phrase>
@@ -2892,8 +2896,8 @@
     remote: "Настройки на LCD на дистанционното"
   </dest>
   <voice>
-    *: ""
-    remote: ""
+    *: none
+    remote: "Настройки на LCD на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -2910,7 +2914,7 @@
   </dest>
   <voice>
     *: none
-    remote_ticking: none
+    remote_ticking: "Намаляване на цъканията"
   </voice>
 </phrase>
 <phrase>
@@ -2924,7 +2928,7 @@
     *: "Показване на икони"
   </dest>
   <voice>
-    *: ""
+    *: "Показване на икони"
   </voice>
 </phrase>
 <phrase>
@@ -2938,7 +2942,7 @@
     *: "Скролиране"
   </dest>
   <voice>
-    *: ""
+    *: "Скролиране"
   </voice>
 </phrase>
 <phrase>
@@ -2952,7 +2956,7 @@
     *: "Пример за настройката на скоростта на скролиране"
   </dest>
   <voice>
-    *: ""
+    *: "Пример за настройката на скоростта на скролиране"
   </voice>
 </phrase>
 <phrase>
@@ -2966,7 +2970,7 @@
     *: "Скорост на скролиране"
   </dest>
   <voice>
-    *: ""
+    *: "Скорост на скролиране"
   </voice>
 </phrase>
 <phrase>
@@ -2977,10 +2981,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Забавяне на скролиране"
+    *: "Отлагане на скролирането"
   </dest>
   <voice>
-    *: ""
+    *: "Отлагане на скролирането"
   </voice>
 </phrase>
 <phrase>
@@ -2991,10 +2995,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Сменящ се текст при скролиране"
+    *: "Размер на стъпката на скролиране"
   </dest>
   <voice>
-    *: ""
+    *: "Размер на стъпката на скролиране"
   </voice>
 </phrase>
 <phrase>
@@ -3008,7 +3012,7 @@
     *: "Пример за настройката на стъпката на скролиране"
   </dest>
   <voice>
-    *: ""
+    *: "Пример за настройката на стъпката на скролиране"
   </voice>
 </phrase>
 <phrase>
@@ -3022,7 +3026,7 @@
     *: "Ограничение на двупосочното скролиране"
   </dest>
   <voice>
-    *: ""
+    *: "Ограничение на двупосочното скролиране"
   </voice>
 </phrase>
 <phrase>
@@ -3035,11 +3039,11 @@
   </source>
   <dest>
     *: none
-    remote: "Настройки на scrolling на дистанционното"
+    remote: "Настройки на скролиране на дистанционното"
   </dest>
   <voice>
-    *: ""
-    remote: ""
+    *: none
+    remote: "Настройки на скролиране на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -3052,11 +3056,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll на екрана извън изглед"
+    lcd_bitmap: "Скролиране на екрана извън изгледа"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Скролиране на екрана извън изгледа"
   </voice>
 </phrase>
 <phrase>
@@ -3069,11 +3073,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Стъпка при scroll на екрана"
+    lcd_bitmap: "Стъпка при скролиране на екрана"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Стъпка при скролиране на екрана"
   </voice>
 </phrase>
 <phrase>
@@ -3084,10 +3088,10 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "Scroll на страници"
+    *: "Скролиране на страници"
   </dest>
   <voice>
-    *: ""
+    *: "Скролиране на страници"
   </voice>
 </phrase>
 <phrase>
@@ -3103,8 +3107,8 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: ""
-    wheel_acceleration: ""
+    *: "Начално задържане на ускоряването на списъците"
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3120,8 +3124,8 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: ""
-    wheel_acceleration: ""
+    *: "Скорост на ускоряване в списъците"
+    wheel_acceleration: none
   </voice>
 </phrase>
 <phrase>
@@ -3134,11 +3138,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Лента за състоянието-/Scrollbar"
+    lcd_bitmap: "Лента на състоянието-/за позициониране"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Ленти на състоянието и за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -3151,10 +3155,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Лента за скролиране"
+    lcd_bitmap: "Лента за позициониране"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: "Лента за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -3167,10 +3172,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Лента за състоянието"
+    lcd_bitmap: "Лента на състоянието"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: "Лента на състоянието"
   </voice>
 </phrase>
 <phrase>
@@ -3186,8 +3192,8 @@
     recorder_pad: "Лента с бутони"
   </dest>
   <voice>
-    *: ""
-    recorder_pad: ""
+    *: none
+    recorder_pad: "Лента с бутони"
   </voice>
 </phrase>
 <phrase>
@@ -3203,7 +3209,8 @@
     lcd_bitmap: "Показване на сила на звука"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: "Показване на сила на звука"
   </voice>
 </phrase>
 <phrase>
@@ -3216,10 +3223,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Показване на батерия"
+    lcd_bitmap: "Показване на батерията"
   </dest>
   <voice>
-    *: ""
+    *: none
+    lcd_bitmap: "Показване на батерията"
   </voice>
 </phrase>
 <phrase>
@@ -3232,11 +3240,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Графичен"
+    lcd_bitmap: "Изображение"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Изображение"
   </voice>
 </phrase>
 <phrase>
@@ -3253,7 +3261,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: none
+    lcd_bitmap: "Цифров"
   </voice>
 </phrase>
 <phrase>
@@ -3265,11 +3273,12 @@
     masd: none
   </source>
   <dest>
-    *: "Пик-метър"
+    *: "Пик метър"
     masd: none
   </dest>
   <voice>
-    *: ""
+    *: "Пик метър"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3281,12 +3290,12 @@
     masd: none
   </source>
   <dest>
-    *: "Задържане на clip"
+    *: "Задържане на индикатора за смущения"
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Задържане на индикатора за смущения"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3298,12 +3307,12 @@
     masd: none
   </source>
   <dest>
-    *: "Задържане на пик"
+    *: "Задържане на пик индикатора"
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Задържане на пик индикатора"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3319,8 +3328,8 @@
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Вечно"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3332,12 +3341,12 @@
     masd: none
   </source>
   <dest>
-    *: "Освобождаване на пик"
+    *: "Освобождаване на пик индикатора"
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Освобождаване на пик индикатора"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3353,8 +3362,8 @@
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Скала"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3370,8 +3379,8 @@
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Логаритмична в децибели"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3387,8 +3396,8 @@
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Линейна в проценти"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3404,8 +3413,8 @@
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Минимален обхват"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3421,8 +3430,8 @@
     masd: none
   </dest>
   <voice>
-    *: ""
-    masd: ""
+    *: "Максимален обхват"
+    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3433,10 +3442,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Кодова страница по подразбиране"
+    *: "Кодова таблица по подразбиране"
   </dest>
   <voice>
-    *: ""
+    *: "Кодова таблица по подразбиране"
   </voice>
 </phrase>
 <phrase>
@@ -3450,7 +3459,7 @@
     *: "Латиница 1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: ""
+    *: "Латиница 1 (ISO-8859-1)"
   </voice>
 </phrase>
 <phrase>
@@ -3464,7 +3473,7 @@
     *: "Гръцки (ISO-8859-7)"
   </dest>
   <voice>
-    *: ""
+    *: "Гръцки (ISO-8859-7)"
   </voice>
 </phrase>
 <phrase>
@@ -3480,8 +3489,8 @@
     lcd_bitmap: "Иврит (ISO-8859-8)"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Иврит (ISO-8859-8)"
   </voice>
 </phrase>
 <phrase>
@@ -3492,10 +3501,10 @@
     *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Kирилица (CP1251)"
+    *: "Кирилица (CP1251)"
   </dest>
   <voice>
-    *: ""
+    *: "Кирилица (CP1251)"
   </voice>
 </phrase>
 <phrase>
@@ -3512,7 +3521,7 @@
   </dest>
   <voice>
     *: none
-    lcd_bitmap: none
+    lcd_bitmap: "Тайландски (ISO-8859-11)"
   </voice>
 </phrase>
 <phrase>
@@ -3528,8 +3537,8 @@
     lcd_bitmap: "Арабски (CP1256)"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Арабски (CP1256)"
   </voice>
 </phrase>
 <phrase>
@@ -3543,7 +3552,7 @@
     *: "Турски (ISO-8859-9)"
   </dest>
   <voice>
-    *: ""
+    *: "Турски (ISO-8859-9)"
   </voice>
 </phrase>
 <phrase>
@@ -3557,7 +3566,7 @@
     *: "Разширена латиница (ISO-8859-2)"
   </dest>
   <voice>
-    *: ""
+    *: "Разширена латиница (ISO-8859-2)"
   </voice>
 </phrase>
 <phrase>
@@ -3573,8 +3582,8 @@
     lcd_bitmap: "Японски (SJIS)"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Японски (SJIS)"
   </voice>
 </phrase>
 <phrase>
@@ -3590,8 +3599,8 @@
     lcd_bitmap: "Опростен китайски (GB2312)"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Опростен китайски (GB2312)"
   </voice>
 </phrase>
 <phrase>
@@ -3607,8 +3616,8 @@
     lcd_bitmap: "Корейски (KSX1001)"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Корейски (KSX1001)"
   </voice>
 </phrase>
 <phrase>
@@ -3624,8 +3633,8 @@
     lcd_bitmap: "Традиционен китайски (BIG5)"
   </dest>
   <voice>
-    *: ""
-    lcd_bitmap: ""
+    *: none
+    lcd_bitmap: "Традиционен китайски (BIG5)"
   </voice>
 </phrase>
 <phrase>
@@ -3639,7 +3648,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: ""
+    *: "Unicode (UTF-8)"
   </voice>
 </phrase>
 <phrase>
@@ -3658,8 +3667,8 @@
   </dest>
   <voice>
     *: none
-    button_light: ""
-    sansafuze*,sansae200*: ""
+    button_light: "Изключване на осветяването на бутоните"
+    sansafuze*,sansae200*: "Изключване на осветяването на колелото"
   </voice>
 </phrase>
 <phrase>
@@ -3675,8 +3684,8 @@
     buttonlight_brightness: "Яркост на осветяването на бутоните"
   </dest>
   <voice>
-    *: ""
-    buttonlight_brightness: ""
+    *: none
+    buttonlight_brightness: "Яркост на осветяването на бутоните"
   </voice>
 </phrase>
 <phrase>
@@ -3690,7 +3699,7 @@
     *: "Екран при стартиране"
   </dest>
   <voice>
-    *: ""
+    *: "Екран при стартиране"
   </voice>
 </phrase>
 <phrase>
@@ -3704,7 +3713,7 @@
     *: "Главно меню"
   </dest>
   <voice>
-    *: ""
+    *: "Главно меню"
   </voice>
 </phrase>
 <phrase>
@@ -3715,10 +3724,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Предишен екран"
+    *: "Предишния екран"
   </dest>
   <voice>
-    *: ""
+    *: "Предишния екран"
   </voice>
 </phrase>
 <phrase>
@@ -3732,7 +3741,7 @@
     *: "Батерия"
   </dest>
   <voice>
-    *: ""
+    *: "Батерия"
   </voice>
 </phrase>
 <phrase>
@@ -3746,7 +3755,7 @@
     *: "Капацитет на батерията"
   </dest>
   <voice>
-    *: ""
+    *: "Капацитет на батерията"
   </voice>
 </phrase>
 <phrase>
@@ -3762,8 +3771,8 @@
     battery_types: "Тип на батерията"
   </dest>
   <voice>
-    *: ""
-    battery_types: ""
+    *: none
+    battery_types: "Тип на батерията"
   </voice>
 </phrase>
 <phrase>
@@ -3779,8 +3788,8 @@
     battery_types: "Алкална"
   </dest>
   <voice>
-    *: ""
-    battery_types: ""
+    *: none
+    battery_types: "Алкална"
   </voice>
 </phrase>
 <phrase>
@@ -3793,11 +3802,11 @@
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
+    battery_types: "NiMH "
   </dest>
   <voice>
-    *: ""
-    battery_types: ""
+    *: none
+    battery_types: "Никел Метал Хидридна"
   </voice>
 </phrase>
 <phrase>
@@ -3811,7 +3820,7 @@
     *: "Диск"
   </dest>
   <voice>
-    *: ""
+    *: "Диск"
   </voice>
 </phrase>
 <phrase>
@@ -3827,8 +3836,8 @@
     flash_storage: none
   </dest>
   <voice>
-    *: ""
-    flash_storage: ""
+    *: "Спиране на диска"
+    flash_storage: none
   </voice>
 </phrase>
 <phrase>
@@ -3841,11 +3850,11 @@
   </source>
   <dest>
     *: none
-    dircache: "Кеширане на директориите"
+    dircache: "Кеширане на папките"
   </dest>
   <voice>
-    *: ""
-    dircache: ""
+    *: none
+    dircache: "Кеширане на папките"
   </voice>
 </phrase>
 <phrase>
@@ -3861,8 +3870,8 @@
     rtc: "Час и дата"
   </dest>
   <voice>
-    *: ""
-    rtc: ""
+    *: none
+    rtc: "Час и дата"
   </voice>
 </phrase>
 <phrase>
@@ -3878,8 +3887,8 @@
     rtc: "Настройки на час/дата"
   </dest>
   <voice>
-    *: ""
-    rtc: ""
+    *: none
+    rtc: "Настройки на час и дата"
   </voice>
 </phrase>
 <phrase>
@@ -3896,7 +3905,7 @@
   </dest>
   <voice>
     *: none
-    rtc: none
+    rtc: "Формат на часа"
   </voice>
 </phrase>
 <phrase>
@@ -3909,11 +3918,11 @@
   </source>
   <dest>
     *: none
-    rtc: "12ч часовник"
+    rtc: "12 часов"
   </dest>
   <voice>
     *: none
-    rtc: none
+    rtc: "12 часов"
   </voice>
 </phrase>
 <phrase>
@@ -3926,11 +3935,11 @@
   </source>
   <dest>
     *: none
-    rtc: "24ч часовник"
+    rtc: "24 часов"
   </dest>
   <voice>
     *: none
-    rtc: none
+    rtc: "24 часов"
   </voice>
 </phrase>
 <phrase>
@@ -3959,6 +3968,7 @@
   </dest>
   <voice>
     *: none
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -3981,20 +3991,21 @@
   </source>
   <dest>
     *: none
-    rtc: "OFF за отказ"
-    mrobe500: "POWER за отказ"
-    iriverh100,iriverh120,iriverh300: "STOP за отказ"
-    ipod*,sansac200*,mpiohd300: "MENU за отказ"
-    iaudiox5,iaudiom5: "RECORD за отказ"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV за отказ"
-    gigabeatfx: "POWER за отказ"
-    mrobe100: "DISPLAY за отказ"
-    gigabeats: "BACK за отказ"
-    gogearsa9200: "LEFT за отказ"
-    vibe500: "CANCEL за отказ"
+    rtc: "OFF = отказ"
+    mrobe500: "POWER = отказ"
+    iriverh100,iriverh120,iriverh300: "STOP = отказ"
+    ipod*,sansac200*,mpiohd300: "MENU = отказ"
+    iaudiox5,iaudiom5: "RECORD = отказ"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = отказ"
+    gigabeatfx: "POWER = отказ"
+    mrobe100: "DISPLAY = отказ"
+    gigabeats: "BACK = отказ"
+    gogearsa9200: "LEFT = отказ"
+    vibe500: "CANCEL = отказ"
   </dest>
   <voice>
     *: none
+    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
   </voice>
 </phrase>
 <phrase>
@@ -4011,7 +4022,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Нед"
   </voice>
 </phrase>
 <phrase>
@@ -4028,7 +4039,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Пон"
   </voice>
 </phrase>
 <phrase>
@@ -4045,7 +4056,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Вт"
   </voice>
 </phrase>
 <phrase>
@@ -4062,7 +4073,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Ср"
   </voice>
 </phrase>
 <phrase>
@@ -4079,7 +4090,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Чет"
   </voice>
 </phrase>
 <phrase>
@@ -4096,7 +4107,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Пет"
   </voice>
 </phrase>
 <phrase>
@@ -4113,7 +4124,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Съб"
   </voice>
 </phrase>
 <phrase>
@@ -4130,7 +4141,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Януари"
   </voice>
 </phrase>
 <phrase>
@@ -4147,7 +4158,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Февруари"
   </voice>
 </phrase>
 <phrase>
@@ -4164,7 +4175,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Март"
   </voice>
 </phrase>
 <phrase>
@@ -4181,7 +4192,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Април"
   </voice>
 </phrase>
 <phrase>
@@ -4198,7 +4209,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Май"
   </voice>
 </phrase>
 <phrase>
@@ -4215,7 +4226,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Юни"
   </voice>
 </phrase>
 <phrase>
@@ -4232,7 +4243,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Юли"
   </voice>
 </phrase>
 <phrase>
@@ -4249,7 +4260,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Август"
   </voice>
 </phrase>
 <phrase>
@@ -4266,7 +4277,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Септември"
   </voice>
 </phrase>
 <phrase>
@@ -4283,7 +4294,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Октомври"
   </voice>
 </phrase>
 <phrase>
@@ -4300,7 +4311,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Ноември"
   </voice>
 </phrase>
 <phrase>
@@ -4317,7 +4328,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "Декември"
   </voice>
 </phrase>
 <phrase>
@@ -4328,10 +4339,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Изключване при неизползване"
+    *: "Изключване при бездействие"
   </dest>
   <voice>
-    *: ""
+    *: "Изключване при бездействие"
   </voice>
 </phrase>
 <phrase>
@@ -4345,7 +4356,7 @@
     *: "Часовник за изключване"
   </dest>
   <voice>
-    *: ""
+    *: "Часовник за изключване"
   </voice>
 </phrase>
 <phrase>
@@ -4359,7 +4370,7 @@
     *: "Ограничения"
   </dest>
   <voice>
-    *: ""
+    *: "Ограничения"
   </voice>
 </phrase>
 <phrase>
@@ -4370,10 +4381,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Максимален брой файлове при разглеждане на директория"
+    *: "Максимален брой файлове при разглеждане на папка"
   </dest>
   <voice>
-    *: ""
+    *: "Максимален брой файлове при разглеждане на папка"
   </voice>
 </phrase>
 <phrase>
@@ -4387,7 +4398,7 @@
     *: "Максимален размер на плейлиста"
   </dest>
   <voice>
-    *: ""
+    *: "Максимален размер на плейлиста"
   </voice>
 </phrase>
 <phrase>
@@ -4403,8 +4414,8 @@
     charging: "Режим адаптер за кола"
   </dest>
   <voice>
-    *: ""
-    charging: ""
+    *: none
+    charging: "Режим адаптер за кола"
   </voice>
 </phrase>
 <phrase>
@@ -4421,7 +4432,7 @@
   </dest>
   <voice>
     *: none
-    alarm: none
+    alarm: "Аларма за събуждане"
   </voice>
 </phrase>
 <phrase>
@@ -4437,8 +4448,8 @@
     alarm: "Екран при събуждане от алармата"
   </dest>
   <voice>
-    *: ""
-    alarm: ""
+    *: none
+    alarm: "Екран при събуждане от алармата"
   </voice>
 </phrase>
 <phrase>
@@ -4454,8 +4465,8 @@
     alarm: "Време на алармата:"
   </dest>
   <voice>
-    *: ""
-    alarm: ""
+    *: none
+    alarm: "Време на алармата"
   </voice>
 </phrase>
 <phrase>
@@ -4468,11 +4479,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Събуждане в %d:%02d"
+    alarm: "Събуждане след %d:%02d"
   </dest>
   <voice>
-    *: ""
-    alarm: ""
+    *: none
+    alarm: "Събуждане след"
   </voice>
 </phrase>
 <phrase>
@@ -4489,7 +4500,7 @@
   </dest>
   <voice>
     *: none
-    alarm: none
+    alarm: "Настройка на алармата"
   </voice>
 </phrase>
 <phrase>
@@ -4505,8 +4516,8 @@
     alarm: "Времето на алармата е твърде скоро!"
   </dest>
   <voice>
-    *: ""
-    alarm: ""
+    *: none
+    alarm: "Времето на алармата е твърде скоро!"
   </voice>
 </phrase>
 <phrase>
@@ -4533,6 +4544,7 @@
   </dest>
   <voice>
     *: none
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4545,11 +4557,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Aлармата е изключена"
+    alarm: "Алармата е изключена"
   </dest>
   <voice>
-    *: ""
-    alarm: ""
+    *: none
+    alarm: "Алармата е изключена"
   </voice>
 </phrase>
 <phrase>
@@ -4563,7 +4575,7 @@
     *: "Правене на отметки"
   </dest>
   <voice>
-    *: ""
+    *: "Правене на отметки"
   </voice>
 </phrase>
 <phrase>
@@ -4577,7 +4589,7 @@
     *: "Отметка при спиране"
   </dest>
   <voice>
-    *: ""
+    *: "Отметка при спиране"
   </voice>
 </phrase>
 <phrase>
@@ -4588,10 +4600,10 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Да - само скорошните"
+    *: "Да - Само скорошни"
   </dest>
   <voice>
-    *: ""
+    *: "Да - Само скорошни"
   </voice>
 </phrase>
 <phrase>
@@ -4602,10 +4614,10 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Питане - само скорощни"
+    *: "Питай - Само скорошни"
   </dest>
   <voice>
-    *: ""
+    *: "Питай - Само скорошни"
   </voice>
 </phrase>
 <phrase>
@@ -4619,7 +4631,7 @@
     *: "Зареждане на последната отметка"
   </dest>
   <voice>
-    *: ""
+    *: "Зареждане на последната отметка"
   </voice>
 </phrase>
 <phrase>
@@ -4633,7 +4645,7 @@
     *: "Поддържане на списък с последните отметки?"
   </dest>
   <voice>
-    *: ""
+    *: "Поддържане на списък с последните отметки?"
   </voice>
 </phrase>
 <phrase>
@@ -4647,7 +4659,7 @@
     *: "Само уникални"
   </dest>
   <voice>
-    *: ""
+    *: "Само уникални"
   </voice>
 </phrase>
 <phrase>
@@ -4661,7 +4673,7 @@
     *: "Език"
   </dest>
   <voice>
-    *: ""
+    *: "Език"
   </voice>
 </phrase>
 <phrase>
@@ -4675,7 +4687,7 @@
     *: "Нов език"
   </dest>
   <voice>
-    *: ""
+    *: "Нов език"
   </voice>
 </phrase>
 <phrase>
@@ -4689,7 +4701,7 @@
     *: "Глас"
   </dest>
   <voice>
-    *: ""
+    *: "Глас"
   </voice>
 </phrase>
 <phrase>
@@ -4703,7 +4715,7 @@
     *: "Произнасяне на менютата"
   </dest>
   <voice>
-    *: ""
+    *: "Произнасяне на менютата"
   </voice>
 </phrase>
 <phrase>
@@ -4714,10 +4726,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Произнасяне на директориите"
+    *: "Произнасяне на папките"
   </dest>
   <voice>
-    *: ""
+    *: "Произнасяне на папките"
   </voice>
 </phrase>
 <phrase>
@@ -4728,10 +4740,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Използване на .talk клипчета за директориите"
+    *: "Използване на .talk клипчета за папките"
   </dest>
   <voice>
-    *: ""
+    *: "Използване на .talk клипчета за папките"
   </voice>
 </phrase>
 <phrase>
@@ -4745,7 +4757,7 @@
     *: "Произнасяне на имената на файловете"
   </dest>
   <voice>
-    *: ""
+    *: "Произнасяне на имената на файловете"
   </voice>
 </phrase>
 <phrase>
@@ -4756,10 +4768,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Използване на .talk клипчета"
+    *: "Използване на .talk клипчета за имената на файловете"
   </dest>
   <voice>
-    *: ""
+    *: "Използване на .talk клипчета за имената на файловете"
   </voice>
 </phrase>
 <phrase>
@@ -4773,7 +4785,7 @@
     *: "Числа"
   </dest>
   <voice>
-    *: ""
+    *: "Числа"
   </voice>
 </phrase>
 <phrase>
@@ -4787,7 +4799,7 @@
     *: "Произнасяне по букви"
   </dest>
   <voice>
-    *: ""
+    *: "Произнасяне по букви"
   </voice>
 </phrase>
 <phrase>
@@ -4798,10 +4810,10 @@
     *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk клип"
+    *: ".talk клипче"
   </dest>
   <voice>
-    *: ".talk клип"
+    *: "talk клипче"
   </voice>
 </phrase>
 <phrase>
@@ -4815,7 +4827,7 @@
     *: "Управление на настройките"
   </dest>
   <voice>
-    *: ""
+    *: "Управление на настройките"
   </voice>
 </phrase>
 <phrase>
@@ -4826,10 +4838,10 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Разглеждане на .cfg-файловете"
+    *: "Разглеждане на .cfg файловете"
   </dest>
   <voice>
-    *: ""
+    *: "Разглеждане на конфигурационните файлове"
   </voice>
 </phrase>
 <phrase>
@@ -4840,10 +4852,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Настройките заредени"
+    *: "Настройките са заредени"
   </dest>
   <voice>
-    *: ""
+    *: "Настройките са заредени"
   </voice>
 </phrase>
 <phrase>
@@ -4857,7 +4869,7 @@
     *: "Връщане на настройките"
   </dest>
   <voice>
-    *: ""
+    *: "Връщане на настройките"
   </voice>
 </phrase>
 <phrase>
@@ -4871,7 +4883,7 @@
     *: "Изчистено"
   </dest>
   <voice>
-    *: ""
+    *: "Настройките са изчистени"
   </voice>
 </phrase>
 <phrase>
@@ -4885,7 +4897,7 @@
     *: "Записване на .cfg файл"
   </dest>
   <voice>
-    *: ""
+    *: "Записване на конфигурационен файл"
   </voice>
 </phrase>
 <phrase>
@@ -4896,10 +4908,10 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Настройките запазени"
+    *: "Настройките са запазени"
   </dest>
   <voice>
-    *: ""
+    *: "Настройките са запазени"
   </voice>
 </phrase>
 <phrase>
@@ -4913,7 +4925,7 @@
     *: "Запазване на настройките на темата"
   </dest>
   <voice>
-    *: ""
+    *: "Запазване на настройките на темата"
   </voice>
 </phrase>
 <phrase>
@@ -4944,6 +4956,7 @@
   </dest>
   <voice>
     *: none
+    recording: "Настройки запис"
   </voice>
 </phrase>
 <phrase>
@@ -4959,8 +4972,8 @@
     radio: "Меню на FM радио "
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Меню на FM радио "
   </voice>
 </phrase>
 <phrase>
@@ -4976,8 +4989,8 @@
     radio: "Няма станции"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Няма станции"
   </voice>
 </phrase>
 <phrase>
@@ -4993,8 +5006,8 @@
     radio: "Добавяне на станция"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Добавяне на станция"
   </voice>
 </phrase>
 <phrase>
@@ -5007,11 +5020,11 @@
   </source>
   <dest>
     *: none
-    radio: "Редактиране на presets"
+    radio: "Редактиране на станция"
   </dest>
   <voice>
     *: none
-    radio: none
+    radio: "Редактиране на станция"
   </voice>
 </phrase>
 <phrase>
@@ -5027,8 +5040,8 @@
     radio: "Премахване на станция"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Премахване на станция"
   </voice>
 </phrase>
 <phrase>
@@ -5044,8 +5057,8 @@
     radio: "Запазването на станциите е неуспешно"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Запазването на станциите е неуспешно"
   </voice>
 </phrase>
 <phrase>
@@ -5061,8 +5074,8 @@
     radio: "Списъкът със станции е пълен"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Списъкът със станции е пълен"
   </voice>
 </phrase>
 <phrase>
@@ -5078,7 +5091,7 @@
     radio_screen_button_bar: "Меню"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio_screen_button_bar: ""
   </voice>
 </phrase>
@@ -5095,7 +5108,7 @@
     radio_screen_button_bar: "Изход"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio_screen_button_bar: ""
   </voice>
 </phrase>
@@ -5112,7 +5125,7 @@
     radio_screen_button_bar: "Действие"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio_screen_button_bar: ""
   </voice>
 </phrase>
@@ -5129,8 +5142,8 @@
     radio: "Станция"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Станция"
   </voice>
 </phrase>
 <phrase>
@@ -5143,10 +5156,10 @@
   </source>
   <dest>
     *: none
-    radio_screen_button_bar: "Добавяне"
+    radio_screen_button_bar: "Добави"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio_screen_button_bar: ""
   </voice>
 </phrase>
@@ -5163,7 +5176,7 @@
     radio_screen_button_bar: "Запис"
   </dest>
   <voice>
-    *: ""
+    *: none
     radio_screen_button_bar: ""
   </voice>
 </phrase>
@@ -5181,7 +5194,7 @@
   </dest>
   <voice>
     *: none
-    radio: none
+    radio: "Принудително моно"
   </voice>
 </phrase>
 <phrase>
@@ -5197,8 +5210,8 @@
     radio: "Екранът е замразен!"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Екранът е замразен!"
   </voice>
 </phrase>
 <phrase>
@@ -5214,8 +5227,8 @@
     radio: "Автоматично сканиране на станциите"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Автоматично сканиране на станциите"
   </voice>
 </phrase>
 <phrase>
@@ -5231,8 +5244,8 @@
     radio: "Изтриване на текущите станции?"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Изтриване на текущите станции?"
   </voice>
 </phrase>
 <phrase>
@@ -5248,8 +5261,8 @@
     radio: "Сканиране %d.%02d MHz"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Сканиране"
   </voice>
 </phrase>
 <phrase>
@@ -5282,8 +5295,8 @@
     radio: "Сканиране"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Сканиране"
   </voice>
 </phrase>
 <phrase>
@@ -5299,8 +5312,8 @@
     radio: "Зареждане на списък със станции"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Зареждане на списък със станции"
   </voice>
 </phrase>
 <phrase>
@@ -5316,8 +5329,8 @@
     radio: "Запазване на списъка със станции"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Запазване на списъка със станции"
   </voice>
 </phrase>
 <phrase>
@@ -5333,8 +5346,8 @@
     radio: "Изчистване на списъка със станциите"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Изчистване на списъка със станциите"
   </voice>
 </phrase>
 <phrase>
@@ -5350,8 +5363,8 @@
     radio: "Списък със станции"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Списък със станции"
   </voice>
 </phrase>
 <phrase>
@@ -5367,8 +5380,8 @@
     radio: "Не са намерени настройки. Автоматично сканиране?"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Не са намерени настройки. Автоматично сканиране?"
   </voice>
 </phrase>
 <phrase>
@@ -5401,8 +5414,8 @@
     radio: "Регион"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Регион"
   </voice>
 </phrase>
 <phrase>
@@ -5419,7 +5432,7 @@
   </dest>
   <voice>
     *: none
-    radio: none
+    radio: "Европа"
   </voice>
 </phrase>
 <phrase>
@@ -5432,11 +5445,11 @@
   </source>
   <dest>
     *: none
-    radio: "САЩ / Канада"
+    radio: "САЩ/Канада"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "САЩ и Канада"
   </voice>
 </phrase>
 <phrase>
@@ -5452,8 +5465,8 @@
     radio: "Япония"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Япония"
   </voice>
 </phrase>
 <phrase>
@@ -5469,8 +5482,8 @@
     radio: "Корея"
   </dest>
   <voice>
-    *: ""
-    radio: ""
+    *: none
+    radio: "Корея"
   </voice>
 </phrase>
 <phrase>
@@ -5486,8 +5499,8 @@
     recording: "Формат"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Формат"
   </voice>
 </phrase>
 <phrase>
@@ -5500,11 +5513,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MPEG Layer 3 (mp3)"
   </dest>
   <voice>
-    *: ""
-    recording: "MPEG Layer 3"
+    *: none
+    recording: "MPEG Layer 3 (mp3)"
   </voice>
 </phrase>
 <phrase>
@@ -5538,7 +5551,7 @@
   </dest>
   <voice>
     *: none
-    recording_swcodec: none
+    recording_swcodec: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5554,7 +5567,7 @@
     recording: "AIFF"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: "AIFF"
   </voice>
 </phrase>
@@ -5568,11 +5581,11 @@
   </source>
   <dest>
     *: none
-    recording: "Настройки на encoder"
+    recording: "Настройки на енкодера"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Настройки на енкодера"
   </voice>
 </phrase>
 <phrase>
@@ -5585,11 +5598,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Битрейт"
+    recording_swcodec: "Побитова скорост"
   </dest>
   <voice>
-    *: ""
-    recording_swcodec: ""
+    *: none
+    recording_swcodec: "Побитова скорост"
   </voice>
 </phrase>
 <phrase>
@@ -5605,8 +5618,8 @@
     recording: "(Няма настройки)"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Няма налични настройки"
   </voice>
 </phrase>
 <phrase>
@@ -5622,7 +5635,8 @@
     recording_hwcodec: "Качество"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording_hwcodec: "Качество"
   </voice>
 </phrase>
 <phrase>
@@ -5638,7 +5652,8 @@
     recording: "Честота"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Честота"
   </voice>
 </phrase>
 <phrase>
@@ -5651,11 +5666,11 @@
   </source>
   <dest>
     *: none
-    recording: "(Същата като на източника)"
+    recording: "(същата като на източника)"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "същата като на източника"
   </voice>
 </phrase>
 <phrase>
@@ -5671,7 +5686,8 @@
     recording: "Източник"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Източник"
   </voice>
 </phrase>
 <phrase>
@@ -5685,11 +5701,13 @@
   </source>
   <dest>
     *: none
-    recording: "Микрoфон"
+    recording: "Микрофон"
     iriverh100,iriverh120,iriverh300: "Вграден микрофон"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Микрофон"
+    iriverh100,iriverh120,iriverh300: "Вграден микрофон"
   </voice>
 </phrase>
 <phrase>
@@ -5702,10 +5720,11 @@
   </source>
   <dest>
     *: none
-    recording: "Дигитален"
+    recording: "Цифров"
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "Цифров"
   </voice>
 </phrase>
 <phrase>
@@ -5718,11 +5737,11 @@
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Line In"
+    recording,archosplayer: "Линеен вход"
   </dest>
   <voice>
-    *: ""
-    recording,archosplayer: "Line In"
+    *: none
+    recording,archosplayer: "Линеен вход"
   </voice>
 </phrase>
 <phrase>
@@ -5738,8 +5757,8 @@
     recording_hwcodec: "Независими кадри"
   </dest>
   <voice>
-    *: ""
-    recording_hwcodec: ""
+    *: none
+    recording_hwcodec: "Независими кадри"
   </voice>
 </phrase>
 <phrase>
@@ -5756,7 +5775,7 @@
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Опции за разделяне на файлове"
   </voice>
 </phrase>
 <phrase>
@@ -5772,8 +5791,8 @@
     recording: "Мерки на разделянето"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Мерки на разделянето"
   </voice>
 </phrase>
 <phrase>
@@ -5789,8 +5808,8 @@
     recording: "Какво да се прави при разделяне"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Какво да се прави при разделяне"
   </voice>
 </phrase>
 <phrase>
@@ -5806,8 +5825,8 @@
     recording: "Започване на нов файл"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Започване на нов файл"
   </voice>
 </phrase>
 <phrase>
@@ -5820,11 +5839,11 @@
   </source>
   <dest>
     *: none
-    recording: "Спиране на записването"
+    recording: "Спиране на записа"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Спиране на записа"
   </voice>
 </phrase>
 <phrase>
@@ -5840,8 +5859,8 @@
     recording: "Време на разделяне"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Време на разделяне"
   </voice>
 </phrase>
 <phrase>
@@ -5857,8 +5876,8 @@
     recording: "Размер на парчетата"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Размер на парчетата"
   </voice>
 </phrase>
 <phrase>
@@ -5874,8 +5893,8 @@
     recording: "Време на предварителен запис"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Време на предварителен запис"
   </voice>
 </phrase>
 <phrase>
@@ -5888,11 +5907,11 @@
   </source>
   <dest>
     *: none
-    recording: "Директория"
+    recording: "Папка"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Папка"
   </voice>
 </phrase>
 <phrase>
@@ -5905,11 +5924,11 @@
   </source>
   <dest>
     *: none
-    recording: "Установяване като директория за запис"
+    recording: "Установяване като папка за запис"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Установяване като папка за запис"
   </voice>
 </phrase>
 <phrase>
@@ -5922,11 +5941,11 @@
   </source>
   <dest>
     *: none
-    recording: "Изчистване на директорията за запис"
+    recording: "Изчистване на папката за запис"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Изчистване на папката за запис"
   </voice>
 </phrase>
 <phrase>
@@ -5939,11 +5958,11 @@
   </source>
   <dest>
     *: none
-    recording: "Невъзможно писането в директорията за запис"
+    recording: "Невъзможно писането в папката за запис"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Невъзможно писането в папката за запис"
   </voice>
 </phrase>
 <phrase>
@@ -5956,11 +5975,11 @@
   </source>
   <dest>
     *: none
-    recording: "Осветяване при clipping"
+    recording: "Осветяване при смущения"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Осветяване при смущения"
   </voice>
 </phrase>
 <phrase>
@@ -5973,11 +5992,11 @@
   </source>
   <dest>
     *: none
-    remote: "Само на плейъра"
+    remote: "Само плейъра"
   </dest>
   <voice>
-    *: ""
-    remote: ""
+    *: none
+    remote: "Само плейъра"
   </voice>
 </phrase>
 <phrase>
@@ -5993,8 +6012,8 @@
     remote: "Само дистанционното"
   </dest>
   <voice>
-    *: ""
-    remote: "no"
+    *: none
+    remote: "Само дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -6007,11 +6026,11 @@
   </source>
   <dest>
     *: none
-    remote: "Главен и дистанционно"
+    remote: "Плейъра и дистанционното"
   </dest>
   <voice>
-    *: ""
-    remote: ""
+    *: none
+    remote: "Плейъра и дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -6027,8 +6046,8 @@
     recording: "Тригер"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Тригер"
   </voice>
 </phrase>
 <phrase>
@@ -6041,11 +6060,11 @@
   </source>
   <dest>
     *: none
-    recording: "Еднократно"
+    recording: "Веднъж"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Веднъж"
   </voice>
 </phrase>
 <phrase>
@@ -6061,8 +6080,8 @@
     recording: "Тип тригер"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Тип на тригера"
   </voice>
 </phrase>
 <phrase>
@@ -6078,8 +6097,8 @@
     recording: "Нов файл"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Нов файл"
   </voice>
 </phrase>
 <phrase>
@@ -6095,8 +6114,8 @@
     recording: "Спиране"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Спиране"
   </voice>
 </phrase>
 <phrase>
@@ -6112,8 +6131,8 @@
     recording: "Започване над"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Започване над"
   </voice>
 </phrase>
 <phrase>
@@ -6126,11 +6145,11 @@
   </source>
   <dest>
     *: none
-    recording: "за поне"
+    recording: "За поне"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "За поне"
   </voice>
 </phrase>
 <phrase>
@@ -6146,8 +6165,8 @@
     recording: "Спиране под"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Спиране под"
   </voice>
 </phrase>
 <phrase>
@@ -6163,8 +6182,8 @@
     recording: "Дупка преди разделяне"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Дупка преди разделяне"
   </voice>
 </phrase>
 <phrase>
@@ -6180,8 +6199,8 @@
     recording: "Предварителен запис"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Предварителен запис"
   </voice>
 </phrase>
 <phrase>
@@ -6194,11 +6213,11 @@
   </source>
   <dest>
     *: none
-    agc: "Безопасно (clip)"
+    agc: "Безопасно (смущения)"
   </dest>
   <voice>
-    *: ""
-    agc: ""
+    *: none
+    agc: "Безопасно (смущения)"
   </voice>
 </phrase>
 <phrase>
@@ -6214,8 +6233,8 @@
     agc: "На живо (бавно)"
   </dest>
   <voice>
-    *: ""
-    agc: ""
+    *: none
+    agc: "На живо (бавно)"
   </voice>
 </phrase>
 <phrase>
@@ -6232,7 +6251,7 @@
   </dest>
   <voice>
     *: none
-    agc: ""
+    agc: "DJ set (бавно)"
   </voice>
 </phrase>
 <phrase>
@@ -6245,11 +6264,11 @@
   </source>
   <dest>
     *: none
-    agc: "Среден"
+    agc: "Средно"
   </dest>
   <voice>
-    *: ""
-    agc: ""
+    *: none
+    agc: "Средно"
   </voice>
 </phrase>
 <phrase>
@@ -6265,8 +6284,8 @@
     agc: "Глас (бързо)"
   </dest>
   <voice>
-    *: ""
-    agc: ""
+    *: none
+    agc: "Глас (бързо)"
   </voice>
 </phrase>
 <phrase>
@@ -6283,7 +6302,7 @@
   </dest>
   <voice>
     *: none
-    remote: none
+    remote: "Изключен дисплей на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -6299,8 +6318,8 @@
     remote: "(Vol- : активиране отново)"
   </dest>
   <voice>
-    *: ""
-    remote: ""
+    *: none
+    remote: "(Vol- : активиране отново)"
   </voice>
 </phrase>
 <phrase>
@@ -6314,7 +6333,7 @@
     *: "Създаване на плейлист"
   </dest>
   <voice>
-    *: ""
+    *: "Създаване на плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -6328,7 +6347,7 @@
     *: "Настройки на разглеждането на плейлисти"
   </dest>
   <voice>
-    *: ""
+    *: "Настройки на разглеждането на плейлисти"
   </voice>
 </phrase>
 <phrase>
@@ -6342,7 +6361,7 @@
     *: "Разглеждане на текущия плейлист"
   </dest>
   <voice>
-    *: ""
+    *: "Разглеждане на текущия плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -6353,10 +6372,10 @@
     *: "Move"
   </source>
   <dest>
-    *: "Преместване"
+    *: "Премести"
   </dest>
   <voice>
-    *: ""
+    *: "Премести"
   </voice>
 </phrase>
 <phrase>
@@ -6370,7 +6389,7 @@
     *: "Показване на индекси"
   </dest>
   <voice>
-    *: ""
+    *: "Показване на индекси"
   </voice>
 </phrase>
 <phrase>
@@ -6381,10 +6400,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Показване на трак"
+    *: "Показване на запис"
   </dest>
   <voice>
-    *: ""
+    *: "Показване на запис"
   </voice>
 </phrase>
 <phrase>
@@ -6395,10 +6414,10 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "Само името на трака"
+    *: "Само името на записа"
   </dest>
   <voice>
-    *: ""
+    *: "Само името на записа"
   </voice>
 </phrase>
 <phrase>
@@ -6412,7 +6431,7 @@
     *: "Премахване"
   </dest>
   <voice>
-    *: ""
+    *: "Премахване"
   </voice>
 </phrase>
 <phrase>
@@ -6423,10 +6442,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Запазване на текущия плейлист"
+    *: "Запиши текущия плейлист"
   </dest>
   <voice>
-    *: ""
+    *: "Запиши текущия плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -6437,10 +6456,10 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "%d трака запазени (%s)"
+    *: "Записани %d записи (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Записите са запазени"
   </voice>
 </phrase>
 <phrase>
@@ -6454,7 +6473,7 @@
     *: "Каталог с плейлисти"
   </dest>
   <voice>
-    *: ""
+    *: "Каталог с плейлисти"
   </voice>
 </phrase>
 <phrase>
@@ -6465,10 +6484,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Рекурсивно вмъкване на директориите"
+    *: "Рекурсивно вмъкване на папките"
   </dest>
   <voice>
-    *: ""
+    *: "Рекурсивно вмъкване на папките"
   </voice>
 </phrase>
 <phrase>
@@ -6482,7 +6501,7 @@
     *: "Рекурсивно?"
   </dest>
   <voice>
-    *: ""
+    *: "Рекурсивно?"
   </voice>
 </phrase>
 <phrase>
@@ -6496,7 +6515,7 @@
     *: "Предупреждаване при изтриване на динамичния плейлист"
   </dest>
   <voice>
-    *: ""
+    *: "Предупреждаване при изтриване на динамичния плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -6510,7 +6529,7 @@
     *: "Изтриване на динамичния плейлист?"
   </dest>
   <voice>
-    *: ""
+    *: "Изтриване на динамичния плейлист?"
   </voice>
 </phrase>
 <phrase>
@@ -6526,8 +6545,8 @@
     soft_shutdown: "Изключване"
   </dest>
   <voice>
-    *: ""
-    soft_shutdown: ""
+    *: none
+    soft_shutdown: "Изключване"
   </voice>
 </phrase>
 <phrase>
@@ -6541,7 +6560,7 @@
     *: "Информация за Rockbox"
   </dest>
   <voice>
-    *: ""
+    *: "Информация за Rockbox"
   </voice>
 </phrase>
 <phrase>
@@ -6557,8 +6576,7 @@
     archosplayer: "Буф:"
   </dest>
   <voice>
-    *: ""
-    archosplayer: ""
+    *: "Размер на буфера"
   </voice>
 </phrase>
 <phrase>
@@ -6571,14 +6589,12 @@
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "Батерия: %d%% %dч %dмин"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dч %dмин"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dч %dмин"
+    *: "Батерия: %d%% %dh %dm"
+    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverh10,ipodmini1g,ipodmini2g: "Бат: %d%% %dh %dm"
   </dest>
   <voice>
-    *: ""
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: ""
-    iriverh10,ipodmini1g,ipodmini2g: ""
+    *: "Зареденост на батерията"
   </voice>
 </phrase>
 <phrase>
@@ -6592,7 +6608,7 @@
     *: "Диск:"
   </dest>
   <voice>
-    *: ""
+    *: "Размер на диска"
   </voice>
 </phrase>
 <phrase>
@@ -6606,7 +6622,7 @@
     *: "Свободно:"
   </dest>
   <voice>
-    *: ""
+    *: "Свободно дисково пространство:"
   </voice>
 </phrase>
 <phrase>
@@ -6619,11 +6635,11 @@
   </source>
   <dest>
     *: none
-    multivolume: "Вгр:"
+    multivolume: "вгр:"
   </dest>
   <voice>
-    *: ""
-    multivolume: ""
+    *: none
+    multivolume: "Вградена памет"
   </voice>
 </phrase>
 <phrase>
@@ -6660,7 +6676,7 @@
     *: "Версия"
   </dest>
   <voice>
-    *: ""
+    *: "Версия"
   </voice>
 </phrase>
 <phrase>
@@ -6674,7 +6690,7 @@
     *: "Включен от"
   </dest>
   <voice>
-    *: ""
+    *: "Включен от"
   </voice>
 </phrase>
 <phrase>
@@ -6688,7 +6704,7 @@
     *: "Върхово време"
   </dest>
   <voice>
-    *: ""
+    *: "Върхово време"
   </voice>
 </phrase>
 <phrase>
@@ -6702,7 +6718,7 @@
     *: "Изчистване на времето?"
   </dest>
   <voice>
-    *: ""
+    *: "Изчистване на времето?"
   </voice>
 </phrase>
 <phrase>
@@ -6713,10 +6729,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Дебъг (Не пипай!)"
+    *: "Дебъг (НЕ ПИПАЙ!)"
   </dest>
   <voice>
-    *: ""
+    *: "Дебъг, не пипай!"
   </voice>
 </phrase>
 <phrase>
@@ -6730,7 +6746,7 @@
     *: "Плейлист"
   </dest>
   <voice>
-    *: ""
+    *: "Плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -6744,7 +6760,7 @@
     *: "Вмъкване"
   </dest>
   <voice>
-    *: ""
+    *: "Вмъкване"
   </voice>
 </phrase>
 <phrase>
@@ -6758,7 +6774,7 @@
     *: "Вмъкване като следващ"
   </dest>
   <voice>
-    *: ""
+    *: "Вмъкване като следващ"
   </voice>
 </phrase>
 <phrase>
@@ -6769,10 +6785,10 @@
     *: "Insert Last"
   </source>
   <dest>
-    *: "Вмъкни най-отзад"
+    *: "Вмъкване като последен"
   </dest>
   <voice>
-    *: ""
+    *: "Вмъкване като последен"
   </voice>
 </phrase>
 <phrase>
@@ -6783,10 +6799,10 @@
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "Разбъркано вмъкване"
+    *: "Вмъкване разбъркано"
   </dest>
   <voice>
-    *: ""
+    *: "Вмъкване разбъркано"
   </voice>
 </phrase>
 <phrase>
@@ -6797,10 +6813,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Опашка"
+    *: "На опашката"
   </dest>
   <voice>
-    *: ""
+    *: "На опашката"
   </voice>
 </phrase>
 <phrase>
@@ -6811,10 +6827,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "Сложи еднократно за следващ"
+    *: "На опашката като следващ"
   </dest>
   <voice>
-    *: ""
+    *: "На опашката като следващ"
   </voice>
 </phrase>
 <phrase>
@@ -6825,10 +6841,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Вмъкни като последен еднократно"
+    *: "На опашката като последен"
   </dest>
   <voice>
-    *: ""
+    *: "На опашката като последен"
   </voice>
 </phrase>
 <phrase>
@@ -6839,10 +6855,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Опашката е разбъркана"
+    *: "На опашката разбъркано"
   </dest>
   <voice>
-    *: "Queue Shuffled"
+    *: "На опашката разбъркано"
   </voice>
 </phrase>
 <phrase>
@@ -6856,7 +6872,7 @@
     *: "Свирене като следваща"
   </dest>
   <voice>
-    *: ""
+    *: "Свирене като следваща"
   </voice>
 </phrase>
 <phrase>
@@ -6867,10 +6883,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Вмъкнати %d трака (%s)"
+    *: "Вмъкнати %d записи (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Записите са вмъкнати"
   </voice>
 </phrase>
 <phrase>
@@ -6881,10 +6897,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "Временно вмъкнати %d трака (%s)"
+    *: "На опашката %d записи (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Записите са поставени на опашката"
   </voice>
 </phrase>
 <phrase>
@@ -6898,7 +6914,7 @@
     *: "Преглед"
   </dest>
   <voice>
-    *: ""
+    *: "Преглед"
   </voice>
 </phrase>
 <phrase>
@@ -6912,7 +6928,7 @@
     *: "Търсене в плейлиста"
   </dest>
   <voice>
-    *: ""
+    *: "Търсене в плейлиста"
   </voice>
 </phrase>
 <phrase>
@@ -6923,7 +6939,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Търсене...  намерени %d (%s)"
+    *: "Търсене... %d намерени (%s)"
   </dest>
   <voice>
     *: ""
@@ -6937,10 +6953,10 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Разбъркай отново"
+    *: "Пренареждане"
   </dest>
   <voice>
-    *: ""
+    *: "Пренареждане"
   </voice>
 </phrase>
 <phrase>
@@ -6954,7 +6970,7 @@
     *: "Разглеждане на каталога"
   </dest>
   <voice>
-    *: ""
+    *: "Разглеждане на каталога"
   </voice>
 </phrase>
 <phrase>
@@ -6968,7 +6984,7 @@
     *: "Добавяне към плейлиста"
   </dest>
   <voice>
-    *: ""
+    *: "Добавяне към плейлиста"
   </voice>
 </phrase>
 <phrase>
@@ -6982,7 +6998,7 @@
     *: "Добавяне към нов плейлист"
   </dest>
   <voice>
-    *: ""
+    *: "Добавяне към нов плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -6996,7 +7012,7 @@
     *: "%s не съществува"
   </dest>
   <voice>
-    *: ""
+    *: "Папката с плейлисти не съществува"
   </voice>
 </phrase>
 <phrase>
@@ -7010,7 +7026,7 @@
     *: "Няма плейлисти"
   </dest>
   <voice>
-    *: ""
+    *: "Няма плейлисти"
   </voice>
 </phrase>
 <phrase>
@@ -7024,7 +7040,7 @@
     *: "Отметки"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "Отметки"
   </voice>
 </phrase>
 <phrase>
@@ -7038,7 +7054,7 @@
     *: "Създаване на отметка"
   </dest>
   <voice>
-    *: ""
+    *: "Създаване на отметка"
   </voice>
 </phrase>
 <phrase>
@@ -7052,7 +7068,7 @@
     *: "Списък с отметки"
   </dest>
   <voice>
-    *: ""
+    *: "Списък с отметки"
   </voice>
 </phrase>
 <phrase>
@@ -7066,7 +7082,7 @@
     *: "Контекстно меню"
   </dest>
   <voice>
-    *: ""
+    *: "Контекстно меню"
   </voice>
 </phrase>
 <phrase>
@@ -7077,10 +7093,10 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "Настройване на рейтинга на песен"
+    *: "Задаване на рейтинг на песента"
   </dest>
   <voice>
-    *: ""
+    *: "Задаване на рейтинг на песента"
   </voice>
 </phrase>
 <phrase>
@@ -7094,7 +7110,7 @@
     *: "Разглеждане на Cuesheet"
   </dest>
   <voice>
-    *: ""
+    *: "Разглеждане на Cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -7105,10 +7121,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Показване на информация за трака"
+    *: "Показване на информация за записа"
   </dest>
   <voice>
-    *: ""
+    *: "Показване на информация за записа"
   </voice>
 </phrase>
 <phrase>
@@ -7122,7 +7138,7 @@
     *: "Заглавие"
   </dest>
   <voice>
-    *: ""
+    *: "Заглавие"
   </voice>
 </phrase>
 <phrase>
@@ -7136,7 +7152,7 @@
     *: "Изпълнител"
   </dest>
   <voice>
-    *: ""
+    *: "Изпълнител"
   </voice>
 </phrase>
 <phrase>
@@ -7150,7 +7166,7 @@
     *: "Албум"
   </dest>
   <voice>
-    *: ""
+    *: "Албум"
   </voice>
 </phrase>
 <phrase>
@@ -7161,10 +7177,10 @@
     *: "Tracknum"
   </source>
   <dest>
-    *: "Трак№"
+    *: "Номер на записа"
   </dest>
   <voice>
-    *: ""
+    *: "Номер на записа"
   </voice>
 </phrase>
 <phrase>
@@ -7175,10 +7191,10 @@
     *: "Genre"
   </source>
   <dest>
-    *: "Стил"
+    *: "Жанр"
   </dest>
   <voice>
-    *: ""
+    *: "Жанр"
   </voice>
 </phrase>
 <phrase>
@@ -7189,10 +7205,10 @@
     *: "Year"
   </source>
   <dest>
-    *: "година"
+    *: "Година"
   </dest>
   <voice>
-    *: ""
+    *: "Година"
   </voice>
 </phrase>
 <phrase>
@@ -7203,10 +7219,10 @@
     *: "Length"
   </source>
   <dest>
-    *: "дължина"
+    *: "Дължина"
   </dest>
   <voice>
-    *: ""
+    *: "Дължина"
   </voice>
 </phrase>
 <phrase>
@@ -7220,7 +7236,7 @@
     *: "Плейлист"
   </dest>
   <voice>
-    *: ""
+    *: "Плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -7231,10 +7247,10 @@
     *: "Bitrate"
   </source>
   <dest>
-    *: "Битрейт"
+    *: "Побитова скорост"
   </dest>
   <voice>
-    *: ""
+    *: "Побитова скорост"
   </voice>
 </phrase>
 <phrase>
@@ -7245,10 +7261,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Албумен изпълнител"
+    *: "Албум Изпълнител"
   </dest>
   <voice>
-    *: ""
+    *: "Албум Изпълнител"
   </voice>
 </phrase>
 <phrase>
@@ -7259,10 +7275,10 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "ДискNo"
+    *: "Номер на диска"
   </dest>
   <voice>
-    *: ""
+    *: "Номер на диска"
   </voice>
 </phrase>
 <phrase>
@@ -7276,7 +7292,7 @@
     *: "Коментар"
   </dest>
   <voice>
-    *: ""
+    *: "Коментар"
   </voice>
 </phrase>
 <phrase>
@@ -7290,7 +7306,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "(VBR)"
   </voice>
 </phrase>
 <phrase>
@@ -7304,7 +7320,7 @@
     *: "Честота"
   </dest>
   <voice>
-    *: ""
+    *: "Честота"
   </voice>
 </phrase>
 <phrase>
@@ -7315,10 +7331,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "усилване на трак"
+    *: "Сила на записа"
   </dest>
   <voice>
-    *: ""
+    *: "Сила на записа"
   </voice>
 </phrase>
 <phrase>
@@ -7329,10 +7345,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Усилване на албума"
+    *: "Сила на албума"
   </dest>
   <voice>
-    *: ""
+    *: "Сила на албума"
   </voice>
 </phrase>
 <phrase>
@@ -7346,7 +7362,7 @@
     *: "Път"
   </dest>
   <voice>
-    *: ""
+    *: "Път"
   </voice>
 </phrase>
 <phrase>
@@ -7360,7 +7376,7 @@
     *: "<Няма информация>"
   </dest>
   <voice>
-    *: ""
+    *: "Няма информация"
   </voice>
 </phrase>
 <phrase>
@@ -7374,7 +7390,7 @@
     *: "Преименуване"
   </dest>
   <voice>
-    *: ""
+    *: "Преименуване"
   </voice>
 </phrase>
 <phrase>
@@ -7385,10 +7401,10 @@
     *: "Cut"
   </source>
   <dest>
-    *: "Отрязване"
+    *: "Изрязване"
   </dest>
   <voice>
-    *: ""
+    *: "Изрязване"
   </voice>
 </phrase>
 <phrase>
@@ -7402,7 +7418,7 @@
     *: "Копиране"
   </dest>
   <voice>
-    *: ""
+    *: "Копиране"
   </voice>
 </phrase>
 <phrase>
@@ -7416,7 +7432,7 @@
     *: "Поставяне"
   </dest>
   <voice>
-    *: ""
+    *: "Поставяне"
   </voice>
 </phrase>
 <phrase>
@@ -7427,10 +7443,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Файлът/Директорията съществува? Презаписване?"
+    *: "Файлът/папката съществува? Презаписване?"
   </dest>
   <voice>
-    *: ""
+    *: "Файлът/папката съществува? Презаписване?"
   </voice>
 </phrase>
 <phrase>
@@ -7444,7 +7460,7 @@
     *: "Изтриване"
   </dest>
   <voice>
-    *: ""
+    *: "Изтриване"
   </voice>
 </phrase>
 <phrase>
@@ -7455,10 +7471,10 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Изтриване на директория"
+    *: "Изтриване на папка"
   </dest>
   <voice>
-    *: ""
+    *: "Изтриване на папка"
   </voice>
 </phrase>
 <phrase>
@@ -7472,7 +7488,7 @@
     *: "Изтриване?"
   </dest>
   <voice>
-    *: ""
+    *: "Изтривате ли?"
   </voice>
 </phrase>
 <phrase>
@@ -7486,7 +7502,7 @@
     *: "Копиране..."
   </dest>
   <voice>
-    *: ""
+    *: "Копиране"
   </voice>
 </phrase>
 <phrase>
@@ -7500,7 +7516,7 @@
     *: "Изтриване..."
   </dest>
   <voice>
-    *: ""
+    *: "Изтриване"
   </voice>
 </phrase>
 <phrase>
@@ -7514,7 +7530,7 @@
     *: "Преместване..."
   </dest>
   <voice>
-    *: ""
+    *: "Преместване"
   </voice>
 </phrase>
 <phrase>
@@ -7525,10 +7541,10 @@
     *: "Deleted"
   </source>
   <dest>
-    *: "Изтрит"
+    *: "Изтрито"
   </dest>
   <voice>
-    *: ""
+    *: "Изтрито"
   </voice>
 </phrase>
 <phrase>
@@ -7541,11 +7557,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Установи като изображение за фон"
+    lcd_non-mono: "Задаване като фон"
   </dest>
   <voice>
-    *: ""
-    lcd_non-mono: ""
+    *: none
+    lcd_non-mono: "Задаване като фон"
   </voice>
 </phrase>
 <phrase>
@@ -7593,7 +7609,7 @@
     *: "Отвори с..."
   </dest>
   <voice>
-    *: ""
+    *: "Отвори с"
   </voice>
 </phrase>
 <phrase>
@@ -7604,10 +7620,10 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Създаване на директория"
+    *: "Създаване на папка"
   </dest>
   <voice>
-    *: ""
+    *: "Създаване на папка"
   </voice>
 </phrase>
 <phrase>
@@ -7621,7 +7637,7 @@
     *: "Свойства"
   </dest>
   <voice>
-    *: ""
+    *: "Свойства"
   </voice>
 </phrase>
 <phrase>
@@ -7632,10 +7648,10 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Добавяне към кратките пътища"
+    *: "Добавяне към преките пътища"
   </dest>
   <voice>
-    *: ""
+    *: "Добавяне към преките пътища"
   </voice>
 </phrase>
 <phrase>
@@ -7648,11 +7664,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Височина и скорост"
   </dest>
   <voice>
-    *: ""
-    pitchscreen: ""
+    *: none
+    pitchscreen: "Височина и скорост"
   </voice>
 </phrase>
 <phrase>
@@ -7665,11 +7681,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Ускори"
+    pitchscreen: "Усилване на височината и скоростта"
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Усилване на височината и скоростта"
   </voice>
 </phrase>
 <phrase>
@@ -7682,11 +7698,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Забави"
+    pitchscreen: "Намаляване на височината и скоростта"
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Намаляване на височината и скоростта"
   </voice>
 </phrase>
 <phrase>
@@ -7702,8 +7718,8 @@
     pitchscreen: "Полутон нагоре"
   </dest>
   <voice>
-    *: ""
-    pitchscreen: ""
+    *: none
+    pitchscreen: "Полутон нагоре"
   </voice>
 </phrase>
 <phrase>
@@ -7719,8 +7735,8 @@
     pitchscreen: "Полутон надолу"
   </dest>
   <voice>
-    *: ""
-    pitchscreen: ""
+    *: none
+    pitchscreen: "Полутон надолу"
   </voice>
 </phrase>
 <phrase>
@@ -7731,10 +7747,10 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Буферът за плейлист e пълен"
+    *: "Буферът за плейлисти е пълен"
   </dest>
   <voice>
-    *: ""
+    *: "Буферът за плейлисти е пълен"
   </voice>
 </phrase>
 <phrase>
@@ -7747,11 +7763,10 @@
   </source>
   <dest>
     *: "Край на списъка с песни"
-    archosplayer: "Kрай на списъка"
+    archosplayer: "Край на списъка"
   </dest>
   <voice>
-    *: ""
-    archosplayer: ""
+    *: "Край на списъка с песни"
   </voice>
 </phrase>
 <phrase>
@@ -7765,7 +7780,7 @@
     *: "Създаване"
   </dest>
   <voice>
-    *: ""
+    *: "Създаване"
   </voice>
 </phrase>
 <phrase>
@@ -7779,7 +7794,7 @@
     *: "Няма нищо за подновяване"
   </dest>
   <voice>
-    *: ""
+    *: "Няма нищо за подновяване"
   </voice>
 </phrase>
 <phrase>
@@ -7790,10 +7805,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Грешка при обновяването на playlist control файла"
+    *: "Грешка при обновяването на контролния файл на плейлиста"
   </dest>
   <voice>
-    *: ""
+    *: "Грешка при обновяването на контролния файл на плейлиста"
   </voice>
 </phrase>
 <phrase>
@@ -7804,10 +7819,10 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Грешка при достъп до playlist-файла"
+    *: "Грешка при достъпа до файла на плейлиста"
   </dest>
   <voice>
-    *: ""
+    *: "Грешка при достъпа до файла на плейлиста"
   </voice>
 </phrase>
 <phrase>
@@ -7818,10 +7833,10 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Грешка при достъпване на playlist control файла"
+    *: "Грешка при достъпа до контролния файл на плейлиста"
   </dest>
   <voice>
-    *: ""
+    *: "Грешка при достъпа до контролния файл на плейлиста"
   </voice>
 </phrase>
 <phrase>
@@ -7832,10 +7847,10 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Грешка при достъпване на директорията"
+    *: "Грешка при достъпа до папката"
   </dest>
   <voice>
-    *: ""
+    *: "Грешка при достъпа до папката"
   </voice>
 </phrase>
 <phrase>
@@ -7846,10 +7861,10 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Playlist control-файлът е невалиден"
+    *: "Контролния файл на плейлиста е невалиден"
   </dest>
   <voice>
-    *: ""
+    *: "Контролния файл на плейлиста е невалиден"
   </voice>
 </phrase>
 <phrase>
@@ -7863,7 +7878,7 @@
     *: "Пауза"
   </dest>
   <voice>
-    *: ""
+    *: "Пауза"
   </voice>
 </phrase>
 <phrase>
@@ -7888,12 +7903,14 @@
     *: "Time"
   </source>
   <dest>
-    *: "Час/Дата"
+    *: "Време"
   </dest>
   <voice>
-    *: ""
+    *: "Време"
   </voice>
 </phrase>
+/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
+ * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -7904,11 +7921,11 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "Зареждане пo време на USB връзка"
+    usb_charging_enable: "Зареждане по време на USB връзка"
   </dest>
   <voice>
     *: none
-    usb_charging_enable: none
+    usb_charging_enable: "Зареждане по време на USB връзка"
   </voice>
 </phrase>
 <phrase>
@@ -7919,10 +7936,10 @@
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "Бутоните са заключени"
+    *: "Клавиатурата е заключена"
   </dest>
   <voice>
-    *: ""
+    *: "Клавиатурата е заключена"
   </voice>
 </phrase>
 <phrase>
@@ -7933,10 +7950,10 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Бутоните отключени"
+    *: "Клавиатурата е отключена"
   </dest>
   <voice>
-    *: ""
+    *: "Клавиатурата е отключена"
   </voice>
 </phrase>
 <phrase>
@@ -7949,10 +7966,10 @@
   </source>
   <dest>
     *: none
-    recording: "Час:"
+    recording: "Време:"
   </dest>
   <voice>
-    *: ""
+    *: none
     recording: ""
   </voice>
 </phrase>
@@ -7970,16 +7987,13 @@
   <dest>
     *: none
     recording: "Дискът е пълен. Натиснете OFF за да продължите."
-    iriverh100,iriverh120,iriverh300: "Дискът е пълен. Натиснете STOP за да продължите."
-    iaudiom5,iaudiox5: "Дискът е пълен. Натиснете POWER за да продължите."
+    iriverh100,iriverh120,iriverh300: "Дискът е пълен. Натиснете stop за да продължите."
+    iaudiom5,iaudiox5: "Дискът е пълен. Натиснете Power за да продължите."
     sansae200*,sansac200*,vibe500: "Дискът е пълен. Натиснете PREV за да продължите."
   </dest>
   <voice>
-    *: ""
-    recording: ""
-    iriverh100,iriverh120,iriverh300: ""
-    iaudiom5,iaudiox5: ""
-    sansae200*,sansac200*: ""
+    *: none
+    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7995,8 +8009,8 @@
     recording: "-безкр"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Минус безкрайност"
   </voice>
 </phrase>
 <phrase>
@@ -8009,11 +8023,11 @@
   </source>
   <dest>
     *: none
-    soft_shutdown: "Натиснете OFF за изключване"
+    soft_shutdown: "Натиснете Включване за Изключване"
   </dest>
   <voice>
-    *: ""
-    soft_shutdown: ""
+    *: none
+    soft_shutdown: "Натиснете Включване за Изключване"
   </voice>
 </phrase>
 <phrase>
@@ -8026,11 +8040,11 @@
   </source>
   <dest>
     *: none
-    archosondio*: "Моля извадете MMC картата"
+    archosondio*: "Моля извадете MMC"
   </dest>
   <voice>
-    *: ""
-    archosondio*: "Please remove multimedia card"
+    *: none
+    archosondio*: "Моля извадете картата памет"
   </voice>
 </phrase>
 <phrase>
@@ -8041,10 +8055,10 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "Фирмуерът е променен"
+    *: "Фърмуера е променен"
   </dest>
   <voice>
-    *: ""
+    *: "Фърмуера е променен"
   </voice>
 </phrase>
 <phrase>
@@ -8058,7 +8072,7 @@
     *: "Рестартиране сега?"
   </dest>
   <voice>
-    *: ""
+    *: "Рестартиране сега?"
   </voice>
 </phrase>
 <phrase>
@@ -8078,7 +8092,7 @@
     *: "OFF за отказ"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP за отказ"
     ipod*: "PLAY/PAUSE за отказ"
-    iaudiox5,iaudiom5: "Продължително PLAY за отказ"
+    iaudiox5,iaudiom5: "Long PLAY за отказ"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV за отказ"
     gigabeats: "BACK за отказ"
     gigabeatfx: "POWER за отказ"
@@ -8098,7 +8112,7 @@
     *: "Няма файлове"
   </dest>
   <voice>
-    *: "No files"
+    *: "Няма файлове"
   </voice>
 </phrase>
 <phrase>
@@ -8112,7 +8126,7 @@
     *: "Нова клавиатура"
   </dest>
   <voice>
-    *: ""
+    *: "Нова клавиатура"
   </voice>
 </phrase>
 <phrase>
@@ -8123,7 +8137,7 @@
     *: "Can't open %s"
   </source>
   <dest>
-    *: "%s не може да се отвори"
+    *: "Не мога да отворя %s"
   </dest>
   <voice>
     *: ""
@@ -8137,7 +8151,7 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Четенето на %s е неуспешно"
+    *: "Неуспешно прочитане на %s"
   </dest>
   <voice>
     *: ""
@@ -8196,7 +8210,7 @@
     *: "Масивът с типове файлове е пълен"
   </dest>
   <voice>
-    *: ""
+    *: "Масивът с типове файлове е пълен"
   </voice>
 </phrase>
 <phrase>
@@ -8207,10 +8221,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Директориен буфер пълен!"
+    *: "Буфера за папките е пълен!"
   </dest>
   <voice>
-    *: ""
+    *: "Буфера за папките е пълен!"
   </voice>
 </phrase>
 <phrase>
@@ -8224,7 +8238,7 @@
     *: "Невалидно име на файл!"
   </dest>
   <voice>
-    *: ""
+    *: "Невалидно име на файл!"
   </voice>
 </phrase>
 <phrase>
@@ -8238,7 +8252,7 @@
     *: "Моля рестартирайте за включване"
   </dest>
   <voice>
-    *: ""
+    *: "Моля рестартирайте за включване"
   </voice>
 </phrase>
 <phrase>
@@ -8251,11 +8265,11 @@
   </source>
   <dest>
     *: none
-    charging: "Батерия: зарежда се"
+    charging: "Батерия: Зареждане"
   </dest>
   <voice>
     *: none
-    charging: none
+    charging: "Батерия: Зареждане"
   </voice>
 </phrase>
 <phrase>
@@ -8272,7 +8286,7 @@
   </dest>
   <voice>
     *: none
-    archosrecorder: none
+    archosrecorder: "Батерия: нерегулирано зареждане"
   </voice>
 </phrase>
 <phrase>
@@ -8289,7 +8303,7 @@
   </dest>
   <voice>
     *: none
-    charging: none
+    charging: "Батерия: регулирано зареждане"
   </voice>
 </phrase>
 <phrase>
@@ -8303,7 +8317,7 @@
     *: "Внимание! Изтощена батерия!"
   </dest>
   <voice>
-    *: ""
+    *: "Внимание! Изтощена батерия!"
   </voice>
 </phrase>
 <phrase>
@@ -8317,7 +8331,7 @@
     *: "Батерията е празна! ЗАРЕДИ!"
   </dest>
   <voice>
-    *: ""
+    *: "Батерията е празна! ЗАРЕДИ!"
   </voice>
 </phrase>
 <phrase>
@@ -8331,7 +8345,7 @@
     *: "B"
   </dest>
   <voice>
-    *: ""
+    *: "байта"
   </voice>
 </phrase>
 <phrase>
@@ -8345,7 +8359,7 @@
     *: "KB"
   </dest>
   <voice>
-    *: "kilobyte"
+    *: "килобайта"
   </voice>
 </phrase>
 <phrase>
@@ -8359,7 +8373,7 @@
     *: "MB"
   </dest>
   <voice>
-    *: "megabyte"
+    *: "мегабайта"
   </voice>
 </phrase>
 <phrase>
@@ -8373,7 +8387,7 @@
     *: "GB"
   </dest>
   <voice>
-    *: ""
+    *: "гигабайта"
   </voice>
 </phrase>
 <phrase>
@@ -8387,7 +8401,7 @@
     *: "."
   </dest>
   <voice>
-    *: ""
+    *: "цяло и"
   </voice>
 </phrase>
 <phrase>
@@ -8457,7 +8471,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "4"
   </voice>
 </phrase>
 <phrase>
@@ -8471,7 +8485,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "5"
   </voice>
 </phrase>
 <phrase>
@@ -8499,7 +8513,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "7"
   </voice>
 </phrase>
 <phrase>
@@ -8513,7 +8527,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "8"
   </voice>
 </phrase>
 <phrase>
@@ -8541,7 +8555,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "10"
   </voice>
 </phrase>
 <phrase>
@@ -8555,7 +8569,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "11"
   </voice>
 </phrase>
 <phrase>
@@ -8583,7 +8597,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "13"
   </voice>
 </phrase>
 <phrase>
@@ -8625,7 +8639,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "16"
   </voice>
 </phrase>
 <phrase>
@@ -8695,7 +8709,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "30"
   </voice>
 </phrase>
 <phrase>
@@ -8709,7 +8723,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "40"
   </voice>
 </phrase>
 <phrase>
@@ -8723,7 +8737,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "50"
   </voice>
 </phrase>
 <phrase>
@@ -8751,7 +8765,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "70"
   </voice>
 </phrase>
 <phrase>
@@ -8765,7 +8779,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "80"
   </voice>
 </phrase>
 <phrase>
@@ -8779,7 +8793,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "90"
   </voice>
 </phrase>
 <phrase>
@@ -8793,7 +8807,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "стотин"
   </voice>
 </phrase>
 <phrase>
@@ -8807,7 +8821,7 @@
     *: ""
   </dest>
   <voice>
-    *: "thousand"
+    *: "хиляди"
   </voice>
 </phrase>
 <phrase>
@@ -8821,7 +8835,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "милиона"
   </voice>
 </phrase>
 <phrase>
@@ -8835,7 +8849,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "милиарда"
   </voice>
 </phrase>
 <phrase>
@@ -8849,7 +8863,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "минус"
   </voice>
 </phrase>
 <phrase>
@@ -8863,7 +8877,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "плюс"
   </voice>
 </phrase>
 <phrase>
@@ -8877,7 +8891,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "милисекунди"
   </voice>
 </phrase>
 <phrase>
@@ -8891,7 +8905,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "секунда"
   </voice>
 </phrase>
 <phrase>
@@ -8905,7 +8919,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "секунди"
   </voice>
 </phrase>
 <phrase>
@@ -8919,7 +8933,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "минута"
   </voice>
 </phrase>
 <phrase>
@@ -8933,7 +8947,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "минути"
   </voice>
 </phrase>
 <phrase>
@@ -8947,7 +8961,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "час"
   </voice>
 </phrase>
 <phrase>
@@ -8961,7 +8975,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hours"
+    *: "часа"
   </voice>
 </phrase>
 <phrase>
@@ -8975,7 +8989,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "килохерца"
   </voice>
 </phrase>
 <phrase>
@@ -8989,7 +9003,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "децибела"
   </voice>
 </phrase>
 <phrase>
@@ -9003,7 +9017,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "процента"
   </voice>
 </phrase>
 <phrase>
@@ -9017,7 +9031,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "милиампер часа"
   </voice>
 </phrase>
 <phrase>
@@ -9031,7 +9045,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "пиксела"
   </voice>
 </phrase>
 <phrase>
@@ -9045,7 +9059,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "в секунда"
   </voice>
 </phrase>
 <phrase>
@@ -9059,7 +9073,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "херца"
   </voice>
 </phrase>
 <phrase>
@@ -9073,7 +9087,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "килобайта в секунда"
   </voice>
 </phrase>
 <phrase>
@@ -9381,7 +9395,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "V"
   </voice>
 </phrase>
 <phrase>
@@ -9437,7 +9451,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "Z"
   </voice>
 </phrase>
 <phrase>
@@ -9451,7 +9465,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "точка"
   </voice>
 </phrase>
 <phrase>
@@ -9479,7 +9493,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "Файл"
   </voice>
 </phrase>
 <phrase>
@@ -9493,7 +9507,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "Папка"
   </voice>
 </phrase>
 <phrase>
@@ -9507,7 +9521,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "аудио"
   </voice>
 </phrase>
 <phrase>
@@ -9521,7 +9535,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "настройки"
   </voice>
 </phrase>
 <phrase>
@@ -9535,7 +9549,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "Екран по време на просвирване"
   </voice>
 </phrase>
 <phrase>
@@ -9549,7 +9563,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "плъгин"
   </voice>
 </phrase>
 <phrase>
@@ -9563,7 +9577,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "шрифт"
   </voice>
 </phrase>
 <phrase>
@@ -9577,7 +9591,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bookmark"
+    *: "отметка"
   </voice>
 </phrase>
 <phrase>
@@ -9591,7 +9605,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "фърмуер"
   </voice>
 </phrase>
 <phrase>
@@ -9607,8 +9621,8 @@
     remote: ""
   </dest>
   <voice>
-    *: ""
-    remote: "remote while-playing-screen"
+    *: none
+    remote: "Екран по време на просвирване на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -9622,7 +9636,7 @@
     *: ""
   </dest>
   <voice>
-    *: "keyboard"
+    *: "клавиатура"
   </voice>
 </phrase>
 <phrase>
@@ -9633,7 +9647,7 @@
     *: ""
   </source>
   <dest>
-    *: ""
+     *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -9650,7 +9664,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "индекс"
   </voice>
 </phrase>
 <phrase>
@@ -9666,8 +9680,8 @@
     rtc: ""
   </dest>
   <voice>
-    *: ""
-    rtc: "Current time:"
+    *: none
+    rtc: "Часът е:"
   </voice>
 </phrase>
 <phrase>
@@ -9713,12 +9727,12 @@
     swcodec: "Gain"
   </source>
   <dest>
-    *: ""
-    swcodec: "Usilvane"
+    *: none
+    swcodec: "Усилване"
   </dest>
   <voice>
     *: none
-    swcodec: none
+    swcodec: "Усилване"
   </voice>
 </phrase>
 <phrase>
@@ -9731,10 +9745,10 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Rejim:"
+    lcd_bitmap: "Режим:"
   </dest>
   <voice>
-    *: ""
+    *: none
     lcd_bitmap: ""
   </voice>
 </phrase>
@@ -9748,7 +9762,7 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Meniu"
+    recorder_pad: "Меню"
   </dest>
   <voice>
     *: none
@@ -9765,10 +9779,10 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Opcia"
+    recorder_pad: "Опция"
   </dest>
   <voice>
-    *: ""
+    *: none
     recorder_pad: ""
   </voice>
 </phrase>
@@ -9785,7 +9799,7 @@
     recorder_pad: "LCD"
   </dest>
   <voice>
-    *: ""
+    *: none
     recorder_pad: ""
   </voice>
 </phrase>
@@ -9799,11 +9813,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stereo"
+    recording: "Стерео"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Стерео"
   </voice>
 </phrase>
 <phrase>
@@ -9816,11 +9830,11 @@
   </source>
   <dest>
     *: none
-    recording: "Mono"
+    recording: "Моно"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Моно"
   </voice>
 </phrase>
 <phrase>
@@ -9833,11 +9847,11 @@
   </source>
   <dest>
     *: none
-    recording_hwcodec: "Kachestvo"
+    recording_hwcodec: "Качество"
   </dest>
   <voice>
     *: none
-    recording_hwcodec: none
+    recording_hwcodec: "Качество"
   </voice>
 </phrase>
 <phrase>
@@ -9850,11 +9864,11 @@
   </source>
   <dest>
     *: none
-    recording: "Chestota"
+    recording: "Честота"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Честота"
   </voice>
 </phrase>
 <phrase>
@@ -9867,11 +9881,11 @@
   </source>
   <dest>
     *: none
-    recording: "Iztochnik"
+    recording: "Източник"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Източник"
   </voice>
 </phrase>
 <phrase>
@@ -9884,11 +9898,11 @@
   </source>
   <dest>
     *: none
-    recording: "Vgraden mikrofon"
+    recording: "Вграден микрофон"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Вграден микрофон"
   </voice>
 </phrase>
 <phrase>
@@ -9901,11 +9915,11 @@
   </source>
   <dest>
     *: none
-    recording: "Lineen vhod"
+    recording: "Линеен вход"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Линеен вход"
   </voice>
 </phrase>
 <phrase>
@@ -9918,11 +9932,11 @@
   </source>
   <dest>
     *: none
-    recording: "Cifrov"
+    recording: "Цифров"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Цифров"
   </voice>
 </phrase>
 <phrase>
@@ -9935,11 +9949,11 @@
   </source>
   <dest>
     *: none
-    recording: "Kanali"
+    recording: "Канали"
   </dest>
   <voice>
-    *: ""
-    recording: ""
+    *: none
+    recording: "Канали"
   </voice>
 </phrase>
 <phrase>
@@ -9952,11 +9966,11 @@
   </source>
   <dest>
     *: none
-    recording: "Triger"
+    recording: "Тригер"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Тригер"
   </voice>
 </phrase>
 <phrase>
@@ -9970,7 +9984,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "от"
   </voice>
 </phrase>
 <phrase>
@@ -9984,7 +9998,7 @@
     *: "Игри"
   </dest>
   <voice>
-    *: ""
+    *: "Игри"
   </voice>
 </phrase>
 <phrase>
@@ -9998,7 +10012,7 @@
     *: "Приложения"
   </dest>
   <voice>
-    *: ""
+    *: "Приложения"
   </voice>
 </phrase>
 <phrase>
@@ -10009,10 +10023,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Демонстрационни"
+    *: "Демонстрации"
   </dest>
   <voice>
-    *: ""
+    *: "Демонстрации"
   </voice>
 </phrase>
 <phrase>
@@ -10023,10 +10037,10 @@
     *: "Work"
   </source>
   <dest>
-    *: "произведение"
+    *: "Работа"
   </dest>
   <voice>
-    *: ""
+    *: "Работа"
   </voice>
 </phrase>
 <phrase>
@@ -10040,7 +10054,7 @@
     *: "Показване на разширенията на файловете"
   </dest>
   <voice>
-    *: ""
+    *: "Показване на разширенията на файловете"
   </voice>
 </phrase>
 <phrase>
@@ -10054,7 +10068,7 @@
     *: "Само на непознати типове файлове"
   </dest>
   <voice>
-    *: ""
+    *: "Само на непознати типове файлове"
   </voice>
 </phrase>
 <phrase>
@@ -10065,10 +10079,10 @@
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "Само при показване на всичките файлове"
+    *: "Само при показване на всички файлове"
   </dest>
   <voice>
-    *: ""
+    *: "Само при показване на всички файлове"
   </voice>
 </phrase>
 <phrase>
@@ -10082,7 +10096,7 @@
     *: ""
   </dest>
   <voice>
-    *: "units per tick"
+    *: "единици за такт"
   </voice>
 </phrase>
 <phrase>
@@ -10098,8 +10112,8 @@
     rtc: ""
   </dest>
   <voice>
-    *: ""
-    rtc: "o'clock"
+    *: none
+    rtc: "точно"
   </voice>
 </phrase>
 <phrase>
@@ -10115,8 +10129,8 @@
     rtc: ""
   </dest>
   <voice>
-    *: ""
-    rtc: "P M"
+    *: none
+    rtc: "следобед"
   </voice>
 </phrase>
 <phrase>
@@ -10132,8 +10146,8 @@
     rtc: ""
   </dest>
   <voice>
-    *: ""
-    rtc: "A M"
+    *: none
+    rtc: "предиобед"
   </voice>
 </phrase>
 <phrase>
@@ -10149,8 +10163,8 @@
     rtc: ""
   </dest>
   <voice>
-    *: ""
-    rtc: "oh"
+    *: none
+    rtc: "00"
   </voice>
 </phrase>
 <phrase>
@@ -10163,11 +10177,11 @@
   </source>
   <dest>
     *: none
-    recording: "Брояч на clips"
+    recording: "Брояч на смущения"
   </dest>
   <voice>
     *: none
-    recording: none
+    recording: "Брояч на смущения"
   </voice>
 </phrase>
 <phrase>
@@ -10184,7 +10198,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: none
+    lcd_color: "Основен цвят"
   </voice>
 </phrase>
 <phrase>
@@ -10197,11 +10211,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Втори цвят"
+    lcd_color: "Второстепенен цвят"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Второстепенен цвят"
   </voice>
 </phrase>
 <phrase>
@@ -10217,8 +10231,8 @@
     lcd_color: "Цвят на текста"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Цвят на текста"
   </voice>
 </phrase>
 <phrase>
@@ -10231,11 +10245,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Лента (запълнен цвят)"
+    lcd_color: "Лента (плътен цвят)"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Лента (плътен цвят)"
   </voice>
 </phrase>
 <phrase>
@@ -10251,8 +10265,8 @@
     lcd_color: "Лента (преливащ цвят)"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Лента (преливащ цвят)"
   </voice>
 </phrase>
 <phrase>
@@ -10266,7 +10280,7 @@
     *: "Централноевропейски (CP1250)"
   </dest>
   <voice>
-    *: ""
+    *: "Централноевропейски (CP1250)"
   </voice>
 </phrase>
 <phrase>
@@ -10280,7 +10294,7 @@
     *: "Настройки на темите"
   </dest>
   <voice>
-    *: ""
+    *: "Настройки на темите"
   </voice>
 </phrase>
 <phrase>
@@ -10296,8 +10310,8 @@
     lcd_color: "Цветове"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Цветове"
   </voice>
 </phrase>
 <phrase>
@@ -10310,11 +10324,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Цветове на избирача на линии"
+    lcd_color: "Цветове на показалеца на редовете"
   </dest>
   <voice>
-    *: ""
-    lcd_color: ""
+    *: none
+    lcd_color: "Цветове на показалеца на редовете"
   </voice>
 </phrase>
 <phrase>
@@ -10328,7 +10342,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit"
+    *: "редактиране"
   </voice>
 </phrase>
 <phrase>
@@ -10342,7 +10356,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "Празен"
   </voice>
 </phrase>
 <phrase>
@@ -10356,7 +10370,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "Празен списък"
   </voice>
 </phrase>
 <phrase>
@@ -10373,7 +10387,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: none
+    multivolume: "Не е налична"
   </voice>
 </phrase>
 <phrase>
@@ -10387,7 +10401,7 @@
     *: "Съобщаване за нивото на батерията"
   </dest>
   <voice>
-    *: ""
+    *: "Съобщаване за нивото на батерията"
   </voice>
 </phrase>
 <phrase>
@@ -10401,7 +10415,7 @@
     *: "Произнасяне на типа на файла"
   </dest>
   <voice>
-    *: ""
+    *: "Произнасяне на типа на файла"
   </voice>
 </phrase>
 <phrase>
@@ -10414,11 +10428,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на бас"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на баса"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на бас"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на баса"
   </voice>
 </phrase>
 <phrase>
@@ -10434,7 +10448,7 @@
     ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на високите"
   </dest>
   <voice>
-    *: ""
+    *: none
     ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на високите"
   </voice>
 </phrase>
@@ -10449,7 +10463,7 @@
     *: "<случайно>"
   </dest>
   <voice>
-    *: ""
+    *: "случайно"
   </voice>
 </phrase>
 <phrase>
@@ -10463,7 +10477,7 @@
     *: "Запазване на звуковите настройки"
   </dest>
   <voice>
-    *: ""
+    *: "Запазване на звуковите настройки"
   </voice>
 </phrase>
 <phrase>
@@ -10479,8 +10493,8 @@
     swcodec: "Цъкане на бутоните"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Цъкане на бутоните"
   </voice>
 </phrase>
 <phrase>
@@ -10496,8 +10510,8 @@
     swcodec: "Повтаряне на цъканията на бутоните"
   </dest>
   <voice>
-    *: ""
-    swcodec: ""
+    *: none
+    swcodec: "Повтаряне на цъканията на бутоните"
   </voice>
 </phrase>
 <phrase>
@@ -10528,7 +10542,7 @@
     *: "Неустановен"
   </dest>
   <voice>
-    *: "Неустановено състояние"
+    *: "Неустановен"
   </voice>
 </phrase>
 <phrase>
@@ -10542,7 +10556,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quick screen"
+    *: "Услужлив екран"
   </voice>
 </phrase>
 <phrase>
@@ -10573,7 +10587,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop Recording And Shutdown"
+    recording: "Спиране на записването и изключване"
   </voice>
 </phrase>
 <phrase>
@@ -10590,7 +10604,7 @@
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx: "Чувствителност на тъчпада"
   </voice>
 </phrase>
 <phrase>
@@ -10603,11 +10617,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx: "Високо"
+    gigabeatfx: "Висока"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "High"
+    gigabeatfx: "Висока"
   </voice>
 </phrase>
 <phrase>
@@ -10620,11 +10634,11 @@
   </source>
   <dest>
     *: none
-    serial_port: "Сериен битрейт"
+    serial_port: "Скорост на серийния порт"
   </dest>
   <voice>
     *: none
-    serial_port: "Сериен битрейт"
+    serial_port: "Скорост на серийния порт"
   </voice>
 </phrase>
 <phrase>
@@ -10637,11 +10651,11 @@
   </source>
   <dest>
     *: none
-    serial_port: "Авто"
+    serial_port: "Автоматична"
   </dest>
   <voice>
     *: none
-    serial_port: "Автоматично"
+    serial_port: "Автоматична"
   </voice>
 </phrase>
 <phrase>
@@ -10723,7 +10737,7 @@
     *: "Много бавно"
   </dest>
   <voice>
-    *: "Very slow"
+    *: "Много бавно"
   </voice>
 </phrase>
 <phrase>
@@ -10737,7 +10751,7 @@
     *: "Бавно"
   </dest>
   <voice>
-    *: "Slow"
+    *: "Бавно"
   </voice>
 </phrase>
 <phrase>
@@ -10751,7 +10765,7 @@
     *: "Много бързо"
   </dest>
   <voice>
-    *: "Very fast"
+    *: "Много бързо"
   </voice>
 </phrase>
 <phrase>
@@ -10765,7 +10779,7 @@
     *: "Бързо"
   </dest>
   <voice>
-    *: "Fast"
+    *: "Бързо"
   </voice>
 </phrase>
 <phrase>
@@ -10779,7 +10793,7 @@
     *: "Дължина на прескачане"
   </dest>
   <voice>
-    *: "Skip Length"
+    *: "Дължина на прескачане"
   </voice>
 </phrase>
 <phrase>
@@ -10790,10 +10804,10 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Пропускане на трак"
+    *: "Пропускане на запис"
   </dest>
   <voice>
-    *: "Skip Track"
+    *: "Пропускане на запис"
   </voice>
 </phrase>
 <phrase>
@@ -10807,7 +10821,7 @@
     *: ""
   </dest>
   <voice>
-    *: "slash"
+    *: "наклонена черта"
   </voice>
 </phrase>
 <phrase>
@@ -10820,11 +10834,11 @@
   </source>
   <dest>
     *: none
-    recording: "Усилване Л"
+    recording: "Л усилване"
   </dest>
   <voice>
     *: none
-    recording: "Gain Left"
+    recording: "Ляво усилване"
   </voice>
 </phrase>
 <phrase>
@@ -10837,11 +10851,11 @@
   </source>
   <dest>
     *: none
-    recording: "Усилване Д"
+    recording: "Д усилване"
   </dest>
   <voice>
     *: none
-    recording: "Gain Right"
+    recording: "Дясно усилване"
   </voice>
 </phrase>
 <phrase>
@@ -10854,11 +10868,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "АРУ"
   </dest>
   <voice>
     *: none
-    agc: "Automatic gain control"
+    agc: "Автоматично регулиране на усилването"
   </voice>
 </phrase>
 <phrase>
@@ -10871,11 +10885,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC време за clip"
+    agc: "АРУ време на смущения"
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: "Автоматично регулиране на усилването: време на смущения"
   </voice>
 </phrase>
 <phrase>
@@ -10888,11 +10902,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC макс. усилване"
+    agc: "АРУ Макс. смущения"
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: "Автоматично регулиране на усилването: Максимални смущения"
   </voice>
 </phrase>
 <phrase>
@@ -10922,7 +10936,7 @@
   </source>
   <dest>
     *: none
-    recording: "CLIP:"
+    recording: "Смущения:"
   </dest>
   <voice>
     *: none
@@ -11016,10 +11030,10 @@
     *: "Right"
   </source>
   <dest>
-    *: "Дясно"
+    *: "Десен"
   </dest>
   <voice>
-    *: "Дясно"
+    *: "Десен"
   </voice>
 </phrase>
 <phrase>
@@ -11030,10 +11044,10 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "Нулиране на настройката"
+    *: "Връщане на настройките"
   </dest>
   <voice>
-    *: "Нулиране на настройката"
+    *: "Връщане на настройките"
   </voice>
 </phrase>
 <phrase>
@@ -11046,11 +11060,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Задай за ляв обект"
+    quickscreen: "Задаване като ляв елемент на услужливия екран"
   </dest>
   <voice>
     *: none
-    quickscreen: "Задай за ляв обект"
+    quickscreen: "Задаване като ляв елемент на услужливия екран"
   </voice>
 </phrase>
 <phrase>
@@ -11063,11 +11077,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Задай за десен обект"
+    quickscreen: "Задаване като десен елемент на услужливия екран"
   </dest>
   <voice>
     *: none
-    quickscreen: "Задай за десен обект"
+    quickscreen: "Задаване като десен елемент на услужливия екран"
   </voice>
 </phrase>
 <phrase>
@@ -11080,11 +11094,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Задай за долен обект"
+    quickscreen: "Задаване като долен елемент на услужливия екран"
   </dest>
   <voice>
     *: none
-    quickscreen: "Задай за долен обект"
+    quickscreen: "Задаване като долен елемент на услужливия екран"
   </voice>
 </phrase>
 <phrase>
@@ -11095,10 +11109,10 @@
     *: "Credits"
   </source>
   <dest>
-    *: "Създатели"
+    *: "Участници"
   </dest>
   <voice>
-    *: "Създатели"
+    *: "Участници"
   </voice>
 </phrase>
 <phrase>
@@ -11109,10 +11123,10 @@
     *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: "Използвай номера при сортиране"
+    *: "Интерпретиране на номерата при сортиране"
   </dest>
   <voice>
-    *: "Използвай номера при сортиране"
+    *: "Интерпретиране на номерата при сортиране"
   </voice>
 </phrase>
 <phrase>
@@ -11191,7 +11205,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "3 по 3 мрежа"
+    touchscreen: "3по3 мрежа"
   </voice>
 </phrase>
 <phrase>
@@ -11219,10 +11233,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Забрани смяна на песен"
+    *: "Предотвратяване смяната на песен"
   </dest>
   <voice>
-    *: "Забрани смяна на песен"
+    *: "Предотвратяване смяната на песен"
   </voice>
 </phrase>
 <phrase>
@@ -11235,11 +11249,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Промяна на продължителността"
+    swcodec: "Сгъстяване на времето"
   </dest>
   <voice>
     *: none
-    swcodec: "Промяна на продължителността"
+    swcodec: "Сгъстяване на времето"
   </voice>
 </phrase>
 <phrase>
@@ -11348,11 +11362,11 @@
   </source>
   <dest>
     *: none
-    remote: "Отдалечена статус лента"
+    remote: "Лента на състоянието на дистанционното"
   </dest>
   <voice>
     *: none
-    remote: "Отдалечена статус лента"
+    remote: "Лента на състоянието на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -11399,11 +11413,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Темпо"
+    pitchscreen: "Честота"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Темпо"
+    pitchscreen: "Честота"
   </voice>
 </phrase>
 <phrase>
@@ -11515,11 +11529,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ширина на скролбара"
+    lcd_bitmap: "Ширина на лентата за позициониране"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Ширина на скролбара"
+    lcd_bitmap: "Ширина на лентата за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -11532,11 +11546,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Позиция на скролбар-а"
+    lcd_bitmap: "Позиция на лентата за позициониране"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Позиция на скролбар-а"
+    lcd_bitmap: "Позиция на лентата за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -11566,11 +11580,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Задай за горен обект"
+    quickscreen: "Задаване като горен елемент на услужливия екран"
   </dest>
   <voice>
     *: none
-    quickscreen: "Задай за горен обект"
+    quickscreen: "Задаване като горен елемент на услужливия екран"
   </voice>
 </phrase>
 <phrase>
@@ -11634,11 +11648,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Коефицент"
+    swcodec: "Коефициент"
   </dest>
   <voice>
     *: none
-    swcodec: "Коефицент"
+    swcodec: "Коефициент"
   </voice>
 </phrase>
 <phrase>
@@ -11821,11 +11835,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Време за освобождаване"
+    swcodec: "Време на освобождаване"
   </dest>
   <voice>
     *: none
-    swcodec: "Време за освобождаване"
+    swcodec: "Време на освобождаване"
   </voice>
 </phrase>
 <phrase>
@@ -11836,10 +11850,10 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Превърти до края"
+    *: "Прескачане до края"
   </dest>
   <voice>
-    *: "Превърти до края"
+    *: "Прескачане до края"
   </voice>
 </phrase>
 <phrase>
@@ -11867,7 +11881,7 @@
     *: ""
   </dest>
   <voice>
-    *: "statusbar skin"
+    *: "Кожа за лентата на състоянието"
   </voice>
 </phrase>
 <phrase>
@@ -11884,7 +11898,7 @@
   </dest>
   <voice>
     *: none
-    remote: "скин за отдалечена статус лента"
+    remote: "Кожа за лентата на състоянието на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -11897,11 +11911,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB HID"
+    usb_hid: "USB УЧИ"
   </dest>
   <voice>
     *: none
-    usb_hid: "USB Human Interface Device"
+    usb_hid: "USB устройство за човешки интерфейс"
   </voice>
 </phrase>
 <phrase>
@@ -11912,10 +11926,10 @@
     *: "Insert Last Shuffled"
   </source>
   <dest>
-    *: "Вмъкни накрая разбъркано"
+    *: "Вмъкване като последна разбъркано"
   </dest>
   <voice>
-    *: "Вмъкни накрая разбъркано"
+    *: "Вмъкване като последна разбъркано"
   </voice>
 </phrase>
 <phrase>
@@ -11926,10 +11940,10 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Добави накрая разбъркано"
+    *: "На опашката като последна разбъркано"
   </dest>
   <voice>
-    *: "Добави накрая разбъркано"
+    *: "На опашката като последна разбъркано"
   </voice>
 </phrase>
 <phrase>
@@ -11974,10 +11988,10 @@
     *: "Next Track:"
   </source>
   <dest>
-    *: "Следваща песен:"
+    *: "Следващ запис:"
   </dest>
   <voice>
-    *: "Следваща песен:"
+    *: "Следващ запис:"
   </voice>
 </phrase>
 <phrase>
@@ -11988,10 +12002,10 @@
     *: "Next:"
   </source>
   <dest>
-    *: "Следваща:"
+    *: "Следващ:"
   </dest>
   <voice>
-    *: "Следваща:"
+    *: "Следващ:"
   </voice>
 </phrase>
 <phrase>
@@ -12018,11 +12032,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Основен скин"
+    lcd_bitmap: "Основна кожа"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Основен скин"
+    lcd_bitmap: "Основна кожа"
   </voice>
 </phrase>
 <phrase>
@@ -12035,11 +12049,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Отдалечен основен скин"
+    lcd_bitmap: "Основна кожа на дистанционното"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Отдалечен основен скин"
+    lcd_bitmap: "Основна кожа на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -12069,11 +12083,11 @@
   </source>
   <dest>
     *: none
-    remote: "Отдалечен екран"
+    remote: "Екран на дистанционното"
   </dest>
   <voice>
     *: none
-    remote: "Отдалечен екран"
+    remote: "Екран на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -12103,11 +12117,11 @@
   </source>
   <dest>
     *: none
-    lineout_poweroff: "Line Out"
+    lineout_poweroff: "Линеен изход"
   </dest>
   <voice>
     *: none
-    lineout_poweroff: "Line Out"
+    lineout_poweroff: "Линеен изход"
   </voice>
 </phrase>
 <phrase>
@@ -12120,11 +12134,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Бутон"
+    hotkey: "Бърз клавиш"
   </dest>
   <voice>
     *: none
-    hotkey: "Бутон"
+    hotkey: "Бърз клавиш"
   </voice>
 </phrase>
 <phrase>
@@ -12137,11 +12151,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Бутон за екрана за възпроизвеждане"
+    hotkey: "Бърз клавиш за WPS"
   </dest>
   <voice>
     *: none
-    hotkey: "Бутон за екрана за възпроизвеждане"
+    hotkey: "Бърз клавиш за WPS"
   </voice>
 </phrase>
 <phrase>
@@ -12154,11 +12168,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Бутон за файловия браузър"
+    hotkey: "Бърз клавиш за файловия браузър"
   </dest>
   <voice>
     *: none
-    hotkey: "Бутон за файловия браузър"
+    hotkey: "Бърз клавиш за файловия браузър"
   </voice>
 </phrase>
 <phrase>
@@ -12188,11 +12202,11 @@
   </source>
   <dest>
     *: none
-    radio_remote: "Отдалечен радио екран"
+    radio_remote: "Екран на радиото на дистанционното"
   </dest>
   <voice>
     *: none
-    radio_remote: "Отдалечен радио екран"
+    radio_remote: "Екран на радиото на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -12209,7 +12223,7 @@
   </dest>
   <voice>
     *: none
-    radio: "скин за радио екран"
+    radio: "Кожа за екрана на радиото"
   </voice>
 </phrase>
 <phrase>
@@ -12226,7 +12240,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "скин за отдалечен радио екран"
+    radio_remote: "Кожа за екрана на радиото на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -12273,11 +12287,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Допълнителни настройки на тоновете"
+    gigabeats: "Разширени настройки на тоновете"
   </dest>
   <voice>
     *: none
-    gigabeats: "Допълнителни настройки на тоновете"
+    gigabeats: "Разширени настройки на тоновете"
   </voice>
 </phrase>
 <phrase>
@@ -12294,7 +12308,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Лента Усилване"
+    gigabeats: "Усилване на лентата"
   </voice>
 </phrase>
 <phrase>
@@ -12311,7 +12325,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Лента Честота"
+    gigabeats: "Честота на лентата"
   </voice>
 </phrase>
 <phrase>
@@ -12324,11 +12338,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Лента %d Ширина"
+    gigabeats: "Лента %d ширина"
   </dest>
   <voice>
     *: none
-    gigabeats: "Лента Ширина"
+    gigabeats: "Ширина на лентата"
   </voice>
 </phrase>
 <phrase>
@@ -12358,11 +12372,11 @@
   </source>
   <dest>
     *: none
-    gigabeats: "Широк"
+    gigabeats: "Разширяване"
   </dest>
   <voice>
     *: none
-    gigabeats: "Широк"
+    gigabeats: "Разширяване"
   </voice>
 </phrase>
 <phrase>
@@ -12371,15 +12385,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D ефект"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D подобрение"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3D ефект"
+    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D подобрение"
   </voice>
 </phrase>
 <phrase>
@@ -12406,11 +12420,11 @@
   </source>
   <dest>
     *: none
-    radio: "Радио екран"
+    radio: "Екран на радиото"
   </dest>
   <voice>
     *: none
-    radio: "Радио екран"
+    radio: "Екран на радиото"
   </voice>
 </phrase>
 <phrase>
@@ -12424,7 +12438,7 @@
     *: "Композитор"
   </dest>
   <voice>
-    *: ""
+    *: "Композитор"
   </voice>
 </phrase>
 <phrase>
@@ -12435,10 +12449,10 @@
     *: "Force"
   </source>
   <dest>
-    *: "Форсиране"
+    *: "Сила"
   </dest>
   <voice>
-    *: "Форсиране"
+    *: "Сила"
   </voice>
 </phrase>
 <phrase>
@@ -12449,10 +12463,10 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "Рамка за снимки"
   </dest>
   <voice>
-    *: "отвори picture flow"
+    *: "Отваря рамка за снимки"
   </voice>
 </phrase>
 <phrase>
@@ -12482,11 +12496,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Изтрий"
+    touchscreen: "Del"
   </dest>
   <voice>
     *: none
-    touchscreen: "Изтрий"
+    touchscreen: "Del"
   </voice>
 </phrase>
 <phrase>
@@ -12528,10 +12542,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "Отваряй файловия браузър тук"
+    *: "Отваряне на файловия браузър тук"
   </dest>
   <voice>
-    *: "Отваряй файловия браузър тук"
+    *: "Отваряне на файловия браузър тук"
   </voice>
 </phrase>
 <phrase>
@@ -12542,10 +12556,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Отваряй файловия браузър в /"
+    *: "Отваряне на файловия браузър в /"
   </dest>
   <voice>
-    *: "Отваряй файловия браузър в /"
+    *: "Отваряне на файловия браузър в кореновата папка"
   </voice>
 </phrase>
 <phrase>
@@ -12643,10 +12657,10 @@
     *: "In custom directories only"
   </source>
   <dest>
-    *: "Само в потребителски директории"
+    *: "Само в потребителски папки"
   </dest>
   <voice>
-    *: "Само в потребителски директории"
+    *: "Само в потребителски папки"
   </voice>
 </phrase>
 <phrase>
@@ -12671,10 +12685,10 @@
     *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Задай като директория за каталога на плейлисти"
+    *: "Задай като папка за каталога на плейлисти"
   </dest>
   <voice>
-    *: "Задай като директория за каталога на плейлисти"
+    *: "Задай като папка за каталога на плейлисти"
   </voice>
 </phrase>
 <phrase>
@@ -12685,10 +12699,10 @@
     *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Нулирай директорията за каталога на плейлисти"
+    *: "Нулирай папката за каталога на плейлисти"
   </dest>
   <voice>
-    *: "Нулирай директорията за каталога на плейлисти"
+    *: "Нулирай папката за каталога на плейлисти"
   </voice>
 </phrase>
 <phrase>
@@ -12699,10 +12713,10 @@
     *: "Current Playlist"
   </source>
   <dest>
-    *: "Текуща плейлиста"
+    *: "Текущ плейлист"
   </dest>
   <voice>
-    *: "Текуща плейлиста"
+    *: "Текущ плейлист"
   </voice>
 </phrase>
 <phrase>
@@ -12729,11 +12743,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "Скрий вграденото USB устройство"
+    multidrive_usb: "USB скриване на вътрешната памет"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "Скрий вграденото USB устройство"
+    multidrive_usb: "USB скриване на вътрешната памет"
   </voice>
 </phrase>
 <phrase>
@@ -12769,16 +12783,16 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes (unused in UI)
+  desc: default sleep timer duration in minutes
   user: core
   <source>
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Време на таймера по подразбиране"
+    *: "Време на таймера на заспиване по подразбиране"
   </dest>
   <voice>
-    *: "Време на таймера по подразбиране"
+    *: "Време на таймера на заспиване по подразбиране"
   </voice>
 </phrase>
 <phrase>
@@ -12789,10 +12803,10 @@
     *: "Start Sleep Timer On Boot"
   </source>
   <dest>
-    *: "Стартирай таймера при включване"
+    *: "Стартирай таймера на заспиване при включване"
   </dest>
   <voice>
-    *: "Стартирай таймера при включване"
+    *: "Стартирай таймера на заспиване при включване"
   </voice>
 </phrase>
 <phrase>
@@ -12803,10 +12817,10 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Отмени таймер"
+    *: "Отмяна на таймера на заспиване"
   </dest>
   <voice>
-    *: "Отмени таймер"
+    *: "Отмяна на таймера на заспиване"
   </voice>
 </phrase>
 <phrase>
@@ -12817,10 +12831,10 @@
     *: "Shortcuts"
   </source>
   <dest>
-    *: "Кратки пътища"
+    *: "Преки пътища"
   </dest>
   <voice>
-    *: "Кратки пътища"
+    *: "Преки пътища"
   </voice>
 </phrase>
 <phrase>
@@ -12893,9 +12907,130 @@
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Рестартирай таймера при натискане на бутон"
+    *: "Рестартирай таймера на заспиване при натискане на бутон"
   </dest>
   <voice>
-    *: "Рестартирай таймера при натискане на бутон"
+    *: "Рестартирай таймера на заспиване при натискане на бутон"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Предотвратяване на автоматичната промяна"
+  </dest>
+  <voice>
+    *: "Предотвратяване на автоматичната промяна"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Използване на преки пътища вместо услужлив екран"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Използване на преки пътища вместо услужлив екран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Стартиране на таймера на заспиване"
+  </dest>
+  <voice>
+    *: "Стартиране на таймера на заспиване"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Западноевропейски (CP1252)"
+  </dest>
+  <voice>
+    *: "Западноевропейски (CP1252)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Прост (главен)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Прост (главен)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Потребителски"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Потребителски"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Изберете една или повече папки"
+  </dest>
+  <voice>
+    *: "Изберете една или повече папки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Изберете папки за сканиране"
+  </dest>
+  <voice>
+    *: "Изберете папки за сканиране"
   </voice>
 </phrase>
