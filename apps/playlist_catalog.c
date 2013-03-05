@@ -161,7 +161,7 @@ restart:
         if (view)
         {
             
-            if (!bookmark_autoload(selected_playlist))
+            if (!bookmark_autoload(selected_playlist, NULL))
             {
                 if (playlist_viewer_ex(selected_playlist) == PLAYLIST_VIEWER_CANCEL)
                     goto restart;
