@@ -55,9 +55,11 @@ struct bookmark_list
     int start;
     int count;
     int total_count;
+    int filtered_count;
     bool show_dont_resume;
     bool reload;
     bool show_playlist_name;
+    const char* filterby; /* filter this name only */
     char* items[];
 };
 
@@ -92,9 +94,10 @@ static const char* get_bookmark_info(int list_index,
                                      void* data,
                                      char *buffer,
                                      size_t buffer_len);
-static int   select_bookmark(const char* bookmark_file_name, bool show_dont_resume, char** selected_bookmark);
+static int   select_bookmark(const char* bookmark_file_name, bool show_dont_resume,
+                             const char* filterby, char** selected_bookmark);
 static bool  write_bookmark(bool create_bookmark_file, const char *bookmark);
-static int   get_bookmark_count(const char* bookmark_file_name);
+static int   get_bookmark_count(const char* bookmark_file_name, const char *filterby, int *filtered_count);
 
 #define TEMP_BUF_SIZE (MAX_PATH + 1)
 static char global_temp_buffer[TEMP_BUF_SIZE];
@@ -135,7 +138,7 @@ int bookmark_load_menu(void)
                                        sizeof(global_temp_buffer));
     if (generate_bookmark_file_name(name))
     {
-        ret = select_bookmark(global_bookmark_file_name, false, &bookmark);
+        ret = select_bookmark(global_bookmark_file_name, false, NULL, &bookmark);
         if (bookmark != NULL)
         {
             ret = play_bookmark(bookmark) ? BOOKMARK_SUCCESS : BOOKMARK_FAIL;
@@ -157,7 +160,7 @@ bool bookmark_mrb_load()
     bool ret = false;
 
     push_current_activity(ACTIVITY_BOOKMARKSLIST);
-    select_bookmark(RECENT_BOOKMARK_FILE, false, &bookmark);
+    select_bookmark(RECENT_BOOKMARK_FILE, false, 0, &bookmark);
     if (bookmark != NULL)
     {
         ret = play_bookmark(bookmark);
@@ -413,7 +416,7 @@ static char* create_bookmark()
 /* interface function.                                                     */
 /* Returns true on bookmark load or bookmark selection.                    */
 /* ------------------------------------------------------------------------*/
-bool bookmark_autoload(const char* file)
+bool bookmark_autoload(const char* file, const char *track)
 {
     char* bookmark;
 
@@ -435,8 +438,10 @@ bool bookmark_autoload(const char* file)
     }
     else
     {
-        int ret = select_bookmark(global_bookmark_file_name, true, &bookmark);
-        
+        /* normal "ask" mode does not filter by track */
+        if (global_settings.autoloadbookmark == BOOKMARK_ASK)
+            track = NULL;
+        int ret = select_bookmark(global_bookmark_file_name, true, track, &bookmark);
         if (bookmark != NULL)
         {
             if (!play_bookmark(bookmark))
@@ -478,7 +483,7 @@ bool bookmark_load(const char* file, bool autoload)
     else
     {
         /* This is not an auto-load, so list the bookmarks */
-        select_bookmark(file, false, &bookmark);
+        select_bookmark(file, false, NULL, &bookmark);
     }
 
     if (bookmark != NULL)
@@ -499,9 +504,10 @@ bool bookmark_load(const char* file, bool autoload)
 }
 
 
-static int get_bookmark_count(const char* bookmark_file_name)
+static int get_bookmark_count(const char* bookmark_file_name, const char *filterby, int *filtered_count)
 {
     int read_count = 0;
+    int tmp_filtered = 0;
     int file = open(bookmark_file_name, O_RDONLY);
 
     if(file < 0)
@@ -510,8 +516,13 @@ static int get_bookmark_count(const char* bookmark_file_name)
     while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
     {
         read_count++;
+        if (filterby && parse_bookmark(global_read_buffer, true)
+            && strcmp(global_filename, filterby) == 0)
+            tmp_filtered++;
     }
-    
+    if (!filterby)
+        tmp_filtered = read_count;
+    *filtered_count = tmp_filtered;
     close(file);
     return read_count;
 }
@@ -537,6 +548,7 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
     bookmarks->start = first_line;
     bookmarks->count = 0;
     bookmarks->reload = false;
+    int tmpcount = 0;
     
     while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
     {
@@ -551,15 +563,22 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
             {
                 break;
             }
-            
-            strcpy(dest, global_read_buffer);
-            bookmarks->items[bookmarks->count] = dest;
-            bookmarks->count++;
+
+            if (bookmarks->filterby == 0
+                || (bookmarks->filterby
+                    && parse_bookmark(global_read_buffer, true)
+                    && strcmp(global_filename, bookmarks->filterby) == 0))
+            {
+                strcpy(dest, global_read_buffer);
+                bookmarks->items[bookmarks->count] = dest;
+                bookmarks->count++;
+            }
+            tmpcount++;
         }
     }
 
     close(file);
-    return bookmarks->start + bookmarks->count;
+    return bookmarks->start + tmpcount;
 }
 
 static const char* get_bookmark_info(int list_index,
@@ -700,7 +719,8 @@ static int bookmark_list_voice_cb(int list_index, void* data)
 /* if no selection was made and BOOKMARK_USB_CONNECTED if the selection    */
 /* menu is forced to exit due to a USB connection.                         */
 /* ------------------------------------------------------------------------*/
-static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume, char** selected_bookmark)
+static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume,
+                           const char* filterby, char** selected_bookmark)
 {
     struct bookmark_list* bookmarks;
     struct gui_synclist list;
@@ -718,6 +738,7 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
     bookmarks->start = 0;
     bookmarks->show_playlist_name
         = strcmp(bookmark_file_name, RECENT_BOOKMARK_FILE) == 0;
+    bookmarks->filterby = filterby;
     gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2, NULL);
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&list, bookmark_list_voice_cb);
@@ -729,7 +750,7 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
         
         if (refresh)
         {
-            int count = get_bookmark_count(bookmark_file_name);
+            int count = get_bookmark_count(bookmark_file_name, filterby, &bookmarks->filtered_count);
             bookmarks->total_count = count;
 
             if (bookmarks->total_count < 1)
@@ -741,6 +762,7 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
                 return BOOKMARK_FAIL;
             }
 
+            count = bookmarks->filtered_count;
             if (bookmarks->show_dont_resume)
             {
                 count++;

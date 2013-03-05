@@ -33,7 +33,7 @@ int  bookmark_load_menu(void);
 bool bookmark_autobookmark(bool prompt_ok);
 bool bookmark_create_menu(void);
 bool bookmark_mrb_load(void);
-bool bookmark_autoload(const char* file);
+bool bookmark_autoload(const char* file, const char *track);
 bool bookmark_load(const char* file, bool autoload);
 bool bookmark_exists(void);
 bool bookmark_is_bookmarkable_state(void);
