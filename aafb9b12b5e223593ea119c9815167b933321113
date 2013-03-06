@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///cw\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-03-06T00:27:01Z",
+      "side": 1,
+      "message": "I think the commit message can be improved. I don\u0027t see the relation to lcd-memframe. Do you perhaps mean linux framebuffer device?",
+      "revId": "aafb9b12b5e223593ea119c9815167b933321113",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///c0\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-03-06T00:27:01Z",
+      "side": 1,
+      "message": "You need to #include \"config.h\" for this",
+      "revId": "aafb9b12b5e223593ea119c9815167b933321113",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///c4\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-03-06T00:27:01Z",
+      "side": 1,
+      "message": "That sentence doesnt make sense (also s/nedeed/needed/).",
+      "revId": "aafb9b12b5e223593ea119c9815167b933321113",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
