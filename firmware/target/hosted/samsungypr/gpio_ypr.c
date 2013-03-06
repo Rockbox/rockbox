@@ -41,13 +41,8 @@ void gpio_close(void)
         close(r0_gpio_dev);
 }
 
-int gpio_control_struct(int request, R0GPIOInfo r)
-{
-    return ioctl(r0_gpio_dev, request, &r);
-}
-
 int gpio_control(int request, int num, int mode, int val)
 {
-    R0GPIOInfo r = { .num = num, .mode = mode, .val = val, };
+    struct gpio_info r = { .num = num, .mode = mode, .val = val, };
     return ioctl(r0_gpio_dev, request, &r);
 }

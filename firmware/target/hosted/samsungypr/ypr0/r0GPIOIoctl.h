@@ -8,11 +8,11 @@
 #include <sys/ioctl.h>
 //#include "iomux.h"
 
-typedef struct {
+struct gpio_info {
 	int num;
 	int mode;
 	int val;
-}__attribute__((packed)) R0GPIOInfo;
+} __attribute__((packed));
 
 
 #define IOCTL_GPIO_MAGIC 	'G'
@@ -28,15 +28,15 @@ typedef struct {
 #define E_IOCTL_GPIO_IS_HIGH		8
 #define E_IOCTL_GPIO_MAX_NR			9
 
-#define DEV_CTRL_GPIO_SET_MUX		_IOW(IOCTL_GPIO_MAGIC, 0, R0GPIOInfo)
-#define DEV_CTRL_GPIO_UNSET_MUX		_IOW(IOCTL_GPIO_MAGIC, 1, R0GPIOInfo)
-#define DEV_CTRL_GPIO_SET_TYPE		_IOW(IOCTL_GPIO_MAGIC, 2, R0GPIOInfo)
-#define DEV_CTRL_GPIO_SET_OUTPUT	_IOW(IOCTL_GPIO_MAGIC, 3, R0GPIOInfo)
-#define DEV_CTRL_GPIO_SET_INPUT		_IOW(IOCTL_GPIO_MAGIC, 4, R0GPIOInfo)
-#define DEV_CTRL_GPIO_SET_HIGH		_IOW(IOCTL_GPIO_MAGIC, 5, R0GPIOInfo)
-#define DEV_CTRL_GPIO_SET_LOW		_IOW(IOCTL_GPIO_MAGIC, 6, R0GPIOInfo)
-#define DEV_CTRL_GPIO_GET_VAL		_IOW(IOCTL_GPIO_MAGIC, 7, R0GPIOInfo)
-#define DEV_CTRL_GPIO_IS_HIGH		_IOW(IOCTL_GPIO_MAGIC, 8, R0GPIOInfo)
+#define DEV_CTRL_GPIO_SET_MUX		_IOW(IOCTL_GPIO_MAGIC, 0, struct gpio_info)
+#define DEV_CTRL_GPIO_UNSET_MUX		_IOW(IOCTL_GPIO_MAGIC, 1, struct gpio_info)
+#define DEV_CTRL_GPIO_SET_TYPE		_IOW(IOCTL_GPIO_MAGIC, 2, struct gpio_info)
+#define DEV_CTRL_GPIO_SET_OUTPUT	_IOW(IOCTL_GPIO_MAGIC, 3, struct gpio_info)
+#define DEV_CTRL_GPIO_SET_INPUT		_IOW(IOCTL_GPIO_MAGIC, 4, struct gpio_info)
+#define DEV_CTRL_GPIO_SET_HIGH		_IOW(IOCTL_GPIO_MAGIC, 5, struct gpio_info)
+#define DEV_CTRL_GPIO_SET_LOW		_IOW(IOCTL_GPIO_MAGIC, 6, struct gpio_info)
+#define DEV_CTRL_GPIO_GET_VAL		_IOW(IOCTL_GPIO_MAGIC, 7, struct gpio_info)
+#define DEV_CTRL_GPIO_IS_HIGH		_IOW(IOCTL_GPIO_MAGIC, 8, struct gpio_info)
 
 
 typedef enum
