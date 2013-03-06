@@ -37,7 +37,7 @@ void gpio_init(void)
 
 void gpio_close(void)
 {
-    if (r0_gpio_dev < 0)
+    if (r0_gpio_dev >= 0)
         close(r0_gpio_dev);
 }
 
