@@ -22,5 +22,8 @@
 
 extern fb_data *dev_fb;
 #define LCD_FRAMEBUF_ADDR(col, row) (dev_fb + row*LCD_WIDTH + col)
-
+#ifdef HAVE_LCD_ENABLE
+extern void lcd_set_active(bool active);
+extern void lcd_enable(bool enable);
+#endif
 #endif

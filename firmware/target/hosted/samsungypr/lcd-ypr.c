@@ -8,6 +8,7 @@
  * $Id: lcd-bitmap.c 29248 2011-02-08 20:05:25Z thomasjfox $
  *
  * Copyright (C) 2011 Lorenzo Miori, Thomas Martitz
+ * Copyright (C) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,26 +23,28 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "string.h"
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-
+#include "config.h"
 #include "file.h"
 #include "debug.h"
 #include "system.h"
 #include "screendump.h"
 #include "lcd.h"
+#include "lcd-target.h"
 
 static int dev_fd = 0;
 fb_data *dev_fb = 0;
 
+#ifdef HAVE_LCD_SHUTDOWN
 void lcd_shutdown(void)
 {
     printf("FB closed.");
     munmap(dev_fb, FRAMEBUFFER_SIZE);
     close(dev_fd);
 }
+#endif
 
 void lcd_init_device(void)
 {
@@ -69,7 +72,7 @@ void lcd_init_device(void)
         exit(3);
     }
 
-    vinfo.bits_per_pixel = 16;
+    vinfo.bits_per_pixel = LCD_DEPTH;
 
     if (ioctl(dev_fd, FBIOPUT_VSCREENINFO, &vinfo)) {
             perror("fbset(ioctl)");
@@ -80,8 +83,7 @@ void lcd_init_device(void)
 
     /* Figure out the size of the screen in bytes */
     screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
-    if (screensize != FRAMEBUFFER_SIZE)
-    {
+    if (screensize != FRAMEBUFFER_SIZE) {
         exit(4);
         perror("Display and framebuffer mismatch!\n");
     }
@@ -93,4 +95,26 @@ void lcd_init_device(void)
         exit(4);
     }
     printf("The framebuffer device was mapped to memory successfully.\n");
+
+    /* Be sure to turn on display at startup */
+    ioctl(dev_fd, FBIOBLANK, VESA_NO_BLANKING);
+#ifdef HAVE_LCD_ENABLE
+    lcd_set_active(true);
+#endif
 }
+
+#ifdef HAVE_LCD_ENABLE
+void lcd_enable(bool enable)
+ {
+    if (lcd_active() == enable)
+        return;
+
+    lcd_set_active(enable);
+
+    /* Turn on or off the display using Linux interface */
+    ioctl(dev_fd, FBIOBLANK, enable ? VESA_NO_BLANKING : VESA_POWERDOWN);
+
+    if (enable)
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+}
+#endif
