@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///cQ\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-target.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-03-06T23:09:19Z",
+      "side": 1,
+      "message": "add extern keyword to lcd_enable() too.",
+      "revId": "11f7cfcc91fef78dae42d97e7c5f73d8429861dc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///cU\u003d",
+        "filename": "firmware/target/hosted/samsungypr/lcd-ypr.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-03-06T23:09:19Z",
+      "side": 1,
+      "message": "Indentation is wrong.\n\nAlso, if this part is necessary within lcd_init_device(), then it shoul be done unconditionally (i.e. without HAVE_LCD_EABLE) as well. I would suggest calling the IOCTL directy here.\n\nHowever if it\u0027s not necessary, and it doesn\u0027t appear to be because it works without this in git master as well then it should just be removed.",
+      "revId": "11f7cfcc91fef78dae42d97e7c5f73d8429861dc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
