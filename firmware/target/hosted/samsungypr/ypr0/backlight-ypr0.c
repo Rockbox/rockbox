@@ -29,22 +29,6 @@
 
 static bool backlight_on_status = true; /* Is on or off? */
 
-/*TODO: see if LCD sleep could be implemented in a better way -> ie using a rockbox feature */
-/* Turn off LCD power supply */
-static void _backlight_lcd_sleep(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "1", 1);
-    close(fp);
-}
-/* Turn on LCD screen */
-static void _backlight_lcd_power(void)
-{
-    int fp = open("/sys/class/graphics/fb0/blank", O_RDWR);
-    write(fp, "0", 1);
-    close(fp);
-}
-
 bool _backlight_init(void)
 {
     /* We have nothing to do */
@@ -56,7 +40,9 @@ void _backlight_on(void)
     if (!backlight_on_status)
     {
         /* Turn on lcd power before backlight */
-        _backlight_lcd_power();
+#ifdef HAVE_LCD_ENABLE
+        lcd_enable(true);
+#endif
         /* Original app sets this to 0xb1 when backlight is on... */
         ascodec_write_pmu(AS3543_BACKLIGHT, 0x1, 0xb1);
     }
@@ -67,11 +53,14 @@ void _backlight_on(void)
 
 void _backlight_off(void)
 {
-    if (backlight_on_status) {
+    if (backlight_on_status)
+    {
         /* Disabling the DCDC15 completely, keeps brightness register value */
         ascodec_write_pmu(AS3543_BACKLIGHT, 0x1, 0x00);
         /* Turn off lcd power then */
-        _backlight_lcd_sleep();
+#ifdef HAVE_LCD_ENABLE
+        lcd_enable(false);
+#endif
     }
 
     backlight_on_status = false;
