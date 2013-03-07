@@ -30,7 +30,7 @@ void EncoderRbSpeex::generateSettings()
 {
     loadSettings();
     insertSetting(eVOLUME, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
-        tr("Volume:"), volume, 1.0, 10.0));
+        tr("Volume:"), volume, 0.0, 2.0));
     insertSetting(eQUALITY, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
         tr("Quality:"), quality, 0, 10.0));
     insertSetting(eCOMPLEXITY, new EncTtsSetting(this, EncTtsSetting::eINT,

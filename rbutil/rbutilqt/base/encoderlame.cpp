@@ -73,7 +73,7 @@ void EncoderLame::generateSettings()
         insertSetting(VOLUME, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
                     tr("Volume"),
                     RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble(),
-                    0.0, 1.0));
+                    0.0, 2.0));
         insertSetting(QUALITY, new EncTtsSetting(this, EncTtsSetting::eDOUBLE,
                     tr("Quality"), quality, 0.0, 1.0));
     }
