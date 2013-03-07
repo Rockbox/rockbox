@@ -113,6 +113,8 @@ static long check_gd3_header( byte* h, long remain )
 static void get_vgm_length( struct header_t* h, struct mp3entry* id3 )
 {
     long length = get_long_le( h->track_duration ) * 10 / 441;
+    id3->tail_trim = 4 * 1000; /* assume fade */
+
     if ( length > 0 )
     {
         long loop_length = 0, intro_length = 0;
@@ -126,13 +128,15 @@ static void get_vgm_length( struct header_t* h, struct mp3entry* id3 )
         {
             intro_length = length; /* make it clear that track is no longer than length */
             loop_length = 0;
+            id3->tail_trim = 0;
         }
         
-         id3->length = intro_length + 2 * loop_length; /* intro + 2 loops */
-         return;
+        /* intro + 2 loops + fade */
+        id3->length = intro_length + 2 * loop_length + id3->tail_trim;
+        return;
     }
 
-    id3->length = 150 * 1000; /* 2.5 minutes */
+    id3->length = 150 * 1000 + id3->tail_trim; /* 2.5 minutes + fade */
 }
 
 bool get_vgm_metadata(int fd, struct mp3entry* id3)
@@ -151,7 +155,7 @@ bool get_vgm_metadata(int fd, struct mp3entry* id3)
     id3->vbr = false;
     id3->filesize = filesize(fd);
 
-    id3->bitrate = 706;
+    id3->bitrate = 1411;
     id3->frequency = 44100;
 
     /* If file is gzipped, will get metadata later */
