@@ -22,4 +22,4 @@ OBJECTS_DIR = build/$$TARGET
 UI_DIR = build/$$TARGET
 MOC_DIR = build/$$TARGET
 RCC_DIR = build/$$TARGET
-
+QT -= gui
