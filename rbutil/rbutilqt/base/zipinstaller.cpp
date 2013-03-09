@@ -25,6 +25,7 @@ ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
     m_unzip = true;
     m_usecache = false;
+    getter = 0;
 }
 
 
@@ -87,6 +88,7 @@ void ZipInstaller::installStart()
     m_file = downloadFile->fileName();
     downloadFile->close();
     // get the real file.
+    if(getter != 0) getter->deleteLater();
     getter = new HttpGet(this);
     if(m_usecache) {
         getter->setCache(true);
