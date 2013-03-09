@@ -387,7 +387,7 @@ void SelectiveInstallWidget::installRockbox(void)
                 ServerInfo::RelCandidateUrl).toString();
 
         //! install build
-        if(m_zipinstaller != NULL) delete m_zipinstaller;
+        if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
         m_zipinstaller->setUrl(url);
         m_zipinstaller->setLogSection("Rockbox (Base)");
@@ -431,7 +431,7 @@ void SelectiveInstallWidget::installFonts(void)
     fontsurl.replace("%RELEASEVER%", relversion);
 
     // create new zip installer
-    if(m_zipinstaller != NULL) delete m_zipinstaller;
+    if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
     m_zipinstaller = new ZipInstaller(this);
     m_zipinstaller->setUrl(fontsurl);
     m_zipinstaller->setLogSection("Fonts");
@@ -491,7 +491,7 @@ void SelectiveInstallWidget::installGamefiles(void)
         }
         qDebug() << "[SelectiveInstallWidget] installing gamefiles";
         // create new zip installer
-        if(m_zipinstaller != NULL) delete m_zipinstaller;
+        if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
 
         m_zipinstaller->setUrl(SystemInfo::value(SystemInfo::DoomUrl).toString());
