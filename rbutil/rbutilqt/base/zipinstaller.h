@@ -19,10 +19,8 @@
  ****************************************************************************/
 
 
-#ifndef INSTALLZIP_H
-#define INSTALLZIP_H
-
-
+#ifndef ZIPINSTALLER_H
+#define ZIPINSTALLER_H
 
 #include <QtCore>
 
@@ -75,8 +73,8 @@ private:
     QDir m_cache;
     bool m_usecache;
 
-    HttpGet *getter;
-    QTemporaryFile *downloadFile;
+    HttpGet *m_getter;
+    QTemporaryFile *m_downloadFile;
 };
 
 

@@ -25,7 +25,7 @@ ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
     m_unzip = true;
     m_usecache = false;
-    getter = 0;
+    m_getter = 0;
 }
 
 
@@ -83,23 +83,23 @@ void ZipInstaller::installStart()
     // make sure to get a fresh one on each run.
     // making this a parent of the temporary file ensures the file gets deleted
     // after the class object gets destroyed.
-    downloadFile = new QTemporaryFile(this);
-    downloadFile->open();
-    m_file = downloadFile->fileName();
-    downloadFile->close();
+    m_downloadFile = new QTemporaryFile(this);
+    m_downloadFile->open();
+    m_file = m_downloadFile->fileName();
+    m_downloadFile->close();
     // get the real file.
-    if(getter != 0) getter->deleteLater();
-    getter = new HttpGet(this);
+    if(m_getter != 0) m_getter->deleteLater();
+    m_getter = new HttpGet(this);
     if(m_usecache) {
-        getter->setCache(true);
+        m_getter->setCache(true);
     }
-    getter->setFile(downloadFile);
+    m_getter->setFile(m_downloadFile);
 
-    connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(getter, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(logProgress(int, int)));
-    connect(this, SIGNAL(internalAborted()), getter, SLOT(abort()));
+    connect(m_getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
+    connect(m_getter, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(logProgress(int, int)));
+    connect(this, SIGNAL(internalAborted()), m_getter, SLOT(abort()));
 
-    getter->getFile(QUrl(m_url));
+    m_getter->getFile(QUrl(m_url));
 }
 
 
@@ -110,16 +110,16 @@ void ZipInstaller::downloadDone(bool error)
      // update progress bar
 
     emit logProgress(1, 1);
-    if(getter->httpResponse() != 200 && !getter->isCached()) {
+    if(m_getter->httpResponse() != 200 && !m_getter->isCached()) {
         emit logItem(tr("Download error: received HTTP error %1.")
-                    .arg(getter->httpResponse()),LOGERROR);
+                    .arg(m_getter->httpResponse()),LOGERROR);
         emit done(true);
         return;
     }
-    if(getter->isCached())
+    if(m_getter->isCached())
         emit logItem(tr("Cached file used."), LOGINFO);
     if(error) {
-        emit logItem(tr("Download error: %1").arg(getter->errorString()), LOGERROR);
+        emit logItem(tr("Download error: %1").arg(m_getter->errorString()), LOGERROR);
         emit done(true);
         return;
     }
@@ -161,14 +161,14 @@ void ZipInstaller::downloadDone(bool error)
         emit logItem(tr("Installing file."), LOGINFO);
         qDebug() << "[ZipInstall] saving downloaded file (no extraction)";
 
-        downloadFile->open(); // copy fails if file is not opened (filename issue?)
+        m_downloadFile->open(); // copy fails if file is not opened (filename issue?)
         // make sure the required path is existing
         QString path = QFileInfo(m_mountpoint + m_target).absolutePath();
         QDir p;
         p.mkpath(path);
         // QFile::copy() doesn't overwrite files, so remove old one first
         QFile(m_mountpoint + m_target).remove();
-        if(!downloadFile->copy(m_mountpoint + m_target)) {
+        if(!m_downloadFile->copy(m_mountpoint + m_target)) {
             emit logItem(tr("Installing file failed."), LOGERROR);
             emit done(true);
             return;
@@ -179,7 +179,7 @@ void ZipInstaller::downloadDone(bool error)
     }
     if(m_logver.isEmpty()) {
         // if no version info is set use the timestamp of the server file.
-        m_logver = getter->timestamp().toString(Qt::ISODate);
+        m_logver = m_getter->timestamp().toString(Qt::ISODate);
     }
 
     emit logItem(tr("Creating installation log"),LOGINFO);
