@@ -44,7 +44,7 @@ struct imx_variant_t imx_variants[] =
 
 static void usage(void)
 {
-    printf("Usage: elftosb [options | file]...\n");
+    printf("Usage: mkimxboot [options | file]...\n");
     printf("Options:\n");
     printf("  -?/--help\tDisplay this message\n");
     printf("  -o <file>\tSet output file\n");
