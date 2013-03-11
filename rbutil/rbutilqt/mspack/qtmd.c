@@ -20,8 +20,8 @@
  * http://www.speakeasy.org/~russotto/quantumcomp.html
  */
 
-#include <system.h>
-#include <qtm.h>
+#include "system-mspack.h"
+#include "qtm.h"
 
 /* import bit-reading macros and code */
 #define BITS_TYPE struct qtmd_stream
@@ -33,7 +33,7 @@
     READ_IF_NEEDED; b1 = *i_ptr++;	\
     INJECT_BITS((b0 << 8) | b1, 16);	\
 } while (0)
-#include <readbits.h>
+#include "readbits.h"
 
 /* Quantum static data tables:
  *

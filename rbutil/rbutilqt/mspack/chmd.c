@@ -9,8 +9,8 @@
 
 /* CHM decompression implementation */
 
-#include <system.h>
-#include <chm.h>
+#include "system-mspack.h"
+#include "chm.h"
 
 /* prototypes */
 static struct mschmd_header * chmd_open(
