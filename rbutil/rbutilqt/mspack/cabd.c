@@ -21,8 +21,8 @@
 
 /* CAB decompression implementation */
 
-#include <system.h>
-#include <cab.h>
+#include "system-mspack.h"
+#include "cab.h"
 #include <assert.h>
 
 /* Notes on compliance with cabinet specification:

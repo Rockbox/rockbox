@@ -13,8 +13,8 @@
 
 /* SZDD decompression implementation */
 
-#include <system.h>
-#include <szdd.h>
+#include "system-mspack.h"
+#include "szdd.h"
 
 /* prototypes */
 static struct msszddd_header *szddd_open(

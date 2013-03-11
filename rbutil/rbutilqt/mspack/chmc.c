@@ -9,8 +9,8 @@
 
 /* CHM compression implementation */
 
-#include <system.h>
-#include <chm.h>
+#include "system-mspack.h"
+#include "chm.h"
 
 struct mschm_compressor *
   mspack_create_chm_compressor(struct mspack_system *sys)
