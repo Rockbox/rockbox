@@ -10,9 +10,9 @@
 #ifndef MSPACK_CAB_H
 #define MSPACK_CAB_H 1
 
-#include <mszip.h>
-#include <qtm.h>
-#include <lzx.h>
+#include "mszip.h"
+#include "qtm.h"
+#include "lzx.h"
 
 /* generic CAB definitions */
 

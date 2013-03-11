@@ -12,7 +12,7 @@
 
 /* LZX compression implementation */
 
-#include <system.h>
-#include <lzx.h>
+#include "system-mspack.h"
+#include "lzx.h"
 
 /* todo */

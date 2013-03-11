@@ -12,8 +12,8 @@
 
 /* MS-ZIP decompression implementation. */
 
-#include <system.h>
-#include <mszip.h>
+#include "system-mspack.h"
+#include "mszip.h"
 
 /* import bit-reading macros and code */
 #define BITS_TYPE struct mszipd_stream
@@ -24,7 +24,7 @@
     READ_IF_NEEDED;		\
     INJECT_BITS(*i_ptr++, 8);	\
 } while (0)
-#include <readbits.h>
+#include "readbits.h"
 
 /* import huffman macros and code */
 #define TABLEBITS(tbl)      MSZIP_##tbl##_TABLEBITS
@@ -32,7 +32,7 @@
 #define HUFF_TABLE(tbl,idx) zip->tbl##_table[idx]
 #define HUFF_LEN(tbl,idx)   zip->tbl##_len[idx]
 #define HUFF_ERROR          return INF_ERR_HUFFSYM
-#include <readhuff.h>
+#include "readhuff.h"
 
 #define FLUSH_IF_NEEDED do {				\
     if (zip->window_posn == MSZIP_FRAME_SIZE) {		\
