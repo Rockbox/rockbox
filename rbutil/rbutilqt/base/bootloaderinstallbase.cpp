@@ -22,6 +22,7 @@
 #include "bootloaderinstallbase.h"
 #include "utils.h"
 #include "ziputil.h"
+#include "mspackutil.h"
 
 #if defined(Q_OS_MACX)
 #include <sys/param.h>
@@ -215,11 +216,35 @@ void BootloaderInstallBase::setBlFile(QStringList sl)
 bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
 {
     bool found = false;
-    ZipUtil z(this);
+    ArchiveUtil *util = 0;
+
+    if(util == 0)
+    {
+        ZipUtil *zu = new ZipUtil(this);
+        if(zu->open(of))
+        {
+            emit logItem(tr("Zip file format detected"), LOGINFO);
+            util = zu;
+        }
+        else
+            delete zu;
+    }
+
+    if(util == 0)
+    {
+        MsPackUtil *msu = new MsPackUtil(this);
+        if(msu->open(of))
+        {
+            emit logItem(tr("CAB file format detected"), LOGINFO);
+            util = msu;
+        }
+        else
+            delete msu;
+    }
+
     // check if the file set is in zip format
-    if(z.open(of)) {
-        emit logItem(tr("Zip file format detected"), LOGINFO);
-        QStringList contents = z.files();
+    if(util) {
+        QStringList contents = util->files();
         qDebug() << "[BootloaderInstallBase] archive contains:" << contents;
         for(int i = 0; i < blfile.size(); ++i) {
             // strip any path, we don't know the structure in the zip
@@ -237,7 +262,7 @@ bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
                     m_tempof.open();
                     m_offile = m_tempof.fileName();
                     m_tempof.close();
-                    if(!z.extractArchive(m_offile, contents.at(j))) {
+                    if(!util->extractArchive(m_offile, contents.at(j))) {
                         emit logItem(tr("Error extracting firmware from archive"), LOGERROR);
                         found = false;
                         break;
@@ -255,6 +280,8 @@ bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
         m_offile = of;
         found = true;
     }
+
+    delete util;
     return found;
 }
 

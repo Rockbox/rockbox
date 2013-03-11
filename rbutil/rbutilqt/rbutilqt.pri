@@ -79,6 +79,27 @@ SOURCES += \
  gui/comboboxviewdelegate.cpp \
  gui/selectiveinstallwidget.cpp \
  gui/backupdialog.cpp \
+ mspack/cabc.c \
+ mspack/cabd.c \
+ mspack/chmc.c \
+ mspack/chmd.c \
+ mspack/hlpc.c \
+ mspack/hlpd.c \
+ mspack/kwajc.c \
+ mspack/kwajd.c \
+ mspack/litc.c \
+ mspack/litd.c \
+ mspack/lzssd.c \
+ mspack/lzxc.c \
+ mspack/lzxd.c \
+ mspack/mszipc.c \
+ mspack/mszipd.c \
+ mspack/qtmd.c \
+ mspack/system-mspack.c \
+ mspack/szddc.c \
+ mspack/szddd.c \
+ base/mspackutil.cpp \
+ base/archiveutil.cpp \
 
 
 HEADERS += \
@@ -156,6 +177,24 @@ HEADERS += \
  gui/comboboxviewdelegate.h \
  gui/selectiveinstallwidget.h \
  gui/backupdialog.h \
+ mspack/cab.h \
+ mspack/chm.h \
+ mspack/des.h \
+ mspack/hlp.h \
+ mspack/kwaj.h \
+ mspack/lit.h \
+ mspack/lzss.h \
+ mspack/lzx.h \
+ mspack/mspack.h \
+ mspack/mszip.h \
+ mspack/qtm.h \
+ mspack/readbits.h \
+ mspack/readhuff.h \
+ mspack/sha.h \
+ mspack/system-mspack.h \
+ mspack/szdd.h \
+ base/mspackutil.h \
+ base/archiveutil.h \
 
 
 FORMS += \
