@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2011 Dominik Riebeling
+ *   Copyright (C) 2013 Amaury Pouly
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,38 +16,26 @@
  *
  ****************************************************************************/
 
-#ifndef ZIPUTIL_H
-#define ZIPUTIL_H
+#ifndef ARCHIVEUTIL_H
+#define ARCHIVEUTIL_H
 
 #include <QtCore>
-#include "archiveutil.h"
-#include "quazip/quazip.h"
-#include "quazip/quazipfile.h"
-#include "quazip/quazipfileinfo.h"
 
-class ZipUtil : public ArchiveUtil
+class ArchiveUtil : public QObject
 {
     Q_OBJECT
 
     public:
-        ZipUtil(QObject* parent);
-        ~ZipUtil();
-        bool open(QString& zipfile, QuaZip::Mode mode = QuaZip::mdUnzip);
-        virtual bool close(void);
-        virtual bool extractArchive(const QString& dest, QString file = "");
-        bool appendDirToArchive(QString& source, QString& basedir);
-        bool appendFileToArchive(QString& file, QString& basedir);
-        qint64 totalUncompressedSize(unsigned int clustersize = 0);
-        virtual QStringList files(void);
+        ArchiveUtil(QObject* parent);
+        ~ArchiveUtil();
+        virtual bool close(void) = 0;
+        virtual bool extractArchive(const QString& dest, QString file = "") = 0;
+        virtual QStringList files(void) = 0;
 
     signals:
        void logProgress(int, int);
        void logItem(QString, int);
-
-    private:
-        QList<QuaZipFileInfo> contentProperties();
-        QuaZip* m_zip;
-
 };
 #endif
 
+ 
