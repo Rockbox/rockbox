@@ -26,7 +26,7 @@
 #include "quazip/quazipfileinfo.h"
 
 
-ZipUtil::ZipUtil(QObject* parent) : QObject(parent)
+ZipUtil::ZipUtil(QObject* parent) : ArchiveUtil(parent)
 {
     m_zip = NULL;
 }
@@ -74,7 +74,7 @@ bool ZipUtil::close(void)
 //!             single file.
 //! @brief file file to extract from archive, full archive if empty.
 //! @return true on success, false otherwise
-bool ZipUtil::extractArchive(QString& dest, QString file)
+bool ZipUtil::extractArchive(const QString& dest, QString file)
 {
     qDebug() << "[ZipUtil] extractArchive" << dest << file;
     bool result = true;
