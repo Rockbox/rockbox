@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///a4\u003d",
+        "filename": "rbutil/rbutilqt/base/bootloaderinstallbase.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2013-03-11T21:51:39Z",
+      "side": 1,
+      "message": "Never mind, I totally missed the util assignment above.. :/",
+      "parentUuid": "AAAASX///bI\u003d",
+      "revId": "db38f0b644d4a079d7cc42af8fd9840abf8da430",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///bE\u003d",
         "filename": "rbutil/rbutilqt/base/bootloaderinstallbase.cpp",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2013-03-11T21:49:29Z",
       "side": 1,
       "message": "Same here",
+      "revId": "db38f0b644d4a079d7cc42af8fd9840abf8da430",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///a0\u003d",
+        "filename": "rbutil/rbutilqt/base/bootloaderinstallbase.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2013-03-11T21:51:39Z",
+      "side": 1,
+      "message": "Same here",
+      "parentUuid": "AAAASX///bE\u003d",
       "revId": "db38f0b644d4a079d7cc42af8fd9840abf8da430",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
