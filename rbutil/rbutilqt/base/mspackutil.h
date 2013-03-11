@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2011 Dominik Riebeling
+ *   Copyright (C) 2013 Amaury Pouly
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,28 +16,24 @@
  *
  ****************************************************************************/
 
-#ifndef ZIPUTIL_H
-#define ZIPUTIL_H
+#ifndef MSPACKUTIL_H
+#define MSPACKUTIL_H
 
 #include <QtCore>
 #include "archiveutil.h"
-#include "quazip/quazip.h"
-#include "quazip/quazipfile.h"
-#include "quazip/quazipfileinfo.h"
+#include "mspack/mspack.h"
 
-class ZipUtil : public ArchiveUtil
+class MsPackUtil : public ArchiveUtil
 {
     Q_OBJECT
 
     public:
-        ZipUtil(QObject* parent);
-        ~ZipUtil();
-        bool open(QString& zipfile, QuaZip::Mode mode = QuaZip::mdUnzip);
+        // archive types can be ORed
+        MsPackUtil(QObject* parent);
+        ~MsPackUtil();
+        bool open(QString& mspackfile);
         virtual bool close(void);
         virtual bool extractArchive(const QString& dest, QString file = "");
-        bool appendDirToArchive(QString& source, QString& basedir);
-        bool appendFileToArchive(QString& file, QString& basedir);
-        qint64 totalUncompressedSize(unsigned int clustersize = 0);
         virtual QStringList files(void);
 
     signals:
@@ -45,9 +41,11 @@ class ZipUtil : public ArchiveUtil
        void logItem(QString, int);
 
     private:
-        QList<QuaZipFileInfo> contentProperties();
-        QuaZip* m_zip;
+        QString errorStringMsPack(int error) const;
+        struct mscab_decompressor* m_cabd;
+        struct mscabd_cabinet *m_cabinet;
 
 };
 #endif
 
+ 
