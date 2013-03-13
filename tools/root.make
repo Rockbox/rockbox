@@ -71,6 +71,9 @@ ifeq (,$(findstring checkwps,$(APP_TYPE)))
     ifeq (,$(findstring warble,$(APP_TYPE)))
       include $(FIRMDIR)/firmware.make
       include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+      ifeq (arch_arm,$(ARCH))
+          include $(ROOTDIR)/lib/unwarminder/unwarminder.make
+      endif
       ifeq (,$(findstring bootloader,$(APPSDIR)))
         include $(ROOTDIR)/lib/skin_parser/skin_parser.make
         include $(ROOTDIR)/lib/tlsf/libtlsf.make
@@ -85,10 +88,6 @@ ifndef APP_TYPE
   ifeq (arch_arm,$(ARCH))
     include $(ROOTDIR)/lib/arm_support/arm_support.make
   endif
-endif
-
-ifeq (arch_arm,$(ARCH))
-    include $(ROOTDIR)/lib/unwarminder/unwarminder.make
 endif
 
 ifneq (,$(findstring bootloader,$(APPSDIR)))
