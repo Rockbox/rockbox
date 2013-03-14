@@ -808,7 +808,7 @@ void radio_screen(void)
 
         while(1)
         {
-            button = get_action(CONTEXT_FM, TIMEOUT_BLOCK);
+            button = get_action(CONTEXT_FM|ALLOW_SOFTLOCK, TIMEOUT_BLOCK);
             if(button == ACTION_FM_STOP)
                 break;
         }
