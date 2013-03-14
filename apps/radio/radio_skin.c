@@ -95,7 +95,7 @@ void fms_fix_displays(enum fms_exiting toggle_state)
 
 int fms_do_button_loop(bool update_screen)
 {
-    int button = skin_wait_for_action(FM_SCREEN, CONTEXT_FM, 
+    int button = skin_wait_for_action(FM_SCREEN, CONTEXT_FM|ALLOW_SOFTLOCK,
                                       update_screen ? TIMEOUT_NOBLOCK : HZ/5);
 #ifdef HAVE_TOUCHSCREEN
     struct touchregion *region;
