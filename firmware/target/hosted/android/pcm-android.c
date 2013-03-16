@@ -58,6 +58,14 @@ static inline void unlock_audio(void)
     pthread_mutex_unlock(&audio_lock_mutex);
 }
 
+static inline void millisleep(int milliseconds)
+{
+    struct timespec ts = {
+        .tv_sec = 0,
+        .tv_nsec = milliseconds*1000*1000
+    };
+    nanosleep(&ts, NULL);
+}
 
 /*
  * write pcm samples to the hardware. Calls AudioTrack.write directly (which
@@ -101,9 +109,16 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
             new_buffer = false;
             pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 
-            /* NOTE: might need to release the mutex and sleep here if the
+            /* need to release the mutex and sleep here if the
                buffer is shorter than the required buffer (like pcm-sdl.c) to
-               have the mixer clocked at a regular interval */
+               have the mixer clocked at a regular interval. this vastly
+               improves responsiveness when pausing/stopping playback */
+            unlock_audio();
+            millisleep(1);
+            lock_audio();
+
+            if (!pcm_is_playing())
+                break;
         }
 
         if (ret < 0)
