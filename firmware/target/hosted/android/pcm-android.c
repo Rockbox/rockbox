@@ -58,7 +58,6 @@ static inline void unlock_audio(void)
     pthread_mutex_unlock(&audio_lock_mutex);
 }
 
-
 /*
  * write pcm samples to the hardware. Calls AudioTrack.write directly (which
  * is usually a blocking call)
@@ -93,18 +92,23 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
         (*env)->SetByteArrayRegion(env, temp_array, 0,
                                         transfer_size, (jbyte*)pcm_data_start);
 
-        ret = (*env)->CallIntMethod(env, this, write_method,
-                                            temp_array, 0, transfer_size);
-
         if (new_buffer)
         {
             new_buffer = false;
             pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-
-            /* NOTE: might need to release the mutex and sleep here if the
-               buffer is shorter than the required buffer (like pcm-sdl.c) to
-               have the mixer clocked at a regular interval */
         }
+        /* SetByteArrayRegion copies, which enables us to unlock audio. This
+         * is good because the below write() call almost certainly block.
+         * This allows the mixer to be clocked at a regular interval which vastly
+         * improves responsiveness when pausing/stopping playback */
+        unlock_audio();
+        ret = (*env)->CallIntMethod(env, this, write_method,
+                                            temp_array, 0, transfer_size);
+        lock_audio();
+
+        /* check if still playing. might have changed during the write() call */
+        if (!pcm_is_playing())
+            break;
 
         if (ret < 0)
         {

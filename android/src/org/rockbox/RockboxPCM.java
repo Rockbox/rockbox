@@ -43,10 +43,6 @@ public class RockboxPCM extends AudioTrack
             AudioFormat.CHANNEL_OUT_STEREO;
     private static final int encoding = 
             AudioFormat.ENCODING_PCM_16BIT;
-    /* 32k is plenty, but some devices may have a higher minimum */
-    private static final int buf_len  = 
-        Math.max(32<<10, 4*getMinBufferSize(samplerate, channels, encoding));
-
     private AudioManager audiomanager;
     private RockboxService rbservice;
     private byte[] raw_data;
@@ -58,14 +54,20 @@ public class RockboxPCM extends AudioTrack
     private float curpcmvolume = 0;
     private float pcmrange;
 
+    /* 8k is plenty, but some devices may have a higher minimum.
+     * 8k represents 125ms of audio */
+    private static final int chunkSize =
+        Math.max(8<<10, getMinBufferSize(samplerate, channels, encoding));
+    Streamer streamer;
+
     public RockboxPCM()
     {
         super(streamtype, samplerate,  channels, encoding,
-                buf_len, AudioTrack.MODE_STREAM);
-        HandlerThread ht = new HandlerThread("audio thread", 
-                Process.THREAD_PRIORITY_URGENT_AUDIO);
-        ht.start();
-        raw_data = new byte[buf_len]; /* in shorts */
+                chunkSize, AudioTrack.MODE_STREAM);
+
+        streamer = new Streamer(chunkSize);
+        streamer.start();
+        raw_data = new byte[chunkSize]; /* in shorts */
         Arrays.fill(raw_data, (byte) 0);
 
         /* find cleaner way to get context? */
@@ -79,14 +81,80 @@ public class RockboxPCM extends AudioTrack
 
         setupVolumeHandler();
         postVolume(audiomanager.getStreamVolume(streamtype));
-        refillmark = buf_len / 4; /* higher values don't work on many devices */
+    }
 
-        /* getLooper() returns null if thread isn't running */
-        while(!ht.isAlive()) Thread.yield();
-        setPlaybackPositionUpdateListener(
-                new PCMListener(buf_len / 2), new Handler(ht.getLooper()));
-        refillmark = bytes2frames(refillmark);
-    }    
+    /**
+     * This class does the actual playback work. Its run() method
+     * continuously writes data to the AudioTrack. This operation blocks
+     * and should therefore be run on its own thread.
+     */
+    private class Streamer extends Thread
+    {
+        byte[] buffer;
+        private boolean quit = false;
+
+        Streamer(int bufsize)
+        {
+            super("audio thread");
+            buffer = new byte[bufsize];
+        }
+
+        @Override
+        public void run()
+        {
+            /* THREAD_PRIORITY_URGENT_AUDIO can only be specified via
+             * setThreadPriority(), and not via thread.setPriority(). This is
+             * also how the android's HandlerThread class implements it */
+            Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
+            while (!quit)
+            {
+                switch(getPlayState())
+                {
+                    case PLAYSTATE_PLAYING:
+                        nativeWrite(buffer, buffer.length);
+                        break;
+                    case PLAYSTATE_PAUSED:
+                    case PLAYSTATE_STOPPED:
+                    {
+                        synchronized (this)
+                        {
+                            try
+                            {
+                                wait();
+                            }
+                            catch (InterruptedException e) { e.printStackTrace(); }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        synchronized void quit()
+        {
+            quit = true;
+            notify();
+        }
+
+        synchronized void kick()
+        {
+            notify();
+        }
+
+        void quitAndJoin()
+        {
+            while(true)
+            {
+                try
+                {
+                    quit();
+                    join();
+                    return;
+                }
+                catch (InterruptedException e) { }
+            }
+        }
+    }
 
     private native void postVolumeChangedEvent(int volume);
 
@@ -164,14 +232,22 @@ public class RockboxPCM extends AudioTrack
             service.startForeground();
             if (getPlayState() == AudioTrack.PLAYSTATE_STOPPED)
             {
-                setNotificationMarkerPosition(refillmark);
                 /* need to fill with silence before starting playback */ 
                 write(raw_data, 0, raw_data.length);
             }
             play();
         }
     }
-    
+
+    @Override
+    public void play() throws IllegalStateException
+    {
+        super.play();
+        /* when stopped or paused the streamer is in a wait() state. need
+         * it to wake it up */
+        streamer.kick();
+    }
+
     @Override
     public synchronized void stop() throws IllegalStateException 
     {
@@ -195,7 +271,15 @@ public class RockboxPCM extends AudioTrack
         RockboxService.getInstance().sendBroadcast(widgetUpdate);
         RockboxService.getInstance().stopForeground();
     }
-    
+
+    @Override
+    public void release()
+    {
+        super.release();
+        /* stop streamer if this AudioTrack is destroyed by whomever */
+        streamer.quitAndJoin();
+    }
+
     public int setStereoVolume(float leftVolume, float rightVolume)
     {
         curpcmvolume = leftVolume;
@@ -231,40 +315,4 @@ public class RockboxPCM extends AudioTrack
     }
 
     public native int nativeWrite(byte[] temp, int len);
-   
-    private class PCMListener implements OnPlaybackPositionUpdateListener 
-    {
-        byte[] pcm_data;
-        public PCMListener(int _refill_bufsize) 
-        {
-            pcm_data = new byte[_refill_bufsize];
-        }
-
-        public void onMarkerReached(AudioTrack track) 
-        {
-            /* push new data to the hardware */
-            RockboxPCM pcm = (RockboxPCM)track;
-            int result = -1;
-            result = pcm.nativeWrite(pcm_data, pcm_data.length);
-            if (result >= 0)
-            {
-                switch(getPlayState())
-                {
-                    case PLAYSTATE_PLAYING:
-                    case PLAYSTATE_PAUSED:
-                        setNotificationMarkerPosition(pcm.refillmark);
-                        break;
-                    case PLAYSTATE_STOPPED:
-                        Logger.d("Stopped");
-                        break;
-                }
-            }
-            else /* stop on error */ 
-                stop();
-        }
-
-        public void onPeriodicNotification(AudioTrack track) 
-        {            
-        }
-    }
 }
