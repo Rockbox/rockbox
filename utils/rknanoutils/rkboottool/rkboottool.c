@@ -703,13 +703,12 @@ static int do_rkfw_image(uint8_t *buf, unsigned long size)
     return 0;
 }
 
-static int do_rkencode_image(uint8_t *buf, unsigned long size)
+static int do_rkencode_image(uint8_t *buf, unsigned long size, int enc_mode)
 {
     void *ptr = malloc(size);
     int len = size;
     uint8_t *buff_ptr = buf;
     uint8_t *out_ptr = ptr;
-    int enc_mode = PAGE_ENC;
     if(enc_mode == PAGE_ENC)
     {
         while(len >= 0x200)
@@ -727,7 +726,7 @@ static int do_rkencode_image(uint8_t *buf, unsigned long size)
         FILE *f = fopen(g_out_prefix, "wb");
         if(f)
         {
-            fwrite(buff_ptr, 1, size, f);
+            fwrite(out_ptr, 1, size, f);
             fclose(f);
         }
         else
@@ -746,7 +745,8 @@ static void usage(void)
     printf("  --rknanofw\tUnpack a regular RknanoFW file\n");
     printf("  --rkboot\tUnpack a BOOT file\n");
     printf("  --rknanostage\tUnpack a RknanoFW stage file\n");
-    printf("  --rkencode\tEncode a raw file\n");
+    printf("  --rkencode\tEncode a raw file in page mode\n");
+    printf("  --rkencode2\tEncode a raw file in continuous mode\n");
     printf("  -o <prefix>\tSet output prefix\n");
     printf("The default is to try to guess the format.\n");
     printf("If several formats are specified, all are tried.\n");
@@ -760,6 +760,7 @@ int main(int argc, char **argv)
     bool try_boot = false;
     bool try_nanostage = false;
     bool try_rkencode = false;
+    bool try_rkencode2 = false;
 
     while(1)
     {
@@ -771,12 +772,13 @@ int main(int argc, char **argv)
             {"rknanofw", no_argument, 0, 'n'},
             {"rknanostage", no_argument, 0, 's'},
             {"rkencode", no_argument, 0, 'e'},
+            {"rkencode2", no_argument, 0, 'E'},
             {"rkboot", no_argument, 0, 'b'},
             {"no-color", no_argument, 0, 'c'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?d9nscbeo:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?d9nscbeEo:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -810,6 +812,9 @@ int main(int argc, char **argv)
             case 'e':
                 try_rkencode = true;
                 break;
+            case 'E':
+                try_rkencode2 = true;
+                break;
             default:
                 printf("Invalid argument '%c'\n", c);
                 abort();
@@ -822,7 +827,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if(!try_nanostage && !try_rkfw && !try_nanofw && !try_boot && !try_rkencode)
+    if(!try_nanostage && !try_rkfw && !try_nanofw && !try_boot && !try_rkencode && !try_rkencode2)
         try_nanostage = try_rkfw = try_nanofw = try_boot = true;
 
     FILE *fin = fopen(argv[optind], "r");
@@ -858,7 +863,9 @@ int main(int argc, char **argv)
         goto Lsuccess;
     if(try_nanostage && !do_nanostage_image(buf, size))
         goto Lsuccess;
-    if(try_rkencode && !do_rkencode_image(buf, size))
+    if(try_rkencode && !do_rkencode_image(buf, size, PAGE_ENC))
+        goto Lsuccess;
+    if(try_rkencode2 && !do_rkencode_image(buf, size, CONTINOUS_ENC))
         goto Lsuccess;
     cprintf(GREY, "No valid format found!\n");
     Lsuccess:
