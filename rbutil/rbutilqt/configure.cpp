@@ -135,17 +135,23 @@ void Config::accept()
         proxy.setPort(ui.proxyPort->text().toInt());
     }
 
-    // QUrl::toEncoded() doesn't encode a colon in the password correctly,
-    // which will result in errors during parsing the string.
-    // QUrl::toPercentEncoding() does work as expected, so build the string to
-    // store in the configuration file manually.
-    QString proxystring = "http://"
-        + QString(QUrl::toPercentEncoding(proxy.userName())) + ":"
-        + QString(QUrl::toPercentEncoding(proxy.password())) + "@"
-        + proxy.host() + ":"
-        + QString::number(proxy.port());
-    RbSettings::setValue(RbSettings::Proxy, proxystring);
-    qDebug() << "[Config] setting proxy to:" << proxy;
+    // Encode the password using base64 before storing it to the configuration
+    // file.
+    // There are two reasons for doing this:
+    // - QUrl::toEncoded() has problems with some characters like the colon and
+    //   @. Those are not percent encoded, causing the string getting parsed
+    //   wrongly when reading it back (see FS#12166).
+    // - The password is cleartext in the configuration file.
+    //   While using base64 doesn't provide any real security either it's at
+    //   least better than plaintext.
+    //   Since this program is open source any fixed mechanism to obfuscate /
+    //   encrypt the password isn't much help either since anyone interested in
+    //   the password can look at the sources. The best way would be to
+    //   eventually use host OS functionality to store the password.
+    QUrl p = proxy;
+    p.setPassword(proxy.password().toUtf8().toBase64());
+    RbSettings::setValue(RbSettings::Proxy, p.toString());
+    qDebug() << "[Config] setting proxy to:" << proxy.toString(QUrl::RemovePassword);
     // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
@@ -239,7 +245,11 @@ void Config::abort()
 void Config::setUserSettings()
 {
     // set proxy
-    proxy.setEncodedUrl(RbSettings::value(RbSettings::Proxy).toByteArray());
+    proxy.setUrl(RbSettings::value(RbSettings::Proxy).toString(),
+            QUrl::StrictMode);
+    // password is base64 encoded in configuration.
+    QByteArray pw = QByteArray::fromBase64(proxy.password().toUtf8());
+    proxy.setPassword(pw);
 
     if(proxy.port() > 0)
         ui.proxyPort->setText(QString("%1").arg(proxy.port()));

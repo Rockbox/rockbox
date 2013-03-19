@@ -610,8 +610,12 @@ QUrl RbUtilQt::proxy()
 {
     QUrl proxy;
     QString proxytype = RbSettings::value(RbSettings::ProxyType).toString();
-    if(proxytype == "manual")
-        proxy.setEncodedUrl(RbSettings::value(RbSettings::Proxy).toByteArray());
+    if(proxytype == "manual") {
+        proxy.setUrl(RbSettings::value(RbSettings::Proxy).toString(),
+                QUrl::TolerantMode);
+        QByteArray pw = QByteArray::fromBase64(proxy.password().toUtf8());
+        proxy.setPassword(pw);
+    }
     else if(proxytype == "system")
         proxy = System::systemProxy();
 
