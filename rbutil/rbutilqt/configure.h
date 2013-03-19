@@ -56,6 +56,7 @@ class Config : public QDialog
         void changeEvent(QEvent *event);
 
     private slots:
+        void showProxyPassword(bool show);
         void setNoProxy(bool);
         void setSystemProxy(bool);
         void updateLanguage(void);

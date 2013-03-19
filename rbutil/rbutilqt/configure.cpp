@@ -111,6 +111,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     connect(ui.showDisabled, SIGNAL(toggled(bool)), this, SLOT(showDisabled(bool)));
     connect(ui.mountPoint, SIGNAL(editTextChanged(QString)), this, SLOT(updateMountpoint(QString)));
     connect(ui.mountPoint, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMountpoint(int)));
+    connect(ui.checkShowProxyPassword, SIGNAL(toggled(bool)), this, SLOT(showProxyPassword(bool)));
     // delete this dialog after it finished automatically.
     connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
 
@@ -309,6 +310,15 @@ void Config::updateCacheInfo(QString path)
 }
 
 
+void Config::showProxyPassword(bool show)
+{
+    if(show)
+        ui.proxyPass->setEchoMode(QLineEdit::Normal);
+    else
+        ui.proxyPass->setEchoMode(QLineEdit::Password);
+}
+
+
 void Config::showDisabled(bool show)
 {
     qDebug() << "[Config] disabled targets shown:" << show;
@@ -471,20 +481,19 @@ void Config::updateEncState()
 
 void Config::setNoProxy(bool checked)
 {
-    bool i = !checked;
-    ui.proxyPort->setEnabled(i);
-    ui.proxyHost->setEnabled(i);
-    ui.proxyUser->setEnabled(i);
-    ui.proxyPass->setEnabled(i);
+    ui.proxyPort->setEnabled(!checked);
+    ui.proxyHost->setEnabled(!checked);
+    ui.proxyUser->setEnabled(!checked);
+    ui.proxyPass->setEnabled(!checked);
+    ui.checkShowProxyPassword->setEnabled(!checked);
+    ui.checkShowProxyPassword->setChecked(false);
+    showProxyPassword(false);
 }
 
 
 void Config::setSystemProxy(bool checked)
 {
-    ui.proxyPort->setEnabled(!checked);
-    ui.proxyHost->setEnabled(!checked);
-    ui.proxyUser->setEnabled(!checked);
-    ui.proxyPass->setEnabled(!checked);
+    setNoProxy(checked);
     if(checked) {
         // save values in input box
         proxy.setScheme("http");
