@@ -40,7 +40,12 @@ static struct pga_data
 } pga_data =
 {
     .gain = DEFAULT_PGA_GAIN,
-    .enabled = 0,
+    .enabled =
+#ifdef HAVE_SW_VOLUME_CONTROL
+    BIT_N(PGA_VOLUME), // enable PGA_VOLUME
+#else
+    0,
+#endif
     .gains[0 ... PGA_NUM_GAINS-1] = PGA_UNITY,
 };
 
