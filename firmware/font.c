@@ -413,7 +413,8 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     struct font *pheader = &header;
     struct font f;
 
-    uint32_t nwidth, noffset;     
+    uint32_t nwidth, noffset;
+    memset(&f, 0, sizeof(struct font));  
     if ( !font_load_header( fd, pheader, &f, &nwidth, &noffset )
 #if LCD_DEPTH < 16
         || f.depth
