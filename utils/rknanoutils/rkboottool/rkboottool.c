@@ -128,7 +128,7 @@ static uint16_t crc(uint8_t *buf, int size)
     {
         for(int bit = 128; bit; bit >>= 1)
         {
-            if(result & 0x80)
+            if(result & 0x8000)
                 result = (2 * result) ^ 0x1021;
             else
                 result *= 2;
@@ -221,7 +221,7 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
         cprintf(GREEN, "  %i: ", i);
         print_blob_interval(&hdr->stage[i]);
         cprintf(OFF, "\n");
-        save_blob(&hdr->stage[i], buf, size, "stage", i, NO_ENC);
+        save_blob(&hdr->stage[i], buf, size, "stage", i, i == 3 ? NO_ENC : CONTINOUS_ENC);
     }
     cprintf(BLUE, "Fonts\n");
     for(unsigned i = 0; i < hdr->nr_fonts; i++)
