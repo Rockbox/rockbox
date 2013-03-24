@@ -75,7 +75,7 @@ long audio_filebufused(void);
 void audio_pre_ff_rewind(void);
 void audio_skip(int direction);
 
-void audio_set_cuesheet(int enable);
+void audio_set_cuesheet(bool enable);
 #ifdef HAVE_CROSSFADE
 void audio_set_crossfade(int enable);
 #endif

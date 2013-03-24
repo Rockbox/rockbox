@@ -3821,7 +3821,7 @@ long audio_filebufused(void)
 
 /* Enable or disable cuesheet support and allocate/don't allocate the
    extra associated resources */
-void audio_set_cuesheet(int enable)
+void audio_set_cuesheet(bool enable)
 {
     if (play_status == PLAY_STOPPED || !enable != !get_current_cuesheet())
     {
