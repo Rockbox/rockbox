@@ -794,7 +794,7 @@ bool usb_inserted(void)
 
 void usb_acknowledge(long id)
 {
-    id = id;
+    (void)id;
 }
 
 void usb_init(void)
