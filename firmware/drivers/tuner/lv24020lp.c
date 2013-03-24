@@ -243,7 +243,7 @@ static int fd_log = -1;
     #define TONE_LVL_SET(x) ((x) << 4)
     #define VOL_LVL(x)      ((x) & 0xf)
     #define VOL_LVL_GET(x)  ((x) & 0xf)
-    #define VOL_LVL_SET(x)  ((x) << 4)
+    #define VOL_LVL_SET(x)  ((x) << 0)
 
 /* W */
 #define AUDIO_CTRL2 (0x0a + BLK2_START)
@@ -554,7 +554,7 @@ static void set_frequency(int freq)
      *
      * For example: when the IF frequency of LV2400x is preset at 110 kHz,
      * it must be tuned at 88.51 MHz to receive the radio station at 88.4 MHz.
-     * -- AN2400S04@ – V0.4
+     * -- AN2400S04@ \96 V0.4
      */
     freq += if_set;
 
