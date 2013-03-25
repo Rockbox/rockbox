@@ -28,6 +28,7 @@
 #include "adc.h"
 #include "font.h"
 #include "storage.h"
+#include "lcd-target.h"
 
 #ifdef RK27_GENERIC
 #define DEBUG_CANCEL BUTTON_VOL
@@ -42,6 +43,7 @@
 
 extern unsigned long sd_debug_time_rd;
 extern unsigned long sd_debug_time_wr;
+extern enum lcd_type_t lcd_type;
 
 bool dbg_hw_info(void)
 {
@@ -62,6 +64,10 @@ bool dbg_hw_info(void)
         _DEBUG_PRINTF("SCU_DIVCON1: 0x%0x", SCU_DIVCON1);
         _DEBUG_PRINTF("SCU_CLKCFG:  0x%0x", SCU_CLKCFG);
         _DEBUG_PRINTF("SCU_CHIPCFG: 0x%0x", SCU_CHIPCFG);
+
+#ifdef HM60X
+	_DEBUG_PRINTF("LCD type: %s", lcd_type == LCD_V1 ? "V1 (HX8340b)": "V2");
+#endif
         line++;
         _DEBUG_PRINTF("sd_debug_time_rd: %d", sd_debug_time_rd);
         _DEBUG_PRINTF("sd_debug_time_wr: %d", sd_debug_time_wr);

@@ -27,6 +27,7 @@
 #include "system.h"
 #include "cpu.h"
 #include "lcdif-rk27xx.h"
+#include "lcd-target.h"
 
 static bool display_on = false;
 
@@ -187,11 +188,7 @@ static void lcd_v1_update_rect(int x, int y, int width, int height)
 
 #ifdef HM60X
 
-enum lcd_type_t
-{
-    LCD_V1,
-    LCD_v2
-} lcd_type;
+enum lcd_type_t lcd_type;
 
 static void identify_lcd(void)
 {

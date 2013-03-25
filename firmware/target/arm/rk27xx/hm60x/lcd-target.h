@@ -23,5 +23,10 @@
 #define LCD_TARGET_H
 
 #define LCD_DATABUS_WIDTH LCDIF_16BIT
+enum lcd_type_t
+{
+    LCD_V1,
+    LCD_v2
+};
 
 #endif
