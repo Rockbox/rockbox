@@ -136,6 +136,10 @@ bool dbg_ports(void)
         _DEBUG_PRINTF("GPIO_PCCON: %02x",(unsigned char)GPIO_PCCON);
         _DEBUG_PRINTF("GPIO_PDDR:  %02x",(unsigned char)GPIO_PDDR);
         _DEBUG_PRINTF("GPIO_PDCON: %02x",(unsigned char)GPIO_PDCON);
+        _DEBUG_PRINTF("GPIO_PEDR:  %02x",(unsigned char)GPIO_PEDR);
+        _DEBUG_PRINTF("GPIO_PECON: %02x",(unsigned char)GPIO_PECON);
+        _DEBUG_PRINTF("GPIO_PFDR:  %02x",(unsigned char)GPIO_PFDR);
+        _DEBUG_PRINTF("GPIO_PFCON: %02x",(unsigned char)GPIO_PFCON);
         _DEBUG_PRINTF("ADC0: %d", adc_read(0));
         _DEBUG_PRINTF("ADC1: %d", adc_read(1));
         _DEBUG_PRINTF("ADC2: %d", adc_read(2));
