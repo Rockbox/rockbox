@@ -60,49 +60,6 @@ static struct viewport default_vp =
 
 static struct viewport* current_vp = &default_vp;
 
-/*** Viewports ***/
-
-void LCDFN(set_viewport)(struct viewport* vp)
-{
-    if (vp == NULL)
-        current_vp = &default_vp;
-    else
-        current_vp = vp;
-
-#if defined(SIMULATOR)
-    /* Force the viewport to be within bounds.  If this happens it should
-     *  be considered an error - the viewport will not draw as it might be
-     *  expected.
-     */
-    if((unsigned) current_vp->x > (unsigned) LCDM(WIDTH) 
-        || (unsigned) current_vp->y > (unsigned) LCDM(HEIGHT) 
-        || current_vp->x + current_vp->width > LCDM(WIDTH)
-        || current_vp->y + current_vp->height > LCDM(HEIGHT))
-    {
-#if !defined(HAVE_VIEWPORT_CLIP)
-        DEBUGF("ERROR: "
-#else
-        DEBUGF("NOTE: "
-#endif
-            "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n", 
-            current_vp->x, current_vp->y, 
-            current_vp->width, current_vp->height);
-    }
-    
-#endif
-}
-
-void LCDFN(update_viewport)(void)
-{
-    LCDFN(update_rect)(current_vp->x, current_vp->y,
-                       current_vp->width, current_vp->height);
-}
-
-void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
-{
-    LCDFN(update_rect)(current_vp->x + x, current_vp->y + y, width, height);
-}
-
 /* LCD init */
 void LCDFN(init)(void)
 {

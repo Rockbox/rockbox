@@ -77,52 +77,6 @@ void lcd_init(void)
     scroll_init();
 }
 
-/*** Viewports ***/
-
-void lcd_set_viewport(struct viewport* vp)
-{
-    if (vp == NULL)
-        current_vp = &default_vp;
-    else
-        current_vp = vp;
-
-    fg_pattern = 0x55 * (~current_vp->fg_pattern & 3);
-    bg_pattern = 0x55 * (~current_vp->bg_pattern & 3);
-    
-#if defined(SIMULATOR)
-    /* Force the viewport to be within bounds.  If this happens it should
-     *  be considered an error - the viewport will not draw as it might be
-     *  expected.
-     */
-    if((unsigned) current_vp->x > (unsigned) LCD_WIDTH 
-        || (unsigned) current_vp->y > (unsigned) LCD_HEIGHT 
-        || current_vp->x + current_vp->width > LCD_WIDTH
-        || current_vp->y + current_vp->height > LCD_HEIGHT)
-    {
-#if !defined(HAVE_VIEWPORT_CLIP)
-        DEBUGF("ERROR: "
-#else
-        DEBUGF("NOTE: "
-#endif
-            "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n", 
-            current_vp->x, current_vp->y, 
-            current_vp->width, current_vp->height);
-    }
-    
-#endif
-}
-
-void lcd_update_viewport(void)
-{
-    lcd_update_rect(current_vp->x, current_vp->y,
-                    current_vp->width, current_vp->height);
-}
-
-void lcd_update_viewport_rect(int x, int y, int width, int height)
-{
-    lcd_update_rect(current_vp->x + x, current_vp->y + y, width, height);
-}
-
 /*** parameter handling ***/
 
 void lcd_set_drawmode(int mode)
