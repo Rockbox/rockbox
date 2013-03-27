@@ -843,8 +843,12 @@ void simplelist_set_line_count(int lines)
         simplelist_line_remaining = sizeof(simplelist_buffer);
         simplelist_line_count = 0;
     }
-    else if (lines >= SIMPLELIST_MAX_LINES)
-        simplelist_line_count = SIMPLELIST_MAX_LINES;
+    else if (lines < simplelist_line_count) {
+        char *end = simplelist_text[lines];
+        simplelist_line_pos = end - simplelist_buffer;
+        simplelist_line_remaining = sizeof(simplelist_buffer) - simplelist_line_pos;
+        simplelist_line_count = lines;
+    }
 }
 /* get the current amount of lines shown */
 int simplelist_get_line_count(void)
