@@ -1838,31 +1838,6 @@ static bool dbg_save_roms(void)
 }
 #endif /* CPU */
 
-static int radio_callback(int btn, struct gui_synclist *lists)
-{
-    (void)lists;
-    if (btn == ACTION_STD_CANCEL)
-        return btn;
-    simplelist_set_line_count(1);
-    simplelist_addline("test one");
-    simplelist_addline("test two");
-    simplelist_addline("test dsaf");
-    simplelist_addline("test asdfsad");
-    simplelist_addline("-------------");
-    return ACTION_REDRAW;
-}
-static bool dbg_fm_radio(void)
-{
-    struct simplelist_info info;
-    info.scroll_all = true;
-    simplelist_info_init(&info, "FM Radio", 1, NULL);
-    simplelist_set_line_count(0);
-    simplelist_addline("HW detected: %s", "no");
-
-    info.action_callback = radio_callback;
-    info.hide_selection = true;
-    return simplelist_show_list(&info);
-}
 #ifndef SIMULATOR
 #if CONFIG_TUNER
 
@@ -2349,7 +2324,6 @@ static const struct {
         { "FM Radio", dbg_fm_radio },
 #endif
 #endif
-    { "TEST HERE", dbg_fm_radio},
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
         { "Write back EEPROM", dbg_write_eeprom },
 #endif
