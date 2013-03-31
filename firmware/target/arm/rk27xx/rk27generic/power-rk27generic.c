@@ -38,6 +38,11 @@ void power_init(void)
     GPIO_PCCON |= (1<<0);
 }
 
+bool tuner_power(bool status)
+{
+    return status;
+}
+
 unsigned int power_input_status(void)
 {
     return (usb_detect() == USB_INSERTED) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
