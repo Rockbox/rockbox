@@ -66,7 +66,21 @@ static const struct button_mapping button_context_wps[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
+#ifdef CONFIG_TUNER
+static const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,                  BUTTON_M|BUTTON_REPEAT,             BUTTON_NONE },
+    { ACTION_FM_PLAY,                  BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY },
+    { ACTION_FM_STOP,                  BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_SETTINGS_INC,             BUTTON_VOL|BUTTON_FF,               BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,       BUTTON_VOL|BUTTON_FF|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,             BUTTON_VOL|BUTTON_REW,              BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,       BUTTON_VOL|BUTTON_REW|BUTTON_REPEAT,BUTTON_NONE },
 
+    { ACTION_FM_EXIT,                  BUTTON_M|BUTTON_REL,                BUTTON_M },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_radio */
+#endif
 
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
@@ -77,7 +91,10 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
-            
+#ifdef CONFIG_TUNER
+        case CONTEXT_FM:
+             return button_context_radio;
+#endif
         case CONTEXT_TREE:
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
