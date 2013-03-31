@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2009 Bertrik Sikken
+ * Copyright (C) 2013 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,38 +18,35 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdbool.h>
 #include "config.h"
-#include "inttypes.h"
-#include "power.h"
-#include "panic.h"
 #include "system.h"
-#include "usb_core.h"   /* for usb_charging_maxcurrent_change */
+#include "audiohw.h"
+#include "audio.h"
 
-void power_off(void)
+static int input_source = AUDIO_SRC_PLAYBACK;
+static unsigned input_flags = 0;
+static int output_source = AUDIO_SRC_PLAYBACK;
+
+static void select_audio_path(void)
 {
-    GPIO_PCCON &= ~(1<<0);
-    while(1);
+    if(input_source == AUDIO_SRC_PLAYBACK)
+        audiohw_set_monitor(false);
+    else
+        audiohw_set_monitor(true);
 }
 
-void power_init(void)
+void audio_input_mux(int source, unsigned flags)
 {
-    GPIO_PCDR |= (1<<0);
-    GPIO_PCCON |= (1<<0);
+    (void) source;
+    (void) flags;
+    input_source = source;
+    input_flags = flags;
+    select_audio_path();
 }
 
-bool tuner_power(bool status)
+void audio_set_output_source(int source)
 {
-    (void) status;
-    return true;
-}
-
-unsigned int power_input_status(void)
-{
-    return (usb_detect() == USB_INSERTED) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
-}
-
-bool charging_state(void)
-{
-   return (usb_detect() == USB_INSERTED);
+    (void) source;
+    output_source = source;
+    select_audio_path();
 }

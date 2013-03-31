@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2009 Bertrik Sikken
+ * Copyright (C) 2013 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,38 +18,22 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdbool.h>
+
 #include "config.h"
-#include "inttypes.h"
-#include "power.h"
-#include "panic.h"
 #include "system.h"
-#include "usb_core.h"   /* for usb_charging_maxcurrent_change */
+#include "fmradio_i2c.h"
+#include "i2c-rk27xx.h"
 
-void power_off(void)
+void fmradio_i2c_init(void)
 {
-    GPIO_PCCON &= ~(1<<0);
-    while(1);
 }
 
-void power_init(void)
+int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
 {
-    GPIO_PCDR |= (1<<0);
-    GPIO_PCCON |= (1<<0);
+    return i2c_write(address, -1, count, buf);
 }
 
-bool tuner_power(bool status)
+int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
-    (void) status;
-    return true;
-}
-
-unsigned int power_input_status(void)
-{
-    return (usb_detect() == USB_INSERTED) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;
-}
-
-bool charging_state(void)
-{
-   return (usb_detect() == USB_INSERTED);
+    return i2c_read(address, -1, count, buf);
 }

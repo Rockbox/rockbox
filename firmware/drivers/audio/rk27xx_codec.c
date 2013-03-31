@@ -55,12 +55,14 @@ static int codec_read(uint8_t reg, uint8_t *val)
 }
 #endif
 
+static uint8_t cr1_sel = DACSEL;
+
 static void audiohw_mute(bool mute)
 {
     if (mute)
-        codec_write(CR1, SB_MICBIAS|DAC_MUTE|DACSEL);
+        codec_write(CR1, SB_MICBIAS|DAC_MUTE|cr1_sel);
     else
-        codec_write(CR1, SB_MICBIAS|DACSEL);
+        codec_write(CR1, SB_MICBIAS|cr1_sel);
 }
 
 /* public functions */
@@ -109,7 +111,7 @@ void audiohw_postinit(void)
     udelay(1000);
 
     /* power up output stage */
-    codec_write(PMR1, SB_ADC|SB_IN1|SB_IN2|SB_MIC|SB_IND);
+    codec_write(PMR1, SB_ADC|SB_MIC|SB_IND);
 
     sleep(HZ/10);
     GPIO_PDDR |= (1<<7); /* PD7 high */
@@ -159,5 +161,15 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
         codec_write(CGR9, vol_r);
         codec_write(CGR8, vol_l);
+        codec_write(CGR5, vol_r);
+        codec_write(CGR4, vol_l);
+        codec_write(CGR3, vol_r);
+        codec_write(CGR2, vol_l);
     }
+}
+
+void audiohw_set_monitor(bool enable)
+{
+    cr1_sel = enable ? BYPASS1|BYPASS2 : DACSEL;
+    codec_write(CR1, cr1_sel|SB_MICBIAS);
 }
