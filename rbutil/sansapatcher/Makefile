@@ -39,7 +39,8 @@ endif
 
 $(OBJDIR)main.o: $(BOOTSRC)
 $(OBJDIR)sansapatcher-rc.o: sansapatcher.rc sansapatcher.manifest
-	$(CROSS)$(WINDRES) -i sansapatcher.rc -o sansapatcher-rc.o
+	@echo WINDRES $(notdir $<)
+	$(SILENT)$(CROSS)$(WINDRES) -i sansapatcher.rc -o $@
 
 bootimg_c200.c: firmware.mi4 $(BIN2C)
 	@echo BIN2C $<

@@ -36,13 +36,14 @@ LIBSOURCES = ipodpatcher.c fat32format.c arc4.c \
 	     ipodio-posix.c ipodio-win32-scsi.c ipodio-win32.c
 SOURCES = main.c $(BOOTSRC) $(LIBSOURCES)
 ipodpatcher: SOURCES+= ipodio-posix.c
-ipodpatcher.exe: SOURCES+= ipodpatcher-rc.o
 
 OUTPUT = ipodpatcher
 include ../libtools.make
 
+ipodpatcher.exe: $(OBJDIR)ipodpatcher-rc.o
 $(OBJDIR)ipodpatcher-rc.o: ipodpatcher.rc ipodpatcher.manifest
-	$(CROSS)$(WINDRES) -i ipodpatcher.rc -o ipodpatcher-rc.o
+	@echo WINDRES $(notdir $<)
+	$(SILENT)$(CROSS)$(WINDRES) -i $< -o $@
 
 %.c: bootloader-%.ipod $(BIN2C)
 	@echo BIN2C $<
