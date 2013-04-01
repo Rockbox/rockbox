@@ -39,7 +39,6 @@ ipodpatcher: SOURCES+= ipodio-posix.c
 ipodpatcher.exe: SOURCES+= ipodpatcher-rc.o
 
 OUTPUT = ipodpatcher
-all: $(OUTPUT)
 include ../libtools.make
 
 $(OBJDIR)ipodpatcher-rc.o: ipodpatcher.rc ipodpatcher.manifest
