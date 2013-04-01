@@ -42,7 +42,7 @@ bool Autodetection::detect()
     detectUsb();
 
     // Try detection via rockbox.info / rbutil.log
-    QStringList mounts = Utils::mountpoints();
+    QStringList mounts = Utils::mountpoints(Utils::MountpointsSupported);
     qDebug() << "[Autodetect] paths to check:" << mounts;
 
     for(int i=0; i< mounts.size();i++)

@@ -35,6 +35,10 @@ public:
         FilesystemFree,
         FilesystemClusterSize,
     };
+    enum MountpointsFilter {
+        MountpointsAll,
+        MountpointsSupported,
+    };
 
     static bool recursiveRmdir(const QString &dirName);
     static QString resolvePathCase(QString path);
@@ -46,7 +50,7 @@ public:
     static QString checkEnvironment(bool permission);
     static int compareVersionStrings(QString s1, QString s2);
     static QString filesystemName(QString path);
-    static QStringList mountpoints(void);
+    static QStringList mountpoints(enum MountpointsFilter type = MountpointsAll);
     static QString resolveDevicename(QString path);
     static QString resolveMountPoint(QString device);
     static QStringList findRunningProcess(QStringList names);

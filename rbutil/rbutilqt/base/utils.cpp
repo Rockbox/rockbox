@@ -568,39 +568,71 @@ QString Utils::resolveMountPoint(QString device)
 }
 
 
-QStringList Utils::mountpoints()
+QStringList Utils::mountpoints(enum MountpointsFilter type)
 {
+    QStringList supported;
     QStringList tempList;
 #if defined(Q_OS_WIN32)
+    supported << "FAT32" << "FAT16" << "FAT12";
     QFileInfoList list = QDir::drives();
     for(int i=0; i<list.size();i++)
     {
-        tempList << list.at(i).absolutePath();
-        qDebug() << "[Utils] Mounted on" << list.at(i).absolutePath();
+        wchar_t t[32];
+        memset(t, 0, 32);
+        if(GetVolumeInformationW((LPCWSTR)list.at(i).absolutePath().utf16(),
+                NULL, 0, NULL, NULL, NULL, t, 32) == 0) {
+            // on error empty retrieved type -- don't rely on
+            // GetVolumeInformation not changing it.
+            memset(t, 0, sizeof(t));
+        }
+
+        QString fstype = QString::fromWCharArray(t);
+        if(type == MountpointsAll || supported.contains(fstype)) {
+            tempList << list.at(i).absolutePath();
+            qDebug() << "[Utils] Added:" << list.at(i).absolutePath()
+                     << "type" << fstype;
+        }
+        else {
+            qDebug() << "[Utils] Ignored:" << list.at(i).absolutePath()
+                     << "type" << fstype;
+        }
     }
 
 #elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+    supported << "vfat" << "msdos";
     int num;
     struct statfs *mntinf;
 
     num = getmntinfo(&mntinf, MNT_WAIT);
     while(num--) {
-        tempList << QString(mntinf->f_mntonname);
-        qDebug() << "[Utils] Mounted on" << mntinf->f_mntonname
-                 << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
+        if(type == MountpointsAll || supported.contains(mntinf->f_fstypename)) {
+            tempList << QString(mntinf->f_mntonname);
+            qDebug() << "[Utils] Added:" << mntinf->f_mntonname
+                     << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
+        }
+        else {
+            qDebug() << "[Utils] Ignored:" << mntinf->f_mntonname
+                     << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
+        }
         mntinf++;
     }
 #elif defined(Q_OS_LINUX)
-
+    supported << "vfat" << "msdos";
     FILE *mn = setmntent("/etc/mtab", "r");
     if(!mn)
         return QStringList("");
 
     struct mntent *ent;
     while((ent = getmntent(mn))) {
-        tempList << QString(ent->mnt_dir);
-        qDebug() << "[Utils] Mounted on" << ent->mnt_dir
-                 << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
+        if(type == MountpointsAll || supported.contains(ent->mnt_type)) {
+            tempList << QString(ent->mnt_dir);
+            qDebug() << "[Utils] Added:" << ent->mnt_dir
+                     << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
+        }
+        else {
+            qDebug() << "[Utils] Ignored:" << ent->mnt_dir
+                     << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
+        }
     }
     endmntent(mn);
 
