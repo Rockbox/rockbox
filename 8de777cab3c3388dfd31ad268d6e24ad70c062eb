@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///ZM\u003d",
+        "filename": "firmware/drivers/audio/rk27xx_codec.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-02T08:51:50Z",
+      "side": 1,
+      "message": "this should be static perhaps",
+      "revId": "8de777cab3c3388dfd31ad268d6e24ad70c062eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///ZQ\u003d",
+        "filename": "firmware/target/arm/rk27xx/audio-rk27xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-02T08:51:50Z",
+      "side": 1,
+      "message": "For now it is ok, but reference design DAP also has MIC as well as it can record from MIC and FM. This implementation seems to assume playback or analog bypass only.",
+      "revId": "8de777cab3c3388dfd31ad268d6e24ad70c062eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///ZU\u003d",
+        "filename": "firmware/target/arm/rk27xx/rk27generic/power-rk27generic.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-02T08:51:50Z",
+      "side": 1,
+      "message": "AFAIK there is no way to turn off tuner chip (at least in reference design) so this should return always true.",
+      "revId": "8de777cab3c3388dfd31ad268d6e24ad70c062eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
