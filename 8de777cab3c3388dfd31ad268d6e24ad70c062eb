@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAASX///Y0\u003d",
+        "filename": "firmware/SOURCES",
+        "patchSetId": 2
+      },
+      "lineNbr": 1512,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-04-02T09:21:30Z",
+      "side": 1,
+      "message": "I think this should be wrapped in #if CONFIG_TUNNER",
+      "revId": "8de777cab3c3388dfd31ad268d6e24ad70c062eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Yw\u003d",
+        "filename": "firmware/SOURCES",
+        "patchSetId": 2
+      },
+      "lineNbr": 1536,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-04-02T09:21:30Z",
+      "side": 1,
+      "message": "and this probably too",
+      "revId": "8de777cab3c3388dfd31ad268d6e24ad70c062eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///ZM\u003d",
         "filename": "firmware/drivers/audio/rk27xx_codec.c",
         "patchSetId": 2
