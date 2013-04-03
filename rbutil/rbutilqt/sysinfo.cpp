@@ -17,6 +17,7 @@
  ****************************************************************************/
 
 #include <QDialog>
+#include <QDir>
 #include "sysinfo.h"
 #include "ui_sysinfofrm.h"
 #include "system.h"
@@ -27,7 +28,7 @@
 Sysinfo::Sysinfo(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
-   
+
     updateSysinfo();
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui.buttonRefresh, SIGNAL(clicked()), this, SLOT(updateSysinfo()));

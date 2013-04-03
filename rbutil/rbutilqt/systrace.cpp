@@ -114,6 +114,7 @@ void SysTrace::debug(QtMsgType type, const char* msg)
 void SysTrace::debug(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     (void)type;
+    (void)context;
     QByteArray localMsg = msg.toLocal8Bit();
     if(lastmessage != msg) {
         lastmessage = msg;

@@ -20,6 +20,9 @@
 #include <QProgressDialog>
 #include <QFileDialog>
 #include <QUrl>
+#if !defined(Q_OS_LINUX)
+#include <QSound>
+#endif
 
 #include "version.h"
 #include "configure.h"
@@ -850,7 +853,6 @@ void Config::configTts()
 {
     int index = ui.comboTts->currentIndex();
     TTSBase* tts = TTSBase::getTTS(this,ui.comboTts->itemData(index).toString());
-
     EncTtsCfgGui gui(this,tts,TTSBase::getTTSName(ui.comboTts->itemData(index).toString()));
     gui.exec();
     updateTtsState(ui.comboTts->currentIndex());

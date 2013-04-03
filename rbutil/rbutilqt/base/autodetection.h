@@ -22,7 +22,9 @@
 #ifndef AUTODETECTION_H_
 #define AUTODETECTION_H_
 
-#include <QtCore>
+#include <QObject>
+#include <QString>
+#include <QList>
 
 class Autodetection :public QObject
 {
