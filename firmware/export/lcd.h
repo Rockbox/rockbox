@@ -207,10 +207,6 @@ extern void lcd_puts_offset(int x, int y, const unsigned char *str, int offset);
 extern void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
                                   int offset);
 extern void lcd_putc(int x, int y, unsigned long ucs);
-extern void lcd_stop_scroll(void);
-extern void lcd_bidir_scroll(int threshold);
-extern void lcd_scroll_speed(int speed);
-extern void lcd_scroll_delay(int ms);
 extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
 extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);

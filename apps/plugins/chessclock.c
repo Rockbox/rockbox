@@ -776,7 +776,7 @@ static int chessclock_set_int(char* string,
             *variable = min;
 
     }
-    rb->lcd_stop_scroll();
+    rb->lcd_scroll_stop();
 
     return CHCL_OK;
 }

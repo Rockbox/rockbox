@@ -323,7 +323,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     FOR_NB_SCREENS(i)
     {
         screens[i].set_viewport(NULL);
-        screens[i].stop_scroll();
+        screens[i].scroll_stop();
         viewportmanager_theme_enable(i, true, &parent[i]);
         quickscreen_fix_viewports(qs, &screens[i], &parent[i], vps[i], &vp_icons[i]);
         gui_quickscreen_draw(qs, &screens[i], &parent[i], vps[i], &vp_icons[i]);
@@ -368,7 +368,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     FOR_NB_SCREENS(i)
     {   /* stop scrolling before exiting */
         for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
-            screens[i].scroll_stop(&vps[i][j]);
+            screens[i].scroll_stop_viewport(&vps[i][j]);
         viewportmanager_theme_undo(i, true);
     }
 

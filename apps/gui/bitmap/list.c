@@ -61,9 +61,9 @@ void gui_synclist_scroll_stop(struct gui_synclist *lists)
 {
     FOR_NB_SCREENS(i)
     {
-        screens[i].scroll_stop(&list_text[i]);
-        screens[i].scroll_stop(&title_text[i]);
-        screens[i].scroll_stop(lists->parent[i]);
+        screens[i].scroll_stop_viewport(&list_text[i]);
+        screens[i].scroll_stop_viewport(&title_text[i]);
+        screens[i].scroll_stop_viewport(lists->parent[i]);
     }
 }
 
@@ -100,7 +100,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
 
     if (sb_set_title_text(list->title, list->title_icon, screen))
         return false; /* the sbs is handling the title */
-    display->scroll_stop(title_text_vp);
+    display->scroll_stop_viewport(title_text_vp);
     if (!list_display_title(list, screen))
         return false;
     *title_text_vp = *(list->parent[screen]);
@@ -160,7 +160,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     line_height = parent->line_height;
     display->set_viewport(parent);
     display->clear_viewport();
-    display->scroll_stop(list_text_vp);
+    display->scroll_stop_viewport(list_text_vp);
     *list_text_vp = *parent;
     list_text_vp->line_height = line_height;
     if ((show_title = draw_title(display, list)))

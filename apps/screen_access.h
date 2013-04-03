@@ -145,11 +145,11 @@ struct screen
                                  int x_offset);
     void (*scroll_speed)(int speed);
     void (*scroll_delay)(int ms);
-    void (*stop_scroll)(void);
     void (*clear_display)(void);
     void (*clear_viewport)(void);
-    void (*scroll_stop)(const struct viewport* vp);
-    void (*scroll_stop_line)(const struct viewport* vp, int y);
+    void (*scroll_stop)(void);
+    void (*scroll_stop_viewport)(const struct viewport *vp);
+    void (*scroll_stop_viewport_line)(const struct viewport *vp, int line);
     void (*update)(void);
     void (*update_viewport)(void);
     void (*backlight_on)(void);

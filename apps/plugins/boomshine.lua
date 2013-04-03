@@ -345,7 +345,7 @@ function display_message(to, ...)
         rb.sleep(to)
     end
 
-    rb.lcd_stop_scroll() -- Stop our scrolling message
+    rb.lcd_scroll_stop() -- Stop our scrolling message
 end
 
 if HAS_TOUCHSCREEN then

@@ -143,7 +143,7 @@ static const struct plugin_api rockbox_api = {
     lcd_puts,
     lcd_putsf,
     lcd_puts_scroll,
-    lcd_stop_scroll,
+    lcd_scroll_stop,
 #ifdef HAVE_LCD_CHARCELLS
     lcd_define_pattern,
     lcd_get_locked_pattern,
@@ -246,7 +246,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_clear_display,
     lcd_remote_puts,
     lcd_remote_puts_scroll,
-    lcd_remote_stop_scroll,
+    lcd_remote_scroll_stop,
     lcd_remote_set_drawmode,
     lcd_remote_get_drawmode,
     lcd_remote_setfont,

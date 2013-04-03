@@ -156,7 +156,7 @@ static void usb_screen_fix_viewports(struct screen *screen,
     disable = (parent->width < logo_width || parent->height < logo_height);
     viewportmanager_theme_enable(screen->screen_type, !disable, parent);
     screen->clear_display();
-    screen->stop_scroll();
+    screen->scroll_stop();
 
     *logo = *parent;
     logo->x = parent->x + parent->width - logo_width;
@@ -308,7 +308,7 @@ void gui_usb_screen_run(bool early_usb)
         vp = &usb_screen_vps_ar[i].parent;
 #endif
         if (vp)
-            screens[i].scroll_stop(vp);
+            screens[i].scroll_stop_viewport(vp);
     }
 #ifdef USB_ENABLE_HID
     if (global_settings.usb_keypad_mode != usb_keypad_mode)
