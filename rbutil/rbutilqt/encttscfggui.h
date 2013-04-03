@@ -17,31 +17,32 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef ENCTTSCFGGUI_H
 #define ENCTTSCFGGUI_H
 
 #include <QDialog>
+#include <QString>
 #include <QProgressDialog>
 #include "encttssettings.h"
 
 //! \brief Shows and manages a configuration gui for encoders and tts enignes
-//! 
+//!
 class EncTtsCfgGui: public QDialog
 {
     Q_OBJECT
 public:
     //! Creates the UI. give it a endoer or tts engine with already set config. uses show() or exec() to show it.
-    EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* interface,QString name);
-      
+    EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* iface, QString name);
+
 private slots:
     //! accept current configuration values and close window
-    void accept(void);   
+    void accept(void);
     //! close window and dont save configuration
     void reject(void);
     //! updates the corresponding setting from the sending Widget
     void updateSetting();
-    //! updates corresponding Widget from the sending Setting. 
+    //! updates corresponding Widget from the sending Setting.
     void updateWidget();
     //! shows a busy dialog. counts calls.
     void showBusy();
@@ -49,7 +50,7 @@ private slots:
     void hideBusy();
     //! used via the SignalMapper for all Browse buttons
     void browse(QObject*);
-    
+
 private:
     //! creates all dynamic window content
     void setUpWindow();
@@ -69,7 +70,7 @@ private:
     QMap<EncTtsSetting*,QWidget*> m_settingsWidgetsMap;
     //! Maps all browse buttons to the corresponding Setting
     QSignalMapper m_browseBtnMap;
-    //! counter how often busyShow() is called, 
+    //! counter how often busyShow() is called,
     int m_busyCnt;
 };
 
