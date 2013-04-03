@@ -115,7 +115,7 @@ static void rolo_error(const char *text)
     button_get(true);
     button_get(true);
     button_get(true);
-    lcd_stop_scroll();
+    lcd_scroll_stop();
 }
 
 #if CONFIG_CPU == SH7034 || CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX

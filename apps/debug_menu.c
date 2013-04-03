@@ -2084,7 +2084,7 @@ static bool cpu_boost_log(void)
             }
         }
     }
-    lcd_stop_scroll();
+    lcd_scroll_stop();
     get_action(CONTEXT_STD,TIMEOUT_BLOCK);
     lcd_setfont(FONT_UI);
     return false;

@@ -43,7 +43,7 @@ void gui_synclist_scroll_stop(struct gui_synclist *lists)
     (void)lists;
     FOR_NB_SCREENS(i)
     {
-        screens[i].stop_scroll();
+        screens[i].scroll_stop();
     }
 }
 

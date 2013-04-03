@@ -2200,7 +2200,7 @@ static int timetag_editor(void)
     }
 
     FOR_NB_SCREENS(idx)
-        rb->screens[idx]->stop_scroll();
+        rb->screens[idx]->scroll_stop();
 
     if (current.changed_lrc)
     {

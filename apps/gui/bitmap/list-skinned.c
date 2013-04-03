@@ -54,7 +54,7 @@ void skinlist_set_cfg(enum screen_type screen,
     if (listcfg[screen] != cfg)
     {
         if (listcfg[screen])
-            screens[screen].scroll_stop(&listcfg[screen]->selected_item_vp.vp);
+            screens[screen].scroll_stop_viewport(&listcfg[screen]->selected_item_vp.vp);
         listcfg[screen] = cfg;
         current_list = NULL;
         current_column = -1;
@@ -269,7 +269,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             /* force disableing scroll because it breaks later */
             if (!is_selected)
             {
-                display->scroll_stop(&skin_viewport->vp);
+                display->scroll_stop_viewport(&skin_viewport->vp);
                 skin_viewport->vp.x = original_x;
                 skin_viewport->vp.y = original_y;
             }

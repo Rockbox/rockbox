@@ -358,7 +358,7 @@ bool ffwd_rew(int button)
 #endif
 #if CONFIG_KEYPAD == PLAYER_PAD
                         FOR_NB_SCREENS(i)
-                            skin_get_gwps(WPS, i)->display->stop_scroll();
+                            skin_get_gwps(WPS, i)->display->scroll_stop();
 #endif
                         if (direction > 0)
                             status_set_ffmode(STATUS_FASTFORWARD);
@@ -639,7 +639,7 @@ static void gwps_leave_wps(void)
 {
     FOR_NB_SCREENS(i)
     {
-        skin_get_gwps(WPS, i)->display->stop_scroll();
+        skin_get_gwps(WPS, i)->display->scroll_stop();
 #ifdef HAVE_BACKDROP_IMAGE
         skin_backdrop_show(sb_get_backdrop(i));
 #endif
@@ -668,7 +668,7 @@ static void gwps_enter_wps(void)
     {
         gwps = skin_get_gwps(WPS, i);
         display = gwps->display;
-        display->stop_scroll();
+        display->scroll_stop();
         viewportmanager_theme_enable(i, skin_has_sbs(i, skin_get_gwps(WPS, i)->data), NULL);
 
         /* Update the values in the first (default) viewport - in case the user

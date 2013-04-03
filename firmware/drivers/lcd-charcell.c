@@ -377,7 +377,7 @@ void lcd_clear_viewport(void)
             for (y = 0; y < current_vp->height; y++)
                 lcd_putxchar(x, y, xspace);
 
-        lcd_scroll_stop(current_vp);
+        lcd_scroll_stop_viewport(current_vp);
     }
 }
 
@@ -486,7 +486,7 @@ void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
         return;
 
     /* make sure scrolling is turned off on the line we are updating */
-    lcd_scroll_stop_line(current_vp, y);
+    lcd_scroll_stop_viewport_line(current_vp, y);
 
     x = lcd_putsxyofs(x, y, offset, str);
     while (x < current_vp->width)
@@ -509,7 +509,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
         return;
 
     /* remove any previously scrolling line at the same location */
-    lcd_scroll_stop_line(current_vp, y);
+    lcd_scroll_stop_viewport_line(current_vp, y);
 
     if (lcd_scroll_info.lines >= LCD_SCROLLABLE_LINES) return;
 

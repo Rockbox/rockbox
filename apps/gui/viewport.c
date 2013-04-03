@@ -178,7 +178,7 @@ static void toggle_theme(enum screen_type screen, bool force)
 #if LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1)
         screens[screen].backdrop_show(NULL);
 #endif
-        screens[screen].stop_scroll();
+        screens[screen].scroll_stop();
         skinlist_set_cfg(screen, NULL);
     }
     /* let list initialize viewport in case viewport dimensions is changed. */

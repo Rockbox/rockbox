@@ -874,7 +874,7 @@ static void save_editor(struct mp3entry *mp3, int splittime)
                 break;
 
             case SE_SAVE:
-                rb->lcd_stop_scroll();
+                rb->lcd_scroll_stop();
                 rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
                 rb->lcd_fillrect(0, 6*8, LCD_WIDTH, LCD_HEIGHT);
                 rb->lcd_set_drawmode(DRMODE_SOLID);

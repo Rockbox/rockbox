@@ -78,7 +78,7 @@ void fms_fix_displays(enum fms_exiting toggle_state)
         }
         else
         {
-            screens[i].stop_scroll();
+            screens[i].scroll_stop();
 #ifdef HAVE_BACKDROP_IMAGE
             skin_backdrop_show(sb_get_backdrop(i));
 #endif

@@ -166,7 +166,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 #else
         viewportmanager_theme_enable(i, true, yn[i].vp);
 #endif
-        screens[i].stop_scroll();
+        screens[i].scroll_stop();
         gui_yesno_draw(&(yn[i]));
     }
 
@@ -231,7 +231,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 
     FOR_NB_SCREENS(i)
     {
-        screens[i].scroll_stop(yn[i].vp);
+        screens[i].scroll_stop_viewport(yn[i].vp);
         viewportmanager_theme_undo(i, true);
     }
 

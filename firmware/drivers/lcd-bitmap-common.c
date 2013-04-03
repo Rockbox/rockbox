@@ -178,6 +178,12 @@ void LCDFN(set_viewport)(struct viewport* vp)
 #endif
 }
 
+struct viewport *LCDFN(get_viewport)(bool *is_default)
+{
+    *is_default = (current_vp == &default_vp);
+    return current_vp;
+}
+
 void LCDFN(update_viewport)(void)
 {
     LCDFN(update_rect)(current_vp->x, current_vp->y,
@@ -405,7 +411,7 @@ void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
                               int style, int x_offset, int y_offset)
 {
     int xpos, ypos, h;
-    LCDFN(scroll_stop_line)(current_vp, y);
+    LCDFN(scroll_stop_viewport_line)(current_vp, y);
     if(!str)
         return;
 
@@ -491,7 +497,7 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
     if (restart)
     {
         /* remove any previously scrolling line at the same location */
-        LCDFN(scroll_stop_line)(current_vp, y);
+        LCDFN(scroll_stop_viewport_line)(current_vp, y);
 
         if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES)) return;
         LCDFN(puts_style_xyoffset)(x, y, string, style, x_offset, y_offset);

@@ -41,6 +41,10 @@ static const char scroll_tick_table[18] = {
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3, 2, 1
 };
 
+/* imported private functions from lcd-bitmap-common.c */
+extern struct viewport *lcd_get_viewport(void);
+extern struct viewport *lcd_remote_get_viewport(void);
+
 static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE*3];
 static const char scroll_name[] = "scroll";
@@ -80,20 +84,21 @@ struct scroll_screen_info lcd_remote_scroll_info =
 };
 #endif /* HAVE_REMOTE_LCD */
 
-void lcd_stop_scroll(void)
+void lcd_scroll_stop(void)
 {
     lcd_scroll_info.lines = 0;
 }
 
 /* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
-void lcd_scroll_stop_line(const struct viewport* current_vp, int y)
+void lcd_scroll_stop_viewport_line(const struct viewport *current_vp, int line)
 {
     int i = 0;
 
     while (i < lcd_scroll_info.lines)
     {
-        if ((lcd_scroll_info.scroll[i].vp == current_vp) && 
-            ((y < 0) || (lcd_scroll_info.scroll[i].y == y)))
+        struct viewport *vp = lcd_scroll_info.scroll[i].vp;
+        if (((vp == current_vp)) && 
+            ((line < 0) || (lcd_scroll_info.scroll[i].y == line)))
         {
             /* If i is not the last active line in the array, then move
                the last item to position i */
@@ -106,7 +111,7 @@ void lcd_scroll_stop_line(const struct viewport* current_vp, int y)
 
             /* A line can only appear once, so we're done, 
              * unless we are clearing the whole viewport */
-            if (y >= 0)
+            if (line >= 0)
                 return ;
         }
         else
@@ -117,9 +122,9 @@ void lcd_scroll_stop_line(const struct viewport* current_vp, int y)
 }
 
 /* Stop all scrolling lines in the specified viewport */
-void lcd_scroll_stop(const struct viewport* vp)
+void lcd_scroll_stop_viewport(const struct viewport *current_vp)
 {
-    lcd_scroll_stop_line(vp, -1);
+    lcd_scroll_stop_viewport_line(current_vp, -1);
 }
 
 void lcd_scroll_speed(int speed)
@@ -157,20 +162,21 @@ void lcd_jump_scroll_delay(int ms)
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-void lcd_remote_stop_scroll(void)
+void lcd_remote_scroll_stop(void)
 {
     lcd_remote_scroll_info.lines = 0;
 }
 
 /* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
-void lcd_remote_scroll_stop_line(const struct viewport* current_vp, int y)
+void lcd_remote_scroll_stop_viewport_line(const struct viewport *current_vp, int line)
 {
     int i = 0;
 
-    while (i < lcd_remote_scroll_info.lines)
+    while (i < lcd_scroll_info.lines)
     {
-        if ((lcd_remote_scroll_info.scroll[i].vp == current_vp) && 
-            ((y < 0) || (lcd_remote_scroll_info.scroll[i].y == y)))
+        struct viewport *vp = lcd_remote_scroll_info.scroll[i].vp;
+        if (((vp == current_vp)) && 
+            ((line < 0) || (lcd_remote_scroll_info.scroll[i].y == line)))
         {
             /* If i is not the last active line in the array, then move
                the last item to position i */
@@ -183,7 +189,7 @@ void lcd_remote_scroll_stop_line(const struct viewport* current_vp, int y)
 
             /* A line can only appear once, so we're done, 
              * unless we are clearing the whole viewport */
-            if (y >= 0)
+            if (line >= 0)
                 return ;
         }
         else
@@ -194,9 +200,9 @@ void lcd_remote_scroll_stop_line(const struct viewport* current_vp, int y)
 }
 
 /* Stop all scrolling lines in the specified viewport */
-void lcd_remote_scroll_stop(const struct viewport* vp)
+void lcd_remote_scroll_stop_viewport(const struct viewport *current_vp)
 {
-    lcd_remote_scroll_stop_line(vp, -1);
+    lcd_remote_scroll_stop_viewport_line(current_vp, -1);
 }
 
 void lcd_remote_scroll_speed(int speed)

@@ -771,7 +771,7 @@ static void led_resistance_calc(void)
         }
     }
     display->set_viewport(&text_vp);
-    rb->lcd_stop_scroll();
+    rb->lcd_scroll_stop();
     display->set_viewport(&screen_vp);
     rb->lcd_clear_display();
 }
@@ -908,7 +908,7 @@ static void resistance_to_color(void)
         }
     }
     display->set_viewport(&text_vp);
-    rb->lcd_stop_scroll();
+    rb->lcd_scroll_stop();
     display->set_viewport(&screen_vp);
     rb->lcd_clear_display();
 }
@@ -989,7 +989,7 @@ static void color_to_resistance(void)
         }                   
     }
     display->set_viewport(&text_vp);
-    rb->lcd_stop_scroll();
+    rb->lcd_scroll_stop();
     display->set_viewport(&screen_vp);
     rb->lcd_clear_display();
     return;

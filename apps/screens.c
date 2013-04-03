@@ -566,7 +566,7 @@ bool set_time_screen(const char* title, struct tm *tm)
         }
     }
     FOR_NB_SCREENS(s)
-        screens[s].scroll_stop(&viewports[s]);
+        screens[s].scroll_stop_viewport(&viewports[s]);
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(old_mode);
 #endif
@@ -581,7 +581,7 @@ bool shutdown_screen(void)
     bool done = false;
     long time_entered = current_tick;
 
-    lcd_stop_scroll();
+    lcd_scroll_stop();
 
     splash(0, str(LANG_CONFIRM_SHUTDOWN));
 
