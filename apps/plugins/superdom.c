@@ -889,7 +889,7 @@ static int get_number(char* param, int* value, int max) {
         rb->lcd_update();
     }
     rb->lcd_setfont(FONT_UI);
-    rb->lcd_stop_scroll();
+    rb->lcd_scroll_stop();
     if (ret == RET_VAL_QUIT_ERR)
         rb->splash(HZ, "Cancelled");
     return ret;

@@ -27,6 +27,7 @@
 #include "lang.h"
 #include "talk.h"
 #include "lcd.h"
+#include "scroll_engine.h"
 #include "button.h"
 #include "backlight.h"
 #include "sound.h"

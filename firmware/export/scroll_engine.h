@@ -29,14 +29,24 @@
 #include <lcd.h>
 #include "file.h"
 
-void scroll_init(void) INIT_ATTR;
-void lcd_scroll_stop(const struct viewport* vp);
-void lcd_scroll_stop_line(const struct viewport* vp, int y);
-void lcd_scroll_fn(void);
+extern void scroll_init(void) INIT_ATTR;
+
+extern void lcd_bidir_scroll(int threshold);
+extern void lcd_scroll_speed(int speed);
+extern void lcd_scroll_delay(int ms);
+
+extern void lcd_scroll_stop(void);
+extern void lcd_scroll_stop_viewport(const struct viewport *vp);
+extern void lcd_scroll_stop_viewport_line(const struct viewport *vp, int line);
+extern void lcd_scroll_fn(void);
 #ifdef HAVE_REMOTE_LCD
-void lcd_remote_scroll_fn(void);
-void lcd_remote_scroll_stop(const struct viewport* vp);
-void lcd_remote_scroll_stop_line(const struct viewport* vp, int y);
+extern void lcd_remote_scroll_speed(int speed);
+extern void lcd_remote_scroll_delay(int ms);
+
+extern void lcd_remote_scroll_stop(void);
+extern void lcd_remote_scroll_stop_viewport(const struct viewport *vp);
+extern void lcd_remote_scroll_stop_viewport_line(const struct viewport *vp, int line);
+extern void lcd_remote_scroll_fn(void);
 #endif
 
 /* internal usage, but in multiple drivers */

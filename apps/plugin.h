@@ -62,6 +62,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "usb.h"
 #include "font.h"
 #include "lcd.h"
+#include "scroll_engine.h"
 #include "metadata.h"
 #include "sound.h"
 #include "mpeg.h"
@@ -195,7 +196,7 @@ struct plugin_api {
     void (*lcd_puts)(int x, int y, const unsigned char *string);
     void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
     void (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
-    void (*lcd_stop_scroll)(void);
+    void (*lcd_scroll_stop)(void);
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_define_pattern)(unsigned long ucs, const char *pattern);
     unsigned long (*lcd_get_locked_pattern)(void);
@@ -327,7 +328,7 @@ struct plugin_api {
     void (*lcd_remote_clear_display)(void);
     void (*lcd_remote_puts)(int x, int y, const unsigned char *string);
     void (*lcd_remote_puts_scroll)(int x, int y, const unsigned char* string);
-    void (*lcd_remote_stop_scroll)(void);
+    void (*lcd_remote_scroll_stop)(void);
     void (*lcd_remote_set_drawmode)(int mode);
     int  (*lcd_remote_get_drawmode)(void);
     void (*lcd_remote_setfont)(int font);

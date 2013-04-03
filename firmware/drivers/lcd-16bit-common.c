@@ -144,13 +144,9 @@ void lcd_clear_viewport(void)
     }
 
     if (current_vp == &default_vp)
-    {
-        lcd_scroll_info.lines = 0;
-    }
+        lcd_scroll_stop();
     else
-    {
-        lcd_scroll_stop(current_vp);
-    }
+        lcd_scroll_stop_viewport(current_vp);
 }
 
 /*** parameter handling ***/
