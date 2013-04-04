@@ -176,7 +176,7 @@ void flash_init(void)
         /* Redundat - we will use special macros
          * just for reference what OF does
          */
-	flash_spec[i].cmd = 0x180E8200 + (i<<9);
+        flash_spec[i].cmd = 0x180E8200 + (i<<9);
         flash_spec[i].addr = 0x180E204 + (i<<9);
         flash_spec[i].data = 0x180E208 + (i<<9);
 

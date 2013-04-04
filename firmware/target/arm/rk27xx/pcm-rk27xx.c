@@ -203,16 +203,16 @@ static void set_codec_freq(unsigned int freq)
     /* {CLKR, CLKF, CLKOD, CODECPLL_DIV} */
     static const unsigned int pcm_freq_params[HW_NUM_FREQ][4] = 
     {
-	[HW_FREQ_96] = {24, 255, 4, 1},
-	[HW_FREQ_48] = {24, 127, 4, 1},
-	[HW_FREQ_44] = {24, 293, 4, 4},
-	[HW_FREQ_32] = {24, 127, 4, 2},
-	[HW_FREQ_24] = {24, 127, 4, 3},
-	[HW_FREQ_22] = {24, 146, 4, 4},
-	[HW_FREQ_16] = {24, 127, 5, 4},
-	[HW_FREQ_12] = {24, 127, 4, 7},
-	[HW_FREQ_11] = {24, 146, 4, 9},
-	[HW_FREQ_8]  = {24, 127, 5, 9},
+        [HW_FREQ_96] = {24, 255, 4, 1},
+        [HW_FREQ_48] = {24, 127, 4, 1},
+        [HW_FREQ_44] = {24, 293, 4, 4},
+        [HW_FREQ_32] = {24, 127, 4, 2},
+        [HW_FREQ_24] = {24, 127, 4, 3},
+        [HW_FREQ_22] = {24, 146, 4, 4},
+        [HW_FREQ_16] = {24, 127, 5, 4},
+        [HW_FREQ_12] = {24, 127, 4, 7},
+        [HW_FREQ_11] = {24, 146, 4, 9},
+        [HW_FREQ_8]  = {24, 127, 5, 9},
     };
     /* select divider output from codec pll */
     SCU_DIVCON1 &= ~((1<<9) | (0xF<<5));
@@ -223,9 +223,9 @@ static void set_codec_freq(unsigned int freq)
 
     SCU_PLLCON3 = (1<<24) |    /* Saturation behavior enable */
                   (1<<23) |    /* Enable fast locking circuit */
-	          (pcm_freq_params[freq][0]<<16) | /* CLKR factor */
-	          (pcm_freq_params[freq][1]<<4)  | /* CLKF factor */
-	          (pcm_freq_params[freq][2]<<1) ; /* CLKOD factor */
+                  (pcm_freq_params[freq][0]<<16) | /* CLKR factor */
+                  (pcm_freq_params[freq][1]<<4)  | /* CLKF factor */
+                  (pcm_freq_params[freq][2]<<1) ; /* CLKOD factor */
 
 /* wait for CODEC PLL lock with 10 ms timeout
  * datasheet states that pll lock should take approx. 0.3 ms

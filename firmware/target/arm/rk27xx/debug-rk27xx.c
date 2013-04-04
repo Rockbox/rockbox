@@ -66,7 +66,7 @@ bool dbg_hw_info(void)
         _DEBUG_PRINTF("SCU_CHIPCFG: 0x%0x", SCU_CHIPCFG);
 
 #ifdef HM60X
-	_DEBUG_PRINTF("LCD type: %s", lcd_type == LCD_V1 ? "V1 (HX8340b)": "V2");
+        _DEBUG_PRINTF("LCD type: %s", lcd_type == LCD_V1 ? "V1 (HX8340b)": "V2");
 #endif
         line++;
         _DEBUG_PRINTF("sd_debug_time_rd: %d", sd_debug_time_rd);
