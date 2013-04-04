@@ -131,13 +131,14 @@ void i2c_init(void)
 
     /* set I2C divider to stay within allowed SCL freq limit
      * APBfreq = 50Mhz
-     * SCLfreq = (APBfreq/5*(I2CCDVR[5:3] + 1) * 2^((I2CCDVR[2:0] + 1))
-     */
-
-    /* we are driving this slightly above specs
-     * (6<<3) | (1<<0)    416kHz
-     * (7<<3) | (1<<0)    357kHz
-     * (6<<3) | (2<<0)    208kHz
+     * I2C_div = (I2CCDVR[5:3] + 1) * 2^((I2CCDVR[2:0] + 1))
+     * SCLfreq = APBfreq/(5*I2C_div)
+     *
+     * (5<<3) | (1<<0)    416.7 KHz (above spec)
+     * (6<<3) | (1<<0)    357.1 kHz
+     * (7<<3) | (1<<0)    312.4 kHz
+     * (6<<3) | (2<<0)    178.6 kHz
+     * (7<<3) | (2<<0)    156.3 kHz
      */
     I2C_OPR = (I2C_OPR & ~(0x3F)) | (6<<3) | (1<<0);
 
