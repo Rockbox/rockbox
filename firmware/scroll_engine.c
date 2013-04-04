@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2007 by Michael Sevakis
  *
- * LCD scrolling driver and scheduler
+ * LCD scrolling thread and scheduler
  *
  * Much collected and combined from the various Rockbox LCD drivers.
  *
@@ -22,6 +22,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "gcc_extensions.h"
 #include "cpu.h"
@@ -49,181 +50,19 @@ static void scroll_thread(void);
 static char scroll_stack[DEFAULT_STACK_SIZE*3];
 static const char scroll_name[] = "scroll";
 
-static struct scrollinfo lcd_scroll[LCD_SCROLLABLE_LINES];
+#include "drivers/lcd-scroll.c"
 
 #ifdef HAVE_REMOTE_LCD
-static struct scrollinfo lcd_remote_scroll[LCD_REMOTE_SCROLLABLE_LINES];
 static struct event_queue scroll_queue SHAREDBSS_ATTR;
-#endif
 
-struct scroll_screen_info lcd_scroll_info =
-{
-    .scroll       = lcd_scroll,
-    .lines        = 0,
-    .ticks        = 12,
-    .delay        = HZ/2,
-    .bidir_limit  = 50,
-#ifdef HAVE_LCD_BITMAP
-    .step         = 6,
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-    .jump_scroll_delay = HZ/4,
-    .jump_scroll       = 0,
-#endif
-};
+/* copied from lcd-remote-1bit.c */
+/* Compile 1 bit vertical packing LCD driver for remote LCD */
+#undef LCDFN
+#define LCDFN(fn) lcd_remote_ ## fn
+#undef LCDM
+#define LCDM(ma) LCD_REMOTE_ ## ma
 
-#ifdef HAVE_REMOTE_LCD
-struct scroll_screen_info lcd_remote_scroll_info =
-{
-    .scroll       = lcd_remote_scroll,
-    .lines        = 0,
-    .ticks        = 12,
-    .delay        = HZ/2,
-    .bidir_limit  = 50,
-    .step         = 6,
-};
-#endif /* HAVE_REMOTE_LCD */
-
-void lcd_scroll_stop(void)
-{
-    lcd_scroll_info.lines = 0;
-}
-
-/* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
-void lcd_scroll_stop_viewport_line(const struct viewport *current_vp, int line)
-{
-    int i = 0;
-
-    while (i < lcd_scroll_info.lines)
-    {
-        struct viewport *vp = lcd_scroll_info.scroll[i].vp;
-        if (((vp == current_vp)) && 
-            ((line < 0) || (lcd_scroll_info.scroll[i].y == line)))
-        {
-            /* If i is not the last active line in the array, then move
-               the last item to position i */
-            if ((i + 1) != lcd_scroll_info.lines)
-            {
-                lcd_scroll_info.scroll[i] =
-                    lcd_scroll_info.scroll[lcd_scroll_info.lines-1];
-            }
-            lcd_scroll_info.lines--;
-
-            /* A line can only appear once, so we're done, 
-             * unless we are clearing the whole viewport */
-            if (line >= 0)
-                return ;
-        }
-        else
-        {
-            i++;
-        }
-    }
-}
-
-/* Stop all scrolling lines in the specified viewport */
-void lcd_scroll_stop_viewport(const struct viewport *current_vp)
-{
-    lcd_scroll_stop_viewport_line(current_vp, -1);
-}
-
-void lcd_scroll_speed(int speed)
-{
-    lcd_scroll_info.ticks = scroll_tick_table[speed];
-}
-
-#if defined(HAVE_LCD_BITMAP)
-void lcd_scroll_step(int step)
-{
-    lcd_scroll_info.step = step;
-}
-#endif
-
-void lcd_scroll_delay(int ms)
-{
-    lcd_scroll_info.delay = ms / (HZ / 10);
-}
-
-void lcd_bidir_scroll(int percent)
-{
-    lcd_scroll_info.bidir_limit = percent;
-}
-
-#ifdef HAVE_LCD_CHARCELLS
-void lcd_jump_scroll(int mode) /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
-{
-    lcd_scroll_info.jump_scroll = mode;
-}
-
-void lcd_jump_scroll_delay(int ms)
-{
-    lcd_scroll_info.jump_scroll_delay = ms / (HZ / 10);
-}
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-void lcd_remote_scroll_stop(void)
-{
-    lcd_remote_scroll_info.lines = 0;
-}
-
-/* Stop scrolling line y in the specified viewport, or all lines if y < 0 */
-void lcd_remote_scroll_stop_viewport_line(const struct viewport *current_vp, int line)
-{
-    int i = 0;
-
-    while (i < lcd_scroll_info.lines)
-    {
-        struct viewport *vp = lcd_remote_scroll_info.scroll[i].vp;
-        if (((vp == current_vp)) && 
-            ((line < 0) || (lcd_remote_scroll_info.scroll[i].y == line)))
-        {
-            /* If i is not the last active line in the array, then move
-               the last item to position i */
-            if ((i + 1) != lcd_remote_scroll_info.lines)
-            {
-                lcd_remote_scroll_info.scroll[i] = 
-                    lcd_remote_scroll_info.scroll[lcd_remote_scroll_info.lines-1];
-            }
-            lcd_remote_scroll_info.lines--;
-
-            /* A line can only appear once, so we're done, 
-             * unless we are clearing the whole viewport */
-            if (line >= 0)
-                return ;
-        }
-        else
-        {
-            i++;
-        }
-    }
-}
-
-/* Stop all scrolling lines in the specified viewport */
-void lcd_remote_scroll_stop_viewport(const struct viewport *current_vp)
-{
-    lcd_remote_scroll_stop_viewport_line(current_vp, -1);
-}
-
-void lcd_remote_scroll_speed(int speed)
-{
-    lcd_remote_scroll_info.ticks = scroll_tick_table[speed];
-}
-
-void lcd_remote_scroll_step(int step)
-{
-    lcd_remote_scroll_info.step = step;
-}
-
-void lcd_remote_scroll_delay(int ms)
-{
-    lcd_remote_scroll_info.delay = ms / (HZ / 10);
-}
-
-void lcd_remote_bidir_scroll(int percent)
-{
-    lcd_remote_scroll_info.bidir_limit = percent;
-}
+#include "drivers/lcd-scroll.c"
 
 static void sync_display_ticks(void)
 {
