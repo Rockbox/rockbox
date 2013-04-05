@@ -25,31 +25,37 @@ TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 # overwrite for releases
 APPVERSION ?= $(shell $(TOP)/../tools/version.sh $(TOP)/..)
 CFLAGS += -DVERSION=\""$(APPVERSION)"\"
-TARGET_DIR ?= $(shell pwd)/
+TARGET_DIR ?= $(abspath .)/
 
+CPPDEFINES=$(shell echo foo | $(CROSS)$(CC) -dM -E -)
 # use POSIX/C99 printf on windows
 CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 
 BINARY = $(OUTPUT)
 # when building a Windows binary add the correct file suffix
-ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
+ifeq ($(findstring CYGWIN,$(CPPDEFINES)),CYGWIN)
 BINARY = $(OUTPUT).exe
 CFLAGS+=-mno-cygwin
+COMPILETARGET = cygwin
 else
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
+ifeq ($(findstring MINGW,$(CPPDEFINES)),MINGW)
 BINARY = $(OUTPUT).exe
+COMPILETARGET = mingw
 else
-ifeq ($(findstring mingw,$(CROSS)$(CC)),mingw)
-BINARY = $(OUTPUT).exe
+ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
+COMPILETARGET = darwin
+LDOPTS += $(LDFLAGS_OSX)
+else
+COMPILETARGET = posix
 endif
 endif
 endif
+$(info Compiler creates $(COMPILETARGET) binaries)
 
 NATIVECC ?= gcc
 CC ?= gcc
 # OS X specifics. Needs to consider cross compiling for Windows.
-ifeq ($(findstring Darwin,$(shell uname)),Darwin)
-ifneq ($(findstring mingw,$(CROSS)$(CC)),mingw)
+ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 # when building libs for OS X build for both i386 and ppc at the same time.
 # This creates fat objects, and ar can only create the archive but not operate
 # on it. As a result the ar call must NOT use the u (update) flag.
@@ -60,10 +66,9 @@ CC ?= gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 NATIVECC ?= gcc-4.0
 endif
-endif
 WINDRES = windres
 
-BUILD_DIR ?= $(TARGET_DIR)build
+BUILD_DIR ?= $(TARGET_DIR)build$(COMPILETARGET)
 OBJDIR = $(abspath $(BUILD_DIR)/$(RBARCH))/
 
 ifdef RBARCH

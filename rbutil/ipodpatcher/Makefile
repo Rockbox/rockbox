@@ -27,10 +27,8 @@ BOOTSRC = ipod1g2g.c ipod3g.c ipod4g.c ipodcolor.c ipodmini1g.c \
 CFLAGS += -DWITH_BOOTOBJS
 endif
 
-ifeq ($(findstring Darwin,$(shell uname)),Darwin)
 # additional frameworks to link on on OS X
-LDOPTS += -framework CoreFoundation -framework IOKit
-endif
+LDOPTS_OSX += -framework CoreFoundation -framework IOKit
 
 LIBSOURCES = ipodpatcher.c fat32format.c arc4.c \
 	     ipodio-posix.c ipodio-win32-scsi.c ipodio-win32.c
