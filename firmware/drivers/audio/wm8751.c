@@ -321,6 +321,18 @@ void audiohw_postinit(void)
     wmcodec_set_masked(PWRMGMT1, PWRMGMT1_VMIDSEL_50K,
                        PWRMGMT1_VMIDSEL_MASK);
 
+    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
+    /* 1111111 ==  +6dB                                    */
+    /* 1111001 ==   0dB                                    */
+    /* 0110000 == -73dB                                    */
+    /* 0101111 == mute (0x2f)                              */
+
+    wmcodec_set_masked(LOUT1, LOUT1_LOUT1VOL(0x79),
+                       LOUT1_LOUT1VOL_MASK);
+    wmcodec_set_masked(ROUT1, ROUT1_RO1VU | ROUT1_ROUT1VOL(0x79),
+                       ROUT1_ROUT1VOL_MASK);
+
+
     audiohw_mute(false);
 
 #if defined(MROBE_100)
@@ -337,6 +349,7 @@ void audiohw_postinit(void)
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
+#if 0
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 ==  +6dB                                    */
     /* 1111001 ==   0dB                                    */
@@ -347,6 +360,10 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
                        LOUT1_LOUT1VOL_MASK);
     wmcodec_set_masked(ROUT1, ROUT1_RO1VU | ROUT1_ROUT1VOL(vol_r),
                        ROUT1_ROUT1VOL_MASK);
+#endif
+    int sw_volume_l = vol_l < VOLUME_MIN ? INT_MIN : vol_l;
+    int sw_volume_r = vol_r < VOLUME_MIN ? INT_MIN : vol_r;
+    pcm_set_master_volume(sw_volume_l, sw_volume_r);
 }
 
 #ifdef TOSHIBA_GIGABEAT_F
@@ -385,8 +402,11 @@ static void sync_prescaler(void)
 
 void audiohw_set_prescaler(int value)
 {
+    pcm_set_prescaler(value);
+#if 0
     prescalertone = 3 * value / 15; /* value in tdB */
     sync_prescaler();
+#endif
 }
 
 /* Nice shutdown of WM8751 codec */

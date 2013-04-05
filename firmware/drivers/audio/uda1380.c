@@ -28,6 +28,7 @@
 #include "udacodec.h"
 
 #include "audiohw.h"
+#include "pcm.h"
 
 /*  The UDA1380 requires a clock signal at a multiple of the sample rate
     (256Fs, 384Fs, 512Fs or 768Fs, where Fs = sample rate).
@@ -138,10 +139,17 @@ static int uda1380_write_reg(unsigned char reg, unsigned short value)
 /**
  * Sets left and right master volume  (0(max) to 252(muted))
  */
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_vol_(int vol_l, int vol_r)
 {
     uda1380_write_reg(REG_MASTER_VOL,
                              MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
+}
+
+void audiohw_set_master_vol(int vol_l, int vol_r)
+{
+    audiohw_set_master_vol_(tenthdb2master(0), tenthdb2master(0));
+    pcm_set_master_volume(vol_l < VOLUME_MIN ? INT_MIN : vol_l,
+                          vol_r < VOLUME_MIN ? INT_MIN : vol_r);
 }
 
 /**
@@ -285,7 +293,8 @@ void audiohw_postinit(void)
 
 void audiohw_set_prescaler(int val)
 {
-    audiohw_set_mixer_vol(tenthdb2mixer(-val), tenthdb2mixer(-val));
+    audiohw_set_mixer_vol(tenthdb2mixer(-0), tenthdb2mixer(-0));
+    pcm_set_prescaler(-val);
 }
 
 /* Nice shutdown of UDA1380 codec */

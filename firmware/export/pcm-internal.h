@@ -24,6 +24,18 @@
 
 #include "config.h"
 
+#ifdef HAVE_SW_VOLUME_CONTROL
+/* Default settings - architecture may have other optimal values */
+
+/* 1 << BITS == unity */
+#define PCM_FACTOR_BITS          15   /* Allows -73 to +6dB gain, no 64-bit */ 
+#define PCM_PLAY_DBL_BUF_SAMPLES 1024 /* Max 4KByte chunks */
+#define PCM_DBL_BUF_BSS               /* In DRAM, uncached may be better */
+#define PCM_FACTOR_MIN           0x00000
+#define PCM_FACTOR_MAX           0x10000
+#endif /* HAVE_SW_VOLUME_CONTROL */
+
+
 /* Cheapo buffer align macro to align to the 16-16 PCM size */
 #define ALIGN_AUDIOBUF(start, size) \
     ({ (start) = (void *)(((uintptr_t)(start) + 3) & ~3); \
@@ -43,12 +55,24 @@ static FORCE_INLINE enum pcm_dma_status pcm_call_status_cb(
     return callback(status);
 }
 
-static FORCE_INLINE enum pcm_dma_status
-pcm_play_dma_status_callback(enum pcm_dma_status status)
+static FORCE_INLINE enum pcm_dma_status pcm_play_call_status_cb(
+    enum pcm_dma_status status)
 {
     extern enum pcm_dma_status
         (* volatile pcm_play_status_callback)(enum pcm_dma_status);
     return pcm_call_status_cb(pcm_play_status_callback, status);
+}
+
+static FORCE_INLINE enum pcm_dma_status
+pcm_play_dma_status_callback(enum pcm_dma_status status)
+{
+#ifdef HAVE_SW_VOLUME_CONTROL
+    extern enum pcm_dma_status
+        pcm_play_dma_status_callback_int(enum pcm_dma_status status);
+    return pcm_play_dma_status_callback_int(status);
+#else
+    return pcm_play_call_status_cb(status);
+#endif /* HAVE_SW_VOLUME_CONTROL */
 }
 
 /* Called by the bottom layer ISR when more data is needed. Returns true

@@ -31,6 +31,8 @@
 #endif
 #include "audiohw.h"
 
+#include "pcm.h"
+
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20},
     /* HAVE_SW_TONE_CONTROLS */
@@ -210,7 +212,7 @@ void audiohw_set_frequency(int fsel)
  *
  * Left & Right: 48 .. 121 .. 127 => Volume -73dB (mute) .. +0 dB .. +6 dB
  */
-void audiohw_set_headphone_vol(int vol_l, int vol_r)
+void audiohw_set_headphone_vol_(int vol_l, int vol_r)
 {
     unsigned value_dap = tlv320_regs[REG_DAP];
     unsigned value_dap_last = value_dap;
@@ -231,6 +233,13 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
     tlv320_write_reg(REG_RHV, RHV_RZC | value_r);
     if (value_dap != value_dap_last)
         tlv320_write_reg(REG_DAP, value_dap);
+}
+
+void audiohw_set_headphone_vol_(int vol_l, int vol_r)
+{
+    audiohw_set_headphone_vol(0x79, 0x79);
+    pcm_set_master_volume(vol_l < VOLUME_MIN ? INT_MIN : vol_l,
+                          vol_r < VOLUME_MIN ? INT_MIN : vol_r);
 }
 
 /**
