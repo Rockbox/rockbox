@@ -28,9 +28,6 @@ enum pga_gain_ids
 {
     PGA_EQ_PRECUT = 0,
     PGA_REPLAYGAIN,
-#ifdef HAVE_SW_VOLUME_CONTROL
-    PGA_VOLUME,
-#endif
     PGA_NUM_GAINS,
 };
 

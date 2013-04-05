@@ -355,6 +355,9 @@ sound.c
 pcm_sampr.c
 pcm.c
 pcm_mixer.c
+#ifdef HAVE_SW_VOLUME_CONTROL
+pcm_sw_volume.c
+#endif /* HAVE_SW_VOLUME_CONTROL */
 #ifdef HAVE_RECORDING
 enc_base.c
 #endif /* HAVE_RECORDING */

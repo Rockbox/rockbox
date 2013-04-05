@@ -24,11 +24,12 @@
 #include "sound.h"
 #include "jz4740.h"
 #include "system.h"
+#include "pcm_sw_volume.h"
 
 /* TODO */
 const struct sound_settings_info audiohw_settings[] = {
 #ifdef HAVE_SW_VOLUME_CONTROL
-    [SOUND_VOLUME]        = {"dB", 0,  1, SW_VOLUME_MIN, 6,   0},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
 #else
     [SOUND_VOLUME]        = {"dB", 0,  1,   0,   6,   0},
 #endif
@@ -293,16 +294,24 @@ void audiohw_init(void)
     i2s_codec_init();
 }
 
-void audiohw_set_volume(int v)
+void audiohw_set_master_vol(int vol_l, int vol_r)
 {
-    if(v >= 0)
-    {
-        /* 0 <= v <= 60 */
-        unsigned int codec_volume = ICDC_CDCCR2_HPVOL(v / 20);
+#ifdef HAVE_SW_VOLUME_CONTROL
+    /* SW volume for <= 1.0 gain, HW at unity, < VOLUME_MIN == MUTE */
+    int sw_volume_l = vol_l < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_l, 0);
+    int sw_volume_r = vol_r < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_r, 0);
+    pcm_set_master_volume(sw_volume_l, sw_volume_r);
+#endif /* HAVE_SW_VOLUME_CONTROL */
 
-        if((REG_ICDC_CDCCR2 & ICDC_CDCCR2_HPVOL(0x3)) != codec_volume)
-            REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_HPVOL(0x3)) | codec_volume;
-    }
+    /* NOTE: the channel being cut if balance is not equal will need
+       adjusting downward so maintain proportion if using volume boost */
+
+    /* HW volume for > 1.0 gain */
+    int v = MAX(vol_l, vol_r);
+    unsigned int hw_volume = v > 0 ? ICDC_CDCCR2_HPVOL(v / 20) : 0;
+
+    if((REG_ICDC_CDCCR2 & ICDC_CDCCR2_HPVOL(0x3)) != hw_volume)
+        REG_ICDC_CDCCR2 = (REG_ICDC_CDCCR2 & ~ICDC_CDCCR2_HPVOL(0x3)) | hw_volume;
 }
 
 void audiohw_set_frequency(int freq)
