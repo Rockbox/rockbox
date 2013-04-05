@@ -28,7 +28,11 @@
 void usb_init_device(void)
 {
     or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
-    and_l(~0x01000040, &GPIO_OUT);     /* GPIO24 is the Cypress chip power */
+
+    /* Turn off all Cypress chip power suppies */
+    and_l(~0x01000000, &GPIO_OUT);       /* GPIO24 (USB_EN)    - low (controled power from usb host) */
+    or_l(0x40, &GPIO_OUT);               /* GPOI6 (USB_POW_ON) - high (controled power from internal battery) */
+
     or_l(0x01000040, &GPIO_ENABLE);
     or_l(0x01000040, &GPIO_FUNCTION);
 }
@@ -43,12 +47,12 @@ void usb_enable(bool on)
     if(on)
     {
         /* Power on the Cypress chip */
-        or_l(0x01000040, &GPIO_OUT);
+        or_l(0x01000000, &GPIO_OUT); /* Turn on only GPIO24 (USB_EN). GPOI6 (USB_POW_ON) still at high state (off) */
         sleep(2);
     }
     else
     {
         /* Power off the Cypress chip */
-        and_l(~0x01000040, &GPIO_OUT);
+        and_l(~0x01000000, &GPIO_OUT); /* Turn off only GPIO24 (USB_EN). GPOI6 (USB_POW_ON) still at high state (off) */
     }
 }

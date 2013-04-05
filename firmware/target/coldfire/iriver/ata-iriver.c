@@ -55,9 +55,15 @@ bool ata_is_coldstart(void)
 void ata_device_init(void)
 {
 #ifdef HAVE_ATA_LED_CTRL
+#if defined(IRIVER_H100_SERIES) /* For iriver H100 series only */
+    /* Enable disk LED */
+    and_l(~0x00000200, &GPIO_OUT);
+    or_l(  0x00000200, &GPIO_ENABLE);
+#else
     /* Enable disk LED & ISD chip power control */
     and_l(~0x00000240, &GPIO_OUT);
     or_l(  0x00000240, &GPIO_ENABLE);
+#endif /* IRIVER_H100_SERIES */
     or_l(  0x00000200, &GPIO_FUNCTION);
 #endif
 
