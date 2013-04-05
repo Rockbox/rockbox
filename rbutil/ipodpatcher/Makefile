@@ -28,7 +28,7 @@ CFLAGS += -DWITH_BOOTOBJS
 endif
 
 # additional frameworks to link on on OS X
-LDOPTS_OSX += -framework CoreFoundation -framework IOKit
+LDOPTS_OSX = -framework CoreFoundation -framework IOKit
 
 LIBSOURCES = ipodpatcher.c fat32format.c arc4.c \
 	     ipodio-posix.c ipodio-win32-scsi.c ipodio-win32.c

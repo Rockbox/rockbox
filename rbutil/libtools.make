@@ -27,6 +27,8 @@ APPVERSION ?= $(shell $(TOP)/../tools/version.sh $(TOP)/..)
 CFLAGS += -DVERSION=\""$(APPVERSION)"\"
 TARGET_DIR ?= $(abspath .)/
 
+NATIVECC = gcc
+CC = gcc
 CPPDEFINES=$(shell echo foo | $(CROSS)$(CC) -dM -E -)
 # use POSIX/C99 printf on windows
 CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
@@ -44,7 +46,7 @@ COMPILETARGET = mingw
 else
 ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 COMPILETARGET = darwin
-LDOPTS += $(LDFLAGS_OSX)
+LDOPTS += $(LDOPTS_OSX)
 else
 COMPILETARGET = posix
 endif
@@ -52,8 +54,6 @@ endif
 endif
 $(info Compiler creates $(COMPILETARGET) binaries)
 
-NATIVECC ?= gcc
-CC ?= gcc
 # OS X specifics. Needs to consider cross compiling for Windows.
 ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 # when building libs for OS X build for both i386 and ppc at the same time.
@@ -62,9 +62,9 @@ ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 CFLAGS += -arch ppc -arch i386
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
-CC ?= gcc-4.0
+CC = gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
-NATIVECC ?= gcc-4.0
+NATIVECC = gcc-4.0
 endif
 WINDRES = windres
 
