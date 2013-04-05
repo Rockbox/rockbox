@@ -78,6 +78,8 @@
 #include "imx233-codec.h"
 #elif defined(HAVE_DUMMY_CODEC)
 #include "dummy_codec.h"
+#elif defined(HAVE_DF1704_CODEC)
+#include "df1704.h"
 #endif
 #if (CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO|PLATFORM_PANDORA|PLATFORM_SDL))
 /* #include <SDL_audio.h> gives errors in other code areas,

@@ -130,7 +130,7 @@ static inline bool card_detect_target(void)
 #if defined(RK27_GENERIC)
 /* My generic device uses PC7 pin, active low */
     return !(GPIO_PCDR & 0x80);
-#elif defined(HM60X) || defined(HM801)
+#elif defined(HM60X) || defined(HM801) || defined(MA9)
     return !(GPIO_PFDR & (1<<2));
 #else
 #error "Unknown target"
