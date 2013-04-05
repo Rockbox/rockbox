@@ -26,6 +26,9 @@
 #include "logf.h"
 #include "system.h"
 #include "i2c.h"
+#ifdef HAVE_SW_VOLUME_CONTROL
+#include "pcm_sw_volume.h"
+#endif /* HAVE_SW_VOLUME_CONTROL */
 
 /* TODO
  * find a nice way to handle 1.5db steps -> see wm8751 ifdef in sound_set_bass/treble
@@ -215,7 +218,7 @@ static void set_prescaled_volume(void)
     dsp_callback(DSP_CALLBACK_SET_PRESCALE, prescale);
 #endif
 
-    if (current_volume == VOLUME_MIN)
+    if (current_volume <= VOLUME_MIN)
         prescale = 0;  /* Make sure the chip gets muted at VOLUME_MIN */
 
     l = r = current_volume + prescale;
@@ -231,13 +234,11 @@ static void set_prescaled_volume(void)
         r += ((r - (VOLUME_MIN - ONE_DB)) * current_balance) / VOLUME_RANGE;
     }
 
-#ifdef HAVE_SW_VOLUME_CONTROL
-    dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
-#endif
-
 /* ypr0 with sdl has separate volume controls */
 #if !defined(HAVE_SDL_AUDIO) || defined(SAMSUNG_YPR0)
-#if CONFIG_CODEC == MAS3507D
+#if defined(HAVE_SW_VOLUME_CONTROL) || defined(HAVE_JZ4740_CODEC)
+    audiohw_set_master_vol(l, r);
+#elif CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380) || defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8711) || defined(HAVE_WM8721) || defined(HAVE_WM8731) \
@@ -253,7 +254,7 @@ static void set_prescaled_volume(void)
 
 #elif defined(HAVE_TLV320) || defined(HAVE_WM8978) || defined(HAVE_WM8985) || defined(HAVE_IMX233_CODEC) || defined(HAVE_AIC3X)
     audiohw_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
-#elif defined(HAVE_JZ4740_CODEC) || defined(HAVE_SDL_AUDIO) || defined(ANDROID)
+#elif defined(HAVE_SDL_AUDIO) || defined(ANDROID)
     audiohw_set_volume(current_volume);
 #endif
 #else /* HAVE_SDL_AUDIO */

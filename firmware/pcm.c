@@ -86,7 +86,7 @@
 static bool pcm_is_ready = false;
 
 /* The registered callback function to ask for more mp3 data */
-static volatile pcm_play_callback_type
+volatile pcm_play_callback_type
     pcm_callback_for_more SHAREDBSS_ATTR = NULL;
 /* The registered callback function to inform of DMA status */
 volatile pcm_status_callback_type
@@ -102,9 +102,89 @@ unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
 /* samplerate frequency selection index */
 int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
 
-/* Called internally by functions to reset the state */
-static void pcm_play_stopped(void)
+static void pcm_play_data_start_int(const void *addr, size_t size);
+static void pcm_play_pause_int(bool play);
+void pcm_play_stop_int(void);
+
+#ifndef HAVE_SW_VOLUME_CONTROL
+/** Standard hw volume control functions - otherwise, see pcm_sw_volume.c **/
+static inline void pcm_play_dma_start_int(const void *addr, size_t size)
 {
+    pcm_play_dma_start(addr, size);
+}
+
+static inline void pcm_play_dma_pause_int(bool pause)
+{
+    if (pause || pcm_get_bytes_waiting() > 0)
+    {
+        pcm_play_dma_pause(pause);
+    }
+    else
+    {
+        logf(" no data");
+        pcm_play_data_start_int(NULL, 0);
+    }
+}
+
+static inline void pcm_play_dma_stop_int(void)
+{
+    pcm_play_dma_stop();
+}
+
+static inline const void * pcm_play_dma_get_peak_buffer_int(int *count)
+{
+    return pcm_play_dma_get_peak_buffer(count);
+}
+
+bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
+                                    const void **addr, size_t *size)
+{
+    /* Check status callback first if error */
+    if (status < PCM_DMAST_OK)
+        status = pcm_play_dma_status_callback(status);
+
+    if (status >= PCM_DMAST_OK && pcm_get_more_int(addr, size))
+        return true;
+
+    /* Error, callback missing or no more DMA to do */
+    pcm_play_stop_int();
+    return false;
+}
+#endif /* ndef HAVE_SW_VOLUME_CONTROL */
+
+static void pcm_play_data_start_int(const void *addr, size_t size)
+{
+    ALIGN_AUDIOBUF(addr, size);
+
+    if ((addr && size) || pcm_get_more_int(&addr, &size))
+    {
+        pcm_apply_settings();
+        logf(" pcm_play_dma_start_int");
+        pcm_play_dma_start_int(addr, size);
+        pcm_playing = true;
+        pcm_paused = false;
+    }
+    else
+    {
+        /* Force a stop */
+        logf(" pcm_play_stop_int");
+        pcm_play_stop_int();
+    }
+}
+
+static void pcm_play_pause_int(bool play)
+{
+    if (play)
+        pcm_apply_settings();
+
+    logf(" pcm_play_dma_pause_int");
+    pcm_play_dma_pause_int(!play);
+    pcm_paused = !play && pcm_playing;
+}
+
+void pcm_play_stop_int(void)
+{
+    pcm_play_dma_stop_int();
     pcm_callback_for_more = NULL;
     pcm_play_status_callback = NULL;
     pcm_paused = false;
@@ -195,7 +275,7 @@ void pcm_calculate_peaks(int *left, int *right)
     static struct pcm_peaks peaks;
 
     int count;
-    const void *addr = pcm_play_dma_get_peak_buffer(&count);
+    const void *addr = pcm_play_dma_get_peak_buffer_int(&count);
 
     pcm_do_peak_calculation(&peaks, pcm_playing && !pcm_paused,
                             addr, count);
@@ -207,9 +287,9 @@ void pcm_calculate_peaks(int *left, int *right)
         *right = peaks.right;
 }
 
-const void* pcm_get_peak_buffer(int * count)
+const void * pcm_get_peak_buffer(int *count)
 {
-    return pcm_play_dma_get_peak_buffer(count);
+    return pcm_play_dma_get_peak_buffer_int(count);
 }
 
 bool pcm_is_playing(void)
@@ -232,8 +312,6 @@ bool pcm_is_paused(void)
 void pcm_init(void)
 {
     logf("pcm_init");
-
-    pcm_play_stopped();
 
     pcm_set_frequency(HW_SAMPR_DEFAULT);
 
@@ -258,41 +336,6 @@ bool pcm_is_initialized(void)
     return pcm_is_ready;
 }
 
-/* Common code to pcm_play_data and pcm_play_pause */
-static void pcm_play_data_start(const void *addr, size_t size)
-{
-    ALIGN_AUDIOBUF(addr, size);
-
-    if (!(addr && size))
-    {
-        pcm_play_callback_type get_more = pcm_callback_for_more;
-        addr = NULL;
-        size = 0;
-
-        if (get_more)
-        {
-            logf(" get_more");
-            get_more(&addr, &size);
-            ALIGN_AUDIOBUF(addr, size);
-        }
-    }
-
-    if (addr && size)
-    {
-        logf(" pcm_play_dma_start");
-        pcm_apply_settings();
-        pcm_play_dma_start(addr, size);
-        pcm_playing = true;
-        pcm_paused = false;
-        return;
-    }
-
-    /* Force a stop */
-    logf(" pcm_play_dma_stop");
-    pcm_play_dma_stop();
-    pcm_play_stopped();
-}
-
 void pcm_play_data(pcm_play_callback_type get_more,
                    pcm_status_callback_type status_cb,
                    const void *start, size_t size)
@@ -304,39 +347,10 @@ void pcm_play_data(pcm_play_callback_type get_more,
     pcm_callback_for_more = get_more;
     pcm_play_status_callback = status_cb;
 
-    logf(" pcm_play_data_start");
-    pcm_play_data_start(start, size);
+    logf(" pcm_play_data_start_int");
+    pcm_play_data_start_int(start, size);
 
     pcm_play_unlock();
-}
-
-bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
-                                    const void **addr, size_t *size)
-{
-    /* Check status callback first if error */
-    if (status < PCM_DMAST_OK)
-        status = pcm_play_dma_status_callback(status);
-
-    pcm_play_callback_type get_more = pcm_callback_for_more;
-
-    if (get_more && status >= PCM_DMAST_OK)
-    {
-        *addr = NULL;
-        *size = 0;
-
-        /* Call registered callback to obtain next buffer */
-        get_more(addr, size);
-        ALIGN_AUDIOBUF(*addr, *size);
-
-        if (*addr && *size)
-            return true;
-    } 
-
-    /* Error, callback missing or no more DMA to do */
-    pcm_play_dma_stop();
-    pcm_play_stopped();
-
-    return false;
 }
 
 void pcm_play_pause(bool play)
@@ -347,28 +361,8 @@ void pcm_play_pause(bool play)
 
     if (play == pcm_paused && pcm_playing)
     {
-        if (!play)
-        {
-            logf(" pcm_play_dma_pause");
-            pcm_play_dma_pause(true);
-            pcm_paused = true;
-        }
-        else if (pcm_get_bytes_waiting() > 0)
-        {
-            logf(" pcm_play_dma_pause");
-            pcm_apply_settings();
-            pcm_play_dma_pause(false);
-            pcm_paused = false;
-        }
-        else
-        {
-            logf(" pcm_play_dma_start: no data");
-            pcm_play_data_start(NULL, 0);
-        }
-    }
-    else
-    {
-        logf(" no change");
+        logf(" pcm_play_pause_int");
+        pcm_play_pause_int(play);
     }
 
     pcm_play_unlock();
@@ -382,13 +376,8 @@ void pcm_play_stop(void)
 
     if (pcm_playing)
     {
-        logf(" pcm_play_dma_stop");
-        pcm_play_dma_stop();
-        pcm_play_stopped();
-    }
-    else
-    {
-        logf(" not playing");
+        logf(" pcm_play_stop_int");
+        pcm_play_stop_int();
     }
 
     pcm_play_unlock();
