@@ -83,13 +83,20 @@ struct pcm_peaks
 };
 
 void pcm_calculate_peaks(int *left, int *right);
-const void* pcm_get_peak_buffer(int* count);
+const void * pcm_get_peak_buffer(int *count);
 size_t pcm_get_bytes_waiting(void);
 
 void pcm_play_stop(void);
 void pcm_play_pause(bool play);
 bool pcm_is_paused(void);
 bool pcm_is_playing(void);
+
+#ifdef HAVE_SW_VOLUME_CONTROL
+void pcm_set_prescaler(int prescale);
+/* vol_X: INT_MIN = mute, otherwise SW_VOLUME_MIN -> SW_VOLUME_MAX in
+ * centibel units */
+void pcm_set_master_volume(int vol_l, int vol_r);
+#endif /* HAVE_SW_VOLUME_CONTROL */
 
 #ifdef HAVE_RECORDING
 
