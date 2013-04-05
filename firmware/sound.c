@@ -231,10 +231,6 @@ static void set_prescaled_volume(void)
         r += ((r - (VOLUME_MIN - ONE_DB)) * current_balance) / VOLUME_RANGE;
     }
 
-#ifdef HAVE_SW_VOLUME_CONTROL
-    dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
-#endif
-
 /* ypr0 with sdl has separate volume controls */
 #if !defined(HAVE_SDL_AUDIO) || defined(SAMSUNG_YPR0)
 #if CONFIG_CODEC == MAS3507D
@@ -244,7 +240,8 @@ static void set_prescaled_volume(void)
    || defined(HAVE_WM8750) || defined(HAVE_WM8751) || defined(HAVE_AS3514) \
    || defined(HAVE_TSC2100) || defined(HAVE_AK4537) || defined(HAVE_UDA1341) \
    || defined(HAVE_CS42L55) || defined(HAVE_RK27XX_CODEC)
-    audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
+    //audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
+    audiohw_set_master_vol(l, r);
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
     || (defined(HAVE_WM8751) && defined(TOSHIBA_GIGABEAT_F)) \
     || defined(HAVE_WM8985) || defined(HAVE_CS42L55)
@@ -253,7 +250,9 @@ static void set_prescaled_volume(void)
 
 #elif defined(HAVE_TLV320) || defined(HAVE_WM8978) || defined(HAVE_WM8985) || defined(HAVE_IMX233_CODEC) || defined(HAVE_AIC3X)
     audiohw_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
-#elif defined(HAVE_JZ4740_CODEC) || defined(HAVE_SDL_AUDIO) || defined(ANDROID)
+#elif defined(HAVE_JZ4740_CODEC)
+    audiohw_set_master_volume(l, r);
+#elif defined(HAVE_SDL_AUDIO) || defined(ANDROID)
     audiohw_set_volume(current_volume);
 #endif
 #else /* HAVE_SDL_AUDIO */

@@ -45,6 +45,8 @@
 #define LCD_DEPTH  16   /* 65k colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+#define HAVE_SW_VOLUME_CONTROL
+
 #ifndef BOOTLOADER
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE

@@ -35,11 +35,6 @@
 #endif
 #include <string.h>
 
-#if defined(HAVE_SW_TONE_CONTROLS) && defined(HAVE_SW_VOLUME_CONTROL)
-/* Still need this for volume control */
-#include "settings.h"
-#endif
-
 /** Firmware callback interface **/
 
 /* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
@@ -58,19 +53,6 @@ int dsp_callback(int msg, intptr_t param)
     case DSP_CALLBACK_SET_TREBLE:
         tone_set_treble(param);
         break;
-    /* FIXME: This must be done by bottom-level PCM driver so it works with
-              all PCM, not here and not in mixer. I won't fully support it
-              here with all streams. -- jethead71 */
-#ifdef HAVE_SW_VOLUME_CONTROL
-    case DSP_CALLBACK_SET_SW_VOLUME:
-        if (global_settings.volume < SW_VOLUME_MAX ||
-            global_settings.volume > SW_VOLUME_MIN)
-        {
-            int vol_gain = get_replaygain_int(global_settings.volume * 100);
-            pga_set_gain(PGA_VOLUME, vol_gain);
-        }
-        break;
-#endif /* HAVE_SW_VOLUME_CONTROL */
 #endif /* HAVE_SW_TONE_CONTROLS */
     case DSP_CALLBACK_SET_CHANNEL_CONFIG:
         channel_mode_set_config(param);
