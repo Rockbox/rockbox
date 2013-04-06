@@ -38,6 +38,7 @@ bool Autodetection::detect()
     m_device = "";
     m_mountpoint = "";
     m_errdev = "";
+    m_usberr = "";
 
     detectUsb();
 
@@ -146,7 +147,8 @@ bool Autodetection::detect()
         // if the found ipod is a macpod also notice it as device with problem.
         if(ipod.macpod)
             m_errdev = ipod.targetname;
-        m_device = ipod.targetname;
+        else
+            m_device = ipod.targetname;
         // since resolveMountPoint is doing exact matches we need to select
         // the correct partition.
         QString mp(ipod.diskname);
@@ -218,8 +220,8 @@ bool Autodetection::detectUsb()
             return true;
         }
         if(usberror.contains(attached.at(i))) {
-            m_errdev = usberror.value(attached.at(i)).at(0);
-            qDebug() << "[USB] detected problem with player" << m_errdev;
+            m_usberr = usberror.value(attached.at(i)).at(0);
+            qDebug() << "[USB] detected problem with player" << m_usberr;
             return true;
         }
         QString idstring = QString("%1").arg(attached.at(i), 8, 16, QChar('0'));
@@ -230,6 +232,37 @@ bool Autodetection::detectUsb()
         }
     }
     return false;
+}
+
+
+QList<struct Autodetection::Detected> Autodetection::detected(void)
+{
+    struct Detected d;
+
+    m_detected.clear();
+    if(!m_device.isEmpty()) {
+        d.device = m_device;
+        d.mountpoint = m_mountpoint;
+        d.status = PlayerOk;
+        m_detected.append(d);
+    }
+    else if(!m_errdev.isEmpty()) {
+        d.device = m_errdev;
+        d.status = PlayerWrongFilesystem;
+        m_detected.append(d);
+    }
+    else if(!m_usberr.isEmpty()) {
+        d.device = m_usberr;
+        d.status = PlayerMtpMode;
+        m_detected.append(d);
+    }
+    else if(!m_incompat.isEmpty()) {
+        d.device = m_incompat;
+        d.status = PlayerIncompatible;
+        m_detected.append(d);
+    }
+
+    return m_detected;
 }
 
 

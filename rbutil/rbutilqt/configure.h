@@ -54,6 +54,7 @@ class Config : public QDialog
         QString mountpoint;
         void updateCacheInfo(QString);
         void changeEvent(QEvent *event);
+        void selectDevice(QString device, QString mountpoint);
 
     private slots:
         void showProxyPassword(bool show);

@@ -725,98 +725,117 @@ void Config::autodetect()
     this->setCursor(Qt::WaitCursor);
     QCoreApplication::processEvents();
 
-    if(detector.detect())  //let it detect
-    {
-        QString devicename = detector.getDevice();
-        // deexpand all items
-        for(int a = 0; a < ui.treeDevices->topLevelItemCount(); a++)
-            ui.treeDevices->topLevelItem(a)->setExpanded(false);
-        //deselect the selected item(s)
-        for(int a = 0; a < ui.treeDevices->selectedItems().size(); a++)
-            ui.treeDevices->selectedItems().at(a)->setSelected(false);
-
-        // find the new item
-        // enumerate all platform items
-        QList<QTreeWidgetItem*> itmList
-            = ui.treeDevices->findItems("*",Qt::MatchWildcard);
-        for(int i=0; i< itmList.size();i++)
-        {
-            //enumerate device items
-            for(int j=0;j < itmList.at(i)->childCount();j++)
-            {
-                QString data = itmList.at(i)->child(j)->data(0, Qt::UserRole).toString();
-                // unset bold flag
-                QFont f = itmList.at(i)->child(j)->font(0);
-                f.setBold(false);
-                itmList.at(i)->child(j)->setFont(0, f);
-
-                if(devicename == data) // item found
-                {
-                    f.setBold(true);
-                    itmList.at(i)->child(j)->setFont(0, f);
-                    itmList.at(i)->child(j)->setSelected(true); //select the item
-                    itmList.at(i)->setExpanded(true); //expand the platform item
-                    //ui.treeDevices->indexOfTopLevelItem(itmList.at(i)->child(j));
-                    ui.treeDevices->scrollToItem(itmList.at(i)->child(j));
-                    break;
-                }
-            }
-        }
-        this->unsetCursor();
-
-        if(!detector.errdev().isEmpty()) {
-            QString text;
-            if(SystemInfo::platformValue(detector.errdev(),
-                                         SystemInfo::CurBootloaderMethod) == "ipod") {
-                text = tr("%1 \"MacPod\" found!\n"
-                        "Rockbox needs a FAT formatted Ipod (so-called \"WinPod\") "
-                        "to run. ").arg(SystemInfo::platformValue(
-                                detector.errdev(), SystemInfo::CurName).toString());
-            }
-            // treat all other errors as MTP device for now.
-            else {
-                text = tr("%1 in MTP mode found!\n"
-                        "You need to change your player to MSC mode for installation. ")
-                        .arg(SystemInfo::platformValue(detector.errdev(),
-                                    SystemInfo::CurName).toString());
-            }
-            text += tr("Until you change this installation will fail!");
-
-            QMessageBox::critical(this, tr("Fatal error"), text, QMessageBox::Ok);
-            return;
-        }
-        if(!detector.incompatdev().isEmpty()) {
-            QString text;
-            text = tr("Detected an unsupported player:\n%1\n"
-                      "Sorry, Rockbox doesn't run on your player.")
-                      .arg(SystemInfo::platformValue(detector.incompatdev(),
-                                  SystemInfo::CurName).toString());
-
-            QMessageBox::critical(this, tr("Fatal: player incompatible"),
-                                  text, QMessageBox::Ok);
-                return;
-            }
-
-        if(detector.getMountPoint() != "" )
-        {
-            setMountpoint(detector.getMountPoint());
-        }
-        else
-        {
-            QMessageBox::warning(this, tr("Autodetection"),
-                    tr("Could not detect a Mountpoint.\n"
-                    "Select your Mountpoint manually."),
-                    QMessageBox::Ok ,QMessageBox::Ok);
-        }
+    detector.detect();
+    QList<struct Autodetection::Detected> detected;
+    detected = detector.detected();
+    this->unsetCursor();
+    if(detected.size() > 1) {
+        // FIXME: handle multiple found players.
+        QMessageBox::information(this, tr("Device Detection"),
+                tr("Multiple devices have been detected. Please disconnect "
+                   "all players but one and try again."));
+        ui.treeDevices->setEnabled(true);
     }
-    else
-    {
-        this->unsetCursor();
-        QMessageBox::warning(this, tr("Autodetection"),
+    else if(detected.size() == 0) {
+        QMessageBox::warning(this, tr("Device Detection"),
                 tr("Could not detect a device.\n"
                    "Select your device and Mountpoint manually."),
                    QMessageBox::Ok ,QMessageBox::Ok);
+        ui.treeDevices->setEnabled(true);
+    }
+    else if(detected.at(0).status != Autodetection::PlayerOk) {
+        QString msg;
+        switch(detected.at(0).status) {
+            case Autodetection::PlayerIncompatible:
+                msg += tr("Detected an unsupported player:\n%1\n"
+                          "Sorry, Rockbox doesn't run on your player.")
+                          .arg(SystemInfo::platformValue(detected.at(0).device,
+                               SystemInfo::CurName).toString());
+                break;
+            case Autodetection::PlayerMtpMode:
+                msg = tr("%1 in MTP mode found!\n"
+                         "You need to change your player to MSC mode for installation. ")
+                         .arg(SystemInfo::platformValue(detected.at(0).device,
+                                    SystemInfo::CurName).toString());
+                break;
+            case Autodetection::PlayerWrongFilesystem:
+                if(SystemInfo::platformValue(detected.at(0).device,
+                            SystemInfo::CurBootloaderMethod) == "ipod") {
+                    msg = tr("%1 \"MacPod\" found!\n"
+                            "Rockbox needs a FAT formatted Ipod (so-called \"WinPod\") "
+                            "to run. ").arg(SystemInfo::platformValue(
+                                    detected.at(0).device, SystemInfo::CurName).toString());
+                }
+                else {
+                    msg = tr("The player contains an incompatible filesystem.\n"
+                            "Make sure you selected the correct mountpoint and "
+                            "the player is set up to use a filesystem compatible "
+                            "with Rockbox.");
+                }
+                break;
+            case Autodetection::PlayerError:
+                msg += tr("An unknown error occured during player detection.");
+                break;
+            default:
+                break;
+        }
+        QMessageBox::information(this, tr("Device Detection"), msg);
+        ui.treeDevices->setEnabled(true);
+    }
+    else {
+        selectDevice(detected.at(0).device, detected.at(0).mountpoint);
+    }
 
+}
+
+void Config::selectDevice(QString device, QString mountpoint)
+{
+    // collapse all items
+    for(int a = 0; a < ui.treeDevices->topLevelItemCount(); a++)
+        ui.treeDevices->topLevelItem(a)->setExpanded(false);
+    // deselect the selected item(s)
+    for(int a = 0; a < ui.treeDevices->selectedItems().size(); a++)
+        ui.treeDevices->selectedItems().at(a)->setSelected(false);
+
+    // find the new item
+    // enumerate all platform items
+    QList<QTreeWidgetItem*> itmList
+        = ui.treeDevices->findItems("*",Qt::MatchWildcard);
+    for(int i=0; i< itmList.size();i++)
+    {
+        //enumerate device items
+        for(int j=0;j < itmList.at(i)->childCount();j++)
+        {
+            QString data = itmList.at(i)->child(j)->data(0, Qt::UserRole).toString();
+            // unset bold flag
+            QFont f = itmList.at(i)->child(j)->font(0);
+            f.setBold(false);
+            itmList.at(i)->child(j)->setFont(0, f);
+
+            if(device == data) // item found
+            {
+                f.setBold(true);
+                itmList.at(i)->child(j)->setFont(0, f);
+                itmList.at(i)->child(j)->setSelected(true); //select the item
+                itmList.at(i)->setExpanded(true); //expand the platform item
+                //ui.treeDevices->indexOfTopLevelItem(itmList.at(i)->child(j));
+                ui.treeDevices->scrollToItem(itmList.at(i)->child(j));
+                break;
+            }
+        }
+    }
+    this->unsetCursor();
+
+    if(!mountpoint.isEmpty())
+    {
+        setMountpoint(mountpoint);
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Autodetection"),
+                tr("Could not detect a Mountpoint.\n"
+                    "Select your Mountpoint manually."),
+                QMessageBox::Ok, QMessageBox::Ok);
     }
     ui.treeDevices->setEnabled(true);
 }

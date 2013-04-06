@@ -33,21 +33,34 @@ class Autodetection :public QObject
 public:
     Autodetection(QObject* parent=0);
 
+    enum PlayerStatus {
+        PlayerOk,
+        PlayerIncompatible,
+        PlayerMtpMode,
+        PlayerWrongFilesystem,
+        PlayerError,
+    };
+
+    struct Detected {
+        QString device;
+        QString mountpoint;
+        enum PlayerStatus status;
+    };
+
     bool detect();
 
-    QString getDevice() {return m_device;}
-    QString getMountPoint() {return m_mountpoint;}
-    QString errdev(void) { return m_errdev; }
-    QString incompatdev(void) { return m_incompat; }
+    QList<struct Detected> detected(void);
 
 private:
     QString resolveMountPoint(QString);
     bool detectUsb(void);
     bool detectAjbrec(QString);
 
+    QList<struct Detected> m_detected;
     QString m_device;
     QString m_mountpoint;
     QString m_errdev;
+    QString m_usberr;
     QString m_incompat;
     QList<int> m_usbconid;
 };
