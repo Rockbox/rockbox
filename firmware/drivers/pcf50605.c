@@ -100,8 +100,11 @@ void pcf50605_init(void)
      * sufficient. Defaults:
      * iPod Video = 0xf5 = 3.0V ON
      * iPod nano  = 0xef = 2.4V ON */
+#if defined(IPOD_VIDEO)
+    pcf50605_write(PCF5060X_D1REGC1, 0xf8); /* 3.3V ON. For Ipod Video this value is more preferably in terms of sound quality */
+#else
     pcf50605_write(PCF5060X_D1REGC1, 0xf0); /* 2.5V ON */
-    
+#endif    
     /* PCF5060X_D2REGC1 is set in accordance to the accessory power setting */
     
 #if  defined (IPOD_VIDEO)
