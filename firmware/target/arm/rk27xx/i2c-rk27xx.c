@@ -24,8 +24,6 @@
 #include "kernel.h"
 #include "i2c-rk27xx.h"
 
-/* NOT TESTED YET */
-
 /*  Driver for the rockchip rk27xx built-in I2C controller in master mode
     
     Both the i2c_read and i2c_write function take the following arguments:
@@ -38,12 +36,26 @@
 
 static struct mutex i2c_mtx;
 
-static bool i2c_write_byte(uint8_t data, bool start)
+static bool i2c_stop(void)
 {
     long timeout = current_tick + HZ/50;
 
-    /* START */
-    I2C_CONR |= (1<<3) | (1<<2); /* master port enable, transmit bit */
+    I2C_CONR |= (1<<4); /* NACK */
+    I2C_LCMR |= (1<<2) | (1<<1); /* resume op, stop */
+
+    while (I2C_LCMR & (1<<1))
+        if (TIME_AFTER(current_tick, timeout))
+            return false;
+
+    return true;
+}
+
+static bool i2c_write_byte(uint8_t data, bool start)
+{
+    long timeout = current_tick + HZ/50;
+    unsigned int isr_status;
+
+    I2C_CONR = (1<<3) | (1<<2); /* master port enable, MTX mode, ACK enable */
     I2C_MTXR = data;
 
     if (start)
@@ -51,12 +63,22 @@ static bool i2c_write_byte(uint8_t data, bool start)
     else
         I2C_LCMR = (1<<2); /* resume op */
 
-    I2C_CONR &= ~(1<<4); /* ACK enable */
-
     /* wait for ACK from slave */
-    while ( (!(I2C_ISR & (1<<0))) || (I2C_LSR & (1<<1)) )
+    do
+    {
+        isr_status = I2C_ISR;
+
+        if (isr_status & (1<<7))
+        {
+            i2c_stop();
+            I2C_ISR = 0;
+            return false;
+        }
+
         if (TIME_AFTER(current_tick, timeout))
             return false;
+
+    } while ((isr_status & (1<<0)) == 0);
 
     /* clear status bit */
     I2C_ISR &= ~(1<<0);
@@ -82,19 +104,7 @@ static bool i2c_read_byte(unsigned char *data)
     return true;
 }
 
-static bool i2c_stop(void)
-{
-    long timeout = current_tick + HZ/50;
 
-    I2C_CONR &= ~(1<<4);
-    I2C_LCMR |= (1<<2) | (1<<1); /* resume op, stop */
-
-    while (I2C_LCMR & (1<<1))
-        if (TIME_AFTER(current_tick, timeout))
-            return false;
-
-    return true;
-}
 
 /* route i2c bus to internal codec or external bus
  * internal codec has 0x4e i2c slave address so
@@ -202,6 +212,7 @@ int i2c_write(unsigned char slave, int address, int len,
 end:
     mutex_unlock(&i2c_mtx);
     SCU_CLKCFG |= CLKCFG_I2C;
+
     return ret;
 }
 
@@ -244,7 +255,7 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
         goto end;
     }
 
-    I2C_CONR &= ~(1<<3); /* clear transmit bit (switch to receive mode) */
+    I2C_CONR = (1<<2); /* master port enable, MRX mode, ACK enable */
 
     while (len)
     {
@@ -272,5 +283,6 @@ int i2c_read(unsigned char slave, int address, int len, unsigned char *data)
 end:
     mutex_unlock(&i2c_mtx);
     SCU_CLKCFG |= CLKCFG_I2C;
+
     return ret;
 }
