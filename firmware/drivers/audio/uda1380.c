@@ -99,8 +99,8 @@ static const unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
                    /* Bass and treble = 0 dB */
    REG_MUTE,       MUTE_MASTER | MUTE_CH2,
                    /* Mute everything to start with */
-   REG_MIX_CTL,    MIX_CTL_MIX,
-                   /* Enable mixer */
+   REG_MIX_CTL,    MIX_CTL_MIX | OVERSAMPLE_MODE(3),
+                   /* Enable mixer and 4x oversampling */
    REG_DEC_VOL,    0,
    REG_PGA,        MUTE_ADC,
    REG_ADC,        SKIP_DCFIL,
