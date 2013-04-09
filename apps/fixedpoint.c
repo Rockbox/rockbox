@@ -271,25 +271,26 @@ long fp14_cos(int val)
  *   values with 16 fractional bits, although intermediates are kept with 28
  *   bits of precision to avoid loss of accuracy during shifts."
  */
+long fp16_log(int x)
+{
+    int t;
+    int y = 0xa65af;
 
-long fp16_log(int x) {
-    long t,y;
+    if (x < 0x00008000) x <<=16,                        y -= 0xb1721;
+    if (x < 0x00800000) x <<= 8,                        y -= 0x58b91;
+    if (x < 0x08000000) x <<= 4,                        y -= 0x2c5c8;
+    if (x < 0x20000000) x <<= 2,                        y -= 0x162e4;
+    if (x < 0x40000000) x <<= 1,                        y -= 0x0b172;
+    t = x + (x >> 1); if ((t & 0x80000000) == 0) x = t, y -= 0x067cd;
+    t = x + (x >> 2); if ((t & 0x80000000) == 0) x = t, y -= 0x03920;
+    t = x + (x >> 3); if ((t & 0x80000000) == 0) x = t, y -= 0x01e27;
+    t = x + (x >> 4); if ((t & 0x80000000) == 0) x = t, y -= 0x00f85;
+    t = x + (x >> 5); if ((t & 0x80000000) == 0) x = t, y -= 0x007e1;
+    t = x + (x >> 6); if ((t & 0x80000000) == 0) x = t, y -= 0x003f8;
+    t = x + (x >> 7); if ((t & 0x80000000) == 0) x = t, y -= 0x001fe;
+    x = 0x80000000 - x;
+    y -= x >> 15;
 
-    y=0xa65af;
-    if(x<0x00008000) x<<=16,              y-=0xb1721;
-    if(x<0x00800000) x<<= 8,              y-=0x58b91;
-    if(x<0x08000000) x<<= 4,              y-=0x2c5c8;
-    if(x<0x20000000) x<<= 2,              y-=0x162e4;
-    if(x<0x40000000) x<<= 1,              y-=0x0b172;
-    t=x+(x>>1); if((t&0x80000000)==0) x=t,y-=0x067cd;
-    t=x+(x>>2); if((t&0x80000000)==0) x=t,y-=0x03920;
-    t=x+(x>>3); if((t&0x80000000)==0) x=t,y-=0x01e27;
-    t=x+(x>>4); if((t&0x80000000)==0) x=t,y-=0x00f85;
-    t=x+(x>>5); if((t&0x80000000)==0) x=t,y-=0x007e1;
-    t=x+(x>>6); if((t&0x80000000)==0) x=t,y-=0x003f8;
-    t=x+(x>>7); if((t&0x80000000)==0) x=t,y-=0x001fe;
-    x=0x80000000-x;
-    y-=x>>15;
     return y;
 }
 
@@ -305,29 +306,23 @@ long fp16_log(int x) {
  */
 long fp16_exp(int x)
 {
-    int t,y;
+    int t;
+    int y = 0x00010000;
 
-    y=0x00010000;
-    t=x-0x58b91; if(t>=0) x=t,y<<=8;
-    t=x-0x2c5c8; if(t>=0) x=t,y<<=4;
-    t=x-0x162e4; if(t>=0) x=t,y<<=2;
-    t=x-0x0b172; if(t>=0) x=t,y<<=1;
-    t=x-0x067cd; if(t>=0) x=t,y+=y>>1;
-    t=x-0x03920; if(t>=0) x=t,y+=y>>2;
-    t=x-0x01e27; if(t>=0) x=t,y+=y>>3;
-    t=x-0x00f85; if(t>=0) x=t,y+=y>>4;
-    t=x-0x007e1; if(t>=0) x=t,y+=y>>5;
-    t=x-0x003f8; if(t>=0) x=t,y+=y>>6;
-    t=x-0x001fe; if(t>=0) x=t,y+=y>>7;
-    if(x&0x100)               y+=y>>8;
-    if(x&0x080)               y+=y>>9;
-    if(x&0x040)               y+=y>>10;
-    if(x&0x020)               y+=y>>11;
-    if(x&0x010)               y+=y>>12;
-    if(x&0x008)               y+=y>>13;
-    if(x&0x004)               y+=y>>14;
-    if(x&0x002)               y+=y>>15;
-    if(x&0x001)               y+=y>>16;
+    if (x < 0) x += 0xb1721,            y >>= 16;
+    t = x - 0x58b91; if (t >= 0) x = t, y <<= 8;
+    t = x - 0x2c5c8; if (t >= 0) x = t, y <<= 4;
+    t = x - 0x162e4; if (t >= 0) x = t, y <<= 2;
+    t = x - 0x0b172; if (t >= 0) x = t, y <<= 1;
+    t = x - 0x067cd; if (t >= 0) x = t, y += y >> 1;
+    t = x - 0x03920; if (t >= 0) x = t, y += y >> 2;
+    t = x - 0x01e27; if (t >= 0) x = t, y += y >> 3;
+    t = x - 0x00f85; if (t >= 0) x = t, y += y >> 4;
+    t = x - 0x007e1; if (t >= 0) x = t, y += y >> 5;
+    t = x - 0x003f8; if (t >= 0) x = t, y += y >> 6;
+    t = x - 0x001fe; if (t >= 0) x = t, y += y >> 7;
+    y += ((y >> 8) * x) >> 8;
+
     return y;
 }
 #endif /* PLUGIN */

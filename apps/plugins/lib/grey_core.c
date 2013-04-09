@@ -27,6 +27,7 @@
 
 #include "plugin.h"
 #include "grey.h"
+#include "fixedpoint.h"
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && \
     (defined(CPU_PP) || (CONFIG_LCD == LCD_TL0350A))
@@ -368,8 +369,6 @@ static const unsigned char lcdlinear[256] = {
 
 /* Prototypes */
 static inline void _deferred_update(void) __attribute__ ((always_inline));
-static int exp_s16p16(int x);
-static int log_s16p16(int x);
 static void grey_screendump_hook(int fd);
 static void fill_gvalues(void);
 #ifdef SIMULATOR
@@ -501,53 +500,6 @@ static void _timer_isr(void)
 
 #endif /* !SIMULATOR */
 
-/* fixed point exp() */
-static int exp_s16p16(int x)
-{
-    int t;
-    int y = 0x00010000;
-
-    if (x < 0) x += 0xb1721,            y >>= 16;
-    t = x - 0x58b91; if (t >= 0) x = t, y <<= 8;
-    t = x - 0x2c5c8; if (t >= 0) x = t, y <<= 4;
-    t = x - 0x162e4; if (t >= 0) x = t, y <<= 2;
-    t = x - 0x0b172; if (t >= 0) x = t, y <<= 1;
-    t = x - 0x067cd; if (t >= 0) x = t, y += y >> 1;
-    t = x - 0x03920; if (t >= 0) x = t, y += y >> 2;
-    t = x - 0x01e27; if (t >= 0) x = t, y += y >> 3;
-    t = x - 0x00f85; if (t >= 0) x = t, y += y >> 4;
-    t = x - 0x007e1; if (t >= 0) x = t, y += y >> 5;
-    t = x - 0x003f8; if (t >= 0) x = t, y += y >> 6;
-    t = x - 0x001fe; if (t >= 0) x = t, y += y >> 7;
-    y += ((y >> 8) * x) >> 8;
-
-    return y;
-}
-
-/* fixed point log() */
-static int log_s16p16(int x)
-{
-    int t;
-    int y = 0xa65af;
-
-    if (x < 0x00008000) x <<=16,                        y -= 0xb1721;
-    if (x < 0x00800000) x <<= 8,                        y -= 0x58b91;
-    if (x < 0x08000000) x <<= 4,                        y -= 0x2c5c8;
-    if (x < 0x20000000) x <<= 2,                        y -= 0x162e4;
-    if (x < 0x40000000) x <<= 1,                        y -= 0x0b172;
-    t = x + (x >> 1); if ((t & 0x80000000) == 0) x = t, y -= 0x067cd;
-    t = x + (x >> 2); if ((t & 0x80000000) == 0) x = t, y -= 0x03920;
-    t = x + (x >> 3); if ((t & 0x80000000) == 0) x = t, y -= 0x01e27;
-    t = x + (x >> 4); if ((t & 0x80000000) == 0) x = t, y -= 0x00f85;
-    t = x + (x >> 5); if ((t & 0x80000000) == 0) x = t, y -= 0x007e1;
-    t = x + (x >> 6); if ((t & 0x80000000) == 0) x = t, y -= 0x003f8;
-    t = x + (x >> 7); if ((t & 0x80000000) == 0) x = t, y -= 0x001fe;
-    x = 0x80000000 - x;
-    y -= x >> 15;
-
-    return y;
-}
-
 static void fill_gvalues(void)
 {
     int i;
@@ -560,7 +512,7 @@ static void fill_gvalues(void)
 #endif
     for (i = 0; i < 256; i++)
     {
-        data = exp_s16p16((_GREY_GAMMA * log_s16p16(i * 257 + 1)) >> 8) + 128;
+        data = fp16_exp((_GREY_GAMMA * fp16_log(i * 257 + 1)) >> 8) + 128;
         data = (data - (data >> 8)) >> 8; /* approx. data /= 257 */
         data = ((lcdlinear[data ^ imask] ^ imask) << 7) + 127;
         _grey_info.gvalue[i] = (data + (data >> 8)) >> 8;
