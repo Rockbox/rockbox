@@ -89,18 +89,33 @@ static unsigned short uda1380_regs[0x30];
 static short recgain_mic;
 static short recgain_line;
 
+#ifdef USE_WSPLL
+/* Internal control of WSPLL */
+static bool wspll_enable;
+
+static void wspll_on(bool on)
+{
+    uda1380_regs[REG_0] &= ~(ADC_CLK | DAC_CLK);
+    uda1380_regs[REG_PWR] &= ~PON_PLL;
+    
+    unsigned short pll_ena = (on) ? (ADC_CLK | DAC_CLK) : 0;
+    unsigned short pll_pow = (on) ? PON_PLL : 0;
+    
+    uda1380_write_reg(REG_0, uda1380_regs[REG_0] | pll_ena);
+    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | pll_pow);
+    
+    wspll_enable = on;
+}
+#endif
+
 /* Definition of a playback configuration to start with */
 
 #define NUM_DEFAULT_REGS 13
 static const unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 {
-   REG_0,          EN_DAC | EN_INT | EN_DEC |
-#ifdef USE_WSPLL
-                   ADC_CLK | DAC_CLK | WSPLL_25_50 |
-#endif
-                   SYSCLK_256FS,
+   REG_0,          EN_DAC | EN_INT | EN_DEC | WSPLL_25_50 | SYSCLK_256FS,
    REG_I2S,        I2S_IFMT_IIS,
-   REG_PWR,        PON_PLL | PON_BIAS,
+   REG_PWR,        PON_BIAS,
                    /* PON_HP & PON_DAC is enabled later */
    REG_AMIX,       AMIX_RIGHT(0x3f) | AMIX_LEFT(0x3f),
                    /* 00=max, 3f=mute */
@@ -245,6 +260,20 @@ void audiohw_set_frequency(int fsel)
 
     ent = values_reg[fsel];
 
+#ifdef USE_WSPLL 
+    /* Enable WSPLL if needed (for Iriver H100 and H300 series) */
+    if (fsel == HW_FREQ_11)
+    {
+      /* Only at this case we need use WSPLL for Iriver H100 and H300 series */
+      if (!wspll_enable) wspll_on(true);
+    }
+    else
+    {
+      /* At this case WSPLL clock and SYSCLK has same value and we don't use WSPLL to avoid WSPLL errors */
+      if (wspll_enable) wspll_on(false);
+    }
+#endif
+    
     /* Set WSPLL input frequency range or SYSCLK divider */
     uda1380_regs[REG_0] &= ~0xf;
     uda1380_write_reg(REG_0, uda1380_regs[REG_0] | ent[1]);
@@ -260,6 +289,10 @@ void audiohw_init(void)
     recgain_mic = 0;
     recgain_line = 0;
 
+#ifdef USE_WSPLL
+    wspll_enable = false;  /* For default WSPLL is off */
+#endif 
+   
     udacodec_reset();
 
     if (audiohw_set_regs() == -1)
@@ -310,7 +343,7 @@ void audiohw_close(void)
 void audiohw_enable_recording(bool source_mic)
 {
 #ifdef USE_WSPLL
-    uda1380_regs[REG_0] &= ~(ADC_CLK | DAC_CLK);
+    if (wspll_enable) uda1380_regs[REG_0] &= ~(ADC_CLK | DAC_CLK);
 #endif
     uda1380_write_reg(REG_0, uda1380_regs[REG_0] | EN_ADC);
 
@@ -357,7 +390,7 @@ void audiohw_disable_recording(void)
 
     uda1380_regs[REG_0] &= ~EN_ADC;
 #ifdef USE_WSPLL
-    uda1380_write_reg(REG_0,   uda1380_regs[REG_0] | ADC_CLK | DAC_CLK);
+    if (wspll_enable) uda1380_write_reg(REG_0,   uda1380_regs[REG_0] | ADC_CLK | DAC_CLK);
 #endif
 
     uda1380_write_reg(REG_ADC, SKIP_DCFIL);
