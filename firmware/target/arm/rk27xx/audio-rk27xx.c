@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2013 by Amaury Pouly
  *
@@ -23,6 +22,7 @@
 #include "audiohw.h"
 #include "audio.h"
 
+#if (INPUT_SRC_CAPS != 0)
 static int input_source = AUDIO_SRC_PLAYBACK;
 static unsigned input_flags = 0;
 static int output_source = AUDIO_SRC_PLAYBACK;
@@ -50,3 +50,4 @@ void audio_set_output_source(int source)
     output_source = source;
     select_audio_path();
 }
+#endif
