@@ -51,7 +51,11 @@
 extern bool debug_audio;
 #endif
 
+#ifdef HAVE_SW_VOLUME_CONTROL
+static int sim_volume = SDL_MIX_MAXVOLUME;
+#else
 static int sim_volume = 0;
+#endif
 
 #if CONFIG_CODEC == SWCODEC
 static int cvt_status = -1;
@@ -414,9 +418,11 @@ void pcm_play_dma_postinit(void)
 {
 }
 
+#ifndef HAVE_SW_VOLUME_CONTROL
 void pcm_set_mixer_volume(int volume)
 {
     sim_volume = volume;
 }
+#endif /* HAVE_SW_VOLUME_CONTROL */
 
 #endif /* CONFIG_CODEC == SWCODEC */

@@ -235,8 +235,10 @@ static void set_prescaled_volume(void)
     }
 
 /* ypr0 with sdl has separate volume controls */
-#if !defined(HAVE_SDL_AUDIO) || defined(SAMSUNG_YPR0)
-#if defined(HAVE_SW_VOLUME_CONTROL) || defined(HAVE_JZ4740_CODEC)
+#if defined(HAVE_SW_VOLUME_CONTROL)
+    audiohw_set_master_vol(l, r);
+#elif !defined(HAVE_SDL_AUDIO) || defined(SAMSUNG_YPR0)
+#if defined(HAVE_JZ4740_CODEC)
     audiohw_set_master_vol(l, r);
 #elif CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);

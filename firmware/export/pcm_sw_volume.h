@@ -24,6 +24,7 @@
 #ifdef HAVE_SW_VOLUME_CONTROL
 
 #include <audiohw.h>
+#include <limits.h>
 
 #define PCM_MUTE_LEVEL INT_MIN
 

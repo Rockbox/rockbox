@@ -29,6 +29,14 @@
  * SDL. if we used DSP we would run code that doesn't actually run on the target
  **/
 
+#ifdef HAVE_SW_VOLUME_CONTROL
+#include "pcm_sw_volume.h"
+
+void audiohw_set_master_vol(int vol_l, int vol_r)
+{
+    pcm_set_master_volume(vol_l, vol_r);
+}
+#else /* ndef HAVE_SW_VOLUME_CONTROL */
 extern void pcm_set_mixer_volume(int);
 
 void audiohw_set_volume(int volume)
@@ -44,6 +52,7 @@ void audiohw_set_volume(int volume)
     (void)volume;
 #endif /* CONFIG_CODEC == SWCODEC */
 }
+#endif /* HAVE_SW_VOLUME_CONTROL */
 
 const struct sound_settings_info audiohw_settings[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, VOLUME_MIN / 10, VOLUME_MAX / 10, -25},
@@ -129,7 +138,13 @@ const struct sound_settings_info audiohw_settings[] = {
  **/
 
 #if defined(AUDIOHW_HAVE_PRESCALER)
-void audiohw_set_prescaler(int value)   { (void)value; }
+void audiohw_set_prescaler(int value)
+{
+#ifdef HAVE_SW_VOLUME_CONTROL
+    pcm_set_prescaler(value);
+#endif
+    (void)value;
+}
 #endif
 #if defined(AUDIOHW_HAVE_BALANCE)
 void audiohw_set_balance(int value)     { (void)value; }
