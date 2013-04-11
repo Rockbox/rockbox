@@ -84,8 +84,6 @@ struct screen
                                 int style, int x_offset, int y_offset);
     void (*puts_scroll_style)(int x, int y, const unsigned char *string,
                                  int style);
-    void (*puts_scroll_style_offset)(int x, int y, const unsigned char *string,
-                                     int style, int x_offset);
     void (*puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string,
                                      int style, int x_offset, int y_offset);
     void (*mono_bitmap)(const unsigned char *src,
@@ -143,8 +141,6 @@ struct screen
     void (*putsf)(int x, int y, const unsigned char *str, ...);
     void (*puts_offset)(int x, int y, const unsigned char *str, int offset);
     void (*puts_scroll)(int x, int y, const unsigned char *string);
-    void (*puts_scroll_offset)(int x, int y, const unsigned char *string,
-                                 int x_offset);
     void (*putsxy_scroll_func)(int x, int y, const unsigned char *string,
                                void (*scroll_func)(struct scrollinfo *),
                                void *data, int x_offset);

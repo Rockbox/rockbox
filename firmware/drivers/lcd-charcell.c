@@ -509,10 +509,6 @@ void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
 }
 
 /** scrolling **/
-void lcd_puts_scroll(int x, int y, const unsigned char *string)
-{
-    lcd_puts_scroll_offset(x, y, string, 0);
-}
 
 void lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
                             int offset,
@@ -586,8 +582,7 @@ void lcd_scroll_fn(struct scrollinfo* s)
     }
 }
 
-void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
-                            int offset)
+void lcd_puts_scroll(int x, int y, const unsigned char *string)
 {
-    lcd_puts_scroll_worker(x, y, string, offset, lcd_scroll_fn, NULL);
+    lcd_puts_scroll_worker(x, y, string, 0, lcd_scroll_fn, NULL);
 }

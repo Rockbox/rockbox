@@ -208,8 +208,6 @@ extern void lcd_puts(int x, int y, const unsigned char *string);
 extern void lcd_putsf(int x, int y, const unsigned char *fmt, ...);
 extern void lcd_puts_style(int x, int y, const unsigned char *string, int style);
 extern void lcd_puts_offset(int x, int y, const unsigned char *str, int offset);
-extern void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
-                                  int offset);
 extern void lcd_putc(int x, int y, unsigned long ucs);
 extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
 extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
@@ -506,8 +504,6 @@ extern void lcd_puts_style_offset(int x, int y, const unsigned char *str,
                                   int style, int x_offset);
 extern void lcd_puts_style_xyoffset(int x, int y, const unsigned char *str,
                                   int style, int x_offset, int y_offset);
-extern void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
-                                  int style, int x_offset);
 extern void lcd_puts_scroll_style_xyoffset(int x, int y, const unsigned char *string,
                                   int style, int x_offset, int y_offset);
 
