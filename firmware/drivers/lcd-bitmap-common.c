@@ -625,19 +625,7 @@ void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 void LCDFN(puts_scroll_style)(int x, int y, const unsigned char *string,
                               int style)
 {
-     LCDFN(puts_scroll_style_offset)(x, y, string, style, 0);
-}
-
-void LCDFN(puts_scroll_offset)(int x, int y, const unsigned char *string,
-                               int offset)
-{
-     LCDFN(puts_scroll_style_offset)(x, y, string, STYLE_DEFAULT, offset);
-}
-
-void LCDFN(puts_scroll_style_offset)(int x, int y, const unsigned char *string,
-                                     int style, int x_offset)
-{
-    LCDFN(puts_scroll_style_xyoffset)(x, y, string, style, x_offset, 0);
+     LCDFN(puts_scroll_style_xyoffset)(x, y, string, style, 0, 0);
 }
 
 #if !defined(HAVE_LCD_COLOR) || !defined(MAIN_LCD)

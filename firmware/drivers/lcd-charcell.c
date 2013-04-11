@@ -494,13 +494,8 @@ void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
 }
 
 /** scrolling **/
-void lcd_puts_scroll(int x, int y, const unsigned char *string)
-{
-    lcd_puts_scroll_offset(x, y, string, 0);
-}
 
-void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
-                            int offset)
+void lcd_puts_scroll(int x, int y, const unsigned char *string)
 {
     struct scrollinfo* s;
     int len;
@@ -517,7 +512,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
 
     s->start_tick = current_tick + lcd_scroll_info.delay;
 
-    lcd_puts_offset(x, y, string, offset);
+    lcd_puts_offset(x, y, string, 0);
     len = utf8length(string);
 
     if (current_vp->width - x < len) 
@@ -555,7 +550,7 @@ void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
 
         s->vp = current_vp;
         s->y = y;
-        s->offset = offset;
+        s->offset = 0;
         s->startx = x;
         s->backward = false;
         lcd_scroll_info.lines++;
