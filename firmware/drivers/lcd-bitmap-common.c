@@ -360,6 +360,12 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
     int text_ypos = ypos;
     int line_height = font_get(current_vp->font)->height;
     text_ypos += h/2 - line_height/2; /* center the text in the line */
+
+    if ((style & STYLE_MODE_MASK) == STYLE_NONE) {
+        if (str[0])
+            LCDFN(putsxyofs)(xpos, text_ypos, offset, str);
+        return;
+    }
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
     int oldfgcolor = current_vp->fg_pattern;
     int oldbgcolor = current_vp->bg_pattern;
