@@ -53,6 +53,8 @@
 #define CONFIG_NAND NAND_RK27XX
 #define HAVE_SW_TONE_CONTROLS
 
+#define HAVE_SW_VOLUME_CONTROL
+
 /* commented for now */
 /* #define HAVE_HOTSWAP */
 

@@ -23,9 +23,11 @@
 #include "config.h"
 #include "audio.h"
 #include "audiohw.h"
+#include "system.h"
+#include "pcm_sw_volume.h"
 
 const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1,   -1,   0,   0},
+    [SOUND_VOLUME]        = {"dB", 0,  1,   VOLUME_MIN/10,   VOLUME_MAX/10,   0},
     /* HAVE_SW_TONE_CONTROLS */
     [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
     [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
@@ -44,3 +46,13 @@ void audiohw_set_frequency(int fsel)
 {
     (void)fsel;
 }
+
+#ifdef HAVE_SW_VOLUME_CONTROL
+void audiohw_set_master_vol(int vol_l, int vol_r)
+{
+    /* SW volume for <= 1.0 gain, HW at unity, < VOLUME_MIN == MUTE */
+    int sw_volume_l = vol_l < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_l, 0);
+    int sw_volume_r = vol_r < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_r, 0);
+    pcm_set_master_volume(sw_volume_l, sw_volume_r);
+}
+#endif /* HAVE_SW_VOLUME_CONTROL */
