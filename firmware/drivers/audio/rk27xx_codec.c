@@ -161,10 +161,6 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
         codec_write(CGR9, vol_r);
         codec_write(CGR8, vol_l);
-        codec_write(CGR5, vol_r);
-        codec_write(CGR4, vol_l);
-        codec_write(CGR3, vol_r);
-        codec_write(CGR2, vol_l);
     }
 }
 
