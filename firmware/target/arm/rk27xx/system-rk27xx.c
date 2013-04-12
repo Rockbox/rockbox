@@ -177,19 +177,13 @@ int system_memory_guard(int newmode)
 /* usecs may be at most 2^32/200 (~21 seconds) for 200MHz max cpu freq */
 void udelay(unsigned usecs)
 {
-    unsigned cycles_per_usec;
     unsigned delay;
 
-    if (cpu_frequency == CPUFREQ_MAX) {
-        cycles_per_usec = (CPUFREQ_MAX + 999999) / 1000000;
-    } else {
-        cycles_per_usec = (CPUFREQ_NORMAL + 999999) / 1000000;
-    }
-
-    delay = (usecs * cycles_per_usec + 3) / 4;
+    delay = (usecs * (cpu_frequency/1000000)) / 5;
 
     asm volatile(
         "1: subs %0, %0, #1  \n"    /* 1 cycle  */
+        "   nop              \n"    /* 1 cycle  */
         "   bne  1b          \n"    /* 3 cycles */
         : : "r"(delay)
     );
