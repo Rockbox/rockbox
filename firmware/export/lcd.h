@@ -119,12 +119,13 @@ enum screen_type {
 #define STRIDE(screen, w, h) (screen==SCREEN_MAIN?STRIDE_MAIN((w), \
                                         (h)):STRIDE_REMOTE((w),(h)))
 
-#define STYLE_DEFAULT    0x00000000
-#define STYLE_COLORED    0x10000000
-#define STYLE_INVERT     0x20000000
-#define STYLE_COLORBAR   0x40000000
-#define STYLE_GRADIENT   0x80000000
-#define STYLE_MODE_MASK  0xF0000000
+#define STYLE_NONE       0x00000000
+#define STYLE_DEFAULT    0x01000000
+#define STYLE_COLORED    0x02000000
+#define STYLE_INVERT     0x04000000
+#define STYLE_COLORBAR   0x08000000
+#define STYLE_GRADIENT   0x10000000
+#define STYLE_MODE_MASK  0xFF000000
 /* HACK: This isnt really a style, We need to be able to tell some of
  * the lcd API that we want to draw text to a specific pixel instead
  * of a char. Remove this hack when the whole LCD api goes to fully
