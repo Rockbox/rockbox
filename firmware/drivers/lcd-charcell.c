@@ -477,10 +477,25 @@ void lcd_putsxyf(int x, int y, const unsigned char *fmt, ...)
 
 /*** Line oriented text output ***/
 
+/* Put a string at a given char position,  skipping first offset chars */
+void lcd_putsofs(int x, int y, const unsigned char *str, int offset)
+{
+    if ((unsigned)y >= (unsigned)current_vp->height)
+        return;
+
+    /* make sure scrolling is turned off on the line we are updating */
+    lcd_scroll_stop_viewport_rect(current_vp, x, y, current_vp->width - x, 1);
+
+    x = lcd_putsxyofs(x, y, offset, str);
+    while (x < current_vp->width)
+        lcd_putxchar(x++, y, xspace);
+}
+
+
 /* Put a string at a given char position */
 void lcd_puts(int x, int y, const unsigned char *str)
 {
-    lcd_puts_offset(x, y, str, 0);
+    lcd_putsofs(x, y, str, 0);
 }
 
 /* Formatting version of lcd_puts */
@@ -492,20 +507,6 @@ void lcd_putsf(int x, int y, const unsigned char *fmt, ...)
     vsnprintf(buf, sizeof (buf), fmt, ap);
     va_end(ap);
     lcd_puts(x, y, buf);
-}
-
-/* Put a string at a given char position,  skipping first offset chars */
-void lcd_puts_offset(int x, int y, const unsigned char *str, int offset)
-{
-    if ((unsigned)y >= (unsigned)current_vp->height)
-        return;
-
-    /* make sure scrolling is turned off on the line we are updating */
-    lcd_scroll_stop_viewport_rect(current_vp, x, y, current_vp->width - x, 1);
-
-    x = lcd_putsxyofs(x, y, offset, str);
-    while (x < current_vp->width)
-        lcd_putxchar(x++, y, xspace);
 }
 
 /** scrolling **/
@@ -529,7 +530,7 @@ void lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
 
     s->start_tick = current_tick + lcd_scroll_info.delay;
 
-    lcd_puts_offset(x, y, string, offset);
+    lcd_putsofs(x, y, string, offset);
     len = utf8length(string);
 
     if (current_vp->width - x >= len)

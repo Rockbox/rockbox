@@ -494,11 +494,6 @@ void LCDFN(puts_style)(int x, int y, const unsigned char *str, int style)
     LCDFN(puts_style_offset)(x, y, str, style, 0);
 }
 
-void LCDFN(puts_offset)(int x, int y, const unsigned char *str, int offset)
-{
-    LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, offset);
-}
-
 /*** scrolling ***/
 
 static struct scrollinfo* find_scrolling_line(int x, int y)
