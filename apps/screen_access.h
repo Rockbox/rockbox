@@ -78,8 +78,6 @@ struct screen
     void (*setuifont)(int newfont);
 
     void (*scroll_step)(int pixels);
-    void (*puts_style_offset)(int x, int y, const unsigned char *str,
-                              int style, int x_offset);
     void (*puts_style_xyoffset)(int x, int y, const unsigned char *str,
                                 int style, int x_offset, int y_offset);
     void (*puts_scroll_style)(int x, int y, const unsigned char *string,
