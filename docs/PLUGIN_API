@@ -1105,21 +1105,11 @@ void lcd_puts_scroll(int x, int y, const unsigned char* string)
 void lcd_puts_scroll_style(int x, int y, const unsigned char* string, int style)
     \group lcd
     \conditions !defined(HAVE_LCD_CHARCELLS) 
-    \param x
-    \param y
-    \param string
-    \param style
-    \description Same as lcd_puts_style, but with scrolling is enabled
-    \see lcd_puts_style
-
-void lcd_puts_style(int x, int y, const unsigned char *str, int style)
-    \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
     \param x Row X
     \param y Column Y
-    \param str
+    \param string
     \param style can be STYLE_DEFAULT for black text display or STYLE_INVERT for white text display
-    \description Put a string at row =x= and column =y=
+    \description Put a string at row =x= and column =y=, the text scrolls if necessary
 
 void lcd_put_cursor(int x, int y, unsigned long ucs)
     \group lcd
