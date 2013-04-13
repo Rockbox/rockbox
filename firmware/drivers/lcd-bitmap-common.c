@@ -467,15 +467,9 @@ void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
     LCDFN(putsxyofs_style)(xpos, ypos+y_offset, str, style, h, x_offset);
 }
 
-void LCDFN(puts_style_offset)(int x, int y, const unsigned char *str,
-                              int style, int x_offset)
-{
-    LCDFN(puts_style_xyoffset)(x, y, str, style, x_offset, 0);
-}
-
 void LCDFN(puts)(int x, int y, const unsigned char *str)
 {
-    LCDFN(puts_style_offset)(x, y, str, STYLE_DEFAULT, 0);
+    LCDFN(puts_style_xyoffset)(x, y, str, STYLE_DEFAULT, 0, 0);
 }
 
 /* Formatting version of LCDFN(puts) */
