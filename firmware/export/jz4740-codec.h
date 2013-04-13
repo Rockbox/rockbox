@@ -24,6 +24,17 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
-void audiohw_set_master_vol(int vol_l, int vol_r);
+/* TODO */
+#ifdef HAVE_SW_VOLUME_CONTROL
+AUDIOHW_SETTING(VOLUME,     "dB", 0,  1, -74,   6, -25)
+#else
+AUDIOHW_SETTING(VOLUME,     "dB", 0,  1,   0,   6,   0)
+#endif /* HAVE_SW_VOLUME_CONTROL */
+
+#ifdef HAVE_RECORDING
+AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1,  1,   0,  31,  23)
+AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1,  1,   0,  31,  23)
+AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,  1,   0,   1,   1)
+#endif /* HAVE_RECORDING */
 
 #endif /* __JZ4740_CODEC_H_ */

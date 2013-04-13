@@ -102,6 +102,11 @@ unsigned long isqrt(unsigned long x);
 #define FP_INF          (0x7fffffff)
 #define FP_NEGINF      -(0x7fffffff)
 
+/** FIXED POINT EXP10
+ * Return 10^x as FP integer.  Argument is FP integer.
+ */
+long fp_exp10(long x, unsigned int fracbits);
+
 /* fracbits in range 12 - 22 work well. Higher is better for
  * calculating dB, lower is better for calculating factor.
  */

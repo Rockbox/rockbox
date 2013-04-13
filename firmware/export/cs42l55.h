@@ -26,14 +26,16 @@
 #define VOLUME_MIN -580
 #define VOLUME_MAX  120
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP \
-                    | TREBLE_CUTOFF_CAP | PRESCALER_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | \
+                      TREBLE_CUTOFF_CAP | PRESCALER_CAP | LINEOUT_CAP)
 
-extern int tenthdb2master(int db);
+AUDIOHW_SETTING(VOLUME,       "dB", 0,  1, -60,  12, -25)
+AUDIOHW_SETTING(BASS,         "dB", 1, 15,-105, 120,   0)
+AUDIOHW_SETTING(TREBLE,       "dB", 1, 15,-105, 120,   0)
+AUDIOHW_SETTING(BASS_CUTOFF,    "", 0,  1,   1,   4,   2)
+AUDIOHW_SETTING(TREBLE_CUTOFF,  "", 0,  1,   1,   4,   1)
 
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
-extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern void audiohw_enable_lineout(bool enable);
+void audiohw_enable_lineout(bool enable);
 
 /* Register addresses and bits */
 
@@ -479,6 +481,5 @@ extern void audiohw_enable_lineout(bool enable);
 
 #define HIDDEN3F                0x3f
 #define HIDDEN3F_DEFAULT        0x46
-
 
 #endif /* __CS42L55_H__ */

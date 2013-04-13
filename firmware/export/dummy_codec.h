@@ -25,6 +25,6 @@
 #define VOLUME_MIN   -730
 #define VOLUME_MAX   0
 
-void audiohw_set_master_vol(int vol_l, int vol_r);
+AUDIOHW_SETTING(VOLUME, "dB", 0, 1, VOLUME_MIN/10, VOLUME_MAX/10, 0)
 
 #endif /* __DUMMY_CODEC_H_ */

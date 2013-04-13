@@ -209,3 +209,9 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
     *count = cnt >> 2;
     return (void *)((addr + 2) & ~3);
 }
+
+void audiohw_set_volume(int value)
+{
+    int tmp = (60 - value * 4) & 0xff;
+    CODECVOL = tmp | (tmp << 8);
+}

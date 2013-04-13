@@ -32,35 +32,6 @@
 #include "system.h"
 #include "sound.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
-    [SOUND_BASS]          = {"dB", 1, 15, -60,  90,   0},
-    [SOUND_TREBLE]        = {"dB", 1, 15, -60,  90,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    /* PGA -17.25dB to 30.0dB in 0.75dB increments 64 steps
-     * digital gain 0dB to 30.0dB in 0.5dB increments
-     * we use 0.75dB fake steps through whole range
-     *
-     * This combined gives -17.25 to 60.0dB 
-     */
-    [SOUND_LEFT_GAIN]     = {"dB", 2,  75, -1725, 6000, 0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 2,  75, -1725, 6000, 0},
-    [SOUND_MIC_GAIN]      = {"dB", 2,  75, -1725, 6000, 3000},
-#endif
-#ifdef AUDIOHW_HAVE_BASS_CUTOFF
-    [SOUND_BASS_CUTOFF]   = {"Hz", 0, 70, 130, 200, 200},
-#endif
-#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
-    [SOUND_TREBLE_CUTOFF] = {"kHz", 0,  4,   4,   8,   4},
-#endif
-#ifdef AUDIOHW_HAVE_DEPTH_3D
-    [SOUND_DEPTH_3D]      = {"%",   0,  1,  0,  15,   0},
-#endif
-};
-
 static uint16_t wmcodec_regs[WM_NUM_REGS] =
 {
     [0 ... WM_NUM_REGS-1] = 0x200, /* set invalid data in gaps */
@@ -139,7 +110,7 @@ static void wmcodec_set_masked(unsigned int reg, unsigned int val,
 }
 
 /* convert tenth of dB volume (-730..60) to master volume register value */
-int tenthdb2master(int db)
+static int vol_tenthdb2hw(int db)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 ==  +6dB  (0x7f)                            */
@@ -185,25 +156,6 @@ void audiohw_set_treble_cutoff(int val)
         wmcodec_set_bits(TREBCTRL, TREBCTRL_TC); 
 }
 #endif
-
-
-int sound_val2phys(int setting, int value)
-{
-    int result;
-
-    switch (setting)
-    {
-#ifdef AUDIOHW_HAVE_DEPTH_3D
-    case SOUND_DEPTH_3D:
-        result = (100 * value + 8) / 15;
-        break;
-#endif
-    default:
-        result = value;
-    }
-
-    return result;
-}
 
 static void audiohw_mute(bool mute)
 {
@@ -335,40 +287,39 @@ void audiohw_postinit(void)
 #endif
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
-    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
-    /* 1111111 ==  +6dB                                    */
-    /* 1111001 ==   0dB                                    */
-    /* 0110000 == -73dB                                    */
-    /* 0101111 == mute (0x2f)                              */
-
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);   
     wmcodec_set_masked(LOUT1, LOUT1_LOUT1VOL(vol_l),
                        LOUT1_LOUT1VOL_MASK);
     wmcodec_set_masked(ROUT1, ROUT1_RO1VU | ROUT1_ROUT1VOL(vol_r),
                        ROUT1_ROUT1VOL_MASK);
 }
 
-#ifdef TOSHIBA_GIGABEAT_F
-void audiohw_set_lineout_vol(int vol_l, int vol_r)
+#ifdef AUDIOHW_HAVE_LINEOUT
+void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
     wmcodec_set_masked(LOUT2, LOUT2_LOUT2VOL(vol_l),
                        LOUT2_LOUT2VOL_MASK);
     wmcodec_set_masked(ROUT2, ROUT2_RO2VU | ROUT2_ROUT2VOL(vol_r),
                        ROUT2_ROUT2VOL_MASK);
 }
-#endif
+#endif /* AUDIOHW_HAVE_LINEOUT */
 
 void audiohw_set_bass(int value)
 {
-    wmcodec_set_masked(BASSCTRL,
-                       BASSCTRL_BASS(tone_tenthdb2hw(value)),
+    value = tone_tenthdb2hw(value);
+    wmcodec_set_masked(BASSCTRL, BASSCTRL_BASS(value),
                        BASSCTRL_BASS_MASK);
 }
 
 void audiohw_set_treble(int value)
 {
-    wmcodec_set_masked(TREBCTRL, TREBCTRL_TREB(tone_tenthdb2hw(value)),
+    value = tone_tenthdb2hw(value);
+    wmcodec_set_masked(TREBCTRL, TREBCTRL_TREB(value),
                        TREBCTRL_TREB_MASK);
 }
 

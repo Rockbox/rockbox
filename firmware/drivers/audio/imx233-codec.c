@@ -25,30 +25,6 @@
 #include "audioout-imx233.h"
 #include "audioin-imx233.h"
 
-const struct sound_settings_info audiohw_settings[] =
-{
-    /* i.MX233 has half dB steps */
-    [SOUND_VOLUME]        = {"dB", 0,  5, VOLUME_MIN / 10,   VOLUME_MAX / 10, -25},
-    /* HAVE_SW_TONE_CONTROLS */
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   0},
-#endif
-    [SOUND_DEPTH_3D]      = {"%",   0,  1,  0,  15,   0},
-};
-
-int tenthdb2master(int tdb)
-{
-    /* Just go from tenth of dB to half to dB */
-    return tdb / 5;
-}
-
 void audiohw_preinit(void)
 {
     imx233_audioout_preinit();
@@ -69,7 +45,7 @@ void audiohw_close(void)
 
 void audiohw_set_headphone_vol(int vol_l, int vol_r)
 {
-    imx233_audioout_set_hp_vol(vol_l, vol_r);
+    imx233_audioout_set_hp_vol(vol_l / 5, vol_r / 5);
 }
 
 void audiohw_set_frequency(int fsel)

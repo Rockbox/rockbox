@@ -354,7 +354,7 @@ static void perform_config(void)
         } else if (!strncmp(name, "offset=", 7)) {
             ci.id3->offset = atoi(val);
         } else if (!strncmp(name, "rate=", 5)) {
-            sound_set_pitch(atof(val) * PITCH_SPEED_100);
+            dsp_callback(DSP_CALLBACK_SET_PITCH, atof(val) * PITCH_SPEED_100);
         } else if (!strncmp(name, "seek=", 5)) {
             codec_action = CODEC_ACTION_SEEK_TIME;
             codec_action_param = atoi(val);

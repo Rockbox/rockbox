@@ -37,7 +37,6 @@
 #define DAC_GCFG        3
 
 /* function prototypes */
-extern int  tenthdb2reg(int db);
 extern int  dac_volume(unsigned int left, unsigned int right, bool deemph);
 extern void dac_enable(bool enable);
 extern void dac_line_in(bool enable);

@@ -361,6 +361,8 @@ pcm_sw_volume.c
 #ifdef HAVE_RECORDING
 enc_base.c
 #endif /* HAVE_RECORDING */
+
+drivers/audio/audiohw-swcodec.c
 #endif /* BOOTLOADER */
 #endif /* SWCODEC */
 

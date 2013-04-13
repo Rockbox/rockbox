@@ -80,7 +80,7 @@ static void codec_set_active(int active)
 #endif
 
 /* convert tenth of dB volume (-1270..0) to master volume register value */
-int tenthdb2master(int db)
+static int vol_tenthdb2hw(int db)
 {
     if (db < VOLUME_MIN)
         return 0xff; /* mute */
@@ -88,29 +88,6 @@ int tenthdb2master(int db)
         return 0x00;
     else
         return ((-db)/5);
-}
-
-int sound_val2phys(int setting, int value)
-{
-    int result;
-
-    switch(setting)
-    {
-#ifdef HAVE_RECORDING
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN:
-        result = (value - 23) * 15; /* fix */
-        break;
-    case SOUND_MIC_GAIN:
-        result = value * 200; /* fix */
-        break;
-#endif
-    default:
-        result = value;
-        break;
-    }
-
-    return result;
 }
 
 /*static void audiohw_mute(bool mute)
@@ -232,6 +209,8 @@ void audiohw_close(void)
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
     akc_write(AK4537_ATTL, vol_l & 0xff);
     akc_write(AK4537_ATTR, vol_r & 0xff);
 }

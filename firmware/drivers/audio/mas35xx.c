@@ -26,36 +26,6 @@
 #include "system.h" /* MAX MIN macros */
 #include "audiohw.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    [SOUND_VOLUME]        = {"dB", 0,  1,-100,  12, -25},
-    [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   6},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   6},
-#elif CONFIG_CODEC == MAS3507D
-    [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18},
-    [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -15,  15,   7},
-#endif
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    [SOUND_LOUDNESS]      = {"dB", 0,  1,   0,  17,   0},
-    [SOUND_AVC]           = {"",   0,  1,  -1,   4,   0},
-    [SOUND_MDB_STRENGTH]  = {"dB", 0,  1,   0, 127,  48},
-    [SOUND_MDB_HARMONICS] = {"%",  0,  1,   0, 100,  50},
-    [SOUND_MDB_CENTER]    = {"Hz", 0, 10,  20, 300,  60},
-    [SOUND_MDB_SHAPE]     = {"Hz", 0, 10,  50, 300,  90},
-    [SOUND_MDB_ENABLE]    = {"",   0,  1,   0,   1,   0},
-    [SOUND_SUPERBASS]     = {"",   0,  1,   0,   1,   0},
-#endif
-#if CONFIG_CODEC == MAS3587F && defined(HAVE_RECORDING)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  15,   8},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  15,   8},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,  15,   2},
-#endif
-};
-
 int channel_configuration = SOUND_CHAN_STEREO;
 int stereo_width = 100;
 
@@ -64,7 +34,6 @@ unsigned long mdb_shape_shadow = 0;
 unsigned long loudness_shadow = 0;
 unsigned long shadow_io_control_main;
 #endif
-
 
 static void set_channel_config(void)
 {
@@ -185,6 +154,22 @@ void audiohw_set_treble(int val)
 #endif
 }
 
+#if (CONFIG_CODEC == MAS3507D)
+/* convert tenth of dB volume (-780..+180) to dac3550 register value */
+static unsigned int tenthdb2reg(int db)
+{
+    if (db < -540)                  /* 3 dB steps */
+        return (db + 780) / 30;
+    else                            /* 1.5 dB steps */
+        return (db + 660) / 15;
+}
+
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    dac_volume(tenthdb2reg(vol_l), tenthdb2reg(vol_r), false);
+}
+#endif /* CONFIG_CODEC == MAS3507D */
+
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void audiohw_set_volume(int val) 
 {
@@ -268,14 +253,32 @@ void audiohw_set_balance(int val)
     mas_codec_writereg(MAS_REG_BALANCE, tmp);
 }
 
-void audiohw_set_pitch(unsigned long val)
+/* This functionality works by telling the decoder that we have another
+   crystal frequency than we actually have. It will adjust its internal
+   parameters and the result is that the audio is played at another pitch.
+*/
+static int32_t last_pitch = PITCH_SPEED_100;
+
+void audiohw_set_pitch(int32_t val)
 {
-    mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &val, 1);
+    if (val == last_pitch)
+        return;
+
+    /* Calculate the new (bogus) frequency */
+    unsigned long reg = 18432 * PITCH_SPEED_100 / val;
+    mas_writemem(MAS_BANK_D0, MAS_D0_OFREQ_CONTROL, &reg, 1);
 
     /* We must tell the MAS that the frequency has changed.
      * This will unfortunately cause a short silence. */
+    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN,
+                 &shadow_io_control_main, 1);
 
-    mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
+    last_pitch = val;
+}
+
+int32_t audiohw_get_pitch(void)
+{
+    return last_pitch;
 }
 
 #endif /* CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F */

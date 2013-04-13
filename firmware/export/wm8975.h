@@ -26,13 +26,19 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | LINEOUT_CAP | \
+                      LIN_GAIN_CAP | MIC_GAIN_CAP)
 
-extern int tenthdb2master(int db);
+AUDIOHW_SETTING(VOLUME,     "dB", 0, 1, -74,  6, -25)
+AUDIOHW_SETTING(BASS,       "dB", 0, 1,  -6,  9,   0)
+AUDIOHW_SETTING(TREBLE,     "dB", 0, 1,  -6,  9,   0)
+#ifdef HAVE_RECORDING
+AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1, 1,   0, 63,  23, ((val - 23) * 15) / 2)
+AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1, 1,   0, 63,  23, ((val - 23) * 15) / 2))
+AUDIOHW_SETTING(MIC_GAIN,   "dB", 1, 1,   0, 63,   0, ((val - 23) * 15) / 2 + 200)
+#endif /* HAVE_RECORDING */
 
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
-extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern void audiohw_enable_lineout(bool enable);
+void audiohw_enable_lineout(bool enable);
 
 /* Register addresses and bits */
 

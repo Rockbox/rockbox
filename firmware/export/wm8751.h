@@ -25,23 +25,36 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
-#if defined(HAVE_WM8750)
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
                       BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP | \
-                      DEPTH_3D_CAP)
-#else
+                      DEPTH_3D_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
-                      BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP)
-#endif
+#if defined(HAVE_WM8750)
+AUDIOHW_SETTING(DEPTH_3D,        "%", 0,  1,    0,   15,    0, (100 * val + 8) / 15)
+#ifdef HAVE_RECORDING
+    /* PGA -17.25dB to 30.0dB in 0.75dB increments 64 steps
+     * digital gain 0dB to 30.0dB in 0.5dB increments
+     * we use 0.75dB fake steps through whole range
+     *
+     * This combined gives -17.25 to 60.0dB 
+     */
+AUDIOHW_SETTING(LEFT_GAIN,      "dB", 2, 75,-1725, 6000,    0, val * 5)
+AUDIOHW_SETTING(RIGHT_GAIN,     "dB", 2, 75,-1725, 6000,    0, val * 5)
+AUDIOHW_SETTING(MIC_GAIN,       "dB", 2, 75,-1725, 6000, 3000, val * 5)
 
-extern int tenthdb2master(int db);
-
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
-extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-#if defined(HAVE_WM8750) && defined(HAVE_RECORDING)
 void audiohw_set_recsrc(int source, bool recording);
-#endif
+#endif /* HAVE_RECORDING */
+#else /* !HAVE_WM8750 */
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
+                      BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP | \
+                      LINEOUT_CAP)
+#endif /* HAVE_WM8750 */
+
+AUDIOHW_SETTING(VOLUME,         "dB", 0,  1,  -74,    6,  -25)
+AUDIOHW_SETTING(BASS,           "dB", 1, 15,  -60,   90,    0)
+AUDIOHW_SETTING(TREBLE,         "dB", 1, 15,  -60,   90,    0)
+AUDIOHW_SETTING(BASS_CUTOFF,    "Hz", 0, 70,  130,  200,  200)
+AUDIOHW_SETTING(TREBLE_CUTOFF, "kHz", 0,  4,    4,    8,    4)
 
 /* Register addresses and bits */
 #define OUTPUT_MUTED                0x2f
@@ -348,4 +361,5 @@ void audiohw_set_recsrc(int source, bool recording);
 #define MONOOUT_MOZC                (1 << 7)
 
 #define WM_NUM_REGS                 0x2b
+
 #endif /* _WM8751_H */

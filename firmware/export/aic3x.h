@@ -25,12 +25,10 @@
 #define VOLUME_MIN -630
 #define VOLUME_MAX  0
 
-extern int tenthdb2master(int db);
+AUDIOHW_SETTING(VOLUME, "dB",  0,  1, -64,   0, -25)
 
 /*** definitions ***/
-extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
-
-extern void aic3x_switch_output(bool stereo);
+void aic3x_switch_output(bool stereo);
 
 /* Page 0 registers */
 #define AIC3X_PAGE_SELECT 0

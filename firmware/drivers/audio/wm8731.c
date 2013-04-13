@@ -37,22 +37,6 @@
 #include "wmcodec.h"
 #include "sound.h"
 
-
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
-    /* HAVE_SW_TONE_CONTROLS */
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#if defined(HAVE_WM8731) && defined(HAVE_RECORDING)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   0},
-#endif
-};
-
 /* Init values/shadows
  * Ignore bit 8 since that only specifies "both" for updating
  * gains - "RESET" (15h) not included */
@@ -109,22 +93,6 @@ static void wmc_write_masked(int reg, unsigned bits, unsigned mask)
     wmc_write(reg, (wmc_regs[reg] & ~mask) | (bits & mask));
 }
 
-/* convert tenth of dB volume (-730..60) to master volume register value */
-int tenthdb2master(int db)
-{
-    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
-    /* 1111111 == +6dB  (0x7f) */
-    /* 1111001 == 0dB   (0x79) */
-    /* 0110000 == -73dB (0x30 */
-    /* 0101111 == mute  (0x2f) */
-
-    if (db < VOLUME_MIN) {
-        return 0x2f;
-    } else {
-        return((db/10)+0x30+73);
-    }
-}
-
 int sound_val2phys(int setting, int value)
 {
     int result;
@@ -146,6 +114,21 @@ int sound_val2phys(int setting, int value)
     }
 
     return result;
+}
+
+/* convert tenth of dB volume (-730..60) to master volume register value */
+static int vol_tenthdb2hw(int db)
+{
+    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
+    /* 1111111 ==  +6dB (0x7f) */
+    /* 1111001 ==   0dB (0x79) */
+    /* 0110000 == -73dB (0x30) */
+    /* 0101111 ==  mute (0x2f) */
+    if (db < VOLUME_MIN) {
+        return 0x2f;
+    } else {
+        return((db/10)+0x30+73);
+    }
 }
 
 static void audiohw_mute(bool mute)
@@ -207,13 +190,11 @@ void audiohw_postinit(void)
 #endif
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
-    /* 1111111 == +6dB */
-    /* 1111001 == 0dB */
-    /* 0110000 == -73dB */
-    /* 0101111 == mute (0x2f) */
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
     wmc_write_masked(LOUTVOL, vol_l, WMC_OUT_VOL_MASK);
     wmc_write_masked(ROUTVOL, vol_r, WMC_OUT_VOL_MASK);
 }

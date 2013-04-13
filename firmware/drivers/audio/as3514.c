@@ -63,21 +63,6 @@
 
 #endif
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB",   0,   1, VOLUME_MIN/10,   6, -25},
-    /* HAVE_SW_TONE_CONTROLS */
-    [SOUND_BASS]          = {"dB",   0,   1, -24,  24,   0},
-    [SOUND_TREBLE]        = {"dB",   0,   1, -24,  24,   0},
-    [SOUND_BALANCE]       = {"%",    0,   1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",     0,   1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",    0,   5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_MIC_GAIN]      = {"dB",   1,   1,   0,  39,  23},
-    [SOUND_LEFT_GAIN]     = {"dB",   1,   1,   0,  31,  23},
-    [SOUND_RIGHT_GAIN]    = {"dB",   1,   1,   0,  31,  23},
-#endif
-};
-
 /* Shadow registers */
 static uint8_t as3514_regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
 
@@ -112,7 +97,7 @@ static void as3514_write_masked(unsigned int reg, unsigned int bits,
 }
 
 /* convert tenth of dB volume to master volume register value */
-int tenthdb2master(int db)
+static int vol_tenthdb2hw(int db)
 {
     /* +6 to -73.5dB (or -81.0 dB) in 1.5dB steps == 53 (or 58) levels */
     if (db < VOLUME_MIN) {
@@ -121,22 +106,6 @@ int tenthdb2master(int db)
         return (VOLUME_MAX-VOLUME_MIN)/15;
     } else {
         return((db-VOLUME_MIN)/15); /* VOLUME_MIN is negative */
-    }
-}
-
-int sound_val2phys(int setting, int value)
-{
-    switch(setting)
-    {
-#if defined(HAVE_RECORDING)
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN:
-    case SOUND_MIC_GAIN:
-        return (value - 23) * 15;
-#endif
-
-    default:
-        return value;
     }
 }
 
@@ -276,6 +245,9 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
     unsigned int hph_r, hph_l;
     unsigned int mix_l, mix_r;
 
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
+
     if (vol_l == 0 && vol_r == 0) {
         audiohw_mute(true);
         return;
@@ -322,12 +294,14 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 }
 
 #if 0 /* unused */
-void audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
 #ifdef HAVE_AS3543
     /* line out volume is set in the same registers */
-    audiohw_set_master_vol(vol_l, vol_r);
+    audiohw_set_master_volume(vol_l, vol_r);
 #else
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
     as3514_write_masked(AS3514_LINE_OUT_R, vol_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_LINE_OUT_L, vol_l, AS3514_VOL_MASK);
 #endif

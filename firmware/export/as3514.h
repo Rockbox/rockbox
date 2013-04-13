@@ -24,11 +24,32 @@
 
 #include "config.h"
 
-extern int tenthdb2master(int db);
+#if 0
+#define AUDIOHW_CAPS    (LINEOUT_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
+#endif
 
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
-extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern void audiohw_set_sampr_dividers(int fsel);
+#define AUDIOHW_CAPS    (LIN_GAIN_CAP | MIC_GAIN_CAP)
+
+/*different volume ranges for different AMS chips*/
+#if CONFIG_CPU == AS3525v2 
+/* Headphone volume goes from -81.0 ... +6dB */
+#define VOLUME_MIN -810
+#define VOLUME_MAX   60
+AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -82,   6, -25)
+#else /* AS3525v1 */
+/* Headphone volume goes from -73.5 ... +6dB */
+#define VOLUME_MIN -735
+#define VOLUME_MAX   60
+AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -74,   6, -25)
+#endif /* CONFIG_CPU == AS3525v2 */
+
+#ifdef HAVE_RECORDING
+AUDIOHW_SETTING(MIC_GAIN,   "dB",   1,   1,   0,  39,  23, (val - 23) * 15)
+AUDIOHW_SETTING(LEFT_GAIN,  "dB",   1,   1,   0,  31,  23, (val - 23) * 15)
+AUDIOHW_SETTING(RIGHT_GAIN, "dB",   1,   1,   0,  31,  23, (val - 23) * 15)
+#endif /* HAVE_RECORDING */
+
+void audiohw_set_sampr_dividers(int fsel);
 
 /* Register Descriptions */
 
@@ -125,16 +146,6 @@ extern void audiohw_set_sampr_dividers(int fsel);
 #define AS3514_UID_0      0x30
 #define AS3514_UID_LEN    16
 #endif
-
-/*different volume ranges for different AMS chips*/
-#if CONFIG_CPU == AS3525v2 
-/* Headphone volume goes from -81.0 ... +6dB */
-#define VOLUME_MIN -810
-#else
-/* Headphone volume goes from -73.5 ... +6dB */
-#define VOLUME_MIN -735
-#endif
-#define VOLUME_MAX   60
 
 /*** Audio Registers ***/
 

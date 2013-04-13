@@ -26,10 +26,14 @@
 
 #define VOLUME_MIN -330
 #define VOLUME_MAX   40
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS    (BASS_CAP | TREBLE_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
 
-extern int tenthdb2master(int db);
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
+AUDIOHW_SETTING(VOLUME,     "dB", 0,  1,   -34,    4, -25)
+#ifdef HAVE_RECORDING /* disabled for now */
+AUDIOHW_SETTING(LEFT_GAIN,  "dB", 2, 75, -1725, 3000,   0)
+AUDIOHW_SETTING(RIGHT_GAIN, "dB", 2, 75, -1725, 3000,   0)
+AUDIOHW_SETTING(MIC_GAIN,   "dB", 0,  1,     0,   20,  20)
+#endif /* HAVE_RECORDING */
 
 #define CODEC_I2C_ADDR 0x4e
 

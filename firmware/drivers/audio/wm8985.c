@@ -88,32 +88,12 @@
 #define OUT4MIX     0x39
 #define BIASCTL     0x3d
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -90,   6, -25},
-    [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
-#endif
-#ifdef AUDIOHW_HAVE_BASS_CUTOFF
-    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
-#endif
-#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
-    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
-#endif
-};
-
 /* shadow registers */
 static unsigned int eq1_reg;
 static unsigned int eq5_reg;
 
 /* convert tenth of dB volume (-89..6) to master volume register value */
-int tenthdb2master(int db)
+static int vol_tenthdb2hw(int db)
 {
      /* Might have no sense, taken from wm8758.c :
          att  DAC  AMP  result
@@ -216,9 +196,13 @@ void audiohw_postinit(void)
     audiohw_mute(0);
 }
 
-void audiohw_set_headphone_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
     int dac_l, amp_l, dac_r, amp_r;
+
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
+
     get_volume_params(vol_l, &dac_l, &amp_l);
     get_volume_params(vol_r, &dac_r, &amp_r);
  
@@ -232,15 +216,19 @@ void audiohw_set_headphone_vol(int vol_l, int vol_r)
     wmcodec_write(ROUT1VOL, amp_r | 0x180);
 }
 
-void audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
-     int dac_l, amp_l, dac_r, amp_r;
-     get_volume_params(vol_l, &dac_l, &amp_l);
-     get_volume_params(vol_r, &dac_r, &amp_r);
+    int dac_l, amp_l, dac_r, amp_r;
+
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
+
+    get_volume_params(vol_l, &dac_l, &amp_l);
+    get_volume_params(vol_r, &dac_r, &amp_r);
  
-     /* set lineout amp OUT2 */
-     wmcodec_write(LOUT2VOL, amp_l);
-     wmcodec_write(ROUT2VOL, amp_r | 0x100);
+    /* set lineout amp OUT2 */
+    wmcodec_write(LOUT2VOL, amp_l);
+    wmcodec_write(ROUT2VOL, amp_r | 0x100);
 }
 
 void audiohw_set_aux_vol(int vol_l, int vol_r)

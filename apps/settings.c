@@ -723,7 +723,7 @@ void settings_apply_pm_range(void)
 void sound_settings_apply(void)
 {
 #if CONFIG_CODEC == SWCODEC
-    sound_set_dsp_callback(dsp_callback);
+    audiohw_swcodec_set_callback(dsp_callback);
 #endif
 #ifdef AUDIOHW_HAVE_BASS
     sound_set(SOUND_BASS, global_settings.bass);

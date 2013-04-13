@@ -24,17 +24,6 @@
 #include <inttypes.h>
 #include <audiohw.h>
 
-
-#if CONFIG_CODEC == SWCODEC
-enum {
-    DSP_CALLBACK_SET_PRESCALE = 0,
-    DSP_CALLBACK_SET_BASS,
-    DSP_CALLBACK_SET_TREBLE,
-    DSP_CALLBACK_SET_CHANNEL_CONFIG,
-    DSP_CALLBACK_SET_STEREO_WIDTH,
-};
-#endif
-
 typedef void sound_set_type(int value);
 
 const char *sound_unit(int setting);
@@ -45,7 +34,6 @@ int sound_max(int setting);
 int sound_default(int setting);
 sound_set_type* sound_get_fn(int setting);
 
-void sound_set_dsp_callback(int (*func)(int, intptr_t));
 void sound_set_volume(int value);
 void sound_set_balance(int value);
 void sound_set_bass(int value);
@@ -130,10 +118,8 @@ void sound_set_superbass(int value);
 void sound_set(int setting, int value);
 int sound_val2phys(int setting, int value);
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 void sound_set_pitch(int32_t pitch);
 int32_t sound_get_pitch(void);
-#endif
 
 #ifdef HAVE_PITCHCONTROL
 /* precision of the pitch and speed variables */

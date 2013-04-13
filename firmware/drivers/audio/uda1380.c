@@ -40,22 +40,8 @@
 #define USE_WSPLL
 #endif
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -84,   0, -25},
-    [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
-#endif
-};
-
 /* convert tenth of dB volume (-840..0) to master volume register value */
-int tenthdb2master(int db)
+static int vol_tenthdb2hw(int db)
 {
     if (db < -720)                  /* 1.5 dB steps */
         return (2940 - db) / 15;
@@ -68,7 +54,7 @@ int tenthdb2master(int db)
 }
 
 /* convert tenth of dB volume (-780..0) to mixer volume register value */
-int tenthdb2mixer(int db)
+static int mixer_tenthdb2hw(int db)
 {
     if (db < -660)                 /* 1.5 dB steps */
         return (2640 - db) / 15;
@@ -138,19 +124,12 @@ static int uda1380_write_reg(unsigned char reg, unsigned short value)
 /**
  * Sets left and right master volume  (0(max) to 252(muted))
  */
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
     uda1380_write_reg(REG_MASTER_VOL,
-                             MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
-}
-
-/**
- * Sets mixer volume for both channels (0(max) to 228(muted))
- */
-void audiohw_set_mixer_vol(int channel1, int channel2)
-{
-    uda1380_write_reg(REG_MIX_VOL,
-                             MIX_VOL_CH_1(channel1) | MIX_VOL_CH_2(channel2));
+                      MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
 }
 
 /**
@@ -285,7 +264,9 @@ void audiohw_postinit(void)
 
 void audiohw_set_prescaler(int val)
 {
-    audiohw_set_mixer_vol(tenthdb2mixer(-val), tenthdb2mixer(-val));
+    val = mixer_tenthdb2hw(-val);
+    uda1380_write_reg(REG_MIX_VOL,
+                      MIX_VOL_CH_1(val) | MIX_VOL_CH_2(val));
 }
 
 /* Nice shutdown of UDA1380 codec */

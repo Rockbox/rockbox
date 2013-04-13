@@ -26,15 +26,22 @@
 #define VOLUME_MIN -890
 #define VOLUME_MAX  60
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | \
+                      TREBLE_CUTOFF_CAP | LINEOUT_CAP | LIN_GAIN_CAP | \
+                      MIC_GAIN_CAP)
 
-extern int tenthdb2master(int db);
-extern int tenthdb2mixer(int db);
+AUDIOHW_SETTING(VOLUME,      "dB", 0,  1, -90,   6, -25)
+AUDIOHW_SETTING(BASS,        "dB", 0,  1, -12,  12,   0)
+AUDIOHW_SETTING(TREBLE,      "dB", 0,  1, -12,  12,   0)
+AUDIOHW_SETTING(BASS_CUTOFF,   "", 0,  1,   1,   4,   1)
+AUDIOHW_SETTING(TREBLE_CUTOFF, "", 0,  1,   1,   4,   1)
+#ifdef HAVE_RECORDING
+AUDIOHW_SETTING(LEFT_GAIN,   "dB", 1,  1,   0,  63,  16, ((val - 23) * 15) / 2 + 200)
+AUDIOHW_SETTING(RIGHT_GAIN,  "dB", 1,  1,   0,  63,  16, ((val - 23) * 15) / 2 + 200)
+AUDIOHW_SETTING(MIC_GAIN,    "dB", 1,  1,   0,  63,  16, ((val - 23) * 15) / 2 + 200)
+#endif /* HAVE_RECORDING */
 
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
-extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern void audiohw_set_mixer_vol(int channel1, int channel2);
-extern void audiohw_enable_lineout(bool enable);
+void audiohw_enable_lineout(bool enable);
 
 #define RESET                   0x00
 #define RESET_RESET             0x0

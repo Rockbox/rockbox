@@ -7,8 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- *
- * Copyright (c) 2011 Andrew Ryabinin
+ * Copyright (C) 2010 by Thomas Martitz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,30 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef HOSTED_CODEC_H
+#define HOSTED_CODEC_H
 
-#include "config.h"
-#include "audio.h"
-#include "audiohw.h"
-#include "system.h"
-#include "pcm_sw_volume.h"
+#define VOLUME_MIN  -990
+#define VOLUME_MAX  0
 
-void audiohw_preinit(void) { }
+#define AUDIOHW_CAPS    (MONO_VOL_CAP)
+AUDIOHW_SETTING(VOLUME, "dB", 0, 1, -100, 0, 0)
 
-void audiohw_postinit(void) { }
-
-void audiohw_close(void) { }
-
-void audiohw_set_frequency(int fsel)
-{
-    (void)fsel;
-}
-
-#ifdef HAVE_SW_VOLUME_CONTROL
-void audiohw_set_volume(int vol_l, int vol_r)
-{
-    /* SW volume for <= 1.0 gain, HW at unity, < VOLUME_MIN == MUTE */
-    int sw_volume_l = vol_l < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_l, 0);
-    int sw_volume_r = vol_r < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_r, 0);
-    pcm_set_master_volume(sw_volume_l, sw_volume_r);
-}
-#endif /* HAVE_SW_VOLUME_CONTROL */
+#endif /* HOSTED_CODEC_H */

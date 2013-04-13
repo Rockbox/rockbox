@@ -353,7 +353,7 @@ long fp16_exp(int x)
 /** FIXED POINT EXP10
  * Return 10^x as FP integer.  Argument is FP integer.
  */
-static long fp_exp10(long x, unsigned int fracbits)
+long fp_exp10(long x, unsigned int fracbits)
 {
     long k;
     long z;

@@ -29,15 +29,25 @@
 #ifdef COWON_D2
 /* FIXME: somehow something was out of sync in the .lang, settings and caps. Keep the
  * cutoffs disabled until someone with the device works it out. */
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | LINEOUT_CAP | \
+                      LIN_GAIN_CAP | MIC_GAIN_CAP)
 #else
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | \
+                      TREBLE_CUTOFF_CAP | LINEOUT_CAP | LIN_GAIN_CAP | \
+                      MIC_GAIN_CAP)
+AUDIOHW_SETTING(BASS_CUTOFF,   "",  0,  1,   1,   4,   1)
+AUDIOHW_SETTING(TREBLE_CUTOFF, "",  0,  1,   1,   4,   1)
 #endif
 
-extern int tenthdb2master(int db);
+AUDIOHW_SETTING(VOLUME,      "dB",  0,  1, -90,   6, -25)
+AUDIOHW_SETTING(BASS,        "dB",  0,  1, -12,  12,   0)
+AUDIOHW_SETTING(TREBLE,      "dB",  0,  1, -12,  12,   0)
+#ifdef HAVE_RECORDING
+AUDIOHW_SETTING(LEFT_GAIN,   "dB",  1,  1,-128,  96,   0)
+AUDIOHW_SETTING(RIGHT_GAIN,  "dB",  1,  1,-128,  96,   0)
+AUDIOHW_SETTING(MIC_GAIN,    "dB",  1,  1,-128, 108,  16)
+#endif /* HAVE_RECORDING */
 
-extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
-extern void audiohw_set_lineout_vol(int vol_l, int vol_r);
-extern void audiohw_set_aux_vol(int vol_l, int vol_r);
+void audiohw_set_aux_vol(int vol_l, int vol_r);
 
 #endif /* _WM8985_H */

@@ -35,38 +35,6 @@
 #endif
 #include <string.h>
 
-/** Firmware callback interface **/
-
-/* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
- * code directly. */
-int dsp_callback(int msg, intptr_t param)
-{
-    switch (msg)
-    {
-#ifdef HAVE_SW_TONE_CONTROLS
-    case DSP_CALLBACK_SET_PRESCALE:
-        tone_set_prescale(param);
-        break;
-    case DSP_CALLBACK_SET_BASS:
-        tone_set_bass(param);
-        break;
-    case DSP_CALLBACK_SET_TREBLE:
-        tone_set_treble(param);
-        break;
-#endif /* HAVE_SW_TONE_CONTROLS */
-    case DSP_CALLBACK_SET_CHANNEL_CONFIG:
-        channel_mode_set_config(param);
-        break;
-    case DSP_CALLBACK_SET_STEREO_WIDTH:
-        channel_mode_custom_set_width(param);
-        break;
-    default:
-        break;
-    }
-
-    return 0;
-}
-
 /** Replaygain settings **/
 static struct replaygain_settings current_settings;
 static struct dsp_replay_gains current_gains;
@@ -153,12 +121,7 @@ static void dsp_pitch_update(struct dsp_config *dsp)
         (int64_t)pitch_ratio * data->format.codec_frequency / PITCH_SPEED_100;
 }
 
-int32_t sound_get_pitch(void)
-{
-    return pitch_ratio;
-}
-
-void sound_set_pitch(int32_t percent)
+static void dsp_set_pitch(int32_t percent)
 {
     pitch_ratio = percent > 0 ? percent : PITCH_SPEED_100;
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
@@ -166,6 +129,50 @@ void sound_set_pitch(int32_t percent)
     dsp_configure(dsp, DSP_SWITCH_FREQUENCY, data->format.codec_frequency);
 }
 #endif /* HAVE_PITCHCONTROL */
+
+
+/** Firmware callback interface **/
+
+/* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
+ * code directly. */
+int dsp_callback(int msg, intptr_t param)
+{
+    int retval = 0;
+
+    switch (msg)
+    {
+#ifdef HAVE_SW_TONE_CONTROLS
+    case DSP_CALLBACK_SET_PRESCALE:
+        tone_set_prescale(param);
+        break;
+    case DSP_CALLBACK_SET_BASS:
+        tone_set_bass(param);
+        break;
+    case DSP_CALLBACK_SET_TREBLE:
+        tone_set_treble(param);
+        break;
+#endif /* HAVE_SW_TONE_CONTROLS */
+    case DSP_CALLBACK_SET_CHANNEL_CONFIG:
+        channel_mode_set_config(param);
+        break;
+    case DSP_CALLBACK_SET_STEREO_WIDTH:
+        channel_mode_custom_set_width(param);
+        break;
+#ifdef HAVE_PITCHCONTROL
+    case DSP_CALLBACK_SET_PITCH:
+        dsp_set_pitch(param);
+        break;
+    case DSP_CALLBACK_GET_PITCH:
+        retval = pitch_ratio;
+        break;
+#endif /* HAVE_PITCHCONTROL */
+    default:
+        break;
+    }
+
+    return retval;
+}
+
 
 /* This is a null-processing stage that monitors as an enabled stage but never
  * becomes active in processing samples. It only hooks messages. */

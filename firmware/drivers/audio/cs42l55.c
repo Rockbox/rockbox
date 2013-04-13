@@ -29,27 +29,15 @@
 #include "cscodec.h"
 #include "cs42l55.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -60,  12, -25},
-    [SOUND_BASS]          = {"dB", 1, 15,-105, 120,   0},
-    [SOUND_TREBLE]        = {"dB", 1, 15,-105, 120,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   2},
-    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
-};
-
 static int bass, treble;
 
-/* convert tenth of dB volume (-600..120) to master volume register value */
-int tenthdb2master(int db)
+/* convert tenth of dB volume (-600..120) to volume register value */
+static int vol_tenthdb2hw(int db)
 {
     /* -60dB to +12dB in 1dB steps */
     /* 0001100 == +12dB (0xc) */
     /* 0000000 == 0dB   (0x0) */
     /* 1000100 == -60dB (0x44, this is actually -58dB) */
-
     if (db < VOLUME_MIN) return HPACTL_HPAMUTE;
     return (db / 10) & HPACTL_HPAVOL_MASK;
 }
@@ -125,11 +113,8 @@ void audiohw_postinit(void)
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
-    /* -60dB to +12dB in 1dB steps */
-    /* 0001100 == +12dB (0xc) */
-    /* 0000000 == 0dB   (0x0) */
-    /* 1000100 == -60dB (0x44, this is actually -58dB) */
-
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
     cscodec_setbits(HPACTL, HPACTL_HPAVOL_MASK | HPACTL_HPAMUTE,
                     vol_l << HPACTL_HPAVOL_SHIFT);
     cscodec_setbits(HPBCTL, HPBCTL_HPBVOL_MASK | HPBCTL_HPBMUTE,
@@ -138,11 +123,8 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
 
 void audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
-    /* -60dB to +12dB in 1dB steps */
-    /* 0001100 == +12dB (0xc) */
-    /* 0000000 == 0dB   (0x0) */
-    /* 1000100 == -60dB (0x44, this is actually -58dB) */
-
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
     cscodec_setbits(LINEACTL, LINEACTL_LINEAVOL_MASK | LINEACTL_LINEAMUTE,
                     vol_l << LINEACTL_LINEAVOL_SHIFT);
     cscodec_setbits(LINEBCTL, LINEBCTL_LINEBVOL_MASK | LINEBCTL_LINEBMUTE,

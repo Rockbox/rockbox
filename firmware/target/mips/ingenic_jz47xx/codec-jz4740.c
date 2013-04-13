@@ -26,30 +26,6 @@
 #include "system.h"
 #include "pcm_sw_volume.h"
 
-/* TODO */
-const struct sound_settings_info audiohw_settings[] = {
-#ifdef HAVE_SW_VOLUME_CONTROL
-    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25},
-#else
-    [SOUND_VOLUME]        = {"dB", 0,  1,   0,   6,   0},
-#endif
-    /* HAVE_SW_TONE_CONTROLS */
-#ifdef AUDIOHW_HAVE_BASS
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
-#endif
-#ifdef AUDIOHW_HAVE_TREBLE
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-#endif
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   1},
-#endif
-};
-
 #if 0
 static unsigned short codec_volume;
 static unsigned short codec_base_gain;

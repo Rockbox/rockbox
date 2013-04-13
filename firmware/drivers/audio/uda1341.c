@@ -28,23 +28,8 @@
 
 #include "audiohw.h"
 
-
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -84,   0, -25},
-    [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},   /* not used */
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},   /* not used */
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},   /* not used */
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
-#endif
-};
-
-/* convert tenth of dB volume (-600..0) to master volume register value */
-int tenthdb2master(int db)
+/* convert tenth of dB volume (-600..0) to volume register value */
+static int vol_tenthdb2hw(int db)
 {
     if (db < -600) 
         return 63;
@@ -229,11 +214,12 @@ void audiohw_set_prescaler(int val)
 #endif /* AUDIOHW_HAVE_PRESCALER */
 
 /**
- * Sets left and right master volume  (1(max) to 62(muted))
+ * Set master volume  (1(max) to 62(muted))
  */
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int volume)
 {
-    uda_regs[UDA_REG_ID_CTRL0] = (vol_l + vol_r) / 2;
+    volume = vol_tenthdb2hw(volume) / 2;
+    uda_regs[UDA_REG_ID_CTRL0] = volume;
     udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL0 | uda_regs[UDA_REG_ID_CTRL0]);
 }
 

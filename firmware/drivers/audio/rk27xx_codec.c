@@ -27,21 +27,6 @@
 #include "system.h"
 #include "i2c-rk27xx.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -34,   4, -25},
-    /* HAVE_SW_TONE_CONTROLS */
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING /* disabled for now */
-    [SOUND_LEFT_GAIN]     = {"dB", 2,  75, -1725, 3000, 0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 2,  75, -1725, 3000, 0},
-    [SOUND_MIC_GAIN]      = {"dB", 0,   1,  0,  20,  20},
-#endif
-};
-
 /* private functions to read/write codec registers */
 static int codec_write(uint8_t reg, uint8_t val)
 {
@@ -66,7 +51,7 @@ static void audiohw_mute(bool mute)
 }
 
 /* public functions */
-int tenthdb2master(int tdb)
+static int vol_tenthdb2hw(int tdb)
 {
     /* we lie here a bit and present 0.5dB gain steps
      * but codec has 'variable' gain steps (0.5, 1.0, 2.0)
@@ -150,6 +135,8 @@ void audiohw_set_frequency(int fsel)
 
 void audiohw_set_master_vol(int vol_l, int vol_r)
 {
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
 
     if (vol_l > 31 || vol_r > 31)
     {

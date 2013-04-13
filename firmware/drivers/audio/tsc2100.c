@@ -29,18 +29,9 @@
 #include "sound.h"
 #include "tsc2100.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB",   0,   1, VOLUME_MIN/10, VOLUME_MAX/10, -25},
-    /* HAVE_SW_TONE_CONTROLS */
-    [SOUND_BASS]          = {"dB",   0,   1, -24,  24,   0},
-    [SOUND_TREBLE]        = {"dB",   0,   1, -24,  24,   0},
-    [SOUND_BALANCE]       = {"%",    0,   1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",     0,   1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",    0,   5,   0, 250, 100},
-};
 static bool is_muted = false;
-/* convert tenth of dB volume to master volume register value */
-int tenthdb2master(int db)
+/* convert tenth of dB volume to volume register value */
+static int vol_tenthdb2hw(int db)
 {
     /* 0 to -63.0dB in 1dB steps, tsc2100 can goto -63.5 in 0.5dB steps */
     if (db < VOLUME_MIN) {
@@ -50,27 +41,6 @@ int tenthdb2master(int db)
     } else {
         return(-((db)/5)); /* VOLUME_MIN is negative */
     }
-}
-
-int sound_val2phys(int setting, int value)
-{
-    int result;
-
-    switch(setting)
-    {
-#if 0
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN:
-    case SOUND_MIC_GAIN:
-        result = (value - 23) * 15;
-        break;
-#endif
-    default:
-        result = value;
-        break;
-    }
-
-    return result;
 }
 
 void audiohw_init(void)
@@ -104,9 +74,12 @@ void audiohw_postinit(void)
     audiohw_mute(false);
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_master_volume(int vol_l, int vol_r)
 {
-   tsc2100_writereg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS, (short)((vol_l<<8) | vol_r) );
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
+    tsc2100_writereg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS,
+                     (short)((vol_l<<8) | vol_r) );
 }
 
 void audiohw_close(void)

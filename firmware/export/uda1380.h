@@ -26,13 +26,18 @@
 #define VOLUME_MIN -840
 #define VOLUME_MAX  0
 
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
+                      LIN_GAIN_CAP | MIC_GAIN_CAP)
 
-extern int tenthdb2master(int db);
-extern int tenthdb2mixer(int db);
-
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
-extern void audiohw_set_mixer_vol(int channel1, int channel2);
+AUDIOHW_SETTING(VOLUME,     "dB", 0,  1, -85,   0, -25)
+AUDIOHW_SETTING(BASS,       "dB", 0,  2,   0,  24,   0)
+AUDIOHW_SETTING(TREBLE,     "dB", 0,  2,   0,   6,   0)
+#ifdef HAVE_RECORDING
+ /* (1/2) * 10 */
+AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1,  1,-128,  96,   0, val * 5)
+AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1,  1,-128,  96,   0, val * 5)
+AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,  1,-128, 108,  16, val * 5)
+#endif /* HAVE_RECORDING */
 
 #define UDA1380_ADDR        0x30
 

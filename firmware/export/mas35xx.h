@@ -39,6 +39,14 @@
 
 #if CONFIG_CODEC == MAS3507D
 
+#define VOLUME_MIN -780
+#define VOLUME_MAX  180
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
+
+AUDIOHW_SETTING(SOUND_VOLUME, "dB", 0,  1, -78,  18, -18)
+AUDIOHW_SETTING(SOUND_BASS,   "dB", 0,  1, -15,  15,   7)
+AUDIOHW_SETTING(SOUND_TREBLE, "dB", 0,  1, -15,  15,   7)
+
 /* I2C defines */
 #define MAS_ADR         0x3a
 #define MAS_DEV_WRITE   (MAS_ADR | 0x00)
@@ -70,10 +78,6 @@
 #define MAS_D0_OUT_LR            0x7f9
 #define MAS_D0_OUT_RL            0x7fa
 #define MAS_D0_OUT_RR            0x7fb
-
-#define VOLUME_MIN -780
-#define VOLUME_MAX  180
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
 
 static const unsigned int bass_table[] =
 {
@@ -167,6 +171,36 @@ static const unsigned int prescale_table[] =
 
 #else /* CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F */
 
+#define VOLUME_MIN -400
+#define VOLUME_MAX  600
+
+AUDIOHW_SETTING(VOLUME,       "dB",  0,  1,-100,  12, -25)
+AUDIOHW_SETTING(BASS,         "dB",  0,  1, -12,  12,   6)
+AUDIOHW_SETTING(TREBLE,       "dB",  0,  1, -12,  12,   6)
+AUDIOHW_SETTING(LOUDNESS,     "dB",  0,  1,   0,  17,   0)
+AUDIOHW_SETTING(AVC             "",  0,  1,  -1,   4,   0)
+AUDIOHW_SETTING(MDB_STRENGTH, "dB",  0,  1,   0, 127,  48)
+AUDIOHW_SETTING(MDB_HARMONICS, "%",  0,  1,   0, 100,  50)
+AUDIOHW_SETTING(MDB_CENTER    "Hz",  0, 10,  20, 300,  60)
+AUDIOHW_SETTING(MDB_SHAPE     "Hz",  0, 10,  50, 300,  90)
+AUDIOHW_SETTING(MDB_ENABLE      "",  0,  1,   0,   1,   0)
+AUDIOHW_SETTING(SUPERBASS       "",  0,  1,   0,   1,   0)
+
+#if CONFIG_CODEC == MAS3587F && defined(HAVE_RECORDING)
+/* MAS3587F and MAS3539F handle clipping prevention internally so we do not
+ * need the prescaler -> CLIPPING_CAP */
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BALANCE_CAP | CLIPPING_CAP | \
+                      MONO_VOL_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
+AUDIOHW_SETTING(LEFT_GAIN,    "dB",  1,  1,   0,  15,   8, (val - 2) * 15)
+AUDIOHW_SETTING(RIGHT_GAIN,   "dB",  1,  1,   0,  15,   8, (val - 2) * 15)
+AUDIOHW_SETTING(MIC_GAIN,     "dB",  1,  1,   0,  15,   2, val * 15 + 210)
+#else
+/* MAS3587F and MAS3539F handle clipping prevention internally so we do not
+ * need the prescaler -> CLIPPING_CAP */
+#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BALANCE_CAP | CLIPPING_CAP | \
+                      MONO_VOL_CAP)
+#endif /* MAS3587F && HAVE_RECORDING */
+
 /* I2C defines */
 #define MAS_ADR         0x3c
 #define MAS_DEV_WRITE   (MAS_ADR | 0x00)
@@ -248,18 +282,7 @@ static const unsigned int prescale_table[] =
 #define MAS_D0_CRC_ERROR_COUNT   0xfd3
 #endif
 
-/* MAS3587F and MAS3539F handle clipping prevention internally so we do not need
- * the prescaler -> CLIPPING_CAP
- */
-
-#define VOLUME_MIN -400
-#define VOLUME_MAX  600
-#define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BALANCE_CAP | CLIPPING_CAP)
-
-#endif /* CONFIG_CODEC */
-
 /* Function prototypes */
-#if CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F
 extern void audiohw_set_loudness(int value);
 extern void audiohw_set_avc(int value);
 extern void audiohw_set_mdb_strength(int value);
@@ -269,7 +292,9 @@ extern void audiohw_set_mdb_shape(int value);
 extern void audiohw_set_mdb_enable(int value);
 extern void audiohw_set_superbass(int value);
 extern void audiohw_set_balance(int val);
-extern void audiohw_set_pitch(unsigned long val);
-#endif
+extern void audiohw_set_pitch(int32_t val);
+extern int audiohw_get_pitch(void);
+
+#endif /* CONFIG_CODEC */
 
 #endif /* _MAS35XX_H */

@@ -27,10 +27,19 @@
 #define VOLUME_MIN -1000
 #define VOLUME_MAX  60
 
-#define AUDIOHW_CAPS    (DEPTH_3D_CAP | BASS_CAP | TREBLE_CAP)
+#define AUDIOHW_CAPS    (DEPTH_3D_CAP | BASS_CAP | TREBLE_CAP | \
+                         LIN_GAIN_CAP | MIC_GAIN_CAP)
 
 /* Work with half dB since the i.MX233 doesn't have a better resolution */
-int tenthdb2master(int tdb);
-void audiohw_set_headphone_vol(int vol_l, int vol_r);
+
+/* i.MX233 has half dB steps */
+AUDIOHW_SETTING(VOLUME,     "dB", 0,   1,-101,   6, -25)
+/* HAVE_SW_TONE_CONTROLS */
+#ifdef HAVE_RECORDING
+AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1,   1,   0,  31,  23)
+AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1,   1,   0,  31,  23)
+AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,   1,   0,   1,   1)
+#endif /* HAVE_RECORDING */
+AUDIOHW_SETTING(DEPTH_3D,    "%", 0,   1,   0,  15,   0)
 
 #endif /* __IMX233_CODEC_H_ */

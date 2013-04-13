@@ -36,39 +36,6 @@
  * file it may break things. */
 extern void audiohw_enable_headphone_jack(bool enable);
 
-const struct sound_settings_info audiohw_settings[] =
-{
-    [SOUND_VOLUME]             = {"dB", 0,   1, -90,   6, -25},
-    [SOUND_BALANCE]            = {"%",  0,   1,-100, 100,   0},
-    [SOUND_CHANNELS]           = {"",   0,   1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]       = {"%",  0,   5,   0, 250, 100},
-    [SOUND_EQ_BAND1_GAIN]      = {"dB", 0,   1, -12,  12,   0},
-    [SOUND_EQ_BAND2_GAIN]      = {"dB", 0,   1, -12,  12,   0},
-    [SOUND_EQ_BAND3_GAIN]      = {"dB", 0,   1, -12,  12,   0},
-    [SOUND_EQ_BAND4_GAIN]      = {"dB", 0,   1, -12,  12,   0},
-    [SOUND_EQ_BAND5_GAIN]      = {"dB", 0,   1, -12,  12,   0},
-    [SOUND_EQ_BAND1_FREQUENCY] = {"",   0,   1,   0,   3,   0},
-    [SOUND_EQ_BAND2_FREQUENCY] = {"",   0,   1,   0,   3,   0},
-    [SOUND_EQ_BAND3_FREQUENCY] = {"",   0,   1,   0,   3,   0},
-    [SOUND_EQ_BAND4_FREQUENCY] = {"",   0,   1,   0,   3,   0},
-    [SOUND_EQ_BAND5_FREQUENCY] = {"",   0,   1,   0,   3,   0},
-    [SOUND_EQ_BAND2_WIDTH]     = {"",   0,   1,   0,   1,   0},
-    [SOUND_EQ_BAND3_WIDTH]     = {"",   0,   1,   0,   1,   0},
-    [SOUND_EQ_BAND4_WIDTH]     = {"",   0,   1,   0,   1,   0},
-    [SOUND_DEPTH_3D]           = {"%",  0,   1,   0,  15,   0},
-#ifdef HAVE_RECORDING
-    /* Digital: -119.0dB to +8.0dB in 0.5dB increments
-     * Analog:  Relegated to volume control
-     * Circumstances unfortunately do not allow a great deal of positive
-     * gain. */
-    [SOUND_LEFT_GAIN]          = {"dB", 1,   1,-238,  16,   0},
-    [SOUND_RIGHT_GAIN]         = {"dB", 1,   1,-238,  16,   0},
-#if 0
-    [SOUND_MIC_GAIN]           = {"dB", 1,   1,-238,  16,   0},
-#endif
-#endif
-};
-
 static uint16_t wmc_regs[WMC_NUM_REGISTERS] =
 {
     /* Initialized with post-reset default values - the 2-wire interface
@@ -184,9 +151,9 @@ static void wmc_write_masked(unsigned int reg, unsigned int bits,
     wmc_write(reg, (wmc_regs[reg] & ~mask) | (bits & mask));
 }
 
-/* convert tenth of dB volume (-890..60) to master volume register value
+/* convert tenth of dB volume (-890..60) to volume register value
  * (000000...111111) */
-int tenthdb2master(int db)
+static int vol_tenthdb2hw(int db)
 {
     /* -90dB to +6dB 1dB steps (96 levels) 7bits */
     /* 1100000 ==  +6dB  (0x60,96)               */
@@ -194,7 +161,7 @@ int tenthdb2master(int db)
     /* 1000001 == -57dB  (0x21,33,DAC)           */
     /* 0000001 == -89dB  (0x01,01)               */
     /* 0000000 == -90dB  (0x00,00,Mute)          */
-    if (db <= VOLUME_MIN)
+    if (db < VOLUME_MIN)
     {
         return 0x0;
     }
@@ -202,39 +169,6 @@ int tenthdb2master(int db)
     {
         return (db - VOLUME_MIN) / 10;
     }
-}
-
-int sound_val2phys(int setting, int value)
-{
-    int result;
-
-    switch (setting)
-    {
-#ifdef HAVE_RECORDING
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN:
-    case SOUND_MIC_GAIN:
-        result = value * 5;
-        break;
-#endif
-
-    case SOUND_EQ_BAND1_GAIN+0x10000:
-    case SOUND_EQ_BAND2_GAIN+0x10000:
-    case SOUND_EQ_BAND3_GAIN+0x10000:
-    case SOUND_EQ_BAND4_GAIN+0x10000:
-    case SOUND_EQ_BAND5_GAIN+0x10000:
-        result = value * 10;
-        break;
-
-    case SOUND_DEPTH_3D:
-        result = (100 * value + 8) / 15;
-        break;
-
-    default:
-        result = value;
-    }
-
-    return result;
 }
 
 void audiohw_preinit(void)
@@ -350,12 +284,15 @@ static void sync_prescaler(void)
                      WMC_DVOL);
 }
 
-void audiohw_set_headphone_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
     int prev_l = wmc_vol.vol_l;
     int prev_r = wmc_vol.vol_r;
     int dac_l, dac_r, hp_l, hp_r;
     int mix_l, mix_r, boost_l, boost_r;
+
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
 
     wmc_vol.vol_l = vol_l;
     wmc_vol.vol_r = vol_r;

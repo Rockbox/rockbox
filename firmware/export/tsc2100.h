@@ -21,6 +21,12 @@
 #ifndef __TSC2100_H_
 #define __TSC2100_H_
 
+/* volume/balance/treble/bass interdependency */
+#define VOLUME_MIN -630
+#define VOLUME_MAX 0
+
+AUDIOHW_SETTING(VOLUME, "dB", 0, 1, -64, 0, -25)
+
 void tsc2100_read_data(void);
 bool tsc2100_read_touch(short *x, short* y, short *z1, short *z2);
 bool tsc2100_read_volt(short *bat1, short *bat2, short *aux);
@@ -138,8 +144,5 @@ void tsc2100_keyclick(void);
 /* ts audio control 5 */
 #define TSAC5_PAGE          2
 #define TSAC5_ADDRESS       0x1e
-
-extern int tenthdb2master(int db);
-extern void audiohw_set_master_vol(int vol_l, int vol_r);
 
 #endif

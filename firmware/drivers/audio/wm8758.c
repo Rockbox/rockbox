@@ -33,22 +33,6 @@
 #include "audiohw.h"
 #include "sound.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -90,   6, -25},
-    [SOUND_BASS]          = {"dB", 0,  1, -12,  12,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -12,  12,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  63,  16},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  63,  16},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,  63,  16},
-#endif
-    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
-    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
-};
-
 /* shadow registers */
 static unsigned short eq1_reg = EQ1_EQ3DMODE | EQ_GAIN_VALUE(0);
 static unsigned short eq5_reg = EQ_GAIN_VALUE(0);
@@ -94,27 +78,6 @@ static void get_volume_params(int db, int *dac, int *amp)
         *dac = 0x00;
         *amp = 0x40;
     }
-}
-
-int sound_val2phys(int setting, int value)
-{
-    int result;
-
-    switch(setting)
-    {
-#ifdef HAVE_RECORDING
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN:
-    case SOUND_MIC_GAIN:
-        result = ((value - 16) * 15) / 2;
-        break;
-#endif
-    default:
-        result = value;
-        break;
-    }
-
-    return result;
 }
 
 static void audiohw_mute(bool mute)
