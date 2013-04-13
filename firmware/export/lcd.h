@@ -497,8 +497,6 @@ extern int  lcd_get_drawmode(void);
 extern void lcd_setfont(int font);
 extern int lcd_getfont(void);
 
-extern void lcd_puts_style_offset(int x, int y, const unsigned char *str,
-                                  int style, int x_offset);
 extern void lcd_puts_style_xyoffset(int x, int y, const unsigned char *str,
                                   int style, int x_offset, int y_offset);
 extern void lcd_puts_scroll_style_xyoffset(int x, int y, const unsigned char *string,
