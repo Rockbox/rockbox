@@ -268,8 +268,6 @@ struct plugin_api {
                             int width, int height);
     void (*lcd_pal256_update_pal)(fb_data *palette);
 #endif
-    void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
-                                  int style);
 #ifdef HAVE_LCD_INVERT
     void (*lcd_set_invert_display)(bool yesno);
 #endif /* HAVE_LCD_INVERT */
@@ -345,8 +343,6 @@ struct plugin_api {
     void (*lcd_remote_mono_bitmap)(const unsigned char *src, int x, int y,
                                    int width, int height);
     void (*lcd_remote_putsxy)(int x, int y, const unsigned char *string);
-    void (*lcd_remote_puts_scroll_style)(int x, int y, const unsigned char* string,
-                                         int style);
     fb_remote_data* lcd_remote_framebuffer;
     void (*lcd_remote_update)(void);
     void (*lcd_remote_update_rect)(int x, int y, int width, int height);
