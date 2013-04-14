@@ -25,7 +25,7 @@
 #ifdef HAVE_REMOTE_LCD
 #include <lcd-remote.h>
 #endif
-#include <scroll_engine.h>
+#include "scroll_engine.h"
 #include <font.h>
 #include <button.h>
 #include <settings.h>
@@ -243,6 +243,7 @@ struct screen screens[NB_SCREENS] =
         .puts_offset=&lcd_puts_offset,
         .puts_scroll=&lcd_puts_scroll,
         .puts_scroll_offset=&lcd_puts_scroll_offset,
+        .putsxy_scroll_func=&lcd_putsxy_scroll_func,
         .scroll_speed=&lcd_scroll_speed,
         .scroll_delay=&lcd_scroll_delay,
         .clear_display=&lcd_clear_display,
@@ -344,6 +345,7 @@ struct screen screens[NB_SCREENS] =
         .puts_offset=&lcd_remote_puts_offset,
         .puts_scroll=&lcd_remote_puts_scroll,
         .puts_scroll_offset=&lcd_remote_puts_scroll_offset,
+        .putsxy_scroll_func=&lcd_remote_putsxy_scroll_func,
         .scroll_speed=&lcd_remote_scroll_speed,
         .scroll_delay=&lcd_remote_scroll_delay,
         .clear_display=&lcd_remote_clear_display,
