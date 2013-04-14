@@ -445,7 +445,7 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
 
 /*** Line oriented text output ***/
 
-void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
+static void LCDFN(putsofs_style)(int x, int y, const unsigned char *str,
                               int style, int x_offset, int y_offset)
 {
     int xpos, ypos, h;
@@ -469,7 +469,7 @@ void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
 
 void LCDFN(puts)(int x, int y, const unsigned char *str)
 {
-    LCDFN(puts_style_xyoffset)(x, y, str, STYLE_DEFAULT, 0, 0);
+    LCDFN(putsofs_style)(x, y, str, STYLE_DEFAULT, 0, 0);
 }
 
 /* Formatting version of LCDFN(puts) */
@@ -581,13 +581,6 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
         s->vp = current_vp;
         LCDFN(scroll_info).lines++;
     }
-}
-
-void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string,
-                                     int style, int x_offset, int y_offset)
-{
-    LCDFN(puts_scroll_worker)(x, y, string, style, x_offset, y_offset,
-                              true, LCDFN(scroll_fn), NULL);
 }
 
 void LCDFN(putsxy_scroll_func)(int x, int y, const unsigned char *string,
