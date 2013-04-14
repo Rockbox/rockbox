@@ -529,6 +529,8 @@ extern void lcd_drawrect(int x, int y, int width, int height);
 extern void lcd_fillrect(int x, int y, int width, int height);
 extern void lcd_gradient_fillrect(int x, int y, int width, int height,
         unsigned start_rgb, unsigned end_rgb);
+extern void lcd_gradient_fillrect_part(int x, int y, int width, int height,
+        unsigned start_rgb, unsigned end_rgb, int src_height, int row_skip);
 extern void lcd_draw_border_viewport(void);
 extern void lcd_fill_viewport(void);
 extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
