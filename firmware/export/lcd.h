@@ -495,11 +495,6 @@ extern int  lcd_get_drawmode(void);
 extern void lcd_setfont(int font);
 extern int lcd_getfont(void);
 
-extern void lcd_puts_style_xyoffset(int x, int y, const unsigned char *str,
-                                  int style, int x_offset, int y_offset);
-extern void lcd_puts_scroll_style_xyoffset(int x, int y, const unsigned char *string,
-                                  int style, int x_offset, int y_offset);
-
 /* low level drawing function pointer arrays */
 #if LCD_DEPTH >= 8
 extern lcd_fastpixelfunc_type* const *lcd_fastpixelfuncs;
