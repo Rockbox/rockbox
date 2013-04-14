@@ -112,6 +112,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "timefuncs.h"
 #include "crc32.h"
 #include "rbpaths.h"
+#include "screen_access.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
