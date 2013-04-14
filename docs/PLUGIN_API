@@ -1102,15 +1102,6 @@ void lcd_puts_scroll(int x, int y, const unsigned char* string)
     \param string
     \description Puts scrolling string on the LCD at row =x= and column =y=. The scrolling style is STYLE_DEFAULT.
 
-void lcd_puts_scroll_style(int x, int y, const unsigned char* string, int style)
-    \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
-    \param x Row X
-    \param y Column Y
-    \param string
-    \param style can be STYLE_DEFAULT for black text display or STYLE_INVERT for white text display
-    \description Put a string at row =x= and column =y=, the text scrolls if necessary
-
 void lcd_put_cursor(int x, int y, unsigned long ucs)
     \group lcd
     \conditions (defined(HAVE_LCD_CHARCELLS))
@@ -1264,15 +1255,6 @@ void lcd_remote_puts_scroll(int x, int y, const unsigned char* string)
     \param x
     \param y
     \param string
-    \description
-
-void lcd_remote_puts_scroll_style(int x, int y, const unsigned char* string, int style)
-    \group remote lcd
-    \conditions (defined(HAVE_REMOTE_LCD))
-    \param x
-    \param y
-    \param string
-    \param style
     \description
 
 void lcd_remote_puts_style(int x, int y, const unsigned char *str, int style)

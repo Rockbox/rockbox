@@ -200,7 +200,6 @@ static const struct plugin_api rockbox_api = {
     lcd_blit_pal256,
     lcd_pal256_update_pal,
 #endif
-    lcd_puts_scroll_style,
 #ifdef HAVE_LCD_INVERT
     lcd_set_invert_display,
 #endif /* HAVE_LCD_INVERT */
@@ -259,7 +258,6 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_mono_bitmap_part,
     lcd_remote_mono_bitmap,
     lcd_remote_putsxy,
-    lcd_remote_puts_scroll_style,
     &lcd_remote_static_framebuffer[0][0],
     lcd_remote_update,
     lcd_remote_update_rect,
