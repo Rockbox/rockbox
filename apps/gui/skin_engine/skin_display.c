@@ -40,6 +40,7 @@
 #include "settings.h"
 #include "scrollbar.h"
 #include "screen_access.h"
+#include "line.h"
 #include "playlist.h"
 #include "audio.h"
 #include "tagcache.h"
@@ -405,6 +406,7 @@ void write_line(struct screen *display, struct align_pos *format_align,
     int string_height;
     int scroll_width;
     int viewport_width = display->getwidth();
+    static struct line_desc linedes = LINE_DESC_DEFINIT;
 
     /* calculate different string sizes and positions */
     display->getstringsize((unsigned char *)" ", &space_width, &string_height);
@@ -507,20 +509,18 @@ void write_line(struct screen *display, struct align_pos *format_align,
         right_width = 0;
     }
 
+    linedes.style = style;
+
     if (scroll && ((left_width > scroll_width) ||
                    (center_width > scroll_width) ||
                    (right_width > scroll_width)))
     {
-#ifdef HAVE_LCD_BITMAP
-        display->puts_scroll_style(0, line,
-                             (unsigned char *)format_align->left, style);
-#else
-        display->puts_scroll(0, line,
-                             (unsigned char *)format_align->left);
-#endif
+        linedes.scroll = true;
+        display->put_line(0, line * string_height, &linedes, (unsigned char *)format_align->left);
     }
     else
     {
+        linedes.scroll = false;
 #ifdef HAVE_LCD_BITMAP
         /* clear the line first */
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -532,42 +532,19 @@ void write_line(struct screen *display, struct align_pos *format_align,
         which will reset the scroller for that line */
         display->puts_scroll(0, line, (unsigned char *)"");
 #ifdef HAVE_LCD_BITMAP
-        style |= STYLE_XY_PIXELS;
         line *= string_height;
+        center_xpos = (viewport_width-center_width)/2;
+        right_xpos = viewport_width-right_width;
+#endif
         /* print aligned strings */
         if (left_width != 0)
-        {
-            display->puts_style_xyoffset(0, line,
-                            (unsigned char *)format_align->left, style, 0, 0);
+            display->put_line(0, line, &linedes, format_align->left);
 
-        }
         if (center_width != 0)
-        {
-            display->puts_style_xyoffset((viewport_width-center_width)/2, line,
-                            (unsigned char *)format_align->center, style, 0, 0);
-        }
+            display->put_line(center_xpos, line, &linedes, format_align->center);
+
         if (right_width != 0)
-        {
-            display->puts_style_xyoffset(viewport_width-right_width, line,
-                            (unsigned char *)format_align->right, style, 0, 0);
-        }
-#else
-        if (left_width != 0)
-        {
-            display->putsxy(0, line,
-                    (unsigned char *)format_align->left);
-        }
-        if (center_width != 0)
-        {
-            display->putsxy(center_xpos, line,
-                    (unsigned char *)format_align->center);
-        }
-        if (right_width != 0)
-        {
-            display->putsxy(right_xpos, line,
-                    (unsigned char *)format_align->right);
-        }
-#endif
+            display->put_line(right_xpos, line, &linedes, format_align->right);
     }
 }
 
