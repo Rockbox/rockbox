@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///VQ\u003d",
+        "filename": "firmware/drivers/lcd-bitmap-common.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-14T23:46:57Z",
+      "side": 1,
+      "message": "It\u0027s used in the function below lcd_puts_scroll_worker(). It\u0027ll find a scrolling line if it was created at the same position, i.e. if the same x and ywhere passed to the lcd_puts_scroll* call. It should still serve its purpose (to change the text of a previously scrolling line) reliably.",
+      "parentUuid": "AAAASX///Vk\u003d",
+      "revId": "e1ee73a8b56d287e868a9d970c43df7808649a09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///Vg\u003d",
         "filename": "firmware/drivers/lcd-scroll.c",
         "patchSetId": 1
