@@ -108,6 +108,8 @@ enum screen_type {
 #endif
 };
 
+struct scrollinfo;
+
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define STRIDE_MAIN(w, h)   (h)
 #else
@@ -212,6 +214,9 @@ extern void lcd_putc(int x, int y, unsigned long ucs);
 extern void lcd_puts_scroll(int x, int y, const unsigned char* string);
 extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);
+extern void lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
+                                   void (*scroll_func)(struct scrollinfo *),
+                                   void *data, int x_offset);
 
 #ifdef HAVE_LCD_BITMAP
 

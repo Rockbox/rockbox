@@ -573,6 +573,17 @@ void LCDFN(puts_scroll_style_xyoffset)(int x, int y, const unsigned char *string
                               true, LCDFN(scroll_fn), NULL);
 }
 
+void LCDFN(putsxy_scroll_func)(int x, int y, const unsigned char *string,
+                                     void (*scroll_func)(struct scrollinfo *),
+                                     void *data, int x_offset)
+{
+    if (!scroll_func)
+        LCDFN(putsxyofs)(x, y, x_offset, string);
+    else
+        LCDFN(puts_scroll_worker)(x, y, string, STYLE_NONE, x_offset, 0,
+                              false, scroll_func, data);
+}
+
 void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 {
     LCDFN(puts_scroll_style)(x, y, string, STYLE_DEFAULT);
