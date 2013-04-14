@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///Vk\u003d",
+        "filename": "firmware/drivers/lcd-bitmap-common.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2013-04-14T23:31:25Z",
+      "side": 1,
+      "message": "where is this used? This doesn\u0027t look like it will be reliable anymore",
+      "revId": "e1ee73a8b56d287e868a9d970c43df7808649a09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Vg\u003d",
+        "filename": "firmware/drivers/lcd-scroll.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2013-04-14T23:31:25Z",
+      "side": 1,
+      "message": "yuck, whitespace",
+      "revId": "e1ee73a8b56d287e868a9d970c43df7808649a09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
