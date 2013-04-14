@@ -73,6 +73,7 @@ gui/buttonbar.c
 gui/icon.c
 #endif
 gui/list.c
+gui/line.c
 #ifdef HAVE_LCD_BITMAP
 gui/bitmap/list.c
 gui/bitmap/list-skinned.c
