@@ -147,7 +147,7 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
             /* If the width offset was 0, use a scrolling puts, else center and
              *  print the title.
              */
-            lcd->puts_scroll_style(0, 0, data[i].title, STYLE_DEFAULT);
+            lcd->puts_scroll(0, 0, data[i].title);
             /* Draw bounding box around the button location. */
             lcd->draw_border_viewport();
         }
