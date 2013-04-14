@@ -603,13 +603,8 @@ void LCDFN(putsxy_scroll_func)(int x, int y, const unsigned char *string,
 
 void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 {
-    LCDFN(puts_scroll_style)(x, y, string, STYLE_DEFAULT);
-}
-
-void LCDFN(puts_scroll_style)(int x, int y, const unsigned char *string,
-                              int style)
-{
-     LCDFN(puts_scroll_style_xyoffset)(x, y, string, style, 0, 0);
+    LCDFN(puts_scroll_worker)(x, y, string, STYLE_DEFAULT, 0, 0,
+                              true, LCDFN(scroll_fn), NULL);
 }
 
 #if !defined(HAVE_LCD_COLOR) || !defined(MAIN_LCD)
