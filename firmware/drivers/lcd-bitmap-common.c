@@ -41,8 +41,21 @@
 #endif
 
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
-void lcd_gradient_fillrect(int x, int y, int width, int height,
-        unsigned start_rgb, unsigned end_rgb)
+/* Fill a rectangle with a gradient. This function draws only the partial
+ * gradient. It assumes the original gradient is src_height high and skips
+ * the first few rows. This is useful for drawing only the bottom half of
+ * a full gradient.
+ *
+ * height == src_height and row_skip == 0 will draw the full gradient
+ *
+ * x, y, width, height - dimensions describing the rectangle
+ * start_rgb - beginning color of the gradient
+ * end_rgb - end color of the gradient
+ * src_height - assumed original height (only height rows will be drawn)
+ * row_skip - how many rows of the original gradient to skip
+ */
+void lcd_gradient_fillrect_part(int x, int y, int width, int height,
+        unsigned start_rgb, unsigned end_rgb, int src_height, int row_skip)
 {
     int old_pattern = current_vp->fg_pattern;
     int step_mul, i;
@@ -52,7 +65,7 @@ void lcd_gradient_fillrect(int x, int y, int width, int height,
     
     if (height == 0) return;
 
-    step_mul = (1 << 16) / height;
+    step_mul = (1 << 16) / src_height;
     int h_r = RGB_UNPACK_RED(start_rgb);
     int h_g = RGB_UNPACK_GREEN(start_rgb);
     int h_b = RGB_UNPACK_BLUE(start_rgb);
@@ -63,6 +76,13 @@ void lcd_gradient_fillrect(int x, int y, int width, int height,
     h_g = (h_g << 16) + (1 << 15);
     h_b = (h_b << 16) + (1 << 15);
 
+    if (row_skip > 0)
+    {
+        h_r -= rstep * row_skip;
+        h_g -= gstep * row_skip;
+        h_b -= bstep * row_skip;
+    }
+
     for(i = y; i < y + height; i++) {
         current_vp->fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
         lcd_hline(x1, x2, i);
@@ -72,6 +92,19 @@ void lcd_gradient_fillrect(int x, int y, int width, int height,
     }
 
     current_vp->fg_pattern = old_pattern;
+}
+
+/* Fill a rectangle with a gradient. The gradient's color will fade from
+ * start_rgb to end_rgb over the height of the rectangle
+ *
+ * x, y, width, height - dimensions describing the rectangle
+ * start_rgb - beginning color of the gradient
+ * end_rgb - end color of the gradient
+ */
+void lcd_gradient_fillrect(int x, int y, int width, int height,
+        unsigned start_rgb, unsigned end_rgb)
+{
+    lcd_gradient_fillrect_part(x, y, width, height, start_rgb, end_rgb, height, 0);
 }
 
 /* Fill a text line with a gradient:
