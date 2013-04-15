@@ -32,7 +32,7 @@
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 extern void TIMER1(void);
 extern void TIMER2(void);
-extern void SERIAL0(void);
+extern void SERIAL_ISR(void);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
 static struct corelock cpufreq_cl SHAREDBSS_ATTR;
@@ -126,7 +126,6 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
                 button_int();
             if (GPIOD_INT_STAT & 0x80)
                 headphones_int();
-
         }
         else if (CPU_HI_INT_STAT & GPIO2_MASK) {
             if (GPIOL_INT_STAT & 0x04)
@@ -169,8 +168,8 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
 /* end PBELL_VIBE500 */
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
-        else if (CPU_HI_INT_STAT & SER0_MASK) {
-            SERIAL0();
+        else if (CPU_HI_INT_STAT & (SER0_MASK | SER1_MASK)) {
+            SERIAL_ISR();
         }
 #endif
     } else {
@@ -310,7 +309,7 @@ void set_cpu_frequency(long frequency)
 #else
 static void pp_set_cpu_frequency(long frequency)
 #endif
-{      
+{
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     corelock_lock(&cpufreq_cl);
 #endif
@@ -334,7 +333,7 @@ static void pp_set_cpu_frequency(long frequency)
         PLL_CONTROL  &= ~0x80000000; /* disable PLL */
         DEV_INIT2    &= ~INIT_PLL;   /* disable PLL power */
         break;
-        
+
       case CPUFREQ_MAX:
         cpu_frequency = CPUFREQ_MAX;
         DEV_INIT2    |= INIT_PLL;   /* enable PLL power */
@@ -379,7 +378,7 @@ static void pp_set_cpu_frequency(long frequency)
         DEV_INIT2    &= ~INIT_PLL;   /* disable PLL power */
         break;
 #else /******** CPUFREQ_NORMAL = 30MHz with PLL ********/
-    case CPUFREQ_NORMAL:
+      case CPUFREQ_NORMAL:
         cpu_frequency = CPUFREQ_NORMAL;
         DEV_INIT2    |= INIT_PLL;   /* enable PLL power */
         PLL_CONTROL  |= 0x88000000; /* enable PLL */
@@ -421,7 +420,7 @@ static void pp_set_cpu_frequency(long frequency)
         DEV_INIT2    &= ~INIT_PLL;   /* disable PLL power */
         break;
     }
-    
+
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
     corelock_unlock(&cpufreq_cl);
 #endif
@@ -447,7 +446,7 @@ void system_init(void)
         DEV_RS2        = 0xffffdfff;
         DEV_RS         = 0x00000000;
         DEV_RS2        = 0x00000000;
-#elif defined (IPOD_VIDEO)    
+#elif defined (IPOD_VIDEO)
         /* set minimum startup configuration */
         DEV_EN         = 0xc2000124;
         DEV_EN2        = 0x00000000;
@@ -461,7 +460,7 @@ void system_init(void)
         DEV_RS2        = 0xffffffff;
         DEV_RS         = 0x00000000;
         DEV_RS2        = 0x00000000;
-#elif defined (IPOD_NANO)    
+#elif defined (IPOD_NANO)
         /* set minimum startup configuration */
         DEV_EN         = 0xc2000124;
         DEV_EN2        = 0x00002000;
@@ -625,4 +624,3 @@ int system_memory_guard(int newmode)
     (void)newmode;
     return 0;
 }
-
