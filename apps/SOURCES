@@ -286,5 +286,7 @@ keymaps/keymap-hm801.c
 keymaps/keymap-sansa-connect.c
 #elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
 keymaps/keymap-ypr0.c
+#elif CONFIG_KEYPAD == MA_PAD
+keymaps/keymap-ma.c
 #endif
 

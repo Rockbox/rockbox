@@ -403,6 +403,8 @@ drivers/audio/rk27xx_codec.c
 drivers/audio/aic3x.c
 #elif defined (HAVE_DUMMY_CODEC)
 drivers/audio/dummy_codec.c
+#elif defined (HAVE_DF1704_CODEC)
+drivers/audio/df1704.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
@@ -689,6 +691,8 @@ target/arm/ipod/lcd-gray.c
 target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
 #elif CONFIG_LCD == LCD_GIGABEAT || CONFIG_LCD == LCD_MINI2440
 target/arm/s3c2440/lcd-s3c2440.c
+#elif CONFIG_LCD == LCD_ILI9342
+target/arm/rk27xx/ma/lcd-ma.c
 #endif
 
 /* USB Stack */
@@ -1693,6 +1697,15 @@ target/arm/rk27xx/hm60x/power-hm60x.c
 target/arm/rk27xx/hm801/button-hm801.c
 target/arm/rk27xx/hm801/powermgmt-hm801.c
 target/arm/rk27xx/hm801/power-hm801.c
+#endif
+
+#if defined(MA9)
+target/arm/rk27xx/ma/button-ma.c
+target/arm/rk27xx/ma/powermgmt-ma.c
+target/arm/rk27xx/ma/power-ma.c
+drivers/pca9555.c
+target/arm/rk27xx/ma/pca9555-ma.c
+target/arm/rk27xx/ma/audio-ma.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
