@@ -595,10 +595,16 @@ target/arm/pp/wmcodec-pp.c
 target/arm/pp/system-pp5002.c
 target/arm/pp/usb-fw-pp5002.c
 target/arm/pp/ata-pp5002.c
+# ifdef HAVE_SERIAL
+target/arm/pp/uart-pp.c
+# endif /* HAVE_SERIAL */
 #elif defined CPU_PP502x
 target/arm/pp/usb-fw-pp502x.c
 target/arm/pp/system-pp502x.c
-#endif
+# ifdef HAVE_SERIAL
+target/arm/pp/uart-pp.c
+# endif /* HAVE_SERIAL */
+#endif /* (CONFIG_CPU==PP5002) || CPU_PP502x */
 #ifdef BOOTLOADER
 #ifdef HAVE_BOOTLOADER_USB_MODE
 target/arm/pp/crt0-pp502x-bl-usb.S
