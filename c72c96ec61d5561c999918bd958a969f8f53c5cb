@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///VE\u003d",
+        "filename": "apps/plugins/lib/stdio_compat.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-15T08:56:10Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "c72c96ec61d5561c999918bd958a969f8f53c5cb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///VA\u003d",
+        "filename": "apps/plugins/lib/stdio_compat.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-15T08:56:10Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "c72c96ec61d5561c999918bd958a969f8f53c5cb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///U8\u003d",
+        "filename": "apps/plugins/lib/stdio_compat.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-15T08:56:10Z",
+      "side": 1,
+      "message": "tab",
+      "revId": "c72c96ec61d5561c999918bd958a969f8f53c5cb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
