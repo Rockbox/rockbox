@@ -20,4 +20,13 @@ SECTIONS
       *(.rodata*)
       *(.data*)
     } > IRAM
+
+    .magic 0x18200ff8 : {
+      BYTE(0x51); /* R */
+      BYTE(0x4B); /* K */
+      BYTE(0x32); /* 2 */
+      BYTE(0x37); /* 7 */
+      BYTE(0x56); /* V */
+      BYTE(0x31); /* 1 */
+    }
 }

@@ -1,42 +1,92 @@
+/* rk27xx DRAM init routine
+ * Based on disassembly of the first binary image uploaded in rom DFU mode
+ * Copyright (C) 2013 Marcin Bukat
+ */
+
 .section .text,"ax",%progbits
 .global start
 
 start:
-    msr   cpsr_c,#0xd3         /* enter supervisor mode, disable IRQ/FIQ */
+    push {r4,r5,r6,r7,lr}
 
+/* setup 200 MHz clock */
 pll_setup:
-    mov   r0,#0x18000000
-    add   r0,r0,#0x1c000
+    ldr     r0,=0x180e8000
+    mov     r1, #0x81
+    str     r1, [r0, #4]     /* FMWAIT */
 
-    /* setup ARM core freq = 200MHz */
-    /* AHB bus freq (HCLK) = 100MHz */
-    /* APB bus freq (PCLK) = 50MHz  */
-    ldr   r1,[r0,#0x14]        /* SCU_DIVCON1 */
-    orr   r1,#9                /* ARM slow mode, HCLK:PCLK = 2:1 */
-    str   r1,[r0,#0x14]
+    ldr     r0,=0x1801c000
+    ldr     r1, [r0,#0x14]   /* SCU_DIVCON1 */
+    bic     r1, r1, #0x1f
+    orr     r1, r1, #9       /* ((1<<3)|(1<<0)) ARM slow mode,
+                              * HCLK:PCLK = 2:1
+                              */
+    str     r1, [r0,#0x14]
 
-    ldr   r1,=0x01970c70       /* (1<<24) | (1<<23) | (23<<16) | (199<<4) */
-    str   r1,[r0,#0x08]
+    ldr     r1,=0x1850310    /* ((1<<24)|(1<<23)|(5<<16)|(49<<4)) */
+    str     r1, [r0,#0x08]   /* SCU_PLLCON1 */
 
-    ldr   r2,=0x40000
-1:
-    ldr   r1,[r0,#0x2c]        /* SCU_STATUS */
-    tst   r1,#1                /* ARM pll lock */
-    bne   1f
-    subs  r2,#1
-    bne   1b
-1:
-    ldr   r1,[r0,#0x14]        /* SCU_DIVCON1 */
-    bic   r1,#5                /* leave ARM slow mode, ARMclk:HCLK = 2:1 */
-    str   r1,[r0,#0x14]
+    ldr     r2,=0x40000
 
-sdram_config:
-    add   r0,r0, #0x94000      /* SDRAM base */
+pll_lock_wait:
+    ldr     r1, [r0,#0x2c]   /* SCU_STATUS */
+    tst     r1, #1           /* ARM pll lock */
+    bne     pll_locked
+    subs    r2, r2, #1
+    bne     pll_lock_wait
 
-    mov   r1,#1
-    str   r1,[r0,#0x10c]       /* MCSDR_BASIC Round-robin, SDRAM width 16bits */
+pll_locked:
+    ldr     r1, [r0,#0x14]   /* SCU_DIVCON1 */
+    bic     r1, #1           /* leave ARM slow mode */
+    str     r1, [r0,#0x14]
 
-    add   r1,#0x10
-    str   r1,[r0,#0x108]       /* MCSDR_ADDCFG 12 bits row/9 bits col addr */
+/* detect SDRAM organization */
+    ldr     r0,=0x180b0000   /* SDRAM controller base addr */
+    mov     r2, #0x60000000  /* start of DRAM */
+    ldr     r1,=0x5aa5f00f   /* test pattern */
+    mov     r3, #1           /* used for bitshifts */
+    mov     r4, #4           /* reg cfg 12bits col address */
 
-    mov   pc,lr                /* we are done, return to bootrom code */ 
+col_loop:
+    str     r4, [r0, #0x108] /* MCSDR_ADDCFG */
+    add     r5, r4, #8       /* col_num_bits */
+    mov     r6, r3, lsl r5   /* offset to the col1 (1<<col_num_bits) */
+    mov     r7, #0
+    str     r7, [r1]         /* *(0x60000000) = 0 */
+    str     r1, [r1, r6]     /* store test pattern in col1 addr */
+    ldr     r7, [r1]
+    cmp     r7, #0           /* check if beginning of dram is not touched */
+    ldreq   r7, [r1, r6]     /* readback col1 addr */
+    cmpeq   r7, r1           /* check if test pattern is valid */
+    beq     row_loop_setup   /* quit column loop */
+    subs    r4, #1
+    bpl     col_loop
+
+row_loop_setup:
+    mov     r5, #2           /* reg cfg 13bits row address */
+
+row_loop:
+    orr     r7, r4, r5, lsl#4
+    str     r7, [r0, #0x108] /* MCSDR_ADDCFG */
+
+    add     r7, r5, #11      /* row_num_bits */
+    mov     r7, r3, lsl r7   /* 1<<row_num_bits */
+    mla     lr, r7, r6, r6   /* (1<<row_num_bits)*(1<<col_num_bits) + 
+                              * (1<<col_num_bits)  (row1, col1 mem cell)
+                              */
+
+    mov     r7, #0
+    str     r7, [r1]         /* *(0x60000000) = 0 */   
+    str     r2, [r1, lr]     /* store test pattern */
+    ldr     r7, [r1]
+    cmp     r7, #0           /* check if beginning of dram is not touched */
+    ldreq   lr, [r1, lr]     /* readback row1,col1 addr */
+    cmpeq   lr, r2           /* check if test pattern is valid */
+    beq     end
+    subs    r5, #1
+    bpl     row_loop
+
+end:
+    orr     r0, r4, r5, lsl#4
+    pop     {r4,r5,r6,r7,pc}
+
