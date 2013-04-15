@@ -36,19 +36,6 @@ AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1,  1,   0,  31,  23, (val - 23) * 15)
 AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,  1,   0,   1,   1, val * 200)
 #endif /* HAVE_RECORDING */
 
-static inline int _param_2_phys(int setting, int value)
-{
-    switch(setting)
-    {
-    default:               return value;
-#ifdef HAVE_RECORDING
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN: return (value - 23) * 15;
-    case SOUND_MIC_GAIN:   return value * 200;       /* 0 or 20 dB */
-#endif
-    }
-}
-
 /*** definitions ***/
 #define HEADPHONE_MUTE 0x30 /* 0110000 = -73db */
 

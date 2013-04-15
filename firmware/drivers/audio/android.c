@@ -23,32 +23,6 @@
 #include "config.h"
 #include "audiohw.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, VOLUME_MIN / 10, VOLUME_MAX / 10, -25},
-/* Bass and treble tone controls */
-#ifdef AUDIOHW_HAVE_BASS
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
-#endif
-#ifdef AUDIOHW_HAVE_TREBLE
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-#endif
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#if defined(HAVE_RECORDING)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16},
-#endif
-#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
-    [SOUND_BASS_CUTOFF]   = {"",   0,  1,   1,   4,   1},
-#endif
-#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
-    [SOUND_TREBLE_CUTOFF] = {"",   0,  1,   1,   4,   1},
-#endif
-};
-
-
 void audiohw_set_volume(int volume)
 {
     extern void pcm_set_mixer_volume(int);

@@ -145,11 +145,6 @@ void audiohw_set_superbass(int value)
 {
     (void)value;
 }
-
-void audiohw_set_pitch(unsigned long value)
-{
-    (void)value;
-}
 #endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 #endif /* CODEC != SWCODEC */
 

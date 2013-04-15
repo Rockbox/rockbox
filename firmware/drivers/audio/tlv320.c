@@ -31,21 +31,6 @@
 #endif
 #include "audiohw.h"
 
-const struct sound_settings_info audiohw_settings[] = {
-    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20},
-    /* HAVE_SW_TONE_CONTROLS */
-    [SOUND_BASS]          = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_TREBLE]        = {"dB", 0,  1, -24,  24,   0},
-    [SOUND_BALANCE]       = {"%",  0,  1,-100, 100,   0},
-    [SOUND_CHANNELS]      = {"",   0,  1,   0,   5,   0},
-    [SOUND_STEREO_WIDTH]  = {"%",  0,  5,   0, 250, 100},
-#ifdef HAVE_RECORDING
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   1},
-#endif
-};
-
 /* convert tenth of dB volume (-73..6) to master volume register value */
 static int vol_tenthdb2hw(int db)
 {
