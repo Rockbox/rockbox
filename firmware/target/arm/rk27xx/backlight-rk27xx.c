@@ -61,6 +61,13 @@ static const unsigned short lin_brightness[] = {
     562, 579, 596, 616, 637, 660, 684, 711,
     739, 770, 802, 837, 874, 914, 955, 1000
 };
+#elif defined(MA9)
+static const unsigned short lin_brightness[] = {
+      2,   4,   7,  10,  15,  21,  28,  36,
+     46,  58,  72,  87, 104, 124, 146, 171,
+    198, 227, 260, 295, 334, 376, 421, 470,
+    522, 578, 638, 702, 770, 842, 918, 1000
+};
 #endif
 
 bool _backlight_init(void)
