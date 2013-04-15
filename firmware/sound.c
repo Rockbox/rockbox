@@ -25,7 +25,6 @@
 #include "config.h"
 #include "system.h"
 #include "sound.h"
-#include "fixedpoint.h"
 #ifdef HAVE_SW_VOLUME_CONTROL
 #include "pcm_sw_volume.h"
 #endif /* HAVE_SW_VOLUME_CONTROL */
@@ -128,8 +127,10 @@ static int current_eq_band_gain[AUDIOHW_EQ_BAND_NUM]; /* tenth dB */
 /* Return the sound value scaled to centibels (tenth-decibels) */
 static int sound_value_to_cb(int setting, int value)
 {
-    long e = (1 - sound_numdecimals(setting)) << 16;
-    return fp_mul(value, fp_exp10(e, 16), 16);
+    int shift = 1 - sound_numdecimals(setting);
+    if (shift < 0) do { value /= 10; } while (++shift);
+    if (shift > 0) do { value *= 10; } while (--shift);
+    return value;
 }
 
 static void set_prescaled_volume(void)
