@@ -32,29 +32,64 @@
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 static int autobaud = 0;
+volatile unsigned long * BASE_RBR, * BASE_THR, * BASE_LCR, * BASE_LSR, * BASE_DLL;
 
 static void set_bitrate(unsigned int rate)
 {
     unsigned int divisor;
     
     divisor = 24000000L / rate / 16;
-    SER0_LCR = 0x80; /* Divisor latch enable */
-    SER0_DLL = (divisor >> 0) & 0xFF;
-    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+    *BASE_LCR = 0x80; /* Divisor latch enable */
+    *BASE_DLL = (divisor >> 0) & 0xFF;
+    *BASE_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
 }
 
 void serial_setup (void)
 {
     int tmp;
 
-#if defined(IPOD_COLOR) || defined(IPOD_4G)
-    /* Route the Tx/Rx pins.  4G Ipod??? */
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI2G)
+
+    /* Route the Tx/Rx pins.  4G Ipod, ser1, dock connector */
+    GPIO_CLEAR_BITWISE(GPIOD_ENABLE, 0x6);
+    GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x6);
+
     outl(0x70000018, inl(0x70000018) & ~0xc00);
+    
+    BASE_RBR = &SER1_RBR;
+    BASE_THR = &SER1_THR;
+    BASE_LCR = &SER1_LCR;
+    BASE_LSR = &SER1_LSR;
+    BASE_DLL = &SER1_DLL;
+
+    DEV_EN |= DEV_SER1;
+    CPU_HI_INT_DIS = SER1_MASK;
+
+    DEV_RS |= DEV_SER1;
+    sleep(1);
+    DEV_RS &= ~DEV_SER1;
+
+    SER1_LCR = 0x80; /* Divisor latch enable */
+    SER1_DLM = 0x00;
+    SER1_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+    SER1_IER = 0x01;
+
+    SER1_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
+
+    CPU_INT_EN = HI_MASK;
+    CPU_HI_INT_EN = SER1_MASK;
+    tmp = SER1_RBR; 
+
 #elif defined(IPOD_NANO) || defined(IPOD_VIDEO)
     /* Route the Tx/Rx pins.  5G Ipod */
     (*(volatile unsigned long *)(0x7000008C)) &= ~0x0C;
     GPO32_ENABLE &= ~0x0C;
-#endif
+
+    BASE_RBR = &SER0_RBR;
+    BASE_THR = &SER0_THR;
+    BASE_LCR = &SER0_LCR;
+    BASE_LSR = &SER0_LSR;
+    BASE_DLL = &SER0_DLL;
 
     DEV_EN = DEV_EN | DEV_SER0;
     CPU_HI_INT_DIS = SER0_MASK;
@@ -70,9 +105,43 @@ void serial_setup (void)
 
     SER0_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
 
-    CPU_INT_EN |= HI_MASK;
-    CPU_HI_INT_EN |= SER0_MASK;
-    tmp = SER0_RBR;
+    CPU_INT_EN = HI_MASK;
+    CPU_HI_INT_EN = SER0_MASK;
+    tmp = SER0_RBR; 
+
+#else
+
+    /* Default Route the Tx/Rx pins.  4G Ipod, ser0, top connector */
+
+    GPIO_CLEAR_BITWISE(GPIOC_INT_EN, 0x8);
+    GPIO_CLEAR_BITWISE(GPIOC_INT_LEV, 0x8);
+    GPIOC_INT_CLR = 0x8;
+    
+    BASE_RBR = &SER0_RBR;
+    BASE_THR = &SER0_THR;
+    BASE_LCR = &SER0_LCR;
+    BASE_LSR = &SER0_LSR;
+    BASE_DLL = &SER0_DLL;
+
+    DEV_EN |= DEV_SER0;
+    CPU_HI_INT_DIS = SER0_MASK;
+
+    DEV_RS |= DEV_SER0;
+    sleep(1);
+    DEV_RS &= ~DEV_SER0;
+
+    SER0_LCR = 0x80; /* Divisor latch enable */
+    SER0_DLM = 0x00;
+    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+    SER0_IER = 0x01;
+
+    SER0_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
+
+    CPU_INT_EN = HI_MASK;
+    CPU_HI_INT_EN = SER0_MASK;
+    tmp = SER0_RBR; 
+
+#endif
 
     serial_bitrate(0);
 }
@@ -93,7 +162,7 @@ void serial_bitrate(int rate)
 
 int tx_rdy(void)
 {
-    if((SER0_LSR & 0x20))
+    if((*BASE_LSR & 0x20))
         return 1;
     else
         return 0;
@@ -101,7 +170,7 @@ int tx_rdy(void)
 
 static int rx_rdy(void)
 {
-    if((SER0_LSR & 0x1))
+    if((*BASE_LSR & 0x1))
         return 1;
     else
         return 0;
@@ -109,15 +178,15 @@ static int rx_rdy(void)
 
 void tx_writec(unsigned char c)
 {
-    SER0_THR =(int) c;
+    *BASE_THR =(int) c;
 }
 
 static unsigned char rx_readc(void)
 {
-    return (SER0_RBR & 0xFF);
+    return (*BASE_RBR & 0xFF);
 }
 
-void SERIAL0(void)
+void SERIAL_ISR(void)
 {
     static int badbaud = 0;
     static bool newpkt = true;
