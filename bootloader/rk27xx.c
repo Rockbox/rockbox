@@ -19,6 +19,7 @@
 #include "crc32-rkw.h"
 #include "rkw-loader.h"
 #include "version.h"
+#include "i2c.h"
 
 /* beginning of DRAM */
 #define DRAM_ORIG 0x60000000
@@ -114,6 +115,7 @@ void main(void)
     kernel_init();
     enable_irq();
 
+    i2c_init();
     adc_init();
     lcd_init();
     backlight_init();
