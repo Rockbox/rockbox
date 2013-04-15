@@ -54,15 +54,13 @@ struct sound_settings_info
     short defaultval;
 };
 
+#undef AUDIOHW_SETTING /* will have been #defined in config.h as empty */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...) \
     static const struct sound_settings_info _audiohw_setting_##name = \
     { .unit = us, .numdecimals = nd, .steps = st, \
       .minval = minv, .maxval = maxv, .defaultval = defv }; \
     static inline int _sound_val2phys_##name(int val) \
     { return #expr[0] ? expr : val; }
-#else
-/* ...otherwise these produce nothing. */
-#define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)
 #endif
 
 #ifdef HAVE_UDA1380

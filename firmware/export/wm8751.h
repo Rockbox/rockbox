@@ -25,11 +25,13 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
+#define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)
+
+#if defined(HAVE_WM8750)
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
                       BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP | \
                       DEPTH_3D_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
 
-#if defined(HAVE_WM8750)
 AUDIOHW_SETTING(DEPTH_3D,        "%", 0,  1,    0,   15,    0, (100 * val + 8) / 15)
 #ifdef HAVE_RECORDING
     /* PGA -17.25dB to 30.0dB in 0.75dB increments 64 steps

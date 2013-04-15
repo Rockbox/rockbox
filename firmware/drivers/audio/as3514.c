@@ -240,7 +240,7 @@ void audiohw_postinit(void)
     audiohw_mute(false);
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
     unsigned int hph_r, hph_l;
     unsigned int mix_l, mix_r;
@@ -298,7 +298,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
 #ifdef HAVE_AS3543
     /* line out volume is set in the same registers */
-    audiohw_set_master_volume(vol_l, vol_r);
+    audiohw_set_volume(vol_l, vol_r);
 #else
     vol_l = vol_tenthdb2hw(vol_l);
     vol_r = vol_tenthdb2hw(vol_r);

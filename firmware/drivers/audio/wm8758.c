@@ -134,7 +134,7 @@ void audiohw_postinit(void)
     audiohw_mute(false);
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
     int dac_l, amp_l, dac_r, amp_r;
     get_volume_params(vol_l, &dac_l, &amp_l);

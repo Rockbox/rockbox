@@ -1139,4 +1139,8 @@ Lyre prototype 1 */
 #define ROCKBOX_HAS_LOGDISKF
 #endif
 
+/* null audiohw setting macro for when codec header is included for reasons
+   other than audio support */
+#define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)
+
 #endif /* __CONFIG_H__ */

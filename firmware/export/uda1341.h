@@ -26,7 +26,8 @@
 #define VOLUME_MIN -840
 #define VOLUME_MAX  0
 
-#define AUDIOHW_CAPS    (BASS_CAP | TREBLE_CAP | MIC_GAIN_CAP | LIN_GAIN_CAP)
+#define AUDIOHW_CAPS    (BASS_CAP | TREBLE_CAP | MIC_GAIN_CAP | LIN_GAIN_CAP\
+                         | MONO_VOL_CAP)
 
 AUDIOHW_SETTING(VOLUME,     "dB", 0,  1, -84,   0, -25)
 AUDIOHW_SETTING(BASS,       "dB", 0,  2,   0,  24,   0)

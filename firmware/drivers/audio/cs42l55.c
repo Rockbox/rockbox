@@ -111,7 +111,7 @@ void audiohw_postinit(void)
     audiohw_mute(false);
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
     vol_l = vol_tenthdb2hw(vol_l);
     vol_r = vol_tenthdb2hw(vol_r);
@@ -121,7 +121,7 @@ void audiohw_set_master_vol(int vol_l, int vol_r)
                     vol_r << HPBCTL_HPBVOL_SHIFT);
 }
 
-void audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
     vol_l = vol_tenthdb2hw(vol_l);
     vol_r = vol_tenthdb2hw(vol_r);

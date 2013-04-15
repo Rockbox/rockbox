@@ -166,7 +166,7 @@ void audiohw_init(void)
      
     audiohw_set_bass (0);  
     audiohw_set_treble (0);  
-    audiohw_set_master_vol (26, 26);    /* -25 dB */
+    audiohw_set_volume (-250);    /* -25 dB */
 }
 
 void audiohw_postinit(void)
