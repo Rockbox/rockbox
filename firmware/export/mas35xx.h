@@ -291,9 +291,6 @@ extern void audiohw_set_mdb_center(int value);
 extern void audiohw_set_mdb_shape(int value);
 extern void audiohw_set_mdb_enable(int value);
 extern void audiohw_set_superbass(int value);
-extern void audiohw_set_balance(int val);
-extern void audiohw_set_pitch(int32_t val);
-extern int audiohw_get_pitch(void);
 
 #endif /* CONFIG_CODEC */
 

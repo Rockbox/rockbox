@@ -24,7 +24,7 @@
 
 #include "config.h"
 #include "system.h" /* MAX MIN macros */
-#include "audiohw.h"
+#include "sound.h"
 
 int channel_configuration = SOUND_CHAN_STEREO;
 int stereo_width = 100;

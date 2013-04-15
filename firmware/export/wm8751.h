@@ -25,8 +25,6 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
-#define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)
-
 #if defined(HAVE_WM8750)
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
                       BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP | \

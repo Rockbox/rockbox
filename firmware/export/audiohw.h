@@ -24,6 +24,7 @@
 
 #include "config.h"
 #include <stdbool.h>
+#include <inttypes.h>
 
 /* define some audiohw caps */
 #define TREBLE_CAP            (1 << 0)

@@ -103,13 +103,6 @@ void sound_set(int setting, int value)
         sound_set_val(value);
 }
 
-/* Return the sound value scaled to centibels (tenth-decibels) */
-static int sound_value_to_cb(int setting, int value)
-{
-    long e = (1 - sound_numdecimals(setting)) << 16;
-    return fp_mul(value, fp_exp10(e, 16), 16);
-}
-
 #if !defined(AUDIOHW_HAVE_CLIPPING)
 /*
  * The prescaler compensates for any kind of boosts, to prevent clipping.
@@ -131,6 +124,13 @@ static int current_bass    = 0; /* tenth dB */
 #ifdef AUDIOHW_HAVE_EQ
 static int current_eq_band_gain[AUDIOHW_EQ_BAND_NUM]; /* tenth dB */
 #endif
+
+/* Return the sound value scaled to centibels (tenth-decibels) */
+static int sound_value_to_cb(int setting, int value)
+{
+    long e = (1 - sound_numdecimals(setting)) << 16;
+    return fp_mul(value, fp_exp10(e, 16), 16);
+}
 
 static void set_prescaled_volume(void)
 {

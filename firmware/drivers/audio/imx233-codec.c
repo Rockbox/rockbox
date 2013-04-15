@@ -43,7 +43,7 @@ void audiohw_close(void)
     imx233_audioin_close();
 }
 
-void audiohw_set_headphone_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
     imx233_audioout_set_hp_vol(vol_l / 5, vol_r / 5);
 }

@@ -93,29 +93,6 @@ static void wmc_write_masked(int reg, unsigned bits, unsigned mask)
     wmc_write(reg, (wmc_regs[reg] & ~mask) | (bits & mask));
 }
 
-int sound_val2phys(int setting, int value)
-{
-    int result;
-
-    switch(setting)
-    {
-#ifdef HAVE_RECORDING
-    case SOUND_LEFT_GAIN:
-    case SOUND_RIGHT_GAIN:
-        result = (value - 23) * 15;
-        break;
-    case SOUND_MIC_GAIN:
-        result = value * 200;
-        break;
-#endif
-    default:
-        result = value;
-        break;
-    }
-
-    return result;
-}
-
 /* convert tenth of dB volume (-730..60) to master volume register value */
 static int vol_tenthdb2hw(int db)
 {
