@@ -109,6 +109,8 @@ struct sound_settings_info
 #elif (CONFIG_PLATFORM & (PLATFORM_ANDROID | PLATFORM_MAEMO\
        | PLATFORM_PANDORA | PLATFORM_SDL))
 #include "hosted_codec.h"
+#elif defined(HAVE_DF1704_CODEC)
+#include "df1704.h"
 #endif
 
 /* convert caps into defines */
