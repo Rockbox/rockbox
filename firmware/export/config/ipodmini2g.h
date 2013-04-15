@@ -166,7 +166,7 @@
 #define HAVE_ATA_POWER_OFF
 
 /* define this if the hardware can be powered off while charging */
-//#define HAVE_POWEROFF_WHILE_CHARGING
+/*#define HAVE_POWEROFF_WHILE_CHARGING */
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
@@ -212,8 +212,10 @@
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 
-#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
+#define IPOD_ACCESSORY_PROTOCOL
+#define HAVE_SERIAL
 
+#define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
 /* DMA is used only for reading on PP502x because although reads are ~8x faster
  * writes appear to be ~25% slower.
