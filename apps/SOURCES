@@ -159,11 +159,12 @@ radio/radioart.c
 #endif
 #endif
 
+fixedpoint.c
+
 #if CONFIG_CODEC == SWCODEC
 #if INPUT_SRC_CAPS != 0
 audio_path.c
 #endif /* INPUT_SRC_CAPS != 0 */
-fixedpoint.c
 pcmbuf.c
 codec_thread.c
 playback.c

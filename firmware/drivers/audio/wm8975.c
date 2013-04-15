@@ -178,7 +178,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     wm8975_write(ROUT1VOL, ROUT1VOL_RO1VU | ROUT1VOL_RO1ZC | vol_r);
 }
 
-void audiohw_set_lineout_vol(int vol_l, int vol_r)
+void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
     vol_l = vol_tenthdb2hw(vol_l);
     vol_r = vol_tenthdb2hw(vol_r);

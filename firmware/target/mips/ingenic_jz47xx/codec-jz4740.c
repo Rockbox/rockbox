@@ -270,7 +270,7 @@ void audiohw_init(void)
     i2s_codec_init();
 }
 
-void audiohw_set_master_vol(int vol_l, int vol_r)
+void audiohw_set_volume(int vol_l, int vol_r)
 {
 #ifdef HAVE_SW_VOLUME_CONTROL
     /* SW volume for <= 1.0 gain, HW at unity, < VOLUME_MIN == MUTE */
