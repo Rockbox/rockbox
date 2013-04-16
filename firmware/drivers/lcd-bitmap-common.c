@@ -41,6 +41,7 @@
 #endif
 
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
+
 /* Fill a rectangle with a gradient. This function draws only the partial
  * gradient. It assumes the original gradient is src_height high and skips
  * the first few rows. This is useful for drawing only the bottom half of
@@ -105,47 +106,6 @@ void lcd_gradient_fillrect(int x, int y, int width, int height,
         unsigned start_rgb, unsigned end_rgb)
 {
     lcd_gradient_fillrect_part(x, y, width, height, start_rgb, end_rgb, height, 0);
-}
-
-/* Fill a text line with a gradient:
- * x1, x2 - x pixel coordinates to start/stop
- * y - y pixel to start from
- * h - line height
- * num_lines - number of lines to span the gradient over
- * cur_line - current line being draw
- */
-static void lcd_do_gradient_line(int x1, int x2, int y, unsigned h,
-                              int num_lines, int cur_line)
-{
-    int step_mul;
-    if (h == 0) return;
-
-    num_lines *= h;
-    cur_line *= h;
-    step_mul = (1 << 16) / (num_lines);
-    int h_r = RGB_UNPACK_RED(current_vp->lss_pattern);
-    int h_g = RGB_UNPACK_GREEN(current_vp->lss_pattern);
-    int h_b = RGB_UNPACK_BLUE(current_vp->lss_pattern);
-    int rstep = (h_r - RGB_UNPACK_RED(current_vp->lse_pattern)) * step_mul;
-    int gstep = (h_g - RGB_UNPACK_GREEN(current_vp->lse_pattern)) * step_mul;
-    int bstep = (h_b - RGB_UNPACK_BLUE(current_vp->lse_pattern)) * step_mul;
-    unsigned start_rgb, end_rgb;
-    h_r = (h_r << 16) + (1 << 15);
-    h_g = (h_g << 16) + (1 << 15);
-    h_b = (h_b << 16) + (1 << 15);
-    if (cur_line)
-    {
-        h_r -= cur_line * rstep;
-        h_g -= cur_line * gstep;
-        h_b -= cur_line * bstep;
-    }
-    start_rgb = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
-
-    h_r -= h * rstep;
-    h_g -= h * gstep;
-    h_b -= h * bstep;
-    end_rgb = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
-    lcd_gradient_fillrect(x1, y, x2 - x1, h, start_rgb, end_rgb);
 }
 
 #endif
@@ -368,6 +328,8 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     font_lock(current_vp->font, false);
 }
 
+/*** pixel oriented text output ***/
+
 /* put a string at a given pixel position */
 void LCDFN(putsxy)(int x, int y, const unsigned char *str)
 {
@@ -385,90 +347,14 @@ void LCDFN(putsxyf)(int x, int y, const unsigned char *fmt, ...)
     LCDFN(putsxy)(x, y, buf);
 }
 
-static void LCDFN(putsxyofs_style)(int xpos, int ypos,
-                                   const unsigned char *str, int style,
-                                   int offset)
-{
-    int lastmode = current_vp->drawmode;
-    int text_ypos = ypos;
-    int h = font_get(current_vp->font)->height;
-
-    if ((style & STYLE_MODE_MASK) == STYLE_NONE) {
-        if (str[0])
-            LCDFN(putsxyofs)(xpos, text_ypos, offset, str);
-        return;
-    }
-#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
-    int oldfgcolor = current_vp->fg_pattern;
-    int oldbgcolor = current_vp->bg_pattern;
-    current_vp->drawmode = DRMODE_SOLID | ((style & STYLE_INVERT) ?
-                                           DRMODE_INVERSEVID : 0);
-    if (style & STYLE_COLORED) {
-        if (current_vp->drawmode == DRMODE_SOLID)
-            current_vp->fg_pattern = style & STYLE_COLOR_MASK;
-        else
-            current_vp->bg_pattern = style & STYLE_COLOR_MASK;
-    }
-    current_vp->drawmode ^= DRMODE_INVERSEVID;
-    if (style & STYLE_GRADIENT) {
-        current_vp->drawmode = DRMODE_FG;
-        lcd_do_gradient_line(xpos, current_vp->width, ypos, h,
-                          NUMLN_UNPACK(style), CURLN_UNPACK(style));
-        current_vp->fg_pattern = current_vp->lst_pattern;
-    }
-    else if (style & STYLE_COLORBAR) {
-        current_vp->drawmode = DRMODE_FG;
-        current_vp->fg_pattern = current_vp->lss_pattern;
-        lcd_fillrect(xpos, ypos, current_vp->width - xpos, h);
-        current_vp->fg_pattern = current_vp->lst_pattern;
-    }
-    else {
-        lcd_fillrect(xpos, ypos, current_vp->width - xpos, h);
-        current_vp->drawmode = (style & STYLE_INVERT) ?
-        (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
-    }
-    if (str[0])
-        lcd_putsxyofs(xpos, text_ypos, offset, str);
-    current_vp->fg_pattern = oldfgcolor;
-    current_vp->bg_pattern = oldbgcolor;
-#else
-    current_vp->drawmode = DRMODE_SOLID | ((style & STYLE_INVERT) ?
-                                           0 : DRMODE_INVERSEVID);
-    LCDFN(fillrect)(xpos, ypos, current_vp->width - xpos, h);
-    current_vp->drawmode ^= DRMODE_INVERSEVID;
-    if (str[0])
-        LCDFN(putsxyofs)(xpos, text_ypos, offset, str);
-#endif
-    current_vp->drawmode = lastmode;
-}
-
 /*** Line oriented text output ***/
-
-static void LCDFN(putsofs_style)(int x, int y, const unsigned char *str,
-                              int style, int x_offset)
-{
-    int xpos, ypos, h;
-    if(!str)
-        return;
-
-    h = font_get(current_vp->font)->height;
-    if ((style&STYLE_XY_PIXELS) == 0)
-    {
-        xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
-        ypos = y * h;
-    }
-    else
-    {
-        xpos = x;
-        ypos = y;
-    }
-    LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, current_vp->width - x, h);
-    LCDFN(putsxyofs_style)(xpos, ypos, str, style, x_offset);
-}
 
 void LCDFN(puts)(int x, int y, const unsigned char *str)
 {
-    LCDFN(putsofs_style)(x, y, str, STYLE_DEFAULT, 0);
+    int h;
+    x *= LCDFN(getstringsize)(" ", NULL, &h);
+    y *= h;
+    LCDFN(putsxyofs)(x, y, 0, str);
 }
 
 /* Formatting version of LCDFN(puts) */
@@ -500,11 +386,16 @@ static struct scrollinfo* find_scrolling_line(int x, int y)
 
 void LCDFN(scroll_fn)(struct scrollinfo* s)
 {
-    LCDFN(putsxyofs_style)(s->x, s->y, s->line, s->style, s->offset);
+    /* Fill with background/backdrop to clear area.
+     * cannot use clear_viewport_rect() since stops scrolling as well */
+    LCDFN(set_drawmode)(DRMODE_SOLID|DRMODE_INVERSEVID);
+    LCDFN(fillrect)(s->x, s->y, s->width, s->height);
+    LCDFN(set_drawmode)(DRMODE_SOLID);
+    LCDFN(putsxyofs)(s->x, s->y, s->offset, s->line);
 }
 
 static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
-                                     int style, int x_offset,
+                                     int x_offset,
                                      bool linebased,
                                      void (*scroll_func)(struct scrollinfo *),
                                      void *data)
@@ -534,7 +425,7 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     if (restart) {
         /* remove any previously scrolling line at the same location */
         LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, width, height);
-        LCDFN(putsxyofs_style)(x, y, string, style, x_offset);
+        LCDFN(putsxyofs)(x, y, x_offset, string);
 
         if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES))
             return;
@@ -571,7 +462,6 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     if (restart) {
         s->offset = x_offset;
         s->backward = false;
-        s->style = style;
         /* assign the rectangle. not necessary if continuing an earlier line */
         s->x = x;
         s->y = y;
@@ -589,14 +479,12 @@ void LCDFN(putsxy_scroll_func)(int x, int y, const unsigned char *string,
     if (!scroll_func)
         LCDFN(putsxyofs)(x, y, x_offset, string);
     else
-        LCDFN(puts_scroll_worker)(x, y, string, STYLE_NONE, x_offset,
-                              false, scroll_func, data);
+        LCDFN(puts_scroll_worker)(x, y, string, x_offset, false, scroll_func, data);
 }
 
 void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 {
-    LCDFN(puts_scroll_worker)(x, y, string, STYLE_DEFAULT, 0,
-                              true, LCDFN(scroll_fn), NULL);
+    LCDFN(puts_scroll_worker)(x, y, string, 0, true, LCDFN(scroll_fn), NULL);
 }
 
 #if !defined(HAVE_LCD_COLOR) || !defined(MAIN_LCD)

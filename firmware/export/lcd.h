@@ -120,27 +120,6 @@ struct scrollinfo;
 #define STRIDE(screen, w, h) (screen==SCREEN_MAIN?STRIDE_MAIN((w), \
                                         (h)):STRIDE_REMOTE((w),(h)))
 
-#define STYLE_NONE       0x00000000
-#define STYLE_DEFAULT    0x01000000
-#define STYLE_COLORED    0x02000000
-#define STYLE_INVERT     0x04000000
-#define STYLE_COLORBAR   0x08000000
-#define STYLE_GRADIENT   0x10000000
-#define STYLE_MODE_MASK  0xFF000000
-/* HACK: This isnt really a style, We need to be able to tell some of
- * the lcd API that we want to draw text to a specific pixel instead
- * of a char. Remove this hack when the whole LCD api goes to fully
- * pixel based positioning - jdgordon */
-#define STYLE_XY_PIXELS  0x00010000
-#define STYLE_COLOR_MASK 0x0000FFFF
-#ifdef HAVE_LCD_COLOR
-#define STYLE_CURLN_MASK 0x0000FF00
-#define STYLE_MAXLN_MASK 0x000000FF
-#define CURLN_PACK(x)    (((x)<<8) & STYLE_CURLN_MASK)
-#define CURLN_UNPACK(x)  ((unsigned char)(((x)&STYLE_CURLN_MASK) >> 8))
-#define NUMLN_PACK(x)    ((x) & STYLE_MAXLN_MASK)
-#define NUMLN_UNPACK(x)  ((unsigned char)((x) & STYLE_MAXLN_MASK))
-#endif
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH <=8
