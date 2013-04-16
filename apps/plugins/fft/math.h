@@ -3,7 +3,7 @@
 
 #include <inttypes.h>
 #include <math.h>
-#include "lib/fixedpoint.h"
+#include "fixedpoint.h"
 
 #define Q_MUL(a, b, bits) (( (int64_t) (a) * (int64_t) (b) ) >> (bits))
 #define Q15_MUL(a, b) Q_MUL(a,b,15)
