@@ -29,6 +29,28 @@
 #include "lcd.h"
 #include "screens.h"
 
+/* Possible line decoration styles. Specify one of
+ * STYLE_NONE, _DEFAULT, _INVERT, _COLORBAR or _GRADIENT, and optionally
+ * or with STYLE_COLORED specifying line_desc.text_color */
+enum line_styles {
+    /* Just print the text. Do not clear or draw line decorations */
+    STYLE_NONE       = 0x00,
+    /* Line background filled with the bg color (or backdrop if present) */ 
+    STYLE_DEFAULT    = 0x01,
+    /* Like STYLE_DFEAULT except that text and background color will be swapped */
+    STYLE_INVERT     = 0x02,
+    /* Line background filled with line color line_desc.line_color */
+    STYLE_COLORBAR   = 0x04,
+    /* Line background filled with gradient, colors taken from
+     * line_desc.line_color and line_desc.line_end_color */
+    STYLE_GRADIENT   = 0x08,
+    /* Modifier for the text color, which will be taken from line_desc.text_color */
+    STYLE_COLORED    = 0x10,
+    /* These are used internally */
+    _STYLE_DECO_MASK = 0x0f,
+    _STYLE_MODE_MASK = 0x7F,
+};
+
 struct line_desc {
     /* height of the line (in pixels). -1 to inherit the height
      * from the font. The text will be centered if the height is larger,
@@ -49,7 +71,7 @@ struct line_desc {
      * lcd format (convert with LCD_RGBPACK() if necessary) */
     fb_data line_color, line_end_color;
     /* line decorations, see STYLE_DEFAULT etc. */
-    int style;
+    enum line_styles style;
     /* whether the line can scroll */
     bool scroll;
 };

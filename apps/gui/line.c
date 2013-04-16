@@ -264,7 +264,6 @@ static void style_line(struct screen *display,
     int style = line->style;
     int width = display->getwidth();
     int height = line->height == -1 ? display->getcharheight() : line->height;
-    unsigned mask = STYLE_MODE_MASK & ~STYLE_COLORED;
 
     /* mask out gradient and colorbar styles for non-color displays */
     if (display->depth < 16)
@@ -277,7 +276,7 @@ static void style_line(struct screen *display,
         style &= ~STYLE_COLORED;
     }
 
-    switch (style & mask)
+    switch (style & _STYLE_DECO_MASK)
     {
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
         case STYLE_GRADIENT:
