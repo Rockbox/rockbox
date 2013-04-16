@@ -15,7 +15,9 @@ RBCODECLIB := $(BUILDDIR)/lib/librbcodec.a
 INCLUDES += -I$(RBCODECLIB_DIR) -I$(RBCODECLIB_DIR)/codecs \
 			-I$(RBCODECLIB_DIR)/dsp -I$(RBCODECLIB_DIR)/metadata
 OTHER_SRC += $(RBCODECLIB_SRC)
-CORE_LIBS += $(RBCODECLIB)
+
+# libfixedpoint must go after in lib list but be made first
+CORE_LIBS := $(RBCODECLIB) $(CORE_LIBS)
 
 $(RBCODECLIB): $(RBCODECLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null

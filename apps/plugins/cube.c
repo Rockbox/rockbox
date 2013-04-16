@@ -21,6 +21,7 @@
 *
 ***************************************************************************/
 #include "plugin.h"
+#include "fixedpoint.h"
 #include "lib/playergfx.h"
 #include "lib/pluginlib_exit.h"
 #if LCD_DEPTH > 1
@@ -31,7 +32,6 @@
 #include "lib/mylcd.h" /* MYLCD_CFG_GREYLIB or MYLCD_CFG_PGFX */
 #endif
 #include "lib/xlcd.h"
-#include "lib/fixedpoint.h"
 
 /* Loops that the values are displayed */
 #define DISP_TIME 30

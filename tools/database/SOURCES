@@ -1,5 +1,4 @@
 database.c
-../../apps/fixedpoint.c
 ../../apps/misc.c
 ../../apps/tagcache.c
 ../../firmware/common/crc32.c
