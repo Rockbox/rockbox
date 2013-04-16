@@ -140,8 +140,7 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
              */
             lcd->set_viewport(&data[i].vp);
 
-            /* Set line_height to height, then it'll center for us */
-            data[i].vp.line_height = data[i].vp.height;
+            /* TODO: Center text vert*/
             data[i].vp.flags |= VP_FLAG_ALIGN_CENTER;
             
             /* If the width offset was 0, use a scrolling puts, else center and
