@@ -26,8 +26,8 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "grey.h"
 #include "fixedpoint.h"
+#include "grey.h"
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && \
     (defined(CPU_PP) || (CONFIG_LCD == LCD_TL0350A))

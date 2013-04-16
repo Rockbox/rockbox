@@ -23,7 +23,7 @@
 #include "codeclib.h"
 #include "inttypes.h"
 #include "math.h"
-#include "lib/fixedpoint.h"
+#include "fixedpoint.h"
 
 CODEC_HEADER
 
