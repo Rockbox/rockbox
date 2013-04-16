@@ -107,10 +107,19 @@ unsigned long isqrt(unsigned long x);
  */
 long fp_exp10(long x, unsigned int fracbits);
 
+/** FIXED POINT LOG10
+ * Return log10(x) as FP integer.  Argument is FP integer.
+ */
+long fp_log10(long n, unsigned int fracbits);
+
 /* fracbits in range 12 - 22 work well. Higher is better for
  * calculating dB, lower is better for calculating factor.
  */
-/* long fp_decibels(unsigned long factor, unsigned int fracbits); */
+
+/** CONVERT FACTOR TO DECIBELS */
+long fp_decibels(unsigned long factor, unsigned int fracbits);
+
+/** CONVERT DECIBELS TO FACTOR */
 long fp_factor(long decibels, unsigned int fracbits);
 
 #endif /* FIXEDPOINT_H */

@@ -25,6 +25,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "fixedpoint.h"
 #include "lib/helper.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_exit.h"
@@ -32,7 +33,6 @@
 #ifndef HAVE_LCD_COLOR
 #include "lib/grey.h"
 #endif
-#include "lib/fixedpoint.h"
 
 
 /******************************* Globals ***********************************/

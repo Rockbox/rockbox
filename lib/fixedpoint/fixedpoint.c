@@ -20,7 +20,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include "fixedpoint.h"
 #include <stdlib.h>
 #include <stdbool.h>
@@ -143,8 +142,6 @@ long fp_sincos(unsigned long phase, long *cos)
     return y;
 }
 
-
-#if defined(PLUGIN) || defined(CODEC)
 /**
  * Fixed point square root via Newton-Raphson.
  * @param x square root argument.
@@ -207,10 +204,7 @@ unsigned long isqrt(unsigned long x)
 
     return g;
 }
-#endif  /* PLUGIN or CODEC */
 
-
-#if defined(PLUGIN)
 /**
  * Fixed point sinus using a lookup table
  * don't forget to divide the result by 16384 to get the actual sinus value
@@ -325,10 +319,7 @@ long fp16_exp(int x)
 
     return y;
 }
-#endif /* PLUGIN */
 
-
-#if (!defined(PLUGIN) && !defined(CODEC))
 /** MODIFIED FROM replaygain.c */
  
 #define FP_MUL_FRAC(x, y) fp_mul(x, y, fracbits)
@@ -407,12 +398,10 @@ long fp_exp10(long x, unsigned int fracbits)
     return FP_MUL_FRAC(k, xp);
 }
 
-
-#if 0   /* useful code, but not currently used */
 /** FIXED POINT LOG10
  * Return log10(x) as FP integer.  Argument is FP integer.
  */
-static long fp_log10(long n, unsigned int fracbits)
+long fp_log10(long n, unsigned int fracbits)
 {
     /* Calculate log2 of argument */
 
@@ -453,15 +442,12 @@ static long fp_log10(long n, unsigned int fracbits)
     return FP_MUL_FRAC(log2, (FP28_LOG10OF2 >> (28 - fracbits)));
 }
 
-
 /** CONVERT FACTOR TO DECIBELS */
 long fp_decibels(unsigned long factor, unsigned int fracbits)
 {
     /* decibels = 20 * log10(factor) */
     return FP_MUL_FRAC((20L << fracbits), fp_log10(factor, fracbits));
 }
-#endif  /* unused code */
-
 
 /** CONVERT DECIBELS TO FACTOR */
 long fp_factor(long decibels, unsigned int fracbits)
@@ -469,4 +455,3 @@ long fp_factor(long decibels, unsigned int fracbits)
     /* factor = 10 ^ (decibels / 20) */
     return fp_exp10(FP_DIV_FRAC(decibels, (20L << fracbits)), fracbits);
 }
-#endif  /* !PLUGIN and !CODEC */

@@ -22,10 +22,10 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "fixedpoint.h"
 
 #include "lib/xlcd.h"
 #include "lib/pluginlib_actions.h"
-#include "lib/fixedpoint.h"
 #include "lib/playback_control.h"
 #include "lib/highscore.h"
 

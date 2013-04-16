@@ -20,7 +20,7 @@
  **************************************************************************/
 #include "plugin.h"
 #include "time.h"
-#include "lib/fixedpoint.h"
+#include "fixedpoint.h"
 #include "lib/pluginlib_actions.h"
 
 
