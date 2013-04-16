@@ -1,6 +1,5 @@
 #if CONFIG_CODEC == SWCODEC /* software codec platforms */
 codeclib.c
-fixedpoint.c
 ffmpeg_bitstream.c
 
 mdct_lookup.c

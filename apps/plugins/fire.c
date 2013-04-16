@@ -22,10 +22,10 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "fixedpoint.h"
 #include "lib/helper.h"
 
 #include "lib/pluginlib_actions.h"
-#include "lib/fixedpoint.h"
 
 #ifndef HAVE_LCD_COLOR
 #include "lib/grey.h"

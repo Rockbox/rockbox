@@ -9,5 +9,7 @@
 
 SRC += $(call preprocess,$(APPSDIR)/SOURCES)
 
+CORE_GCSECTIONS = yes
+
 # don't build rombox.ucl
 ARCHOSROM=

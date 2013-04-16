@@ -19,7 +19,7 @@ include $(RBCODECLIB_DIR)/codecs/lib/libcodec.make
 OTHER_INC += -I$(RBCODECLIB_DIR)/codecs/lib
 
 # extra libraries
-CODEC_LIBS := $(CODECLIB)
+CODEC_LIBS := $(CODECLIB) $(FIXEDPOINTLIB)
 
 # the codec libraries
 include $(RBCODECLIB_DIR)/codecs/demac/libdemac.make

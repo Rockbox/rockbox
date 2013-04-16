@@ -2,5 +2,4 @@ warble.c
 ../../../firmware/common/strlcpy.c
 ../../../firmware/common/unicode.c
 ../../../firmware/common/structec.c
-../../../apps/fixedpoint.c
 ../../../uisimulator/common/io.c

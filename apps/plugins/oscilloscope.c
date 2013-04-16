@@ -22,13 +22,11 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "fixedpoint.h"
 #include "lib/helper.h"
 #include "lib/pluginlib_exit.h"
-
 #include "lib/xlcd.h"
 #include "lib/configfile.h"
-#include "fixedpoint.h"
-#include "lib/fixedpoint.h"
 #include "lib/osd.h"
 
 /* variable button definitions */

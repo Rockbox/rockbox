@@ -4,7 +4,6 @@ helper.c
 md5.c
 jhash.c
 configfile.c
-fixedpoint.c
 playback_control.c
 rgb_hsv.c
 highscore.c

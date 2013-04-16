@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 #include "plugin.h"
-#include "lib/fixedpoint.h"
+#include "fixedpoint.h"
 #include "lib/playback_control.h"
 
 
