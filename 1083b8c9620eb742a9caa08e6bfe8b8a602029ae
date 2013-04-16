@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///Uo\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "this is obsolete as of yesterday Mike\u0027s commit",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///UM\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a call to pca9555 handling function?",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///UQ\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a call to pca9555 handling function?",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Uk\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "Such busy loops tend to bring problems on compiler upgrade. Either protect variable with volatile, switch to udelay() or provide private delay function in inline asm.",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///UE\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "In various places in our code we use construct as below which is IMO more readable but it is a matter of taste\n\nfor (i\u003d(1\u003c\u003c15); i; i\u003e\u003e\u003d1)\n{\n    ....\n   if (tmp \u0026 i)\n       SET_MD(1);\n   else\n       SET_MD(0)\n}",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///UU\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a call to pca9555 handling function?",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///UY\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a call to pca9555 handling function?",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Uc\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a call to pca9555 handling function?",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///UI\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "The arg should be meaningful. At very least put a comment what it does (mutes df1704 or what?)",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Ug\u003d",
+        "filename": "firmware/drivers/audio/df1704.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "That is insane.",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///UA\u003d",
+        "filename": "firmware/target/arm/rk27xx/ma9/pca9555.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "This belongs to df1704 init really. pca9555 driver should provide something like pca9555_read() and pca9555() write functions. Everything else should be in pca\u0027s client code.",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///T8\u003d",
+        "filename": "firmware/target/arm/rk27xx/ma9/pca9555.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "Similar as above, this really belongs to button-ma9.c",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///T4\u003d",
+        "filename": "firmware/target/arm/rk27xx/ma9/power-ma9.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-16T07:46:24Z",
+      "side": 1,
+      "message": "tabs, other then this IMO there should be call to pca9555_read() instead",
+      "revId": "1083b8c9620eb742a9caa08e6bfe8b8a602029ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
