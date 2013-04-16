@@ -445,7 +445,7 @@ static void LCDFN(putsxyofs_style)(int xpos, int ypos,
 /*** Line oriented text output ***/
 
 static void LCDFN(putsofs_style)(int x, int y, const unsigned char *str,
-                              int style, int x_offset, int y_offset)
+                              int style, int x_offset)
 {
     int xpos, ypos, h;
     if(!str)
@@ -463,12 +463,12 @@ static void LCDFN(putsofs_style)(int x, int y, const unsigned char *str,
         ypos = y;
     }
     LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, current_vp->width - x, h);
-    LCDFN(putsxyofs_style)(xpos, ypos+y_offset, str, style, x_offset);
+    LCDFN(putsxyofs_style)(xpos, ypos, str, style, x_offset);
 }
 
 void LCDFN(puts)(int x, int y, const unsigned char *str)
 {
-    LCDFN(putsofs_style)(x, y, str, STYLE_DEFAULT, 0, 0);
+    LCDFN(putsofs_style)(x, y, str, STYLE_DEFAULT, 0);
 }
 
 /* Formatting version of LCDFN(puts) */
@@ -504,7 +504,7 @@ void LCDFN(scroll_fn)(struct scrollinfo* s)
 }
 
 static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
-                                     int style, int x_offset, int y_offset,
+                                     int style, int x_offset,
                                      bool linebased,
                                      void (*scroll_func)(struct scrollinfo *),
                                      void *data)
@@ -521,7 +521,7 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
      * for find_scrolling_line() to work */
     cwidth = font_get(current_vp->font)->maxwidth;
     height = font_get(current_vp->font)->height;
-    y = y * (linebased ? height : 1) + y_offset;
+    y = y * (linebased ? height : 1);
     x = x * (linebased ? cwidth : 1);
     width = current_vp->width - x;
 
@@ -589,13 +589,13 @@ void LCDFN(putsxy_scroll_func)(int x, int y, const unsigned char *string,
     if (!scroll_func)
         LCDFN(putsxyofs)(x, y, x_offset, string);
     else
-        LCDFN(puts_scroll_worker)(x, y, string, STYLE_NONE, x_offset, 0,
+        LCDFN(puts_scroll_worker)(x, y, string, STYLE_NONE, x_offset,
                               false, scroll_func, data);
 }
 
 void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 {
-    LCDFN(puts_scroll_worker)(x, y, string, STYLE_DEFAULT, 0, 0,
+    LCDFN(puts_scroll_worker)(x, y, string, STYLE_DEFAULT, 0,
                               true, LCDFN(scroll_fn), NULL);
 }
 
