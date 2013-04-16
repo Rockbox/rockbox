@@ -19,9 +19,9 @@
  *
  ****************************************************************************/
 
+#include "fixedpoint.h"
 #include "clock_draw_analog.h"
 #include "lib/xlcd.h"
-#include "lib/fixedpoint.h"
 #include "clock_bitmaps.h"
 #include "clock_bitmap_strings.h"
 
