@@ -33,12 +33,13 @@ INCLUDES += -I$(ROOTDIR)/apps/gui \
             -I$(ROOTDIR)/lib/rbcodec \
             -I$(ROOTDIR)/lib/rbcodec/metadata \
             -I$(ROOTDIR)/lib/rbcodec/dsp \
+            -I$(ROOTDIR)/lib/fixedpoint \
             -I$(APPSDIR) \
             -I$(BUILDDIR)
 
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 
-$(BUILDDIR)/$(BINARY): $$(DATABASE_OBJ)
+$(BUILDDIR)/$(BINARY): $$(DATABASE_OBJ) $(FIXEDPOINTLIB)
 	$(call PRINTS,LD $(BINARY))
-	$(SILENT)$(HOSTCC) -o $@ $+
+	$(SILENT)$(HOSTCC) $(call a2lnk $(FIXEDPOINTLIB)) -o $@ $+
