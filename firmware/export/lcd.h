@@ -43,7 +43,6 @@ struct viewport {
 #ifdef HAVE_LCD_BITMAP
     int flags;
     int font;
-    int line_height; /* 0 for using font height */
     int drawmode;
 #endif
 #if LCD_DEPTH > 1

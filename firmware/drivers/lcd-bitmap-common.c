@@ -387,12 +387,11 @@ void LCDFN(putsxyf)(int x, int y, const unsigned char *fmt, ...)
 
 static void LCDFN(putsxyofs_style)(int xpos, int ypos,
                                    const unsigned char *str, int style,
-                                   int h, int offset)
+                                   int offset)
 {
     int lastmode = current_vp->drawmode;
     int text_ypos = ypos;
-    int line_height = font_get(current_vp->font)->height;
-    text_ypos += h/2 - line_height/2; /* center the text in the line */
+    int h = font_get(current_vp->font)->height;
 
     if ((style & STYLE_MODE_MASK) == STYLE_NONE) {
         if (str[0])
@@ -452,7 +451,7 @@ static void LCDFN(putsofs_style)(int x, int y, const unsigned char *str,
     if(!str)
         return;
 
-    h = current_vp->line_height ?: (int)font_get(current_vp->font)->height;
+    h = font_get(current_vp->font)->height;
     if ((style&STYLE_XY_PIXELS) == 0)
     {
         xpos = x * LCDFN(getstringsize)(" ", NULL, NULL);
@@ -464,7 +463,7 @@ static void LCDFN(putsofs_style)(int x, int y, const unsigned char *str,
         ypos = y;
     }
     LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, current_vp->width - x, h);
-    LCDFN(putsxyofs_style)(xpos, ypos+y_offset, str, style, h, x_offset);
+    LCDFN(putsxyofs_style)(xpos, ypos+y_offset, str, style, x_offset);
 }
 
 void LCDFN(puts)(int x, int y, const unsigned char *str)
@@ -501,7 +500,7 @@ static struct scrollinfo* find_scrolling_line(int x, int y)
 
 void LCDFN(scroll_fn)(struct scrollinfo* s)
 {
-    LCDFN(putsxyofs_style)(s->x, s->y, s->line, s->style, s->height, s->offset);
+    LCDFN(putsxyofs_style)(s->x, s->y, s->line, s->style, s->offset);
 }
 
 static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
@@ -521,7 +520,7 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     /* prepare rectangle for scrolling. x and y must be calculated early
      * for find_scrolling_line() to work */
     cwidth = font_get(current_vp->font)->maxwidth;
-    height = current_vp->line_height ?: (int)font_get(current_vp->font)->height;
+    height = font_get(current_vp->font)->height;
     y = y * (linebased ? height : 1) + y_offset;
     x = x * (linebased ? cwidth : 1);
     width = current_vp->width - x;
@@ -535,7 +534,7 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     if (restart) {
         /* remove any previously scrolling line at the same location */
         LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, width, height);
-        LCDFN(putsxyofs_style)(x, y, string, style, height, x_offset);
+        LCDFN(putsxyofs_style)(x, y, string, style, x_offset);
 
         if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES))
             return;
