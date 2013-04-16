@@ -10,7 +10,6 @@
 CODECLIB := $(CODECDIR)/libcodec.a
 CODECLIB_SRC := $(call preprocess, $(RBCODECLIB_DIR)/codecs/lib/SOURCES)
 CODECLIB_OBJ := $(call c2obj, $(CODECLIB_SRC))
-OTHER_SRC += $(CODECLIB_SRC)
 
 $(CODECLIB): $(CODECLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
