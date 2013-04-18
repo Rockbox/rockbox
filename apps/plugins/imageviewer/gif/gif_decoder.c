@@ -125,30 +125,18 @@ void gif_open(char *filename, struct gif_decoder *d)
     d->frames_count = 0;
 }
 
-static void set_canvas_background(GifPixelType *Line, pixel_t *out,
-                                  GifFileType *GifFile)
+static void set_canvas_background(pixel_t *out, GifFileType *GifFile)
 {
-    int i;
-
     /* Reading Gif spec it seems one should always use background color
      * in canvas but most real files omit this and sets background color to 0
      * (which IS valid index). We can choose to either conform to standard
      * (and wrongly display most of gifs with transparency) or stick to
      * common practise and treat background color 0 as transparent.
-     * I preffer the second.
+     * Moreover when dispose method is BACKGROUND spec suggest
+     * to reset canvas to global background color specified in gif BUT
+     * all renderers I know use transparency instead.
      */
-    if (GifFile->SColorMap && GifFile->SBackGroundColor != 0)
-    {
-        memset(Line, GifFile->SBackGroundColor, GifFile->SWidth);
-
-        for(i=0; i<GifFile->SHeight; i++)
-            gif2pixels(Line, out, i, 0, GifFile->SWidth);
-    }
-    else
-    {
-        memset(out, PIXEL_TRANSPARENT, PIXELS_SZ);    
-    }
-
+    memset(out, PIXEL_TRANSPARENT, PIXELS_SZ);    
 }
 
 /* var names adhere to giflib coding style */
@@ -212,7 +200,7 @@ void gif_decode(struct gif_decoder *d,
     }
 
     /* Global background color */
-    set_canvas_background(Line, pixels_buffer[0], GifFile);
+    set_canvas_background(pixels_buffer[0], GifFile);
 
     bm.width = GifFile->SWidth;
     bm.height = GifFile->SHeight;
@@ -335,7 +323,7 @@ void gif_decode(struct gif_decoder *d,
                     switch (GifFile->Image.GCB->DisposalMode)
                     {
                         case DISPOSE_BACKGROUND:
-                            set_canvas_background(Line, pixels_buffer[buf_idx],
+                            set_canvas_background(pixels_buffer[buf_idx],
                                                   GifFile);
                             break;
 

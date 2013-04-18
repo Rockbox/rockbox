@@ -110,10 +110,9 @@ static int load_image(char *filename, struct image_info *info,
 
             if (!iv->running_slideshow)
             {
-                rb->lcd_putsf(0, 2, "image %dx%d",
-                              p_decoder->width,
-                              p_decoder->height);
-                rb->lcd_putsf(0, 3, "decoding %d*%d",
+                rb->lcd_putsf(0, 2, "file: %s",
+                              filename);
+                rb->lcd_putsf(0, 3, "size: %dx%d",
                               p_decoder->width,
                               p_decoder->height);
                 rb->lcd_update();
