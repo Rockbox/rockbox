@@ -33,6 +33,23 @@
       "revId": "b75e80e66035d66b9b06dc892bc6fb632951ccf7",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///TA\u003d",
+        "filename": "firmware/target/arm/pp/system-pp502x.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-19T10:14:49Z",
+      "side": 1,
+      "message": "Why not else if (CPU_HI_INT_STAT \u0026 (SER0_MASK | SER1_MASK)) ?\nThis will save one comparison if compiler is not smart enough to catch this.",
+      "revId": "b75e80e66035d66b9b06dc892bc6fb632951ccf7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
