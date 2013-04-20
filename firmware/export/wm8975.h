@@ -22,10 +22,6 @@
 #ifndef _WM8975_H
 #define _WM8975_H
 
-/* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -730
-#define VOLUME_MAX  60
-
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | LINEOUT_CAP | \
                       LIN_GAIN_CAP | MIC_GAIN_CAP)
 

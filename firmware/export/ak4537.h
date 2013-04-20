@@ -23,9 +23,6 @@
 #define _AK4537_H
 
 /* Volume goes from -127.0 ... 0 dB in 0.5 dB increments */
-#define VOLUME_MIN -1270
-#define VOLUME_MAX     0
-
 AUDIOHW_SETTING(VOLUME, "dB",  0,  1, -128,   0, -25)
 
 #define AKC_NUM_REGS        0x11

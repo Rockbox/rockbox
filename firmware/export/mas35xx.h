@@ -39,8 +39,6 @@
 
 #if CONFIG_CODEC == MAS3507D
 
-#define VOLUME_MIN -780
-#define VOLUME_MAX  180
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP)
 
 AUDIOHW_SETTING(VOLUME, "dB", 0,  1, -78,  18, -18)
@@ -170,9 +168,6 @@ static const unsigned int prescale_table[] =
 };
 
 #else /* CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F */
-
-#define VOLUME_MIN -400
-#define VOLUME_MAX  600
 
 AUDIOHW_SETTING(VOLUME,       "dB",  0,  1,-100,  12, -25)
 AUDIOHW_SETTING(BASS,         "dB",  0,  1, -12,  12,   6)

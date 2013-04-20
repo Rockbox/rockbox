@@ -31,7 +31,7 @@
 /* convert tenth of dB volume (-600..0) to volume register value */
 static int vol_tenthdb2hw(int db)
 {
-    if (db < -600) 
+    if (db <= -610) 
         return 63;
     else                            /* 1 dB steps */
         return -(db / 10) + 1;

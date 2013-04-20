@@ -34,12 +34,12 @@ static bool is_muted = false;
 static int vol_tenthdb2hw(int db)
 {
     /* 0 to -63.0dB in 1dB steps, tsc2100 can goto -63.5 in 0.5dB steps */
-    if (db < VOLUME_MIN) {
+    if (db <= -640) {
         return 0x7E;
-    } else if (db >= VOLUME_MAX) {
+    } else if (db >= 0) {
         return 0x00;
     } else {
-        return(-((db)/5)); /* VOLUME_MIN is negative */
+        return(-((db)/5));
     }
 }
 

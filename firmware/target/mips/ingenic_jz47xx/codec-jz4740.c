@@ -273,9 +273,9 @@ void audiohw_init(void)
 void audiohw_set_volume(int vol_l, int vol_r)
 {
 #ifdef HAVE_SW_VOLUME_CONTROL
-    /* SW volume for <= 1.0 gain, HW at unity, < VOLUME_MIN == MUTE */
-    int sw_volume_l = vol_l < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_l, 0);
-    int sw_volume_r = vol_r < VOLUME_MIN ? PCM_MUTE_LEVEL : MIN(vol_r, 0);
+    /* SW volume for <= 1.0 gain, HW at unity, < -740 == MUTE */
+    int sw_volume_l = vol_l <= -740 ? PCM_MUTE_LEVEL : MIN(vol_l, 0);
+    int sw_volume_r = vol_r <= -740 ? PCM_MUTE_LEVEL : MIN(vol_r, 0);
     pcm_set_master_volume(sw_volume_l, sw_volume_r);
 #endif /* HAVE_SW_VOLUME_CONTROL */
 

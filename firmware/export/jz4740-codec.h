@@ -21,10 +21,6 @@
 #ifndef __JZ4740_CODEC_H_
 #define __JZ4740_CODEC_H_
 
-#define VOLUME_MIN -730
-#define VOLUME_MAX  60
-
-/* TODO */
 #ifdef HAVE_SW_VOLUME_CONTROL
 AUDIOHW_SETTING(VOLUME,     "dB", 0,  1, -74,   6, -25)
 #else

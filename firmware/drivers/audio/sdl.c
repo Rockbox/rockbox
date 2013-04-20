@@ -23,6 +23,12 @@
 #include "config.h"
 #include "sound.h"
 #include "pcm_sampr.h"
+#if CONFIG_CODEC == SWCODEC
+#include "fixedpoint.h"
+#ifdef HAVE_SW_VOLUME_CONTROL
+#include "pcm_sw_volume.h"
+#endif
+#endif
 
 /**
  * Audio Hardware api. Make them do nothing as we cannot properly simulate with
@@ -30,8 +36,6 @@
  **/
 
 #ifdef HAVE_SW_VOLUME_CONTROL
-#include "pcm_sw_volume.h"
-
 void audiohw_set_volume(int vol_l, int vol_r)
 {
     pcm_set_master_volume(vol_l, vol_r);
@@ -39,21 +43,13 @@ void audiohw_set_volume(int vol_l, int vol_r)
 
 #else /* ndef HAVE_SW_VOLUME_CONTROL */
 
-extern void pcm_set_mixer_volume(int);
 
 void audiohw_set_volume(int volume)
 {
 #if CONFIG_CODEC == SWCODEC
-#if !(CONFIG_PLATFORM & PLATFORM_MAEMO5)
-    if (volume < VOLUME_MIN)
-        volume = 0;
-    else
-        volume = SDL_MIX_MAXVOLUME * (volume - VOLUME_MIN + ONE_DB) /
-                    (VOLUME_RANGE + ONE_DB);
-#endif /* !(CONFIG_PLATFORM & PLATFORM_MAEMO5) */
-
+    extern void pcm_set_mixer_volume(int volume);
     pcm_set_mixer_volume(volume);
-#endif /* CONFIG_CODEC == SWCODEC */
+#endif
     (void)volume;
 }
 #endif /* HAVE_SW_VOLUME_CONTROL */

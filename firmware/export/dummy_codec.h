@@ -22,9 +22,8 @@
 #ifndef __DUMMY_CODEC_H_
 #define __DUMMY_CODEC_H_
 
-#define VOLUME_MIN   -730
-#define VOLUME_MAX   0
-
-AUDIOHW_SETTING(VOLUME, "dB", 0, 1, VOLUME_MIN/10, VOLUME_MAX/10, 0)
+#define DUMMY_VOLUME_MIN    -740
+#define DUMMY_VOLUME_MAX    0
+AUDIOHW_SETTING(VOLUME, "dB", 0, 1, -74, 0, 0)
 
 #endif /* __DUMMY_CODEC_H_ */

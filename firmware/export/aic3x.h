@@ -22,9 +22,6 @@
 #ifndef _AIC3X_H_
 #define _AIC3X_H_
 
-#define VOLUME_MIN -630
-#define VOLUME_MAX  0
-
 AUDIOHW_SETTING(VOLUME, "dB",  0,  1, -64,   0, -25)
 
 /*** definitions ***/

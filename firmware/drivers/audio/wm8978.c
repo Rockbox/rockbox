@@ -155,20 +155,17 @@ static void wmc_write_masked(unsigned int reg, unsigned int bits,
  * (000000...111111) */
 static int vol_tenthdb2hw(int db)
 {
-    /* -90dB to +6dB 1dB steps (96 levels) 7bits */
-    /* 1100000 ==  +6dB  (0x60,96)               */
-    /* 1101010 ==   0dB  (0x5a,90)               */
-    /* 1000001 == -57dB  (0x21,33,DAC)           */
-    /* 0000001 == -89dB  (0x01,01)               */
-    /* 0000000 == -90dB  (0x00,00,Mute)          */
-    if (db < VOLUME_MIN)
-    {
+    /*   att  DAC  AMP  result
+        +6dB    0   +6     96
+         0dB    0    0     90
+       -57dB    0  -57     33
+       -58dB   -1  -57     32
+       -89dB  -32  -57      1
+       -90dB  -oo  -oo      0 */
+    if (db <= -900)
         return 0x0;
-    }
     else
-    {
-        return (db - VOLUME_MIN) / 10;
-    }
+        return db / 10 - -90;
 }
 
 void audiohw_preinit(void)

@@ -21,10 +21,6 @@
 #ifndef _WM8751_H
 #define _WM8751_H
 
-/* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -730
-#define VOLUME_MAX  60
-
 #if defined(HAVE_WM8750)
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
                       BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP | \

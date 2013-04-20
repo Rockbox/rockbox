@@ -58,7 +58,7 @@ static int vol_tenthdb2hw(int tdb)
      * depending on gain region.
      */
 
-    if (tdb < VOLUME_MIN)
+    if (tdb <= -340)
         return 32;
     else if (tdb < -115)
         return -(((tdb + 115)/20) - 20); /* 2.0 dB steps */

@@ -38,7 +38,7 @@ static int vol_tenthdb2hw(int db)
     /* 0001100 == +12dB (0xc) */
     /* 0000000 == 0dB   (0x0) */
     /* 1000100 == -60dB (0x44, this is actually -58dB) */
-    if (db < VOLUME_MIN) return HPACTL_HPAMUTE;
+    if (db <= -600) return HPACTL_HPAMUTE;
     return (db / 10) & HPACTL_HPAVOL_MASK;
 }
 

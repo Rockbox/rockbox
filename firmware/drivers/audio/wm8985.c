@@ -104,10 +104,10 @@ static int vol_tenthdb2hw(int db)
         -89dB  -32  -57      1
         -90dB  -oo  -oo      0 */
 
-    if (db < VOLUME_MIN) {
+    if (db <= -900) {
         return 0;
     } else {
-        return (db-VOLUME_MIN)/10 + 1;
+        return db / 10 - -90;
     }
 }
 

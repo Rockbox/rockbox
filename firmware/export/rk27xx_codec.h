@@ -24,8 +24,6 @@
 #ifndef _RK27XX_CODEC_H_
 #define _RK27XX_CODEC_H_
 
-#define VOLUME_MIN -330
-#define VOLUME_MAX   40
 #define AUDIOHW_CAPS    (BASS_CAP | TREBLE_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
 
 AUDIOHW_SETTING(VOLUME,     "dB", 0,  1,   -34,    4, -25)

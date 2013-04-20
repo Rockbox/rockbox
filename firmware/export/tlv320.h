@@ -22,9 +22,6 @@
 #ifndef _TLV320_H_
 #define _TLV320_H_
 
-#define VOLUME_MIN -730
-#define VOLUME_MAX  60
-
 #define AUDIOHW_CAPS    (LIN_GAIN_CAP | MIC_GAIN_CAP)
 
 AUDIOHW_SETTING(VOLUME,     "dB", 0,  1, -74,   6, -20)

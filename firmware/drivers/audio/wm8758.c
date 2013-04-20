@@ -38,7 +38,7 @@ static unsigned short eq1_reg = EQ1_EQ3DMODE | EQ_GAIN_VALUE(0);
 static unsigned short eq5_reg = EQ_GAIN_VALUE(0);
 
 /* convert tenth of dB volume (-89..6) to master volume register value */
-int tenthdb2master(int db)
+static int vol_tenthdb2hw(int db)
 {
     /*   att  DAC  AMP  result
         +6dB    0   +6     96
@@ -47,10 +47,10 @@ int tenthdb2master(int db)
        -58dB   -1  -57     32
        -89dB  -32  -57      1
        -90dB  -oo  -oo      0 */
-    if (db < VOLUME_MIN) {
+    if (db <= -900) {
         return 0;
     } else {
-        return (db-VOLUME_MIN)/10 + 1;
+        return db / 10 - -90;
     }
 }
 
@@ -137,6 +137,10 @@ void audiohw_postinit(void)
 void audiohw_set_volume(int vol_l, int vol_r)
 {
     int dac_l, amp_l, dac_r, amp_r;
+
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
+
     get_volume_params(vol_l, &dac_l, &amp_l);
     get_volume_params(vol_r, &dac_r, &amp_r);
 

@@ -126,22 +126,6 @@ AUDIOHW_SETTING(BALANCE,      "%", 0, 1, -100, 100,   0)
 AUDIOHW_SETTING(CHANNELS,      "", 0, 1,    0,   5,   0)
 AUDIOHW_SETTING(STEREO_WIDTH, "%", 0, 5,    0, 250, 100)
 
-#define ONE_DB 10
-
-#if !defined(VOLUME_MIN) && !defined(VOLUME_MAX)
-#warning define for VOLUME_MIN and VOLUME_MAX is missing
-#define VOLUME_MIN -700
-#define VOLUME_MAX  0
-#endif
-
-#ifndef AUDIOHW_NUM_TONE_CONTROLS
-#define AUDIOHW_NUM_TONE_CONTROLS 0
-#endif
-
-/* volume/balance/treble/bass interdependency main part */
-#define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
-
-
 /* convert caps into defines */
 #ifdef AUDIOHW_CAPS
 /* Tone controls */
@@ -183,7 +167,7 @@ AUDIOHW_SETTING(STEREO_WIDTH, "%", 0, 5,    0, 250, 100)
 enum
 {
     /* Band 1 is implied; bands must be contiguous, 1 to N */
-    AUDIOHW_EQ_BAND1 = 0,
+    AUDIOHW_EQ_BAND1,
 #define AUDIOHW_HAVE_EQ_BAND1
 #if (AUDIOHW_EQ_BAND_CAPS & (EQ_CAP << 1))
     AUDIOHW_EQ_BAND2,
@@ -209,7 +193,6 @@ enum
 #define AUDIOHW_HAVE_EQ_FREQUENCY
 enum
 {
-    __AUDIOHW_EQ_BAND_FREQUENCY = -1,
 #if defined(AUDIOHW_HAVE_EQ_BAND1) && \
         (AUDIOHW_EQ_FREQUENCY_CAPS & (EQ_CAP << 0))
     AUDIOHW_EQ_BAND1_FREQUENCY,
@@ -235,7 +218,7 @@ enum
     AUDIOHW_EQ_BAND5_FREQUENCY,
 #define AUDIOHW_HAVE_EQ_BAND5_FREQUENCY
 #endif
-    AUDIOHW_EQ_FREQUENCY_NUM,
+    AUDIOHW_EQ_FREQUENCY_NUM, /* Keep last */
 };
 #endif /* AUDIOHW_EQ_FREQUENCY_CAPS */
 
@@ -244,7 +227,6 @@ enum
 #define AUDIOHW_HAVE_EQ_WIDTH
 enum
 {
-    __AUDIOHW_EQ_BAND_WIDTH = -1,
 #if defined(AUDIOHW_HAVE_EQ_BAND1) && \
         (AUDIOHW_EQ_WIDTH_CAPS & (EQ_CAP << 1))
     AUDIOHW_EQ_BAND2_WIDTH,
@@ -267,7 +249,7 @@ enum
 /* Types and number of settings types (gain, frequency, width) */
 enum AUDIOHW_EQ_SETTINGS
 {
-    AUDIOHW_EQ_GAIN = 0,
+    AUDIOHW_EQ_GAIN,
 #ifdef AUDIOHW_HAVE_EQ_FREQUENCY
     AUDIOHW_EQ_FREQUENCY,
 #endif
@@ -309,104 +291,8 @@ enum AUDIOHW_EQ_SETTINGS
 #endif
 #endif /* AUDIOHW_CAPS */
 
-enum {
-    /* TODO: Volume shouldn't be needed if device doesn't have digital control */
-    SOUND_VOLUME = 0,
-/* Tone control */
-#if defined(AUDIOHW_HAVE_BASS)
-    SOUND_BASS,
-#endif
-#if defined(AUDIOHW_HAVE_TREBLE)
-    SOUND_TREBLE,
-#endif
-    SOUND_BALANCE,
-    SOUND_CHANNELS,
-    SOUND_STEREO_WIDTH,
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    SOUND_LOUDNESS,
-    SOUND_AVC,
-    SOUND_MDB_STRENGTH,
-    SOUND_MDB_HARMONICS,
-    SOUND_MDB_CENTER,
-    SOUND_MDB_SHAPE,
-    SOUND_MDB_ENABLE,
-    SOUND_SUPERBASS,
-#endif
-#if defined(AUDIOHW_HAVE_LIN_GAIN)
-    SOUND_LEFT_GAIN,
-    SOUND_RIGHT_GAIN,
-#endif
-#if defined(AUDIOHW_HAVE_MIC_GAIN)
-    SOUND_MIC_GAIN,
-#endif
-/* Bass and treble tone controls */
-#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
-    SOUND_BASS_CUTOFF,
-#endif
-#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
-    SOUND_TREBLE_CUTOFF,
-#endif
-/* 3D effect */
-#if defined(AUDIOHW_HAVE_DEPTH_3D)
-    SOUND_DEPTH_3D,
-#endif
-/* Hardware EQ tone controls */
-/* Band gains */
-#if defined(AUDIOHW_HAVE_EQ)
-    /* Band 1 implied */
-    SOUND_EQ_BAND1_GAIN,
-#if defined(AUDIOHW_HAVE_EQ_BAND2)
-    SOUND_EQ_BAND2_GAIN,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND3)
-    SOUND_EQ_BAND3_GAIN,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND4)
-    SOUND_EQ_BAND4_GAIN,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND5)
-    SOUND_EQ_BAND5_GAIN,
-#endif
-/* Band frequencies */
-#if defined(AUDIOHW_HAVE_EQ_BAND1_FREQUENCY)
-    SOUND_EQ_BAND1_FREQUENCY,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND2_FREQUENCY)
-    SOUND_EQ_BAND2_FREQUENCY,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND3_FREQUENCY)
-    SOUND_EQ_BAND3_FREQUENCY,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND4_FREQUENCY)
-    SOUND_EQ_BAND4_FREQUENCY,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND5_FREQUENCY)
-    SOUND_EQ_BAND5_FREQUENCY,
-#endif
-/* Band widths */
-#if defined(AUDIOHW_HAVE_EQ_BAND2_WIDTH)
-    SOUND_EQ_BAND2_WIDTH,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND3_WIDTH)
-    SOUND_EQ_BAND3_WIDTH,
-#endif
-#if defined(AUDIOHW_HAVE_EQ_BAND4_WIDTH)
-    SOUND_EQ_BAND4_WIDTH,
-#endif
-#endif /* AUDIOHW_HAVE_EQ */
-    SOUND_LAST_SETTING, /* Keep this last */
-};
-
-enum Channel
-{
-    SOUND_CHAN_STEREO,
-    SOUND_CHAN_MONO,
-    SOUND_CHAN_CUSTOM,
-    SOUND_CHAN_MONO_LEFT,
-    SOUND_CHAN_MONO_RIGHT,
-    SOUND_CHAN_KARAOKE,
-    SOUND_CHAN_NUM_MODES,
-};
+/* Generate enumeration of SOUND_xxx constants */
+#include "audiohw_settings.h"
 
 /* All usable functions implemented by a audio codec drivers. Most of
  * the function in sound settings are only called, when in audio codecs
@@ -619,8 +505,19 @@ void audiohw_set_monitor(bool enable);
 
 /**
  * Set channel configuration.
- * @param val new channel value (see enum Channel).
+ * @param val new channel value (see enum below).
  */
+enum AUDIOHW_CHANNEL_CONFIG
+{
+    SOUND_CHAN_STEREO,
+    SOUND_CHAN_MONO,
+    SOUND_CHAN_CUSTOM,
+    SOUND_CHAN_MONO_LEFT,
+    SOUND_CHAN_MONO_RIGHT,
+    SOUND_CHAN_KARAOKE,
+    SOUND_CHAN_NUM_MODES,
+};
+
 void audiohw_set_channel(int val);
 
 #ifdef HAVE_PITCHCONTROL

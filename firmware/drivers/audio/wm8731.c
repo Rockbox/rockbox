@@ -101,7 +101,7 @@ static int vol_tenthdb2hw(int db)
     /* 1111001 ==   0dB (0x79) */
     /* 0110000 == -73dB (0x30) */
     /* 0101111 ==  mute (0x2f) */
-    if (db < VOLUME_MIN) {
+    if (db <= -740) {
         return 0x2f;
     } else {
         return((db/10)+0x30+73);

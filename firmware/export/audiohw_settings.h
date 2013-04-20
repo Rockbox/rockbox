@@ -21,6 +21,7 @@
  *
  ****************************************************************************/
 #if defined(AUDIOHW_SOUND_SETTINGS_ENTRIES)
+#undef AUDIOHW_SOUND_SETTINGS_ENTRIES
 /* Define sound_setting_entries table */
 
 #define AUDIOHW_SETTINGS(...) \
@@ -38,6 +39,7 @@
     [SOUND_##name] = { .info = &_audiohw_setting_##name, .function = fn },
 
 #elif defined(AUDIOHW_SOUND_SETTINGS_VAL2PHYS)
+#undef AUDIOHW_SOUND_SETTINGS_VAL2PHYS
 
 /* Implements sound_val2phys */
 #define AUDIOHW_SETTINGS(...) \
@@ -53,6 +55,19 @@
 
 #define AUDIOHW_SETTING_ENT(name, fn) \
     case SOUND_##name: return _sound_val2phys_##name(value);
+
+#else
+
+/* Generate enumeration of SOUND_xxx constants */
+#define AUDIOHW_SETTINGS(...) \
+    enum                                               \
+    {                                                  \
+        __VA_ARGS__                                    \
+        SOUND_LAST_SETTING,                            \
+    };
+
+#define AUDIOHW_SETTING_ENT(name, fn) \
+    SOUND_##name,
 
 #endif /* setting table type selection */
 
@@ -139,5 +154,3 @@ AUDIOHW_SETTINGS(
 
 #undef AUDIOHW_SETTINGS
 #undef AUDIOHW_SETTING_ENT
-#undef AUDIOHW_SOUND_SETTINGS_ENTRIES
-#undef AUDIOHW_SOUND_SETTINGS_VAL2PHYS

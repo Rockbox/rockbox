@@ -24,9 +24,6 @@
 /* i.MX233 can boost up to 6dB in DAC mode and 12dB in line mode. Since mic/line
  * already have adjustable gain, keep lowest of both. With chained DAC volume
  * and headphone volume, the i.MX233 can achieve < -100dB but stay at -100dB. */
-#define VOLUME_MIN -1000
-#define VOLUME_MAX  60
-
 #define AUDIOHW_CAPS    (DEPTH_3D_CAP | BASS_CAP | TREBLE_CAP | \
                          LIN_GAIN_CAP | MIC_GAIN_CAP)
 

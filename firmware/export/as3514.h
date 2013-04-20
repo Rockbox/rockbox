@@ -32,14 +32,8 @@
 
 /*different volume ranges for different AMS chips*/
 #if CONFIG_CPU == AS3525v2 
-/* Headphone volume goes from -81.0 ... +6dB */
-#define VOLUME_MIN -810
-#define VOLUME_MAX   60
 AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -82,   6, -25)
 #else /* AS3525v1 */
-/* Headphone volume goes from -73.5 ... +6dB */
-#define VOLUME_MIN -735
-#define VOLUME_MAX   60
 AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -74,   6, -25)
 #endif /* CONFIG_CPU == AS3525v2 */
 

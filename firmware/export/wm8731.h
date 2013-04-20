@@ -24,10 +24,6 @@
 #ifndef _WM8731_H
 #define _WM8731_H
 
-/* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -730
-#define VOLUME_MAX  60
-
 #define AUDIOHW_CAPS        (LIN_GAIN_CAP | MIC_GAIN_CAP)
 
 AUDIOHW_SETTING(VOLUME,     "dB", 0,  1, -74,   6, -25)

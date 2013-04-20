@@ -67,9 +67,9 @@ static void codec_set_active(int active)
 /* convert tenth of dB volume (-1270..0) to master volume register value */
 static int vol_tenthdb2hw(int db)
 {
-    if (db < VOLUME_MIN)
+    if (db <= -1280)
         return 0xff; /* mute */
-    else if (db >= VOLUME_MAX)
+    else if (db >= 0)
         return 0x00;
     else
         return ((-db)/5);

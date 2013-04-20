@@ -421,7 +421,9 @@ void pcm_play_dma_postinit(void)
 #ifndef HAVE_SW_VOLUME_CONTROL
 void pcm_set_mixer_volume(int volume)
 {
-    sim_volume = volume;
+    int minvol = sound_min(SOUND_VOLUME);
+    int volrange = sound_max(SOUND_VOLUME) - minvol;
+    sim_volume = SDL_MIX_MAXVOLUME * (volume / 10 - minvol) / volrange;
 }
 #endif /* HAVE_SW_VOLUME_CONTROL */
 

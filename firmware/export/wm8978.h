@@ -23,9 +23,6 @@
 #ifndef _WM8978_H
 #define _WM8978_H
 
-#define VOLUME_MIN -890
-#define VOLUME_MAX 60
-
 #if 0
 #define AUDIOHW_CAPS (EQ_CAP | PRESCALER_CAP | DEPTH_3D_CAP | \
                       LIN_GAIN_CAP | MIC_GAIN_CAP)

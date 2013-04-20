@@ -112,18 +112,6 @@ void sound_set(int setting, int value)
  * by 12 dB after processing.
  */
 
-static int current_volume  = 0; /* tenth dB */
-static int current_balance = 0; /* percent  */
-#ifdef AUDIOHW_HAVE_TREBLE
-static int current_treble  = 0; /* tenth dB */
-#endif
-#ifdef AUDIOHW_HAVE_BASS
-static int current_bass    = 0; /* tenth dB */
-#endif
-#ifdef AUDIOHW_HAVE_EQ
-static int current_eq_band_gain[AUDIOHW_EQ_BAND_NUM]; /* tenth dB */
-#endif
-
 /* Return the sound value scaled to centibels (tenth-decibels) */
 static int sound_value_to_cb(int setting, int value)
 {
@@ -133,20 +121,44 @@ static int sound_value_to_cb(int setting, int value)
     return value;
 }
 
+static struct
+{
+    int volume;                       /* tenth dB */
+    int balance;                      /* percent  */
+#if defined(AUDIOHW_HAVE_BASS)
+    int bass;                         /* tenth dB */
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE)
+    int treble;                       /* tenth dB */
+#endif
+#if defined(AUDIOHW_HAVE_EQ)
+    int eq_gain[AUDIOHW_EQ_BAND_NUM]; /* tenth dB */
+#endif
+} sound_prescaler;
+
+#if defined(AUDIOHW_HAVE_BASS) || defined (AUDIOHW_HAVE_TREBLE) \
+        || defined(AUDIOHW_HAVE_EQ)
+#define TONE_PRESCALER
+#endif
+
 static void set_prescaled_volume(void)
 {
-    int prescale = 0;
+#if defined(TONE_PRESCALER) || !defined(AUDIOHW_HAVE_MONO_VOLUME)
+    const int minvol = sound_value_to_cb(SOUND_VOLUME, sound_min(SOUND_VOLUME));
+#endif
+    int volume = sound_prescaler.volume;
 
-#if defined(AUDIOHW_HAVE_BASS) || defined(AUDIOHW_HAVE_TREBLE) \
-    || defined(AUDIOHW_HAVE_EQ)
+#if defined(TONE_PRESCALER)
+    int prescale = 0;
 
     /* Note: Having Tone + EQ isn't prohibited */
 #if defined(AUDIOHW_HAVE_BASS) && defined(AUDIOHW_HAVE_TREBLE)
-    prescale = MAX(current_bass, current_treble);
+    prescale = MAX(sound_prescaler.bass, sound_prescaler.treble);
 #endif
+
 #if defined(AUDIOHW_HAVE_EQ)
     for (int i = 0; i < AUDIOHW_EQ_BAND_NUM; i++)
-        prescale = MAX(current_eq_band_gain[i], prescale);
+        prescale = MAX(sound_prescaler.eq_gain[i], prescale);
 #endif
 
     if (prescale < 0)
@@ -156,31 +168,38 @@ static void set_prescaled_volume(void)
     /* Gain up the analog volume to compensate the prescale gain reduction,
      * but if this would push the volume over the top, reduce prescaling
      * instead (might cause clipping). */
-    if (current_volume + prescale > VOLUME_MAX)
-        prescale = VOLUME_MAX - current_volume;
+    const int maxvol = sound_value_to_cb(SOUND_VOLUME, sound_max(SOUND_VOLUME));
+
+    if (volume + prescale > maxvol)
+        prescale = maxvol - volume;
 
     audiohw_set_prescaler(prescale);
 
-    if (current_volume < VOLUME_MIN)
+    if (volume <= minvol)
         prescale = 0;  /* Make sure the audio gets muted */
-#endif /* AUDIOHW_HAVE_BASS || AUDIOHW_HAVE_TREBLE || AUDIOHW_HAVE_EQ */
+
+#ifndef AUDIOHW_HAVE_MONO_VOLUME
+    /* At the moment, such targets have lousy volume resolution and so minute
+       boost won't work how we'd like */
+    volume += prescale;
+#endif
+#endif /* TONE_PRESCALER */
 
 #if defined(AUDIOHW_HAVE_MONO_VOLUME)
-    audiohw_set_volume(current_volume);
+    audiohw_set_volume(volume);
 #else /* Stereo volume */
-    int l = current_volume + prescale, r = l;
+    int l = volume, r = volume;
 
-    /* Balance the channels scaled by the current volume and min volume. */
-    /* Subtract a dB from VOLUME_MIN to get it to a mute level */
-    int volshift = current_balance * VOLUME_RANGE / 100; /* tenth of dB */
+    /* Balance the channels scaled by the current volume and min volume */
+    int balance = sound_prescaler.balance; /* percent */
 
-    if (volshift > 0)
+    if (balance > 0)
     {
-        l -= ((l - (VOLUME_MIN - ONE_DB)) * volshift) / VOLUME_RANGE;
+        l -= (l - minvol) * balance / 100;
     }
-    else if (volshift < 0)
+    else if (balance < 0)
     {
-        r += ((r - (VOLUME_MIN - ONE_DB)) * volshift) / VOLUME_RANGE;
+        r += (r - minvol) * balance / 100;
     }
 
     audiohw_set_volume(l, r);
@@ -190,8 +209,6 @@ static void set_prescaled_volume(void)
     /* For now, lineout stays at unity */
     audiohw_set_lineout_volume(0, 0);
 #endif /* AUDIOHW_HAVE_LINEOUT */
-
-    (void)prescale; /* In case of no tone controls + mono volume */
 }
 #endif /* AUDIOIHW_HAVE_CLIPPING */
 
@@ -203,7 +220,7 @@ void sound_set_volume(int value)
 #if defined(AUDIOHW_HAVE_CLIPPING)
     audiohw_set_volume(value);
 #else
-    current_volume = sound_value_to_cb(SOUND_VOLUME, value);
+    sound_prescaler.volume = sound_value_to_cb(SOUND_VOLUME, value);
     set_prescaled_volume();
 #endif
 }
@@ -216,12 +233,12 @@ void sound_set_balance(int value)
 #if defined(AUDIOHW_HAVE_BALANCE)
     audiohw_set_balance(value);
 #else
-    current_balance = value;
+    sound_prescaler.balance = value;
     set_prescaled_volume();
 #endif
 }
 
-#ifdef AUDIOHW_HAVE_BASS
+#if defined(AUDIOHW_HAVE_BASS)
 void sound_set_bass(int value)
 {
     if (!audio_is_initialized)
@@ -230,13 +247,13 @@ void sound_set_bass(int value)
     audiohw_set_bass(value);
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
-    current_bass = sound_value_to_cb(SOUND_BASS, value);
+    sound_prescaler.bass = sound_value_to_cb(SOUND_BASS, value);
     set_prescaled_volume();
 #endif
 }
 #endif /* AUDIOHW_HAVE_BASS */
 
-#ifdef AUDIOHW_HAVE_TREBLE
+#if defined(AUDIOHW_HAVE_TREBLE)
 void sound_set_treble(int value)
 {
     if (!audio_is_initialized)
@@ -245,7 +262,7 @@ void sound_set_treble(int value)
     audiohw_set_treble(value);
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
-    current_treble = sound_value_to_cb(SOUND_TREBLE, value);
+    sound_prescaler.treble = sound_value_to_cb(SOUND_TREBLE, value);
     set_prescaled_volume();
 #endif
 }
@@ -259,7 +276,7 @@ void sound_set_bass_cutoff(int value)
 
     audiohw_set_bass_cutoff(value);
 }
-#endif
+#endif /* AUDIOHW_HAVE_BASS_CUTOFF */
 
 #if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
 void sound_set_treble_cutoff(int value)
@@ -269,7 +286,7 @@ void sound_set_treble_cutoff(int value)
 
     audiohw_set_treble_cutoff(value);
 }
-#endif
+#endif /* AUDIOHW_HAVE_TREBLE_CUTOFF */
 
 void sound_set_channels(int value)
 {
@@ -295,7 +312,7 @@ void sound_set_depth_3d(int value)
 
     audiohw_set_depth_3d(value);
 }
-#endif
+#endif /* AUDIOHW_HAVE_DEPTH_3D */
 
 #if defined(AUDIOHW_HAVE_EQ)
 int sound_enum_hw_eq_band_setting(unsigned int band,
@@ -370,11 +387,13 @@ static void sound_set_hw_eq_band_gain(unsigned int band, int value)
     if (!audio_is_initialized)
         return;
 
-    int setting = sound_enum_hw_eq_band_setting(band, AUDIOHW_EQ_GAIN);
-    current_eq_band_gain[band] = sound_value_to_cb(setting, value);
-
     audiohw_set_eq_band_gain(band, value);
+
+#if !defined (AUDIOHW_HAVE_CLIPPING)
+    int setting = sound_enum_hw_eq_band_setting(band, AUDIOHW_EQ_GAIN);
+    sound_prescaler.eq_gain[band] = sound_value_to_cb(setting, value);
     set_prescaled_volume();
+#endif /* AUDIOHW_HAVE_CLIPPING */
 }
 
 void sound_set_hw_eq_band1_gain(int value)
@@ -557,7 +576,7 @@ void sound_set_superbass(int value)
 }
 #endif /* CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F */
 
-#ifdef HAVE_PITCHCONTROL
+#if defined(HAVE_PITCHCONTROL)
 void sound_set_pitch(int32_t pitch)
 {
     if (!audio_is_initialized)

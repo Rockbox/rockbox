@@ -427,9 +427,9 @@ void pcm_play_dma_postinit(void)
 
 void pcm_set_mixer_volume(int volume)
 {
-    /* gstreamer volume range is from 0.00 to 1.00 */
-    gdouble gst_vol = (gdouble)(volume - VOLUME_MIN) / (gdouble)VOLUME_RANGE;
-
+    /* gstreamer volume range is from 0.00 to 1.00
+     * input is -990..0 */
+    gdouble gst_vol = 1.0f - (gdouble)volume / -990.0f;
     g_object_set (G_OBJECT(gst_volume), "volume", gst_vol, NULL);
 }
 

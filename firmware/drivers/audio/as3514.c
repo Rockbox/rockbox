@@ -31,6 +31,16 @@
 #include "i2s.h"
 #include "ascodec.h"
 
+#if CONFIG_CPU == AS3525v2 
+/* Headphone volume goes from -81.0 ... +6dB */
+#define VOLUME_MIN -820
+#define VOLUME_MAX   60
+#else
+/* Headphone volume goes from -73.5 ... +6dB */
+#define VOLUME_MIN -740
+#define VOLUME_MAX   60
+#endif
+
 /*
  * This drivers supports:
  * as3514 , as used in the PP targets
@@ -99,13 +109,12 @@ static void as3514_write_masked(unsigned int reg, unsigned int bits,
 /* convert tenth of dB volume to master volume register value */
 static int vol_tenthdb2hw(int db)
 {
-    /* +6 to -73.5dB (or -81.0 dB) in 1.5dB steps == 53 (or 58) levels */
-    if (db < VOLUME_MIN) {
+    if (db <= VOLUME_MIN) {
         return 0x0;
     } else if (db > VOLUME_MAX) {
-        return (VOLUME_MAX-VOLUME_MIN)/15;
+        return (VOLUME_MAX - VOLUME_MIN) / 15;
     } else {
-        return((db-VOLUME_MIN)/15); /* VOLUME_MIN is negative */
+        return  (db - VOLUME_MIN) / 15;
     }
 }
 

@@ -21,10 +21,6 @@
 #ifndef __TSC2100_H_
 #define __TSC2100_H_
 
-/* volume/balance/treble/bass interdependency */
-#define VOLUME_MIN -630
-#define VOLUME_MAX 0
-
 AUDIOHW_SETTING(VOLUME, "dB", 0, 1, -64, 0, -25)
 
 void tsc2100_read_data(void);
@@ -94,8 +90,6 @@ void tsc2100_keyclick(void);
 /* ts codec dac gain control */
 #define TSDACGAIN_PAGE          2
 #define TSDACGAIN_ADDRESS       0x02
-#define VOLUME_MAX  0
-#define VOLUME_MIN  -630
 
 /* ts audio control 2 */
 #define TSAC2_PAGE          2
