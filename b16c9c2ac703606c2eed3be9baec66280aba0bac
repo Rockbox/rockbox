@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///Ro\u003d",
+        "filename": "lib/fixedpoint/fixedpoint.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-21T21:10:03Z",
+      "side": 1,
+      "message": "Okay, I don\u0027t know why but I can see it in plugins.make.",
+      "parentUuid": "AAAASX///SA\u003d",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///SY\u003d",
         "filename": "lib/rbcodec/rbcodec.make",
         "patchSetId": 5
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "No. Explained in comment. If sections are discarded from the library because it\u0027s earlier in the list, then rbcodec won\u0027t link. libfixedpoint needs to go later. If you know another way around this dependency issue that is reasonable, then feel free to make it known. Otherwise it\u0027s nothing more than str \u003d str + \"x\" vs. str \u003d \"x\" + str.",
       "parentUuid": "AAAASX///SY\u003d",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Rk\u003d",
+        "filename": "lib/rbcodec/rbcodec.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-21T21:10:03Z",
+      "side": 1,
+      "message": "ah, I misread that line. Probably fine.",
+      "parentUuid": "AAAASX///R8\u003d",
       "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -206,6 +242,24 @@
       "side": 1,
       "message": "Making libfixedpoint doesn\u0027t imply core dependence. I suppose that can be \r\nadjusted to check SOFTWARECODECS in fixedpoint.make",
       "parentUuid": "AAAASX///SM\u003d",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Rg\u003d",
+        "filename": "tools/root.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-21T21:10:03Z",
+      "side": 1,
+      "message": "/me has trouble parsing that reply\n\nI was just suggesting the \"CORE_LIBS +\u003d $(FIXEDPOINTLIB)\" line should be in fixedpoint.make like done in the other lib makefiles, for the sake of consistency.\n\nIf you are suggesting to join all \"CORE_LIBS +\u003d XXX\" lines into root.make I think that should be a separate change.",
+      "parentUuid": "AAAASX///Rw\u003d",
       "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
