@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///SE\u003d",
+        "filename": "apps/plugins/lib/grey_core.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2013-04-21T09:04:25Z",
+      "side": 1,
+      "message": "True enough. Probably cruft.",
+      "parentUuid": "AAAASX///Sg\u003d",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///Sc\u003d",
         "filename": "lib/fixedpoint/fixedpoint.make",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2013-04-20T22:38:06Z",
       "side": 1,
       "message": "Why is that?",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///SA\u003d",
+        "filename": "lib/fixedpoint/fixedpoint.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2013-04-21T09:04:25Z",
+      "side": 1,
+      "message": "Someone wants the SIM to use that convention, presumably for some debugging purpose. Check out other plugin and codec libs.",
+      "parentUuid": "AAAASX///Sc\u003d",
       "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///R8\u003d",
+        "filename": "lib/rbcodec/rbcodec.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2013-04-21T09:04:25Z",
+      "side": 1,
+      "message": "No. Explained in comment. If sections are discarded from the library because it\u0027s earlier in the list, then rbcodec won\u0027t link. libfixedpoint needs to go later. If you know another way around this dependency issue that is reasonable, then feel free to make it known. Otherwise it\u0027s nothing more than str \u003d str + \"x\" vs. str \u003d \"x\" + str.",
+      "parentUuid": "AAAASX///SY\u003d",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///SU\u003d",
         "filename": "tools/database/database.make",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2013-04-20T22:38:06Z",
       "side": 1,
       "message": "Whitespaces",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///R4\u003d",
+        "filename": "tools/database/database.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2013-04-21T09:04:25Z",
+      "side": 1,
+      "message": "@_@",
+      "parentUuid": "AAAASX///SU\u003d",
       "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///R0\u003d",
+        "filename": "tools/root.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2013-04-21T09:04:25Z",
+      "side": 1,
+      "message": "bootbox did its own. personally I don\u0027t care and it\u0027s no worse than what\u0027s \r\ngoing on. these settings shouldn\u0027t be forced globally, unless --gc-sections \r\nshould be the linker default. Even without -ffunction-sections \r\nand -fdata-sections it can help drop an unused thing or two or three.",
+      "parentUuid": "AAAASX///SQ\u003d",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///SM\u003d",
         "filename": "tools/root.make",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2013-04-20T22:38:06Z",
       "side": 1,
       "message": "CORE_LIBS is modified in the respective makefile (see rbcodec.make), IMO this patch should follow suit.\n\nChanging this to be all in root.make should be a separate change if it\u0027s wanted.",
+      "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Rw\u003d",
+        "filename": "tools/root.make",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2013-04-21T09:04:25Z",
+      "side": 1,
+      "message": "Making libfixedpoint doesn\u0027t imply core dependence. I suppose that can be \r\nadjusted to check SOFTWARECODECS in fixedpoint.make",
+      "parentUuid": "AAAASX///SM\u003d",
       "revId": "b16c9c2ac703606c2eed3be9baec66280aba0bac",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
