@@ -1139,6 +1139,18 @@ Lyre prototype 1 */
 #define ROCKBOX_HAS_LOGDISKF
 #endif
 
+#if defined(HAVE_SDL_AUDIO) && CONFIG_CODEC == SWCODEC \
+    && !defined(HAVE_SW_VOLUME_CONTROL) \
+    && !(CONFIG_PLATFORM & PLATFORM_MAEMO5)
+/* SW volume is needed for accurate control and no double buffering should be
+ * required. If target uses SW volume, then its definitions are used instead
+ * so things are as on target. */
+#define HAVE_SW_VOLUME_CONTROL
+#define PCM_SW_VOLUME_UNBUFFERED /* pcm driver itself is buffered */
+/* 24 bits is a nice res for ~ -128dB...+36dB that covers all targets */
+#define PCM_SW_VOLUME_FRACBITS  (24)
+#endif /* default SDL SW volume conditions */
+
 /* null audiohw setting macro for when codec header is included for reasons
    other than audio support */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)

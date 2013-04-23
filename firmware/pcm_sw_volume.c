@@ -26,6 +26,67 @@
 #include "fixedpoint.h"
 #include "pcm_sw_volume.h"
 
+static int32_t vol_factor_l = 0, vol_factor_r = 0;
+#ifdef AUDIOHW_HAVE_PRESCALER
+static int32_t prescale_factor = PCM_FACTOR_UNITY;
+#endif /* AUDIOHW_HAVE_PRESCALER */
+
+/* pcm scaling factors */
+static int32_t pcm_factor_l = 0, pcm_factor_r = 0;
+
+#define PCM_FACTOR_CLIP(f) \
+    MAX(MIN((f), PCM_FACTOR_MAX), PCM_FACTOR_MIN)
+
+
+/** Volume scaling routine
+ ** If unbuffered, called externally by pcm driver
+ **/
+
+/* TODO: #include CPU-optimized routines and move this to /firmware/asm */
+
+#if PCM_SW_VOLUME_FRACBITS > 16
+/* Requires large integer math */
+#define PCM_SCALE_SAMPLE(f, s) \
+    (int32_t)(((int64_t)(f) * (s) + PCM_FACTOR_UNITY/2) >> PCM_SW_VOLUME_FRACBITS)
+#else /* PCM_SW_VOLUME_FRACBITS <= 16 */
+#define PCM_SCALE_SAMPLE(f, s) \
+    (((f) * (s) + PCM_FACTOR_UNITY/2) >> PCM_SW_VOLUME_FRACBITS)
+#endif /* PCM_SW_VOLUME_FRACBITS > 16 */
+
+/* Copies buffer with volume scaling applied */
+#ifndef PCM_SW_VOLUME_UNBUFFERED
+static inline
+#endif
+void pcm_sw_volume_copy_buffer(void *dst, const void *src, size_t size)
+{
+    int16_t *d = dst;
+    const int16_t *s = src;
+    int32_t factor_l = pcm_factor_l;
+    int32_t factor_r = pcm_factor_r;
+
+    if (LIKELY(factor_l <= PCM_FACTOR_UNITY && factor_r <= PCM_FACTOR_UNITY))
+    {
+        /* All cut or unity */
+        while (size)
+        {
+            *d++ = PCM_SCALE_SAMPLE(factor_l, *s++);
+            *d++ = PCM_SCALE_SAMPLE(factor_r, *s++);
+            size -= PCM_SAMPLE_SIZE;
+        }
+    }
+    else
+    {
+        /* Any positive gain requires clipping */
+        while (size)
+        {
+            *d++ = clip_sample_16(PCM_SCALE_SAMPLE(factor_l, *s++));
+            *d++ = clip_sample_16(PCM_SCALE_SAMPLE(factor_r, *s++));
+            size -= PCM_SAMPLE_SIZE;
+        }
+    }
+}
+
+#ifndef PCM_SW_VOLUME_UNBUFFERED
 /* source buffer from client */
 static const void * volatile src_buf_addr = NULL;
 static size_t volatile src_buf_rem = 0;
@@ -40,48 +101,7 @@ static int pcm_dbl_buf_num = 0;
 static size_t frame_size;
 static unsigned int frame_count, frame_err, frame_frac;
 
-static int32_t vol_factor_l = 0, vol_factor_r = 0;
-#ifdef AUDIOHW_HAVE_PRESCALER
-static int32_t prescale_factor = PCM_FACTOR_UNITY;
-#endif /* AUDIOHW_HAVE_PRESCALER */
-
-/* pcm scaling factors */
-static int32_t pcm_factor_l = 0, pcm_factor_r = 0;
-
-#define PCM_FACTOR_CLIP(f) \
-    MAX(MIN((f), PCM_FACTOR_MAX), PCM_FACTOR_MIN)
-#define PCM_SCALE_SAMPLE(f, s) \
-    (((f) * (s) + PCM_FACTOR_UNITY/2) >> PCM_FACTOR_BITS)
-
-
-/* TODO: #include CPU-optimized routines and move this to /firmware/asm */
-static inline void pcm_copy_buffer(int16_t *dst, const int16_t *src,
-                                   size_t size)
-{
-    int32_t factor_l = pcm_factor_l;
-    int32_t factor_r = pcm_factor_r;
-
-    if (LIKELY(factor_l <= PCM_FACTOR_UNITY && factor_r <= PCM_FACTOR_UNITY))
-    {
-        /* All cut or unity */
-        while (size)
-        {
-            *dst++ = PCM_SCALE_SAMPLE(factor_l, *src++);
-            *dst++ = PCM_SCALE_SAMPLE(factor_r, *src++);
-            size -= PCM_SAMPLE_SIZE;
-        }
-    }
-    else
-    {
-        /* Any positive gain requires clipping */
-        while (size)
-        {
-            *dst++ = clip_sample_16(PCM_SCALE_SAMPLE(factor_l, *src++));
-            *dst++ = clip_sample_16(PCM_SCALE_SAMPLE(factor_r, *src++));
-            size -= PCM_SAMPLE_SIZE;
-        }
-    }
-}
+/** Overrides of certain functions in pcm.c and pcm-internal.h **/
 
 bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
                                     const void **addr, size_t *size)
@@ -155,7 +175,7 @@ pcm_play_dma_status_callback_int(enum pcm_dma_status status)
 
     pcm_dbl_buf_num ^= 1;
     pcm_dbl_buf_size[pcm_dbl_buf_num] = size;
-    pcm_copy_buffer(pcm_dbl_buf[pcm_dbl_buf_num], addr, size);
+    pcm_sw_volume_copy_buffer(pcm_dbl_buf[pcm_dbl_buf_num], addr, size);
 
     return PCM_DMAST_OK;
 }
@@ -216,6 +236,11 @@ const void * pcm_play_dma_get_peak_buffer_int(int *count)
     return NULL;
 }
 
+#endif /* PCM_SW_VOLUME_UNBUFFERED */
+
+
+/** Internal **/
+
 /* Return the scale factor corresponding to the centibel level */
 static int32_t pcm_centibels_to_factor(int volume)
 {
@@ -223,8 +248,12 @@ static int32_t pcm_centibels_to_factor(int volume)
         return 0; /* mute */
 
     /* Centibels -> fixedpoint */
-    return fp_factor(fp_div(volume, 10, PCM_FACTOR_BITS), PCM_FACTOR_BITS);
+    return fp_factor(fp_div(volume, 10, PCM_SW_VOLUME_FRACBITS),
+                     PCM_SW_VOLUME_FRACBITS);
 }
+
+
+/** Public functions **/
 
 /* Produce final pcm scale factor */
 static void pcm_sync_prescaler(void)
@@ -232,8 +261,8 @@ static void pcm_sync_prescaler(void)
     int32_t factor_l = vol_factor_l;
     int32_t factor_r = vol_factor_r;
 #ifdef AUDIOHW_HAVE_PRESCALER
-    factor_l = fp_mul(prescale_factor, factor_l, PCM_FACTOR_BITS);
-    factor_r = fp_mul(prescale_factor, factor_r, PCM_FACTOR_BITS);
+    factor_l = fp_mul(prescale_factor, factor_l, PCM_SW_VOLUME_FRACBITS);
+    factor_r = fp_mul(prescale_factor, factor_r, PCM_SW_VOLUME_FRACBITS);
 #endif
     pcm_factor_l = PCM_FACTOR_CLIP(factor_l);
     pcm_factor_r = PCM_FACTOR_CLIP(factor_r);
