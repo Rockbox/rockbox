@@ -106,8 +106,9 @@ static void pcm_play_data_start_int(const void *addr, size_t size);
 static void pcm_play_pause_int(bool play);
 void pcm_play_stop_int(void);
 
-#ifndef HAVE_SW_VOLUME_CONTROL
-/** Standard hw volume control functions - otherwise, see pcm_sw_volume.c **/
+#if !defined(HAVE_SW_VOLUME_CONTROL) || defined(PCM_SW_VOLUME_UNBUFFERED)
+/** Standard hw volume/unbuffered control functions - otherwise, see
+ ** pcm_sw_volume.c **/
 static inline void pcm_play_dma_start_int(const void *addr, size_t size)
 {
     pcm_play_dma_start(addr, size);
@@ -150,7 +151,7 @@ bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
     pcm_play_stop_int();
     return false;
 }
-#endif /* ndef HAVE_SW_VOLUME_CONTROL */
+#endif /* !HAVE_SW_VOLUME_CONTROL || PCM_SW_VOLUME_UNBUFFERED */
 
 static void pcm_play_data_start_int(const void *addr, size_t size)
 {
