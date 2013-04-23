@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///RM\u003d",
+        "filename": "tools/root.make",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-04-23T07:18:14Z",
+      "side": 1,
+      "message": "Hm, maybe I\u0027m misunderstanding...but isnt GLOBAL_LDOPTS supposed to be applied to all (core, codec and plugin) builds, while LDOPTS only applies to the core?",
+      "revId": "0e0549552ffba6f2466b1a13d53f9590a23e87f4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
