@@ -23,36 +23,48 @@
 #include "config.h"
 #include "sound.h"
 #include "pcm_sampr.h"
-
-/**
- * Audio Hardware api. Make them do nothing as we cannot properly simulate with
- * SDL. if we used DSP we would run code that doesn't actually run on the target
- **/
-
 #ifdef HAVE_SW_VOLUME_CONTROL
 #include "pcm_sw_volume.h"
+#include "fixedpoint.h"
+#endif
 
-void audiohw_set_volume(int vol_l, int vol_r)
+/**
+ * Audio Hardware api. Make some of them do nothing as we cannot properly
+ * simulate with SDL. if we used DSP we would run code that doesn't actually
+ * run on the target
+ **/
+#ifdef HAVE_SW_VOLUME_CONTROL
+static int sdl_volume_level(int volume)
 {
-    pcm_set_master_volume(vol_l, vol_r);
+    int shift = (1 - sound_numdecimals(SOUND_VOLUME)) << 16;
+    int minvol = fp_mul(sound_min(SOUND_VOLUME), fp_exp10(shift, 16), 16);
+    return volume <= minvol ? INT_MIN : volume;
 }
+#endif /* HAVE_SW_VOLUME_CONTROL */
 
-#else /* ndef HAVE_SW_VOLUME_CONTROL */
-
-
+#if defined(AUDIOHW_HAVE_MONO_VOLUME)
 void audiohw_set_volume(int volume)
 {
-#if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_SW_VOLUME_CONTROL
+    volume = sdl_volume_level(volume);
+    pcm_set_master_volume(volume, volume);
+#elif CONFIG_CODEC == SWCODEC
     extern void pcm_set_mixer_volume(int volume);
     pcm_set_mixer_volume(volume);
 #endif
     (void)volume;
 }
-#endif /* HAVE_SW_VOLUME_CONTROL */
-
-/**
- * stubs here, for the simulator
- **/
+#else /* !AUDIOHW_HAVE_MONO_VOLUME */
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+#ifdef HAVE_SW_VOLUME_CONTROL
+    vol_l = sdl_volume_level(vol_l);
+    vol_r = sdl_volume_level(vol_r);
+    pcm_set_master_volume(vol_l, vol_r);
+#endif
+    (void)vol_l; (void)vol_r;
+}
+#endif /* AUDIOHW_HAVE_MONO_VOLUME */
 
 #if defined(AUDIOHW_HAVE_PRESCALER)
 void audiohw_set_prescaler(int value)
@@ -62,7 +74,8 @@ void audiohw_set_prescaler(int value)
 #endif
     (void)value;
 }
-#endif
+#endif /* AUDIOHW_HAVE_PRESCALER */
+
 #if defined(AUDIOHW_HAVE_BALANCE)
 void audiohw_set_balance(int value)     { (void)value; }
 #endif

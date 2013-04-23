@@ -111,11 +111,6 @@ struct sound_settings_info
 #include "hosted_codec.h"
 #endif
 
-#if defined(SIMULATOR) && !defined(HAVE_SW_VOLUME_CONTROL)
-/* For now, without software volume control, sim only supports mono control */
-#define AUDIOHW_HAVE_MONO_VOLUME
-#endif
-
 /* Some values are the same for every codec and can be defined here one
    time. */
 #ifdef HAVE_SW_TONE_CONTROLS
