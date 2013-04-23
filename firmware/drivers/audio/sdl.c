@@ -23,12 +23,6 @@
 #include "config.h"
 #include "sound.h"
 #include "pcm_sampr.h"
-#if CONFIG_CODEC == SWCODEC
-#include "fixedpoint.h"
-#ifdef HAVE_SW_VOLUME_CONTROL
-#include "pcm_sw_volume.h"
-#endif
-#endif
 
 /**
  * Audio Hardware api. Make them do nothing as we cannot properly simulate with
@@ -36,6 +30,8 @@
  **/
 
 #ifdef HAVE_SW_VOLUME_CONTROL
+#include "pcm_sw_volume.h"
+
 void audiohw_set_volume(int vol_l, int vol_r)
 {
     pcm_set_master_volume(vol_l, vol_r);
