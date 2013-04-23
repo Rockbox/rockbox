@@ -16,6 +16,24 @@
       "revId": "0e0549552ffba6f2466b1a13d53f9590a23e87f4",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///RE\u003d",
+        "filename": "tools/root.make",
+        "patchSetId": 7
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2013-04-23T23:05:53Z",
+      "side": 1,
+      "message": "LDOPTS seems to be, at least in current usage, something for specific targets and only used by certain makefiles. GLOBAL_LDOPTS is what is being used to feed flags to the core rule. Perhaps all this shold be straightened out and made clear but I don\u0027t think this patch is the place. Afterall, it is software and can be easily changed. :-)",
+      "parentUuid": "AAAASX///RM\u003d",
+      "revId": "0e0549552ffba6f2466b1a13d53f9590a23e87f4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
