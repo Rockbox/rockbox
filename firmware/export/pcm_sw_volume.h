@@ -21,6 +21,12 @@
 #ifndef PCM_SW_VOLUME_H
 #define PCM_SW_VOLUME_H
 
+/***
+ ** Note: Only PCM drivers that are themselves buffered should use the
+ ** PCM_SW_VOLUME_UNBUFFERED configuration. This may be part of the platform,
+ ** the library or a hardware necessity. Normally, it shouldn't be used and
+ ** only the port developer can properly decide.
+ **/
 #ifdef HAVE_SW_VOLUME_CONTROL
 
 #include <audiohw.h>

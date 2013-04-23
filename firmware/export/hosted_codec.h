@@ -21,8 +21,13 @@
 #ifndef HOSTED_CODEC_H
 #define HOSTED_CODEC_H
 
+#if defined(HAVE_SDL_AUDIO) \
+    && !(CONFIG_PLATFORM & PLATFORM_MAEMO5)
+AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -80,   0,   0)
+#else
 #define AUDIOHW_CAPS    (MONO_VOL_CAP)
 AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -99,   0,   0)
+#endif /* CONFIG_PLATFORM & PLATFORM_SDL */
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 /* Bass and treble tone controls */

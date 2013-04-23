@@ -51,12 +51,6 @@
 extern bool debug_audio;
 #endif
 
-#ifdef HAVE_SW_VOLUME_CONTROL
-static int sim_volume = SDL_MIX_MAXVOLUME;
-#else
-static int sim_volume = 0;
-#endif
-
 #if CONFIG_CODEC == SWCODEC
 static int cvt_status = -1;
 
@@ -177,10 +171,10 @@ static void write_to_soundcard(struct pcm_udata *udata)
             cvt.len = rd * pcm_sample_bytes;
             cvt.buf = (Uint8 *) malloc(cvt.len * cvt.len_mult);
 
-            memcpy(cvt.buf, pcm_data, cvt.len);
+            pcm_copy_buffer(cvt.buf, pcm_data, cvt.len);
 
             SDL_ConvertAudio(&cvt);
-            SDL_MixAudio(udata->stream, cvt.buf, cvt.len_cvt, sim_volume);
+            memcpy(udata->stream, cvt.buf, cvt.len_cvt);
 
             udata->num_in = cvt.len / pcm_sample_bytes;
             udata->num_out = cvt.len_cvt / pcm_sample_bytes;
@@ -223,8 +217,8 @@ static void write_to_soundcard(struct pcm_udata *udata)
         }
     } else {
         udata->num_in = udata->num_out = MIN(udata->num_in, udata->num_out);
-        SDL_MixAudio(udata->stream, pcm_data, 
-                     udata->num_out * pcm_sample_bytes, sim_volume);
+        pcm_copy_buffer(udata->stream, pcm_data,
+                        udata->num_out * pcm_sample_bytes);
 #ifdef DEBUG
         if (udata->debug != NULL) {
            fwrite(pcm_data, sizeof(Uint8), udata->num_out * pcm_sample_bytes,
@@ -417,14 +411,5 @@ void pcm_play_dma_init(void)
 void pcm_play_dma_postinit(void)
 {
 }
-
-#ifndef HAVE_SW_VOLUME_CONTROL
-void pcm_set_mixer_volume(int volume)
-{
-    int minvol = sound_min(SOUND_VOLUME);
-    int volrange = sound_max(SOUND_VOLUME) - minvol;
-    sim_volume = SDL_MIX_MAXVOLUME * (volume / 10 - minvol) / volrange;
-}
-#endif /* HAVE_SW_VOLUME_CONTROL */
 
 #endif /* CONFIG_CODEC == SWCODEC */
