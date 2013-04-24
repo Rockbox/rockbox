@@ -7,9 +7,9 @@
 
 Build Your Own Rockbox
 
-1. Check out 'rockbox' from SVN (or extract a downloaded archive).
+1. Clone 'rockbox' from git (or extract a downloaded archive).
 
-   $ svn co svn://svn.rockbox.org/rockbox/trunk rockbox
+   $ git clone git://git.rockbox.org/rockbox
 
      or
 
