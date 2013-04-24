@@ -40,9 +40,9 @@ static int pcm_dbl_buf_num = 0;
 static size_t frame_size;
 static unsigned int frame_count, frame_err, frame_frac;
 
+static int32_t vol_factor_l = 0, vol_factor_r = 0;
 #ifdef AUDIOHW_HAVE_PRESCALER
 static int32_t prescale_factor = PCM_FACTOR_UNITY;
-static int32_t vol_factor_l = 0, vol_factor_r = 0;
 #endif /* AUDIOHW_HAVE_PRESCALER */
 
 /* pcm scaling factors */
@@ -223,25 +223,30 @@ static int32_t pcm_centibels_to_factor(int volume)
         return 0; /* mute */
 
     /* Centibels -> fixedpoint */
-    return fp_factor(PCM_FACTOR_UNITY*volume / 10, PCM_FACTOR_BITS);
+    return fp_factor(fp_div(volume, 10, PCM_FACTOR_BITS), PCM_FACTOR_BITS);
 }
 
-#ifdef AUDIOHW_HAVE_PRESCALER
 /* Produce final pcm scale factor */
 static void pcm_sync_prescaler(void)
 {
-    int32_t factor_l = fp_mul(prescale_factor, vol_factor_l, PCM_FACTOR_BITS);
-    int32_t factor_r = fp_mul(prescale_factor, vol_factor_r, PCM_FACTOR_BITS);
+    int32_t factor_l = vol_factor_l;
+    int32_t factor_r = vol_factor_r;
+#ifdef AUDIOHW_HAVE_PRESCALER
+    factor_l = fp_mul(prescale_factor, factor_l, PCM_FACTOR_BITS);
+    factor_r = fp_mul(prescale_factor, factor_r, PCM_FACTOR_BITS);
+#endif
     pcm_factor_l = PCM_FACTOR_CLIP(factor_l);
     pcm_factor_r = PCM_FACTOR_CLIP(factor_r);
 }
 
+#ifdef AUDIOHW_HAVE_PRESCALER
 /* Set the prescaler value for all PCM playback */
 void pcm_set_prescaler(int prescale)
 {
     prescale_factor = pcm_centibels_to_factor(-prescale);
     pcm_sync_prescaler();
 }
+#endif /* AUDIOHW_HAVE_PRESCALER */
 
 /* Set the per-channel volume cut/gain for all PCM playback */
 void pcm_set_master_volume(int vol_l, int vol_r)
@@ -250,15 +255,3 @@ void pcm_set_master_volume(int vol_l, int vol_r)
     vol_factor_r = pcm_centibels_to_factor(vol_r);
     pcm_sync_prescaler();
 }
-
-#else /* ndef AUDIOHW_HAVE_PRESCALER */
-
-/* Set the per-channel volume cut/gain for all PCM playback */
-void pcm_set_master_volume(int vol_l, int vol_r)
-{
-    int32_t factor_l = pcm_centibels_to_factor(vol_l);
-    int32_t factor_r = pcm_centibels_to_factor(vol_r);
-    pcm_factor_l = PCM_FACTOR_CLIP(factor_l);
-    pcm_factor_r = PCM_FACTOR_CLIP(factor_r);
-}
-#endif /* AUDIOHW_HAVE_PRESCALER */
