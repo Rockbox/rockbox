@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///Qo\u003d",
+        "filename": "firmware/target/arm/pp/uart-pp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-25T09:37:58Z",
+      "side": 1,
+      "message": "This red thing is \u0027white space error\u0027",
+      "revId": "74da8f7df1976ea0967bbd31f561d1338a7a931e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Qk\u003d",
+        "filename": "firmware/target/arm/pp/uart-pp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-25T09:37:58Z",
+      "side": 1,
+      "message": "this too",
+      "revId": "74da8f7df1976ea0967bbd31f561d1338a7a931e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Qg\u003d",
+        "filename": "firmware/target/arm/pp/uart-pp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-25T09:37:58Z",
+      "side": 1,
+      "message": "and this...",
+      "revId": "74da8f7df1976ea0967bbd31f561d1338a7a931e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Qc\u003d",
+        "filename": "firmware/target/arm/pp/uart-pp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-25T09:37:58Z",
+      "side": 1,
+      "message": "and this...",
+      "revId": "74da8f7df1976ea0967bbd31f561d1338a7a931e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///QY\u003d",
+        "filename": "firmware/target/arm/pp/uart-pp.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-04-25T09:37:58Z",
+      "side": 1,
+      "message": "and this...",
+      "revId": "74da8f7df1976ea0967bbd31f561d1338a7a931e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
