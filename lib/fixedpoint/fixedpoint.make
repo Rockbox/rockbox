@@ -19,7 +19,7 @@ CORE_LIBS += $(FIXEDPOINTLIB)
 CORE_GCSECTIONS := yes
 endif
 
-FIXEDPOINTLIB_FLAGS := $(CFLAGS)
+FIXEDPOINTLIB_FLAGS := $(CFLAGS) $(SHARED_CFLAGS)
 
 # Do not use '-ffunction-sections' and '-fdata-sections' when compiling sdl-sim
 ifneq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)
