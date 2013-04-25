@@ -100,6 +100,8 @@ struct gui_synclist
     int start_item[NB_SCREENS]; /* the item that is displayed at the top of the screen */
     /* the number of lines that are selected at the same time */
     int selected_size;
+    /* the number of pixels each line occupies (including optional padding on touchscreen */
+    int line_height[NB_SCREENS];
 #ifdef HAVE_LCD_BITMAP
     int offset_position[NB_SCREENS]; /* the list's screen scroll placement in pixels */
 #endif
