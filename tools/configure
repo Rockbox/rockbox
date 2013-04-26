@@ -711,7 +711,11 @@ androidcc () {
     if [ -z "$gccdir" ]; then
         gccdir=$gcctarget$gccchoice
     fi
-    gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86
+    if [ -d $ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86 ]; then
+        gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86
+    else
+        gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86_64
+    fi
     PATH=$PATH:$gccprefix/bin
     prefixtools $gcctarget
 }
