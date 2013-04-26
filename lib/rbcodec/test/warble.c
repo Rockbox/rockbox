@@ -84,6 +84,11 @@ static bool use_dsp = true;
 static bool enable_loop = false;
 static const char *config = "";
 
+/* Volume control */
+#define VOL_FRACBITS 31
+#define VOL_FACTOR_UNITY (1u << VOL_FRACBITS)
+static uint32_t playback_vol_factor = VOL_FACTOR_UNITY;
+
 static int input_fd;
 static enum codec_command_action codec_action;
 static intptr_t codec_action_param = 0;
@@ -250,6 +255,33 @@ static void playback_init(void)
     playback_decode_sema = SDL_CreateSemaphore(0);
 }
 
+static void playback_copy_audio_buffer_S16SYS(
+    void *dst, const void *src, int len)
+{
+    int64_t factor = playback_vol_factor;
+
+    if (factor == VOL_FACTOR_UNITY) {
+        memcpy(dst, src, len);
+    } else {
+        const int16_t *s = src;
+        int16_t *d = dst;
+
+        while (len) {
+            *d++ = factor * *s++ >> VOL_FRACBITS;
+            *d++ = factor * *s++ >> VOL_FRACBITS;
+            len -= sizeof (int16_t) * 2;
+        }
+    }
+}
+
+static void playback_set_volume(int volume)
+{
+    if (volume > 0)
+        volume = 0;
+
+    playback_vol_factor = pow(10, (double)volume / 20.0) * VOL_FACTOR_UNITY;
+}
+
 static void playback_callback(void *userdata, Uint8 *stream, int len)
 {
     while (len > 0) {
@@ -268,7 +300,8 @@ static void playback_callback(void *userdata, Uint8 *stream, int len)
         }
         char *play_buffer = playback_buffer[playback_play_ind];
         int copy_len = MIN(len, PLAYBACK_BUFFER_SIZE - playback_play_pos);
-        memcpy(stream, play_buffer + playback_play_pos, copy_len);
+        playback_copy_audio_buffer_S16SYS(stream,
+            play_buffer + playback_play_pos, copy_len);
         len -= copy_len;
         stream += copy_len;
         playback_play_pos += copy_len;
@@ -360,11 +393,8 @@ static void perform_config(void)
             codec_action_param = atoi(val);
         } else if (!strncmp(name, "tempo=", 6)) {
             dsp_set_timestretch(atof(val) * PITCH_SPEED_100);
-#ifdef HAVE_SW_VOLUME_CONTROL
         } else if (!strncmp(name, "vol=", 4)) {
-            global_settings.volume = atoi(val);
-            dsp_callback(DSP_CALLBACK_SET_SW_VOLUME, 0);
-#endif
+            playback_set_volume(atoi(val));
         } else {
             fprintf(stderr, "error: unrecognized config \"%.*s\"\n",
                     (int)(eq - name), name);
@@ -814,9 +844,7 @@ static void print_help(const char *progname)
                     "  rate=<n>      Multiply rate by <n> [1.0]\n"
                     "  seek=<n>      Seek <n> ms into the file\n"
                     "  tempo=<n>     Timestretch by <n> [1.0]\n"
-#ifdef HAVE_SW_VOLUME_CONTROL
-                    "  vol=<n>       Set volume to <n> dB [0]\n"
-#endif
+                    "  vol=<n>       Set volume attenuation to <n> dB [-0]\n"
                     "  wait=<n>      Don't apply remaining configuration until\n"
                     "                <n> total samples have output\n"
                     "\n"
