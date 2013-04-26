@@ -967,7 +967,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
                  * language string and an optional short description;
                  * remove them so unicode_munge can work correctly
                  */
-                 
+
                 if((tr->tag_length == 4 && !memcmp( header, "COMM", 4)) ||
                    (tr->tag_length == 3 && !memcmp( header, "COM", 3))) {
                     int offset;
@@ -1113,8 +1113,15 @@ void setid3v2title(int fd, struct mp3entry *entry)
             }
         } else {
             /* Seek to the next frame */
-            if(framelen < totframelen)
-                lseek(fd, totframelen - framelen, SEEK_CUR);
+            if(framelen < totframelen) {
+                if(global_unsynch && version <= ID3_VER_2_3) {
+                    size -= skip_unsynched(fd, totframelen - framelen);
+                }
+                else {
+                    lseek(fd, totframelen - framelen, SEEK_CUR);
+                    size -= totframelen - framelen;
+                }
+            }
         }
     }
 }
