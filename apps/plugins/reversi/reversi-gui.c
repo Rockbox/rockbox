@@ -188,9 +188,6 @@ static bool game_finished;
  *      int drawmode- Modes defined in lcd.h
  *      unsigned fg_pattern     - foreground color
  *      unsigned bg_pattern     - backbround color
- *      unsigned lss_pattern    - Selector colors (currently unused)
- *      unsigned lse_pattern    - |
- *      unsigned lst_pattern    - \/
  *
  * The rest of the touch button elements are:
  *   bool repeat    - requires the area be held for the action

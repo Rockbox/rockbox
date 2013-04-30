@@ -240,11 +240,6 @@ static struct viewport* opt_viewport(lua_State *L, int narg, struct viewport* al
 #if LCD_DEPTH > 1
     check_tablevalue(L, "fg_pattern", tablepos, &vp->fg_pattern, true);
     check_tablevalue(L, "bg_pattern", tablepos, &vp->bg_pattern, true);
-#ifdef HAVE_LCD_COLOR
-    check_tablevalue(L, "lss_pattern", tablepos, &vp->lss_pattern, true);
-    check_tablevalue(L, "lse_pattern", tablepos, &vp->lse_pattern, true);
-    check_tablevalue(L, "lst_pattern", tablepos, &vp->lst_pattern, true);
-#endif
 #endif
 
     return vp;

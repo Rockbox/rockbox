@@ -47,11 +47,6 @@ static struct viewport vp0 =
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = BGCOLOR_1,
 #endif
-#ifdef HAVE_LCD_COLOR
-    .lss_pattern = LCD_DEFAULT_BG,
-    .lse_pattern = LCD_DEFAULT_BG,
-    .lst_pattern = LCD_DEFAULT_BG,
-#endif
 };
 
 static struct viewport vp1 =
@@ -65,11 +60,6 @@ static struct viewport vp1 =
 #if LCD_DEPTH > 1
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = LCD_DEFAULT_BG,
-#ifdef HAVE_LCD_COLOR
-    .lss_pattern = LCD_DEFAULT_BG,
-    .lse_pattern = LCD_DEFAULT_BG,
-    .lst_pattern = LCD_DEFAULT_BG,
-#endif
 #endif
 };
 
@@ -84,11 +74,6 @@ static struct viewport vp2 =
 #if LCD_DEPTH > 1
     .fg_pattern = FGCOLOR_1,
     .bg_pattern = BGCOLOR_2,
-#ifdef HAVE_LCD_COLOR
-    .lss_pattern = LCD_DEFAULT_BG,
-    .lse_pattern = LCD_DEFAULT_BG,
-    .lst_pattern = LCD_DEFAULT_BG,
-#endif
 #endif
 };
 
@@ -104,11 +89,6 @@ static struct viewport vp3 =
 #if LCD_DEPTH > 1
     .fg_pattern = LCD_BLACK,
     .bg_pattern = LCD_WHITE,
-#ifdef HAVE_LCD_COLOR
-    .lss_pattern = LCD_DEFAULT_BG,
-    .lse_pattern = LCD_DEFAULT_BG,
-    .lst_pattern = LCD_DEFAULT_BG,
-#endif
 #endif
 };
 
