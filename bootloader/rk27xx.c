@@ -19,7 +19,7 @@
 #include "crc32-rkw.h"
 #include "rkw-loader.h"
 #include "version.h"
-#inlcude "i2c-rk27xx.h"
+#include "i2c-rk27xx.h"
 
 /* beginning of DRAM */
 #define DRAM_ORIG 0x60000000
