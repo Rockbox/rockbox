@@ -1957,9 +1957,9 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
     skin_vp->start_bgcolour = skin_vp->vp.bg_pattern;
 #endif
 #ifdef HAVE_LCD_COLOR
-    skin_vp->start_gradient.start = skin_vp->vp.lss_pattern;
-    skin_vp->start_gradient.end = skin_vp->vp.lse_pattern;
-    skin_vp->start_gradient.text = skin_vp->vp.lst_pattern;
+    skin_vp->start_gradient.start = global_settings.lss_color;
+    skin_vp->start_gradient.end = global_settings.lse_color;
+    skin_vp->start_gradient.text = global_settings.lst_color;
 #endif
 
 

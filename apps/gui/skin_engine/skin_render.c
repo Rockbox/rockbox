@@ -859,11 +859,6 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
             skin_backdrop_show(data->backdrop_id);
         }
 #endif
-#ifdef HAVE_LCD_COLOR
-        skin_viewport->vp.lss_pattern = skin_viewport->start_gradient.start;
-        skin_viewport->vp.lse_pattern = skin_viewport->start_gradient.end;
-        skin_viewport->vp.lst_pattern = skin_viewport->start_gradient.text;
-#endif
         
         /* dont redraw the viewport if its disabled */
         if (skin_viewport->hidden_flags&VP_NEVER_VISIBLE)

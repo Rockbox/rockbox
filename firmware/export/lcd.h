@@ -48,11 +48,6 @@ struct viewport {
 #if LCD_DEPTH > 1
     unsigned fg_pattern;
     unsigned bg_pattern;
-#ifdef HAVE_LCD_COLOR
-    unsigned lss_pattern;
-    unsigned lse_pattern;
-    unsigned lst_pattern;
-#endif
 #endif
 };
 

@@ -52,9 +52,6 @@ static struct viewport default_vp =
     .drawmode = DRMODE_SOLID,
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = LCD_DEFAULT_BG,
-    .lss_pattern = LCD_DEFAULT_BG,
-    .lse_pattern = LCD_DEFAULT_BG,
-    .lst_pattern = LCD_DEFAULT_BG,
 };
 
 static struct viewport* current_vp IDATA_ATTR = &default_vp;
@@ -179,21 +176,6 @@ void lcd_set_background(unsigned color)
 unsigned lcd_get_background(void)
 {
     return current_vp->bg_pattern;
-}
-
-void lcd_set_selector_start(unsigned color)
-{
-    current_vp->lss_pattern = color;
-}
-
-void lcd_set_selector_end(unsigned color)
-{
-    current_vp->lse_pattern = color;
-}
-
-void lcd_set_selector_text(unsigned color)
-{
-    current_vp->lst_pattern = color;
 }
 
 void lcd_set_drawinfo(int mode, unsigned fg_color, unsigned bg_color)

@@ -329,11 +329,6 @@ void viewport_set_fullscreen(struct viewport *vp,
     {
         vp->fg_pattern = FG_FALLBACK;
         vp->bg_pattern = BG_FALLBACK;
-#ifdef HAVE_LCD_COLOR
-        vp->lss_pattern = global_settings.lss_color;
-        vp->lse_pattern = global_settings.lse_color;
-        vp->lst_pattern = global_settings.lst_color;
-#endif
     }
 #endif
 
