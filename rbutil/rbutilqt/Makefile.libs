@@ -1,0 +1,54 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+#
+
+ifndef V
+SILENT = @
+endif
+
+TARGET_DIR ?= $(abspath .)/build/
+BUILD_DIR ?= $(abspath .)/build/
+
+# re-export variables that might have been set via command line.
+# If set via command line sub-makefiles cannot override them, so use different
+# variable names in the calling makefile.
+export SYS_SPEEX
+export TARGET_DIR
+export CFLAGS=$(EXTRALIB_CFLAGS)
+export CC=$(EXTRALIBS_CC)
+export AR=$(EXTRALIB_AR)
+
+libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot
+
+
+librbspeex:
+	$(SILENT) $(MAKE) -C $(RBBASE_DIR)/tools/rbspeex BUILD_DIR=$(BUILD_DIR)/libspeex librbspeex.a
+
+libucl:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/tools/ucl/src BUILD_DIR=$(BUILD_DIR)/ucl libucl.a
+
+libipodpatcher:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/ipodpatcher BUILD_DIR=$(BUILD_DIR)/ipodpatcher APPVERSION="rbutil" libipodpatcher.a
+
+libsansapatcher:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/sansapatcher BUILD_DIR=$(BUILD_DIR)/sansapatcher APPVERSION="rbutil" libsansapatcher.a
+
+libmkamsboot:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mkamsboot BUILD_DIR=$(BUILD_DIR)/mkamsboot APPVERSION="rbutil" libmkamsboot.a
+
+libmktccboot:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mktccboot BUILD_DIR=$(BUILD_DIR)/mktccboot APPVERSION="rbutil" libmktccboot.a
+
+libmkmpioboot:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mkmpioboot BUILD_DIR=$(BUILD_DIR)/mkmpioboot APPVERSION="rbutil" libmkmpioboot.a
+
+libchinachippatcher:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/chinachippatcher BUILD_DIR=$(BUILD_DIR)/chinachippatcher APPVERSION="rbutil" libchinachippatcher.a
+
+libmkimxboot:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mkimxboot BUILD_DIR=$(BUILD_DIR)/mkimxboot APPVERSION="rbutil" libmkimxboot.a
+

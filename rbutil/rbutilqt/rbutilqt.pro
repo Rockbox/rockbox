@@ -31,9 +31,9 @@ MOC_DIR = $$MYBUILDDIR/moc
 RCC_DIR = $$MYBUILDDIR/rcc
 
 !silent {
-    ADDENV = "V=1"
+    VERBOSE = "V=1"
 } else {
-    ADDENV = "@"
+    VERBOSE =
 }
 
 # check version of Qt installation
@@ -72,65 +72,23 @@ message("Rockbox Base dir: "$$RBBASE_DIR)
 # here. This assumes that QMAKE_CC will always be "gcc", maybe with a postfix.
 MYAR = $$replace(QMAKE_CC,gcc.*,ar)
 
-librbspeex.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/rbspeex/ \
+extralibs.commands = $$SILENT \
+        $(MAKE) -f $$RBBASE_DIR/rbutil/rbutilqt/Makefile.libs \
+        $$VERBOSE \
+        SYS_SPEEX=$$LIBSPEEX \
+        BUILD_DIR=$$MYLIBBUILDDIR/ \
         TARGET_DIR=$$MYLIBBUILDDIR \
-        SYS_SPEEX=\"$$LIBSPEEX\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/tools/rbspeex librbspeex.a
-libucl.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/ucl/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/tools/ucl/src libucl.a
-libipodpatcher.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/ipodpatcher/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        APPVERSION=\"rbutil\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/rbutil/ipodpatcher libipodpatcher.a
-libsansapatcher.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/sansapatcher/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        APPVERSION=\"rbutil\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/rbutil/sansapatcher libsansapatcher.a
-libmkamsboot.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/mkamsboot/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        APPVERSION=\"rbutil\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/rbutil/mkamsboot libmkamsboot.a
-libmktccboot.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/mktccboot/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        APPVERSION=\"rbutil\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/rbutil/mktccboot libmktccboot.a
-libmkmpioboot.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/mkmpioboot/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        APPVERSION=\"rbutil\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/rbutil/mkmpioboot libmkmpioboot.a
-libchinachippatcher.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/chinachippatcher/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        APPVERSION=\"rbutil\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/rbutil/chinachippatcher libchinachippatcher.a
-libmkimxboot.commands = $$ADDENV \
-        BUILD_DIR=$$MYLIBBUILDDIR/mkimxboot/ \
-        TARGET_DIR=$$MYLIBBUILDDIR \
-        APPVERSION=\"rbutil\" \
-        CC=\"$$QMAKE_CC\" CFLAGS=\"$$MACHINEFLAGS\" AR=\"$$MYAR\" \
-        $(MAKE) -C $$RBBASE_DIR/rbutil/mkimxboot libmkimxboot.a
+        RBBASE_DIR=$$RBBASE_DIR \
+        EXTRALIBS_CC=\"$$QMAKE_CC\" \
+        EXTRALIB_CFLAGS=\"$$MACHINEFLAGS\" \
+        EXTRALIBS_AR=\"$$MYAR\" \
+        libs
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = librbspeex libipodpatcher libsansapatcher libmkamsboot libmktccboot \
          libmkmpioboot libchinachippatcher libmkimxboot libucl
-QMAKE_EXTRA_TARGETS += $$RBLIBS
-PRE_TARGETDEPS += $$RBLIBS
+QMAKE_EXTRA_TARGETS += extralibs
+PRE_TARGETDEPS += extralibs
 
 # rule for creating ctags file
 tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES)
