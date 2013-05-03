@@ -18,13 +18,17 @@ SPEEXOPTS = -DHAVE_CONFIG_H -DROCKBOX_VOICE_ENCODER
 
 CFLAGS += $(SPEEXOPTS) $(INCLUDES) -O3 -fomit-frame-pointer -Wno-unused-parameter
 
+CPPDEFINES := $(shell echo foo | $(CROSS)$(CC) -dM -E -)
 #build standalone win32 executables on cygwin
-ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
+ifeq ($(findstring CYGWIN,$(CPPDEFINES)),CYGWIN)
 CFLAGS+=-mno-cygwin
-endif
+COMPILETARGET = cygwin
+else
+ifeq ($(findstring MINGW,$(CPPDEFINES)),MINGW)
+COMPILETARGET = mingw
+else
 # OS X specifics. Needs to consider cross compiling for Windows.
-ifeq ($(findstring Darwin,$(shell uname)),Darwin)
-ifneq ($(findstring mingw,$(CROSS)$(CC)),mingw)
+ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 # when building libs for OS X build for both i386 and ppc at the same time.
 # This creates fat objects, and ar can only create the archive but not operate
 # on it. As a result the ar call must NOT use the u (update) flag.
@@ -34,8 +38,13 @@ ARCHFLAGS = -arch ppc -arch i386
 CC ?= gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 NATIVECC ?= gcc-4.0
+COMPILETARGET = darwin
+else
+COMPILETARGET = posix
 endif
 endif
+endif
+$(info Compiler creates $(COMPILETARGET) binaries)
 
 # don't try to use the systems libspeex when building a static binary.
 ifndef STATIC
@@ -45,14 +54,15 @@ endif
 # fall back to our own librbspeex if no suitable found.
 ifeq ($(SYS_SPEEX),)
 # This sets up 'SRC' based on the files mentioned in SOURCES
-SRC := $(shell cat $(SPEEXSRC)/SOURCES | $(CC) $(CFLAGS) -E -P - | grep -v "^\#" | grep -v "^$$")
+SRC := $(shell $(CC) $(CFLAGS) -E -P -xc $(SPEEXSRC)/SOURCES)
+$(warning $(SRC))
 LIBS = $(TARGET_DIR)librbspeex.a
 else
 LIBS = $(SYS_SPEEX)
 endif
 
 TARGET_DIR ?= $(shell pwd)/
-BUILD_DIR ?= $(TARGET_DIR)build
+BUILD_DIR ?= $(TARGET_DIR)build$(COMPILETARGET)
 SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeex.c rbspeexenc.c rbspeexdec.c
 OBJS = $(addprefix $(BUILD_DIR)/,$(SRC:%.c=%.o))
 DEPFILE = $(BUILD_DIR)/dep-speex
