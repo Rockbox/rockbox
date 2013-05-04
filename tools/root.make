@@ -214,21 +214,23 @@ $(LINKROM): $(ROMLDS)
 	$(call PRINTS,PP $(@F))
 	$(call preprocess2file,$<,$@,-DLOADADDRESS=$(LOADADDRESS))
 
+# Note: make sure -Wl,--gc-sections comes before -T in the linker options.
+# Having the latter first caused crashes on (at least) mini2g.
 $(BUILDDIR)/rockbox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LINKRAM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(RBCODEC_BLD)/codecs $(call a2lnk, $(VOICESPEEXLIB)) \
 		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) \
-		-lgcc -T$(LINKRAM) \
-		$(CORE_LDOPTS) -Wl,-Map,$(BUILDDIR)/rockbox.map
+		-lgcc $(CORE_LDOPTS) -T$(LINKRAM) \
+		-Wl,-Map,$(BUILDDIR)/rockbox.map
 
 $(BUILDDIR)/rombox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS) $$(LINKROM)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(RBCODEC_BLD)/codecs $(call a2lnk, $(VOICESPEEXLIB)) \
 		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) \
-		-lgcc -T$(LINKROM) \
-		$(CORE_LDOPTS) -Wl,-Map,$(BUILDDIR)/rombox.map
+		-lgcc $(CORE_LDOPTS) -T$(LINKROM) \
+		-Wl,-Map,$(BUILDDIR)/rombox.map
 
 $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
 	$(call PRINTS,OC $(@F))$(call objcopy,$<,$@)
