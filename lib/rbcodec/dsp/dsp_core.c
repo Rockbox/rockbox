@@ -414,14 +414,14 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
     /* Tag input with codec-specified sample format */
     src->format = dsp->io_data.format;
 
+    if (src->format.version != dsp->io_data.sample_buf.format.version)
+        dsp_sample_input_format_change(&dsp->io_data, &src->format);
+
     while (1)
     {
         /* Out-of-place-processing stages take the current buf as input
          * and switch the buffer to their own output buffer */
         struct dsp_buffer *buf = src;
-
-        if (UNLIKELY(buf->format.version != dsp->io_data.sample_buf.format.version))
-            dsp_sample_input_format_change(&dsp->io_data, &buf->format);
 
         /* Convert input samples to internal format */
         dsp->io_data.input_samples(&dsp->io_data, &buf);
