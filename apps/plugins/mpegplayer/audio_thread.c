@@ -621,7 +621,7 @@ static void audio_thread(void)
         if (frame.header.samplerate != td.samplerate)
         {
             td.samplerate = frame.header.samplerate;
-            rb->dsp_configure(td.dsp, DSP_SWITCH_FREQUENCY,
+            rb->dsp_configure(td.dsp, DSP_SET_FREQUENCY,
                               td.samplerate);
         }
 

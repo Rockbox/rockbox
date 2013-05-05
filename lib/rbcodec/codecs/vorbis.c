@@ -91,7 +91,7 @@ static bool vorbis_set_codec_parameters(OggVorbis_File *vf)
         return false;
     }
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
 
     if (vi->channels == 2) {

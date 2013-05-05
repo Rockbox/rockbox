@@ -157,7 +157,7 @@ enum codec_status codec_run(void)
 
     resume_offset = ci->id3->offset;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
 
     ci->seek_buffer(ci->id3->first_frame_offset);

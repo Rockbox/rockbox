@@ -67,7 +67,7 @@ enum codec_status codec_run(void)
 
     codec_set_replaygain(ci->id3);
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     if (info.NCH == 2) {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (info.NCH == 1) {

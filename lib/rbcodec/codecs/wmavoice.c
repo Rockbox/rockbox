@@ -90,7 +90,7 @@ restart_track:
     memset(&avctx, 0, sizeof(AVCodecContext));
     memset(&avpkt, 0, sizeof(AVPacket));
     
-    ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
+    ci->configure(DSP_SET_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_INTERLEAVED);
     codec_set_replaygain(ci->id3);

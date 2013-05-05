@@ -65,7 +65,7 @@ restart_track:
        saves us from parsing it again here. */
     memcpy(&wfx, ci->id3->toc, sizeof(wfx));
     
-    ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
+    ci->configure(DSP_SET_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);

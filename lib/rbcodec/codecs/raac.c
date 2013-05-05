@@ -79,7 +79,7 @@ enum codec_status codec_run(void)
     ci->seek_buffer(0);
 
     init_rm(&rmctx);    
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
    
     /* initialise the sound converter */

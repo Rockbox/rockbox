@@ -1235,7 +1235,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
     if (reason == CODEC_LOAD) {
         /* Make use of 44.1khz */
-        ci->configure(DSP_SWITCH_FREQUENCY, SAMPLE_RATE);
+        ci->configure(DSP_SET_FREQUENCY, SAMPLE_RATE);
         /* Sample depth is 28 bit host endian */
         ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
         /* Mono output */

@@ -142,7 +142,7 @@ enum codec_status codec_run(void)
     if (codec_init())
         return CODEC_ERROR;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
     
     /* Intialise the A52 decoder and check for success */

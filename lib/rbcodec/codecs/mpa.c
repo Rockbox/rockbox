@@ -342,7 +342,7 @@ enum codec_status codec_run(void)
 
     file_end = 0;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
     
@@ -475,7 +475,7 @@ enum codec_status codec_run(void)
         /* Check if sample rate and stereo settings changed in this frame. */
         if (frame.header.samplerate != current_frequency) {
             current_frequency = frame.header.samplerate;
-            ci->configure(DSP_SWITCH_FREQUENCY, current_frequency);
+            ci->configure(DSP_SET_FREQUENCY, current_frequency);
         }
         if (MAD_NCHANNELS(&frame.header) == 2) {
             if (current_stereo_mode != STEREO_NONINTERLEAVED) {

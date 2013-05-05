@@ -577,7 +577,7 @@ static void ci_configure(int setting, intptr_t value)
         dsp_configure(ci.dsp, setting, value);
     } else {
         if (setting == DSP_SET_FREQUENCY
-                || setting == DSP_SWITCH_FREQUENCY)
+                || setting == DSP_SET_FREQUENCY)
             format.freq = value;
         else if (setting == DSP_SET_SAMPLE_DEPTH)
             format.depth = value;

@@ -82,7 +82,7 @@ enum codec_status codec_run(void)
     }
 
     ci->id3->frequency = sc.sample_rate;
-    ci->configure(DSP_SWITCH_FREQUENCY, sc.sample_rate);
+    ci->configure(DSP_SET_FREQUENCY, sc.sample_rate);
 
     if (sc.sample_rate) {
         ci->id3->length = (sc.totalsamples / sc.sample_rate) * 1000;

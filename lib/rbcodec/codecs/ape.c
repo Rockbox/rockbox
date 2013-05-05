@@ -200,7 +200,7 @@ enum codec_status codec_run(void)
                        (ape_ctx.seektablefilepos +
                         ape_ctx.numseekpoints * sizeof(uint32_t)));
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ape_ctx.samplerate);
+    ci->configure(DSP_SET_FREQUENCY, ape_ctx.samplerate);
     ci->configure(DSP_SET_STEREO_MODE, ape_ctx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);

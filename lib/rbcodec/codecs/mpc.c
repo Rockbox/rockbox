@@ -102,7 +102,7 @@ enum codec_status codec_run(void)
     
     byterate  = (mpc_uint32_t)(info.average_bitrate) / 8;
     frequency = info.sample_freq / 100; /* 0.1 kHz accuracy */
-    ci->configure(DSP_SWITCH_FREQUENCY, info.sample_freq);
+    ci->configure(DSP_SET_FREQUENCY, info.sample_freq);
 
     /* Remark: rockbox offset is the file offset in bytes. So, estimate the 
      * sample seek position from the file offset, the sampling frequency and

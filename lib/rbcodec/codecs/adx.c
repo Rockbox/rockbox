@@ -218,7 +218,7 @@ enum codec_status codec_run(void)
     ci->set_elapsed(0);
 
     /* setup pcm buffer format */
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     if (channels == 2) {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (channels == 1) {

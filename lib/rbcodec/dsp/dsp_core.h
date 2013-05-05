@@ -35,7 +35,6 @@ enum dsp_settings
     DSP_INIT, /* For dsp_init */
     DSP_RESET,
     DSP_SET_FREQUENCY,
-    DSP_SWITCH_FREQUENCY = DSP_SET_FREQUENCY, /* deprecated */
     DSP_SET_SAMPLE_DEPTH,
     DSP_SET_STEREO_MODE,
     DSP_FLUSH,

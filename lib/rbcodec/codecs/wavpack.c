@@ -68,7 +68,7 @@ enum codec_status codec_run(void)
     if (!wpc)
         return CODEC_ERROR;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, WavpackGetSampleRate (wpc));
+    ci->configure(DSP_SET_FREQUENCY, WavpackGetSampleRate (wpc));
     codec_set_replaygain(ci->id3);
     /* bps = WavpackGetBytesPerSample (wpc); */
     nchans = WavpackGetReducedChannels (wpc);

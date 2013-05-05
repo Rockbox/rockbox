@@ -84,7 +84,7 @@ enum codec_status codec_run(void)
 
     file_offset = ci->id3->offset;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
 
     stream_create(&input_stream,ci);

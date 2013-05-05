@@ -96,7 +96,7 @@ restart_track:
     ci->set_elapsed(elapsedtime);
 
     resume_offset = 0;
-    ci->configure(DSP_SWITCH_FREQUENCY, wfx.rate);
+    ci->configure(DSP_SET_FREQUENCY, wfx.rate);
     ci->configure(DSP_SET_STEREO_MODE, wfx.channels == 1 ?
                   STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);

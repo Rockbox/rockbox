@@ -225,7 +225,7 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    ci->configure(DSP_SWITCH_FREQUENCY, ci->id3->frequency);
+    ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     if (format.channels == 2) {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
     } else if (format.channels == 1) {
