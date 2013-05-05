@@ -47,12 +47,12 @@ void audiohw_set_stereo_width(int value)
 #ifdef HAVE_SW_TONE_CONTROLS
 void audiohw_set_bass(int value)
 {
-    callback(DSP_CALLBACK_SET_BASS, value);
+    callback(DSP_CALLBACK_SET_BASS, value*10);
 }
 
 void audiohw_set_treble(int value)
 {
-    callback(DSP_CALLBACK_SET_TREBLE, value);
+    callback(DSP_CALLBACK_SET_TREBLE, value*10);
 }
 #endif /* HAVE_SW_TONE_CONTROLS */
 
