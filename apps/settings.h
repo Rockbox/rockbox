@@ -536,6 +536,8 @@ struct user_settings
 #ifdef HAVE_TOUCHSCREEN
     int list_line_padding;
 #endif
+    bool list_separator_enabled;
+    int list_separator_color;
 
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
