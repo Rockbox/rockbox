@@ -12926,6 +12926,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Line Separator"
+  </dest>
+  <voice>
+    *: "Line Separator"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Line Separator Colour"
+  </dest>
+  <voice>
+    *: "Line Separator Colour"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SHORTCUTS
   desc: Title in the shortcuts menu
   user: core

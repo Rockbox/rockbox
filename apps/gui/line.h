@@ -74,11 +74,14 @@ struct line_desc {
     enum line_styles style;
     /* whether the line can scroll */
     bool scroll;
+    /* height of the line separator (in pixels). 0 to disable drawing
+     * of the separator */
+    int8_t separator_height;
 };
 
 /* default initializer, can be used for static initialitation also.
  * This initializer will result in single lines without style that don't scroll */
-#define LINE_DESC_DEFINIT { .style = STYLE_DEFAULT, .height = -1, .line = 0, .nlines = 1, .scroll = false }
+#define LINE_DESC_DEFINIT { .style = STYLE_DEFAULT, .height = -1, .separator_height = 0, .line = 0, .nlines = 1, .scroll = false }
 
 /**
  * Print a line at a given pixel postion, using decoration information from
