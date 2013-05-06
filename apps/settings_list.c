@@ -282,6 +282,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_THEME_SELECTOR_START LCD_RGBPACK(0xff, 0xeb, 0x9c)
 #define DEFAULT_THEME_SELECTOR_END LCD_RGBPACK(0xb5, 0x8e, 0x00)
 #define DEFAULT_THEME_SELECTOR_TEXT LCD_RGBPACK(0x00, 0x00, 0x00)
+#define DEFAULT_THEME_SEPARATOR  LCD_RGBPACK(0x80, 0x80, 0x80)
 
 #define DEFAULT_BACKDROP    BACKDROP_DIR "/cabbiev2.bmp"
 
@@ -323,7 +324,6 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_TAGCACHE_SCAN_PATHS "/"
 #endif
 
-#ifdef HAVE_TOUCHSCREEN
 
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
@@ -348,7 +348,6 @@ static int32_t list_pad_getlang(int value, int unit)
     }
 }
 
-#endif /* HAVE_TOUCHSCREEN */
 static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
@@ -909,6 +908,14 @@ const struct settings_list settings[] = {
                   -1, "list padding", "auto,off", UNIT_PIXEL, list_pad_formatter,
                   list_pad_getlang, NULL, 16,
                   -1,0,2,4,6,8,10,12,16,20,24,28,32,38,44,50),
+#endif
+#if LCD_DEPTH > 1
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, list_separator_height, LANG_LIST_SEPARATOR,
+                  0, "list separator height", "auto,off", UNIT_PIXEL,
+                  list_pad_formatter, list_pad_getlang, NULL, 15,
+                  -1,0,1,2,3,4,5,7,9,11,13,16,20,25,30),
+    {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.list_separator_color,-1,
+        INT(DEFAULT_THEME_SEPARATOR),"list separator color",NULL,UNUSED},
 #endif
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(F_THEMESETTING,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),

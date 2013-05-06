@@ -114,7 +114,6 @@ struct scrollinfo;
 #define STRIDE(screen, w, h) (screen==SCREEN_MAIN?STRIDE_MAIN((w), \
                                         (h)):STRIDE_REMOTE((w),(h)))
 
-
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH <=8
 #if (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \

@@ -202,6 +202,11 @@ viewers iconset..+x2:        icons/tango_small_viewers_mono.bmp
 show icons: on
 statusbar: top
 ui viewport: -
+# Touchscreen: whether to show line separators or not. Default to yes only on touchscreen targets.
+list separator height: 0
+list separator height..+&touchscreen: auto
+list separator color: 808080
+
 </main>
 
 <remote>

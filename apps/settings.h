@@ -531,12 +531,15 @@ struct user_settings
 #ifdef HAVE_LCD_BITMAP
     int scrollbar;    /* SCROLLBAR_* enum values */
     int scrollbar_width;
-#endif
 
 #ifdef HAVE_TOUCHSCREEN
     int list_line_padding;
 #endif
-
+#if LCD_DEPTH > 1
+    int list_separator_height; /* -1=auto (== 1 currently), 0=disabled, X=height in pixels */
+    int list_separator_color;
+#endif
+#endif
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
