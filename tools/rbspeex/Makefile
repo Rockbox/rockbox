@@ -55,7 +55,6 @@ endif
 ifeq ($(SYS_SPEEX),)
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SRC := $(shell $(CC) $(CFLAGS) -E -P -xc $(SPEEXSRC)/SOURCES)
-$(warning $(SRC))
 LIBS = $(TARGET_DIR)librbspeex.a
 else
 LIBS = $(SYS_SPEEX)
