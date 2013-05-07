@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///Lk\u003d",
+        "filename": "firmware/target/arm/rk27xx/lcdif-rk27xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-05-07T18:40:48Z",
+      "side": 1,
+      "message": "I think this with iomux_lcd change should be in separate commit, but I don\u0027t really care about it. So decision is yours.",
+      "revId": "8e0b70ecd2a28ec51c19f9d4652d89aab1467e11",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
