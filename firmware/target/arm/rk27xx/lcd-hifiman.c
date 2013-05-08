@@ -252,9 +252,6 @@ static void lcd_v2_display_init(void)
 
     lcd_write_reg(0x07, 0x1017);
 
-    lcd_write_reg(0x20, 0x00AF);
-    lcd_write_reg(0x21, 0x0000);
-
     lcd_cmd(0x22);
 
     for (x=0; x<LCD_WIDTH; x++)
@@ -271,23 +268,33 @@ static void lcd_v2_enable (bool on)
 
 static void lcd_v2_set_gram_area(int x, int y, int width, int height)
 {
-    (void) x;
-    (void) y;
-    (void) width;
-    (void) height;
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
+
+    lcd_write_reg(0x36, height-1);
+    lcd_write_reg(0x37, y);
+    lcd_write_reg(0x38, width-1);
+    lcd_write_reg(0x39, x);
+
+    /* set GRAM address */
+    lcd_write_reg(0x20, y);
+    lcd_write_reg(0x21, x);
+
     lcd_cmd(0x22);
     LCDC_CTRL &= ~RGB24B;
 }
 
 static void lcd_v2_update_rect(int x, int y, int width, int height)
 {
-    (void) x;
-    (void) y;
-    (void) width;
-    (void) height;
-    lcd_update();
+    int px = x, py = y;
+    int pxmax = x + width, pymax = y + height;
+
+    lcd_v2_set_gram_area(x, y, pxmax, pymax);
+
+    for (py=y; py<pymax; py++)
+        for (px=x; px<pxmax; px++)
+            LCD_DATA = (*FBADDR(px, py));
+
 }
 
 void lcd_display_init(void)
