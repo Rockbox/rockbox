@@ -70,7 +70,9 @@ message("Rockbox Base dir: "$$RBBASE_DIR)
 # the ar that matches the current gcc. Since qmake doesn't provide a variable
 # holding the correct ar without any additions we need to figure it ourselves
 # here. This assumes that QMAKE_CC will always be "gcc", maybe with a postfix.
-MYAR = $$replace(QMAKE_CC,gcc.*,ar)
+contains(QMAKE_CC, gcc) {
+    EXTRALIBS_MYAR = "EXTRALIBS_AR="$$replace(QMAKE_CC,gcc.*,ar)
+}
 
 extralibs.commands = $$SILENT \
         $(MAKE) -f $$RBBASE_DIR/rbutil/rbutilqt/Makefile.libs \
@@ -81,7 +83,7 @@ extralibs.commands = $$SILENT \
         RBBASE_DIR=$$RBBASE_DIR \
         EXTRALIBS_CC=\"$$QMAKE_CC\" \
         EXTRALIB_CFLAGS=\"$$MACHINEFLAGS\" \
-        EXTRALIBS_AR=\"$$MYAR\" \
+        $$EXTRALIBS_MYAR \
         libs
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
