@@ -157,6 +157,10 @@ void audiohw_set_volume(int vol_l, int vol_r)
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
     int dac_l, amp_l, dac_r, amp_r;
+
+    vol_l = vol_tenthdb2hw(vol_l);
+    vol_r = vol_tenthdb2hw(vol_r);
+
     get_volume_params(vol_l, &dac_l, &amp_l);
     get_volume_params(vol_r, &dac_r, &amp_r);
 
