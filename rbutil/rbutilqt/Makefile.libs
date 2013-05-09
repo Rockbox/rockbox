@@ -12,15 +12,23 @@ endif
 
 TARGET_DIR ?= $(abspath .)/build/
 BUILD_DIR ?= $(abspath .)/build/
+# allow using this Makefile directly. Otherwise those variables are set via
+# the generated one.
+ifndef RBBASE_DIR
+RBBASE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))/../../
+endif
+EXTRALIBS_CC ?= gcc
+EXTRALIBS_AR ?= ar
 
 # re-export variables that might have been set via command line.
 # If set via command line sub-makefiles cannot override them, so use different
 # variable names in the calling makefile.
 export SYS_SPEEX
 export TARGET_DIR
+export RBBASE_DIR
 export CFLAGS=$(EXTRALIB_CFLAGS)
 export CC=$(EXTRALIBS_CC)
-export AR=$(EXTRALIB_AR)
+export AR=$(EXTRALIBS_AR)
 
 libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot
 
