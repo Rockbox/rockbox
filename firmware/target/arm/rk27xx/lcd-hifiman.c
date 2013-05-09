@@ -263,7 +263,32 @@ static void lcd_v2_display_init(void)
 
 static void lcd_v2_enable (bool on)
 {
+    if (on == display_on)
+        return;
+
+    lcdctrl_bypass(1);
+    LCDC_CTRL |= RGB24B;
+
+    if (on)
+    {
+        lcd_write_reg(0x10, 0x0000);
+        lcd_write_reg(0x11, 0x1B41);
+        udelay(50000);
+        lcd_write_reg(0x07, 0x1017);
+        udelay(50000);
+    }
+    else
+    {
+        lcd_write_reg(0x07, 0x0000);
+        udelay(50000);
+        lcd_write_reg(0x11, 0x0001);
+        udelay(50000);
+        lcd_write_reg(0x10, 0x0001);
+    }
     display_on = on;
+
+    LCDC_CTRL &= ~RGB24B;
+
 }
 
 static void lcd_v2_set_gram_area(int x, int y, int width, int height)
