@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///LQ\u003d",
+        "filename": "firmware/target/arm/rk27xx/lcdif-rk27xx.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-05-09T13:04:00Z",
+      "side": 1,
+      "message": "It would be better to use lcdctrl_buff_setup here.",
+      "revId": "8f895f481f20125880410b465165501168238dc5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
