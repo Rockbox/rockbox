@@ -24,12 +24,12 @@ TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 
 # overwrite for releases
 APPVERSION ?= $(shell $(TOP)/../tools/version.sh $(TOP)/..)
-CFLAGS += -DVERSION=\""$(APPVERSION)"\"
+CFLAGS += -DVERSION=\"$(APPVERSION)\"
 TARGET_DIR ?= $(abspath .)/
 
 NATIVECC ?= gcc
 CC ?= gcc
-CPPDEFINES=$(shell echo foo | $(CROSS)$(CC) -dM -E -)
+CPPDEFINES := $(shell echo foo | $(CROSS)$(CC) -dM -E -)
 # use POSIX/C99 printf on windows
 CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 
