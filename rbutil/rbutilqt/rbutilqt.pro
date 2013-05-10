@@ -13,6 +13,14 @@
 # KIND, either express or implied.
 #
 
+# The external Makefiles use ar to create libs. To allow cross-compiling pass
+# the ar that matches the current gcc. Since qmake doesn't provide a variable
+# holding the correct ar without any additions we need to figure it ourselves
+# here.
+# Only do this if CC is gcc. Also, do this before ccache support is enabled.
+contains(QMAKE_CC,($$find(QMAKE_CC,.*gcc.*))) {
+    EXTRALIBS_OPTS = "EXTRALIBS_AR=\""$$replace(QMAKE_CC,gcc.*,ar)\"
+}
 # ccache
 unix:!mac:!noccache {
     CCACHE = $$system(which ccache)
@@ -22,6 +30,9 @@ unix:!mac:!noccache {
         QMAKE_CC = ccache $$QMAKE_CC
     }
 }
+MACHINEFLAGS = $$find(QMAKE_CFLAGS, -m[63][42])
+EXTRALIBS_OPTS += EXTRALIBS_CC=\"$$QMAKE_CC\"
+EXTRALIBS_OPTS += EXTRALIB_CFLAGS=\"$$MACHINEFLAGS\" \
 
 MYBUILDDIR = $$OUT_PWD/build/
 MYLIBBUILDDIR = $$MYBUILDDIR/libs/
@@ -46,8 +57,6 @@ RCC_DIR = $$MYBUILDDIR/rcc
 message("Qt version used:" $$VER)
 }
 
-MACHINEFLAGS = $$find(QMAKE_CFLAGS, -m[63][42])
-
 RBBASE_DIR = $$_PRO_FILE_PWD_
 RBBASE_DIR = $$replace(RBBASE_DIR,/rbutil/rbutilqt,)
 
@@ -66,29 +75,20 @@ message("Rockbox Base dir: "$$RBBASE_DIR)
 !static:unix:!mac {
     LIBSPEEX = $$system(pkg-config --silence-errors --libs speex speexdsp)
 }
-# The external Makefiles use ar to create libs. To allow cross-compiling pass
-# the ar that matches the current gcc. Since qmake doesn't provide a variable
-# holding the correct ar without any additions we need to figure it ourselves
-# here. This assumes that QMAKE_CC will always be "gcc", maybe with a postfix.
-contains(QMAKE_CC, gcc) {
-    EXTRALIBS_MYAR = "EXTRALIBS_AR="$$replace(QMAKE_CC,gcc.*,ar)
-}
 
 extralibs.commands = $$SILENT \
         $(MAKE) -f $$RBBASE_DIR/rbutil/rbutilqt/Makefile.libs \
         $$VERBOSE \
-        SYS_SPEEX=$$LIBSPEEX \
+        SYS_SPEEX=\"$$LIBSPEEX\" \
         BUILD_DIR=$$MYLIBBUILDDIR/ \
         TARGET_DIR=$$MYLIBBUILDDIR \
         RBBASE_DIR=$$RBBASE_DIR \
-        EXTRALIBS_CC=\"$$QMAKE_CC\" \
-        EXTRALIB_CFLAGS=\"$$MACHINEFLAGS\" \
-        $$EXTRALIBS_MYAR \
+        $$EXTRALIBS_OPTS \
         libs
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
-RBLIBS = librbspeex libipodpatcher libsansapatcher libmkamsboot libmktccboot \
-         libmkmpioboot libchinachippatcher libmkimxboot libucl
+RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
+         mkmpioboot chinachippatcher mkimxboot ucl
 QMAKE_EXTRA_TARGETS += extralibs
 PRE_TARGETDEPS += extralibs
 
@@ -116,7 +116,7 @@ DEPENDPATH = $$INCLUDEPATH
 LIBS += -L$$OUT_PWD -L$$MYLIBBUILDDIR
 # append all RBLIBS to LIBS
 for(rblib, RBLIBS) {
-    LIBS += -l$$replace(rblib, lib,)
+    LIBS += -l$$rblib
 }
 
 # on win32 libz is linked implicitly.
