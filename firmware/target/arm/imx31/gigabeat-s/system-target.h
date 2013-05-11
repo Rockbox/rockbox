@@ -44,6 +44,11 @@ static inline unsigned long usec_timer(void)
     return GPTCNT;
 }
 
+/* Fire an event usecs microseconds from now */
+typedef void (* uevent_cb_type)(void);
+void uevent(unsigned long usecs, uevent_cb_type callback);
+void uevent_cancel(void);
+
 void watchdog_init(unsigned int half_seconds);
 void watchdog_service(void);
 
@@ -57,9 +62,6 @@ void system_prepare_fw_start(void);
 void tick_stop(void);
 void kernel_device_init(void);
 void system_halt(void);
-
-/* Handle some audio lockout related tasks */
-void kernel_audio_locking(bool locking);
 
 #define KDEV_INIT
 

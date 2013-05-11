@@ -25,6 +25,7 @@
 #define INT_PRIO_DEFAULT    7
 #define INT_PRIO_DVFS       (INT_PRIO_DEFAULT+1)
 #define INT_PRIO_DPTC       (INT_PRIO_DEFAULT+1)
+#define INT_PRIO_GPT        (INT_PRIO_DEFAULT+1)
 #define INT_PRIO_SDMA       (INT_PRIO_DEFAULT+2)
 
 enum INT_TYPE

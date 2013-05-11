@@ -75,6 +75,7 @@ static uint32_t check_regulator_setting(uint32_t setting)
 
 
 /** DVFS **/
+#define DVFS_TVWAIT 100 /* Voltage ramp wait time */
 static bool dvfs_running = false; /* Has driver enabled DVFS? */
 
 /* Request tracking since boot */
@@ -90,10 +91,9 @@ static inline void updten_wait(void)
 }
 
 /* Do the actual frequency and DVFS pin change - always call with IRQ masked */
-static void do_dvfs_update(unsigned int level)
+static void do_dvfs_update(unsigned long pmcr0, unsigned int level)
 {
     const struct dvfs_clock_table_entry *setting = &dvfs_clock_table[level];
-    unsigned long pmcr0 = CCM_PMCR0;
 
     if (pmcr0 & CCM_PMCR0_DPTEN)
     {
@@ -106,7 +106,7 @@ static void do_dvfs_update(unsigned int level)
     pmcr0 &= ~CCM_PMCR0_VSCNT;
 
     if (level < ((pmcr0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS))
-    { 
+    {
         pmcr0 |= CCM_PMCR0_UDSC; /* Up scaling, increase */
         pmcr0 |= setting->vscnt << CCM_PMCR0_VSCNT_POS;
     }
@@ -136,12 +136,20 @@ static void do_dvfs_update(unsigned int level)
     }
 
     CCM_PMCR0 = pmcr0;
-    /* Note: changes to frequency with ints unmaked seem to cause spurious
-     * DVFS interrupts with value CCM_PMCR0_FSVAI_NO_INT. These aren't
-     * supposed to happen. Only do the lengthy delay with them enabled. */
-    enable_irq();
-    udelay(100); /* Software wait for voltage ramp-up */
-    disable_irq();
+
+    /* dvfs_int_voltage_wait_complete must be call to complete this; how that
+       is accomplished depends upon whether this was an interrupt with DVFS
+       enabled or a manual setting of the CPU frequency */
+}
+
+/* Perform final DVFS frequency change steps after voltage ramp wait */
+static void dvfs_int_voltage_wait_complete(void)
+{
+    const struct dvfs_clock_table_entry *setting =
+        &dvfs_clock_table[dvfs_level];
+
+    unsigned long pmcr0 = CCM_PMCR0;
+
     CCM_PDR0 = setting->pdr_val;
 
     if (!(pmcr0 & CCM_PMCR0_DFSUP_POST_DIVIDERS))
@@ -155,6 +163,9 @@ static void do_dvfs_update(unsigned int level)
 
     cpu_frequency = ccm_get_mcu_clk();
 
+    if (dvfs_running)
+        CCM_PMCR0 &= ~CCM_PMCR0_FSVAIM;
+
     if (pmcr0 & CCM_PMCR0_DPTEN)
     {
         update_dptc_counts();
@@ -165,24 +176,28 @@ static void do_dvfs_update(unsigned int level)
 /* Start DVFS, change the set point and stop it */
 static void set_current_dvfs_level(unsigned int level)
 {
-    int oldlevel;
-
     /* Have to wait at least 3 div3 clocks before enabling after being
-     * stopped. */
-    udelay(1500);
-
-    oldlevel = disable_irq_save();
-    CCM_PMCR0 |= CCM_PMCR0_DVFEN;
-    do_dvfs_update(level);
-    restore_irq(oldlevel);
+     * stopped before calling. */
 
     updten_wait();
 
+    int oldlevel = disable_irq_save();
+    CCM_PMCR0 |= CCM_PMCR0_DVFEN;
+    do_dvfs_update(CCM_PMCR0, level);
+    restore_irq(oldlevel);
+
+    udelay(DVFS_TVWAIT);
+
+    oldlevel = disable_irq_save();
+    dvfs_int_voltage_wait_complete();
+    restore_irq(oldlevel);
+
+    updten_wait();
     bitclr32(&CCM_PMCR0, CCM_PMCR0_DVFEN);
 }
 
-/* DVFS Interrupt handler */
-static void USED_ATTR dvfs_int(void)
+/* Interrupt handler for DVFS */
+static void dvfs_int(void)
 {
     unsigned long pmcr0 = CCM_PMCR0;
     unsigned long fsvai = pmcr0 & CCM_PMCR0_FSVAI;
@@ -235,14 +250,19 @@ static void USED_ATTR dvfs_int(void)
         return;     /* Do nothing. Freq change is not required */
     } /* end switch */
 
-    do_dvfs_update(level);
+    /* Mask DVFS interrupt until voltage wait is complete */
+    pmcr0 |= CCM_PMCR0_FSVAIM;
+
+    do_dvfs_update(pmcr0, level);
+
+    /* Complete this in a few microseconds from now */
+    uevent(DVFS_TVWAIT, dvfs_int_voltage_wait_complete);
 }
 
 /* Interrupt vector for DVFS */
-static __attribute__((naked, interrupt("IRQ"))) void CCM_DVFS_HANDLER(void)
+static __attribute__((interrupt("IRQ"))) void CCM_DVFS_HANDLER(void)
 {
-    /* Audio can glitch with the long udelay if nested IRQ isn't allowed. */
-    AVIC_NESTED_NI_CALL(dvfs_int, INT_PRIO_DVFS);
+    dvfs_int();
 }
 
 /* Initialize the DVFS hardware */
@@ -273,7 +293,7 @@ static void INIT_ATTR dvfs_init(void)
 
     /* GP load bits disabled */
     bitclr32(&CCM_PMCR1, 0xf);
-    
+
     /* Initialize DVFS signal weights and detection modes. */
     int i;
     for (i = 0; i < 16; i++)
@@ -312,6 +332,7 @@ static void INIT_ATTR dvfs_init(void)
                            dvfs_clock_table[DVFS_LEVEL_DEFAULT].pdr_val);
 
     /* Set initial level and working point. */
+    udelay(1500);
     set_current_dvfs_level(DVFS_LEVEL_DEFAULT);
 
     logf("DVFS: Initialized");
@@ -537,33 +558,23 @@ void dvfs_stop(void)
     if (!dvfs_running)
         return;
 
+    uevent_cancel();
+
     /* Mask DVFS interrupts. */
     avic_disable_int(INT_CCM_DVFS);
     bitset32(&CCM_PMCR0, CCM_PMCR0_FSVAIM | CCM_PMCR0_LBMI);
 
-    if (((CCM_PMCR0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS) !=
-            DVFS_LEVEL_DEFAULT)
-    {
-        int oldlevel;
-        /* Set default frequency level */
-        updten_wait();
-        oldlevel = disable_irq_save();
-        do_dvfs_update(DVFS_LEVEL_DEFAULT);
-        restore_irq(oldlevel);
-        updten_wait();
-    }
-
-    /* Disable DVFS. */
-    bitclr32(&CCM_PMCR0, CCM_PMCR0_DVFEN);
     dvfs_running = false;
 
+    /* Set default frequency level */
+    set_current_dvfs_level(DVFS_LEVEL_DEFAULT);
     logf("DVFS: stopped");
 }
 
 /* Is DVFS enabled? */
 bool dvfs_enabled(void)
 {
-   return dvfs_running; 
+   return dvfs_running;
 }
 
 /* If DVFS is disabled, set the level explicitly */
@@ -575,6 +586,7 @@ void dvfs_set_level(unsigned int level)
         level == ((CCM_PMCR0 & CCM_PMCR0_DVSUP) >> CCM_PMCR0_DVSUP_POS))
         return;
 
+    udelay(1500);
     set_current_dvfs_level(level);
 }
 
@@ -778,7 +790,7 @@ void dptc_start(void)
     enable_dptc();
     restore_irq(oldlevel);
 
-    avic_enable_int(INT_CCM_CLK, INT_TYPE_IRQ, INT_PRIO_DPTC, 
+    avic_enable_int(INT_CCM_CLK, INT_TYPE_IRQ, INT_PRIO_DPTC,
                     CCM_CLK_HANDLER);
 
     logf("DPTC: started");

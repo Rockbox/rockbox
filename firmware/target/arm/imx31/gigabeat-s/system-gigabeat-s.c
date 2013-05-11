@@ -84,7 +84,62 @@ void watchdog_service(void)
     WDOG_WSR = 0xaaaa;
 }
 
-/** GPT timer routines - basis for udelay **/
+
+/** uevent APIs **/
+
+static void (*ucallback)(void) = NULL; /* uevent callback */
+
+static void cancel_uevent(void)
+{
+    GPTSR = GPTSR_OF1;
+    GPTIR &= ~GPTIR_OF1IE;
+    ucallback = NULL;
+}
+
+static void __attribute__((interrupt("IRQ"))) GPT_HANDLER(void)
+{
+    uevent_cb_type cb = ucallback;
+    cancel_uevent();
+    cb();
+}
+
+void uevent(unsigned long usecs, uevent_cb_type callback)
+{
+    if (!callback || ucallback)
+        return; /* Is busy */
+
+    unsigned long status = disable_interrupt_save(IRQ_FIQ_STATUS);
+
+    ucallback = callback;
+
+    for (int i = 0; i < 1; i++)
+    {
+        unsigned long utime = GPTCNT;
+        unsigned long time = utime + usecs + 1;
+
+        GPTOCR1 = time;
+        GPTSR = GPTSR_OF1;
+        GPTIR |= GPTIR_OF1IE;
+
+        if (TIME_BEFORE(GPTCNT, time))
+            break; /* Didn't miss it */
+    }
+
+    restore_interrupt(status);
+}
+
+void uevent_cancel(void)
+{
+    unsigned long status = disable_interrupt_save(IRQ_FIQ_STATUS);
+
+    if (ucallback)
+        cancel_uevent();
+
+    restore_interrupt(status);
+}
+
+
+/** GPT timer routines - basis for udelay/uevent **/
 
 /* Start the general-purpose timer (1MHz) */
 void gpt_start(void)
@@ -102,13 +157,20 @@ void gpt_start(void)
      */
     GPTCR = GPTCR_FRR | GPTCR_WAITEN | GPTCR_CLKSRC_IPG_CLK;
     GPTPR = ipg_mhz - 1;
+    GPTSR = GPTSR_OF1;
     GPTCR |= GPTCR_EN;
+
+    avic_enable_int(INT_GPT, INT_TYPE_IRQ, INT_PRIO_GPT, GPT_HANDLER);
 }
 
 /* Stop the general-purpose timer */
 void gpt_stop(void)
 {
+    unsigned long status = disable_interrupt_save(IRQ_FIQ_STATUS);
+    avic_disable_int(INT_GPT);
+    cancel_uevent();
     GPTCR &= ~GPTCR_EN;
+    restore_interrupt(status);
 }
 
 int system_memory_guard(int newmode)
@@ -258,7 +320,7 @@ void dumpregs(void)
                   "mov %3,r12":
                   "=r"(regs.r8),"=r"(regs.r9),
                   "=r"(regs.r10),"=r"(regs.r11):);
-  
+
     asm volatile ("mov %0,r12\n\t"
                    "mov %1,sp\n\t"
                    "mov %2,lr\n\t"
@@ -280,7 +342,7 @@ void dumpregs(void)
     DEBUGF("R8=0x%x\tR9=0x%x\tR10=0x%x\tR11=0x%x\n",regs.r8,regs.r9,regs.r10,regs.r11);
     DEBUGF("R12=0x%x\tSP=0x%x\tLR=0x%x\tPC=0x%x\n",regs.r12,regs.sp,regs.lr,regs.pc);
     //DEBUGF("CPSR=0x%x\t\n",regs.cpsr);
-    
+
  }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

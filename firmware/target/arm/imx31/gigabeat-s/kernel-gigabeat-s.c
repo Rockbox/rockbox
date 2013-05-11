@@ -56,7 +56,7 @@ void INIT_ATTR tick_start(unsigned int interval_in_ms)
     EPITCR1 = EPITCR_CLKSRC_IPG_CLK | EPITCR_WAITEN | EPITCR_IOVW |
               ((2640-1) << EPITCR_PRESCALER_POS) | EPITCR_RLD |
               EPITCR_OCIEN | EPITCR_ENMOD;
- 
+
     EPITLR1 = interval_in_ms*25; /* Count down from interval */
     EPITCMPR1 = 0;               /* Event when counter reaches 0 */
     EPITSR1 = EPITSR_OCIF;       /* Clear any pending interrupt */
@@ -85,10 +85,4 @@ void tick_stop(void)
     EPITCR1 &= ~(EPITCR_OCIEN | EPITCR_EN); /* Disable counter */
     EPITSR1 = EPITSR_OCIF;                  /* Clear pending */
     ccm_module_clock_gating(CG_EPIT1, CGM_OFF); /* Turn off module clock */
-}
-
-
-void kernel_audio_locking(bool locking)
-{
-    dvfs_int_mask(locking);
 }
