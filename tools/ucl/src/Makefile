@@ -22,20 +22,32 @@ ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
 
+CPPDEFINES := $(shell echo foo | $(CROSS)$(CC) -dM -E -)
+#build standalone win32 executables on cygwin
+ifeq ($(findstring CYGWIN,$(CPPDEFINES)),CYGWIN)
+COMPILETARGET = cygwin
+else
+ifeq ($(findstring MINGW,$(CPPDEFINES)),MINGW)
+COMPILETARGET = mingw
+else
 # OS X specifics. Needs to consider cross compiling for Windows.
-ifeq ($(findstring Darwin,$(shell uname)),Darwin)
-ifneq ($(findstring mingw,$(CROSS)$(CC)),mingw)
+ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 # when building libs for OS X build for both i386 and ppc at the same time.
 # This creates fat objects, and ar can only create the archive but not operate
 # on it. As a result the ar call must NOT use the u (update) flag.
-CFLAGS += -arch ppc -arch i386
+ARCHFLAGS = -arch ppc -arch i386
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
 CC ?= gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 NATIVECC ?= gcc-4.0
+COMPILETARGET = darwin
+else
+COMPILETARGET = posix
 endif
 endif
+endif
+$(info Compiler creates $(COMPILETARGET) binaries)
 
 TARGET_DIR ?= $(shell pwd)/
 OBJDIR = $(TARGET_DIR)build$(RBARCH)
@@ -60,13 +72,12 @@ $(TARGET_DIR)ucl.dll: $(OBJS)
 
 $(TARGET_DIR)libucl$(RBARCH).a: $(OBJS)
 	@echo AR $(notdir $@)
-	$(SILENT)rm -f $@
 	$(SILENT)$(CROSS)$(AR) rcs $@ $(OBJS) >/dev/null 2>&1
 
 $(OBJDIR)/%.o: %.c
 	@echo CC $<
 	$(SILENT)$(call mkdir, $(dir $@))
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c $< -o $@
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(ARCHFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(TARGET_DIR)libucl*.a
