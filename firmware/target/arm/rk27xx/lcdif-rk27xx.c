@@ -68,6 +68,33 @@ static uint32_t lcd_data_transform(uint32_t data)
     return (r | g | b);
 }
 
+static void lcdctrl_buff_setup(int width, int height)
+{
+    /* Warning: datasheet addresses and OF addresses
+     * don't match for HOR_ACT and VERT_ACT
+     */
+    HOR_ACT = width + 3;        /* define horizonatal active region */
+    VERT_ACT = height;          /* define vertical active region */
+
+    /* This lines define layout of data in lcdif internal buffer
+     * LINEx_UVADDR = LINEx_YADDR + 1
+     * buffer is organized as 2048 x 32bit
+     * we use RGB565 (16 bits per pixel) so we pack 2 pixels
+     * in every lcdbuffer mem cell
+     */
+    width = width  >> 1;
+
+    LINE0_YADDR = 0;
+    LINE1_YADDR = 1 * width;
+    LINE2_YADDR = 2 * width;
+    LINE3_YADDR = 3 * width;
+
+    LINE0_UVADDR = LINE0_YADDR + 1;
+    LINE1_UVADDR = LINE1_YADDR + 1;
+    LINE2_UVADDR = LINE2_YADDR + 1;
+    LINE3_UVADDR = LINE3_YADDR + 1;
+}
+
 static void lcdctrl_init(void)
 {
     int i;
@@ -80,31 +107,11 @@ static void lcdctrl_init(void)
     LCDC_CTRL = ALPHA(7) | LCDC_STOP | LCDC_MCU | RGB24B;
     MCU_CTRL = ALPHA_BASE(0x3f) | MCU_CTRL_BYPASS;
 
-    /* Warning: datasheet addresses and OF addresses
-     * don't match for HOR_ACT and VERT_ACT
-     */
-    HOR_ACT = LCD_WIDTH + 3;        /* define horizonatal active region */
-    VERT_ACT = LCD_HEIGHT;          /* define vertical active region */
     VERT_PERIOD = (1<<7)|(1<<5)|1;  /* CSn/WEn/RDn signal timings */
 
     lcd_display_init();
     lcdctrl_bypass(0);
-
-    /* This lines define layout of data in lcdif internal buffer
-     * LINEx_UVADDR = LINEx_YADDR + 1
-     * buffer is organized as 2048 x 32bit
-     * we use RGB565 (16 bits per pixel) so we pack 2 pixels
-     * in every lcdbuffer mem cell
-     */
-    LINE0_YADDR = 0;
-    LINE1_YADDR = 1 * LCD_WIDTH/2;
-    LINE2_YADDR = 2 * LCD_WIDTH/2;
-    LINE3_YADDR = 3 * LCD_WIDTH/2;
-
-    LINE0_UVADDR = 1;
-    LINE1_UVADDR = (1 * LCD_WIDTH/2) + 1;
-    LINE2_UVADDR = (2 * LCD_WIDTH/2) + 1;
-    LINE3_UVADDR = (3 * LCD_WIDTH/2) + 1;
+    lcdctrl_buff_setup(LCD_WIDTH, LCD_HEIGHT);
 
     LCDC_INTR_MASK = INTR_MASK_EVENLINE;
 
@@ -185,18 +192,20 @@ static void dwdma_start(uint8_t ch, struct llp_t *llp, uint8_t handshake)
    DWDMA_DMA_CHEN = (0x101<<ch);
 }
 
-static void create_llp(void)
+static void create_llp(int x, int y, int width, int height)
 {
     int i;
 
-    /* build LLPs */
-    for (i=0; i<LCD_HEIGHT; i++)
-        llp_setup((void *)FBADDR(0,i),
-                  (void*)(LCD_BUFF+((i%4)*4*LCD_WIDTH/2)),
-                  &(scr_llp[i]),
-                  LCD_WIDTH/2);
+    width = width>>1;
 
-    llp_end(&scr_llp[LCD_HEIGHT-1]);
+    /* build LLPs */
+    for (i=0; i<height; i++)
+        llp_setup((void *)FBADDR(x,y+i),
+                  (void*)(LCD_BUFF+((i%4)*4*width)),
+                  &(scr_llp[i]),
+                  width);
+
+    llp_end(&scr_llp[height-1]);
 }
 
 /* Public functions */
@@ -244,15 +253,30 @@ void lcd_init_device(void)
     lcdctrl_init();    /* basic lcdc module configuration */
 }
 
-void lcd_update()
+void lcd_update_rect(int x, int y, int width, int height)
 {
-    lcd_set_gram_area(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);
+    int x_end, y_end, x_align, y_align;
+
+    /* min alowed transfer seems to be 4x4 pixels */
+    x_align = x & 3;
+    y_align = y & 3;
+    x = x - x_align;
+    y = y - y_align;
+    width = (width + x_align + 3) & ~3;
+    height = (height + y_align + 3) & ~3;
+    x_end = x + width - 1;
+    y_end = y + height - 1;
+
+    lcd_set_gram_area(x, y, x_end, y_end);
+    create_llp(x, y, width, height);
     lcdctrl_bypass(0);
 
+    /* whole framebuffer for now */
     commit_discard_dcache_range(FBADDR(0,0), 2*LCD_WIDTH*LCD_HEIGHT);
 
     while (!(LCDC_STA & LCDC_MCU_IDLE));
 
+    lcdctrl_buff_setup(width, height);
     dwdma_start(0, scr_llp, 6);
     udelay(10);
 
@@ -261,4 +285,9 @@ void lcd_update()
 
     /* Wait for DMA transfer to finish */
     while (DWDMA_CTL_L(0) & (1<<27));
+}
+
+void lcd_update()
+{
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }

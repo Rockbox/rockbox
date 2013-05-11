@@ -175,19 +175,6 @@ static void lcd_v1_set_gram_area(int x_start, int y_start,
     LCDC_CTRL &= ~RGB24B;
 }
 
-static void lcd_v1_update_rect(int x, int y, int width, int height)
-{
-    int px = x, py = y;
-    int pxmax = x + width, pymax = y + height;
-
-    lcd_v1_set_gram_area(x, y, pxmax-1, pymax-1);
-
-    for (py=y; py<pymax; py++)
-        for (px=x; px<pxmax; px++)     
-            LCD_DATA = (*FBADDR(px, py));
-}
-
-
 #ifdef HM60X
 
 enum lcd_type_t lcd_type;
@@ -312,19 +299,6 @@ static void lcd_v2_set_gram_area(int x_start, int y_start,
     LCDC_CTRL &= ~RGB24B;
 }
 
-static void lcd_v2_update_rect(int x, int y, int width, int height)
-{
-    int px = x, py = y;
-    int pxmax = x + width, pymax = y + height;
-
-    lcd_v2_set_gram_area(x, y, pxmax-1, pymax-1);
-
-    for (py=y; py<pymax; py++)
-        for (px=x; px<pxmax; px++)
-            LCD_DATA = (*FBADDR(px, py));
-
-}
-
 void lcd_display_init(void)
 {
     reset_lcd();
@@ -352,16 +326,6 @@ void lcd_set_gram_area(int x_start, int y_start,
         lcd_v2_set_gram_area(x_start, y_start, x_end, y_end);
 }
 
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    if (lcd_type == LCD_V1)
-        lcd_v1_update_rect(x, y, width, height);
-    else
-        lcd_v2_update_rect(x, y, width, height);
-}
-
-
-
 #else /* HM801 */
 
 void lcd_display_init(void)
@@ -380,15 +344,7 @@ void lcd_set_gram_area(int x_start, int y_start,
 {
     lcd_v1_set_gram_area(x_start, y_start, x_end, y_end);
 }
-
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    lcd_v1_update_rect(x, y, width, height);
-}
-
 #endif
-
-
 
 bool lcd_active()
 {

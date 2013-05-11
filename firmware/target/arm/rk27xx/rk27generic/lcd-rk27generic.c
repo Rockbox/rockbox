@@ -179,20 +179,6 @@ void lcd_set_gram_area(int x_start, int y_start,
     LCDC_CTRL &= ~RGB24B;
 }
 
-void lcd_update_rect(int x, int y, int width, int height)
-{
-    int px = x, py = y;
-    int pxmax = x + width, pymax = y + height;
-
-    lcd_set_gram_area(x, y, pxmax-1, pymax-1);
-
-    for (py=y; py<pymax; py++)
-    {
-        for (px=x; px<pxmax; px++)
-            LCD_DATA = *FBADDR(px,py);
-    }
-}
-
 /* Blit a YUV bitmap directly to the LCD
  * provided by generic fallback in lcd-16bit-common.c
  */
