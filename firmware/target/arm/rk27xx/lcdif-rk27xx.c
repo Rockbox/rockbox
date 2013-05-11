@@ -246,7 +246,7 @@ void lcd_init_device(void)
 
 void lcd_update()
 {
-    lcd_set_gram_area(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_set_gram_area(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);
     lcdctrl_bypass(0);
 
     commit_discard_dcache_range(FBADDR(0,0), 2*LCD_WIDTH*LCD_HEIGHT);

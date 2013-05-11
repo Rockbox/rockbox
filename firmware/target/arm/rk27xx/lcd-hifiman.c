@@ -159,15 +159,17 @@ static void lcd_v1_enable (bool on)
 
     LCDC_CTRL &= ~RGB24B;
 }
-static void lcd_v1_set_gram_area(int x, int y, int width, int height)
+
+static void lcd_v1_set_gram_area(int x_start, int y_start,
+                                 int x_end, int y_end)
 {
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
     
-    lcd_write_reg(0x03, x);
-    lcd_write_reg(0x05, width-1);
-    lcd_write_reg(0x07, y);
-    lcd_write_reg(0x09, height-1);
+    lcd_write_reg(0x03, x_start);
+    lcd_write_reg(0x05, x_end);
+    lcd_write_reg(0x07, y_start);
+    lcd_write_reg(0x09, y_end);
     
     lcd_cmd(0x22);
     LCDC_CTRL &= ~RGB24B;
@@ -178,7 +180,7 @@ static void lcd_v1_update_rect(int x, int y, int width, int height)
     int px = x, py = y;
     int pxmax = x + width, pymax = y + height;
 
-    lcd_v1_set_gram_area(x, y, pxmax, pymax);
+    lcd_v1_set_gram_area(x, y, pxmax-1, pymax-1);
 
     for (py=y; py<pymax; py++)
         for (px=x; px<pxmax; px++)     
@@ -291,19 +293,20 @@ static void lcd_v2_enable (bool on)
 
 }
 
-static void lcd_v2_set_gram_area(int x, int y, int width, int height)
+static void lcd_v2_set_gram_area(int x_start, int y_start,
+                                 int x_end, int y_end)
 {
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
 
-    lcd_write_reg(0x36, height-1);
-    lcd_write_reg(0x37, y);
-    lcd_write_reg(0x38, width-1);
-    lcd_write_reg(0x39, x);
+    lcd_write_reg(0x36, y_end);
+    lcd_write_reg(0x37, y_start);
+    lcd_write_reg(0x38, x_end);
+    lcd_write_reg(0x39, x_start);
 
     /* set GRAM address */
-    lcd_write_reg(0x20, y);
-    lcd_write_reg(0x21, x);
+    lcd_write_reg(0x20, y_start);
+    lcd_write_reg(0x21, x_start);
 
     lcd_cmd(0x22);
     LCDC_CTRL &= ~RGB24B;
@@ -314,7 +317,7 @@ static void lcd_v2_update_rect(int x, int y, int width, int height)
     int px = x, py = y;
     int pxmax = x + width, pymax = y + height;
 
-    lcd_v2_set_gram_area(x, y, pxmax, pymax);
+    lcd_v2_set_gram_area(x, y, pxmax-1, pymax-1);
 
     for (py=y; py<pymax; py++)
         for (px=x; px<pxmax; px++)
@@ -340,12 +343,13 @@ void lcd_enable (bool on)
         lcd_v2_enable(on);
 }
 
-void lcd_set_gram_area(int x, int y, int width, int height)
+void lcd_set_gram_area(int x_start, int y_start,
+                       int x_end, int y_end)
 {
    if (lcd_type == LCD_V1)
-        lcd_v1_set_gram_area(x, y, width, height);
+        lcd_v1_set_gram_area(x_start, y_start, x_end, y_end);
     else
-        lcd_v2_set_gram_area(x, y, width, height);
+        lcd_v2_set_gram_area(x_start, y_start, x_end, y_end);
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
@@ -371,9 +375,10 @@ void lcd_enable (bool on)
     lcd_v1_enable(on);
 }
 
-void lcd_set_gram_area(int x, int y, int width, int height)
+void lcd_set_gram_area(int x_start, int y_start,
+                       int x_end, int y_end)
 {
-    lcd_v1_set_gram_area(x, y, width, height);
+    lcd_v1_set_gram_area(x_start, y_start, x_end, y_end);
 }
 
 void lcd_update_rect(int x, int y, int width, int height)

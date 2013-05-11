@@ -10,6 +10,6 @@ void lcd_write_reg(unsigned int reg, unsigned int val);
 void lcdctrl_bypass(unsigned int on_off);
 void lcd_display_init(void);
 
-void lcd_set_gram_area(int x, int y, int width, int height);
+void lcd_set_gram_area(int x_start, int y_start, int x_end, int y_end);
 
 #endif /* _LCDIF_RK27XX_H */
