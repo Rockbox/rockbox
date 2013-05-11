@@ -11,6 +11,12 @@ ifndef V
 SILENT = @
 endif
 
+ifeq ($(OS),Windows_NT)
+mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+else
+mkdir = mkdir -p $(1)
+endif
+
 SPEEXSRC = ../../lib/rbcodec/codecs/libspeex
 
 INCLUDES = -I $(SPEEXSRC)
@@ -124,5 +130,5 @@ clean:
 
 $(BUILD_DIR):
 	@echo MKDIR $(BUILD_DIR)
-	$(SILENT)mkdir $(BUILD_DIR)
+	$(SILENT)$(call mkdir, $(BUILD_DIR))
 

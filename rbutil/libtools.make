@@ -21,6 +21,11 @@ endif
 
 # Get directory this Makefile is in for relative paths.
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
+ifeq ($(OS),Windows_NT)
+mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+else
+mkdir = mkdir -p $(1)
+endif
 
 # overwrite for releases
 APPVERSION ?= $(shell $(TOP)/../tools/version.sh $(TOP)/..)
@@ -93,7 +98,7 @@ $(OBJDIR)$(LIBUCL):
 # building the standalone executable
 $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo LD $@
-#	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(call mkdir,$(dir $@))
 # EXTRADEPS need to be built into OBJDIR.
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(LDOPTS) -o $(BINARY) \
 	    $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) \
@@ -102,7 +107,7 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 # common rules
 $(OBJDIR)%.o:
 	@echo CC $<
-	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(call mkdir,$(dir $@))
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
 
 # lib rules
@@ -116,14 +121,14 @@ dll: $(OUTPUT).dll
 $(OUTPUT).dll: $(TARGET_DIR)$(OUTPUT).dll
 $(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo DLL $(notdir $@)
-	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(call mkdir,$(dir $@))
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -shared -o $@ $^ \
 		    -Wl,--output-def,$(TARGET_DIR)$(OUTPUT).def
 
 # create lib file from objects
 $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo AR $(notdir $@)
-	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(call mkdir,$(dir $@))
 	$(SILENT)$(AR) rcs $@ $^
 
 clean:
@@ -138,6 +143,6 @@ $(BIN2C):
 # OS X specifics
 $(OUTPUT).dmg: $(OUTPUT)
 	@echo DMG $@
-	$(SILENT)mkdir -p $(OUTPUT)-dmg
+	$(SILENT)$(call mkdir,$(OUTPUT)-dmg))
 	$(SILENT)cp -p $(OUTPUT) $(OUTPUT)-dmg
 	$(SILENT)hdiutil create -srcfolder $(OUTPUT)-dmg $@

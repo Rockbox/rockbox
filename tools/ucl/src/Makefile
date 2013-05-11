@@ -12,6 +12,12 @@ ifndef V
 SILENT = @
 endif
 
+ifeq ($(OS),Windows_NT)
+mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+else
+mkdir = mkdir -p $(1)
+endif
+
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
 endif
@@ -59,7 +65,7 @@ $(TARGET_DIR)libucl$(RBARCH).a: $(OBJS)
 
 $(OBJDIR)/%.o: %.c
 	@echo CC $<
-	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(call mkdir, $(dir $@))
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
