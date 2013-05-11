@@ -1,10 +1,8 @@
 #ifndef _LCDIF_RK27XX_H
 #define _LCDIF_RK27XX_H
 
-enum lcdif_mode_t {
-    LCDIF_16BIT,
-    LCDIF_18BIT
-};
+#define LCDIF_16BIT 16
+#define LCDIF_18BIT 18
 
 void lcd_cmd(unsigned int cmd);
 void lcd_data(unsigned int data);

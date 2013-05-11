@@ -50,19 +50,19 @@ static uint32_t lcd_data_transform(uint32_t data)
 {
     unsigned int r, g, b;
 
-#if defined(RK27_GENERIC)
+#if (LCD_DATABUS_WIDTH == LCDIF_18BIT)
     /* 18 bit interface */
     r = (data & 0x0000fc00)<<8;
     /* g = ((data & 0x00000300) >> 2) | ((data & 0x000000e0) >> 3); */
     g = ((data & 0x00000300) << 6) | ((data & 0x000000e0) << 5);
     b = (data & 0x00000001f) << 3;
-#elif defined(HM60X) || defined(HM801) || defined(MA9)
+#elif (LCD_DATABUS_WIDTH == LCDIF_16BIT)
     /* 16 bit interface */
     r = (data & 0x0000f800) << 8;
     g = (data & 0x000007e0) << 5;
     b = (data & 0x0000001f) << 3;
 #else
-#error "Unknown target"
+#error "LCD_DATABUS_WIDTH needs to be defined in lcd-target.h"
 #endif
 
     return (r | g | b);
@@ -119,17 +119,15 @@ static void lcdctrl_init(void)
     MCU_CTRL = MCU_CTRL_RS_HIGH|MCU_CTRL_BUFF_WRITE|MCU_CTRL_BUFF_START;
 }
 
-/* configure pins to drive lcd in 18bit mode (16bit mode for HiFiMAN's) */
-static void iomux_lcd(enum lcdif_mode_t mode)
+/* configure pins to drive lcd in 18bit or 16bit mode */
+static void iomux_lcd(void)
 {
     unsigned long muxa;
 
     muxa = SCU_IOMUXA_CON & ~(IOMUX_LCD_VSYNC|IOMUX_LCD_DEN|0xff);
-
-    if (mode == LCDIF_18BIT)
-    {
-        muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
-    }
+#if (LCD_DATABUS_WIDTH == LCDIF_18BIT)
+    muxa |= IOMUX_LCD_D18|IOMUX_LCD_D20|IOMUX_LCD_D22|IOMUX_LCD_D17|IOMUX_LCD_D16;
+#endif
 
     SCU_IOMUXA_CON = muxa;
     SCU_IOMUXB_CON |= IOMUX_LCD_D815;
@@ -241,10 +239,9 @@ void lcd_write_reg(unsigned int reg, unsigned int val)
 /* rockbox API functions */
 void lcd_init_device(void)
 {
-    iomux_lcd(LCD_DATABUS_WIDTH);   /* setup pins for lcd interface */
-    dwdma_init();                   /* init dwdma module */
-    create_llp();                   /* build LLPs for screen update dma */
-    lcdctrl_init();                 /* basic lcdc module configuration */
+    iomux_lcd();       /* setup pins for lcd interface */
+    dwdma_init();      /* init dwdma module */
+    lcdctrl_init();    /* basic lcdc module configuration */
 }
 
 void lcd_update()
