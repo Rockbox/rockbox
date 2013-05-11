@@ -25,9 +25,4 @@ include ../libtools.make
 # Rules go _after_ including mkboot.make to have OBJDIR set up correctly.
 # Paths are assumed to end with a /
 telechips.o: $(OBJDIR)telechips.o
-$(OBJDIR)%.o: $(TOOLSDIR)%.c
-	@echo CC $<
-	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
-
 

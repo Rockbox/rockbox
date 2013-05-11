@@ -80,6 +80,8 @@ all: $(BINARY)
 OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(SOURCES))))
 LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(LIBSOURCES))))
 
+$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(subst .c,.o,$(notdir $(src)))): $(src)))
+
 # additional link dependencies for the standalone executable
 # extra dependencies: libucl
 LIBUCL = libucl$(RBARCH).a
@@ -98,7 +100,7 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 
 # common rules
-$(OBJDIR)%.o: %.c
+$(OBJDIR)%.o:
 	@echo CC $<
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<

@@ -27,7 +27,3 @@ include ../libtools.make
 $(OBJDIR)mkimxboot.o: dualboot.h dualboot.c mkimxboot.c mkimxboot.h
 $(OBJDIR)main.o: dualboot.h dualboot.c main.c mkimxboot.h
 
-$(OBJDIR)%.o: $(IMXTOOLS_DIR)%.c
-	@echo CC $<
-	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
