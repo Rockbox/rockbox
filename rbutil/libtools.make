@@ -74,10 +74,12 @@ endif
 WINDRES = windres
 
 BUILD_DIR ?= $(TARGET_DIR)build$(COMPILETARGET)
-OBJDIR = $(abspath $(BUILD_DIR)/$(RBARCH))/
 
 ifdef RBARCH
 CFLAGS += -arch $(RBARCH)
+OBJDIR = $(abspath $(BUILD_DIR)/$(RBARCH))/
+else
+OBJDIR = $(abspath $(BUILD_DIR))/
 endif
 
 all: $(BINARY)
@@ -85,7 +87,11 @@ all: $(BINARY)
 OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(SOURCES))))
 LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(LIBSOURCES))))
 
+# create dependency files. Make sure to use the same prefix as with OBJS!
 $(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(subst .c,.o,$(notdir $(src)))): $(src)))
+$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(subst .c,.d,$(notdir $(src)))): $(src)))
+DEPS = $(addprefix $(OBJDIR),$(subst .c,.d,$(notdir $(SOURCES) $(LIBSOURCES))))
+-include $(DEPS)
 
 # additional link dependencies for the standalone executable
 # extra dependencies: libucl
@@ -134,6 +140,10 @@ $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALI
 clean:
 	rm -f $(OBJS) $(OUTPUT) $(TARGET_DIR)lib$(OUTPUT)*.a $(OUTPUT).dmg
 	rm -rf $(OUTPUT)-* i386 ppc $(OBJDIR)
+
+%.d:
+	$(SILENT)$(call mkdir,$(BUILD_DIR))
+	$(SILENT)$(CC) -MG -MM -MT $(subst .d,.o,$@) $(CFLAGS) -o $(BUILD_DIR)/$(notdir $@) $<
 
 # extra tools
 BIN2C = $(TOP)/tools/bin2c
