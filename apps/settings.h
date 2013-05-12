@@ -790,6 +790,10 @@ struct user_settings
     int depth_3d;
 #endif
 
+#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
+    int roll_off;
+#endif
+
 #ifdef AUDIOHW_HAVE_EQ
     /** Hardware EQ tone controls **/
     struct hw_eq_band

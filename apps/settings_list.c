@@ -778,6 +778,13 @@ const struct settings_list settings[] = {
     SOUND_SETTING(0,depth_3d, LANG_DEPTH_3D, "3-d enhancement",
                   SOUND_DEPTH_3D),
 #endif
+
+#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
+    CHOICE_SETTING(F_SOUNDSETTING, roll_off, LANG_FILTER_ROLL_OFF, 0,
+                   "roll_off", "sharp,slow", sound_set_filter_roll_off,
+                   2, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW)),
+#endif
+
     /* playback */
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),

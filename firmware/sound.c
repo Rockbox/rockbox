@@ -314,6 +314,16 @@ void sound_set_depth_3d(int value)
 }
 #endif /* AUDIOHW_HAVE_DEPTH_3D */
 
+#if defined(AUDIOHW_HAVE_FILTER_ROLL_OFF)
+void sound_set_filter_roll_off(int value)
+{
+    if (!audio_is_initialized)
+        return;
+
+    audiohw_set_filter_roll_off(value);
+}
+#endif
+
 #if defined(AUDIOHW_HAVE_EQ)
 int sound_enum_hw_eq_band_setting(unsigned int band,
                                   unsigned int band_setting)

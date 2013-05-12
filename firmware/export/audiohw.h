@@ -40,6 +40,7 @@
 #define MONO_VOL_CAP          (1 << 10)
 #define LIN_GAIN_CAP          (1 << 11)
 #define MIC_GAIN_CAP          (1 << 12)
+#define FILTER_ROLL_OFF_CAP   (1 << 13)
 
 /* Used by every driver to export its min/max/default values for its audio
    settings. */
@@ -269,6 +270,11 @@ enum AUDIOHW_EQ_SETTINGS
 #define AUDIOHW_HAVE_MIC_GAIN
 #endif
 #endif /* HAVE_RECORDING */
+
+#if (AUDIOHW_CAPS & FILTER_ROLL_OFF_CAP)
+#define AUDIOHW_HAVE_FILTER_ROLL_OFF
+#endif
+
 #endif /* AUDIOHW_CAPS */
 
 #ifdef HAVE_SW_TONE_CONTROLS
@@ -452,6 +458,16 @@ void audiohw_set_eq_band_width(unsigned int band, int val);
  *          DEPTH_3D_CAP
  */
 void audiohw_set_depth_3d(int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
+/**
+ * Set DAC's oversampling filter roll-off.
+ * @param val 0 - sharp roll-off, 1 - slow roll-off.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          FILTER_ROLL_OFF_CAP
+ */
+void audiohw_set_filter_roll_off(int val);
 #endif
 
 

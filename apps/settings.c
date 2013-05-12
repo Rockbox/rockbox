@@ -753,6 +753,9 @@ void sound_settings_apply(void)
 #ifdef AUDIOHW_HAVE_DEPTH_3D
     sound_set(SOUND_DEPTH_3D, global_settings.depth_3d);
 #endif
+#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
+    sound_set(SOUND_FILTER_ROLL_OFF, global_settings.roll_off);
+#endif
 #ifdef AUDIOHW_HAVE_EQ
     int b;
 

@@ -88,6 +88,10 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
 MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
 #endif
 
+#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
+MENUITEM_SETTING(roll_off, &global_settings.roll_off, NULL);
+#endif
+
 #if CONFIG_CODEC == SWCODEC
     /* Crossfeed Submenu */
     MENUITEM_SETTING(crossfeed, &global_settings.crossfeed, lowlatency_callback);
@@ -182,6 +186,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           ,&balance,&channel_config,&stereo_width
 #ifdef AUDIOHW_HAVE_DEPTH_3D
           ,&depth_3d
+#endif
+#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
+          ,&roll_off
 #endif
 #if CONFIG_CODEC == SWCODEC
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
