@@ -87,7 +87,7 @@ void watchdog_service(void)
 
 /** uevent APIs **/
 
-static void (*ucallback)(void) = NULL; /* uevent callback */
+static uevent_cb_type ucallback = NULL; /* uevent callback */
 
 static void cancel_uevent(void)
 {
