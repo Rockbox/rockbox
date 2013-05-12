@@ -42,6 +42,17 @@ bool ata_is_coldstart()
     /* TODO: Implement coldstart variable */
 }
 
+/* These are PIO timings for 80 Mhz.  At 24 Mhz, the first value is 0 but the
+   rest are the same. They go in IDE0_PRI_TIMING0.
+
+   Rockbox used to use 0x10, and test_disk shows that leads to faster PIO.
+   However on some disks connected with mSATA adapters this causes corrupt data
+   so we now just use these timings from the OF.
+*/
+static const unsigned long pio80mhz[] = {
+    0xC293, 0x43A2, 0x11A1, 0x7232, 0x3131
+};
+
 void ata_device_init()
 {
 #ifdef SAMSUNG_YH920
@@ -63,20 +74,15 @@ void ata_device_init()
 #endif
 #endif
 
-    IDE0_PRI_TIMING0 = 0x10;
+    IDE0_PRI_TIMING0 = pio80mhz[0];
     IDE0_PRI_TIMING1 = 0x80002150;
 }
 
-/* These are PIO timings for 80 Mhz.  At 24 Mhz, 
-   the first value is 0 but the rest are the same.
-   They go in IDE0_PRI_TIMING0.
-   
-   Rockbox used 0x10, and test_disk shows that leads to faster PIO.   
-   If 0x10 is incorrect, these timings may be needed with some devices.
-static const unsigned long pio80mhz[] = {
-    0xC293, 0x43A2, 0x11A1, 0x7232, 0x3131
-}; 
-*/
+/* Setup the timing for PIO mode */
+void ata_set_pio_timings(int mode)
+{
+    IDE0_PRI_TIMING0 = pio80mhz[mode];
+}
 
 #ifdef HAVE_ATA_DMA
 /* Timings for multi-word and ultra DMA modes.
