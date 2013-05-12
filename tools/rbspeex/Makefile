@@ -82,7 +82,6 @@ DEPS = $(addprefix $(BUILD_DIR)/,$(subst .c,.d,$(notdir $(SOURCES))))
 -include $(DEPS)
 
 %.d:
-	@echo DEP $(notdir $@)
 	$(SILENT)$(call mkdir,$(BUILD_DIR))
 	$(SILENT)$(CC) -MG -MM -MT $(subst .d,.o,$@) $(CFLAGS) -o $(BUILD_DIR)/$(notdir $@) $<
 
@@ -95,7 +94,7 @@ $(TARGET_DIR)rbspeex.dll: $(OBJS) $(BUILD_DIR)/rbspeex.o
 
 $(TARGET_DIR)librbspeex.a: $(OBJS) $(BUILD_DIR)/rbspeex.o
 	@echo AR $(notdir $@)
-	$(SILENT)$(CROSS)$(AR) rcs $@ $^ > /dev/null 2>&1
+	$(SILENT)$(CROSS)$(AR) rcs $@ $^
 
 librbspeex.a: $(TARGET_DIR)librbspeex.a
 	

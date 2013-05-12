@@ -72,7 +72,7 @@ $(TARGET_DIR)ucl.dll: $(OBJS)
 
 $(TARGET_DIR)libucl$(RBARCH).a: $(OBJS)
 	@echo AR $(notdir $@)
-	$(SILENT)$(CROSS)$(AR) rcs $@ $(OBJS) >/dev/null 2>&1
+	$(SILENT)$(CROSS)$(AR) rcs $@ $(OBJS)
 
 $(OBJDIR)/%.o: %.c
 	@echo CC $<
