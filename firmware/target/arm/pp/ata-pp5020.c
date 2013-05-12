@@ -25,8 +25,9 @@
 #include "system.h"
 #include "kernel.h"
 #include "ata-driver.h"
+#include "ata.h"
 
-void ata_reset() 
+void ata_reset()
 {
 
 }
@@ -43,6 +44,17 @@ bool ata_is_coldstart()
     /* TODO: Implement coldstart variable */
 }
 
+/* These are PIO timings for 80 Mhz.  At 24 Mhz, the first value is 0 but the
+   rest are the same. They go in IDE0_PRI_TIMING0.
+
+   Rockbox used to use 0x10, and test_disk shows that leads to faster PIO.
+   However on some disks connected with mSATA adapters this causes corrupt data
+   so we now just use these timings from the OF.
+*/
+static const unsigned long pio80mhz[] = {
+    0xC293, 0x43A2, 0x11A1, 0x7232, 0x3131
+};
+
 void ata_device_init()
 {
 #ifdef SAMSUNG_YH920
@@ -52,7 +64,7 @@ void ata_device_init()
     IDE_DMA_CONTROL |= 2;
     IDE_DMA_CONTROL &= ~1;
     IDE0_CFG &= ~0x8010;
-    IDE0_CFG |= 0x20; 
+    IDE0_CFG |= 0x20;
 #else
 
     /* From ipod-ide.c:ipod_ide_register() */
@@ -64,33 +76,31 @@ void ata_device_init()
 #endif
 #endif
 
-    IDE0_PRI_TIMING0 = 0x10;
+    IDE0_PRI_TIMING0 = pio80mhz[0];
     IDE0_PRI_TIMING1 = 0x80002150;
 }
 
-/* These are PIO timings for 80 Mhz.  At 24 Mhz, 
-   the first value is 0 but the rest are the same.
-   They go in IDE0_PRI_TIMING0.
-   
-   Rockbox used 0x10, and test_disk shows that leads to faster PIO.   
-   If 0x10 is incorrect, these timings may be needed with some devices.
-static const unsigned long pio80mhz[] = {
-    0xC293, 0x43A2, 0x11A1, 0x7232, 0x3131
-}; 
-*/
+/* Setup the timing for PIO mode */
+void ata_set_pio_timings(int mode)
+{
+    if (ata_disk_isssd())
+        IDE0_PRI_TIMING0 = pio80mhz[mode];
+    else
+        IDE0_PRI_TIMING0 = 0x10;
+}
 
 #ifdef HAVE_ATA_DMA
 /* Timings for multi-word and ultra DMA modes.
    These go in IDE0_PRI_TIMING1
  */
 static const unsigned long tm_mwdma[] = {
-    0xF9F92, 0x56562, 0x45451 
+    0xF9F92, 0x56562, 0x45451
 };
 
-static const unsigned long tm_udma[] = { 
-    0x800037C1, 0x80003491, 0x80003371, 
-#if ATA_MAX_UDMA > 2       
-    0x80003271, 0x80003071 
+static const unsigned long tm_udma[] = {
+    0x800037C1, 0x80003491, 0x80003371,
+#if ATA_MAX_UDMA > 2
+    0x80003271, 0x80003071
 #endif
 };
 
@@ -126,7 +136,7 @@ void ata_dma_set_mode(unsigned char mode) {
 #if !defined(IPOD_NANO)
     IDE0_CFG |= 0x20000000; /* >= 50 Mhz */
 #endif
-} 
+}
 
 #define IDE_CFG_INTRQ           8
 #define IDE_DMA_CONTROL_READ    8
@@ -137,8 +147,8 @@ void ata_dma_set_mode(unsigned char mode) {
 static ICODE_ATTR int ata_wait_intrq(void)
 {
     long timeout = current_tick + HZ*10;
-    
-    do 
+
+    do
     {
         if (IDE0_CFG & IDE_CFG_INTRQ)
             return 1;
@@ -149,11 +159,11 @@ static ICODE_ATTR int ata_wait_intrq(void)
     return 0; /* timeout */
 }
 
-/* This function checks if parameters are appropriate for DMA, 
+/* This function checks if parameters are appropriate for DMA,
    and if they are, it sets up for DMA.
-   
+
    If return value is false, caller may use PIO for this transfer.
-   
+
    If return value is true, caller must issue a DMA ATA command
    and then call ata_dma_finish().
  */
@@ -217,18 +227,18 @@ bool ata_dma_setup(void *addr, unsigned long bytes, bool write) {
 
 /* This function waits for a DMA transfer to end.
    It must be called to finish what ata_dma_setup started.
-   
+
    Return value is true if DMA completed before the timeout, and false
    if a timeout happened.
  */
 bool ata_dma_finish(void) {
     bool res;
-    
+
     /* It may be okay to put this at the end of setup */
     IDE_DMA_CONTROL |= 1;
 
     /* Wait for end of transfer.
-       Reading standard ATA status while DMA is in progress causes 
+       Reading standard ATA status while DMA is in progress causes
        failures and hangs.  Because of that, another wait is used.
      */
     res = ata_wait_intrq();
