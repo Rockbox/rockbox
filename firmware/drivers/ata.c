@@ -332,7 +332,7 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
 
-static inline int ata_disk_isssd(void)
+int ata_disk_isssd(void)
 {
     /* offset 217 is "Nominal Rotation rate"
        0x0000 == Not reported

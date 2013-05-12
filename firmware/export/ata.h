@@ -165,6 +165,9 @@ int ata_num_drives(int first_drive);
 long ata_last_disk_activity(void);
 int ata_spinup_time(void); /* ticks */
 
+/* Returns 1 if drive is solid-state */
+int ata_disk_isssd(void);
+
 #ifdef HAVE_ATA_DMA
 /* Returns current DMA mode */
 int ata_get_dma_mode(void);

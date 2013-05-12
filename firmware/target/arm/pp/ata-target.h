@@ -49,6 +49,8 @@
 #define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
 
+#define ATA_SET_PIO_TIMING
+
 #endif /* CONFIG_CPU */
 
 #ifdef HAVE_ATA_DMA
