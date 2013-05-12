@@ -113,3 +113,17 @@ void audiohw_set_volume(int vol_l, int vol_r)
     df1704_write_reg(DF1704_MODE(0), DF1704_LDL_ON|vol_tenthdb2hw(vol_l));
     df1704_write_reg(DF1704_MODE(1), DF1704_LDR_ON|vol_tenthdb2hw(vol_r));
 }
+
+void audiohw_set_filter_roll_off(int value)
+{
+    int mode3_val = DF1704_CKO_HALF |
+                    DF1704_LRP_H    |
+                    DF1704_I2S_ON;
+
+    if (value == 0) {
+        mode3_val |= DF1704_SRO_SHARP;
+    } else {
+        mode3_val |= DF1704_SRO_SLOW;
+    }
+    df1704_write_reg(DF1704_MODE(3), mode3_val);
+}
