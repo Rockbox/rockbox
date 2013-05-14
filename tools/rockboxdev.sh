@@ -140,11 +140,11 @@ build() {
     fi
 
     # download patch
-    if test -n "$patch"; then
-        if test ! -f "$dlwhere/$patch"; then
-            getfile "$patch" "$patch_url"
+    for p in $patch; do
+        if test ! -f "$dlwhere/$p"; then
+            getfile "$p" "$patch_url"
         fi
-    fi
+    done
 
     cd $builddir
 
@@ -152,18 +152,18 @@ build() {
     tar xjf $dlwhere/$file
 
     # do we have a patch?
-    if test -n "$patch"; then
-        echo "ROCKBOXDEV: applying patch $patch"
+    for p in $patch; do
+        echo "ROCKBOXDEV: applying patch $p"
 
         # apply the patch
-        (cd $builddir/$toolname-$version && patch -p1 < "$dlwhere/$patch")
+        (cd $builddir/$toolname-$version && patch -p1 < "$dlwhere/$p")
 
         # check if the patch applied cleanly
         if [ $? -gt 0 ]; then
-            echo "ROCKBOXDEV: failed to apply patch $patch"
+            echo "ROCKBOXDEV: failed to apply patch $p"
             exit
         fi
-    fi
+    done
 
     # kludge to avoid having to install GMP, MPFR and MPC, for new gcc
     if test -n "$needs_libs"; then
@@ -361,7 +361,7 @@ do
             # default rule for Objective C. Disable the builtin make rules. See
             # http://sourceware.org/ml/binutils/2005-12/msg00259.html
             export MAKEFLAGS="-r $MAKEFLAGS"
-            build "binutils" "sh-elf" "2.16.1" "" "--disable-werror"
+            build "binutils" "sh-elf" "2.16.1" "binutils-2.16.1-texinfo-fix.diff" "--disable-werror"
             build "gcc" "sh-elf" "4.0.3" "gcc-4.0.3-rockbox-1.diff"
             ;;
 
@@ -375,8 +375,8 @@ do
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.20.1" "" "--disable-werror"
-            build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf" "gmp mpfr mpc"
+            build "binutils" "m68k-elf" "2.20.1" "binutils-2.20.1-texinfo-fix.diff" "--disable-werror"
+            build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc"
             ;;
 
         [Aa])
@@ -388,8 +388,8 @@ do
                     gccopts="--disable-nls"
                     ;;
             esac
-            build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff" "$binopts --disable-werror"
-            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts" "gmp mpfr"
+            build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff binutils-2.20.1-texinfo-fix.diff" "$binopts --disable-werror"
+            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
