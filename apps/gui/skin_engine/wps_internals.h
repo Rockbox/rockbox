@@ -361,6 +361,9 @@ struct wps_data
 #ifdef HAVE_ALBUMART
     OFFSETTYPE(struct skin_albumart *) albumart;
     int    playback_aa_slot;
+    /* copy of albumart to survive skin resets, used to check if albumart
+     * dimensions changed on skin change */
+    short last_albumart_width, last_albumart_height;
 #endif
 
 #ifdef HAVE_SKIN_VARIABLES
