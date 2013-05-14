@@ -83,10 +83,23 @@ struct skin_stats *skin_get_stats(int number, int screen)
 
 static void gui_skin_reset(struct gui_skin *skin)
 {
+    struct wps_data *data;
+    struct skin_albumart *aa_save;
     skin->failsafe_loaded = false;
     skin->needs_full_update = true;
-    skin->gui_wps.data = &skin->data;
-    memset(skin->gui_wps.data, 0, sizeof(struct wps_data));
+    skin->gui_wps.data = data = &skin->data;
+    /* copy to temp var to protect against memset */
+    if ((aa_save = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart)))
+    {
+        short old_width, old_height;
+        old_width = aa_save->width;
+        old_height = aa_save->height;
+        memset(data, 0, sizeof(struct wps_data));
+        data->last_albumart_width = old_width;
+        data->last_albumart_height = old_height;
+    }
+    else
+        memset(data, 0, sizeof(struct wps_data));
     skin->data.wps_loaded = false;
     skin->data.buflib_handle = -1;
     skin->data.tree = -1;
