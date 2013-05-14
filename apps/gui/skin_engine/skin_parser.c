@@ -2286,19 +2286,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     char *wps_buffer = NULL;
     if (!wps_data || !buf)
         return false;
-#ifdef HAVE_ALBUMART
-    int status;
-    struct mp3entry *curtrack;
-    long offset;
-    struct skin_albumart old_aa = {.state = WPS_ALBUMART_NONE};
-    struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);
-    if (aa)
-    {
-        old_aa.state = aa->state;
-        old_aa.height = aa->height;
-        old_aa.width = aa->width;
-    }
-#endif
 #ifdef HAVE_LCD_BITMAP
     int i;
     for (i=0;i<MAXUSERFONTS;i++)
@@ -2401,17 +2388,16 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
 #endif
 #if defined(HAVE_ALBUMART) && !defined(__PCTOOL__)
-    status = audio_status();
+    int status = audio_status();
     if (status & AUDIO_STATUS_PLAY)
     {
+        /* last_albumart_{width,height} is either both 0 or valid AA dimensions */
         struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);
-        if (aa && ((aa->state && !old_aa.state) ||
-            (aa->state &&
-            (((old_aa.height != aa->height) ||
-            (old_aa.width != aa->width))))))
+        if (aa && (aa->state != WPS_ALBUMART_NONE ||
+            (((wps_data->last_albumart_height != aa->height) ||
+            (wps_data->last_albumart_width != aa->width)))))
         {
-            curtrack = audio_current_track();
-            offset = curtrack->offset;
+            long offset = audio_current_track()->offset;
             audio_stop();
             if (!(status & AUDIO_STATUS_PAUSE))
                 audio_play(offset);
