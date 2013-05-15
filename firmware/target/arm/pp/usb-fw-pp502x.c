@@ -108,7 +108,7 @@
 static void usb_reset_controller(void)
 {
     /* enable usb module */
-    outl(inl(0x7000002C) | 0x3000000, 0x7000002C);  
+    outl(inl(0x7000002C) | 0x3000000, 0x7000002C);
 
     DEV_EN |= DEV_USB0;
     DEV_EN |= DEV_USB1;
@@ -197,7 +197,11 @@ void usb_enable(bool on)
 
 void usb_attach(void)
 {
-    usb_drv_attach();
+#if defined(IPOD_VIDEO)
+    /* FIXME: Some iPod Video's need this 2nd call of usb_drv_init() to establish
+     * an USB connection. */
+    usb_drv_init();
+#endif
 }
 
 bool usb_plugged(void)

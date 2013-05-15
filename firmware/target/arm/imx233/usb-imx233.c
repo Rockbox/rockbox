@@ -42,7 +42,6 @@ void usb_remove_int(void)
 
 void usb_attach(void)
 {
-    usb_drv_attach();
 }
 
 void usb_drv_int_enable(bool enable)

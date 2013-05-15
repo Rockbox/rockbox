@@ -489,17 +489,6 @@ void usb_drv_init(void)
     /* now a bus reset will occur. see bus_reset() */
 }
 
-/* fully enable driver */
-void usb_drv_attach(void)
-{
-    logf("usb_drv_attach");
-#if defined(IPOD_VIDEO)
-    /* FIXME: Some iPod Video's need this 2nd call of usb_drv_init() to establish
-     * an USB connection. */
-    usb_drv_init();
-#endif
-}
-
 void usb_drv_exit(void)
 {
     usb_drv_stop();

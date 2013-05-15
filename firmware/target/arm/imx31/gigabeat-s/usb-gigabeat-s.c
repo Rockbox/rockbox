@@ -123,8 +123,6 @@ void usb_attach(void)
         bootloader_install_mode =
             (button_status() & USB_BL_INSTALL_MODE_BTN) != 0;
     }
-
-    usb_drv_attach();
 }
 
 static void __attribute__((interrupt("IRQ"))) USB_OTG_HANDLER(void)
