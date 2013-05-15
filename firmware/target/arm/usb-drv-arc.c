@@ -494,7 +494,7 @@ void usb_drv_attach(void)
 {
     logf("usb_drv_attach");
 #if defined(IPOD_VIDEO)
-    /* FIXME: Some iPod Video's need this 2nd call of usb_drv_init() to establish 
+    /* FIXME: Some iPod Video's need this 2nd call of usb_drv_init() to establish
      * an USB connection. */
     usb_drv_init();
 #endif
@@ -899,7 +899,7 @@ static void transfer_completed(void)
             int pipe = ep * 2 + dir;
             if (mask & pipe2mask[pipe]) {
                 struct queue_head* qh = &qh_array[pipe];
-                
+
                 int length=0;
                 struct transfer_descriptor* td=&td_array[pipe*NUM_TDS_PER_EP];
                 while(td!=(struct transfer_descriptor*)DTD_NEXT_TERMINATE && td!=0)
@@ -921,7 +921,7 @@ static void transfer_completed(void)
                     qh->wait=0;
                     semaphore_release(&transfer_completion_signal[pipe]);
                 }
-                
+
                 usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT,
                         qh->status, length);
                 Lskip:
@@ -985,23 +985,23 @@ static void init_queue_heads(void)
 
     /* TODO: this should take ep_allocation into account */
     for (i=1;i<USB_NUM_ENDPOINTS;i++) {
-        
+
         /* OUT */
         if(endpoints[i].type[DIR_OUT] == USB_ENDPOINT_XFER_ISOC)
             /* FIXME: we can adjust the number of packets per frame, currently use one */
             qh_array[i*2].max_pkt_length = packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL | 1 << QH_MULT_POS;
         else
             qh_array[i*2].max_pkt_length = packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
-        
+
         qh_array[i*2].dtd.next_td_ptr = QH_NEXT_TERMINATE;
-        
+
         /* IN */
         if(endpoints[i].type[DIR_IN] == USB_ENDPOINT_XFER_ISOC)
             /* FIXME: we can adjust the number of packets per frame, currently use one */
             qh_array[i*2+1].max_pkt_length = packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL | 1 << QH_MULT_POS;
         else
             qh_array[i*2+1].max_pkt_length = packetsize << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
-        
+
         qh_array[i*2+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
     }
 }
