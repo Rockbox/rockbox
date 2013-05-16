@@ -208,18 +208,10 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     new_block = block + shift;
     new_start = tmp->alloc + shift*sizeof(union buflib_data);
 
-    /* disable IRQs to make accessing the buffer from interrupt context safe. */
-    /* protect the move callback, as a cached global pointer might be updated
-     * in it. and protect "tmp->alloc = new_start" for buflib_get_data() */
-    /* call the callback before moving */
+    /* If move must be synchronized with use, user should have specified a
+       callback that handles this */
     if (ops && ops->sync_callback)
-    {
         ops->sync_callback(handle, true);
-    }
-    else
-    {
-        disable_irq();
-    }
 
     bool retval = false;
     if (!ops || ops->move_callback(handle, tmp->alloc, new_start)
@@ -231,13 +223,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     }
 
     if (ops && ops->sync_callback)
-    {
         ops->sync_callback(handle, false);
-    }
-    else
-    {
-        enable_irq();
-    }
 
     return retval;
 }
