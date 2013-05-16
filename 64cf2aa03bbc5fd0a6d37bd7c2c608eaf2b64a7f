@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "AAAASX///Iw\u003d",
+        "filename": "lib/rbcodec/dsp/dsp_cf.S",
+        "patchSetId": 14
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-05-16T15:02:11Z",
+      "side": 1,
+      "message": "nevermind, I forgot that coldfire\u0027s lsr.l immediate is 1-8",
+      "parentUuid": "AAAASX///I8\u003d",
+      "revId": "64cf2aa03bbc5fd0a6d37bd7c2c608eaf2b64a7f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAASX///I4\u003d",
         "filename": "lib/rbcodec/dsp/dsp_cf.S",
         "patchSetId": 14
@@ -30,6 +48,24 @@
       "writtenOn": "2013-05-16T14:54:27Z",
       "side": 1,
       "message": "again why not shift-by-16 ?",
+      "revId": "64cf2aa03bbc5fd0a6d37bd7c2c608eaf2b64a7f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Is\u003d",
+        "filename": "lib/rbcodec/dsp/dsp_cf.S",
+        "patchSetId": 14
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-05-16T15:02:11Z",
+      "side": 1,
+      "message": "as above",
+      "parentUuid": "AAAASX///I4\u003d",
       "revId": "64cf2aa03bbc5fd0a6d37bd7c2c608eaf2b64a7f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
