@@ -336,7 +336,7 @@ static void yearday_to_daymonth(int yd, int y, int *d, int *m)
     static char t[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
     bool leap = (y%4 == 0 && y%100 != 0) || y%400 == 0;
-    t[2] = leap ? 29 : 28;
+    t[1] = leap ? 29 : 28;
 
     int i;
     for (i = 0; i < 12 && yd >= t[i]; i++)
