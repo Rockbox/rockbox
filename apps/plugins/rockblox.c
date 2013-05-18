@@ -753,6 +753,7 @@ static struct _rockblox_status
     int cf;
     int co;
     int nf;
+    bool dropped;
     short board[BOARD_HEIGHT][BOARD_WIDTH]; /* 20 rows of 10 blocks */
 } rockblox_status;
 
@@ -1234,7 +1235,7 @@ static void draw_next_block (void)
 /* move the block to a relative location */
 static void move_block (int x, int y, int o)
 {
-    if (canMoveTo (rockblox_status.cx + x, rockblox_status.cy + y, o)) {
+    if (!rockblox_status.dropped && canMoveTo (rockblox_status.cx + x, rockblox_status.cy + y, o)) {
         rockblox_status.cy += y;
         rockblox_status.cx += x;
         rockblox_status.co = o;
@@ -1251,6 +1252,7 @@ static void new_block (void)
     rockblox_status.nf = t_rand (BLOCKS_NUM);
     rockblox_status.gameover = !canMoveTo (rockblox_status.cx,
             rockblox_status.cy, rockblox_status.co);
+    rockblox_status.dropped = false;
 
     draw_next_block ();
 }
@@ -1511,6 +1513,7 @@ static int rockblox_loop (void)
 #endif
                 while (canMoveTo (rockblox_status.cx, rockblox_status.cy + 1, rockblox_status.co))
                     move_block (0, 1, rockblox_status.co);
+                rockblox_status.dropped = true;
                 break;
 #ifdef ROCKBLOX_RESTART
             case ROCKBLOX_RESTART:
