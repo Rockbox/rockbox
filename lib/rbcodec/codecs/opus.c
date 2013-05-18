@@ -329,10 +329,8 @@ enum codec_status codec_run(void)
     int64_t seek_target;
     uint64_t granule_pos;
 
-    /* reset our simple malloc */
-    if (codec_init()) {
-        goto done;
-    }
+    ogg_malloc_init();
+
     global_stack = 0;
 
 #if defined(CPU_COLDFIRE)
@@ -344,10 +342,10 @@ enum codec_status codec_run(void)
     /* pre-init the ogg_sync_state buffer, so it won't need many reallocs */
     ogg_sync_init(&oy);
     oy.storage = 64*1024;
-    oy.data = codec_malloc(oy.storage);
+    oy.data = _ogg_malloc(oy.storage);
 
     /* allocate output buffer */
-    uint16_t *output = (uint16_t*) codec_malloc(MAX_FRAME_SIZE*sizeof(uint16_t));
+    uint16_t *output = (uint16_t*) _ogg_malloc(MAX_FRAME_SIZE*sizeof(uint16_t));
 
     ci->seek_buffer(0);
     ci->set_elapsed(0);
@@ -465,6 +463,7 @@ enum codec_status codec_run(void)
     LOGF("Returned OK");
     error = CODEC_OK;
 done:
+    ogg_malloc_destroy();
     return error;
 }
 

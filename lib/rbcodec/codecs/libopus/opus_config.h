@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "codeclib.h"
+#include "ogg/ogg.h"
 
 /* general stuff */
 #define OPUS_BUILD
@@ -14,9 +15,9 @@
 #define OVERRIDE_OPUS_FREE
 #define OVERRIDE_OPUS_ALLOC_SCRATCH
 
-#define opus_alloc          codec_malloc
-#define opus_free           codec_free
-#define opus_alloc_scratch  codec_malloc
+#define opus_alloc          _ogg_malloc
+#define opus_free           _ogg_free
+#define opus_alloc_scratch  _ogg_malloc
 
 /* lrint */
 #define HAVE_LRINTF 0

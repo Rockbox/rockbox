@@ -1,56 +1,54 @@
-#include "config.h"
-#include <stdint.h>
+#ifndef OS_TYPES_H
+#define OS_TYPES_H
 #include "codeclib.h"
+#include <stdint.h>
+#include <tlsf.h>
 
-#ifdef SIMULATOR
-
-#include <stdio.h>
-
-static inline void* _ogg_malloc(size_t size)
+static inline void ogg_malloc_init(void)
 {
-    void *buf;
-
-    printf("ogg_malloc %d", size);
-    buf = codec_malloc(size);
-    printf(" = %p\n", buf);
-    
-    return buf;
+    size_t bufsize;
+    void* buf = ci->codec_get_buffer(&bufsize);
+    init_memory_pool(bufsize, buf);
 }
 
-static inline void* _ogg_calloc(size_t nmemb, size_t size)
+static inline void ogg_malloc_destroy(void)
 {
-    printf("ogg_calloc %d %d\n", nmemb, size);
-    return codec_calloc(nmemb, size);
+    size_t bufsize;
+    void* buf = ci->codec_get_buffer(&bufsize);
+    destroy_memory_pool(buf);
 }
 
-static inline void* _ogg_realloc(void *ptr, size_t size)
+static inline void *_ogg_malloc(size_t size)
 {
-    void *buf;
-
-    printf("ogg_realloc %p %d", ptr, size);
-    buf = codec_realloc(ptr, size);
-    printf(" = %p\n", buf);
-    return buf;
+    void* x = tlsf_malloc(size);
+    DEBUGF("ogg_malloc %zu = %p\n", size, x);
+    return x;
 }
 
-static inline void _ogg_free(void *ptr)
+static inline void *_ogg_calloc(size_t nmemb, size_t size)
 {
-    printf("ogg_free %p\n", ptr);
-    codec_free(ptr);
+    void *x = tlsf_calloc(nmemb, size);
+    DEBUGF("ogg_calloc %zu %zu\n", nmemb, size);
+    return x;
 }
 
-#else
+static inline void *_ogg_realloc(void *ptr, size_t size)
+{
+    void *x = tlsf_realloc(ptr, size);
+    DEBUGF("ogg_realloc %p %zu = %p\n", ptr, size, x);
+    return x;
+}
 
-#define _ogg_malloc  codec_malloc
-#define _ogg_calloc  codec_calloc
-#define _ogg_realloc codec_realloc
-#define _ogg_free    codec_free
-
-#endif
+static inline void _ogg_free(void* ptr)
+{
+    DEBUGF("ogg_free %p\n", ptr);
+    tlsf_free(ptr);
+}
 
 typedef int16_t ogg_int16_t;
 typedef uint16_t ogg_uint16_t;
 typedef int32_t ogg_int32_t;
 typedef uint32_t ogg_uint32_t;
 typedef int64_t ogg_int64_t;
+#endif /* OS_TYPES_H */
 
