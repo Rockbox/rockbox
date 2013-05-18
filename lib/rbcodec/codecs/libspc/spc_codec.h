@@ -213,7 +213,9 @@ struct cpu_ram_t
 #define RAM ram.ram
 extern struct cpu_ram_t ram;
 
-long CPU_run( THIS, long start_time ) ICODE_ATTR_SPC;
+long CPU_run( THIS, long start_time )
+    ICODE_ATTR_SPC;
+
 void CPU_Init( THIS );
 
 /* The DSP portion (awe!) */
@@ -261,6 +263,7 @@ struct globals_t
     char    unused9 [2];
 };
 
+enum { ENV_RATE_INIT = 0x7800 };
 enum state_t
 {  /* -1, 0, +1 allows more efficient if statements */
     state_decay   = -1,
@@ -278,64 +281,61 @@ struct cache_entry_t
 };
 
 enum { BRR_BLOCK_SIZE = 16 };
-enum { BRR_CACHE_SIZE = 0x20000 + 32} ;
+enum { BRR_CACHE_SIZE = 0x20000 + 32};
+
+#if SPC_BRRCACHE
+struct voice_wave_t
+{
+    int16_t const* samples; /* decoded samples in cache */
+    long position;         /* position in samples buffer, 12-bit frac */
+    long end;              /* end position in samples buffer */
+    int loop;              /* length of looping area */
+    unsigned block_header; /* header byte from current BRR block */
+    uint8_t const* addr;   /* BRR waveform address in RAM */
+};
+#else /* !SPC_BRRCACHE */
+struct voice_wave_t
+{
+    int16_t samples [3 + BRR_BLOCK_SIZE + 1]; /* last decoded block */
+    int32_t position;      /* position in samples buffer, 12-bit frac */
+    unsigned block_header; /* header byte from current BRR block */
+    uint8_t const* addr;   /* BRR waveform address in RAM */
+};
+#endif /* SPC_BRRCACHE */
 
 struct voice_t
 {
-#if SPC_BRRCACHE
-    int16_t const* samples;
-    long wave_end;
-    int wave_loop;
-#else
-    int16_t samples [3 + BRR_BLOCK_SIZE + 1];
-    int block_header; /* header byte from current block */
-#endif
-    uint8_t const* addr;
+    struct voice_wave_t wave;
     short volume [2];
-    long position;/* position in samples buffer, with 12-bit fraction */
     short envx;
     short env_mode;
     short env_timer;
     short key_on_delay;
+    short rate;
 };
 
-#if SPC_BRRCACHE
-/* a little extra for samples that go past end */
-extern int16_t BRRcache [BRR_CACHE_SIZE];
+#if !SPC_NOECHO
+enum { FIR_BUF_HALF = 8 };
 #endif
 
-enum { FIR_BUF_HALF = 8 };
+struct Spc_Dsp;
 
-#if defined(CPU_COLDFIRE)
-/* global because of the large aligment requirement for hardware masking -
- * L-R interleaved 16-bit samples for easy loading and mac.w use.
- */
-enum
-{
-    FIR_BUF_CNT   = FIR_BUF_HALF,
-    FIR_BUF_SIZE  = FIR_BUF_CNT * sizeof ( int32_t ),
-    FIR_BUF_ALIGN = FIR_BUF_SIZE * 2,
-    FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) - 1))
-};
-#elif defined (CPU_ARM)
+/* These must go before the definition of struct Spc_Dsp because a
+   definition of struct echo_filter is required. Only declarations
+   are created unless SPC_DSP_C is defined before including these. */
+#if defined(CPU_ARM)
 #if ARM_ARCH >= 6
-enum
-{
-    FIR_BUF_CNT   = FIR_BUF_HALF * 2,
-    FIR_BUF_SIZE  = FIR_BUF_CNT * sizeof ( int32_t ),
-    FIR_BUF_ALIGN = FIR_BUF_SIZE,
-    FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) - 1))
-};
+#include "cpu/spc_dsp_armv6.h"
 #else
-enum
-{
-    FIR_BUF_CNT   = FIR_BUF_HALF * 2 * 2,
-    FIR_BUF_SIZE  = FIR_BUF_CNT * sizeof ( int32_t ),
-    FIR_BUF_ALIGN = FIR_BUF_SIZE,
-    FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) * 2 - 1))
-};
-#endif /* ARM_ARCH */
-#endif /* CPU_* */
+#include "cpu/spc_dsp_armv4.h"
+#endif
+#elif defined (CPU_COLDFIRE)
+#include "cpu/spc_dsp_coldfire.h"
+#endif
+
+/* Above may still use generic implementations. Also defines final 
+   function names. */
+#include "spc_dsp_generic.h"
 
 struct Spc_Dsp
 {
@@ -347,47 +347,15 @@ struct Spc_Dsp
         int16_t align;
     } r;
     
-    unsigned echo_pos;
     int keys_down;
     int noise_count;
     uint16_t noise; /* also read as int16_t */
-    
-#if defined(CPU_COLDFIRE)
-    /* FIR history is interleaved. Hardware handles wrapping by mask.
-     * |LR|LR|LR|LR|LR|LR|LR|LR| */
-    int32_t *fir_ptr;
-    /* wrapped address just behind current position -
-       allows mac.w to increment and mask fir_ptr */
-    int32_t *last_fir_ptr;
-    /* copy of echo FIR constants as int16_t for use with mac.w */
-    int16_t fir_coeff [VOICE_COUNT];
-#elif defined (CPU_ARM)
-   /* fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code */
-    int32_t *fir_ptr;
-#if ARM_ARCH >= 6
-    /* FIR history is interleaved with guard to eliminate wrap checking
-     * when convolving.
-     * |LR|LR|LR|LR|LR|LR|LR|LR|--|--|--|--|--|--|--|--| */
-    /* copy of echo FIR constants as int16_t, loaded as int32 for
-     * halfword, packed multiples */
-    int16_t fir_coeff [VOICE_COUNT];
-#else
-    /* FIR history is interleaved with guard to eliminate wrap checking
-     * when convolving.
-     * |LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|...
-     * |--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--| */
-    /* copy of echo FIR constants as int32_t, for faster access */
-    int32_t fir_coeff [VOICE_COUNT]; 
-#endif /* ARM_ARCH */
-#else /* Unoptimized CPU */
-    /* fir_buf [i + 8] == fir_buf [i], to avoid wrap checking in FIR code */
-    int fir_pos; /* (0 to 7) */
-    int fir_buf [FIR_BUF_HALF * 2] [2];
-    /* copy of echo FIR constants as int, for faster access */
-    int fir_coeff [VOICE_COUNT]; 
-#endif
-    
     struct voice_t voice_state [VOICE_COUNT];
+
+#if !SPC_NOECHO
+    unsigned echo_pos;
+    struct echo_filter fir;
+#endif /* !SPC_NOECHO */
     
 #if SPC_BRRCACHE
     uint8_t oldsize;
@@ -396,7 +364,9 @@ struct Spc_Dsp
 #endif
 };
 
-void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf ) ICODE_ATTR_SPC;
+void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
+    ICODE_ATTR_SPC;
+
 void DSP_reset( struct Spc_Dsp* this );
 
 static inline void DSP_run( struct Spc_Dsp* this, long count, int32_t* out )
@@ -474,7 +444,8 @@ void SPC_Init( THIS );
 int SPC_load_spc( THIS, const void* data, long size );
 
 /**************** DSP interaction ****************/
-void DSP_write( struct Spc_Dsp* this, int i, int data ) ICODE_ATTR_SPC;
+void DSP_write( struct Spc_Dsp* this, int i, int data )
+    ICODE_ATTR_SPC;
 
 static inline int DSP_read( struct Spc_Dsp* this, int i )
 {
@@ -482,10 +453,14 @@ static inline int DSP_read( struct Spc_Dsp* this, int i )
     return this->r.reg [i];
 }
 
-int SPC_read( THIS, unsigned addr, long const time ) ICODE_ATTR_SPC;
-void SPC_write( THIS, unsigned addr, int data, long const time ) ICODE_ATTR_SPC;
+int SPC_read( THIS, unsigned addr, long const time )
+    ICODE_ATTR_SPC;
+
+void SPC_write( THIS, unsigned addr, int data, long const time )
+    ICODE_ATTR_SPC;
 
 /**************** Sample generation ****************/
-int SPC_play( THIS, long count, int32_t* out ) ICODE_ATTR_SPC;
+int SPC_play( THIS, long count, int32_t* out )
+    ICODE_ATTR_SPC;
 
 #endif /* _SPC_CODEC_H_ */

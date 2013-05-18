@@ -113,9 +113,7 @@ enum { st_c = 0x01 };
 
 long CPU_run( THIS, long start_time )
 {
-#if 0
     ENTER_TIMER(cpu);
-#endif
     
     register long spc_time_ = start_time;
     
@@ -1036,9 +1034,7 @@ out_of_time:
     this->r.x  = (uint8_t) x;
     this->r.y  = (uint8_t) y;
  
-#if 0
     EXIT_TIMER(cpu);
-#endif
     return spc_time_;
 }
 
