@@ -65,6 +65,10 @@ $releasenotes="/wiki/ReleaseNotes313";
         name => 'Philips GoGear SA9200',
         status => 2,
     },
+    'hifietma9' => {
+        name => 'HiFi E.T MA9',
+        status => 2,
+    },
     'hifimanhm60x' => {
         name => 'HiFiMAN HM-60x',
         status => 2,
