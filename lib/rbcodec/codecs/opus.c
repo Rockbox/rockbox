@@ -384,6 +384,12 @@ enum codec_status codec_run(void)
                 stream_init = 1;
             }
 
+            /* Do this to avoid allocating space for huge comment packets
+               (embedded Album Art) */
+            if(os.packetno == 1){
+              ogg_sync_reset(&oy);
+            }
+
             /* Add page to the bitstream */
             ogg_stream_pagein(&os, &og);
 
