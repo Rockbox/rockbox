@@ -188,7 +188,7 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
 }
 
 static int speex_seek_page_granule(int64_t pos, int64_t curpos,
-                                   ogg_sync_state *oy)
+                                   ogg_sync_state *oy, ogg_stream_state *os)
 {
     /* TODO: Someone may want to try to implement seek to packet, 
              instead of just to page (should be more accurate, not be any 
@@ -257,6 +257,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
         *curbyteoffset = 0;
         ci->seek_buffer(*curbyteoffset);
         ogg_sync_reset(oy);
+        ogg_stream_reset(os);
         return 0;
     } else if (curpos > pos) {  /* backwards */
         offset = seek_backwards(oy,&og,pos);
@@ -365,7 +366,7 @@ enum codec_status codec_run(void)
 
                 LOGF("Opus seek page:%lld,%lld,%ld\n",
 		            seek_target, page_granule, (long)param);
-                speex_seek_page_granule(seek_target, page_granule, &oy);
+                speex_seek_page_granule(seek_target, page_granule, &oy, &os);
             }
 
             ci->set_elapsed(param);
