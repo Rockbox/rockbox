@@ -61,11 +61,6 @@ void clt_mdct_forward(const mdct_lookup *l, kiss_fft_scalar *in,
       kiss_fft_scalar * OPUS_RESTRICT out,
       const opus_val16 *window, int overlap, int shift, int stride);
 
-#if defined(CPU_COLDFIRE)
-#define MDCT_ICODE ICODE_ATTR
-#else
-#define MDCT_ICODE
-#endif
 /** Compute a backward MDCT (no scaling) and performs weighted overlap-add
     (scales implicitly by 1/2) */
 void clt_mdct_backward(const mdct_lookup *l, kiss_fft_scalar *in,

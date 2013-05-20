@@ -61,76 +61,9 @@
       do{ (m).r = SUB32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)); \
           (m).i = ADD32(S_MUL((a).r,(b).i) , S_MUL((a).i,(b).r)); }while(0)
 
-#if defined (CPU_COLDFIRE)
-#   define C_MULC(m,a,b) \
-    { \
-      asm volatile("move.l (%[bp]), %%d2;" \
-                   "clr.l %%d3;" \
-                   "move.w %%d2, %%d3;" \
-                   "swap %%d3;" \
-                   "clr.w %%d2;" \
-                   "movem.l (%[ap]), %%d0-%%d1;" \
-                   "mac.l %%d0, %%d2, %%acc0;" \
-                   "mac.l %%d1, %%d3, %%acc0;" \
-                   "mac.l %%d1, %%d2, %%acc1;" \
-                   "msac.l %%d0, %%d3, %%acc1;" \
-                   "movclr.l %%acc0, %[mr];" \
-                   "movclr.l %%acc1, %[mi];" \
-                   : [mr] "=r" ((m).r), [mi] "=r" ((m).i) \
-                   : [ap] "a" (&(a)), [bp] "a" (&(b)) \
-                   : "d0", "d1", "d2", "d3", "cc"); \
-    }
-#elif defined(CPU_ARM)
-#if (ARM_ARCH < 5)
-
-
-#   define C_MULC(m,a,b) \
-    { \
-      asm volatile( \
-                   "ldm %[ap], {r0,r1}                  \n\t" \
-                   "ldrsh r2, [%[bp], #0]                 \n\t" \
-                   "ldrsh r3, [%[bp], #2]                 \n\t" \
-                   \
-                   "smull r4, %[mr], r0, r2               \n\t" \
-                   "smlal r4, %[mr], r1, r3               \n\t" \
-                   "mov   r4, r4, lsr #15                 \n\t" \
-                   "orr   %[mr], r4, %[mr], lsl #17       \n\t" \
-                   \
-                   "smull r4, %[mi], r1, r2               \n\t" \
-                   "rsb   r3, r3, #0                      \n\t" \
-                   "smlal r4, %[mi], r0, r3               \n\t" \
-                   "mov   r4, r4, lsr #15                 \n\t" \
-                   "orr   %[mi], r4, %[mi], lsl #17       \n\t" \
-                   : [mr] "=r" ((m).r), [mi] "=r" ((m).i) \
-                   : [ap] "r" (&(a)), [bp] "r" (&(b)) \
-                   : "r0", "r1", "r2", "r3", "r4"); \
-}
-#else
-/*same as above but using armv5 packed multiplies*/
-#   define C_MULC(m,a,b) \
-    { \
-      asm volatile( \
-                   "ldm %[ap], {r0,r1}            \n\t" \
-                   "ldr r2, [%[bp], #0] 	        \n\t" \
-      				\
-                   "smulwb r4, r0, r2               \n\t"  /*r4=a.r*b.r*/    \
-                   "smlawt %[mr], r1, r2, r4        \n\t"  /*m.r=r4+a.i*b.i*/\
-                   "mov   %[mr], %[mr], lsl #1      \n\t"  /*Q15 not Q16*/   \
-                    \
-                   "smulwb r1, r1, r2               \n\t"  /*r1=a.i*b.r*/    \
-                   "smulwt r4, r0, r2               \n\t"  /*r4=a.r*b.i*/    \
-                   "sub %[mi], r1, r4               \n\t" \
-                   "mov   %[mi], %[mi], lsl #1      \n\t" \
-                   : [mr] "=r" ((m).r), [mi] "=r" ((m).i) \
-                   : [ap] "r" (&(a)), [bp] "r" (&(b)) \
-                   : "r0", "r1", "r2", "r4"); \
-}
-#endif /*ARMv5 code*/
-#else
 #   define C_MULC(m,a,b) \
       do{ (m).r = ADD32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)); \
           (m).i = SUB32(S_MUL((a).i,(b).r) , S_MUL((a).r,(b).i)); }while(0)
-#endif
 
 #   define C_MUL4(m,a,b) \
       do{ (m).r = SHR32(SUB32(S_MUL((a).r,(b).r) , S_MUL((a).i,(b).i)),2); \
@@ -160,6 +93,18 @@
 #define C_SUBFROM( res , a)\
     do {(res).r = ADD32((res).r,(a).r);  (res).i = SUB32((res).i,(a).i); \
     }while(0)
+
+#if defined(ARMv4_ASM)
+#include "arm/kiss_fft_armv4.h"
+#endif
+
+#if defined(ARMv5E_ASM)
+#include "arm/kiss_fft_armv5e.h"
+#endif
+
+#if defined(CF_ASM)
+#include "cf/kiss_fft_cf.h"
+#endif
 
 #else  /* not FIXED_POINT*/
 

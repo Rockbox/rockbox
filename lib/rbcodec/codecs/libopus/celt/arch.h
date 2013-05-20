@@ -100,6 +100,7 @@ typedef opus_val32 celt_ener;
 #define DB_SHIFT 10
 
 #define EPSILON 1
+#define VERY_SMALL 0
 #define VERY_LARGE16 ((opus_val16)32767)
 #define Q15_ONE ((opus_val16)32767)
 
@@ -112,16 +113,18 @@ typedef opus_val32 celt_ener;
 
 #include "fixed_generic.h"
 
-#ifdef ARM5E_ASM
-#include "fixed_arm5e.h"
-#elif defined (ARM4_ASM)
-#include "fixed_arm4.h"
+#ifdef ARMv5E_ASM
+#include "arm/fixed_armv5e.h"
+#elif defined (ARMv4_ASM)
+#include "arm/fixed_armv4.h"
 #elif defined (BFIN_ASM)
 #include "fixed_bfin.h"
 #elif defined (TI_C5X_ASM)
 #include "fixed_c5x.h"
 #elif defined (TI_C6X_ASM)
 #include "fixed_c6x.h"
+#elif defined (CF_ASM)
+#include "cf/fixed_cf.h"
 #endif
 
 #endif
@@ -140,6 +143,7 @@ typedef float celt_ener;
 #define NORM_SCALING 1.f
 
 #define EPSILON 1e-15f
+#define VERY_SMALL 1e-30f
 #define VERY_LARGE16 1e15f
 #define Q15_ONE ((opus_val16)1.f)
 
@@ -161,6 +165,7 @@ typedef float celt_ener;
 #define SHR(a,shift)    (a)
 #define SHL(a,shift)    (a)
 #define SATURATE(x,a)   (x)
+#define SATURATE16(x)   (x)
 
 #define ROUND16(a,shift)  (a)
 #define HALF16(x)       (.5f*(x))

@@ -12,7 +12,7 @@ documentation and/or other materials provided with the distribution.
 names of specific contributors, may be used to endorse or promote
 products derived from this software without specific prior written
 permission.
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS”
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
@@ -151,13 +151,11 @@ void silk_ana_filt_bank_1(
 /*                        SCALAR FUNCTIONS                          */
 /********************************************************************/
 
-#if 0
 /* Approximation of 128 * log2() (exact inverse of approx 2^() below) */
 /* Convert input to a log scale    */
 opus_int32 silk_lin2log(
     const opus_int32            inLin               /* I  input in linear scale                                         */
 );
-#endif
 
 /* Approximation of a sigmoid function */
 opus_int silk_sigm_Q15(
@@ -168,12 +166,6 @@ opus_int silk_sigm_Q15(
 /* Convert input to a linear scale */
 opus_int32 silk_log2lin(
     const opus_int32            inLog_Q7            /* I  input on log scale                                            */
-);
-
-/* Function that returns the maximum absolut value of the input vector */
-opus_int16 silk_int16_array_maxabs(                 /* O   Maximum absolute value, max: 2^15-1                          */
-    const opus_int16            *vec,               /* I   Input vector  [len]                                          */
-    const opus_int32            len                 /* I   Length of input vector                                       */
 );
 
 /* Compute number of bits to right shift the sum of squares of a vector    */
@@ -254,7 +246,7 @@ opus_int silk_pitch_analysis_core(                  /* O    Voicing estimate: 0 
     opus_int                    *LTPCorr_Q15,       /* I/O  Normalized correlation; input: value from previous frame    */
     opus_int                    prevLag,            /* I    Last lag of previous frame; set to zero is unvoiced         */
     const opus_int32            search_thres1_Q16,  /* I    First stage threshold for lag candidates 0 - 1              */
-    const opus_int              search_thres2_Q15,  /* I    Final threshold for lag candidates 0 - 1                    */
+    const opus_int              search_thres2_Q13,  /* I    Final threshold for lag candidates 0 - 1                    */
     const opus_int              Fs_kHz,             /* I    Sample frequency (kHz)                                      */
     const opus_int              complexity,         /* I    Complexity setting, 0-2, where 2 is highest                 */
     const opus_int              nb_subfr            /* I    number of 5 ms subframes                                    */
@@ -315,7 +307,7 @@ void silk_burg_modified(
     opus_int32                  A_Q16[],            /* O    Prediction coefficients (length order)                      */
     const opus_int16            x[],                /* I    Input signal, length: nb_subfr * ( D + subfr_length )       */
     const opus_int32            minInvGain_Q30,     /* I    Inverse of max prediction gain                              */
-    const opus_int              subfr_length,       /* I    Input signal subframe length (incl. D preceeding samples)   */
+    const opus_int              subfr_length,       /* I    Input signal subframe length (incl. D preceding samples)    */
     const opus_int              nb_subfr,           /* I    Number of subframes stacked in x                            */
     const opus_int              D                   /* I    Order                                                       */
 );
@@ -381,7 +373,7 @@ static inline opus_int32 silk_ROR32( opus_int32 a32, opus_int rot )
     }
 }
 
-/* Allocate opus_int16 alligned to 4-byte memory address */
+/* Allocate opus_int16 aligned to 4-byte memory address */
 #if EMBEDDED_ARM
 #define silk_DWORD_ALIGN __attribute__((aligned(4)))
 #else
@@ -583,6 +575,14 @@ static inline opus_int64 silk_max_64(opus_int64 a, opus_int64 b)
 #include "Inlines.h"
 #include "MacroCount.h"
 #include "MacroDebug.h"
+
+#ifdef ARMv4_ASM
+#include "arm/SigProc_FIX_armv4.h"
+#endif
+
+#ifdef ARMv5E_ASM
+#include "arm/SigProc_FIX_armv5e.h"
+#endif
 
 #ifdef  __cplusplus
 }

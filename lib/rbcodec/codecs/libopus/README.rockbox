@@ -9,10 +9,6 @@ Opus:
 * copied .h files from opus/include to lib/rbcodec/codecs/libopus
 * copied .c/.h files from opus/celt to lib/rbcodec/codecs/libopus/celt
 * copied .c/.h files from opus/silk to lib/rbcodec/codecs/libopus/silk
-* renamed opus config.h file to opus_config.h and replaced #include "config.h",
-  for example
-find . -name "*.h" -print | xargs sed -i 's/include "config.h"/include "opus_config.h"/g'
-find . -name "*.c" -print | xargs sed -i 's/include "config.h"/include "opus_config.h"/g'
 
 Opus-tools:
 * copied src/opus_header.h and src/opus_header.c to lib/rbcodec/codecs/libopus

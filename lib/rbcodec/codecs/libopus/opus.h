@@ -136,10 +136,11 @@ extern "C" {
   * <li>audio_frame is the audio data in opus_int16 (or float for opus_encode_float())</li>
   * <li>frame_size is the duration of the frame in samples (per channel)</li>
   * <li>packet is the byte array to which the compressed data is written</li>
-  * <li>max_packet is the maximum number of bytes that can be written in the packet (4000 bytes is recommended)</li>
+  * <li>max_packet is the maximum number of bytes that can be written in the packet (4000 bytes is recommended).
+  *     Do not use max_packet to control VBR target bitrate, instead use the #OPUS_SET_BITRATE CTL.</li>
   * </ul>
   *
-  * opus_encode() and opus_encode_frame() return the number of bytes actually written to the packet.
+  * opus_encode() and opus_encode_float() return the number of bytes actually written to the packet.
   * The return value <b>can be negative</b>, which indicates that an error has occurred. If the return value
   * is 1 byte, then the packet does not need to be transmitted (DTX).
   *
@@ -252,9 +253,10 @@ OPUS_EXPORT int opus_encoder_init(
   *                                                 memory for the output
   *                                                 payload. This may be
   *                                                 used to impose an upper limit on
-  *                                                 the variable bitrate, but should
+  *                                                 the instant bitrate, but should
   *                                                 not be used as the only bitrate
-  *                                                 control.
+  *                                                 control. Use #OPUS_SET_BITRATE to
+  *                                                 control the bitrate.
   * @returns The length of the encoded packet (in bytes) on success or a
   *          negative error code (see @ref opus_errorcodes) on failure.
   */
@@ -292,9 +294,10 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT opus_int32 opus_encode(
   *                                                 memory for the output
   *                                                 payload. This may be
   *                                                 used to impose an upper limit on
-  *                                                 the variable bitrate, but should
+  *                                                 the instant bitrate, but should
   *                                                 not be used as the only bitrate
-  *                                                 control.
+  *                                                 control. Use #OPUS_SET_BITRATE to
+  *                                                 control the bitrate.
   * @returns The length of the encoded packet (in bytes) on success or a
   *          negative error code (see @ref opus_errorcodes) on failure.
   */
@@ -340,7 +343,7 @@ OPUS_EXPORT int opus_encoder_ctl(OpusEncoder *st, int request, ...) OPUS_ARG_NON
   * where
   * @li Fs is the sampling rate and must be 8000, 12000, 16000, 24000, or 48000
   * @li channels is the number of channels (1 or 2)
-  * @li error will hold the error code in case or failure (or #OPUS_OK on success)
+  * @li error will hold the error code in case of failure (or #OPUS_OK on success)
   * @li the return value is a newly created decoder state to be used for decoding
   *
   * While opus_decoder_create() allocates memory for the state, it's also possible
@@ -371,7 +374,7 @@ OPUS_EXPORT int opus_encoder_ctl(OpusEncoder *st, int request, ...) OPUS_ARG_NON
   * @li max_size is the max duration of the frame in samples (per channel) that can fit into the decoded_frame array
   *
   * opus_decode() and opus_decode_float() return the number of samples (per channel) decoded from the packet.
-  * If that value is negative, then an error has occured. This can occur if the packet is corrupted or if the audio
+  * If that value is negative, then an error has occurred. This can occur if the packet is corrupted or if the audio
   * buffer is too small to hold the decoded audio.
   *
   * Opus is a stateful codec with overlapping blocks and as a result Opus
@@ -447,8 +450,11 @@ OPUS_EXPORT int opus_decoder_init(
   * @param [out] pcm <tt>opus_int16*</tt>: Output signal (interleaved if 2 channels). length
   *  is frame_size*channels*sizeof(opus_int16)
   * @param [in] frame_size Number of samples per channel of available space in \a pcm.
-  *  If this is less than the maximum frame size (120 ms), this function will
-  *  not be capable of decoding some packets.
+  *  If this is less than the maximum packet duration (120ms; 5760 for 48kHz), this function will
+  *  not be capable of decoding some packets. In the case of PLC (data==NULL) or FEC (decode_fec=1),
+  *  then frame_size needs to be exactly the duration of audio that is missing, otherwise the
+  *  decoder will not be in the optimal state to decode the next incoming packet. For the PLC and
+  *  FEC cases, frame_size <b>must</b> be a multiple of 2.5 ms.
   * @param [in] decode_fec <tt>int</tt>: Flag (0 or 1) to request that any in-band forward error correction data be
   *  decoded. If no such data is available, the frame is decoded as if it were lost.
   * @returns Number of decoded samples or @ref opus_errorcodes
@@ -468,8 +474,12 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_decode(
   * @param [in] len <tt>opus_int32</tt>: Number of bytes in payload
   * @param [out] pcm <tt>float*</tt>: Output signal (interleaved if 2 channels). length
   *  is frame_size*channels*sizeof(float)
-  * @param [in] frame_size Number of samples per channel of available space in *pcm,
-  *  if less than the maximum frame size (120ms) some frames can not be decoded
+  * @param [in] frame_size Number of samples per channel of available space in \a pcm.
+  *  If this is less than the maximum packet duration (120ms; 5760 for 48kHz), this function will
+  *  not be capable of decoding some packets. In the case of PLC (data==NULL) or FEC (decode_fec=1),
+  *  then frame_size needs to be exactly the duration of audio that is missing, otherwise the
+  *  decoder will not be in the optimal state to decode the next incoming packet. For the PLC and
+  *  FEC cases, frame_size <b>must</b> be a multiple of 2.5 ms.
   * @param [in] decode_fec <tt>int</tt>: Flag (0 or 1) to request that any in-band forward error correction data be
   *  decoded. If no such data is available the frame is decoded as if it were lost.
   * @returns Number of decoded samples or @ref opus_errorcodes
@@ -510,7 +520,7 @@ OPUS_EXPORT void opus_decoder_destroy(OpusDecoder *st);
   * @param [in] len <tt>opus_int32</tt>: size of data
   * @param [out] out_toc <tt>char*</tt>: TOC pointer
   * @param [out] frames <tt>char*[48]</tt> encapsulated frames
-  * @param [out] size <tt>short[48]</tt> sizes of the encapsulated frames
+  * @param [out] size <tt>opus_int16[48]</tt> sizes of the encapsulated frames
   * @param [out] payload_offset <tt>int*</tt>: returns the position of the payload within the packet (in bytes)
   * @returns number of frames
   */
@@ -519,7 +529,7 @@ OPUS_EXPORT int opus_packet_parse(
    opus_int32 len,
    unsigned char *out_toc,
    const unsigned char *frames[48],
-   short size[48],
+   opus_int16 size[48],
    int *payload_offset
 ) OPUS_ARG_NONNULL(1) OPUS_ARG_NONNULL(4);
 
@@ -556,18 +566,46 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_packet_get_nb_channels(const unsign
   * @param [in] packet <tt>char*</tt>: Opus packet
   * @param [in] len <tt>opus_int32</tt>: Length of packet
   * @returns Number of frames
+  * @retval OPUS_BAD_ARG Insufficient data was passed to the function
   * @retval OPUS_INVALID_PACKET The compressed data passed is corrupted or of an unsupported type
   */
 OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_packet_get_nb_frames(const unsigned char packet[], opus_int32 len) OPUS_ARG_NONNULL(1);
+
+/** Gets the number of samples of an Opus packet.
+  * @param [in] packet <tt>char*</tt>: Opus packet
+  * @param [in] len <tt>opus_int32</tt>: Length of packet
+  * @param [in] Fs <tt>opus_int32</tt>: Sampling rate in Hz.
+  *                                     This must be a multiple of 400, or
+  *                                     inaccurate results will be returned.
+  * @returns Number of samples
+  * @retval OPUS_BAD_ARG Insufficient data was passed to the function
+  * @retval OPUS_INVALID_PACKET The compressed data passed is corrupted or of an unsupported type
+  */
+OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_packet_get_nb_samples(const unsigned char packet[], opus_int32 len, opus_int32 Fs) OPUS_ARG_NONNULL(1);
 
 /** Gets the number of samples of an Opus packet.
   * @param [in] dec <tt>OpusDecoder*</tt>: Decoder state
   * @param [in] packet <tt>char*</tt>: Opus packet
   * @param [in] len <tt>opus_int32</tt>: Length of packet
   * @returns Number of samples
+  * @retval OPUS_BAD_ARG Insufficient data was passed to the function
   * @retval OPUS_INVALID_PACKET The compressed data passed is corrupted or of an unsupported type
   */
 OPUS_EXPORT OPUS_WARN_UNUSED_RESULT int opus_decoder_get_nb_samples(const OpusDecoder *dec, const unsigned char packet[], opus_int32 len) OPUS_ARG_NONNULL(1) OPUS_ARG_NONNULL(2);
+
+/** Applies soft-clipping to bring a float signal within the [-1,1] range. If
+  * the signal is already in that range, nothing is done. If there are values
+  * outside of [-1,1], then the signal is clipped as smoothly as possible to
+  * both fit in the range and avoid creating excessive distortion in the
+  * process.
+  * @param [in,out] pcm <tt>float*</tt>: Input PCM and modified PCM
+  * @param [in] frame_size <tt>int</tt> Number of samples per channel to process
+  * @param [in] channels <tt>int</tt>: Number of channels
+  * @param [in,out] softclip_mem <tt>float*</tt>: State memory for the soft clipping process (one float per channel, initialized to zero)
+  */
+OPUS_EXPORT void opus_pcm_soft_clip(float *pcm, int frame_size, int channels, float *softclip_mem);
+
+
 /**@}*/
 
 /** @defgroup opus_repacketizer Repacketizer

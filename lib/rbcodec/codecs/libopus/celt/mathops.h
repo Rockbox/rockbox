@@ -43,6 +43,41 @@
 
 unsigned isqrt32(opus_uint32 _val);
 
+#ifndef OVERRIDE_CELT_MAXABS16
+static inline opus_val32 celt_maxabs16(const opus_val16 *x, int len)
+{
+   int i;
+   opus_val16 maxval = 0;
+   opus_val16 minval = 0;
+   for (i=0;i<len;i++)
+   {
+      maxval = MAX16(maxval, x[i]);
+      minval = MIN16(minval, x[i]);
+   }
+   return MAX32(EXTEND32(maxval),-EXTEND32(minval));
+}
+#endif
+
+#ifndef OVERRIDE_CELT_MAXABS32
+#ifdef FIXED_POINT
+static inline opus_val32 celt_maxabs32(const opus_val32 *x, int len)
+{
+   int i;
+   opus_val32 maxval = 0;
+   opus_val32 minval = 0;
+   for (i=0;i<len;i++)
+   {
+      maxval = MAX32(maxval, x[i]);
+      minval = MIN32(minval, x[i]);
+   }
+   return MAX32(maxval, -minval);
+}
+#else
+#define celt_maxabs32(x,len) celt_maxabs16(x,len)
+#endif
+#endif
+
+
 #ifndef FIXED_POINT
 
 #define PI 3.141592653f
@@ -117,27 +152,6 @@ static inline opus_int16 celt_ilog2(opus_int32 x)
 }
 #endif
 
-#ifndef OVERRIDE_CELT_MAXABS16
-static inline opus_val16 celt_maxabs16(opus_val16 *x, int len)
-{
-   int i;
-   opus_val16 maxval = 0;
-   for (i=0;i<len;i++)
-      maxval = MAX16(maxval, ABS16(x[i]));
-   return maxval;
-}
-#endif
-
-#ifndef OVERRIDE_CELT_MAXABS32
-static inline opus_val32 celt_maxabs32(opus_val32 *x, int len)
-{
-   int i;
-   opus_val32 maxval = 0;
-   for (i=0;i<len;i++)
-      maxval = MAX32(maxval, ABS32(x[i]));
-   return maxval;
-}
-#endif
 
 /** Integer log in base2. Defined for zero, but not for negative numbers */
 static inline opus_int16 celt_zlog2(opus_val32 x)
@@ -176,6 +190,13 @@ static inline opus_val16 celt_log2(opus_val32 x)
 #define D1 22804
 #define D2 14819
 #define D3 10204
+
+static inline opus_val32 celt_exp2_frac(opus_val16 x)
+{
+   opus_val16 frac;
+   frac = SHL16(x, 4);
+   return ADD16(D0, MULT16_16_Q15(frac, ADD16(D1, MULT16_16_Q15(frac, ADD16(D2 , MULT16_16_Q15(D3,frac))))));
+}
 /** Base-2 exponential approximation (2^x). (Q10 input, Q16 output) */
 static inline opus_val32 celt_exp2(opus_val16 x)
 {
@@ -186,8 +207,7 @@ static inline opus_val32 celt_exp2(opus_val16 x)
       return 0x7f000000;
    else if (integer < -15)
       return 0;
-   frac = SHL16(x-SHL16(integer,10),4);
-   frac = ADD16(D0, MULT16_16_Q15(frac, ADD16(D1, MULT16_16_Q15(frac, ADD16(D2 , MULT16_16_Q15(D3,frac))))));
+   frac = celt_exp2_frac(x-SHL16(integer,10));
    return VSHR32(EXTEND32(frac), -integer-2);
 }
 

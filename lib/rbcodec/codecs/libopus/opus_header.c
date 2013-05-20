@@ -26,7 +26,7 @@
 */
 
 #ifdef HAVE_CONFIG_H
-# include "opus_config.h"
+# include "config.h"
 #endif
 
 #include "opus_header.h"
