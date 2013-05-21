@@ -313,21 +313,21 @@ decode_brr_block( struct voice_t* voice, uint8_t const* addr, int16_t* out )
 static void NO_INLINE ICODE_ATTR_SPC
 brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
                   unsigned start_addr, struct voice_t* voice,
-                  struct raw_voice_t const* raw_voice )
+                  unsigned waveform, bool initial_point )
 {
     /* a little extra for samples that go past end */
     static int16_t BRRcache [BRR_CACHE_SIZE] CACHEALIGN_ATTR;
 
-    DEBUGF( "decode at %08x (wave #%d)\n",
-            start_addr, raw_voice->waveform );
+    DEBUGF( "decode at %08x (wave #%d)\n", start_addr, waveform );
 
-    struct cache_entry_t* const wave_entry =
-        &this->wave_entry [raw_voice->waveform];
+    struct cache_entry_t* const wave_entry = &this->wave_entry [waveform];
 
     wave_entry->start_addr = start_addr;
 
-    uint8_t const* const loop_ptr =
-        ram.ram + letoh16( sd [raw_voice->waveform].loop );
+    unsigned loop_addr = letoh16( sd [waveform].loop );
+    uint8_t const* const loop_ptr = ram.ram + loop_addr;
+
+    DEBUGF( "loop addr at %08x\n", (unsigned)loop_addr );
 
     int16_t* loop_start = NULL;
 
@@ -337,8 +337,13 @@ brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
     wave_entry->samples = out;
 
     /* BRR filter uses previous samples */
-    out [BRR_BLOCK_SIZE + 1] = 0;
-    out [BRR_BLOCK_SIZE + 2] = 0;
+    if ( initial_point )
+    {
+        /* initialize filters */
+        out [BRR_BLOCK_SIZE + 1] = 0;
+        out [BRR_BLOCK_SIZE + 2] = 0;
+    }
+
     *out++ = 0;
 
     unsigned block_header;
@@ -348,8 +353,8 @@ brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
         if ( addr == loop_ptr )
         {
             loop_start = out;
-            DEBUGF( "loop at %08lx (wave #%d)\n",
-                    (unsigned long)(addr - RAM), raw_voice->waveform );
+            DEBUGF( "loop found at %08lx (wave #%d)\n",
+                    (unsigned long)(addr - RAM), waveform );
         }
 
         /* output position - preincrement */
@@ -389,53 +394,79 @@ brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
         else
         {
             DEBUGF( "loop point outside initial wave\n" );
+            /* Plan filter init for later decoding at loop point */
+            int16_t* next = BRRcache + loop_addr * 2;
+            next [BRR_BLOCK_SIZE + 1] = out [0];
+            next [BRR_BLOCK_SIZE + 2] = out [1];
         }
     }
 
     DEBUGF( "end at %08lx (wave #%d)\n",
-            (unsigned long)(addr - RAM), raw_voice->waveform );
+            (unsigned long)(addr - RAM), waveform );
 
     /* add to cache */
     this->wave_entry_old [this->oldsize++] = *wave_entry;
 }
 
-static inline void
-brr_key_on( struct Spc_Dsp* this,  struct src_dir const* sd,
-            struct voice_t* voice, struct raw_voice_t const* raw_voice )
+/* see if in cache */
+static inline bool
+brr_probe_cache( struct Spc_Dsp* this, unsigned start_addr,
+                 struct cache_entry_t* wave_entry )
 {
-    unsigned start_addr = letoh16( sd [raw_voice->waveform].start );
-    struct cache_entry_t* const wave_entry =
-        &this->wave_entry [raw_voice->waveform];
+    if ( wave_entry->start_addr == start_addr )
+        return true;
 
-    /* predecode BRR if not already */
-    if ( wave_entry->start_addr != start_addr )
+    for ( int i = 0; i < this->oldsize; i++ )
     {
-        /* see if in cache */
-        for ( int i = 0; i < this->oldsize; i++ )
+        struct cache_entry_t* e = &this->wave_entry_old [i];
+
+        if ( e->start_addr == start_addr )
         {
-            struct cache_entry_t* e = &this->wave_entry_old [i];
-
-            if ( e->start_addr == start_addr )
-            {
-                DEBUGF( "found in wave_entry_old (oldsize=%d)\n",
-                    this->oldsize );
-                *wave_entry = *e;
-                goto wave_in_cache; /* Wave in cache */
-            }
+#if 0 /* do NOT want to see all the key down stuff for cached waves */
+            DEBUGF( "found in wave_entry_old (oldsize=%d)\n",
+                this->oldsize );
+#endif
+            *wave_entry = *e;
+            return true; /* Wave in cache */
         }
-
-        /* actually decode it */
-        brr_decode_cache( this, sd, start_addr, voice, raw_voice );
     }
 
-wave_in_cache:
-    voice->wave.position = 3 * 0x1000 - 1; /* 0x2fff */
-    voice->wave.samples  = wave_entry->samples;
-    voice->wave.end      = wave_entry->end;
-    voice->wave.loop     = wave_entry->loop;
+    return false;
 }
 
-static inline int brr_decode( struct src_dir const* sd, struct voice_t* voice,
+static NO_INLINE ICODE_ATTR_SPC void
+brr_key_on( struct Spc_Dsp* this,  struct src_dir const* sd,
+            struct voice_t* voice, struct raw_voice_t const* raw_voice,
+            unsigned start_addr )
+{
+    bool initial_point = false;
+    unsigned waveform = raw_voice->waveform;
+
+    if (start_addr == (unsigned)-1)
+    {
+        initial_point = true;
+        start_addr = letoh16( sd [waveform].start );
+    }
+
+    struct cache_entry_t* const wave_entry = &this->wave_entry [waveform];
+
+    /* predecode BRR if not already */
+    if ( !brr_probe_cache( this, start_addr, wave_entry ) )
+    {
+        /* actually decode it */
+        brr_decode_cache( this, sd, start_addr, voice, waveform,
+                          initial_point );
+    }
+
+    voice->wave.position  = 3 * 0x1000 - 1; /* 0x2fff */
+    voice->wave.samples   = wave_entry->samples;
+    voice->wave.end       = wave_entry->end;
+    voice->wave.loop      = wave_entry->loop;
+    voice->wave.loop_addr = letoh16( sd [waveform].loop );
+}
+
+static inline int brr_decode( struct Spc_Dsp* this, struct src_dir const* sd,
+                              struct voice_t* voice,
                               struct raw_voice_t const* raw_voice )
 {
     if ( voice->wave.position < voice->wave.end )
@@ -444,7 +475,13 @@ static inline int brr_decode( struct src_dir const* sd, struct voice_t* voice,
     long loop_len = voice->wave.loop << 12;
 
     if ( !loop_len )
-        return 2;
+    {
+        if ( !(voice->wave.block_header & 2 ) )
+            return 2;
+
+        /* "Loop" is outside initial waveform */
+        brr_key_on( this, sd, voice, raw_voice, voice->wave.loop_addr );
+    }
 
     voice->wave.position -= loop_len;
     return 1;
@@ -456,7 +493,8 @@ static inline int brr_decode( struct src_dir const* sd, struct voice_t* voice,
 
 static inline void
 brr_key_on( struct Spc_Dsp* this,  struct src_dir const* sd,
-            struct voice_t* voice, struct raw_voice_t const* raw_voice )
+            struct voice_t* voice, struct raw_voice_t const* raw_voice,
+            unsigned start_addr )
 {
     voice->wave.addr = ram.ram + letoh16( sd [raw_voice->waveform].start );
     /* BRR filter uses previous samples */
@@ -465,10 +503,11 @@ brr_key_on( struct Spc_Dsp* this,  struct src_dir const* sd,
     /* force decode on next brr_decode call */
     voice->wave.position = (BRR_BLOCK_SIZE + 3) * 0x1000 - 1; /* 0x12fff */
     voice->wave.block_header = 0; /* "previous" BRR header */
-    (void)this;
+    (void)this; (void)start_addr;
 }
 
-static inline int brr_decode( struct src_dir const* sd, struct voice_t* voice,
+static inline int brr_decode( struct Spc_Dsp* this, struct src_dir const* sd,
+                              struct voice_t* voice,
                               struct raw_voice_t const* raw_voice )
 {
     #undef RAM
@@ -510,6 +549,7 @@ static inline int brr_decode( struct src_dir const* sd, struct voice_t* voice,
     decode_brr_block( voice, addr, &voice->wave.samples [1 + BRR_BLOCK_SIZE] );
 
     return dec;
+    (void)this;
 }
 #endif /* SPC_BRRCACHE */
 
@@ -527,7 +567,7 @@ key_on( struct Spc_Dsp* const this, struct voice_t* const voice,
         voice->envx      = 0;
         voice->env_mode  = state_attack;
         voice->env_timer = ENV_RATE_INIT; /* TODO: inaccurate? */
-        brr_key_on( this, sd, voice, raw_voice );
+        brr_key_on( this, sd, voice, raw_voice, -1 );
     }
 }
 
@@ -784,7 +824,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             
             ENTER_TIMER(dsp_gen);
 
-            switch ( brr_decode( sd, voice, raw_voice ) )
+            switch ( brr_decode( this, sd, voice, raw_voice ) )
             {
             case 2:
                 /* bit was set, so this clears it */

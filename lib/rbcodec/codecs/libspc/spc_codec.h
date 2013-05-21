@@ -292,6 +292,7 @@ struct voice_wave_t
     int loop;              /* length of looping area */
     unsigned block_header; /* header byte from current BRR block */
     uint8_t const* addr;   /* BRR waveform address in RAM */
+    unsigned loop_addr;    /* Loop address in RAM */
 };
 #else /* !SPC_BRRCACHE */
 struct voice_wave_t
