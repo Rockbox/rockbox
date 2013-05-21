@@ -44,21 +44,24 @@ struct radioart {
 static char* buf;
 static struct radioart radioart[MAX_RADIOART_IMAGES];
 
-static int find_oldest_image(void)
+static int find_oldest_image_index(void)
 {
     int i;
-    long oldest_tick = radioart[0].last_tick;
-    int oldest_idx = 0;
-    for(i=1;i<MAX_RADIOART_IMAGES;i++)
+    long oldest_tick = current_tick;
+    int oldest_idx = -1;
+    for(i = 0; ARRAYLEN(radioart); i++)
     {
-        if (radioart[i].last_tick < oldest_tick)
+        struct radioart *ra = &radioart[i];
+        /* last_tick is only valid if it's actually loaded, i.e. valid handle */
+        if (ra->handle >= 0 && TIME_BEFORE(ra->last_tick, oldest_tick))
         {
-            oldest_tick = radioart[i].last_tick;
+            oldest_tick = ra->last_tick;
             oldest_idx = i;
         }
     }
     return oldest_idx;
 }
+
 static int load_radioart_image(struct radioart *ra, const char* preset_name, 
                                struct dim *dim)
 {
@@ -86,9 +89,12 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
     ra->handle = bufopen(path, 0, TYPE_BITMAP, &user_data);
     if (ra->handle == ERR_BUFFER_FULL)
     {
-        int i = find_oldest_image();
-        bufclose(i);
-        ra->handle = bufopen(path, 0, TYPE_BITMAP, &ra->dim);
+        int i = find_oldest_image_index();
+        if (i != -1)
+        {
+            bufclose(radioart[i].handle);
+            ra->handle = bufopen(path, 0, TYPE_BITMAP, &user_data);
+        }
     }
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(true);
@@ -126,10 +132,13 @@ int radio_get_art_hid(struct dim *requested_dim)
     }
     else
     {
-        int i = find_oldest_image();
-        bufclose(radioart[i].handle);
-        return load_radioart_image(&radioart[i],
-                                   preset_name, requested_dim);        
+        int i = find_oldest_image_index();
+        if (i != -1)
+        {
+            bufclose(radioart[i].handle);
+            return load_radioart_image(&radioart[i],
+                                       preset_name, requested_dim);
+        }
     }
         
     return -1;
