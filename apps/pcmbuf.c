@@ -1238,7 +1238,7 @@ static void pcmbuf_fade_tick(void)
     if (fade_vol == MIX_AMP_MUTE || fade_vol == MIX_AMP_UNITY)
     {
         /* Fade is complete */
-        tick_remove_task(pcmbuf_fade_tick);
+        //~ tick_remove_task(pcmbuf_fade_tick);
         if (fade_state == PCM_FADING_OUT)
         {
             /* Tell PCM to stop at its earliest convenience */
@@ -1255,8 +1255,8 @@ void pcmbuf_fade(bool fade, bool in)
     /* Must pause any active fade */
     pcm_play_lock();
 
-    if (fade_state != PCM_NOT_FADING)
-        tick_remove_task(pcmbuf_fade_tick);
+    //~ if (fade_state != PCM_NOT_FADING)
+        //~ tick_remove_task(pcmbuf_fade_tick);
 
     fade_out_complete = false;
 
@@ -1273,7 +1273,7 @@ void pcmbuf_fade(bool fade, bool in)
     {
         /* Set direction and resume fade from current point */
         fade_state = in ? PCM_FADING_IN : PCM_FADING_OUT;
-        tick_add_task(pcmbuf_fade_tick);
+        //~ tick_add_task(pcmbuf_fade_tick);
     }
 }
 
@@ -1288,14 +1288,14 @@ void pcmbuf_soft_mode(bool shhh)
 {
     /* Have to block the tick or improper order could leave volume in soft
        mode if fading reads the old value first but updates after us. */
-    int res = fade_state != PCM_NOT_FADING ?
-                tick_remove_task(pcmbuf_fade_tick) : -1;
+    //~ int res = fade_state != PCM_NOT_FADING ?
+                //~ tick_remove_task(pcmbuf_fade_tick) : -1;
 
     soft_mode = shhh;
     pcmbuf_update_volume();
 
-    if (res == 0)
-        tick_add_task(pcmbuf_fade_tick);
+    //~ if (res == 0)
+        //~ tick_add_task(pcmbuf_fade_tick);
 }
 
 

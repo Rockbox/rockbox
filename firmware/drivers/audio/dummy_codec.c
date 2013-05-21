@@ -25,6 +25,7 @@
 #include "audiohw.h"
 #include "system.h"
 #include "pcm_sw_volume.h"
+#include "dummy_codec.h"
 
 void audiohw_preinit(void) { }
 

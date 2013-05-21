@@ -297,6 +297,7 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
     return search_albumart_files(id3, size_string, buf, buflen);
 }
 
+#if 0
 /* Draw the album art bitmap from the given handle ID onto the given WPS.
    Call with clear = true to clear the bitmap instead of drawing it. */
 void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
@@ -366,5 +367,5 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
         gwps->display->set_drawmode(DRMODE_SOLID);
     }
 }
-
+#endif
 #endif /* PLUGIN */

@@ -20,9 +20,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
+#include "thread.h"
 #include "logf.h"
 #include "usb.h"
 #include "pcm.h"
@@ -96,12 +98,12 @@ static void NORETURN_ATTR audio_thread(void)
 #endif
 
         /* All return upon USB */
-        case SYS_USB_CONNECTED:
-            LOGFQUEUE("audio < SYS_USB_CONNECTED");
-            voice_stop();
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            usb_wait_for_disconnect(&audio_queue);
-            break;
+        //~ case SYS_USB_CONNECTED:
+            //~ LOGFQUEUE("audio < SYS_USB_CONNECTED");
+            //~ voice_stop();
+            //~ usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            //~ usb_wait_for_disconnect(&audio_queue);
+            //~ break;
         }
 
         queue_wait(&audio_queue, &ev);
@@ -172,10 +174,10 @@ void INIT_ATTR audio_init(void)
 
     /* ...now...audio_reset_buffer must know the size of voicefile buffer so
        init talk first which will init the buffers */
-    talk_init();
+    //~ talk_init();
 
    /* Probably safe to say */
     audio_is_initialized = true;
 
-    sound_settings_apply();
+    //~ sound_settings_apply();
 }

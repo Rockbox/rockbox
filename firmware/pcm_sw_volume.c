@@ -66,32 +66,32 @@ void pcm_sw_volume_copy_buffer(void *dst, const void *src, size_t size)
     uint32_t factor_l = pcm_factor_l;
     uint32_t factor_r = pcm_factor_r;
 
-    if (factor_l == PCM_FACTOR_UNITY && factor_r == PCM_FACTOR_UNITY)
+    //~ if (factor_l == PCM_FACTOR_UNITY && factor_r == PCM_FACTOR_UNITY)
     {
         /* Both unity */
         memcpy(dst, src, size);
     }
-    else if (LIKELY(factor_l <= PCM_FACTOR_UNITY &&
-                    factor_r <= PCM_FACTOR_UNITY))
-    {
-        /* Either cut, both <= UNITY */
-        while (size)
-        {
-            *d++ = pcm_scale_sample(factor_l, *s++);
-            *d++ = pcm_scale_sample(factor_r, *s++);
-            size -= PCM_SAMPLE_SIZE;
-        }
-    }
-    else
-    {
-        /* Either positive gain, requires clipping */
-        while (size)
-        {
-            *d++ = clip_sample_16(pcm_scale_sample(factor_l, *s++));
-            *d++ = clip_sample_16(pcm_scale_sample(factor_r, *s++));
-            size -= PCM_SAMPLE_SIZE;
-        }
-    }
+    //~ else if (LIKELY(factor_l <= PCM_FACTOR_UNITY &&
+                    //~ factor_r <= PCM_FACTOR_UNITY))
+    //~ {
+        //~ /* Either cut, both <= UNITY */
+        //~ while (size)
+        //~ {
+            //~ *d++ = pcm_scale_sample(factor_l, *s++);
+            //~ *d++ = pcm_scale_sample(factor_r, *s++);
+            //~ size -= PCM_SAMPLE_SIZE;
+        //~ }
+    //~ }
+    //~ else
+    //~ {
+        //~ /* Either positive gain, requires clipping */
+        //~ while (size)
+        //~ {
+            //~ *d++ = clip_sample_16(pcm_scale_sample(factor_l, *s++));
+            //~ *d++ = clip_sample_16(pcm_scale_sample(factor_r, *s++));
+            //~ size -= PCM_SAMPLE_SIZE;
+        //~ }
+    //~ }
 }
 
 #ifndef PCM_SW_VOLUME_UNBUFFERED

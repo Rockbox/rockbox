@@ -1,3 +1,4 @@
+#ifndef LIBROCKPLAY
 #ifdef ROCKBOX_HAS_LOGF
 logfdisp.c
 #endif
@@ -299,3 +300,14 @@ keymaps/keymap-ma.c
 keymaps/keymap-nwz.c
 #endif
 
+#else
+abrepeat.c
+audio_thread.c
+codec_thread.c
+codecs.c
+playback.c
+buffering.c
+playlist.c
+pcmbuf.c
+rockplay/main.c
+#endif

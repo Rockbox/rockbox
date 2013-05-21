@@ -25,29 +25,26 @@
 
 #include "config.h"
 
-#ifndef HAVE_CORELOCK_OBJECT
+#ifdef LIBROCKPLAY
+#include <pthread.h>
 
-/* No atomic corelock op needed or just none defined */
-#define corelock_init(cl)
-#define corelock_lock(cl)
-#define corelock_try_lock(cl)
-#define corelock_unlock(cl)
-
+struct corelock
+{
+    pthread_mutex_t mutex;
+};
 #else
-
 /* No reliable atomic instruction available - use Peterson's algorithm */
 struct corelock
 {
     volatile unsigned char myl[NUM_CORES];
     volatile unsigned char turn;
 } __attribute__((packed));
+#endif
 
 /* Too big to inline everywhere */
 extern void corelock_init(struct corelock *cl);
 extern void corelock_lock(struct corelock *cl);
 extern int  corelock_try_lock(struct corelock *cl);
 extern void corelock_unlock(struct corelock *cl);
-
-#endif /* HAVE_CORELOCK_OBJECT */
 
 #endif /* CORELOCK_H */

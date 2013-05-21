@@ -102,7 +102,9 @@ int get_cpu_boost_counter(void);
 #endif
 
 /* return number of elements in array a */
+#ifndef ARRAYLEN
 #define ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
+#endif
 
 /* return p incremented by specified number of bytes */
 #define SKIPBYTES(p, count) ((typeof (p))((char *)(p) + (count)))

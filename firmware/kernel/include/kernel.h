@@ -24,6 +24,17 @@
 #include "config.h"
 
 #include "system.h"
+
+#ifdef HAVE_CORELOCK_OBJECT
+#include "corelock.h"
+#else
+/* No atomic corelock op needed or just none defined */
+#define corelock_init(cl)
+#define corelock_lock(cl)
+#define corelock_try_lock(cl)
+#define corelock_unlock(cl)
+#endif
+
 #include "queue.h"
 #include "mutex.h"
 #include "tick.h"
@@ -36,9 +47,7 @@
 #include "semaphore.h"
 #endif
 
-#ifdef HAVE_CORELOCK_OBJECT
-#include "corelock.h"
-#endif
+#include "thread.h"
 
 #define OBJ_WAIT_TIMEDOUT     (-1)
 #define OBJ_WAIT_FAILED       0
@@ -58,7 +67,7 @@ static inline void kernel_init(void)
     if (CURRENT_CORE == CPU)
     {
         init_queues();
-        init_tick();
+        //~ init_tick();
 #ifdef KDEV_INIT
         kernel_device_init();
 #endif

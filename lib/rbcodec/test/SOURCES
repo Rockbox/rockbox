@@ -1,5 +1,30 @@
 warble.c
+libwrappers.c
 ../../../firmware/common/strlcpy.c
 ../../../firmware/common/unicode.c
 ../../../firmware/common/structec.c
+../../../firmware/common/crc32.c
+../../../firmware/common/filefuncs.c
+../../../firmware/general.c
+../../../firmware/events.c
+../../../firmware/buflib_malloc.c
+../../../firmware/core_alloc.c
+../../../firmware/pcm.c
+../../../firmware/pcm_mixer.c
+../../../firmware/pcm_sampr.c
+../../../firmware/pcm_sw_volume.c
+../../../firmware/target/hosted/sdl/pcm-sdl.c
 ../../../uisimulator/common/io.c
+
+//~ ../../../apps/recorder/bmp.c
+//~ ../../../apps/recorder/albumart.c
+//~ ../../../apps/recorder/resize.c
+//~ ../../../apps/recorder/jpeg_load.c
+../../../apps/abrepeat.c
+../../../apps/audio_thread.c
+../../../apps/codec_thread.c
+../../../apps/codecs.c
+../../../apps/playback.c
+../../../apps/buffering.c
+../../../apps/playlist.c
+../../../apps/pcmbuf.c

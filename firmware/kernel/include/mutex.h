@@ -26,6 +26,13 @@
 #include "config.h"
 #include "thread.h"
 
+#ifdef LIBROCKPLAY
+#include <pthread.h>
+struct mutex
+{
+    pthread_mutex_t mutex;
+};
+#else
 struct mutex
 {
     struct thread_entry *queue;         /* waiter list */
@@ -41,8 +48,11 @@ struct mutex
                                            for priority scheduling
                                            (in blocker struct for that) */
 #endif
-    IF_COP( struct corelock cl; )       /* multiprocessor sync */
+#ifdef HAVE_CORELOCK_OBJECT
+    struct corelock cl;                 /* multiprocessor sync */
+#endif
 };
+#endif
 
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);
@@ -53,7 +63,7 @@ extern void mutex_unlock(struct mutex *m);
  * reliance on it is a bug! */
 static inline void mutex_set_preempt(struct mutex *m, bool preempt)
     { m->no_preempt = !preempt; }
-#else
+#elif !defined(LIBROCKPLAY)
 /* Deprecated but needed for now - firmware/drivers/ata_mmc.c */
 static inline bool mutex_test(const struct mutex *m)
     { return m->thread != NULL; }

@@ -74,19 +74,19 @@
 #include "playlist.h"
 #include "ata_idle_notify.h"
 #include "file.h"
-#include "action.h"
-#include "dir.h"
+//~ #include "action.h"
+//~ #include "dir.h"
 #include "debug.h"
 #include "audio.h"
 #include "lcd.h"
-#include "kernel.h"
+//~ #include "kernel.h"
 #include "settings.h"
 #include "status.h"
 #include "applimits.h"
 #include "screens.h"
 #include "core_alloc.h"
 #include "misc.h"
-#include "filefuncs.h"
+//~ #include "filefuncs.h"
 #include "button.h"
 #include "filetree.h"
 #include "abrepeat.h"
@@ -94,16 +94,17 @@
 #include "usb.h"
 #include "filetypes.h"
 #ifdef HAVE_LCD_BITMAP
-#include "icons.h"
+//~ #include "icons.h"
 #endif
-#include "system.h"
+//~ #include "system.h"
 
-#include "lang.h"
+//~ #include "lang.h"
 #include "talk.h"
-#include "splash.h"
+//~ #include "splash.h"
 #include "rbunicode.h"
 #include "root_menu.h"
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
+#include "crc32.h"
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
@@ -210,7 +211,7 @@ static bool is_m3u8(const char* filename)
     return !(len > 4 && strcasecmp(&filename[len - 4], ".m3u") == 0);
 }
 
-
+//~ #define ATTR_DIRECTORY 4
 /* Convert a filename in an M3U playlist to UTF-8. 
  *
  * buf     - the filename to convert; can contain more than one line from the
@@ -341,13 +342,13 @@ static void create_control(struct playlist_info* playlist)
                                 O_CREAT|O_RDWR|O_TRUNC, 0666);
     if (playlist->control_fd < 0)
     {
-        if (check_rockboxdir())
-        {
-            cond_talk_ids_fq(LANG_PLAYLIST_CONTROL_ACCESS_ERROR);
-            splashf(HZ*2, (unsigned char *)"%s (%d)",
-                           str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
-                           playlist->control_fd);
-        }
+        //~ if (check_rockboxdir())
+        //~ {
+            //~ cond_talk_ids_fq(LANG_PLAYLIST_CONTROL_ACCESS_ERROR);
+            //~ splashf(HZ*2, (unsigned char *)"%s (%d)",
+                           //~ str(LANG_PLAYLIST_CONTROL_ACCESS_ERROR),
+                           //~ playlist->control_fd);
+        //~ }
         playlist->control_created = false;
     }
     else
@@ -530,7 +531,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     if((i = lseek(playlist->fd, 0, SEEK_CUR)) > 0)
         playlist->utf8 = true; /* Override any earlier indication. */
 
-    splash(0, ID2P(LANG_WAIT));
+    //~ splash(0, ID2P(LANG_WAIT));
 
     if (!buffer)
     {
@@ -603,10 +604,12 @@ static int create_and_play_dir(int direction, bool play_last)
     int res;
     int index = -1;
 
-    if(direction > 0)
-      res = get_next_directory(dir);
-    else
-      res = get_previous_directory(dir);
+    return -1;
+
+    //~ if(direction > 0)
+      //~ res = get_next_directory(dir);
+    //~ else
+      //~ res = get_previous_directory(dir);
 
     if (res < 0)
         /* return the error encountered */
@@ -617,7 +620,7 @@ static int create_and_play_dir(int direction, bool play_last)
         ft_build_playlist(tree_get_context(), 0);
 
         if (global_settings.playlist_shuffle)
-             playlist_shuffle(current_tick, -1);
+             playlist_shuffle(0xdeadbeef, -1);
 
         if (play_last && direction <= 0)
             index = current_playlist.amount - 1;
@@ -851,12 +854,12 @@ static int directory_search_callback(char* filename, void* context)
     {
         unsigned char* count_str;
 
-        if (c->queue)
-            count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-        else
-            count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-        display_playlist_count(c->count, count_str, false);
+        //~ if (c->queue)
+            //~ count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
+        //~ else
+            //~ count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
+//~ 
+        //~ display_playlist_count(c->count, count_str, false);
         
         if ((c->count) == PLAYLIST_DISPLAY_COUNT &&
             (audio_status() & AUDIO_STATUS_PLAY) &&
@@ -1421,10 +1424,10 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
 
         if (max < 0)
         {
-            if (control_file)
-                splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
-            else
-                splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+            //~ if (control_file)
+                //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+            //~ else
+                //~ splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
 
             return max;
         }
@@ -1434,6 +1437,8 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
 
     return (format_track_path(buf, tmp_buf, buf_length, max, dir_buf));
 }
+
+#if 0
 
 static int get_next_directory(char *dir){
     return get_next_dir(dir, true);
@@ -1492,7 +1497,7 @@ static int get_next_dir(char *dir, bool is_forward)
                    times as many tries as there are directories. */
                 unsigned long allowed_tries = folder_count * 4;
                 int i;
-                srand(current_tick);
+                srand(0xdeadbeef);
                 *(tc->dirfilter) = SHOW_MUSIC;
                 tc->sort_dir = global_settings.sort_dir;
                 while (!exit && allowed_tries--)
@@ -1565,12 +1570,12 @@ static int get_next_dir(char *dir, bool is_forward)
         for (i=0; i<num_files; i++)
         {
             /* user abort */
-            if (action_userabort(TIMEOUT_NOBLOCK))
-            {
-                result = -1;
-                exit = true;
-                break;
-            }
+            //~ if (action_userabort(TIMEOUT_NOBLOCK))
+            //~ {
+                //~ result = -1;
+                //~ exit = true;
+                //~ break;
+            //~ }
 
             if (files[i].attr & ATTR_DIRECTORY)
             {
@@ -1624,6 +1629,7 @@ static int get_next_dir(char *dir, bool is_forward)
 
     return result;
 }
+#endif
 
 /*
  * Checks if there are any music files in the dir or any of its
@@ -1631,6 +1637,7 @@ static int get_next_dir(char *dir, bool is_forward)
  */
 static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
 {
+#if 0
     int result = -1;
     int dirlen = strlen(dir);
     int num_files = 0;
@@ -1674,11 +1681,11 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
     {
         for (i=0; i<num_files; i++)
         {
-            if (action_userabort(TIMEOUT_NOBLOCK))
-            {
-                result = -2;
-                break;
-            }
+            //~ if (action_userabort(TIMEOUT_NOBLOCK))
+            //~ {
+                //~ result = -2;
+                //~ break;
+            //~ }
 
             if (files[i].attr & ATTR_DIRECTORY)
             {
@@ -1702,10 +1709,13 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
         }
 
         /* we now need to reload our current directory */
-        if(ft_load(tc, dir) < 0)
-            splash(HZ*2, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        //~ if(ft_load(tc, dir) < 0)
+            //~ splash(HZ*2, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
     }
     return result;
+#else
+    return false;
+#endif
 }
 
 /*
@@ -1793,21 +1803,21 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
 static void display_playlist_count(int count, const unsigned char *fmt,
                                    bool final)
 {
-    static long talked_tick = 0;
-    long id = P2ID(fmt);
-    if(global_settings.talk_menu && id>=0)
-    {
-        if(final || (count && (talked_tick == 0
-                               || TIME_AFTER(current_tick, talked_tick+5*HZ))))
-        {
-            talked_tick = current_tick;
-            talk_number(count, false);
-            talk_id(id, true);
-        }
-    }
-    fmt = P2STR(fmt);
+    //~ static long talked_tick = 0;
+    //~ long id = P2ID(fmt);
+    //~ if(global_settings.talk_menu && id>=0)
+    //~ {
+        //~ if(final || (count && (talked_tick == 0
+                               //~ || TIME_AFTER(current_tick, talked_tick+5*HZ))))
+        //~ {
+            //~ talked_tick = current_tick;
+            //~ talk_number(count, false);
+            //~ talk_id(id, true);
+        //~ }
+    //~ }
+    //~ fmt = P2STR(fmt);
 
-    splashf(0, fmt, count, str(LANG_OFF_ABORT));
+    //~ splashf(0, fmt, count, str(LANG_OFF_ABORT));
 }
 
 /*
@@ -1815,7 +1825,7 @@ static void display_playlist_count(int count, const unsigned char *fmt,
  */
 static void display_buffer_full(void)
 {
-    splash(HZ*2, ID2P(LANG_PLAYLIST_BUFFER_FULL));
+    //~ splash(HZ*2, ID2P(LANG_PLAYLIST_BUFFER_FULL));
 }
 
 /*
@@ -1888,7 +1898,7 @@ static int flush_cached_control(struct playlist_info* playlist)
     else
     {
         result = -1;
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
     }
 
     return result;
@@ -2015,8 +2025,13 @@ void playlist_init(void)
     mutex_init(&created_playlist_mutex);
 
     playlist->current = true;
+#ifdef LIBROCKPLAY
+    snprintf(playlist->control_filename, MAX_PATH,
+            "%s/config/rockplay/playlist_control", getenv("HOME"));
+#else
     strlcpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
+#endif
     playlist->fd = -1;
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
@@ -2105,11 +2120,11 @@ int playlist_resume(void)
 
     empty_playlist(playlist, true);
 
-    splash(0, ID2P(LANG_WAIT));
+    //~ splash(0, ID2P(LANG_WAIT));
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
     if (playlist->control_fd < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
     playlist->control_created = true;
@@ -2117,7 +2132,7 @@ int playlist_resume(void)
     control_file_size = filesize(playlist->control_fd);
     if (control_file_size <= 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -2126,7 +2141,7 @@ int playlist_resume(void)
         PLAYLIST_COMMAND_SIZE<buflen?PLAYLIST_COMMAND_SIZE:buflen);
     if(nread <= 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -2145,24 +2160,24 @@ int playlist_resume(void)
         char *str1 = NULL;
         char *str2 = NULL;
         char *str3 = NULL;
-        unsigned long last_tick = current_tick;
+        //~ unsigned long last_tick = current_tick;
         bool useraborted = false;
         
         for(count=0; count<nread && !exit_loop && !useraborted; count++,p++)
         {
             /* So a splash while we are loading. */
-            if (TIME_AFTER(current_tick, last_tick + HZ/4))
-            {
-                splashf(0, str(LANG_LOADING_PERCENT), 
-                           (total_read+count)*100/control_file_size,
-                           str(LANG_OFF_ABORT));
-                if (action_userabort(TIMEOUT_NOBLOCK))
-                {
-                    useraborted = true;
-                    break;
-                }
-                last_tick = current_tick;
-            }
+            //~ if (TIME_AFTER(current_tick, last_tick + HZ/4))
+            //~ {
+                //~ splashf(0, str(LANG_LOADING_PERCENT), 
+                           //~ (total_read+count)*100/control_file_size,
+                           //~ str(LANG_OFF_ABORT));
+                //~ if (action_userabort(TIMEOUT_NOBLOCK))
+                //~ {
+                    //~ useraborted = true;
+                    //~ break;
+                //~ }
+                //~ last_tick = current_tick;
+            //~ }
             
             /* Are we on a new line? */
             if((*p == '\n') || (*p == '\r'))
@@ -2209,7 +2224,7 @@ int playlist_resume(void)
                         else if (str2[0] != '\0')
                         {
                             playlist->in_ram = true;
-                            resume_directory(str2);
+                            //~ resume_directory(str2);
                         }
                         
                         /* load the rest of the data */
@@ -2420,21 +2435,21 @@ int playlist_resume(void)
 
         if (result < 0)
         {
-            splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
+            //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
             return result;
         }
 
-        if (useraborted)
-        {
-            splash(HZ*2, ID2P(LANG_CANCEL));
-            return -1;
-        }
+        //~ if (useraborted)
+        //~ {
+            //~ splash(HZ*2, ID2P(LANG_CANCEL));
+            //~ return -1;
+        //~ }
         if (!newline || (exit_loop && count<nread))
         {
             if ((total_read + count) >= control_file_size)
             {
                 /* no newline at end of control file */
-                splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
+                //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
                 return -1;
             }
 
@@ -2560,7 +2575,7 @@ void playlist_start(int start_index, int offset)
     /* Cancel FM radio selection as previous music. For cases where we start
        playback without going to the WPS, such as playlist insert.. or
        playlist catalog. */
-    previous_music_is_wps();
+    //~ previous_music_is_wps();
 
     playlist->index = start_index;
 
@@ -2679,7 +2694,7 @@ int playlist_next(int steps)
             /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
             playlist->first_index = 0;
             sort_playlist(playlist, false, false);
-            randomise_playlist(playlist, current_tick, false, true);
+            randomise_playlist(playlist, 0xdeadbeef, false, true);
 
 #if CONFIG_CODEC == SWCODEC
             playlist->started = true;
@@ -2768,7 +2783,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
             global_status.resume_index  = playlist->index;
             global_status.resume_crc32 = crc;
             global_status.resume_offset = id3->offset;
-            status_save();
+            //~ status_save();
         }
     }
     else
@@ -2776,7 +2791,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
         global_status.resume_index  = -1;
         global_status.resume_crc32 = -1;
         global_status.resume_offset = -1;
-        status_save();
+        //~ status_save();
     }
 
     return 0;
@@ -2989,7 +3004,7 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
 
     if (check_control(playlist) < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -3020,7 +3035,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     if (check_control(playlist) < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -3032,12 +3047,12 @@ int playlist_insert_directory(struct playlist_info* playlist,
             return -1;
     }
 
-    if (queue)
-        count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-    else
-        count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-    display_playlist_count(0, count_str, false);
+    //~ if (queue)
+        //~ count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
+    //~ else
+        //~ count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
+//~ 
+    //~ display_playlist_count(0, count_str, false);
 
     context.playlist = playlist;
     context.position = position;
@@ -3046,8 +3061,9 @@ int playlist_insert_directory(struct playlist_info* playlist,
     
     cpu_boost(true);
 
-    result = playlist_directory_tracksearch(dirname, recurse,
-        directory_search_callback, &context);
+    //~ result = playlist_directory_tracksearch(dirname, recurse,
+        //~ directory_search_callback, &context);
+    result = -1;
 
     sync_control(playlist, false);
 
@@ -3087,14 +3103,14 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
     if (check_control(playlist) < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
     fd = open_utf8(filename, O_RDONLY);
     if (fd < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
         return -1;
     }
 
@@ -3107,12 +3123,12 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     else
         dir = "/";
 
-    if (queue)
-        count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-    else
-        count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-    display_playlist_count(count, count_str, false);
+    //~ if (queue)
+        //~ count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
+    //~ else
+        //~ count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
+//~ 
+    //~ display_playlist_count(count, count_str, false);
 
     if (position == PLAYLIST_REPLACE)
     {
@@ -3126,8 +3142,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
         /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-            break;
+        //~ if (action_userabort(TIMEOUT_NOBLOCK))
+            //~ break;
     
         if (temp_buf[0] != '#' && temp_buf[0] != '\0')
         {
@@ -3215,7 +3231,7 @@ int playlist_delete(struct playlist_info* playlist, int index)
 
     if (check_control(playlist) < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -3250,7 +3266,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
 
     if (check_control(playlist) < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
         return -1;
     }
 
@@ -3519,10 +3535,10 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         {
             /* not enough buffer space to store updated indices */
             /* Try to get a buffer */
-            playlist->buffer = plugin_get_buffer((size_t*)&playlist->buffer_size);
-            if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
+            //~ playlist->buffer = plugin_get_buffer((size_t*)&playlist->buffer_size);
+            //~ if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
             {
-                splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+                //~ splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
                 result = -1;
                 goto reset_old_buffer;
             }
@@ -3544,12 +3560,12 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     }
     if (fd < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
         result = -1;
         goto reset_old_buffer;
     }
 
-    display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
+    //~ display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
 
     cpu_boost(true);
 
@@ -3561,11 +3577,11 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         int seek;
 
         /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-        {
-            result = -1;
-            break;
-        }
+        //~ if (action_userabort(TIMEOUT_NOBLOCK))
+        //~ {
+            //~ result = -1;
+            //~ break;
+        //~ }
 
         control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
         queue = playlist->indices[index] & PLAYLIST_QUEUE_MASK;
@@ -3586,16 +3602,16 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
             if (fdprintf(fd, "%s\n", tmp_buf) < 0)
             {
-                splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+                //~ splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
                 result = -1;
                 break;
             }
 
             count++;
 
-            if ((count % PLAYLIST_DISPLAY_COUNT) == 0)
-                display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT),
-                                       false);
+            //~ if ((count % PLAYLIST_DISPLAY_COUNT) == 0)
+                //~ display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT),
+                                       //~ false);
 
             yield();
         }
@@ -3603,7 +3619,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         index = (index+1)%playlist->amount;
     }
 
-    display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), true);
+    //~ display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), true);
 
     close(fd);
 
@@ -3657,6 +3673,7 @@ reset_old_buffer:
     return result;
 }
 
+#if 0
 /*
  * Search specified directory for tracks and notify via callback.  May be
  * called recursively.
@@ -3681,7 +3698,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
 
     if (ft_load(tc, dirname) < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
         *(tc->dirfilter) = old_dirfilter;
         return -1;
     }
@@ -3695,11 +3712,11 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
     for (i=0; i<num_files; i++)
     {
         /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-        {
-            result = -1;
-            break;
-        }
+        //~ if (action_userabort(TIMEOUT_NOBLOCK))
+        //~ {
+            //~ result = -1;
+            //~ break;
+        //~ }
 
         struct entry *files = core_get_data(cache->entries_handle);
         if (files[i].attr & ATTR_DIRECTORY)
@@ -3752,3 +3769,5 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
 
     return result;
 }
+
+#endif

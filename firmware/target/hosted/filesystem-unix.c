@@ -26,7 +26,7 @@
 #include <dirent.h>
 #include <time.h>   /* localtime() */
 #include "system-target.h"
-#include "dir-target.h"
+//~ #include "dir-target.h"
 #include "file.h"
 #include "dir.h"
 #include "rbpaths.h"

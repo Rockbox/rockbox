@@ -433,7 +433,7 @@ static bool codec_loop_track_callback(void)
 /** --- CODEC THREAD --- **/
 
 /* Handle Q_CODEC_LOAD */
-static void load_codec(const struct codec_load_info *ev_data)
+void NO_INLINE load_codec(const struct codec_load_info *ev_data)
 {
     int status = CODEC_ERROR;
     /* Save a local copy so we can let the audio thread go ASAP */

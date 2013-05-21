@@ -83,6 +83,7 @@ bool file_exists(const char *file)
     return true;
 }
 
+#if 0
 bool dir_exists(const char *path)
 {
     DIR* d = opendir(path);
@@ -99,4 +100,5 @@ struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
     (void)parent;
     return entry->info;
 }
+#endif
 #endif

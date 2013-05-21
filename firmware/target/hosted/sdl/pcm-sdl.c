@@ -48,7 +48,8 @@
 
 #ifdef DEBUG
 #include <stdio.h>
-extern bool debug_audio;
+//~ extern bool debug_audio;
+bool debug_audio;
 #endif
 
 #if CONFIG_CODEC == SWCODEC

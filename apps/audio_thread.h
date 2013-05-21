@@ -23,6 +23,8 @@
 #ifndef AUDIO_THREAD_H
 #define AUDIO_THREAD_H
 
+#include "kernel.h"
+
 /* Define one constant that includes recording related functionality */
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #define AUDIO_HAVE_RECORDING

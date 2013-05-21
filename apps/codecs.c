@@ -31,13 +31,13 @@
 #include "load_code.h"
 #include "debug.h"
 #include "button.h"
-#include "dir.h"
+//~ #include "dir.h"
 #include "file.h"
 #include "kernel.h"
 #include "screens.h"
 #include "misc.h"
 #include "codecs.h"
-#include "lang.h"
+//~ #include "lang.h"
 #include "keyboard.h"
 #include "buffering.h"
 #include "mp3_playback.h"
@@ -157,8 +157,8 @@ struct codec_api ci = {
 
 void codec_get_full_path(char *path, const char *codec_root_fn)
 {
-    snprintf(path, MAX_PATH-1, CODECS_DIR "/" CODEC_PREFIX "%s."
-            CODEC_EXTENSION, codec_root_fn);
+    snprintf(path, MAX_PATH-1, "%s/lib/rbcodec/codecs/" CODEC_PREFIX "%s."
+            CODEC_EXTENSION, getenv("PWD"), codec_root_fn);
 }
 
 /* Returns pointer to and size of free codec RAM. Aligns to CACHEALIGN_SIZE. */
