@@ -37,7 +37,7 @@
 #define MAX_OPEN_FILES 11
 
 #if !defined(PLUGIN) && !defined(CODEC)
-#if defined(APPLICATION) && !defined(__PCTOOL__)
+#if 0 && defined(APPLICATION) && !defined(__PCTOOL__)
 #include "rbpaths.h"
 #   define open(x, ...)     app_open(x, __VA_ARGS__)
 #   define creat(x,m)       app_creat(x, m)

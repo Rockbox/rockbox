@@ -1,3 +1,7 @@
+#if 1
+#include "../lib/rbcodec/rbcodecconfig-example.h"
+#else
+
 #ifndef RBCODECCONFIG_H_INCLUDED
 #define RBCODECCONFIG_H_INCLUDED
 
@@ -78,5 +82,7 @@ static inline void dsp_process_end(struct dsp_loop_context *ctx)
 #define DSP_OUT_MIN_HZ      PLAY_SAMPR_HW_MIN
 #define DSP_OUT_MAX_HZ      PLAY_SAMPR_MAX
 #define DSP_OUT_DEFAULT_HZ  PLAY_SAMPR_DEFAULT
+
+#endif
 
 #endif

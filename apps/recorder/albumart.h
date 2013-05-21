@@ -26,7 +26,9 @@
 
 #include <stdbool.h>
 #include "metadata.h"
-#include "skin_engine/skin_engine.h"
+#include "bmp.h"
+
+//~ #include "skin_engine/skin_engine.h"
 
 /* Look for albumart bitmap in the same dir as the track and in its parent dir.
  * Calls size_func to get the dimensions to look for
@@ -38,7 +40,7 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
 #ifndef PLUGIN
 /* Draw the album art bitmap from the given handle ID onto the given Skin.
    Call with clear = true to clear the bitmap instead of drawing it. */
-void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear);
+//~ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear);
 #endif
 
 bool search_albumart_files(const struct mp3entry *id3, const char *size_string,

@@ -27,6 +27,10 @@
 *
 ****************************************************************************/
 
+#include <fcntl.h>
+#include <unistd.h>
+#include "system.h"
+#include "filefuncs.h"
 #include "plugin.h"
 #include "debug.h"
 #include "jpeg_load.h"

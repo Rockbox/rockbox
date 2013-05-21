@@ -22,7 +22,6 @@
 #include <sys/stat.h> /* stat() */
 #include "mv.h" /* stat() */
 
-
 long filesize(int fd)
 {
     struct stat buf;

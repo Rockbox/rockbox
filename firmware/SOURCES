@@ -1,6 +1,7 @@
 #undef unix /* causes problems with some files */
 #undef linux
 
+#ifndef LIBROCKPLAY
 ata_idle_notify.c
 events.c
 backlight.c
@@ -1822,21 +1823,44 @@ drivers/audio/android.c
 drivers/touchpad.c
 #endif
 
+#else /* LIBROCKPLAY */
+
+common/strlcpy.c
+common/unicode.c
+common/structec.c
+common/crc32.c
+common/filefuncs.c
+common/format.c
+general.c
+events.c
+buflib_malloc.c
+core_alloc.c
+pcm.c
+pcm_mixer.c
+pcm_sampr.c
+pcm_sw_volume.c
+usb.c
+target/hosted/pcm-alsa.c
+//~ target/hosted/sdl/pcm-sdl.c
+drivers/audio/dummy_codec.c
+
+#endif
+
 /* firmware/kernel section */
 #ifdef HAVE_CORELOCK_OBJECT
-kernel/corelock.c
+kernel/pthread/corelock.c
 #endif
-kernel/mutex.c
+kernel/pthread/mutex.c
 kernel/queue.c
 #ifdef HAVE_SEMAPHORE_OBJECTS
-kernel/semaphore.c
+//kernel/semaphore.c
 #endif
 #if defined(HAVE_SDL_THREADS)
 target/hosted/sdl/thread-sdl.c
 #else
-kernel/thread.c
+kernel/pthread/thread.c
 #endif
-kernel/tick.c
+//kernel/tick.c
 #ifdef INCLUDE_TIMEOUT_API
 kernel/timeout.c
 #endif

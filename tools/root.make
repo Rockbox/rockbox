@@ -67,19 +67,15 @@ all: $(DEPFILE) build
 # compile rules
 include $(TOOLSDIR)/tools.make
 
-ifeq (,$(findstring checkwps,$(APP_TYPE)))
-  ifeq (,$(findstring database,$(APP_TYPE)))
-    ifeq (,$(findstring warble,$(APP_TYPE)))
-      include $(FIRMDIR)/firmware.make
-      include $(ROOTDIR)/apps/bitmaps/bitmaps.make
-      ifeq (arch_arm,$(ARCH))
-          include $(ROOTDIR)/lib/unwarminder/unwarminder.make
-      endif
-      ifeq (,$(findstring bootloader,$(APPSDIR)))
-        include $(ROOTDIR)/lib/skin_parser/skin_parser.make
-        include $(ROOTDIR)/lib/tlsf/libtlsf.make
-      endif
-    endif
+ifeq (,$(filter checkwps database warble librockplay,$(APP_TYPE)))
+  include $(FIRMDIR)/firmware.make
+  include $(ROOTDIR)/apps/bitmaps/bitmaps.make
+  ifeq (arch_arm,$(ARCH))
+	  include $(ROOTDIR)/lib/unwarminder/unwarminder.make
+  endif
+  ifeq (,$(findstring bootloader,$(APPSDIR)))
+	include $(ROOTDIR)/lib/skin_parser/skin_parser.make
+	include $(ROOTDIR)/lib/tlsf/libtlsf.make
   endif
 endif
 
@@ -110,6 +106,13 @@ else ifneq (,$(findstring warble,$(APP_TYPE)))
   include $(ROOTDIR)/lib/rbcodec/test/warble.make
   include $(ROOTDIR)/lib/tlsf/libtlsf.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
+  include $(ROOTDIR)/lib/queuelib/queuelib.make
+else ifneq (,$(findstring librockplay,$(APP_TYPE)))
+  include $(FIRMDIR)/firmware.make
+  include $(APPSDIR)/apps.make
+  include $(ROOTDIR)/lib/tlsf/libtlsf.make
+  include $(ROOTDIR)/lib/rbcodec/rbcodec.make
+  include $(ROOTDIR)/rockplay/rockplay.make
 else # core
   include $(APPSDIR)/apps.make
   include $(APPSDIR)/lang/lang.make

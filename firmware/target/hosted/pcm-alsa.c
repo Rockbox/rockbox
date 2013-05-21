@@ -544,6 +544,7 @@ void pcm_play_dma_pause(bool pause)
 void pcm_play_dma_stop(void)
 {
     snd_pcm_drain(handle);
+    snd_pcm_prepare(handle);
 #ifdef USE_ASYNC_THREAD
     pthread_cond_signal(&pcm_disabed_cond);
 #endif

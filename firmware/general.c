@@ -89,6 +89,7 @@ int make_list_from_caps32(unsigned long src_mask,
 } /* make_list_from_caps32 */
 #endif /* CONFIG_CODEC == SWCODEC */
 
+#if 0
 /* Create a filename with a number part in a way that the number is 1
  * higher than the highest numbered file matching the same pattern.
  * It is allowed that buffer and path point to the same memory location,
@@ -197,6 +198,8 @@ char *create_datetime_filename(char *buffer, const char *path,
 }
 #endif /* CONFIG_RTC */
 
+#endif
+
 /***
  ** Compacted pointer lists
  **
@@ -232,4 +235,77 @@ int remove_array_ptr(void **arr, void *ptr)
     while (curr != NULL);
 
     return 0;
+}
+
+/** Open a UTF-8 file and set file descriptor to first byte after BOM.
+ *  If no BOM is present this behaves like open().
+ *  If the file is opened for writing and O_TRUNC is set, write a BOM to
+ *  the opened file and leave the file pointer set after the BOM.
+ */
+/* Unicode byte order mark sequences and lengths */
+#define BOM_UTF_8 "\xef\xbb\xbf"
+#define BOM_UTF_8_SIZE 3
+#define BOM_UTF_16_LE "\xff\xfe"
+#define BOM_UTF_16_BE "\xfe\xff"
+#define BOM_UTF_16_SIZE 2
+
+int open_utf8(const char* pathname, int flags)
+{
+    int fd;
+    unsigned char bom[BOM_UTF_8_SIZE];
+
+    fd = open(pathname, flags, 0666);
+    if(fd < 0)
+        return fd;
+
+    if(flags & (O_TRUNC | O_WRONLY))
+    {
+        write(fd, BOM_UTF_8, BOM_UTF_8_SIZE);
+    }
+    else
+    {
+        read(fd, bom, BOM_UTF_8_SIZE);
+        /* check for BOM */
+        if(memcmp(bom, BOM_UTF_8, BOM_UTF_8_SIZE))
+            lseek(fd, 0, SEEK_SET);
+    }
+    return fd;
+}
+
+#include <errno.h>
+
+/* Read (up to) a line of text from fd into buffer and return number of bytes
+ * read (which may be larger than the number of bytes stored in buffer). If
+ * an error occurs, -1 is returned (and buffer contains whatever could be
+ * read). A line is terminated by a LF char. Neither LF nor CR chars are
+ * stored in buffer.
+ */
+int read_line(int fd, char* buffer, int buffer_size)
+{
+    int count = 0;
+    int num_read = 0;
+
+    errno = 0;
+
+    while (count < buffer_size)
+    {
+        unsigned char c;
+
+        if (1 != read(fd, &c, 1))
+            break;
+
+        num_read++;
+
+        if ( c == '\n' )
+            break;
+
+        if ( c == '\r' )
+            continue;
+
+        buffer[count++] = c;
+    }
+
+    buffer[MIN(count, buffer_size - 1)] = 0;
+
+    return errno ? -1 : num_read;
 }

@@ -564,6 +564,8 @@ Lyre prototype 1 */
 #include "config/creativezenxfistyle.h"
 #elif defined(SAMSUNG_YPR1)
 #include "config/samsungypr1.h"
+#elif defined(LIBROCKPLAY)
+#include "config/librockplay.h"
 #else
 /* no known platform */
 #endif
@@ -1081,8 +1083,8 @@ Lyre prototype 1 */
 #define NOCACHEDATA_ATTR
 #endif
 
-#define IF_COP(...)
-#define IF_COP_VOID(...)    void
+#define IF_COP(...)         __VA_ARGS__
+#define IF_COP_VOID(...)    __VA_ARGS__
 #define IF_COP_CORE(core)   CURRENT_CORE
 
 #endif /* NUM_CORES */

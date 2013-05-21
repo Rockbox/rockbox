@@ -86,7 +86,7 @@
  *
  * simulator (possibly) doesn't simulate stack usage anyway but well ... */
 
-#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__)
+#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || 1
 struct regs
 {
     void *t;             /* OS thread */
@@ -164,6 +164,21 @@ struct priority_distribution
 
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
+
+#ifdef LIBROCKPLAY
+#include <pthread.h>
+struct thread_entry
+{
+    pthread_cond_t cond;
+    struct thread_entry **bqp;
+    intptr_t retval;
+    void (*wakeup_ext_cb)(struct thread_entry *thread);
+    struct corelock *lock;
+    int runnable;
+    struct thread_list l;      /* Links for blocked/waking/running -
+                                  circular linkage in both directions */
+};
+#else
 /* Information kept in each thread slot
  * members are arranged according to size - largest first - in order
  * to ensure both alignment and packing at the same time.
@@ -235,6 +250,7 @@ struct thread_entry
     unsigned char io_priority;
 #endif
 };
+#endif
 
 /*** Macros for internal use ***/
 /* Thread ID, 16 bits = |VVVVVVVV|SSSSSSSS| */

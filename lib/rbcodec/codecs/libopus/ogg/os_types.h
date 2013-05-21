@@ -2,8 +2,9 @@
 #define OS_TYPES_H
 #include "codeclib.h"
 #include <stdint.h>
-#include <tlsf.h>
 
+#ifndef LIBROCKPLAY
+#include <tlsf.h>
 static inline void ogg_malloc_init(void)
 {
     size_t bufsize;
@@ -17,6 +18,24 @@ static inline void ogg_malloc_destroy(void)
     void* buf = ci->codec_get_buffer(&bufsize);
     destroy_memory_pool(buf);
 }
+#else
+
+#include <stdlib.h>
+static inline void ogg_malloc_init(void)
+{
+}
+
+static inline void ogg_malloc_destroy(void)
+{
+}
+
+#define tlsf_malloc  malloc
+#define tlsf_free    free
+#define tlsf_calloc  calloc
+#define tlsf_realloc realloc
+
+#endif
+
 
 static inline void *_ogg_malloc(size_t size)
 {
@@ -51,4 +70,3 @@ typedef int32_t ogg_int32_t;
 typedef uint32_t ogg_uint32_t;
 typedef int64_t ogg_int64_t;
 #endif /* OS_TYPES_H */
-

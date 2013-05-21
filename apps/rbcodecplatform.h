@@ -1,3 +1,7 @@
+#if 1
+#include "../lib/rbcodec/rbcodecplatform-unix.h"
+#else
+
 #ifndef RBCODECPLATFORM_H_INCLUDED
 #define RBCODECPLATFORM_H_INCLUDED
 #if 0
@@ -37,3 +41,4 @@ void tdspeed_free_buffers(int32_t **buffers, int nbuf);
 
 #endif
 
+#endif

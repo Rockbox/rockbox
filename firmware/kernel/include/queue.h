@@ -24,6 +24,8 @@
 
 #include <stdint.h>
 #include "config.h"
+
+#include "kernel.h"
 #include "thread.h"
 
 /* System defined message ID's - |sign bit = 1|class|id| */
@@ -91,9 +93,9 @@ struct queue_sender_list
     struct thread_entry *list;                  /* list of senders in map */
     /* Send info for last message dequeued or NULL if replied or not sent */
     struct thread_entry * volatile curr_sender;
-#ifdef HAVE_PRIORITY_SCHEDULING
-    struct blocker blocker;
-#endif
+//~ #ifdef HAVE_PRIORITY_SCHEDULING
+    //~ struct blocker blocker;
+//~ #endif
 };
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
@@ -120,7 +122,9 @@ struct event_queue
                                            for sync message senders */
 #endif
 #endif
-    IF_COP( struct corelock cl; )       /* multiprocessor sync */
+#ifdef HAVE_CORELOCK_OBJECT
+    struct corelock cl;                 /* multiprocessor sync */
+#endif
 };
 
 extern void queue_init(struct event_queue *q, bool register_queue);

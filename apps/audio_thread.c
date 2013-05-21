@@ -20,9 +20,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
+#include "thread.h"
 #include "logf.h"
 #include "usb.h"
 #include "pcm.h"
@@ -98,7 +100,9 @@ static void NORETURN_ATTR audio_thread(void)
         /* All return upon USB */
         case SYS_USB_CONNECTED:
             LOGFQUEUE("audio < SYS_USB_CONNECTED");
+#ifdef PLAYBACK_VOICE
             voice_stop();
+#endif
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             usb_wait_for_disconnect(&audio_queue);
             break;
@@ -173,5 +177,5 @@ void INIT_ATTR audio_init(void)
    /* Probably safe to say */
     audio_is_initialized = true;
 
-    sound_settings_apply();
+    //~ sound_settings_apply();
 }

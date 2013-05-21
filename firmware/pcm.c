@@ -240,7 +240,7 @@ static void pcm_peak_peeker(const int16_t *p, int count,
 void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
                              const void *addr, int count)
 {
-    long tick = current_tick;
+    long tick = 0;//current_tick;
 
     /* Peak no farther ahead than expected period to avoid overcalculation */
     long period = tick - peaks->tick;

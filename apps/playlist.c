@@ -74,19 +74,19 @@
 #include "playlist.h"
 #include "ata_idle_notify.h"
 #include "file.h"
-#include "action.h"
+//~ #include "action.h"
 #include "mv.h"
 #include "debug.h"
 #include "audio.h"
 #include "lcd.h"
-#include "kernel.h"
+//~ #include "kernel.h"
 #include "settings.h"
 #include "status.h"
 #include "applimits.h"
 #include "screens.h"
 #include "core_alloc.h"
 #include "misc.h"
-#include "filefuncs.h"
+//~ #include "filefuncs.h"
 #include "button.h"
 #include "filetree.h"
 #include "abrepeat.h"
@@ -94,17 +94,18 @@
 #include "usb.h"
 #include "filetypes.h"
 #ifdef HAVE_LCD_BITMAP
-#include "icons.h"
+//~ #include "icons.h"
 #endif
-#include "system.h"
+//~ #include "system.h"
 
-#include "lang.h"
+//~ #include "lang.h"
 #include "talk.h"
-#include "splash.h"
+//~ #include "splash.h"
 #include "rbunicode.h"
 #include "root_menu.h"
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
 #include "panic.h"
+#include "crc32.h"
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
@@ -212,7 +213,7 @@ static bool is_m3u8(const char* filename)
     return !(len > 4 && strcasecmp(&filename[len - 4], ".m3u") == 0);
 }
 
-
+//~ #define ATTR_DIRECTORY 4
 /* Convert a filename in an M3U playlist to UTF-8. 
  *
  * buf     - the filename to convert; can contain more than one line from the
@@ -584,10 +585,12 @@ static int create_and_play_dir(int direction, bool play_last)
     int res;
     int index = -1;
 
-    if(direction > 0)
-      res = get_next_directory(dir);
-    else
-      res = get_previous_directory(dir);
+    return -1;
+
+    //~ if(direction > 0)
+      //~ res = get_next_directory(dir);
+    //~ else
+      //~ res = get_previous_directory(dir);
 
     if (res < 0)
         /* return the error encountered */
@@ -598,7 +601,7 @@ static int create_and_play_dir(int direction, bool play_last)
         ft_build_playlist(tree_get_context(), 0);
 
         if (global_settings.playlist_shuffle)
-             playlist_shuffle(current_tick, -1);
+             playlist_shuffle(0xdeadbeef, -1);
 
         if (play_last && direction <= 0)
             index = current_playlist.amount - 1;
@@ -1399,6 +1402,8 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     return (format_track_path(buf, tmp_buf, buf_length, max, dir_buf));
 }
 
+#if 0
+
 static int get_next_directory(char *dir){
     return get_next_dir(dir, true);
 }
@@ -1456,7 +1461,7 @@ static int get_next_dir(char *dir, bool is_forward)
                    times as many tries as there are directories. */
                 unsigned long allowed_tries = folder_count * 4;
                 int i;
-                srand(current_tick);
+                srand(0xdeadbeef);
                 *(tc->dirfilter) = SHOW_MUSIC;
                 tc->sort_dir = global_settings.sort_dir;
                 while (!exit && allowed_tries--)
@@ -1588,6 +1593,7 @@ static int get_next_dir(char *dir, bool is_forward)
 
     return result;
 }
+#endif
 
 /*
  * Checks if there are any music files in the dir or any of its
@@ -1595,6 +1601,7 @@ static int get_next_dir(char *dir, bool is_forward)
  */
 static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
 {
+#if 0
     int result = -1;
     int dirlen = strlen(dir);
     int num_files = 0;
@@ -1638,11 +1645,11 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
     {
         for (i=0; i<num_files; i++)
         {
-            if (action_userabort(TIMEOUT_NOBLOCK))
-            {
-                result = -2;
-                break;
-            }
+            //~ if (action_userabort(TIMEOUT_NOBLOCK))
+            //~ {
+                //~ result = -2;
+                //~ break;
+            //~ }
 
             if (files[i].attr & ATTR_DIRECTORY)
             {
@@ -1670,6 +1677,9 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
             splash(HZ*2, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
     }
     return result;
+#else
+    return false;
+#endif
 }
 
 /*
@@ -1945,8 +1955,13 @@ void playlist_init(void)
     mutex_init(&created_playlist_mutex);
 
     playlist->current = true;
+#ifdef LIBROCKPLAY
+    snprintf(playlist->control_filename, MAX_PATH,
+            "%s/config/rockplay/playlist_control", getenv("HOME"));
+#else
     strlcpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
+#endif
     playlist->fd = -1;
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
@@ -2083,6 +2098,7 @@ int playlist_resume(void)
         goto out;
     }
 
+
     /* read a small amount first to get the header */
     nread = read(playlist->control_fd, buffer,
         PLAYLIST_COMMAND_SIZE<buflen?PLAYLIST_COMMAND_SIZE:buflen);
@@ -2172,7 +2188,7 @@ int playlist_resume(void)
                         else if (str2[0] != '\0')
                         {
                             playlist->in_ram = true;
-                            resume_directory(str2);
+                            //~ resume_directory(str2);
                         }
                         
                         /* load the rest of the data */
@@ -2532,7 +2548,7 @@ void playlist_start(int start_index, int offset)
     /* Cancel FM radio selection as previous music. For cases where we start
        playback without going to the WPS, such as playlist insert.. or
        playlist catalog. */
-    previous_music_is_wps();
+    //~ previous_music_is_wps();
 
     playlist->index = start_index;
 
@@ -2652,7 +2668,7 @@ int playlist_next(int steps)
             /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
             playlist->first_index = 0;
             sort_playlist(playlist, false, false);
-            randomise_playlist(playlist, current_tick, false, true);
+            randomise_playlist(playlist, 0xdeadbeef, false, true);
 
 #if CONFIG_CODEC == SWCODEC
             playlist->started = true;
@@ -2741,7 +2757,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
             global_status.resume_index  = playlist->index;
             global_status.resume_crc32 = crc;
             global_status.resume_offset = id3->offset;
-            status_save();
+            //~ status_save();
         }
     }
     else
@@ -2749,7 +2765,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
         global_status.resume_index  = -1;
         global_status.resume_crc32 = -1;
         global_status.resume_offset = -1;
-        status_save();
+        //~ status_save();
     }
 
     return 0;
@@ -3007,9 +3023,10 @@ int playlist_insert_directory(struct playlist_info* playlist,
     
     cpu_boost(true);
 
-    result = playlist_directory_tracksearch(dirname, recurse,
-        queue ? PLAYLIST_PROGRESS_QUEUE : PLAYLIST_PROGRESS_INSERT,
-        directory_search_callback, &context);
+    //~ result = playlist_directory_tracksearch(dirname, recurse,
+        //~ queue ? PLAYLIST_PROGRESS_QUEUE : PLAYLIST_PROGRESS_INSERT,
+        //~ directory_search_callback, &context);
+    result = -1;
 
     sync_control(playlist, false);
 
@@ -3460,13 +3477,12 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     if (!strncmp(playlist->filename, path, strlen(path)))
     {
         /* Attempting to overwrite current playlist file.*/
-
         if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
         {
             /* not enough buffer space to store updated indices */
             /* Try to get a buffer */
-            playlist->buffer = plugin_get_buffer((size_t*)&playlist->buffer_size);
-            if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
+            //~ playlist->buffer = plugin_get_buffer((size_t*)&playlist->buffer_size);
+            //~ if (playlist->buffer_size < (int)(playlist->amount * sizeof(int)))
             {
                 result = PLAYLIST_ERROR_ACCESS_PLAYLIST;
                 goto reset_old_buffer;
@@ -3597,6 +3613,7 @@ reset_old_buffer:
     return result;
 }
 
+#if 0
 /*
  * Search specified directory for tracks and notify via callback.  May be
  * called recursively.
@@ -3619,7 +3636,7 @@ static int walk_directories(const char* dirname, bool recurse,
 
     if (ft_load(tc, dirname) < 0)
     {
-        splash(HZ*2, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        //~ splash(HZ*2, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
         *(tc->dirfilter) = old_dirfilter;
         return -1;
     }
@@ -3706,3 +3723,5 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
 
     return result;
 }
+
+#endif

@@ -19,7 +19,7 @@
 #define HAVE_LCD_COLOR
 
 /* define this if you want album art for this target */
-#define HAVE_ALBUMART
+//~ #define HAVE_ALBUMART
 
 /* define this to enable bitmap scaling */
 #define HAVE_BMP_SCALING
@@ -75,7 +75,7 @@
 #define HAVE_SDL
 #define HAVE_SDL_AUDIO
 
-#define HAVE_SW_TONE_CONTROLS 
+//~ #define HAVE_SW_TONE_CONTROLS 
 
 /* Define this to the CPU frequency */
 /*

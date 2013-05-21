@@ -820,11 +820,14 @@ static void shrink_handle(struct memory_handle *h)
             adjust_mp3entry((struct mp3entry *)&buffer[h->data],
                             (void *)&buffer[h->data],
                             (const void *)&buffer[olddata]);
-        } else if (h->type == TYPE_BITMAP) {
+        }
+#ifdef HAVE_ALBUMART
+        else if (h->type == TYPE_BITMAP) {
             /* adjust the bitmap's pointer */
             struct bitmap *bmp = (struct bitmap *)&buffer[h->data];
             bmp->data = &buffer[h->data + sizeof(struct bitmap)];
         }
+#endif
     }
 }
 

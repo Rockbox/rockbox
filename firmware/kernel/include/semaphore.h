@@ -30,7 +30,9 @@ struct semaphore
     struct thread_entry *queue;         /* Waiter list */
     int volatile count;                 /* # of waits remaining before unsignaled */
     int max;                            /* maximum # of waits to remain signaled */
-    IF_COP( struct corelock cl; )       /* multiprocessor sync */
+#ifdef HAVE_CORELOCK_OBJECT
+    struct corelock cl;                 /* multiprocessor sync */
+#endif
 };
 
 extern void semaphore_init(struct semaphore *s, int max, int start);

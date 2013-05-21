@@ -1,5 +1,4 @@
 #include "os_types.h"
-#include <tlsf.h>
 
 #if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
 #include <setjmp.h>
@@ -8,9 +7,11 @@ extern jmp_buf rb_jump_buf;
 #elif defined(SIMULATOR)
 #define LONGJMP(x)  do { DEBUGF("Vorbis: allocation failed!\n"); return NULL; } while (false)
 #else
-#define LONGJMP(x)  return NULL
+#define LONGJMP(x)  abort();
 #endif
 
+#ifndef LIBROCKPLAY
+#include <tlsf.h>
 void ogg_malloc_init(void)
 {
     size_t bufsize;
@@ -24,6 +25,26 @@ void ogg_malloc_destroy()
     void* buf = ci->codec_get_buffer(&bufsize);
     destroy_memory_pool(buf);
 }
+#else
+#include <stdlib.h>
+void ogg_malloc_init(void)
+{
+}
+
+void ogg_malloc_destroy(void)
+{
+}
+
+#undef malloc
+#undef free
+#undef calloc
+#undef realloc
+#define tlsf_malloc  malloc
+#define tlsf_free    free
+#define tlsf_calloc  calloc
+#define tlsf_realloc realloc
+
+#endif
 
 void *ogg_malloc(size_t size)
 {
