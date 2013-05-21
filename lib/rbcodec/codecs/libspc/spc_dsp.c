@@ -154,15 +154,14 @@ void DSP_write( struct Spc_Dsp* this, int i, int data )
 
 /* Decode BRR block */
 static inline void
-decode_brr_block( struct voice_t* voice, uint8_t const* addr, int16_t* out )
+decode_brr_block( struct voice_t* voice, unsigned start_addr, int16_t* out )
 {
     /* header */
-    unsigned block_header = *addr;
+    start_addr += 9; /* point to next header */
+    uint8_t const* addr = ram.ram + start_addr;
+    unsigned block_header = addr[-9];
     voice->wave.block_header = block_header;
-
-    /* point to next header */
-    addr += 9;
-    voice->wave.addr = addr;
+    voice->wave.start_addr = start_addr;
 
     /* previous samples */
     int smp2 = out [0];
@@ -318,20 +317,15 @@ brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
     /* a little extra for samples that go past end */
     static int16_t BRRcache [BRR_CACHE_SIZE] CACHEALIGN_ATTR;
 
-    DEBUGF( "decode at %08x (wave #%d)\n", start_addr, waveform );
+    DEBUGF( "decode at %04x (wave #%u)\n", start_addr, waveform );
 
     struct cache_entry_t* const wave_entry = &this->wave_entry [waveform];
-
     wave_entry->start_addr = start_addr;
 
-    unsigned loop_addr = letoh16( sd [waveform].loop );
-    uint8_t const* const loop_ptr = ram.ram + loop_addr;
-
-    DEBUGF( "loop addr at %08x\n", (unsigned)loop_addr );
-
+    unsigned const loop_addr = letoh16( sd [waveform].loop );
     int16_t* loop_start = NULL;
 
-    uint8_t const* addr = ram.ram + start_addr;
+    DEBUGF( "loop addr at %04x (wave #%u)\n", loop_addr, waveform );
 
     int16_t* out = BRRcache + start_addr * 2;
     wave_entry->samples = out;
@@ -350,35 +344,36 @@ brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
 
     do
     {
-        if ( addr == loop_ptr )
+        if ( start_addr == loop_addr )
         {
             loop_start = out;
-            DEBUGF( "loop found at %08lx (wave #%d)\n",
-                    (unsigned long)(addr - RAM), waveform );
+            DEBUGF( "loop found at %04x (wave #%u)\n", start_addr, waveform );
         }
 
         /* output position - preincrement */
         out += BRR_BLOCK_SIZE;
 
-        decode_brr_block( voice, addr, out );
+        decode_brr_block( voice, start_addr, out );
 
         block_header = voice->wave.block_header;
-        addr = voice->wave.addr;
+        start_addr = voice->wave.start_addr;
 
         /* if next block has end flag set, this block ends early */
         /* (verified) */
-        if ( (block_header & 3) != 3 && (*addr & 3) == 1 )
+        if ( (block_header & 3) != 3 && (start_addr[ram.ram] & 3) == 1 )
         { 
             /* skip last 9 samples */
-            DEBUGF( "block early end\n" );
+            DEBUGF( "block early end (wave #%u)\n", waveform );
             out -= 9;
             break;
         }
     }
-    while ( !(block_header & 1) && addr < RAM + 0x10000 );
+    while ( !(block_header & 1) && start_addr < 0x10000 );
 
-    wave_entry->end = (out - 1 - wave_entry->samples) << 12;
-    wave_entry->loop = 0;
+    wave_entry->end          = (out - 1 - wave_entry->samples) << 12;
+    wave_entry->loop         = 0;
+    wave_entry->loop_addr    = 0;
+    wave_entry->block_header = block_header;
 
     if ( (block_header & 2) )
     {
@@ -399,10 +394,11 @@ brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
             next [BRR_BLOCK_SIZE + 1] = out [0];
             next [BRR_BLOCK_SIZE + 2] = out [1];
         }
+
+        wave_entry->loop_addr = loop_addr;
     }
 
-    DEBUGF( "end at %08lx (wave #%d)\n",
-            (unsigned long)(addr - RAM), waveform );
+    DEBUGF( "end at %04x (wave #%u)\n\n", start_addr, waveform );
 
     /* add to cache */
     this->wave_entry_old [this->oldsize++] = *wave_entry;
@@ -416,15 +412,15 @@ brr_probe_cache( struct Spc_Dsp* this, unsigned start_addr,
     if ( wave_entry->start_addr == start_addr )
         return true;
 
-    for ( int i = 0; i < this->oldsize; i++ )
+    for ( unsigned i = 0; i < this->oldsize; i++ )
     {
         struct cache_entry_t* e = &this->wave_entry_old [i];
 
         if ( e->start_addr == start_addr )
         {
 #if 0 /* do NOT want to see all the key down stuff for cached waves */
-            DEBUGF( "found in wave_entry_old (oldsize=%d)\n",
-                this->oldsize );
+            DEBUGF( "found in wave_entry_old (oldsize=%u)\n",
+                    this->oldsize );
 #endif
             *wave_entry = *e;
             return true; /* Wave in cache */
@@ -458,11 +454,13 @@ brr_key_on( struct Spc_Dsp* this,  struct src_dir const* sd,
                           initial_point );
     }
 
-    voice->wave.position  = 3 * 0x1000 - 1; /* 0x2fff */
-    voice->wave.samples   = wave_entry->samples;
-    voice->wave.end       = wave_entry->end;
-    voice->wave.loop      = wave_entry->loop;
-    voice->wave.loop_addr = letoh16( sd [waveform].loop );
+    voice->wave.position     = 3 * 0x1000 - 1; /* 0x2fff */
+    voice->wave.samples      = wave_entry->samples;
+    voice->wave.end          = wave_entry->end;
+    voice->wave.loop         = wave_entry->loop;
+    voice->wave.start_addr   = wave_entry->start_addr;
+    voice->wave.loop_addr    = wave_entry->loop_addr;
+    voice->wave.block_header = wave_entry->block_header;
 }
 
 static inline int brr_decode( struct Spc_Dsp* this, struct src_dir const* sd,
@@ -496,7 +494,7 @@ brr_key_on( struct Spc_Dsp* this,  struct src_dir const* sd,
             struct voice_t* voice, struct raw_voice_t const* raw_voice,
             unsigned start_addr )
 {
-    voice->wave.addr = ram.ram + letoh16( sd [raw_voice->waveform].start );
+    voice->wave.start_addr = letoh16( sd [raw_voice->waveform].start );
     /* BRR filter uses previous samples */
     voice->wave.samples [BRR_BLOCK_SIZE + 1] = 0;
     voice->wave.samples [BRR_BLOCK_SIZE + 2] = 0;
@@ -510,23 +508,15 @@ static inline int brr_decode( struct Spc_Dsp* this, struct src_dir const* sd,
                               struct voice_t* voice,
                               struct raw_voice_t const* raw_voice )
 {
-    #undef RAM
-#if defined(CPU_ARM) && !SPC_BRRCACHE
-    uint8_t* const ram_ = ram.ram;
-    #define RAM ram_
-#else
-    #define RAM ram.ram
-#endif
-
     if ( voice->wave.position < BRR_BLOCK_SIZE * 0x1000 )
         return 0;
 
     voice->wave.position -= BRR_BLOCK_SIZE * 0x1000;
 
-    uint8_t const* addr = voice->wave.addr;
+    unsigned start_addr = voice->wave.start_addr;
 
-    if ( addr >= RAM + 0x10000 )
-        addr -= 0x10000;
+    if ( start_addr >= 0x10000 )
+        start_addr -= 0x10000;
 
     unsigned block_header = voice->wave.block_header;
 
@@ -535,7 +525,7 @@ static inline int brr_decode( struct Spc_Dsp* this, struct src_dir const* sd,
 
     if ( block_header & 1 )
     {
-        addr = RAM + letoh16( sd [raw_voice->waveform].loop );
+        start_addr = letoh16( sd [raw_voice->waveform].loop );
         dec = 1;
 
         if ( !(block_header & 2) ) /* 1% of the time */
@@ -546,7 +536,8 @@ static inline int brr_decode( struct Spc_Dsp* this, struct src_dir const* sd,
         }
     }
 
-    decode_brr_block( voice, addr, &voice->wave.samples [1 + BRR_BLOCK_SIZE] );
+    decode_brr_block( voice, start_addr,
+                      &voice->wave.samples [1 + BRR_BLOCK_SIZE] );
 
     return dec;
     (void)this;
@@ -956,13 +947,13 @@ void DSP_reset( struct Spc_Dsp* this )
     {
         struct voice_t* v = this->voice_state + i;
         v->env_mode = state_release;
-        v->wave.addr = ram.ram;
+        v->wave.start_addr = 0;
     }
     
 #if SPC_BRRCACHE
     this->oldsize = 0;
     for ( int i = 0; i < 256; i++ )
-        this->wave_entry [i].start_addr = -1;
+        this->wave_entry [i].start_addr = 0xffff;
 #endif /* SPC_BRRCACHE */
 
 #if !SPC_NOECHO

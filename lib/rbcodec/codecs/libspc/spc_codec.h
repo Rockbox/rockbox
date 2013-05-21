@@ -272,18 +272,21 @@ enum state_t
     state_release = 2
 };
 
-struct cache_entry_t
-{
-    int16_t const* samples;
-    unsigned end; /* past-the-end position */
-    unsigned loop; /* number of samples in loop */
-    unsigned start_addr;
-};
-
 enum { BRR_BLOCK_SIZE = 16 };
-enum { BRR_CACHE_SIZE = 0x20000 + 32};
 
 #if SPC_BRRCACHE
+struct cache_entry_t
+{
+    int16_t const* samples; /* decoded samples (cached) */
+    unsigned end;          /* past-the-end position (cached) */
+    unsigned loop;         /* number of samples in loop (cached) */
+    uint16_t start_addr;   /* RAM start address */
+    uint16_t loop_addr;    /* RAM loop address */
+    uint8_t  block_header; /* final wave block header */
+};
+
+enum { BRR_CACHE_SIZE = 0x20000 + 32};
+
 struct voice_wave_t
 {
     int16_t const* samples; /* decoded samples in cache */
@@ -291,7 +294,7 @@ struct voice_wave_t
     long end;              /* end position in samples buffer */
     int loop;              /* length of looping area */
     unsigned block_header; /* header byte from current BRR block */
-    uint8_t const* addr;   /* BRR waveform address in RAM */
+    unsigned start_addr;   /* BRR waveform address in RAM */
     unsigned loop_addr;    /* Loop address in RAM */
 };
 #else /* !SPC_BRRCACHE */
@@ -300,7 +303,7 @@ struct voice_wave_t
     int16_t samples [3 + BRR_BLOCK_SIZE + 1]; /* last decoded block */
     int32_t position;      /* position in samples buffer, 12-bit frac */
     unsigned block_header; /* header byte from current BRR block */
-    uint8_t const* addr;   /* BRR waveform address in RAM */
+    unsigned start_addr;   /* BRR waveform address in RAM */
 };
 #endif /* SPC_BRRCACHE */
 
@@ -359,7 +362,7 @@ struct Spc_Dsp
 #endif /* !SPC_NOECHO */
     
 #if SPC_BRRCACHE
-    uint8_t oldsize;
+    unsigned oldsize;
     struct cache_entry_t wave_entry     [256];
     struct cache_entry_t wave_entry_old [256];
 #endif
