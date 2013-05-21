@@ -385,17 +385,17 @@ enum codec_status codec_run(void)
                 stream_init = 1;
             }
 
-            /* Do this to avoid allocating space for huge comment packets
-               (embedded Album Art) */
-            if(os.packetno == 1){
-              ogg_sync_reset(&oy);
-            }
-
             /* Add page to the bitstream */
             ogg_stream_pagein(&os, &og);
 
             page_granule = ogg_page_granulepos(&og);
             granule_pos = page_granule;
+
+            /* Do this to avoid allocating space for huge comment packets
+               (embedded Album Art) */
+            if(os.packetno == 1 && ogg_stream_packetpeek(&os, &op) != 1){
+              ogg_sync_reset(&oy);
+            }
 
             while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
                 if (op.packetno == 0){
