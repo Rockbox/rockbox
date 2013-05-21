@@ -904,7 +904,6 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 void DSP_reset( struct Spc_Dsp* this )
 {
     this->keys_down   = 0;
-    this->echo_pos    = 0;
     this->noise_count = 0;
     this->noise       = 2;
     
@@ -927,6 +926,7 @@ void DSP_reset( struct Spc_Dsp* this )
 #endif /* SPC_BRRCACHE */
 
 #if !SPC_NOECHO
+    this->echo_pos = 0;
     echo_init(this);
 #endif /* SPC_NOECHO */
 
