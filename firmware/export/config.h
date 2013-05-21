@@ -1063,9 +1063,9 @@ Lyre prototype 1 */
 #define NOCACHEDATA_ATTR
 #endif
 
-#define IF_COP(...)
-#define IF_COP_VOID(...)    void
-#define IF_COP_CORE(core)   CURRENT_CORE
+#define IF_COP(...)         __VA_ARGS__
+#define IF_COP_VOID(...)    __VA_ARGS__
+#define IF_COP_CORE(core)   core
 
 #endif /* NUM_CORES */
 

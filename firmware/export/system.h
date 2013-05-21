@@ -23,7 +23,8 @@
 #define __SYSTEM_H__
 
 #include "cpu.h"
-#include "stdbool.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include "kernel.h"
 #include "gcc_extensions.h" /* for LIKELY/UNLIKELY */
 
@@ -98,7 +99,9 @@ int get_cpu_boost_counter(void);
 #endif
 
 /* return number of elements in array a */
+#ifndef ARRAYLEN
 #define ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
+#endif
 
 /* return p incremented by specified number of bytes */
 #define SKIPBYTES(p, count) ((typeof (p))((char *)(p) + (count)))

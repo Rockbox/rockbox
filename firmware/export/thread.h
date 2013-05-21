@@ -22,6 +22,7 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#if 0
 #include "config.h"
 #include <inttypes.h>
 #include <stddef.h>
@@ -403,6 +404,8 @@ void thread_get_name(char *buffer, int size,
                      struct thread_entry *thread);
 #ifdef RB_PROFILE
 void profile_thread(void);
+#endif
+
 #endif
 
 #endif /* THREAD_H */

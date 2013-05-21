@@ -57,7 +57,7 @@
          logically separate the two functions. I won't go that far just yet. */
 
 /* Internal support for voice playback */
-#define PLAYBACK_VOICE
+//~ #define PLAYBACK_VOICE
 
 #if CONFIG_PLATFORM & PLATFORM_NATIVE
 /* Application builds don't support direct code loading */
@@ -156,7 +156,7 @@ static struct mp3entry static_id3_entries[ID3_TYPE_NUM_STATIC]; /* (A,O) */
 static struct mutex id3_mutex SHAREDBSS_ATTR; /* (A,O)*/
 
 /** For album art support **/
-#define MAX_MULTIPLE_AA SKINNABLE_SCREENS_COUNT
+#define MAX_MULTIPLE_AA 2//SKINNABLE_SCREENS_COUNT
 #ifdef HAVE_ALBUMART
 
 static struct albumart_slot
@@ -748,13 +748,13 @@ static void audio_reset_buffer_noalloc(
 
     /* Subtract whatever voice needs (we're called when promoting
                                       the state only) */
-    allocsize = talkbuf_init(filebuf);
-    allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
-    if (allocsize > filebuflen)
-        goto bufpanic;
-
-    filebuf += allocsize;
-    filebuflen -= allocsize;
+    //~ allocsize = talkbuf_init(filebuf);
+    //~ allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
+    //~ if (allocsize > filebuflen)
+        //~ goto bufpanic;
+//~ 
+    //~ filebuf += allocsize;
+    //~ filebuflen -= allocsize;
 
     if (state == AUDIOBUF_STATE_INITIALIZED)
     {
@@ -1516,6 +1516,7 @@ static bool audio_load_cuesheet(struct track_info *info,
     struct cuesheet *cue = get_current_cuesheet();
     track_id3->cuesheet = NULL;
 
+#if 0
     if (cue && info->cuesheet_hid == ERR_HANDLE_NOT_FOUND)
     {
         /* If error other than a full buffer, then mark it "unsupported" to
@@ -1565,6 +1566,7 @@ static bool audio_load_cuesheet(struct track_info *info,
             info->cuesheet_hid = hid;
         }
     }
+#endif
 
     return true;
 }
@@ -2511,7 +2513,7 @@ static void audio_start_playback(size_t offset, unsigned int flags)
         audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
-        sound_set_volume(global_settings.volume);
+        //~ sound_set_volume(global_settings.volume);
 #endif
 #ifdef HAVE_PLAY_FREQ
         settings_apply_play_freq(global_settings.play_frequency, true);
@@ -3013,7 +3015,7 @@ void audio_playback_handler(struct queue_event *ev)
         /* So we can go straight from playback to recording */
         case Q_AUDIO_INIT_RECORDING:
 #endif
-        case SYS_USB_CONNECTED:
+        //~ case SYS_USB_CONNECTED:
         case Q_AUDIO_STOP:
             LOGFQUEUE("playback < Q_AUDIO_STOP");
             audio_stop_playback();
@@ -3188,7 +3190,7 @@ static void buffer_event_finished_callback(void *data)
 
     case TYPE_PACKET_AUDIO:
         /* Strip any useless trailing tags that are left. */
-        strip_tags(hid);
+        //~ strip_tags(hid);
         /* Fall-through */
     case TYPE_ATOMIC_AUDIO:
         LOGFQUEUE("buffering > audio Q_AUDIO_HANDLE_FINISHED: %d", hid);
@@ -3436,7 +3438,7 @@ void audio_skip(int offset)
            processed one */
         skip_offset = accum;
 
-        system_sound_play(SOUND_TRACK_SKIP);
+        //~ system_sound_play(SOUND_TRACK_SKIP);
 
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP %d", offset);
 
@@ -3456,7 +3458,7 @@ void audio_skip(int offset)
     else
     {
         /* No more tracks */
-        system_sound_play(SOUND_TRACK_NO_MORE);
+        //~ system_sound_play(SOUND_TRACK_NO_MORE);
     }
 
     id3_mutex_unlock();
@@ -3515,6 +3517,8 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     unsigned char *buf;
 
+#if 0
+
     if (audio_is_initialized && thread_self() != audio_thread_id)
     {
         audio_hard_stop();
@@ -3570,6 +3574,9 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 
     *buffer_size = filebuflen;
     return buf;
+#else
+    return NULL;
+#endif
 }
 
 /* Restore audio buffer to a particular state (promoting status) */

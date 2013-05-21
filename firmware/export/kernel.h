@@ -21,6 +21,7 @@
 #ifndef _KERNEL_H_
 #define _KERNEL_H_
 
+#if 0
 #include <stdbool.h>
 #include <inttypes.h>
 #include "config.h"
@@ -105,9 +106,9 @@ struct queue_sender_list
     struct thread_entry *list;                  /* list of senders in map */
     /* Send info for last message dequeued or NULL if replied or not sent */
     struct thread_entry * volatile curr_sender;
-#ifdef HAVE_PRIORITY_SCHEDULING
-    struct blocker blocker;
-#endif
+//~ #ifdef HAVE_PRIORITY_SCHEDULING
+    //~ struct blocker blocker;
+//~ #endif
 };
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
@@ -281,5 +282,10 @@ extern void semaphore_init(struct semaphore *s, int max, int start);
 extern int  semaphore_wait(struct semaphore *s, int timeout);
 extern void semaphore_release(struct semaphore *s);
 #endif /* HAVE_SEMAPHORE_OBJECTS */
+
+#else
+#include "locking.h"
+#include "thread.h"
+#endif
 
 #endif /* _KERNEL_H_ */

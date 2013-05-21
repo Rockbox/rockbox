@@ -175,7 +175,7 @@ static void ab_draw_vertical_line_mark(struct screen * screen,
 
 #define DIRECTION_RIGHT 1
 #define DIRECTION_LEFT -1
-
+#if 0
 static void ab_draw_arrow_mark(struct screen * screen,
                                       int x, int y, int h, int direction)
 {
@@ -220,5 +220,6 @@ void ab_draw_markers(struct screen * screen, int capacity,
 }
 
 #endif /* HAVE_LCD_BITMAP */
+#endif
 
 #endif /* AB_REPEAT_ENABLE */

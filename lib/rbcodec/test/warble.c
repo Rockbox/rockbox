@@ -41,6 +41,9 @@
 #include "kernel.h"
 #include "platform.h"
 
+#include "libwrappers.h"
+#include "playlist.h"
+
 /***************** EXPORTED *****************/
 
 struct user_settings global_settings;
@@ -48,18 +51,6 @@ struct user_settings global_settings;
 int set_irq_level(int level)
 {
     return 0;
-}
-
-void mutex_init(struct mutex *m)
-{
-}
-
-void mutex_lock(struct mutex *m)
-{
-}
-
-void mutex_unlock(struct mutex *m)
-{
 }
 
 void debugf(const char *fmt, ...)
@@ -603,7 +594,7 @@ static bool ci_should_loop(void)
 
 static unsigned ci_sleep(unsigned ticks)
 {
-    return 0;
+    return sleep(ticks);
 }
 
 static void ci_debugf(const char *fmt, ...)
@@ -857,6 +848,7 @@ static void print_help(const char *progname)
                     , progname, progname, progname, progname);
 }
 
+#if 0
 int main(int argc, char **argv)
 {
     int opt;
@@ -904,3 +896,69 @@ int main(int argc, char **argv)
 
     return 0;
 }
+#else
+int main(int argc, const char **argv)
+{
+    int i;
+    init_library();
+
+    if (argc < 2)
+        return 0;
+
+    playlist_create("/", NULL);
+
+    for (i = 1, argv; i < argc; ++i)
+        playlist_add(argv[i]);
+
+    playlist_start(0, 0);
+
+
+    while(1)
+    {
+        switch (getc(stdin))
+        {
+            case 'n': audio_next(); break;
+            case 'p': audio_prev(); break;
+            case 'h': audio_pause(); break;
+            case 's': audio_resume(); break;
+            case 'q': audio_stop(); return 0;
+        }
+    }
+}
+#endif
+
+#include <dlfcn.h>
+
+void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
+{
+    return dlopen(filename, RTLD_NOW);
+}
+
+void *lc_get_header(void *handle)
+{
+    char *ret = dlsym(handle, "__header");
+    if (ret == NULL)
+        ret = dlsym(handle, "___header");
+
+    return ret;
+}
+
+void lc_close(void *handle)
+{
+    dlclose(handle);
+}
+
+void *lc_open_from_mem(void *addr, size_t blob_size)
+{
+    (void)addr;
+    (void)blob_size;
+    /* we don't support loading code from memory on application builds,
+     * it doesn't make sense (since it means writing the blob to disk again and
+     * then falling back to load from disk) and requires the ability to write
+     * to an executable directory */
+    return NULL;
+}
+
+struct system_status global_status;
+
+void cpu_boost(bool onoff) {}

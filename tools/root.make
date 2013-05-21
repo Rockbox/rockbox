@@ -110,6 +110,7 @@ else ifneq (,$(findstring warble,$(APP_TYPE)))
   include $(ROOTDIR)/lib/rbcodec/test/warble.make
   include $(ROOTDIR)/lib/tlsf/libtlsf.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
+  include $(ROOTDIR)/lib/queuelib/queuelib.make
 else # core
   include $(APPSDIR)/apps.make
   include $(APPSDIR)/lang/lang.make
