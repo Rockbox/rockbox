@@ -351,11 +351,6 @@ prefetch_abort_handler:
     mov     r1, #1
     b       UIE
 
-data_abort_handler:
-    sub     r0, lr, #8 
-    mov     r1, #2
-    b       UIE
-
 /* should never happen in the bootloader */
 fiq_handler:
     subs    pc, lr, #4
