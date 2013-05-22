@@ -82,6 +82,7 @@
 #define IBSS_ATTR_SPC               IBSS_ATTR
 #define ICODE_ATTR_SPC              ICODE_ATTR
 #define ICONST_ATTR_SPC             ICONST_ATTR
+#define IDATA_ATTR_SPC              IDATA_ATTR
 /* Not enough IRAM available to move further data to it. */
 #define IBSS_ATTR_SPC_LARGE_IRAM
 
@@ -90,6 +91,7 @@
 #define IBSS_ATTR_SPC
 #define ICODE_ATTR_SPC
 #define ICONST_ATTR_SPC
+#define IDATA_ATTR_SPC
 /* Not enough IRAM available to move further data to it. */
 #define IBSS_ATTR_SPC_LARGE_IRAM
 
@@ -97,6 +99,7 @@
 #define IBSS_ATTR_SPC               IBSS_ATTR
 #define ICODE_ATTR_SPC              ICODE_ATTR
 #define ICONST_ATTR_SPC             ICONST_ATTR
+#define IDATA_ATTR_SPC              IDATA_ATTR
 /* Not enough IRAM available to move further data to it. */
 #define IBSS_ATTR_SPC_LARGE_IRAM
 
@@ -104,6 +107,7 @@
 #define IBSS_ATTR_SPC               IBSS_ATTR
 #define ICODE_ATTR_SPC              ICODE_ATTR
 #define ICONST_ATTR_SPC             ICONST_ATTR
+#define IDATA_ATTR_SPC              IDATA_ATTR
 /* Very large IRAM. Move even more data to it. */
 #define IBSS_ATTR_SPC_LARGE_IRAM    IBSS_ATTR
 
@@ -111,6 +115,7 @@
 #define IBSS_ATTR_SPC               IBSS_ATTR
 #define ICODE_ATTR_SPC              ICODE_ATTR
 #define ICONST_ATTR_SPC             ICONST_ATTR
+#define IDATA_ATTR_SPC              IDATA_ATTR
 /* Not enough IRAM available to move further data to it. */
 #define IBSS_ATTR_SPC_LARGE_IRAM
 #endif
@@ -318,6 +323,8 @@ struct Spc_Dsp;
 #if defined(CPU_ARM)
 #if ARM_ARCH >= 6
 #include "cpu/spc_dsp_armv6.h"
+#elif ARM_ARCH >= 5
+#include "cpu/spc_dsp_armv5.h"
 #else
 #include "cpu/spc_dsp_armv4.h"
 #endif
@@ -328,6 +335,10 @@ struct Spc_Dsp;
 /* Above may still use generic implementations. Also defines final 
    function names. */
 #include "spc_dsp_generic.h"
+
+#if !SPC_NOINTERP && !defined (GAUSS_TABLE_SCALE)
+#define GAUSS_TABLE_SCALE 0
+#endif
 
 struct Spc_Dsp
 {

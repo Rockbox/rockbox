@@ -32,6 +32,8 @@
 #if defined(CPU_ARM)
 #if ARM_ARCH >= 6
 #include "cpu/spc_dsp_armv6.c"
+#elif ARM_ARCH >= 5
+#include "cpu/spc_dsp_armv5.c"
 #else
 #include "cpu/spc_dsp_armv4.c"
 #endif
@@ -55,7 +57,7 @@ static unsigned short const env_rates [0x20] ICONST_ATTR_SPC =
 #if !SPC_NOINTERP
 /* Interleved gauss table (to improve cache coherency). */
 /* gauss [i * 2 + j] = normal_gauss [(1 - j) * 256 + i] */
-static int16_t const gauss_table [512] ICONST_ATTR_SPC MEM_ALIGN_ATTR =
+static int16_t gauss_table [512] IDATA_ATTR_SPC MEM_ALIGN_ATTR =
 {
     370,1305, 366,1305, 362,1304, 358,1304,
     354,1304, 351,1304, 347,1304, 343,1303,
@@ -955,6 +957,15 @@ void DSP_reset( struct Spc_Dsp* this )
     for ( int i = 0; i < 256; i++ )
         this->wave_entry [i].start_addr = 0xffff;
 #endif /* SPC_BRRCACHE */
+
+#if !SPC_NOINTERP && GAUSS_TABLE_SCALE
+    if (gauss_table[0] == 370)
+    {
+        /* Not yet scaled */
+        for ( int i = 0; i < 512; i++)
+            gauss_table[i] <<= GAUSS_TABLE_SCALE;
+    }
+#endif /* !SPC_NOINTERP && GAUSS_TABLE_SCALE */
 
 #if !SPC_NOECHO
     this->echo_pos = 0;
