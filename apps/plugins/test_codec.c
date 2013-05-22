@@ -910,8 +910,6 @@ menu:
                         boost_settings, 2, NULL);
         goto menu;
     }
-    if(boost)
-        rb->cpu_boost(true);
 #endif
 
     if (result == QUIT)
@@ -963,6 +961,11 @@ menu:
         goto exit;
     }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    if (boost)
+        rb->cpu_boost(true);
+#endif
+
     if (scandir) {
         /* Test all files in the same directory as the file selected by the
            user */
@@ -1003,12 +1006,13 @@ menu:
             log_text("Wrote /test.wav",true);
         }
     }
-    plugin_quit();
 
-    #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        if(boost)
-          rb->cpu_boost(false);
-    #endif
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    if (boost)
+        rb->cpu_boost(false);
+#endif
+
+    plugin_quit();
 
     rb->button_clear_queue();
     goto show_menu;
