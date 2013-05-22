@@ -84,6 +84,9 @@ static bool usb_hid = true;
 static bool usb_host_present = false;
 static int usb_num_acks_to_expect = 0;
 static long usb_last_broadcast_tick = 0;
+#ifdef HAVE_USB_POWER
+static bool usb_charging_only = false;
+#endif
 
 #if defined(USB_FIREWIRE_HANDLING) \
     || (defined(HAVE_USBSTACK) && !defined(USE_ROCKBOX_USB))
@@ -127,13 +130,15 @@ static inline bool usb_do_screendump(void)
 #endif /* HAVE_LCD_BITMAP */
 
 /* Power (charging-only) button */
-static inline bool usb_power_button(void)
+static inline void usb_detect_charging_only(bool detect)
 {
 #ifdef HAVE_USB_POWER
-    return (button_status() & ~USBPOWER_BTN_IGNORE);
-#else
-    return false;
+    if (detect)
+        detect = button_status() & ~USBPOWER_BTN_IGNORE;
+
+    usb_charging_only = detect;
 #endif
+    (void)detect;
 }
 
 #ifdef USB_FIREWIRE_HANDLING
@@ -375,12 +380,14 @@ static void usb_set_host_present(bool present)
         return;
     }
 
-    if(usb_power_button())
+#ifdef HAVE_USB_POWER
+    if (usb_charging_only)
     {
         /* Only charging is desired */
         usb_configure_drivers(USB_POWERED);
         return;
     }
+#endif
 
     if(!usb_configure_drivers(USB_INSERTED))
         return; /* Exclusive storage access not required */
@@ -470,6 +477,8 @@ static void NORETURN_ATTR usb_thread(void)
             usb_state = USB_POWERED;
             usb_stack_enable(true);
 
+            usb_detect_charging_only(true);
+
 #ifndef USB_DETECT_BY_REQUEST
             usb_set_host_present(true);
 #endif
@@ -496,6 +505,7 @@ static void NORETURN_ATTR usb_thread(void)
 
             usb_state = USB_EXTRACTED;
 
+            usb_detect_charging_only(false);
             usb_set_host_present(false);
             break;
             /* USB_EXTRACTED: */
