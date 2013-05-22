@@ -41,53 +41,41 @@
 #define ARM_ARCH 0
 #endif
 
-#define SPC_DUAL_CORE 1
-
-#if !defined(SPC_DUAL_CORE) || NUM_CORES == 1
-#undef  SPC_DUAL_CORE
+#if NUM_CORES == 1
 #define SPC_DUAL_CORE 0
+#else
+#define SPC_DUAL_CORE 1
 #endif
 
-/* Only some targets are fast enough for gaussian and realtime BRR decode */
-#if CONFIG_CPU == S3C2440 || CONFIG_CPU == IMX31L || \
-    CONFIG_CPU == AS3525 || CONFIG_CPU == AS3525v2 || \
-    defined(CPU_S5L870X) || \
-    (CONFIG_PLATFORM & PLATFORM_HOSTED) || MEMORYSIZE <= 2
-    /* Don't cache BRR waves */
-    #define SPC_BRRCACHE 0 
-    
-    /* Allow gaussian interpolation */
-    #define SPC_NOINTERP 0
-
-    /* Allow echo processing */
-    #define SPC_NOECHO 0
-#elif defined(CPU_COLDFIRE)
+/* Only some targets are too slow for gaussian and realtime BRR decode */
+#if defined(CPU_COLDFIRE)
     /* Cache BRR waves */
     #define SPC_BRRCACHE 1 
-    
     /* Disable gaussian interpolation */
     #define SPC_NOINTERP 1
-
-    /* Allow echo processing */
-    #define SPC_NOECHO 0
-#elif defined (CPU_PP) && SPC_DUAL_CORE
+#elif defined (CPU_PP)
     /* Cache BRR waves */
     #define SPC_BRRCACHE 1 
-    
     /* Disable gaussian interpolation */
     #define SPC_NOINTERP 1
-
-    /* Allow echo processing */
-    #define SPC_NOECHO 0
-#else
-    /* Cache BRR waves */
-    #define SPC_BRRCACHE 1 
-    
-    /* Disable gaussian interpolation */
-    #define SPC_NOINTERP 1
-
+#if !SPC_DUAL_CORE
     /* Disable echo processing */
     #define SPC_NOECHO 1
+#endif
+#endif /* CPU_* */
+
+/** Turn on, by default, all the good stuff **/
+#ifndef SPC_BRRCACHE
+    /* Don't cache BRR waves */
+    #define SPC_BRRCACHE 0
+#endif
+#ifndef SPC_NOINTERP
+    /* Allow gaussian interpolation */
+    #define SPC_NOINTERP 0
+#endif
+#ifndef SPC_NOECHO
+    /* Allow echo processing */
+    #define SPC_NOECHO 0
 #endif
 
 #if   (CONFIG_CPU == MCF5250)
