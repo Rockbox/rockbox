@@ -203,11 +203,6 @@ fiq_handler:
     ldmfd sp!, {r0-r7, r12, lr}
     subs pc, lr, #4
 
-data_abort_handler:
-    sub    r0, lr, #8 
-    mov    r1, #2
-    b      UIE
-
 irq_handler:
 #ifndef STUB
     stmfd  sp!, {r0-r11, r12, lr}
