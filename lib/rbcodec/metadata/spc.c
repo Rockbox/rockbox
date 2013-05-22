@@ -121,6 +121,8 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
         fade=5*1000; /* 5 seconds */
     }
     
+    id3->bitrate = 1536; /* 32kHz * 24bits/ch / 1000 */
+    id3->frequency = 32000;
     id3->length = length+fade;
 
     id3->filesize = filesize(fd);
