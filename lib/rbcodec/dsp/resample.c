@@ -50,7 +50,8 @@ static struct resample_data
     int32_t  history[2][3]; /* 08h: Last samples for interpolation (L+R)
                                     0 = oldest, 2 = newest */
                             /* 20h */
-    int32_t  frequency;     /* Virtual samplerate */
+    int32_t  frequency;     /* Virtual input samplerate */
+    int32_t  frequency_out; /* Resampler output samplerate */
     struct dsp_buffer resample_buf; /* Buffer descriptor for resampled data */
     int32_t *resample_out_p[2]; /* Actual output buffer pointers */
 } resample_data[DSP_COUNT] IBSS_ATTR;
@@ -73,14 +74,16 @@ static void resample_flush(struct dsp_proc_entry *this)
 }
 
 static bool resample_new_delta(struct resample_data *data,
-                               struct sample_format *format)
+                               struct sample_format *format,
+                               int32_t fout)
 {
     int32_t frequency = format->frequency; /* virtual samplerate */
 
     data->frequency = frequency;
-    data->delta = fp_div(frequency, NATIVE_FREQUENCY, 16);
+    data->frequency_out = fout;
+    data->delta = fp_div(frequency, fout, 16);
 
-    if (frequency == NATIVE_FREQUENCY)
+    if (frequency == data->frequency_out)
     {
         /* NOTE: If fully glitch-free transistions from no resampling to
            resampling are desired, history should be maintained even when
@@ -233,19 +236,21 @@ static intptr_t resample_new_format(struct dsp_proc_entry *this,
     DSP_PRINT_FORMAT(DSP_PROC_RESAMPLE, *format);
 
     int32_t frequency = data->frequency;
+    int32_t fout = dsp_configure(dsp, DSP_GET_OUT_FREQUENCY, 0);
     bool active = dsp_proc_active(dsp, DSP_PROC_RESAMPLE);
 
-    if (format->frequency != frequency)
+    if (format->frequency != frequency || data->frequency_out != fout)
     {
-        DEBUGF("  DSP_PROC_RESAMPLE- new delta\n");
-        active = resample_new_delta(data, format);
+        DEBUGF("  DSP_PROC_RESAMPLE- new settings: %d %d\n",
+               (int)format->frequency, (int)fout);
+        active = resample_new_delta(data, format, fout);
         dsp_proc_activate(dsp, DSP_PROC_RESAMPLE, active);
     }
 
-    /* Everything after us is NATIVE_FREQUENCY */
+    /* Everything after us is fout */
     dst->format = *format;
-    dst->format.frequency = NATIVE_FREQUENCY;
-    dst->format.codec_frequency = NATIVE_FREQUENCY;
+    dst->format.frequency = fout;
+    dst->format.codec_frequency = fout;
 
     if (active)
         return PROC_NEW_FORMAT_OK;
@@ -287,8 +292,10 @@ static void INIT_ATTR resample_dsp_init(struct dsp_config *dsp,
 static void INIT_ATTR resample_proc_init(struct dsp_proc_entry *this,
                                          struct dsp_config *dsp)
 {
+    struct resample_data *data = (void *)this->data;
     dsp_proc_set_in_place(dsp, DSP_PROC_RESAMPLE, false);
     this->data = (intptr_t)&resample_data[dsp_get_id(dsp)];
+    data->frequency_out = DSP_OUT_DEFAULT_HZ;
     this->process = resample_process;
 }
 
@@ -321,6 +328,10 @@ static intptr_t resample_configure(struct dsp_proc_entry *this,
 
     case DSP_PROC_NEW_FORMAT:
         retval = resample_new_format(this, dsp, (struct sample_format *)value);
+        break;
+
+    case DSP_SET_OUT_FREQUENCY:
+        dsp_proc_want_format_update(dsp, DSP_PROC_RESAMPLE);
         break;
     }
 

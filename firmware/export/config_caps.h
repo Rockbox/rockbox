@@ -116,3 +116,14 @@
 #endif
 
 #endif /* HAVE_RECORDING */
+
+/* Samplerate config */
+#define PCM_SAMPR_CONFIG_ONLY /* no C code */
+#include "pcm_sampr.h"
+#undef PCM_SAMPR_CONFIG_ONLY
+
+#if HW_SAMPR_CAPS & (SAMPR_CAP_96 | SAMPR_CAP_88 | \
+                     SAMPR_CAP_64 | SAMPR_CAP_48)
+#define HAVE_PLAY_FREQ
+#endif /* caps > 44 */
+

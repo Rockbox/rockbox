@@ -2045,8 +2045,11 @@ static int audio_fill_file_buffer(void)
     /* Must reset the buffer before use if trashed or voice only - voice
        file size shouldn't have changed so we can go straight from
        AUDIOBUF_STATE_VOICED_ONLY to AUDIOBUF_STATE_INITIALIZED */
-    if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
+    if (buffer_state != AUDIOBUF_STATE_INITIALIZED ||
+        !pcmbuf_is_same_size())
+    {
         audio_reset_buffer(AUDIOBUF_STATE_INITIALIZED);
+    }
 
     logf("Starting buffer fill");
 

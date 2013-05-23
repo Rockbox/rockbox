@@ -85,6 +85,10 @@ struct system_status global_status;
 #ifdef HAVE_RECORDING
 #include "enc_config.h"
 #endif
+#include "pcm_sampr.h"
+#ifdef HAVE_PLAY_FREQ
+#include "pcm_mixer.h"
+#endif
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #define NVRAM_BLOCK_SIZE 44
@@ -720,6 +724,42 @@ void settings_apply_pm_range(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
+#ifdef HAVE_PLAY_FREQ
+void settings_apply_play_freq(int value)
+{
+    static const unsigned long play_sampr[] =
+    {
+        HW_HAVE_44_( SAMPR_44,)
+        HW_HAVE_48_( SAMPR_48,)
+        HW_HAVE_64_( SAMPR_64,)
+        HW_HAVE_88_( SAMPR_88,)
+        HW_HAVE_96_( SAMPR_96,)
+    };
+
+    if ((unsigned)value >= ARRAYLEN(play_sampr))
+        value = 0;
+
+    unsigned long sampr = play_sampr[value];
+
+    long offset = audio_current_track()->offset;
+    bool playing = audio_status() == AUDIO_STATUS_PLAY;
+
+    if (playing)
+    {
+        struct mp3entry *id3 = audio_current_track();
+        offset = id3->offset;
+    }
+
+    audio_hard_stop();
+    mixer_set_samplerate(sampr);
+    dsp_set_output_frequency(sampr);
+
+    if (playing)
+        audio_play(offset);
+}
+#endif
+
+
 void sound_settings_apply(void)
 {
 #ifdef AUDIOHW_HAVE_BASS
@@ -870,6 +910,10 @@ void settings_apply(bool read_disk)
     peak_meter_init_times(
         global_settings.peak_meter_release, global_settings.peak_meter_hold,
         global_settings.peak_meter_clip_hold);
+#endif /* HAVE_LCD_BITMAP */
+
+#ifdef HAVE_PLAY_FREQ
+    settings_apply_play_freq(global_settings.play_frequency);
 #endif
 
 #ifdef HAVE_SPEAKER

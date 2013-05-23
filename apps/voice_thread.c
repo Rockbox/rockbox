@@ -32,7 +32,7 @@
 #include "pcm_mixer.h"
 #include "codecs/libspeex/speex/speex.h"
 
-/* Default number of native-frequency PCM frames to queue - adjust as
+/* Default number of dsp-frequency PCM frames to queue - adjust as
    necessary per-target */
 #define VOICE_FRAMES 4
 
@@ -85,8 +85,8 @@ static struct event_queue voice_queue SHAREDBSS_ATTR;
 static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
 static int quiet_counter SHAREDDATA_ATTR = 0;
 
-#define VOICE_PCM_FRAME_COUNT   ((NATIVE_FREQUENCY*VOICE_FRAME_COUNT + \
-                                 VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
+#define VOICE_PCM_FRAME_COUNT   ((DSP_OUT_MAX_HZ*VOICE_FRAME_COUNT + \
+                                  VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
 #define VOICE_PCM_FRAME_SIZE    (VOICE_PCM_FRAME_COUNT*2*sizeof (int16_t))
 
 /* Voice processing states */

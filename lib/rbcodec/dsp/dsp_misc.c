@@ -134,6 +134,24 @@ int32_t dsp_get_pitch(void)
 }
 #endif /* HAVE_PITCHCONTROL */
 
+/* Set output samplerate on all DSPs - convenience function */
+void dsp_set_output_frequency(int samplerate)
+{
+
+    struct dsp_config *dsp;
+    for (int i = 0; (dsp = dsp_get_config(i)); i++)
+        dsp_configure(dsp, DSP_SET_OUT_FREQUENCY, samplerate);
+}
+
+/* Get last set frequency - only valid for all if set by
+   dsp_set_output_frequency or same rate has been set for all,
+   otherwise just dsp[0]. */
+int dsp_get_output_frequency(void)
+{
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    return dsp_configure(dsp, DSP_GET_OUT_FREQUENCY, 0);
+}
+
 static void INIT_ATTR misc_dsp_init(struct dsp_config *dsp,
                                     enum dsp_ids dsp_id)
 {
