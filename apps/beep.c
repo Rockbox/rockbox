@@ -21,10 +21,10 @@
 #include "config.h"
 #include "system.h"
 #include "settings.h"
-#include "dsp_core.h" /* for NATIVE_FREQUENCY */
 #include "pcm.h"
 #include "pcm_mixer.h"
 #include "misc.h"
+#include "fixedpoint.h"
 
 /** Beep generation, CPU optimized **/
 #include "asm/beep.c"
@@ -39,8 +39,10 @@ static uint32_t beep_amplitude; /* Amplitude of square wave generator */
 #endif
 static int beep_count;          /* Number of samples remaining to generate */
 
-/* Reserve enough static space for keyclick to fit */
-#define BEEP_BUF_COUNT (NATIVE_FREQUENCY / 1000 * KEYCLICK_DURATION)
+#define BEEP_COUNT(fs, duration) ((fs) / 1000 * (duration))
+
+/* Reserve enough static space for keyclick to fit in worst case */
+#define BEEP_BUF_COUNT  BEEP_COUNT(PLAY_SAMPR_MAX, KEYCLICK_DURATION)
 static int16_t beep_buf[BEEP_BUF_COUNT*2] IBSS_ATTR __attribute__((aligned(4)));
 
 /* Callback to generate the beep frames - also don't want inlining of
@@ -75,9 +77,10 @@ void beep_play(unsigned int frequency, unsigned int duration,
         amplitude = INT16_MAX;
 
     /* Setup the parameters for the square wave generator */
+    uint32_t fout = mixer_get_frequency();
     beep_phase = 0;
-    beep_step = 0xffffffffu / NATIVE_FREQUENCY * frequency;
-    beep_count = NATIVE_FREQUENCY / 1000 * duration;
+    beep_step = fp_div(frequency, fout, 32);
+    beep_count = BEEP_COUNT(fout, duration);
 
 #ifdef BEEP_GENERIC
     beep_amplitude = amplitude;

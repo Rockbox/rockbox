@@ -13156,3 +13156,20 @@
     *: "Slow"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PLAYBACK_FREQUENCY
+  desc: in playback settings (merge with LANG_RECORDING_FREQUENCY if cleaning) 
+  user: core
+  <source>
+    *: none
+    play_frequency: "Frequency"
+  </source>
+  <dest>
+    *: none
+    play_frequency: "Frequency"
+  </dest>
+  <voice>
+    *: none
+    play_frequency: "Frequency"
+  </voice>
+</phrase>

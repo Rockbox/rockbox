@@ -37,6 +37,10 @@
 #include "misc.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
+#include "pcm_sampr.h"
+#ifdef HAVE_PLAY_FREQ
+#include "talk.h"
+#endif
 #endif
 
 
@@ -192,6 +196,10 @@ MENUITEM_SETTING(prevent_skip, &global_settings.prevent_skip, NULL);
 MENUITEM_SETTING(resume_rewind, &global_settings.resume_rewind, NULL);
 #endif
 MENUITEM_SETTING(pause_rewind, &global_settings.pause_rewind, NULL);
+#ifdef HAVE_PLAY_FREQ
+MENUITEM_SETTING(play_frequency, &global_settings.play_frequency,
+                 playback_callback);
+#endif
 
 MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
           Icon_Playback_menu,
@@ -217,12 +225,15 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #ifdef HAVE_HEADPHONE_DETECTION
          ,&unplug_menu
 #endif
-         ,&skip_length, &prevent_skip,
+         ,&skip_length, &prevent_skip
 
 #if CONFIG_CODEC == SWCODEC
-          &resume_rewind,
+          ,&resume_rewind
 #endif
-          &pause_rewind,
+          ,&pause_rewind
+#ifdef HAVE_PLAY_FREQ
+          ,&play_frequency
+#endif
          );
          
 static int playback_callback(int action,const struct menu_item_ex *this_item)
@@ -243,9 +254,19 @@ static int playback_callback(int action,const struct menu_item_ex *this_item)
             break;
 
         case ACTION_EXIT_MENUITEM: /* on exit */
+            /* Playing or not */
+#ifdef HAVE_PLAY_FREQ
+            if (this_item == &play_frequency)
+            {
+                settings_apply_play_freq(global_settings.play_frequency, false);
+                break;
+            }
+#endif /* HAVE_PLAY_FREQ */
+
             if (!(audio_status() & AUDIO_STATUS_PLAY))
                 break;
 
+            /* Playing only */
             if (this_item == &shuffle_item)
             {
                 if (old_shuffle == global_settings.playlist_shuffle)

@@ -196,55 +196,56 @@ crossfeed_process:
     @ to keep the count on the stack :/
     ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmfd   sp!, { r4-r11, lr }        @ stack modified regs
-    ldr     r12, [r1]                  @ r12 = buf->remcount
-    ldr     r14, [r0]                  @ r14 = this->data = &crossfeed_state
-    ldmib   r1, { r2-r3 }              @ r2 = buf->p32[0], r3 = buf->p32[1]
-    ldmia   r14!, { r4-r11 }           @ load direct gain and filter data
-    add     r0, r14, #13*2*4           @ calculate end of delay
-    stmfd   sp!, { r0, r12 }           @ stack end of delay adr, count and state
-    ldr     r0, [r0]                   @ fetch current delay line address
+    ldr     r0, [r0]                   @ r0 = this->data = &crossfeed_state
+    ldmia   r1, { r1-r3 }              @ r1 = buf->remcount, r2 = buf->p32[0],
+                                       @ r3 = buf->p32[1]
+    ldmia   r0, { r4-r12, r14 }        @ r4 = gain, r5-r7 = coeffs,
+                                       @ r8-r11 = history, r12 = index,
+                                       @ r14 = index_max
+    add     r0, r0, #0x28              @ r0 = state->delay
+    stmfd   sp!, { r0-r1, r14 }        @ stack state->delay, count, index_max
 
-    /* Register usage in loop:
-     * r0 = &delay[index][0], r1 = accumulator high, r2 = buf->p32[0],
+   /* Register usage in loop:
+     * r0 = acc low/count, r1 = acc high, r2 = buf->p32[0],
      * r3 = buf->p32[1], r4 = direct gain, r5-r7 = b0, b1, a1 (filter coefs),
-     * r8-r11 = filter history, r12 = temp, r14 = accumulator low
+     * r8 = dr[n-1], r9 = y_r[n-1], r10 = dl[n-1], r11 = y_l[n-1],
+     * r12 = index, r14 = scratch/index_max
      */
 .cfloop:
-    smull   r14, r1, r6, r8            @ acc = b1*dr[n - 1]
-    smlal   r14, r1, r7, r9            @ acc += a1*y_l[n - 1]
-    ldr     r8, [r0, #4]               @ r8 = dr[n]
-    smlal   r14, r1, r5, r8            @ acc += b0*dr[n]
-    mov     r9, r1, lsl #1             @ fix format for filter history
-    ldr     r12, [r2]                  @ load left input
-    smlal   r14, r1, r4, r12           @ acc += gain*x_l[n]
-    mov     r1, r1, lsl #1             @ fix format
+    smull   r0, r1, r6, r8             @ acc = b1*dr[n - 1]
+    ldr     r8, [r12, #4]              @ r8 = dr[n]
+    smlal   r0, r1, r7, r9             @ acc += a1*y_r[n - 1]
+    smlal   r0, r1, r5, r8             @ acc += b0*dr[n]
+    ldr     r14, [r2]                  @ load left input: x_l[n]
+    mov     r9, r1, asl #1             @ fix format for filter history
+    smlal   r0, r1, r4, r14            @ acc += gain*x_l[n]
+    mov     r1, r1, asl #1             @ fix format
     str     r1, [r2], #4               @ save result
-
-    smull   r14, r1, r6, r10           @ acc = b1*dl[n - 1]
-    smlal   r14, r1, r7, r11           @ acc += a1*y_r[n - 1]
-    ldr     r10, [r0]                  @ r10 = dl[n]
-    str     r12, [r0], #4              @ save left input to delay line
-    smlal   r14, r1, r5, r10           @ acc += b0*dl[n]
-    mov     r11, r1, lsl #1            @ fix format for filter history
-    ldr     r12, [r3]                  @ load right input
-    smlal   r14, r1, r4, r12           @ acc += gain*x_r[n]
-    str     r12, [r0], #4              @ save right input to delay line
-    mov     r1, r1, lsl #1             @ fix format
-    ldmia   sp, { r12, r14 }           @ fetch delay line end addr and count from stack
+    smull   r0, r1, r6, r10            @ acc = b1*dl[n - 1]
+    ldr     r10, [r12]                 @ r10 = dl[n]
+    smlal   r0, r1, r7, r11            @ acc += a1*y_l[n - 1]
+    smlal   r0, r1, r5, r10            @ acc += b0*dl[n]
+    str     r14, [r12], #4             @ save left input to delay line
+    ldr     r14, [r3]                  @ load right input: x_r[n]
+    mov     r11, r1, asl #1            @ fix format for filter history
+    smlal   r0, r1, r4, r14            @ acc += gain*x_r[n]
+    str     r14, [r12], #4             @ save right input to delay line
+    ldmib   sp, { r0, r14 }            @ fetch count and delay end
+    mov     r1, r1, asl #1             @ fix format
     str     r1, [r3], #4               @ save result
 
-    cmp     r0, r12                    @ need to wrap to start of delay?
-    subhs   r0, r12, #13*2*4           @ wrap back delay line ptr to start
+    cmp     r12, r14                   @ need to wrap to start of delay?
+    ldrhs   r12, [sp]                  @ wrap delay index
 
-    subs    r14, r14, #1               @ are we finished?
-    strgt   r14, [sp, #4]              @ nope, save count back to stack
+    subs    r0, r0, #1                 @ are we finished?
+    strgt   r0, [sp, #4]               @ save count to stack
     bgt     .cfloop
 
     @ save data back to struct
-    str     r0, [r12]                  @ save delay line index
-    sub     r12, r12, #13*2*4 + 4*4    @ r12 = data->history
-    stmia   r12, { r8-r11 }            @ save filter history
-    add     sp, sp, #8                 @ remove temp variables from stack
+    ldr     r0, [sp]                   @ fetch state->delay
+    sub     r0, r0, #0x18              @ save filter history and delay index
+    stmia   r0, { r8-r12 }             @
+    add     sp, sp, #12                @ remove temp variables from stack
     ldmpc   regs=r4-r11
     .size   crossfeed_process, .-crossfeed_process
 
@@ -260,8 +261,7 @@ crossfeed_meier_process:
     ldr     r0, [r0]                   @ r0 = this->data = &crossfeed_state
     stmfd   sp!, { r4-r10, lr }        @ stack non-volatile context
     ldmia   r1, { r1-r3 }              @ r1 = buf->remcout, r2=p32[0], r3=p32[1]
-    add     r0, r0, #16                @ r0 = &state->vcl
-    ldmia   r0, { r4-r8 }              @ r4 = vcl, r5 = vcr, r6 = vdiff
+    ldmib   r0, { r4-r8 }              @ r4 = vcl, r5 = vcr, r6 = vdiff
                                        @ r7 = coef1, r8 = coef2
 .cfm_loop:
     ldr     r12, [r2]                  @ r12 = lout
@@ -285,7 +285,7 @@ crossfeed_meier_process:
     sub     r5, r5, r12                @ r5 = vcr -= res2
     bgt     .cfm_loop                  @ more samples?
 
-    stmia   r0, { r4-r6 }              @ save vcl, vcr, vdiff
+    stmib   r0, { r4-r6 }              @ save vcl, vcr, vdiff
     ldmpc   regs=r4-r10                @ restore non-volatile context, return
     .size   crossfeed_meier_process, .-crossfeed_meier_process
 

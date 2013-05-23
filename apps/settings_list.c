@@ -807,6 +807,11 @@ const struct settings_list settings[] = {
                    ,ID2P(LANG_REPEAT_AB)
 #endif
                   ), /* CHOICE_SETTING( repeat_mode ) */
+#ifdef HAVE_PLAY_FREQ
+    STRINGCHOICE_SETTING(0, play_frequency, LANG_PLAYBACK_FREQUENCY, 0,
+        "playback frequency", "44.1 kHz,48 kHz", NULL, 2,
+        TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ)),
+#endif /* HAVE_PLAY_FREQ */
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST
     /* its easier to leave this one un-macro()ed for the time being */

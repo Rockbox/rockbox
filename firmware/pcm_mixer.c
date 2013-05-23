@@ -25,13 +25,14 @@
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
-#include "dsp_core.h" /* For NATIVE_FREQUENCY */
 
 /* Channels use standard-style PCM callback interface but a latency of one
    frame by double-buffering is introduced in order to facilitate mixing and
    keep the hardware fed. There must be sufficient time to perform operations
    before the last samples are sent to the codec and so things are done in
    parallel (as much as possible) with sending-out data. */
+
+static unsigned int mixer_sampr = HW_SAMPR_DEFAULT;
 
 /* Define this to nonzero to add a marker pulse at each frame start */
 #define FRAME_BOUNDARY_MARKERS 0
@@ -65,7 +66,7 @@ static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
 static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
 
 /* Number of silence frames to play after all data has played */
-#define MAX_IDLE_FRAMES     (NATIVE_FREQUENCY*3 / MIX_FRAME_SAMPLES)
+#define MAX_IDLE_FRAMES     (mixer_sampr*3 / MIX_FRAME_SAMPLES)
 static unsigned int idle_counter = 0;
 
 /** Mixing routines, CPU optmized **/
@@ -256,7 +257,7 @@ static void mixer_start_pcm(void)
 #endif
 
     /* Requires a shared global sample rate for all channels */
-    pcm_set_frequency(NATIVE_FREQUENCY);
+    pcm_set_frequency(mixer_sampr);
 
     /* Prepare initial frames and set up the double buffer */
     mixer_buffer_callback(PCM_DMAST_STARTED);
@@ -437,4 +438,24 @@ void mixer_reset(void)
         channel_stopped(*active_channels);
 
     idle_counter = 0;
+}
+
+/* Set output samplerate */
+void mixer_set_frequency(unsigned int samplerate)
+{
+    pcm_set_frequency(samplerate);
+    samplerate = pcm_get_frequency();
+
+    if (samplerate == mixer_sampr)
+        return;
+
+    /* All data is now invalid */
+    mixer_reset();
+    mixer_sampr = samplerate;
+}
+
+/* Get output samplerate */
+unsigned int mixer_get_frequency(void)
+{
+    return mixer_sampr;
 }

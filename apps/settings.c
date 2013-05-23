@@ -85,6 +85,11 @@ struct system_status global_status;
 #ifdef HAVE_RECORDING
 #include "enc_config.h"
 #endif
+#include "pcm_sampr.h"
+#ifdef HAVE_PLAY_FREQ
+#include "pcm_mixer.h"
+#include "dsp_core.h"
+#endif
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #define NVRAM_BLOCK_SIZE 44
@@ -720,6 +725,36 @@ void settings_apply_pm_range(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
+#ifdef HAVE_PLAY_FREQ
+void settings_apply_play_freq(int value, bool playback)
+{
+    static const unsigned long play_sampr[] = { SAMPR_44, SAMPR_48 };
+    static int prev_setting = 0;
+
+    if ((unsigned)value >= ARRAYLEN(play_sampr))
+        value = 0;
+
+    bool changed = value != prev_setting;
+    prev_setting = value;
+
+    long offset = 0;
+    bool playing = changed && !playback &&
+                   audio_status() == AUDIO_STATUS_PLAY;
+
+    if (playing)
+        offset = audio_current_track()->offset;
+
+    if (changed && !playback)
+        audio_hard_stop();
+
+    /* Other sub-areas of playback pick it up from the mixer */
+    mixer_set_frequency(play_sampr[value]);
+
+    if (playing)
+        audio_play(offset);
+}
+#endif /* HAVE_PLAY_FREQ */
+
 void sound_settings_apply(void)
 {
 #ifdef AUDIOHW_HAVE_BASS
@@ -976,6 +1011,9 @@ void settings_apply(bool read_disk)
     set_codepage(global_settings.default_codepage);
     CHART("<set_codepage");
 
+#ifdef HAVE_PLAY_FREQ
+    settings_apply_play_freq(global_settings.play_frequency, false);
+#endif
 #if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_CROSSFADE
     audio_set_crossfade(global_settings.crossfade);

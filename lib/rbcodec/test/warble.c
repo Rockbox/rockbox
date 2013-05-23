@@ -145,7 +145,7 @@ static void write_wav_header(void)
     if (use_dsp) {
         channels = 2;
         sample_size = 16;
-        freq = NATIVE_FREQUENCY;
+        freq = dsp_get_output_frequency(ci.dsp);
         type = WAVE_FORMAT_PCM;
     } else {
         channels = format.channels;
@@ -312,7 +312,7 @@ static void playback_start(void)
 {
     playback_running = true;
     SDL_AudioSpec spec = {0};
-    spec.freq = NATIVE_FREQUENCY;
+    spec.freq = dsp_get_output_frequency(ci.dsp);
     spec.format = AUDIO_S16SYS;
     spec.channels = 2;
     spec.samples = 0x400;
@@ -776,6 +776,7 @@ static void decode_file(const char *input_fn)
     ci.id3 = &id3;
     if (use_dsp) {
         ci.dsp = dsp_get_config(CODEC_IDX_AUDIO);
+        dsp_configure(ci.dsp, DSP_SET_OUT_FREQUENCY, DSP_OUT_DEFAULT_HZ);
         dsp_configure(ci.dsp, DSP_RESET, 0);
         dsp_dither_enable(false);
     }

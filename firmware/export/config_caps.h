@@ -116,3 +116,37 @@
 #endif
 
 #endif /* HAVE_RECORDING */
+
+/* Samplerate config */
+#define PCM_SAMPR_CONFIG_ONLY /* no C code */
+#include "pcm_sampr.h"
+#undef PCM_SAMPR_CONFIG_ONLY
+
+#define PLAY_SAMPR_CAPS (HW_SAMPR_CAPS & (SAMPR_CAP_44 | SAMPR_CAP_48))
+/**
+ * PLAY_SAMPR_MIN:     The minimum allowable samplerate for global playback.
+ *                     Music won't play at a lower rate.
+ * PLAY_SAMPR_MAX:     The maximum allowable samplerate for global playback.
+ *                     Music won't play at a faster rate.
+ * PLAY_SAMPR_DEFAULT: The default samplerate, unless configured otherwise.
+ * PLAY_SAMPR_HW_MIN:  The minimum allowable rate for some subsystems such
+ *                     as the DSP core. DSP never exceeds *MAX to lessen
+ *                     buffer allocation demands and overhead.
+ */
+#if PLAY_SAMPR_CAPS & (PLAY_SAMPR_CAPS - 1)
+#define HAVE_PLAY_FREQ
+# define PLAY_SAMPR_MIN     SAMPR_44
+# define PLAY_SAMPR_MAX     SAMPR_48
+# define PLAY_SAMPR_DEFAULT SAMPR_44
+# define PLAY_SAMPR_HW_MIN  HW_SAMPR_MIN
+#elif PLAY_SAMPR_CAPS & SAMPR_CAP_44
+# define PLAY_SAMPR_MIN     SAMPR_44
+# define PLAY_SAMPR_MAX     SAMPR_44
+# define PLAY_SAMPR_DEFAULT SAMPR_44
+# define PLAY_SAMPR_HW_MIN  HW_SAMPR_MIN
+#elif PLAY_SAMPR_CAPS & SAMPR_CAP_48
+# define PLAY_SAMPR_MIN     SAMPR_48
+# define PLAY_SAMPR_MAX     SAMPR_48
+# define PLAY_SAMPR_DEFAULT SAMPR_48
+# define PLAY_SAMPR_HW_MIN  HW_SAMPR_MIN
+#endif

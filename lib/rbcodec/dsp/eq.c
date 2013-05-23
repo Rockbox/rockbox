@@ -25,6 +25,7 @@
 #include "dsp_filter.h"
 #include "dsp_proc_entry.h"
 #include "dsp_core.h"
+#include "dsp_misc.h"
 #include "eq.h"
 #include "pga.h"
 #include "replaygain.h"
@@ -42,6 +43,9 @@
 #error Band count must be greater than or equal to 3
 #endif
 
+/* Cached band settings */
+static struct eq_band_setting settings[EQ_NUM_BANDS];
+
 static struct eq_state
 {
     uint32_t enabled;                        /* Mask of enabled bands */
@@ -49,14 +53,46 @@ static struct eq_state
     struct dsp_filter filters[EQ_NUM_BANDS]; /* Data for each filter */
 } eq_data IBSS_ATTR;
 
+#define FOR_EACH_ENB_BAND(b) \
+    for (uint8_t *b = eq_data.bands; *b < EQ_NUM_BANDS; b++)
+
 /* Clear histories of all enabled bands */
 static void eq_flush(void)
 {
     if (eq_data.enabled == 0)
         return; /* Not initialized yet/no bands on */
 
-    for (uint8_t *b = eq_data.bands; *b < EQ_NUM_BANDS; b++)
+    FOR_EACH_ENB_BAND(b)
         filter_flush(&eq_data.filters[*b]);
+}
+
+static void update_band_filter(int band, unsigned int fout)
+{
+    /* Convert user settings to format required by coef generator
+       functions */
+    typeof (filter_pk_coefs) *coef_gen = filter_pk_coefs;
+
+    /* Only first and last bands are not peaking filters */
+    if (band == 0)
+        coef_gen = filter_ls_coefs;
+    else if (band == EQ_NUM_BANDS-1)
+        coef_gen = filter_hs_coefs;
+
+    const struct eq_band_setting *setting = &settings[band];
+    struct dsp_filter *filter = &eq_data.filters[band];
+
+    coef_gen(fp_div(setting->cutoff, fout, 32), setting->q ?: 1,
+             setting->gain, filter);
+}
+
+/* Resync all bands to a new DSP output frequency */
+static void update_samplerate(unsigned int fout)
+{
+    if (eq_data.enabled == 0)
+        return; /* Not initialized yet/no bands on */
+
+    FOR_EACH_ENB_BAND(b)
+        update_band_filter(*b, fout);
 }
 
 /** DSP interface **/
@@ -73,11 +109,14 @@ void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting)
     if (band < 0 || band >= EQ_NUM_BANDS)
         return;
 
+    settings[band] = *setting; /* cache setting */
+
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+
     /* NOTE: The coef functions assume the EMAC unit is in fractional mode,
        which it should be, since we're executed from the main thread. */
 
     uint32_t mask = eq_data.enabled;
-    struct dsp_filter *filter = &eq_data.filters[band];
 
     /* Assume a band is disabled if the gain is zero */
     mask &= ~BIT_N(band);
@@ -85,33 +124,19 @@ void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting)
     if (setting->gain != 0)
     {
         mask |= BIT_N(band);
-
-        /* Convert user settings to format required by coef generator
-           functions */
-        void (* coef_gen)(unsigned long cutoff, unsigned long Q, long db,
-                          struct dsp_filter *f) = filter_pk_coefs;
-
-        /* Only first and last bands are not peaking filters */
-        if (band == 0)
-            coef_gen = filter_ls_coefs;
-        else if (band == EQ_NUM_BANDS-1)
-            coef_gen = filter_hs_coefs;
-
-        coef_gen(0xffffffff / NATIVE_FREQUENCY * setting->cutoff,
-                 setting->q ?: 1, setting->gain, filter);
+        update_band_filter(band, dsp_get_output_frequency(dsp));
     }
 
     if (mask == eq_data.enabled)
         return; /* No change in band-enable state */
 
     if (mask & BIT_N(band))
-        filter_flush(filter); /* Coming online */
+        filter_flush(&eq_data.filters[band]); /* Coming online */
 
     eq_data.enabled = mask;
 
     /* Only be active if there are bands to process - if EQ is off, then
        this call has no effect */
-    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_proc_activate(dsp, DSP_PROC_EQUALIZER, mask != 0);
   
     /* Prepare list of enabled bands for efficient iteration */
@@ -125,6 +150,11 @@ void dsp_set_eq_coefs(int band, const struct eq_band_setting *setting)
 void dsp_eq_enable(bool enable)
 {
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    bool enabled = dsp_proc_enabled(dsp, DSP_PROC_EQUALIZER);
+
+    if (enable == enabled)
+        return;
+
     dsp_proc_enable(dsp, DSP_PROC_EQUALIZER, enable);
 
     if (enable && eq_data.enabled != 0)
@@ -139,7 +169,7 @@ static void eq_process(struct dsp_proc_entry *this,
     int count = buf->remcount;
     unsigned int channels = buf->format.num_channels;
 
-    for (uint8_t *b = eq_data.bands; *b < EQ_NUM_BANDS; b++)
+    FOR_EACH_ENB_BAND(b)
         filter_process(&eq_data.filters[*b], buf->p32, count, channels);
 
     (void)this;
@@ -154,10 +184,9 @@ static intptr_t eq_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_PROC_INIT:
-        if (value != 0)
-            break; /* Already enabled */
-
         this->process = eq_process;
+        /* Wouldn't have been getting frequency updates */
+        update_samplerate(dsp_get_output_frequency(dsp));
         /* Fall-through */
     case DSP_PROC_CLOSE:
         pga_enable_gain(PGA_EQ_PRECUT, setting == DSP_PROC_INIT);
@@ -165,6 +194,10 @@ static intptr_t eq_configure(struct dsp_proc_entry *this,
         
     case DSP_FLUSH:
         eq_flush();
+        break;
+
+    case DSP_SET_OUT_FREQUENCY:
+        update_samplerate(value);
         break;
     }
 

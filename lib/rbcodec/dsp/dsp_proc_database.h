@@ -40,7 +40,7 @@ DSP_PROC_DB_START
 #ifdef HAVE_PITCHCONTROL
     DSP_PROC_DB_ITEM(TIMESTRETCH)   /* time-stretching */
 #endif
-    DSP_PROC_DB_ITEM(RESAMPLE)      /* resampler providing NATIVE_FREQUENCY */
+    DSP_PROC_DB_ITEM(RESAMPLE)      /* resampler providing output frequency */
     DSP_PROC_DB_ITEM(CROSSFEED)     /* stereo crossfeed */
     DSP_PROC_DB_ITEM(EQUALIZER)     /* n-band equalizer */
 #ifdef HAVE_SW_TONE_CONTROLS

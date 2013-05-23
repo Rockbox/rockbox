@@ -274,3 +274,7 @@ lowmem
 #if defined(HAVE_HARDWARE_CLICK)
 hardware_click
 #endif
+
+#if defined(HAVE_PLAY_FREQ)
+play_frequency
+#endif

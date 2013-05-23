@@ -59,4 +59,11 @@ void dsp_set_pitch(int32_t pitch);
 int32_t dsp_get_pitch(void);
 #endif /* HAVE_PITCHCONTROL */
 
+/* Set output samplerate for all DSPs */
+void dsp_set_all_output_frequency(unsigned int samplerate);
+
+/* Return DSP's output samplerate */
+struct dsp_config;
+unsigned int dsp_get_output_frequency(struct dsp_config *dsp);
+
 #endif /* DSP_MISC_H */

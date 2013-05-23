@@ -44,7 +44,7 @@
 #define AUDIOBUF_ALLOC_SIZE (AUDIOBUF_SIZE+AUDIOBUF_GUARD_SIZE)
 
 /** PCM buffer **/
-#define CLOCK_RATE NATIVE_FREQUENCY /* Our clock rate in ticks/second (samplerate) */
+#define CLOCK_RATE 44100 /* Our clock rate in ticks/second (samplerate) */
 
 /* Define this as "1" to have a test tone instead of silence clip */
 #define SILENCE_TEST_TONE 0
