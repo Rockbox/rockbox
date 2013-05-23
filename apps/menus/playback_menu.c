@@ -37,6 +37,10 @@
 #include "misc.h"
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
+#include "pcm_sampr.h"
+#ifdef HAVE_PLAY_FREQ
+#include "talk.h"
+#endif
 #endif
 
 
@@ -193,6 +197,40 @@ MENUITEM_SETTING(resume_rewind, &global_settings.resume_rewind, NULL);
 #endif
 MENUITEM_SETTING(pause_rewind, &global_settings.pause_rewind, NULL);
 
+#ifdef HAVE_PLAY_FREQ
+static int play_frequency_func(void)
+{
+    static const struct opt_items names[] =
+    {
+        HW_HAVE_96_({ "96kHz",   TALK_ID(96, UNIT_KHZ) },)
+        HW_HAVE_88_({ "88.2kHz", TALK_ID_DECIMAL(882, 1, UNIT_KHZ) },)
+        HW_HAVE_64_({ "64kHz",   TALK_ID(64, UNIT_KHZ) },)
+        HW_HAVE_48_({ "48kHz",   TALK_ID(48, UNIT_KHZ) },)
+        HW_HAVE_44_({ "44.1kHz", TALK_ID_DECIMAL(441, 1, UNIT_KHZ) },)
+    };
+
+    /* 44 is at 0; keep things in the right order */
+    int value = ARRAYLEN(names) - 1 - global_settings.play_frequency;
+    bool ret = set_option(str(LANG_PLAYBACK_FREQUENCY),
+                          &value, INT, names, ARRAYLEN(names), NULL );
+
+    if (!ret)
+    {
+        value = ARRAYLEN(names) - 1 - value;
+        if (value != global_settings.play_frequency)
+        {
+            global_settings.play_frequency = value;
+            settings_apply_play_freq(value, false);
+        }
+    }
+
+    return ret;
+}
+
+MENUITEM_FUNCTION(play_frequency, 0, ID2P(LANG_PLAYBACK_FREQUENCY), 
+                    play_frequency_func, NULL, NULL, Icon_Menu_setting);
+#endif /* HAVE_PLAY_FREQ */
+
 MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
           Icon_Playback_menu,
           &shuffle_item, &repeat_mode, &play_selected,
@@ -217,12 +255,15 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #ifdef HAVE_HEADPHONE_DETECTION
          ,&unplug_menu
 #endif
-         ,&skip_length, &prevent_skip,
+         ,&skip_length, &prevent_skip
 
 #if CONFIG_CODEC == SWCODEC
-          &resume_rewind,
+          ,&resume_rewind
 #endif
-          &pause_rewind,
+          ,&pause_rewind
+#ifdef HAVE_PLAY_FREQ
+          ,&play_frequency
+#endif
          );
          
 static int playback_callback(int action,const struct menu_item_ex *this_item)
@@ -269,7 +310,6 @@ static int playback_callback(int action,const struct menu_item_ex *this_item)
 
                 audio_flush_and_reload_tracks();
             }
-
             break;
     }
     return action;

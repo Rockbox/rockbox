@@ -59,4 +59,12 @@ void dsp_set_pitch(int32_t pitch);
 int32_t dsp_get_pitch(void);
 #endif /* HAVE_PITCHCONTROL */
 
+/* Set output samplerate on all DSPs - convenience function */
+void dsp_set_output_frequency(int samplerate);
+
+/* Get last set frequency - only valid for all if set by
+   dsp_set_output_frequency or same rate has been set for all,
+   otherwise just dsp[0]. */
+int dsp_get_output_frequency(void);
+
 #endif /* DSP_MISC_H */

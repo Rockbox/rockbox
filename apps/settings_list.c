@@ -786,6 +786,13 @@ const struct settings_list settings[] = {
 #endif
 
     /* playback */
+#ifdef HAVE_PLAY_FREQ
+    {F_T_INT,&global_settings.play_frequency,
+        LANG_PLAYBACK_FREQUENCY,INT(0),
+        "playback frequency",
+        HW_HAVE_44_("44") HW_HAVE_48_(",48") HW_HAVE_64_(",64")
+        HW_HAVE_88_(",88") HW_HAVE_96_(",96"),UNUSED},
+#endif /* HAVE_PLAY_FREQ */
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
     SYSTEM_SETTING(NVRAM(4), resume_crc32, -1),

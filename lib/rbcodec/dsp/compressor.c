@@ -28,6 +28,7 @@
 #include "logf.h"
 #include "dsp_proc_entry.h"
 #include "compressor.h"
+#include "dsp_misc.h"
 
 static struct compressor_settings curr_set; /* Cached settings */
 
@@ -48,7 +49,8 @@ static bool compressor_update(const struct compressor_settings *settings)
     static const int comp_ratios[] = { 2, 4, 6, 10, 0 };
     int  ratio      = comp_ratios[settings->ratio];
     bool soft_knee  = settings->knee == 1;
-    int  release    = settings->release_time * NATIVE_FREQUENCY / 1000;
+    int  release    = settings->release_time *
+                        dsp_get_output_frequency() / 1000;
 
     bool changed = false;
     bool active  = threshold < 0;
@@ -386,10 +388,16 @@ static intptr_t compressor_configure(struct dsp_proc_entry *this,
             break; /* Already enabled */
 
         this->process = compressor_process;
+        /* Won't have been getting frequency updates */
+        compressor_update(&curr_set);
         /* Fall-through */
     case DSP_RESET:
     case DSP_FLUSH:
         release_gain = UNITY;
+        break;
+
+    case DSP_SET_OUT_FREQUENCY:
+        compressor_update(&curr_set);
         break;
     }
 

@@ -380,6 +380,7 @@ bool pcm_output_init(void)
     }
 #endif
 
+    rb->mixer_set_samplerate(CLOCK_RATE);
     return true;
 }
 
