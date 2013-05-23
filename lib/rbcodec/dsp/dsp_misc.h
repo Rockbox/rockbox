@@ -54,18 +54,9 @@ struct dsp_replay_gains
 
 void dsp_replaygain_set_settings(const struct replaygain_settings *settings);
 
-/* Callback for firmware layers to interface */
-enum
-{
-    DSP_CALLBACK_SET_PRESCALE = 0,
-    DSP_CALLBACK_SET_BASS,
-    DSP_CALLBACK_SET_TREBLE,
-    DSP_CALLBACK_SET_CHANNEL_CONFIG,
-    DSP_CALLBACK_SET_STEREO_WIDTH,
-    DSP_CALLBACK_SET_PITCH,
-    DSP_CALLBACK_GET_PITCH,
-};
-
-int dsp_callback(int msg, intptr_t param);
+#ifdef HAVE_PITCHCONTROL
+void dsp_set_pitch(int32_t pitch);
+int32_t dsp_get_pitch(void);
+#endif /* HAVE_PITCHCONTROL */
 
 #endif /* DSP_MISC_H */

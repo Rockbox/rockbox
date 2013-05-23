@@ -21,56 +21,51 @@
 #include "config.h"
 #include "system.h"
 #include "sound.h"
+#ifdef HAVE_SW_TONE_CONTROLS
+#include "tone_controls.h"
+#endif
+#include "channel_mode.h"
 #include "dsp_misc.h"
 
-/* Linking audio hardware calls to SWCODEC DSP emulation */
-
-static audiohw_swcodec_cb_type callback = NULL;
-
-void audiohw_swcodec_set_callback(audiohw_swcodec_cb_type func)
-{
-    callback = func;
-}
-
-/** Functions exported by audiohw.h **/
+/** Functions exported by audiohw.h but implemented in DSP **/
 
 void audiohw_set_channel(int value)
 {
-    callback(DSP_CALLBACK_SET_CHANNEL_CONFIG, value);
+    channel_mode_set_config(value);
 }
 
 void audiohw_set_stereo_width(int value)
 {
-    callback(DSP_CALLBACK_SET_STEREO_WIDTH, value);
+    channel_mode_custom_set_width(value);
 }
 
 #ifdef HAVE_SW_TONE_CONTROLS
 void audiohw_set_bass(int value)
 {
-    callback(DSP_CALLBACK_SET_BASS, value*10);
+    tone_set_bass(value*10);
 }
 
 void audiohw_set_treble(int value)
 {
-    callback(DSP_CALLBACK_SET_TREBLE, value*10);
+    tone_set_treble(value*10);
 }
 #endif /* HAVE_SW_TONE_CONTROLS */
 
 #ifndef AUDIOHW_HAVE_PRESCALER
 void audiohw_set_prescaler(int value)
 {
-    callback(DSP_CALLBACK_SET_PRESCALE, value);
+    tone_set_prescale(value);
 }
 #endif /* AUDIOHW_HAVE_PRESCALER */
 
 #ifdef HAVE_PITCHCONTROL
 void audiohw_set_pitch(int32_t value)
 {
-    callback(DSP_CALLBACK_SET_PITCH, value);
+    dsp_set_pitch(value);
 }
 
 int32_t audiohw_get_pitch(void)
 {
-    return callback(DSP_CALLBACK_GET_PITCH, 0);
+    return dsp_get_pitch();
 }
 #endif /* HAVE_PITCHCONTROL */

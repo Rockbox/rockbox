@@ -529,11 +529,6 @@ void audiohw_set_stereo_width(int val);
 void audiohw_enable_speaker(bool on);
 #endif /* HAVE_SPEAKER */
 
-#if CONFIG_CODEC == SWCODEC
-typedef int (*audiohw_swcodec_cb_type)(int msg, intptr_t param);
-void audiohw_swcodec_set_callback(audiohw_swcodec_cb_type func);
-#endif /* CONFIG_CODEC == SWCODEC */
-
 /**
  * Some setting are the same for every codec and can be defined here.
  */

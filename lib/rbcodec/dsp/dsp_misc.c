@@ -116,7 +116,7 @@ static void dsp_pitch_update(struct dsp_config *dsp)
                   fp_div(pitch_ratio, PITCH_SPEED_100, 16));
 }
 
-static void dsp_set_pitch(int32_t percent)
+void dsp_set_pitch(int32_t percent)
 {
     if (percent <= 0)
         percent = PITCH_SPEED_100;
@@ -128,50 +128,12 @@ static void dsp_set_pitch(int32_t percent)
 
     dsp_pitch_update(dsp_get_config(CODEC_IDX_AUDIO));
 }
-#endif /* HAVE_PITCHCONTROL */
 
-
-/** Firmware callback interface **/
-
-/* Hook back from firmware/ part of audio, which can't/shouldn't call apps/
- * code directly. */
-int dsp_callback(int msg, intptr_t param)
+int32_t dsp_get_pitch(void)
 {
-    int retval = 0;
-
-    switch (msg)
-    {
-#ifdef HAVE_SW_TONE_CONTROLS
-    case DSP_CALLBACK_SET_PRESCALE:
-        tone_set_prescale(param);
-        break;
-    case DSP_CALLBACK_SET_BASS:
-        tone_set_bass(param);
-        break;
-    case DSP_CALLBACK_SET_TREBLE:
-        tone_set_treble(param);
-        break;
-#endif /* HAVE_SW_TONE_CONTROLS */
-    case DSP_CALLBACK_SET_CHANNEL_CONFIG:
-        channel_mode_set_config(param);
-        break;
-    case DSP_CALLBACK_SET_STEREO_WIDTH:
-        channel_mode_custom_set_width(param);
-        break;
-#ifdef HAVE_PITCHCONTROL
-    case DSP_CALLBACK_SET_PITCH:
-        dsp_set_pitch(param);
-        break;
-    case DSP_CALLBACK_GET_PITCH:
-        retval = pitch_ratio;
-        break;
-#endif /* HAVE_PITCHCONTROL */
-    default:
-        break;
-    }
-
-    return retval;
+    return pitch_ratio;
 }
+#endif /* HAVE_PITCHCONTROL */
 
 static void INIT_ATTR misc_dsp_init(struct dsp_config *dsp,
                                     enum dsp_ids dsp_id)
