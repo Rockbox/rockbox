@@ -40,7 +40,6 @@
 #include "settings.h"
 #include "audio.h"
 #include "voice_thread.h"
-#include "dsp_core.h"
 
 /* This is the target fill size of chunks on the pcm buffer
    Can be any number of samples but power of two sizes make for faster and
@@ -66,11 +65,11 @@
    chunks */
 
 /* Return data level in 1/4-second increments */
-#define DATA_LEVEL(quarter_secs) (NATIVE_FREQUENCY * (quarter_secs))
+#define DATA_LEVEL(quarter_secs) (pcmbuf_sampr * (quarter_secs))
 
 /* Number of bytes played per second:
    (sample rate * 2 channels * 2 bytes/sample) */
-#define BYTERATE            (NATIVE_FREQUENCY * 4)
+#define BYTERATE            (pcmbuf_sampr * 2 * 2)
 
 #if MEMORYSIZE > 2
 /* Keep watermark high for large memory target - at least (2s) */
@@ -104,6 +103,7 @@ static size_t pcmbuf_size;
 static struct chunkdesc *pcmbuf_descriptors;
 static unsigned int pcmbuf_desc_count;
 static unsigned int position_key = 1;
+static unsigned int pcmbuf_sampr = 0;
 
 static size_t chunk_ridx;
 static size_t chunk_widx;
@@ -111,8 +111,7 @@ static size_t chunk_widx;
 static size_t pcmbuf_bytes_waiting;
 static struct chunkdesc *current_desc;
 
-/* Only written if HAVE_CROSSFADE */
-static size_t pcmbuf_watermark = PCMBUF_WATERMARK;
+static size_t pcmbuf_watermark = 0;
 
 static bool low_latency_mode = false;
 
@@ -545,6 +544,8 @@ size_t pcmbuf_init(void *bufend)
     }
 
     pcmbuf_finish_crossfade_enable();
+#else 
+    pcmbuf_watermark = PCMBUF_WATERMARK;
 #endif /* HAVE_CROSSFADE */
 
     init_buffer_state();
@@ -1330,4 +1331,14 @@ bool pcmbuf_is_lowdata(void)
 void pcmbuf_set_low_latency(bool state)
 {
     low_latency_mode = state;
+}
+
+void pcmbuf_update_frequency(void)
+{
+    pcmbuf_sampr = mixer_get_frequency();
+}
+
+unsigned int pcmbuf_get_frequency(void)
+{
+    return pcmbuf_sampr;
 }

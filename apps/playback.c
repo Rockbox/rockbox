@@ -2028,8 +2028,11 @@ static int audio_fill_file_buffer(void)
     /* Must reset the buffer before use if trashed or voice only - voice
        file size shouldn't have changed so we can go straight from
        AUDIOBUF_STATE_VOICED_ONLY to AUDIOBUF_STATE_INITIALIZED */
-    if (buffer_state != AUDIOBUF_STATE_INITIALIZED)
+    if (buffer_state != AUDIOBUF_STATE_INITIALIZED ||
+        !pcmbuf_is_same_size())
+    {
         audio_reset_buffer(AUDIOBUF_STATE_INITIALIZED);
+    }
 
     logf("Starting buffer fill");
 
@@ -2510,6 +2513,11 @@ static void audio_start_playback(size_t offset, unsigned int flags)
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
         sound_set_volume(global_settings.volume);
 #endif
+#ifdef HAVE_PLAY_FREQ
+        settings_apply_play_freq(global_settings.play_frequency, true);
+#endif
+        pcmbuf_update_frequency();
+
         /* Be sure channel is audible */
         pcmbuf_fade(false, true);
 
@@ -3755,6 +3763,7 @@ void INIT_ATTR playback_init(void)
     mutex_init(&id3_mutex);
     track_list_init();
     buffering_init();
+    pcmbuf_update_frequency();
     add_event(PLAYBACK_EVENT_VOICE_PLAYING, false, playback_voice_event);
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */

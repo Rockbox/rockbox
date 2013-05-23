@@ -134,6 +134,21 @@ int32_t dsp_get_pitch(void)
 }
 #endif /* HAVE_PITCHCONTROL */
 
+/* Set output samplerate for all DSPs */
+void dsp_set_all_output_frequency(unsigned int samplerate)
+{
+
+    struct dsp_config *dsp;
+    for (int i = 0; (dsp = dsp_get_config(i)); i++)
+        dsp_configure(dsp, DSP_SET_OUT_FREQUENCY, samplerate);
+}
+
+/* Return DSP's output samplerate */
+unsigned int dsp_get_output_frequency(struct dsp_config *dsp)
+{
+    return dsp_configure(dsp, DSP_GET_OUT_FREQUENCY, 0);
+}
+
 static void INIT_ATTR misc_dsp_init(struct dsp_config *dsp,
                                     enum dsp_ids dsp_id)
 {

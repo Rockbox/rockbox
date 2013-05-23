@@ -798,6 +798,8 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+    mixer_set_frequency,
+    mixer_get_frequency,
 };
 
 int plugin_load(const char* plugin, const void* parameter)
