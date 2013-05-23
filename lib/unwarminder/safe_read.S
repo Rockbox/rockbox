@@ -137,6 +137,6 @@ data_abort_handler:
     @ restore registers
     ldmfd   sp!, {r0-r1}
     @ restore mode and jump back to the *next* instruction
-    subs    pc, lr, #-4
+    subs    pc, lr, #4
 .size       data_abort_handler, . - data_abort_handler
 #endif
