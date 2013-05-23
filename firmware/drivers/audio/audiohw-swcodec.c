@@ -54,7 +54,13 @@ void audiohw_set_treble(int value)
 #ifndef AUDIOHW_HAVE_PRESCALER
 void audiohw_set_prescaler(int value)
 {
+#ifdef HAVE_SW_TONE_CONTROLS
     tone_set_prescale(value);
+#endif
+    /* FIXME: Should PGA be used if HW tone controls but no HW prescaler?
+       Callback-based implementation would have had no prescaling at all
+       so just do nothing for now, changing nothing. */
+    (void)value;    
 }
 #endif /* AUDIOHW_HAVE_PRESCALER */
 
