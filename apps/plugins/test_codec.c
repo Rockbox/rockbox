@@ -502,7 +502,12 @@ static void configure(int setting, intptr_t value)
     {
         case DSP_SET_FREQUENCY:
             DEBUGF("samplerate=%d\n",(int)value);
-            wavinfo.samplerate = use_dsp ? NATIVE_FREQUENCY : (int)value;
+            if (use_dsp) {
+                wavinfo.samplerate = rb->dsp_configure(
+                    ci.dsp, DSP_GET_OUT_FREQUENCY, 0);
+            } else {
+                wavinfo.samplerate = (int)value;
+            }
             break;
 
         case DSP_SET_SAMPLE_DEPTH:

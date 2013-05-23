@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <sys/types.h>
+#include "config.h"
 #include "system.h"
 #include "core_alloc.h"
 #include "thread.h"
@@ -30,8 +30,7 @@
 #include "pcm_mixer.h"
 #include "codecs/libspeex/speex/speex.h"
 
-/* Default number of native-frequency PCM frames to queue - adjust as
-   necessary per-target */
+/* Default number of PCM frames to queue - adjust as necessary per-target */
 #define VOICE_FRAMES 4
 
 /* Define any of these as "1" and uncomment the LOGF_ENABLE line to log
@@ -84,8 +83,8 @@ static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
 static int quiet_counter SHAREDDATA_ATTR = 0;
 static bool voice_playing = false;
 
-#define VOICE_PCM_FRAME_COUNT   ((NATIVE_FREQUENCY*VOICE_FRAME_COUNT + \
-                                 VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
+#define VOICE_PCM_FRAME_COUNT   ((PLAY_SAMPR_MAX*VOICE_FRAME_COUNT + \
+                                  VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
 #define VOICE_PCM_FRAME_SIZE    (VOICE_PCM_FRAME_COUNT*2*sizeof (int16_t))
 
 /* Voice processing states */
@@ -356,11 +355,13 @@ static enum voice_state voice_message(struct voice_thread_data *td)
         {
             /* Stop any clip still playing */
             voice_stop_playback();
+            dsp_configure(td->dsp, DSP_FLUSH, 0);
         }
 
         if (quiet_counter <= 0)
         {
             voice_playing = true;
+            dsp_configure(td->dsp, DSP_SET_OUT_FREQUENCY, mixer_get_frequency());
             send_event(PLAYBACK_EVENT_VOICE_PLAYING, &voice_playing);
         }
 

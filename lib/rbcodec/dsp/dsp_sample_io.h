@@ -50,6 +50,7 @@ struct sample_io_data
     struct dsp_buffer sample_buf; /* Buffer descriptor for converted samples */
     int32_t *sample_buf_p[2];     /* Internal format buffer pointers */
     sample_output_fn_type output_samples; /* Final output function */
+    unsigned int output_sampr;    /* Master output samplerate */
     uint8_t format_dirty;         /* Format change set, avoids superfluous
                                      increments before carrying it out */
     uint8_t output_version;       /* Format version of src buffer at output */
@@ -62,8 +63,8 @@ void dsp_sample_output_format_change(struct sample_io_data *this,
                                      struct sample_format *format);
 
 /* Sample IO watches the format setting from the codec */
-void dsp_sample_io_configure(struct sample_io_data *this,
+bool dsp_sample_io_configure(struct sample_io_data *this,
                              unsigned int setting,
-                             intptr_t value);
+                             intptr_t *value_p);
 
 #endif /* DSP_SAMPLE_IO_H */

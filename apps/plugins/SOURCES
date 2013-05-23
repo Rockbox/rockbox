@@ -37,6 +37,8 @@ resistor.c
 remote_control.c
 #endif
 
+test_codec.c
+test_sampr.c
 
 
 #ifdef HAVE_BACKLIGHT
