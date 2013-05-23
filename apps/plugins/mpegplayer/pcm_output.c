@@ -51,6 +51,8 @@ static uint32_t volatile clock_time IBSS_ATTR; /* Timestamp adjusted */
 static int pcm_skipped = 0;
 static int pcm_underruns = 0;
 
+static unsigned int old_sampr = 0;
+
 /* Small silence clip. ~5.80ms @ 44.1kHz */
 static int16_t silence[256*2] ALIGNED_ATTR(4) = { 0 };
 
@@ -380,9 +382,13 @@ bool pcm_output_init(void)
     }
 #endif
 
+    old_sampr = rb->mixer_get_frequency();
+    rb->mixer_set_frequency(CLOCK_RATE);
     return true;
 }
 
 void pcm_output_exit(void)
 {
+    if (old_sampr != 0)
+        rb->mixer_set_frequency(old_sampr);
 }

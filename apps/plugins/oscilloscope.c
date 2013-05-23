@@ -1200,13 +1200,14 @@ static long anim_peaks_vertical(void)
 /** Waveform View **/
 
 #ifdef OSCILLOSCOPE_GRAPHMODE
-static int16_t waveform_buffer[2*ALIGN_UP(NATIVE_FREQUENCY, 2048)+2*2048]
+static int16_t waveform_buffer[2*ALIGN_UP(PLAY_SAMPR_MAX, 2048)+2*2048]
     MEM_ALIGN_ATTR;
 static size_t waveform_buffer_threshold = 0;
 static size_t volatile waveform_buffer_have = 0;
 static size_t waveform_buffer_break = 0;
+static unsigned long mixer_sampr = PLAY_SAMPR_DEFAULT;
 #define PCM_SAMPLESIZE (2*sizeof(int16_t))
-#define PCM_BYTERATE (NATIVE_FREQUENCY*PCM_SAMPLESIZE)
+#define PCM_BYTERATE(sampr) ((sampr)*PCM_SAMPLESIZE)
 
 #define WAVEFORM_SCALE_PCM(full_scale, sample) \
         ((((full_scale) * (sample)) + (1 << 14)) >> 15)
@@ -1390,7 +1391,7 @@ static long anim_waveform_horizontal(void)
         return cur_tick + HZ/5;
     }
 
-    int count = (NATIVE_FREQUENCY*osc_delay + 100*HZ - 1) / (100*HZ);
+    int count = (mixer_sampr*osc_delay + 100*HZ - 1) / (100*HZ);
 
     waveform_buffer_set_threshold(count*PCM_SAMPLESIZE);
 
@@ -1516,7 +1517,8 @@ static long anim_waveform_horizontal(void)
     osd_lcd_update();
 
     long delay = get_next_delay();
-    return cur_tick + delay - waveform_buffer_have * HZ / PCM_BYTERATE;
+    return cur_tick + delay - waveform_buffer_have * HZ /
+                PCM_BYTERATE(mixer_sampr);
 }
 
 static void anim_waveform_plot_filled_v(int y, int y_prev,
@@ -1583,7 +1585,7 @@ static long anim_waveform_vertical(void)
         return cur_tick + HZ/5;
     }
 
-    int count = (NATIVE_FREQUENCY*osc_delay + 100*HZ - 1) / (100*HZ);
+    int count = (mixer_sampr*osc_delay + 100*HZ - 1) / (100*HZ);
 
     waveform_buffer_set_threshold(count*PCM_SAMPLESIZE);
 
@@ -1709,7 +1711,8 @@ static long anim_waveform_vertical(void)
     osd_lcd_update();
 
     long delay = get_next_delay();
-    return cur_tick + delay - waveform_buffer_have * HZ / PCM_BYTERATE;
+    return cur_tick + delay - waveform_buffer_have * HZ
+                / PCM_BYTERATE(mixer_sampr);
 }
 
 static void anim_waveform_exit(void)
@@ -1870,6 +1873,10 @@ static void osc_setup(void)
     rb->lcd_set_backdrop(NULL);
     rb->lcd_clear_display();
     osd_lcd_update();
+#endif
+
+#ifdef OSCILLOSCOPE_GRAPHMODE
+    mixer_sampr = rb->mixer_get_frequency();
 #endif
 
     /* Turn off backlight timeout */

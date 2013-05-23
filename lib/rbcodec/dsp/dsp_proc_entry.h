@@ -132,6 +132,10 @@ typedef intptr_t (*dsp_proc_config_fn_type)(struct dsp_proc_entry *this,
  * by processing code! */
 void dsp_proc_enable(struct dsp_config *dsp, enum dsp_proc_ids id,
                      bool enable);
+
+/* Is the specified stage enabled on the DSP? */
+bool dsp_proc_enabled(struct dsp_config *dsp, enum dsp_proc_ids id);
+
 /* Activate/deactivate processing stage, doesn't affect enabled status
  * thus will not enable anything -
  * may be called during processing to activate/deactivate for format
