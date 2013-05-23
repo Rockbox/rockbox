@@ -53,7 +53,10 @@ unsigned int pcm_sampr_type_rec_to_play(unsigned int samplerate);
 #endif
 #endif /* CONFIG_SAMPR_TYPES */
 
+/* set next frequency to be used */
 void pcm_set_frequency(unsigned int samplerate);
+/* return last-set frequency */
+unsigned int pcm_get_frequency(void);
 /* apply settings to hardware immediately */
 void pcm_apply_settings(void);
 

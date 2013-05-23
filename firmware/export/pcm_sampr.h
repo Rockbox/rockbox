@@ -20,7 +20,12 @@
  ****************************************************************************/
 
 #ifndef PCM_SAMPR_H
+
+/* File might be included for CPP config macros only. Allow it to be included
+ * again for full C declarations. */
+#ifndef PCM_SAMPR_CONFIG_ONLY
 #define PCM_SAMPR_H
+#endif
 
 #ifndef HW_SAMPR_CAPS
 #define HW_SAMPR_CAPS SAMPR_CAP_44 /* if not defined, default to 44100 */
@@ -75,11 +80,14 @@
                          SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
                          SAMPR_CAP_12 | SAMPR_CAP_11 | SAMPR_CAP_8)
 
+#ifndef PCM_SAMPR_CONFIG_ONLY
 /* Master list of all "standard" rates supported. */
 extern const unsigned long audio_master_sampr_list[SAMPR_NUM_FREQ];
+#endif /* PCM_SAMPR_CONFIG_ONLY */
 
 /** Hardware sample rates **/
 
+#ifndef PCM_SAMPR_CONFIG_ONLY
 /* Enumeration of supported frequencies where 0 is the highest rate
    supported and REC_NUM_FREQUENCIES is the number available */
 enum hw_freq_indexes
@@ -183,14 +191,49 @@ enum hw_freq_indexes
 #define HW_HAVE_8_(...)
 #endif
     HW_NUM_FREQ,
-    HW_FREQ_DEFAULT = HW_FREQ_44,
-    HW_SAMPR_DEFAULT = SAMPR_44,
 }; /* enum hw_freq_indexes */
 
 /* list of hardware sample rates */
 extern const unsigned long hw_freq_sampr[HW_NUM_FREQ];
+#endif /* PCM_SAMPR_CONFIG_ONLY */
+
+#define HW_FREQ_DEFAULT     HW_FREQ_44
+#define HW_SAMPR_DEFAULT    SAMPR_44
+
+
+#if HW_SAMPR_CAPS & SAMPR_CAP_96
+# define HW_SAMPR_MAX   SAMPR_96
+#elif HW_SAMPR_CAPS & SAMPR_CAP_88
+# define HW_SAMPR_MAX   SAMPR_88
+#elif HW_SAMPR_CAPS & SAMPR_CAP_64
+# define HW_SAMPR_MAX   SAMPR_64
+#elif HW_SAMPR_CAPS & SAMPR_CAP_48
+# define HW_SAMPR_MAX   SAMPR_48
+#else
+# define HW_SAMPR_MAX   SAMPR_44
+#endif
+
+#if HW_SAMPR_CAPS & SAMPR_CAP_8
+# define HW_SAMPR_MIN   SAMPR_8
+#elif HW_SAMPR_CAPS & SAMPR_CAP_11
+# define HW_SAMPR_MIN   SAMPR_11
+#elif HW_SAMPR_CAPS & SAMPR_CAP_12
+# define HW_SAMPR_MIN   SAMPR_12
+#elif HW_SAMPR_CAPS & SAMPR_CAP_16
+# define HW_SAMPR_MIN   SAMPR_16
+#elif HW_SAMPR_CAPS & SAMPR_CAP_22
+# define HW_SAMPR_MIN   SAMPR_22
+#elif HW_SAMPR_CAPS & SAMPR_CAP_24
+# define HW_SAMPR_MIN   SAMPR_24
+#elif HW_SAMPR_CAPS & SAMPR_CAP_32
+# define HW_SAMPR_MIN   SAMPR_32
+#else
+# define HW_SAMPR_MIN   SAMPR_44
+#endif
 
 #ifdef HAVE_RECORDING
+
+#ifndef PCM_SAMPR_CONFIG_ONLY
 /* Enumeration of supported frequencies where 0 is the highest rate
    supported and REC_NUM_FREQUENCIES is the number available */
 enum rec_freq_indexes
@@ -296,6 +339,10 @@ enum rec_freq_indexes
     REC_NUM_FREQ,
 }; /* enum rec_freq_indexes */
 
+/* List of recording supported sample rates (set or subset of master list) */
+extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
+#endif /* PCM_SAMPR_CONFIG_ONLY */
+
 /* Default to 44.1kHz if not otherwise specified */
 #ifndef REC_FREQ_DEFAULT
 #define REC_FREQ_DEFAULT REC_FREQ_44
@@ -314,8 +361,7 @@ enum rec_freq_indexes
                                 REC_HAVE_16_(",16") REC_HAVE_12_(",12") \
                                 REC_HAVE_11_(",11") REC_HAVE_8_(",8")[1]
 
-/* List of recording supported sample rates (set or subset of master list) */
-extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
+
 #endif /* HAVE_RECORDING */
 
 #ifdef CONFIG_SAMPR_TYPES
@@ -326,8 +372,10 @@ extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
 #define SAMPR_TYPE_REC  (0x01 << 24)
 #endif
 
+#ifndef PCM_SAMPR_CONFIG_ONLY
 unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
                                    unsigned int type);
+#endif
 
 #else /* ndef CONFIG_SAMPR_TYPES */
 

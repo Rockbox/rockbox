@@ -127,4 +127,10 @@ void mixer_channel_set_buffer_hook(enum pcm_mixer_channel channel,
 /* Stop ALL channels and PCM and reset state */
 void mixer_reset(void);
 
+/* Set output samplerate */
+void mixer_set_frequency(unsigned int samplerate);
+
+/* Get output samplerate */
+unsigned int mixer_get_frequency(void);
+
 #endif /* PCM_MIXER_H */

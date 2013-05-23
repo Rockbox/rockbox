@@ -286,14 +286,17 @@ static void INIT_ATTR dsp_sample_input_init(struct sample_io_data *this,
 static void INIT_ATTR dsp_sample_io_init(struct sample_io_data *this,
                                          enum dsp_ids dsp_id)
 {
+    this->output_sampr = DSP_OUT_DEFAULT_HZ;
     dsp_sample_input_init(this, dsp_id);
     dsp_sample_output_init(this);
 }
 
-void dsp_sample_io_configure(struct sample_io_data *this,
+bool dsp_sample_io_configure(struct sample_io_data *this,
                              unsigned int setting,
-                             intptr_t value)
+                             intptr_t *value_p)
 {
+    intptr_t value = *value_p;
+
     switch (setting)
     {
     case DSP_INIT:
@@ -306,15 +309,15 @@ void dsp_sample_io_configure(struct sample_io_data *this,
         this->format.num_channels = 2;
         this->format.frac_bits = WORD_FRACBITS;
         this->format.output_scale = WORD_FRACBITS + 1 - NATIVE_DEPTH;
-        this->format.frequency = NATIVE_FREQUENCY;
-        this->format.codec_frequency = NATIVE_FREQUENCY;
+        this->format.frequency = this->output_sampr;
+        this->format.codec_frequency = this->output_sampr;
         this->sample_depth = NATIVE_DEPTH;
         this->stereo_mode = STEREO_NONINTERLEAVED;
         break;
 
     case DSP_SET_FREQUENCY:
         format_change_set(this);
-        value = value > 0 ? value : NATIVE_FREQUENCY;
+        value = value > 0 ? (unsigned int)value : this->output_sampr;
         this->format.frequency = value;
         this->format.codec_frequency = value;
         break;
@@ -345,5 +348,22 @@ void dsp_sample_io_configure(struct sample_io_data *this,
         this->format.frequency =
             fp_mul(value, this->format.codec_frequency, 16);
         break;
+
+    case DSP_SET_OUT_FREQUENCY:
+        value = value > 0 ? value : DSP_OUT_DEFAULT_HZ;
+        value = MIN(DSP_OUT_MAX_HZ, MAX(DSP_OUT_MIN_HZ, value));
+        *value_p = value;
+
+        if ((unsigned int)value == this->output_sampr)
+            return true; /* No change; don't broadcast */
+
+        this->output_sampr = value;
+        break;
+
+    case DSP_GET_OUT_FREQUENCY:
+        *value_p = this->output_sampr;
+        return true; /* Only I/O handles it */
     }
+
+    return false;
 }

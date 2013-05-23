@@ -81,5 +81,7 @@ void pcmbuf_sync_position_update(void);
 /* Misc */
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);
+void pcmbuf_update_frequency(void);
+unsigned int pcmbuf_get_frequency(void);
 
 #endif /* PCMBUF_H */

@@ -28,6 +28,7 @@
 #include "logf.h"
 #include "dsp_proc_entry.h"
 #include "compressor.h"
+#include "dsp_misc.h"
 
 static struct compressor_settings curr_set; /* Cached settings */
 
@@ -40,7 +41,8 @@ static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
 
 /** COMPRESSOR UPDATE
  *  Called via the menu system to configure the compressor process */
-static bool compressor_update(const struct compressor_settings *settings)
+static bool compressor_update(struct dsp_config *dsp,
+                              const struct compressor_settings *settings)
 {
     /* make settings values useful */
     int  threshold  = settings->threshold;
@@ -48,9 +50,10 @@ static bool compressor_update(const struct compressor_settings *settings)
     static const int comp_ratios[] = { 2, 4, 6, 10, 0 };
     int  ratio      = comp_ratios[settings->ratio];
     bool soft_knee  = settings->knee == 1;
-    int  release    = settings->release_time * NATIVE_FREQUENCY / 1000;
+    int  release    = settings->release_time *
+                            dsp_get_output_frequency(dsp) / 1000;
 
-    bool changed = false;
+    bool changed = settings == &curr_set; /* If frequency change */
     bool active  = threshold < 0;
 
     if (memcmp(settings, &curr_set, sizeof (curr_set)))
@@ -300,8 +303,8 @@ static inline int32_t get_compression_gain(struct sample_format *format,
 void dsp_set_compressor(const struct compressor_settings *settings)
 {
     /* enable/disable the compressor depending upon settings */
-    bool enable = compressor_update(settings);
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    bool enable = compressor_update(dsp, settings);
     dsp_proc_enable(dsp, DSP_PROC_COMPRESSOR, enable);
     dsp_proc_activate(dsp, DSP_PROC_COMPRESSOR, true);
 }
@@ -386,15 +389,20 @@ static intptr_t compressor_configure(struct dsp_proc_entry *this,
             break; /* Already enabled */
 
         this->process = compressor_process;
+        /* Won't have been getting frequency updates */
+        compressor_update(dsp, &curr_set);
         /* Fall-through */
     case DSP_RESET:
     case DSP_FLUSH:
         release_gain = UNITY;
         break;
+
+    case DSP_SET_OUT_FREQUENCY:
+        compressor_update(dsp, &curr_set);
+        break;
     }
 
     return 0;
-    (void)dsp;
 }
 
 /* Database entry */
