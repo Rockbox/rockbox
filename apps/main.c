@@ -641,6 +641,7 @@ static void init(void)
     }
 
 #if CONFIG_CODEC == SWCODEC
+    pcm_init();
     dsp_init();
 #endif
 
