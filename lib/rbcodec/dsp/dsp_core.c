@@ -103,8 +103,21 @@ static intptr_t proc_broadcast(struct dsp_config *dsp, unsigned int setting,
                                intptr_t value)
 {
     bool multi = setting < DSP_PROC_SETTING;
-    struct dsp_proc_slot *s = multi ? dsp->proc_slots :
-        find_proc_slot(dsp, setting - DSP_PROC_SETTING);
+    struct dsp_proc_slot *s;
+
+    if (multi)
+    {
+        /* Message to all enabled stages */
+        if (dsp_sample_io_configure(&dsp->io_data, setting, &value))
+            return value; /* To I/O only */
+
+        s = dsp->proc_slots;
+    }
+    else
+    {
+        /* Message to a particular stage */
+        s = find_proc_slot(dsp, setting - DSP_PROC_SETTING);
+    }
 
     while (s != NULL)
     {
@@ -117,7 +130,7 @@ static intptr_t proc_broadcast(struct dsp_config *dsp, unsigned int setting,
         s = s->next;
     }
 
-    return multi ? 1 : 0;
+    return 0;
 }
 
 /* Add an item to the enabled list */
@@ -242,6 +255,12 @@ void dsp_proc_enable(struct dsp_config *dsp, enum dsp_proc_ids id,
     dsp_proc_activate(dsp, id, false); /* Deactivate it first */
     struct dsp_proc_slot *s = dsp_proc_enable_delink(dsp, mask);
     proc_db_entry(s)->configure(&s->proc_entry, dsp, DSP_PROC_CLOSE, 0);
+}
+
+/* Is the stage specified by the id currently enabled? */
+bool dsp_proc_enabled(struct dsp_config *dsp, enum dsp_proc_ids id)
+{
+    return (dsp->proc_mask_enabled & BIT_N(id)) != 0;
 }
 
 /* Activate or deactivate a stage */
@@ -454,7 +473,6 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
 intptr_t dsp_configure(struct dsp_config *dsp, unsigned int setting,
                        intptr_t value)
 {
-    dsp_sample_io_configure(&dsp->io_data, setting, value);
     return proc_broadcast(dsp, setting, value);
 }
 
@@ -497,7 +515,8 @@ void INIT_ATTR dsp_init(void)
         count = slot_count[i];
         dsp->slot_free_mask = MASK_N(uint32_t, count, shift);
 
-        dsp_sample_io_configure(&dsp->io_data, DSP_INIT, i);
+        intptr_t value = i;
+        dsp_sample_io_configure(&dsp->io_data, DSP_INIT, &value);
 
         /* Notify each db entry of global init for each DSP */
         for (unsigned int j = 0; j < DSP_NUM_PROC_STAGES; j++)

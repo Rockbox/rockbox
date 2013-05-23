@@ -39,13 +39,13 @@ enum dsp_settings
     DSP_SET_STEREO_MODE,
     DSP_FLUSH,
     DSP_SET_PITCH,
+    DSP_SET_OUT_FREQUENCY,
+    DSP_GET_OUT_FREQUENCY,
     DSP_PROC_INIT,
     DSP_PROC_CLOSE,
     DSP_PROC_NEW_FORMAT,
     DSP_PROC_SETTING, /* stage-specific should be this + id */
 };
-
-#define NATIVE_FREQUENCY   44100 /* internal/output sample rate */
 
 enum dsp_stereo_modes
 {
