@@ -22,16 +22,19 @@
 #include "system.h"
 #include "general.h"
 #include "kernel.h"
+#include "pcm_sampr.h"
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
-#include "dsp_core.h" /* For NATIVE_FREQUENCY */
 
 /* Channels use standard-style PCM callback interface but a latency of one
    frame by double-buffering is introduced in order to facilitate mixing and
    keep the hardware fed. There must be sufficient time to perform operations
    before the last samples are sent to the codec and so things are done in
    parallel (as much as possible) with sending-out data. */
+
+static bool mixer_playing = false;
+static unsigned long mixer_samplerate = HW_SAMPR_DEFAULT;
 
 /* Define this to nonzero to add a marker pulse at each frame start */
 #define FRAME_BOUNDARY_MARKERS 0
@@ -65,7 +68,7 @@ static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
 static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
 
 /* Number of silence frames to play after all data has played */
-#define MAX_IDLE_FRAMES     (NATIVE_FREQUENCY*3 / MIX_FRAME_SAMPLES)
+#define MAX_IDLE_FRAMES     (HW_SAMPR_DEFAULT*3 / MIX_FRAME_SAMPLES)
 static unsigned int idle_counter = 0;
 
 /** Mixing routines, CPU optmized **/
@@ -105,6 +108,9 @@ static void mixer_pcm_callback(const void **addr, size_t *size)
 {
     *addr = downmix_buf[downmix_index];
     *size = next_size;
+
+    if (next_size == 0)
+        mixer_playing = false;
 }
 
 static inline void chan_call_buffer_hook(struct mixer_channel *chan)
@@ -247,7 +253,7 @@ fill_frame:
 /* Start PCM driver if it's not currently playing */
 static void mixer_start_pcm(void)
 {
-    if (pcm_is_playing())
+    if (pcm_is_playing() && mixer_playing)
         return;
 
 #if defined(HAVE_RECORDING)
@@ -255,8 +261,10 @@ static void mixer_start_pcm(void)
         return;
 #endif
 
+    mixer_playing = true;
+
     /* Requires a shared global sample rate for all channels */
-    pcm_set_frequency(NATIVE_FREQUENCY);
+    pcm_set_frequency(mixer_samplerate);
 
     /* Prepare initial frames and set up the double buffer */
     mixer_buffer_callback(PCM_DMAST_STARTED);
@@ -437,4 +445,21 @@ void mixer_reset(void)
         channel_stopped(*active_channels);
 
     idle_counter = 0;
+    mixer_playing = false;
+}
+
+void mixer_set_samplerate(unsigned long samplerate)
+{
+    if (samplerate == mixer_samplerate)
+        return;
+
+    /* All data will now be invalid */
+    mixer_reset(); 
+    pcm_set_frequency(samplerate);
+    mixer_samplerate = pcm_get_frequency(); /* might have been corrected */
+}
+
+unsigned long mixer_get_samplerate(void)
+{
+    return mixer_samplerate;
 }

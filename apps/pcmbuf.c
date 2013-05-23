@@ -66,11 +66,11 @@
    chunks */
 
 /* Return data level in 1/4-second increments */
-#define DATA_LEVEL(quarter_secs) (NATIVE_FREQUENCY * (quarter_secs))
+#define DATA_LEVEL(quarter_secs) (pcmbuf_sampr * (quarter_secs))
 
 /* Number of bytes played per second:
    (sample rate * 2 channels * 2 bytes/sample) */
-#define BYTERATE            (NATIVE_FREQUENCY * 4)
+#define BYTERATE            (pcmbuf_sampr * 4)
 
 #if MEMORYSIZE > 2
 /* Keep watermark high for large memory target - at least (2s) */
@@ -104,6 +104,7 @@ static size_t pcmbuf_size;
 static struct chunkdesc *pcmbuf_descriptors;
 static unsigned int pcmbuf_desc_count;
 static unsigned int position_key = 1;
+static unsigned long pcmbuf_sampr;
 
 static size_t chunk_ridx;
 static size_t chunk_widx;
@@ -111,8 +112,7 @@ static size_t chunk_widx;
 static size_t pcmbuf_bytes_waiting;
 static struct chunkdesc *current_desc;
 
-/* Only written if HAVE_CROSSFADE */
-static size_t pcmbuf_watermark = PCMBUF_WATERMARK;
+static size_t pcmbuf_watermark;
 
 static bool low_latency_mode = false;
 
@@ -488,6 +488,8 @@ void pcmbuf_write_complete(int count, unsigned long elapsed, off_t offset)
 /** Init */
 static unsigned int get_next_required_pcmbuf_chunks(void)
 {
+    pcmbuf_sampr = mixer_get_samplerate();
+
     size_t size = MIN_BUFFER_SIZE;
 
 #ifdef HAVE_CROSSFADE
@@ -545,6 +547,8 @@ size_t pcmbuf_init(void *bufend)
     }
 
     pcmbuf_finish_crossfade_enable();
+#else 
+    pcmbuf_watermark = PCMBUF_WATERMARK;
 #endif /* HAVE_CROSSFADE */
 
     init_buffer_state();
@@ -758,6 +762,7 @@ void pcmbuf_play_start(void)
         chunk_widx != chunk_ridx)
     {
         current_desc = NULL;
+        pcmbuf_sampr = mixer_get_samplerate();
         mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, pcmbuf_pcm_callback,
                                 NULL, 0);
     }
@@ -1146,6 +1151,7 @@ static void write_to_crossfade(size_t size, unsigned long elapsed, off_t offset)
 static void pcmbuf_finish_crossfade_enable(void)
 {
     /* Copy the pending setting over now */
+    pcmbuf_sampr = mixer_get_samplerate();
     crossfade_setting = crossfade_enable_request;
 
     pcmbuf_watermark = (crossfade_setting != CROSSFADE_ENABLE_OFF && pcmbuf_size) ?
@@ -1168,9 +1174,18 @@ void pcmbuf_request_crossfade_enable(int setting)
 
 bool pcmbuf_is_same_size(void)
 {
-    /* if pcmbuf_buffer is NULL, then not set up yet even once so always */
-    bool same_size = pcmbuf_buffer ?
-        (get_next_required_pcmbuf_chunks() == pcmbuf_desc_count) : true;
+
+    bool same_size = true;
+    unsigned long fout = mixer_get_samplerate();
+
+    if (pcmbuf_buffer)
+    {
+        if (fout != pcmbuf_sampr)
+            same_size = false;
+
+        if (get_next_required_pcmbuf_chunks() != pcmbuf_desc_count)
+            same_size = false;
+    }
 
     /* no buffer change needed, so finish crossfade setup now */
     if (same_size)

@@ -415,6 +415,11 @@ void pcm_set_frequency(unsigned int samplerate)
     pcm_fsel = index;
 }
 
+unsigned int pcm_get_frequency(void)
+{
+    return pcm_sampr;
+}
+
 /* apply pcm settings to the hardware */
 void pcm_apply_settings(void)
 {

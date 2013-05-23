@@ -289,6 +289,11 @@ static void INIT_ATTR dsp_sample_io_init(struct sample_io_data *this,
     dsp_sample_output_init(this);
 }
 
+static int get_out_hz(struct sample_io_data *this)
+{
+    return dsp_configure((void *)this, DSP_GET_OUT_FREQUENCY, 0);
+}
+
 void dsp_sample_io_configure(struct sample_io_data *this,
                              unsigned int setting,
                              intptr_t value)
@@ -299,21 +304,22 @@ void dsp_sample_io_configure(struct sample_io_data *this,
         dsp_sample_io_init(this, (enum dsp_ids)value);
         break;
 
-    case DSP_RESET:
+    case DSP_RESET:;
         /* Reset all sample descriptions to default */
+        int fout = get_out_hz(this);
         format_change_set(this);
         this->format.num_channels = 2;
         this->format.frac_bits = WORD_FRACBITS;
         this->format.output_scale = WORD_FRACBITS + 1 - NATIVE_DEPTH;
-        this->format.frequency = NATIVE_FREQUENCY;
-        this->format.codec_frequency = NATIVE_FREQUENCY;
+        this->format.frequency = fout;
+        this->format.codec_frequency = fout;
         this->sample_depth = NATIVE_DEPTH;
         this->stereo_mode = STEREO_NONINTERLEAVED;
         break;
 
     case DSP_SET_FREQUENCY:
         format_change_set(this);
-        value = value > 0 ? value : NATIVE_FREQUENCY;
+        value = value > 0 ? value : get_out_hz(this);
         this->format.frequency = value;
         this->format.codec_frequency = value;
         break;

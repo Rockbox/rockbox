@@ -23,7 +23,7 @@ $(BUILDDIR)/apps/features: $(APPSDIR)/features.txt  $(BUILDDIR)/firmware/common/
 	$(SILENT)mkdir -p $(BUILDDIR)/lang
 	$(call PRINTS,PP $(<F))
 	$(SILENT)$(CC) $(PPCFLAGS) \
-                 -E -P -imacros "config.h" -imacros "button.h" -x c $< | \
+                 -E -P -imacros "config.h" -imacros "pcm_sampr.h" -imacros "button.h" -x c $< | \
 		grep -v "^\#" | grep -v "^ *$$" > $(BUILDDIR)/apps/features; \
 
 $(BUILDDIR)/apps/genlang-features:  $(BUILDDIR)/apps/features

@@ -81,6 +81,8 @@
 #define fp_mul(x, y, z) (long)((((long long)(x)) * ((long long)(y))) >> (z))
 #define fp_div(x, y, z) (long)((((long long)(x)) << (z)) / ((long long)(y)))
 
+#define fp_muldiv(x, y, z) (long)((long long)(x)*(y) / (z))
+
 long fp_sincos(unsigned long phase, long *cos);
 long fp_sqrt(long a, unsigned int fracbits);
 long fp14_cos(int val);

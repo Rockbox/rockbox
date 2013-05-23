@@ -1200,7 +1200,7 @@ static long anim_peaks_vertical(void)
 /** Waveform View **/
 
 #ifdef OSCILLOSCOPE_GRAPHMODE
-static int16_t waveform_buffer[2*ALIGN_UP(NATIVE_FREQUENCY, 2048)+2*2048]
+static int16_t waveform_buffer[2*ALIGN_UP(HW_SAMPR_MAX, 2048)+2*2048]
     MEM_ALIGN_ATTR;
 static size_t waveform_buffer_threshold = 0;
 static size_t volatile waveform_buffer_have = 0;

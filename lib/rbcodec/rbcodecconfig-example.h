@@ -5,6 +5,10 @@
 #define HAVE_SW_TONE_CONTROLS
 #define HAVE_ALBUMART
 #define NUM_CORES 1
+/* All the same unless a configuration option is added to warble */
+#define DSP_OUT_MIN_HZ     44100
+#define DSP_OUT_DEFAULT_HZ 44100
+#define DSP_OUT_MAX_HZ     44100
 
 #ifndef __ASSEMBLER__
 

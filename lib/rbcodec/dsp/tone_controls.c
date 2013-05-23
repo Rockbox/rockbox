@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include "fixedpoint.h"
 #include "dsp_proc_entry.h"
 #include "dsp_filter.h"
 #include "tone_controls.h"
@@ -39,8 +40,19 @@ static const unsigned int tone_treble_cutoff = 3500;
 static int tone_bass = 0;
 static int tone_treble = 0;
 
+/* Current prescaler setting */
+static int tone_prescale = 0;
+
 /* Data for each DSP */
 static struct dsp_filter tone_filters[DSP_COUNT] IBSS_ATTR;
+
+static void update_filter(int id, int fout)
+{
+    filter_bishelf_coefs(fp_muldiv(0xffffffff, tone_bass_cutoff, fout),
+                         fp_muldiv(0xffffffff, tone_treble_cutoff, fout),
+                         tone_bass, tone_treble, -tone_prescale,
+                         &tone_filters[id]);
+}
 
 /* Update the filters' coefficients based upon the bass/treble settings */
 void tone_set_prescale(int prescale)
@@ -48,23 +60,20 @@ void tone_set_prescale(int prescale)
     int bass = tone_bass;
     int treble = tone_treble;
 
-    struct dsp_filter tone_filter; /* Temp to hold new version */
-    filter_bishelf_coefs(0xffffffff / NATIVE_FREQUENCY * tone_bass_cutoff,
-                         0xffffffff / NATIVE_FREQUENCY * tone_treble_cutoff,
-                         bass, treble, -prescale, &tone_filter);
+    tone_prescale = prescale;
 
     struct dsp_config *dsp;
     for (int i = 0; (dsp = dsp_get_config(i)); i++)
     {
-        struct dsp_filter *filter = &tone_filters[i];
-        filter_copy(filter, &tone_filter);
+        int fout = dsp_configure(dsp, DSP_GET_OUT_FREQUENCY, 0);
+        update_filter(i, fout);
     
-        bool enable = bass != 0 || treble != 0;
+        bool enable = bass != 0 || treble != 0 || prescale != 0;
         dsp_proc_enable(dsp, DSP_PROC_TONE_CONTROLS, enable);
 
-        if (!dsp_proc_active(dsp, DSP_PROC_TONE_CONTROLS))
+        if (enable && !dsp_proc_active(dsp, DSP_PROC_TONE_CONTROLS))
         {
-            filter_flush(filter); /* Going online */
+            filter_flush(&tone_filters[i]); /* Going online */
             dsp_proc_activate(dsp, DSP_PROC_TONE_CONTROLS, true);
         }
     }
@@ -111,6 +120,10 @@ static intptr_t tone_configure(struct dsp_proc_entry *this,
         /* Fall-through */
     case DSP_FLUSH:
         filter_flush((struct dsp_filter *)this->data);
+        break;
+
+    case DSP_SET_OUT_FREQUENCY:
+        update_filter(dsp_get_id(dsp), value);
         break;
     }
 

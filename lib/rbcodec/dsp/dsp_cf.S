@@ -81,58 +81,60 @@ crossfeed_process:
     movem.l     %d2-%d7/%a2-%a6, (%sp)  | save all regs
     movem.l     48(%sp), %a1/%a4        | %a1 = this, %a4 = buf_p
     move.l      (%a4), %a4              | %a4 = buf = *buf_p
-    movem.l     (%a4), %d7/%a4-%a5      | %d7 = buf->remcount, %a4 = buf->p32[0],
+    movem.l     (%a4), %d0/%a4-%a5      | %d0 = buf->remcount, %a4 = buf->p32[0],
                                         | %a5 = buf->p32[1]
-    move.l      (%a1), %a1              | %a1 = &crossfeed_state
-    move.l      (%a1)+, %d6             | %d6 = direct gain
-    movem.l     12(%a1), %d0-%d3        | fetch filter history samples
-    lea.l       132(%a1), %a6           | %a6 = delay line wrap limit
-    move.l      (%a6), %a0              | fetch delay line address
-    movem.l     (%a1), %a1-%a3          | load filter coefs
-    bra.b       20f | loop start        | go to loop start point
+    move.l      (%a1), %a6              | %d7 = state = &crossfeed_state
+    movem.l     (%a6), %d1-%d6/%a0-%a3  | %d1 = gain, %d2-%d4 = coefs,
+                                        | %d5..%d6 = history[0..1],
+                                        | %a0..%a1 = history[2..3],
+                                        | %a2 = index, %a3 = index_max
+    lea.l       0x28(%a6), %a6          | %a6 = state->delay
+    move.l      %a6, -(%sp)             | push state->delay
+    bra.b       .cfp_loop_start
     /* Register usage in loop:
-     * %a0 = delay_p, %a1..%a3 = b0, b1, a1 (filter coefs),
-     * %a4 = buf[0], %a5 = buf[1],
-     * %a6 = delay line pointer wrap limit,
-     * %d0..%d3 = history
-     * %d4..%d5 = temp.
-     * %d6 = direct gain,
-     * %d7 = count
+     * %d0 = count, %d1 = direct gain, %d2..%d4 = b0, b1, a1 (filter coefs),
+     * %d5..%d6 = history[0..1], %d7 = scratch
+     * %a0..%a1 = history[2..3], %a2 = index, %a3 = index_max,
+     * %a4 = buf[0], %a5 = buf[1], %a6 = scratch
      */
-10: | loop                              |
-    movclr.l    %acc0, %d4              | write outputs
-    move.l      %d4, (%a4)+             | .
-    movclr.l    %acc1, %d5              | .
-    move.l      %d5, (%a5)+             | .
-20: | loop start                        |
-    mac.l       %a2, %d0, (%a0)+, %d0, %acc0 | %acc0  = b1*dl[n - 1], %d0 = dl[n]
-    mac.l       %a1, %d0             , %acc0 | %acc0 += b0*dl[n]
-    mac.l       %a3, %d1, (%a5),  %d5, %acc0 | %acc0 += a1*y_r[n - 1], load R
-    mac.l       %a2, %d2, (%a0)+, %d2, %acc1 | %acc1  = b1*dr[n - 1], %d2 = dr[n]
-    mac.l       %a1, %d2             , %acc1 | %acc1 += b0*dr[n]
-    mac.l       %a3, %d3, (%a4),  %d4, %acc1 | %acc1 += a1*y_l[n - 1], load L
-    movem.l     %d4-%d5, -8(%a0)        | save left & right inputs to delay line
-    move.l      %acc0, %d3              | get filtered delayed left sample (y_l[n])
-    move.l      %acc1, %d1              | get filtered delayed right sample (y_r[n])
-    mac.l       %d6, %d4, %acc0         | %acc0 += gain*x_l[n]
-    mac.l       %d6, %d5, %acc1         | %acc1 += gain*x_r[n]
-    cmp.l       %a6, %a0                | wrap %a0 if passed end
-    bhs.b       30f | wrap buffer       |
-    tpf.l                               | trap the buffer wrap
-30: | wrap buffer                       | ...fwd taken branches more costly
-    lea.l       -104(%a6), %a0          | wrap it up
-    subq.l      #1, %d7                 | --count > 0 ?
-    bgt.b       10b | loop              | yes? do more
-    movclr.l    %acc0, %d4              | write last outputs
-    move.l      %d4, (%a4)              | .
-    movclr.l    %acc1, %d5              | .
-    move.l      %d5, (%a5)              | .
-    movem.l     %d0-%d3, -120(%a6)      | ...history
-    move.l      %a0, (%a6)              | ...delay_p
+.cfp_loop:
+    movclr.l    %acc0, %d7              | write outputs
+    move.l      %d7, (%a4)+             | .
+    movclr.l    %acc1, %a6              | .
+    move.l      %a6, (%a5)+             | .
+.cfp_loop_start:
+    mac.l       %d3, %d5, (%a2)+, %d5, %acc1 | %acc1  = b1*dl[n - 1], %d5 = dl[n]
+    mac.l       %d2, %d5             , %acc1 | %acc1 += b0*dl[n]
+    mac.l       %d4, %d6, (%a4),  %d7, %acc1 | %acc1 += a1*y_l[n - 1], %d7 = x_l[n]
+    mac.l       %d3, %a0, (%a2)+, %a0, %acc0 | %acc0  = b1*dr[n - 1], %a0 = dr[n]
+    mac.l       %a2, %a0             , %acc0 | %acc0 += b0*dr[n]
+    mac.l       %d4, %a1, (%a5),  %a6, %acc0 | %acc0 += a1*y_r[n - 1], %a6 = x_r[n]
+    movem.l     %d7/%a6, -8(%a2)        | save x_l[n] and x_r[n] to delay line
+    move.l      %acc1, %d6              | get filtered delayed left sample (y_l[n])
+    move.l      %acc0, %a1              | get filtered delayed right sample (y_r[n])
+    mac.l       %d1, %d7, %acc0         | %acc0 = gain*x_l[n] + y_r[n]
+    mac.l       %d1, %a6, %acc1         | %acc1 = gain*x_r[n] + y_l[n]
+
+    cmp.l       %a3, %a2                | wrap index if past end
+    bhs.b       1f                      |
+    tpf.w                               | trap the buffer wrap
+1:                                      | ...fwd taken branches more costly
+    move.l      (%sp), %a2         | 2b | wrap it up
+
+    subq.l      #1, %d0                 | --count > 0 ?
+    bgt.b       .cfp_loop               | yes? do more
+
+    movclr.l    %acc0, %d7              | write last outputs
+    move.l      %d7, (%a4)              | .
+    movclr.l    %acc1, %a6              | .
+    move.l      %a6, (%a5)              | .
+
+    move.l      (%sp)+, %a6             | pop state->delay
+    movem.l     %d5-%d6/%a0-%a2, -0x18(%a6) | save history, index
     movem.l     (%sp), %d2-%d7/%a2-%a6  | restore all regs
     lea.l       44(%sp), %sp            |
     rts                                 |
-    .size       crossfeed_process,.-crossfeed_process
+    .size       crossfeed_process, .-crossfeed_process
 
 /****************************************************************************
  * void crossfeed_meier_process(struct dsp_proc_entry *this,
@@ -147,7 +149,7 @@ crossfeed_meier_process:
     movem.l     %d2-%d6/%a2, (%sp)      | .
     move.l      (%a0), %a0              | %a0 = &this->data = &crossfeed_state
     move.l      (%a1), %a1              | %a1 = buf = *buf_p
-    movem.l     16(%a0), %d1-%d5        | %d1 = vcl, %d2 = vcr, %d3 = vdiff,
+    movem.l     4(%a0), %d1-%d5         | %d1 = vcl, %d2 = vcr, %d3 = vdiff,
                                         | %d4 = coef1, %d5 = coef2
     movem.l     (%a1), %d0/%a1-%a2      | %d0 = count = buf->remcount
                                         | %a1 = p32[0], %a2 = p32[1]
@@ -155,7 +157,7 @@ crossfeed_meier_process:
     | %d0 = count, %d1 = vcl, %d2 = vcr, %d3 = vdiff/lout,
     | %d4 = coef1, %d5 = coef2, %d6 = rout/scratch
     | %a1 = p32[0], %a2 = p32[1]
-10: | loop
+.cfmp_loop:
     mac.l       %d5, %d3, %acc0         | %acc0 = common = coef2*vdiff
     move.l      %acc0, %acc1            | copy common
     mac.l       %d4, %d1, (%a1), %d3, %acc0 | %acc0 += coef1*vcl, %d3 = lout
@@ -170,9 +172,9 @@ crossfeed_meier_process:
     movclr.l    %acc1, %d6              | %d5 = fetch -res2 in s0.31
     add.l       %d6, %d2                | vcr += -res2
     subq.l      #1, %d0                 | count--
-    bgt         10b | loop              | more samples?
+    bgt         .cfmp_loop              | more samples?
                                         |
-    movem.l     %d1-%d3, 16(%a0)        | save vcl, vcr, vdiff
+    movem.l     %d1-%d3, 4(%a0)         | save vcl, vcr, vdiff
     movem.l     (%sp), %d2-%d6/%a2      | restore non-volatiles
     lea.l       24(%sp), %sp            | .
     rts                                 |
