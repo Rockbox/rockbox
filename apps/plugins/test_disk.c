@@ -439,7 +439,6 @@ enum plugin_status plugin_start(const void* parameter)
                         "Disk speed", "Write & verify");
     int selected=0;
     bool quit = false;
-    int align;
     DIR *dir;
 
     (void)parameter;
@@ -458,10 +457,13 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
     audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
+#ifdef STORAGE_WANTS_ALIGN
+    /* align start and length for DMA */
+    STORAGE_ALIGN_BUFFER(audiobuf, audiobuflen);
+#else
     /* align start and length to 32 bit */
-    align = (-(intptr_t)audiobuf) & 3;
-    audiobuf += align;
-    audiobuflen = (audiobuflen - align) & ~3;
+    ALIGN_BUFFER(audiobuf, audiobuflen, 4);
+#endif
 
     rb->srand(*rb->current_tick);
 
