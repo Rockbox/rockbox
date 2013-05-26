@@ -55,14 +55,14 @@ static inline int gaussian_fast_amp( struct voice_t* voice, int output,
                                      int* amp_0, int* amp_1 )
 {
     asm volatile (
-    "mov     %[out], %[out], asr #15   \n"
-    "smulbb  %[out], %[out], %[envx]   \n"
+    "smulwb  %[out], %[out], %[envx] \n"
     : [out]"+r"(output)
     : [envx]"r"(voice->envx));
     asm volatile (
-    "mov     %[out], %[out], asr #11   \n"
-    "smulbb  %[a0], %[out], %[v0]      \n"
-    "smulbb  %[a1], %[out], %[v1]      \n"
+    "mov     %[out], %[out], asl #6  \n"
+    "smulwb  %[a0], %[out], %[v0]    \n"
+    "smulwb  %[a1], %[out], %[v1]    \n"
+    "mov     %[out], %[out], asr #5  \n"
     : [out]"+r"(output),
       [a0]"=&r"(*amp_0), [a1]"=r"(*amp_1)
     : [v0]"r"(voice->volume [0]),
