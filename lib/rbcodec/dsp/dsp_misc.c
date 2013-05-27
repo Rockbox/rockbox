@@ -22,7 +22,6 @@
  *
  ****************************************************************************/
 #include "rbcodecconfig.h"
-#include "sound.h"
 #include "fixedpoint.h"
 #include "replaygain.h"
 #include "dsp_proc_entry.h"

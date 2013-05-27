@@ -126,5 +126,12 @@ static inline int32_t clip_sample_16(int32_t sample)
 #endif
 */
 
+#ifdef HAVE_PITCHCONTROL
+/* precision of the pitch and speed variables */
+/* One zero per decimal (100 means two decimal places */
+#define PITCH_SPEED_PRECISION 100L
+#define PITCH_SPEED_100 (100L * PITCH_SPEED_PRECISION)  /* 100% speed */
+#endif /* HAVE_PITCHCONTROL */
+
 int find_first_set_bit(uint32_t value);
 #endif /* PLATFORM_H_INCLUDED */

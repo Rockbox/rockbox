@@ -19,8 +19,6 @@
  *
  ****************************************************************************/
 #include "rbcodecconfig.h"
-#include <stdbool.h>
-#include <sys/types.h>
 #include "fixedpoint.h"
 #include "fracmul.h"
 #include <string.h>
