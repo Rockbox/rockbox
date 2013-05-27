@@ -20,7 +20,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
+#include "rbcodecconfig.h"
 
 /****************************************************************************
  * void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)

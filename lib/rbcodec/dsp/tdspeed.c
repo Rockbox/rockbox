@@ -20,8 +20,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "rbcodecconfig.h"
 #include "platform.h"
-#include "config.h"
 #include "sound.h"
 #include "core_alloc.h"
 #include "dsp-util.h"

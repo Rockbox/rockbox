@@ -31,6 +31,16 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
 #ifndef BIT_N
 # define BIT_N(n) (1U << (n))
 #endif
+
+#ifndef MASK_N
+/* Make a mask of n contiguous bits, shifted left by 'shift' */
+# define MASK_N(type, n, shift) \
+     ((type)((((type)1 << (n)) - (type)1) << (shift)))
+#endif
+
+#ifndef INIT_ATTR
+# define INIT_ATTR
+#endif
 /*
 #ifdef CODEC
 
@@ -115,4 +125,6 @@ static inline int32_t clip_sample_16(int32_t sample)
 }
 #endif
 */
+
+int find_first_set_bit(uint32_t value);
 #endif /* PLATFORM_H_INCLUDED */

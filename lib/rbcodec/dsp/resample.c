@@ -20,8 +20,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include "system.h"
+#include "rbcodecconfig.h"
+#include "platform.h"
 #include "fracmul.h"
 #include "fixedpoint.h"
 #include "dsp_proc_entry.h"

@@ -19,12 +19,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include "system.h"
+#include "rbcodecconfig.h"
 #include "platform.h"
 #include "dsp_core.h"
 #include "dsp_sample_io.h"
-#include <sys/types.h>
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /*#define LOGF_ENABLE*/

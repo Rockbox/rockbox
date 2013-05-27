@@ -19,8 +19,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include "system.h"
+#include "rbcodecconfig.h"
 #include "sound.h"
 #include "fixedpoint.h"
 #include "fracmul.h"

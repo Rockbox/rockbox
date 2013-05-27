@@ -20,7 +20,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- #include "config.h"
+ #include "rbcodecconfig.h"
 
 /****************************************************************************
  *  void channel_mode_proc_mono(struct dsp_proc_entry *this,

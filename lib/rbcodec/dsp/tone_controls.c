@@ -19,14 +19,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include <stdbool.h>
-#include <sys/types.h>
-#include <stdint.h>
+#include "rbcodecconfig.h"
+#include "platform.h"
 #include "dsp_proc_entry.h"
 #include "dsp_filter.h"
 #include "tone_controls.h"
-#include <string.h>
 
 /* These apply to all DSP streams to remain as consistant as possible with
  * the behavior of hardware tone controls */

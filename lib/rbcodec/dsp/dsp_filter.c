@@ -18,13 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdbool.h>
-#include <string.h>
-#include "config.h"
+#include "rbcodecconfig.h"
 #include "fixedpoint.h"
 #include "fracmul.h"
 #include "dsp_filter.h"
 #include "replaygain.h"
+#include <string.h>
 
 enum filter_shift
 {
