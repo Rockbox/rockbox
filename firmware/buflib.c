@@ -647,9 +647,9 @@ free_space_at_end(struct buflib_context* ctx)
         return 0;
 }
 
-/* Return the maximum allocatable memory in bytes */
+/* Return the maximum allocatable contiguous memory in bytes */
 size_t
-buflib_available(struct buflib_context* ctx)
+buflib_allocatable(struct buflib_context* ctx)
 {
     union buflib_data *this;
     size_t free_space = 0, max_free_space = 0;
@@ -685,6 +685,29 @@ buflib_available(struct buflib_context* ctx)
         return max_free_space;
     else
         return 0;
+}
+
+/* Return the amount of unallocated memory in bytes (even if not contiguous) */
+size_t
+buflib_available(struct buflib_context* ctx)
+{
+    union buflib_data *this;
+    size_t free_space = 0;
+
+    /* now look if there's free in holes */
+    for(this = find_first_free(ctx); this < ctx->alloc_end; this += abs(this->val))
+    {
+        if (this->val < 0)
+        {
+            free_space += -this->val;
+            continue;
+        }
+    }
+
+    free_space *= sizeof(union buflib_data); /* make it bytes */
+    free_space += free_space_at_end(ctx);
+
+    return free_space;
 }
 
 /*
