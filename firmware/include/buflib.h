@@ -143,14 +143,19 @@ void buflib_init(struct buflib_context *context, void *buf, size_t size);
 
 
 /**
- * Returns how many bytes left the buflib has to satisfy allocations.
+ * Returns the amount of unallocated bytes. It does not mean this amount
+ * can be actually allocated because they might not be contiguous.
  *
- * This function does not yet consider possible compaction so there might
- * be more space left. This may change in the future.
- *
- * Returns: The number of bytes left in the memory pool.
+ * Returns: The number of unallocated bytes in the memory pool.
  */
 size_t buflib_available(struct buflib_context *ctx);
+
+/**
+ * Returns the biggest possible allocation that can be determined to succeed.
+ *
+ * Returns: The amount of bytes of the biggest unallocated, contiguous region.
+ */
+size_t buflib_allocatable(struct buflib_context *ctx);
 
 
 /**
