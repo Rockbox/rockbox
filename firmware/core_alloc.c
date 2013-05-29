@@ -67,6 +67,11 @@ size_t core_available(void)
     return buflib_available(&core_ctx);
 }
 
+size_t core_allocatable(void)
+{
+    return buflib_allocatable(&core_ctx);
+}
+
 int core_free(int handle)
 {
     return buflib_free(&core_ctx, handle);
