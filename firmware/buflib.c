@@ -165,7 +165,7 @@ static union buflib_data* handle_to_block(struct buflib_context* ctx, int handle
     union buflib_data* name_field =
                 (union buflib_data*)buflib_get_name(ctx, handle);
 
-    return name_field - 3;
+    return name_field ? name_field - 3 : NULL;
 }
 
 /* Shrink the handle table, returning true if its size was reduced, false if
@@ -353,11 +353,15 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
                 ret = this[2].ops->shrink_callback(handle, shrink_hints,
                                             data, (char*)(this+this->val)-data);
                 result |= (ret == BUFLIB_CB_OK);
-                /* this might have changed in the callback (if
-                 * it shrinked from the top), get it again */
+                /* 'this' might have changed in the callback (if it shrinked
+                 * from the top or even freed the handle), get it again */
                 this = handle_to_block(ctx, handle);
+                /* The handle was possibly be freed in the callback,
+                 * re-run the loop with the handle before */
+                if (!this)
+                    this = before;
                 /* could also change with shrinking from back */
-                if (last)
+                else if (last)
                     ctx->alloc_end = this + this->val;
             }
         }
@@ -780,6 +784,8 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
 {
     union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
+    if (!data)
+        return NULL;
     size_t len = data[-1].val;
     if (len <= 1)
         return NULL;
