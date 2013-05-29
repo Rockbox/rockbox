@@ -724,7 +724,18 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
     /* limit name to 16 since that's what buflib_available() accounts for it */
     char buf[16];
 
-    *size = buflib_available(ctx);
+    /* ignore ctx->compact because it's true if all movable blocks are contiguous
+     * even if the buffer has holes due to unmovable allocations */
+    unsigned hints;
+    size_t bufsize = ctx->handle_table - ctx->buf_start;
+    bufsize = MIN(BUFLIB_SHRINK_SIZE_MASK, bufsize*sizeof(union buflib_data)); /* make it bytes */
+    /* try as hard as possible to free up space. allocations are
+     * welcome to give up some or all of their memory */
+    hints = BUFLIB_SHRINK_POS_BACK | BUFLIB_SHRINK_POS_FRONT | bufsize;
+    /* compact until no space can be gained anymore */
+    while (buflib_compact_and_shrink(ctx, hints));
+
+    *size = buflib_allocatable(ctx);
     if (*size <= 0) /* OOM */
         return -1;
 
