@@ -800,6 +800,8 @@ static const struct plugin_api rockbox_api = {
 
 };
 
+static int plugin_buffer_handle;
+
 int plugin_load(const char* plugin, const void* parameter)
 {
     struct plugin_header *p_hdr;
@@ -814,6 +816,8 @@ int plugin_load(const char* plugin, const void* parameter)
         }
         lc_close(current_plugin_handle);
         current_plugin_handle = pfn_tsr_exit = NULL;
+        if (plugin_buffer_handle > 0)
+            plugin_buffer_handle = core_free(plugin_buffer_handle);
     }
 
     splash(0, ID2P(LANG_WAIT));
@@ -877,6 +881,9 @@ int plugin_load(const char* plugin, const void* parameter)
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
 
+    /* allow voice to back off if the plugin needs lots of memory */
+    talk_buffer_set_policy(TALK_BUFFER_LOOSE);
+
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     open_files = 0;
 #endif
@@ -890,7 +897,11 @@ int plugin_load(const char* plugin, const void* parameter)
     {   /* close handle if plugin is no tsr one */
         lc_close(current_plugin_handle);
         current_plugin_handle = NULL;
+        if (plugin_buffer_handle > 0)
+            plugin_buffer_handle = core_free(plugin_buffer_handle);
     }
+
+    talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
 
     /* Go back to the global setting in case the plugin changed it */
 #ifdef HAVE_TOUCHSCREEN
@@ -983,8 +994,12 @@ void* plugin_get_buffer(size_t *buffer_size)
  */
 void* plugin_get_audio_buffer(size_t *buffer_size)
 {
-    audio_stop();
-    return audio_get_buffer(true, buffer_size);
+    /* dummy ops with no callbacks, needed because by
+     * default buflib buffers can be moved around which must be avoided */
+    static struct buflib_callbacks dummy_ops;
+    plugin_buffer_handle = core_alloc_maximum("plugin audio buf", buffer_size,
+        &dummy_ops);
+    return core_get_data(plugin_buffer_handle);
 }
 
 /* The plugin wants to stay resident after leaving its main function, e.g.
