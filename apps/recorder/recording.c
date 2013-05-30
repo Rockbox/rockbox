@@ -691,15 +691,8 @@ void rec_set_source(int source, unsigned flags)
 
 void rec_set_recording_options(struct audio_recording_options *options)
 {
-#if CONFIG_CODEC != SWCODEC
-    if (global_settings.rec_prerecord_time)
-    {
-        talk_buffer_steal(); /* will use the mp3 buffer */
-    }
-#else /* == SWCODEC */
     rec_set_source(options->rec_source,
                    options->rec_source_flags | SRCF_RECORDING);
-#endif /* CONFIG_CODEC != SWCODEC */
 
     audio_set_recording_options(options);
 }
@@ -724,9 +717,6 @@ void rec_command(enum recording_command cmd)
             /* steal mp3 buffer, create unique filename and start recording */
             pm_reset_clipcount();
             pm_activate_clipcount(true);
-#if CONFIG_CODEC != SWCODEC
-            talk_buffer_steal(); /* we use the mp3 buffer */
-#endif
             audio_record(rec_create_filename(path_buffer));
             break;
         case RECORDING_CMD_START_NEWFILE:
