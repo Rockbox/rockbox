@@ -175,8 +175,8 @@ void audiohw_set_sampr_dividers(int fsel)
         },
         [HW_FREQ_48] =      /* CLK / 250 (48000Hz) */
         {
-            .iisclk = 49,
-            .iisdiv = 4,
+            .iisclk = 24,
+            .iisdiv = 9
         },
         /* going a bit higher would be nice to get 64kHz play, 32kHz rec, but a
          * close enough division isn't obtainable unless CLK can be changed */
