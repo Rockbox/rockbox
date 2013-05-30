@@ -42,6 +42,7 @@
 /***************************************************************************/
 
 /** General recording state **/
+static bool is_initialized = false;    /* Subsystem ready?                 */
 static bool is_recording;              /* We are recording                 */
 static bool is_paused;                 /* We have paused                   */
 static unsigned long errors;           /* An error has occured             */
@@ -1133,6 +1134,8 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 /* PCMREC_INIT */
 static void pcmrec_init(void)
 {
+    is_initialized = true;
+
     unsigned char *buffer;
     send_event(RECORDING_EVENT_START, NULL);
 
@@ -1185,6 +1188,7 @@ static void pcmrec_init(void)
 /* PCMREC_CLOSE */
 static void pcmrec_close(void)
 {
+    is_initialized = false;
     dma_lock = true;
     pre_record_ticks = 0; /* Can't be prerecording any more */
     warnings         = 0;
@@ -1490,6 +1494,17 @@ static void pcmrec_thread(void)
         {
             /* Not doing anything - sit and wait for commands */
             queue_wait(&pcmrec_queue, &ev);
+
+            /* Some messages must be handled even if not initialized */
+            switch (ev.id)
+            {
+            case PCMREC_INIT:
+            case SYS_USB_CONNECTED:
+                break;
+            default:
+                if (!is_initialized)
+                    continue;
+            }
         }
 
         switch (ev.id)
@@ -1533,7 +1548,10 @@ static void pcmrec_thread(void)
             case SYS_USB_CONNECTED:
                 if (is_recording)
                     break;
-                pcmrec_close();
+
+                if (is_initialized)
+                    pcmrec_close();
+
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&pcmrec_queue);
                 flush_interrupts = 0;
