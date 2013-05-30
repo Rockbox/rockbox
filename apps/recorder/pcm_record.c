@@ -24,6 +24,7 @@
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
+#include "panic.h"
 #include "string-extra.h"
 #include "pcm_record.h"
 #include "codecs.h"
@@ -40,6 +41,8 @@
 #include "spdif.h"
 #endif
 #include "audio_thread.h"
+#include "core_alloc.h"
+#include "talk.h"
 
 /* Macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
@@ -1402,11 +1405,22 @@ static void tally_prerecord_data(void)
 
 /** Event handlers for recording thread **/
 
+static int pcmrec_handle;
 /* Q_AUDIO_INIT_RECORDING */
 static void on_init_recording(void)
 {
     send_event(RECORDING_EVENT_START, NULL);
-    rec_buffer = audio_get_buffer(true, &rec_buffer_size);
+    /* dummy ops with no callbacks, needed because by
+     * default buflib buffers can be moved around which must be avoided
+     * FIXME: This buffer should play nicer and be shrinkable/movable */
+    static struct buflib_callbacks dummy_ops;
+    talk_buffer_set_policy(TALK_BUFFER_LOOSE);
+    pcmrec_handle = core_alloc_maximum("pcmrec", &rec_buffer_size, &dummy_ops);
+    if (pcmrec_handle)
+    /* someone is abusing core_alloc_maximum(). Fix this evil guy instead of
+     * trying to handle OOM without hope */
+        panicf("%s(): OOM\n", __func__);
+    rec_buffer = core_get_data(pcmrec_handle);
     init_rec_buffers();
     init_state();
     pcm_init_recording();
@@ -1429,6 +1443,10 @@ static void on_close_recording(void)
     pcm_set_frequency(HW_SAMPR_RESET | SAMPR_TYPE_REC);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
     pcm_apply_settings();
+
+    if (pcmrec_handle > 0)
+        pcmrec_handle = core_free(pcmrec_handle);
+    talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
 
     send_event(RECORDING_EVENT_STOP, NULL);
 }

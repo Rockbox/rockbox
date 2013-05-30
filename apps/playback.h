@@ -80,12 +80,6 @@ void audio_set_cuesheet(bool enable);
 void audio_set_crossfade(int enable);
 #endif
 
-enum
-{
-    AUDIO_WANT_PLAYBACK = 0,
-    AUDIO_WANT_VOICE,
-};
-bool audio_restore_playback(int type); /* Restores the audio buffer to handle the requested playback */
 size_t audio_get_filebuflen(void);
 
 unsigned int playback_status(void);

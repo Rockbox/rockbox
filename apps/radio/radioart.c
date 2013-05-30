@@ -32,6 +32,7 @@
 #include "kernel.h"
 #include "string-extra.h"
 #include "filefuncs.h"
+#include "core_alloc.h"
 
 #define MAX_RADIOART_IMAGES 10
 struct radioart {
@@ -158,14 +159,49 @@ static void buffer_reset_handler(void *data)
     (void)data;
 }
 
+static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
+{
+    (void)start;
+    (void)old_size;
+
+    ssize_t old_size_s = old_size;
+    size_t size_hint = (hints & BUFLIB_SHRINK_SIZE_MASK);
+    ssize_t wanted_size = old_size_s - size_hint;
+
+    if (wanted_size <= 0)
+    {
+        core_free(handle);
+        buffering_reset(NULL, 0);
+    }
+    else
+    {
+        if (hints & BUFLIB_SHRINK_POS_FRONT)
+            start += size_hint;
+
+        buffering_reset(start, wanted_size);
+        core_shrink(handle, start, wanted_size);
+        buf = start;
+
+        /* one-shot */
+        add_event(BUFFER_EVENT_BUFFER_RESET, true, buffer_reset_handler);
+    }
+
+    return BUFLIB_CB_OK;
+}
+
+static struct buflib_callbacks radioart_ops = {
+    .shrink_callback = shrink_callback,
+};
+
 void radioart_init(bool entering_screen)
 {
     if (entering_screen)
     {
         /* grab control over buffering */
         size_t bufsize;
-        buf = audio_get_buffer(false, &bufsize);
-        buffering_reset(buf, bufsize);
+        int handle = core_alloc_maximum("radioart", &bufsize, &radioart_ops);
+        buffering_reset(core_get_data(handle), bufsize);
+        buf = core_get_data(handle);
         /* one-shot */
         add_event(BUFFER_EVENT_BUFFER_RESET, true, buffer_reset_handler);
     }

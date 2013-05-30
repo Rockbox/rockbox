@@ -527,7 +527,13 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     ssize_t size = (ssize_t)old_size - wanted_size;
     /* keep at least 256K for the buffering */
     if ((size - extradata_size) < AUDIO_BUFFER_RESERVE)
-        return BUFLIB_CB_CANNOT_SHRINK;
+    {
+        /* check if buflib needs the memory really hard. if yes we give
+         * up playback for now, otherwise refuse to shrink to keep at least
+         * 256K for the buffering */
+        if ((hints & BUFLIB_SHRINK_POS_MASK) != BUFLIB_SHRINK_POS_MASK)
+            return BUFLIB_CB_CANNOT_SHRINK;
+    }
     /* TODO: Do it without stopping playback, if possible */
     bool playing = (audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY;
     long offset = audio_current_track()->offset;
@@ -539,7 +545,6 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     }
     else
         audio_stop();
-    talk_buffer_steal(); /* we obtain control over the buffer */
 
     switch (hints & BUFLIB_SHRINK_POS_MASK)
     {
@@ -550,6 +555,12 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
         case BUFLIB_SHRINK_POS_FRONT:
             core_shrink(handle, start + wanted_size, size);
             audio_reset_buffer_noalloc(start + wanted_size, size);
+            break;
+        case BUFLIB_SHRINK_POS_MASK:
+            audiobuf_handle = core_free(audiobuf_handle);
+            mpeg_audiobuf = NULL;
+            talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
+            playing = false;
             break;
     }
     if (playing)
@@ -564,45 +575,6 @@ static struct buflib_callbacks ops = {
     .move_callback = NULL,
     .shrink_callback = shrink_callback,
 };
-
-static size_t audio_talkbuf_init(char *bufstart)
-{
-    size_t ret = talkbuf_init(bufstart);
-    if (ret > (size_t)audiobuflen) /* does the voice even fit? */
-    {
-        talk_buffer_steal();
-        return 0;
-    }
-    return ret;
-}
-
-unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
-{
-    (void)talk_buf; /* always grab the voice buffer for now */
-
-    if (audio_is_initialized)
-        audio_hard_stop();
-
-    if (!buffer_size) /* special case for talk_init() */
-        return NULL;
-
-    if (!audiobuf_handle)
-    {
-        size_t bufsize;
-        /* audio_hard_stop() frees audiobuf, so re-aquire */
-        audiobuf_handle = core_alloc_maximum("audiobuf", &bufsize, &ops);
-        audiobuflen = bufsize;
-        if (buffer_size)
-            *buffer_size = audiobuflen;
-    }
-    mpeg_audiobuf = core_get_data(audiobuf_handle);
-    /* tell talk about the new buffer, don't re-enable just yet because the
-     * buffer is stolen */
-    audio_talkbuf_init(mpeg_audiobuf);
-
-    return mpeg_audiobuf;
-}
-
 
 #ifndef SIMULATOR
 /* Send callback events to notify about removing old tracks. */
@@ -2755,7 +2727,6 @@ size_t audio_buffer_available(void)
 
 static void audio_reset_buffer_noalloc(void* buf, size_t bufsize)
 {
-    talk_buffer_steal(); /* will use the mp3 buffer */
     mpeg_audiobuf = buf;
     audiobuflen = bufsize;
     if (global_settings.cuesheet)
@@ -2764,16 +2735,20 @@ static void audio_reset_buffer_noalloc(void* buf, size_t bufsize)
         mpeg_audiobuf = SKIPBYTES(mpeg_audiobuf, sizeof(struct cuesheet));
         audiobuflen -= sizeof(struct cuesheet);
     }
-    audio_talkbuf_init(mpeg_audiobuf);
 }
 
 static void audio_reset_buffer(void)
 {
     size_t bufsize = audiobuflen;
 
-    /* alloc buffer if it's was never allocated or freed by audio_hard_stop() */
+    /* alloc buffer if it's was never allocated or freed by audio_hard_stop() 
+     * because voice cannot be played during audio playback make
+     * talk.c give up all buffers and disable itself */
     if (!audiobuf_handle)
+    {
+        talk_buffer_set_policy(TALK_BUFFER_LOOSE);
         audiobuf_handle = core_alloc_maximum("audiobuf", &bufsize, &ops);
+    }
 
     audio_reset_buffer_noalloc(core_get_data(audiobuf_handle), bufsize);
 }
@@ -2818,6 +2793,8 @@ void audio_play(long offset)
 
 void audio_stop(void)
 {
+    if (audiobuf_handle <= 0)
+        return; /* nothing to do, must be hard-stopped already */
 #ifndef SIMULATOR
     mpeg_stop_done = false;
     queue_post(&mpeg_queue, MPEG_STOP, 0);
@@ -2828,8 +2805,6 @@ void audio_stop(void)
     is_playing = false;
     playing = false;
 #endif /* SIMULATOR */
-    /* give voice our entire buffer */
-    audio_talkbuf_init(mpeg_audiobuf);
 }
 
 /* dummy */
@@ -2840,13 +2815,12 @@ void audio_stop_recording(void)
 
 void audio_hard_stop(void)
 {
-    audio_stop();
-    /* tell voice we obtain the buffer before freeing */
-    talk_buffer_steal();
     if (audiobuf_handle > 0)
     {
+        audio_stop();
         audiobuf_handle = core_free(audiobuf_handle);
         mpeg_audiobuf = NULL;
+        talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
     }
 }
 

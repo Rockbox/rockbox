@@ -71,6 +71,26 @@ enum {
 /* convenience macro to have both virtual pointer and ID as arguments */
 #define STR(id) ID2P(id), id
 
+/* Policy values for how hard to try to keep the talk/voice buffers.
+ * Affects how genereous talk.c is when it's asked for memory in
+ * shrink_callbacks().
+ *
+ * I.e. setting the policy to TALK_BUFFER_LOOSE, it will happily give its
+ * entire bufer away if asked for, e.g. due to a another module
+ * calling core_alloc_maximum(), TALK_BUFFER_HOLD on the other hand will
+ * make it keep the buffers so that a call to core_alloc_maximum() does not
+ * stop the speech-interface.
+ */
+enum talk_buffer_policies {
+    TALK_BUFFER_DEFAULT,
+    TALK_BUFFER_LOOSE,
+    TALK_BUFFER_HOLD,
+};
+
+/* This sets the actual policy. Call this before core_alloc_maximum() to
+ * get the desired outcome */
+void talk_buffer_set_policy(int policy);
+
 /* publish these strings, so they're stored only once (better than #define) */
 extern const char* const dir_thumbnail_name; /* "_dirname.talk" */
 extern const char* const file_thumbnail_ext; /* ".talk" for file voicing */
@@ -81,7 +101,6 @@ bool talk_voice_required(void); /* returns true if voice codec required */
 #endif
 int talk_get_bufsize(void); /* get the loaded voice file size */
 size_t talkbuf_init(char* bufstart);
-void talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
 int talk_id(int32_t id, bool enqueue); /* play a voice ID from voicefont */
 /* play a thumbnail from file */

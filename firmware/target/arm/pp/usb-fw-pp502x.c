@@ -230,21 +230,6 @@ void usb_insert_int(void)
 }
 #endif /* USB_STATUS_BY_EVENT */
 
-#ifdef HAVE_BOOTLOADER_USB_MODE
-/* Replacement function that returns all unused memory after the bootloader
- * because the storage driver uses the audio buffer */
-extern unsigned char freebuffer[];
-extern unsigned char freebufferend[];
-unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
-{
-    if (buffer_size)
-        *buffer_size = freebufferend - freebuffer + 1;
-
-    return freebuffer;
-    (void)talk_buf;
-}
-#endif /* HAVE_BOOTLOADER_USB_MODE */
-
 void usb_drv_int_enable(bool enable)
 {
     /* enable/disable USB IRQ in CPU */
