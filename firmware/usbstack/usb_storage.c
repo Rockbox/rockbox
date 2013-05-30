@@ -34,6 +34,7 @@
 #if CONFIG_RTC
 #include "timefuncs.h"
 #endif
+#include "core_alloc.h"
 
 #ifdef USB_USE_RAMDISK
 #define RAMDISK_SIZE 2048
@@ -430,6 +431,7 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
     return (dest - orig_dest);
 }
 
+static int usb_handle;
 void usb_storage_init_connection(void)
 {
     logf("ums: set config");
@@ -452,13 +454,17 @@ void usb_storage_init_connection(void)
 #else
     /* TODO : check if bufsize is at least 32K ? */
     size_t bufsize;
-    unsigned char * audio_buffer;
+    unsigned char * buffer;
+    /* dummy ops with no callbacks, needed because by
+     * default buflib buffers can be moved around which must be avoided */
+    static struct buflib_callbacks dummy_ops;
 
-    audio_buffer = audio_get_buffer(false,&bufsize);
+    usb_handle = core_alloc_maximum("usb storage", &bufsize, &dummy_ops);
+    buffer = core_get_data(usb_handle);
 #if defined(UNCACHED_ADDR) && CONFIG_CPU != AS3525
-    cbw_buffer = (void *)UNCACHED_ADDR((unsigned int)(audio_buffer+31) & 0xffffffe0);
+    cbw_buffer = (void *)UNCACHED_ADDR((unsigned int)(buffer+31) & 0xffffffe0);
 #else
-    cbw_buffer = (void *)((unsigned int)(audio_buffer+31) & 0xffffffe0);
+    cbw_buffer = (void *)((unsigned int)(buffer+31) & 0xffffffe0);
 #endif
     tb.transfer_buffer = cbw_buffer + MAX_CBW_SIZE;
     commit_discard_dcache();
@@ -478,7 +484,8 @@ void usb_storage_init_connection(void)
 
 void usb_storage_disconnect(void)
 {
-    /* Empty for now */
+    if (usb_handle > 0)
+        usb_handle = core_free(usb_handle);
 }
 
 /* called by usb_core_transfer_complete() */
