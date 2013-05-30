@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///Fs\u003d",
+        "filename": "apps/lang/english.lang",
+        "patchSetId": 2
+      },
+      "lineNbr": 4716,
+      "author": {
+        "id": 1000047
+      },
+      "writtenOn": "2013-05-30T17:37:14Z",
+      "side": 1,
+      "message": "Please add new strings at the end of the file, to not \"confuse\" existing voice files.",
+      "revId": "ad298ca673bdc4812365f50dd57ce62ffd08eb18",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
