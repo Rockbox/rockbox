@@ -75,10 +75,6 @@ void audio_error_clear(void);
 int audio_get_file_pos(void);
 void audio_beep(int duration);
 
-/* Required call when audio buffer is required for some other purpose */
-/* implemented in apps but called from firmware(!) */
-unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size);
-
 #if CONFIG_CODEC == SWCODEC
 void audio_next_dir(void);
 void audio_prev_dir(void);

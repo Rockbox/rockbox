@@ -104,6 +104,7 @@
 #include "rbunicode.h"
 #include "root_menu.h"
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
+#include "panic.h"
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
@@ -531,13 +532,6 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         playlist->utf8 = true; /* Override any earlier indication. */
 
     splash(0, ID2P(LANG_WAIT));
-
-    if (!buffer)
-    {
-        /* use mp3 buffer for maximum load speed */
-        audio_stop();
-        buffer = audio_get_buffer(false, &buflen);
-    }
 
     store_index = true;
 
@@ -2077,8 +2071,26 @@ int playlist_create(const char *dir, const char *file)
     new_playlist(playlist, dir, file);
 
     if (file)
-        /* load the playlist file */
-        add_indices_to_playlist(playlist, NULL, 0);
+    {
+        /* dummy ops with no callbacks, needed because by
+         * default buflib buffers can be moved around which must be avoided */
+        static struct buflib_callbacks dummy_ops;
+        int handle;
+        size_t buflen;
+        /* use mp3 buffer for maximum load speed */
+        handle = core_alloc_maximum("temp", &buflen, &dummy_ops);
+        if (handle > 0)
+        {
+            /* load the playlist file */
+            add_indices_to_playlist(playlist, core_get_data(handle), buflen);
+            core_free(handle);
+        }
+        else
+        {
+            /* should not happen */
+            panicf("%s(): OOM", __func__);
+        }
+    }
 
     return 0;
 }
@@ -2094,14 +2106,22 @@ int playlist_resume(void)
     struct playlist_info* playlist = &current_playlist;
     char *buffer;
     size_t buflen;
+    int handle;
     int nread;
     int total_read = 0;
     int control_file_size = 0;
     bool first = true;
     bool sorted = true;
+    int result = -1;
 
+    /* dummy ops with no callbacks, needed because by
+     * default buflib buffers can be moved around which must be avoided */
+    static struct buflib_callbacks dummy_ops;
     /* use mp3 buffer for maximum load speed */
-    buffer = (char *)audio_get_buffer(false, &buflen);
+    handle = core_alloc_maximum("temp", &buflen, &dummy_ops);
+    if (handle < 0)
+        panicf("%s(): OOM", __func__);
+    buffer = core_get_data(handle);
 
     empty_playlist(playlist, true);
 
@@ -2110,7 +2130,7 @@ int playlist_resume(void)
     if (playlist->control_fd < 0)
     {
         splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
-        return -1;
+        goto out;
     }
     playlist->control_created = true;
 
@@ -2118,7 +2138,7 @@ int playlist_resume(void)
     if (control_file_size <= 0)
     {
         splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
-        return -1;
+        goto out;
     }
 
     /* read a small amount first to get the header */
@@ -2127,14 +2147,14 @@ int playlist_resume(void)
     if(nread <= 0)
     {
         splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
-        return -1;
+        goto out;
     }
 
     playlist->started = true;
 
     while (1)
     {
-        int result = 0;
+        result = 0;
         int count;
         enum playlist_command current_command = PLAYLIST_COMMAND_COMMENT;
         int last_newline = 0;
@@ -2195,7 +2215,10 @@ int playlist_resume(void)
                         version = atoi(str1);
                         
                         if (version != PLAYLIST_CONTROL_FILE_VERSION)
-                            return -1;
+                        {
+                            result = -1;
+                            goto out;
+                        }
                         
                         update_playlist_filename(playlist, str2, str3);
                         
@@ -2204,7 +2227,7 @@ int playlist_resume(void)
                             /* NOTE: add_indices_to_playlist() overwrites the
                                audiobuf so we need to reload control file
                                data */
-                            add_indices_to_playlist(playlist, NULL, 0);
+                            add_indices_to_playlist(playlist, buffer, buflen);
                         }
                         else if (str2[0] != '\0')
                         {
@@ -2242,7 +2265,10 @@ int playlist_resume(void)
                            buffer */
                         if (add_track_to_playlist(playlist, str3, position,
                                 queue, total_read+(str3-buffer)) < 0)
-                        return -1;
+                        {
+                            result = -1;
+                            goto out;
+                        }
                         
                         playlist->last_insert_pos = last_position;
 
@@ -2264,7 +2290,10 @@ int playlist_resume(void)
                         
                         if (remove_track_from_playlist(playlist, position,
                                 false) < 0)
-                            return -1;
+                        {
+                            result = -1;
+                            goto out;
+                        }
 
                         break;
                     }
@@ -2291,7 +2320,10 @@ int playlist_resume(void)
                         
                         if (randomise_playlist(playlist, seed, false,
                                 false) < 0)
-                            return -1;
+                        {
+                            result = -1;
+                            goto out;
+                        }
                         sorted = false;
                         break;
                     }
@@ -2308,7 +2340,10 @@ int playlist_resume(void)
                         playlist->first_index = atoi(str1);
                         
                         if (sort_playlist(playlist, false, false) < 0)
-                            return -1;
+                        {
+                            result = -1;
+                            goto out;
+                        }
 
                         sorted = true;
                         break;
@@ -2421,13 +2456,14 @@ int playlist_resume(void)
         if (result < 0)
         {
             splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
-            return result;
+            goto out;
         }
 
         if (useraborted)
         {
             splash(HZ*2, ID2P(LANG_CANCEL));
-            return -1;
+            result = -1;
+            goto out;
         }
         if (!newline || (exit_loop && count<nread))
         {
@@ -2435,7 +2471,8 @@ int playlist_resume(void)
             {
                 /* no newline at end of control file */
                 splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
-                return -1;
+                result = -1;
+                goto out;
             }
 
             /* We didn't end on a newline or we exited loop prematurely.
@@ -2464,7 +2501,9 @@ int playlist_resume(void)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
-    return 0;
+out:
+    core_free(handle);
+    return result;
 }
 
 /*
