@@ -39,6 +39,8 @@
 #include "spdif.h"
 #endif
 #include "audio_thread.h"
+#include "core_alloc.h"
+#include "talk.h"
 
 /***************************************************************************/
 
@@ -1158,6 +1160,8 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 /** event handlers for pcmrec thread */
 
 /* PCMREC_INIT */
+
+static int pcmrec_handle;
 static void pcmrec_init(void)
 {
     send_event(RECORDING_EVENT_START, NULL);
@@ -1165,7 +1169,17 @@ static void pcmrec_init(void)
 
     pcmrec_init_state();
 
-    unsigned char *buffer = audio_get_buffer(true, &rec_buffer_size);
+    /* dummy ops with no callbacks, needed because by
+     * default buflib buffers can be moved around which must be avoided
+     * FIXME: This buffer should play nicer and be shrinkable/movable */
+    static struct buflib_callbacks dummy_ops;
+    talk_buffer_set_policy(TALK_BUFFER_LOOSE);
+    pcmrec_handle = core_alloc_maximum("pcmrec", &rec_buffer_size, &dummy_ops);
+    if (pcmrec_handle)
+    /* someone is abusing core_alloc_maximum(). Fix this evil guy instead of
+     * trying to handle OOM without hope */
+        panicf("%s(): OOM\n", __func__);
+    unsigned char *buffer = core_get_data(pcmrec_handle);
 
     /* Line align pcm_buffer 2^5=32 bytes */
     pcm_buffer = (unsigned char *)ALIGN_UP_P2((uintptr_t)buffer, 5);
@@ -1186,6 +1200,9 @@ static void pcmrec_close(void)
     codec_unload();
     pcm_close_recording();
     reset_hardware();
+    if (pcmrec_handle > 0)
+        pcmrec_handle = core_free(pcmrec_handle);
+    talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
     send_event(RECORDING_EVENT_STOP, NULL);
 } /* pcmrec_close */
 
