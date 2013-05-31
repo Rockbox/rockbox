@@ -1191,7 +1191,6 @@ static void pcmrec_close(void)
 
 /* PCMREC_OPTIONS */
 static void pcmrec_set_recording_options(
-    struct event_queue *q,
     struct audio_recording_options *options)
 {
     /* stop everything */
@@ -1237,9 +1236,10 @@ static void pcmrec_set_recording_options(
     /* apply hardware setting to start monitoring now */
     pcm_apply_settings();
 
+    queue_reply(&audio_queue, 0); /* Release sender */
+
     if (codec_load(-1, enc_config.afmt | CODEC_TYPE_ENCODER))
     {
-        queue_reply(q, true);
 
         /* run immediately */
         codec_go();
@@ -1487,7 +1487,7 @@ void audio_recording_handler(struct queue_event *ev)
             return; /* no more recording */
 
         case Q_AUDIO_RECORDING_OPTIONS:
-            pcmrec_set_recording_options(&audio_queue,
+            pcmrec_set_recording_options(
                 (struct audio_recording_options *)ev->data);
             break;
 

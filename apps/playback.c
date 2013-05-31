@@ -3078,6 +3078,8 @@ void audio_playback_handler(struct queue_event *ev)
             /* buffer needs to be reinitialized */
             LOGFQUEUE("playback < Q_AUDIO_REMAKE_AUDIO_BUFFER");
             audio_start_playback(0, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
+            if (play_status == PLAY_STOPPED)
+                return; /* just need to change buffer state */
             break;
 
 #ifdef HAVE_DISK_STORAGE
@@ -3086,6 +3088,8 @@ void audio_playback_handler(struct queue_event *ev)
             LOGFQUEUE("playback < Q_AUDIO_UPDATE_WATERMARK: %d",
                       (int)ev->data);
             audio_update_filebuf_watermark(ev->data);
+            if (play_status == PLAY_STOPPED)
+                return; /* just need to update setting */
             break;
 #endif /* HAVE_DISK_STORAGE */
 

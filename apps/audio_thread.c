@@ -79,6 +79,14 @@ static void NORETURN_ATTR audio_thread(void)
             audio_playback_handler(&ev);
             continue;
 
+        /* Playback has to handle these, even if not playing */
+        case Q_AUDIO_REMAKE_AUDIO_BUFFER:
+#ifdef HAVE_DISK_STORAGE
+        case Q_AUDIO_UPDATE_WATERMARK:
+#endif
+            audio_playback_handler(&ev);
+            break;
+
 #ifdef AUDIO_HAVE_RECORDING
         /* Starts the recording engine branch */
         case Q_AUDIO_INIT_RECORDING:
@@ -132,10 +140,6 @@ void audio_init(void)
 
     logf("audio: initializing");
 
-    playback_init();
-
-    /* Recording doesn't need init call */
-
     /* Initialize queues before giving control elsewhere in case it likes
        to send messages. Thread creation will be delayed however so nothing
        starts running until ready if something yields such as talk_init. */
@@ -150,6 +154,9 @@ void audio_init(void)
 
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list,
                             audio_thread_id);
+
+    playback_init();
+    /* Recording doesn't need init call */
 
     /* ...now...audio_reset_buffer must know the size of voicefile buffer so
        init talk first which will init the buffers */
