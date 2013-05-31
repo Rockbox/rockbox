@@ -26,6 +26,7 @@
 #include "codecs.h"
 #include "codec_thread.h"
 #include "pcmbuf.h"
+#include "audio_thread.h"
 #include "playback.h"
 #include "buffering.h"
 #include "dsp_core.h"

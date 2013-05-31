@@ -163,6 +163,7 @@ radio/radioart.c
 #if INPUT_SRC_CAPS != 0
 audio_path.c
 #endif /* INPUT_SRC_CAPS != 0 */
+audio_thread.c
 pcmbuf.c
 codec_thread.c
 playback.c

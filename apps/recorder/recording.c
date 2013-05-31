@@ -1074,10 +1074,6 @@ bool recording_screen(bool no_source)
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    /* This should be done before touching audio settings */
-    while (!pcm_is_initialized())
-       sleep(0);
-
     /* recording_menu gets messed up: so prevent manus talking */
     talk_disable(true);
     /* audio_init_recording stops anything playing when it takes the audio
@@ -1208,11 +1204,6 @@ bool recording_screen(bool no_source)
                     pm_h[i] /= 2;
                 trig_width[i] = vp_top[i].width - pm_x[i];
             }
-
-#if CONFIG_CODEC == SWCODEC
-            audio_close_recording();
-            audio_init_recording();
-#endif
 
             rec_init_recording_options(&rec_options);
             rec_set_recording_options(&rec_options);

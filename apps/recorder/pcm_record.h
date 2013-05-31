@@ -42,6 +42,8 @@
 /* encoder has written past end of allocated space */
 #define PCMREC_E_CHUNK_OVF              0x80010000
 #endif /* DEBUG */
+/* DMA callback has reported an error */
+#define PCMREC_E_DMA                    0x80020000
 
 /** General functions for high level codec recording **/
 /* pcm_rec_error_clear is deprecated for general use. audio_error_clear
@@ -49,7 +51,7 @@
 void pcm_rec_error_clear(void);
 /* pcm_rec_status is deprecated for general use. audio_status merges the
    results for consistency with the hardware codec version */
-unsigned long pcm_rec_status(void);
+unsigned int pcm_rec_status(void);
 unsigned long pcm_rec_get_warnings(void);
 void pcm_rec_init(void) INIT_ATTR;
 int  pcm_rec_current_bitrate(void);

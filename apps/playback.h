@@ -92,68 +92,6 @@ size_t audio_get_filebuflen(void);
    otherwise the result is undefined. */
 bool audio_automatic_skip(void);
 
-/* Define one constant that includes recording related functionality */
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
-#define AUDIO_HAVE_RECORDING
-#endif
-
-enum {
-    Q_NULL = 0,                 /* reserved */
-
-    /* -> audio */
-    Q_AUDIO_PLAY = 1,
-    Q_AUDIO_STOP,
-    Q_AUDIO_PAUSE,
-    Q_AUDIO_SKIP,
-    Q_AUDIO_PRE_FF_REWIND,
-    Q_AUDIO_FF_REWIND,
-    Q_AUDIO_FLUSH,
-    Q_AUDIO_DIR_SKIP,
-
-    /* pcmbuf -> audio */
-    Q_AUDIO_TRACK_CHANGED,
-
-    /* audio -> audio */
-    Q_AUDIO_FILL_BUFFER,        /* continue buffering next track */
-
-    /* buffering -> audio */
-    Q_AUDIO_BUFFERING,          /* some buffer event */
-    Q_AUDIO_FINISH_LOAD_TRACK,  /* metadata is buffered */
-    Q_AUDIO_HANDLE_FINISHED,    /* some other type is buffered */
-
-    /* codec -> audio (*) */
-    Q_AUDIO_CODEC_SEEK_COMPLETE,
-    Q_AUDIO_CODEC_COMPLETE,
-
-    /* audio -> codec */
-    Q_CODEC_LOAD,
-    Q_CODEC_RUN,
-    Q_CODEC_PAUSE,
-    Q_CODEC_SEEK,
-    Q_CODEC_STOP,
-    Q_CODEC_UNLOAD,
-
-
-    /*- miscellanous -*/
-#ifdef AUDIO_HAVE_RECORDING
-    /* -> codec */
-    Q_AUDIO_LOAD_ENCODER,       /* load an encoder for recording */
-#endif
-    /* -> codec */
-    Q_CODEC_DO_CALLBACK,
-
-
-    /*- settings -*/
-
-#ifdef HAVE_DISK_STORAGE
-    /* -> audio */
-    Q_AUDIO_UPDATE_WATERMARK,   /* buffering watermark needs updating */
-#endif
-    /* -> audio */
-    Q_AUDIO_REMAKE_AUDIO_BUFFER, /* buffer needs to be reinitialized */
-};
-
-/* (*) If you change these, you must check audio_clear_track_notifications
-       in playback.c for correctness */
+unsigned int playback_status(void);
 
 #endif /* _PLAYBACK_H */

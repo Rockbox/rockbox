@@ -27,7 +27,6 @@
 #include "core_alloc.h"
 #include "sound.h"
 #include "ata.h"
-#include "usb.h"
 #include "codecs.h"
 #include "codec_thread.h"
 #include "voice_thread.h"
@@ -38,16 +37,13 @@
 #include "playlist.h"
 #include "abrepeat.h"
 #include "pcmbuf.h"
+#include "audio_thread.h"
 #include "playback.h"
 #include "misc.h"
 #include "settings.h"
 
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
-#endif
-
-#ifdef AUDIO_HAVE_RECORDING
-#include "pcm_record.h"
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -104,8 +100,10 @@
  */
 
 /** Miscellaneous **/
-bool audio_is_initialized = false; /* (A,O-) */
-extern struct codec_api ci;        /* (A,C) */
+extern unsigned int audio_thread_id;   /* from audio_thread.c */
+extern struct event_queue audio_queue; /* from audio_thread.c */
+extern bool audio_is_initialized;      /* from audio_thread.c */
+extern struct codec_api ci;            /* from codecs.c */
 
 /** Possible arrangements of the main buffer **/
 static enum audio_buffer_state
@@ -190,7 +188,6 @@ static enum filling_state
     STATE_FINISHED, /* all remaining tracks are fully buffered */
     STATE_ENDING,   /* audio playback is ending */
     STATE_ENDED,    /* audio playback is done */
-    STATE_USB,      /* USB mode, ignore most messages */
 } filling = STATE_IDLE;
 
 /* Track info - holds information about each track in the buffer */
@@ -329,15 +326,6 @@ static bool codec_skip_pending = false;
 static int  codec_skip_status;
 static bool codec_seeking = false;          /* Codec seeking ack expected? */
 static unsigned int position_key = 0;
-
-/* Event queues */
-static struct event_queue audio_queue SHAREDBSS_ATTR;
-
-/* Audio thread */
-static struct queue_sender_list audio_queue_sender_list SHAREDBSS_ATTR;
-static long audio_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
-static const char audio_thread_name[] = "audio";
-static unsigned int audio_thread_id = 0;
 
 /* Forward declarations */
 enum audio_start_playback_flags
@@ -2985,37 +2973,131 @@ static void audio_on_audio_flush(void)
     }
 }
 
-#ifdef AUDIO_HAVE_RECORDING
-/* Load the requested encoder type
-   (Q_AUDIO_LOAD_ENCODER) */
-static void audio_on_load_encoder(int afmt)
+/* Called by audio thread when playback is started */
+void audio_playback_handler(struct queue_event *ev)
 {
-    bool res = true;
-
-    if (play_status != PLAY_STOPPED)
-        audio_stop_playback(); /* Can't load both types at once */
-    else
-        codec_unload(); /* Encoder still loaded, stop and unload it */
-
-    if (afmt != AFMT_UNKNOWN)
-    {
-        res = codec_load(-1, afmt | CODEC_TYPE_ENCODER);
-        if (res)
-            codec_go(); /* These are run immediately */
-    }
-
-    queue_reply(&audio_queue, res);
-}
-#endif /* AUDIO_HAVE_RECORDING */
-
-static void audio_thread(void)
-{
-    struct queue_event ev;
-
-    pcm_postinit();
-
     while (1)
     {
+        switch (ev->id)
+        {
+        /** Codec and track change messages **/
+        case Q_AUDIO_CODEC_COMPLETE:
+            /* Codec is done processing track and has gone idle */
+            LOGFQUEUE("playback < Q_AUDIO_CODEC_COMPLETE: %ld",
+                      (long)ev->data);
+            audio_on_codec_complete(ev->data);
+            break;
+
+        case Q_AUDIO_CODEC_SEEK_COMPLETE:
+            /* Codec is done seeking */
+            LOGFQUEUE("playback < Q_AUDIO_SEEK_COMPLETE");
+            audio_on_codec_seek_complete();
+            break;
+
+        case Q_AUDIO_TRACK_CHANGED:
+            /* PCM track change done */
+            LOGFQUEUE("playback < Q_AUDIO_TRACK_CHANGED");
+            audio_on_track_changed();
+            break;
+
+        /** Control messages **/
+        case Q_AUDIO_PLAY:
+            LOGFQUEUE("playback < Q_AUDIO_PLAY");
+            audio_start_playback(ev->data, 0);
+            break;
+
+#ifdef AUDIO_HAVE_RECORDING
+        /* So we can go straight from playback to recording */
+        case Q_AUDIO_INIT_RECORDING:
+#endif
+        case SYS_USB_CONNECTED:
+        case Q_AUDIO_STOP:
+            LOGFQUEUE("playback < Q_AUDIO_STOP");
+            audio_stop_playback();
+            if (ev->data != 0)
+                queue_clear(&audio_queue);
+            return; /* no more playback */
+
+        case Q_AUDIO_PAUSE:
+            LOGFQUEUE("playback < Q_AUDIO_PAUSE");
+            audio_on_pause(ev->data);
+            break;
+
+        case Q_AUDIO_SKIP:
+            LOGFQUEUE("playback < Q_AUDIO_SKIP");
+            audio_on_skip();
+            break;
+
+        case Q_AUDIO_DIR_SKIP:
+            LOGFQUEUE("playback < Q_AUDIO_DIR_SKIP");
+            audio_on_dir_skip(ev->data);
+            break;
+
+        case Q_AUDIO_PRE_FF_REWIND:
+            LOGFQUEUE("playback < Q_AUDIO_PRE_FF_REWIND");
+            audio_on_pre_ff_rewind();
+            break;
+
+        case Q_AUDIO_FF_REWIND:
+            LOGFQUEUE("playback < Q_AUDIO_FF_REWIND");
+            audio_on_ff_rewind(ev->data);
+            break;
+
+        case Q_AUDIO_FLUSH:
+            LOGFQUEUE("playback < Q_AUDIO_FLUSH: %d", (int)ev->data);
+            audio_on_audio_flush();
+            break;
+
+        /** Buffering messages **/
+        case Q_AUDIO_BUFFERING:
+            /* some buffering event */
+            LOGFQUEUE("playback < Q_AUDIO_BUFFERING: %d", (int)ev->data);
+            audio_on_buffering(ev->data);
+            break;
+
+        case Q_AUDIO_FILL_BUFFER:
+            /* continue buffering next track */
+            LOGFQUEUE("playback < Q_AUDIO_FILL_BUFFER");
+            audio_on_fill_buffer();
+            break;
+
+        case Q_AUDIO_FINISH_LOAD_TRACK:
+            /* metadata is buffered */
+            LOGFQUEUE("playback < Q_AUDIO_FINISH_LOAD_TRACK");
+            audio_on_finish_load_track(ev->data);
+            break;
+
+        case Q_AUDIO_HANDLE_FINISHED:
+            /* some other type is buffered */
+            LOGFQUEUE("playback < Q_AUDIO_HANDLE_FINISHED");
+            audio_on_handle_finished(ev->data);
+            break;
+
+        /** Miscellaneous messages **/
+        case Q_AUDIO_REMAKE_AUDIO_BUFFER:
+            /* buffer needs to be reinitialized */
+            LOGFQUEUE("playback < Q_AUDIO_REMAKE_AUDIO_BUFFER");
+            audio_start_playback(0, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
+            break;
+
+#ifdef HAVE_DISK_STORAGE
+        case Q_AUDIO_UPDATE_WATERMARK:
+            /* buffering watermark needs updating */
+            LOGFQUEUE("playback < Q_AUDIO_UPDATE_WATERMARK: %d",
+                      (int)ev->data);
+            audio_update_filebuf_watermark(ev->data);
+            break;
+#endif /* HAVE_DISK_STORAGE */
+
+        case SYS_TIMEOUT:
+            LOGFQUEUE_SYS_TIMEOUT("playback < SYS_TIMEOUT");
+            break;
+
+        default:
+            /* LOGFQUEUE("audio < default : %08lX", ev->id); */
+            break;
+        } /* end switch */
+
         switch (filling)
         {
         /* Active states */
@@ -3039,174 +3121,22 @@ static void audio_thread(void)
             if (audio_pcmbuf_track_change_scan())
             {
                 /* Transfer notification to audio queue event */
-                ev.id = Q_AUDIO_TRACK_CHANGED;
-                ev.data = 1;
+                ev->id = Q_AUDIO_TRACK_CHANGED;
+                ev->data = 1;
             }
             else
             {
                 /* If doing auto skip, poll pcmbuf track notifications a bit
                    faster to promply detect the transition */
-                queue_wait_w_tmo(&audio_queue, &ev,
-                                 skip_pending == TRACK_SKIP_NONE ?
-                                    HZ/2 : HZ/10);
+                queue_wait_w_tmo(&audio_queue, ev,
+                    skip_pending == TRACK_SKIP_NONE ? HZ/2 : HZ/10);
             }
             break;
 
         /* Idle states */
         default:
-            queue_wait(&audio_queue, &ev);
-
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-            switch (ev.id)
-            {
-#ifdef AUDIO_HAVE_RECORDING
-            /* Must monitor the encoder message for recording so it can remove
-               it if we process the insertion before it does. It cannot simply
-               be removed from under recording however. */
-            case Q_AUDIO_LOAD_ENCODER:
-                break;
-#endif
-            case SYS_USB_DISCONNECTED:
-                filling = STATE_IDLE;
-                break;
-
-            default:
-                if (filling == STATE_USB)
-                    continue;
-            }
-#endif /* CONFIG_PLATFORM */
+            queue_wait(&audio_queue, ev);
         }
-
-        switch (ev.id)
-        {
-        /** Codec and track change messages **/
-        case Q_AUDIO_CODEC_COMPLETE:
-            /* Codec is done processing track and has gone idle */
-            LOGFQUEUE("audio < Q_AUDIO_CODEC_COMPLETE: %ld", (long)ev.data);
-            audio_on_codec_complete(ev.data);
-            break;
-
-        case Q_AUDIO_CODEC_SEEK_COMPLETE:
-            /* Codec is done seeking */
-            LOGFQUEUE("audio < Q_AUDIO_SEEK_COMPLETE");
-            audio_on_codec_seek_complete();
-            break;
-
-        case Q_AUDIO_TRACK_CHANGED:
-            /* PCM track change done */
-            LOGFQUEUE("audio < Q_AUDIO_TRACK_CHANGED");
-            audio_on_track_changed();
-            break;
-
-        /** Control messages **/
-        case Q_AUDIO_PLAY:
-            LOGFQUEUE("audio < Q_AUDIO_PLAY");
-            audio_start_playback(ev.data, 0);
-            break;
-
-        case Q_AUDIO_STOP:
-            LOGFQUEUE("audio < Q_AUDIO_STOP");
-            audio_stop_playback();
-            if (ev.data != 0)
-                queue_clear(&audio_queue);
-            break;
-
-        case Q_AUDIO_PAUSE:
-            LOGFQUEUE("audio < Q_AUDIO_PAUSE");
-            audio_on_pause(ev.data);
-            break;
-
-        case Q_AUDIO_SKIP:
-            LOGFQUEUE("audio < Q_AUDIO_SKIP");
-            audio_on_skip();
-            break;
-
-        case Q_AUDIO_DIR_SKIP:
-            LOGFQUEUE("audio < Q_AUDIO_DIR_SKIP");
-            audio_on_dir_skip(ev.data);
-            break;
-
-        case Q_AUDIO_PRE_FF_REWIND:
-            LOGFQUEUE("audio < Q_AUDIO_PRE_FF_REWIND");
-            audio_on_pre_ff_rewind();
-            break;
-
-        case Q_AUDIO_FF_REWIND:
-            LOGFQUEUE("audio < Q_AUDIO_FF_REWIND");
-            audio_on_ff_rewind(ev.data);
-            break;
-
-        case Q_AUDIO_FLUSH:
-            LOGFQUEUE("audio < Q_AUDIO_FLUSH: %d", (int)ev.data);
-            audio_on_audio_flush();
-            break;
-
-        /** Buffering messages **/
-        case Q_AUDIO_BUFFERING:
-            /* some buffering event */
-            LOGFQUEUE("audio < Q_AUDIO_BUFFERING: %d", (int)ev.data);
-            audio_on_buffering(ev.data);
-            break;
-
-        case Q_AUDIO_FILL_BUFFER:
-            /* continue buffering next track */
-            LOGFQUEUE("audio < Q_AUDIO_FILL_BUFFER");
-            audio_on_fill_buffer();
-            break;
-
-        case Q_AUDIO_FINISH_LOAD_TRACK:
-            /* metadata is buffered */
-            LOGFQUEUE("audio < Q_AUDIO_FINISH_LOAD_TRACK");
-            audio_on_finish_load_track(ev.data);
-            break;
-
-        case Q_AUDIO_HANDLE_FINISHED:
-            /* some other type is buffered */
-            LOGFQUEUE("audio < Q_AUDIO_HANDLE_FINISHED");
-            audio_on_handle_finished(ev.data);
-            break;
-
-        /** Miscellaneous messages **/
-        case Q_AUDIO_REMAKE_AUDIO_BUFFER:
-            /* buffer needs to be reinitialized */
-            LOGFQUEUE("audio < Q_AUDIO_REMAKE_AUDIO_BUFFER");
-            audio_start_playback(0, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
-            break;
-
-#ifdef HAVE_DISK_STORAGE
-        case Q_AUDIO_UPDATE_WATERMARK:
-            /* buffering watermark needs updating */
-            LOGFQUEUE("audio < Q_AUDIO_UPDATE_WATERMARK: %d", (int)ev.data);
-            audio_update_filebuf_watermark(ev.data);
-            break;
-#endif /* HAVE_DISK_STORAGE */
-
-#ifdef AUDIO_HAVE_RECORDING
-        case Q_AUDIO_LOAD_ENCODER:
-            /* load an encoder for recording */
-            LOGFQUEUE("audio < Q_AUDIO_LOAD_ENCODER: %d", (int)ev.data);
-            audio_on_load_encoder(ev.data);
-            break;
-#endif /* AUDIO_HAVE_RECORDING */
-
-        case SYS_USB_CONNECTED:
-            LOGFQUEUE("audio < SYS_USB_CONNECTED");
-            audio_stop_playback();
-#ifdef PLAYBACK_VOICE
-            voice_stop();
-#endif
-            filling = STATE_USB;
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            break;
-
-        case SYS_TIMEOUT:
-            LOGFQUEUE_SYS_TIMEOUT("audio < SYS_TIMEOUT");
-            break;
-
-        default:
-            /* LOGFQUEUE("audio < default : %08lX", ev.id); */
-            break;
-        } /* end switch */
     } /* end while */
 }
 
@@ -3355,27 +3285,6 @@ bool audio_pcmbuf_may_play(void)
 
 
 /** -- External interfaces -- **/
-
-/* Return the playback and recording status */
-int audio_status(void)
-{
-    unsigned int ret = play_status;
-
-#ifdef AUDIO_HAVE_RECORDING
-    /* Do this here for constitency with mpeg.c version */
-    ret |= pcm_rec_status();
-#endif
-
-    return (int)ret;
-}
-
-/* Clear all accumulated audio errors for playback and recording */
-void audio_error_clear(void)
-{
-#ifdef AUDIO_HAVE_RECORDING
-    pcm_rec_error_clear();
-#endif
-}
 
 /* Get a copy of the id3 data for the for current track + offset + skip delta */
 bool audio_peek_track(struct mp3entry *id3, int offset)
@@ -3599,7 +3508,7 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     unsigned char *buf;
 
-    if (audio_is_initialized)
+    if (audio_is_initialized && thread_self() != audio_thread_id)
     {
         audio_hard_stop();
     }
@@ -3655,15 +3564,6 @@ unsigned char * audio_get_buffer(bool talk_buf, size_t *buffer_size)
     *buffer_size = filebuflen;
     return buf;
 }
-
-#ifdef HAVE_RECORDING
-/* Stop audio, voice and obtain all available buffer space */
-unsigned char * audio_get_recording_buffer(size_t *buffer_size)
-{
-    audio_hard_stop();
-    return audio_get_buffer(true, buffer_size);
-}
-#endif /* HAVE_RECORDING */
 
 /* Restore audio buffer to a particular state (promoting status) */
 bool audio_restore_playback(int type)
@@ -3755,30 +3655,6 @@ void playback_release_aa_slot(int slot)
 }
 #endif /* HAVE_ALBUMART */
 
-
-#ifdef HAVE_RECORDING
-/* Load an encoder and run it */
-bool audio_load_encoder(int afmt)
-{
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    LOGFQUEUE("audio >| Q_AUDIO_LOAD_ENCODER: %d", afmt);
-    return audio_queue_send(Q_AUDIO_LOAD_ENCODER, afmt) != 0;
-#else
-    (void)afmt;
-    return true;
-#endif
-}
-
-/* Stop an encoder and unload it */
-void audio_remove_encoder(void)
-{
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    LOGFQUEUE("audio >| Q_AUDIO_LOAD_ENCODER: NULL");
-    audio_queue_send(Q_AUDIO_LOAD_ENCODER, AFMT_UNKNOWN);
-#endif
-}
-#endif /* HAVE_RECORDING */
-
 /* Is an automatic skip in progress? If called outside transition callbacks,
    indicates the last skip type at the time it was processed and isn't very
    meaningful. */
@@ -3866,58 +3742,24 @@ void audio_set_crossfade(int enable)
 }
 #endif /* HAVE_CROSSFADE */
 
+unsigned int playback_status(void)
+{
+    return play_status;
+}
 
 /** -- Startup -- **/
-
-/* Initialize the audio system - called from init() in main.c */
-void audio_init(void)
+void playback_init(void)
 {
-    /* Can never do this twice */
-    if (audio_is_initialized)
-    {
-        logf("audio: already initialized");
-        return;
-    }
-
-    logf("audio: initializing");
-
-    /* Initialize queues before giving control elsewhere in case it likes
-       to send messages. Thread creation will be delayed however so nothing
-       starts running until ready if something yields such as talk_init. */
-    queue_init(&audio_queue, true);
-
-    mutex_init(&id3_mutex);
-
-    pcm_init();
-
-    codec_thread_init();
-
-    /* This thread does buffer, so match its priority */
-    audio_thread_id = create_thread(audio_thread, audio_stack,
-                  sizeof(audio_stack), 0, audio_thread_name
-                  IF_PRIO(, MIN(PRIORITY_BUFFERING, PRIORITY_USER_INTERFACE))
-                  IF_COP(, CPU));
-
-    queue_enable_queue_send(&audio_queue, &audio_queue_sender_list,
-                            audio_thread_id);
+    logf("playback: initializing");
 
     /* Initialize the track buffering system */
+    mutex_init(&id3_mutex);
     track_list_init();
     buffering_init();
-
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);
 #endif
-
-    /* ...now...audio_reset_buffer must know the size of voicefile buffer so
-       init talk first which will init the buffers */
-    talk_init();
-
-    /* Probably safe to say */
-    audio_is_initialized = true;
-
-    sound_settings_apply();
 #ifdef HAVE_DISK_STORAGE
     audio_set_buffer_margin(global_settings.buffer_margin);
 #endif

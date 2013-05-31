@@ -87,6 +87,7 @@
 #endif
 
 #if (CONFIG_CODEC == SWCODEC)
+#include "audio_thread.h"
 #include "playback.h"
 #include "tdspeed.h"
 #endif
@@ -386,6 +387,7 @@ static void init(void)
 
     storage_init();
 #if CONFIG_CODEC == SWCODEC
+    pcm_init();
     dsp_init();
 #endif
     settings_reset();
@@ -421,10 +423,6 @@ static void init(void)
     scrobbler_init();
 
     audio_init();
-
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING)
-    pcm_rec_init();
-#endif
 
     settings_apply_skins();
 }
@@ -641,6 +639,7 @@ static void init(void)
     }
 
 #if CONFIG_CODEC == SWCODEC
+    pcm_init();
     dsp_init();
 #endif
 
@@ -726,10 +725,6 @@ static void init(void)
     CHART(">audio_init");
     audio_init();
     CHART("<audio_init");
-
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING)
-    pcm_rec_init();
-#endif
 
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);

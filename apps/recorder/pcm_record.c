@@ -38,11 +38,13 @@
 #ifdef HAVE_SPDIF_IN
 #include "spdif.h"
 #endif
+#include "audio_thread.h"
 
 /***************************************************************************/
 
+extern struct event_queue audio_queue;
+
 /** General recording state **/
-static bool is_initialized = false;    /* Subsystem ready?                 */
 static bool is_recording;              /* We are recording                 */
 static bool is_paused;                 /* We have paused                   */
 static unsigned long errors;           /* An error has occured             */
@@ -230,14 +232,6 @@ enum
 
 /***************************************************************************/
 
-static struct event_queue       pcmrec_queue SHAREDBSS_ATTR;
-static struct queue_sender_list pcmrec_queue_send SHAREDBSS_ATTR;
-static long                pcmrec_stack[3*DEFAULT_STACK_SIZE/sizeof(long)];
-static const char          pcmrec_thread_name[] = "pcmrec";
-static unsigned int pcmrec_thread_id = 0;
-
-static void pcmrec_thread(void);
-
 enum
 {
     PCMREC_NULL = 0,
@@ -248,14 +242,23 @@ enum
     PCMREC_STOP,            /* stop the current recording      */
     PCMREC_PAUSE,           /* pause the current recording     */
     PCMREC_RESUME,          /* resume the current recording    */
-#if 0
-    PCMREC_FLUSH_NUM,       /* flush a number of files out     */
-#endif
 };
 
 /*******************************************************************/
-/* Functions that are not executing in the pcmrec_thread first     */
+/* Functions that are not executing in the audio thread first      */
 /*******************************************************************/
+
+static void pcmrec_raise_error_status(unsigned long e)
+{
+    pcm_rec_lock(); /* DMA sets this too */
+    errors |= e;
+    pcm_rec_unlock();
+}
+
+static void pcmrec_raise_warning_status(unsigned long w)
+{
+    warnings |= w;
+}
     
 /* Callback for when more data is ready - called in interrupt context */
 static void pcm_rec_have_more(void **start, size_t *size)
@@ -268,7 +271,7 @@ static void pcm_rec_have_more(void **start, size_t *size)
         /* set pcm ovf if processing start position is inside current
            write chunk */
         if ((unsigned)(pcm_enc_pos - next_pos) < PCM_CHUNK_SIZE)
-            warnings |= PCMREC_W_PCM_BUFFER_OVF;
+            pcmrec_raise_warning_status(PCMREC_W_PCM_BUFFER_OVF);
 
         dma_wr_pos = next_pos;
     }
@@ -285,7 +288,7 @@ static enum pcm_dma_status pcm_rec_status_callback(enum pcm_dma_status status)
         if (status == PCM_DMAST_ERR_DMA)
         {
             /* Flush recorded data to disk and stop recording */
-            queue_post(&pcmrec_queue, PCMREC_STOP, 0);
+            errors |= PCMREC_E_DMA;
             return status;
         }
         /* else try again next transmission - frame is invalid */
@@ -315,9 +318,9 @@ void pcm_rec_error_clear(void)
 /**
  * Check mode, errors and warnings
  */
-unsigned long pcm_rec_status(void)
+unsigned int pcm_rec_status(void)
 {
-    unsigned long ret = 0;
+    unsigned int ret = 0;
 
     if (is_recording)
         ret |= AUDIO_STATUS_RECORD;
@@ -379,20 +382,6 @@ unsigned long pcm_rec_sample_rate(void)
 } /* audio_get_sample_rate */
 #endif
 
-/**
- * Creates pcmrec_thread
- */
-void pcm_rec_init(void)
-{
-    queue_init(&pcmrec_queue, true);
-    pcmrec_thread_id =
-        create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
-                      0, pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING)
-                      IF_COP(, CPU));
-    queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send,
-                            pcmrec_thread_id);
-} /* pcm_rec_init */
-
 /** audio_* group **/
 
 /**
@@ -401,7 +390,7 @@ void pcm_rec_init(void)
 void audio_init_recording(void)
 {
     logf("audio_init_recording");
-    queue_send(&pcmrec_queue, PCMREC_INIT, 0);
+    queue_send(&audio_queue, Q_AUDIO_INIT_RECORDING, 1);
     logf("audio_init_recording done");
 } /* audio_init_recording */
 
@@ -411,7 +400,7 @@ void audio_init_recording(void)
 void audio_close_recording(void)
 {
     logf("audio_close_recording");
-    queue_send(&pcmrec_queue, PCMREC_CLOSE, 0);
+    queue_send(&audio_queue, Q_AUDIO_CLOSE_RECORDING, 0);
     logf("audio_close_recording done");
 } /* audio_close_recording */
 
@@ -421,7 +410,7 @@ void audio_close_recording(void)
 void audio_set_recording_options(struct audio_recording_options *options)
 {
     logf("audio_set_recording_options");
-    queue_send(&pcmrec_queue, PCMREC_OPTIONS, (intptr_t)options);
+    queue_send(&audio_queue, Q_AUDIO_RECORDING_OPTIONS, (intptr_t)options);
     logf("audio_set_recording_options done");
 } /* audio_set_recording_options */
 
@@ -432,7 +421,7 @@ void audio_record(const char *filename)
 {
     logf("audio_record: %s", filename);
     flush_interrupt();
-    queue_send(&pcmrec_queue, PCMREC_RECORD, (intptr_t)filename);
+    queue_send(&audio_queue, Q_AUDIO_RECORD, (intptr_t)filename);
     logf("audio_record_done");
 } /* audio_record */
 
@@ -451,7 +440,7 @@ void audio_stop_recording(void)
 {
     logf("audio_stop_recording");
     flush_interrupt();
-    queue_post(&pcmrec_queue, PCMREC_STOP, 0);
+    queue_post(&audio_queue, Q_AUDIO_STOP, 0);
     logf("audio_stop_recording done");
 } /* audio_stop_recording */
 
@@ -462,7 +451,7 @@ void audio_pause_recording(void)
 {
     logf("audio_pause_recording");
     flush_interrupt();
-    queue_post(&pcmrec_queue, PCMREC_PAUSE, 0);
+    queue_post(&audio_queue, Q_AUDIO_PAUSE, 0);
     logf("audio_pause_recording done");
 } /* audio_pause_recording */
 
@@ -472,7 +461,7 @@ void audio_pause_recording(void)
 void audio_resume_recording(void)
 {
     logf("audio_resume_recording");
-    queue_post(&pcmrec_queue, PCMREC_RESUME, 0);
+    queue_post(&audio_queue, Q_AUDIO_RESUME, 0);
     logf("audio_resume_recording done");
 } /* audio_resume_recording */
 
@@ -517,9 +506,45 @@ unsigned long audio_num_recorded_bytes(void)
     
 /***************************************************************************/
 /*                                                                         */
-/*         Functions that execute in the context of pcmrec_thread          */
+/*         Functions that execute in the context of audio thread           */
 /*                                                                         */
 /***************************************************************************/
+
+static void pcmrec_init_state(void)
+{
+    flush_interrupts = 0;
+
+    /* warings and errors */
+    warnings          =
+    errors            = 0;
+
+    /* pcm FIFO */
+    dma_lock          = true;
+    pcm_rd_pos        = 0;
+    dma_wr_pos        = 0;
+    pcm_enc_pos       = 0;
+
+    /* encoder FIFO */
+    enc_wr_index      = 0;
+    enc_rd_index      = 0;
+
+    /* filename queue */
+    fnq_rd_pos        = 0;
+    fnq_wr_pos        = 0;
+
+    /* stats */
+    num_rec_bytes     = 0;
+    num_rec_samples   = 0;
+#if 0
+    accum_rec_bytes   = 0;
+    accum_pcm_samples = 0;
+#endif
+
+    pre_record_ticks  = 0;
+
+    is_recording      = false;
+    is_paused         = false;
+} /* pcmrec_init_state */
 
 /** Filename Queue **/
 
@@ -594,7 +619,7 @@ static void pcmrec_close_file(int *fd_p)
         return; /* preserve error */
 
     if (close(*fd_p) != 0)
-        errors |= PCMREC_E_IO;
+        pcmrec_raise_error_status(PCMREC_E_IO);
 
     *fd_p = -1;
 } /* pcmrec_close_file */
@@ -646,7 +671,7 @@ static void pcmrec_start_file(void)
     {
         logf("start file: fnq empty");
         *filename = '\0';
-        errors |= PCMREC_E_FNQ_DESYNC;
+        pcmrec_raise_error_status(PCMREC_E_FNQ_DESYNC);
     }
     else if (errors != 0)
     {
@@ -656,7 +681,7 @@ static void pcmrec_start_file(void)
     {
         /* Any previous file should have been closed */
         logf("start file: file already open");
-        errors |= PCMREC_E_FNQ_DESYNC;
+        pcmrec_raise_error_status(PCMREC_E_FNQ_DESYNC);
     }
     
     if (errors != 0)
@@ -671,7 +696,7 @@ static void pcmrec_start_file(void)
     if (errors == 0 && (rec_fdata.chunk->flags & CHUNKF_ERROR))
     {
         logf("start file: enc error");
-        errors |= PCMREC_E_ENCODER;
+        pcmrec_raise_error_status(PCMREC_E_ENCODER);
     }
 
     if (errors != 0)
@@ -706,7 +731,7 @@ static inline void pcmrec_write_chunk(void)
     {
         logf("wr chk enc error %lu %lu",
              rec_fdata.chunk->enc_size, rec_fdata.chunk->num_pcm);
-        errors |= PCMREC_E_ENCODER;
+        pcmrec_raise_error_status(PCMREC_E_ENCODER);
     }
 } /* pcmrec_write_chunk */
 
@@ -725,7 +750,7 @@ static void pcmrec_end_file(void)
         if (rec_fdata.chunk->flags & CHUNKF_ERROR)
         {
             logf("end file: enc error");
-            errors |= PCMREC_E_ENCODER;
+            pcmrec_raise_error_status(PCMREC_E_ENCODER);
         }
         else
         {
@@ -946,7 +971,7 @@ static void pcmrec_flush(unsigned flush_num)
 
     /* sync file */
     if (rec_fdata.rec_file >= 0 && fsync(rec_fdata.rec_file) != 0)
-        errors |= PCMREC_E_IO;
+        pcmrec_raise_error_status(PCMREC_E_IO);
 
     cpu_boost(false);
 
@@ -1001,7 +1026,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 
     if (filename)
         strlcpy(path, filename, MAX_PATH);
-    queue_reply(&pcmrec_queue, 0); /* We have all we need */
+    queue_reply(&audio_queue, 0); /* We have all we need */
 
     data.pre_chunk = NULL;
     data.chunk = GET_ENC_CHUNK(enc_wr_index);
@@ -1129,51 +1154,18 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
         pcmrec_flush(PCMREC_FLUSH_IF_HIGH);
 } /* pcmrec_new_stream */
 
+
 /** event handlers for pcmrec thread */
 
 /* PCMREC_INIT */
 static void pcmrec_init(void)
 {
-    is_initialized = true;
-
-    unsigned char *buffer;
     send_event(RECORDING_EVENT_START, NULL);
-
-    /* warings and errors */
-    warnings          =
-    errors            = 0;
-
     pcmrec_close_file(&rec_fdata.rec_file);
-    rec_fdata.rec_file = -1;
 
-    /* pcm FIFO */
-    dma_lock          = true;
-    pcm_rd_pos        = 0;
-    dma_wr_pos        = 0;
-    pcm_enc_pos       = 0;
+    pcmrec_init_state();
 
-    /* encoder FIFO */
-    enc_wr_index      = 0;
-    enc_rd_index      = 0;
-
-    /* filename queue */
-    fnq_rd_pos        = 0;
-    fnq_wr_pos        = 0;
-
-    /* stats */
-    num_rec_bytes     = 0;
-    num_rec_samples   = 0;
-#if 0
-    accum_rec_bytes   = 0;
-    accum_pcm_samples = 0;
-#endif
-
-    pre_record_ticks  = 0;
-
-    is_recording      = false;
-    is_paused         = false;
-
-    buffer = audio_get_recording_buffer(&rec_buffer_size);
+    unsigned char *buffer = audio_get_buffer(true, &rec_buffer_size);
 
     /* Line align pcm_buffer 2^5=32 bytes */
     pcm_buffer = (unsigned char *)ALIGN_UP_P2((uintptr_t)buffer, 5);
@@ -1188,23 +1180,25 @@ static void pcmrec_init(void)
 /* PCMREC_CLOSE */
 static void pcmrec_close(void)
 {
-    is_initialized = false;
     dma_lock = true;
     pre_record_ticks = 0; /* Can't be prerecording any more */
     warnings         = 0;
+    codec_unload();
     pcm_close_recording();
     reset_hardware();
-    audio_remove_encoder();
     send_event(RECORDING_EVENT_STOP, NULL);
 } /* pcmrec_close */
 
 /* PCMREC_OPTIONS */
 static void pcmrec_set_recording_options(
+    struct event_queue *q,
     struct audio_recording_options *options)
 {
-    /* stop DMA transfer */
+    /* stop everything */
     dma_lock = true;
+    codec_unload();
     pcm_stop_recording();
+    pcmrec_init_state();
 
     rec_frequency      = options->rec_frequency;
     rec_source         = options->rec_source;
@@ -1243,10 +1237,13 @@ static void pcmrec_set_recording_options(
     /* apply hardware setting to start monitoring now */
     pcm_apply_settings();
 
-    queue_reply(&pcmrec_queue, 0); /* Release sender */
-
-    if (audio_load_encoder(enc_config.afmt))
+    if (codec_load(-1, enc_config.afmt | CODEC_TYPE_ENCODER))
     {
+        queue_reply(q, true);
+
+        /* run immediately */
+        codec_go();
+
         /* start DMA transfer */
         dma_lock = pre_record_ticks == 0;
         pcm_record_data(pcm_rec_have_more, pcm_rec_status_callback,
@@ -1255,7 +1252,7 @@ static void pcmrec_set_recording_options(
     else
     {
         logf("set rec opt: enc load failed");
-        errors |= PCMREC_E_LOAD_ENCODER;
+        pcmrec_raise_error_status(PCMREC_E_LOAD_ENCODER);
     }
 } /* pcmrec_set_recording_options */
 
@@ -1468,97 +1465,65 @@ static void pcmrec_resume(void)
     logf("pcmrec_resume done");
 } /* pcmrec_resume */
 
-static void pcmrec_thread(void) NORETURN_ATTR;
-static void pcmrec_thread(void)
+/* Called by audio thread when recording is initialized */
+void audio_recording_handler(struct queue_event *ev)
 {
-    struct queue_event ev;
+    logf("audio recording start");
 
-    logf("thread pcmrec start");
-
-    while(1)
+    while (1)
     {
-        if (is_recording)
+        switch (ev->id)
         {
-            /* Poll periodically to flush data */
-            queue_wait_w_tmo(&pcmrec_queue, &ev, HZ/5);
+        case Q_AUDIO_INIT_RECORDING:
+            pcmrec_init();
+            break;
 
-            if (ev.id == SYS_TIMEOUT)
-            {
-                /* Messages that interrupt this will complete it */
-                pcmrec_flush(PCMREC_FLUSH_IF_HIGH |
-                             PCMREC_FLUSH_INTERRUPTABLE);
-                continue;
-            }
-        }
-        else
-        {
-            /* Not doing anything - sit and wait for commands */
-            queue_wait(&pcmrec_queue, &ev);
-
-            /* Some messages must be handled even if not initialized */
-            switch (ev.id)
-            {
-            case PCMREC_INIT:
-            case SYS_USB_CONNECTED:
+        case SYS_USB_CONNECTED:
+            if (is_recording)
                 break;
-            default:
-                if (!is_initialized)
-                    continue;
-            }
-        }
+            /* Fall-through */
+        case Q_AUDIO_CLOSE_RECORDING:
+            pcmrec_close();
+            return; /* no more recording */
 
-        switch (ev.id)
-        {
-            case PCMREC_INIT:
-                pcmrec_init();
-                break;
+        case Q_AUDIO_RECORDING_OPTIONS:
+            pcmrec_set_recording_options(&audio_queue,
+                (struct audio_recording_options *)ev->data);
+            break;
 
-            case PCMREC_CLOSE:
-                pcmrec_close();
-                break;
+        case Q_AUDIO_RECORD:
+            clear_flush_interrupt();
+            pcmrec_record((const char *)ev->data);
+            break;
 
-            case PCMREC_OPTIONS:
-                pcmrec_set_recording_options(
-                    (struct audio_recording_options *)ev.data);
-                break;
+        case Q_AUDIO_STOP:
+            clear_flush_interrupt();
+            pcmrec_stop();
+            break;
 
-            case PCMREC_RECORD:
-                clear_flush_interrupt();
-                pcmrec_record((const char *)ev.data);
-                break;
+        case Q_AUDIO_PAUSE:
+            clear_flush_interrupt();
+            pcmrec_pause();
+            break;
 
-            case PCMREC_STOP:
-                clear_flush_interrupt();
-                pcmrec_stop();
-                break;
+        case Q_AUDIO_RESUME:
+            pcmrec_resume();
+            break;
 
-            case PCMREC_PAUSE:
-                clear_flush_interrupt();
-                pcmrec_pause();
-                break;
+        case SYS_TIMEOUT:
+            /* Messages that interrupt this will complete it */
+            pcmrec_flush(PCMREC_FLUSH_IF_HIGH |
+                         PCMREC_FLUSH_INTERRUPTABLE);
 
-            case PCMREC_RESUME:
-                pcmrec_resume();
-                break;
-#if 0
-            case PCMREC_FLUSH_NUM:
-                pcmrec_flush((unsigned)ev.data);
-                break;
-#endif
-            case SYS_USB_CONNECTED:
-                if (is_recording)
-                    break;
-
-                if (is_initialized)
-                    pcmrec_close();
-
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                usb_wait_for_disconnect(&pcmrec_queue);
-                flush_interrupts = 0;
-                break;
+            if (errors & PCMREC_E_DMA)
+                queue_post(&audio_queue, Q_AUDIO_STOP, 0);
+            break;
         } /* end switch */
+
+        queue_wait_w_tmo(&audio_queue, ev,
+                         is_recording ? HZ/5 : TIMEOUT_BLOCK);
     } /* end while */
-} /* pcmrec_thread */
+} /* audio_recording_handler */
 
 /****************************************************************************/
 /*                                                                          */
@@ -1696,7 +1661,7 @@ struct enc_chunk_hdr * enc_get_chunk(void)
 #ifdef DEBUG
     if (chunk->id != ENC_CHUNK_MAGIC || *wrap_id_p != ENC_CHUNK_MAGIC)
     {
-        errors |= PCMREC_E_CHUNK_OVF;
+        pcmrec_raise_error_status(PCMREC_E_CHUNK_OVF);
         logf("finish chk ovf: %d", enc_wr_index);
     }
 #endif
@@ -1718,7 +1683,7 @@ void enc_finish_chunk(void)
     if ((long)chunk->flags < 0)
     {
         /* encoder set error flag */
-        errors |= PCMREC_E_ENCODER;
+        pcmrec_raise_error_status(PCMREC_E_ENCODER);
         logf("finish chk enc error");
     }
 
@@ -1737,7 +1702,7 @@ void enc_finish_chunk(void)
     else if (is_recording)        /* buffer full */
     {
         /* keep current position and put up warning flag */
-        warnings |= PCMREC_W_ENC_BUFFER_OVF;
+        pcmrec_raise_warning_status(PCMREC_W_ENC_BUFFER_OVF);
         logf("enc_buffer ovf");
         DEC_ENC_INDEX(enc_wr_index);
         if (pcmrec_context)
