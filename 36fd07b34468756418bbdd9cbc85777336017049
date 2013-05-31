@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///FY\u003d",
+        "filename": "apps/bookmark.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-05-31T09:52:38Z",
+      "side": 1,
+      "message": "IMO this should be done by the caller.",
+      "revId": "36fd07b34468756418bbdd9cbc85777336017049",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///FQ\u003d",
+        "filename": "apps/bookmark.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-05-31T09:52:38Z",
+      "side": 1,
+      "message": "You add a parse_bookmark() call here that wasn\u0027t there before. Why is it good for the filter-case only?",
+      "revId": "36fd07b34468756418bbdd9cbc85777336017049",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///FU\u003d",
+        "filename": "apps/bookmark.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-05-31T09:52:38Z",
+      "side": 1,
+      "message": "You add a parse_bookmark() call here that wasn\u0027t there before. Why is it good for the filter-case only?",
+      "revId": "36fd07b34468756418bbdd9cbc85777336017049",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
