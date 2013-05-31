@@ -65,7 +65,7 @@ unsigned int audio_thread_id = 0;
 static void NORETURN_ATTR audio_thread(void)
 {
     struct queue_event ev;
-    ev.id = SYS_TIMEOUT; /* something not in switch below */
+    ev.id = Q_NULL; /* something not in switch below */
 
     pcm_postinit();
 
