@@ -347,6 +347,7 @@ void audio_pcmbuf_sync_position(void);
 /** --- voice event --- **/
 void playback_voice_event(void *data)
 {
+    /* Make audio play softly while voice is speaking */
     pcmbuf_soft_mode(*(bool *)data);
 }
 

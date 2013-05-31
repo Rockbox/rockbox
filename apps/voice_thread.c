@@ -360,8 +360,6 @@ static enum voice_state voice_message(struct voice_thread_data *td)
 
         if (quiet_counter <= 0)
         {
-            /* Make audio play more softly and set delay to return to normal
-               playback level */
             voice_playing = true;
             send_event(PLAYBACK_EVENT_VOICE_PLAYING, &voice_playing);
         }
