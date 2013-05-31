@@ -3006,7 +3006,7 @@ void audio_playback_handler(struct queue_event *ev)
             audio_start_playback(ev->data, 0);
             break;
 
-#ifdef AUDIO_HAVE_RECORDING
+#ifdef HAVE_RECORDING
         /* So we can go straight from playback to recording */
         case Q_AUDIO_INIT_RECORDING:
 #endif
