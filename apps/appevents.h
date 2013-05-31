@@ -45,6 +45,8 @@ enum {
     PLAYBACK_EVENT_TRACK_SKIP,
     /* Next track medadata was just loaded */
     PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE,
+    /* Voice is playing: data = &(bool){true|false} */
+    PLAYBACK_EVENT_VOICE_PLAYING,
 };
 
 /** Buffering events **/

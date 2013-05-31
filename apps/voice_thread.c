@@ -22,12 +22,10 @@
 #include "system.h"
 #include "core_alloc.h"
 #include "thread.h"
+#include "appevents.h"
 #include "voice_thread.h"
 #include "talk.h"
 #include "dsp_core.h"
-#include "audio.h"
-#include "playback.h"
-#include "pcmbuf.h"
 #include "pcm.h"
 #include "pcm_mixer.h"
 #include "codecs/libspeex/speex/speex.h"
@@ -84,6 +82,7 @@ static const char voice_thread_name[] = "voice";
 static struct event_queue voice_queue SHAREDBSS_ATTR;
 static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
 static int quiet_counter SHAREDDATA_ATTR = 0;
+static bool voice_playing = false;
 
 #define VOICE_PCM_FRAME_COUNT   ((NATIVE_FREQUENCY*VOICE_FRAME_COUNT + \
                                  VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
@@ -301,7 +300,7 @@ void mp3_play_pause(bool play)
 /* Tell if voice is still in a playing state */
 bool mp3_is_playing(void)
 {
-    return quiet_counter != 0;
+    return voice_playing;
 }
 
 /* This function is meant to be used by the buffer request functions to
@@ -319,7 +318,7 @@ void voice_wait(void)
      * new clip by the time we wait. This should be resolvable if conditions
      * ever require knowing the very clip you requested has finished. */
 
-    while (quiet_counter != 0)
+    while (voice_playing)
         sleep(1);
 }
 
@@ -341,10 +340,8 @@ static void voice_data_init(struct voice_thread_data *td)
 /* Voice thread message processing */
 static enum voice_state voice_message(struct voice_thread_data *td)
 {
-    if (quiet_counter > 0)
-        queue_wait_w_tmo(&voice_queue, &td->ev, HZ/10);
-    else
-        queue_wait(&voice_queue, &td->ev);
+    queue_wait_w_tmo(&voice_queue, &td->ev,
+                     quiet_counter > 0 ? HZ/10 : TIMEOUT_BLOCK);
 
     switch (td->ev.id)
     {
@@ -361,6 +358,14 @@ static enum voice_state voice_message(struct voice_thread_data *td)
             voice_stop_playback();
         }
 
+        if (quiet_counter <= 0)
+        {
+            /* Make audio play more softly and set delay to return to normal
+               playback level */
+            voice_playing = true;
+            send_event(PLAYBACK_EVENT_VOICE_PLAYING, &voice_playing);
+        }
+
         quiet_counter = QUIET_COUNT;
 
         /* Copy the clip info */
@@ -368,10 +373,6 @@ static enum voice_state voice_message(struct voice_thread_data *td)
 
         /* We need nothing more from the sending thread - let it run */
         queue_reply(&voice_queue, 1);
-
-        /* Make audio play more softly and set delay to return to normal
-           playback level */
-        pcmbuf_soft_mode(true);
 
         /* Clean-start the decoder */
         td->st = speex_decoder_init(&speex_wb_mode);
@@ -394,8 +395,10 @@ static enum voice_state voice_message(struct voice_thread_data *td)
         if (quiet_counter-- != QUIET_COUNT)
         {
             if (quiet_counter <= 0)
-                pcmbuf_soft_mode(false);
-
+            {
+                voice_playing = false;
+                send_event(PLAYBACK_EVENT_VOICE_PLAYING, &voice_playing);
+            }
             break;
         }
 

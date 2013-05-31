@@ -344,6 +344,12 @@ void audio_pcmbuf_sync_position(void);
 
 /**************************************/
 
+/** --- voice event --- **/
+void playback_voice_event(void *data)
+{
+    pcmbuf_soft_mode(*(bool *)data);
+}
+
 /** --- audio_queue helpers --- **/
 static void audio_queue_post(long id, intptr_t data)
 {
@@ -3760,6 +3766,7 @@ void playback_init(void)
     mutex_init(&id3_mutex);
     track_list_init();
     buffering_init();
+    add_event(PLAYBACK_EVENT_VOICE_PLAYING, false, playback_voice_event);
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);
