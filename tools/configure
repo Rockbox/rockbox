@@ -1331,8 +1331,8 @@ cat <<EOF
  201) Android             ==HiFi E.T.==          191) HM-801
  202) Nokia N8xx          210) MA9
  203) Nokia N900          211) MA9C              ==Sony==
- 204) Pandora                                    220) NWZ-E370 series
- 205) Samsung YP-R0                              221) NWZ-E360 series
+ 204) Pandora             212) MA8               220) NWZ-E370 series
+ 205) Samsung YP-R0       213) MA8C              221) NWZ-E360 series
  206) Android MIPS
  207) Android x86
 EOF
@@ -3505,6 +3505,52 @@ fi
     memory=16
     arm7ejscc
     tool="$rootdir/tools/scramble -rkw -modelnum=84"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ma"
+    ;;
+
+   212|hifietma8)
+    target_id=85
+    modelname="hifietma8"
+    target="MA8"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=85"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ma"
+    ;;
+
+   213|hifietma8c)
+    target_id=91
+    modelname="hifietma8c"
+    target="MA8C"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=91"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"

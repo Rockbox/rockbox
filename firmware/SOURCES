@@ -411,6 +411,8 @@ drivers/audio/aic3x.c
 drivers/audio/dummy_codec.c
 #elif defined (HAVE_DF1704_CODEC)
 drivers/audio/df1704.c
+#elif defined (HAVE_PCM1792_CODEC)
+drivers/audio/pcm1792.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
@@ -1745,7 +1747,7 @@ target/arm/rk27xx/hm801/powermgmt-hm801.c
 target/arm/rk27xx/hm801/power-hm801.c
 #endif
 
-#if defined(MA9) || defined(MA9C)
+#if defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C)
 target/arm/rk27xx/ma/button-ma.c
 target/arm/rk27xx/ma/powermgmt-ma.c
 target/arm/rk27xx/ma/power-ma.c
