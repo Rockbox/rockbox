@@ -535,6 +535,10 @@ Lyre prototype 1 */
 #include "config/hifietma9.h"
 #elif defined(MA9C)
 #include "config/hifietma9c.h"
+#elif defined(MA8)
+#include "config/hifietma8.h"
+#elif defined(MA8C)
+#include "config/hifietma8c.h"
 #elif defined(SONY_NWZE370)
 #include "config/sonynwze370.h"
 #elif defined(SONY_NWZE360)

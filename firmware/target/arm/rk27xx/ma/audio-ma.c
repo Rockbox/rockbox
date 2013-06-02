@@ -29,21 +29,25 @@ void df1704_set_ml_dir(const int dir)
 {
     pca9555_write_config(dir<<8, (1<<8));
 }
+void pcm1792_set_ml_dir (const int) __attribute__((alias("df1704_set_ml_dir")));
 
 void df1704_set_ml(const int val)
 {
     pca9555_write_output(val<<8, 1<<8);
 }
+void pcm1792_set_ml (const int) __attribute__((alias("df1704_set_ml")));
 
 void df1704_set_mc(const int val)
 {
     pca9555_write_output(val<<1, 1<<1);
 }
+void pcm1792_set_mc (const int) __attribute__((alias("df1704_set_mc")));
 
 void df1704_set_md(const int val)
 {
     pca9555_write_output(val<<0, 1<<0);
 }
+void pcm1792_set_md (const int) __attribute__((alias("df1704_set_md")));
 
 static void pop_ctrl(const int val)
 {
@@ -59,7 +63,6 @@ static void dac_enable(const int val)
 {
     pca9555_write_output(val<<4, 1<<4);
 }
-
 
 void audiohw_postinit(void)
 {

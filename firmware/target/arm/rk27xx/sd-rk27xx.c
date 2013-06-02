@@ -132,7 +132,7 @@ static inline bool card_detect_target(void)
     return !(GPIO_PCDR & 0x80);
 #elif defined(HM60X) || defined(HM801)
     return !(GPIO_PFDR & (1<<2));
-#elif defined(MA9) || defined(MA9C)
+#elif defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C)
     return (GPIO_PCDR & 0x80);
 #else
 #error "Unknown target"

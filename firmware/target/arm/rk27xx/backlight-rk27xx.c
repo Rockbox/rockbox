@@ -61,7 +61,7 @@ static const unsigned short lin_brightness[] = {
     562, 579, 596, 616, 637, 660, 684, 711,
     739, 770, 802, 837, 874, 914, 955, 1000
 };
-#elif defined(MA9) || defined(MA9C)
+#elif defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C)
 static const unsigned short lin_brightness[] = {
       2,   4,   7,  10,  15,  21,  28,  36,
      46,  58,  72,  87, 104, 124, 146, 171,
