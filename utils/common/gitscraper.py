@@ -95,7 +95,7 @@ def get_lstree(repo, start, filterlist=[]):
                 if rf[3] in objects:
                     print("FATAL: key already exists in dict!")
                     return {}
-                objects[rf[3]] = rf[2]
+                objects[rf[3].decode()] = rf[2].decode()
     return objects
 
 
@@ -172,7 +172,7 @@ def scrape_files(repo, treehash, filelist, dest="", timestamp_files=[]):
     treeobjects = get_lstree(repo, treehash, filelist)
     timestamps = {}
     for obj in treeobjects:
-        get_object(repo, treeobjects[obj], os.path.join(dest.encode(), obj))
+        get_object(repo, treeobjects[obj], os.path.join(dest, obj))
         for f in timestamp_files:
             if obj.find(f) == 0:
                 timestamps[obj] = get_file_timestamp(repo, treehash, obj)
