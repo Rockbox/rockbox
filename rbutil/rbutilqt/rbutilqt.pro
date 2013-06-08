@@ -156,6 +156,11 @@ dbg {
 
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
 
+# check version of Qt installation
+!contains(QT_MAJOR_VERSION, 5) {
+    # suppress warnings in Qt 4.8 shown by gcc 4.8
+    QMAKE_CXXFLAGS += -Wno-unused-local-typedefs
+}
 # platform specific
 win32 {
     # use MinGW's implementation of stdio functions for extended format string
