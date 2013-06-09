@@ -573,7 +573,7 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
     QStringList supported;
     QStringList tempList;
 #if defined(Q_OS_WIN32)
-    supported << "FAT32" << "FAT16" << "FAT12";
+    supported << "FAT32" << "FAT16" << "FAT12" << "HFS";
     QFileInfoList list = QDir::drives();
     for(int i=0; i<list.size();i++)
     {
@@ -599,7 +599,7 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
     }
 
 #elif defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
-    supported << "vfat" << "msdos";
+    supported << "vfat" << "msdos" << "hfs";
     int num;
     struct statfs *mntinf;
 
@@ -617,7 +617,7 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
         mntinf++;
     }
 #elif defined(Q_OS_LINUX)
-    supported << "vfat" << "msdos";
+    supported << "vfat" << "msdos" << "hfsplus";
     FILE *mn = setmntent("/etc/mtab", "r");
     if(!mn)
         return QStringList("");
