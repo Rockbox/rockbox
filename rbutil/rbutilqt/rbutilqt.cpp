@@ -72,6 +72,8 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 
     absolutePath = qApp->applicationDirPath();
 
+    QString c = RbSettings::value(RbSettings::CachePath).toString();
+    HttpGet::setGlobalCache(c.isEmpty() ? QDir::tempPath() : c);
     HttpGet::setGlobalUserAgent("rbutil/"VERSION);
     HttpGet::setGlobalProxy(proxy());
     // init startup & autodetection
@@ -113,12 +115,9 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 #endif
 
 #if !defined(Q_OS_WIN32) && !defined(Q_OS_MACX)
-    /* eject funtionality is only implemented on W32 right now. */
+    /* eject funtionality is not available on Linux right now. */
     ui.buttonEject->setEnabled(false);
 #endif
-    QString c = RbSettings::value(RbSettings::CachePath).toString();
-    if(c.isEmpty()) c = QDir::tempPath();
-    HttpGet::setGlobalCache(c);
     updateDevice();
     downloadInfo();
 
@@ -314,8 +313,9 @@ void RbUtilQt::updateSettings()
     qDebug() << "[RbUtil] updating current settings";
     updateDevice();
     manual->updateManual();
+    QString c = RbSettings::value(RbSettings::CachePath).toString();
+    HttpGet::setGlobalCache(c.isEmpty() ? QDir::tempPath() : c);
     HttpGet::setGlobalProxy(proxy());
-    HttpGet::setGlobalCache(RbSettings::value(RbSettings::CachePath).toString());
 
     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
         QApplication::processEvents();
