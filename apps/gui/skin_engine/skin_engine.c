@@ -89,6 +89,7 @@ static void gui_skin_reset(struct gui_skin *skin)
     skin->needs_full_update = true;
     skin->gui_wps.data = data = &skin->data;
     /* copy to temp var to protect against memset */
+#ifdef HAVE_ALBUMART
     if ((aa_save = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart)))
     {
         short old_width, old_height;
@@ -99,6 +100,7 @@ static void gui_skin_reset(struct gui_skin *skin)
         data->last_albumart_height = old_height;
     }
     else
+#endif
         memset(data, 0, sizeof(struct wps_data));
     skin->data.wps_loaded = false;
     skin->data.buflib_handle = -1;
