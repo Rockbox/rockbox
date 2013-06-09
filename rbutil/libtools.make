@@ -64,7 +64,7 @@ ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 # when building libs for OS X build for both i386 and ppc at the same time.
 # This creates fat objects, and ar can only create the archive but not operate
 # on it. As a result the ar call must NOT use the u (update) flag.
-CFLAGS += -arch ppc -arch i386
+ARCHFLAGS += -arch ppc -arch i386
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
 CC = gcc-4.0
@@ -76,7 +76,7 @@ WINDRES = windres
 BUILD_DIR ?= $(TARGET_DIR)build$(COMPILETARGET)
 
 ifdef RBARCH
-CFLAGS += -arch $(RBARCH)
+ARCHFLAGS += -arch $(RBARCH)
 OBJDIR = $(abspath $(BUILD_DIR)/$(RBARCH))/
 else
 OBJDIR = $(abspath $(BUILD_DIR))/
@@ -106,7 +106,7 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo LD $@
 	$(SILENT)$(call mkdir,$(dir $@))
 # EXTRADEPS need to be built into OBJDIR.
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(LDOPTS) -o $(BINARY) \
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) $(LDOPTS) -o $(BINARY) \
 	    $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) \
 	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 
@@ -114,7 +114,7 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 $(OBJDIR)%.o:
 	@echo CC $<
 	$(SILENT)$(call mkdir,$(dir $@))
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -c -o $@ $<
 
 # lib rules
 lib$(OUTPUT)$(RBARCH).a: $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
@@ -128,7 +128,7 @@ $(OUTPUT).dll: $(TARGET_DIR)$(OUTPUT).dll
 $(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo DLL $(notdir $@)
 	$(SILENT)$(call mkdir,$(dir $@))
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -shared -o $@ $^ \
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -shared -o $@ $^ \
 		    -Wl,--output-def,$(TARGET_DIR)$(OUTPUT).def
 
 # create lib file from objects
