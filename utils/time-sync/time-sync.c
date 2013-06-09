@@ -16,6 +16,7 @@
  *
  */
 
+#define _XOPEN_SOURCE /* to enable strptime() */
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -27,14 +28,27 @@ int
 main (int argc, char **argv)
 {
     if (argc < 2) {
-        printf ("usage: %s <device>\n", basename(argv[0]));
-	return 1;
+        printf ("usage: %s <device> [time]\n", basename(argv[0]));
+        return 1;
     }
 
-    if (sync_time (argv[1], NULL)) {
-	printf ("Error occured while syncing time.\n");
+    struct tm time;
+    struct tm* ptime = NULL;
+    if (argc > 2) {
+        if(strptime(argv[2], "%Y-%m-%dT%H:%M:%S", &time)) {
+            ptime = &time;
+        }
+        else {
+            printf ("Could not parse time. Using local time.\n");
+            printf ("Time string needs to use the format YYYY-MM-DDThh:mm:ss\n");
+            printf ("(ISO 8601 format)\n");
+        }
+    }
+
+    if (sync_time (argv[1], ptime)) {
+        printf ("Error occured while syncing time.\n");
     } else {
-	printf ("Time was synced!\n");
+        printf ("Time was synced!\n");
     }
 
     return 0;
