@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///DY\u003d",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2013-06-10T18:21:49Z",
+      "side": 1,
+      "message": "this can now be a free block, if the current block was freed, and either the previous block was free or the current block was the only block. In that situation, the line below would incorrectly update alloc_end. It should already be updated correctly by buflib_free(), so there shouldn\u0027t be any need to update it again here. I suggest \"else if (last \u0026\u0026 this !\u003d ctx-\u003ealloc_end)\" above.",
+      "revId": "606445c3a10e4756a2084d0d108289c8c887cf3a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
