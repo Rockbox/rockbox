@@ -16,6 +16,24 @@
       "revId": "606445c3a10e4756a2084d0d108289c8c887cf3a",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///DQ\u003d",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-06-10T19:00:27Z",
+      "side": 1,
+      "message": "No, this case is only taken if this isn\u0027t free. the new \"if (!this)\" case is when this is free since handle_to_block() returns NULL for handles that have been freed.",
+      "parentUuid": "AAAASX///DY\u003d",
+      "revId": "606445c3a10e4756a2084d0d108289c8c887cf3a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
