@@ -2,27 +2,24 @@ DEFINES=
 CC=gcc
 CXX=g++
 LD=g++
-CFLAGS=-g -std=c99 -W -Wall `xml2-config --cflags` $(DEFINES)
-CXXFLAGS=-g -W -Wall `xml2-config --cflags` $(DEFINES)
-LDFLAGS=`xml2-config --libs`
-BINS= tester headergen hwemulgen
+CFLAGS=-g -std=c99 -Wall $(DEFINES) -Ilib
+CXXFLAGS=-g -Wall $(DEFINES) -Ilib
+LDFLAGS=-Llib -lsocdesc `xml2-config --libs`
+SRC=$(wildcard *.c)
+SRCXX=$(wildcard *.cpp)
+EXEC=$(SRC:.c=) $(SRCXX:.cpp=)
+LIB=lib/libsocdesc.a
 
-all: $(BINS)
+all: $(EXEC)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(LIB):
+	make -C lib
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+%: %.c $(LIB)
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
-headergen: headergen.o desc_parser.o
-	$(LD) -o $@ $^ $(LDFLAGS)
-
-hwemulgen: hwemulgen.o desc_parser.o
-	$(LD) -o $@ $^ $(LDFLAGS)
-
-tester: tester.o desc_parser.o
-	$(LD) -o $@ $^ $(LDFLAGS)
+%: %.cpp $(LIB)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
 
 clean:
-	rm -fr *.o $(BINS)
+	rm -fr $(EXEC)

@@ -1,0 +1,120 @@
+This file describes the format of the register map based on XML.
+
+Root
+----
+As any XML document, the content of the file should be enclosed in a "xml" tag.
+
+Example:
+<?xml version="1.0"?>
+<!-- desc -->
+</xml>
+
+Element: soc
+------------
+The XML can contain one or more SoC description. Each description is enclosed in
+a "soc" tag. The following properties are defined:
+- "name" (mandatory,string): the mnemonic of the SoC.
+- "desc" (optional,string): a textual description of the SoC.
+
+Example:
+<soc name="stmp3700" desc="STMP3700">
+<!-- soc desc -->
+</soc>
+
+Element: soc.dev
+----------------
+Each SoC can contain any number of devices. Each device is enclosed in a "dev"
+tag. A device is logical group of registers and doesn't have a precise meaning.
+If a SoC has several copies of the same device at different addresses (SSP1, SSP2
+for example), then only one copy has to be described since a device can have
+several address (see soc.dev.addr section). The following properties are defined:
+- "name" (mandatory,string): the mnemonic of the device.
+- "long_name" (optional,string): a short description of the device.
+- "desc" (optional,string): a long description of the SoC.
+- "version" (optional,string): version of the register description for this device.
+
+Example:
+<dev name="APBH" long_name="APHB DMA" desc="AHB-to-APBH Bridge with DMA" version="3.2.0">
+<!-- dev desc>
+</dev>
+
+Element: soc.dev.addr
+---------------------
+Each device can have one or more addresses associated with it. Each address is
+enclosed in a "addr" tag. This allows to describe several blocks are once on SoCs
+where several copies of the same block exist at different addresses.
+The following properties are defined:
+- "name" (mandatory,string): unique name of this instance of the device.
+- "addr" (mandatory,integer): base address of this instance of the device.
+
+Example:
+<addr name="SSP1" addr="0x80010000" />
+<addr name="SSP2" addr="0x80034000" />
+
+Element: soc.dev.reg
+--------------------
+Each device can contain any number of registers. Each register is enclosed in a
+"reg" tag. If a SoC has several copies of the same register at different addresses
+(INTERRUPT0, INTERRUPT1 for example), then only one copy has to be described since
+a register can have several address (see soc.dev.reg.addr section).
+The following properties are defined:
+- "name" (mandatory,string): the mnemonic of the register.
+- "sct" (optional,"yes" or "no"): STMP specific attribute to specify the existence
+  of the SCT variants of this register.
+
+Example:
+<reg name="TIMCTRLn" sct="yes">
+<!-- reg desc -->
+</reg>
+
+Element: soc.dev.reg.addr
+-------------------------
+Each device can have one or more addresses associated with it. Each address
+is enclosed in a "addr" tag. This allows to describe several register at once on
+SoCs where a similar register is replicated several times.
+The following properties are defined:
+- "name" (mandatory,string): unique name of this instance of the register.
+- "addr" (mandatory,integer): base address of this instance of the register.
+
+Example:
+<addr name="TIMCTRL0" addr="0x20" />
+<addr name="TIMCTRL1" addr="0x40" />
+<addr name="TIMCTRL2" addr="0x60" />
+
+Element: soc.dev.reg.formula
+----------------------------
+In the special case where the addresses of the register follow a pattern, an
+explicit formula can be described as part of the format. There is no specific
+requirement on the formula except that the register addresses be indexed by
+a variable "n" which range from 0 to N-1 where N is the number of address.
+The following properties are defined:
+- "string" (mandatory,string): the equation describing the addresses.
+
+Example:
+<formula string="0x20+n*0x20"/>
+
+Element: soc.dev.reg.field
+--------------------------
+Each register can be further divided into disjoints fields. Each field
+is enclosed in a "field" tag. A field is defined as a contiguous set
+of bits in the register. The following properties are defined:
+- "name" (mandatory,string): the mnemonic of field
+- "bitrange" (mandatory,string): the bit range of the field written as
+  "n-m" where n and m are integers giving the most (resp. least) significant
+  bit of the field.
+
+Example:
+<field name="PRESCALE" bitrange="5:4">
+<!-- field desc -->
+</field>
+
+Element: soc.dev.reg.field.value
+--------------------------------
+Each field can describe a list of named values in cases where this is appropriate.
+Each value is enclosed in a "value" tag. The following properties are defined:
+- "name" (mandatory,string): the mnemonic of the value.
+- "value" (mandatory,integer): the associated value.
+
+Example:
+<value name="DIV_BY_1" value="0x0" />
+<value name="DIV_BY_2" value="0x1" />

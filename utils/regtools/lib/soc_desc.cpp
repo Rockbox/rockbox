@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Amaury Pouly
+ * Copyright (C) 2012 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "desc_parser.hpp"
+#include "soc_desc.hpp"
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <stdio.h>
@@ -150,41 +150,64 @@ bool parse_field_elem(xmlNode *node, soc_reg_field_t& field)
     END_ATTR_MATCH()
 
     BEGIN_NODE_MATCH(node->children)
-        SOFT_MATCH_ELEM_NODE("value", field.values, parse_value_elem)
+        SOFT_MATCH_ELEM_NODE("value", field.value, parse_value_elem)
     END_NODE_MATCH()
+
+    return true;
+}
+
+bool parse_reg_addr_elem(xmlNode *node, soc_reg_addr_t& addr)
+{
+    BEGIN_ATTR_MATCH(node->properties)
+        MATCH_TEXT_ATTR("name", addr.name)
+        MATCH_UINT32_ATTR("addr", addr.addr)
+    END_ATTR_MATCH()
+
+    return true;
+}
+
+bool parse_reg_formula_elem(xmlNode *node, soc_reg_formula_t& formula)
+{
+    BEGIN_ATTR_MATCH(node->properties)
+        MATCH_TEXT_ATTR("string", formula.string)
+    END_ATTR_MATCH()
+
+    formula.type = REG_FORMULA_STRING;
 
     return true;
 }
 
 bool parse_reg_elem(xmlNode *node, soc_reg_t& reg)
 {
+    std::vector< soc_reg_formula_t > formulas;
     BEGIN_ATTR_MATCH(node->properties)
         MATCH_TEXT_ATTR("name", reg.name)
-        MATCH_UINT32_ATTR("addr", reg.addr)
         SOFT_MATCH_SCT_ATTR("sct", reg.flags)
     END_ATTR_MATCH()
 
     BEGIN_NODE_MATCH(node->children)
-        MATCH_ELEM_NODE("field", reg.fields, parse_field_elem)
+        MATCH_ELEM_NODE("addr", reg.addr, parse_reg_addr_elem)
+        MATCH_ELEM_NODE("formula", formulas, parse_reg_formula_elem)
+        MATCH_ELEM_NODE("field", reg.field, parse_field_elem)
     END_NODE_MATCH()
+
+    if(formulas.size() > 1)
+    {
+        fprintf(stderr, "Only one formula is allowed per register\n");
+        return false;
+    }
+    if(formulas.size() == 1)
+        reg.formula = formulas[0];
 
     return true;
 }
 
-bool parse_multireg_elem(xmlNode *node, soc_multireg_t& mreg)
+bool parse_dev_addr_elem(xmlNode *node, soc_dev_addr_t& addr)
 {
     BEGIN_ATTR_MATCH(node->properties)
-        MATCH_TEXT_ATTR("name", mreg.name)
-        MATCH_UINT32_ATTR("base", mreg.base)
-        MATCH_UINT32_ATTR("count", mreg.count)
-        MATCH_UINT32_ATTR("offset", mreg.offset)
-        SOFT_MATCH_SCT_ATTR("sct", mreg.flags)
+        MATCH_TEXT_ATTR("name", addr.name)
+        MATCH_UINT32_ATTR("addr", addr.addr)
     END_ATTR_MATCH()
-
-    BEGIN_NODE_MATCH(node->children)
-        MATCH_ELEM_NODE("reg", mreg.regs, parse_reg_elem)
-        MATCH_ELEM_NODE("field", mreg.fields, parse_field_elem)
-    END_NODE_MATCH()
 
     return true;
 }
@@ -193,31 +216,12 @@ bool parse_dev_elem(xmlNode *node, soc_dev_t& dev)
 {
     BEGIN_ATTR_MATCH(node->properties)
         MATCH_TEXT_ATTR("name", dev.name)
-        MATCH_UINT32_ATTR("addr", dev.addr)
-        MATCH_TEXT_ATTR("long_name", dev.long_name)
-        MATCH_TEXT_ATTR("desc", dev.desc)
+        MATCH_TEXT_ATTR("version", dev.version)
     END_ATTR_MATCH()
 
     BEGIN_NODE_MATCH(node->children)
-        MATCH_ELEM_NODE("multireg", dev.multiregs, parse_multireg_elem)
-        MATCH_ELEM_NODE("reg", dev.regs, parse_reg_elem)
-    END_NODE_MATCH()
-
-    return true;
-}
-
-bool parse_multidev_elem(xmlNode *node, soc_multidev_t& dev)
-{
-    BEGIN_ATTR_MATCH(node->properties)
-        MATCH_TEXT_ATTR("name", dev.name)
-        MATCH_TEXT_ATTR("long_name", dev.long_name)
-        MATCH_TEXT_ATTR("desc", dev.desc)
-    END_ATTR_MATCH()
-
-    BEGIN_NODE_MATCH(node->children)
-        MATCH_ELEM_NODE("dev", dev.devs, parse_dev_elem)
-        MATCH_ELEM_NODE("multireg", dev.multiregs, parse_multireg_elem)
-        MATCH_ELEM_NODE("reg", dev.regs, parse_reg_elem)
+        MATCH_ELEM_NODE("addr", dev.addr, parse_dev_addr_elem)
+        MATCH_ELEM_NODE("reg", dev.reg, parse_reg_elem)
     END_NODE_MATCH()
 
     return true;
@@ -231,22 +235,21 @@ bool parse_soc_elem(xmlNode *node, soc_t& soc)
     END_ATTR_MATCH()
 
     BEGIN_NODE_MATCH(node->children)
-        MATCH_ELEM_NODE("dev", soc.devs, parse_dev_elem)
-        MATCH_ELEM_NODE("multidev", soc.multidevs, parse_multidev_elem)
+        MATCH_ELEM_NODE("dev", soc.dev, parse_dev_elem)
     END_NODE_MATCH()
 
     return true;
 }
 
-bool parse_root_elem(xmlNode *node, std::vector< soc_t >& socs)
+bool parse_root_elem(xmlNode *node, std::vector< soc_t >& soc)
 {
     BEGIN_NODE_MATCH(node)
-        MATCH_ELEM_NODE("soc", socs, parse_soc_elem)
+        MATCH_ELEM_NODE("soc", soc, parse_soc_elem)
     END_NODE_MATCH()
     return true;
 }
 
-bool parse_soc_desc(const std::string& filename, std::vector< soc_t >& socs)
+bool soc_desc_parse_xml(const std::string& filename, std::vector< soc_t >& socs)
 {
     LIBXML_TEST_VERSION
 
