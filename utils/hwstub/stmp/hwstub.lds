@@ -38,6 +38,7 @@ SECTIONS
     {
         oc_codestart = .;
         *(.text*)
+        *(.icode*)
         *(.data*)
         *(.rodata*)
     } > OCRAM

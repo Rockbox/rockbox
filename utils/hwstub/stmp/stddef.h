@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL_STDDEF__
-#define __HWEMUL_STDDEF__
+#ifndef __HWSTUB_STDDEF__
+#define __HWSTUB_STDDEF__
 
 #include "stdint.h"
 
@@ -29,4 +29,4 @@ typedef int32_t ssize_t;
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-#endif /* __HWEMUL_STDDEF__ */
+#endif /* __HWSTUB_STDDEF__ */

@@ -18,19 +18,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL_PROTOCOL__
-#define __HWEMUL_PROTOCOL__
+#ifndef __HWSTUB_PROTOCOL__
+#define __HWSTUB_PROTOCOL__
 
-#define HWEMUL_CLASS        0xfe
-#define HWEMUL_SUBCLASS     0xac
-#define HWEMUL_PROTOCOL     0x1d
+#define HWSTUB_CLASS        0xfe
+#define HWSTUB_SUBCLASS     0xac
+#define HWSTUB_PROTOCOL     0x1d
 
-#define HWEMUL_VERSION_MAJOR    2
-#define HWEMUL_VERSION_MINOR    8
-#define HWEMUL_VERSION_REV      2
+#define HWSTUB_VERSION_MAJOR    2
+#define HWSTUB_VERSION_MINOR    9
+#define HWSTUB_VERSION_REV      2
 
-#define HWEMUL_USB_VID  0xfee1
-#define HWEMUL_USB_PID  0xdead
+#define HWSTUB_USB_VID  0xfee1
+#define HWSTUB_USB_PID  0xdead
 
 /**
  * Control commands
@@ -41,22 +41,22 @@
  */
 
 /* list of commands */
-#define HWEMUL_GET_INFO     0 /* mandatory */
-#define HWEMUL_GET_LOG      1 /* optional */
-#define HWEMUL_RW_MEM       2 /* optional */
-#define HWEMUL_CALL         3 /* optional */
-#define HWEMUL_JUMP         4 /* optional */
-#define HWEMUL_AES_OTP      5 /* optional */
+#define HWSTUB_GET_INFO     0 /* mandatory */
+#define HWSTUB_GET_LOG      1 /* optional */
+#define HWSTUB_RW_MEM       2 /* optional */
+#define HWSTUB_CALL         3 /* optional */
+#define HWSTUB_JUMP         4 /* optional */
+#define HWSTUB_AES_OTP      5 /* optional */
 
 /**
- * HWEMUL_GET_INFO: get some information about an aspect of the device.
+ * HWSTUB_GET_INFO: get some information about an aspect of the device.
  * The wIndex field of the SETUP specifies which information to get. */
 
 /* list of possible information */
-#define HWEMUL_INFO_VERSION     0
-#define HWEMUL_INFO_LAYOUT      1
-#define HWEMUL_INFO_STMP        2
-#define HWEMUL_INFO_FEATURES    3
+#define HWSTUB_INFO_VERSION     0
+#define HWSTUB_INFO_LAYOUT      1
+#define HWSTUB_INFO_STMP        2
+#define HWSTUB_INFO_FEATURES    3
 
 struct usb_resp_info_version_t
 {
@@ -86,11 +86,11 @@ struct usb_resp_info_stmp_t
 } __attribute__((packed));
 
 /* list of possible features */
-#define HWEMUL_FEATURE_LOG      (1 << 0)
-#define HWEMUL_FEATURE_MEM      (1 << 1)
-#define HWEMUL_FEATURE_CALL     (1 << 2)
-#define HWEMUL_FEATURE_JUMP     (1 << 2)
-#define HWEMUL_FEATURE_AES_OTP  (1 << 3)
+#define HWSTUB_FEATURE_LOG      (1 << 0)
+#define HWSTUB_FEATURE_MEM      (1 << 1)
+#define HWSTUB_FEATURE_CALL     (1 << 2)
+#define HWSTUB_FEATURE_JUMP     (1 << 2)
+#define HWSTUB_FEATURE_AES_OTP  (1 << 3)
 
 struct usb_resp_info_features_t
 {
@@ -98,30 +98,32 @@ struct usb_resp_info_features_t
 };
 
 /**
- * HWEMUL_GET_LOG: only if has HWEMUL_FEATURE_LOG.
+ * HWSTUB_GET_LOG: only if has HWSTUB_FEATURE_LOG.
  * The log is returned as part of the control transfer.
  */
 
 /**
- * HWEMUL_RW_MEM: only if has HWEMUL_FEATURE_MEM.
+ * HWSTUB_RW_MEM: only if has HWSTUB_FEATURE_MEM.
+ * The 32-bit address is split into two parts.
+ * The low 16-bit are stored in wValue and the upper
+ * 16-bit are stored in wIndex. Depending on the transfer direction,
+ * the transfer is either a read or a write.
+ * The read/write on the device are guaranteed to be 16-bit/32-bit when
+ * possible, making it suitable to read/write registers. */
+
+/**
+ * HWSTUB_x: only if has HWSTUB_FEATURE_x where x=CALL or JUMP.
  * The 32-bit address is split into two parts.
  * The low 16-bit are stored in wValue and the upper
  * 16-bit are stored in wIndex. Depending on the transfer direction,
  * the transfer is either a read or a write. */
 
 /**
- * HWEMUL_x: only if has HWEMUL_FEATURE_x where x=CALL or JUMP.
- * The 32-bit address is split into two parts.
- * The low 16-bit are stored in wValue and the upper
- * 16-bit are stored in wIndex. Depending on the transfer direction,
- * the transfer is either a read or a write. */
-
-/**
- * HWEMUL_AES_OTP: only if has HWEMUL_FEATURE_AES_OTP.
+ * HWSTUB_AES_OTP: only if has HWSTUB_FEATURE_AES_OTP.
  * The control transfer contains the data to be en/decrypted and the data
  * is sent back on the interrupt endpoint. The first 16-bytes of the data
  * are interpreted as the IV. The output format is the same.
  * The wValue field contains the parameters of the process. */
-#define HWEMUL_AES_OTP_ENCRYPT  (1 << 0)
+#define HWSTUB_AES_OTP_ENCRYPT  (1 << 0)
 
-#endif /* __HWEMUL_PROTOCOL__ */
+#endif /* __HWSTUB_PROTOCOL__ */

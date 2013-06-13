@@ -18,12 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL_FORMAT__
-#define __HWEMUL_FORMAT__
+#ifndef __HWSTUB_FORMAT__
+#define __HWSTUB_FORMAT__
 
 #include <stdarg.h>
 
 void vuprintf(int (*push)(void *userp, unsigned char data),
               void *userp, const char *fmt, va_list ap);
 
-#endif /* __HWEMUL_FORMAT__ */
+#endif /* __HWSTUB_FORMAT__ */

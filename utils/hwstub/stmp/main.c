@@ -34,118 +34,20 @@ extern unsigned char oc_bufferend[];
 
 /**
  *
- * Pin control
+ * Global
  *
  */
 
-#define HW_PINCTRL_BASE         0x80018000
-
-#define HW_PINCTRL_CTRL         (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x0))
-#define HW_PINCTRL_MUXSEL(i)    (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x100 + (i) * 0x10))
-#define HW_PINCTRL_DRIVE(i)     (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x200 + (i) * 0x10))
-#ifdef HAVE_STMP3700
-#define HW_PINCTRL_PULL(i)      (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x300 + (i) * 0x10))
-#define HW_PINCTRL_DOUT(i)      (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x400 + (i) * 0x10))
-#define HW_PINCTRL_DIN(i)       (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x500 + (i) * 0x10))
-#define HW_PINCTRL_DOE(i)       (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x600 + (i) * 0x10))
-#define HW_PINCTRL_PIN2IRQ(i)   (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x700 + (i) * 0x10))
-#define HW_PINCTRL_IRQEN(i)     (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x800 + (i) * 0x10))
-#define HW_PINCTRL_IRQLEVEL(i)  (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x900 + (i) * 0x10))
-#define HW_PINCTRL_IRQPOL(i)    (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0xa00 + (i) * 0x10))
-#define HW_PINCTRL_IRQSTAT(i)   (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0xb00 + (i) * 0x10))
-#else
-#define HW_PINCTRL_PULL(i)      (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x400 + (i) * 0x10))
-#define HW_PINCTRL_DOUT(i)      (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x500 + (i) * 0x10))
-#define HW_PINCTRL_DIN(i)       (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x600 + (i) * 0x10))
-#define HW_PINCTRL_DOE(i)       (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x700 + (i) * 0x10))
-#define HW_PINCTRL_PIN2IRQ(i)   (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x800 + (i) * 0x10))
-#define HW_PINCTRL_IRQEN(i)     (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0x900 + (i) * 0x10))
-#define HW_PINCTRL_IRQLEVEL(i)  (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0xa00 + (i) * 0x10))
-#define HW_PINCTRL_IRQPOL(i)    (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0xb00 + (i) * 0x10))
-#define HW_PINCTRL_IRQSTAT(i)   (*(volatile uint32_t *)(HW_PINCTRL_BASE + 0xc00 + (i) * 0x10))
-#endif
-
-#define PINCTRL_FUNCTION_MAIN   0
-#define PINCTRL_FUNCTION_ALT1   1
-#define PINCTRL_FUNCTION_ALT2   2
-#define PINCTRL_FUNCTION_GPIO   3
-
-#define PINCTRL_DRIVE_4mA       0
-#define PINCTRL_DRIVE_8mA       1
-#define PINCTRL_DRIVE_12mA      2
-#define PINCTRL_DRIVE_16mA      3 /* not available on all pins */
-
-typedef void (*pin_irq_cb_t)(int bank, int pin);
-
-static inline void imx233_pinctrl_init(void)
+enum stmp_family_t
 {
-    __REG_CLR(HW_PINCTRL_CTRL) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
-}
+    UNKNOWN,
+    STMP3600,
+    STMP3700,
+    STMP3770,
+    STMP3780
+};
 
-static inline void imx233_set_pin_drive_strength(unsigned bank, unsigned pin, unsigned strength)
-{
-    __REG_CLR(HW_PINCTRL_DRIVE(4 * bank + pin / 8)) = 3 << (4 * (pin % 8));
-    __REG_SET(HW_PINCTRL_DRIVE(4 * bank + pin / 8)) = strength << (4 * (pin % 8));
-}
-
-static inline void imx233_enable_gpio_output(unsigned bank, unsigned pin, bool enable)
-{
-    if(enable)
-        __REG_SET(HW_PINCTRL_DOE(bank)) = 1 << pin;
-    else
-        __REG_CLR(HW_PINCTRL_DOE(bank)) = 1 << pin;
-}
-
-static inline void imx233_enable_gpio_output_mask(unsigned bank, uint32_t pin_mask, bool enable)
-{
-    if(enable)
-        __REG_SET(HW_PINCTRL_DOE(bank)) = pin_mask;
-    else
-        __REG_CLR(HW_PINCTRL_DOE(bank)) = pin_mask;
-}
-
-static inline void imx233_set_gpio_output(unsigned bank, unsigned pin, bool value)
-{
-    if(value)
-        __REG_SET(HW_PINCTRL_DOUT(bank)) = 1 << pin;
-    else
-        __REG_CLR(HW_PINCTRL_DOUT(bank)) = 1 << pin;
-}
-
-static inline void imx233_set_gpio_output_mask(unsigned bank, uint32_t pin_mask, bool value)
-{
-    if(value)
-        __REG_SET(HW_PINCTRL_DOUT(bank)) = pin_mask;
-    else
-        __REG_CLR(HW_PINCTRL_DOUT(bank)) = pin_mask;
-}
-
-static inline uint32_t imx233_get_gpio_input_mask(unsigned bank, uint32_t pin_mask)
-{
-    return HW_PINCTRL_DIN(bank) & pin_mask;
-}
-
-static inline void imx233_set_pin_function(unsigned bank, unsigned pin, unsigned function)
-{
-    __REG_CLR(HW_PINCTRL_MUXSEL(2 * bank + pin / 16)) = 3 << (2 * (pin % 16));
-    __REG_SET(HW_PINCTRL_MUXSEL(2 * bank + pin / 16)) = function << (2 * (pin % 16));
-}
-
-static inline void imx233_enable_pin_pullup(unsigned bank, unsigned pin, bool enable)
-{
-    if(enable)
-        __REG_SET(HW_PINCTRL_PULL(bank)) = 1 << pin;
-    else
-        __REG_CLR(HW_PINCTRL_PULL(bank)) = 1 << pin;
-}
-
-static inline void imx233_enable_pin_pullup_mask(unsigned bank, uint32_t pin_msk, bool enable)
-{
-    if(enable)
-        __REG_SET(HW_PINCTRL_PULL(bank)) = pin_msk;
-    else
-        __REG_CLR(HW_PINCTRL_PULL(bank)) = pin_msk;
-}
+enum stmp_family_t g_stmp_family = UNKNOWN;
 
 /**
  *
@@ -458,287 +360,38 @@ static void usb_drv_configure_endpoint(int ep_num, int type)
 
 /**
  *
- * Clock control
+ * Clkctrl
  *
- **/
-#define __CLK_CLKGATE   (1 << 31)
-#define __CLK_BUSY      (1 << 29)
+ */
 
 #define HW_CLKCTRL_BASE     0x80040000
 
 #define HW_CLKCTRL_PLLCTRL0 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x0))
+#define HW_CLKCTRL_PLLCTRL0__BYPASS         (1 << 17) /* STMP3600 only */
 #define HW_CLKCTRL_PLLCTRL0__POWER          (1 << 16)
 #define HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS    (1 << 18)
-#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BP     20
-#define HW_CLKCTRL_PLLCTRL0__DIV_SEL_BM     (3 << 20)
 
 #define HW_CLKCTRL_PLLCTRL1 (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x10))
+#define HW_CLKCTRL_PLLCTRL1__LOCK           (1 << 31)
 
-#define HW_CLKCTRL_CPU      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x20))
-#define HW_CLKCTRL_CPU__DIV_CPU_BP  0
-#define HW_CLKCTRL_CPU__DIV_CPU_BM  0x3f
-#define HW_CLKCTRL_CPU__INTERRUPT_WAIT  (1 << 12)
-#define HW_CLKCTRL_CPU__DIV_XTAL_BP 16
-#define HW_CLKCTRL_CPU__DIV_XTAL_BM (0x3ff << 16)
-#define HW_CLKCTRL_CPU__DIV_XTAL_FRAC_EN    (1 << 26)
-#define HW_CLKCTRL_CPU__BUSY_REF_CPU    (1 << 28)
+/* STMP3600 only */
+#define HW_CLKCTRL_CPUCLKCTRL   (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x20))
+#define HW_CLKCTRL_CPUCLKCTRL__DIV_BP   0
+#define HW_CLKCTRL_CPUCLKCTRL__DIV_BM   0x3ff
+#define HW_CLKCTRL_CPUCLKCTRL__WAIT_PLL_LOCK    (1 << 30)
 
-#define HW_CLKCTRL_HBUS     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x30))
-#define HW_CLKCTRL_HBUS__DIV_BP         0
-#define HW_CLKCTRL_HBUS__DIV_BM         0x1f
-#define HW_CLKCTRL_HBUS__DIV_FRAC_EN    (1 << 5)
-#define HW_CLKCTRL_HBUS__SLOW_DIV_BP    16
-#define HW_CLKCTRL_HBUS__SLOW_DIV_BM    (0x7 << 16)
-#define HW_CLKCTRL_HBUS__AUTO_SLOW_MODE (1 << 20)
+/* STMP3600 */
+#define HW_CLKCTRL_HBUSCLKCTRL  (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x30))
 
-#define HW_CLKCTRL_XBUS     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x40))
-#define HW_CLKCTRL_XBUS__DIV_BP     0
-#define HW_CLKCTRL_XBUS__DIV_BM     0x3ff
-#define HW_CLKCTRL_XBUS__BUSY       (1 << 31)
+/* STMP3600 only */
+#define HW_CLKCTRL_XBUSCLKCTRL  (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x40))
+#define HW_CLKCTRL_XBUSCLKCTRL__DIV_BP   0
+#define HW_CLKCTRL_XBUSCLKCTRL__DIV_BM   0x3ff
 
-#define HW_CLKCTRL_XTAL     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x50))
-#define HW_CLKCTRL_XTAL__TIMROT_CLK32K_GATE (1 << 26)
-#define HW_CLKCTRL_XTAL__DRI_CLK24M_GATE    (1 << 28)
-#define HW_CLKCTRL_XTAL__PWM_CLK24M_GATE    (1 << 29)
-#define HW_CLKCTRL_XTAL__FILT_CLK24M_GATE   (1 << 30)
-
-#define HW_CLKCTRL_PIX      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x60))
-#define HW_CLKCTRL_PIX__DIV_BP  0
-#define HW_CLKCTRL_PIX__DIV_BM  0xfff
-
-#define HW_CLKCTRL_SSP      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x70))
-#define HW_CLKCTRL_SSP__DIV_BP  0
-#define HW_CLKCTRL_SSP__DIV_BM  0x1ff
-
-#define HW_CLKCTRL_EMI      (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xa0))
-#define HW_CLKCTRL_EMI__DIV_EMI_BP  0
-#define HW_CLKCTRL_EMI__DIV_EMI_BM  0x3f
-#define HW_CLKCTRL_EMI__DIV_XTAL_BP 8
-#define HW_CLKCTRL_EMI__DIV_XTAL_BM (0xf << 8)
-#define HW_CLKCTRL_EMI__BUSY_REF_EMI    (1 << 28)
-#define HW_CLKCTRL_EMI__SYNC_MODE_EN    (1 << 30)
-#define HW_CLKCTRL_EMI__CLKGATE     (1 << 31)
-
-#ifdef HAVE_STMP3770
-#define HW_CLKCTRL_CLKSEQ   (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xe0))
-#else
-#define HW_CLKCTRL_CLKSEQ   (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x110))
-#endif
-#define HW_CLKCTRL_CLKSEQ__BYPASS_PIX   (1 << 1)
-#define HW_CLKCTRL_CLKSEQ__BYPASS_SSP   (1 << 5)
-#define HW_CLKCTRL_CLKSEQ__BYPASS_EMI   (1 << 6)
-#define HW_CLKCTRL_CLKSEQ__BYPASS_CPU   (1 << 7)
-
-#ifdef HAVE_STMP3770
-#define HW_CLKCTRL_FRAC     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xd0))
-#else
-#define HW_CLKCTRL_FRAC     (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xf0))
-#endif
-#define HW_CLKCTRL_FRAC_CPU (*(volatile uint8_t *)(HW_CLKCTRL_BASE + 0xf0))
-#define HW_CLKCTRL_FRAC_EMI (*(volatile uint8_t *)(HW_CLKCTRL_BASE + 0xf1))
-#define HW_CLKCTRL_FRAC_PIX (*(volatile uint8_t *)(HW_CLKCTRL_BASE + 0xf2))
-#define HW_CLKCTRL_FRAC_IO  (*(volatile uint8_t *)(HW_CLKCTRL_BASE + 0xf3))
-#define HW_CLKCTRL_FRAC_XX__XXDIV_BM    0x3f
-#define HW_CLKCTRL_FRAC_XX__XX_STABLE   (1 << 6)
-#define HW_CLKCTRL_FRAC_XX__CLKGATEXX   (1 << 7)
-
-#define HW_CLKCTRL_RESET    (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x120))
-#define HW_CLKCTRL_RESET_CHIP   0x2
-#define HW_CLKCTRL_RESET_DIG    0x1
-
-/**
- *
- * DMA
- *
- */
-
-/********
- * APHB *
- ********/
-
-#define HW_APBH_BASE        0x80004000
-
-/* APHB channels */
-#define HW_APBH_SSP(ssp)    ssp
-
-#define HW_APBH_CTRL0       (*(volatile uint32_t *)(HW_APBH_BASE + 0x0))
-#define HW_APBH_CTRL0__FREEZE_CHANNEL(i)    (1 << (i))
-#define HW_APBH_CTRL0__CLKGATE_CHANNEL(i)   (1 << ((i) + 8))
-#define HW_APBH_CTRL0__RESET_CHANNEL(i)     (1 << ((i) + 16))
-#define HW_APBH_CTRL0__APB_BURST4_EN        (1 << 28)
-#define HW_APBH_CTRL0__APB_BURST8_EN        (1 << 29)
-
-#define HW_APBH_CTRL1       (*(volatile uint32_t *)(HW_APBH_BASE + 0x10))
-#define HW_APBH_CTRL1__CHx_CMDCMPLT_IRQ(i)      (1 << (i))
-#define HW_APBH_CTRL1__CHx_CMDCMPLT_IRQ_EN(i)   (1 << ((i) + 16))
-
-#define HW_APBH_CTRL2       (*(volatile uint32_t *)(HW_APBH_BASE + 0x20))
-#define HW_APBH_CTRL2__CHx_ERROR_IRQ(i)         (1 << (i))
-#define HW_APBH_CTRL2__CHx_ERROR_STATUS(i)      (1 << ((i) + 16))
-
-#define HW_APBH_CHx_CURCMDAR(i) (*(volatile uint32_t *)(HW_APBH_BASE + 0x40 + 0x70 * (i)))
-
-#define HW_APBH_CHx_NXTCMDAR(i) (*(volatile uint32_t *)(HW_APBH_BASE + 0x50 + 0x70 * (i)))
-
-#define HW_APBH_CHx_CMD(i)      (*(volatile uint32_t *)(HW_APBH_BASE + 0x60 + 0x70 * (i)))
-
-#define HW_APBH_CHx_BAR(i)      (*(volatile uint32_t *)(HW_APBH_BASE + 0x70 + 0x70 * (i)))
-
-#define HW_APBH_CHx_SEMA(i)     (*(volatile uint32_t *)(HW_APBH_BASE + 0x80 + 0x70 * (i)))
-
-#define HW_APBH_CHx_DEBUG1(i)   (*(volatile uint32_t *)(HW_APBH_BASE + 0x90 + 0x70 * (i)))
-
-#define HW_APBH_CHx_DEBUG2(i)   (*(volatile uint32_t *)(HW_APBH_BASE + 0xa0 + 0x70 * (i)))
-#define HW_APBH_CHx_DEBUG2__AHB_BYTES_BP    0
-#define HW_APBH_CHx_DEBUG2__AHB_BYTES_BM    0xffff
-#define HW_APBH_CHx_DEBUG2__APB_BYTES_BP    16
-#define HW_APBH_CHx_DEBUG2__APB_BYTES_BM    0xffff0000
-
-/********
- * APHX *
- ********/
-
-/* APHX channels */
-#define HW_APBX_AUDIO_ADC   0
-#define HW_APBX_AUDIO_DAC   1
-#define HW_APBX_I2C         3
-
-#define HW_APBX_BASE        0x80024000
-
-#define HW_APBX_CTRL0       (*(volatile uint32_t *)(HW_APBX_BASE + 0x0))
-
-#define HW_APBX_CTRL1       (*(volatile uint32_t *)(HW_APBX_BASE + 0x10))
-#define HW_APBX_CTRL1__CHx_CMDCMPLT_IRQ(i)      (1 << (i))
-#define HW_APBX_CTRL1__CHx_CMDCMPLT_IRQ_EN(i)   (1 << ((i) + 16))
-
-#define HW_APBX_CTRL2       (*(volatile uint32_t *)(HW_APBX_BASE + 0x20))
-#define HW_APBX_CTRL2__CHx_ERROR_IRQ(i)         (1 << (i))
-#define HW_APBX_CTRL2__CHx_ERROR_STATUS(i)      (1 << ((i) + 16))
-
-#define HW_APBX_CHANNEL_CTRL    (*(volatile uint32_t *)(HW_APBX_BASE + 0x30))
-#define HW_APBX_CHANNEL_CTRL__FREEZE_CHANNEL(i) (1 << (i))
-#define HW_APBX_CHANNEL_CTRL__RESET_CHANNEL(i)  (1 << ((i) + 16))
-
-#define HW_APBX_CHx_CURCMDAR(i) (*(volatile uint32_t *)(HW_APBX_BASE + 0x100 + (i) * 0x70))
-
-#define HW_APBX_CHx_NXTCMDAR(i) (*(volatile uint32_t *)(HW_APBX_BASE + 0x110 + (i) * 0x70))
-
-#define HW_APBX_CHx_CMD(i)      (*(volatile uint32_t *)(HW_APBX_BASE + 0x120 + (i) * 0x70))
-
-#define HW_APBX_CHx_BAR(i)      (*(volatile uint32_t *)(HW_APBX_BASE + 0x130 + (i) * 0x70))
-
-#define HW_APBX_CHx_SEMA(i)     (*(volatile uint32_t *)(HW_APBX_BASE + 0x140 + (i) * 0x70))
-
-#define HW_APBX_CHx_DEBUG1(i)   (*(volatile uint32_t *)(HW_APBX_BASE + 0x150 + (i) * 0x70))
-
-#define HW_APBX_CHx_DEBUG2(i)   (*(volatile uint32_t *)(HW_APBX_BASE + 0x160 + (i) * 0x70))
-#define HW_APBX_CHx_DEBUG2__AHB_BYTES_BP    0
-#define HW_APBX_CHx_DEBUG2__AHB_BYTES_BM    0xffff
-#define HW_APBX_CHx_DEBUG2__APB_BYTES_BP    16
-#define HW_APBX_CHx_DEBUG2__APB_BYTES_BM    0xffff0000
-
-/**********
- * COMMON *
- **********/
-
-struct apb_dma_command_t
-{
-    struct apb_dma_command_t *next;
-    uint32_t cmd;
-    void *buffer;
-    /* PIO words follow */
-};
-
-#define APBH_DMA_CHANNEL(i)     i
-#define APBX_DMA_CHANNEL(i)     ((i) | 0x10)
-#define APB_IS_APBX_CHANNEL(x)  ((x) & 0x10)
-#define APB_GET_DMA_CHANNEL(x)  ((x) & 0xf)
-
-#define APB_SSP(ssp)        APBH_DMA_CHANNEL(HW_APBH_SSP(ssp))
-#define APB_AUDIO_ADC       APBX_DMA_CHANNEL(HW_APBX_AUDIO_ADC)
-#define APB_AUDIO_DAC       APBX_DMA_CHANNEL(HW_APBX_AUDIO_DAC)
-#define APB_I2C             APBX_DMA_CHANNEL(HW_APBX_I2C)
-
-#define HW_APB_CHx_CMD__COMMAND_BM         0x3
-#define HW_APB_CHx_CMD__COMMAND__NO_XFER   0
-#define HW_APB_CHx_CMD__COMMAND__WRITE     1
-#define HW_APB_CHx_CMD__COMMAND__READ      2
-#define HW_APB_CHx_CMD__COMMAND__SENSE     3
-#define HW_APB_CHx_CMD__CHAIN              (1 << 2)
-#define HW_APB_CHx_CMD__IRQONCMPLT         (1 << 3)
-/* those two are only available on APHB */
-#define HW_APBH_CHx_CMD__NANDLOCK          (1 << 4)
-#define HW_APBH_CHx_CMD__NANDWAIT4READY    (1 << 5)
-#define HW_APB_CHx_CMD__SEMAPHORE          (1 << 6)
-#define HW_APB_CHx_CMD__WAIT4ENDCMD        (1 << 7)
-/* An errata advise not to use it */
-//#define HW_APB_CHx_CMD__HALTONTERMINATE    (1 << 8)
-#define HW_APB_CHx_CMD__CMDWORDS_BM         0xf000
-#define HW_APB_CHx_CMD__CMDWORDS_BP         12
-#define HW_APB_CHx_CMD__XFER_COUNT_BM       0xffff0000
-#define HW_APB_CHx_CMD__XFER_COUNT_BP       16
-/* For software use */
-#define HW_APB_CHx_CMD__UNUSED_BP           8
-#define HW_APB_CHx_CMD__UNUSED_BM           (0xf << 8)
-#define HW_APB_CHx_CMD__UNUSED_MAGIC        (0xa << 8)
-
-#define HW_APB_CHx_SEMA__PHORE_BM           0xff0000
-#define HW_APB_CHx_SEMA__PHORE_BP           16
-
-/* A single descriptor cannot transfer more than 2^16 bytes */
-#define IMX233_MAX_SINGLE_DMA_XFER_SIZE     (1 << 16)
-
-static void imx233_dma_init(void)
-{
-    __REG_CLR(HW_APBH_CTRL0) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
-    __REG_CLR(HW_APBX_CTRL0) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
-}
-
-static void imx233_dma_reset_channel(unsigned chan)
-{
-    volatile uint32_t *ptr;
-    uint32_t bm;
-    if(APB_IS_APBX_CHANNEL(chan))
-    {
-        ptr = &HW_APBX_CHANNEL_CTRL;
-        bm = HW_APBX_CHANNEL_CTRL__RESET_CHANNEL(APB_GET_DMA_CHANNEL(chan));
-    }
-    else
-    {
-        ptr = &HW_APBH_CTRL0;
-        bm = HW_APBH_CTRL0__RESET_CHANNEL(APB_GET_DMA_CHANNEL(chan));
-    }
-    __REG_SET(*ptr) = bm;
-    /* wait for end of reset */
-    while(*ptr & bm)
-        ;
-}
-
-static void imx233_dma_start_command(unsigned chan, struct apb_dma_command_t *cmd)
-{
-    if(APB_IS_APBX_CHANNEL(chan))
-    {
-        HW_APBX_CHx_NXTCMDAR(APB_GET_DMA_CHANNEL(chan)) = (uint32_t)cmd;
-        HW_APBX_CHx_SEMA(APB_GET_DMA_CHANNEL(chan)) = 1;
-    }
-    else
-    {
-        HW_APBH_CHx_NXTCMDAR(APB_GET_DMA_CHANNEL(chan)) = (uint32_t)cmd;
-        HW_APBH_CHx_SEMA(APB_GET_DMA_CHANNEL(chan)) = 1;
-    }
-}
-
-static void imx233_dma_wait_completion(unsigned chan)
-{
-    volatile uint32_t *sema;
-    if(APB_IS_APBX_CHANNEL(chan))
-        sema = &HW_APBX_CHx_SEMA(APB_GET_DMA_CHANNEL(chan));
-    else
-        sema = &HW_APBH_CHx_SEMA(APB_GET_DMA_CHANNEL(chan));
-
-    while(*sema & HW_APB_CHx_SEMA__PHORE_BM)
-        ;
-}
+/* STMP3600 only */
+#define HW_CLKCTRL_UTMICLKCTRL  (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x70))
+#define HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK30M_GATE    (1 << 30)
+#define HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK120M_GATE   (1 << 31)
 
 /**
  *
@@ -750,8 +403,6 @@ static void imx233_dma_wait_completion(unsigned chan)
 #define HW_DIGCTL_BASE          0x8001C000
 #define HW_DIGCTL_CTRL          (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0))
 #define HW_DIGCTL_CTRL__USB_CLKGATE (1 << 2)
-
-#define HW_DIGCTL_HCLKCOUNT     (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0x20))
 
 #define HW_DIGCTL_MICROSECONDS  (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xC0))
 
@@ -786,7 +437,6 @@ static void udelay(unsigned us)
 /* USB Phy */
 #define HW_USBPHY_BASE          0x8007C000
 #define HW_USBPHY_PWD           (*(volatile uint32_t *)(HW_USBPHY_BASE + 0))
-#define HW_USBPHY_PWD__ALL      (7 << 10 | 0xf << 17)
 
 #define HW_USBPHY_CTRL          (*(volatile uint32_t *)(HW_USBPHY_BASE + 0x30))
 
@@ -852,17 +502,9 @@ struct dcp_packet_t
  *
  */
 
-void memcpy(uint8_t *dst, const uint8_t *src, uint32_t length)
-{
-    for(uint32_t i = 0; i < length; i++)
-        dst[i] = src[i];
-}
-
-void memset(uint8_t *dst, uint8_t fill, uint32_t length)
-{
-    for(uint32_t i = 0; i < length; i++)
-        dst[i] = fill;
-}
+void memcpy(void *dest, const void *src, size_t n);
+void memmove(void *dest, const void *src, size_t n);
+void memset(void *dst, int value, size_t n);
 
 /**
  * 
@@ -880,9 +522,9 @@ static struct usb_device_descriptor __attribute__((aligned(2)))
     .bDeviceSubClass    = 0,
     .bDeviceProtocol    = 0,
     .bMaxPacketSize0    = 64,
-    .idVendor           = HWEMUL_USB_VID,
-    .idProduct          = HWEMUL_USB_PID,
-    .bcdDevice          = HWEMUL_VERSION_MAJOR << 8 | HWEMUL_VERSION_MINOR,
+    .idVendor           = HWSTUB_USB_VID,
+    .idProduct          = HWSTUB_USB_PID,
+    .bcdDevice          = HWSTUB_VERSION_MAJOR << 8 | HWSTUB_VERSION_MINOR,
     .iManufacturer      = 1,
     .iProduct           = 2,
     .iSerialNumber      = 3,
@@ -913,9 +555,9 @@ static struct usb_interface_descriptor __attribute__((aligned(2)))
     .bInterfaceNumber   = 0,
     .bAlternateSetting  = 0,
     .bNumEndpoints      = 3,
-    .bInterfaceClass    = HWEMUL_CLASS,
-    .bInterfaceSubClass = HWEMUL_SUBCLASS,
-    .bInterfaceProtocol = HWEMUL_PROTOCOL,
+    .bInterfaceClass    = HWSTUB_CLASS,
+    .bInterfaceSubClass = HWSTUB_SUBCLASS,
+    .bInterfaceProtocol = HWSTUB_PROTOCOL,
     .iInterface         = 4
 };
 
@@ -966,9 +608,9 @@ static struct usb_string_descriptor __attribute__((aligned(2)))
     28,
     USB_DT_STRING,
     {'A', 'c', 'i', 'd', ' ',
-     '0' + (HWEMUL_VERSION_MAJOR >> 4), '0' + (HWEMUL_VERSION_MAJOR & 0xf), '.',
-     '0' + (HWEMUL_VERSION_MINOR >> 4), '0' + (HWEMUL_VERSION_MINOR & 0xf), '.',
-     '0' + (HWEMUL_VERSION_REV >> 4), '0' + (HWEMUL_VERSION_REV & 0xf) }
+     '0' + (HWSTUB_VERSION_MAJOR >> 4), '0' + (HWSTUB_VERSION_MAJOR & 0xf), '.',
+     '0' + (HWSTUB_VERSION_MINOR >> 4), '0' + (HWSTUB_VERSION_MINOR & 0xf), '.',
+     '0' + (HWSTUB_VERSION_REV >> 4), '0' + (HWSTUB_VERSION_REV & 0xf) }
 };
 
 /* this is stringid #0: languages supported */
@@ -1138,9 +780,9 @@ static void handle_std_req(struct usb_ctrlrequest *req)
 
 struct usb_resp_info_version_t g_version =
 {
-    .major = HWEMUL_VERSION_MAJOR,
-    .minor = HWEMUL_VERSION_MINOR,
-    .revision = HWEMUL_VERSION_REV
+    .major = HWSTUB_VERSION_MAJOR,
+    .minor = HWSTUB_VERSION_MINOR,
+    .revision = HWSTUB_VERSION_REV
 };
 
 struct usb_resp_info_layout_t g_layout;
@@ -1149,8 +791,8 @@ struct usb_resp_info_stmp_t g_stmp;
 
 struct usb_resp_info_features_t g_features =
 {
-    .feature_mask = HWEMUL_FEATURE_LOG | HWEMUL_FEATURE_MEM |
-        HWEMUL_FEATURE_CALL | HWEMUL_FEATURE_JUMP | HWEMUL_FEATURE_AES_OTP
+    .feature_mask = HWSTUB_FEATURE_LOG | HWSTUB_FEATURE_MEM |
+        HWSTUB_FEATURE_CALL | HWSTUB_FEATURE_JUMP | HWSTUB_FEATURE_AES_OTP
 };
 
 static void fill_layout_info(void)
@@ -1177,21 +819,21 @@ static void handle_get_info(struct usb_ctrlrequest *req)
     int size = 0;
     switch(req->wIndex)
     {
-        case HWEMUL_INFO_VERSION:
+        case HWSTUB_INFO_VERSION:
             ptr = &g_version;
             size = sizeof(g_version);
             break;
-        case HWEMUL_INFO_LAYOUT:
+        case HWSTUB_INFO_LAYOUT:
             fill_layout_info();
             ptr = &g_layout;
             size = sizeof(g_layout);
             break;
-        case HWEMUL_INFO_STMP:
+        case HWSTUB_INFO_STMP:
             fill_stmp_info();
             ptr = &g_stmp;
             size = sizeof(g_stmp);
             break;
-        case HWEMUL_INFO_FEATURES:
+        case HWSTUB_INFO_FEATURES:
             ptr = &g_features;
             size = sizeof(g_features);
             break;
@@ -1249,17 +891,22 @@ static void handle_call_jump(struct usb_ctrlrequest *req)
 {
     uint32_t addr = req->wValue | req->wIndex << 16;
 
-    if(req->bRequest == HWEMUL_CALL)
+    if(req->bRequest == HWSTUB_CALL)
         ((void (*)(void))addr)();
     else
+    {
+        /* disconnect to make sure usb/dma won't interfere */
+        REG_USBCMD &= ~USBCMD_RUN;
+        REG_USBCMD |= USBCMD_CTRL_RESET;
         asm volatile("bx %0\n" : : "r" (addr) : "memory");
+    }
 }
 
 static void do_aes_otp(void *buffer, unsigned length, unsigned params)
 {
     static struct dcp_packet_t dcp_packet;
 
-    bool encrypt = !!(params & HWEMUL_AES_OTP_ENCRYPT);
+    bool encrypt = !!(params & HWSTUB_AES_OTP_ENCRYPT);
     /* reset DCP */
     __REG_SET(HW_DCP_CTRL) = 0x80000000;
     /* clear clock gate */
@@ -1307,20 +954,20 @@ static void handle_class_dev_req(struct usb_ctrlrequest *req)
 {
     switch(req->bRequest)
     {
-        case HWEMUL_GET_INFO:
+        case HWSTUB_GET_INFO:
             handle_get_info(req);
             break;
-        case HWEMUL_GET_LOG:
+        case HWSTUB_GET_LOG:
             handle_get_log(req);
             break;
-        case HWEMUL_RW_MEM:
+        case HWSTUB_RW_MEM:
             handle_rw_mem(req);
             break;
-        case HWEMUL_CALL:
-        case HWEMUL_JUMP:
+        case HWSTUB_CALL:
+        case HWSTUB_JUMP:
             handle_call_jump(req);
             break;
-        case HWEMUL_AES_OTP:
+        case HWSTUB_AES_OTP:
             handle_aes_otp(req);
             break;
         default:
@@ -1348,19 +995,68 @@ static void handle_class_req(struct usb_ctrlrequest *req)
 void main(uint32_t arg)
 {
     usb_buffer_size = oc_buffersize;
-    
-    logf("hwemul %d.%d.%d\n", HWEMUL_VERSION_MAJOR, HWEMUL_VERSION_MINOR,
-         HWEMUL_VERSION_REV);
+
+    logf("hwstub %d.%d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR,
+         HWSTUB_VERSION_REV);
     logf("argument: 0x%08x\n", arg);
+
+    /* detect family */
+    uint16_t product_code = __XTRACT(HW_DIGCTL_CHIPID, PRODUCT_CODE);
+    if(product_code >= 0x3600 && product_code < 0x3700)
+    {
+        logf("identified STMP3600 family\n");
+        g_stmp_family = STMP3600;
+    }
+    else if(product_code == 0x3700)
+    {
+        logf("identified STMP3700 family\n");
+        g_stmp_family = STMP3700;
+    }
+    else if(product_code == 0x37b0)
+    {
+        logf("identified STMP3770 family\n");
+        g_stmp_family = STMP3770;
+    }
+    else if(product_code == 0x3780)
+    {
+        logf("identified STMP3780 family\n");
+        g_stmp_family = STMP3780;
+    }
+    else
+        logf("cannot identify family: 0x%x\n", product_code);
 
     /* we don't know if USB was connected or not. In USB recovery mode it will
      * but in other cases it might not be. In doubt, disconnect */
     REG_USBCMD &= ~USBCMD_RUN;
+    if(g_stmp_family == STMP3600)
+    {
+        /* CPU clock is always derived from PLL, if we switch to PLL, cpu will
+         * run at 480 MHz unprepared ! That's bad so prepare to run at slow sleed
+         * (1.2MHz) for a safe transition */
+        HW_CLKCTRL_CPUCLKCTRL = HW_CLKCTRL_CPUCLKCTRL__WAIT_PLL_LOCK | 400;
+        /* We need to ensure that XBUS < HBUS but HBUS will be 1.2 MHz after the
+         * switch so lower XBUS too */
+        HW_CLKCTRL_XBUSCLKCTRL = 20;
+        /* Power PLL */
+        __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__POWER;
+        HW_CLKCTRL_PLLCTRL0 = (HW_CLKCTRL_PLLCTRL0 & ~0x3ff) | 480;
+        /* Wait lock */
+        while(!(HW_CLKCTRL_PLLCTRL1 & HW_CLKCTRL_PLLCTRL1__LOCK));
+        /* Switch to PLL source */
+        __REG_CLR(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__BYPASS;
+        /* Get back XBUS = 24 MHz and CPU = HBUS = 64MHz */
+        HW_CLKCTRL_CPUCLKCTRL = 7;
+        HW_CLKCTRL_HBUSCLKCTRL = 7;
+        HW_CLKCTRL_XBUSCLKCTRL = 1;
+        __REG_CLR(HW_CLKCTRL_UTMICLKCTRL) = HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK120M_GATE;
+        __REG_CLR(HW_CLKCTRL_UTMICLKCTRL) = HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK30M_GATE;
+    }
+    else
+        __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__POWER;
     /* enable USB PHY PLL */
     __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS;
     /* power up USB PHY */
     __REG_CLR(HW_USBPHY_CTRL) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
-    //__REG_CLR(HW_USBPHY_PWD) = HW_USBPHY_PWD__ALL;
     HW_USBPHY_PWD = 0;
     /* enable USB controller */
     __REG_CLR(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__USB_CLKGATE;
@@ -1382,7 +1078,7 @@ void main(uint32_t arg)
     REG_ENDPTSETUPSTAT = EPSETUP_STATUS_EP0;
     /* run! */
     REG_USBCMD |= USBCMD_RUN;
-    
+
     while(1)
     {
         /* wait for setup */

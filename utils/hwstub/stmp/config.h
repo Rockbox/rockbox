@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL_CONFIG__
-#define __HWEMUL_CONFIG__
+#ifndef __HWSTUB_CONFIG__
+#define __HWSTUB_CONFIG__
 
 #define MEMORYSIZE      0
 #define STACK_SIZE      0x1000
@@ -30,4 +30,27 @@
 #define DRAM_ORIG       0x40000000
 #define DRAM_SIZE       (MEMORYSIZE * 0x100000)
 
-#endif /* __HWEMUL_CONFIG__ */
+#define CPU_ARM
+#define ARM_ARCH    5
+
+#if defined(CPU_ARM) && defined(__ASSEMBLER__)
+/* ARMv4T doesn't switch the T bit when popping pc directly, we must use BX */
+.macro ldmpc cond="", order="ia", regs
+#if ARM_ARCH == 4 && defined(USE_THUMB)
+    ldm\cond\order sp!, { \regs, lr }
+    bx\cond lr
+#else
+    ldm\cond\order sp!, { \regs, pc }
+#endif
+.endm
+.macro ldrpc cond=""
+#if ARM_ARCH == 4 && defined(USE_THUMB)
+    ldr\cond lr, [sp], #4
+    bx\cond  lr
+#else
+    ldr\cond pc, [sp], #4
+#endif
+.endm
+#endif
+
+#endif /* __HWSTUB_CONFIG__ */

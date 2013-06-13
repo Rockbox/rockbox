@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL_STRING__
-#define __HWEMUL_STRING__
+#ifndef __HWSTUB_STRING__
+#define __HWSTUB_STRING__
 
 #include "stddef.h"
 
@@ -27,4 +27,4 @@ void memset(void *dst, int c, size_t n);
 void memcpy(void *dst, const void *src, size_t n);
 size_t strlen(const char *s);
 
-#endif /* __HWEMUL_STRING__ */
+#endif /* __HWSTUB_STRING__ */

@@ -18,12 +18,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL__
-#define __HWEMUL__
+#ifndef __HWSTUB__
+#define __HWSTUB__
 
 #include <libusb.h>
-#include "hwemul_protocol.h"
-#include "hwemul_soc.h"
+#include "hwstub_protocol.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  *
@@ -31,7 +34,7 @@
  *
  */
 
-struct hwemul_device_t
+struct hwstub_device_t
 {
     libusb_device_handle *handle;
     int intf;
@@ -41,23 +44,27 @@ struct hwemul_device_t
 };
 
 /* Requires then ->handle field only. Returns 0 on success */
-int hwemul_probe(struct hwemul_device_t *dev);
+int hwstub_probe(struct hwstub_device_t *dev);
 /* Returns 0 on success */
-int hwemul_release(struct hwemul_device_t *dev);
+int hwstub_release(struct hwstub_device_t *dev);
 
 /* Returns number of bytes filled */
-int hwemul_get_info(struct hwemul_device_t *dev, uint16_t idx, void *info, size_t sz);
+int hwstub_get_info(struct hwstub_device_t *dev, uint16_t idx, void *info, size_t sz);
 /* Returns number of bytes filled */
-int hwemul_get_log(struct hwemul_device_t *dev, void *buf, size_t sz);
+int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz);
 /* Returns number of bytes written/read or <0 on error */
-int hwemul_rw_mem(struct hwemul_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
+int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
 /* Returns <0 on error */
-int hwemul_call(struct hwemul_device_t *dev, uint32_t addr);
-int hwemul_jump(struct hwemul_device_t *dev, uint32_t addr);
+int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);
+int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr);
 /* Returns <0 on error. The size must be a multiple of 16. */
-int hwemul_aes_otp(struct hwemul_device_t *dev, void *buf, size_t sz, uint16_t param);
+int hwstub_aes_otp(struct hwstub_device_t *dev, void *buf, size_t sz, uint16_t param);
 
-const char *hwemul_get_product_string(struct usb_resp_info_stmp_t *stmp);
-const char *hwemul_get_rev_string(struct usb_resp_info_stmp_t *stmp);
+const char *hwstub_get_product_string(struct usb_resp_info_stmp_t *stmp);
+const char *hwstub_get_rev_string(struct usb_resp_info_stmp_t *stmp);
 
-#endif /* __HWEMUL__ */
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif /* __HWSTUB__ */

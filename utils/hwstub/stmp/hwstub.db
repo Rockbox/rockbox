@@ -20,12 +20,12 @@
  ****************************************************************************/
 sources
 {
-    hwemul = "hwemul.elf";
+    hwstub = "hwstub.elf";
 }
 
 section(0)
 {
-    load hwemul;
-    jump hwemul(1);
+    load hwstub;
+    jump hwstub(1);
 }
 

@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL_LOGF__
-#define __HWEMUL_LOGF__
+#ifndef __HWSTUB_LOGF__
+#define __HWSTUB_LOGF__
 
 #include "stddef.h"
 #include <stdarg.h>
@@ -28,4 +28,4 @@ void enable_logf(bool en);
 void logf(const char *fmt, ...);
 size_t logf_readback(char *buf, size_t max_size);
 
-#endif /* __HWEMUL_LOGF__ */
+#endif /* __HWSTUB_LOGF__ */

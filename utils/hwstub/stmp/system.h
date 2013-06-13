@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWEMUL_SYSTEM__
-#define __HWEMUL_SYSTEM__
+#ifndef __HWSTUB_SYSTEM__
+#define __HWSTUB_SYSTEM__
 
 #define IRQ_ENABLED      0x00
 #define IRQ_DISABLED     0x80
@@ -114,5 +114,5 @@ static inline int disable_interrupt_save(int mask)
     return cpsr;
 }
 
-#endif /* __HWEMUL_SYSTEM__ */
+#endif /* __HWSTUB_SYSTEM__ */
  

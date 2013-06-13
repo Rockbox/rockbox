@@ -18,15 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "hwemul.h"
-#include "hwemul_soc.h"
+#include "hwstub.h"
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
 /* requires then ->handle field only */
-int hwemul_probe(struct hwemul_device_t *dev)
+int hwstub_probe(struct hwstub_device_t *dev)
 {
     libusb_device *mydev = libusb_get_device(dev->handle);
 
@@ -44,9 +43,9 @@ int hwemul_probe(struct hwemul_device_t *dev)
         const struct libusb_interface_descriptor *interface =
             &config->interface[intf].altsetting[0];
         if(interface->bNumEndpoints != 3 ||
-                interface->bInterfaceClass != HWEMUL_CLASS ||
-                interface->bInterfaceSubClass != HWEMUL_SUBCLASS ||
-                interface->bInterfaceProtocol != HWEMUL_PROTOCOL)
+                interface->bInterfaceClass != HWSTUB_CLASS ||
+                interface->bInterfaceSubClass != HWSTUB_SUBCLASS ||
+                interface->bInterfaceProtocol != HWSTUB_PROTOCOL)
             continue;
         dev->intf = intf;
         dev->bulk_in = dev->bulk_out = dev->int_in = -1;
@@ -73,26 +72,26 @@ int hwemul_probe(struct hwemul_device_t *dev)
     return libusb_claim_interface(dev->handle, intf);
 }
 
-int hwemul_release(struct hwemul_device_t *dev)
+int hwstub_release(struct hwstub_device_t *dev)
 {
     return libusb_release_interface(dev->handle, dev->intf);
 }
 
-int hwemul_get_info(struct hwemul_device_t *dev, uint16_t idx, void *info, size_t sz)
+int hwstub_get_info(struct hwstub_device_t *dev, uint16_t idx, void *info, size_t sz)
 {
     return libusb_control_transfer(dev->handle,
         LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_IN,
-        HWEMUL_GET_INFO, 0, idx, info, sz, 1000);
+        HWSTUB_GET_INFO, 0, idx, info, sz, 1000);
 }
 
-int hwemul_get_log(struct hwemul_device_t *dev, void *buf, size_t sz)
+int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz)
 {
     return libusb_control_transfer(dev->handle,
         LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_IN,
-        HWEMUL_GET_LOG, 0, 0, buf, sz, 1000);
+        HWSTUB_GET_LOG, 0, 0, buf, sz, 1000);
 }
 
-int hwemul_rw_mem(struct hwemul_device_t *dev, int read, uint32_t addr, void *buf, size_t sz)
+int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz)
 {
     size_t tot_sz = 0;
     while(sz)
@@ -101,7 +100,7 @@ int hwemul_rw_mem(struct hwemul_device_t *dev, int read, uint32_t addr, void *bu
         int ret = libusb_control_transfer(dev->handle,
             LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
             (read ? LIBUSB_ENDPOINT_IN : LIBUSB_ENDPOINT_OUT),
-            HWEMUL_RW_MEM, addr & 0xffff, addr >> 16, buf, xfer, 1000);
+            HWSTUB_RW_MEM, addr & 0xffff, addr >> 16, buf, xfer, 1000);
         if(ret != xfer)
             return ret;
         sz -= xfer;
@@ -112,23 +111,23 @@ int hwemul_rw_mem(struct hwemul_device_t *dev, int read, uint32_t addr, void *bu
     return tot_sz;
 }
 
-int hwemul_call(struct hwemul_device_t *dev, uint32_t addr)
+int hwstub_call(struct hwstub_device_t *dev, uint32_t addr)
 {
     return libusb_control_transfer(dev->handle,
             LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWEMUL_CALL, addr & 0xffff, addr >> 16, NULL, 0,
+            LIBUSB_ENDPOINT_OUT, HWSTUB_CALL, addr & 0xffff, addr >> 16, NULL, 0,
             1000);
 }
 
-int hwemul_jump(struct hwemul_device_t *dev, uint32_t addr)
+int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr)
 {
     return libusb_control_transfer(dev->handle,
             LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWEMUL_JUMP, addr & 0xffff, addr >> 16, NULL, 0,
+            LIBUSB_ENDPOINT_OUT, HWSTUB_JUMP, addr & 0xffff, addr >> 16, NULL, 0,
             1000);
 }
 
-const char *hwemul_get_product_string(struct usb_resp_info_stmp_t *stmp)
+const char *hwstub_get_product_string(struct usb_resp_info_stmp_t *stmp)
 {
     switch(stmp->chipid)
     {
@@ -139,7 +138,7 @@ const char *hwemul_get_product_string(struct usb_resp_info_stmp_t *stmp)
     }
 }
 
-const char *hwemul_get_rev_string(struct usb_resp_info_stmp_t *stmp)
+const char *hwstub_get_rev_string(struct usb_resp_info_stmp_t *stmp)
 {
     switch(stmp->chipid)
     {
@@ -159,11 +158,11 @@ const char *hwemul_get_rev_string(struct usb_resp_info_stmp_t *stmp)
     }
 }
 
-int hwemul_aes_otp(struct hwemul_device_t *dev, void *buf, size_t sz, uint16_t param)
+int hwstub_aes_otp(struct hwstub_device_t *dev, void *buf, size_t sz, uint16_t param)
 {
     int ret = libusb_control_transfer(dev->handle,
             LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWEMUL_AES_OTP, param, 0, buf, sz,
+            LIBUSB_ENDPOINT_OUT, HWSTUB_AES_OTP, param, 0, buf, sz,
             1000);
     if(ret <0 || (unsigned)ret != sz)
         return -1;
