@@ -473,9 +473,14 @@ CMD_FN(cmd_component)
 
 CMD_FN(cmd_keyfile)
 {
-    (void) sb;
     if(!add_keys_from_file(args[0].str))
         bug("Cannot add keys from file '%s'\n", args[0].str);
+    for(int i = 0; i < g_nr_keys; i++)
+        if(g_key_array[i].method == CRYPTO_XOR_KEY)
+        {
+            memcpy(&sb->key, &g_key_array[i], sizeof(sb->key));
+            break;
+        }
     return 0;
 }
 
@@ -501,6 +506,7 @@ struct cmd_entry_t g_cmds[] =
     CMD("-N", cmd_clear_strict, 0)
     CMD("-nonstrict", cmd_clear_strict, 0)
     CMD("-call", cmd_call, 1, ARG_UINT)
+    CMD("-jump", cmd_jump, 1, ARG_UINT)
     CMD("-jumparg", cmd_jumparg, 1, ARG_UINT)
     CMD("-f", cmd_load, 1, ARG_STR)
     CMD("-load", cmd_load, 1, ARG_STR)
@@ -515,7 +521,6 @@ struct cmd_entry_t g_cmds[] =
     CMD("-v", cmd_component, 1, ARG_STR)
     CMD("-component", cmd_component, 1, ARG_STR)
     CMD("-k", cmd_keyfile, 1, ARG_STR)
-    CMD("-jump", cmd_jump, 1, ARG_UINT)
 };
 #undef CMD
 
@@ -579,8 +584,8 @@ static void usage(void)
     printf("  -C/-noncritical\t\tClear critical flag\n");
     printf("  -n/-strict\t\t\tSet strict flag\n");
     printf("  -N/-nonstrict\t\t\tClear strict flag\n");
-    printf("  -call <addr>\t\tCall an address\n");
-    printf("  -jump <addr>\t\tJump to an address\n");
+    printf("  -call <addr>\t\t\tCall code at a specified address\n");
+    printf("  -jump <addr>\t\t\tJump to code at a specified address\n");
     
     exit(1);
 }
