@@ -875,7 +875,7 @@ whichadvanced () {
   fi
   if [ "yes" = "$simulator" ]; then
     debug="-DDEBUG"
-    extradefines="$extradefines -DSIMULATOR"
+    extradefines="$extradefines -DSIMULATOR -DHAVE_TEST_PLUGINS"
     archosrom=""
     flash=""
   fi
@@ -3562,7 +3562,7 @@ fi
       fi
       debug="-DDEBUG"
       simulator="yes"
-      extradefines="$extradefines -DSIMULATOR"
+      extradefines="$extradefines -DSIMULATOR -DHAVE_TEST_PLUGINS"
       archosrom=""
       flash=""
       echo "Simulator build selected"
