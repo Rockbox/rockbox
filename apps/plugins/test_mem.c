@@ -132,6 +132,7 @@ static void read_test(volatile int *buf, int buf_size, int loop_cnt)
             x = buf[j+4];
         }
     }
+    (void)x;
 #endif
 }
 
