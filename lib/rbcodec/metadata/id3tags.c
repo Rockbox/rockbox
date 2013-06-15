@@ -299,7 +299,10 @@ static int parsegenre( struct mp3entry* entry, char* tag, int bufferpos )
 /* parse embed albumart */
 static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
 {
-    entry->has_embedded_albumart = false;
+    /* don't parse albumart if already one found. This callback function is
+     * called unconditionally. */
+    if(entry->has_embedded_albumart)
+        return bufferpos;
 
     /* we currently don't support unsynchronizing albumart */
     if (entry->albumart.type == AA_TYPE_UNSYNC)
@@ -733,6 +736,10 @@ void setid3v2title(int fd, struct mp3entry *entry)
     int rc;
 #if CONFIG_CODEC == SWCODEC
     bool itunes_gapless = false;
+#endif
+
+#ifdef HAVE_ALBUMART
+    entry->has_embedded_albumart = false;
 #endif
 
     global_ff_found = false;
