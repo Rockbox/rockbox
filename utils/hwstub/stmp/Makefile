@@ -71,3 +71,4 @@ $(EXEC_SB1): $(EXEC_ELF)
 
 clean:
 	rm -rf $(OBJ) $(DEPS) $(EXEC) $(TMP_LDS) $(TMP_MAP)
+
