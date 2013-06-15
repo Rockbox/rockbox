@@ -66,6 +66,11 @@ static void usage(void)
     }
     printf("\n");
     printf("By default a dualboot image is built\n");
+    printf("This tools supports the following format for the boot file:\n");
+    printf("- rockbox scramble format\n");
+    printf("- elf format\n");
+    printf("Additional checks will be performed on rockbox scramble format to\n");
+    printf("ensure soundness of operation.\n");
     exit(1);
 }
 

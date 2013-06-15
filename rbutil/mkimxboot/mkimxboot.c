@@ -27,13 +27,15 @@
 #include "sb.h"
 #include "dualboot.h"
 #include "md5.h"
+#include "elf.h"
 
 /* abstract structure to represent a Rockbox firmware. It can be a scrambled file
  * or an ELF file or whatever. */
 struct rb_fw_t
 {
-    void *boot;
-    size_t boot_sz;
+    int nr_insts;
+    struct sb_inst_t *insts;
+    int entry_idx;
 };
 
 struct imx_fw_variant_desc_t
@@ -167,6 +169,24 @@ static const struct imx_model_desc_t imx_models[] =
 #define MAGIC_RECOVERY  0xfee1dead
 #define MAGIC_NORMAL    0xcafebabe
 
+static int rb_fw_get_sb_inst_count(struct rb_fw_t *fw)
+{
+    return fw->nr_insts;
+}
+
+/* fill sb instruction for the firmware, fill fill rb_fw_get_sb_inst_count() instructions */
+static void rb_fw_fill_sb(struct rb_fw_t *fw, struct sb_inst_t *inst,
+    uint32_t entry_arg)
+{
+    memcpy(inst, fw->insts, fw->nr_insts * sizeof(struct sb_inst_t));
+    /* copy data if needed */
+    for(int i = 0; i < fw->nr_insts; i++)
+        if(fw->insts[i].inst == SB_INST_LOAD)
+            fw->insts[i].data = memdup(fw->insts[i].data, fw->insts[i].size);
+    /* replace call argument of the entry point */
+    inst[fw->entry_idx].argument = entry_arg;
+}
+
 static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
     enum imx_output_type_t type, struct sb_file_t *sb_file, struct rb_fw_t boot_fw)
 {
@@ -188,6 +208,9 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
     /* Do not override real key and IV */
     sb_file->override_crypto_iv = false;
     sb_file->override_real_key = false;
+
+    /* used to manipulate entries */
+    int nr_boot_inst = rb_fw_get_sb_inst_count(&boot_fw);
 
     /* first locate the good instruction */
     struct sb_section_t *sec = &sb_file->sections[0];
@@ -230,19 +253,12 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
         /* create a new section */
         struct sb_section_t rock_sec;
         memset(&rock_sec, 0, sizeof(rock_sec));
-        /* section has two instructions: load and call */
+        /* section can have any number of instructions */
         rock_sec.identifier = MAGIC_ROCK;
         rock_sec.alignment = BLOCK_SIZE;
-        rock_sec.nr_insts = 2;
-        rock_sec.insts = xmalloc(2 * sizeof(struct sb_inst_t));
-        memset(rock_sec.insts, 0, 2 * sizeof(struct sb_inst_t));
-        rock_sec.insts[0].inst = SB_INST_LOAD;
-        rock_sec.insts[0].size = boot_fw.boot_sz;
-        rock_sec.insts[0].data = memdup(boot_fw.boot, boot_fw.boot_sz);
-        rock_sec.insts[0].addr = imx_models[model].bootloader_addr;
-        rock_sec.insts[1].inst = SB_INST_JUMP;
-        rock_sec.insts[1].addr = imx_models[model].bootloader_addr;
-        rock_sec.insts[1].argument = MAGIC_NORMAL;
+        rock_sec.nr_insts = nr_boot_inst;
+        rock_sec.insts = xmalloc(nr_boot_inst * sizeof(struct sb_inst_t));
+        rb_fw_fill_sb(&boot_fw, rock_sec.insts, MAGIC_NORMAL);
 
         sb_file->sections = augment_array(sb_file->sections,
             sizeof(struct sb_section_t), sb_file->nr_sections,
@@ -254,23 +270,16 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
     else if(type == IMX_SINGLEBOOT || type == IMX_RECOVERY)
     {
         bool recovery = type == IMX_RECOVERY;
-        /* remove everything after the call and add two instructions: load and call */
-        struct sb_inst_t *new_insts = xmalloc(sizeof(struct sb_inst_t) * (jump_idx + 2));
+        /* remove everything after the call and add instructions for firmware */
+        struct sb_inst_t *new_insts = xmalloc(sizeof(struct sb_inst_t) * (jump_idx + nr_boot_inst));
         memcpy(new_insts, sec->insts, sizeof(struct sb_inst_t) * jump_idx);
         for(int i = jump_idx; i < sec->nr_insts; i++)
             sb_free_instruction(sec->insts[i]);
-        memset(new_insts + jump_idx, 0, 2 * sizeof(struct sb_inst_t));
-        new_insts[jump_idx + 0].inst = SB_INST_LOAD;
-        new_insts[jump_idx + 0].size = boot_fw.boot_sz;
-        new_insts[jump_idx + 0].data = memdup(boot_fw.boot, boot_fw.boot_sz);
-        new_insts[jump_idx + 0].addr = imx_models[model].bootloader_addr;
-        new_insts[jump_idx + 1].inst = SB_INST_JUMP;
-        new_insts[jump_idx + 1].addr = imx_models[model].bootloader_addr;
-        new_insts[jump_idx + 1].argument = recovery ? MAGIC_RECOVERY : MAGIC_NORMAL;
+        rb_fw_fill_sb(&boot_fw, &new_insts[jump_idx], recovery ? MAGIC_RECOVERY : MAGIC_NORMAL);
 
         free(sec->insts);
         sec->insts = new_insts;
-        sec->nr_insts = jump_idx + 2;
+        sec->nr_insts = jump_idx + nr_boot_inst;
         /* remove all other sections */
         for(int i = 1; i < sb_file->nr_sections; i++)
             sb_free_section(sb_file->sections[i]);
@@ -558,9 +567,10 @@ static enum imx_error_t load_sb_file(const char *file, int md5_idx,
     return IMX_SUCCESS;
 }
 
-/* Load a rockbox firwmare from a buffer. Data is copied. */
-static enum imx_error_t rb_fw_load_buf(struct rb_fw_t *fw, uint8_t *buf, size_t sz,
-    enum imx_model_t model)
+/* Load a rockbox firwmare from a buffer. Data is copied. Assume firmware is
+ * using our scramble format. */
+static enum imx_error_t rb_fw_load_buf_scramble(struct rb_fw_t *fw, uint8_t *buf,
+    size_t sz, enum imx_model_t model)
 {
     if(sz < 8)
     {
@@ -583,9 +593,110 @@ static enum imx_error_t rb_fw_load_buf(struct rb_fw_t *fw, uint8_t *buf, size_t 
         printf("[ERR] Bootloader checksum mismatch\n");
         return IMX_BOOT_CHECKSUM_ERROR;
     }
-    fw->boot = memdup(buf + 8, sz - 8);
-    fw->boot_sz = sz - 8;
+    /* two instructions: load and jump */
+    fw->nr_insts = 2;
+    fw->entry_idx = 1;
+    fw->insts = xmalloc(fw->nr_insts * sizeof(struct sb_inst_t));
+    memset(fw->insts, 0, fw->nr_insts * sizeof(struct sb_inst_t));
+    fw->insts[0].inst = SB_INST_LOAD;
+    fw->insts[0].addr = imx_models[model].bootloader_addr;
+    fw->insts[0].size = sz - 8;
+    fw->insts[0].data = memdup(buf + 8, sz - 8);
+    fw->insts[1].inst = SB_INST_JUMP;
+    fw->insts[1].addr = imx_models[model].bootloader_addr;
     return IMX_SUCCESS;
+}
+
+struct elf_user_t
+{
+    void *buf;
+    size_t sz;
+};
+
+static bool elf_read(void *user, uint32_t addr, void *buf, size_t count)
+{
+    struct elf_user_t *u = user;
+    if(addr + count <= u->sz)
+    {
+        memcpy(buf, u->buf + addr, count);
+        return true;
+    }
+    else
+        return false;
+}
+
+static void elf_printf(void *user, bool error, const char *fmt, ...)
+{
+    if(!g_debug && !error)
+        return;
+    (void) user;
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+/* Load a rockbox firwmare from a buffer. Data is copied. Assume firmware is
+ * using ELF format. */
+static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
+    size_t sz, enum imx_model_t model)
+{
+    struct elf_params_t elf;
+    struct elf_user_t user;
+    user.buf = buf;
+    user.sz = sz;
+    elf_init(&elf);
+    if(!elf_read_file(&elf, &elf_read, &elf_printf, &user))
+    {
+        elf_release(&elf);
+        printf("[ERR] Error parsing ELF file\n");
+        return IMX_BOOT_INVALID;
+    }
+    elf_translate_addresses(&elf);
+    fw->nr_insts = elf_get_nr_sections(&elf) + 1;
+    fw->insts = xmalloc(fw->nr_insts * sizeof(struct sb_inst_t));
+    fw->entry_idx = fw->nr_insts - 1;
+    memset(fw->insts, 0, fw->nr_insts * sizeof(struct sb_inst_t));
+    struct elf_section_t *sec = elf.first_section;
+    for(int i = 0; sec; i++, sec = sec->next)
+    {
+        fw->insts[i].addr = sec->addr;
+        fw->insts[i].size = sec->size;
+        if(sec->type == EST_LOAD)
+        {
+            fw->insts[i].inst = SB_INST_LOAD;
+            fw->insts[i].data = memdup(sec->section, sec->size);
+        }
+        else if(sec->type == EST_FILL)
+        {
+            fw->insts[i].inst = SB_INST_FILL;
+            fw->insts[i].pattern = sec->pattern;
+        }
+        else
+        {
+            printf("[WARN] Warning parsing ELF file: unsupported section type mapped to NOP!\n");
+            fw->insts[i].inst = SB_INST_NOP;
+        }
+    }
+    fw->insts[fw->nr_insts - 1].inst = SB_INST_JUMP;
+    if(!elf_get_start_addr(&elf, &fw->insts[fw->nr_insts - 1].addr))
+    {
+        elf_release(&elf);
+        printf("[ERROR] Error parsing ELF file: it has no entry point!\n");
+        return IMX_BOOT_INVALID;
+    }
+    elf_release(&elf);
+    return IMX_SUCCESS;
+}
+
+/* Load a rockbox firwmare from a buffer. Data is copied. */
+static enum imx_error_t rb_fw_load_buf(struct rb_fw_t *fw, uint8_t *buf,
+    size_t sz, enum imx_model_t model)
+{
+    /* detect file format */
+    if(sz >= 4 && buf[0] == 0x7f && memcmp(buf + 1, "ELF", 3) == 0)
+        return rb_fw_load_buf_elf(fw, buf, sz, model);
+    else
+        return rb_fw_load_buf_scramble(fw, buf, sz, model);
 }
 
 /* load a rockbox firmware from a file. */
@@ -606,9 +717,10 @@ static enum imx_error_t rb_fw_load(struct rb_fw_t *fw, const char *file,
 /* free rockbox firmware */
 static void rb_fw_free(struct rb_fw_t *fw)
 {
-    free(fw->boot);
-    fw->boot = NULL;
-    fw->boot_sz = 0;
+    for(int i = 0; i < fw->nr_insts; i++)
+        sb_free_instruction(fw->insts[i]);
+    free(fw->insts);
+    memset(fw, 0, sizeof(struct rb_fw_t));
 }
 
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
