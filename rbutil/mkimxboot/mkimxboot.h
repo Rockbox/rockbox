@@ -41,7 +41,8 @@ enum imx_error_t
     IMX_BOOT_CHECKSUM_ERROR = -7,
     IMX_DONT_KNOW_HOW_TO_PATCH = -8,
     IMX_VARIANT_MISMATCH = -9,
-    IMX_FIRST_SB_ERROR = -10,
+    IMX_WRITE_ERROR = -10,
+    IMX_FIRST_SB_ERROR = -11,
 };
 
 enum imx_output_type_t
