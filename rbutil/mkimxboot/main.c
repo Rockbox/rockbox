@@ -46,16 +46,16 @@ static void usage(void)
 {
     printf("Usage: mkimxboot [options | file]...\n");
     printf("Options:\n");
-    printf("  -?/--help\tDisplay this message\n");
-    printf("  -o <file>\tSet output file\n");
-    printf("  -i <file>\tSet input file\n");
-    printf("  -b <file>\tSet boot file\n");
-    printf("  -d/--debug\tEnable debug output\n");
-    printf("  -t <type>\tSet type (dualboot, singleboot, recovery)\n");
-    printf("  -v <v>\tSet variant\n");
-    printf("  -x\t\tDump device informations\n");
-    printf("  -w\tExtract the original firmware\n");
-    printf("  -p <ver>\tForce product and component version\n");
+    printf("  -?/--help   Display this message\n");
+    printf("  -o <file>   Set output file\n");
+    printf("  -i <file>   Set input file\n");
+    printf("  -b <file>   Set boot file\n");
+    printf("  -d/--debug  Enable debug output\n");
+    printf("  -t <type>   Set type (dualboot, singleboot, recovery)\n");
+    printf("  -v <v>      Set variant\n");
+    printf("  -x          Dump device informations\n");
+    printf("  -w          Extract the original firmware\n");
+    printf("  -p <ver>    Force product and component version\n");
     printf("Supported variants: (default is standard)\n");
     printf("  ");
     for(size_t i = 0; i < NR_VARIANTS; i++)
