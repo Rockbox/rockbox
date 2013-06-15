@@ -106,7 +106,7 @@ void sha_1_block(struct sha_1_params_t *params, uint32_t cur_hash[5], byte *data
     memmove(w, data, 64);
     for(int i = 0; i < 16; i++)
         byte_swap32(&w[i]);
-        
+
     for(int i = 16; i <= 79; i++)
         w[i] = rot_left(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1);
 
@@ -141,7 +141,7 @@ void sha_1_block(struct sha_1_params_t *params, uint32_t cur_hash[5], byte *data
         a = temp;
     }
     #undef w
-    
+
     cur_hash[0] += a;
     cur_hash[1] += b;
     cur_hash[2] += c;

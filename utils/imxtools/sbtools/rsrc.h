@@ -92,4 +92,4 @@ void rsrc_dump(struct rsrc_file_t *file, void *u, rsrc_color_printf printf);
 void rsrc_free(struct rsrc_file_t *file);
 
 #endif /* __RSRC_H__ */
- 
+

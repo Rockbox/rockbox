@@ -165,4 +165,4 @@ void sb1_dump(struct sb1_file_t *file, void *u, sb1_color_printf printf);
 void sb1_free(struct sb1_file_t *file);
 
 #endif /* __SB1_H__ */
- 
+

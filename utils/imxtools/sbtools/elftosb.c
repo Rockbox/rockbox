@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #define _ISOC99_SOURCE
 #define _POSIX_C_SOURCE 200809L /* for strdup */
 #include <stdio.h>
@@ -144,7 +144,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
 
     db_generate_default_sb_version(&sb->product_ver);
     db_generate_default_sb_version(&sb->component_ver);
-    
+
     if(g_debug)
         printf("Applying command file...\n");
     /* count sections */
@@ -246,7 +246,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
                 }
                 else
                     bug("die\n");
-                
+
                 cinst = cinst->next;
             }
 
@@ -308,7 +308,7 @@ static struct sb_file_t *apply_cmd_file(struct cmd_file_t *cmd_file)
                 }
                 else
                     bug("die\n");
-                
+
                 cinst = cinst->next;
             }
         }
@@ -347,7 +347,7 @@ int main(int argc, char **argv)
     struct crypto_key_t crypto_iv;
     real_key.method = CRYPTO_NONE;
     crypto_iv.method = CRYPTO_NONE;
-    
+
     while(1)
     {
         static struct option long_options[] =
@@ -452,10 +452,10 @@ int main(int argc, char **argv)
     sb_file->first_boot_sec_id = sb_file->sections[0].identifier;
     sb_file->flags = 0;
     sb_file->minor_version = 1;
-    
+
     sb_write_file(sb_file, output_filename);
     sb_free(sb_file);
     clear_keys();
-    
+
     return 0;
 }

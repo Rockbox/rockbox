@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
                 }
                 printf("Invalid variant '%s'\n", optarg);
                 return 1;
-                
+
                 Lok:
                 break;
             }

@@ -86,10 +86,10 @@ static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id
     sprintf(filename, "%s%s.%d.elf", g_out_prefix, name, count);
     if(g_debug)
         printf("Write boot section %s to %s\n", name, filename);
-    
+
     FILE *fd = fopen(filename, "wb");
     free(filename);
-    
+
     if(fd == NULL)
         return;
     if(g_elf_simplify)
@@ -112,7 +112,7 @@ static void extract_sb_section(struct sb_section_t *sec)
         if(g_debug)
             printf("Write data section %s to %s\n", sec_name, filename);
         free(filename);
-        
+
         for(int j = 0; j < sec->nr_insts; j++)
         {
             assert(sec->insts[j].inst == SB_INST_DATA);
@@ -494,7 +494,7 @@ int main(int argc, char **argv)
         }
         if(loopback)
             sb1_write_file(file, loopback);
-        
+
         sb1_free(file);
     }
     else
@@ -504,6 +504,6 @@ int main(int argc, char **argv)
         return 1;
     }
     clear_keys();
-    
+
     return 0;
 }

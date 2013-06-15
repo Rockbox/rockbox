@@ -733,7 +733,7 @@ struct cmd_file_t *db_parse_file(const char *file)
                         inst->type = (inst->type == CMD_CALL) ? CMD_CALL_AT : CMD_JUMP_AT;
                         inst->addr = parse_intexpr(&lctx, cmd_file->constant_list);
                     }
-                    
+
                     if(lexem.type == LEX_LPAREN)
                     {
                         next(true);

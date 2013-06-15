@@ -68,7 +68,7 @@ int crypto_apply(
     {
         if(out_cbc_mac && !encrypt)
             memcpy(*out_cbc_mac, in_data + 16 * (nr_blocks - 1), 16);
-        
+
         libusb_device_handle *handle = NULL;
         libusb_context *ctx;
         /* init library */
@@ -97,7 +97,7 @@ int crypto_apply(
             printf("usbotp: configuration: %d\n", config_id);
             printf("usbotp: interfaces: %d\n", config->bNumInterfaces);
         }
-        
+
         const struct libusb_endpoint_descriptor *endp = NULL;
         int intf, intf_alt;
         for(intf = 0; intf < config->bNumInterfaces; intf++)
@@ -147,7 +147,7 @@ int crypto_apply(
             buffer_size, &recv_size, 1000);
         libusb_release_interface(handle, intf);
         libusb_close(handle);
-        
+
         if(ret < 0)
         {
             if(g_debug)
@@ -166,7 +166,7 @@ int crypto_apply(
             memcpy(out_data, buffer + 16, 16 * nr_blocks);
         if(out_cbc_mac && encrypt)
             memcpy(*out_cbc_mac, buffer + buffer_size - 16, 16);
-        
+
         return CRYPTO_ERROR_SUCCESS;
     }
     #endif

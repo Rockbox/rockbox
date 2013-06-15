@@ -184,7 +184,7 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
     if(sb->userdata)
         fwrite(sb->userdata, sb->userdata_size, 1, fd);
     fclose(fd);
-    
+
     return SB1_SUCCESS;
 }
 
@@ -257,7 +257,7 @@ bool sb1_is_key_valid_fast(void *buffer, size_t size, union xorcrypt_key_t _key[
     struct sb1_header_t *header = (struct sb1_header_t *)buffer;
 
     union xorcrypt_key_t key[2];
-    
+
     uint8_t sector[SECTOR_SIZE];
     /* copy key and data because it's modified by the crypto code */
     memcpy(key, _key, sizeof(key));
@@ -399,7 +399,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
     printf(YELLOW, "%X.%X.%X\n", product_ver.major, product_ver.minor, product_ver.revision);
     printf(GREEN, "  Component version: ");
     printf(YELLOW, "%X.%X.%X\n", component_ver.major, component_ver.minor, component_ver.revision);
-    
+
     printf(GREEN, "  Drive tag: ");
     printf(YELLOW, "%x\n", header->drive_tag);
 

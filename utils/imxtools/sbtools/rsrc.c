@@ -161,12 +161,12 @@ static bool read_entries(struct rsrc_file_t *f, void *u,
                 printf(RED, "%c", isprint(p[i]) ? p[i] : '.');
         }
         printf(OFF, "\n");
-        
+
         if(RSRC_TABLE_ENTRY_TYPE(te) == RSRC_TYPE_NESTED)
         {
             char *p = prefix + strlen(prefix);
             sprintf(p, "%s|  ", RED);
-            
+
             bool ok = read_entries(f, u, cprintf, err,
                 RSRC_TABLE_ENTRY_OFFSET(te), index,
                 level - 1, prefix);
@@ -175,7 +175,7 @@ static bool read_entries(struct rsrc_file_t *f, void *u,
             *p = 0;
         }
     }
-    
+
     return true;
     #undef printf
     #undef fatal
@@ -220,7 +220,7 @@ struct rsrc_file_t *rsrc_read_memory(void *_buf, size_t filesize, void *u,
     bool ok = read_entries(rsrc_file, u, cprintf, err, RSRC_SECTOR_SIZE, 0, 3, prefix);
     if(!ok)
         fatal(*err, "Error while parsing rsrc table\n");
-    
+
     return rsrc_file;
     #undef printf
     #undef fatal
@@ -253,4 +253,4 @@ void rsrc_dump(struct rsrc_file_t *file, void *u, rsrc_color_printf cprintf)
     #undef printf
     #undef print_hex
 }
- 
+

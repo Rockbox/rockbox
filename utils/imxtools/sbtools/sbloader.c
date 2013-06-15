@@ -340,7 +340,7 @@ static int probe_hid_xfer_size(libusb_device_handle *dev)
         size -= item.total_size;
     }
     return xfer_size / 8;
-    
+
     Lerr:
     printf("Cannot probe transfer size, please specify it on command line.\n");
     exit(11);

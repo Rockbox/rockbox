@@ -180,7 +180,7 @@ struct sb_section_t
     bool is_data;
     bool is_cleartext;
     uint32_t alignment;
-    // data sections are handled as one or more SB_INST_DATA virtual instruction 
+    // data sections are handled as one or more SB_INST_DATA virtual instruction
     int nr_insts;
     struct sb_inst_t *insts;
     /* for production use */
@@ -196,7 +196,7 @@ struct sb_file_t
     /* override crypto IV, use with caution ! Use NULL to generate it */
     bool override_crypto_iv;
     uint8_t crypto_iv[16];
-    
+
     int nr_sections;
     uint16_t drive_tag;
     uint32_t first_boot_sec_id;

@@ -265,7 +265,7 @@ static bool parse_sb_version(struct sb1_version_t *ver, char *str)
 }
 
 /**
- * Command line parsing 
+ * Command line parsing
  */
 
 #define MAX_NR_ARGS 2
@@ -586,7 +586,7 @@ static void usage(void)
     printf("  -N/-nonstrict\t\t\tClear strict flag\n");
     printf("  -call <addr>\t\t\tCall code at a specified address\n");
     printf("  -jump <addr>\t\t\tJump to code at a specified address\n");
-    
+
     exit(1);
 }
 
@@ -623,4 +623,4 @@ int main(int argc, char **argv)
 
     return ret;
 }
- 
+
