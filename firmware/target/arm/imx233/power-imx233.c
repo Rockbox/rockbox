@@ -38,76 +38,76 @@ struct current_step_bit_t
 /* in decreasing order */
 static struct current_step_bit_t g_charger_current_bits[] =
 {
-    { 400, HW_POWER_CHARGE__BATTCHRG_I__400mA },
-    { 200, HW_POWER_CHARGE__BATTCHRG_I__200mA },
-    { 100, HW_POWER_CHARGE__BATTCHRG_I__100mA },
-    { 50, HW_POWER_CHARGE__BATTCHRG_I__50mA },
-    { 20, HW_POWER_CHARGE__BATTCHRG_I__20mA },
-    { 10, HW_POWER_CHARGE__BATTCHRG_I__10mA }
+    { 400, BV_POWER_CHARGE_BATTCHRG_I__400mA },
+    { 200, BV_POWER_CHARGE_BATTCHRG_I__200mA },
+    { 100, BV_POWER_CHARGE_BATTCHRG_I__100mA },
+    { 50, BV_POWER_CHARGE_BATTCHRG_I__50mA },
+    { 20, BV_POWER_CHARGE_BATTCHRG_I__20mA },
+    { 10, BV_POWER_CHARGE_BATTCHRG_I__10mA }
 };
 
 /* in decreasing order */
 static struct current_step_bit_t g_charger_stop_current_bits[] =
 {
-    { 100, HW_POWER_CHARGE__STOP_ILIMIT__100mA },
-    { 50, HW_POWER_CHARGE__STOP_ILIMIT__50mA },
-    { 20, HW_POWER_CHARGE__STOP_ILIMIT__20mA },
-    { 10, HW_POWER_CHARGE__STOP_ILIMIT__10mA }
+    { 100, BV_POWER_CHARGE_STOP_ILIMIT__100mA },
+    { 50, BV_POWER_CHARGE_STOP_ILIMIT__50mA },
+    { 20, BV_POWER_CHARGE_STOP_ILIMIT__20mA },
+    { 10, BV_POWER_CHARGE_STOP_ILIMIT__10mA }
 };
 
 /* in decreasing order */
 static struct current_step_bit_t g_4p2_charge_limit_bits[] =
 {
-    { 400, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__400mA },
-    { 200, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__200mA },
-    { 100, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__100mA },
-    { 50, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__50mA },
-    { 20, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__20mA },
-    { 10, HW_POWER_5VCTRL__CHARGE_4P2_ILIMIT__10mA }
+    { 400, BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__400mA },
+    { 200, BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__200mA },
+    { 100, BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__100mA },
+    { 50, BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__50mA },
+    { 20, BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__20mA },
+    { 10, BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__10mA }
 };
 
 void INT_VDD5V(void)
 {
-    if(HW_POWER_CTRL & HW_POWER_CTRL__VBUSVALID_IRQ)
+    if(BF_RD(POWER_CTRL, VBUSVALID_IRQ))
     {
-        if(HW_POWER_STS & HW_POWER_STS__VBUSVALID)
+        if(BF_RD(POWER_STS, VBUSVALID))
             usb_insert_int();
         else
             usb_remove_int();
         /* reverse polarity */
-        __REG_TOG(HW_POWER_CTRL) = HW_POWER_CTRL__POLARITY_VBUSVALID;
+        BF_TOG(POWER_CTRL, POLARITY_VBUSVALID);
         /* enable int */
-        __REG_CLR(HW_POWER_CTRL) = HW_POWER_CTRL__VBUSVALID_IRQ;
+        BF_CLR(POWER_CTRL, VBUSVALID_IRQ);
     }
 }
 
 void imx233_power_init(void)
 {
     /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
-    __REG_CLR(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__VBUSVALID_TRSH_BM;
-    __REG_SET(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__VBUSVALID_TRSH_4V |
-        HW_POWER_5VCTRL__PWRUP_VBUS_CMPS;
+    BF_CLR(POWER_5VCTRL, VBUSVALID_TRSH);
+    BF_SETV(POWER_5VCTRL, VBUSVALID_TRSH, 1);
+    BF_SET(POWER_5VCTRL, PWRUP_VBUS_CMPS);
     /* enable vbusvalid detection method for the dcdc (improves efficiency) */
-    __REG_SET(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__VBUSVALID_5VDETECT;
-    /* clear vbusvalid irq and set correct polarity */
-    __REG_CLR(HW_POWER_CTRL) = HW_POWER_CTRL__VBUSVALID_IRQ;
-    if(HW_POWER_STS & HW_POWER_STS__VBUSVALID)
-        __REG_CLR(HW_POWER_CTRL) = HW_POWER_CTRL__POLARITY_VBUSVALID;
+    BF_SET(POWER_5VCTRL, VBUSVALID_5VDETECT);
+    BF_CLR(POWER_CTRL, VBUSVALID_IRQ);
+    if(BF_RD(POWER_STS, VBUSVALID))
+        BF_CLR(POWER_CTRL, POLARITY_VBUSVALID);
     else
-        __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__POLARITY_VBUSVALID;
-    __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__ENIRQ_VBUS_VALID;
+        BF_SET(POWER_CTRL, POLARITY_VBUSVALID);
+    BF_SET(POWER_CTRL, ENIRQ_VBUS_VALID);
     imx233_icoll_enable_interrupt(INT_SRC_VDD5V, true);
     /* setup linear regulator offsets to 25 mV below to prevent contention between
      * linear regulators and DCDC */
-    __FIELD_SET(HW_POWER_VDDDCTRL, LINREG_OFFSET, 2);
-    __FIELD_SET(HW_POWER_VDDACTRL, LINREG_OFFSET, 2);
-    __FIELD_SET(HW_POWER_VDDIOCTRL, LINREG_OFFSET, 2);
+    BF_WR(POWER_VDDDCTRL, LINREG_OFFSET, 2);
+    BF_WR(POWER_VDDACTRL, LINREG_OFFSET, 2);
+    BF_WR(POWER_VDDIOCTRL, LINREG_OFFSET, 2);
     /* enable DCDC (more efficient) */
-    __REG_SET(HW_POWER_5VCTRL) = HW_POWER_5VCTRL__ENABLE_DCDC;
+    BF_SET(POWER_5VCTRL, ENABLE_DCDC);
     /* enable a few bits controlling the DC-DC as recommended by Freescale */
-    __REG_SET(HW_POWER_LOOPCTRL) = HW_POWER_LOOPCTRL__TOGGLE_DIF |
-        HW_POWER_LOOPCTRL__EN_CM_HYST;
-    __FIELD_SET(HW_POWER_LOOPCTRL, EN_RCSCALE, HW_POWER_LOOPCTRL__EN_RCSCALE__2X);
+    BF_SET(POWER_LOOPCTRL, TOGGLE_DIF);
+    BF_SET(POWER_LOOPCTRL, EN_CM_HYST);
+    BF_CLR(POWER_LOOPCTRL, EN_RCSCALE);
+    BF_SETV(POWER_LOOPCTRL, EN_RCSCALE, 1);
 }
 
 void power_init(void)
@@ -126,7 +126,7 @@ void power_off(void)
     imx233_set_gpio_output(0, 9, true);
 #endif
     /* power down */
-    HW_POWER_RESET = HW_POWER_RESET__UNLOCK | HW_POWER_RESET__PWD;
+    HW_POWER_RESET = BM_OR2(POWER_RESET, UNLOCK, PWD);
     while(1);
 }
 
@@ -138,24 +138,24 @@ unsigned int power_input_status(void)
 
 bool charging_state(void)
 {
-    return HW_POWER_STS & HW_POWER_STS__CHRGSTS;
+    return BF_RD(POWER_STS, CHRGSTS);
 }
 
 void imx233_power_set_charge_current(unsigned current)
 {
-    __REG_CLR(HW_POWER_CHARGE) = HW_POWER_CHARGE__BATTCHRG_I_BM;
+    BF_CLR(POWER_CHARGE, BATTCHRG_I);
     /* find closest current LOWER THAN OR EQUAL TO the expected current */
     for(unsigned i = 0; i < ARRAYLEN(g_charger_current_bits); i++)
         if(current >= g_charger_current_bits[i].current)
         {
             current -= g_charger_current_bits[i].current;
-            __REG_SET(HW_POWER_CHARGE) = g_charger_current_bits[i].bit;
+            BF_SETV(POWER_CHARGE, BATTCHRG_I, g_charger_current_bits[i].bit);
         }
 }
 
 void imx233_power_set_stop_current(unsigned current)
 {
-    __REG_CLR(HW_POWER_CHARGE) = HW_POWER_CHARGE__STOP_ILIMIT_BM;
+    BF_CLR(POWER_CHARGE, STOP_ILIMIT);
     /* find closest current GREATHER THAN OR EQUAL TO the expected current */
     unsigned sum = 0;
     for(unsigned i = 0; i < ARRAYLEN(g_charger_stop_current_bits); i++)
@@ -166,7 +166,7 @@ void imx233_power_set_stop_current(unsigned current)
         if(current > sum)
         {
             current -= g_charger_stop_current_bits[i].current;
-            __REG_SET(HW_POWER_CHARGE) = g_charger_stop_current_bits[i].bit;
+            BF_SETV(POWER_CHARGE, STOP_ILIMIT, g_charger_stop_current_bits[i].bit);
         }
     }
 }
@@ -191,17 +191,17 @@ static struct
         .min = HW_POWER_##name##CTRL__TRG_MIN, \
         .step = HW_POWER_##name##CTRL__TRG_STEP, \
         .reg = &HW_POWER_##name##CTRL, \
-        .trg_bm = HW_POWER_##name##CTRL__TRG_BM, \
-        .trg_bp = HW_POWER_##name##CTRL__TRG_BP, \
+        .trg_bm = BM_POWER_##name##CTRL_TRG, \
+        .trg_bp = BP_POWER_##name##CTRL_TRG, \
         .flags = mask
 #define ADD_REGULATOR_BO(name) \
-        .bo_bm = HW_POWER_##name##CTRL__BO_OFFSET_BM, \
-        .bo_bp = HW_POWER_##name##CTRL__BO_OFFSET_BP
+        .bo_bm = BM_POWER_##name##CTRL_BO_OFFSET, \
+        .bo_bp = BP_POWER_##name##CTRL_BO_OFFSET
 #define ADD_REGULATOR_LINREG(name) \
-        .linreg_bm = HW_POWER_##name##CTRL__ENABLE_LINREG
+        .linreg_bm = BM_POWER_##name##CTRL_ENABLE_LINREG
 #define ADD_REGULATOR_LINREG_OFFSET(name) \
-        .linreg_offset_bm = HW_POWER_##name##CTRL__LINREG_OFFSET_BM, \
-        .linreg_offset_bp = HW_POWER_##name##CTRL__LINREG_OFFSET_BP
+        .linreg_offset_bm = BM_POWER_##name##CTRL_LINREG_OFFSET, \
+        .linreg_offset_bp = BP_POWER_##name##CTRL_LINREG_OFFSET
     [REGULATOR_VDDD] =
     {
         ADD_REGULATOR(VDDD, HAS_BO|HAS_LINREG|HAS_LINREG_OFFSET),
@@ -257,7 +257,7 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
     unsigned raw_val = (value_mv - regulator_info[reg].min) / regulator_info[reg].step;
     unsigned raw_bo_offset = (value_mv - brownout_mv) / regulator_info[reg].step;
     // clear dc-dc ok flag
-    __REG_SET(HW_POWER_CTRL) = HW_POWER_CTRL__DC_OK_IRQ;
+    BF_SET(POWER_CTRL, DC_OK_IRQ);
     // update
     uint32_t reg_val = (*regulator_info[reg].reg) & ~regulator_info[reg].trg_bm;
     reg_val |= raw_val << regulator_info[reg].trg_bp;
@@ -271,12 +271,12 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
      * If DC-DC is used, we can use the DCDC_OK irq
      * Otherwise it is unreliable (doesn't work when lowering voltage on linregs)
      * It usually takes between 0.5ms and 2.5ms */
-    if(!(HW_POWER_5VCTRL & HW_POWER_5VCTRL__ENABLE_DCDC))
+    if(!BF_RD(POWER_5VCTRL, ENABLE_DCDC))
         panicf("regulator %d: wait for voltage stabilize in linreg mode !", reg);
     unsigned timeout = current_tick + (HZ * 20) / 1000;
-    while(!(HW_POWER_CTRL & HW_POWER_CTRL__DC_OK_IRQ) || !TIME_AFTER(current_tick, timeout))
+    while(!BF_RD(POWER_CTRL, DC_OK_IRQ) || !TIME_AFTER(current_tick, timeout))
         yield();
-    if(!(HW_POWER_CTRL & HW_POWER_CTRL__DC_OK_IRQ))
+    if(!BF_RD(POWER_CTRL, DC_OK_IRQ))
         panicf("regulator %d: failed to stabilize", reg);
 }
 
@@ -311,55 +311,57 @@ void imx233_power_set_regulator_linreg(enum imx233_regulator_t reg,
 struct imx233_power_info_t imx233_power_get_info(unsigned flags)
 {
     static int dcdc_freqsel[8] = {
-        [HW_POWER_MISC__FREQSEL__RES] = 0,
-        [HW_POWER_MISC__FREQSEL__20MHz] = 20000,
-        [HW_POWER_MISC__FREQSEL__24MHz] = 24000,
-        [HW_POWER_MISC__FREQSEL__19p2MHz] = 19200,
-        [HW_POWER_MISC__FREQSEL__14p4MHz] = 14200,
-        [HW_POWER_MISC__FREQSEL__18MHz] = 18000,
-        [HW_POWER_MISC__FREQSEL__21p6MHz] = 21600,
-        [HW_POWER_MISC__FREQSEL__17p28MHz] = 17280,
+        [BV_POWER_MISC_FREQSEL__RES] = 0,
+        [BV_POWER_MISC_FREQSEL__20MHz] = 20000,
+        [BV_POWER_MISC_FREQSEL__24MHz] = 24000,
+        [BV_POWER_MISC_FREQSEL__19p2MHz] = 19200,
+        [BV_POWER_MISC_FREQSEL__14p4MHz] = 14200,
+        [BV_POWER_MISC_FREQSEL__18MHz] = 18000,
+        [BV_POWER_MISC_FREQSEL__21p6MHz] = 21600,
+        [BV_POWER_MISC_FREQSEL__17p28MHz] = 17280,
     };
     
     struct imx233_power_info_t s;
     memset(&s, 0, sizeof(s));
     if(flags & POWER_INFO_DCDC)
     {
-        s.dcdc_sel_pllclk = HW_POWER_MISC & HW_POWER_MISC__SEL_PLLCLK;
-        s.dcdc_freqsel = dcdc_freqsel[__XTRACT(HW_POWER_MISC, FREQSEL)];
+        s.dcdc_sel_pllclk = BF_RD(POWER_MISC, SEL_PLLCLK);
+        s.dcdc_freqsel = dcdc_freqsel[BF_RD(POWER_MISC, FREQSEL)];
     }
     if(flags & POWER_INFO_CHARGE)
     {
+        uint32_t current = BF_RD(POWER_CHARGE, BATTCHRG_I);
+        uint32_t stop_current = BF_RD(POWER_CHARGE, STOP_ILIMIT);
         for(unsigned i = 0; i < ARRAYLEN(g_charger_current_bits); i++)
-            if(HW_POWER_CHARGE & g_charger_current_bits[i].bit)
+            if(current & g_charger_current_bits[i].bit)
                 s.charge_current += g_charger_current_bits[i].current;
         for(unsigned i = 0; i < ARRAYLEN(g_charger_stop_current_bits); i++)
-            if(HW_POWER_CHARGE & g_charger_stop_current_bits[i].bit)
+            if(stop_current & g_charger_stop_current_bits[i].bit)
                 s.stop_current += g_charger_stop_current_bits[i].current;
-        s.charging = HW_POWER_STS & HW_POWER_STS__CHRGSTS;
-        s.batt_adj = HW_POWER_BATTMONITOR & HW_POWER_BATTMONITOR__ENBATADJ;
+        s.charging = BF_RD(POWER_STS, CHRGSTS);
+        s.batt_adj = BF_RD(POWER_BATTMONITOR, EN_BATADJ);
     }
     if(flags & POWER_INFO_4P2)
     {
-        s._4p2_enable = HW_POWER_DCDC4P2 & HW_POWER_DCDC4P2__ENABLE_4P2;
-        s._4p2_dcdc = HW_POWER_DCDC4P2 & HW_POWER_DCDC4P2__ENABLE_DCDC;
-        s._4p2_cmptrip = __XTRACT(HW_POWER_DCDC4P2, CMPTRIP);
-        s._4p2_dropout = __XTRACT(HW_POWER_DCDC4P2, DROPOUT_CTRL);
+        s._4p2_enable = BF_RD(POWER_DCDC4P2, ENABLE_4P2);
+        s._4p2_dcdc = BF_RD(POWER_DCDC4P2, ENABLE_DCDC);
+        s._4p2_cmptrip = BF_RD(POWER_DCDC4P2, CMPTRIP);
+        s._4p2_dropout = BF_RD(POWER_DCDC4P2, DROPOUT_CTRL);
     }
     if(flags & POWER_INFO_5V)
     {
-        s._5v_pwd_charge_4p2 = HW_POWER_5VCTRL & HW_POWER_5VCTRL__PWD_CHARGE_4P2;
-        s._5v_dcdc_xfer = HW_POWER_5VCTRL & HW_POWER_5VCTRL__DCDC_XFER;
-        s._5v_enable_dcdc = HW_POWER_5VCTRL & HW_POWER_5VCTRL__ENABLE_DCDC;
+        s._5v_pwd_charge_4p2 = BF_RD(POWER_5VCTRL, PWD_CHARGE_4P2);
+        s._5v_enable_dcdc = BF_RD(POWER_5VCTRL, ENABLE_DCDC);
+        uint32_t charge_4p2_ilimit = BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT);
         for(unsigned i = 0; i < ARRAYLEN(g_4p2_charge_limit_bits); i++)
-            if(HW_POWER_5VCTRL & g_4p2_charge_limit_bits[i].bit)
+            if(charge_4p2_ilimit & g_4p2_charge_limit_bits[i].bit)
                 s._5v_charge_4p2_limit += g_4p2_charge_limit_bits[i].current;
-        s._5v_vbusvalid_detect = HW_POWER_5VCTRL & HW_POWER_5VCTRL__VBUSVALID_5VDETECT;
-        s._5v_vbus_cmps = HW_POWER_5VCTRL & HW_POWER_5VCTRL__PWRUP_VBUS_CMPS;
+        s._5v_vbusvalid_detect = BF_RD(POWER_5VCTRL, VBUSVALID_5VDETECT);
+        s._5v_vbus_cmps = BF_RD(POWER_5VCTRL, PWRUP_VBUS_CMPS);
         s._5v_vbusvalid_thr =
-            __XTRACT(HW_POWER_5VCTRL, VBUSVALID_TRSH) == 0 ?
+            BF_RD(POWER_5VCTRL, VBUSVALID_TRSH) == 0 ?
                 2900
-                : 3900 + __XTRACT(HW_POWER_5VCTRL, VBUSVALID_TRSH) * 100;
+                : 3900 + BF_RD(POWER_5VCTRL, VBUSVALID_TRSH) * 100;
     }
     return s;
 }

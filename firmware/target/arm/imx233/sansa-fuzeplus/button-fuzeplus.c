@@ -369,7 +369,7 @@ int button_read_device(void)
     static int volume_power_lock = 0;
     if(volume_power_lock > 0)
         volume_power_lock--;
-    switch(__XTRACT(HW_POWER_STS, PSWITCH))
+    switch(BF_RD(POWER_STS, PSWITCH))
     {
         case 1: 
             if(volume_power_lock == 0)

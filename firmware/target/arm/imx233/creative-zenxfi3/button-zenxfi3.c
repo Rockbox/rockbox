@@ -176,7 +176,7 @@ int button_read_device(void)
         res |= BUTTON_VOL_DOWN;
     if(!(mask & 0x100))
         res |= BUTTON_VOL_UP;
-    if(__XTRACT(HW_POWER_STS, PSWITCH) != 0 && power_ignore_counter == 0)
+    if(BF_RD(POWER_STS, PSWITCH) != 0 && power_ignore_counter == 0)
         res |= BUTTON_POWER;
     return res | touchpad_btns;
 }

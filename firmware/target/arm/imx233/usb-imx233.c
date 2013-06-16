@@ -61,7 +61,7 @@ void usb_init_device(void)
 
 int usb_detect(void)
 {
-    return (HW_POWER_STS & HW_POWER_STS__VBUSVALID) ? USB_INSERTED : USB_EXTRACTED;
+    return BF_RD(POWER_STS, VBUSVALID) ? USB_INSERTED : USB_EXTRACTED;
 }
 
 void usb_enable(bool on)

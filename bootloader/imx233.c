@@ -150,7 +150,7 @@ void main(uint32_t arg, uint32_t addr)
 
     printf("Boot version: %s", RBVERSION);
     printf("arg=%x addr=%x", arg, addr);
-    printf("power up source: %x", __XTRACT(HW_POWER_STS, PWRUP_SOURCE));
+    printf("power up source: %x", BF_RD(POWER_STS, PWRUP_SOURCE));
 
     if(arg == 0xfee1dead)
     {
