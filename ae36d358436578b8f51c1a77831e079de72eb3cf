@@ -16,6 +16,24 @@
       "revId": "ae36d358436578b8f51c1a77831e079de72eb3cf",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Bc\u003d",
+        "filename": "apps/talk.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-06-16T23:12:57Z",
+      "side": 1,
+      "message": "Yes, the leading + is extraneous (and not intended), but the line is correct. Will make it less suspicious in the next version",
+      "parentUuid": "AAAASX///Bw\u003d",
+      "revId": "ae36d358436578b8f51c1a77831e079de72eb3cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
