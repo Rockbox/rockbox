@@ -55,10 +55,12 @@
 #define LRADC_SRC_NMOS_THICK    LRADC_SRC(10)
 #define LRADC_SRC_PMOS_THICK    LRADC_SRC(11)
 #define LRADC_SRC_PMOS_THICK    LRADC_SRC(11)
+#if IMX233_SUBTARGET >= 3700
 #define LRADC_SRC_USB_DP        LRADC_SRC(12)
 #define LRADC_SRC_USB_DN        LRADC_SRC(13)
 #define LRADC_SRC_VBG           LRADC_SRC(14)
 #define LRADC_SRC_5V            LRADC_SRC(15)
+#endif
 
 /* frequency of the delay counter */
 #define LRADC_DELAY_FREQ    2000
@@ -72,14 +74,17 @@ void imx233_lradc_setup_delay(int dchan, int trigger_lradc, int trigger_delays,
 void imx233_lradc_clear_channel_irq(int channel);
 bool imx233_lradc_read_channel_irq(int channel);
 void imx233_lradc_enable_channel_irq(int channel, bool enable);
+/* a non-null cb will enable the icoll interrupt, a null one will disable it
+ * NOTE the channel irq is automatically cleared */
 void imx233_lradc_set_channel_irq_callback(int channel, lradc_irq_fn_t cb);
 void imx233_lradc_kick_channel(int channel);
 void imx233_lradc_kick_delay(int dchan);
 void imx233_lradc_wait_channel(int channel);
 int imx233_lradc_read_channel(int channel);
 void imx233_lradc_clear_channel(int channel);
-// acquire a virtual channel, returns -1 on timeout, channel otherwise */
-int imx233_lradc_acquire_channel(int timeout);
+/* acquire a channel, returns -1 on timeout, channel otherwise
+ * the returned channel is garanteed to be able measure source src */
+int imx233_lradc_acquire_channel(int src, int timeout);
 void imx233_lradc_release_channel(int chan);
 // doesn't check that channel is in use!
 void imx233_lradc_reserve_channel(int channel);
@@ -96,9 +101,11 @@ void imx233_lradc_enable_touch_detect_irq(bool enable);
 void imx233_lradc_clear_touch_detect_irq(void);
 bool imx233_lradc_read_touch_detect(void);
 
+#if IMX233_SUBTARGET >= 3700
 /* enable sensing and return temperature in kelvin,
  * channels needs not to be configured */
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan);
+#endif
 /* return *raw* external temperature, might need some transformation
  * channel needs not to be configured */
 int imx233_lradc_sense_ext_temperature(int chan, int sensor);

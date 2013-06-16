@@ -25,7 +25,11 @@
 #include "stdlib.h"
 
 /* channels */
+#if IMX233_SUBTARGET >= 3700
 static struct channel_arbiter_t channel_arbiter;
+#else
+static struct semaphore channel_sema[LRADC_NUM_CHANNELS];
+#endif
 /* delay channels */
 static struct channel_arbiter_t delay_arbiter;
 /* battery is very special, dedicate a channel and a delay to it */
@@ -44,6 +48,7 @@ void INT_LRADC_CH(int chan)
 {
     if(irq_cb[chan])
         irq_cb[chan](chan);
+    imx233_lradc_clear_channel_irq(chan);
 }
 
 define_cb(0)
@@ -58,6 +63,7 @@ define_cb(7)
 void imx233_lradc_set_channel_irq_callback(int channel, lradc_irq_fn_t cb)
 {
     irq_cb[channel] = cb;
+    imx233_icoll_enable_interrupt(INT_SRC_LRADC_CHx(channel), cb != NULL);
 }
 
 void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples, int src)
@@ -68,8 +74,23 @@ void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples
         BF_SETV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << channel);
     else
         BF_CLRV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << channel);
+#if IMX233_SUBTARGET >= 3700
     HW_LRADC_CTRL4_CLR = BM_LRADC_CTRL4_LRADCxSELECT(channel);
     HW_LRADC_CTRL4_SET = src << BP_LRADC_CTRL4_LRADCxSELECT(channel);
+#else
+    if(channel == 6)
+    {
+        BF_CLR(LRADC_CTRL2, LRADC6SELECT);
+        BF_SETV(LRADC_CTRL2, LRADC6SELECT, src);
+    }
+    else if(channel == 7)
+    {
+        BF_CLR(LRADC_CTRL2, LRADC7SELECT);
+        BF_SETV(LRADC_CTRL2, LRADC7SELECT, src);
+    }
+    else if(channel != src)
+        panicf("cannot configure channel %d for source %d", channel, src);
+#endif
 }
 
 void imx233_lradc_setup_delay(int dchan, int trigger_lradc, int trigger_delays,
@@ -126,8 +147,10 @@ void imx233_lradc_clear_channel(int channel)
     BF_CLRn(LRADC_CHn, channel, VALUE);
 }
 
-int imx233_lradc_acquire_channel(int timeout)
+#if IMX233_SUBTARGET >= 3700
+int imx233_lradc_acquire_channel(int src, int timeout)
 {
+    (void) src;
     return arbiter_acquire(&channel_arbiter, timeout);
 }
 
@@ -140,6 +163,26 @@ void imx233_lradc_reserve_channel(int channel)
 {
     return arbiter_reserve(&channel_arbiter, channel);
 }
+#else
+int imx233_lradc_acquire_channel(int src, int timeout)
+{
+    int channel = src <= LRADC_SRC_BATTERY ? src : 6;
+    if(semaphore_wait(&channel_sema[channel], timeout) == OBJ_WAIT_TIMEDOUT)
+        return -1;
+    return channel;
+}
+
+void imx233_lradc_release_channel(int chan)
+{
+    semaphore_release(&channel_sema[chan]);
+}
+
+void imx233_lradc_reserve_channel(int channel)
+{
+    if(imx233_lradc_acquire_channel(channel, 0) == -1)
+        panicf("Cannot reserve a used channel");
+}
+#endif
 
 int imx233_lradc_acquire_delay(int timeout)
 {
@@ -156,6 +199,7 @@ void imx233_lradc_reserve_delay(int channel)
     return arbiter_reserve(&delay_arbiter, channel);
 }
 
+#if IMX233_SUBTARGET >= 3700
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
 {
     imx233_lradc_setup_channel(nmos_chan, false, false, 0, LRADC_SRC_NMOS_THIN);
@@ -177,6 +221,7 @@ int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
     // return diff * 1.012 / 4
     return (diff * 1012) / 4000;
 }
+#endif
 
 /* set to 0 to disable current source */
 static void imx233_lradc_set_temp_isrc(int sensor, int value)
@@ -278,7 +323,15 @@ bool imx233_lradc_read_touch_detect(void)
 
 void imx233_lradc_init(void)
 {
+    /* On STMP3700+, any channel can measure any source but on STMP3600 only
+     * channels 6 and 7 can measure all sources. Channel 7 being dedicated to
+     * battery, only channel 6 is available for free use */
+#if IMX233_SUBTARGET >= 3700
     arbiter_init(&channel_arbiter, LRADC_NUM_CHANNELS);
+#else
+    for(int i = 0; i < LRADC_NUM_CHANNELS; i++)
+        semaphore_init(&channel_sema[i], 1, 1);
+#endif
     arbiter_init(&delay_arbiter, LRADC_NUM_DELAYS);
     // enable block
     imx233_reset_block(&HW_LRADC_CTRL0);
@@ -287,7 +340,9 @@ void imx233_lradc_init(void)
     // disable temperature sensors
     BF_CLR(LRADC_CTRL2, TEMP_SENSOR_IENABLE0);
     BF_CLR(LRADC_CTRL2, TEMP_SENSOR_IENABLE1);
+#if IMX233_SUBTARGET >= 3700
     BF_SET(LRADC_CTRL2, TEMPSENSE_PWD);
+#endif
     // set frequency
     BF_CLR(LRADC_CTRL3, CYCLE_TIME);
     BF_SETV(LRADC_CTRL3, CYCLE_TIME_V, 6MHZ);

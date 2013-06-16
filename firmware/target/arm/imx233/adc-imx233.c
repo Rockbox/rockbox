@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "adc-imx233.h"
+#include "power-imx233.h"
 
 void adc_init(void)
 {
@@ -35,7 +36,7 @@ static short adc_read_physical_ex(int virt)
 
 static short adc_read_physical(int src, bool div2)
 {
-    int virt = imx233_lradc_acquire_channel(TIMEOUT_BLOCK);
+    int virt = imx233_lradc_acquire_channel(src, TIMEOUT_BLOCK);
     // divide by two for wider ranger
     imx233_lradc_setup_channel(virt, div2, false, 0, src);
     int val = adc_read_physical_ex(virt);
@@ -52,14 +53,17 @@ static short adc_read_virtual(int c)
         case IMX233_ADC_VDDIO:
             /* VddIO pin has a builtin 2:1 divide */
             return adc_read_physical(LRADC_SRC_VDDIO, false);
+#if IMX233_SUBTARGET >= 3700
         case IMX233_ADC_VDD5V:
             /* Vdd5V pin has a builtin 4:1 divide */
             return adc_read_physical(LRADC_SRC_5V, false) * 2;
+#endif
         case IMX233_ADC_DIE_TEMP:
         {
+#if IMX233_SUBTARGET >= 3700
             // don't block on second channel otherwise we might deadlock !
-            int nmos_chan = imx233_lradc_acquire_channel(TIMEOUT_BLOCK);
-            int pmos_chan = imx233_lradc_acquire_channel(TIMEOUT_NOBLOCK);
+            int nmos_chan = imx233_lradc_acquire_channel(LRADC_SRC_NMOS_THIN, TIMEOUT_BLOCK);
+            int pmos_chan = imx233_lradc_acquire_channel(LRADC_SRC_PMOS_THIN, TIMEOUT_NOBLOCK);
             int val = 0;
             if(pmos_chan >= 0)
             {
@@ -67,12 +71,19 @@ static short adc_read_virtual(int c)
                 imx233_lradc_release_channel(pmos_chan);
             }
             imx233_lradc_release_channel(nmos_chan);
+#else
+            int min, max, val;
+            if(imx233_power_sense_die_temperature(&min, &max) < 0)
+                val = -1;
+            else
+                val = (max + min) / 2;
+#endif
             return val;
         }
 #ifdef IMX233_BATT_TEMP_SENSOR
         case IMX233_ADC_BATT_TEMP:
         {
-            int virt = imx233_lradc_acquire_channel(TIMEOUT_BLOCK);
+            int virt = imx233_lradc_acquire_channel(IMX233_BATT_TEMP_SENSOR, TIMEOUT_BLOCK);
             int val = imx233_lradc_sense_ext_temperature(virt, IMX233_BATT_TEMP_SENSOR);
             imx233_lradc_release_channel(virt);
             return val;

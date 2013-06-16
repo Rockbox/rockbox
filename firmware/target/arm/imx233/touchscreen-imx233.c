@@ -167,7 +167,7 @@ static void touch_channel_irq(int chan)
 
 void imx233_touchscreen_init(void)
 {
-    touch_chan = imx233_lradc_acquire_channel(TIMEOUT_NOBLOCK);
+    touch_chan = imx233_lradc_acquire_channel(LRADC_SRC_XPLUS, TIMEOUT_NOBLOCK);
     touch_delay = imx233_lradc_acquire_delay(TIMEOUT_NOBLOCK);
     if(touch_chan < 0 || touch_delay < 0)
         panicf("Cannot acquire channel and delays for touchscreen measurement");
