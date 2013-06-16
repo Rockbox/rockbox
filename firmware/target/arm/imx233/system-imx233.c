@@ -30,7 +30,9 @@
 #include "dma-imx233.h"
 #include "ssp-imx233.h"
 #include "i2c-imx233.h"
+#if IMX233_SUBTARGET >= 3700
 #include "dcp-imx233.h"
+#endif
 #include "pwm-imx233.h"
 #include "icoll-imx233.h"
 #include "lradc-imx233.h"
@@ -44,7 +46,11 @@
 
 void imx233_chip_reset(void)
 {
+#if IMX233_SUBTARGET >= 3700
     HW_CLKCTRL_RESET = BM_CLKCTRL_RESET_CHIP;
+#else
+    HW_POWER_RESET = BF_OR2(POWER_RESET, UNLOCK_V(KEY), RST_DIG(1));
+#endif
 }
 
 void system_reboot(void)
@@ -109,7 +115,9 @@ void system_init(void)
      * Make sure IO clock is running at expected speed */
     imx233_clkctrl_init();
     imx233_clkctrl_enable(CLK_PLL, true);
+#if IMX233_SUBTARGET >= 3700
     imx233_clkctrl_set_frac_div(CLK_IO, 18); // clk_io@clk_pll
+#endif
 
     imx233_rtc_init();
     imx233_icoll_init();
@@ -117,7 +125,9 @@ void system_init(void)
     imx233_timrot_init();
     imx233_dma_init();
     imx233_ssp_init();
+#if IMX233_SUBTARGET >= 3700
     imx233_dcp_init();
+#endif
     imx233_pwm_init();
     imx233_lradc_init();
     imx233_power_init();
@@ -166,8 +176,13 @@ void udelay(unsigned us)
 
 void imx233_digctl_set_arm_cache_timings(unsigned timings)
 {
+#if IMX233_SUBTARGET >= 3780
     HW_DIGCTL_ARMCACHE = BF_OR5(DIGCTL_ARMCACHE, ITAG_SS(timings),
         DTAG_SS(timings), CACHE_SS(timings), DRTY_SS(timings), VALID_SS(timings));
+#else
+    HW_DIGCTL_ARMCACHE = BF_OR3(DIGCTL_ARMCACHE, ITAG_SS(timings),
+        DTAG_SS(timings), CACHE_SS(timings));
+#endif
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
