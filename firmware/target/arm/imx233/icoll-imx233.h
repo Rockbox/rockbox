@@ -24,24 +24,7 @@
 #include "config.h"
 #include "system.h"
 
-/* Interrupt collector */
-#define HW_ICOLL_BASE           0x80000000
-
-#define HW_ICOLL_VECTOR         (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x0))
-
-#define HW_ICOLL_LEVELACK       (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x10))
-#define HW_ICOLL_LEVELACK__LEVEL0   0x1
-
-#define HW_ICOLL_CTRL           (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x20))
-#define HW_ICOLL_CTRL__IRQ_FINAL_ENABLE (1 << 16)
-#define HW_ICOLL_CTRL__ARM_RSE_MODE     (1 << 18)
-
-#define HW_ICOLL_VBASE          (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x40))
-#define HW_ICOLL_INTERRUPT(i)   (*(volatile uint32_t *)(HW_ICOLL_BASE + 0x120 + (i) * 0x10))
-#define HW_ICOLL_INTERRUPT__PRIORITY_BM 0x3
-#define HW_ICOLL_INTERRUPT__ENABLE      0x4
-#define HW_ICOLL_INTERRUPT__SOFTIRQ     0x8
-#define HW_ICOLL_INTERRUPT__ENFIQ       0x10
+#include "regs/regs-icoll.h"
 
 #define INT_SRC_SSP2_ERROR  2
 #define INT_SRC_VDD5V       3

@@ -113,7 +113,7 @@ static uint32_t irq_count[INT_SRC_NR_SOURCES];
 struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 {
     struct imx233_icoll_irq_info_t info;
-    info.enabled = !!(HW_ICOLL_INTERRUPT(src) & HW_ICOLL_INTERRUPT__ENABLE);
+    info.enabled = BF_RDn(ICOLL_INTERRUPTn, src, ENABLE);
     info.freq = irq_count_old[src];
     return info;
 }
@@ -145,7 +145,7 @@ void irq_handler(void)
         do_irq_stat();
     (*(isr_t *)HW_ICOLL_VECTOR)();
     /* acknowledge completion of IRQ (all use the same priority 0) */
-    HW_ICOLL_LEVELACK = HW_ICOLL_LEVELACK__LEVEL0;
+    HW_ICOLL_LEVELACK = BV_ICOLL_LEVELACK_IRQLEVELACK__LEVEL0;
 }
 
 void fiq_handler(void)
@@ -155,23 +155,21 @@ void fiq_handler(void)
 void imx233_icoll_enable_interrupt(int src, bool enable)
 {
     if(enable)
-        __REG_SET(HW_ICOLL_INTERRUPT(src)) = HW_ICOLL_INTERRUPT__ENABLE;
+        BF_SETn(ICOLL_INTERRUPTn, src, ENABLE);
     else
-        __REG_CLR(HW_ICOLL_INTERRUPT(src)) = HW_ICOLL_INTERRUPT__ENABLE;
+        BF_CLRn(ICOLL_INTERRUPTn, src, ENABLE);
 }
 
 void imx233_icoll_init(void)
 {
     imx233_reset_block(&HW_ICOLL_CTRL);
-    /* disable all interrupts */
+    /* disable all interrupts:
+     * priority = 0, disable, disable fiq */
     for(int i = 0; i < INT_SRC_NR_SOURCES; i++)
-    {
-        /* priority = 0, disable, disable fiq */
-        HW_ICOLL_INTERRUPT(i) = 0;
-    }
+        HW_ICOLL_INTERRUPTn(i) = 0;
     /* setup vbase as isr_table */
     HW_ICOLL_VBASE = (uint32_t)&isr_table;
     /* enable final irq bit */
-    __REG_SET(HW_ICOLL_CTRL) = HW_ICOLL_CTRL__IRQ_FINAL_ENABLE;
+    BF_SET(ICOLL_CTRL, IRQ_FINAL_ENABLE);
 }
 
