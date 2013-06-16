@@ -89,6 +89,7 @@ static struct emi_reg_t settings_155M[15] ICONST_ATTR __attribute__((alias("sett
 
 static void set_frequency(unsigned long freq) ICODE_ATTR;
 
+#if IMX233_SUBTARGET >= 3700
 static void set_frequency(unsigned long freq)
 {
     /** WARNING all restriction of imx233_emi_set_frequency apply here !! */
@@ -144,7 +145,7 @@ void imx233_emi_set_frequency(unsigned long freq)
      * possible in this state anyway.
      * WARNING DANGER don't call any external function when sdram is disabled
      * otherwise you'll poke sdram and trigger a fatal data abort ! */
-
+    
     /* first disable all interrupts */
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     /* flush the cache */
@@ -172,7 +173,10 @@ void imx233_emi_set_frequency(unsigned long freq)
     /* wait for transition */
     while(BF_RD(CLKCTRL_EMI, BUSY_REF_XTAL));
     /* put emi dll into reset mode */
+    // FIXME Unsure about what to do for stmp37xx
+#if IMX233_SUBTARGET >= 3780
     HW_EMI_CTRL_SET = BM_EMI_CTRL_DLL_RESET | BM_EMI_CTRL_DLL_SHIFT_RESET;
+#endif
     /* load the new frequency dividers */
     set_frequency(freq);
     /* switch emi back to pll */
@@ -180,7 +184,9 @@ void imx233_emi_set_frequency(unsigned long freq)
     /* wait for transition */
     while(BF_RD(CLKCTRL_EMI, BUSY_REF_EMI));
     /* allow emi dll to lock again */
+#if IMX233_SUBTARGET >= 3780
     HW_EMI_CTRL_CLR = BM_EMI_CTRL_DLL_RESET | BM_EMI_CTRL_DLL_SHIFT_RESET;
+#endif
     /* wait for lock */
     while(!BF_RD(DRAM_CTL04, DLLLOCKREG));
     /* get DRAM out of self-refresh mode */
@@ -190,3 +196,4 @@ void imx233_emi_set_frequency(unsigned long freq)
 
     restore_interrupt(oldstatus);
 }
+#endif
