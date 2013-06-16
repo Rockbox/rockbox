@@ -105,8 +105,12 @@ void system_init(void)
     /* NOTE: don't use anything here that might require tick task !
      * It is initialized by kernel_init *after* system_init().
      * The main() will naturally set cpu speed to normal after kernel_init()
-     * so don't bother if the cpu is running at 24MHz here. */
-    imx233_clkctrl_enable_clock(CLK_PLL, true);
+     * so don't bother if the cpu is running at 24MHz here.
+     * Make sure IO clock is running at expected speed */
+    imx233_clkctrl_init();
+    imx233_clkctrl_enable(CLK_PLL, true);
+    imx233_clkctrl_set_frac_div(CLK_IO, 18); // clk_io@clk_pll
+
     imx233_rtc_init();
     imx233_icoll_init();
     imx233_pinctrl_init();
@@ -119,19 +123,14 @@ void system_init(void)
     imx233_power_init();
     imx233_i2c_init();
 
-    imx233_clkctrl_enable_auto_slow_monitor(AS_CPU_INSTR, true);
-    imx233_clkctrl_enable_auto_slow_monitor(AS_CPU_DATA, true);
-    imx233_clkctrl_enable_auto_slow_monitor(AS_TRAFFIC, true);
-    imx233_clkctrl_enable_auto_slow_monitor(AS_TRAFFIC_JAM, true);
-    imx233_clkctrl_enable_auto_slow_monitor(AS_APBXDMA, true);
-    imx233_clkctrl_enable_auto_slow_monitor(AS_APBHDMA, true);
-    imx233_clkctrl_set_auto_slow_divisor(AS_DIV_8);
-    imx233_clkctrl_enable_auto_slow(true);
+    /* make sure auto-slow is disable now, we don't know at which frequency we
+     * are running and auto-slow could violate constraints on {xbus,hbus} */
+    imx233_clkctrl_enable_auto_slow(false);
+    imx233_clkctrl_set_auto_slow_div(BV_CLKCTRL_HBUS_SLOW_DIV__BY8);
 
-    cpu_frequency = imx233_clkctrl_get_clock_freq(CLK_CPU);
+    cpu_frequency = imx233_clkctrl_get_freq(CLK_CPU);
 
-#if !defined(BOOTLOADER) &&(defined(SANSA_FUZEPLUS) || \
-    defined(CREATIVE_ZENXFI3) || defined(CREATIVE_ZENXFI2))
+#if CONFIG_TUNER
     fmradio_i2c_init();
 #endif
 }
@@ -210,7 +209,6 @@ void set_cpu_frequency(long frequency)
     if(prof->cpu_freq == 0)
         return;
     /* disable auto-slow (enable back afterwards) */
-    bool as = imx233_clkctrl_is_auto_slow_enabled();
     imx233_clkctrl_enable_auto_slow(false);
 
     /* WARNING watch out the order ! */
@@ -221,28 +219,28 @@ void set_cpu_frequency(long frequency)
         /* Change ARM cache timings */
         imx233_digctl_set_arm_cache_timings(prof->arm_cache_timings);
         /* Switch CPU to crystal at 24MHz */
-        imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+        imx233_clkctrl_set_bypass(CLK_CPU, true);
         /* Program CPU divider for PLL */
-        imx233_clkctrl_set_fractional_divisor(CLK_CPU, prof->cpu_fdiv);
-        imx233_clkctrl_set_clock_divisor(CLK_CPU, prof->cpu_idiv);
+        imx233_clkctrl_set_frac_div(CLK_CPU, prof->cpu_fdiv);
+        imx233_clkctrl_set_div(CLK_CPU, prof->cpu_idiv);
         /* Change the HBUS divider to its final value */
-        imx233_clkctrl_set_clock_divisor(CLK_HBUS, prof->hbus_div);
+        imx233_clkctrl_set_div(CLK_HBUS, prof->hbus_div);
         /* Switch back CPU to PLL */
-        imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+        imx233_clkctrl_set_bypass(CLK_CPU, false);
         /* Set the new EMI frequency */
         imx233_emi_set_frequency(prof->emi_freq);
     }
     else
     {
         /* Switch CPU to crystal at 24MHz */
-        imx233_clkctrl_set_bypass_pll(CLK_CPU, true);
+        imx233_clkctrl_set_bypass(CLK_CPU, true);
         /* Program HBUS divider to its final value */
-        imx233_clkctrl_set_clock_divisor(CLK_HBUS, prof->hbus_div);
+        imx233_clkctrl_set_div(CLK_HBUS, prof->hbus_div);
         /* Program CPU divider for PLL */
-        imx233_clkctrl_set_fractional_divisor(CLK_CPU, prof->cpu_fdiv);
-        imx233_clkctrl_set_clock_divisor(CLK_CPU, prof->cpu_idiv);
+        imx233_clkctrl_set_frac_div(CLK_CPU, prof->cpu_fdiv);
+        imx233_clkctrl_set_div(CLK_CPU, prof->cpu_idiv);
         /* Switch back CPU to PLL */
-        imx233_clkctrl_set_bypass_pll(CLK_CPU, false);
+        imx233_clkctrl_set_bypass(CLK_CPU, false);
         /* Set the new EMI frequency */
         imx233_emi_set_frequency(prof->emi_freq);
         /* Change ARM cache timings */
@@ -251,7 +249,7 @@ void set_cpu_frequency(long frequency)
         imx233_power_set_regulator(REGULATOR_VDDD, prof->vddd, prof->vddd_bo);
     }
     /* enable auto slow again */
-    imx233_clkctrl_enable_auto_slow(as);
+    imx233_clkctrl_enable_auto_slow(true);
     /* update frequency */
     cpu_frequency = frequency;
 }

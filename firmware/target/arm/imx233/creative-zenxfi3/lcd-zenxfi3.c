@@ -97,10 +97,10 @@ static void setup_lcdif(void)
 static void setup_lcdif_clock(void)
 {
     /* the LCD seems to work at 24Mhz, so use the xtal clock with no divider */
-    imx233_clkctrl_enable_clock(CLK_PIX, false);
-    imx233_clkctrl_set_clock_divisor(CLK_PIX, 1);
-    imx233_clkctrl_set_bypass_pll(CLK_PIX, true); /* use XTAL */
-    imx233_clkctrl_enable_clock(CLK_PIX, true);
+    imx233_clkctrl_enable(CLK_PIX, false);
+    imx233_clkctrl_set_div(CLK_PIX, 1);
+    imx233_clkctrl_set_bypass(CLK_PIX, true); /* use XTAL */
+    imx233_clkctrl_enable(CLK_PIX, true);
 }
 
 static void lcd_write_reg(uint32_t reg, uint32_t data)

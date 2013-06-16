@@ -114,7 +114,7 @@ void imx233_ssp_start(int ssp)
         return;
     ssp_in_use[ssp - 1] = true;
     /* Gate block */
-    imx233_reset_block(&SSP_REGn(SSP_CTRL0, ssp));
+    imx233_ssp_softreset(ssp);
     /* Gate dma channel */
     imx233_dma_clkgate_channel(APB_SSP(ssp), true);
     /* If first block to start, start SSP clock */
@@ -123,11 +123,11 @@ void imx233_ssp_start(int ssp)
         /** 2.3.1: the clk_ssp maximum frequency is 102.858 MHz */
         /* fracdiv = 18 => clk_io = pll = 480Mhz
          * intdiv = 5 => clk_ssp = 96Mhz */
-        imx233_clkctrl_set_fractional_divisor(CLK_IO, 18);
-        imx233_clkctrl_enable_clock(CLK_SSP, false);
-        imx233_clkctrl_set_clock_divisor(CLK_SSP, 5);
-        imx233_clkctrl_set_bypass_pll(CLK_SSP, false); /* use IO */
-        imx233_clkctrl_enable_clock(CLK_SSP, true);
+        imx233_clkctrl_set_frac_div(CLK_IO, 18);
+        imx233_clkctrl_enable(CLK_SSP, false);
+        imx233_clkctrl_set_div(CLK_SSP, 5);
+        imx233_clkctrl_set_bypass(CLK_SSP, false); /* use IO */
+        imx233_clkctrl_enable(CLK_SSP, true);
     }
     ssp_nr_in_use++;
 }
@@ -145,16 +145,13 @@ void imx233_ssp_stop(int ssp)
     /* If last block to stop, stop SSP clock */
     ssp_nr_in_use--;
     if(ssp_nr_in_use == 0)
-    {
-        imx233_clkctrl_enable_clock(CLK_SSP, false);
-        imx233_clkctrl_set_fractional_divisor(CLK_IO, 0);
-    }
+        imx233_clkctrl_enable(CLK_SSP, false);
 }
 
 void imx233_ssp_softreset(int ssp)
 {
     ASSERT_SSP(ssp)
-    imx233_reset_block(&HW_SSP_CTRL0(ssp));
+    imx233_reset_block(&SSP_REGn(SSP_CTRL0, ssp));
 }
 
 void imx233_ssp_set_timings(int ssp, int divide, int rate, int timeout)

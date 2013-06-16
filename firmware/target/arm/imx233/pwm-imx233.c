@@ -25,7 +25,7 @@
 void imx233_pwm_init(void)
 {
     imx233_reset_block(&HW_PWM_CTRL);
-    imx233_clkctrl_enable_xtal(XTAM_PWM, true);
+    imx233_clkctrl_enable(CLK_PWM, true);
 }
 
 bool imx233_pwm_is_channel_enable(int channel)
@@ -50,7 +50,8 @@ void imx233_pwm_setup_channel(int channel, int period, int cdiv, int active,
         imx233_pwm_enable_channel(channel, false);
     /* setup pin */
     imx233_pinctrl_setup_vpin(VPIN_PWM(channel), "pwm", PINCTRL_DRIVE_4mA, false);
-    /* watch the order ! active THEN period */
+    /* watch the order ! active THEN period
+     * NOTE: the register value is period-1 */
     HW_PWM_ACTIVEn(channel) = BF_OR2(PWM_ACTIVEn, ACTIVE(active), INACTIVE(inactive));
     HW_PWM_PERIODn(channel) = BF_OR4(PWM_PERIODn, PERIOD(period - 1),
         ACTIVE_STATE(active_state), INACTIVE_STATE(inactive_state), CDIV(cdiv));

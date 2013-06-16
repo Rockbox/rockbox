@@ -168,10 +168,10 @@ static inline uint32_t decode_18_to_16(uint32_t a)
 static void setup_lcdif_clock(void)
 {
     /* the LCD seems to work at 24Mhz, so use the xtal clock with no divider */
-    imx233_clkctrl_enable_clock(CLK_PIX, false);
-    imx233_clkctrl_set_clock_divisor(CLK_PIX, 1);
-    imx233_clkctrl_set_bypass_pll(CLK_PIX, true); /* use XTAL */
-    imx233_clkctrl_enable_clock(CLK_PIX, true);
+    imx233_clkctrl_enable(CLK_PIX, false);
+    imx233_clkctrl_set_div(CLK_PIX, 1);
+    imx233_clkctrl_set_bypass(CLK_PIX, true); /* use XTAL */
+    imx233_clkctrl_enable(CLK_PIX, true);
 }
 
 static uint32_t i80_read_register(uint32_t data_out)
