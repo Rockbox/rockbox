@@ -64,34 +64,35 @@ static unsigned ssp_log_block_size[IMX233_NR_SSP];
 static ssp_detect_cb_t ssp_detect_cb[IMX233_NR_SSP];
 static bool ssp_detect_invert[IMX233_NR_SSP];
 
-void INT_SSP(int ssp)
+void INT_SSP(int ssp, bool err)
 {
     /* reset dma channel on error */
-    if(imx233_dma_is_channel_error_irq(APB_SSP(ssp)))
+    if(imx233_dma_is_channel_error_irq(APB_SSP(ssp)) || err)
         imx233_dma_reset_channel(APB_SSP(ssp));
     /* clear irq flags */
     imx233_dma_clear_channel_interrupt(APB_SSP(ssp));
+    SSP_CLRn(SSP_CTRL1, ssp, ALL_IRQ_EN);
     semaphore_release(&ssp_sema[ssp - 1]);
 }
 
 void INT_SSP1_DMA(void)
 {
-    INT_SSP(1);
+    INT_SSP(1, false);
 }
 
 void INT_SSP2_DMA(void)
 {
-    INT_SSP(2);
+    INT_SSP(2, false);
 }
 
 void INT_SSP1_ERROR(void)
 {
-    panicf("ssp1 error");
+    INT_SSP(1, true);
 }
 
 void INT_SSP2_ERROR(void)
 {
-    panicf("ssp2 error");
+    INT_SSP(2, true);
 }
 
 void imx233_ssp_init(void)
@@ -123,7 +124,6 @@ void imx233_ssp_start(int ssp)
         /** 2.3.1: the clk_ssp maximum frequency is 102.858 MHz */
         /* fracdiv = 18 => clk_io = pll = 480Mhz
          * intdiv = 5 => clk_ssp = 96Mhz */
-        imx233_clkctrl_set_frac_div(CLK_IO, 18);
         imx233_clkctrl_enable(CLK_SSP, false);
         imx233_clkctrl_set_div(CLK_SSP, 5);
         imx233_clkctrl_set_bypass(CLK_SSP, false); /* use IO */
@@ -262,11 +262,12 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     ASSERT_SSP(ssp)
     mutex_lock(&ssp_mutex[ssp - 1]);
     /* Enable all interrupts */
+    imx233_dma_reset_channel(APB_SSP(ssp));
     imx233_icoll_enable_interrupt(INT_SRC_SSP_DMA(ssp), true);
+    imx233_icoll_enable_interrupt(INT_SRC_SSP_ERROR(ssp), true);
     imx233_dma_enable_channel_interrupt(APB_SSP(ssp), true);
 
     unsigned xfer_size = block_count * (1 << ssp_log_block_size[ssp - 1]);
-    
     ssp_dma_cmd[ssp - 1].cmd0 = BF_OR4(SSP_CMD0, CMD(cmd), APPEND_8CYC(1),
         BLOCK_SIZE(ssp_log_block_size[ssp - 1]), BLOCK_COUNT(block_count - 1));
     ssp_dma_cmd[ssp - 1].cmd1 = cmd_arg;
@@ -285,14 +286,12 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
         IRQONCMPLT(1), SEMAPHORE(1), WAIT4ENDCMD(1), CMDWORDS(3), XFER_COUNT(xfer_size));
 
     SSP_CLRn(SSP_CTRL1, ssp, ALL_IRQ);
-
-    imx233_dma_reset_channel(APB_SSP(ssp));
+    SSP_SETn(SSP_CTRL1, ssp, ALL_IRQ_EN);
     imx233_dma_start_command(APB_SSP(ssp), &ssp_dma_cmd[ssp - 1].dma);
 
     /* the SSP hardware already has a timeout but we never know; 1 sec is a maximum
      * for all operations */
     enum imx233_ssp_error_t ret;
-    
     if(semaphore_wait(&ssp_sema[ssp - 1], HZ) == OBJ_WAIT_TIMEDOUT)
     {
         imx233_dma_reset_channel(APB_SSP(ssp));
