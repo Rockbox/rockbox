@@ -28,7 +28,7 @@ void INT_TIMER##nr(void) \
 { \
     if(timer_fns[nr]) \
         timer_fns[nr](); \
-    __REG_CLR(HW_TIMROT_TIMCTRL(nr)) = HW_TIMROT_TIMCTRL__IRQ; \
+    BF_CLRn(TIMROT_TIMCTRLn, nr, IRQ); \
 }
 
 define_timer_irq(0)
@@ -40,33 +40,20 @@ void imx233_setup_timer(unsigned timer_nr, bool reload, unsigned count,
     unsigned src, unsigned prescale, bool polarity, imx233_timer_fn_t fn)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
-    
-    timer_fns[timer_nr] = fn;
-    
-    HW_TIMROT_TIMCTRL(timer_nr) = src | prescale;
-    if(polarity)
-        __REG_SET(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__POLARITY;
-    if(reload)
-    {
-        __REG_SET(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__RELOAD;
-        /* manual says count - 1 for reload timers */
-        HW_TIMROT_TIMCOUNT(timer_nr) = count - 1;
-    }
-    else
-        HW_TIMROT_TIMCOUNT(timer_nr) = count;
     /* only enable interrupt if function is set */
-    if(fn != NULL)
-    {
-        /* enable interrupt */
-        imx233_icoll_enable_interrupt(INT_SRC_TIMER(timer_nr), true);
-        /* clear irq bit and enable */
-        __REG_CLR(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__IRQ;
-        __REG_SET(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__IRQ_EN;
-    }
-    else
-        imx233_icoll_enable_interrupt(INT_SRC_TIMER(timer_nr), false);
+    bool irq = fn != NULL;
+
+    timer_fns[timer_nr] = fn;
+
+    HW_TIMROT_TIMCTRLn(timer_nr) = BF_OR6(TIMROT_TIMCTRLn, SELECT(src),
+        PRESCALE(prescale), POLARITY(polarity), RELOAD(reload), IRQ(irq),
+        IRQ_EN(irq));
+
+    /* manual says count - 1 for reload timers */
+    HW_TIMROT_TIMCOUNTn(timer_nr) = reload ? count - 1 : reload;
+    imx233_icoll_enable_interrupt(INT_SRC_TIMER(timer_nr), irq);
     /* finally update */
-    __REG_SET(HW_TIMROT_TIMCTRL(timer_nr)) = HW_TIMROT_TIMCTRL__UPDATE;
+    BF_SETn(TIMROT_TIMCTRLn, timer_nr, UPDATE);
 
     restore_interrupt(oldstatus);
 }
