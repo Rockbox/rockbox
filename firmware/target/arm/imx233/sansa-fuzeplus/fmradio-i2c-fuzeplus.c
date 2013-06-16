@@ -58,12 +58,12 @@ static void i2c_sda_out(bool high)
 
 static bool i2c_scl_in(void)
 {
-    return imx233_pinctrl_get_gpio_mask(1, 1 << 22);
+    return imx233_pinctrl_get_gpio(1, 22);
 }
 
 static bool i2c_sda_in(void)
 {
-    return imx233_pinctrl_get_gpio_mask(1, 1 << 24);
+    return imx233_pinctrl_get_gpio(1, 24);
 }
 
 static void i2c_delay(int d)

@@ -144,7 +144,7 @@ void button_init_device(void)
 bool button_hold(void)
 {
     /* B0P04: #hold */
-    return !imx233_pinctrl_get_gpio_mask(0, 0x10);
+    return !imx233_pinctrl_get_gpio(0, 4);
 }
 
 int button_read_device(void)
@@ -172,10 +172,9 @@ int button_read_device(void)
     /* B2P07: #volume-
      * B2P08: #volume+
      * PSWITCH: power */
-    uint32_t mask = imx233_pinctrl_get_gpio_mask(2, 0x180);
-    if(!(mask & 0x80))
+    if(!imx233_pinctrl_get_gpio(2, 7))
         res |= BUTTON_VOL_DOWN;
-    if(!(mask & 0x100))
+    if(!imx233_pinctrl_get_gpio(2, 8))
         res |= BUTTON_VOL_UP;
     if(BF_RD(POWER_STS, PSWITCH) != 0 && power_ignore_counter == 0)
         res |= BUTTON_POWER;

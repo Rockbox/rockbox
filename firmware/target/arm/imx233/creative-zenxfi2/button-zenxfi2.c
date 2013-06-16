@@ -119,10 +119,9 @@ int button_read_device(int *data)
     int res = 0;
     /* B0P11: #power
      * B0P14: #select */
-    uint32_t mask = imx233_pinctrl_get_gpio_mask(0, 0x4800);
-    if(!(mask & 0x800))
+    if(!imx233_pinctrl_get_gpio(0, 11))
         res |= BUTTON_POWER;
-    if(!(mask & 0x4000))
+    if(!imx233_pinctrl_get_gpio(0, 14))
         res |= BUTTON_MENU;
     return res | touchscreen_read_device(data);
 }

@@ -489,7 +489,7 @@ bool dbg_hw_info_pinctrl(void)
 
         lcd_clear_display();
         for(int i = 0; i < 4; i++)
-            lcd_putsf(0, i, "DIN%d = 0x%08x", i, imx233_pinctrl_get_gpio_mask(i, 0xffffffff));
+            lcd_putsf(0, i, "DIN%d = 0x%08x", i, HW_PINCTRL_DINn(i));
 #ifdef IMX233_PINCTRL_DEBUG
         unsigned cur_line = 6;
         unsigned last_line = lcd_getheight() / font_get(lcd_getfont())->height;

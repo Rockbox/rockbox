@@ -35,23 +35,24 @@
 #define PINCTRL_FUNCTION_ALT2   2
 #define PINCTRL_FUNCTION_GPIO   3
 
+#if IMX233_SUBTARGET >= 3700
 #define PINCTRL_DRIVE_4mA       0
 #define PINCTRL_DRIVE_8mA       1
 #define PINCTRL_DRIVE_12mA      2
 #define PINCTRL_DRIVE_16mA      3 /* not available on all pins */
+#else
+#define PINCTRL_DRIVE_4mA       0
+#define PINCTRL_DRIVE_8mA       1
+#endif
 
 #ifdef IMX233_PINCTRL_DEBUG
 void imx233_pinctrl_acquire(unsigned bank, unsigned pin, const char *name);
-void imx233_pinctrl_acquire_mask(unsigned bank, uint32_t mask, const char *name);
 void imx233_pinctrl_release(unsigned bank, unsigned pin, const char *name);
-void imx233_pinctrl_release_mask(unsigned bank, uint32_t mask, const char *name);
 const char *imx233_pinctrl_blame(unsigned bank, unsigned pin);
 #else
 #define imx233_pinctrl_acquire(...)
-#define imx233_pinctrl_acquire_mask(...)
 #define imx233_pinctrl_release(...)
-#define imx233_pinctrl_release_mask(...)
-#define imx233_pinctrl_blame(...) NULL
+#define imx233_pinctrl_get_pin_use(...) NULL
 #endif
 
 typedef void (*pin_irq_cb_t)(int bank, int pin, intptr_t user);
@@ -61,11 +62,19 @@ static inline void imx233_pinctrl_init(void)
     HW_PINCTRL_CTRL_CLR = BM_OR2(PINCTRL_CTRL, CLKGATE, SFTRST);
 }
 
+#if IMX233_SUBTARGET >= 3700
 static inline void imx233_pinctrl_set_drive(unsigned bank, unsigned pin, unsigned strength)
 {
     HW_PINCTRL_DRIVEn_CLR(4 * bank + pin / 8) = 3 << (4 * (pin % 8));
     HW_PINCTRL_DRIVEn_SET(4 * bank + pin / 8) = strength << (4 * (pin % 8));
 }
+#else
+static inline void imx233_pinctrl_set_drive(unsigned bank, unsigned pin, unsigned strength)
+{
+   HW_PINCTRL_DRIVEn_CLR(bank) = 1 << pin;
+   HW_PINCTRL_DRIVEn_SET(bank) = strength << pin;
+}
+#endif
 
 static inline void imx233_pinctrl_enable_gpio(unsigned bank, unsigned pin, bool enable)
 {
@@ -73,14 +82,6 @@ static inline void imx233_pinctrl_enable_gpio(unsigned bank, unsigned pin, bool 
         HW_PINCTRL_DOEn_SET(bank) = 1 << pin;
     else
         HW_PINCTRL_DOEn_CLR(bank) = 1 << pin;
-}
-
-static inline void imx233_pinctrl_enable_gpio_mask(unsigned bank, uint32_t pin_mask, bool enable)
-{
-    if(enable)
-        HW_PINCTRL_DOEn_SET(bank) = pin_mask;
-    else
-        HW_PINCTRL_DOEn_CLR(bank) = pin_mask;
 }
 
 static inline void imx233_pinctrl_set_gpio(unsigned bank, unsigned pin, bool value)
@@ -91,25 +92,32 @@ static inline void imx233_pinctrl_set_gpio(unsigned bank, unsigned pin, bool val
         HW_PINCTRL_DOUTn_CLR(bank) = 1 << pin;
 }
 
-static inline void imx233_pinctrl_set_gpio_mask(unsigned bank, uint32_t pin_mask, bool value)
+static inline bool imx233_pinctrl_get_gpio(unsigned bank, unsigned pin)
 {
-    if(value)
-        HW_PINCTRL_DOUTn_SET(bank) = pin_mask;
-    else
-        HW_PINCTRL_DOUTn_CLR(bank) = pin_mask;
-}
-
-static inline uint32_t imx233_pinctrl_get_gpio_mask(unsigned bank, uint32_t pin_mask)
-{
-    return HW_PINCTRL_DINn(bank) & pin_mask;
+    return (HW_PINCTRL_DINn(bank) >> pin) & 1;
 }
 
 static inline void imx233_pinctrl_set_function(unsigned bank, unsigned pin, unsigned function)
 {
+#if IMX233_SUBTARGET >= 3700
     HW_PINCTRL_MUXSELn_CLR(2 * bank + pin / 16) = 3 << (2 * (pin % 16));
     HW_PINCTRL_MUXSELn_SET(2 * bank + pin / 16) = function << (2 * (pin % 16));
+#else
+    if(pin < 16)
+    {
+        HW_PINCTRL_MUXSELLn_CLR(bank) = 3 << (2 * pin);
+        HW_PINCTRL_MUXSELLn_SET(bank) = function << (2 * pin);
+    }
+    else
+    {
+        pin -= 16;
+        HW_PINCTRL_MUXSELHn_CLR(bank) = 3 << (2 * pin);
+        HW_PINCTRL_MUXSELHn_SET(bank) = function << (2 * pin);
+    }
+#endif
 }
 
+#if IMX233_SUBTARGET >= 3700
 static inline void imx233_pinctrl_enable_pullup(unsigned bank, unsigned pin, bool enable)
 {
     if(enable)
@@ -117,14 +125,14 @@ static inline void imx233_pinctrl_enable_pullup(unsigned bank, unsigned pin, boo
     else
         HW_PINCTRL_PULLn_CLR(bank) = 1 << pin;
 }
-
-static inline void imx233_pinctrl_enable_pullup_mask(unsigned bank, uint32_t pin_msk, bool enable)
+#else
+static inline void imx233_pinctrl_enable_pullup(unsigned bank, unsigned pin, bool enable)
 {
-    if(enable)
-        HW_PINCTRL_PULLn_SET(bank) = pin_msk;
-    else
-        HW_PINCTRL_PULLn_CLR(bank) = pin_msk;
+    (void) bank;
+    (void) pin;
+    (void) enable;
 }
+#endif
 
 /** On irq, the pin irq interrupt is disable and then cb is called;
  * the setup_pin_irq function needs to be called again to enable it again */
@@ -158,6 +166,14 @@ static inline void imx233_pinctrl_setup_vpin(vpin_t vpin, const char *name,
     imx233_pinctrl_enable_pullup(bank, pin, pullup);
 }
 
+#if IMX233_SUBTARGET < 3700
+#include "pins/pins-stmp3600.h"
+#elif IMX233_SUBTARGET < 3770
+#include "pins/pins-stmp3700.h"
+#elif IMX233_SUBTARGET < 3780
+#error implement this
+#else
 #include "pins/pins-imx233.h"
+#endif
 
 #endif /* __PINCTRL_IMX233_H__ */

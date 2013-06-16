@@ -79,7 +79,7 @@ bool button_debug_screen(void)
         lcd_putsf(0, 1, "RMI: id=%s p=%x s=%x", product_id, func_presence, sensor_prop);
         lcd_putsf(0, 2, "xmax=%d ymax=%d res=%d", x_max, y_max, sensor_resol);
         lcd_putsf(0, 3, "attn=%d ctl=%x int=%x",
-            imx233_pinctrl_get_gpio_mask(0, 0x08000000) ? 0 : 1,
+            imx233_pinctrl_get_gpio(0, 27) ? 0 : 1,
             rmi_read_single(RMI_DEVICE_CONTROL),
             rmi_read_single(RMI_INTERRUPT_REQUEST));
         lcd_putsf(0, 4, "sensi: %d min_dist: %d", (int)sensitivity.value, min_dist);
@@ -356,7 +356,7 @@ int touchpad_read_device(void)
 int button_read_device(void)
 {
     int res = 0;
-    if(!imx233_pinctrl_get_gpio_mask(1, 0x40000000))
+    if(!imx233_pinctrl_get_gpio(1, 30))
         res |= BUTTON_VOL_DOWN;
     /* The imx233 uses the voltage on the PSWITCH pin to detect power up/down
      * events as well as recovery mode. Since the power button is the power button

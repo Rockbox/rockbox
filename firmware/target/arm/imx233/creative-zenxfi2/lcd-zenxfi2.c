@@ -53,7 +53,7 @@ static void setup_lcd_pins(bool use_lcdif)
     imx233_pinctrl_acquire(1, 23, "lcd enable");
     imx233_pinctrl_acquire(1, 24, "lcd hsync");
     imx233_pinctrl_acquire(1, 25, "lcd vsync");
-    imx233_pinctrl_acquire_mask(1, 0x3ffff, "lcd data");
+    //imx233_pinctrl_acquire_mask(1, 0x3ffff, "lcd data");
     if(use_lcdif)
     {
         imx233_pinctrl_set_function(1, 25, PINCTRL_FUNCTION_MAIN); /* lcd_vsync */
@@ -71,7 +71,7 @@ static void setup_lcd_pins(bool use_lcdif)
     else
     {
         HW_PINCTRL_MUXSELn_SET(2) = 0xffffffff; /* lcd_d{0-15} */
-        imx233_pinctrl_enable_gpio_mask(1, 0x3ffffff, false); /* lcd_{d{0-17},reset,rs,wr,cs,dotclk,enable,hsync,vsync} */
+        HW_PINCTRL_DOEn_CLR(1) = 0x3ffffff; /* lcd_{d{0-17},reset,rs,wr,cs,dotclk,enable,hsync,vsync} */
         imx233_pinctrl_set_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
         imx233_pinctrl_set_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */
         imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */

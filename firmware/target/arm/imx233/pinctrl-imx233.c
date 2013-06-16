@@ -35,25 +35,11 @@ void imx233_pinctrl_acquire(unsigned bank, unsigned pin, const char *name)
     pin_use[bank][pin] = name;
 }
 
-void imx233_pinctrl_acquire_mask(unsigned bank, uint32_t mask, const char *name)
-{
-    for(unsigned pin = 0; pin < 32; pin++)
-        if(mask & (1 << pin))
-            imx233_pinctrl_acquire(bank, pin, name);
-}
-
 void imx233_pinctrl_release(unsigned bank, unsigned pin, const char *name)
 {
     if(pin_use[bank][pin] != NULL && pin_use[bank][pin] != name)
         panicf("release B%dP%02d for %s: was %s!", bank, pin, name, pin_use[bank][pin]);
     pin_use[bank][pin] = NULL;
-}
-
-void imx233_pinctrl_release_mask(unsigned bank, uint32_t mask, const char *name)
-{
-    for(unsigned pin = 0; pin < 32; pin++)
-        if(mask & (1 << pin))
-            imx233_pinctrl_release(bank, pin, name);
 }
 
 const char *imx233_pinctrl_blame(unsigned bank, unsigned pin)
