@@ -816,7 +816,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         case SCSI_REPORT_LUNS: {
             logf("scsi report luns %d",lun);
-            int allocation_length=0;
+            unsigned int allocation_length=0;
             int i;
             unsigned int response_length = 8+8*storage_num_drives();
             allocation_length|=(cbw->command_block[6]<<24);
@@ -834,6 +834,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 #endif
                     tb.lun_data->luns[i][1]=0;
             }
+            length = MIN(length, allocation_length);
             send_command_result(tb.lun_data,
                                 MIN(response_length, length));
             break;
