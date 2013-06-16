@@ -28,33 +28,8 @@
 #include "icoll-imx233.h"
 #include "clock-target.h" /* CPUFREQ_* are defined here */
 
-/* Digital control */
-#define HW_DIGCTL_BASE          0x8001C000
-#define HW_DIGCTL_CTRL          (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0))
-#define HW_DIGCTL_CTRL__USB_CLKGATE (1 << 2)
-
-#define HW_DIGCTL_HCLKCOUNT     (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0x20))
-
-#define HW_DIGCTL_MICROSECONDS  (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xC0))
-
-#define HW_DIGCTL_ARMCACHE      (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0x2b0))
-#define HW_DIGCTL_ARMCACHE__ITAG_SS_BP  0
-#define HW_DIGCTL_ARMCACHE__ITAG_SS_BM  (3 << 0)
-#define HW_DIGCTL_ARMCACHE__DTAG_SS_BP  4
-#define HW_DIGCTL_ARMCACHE__DTAG_SS_BM  (3 << 4)
-#define HW_DIGCTL_ARMCACHE__CACHE_SS_BP  8
-#define HW_DIGCTL_ARMCACHE__CACHE_SS_BM  (3 << 8)
-#define HW_DIGCTL_ARMCACHE__DRTY_SS_BP  12
-#define HW_DIGCTL_ARMCACHE__DRTY_SS_BM  (3 << 12)
-#define HW_DIGCTL_ARMCACHE__VALID_SS_BP  16
-#define HW_DIGCTL_ARMCACHE__VALID_SS_BM  (3 << 16)
-
-/* USB Phy */
-#define HW_USBPHY_BASE          0x8007C000 
-#define HW_USBPHY_PWD           (*(volatile uint32_t *)(HW_USBPHY_BASE + 0))
-#define HW_USBPHY_PWD__ALL      (7 << 10 | 0xf << 17)
-
-#define HW_USBPHY_CTRL          (*(volatile uint32_t *)(HW_USBPHY_BASE + 0x30))
+#include "regs/regs-digctl.h"
+#include "regs/regs-usbphy.h"
 
 /**
  * Absolute maximum CPU speed: 454.74 MHz

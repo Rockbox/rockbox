@@ -167,12 +167,8 @@ void udelay(unsigned us)
 
 void imx233_digctl_set_arm_cache_timings(unsigned timings)
 {
-    HW_DIGCTL_ARMCACHE =
-        timings << HW_DIGCTL_ARMCACHE__ITAG_SS_BP |
-        timings << HW_DIGCTL_ARMCACHE__DTAG_SS_BP |
-        timings << HW_DIGCTL_ARMCACHE__CACHE_SS_BP |
-        timings << HW_DIGCTL_ARMCACHE__DRTY_SS_BP |
-        timings << HW_DIGCTL_ARMCACHE__VALID_SS_BP;
+    HW_DIGCTL_ARMCACHE = BF_OR5(DIGCTL_ARMCACHE, ITAG_SS(timings),
+        DTAG_SS(timings), CACHE_SS(timings), DRTY_SS(timings), VALID_SS(timings));
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -264,21 +260,23 @@ void set_cpu_frequency(long frequency)
 void imx233_enable_usb_controller(bool enable)
 {
     if(enable)
-        __REG_CLR(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__USB_CLKGATE;
+        BF_CLR(DIGCTL_CTRL, USB_CLKGATE);
     else
-        __REG_SET(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__USB_CLKGATE;
+        BF_SET(DIGCTL_CTRL, USB_CLKGATE);
 }
 
 void imx233_enable_usb_phy(bool enable)
 {
     if(enable)
     {
-        __REG_CLR(HW_USBPHY_CTRL) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
-        __REG_CLR(HW_USBPHY_PWD) = HW_USBPHY_PWD__ALL;
+        BF_CLR(USBPHY_CTRL, SFTRST);
+        BF_CLR(USBPHY_CTRL, CLKGATE);
+        HW_USBPHY_PWD_CLR = 0xffffffff;
     }
     else
     {
-        __REG_SET(HW_USBPHY_PWD) = HW_USBPHY_PWD__ALL;
-        __REG_SET(HW_USBPHY_CTRL) = __BLOCK_CLKGATE | __BLOCK_SFTRST;
+        HW_USBPHY_PWD_SET = 0xffffffff;
+        BF_SET(USBPHY_CTRL, SFTRST);
+        BF_SET(USBPHY_CTRL, CLKGATE);
     }
 }
