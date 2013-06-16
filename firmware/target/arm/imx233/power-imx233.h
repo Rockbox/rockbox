@@ -34,6 +34,7 @@
 #define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__200mA   (1 << 4)
 #define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__400mA   (1 << 5)
 
+
 #define BV_POWER_CHARGE_BATTCHRG_I__10mA   (1 << 0)
 #define BV_POWER_CHARGE_BATTCHRG_I__20mA   (1 << 1)
 #define BV_POWER_CHARGE_BATTCHRG_I__50mA   (1 << 2)
@@ -46,6 +47,7 @@
 #define BV_POWER_CHARGE_STOP_ILIMIT__50mA  (1 << 2)
 #define BV_POWER_CHARGE_STOP_ILIMIT__100mA (1 << 3)
 
+#if IMX233_SUBTARGET >= 3700
 #define HW_POWER_VDDDCTRL__TRG_STEP 25 /* mV */
 #define HW_POWER_VDDDCTRL__TRG_MIN  800 /* mV */
 
@@ -57,6 +59,13 @@
 
 #define HW_POWER_VDDMEMCTRL__TRG_STEP    50 /* mV */
 #define HW_POWER_VDDMEMCTRL__TRG_MIN 1700 /* mV */
+#else
+/* don't use the full available range because of the weird encodings for
+ * extreme values which are useless anyway */
+#define HW_POWER_VDDDCTRL__TRG_STEP 32 /* mV */
+#define HW_POWER_VDDDCTRL__TRG_MIN  1280 /* mV */
+#define HW_POWER_VDDDCTRL__TRG_OFF  8 /* below 8, the register value doesn't encode linearly */
+#endif
 
 #define BV_POWER_MISC_FREQSEL__RES         0
 #define BV_POWER_MISC_FREQSEL__20MHz       1
@@ -67,6 +76,7 @@
 #define BV_POWER_MISC_FREQSEL__21p6MHz     6
 #define BV_POWER_MISC_FREQSEL__17p28MHz    7
 
+
 void imx233_power_init(void);
 
 void imx233_power_set_charge_current(unsigned current); /* in mA */
@@ -75,10 +85,12 @@ void imx233_power_enable_batadj(bool enable);
 
 enum imx233_regulator_t
 {
-    REGULATOR_VDDD, /* target, brownout, linreg, linreg offset */
+    REGULATOR_VDDD, /* target, brownout, linreg[3700+], linreg offset[3700+] */
+#if IMX233_SUBTARGET >= 3700
     REGULATOR_VDDA, /* target, brownout, linreg, linreg offset */
     REGULATOR_VDDIO, /* target, brownout, linreg offset */
     REGULATOR_VDDMEM, /* target, linreg */
+#endif
     REGULATOR_COUNT,
 };
 
@@ -97,12 +109,19 @@ void imx233_power_get_regulator_linreg(enum imx233_regulator_t reg,
 void imx233_power_set_regulator_linreg(enum imx233_regulator_t reg,
     bool enabled, int linreg_offset);
 
+#if IMX233_SUBTARGET >= 3700
 static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
 {
     if(pll)
         BF_WR(POWER_MISC, FREQSEL, freq);
     BF_WR(POWER_MISC, SEL_PLLCLK, pll);
 }
+#endif
+
+#if IMX233_SUBTARGET < 3700
+/* return -1 on error */
+int imx233_power_sense_die_temperature(int *min, int *max);
+#endif
 
 struct imx233_power_info_t
 {
