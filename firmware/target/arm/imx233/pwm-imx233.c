@@ -30,15 +30,15 @@ void imx233_pwm_init(void)
 
 bool imx233_pwm_is_channel_enable(int channel)
 {
-    return HW_PWM_CTRL & HW_PWM_CTRL__PWMx_ENABLE(channel);
+    return BF_RD(PWM_CTRL, PWMx_ENABLE(channel));
 }
 
 void imx233_pwm_enable_channel(int channel, bool enable)
 {
     if(enable)
-        __REG_SET(HW_PWM_CTRL) = HW_PWM_CTRL__PWMx_ENABLE(channel);
+        BF_SET(PWM_CTRL, PWMx_ENABLE(channel));
     else
-        __REG_CLR(HW_PWM_CTRL) = HW_PWM_CTRL__PWMx_ENABLE(channel);
+        BF_CLR(PWM_CTRL, PWMx_ENABLE(channel));
 }
 
 void imx233_pwm_setup_channel(int channel, int period, int cdiv, int active,
@@ -56,11 +56,9 @@ void imx233_pwm_setup_channel(int channel, int period, int cdiv, int active,
     imx233_set_pin_drive_strength(IMX233_PWM_PIN_BANK(channel), IMX233_PWM_PIN(channel),
         PINCTRL_DRIVE_4mA);
     /* watch the order ! active THEN period */
-    HW_PWM_ACTIVEx(channel) = active << HW_PWM_ACTIVEx__ACTIVE_BP |
-        inactive << HW_PWM_ACTIVEx__INACTIVE_BP;
-    HW_PWM_PERIODx(channel) = period | active_state << HW_PWM_PERIODx__ACTIVE_STATE_BP |
-        inactive_state << HW_PWM_PERIODx__INACTIVE_STATE_BP |
-        cdiv << HW_PWM_PERIODx__CDIV_BP;
+    HW_PWM_ACTIVEn(channel) = BF_OR2(PWM_ACTIVEn, ACTIVE(active), INACTIVE(inactive));
+    HW_PWM_PERIODn(channel) = BF_OR4(PWM_PERIODn, PERIOD(period - 1),
+        ACTIVE_STATE(active_state), INACTIVE_STATE(inactive_state), CDIV(cdiv));
     /* restore */
     imx233_pwm_enable_channel(channel, enable);
 }
