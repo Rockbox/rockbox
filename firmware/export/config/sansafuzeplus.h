@@ -1,6 +1,8 @@
 /*
  * This config file is for the Sandisk Sansa Fuze+
  */
+#define IMX233_SUBTARGET    3780
+#define IMX233_PACKAGE      IMX233_BGA169
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 72

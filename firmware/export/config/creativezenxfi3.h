@@ -1,7 +1,8 @@
 /*
  * This config file is for the Creative Zen X-Fi3
  */
-#define TARGET_TREE /* this target is using the target tree system */
+#define IMX233_SUBTARGET    3780
+#define IMX233_PACKAGE      IMX233_BGA169
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 83
