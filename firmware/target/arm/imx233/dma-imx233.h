@@ -37,8 +37,12 @@
 #define APB_IS_APBX_CHANNEL(x)  ((x) & 0x10)
 #define APB_GET_DMA_CHANNEL(x)  ((x) & 0xf)
 
+#if IMX233_SUBTARGET >= 3700
 // NOTE: although undocumented, the iMX233 channel 0 is actually the LCDIF one
 #define APB_LCDIF           APBH_DMA_CHANNEL(0)
+#else
+#define APB_LCDIF           APBX_DMA_CHANNEL(4)
+#endif
 
 #define APB_SSP(ssp)        APBH_DMA_CHANNEL(ssp)
 #define APB_GPMI(dev)       APBH_DMA_CHANNEL(4 + (dev))
@@ -151,6 +155,10 @@ void imx233_dma_enable_channel_interrupt(unsigned chan, bool enable);
 void imx233_dma_clear_channel_interrupt(unsigned chan);
 bool imx233_dma_is_channel_error_irq(unsigned chan);
 /* assume no command is in progress */
+void imx233_dma_prepare_command(unsigned chan, struct apb_dma_command_t *cmd);
+void imx233_dma_set_next_command(unsigned chan, struct apb_dma_command_t *cmd);
+void imx233_dma_inc_sema(unsigned chan, unsigned amount);
+/* wrapper around prepare_command, set_next_command, inc_sema(1) */
 void imx233_dma_start_command(unsigned chan, struct apb_dma_command_t *cmd);
 /* return value of the semaphore */
 int imx233_dma_wait_completion(unsigned chan, unsigned tmo);
