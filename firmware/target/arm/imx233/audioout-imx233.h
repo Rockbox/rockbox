@@ -36,5 +36,7 @@ void imx233_audioout_set_hp_vol(int vol_l, int vol_r);
 void imx233_audioout_set_freq(int fsel);
 /* select between DAC and Line1 */
 void imx233_audioout_select_hp_input(bool line1);
+/* value in 1.5dB steps, from 0dB to 6dB */
+void imx233_audioout_set_3d_effect(int val);
 
 #endif /* __audioout_imx233__ */

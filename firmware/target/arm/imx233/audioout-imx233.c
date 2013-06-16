@@ -37,6 +37,7 @@ static int hp_unmute_cb(struct timeout *tmo)
 
 void imx233_audioout_preinit(void)
 {
+
     /* Enable AUDIOOUT block */
     imx233_reset_block(&HW_AUDIOOUT_CTRL);
     /* Enable digital filter clock */
@@ -57,7 +58,9 @@ void imx233_audioout_preinit(void)
     /* change bias to -50% */
     BF_WR(AUDIOOUT_TEST, HP_I1_ADJ, 1);
     BF_WR(AUDIOOUT_REFCTRL, BIAS_CTRL, 1);
+#if IMX233_SUBTARGET >= 3700
     BF_SET(AUDIOOUT_REFCTRL, RAISE_REF);
+#endif
     BF_SET(AUDIOOUT_REFCTRL, XTAL_BGR_BIAS);
     /* Stop holding to ground */
     BF_CLR(AUDIOOUT_ANACTRL, HP_HOLD_GND);
@@ -72,12 +75,12 @@ void imx233_audioout_preinit(void)
     HW_AUDIOOUT_DATA = 0;
     HW_AUDIOOUT_DATA = 0;
     HW_AUDIOOUT_DATA = 0;
-    /* wait for everything to stabilize before unmuting */
-    timeout_register(&hp_unmute_oneshort, hp_unmute_cb, HZ / 2, 0);
 }
 
 void imx233_audioout_postinit(void)
 {
+    /* wait for everything to stabilize before unmuting */
+    timeout_register(&hp_unmute_oneshort, hp_unmute_cb, HZ / 2, 0);
 }
 
 void imx233_audioout_close(void)
@@ -127,7 +130,11 @@ static void set_hp_vol(int vol_l, int vol_r)
     vol_l = MAX(min, MIN(vol_l, max));
     vol_r = MAX(min, MIN(vol_r, max));
     /* unmute, enable zero cross and set volume.*/
+#if IMX233_SUBTARGET >= 3700
     unsigned mstr_zcd = BM_AUDIOOUT_HPVOL_EN_MSTR_ZCD;
+#else
+    unsigned mstr_zcd = 0;
+#endif
     HW_AUDIOOUT_HPVOL = mstr_zcd | BF_OR3(AUDIOOUT_HPVOL, SELECT(input_line1),
         VOL_LEFT(max - vol_l), VOL_RIGHT(max - vol_r));
 }
@@ -183,7 +190,7 @@ void imx233_audioout_set_freq(int fsel)
     HW_AUDIOOUT_DACSRR = BF_OR4(AUDIOOUT_DACSRR,
         SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
         SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
-
+    
     #if 0
     /* Select base_mult and src_hold depending on the audio range:
      *     0 < f <= 12000   --> base_mult = 1, src_hold = 3 (div by 4)
@@ -217,4 +224,21 @@ void imx233_audioout_select_hp_input(bool line1)
     input_line1 = line1;
     /* reapply volume setting */
     apply_volume();
+}
+
+void imx233_audioout_set_3d_effect(int val)
+{
+    switch(val)
+    {
+        /* 0 and 1.5dB: off */
+        case 0: case 1: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 0); break;
+        /* 3dB: low */
+        case 2: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 1); break;
+        /* 4.5dB: low */
+        case 3: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 2); break;
+        /* 6dB: low */
+        case 4: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 3); break;
+        /* others: off */
+        default: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 0); break;
+    }
 }
