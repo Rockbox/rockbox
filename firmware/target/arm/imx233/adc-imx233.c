@@ -51,10 +51,10 @@ static short adc_read_virtual(int c)
             return imx233_lradc_read_battery_voltage();
         case IMX233_ADC_VDDIO:
             /* VddIO pin has a builtin 2:1 divide */
-            return adc_read_physical(HW_LRADC_CHANNEL_VDDIO, false);
+            return adc_read_physical(LRADC_SRC_VDDIO, false);
         case IMX233_ADC_VDD5V:
             /* Vdd5V pin has a builtin 4:1 divide */
-            return adc_read_physical(HW_LRADC_CHANNEL_5V, false) * 2;
+            return adc_read_physical(LRADC_SRC_5V, false) * 2;
         case IMX233_ADC_DIE_TEMP:
         {
             // don't block on second channel otherwise we might deadlock !

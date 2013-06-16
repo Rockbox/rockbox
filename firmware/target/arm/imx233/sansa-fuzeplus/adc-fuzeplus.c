@@ -28,7 +28,7 @@ int imx233_adc_mapping[] =
     [ADC_VDDIO] = IMX233_ADC_VDDIO,
     [ADC_5V] = IMX233_ADC_VDD5V,
     [ADC_BATT_TEMP] = IMX233_ADC_BATT_TEMP,
-    [ADC_CH2] = HW_LRADC_CHANNEL(2),
+    [ADC_CH2] = LRADC_SRC(2),
 };
 
 const char *imx233_adc_channel_name[] =

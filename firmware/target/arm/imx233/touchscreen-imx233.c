@@ -82,13 +82,13 @@ static void enter_state(enum touch_state_t state)
             imx233_lradc_enable_touch_detect_irq(true);
             break;
         case TOUCH_STATE_MEASURE_X:
-            kick_measure(true, false, false, HW_LRADC_CHANNEL_YPLUS);
+            kick_measure(true, false, false, LRADC_SRC_YPLUS);
             break;
         case TOUCH_STATE_MEASURE_Y:
-            kick_measure(false, true, false, HW_LRADC_CHANNEL_XPLUS);
+            kick_measure(false, true, false, LRADC_SRC_XPLUS);
             break;
         case TOUCH_STATE_VERIFY:
-            kick_measure(false, false, true, HW_LRADC_CHANNEL_YPLUS);
+            kick_measure(false, false, true, LRADC_SRC_YPLUS);
             break;
     }
 }

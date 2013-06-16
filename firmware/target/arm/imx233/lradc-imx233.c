@@ -32,7 +32,7 @@ static struct channel_arbiter_t delay_arbiter;
 static int battery_chan;
 static int battery_delay_chan;
 /* irq callbacks */
-static lradc_irq_fn_t irq_cb[HW_LRADC_NUM_CHANNELS];
+static lradc_irq_fn_t irq_cb[LRADC_NUM_CHANNELS];
 
 #define define_cb(x) \
     void INT_LRADC_CH##x(void) \
@@ -62,55 +62,51 @@ void imx233_lradc_set_channel_irq_callback(int channel, lradc_irq_fn_t cb)
 
 void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples, int src)
 {
-    __REG_CLR(HW_LRADC_CHx(channel)) = HW_LRADC_CHx__NUM_SAMPLES_BM | HW_LRADC_CHx__ACCUMULATE;
-    __REG_SET(HW_LRADC_CHx(channel)) = nr_samples << HW_LRADC_CHx__NUM_SAMPLES_BP |
-        acc << HW_LRADC_CHx__ACCUMULATE;
+    HW_LRADC_CHn_CLR(channel) = BM_OR2(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
+    HW_LRADC_CHn_SET(channel) = BF_OR2(LRADC_CHn, NUM_SAMPLES(nr_samples), ACCUMULATE(acc));
     if(div2)
-        __REG_SET(HW_LRADC_CTRL2) = HW_LRADC_CTRL2__DIVIDE_BY_TWO(channel);
+        BF_SETV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << channel);
     else
-        __REG_CLR(HW_LRADC_CTRL2) = HW_LRADC_CTRL2__DIVIDE_BY_TWO(channel);
-    __REG_CLR(HW_LRADC_CTRL4) = HW_LRADC_CTRL4__LRADCxSELECT_BM(channel);
-    __REG_SET(HW_LRADC_CTRL4) = src << HW_LRADC_CTRL4__LRADCxSELECT_BP(channel);
+        BF_CLRV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << channel);
+    HW_LRADC_CTRL4_CLR = BM_LRADC_CTRL4_LRADCxSELECT(channel);
+    HW_LRADC_CTRL4_SET = src << BP_LRADC_CTRL4_LRADCxSELECT(channel);
 }
 
 void imx233_lradc_setup_delay(int dchan, int trigger_lradc, int trigger_delays,
     int loop_count, int delay)
 {
-    HW_LRADC_DELAYx(dchan) =
-        trigger_lradc << HW_LRADC_DELAYx__TRIGGER_LRADCS_BP |
-        trigger_delays << HW_LRADC_DELAYx__TRIGGER_DELAYS_BP |
-        loop_count << HW_LRADC_DELAYx__LOOP_COUNT_BP |
-        delay << HW_LRADC_DELAYx__DELAY_BP;
+    HW_LRADC_DELAYn(dchan) = BF_OR4(LRADC_DELAYn, TRIGGER_LRADCS(trigger_lradc),
+        TRIGGER_DELAYS(trigger_delays), LOOP_COUNT(loop_count), DELAY(delay));
 }
 
 void imx233_lradc_clear_channel_irq(int channel)
 {
-    __REG_CLR(HW_LRADC_CTRL1) = HW_LRADC_CTRL1__LRADCx_IRQ(channel);
+    BF_CLR(LRADC_CTRL1, LRADCx_IRQ(channel));
 }
 
 bool imx233_lradc_read_channel_irq(int channel)
 {
-    return HW_LRADC_CTRL1 & HW_LRADC_CTRL1__LRADCx_IRQ(channel);
+    return BF_RD(LRADC_CTRL1, LRADCx_IRQ(channel));
 }
 
 void imx233_lradc_enable_channel_irq(int channel, bool enable)
 {
     if(enable)
-        __REG_SET(HW_LRADC_CTRL1) = HW_LRADC_CTRL1__LRADCx_IRQ_EN(channel);
+        BF_SET(LRADC_CTRL1, LRADCx_IRQ_EN(channel));
     else
-        __REG_CLR(HW_LRADC_CTRL1) = HW_LRADC_CTRL1__LRADCx_IRQ_EN(channel);
+        BF_CLR(LRADC_CTRL1, LRADCx_IRQ_EN(channel));
     imx233_lradc_clear_channel_irq(channel);
 }
 
 void imx233_lradc_kick_channel(int channel)
 {
     imx233_lradc_clear_channel_irq(channel);
-    __REG_SET(HW_LRADC_CTRL0) = HW_LRADC_CTRL0__SCHEDULE(channel);
+    BF_SETV(LRADC_CTRL0, SCHEDULE, 1 << channel);
 }
 
 void imx233_lradc_kick_delay(int dchan)
 {
-    __REG_SET(HW_LRADC_DELAYx(dchan)) = HW_LRADC_DELAYx__KICK;
+    BF_SETn(LRADC_DELAYn, dchan, KICK);
 }
 
 void imx233_lradc_wait_channel(int channel)
@@ -122,12 +118,12 @@ void imx233_lradc_wait_channel(int channel)
 
 int imx233_lradc_read_channel(int channel)
 {
-    return __XTRACT_EX(HW_LRADC_CHx(channel), HW_LRADC_CHx__VALUE);
+    return BF_RDn(LRADC_CHn, channel, VALUE);
 }
 
 void imx233_lradc_clear_channel(int channel)
 {
-    __REG_CLR(HW_LRADC_CHx(channel)) = HW_LRADC_CHx__VALUE_BM;
+    BF_CLRn(LRADC_CHn, channel, VALUE);
 }
 
 int imx233_lradc_acquire_channel(int timeout)
@@ -162,10 +158,10 @@ void imx233_lradc_reserve_delay(int channel)
 
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
 {
-    imx233_lradc_setup_channel(nmos_chan, false, false, 0, HW_LRADC_CHANNEL_NMOS_THIN);
-    imx233_lradc_setup_channel(pmos_chan, false, false, 0, HW_LRADC_CHANNEL_PMOS_THIN);
+    imx233_lradc_setup_channel(nmos_chan, false, false, 0, LRADC_SRC_NMOS_THIN);
+    imx233_lradc_setup_channel(pmos_chan, false, false, 0, LRADC_SRC_PMOS_THIN);
     // mux sensors
-    __REG_CLR(HW_LRADC_CTRL2) = HW_LRADC_CTRL2__TEMPSENSE_PWD;
+    BF_CLR(LRADC_CTRL2, TEMPSENSE_PWD);
     imx233_lradc_clear_channel(nmos_chan);
     imx233_lradc_clear_channel(pmos_chan);
     // schedule both channels
@@ -175,7 +171,7 @@ int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
     imx233_lradc_wait_channel(nmos_chan);
     imx233_lradc_wait_channel(pmos_chan);
     // mux sensors
-    __REG_SET(HW_LRADC_CTRL2) = HW_LRADC_CTRL2__TEMPSENSE_PWD;
+    BF_SET(LRADC_CTRL2, TEMPSENSE_PWD);
     // do the computation
     int diff = imx233_lradc_read_channel(nmos_chan) - imx233_lradc_read_channel(pmos_chan);
     // return diff * 1.012 / 4
@@ -187,19 +183,19 @@ static void imx233_lradc_set_temp_isrc(int sensor, int value)
 {
     if(sensor < 0 || sensor > 1)
         panicf("imx233_lradc_set_temp_isrc: invalid sensor");
-    unsigned mask = HW_LRADC_CTRL2__TEMP_ISRCx_BM(sensor);
-    unsigned bp = HW_LRADC_CTRL2__TEMP_ISRCx_BP(sensor);
-    unsigned en = HW_LRADC_CTRL2__TEMP_SENSOR_IENABLEx(sensor);
+    unsigned mask = sensor ? BM_LRADC_CTRL2_TEMP_ISRC0 : BM_LRADC_CTRL2_TEMP_ISRC1;
+    unsigned bp = sensor ? BP_LRADC_CTRL2_TEMP_ISRC0 : BP_LRADC_CTRL2_TEMP_ISRC1;
+    unsigned en = sensor ? BM_LRADC_CTRL2_TEMP_SENSOR_IENABLE0 : BM_LRADC_CTRL2_TEMP_SENSOR_IENABLE1;
 
-    __REG_CLR(HW_LRADC_CTRL2) = mask;
-    __REG_SET(HW_LRADC_CTRL2) = value << bp;
+    HW_LRADC_CTRL2_CLR = mask;
+    HW_LRADC_CTRL2_SET = value << bp;
     if(value != 0)
     {
-        __REG_SET(HW_LRADC_CTRL2) = en;
+        HW_LRADC_CTRL2_SET = en;
         udelay(100);
     }
     else
-        __REG_CLR(HW_LRADC_CTRL2) = en;
+        HW_LRADC_CTRL2_CLR = en;
 }
 
 int imx233_lradc_sense_ext_temperature(int chan, int sensor)
@@ -208,7 +204,7 @@ int imx233_lradc_sense_ext_temperature(int chan, int sensor)
     /* setup channel */
     imx233_lradc_setup_channel(chan, false, false, 0, sensor);
     /* set current source to 300µA */
-    imx233_lradc_set_temp_isrc(sensor, HW_LRADC_CTRL2__TEMP_ISRC__300uA);
+    imx233_lradc_set_temp_isrc(sensor, BV_LRADC_CTRL2_TEMP_ISRC0__300);
     /* read value and accumulate */
     int a = 0;
     for(int i = 0; i < EXT_TEMP_ACC_COUNT; i++)
@@ -220,7 +216,7 @@ int imx233_lradc_sense_ext_temperature(int chan, int sensor)
     }
     /* setup channel for small accumulation */
     /* set current source to 20µA */
-    imx233_lradc_set_temp_isrc(sensor, HW_LRADC_CTRL2__TEMP_ISRC__20uA);
+    imx233_lradc_set_temp_isrc(sensor, BV_LRADC_CTRL2_TEMP_ISRC0__20);
     /* read value */
     int b = 0;
     for(int i = 0; i < EXT_TEMP_ACC_COUNT; i++)
@@ -231,72 +227,75 @@ int imx233_lradc_sense_ext_temperature(int chan, int sensor)
         b += imx233_lradc_read_channel(chan);
     }
     /* disable sensor current */
-    imx233_lradc_set_temp_isrc(sensor, HW_LRADC_CTRL2__TEMP_ISRC__0uA);
+    imx233_lradc_set_temp_isrc(sensor, BV_LRADC_CTRL2_TEMP_ISRC0__ZERO);
     
     return (abs(b - a) / EXT_TEMP_ACC_COUNT) * 1104 / 1000;
 }
 
 void imx233_lradc_setup_battery_conversion(bool automatic, unsigned long scale_factor)
 {
-    __REG_CLR(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__SCALE_FACTOR_BM;
-    __REG_SET(HW_LRADC_CONVERSION) = scale_factor;
+    BF_CLR(LRADC_CONVERSION, SCALE_FACTOR);
+    BF_SETV(LRADC_CONVERSION, SCALE_FACTOR, scale_factor);
     if(automatic)
-        __REG_SET(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__AUTOMATIC;
+        BF_SET(LRADC_CONVERSION, AUTOMATIC);
     else
-        __REG_CLR(HW_LRADC_CONVERSION) = HW_LRADC_CONVERSION__AUTOMATIC;
+        BF_CLR(LRADC_CONVERSION, AUTOMATIC);
 }
 
 int imx233_lradc_read_battery_voltage(void)
 {
-    return __XTRACT(HW_LRADC_CONVERSION, SCALED_BATT_VOLTAGE);
+    return BF_RD(LRADC_CONVERSION, SCALED_BATT_VOLTAGE);
 }
 
 void imx233_lradc_setup_touch(bool xminus_enable, bool yminus_enable,
     bool xplus_enable, bool yplus_enable, bool touch_detect)
 {
-    __FIELD_SET_CLR(HW_LRADC_CTRL0, XMINUS_ENABLE, xminus_enable);
-    __FIELD_SET_CLR(HW_LRADC_CTRL0, YMINUS_ENABLE, yminus_enable);
-    __FIELD_SET_CLR(HW_LRADC_CTRL0, XPLUS_ENABLE, xplus_enable);
-    __FIELD_SET_CLR(HW_LRADC_CTRL0, YPLUS_ENABLE, yplus_enable);
-    __FIELD_SET_CLR(HW_LRADC_CTRL0, TOUCH_DETECT_ENABLE, touch_detect);
+    HW_LRADC_CTRL0_CLR = BM_OR5(LRADC_CTRL0, XMINUS_ENABLE, YMINUS_ENABLE,
+        XPLUS_ENABLE, YPLUS_ENABLE, TOUCH_DETECT_ENABLE);
+    HW_LRADC_CTRL0_SET = BF_OR5(LRADC_CTRL0, XMINUS_ENABLE(xminus_enable),
+        YMINUS_ENABLE(yminus_enable), XPLUS_ENABLE(xplus_enable),
+        YPLUS_ENABLE(yplus_enable), TOUCH_DETECT_ENABLE(touch_detect));
 }
 
 void imx233_lradc_enable_touch_detect_irq(bool enable)
 {
-    __FIELD_SET_CLR(HW_LRADC_CTRL1, TOUCH_DETECT_IRQ_EN, enable);
+    if(enable)
+        BF_SET(LRADC_CTRL1, TOUCH_DETECT_IRQ_EN);
+    else
+        BF_CLR(LRADC_CTRL1, TOUCH_DETECT_IRQ_EN);
     imx233_lradc_clear_touch_detect_irq();
 }
 
 void imx233_lradc_clear_touch_detect_irq(void)
 {
-    __REG_CLR(HW_LRADC_CTRL1) = HW_LRADC_CTRL1__TOUCH_DETECT_IRQ;
+    BF_CLR(LRADC_CTRL1, TOUCH_DETECT_IRQ);
 }
 
 bool imx233_lradc_read_touch_detect(void)
 {
-    return HW_LRADC_STATUS & HW_LRADC_STATUS__TOUCH_DETECT_RAW;
+    return BF_RD(LRADC_STATUS, TOUCH_DETECT_RAW);
 }
 
 void imx233_lradc_init(void)
 {
-    arbiter_init(&channel_arbiter, HW_LRADC_NUM_CHANNELS);
-    arbiter_init(&delay_arbiter, HW_LRADC_NUM_DELAYS);
+    arbiter_init(&channel_arbiter, LRADC_NUM_CHANNELS);
+    arbiter_init(&delay_arbiter, LRADC_NUM_DELAYS);
     // enable block
     imx233_reset_block(&HW_LRADC_CTRL0);
     // disable ground ref
-    __REG_CLR(HW_LRADC_CTRL0) = HW_LRADC_CTRL0__ONCHIP_GROUNDREF;
+    BF_CLR(LRADC_CTRL0, ONCHIP_GROUNDREF);
     // disable temperature sensors
-    __REG_CLR(HW_LRADC_CTRL2) = HW_LRADC_CTRL2__TEMP_SENSOR_IENABLE0 |
-        HW_LRADC_CTRL2__TEMP_SENSOR_IENABLE1;
-    __REG_SET(HW_LRADC_CTRL2) = HW_LRADC_CTRL2__TEMPSENSE_PWD;
+    BF_CLR(LRADC_CTRL2, TEMP_SENSOR_IENABLE0);
+    BF_CLR(LRADC_CTRL2, TEMP_SENSOR_IENABLE1);
+    BF_SET(LRADC_CTRL2, TEMPSENSE_PWD);
     // set frequency
-    __REG_CLR(HW_LRADC_CTRL3) = HW_LRADC_CTRL3__CYCLE_TIME_BM;
-    __REG_SET(HW_LRADC_CTRL3) = HW_LRADC_CTRL3__CYCLE_TIME__6MHz;
+    BF_CLR(LRADC_CTRL3, CYCLE_TIME);
+    BF_SETV(LRADC_CTRL3, CYCLE_TIME_V, 6MHZ);
     // setup battery
     battery_chan = 7;
     imx233_lradc_reserve_channel(battery_chan);
     /* setup them for the simplest use: no accumulation, no division*/
-    imx233_lradc_setup_channel(battery_chan, false, false, 0, HW_LRADC_CHANNEL_BATTERY);
+    imx233_lradc_setup_channel(battery_chan, false, false, 0, LRADC_SRC_BATTERY);
     /* setup delay channel for battery for automatic reading and scaling */
     battery_delay_chan = 0;
     imx233_lradc_reserve_delay(battery_delay_chan);
@@ -307,5 +306,5 @@ void imx233_lradc_init(void)
         1 << battery_delay_chan, 0, 200);
     imx233_lradc_kick_delay(battery_delay_chan);
     /* enable automatic conversion, use Li-Ion type battery */
-    imx233_lradc_setup_battery_conversion(true, HW_LRADC_CONVERSION__SCALE_FACTOR__LI_ION);
+    imx233_lradc_setup_battery_conversion(true, BV_LRADC_CONVERSION_SCALE_FACTOR__LI_ION);
 }

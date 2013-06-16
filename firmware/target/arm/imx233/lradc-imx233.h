@@ -28,101 +28,40 @@
 #include "system.h"
 #include "system-target.h"
 
-#define HW_LRADC_BASE       0x80050000
+#include "regs/regs-lradc.h"
 
-#define HW_LRADC_CTRL0      (*(volatile uint32_t *)(HW_LRADC_BASE + 0x0))
-#define HW_LRADC_CTRL0__XPLUS_ENABLE        (1 << 16)
-#define HW_LRADC_CTRL0__YPLUS_ENABLE        (1 << 17)
-#define HW_LRADC_CTRL0__XMINUS_ENABLE       (1 << 18)
-#define HW_LRADC_CTRL0__YMINUS_ENABLE       (1 << 19)
-#define HW_LRADC_CTRL0__TOUCH_DETECT_ENABLE (1 << 20)
-#define HW_LRADC_CTRL0__ONCHIP_GROUNDREF    (1 << 21)
-#define HW_LRADC_CTRL0__SCHEDULE(x)         (1 << (x))
+/** additional defines */
+#define BP_LRADC_CTRL4_LRADCxSELECT(x)  (4 * (x))
+#define BM_LRADC_CTRL4_LRADCxSELECT(x)  (0xf << (4 * (x)))
 
-#define HW_LRADC_CTRL1      (*(volatile uint32_t *)(HW_LRADC_BASE + 0x10))
-#define HW_LRADC_CTRL1__LRADCx_IRQ(x)       (1 << (x))
-#define HW_LRADC_CTRL1__TOUCH_DETECT_IRQ    (1 << 8)
-#define HW_LRADC_CTRL1__LRADCx_IRQ_EN(x)    (1 << ((x) + 16))
-#define HW_LRADC_CTRL1__TOUCH_DETECT_IRQ_EN (1 << 24)
+#define BP_LRADC_CTRL1_LRADCx_IRQ(x)    (x)
+#define BM_LRADC_CTRL1_LRADCx_IRQ(x)    (1 << (x))
 
-#define HW_LRADC_CTRL2      (*(volatile uint32_t *)(HW_LRADC_BASE + 0x20))
-#define HW_LRADC_CTRL2__TEMP_ISRC1_BP           4
-#define HW_LRADC_CTRL2__TEMP_ISRC1_BM           0xf0
-#define HW_LRADC_CTRL2__TEMP_ISRC0_BP           0
-#define HW_LRADC_CTRL2__TEMP_ISRC0_BM           0xf
-#define HW_LRADC_CTRL2__TEMP_ISRCx_BP(x)        (4 * (x))
-#define HW_LRADC_CTRL2__TEMP_ISRCx_BM(x)        (0xf << (4 * (x)))
-#define HW_LRADC_CTRL2__TEMP_ISRC__0uA          0
-#define HW_LRADC_CTRL2__TEMP_ISRC__20uA         1
-#define HW_LRADC_CTRL2__TEMP_ISRC__300uA        15
-#define HW_LRADC_CTRL2__TEMP_SENSOR_IENABLE0    (1 << 8)
-#define HW_LRADC_CTRL2__TEMP_SENSOR_IENABLE1    (1 << 9)
-#define HW_LRADC_CTRL2__TEMP_SENSOR_IENABLEx(x) (1 << (8 + (x)))
-#define HW_LRADC_CTRL2__TEMPSENSE_PWD           (1 << 15)
-#define HW_LRADC_CTRL2__DIVIDE_BY_TWO(x)        (1 << ((x) + 24))
+#define BP_LRADC_CTRL1_LRADCx_IRQ_EN(x)    (16 + (x))
+#define BM_LRADC_CTRL1_LRADCx_IRQ_EN(x)    (1 << (16 + (x)))
 
-#define HW_LRADC_CTRL3      (*(volatile uint32_t *)(HW_LRADC_BASE + 0x30))
-#define HW_LRADC_CTRL3__CYCLE_TIME_BM       0x300
-#define HW_LRADC_CTRL3__CYCLE_TIME_BP       8
-#define HW_LRADC_CTRL3__CYCLE_TIME__6MHz    (0 << 8)
-#define HW_LRADC_CTRL3__CYCLE_TIME__4MHz    (1 << 8)
-#define HW_LRADC_CTRL3__CYCLE_TIME__3MHz    (2 << 8)
-#define HW_LRADC_CTRL3__CYCLE_TIME__2MHz    (3 << 8)
+#define LRADC_NUM_CHANNELS  8
+#define LRADC_NUM_DELAYS    4
 
-#define HW_LRADC_STATUS     (*(volatile uint32_t *)(HW_LRADC_BASE + 0x40))
-#define HW_LRADC_STATUS__TOUCH_DETECT_RAW   (1 << 0)
+#define LRADC_SRC(x)            (x)
+#define LRADC_SRC_XPLUS         LRADC_SRC(2)
+#define LRADC_SRC_YPLUS         LRADC_SRC(3)
+#define LRADC_SRC_XMINUS        LRADC_SRC(4)
+#define LRADC_SRC_YMINUS        LRADC_SRC(5)
+#define LRADC_SRC_VDDIO         LRADC_SRC(6)
+#define LRADC_SRC_BATTERY       LRADC_SRC(7)
+#define LRADC_SRC_PMOS_THIN     LRADC_SRC(8)
+#define LRADC_SRC_NMOS_THIN     LRADC_SRC(9)
+#define LRADC_SRC_NMOS_THICK    LRADC_SRC(10)
+#define LRADC_SRC_PMOS_THICK    LRADC_SRC(11)
+#define LRADC_SRC_PMOS_THICK    LRADC_SRC(11)
+#define LRADC_SRC_USB_DP        LRADC_SRC(12)
+#define LRADC_SRC_USB_DN        LRADC_SRC(13)
+#define LRADC_SRC_VBG           LRADC_SRC(14)
+#define LRADC_SRC_5V            LRADC_SRC(15)
 
-#define HW_LRADC_CHx(x)     (*(volatile uint32_t *)(HW_LRADC_BASE + 0x50 + (x) * 0x10))
-#define HW_LRADC_CHx__NUM_SAMPLES_BM    (0x1f << 24)
-#define HW_LRADC_CHx__NUM_SAMPLES_BP    24
-#define HW_LRADC_CHx__ACCUMULATE        29
-#define HW_LRADC_CHx__VALUE_BM          0x3ffff
-#define HW_LRADC_CHx__VALUE_BP          0
-
-#define HW_LRADC_DELAYx(x)  (*(volatile uint32_t *)(HW_LRADC_BASE + 0xD0 + (x) * 0x10))
-#define HW_LRADC_DELAYx__DELAY_BP           0
-#define HW_LRADC_DELAYx__DELAY_BM           0x7ff
-#define HW_LRADC_DELAYx__LOOP_COUNT_BP      11
-#define HW_LRADC_DELAYx__LOOP_COUNT_BM      (0x1f << 11)
-#define HW_LRADC_DELAYx__TRIGGER_DELAYS_BP  16
-#define HW_LRADC_DELAYx__TRIGGER_DELAYS_BM  (0xf << 16)
-#define HW_LRADC_DELAYx__KICK               (1 << 20)
-#define HW_LRADC_DELAYx__TRIGGER_LRADCS_BP  24
-#define HW_LRADC_DELAYx__TRIGGER_LRADCS_BM  (0xff << 24)
-
-#define HW_LRADC_CONVERSION (*(volatile uint32_t *)(HW_LRADC_BASE + 0x130))
-#define HW_LRADC_CONVERSION__SCALED_BATT_VOLTAGE_BP 0
-#define HW_LRADC_CONVERSION__SCALED_BATT_VOLTAGE_BM 0x3ff
-#define HW_LRADC_CONVERSION__SCALE_FACTOR_BM        (3 << 16)
-#define HW_LRADC_CONVERSION__SCALE_FACTOR_BP        16
-#define HW_LRADC_CONVERSION__SCALE_FACTOR__LI_ION   (2 << 16)
-#define HW_LRADC_CONVERSION__AUTOMATIC              (1 << 20)
-
-#define HW_LRADC_CTRL4      (*(volatile uint32_t *)(HW_LRADC_BASE + 0x140))
-#define HW_LRADC_CTRL4__LRADCxSELECT_BM(x)  (0xf << ((x) * 4))
-#define HW_LRADC_CTRL4__LRADCxSELECT_BP(x)  ((x) * 4)
-
-#define HW_LRADC_VERSION    (*(volatile uint32_t *)(HW_LRADC_BASE + 0x150))
-
-#define HW_LRADC_NUM_CHANNELS   8
-#define HW_LRADC_NUM_DELAYS     4
-
-#define HW_LRADC_CHANNEL(x)         (x)
-#define HW_LRADC_CHANNEL_XPLUS      HW_LRADC_CHANNEL(2)
-#define HW_LRADC_CHANNEL_YPLUS      HW_LRADC_CHANNEL(3)
-#define HW_LRADC_CHANNEL_XMINUS     HW_LRADC_CHANNEL(4)
-#define HW_LRADC_CHANNEL_YMINUS     HW_LRADC_CHANNEL(5)
-#define HW_LRADC_CHANNEL_VDDIO      HW_LRADC_CHANNEL(6)
-#define HW_LRADC_CHANNEL_BATTERY    HW_LRADC_CHANNEL(7)
-#define HW_LRADC_CHANNEL_PMOS_THIN  HW_LRADC_CHANNEL(8)
-#define HW_LRADC_CHANNEL_NMOS_THIN  HW_LRADC_CHANNEL(9)
-#define HW_LRADC_CHANNEL_NMOS_THICK HW_LRADC_CHANNEL(10)
-#define HW_LRADC_CHANNEL_PMOS_THICK HW_LRADC_CHANNEL(11)
-#define HW_LRADC_CHANNEL_PMOS_THICK HW_LRADC_CHANNEL(11)
-#define HW_LRADC_CHANNEL_USB_DP     HW_LRADC_CHANNEL(12)
-#define HW_LRADC_CHANNEL_USB_DN     HW_LRADC_CHANNEL(13)
-#define HW_LRADC_CHANNEL_VBG        HW_LRADC_CHANNEL(14)
-#define HW_LRADC_CHANNEL_5V         HW_LRADC_CHANNEL(15)
+/* frequency of the delay counter */
+#define LRADC_DELAY_FREQ    2000
 
 typedef void (*lradc_irq_fn_t)(int chan);
 
