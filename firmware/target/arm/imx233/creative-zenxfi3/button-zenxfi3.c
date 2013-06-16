@@ -66,10 +66,11 @@ static long mpr121_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char mpr121_thread_name[] = "mpr121";
 static struct event_queue mpr121_queue;
 
-static void mpr121_irq_cb(int bank, int pin)
+static void mpr121_irq_cb(int bank, int pin, intptr_t user)
 {
     (void) bank;
     (void) pin;
+    (void) user;
     /* the callback will not be fired until interrupt is enabled back so
      * the queue will not overflow or contain multiple MPR121_INTERRUPT events */
     queue_post(&mpr121_queue, MPR121_INTERRUPT, 0);
@@ -107,7 +108,7 @@ static void mpr121_thread(void)
             if(status & 0x80) touchpad_btns |= BUTTON_PLAY;
         }
         /* enable interrupt */
-        imx233_pinctrl_setup_irq(0, 18, true, true, false, &mpr121_irq_cb);
+        imx233_pinctrl_setup_irq(0, 18, true, true, false, &mpr121_irq_cb, 0);
     }
 }
 
@@ -125,7 +126,7 @@ void button_init_device(void)
     imx233_pinctrl_acquire(0, 18, "mpr121 int");
     imx233_pinctrl_set_function(0, 18, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 18, false);
-    imx233_pinctrl_setup_irq(0, 18, true, true, false, &mpr121_irq_cb);
+    imx233_pinctrl_setup_irq(0, 18, true, true, false, &mpr121_irq_cb, 0);
     /* hold button */
     imx233_pinctrl_acquire(0, 4, "hold");
     imx233_pinctrl_set_function(0, 4, PINCTRL_FUNCTION_GPIO);

@@ -113,10 +113,11 @@ static struct semaphore rds_sema;
 static uint32_t rds_stack[DEFAULT_STACK_SIZE / sizeof(uint32_t)];
 
 /* RDS GPIO interrupt handler */
-static void stc_rds_callback(int bank, int pin)
+static void stc_rds_callback(int bank, int pin, intptr_t user)
 {
     (void) bank;
     (void) pin;
+    (void) user;
 
     semaphore_release(&rds_sema);
 }
@@ -132,7 +133,7 @@ static void NORETURN_ATTR rds_thread(void)
         if(si4700_rds_read_raw(rds_data) && rds_process(rds_data))
             si4700_rds_set_event();
         /* renable callback */
-        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback);
+        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback, 0);
     }
 }
 
@@ -145,11 +146,11 @@ void si4700_rds_powerup(bool on)
         imx233_pinctrl_set_function(2, 27, PINCTRL_FUNCTION_GPIO);
         imx233_pinctrl_enable_gpio(2, 27, false);
         /* pin is set to 0 when an RDS packet has arrived */
-        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback);
+        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback, 0);
     }
     else
     {
-        imx233_pinctrl_setup_irq(2, 27, false, false, false, NULL);
+        imx233_pinctrl_setup_irq(2, 27, false, false, false, NULL, 0);
         imx233_pinctrl_release(2, 27, "tuner stc/rds");
     }
 }

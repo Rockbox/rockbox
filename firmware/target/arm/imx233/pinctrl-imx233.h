@@ -54,7 +54,7 @@ const char *imx233_pinctrl_blame(unsigned bank, unsigned pin);
 #define imx233_pinctrl_blame(...) NULL
 #endif
 
-typedef void (*pin_irq_cb_t)(int bank, int pin);
+typedef void (*pin_irq_cb_t)(int bank, int pin, intptr_t user);
 
 static inline void imx233_pinctrl_init(void)
 {
@@ -69,7 +69,7 @@ static inline void imx233_pinctrl_set_drive(unsigned bank, unsigned pin, unsigne
 
 static inline void imx233_pinctrl_enable_gpio(unsigned bank, unsigned pin, bool enable)
 {
-   if(enable)
+    if(enable)
         HW_PINCTRL_DOEn_SET(bank) = 1 << pin;
     else
         HW_PINCTRL_DOEn_CLR(bank) = 1 << pin;
@@ -128,7 +128,7 @@ static inline void imx233_pinctrl_enable_pullup_mask(unsigned bank, uint32_t pin
 
 /** On irq, the pin irq interrupt is disable and then cb is called;
  * the setup_pin_irq function needs to be called again to enable it again */
-void imx233_pinctrl_setup_irq(int bank, int pin, bool enable_int,
-    bool level, bool polarity, pin_irq_cb_t cb);
+void imx233_pinctrl_setup_irq(unsigned bank, unsigned pin, bool enable_int,
+    bool level, bool polarity, pin_irq_cb_t cb, intptr_t user);
 
 #endif /* __PINCTRL_IMX233_H__ */

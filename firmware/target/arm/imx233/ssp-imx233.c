@@ -335,8 +335,9 @@ void imx233_ssp_sd_mmc_power_up_sequence(int ssp)
     SSP_CLRn(SSP_CMD0, ssp, CONT_CLKING_EN);
 }
 
-static int ssp_detect_oneshot_callback(int ssp)
+static int ssp_detect_oneshot_callback(struct timeout *tmo)
 {
+    int ssp = tmo->data;
     ASSERT_SSP(ssp)
     if(ssp_detect_cb[ssp - 1])
         ssp_detect_cb[ssp - 1](ssp);
@@ -344,26 +345,13 @@ static int ssp_detect_oneshot_callback(int ssp)
     return 0;
 }
 
-static int ssp1_detect_oneshot_callback(struct timeout *tmo)
-{
-    (void) tmo;
-    return ssp_detect_oneshot_callback(1);
-}
+static struct timeout ssp_detect_oneshot[2];
 
-static int ssp2_detect_oneshot_callback(struct timeout *tmo)
+static void detect_irq(int bank, int pin, intptr_t ssp)
 {
-    (void) tmo;
-    return ssp_detect_oneshot_callback(2);
-}
-
-static void detect_irq(int bank, int pin)
-{
-    static struct timeout ssp1_detect_oneshot;
-    static struct timeout ssp2_detect_oneshot;
-    if(bank == 2 && pin == 1)
-        timeout_register(&ssp1_detect_oneshot, ssp1_detect_oneshot_callback, (3*HZ/10), 0);
-    else if(bank == 0 && pin == 19)
-        timeout_register(&ssp2_detect_oneshot, ssp2_detect_oneshot_callback, (3*HZ/10), 0);
+    (void) bank;
+    (void) pin;
+    timeout_register(&ssp_detect_oneshot[ssp - 1], ssp_detect_oneshot_callback, (3*HZ/10), ssp);
 }
 
 void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn,
@@ -381,8 +369,9 @@ void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn,
         imx233_pinctrl_enable_gpio(bank, pin, false);
     }
     if(first_time && imx233_ssp_sdmmc_detect(ssp))
-        detect_irq(bank, pin);
-    imx233_pinctrl_setup_irq(bank, pin, enable, true, !imx233_ssp_sdmmc_detect_raw(ssp), detect_irq);
+        detect_irq(bank, pin, ssp);
+    imx233_pinctrl_setup_irq(bank, pin, enable,
+        true, !imx233_ssp_sdmmc_detect_raw(ssp), detect_irq, ssp);
 }
 
 bool imx233_ssp_sdmmc_is_detect_inverted(int ssp)

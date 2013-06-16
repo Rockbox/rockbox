@@ -222,10 +222,11 @@ static int touchpad_read_device(void)
     return touchpad_btns;
 }
 
-static void rmi_attn_cb(int bank, int pin)
+static void rmi_attn_cb(int bank, int pin, intptr_t user)
 {
     (void) bank;
     (void) pin;
+    (void) user;
     /* the callback will not be fired until interrupt is enabled back so
      * the queue will not overflow or contain multiple RMI_INTERRUPT events */
     queue_post(&rmi_queue, RMI_INTERRUPT, 0);
@@ -271,7 +272,7 @@ static void rmi_thread(void)
             touchpad_btns = 0;
         
         /* enable interrupt */
-        imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb);
+        imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
     }
 }
 
@@ -328,7 +329,7 @@ void button_init_device(void)
     imx233_pinctrl_acquire(0, 27, "touchpad int");
     imx233_pinctrl_set_function(0, 27, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 27, false);
-    imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb);
+    imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
     /* Volume down */
     imx233_pinctrl_acquire(1, 30, "volume down");
     imx233_pinctrl_set_function(1, 30, PINCTRL_FUNCTION_GPIO);

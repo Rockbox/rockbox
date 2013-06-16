@@ -63,6 +63,7 @@ const char *imx233_pinctrl_blame(unsigned bank, unsigned pin)
 #endif
 
 static pin_irq_cb_t pin_cb[3][32]; /* 3 banks, 32 pins/bank */
+static intptr_t pin_cb_user[3][32];
 
 static void INT_GPIO(int bank)
 {
@@ -71,9 +72,12 @@ static void INT_GPIO(int bank)
         if(fire & (1 << pin))
         {
             pin_irq_cb_t cb = pin_cb[bank][pin];
-            imx233_pinctrl_setup_irq(bank, pin, false, false, false, NULL);
+            intptr_t arg = pin_cb_user[bank][pin];
+            /* WARNING: this call will modify pin_cb and pin_cb_user, that's
+             * why we copy the data before ! */
+            imx233_pinctrl_setup_irq(bank, pin, false, false, false, NULL, 0);
             if(cb)
-                cb(bank, pin);
+                cb(bank, pin, arg);
         }
 }
 
@@ -92,13 +96,14 @@ void INT_GPIO2(void)
     INT_GPIO(2);
 }
 
-void imx233_pinctrl_setup_irq(int bank, int pin, bool enable_int,
-    bool level, bool polarity, pin_irq_cb_t cb)
+void imx233_pinctrl_setup_irq(unsigned bank, unsigned pin, bool enable_int,
+    bool level, bool polarity, pin_irq_cb_t cb, intptr_t user)
 {
     HW_PINCTRL_PIN2IRQn_CLR(bank) = 1 << pin;
     HW_PINCTRL_IRQENn_CLR(bank) = 1 << pin;
     HW_PINCTRL_IRQSTATn_CLR(bank) = 1 << pin;
     pin_cb[bank][pin] = cb;
+    pin_cb_user[bank][pin] = user;
     if(enable_int)
     {
         if(level)
