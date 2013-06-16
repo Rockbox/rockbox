@@ -82,15 +82,14 @@ void INT_I2C_DMA(void)
 
 void imx233_i2c_init(void)
 {
-    //imx233_reset_block(&HW_I2C_CTRL0);
-    __REG_SET(HW_I2C_CTRL0) = __BLOCK_SFTRST;
+    BF_SET(I2C_CTRL0, SFTRST);
     /* setup pins (must be done when shutdown) */
     imx233_pinctrl_acquire_pin(0, 30, "i2c");
     imx233_pinctrl_acquire_pin(0, 31, "i2c");
     imx233_set_pin_function(0, 30, PINCTRL_FUNCTION_MAIN);
     imx233_set_pin_function(0, 31, PINCTRL_FUNCTION_MAIN);
     /* clear softreset */
-    __REG_CLR(HW_I2C_CTRL0) = __BLOCK_SFTRST | __BLOCK_CLKGATE;
+    imx233_reset_block(&HW_I2C_CTRL0);
     /* Errata:
      * When RETAIN_CLOCK is set, the ninth clock pulse (ACK) is not generated. However, the SDA
      * line is read at the proper timing interval. If RETAIN_CLOCK is cleared, the ninth clock pulse is
@@ -98,8 +97,8 @@ void imx233_i2c_init(void)
      * HW_I2C_CTRL1[ACK_MODE] has default value of 0. It should be set to 1 to enable the fix for
      * this issue.
      */
-    __REG_SET(HW_I2C_CTRL1) = HW_I2C_CTRL1__ACK_MODE;
-    __REG_SET(HW_I2C_CTRL0) = __BLOCK_CLKGATE;
+    BF_SET(I2C_CTRL1, ACK_MODE);
+    BF_SET(I2C_CTRL0, CLKGATE);
     /* Fast-mode @ 400K */
     HW_I2C_TIMING0 = 0x000F0007; /* tHIGH=0.6us, read at 0.3us */
     HW_I2C_TIMING1 = 0x001F000F; /* tLOW=1.3us, write at 0.6us */
@@ -113,7 +112,7 @@ void imx233_i2c_begin(void)
 {
     mutex_lock(&i2c_mutex);
     /* wakeup */
-    __REG_CLR(HW_I2C_CTRL0) = __BLOCK_CLKGATE;
+    BF_CLR(I2C_CTRL0, CLKGATE);
     i2c_nr_stages = 0;
     i2c_buffer_end = 0;
 }
@@ -148,7 +147,7 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
         i2c_stage[i2c_nr_stages - 1].dma.next = &i2c_stage[i2c_nr_stages].dma;
         i2c_stage[i2c_nr_stages - 1].dma.cmd |= HW_APB_CHx_CMD__CHAIN;
         if(!start)
-            i2c_stage[i2c_nr_stages - 1].ctrl0 |= HW_I2C_CTRL0__RETAIN_CLOCK;
+            i2c_stage[i2c_nr_stages - 1].ctrl0 |= BM_I2C_CTRL0_RETAIN_CLOCK;
     }
     i2c_stage[i2c_nr_stages].dma.buffer = i2c_buffer + start_off;
     i2c_stage[i2c_nr_stages].dma.next = NULL;
@@ -158,11 +157,9 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
         1 << HW_APB_CHx_CMD__CMDWORDS_BP |
         size << HW_APB_CHx_CMD__XFER_COUNT_BP;
     /* assume that any read is final (send nak on last) */
-    i2c_stage[i2c_nr_stages].ctrl0 = size |
-        (transmit ? HW_I2C_CTRL0__TRANSMIT : HW_I2C_CTRL0__SEND_NAK_ON_LAST) |
-        (start ? HW_I2C_CTRL0__PRE_SEND_START : 0) |
-        (stop ? HW_I2C_CTRL0__POST_SEND_STOP : 0) |
-        HW_I2C_CTRL0__MASTER_MODE;
+    i2c_stage[i2c_nr_stages].ctrl0 = BF_OR6(I2C_CTRL0,
+        XFER_COUNT(size), DIRECTION(transmit), SEND_NAK_ON_LAST(!transmit),
+        PRE_SEND_START(start), POST_SEND_STOP(stop), MASTER_MODE(1));
     i2c_nr_stages++;
     return I2C_SUCCESS;
 }
@@ -185,7 +182,7 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
         return I2C_ERROR;
     i2c_stage[i2c_nr_stages - 1].dma.cmd |= HW_APB_CHx_CMD__SEMAPHORE | HW_APB_CHx_CMD__IRQONCMPLT;
 
-    __REG_CLR(HW_I2C_CTRL1) = HW_I2C_CTRL1__ALL_IRQ;
+    BF_CLR(I2C_CTRL1, ALL_IRQ);
     imx233_dma_reset_channel(APB_I2C);
     imx233_icoll_enable_interrupt(INT_SRC_I2C_DMA, true);
     imx233_dma_enable_channel_interrupt(APB_I2C, true);
@@ -197,16 +194,16 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
         imx233_dma_reset_channel(APB_I2C);
         ret = I2C_TIMEOUT;
     }
-    else if(HW_I2C_CTRL1 & HW_I2C_CTRL1__MASTER_LOSS_IRQ)
+    else if(BF_RD(I2C_CTRL1, MASTER_LOSS_IRQ))
         ret = I2C_MASTER_LOSS;
-    else if(HW_I2C_CTRL1 & HW_I2C_CTRL1__NO_SLAVE_ACK_IRQ)
+    else if(BF_RD(I2C_CTRL1, NO_SLAVE_ACK_IRQ))
         ret= I2C_NO_SLAVE_ACK;
-    else if(HW_I2C_CTRL1 & HW_I2C_CTRL1__EARLY_TERM_IRQ)
+    else if(BF_RD(I2C_CTRL1, EARLY_TERM_IRQ))
         ret = I2C_SLAVE_NAK;
     else
         ret = imx233_i2c_finalize();
     /* sleep */
-    __REG_SET(HW_I2C_CTRL0) = __BLOCK_CLKGATE;
+    BF_SET(I2C_CTRL0, CLKGATE);
     mutex_unlock(&i2c_mutex);
     return ret;
 }

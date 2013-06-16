@@ -26,92 +26,11 @@
 #include "system-target.h"
 #include "i2c.h"
 
-#define HW_I2C_BASE         0x80058000 
+#include "regs/regs-i2c.h"
 
-#define HW_I2C_CTRL0        (*(volatile uint32_t *)(HW_I2C_BASE + 0x0))
-#define HW_I2C_CTRL0__XFER_COUNT_BM     0xffff
-#define HW_I2C_CTRL0__TRANSMIT          (1 << 16)
-#define HW_I2C_CTRL0__MASTER_MODE       (1 << 17)
-#define HW_I2C_CTRL0__SLAVE_ADDRESS_ENABLE  (1 << 18)
-#define HW_I2C_CTRL0__PRE_SEND_START    (1 << 19)
-#define HW_I2C_CTRL0__POST_SEND_STOP    (1 << 20)
-#define HW_I2C_CTRL0__RETAIN_CLOCK      (1 << 21)
-#define HW_I2C_CTRL0__CLOCK_HELD        (1 << 22)
-#define HW_I2C_CTRL0__PIO_MODE          (1 << 24)
-#define HW_I2C_CTRL0__SEND_NAK_ON_LAST  (1 << 25)
-#define HW_I2C_CTRL0__ACKNOWLEDGE       (1 << 26)
-#define HW_I2C_CTRL0__RUN               (1 << 29)
-
-#define HW_I2C_TIMING0      (*(volatile uint32_t *)(HW_I2C_BASE + 0x10))
-#define HW_I2C_TIMING0__RECV_COUNT_BM   0x3ff
-#define HW_I2C_TIMING0__HIGH_COUNT_BM   (0x3ff << 16)
-#define HW_I2C_TIMING0__HIGH_COUNT_BP   16
-
-#define HW_I2C_TIMING1      (*(volatile uint32_t *)(HW_I2C_BASE + 0x20))
-#define HW_I2C_TIMING1__XMIT_COUNT_BM   0x3ff
-#define HW_I2C_TIMING1__LOW_COUNT_BM    (0x3ff << 16)
-#define HW_I2C_TIMING1__LOW_COUNT_BP    16
-
-#define HW_I2C_TIMING2      (*(volatile uint32_t *)(HW_I2C_BASE + 0x30))
-#define HW_I2C_TIMING2__LEADIN_COUNT_BM 0x3ff
-#define HW_I2C_TIMING2__BUS_FREE_BM     (0x3ff << 16)
-#define HW_I2C_TIMING2__BUS_FREE_BP     16
-
-#define HW_I2C_CTRL1        (*(volatile uint32_t *)(HW_I2C_BASE + 0x40))
-#define HW_I2C_CTRL1__SLAVE_IRQ         (1 << 0)
-#define HW_I2C_CTRL1__SLAVE_STOP_IRQ    (1 << 1)
-#define HW_I2C_CTRL1__MASTER_LOSS_IRQ   (1 << 2)
-#define HW_I2C_CTRL1__EARLY_TERM_IRQ    (1 << 3)
-#define HW_I2C_CTRL1__OVERSIZE_XFER_TERM_IRQ    (1 << 4)
-#define HW_I2C_CTRL1__NO_SLAVE_ACK_IRQ  (1 << 5)
-#define HW_I2C_CTRL1__DATA_ENGINE_COMPLT_IRQ    (1 << 6)
-#define HW_I2C_CTRL1__BUS_FREE_IRQ      (1 << 7)
-#define HW_I2C_CTRL1__SLAVE_IRQ_EN      (1 << 8)
-#define HW_I2C_CTRL1__SLAVE_STOP_IRQ_EN (1 << 9)
-#define HW_I2C_CTRL1__MASTER_LOSS_IRQ_EN    (1 << 10)
-#define HW_I2C_CTRL1__EARLY_TERM_IRQ_EN (1 << 11)
-#define HW_I2C_CTRL1__OVERSIZE_XFER_TERM_IRQ_EN (1 << 12)
-#define HW_I2C_CTRL1__NO_SLAVE_ACK_IRQ_EN   (1 << 13)
-#define HW_I2C_CTRL1__DATA_ENGINE_COMPLT_IRQ_EN (1 << 14)
-#define HW_I2C_CTRL1__BUS_FREE_IRQ_EN   (1 << 15)
-#define HW_I2C_CTRL1__BCAST_SLAVE_EN    (1 << 24)
-#define HW_I2C_CTRL1__FORCE_CLK_IDLE    (1 << 25)
-#define HW_I2C_CTRL1__FORCE_DATA_IDLE   (1 << 26)
-#define HW_I2C_CTRL1__ACK_MODE          (1 << 27)
-#define HW_I2C_CTRL1__CLR_GOT_A_NAK     (1 << 28)
-#define HW_I2C_CTRL1__ALL_IRQ           0xff
-#define HW_I2C_CTRL1__ALL_IRQ_EN        0xff00
-
-#define HW_I2C_STAT         (*(volatile uint32_t *)(HW_I2C_BASE + 0x50))
-#define HW_I2C_STAT__SLAVE_IRQ_SUMMARY          (1 << 0)
-#define HW_I2C_STAT__SLAVE_STOP_IRQ_SUMMARY     (1 << 1)
-#define HW_I2C_STAT__MASTER_LOSS_IRQ_SUMMARY    (1 << 2)
-#define HW_I2C_STAT__EARLY_TERM_IRQ_SUMMARY     (1 << 3)
-#define HW_I2C_STAT__OVERSIZE_XFER_TERM_IRQ_SUMMARY     (1 << 4)
-#define HW_I2C_STAT__NO_SLAVE_ACK_IRQ_SUMMARY   (1 << 5)
-#define HW_I2C_STAT__DATA_ENGINE_COMPLT_IRQ_SUMMARY     (1 << 6)
-#define HW_I2C_STAT__BUS_FREE_IRQ_SUMMARY       (1 << 7)
-#define HW_I2C_STAT__SLAVE_BUSY                 (1 << 8)
-#define HW_I2C_STAT__DATA_ENGINE_BUSY           (1 << 9)
-#define HW_I2C_STAT__CLK_GEN_BUSY               (1 << 10)
-#define HW_I2C_STAT__BUS_BUSY                   (1 << 11)
-#define HW_I2C_STAT__DATA_ENGINE_DMA_WAIT       (1 << 12)
-#define HW_I2C_STAT__SLAVE_SEARCHING            (1 << 13)
-#define HW_I2C_STAT__SLAVE_FOUND                (1 << 14)
-#define HW_I2C_STAT__SLAVE_ADDR_EQ_ZERO         (1 << 15)
-#define HW_I2C_STAT__RCVD_SLAVE_ADDR_BM         (0xff << 16)
-#define HW_I2C_STAT__RCVD_SLAVE_ADDR_BP         16
-#define HW_I2C_STAT__GOT_A_NAK                  (1 << 28)
-#define HW_I2C_STAT__ANY_ENABLED_IRQ            (1 << 29)
-#define HW_I2C_STAT__MASTER_PRESENT             (1 << 31)
-
-#define HW_I2C_DATA         (*(volatile uint32_t *)(HW_I2C_BASE + 0x60))
-
-#define HW_I2C_DEBUG0       (*(volatile uint32_t *)(HW_I2C_BASE + 0x70))
-
-#define HW_I2C_DEBUG1       (*(volatile uint32_t *)(HW_I2C_BASE + 0x80))
-
-#define HW_I2C_VERSION      (*(volatile uint32_t *)(HW_I2C_BASE + 0x90))
+#define BM_I2C_CTRL1_ALL_IRQ \
+    BM_OR8(I2C_CTRL1, SLAVE_IRQ, SLAVE_STOP_IRQ, MASTER_LOSS_IRQ, EARLY_TERM_IRQ, \
+        OVERSIZE_XFER_TERM_IRQ, NO_SLAVE_ACK_IRQ, DATA_ENGINE_CMPLT_IRQ, BUS_FREE_IRQ)
 
 enum imx233_i2c_error_t
 {
