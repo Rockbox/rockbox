@@ -33,13 +33,26 @@
 
 #define IMX233_PWM_NR_CHANNELS  5
 
-#define IMX233_PWM_PIN_BANK(channel)    1
-#define IMX233_PWM_PIN(channel) (26 + (channel))
-
 void imx233_pwm_init(void);
-void imx233_pwm_setup_channel(int channel, int period, int cdiv, int active,
+void imx233_pwm_setup(int channel, int period, int cdiv, int active,
     int active_state, int inactive, int inactive_state);
-void imx233_pwm_enable_channel(int channel, bool enable);
-bool imx233_pwm_is_channel_enable(int channel);
+/* helper function to compute adequate divisor and period, given a minimum
+ * period resolution (for active/inactive) */
+void imx233_pwm_lookup_freq(int freq, int min_period, int *period, int *cdiv);
+/* simple setup with active 1, inactive 0, duty cycle in percent */
+void imx233_pwm_setup_simple(int channel, int freq, int duty_cycle);
+void imx233_pwm_enable(int channel, bool enable);
+bool imx233_pwm_is_enabled(int channel);
+
+struct imx233_pwm_info_t
+{
+    bool enabled;
+    int cdiv;
+    int period;
+    int inactive, active;
+    char inactive_state, active_state; // '0', '1' or 'Z'
+};
+
+struct imx233_pwm_info_t imx233_pwm_get_info(int channel);
 
 #endif /* __PWM_IMX233_H__ */
