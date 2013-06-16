@@ -26,9 +26,9 @@
 void imx233_clkctrl_enable_xtal(enum imx233_xtal_clk_t xtal_clk, bool enable)
 {
     if(enable)
-        __REG_CLR(HW_CLKCTRL_XTAL) = xtal_clk;
+        HW_CLKCTRL_XTAL_CLR = xtal_clk;
     else
-        __REG_SET(HW_CLKCTRL_XTAL) = xtal_clk;
+        HW_CLKCTRL_XTAL_SET = xtal_clk;
 }
 
 bool imx233_clkctrl_is_xtal_enable(enum imx233_xtal_clk_t clk)
@@ -38,78 +38,49 @@ bool imx233_clkctrl_is_xtal_enable(enum imx233_xtal_clk_t clk)
 
 void imx233_clkctrl_enable_clock(enum imx233_clock_t clk, bool enable)
 {
-    volatile uint32_t *REG;
+    bool gate = !enable;
     switch(clk)
     {
-        case CLK_PIX: REG = &HW_CLKCTRL_PIX; break;
-        case CLK_SSP: REG = &HW_CLKCTRL_SSP; break;
+        case CLK_PIX: BF_WR(CLKCTRL_PIX, CLKGATE, gate); break;
+        case CLK_SSP: BF_WR(CLKCTRL_SSP, CLKGATE, gate); break;
         case CLK_PLL:
-        {
+            /* pll is a special case */
             if(enable)
             {
-                __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__POWER;
-                while(!(HW_CLKCTRL_PLLCTRL1 & HW_CLKCTRL_PLLCTRL1__LOCK));
+                BF_SET(CLKCTRL_PLLCTRL0, POWER);
+                while(!BF_RD(CLKCTRL_PLLCTRL1, LOCK));
             }
             else
-                __REG_CLR(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__POWER;
-            return;
-        }
-        default: return;
-    }
-
-    /* warning: some registers like HW_CLKCTRL_PIX don't have a CLR/SET variant ! */
-    if(enable)
-    {
-        *REG = (*REG) & ~__CLK_CLKGATE;
-        while((*REG) & __CLK_CLKGATE);
-        while((*REG) & __CLK_BUSY);
-    }
-    else
-    {
-        *REG |= __CLK_CLKGATE;
-        while(!((*REG) & __CLK_CLKGATE));
+                BF_CLR(CLKCTRL_PLLCTRL0, POWER);
+            break;
+        default:
+            break;
     }
 }
 
 bool imx233_clkctrl_is_clock_enabled(enum imx233_clock_t clk)
 {
-    volatile uint32_t *REG;
     switch(clk)
     {
-        case CLK_PLL: return HW_CLKCTRL_PLLCTRL0 & HW_CLKCTRL_PLLCTRL0__POWER;
-        case CLK_PIX: REG = &HW_CLKCTRL_PIX; break;
-        case CLK_SSP: REG = &HW_CLKCTRL_SSP; break;
+        case CLK_PLL: return BF_RD(CLKCTRL_PLLCTRL0, POWER);
+        case CLK_PIX: return !BF_RD(CLKCTRL_PIX, CLKGATE);
+        case CLK_SSP: return !BF_RD(CLKCTRL_SSP, CLKGATE);
         default: return true;
     }
-
-    return !((*REG) & __CLK_CLKGATE);
 }
 
 void imx233_clkctrl_set_clock_divisor(enum imx233_clock_t clk, int div)
 {
-    /* warning: some registers like HW_CLKCTRL_PIX don't have a CLR/SET variant ! */
+    /* warning: some registers like HW_CLKCTRL_PIX don't have a CLR/SET variant !
+     * assume that we always derive emi and cpu from ref_XX */
     switch(clk)
     {
-        case CLK_PIX:
-            __FIELD_SET(HW_CLKCTRL_PIX, DIV, div);
-            break;
-        case CLK_SSP:
-            __FIELD_SET(HW_CLKCTRL_SSP, DIV, div);
-            break;
-        case CLK_CPU:
-            __FIELD_SET(HW_CLKCTRL_CPU, DIV_CPU, div);
-            break;
-        case CLK_EMI:
-            __FIELD_SET(HW_CLKCTRL_EMI, DIV_EMI, div);
-            break;
-        case CLK_HBUS:
-            /* disable frac enable at the same time */
-            HW_CLKCTRL_HBUS = div << HW_CLKCTRL_HBUS__DIV_BP |
-                (HW_CLKCTRL_HBUS & ~(HW_CLKCTRL_HBUS__DIV_FRAC_EN | HW_CLKCTRL_HBUS__DIV_BM));
-            break;
-        case CLK_XBUS:
-            __FIELD_SET(HW_CLKCTRL_XBUS, DIV, div);
-            break;
+        case CLK_PIX: BF_WR(CLKCTRL_PIX, DIV, div); break;
+        case CLK_CPU: BF_WR(CLKCTRL_CPU, DIV_CPU, div); break;
+        case CLK_EMI: BF_WR(CLKCTRL_EMI, DIV_EMI, div); break;
+        case CLK_SSP: BF_WR(CLKCTRL_SSP, DIV, div); break;
+        case CLK_HBUS: BF_WR(CLKCTRL_HBUS, DIV, div); break;
+        case CLK_XBUS: BF_WR(CLKCTRL_XBUS, DIV, div); break;
         default: return;
     }
 }
@@ -118,66 +89,54 @@ int imx233_clkctrl_get_clock_divisor(enum imx233_clock_t clk)
 {
     switch(clk)
     {
-        case CLK_PIX: return __XTRACT(HW_CLKCTRL_PIX, DIV);
-        case CLK_SSP: return __XTRACT(HW_CLKCTRL_SSP, DIV);
-        case CLK_CPU: return __XTRACT(HW_CLKCTRL_CPU, DIV_CPU);
-        case CLK_EMI: return __XTRACT(HW_CLKCTRL_EMI, DIV_EMI);
-        case CLK_HBUS:
-            if(HW_CLKCTRL_HBUS & HW_CLKCTRL_HBUS__DIV_FRAC_EN)
-                return 0;
-            else
-                return __XTRACT(HW_CLKCTRL_HBUS, DIV);
-        case CLK_XBUS: return __XTRACT(HW_CLKCTRL_XBUS, DIV);
+        case CLK_PIX: return BF_RD(CLKCTRL_PIX, DIV);
+        case CLK_CPU: return BF_RD(CLKCTRL_CPU, DIV_CPU);
+        case CLK_EMI: return BF_RD(CLKCTRL_EMI, DIV_EMI);
+        case CLK_SSP: return BF_RD(CLKCTRL_SSP, DIV);
+        case CLK_HBUS: return BF_RD(CLKCTRL_HBUS, DIV);
+        case CLK_XBUS: return BF_RD(CLKCTRL_XBUS, DIV);
         default: return 0;
     }
 }
 
 void imx233_clkctrl_set_fractional_divisor(enum imx233_clock_t clk, int fracdiv)
 {
-    /* NOTE: HW_CLKCTRL_FRAC only support byte access ! */
-    volatile uint8_t *REG;
+#define handle_frac(dev) \
+    case CLK_##dev: \
+        if(fracdiv == 0) \
+            BF_SET(CLKCTRL_FRAC, CLKGATE##dev); \
+        else { \
+            BF_WR(CLKCTRL_FRAC, dev##FRAC, fracdiv); \
+            BF_CLR(CLKCTRL_FRAC, CLKGATE##dev); } \
+        break;
     switch(clk)
     {
-        case CLK_HBUS:
-            /* set frac enable at the same time */
-            HW_CLKCTRL_HBUS = fracdiv << HW_CLKCTRL_HBUS__DIV_BP | HW_CLKCTRL_HBUS__DIV_FRAC_EN |
-                (HW_CLKCTRL_HBUS & ~HW_CLKCTRL_HBUS__DIV_BM);
-            return;
-        case CLK_PIX: REG = &HW_CLKCTRL_FRAC_PIX; break;
-        case CLK_IO: REG = &HW_CLKCTRL_FRAC_IO; break;
-        case CLK_CPU: REG = &HW_CLKCTRL_FRAC_CPU; break;
-        case CLK_EMI: REG = &HW_CLKCTRL_FRAC_EMI; break;
-        default: return;
+        handle_frac(PIX)
+        handle_frac(IO)
+        handle_frac(CPU)
+        handle_frac(EMI)
+        default: break;
     }
-
-    if(fracdiv != 0)
-        *REG = fracdiv;
-    else
-        *REG = HW_CLKCTRL_FRAC_XX__CLKGATEXX;
+#undef handle_frac
 }
 
 int imx233_clkctrl_get_fractional_divisor(enum imx233_clock_t clk)
 {
-    /* NOTE: HW_CLKCTRL_FRAC only support byte access ! */
-    volatile uint8_t *REG;
+#define handle_frac(dev) \
+    case CLK_##dev:\
+        if(BF_RD(CLKCTRL_FRAC, CLKGATE##dev)) \
+            return 0; \
+        else \
+            return BF_RD(CLKCTRL_FRAC, dev##FRAC);
     switch(clk)
     {
-        case CLK_HBUS:
-            if(HW_CLKCTRL_HBUS & HW_CLKCTRL_HBUS__DIV_FRAC_EN)
-                return __XTRACT(HW_CLKCTRL_HBUS, DIV);
-            else
-                return 0;
-        case CLK_PIX: REG = &HW_CLKCTRL_FRAC_PIX; break;
-        case CLK_IO: REG = &HW_CLKCTRL_FRAC_IO; break;
-        case CLK_CPU: REG = &HW_CLKCTRL_FRAC_CPU; break;
-        case CLK_EMI: REG = &HW_CLKCTRL_FRAC_EMI; break;
+        handle_frac(PIX)
+        handle_frac(IO)
+        handle_frac(CPU)
+        handle_frac(EMI)
         default: return 0;
     }
-
-    if((*REG) & HW_CLKCTRL_FRAC_XX__CLKGATEXX)
-        return 0;
-    else
-        return *REG & ~HW_CLKCTRL_FRAC_XX__XX_STABLE;
+#undef handle_frac
 }
 
 void imx233_clkctrl_set_bypass_pll(enum imx233_clock_t clk, bool bypass)
@@ -185,45 +144,42 @@ void imx233_clkctrl_set_bypass_pll(enum imx233_clock_t clk, bool bypass)
     uint32_t msk;
     switch(clk)
     {
-        case CLK_PIX: msk = HW_CLKCTRL_CLKSEQ__BYPASS_PIX; break;
-        case CLK_SSP: msk = HW_CLKCTRL_CLKSEQ__BYPASS_SSP; break;
-        case CLK_CPU: msk = HW_CLKCTRL_CLKSEQ__BYPASS_CPU; break;
-        case CLK_EMI: msk = HW_CLKCTRL_CLKSEQ__BYPASS_EMI; break;
+        case CLK_PIX: msk = BM_CLKCTRL_CLKSEQ_BYPASS_PIX; break;
+        case CLK_SSP: msk = BM_CLKCTRL_CLKSEQ_BYPASS_SSP; break;
+        case CLK_CPU: msk = BM_CLKCTRL_CLKSEQ_BYPASS_CPU; break;
+        case CLK_EMI: msk = BM_CLKCTRL_CLKSEQ_BYPASS_EMI; break;
         default: return;
     }
 
     if(bypass)
-        __REG_SET(HW_CLKCTRL_CLKSEQ) = msk;
+        HW_CLKCTRL_CLKSEQ_SET = msk;
     else
-        __REG_CLR(HW_CLKCTRL_CLKSEQ) = msk;
+        HW_CLKCTRL_CLKSEQ_CLR = msk;
 }
 
 bool imx233_clkctrl_get_bypass_pll(enum imx233_clock_t clk)
 {
-    uint32_t msk;
     switch(clk)
     {
-        case CLK_PIX: msk = HW_CLKCTRL_CLKSEQ__BYPASS_PIX; break;
-        case CLK_SSP: msk = HW_CLKCTRL_CLKSEQ__BYPASS_SSP; break;
-        case CLK_CPU: msk = HW_CLKCTRL_CLKSEQ__BYPASS_CPU; break;
-        case CLK_EMI: msk = HW_CLKCTRL_CLKSEQ__BYPASS_EMI; break;
+        case CLK_PIX: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_PIX);
+        case CLK_SSP: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_SSP);
+        case CLK_CPU: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_CPU);
+        case CLK_EMI: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_EMI);
         default: return false;
     }
-
-    return HW_CLKCTRL_CLKSEQ & msk;
 }
 
 void imx233_clkctrl_enable_usb_pll(bool enable)
 {
     if(enable)
-        __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS;
+        BF_SET(CLKCTRL_PLLCTRL0, EN_USB_CLKS);
     else
-        __REG_CLR(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS;
+        BF_CLR(CLKCTRL_PLLCTRL0, EN_USB_CLKS);
 }
 
 bool imx233_clkctrl_is_usb_pll_enabled(void)
 {
-    return HW_CLKCTRL_PLLCTRL0 & HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS;
+    return BF_RD(CLKCTRL_PLLCTRL0, EN_USB_CLKS);
 }
 
 void imx233_clkctrl_set_auto_slow_divisor(enum imx233_as_div_t div)
@@ -231,34 +187,31 @@ void imx233_clkctrl_set_auto_slow_divisor(enum imx233_as_div_t div)
     /* the SLOW_DIV must only be set when auto-slow is disabled */
     bool old_status = imx233_clkctrl_is_auto_slow_enabled();
     imx233_clkctrl_enable_auto_slow(false);
-    __FIELD_SET(HW_CLKCTRL_HBUS, SLOW_DIV, div);
+    BF_WR(CLKCTRL_HBUS, SLOW_DIV, div);
     imx233_clkctrl_enable_auto_slow(old_status);
 }
 
 enum imx233_as_div_t imx233_clkctrl_get_auto_slow_divisor(void)
 {
-    return __XTRACT(HW_CLKCTRL_HBUS, SLOW_DIV);
+    return BF_RD(CLKCTRL_HBUS, SLOW_DIV);
 }
 
 void imx233_clkctrl_enable_auto_slow(bool enable)
 {
-    if(enable)
-        __REG_SET(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__AUTO_SLOW_MODE;
-    else
-        __REG_CLR(HW_CLKCTRL_HBUS) = HW_CLKCTRL_HBUS__AUTO_SLOW_MODE;
+    BF_WR(CLKCTRL_HBUS, AUTO_SLOW_MODE, enable);
 }
 
 bool imx233_clkctrl_is_auto_slow_enabled(void)
 {
-    return HW_CLKCTRL_HBUS & HW_CLKCTRL_HBUS__AUTO_SLOW_MODE;
+    return BF_RD(CLKCTRL_HBUS, AUTO_SLOW_MODE);
 }
 
 void imx233_clkctrl_enable_auto_slow_monitor(enum imx233_as_monitor_t monitor, bool enable)
 {
     if(enable)
-        __REG_SET(HW_CLKCTRL_HBUS) = monitor;
+        HW_CLKCTRL_HBUS_SET = monitor;
     else
-        __REG_CLR(HW_CLKCTRL_HBUS) = monitor;
+        HW_CLKCTRL_HBUS_CLR = monitor;
 }
 
 bool imx233_clkctrl_is_auto_slow_monitor_enabled(enum imx233_as_monitor_t monitor)
@@ -268,7 +221,7 @@ bool imx233_clkctrl_is_auto_slow_monitor_enabled(enum imx233_as_monitor_t monito
 
 bool imx233_clkctrl_is_emi_sync_enabled(void)
 {
-    return !!(HW_CLKCTRL_EMI & HW_CLKCTRL_EMI__SYNC_MODE_EN);
+    return BF_RD(CLKCTRL_EMI, SYNC_MODE_EN);
 }
 
 unsigned imx233_clkctrl_get_clock_freq(enum imx233_clock_t clk)
@@ -289,9 +242,9 @@ unsigned imx233_clkctrl_get_clock_freq(enum imx233_clock_t clk)
             {
                 ref = imx233_clkctrl_get_clock_freq(CLK_XTAL);
                 /* Integer divide mode vs fractional divide mode */
-                if(HW_CLKCTRL_CPU & HW_CLKCTRL_CPU__DIV_XTAL_FRAC_EN)
+                if(BF_RD(CLKCTRL_CPU, DIV_XTAL_FRAC_EN))
 
-                    return (ref * __XTRACT(HW_CLKCTRL_CPU, DIV_XTAL)) / 32;
+                    return (ref * BF_RD(CLKCTRL_CPU, DIV_XTAL)) / 32;
                 else
                     return ref / imx233_clkctrl_get_clock_divisor(CLK_CPU);
             }
@@ -357,10 +310,10 @@ unsigned imx233_clkctrl_get_clock_freq(enum imx233_clock_t clk)
             if(imx233_clkctrl_get_bypass_pll(CLK_EMI))
             {
                 ref = imx233_clkctrl_get_clock_freq(CLK_XTAL);
-                if(HW_CLKCTRL_EMI & HW_CLKCTRL_EMI__CLKGATE)
+                if(BF_RD(CLKCTRL_EMI, CLKGATE))
                     return 0;
                 else
-                    return ref / __XTRACT(HW_CLKCTRL_EMI, DIV_XTAL);
+                    return ref / BF_RD(CLKCTRL_EMI, DIV_XTAL);
             }
             else
             {

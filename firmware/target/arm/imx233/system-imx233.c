@@ -44,7 +44,7 @@
 
 void imx233_chip_reset(void)
 {
-    HW_CLKCTRL_RESET = HW_CLKCTRL_RESET_CHIP;
+    HW_CLKCTRL_RESET = BM_CLKCTRL_RESET_CHIP;
 }
 
 void system_reboot(void)

@@ -91,33 +91,37 @@ static void set_frequency(unsigned long freq) ICODE_ATTR;
 
 static void set_frequency(unsigned long freq)
 {
-    /* Set divider and clear clkgate. Do byte access to register to avoid bothering
-     * with other PFDs */
+    /** WARNING all restriction of imx233_emi_set_frequency apply here !! */
+    /* Set divider and clear clkgate. */
+    unsigned fracdiv;
+    unsigned div;
     switch(freq)
     {
         case IMX233_EMIFREQ_151_MHz:
             /* clk_emi@ref_emi/3*18/19 */
-            HW_CLKCTRL_FRAC_EMI = 19;
-            __FIELD_SET(HW_CLKCTRL_EMI, DIV_EMI, 3);
+            fracdiv = 19;
+            div = 3;
             /* ref_emi@480 MHz
              * clk_emi@151.58 MHz */
             break;
         case IMX233_EMIFREQ_130_MHz:
             /* clk_emi@ref_emi/2*18/33 */
-            HW_CLKCTRL_FRAC_EMI = 33;
-            __FIELD_SET(HW_CLKCTRL_EMI, DIV_EMI, 2);
+            fracdiv = 33;
+            div = 2;
             /* ref_emi@480 MHz
              * clk_emi@130.91 MHz */
             break;
         case IMX233_EMIFREQ_64_MHz:
         default:
             /* clk_emi@ref_emi/5*18/27 */
-            HW_CLKCTRL_FRAC_EMI = 27;
-            __FIELD_SET(HW_CLKCTRL_EMI, DIV_EMI, 5);
+            fracdiv = 27;
+            div = 5;
             /* ref_emi@480 MHz
              * clk_emi@64 MHz */
             break;
     }
+    BF_WR(CLKCTRL_FRAC, EMIFRAC, fracdiv);
+    BF_WR(CLKCTRL_EMI, DIV_EMI, div);
 }
 
 void imx233_emi_set_frequency(unsigned long freq) ICODE_ATTR;
@@ -162,17 +166,17 @@ void imx233_emi_set_frequency(unsigned long freq)
         HW_DRAM_CTLxx(regs->index) = regs->value;
     while((regs++)->index != 40);
     /* switch emi to xtal */
-    __REG_SET(HW_CLKCTRL_CLKSEQ) = HW_CLKCTRL_CLKSEQ__BYPASS_EMI;
+    BF_SET(CLKCTRL_CLKSEQ, BYPASS_EMI);
     /* wait for transition */
-    while(HW_CLKCTRL_EMI & HW_CLKCTRL_EMI__BUSY_REF_XTAL);
+    while(BF_RD(CLKCTRL_EMI, BUSY_REF_XTAL));
     /* put emi dll into reset mode */
     __REG_SET(HW_EMI_CTRL) = HW_EMI_CTRL__DLL_RESET | HW_EMI_CTRL__DLL_SHIFT_RESET;
     /* load the new frequency dividers */
     set_frequency(freq);
     /* switch emi back to pll */
-    __REG_CLR(HW_CLKCTRL_CLKSEQ) = HW_CLKCTRL_CLKSEQ__BYPASS_EMI;
+    BF_CLR(CLKCTRL_CLKSEQ, BYPASS_EMI);
     /* wait for transition */
-    while(HW_CLKCTRL_EMI & HW_CLKCTRL_EMI__BUSY_REF_EMI);
+    while(BF_RD(CLKCTRL_EMI, BUSY_REF_EMI));
     /* allow emi dll to lock again */
     __REG_CLR(HW_EMI_CTRL) = HW_EMI_CTRL__DLL_RESET | HW_EMI_CTRL__DLL_SHIFT_RESET;
     /* wait for lock */
