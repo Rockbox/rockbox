@@ -24,28 +24,7 @@
 #include "config.h"
 #include "system.h"
 
-#define HW_OCOTP_BASE           0x8002c000
-
-#define HW_OCOTP_CTRL           (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x0))
-#define HW_OCOTP_CTRL__RD_BANK_OPEN (1 << 12)
-#define HW_OCOTP_CTRL__ERROR        (1 << 9)
-#define HW_OCOTP_CTRL__BUSY         (1 << 8)
-
-#define HW_OCOTP_CUSTx(x)       (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x20 + 0x10 * (x)))
-
-#define HW_OCOTP_CRYPTOx(x)     (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x60 + 0x10 * (x)))
-
-#define HW_OCOTP_HWCAPx(x)      (*(volatile uint32_t *)(HW_OCOTP_BASE + 0xa0 + 0x10 * (x)))
-
-#define HW_OCOTP_SWCAP          (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x100))
-
-#define HW_OCOTP_CUSTCAP        (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x110))
-
-#define HW_OCOTP_OPSx(x)        (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x130 + 0x10 * (x)))
-
-#define HW_OCOTP_UNx(x)         (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x170 + 0x10 * (x)))
-
-#define HW_OCOTP_ROMx(x)        (*(volatile uint32_t *)(HW_OCOTP_BASE + 0x1a0 + 0x10 * (x)))
+#include "regs/regs-ocotp.h"
 
 #define IMX233_NUM_OCOTP_CUST   4
 #define IMX233_NUM_OCOTP_CRYPTO 4
@@ -54,19 +33,19 @@
 #define IMX233_NUM_OCOTP_UN     3
 #define IMX233_NUM_OCOTP_ROM    8
 
-static void imx233_ocotp_open_banks(bool open)
+static inline void imx233_ocotp_open_banks(bool open)
 {
     if(open)
     {
-        __REG_CLR(HW_OCOTP_CTRL) = HW_OCOTP_CTRL__ERROR;
-        __REG_SET(HW_OCOTP_CTRL) = HW_OCOTP_CTRL__RD_BANK_OPEN;
-        while(HW_OCOTP_CTRL & HW_OCOTP_CTRL__BUSY);
+        BF_CLR(OCOTP_CTRL, ERROR);
+        BF_SET(OCOTP_CTRL, RD_BANK_OPEN);
+        while(BF_RD(OCOTP_CTRL, BUSY));
     }
     else
-        __REG_CLR(HW_OCOTP_CTRL) = HW_OCOTP_CTRL__RD_BANK_OPEN;
+        BF_CLR(OCOTP_CTRL, RD_BANK_OPEN);
 }
 
-static uint32_t imx233_ocotp_read(volatile uint32_t *reg)
+static inline uint32_t imx233_ocotp_read(volatile uint32_t *reg)
 {
     imx233_ocotp_open_banks(true);
     uint32_t val = *reg;

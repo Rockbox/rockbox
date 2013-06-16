@@ -338,7 +338,7 @@ static void set_serial_descriptor(void)
 {
     short* p = &usb_string_iSerial.wString[1];
     for(int i = 0; i < IMX233_NUM_OCOTP_OPS; i++) {
-        uint32_t ops = imx233_ocotp_read(&HW_OCOTP_OPSx(i));
+        uint32_t ops = imx233_ocotp_read(&HW_OCOTP_OPSn(i));
         for(int j = 0; j < 8; j++) {
             *p++ = hex[(ops >> 28) & 0xF];
             ops <<= 4;
