@@ -27,106 +27,26 @@
 #include "pinctrl-imx233.h"
 #include "dma-imx233.h"
 
+#include "regs/regs-ssp.h"
+
+#define IMX233_NR_SSP  2
+
 /* ssp can value 1 or 2 */
 #define __SSP_SELECT(ssp, ssp1, ssp2) ((ssp) == 1 ? (ssp1) : (ssp2))
 
 #define INT_SRC_SSP_DMA(ssp)    __SSP_SELECT(ssp, INT_SRC_SSP1_DMA, INT_SRC_SSP2_DMA)
 #define INT_SRC_SSP_ERROR(ssp)  __SSP_SELECT(ssp, INT_SRC_SSP1_ERROR, INT_SRC_SSP2_ERROR)
 
-#define HW_SSP1_BASE        0x80010000
-#define HW_SSP2_BASE        0x80034000
+#define BP_SSP_CTRL1_ALL_IRQ    0
+#define BM_SSP_CTRL1_ALL_IRQ \
+    BM_OR8(SSP_CTRL1, SDIO_IRQ, RESP_ERR_IRQ, RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, \
+        DATA_CRC_IRQ, FIFO_UNDERRUN_IRQ, RECV_TIMEOUT_IRQ, FIFO_OVERRUN_IRQ)
+#define BM_SSP_CTRL1_ALL_IRQ_EN \
+    BM_OR8(SSP_CTRL1, SDIO_IRQ_EN, RESP_ERR_IRQ_EN, RESP_TIMEOUT_IRQ_EN, DATA_TIMEOUT_IRQ_EN, \
+        DATA_CRC_IRQ_EN, FIFO_UNDERRUN_EN, RECV_TIMEOUT_IRQ_EN, FIFO_OVERRUN_IRQ_EN)
 
-#define HW_SSP_BASE(ssp)    __SSP_SELECT(ssp, HW_SSP1_BASE, HW_SSP2_BASE)
-
-#define HW_SSP_CTRL0(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x0))
-#define HW_SSP_CTRL0__RUN           (1 << 29)
-#define HW_SSP_CTRL0__SDIO_IRQ_CHECK    (1 << 28)
-#define HW_SSP_CTRL0__LOCK_CS       (1 << 27)
-#define HW_SSP_CTRL0__IGNORE_CRC    (1 << 26)
-#define HW_SSP_CTRL0__READ          (1 << 25)
-#define HW_SSP_CTRL0__DATA_XFER     (1 << 24)
-#define HW_SSP_CTRL0__BUS_WIDTH_BM  (3 << 22)
-#define HW_SSP_CTRL0__BUS_WIDTH_BP  22
-#define HW_SSP_CTRL0__BUS_WIDTH__ONE_BIT    0
-#define HW_SSP_CTRL0__BUS_WIDTH__FOUR_BIT   1
-#define HW_SSP_CTRL0__BUS_WIDTH__EIGHT_BIT  2
-#define HW_SSP_CTRL0__WAIT_FOR_IRQ  (1 << 21)
-#define HW_SSP_CTRL0__WAIT_FOR_CMD  (1 << 20)
-#define HW_SSP_CTRL0__LONG_RESP     (1 << 19)
-#define HW_SSP_CTRL0__CHECK_RESP    (1 << 18)
-#define HW_SSP_CTRL0__GET_RESP      (1 << 17)
-#define HW_SSP_CTRL0__ENABLE        (1 << 16)
-#define HW_SSP_CTRL0__XFER_COUNT_BM 0xffff
-
-
-#define HW_SSP_CMD0(ssp)    (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x10))
-#define HW_SSP_CMD0__SLOW_CLKING_EN     (1 << 22)
-#define HW_SSP_CMD0__CONT_CLKING_EN     (1 << 21)
-#define HW_SSP_CMD0__APPEND_8CYC        (1 << 20)
-#define HW_SSP_CMD0__BLOCK_SIZE_BM      (0xf << 16)
-#define HW_SSP_CMD0__BLOCK_SIZE_BP      16
-#define HW_SSP_CMD0__BLOCK_COUNT_BM     (0xff << 8)
-#define HW_SSP_CMD0__BLOCK_COUNT_BP     8
-#define HW_SSP_CMD0__CMD_BM             0xff
-
-#define HW_SSP_CMD1(ssp)    (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x20))
-
-#define HW_SSP_TIMING(ssp)  (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x50))
-#define HW_SSP_TIMING__CLOCK_TIMEOUT_BM 0xffff0000
-#define HW_SSP_TIMING__CLOCK_TIMEOUT_BP 16
-#define HW_SSP_TIMING__CLOCK_DIVIDE_BM  0xff00
-#define HW_SSP_TIMING__CLOCK_DIVIDE_BP  8
-#define HW_SSP_TIMING__CLOCK_RATE_BM    0xff
-
-#define HW_SSP_CTRL1(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x60))
-#define HW_SSP_CTRL1__SDIO_IRQ          (1 << 31)
-#define HW_SSP_CTRL1__SDIO_IRQ_EN       (1 << 30)
-#define HW_SSP_CTRL1__RESP_ERR_IRQ      (1 << 29)
-#define HW_SSP_CTRL1__RESP_ERR_IRQ_EN   (1 << 28)
-#define HW_SSP_CTRL1__RESP_TIMEOUT_IRQ  (1 << 27)
-#define HW_SSP_CTRL1__RESP_TIMEOUT_IRQ_EN  (1 << 26)
-#define HW_SSP_CTRL1__DATA_TIMEOUT_IRQ  (1 << 25)
-#define HW_SSP_CTRL1__DATA_TIMEOUT_IRQ_EN  (1 << 24)
-#define HW_SSP_CTRL1__DATA_CRC_IRQ      (1 << 23)
-#define HW_SSP_CTRL1__DATA_CRC_IRQ_EN   (1 << 22)
-#define HW_SSP_CTRL1__FIFO_UNDERRUN_IRQ (1 << 21)
-#define HW_SSP_CTRL1__FIFO_UNDERRUN_IRQ_EN (1 << 20)
-#define HW_SSP_CTRL1__RECV_TIMEOUT_IRQ  (1 << 17)
-#define HW_SSP_CTRL1__RECV_TIMEOUT_IRQ_EN   (1 << 16)
-#define HW_SSP_CTRL1__FIFO_OVERRUN_IRQ  (1 << 15)
-#define HW_SSP_CTRL1__FIFO_OVERRUN_IRQ_EN   (1 << 14)
-#define HW_SSP_CTRL1__DMA_ENABLE        (1 << 13)
-#define HW_SSP_CTRL1__SLAVE_OUT_DISABLE (1 << 11)
-#define HW_SSP_CTRL1__PHASE             (1 << 10)
-#define HW_SSP_CTRL1__POLARITY          (1 << 9)
-#define HW_SSP_CTRL1__SLAVE_MODE        (1 << 8)
-#define HW_SSP_CTRL1__WORD_LENGTH_BM    (0xf << 4)
-#define HW_SSP_CTRL1__WORD_LENGTH_BP    4
-#define HW_SSP_CTRL1__WORD_LENGTH__EIGHT_BITS   0x7
-#define HW_SSP_CTRL1__SSP_MODE_BM       0xf
-#define HW_SSP_CTRL1__SSP_MODE__SD_MMC  0x3
-#define HW_SSP_CTRL1__ALL_IRQ           0xaaa28000
-
-#define HW_SSP_DATA(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x70))
-
-#define HW_SSP_SDRESP0(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x80))
-#define HW_SSP_SDRESP1(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x90))
-#define HW_SSP_SDRESP2(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0xA0))
-#define HW_SSP_SDRESP3(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0xB0))
-
-#define HW_SSP_STATUS(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0xC0))
-#define HW_SSP_STATUS__RECV_TIMEOUT_STAT    (1 << 11)
-#define HW_SSP_STATUS__TIMEOUT              (1 << 12)
-#define HW_SSP_STATUS__DATA_CRC_ERR         (1 << 13)
-#define HW_SSP_STATUS__RESP_TIMEOUT         (1 << 14)
-#define HW_SSP_STATUS__RESP_ERR             (1 << 15)
-#define HW_SSP_STATUS__RESP_CRC_ERR         (1 << 16)
-#define HW_SSP_STATUS__CARD_DETECT          (1 << 28)
-#define HW_SSP_STATUS__ALL_ERRORS           0x1f800
-
-#define HW_SSP_DEBUG(ssp)   (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x100))
-
-#define HW_SSP_VERSION(ssp) (*(volatile uint32_t *)(HW_SSP_BASE(ssp) + 0x110))
+#define BM_SSP_CTRL1_TIMEOUT_IRQ \
+    BM_OR3(SSP_CTRL1, RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, RECV_TIMEOUT_IRQ)
 
 #define IMX233_MAX_SSP_XFER_SIZE            IMX233_MAX_SINGLE_DMA_XFER_SIZE
 

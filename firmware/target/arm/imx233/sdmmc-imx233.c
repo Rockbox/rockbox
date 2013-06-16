@@ -287,7 +287,7 @@ static int init_sd_card(int drive)
     sdmmc_power(drive, true);
     imx233_ssp_start(ssp);
     imx233_ssp_softreset(ssp);
-    imx233_ssp_set_mode(ssp, HW_SSP_CTRL1__SSP_MODE__SD_MMC);
+    imx233_ssp_set_mode(ssp, BV_SSP_CTRL1_SSP_MODE__SD_MMC);
     /* SSPCLK @ 96MHz
      * gives bitrate of 96000 / 240 / 1 = 400kHz */
     imx233_ssp_set_timings(ssp, 240, 0, 0xffff);
@@ -397,7 +397,7 @@ static int init_mmc_drive(int drive)
     sdmmc_power(drive, true);
     imx233_ssp_start(ssp);
     imx233_ssp_softreset(ssp);
-    imx233_ssp_set_mode(ssp, HW_SSP_CTRL1__SSP_MODE__SD_MMC);
+    imx233_ssp_set_mode(ssp, BV_SSP_CTRL1_SSP_MODE__SD_MMC);
     /* SSPCLK @ 96MHz
      * gives bitrate of 96000 / 240 / 1 = 400kHz */
     imx233_ssp_set_timings(ssp, 240, 0, 0xffff);

@@ -29,8 +29,16 @@
 #if 0
 #define ASSERT_SSP(ssp) if(ssp < 1 || ssp > 2) panicf("ssp=%d in %s", ssp, __func__);
 #else
-#define ASSERT_SSP(ssp)
+#define ASSERT_SSP(ssp) (void) ssp;
 #endif
+
+/* Hack to handle both single and multi devices at once */
+#define SSP_SETn(reg, n, field) BF_SETn(reg, n, field)
+#define SSP_CLRn(reg, n, field) BF_CLRn(reg, n, field)
+#define SSP_RDn(reg, n, field) BF_RDn(reg, n, field)
+#define SSP_WRn(reg, n, field, val) BF_WRn(reg, n, field, val)
+#define SSP_WRn_V(reg, n, field, val) BF_WRn_V(reg, n, field, val)
+#define SSP_REGn(reg, n) HW_##reg(n)
 
 /* Used for DMA */
 struct ssp_dma_command_t
@@ -46,15 +54,15 @@ struct ssp_dma_command_t
 
 __ENSURE_STRUCT_CACHE_FRIENDLY(struct ssp_dma_command_t)
 
-static bool ssp_in_use[2];
+static bool ssp_in_use[IMX233_NR_SSP];
 static int ssp_nr_in_use = 0;
-static struct mutex ssp_mutex[2];
-static struct semaphore ssp_sema[2];
-static struct ssp_dma_command_t ssp_dma_cmd[2];
-static uint32_t ssp_bus_width[2];
-static unsigned ssp_log_block_size[2];
-static ssp_detect_cb_t ssp_detect_cb[2];
-static bool ssp_detect_invert[2];
+static struct mutex ssp_mutex[IMX233_NR_SSP];
+static struct semaphore ssp_sema[IMX233_NR_SSP];
+static struct ssp_dma_command_t ssp_dma_cmd[IMX233_NR_SSP];
+static uint32_t ssp_bus_width[IMX233_NR_SSP];
+static unsigned ssp_log_block_size[IMX233_NR_SSP];
+static ssp_detect_cb_t ssp_detect_cb[IMX233_NR_SSP];
+static bool ssp_detect_invert[IMX233_NR_SSP];
 
 void INT_SSP(int ssp)
 {
@@ -88,16 +96,15 @@ void INT_SSP2_ERROR(void)
 
 void imx233_ssp_init(void)
 {
-    /* power down */
-    __REG_SET(HW_SSP_CTRL0(1)) = __BLOCK_CLKGATE;
-    __REG_SET(HW_SSP_CTRL0(2)) = __BLOCK_CLKGATE;
-
+    /* power down and init data structures */
     ssp_nr_in_use = 0;
-    semaphore_init(&ssp_sema[0], 1, 0);
-    semaphore_init(&ssp_sema[1], 1, 0);
-    mutex_init(&ssp_mutex[0]);
-    mutex_init(&ssp_mutex[1]);
-    ssp_bus_width[0] = ssp_bus_width[1] = HW_SSP_CTRL0__BUS_WIDTH__ONE_BIT;
+    for(int i = 0; i < IMX233_NR_SSP; i++)
+    {
+        SSP_SETn(SSP_CTRL0, 1 + i, CLKGATE);
+        semaphore_init(&ssp_sema[i], 1, 0);
+        mutex_init(&ssp_mutex[i]);
+        ssp_bus_width[i] = BV_SSP_CTRL0_BUS_WIDTH__ONE_BIT;
+    }
 }
 
 void imx233_ssp_start(int ssp)
@@ -107,7 +114,7 @@ void imx233_ssp_start(int ssp)
         return;
     ssp_in_use[ssp - 1] = true;
     /* Gate block */
-    imx233_reset_block(&HW_SSP_CTRL0(ssp));
+    imx233_reset_block(&SSP_REGn(SSP_CTRL0, ssp));
     /* Gate dma channel */
     imx233_dma_clkgate_channel(APB_SSP(ssp), true);
     /* If first block to start, start SSP clock */
@@ -132,7 +139,7 @@ void imx233_ssp_stop(int ssp)
         return;
     ssp_in_use[ssp - 1] = false;
     /* Gate off */
-    __REG_SET(HW_SSP_CTRL0(ssp)) = __BLOCK_CLKGATE;
+    SSP_SETn(SSP_CTRL0, ssp, CLKGATE);
     /* Gate off dma */
     imx233_dma_clkgate_channel(APB_SSP(ssp), false);
     /* If last block to stop, stop SSP clock */
@@ -153,8 +160,8 @@ void imx233_ssp_softreset(int ssp)
 void imx233_ssp_set_timings(int ssp, int divide, int rate, int timeout)
 {
     ASSERT_SSP(ssp)
-    HW_SSP_TIMING(ssp) = divide << HW_SSP_TIMING__CLOCK_DIVIDE_BP | rate |
-        timeout << HW_SSP_TIMING__CLOCK_TIMEOUT_BP;
+    SSP_REGn(SSP_TIMING, ssp) = BF_OR3(SSP_TIMING, CLOCK_DIVIDE(divide),
+        CLOCK_RATE(rate), TIMEOUT(timeout));
 }
 
 void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
@@ -223,16 +230,15 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
 void imx233_ssp_set_mode(int ssp, unsigned mode)
 {
     ASSERT_SSP(ssp)
+    /* set mode */
+    SSP_WRn(SSP_CTRL1, ssp, SSP_MODE, mode);
+    /* set mode specific settings */
     switch(mode)
     {
-        case HW_SSP_CTRL1__SSP_MODE__SD_MMC:
-            /* clear mode and word length */
-            __REG_CLR(HW_SSP_CTRL1(ssp)) =
-                HW_SSP_CTRL1__SSP_MODE_BM | HW_SSP_CTRL1__WORD_LENGTH_BM;
-            /* set mode, set word length to 8-bit, polarity and enable dma */
-            __REG_SET(HW_SSP_CTRL1(ssp)) = mode |
-                HW_SSP_CTRL1__WORD_LENGTH__EIGHT_BITS << HW_SSP_CTRL1__WORD_LENGTH_BP |
-                HW_SSP_CTRL1__POLARITY | HW_SSP_CTRL1__DMA_ENABLE;
+        case BV_SSP_CTRL1_SSP_MODE__SD_MMC:
+            SSP_WRn_V(SSP_CTRL1, ssp, WORD_LENGTH, EIGHT_BITS);
+            SSP_SETn(SSP_CTRL1, ssp, POLARITY);
+            SSP_SETn(SSP_CTRL1, ssp, DMA_ENABLE);
             break;
         default: return;
     }
@@ -243,9 +249,9 @@ void imx233_ssp_set_bus_width(int ssp, unsigned width)
     ASSERT_SSP(ssp)
     switch(width)
     {
-        case 1: ssp_bus_width[ssp - 1] = HW_SSP_CTRL0__BUS_WIDTH__ONE_BIT; break;
-        case 4: ssp_bus_width[ssp - 1] = HW_SSP_CTRL0__BUS_WIDTH__FOUR_BIT; break;
-        case 8: ssp_bus_width[ssp - 1] = HW_SSP_CTRL0__BUS_WIDTH__EIGHT_BIT; break;
+        case 1: ssp_bus_width[ssp - 1] = BV_SSP_CTRL0_BUS_WIDTH__ONE_BIT; break;
+        case 4: ssp_bus_width[ssp - 1] = BV_SSP_CTRL0_BUS_WIDTH__FOUR_BIT; break;
+        case 8: ssp_bus_width[ssp - 1] = BV_SSP_CTRL0_BUS_WIDTH__EIGHT_BIT; break;
     }
 }
 
@@ -267,19 +273,15 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
 
     unsigned xfer_size = block_count * (1 << ssp_log_block_size[ssp - 1]);
     
-    ssp_dma_cmd[ssp - 1].cmd0 = cmd | HW_SSP_CMD0__APPEND_8CYC |
-        ssp_log_block_size[ssp - 1] << HW_SSP_CMD0__BLOCK_SIZE_BP |
-        (block_count - 1) << HW_SSP_CMD0__BLOCK_COUNT_BP;
+    ssp_dma_cmd[ssp - 1].cmd0 = BF_OR4(SSP_CMD0, CMD(cmd), APPEND_8CYC(1),
+        BLOCK_SIZE(ssp_log_block_size[ssp - 1]), BLOCK_COUNT(block_count - 1));
     ssp_dma_cmd[ssp - 1].cmd1 = cmd_arg;
     /* setup all flags and run */
-    ssp_dma_cmd[ssp - 1].ctrl0 = xfer_size | HW_SSP_CTRL0__ENABLE |
-        (buffer ?  0 : HW_SSP_CTRL0__IGNORE_CRC) |
-        (wait4irq ? HW_SSP_CTRL0__WAIT_FOR_IRQ : 0) |
-        (resp != SSP_NO_RESP ? HW_SSP_CTRL0__GET_RESP : 0) |
-        (resp == SSP_LONG_RESP ? HW_SSP_CTRL0__LONG_RESP : 0) |
-        (ssp_bus_width[ssp - 1] << HW_SSP_CTRL0__BUS_WIDTH_BP) |
-        (buffer ? HW_SSP_CTRL0__DATA_XFER : 0) |
-        (read ? HW_SSP_CTRL0__READ : 0);
+    ssp_dma_cmd[ssp - 1].ctrl0 = BF_OR9(SSP_CTRL0, XFER_COUNT(xfer_size),
+        ENABLE(1), IGNORE_CRC(buffer == NULL), WAIT_FOR_IRQ(wait4irq),
+        GET_RESP(resp != SSP_NO_RESP), LONG_RESP(resp == SSP_LONG_RESP),
+        BUS_WIDTH(ssp_bus_width[ssp - 1]), DATA_XFER(buffer != NULL),
+        READ(read));
     /* setup the dma parameters */
     ssp_dma_cmd[ssp - 1].dma.buffer = buffer;
     ssp_dma_cmd[ssp - 1].dma.next = NULL;
@@ -291,7 +293,8 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
         (3 << HW_APB_CHx_CMD__CMDWORDS_BP) |
         (xfer_size << HW_APB_CHx_CMD__XFER_COUNT_BP);
 
-    __REG_CLR(HW_SSP_CTRL1(ssp)) = HW_SSP_CTRL1__ALL_IRQ;
+    SSP_CLRn(SSP_CTRL1, ssp, ALL_IRQ);
+
     imx233_dma_reset_channel(APB_SSP(ssp));
     imx233_dma_start_command(APB_SSP(ssp), &ssp_dma_cmd[ssp - 1].dma);
 
@@ -304,10 +307,9 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
         imx233_dma_reset_channel(APB_SSP(ssp));
         ret = SSP_TIMEOUT;
     }
-    else if((HW_SSP_CTRL1(ssp) & HW_SSP_CTRL1__ALL_IRQ) == 0)
+    else if((SSP_REGn(SSP_CTRL1, ssp) & BM_SSP_CTRL1_ALL_IRQ) == 0)
         ret =  SSP_SUCCESS;
-    else if(HW_SSP_CTRL1(ssp) & (HW_SSP_CTRL1__RESP_TIMEOUT_IRQ |
-            HW_SSP_CTRL1__DATA_TIMEOUT_IRQ | HW_SSP_CTRL1__RECV_TIMEOUT_IRQ))
+    else if((SSP_REGn(SSP_CTRL1, ssp) & BM_SSP_CTRL1_TIMEOUT_IRQ))
         ret = SSP_TIMEOUT;
     else
         ret = SSP_ERROR;
@@ -315,12 +317,12 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     if(resp_ptr != NULL)
     {
         if(resp != SSP_NO_RESP)
-            *resp_ptr++ = HW_SSP_SDRESP0(ssp);
+            *resp_ptr++ = SSP_REGn(SSP_SDRESP0, ssp);
         if(resp == SSP_LONG_RESP)
         {
-            *resp_ptr++ = HW_SSP_SDRESP1(ssp);
-            *resp_ptr++ = HW_SSP_SDRESP2(ssp);
-            *resp_ptr++ = HW_SSP_SDRESP3(ssp);
+            *resp_ptr++ = SSP_REGn(SSP_SDRESP1, ssp);
+            *resp_ptr++ = SSP_REGn(SSP_SDRESP2, ssp);
+            *resp_ptr++ = SSP_REGn(SSP_SDRESP3, ssp);
         }
     }
     mutex_unlock(&ssp_mutex[ssp - 1]);
@@ -330,10 +332,10 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
 void imx233_ssp_sd_mmc_power_up_sequence(int ssp)
 {
     ASSERT_SSP(ssp)
-    __REG_CLR(HW_SSP_CMD0(ssp)) = HW_SSP_CMD0__SLOW_CLKING_EN;
-    __REG_SET(HW_SSP_CMD0(ssp)) = HW_SSP_CMD0__CONT_CLKING_EN;
+    SSP_CLRn(SSP_CMD0, ssp, SLOW_CLKING_EN);
+    SSP_SETn(SSP_CMD0, ssp, CONT_CLKING_EN);
     mdelay(1);
-    __REG_CLR(HW_SSP_CMD0(ssp)) = HW_SSP_CMD0__CONT_CLKING_EN;
+    SSP_CLRn(SSP_CMD0, ssp, CONT_CLKING_EN);
 }
 
 static int ssp_detect_oneshot_callback(int ssp)
@@ -395,7 +397,7 @@ bool imx233_ssp_sdmmc_is_detect_inverted(int ssp)
 bool imx233_ssp_sdmmc_detect_raw(int ssp)
 {
     ASSERT_SSP(ssp)
-    return !!(HW_SSP_STATUS(ssp) & HW_SSP_STATUS__CARD_DETECT);
+    return SSP_RDn(SSP_STATUS, ssp, CARD_DETECT);
 }
 
 bool imx233_ssp_sdmmc_detect(int ssp)
