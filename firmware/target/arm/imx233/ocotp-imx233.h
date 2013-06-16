@@ -26,6 +26,7 @@
 
 #include "regs/regs-ocotp.h"
 
+#if IMX233_SUBTARGET >= 3700
 #define IMX233_NUM_OCOTP_CUST   4
 #define IMX233_NUM_OCOTP_CRYPTO 4
 #define IMX233_NUM_OCOTP_HWCAP  6
@@ -52,5 +53,6 @@ static inline uint32_t imx233_ocotp_read(volatile uint32_t *reg)
     imx233_ocotp_open_banks(false);
     return val;
 }
+#endif
 
 #endif /* OCOTP_IMX233_H */
