@@ -34,66 +34,15 @@ static bool lcd_on;
 #endif
 static unsigned lcd_yuv_options = 0;
 
-static void setup_parameters(void)
-{
-    imx233_lcdif_reset();
-    imx233_lcdif_set_lcd_databus_width(BV_LCDIF_CTRL_LCD_DATABUS_WIDTH__18_BIT);
-    imx233_lcdif_set_word_length(BV_LCDIF_CTRL_WORD_LENGTH__18_BIT);
-    imx233_lcdif_set_timings(2, 2, 3, 3);
-    imx233_lcdif_enable_underflow_recover(true);
-}
-
-static void setup_lcd_pins(bool use_lcdif)
-{
-    imx233_pinctrl_acquire(1, 18, "lcd reset");
-    imx233_pinctrl_acquire(1, 19, "lcd rs");
-    imx233_pinctrl_acquire(1, 20, "lcd wr");
-    imx233_pinctrl_acquire(1, 21, "lcd cs");
-    imx233_pinctrl_acquire(1, 22, "lcd dotclk");
-    imx233_pinctrl_acquire(1, 23, "lcd enable");
-    imx233_pinctrl_acquire(1, 24, "lcd hsync");
-    imx233_pinctrl_acquire(1, 25, "lcd vsync");
-    //imx233_pinctrl_acquire_mask(1, 0x3ffff, "lcd data");
-    if(use_lcdif)
-    {
-        imx233_pinctrl_set_function(1, 25, PINCTRL_FUNCTION_MAIN); /* lcd_vsync */
-        imx233_pinctrl_set_function(1, 21, PINCTRL_FUNCTION_MAIN); /* lcd_cs */
-        imx233_pinctrl_set_function(1, 22, PINCTRL_FUNCTION_MAIN); /* lcd_dotclk */
-        imx233_pinctrl_set_function(1, 23, PINCTRL_FUNCTION_MAIN); /* lcd_enable */
-        imx233_pinctrl_set_function(1, 24, PINCTRL_FUNCTION_MAIN); /* lcd_hsync */
-        imx233_pinctrl_set_function(1, 18, PINCTRL_FUNCTION_MAIN); /* lcd_reset */
-        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
-        imx233_pinctrl_set_function(1, 16, PINCTRL_FUNCTION_MAIN); /* lcd_d16 */
-        imx233_pinctrl_set_function(1, 17, PINCTRL_FUNCTION_MAIN); /* lcd_d17 */
-        imx233_pinctrl_set_function(1, 20, PINCTRL_FUNCTION_MAIN); /* lcd_wr */
-        HW_PINCTRL_MUXSELn_CLR(2) = 0xffffffff; /* lcd_d{0-15} */
-    }
-    else
-    {
-        HW_PINCTRL_MUXSELn_SET(2) = 0xffffffff; /* lcd_d{0-15} */
-        HW_PINCTRL_DOEn_CLR(1) = 0x3ffffff; /* lcd_{d{0-17},reset,rs,wr,cs,dotclk,enable,hsync,vsync} */
-        imx233_pinctrl_set_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
-        imx233_pinctrl_set_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */
-        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
-        imx233_pinctrl_set_function(1, 20, PINCTRL_FUNCTION_GPIO); /* lcd_wr */
-        imx233_pinctrl_set_function(1, 21, PINCTRL_FUNCTION_GPIO); /* lcd_cs */
-        imx233_pinctrl_set_function(1, 22, PINCTRL_FUNCTION_GPIO); /* lcd_dotclk */
-        imx233_pinctrl_set_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
-        imx233_pinctrl_set_function(1, 24, PINCTRL_FUNCTION_GPIO); /* lcd_hsync */
-        imx233_pinctrl_set_function(1, 25, PINCTRL_FUNCTION_GPIO); /* lcd_vsync */
-    }
-}
-
-static void common_lcd_enable(bool enable)
-{
-    imx233_lcdif_enable(enable);
-    setup_lcd_pins(enable); /* use GPIO pins when disable */
-}
-
 static void setup_lcdif(void)
 {
-    setup_parameters();
-    common_lcd_enable(true);
+    imx233_lcdif_init();
+    imx233_lcdif_set_lcd_databus_width(18);
+    imx233_lcdif_set_word_length(18);
+    imx233_lcdif_set_timings(2, 2, 3, 3);
+    imx233_lcdif_enable_underflow_recover(true);
+    imx233_lcdif_enable(true);
+    imx233_lcdif_setup_system_pins(18);
     imx233_lcdif_enable_bus_master(true);
 }
 
@@ -120,13 +69,13 @@ static void lcd_write_reg(uint32_t reg, uint32_t data)
 {
     uint32_t old_reg = reg;
     /* get back to 18-bit word length */
-    imx233_lcdif_set_word_length(BV_LCDIF_CTRL_WORD_LENGTH__18_BIT);
+    imx233_lcdif_set_word_length(18);
     reg = encode_16_to_18(reg);
     data = encode_16_to_18(data);
     
-    imx233_lcdif_pio_send(false, 2, &reg);
+    imx233_lcdif_pio_send(false, 1, &reg);
     if(old_reg != 0 && old_reg != 0x202)
-        imx233_lcdif_pio_send(true, 2, &data);
+        imx233_lcdif_pio_send(true, 1, &data);
 }
 
 #define REG_MDELAY  0xffffffff
@@ -208,11 +157,11 @@ void lcd_init_device(void)
     setup_lcdif_clock();
 
     // reset device
-    BF_SET(LCDIF_CTRL1, RESET);
+    imx233_lcdif_reset_lcd(true);
     mdelay(50);
-    BF_CLR(LCDIF_CTRL1, RESET);
+    imx233_lcdif_reset_lcd(false);
     mdelay(10);
-    BF_SET(LCDIF_CTRL1, RESET);
+    imx233_lcdif_reset_lcd(true);
 
     lcd_init_seq();
 #ifdef HAVE_LCD_ENABLE
@@ -247,12 +196,8 @@ void lcd_enable(bool enable)
 
     lcd_on = enable;
     
-    if(enable)
-        common_lcd_enable(true);
     lcd_enable_seq(enable);
-    if(!enable)
-        common_lcd_enable(false);
-    else
+    if(enable)
         send_event(LCD_EVENT_ACTIVATION, NULL);
 }
 #endif
@@ -283,9 +228,8 @@ void lcd_update_rect(int x, int y, int w, int h)
     lcd_write_reg(0x201, 0);
     lcd_write_reg(0x202, 0);
     imx233_lcdif_wait_ready();
-    imx233_lcdif_set_word_length(BV_LCDIF_CTRL_WORD_LENGTH__16_BIT);
+    imx233_lcdif_set_word_length(16);
     imx233_lcdif_set_byte_packing_format(0xf); /* two pixels per 32-bit word */
-    imx233_lcdif_set_data_format(false, false, false); /* RGB565, don't care, don't care */
 
     /* there are two cases here:
      * - either width = LCD_WIDTH and we can directly memcopy a part of lcd_framebuffer to FRAME

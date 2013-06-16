@@ -79,5 +79,9 @@
 #define VPIN_LCD_RS         VPIN_PACK(1, 19, MAIN)
 #define VPIN_LCD_WR         VPIN_PACK(1, 20, MAIN)
 #define VPIN_LCD_CS         VPIN_PACK(1, 21, MAIN)
+#define VPIN_LCD_DOTCLK     VPIN_PACK(1, 22, MAIN)
+#define VPIN_LCD_ENABLE     VPIN_PACK(1, 23, MAIN)
+#define VPIN_LCD_HSYNC      VPIN_PACK(1, 24, MAIN)
+#define VPIN_LCD_VSYNC      VPIN_PACK(1, 25, MAIN)
 
 #endif /* __PINS_IMX233__ */
