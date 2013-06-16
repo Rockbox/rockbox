@@ -341,9 +341,8 @@ static int init_sd_card(int drive)
             return -6;
 
         /* CMD6 */
-        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_RESP, NULL))
             return -7;
-        sleep(HZ/10);
 
         /*  go back to STBY state so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
