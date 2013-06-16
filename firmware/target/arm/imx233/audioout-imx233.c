@@ -24,13 +24,14 @@
 #include "pcm_sampr.h"
 
 static int hp_vol_l, hp_vol_r;
+static bool input_line1;
 static struct timeout hp_unmute_oneshort;
 
 static int hp_unmute_cb(struct timeout *tmo)
 {
     (void) tmo;
     /* unmute HP */
-    __REG_CLR(HW_AUDIOOUT_HPVOL) = HW_AUDIOOUT_HPVOL__MUTE;
+    BF_CLR(AUDIOOUT_HPVOL, MUTE);
     return 0;
 }
 
@@ -41,35 +42,31 @@ void imx233_audioout_preinit(void)
     /* Enable digital filter clock */
     imx233_clkctrl_enable_xtal(XTAL_FILT, true);
     /* Enable DAC */
-    __REG_CLR(HW_AUDIOOUT_ANACLKCTRL) = HW_AUDIOOUT_ANACLKCTRL__CLKGATE;
+    BF_CLR(AUDIOOUT_ANACLKCTRL, CLKGATE);
     /* Set capless mode */
-    __REG_CLR(HW_AUDIOOUT_PWRDN) = HW_AUDIOOUT_PWRDN__CAPLESS;
+    BF_CLR(AUDIOOUT_PWRDN, CAPLESS);
     /* Set word-length to 16-bit */
-    __REG_SET(HW_AUDIOOUT_CTRL) = HW_AUDIOOUT_CTRL__WORD_LENGTH;
+    BF_SET(AUDIOOUT_CTRL, WORD_LENGTH);
     /* Power up DAC */
-    __REG_CLR(HW_AUDIOOUT_PWRDN) = HW_AUDIOOUT_PWRDN__DAC;
+    BF_CLR(AUDIOOUT_PWRDN, DAC);
     /* Hold HP to ground to avoid pop, then release and power up HP */
-    __REG_SET(HW_AUDIOOUT_ANACTRL) = HW_AUDIOOUT_ANACTRL__HP_HOLD_GND;
-    __REG_CLR(HW_AUDIOOUT_PWRDN) = HW_AUDIOOUT_PWRDN__HEADPHONE;
+    BF_SET(AUDIOOUT_ANACTRL, HP_HOLD_GND);
+    BF_CLR(AUDIOOUT_PWRDN, HEADPHONE);
     /* Set HP mode to AB */
-    __REG_SET(HW_AUDIOOUT_ANACTRL) = HW_AUDIOOUT_ANACTRL__HP_CLASSAB;
-    /* change biais to -50% */
-    __REG_CLR(HW_AUDIOOUT_TEST) = HW_AUDIOOUT_TEST__HP_I1_ADJ_BM;
-    __REG_SET(HW_AUDIOOUT_TEST) = HW_AUDIOOUT_TEST__HP_I1_ADJ_M_50;
-    __REG_CLR(HW_AUDIOOUT_REFCTRL) = HW_AUDIOOUT_REFCTRL__BIAS_CTRL_BM;
-    __REG_SET(HW_AUDIOOUT_REFCTRL) = 1 << HW_AUDIOOUT_REFCTRL__BIAS_CTRL_BP;
-    __REG_SET(HW_AUDIOOUT_REFCTRL) = HW_AUDIOOUT_REFCTRL__RAISE_REF;
-    __REG_SET(HW_AUDIOOUT_REFCTRL) = HW_AUDIOOUT_REFCTRL__XTAL_BGR_BIAS;
+    BF_SET(AUDIOOUT_ANACTRL, HP_CLASSAB);
+    /* change bias to -50% */
+    BF_WR(AUDIOOUT_TEST, HP_I1_ADJ, 1);
+    BF_WR(AUDIOOUT_REFCTRL, BIAS_CTRL, 1);
+    BF_SET(AUDIOOUT_REFCTRL, RAISE_REF);
+    BF_SET(AUDIOOUT_REFCTRL, XTAL_BGR_BIAS);
     /* Stop holding to ground */
-    __REG_CLR(HW_AUDIOOUT_ANACTRL) = HW_AUDIOOUT_ANACTRL__HP_HOLD_GND;
+    BF_CLR(AUDIOOUT_ANACTRL, HP_HOLD_GND);
     /* Set dmawait count to 31 (see errata, workaround random stop) */
-    __REG_CLR(HW_AUDIOOUT_CTRL) = HW_AUDIOOUT_CTRL__DMAWAIT_COUNT_BM;
-    __REG_SET(HW_AUDIOOUT_CTRL) = 31 << HW_AUDIOOUT_CTRL__DMAWAIT_COUNT_BP;
+    BF_WR(AUDIOOUT_CTRL, DMAWAIT_COUNT, 31);
     /* start converting audio */
-    __REG_SET(HW_AUDIOOUT_CTRL) = HW_AUDIOOUT_CTRL__RUN;
+    BF_SET(AUDIOOUT_CTRL, RUN);
     /* unmute DAC */
-    __REG_CLR(HW_AUDIOOUT_DACVOLUME) = HW_AUDIOOUT_DACVOLUME__MUTE_LEFT |
-        HW_AUDIOOUT_DACVOLUME__MUTE_RIGHT;
+    HW_AUDIOOUT_DACVOLUME_CLR = BM_OR2(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
     /* send a few samples to avoid pop */
     HW_AUDIOOUT_DATA = 0;
     HW_AUDIOOUT_DATA = 0;
@@ -86,24 +83,23 @@ void imx233_audioout_postinit(void)
 void imx233_audioout_close(void)
 {
     /* Switch to class A */
-    __REG_CLR(HW_AUDIOOUT_ANACTRL) = HW_AUDIOOUT_ANACTRL__HP_CLASSAB;
+    BF_CLR(AUDIOOUT_ANACTRL, HP_CLASSAB);
     /* Hold HP to ground */
-    __REG_SET(HW_AUDIOOUT_ANACTRL) = HW_AUDIOOUT_ANACTRL__HP_HOLD_GND;
+    BF_SET(AUDIOOUT_ANACTRL, HP_HOLD_GND);
     /* Mute HP and power down */
-    __REG_SET(HW_AUDIOOUT_HPVOL) = HW_AUDIOOUT_HPVOL__MUTE;
+    BF_SET(AUDIOOUT_HPVOL, MUTE);
     /* Power down HP */
-    __REG_SET(HW_AUDIOOUT_PWRDN) = HW_AUDIOOUT_PWRDN__HEADPHONE;
+    BF_SET(AUDIOOUT_PWRDN, HEADPHONE);
     /* Mute DAC */
-    __REG_SET(HW_AUDIOOUT_DACVOLUME) = HW_AUDIOOUT_DACVOLUME__MUTE_LEFT
-        | HW_AUDIOOUT_DACVOLUME__MUTE_RIGHT;
+    HW_AUDIOOUT_DACVOLUME_SET = BM_OR2(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
     /* Power down DAC */
-    __REG_SET(HW_AUDIOOUT_PWRDN) = HW_AUDIOOUT_PWRDN__DAC;
+    BF_SET(AUDIOOUT_PWRDN, DAC);
     /* Gate off DAC */
-    __REG_SET(HW_AUDIOOUT_ANACLKCTRL) = HW_AUDIOOUT_ANACLKCTRL__CLKGATE;
+    BF_SET(AUDIOOUT_ANACLKCTRL, CLKGATE);
     /* Disable digital filter clock */
     imx233_clkctrl_enable_xtal(XTAL_FILT, false);
     /* will also gate off the module */
-    __REG_CLR(HW_AUDIOOUT_CTRL) = HW_AUDIOOUT_CTRL__RUN;
+    BF_CLR(AUDIOOUT_CTRL, RUN);
 }
 
 /* volume in half dB
@@ -115,36 +111,31 @@ static void set_dac_vol(int vol_l, int vol_r)
     vol_r = MAX(-200, MIN(vol_r, 0));
     /* unmute, enable zero cross and set volume.
      * 0xff is 0dB */
-    HW_AUDIOOUT_DACVOLUME =
-        (0xff + vol_l) << HW_AUDIOOUT_DACVOLUME__VOLUME_LEFT_BP |
-        (0xff + vol_r) << HW_AUDIOOUT_DACVOLUME__VOLUME_RIGHT_BP |
-        HW_AUDIOOUT_DACVOLUME__EN_ZCD;
+    HW_AUDIOOUT_DACVOLUME = BF_OR3(AUDIOOUT_DACVOLUME,
+        VOLUME_LEFT(0xff + vol_l), VOLUME_RIGHT(0xff + vol_r), EN_ZCD(1));
 }
 
 /* volume in half dB
  * don't check input values */
 static void set_hp_vol(int vol_l, int vol_r)
 {
-    uint32_t select = (HW_AUDIOOUT_HPVOL & HW_AUDIOOUT_HPVOL__SELECT);
     /* minimum is -57.5dB and max is 6dB in DAC mode
      * and -51.5dB / 12dB in Line1 mode */
-    int min = select ? -103 : -115;
-    int max = select ? 24 : 12;
+    int min = input_line1 ? -103 : -115;
+    int max = input_line1 ? 24 : 12;
 
     vol_l = MAX(min, MIN(vol_l, max));
     vol_r = MAX(min, MIN(vol_r, max));
-    /* unmute, enable zero cross and set volume. Keep select value. */
-    HW_AUDIOOUT_HPVOL =
-        (max - vol_l) << HW_AUDIOOUT_HPVOL__VOL_LEFT_BP |
-        (max - vol_r) << HW_AUDIOOUT_HPVOL__VOL_RIGHT_BP |
-        select |
-        HW_AUDIOOUT_HPVOL__EN_MSTR_ZCD;
+    /* unmute, enable zero cross and set volume.*/
+    unsigned mstr_zcd = BM_AUDIOOUT_HPVOL_EN_MSTR_ZCD;
+    HW_AUDIOOUT_HPVOL = mstr_zcd | BF_OR3(AUDIOOUT_HPVOL, SELECT(input_line1),
+        VOL_LEFT(max - vol_l), VOL_RIGHT(max - vol_r));
 }
 
 static void apply_volume(void)
 {
     /* Two cases: line1 and dac */
-    if(HW_AUDIOOUT_HPVOL & HW_AUDIOOUT_HPVOL__SELECT)
+    if(input_line1)
     {
         /* In line1 mode, the HP is the only way to adjust the volume */
         set_hp_vol(hp_vol_l, hp_vol_r);
@@ -189,12 +180,10 @@ void imx233_audioout_set_freq(int fsel)
         HW_HAVE_96_([HW_FREQ_96] = { 0x2, 0x0, 0xf, 0x13ff },)
     };
 
-    HW_AUDIOOUT_DACSRR =
-        dacssr[fsel].src_frac << HW_AUDIOOUT_DACSRR__SRC_FRAC_BP |
-        dacssr[fsel].src_int << HW_AUDIOOUT_DACSRR__SRC_INT_BP |
-        dacssr[fsel].src_hold << HW_AUDIOOUT_DACSRR__SRC_HOLD_BP |
-        dacssr[fsel].base_mult << HW_AUDIOOUT_DACSRR__BASEMULT_BP;
-    
+    HW_AUDIOOUT_DACSRR = BF_OR4(AUDIOOUT_DACSRR,
+        SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
+        SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
+
     #if 0
     /* Select base_mult and src_hold depending on the audio range:
      *     0 < f <= 12000   --> base_mult = 1, src_hold = 3 (div by 4)
@@ -216,21 +205,16 @@ void imx233_audioout_set_freq(int fsel)
     int src_int = (750000 * base_mult) / (f * (src_hold + 1));
     int src_frac = ((750000 * base_mult - src_int * f * (src_hold + 1)) << 13) / (f * (src_hold + 1));
 
-    HW_AUDIOOUT_DACSRR =
-        src_frac << HW_AUDIOOUT_DACSRR__SRC_FRAC_BP |
-        src_int << HW_AUDIOOUT_DACSRR__SRC_INT_BP |
-        src_hold << HW_AUDIOOUT_DACSRR__SRC_HOLD_BP |
-        base_mult << HW_AUDIOOUT_DACSRR__BASEMULT_BP;
+    HW_AUDIOOUT_DACSRR = BF_OR4(AUDIOOUT_DACSRR,
+        SRC_FRAC(src_frac), SRC_INT(src_int),
+        SRC_HOLD(src_hold), BASEMULT(base_mult));
     #endif
 }
 
 /* select between DAC and Line1 */
 void imx233_audioout_select_hp_input(bool line1)
 {
-    if(line1)
-        __REG_SET(HW_AUDIOOUT_HPVOL) = HW_AUDIOOUT_HPVOL__SELECT;
-    else
-        __REG_CLR(HW_AUDIOOUT_HPVOL) = HW_AUDIOOUT_HPVOL__SELECT;
+    input_line1 = line1;
     /* reapply volume setting */
     apply_volume();
 }
