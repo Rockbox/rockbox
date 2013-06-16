@@ -25,9 +25,9 @@ void imx233_audioin_preinit(void)
     /* Enable AUDIOIN block */
     imx233_reset_block(&HW_AUDIOIN_CTRL);
     /* Enable ADC */
-    __REG_CLR(HW_AUDIOIN_ANACLKCTRL) = HW_AUDIOIN_ANACLKCTRL__CLKGATE;
+    BF_SET(AUDIOIN_CTRL, CLKGATE);
     /* Set word-length to 16-bit */
-    __REG_SET(HW_AUDIOIN_CTRL) = HW_AUDIOIN_CTRL__WORD_LENGTH;
+    BF_SET(AUDIOIN_CTRL, WORD_LENGTH);
 }
 
 void imx233_audioin_postinit(void)
@@ -38,7 +38,7 @@ void imx233_audioin_close(void)
 {
     /* TODO mute */
     /* Gate off ADC */
-    __REG_SET(HW_AUDIOIN_ANACLKCTRL) = HW_AUDIOIN_ANACLKCTRL__CLKGATE;
+    BF_SET(AUDIOIN_ANACLKCTRL, CLKGATE);
     /* will also gate off the module */
-    __REG_CLR(HW_AUDIOIN_CTRL) = HW_AUDIOIN_CTRL__RUN;
+    BF_CLR(AUDIOIN_CTRL, RUN);
 }
