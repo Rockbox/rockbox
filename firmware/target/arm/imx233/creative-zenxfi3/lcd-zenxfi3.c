@@ -65,11 +65,11 @@ static void setup_lcd_pins(bool use_lcdif)
         imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_MAIN); /* lcd_d16 */
         imx233_set_pin_function(1, 17, PINCTRL_FUNCTION_MAIN); /* lcd_d17 */
         imx233_set_pin_function(1, 20, PINCTRL_FUNCTION_MAIN); /* lcd_wr */
-        __REG_CLR(HW_PINCTRL_MUXSEL(2)) = 0xffffffff; /* lcd_d{0-15} */
+        HW_PINCTRL_MUXSELn_CLR(2) = 0xffffffff; /* lcd_d{0-15} */
     }
     else
     {
-        __REG_SET(HW_PINCTRL_MUXSEL(2)) = 0xffffffff; /* lcd_d{0-15} */
+        HW_PINCTRL_MUXSELn_SET(2) = 0xffffffff; /* lcd_d{0-15} */
         imx233_enable_gpio_output_mask(1, 0x2bfffff, false); /* lcd_{d{0-17},reset,rs,wr,cs,enable,vsync} */
         imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
         imx233_set_pin_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */

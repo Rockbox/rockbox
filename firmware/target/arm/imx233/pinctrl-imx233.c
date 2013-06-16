@@ -66,7 +66,7 @@ static pin_irq_cb_t pin_cb[3][32]; /* 3 banks, 32 pins/bank */
 
 static void INT_GPIO(int bank)
 {
-    uint32_t fire = HW_PINCTRL_IRQSTAT(bank) & HW_PINCTRL_IRQEN(bank);
+    uint32_t fire = HW_PINCTRL_IRQSTATn(bank) & HW_PINCTRL_IRQENn(bank);
     for(int pin = 0; pin < 32; pin++)
         if(fire & (1 << pin))
         {
@@ -95,22 +95,22 @@ void INT_GPIO2(void)
 void imx233_setup_pin_irq(int bank, int pin, bool enable_int,
     bool level, bool polarity, pin_irq_cb_t cb)
 {
-    __REG_CLR(HW_PINCTRL_PIN2IRQ(bank)) = 1 << pin;
-    __REG_CLR(HW_PINCTRL_IRQEN(bank)) = 1 << pin;
-    __REG_CLR(HW_PINCTRL_IRQSTAT(bank))= 1 << pin;
+    HW_PINCTRL_PIN2IRQn_CLR(bank) = 1 << pin;
+    HW_PINCTRL_IRQENn_CLR(bank) = 1 << pin;
+    HW_PINCTRL_IRQSTATn_CLR(bank) = 1 << pin;
     pin_cb[bank][pin] = cb;
     if(enable_int)
     {
         if(level)
-            __REG_SET(HW_PINCTRL_IRQLEVEL(bank)) = 1 << pin;
+            HW_PINCTRL_IRQLEVELn_SET(bank) = 1 << pin;
         else
-            __REG_CLR(HW_PINCTRL_IRQLEVEL(bank)) = 1 << pin;
+            HW_PINCTRL_IRQLEVELn_CLR(bank) = 1 << pin;
         if(polarity)
-            __REG_SET(HW_PINCTRL_IRQPOL(bank)) = 1 << pin;
+            HW_PINCTRL_IRQPOLn_SET(bank) = 1 << pin;
         else
-            __REG_CLR(HW_PINCTRL_IRQPOL(bank)) = 1 << pin;
-        __REG_SET(HW_PINCTRL_PIN2IRQ(bank)) = 1 << pin;
-        __REG_SET(HW_PINCTRL_IRQEN(bank)) = 1 << pin;
+            HW_PINCTRL_IRQPOLn_CLR(bank) = 1 << pin;
+        HW_PINCTRL_PIN2IRQn_SET(bank) = 1 << pin;
+        HW_PINCTRL_IRQENn_SET(bank) = 1 << pin;
         imx233_icoll_enable_interrupt(INT_SRC_GPIO(bank), true);
     }
 }
