@@ -56,8 +56,8 @@ static enum lcd_kind_t
 static void setup_parameters(void)
 {
     imx233_lcdif_reset();
-    imx233_lcdif_set_lcd_databus_width(HW_LCDIF_CTRL__LCD_DATABUS_WIDTH_18_BIT);
-    imx233_lcdif_set_word_length(HW_LCDIF_CTRL__WORD_LENGTH_18_BIT);
+    imx233_lcdif_set_lcd_databus_width(BV_LCDIF_CTRL_LCD_DATABUS_WIDTH__18_BIT);
+    imx233_lcdif_set_word_length(BV_LCDIF_CTRL_WORD_LENGTH__18_BIT);
     imx233_lcdif_set_timings(1, 2, 2, 2);
     imx233_lcdif_enable_underflow_recover(true);
 }
@@ -218,7 +218,7 @@ static void lcd_write_reg(uint32_t reg, uint32_t data)
     uint32_t old_reg = reg;
     imx233_lcdif_wait_ready();
     /* get back to 18-bit word length */
-    imx233_lcdif_set_word_length(HW_LCDIF_CTRL__WORD_LENGTH_18_BIT);
+    imx233_lcdif_set_word_length(BV_LCDIF_CTRL_WORD_LENGTH__18_BIT);
     reg = encode_16_to_18(reg);
     data = encode_16_to_18(data);
     
@@ -398,11 +398,11 @@ void lcd_init_device(void)
             break;
     }
     // reset device
-    __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
+    BF_SET(LCDIF_CTRL1, RESET);
     mdelay(50);
-    __REG_CLR(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
+    BF_CLR(LCDIF_CTRL1, RESET);
     mdelay(10);
-    __REG_SET(HW_LCDIF_CTRL1) = HW_LCDIF_CTRL1__RESET;
+    BF_SET(LCDIF_CTRL1, RESET);
 
     switch(lcd_kind)
     {
@@ -578,7 +578,7 @@ void lcd_update_rect(int x, int y, int w, int h)
     lcd_write_reg(0x21, y);
     lcd_write_reg(0x22, 0);
     imx233_lcdif_wait_ready();
-    imx233_lcdif_set_word_length(HW_LCDIF_CTRL__WORD_LENGTH_16_BIT);
+    imx233_lcdif_set_word_length(BV_LCDIF_CTRL_WORD_LENGTH__16_BIT);
     imx233_lcdif_set_byte_packing_format(0xf); /* two pixels per 32-bit word */
     imx233_lcdif_set_data_format(false, false, false); /* RGB565, don't care, don't care */
     /* there are two cases here:
