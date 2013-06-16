@@ -561,7 +561,7 @@ static void stream_on_seek(struct stream_seek_data *skd)
         /* Either seeking must be possible or a full rewind must be done */
         if (stream_can_seek() || time_from_whence(time, whence) == 0)
         {
-            bool buffer;
+            bool buffer = false;
 
             if (stream_mgr.status == STREAM_PLAYING)
             {

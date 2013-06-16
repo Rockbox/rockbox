@@ -991,7 +991,6 @@ USE_DESKTOP(long long) static int
 inflate_unzip(struct mbreader_t *in,char* outbuffer,uint32_t outbuflen)
 {
     USE_DESKTOP(long long total = 0; )
-    typedef void (*sig_type)(int);
 
     /* Allocate all global buffers (for DYN_ALLOC option) */
     gunzip_outbuf_count = 0;
