@@ -131,4 +131,33 @@ static inline void imx233_pinctrl_enable_pullup_mask(unsigned bank, uint32_t pin
 void imx233_pinctrl_setup_irq(unsigned bank, unsigned pin, bool enable_int,
     bool level, bool polarity, pin_irq_cb_t cb, intptr_t user);
 
+/**
+ * Virtual pin interface
+ *
+ * This interface provides an easy way to configure standard pins for
+ * devices like SSP, LCD, etc
+ * The point here is that these pins can or cannot exist depending on the
+ * chip and the package and the drivers don't want to mess with that.
+ *
+ * A virtual pin is described by a bank, a pin and the function.
+ */
+typedef unsigned vpin_t;
+#define VPIN_PACK(bank, pin, mux)  \
+    ((vpin_t)((bank) << 5 | (pin) | PINCTRL_FUNCTION_##mux << 7))
+#define VPIN_UNPACK_BANK(vpin) (((vpin) >> 5) & 3)
+#define VPIN_UNPACK_PIN(vpin)  (((vpin) >> 0) & 0x1f)
+#define VPIN_UNPACK_MUX(vpin)  (((vpin) >> 7) & 3)
+
+static inline void imx233_pinctrl_setup_vpin(vpin_t vpin, const char *name,
+    unsigned drive, bool pullup)
+{
+    unsigned bank = VPIN_UNPACK_BANK(vpin), pin = VPIN_UNPACK_PIN(vpin);
+    imx233_pinctrl_acquire(bank, pin, name);
+    imx233_pinctrl_set_function(bank, pin, VPIN_UNPACK_MUX(vpin));
+    imx233_pinctrl_set_drive(bank, pin, drive);
+    imx233_pinctrl_enable_pullup(bank, pin, pullup);
+}
+
+#include "pins/pins-imx233.h"
+
 #endif /* __PINCTRL_IMX233_H__ */

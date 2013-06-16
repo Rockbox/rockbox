@@ -84,10 +84,8 @@ void imx233_i2c_init(void)
 {
     BF_SET(I2C_CTRL0, SFTRST);
     /* setup pins (must be done when shutdown) */
-    imx233_pinctrl_acquire(0, 30, "i2c");
-    imx233_pinctrl_acquire(0, 31, "i2c");
-    imx233_pinctrl_set_function(0, 30, PINCTRL_FUNCTION_MAIN);
-    imx233_pinctrl_set_function(0, 31, PINCTRL_FUNCTION_MAIN);
+    imx233_pinctrl_setup_vpin(VPIN_I2C_SCL, "i2c scl", PINCTRL_DRIVE_4mA, true);
+    imx233_pinctrl_setup_vpin(VPIN_I2C_SDA, "i2c sda", PINCTRL_DRIVE_4mA, true);
     /* clear softreset */
     imx233_reset_block(&HW_I2C_CTRL0);
     /* Errata:
