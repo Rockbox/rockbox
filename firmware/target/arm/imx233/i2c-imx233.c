@@ -145,17 +145,15 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
     if(i2c_nr_stages > 0)
     {
         i2c_stage[i2c_nr_stages - 1].dma.next = &i2c_stage[i2c_nr_stages].dma;
-        i2c_stage[i2c_nr_stages - 1].dma.cmd |= HW_APB_CHx_CMD__CHAIN;
+        i2c_stage[i2c_nr_stages - 1].dma.cmd |= BM_APB_CHx_CMD_CHAIN;
         if(!start)
             i2c_stage[i2c_nr_stages - 1].ctrl0 |= BM_I2C_CTRL0_RETAIN_CLOCK;
     }
     i2c_stage[i2c_nr_stages].dma.buffer = i2c_buffer + start_off;
     i2c_stage[i2c_nr_stages].dma.next = NULL;
-    i2c_stage[i2c_nr_stages].dma.cmd =
-        (transmit ? HW_APB_CHx_CMD__COMMAND__READ : HW_APB_CHx_CMD__COMMAND__WRITE) |
-        HW_APB_CHx_CMD__WAIT4ENDCMD |
-        1 << HW_APB_CHx_CMD__CMDWORDS_BP |
-        size << HW_APB_CHx_CMD__XFER_COUNT_BP;
+    i2c_stage[i2c_nr_stages].dma.cmd = BF_OR4(APB_CHx_CMD,
+        COMMAND(transmit ? BV_APB_CHx_CMD_COMMAND__READ : BV_APB_CHx_CMD_COMMAND__WRITE),
+        WAIT4ENDCMD(1), CMDWORDS(1), XFER_COUNT(size));
     /* assume that any read is final (send nak on last) */
     i2c_stage[i2c_nr_stages].ctrl0 = BF_OR6(I2C_CTRL0,
         XFER_COUNT(size), DIRECTION(transmit), SEND_NAK_ON_LAST(!transmit),
@@ -170,8 +168,8 @@ static enum imx233_i2c_error_t imx233_i2c_finalize(void)
     for(int i = 0; i < i2c_nr_stages; i++)
     {
         struct i2c_dma_command_t *c = &i2c_stage[i];
-        if(__XTRACT_EX(c->dma.cmd, HW_APB_CHx_CMD__COMMAND) == HW_APB_CHx_CMD__COMMAND__WRITE)
-            memcpy(c->dst, c->src, __XTRACT_EX(c->dma.cmd, HW_APB_CHx_CMD__XFER_COUNT));
+        if(BF_RDX(c->dma.cmd, APB_CHx_CMD, COMMAND) == BV_APB_CHx_CMD_COMMAND__WRITE)
+            memcpy(c->dst, c->src, BF_RDX(c->dma.cmd, APB_CHx_CMD, XFER_COUNT));
     }
     return I2C_SUCCESS;
 }
@@ -180,7 +178,7 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
 {
     if(i2c_nr_stages == 0)
         return I2C_ERROR;
-    i2c_stage[i2c_nr_stages - 1].dma.cmd |= HW_APB_CHx_CMD__SEMAPHORE | HW_APB_CHx_CMD__IRQONCMPLT;
+    i2c_stage[i2c_nr_stages - 1].dma.cmd |= BM_APB_CHx_CMD_SEMAPHORE | BM_APB_CHx_CMD_IRQONCMPLT;
 
     BF_CLR(I2C_CTRL1, ALL_IRQ);
     imx233_dma_reset_channel(APB_I2C);

@@ -25,91 +25,29 @@
 #include "system.h"
 #include "system-target.h"
 
-/********
- * APHB *
- ********/
+#include "regs/regs-apbh.h"
+#include "regs/regs-apbx.h"
 
-#define HW_APBH_BASE        0x80004000
+/************
+ * CHANNELS *
+ ************/
 
-/* APHB channels */
-#define HW_APBH_SSP(ssp)    ssp
-#define HW_APBH_NAND(dev)   (4 + (ssp))
+#define APBH_DMA_CHANNEL(i)     i
+#define APBX_DMA_CHANNEL(i)     ((i) | 0x10)
+#define APB_IS_APBX_CHANNEL(x)  ((x) & 0x10)
+#define APB_GET_DMA_CHANNEL(x)  ((x) & 0xf)
 
-#define HW_APBH_CTRL0       (*(volatile uint32_t *)(HW_APBH_BASE + 0x0))
-#define HW_APBH_CTRL0__FREEZE_CHANNEL(i)    (1 << (i))
-#define HW_APBH_CTRL0__CLKGATE_CHANNEL(i)   (1 << ((i) + 8))
-#define HW_APBH_CTRL0__RESET_CHANNEL(i)     (1 << ((i) + 16))
-#define HW_APBH_CTRL0__APB_BURST4_EN        (1 << 28)
-#define HW_APBH_CTRL0__APB_BURST8_EN        (1 << 29)
+// NOTE: although undocumented, the iMX233 channel 0 is actually the LCDIF one
+#define APB_LCDIF           APBH_DMA_CHANNEL(0)
 
-#define HW_APBH_CTRL1       (*(volatile uint32_t *)(HW_APBH_BASE + 0x10))
-#define HW_APBH_CTRL1__CHx_CMDCMPLT_IRQ(i)      (1 << (i))
-#define HW_APBH_CTRL1__CHx_CMDCMPLT_IRQ_EN(i)   (1 << ((i) + 16))
+#define APB_SSP(ssp)        APBH_DMA_CHANNEL(ssp)
+#define APB_GPMI(dev)       APBH_DMA_CHANNEL(4 + (dev))
 
-#define HW_APBH_CTRL2       (*(volatile uint32_t *)(HW_APBH_BASE + 0x20))
-#define HW_APBH_CTRL2__CHx_ERROR_IRQ(i)         (1 << (i))
-#define HW_APBH_CTRL2__CHx_ERROR_STATUS(i)      (1 << ((i) + 16))
-
-#define HW_APBH_CHx_CURCMDAR(i) (*(volatile uint32_t *)(HW_APBH_BASE + 0x40 + 0x70 * (i)))
-
-#define HW_APBH_CHx_NXTCMDAR(i) (*(volatile uint32_t *)(HW_APBH_BASE + 0x50 + 0x70 * (i)))
-
-#define HW_APBH_CHx_CMD(i)      (*(volatile uint32_t *)(HW_APBH_BASE + 0x60 + 0x70 * (i)))
-
-#define HW_APBH_CHx_BAR(i)      (*(volatile uint32_t *)(HW_APBH_BASE + 0x70 + 0x70 * (i)))
-
-#define HW_APBH_CHx_SEMA(i)     (*(volatile uint32_t *)(HW_APBH_BASE + 0x80 + 0x70 * (i)))
-
-#define HW_APBH_CHx_DEBUG1(i)   (*(volatile uint32_t *)(HW_APBH_BASE + 0x90 + 0x70 * (i)))
-
-#define HW_APBH_CHx_DEBUG2(i)   (*(volatile uint32_t *)(HW_APBH_BASE + 0xa0 + 0x70 * (i)))
-#define HW_APBH_CHx_DEBUG2__AHB_BYTES_BP    0
-#define HW_APBH_CHx_DEBUG2__AHB_BYTES_BM    0xffff
-#define HW_APBH_CHx_DEBUG2__APB_BYTES_BP    16
-#define HW_APBH_CHx_DEBUG2__APB_BYTES_BM    0xffff0000
-
-/********
- * APHX *
- ********/
- 
-/* APHX channels */
-#define HW_APBX_AUDIO_ADC   0
-#define HW_APBX_AUDIO_DAC   1
-#define HW_APBX_I2C         3
-
-#define HW_APBX_BASE        0x80024000
-
-#define HW_APBX_CTRL0       (*(volatile uint32_t *)(HW_APBX_BASE + 0x0))
-
-#define HW_APBX_CTRL1       (*(volatile uint32_t *)(HW_APBX_BASE + 0x10))
-#define HW_APBX_CTRL1__CHx_CMDCMPLT_IRQ(i)      (1 << (i))
-#define HW_APBX_CTRL1__CHx_CMDCMPLT_IRQ_EN(i)   (1 << ((i) + 16))
-
-#define HW_APBX_CTRL2       (*(volatile uint32_t *)(HW_APBX_BASE + 0x20))
-#define HW_APBX_CTRL2__CHx_ERROR_IRQ(i)         (1 << (i))
-#define HW_APBX_CTRL2__CHx_ERROR_STATUS(i)      (1 << ((i) + 16))
-
-#define HW_APBX_CHANNEL_CTRL    (*(volatile uint32_t *)(HW_APBX_BASE + 0x30))
-#define HW_APBX_CHANNEL_CTRL__FREEZE_CHANNEL(i) (1 << (i))
-#define HW_APBX_CHANNEL_CTRL__RESET_CHANNEL(i)  (1 << ((i) + 16))
-
-#define HW_APBX_CHx_CURCMDAR(i) (*(volatile uint32_t *)(HW_APBX_BASE + 0x100 + (i) * 0x70))
-
-#define HW_APBX_CHx_NXTCMDAR(i) (*(volatile uint32_t *)(HW_APBX_BASE + 0x110 + (i) * 0x70))
-
-#define HW_APBX_CHx_CMD(i)      (*(volatile uint32_t *)(HW_APBX_BASE + 0x120 + (i) * 0x70))
-
-#define HW_APBX_CHx_BAR(i)      (*(volatile uint32_t *)(HW_APBX_BASE + 0x130 + (i) * 0x70))
-
-#define HW_APBX_CHx_SEMA(i)     (*(volatile uint32_t *)(HW_APBX_BASE + 0x140 + (i) * 0x70))
-
-#define HW_APBX_CHx_DEBUG1(i)   (*(volatile uint32_t *)(HW_APBX_BASE + 0x150 + (i) * 0x70))
-
-#define HW_APBX_CHx_DEBUG2(i)   (*(volatile uint32_t *)(HW_APBX_BASE + 0x160 + (i) * 0x70))
-#define HW_APBX_CHx_DEBUG2__AHB_BYTES_BP    0
-#define HW_APBX_CHx_DEBUG2__AHB_BYTES_BM    0xffff
-#define HW_APBX_CHx_DEBUG2__APB_BYTES_BP    16
-#define HW_APBX_CHx_DEBUG2__APB_BYTES_BM    0xffff0000
+#define APB_AUDIO_ADC       APBX_DMA_CHANNEL(0)
+#define APB_AUDIO_DAC       APBX_DMA_CHANNEL(1)
+#define APB_I2C             APBX_DMA_CHANNEL(3)
+// NOTE: although undocumented, the IMX233 channel 5 is actually the DRI one
+#define APB_DRI             APBX_DMA_CHANNEL(5)
 
 /**********
  * COMMON *
@@ -154,43 +92,49 @@ struct imx233_dma_info_t
     int nr_unaligned;
 };
 
-#define APBH_DMA_CHANNEL(i)     i
-#define APBX_DMA_CHANNEL(i)     ((i) | 0x10)
-#define APB_IS_APBX_CHANNEL(x)  ((x) & 0x10)
-#define APB_GET_DMA_CHANNEL(x)  ((x) & 0xf)
-
-#define APB_SSP(ssp)        APBH_DMA_CHANNEL(HW_APBH_SSP(ssp))
-#define APB_AUDIO_ADC       APBX_DMA_CHANNEL(HW_APBX_AUDIO_ADC)
-#define APB_AUDIO_DAC       APBX_DMA_CHANNEL(HW_APBX_AUDIO_DAC)
-#define APB_I2C             APBX_DMA_CHANNEL(HW_APBX_I2C)
-#define APB_NAND(dev)       APBH_DMA_CHANNEL(HW_APBH_NAND(dev))
-
-#define HW_APB_CHx_CMD__COMMAND_BM         0x3
-#define HW_APB_CHx_CMD__COMMAND_BP         0
-#define HW_APB_CHx_CMD__COMMAND__NO_XFER   0
-#define HW_APB_CHx_CMD__COMMAND__WRITE     1
-#define HW_APB_CHx_CMD__COMMAND__READ      2
-#define HW_APB_CHx_CMD__COMMAND__SENSE     3
-#define HW_APB_CHx_CMD__CHAIN              (1 << 2)
-#define HW_APB_CHx_CMD__IRQONCMPLT         (1 << 3)
+#define BM_APB_CHx_CMD_COMMAND          0x3
+#define BP_APB_CHx_CMD_COMMAND          0
+#define BF_APB_CHx_CMD_COMMAND(v)       ((v) & 0x3)
+#define BF_APB_CHx_CMD_COMMAND_V(v)     BF_APB_CHx_CMD_COMMAND(BV_APB_CHx_CMD_COMMAND__##v)
+#define BV_APB_CHx_CMD_COMMAND__NO_XFER 0
+#define BV_APB_CHx_CMD_COMMAND__WRITE   1
+#define BV_APB_CHx_CMD_COMMAND__READ    2
+#define BV_APB_CHx_CMD_COMMAND__SENSE   3
+#define BM_APB_CHx_CMD_CHAIN            (1 << 2)
+#define BP_APB_CHx_CMD_CHAIN            2
+#define BF_APB_CHx_CMD_CHAIN(v)         (((v) & 1) << 2)
+#define BM_APB_CHx_CMD_IRQONCMPLT       (1 << 3)
+#define BP_APB_CHx_CMD_IRQONCMPLT       3
+#define BF_APB_CHx_CMD_IRQONCMPLT(v)    (((v) & 1) << 3)
 /* those two are only available on APHB */
-#define HW_APBH_CHx_CMD__NANDLOCK          (1 << 4)
-#define HW_APBH_CHx_CMD__NANDWAIT4READY    (1 << 5)
-#define HW_APB_CHx_CMD__SEMAPHORE          (1 << 6)
-#define HW_APB_CHx_CMD__WAIT4ENDCMD        (1 << 7)
-/* An errata advise not to use it */
-#define HW_APB_CHx_CMD__HALTONTERMINATE    (1 << 8)
-#define HW_APB_CHx_CMD__CMDWORDS_BM         0xf000
-#define HW_APB_CHx_CMD__CMDWORDS_BP         12
-#define HW_APB_CHx_CMD__XFER_COUNT_BM       0xffff0000
-#define HW_APB_CHx_CMD__XFER_COUNT_BP       16
-/* For software use */
-#define HW_APB_CHx_CMD__UNUSED_BP           8
-#define HW_APB_CHx_CMD__UNUSED_BM           (0xf << 8)
-#define HW_APB_CHx_CMD__UNUSED_MAGIC        (0xa << 8)
+#define BM_APBH_CHx_CMD_NANDLOCK        (1 << 4)
+#define BP_APBH_CHx_CMD_NANDLOCK        4
+#define BF_APBH_CHx_CMD_NANDLOCK(v)     (((v) & 1) << 4)
+#define BM_APBH_CHx_CMD_NANDWAIT4READY  (1 << 5)
+#define BP_APBH_CHx_CMD_NANDWAIT4READY  5
+#define BF_APBH_CHx_CMD_NANDWAIT4READY(v)   (((v) & 1) << 5)
 
-#define HW_APB_CHx_SEMA__PHORE_BM           0xff0000
-#define HW_APB_CHx_SEMA__PHORE_BP           16
+#define BM_APB_CHx_CMD_SEMAPHORE        (1 << 6)
+#define BP_APB_CHx_CMD_SEMAPHORE        6
+#define BF_APB_CHx_CMD_SEMAPHORE(v)     (((v) & 1) << 6)
+#define BM_APB_CHx_CMD_WAIT4ENDCMD      (1 << 7)
+#define BP_APB_CHx_CMD_WAIT4ENDCMD      7
+#define BF_APB_CHx_CMD_WAIT4ENDCMD(v)   (((v) & 1) << 7)
+/** WARNING: An errata advise not to use it */
+#define BM_APB_CHx_CMD_HALTONTERMINATE (1 << 8)
+#define BP_APB_CHx_CMD_HALTONTERMINATE 8
+#define BF_APB_CHx_CMD_HALTONTERMINATE(v)   (((v) & 1) << 8)
+#define BM_APB_CHx_CMD_CMDWORDS        0xf000
+#define BP_APB_CHx_CMD_CMDWORDS        12
+#define BF_APB_CHx_CMD_CMDWORDS(v)     (((v) & 0xf) << 12)
+#define BM_APB_CHx_CMD_XFER_COUNT      0xffff0000
+#define BP_APB_CHx_CMD_XFER_COUNT      16
+#define BF_APB_CHx_CMD_XFER_COUNT(v)   (((v) & 0xffff) << 16)
+/* For software use */
+#define BP_APB_CHx_CMD_UNUSED           8
+#define BM_APB_CHx_CMD_UNUSED           (0xf << 8)
+#define BF_APB_CHx_CMD_UNUSED(v)        (((v) & 0xf) << 8)
+#define BV_APB_CHx_CMD_UNUSED__MAGIC    0xa
 
 /* A single descriptor cannot transfer more than 2^16 bytes but because of the
  * weird 0=64KiB, it's safer to restrict to 2^15 */

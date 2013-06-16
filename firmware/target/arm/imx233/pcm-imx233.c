@@ -48,10 +48,8 @@ static void play(const void *addr, size_t size)
 {
     dac_dma.dma.next = NULL;
     dac_dma.dma.buffer = (void *)addr;
-    dac_dma.dma.cmd = HW_APB_CHx_CMD__COMMAND__READ |
-        HW_APB_CHx_CMD__IRQONCMPLT |
-        HW_APB_CHx_CMD__SEMAPHORE |
-        size << HW_APB_CHx_CMD__XFER_COUNT_BP;
+    dac_dma.dma.cmd = BF_OR4(APB_CHx_CMD, COMMAND_V(READ),
+        IRQONCMPLT(1), SEMAPHORE(1), XFER_COUNT(size));
     /* dma subsystem will make sure cached stuff is written to memory */
     imx233_dma_start_command(APB_AUDIO_DAC, &dac_dma.dma);
 }

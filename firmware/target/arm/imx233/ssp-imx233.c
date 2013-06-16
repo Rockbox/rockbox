@@ -285,13 +285,10 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     /* setup the dma parameters */
     ssp_dma_cmd[ssp - 1].dma.buffer = buffer;
     ssp_dma_cmd[ssp - 1].dma.next = NULL;
-    ssp_dma_cmd[ssp - 1].dma.cmd =
-        (buffer == NULL ? HW_APB_CHx_CMD__COMMAND__NO_XFER :
-         read ? HW_APB_CHx_CMD__COMMAND__WRITE : HW_APB_CHx_CMD__COMMAND__READ) |
-        HW_APB_CHx_CMD__IRQONCMPLT | HW_APB_CHx_CMD__SEMAPHORE |
-        HW_APB_CHx_CMD__WAIT4ENDCMD |
-        (3 << HW_APB_CHx_CMD__CMDWORDS_BP) |
-        (xfer_size << HW_APB_CHx_CMD__XFER_COUNT_BP);
+    ssp_dma_cmd[ssp - 1].dma.cmd = BF_OR6(APB_CHx_CMD,
+        COMMAND(buffer == NULL ? BV_APB_CHx_CMD_COMMAND__NO_XFER :
+        read ? BV_APB_CHx_CMD_COMMAND__WRITE : BV_APB_CHx_CMD_COMMAND__READ),
+        IRQONCMPLT(1), SEMAPHORE(1), WAIT4ENDCMD(1), CMDWORDS(3), XFER_COUNT(xfer_size));
 
     SSP_CLRn(SSP_CTRL1, ssp, ALL_IRQ);
 
