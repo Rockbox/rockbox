@@ -23,9 +23,9 @@
 
 static void imx233_rtc_write_reg(volatile uint32_t *reg, uint32_t val)
 {
-    while(__XTRACT(HW_RTC_STAT, NEW_REGS) != 0);
+    while(BF_RD(RTC_STAT, NEW_REGS) != 0);
     *reg = val;
-    while(__XTRACT(HW_RTC_STAT, NEW_REGS) != 0);
+    while(BF_RD(RTC_STAT, NEW_REGS) != 0);
 }
 
 void imx233_rtc_write_seconds(uint32_t seconds)
@@ -35,7 +35,7 @@ void imx233_rtc_write_seconds(uint32_t seconds)
 
 void imx233_rtc_write_persistent(int idx, uint32_t val)
 {
-    imx233_rtc_write_reg(&HW_RTC_PERSISTENTx(idx), val);
+    imx233_rtc_write_reg(&HW_RTC_PERSISTENTn(idx), val);
 }
 
 struct imx233_rtc_info_t imx233_rtc_get_info(void)
@@ -44,6 +44,6 @@ struct imx233_rtc_info_t imx233_rtc_get_info(void)
     memset(&info, 0, sizeof(info));
     info.seconds = HW_RTC_SECONDS;
     for(int i = 0; i < 6; i++)
-        info.persistent[i] = HW_RTC_PERSISTENTx(i);
+        info.persistent[i] = HW_RTC_PERSISTENTn(i);
     return info;
 }
