@@ -33,12 +33,21 @@
 #endif
 
 /* Hack to handle both single and multi devices at once */
+#if IMX233_SUBTARGET < 3700
+#define SSP_SETn(reg, n, field) BF_SET(reg, field)
+#define SSP_CLRn(reg, n, field) BF_CLR(reg, field)
+#define SSP_RDn(reg, n, field) BF_RD(reg, field)
+#define SSP_WRn(reg, n, field, val) BF_WR(reg, field, val)
+#define SSP_WRn_V(reg, n, field, val) BF_WR_V(reg, field, val)
+#define SSP_REGn(reg, n) HW_##reg
+#else
 #define SSP_SETn(reg, n, field) BF_SETn(reg, n, field)
 #define SSP_CLRn(reg, n, field) BF_CLRn(reg, n, field)
 #define SSP_RDn(reg, n, field) BF_RDn(reg, n, field)
 #define SSP_WRn(reg, n, field, val) BF_WRn(reg, n, field, val)
 #define SSP_WRn_V(reg, n, field, val) BF_WRn_V(reg, n, field, val)
 #define SSP_REGn(reg, n) HW_##reg(n)
+#endif
 
 /* Used for DMA */
 struct ssp_dma_command_t
@@ -126,7 +135,9 @@ void imx233_ssp_start(int ssp)
          * intdiv = 5 => clk_ssp = 96Mhz */
         imx233_clkctrl_enable(CLK_SSP, false);
         imx233_clkctrl_set_div(CLK_SSP, 5);
+#if IMX233_SUBTARGET >= 3700
         imx233_clkctrl_set_bypass(CLK_SSP, false); /* use IO */
+#endif
         imx233_clkctrl_enable(CLK_SSP, true);
     }
     ssp_nr_in_use++;
@@ -178,12 +189,17 @@ void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     }
     if(bus_width >= 8)
     {
+#ifdef VPIN_SSP1_D4
         if(use_alt)
         {
+#ifdef VPIN_SSP1_D4_ALT
             imx233_pinctrl_setup_vpin(VPIN_SSP1_D4_ALT, "ssp1_d4", drive_strength, enable_pullups);
             imx233_pinctrl_setup_vpin(VPIN_SSP1_D5_ALT, "ssp1_d5", drive_strength, enable_pullups);
             imx233_pinctrl_setup_vpin(VPIN_SSP1_D6_ALT, "ssp1_d6", drive_strength, enable_pullups);
             imx233_pinctrl_setup_vpin(VPIN_SSP1_D7_ALT, "ssp1_d7", drive_strength, enable_pullups);
+#else
+            panicf("there is ssp1 alt on this soc!");
+#endif
         }
         else
         {
@@ -192,6 +208,9 @@ void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
             imx233_pinctrl_setup_vpin(VPIN_SSP1_D6, "ssp1_d6", drive_strength, enable_pullups);
             imx233_pinctrl_setup_vpin(VPIN_SSP1_D7, "ssp1_d7", drive_strength, enable_pullups);
         }
+#else
+        panicf("ssp1 bus width is limited to 4 on this soc!");
+#endif
     }
 }
 
@@ -201,6 +220,7 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     (void) enable_pullups;
     (void) bus_width;
     (void) drive_strength;
+#ifdef VPIN_SSP2_CMD
     /* SSP_{CMD,SCK} */
     imx233_pinctrl_setup_vpin(VPIN_SSP2_CMD, "ssp2_cmd", drive_strength, enable_pullups);
     imx233_pinctrl_setup_vpin(VPIN_SSP2_SCK, "ssp2_sck", drive_strength, false);
@@ -219,6 +239,9 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
         imx233_pinctrl_setup_vpin(VPIN_SSP2_D6, "ssp2_d6", drive_strength, enable_pullups);
         imx233_pinctrl_setup_vpin(VPIN_SSP2_D7, "ssp2_d7", drive_strength, enable_pullups);
     }
+#else
+    panicf("there is no ssp2 on this soc!");
+#endif
 }
 
 void imx233_ssp_set_mode(int ssp, unsigned mode)
@@ -245,13 +268,22 @@ void imx233_ssp_set_bus_width(int ssp, unsigned width)
     {
         case 1: ssp_bus_width[ssp - 1] = BV_SSP_CTRL0_BUS_WIDTH__ONE_BIT; break;
         case 4: ssp_bus_width[ssp - 1] = BV_SSP_CTRL0_BUS_WIDTH__FOUR_BIT; break;
+        /* STMP3600 cannot do 8-bit bus */
+#if IMX233_SUBTARGET >= 3700
         case 8: ssp_bus_width[ssp - 1] = BV_SSP_CTRL0_BUS_WIDTH__EIGHT_BIT; break;
+#endif
+        default: panicf("ssp: target doesn't handle %d-bits bus", width);
     }
 }
 
 void imx233_ssp_set_block_size(int ssp, unsigned log_block_size)
 {
     ASSERT_SSP(ssp)
+    /* STMP3600 cannot change block size */
+#if IMX233_SUBTARGET < 3600
+    if(log_block_size != 9)
+        panicf("ssp: target doesn't block size %d", 1 << log_block_size);
+#endif
     ssp_log_block_size[ssp - 1] = log_block_size;
 }
 
@@ -268,8 +300,13 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     imx233_dma_enable_channel_interrupt(APB_SSP(ssp), true);
 
     unsigned xfer_size = block_count * (1 << ssp_log_block_size[ssp - 1]);
+
+#if IMX233_SUBTARGET < 3700
+    ssp_dma_cmd[ssp - 1].cmd0 = BF_OR1(SSP_CMD0, CMD(cmd));
+#else
     ssp_dma_cmd[ssp - 1].cmd0 = BF_OR4(SSP_CMD0, CMD(cmd), APPEND_8CYC(1),
         BLOCK_SIZE(ssp_log_block_size[ssp - 1]), BLOCK_COUNT(block_count - 1));
+#endif
     ssp_dma_cmd[ssp - 1].cmd1 = cmd_arg;
     /* setup all flags and run */
     ssp_dma_cmd[ssp - 1].ctrl0 = BF_OR9(SSP_CTRL0, XFER_COUNT(xfer_size),
@@ -322,10 +359,12 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
 void imx233_ssp_sd_mmc_power_up_sequence(int ssp)
 {
     ASSERT_SSP(ssp)
+#if IMX233_SUBTARGET >= 3780
     SSP_CLRn(SSP_CMD0, ssp, SLOW_CLKING_EN);
     SSP_SETn(SSP_CMD0, ssp, CONT_CLKING_EN);
     mdelay(1);
     SSP_CLRn(SSP_CMD0, ssp, CONT_CLKING_EN);
+#endif
 }
 
 static int ssp_detect_oneshot_callback(struct timeout *tmo)
@@ -353,7 +392,13 @@ void imx233_ssp_sdmmc_setup_detect(int ssp, bool enable, ssp_detect_cb_t fn,
     ASSERT_SSP(ssp)
     vpin_t vpin = VPIN_SSP1_DET;
     if(ssp == 2)
+    {
+#ifdef VPIN_SSP2_DET
         vpin = VPIN_SSP2_DET;
+#else
+        panicf("there is no ssp2 det on this soc!");
+#endif
+    }
     unsigned bank = VPIN_UNPACK_BANK(vpin), pin = VPIN_UNPACK_PIN(vpin);
     ssp_detect_cb[ssp - 1] = fn;
     ssp_detect_invert[ssp - 1] = invert;

@@ -29,21 +29,38 @@
 
 #include "regs/regs-ssp.h"
 
+#if IMX233_SUBTARGET < 3700
+#define IMX233_NR_SSP  1
+#else
 #define IMX233_NR_SSP  2
+#endif
 
 /* ssp can value 1 or 2 */
+#if IMX233_NR_SSP >= 2
 #define __SSP_SELECT(ssp, ssp1, ssp2) ((ssp) == 1 ? (ssp1) : (ssp2))
+#else
+#define __SSP_SELECT(ssp, ssp1, ssp2) (ssp1)
+#endif
 
 #define INT_SRC_SSP_DMA(ssp)    __SSP_SELECT(ssp, INT_SRC_SSP1_DMA, INT_SRC_SSP2_DMA)
 #define INT_SRC_SSP_ERROR(ssp)  __SSP_SELECT(ssp, INT_SRC_SSP1_ERROR, INT_SRC_SSP2_ERROR)
 
 #define BP_SSP_CTRL1_ALL_IRQ    0
+#if IMX233_SUBTARGET < 3700
+#define BM_SSP_CTRL1_ALL_IRQ \
+    BM_OR7(SSP_CTRL1, SDIO_IRQ, RESP_ERR_IRQ, RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, \
+        DATA_CRC_IRQ, RECV_TIMEOUT_IRQ, RECV_OVRFLW_IRQ)
+#define BM_SSP_CTRL1_ALL_IRQ_EN \
+    BM_OR7(SSP_CTRL1, SDIO_IRQ_EN, RESP_ERR_IRQ_EN, RESP_TIMEOUT_IRQ_EN, DATA_TIMEOUT_IRQ_EN, \
+        DATA_CRC_IRQ_EN, RECV_TIMEOUT_IRQ_EN, RECV_OVRFLW_IRQ_EN)
+#else
 #define BM_SSP_CTRL1_ALL_IRQ \
     BM_OR8(SSP_CTRL1, SDIO_IRQ, RESP_ERR_IRQ, RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, \
         DATA_CRC_IRQ, FIFO_UNDERRUN_IRQ, RECV_TIMEOUT_IRQ, FIFO_OVERRUN_IRQ)
 #define BM_SSP_CTRL1_ALL_IRQ_EN \
     BM_OR8(SSP_CTRL1, SDIO_IRQ_EN, RESP_ERR_IRQ_EN, RESP_TIMEOUT_IRQ_EN, DATA_TIMEOUT_IRQ_EN, \
         DATA_CRC_IRQ_EN, FIFO_UNDERRUN_EN, RECV_TIMEOUT_IRQ_EN, FIFO_OVERRUN_IRQ_EN)
+#endif
 
 #define BM_SSP_CTRL1_TIMEOUT_IRQ \
     BM_OR3(SSP_CTRL1, RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, RECV_TIMEOUT_IRQ)
@@ -80,6 +97,7 @@ void imx233_ssp_set_block_size(int ssp, unsigned log_block_size);
 enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     uint32_t cmd_arg, enum imx233_ssp_resp_t resp, void *buffer, unsigned block_count,
     bool wait4irq, bool read, uint32_t *resp_ptr);
+/* pullups/alternative are ignored on targets which don't support it */
 void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     unsigned drive_strength, bool use_alt);
 void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
