@@ -33,6 +33,7 @@
 #include "dcp-imx233.h"
 #include "pinctrl-imx233.h"
 #include "ocotp-imx233.h"
+#include "pwm-imx233.h"
 #include "string.h"
 #include "stdio.h"
 
@@ -56,7 +57,6 @@ static struct
     unsigned src;
 } dbg_irqs[] =
 {
-    { "ssp2_err", INT_SRC_SSP2_ERROR },
     { "vdd5v", INT_SRC_VDD5V },
     { "dac_dma", INT_SRC_DAC_DMA },
     { "dac_err", INT_SRC_DAC_ERROR },
@@ -68,7 +68,13 @@ static struct
     { "gpio0", INT_SRC_GPIO0 },
     { "gpio1", INT_SRC_GPIO1 },
     { "gpio2", INT_SRC_GPIO2 },
+#if IMX233_SUBTARGET >= 3780
     { "ssp2_dma", INT_SRC_SSP2_DMA },
+    { "ssp2_err", INT_SRC_SSP2_ERROR },
+    { "lcdif_dma", INT_SRC_LCDIF_DMA },
+    { "lcdif_err", INT_SRC_LCDIF_ERROR },
+    { "dcp", INT_SRC_DCP },
+#endif
     { "i2c_dma", INT_SRC_I2C_DMA },
     { "i2c_err", INT_SRC_I2C_ERROR },
     { "timer0", INT_SRC_TIMER(0) },
@@ -84,10 +90,7 @@ static struct
     { "lradc_ch5", INT_SRC_LRADC_CHx(5) },
     { "lradc_ch6", INT_SRC_LRADC_CHx(6) },
     { "lradc_ch7", INT_SRC_LRADC_CHx(7) },
-    { "lcdif_dma", INT_SRC_LCDIF_DMA },
-    { "lcdif_err", INT_SRC_LCDIF_ERROR },
     { "rtc_1msec", INT_SRC_RTC_1MSEC },
-    { "dcp", INT_SRC_DCP },
 };
 
 bool dbg_hw_info_dma(void)
@@ -166,9 +169,13 @@ bool dbg_hw_info_power(void)
         lcd_putsf(0, line++, "%6s %4d %4d %s", #name, trg, bo, buf); \
 
         DISP_REGULATOR(VDDD);
+#if IMX233_SUBTARGET >= 3700
         DISP_REGULATOR(VDDA);
         DISP_REGULATOR(VDDIO);
+#endif
+#if IMX233_SUBTARGET >= 3780
         DISP_REGULATOR(VDDMEM);
+#endif
         lcd_putsf(0, line++, "DC-DC: pll: %d   freq: %d", info.dcdc_sel_pllclk, info.dcdc_freqsel);
         lcd_putsf(0, line++, "charge: %d mA  stop: %d mA", info.charge_current, info.stop_current);
         lcd_putsf(0, line++, "charging: %d  bat_adj: %d", info.charging, info.batt_adj);
@@ -245,7 +252,7 @@ static struct
 bool dbg_hw_info_clkctrl(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-
+    
     while(1)
     {
         int button = get_action(CONTEXT_STD, HZ / 10);
@@ -296,7 +303,7 @@ bool dbg_hw_info_clkctrl(void)
 bool dbg_hw_info_powermgmt(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
         int button = get_action(CONTEXT_STD, HZ / 10);
@@ -317,12 +324,17 @@ bool dbg_hw_info_powermgmt(void)
         struct imx233_powermgmt_info_t info = imx233_powermgmt_get_info();
         
         lcd_putsf(0, 0, "state: %s",
+            info.state == DISCHARGING ? "discharging" :
+#if CONFIG_CHARGING >= CHARGING_MONITOR
             info.state == CHARGE_STATE_DISABLED ? "disabled" :
             info.state == CHARGE_STATE_ERROR ? "error" :
-            info.state == DISCHARGING ? "discharging" :
+#endif
+#if CONFIG_CHARGING >= CHARGING_MONITOR
             info.state == TRICKLE ? "trickle" :
             info.state == TOPOFF ? "topoff" :
-            info.state == CHARGING ? "charging" : "<unknown>");
+            info.state == CHARGING ? "charging" :
+#endif
+            "<unknown>");
         lcd_putsf(0, 1, "charging tmo: %d", info.charging_timeout);
         lcd_putsf(0, 2, "topoff tmo: %d", info.topoff_timeout);
         lcd_putsf(0, 3, "4p2ilimit tmo: %d", info.incr_4p2_ilimit_timeout);
@@ -364,6 +376,7 @@ bool dbg_hw_info_rtc(void)
     }
 }
 
+#if IMX233_SUBTARGET >= 3780
 bool dbg_hw_info_dcp(void)
 {
     lcd_setfont(FONT_SYSFIXED);
@@ -409,6 +422,12 @@ bool dbg_hw_info_dcp(void)
         yield();
     }
 }
+#else
+bool dbg_hw_info_dcp(void)
+{
+    return true;
+}
+#endif
 
 bool dbg_hw_info_icoll(void)
 {
@@ -417,7 +436,7 @@ bool dbg_hw_info_icoll(void)
     int first_irq = 0;
     int dbg_irqs_count = sizeof(dbg_irqs) / sizeof(dbg_irqs[0]);
     int line_count = lcd_getheight() / font_get(lcd_getfont())->height;
-    
+
     while(1)
     {
         int button = get_action(CONTEXT_STD, HZ / 10);
@@ -447,7 +466,7 @@ bool dbg_hw_info_icoll(void)
         {
             struct imx233_icoll_irq_info_t info = imx233_icoll_get_irq_info(dbg_irqs[i].src);
             lcd_putsf(0, j, "%s", dbg_irqs[i].name);
-            if(info.enabled)
+            if(info.enabled || info.freq > 0)
                 lcd_putsf(10, j, "%d", info.freq);
         }
         lcd_update();
@@ -512,6 +531,7 @@ bool dbg_hw_info_pinctrl(void)
     }
 }
 
+#if IMX233_SUBTARGET >= 3700
 struct
 {
     const char *name;
@@ -582,13 +602,120 @@ bool dbg_hw_info_ocotp(void)
         yield();
     }
 }
+#else
+bool dbg_hw_info_ocotp(void)
+{
+    return true;
+}
+#endif
+
+bool dbg_hw_info_pwm(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+    bool detailled_view = false;
+
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
+                detailled_view = !detailled_view;
+                break;
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        int line = 0;
+        if(detailled_view)
+            lcd_putsf(0, line++, "c cdiv period active/x inactive");
+        else
+            lcd_putsf(0, line++, "pwm");
+        for(int i = 0; i < IMX233_PWM_NR_CHANNELS; i++)
+        {
+            struct imx233_pwm_info_t info = imx233_pwm_get_info(i);
+            if(!info.enabled)
+                continue;
+            if(detailled_view)
+            {
+                lcd_putsf(0, line++, "%d %4d %6d %6d/%c %6d/%c", i, info.cdiv,
+                    info.period, info.active, info.active_state,
+                    info.inactive, info.inactive_state);
+            }
+            else
+            {
+                char *prefix = "";
+                int freq = imx233_clkctrl_get_freq(CLK_XTAL) * 1000 / info.cdiv / info.period;
+                if(freq > 1000)
+                {
+                    prefix = "K";
+                    freq /= 1000;
+                }
+                int duty = (info.inactive - info.active) * 100 / info.period;
+                lcd_putsf(0, line++, "%d @%d %sHz, %d%% %c/%c", i, freq, prefix,
+                    duty, info.active_state, info.inactive_state);
+            }
+        }
+
+        lcd_update();
+        yield();
+    }
+}
+
+bool dbg_hw_info_usb(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+                BF_SET(USBPHY_CTRL, ENOTGIDDETECT);
+                BF_SET(USBPHY_CTRL, ENDEVPLUGINDETECT);
+                break;
+            case ACTION_STD_PREV:
+                BF_CLR(USBPHY_CTRL, ENOTGIDDETECT);
+                BF_CLR(USBPHY_CTRL, ENDEVPLUGINDETECT);
+                break;
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        int line = 0;
+        lcd_putsf(0, line++, "VBUS valid: %d/%d", BF_RD(POWER_STS, VBUSVALID), BF_RD(POWER_STS, VBUSVALID_STATUS));
+        lcd_putsf(0, line++, "A valid: %d/%d", BF_RD(POWER_STS, AVALID), BF_RD(POWER_STS, AVALID_STATUS));
+        lcd_putsf(0, line++, "B valid: %d/%d", BF_RD(POWER_STS, BVALID), BF_RD(POWER_STS, BVALID_STATUS));
+        lcd_putsf(0, line++, "session end: %d", BF_RD(POWER_STS, SESSEND));
+        lcd_putsf(0, line++, "dev plugin: %d", BF_RD(USBPHY_STATUS, DEVPLUGIN_STATUS));
+        lcd_putsf(0, line++, "OTG ID: %d", BF_RD(USBPHY_STATUS, OTGID_STATUS));
+
+        lcd_update();
+        yield();
+    }
+}
 
 bool dbg_hw_info(void)
 {
     return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() &&
         dbg_hw_info_power() && dbg_hw_info_powermgmt() && dbg_hw_info_rtc() &&
         dbg_hw_info_dcp() && dbg_hw_info_pinctrl() && dbg_hw_info_icoll() &&
-        dbg_hw_info_ocotp() && dbg_hw_target_info();
+        dbg_hw_info_ocotp() && dbg_hw_info_pwm() && dbg_hw_info_usb() &&
+        dbg_hw_target_info();
 }
 
 bool dbg_ports(void)
