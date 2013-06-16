@@ -41,9 +41,8 @@ static inline void core_sleep(void)
 
 enum imx233_clock_t
 {
-    CLK_PIX, /* freq, div, frac, bypass, enable */
     CLK_SSP, /* freq, div, bypass, enable */
-    CLK_IO, /* freq, frac */
+    CLK_IO, /* freq, frac (stmp3700+) */
     CLK_CPU, /* freq, div, frac, bypass */
     CLK_HBUS, /* freq, div, frac */
     CLK_PLL, /* freq, enable */
@@ -55,6 +54,9 @@ enum imx233_clock_t
     CLK_PWM, /* enable */
     CLK_TIMROT,  /* enable */
     CLK_UART, /* enable */
+#if IMX233_SUBTARGET >= 3700
+    CLK_PIX, /* freq, div, frac, bypass, enable */
+#endif
 };
 
 void imx233_clkctrl_init(void);
@@ -63,12 +65,14 @@ void imx233_clkctrl_enable(enum imx233_clock_t clk, bool enable);
 bool imx233_clkctrl_is_enabled(enum imx233_clock_t cl);
 void imx233_clkctrl_set_div(enum imx233_clock_t clk, int div);
 int imx233_clkctrl_get_div(enum imx233_clock_t clk);
+#if IMX233_SUBTARGET >= 3700
 /* call with fracdiv=0 to disable it */
 void imx233_clkctrl_set_frac_div(enum imx233_clock_t clk, int fracdiv);
 /* 0 means fractional dividor disable */
 int imx233_clkctrl_get_frac_div(enum imx233_clock_t clk);
 void imx233_clkctrl_set_bypass(enum imx233_clock_t clk, bool bypass);
 bool imx233_clkctrl_get_bypass(enum imx233_clock_t clk);
+#endif
 void imx233_clkctrl_enable_usb(bool enable);
 bool imx233_clkctrl_is_usb_enabled(void);
 /* returns frequency in KHz */
