@@ -88,14 +88,16 @@ void imx233_i2c_init(void)
     imx233_pinctrl_setup_vpin(VPIN_I2C_SDA, "i2c sda", PINCTRL_DRIVE_4mA, true);
     /* clear softreset */
     imx233_reset_block(&HW_I2C_CTRL0);
-    /* Errata:
+    /* Errata (imx233):
      * When RETAIN_CLOCK is set, the ninth clock pulse (ACK) is not generated. However, the SDA
      * line is read at the proper timing interval. If RETAIN_CLOCK is cleared, the ninth clock pulse is
      * generated.
      * HW_I2C_CTRL1[ACK_MODE] has default value of 0. It should be set to 1 to enable the fix for
      * this issue.
      */
+#if IMX233_SUBTARGET >= 3780
     BF_SET(I2C_CTRL1, ACK_MODE);
+#endif
     BF_SET(I2C_CTRL0, CLKGATE);
     /* Fast-mode @ 400K */
     HW_I2C_TIMING0 = 0x000F0007; /* tHIGH=0.6us, read at 0.3us */
