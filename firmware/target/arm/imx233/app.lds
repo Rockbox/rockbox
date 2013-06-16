@@ -131,5 +131,5 @@ SECTIONS
     {
         _pluginbuf = .;
         pluginbuf = .;
-    }
+    } > DRAM
 }
