@@ -148,12 +148,12 @@ static void findDelta(struct SynthObject * so, int ch, int note)
 
 /*
     Old formula:
-    delta = (((gustable[note+chPBNoteOffset[ch]]<<FRACTSIZE) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
+    delta = (((freqtable[note+chPBNoteOffset[ch]]<<FRACTSIZE) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
 
     Plus some pitch stuff. See old SVN for how it used to be
 */
 
-    delta = (((gustable[note+chPBNoteOffset[ch]]))); /* anywhere from 8000 to 8000000 */
+    delta = (((freqtable[note+chPBNoteOffset[ch]]))); /* anywhere from 8000 to 8000000 */
     delta = delta * wf->sampRate;           /* approx 20000 - 44000 but can vary with tuning */
     delta = (delta * chPBFractBend[ch]);    /* approx 60000 - 70000 */
     delta = delta / (SAMPLE_RATE);  /* 44100 or 22050 */
@@ -263,7 +263,7 @@ static inline void pressNote(int ch, int note, int vol)
 
             struct GWaveform * wf = drumSet[note]->waveforms[0];
             voices[a].wf = wf;
-            voices[a].delta = (((gustable[note]<<FRACTSIZE) / wf->rootFreq) * wf->sampRate / SAMPLE_RATE);
+            voices[a].delta = (((freqtable[note]<<FRACTSIZE) / wf->rootFreq) * wf->sampRate / SAMPLE_RATE);
             if (wf->mode & 28)
 //                midi_debug("\nWoah, a drum patch has a loop. Stripping the loop...");
             wf->mode = wf->mode & (255-28);

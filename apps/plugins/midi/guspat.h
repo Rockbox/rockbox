@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-extern const uint32_t gustable[];
+extern const uint32_t freqtable[];
 
 struct GWaveform
 {
