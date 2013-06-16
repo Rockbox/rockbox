@@ -129,10 +129,10 @@ void imx233_emi_set_frequency(unsigned long freq) ICODE_ATTR;
 void imx233_emi_set_frequency(unsigned long freq)
 {
     /** FIXME we rely on the compiler to NOT use the stack here because it's
-     * in iram ! If it's not smart enough, one can switch the switch to use
+     * not in iram ! If it's not smart enough, one can switch the switch to use
      * the irq stack since we are running interrupts disable here ! */
     /** BUG for freq<=24 MHz we must keep bypass mode since we run on xtal
-     * we this setting is unused by our code so ignore this bug for now */
+     * since this setting is unused by our code so ignore this bug for now */
     /** WARNING DANGER
      * Changing the EMI frequency is complicated because it requires to
      * completely shutdown the external memory interface. We must make sure
@@ -140,17 +140,19 @@ void imx233_emi_set_frequency(unsigned long freq)
      * the sdram will be made during the change. Care must be taken w.r.t to
      * the cache also. */
     /** FIXME assume that auto-slow is disabled here since that could put some
-     * clock below the minimum value and we want to spend as less time as
-     * possible in this state anyway. */
-    
+     * clock below the minimum value and we want to spend as least time as
+     * possible in this state anyway.
+     * WARNING DANGER don't call any external function when sdram is disabled
+     * otherwise you'll poke sdram and trigger a fatal data abort ! */
+
     /* first disable all interrupts */
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     /* flush the cache */
     commit_discard_idcache();
     /* put DRAM into self-refresh mode */
-    HW_DRAM_CTL08 |= HW_DRAM_CTL08__SREFRESH;
+    HW_DRAM_CTL08 |= BM_DRAM_CTL08_SREFRESH;
     /* wait for DRAM to be halted */
-    while(!(HW_EMI_STAT & HW_EMI_STAT__DRAM_HALTED));
+    while(!BF_RD(EMI_STAT, DRAM_HALTED));
     /* load timings */
     struct emi_reg_t *regs;
     if(freq <= 24000) regs = settings_24M;
@@ -170,7 +172,7 @@ void imx233_emi_set_frequency(unsigned long freq)
     /* wait for transition */
     while(BF_RD(CLKCTRL_EMI, BUSY_REF_XTAL));
     /* put emi dll into reset mode */
-    __REG_SET(HW_EMI_CTRL) = HW_EMI_CTRL__DLL_RESET | HW_EMI_CTRL__DLL_SHIFT_RESET;
+    HW_EMI_CTRL_SET = BM_EMI_CTRL_DLL_RESET | BM_EMI_CTRL_DLL_SHIFT_RESET;
     /* load the new frequency dividers */
     set_frequency(freq);
     /* switch emi back to pll */
@@ -178,13 +180,13 @@ void imx233_emi_set_frequency(unsigned long freq)
     /* wait for transition */
     while(BF_RD(CLKCTRL_EMI, BUSY_REF_EMI));
     /* allow emi dll to lock again */
-    __REG_CLR(HW_EMI_CTRL) = HW_EMI_CTRL__DLL_RESET | HW_EMI_CTRL__DLL_SHIFT_RESET;
+    HW_EMI_CTRL_CLR = BM_EMI_CTRL_DLL_RESET | BM_EMI_CTRL_DLL_SHIFT_RESET;
     /* wait for lock */
-    while(!(HW_DRAM_CTL04 & HW_DRAM_CTL04__DLLLOCKREG));
+    while(!BF_RD(DRAM_CTL04, DLLLOCKREG));
     /* get DRAM out of self-refresh mode */
-    HW_DRAM_CTL08 &= ~HW_DRAM_CTL08__SREFRESH;
+    HW_DRAM_CTL08 &= ~BM_DRAM_CTL08_SREFRESH;
     /* wait for DRAM to be to run again */
-    while(HW_EMI_STAT & HW_EMI_STAT__DRAM_HALTED);
+    while(HW_EMI_STAT & BM_EMI_STAT_DRAM_HALTED);
 
     restore_interrupt(oldstatus);
 }
