@@ -28,35 +28,35 @@
 // 4 banks of 32 pins
 static const char *pin_use[4][32];
 
-void imx233_pinctrl_acquire_pin(unsigned bank, unsigned pin, const char *name)
+void imx233_pinctrl_acquire(unsigned bank, unsigned pin, const char *name)
 {
     if(pin_use[bank][pin] != NULL && pin_use[bank][pin] != name)
         panicf("acquire B%dP%02d for %s, was %s!", bank, pin, name, pin_use[bank][pin]);
     pin_use[bank][pin] = name;
 }
 
-void imx233_pinctrl_acquire_pin_mask(unsigned bank, uint32_t mask, const char *name)
+void imx233_pinctrl_acquire_mask(unsigned bank, uint32_t mask, const char *name)
 {
     for(unsigned pin = 0; pin < 32; pin++)
         if(mask & (1 << pin))
-            imx233_pinctrl_acquire_pin(bank, pin, name);
+            imx233_pinctrl_acquire(bank, pin, name);
 }
 
-void imx233_pinctrl_release_pin(unsigned bank, unsigned pin, const char *name)
+void imx233_pinctrl_release(unsigned bank, unsigned pin, const char *name)
 {
     if(pin_use[bank][pin] != NULL && pin_use[bank][pin] != name)
         panicf("release B%dP%02d for %s: was %s!", bank, pin, name, pin_use[bank][pin]);
     pin_use[bank][pin] = NULL;
 }
 
-void imx233_pinctrl_release_pin_mask(unsigned bank, uint32_t mask, const char *name)
+void imx233_pinctrl_release_mask(unsigned bank, uint32_t mask, const char *name)
 {
     for(unsigned pin = 0; pin < 32; pin++)
         if(mask & (1 << pin))
-            imx233_pinctrl_release_pin(bank, pin, name);
+            imx233_pinctrl_release(bank, pin, name);
 }
 
-const char *imx233_pinctrl_get_pin_use(unsigned bank, unsigned pin)
+const char *imx233_pinctrl_blame(unsigned bank, unsigned pin)
 {
     return pin_use[bank][pin];
 }
@@ -71,7 +71,7 @@ static void INT_GPIO(int bank)
         if(fire & (1 << pin))
         {
             pin_irq_cb_t cb = pin_cb[bank][pin];
-            imx233_setup_pin_irq(bank, pin, false, false, false, NULL);
+            imx233_pinctrl_setup_irq(bank, pin, false, false, false, NULL);
             if(cb)
                 cb(bank, pin);
         }
@@ -92,7 +92,7 @@ void INT_GPIO2(void)
     INT_GPIO(2);
 }
 
-void imx233_setup_pin_irq(int bank, int pin, bool enable_int,
+void imx233_pinctrl_setup_irq(int bank, int pin, bool enable_int,
     bool level, bool polarity, pin_irq_cb_t cb)
 {
     HW_PINCTRL_PIN2IRQn_CLR(bank) = 1 << pin;

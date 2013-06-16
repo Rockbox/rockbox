@@ -79,7 +79,7 @@ bool button_debug_screen(void)
         lcd_putsf(0, 1, "RMI: id=%s p=%x s=%x", product_id, func_presence, sensor_prop);
         lcd_putsf(0, 2, "xmax=%d ymax=%d res=%d", x_max, y_max, sensor_resol);
         lcd_putsf(0, 3, "attn=%d ctl=%x int=%x",
-            imx233_get_gpio_input_mask(0, 0x08000000) ? 0 : 1,
+            imx233_pinctrl_get_gpio_mask(0, 0x08000000) ? 0 : 1,
             rmi_read_single(RMI_DEVICE_CONTROL),
             rmi_read_single(RMI_INTERRUPT_REQUEST));
         lcd_putsf(0, 4, "sensi: %d min_dist: %d", (int)sensitivity.value, min_dist);
@@ -271,7 +271,7 @@ static void rmi_thread(void)
             touchpad_btns = 0;
         
         /* enable interrupt */
-        imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
+        imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb);
     }
 }
 
@@ -302,10 +302,10 @@ void button_init_device(void)
      */
      
     /* touchpad power */
-    imx233_pinctrl_acquire_pin(0, 26, "touchpad power");
-    imx233_set_pin_function(0, 26, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(0, 26, false);
-    imx233_set_pin_drive_strength(0, 26, PINCTRL_DRIVE_8mA);
+    imx233_pinctrl_acquire(0, 26, "touchpad power");
+    imx233_pinctrl_set_function(0, 26, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(0, 26, false);
+    imx233_pinctrl_set_drive(0, 26, PINCTRL_DRIVE_8mA);
     
     rmi_init(0x40);
 
@@ -325,14 +325,14 @@ void button_init_device(void)
     create_thread(rmi_thread, rmi_stack, sizeof(rmi_stack), 0,
             rmi_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
     /* enable interrupt */
-    imx233_pinctrl_acquire_pin(0, 27, "touchpad int");
-    imx233_set_pin_function(0, 27, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(0, 27, false);
-    imx233_setup_pin_irq(0, 27, true, true, false, &rmi_attn_cb);
+    imx233_pinctrl_acquire(0, 27, "touchpad int");
+    imx233_pinctrl_set_function(0, 27, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(0, 27, false);
+    imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb);
     /* Volume down */
-    imx233_pinctrl_acquire_pin(1, 30, "volume down");
-    imx233_set_pin_function(1, 30, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(1, 30, false);
+    imx233_pinctrl_acquire(1, 30, "volume down");
+    imx233_pinctrl_set_function(1, 30, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(1, 30, false);
 }
 
 #else
@@ -340,9 +340,9 @@ void button_init_device(void)
 void button_init_device(void)
 {
     /* Volume down */
-    imx233_pinctrl_acquire_pin(1, 30, "volume down");
-    imx233_set_pin_function(1, 30, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(1, 30, false);
+    imx233_pinctrl_acquire(1, 30, "volume down");
+    imx233_pinctrl_set_function(1, 30, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(1, 30, false);
 }
 
 int touchpad_read_device(void)
@@ -355,7 +355,7 @@ int touchpad_read_device(void)
 int button_read_device(void)
 {
     int res = 0;
-    if(!imx233_get_gpio_input_mask(1, 0x40000000))
+    if(!imx233_pinctrl_get_gpio_mask(1, 0x40000000))
         res |= BUTTON_VOL_DOWN;
     /* The imx233 uses the voltage on the PSWITCH pin to detect power up/down
      * events as well as recovery mode. Since the power button is the power button

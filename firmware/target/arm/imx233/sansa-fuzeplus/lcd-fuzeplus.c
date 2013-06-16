@@ -67,36 +67,36 @@ static void setup_lcd_pins(bool use_lcdif)
     /* WARNING
      * the B1P22 and B1P24 pins are used by the tuner i2c! Do NOT drive
      * them as lcd_dotclk and lcd_hsync or it will break the tuner! */
-    imx233_pinctrl_acquire_pin(1, 18, "lcd reset");
-    imx233_pinctrl_acquire_pin(1, 19, "lcd rs");
-    imx233_pinctrl_acquire_pin(1, 20, "lcd wr");
-    imx233_pinctrl_acquire_pin(1, 21, "lcd cs");
-    imx233_pinctrl_acquire_pin(1, 23, "lcd enable");
-    imx233_pinctrl_acquire_pin(1, 25, "lcd vsync");
-    imx233_pinctrl_acquire_pin_mask(1, 0x3ffff, "lcd data");
+    imx233_pinctrl_acquire(1, 18, "lcd reset");
+    imx233_pinctrl_acquire(1, 19, "lcd rs");
+    imx233_pinctrl_acquire(1, 20, "lcd wr");
+    imx233_pinctrl_acquire(1, 21, "lcd cs");
+    imx233_pinctrl_acquire(1, 23, "lcd enable");
+    imx233_pinctrl_acquire(1, 25, "lcd vsync");
+    imx233_pinctrl_acquire_mask(1, 0x3ffff, "lcd data");
     if(use_lcdif)
     {
-        imx233_set_pin_function(1, 25, PINCTRL_FUNCTION_GPIO); /* lcd_vsync */
-        imx233_set_pin_function(1, 21, PINCTRL_FUNCTION_MAIN); /* lcd_cs */
-        imx233_set_pin_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
-        imx233_set_pin_function(1, 18, PINCTRL_FUNCTION_MAIN); /* lcd_reset */
-        imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
-        imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_MAIN); /* lcd_d16 */
-        imx233_set_pin_function(1, 17, PINCTRL_FUNCTION_MAIN); /* lcd_d17 */
-        imx233_set_pin_function(1, 20, PINCTRL_FUNCTION_MAIN); /* lcd_wr */
+        imx233_pinctrl_set_function(1, 25, PINCTRL_FUNCTION_GPIO); /* lcd_vsync */
+        imx233_pinctrl_set_function(1, 21, PINCTRL_FUNCTION_MAIN); /* lcd_cs */
+        imx233_pinctrl_set_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
+        imx233_pinctrl_set_function(1, 18, PINCTRL_FUNCTION_MAIN); /* lcd_reset */
+        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
+        imx233_pinctrl_set_function(1, 16, PINCTRL_FUNCTION_MAIN); /* lcd_d16 */
+        imx233_pinctrl_set_function(1, 17, PINCTRL_FUNCTION_MAIN); /* lcd_d17 */
+        imx233_pinctrl_set_function(1, 20, PINCTRL_FUNCTION_MAIN); /* lcd_wr */
         HW_PINCTRL_MUXSELn_CLR(2) = 0xffffffff; /* lcd_d{0-15} */
     }
     else
     {
         HW_PINCTRL_MUXSELn_SET(2) = 0xffffffff; /* lcd_d{0-15} */
         HW_PINCTRL_DOEn_CLR(1) = 0x2bfffff;
-        imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
-        imx233_set_pin_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */
-        imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
-        imx233_set_pin_function(1, 20, PINCTRL_FUNCTION_GPIO); /* lcd_wr */
-        imx233_set_pin_function(1, 21, PINCTRL_FUNCTION_GPIO); /* lcd_cs */
-        imx233_set_pin_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
-        imx233_set_pin_function(1, 25, PINCTRL_FUNCTION_GPIO); /* lcd_vsync */
+        imx233_pinctrl_set_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
+        imx233_pinctrl_set_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */
+        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
+        imx233_pinctrl_set_function(1, 20, PINCTRL_FUNCTION_GPIO); /* lcd_wr */
+        imx233_pinctrl_set_function(1, 21, PINCTRL_FUNCTION_GPIO); /* lcd_cs */
+        imx233_pinctrl_set_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
+        imx233_pinctrl_set_function(1, 25, PINCTRL_FUNCTION_GPIO); /* lcd_vsync */
     }
 }
 
@@ -104,41 +104,41 @@ static void setup_lcd_pins_i80(bool i80)
 {
     if(i80)
     {
-        imx233_set_pin_drive_strength(1, 19, PINCTRL_DRIVE_12mA); /* lcd_rs */
-        imx233_set_pin_drive_strength(1, 20, PINCTRL_DRIVE_12mA); /* lcd_wr */
-        imx233_set_pin_drive_strength(1, 21, PINCTRL_DRIVE_12mA); /* lcd_cs */
-        imx233_set_pin_drive_strength(1, 23, PINCTRL_DRIVE_12mA); /* lcd_enable */
-        imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
-        imx233_set_pin_function(1, 20, PINCTRL_FUNCTION_GPIO); /* lcd_wr */
-        imx233_set_pin_function(1, 21, PINCTRL_FUNCTION_GPIO); /* lcd_cs */
-        imx233_set_pin_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
+        imx233_pinctrl_set_drive(1, 19, PINCTRL_DRIVE_12mA); /* lcd_rs */
+        imx233_pinctrl_set_drive(1, 20, PINCTRL_DRIVE_12mA); /* lcd_wr */
+        imx233_pinctrl_set_drive(1, 21, PINCTRL_DRIVE_12mA); /* lcd_cs */
+        imx233_pinctrl_set_drive(1, 23, PINCTRL_DRIVE_12mA); /* lcd_enable */
+        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
+        imx233_pinctrl_set_function(1, 20, PINCTRL_FUNCTION_GPIO); /* lcd_wr */
+        imx233_pinctrl_set_function(1, 21, PINCTRL_FUNCTION_GPIO); /* lcd_cs */
+        imx233_pinctrl_set_function(1, 23, PINCTRL_FUNCTION_GPIO); /* lcd_enable */
         /* lcd_{rs,wr,cs,enable} */
-        imx233_enable_gpio_output_mask(1, (1 << 19) | (1 << 20) | (1 << 21) | (1 << 23), true);
-        imx233_set_gpio_output_mask(1, (1 << 19) | (1 << 20) | (1 << 21) | (1 << 23), true);
+        imx233_pinctrl_enable_gpio_mask(1, (1 << 19) | (1 << 20) | (1 << 21) | (1 << 23), true);
+        imx233_pinctrl_set_gpio_mask(1, (1 << 19) | (1 << 20) | (1 << 21) | (1 << 23), true);
 
-        imx233_enable_gpio_output_mask(1, 0x3ffff, false); /* lcd_d{0-17} */
+        imx233_pinctrl_enable_gpio_mask(1, 0x3ffff, false); /* lcd_d{0-17} */
         HW_PINCTRL_MUXSELn_SET(2) = 0xffffffff; /* lcd_d{0-15} as GPIO */
-        imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
-        imx233_set_pin_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */
-        imx233_set_pin_function(1, 18, PINCTRL_FUNCTION_GPIO); /* lcd_reset */
-        imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
+        imx233_pinctrl_set_function(1, 16, PINCTRL_FUNCTION_GPIO); /* lcd_d16 */
+        imx233_pinctrl_set_function(1, 17, PINCTRL_FUNCTION_GPIO); /* lcd_d17 */
+        imx233_pinctrl_set_function(1, 18, PINCTRL_FUNCTION_GPIO); /* lcd_reset */
+        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_GPIO); /* lcd_rs */
     }
     else
     {
-        imx233_set_gpio_output_mask(1, (1 << 19) | (1 << 20) | (1 << 21) | (1 << 23), true);
-        imx233_set_pin_drive_strength(1, 19, PINCTRL_DRIVE_4mA); /* lcd_rs */
-        imx233_set_pin_drive_strength(1, 20, PINCTRL_DRIVE_4mA); /* lcd_wr */
-        imx233_set_pin_drive_strength(1, 21, PINCTRL_DRIVE_4mA); /* lcd_cs */
-        imx233_set_pin_drive_strength(1, 23, PINCTRL_DRIVE_4mA); /* lcd_enable */
-        imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
-        imx233_set_pin_function(1, 20, PINCTRL_FUNCTION_MAIN); /* lcd_wr */
-        imx233_set_pin_function(1, 21, PINCTRL_FUNCTION_MAIN); /* lcd_cs */
-        imx233_enable_gpio_output_mask(1, 0x3ffff, false); /* lcd_d{0-17} */
+        imx233_pinctrl_set_gpio_mask(1, (1 << 19) | (1 << 20) | (1 << 21) | (1 << 23), true);
+        imx233_pinctrl_set_drive(1, 19, PINCTRL_DRIVE_4mA); /* lcd_rs */
+        imx233_pinctrl_set_drive(1, 20, PINCTRL_DRIVE_4mA); /* lcd_wr */
+        imx233_pinctrl_set_drive(1, 21, PINCTRL_DRIVE_4mA); /* lcd_cs */
+        imx233_pinctrl_set_drive(1, 23, PINCTRL_DRIVE_4mA); /* lcd_enable */
+        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
+        imx233_pinctrl_set_function(1, 20, PINCTRL_FUNCTION_MAIN); /* lcd_wr */
+        imx233_pinctrl_set_function(1, 21, PINCTRL_FUNCTION_MAIN); /* lcd_cs */
+        imx233_pinctrl_enable_gpio_mask(1, 0x3ffff, false); /* lcd_d{0-17} */
         HW_PINCTRL_MUXSELn_CLR(2) = 0xffffffff; /* lcd_d{0-15} as lcd_d{0-15} */
-        imx233_set_pin_function(1, 16, PINCTRL_FUNCTION_MAIN); /* lcd_d16 */
-        imx233_set_pin_function(1, 17, PINCTRL_FUNCTION_MAIN); /* lcd_d17 */
-        imx233_set_pin_function(1, 18, PINCTRL_FUNCTION_MAIN); /* lcd_reset */
-        imx233_set_pin_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
+        imx233_pinctrl_set_function(1, 16, PINCTRL_FUNCTION_MAIN); /* lcd_d16 */
+        imx233_pinctrl_set_function(1, 17, PINCTRL_FUNCTION_MAIN); /* lcd_d17 */
+        imx233_pinctrl_set_function(1, 18, PINCTRL_FUNCTION_MAIN); /* lcd_reset */
+        imx233_pinctrl_set_function(1, 19, PINCTRL_FUNCTION_MAIN); /* lcd_rs */
     }
 }
 
@@ -178,37 +178,37 @@ static uint32_t i80_read_register(uint32_t data_out)
 {
     imx233_lcdif_wait_ready();
     /* lcd_enable is mapped to the RD pin of the controller */
-    imx233_set_gpio_output(1, 21, true); /* lcd_cs */
-    imx233_set_gpio_output(1, 19, true); /* lcd_rs */
-    imx233_set_gpio_output(1, 23, true); /* lcd_enable */
-    imx233_set_gpio_output(1, 20, true); /* lcd_wr */
-    imx233_enable_gpio_output_mask(1, 0x3ffff, true); /* lcd_d{0-17} */
+    imx233_pinctrl_set_gpio(1, 21, true); /* lcd_cs */
+    imx233_pinctrl_set_gpio(1, 19, true); /* lcd_rs */
+    imx233_pinctrl_set_gpio(1, 23, true); /* lcd_enable */
+    imx233_pinctrl_set_gpio(1, 20, true); /* lcd_wr */
+    imx233_pinctrl_enable_gpio_mask(1, 0x3ffff, true); /* lcd_d{0-17} */
     udelay(2);
-    imx233_set_gpio_output(1, 19, false); /* lcd_rs */
+    imx233_pinctrl_set_gpio(1, 19, false); /* lcd_rs */
     udelay(1);
-    imx233_set_gpio_output(1, 21, false); /* lcd_cs */
+    imx233_pinctrl_set_gpio(1, 21, false); /* lcd_cs */
     udelay(1);
-    imx233_set_gpio_output(1, 20, false); /* lcd_wr */
+    imx233_pinctrl_set_gpio(1, 20, false); /* lcd_wr */
     udelay(1);
-    imx233_set_gpio_output_mask(1, data_out & 0x3ffff, true); /* lcd_d{0-17} */
+    imx233_pinctrl_set_gpio_mask(1, data_out & 0x3ffff, true); /* lcd_d{0-17} */
     udelay(1);
-    imx233_set_gpio_output(1, 20, true); /* lcd_wr */
+    imx233_pinctrl_set_gpio(1, 20, true); /* lcd_wr */
     udelay(3);
-    imx233_enable_gpio_output_mask(1, 0x3ffff, false); /* lcd_d{0-17} */
+    imx233_pinctrl_enable_gpio_mask(1, 0x3ffff, false); /* lcd_d{0-17} */
     udelay(2);
-    imx233_set_gpio_output(1, 23, false); /* lcd_enable */
+    imx233_pinctrl_set_gpio(1, 23, false); /* lcd_enable */
     udelay(1);
-    imx233_set_gpio_output(1, 19, true); /* lcd_rs */
+    imx233_pinctrl_set_gpio(1, 19, true); /* lcd_rs */
     udelay(1);
-    imx233_set_gpio_output(1, 23, true); /* lcd_enable */
+    imx233_pinctrl_set_gpio(1, 23, true); /* lcd_enable */
     udelay(3);
-    imx233_set_gpio_output(1, 23, false); /* lcd_enable */
+    imx233_pinctrl_set_gpio(1, 23, false); /* lcd_enable */
     udelay(2);
-    uint32_t data_in = imx233_get_gpio_input_mask(1, 0x3ffff); /* lcd_d{0-17} */
+    uint32_t data_in = imx233_pinctrl_get_gpio_mask(1, 0x3ffff); /* lcd_d{0-17} */
     udelay(1);
-    imx233_set_gpio_output(1, 23, true); /* lcd_enable */
+    imx233_pinctrl_set_gpio(1, 23, true); /* lcd_enable */
     udelay(1);
-    imx233_set_gpio_output(1, 21, true); /* lcd_cs */
+    imx233_pinctrl_set_gpio(1, 21, true); /* lcd_cs */
     udelay(1);
     return data_in;
 }

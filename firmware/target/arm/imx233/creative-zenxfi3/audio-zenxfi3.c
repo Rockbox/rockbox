@@ -34,15 +34,15 @@ static bool initialized = false;
 static void init(void)
 {
     /* HP gate */
-    imx233_pinctrl_acquire_pin(1, 30, "hp gate");
-    imx233_set_pin_function(1, 30, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(1, 30, true);
-    imx233_set_gpio_output(1, 30, false);
+    imx233_pinctrl_acquire(1, 30, "hp gate");
+    imx233_pinctrl_set_function(1, 30, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(1, 30, true);
+    imx233_pinctrl_set_gpio(1, 30, false);
     /* SPKR gate */
-    imx233_pinctrl_acquire_pin(1, 22, "spkr gate");
-    imx233_set_pin_function(1, 22, PINCTRL_FUNCTION_GPIO);
-    imx233_enable_gpio_output(1, 22, true);
-    imx233_set_gpio_output(1, 22, false);
+    imx233_pinctrl_acquire(1, 22, "spkr gate");
+    imx233_pinctrl_set_function(1, 22, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(1, 22, true);
+    imx233_pinctrl_set_gpio(1, 22, false);
     
     initialized = true;
 }
@@ -52,7 +52,7 @@ static void select_audio_path(void)
     if(!initialized)
         init();
     /* route audio to HP */
-    imx233_set_gpio_output(1, 30, true);
+    imx233_pinctrl_set_gpio(1, 30, true);
 
     if(input_source == AUDIO_SRC_PLAYBACK)
         imx233_audioout_select_hp_input(false);

@@ -527,7 +527,7 @@ bool dbg_hw_info_pinctrl(void)
 
         lcd_clear_display();
         for(int i = 0; i < 4; i++)
-            lcd_putsf(0, i, "DIN%d = 0x%08x", i, imx233_get_gpio_input_mask(i, 0xffffffff));
+            lcd_putsf(0, i, "DIN%d = 0x%08x", i, imx233_pinctrl_get_gpio_mask(i, 0xffffffff));
 #ifdef IMX233_PINCTRL_DEBUG
         unsigned cur_line = 6;
         unsigned last_line = lcd_getheight() / font_get(lcd_getfont())->height;
@@ -536,7 +536,7 @@ bool dbg_hw_info_pinctrl(void)
         for(int bank = 0; bank < 4; bank++)
         for(int pin = 0; pin < 32; pin++)
         {
-            const char *owner = imx233_pinctrl_get_pin_use(bank, pin);
+            const char *owner = imx233_pinctrl_blame(bank, pin);
             if(owner == NULL)
                 continue;
             if(cur_idx++ >= top_user && cur_line < last_line)

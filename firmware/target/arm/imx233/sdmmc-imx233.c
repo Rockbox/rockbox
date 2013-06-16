@@ -200,13 +200,13 @@ static void sdmmc_power(int drive, bool on)
     {
         int bank = PIN2BANK(SDMMC_CONF(drive).power_pin);
         int pin = PIN2PIN(SDMMC_CONF(drive).power_pin);
-        imx233_pinctrl_acquire_pin(bank, pin, "sd/mmc power");
-        imx233_set_pin_function(bank, pin, PINCTRL_FUNCTION_GPIO);
-        imx233_enable_gpio_output(bank, pin, true);
+        imx233_pinctrl_acquire(bank, pin, "sd/mmc power");
+        imx233_pinctrl_set_function(bank, pin, PINCTRL_FUNCTION_GPIO);
+        imx233_pinctrl_enable_gpio(bank, pin, true);
         if(SDMMC_FLAGS(drive) & POWER_INVERTED)
-            imx233_set_gpio_output(bank, pin, !on);
+            imx233_pinctrl_set_gpio(bank, pin, !on);
         else
-            imx233_set_gpio_output(bank, pin, on);
+            imx233_pinctrl_set_gpio(bank, pin, on);
     }
     if(SDMMC_FLAGS(drive) & POWER_DELAY)
         sleep(SDMMC_CONF(drive).power_delay);

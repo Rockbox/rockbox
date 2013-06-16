@@ -30,21 +30,21 @@ void _backlight_set_brightness(int brightness)
 {
     if(brightness != 0)
         brightness = 32 - (brightness * 32) / 100;
-    imx233_set_gpio_output(1, 28, false);
+    imx233_pinctrl_set_gpio(1, 28, false);
     udelay(600);
     while(brightness-- > 0)
     {
-        imx233_set_gpio_output(1, 28, false);
-        imx233_set_gpio_output(1, 28, true);
+        imx233_pinctrl_set_gpio(1, 28, false);
+        imx233_pinctrl_set_gpio(1, 28, true);
     }
 }
 
 bool _backlight_init(void)
 {
-    imx233_pinctrl_acquire_pin(1, 28, "backlight");
-    imx233_set_pin_function(1, 28, PINCTRL_FUNCTION_GPIO);
-    imx233_set_pin_drive_strength(1, 28, PINCTRL_DRIVE_8mA);
-    imx233_enable_gpio_output(1, 28, true);
+    imx233_pinctrl_acquire(1, 28, "backlight");
+    imx233_pinctrl_set_function(1, 28, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_set_drive(1, 28, PINCTRL_DRIVE_8mA);
+    imx233_pinctrl_enable_gpio(1, 28, true);
     _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
     return true;
 }

@@ -33,11 +33,11 @@ bool tuner_power(bool enable)
     if(enable != tuner_enable)
     {
         /* CE is B029 (active high) */
-        imx233_pinctrl_acquire_pin(0, 29, "tuner power");
-        imx233_set_pin_function(0, 29, PINCTRL_FUNCTION_GPIO);
-        imx233_set_pin_drive_strength(0, 29, PINCTRL_DRIVE_4mA);
-        imx233_enable_gpio_output(0, 29, enable);
-        imx233_set_gpio_output(0, 29, enable);
+        imx233_pinctrl_acquire(0, 29, "tuner power");
+        imx233_pinctrl_set_function(0, 29, PINCTRL_FUNCTION_GPIO);
+        imx233_pinctrl_set_drive(0, 29, PINCTRL_DRIVE_4mA);
+        imx233_pinctrl_enable_gpio(0, 29, enable);
+        imx233_pinctrl_set_gpio(0, 29, enable);
         tuner_enable = enable;
         /* give time to power up */
         udelay(5);

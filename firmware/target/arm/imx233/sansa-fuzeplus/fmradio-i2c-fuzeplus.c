@@ -38,32 +38,32 @@ static int fmradio_i2c_bus = -1;
 
 static void i2c_scl_dir(bool out)
 {
-    imx233_enable_gpio_output(1, 22, out);
+    imx233_pinctrl_enable_gpio(1, 22, out);
 }
 
 static void i2c_sda_dir(bool out)
 {
-    imx233_enable_gpio_output(1, 24, out);
+    imx233_pinctrl_enable_gpio(1, 24, out);
 }
 
 static void i2c_scl_out(bool high)
 {
-    imx233_set_gpio_output(1, 22, high);
+    imx233_pinctrl_set_gpio(1, 22, high);
 }
 
 static void i2c_sda_out(bool high)
 {
-    imx233_set_gpio_output(1, 24, high);
+    imx233_pinctrl_set_gpio(1, 24, high);
 }
 
 static bool i2c_scl_in(void)
 {
-    return imx233_get_gpio_input_mask(1, 1 << 22);
+    return imx233_pinctrl_get_gpio_mask(1, 1 << 22);
 }
 
 static bool i2c_sda_in(void)
 {
-    return imx233_get_gpio_input_mask(1, 1 << 24);
+    return imx233_pinctrl_get_gpio_mask(1, 1 << 24);
 }
 
 static void i2c_delay(int d)
@@ -90,10 +90,10 @@ struct i2c_interface fmradio_i2c =
 
 void fmradio_i2c_init(void)
 {
-    imx233_pinctrl_acquire_pin(1, 24, "fmradio i2c");
-    imx233_pinctrl_acquire_pin(1, 22, "fmradio i2c");
-    imx233_set_pin_function(1, 24, PINCTRL_FUNCTION_GPIO);
-    imx233_set_pin_function(1, 22, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_acquire(1, 24, "fmradio i2c");
+    imx233_pinctrl_acquire(1, 22, "fmradio i2c");
+    imx233_pinctrl_set_function(1, 24, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_set_function(1, 22, PINCTRL_FUNCTION_GPIO);
     fmradio_i2c_bus = i2c_add_node(&fmradio_i2c);
 }
 
@@ -132,7 +132,7 @@ static void NORETURN_ATTR rds_thread(void)
         if(si4700_rds_read_raw(rds_data) && rds_process(rds_data))
             si4700_rds_set_event();
         /* renable callback */
-        imx233_setup_pin_irq(2, 27, true, true, false, &stc_rds_callback);
+        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback);
     }
 }
 
@@ -141,16 +141,16 @@ void si4700_rds_powerup(bool on)
 {
     if(on)
     {
-        imx233_pinctrl_acquire_pin(2, 27, "tuner stc/rds");
-        imx233_set_pin_function(2, 27, PINCTRL_FUNCTION_GPIO);
-        imx233_enable_gpio_output(2, 27, false);
+        imx233_pinctrl_acquire(2, 27, "tuner stc/rds");
+        imx233_pinctrl_set_function(2, 27, PINCTRL_FUNCTION_GPIO);
+        imx233_pinctrl_enable_gpio(2, 27, false);
         /* pin is set to 0 when an RDS packet has arrived */
-        imx233_setup_pin_irq(2, 27, true, true, false, &stc_rds_callback);
+        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback);
     }
     else
     {
-        imx233_setup_pin_irq(2, 27, false, false, false, NULL);
-        imx233_pinctrl_release_pin(2, 27, "tuner stc/rds");
+        imx233_pinctrl_setup_irq(2, 27, false, false, false, NULL);
+        imx233_pinctrl_release(2, 27, "tuner stc/rds");
     }
 }
 
