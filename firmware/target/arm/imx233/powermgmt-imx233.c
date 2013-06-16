@@ -48,6 +48,7 @@ void powermgmt_init_target(void)
 {
     imx233_power_set_charge_current(IMX233_CHARGE_CURRENT);
     imx233_power_set_stop_current(IMX233_STOP_CURRENT);
+#if IMX233_SUBTARGET >= 3780
     /* assume that adc_init was called and battery monitoring via LRADC setup */
     BF_WR(POWER_BATTMONITOR, EN_BATADJ, 1);
     /* make sure we are in a known state: disable charger and 4p2 */
@@ -55,11 +56,13 @@ void powermgmt_init_target(void)
     BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 0);
     BF_WR(POWER_DCDC4P2, ENABLE_4P2, 0);
     BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+#endif
     charge_state = DISCHARGING;
 }
 
 void charging_algorithm_step(void)
 {
+#if IMX233_SUBTARGET >= 3780
     bool is_5v_present = usb_detect() == USB_INSERTED;
 
     /* initial state & 5v -> battery transition */
@@ -139,6 +142,7 @@ void charging_algorithm_step(void)
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
         charge_state = CHARGE_STATE_DISABLED;
     }
+#endif
 }
 
 void charging_algorithm_close(void)
