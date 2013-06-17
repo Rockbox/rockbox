@@ -217,21 +217,21 @@ static void usage(void)
 {
     printf("Usage: sbtoelf [options] sb-file\n");
     printf("Options:\n");
-    printf("  -?/--help\tDisplay this message\n");
-    printf("  -o <prefix>\tEnable output and set prefix\n");
-    printf("  -d/--debug\tEnable debug output*\n");
-    printf("  -k <file>\tAdd key file\n");
-    printf("  -z\t\tAdd zero key\n");
-    printf("  -r\t\tUse raw command mode\n");
-    printf("  -a/--add-key <key>\tAdd single key (hex or usbotp)\n");
-    printf("  -n/--no-color\tDisable output colors\n");
-    printf("  -l/--loopback <file>\tProduce sb file out of extracted description*\n");
-    printf("  -f/--force\tForce reading even without a key*\n");
-    printf("  -1/--v1\tForce to read file as a version 1 file\n");
-    printf("  -2/--v2\tForce to read file as a version 2 file\n");
-    printf("  -s/--no-simpl\tPrevent elf files from being simplified*\n");
-    printf("  -x\t\tUse default sb1 key\n");
-    printf("  -b\tBrute force key\n");
+    printf("  -?/--help             Display this message\n");
+    printf("  -o <prefix>           Enable output and set prefix\n");
+    printf("  -d/--debug            Enable debug output*\n");
+    printf("  -k <file>             Add key file\n");
+    printf("  -z                    Add zero key\n");
+    printf("  -r                    Use raw command mode\n");
+    printf("  -a/--add-key <key>    Add single key (hex or usbotp)\n");
+    printf("  -n/--no-color         Disable output colors\n");
+    printf("  -l/--loopback <file>  Produce sb file out of extracted description*\n");
+    printf("  -f/--force            Force reading even without a key*\n");
+    printf("  -1/--v1               Force to read file as a version 1 file\n");
+    printf("  -2/--v2               Force to read file as a version 2 file\n");
+    printf("  -s/--no-simpl         Prevent elf files from being simplified*\n");
+    printf("  -x                    Use default sb1 key\n");
+    printf("  -b                    Brute force key\n");
     printf("Options marked with a * are for debug purpose only\n");
     exit(1);
 }

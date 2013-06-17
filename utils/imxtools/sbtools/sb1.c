@@ -252,10 +252,12 @@ static const char *sb1_datatype_name(int cmd)
     }
 }
 
-bool sb1_is_key_valid_fast(void *buffer, size_t size, union xorcrypt_key_t _key[2])
+/* Quick and dirty way to check a key is valid.
+ * We don't do any form of format checking because we are trying to bruteforce
+ * the key anyway. Assume buffer is of size SECTOR_SIZE */
+bool sb1_is_key_valid_fast(void *buffer, union xorcrypt_key_t _key[2])
 {
     struct sb1_header_t *header = (struct sb1_header_t *)buffer;
-
     union xorcrypt_key_t key[2];
 
     uint8_t sector[SECTOR_SIZE];
@@ -312,7 +314,7 @@ bool sb1_brute_force(const char *filename, void *u, sb1_color_printf cprintf,
                 for(int j = 0; j < 32; j++)
                     printf(YELLOW, " %08x", key->u.xor_key[j / 16].k[j % 16]);
             }
-            if(sb1_is_key_valid_fast(sector, SECTOR_SIZE, key->u.xor_key))
+            if(sb1_is_key_valid_fast(sector, key->u.xor_key))
             {
                 if(g_debug)
                     printf(RED, " Ok\n");
