@@ -1169,9 +1169,6 @@ target/arm/imx233/creative-zenxfi3/debug-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/power-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/adc-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
-#ifndef BOOTLOADER
-target/arm/imx233/creative-zenxfi3/audio-zenxfi3.c
-#endif
 #endif
 
 #ifdef SANSA_CONNECT
