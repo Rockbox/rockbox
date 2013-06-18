@@ -89,6 +89,7 @@ static const char *imx_fw_variant[] =
     [VARIANT_ZENXFI2_NAND] = "ZEN X-Fi2 NAND",
     [VARIANT_ZENXFI2_SD] = "ZEN X-Fi2 eMMC/SD",
     [VARIANT_ZENXFISTYLE_RECOVERY] = "ZEN X-Fi Style Recovery",
+    [VARIANT_ZENSTYLE_RECOVERY] = "ZEN Style 100/300 Recovery",
 };
 
 static const struct imx_md5sum_t imx_sums[] =
@@ -142,6 +143,14 @@ static const struct imx_md5sum_t imx_sums[] =
             [VARIANT_ZENXFISTYLE_RECOVERY] = {610272, 232688},
         }
     },
+    {
+        /* Version 1.03.04e */
+        MODEL_ZENSTYLE, "dbebec8fe666412061d9740ff68605dd", "1.03.04e",
+        {
+            [VARIANT_DEFAULT] = {758848, 6641344},
+            [VARIANT_ZENSTYLE_RECOVERY] = {610272, 148576},
+        }
+    },
 };
 
 static struct crypto_key_t zero_key =
@@ -159,6 +168,8 @@ static const struct imx_model_desc_t imx_models[] =
     [MODEL_ZENXFI3] = {"Zen X-Fi3", dualboot_zenxfi3, sizeof(dualboot_zenxfi3), "zxf3", 83,
                        1, &zero_key, 0, 0x40000000 },
     [MODEL_ZENXFISTYLE] = {"Zen X-Fi Style", NULL, 0, "", -1,
+                       1, &zero_key, 0, 0x40000000 },
+    [MODEL_ZENSTYLE] = {"Zen Style 100/300", NULL, 0, "", -1,
                        1, &zero_key, 0, 0x40000000 },
 };
 
