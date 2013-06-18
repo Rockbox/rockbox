@@ -26,9 +26,25 @@
 #include "system.h"
 
 #include "regs/regs-audioin.h"
+/* some audioout registers impact audioin */
+#include "regs/regs-audioout.h"
+
+#define AUDIOIN_SELECT_MICROPHONE   0
+#define AUDIOIN_SELECT_LINE1        1
+#define AUDIOIN_SELECT_HEADPHONE    2
+#define AUDIOIN_SELECT_LINE2        3
 
 void imx233_audioin_preinit(void);
 void imx233_audioin_postinit(void);
+void imx233_audioin_open(void);
 void imx233_audioin_close(void);
+/* use AUDIONIN_SELECT_* values */
+void imx233_audioin_select_mux_input(bool right, int select);
+/* volume in half dB */
+void imx233_audioin_set_vol(bool right, int vol, int select);
+/* frequency index, NOT the frequency itself */
+void imx233_audioin_set_freq(int fsel);
+/* enable microphone */
+void imx233_audioin_enable_mic(bool enable);
 
 #endif /* __audioin_imx233__ */
