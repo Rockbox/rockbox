@@ -311,7 +311,7 @@ static int probe_hid_xfer_size(libusb_device_handle *dev)
         sizeof(buffer), 1000);
     if(ret <= 0)
         goto Lerr;
-    /* this is not a real parse, since the HID descriptor of the device is
+    /* this is not a real parser, since the HID descriptor of the device is
      * is mostly trivial, we assume that all reports are made up of one item
      * and simply compute the maximum of report size * report count */
     int xfer_size = 0;
@@ -364,6 +364,7 @@ int main(int argc, char **argv)
         .dev_type = PROBE_DEVICE};
     int usb_bus = -1;
     int usb_dev = -1;
+    int force_xfer_size = 0;
     /* parse command line */
     while(1)
     {
@@ -390,7 +391,7 @@ int main(int argc, char **argv)
             case 'x':
             {
                 char *end;
-                di.xfer_size = strtoul(optarg, &end, 0);
+                force_xfer_size = strtoul(optarg, &end, 0);
                 if(*end)
                 {
                     printf("Invalid transfer size!\n");
@@ -506,6 +507,8 @@ int main(int argc, char **argv)
         dev_type = g_dev_info[db_idx].dev_type;
         xfer_size = g_dev_info[db_idx].xfer_size;
     }
+    if(force_xfer_size > 0)
+        xfer_size = force_xfer_size;
     if(dev_type == PROBE_DEVICE)
         dev_type = probe_protocol(dev);
     if(xfer_size == 0)
