@@ -53,14 +53,41 @@ void audiohw_set_frequency(int fsel)
     imx233_audioout_set_freq(fsel);
 }
 
+void audiohw_enable_recording(bool source_mic)
+{
+    imx233_audioin_open();
+    /* if source is microhpone we need to power the microphone too */
+    imx233_audioin_enable_mic(source_mic);
+}
+
+void audiohw_disable_recording(void)
+{
+    imx233_audioin_close();
+}
+
 void audiohw_set_recvol(int left, int right, int type)
 {
-    (void) left;
-    (void) right;
-    (void) type;
+    if(type == AUDIO_GAIN_LINEIN)
+    {
+        imx233_audioin_set_vol(false, left, AUDIOIN_SELECT_LINE1);
+        imx233_audioin_set_vol(true, right, AUDIOIN_SELECT_LINE1);
+        imx233_audioin_set_vol(false, left, AUDIOIN_SELECT_LINE2);
+        imx233_audioin_set_vol(true, right, AUDIOIN_SELECT_LINE2);
+        imx233_audioin_set_vol(false, left, AUDIOIN_SELECT_HEADPHONE);
+        imx233_audioin_set_vol(true, right, AUDIOIN_SELECT_HEADPHONE);
+    }
+    else
+        imx233_audioin_set_vol(false, left, AUDIOIN_SELECT_MICROPHONE);
 }
 
 void audiohw_set_depth_3d(int val)
 {
-    (void) val;
+    /* input is raw value ranging from 0dB to 6dB in tenth of dB
+     * convert to value in 1.5dB steps */
+    imx233_audioout_set_3d_effect(val / 15);
+}
+
+void audiohw_set_monitor(bool enable)
+{
+    imx233_audioout_select_hp_input(enable);
 }

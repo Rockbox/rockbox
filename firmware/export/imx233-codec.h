@@ -37,6 +37,7 @@ AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1,   1,   0,  31,  23)
 AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1,   1,   0,  31,  23)
 AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,   1,   0,   1,   1)
 #endif /* HAVE_RECORDING */
-AUDIOHW_SETTING(DEPTH_3D,    "%", 0,   1,   0,  15,   0)
+/* i.MX233 has four settings: 0dB, 3dB, 4.5dB, 6dB so fake 1.5dB steps */
+AUDIOHW_SETTING(DEPTH_3D,   "dB", 1,  15,   0,  60,   0)
 
 #endif /* __IMX233_CODEC_H_ */
