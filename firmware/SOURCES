@@ -535,10 +535,12 @@ target/arm/imx233/adc-imx233.c
 target/arm/imx233/lradc-imx233.c
 target/arm/imx233/pwm-imx233.c
 target/arm/imx233/rtc-imx233.c
+#if IMX233_SUBTARGET >= 3700
 target/arm/imx233/dcp-imx233.c
+#endif
 target/arm/imx233/emi-imx233.c
 target/arm/imx233/uartdbg-imx233.c
-# ifdef HAVE_TOUCHSCREEN
+# if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD_IMX233)
 target/arm/imx233/touchscreen-imx233.c
 # endif
 #ifndef BOOTLOADER
