@@ -52,7 +52,7 @@ extern char loadaddressend[];
 static void usb_mode(int connect_timeout)
 {
     int button;
-    
+
     usb_init();
     usb_start_monitoring();
 
@@ -150,7 +150,9 @@ void main(uint32_t arg, uint32_t addr)
 
     printf("Boot version: %s", RBVERSION);
     printf("arg=%x addr=%x", arg, addr);
+#if IMX233_SUBTARGET >= 3780
     printf("power up source: %x", BF_RD(POWER_STS, PWRUP_SOURCE));
+#endif
 
     if(arg == 0xfee1dead)
     {
