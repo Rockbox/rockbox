@@ -35,7 +35,7 @@ QString BootloaderInstallAms::ofHint()
               "player along with the rockbox bootloader. "
               "You need to download this file yourself due to legal "
               "reasons. Please browse the "
-              "<a href='http://forums.sandisk.com/sansa/'>Sansa Forums'</a> "
+              "<a href='http://forums.sandisk.com/sansa/'>Sansa Forums</a> "
               "or refer to the "
               "<a href='http://www.rockbox.org/manual.shtml'>manual</a> and "
               "the <a href='http://www.rockbox.org/wiki/SansaAMS'>SansaAMS</a> "
