@@ -1157,9 +1157,6 @@ target/arm/imx233/creative-zenxfi2/debug-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/power-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/adc-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/powermgmt-zenxfi2.c
-#ifndef BOOTLOADER
-target/arm/imx233/creative-zenxfi2/audio-zenxfi2.c
-#endif
 #endif
 
 #ifdef CREATIVE_ZENXFI3

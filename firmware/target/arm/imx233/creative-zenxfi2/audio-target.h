@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 by Amaury Pouly
+ * Copyright (C) 2013 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,38 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "config.h"
-#include "system.h"
-#include "audiohw.h"
-#include "audio.h"
-#include "audioout-imx233.h"
-#include "audioin-imx233.h"
+#ifndef __audio_target__
+#define __audio_target__
 
-static int input_source = AUDIO_SRC_PLAYBACK;
-static unsigned input_flags = 0;
-static int output_source = AUDIO_SRC_PLAYBACK;
-
-static void select_audio_path(void)
-{
-    if(input_source == AUDIO_SRC_PLAYBACK)
-        imx233_audioout_select_hp_input(false);
-    else
-        imx233_audioout_select_hp_input(true);
-}
-
-void audio_input_mux(int source, unsigned flags)
-{
-    (void) source;
-    (void) flags;
-    input_source = source;
-    input_flags = flags;
-    select_audio_path();
-}
-  
-void audio_set_output_source(int source)
-{
-    (void) source;
-    output_source = source;
-    select_audio_path();
-}
-
+#endif /* __audio_target__ */
