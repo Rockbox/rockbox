@@ -547,6 +547,7 @@ target/arm/imx233/usb-imx233.c
 #ifdef HAVE_IMX233_CODEC
 target/arm/imx233/audioout-imx233.c
 target/arm/imx233/audioin-imx233.c
+target/arm/imx233/audio-imx233.c
 target/arm/imx233/pcm-imx233.c
 drivers/audio/imx233-codec.c
 #endif
@@ -1393,9 +1394,6 @@ target/arm/imx233/sansa-fuzeplus/debug-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/power-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/adc-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/powermgmt-fuzeplus.c
-#ifndef BOOTLOADER
-target/arm/imx233/sansa-fuzeplus/audio-fuzeplus.c
-#endif
 #endif
 
 #ifdef SANSA_CLIPZIP
