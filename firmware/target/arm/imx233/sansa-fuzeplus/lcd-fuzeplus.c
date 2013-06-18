@@ -194,7 +194,7 @@ static uint32_t i80_read_register(uint32_t data_out)
     udelay(1);
     imx233_pinctrl_set_gpio(1, 20, true); /* lcd_wr */
     udelay(3);
-    HW_PINCTRL_DOUTn_CLR(1) = 0x3ffff; /* lcd_d{0-17} */
+    HW_PINCTRL_DOEn_CLR(1) = 0x3ffff; /* lcd_d{0-17} */
     udelay(2);
     imx233_pinctrl_set_gpio(1, 23, false); /* lcd_enable */
     udelay(1);
