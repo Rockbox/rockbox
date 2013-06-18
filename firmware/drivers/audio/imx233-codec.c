@@ -24,17 +24,20 @@
 #include "audio.h"
 #include "audioout-imx233.h"
 #include "audioin-imx233.h"
+#include "audio-imx233.h"
 
 void audiohw_preinit(void)
 {
     imx233_audioout_preinit();
     imx233_audioin_preinit();
+    imx233_audio_preinit();
 }
 
 void audiohw_postinit(void)
 {
     imx233_audioout_postinit();
     imx233_audioin_postinit();
+    imx233_audio_postinit();
 }
 
 void audiohw_close(void)
