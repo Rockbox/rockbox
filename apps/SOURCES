@@ -289,5 +289,7 @@ keymaps/keymap-sansa-connect.c
 keymaps/keymap-ypr0.c
 #elif CONFIG_KEYPAD == MA_PAD
 keymaps/keymap-ma.c
+#elif CONFIG_KEYPAD == SAMSUNG_YPZ5_PAD
+keymaps/keymap-ypz5.c
 #endif
 

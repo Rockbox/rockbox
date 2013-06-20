@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2011 by Amaury Pouly
+ * Copyright (C) 2007 Dave Chapman
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,60 +20,98 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
-#include "gpmi-imx233.h"
-#include "pinctrl-imx233.h"
-#include "button-target.h"
-#include "fat.h"
+#include <string.h>
+#include "thread.h"
 #include "disk.h"
-#include "usb.h"
-#include "debug.h"
-#include "nand.h"
 #include "storage.h"
+#include "panic.h"
+#include "usb.h"
+#include "ftl-target.h"
+#include "nand-target.h"
 
-static int nand_first_drive;
+/* This file provides only STUBS for now */
 
-int nand_init(void)
+/** static, private data **/ 
+static bool initialized = false;
+
+/* API Functions */
+int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
+                     void* inbuf)
 {
-    return -1;
-}
-int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
-                     void* buf)
-{
-    return -1;
+    (void)drive;
+    return ftl_read(start, incount, inbuf);
 }
 
 int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
-                     const void* buf)
+                      const void* outbuf)
 {
-    return -1;
+    (void)drive;
+    return ftl_write(start, count, outbuf);
 }
 
-int nand_num_drives(int first_drive)
+void nand_spindown(int seconds)
 {
-    nand_first_drive = first_drive;
-    return 1;
+    (void)seconds;
+}
+
+void nand_sleep(void)
+{
+    nand_power_down();
+}
+
+void nand_sleepnow(void)
+{
+    nand_power_down();
+}
+
+void nand_spin(void)
+{
+    nand_set_active();
+}
+
+void nand_enable(bool on)
+{
+    (void)on;
 }
 
 void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
 {
-    IF_MD((void)drive);
-    info->sector_size = SECTOR_SIZE;
-    info->num_sectors = 0;
-    info->vendor = "";
-    info->product = "";
-    info->revision = "";
+    (void)drive;
+     (*info).sector_size = 0x800;
+     (*info).num_sectors = 128;
+     (*info).vendor = "";
+     (*info).product = "";
+     (*info).revision = "";
 }
 
-/*
-bool nand_present(IF_MD(int drive))
+long nand_last_disk_activity(void)
 {
-    IF_MD((void) drive);
-    return true;
+    return nand_last_activity();
 }
 
-bool nand_removable(IF_MD(int drive))
+#ifdef HAVE_STORAGE_FLUSH
+int nand_flush(void)
 {
-    IF_MD((void) drive);
-    return false;
+    int rc = ftl_sync();
+    if (rc != 0) panicf("Failed to unmount flash: %X", rc);
+    return rc;
 }
-*/
+#endif
+
+int nand_init(void)
+{
+    if (ftl_init()) return 1;
+
+    initialized = true;
+    return 0;
+}
+
+#ifdef CONFIG_STORAGE_MULTI
+int nand_num_drives(int first_drive)
+{
+    /* We don't care which logical drive number(s) we have been assigned */
+    (void)first_drive;
+    
+    return 1;
+}
+#endif
