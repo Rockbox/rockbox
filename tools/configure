@@ -1322,7 +1322,7 @@ cat <<EOF
  141) YH-920              160) Vibe 500          ==Logik==
  142) YH-925                                     80) DAX 1GB MP3/DAB
  143) YP-S3               ==MPIO==
-                          170) HD200             ==Lyre project==
+ 144) YP-Z5               170) HD200             ==Lyre project==
  ==Application==          171) HD300             130) Lyre proto 1
  200) SDL                                        131) Mini2440
  201) Android             ==ROCKCHIP==
@@ -3056,6 +3056,26 @@ fi
     t_cpu="arm"
     t_manufacturer="s5l8700"
     t_model="yps3"
+    ;;
+    
+  144|samsungypz5)
+    target_id=84
+    modelname="samsungypz5"
+    target="SAMSUNG_YPZ5"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=ypz5"
+    output="rockbox.samsung"
+    bootoutput="bootloader-ypz5.samsung"
+    appextra="gui:recorder:radio"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="samsung-ypz5"
+    arm926ejscc
     ;;
     
    160|vibe500)

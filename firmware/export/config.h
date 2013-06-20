@@ -148,6 +148,7 @@
 #define CREATIVE_ZENXFI2_PAD 54
 #define CREATIVE_ZENXFI3_PAD 55
 #define MA_PAD            56
+#define SAMSUNG_YPZ5_PAD   57
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -250,6 +251,7 @@
 #define LCD_CREATIVEZXFI2 48 /* as used by the Creative Zen X-Fi2 */
 #define LCD_CREATIVEZXFI3 49 /* as used by the Creative Zen X-Fi3 */
 #define LCD_ILI9342   50 /* as used by HiFi E.T MA9/MA8 */
+#define LCD_SAMSUNGYPZ5   51 /* as used by Samsung YP-Z5 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -509,6 +511,8 @@ Lyre prototype 1 */
 #include "config/samsungypr0.h"
 #elif defined(MA9)
 #include "config/hifietma9.h"
+#elif defined(SAMSUNG_YPZ5)
+#include "config/samsungypz5.h"
 #else
 /* no known platform */
 #endif
