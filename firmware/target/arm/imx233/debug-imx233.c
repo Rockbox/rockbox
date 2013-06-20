@@ -240,7 +240,9 @@ static struct
 {
     { CLK_PLL, "pll", true, false, false, false, true},
     { CLK_XTAL, "xtal", false, false, false, false, true},
+#if IMX233_SUBTARGET >= 3700
     { CLK_PIX, "pix", true, true, true, true, true },
+#endif
     { CLK_SSP, "ssp", true, true, true, false, true },
     { CLK_IO,  "io",  false, false, false, true, true },
     { CLK_CPU, "cpu", false, true, true, true, true },
@@ -279,12 +281,16 @@ bool dbg_hw_info_clkctrl(void)
             lcd_putsf(0, i + 1, "%4s", c.name);
             if(c.has_enable)
                 lcd_putsf(5, i + 1, "%2d", imx233_clkctrl_is_enabled(c.clk));
+#if IMX233_SUBTARGET >= 3700
             if(c.has_bypass)
                 lcd_putsf(8, i + 1, "%2d", imx233_clkctrl_get_bypass(c.clk));
+#endif
             if(c.has_idiv && imx233_clkctrl_get_div(c.clk) != 0)
                 lcd_putsf(10, i + 1, "%4d", imx233_clkctrl_get_div(c.clk));
+#if IMX233_SUBTARGET >= 3700
             if(c.has_fdiv && imx233_clkctrl_get_frac_div(c.clk) != 0)
                 lcd_putsf(16, i + 1, "%4d", imx233_clkctrl_get_frac_div(c.clk));
+#endif
             if(c.has_freq)
                 lcd_putsf(21, i + 1, "%9d", imx233_clkctrl_get_freq(c.clk));
             #undef c
@@ -697,9 +703,15 @@ bool dbg_hw_info_usb(void)
 
         lcd_clear_display();
         int line = 0;
+#if IMX233_SUBTARGET >= 3700
         lcd_putsf(0, line++, "VBUS valid: %d/%d", BF_RD(POWER_STS, VBUSVALID), BF_RD(POWER_STS, VBUSVALID_STATUS));
         lcd_putsf(0, line++, "A valid: %d/%d", BF_RD(POWER_STS, AVALID), BF_RD(POWER_STS, AVALID_STATUS));
         lcd_putsf(0, line++, "B valid: %d/%d", BF_RD(POWER_STS, BVALID), BF_RD(POWER_STS, BVALID_STATUS));
+#else
+        lcd_putsf(0, line++, "VBUS valid: %d/%d", BF_RD(POWER_STS, VBUSVALID));
+        lcd_putsf(0, line++, "A valid: %d/%d", BF_RD(POWER_STS, AVALID));
+        lcd_putsf(0, line++, "B valid: %d/%d", BF_RD(POWER_STS, BVALID));
+#endif
         lcd_putsf(0, line++, "session end: %d", BF_RD(POWER_STS, SESSEND));
         lcd_putsf(0, line++, "dev plugin: %d", BF_RD(USBPHY_STATUS, DEVPLUGIN_STATUS));
         lcd_putsf(0, line++, "OTG ID: %d", BF_RD(USBPHY_STATUS, OTGID_STATUS));
