@@ -89,8 +89,9 @@ static void gui_skin_reset(struct gui_skin *skin)
     skin->gui_wps.data = data = &skin->data;
 #ifdef HAVE_ALBUMART
     struct skin_albumart *aa_save;
+    unsigned char *buffer = get_skin_buffer(data);
     /* copy to temp var to protect against memset */
-    if ((aa_save = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart)))
+    if (buffer && (aa_save = SKINOFFSETTOPTR(buffer, data->albumart)))
     {
         short old_width, old_height;
         old_width = aa_save->width;
