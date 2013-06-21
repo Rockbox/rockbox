@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX///A4\u003d",
+        "filename": "bootloader/common.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "just printf(loader_strerror(error); should be enough.",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///A0\u003d",
+        "filename": "bootloader/creativezvm.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "\u003c\u003d EFILE_EMPTY",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Aw\u003d",
+        "filename": "bootloader/gigabeat-s.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "\u003c\u003d EFILE_EMPTY",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///As\u003d",
+        "filename": "bootloader/ipod.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "\u003c\u003d EFILE_EMPTY",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Ao\u003d",
+        "filename": "bootloader/ipodnano2g.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "\u003c\u003d EFILE_EMPTY",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Ak\u003d",
+        "filename": "bootloader/iriver_h300.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "\u003c\u003d EFILE_EMPTY",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Ag\u003d",
+        "filename": "bootloader/mpio_hd200_hd300.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "\u003c\u003d EFILE_EMPTY",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///Ac\u003d",
+        "filename": "bootloader/mrobe500.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "No need to check rc here.",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///AY\u003d",
+        "filename": "firmware/common/loader_strerror.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "Copyright header.",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///AU\u003d",
+        "filename": "firmware/export/mi4-loader.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///AQ\u003d",
+        "filename": "firmware/include/loader_strerror.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "copyright header",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX///AM\u003d",
+        "filename": "firmware/target/arm/pp/mi4-loader.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-21T07:09:28Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "1cc992f4cadc7fe4b970254ad348e6ff65ae0bc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
