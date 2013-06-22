@@ -145,7 +145,7 @@ struct encoder_config
         struct mp3_enc_config     mp3_enc;
         struct wavpack_enc_config wavpack_enc;
         struct wav_enc_config     wav_enc;
-    };          
+    };
 };
 
 /** Encoder chunk macros and definitions **/
@@ -218,7 +218,7 @@ struct enc_file_event_data
     unsigned long new_num_pcm;     /* New number of pcm in chunk           */
     const char   *filename;        /* filename to open if ENC_START_FILE   */
     int           rec_file;        /* Current file or < 0 if none          */
-    unsigned long num_pcm_samples; /* Current pcm sample count written to 
+    unsigned long num_pcm_samples; /* Current pcm sample count written to
                                       file so far.                         */
 };
 

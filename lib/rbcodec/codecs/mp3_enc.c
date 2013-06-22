@@ -185,7 +185,7 @@ static const uint8_t ht_count_const[2][2][16] =
   { {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },     /* table1 */
     { 4,  5,  5,  6,  5,  6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 } } }; /* hleng1 */
 
-static const uint8_t  t1HB_const[4]  = {1,1,1,0}; 
+static const uint8_t  t1HB_const[4]  = {1,1,1,0};
 static const uint8_t  t2HB_const[9]  = {1,2,1,3,1,1,3,2,0};
 static const uint8_t  t3HB_const[9]  = {3,2,1,1,1,1,3,2,0};
 static const uint8_t  t5HB_const[16] = {1,2,6,5,3,1,4,4,7,5,7,1,6,1,1,0};
@@ -739,11 +739,11 @@ static const short int2idx_const[4096] = /*  int2idx[i] = sqrt(i*sqrt(i)); */
 509,509,509,509,509,509,509,509,509,509,510,510,510,510,510,510,510,510,510,510,
 510,511,511,511,511,511,511,511,511,511,511,512,512,512,512,512 };
 
-static const int order[32] = 
+static const int order[32] =
 { 0, 1, 16, 17, 8, 9, 24, 25, 4, 5, 20, 21, 12, 13, 28, 29,
   2, 3, 18, 19,10,11, 26, 27, 6, 7, 22, 23, 14, 15, 30, 31 };
 
-static const long sampr_index[2][3] = 
+static const long sampr_index[2][3] =
 { { 22050, 24000, 16000 },      /* MPEG 2 */
   { 44100, 48000, 32000 } };    /* MPEG 1 */
 
@@ -765,7 +765,7 @@ static const int ca_const[8] =
 static const int cs_const[8] =
 { 28098, 28893, 31117, 32221, 32621, 32740, 32765, 32768 };
 
-static const short enwindow_const[15*27+24] = 
+static const short enwindow_const[15*27+24] =
 { 0,   65,  593,  1766, 22228, 2115, 611, 62,
   8,  119, 1419, 10564,-11659,-1635,-154, -9,
  -8, -119,-1419,-10564, 11659, 1635, 154,  9, 464,  100,  91,
@@ -853,7 +853,7 @@ static void encodeSideInfo( side_info_t si[2][2] )
 {
   int gr, ch, header;
   uint32_t  cc=0, sz=0;
-  
+
   /*
    * MPEG header layout:
    * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM
@@ -960,7 +960,7 @@ static void Huffmancodebits( short *ix, char *xr_sign, side_info_t *gi )
 
   if(bigvals > region2)
     bits += HuffmanCode(ix, xr_sign, region2, bigvals, gi->table_select[2]);
- 
+
   if(count1 > bigvals)
     bits += HuffmanCod1(ix, xr_sign, bigvals,  count1, gi->table_select[3]);
 
@@ -1158,7 +1158,7 @@ static int choose_table( short *ix, uint32_t begin, uint32_t end, int *bits )
 {
   uint32_t i;
   int    max, table0, table1;
-  
+
   for(i=begin,max=0; i<end; i++)
     if(ix[i] > max)
       max = ix[i];
@@ -1315,7 +1315,7 @@ static int calc_runlen( short *ix, side_info_t *si )
     int w = ix[i-2];
     int x = ix[i-3];
     int y = ix[i-4];
-    
+
     if((v | w | x | y) <= 1)
     {
       p = (y<<3) + (x<<2) + (w<<1) + (v);
@@ -1380,7 +1380,7 @@ static int quantize_int(int *xr, short *ix, side_info_t *si)
 static void subdivide(side_info_t *si)
 {
   int scfb, count0, count1;
-  
+
   if( !si->address3 )
   { /* no bigvalue region */
     si->region_0_1 = 0;
@@ -1442,7 +1442,7 @@ static int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
 
 /************************************************************************/
 /* The code selects the best quantStep for a particular set of scalefacs*/
-/************************************************************************/ 
+/************************************************************************/
 static int inner_loop(int *xr, int max_bits, side_info_t *si)
 {
   int bits;
@@ -1783,7 +1783,7 @@ void window_subband2(short *x1, int a[SBLIMIT])
   a[ 7] -= a[ 6];
   a[22] -= a[ 7];
   a[23] -= a[22];
-    
+
   xr = a[ 6];  a[ 6] = a[31] - xr;  a[31] = a[31] + xr;
   xr = a[ 7];  a[ 7] = a[30] - xr;  a[30] = a[30] + xr;
   xr = a[22];  a[22] = a[15] - xr;  a[15] = a[15] + xr;
@@ -1803,23 +1803,23 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr = a[ 1] - a[13];  a[ 1] += a[13];  a[13] = shft9(xr) * wp[ -4*27+25];
   xr = a[16] - a[28];  a[16] += a[28];  a[28] = shft9(xr) * wp[ -4*27+25];
   xr =-a[17] + a[29];  a[17] += a[29];  a[29] = shft9(xr) * wp[ -4*27+25];
-  
+
   xr = SQRT * shft9(a[ 2] - a[10]);  a[ 2] += a[10];  a[10] = xr;
   xr = SQRT * shft9(a[ 3] - a[11]);  a[ 3] += a[11];  a[11] = xr;
   xr = SQRT * shft9(a[26] - a[18]);  a[18] += a[26];  a[26] = xr - a[18];
   xr = SQRT * shft9(a[27] - a[19]);  a[19] += a[27];  a[27] = xr - a[19];
-  
+
   xr = a[ 2];  a[19] -= a[ 3];  a[ 3] -= xr;  a[ 2] = a[31] - xr;  a[31] += xr;
   xr = a[ 3];  a[11] -= a[19];  a[18] -= xr;  a[ 3] = a[30] - xr;  a[30] += xr;
   xr = a[18];  a[27] -= a[11];  a[19] -= xr;  a[18] = a[15] - xr;  a[15] += xr;
-  
+
   xr = a[19];  a[10] -= xr;  a[19] = a[14] - xr;  a[14] += xr;
   xr = a[10];  a[11] -= xr;  a[10] = a[23] - xr;  a[23] += xr;
   xr = a[11];  a[26] -= xr;  a[11] = a[22] - xr;  a[22] += xr;
   xr = a[26];  a[27] -= xr;  a[26] = a[ 7] - xr;  a[ 7] += xr;
-  
+
   xr = a[27];  a[27] = a[6] - xr;  a[6] += xr;
-  
+
   xr = SQRT * shft9(a[ 0] - a[ 4]);  a[ 0] += a[ 4];  a[ 4] = xr;
   xr = SQRT * shft9(a[ 1] - a[ 5]);  a[ 1] += a[ 5];  a[ 5] = xr;
   xr = SQRT * shft9(a[16] - a[20]);  a[16] += a[20];  a[20] = xr;
@@ -1828,15 +1828,15 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr =-SQRT * shft9(a[ 9] - a[13]);  a[ 9] += a[13];  a[13] = xr - a[ 9];
   xr =-SQRT * shft9(a[25] - a[29]);  a[25] += a[29];  a[29] = xr - a[25];
   xr =-SQRT * shft9(a[24] + a[28]);  a[24] -= a[28];  a[28] = xr - a[24];
-  
+
   xr = a[24] - a[16]; a[24] = xr;
   xr = a[20] - xr;    a[20] = xr;
   xr = a[28] - xr;    a[28] = xr;
-  
+
   xr = a[25] - a[17]; a[25] = xr;
   xr = a[21] - xr;    a[21] = xr;
   xr = a[29] - xr;    a[29] = xr;
-  
+
   xr = a[17] - a[1];  a[17] = xr;
   xr = a[ 9] - xr;    a[ 9] = xr;
   xr = a[25] - xr;    a[25] = xr;
@@ -1844,7 +1844,7 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr = a[21] - xr;    a[21] = xr;
   xr = a[13] - xr;    a[13] = xr;
   xr = a[29] - xr;    a[29] = xr;
-  
+
   xr = a[ 1] - a[0];  a[ 1] = xr;
   xr = a[16] - xr;    a[16] = xr;
   xr = a[17] - xr;    a[17] = xr;
@@ -1860,7 +1860,7 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr = a[13] - xr;    a[13] = xr;
   xr = a[28] - xr;    a[28] = xr;
   xr = a[29] - xr;    a[29] = xr;
-  
+
   xr = a[ 0];  a[ 0] += a[31];  a[31] -= xr;
   xr = a[ 1];  a[ 1] += a[30];  a[30] -= xr;
   xr = a[16];  a[16] += a[15];  a[15] -= xr;
@@ -1900,7 +1900,7 @@ void mdct_long(int *out, int *in)
   ct      = (tc1 - tc3 - tc4) * cx[6];
   out[5]  = ct + st;
   out[6]  = ct - st;
-    
+
   tc2     = (in[16] - in[10]) * cx[6];
   ts6     =  ts6 * cx[7] + in[4] * cx[8];
 
@@ -1908,12 +1908,12 @@ void mdct_long(int *out, int *in)
   st      = -ts5 * cx[4] + ts6 - ts7 * cx[5] + ts8 * cx[3];
   out[1]  = ct + st;
   out[2]  = ct - st;
-    
+
   ct      =  tc1 * cx[1] - tc2 - tc3 * cx[2] + tc4 * cx[0];
   st      = -ts5 * cx[5] + ts6 - ts7 * cx[3] + ts8 * cx[4];
   out[ 9] = ct + st;
   out[10] = ct - st;
-    
+
   ct      = tc1 * cx[2] - tc2 + tc3 * cx[0] - tc4 * cx[1];
   st      = ts5 * cx[3] - ts6 + ts7 * cx[4] - ts8 * cx[5];
   out[13] = ct + st;
@@ -1966,7 +1966,7 @@ static int find_samplerate_index(long freq, int *mp3_type)
     int mpeg = freq >= (32000+24000)/2 ? 1 : 0;
     int i = ci->round_value_to_list32(freq, sampr_index[mpeg], 3, true);
     *mp3_type = mpeg;
-    return i;    
+    return i;
 }
 
 static bool init_mp3_encoder_engine(int sample_rate,
@@ -2523,7 +2523,7 @@ static void enc_events_callback(enum enc_events event, void *data)
             return;
 
         break;
- 
+
     case ENC_END_FILE:
          if (on_end_file((struct enc_file_event_data *)data))
             return;
