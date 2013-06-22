@@ -99,7 +99,7 @@ static int           num_channels;       /* Current number of channels     */
 static int           rec_mono_mode;      /* how mono is created            */
 static struct encoder_config enc_config; /* Current encoder configuration  */
 static unsigned long  pre_record_ticks;  /* pre-record time in ticks       */
-  
+
 /****************************************************************************
   use 2 circular buffers:
   pcm_buffer=DMA output buffer:    chunks (8192 Bytes) of raw pcm audio data
@@ -166,7 +166,7 @@ static size_t         enc_chunk_size;  /* maximum encoder chunk size       */
 static unsigned long  enc_sample_rate; /* sample rate used by encoder      */
 static bool           pcmrec_context = false;  /* called by pcmrec thread? */
 static bool           pcm_buffer_empty; /* all pcm chunks processed?       */
- 
+
 /** file flushing **/
 static int            low_watermark;   /* Low watermark to stop flush      */
 static int            high_watermark;  /* max chunk limit for data flush   */
@@ -259,7 +259,7 @@ static void pcmrec_raise_warning_status(unsigned long w)
 {
     warnings |= w;
 }
-    
+
 /* Callback for when more data is ready - called in interrupt context */
 static void pcm_rec_have_more(void **start, size_t *size)
 {
@@ -457,7 +457,7 @@ void audio_pause_recording(void)
 
 /**
  * Resume current recording if paused
- */    
+ */
 void audio_resume_recording(void)
 {
     logf("audio_resume_recording");
@@ -466,11 +466,11 @@ void audio_resume_recording(void)
 } /* audio_resume_recording */
 
 /**
- * Note that microphone is mono, only left value is used 
+ * Note that microphone is mono, only left value is used
  * See audiohw_set_recvol() for exact ranges.
  *
  * @param type   AUDIO_GAIN_MIC, AUDIO_GAIN_LINEIN
- * 
+ *
  */
 void audio_set_recording_gain(int left, int right, int type)
 {
@@ -503,7 +503,7 @@ unsigned long audio_num_recorded_bytes(void)
 
     return num_rec_bytes;
 } /* audio_num_recorded_bytes */
-    
+
 /***************************************************************************/
 /*                                                                         */
 /*         Functions that execute in the context of audio thread           */
@@ -559,14 +559,14 @@ static inline void pcmrec_fnq_set_empty(void)
 {
     fnq_rd_pos = fnq_wr_pos;
 } /* pcmrec_fnq_set_empty */
-        
+
 /* returns true if the queue is full */
 static bool pcmrec_fnq_is_full(void)
 {
     ssize_t size = fnq_wr_pos - fnq_rd_pos;
     if (size < 0)
         size += fnq_size;
-    
+
     return size >= fnq_size - MAX_PATH;
 } /* pcmrec_fnq_is_full */
 
@@ -575,7 +575,7 @@ static bool pcmrec_fnq_add_filename(const char *filename)
 {
     strlcpy(fn_queue + fnq_wr_pos, filename, MAX_PATH);
     fnq_wr_pos = FNQ_NEXT(fnq_wr_pos);
-    
+
     if (fnq_rd_pos != fnq_wr_pos)
         return true;
 
@@ -607,7 +607,7 @@ static bool pcmrec_fnq_get_filename(char *filename)
 
     if (filename)
         strlcpy(filename, fn_queue + fnq_rd_pos, MAX_PATH);
-    
+
     fnq_rd_pos = FNQ_NEXT(fnq_rd_pos);
     return true;
 } /* pcmrec_fnq_get_filename */
@@ -683,7 +683,7 @@ static void pcmrec_start_file(void)
         logf("start file: file already open");
         pcmrec_raise_error_status(PCMREC_E_FNQ_DESYNC);
     }
-    
+
     if (errors != 0)
         rec_fdata.chunk->flags |= CHUNKF_ERROR;
 
@@ -709,7 +709,7 @@ static void pcmrec_start_file(void)
     {
         pcmrec_update_sizes(enc_size, num_pcm);
     }
-    
+
     rec_fdata.chunk->flags &= ~CHUNKF_START_FILE;
 } /* pcmrec_start_file */
 
@@ -893,7 +893,7 @@ static void pcmrec_flush(unsigned flush_num)
     logf("writing:%d(%d):%s%s", num_ready, flush_num,
          interruptable ? "i" : "",
          flush_num == PCMREC_FLUSH_MINI ? "m" : "");
-        
+
     cpu_boost(true);
 
     remaining      = flush_num;
@@ -1077,7 +1077,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
             logf("stream prerecord start");
             start = data.pre_chunk = GET_ENC_CHUNK(pre_index);
             start->flags &= CHUNKF_START_FILE | CHUNKF_PRERECORD;
-        } 
+        }
         else
         {
             logf("stream normal start");
@@ -1145,7 +1145,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
             pcmrec_flush(PCMREC_FLUSH_ALL);
             did_flush = true;
         }
-   
+
         fnq_add_fn(path);
     }
 
@@ -1271,7 +1271,7 @@ static void pcmrec_record(const char *filename)
     num_rec_bytes   = 0;
     num_rec_samples = 0;
 
-    if (!is_recording) 
+    if (!is_recording)
     {
 #if 0
         accum_rec_bytes   = 0;
@@ -1371,7 +1371,7 @@ static void pcmrec_record(const char *filename)
 static void pcmrec_stop(void)
 {
     logf("pcmrec_stop");
-   
+
     if (is_recording)
     {
         dma_lock = true;    /* lock dma write position */
@@ -1401,7 +1401,7 @@ static void pcmrec_stop(void)
         {
             logf("fnq: not empty!");
             pcmrec_fnq_set_empty();
-        }   
+        }
 
         /* be absolutely sure the file is closed */
         if (errors != 0)
@@ -1446,7 +1446,7 @@ static void pcmrec_pause(void)
 static void pcmrec_resume(void)
 {
     logf("pcmrec_resume");
-    
+
     if (!is_recording)
     {
         logf("not recording");
@@ -1593,7 +1593,7 @@ void enc_set_parameters(struct enc_parameters *params)
 
     enc_num_chunks = bufsize / enc_chunk_size;
     logf("num chunks:%d", enc_num_chunks);
-        
+
     /* get real amount used by encoder chunks */
     bufsize = enc_num_chunks*enc_chunk_size;
     logf("enc size:%lu", bufsize);
@@ -1674,7 +1674,7 @@ struct enc_chunk_hdr * enc_get_chunk(void)
     return chunk;
 } /* enc_get_chunk */
 
-/* releases the current chunk into the available chunks - 
+/* releases the current chunk into the available chunks -
    NOTE: can be called by pcmrec thread when splitting streams */
 void enc_finish_chunk(void)
 {

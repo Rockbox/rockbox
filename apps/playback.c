@@ -787,7 +787,7 @@ static void audio_reset_buffer_noalloc(
         allocsize = ALIGN_UP(allocsize, sizeof (intptr_t));
         if (allocsize > filebuflen)
             goto bufpanic;
-    
+
         filebuflen -= allocsize;
 
         /* Scratch memory */

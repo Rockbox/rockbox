@@ -107,13 +107,13 @@ enum codec_command_action {
 struct codec_api {
     off_t  filesize;          /* Total file length */
     off_t  curpos;            /* Current buffer position */
-    
+
     struct mp3entry *id3;     /* TAG metadata pointer */
     int    audio_hid;         /* Current audio handle */
-    
+
     /* The dsp instance to be used for audio output */
     struct dsp_config *dsp;
-    
+
     /* Returns buffer to malloc array. Only codeclib should need this. */
     void* (*codec_get_buffer)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
@@ -121,7 +121,7 @@ struct codec_api {
     void (*pcmbuf_insert)(const void *ch1, const void *ch2, int count);
     /* Set song position in WPS (value in ms). */
     void (*set_elapsed)(unsigned long value);
-    
+
     /* Read next <size> amount bytes from file buffer to <ptr>.
        Will return number of bytes read or 0 if end of file. */
     size_t (*read_filebuf)(void *ptr, size_t size);
@@ -198,7 +198,7 @@ struct codec_api {
     void (*profile_func_enter)(void *this_fn, void *call_site);
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
- 
+
 #ifdef HAVE_RECORDING
     void            (*enc_get_inputs)(struct enc_inputs *inputs);
     void            (*enc_set_parameters)(struct enc_parameters *params);

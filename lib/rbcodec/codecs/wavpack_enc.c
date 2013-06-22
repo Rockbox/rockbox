@@ -47,7 +47,7 @@ struct riff_header
     uint16_t block_align;     /* 20h - num_channels*bits_per_samples/8   */
     uint16_t bits_per_sample; /* 22h - 8=8 bits, 16=16 bits, etc.        */
     /* Not for audio_format=1 (PCM) */
-/*  unsigned short extra_param_size;   24h - size of extra data                */ 
+/*  unsigned short extra_param_size;   24h - size of extra data                */
 /*  unsigned char  *extra_params; */
     /* data header */
     uint8_t  data_id[4];      /* 24h - "data" */
@@ -82,7 +82,7 @@ static const struct riff_header riff_header =
     /* "RIFF" header */
     { 'R', 'I', 'F', 'F' },         /* riff_id          */
     0,                              /* riff_size   (*)  */
-    /* format header */ 
+    /* format header */
     { 'W', 'A', 'V', 'E' },         /* format           */
     { 'f', 'm', 't', ' ' },         /* format_id        */
     htole32(16),                    /* format_size      */
@@ -234,7 +234,7 @@ static bool on_start_file(struct enc_file_event_data *data)
     data->num_pcm_samples = 0;
 
     /* write template headers */
-    if (ci->write(data->rec_file, &wvpk_mdh, sizeof (wvpk_mdh)) 
+    if (ci->write(data->rec_file, &wvpk_mdh, sizeof (wvpk_mdh))
             != sizeof (wvpk_mdh) ||
         ci->write(data->rec_file, &riff_header, sizeof (riff_header))
             != sizeof (riff_header))
@@ -344,7 +344,7 @@ static bool init_encoder(void)
 {
     struct enc_inputs     inputs;
     struct enc_parameters params;
-    
+
     codec_init();
 
     if (ci->enc_get_inputs         == NULL ||
