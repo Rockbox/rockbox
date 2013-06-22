@@ -67,7 +67,7 @@ static int perfcheck(void)
         "mov     %[res], #0          \n"
         "ldr     r0, [%[timr]]       \n"
         "add     r0, r0, %[tmo]      \n"
-    "1:                              \n"
+        "1:                          \n"
         "add     %[res], %[res], #1  \n"
         "ldr     r1, [%[timr]]       \n"
         "cmp     r1, r0              \n"
@@ -155,9 +155,12 @@ bool dbg_ports(void)
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
         const unsigned char *serbuf = iap_get_serbuf();
-        lcd_putsf(0, line++, "IAP: %02x %02x %02x %02x %02x %02x %02x %02x", 
-         serbuf[0], serbuf[1], serbuf[2], serbuf[3], serbuf[4], serbuf[5],
-         serbuf[6], serbuf[7]);
+        if (serbuf)
+        {
+            lcd_putsf(0, line++, "IAP: %02x %02x %02x %02x %02x %02x %02x %02x",
+             serbuf[0], serbuf[1], serbuf[2], serbuf[3], serbuf[4], serbuf[5],
+             serbuf[6], serbuf[7]);
+        }
 #endif
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
