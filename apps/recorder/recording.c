@@ -280,7 +280,7 @@ static void set_gain(void)
     {
         if (global_settings.rec_mic_gain > sound_max(SOUND_MIC_GAIN))
             global_settings.rec_mic_gain = sound_max(SOUND_MIC_GAIN);
-        
+
         if (global_settings.rec_mic_gain < sound_min(SOUND_MIC_GAIN))
             global_settings.rec_mic_gain = sound_min(SOUND_MIC_GAIN);
 
@@ -301,7 +301,7 @@ static void set_gain(void)
 
         if (global_settings.rec_right_gain < sound_min(SOUND_RIGHT_GAIN))
             global_settings.rec_right_gain = sound_min(SOUND_RIGHT_GAIN);
-      
+
         /* AUDIO_SRC_LINEIN, AUDIO_SRC_FMRADIO, AUDIO_SRC_SPDIF */
         audio_set_recording_gain(global_settings.rec_left_gain,
                                  global_settings.rec_right_gain,
@@ -327,7 +327,7 @@ static bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
             return false;
 
     if (*peak_r > *peak_l)
-        balance_mem[peak_time % BAL_MEM_SIZE] = (*peak_l ? 
+        balance_mem[peak_time % BAL_MEM_SIZE] = (*peak_l ?
             MIN((10000 * *peak_r) / *peak_l - 10000, 15118) : 15118);
     else
         balance_mem[peak_time % BAL_MEM_SIZE] = (*peak_r ?
@@ -394,7 +394,7 @@ static void change_recording_gain(bool increment, bool left, bool right)
     }
 }
 
-/* 
+/*
  * Handle automatic gain control (AGC).
  * Change recording gain if peak_x levels are above or below
  * target volume for specified timeouts.
@@ -645,7 +645,7 @@ int rec_create_directory(void)
         {
             while (action_userabort(HZ) == false)
             {
-                splashf(0, "%s %s", 
+                splashf(0, "%s %s",
                         str(LANG_REC_DIR_NOT_WRITABLE),
                         str(LANG_OFF_ABORT));
             }
@@ -1050,7 +1050,7 @@ bool recording_screen(bool no_source)
     int trig_ypos[NB_SCREENS];      /* trigger bar y pos */
     int trig_width[NB_SCREENS];     /* trigger bar width */
     int top_height_req[NB_SCREENS]; /* required height for top half */
-                                     /* tweak layout tiny screens / big fonts */                                    
+                                     /* tweak layout tiny screens / big fonts */
     bool compact_view[NB_SCREENS] = { false };
     struct gui_synclist lists;      /* the list in the bottom vp */
 #if defined(HAVE_AGC)
@@ -1445,7 +1445,7 @@ bool recording_screen(bool no_source)
 #ifdef HAVE_MIC_REC
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
                         {
-                            global_settings.rec_mic_gain -= 
+                            global_settings.rec_mic_gain -=
                                 sound_steps(SOUND_MIC_GAIN);
                         }
                         else
