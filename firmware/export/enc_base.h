@@ -9,7 +9,7 @@
  *
  * Base declarations for working with software encoders
  *
- * Copyright (C) 2006 Michael Sevakis
+ * Copyright (C) 2006-2013 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +24,9 @@
 #ifndef ENC_BASE_H
 #define ENC_BASE_H
 
-/** encoder config structures **/
+#include <sys/types.h>
+
+/** Encoder config structures **/
 
 /** aiff_enc.codec **/
 struct aiff_enc_config
@@ -57,18 +59,22 @@ struct aiff_enc_config
 
 /* MPEG 1 */
 #define MPEG1_SAMPR_CAPS    (SAMPR_CAP_32 | SAMPR_CAP_48 | SAMPR_CAP_44)
-#define MPEG1_BITR_CAPS     (MP3_BITR_CAP_32  | MP3_BITR_CAP_40  | MP3_BITR_CAP_48  | \
-                             MP3_BITR_CAP_56  | MP3_BITR_CAP_64  | MP3_BITR_CAP_80  | \
-                             MP3_BITR_CAP_96  | MP3_BITR_CAP_112 | MP3_BITR_CAP_128 | \
-                             MP3_BITR_CAP_160 | MP3_BITR_CAP_192 | MP3_BITR_CAP_224 | \
+#define MPEG1_BITR_CAPS     (MP3_BITR_CAP_32  | MP3_BITR_CAP_40  | \
+                             MP3_BITR_CAP_48  | MP3_BITR_CAP_56  | \
+                             MP3_BITR_CAP_64  | MP3_BITR_CAP_80  | \
+                             MP3_BITR_CAP_96  | MP3_BITR_CAP_112 | \
+                             MP3_BITR_CAP_128 | MP3_BITR_CAP_160 | \
+                             MP3_BITR_CAP_192 | MP3_BITR_CAP_224 | \
                              MP3_BITR_CAP_256 | MP3_BITR_CAP_320)
 
 /* MPEG 2 */
 #define MPEG2_SAMPR_CAPS    (SAMPR_CAP_22 | SAMPR_CAP_24 | SAMPR_CAP_16)
-#define MPEG2_BITR_CAPS     (MP3_BITR_CAP_8   | MP3_BITR_CAP_16  | MP3_BITR_CAP_24  | \
-                             MP3_BITR_CAP_32  | MP3_BITR_CAP_40  | MP3_BITR_CAP_48  | \
-                             MP3_BITR_CAP_56  | MP3_BITR_CAP_64  | MP3_BITR_CAP_80  | \
-                             MP3_BITR_CAP_96  | MP3_BITR_CAP_112 | MP3_BITR_CAP_128 | \
+#define MPEG2_BITR_CAPS     (MP3_BITR_CAP_8   | MP3_BITR_CAP_16  | \
+                             MP3_BITR_CAP_24  | MP3_BITR_CAP_32  | \
+                             MP3_BITR_CAP_40  | MP3_BITR_CAP_48  | \
+                             MP3_BITR_CAP_56  | MP3_BITR_CAP_64  | \
+                             MP3_BITR_CAP_80  | MP3_BITR_CAP_96  | \
+                             MP3_BITR_CAP_112 | MP3_BITR_CAP_128 | \
                              MP3_BITR_CAP_144 | MP3_BITR_CAP_160)
 
 #if 0
@@ -131,6 +137,7 @@ struct wavpack_enc_config
 #endif
 };
 
+/* General config information about any encoder */
 struct encoder_config
 {
     union
@@ -149,144 +156,77 @@ struct encoder_config
 };
 
 /** Encoder chunk macros and definitions **/
-#define CHUNKF_START_FILE 0x0001ul /* This chunk starts a new file         */
-#define CHUNKF_END_FILE   0x0002ul /* This chunk ends the current file     */
-#define CHUNKF_PRERECORD  0x0010ul /* This chunk is prerecord data,
-                                      a new file could start anytime       */
-#define CHUNKF_ABORT      0x0020ul /* Encoder should not finish this
-                                      chunk                                */
-#define CHUNKF_ERROR    (~0ul ^ (~0ul >> 1)) /* An error has occured
-                                      (passed to/from encoder). Use the
-                                      sign bit to check (long)flags < 0.   */
-#define CHUNKF_ALLFLAGS (0x0033ul | CHUNKF_ERROR)
 
-/* Header at the beginning of every encoder chunk */
-#ifdef DEBUG
-#define H_TO_BE32 htobe32
-#define ENC_CHUNK_MAGIC H_TO_BE32(('P' << 24) | ('T' << 16) | ('Y' << 8) | 'R')
-#endif
-struct enc_chunk_hdr
+/* What sort of data does the header describe? */
+enum CHUNK_T
 {
-#ifdef DEBUG
-    unsigned long id;         /* overflow detection - 'PTYR' - acronym for
-                                 "PTYR Tells You Right" ;)                 */
-#endif
-    unsigned long flags;      /* in/out: flags used by encoder and file
-                                         writing                           */
-    size_t        enc_size;   /* out:    amount of encoder data written to
-                                         chunk                             */
-    unsigned long num_pcm;    /* out:    number of PCM samples eaten during
-                                         processing
-                                         (<= size of allocated buffer)     */
-    unsigned char *enc_data;  /* out:    pointer to enc_size_written bytes
-                                         of encoded audio data in chunk    */
-    /* Encoder defined data follows header. Can be audio data + any other
-       stuff the encoder needs to handle on a per chunk basis */
+    CHUNK_T_DATA         = 0x0, /* Encoded audio data */
+    CHUNK_T_STREAM_START = 0x1, /* Stream start marker */
+    CHUNK_T_STREAM_END   = 0x2, /* Stream end marker */
+    CHUNK_T_WRAP         = 0x3  /* Buffer early wrap marker */
 };
 
-/* Paranoia: be sure header size is 4-byte aligned */
-#define ENC_CHUNK_HDR_SIZE \
-            ALIGN_UP_P2(sizeof (struct enc_chunk_hdr), 2)
-/* Skip the chunk header and return data */
-#define ENC_CHUNK_SKIP_HDR(t, hdr) \
-            ((typeof (t))((char *)hdr + ENC_CHUNK_HDR_SIZE))
-/* Cast p to struct enc_chunk_hdr * */
-#define ENC_CHUNK_HDR(p) \
-            ((struct enc_chunk_hdr *)(p))
-
-enum enc_events
+/* Header for every buffer slot and chunk */
+union enc_chunk_hdr
 {
-    /* File writing events - data points to enc_file_event_data            */
-    ENC_START_FILE = 0,  /* a new file has been opened and no data has yet
-                            been written                                   */
-    ENC_WRITE_CHUNK,     /* write the current chunk to disk                */
-    ENC_END_FILE,        /* current file about to be closed and all valid
-                            data has been written                          */
-    /* Encoder buffer events - data points to enc_buffer_event_data        */
-    ENC_REC_NEW_STREAM,  /* Take steps to finish current stream and start
-                            new                                            */
-};
+    struct
+    {
+        uint32_t type   : 2;    /* Chunk type (CHUNK_T_*) */
+        uint32_t err    : 1;    /* Encoder error */
+        uint32_t pre    : 1;    /* Chunk is prerecorded data */
+        uint32_t aux0   : 1;    /* Aux flag 0 - for encoder */
+        uint32_t unused : 3;    /* */
+        uint32_t size   : 24;   /* size of data */
+    };
+    uint32_t zero;              /* Zero-out struct access */
+    intptr_t reserved1;         /* Want it at least pointer-sized */
+} __attribute__((__may_alias__));
 
-/**
- * encoder can write extra data to the file such as headers or more encoded
- * samples and must update sizes and samples accordingly.
- */
-struct enc_file_event_data
+#define ENC_HDR_SIZE    (sizeof (union enc_chunk_hdr))
+
+/* When hdr.type is CHUNK_T_STREAM_START */
+struct enc_chunk_file
 {
-    struct enc_chunk_hdr *chunk;   /* Current chunk                        */
-    size_t        new_enc_size;    /* New size of chunk                    */
-    unsigned long new_num_pcm;     /* New number of pcm in chunk           */
-    const char   *filename;        /* filename to open if ENC_START_FILE   */
-    int           rec_file;        /* Current file or < 0 if none          */
-    unsigned long num_pcm_samples; /* Current pcm sample count written to
-                                      file so far.                         */
-};
+    union enc_chunk_hdr hdr;    /* This chunk's header */
+                                /* hdr.size = slot count of chunk */
+    char path[];                /* NULL-terminated path of file */
+} __attribute__((__may_alias__));
 
-/**
- * encoder may add some data to the end of the last and start of the next
- * but must never yield when called so any encoding done should be absolutely
- * minimal.
- */
-struct enc_buffer_event_data
+/* If flags = CHUNK_T_STREAM_END, just the header exists */
+
+/* When hdr.type is CHUNK_T_DATA */
+struct enc_chunk_data
 {
-    unsigned long         flags;       /* in: One or more of:
-                                        *     CHUNKF_PRERECORD
-                                        *     CHUNKF_END_FILE
-                                        *     CHUNKF_START_FILE
-                                        */
-    struct enc_chunk_hdr *pre_chunk;   /* in: pointer to first prerecord
-                                        *     chunk
-                                        */
-    struct enc_chunk_hdr *chunk;       /* in,out: chunk were split occurs -
-                                        *         first chunk of start
-                                        */
-};
+    union enc_chunk_hdr hdr;    /* IN,OUT: This chunk's header */
+                                /* hdr.size = total size of data[] */
+    uint32_t pcm_count;         /* OUT: number of PCM samples encoded */
+    uint8_t data[];             /* OUT: encoded audio data */
+} __attribute__((__may_alias__));
 
-/** Callbacks called by encoder codec **/
+/* CHUNK_T_STREAM_END and CHUNK_T_WRAP consist of only the header */
 
-/* parameters passed to encoder by enc_get_inputs */
+#define ENC_FILE_HDR(hdr) ((struct enc_chunk_file *)(hdr))
+#define ENC_DATA_HDR(hdr) ((struct enc_chunk_data *)(hdr))
+
+/* Audio and encoder stream parameters */
 struct enc_inputs
 {
-    unsigned long sample_rate;     /* out - pcm frequency                  */
-    int           num_channels;    /* out - number of audio channels       */
-    int           rec_mono_mode;   /* out - how to create mono             */
-    struct encoder_config *config; /* out - encoder settings               */
-};
-
-void enc_get_inputs(struct enc_inputs *inputs);
-
-/* parameters pass from encoder to enc_set_parameters */
-struct enc_parameters
-{
     /* IN parameters */
-    int           afmt;            /* AFMT_* id - sanity checker           */
-    size_t        chunk_size;      /* max chunk size required              */
-    unsigned long enc_sample_rate; /* actual sample rate used by encoder
-                                      (for recorded time calculation)      */
-    size_t        reserve_bytes;   /* number of bytes to reserve immediately
-                                      following chunks                     */
-    void (*events_callback)(enum enc_events event,
-                            void *data); /*  pointer to events callback    */
-    /* OUT parameters */
-    unsigned char *enc_buffer;     /* pointer to enc_buffer                */
-    size_t         buf_chunk_size; /* size of chunks in enc_buffer         */
-    int            num_chunks;     /* number of chunks allotted to encoder */
-    unsigned char *reserve_buffer; /* pointer to reserve_bytes bytes       */
+    unsigned long sample_rate;     /* PCM samplerate setting */
+    int           num_channels;    /* Number of audio channels */
+    struct encoder_config *config; /* Encoder settings */
+
+    /* IN,OUT parameters */
+    unsigned long enc_sample_rate; /* Actual sample rate accepted by encoder
+                                      (for recorded time calculation) */
 };
 
-/* set the encoder dimensions - called by encoder codec at initialization
-   and termination */
-void   enc_set_parameters(struct enc_parameters *params);
-/* returns pointer to next write chunk in circular buffer */
-struct enc_chunk_hdr * enc_get_chunk(void);
-/* releases the current chunk into the available chunks */
-void   enc_finish_chunk(void);
+enum enc_callback_reason
+{
+    ENC_CB_INPUTS, /* 'params' is struct enc_inputs * */
+    ENC_CB_STREAM, /* 'params' is union enc_chunk_hdr * */
+};
 
-#define PCM_MAX_FEED_SIZE       20000 /* max pcm size passed to encoder    */
-
-/* passes a pointer to next chunk of unprocessed wav data */
-unsigned char * enc_get_pcm_data(size_t size);
-/* puts some pcm data back in the queue */
-size_t          enc_unget_pcm_data(size_t size);
+typedef int (* enc_callback_t)(enum enc_callback_reason reason, void *params);
 
 #endif /* ENC_BASE_H */

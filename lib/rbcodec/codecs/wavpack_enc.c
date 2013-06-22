@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Antonius Hellmann
+ * Copyright (C) 2006-2013 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -47,29 +48,39 @@ struct riff_header
     uint16_t block_align;     /* 20h - num_channels*bits_per_samples/8   */
     uint16_t bits_per_sample; /* 22h - 8=8 bits, 16=16 bits, etc.        */
     /* Not for audio_format=1 (PCM) */
-/*  unsigned short extra_param_size;   24h - size of extra data                */
-/*  unsigned char  *extra_params; */
+/*  uint16_t extra_param_size;   24h - size of extra data                */
+/*  uint8_t  extra_params[extra_param_size];                             */
     /* data header */
     uint8_t  data_id[4];      /* 24h - "data" */
     uint32_t data_size;       /* 28h - num_samples*num_channels*bits_per_sample/8 */
-/*  unsigned char  *data;              2ch - actual sound data */
+/*  uint8_t  data[data_size];    2Ch - actual sound data */
 } __attribute__((packed));
 
 #define RIFF_FMT_HEADER_SIZE   12 /* format -> format_size */
 #define RIFF_FMT_DATA_SIZE     16 /* audio_format -> bits_per_sample */
 #define RIFF_DATA_HEADER_SIZE   8 /* data_id -> data_size */
 
+struct wvpk_chunk_data
+{
+    struct enc_chunk_data ckhdr;  /* The base data chunk header */
+    WavpackHeader         wphdr;  /* The block wavpack info */
+    uint8_t               data[]; /* Encoded audio data */
+};
+
 #define PCM_DEPTH_BITS         16
 #define PCM_DEPTH_BYTES         2
 #define PCM_SAMP_PER_CHUNK   5000
-#define PCM_CHUNK_SIZE      (4*PCM_SAMP_PER_CHUNK)
 
 /** Data **/
-static int8_t input_buffer[PCM_CHUNK_SIZE*2]     IBSS_ATTR;
-static WavpackConfig config                      IBSS_ATTR;
+static int32_t input_buffer[PCM_SAMP_PER_CHUNK*2] IBSS_ATTR;
+
+static WavpackConfig config IBSS_ATTR;
 static WavpackContext *wpc;
-static int32_t data_size, input_size, input_step IBSS_ATTR;
-static int32_t err                               IBSS_ATTR;
+static uint32_t sample_rate;
+static int num_channels;
+static uint32_t total_samples;
+static size_t out_reqsize;
+static size_t frame_size;
 
 static const WavpackMetadataHeader wvpk_mdh =
 {
@@ -77,7 +88,7 @@ static const WavpackMetadataHeader wvpk_mdh =
     sizeof (struct riff_header) / sizeof (uint16_t),
 };
 
-static const struct riff_header riff_header =
+static const struct riff_header riff_template_header =
 {
     /* "RIFF" header */
     { 'R', 'I', 'F', 'F' },         /* riff_id          */
@@ -96,157 +107,75 @@ static const struct riff_header riff_header =
     /* data header */
     { 'd', 'a', 't', 'a' },         /* data_id          */
     0                               /* data_size    (*) */
-    /* (*) updated during ENC_END_FILE event */
+    /* (*) updated when finalizing stream */
 };
 
-static inline void sample_to_int32_mono(int32_t **src, int32_t **dst)
+static inline void sample_to_int32(int32_t **dst, int32_t **src)
 {
-    int32_t t = *(*src)++;
-    /* endianness irrelevant */
-    t = (int16_t)t + (t >> 16) + err;
-    err = t & 1;
-    *(*dst)++ = t >> 1;
-} /* sample_to_int32_mono */
-
-static inline void sample_to_int32_stereo(int32_t **src, int32_t **dst)
-{
-    int32_t t = *(*src)++;
+    uint32_t t = *(*src)++;
 #ifdef ROCKBOX_BIG_ENDIAN
-    *(*dst)++ = t >> 16, *(*dst)++ = (int16_t)t;
+    *(*dst)++ = (int32_t)t >> 16;
+    *(*dst)++ = (int16_t)t;
 #else
-    *(*dst)++ = (int16_t)t, *(*dst)++ = t >> 16;
+    *(*dst)++ = (int16_t)t;
+    *(*dst)++ = (int32_t)t >> 16;
 #endif
-} /* sample_to_int32_stereo */
+}
 
-static void chunk_to_int32(int32_t *src) ICODE_ATTR;
-static void chunk_to_int32(int32_t *src)
+static void ICODE_ATTR input_buffer_to_int32(size_t size)
 {
-    int32_t *src_end, *dst;
-#ifdef USE_IRAM
-    /* copy to IRAM before converting data */
-    dst     = (int32_t *)input_buffer + PCM_SAMP_PER_CHUNK;
-    src_end = dst + PCM_SAMP_PER_CHUNK;
+    int32_t *dst = input_buffer;
+    int32_t *src = input_buffer + PCM_SAMP_PER_CHUNK;
 
-    memcpy(dst, src, PCM_CHUNK_SIZE);
-
-    src = dst;
-#else
-    src_end = src + PCM_SAMP_PER_CHUNK;
-#endif
-
-    dst = (int32_t *)input_buffer;
-
-    if (config.num_channels == 1)
+    do
     {
-        /*
-         *  |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
-         *  |mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm|
-         */
-        do
-        {
-            /* read 10 longs and write 10 longs */
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-            sample_to_int32_mono(&src, &dst);
-        }
-        while(src < src_end);
-
-        return;
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
+        sample_to_int32(&dst, &src);
     }
-    else
-    {
-        /*
-         *  |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
-         *  |llllllllllllllllllllllllllllllll|rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr|
-         */
-        do
-        {
-            /* read 10 longs and write 20 longs */
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-            sample_to_int32_stereo(&src, &dst);
-        }
-        while (src < src_end);
+    while (size -= 10 * 2 * PCM_DEPTH_BYTES);
+}
 
-        return;
-    }
-} /* chunk_to_int32 */
-
-/* called very often - inline */
-static inline bool is_file_data_ok(struct enc_file_event_data *data) ICODE_ATTR;
-static inline bool is_file_data_ok(struct enc_file_event_data *data)
+static int on_stream_data(struct wvpk_chunk_data *wpdata)
 {
-    return data->rec_file >= 0 && (long)data->chunk->flags >= 0;
-} /* is_file_data_ok */
-
-/* called very often - inline */
-static inline bool on_write_chunk(struct enc_file_event_data *data) ICODE_ATTR;
-static inline bool on_write_chunk(struct enc_file_event_data *data)
-{
-    if (!is_file_data_ok(data))
-        return false;
-
-    if (data->chunk->enc_data == NULL)
-    {
-#ifdef ROCKBOX_HAS_LOGF
-        ci->logf("wvpk enc: NULL data");
-#endif
-        return true;
-    }
-
     /* update timestamp (block_index) */
-    ((WavpackHeader *)data->chunk->enc_data)->block_index =
-            htole32(data->num_pcm_samples);
+    wpdata->wphdr.block_index = htole32(total_samples);
 
-    if (ci->write(data->rec_file, data->chunk->enc_data,
-                  data->chunk->enc_size) != (ssize_t)data->chunk->enc_size)
-        return false;
+    size_t size = wpdata->ckhdr.hdr.size;
+    if (ci->enc_stream_write(wpdata->ckhdr.data, size) != (ssize_t)size)
+        return -1;
 
-    data->num_pcm_samples += data->chunk->num_pcm;
-    return true;
-} /* on_write_chunk */
+    total_samples += wpdata->ckhdr.pcm_count;
 
-static bool on_start_file(struct enc_file_event_data *data)
+    return 0;
+}
+
+static int on_stream_start(void)
 {
-    if ((data->chunk->flags & CHUNKF_ERROR) || *data->filename == '\0')
-        return false;
-
-    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
-
-    if (data->rec_file < 0)
-        return false;
-
     /* reset sample count */
-    data->num_pcm_samples = 0;
+    total_samples = 0;
 
     /* write template headers */
-    if (ci->write(data->rec_file, &wvpk_mdh, sizeof (wvpk_mdh))
-            != sizeof (wvpk_mdh) ||
-        ci->write(data->rec_file, &riff_header, sizeof (riff_header))
-            != sizeof (riff_header))
-    {
-        return false;
-    }
+    if (ci->enc_stream_write(&wvpk_mdh, sizeof (wvpk_mdh))
+            != sizeof (wvpk_mdh))
+        return -1;
 
-    data->new_enc_size += sizeof(wvpk_mdh) + sizeof(riff_header);
-    return true;
-} /* on_start_file */
+    if (ci->enc_stream_write(&riff_template_header,
+                             sizeof (riff_template_header))
+            != sizeof (riff_template_header))
+        return -2;
 
-static bool on_end_file(struct enc_file_event_data *data)
+    return 0;
+}
+
+static int on_stream_end(void)
 {
     struct
     {
@@ -255,19 +184,16 @@ static bool on_end_file(struct enc_file_event_data *data)
         WavpackHeader         wph;
     } __attribute__ ((packed)) h;
 
-    uint32_t data_size;
-
-    if (data->rec_file < 0)
-        return false; /* file already closed, nothing more we can do */
-
-    /* always _try_ to write the file header, even on error */
+    /* Correcting sizes on error is a bit of a pain */
 
     /* read template headers at start */
-    if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
-        ci->read(data->rec_file, &h, sizeof (h)) != sizeof (h))
-        return false;
+    if (ci->enc_stream_lseek(0, SEEK_SET) != 0)
+        return -1;
 
-    data_size = data->num_pcm_samples*config.num_channels*PCM_DEPTH_BYTES;
+    if (ci->enc_stream_read(&h, sizeof (h)) != sizeof (h))
+        return -2;
+
+    size_t data_size = total_samples*config.num_channels*PCM_DEPTH_BYTES;
 
     /** "RIFF" header **/
     h.rhdr.riff_size    = htole32(RIFF_FMT_HEADER_SIZE +
@@ -286,121 +212,29 @@ static bool on_end_file(struct enc_file_event_data *data)
     /** Wavpack header **/
     h.wph.ckSize        = htole32(letoh32(h.wph.ckSize) + sizeof (h.wpmdh)
                                 + sizeof (h.rhdr));
-    h.wph.total_samples = htole32(data->num_pcm_samples);
+    h.wph.total_samples = htole32(total_samples);
 
     /* MDH|RIFF|WVPK => WVPK|MDH|RIFF */
-    if (ci->lseek(data->rec_file, 0, SEEK_SET)
-            != 0 ||
-        ci->write(data->rec_file, &h.wph, sizeof (h.wph))
-            != sizeof (h.wph) ||
-        ci->write(data->rec_file, &h.wpmdh, sizeof (h.wpmdh))
-            != sizeof (h.wpmdh) ||
-        ci->write(data->rec_file, &h.rhdr, sizeof (h.rhdr))
-            != sizeof (h.rhdr) ||
-        ci->close(data->rec_file) != 0 )
-    {
-        return false;
-    }
+    if (ci->enc_stream_lseek(0, SEEK_SET) != 0)
+        return -3;
 
-    data->rec_file = -1;
+    if (ci->enc_stream_write(&h.wph, sizeof (h.wph)) != sizeof (h.wph))
+        return -4;
 
-    return true;
-} /* on_end_file */
+    if (ci->enc_stream_write(&h.wpmdh, sizeof (h.wpmdh)) != sizeof (h.wpmdh))
+        return -5;
 
-static void enc_events_callback(enum enc_events event, void *data)
-                                    ICODE_ATTR;
-static void enc_events_callback(enum enc_events event, void *data)
-{
-    switch (event)
-    {
-    case ENC_WRITE_CHUNK:
-        if (on_write_chunk((struct enc_file_event_data *)data))
-            return;
+    if (ci->enc_stream_write(&h.rhdr, sizeof (h.rhdr)) != sizeof (h.rhdr))
+        return -6;
 
-        break;
-
-    case ENC_START_FILE:
-        /* write metadata header and RIFF header */
-        if (on_start_file((struct enc_file_event_data *)data))
-            return;
-
-        break;
-
-    case ENC_END_FILE:
-        if (on_end_file((struct enc_file_event_data *)data))
-            return;
-
-        break;
-
-    default:
-        return;
-    }
-
-    /* Something failed above. Signal error back to core. */
-    ((struct enc_file_event_data *)data)->chunk->flags |= CHUNKF_ERROR;
-} /* enc_events_callback */
-
-static bool init_encoder(void)
-{
-    struct enc_inputs     inputs;
-    struct enc_parameters params;
-
-    codec_init();
-
-    if (ci->enc_get_inputs         == NULL ||
-        ci->enc_set_parameters     == NULL ||
-        ci->enc_get_chunk          == NULL ||
-        ci->enc_finish_chunk       == NULL ||
-        ci->enc_get_pcm_data       == NULL ||
-        ci->enc_unget_pcm_data     == NULL )
-        return false;
-
-    ci->enc_get_inputs(&inputs);
-
-    if (inputs.config->afmt != AFMT_WAVPACK)
-        return false;
-
-    memset(&config, 0, sizeof (config));
-    config.bits_per_sample  = PCM_DEPTH_BITS;
-    config.bytes_per_sample = PCM_DEPTH_BYTES;
-    config.sample_rate      = inputs.sample_rate;
-    config.num_channels     = inputs.num_channels;
-
-    wpc = WavpackOpenFileOutput ();
-
-    if (!WavpackSetConfiguration(wpc, &config, -1))
-        return false;
-
-    err = 0;
-
-    /* configure the buffer system */
-    params.afmt            = AFMT_WAVPACK;
-    input_size             = PCM_CHUNK_SIZE*inputs.num_channels / 2;
-    data_size              = 105*input_size / 100;
-    input_size            *= 2;
-    input_step             = input_size / 4;
-    params.chunk_size      = data_size;
-    params.enc_sample_rate = inputs.sample_rate;
-    params.reserve_bytes   = 0;
-    params.events_callback = enc_events_callback;
-
-    ci->enc_set_parameters(&params);
-
-    return true;
-} /* init_encoder */
+    return 0;
+}
 
 /* this is the codec entry point */
 enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    if (reason == CODEC_LOAD) {
-        /* initialize params and config */
-        if (!init_encoder())
-            return CODEC_ERROR;
-    }
-    else if (reason == CODEC_UNLOAD) {
-        /* reset parameters to initial state */
-        ci->enc_set_parameters(NULL);
-    }
+    if (reason == CODEC_LOAD)
+        codec_init();
 
     return CODEC_OK;
 }
@@ -408,60 +242,89 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
+    enum { GETBUF_ENC, GETBUF_PCM } getbuf = GETBUF_ENC;
+    struct enc_chunk_data *data = NULL;
+
     /* main encoding loop */
-    while(ci->get_command(NULL) != CODEC_ACTION_HALT)
+    while (1)
     {
-        uint8_t *src = (uint8_t *)ci->enc_get_pcm_data(PCM_CHUNK_SIZE);
-        struct enc_chunk_hdr *chunk;
-        bool abort_chunk;
-        uint8_t *dst;
-        uint8_t *src_end;
+        enum codec_command_action action = ci->get_command(NULL);
 
-        if(src == NULL)
-            continue;
+        if (action != CODEC_ACTION_NULL)
+            break;
 
-        chunk = ci->enc_get_chunk();
-
-        /* reset counts and pointer */
-        chunk->enc_size = 0;
-        chunk->num_pcm  = 0;
-        chunk->enc_data = NULL;
-
-        dst = ENC_CHUNK_SKIP_HDR(dst, chunk);
-
-        WavpackStartBlock(wpc, dst, dst + data_size);
-
-        chunk_to_int32((uint32_t*)src);
-        src      = input_buffer;
-        src_end  = src + input_size;
-
-        /* encode chunk in four steps yielding between each */
-        do
+        /* First obtain output buffer; when available, get PCM data */
+        switch (getbuf)
         {
-            abort_chunk = true;
-            if (WavpackPackSamples(wpc, (int32_t *)src,
-                                   PCM_SAMP_PER_CHUNK/4))
-            {
-                chunk->num_pcm += PCM_SAMP_PER_CHUNK/4;
-                ci->yield();
-                /* could've been stopped in some way */
-                abort_chunk = chunk->flags & CHUNKF_ABORT;
-            }
-
-            src += input_step;
+        case GETBUF_ENC:
+            if (!(data = ci->enc_encbuf_get_buffer(out_reqsize)))
+                continue;
+            getbuf = GETBUF_PCM;
+        case GETBUF_PCM:
+            if (!ci->enc_pcmbuf_read(input_buffer + PCM_SAMP_PER_CHUNK,
+                                     PCM_SAMP_PER_CHUNK))
+                continue;
+            getbuf = GETBUF_ENC;
         }
-        while (!abort_chunk && src < src_end);
 
-        if (!abort_chunk)
+        input_buffer_to_int32(frame_size);
+
+        if (WavpackStartBlock(wpc, data->data, data->data + out_reqsize) &&
+            WavpackPackSamples(wpc, input_buffer, PCM_SAMP_PER_CHUNK))
         {
-            chunk->enc_data = dst;
-            if (chunk->num_pcm < PCM_SAMP_PER_CHUNK)
-                ci->enc_unget_pcm_data(PCM_CHUNK_SIZE - chunk->num_pcm*4);
             /* finish the chunk and store chunk size info */
-            chunk->enc_size = WavpackFinishBlock(wpc);
-            ci->enc_finish_chunk();
+            data->hdr.size = WavpackFinishBlock(wpc);
+            data->pcm_count = PCM_SAMP_PER_CHUNK;
         }
+        else
+        {
+            data->hdr.err = 1;
+        }
+
+        ci->enc_pcmbuf_advance(PCM_SAMP_PER_CHUNK);
+        ci->enc_encbuf_finish_buffer();
     }
 
     return CODEC_OK;
+}
+
+/* this is called by recording system */
+int ICODE_ATTR enc_callback(enum enc_callback_reason reason,
+                            void *params)
+{
+    if (LIKELY(reason == ENC_CB_STREAM))
+    {
+        switch (((union enc_chunk_hdr *)params)->type)
+        {
+        case CHUNK_T_DATA:
+            return on_stream_data(params);
+        case CHUNK_T_STREAM_START:
+            return on_stream_start();
+        case CHUNK_T_STREAM_END:
+            return on_stream_end();
+        }
+    }
+    else if (reason == ENC_CB_INPUTS)
+    {
+        /* Save parameters */
+        struct enc_inputs *inputs = params;
+        sample_rate = inputs->sample_rate;
+        num_channels = inputs->num_channels;
+        frame_size = PCM_SAMP_PER_CHUNK*PCM_DEPTH_BYTES*num_channels;
+        out_reqsize = frame_size*110 / 100; /* Add 10% */
+
+        /* Setup Wavpack encoder */
+        memset(&config, 0, sizeof (config));
+        config.bits_per_sample = PCM_DEPTH_BITS;
+        config.bytes_per_sample = PCM_DEPTH_BYTES;
+        config.sample_rate = sample_rate;
+        config.num_channels = num_channels;
+
+        wpc = WavpackOpenFileOutput();
+
+        if (!WavpackSetConfiguration(wpc, &config, -1))
+            return -1;
+    }
+
+    return 0;
 }

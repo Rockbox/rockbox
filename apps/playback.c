@@ -351,18 +351,6 @@ void playback_voice_event(void *data)
     pcmbuf_soft_mode(*(bool *)data);
 }
 
-/** --- audio_queue helpers --- **/
-static void audio_queue_post(long id, intptr_t data)
-{
-    queue_post(&audio_queue, id, data);
-}
-
-static intptr_t audio_queue_send(long id, intptr_t data)
-{
-    return queue_send(&audio_queue, id, data);
-}
-
-
 /** --- MP3Entry --- **/
 
 /* Does the mp3entry have enough info for us to use it? */
