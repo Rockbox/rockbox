@@ -607,14 +607,6 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             unplug_change(false);
             return SYS_PHONE_UNPLUGGED;
 #endif
-#ifdef IPOD_ACCESSORY_PROTOCOL
-        case SYS_IAP_PERIODIC:
-            iap_periodic();
-            return SYS_IAP_PERIODIC;
-        case SYS_IAP_HANDLEPKT:
-            iap_handlepkt();
-            return SYS_IAP_HANDLEPKT;
-#endif
 #if CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO)
         /* stop playback if we receive a call */
         case SYS_CALL_INCOMING:
