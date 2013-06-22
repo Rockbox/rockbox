@@ -46,6 +46,9 @@ void codec_go(void);
 bool codec_pause(void);
 void codec_seek(long time);
 void codec_stop(void);
+#ifdef HAVE_RECORDING
+size_t codec_finish_stream(void);
+#endif
 void codec_unload(void);
 int codec_loaded(void);
 

@@ -73,13 +73,6 @@ static size_t codec_size;
 
 extern void* plugin_get_audio_buffer(size_t *buffer_size);
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_RECORDING)
-#undef open
-static int open(const char* pathname, int flags, ...)
-{
-    return file_open(pathname, flags);
-}
-#endif
 struct codec_api ci = {
 
     0,    /* filesize */
@@ -99,7 +92,7 @@ struct codec_api ci = {
     NULL, /* configure */
     NULL, /* get_command */
     NULL, /* loop_track */
-    
+
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
     __div0,
@@ -147,21 +140,14 @@ struct codec_api ci = {
 #endif
 
 #ifdef HAVE_RECORDING
-    enc_get_inputs,
-    enc_set_parameters,
-    enc_get_chunk,
-    enc_finish_chunk,
-    enc_get_pcm_data,
-    enc_unget_pcm_data,
-
-    /* file */
-    (open_func)PREFIX(open),
-    PREFIX(close),
-    (read_func)PREFIX(read),
-    PREFIX(lseek),
-    (write_func)PREFIX(write),
+    NULL, /* enc_pcmbuf_read */
+    NULL, /* enc_pcmbuf_advance */
+    NULL, /* enc_encbuf_get_buffer */
+    NULL, /* enc_encbuf_finish_buffer */
+    NULL, /* enc_stream_read */
+    NULL, /* enc_stream_lseek */
+    NULL, /* enc_stream_write */
     round_value_to_list32,
-
 #endif /* HAVE_RECORDING */
 
     /* new stuff at the end, sort into place next time
@@ -299,3 +285,16 @@ int codec_close(void)
 
     return status;
 }
+
+#ifdef HAVE_RECORDING
+enc_callback_t codec_get_enc_callback(void)
+{
+    if (curr_handle == NULL ||
+        c_hdr->lc_hdr.magic != CODEC_ENC_MAGIC) {
+        logf("Codec: not an encoder");
+        return NULL;
+    }
+
+    return c_hdr->rec_extension[0];
+}
+#endif /* HAVE_RECORDING */
