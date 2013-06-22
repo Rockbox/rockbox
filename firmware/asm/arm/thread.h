@@ -31,6 +31,8 @@ struct regs
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
   #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
+#elif defined(IPOD_ACCESSORY_PROTOCOL) && (defined(IPOD_COLOR) || defined(IPOD_MINI2G) || defined(IPOD_NANO) || defined(IPOD_VIDEO))
+  #define DEFAULT_STACK_SIZE 0x800  /* Bytes */
 #else
   #define DEFAULT_STACK_SIZE 0x400  /* Bytes */
 #endif
