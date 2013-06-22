@@ -62,7 +62,11 @@ tagtree.c
 filetree.c
 scrobbler.c
 #ifdef IPOD_ACCESSORY_PROTOCOL
-iap.c
+iap/iap-core.c
+iap/iap-lingo0.c
+iap/iap-lingo2.c
+iap/iap-lingo3.c
+iap/iap-lingo4.c
 #endif
 
 screen_access.c

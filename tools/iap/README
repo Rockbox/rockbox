@@ -1,0 +1,23 @@
+These are perl test scripts for validating the IAP implementation.
+Also included is a perl class for talking to an iPod via the serial
+port. You will probably need Linux to use this.
+
+Run "make moduletest" to test the perl module itself. This will not
+require any serial connection, or even an iPod, for that matter.
+
+Run "make test" to run the iPod communication tests themselves.
+
+In order to test make sure
+
+- the iPod is connected to a serial port
+- the test scripts assume that this port is /dev/ttyUSB0. Change
+  as neccessary
+
+Sometimes, tests will time out instead of giving the desired result.
+As long as the timeouts are not reproducable this is usually not a
+problem. The serial port is known to be unreliable, and devices will
+retransmit. This happens even with the OF.
+
+The tests were designed against an iPod Touch 2G as a reference device.
+Some older iPods fail some of the test, even with the OF, because of
+behaviour changes in later firmware releases by Apple.
