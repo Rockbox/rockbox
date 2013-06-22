@@ -62,9 +62,12 @@ tagtree.c
 filetree.c
 scrobbler.c
 #ifdef IPOD_ACCESSORY_PROTOCOL
-iap.c
+iap/iap-core.c
+iap/iap-lingo0.c
+iap/iap-lingo2.c
+iap/iap-lingo3.c
+iap/iap-lingo4.c
 #endif
-
 screen_access.c
 #ifdef HAVE_BUTTONBAR
 gui/buttonbar.c
@@ -87,7 +90,6 @@ gui/pitchscreen.c
 gui/quickscreen.c
 #endif
 gui/folder_select.c
-
 gui/wps.c
 gui/scrollbar.c
 gui/splash.c
@@ -102,7 +104,6 @@ hosted/android/notification.c
 gui/yesno.c
 #endif
 gui/viewport.c
-
 gui/skin_engine/skin_backdrops.c
 gui/skin_engine/skin_display.c
 gui/skin_engine/skin_engine.c
@@ -112,11 +113,9 @@ gui/skin_engine/skin_tokens.c
 #ifdef HAVE_TOUCHSCREEN
 gui/skin_engine/skin_touchsupport.c
 #endif
-
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
 gui/backdrop.c
 #endif
-
 #ifdef HAVE_LCD_CHARCELLS
 player/icons.c
 player/keyboard.c
@@ -149,7 +148,6 @@ gui/color_picker.c
 #ifdef HAVE_RECORDING
 recorder/recording.c
 #endif
-
 #if CONFIG_TUNER
 radio/radio.c
 radio/presets.c
@@ -158,7 +156,6 @@ radio/radio_skin.c
 radio/radioart.c
 #endif
 #endif
-
 #if CONFIG_CODEC == SWCODEC
 #if INPUT_SRC_CAPS != 0
 audio_path.c
@@ -189,7 +186,7 @@ tagcache.c
 keymaps/keymap-touchscreen.c
 #endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+ || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 keymaps/keymap-h1x0_h3x0.c
 #elif ((CONFIG_KEYPAD == IPOD_4G_PAD) \
     || (CONFIG_KEYPAD == IPOD_3G_PAD) \
