@@ -74,7 +74,10 @@ enum
     Q_AUDIO_CLOSE_RECORDING,
     Q_AUDIO_RECORDING_OPTIONS,
     Q_AUDIO_RECORD,
-    Q_AUDIO_RESUME,
+    Q_AUDIO_RECORD_STOP,
+    Q_AUDIO_RECORD_PAUSE,
+    Q_AUDIO_RECORD_RESUME,
+    Q_AUDIO_RECORD_FLUSH,
 #endif
 
     /*- settings -*/
@@ -98,5 +101,9 @@ void audio_playback_handler(struct queue_event *ev);
 #ifdef AUDIO_HAVE_RECORDING
 void audio_recording_handler(struct queue_event *ev);
 #endif
+
+/** --- audio_queue helpers --- **/
+void audio_queue_post(long id, intptr_t data);
+intptr_t audio_queue_send(long id, intptr_t data);
 
 #endif /* AUDIO_THREAD_H */

@@ -1730,7 +1730,7 @@ bool recording_screen(bool no_source)
                 /* Don't use language string unless agreed upon to make this
                    method permanent - could do something in the statusbar */
                 snprintf(buf, sizeof(buf), "Warning: %08lX",
-                         pcm_rec_get_warnings());
+                         (unsigned long)pcm_rec_get_warnings());
             }
             else
 #endif /* CONFIG_CODEC == SWCODEC */
@@ -1755,8 +1755,16 @@ bool recording_screen(bool no_source)
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
+#if CONFIG_CODEC == SWCODEC
+                /* Tracks amount of prerecorded data in buffer */
+                snprintf(buf, sizeof(buf), "%s (%lu/%ds)...",
+                         str(LANG_RECORD_PRERECORD),
+                         audio_prerecorded_time() / HZ,
+                         global_settings.rec_prerecord_time);
+#else /* !SWCODEC */
                 snprintf(buf, sizeof(buf), "%s...",
                          str(LANG_RECORD_PRERECORD));
+#endif /* CONFIG_CODEC == SWCODEC */
             }
             else
             {
@@ -1915,8 +1923,7 @@ bool recording_screen(bool no_source)
             screens[i].update();
 
 #if CONFIG_CODEC == SWCODEC
-        /* stop recording - some players like H10 freeze otherwise
-           TO DO: find out why it freezes and fix properly */
+        /* stop recording first and try to finish saving whatever it can */
         rec_command(RECORDING_CMD_STOP);
         audio_close_recording();
 #endif

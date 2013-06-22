@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2006-2013 by Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,47 +19,64 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef PCM_RECORD_H
 #define PCM_RECORD_H
 
-#include "config.h"
+/** Warnings (recording may continue with possible data loss)
+ ** Reset of recording clears, otherwise see notes below
+ */
 
-/** Warnings **/
-/* pcm (dma) buffer has overflowed */
+/* PCM buffer has overflowed; PCM samples were dropped */
+/* persists until: stop, new file, clear */
 #define PCMREC_W_PCM_BUFFER_OVF         0x00000001
-/* encoder output buffer has overflowed */
+/* encoder output buffer has overflowed; encoded data was dropped */
+/* persists until: stop, new file, clear */
 #define PCMREC_W_ENC_BUFFER_OVF         0x00000002
-/** Errors **/
-/* failed to load encoder */
-#define PCMREC_E_LOAD_ENCODER           0x80001000
-/* error originating in encoder */
-#define PCMREC_E_ENCODER                0x80002000
-/* filename queue has desynced from stream markers */
-#define PCMREC_E_FNQ_DESYNC             0x80004000
-/* I/O error has occurred */
-#define PCMREC_E_IO                     0x80008000
-#ifdef DEBUG
-/* encoder has written past end of allocated space */
-#define PCMREC_E_CHUNK_OVF              0x80010000
-#endif /* DEBUG */
-/* DMA callback has reported an error */
-#define PCMREC_E_DMA                    0x80020000
+/* encoder and set/detected sample rates do not match */
+/* persists until: rates match, clear */
+#define PCMREC_W_SAMPR_MISMATCH         0x00000004
+/* PCM frame skipped because of recoverable DMA error */
+/* persists until: clear */
+#define PCMREC_W_DMA                    0x00000008
+/* internal file size limit was reached; encoded data was dropped */
+/* persists until: stop, new file, clear */
+#define PCMREC_W_FILE_SIZE              0x00000010
 
-/** General functions for high level codec recording **/
-/* pcm_rec_error_clear is deprecated for general use. audio_error_clear
-   should be used */
+/* all warning flags */
+#define PCMREC_W_ALL                    0x0000001f
+
+/** Errors (recording should be reset)
+ **
+ ** Stopping recording if recording clears internally and externally visible
+ ** status must be cleared with audio_error_clear()
+ ** reset of recording clears
+ */
+
+/* DMA callback has reported an error */
+#define PCMREC_E_DMA                    0x80010000
+/* failed to load encoder */
+#define PCMREC_E_LOAD_ENCODER           0x80020000
+/* error originating in encoder */
+#define PCMREC_E_ENCODER                0x80040000
+/* error from encoder setup of stream parameters */
+#define PCMREC_E_ENC_SETUP              0x80080000
+/* error writing to output stream */
+#define PCMREC_E_ENCODER_STREAM         0x80100000
+/* I/O error has occurred */
+#define PCMREC_E_IO                     0x80200000
+
+/* all error flags */
+#define PCMREC_E_ALL                    0x803f0000
+
+/* Functions called by audio_thread.c */
 void pcm_rec_error_clear(void);
-/* pcm_rec_status is deprecated for general use. audio_status merges the
-   results for consistency with the hardware codec version */
 unsigned int pcm_rec_status(void);
-unsigned long pcm_rec_get_warnings(void);
-void pcm_rec_init(void) INIT_ATTR;
-int  pcm_rec_current_bitrate(void);
-int  pcm_rec_encoder_afmt(void); /* AFMT_* value, AFMT_UNKNOWN if none */
-int  pcm_rec_rec_format(void);   /* Format index or -1 otherwise */
+uint32_t pcm_rec_get_warnings(void);
+#ifdef HAVE_SPDIF_IN
 unsigned long pcm_rec_sample_rate(void);
-int  pcm_get_num_unprocessed(void);
+#endif
+
+void recording_init(void);
 
 /* audio.h contains audio_* recording functions */
 

@@ -212,10 +212,7 @@ unsigned long audio_num_recorded_bytes(void);
 
 #if CONFIG_CODEC == SWCODEC
 /* SWCODEC recording functions */
-/* playback.c */
-bool audio_load_encoder(int afmt);
-void audio_remove_encoder(void);
-unsigned char *audio_get_recording_buffer(size_t *buffer_size);
+unsigned long audio_prerecorded_time(void);
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #endif /* HAVE_RECORDING */

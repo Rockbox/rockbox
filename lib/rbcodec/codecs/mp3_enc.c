@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Antonius Hellmann
+ * Copyright (C) 2006-2013 Michael Sevakis
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,17 +38,9 @@
 
 CODEC_ENC_HEADER
 
-#define ENC_PADDING_FRAMES1        2
-#define ENC_PADDING_FRAMES2        4
-#define ENC_DELAY_SAMP           576
-#define ENC_DELAY_SIZE          (ENC_DELAY_SAMP*4)
-#define SAMP_PER_FRAME1         1152
-#define SAMP_PER_FRAME2          576
-#define PCM_CHUNK_SIZE1         (SAMP_PER_FRAME1*4)
-#define PCM_CHUNK_SIZE2         (SAMP_PER_FRAME2*4)
-#define SAMPL2                576
-#define SBLIMIT                32
-#define HTN                    16
+#define SAMPL2      576
+#define SBLIMIT      32
+#define HTN          16
 #define memcpy      ci->memcpy
 #define memset      ci->memset
 #define putlong(c, s)  if(s+sz <= 32) { cc = (cc << s) | c;      sz+= s; } \
@@ -79,18 +72,24 @@ typedef struct {
 } side_info_t;
 
 typedef struct {
-    side_info_t       cod_info[2][2];
-    mpeg_t            mpg;
-    long              frac_per_frame;
-    long              byte_per_frame;
-    long              slot_lag;
-    int               sideinfo_len;
-    int               mean_bits;
-    int               ResvSize;
-    int               channels;
-    int               rec_mono_mode;
-    int               granules;
-    long              samplerate;
+    side_info_t cod_info[2][2];
+    mpeg_t   mpg;
+    long     frac_per_frame;
+    long     byte_per_frame;
+    long     req_byte_per_frame;
+    long     slot_lag;
+    int      sideinfo_len;
+    int      mean_bits;
+    int      ResvSize;
+    int      channels;
+    int      granules;
+    long     src_samplerate;
+    long     samplerate;
+    short    *samp_buffer;
+    unsigned samp_per_frame;
+    int      flush_frames;
+    int      delay;
+    int      padding;
 } config_t;
 
 typedef struct {
@@ -118,7 +117,8 @@ struct huffcodebig {
 #define shft_n(x,n) ((x) >> n)
 #define SQRT        724 /* sqrt(2) * 512 */
 
-static short     mfbuf       [2*(1152+512)]      IBSS_ATTR; /*  3328 Bytes */
+static short     mfbuf       [2*(1152+512)]      IBSS_ATTR
+         /* for memcpy and 32-bit access */ MEM_ALIGN_ATTR; /*  3328 Bytes */
 static int       sb_data     [2][2][18][SBLIMIT] IBSS_ATTR; /* 13824 Bytes */
 static int       mdct_freq   [SAMPL2]            IBSS_ATTR; /*  2304 Bytes */
 static char      mdct_sign   [SAMPL2]            IBSS_ATTR; /*   576 Bytes */
@@ -171,12 +171,7 @@ static uint8_t   t16l        [256]               IBSS_ATTR;
 static uint8_t   t24l        [256]               IBSS_ATTR;
 static struct huffcodetab ht [HTN]               IBSS_ATTR;
 
-static unsigned pcm_chunk_size                   IBSS_ATTR;
-static unsigned samp_per_frame                   IBSS_ATTR;
-
 static config_t          cfg                     IBSS_ATTR;
-static char             *res_buffer;
-static int32_t           err                     IBSS_ATTR;
 static uint8_t           band_scale_f[22];
 
 static const uint8_t ht_count_const[2][2][16] =
@@ -848,42 +843,56 @@ static int  count_bit1 ( short *ix, uint32_t start, uint32_t end, int *bits );
 static int  count_bigv ( short *ix, uint32_t start, uint32_t end, int table0, int table1,
                   int *bits);
 
+static inline uint32_t encodeHeader( int padding, long bitr_id )
+{
+    /*
+     * MPEG header layout:
+     * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM
+     * A (31-21) = frame sync
+     * B (20-19) = MPEG type
+     * C (18-17) = MPEG layer
+     * D (16)    = protection bit
+     * E (15-12) = bitrate index
+     * F (11-10) = samplerate index
+     * G (9)     = padding bit
+     * H (8)     = private bit
+     * I (7-6)   = channel mode
+     * J (5-4)   = mode extension (jstereo only)
+     * K (3)     = copyright bit
+     * L (2)     = original
+     * M (1-0)   = emphasis
+     */
+    return (0xffe00000           )  /* frame sync (AAAAAAAAA AAA) */
+         | (0x2             << 19)  /* mp3 type (upper):  1 (BB)  */
+         | (cfg.mpg.type    << 19)
+         | (0x1             << 17)  /* mp3 layer:        01 (CC)  */
+         | (0x1             << 16)  /* mp3 crc:           1 (D)   */
+         | (bitr_id         << 12)
+         | (cfg.mpg.smpl_id << 10)
+         | (padding         <<  9)
+         | (cfg.mpg.mode    <<  6)
+         | (0x1             <<  2); /* mp3 org:           1 (L)   */
+    /* no emphasis (bits 0-1) */
+}
 
+static long calcFrameSize(int bitr_id, long *frac)
+{
+    unsigned long v = bitr_index[cfg.mpg.type][bitr_id];
+    v = SAMPL2 * 16000 * v / (2 - cfg.mpg.type);
+    v /= cfg.samplerate;
+
+    if (frac)
+        *frac = v % 64;
+
+    return v / 64;
+
+}
 static void encodeSideInfo( side_info_t si[2][2] )
 {
-  int gr, ch, header;
+  int gr, ch;
   uint32_t  cc=0, sz=0;
 
-  /*
-   * MPEG header layout:
-   * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM
-   * A (31-21) = frame sync
-   * B (20-19) = MPEG type
-   * C (18-17) = MPEG layer
-   * D (16)    = protection bit
-   * E (15-12) = bitrate index
-   * F (11-10) = samplerate index
-   * G (9)     = padding bit
-   * H (8)     = private bit
-   * I (7-6)   = channel mode
-   * J (5-4)   = mode extension (jstereo only)
-   * K (3)     = copyright bit
-   * L (2)     = original
-   * M (1-0)   = emphasis
-   */
-
-  header  = (0xfff00000) | /* frame sync (AAAAAAAAA AAA)
-                              mp3 type (upper):  1 (B)  */
-            (0x01 << 17) | /* mp3 layer:        01 (CC) */
-            ( 0x1 << 16) | /* mp3 crc:           1 (D)  */
-            ( 0x1 <<  2);  /* mp3 org:           1 (L)  */
-  header |= cfg.mpg.type    << 19;
-  header |= cfg.mpg.bitr_id << 12;
-  header |= cfg.mpg.smpl_id << 10;
-  header |= cfg.mpg.padding <<  9;
-  header |= cfg.mpg.mode    <<  6;
-  /* no emphasis (bits 0-1) */
-  putbits( header, 32 );
+  putbits( encodeHeader( cfg.mpg.padding, cfg.mpg.bitr_id ), 32 );
 
   if(cfg.mpg.type == 1)
   { /* MPEG1 */
@@ -1501,8 +1510,8 @@ static void iteration_loop(int *xr, side_info_t *si, int gr_cnt)
 
 
 /* returns sum_j=0^31 a[j]*cos(PI*j*(k+1/2)/32), 0<=k<32 */
-void window_subband1(short *wk, int sb0[SBLIMIT], int sb1[SBLIMIT]) ICODE_ATTR;
-void window_subband1(short *wk, int sb0[SBLIMIT], int sb1[SBLIMIT])
+static void ICODE_ATTR window_subband1(short *wk, int sb0[SBLIMIT],
+                                       int sb1[SBLIMIT])
 {
   int   k, i, u, v;
   short *wp, *x1, *x2;
@@ -1761,8 +1770,7 @@ void window_subband1(short *wk, int sb0[SBLIMIT], int sb1[SBLIMIT])
 #endif
 }
 
-void window_subband2(short *x1, int a[SBLIMIT]) ICODE_ATTR;
-void window_subband2(short *x1, int a[SBLIMIT])
+static void ICODE_ATTR window_subband2(short *x1, int a[SBLIMIT])
 {
   int   xr;
   short *wp = enwindow;
@@ -1879,8 +1887,7 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr = a[29];  a[29] += a[ 2];  a[ 2] -= xr;
 }
 
-void mdct_long(int *out, int *in) ICODE_ATTR;
-void mdct_long(int *out, int *in)
+static void ICODE_ATTR mdct_long(int *out, int *in)
 {
   int ct,st;
   int tc1, tc2, tc3, tc4, ts5, ts6, ts7, ts8;
@@ -1969,44 +1976,51 @@ static int find_samplerate_index(long freq, int *mp3_type)
     return i;
 }
 
-static bool init_mp3_encoder_engine(int sample_rate,
-                                    int num_channels,
-                                    int rec_mono_mode,
-                                    struct encoder_config *enc_cfg)
+static void mp3_encoder_reset(void)
 {
-    const bool stereo = num_channels > 1;
-    uint32_t avg_byte_per_frame;
+    memset(&cfg.cod_info, 0, sizeof(cfg.cod_info));
+    memset(mfbuf        , 0, sizeof(mfbuf       ));
+    memset(mdct_freq    , 0, sizeof(mdct_freq   ));
+    memset(enc_data     , 0, sizeof(enc_data    ));
+    memset(sb_data      , 0, sizeof(sb_data     ));
+    memset(&CodedData   , 0, sizeof(CodedData   ));
+    cfg.slot_lag = 0;
+}
 
-    cfg.channels      = stereo ? 2 : 1;
-    cfg.rec_mono_mode = rec_mono_mode;
-    cfg.mpg.mode      = stereo ? 0 : 3; /* 0=stereo, 3=mono */
-    cfg.mpg.smpl_id   = find_samplerate_index(sample_rate, &cfg.mpg.type);
-    cfg.samplerate    = sampr_index[cfg.mpg.type][cfg.mpg.smpl_id];
-    cfg.mpg.bitr_id   = find_bitrate_index(cfg.mpg.type,
-                                           enc_cfg->mp3_enc.bitrate,
-                                           stereo);
-    cfg.mpg.bitrate   = bitr_index[cfg.mpg.type][cfg.mpg.bitr_id];
-    cfg.mpg.num_bands = num_bands[stereo ? cfg.mpg.type : 2][cfg.mpg.bitr_id];
+static void mp3_encoder_init(unsigned long sample_rate, int num_channels,
+                             unsigned long bitrate)
+{
+    mp3_encoder_reset();
+
+    const bool stereo  = num_channels > 1;
+    cfg.channels       = stereo ? 2 : 1;
+    cfg.mpg.mode       = stereo ? 0 : 3; /* 0=stereo, 3=mono */
+    cfg.mpg.smpl_id    = find_samplerate_index(sample_rate, &cfg.mpg.type);
+    cfg.samplerate     = sampr_index[cfg.mpg.type][cfg.mpg.smpl_id];
+    cfg.src_samplerate = sample_rate;
+    cfg.mpg.bitr_id    = find_bitrate_index(cfg.mpg.type, bitrate, stereo);
+    cfg.mpg.bitrate    = bitr_index[cfg.mpg.type][cfg.mpg.bitr_id];
+    cfg.mpg.num_bands  = num_bands[stereo ? cfg.mpg.type : 2][cfg.mpg.bitr_id];
 
     if (cfg.mpg.type == 1)
     {
-        cfg.granules = 2;
-        pcm_chunk_size = PCM_CHUNK_SIZE1;
-        samp_per_frame = SAMP_PER_FRAME1;
+        cfg.granules       = 2;
+        cfg.samp_per_frame = 1152;
+        cfg.flush_frames   = 2;
     }
     else
     {
-        cfg.granules = 1;
-        pcm_chunk_size = PCM_CHUNK_SIZE2;
-        samp_per_frame = SAMP_PER_FRAME2;
+        cfg.granules       = 1;
+        cfg.samp_per_frame = 576;
+        cfg.flush_frames   = 3;
     }
 
+    cfg.delay   = 576-16;
+    cfg.padding = 3*576+16;
+
+    cfg.samp_buffer = mfbuf + 2*512;
+
     memcpy(scalefac, sfBand[cfg.mpg.smpl_id + 3*cfg.mpg.type], sizeof(scalefac));
-    memset(mfbuf     , 0              , sizeof(mfbuf     ));
-    memset(mdct_freq , 0              , sizeof(mdct_freq ));
-    memset(enc_data  , 0              , sizeof(enc_data  ));
-    memset(sb_data   , 0              , sizeof(sb_data   ));
-    memset(&CodedData, 0              , sizeof(CodedData ));
     memcpy(ca        , ca_const       , sizeof(ca        ));
     memcpy(cs        , cs_const       , sizeof(cs        ));
     memcpy(cx        , cx_const       , sizeof(cx        ));
@@ -2052,6 +2066,7 @@ static bool init_mp3_encoder_engine(int sample_rate,
     memcpy(t16l      , t16l_const     , sizeof(t16l      ));
     memcpy(t24l      , t24l_const     , sizeof(t24l      ));
     memcpy(ht        , ht_const       , sizeof(ht        ));
+    memset(band_scale_f, 0            , sizeof(band_scale_f));
 
     ht[ 0].table =  NULL;  ht[ 0].hlen = NULL; /* Apparently not used */
     ht[ 1].table =  t1HB;  ht[ 1].hlen =  t1l;
@@ -2071,89 +2086,13 @@ static bool init_mp3_encoder_engine(int sample_rate,
     ht[15].table = t15HB;  ht[15].hlen = t15l;
 
     /* Figure average number of 'bytes' per frame */
-    avg_byte_per_frame = SAMPL2 * 16000 * cfg.mpg.bitrate / (2 - cfg.mpg.type);
-    avg_byte_per_frame = avg_byte_per_frame / cfg.samplerate;
-    cfg.byte_per_frame = avg_byte_per_frame / 64;
-    cfg.frac_per_frame = avg_byte_per_frame & 63;
-    cfg.slot_lag       = 0;
+    cfg.byte_per_frame = calcFrameSize(cfg.mpg.bitr_id, &cfg.frac_per_frame);
     cfg.sideinfo_len   = 32 + (cfg.mpg.type ? (cfg.channels == 1 ? 136 : 256)
                                             : (cfg.channels == 1 ?  72 : 136));
 
-    return true;
+    cfg.req_byte_per_frame = ALIGN_UP(cfg.byte_per_frame + 1,
+                                      sizeof (uint32_t));
 }
-
-static inline void to_mono(uint16_t **samp)
-{
-    int16_t l = **samp;
-    int16_t r = *(*samp+1);
-    int32_t m;
-
-    switch(cfg.rec_mono_mode)
-    {
-        case 1:
-            /* mono = L */
-            m  = l;
-            break;
-        case 2:
-            /* mono = R */
-            m  = r;
-            break;
-        case 0:
-        default:
-            /* mono = (L+R)/2 */
-            m  = l + r + err;
-            err = m & 1;
-            m >>= 1;
-            break;
-    }
-    *(*samp)++ = (uint16_t)m;
-    *(*samp)++ = (uint16_t)m;
-} /* to_mono */
-
-static void to_mono_mm(void) ICODE_ATTR;
-static void to_mono_mm(void)
-{
-    /* |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
-     * |mmmmmmmmmmmmmmmm|mmmmmmmmmmmmmmmm|
-     */
-    uint16_t *samp = &mfbuf[2*512];
-    uint16_t *samp_end = samp + 2*samp_per_frame;
-
-    do
-    {
-        to_mono(&samp);
-        to_mono(&samp);
-        to_mono(&samp);
-        to_mono(&samp);
-        to_mono(&samp);
-        to_mono(&samp);
-        to_mono(&samp);
-        to_mono(&samp);
-    }
-    while (samp < samp_end);
-} /* to_mono_mm */
-
-#ifdef ROCKBOX_LITTLE_ENDIAN
-/* Swaps a frame to big endian */
-static inline void byte_swap_frame32(uint32_t *dst, uint32_t *src,
-                                     size_t size)
-{
-    uint32_t *src_end = SKIPBYTES(src, size);
-
-    do
-    {
-        *dst++ = swap32(*src++);
-        *dst++ = swap32(*src++);
-        *dst++ = swap32(*src++);
-        *dst++ = swap32(*src++);
-        *dst++ = swap32(*src++);
-        *dst++ = swap32(*src++);
-        *dst++ = swap32(*src++);
-        *dst++ = swap32(*src++);
-    }
-    while(src < src_end);
-} /* byte_swap_frame32 */
-#endif /* ROCKBOX_LITTLE_ENDIAN */
 
 static void set_scale_facs(int *mdct_freq)
 {
@@ -2188,12 +2127,10 @@ static void set_scale_facs(int *mdct_freq)
   }
 }
 
-static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
-                             ICODE_ATTR;
-static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
+static size_t ICODE_ATTR mp3_encoder_encode_frame(uint8_t *outbuf)
 {
-   int      gr, gr_cnt;
-   uint32_t max;
+    int      gr, gr_cnt;
+    uint32_t max;
 
     /* encode one mp3 frame in this loop */
     CodedData.bitpos = 0;
@@ -2210,28 +2147,6 @@ static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
     cfg.mean_bits = (8 * cfg.byte_per_frame + 8 * cfg.mpg.padding
                        - cfg.sideinfo_len) / cfg.granules / cfg.channels
                        - 42; // reserved for scale_facs
-
-    /* shift out old samples */
-    memcpy(mfbuf, mfbuf + 2*cfg.granules*576, 4*512);
-
-    if (chunk->flags & CHUNKF_START_FILE)
-    {
-        /* prefix silent samples for encoder delay */
-        memset(mfbuf + 2*512, 0, ENC_DELAY_SIZE);
-        /* read new samples to iram for further processing */
-        memcpy(mfbuf + 2*512 + ENC_DELAY_SIZE/2,
-               buffer, pcm_chunk_size - ENC_DELAY_SIZE);
-        chunk->num_pcm = samp_per_frame - ENC_DELAY_SAMP;
-    }
-    else
-    {
-        /* read new samples to iram for further processing */
-        memcpy(mfbuf + 2*512, buffer, pcm_chunk_size);
-        chunk->num_pcm = samp_per_frame;
-    }
-
-    if (cfg.channels == 1)
-        to_mono_mm();
 
     cfg.ResvSize = 0;
     gr_cnt = cfg.granules * cfg.channels;
@@ -2366,264 +2281,398 @@ static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
         }
     }
 
-    chunk->enc_size = cfg.byte_per_frame + cfg.mpg.padding;
+    /* shift out old samples */
+    memmove(mfbuf, mfbuf + 2*cfg.granules*576, 4*512);
 
     /* finish this chunk by adding sideinfo header data */
     CodedData.bitpos = 0;
     encodeSideInfo( cfg.cod_info );
 
-#ifdef ROCKBOX_BIG_ENDIAN
-    /* copy chunk to enc_buffer */
-    memcpy(chunk->enc_data, CodedData.bbuf, chunk->enc_size);
+    long size = cfg.byte_per_frame + cfg.mpg.padding;
+
+#ifdef ROCKBOX_LITTLE_ENDIAN
+    /* convert frame to big endian */
+    const uint32_t *src = CodedData.bbuf;
+    uint32_t *dst = (uint32_t *)outbuf;
+
+    for(long i = 0; i < size; i += sizeof(uint32_t))
+        *dst++ = swap32(*src++);
 #else
-    /* swap frame to big endian */
-    byte_swap_frame32((uint32_t *)chunk->enc_data, CodedData.bbuf, chunk->enc_size);
-#endif
-} /* encode_frame */
+    memcpy(outbuf, CodedData.bbuf, size);
+#endif /* ROCKBOX_LITTLE_ENDIAN */
 
-/* called very often - inline */
-static inline bool is_file_data_ok(struct enc_file_event_data *filed)
+    return size;
+}
+
+
+/*======== Codec section ========*/
+
+/* CRC code lovingly ripped from:
+ * github.com/CFR-maniac/lame/blob/master/libmp3lame/VbrTag.c */
+
+/* Lookup table for fast CRC computation
+ * See 'crc_update_lookup'
+ * Uses the polynomial x^16+x^15+x^2+1 */
+static const uint16_t crc16_lookup[256] ICONST_ATTR =
 {
-    return filed->rec_file >= 0 && (long)filed->chunk->flags >= 0;
-} /* is_event_ok */
+    0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
+    0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
+    0xCC01, 0x0CC0, 0x0D80, 0xCD41, 0x0F00, 0xCFC1, 0xCE81, 0x0E40,
+    0x0A00, 0xCAC1, 0xCB81, 0x0B40, 0xC901, 0x09C0, 0x0880, 0xC841,
+    0xD801, 0x18C0, 0x1980, 0xD941, 0x1B00, 0xDBC1, 0xDA81, 0x1A40,
+    0x1E00, 0xDEC1, 0xDF81, 0x1F40, 0xDD01, 0x1DC0, 0x1C80, 0xDC41,
+    0x1400, 0xD4C1, 0xD581, 0x1540, 0xD701, 0x17C0, 0x1680, 0xD641,
+    0xD201, 0x12C0, 0x1380, 0xD341, 0x1100, 0xD1C1, 0xD081, 0x1040,
+    0xF001, 0x30C0, 0x3180, 0xF141, 0x3300, 0xF3C1, 0xF281, 0x3240,
+    0x3600, 0xF6C1, 0xF781, 0x3740, 0xF501, 0x35C0, 0x3480, 0xF441,
+    0x3C00, 0xFCC1, 0xFD81, 0x3D40, 0xFF01, 0x3FC0, 0x3E80, 0xFE41,
+    0xFA01, 0x3AC0, 0x3B80, 0xFB41, 0x3900, 0xF9C1, 0xF881, 0x3840,
+    0x2800, 0xE8C1, 0xE981, 0x2940, 0xEB01, 0x2BC0, 0x2A80, 0xEA41,
+    0xEE01, 0x2EC0, 0x2F80, 0xEF41, 0x2D00, 0xEDC1, 0xEC81, 0x2C40,
+    0xE401, 0x24C0, 0x2580, 0xE541, 0x2700, 0xE7C1, 0xE681, 0x2640,
+    0x2200, 0xE2C1, 0xE381, 0x2340, 0xE101, 0x21C0, 0x2080, 0xE041,
+    0xA001, 0x60C0, 0x6180, 0xA141, 0x6300, 0xA3C1, 0xA281, 0x6240,
+    0x6600, 0xA6C1, 0xA781, 0x6740, 0xA501, 0x65C0, 0x6480, 0xA441,
+    0x6C00, 0xACC1, 0xAD81, 0x6D40, 0xAF01, 0x6FC0, 0x6E80, 0xAE41,
+    0xAA01, 0x6AC0, 0x6B80, 0xAB41, 0x6900, 0xA9C1, 0xA881, 0x6840,
+    0x7800, 0xB8C1, 0xB981, 0x7940, 0xBB01, 0x7BC0, 0x7A80, 0xBA41,
+    0xBE01, 0x7EC0, 0x7F80, 0xBF41, 0x7D00, 0xBDC1, 0xBC81, 0x7C40,
+    0xB401, 0x74C0, 0x7580, 0xB541, 0x7700, 0xB7C1, 0xB681, 0x7640,
+    0x7200, 0xB2C1, 0xB381, 0x7340, 0xB101, 0x71C0, 0x7080, 0xB041,
+    0x5000, 0x90C1, 0x9181, 0x5140, 0x9301, 0x53C0, 0x5280, 0x9241,
+    0x9601, 0x56C0, 0x5780, 0x9741, 0x5500, 0x95C1, 0x9481, 0x5440,
+    0x9C01, 0x5CC0, 0x5D80, 0x9D41, 0x5F00, 0x9FC1, 0x9E81, 0x5E40,
+    0x5A00, 0x9AC1, 0x9B81, 0x5B40, 0x9901, 0x59C0, 0x5880, 0x9841,
+    0x8801, 0x48C0, 0x4980, 0x8941, 0x4B00, 0x8BC1, 0x8A81, 0x4A40,
+    0x4E00, 0x8EC1, 0x8F81, 0x4F40, 0x8D01, 0x4DC0, 0x4C80, 0x8C41,
+    0x4400, 0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641,
+    0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040
+};
 
-static unsigned char mp3_data[16384] __attribute__((aligned(4)));
-static unsigned int  mp3_data_len; /* current data size in buffer */
+static ssize_t header_size;
+static unsigned int mp3_crc16;
 
-/* called very often - inline */
-static inline bool on_write_chunk(struct enc_file_event_data *data)
+/* fast CRC-16 computation - uses table crc16_lookup 8*/
+static inline unsigned int crc_update_lookup(unsigned int value,
+                                             unsigned int crc)
 {
-    if (!is_file_data_ok(data))
-        return false;
+    unsigned int tmp = crc ^ value;
+    crc = (crc >> 8) ^ crc16_lookup[tmp & 0xff];
+    return crc & 0xffff;
+}
 
-    if (data->chunk->enc_data == NULL)
+/* Calculate position of 'Info' header */
+static int get_info_offset(uint32_t header)
+{
+    uint32_t type = (header & (0x3 << 19)) >> 19;
+    uint32_t mode = (header & (0x3 << 6)) >> 6;
+
+    return type == 3 ? (mode == 3 ? 21 : 36) : (mode == 3 ? 13 : 21);
+}
+
+/* Write very basic 'Info' header with delay, padding and a bit of
+ * miscellaneous info. */
+static bool write_info_header(bool first_encode)
+{
+    ssize_t size = cfg.byte_per_frame;
+
+    /* By default the MP3 frame header for the info frame is the same as
+       unpadded audio frames */
+    uint32_t header = encodeHeader(0, cfg.mpg.bitr_id);
+
+    int i = get_info_offset(header);
+
+    if (i + 8 + 36 > size)
     {
-#ifdef ROCKBOX_HAS_LOGF
-        ci->logf("mp3 enc: NULL data");
-#endif
-        return true;
-    }
-
-    /* if current chunk doesn't fit => write collected data */
-    if (mp3_data_len + data->chunk->enc_size > sizeof(mp3_data))
-    {
-        if (ci->write(data->rec_file, mp3_data,
-                    mp3_data_len) != (ssize_t)mp3_data_len)
-            return false;
-
-        mp3_data_len = 0;
-    }
-
-    memcpy(mp3_data+mp3_data_len, data->chunk->enc_data,
-           data->chunk->enc_size);
-
-    mp3_data_len += data->chunk->enc_size;
-
-    data->num_pcm_samples += data->chunk->num_pcm;
-    return true;
-} /* on_write_chunk */
-
-static bool on_start_file(struct enc_file_event_data *data)
-{
-    if ((data->chunk->flags & CHUNKF_ERROR) || *data->filename == '\0')
-        return false;
-
-    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC, 0666);
-
-    if (data->rec_file < 0)
-        return false;
-
-    /* reset sample count */
-    data->num_pcm_samples = 0;
-
-    /* reset buffer write position */
-    mp3_data_len = 0;
-
-    return true;
-} /* on_start_file */
-
-static bool on_end_file(struct enc_file_event_data *data)
-{
-    if (data->rec_file < 0)
-        return false; /* file already closed, nothing more we can do */
-
-    /* write the remaining mp3_data */
-    if (ci->write(data->rec_file, mp3_data, mp3_data_len)
-                   != (ssize_t)mp3_data_len)
-        return false;
-
-    /* reset buffer write position */
-    mp3_data_len = 0;
-
-    /* always _try_ to write the file header, even on error */
-    if (ci->close(data->rec_file) != 0)
-        return false;
-
-    data->rec_file = -1;
-
-    return true;
-} /* on_end_file */
-
-static void on_rec_new_stream(struct enc_buffer_event_data *data)
-{
-    int num_frames = cfg.mpg.type == 1 ?
-        ENC_PADDING_FRAMES1 : ENC_PADDING_FRAMES2;
-
-    if (data->flags & CHUNKF_END_FILE)
-    {
-        /* add silent frames to end - encoder will also be flushed for start
-           of next file if any */
-        memset(res_buffer, 0, pcm_chunk_size);
-
-        /* the initial chunk given for the end is at enc_wr_index */
-        while (num_frames-- > 0)
+        /* The default frame size too small so find the smallest one that
+           may accomodate it by increasing the bit rate for this empty
+           MP3 frame */
+        int j;
+        for (j = cfg.mpg.bitr_id + 1; j < 15; j++)
         {
-            data->chunk->enc_data = ENC_CHUNK_SKIP_HDR(data->chunk->enc_data,
-                                                       data->chunk);
+            size = calcFrameSize(j, NULL);
 
-            encode_frame(res_buffer, data->chunk);
-            data->chunk->num_pcm = samp_per_frame;
-
-            ci->enc_finish_chunk();
-            data->chunk = ci->enc_get_chunk();
+            if (size >= i + 8 + 36)
+                break;
         }
-    }
-    else if (data->flags & CHUNKF_PRERECORD)
-    {
-        /* nothing to add and we cannot change prerecorded data */
-    }
-    else if (data->flags & CHUNKF_START_FILE)
-    {
-        /* starting fresh ... be sure to flush encoder first */
-        struct enc_chunk_hdr *chunk = ENC_CHUNK_HDR(res_buffer);
 
-        chunk->flags    = 0;
-        chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
-
-        while (num_frames-- > 0)
+        if (j >= 15)
         {
-            memset(chunk->enc_data, 0, pcm_chunk_size);
-            encode_frame(chunk->enc_data, chunk);
+            /* Shouldn't really happen but... */
+            header_size = -1;
+            return true;
         }
-    }
-} /* on_rec_new_stream */
 
-static void enc_events_callback(enum enc_events event, void *data)
-{
-    switch (event)
+        header = encodeHeader(0, j);
+        /* Info offset won't change */
+    }
+
+    uint8_t frame[size];
+    memset(frame, 0, size);
+
+    frame[0] = header >> 24;
+    frame[1] = header >> 16;
+    frame[2] = header >>  8;
+    frame[3] = header >>  0;
+
+    /* 'Info' header (CBR 'Xing') */
+    memcpy(&frame[i], "Info", 4);
+
+    /* flags = 0; Info contains no other sections and is 8 bytes */
+
+    /* Just mark the LAMEness to indicate header presence; we're not
+       actually _the_ LAME so 'rbshn' is the version we give */
+    memcpy(&frame[i + 8], "LAMErbshn", 9);
+
+    /* Fill-in some info about us
+     * reference: http://gabriel.mp3-tech.org/mp3infotag.html
+     */
+
+    /* Revision + VBR method:
+     * [7:4] = Revision (0 ??)
+     * [3:0] = VBR method (CBR)
+     */
+    frame[i + 17] = (0 << 4) | (1 << 0);
+
+    /* If first frame since encoder reset is long gone (not unlikely in
+       prerecording), then the delay is long passed and no trimming done
+       at the start */
+    unsigned int delay = first_encode ? cfg.delay : 0;
+    unsigned int padding = cfg.padding;
+
+    /* Delay and padding:
+     * [23:12] = delay
+     * [11: 0] = padding
+     */
+    frame[i + 29] = delay >> 4;
+    frame[i + 30] = (delay << 4) | (padding >> 8);
+    frame[i + 31] = padding;
+
+    /* Misc:
+     * [7:6] = source frequency
+     * [  5] = unwise settings (of course not :)
+     * [4:2] = stereo mode (mono or stereo)
+     * [1:0] = noise shaping (who knows, 0)
+     */
+    uint8_t misc;
+
+    if (cfg.src_samplerate <= 32000)
+        misc = (0 << 6);
+    else if (cfg.src_samplerate <= 44100)
+        misc = (1 << 6);
+    else if (cfg.src_samplerate <= 48000)
+        misc = (2 << 6);
+    else /* > 48000 */
+        misc = (3 << 6);
+
+    if (cfg.channels > 1)
+        misc |= (1 << 2); /* Stereo */
+
+    frame[i + 32] = misc;
+
+    if (ci->enc_stream_write(frame, size) != size)
     {
-    case ENC_WRITE_CHUNK:
-        if (on_write_chunk((struct enc_file_event_data *)data))
-            return;
-
-        break;
-
-    case ENC_START_FILE:
-        if (on_start_file((struct enc_file_event_data *)data))
-            return;
-
-        break;
-
-    case ENC_END_FILE:
-         if (on_end_file((struct enc_file_event_data *)data))
-            return;
-
-         break;
-
-    case ENC_REC_NEW_STREAM:
-        on_rec_new_stream((struct enc_buffer_event_data *)data);
-        return;
-
-    default:
-        return;
+        ci->enc_stream_lseek(0, SEEK_SET);
+        header_size = -1;
+        return false;
     }
 
-    /* Something failed above. Signal error back to core. */
-    ((struct enc_file_event_data *)data)->chunk->flags |= CHUNKF_ERROR;
-} /* enc_events_callback */
-
-static bool enc_init(void)
-{
-    struct enc_inputs     inputs;
-    struct enc_parameters params;
-
-    if (ci->enc_get_inputs         == NULL ||
-        ci->enc_set_parameters     == NULL ||
-        ci->enc_get_chunk          == NULL ||
-        ci->enc_finish_chunk       == NULL ||
-        ci->enc_get_pcm_data       == NULL ||
-        ci->enc_unget_pcm_data     == NULL )
-        return false;
-
-    ci->enc_get_inputs(&inputs);
-
-    if (inputs.config->afmt != AFMT_MPA_L3)
-        return false;
-
-    init_mp3_encoder_engine(inputs.sample_rate, inputs.num_channels,
-                            inputs.rec_mono_mode, inputs.config);
-
-    err = 0;
-
-    /* configure the buffer system */
-    params.afmt            = AFMT_MPA_L3;
-    params.chunk_size      = cfg.byte_per_frame + 1;
-    params.enc_sample_rate = cfg.samplerate;
-    /* need enough reserved bytes to hold one frame of pcm samples + hdr
-       for padding and flushing */
-    params.reserve_bytes   = ENC_CHUNK_HDR_SIZE + pcm_chunk_size;
-    params.events_callback = enc_events_callback;
-    ci->enc_set_parameters(&params);
-
-    res_buffer             = params.reserve_buffer;
-
-#ifdef CPU_COLDFIRE
-    asm volatile ("move.l #0, %macsr"); /* integer mode */
-#endif
-
+    header_size = size;
     return true;
-} /* enc_init */
+}
+
+static inline int on_stream_data(struct enc_chunk_data *data)
+{
+    ssize_t size = data->hdr.size;
+
+    if (header_size > 0)
+    {
+        /* Header is layed-down; keep running CRC of audio data */
+        uint8_t *p = data->data;
+        uint8_t *p_end = p + size;
+
+        while (p < p_end)
+            mp3_crc16 = crc_update_lookup(*p++, mp3_crc16);
+    }
+
+    if (ci->enc_stream_write(data->data, size) != size)
+        return -1;
+
+    return 0;
+}
+
+static int on_stream_start(struct enc_chunk_file *file)
+{
+    mp3_crc16 = 0x0000;
+
+    if (!write_info_header(file->hdr.aux0))
+        return -1;
+
+    return 0;
+}
+
+static int on_stream_end(union enc_chunk_hdr *hdr)
+{
+    ssize_t size = header_size;
+
+    if (size <= 0)
+        return 0; /* No header possible/none yet written */
+
+    /* Update audio CRC and header CRC */
+    uint8_t frame[size];
+
+    /* Won't fail this since it could still be useable if some decoder
+       plays loose with the CRC info (like Rockbox :) */
+    if (ci->enc_stream_lseek(0, SEEK_SET) != 0 ||
+        ci->enc_stream_read(frame, size) != size)
+        return 0;
+
+    uint32_t header = (frame[0] << 24) | (frame[1] << 16) |
+                      (frame[2] <<  8) | (frame[3] <<  0);
+    int i = get_info_offset(header); /* Get 'Info' header */
+
+    /* 'Info' header = 8 bytes */
+
+    /* Fill-in audio data CRC16 */
+
+    /* On error, fixing data CRC would require scanning file since it
+       has probably dropped something we tried to write and the likely
+       reason is that the disk filled; just leave it 0 in that case. */
+    if (!hdr->err)
+    {
+        frame[i + 40] = mp3_crc16 >> 8;
+        frame[i + 41] = mp3_crc16;
+    }
+
+    /* Fill-in header CRC16 */
+    unsigned int hdr_crc16 = 0x0000;
+    for (int j = 0; j < i + 42; j++)
+        hdr_crc16 = crc_update_lookup(frame[j], hdr_crc16);
+
+    frame[i + 42] = hdr_crc16 >> 8;
+    frame[i + 43] = hdr_crc16;
+
+    /* Update file */
+    if (ci->enc_stream_lseek(0, SEEK_SET) == 0)
+        ci->enc_stream_write(frame, size);
+
+    return 0;
+}
 
 /* this is the codec entry point */
 enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
-    if (reason == CODEC_LOAD) {
-        if (!enc_init())
-            return CODEC_ERROR;
-    }
-    else if (reason == CODEC_UNLOAD) {
-        /* reset parameters to initial state */
-        ci->enc_set_parameters(NULL);
-    }
-
+#ifdef CPU_COLDFIRE
+    if (reason == CODEC_LOAD)
+        asm volatile ("move.l #0, %macsr"); /* integer mode */
+#endif
     return CODEC_OK;
+    (void)reason;
 }
 
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
+    mp3_encoder_reset();
+    uint32_t first = 1;
+
+    /* Needs to do stream finishing steps to flush-out all samples */
+    int frames_rem = -1; /* -1 = indeterminate */
+
+    enum { GETBUF_ENC, GETBUF_PCM } getbuf = GETBUF_ENC;
+    struct enc_chunk_data *data = NULL;
+
     /* main encoding loop */
-    while(ci->get_command(NULL) != CODEC_ACTION_HALT)
+    while (frames_rem)
     {
-        char *buffer = buffer = ci->enc_get_pcm_data(pcm_chunk_size);
-        struct enc_chunk_hdr *chunk;
+        intptr_t param;
+        enum codec_command_action action = ci->get_command(&param);
 
-        if(buffer == NULL)
-            continue;
-
-        chunk           = ci->enc_get_chunk();
-        chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
-
-        encode_frame(buffer, chunk);
-
-        if (chunk->num_pcm < samp_per_frame)
+        if (action != CODEC_ACTION_NULL)
         {
-            ci->enc_unget_pcm_data(pcm_chunk_size - chunk->num_pcm*4);
-            chunk->num_pcm = samp_per_frame;
+            if (action != CODEC_ACTION_STREAM_FINISH)
+                break;
+
+            if (frames_rem < 0)
+                frames_rem = cfg.flush_frames;
+
+            /* Reply with required space */
+            *(size_t *)param = cfg.req_byte_per_frame*frames_rem;
         }
 
-        ci->enc_finish_chunk();
+        /* First obtain output buffer; when available, get PCM data */
+        switch (getbuf)
+        {
+        case GETBUF_ENC:
+            if (!(data = ci->enc_encbuf_get_buffer(cfg.req_byte_per_frame)))
+                continue;
+            getbuf = GETBUF_PCM;
+        case GETBUF_PCM:
+            if (LIKELY(frames_rem < 0))
+            {
+                /* Encoding audio */
+                int count = cfg.samp_per_frame;
+                if (!ci->enc_pcmbuf_read(cfg.samp_buffer, count))
+                    continue;
+
+                ci->enc_pcmbuf_advance(cfg.samp_per_frame);
+
+                if (cfg.channels == 1)
+                {
+                    /* Interleave the mono samples to stereo as required by
+                       encoder */
+                    uint16_t *src = cfg.samp_buffer + count;
+                    uint32_t *dst = (uint32_t *)(src + count);
+
+                    for (int i = count; i > 0; i--)
+                        { uint32_t s = *--src; *--dst = s | (s << 16); }
+                }
+            }
+            else
+            {
+                /* Flushing encoder */
+                memset(cfg.samp_buffer, 0, cfg.samp_per_frame*4);
+                frames_rem--;
+            }
+            getbuf = GETBUF_ENC;
+        }
+
+        data->hdr.aux0 = first;
+        first = 0;
+        data->hdr.size = mp3_encoder_encode_frame(data->data);
+        data->pcm_count = cfg.samp_per_frame;
+        ci->enc_encbuf_finish_buffer();
     }
 
     return CODEC_OK;
+}
+
+/* this is called by recording system */
+int ICODE_ATTR enc_callback(enum enc_callback_reason reason,
+                            void *params)
+{
+    if (LIKELY(reason == ENC_CB_STREAM))
+    {
+        switch (((union enc_chunk_hdr *)params)->type)
+        {
+        case CHUNK_T_DATA:
+            return on_stream_data(params);
+        case CHUNK_T_STREAM_START:
+            return on_stream_start(params);
+        case CHUNK_T_STREAM_END:
+            return on_stream_end(params);
+        }
+    }
+    else if (reason == ENC_CB_INPUTS)
+    {
+        struct enc_inputs *inputs = params;
+
+        mp3_encoder_init(inputs->sample_rate, inputs->num_channels,
+                         inputs->config->mp3_enc.bitrate);
+
+        /* Return the actual configuration */
+        inputs->enc_sample_rate = cfg.samplerate;
+    }
+
+    return 0;
 }
