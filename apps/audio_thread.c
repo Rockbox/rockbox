@@ -108,6 +108,16 @@ static void NORETURN_ATTR audio_thread(void)
     }
 }
 
+void audio_queue_post(long id, intptr_t data)
+{
+    queue_post(&audio_queue, id, data);
+}
+
+intptr_t audio_queue_send(long id, intptr_t data)
+{
+    return queue_send(&audio_queue, id, data);
+}
+
 /* Return the playback and recording status */
 int audio_status(void)
 {
@@ -156,7 +166,9 @@ void audio_init(void)
                             audio_thread_id);
 
     playback_init();
-    /* Recording doesn't need init call */
+#ifdef AUDIO_HAVE_RECORDING
+    recording_init();
+#endif
 
     /* ...now...audio_reset_buffer must know the size of voicefile buffer so
        init talk first which will init the buffers */

@@ -249,7 +249,7 @@ static void codec_pcmbuf_insert_callback(
                 return; /* No input remains and DSP purged */
             }
         }
-    }    
+    }
 }
 
 /* helper function, not a callback */
@@ -365,10 +365,14 @@ static enum codec_command_action
 
         queue_peek(&codec_queue, &ev); /* Find out what it is */
 
-        long id = ev.id;
+        intptr_t id = ev.id;
 
         switch (id)
         {
+        case Q_NULL:
+            LOGFQUEUE("codec < Q_NULL");
+            break;
+
         case Q_CODEC_RUN:   /* Already running */
             LOGFQUEUE("codec < Q_CODEC_RUN");
             break;
@@ -388,8 +392,25 @@ static enum codec_command_action
             break;
 
         case Q_CODEC_STOP:  /* Must only return 0 in main loop */
-            LOGFQUEUE("codec < Q_CODEC_STOP");
-            dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
+            LOGFQUEUE("codec < Q_CODEC_STOP: %ld", ev.data);
+#ifdef HAVE_RECORDING
+            if (type_is_encoder(codec_type))
+            {
+                /* Stream finish request (soft stop)? */
+                if (ev.data && param)
+                {
+                    /* ev.data is pointer to size */
+                    *param = ev.data;
+                    action = CODEC_ACTION_STREAM_FINISH;
+                    break;
+                }
+            }
+            else
+#endif /* HAVE_RECORDING */
+            {
+                dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
+            }
+
             return CODEC_ACTION_HALT; /* Leave in queue */
 
         default:            /* This is in error in this context. */
@@ -459,7 +480,8 @@ static void load_codec(const struct codec_load_info *ev_data)
         }
     }
 
-    if (status >= 0)
+    /* Types must agree */
+    if (status >= 0 && encoder == !!codec_get_enc_callback())
     {
         codec_type = data.afmt;
         codec_queue_ack(Q_CODEC_LOAD);
@@ -558,7 +580,7 @@ static void NORETURN_ATTR codec_thread(void)
 {
     struct queue_event ev;
 
-    while (1)   
+    while (1)
     {
         cancel_cpu_boost();
 
@@ -685,9 +707,32 @@ bool codec_pause(void)
 void codec_stop(void)
 {
     /* Wait until it's in the main loop */
-    LOGFQUEUE("audio >| codec Q_CODEC_STOP");
+    LOGFQUEUE("audio >| codec Q_CODEC_STOP: 0");
     while (codec_queue_send(Q_CODEC_STOP, 0) != Q_NULL);
 }
+
+#ifdef HAVE_RECORDING
+/* Tells codec to take final encoding step and then exit -
+   Returns minimum buffer size required or 0 if complete */
+size_t codec_finish_stream(void)
+{
+    size_t size = 0;
+
+    LOGFQUEUE("audio >| codec Q_CODEC_STOP: &size");
+    if (codec_queue_send(Q_CODEC_STOP, (intptr_t)&size) != Q_NULL)
+    {
+        /* Sync to keep size in scope and get response */
+        LOGFQUEUE("audio >| codec Q_NULL");
+        codec_queue_send(Q_NULL, 0);
+
+        if (size == 0)
+            codec_stop(); /* Replied with 0 size */
+    }
+    /* else thread running in the main loop */
+
+    return size;
+}
+#endif /* HAVE_RECORDING */
 
 /* Call the codec's exit routine and close all references */
 void codec_unload(void)

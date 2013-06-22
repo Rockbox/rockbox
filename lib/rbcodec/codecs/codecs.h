@@ -36,7 +36,7 @@
 #endif
 #if (CONFIG_CODEC == SWCODEC)
 #ifdef HAVE_RECORDING
-#include "pcm_record.h"
+#include "enc_base.h"
 #endif
 #include "dsp_core.h"
 #include "dsp_misc.h"
@@ -72,12 +72,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 45
+#define CODEC_API_VERSION 46
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 45
+#define CODEC_MIN_API_VERSION 46
 
 /* reasons for calling codec main entrypoint */
 enum codec_entry_call_reason {
@@ -96,6 +96,9 @@ enum codec_command_action {
     CODEC_ACTION_HALT = -1,
     CODEC_ACTION_NULL = 0,
     CODEC_ACTION_SEEK_TIME = 1,
+#ifdef HAVE_RECORDING
+    CODEC_ACTION_STREAM_FINISH = 2,
+#endif
 };
 
 /* NOTE: To support backwards compatibility, only add new functions at
@@ -200,24 +203,18 @@ struct codec_api {
 #endif
 
 #ifdef HAVE_RECORDING
-    void            (*enc_get_inputs)(struct enc_inputs *inputs);
-    void            (*enc_set_parameters)(struct enc_parameters *params);
-    struct enc_chunk_hdr * (*enc_get_chunk)(void);
-    void            (*enc_finish_chunk)(void);
-    unsigned char * (*enc_get_pcm_data)(size_t size);
-    size_t          (*enc_unget_pcm_data)(size_t size);
-
-    /* file */
-    int (*open)(const char* pathname, int flags, ...);
-    int (*close)(int fd);
-    ssize_t (*read)(int fd, void* buf, size_t count);
-    off_t (*lseek)(int fd, off_t offset, int whence);
-    ssize_t (*write)(int fd, const void* buf, size_t count);
+    int (*enc_pcmbuf_read)(void *buf, int count);
+    int (*enc_pcmbuf_advance)(int count);
+    struct enc_chunk_data * (*enc_encbuf_get_buffer)(size_t need);
+    void (*enc_encbuf_finish_buffer)(void);
+    ssize_t (*enc_stream_read)(void *buf, size_t count);
+    off_t (*enc_stream_lseek)(off_t offset, int whence);
+    ssize_t (*enc_stream_write)(const void *buf, size_t count);
     int (*round_value_to_list32)(unsigned long value,
                                  const unsigned long list[],
                                  int count,
                                  bool signd);
-#endif
+#endif /* HAVE_RECORDING */
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
@@ -229,6 +226,7 @@ struct codec_header {
     enum codec_status(*entry_point)(enum codec_entry_call_reason reason);
     enum codec_status(*run_proc)(void);
     struct codec_api **api;
+    void * rec_extension[]; /* extension for encoders */
 };
 
 #ifdef CODEC
@@ -249,7 +247,7 @@ extern unsigned char plugin_end_addr[];
         __attribute__ ((section (".header")))= { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
         plugin_start_addr, plugin_end_addr }, codec_start, \
-        codec_run, &ci };
+        codec_run, &ci, { enc_callback } };
 
 #else /* def SIMULATOR */
 /* decoders */
@@ -262,7 +260,7 @@ extern unsigned char plugin_end_addr[];
 #define CODEC_ENC_HEADER \
         const struct codec_header __header = { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, codec_run, &ci };
+        codec_start, codec_run, &ci, { enc_callback } };
 #endif /* SIMULATOR */
 #endif /* CODEC */
 
@@ -277,12 +275,19 @@ void *codec_get_buffer_callback(size_t *size);
 int codec_load_buf(int hid, struct codec_api *api);
 int codec_load_file(const char* codec, struct codec_api *api);
 int codec_run_proc(void);
-int codec_halt(void);
 int codec_close(void);
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+enc_callback_t codec_get_enc_callback(void);
+#else
+#define codec_get_enc_callback()  NULL
+#endif
 
 /* defined by the codec */
 enum codec_status codec_start(enum codec_entry_call_reason reason);
 enum codec_status codec_main(enum codec_entry_call_reason reason);
 enum codec_status codec_run(void);
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+int enc_callback(enum enc_callback_reason reason, void *params);
+#endif
 
 #endif /* _CODECS_H_ */
