@@ -537,13 +537,13 @@ bool dbg_hw_info_pinctrl(void)
     }
 }
 
-#if IMX233_SUBTARGET >= 3700
 struct
 {
     const char *name;
     volatile uint32_t *addr;
 } dbg_ocotp[] =
 {
+#if IMX233_SUBTARGET >= 3700
 #define E(n,v) { .name = n, .addr = &v }
     E("CUST0", HW_OCOTP_CUSTn(0)), E("CUST1", HW_OCOTP_CUSTn(1)),
     E("CUST2", HW_OCOTP_CUSTn(2)), E("CUST0", HW_OCOTP_CUSTn(3)),
@@ -559,6 +559,23 @@ struct
     E("ROM2", HW_OCOTP_ROMn(2)), E("ROM3", HW_OCOTP_ROMn(3)),
     E("ROM4", HW_OCOTP_ROMn(4)), E("ROM5", HW_OCOTP_ROMn(5)),
     E("ROM6", HW_OCOTP_ROMn(6)), E("ROM7", HW_OCOTP_ROMn(7)),
+#undef E
+#else
+#define E(n,v) { .name = n, .addr = &v }
+    E("LASERFUSE0", HW_RTC_LASERFUSEn(0)),
+    E("LASERFUSE1", HW_RTC_LASERFUSEn(1)),
+    E("LASERFUSE2", HW_RTC_LASERFUSEn(2)),
+    E("LASERFUSE3", HW_RTC_LASERFUSEn(3)),
+    E("LASERFUSE4", HW_RTC_LASERFUSEn(4)),
+    E("LASERFUSE5", HW_RTC_LASERFUSEn(5)),
+    E("LASERFUSE6", HW_RTC_LASERFUSEn(6)),
+    E("LASERFUSE7", HW_RTC_LASERFUSEn(7)),
+    E("LASERFUSE8", HW_RTC_LASERFUSEn(8)),
+    E("LASERFUSE9", HW_RTC_LASERFUSEn(9)),
+    E("LASERFUSE10", HW_RTC_LASERFUSEn(10)),
+    E("LASERFUSE11", HW_RTC_LASERFUSEn(11)),
+#undef E
+#endif
 };
 
 bool dbg_hw_info_ocotp(void)
@@ -608,12 +625,6 @@ bool dbg_hw_info_ocotp(void)
         yield();
     }
 }
-#else
-bool dbg_hw_info_ocotp(void)
-{
-    return true;
-}
-#endif
 
 bool dbg_hw_info_pwm(void)
 {

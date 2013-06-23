@@ -24,9 +24,12 @@
 #include "config.h"
 #include "system.h"
 
-#include "regs/regs-ocotp.h"
+/** STMP3700 and over have OCOTP registers
+ * where STMP3600 has laser fuses. */
 
 #if IMX233_SUBTARGET >= 3700
+#include "regs/regs-ocotp.h"
+
 #define IMX233_NUM_OCOTP_CUST   4
 #define IMX233_NUM_OCOTP_CRYPTO 4
 #define IMX233_NUM_OCOTP_HWCAP  6
@@ -51,6 +54,18 @@ static inline uint32_t imx233_ocotp_read(volatile uint32_t *reg)
     imx233_ocotp_open_banks(true);
     uint32_t val = *reg;
     imx233_ocotp_open_banks(false);
+    return val;
+}
+#else
+#include "regs/regs-rtc.h"
+
+#define IMX233_NUM_OCOTP_LASERFUSE  12
+
+static inline uint32_t imx233_ocotp_read(volatile uint32_t *reg)
+{
+    BF_WR_V(RTC_UNLOCK, KEY, VAL);
+    uint32_t val = *reg;
+    BF_WR(RTC_UNLOCK, KEY, 0);
     return val;
 }
 #endif
