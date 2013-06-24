@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//+/0\u003d",
+        "filename": "firmware/common/rb-loader.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-06-24T14:07:30Z",
+      "side": 1,
+      "message": "ret \u003d EFILE_TOO_BIG;",
+      "revId": "c837e47c3dbaf0a38849792d115c60ab20b482c7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
