@@ -31,6 +31,7 @@
 #include "version.h"
 #include "uart-target.h"
 #include "power.h"
+#include "loader_strerror.h"
 
 extern void show_logo(void);
 
