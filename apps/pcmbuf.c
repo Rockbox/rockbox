@@ -243,7 +243,7 @@ static struct chunkdesc * index_chunkdesc_offs(size_t index, int offset)
     {
         i = (i + offset) % pcmbuf_desc_count;
 
-        /* remainder => modulus */ 
+        /* remainder => modulus */
         if (i < 0)
             i += pcmbuf_desc_count;
     }
@@ -811,7 +811,7 @@ static size_t crossfade_find_index(size_t index, size_t size)
         while (i != chunk_widx)
         {
             size_t desc_size = index_chunkdesc(i)->size;
- 
+
             if (size < desc_size)
                 return i + size;
 
