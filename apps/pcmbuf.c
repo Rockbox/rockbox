@@ -241,7 +241,7 @@ static struct chunkdesc * index_chunkdesc_offs(size_t index, int offset)
 
     if (offset != 0)
     {
-        i = (i + offset) % pcmbuf_desc_count;
+        i = (i + offset) % (int)pcmbuf_desc_count;
 
         /* remainder => modulus */
         if (i < 0)
