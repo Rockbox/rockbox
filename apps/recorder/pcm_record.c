@@ -24,6 +24,7 @@
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
+#include "string-extra.h"
 #include "pcm_record.h"
 #include "codecs.h"
 #include "logf.h"
