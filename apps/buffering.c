@@ -201,7 +201,7 @@ static inline uintptr_t ringbuf_sub(uintptr_t p, size_t v)
     uintptr_t res = p;
     if (p < v)
         res += buffer_len; /* wrap */
-        
+
     return res - v;
 }
 
@@ -1118,7 +1118,7 @@ int bufalloc(const void *src, size_t size, enum data_type type)
                 memcpy(&buffer[buf_widx], src, size);
             }
         }
-        
+
         h->fd = -1;
         *h->path = 0;
         h->filesize = size;
@@ -1173,7 +1173,7 @@ static void rebuffer_handle(int handle_id, size_t newpos)
         h->ridx = ringbuf_add(h->data, amount);
 
         if (buffer_handle(handle_id, amount + 1)) {
-            size_t rd = ringbuf_sub(h->ridx, h->data); 
+            size_t rd = ringbuf_sub(h->ridx, h->data);
             size_t wr = ringbuf_sub(h->widx, h->data);
             if (wr >= rd) {
                 /* It really did succeed */
@@ -1550,7 +1550,7 @@ bool buf_pin_handle(int handle_id, bool pin)
         h->pinned--;
     }
 
-    return true; 
+    return true;
 }
 
 bool buf_signal_handle(int handle_id, bool signal)
@@ -1560,7 +1560,7 @@ bool buf_signal_handle(int handle_id, bool signal)
         return false;
 
     h->signaled = signal ? 1 : 0;
-    return true; 
+    return true;
 }
 
 /* Return the size of the ringbuffer */
@@ -1750,7 +1750,7 @@ bool buffering_reset(char *buf, size_t buflen)
 
     if (buf) {
         buflen -= MIN(buflen, GUARD_BUFSIZE);
-    
+
         STORAGE_ALIGN_BUFFER(buf, buflen);
 
         if (!buf || !buflen)
