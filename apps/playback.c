@@ -494,7 +494,7 @@ static void track_info_wipe(struct track_info * info)
 /** --- Track list --- **/
 
 /* Initialize the track list */
-static void track_list_init(void)
+static void INIT_ATTR track_list_init(void)
 {
     int i;
     for (i = 0; i < TRACK_LIST_LEN; i++)
@@ -3747,7 +3747,7 @@ unsigned int playback_status(void)
 }
 
 /** -- Startup -- **/
-void playback_init(void)
+void INIT_ATTR playback_init(void)
 {
     logf("playback: initializing");
 

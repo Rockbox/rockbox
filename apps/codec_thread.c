@@ -627,7 +627,7 @@ static void NORETURN_ATTR codec_thread(void)
 /** --- Miscellaneous external interfaces -- **/
 
 /* Initialize playback's codec interface */
-void codec_thread_init(void)
+void INIT_ATTR codec_thread_init(void)
 {
     /* Init API */
     ci.dsp              = dsp_get_config(CODEC_IDX_AUDIO);

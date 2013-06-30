@@ -139,7 +139,7 @@ void audio_error_clear(void)
 /** -- Startup -- **/
 
 /* Initialize the audio system - called from init() in main.c */
-void audio_init(void)
+void INIT_ATTR audio_init(void)
 {
     /* Can never do this twice */
     if (audio_is_initialized)

@@ -1720,7 +1720,7 @@ static void NORETURN_ATTR buffering_thread(void)
     }
 }
 
-void buffering_init(void)
+void INIT_ATTR buffering_init(void)
 {
     mutex_init(&llist_mutex);
 
