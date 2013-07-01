@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//++A\u003d",
+        "filename": "manual/main_menu/fmradio.tex",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-01T21:38:29Z",
+      "side": 1,
+      "message": "I am not sure the Recorder has a FM soft lock, it only has a WPS one.",
+      "revId": "e473657d0e32d4d15d802bb1f7e7a7b5370fba1f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+98\u003d",
+        "filename": "manual/main_menu/fmradio.tex",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-01T21:38:29Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "e473657d0e32d4d15d802bb1f7e7a7b5370fba1f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+94\u003d",
+        "filename": "manual/main_menu/fmradio.tex",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-01T21:38:29Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "e473657d0e32d4d15d802bb1f7e7a7b5370fba1f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
