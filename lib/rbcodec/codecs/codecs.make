@@ -21,6 +21,19 @@ OTHER_INC += -I$(RBCODECLIB_DIR)/codecs/lib
 # extra libraries
 CODEC_LIBS := $(CODECLIB) $(FIXEDPOINTLIB)
 
+# compile flags for codecs
+CODECFLAGS := $(CFLAGS) $(RBCODEC_CFLAGS) -fstrict-aliasing \
+			 -I$(RBCODECLIB_DIR)/codecs -I$(RBCODECLIB_DIR)/codecs/lib -DCODEC
+
+ifdef APP_TYPE
+ CODECLDFLAGS = $(SHARED_LDFLAG) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
+ CODECFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
+else
+ CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
+ CODECFLAGS += -UDEBUG -DNDEBUG
+endif
+CODECLDFLAGS += $(GLOBAL_LDOPTS)
+
 # the codec libraries
 include $(RBCODECLIB_DIR)/codecs/demac/libdemac.make
 include $(RBCODECLIB_DIR)/codecs/liba52/liba52.make
@@ -52,10 +65,6 @@ include $(RBCODECLIB_DIR)/codecs/libgme/libvgm.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libkss.make
 include $(RBCODECLIB_DIR)/codecs/libgme/libemu2413.make
 include $(RBCODECLIB_DIR)/codecs/libopus/libopus.make
-
-# compile flags for codecs
-CODECFLAGS = $(CFLAGS) $(RBCODEC_CFLAGS) -fstrict-aliasing \
-			 -I$(RBCODECLIB_DIR)/codecs -I$(RBCODECLIB_DIR)/codecs/lib -DCODEC
 
 # set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
 # in a -ffoo -fno-foo pair, there is no need to filter them out
@@ -187,15 +196,6 @@ $(CODECDIR)/%.o: $(RBCODECLIB_DIR)/codecs/%.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
 		-I$(dir $<) $(CODECFLAGS) $(ASMFLAGS) -c $< -o $@
-
-ifdef APP_TYPE
- CODECLDFLAGS = $(SHARED_LDFLAG) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
- CODECFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
-else
- CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
- CODECFLAGS += -UDEBUG -DNDEBUG
-endif
-CODECLDFLAGS += $(GLOBAL_LDOPTS)
 
 $(CODECDIR)/%-pre.map: $(CODEC_CRT0) $(CODECLINK_LDS) $(CODECDIR)/%.o $(CODECS_LIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*-pre.elf \
