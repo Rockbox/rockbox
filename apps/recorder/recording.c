@@ -1074,6 +1074,10 @@ bool recording_screen(bool no_source)
 #endif
 
 #if CONFIG_CODEC == SWCODEC
+    /* hardware samplerate gets messed up so prevent mixer playing */
+    int keyclick = global_settings.keyclick;
+    global_settings.keyclick = 0;
+
     /* recording_menu gets messed up: so prevent manus talking */
     talk_disable(true);
     /* audio_init_recording stops anything playing when it takes the audio
@@ -1956,6 +1960,9 @@ rec_abort:
 
     /* restore talking */
     talk_disable(false);
+
+    /* restore keyclick */
+    global_settings.keyclick = keyclick;
 #else /* !SWCODEC */
     audio_init_playback();
 #endif /* CONFIG_CODEC == SWCODEC */
