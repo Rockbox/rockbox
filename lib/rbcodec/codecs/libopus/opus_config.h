@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "config.h"
+#include "rbcodecconfig.h"
 #include "codeclib.h"
 #include "ogg/ogg.h"
 

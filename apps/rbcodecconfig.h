@@ -1,7 +1,8 @@
 #ifndef RBCODECCONFIG_H_INCLUDED
 #define RBCODECCONFIG_H_INCLUDED
 
-#include "config.h"
+/* Explicit path to avoid issues with name clashes (libopus) */
+#include "../firmware/export/config.h"
 
 #ifndef __ASSEMBLER__
 

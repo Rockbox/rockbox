@@ -13,10 +13,12 @@ OPUSLIB_SRC := $(call preprocess, $(RBCODECLIB_DIR)/codecs/libopus/SOURCES)
 OPUSLIB_OBJ := $(call c2obj, $(OPUSLIB_SRC))
 
 # codec specific compilation flags
-$(OPUSLIB) : CODECFLAGS += -DHAVE_CONFIG_H \
+# prepend paths to avoid name clash issues
+$(OPUSLIB) : CODECFLAGS := -DHAVE_CONFIG_H \
    -I$(RBCODECLIB_DIR)/codecs/libopus \
    -I$(RBCODECLIB_DIR)/codecs/libopus/celt \
-   -I$(RBCODECLIB_DIR)/codecs/libopus/silk
+   -I$(RBCODECLIB_DIR)/codecs/libopus/silk \
+   $(CODECFLAGS)
 
 $(OPUSLIB): $(OPUSLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
