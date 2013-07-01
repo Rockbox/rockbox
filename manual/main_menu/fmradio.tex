@@ -89,6 +89,14 @@
           \ActionFMMenu
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMMenu}
           & Display the FM radio settings menu.\\
+          %
+          % software hold targets
+          \nopt{hold_button}{%
+            \opt{SANSA_CLIP_PAD}{\ButtonHome+\ButtonSelect}
+            \opt{SANSA_FUZEPLUS_PAD}{\ButtonPower}
+            \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
+            & Key lock (software hold switch) on/off.\\
+          }%
        \end{btnmap}
 
   \begin{description}
