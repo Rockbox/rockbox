@@ -28,15 +28,18 @@
 
 #define YEAR1980    315532800   /* 1980/1/1 00:00:00 in UTC */
 
+#if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3)
+#define USE_PERSISTENT
+#endif
+
 void rtc_init(void)
 {
     /* rtc-imx233 is initialized by the system */
 }
 
-int rtc_read_datetime(struct tm *tm)
+static void seconds_to_datetime(uint32_t seconds, struct tm *tm)
 {
-    uint32_t seconds = imx233_rtc_read_seconds();
-#if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3)
+#ifdef USE_PERSISTENT
     /* The OF uses PERSISTENT2 register to keep the adjustment and only changes
      * SECONDS if necessary. */
     seconds += imx233_rtc_read_persistent(2);
@@ -47,7 +50,11 @@ int rtc_read_datetime(struct tm *tm)
 #endif
 
     gmtime_r(&seconds, tm);
+}
 
+int rtc_read_datetime(struct tm *tm)
+{
+    seconds_to_datetime(imx233_rtc_read_seconds(), tm);
     return 0;
 }
 
@@ -57,7 +64,7 @@ int rtc_write_datetime(const struct tm *tm)
 
     seconds = mktime((struct tm *)tm);
 
-#if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3)
+#ifdef USE_PERSISTENT
     /* The OF uses PERSISTENT2 register to keep the adjustment and only changes
      * SECONDS if necessary.
      * NOTE: the OF uses this mechanism to prevent roll back in time. Although
@@ -75,28 +82,58 @@ int rtc_write_datetime(const struct tm *tm)
 
 void rtc_set_alarm(int h, int m)
 {
-    (void) h;
-    (void) m;
+    /* transform alarm time to absolute time */
+    struct tm tm;
+    seconds_to_datetime(imx233_rtc_read_seconds(), &tm);
+    /* if same date and hour/min is in the past, advance one day */
+    if(h < tm.tm_hour || (h == tm.tm_hour && m <= tm.tm_min))
+        seconds_to_datetime(imx233_rtc_read_seconds() + 3600 * 60, &tm);
+    tm.tm_hour = h;
+    tm.tm_min = m;
+    tm.tm_sec = 0;
+
+    uint32_t seconds = mktime(&tm);
+#ifdef USE_PERSISTENT
+    imx233_rtc_write_alarm(seconds - imx233_rtc_read_persistent(2));
+#else
+    imx233_rtc_write_alarm(seconds - YEAR1980);
+#endif
 }
 
 void rtc_get_alarm(int *h, int *m)
 {
-    (void) h;
-    (void) m;
+    struct tm tm;
+    seconds_to_datetime(imx233_rtc_read_alarm(), &tm);
+    *m = tm.tm_min;
+    *h = tm.tm_hour;
 }
 
 void rtc_enable_alarm(bool enable)
 {
-    (void) enable;
+    BF_CLR(RTC_CTRL, ALARM_IRQ_EN);
+    BF_CLR(RTC_CTRL, ALARM_IRQ);
+    uint32_t val = imx233_rtc_read_persistent(0);
+    BF_WRX(val, RTC_PERSISTENT0, ALARM_EN, enable);
+    BF_WRX(val, RTC_PERSISTENT0, ALARM_WAKE_EN, enable);
+    BF_WRX(val, RTC_PERSISTENT0, ALARM_WAKE, 0);
+    imx233_rtc_write_persistent(0, val);
 }
 
+/**
+ * Check if alarm caused unit to start.
+ */
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    (void) release_alarm;
-    return false;
+    bool res = BF_RDX(imx233_rtc_read_persistent(0), RTC_PERSISTENT0, ALARM_WAKE);
+    if(release_alarm)
+        rtc_enable_alarm(false);
+    return res;
 }
 
+/**
+ * Checks if an alarm interrupt has triggered since last we checked.
+ */
 bool rtc_check_alarm_flag(void)
 {
-    return false;
+    return BF_RD(RTC_CTRL, ALARM_IRQ);
 }

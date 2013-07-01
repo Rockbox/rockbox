@@ -33,6 +33,8 @@ struct imx233_rtc_info_t
 {
     uint32_t seconds;
     uint32_t persistent[6];
+    uint32_t alarm;
+    bool alarm_en, alarm_wake_en, alarm_wake, alarm_irq;
 };
 
 static inline void imx233_rtc_init(void)
@@ -64,8 +66,14 @@ static inline void imx233_rtc_enable_msec_irq(bool enable)
         BF_CLR(RTC_CTRL, ONEMSEC_IRQ_EN);
 }
 
+static inline uint32_t imx233_rtc_read_alarm(void)
+{
+    return HW_RTC_ALARM;
+}
+
 void imx233_rtc_write_seconds(uint32_t seconds);
 void imx233_rtc_write_persistent(int idx, uint32_t val);
+void imx233_rtc_write_alarm(uint32_t seconds);
 
 struct imx233_rtc_info_t imx233_rtc_get_info(void);
 
