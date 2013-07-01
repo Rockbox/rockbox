@@ -353,8 +353,17 @@ static int init_sd_card(int drive)
             return -6;
 
         /* CMD6 */
-        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_RESP, NULL))
-            return -7;
+        {
+            /* only transfer 64 bytes */
+            imx233_ssp_set_block_size(ssp, /*log2(64)*/6);
+            if(imx233_ssp_sd_mmc_transfer(ssp, SD_SWITCH_FUNC, 0x80fffff1,
+                    SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, NULL))
+            {
+                imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
+                return -12;
+            }
+            imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
+        }
 
         /*  go back to STBY state so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
@@ -465,10 +474,9 @@ static int init_mmc_drive(int drive)
 
     /* read extended CSD */
     {
-        uint8_t ext_csd[512];
+        uint8_t *ext_csd = aligned_buffer[drive];
         if(imx233_ssp_sd_mmc_transfer(ssp, 8, 0, SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, &status))
             return -12;
-        memcpy(ext_csd, aligned_buffer[drive], 512);
         uint32_t *sec_count = (void *)&ext_csd[212];
         window_start[drive] = 0;
         window_end[drive] = *sec_count;
