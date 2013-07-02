@@ -162,4 +162,16 @@ int talk_idarray(const long *idarray, bool enqueue);
         } \
     }while(0)
 
+struct talk_debug_data {
+    char voicefile[32];
+    long memory_allocated, memory_used;
+    int  num_clips, num_empty_clips;
+    int  min_clipsize, avg_clipsize, max_clipsize;
+    int  cached_clips;
+    int  cache_hits;
+    int  cache_misses;
+};
+
+bool talk_get_debug_data(struct talk_debug_data *data);
+
 #endif /* __TALK_H__ */

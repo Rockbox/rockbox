@@ -131,6 +131,8 @@
 #include "rds.h"
 #endif
 
+#include "talk.h"
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -2130,6 +2132,67 @@ static bool dbg_scrollwheel(void)
 }
 #endif
 
+static const char* dbg_talk_get_name(int selected_item, void *data,
+                                     char *buffer, size_t buffer_len)
+{
+    struct talk_debug_data *talk_data = data;
+    switch(selected_item)
+    {
+        case 0:
+            if (talk_data)
+                snprintf(buffer, buffer_len, "Current voice file: %s",
+                        talk_data->voicefile);
+            else
+                buffer = "No voice information available";
+            break;
+        case 1:
+            snprintf(buffer, buffer_len, "Number of (empty) clips in voice file: (%d) %d",
+                    talk_data->num_empty_clips, talk_data->num_clips);
+            break;
+        case 2:
+            snprintf(buffer, buffer_len, "Min/Avg/Max size of clips: %d / %d / %d",
+                    talk_data->min_clipsize, talk_data->avg_clipsize, talk_data->max_clipsize);
+            break;
+        case 3:
+            snprintf(buffer, buffer_len, "Memory allocated: %ld.%02ld KB",
+                    talk_data->memory_allocated / 1024, talk_data->memory_allocated % 1024);
+            break;
+        case 4:
+            snprintf(buffer, buffer_len, "Memory used: %ld.%02ld KB",
+                    talk_data->memory_used / 1024, talk_data->memory_used % 1024);
+            break;
+        case 5:
+            snprintf(buffer, buffer_len, "Number of clips in cache: %d",
+                    talk_data->cached_clips);
+            break;
+        case 6:
+            snprintf(buffer, buffer_len, "Cache hits / misses: %d / %d",
+                    talk_data->cache_hits, talk_data->cache_misses);
+            break;
+        default:
+            buffer = "TODO";
+            break;
+    }
+
+    return buffer;
+}
+
+static bool dbg_talk(void)
+{
+    struct simplelist_info list;
+    struct talk_debug_data data;
+    if (talk_get_debug_data(&data))
+        simplelist_info_init(&list, "Voice Information:", 7, &data);
+    else
+        simplelist_info_init(&list, "Voice Information:", 1, NULL);
+    list.scroll_all = true;
+    list.hide_selection = true;
+    list.timeout = HZ;
+    list.get_name = dbg_talk_get_name;
+
+    return simplelist_show_list(&list);
+}
+
 #ifdef HAVE_USBSTACK
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
 static bool toggle_usb_serial(void)
@@ -2361,6 +2424,7 @@ static const struct {
      && !defined(IPOD_MINI) && !defined(SIMULATOR))
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
+        {"Talk engine stats", dbg_talk },
 };
 
 static int menu_action_callback(int btn, struct gui_synclist *lists)

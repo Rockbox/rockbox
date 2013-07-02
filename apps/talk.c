@@ -123,6 +123,7 @@ static uint8_t        clip_age[QUEUE_SIZE];
 #if QUEUE_SIZE > 255
 #   error clip_age[] type too small
 #endif
+static int cache_hits, cache_misses;
 #endif
 
 /* Multiple thumbnails can be loaded back-to-back in this buffer. */
@@ -165,6 +166,7 @@ struct queue_entry /* one entry of the internal queue */
 
 static struct queue_entry queue[QUEUE_SIZE]; /* queue of scheduled clips */
 
+#define DEFAULT_VOICE_LANG "english"
 
 /***************** Private implementation *****************/
 
@@ -294,7 +296,7 @@ static struct buflib_callbacks index_ops = {
 static int open_voicefile(void)
 {
     char buf[64];
-    char* p_lang = "english"; /* default */
+    char* p_lang = DEFAULT_VOICE_LANG; /* default */
 
     if ( global_settings.lang_file[0] &&
          global_settings.lang_file[0] != 0xff ) 
@@ -344,6 +346,7 @@ static int get_clip(long id, long* p_size)
         ssize_t ret;
         int fd, idx = 0;
         unsigned char *voicebuf;
+        cache_misses++;
         if (id == VOICE_PAUSE) {
             idx = QUEUE_SIZE;   /* we keep VOICE_PAUSE loaded */
         } else {
@@ -397,6 +400,7 @@ static int get_clip(long id, long* p_size)
     else
     {   /* clip is in memory already */
         /* Find where it was loaded */
+        cache_hits++;
         if (id == VOICE_PAUSE) {
             retval = QUEUE_SIZE * max_clipsize;
         } else {
@@ -582,7 +586,6 @@ load_err_free:
     index_handle = core_free(index_handle);
     return false;
 }
-
 
 /* called in ISR context (on HWCODEC) if mp3 data got consumed */
 static void mp3_callback(const void** start, size_t* size)
@@ -1456,3 +1459,57 @@ void talk_time(const struct tm *tm, bool enqueue)
 }
 
 #endif /* CONFIG_RTC */
+
+
+bool talk_get_debug_data(struct talk_debug_data *data)
+{
+    char* p_lang = DEFAULT_VOICE_LANG; /* default */
+
+    memset(data, 0, sizeof(*data));
+
+    if (!has_voicefile || index_handle <= 0)
+        return false;
+
+    if (global_settings.lang_file[0] && global_settings.lang_file[0] != 0xff)
+        p_lang = (char *)global_settings.lang_file;
+
+    struct clip_entry *clips = core_get_data(index_handle);
+#ifdef TALK_PARTIAL_LOAD
+    int cached = 0;
+#endif
+    int real_clips = 0;
+
+    strlcpy(data->voicefile, p_lang, sizeof(data->voicefile));
+    data->num_clips = voicefile.id1_max + voicefile.id2_max;
+    data->avg_clipsize = data->max_clipsize = 0;
+    data->min_clipsize = INT_MAX;
+    for(int i = 0; i < data->num_clips; i++)
+    {
+        int size = clips[i].size & (~LOADED_MASK);
+        if (!size) continue;
+        real_clips += 1;
+        if (size < data->min_clipsize)
+            data->min_clipsize = size;
+        if (size > data->max_clipsize)
+            data->max_clipsize = size;
+        data->avg_clipsize += size;
+#ifdef TALK_PARTIAL_LOAD
+        if (clips[i].size & LOADED_MASK)
+            cached++;
+#endif
+    }
+    data->avg_clipsize /= real_clips;
+    data->num_empty_clips = data->num_clips - real_clips;
+    data->memory_allocated = voicefile_size + size_for_thumbnail;
+    data->memory_used = voicefile_size + thumbnail_buf_used;
+#ifdef TALK_PARTIAL_LOAD
+    data->cached_clips = cached;
+    data->cache_hits   = cache_hits;
+    data->cache_misses = cache_misses;
+#else
+    data->cached_clips = real_clips;
+    data->cache_hits = data->cache_misses = -1;
+#endif
+
+    return true;
+}
