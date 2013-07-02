@@ -26,12 +26,26 @@
 #define SCSI_STMP_READ                          0xc0
 #define SCSI_STMP_WRITE                         0xc1
 /** STMP: Command */
-#define SCSI_STMP_CMD_GET_PROTOCOL_VERSION      0
-#define SCSI_STMP_CMD_GET_LOGICAL_MEDIA_INFO    2
-#define SCSI_STMP_CMD_GET_LOGICAL_TABLE         5
+#define SCSI_STMP_CMD_GET_PROTOCOL_VERSION      0x0
+#define SCSI_STMP_CMD_GET_LOGICAL_MEDIA_INFO    0x2
+#define SCSI_STMP_CMD_GET_LOGICAL_TABLE         0x5
+#define SCSI_STMP_CMD_ALLOCATE_LOGICAL_MEDIA    0x6
+#define SCSI_STMP_CMD_ERASE LOGICAL MEDIA       0x7
 #define SCSI_STMP_CMD_GET_LOGICAL_DRIVE_INFO    0x12
+#define SCSI_STMP_CMD_READ_LOGICAL_DRIVE_SECTOR 0x13
+#define SCSI_STMP_CMD_SET_LOGICAL_DRIVE_INFO    0x20
+#define SCSI_STMP_CMD_WRITE_LOGICAL_DRIVE_SECTOR    0x23
+#define SCSI_STMP_CMD_ERASE_LOGICAL_DRIVE       0x2f
 #define SCSI_STMP_CMD_GET_CHIP_MAJOR_REV_ID     0x30
+#define SCSI_STMP_CMD_CHIP_RESET                0x31
+#define SCSI_STMP_CMD_GET_CHIP_SERIAL_NUMBER    0x32
 #define SCSI_STMP_CMD_GET_ROM_REV_ID            0x37
+#define SCSI_STMP_CMD_GET_JANUS_STATUS          0x40
+#define SCSI_STMP_CMD_INITIALIZE_STATUS         0x41
+#define SCSI_STMP_CMD_RESET_TO_RECOVERY         0x42
+#define SCSI_STMP_CMD_INITIALIZE_DATA_STORE     0x43
+#define SCSI_STMP_CMD_RESET_TO_UPDATER          0x44
+#define SCSI_STMP_CMD_GET_DEVICE_INFO           0x45
 
 struct scsi_stmp_protocol_version_t
 {
@@ -90,8 +104,24 @@ struct scsi_stmp_logical_media_info_manufacturer_t
     uint32_t type; /* big-endian */
 }  __attribute__((packed));
 
-#define SCSI_STMP_DRIVE_INFO_SIZE   2
-#define SCSI_STMP_DRIVE_INFO_TYPE   5
+#define SCSI_STMP_DRIVE_INFO_SECTOR 0 /** Sector Size (bytes) */
+#define SCSI_STMP_DRIVE_INFO_SIZE   2 /** Total Size (bytes) */
+#define SCSI_STMP_DRIVE_INFO_COUNT  4 /** Sector Count */
+#define SCSI_STMP_DRIVE_INFO_TYPE   5 /** Drive Type */
+
+#define SCSI_STMP_DRIVE_TYPE_USER   0
+#define SCSI_STMP_DRIVE_TYPE_SYSTEM 1
+#define SCSI_STMP_DRIVE_TYPE_DRM    2
+
+struct scsi_stmp_logical_drive_info_sector_t
+{
+    uint32_t size; /* big-endian */
+}  __attribute__((packed));
+
+struct scsi_stmp_logical_drive_info_count_t
+{
+    uint64_t count; /* big-endian */
+}  __attribute__((packed));
 
 struct scsi_stmp_logical_drive_info_size_t
 {

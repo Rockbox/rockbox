@@ -344,6 +344,46 @@ static int stmp_get_logical_drive_info(uint8_t drive, uint8_t info, void *data, 
     return do_sense_analysis(ret, sense, sense_size);
 }
 
+static const char *stmp_get_logical_media_type_string(uint32_t type)
+{
+    switch(type)
+    {
+        case SCSI_STMP_MEDIA_TYPE_NAND: return "NAND";
+        case SCSI_STMP_MEDIA_TYPE_SDMMC: return "SD/MMC";
+        case SCSI_STMP_MEDIA_TYPE_HDD: return "HDD";
+        case SCSI_STMP_MEDIA_TYPE_RAM: return "RAM";
+        case SCSI_STMP_MEDIA_TYPE_iNAND: return "iNAND";
+        default: return "?";
+    }
+}
+
+static const char *stmp_get_logical_media_vendor_string(uint32_t type)
+{
+    switch(type)
+    {
+        case SCSI_STMP_MEDIA_VENDOR_SAMSUNG: return "Samsung";
+        case SCSI_STMP_MEDIA_VENDOR_STMICRO: return "ST Micro";
+        case SCSI_STMP_MEDIA_VENDOR_HYNIX: return "Hynix";
+        case SCSI_STMP_MEDIA_VENDOR_MICRON: return "Micron";
+        case SCSI_STMP_MEDIA_VENDOR_TOSHIBA: return "Toshiba";
+        case SCSI_STMP_MEDIA_VENDOR_RENESAS: return "Renesas";
+        case SCSI_STMP_MEDIA_VENDOR_INTEL: return "Intel";
+        case SCSI_STMP_MEDIA_VENDOR_SANDISK: return "Sandisk";
+        default: return "?";
+    }
+}
+
+static const char *stmp_get_logical_drive_type_string(uint32_t type)
+{
+    switch(type)
+    {
+        case SCSI_STMP_DRIVE_TYPE_USER: return "User";
+        case SCSI_STMP_DRIVE_TYPE_SYSTEM: return "System";
+        case SCSI_STMP_DRIVE_TYPE_DRM: return "DRM";
+        default: return "?";
+    }
+}
+
 static int do_work(void)
 {
     cprintf(BLUE, "Information\n");
@@ -389,11 +429,12 @@ static int do_work(void)
         }
 
         len = 4;
-        ret = stmp_get_logical_media_info(6, &u.u32, &len);
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_TYPE, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
-            cprintf_field("  Logical Media Info (6): ", "%#x\n", u.u32);
+            cprintf_field("  Media Type: ", "%#x", u.u32);
+            cprintf(RED, " (%s)\n", stmp_get_logical_media_type_string(u.u32));
         }
 
         len = 1;
@@ -406,7 +447,7 @@ static int do_work(void)
         if(!ret && len == 8)
         {
             u.u64 = fix_endian64be(u.u64);
-            cprintf_field("  Logical Media Info (1): ", "%#llx\n", u.u64);
+            cprintf_field("  Logical Media Info (1): ", "%#llx\n", (unsigned long long)u.u64);
         }
 
         len = 4;
@@ -436,11 +477,12 @@ static int do_work(void)
             cprintf_field("  Logical Media Info (9): ", "%#x\n", u.u8);
 
         len = 4;
-        ret = stmp_get_logical_media_info(12, &u.u32, &len);
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_VENDOR, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
-            cprintf_field("  Logical Media Info (12): ", "%#x\n", u.u32);
+            cprintf_field("  Media Vendor: ", "%#x", u.u32);
+            cprintf(RED, " (%s)\n", stmp_get_logical_media_vendor_string(u.u32));
         }
 
         len = 8;
@@ -448,7 +490,7 @@ static int do_work(void)
         if(!ret && len == 8)
         {
             u.u64 = fix_endian64be(u.u64);
-            cprintf_field("  Logical Media Info (13): ", "%#llx\n", u.u64);
+            cprintf_field("  Logical Media Info (13): ", "%#llx\n", (unsigned long long)u.u64);
         }
 
         len = 4;
@@ -525,11 +567,11 @@ static int do_work(void)
             cprintf_field("  Drive ", "%02x\n", drive);
             
             int len = 4;
-            ret = stmp_get_logical_drive_info(drive, 0, &u.u32, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
-                cprintf_field("    Info 0: ", "%#x\n", u.u32);
+                cprintf_field("    Sector Size: ", "%#x\n", u.u32);
             }
 
             len = 4;
@@ -541,11 +583,11 @@ static int do_work(void)
             }
 
             len = 8;
-            ret = stmp_get_logical_drive_info(drive, 2, &u.u64, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SIZE, &u.u64, &len);
             if(!ret && len == 8)
             {
                 u.u64 = fix_endian64be(u.u64);
-                cprintf_field("    Info 2: ", "%#llx\n", u.u64);
+                cprintf_field("    Total Size: ", "%#llx\n", (unsigned long long)u.u64);
             }
 
             len = 4;
@@ -557,19 +599,20 @@ static int do_work(void)
             }
 
             len = 8;
-            ret = stmp_get_logical_drive_info(drive, 4, &u.u64, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_COUNT, &u.u64, &len);
             if(!ret && len == 8)
             {
                 u.u64 = fix_endian64be(u.u64);
-                cprintf_field("    Info 4: ", "%#llx\n", u.u64);
+                cprintf_field("    Sector Count: ", "%#llx\n", (unsigned long long)u.u64);
             }
 
             len = 4;
-            ret = stmp_get_logical_drive_info(drive, 5, &u.u32, &len);
+            ret = stmp_get_logical_drive_info(drive,SCSI_STMP_DRIVE_INFO_TYPE, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
-                cprintf_field("    Info 5: ", "%#x\n", u.u32);
+                cprintf_field("    Type: ", "%#x", u.u32);
+                cprintf(RED, " (%s)\n", stmp_get_logical_drive_type_string(u.u32));
             }
 
             len = 1;
