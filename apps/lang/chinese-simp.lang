@@ -10565,15 +10565,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "触摸板灵敏度"
+    gigabeatfx,sansafuzeplus: "触摸板灵敏度"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "触摸板灵敏度"
+    gigabeatfx,sansafuzeplus: "触摸板灵敏度"
   </voice>
 </phrase>
 <phrase>

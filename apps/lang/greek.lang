@@ -10456,15 +10456,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Ευαισθησία πινακίδας αφής"
+    gigabeatfx,sansafuzeplus: "Ευαισθησία πινακίδας αφής"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Ευαισθησία πινακίδας αφής"
+    gigabeatfx,sansafuzeplus: "Ευαισθησία πινακίδας αφής"
   </voice>
 </phrase>
 <phrase>

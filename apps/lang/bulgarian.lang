@@ -10596,15 +10596,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Чувствителност на тъчпада"
+    gigabeatfx,sansafuzeplus: "Чувствителност на тъчпада"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Чувствителност на тъчпада"
+    gigabeatfx,sansafuzeplus: "Чувствителност на тъчпада"
   </voice>
 </phrase>
 <phrase>

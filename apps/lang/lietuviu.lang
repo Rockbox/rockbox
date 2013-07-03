@@ -10648,15 +10648,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Jautrumas lietimui"
+    gigabeatfx,sansafuzeplus: "Jautrumas lietimui"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Jautrumas lietimui"
+    gigabeatfx,sansafuzeplus: "Jautrumas lietimui"
   </voice>
 </phrase>
 <phrase>
