@@ -215,6 +215,9 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_STOP,        BUTTON_OFF,                            BUTTON_NONE },
     { ACTION_FM_MODE,        BUTTON_ON | BUTTON_REPEAT,             BUTTON_ON },
     { ACTION_FM_EXIT,        BUTTON_ON | BUTTON_REL,                BUTTON_ON },
+#ifndef HAS_BUTTON_HOLD
+    { ACTION_STD_KEYLOCK,       BUTTON_F1|BUTTON_DOWN,      BUTTON_NONE },
+#endif 
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
     
