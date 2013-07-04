@@ -25,6 +25,10 @@
 
 CODEC_ENC_HEADER
 
+#if NUM_CORES > 1
+#define WAVPACK_ENC_COP
+#endif
+
 /** Types **/
 typedef struct
 {
@@ -74,13 +78,24 @@ struct wvpk_chunk_data
 /** Data **/
 static int32_t input_buffer[PCM_SAMP_PER_CHUNK*2] IBSS_ATTR;
 
+#ifdef WAVPACK_ENC_COP
+#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+/* Not enough for IRAM */
+static uint8_t output_buffer[PCM_SAMP_PER_CHUNK*PCM_DEPTH_BYTES*2*110/100]
+        SHAREDBSS_ATTR MEM_ALIGN_ATTR;
+#else
+static uint8_t output_buffer[PCM_SAMP_PER_CHUNK*PCM_DEPTH_BYTES*2*110/100]
+        IBSS_ATTR MEM_ALIGN_ATTR;
+#endif
+#endif /* WAVPACK_ENC_COP */
+
 static WavpackConfig config IBSS_ATTR;
-static WavpackContext *wpc;
-static uint32_t sample_rate;
-static int num_channels;
-static uint32_t total_samples;
-static size_t out_reqsize;
-static size_t frame_size;
+static WavpackContext *wpc IBSS_ATTR;
+static uint32_t sample_rate IBSS_ATTR;
+static int num_channels IBSS_ATTR;
+static uint32_t total_samples IBSS_ATTR;
+static size_t out_reqsize IBSS_ATTR;
+static size_t frame_size IBSS_ATTR;
 
 static const WavpackMetadataHeader wvpk_mdh =
 {
@@ -230,6 +245,89 @@ static int on_stream_end(void)
     return 0;
 }
 
+static inline uint32_t encode_block_(uint8_t *outbuf)
+{
+    if (WavpackStartBlock(wpc, outbuf, outbuf + out_reqsize) &&
+        WavpackPackSamples(wpc, input_buffer, PCM_SAMP_PER_CHUNK))
+        return WavpackFinishBlock(wpc);
+
+    return 0;
+}
+
+#ifdef WAVPACK_ENC_COP
+/* This is to relieve CPU of encoder load since it has other significant tasks
+   to perform when recording. It is not written to provide parallelism within
+   the codec. */
+static const char enc_thread_name[] = { "Wavpack enc" };
+static bool quit IBSS_ATTR;
+static uint32_t out_size IBSS_ATTR;
+static struct semaphore enc_sema IBSS_ATTR;
+static struct semaphore cod_sema IBSS_ATTR;
+static unsigned int enc_thread_id;
+
+static void ICODE_ATTR enc_thread(void)
+{
+    while (1)
+    {
+        ci->semaphore_wait(&enc_sema, TIMEOUT_BLOCK);
+
+        if (quit)
+            break;
+
+        out_size = encode_block_(output_buffer);
+
+        ci->semaphore_release(&cod_sema);
+    }
+}
+
+static inline bool enc_thread_init(void *stack, size_t stack_size)
+{
+    quit = false;
+    ci->semaphore_init(&enc_sema, 1, 0);
+    ci->semaphore_init(&cod_sema, 1, 0);
+
+    enc_thread_id = ci->create_thread(enc_thread, stack, stack_size,
+                                      0, enc_thread_name
+                                      IF_PRIO(, PRIORITY_PLAYBACK)
+                                      IF_COP(, COP));
+
+    return enc_thread_id != 0;
+}
+
+static inline void enc_thread_stop(void)
+{
+    quit = true;
+    ci->semaphore_release(&enc_sema);
+    ci->thread_wait(enc_thread_id);
+}
+
+static inline uint32_t encode_block(uint8_t *outbuf)
+{
+    ci->semaphore_release(&enc_sema);
+    ci->semaphore_wait(&cod_sema, TIMEOUT_BLOCK);
+    ci->memcpy(outbuf, output_buffer, out_size);
+    return out_size;
+}
+
+#else /* !WAVPACK_ENC_COP */
+
+static inline uint32_t encode_block(uint8_t *outbuf)
+{
+    return encode_block_(outbuf);
+}
+
+static inline bool enc_thread_init(void *stack, size_t stack_size)
+{
+    return true;
+    (void)stack; (void)stack_size;
+}
+
+static inline void enc_thread_stop(void)
+{
+}
+
+#endif /* WAVPACK_ENC_COP */
+
 /* this is the codec entry point */
 enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
@@ -242,6 +340,13 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
+    /* Encoder thread stack goes on our stack - leave 4k for us
+       Will be optimized away when single-threaded */
+    uint32_t enc_stack[(DEFAULT_STACK_SIZE+0x1000) / sizeof(uint32_t)];
+
+    if (!enc_thread_init(enc_stack, sizeof (enc_stack)))
+        return CODEC_ERROR;
+
     enum { GETBUF_ENC, GETBUF_PCM } getbuf = GETBUF_ENC;
     struct enc_chunk_data *data = NULL;
 
@@ -269,11 +374,12 @@ enum codec_status codec_run(void)
 
         input_buffer_to_int32(frame_size);
 
-        if (WavpackStartBlock(wpc, data->data, data->data + out_reqsize) &&
-            WavpackPackSamples(wpc, input_buffer, PCM_SAMP_PER_CHUNK))
+        uint32_t size = encode_block(data->data);
+
+        if (size)
         {
             /* finish the chunk and store chunk size info */
-            data->hdr.size = WavpackFinishBlock(wpc);
+            data->hdr.size = size;
             data->pcm_count = PCM_SAMP_PER_CHUNK;
         }
         else
@@ -285,6 +391,7 @@ enum codec_status codec_run(void)
         ci->enc_encbuf_finish_buffer();
     }
 
+    enc_thread_stop();
     return CODEC_OK;
 }
 
