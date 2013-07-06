@@ -970,8 +970,10 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+#if CONFIG_CODEC == SWCODEC
     void (*mixer_set_frequency)(unsigned int samplerate);
     unsigned int (*mixer_get_frequency)(void);
+#endif
 };
 
 /* plugin header */
