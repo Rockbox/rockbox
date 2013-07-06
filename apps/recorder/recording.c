@@ -964,8 +964,7 @@ static const char* reclist_get_name(int selected_item, void * data,
 #ifdef HAVE_SPDIF_REC
         case ITEM_SAMPLERATE_D:
             snprintf(buffer, buffer_len, "%s: %lu",
-                     str(LANG_RECORDING_FREQUENCY),
-                     pcm_rec_sample_rate());
+                     str(LANG_FREQUENCY), pcm_rec_sample_rate());
             break;
 #endif
 #endif
