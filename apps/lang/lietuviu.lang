@@ -5694,20 +5694,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FREQUENCY
-  desc: in the recording settings
+  id: LANG_FREQUENCY
+  desc: in recording and playback settings
   user: core
   <source>
     *: none
-    recording: "Frequency"
+    recording,play_frequency: "Frequency"
   </source>
   <dest>
     *: none
-    recording: "Dažnis"
+    recording,play_frequency: "Dažnis"
   </dest>
   <voice>
     *: none
-    recording: "Dažnis"
+    recording,play_frequency: "Dažnis"
   </voice>
 </phrase>
 <phrase>

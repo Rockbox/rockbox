@@ -124,7 +124,7 @@ static int recfrequency_func(void)
         { "24kHz", TALK_ID(24, UNIT_KHZ) },
         { "16kHz", TALK_ID(16, UNIT_KHZ) }
     };
-    return set_option(str(LANG_RECORDING_FREQUENCY),
+    return set_option(str(LANG_FREQUENCY),
                       &global_settings.rec_frequency, INT,
                       names, 6, NULL );
 #endif /* CONFIG_CODEC == MAS3587F */
@@ -191,7 +191,7 @@ static int recfrequency_func(void)
                 table, n_opts, false);
     }
 
-    ret = set_option(str(LANG_RECORDING_FREQUENCY),
+    ret = set_option(str(LANG_FREQUENCY),
                      &rec_frequency, INT, opts, n_opts, NULL );
 
     if (!ret
@@ -209,7 +209,7 @@ static int recfrequency_func(void)
     return ret;
 #endif /* CONFIG_CODEC == SWCODEC */
 } /* recfrequency */
-MENUITEM_FUNCTION(recfrequency, 0, ID2P(LANG_RECORDING_FREQUENCY), 
+MENUITEM_FUNCTION(recfrequency, 0, ID2P(LANG_FREQUENCY),
                     recfrequency_func, NULL, NULL, Icon_Menu_setting);
 
 

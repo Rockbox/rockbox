@@ -5640,20 +5640,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FREQUENCY
-  desc: in the recording settings
+  id: LANG_FREQUENCY
+  desc: in recording and playback settings
   user: core
   <source>
     *: none
-    recording: "Frequency"
+    recording,play_frequency: "Frequency"
   </source>
   <dest>
     *: none
-    recording: "Frécwince"
+    recording,play_frequency: "Frécwince"
   </dest>
   <voice>
     *: none
-    recording: "Frécwince"
+    recording,play_frequency: "Frécwince"
   </voice>
 </phrase>
 <phrase>

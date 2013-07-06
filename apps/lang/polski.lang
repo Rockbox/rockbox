@@ -5646,20 +5646,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FREQUENCY
-  desc: in the recording settings
+  id: LANG_FREQUENCY
+  desc: in recording and playback settings
   user: core
   <source>
     *: none
-    recording: "Frequency"
+    recording,play_frequency: "Frequency"
   </source>
   <dest>
     *: none
-    recording: "Częstotliwość"
+    recording,play_frequency: "Częstotliwość"
   </dest>
   <voice>
     *: none
-    recording: "Częstotliwość"
+    recording,play_frequency: "Częstotliwość"
   </voice>
 </phrase>
 <phrase>

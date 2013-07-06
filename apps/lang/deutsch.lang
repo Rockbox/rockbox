@@ -5639,20 +5639,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FREQUENCY
-  desc: in the recording settings
+  id: LANG_FREQUENCY
+  desc: in recording and playback settings
   user: core
   <source>
     *: none
-    recording: "Frequency"
+    recording,play_frequency: "Frequency"
   </source>
   <dest>
     *: none
-    recording: "Abtastrate"
+    recording,play_frequency: "Abtastrate"
   </dest>
   <voice>
     *: none
-    recording: "Abtastrate"
+    recording,play_frequency: "Abtastrate"
   </voice>
 </phrase>
 <phrase>

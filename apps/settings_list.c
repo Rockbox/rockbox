@@ -808,7 +808,7 @@ const struct settings_list settings[] = {
 #endif
                   ), /* CHOICE_SETTING( repeat_mode ) */
 #ifdef HAVE_PLAY_FREQ
-    STRINGCHOICE_SETTING(0, play_frequency, LANG_PLAYBACK_FREQUENCY, 0,
+    STRINGCHOICE_SETTING(0, play_frequency, LANG_FREQUENCY, 0,
         "playback frequency", "44.1 kHz,48 kHz", NULL, 2,
         TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ)),
 #endif /* HAVE_PLAY_FREQ */
@@ -1338,8 +1338,8 @@ const struct settings_list settings[] = {
 #endif /* DEFAULT_REC_RIGHT_GAIN */
 #if CONFIG_CODEC == MAS3587F
     {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
-        LANG_RECORDING_FREQUENCY, INT(0),
-        "rec frequency","44,48,32,22,24,16", UNUSED},
+        LANG_FREQUENCY, INT(0), "rec frequency",
+        "44,48,32,22,24,16", UNUSED},
     INT_SETTING(F_RECSETTING, rec_quality, LANG_RECORDING_QUALITY, 5,
                 "rec quality", UNIT_INT, 0, 7, 1, NULL, NULL, NULL),
     OFFON_SETTING(F_RECSETTING, rec_editable, LANG_RECORDING_EDITABLE, false,
@@ -1347,7 +1347,7 @@ const struct settings_list settings[] = {
 #endif /* CONFIG_CODEC == MAS3587F */
 #if CONFIG_CODEC == SWCODEC
     {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
-        LANG_RECORDING_FREQUENCY,INT(REC_FREQ_DEFAULT),
+        LANG_FREQUENCY,INT(REC_FREQ_DEFAULT),
         "rec frequency",REC_FREQ_CFG_VAL_LIST,UNUSED},
     {F_T_INT|F_RECSETTING,&global_settings.rec_format,
         LANG_RECORDING_FORMAT,INT(REC_FORMAT_DEFAULT),
