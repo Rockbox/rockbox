@@ -689,6 +689,11 @@ void radio_screen(void)
             case ACTION_NONE:
                 update_type = SKIN_REFRESH_NON_STATIC;
                 break;
+             /* this case is used by the softlock feature
+              * it requests a full update here */
+            case ACTION_REDRAW:
+                skin_request_full_update(FM_SCREEN);
+                break;
 
             default:
                 default_event_handler(button);
