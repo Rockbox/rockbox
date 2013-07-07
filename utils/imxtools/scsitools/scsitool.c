@@ -344,6 +344,40 @@ static int stmp_get_logical_drive_info(uint8_t drive, uint8_t info, void *data, 
     return do_sense_analysis(ret, sense, sense_size);
 }
 
+static int stmp_get_device_info(uint8_t info, void *data, int *len)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_GET_DEVICE_INFO;
+    cdb[2] = info;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
+    if(ret < 0)
+        return ret;
+    return do_sense_analysis(ret, sense, sense_size);
+}
+
+static int stmp_get_serial_number(uint8_t info, void *data, int *len)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_GET_CHIP_SERIAL_NUMBER;
+    cdb[2] = info;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
+    if(ret < 0)
+        return ret;
+    return do_sense_analysis(ret, sense, sense_size);
+}
+
 static const char *stmp_get_logical_media_type_string(uint32_t type)
 {
     switch(type)
@@ -417,10 +451,38 @@ static int do_work(void)
             uint16_t u16;
             uint32_t u32;
             uint64_t u64;
-            uint8_t buf[52];
+            uint8_t buf[1024];
         }u;
 
-        int len = 2;
+        cprintf(GREEN, "  Device\n");
+        int len = 4;
+        ret = stmp_get_device_info(0, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("    Info 0: ", "%lu", (unsigned long)u.u32);
+        }
+
+        len = 4;
+        ret = stmp_get_device_info(1, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("    Info 1: ", "%lu", (unsigned long)u.u32);
+        }
+
+        len = 2;
+        ret = stmp_get_serial_number(0, &u.u16, &len);
+        if(!ret && len == 2)
+        {
+            u.u16 = fix_endian16be(u.u16);
+            len = MIN(u.u16, sizeof(u.buf));
+            ret = stmp_get_serial_number(1, u.buf, &len);
+            cprintf_field("    Serial Number:", " ");
+            print_hex(u.buf, len);
+        }
+
+        len = 2;
         ret = stmp_get_logical_media_info(0, &u.u16, &len);
         if(!ret && len == 2)
         {
