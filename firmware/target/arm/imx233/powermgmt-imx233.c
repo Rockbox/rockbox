@@ -44,19 +44,46 @@ int _battery_voltage(void)
     return BF_RD(POWER_BATTMONITOR, BATT_VAL) * 8;
 }
 
-void powermgmt_init_target(void)
+void imx233_powermgmt_init(void)
 {
     imx233_power_set_charge_current(IMX233_CHARGE_CURRENT);
     imx233_power_set_stop_current(IMX233_STOP_CURRENT);
-#if IMX233_SUBTARGET >= 3780
     /* assume that adc_init was called and battery monitoring via LRADC setup */
     BF_WR(POWER_BATTMONITOR, EN_BATADJ, 1);
+#if IMX233_SUBTARGET >= 3700
+    /* setup linear regulator offsets to 25 mV below to prevent contention between
+     * linear regulators and DCDC */
+    BF_WR(POWER_VDDDCTRL, LINREG_OFFSET, 2);
+    BF_WR(POWER_VDDACTRL, LINREG_OFFSET, 2);
+    BF_WR(POWER_VDDIOCTRL, LINREG_OFFSET, 2);
+    /* enable DCDC (more efficient) */
+    BF_SET(POWER_5VCTRL, ENABLE_DCDC);
+    BF_CLR(POWER_5VCTRL, DCDC_XFER);
+#else
+    BF_SET(POWER_5VCTRL, LINREG_OFFSET);
+    BF_SET(POWER_5VCTRL, EN_DCDC1);
+    BF_SET(POWER_5VCTRL, EN_DCDC2);
+#endif
+
+#if IMX233_SUBTARGET >= 3780
+    /* enable a few bits controlling the DC-DC as recommended by Freescale */
+    BF_SET(POWER_LOOPCTRL, TOGGLE_DIF);
+    BF_SET(POWER_LOOPCTRL, EN_CM_HYST);
+    BF_CLR(POWER_LOOPCTRL, EN_RCSCALE);
+    BF_SETV(POWER_LOOPCTRL, EN_RCSCALE, 1);
+    /* adjust arbitration between 4.2 and battery */
+    BF_WR(POWER_DCDC4P2, CMPTRIP, 0); /* 85% */
+    BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
     /* make sure we are in a known state: disable charger and 4p2 */
     BF_SET(POWER_CHARGE, PWD_BATTCHRG);
     BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 0);
     BF_WR(POWER_DCDC4P2, ENABLE_4P2, 0);
     BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
 #endif
+}
+
+void powermgmt_init_target(void)
+{
     charge_state = DISCHARGING;
 }
 
@@ -106,9 +133,6 @@ void charging_algorithm_step(void)
         {
             logf("pwrmgmt: enable dcdc and charger");
             logf("pwrmgmt: trickle -> charging");
-            /* adjust arbitration between 4.2 and battery */
-            BF_WR(POWER_DCDC4P2, CMPTRIP, 0); /* 85% */
-            BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
             BF_CLR(POWER_5VCTRL, DCDC_XFER);
             BF_SET(POWER_5VCTRL, ENABLE_DCDC);
             /* enable battery charging */

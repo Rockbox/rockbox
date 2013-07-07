@@ -37,7 +37,6 @@ void tick_start(unsigned int interval_in_ms)
         false, &tick_timer);
 }
 
-
 void arbiter_init(struct channel_arbiter_t *a, unsigned count)
 {
     mutex_init(&a->mutex);

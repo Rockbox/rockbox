@@ -43,6 +43,7 @@
 #include "backlight-target.h"
 #include "button.h"
 #include "fmradio_i2c.h"
+#include "powermgmt.h"
 
 void imx233_chip_reset(void)
 {
@@ -132,6 +133,7 @@ void system_init(void)
     imx233_lradc_init();
     imx233_power_init();
     imx233_i2c_init();
+    imx233_powermgmt_init();
 
     /* make sure auto-slow is disable now, we don't know at which frequency we
      * are running and auto-slow could violate constraints on {xbus,hbus} */

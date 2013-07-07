@@ -146,27 +146,6 @@ void imx233_power_init(void)
     BF_SET(POWER_CTRL, ENIRQ_VDD5V_GT_VDDIO);
 #endif
     imx233_icoll_enable_interrupt(INT_SRC_VDD5V, true);
-    /* setup linear regulator offsets to 25 mV below to prevent contention between
-     * linear regulators and DCDC */
-#if IMX233_SUBTARGET >= 3700
-    BF_WR(POWER_VDDDCTRL, LINREG_OFFSET, 2);
-    BF_WR(POWER_VDDACTRL, LINREG_OFFSET, 2);
-    BF_WR(POWER_VDDIOCTRL, LINREG_OFFSET, 2);
-    /* enable DCDC (more efficient) */
-    BF_SET(POWER_5VCTRL, ENABLE_DCDC);
-#else
-    BF_SET(POWER_5VCTRL, LINREG_OFFSET);
-    BF_SET(POWER_5VCTRL, EN_DCDC1);
-    BF_SET(POWER_5VCTRL, EN_DCDC2);
-#endif
-
-#if IMX233_SUBTARGET >= 3780
-    /* enable a few bits controlling the DC-DC as recommended by Freescale */
-    BF_SET(POWER_LOOPCTRL, TOGGLE_DIF);
-    BF_SET(POWER_LOOPCTRL, EN_CM_HYST);
-    BF_CLR(POWER_LOOPCTRL, EN_RCSCALE);
-    BF_SETV(POWER_LOOPCTRL, EN_RCSCALE, 1);
-#endif
 }
 
 void power_init(void)
