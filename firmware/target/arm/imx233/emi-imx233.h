@@ -30,6 +30,16 @@
 
 #define HW_DRAM_CTLxx(xx) (*(&HW_DRAM_CTL00 + (xx)))
 
+struct imx233_emi_info_t
+{
+    int cas; // 1/2 cycle unit
+    int rows;
+    int columns;
+    int banks;
+    int chips;
+    int size;
+};
+
 /**
  * Absolute maximum EMI speed:  151.58 MHz (mDDR),  130.91 MHz (DDR)
  * Intermediate EMI speeds: 130.91 MHz,  120.00 MHz, 64 MHz, 24 MHz
@@ -41,5 +51,6 @@
 #define IMX233_EMIFREQ_24_MHz    24000
 
 void imx233_emi_set_frequency(unsigned long freq);
+struct imx233_emi_info_t imx233_emi_get_info(void);
 
 #endif /* __EMI_IMX233_H__ */

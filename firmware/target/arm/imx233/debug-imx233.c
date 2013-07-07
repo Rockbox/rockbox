@@ -34,6 +34,7 @@
 #include "pinctrl-imx233.h"
 #include "ocotp-imx233.h"
 #include "pwm-imx233.h"
+#include "emi-imx233.h"
 #include "string.h"
 #include "stdio.h"
 
@@ -732,12 +733,48 @@ bool dbg_hw_info_usb(void)
     }
 }
 
+bool dbg_hw_info_emi(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = get_action(CONTEXT_STD, HZ / 10);
+        switch(button)
+        {
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
+            case ACTION_STD_OK:
+            case ACTION_STD_MENU:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACTION_STD_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        struct imx233_emi_info_t info = imx233_emi_get_info();
+        int line = 0;
+        lcd_putsf(0, line++, "EMI");
+        lcd_putsf(0, line++, "rows: %d", info.rows);
+        lcd_putsf(0, line++, "columns: %d", info.columns);
+        lcd_putsf(0, line++, "banks: %d", info.banks);
+        lcd_putsf(0, line++, "chips: %d", info.chips);
+        lcd_putsf(0, line++, "size: %d MiB", info.size / 1024 / 1024);
+        lcd_putsf(0, line++, "cas: %d.%d", info.cas / 2, 5 * (info.cas % 2));
+
+        lcd_update();
+        yield();
+    }
+}
+
 bool dbg_hw_info(void)
 {
     return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() &&
         dbg_hw_info_power() && dbg_hw_info_powermgmt() && dbg_hw_info_rtc() &&
         dbg_hw_info_dcp() && dbg_hw_info_pinctrl() && dbg_hw_info_icoll() &&
-        dbg_hw_info_ocotp() && dbg_hw_info_pwm() && dbg_hw_info_usb() &&
+        dbg_hw_info_ocotp() && dbg_hw_info_pwm() && dbg_hw_info_usb() && dbg_hw_info_emi() &&
         dbg_hw_target_info();
 }
 
