@@ -11,6 +11,7 @@ SECTIONS
 {
     .text 0 :
     {
+        *(.start*)
         *(.text*)
     } > OCRAM
 }

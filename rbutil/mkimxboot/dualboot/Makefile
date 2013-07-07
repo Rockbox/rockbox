@@ -1,33 +1,38 @@
 CC=gcc
-CROSS_PREFIX=arm-elf-eabi
-# Edit the following variables (plus copy/paste another set of rules) when
-# adding a new target.  mkimxboot.c also needs to be edited to refer to these
-# new images.
+LD=ld
+OC=objcopy
+CROSS_PREFIX=arm-elf-eabi-
+REGS_PATH=../../../firmware/target/arm/imx233/regs
+CFLAGS=-mcpu=arm926ej-s -std=gnu99 -I. -I$(REGS_PATH) -nostdlib -ffreestanding -fomit-frame-pointer -O
+# Edit the following variables when adding a new target.
+# mkimxboot.c also needs to be edited to refer to these
+# To add a new target x you need to:
+# 1) add x to the list in TARGETS
+# 2) create a variable named OPT_x of the form:
+#    OPT_x=target specific defines
+TARGETS=fuzeplus zenxfi2 zenxfi3
+OPT_fuzeplus=-DSANSA_FUZEPLUS -DIMX233_SUBTARGET=3780
+OPT_zenxfi2=-DCREATIVE_ZENXFI2 -DIMX233_SUBTARGET=3780
+OPT_zenxfi3=-DCREATIVE_ZENXFI3 -DIMX233_SUBTARGET=3780
 
-BOOTOBJS = dualboot_fuzeplus.o dualboot_zenxfi2.o dualboot_zenxfi3.o
-BOOTBINS = dualboot_fuzeplus.arm-bin dualboot_zenxfi2.arm-bin dualboot_zenxfi3.arm-bin
+BOOTOBJS=$(patsubst %, dualboot_%.o, $(TARGETS))
+BOOTBINS=$(patsubst %, dualboot_%.arm-bin, $(TARGETS))
 
 all: ../dualboot.h ../dualboot.c
 
 # Dualboot bootloaders
 
-dualboot_fuzeplus.o: dualboot.S
-	$(CROSS_PREFIX)-$(CC) -mcpu=arm926ej-s -DSANSA_FUZEPLUS -c -o dualboot_fuzeplus.o dualboot.S
+dualboot_%.o: dualboot.c
+	$(CROSS_PREFIX)$(CC) $(CFLAGS) $(OPT_$(@:dualboot_%.o=%)) -c -o $@ $^
 
-dualboot_zenxfi2.o: dualboot.S
-	$(CROSS_PREFIX)-$(CC) -mcpu=arm926ej-s -DCREATIVE_ZENXFI2 -c -o dualboot_zenxfi2.o dualboot.S
-
-dualboot_zenxfi3.o: dualboot.S
-	$(CROSS_PREFIX)-$(CC) -mcpu=arm926ej-s -DCREATIVE_ZENXFI3 -c -o dualboot_zenxfi3.o dualboot.S
+dualboot_%.arm-elf: dualboot_%.o
+	$(CROSS_PREFIX)$(LD) $(LDFLAGS) -Tdualboot.lds -o $@ $<
 
 # Rules for the ARM code embedded in mkamsboot - assemble, link, then extract
 # the binary code and finally convert to .h for building in mkamsboot
 
-%.arm-elf: %.o
-	$(CROSS_PREFIX)-ld -Tdualboot.lds -o $@ $<
-
 %.arm-bin: %.arm-elf
-	$(CROSS_PREFIX)-objcopy -O binary $< $@
+	$(CROSS_PREFIX)$(OC) -O binary $< $@
 
 ../dualboot.c ../dualboot.h: $(BOOTBINS) bin2c
 	./bin2c ../dualboot $(BOOTBINS)
