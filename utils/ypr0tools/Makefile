@@ -1,13 +1,20 @@
+DEFINES=
+CC=gcc
+LD=gcc
+CFLAGS=-g -std=c99 -W -Wall $(DEFINES)
+LDFLAGS=
+BINS=fwcrypt fwdecrypt
 
-.PHONY: all clean
-PROGS = extract_section
-CC = gcc
-CFLAGS = -O1 -g -W -Wall
+all: $(BINS)
 
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-all: $(PROGS)
-	$(MAKE) -C cramfs-1.1
+fwdecrypt: fwdecrypt.o common.o ../../tools/fwpatcher/md5.o
+	$(LD) -o $@ $^ $(LDFLAGS)
+
+fwcrypt: fwcrypt.o common.o ../../tools/fwpatcher/md5.o
+	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:
-	$(MAKE) -C cramfs-1.1 clean
-	rm -f extract_section
+	rm -fr *.o $(BINS)
