@@ -1623,6 +1623,8 @@ static void on_record_stop(void)
     if (record_state == REC_STATE_IDLE)
         return;
 
+    trigger_cpu_boost();
+
     /* Drain encoder and PCM buffers */
     pcm_pause = true;
     finish_stream(true);
