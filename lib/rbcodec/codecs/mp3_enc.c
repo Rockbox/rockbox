@@ -2838,21 +2838,8 @@ static struct semaphore enc_sema IBSS_ATTR;
 static struct semaphore cod_sema IBSS_ATTR;
 static unsigned int enc_thread_id;
 
-/* Needs two extra loops to drain sb_data_buf.
- * Progress at state:
- *    |F|F|F|
- *|1|2|           : fill 1
- *  |2|1|         : fill 2, get 1
- *    |1|2|       : fill 1, get 2
- *      |2|1|     : fill 2, get 1
- *        |1|2|   : get 2
- *          |2|1| : get 1
- * Loops = Fcount + 2
- *
- * Case of Fcount==1, which would otherwise fail, never happens due to
- * padding frames.
- */
-#define DRAIN_FRAMES 2
+/* Needs one extra loop to drain sb_data_buf */
+#define DRAIN_FRAMES 1
 
 static void enc_thread(void)
 {
@@ -2894,7 +2881,7 @@ static bool enc_thread_init(void *stack, size_t stack_size)
     (void)stack; (void)stack_size;
 }
 
-static inline void enc_thread_sb_data_ready(void)
+static inline void enc_thread_compress_frame(void)
 {
 #ifdef MP3_ENC_COP
     sb_data_buf_swap();
@@ -2925,7 +2912,7 @@ static inline bool wait_for_frame(void)
     {
         /* Fill subband data buffer before getting frame from COP */
         enc_status = ENC_SB_FULL;
-        enc_thread_sb_data_ready();
+        enc_thread_compress_frame();
         return false;
     }
 #endif /* MP3_ENC_COP */
@@ -2935,9 +2922,7 @@ static inline bool wait_for_frame(void)
 
 static inline size_t get_frame(uint8_t *buffer)
 {
-    size_t size = mp3_enc_get_frame(buffer);
-    enc_thread_sb_data_ready();
-    return size;
+    return mp3_enc_get_frame(buffer);
 }
 
 /* this is the codec entry point */
@@ -2971,7 +2956,7 @@ enum codec_status codec_run(void)
     struct enc_chunk_data *data = NULL;
 
     /* main encoding loop */
-    while (frames_rem)
+    while (1)
     {
         intptr_t param;
         enum codec_command_action action = ci->get_command(&param);
@@ -3012,7 +2997,7 @@ enum codec_status codec_run(void)
             /* else Draining remaining buffered data */
 
             if (!wait_for_frame()) /* MT only */
-                continue;
+                break;
 
             getbuf = GETBUF_ENC;
         case GETBUF_ENC:
@@ -3024,12 +3009,18 @@ enum codec_status codec_run(void)
             data->hdr.aux0 = first;
             first = 0;
             data->hdr.size = get_frame(data->data);
-            data->pcm_count = cfg.samp_per_frame;
 
+            if (frames_rem)
+                enc_thread_compress_frame(); /* MT only */
+
+            data->pcm_count = cfg.samp_per_frame;
             ci->enc_encbuf_finish_buffer();
 
             getbuf = GETBUF_PCM;
         }
+
+        if (!frames_rem)
+            break;
     } /* while */
 
     enc_thread_stop(); /* MT only */
