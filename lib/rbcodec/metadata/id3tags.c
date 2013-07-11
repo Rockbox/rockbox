@@ -355,7 +355,8 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
         /* fixup offset&size for image data */
         entry->albumart.pos  += tag - start;
         entry->albumart.size -= tag - start;
-        entry->has_embedded_albumart = true;
+        /* check for malformed tag with no picture data */
+        entry->has_embedded_albumart = (entry->albumart.size != 0);
     }
     /* return bufferpos as we didn't store anything in id3v2buf */
     return bufferpos;
