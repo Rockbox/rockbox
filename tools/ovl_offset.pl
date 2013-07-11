@@ -19,7 +19,7 @@ sub map_scan {
         elsif ($_ =~ / +0x([0-9a-f]+) +_?plugin_start_addr = ./) {
             $startaddr = hex($1);
         }
-        elsif ($_ =~ / +0x([0-9a-f]+) +_?plugin_end_addr = ./) {
+        elsif ($_ =~ / +0x([0-9a-f]+) +_?plugin_load_end_addr = ./) {
             $endaddr = hex($1);
         }
     }

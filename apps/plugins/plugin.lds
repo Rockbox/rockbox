@@ -247,35 +247,38 @@ SECTIONS
     {
         *(.rodata*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-		*(.irodata)
+        *(.irodata)
 #endif
-        . = ALIGN(0x4);
     } > PLUGIN_RAM
 
     .data :
     {
         *(.data*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-		*(.idata)
+        *(.idata)
 #endif
     } > PLUGIN_RAM
-
+    
 #if NOCACHE_BASE != 0
     .ncdata . + NOCACHE_BASE :
     {
         . = ALIGN(CACHEALIGN_SIZE);
         *(.ncdata*)
         . = ALIGN(CACHEALIGN_SIZE);
-/* EABI currently needs iramcopy defined here, otherwise .iram can sometimes
-   have an incorrect load address, breaking codecs. */
-#if defined(IRAMSIZE)
+/* EABI currently needs these defined here, otherwise .iram and .bss can
+   sometimes have an incorrect load address, breaking codecs and plugins. */
+        bssaddr = . - NOCACHE_BASE; 
+#if defined(IRAMSIZE) && IRAMSIZE != 0
         iramcopy = . - NOCACHE_BASE;
 #endif
     } AT> PLUGIN_RAM
 /* This definition is used when NOCACHE_BASE is 0. The address offset bug only
    seems to occur when the empty .ncdata is present. */
-#elif defined(IRAMSIZE)
+#else
+    bssaddr = .;
+#if defined(IRAMSIZE) && IRAMSIZE != 0
     iramcopy = .;
+#endif
 #endif
 
     /DISCARD/ :
@@ -286,33 +289,13 @@ SECTIONS
 #endif
     }
 
-#if defined(IRAMSIZE) && IRAMSIZE != 0
-    .iram IRAMORIG : AT ( iramcopy)
-    {
-        iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
-        iramend = .;
-    } > PLUGIN_IRAM
-
-
-    .ibss (NOLOAD) :
-    {
-        iedata = .;
-        *(.ibss)
-        . = ALIGN(0x4);
-        iend = .;
-    } > PLUGIN_IRAM
-#endif
-
-    .bss (NOLOAD) :
+    .bss bssaddr (NOLOAD) :
     {
     	plugin_bss_start = .;
     	_plugin_bss_start = .;
         *(.bss*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-		*(.ibss)
+        *(.ibss)
 #endif
         *(COMMON)
         . = ALIGN(0x4);
@@ -324,14 +307,52 @@ SECTIONS
     	. = ALIGN(CACHEALIGN_SIZE);
     	*(.ncbss*)
         . = ALIGN(CACHEALIGN_SIZE);
+        /* We won't trust this one any more than with .ncdata */
+        pluginendaddr = . - NOCACHE_BASE;
     } AT> PLUGIN_RAM
+#else
+    pluginendaddr = .;
 #endif
 
-    /* Restore . */
-    .pluginend . - NOCACHE_BASE :
+    /* Final end of plugin after IRAM setup. The plugin or codec buffer
+       is considered unused by the in-RAM image at this point once IRAM
+       is copied. */
+    .pluginend pluginendaddr :
     {
         _plugin_end_addr = .;
         plugin_end_addr = .;
+    }
+
+#if defined(IRAMSIZE) && IRAMSIZE != 0
+    .iram IRAMORIG : AT (iramcopy)
+    {
+        iramstart = .;
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        iramend = .;
+    } > PLUGIN_IRAM
+
+    .ibss (NOLOAD) :
+    {
+        iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        iend = .;
+    } > PLUGIN_IRAM
+    
+    loadendaddr = MAX(plugin_end_addr, LOADADDR(.iram) + SIZEOF(.iram));
+#else
+    loadendaddr = plugin_end_addr;
+#endif
+
+    /* This is for ovl_offset.pl and is the highest address that must
+       be loaded into the plugin buffer (past the end of last data in
+       stored image). */
+    .pluginloadend loadendaddr :
+    {
+    	_plugin_load_end_addr = .;
+    	plugin_load_end_addr = .;
     }
 
     /* Special trick to avoid a linker error when no other sections are
