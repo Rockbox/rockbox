@@ -247,15 +247,16 @@ SECTIONS
     {
         *(.rodata*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-        *(.irodata)
+		*(.irodata)
 #endif
+        . = ALIGN(0x4);
     } > PLUGIN_RAM
 
     .data :
     {
         *(.data*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-        *(.idata)
+		*(.idata)
 #endif
     } > PLUGIN_RAM
 
@@ -265,11 +266,15 @@ SECTIONS
         . = ALIGN(CACHEALIGN_SIZE);
         *(.ncdata*)
         . = ALIGN(CACHEALIGN_SIZE);
-    } AT> PLUGIN_RAM
-    . -= NOCACHE_BASE;
+/* EABI currently needs iramcopy defined here, otherwise .iram can sometimes
+   have an incorrect load address, breaking codecs. */
+#if defined(IRAMSIZE)
+        iramcopy = . - NOCACHE_BASE;
 #endif
-
-#if defined(IRAMSIZE) && IRAMSIZE != 0
+    } AT> PLUGIN_RAM
+/* This definition is used when NOCACHE_BASE is 0. The address offset bug only
+   seems to occur when the empty .ncdata is present. */
+#elif defined(IRAMSIZE)
     iramcopy = .;
 #endif
 
@@ -281,13 +286,33 @@ SECTIONS
 #endif
     }
 
-    .bss . (NOLOAD) :
+#if defined(IRAMSIZE) && IRAMSIZE != 0
+    .iram IRAMORIG : AT ( iramcopy)
+    {
+        iramstart = .;
+        *(.icode)
+        *(.irodata)
+        *(.idata)
+        iramend = .;
+    } > PLUGIN_IRAM
+
+
+    .ibss (NOLOAD) :
+    {
+        iedata = .;
+        *(.ibss)
+        . = ALIGN(0x4);
+        iend = .;
+    } > PLUGIN_IRAM
+#endif
+
+    .bss (NOLOAD) :
     {
     	plugin_bss_start = .;
     	_plugin_bss_start = .;
         *(.bss*)
 #if defined(IRAMSIZE) && IRAMSIZE == 0
-        *(.ibss)
+		*(.ibss)
 #endif
         *(COMMON)
         . = ALIGN(0x4);
@@ -300,34 +325,14 @@ SECTIONS
     	*(.ncbss*)
         . = ALIGN(CACHEALIGN_SIZE);
     } AT> PLUGIN_RAM
-    . -= NOCACHE_BASE;
 #endif
 
-    /* Final end of plugin after IRAM setup */
-    .pluginend :
+    /* Restore . */
+    .pluginend . - NOCACHE_BASE :
     {
         _plugin_end_addr = .;
         plugin_end_addr = .;
     }
-
-#if defined(IRAMSIZE) && IRAMSIZE != 0
-    .iram IRAMORIG : AT (iramcopy)
-    {
-        iramstart = .;
-        *(.icode)
-        *(.irodata)
-        *(.idata)
-        iramend = .;
-    } > PLUGIN_IRAM
-
-    .ibss (NOLOAD) :
-    {
-        iedata = .;
-        *(.ibss)
-        . = ALIGN(0x4);
-        iend = .;
-    } > PLUGIN_IRAM
-#endif
 
     /* Special trick to avoid a linker error when no other sections are
        left after garbage collection (plugin not for this platform) */
