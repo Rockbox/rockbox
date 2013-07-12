@@ -58,7 +58,7 @@ int playback_claim_aa_slot(struct dim *dim);
 
 /*
  * Releases the albumart slot with given id
- * 
+ *
  * Save to call from other threads */
 void playback_release_aa_slot(int slot);
 

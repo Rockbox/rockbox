@@ -140,7 +140,7 @@ static void write_cache(void)
     fd = open(scrobbler_file, O_WRONLY | O_APPEND);
     if(fd >= 0)
     {
-        logf("SCROBBLER: writing %d entries", cache_pos); 
+        logf("SCROBBLER: writing %d entries", cache_pos);
         /* copy data to temporary storage in case data moves during I/O */
         char temp_buf[SCROBBLER_CACHE_LEN];
         for ( i=0; i < cache_pos; i++ )

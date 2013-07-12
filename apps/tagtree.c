@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-/** 
+/**
  * Basic structure on this file was copied from dbtree.c and modified to
  * support the tag cache interface.
  */
@@ -117,13 +117,13 @@ static bool sort_inverse;
 
 /*
  * "%3d. %s" autoscore title %sort = "inverse" %limit = "100"
- * 
+ *
  * valid = true
  * formatstr = "%-3d. %s"
  * tags[0] = tag_autoscore
  * tags[1] = tag_title
  * tag_count = 2
- * 
+ *
  * limit = 100
  * sort_inverse = true
  */
@@ -135,7 +135,7 @@ struct display_format {
     int group_id;
     int tags[MAX_TAGS];
     int tag_count;
-    
+
     int limit;
     int strip;
     bool sort_inverse;
@@ -288,17 +288,17 @@ static int get_token_str(char *buf, int size)
 
     if (*strp == '\0' || *(++strp) == '\0')
         return -1;
-    
+
     /* Read the data. */
     while (*strp != '"' && *strp != '\0' && --size > 0)
         *(buf++) = *(strp++);
-    
+
     *buf = '\0';
     if (*strp != '"')
         return -2;
-    
+
     strp++;
-    
+
     return 0;
 }
 
@@ -345,11 +345,11 @@ static int get_tag(int *tag)
     };
     char buf[128];
     unsigned int i;
-    
+
     /* Find the start. */
     while ((*strp == ' ' || *strp == '>') && *strp != '\0')
         strp++;
-    
+
     if (*strp == '\0' || *strp == '?')
         return 0;
 
@@ -433,16 +433,16 @@ static bool read_clause(struct tagcache_search_clause *clause)
 {
     char buf[SEARCHSTR_SIZE];
     unsigned int i;
-    
+
     if (get_tag(&clause->tag) <= 0)
         return false;
-    
+
     if (get_clause(&clause->type) <= 0)
         return false;
-    
+
     if (get_token_str(buf, sizeof buf) < 0)
         return false;
-       
+
     for (i=0; i<ARRAYLEN(id3_to_search_mapping); i++)
     {
         if (!strcasecmp(buf, id3_to_search_mapping[i].string))
@@ -453,13 +453,13 @@ static bool read_clause(struct tagcache_search_clause *clause)
     {
         clause->source = source_runtime+i;
         clause->str = tagtree_alloc(SEARCHSTR_SIZE);
-    }    
-    else 
+    }
+    else
     {
         clause->source = source_constant;
         clause->str = tagtree_strdup(buf);
-    }    
-    
+    }
+
     if (TAGCACHE_IS_NUMERIC(clause->tag))
     {
         clause->numeric = true;
@@ -468,24 +468,24 @@ static bool read_clause(struct tagcache_search_clause *clause)
     else
         clause->numeric = false;
 
-    logf("got clause: %d/%d [%s]", clause->tag, clause->type, clause->str);   
-    
+    logf("got clause: %d/%d [%s]", clause->tag, clause->type, clause->str);
+
     return true;
 }
 
 static bool read_variable(char *buf, int size)
 {
     int condition;
-    
+
     if (!get_clause(&condition))
         return false;
-    
+
     if (condition != clause_is)
         return false;
-    
+
     if (get_token_str(buf, size) < 0)
         return false;
-    
+
     return true;
 }
 
@@ -495,12 +495,12 @@ static int get_format_str(struct display_format *fmt)
     int ret;
     char buf[128];
     int i;
-    
+
     memset(fmt, 0, sizeof(struct display_format));
-    
+
     if (get_token_str(fmt->name, sizeof fmt->name) < 0)
         return -10;
-    
+
     /* Determine the group id */
     fmt->group_id = 0;
     for (i = 0; i < format_count; i++)
@@ -510,30 +510,30 @@ static int get_format_str(struct display_format *fmt)
             fmt->group_id = formats[i]->group_id;
             break;
         }
-        
+
         if (formats[i]->group_id > fmt->group_id)
             fmt->group_id = formats[i]->group_id;
     }
-    
+
     if (i == format_count)
         fmt->group_id++;
-    
+
     logf("format: (%d) %s", fmt->group_id, fmt->name);
-    
+
     if (get_token_str(buf, sizeof buf) < 0)
         return -10;
-    
+
     fmt->formatstr = tagtree_strdup(buf);
-    
+
     while (fmt->tag_count < MAX_TAGS)
     {
         ret = get_tag(&fmt->tags[fmt->tag_count]);
         if (ret < 0)
             return -11;
-        
+
         if (ret == 0)
             break;
-        
+
         switch (fmt->tags[fmt->tag_count]) {
         case var_sorttype:
             if (!read_variable(buf, sizeof buf))
@@ -541,24 +541,24 @@ static int get_format_str(struct display_format *fmt)
             if (!strcasecmp("inverse", buf))
                 fmt->sort_inverse = true;
             break;
-            
+
         case var_limit:
             if (!read_variable(buf, sizeof buf))
                 return -13;
             fmt->limit = atoi(buf);
             break;
-            
+
         case var_strip:
             if (!read_variable(buf, sizeof buf))
                 return -14;
             fmt->strip = atoi(buf);
             break;
-            
+
         default:
             fmt->tag_count++;
         }
     }
-    
+
     return 1;
 }
 
@@ -571,17 +571,17 @@ static int add_format(const char *buf)
     }
 
     strp = buf;
-    
+
     if (formats[format_count] == NULL)
         formats[format_count] = tagtree_alloc0(sizeof(struct display_format));
-    
+
     if (get_format_str(formats[format_count]) < 0)
     {
         logf("get_format_str() parser failed!");
         memset(formats[format_count], 0, sizeof(struct display_format));
         return -4;
     }
-    
+
     while (*strp != '\0' && *strp != '?')
         strp++;
 
@@ -594,28 +594,28 @@ static int add_format(const char *buf)
         while (1)
         {
             struct tagcache_search_clause *newclause;
-            
+
             if (clause_count >= TAGCACHE_MAX_CLAUSES)
             {
                 logf("too many clauses");
                 break;
             }
-            
+
             newclause = tagtree_alloc(sizeof(struct tagcache_search_clause));
-            
+
             formats[format_count]->clause[clause_count] = newclause;
             if (!read_clause(newclause))
                 break;
-            
+
             clause_count++;
         }
         tagtree_unlock();
-        
+
         formats[format_count]->clause_count = clause_count;
     }
-    
+
     format_count++;
-    
+
     return 1;
 }
 
@@ -624,28 +624,28 @@ static int get_condition(struct search_instruction *inst)
     struct tagcache_search_clause *new_clause;
     int clause_count;
     char buf[128];
-        
+
     switch (*strp)
     {
         case '=':
         {
             int i;
-            
+
             if (get_token_str(buf, sizeof buf) < 0)
                 return -1;
-            
+
             for (i = 0; i < format_count; i++)
             {
                 if (!strcasecmp(formats[i]->name, buf))
                     break;
             }
-            
+
             if (i == format_count)
             {
                 logf("format not found: %s", buf);
                 return -2;
             }
-            
+
             inst->format_id[inst->tagorder_count] = formats[i]->group_id;
             return 1;
         }
@@ -665,10 +665,10 @@ static int get_condition(struct search_instruction *inst)
         logf("Too many clauses");
         return false;
     }
-    
+
     new_clause = tagtree_alloc(sizeof(struct tagcache_search_clause));
     inst->clause[inst->tagorder_count][clause_count] = new_clause;
-    
+
     if (*strp == '|')
     {
         strp++;
@@ -683,7 +683,7 @@ static int get_condition(struct search_instruction *inst)
             return -1;
     }
     inst->clause_count[inst->tagorder_count]++;
-    
+
     return 1;
 }
 
@@ -702,25 +702,25 @@ static bool parse_search(struct menu_entry *entry, const char *str)
     struct search_instruction *inst = &entry->si;
     char buf[MAX_PATH];
     int i;
-    
+
     strp = str;
-    
+
     /* Parse entry name */
     if (get_token_str(entry->name, sizeof entry->name) < 0)
     {
         logf("No name found.");
         return false;
     }
-    
+
     /* Parse entry type */
     if (get_tag(&entry->type) <= 0)
         return false;
-    
+
     if (entry->type == menu_load)
     {
         if (get_token_str(buf, sizeof buf) < 0)
             return false;
-        
+
         /* Find the matching root menu or "create" it */
         for (i = 0; i < menu_count; i++)
         {
@@ -730,38 +730,38 @@ static bool parse_search(struct menu_entry *entry, const char *str)
                 return true;
             }
         }
-        
+
         if (menu_count >= TAGMENU_MAX_MENUS)
         {
             logf("max menucount reached");
             return false;
         }
-        
+
         /* Allocate a new menu unless link is found. */
         menus[menu_count] = tagtree_alloc0(sizeof(struct menu_root));
         strlcpy(menus[menu_count]->id, buf, MAX_MENU_ID_SIZE);
         entry->link = menu_count;
         ++menu_count;
-        
+
         return true;
     }
-    
+
     if (entry->type != menu_next)
         return false;
-    
+
     while (inst->tagorder_count < MAX_TAGS)
     {
         ret = get_tag(&inst->tagorder[inst->tagorder_count]);
-        if (ret < 0) 
+        if (ret < 0)
         {
             logf("Parse error #1");
             logf("%s", strp);
             return false;
         }
-        
+
         if (ret == 0)
             break ;
-        
+
         logf("tag: %d", inst->tagorder[inst->tagorder_count]);
 
         tagtree_lock();
@@ -772,11 +772,11 @@ static bool parse_search(struct menu_entry *entry, const char *str)
             return false;
 
         inst->tagorder_count++;
-        
+
         if (get_tag(&type) <= 0 || type != menu_next)
             break;
     }
-    
+
     return true;
 }
 
@@ -787,7 +787,7 @@ static int compare(const void *p1, const void *p2)
 
     if (sort_inverse)
         return strncasecmp(e2->name, e1->name, MAX_PATH);
-    
+
     return strncasecmp(e1->name, e2->name, MAX_PATH);
 }
 
@@ -795,13 +795,13 @@ static void tagtree_buffer_event(void *data)
 {
     struct tagcache_search tcs;
     struct mp3entry *id3 = (struct mp3entry*)data;
-    
+
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb && !global_settings.autoresume_enable)
         return;
 
     logf("be:%s", id3->path);
-    
+
     while (! tagcache_is_fully_initialized())
         yield();
 
@@ -810,7 +810,7 @@ static void tagtree_buffer_event(void *data)
         logf("tc stat: not found: %s", id3->path);
         return;
     }
-    
+
     if (global_settings.runtimedb)
     {
         id3->playcount  = tagcache_get_numeric(&tcs, tag_playcount);
@@ -819,11 +819,11 @@ static void tagtree_buffer_event(void *data)
         id3->lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
         id3->score      = tagcache_get_numeric(&tcs, tag_virt_autoscore) / 10;
         id3->playtime   = tagcache_get_numeric(&tcs, tag_playtime);
-        
+
         logf("-> %ld/%ld", id3->playcount, id3->playtime);
     }
- 
- #if CONFIG_CODEC == SWCODEC   
+
+ #if CONFIG_CODEC == SWCODEC
     if (global_settings.autoresume_enable)
     {
         /* Load current file resume offset if not already defined (by
@@ -832,15 +832,15 @@ static void tagtree_buffer_event(void *data)
         {
             id3->offset = tagcache_get_numeric(&tcs, tag_lastoffset);
 
-            logf("tagtree_buffer_event: Set offset for %s to %lX\n", 
+            logf("tagtree_buffer_event: Set offset for %s to %lX\n",
                  str_or_empty(id3->title), id3->offset);
         }
     }
  #endif
- 
+
     /* Store our tagcache index pointer. */
     id3->tagcache_idx = tcs.idx_id+1;
-    
+
     tagcache_search_finish(&tcs);
 }
 
@@ -849,14 +849,14 @@ static void tagtree_track_finish_event(void *data)
     long lastplayed;
     long tagcache_idx;
     struct mp3entry *id3 = (struct mp3entry*)data;
-    
+
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb && !global_settings.autoresume_enable)
     {
         logf("runtimedb gathering and autoresume not enabled");
         return;
     }
-    
+
     tagcache_idx=id3->tagcache_idx;
     if (!tagcache_idx)
     {
@@ -864,7 +864,7 @@ static void tagtree_track_finish_event(void *data)
         return;
     }
     tagcache_idx--;
-    
+
     /* Don't process unplayed tracks, or tracks interrupted within the
        first 15 seconds. */
     if (id3->elapsed == 0
@@ -876,24 +876,24 @@ static void tagtree_track_finish_event(void *data)
         logf("not logging unplayed or skipped track");
         return;
     }
-    
+
     lastplayed = tagcache_increase_serial();
     if (lastplayed < 0)
     {
         logf("incorrect tc serial:%ld", lastplayed);
         return;
     }
-    
+
     if (global_settings.runtimedb)
     {
         long playcount;
         long playtime;
 
         playcount = id3->playcount + 1;
-        
+
         /* Ignore the last 15s (crossfade etc.) */
         playtime = id3->playtime + MIN(id3->length, id3->elapsed + 15 * 1000);
-        
+
         logf("ube:%s", id3->path);
         logf("-> %ld/%ld", playcount, playtime);
         logf("-> %ld/%ld/%ld", id3->elapsed, id3->length,
@@ -905,7 +905,7 @@ static void tagtree_track_finish_event(void *data)
         tagcache_update_numeric(tagcache_idx, tag_lastplayed, lastplayed);
     }
 
-#if CONFIG_CODEC == SWCODEC 
+#if CONFIG_CODEC == SWCODEC
     if (global_settings.autoresume_enable)
     {
         unsigned long offset
@@ -913,7 +913,7 @@ static void tagtree_track_finish_event(void *data)
 
         tagcache_update_numeric(tagcache_idx, tag_lastoffset, offset);
 
-        logf("tagtree_track_finish_event: Save offset for %s: %lX",  
+        logf("tagtree_track_finish_event: Save offset for %s: %lX",
              str_or_empty(id3->title), offset);
     }
 #endif
@@ -922,13 +922,13 @@ static void tagtree_track_finish_event(void *data)
 bool tagtree_export(void)
 {
     struct tagcache_search tcs;
-    
+
     splash(0, str(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
         splash(HZ*2, ID2P(LANG_FAILED));
     }
-    
+
     return false;
 }
 
@@ -939,7 +939,7 @@ bool tagtree_import(void)
     {
         splash(HZ*2, ID2P(LANG_FAILED));
     }
-    
+
     return false;
 }
 
@@ -952,16 +952,16 @@ static int parse_line(int n, char *buf, void *parameters)
     static bool read_menu;
     int i;
     char *p;
-    
+
     (void)parameters;
-    
+
     /* Strip possible <CR> at end of line. */
     p = strchr(buf, '\r');
     if (p != NULL)
         *p = '\0';
-    
+
     logf("parse:%d/%s", n, buf);
-    
+
     /* First line, do initialisation. */
     if (n == 0)
     {
@@ -970,13 +970,13 @@ static int parse_line(int n, char *buf, void *parameters)
             logf("Version mismatch");
             return -1;
         }
-        
+
         read_menu = false;
     }
-    
+
     if (buf[0] == '#')
         return 0;
-    
+
     if (buf[0] == '\0')
     {
         if (read_menu)
@@ -986,13 +986,13 @@ static int parse_line(int n, char *buf, void *parameters)
         }
         return 0;
     }
-    
+
     if (!read_menu)
     {
         strp = buf;
         if (get_tag(&variable) <= 0)
             return 0;
-        
+
         switch (variable)
         {
             case var_format:
@@ -1001,33 +1001,33 @@ static int parse_line(int n, char *buf, void *parameters)
                     logf("Format add fail: %s", data);
                 }
                 break;
-                
+
             case var_include:
                 if (get_token_str(data, sizeof(data)) < 0)
                 {
                     logf("%%include empty");
                     return 0;
                 }
-            
+
                 if (!parse_menu(data))
                 {
                     logf("Load menu fail: %s", data);
                 }
                 break;
-                
+
             case var_menu_start:
                 if (menu_count >= TAGMENU_MAX_MENUS)
                 {
                     logf("max menucount reached");
                     return 0;
                 }
-            
+
                 if (get_token_str(data, sizeof data) < 0)
                 {
                     logf("%%menu_start id empty");
                     return 0;
                 }
-            
+
                 menu = NULL;
                 for (i = 0; i < menu_count; i++)
                 {
@@ -1036,15 +1036,15 @@ static int parse_line(int n, char *buf, void *parameters)
                         menu = menus[i];
                     }
                 }
-            
-                if (menu == NULL) 
+
+                if (menu == NULL)
                 {
                     menus[menu_count] = tagtree_alloc0(sizeof(struct menu_root));
                     menu = menus[menu_count];
                     ++menu_count;
                     strlcpy(menu->id, data, MAX_MENU_ID_SIZE);
                 }
-            
+
                 if (get_token_str(menu->title, sizeof(menu->title)) < 0)
                 {
                     logf("%%menu_start title empty");
@@ -1053,18 +1053,18 @@ static int parse_line(int n, char *buf, void *parameters)
                 logf("menu: %s", menu->title);
                 read_menu = true;
                 break;
-                
+
             case var_rootmenu:
                 /* Only set root menu once. */
                 if (rootmenu >= 0)
                     break;
-                
+
                 if (get_token_str(data, sizeof(data)) < 0)
                 {
                     logf("%%rootmenu empty");
                     return 0;
                 }
-                
+
                 for (i = 0; i < menu_count; i++)
                 {
                     if (!strcasecmp(menus[i]->id, data))
@@ -1074,16 +1074,16 @@ static int parse_line(int n, char *buf, void *parameters)
                 }
                 break;
         }
-        
+
         return 0;
     }
-    
+
     if (menu->itemcount >= TAGMENU_MAX_ITEMS)
     {
         logf("max itemcount reached");
         return 0;
     }
-    
+
     /* Allocate */
     if (menu->items[menu->itemcount] == NULL)
         menu->items[menu->itemcount] = tagtree_alloc0(sizeof(struct menu_entry));
@@ -1106,18 +1106,18 @@ static bool parse_menu(const char *filename)
         logf("max menucount reached");
         return false;
     }
-    
+
     fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
         logf("Search instruction file not found.");
         return false;
     }
-    
+
     /* Now read file for real, parsing into si */
     fast_readline(fd, buf, sizeof buf, NULL, parse_line);
     close(fd);
-    
+
     return true;
 }
 
@@ -1136,7 +1136,7 @@ void tagtree_init(void)
                 sizeof(struct tagentry), sizeof(struct entry));
     if (lock_count > 0)
         panicf("tagtree locked after parsing");
-    
+
     /* If no root menu is set, assume it's the first single menu
      * we have. That shouldn't normally happen. */
     if (rootmenu < 0)
@@ -1151,14 +1151,14 @@ void tagtree_init(void)
 static bool show_search_progress(bool init, int count)
 {
     static int last_tick = 0;
-    
+
     /* Don't show splashes for 1/2 second after starting search */
     if (init)
     {
         last_tick = current_tick + HZ/2;
         return true;
     }
-    
+
     /* Update progress every 1/10 of a second */
     if (TIME_AFTER(current_tick, last_tick + HZ/10))
     {
@@ -1168,7 +1168,7 @@ static bool show_search_progress(bool init, int count)
         last_tick = current_tick;
         yield();
     }
-    
+
     return true;
 }
 
@@ -1181,7 +1181,7 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
     int parpos = 0;
     int buf_pos = 0;
     int i;
-    
+
     memset(buf, 0, buf_size);
     for (i = 0; fmt->formatstr[i] != '\0'; i++)
     {
@@ -1195,7 +1195,7 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
                 return -1;
             }
         }
-        
+
         char formatchar = fmt->formatstr[i];
 
         if (read_format)
@@ -1260,16 +1260,16 @@ static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
         }
         else
             buf[buf_pos++] = formatchar;
-        
+
         if (buf_pos >= buf_size - 1)    /* need at least one more byte for \0 */
         {
             logf("buffer overflow");
             return -4;
         }
     }
-    
+
     buf[buf_pos++] = '\0';
-    
+
     return 0;
 }
 
@@ -1312,19 +1312,19 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
     if (!tagcache_search(&tcs, tag))
         return -1;
-    
+
     /* Prevent duplicate entries in the search list. */
     tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
-    
+
     if (level || csi->clause_count[0] || TAGCACHE_IS_NUMERIC(tag))
         sort = true;
-    
+
     for (i = 0; i < level; i++)
     {
         if (TAGCACHE_IS_NUMERIC(csi->tagorder[i]))
         {
             static struct tagcache_search_clause cc;
-            
+
             memset(&cc, 0, sizeof(struct tagcache_search_clause));
             cc.tag = csi->tagorder[i];
             cc.type = clause_is;
@@ -1334,7 +1334,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         }
         else
         {
-            tagcache_search_add_filter(&tcs, csi->tagorder[i], 
+            tagcache_search_add_filter(&tcs, csi->tagorder[i],
                                        csi->result_seek[i]);
         }
     }
@@ -1345,15 +1345,15 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     for (i = 0; i <= level; i++)
     {
         int j;
-        
+
         for (j = 0; j < csi->clause_count[i]; j++)
             tagcache_search_add_clause(&tcs, csi->clause[i][j]);
     }
-    
+
     current_offset = offset;
     current_entry_count = 0;
     c->dirfull = false;
-    
+
     fmt = NULL;
     for (i = 0; i < format_count; i++)
     {
@@ -1374,7 +1374,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         sort_limit = 0;
         strip = 0;
     }
-    
+
     /* lock buflib out due to possible yields */
     tree_lock_cache(c);
     struct tagentry *dptr = core_get_data(c->cache.entries_handle);
@@ -1401,12 +1401,12 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
         total_count += 2;
     }
-    
+
     while (tagcache_get_next(&tcs))
     {
         if (total_count++ < offset)
             continue;
-        
+
         dptr->newtable = NAVIBROWSE;
         if (tag == tag_title || tag == tag_filename)
         {
@@ -1415,7 +1415,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         }
         else
             dptr->extraseek = tcs.result_seek;
-        
+
         fmt = NULL;
         /* Check the format */
         tagtree_lock();
@@ -1423,7 +1423,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         {
             if (formats[i]->group_id != csi->format_id[level])
                 continue;
-            
+
             if (tagcache_check_clauses(&tcs, formats[i]->clause,
                                        formats[i]->clause_count))
             {
@@ -1439,11 +1439,11 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             tcs.result_len = strlen(tcs.result);
             tcs.ramresult = true;
         }
-        
+
         if (!tcs.ramresult || fmt)
         {
             dptr->name = core_get_data(c->cache.name_buffer_handle)+namebufused;
-            
+
             if (fmt)
             {
                 int ret = format_str(&tcs, fmt, dptr->name,
@@ -1482,7 +1482,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         }
         else
             dptr->name = tcs.result;
-        
+
         dptr++;
         current_entry_count++;
 
@@ -1493,7 +1493,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             sort = false;
             break ;
         }
-        
+
         if (init && !tcs.ramsearch)
         {
             if (!show_search_progress(false, total_count))
@@ -1505,7 +1505,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             }
         }
     }
-    
+
     if (sort)
     {
         struct tagentry *entries = get_entries(c);
@@ -1513,7 +1513,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
               current_entry_count - special_entry_count,
               sizeof(struct tagentry), compare);
     }
-    
+
     if (!init)
     {
         tagcache_search_finish(&tcs);
@@ -1521,7 +1521,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         tagtree_unlock();
         return current_entry_count;
     }
-    
+
     while (tagcache_get_next(&tcs))
     {
         if (!tcs.ramsearch)
@@ -1531,7 +1531,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         }
         total_count++;
     }
-    
+
     tagcache_search_finish(&tcs);
     tree_unlock_cache(c);
     tagtree_unlock();
@@ -1542,42 +1542,42 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         logf("Too small dir buffer");
         return 0;
     }
-    
+
     if (sort_limit)
         total_count = MIN(total_count, sort_limit);
-    
+
     if (strip)
     {
         dptr = get_entries(c);
         for (i = special_entry_count; i < current_entry_count; i++, dptr++)
         {
             int len = strlen(dptr->name);
-            
+
             if (len < strip)
                 continue;
-            
+
             dptr->name = &dptr->name[strip];
         }
     }
 
     return total_count;
-    
+
 }
 
 static int load_root(struct tree_context *c)
 {
     struct tagentry *dptr = core_get_data(c->cache.entries_handle);
     int i;
-    
+
     tc = c;
     c->currtable = ROOT;
     if (c->dirlevel == 0)
         c->currextra = rootmenu;
-    
+
     menu = menus[c->currextra];
     if (menu == NULL)
         return 0;
-    
+
     for (i = 0; i < menu->itemcount; i++)
     {
         dptr->name = menu->items[i]->name;
@@ -1587,7 +1587,7 @@ static int load_root(struct tree_context *c)
                 dptr->newtable = NAVIBROWSE;
                 dptr->extraseek = i;
                 break;
-            
+
             case menu_load:
                 dptr->newtable = ROOT;
                 dptr->extraseek = menu->items[i]->link;
@@ -1596,10 +1596,10 @@ static int load_root(struct tree_context *c)
 
         dptr++;
     }
-    
+
     current_offset = 0;
     current_entry_count = i;
-    
+
     return i;
 }
 
@@ -1607,7 +1607,7 @@ int tagtree_load(struct tree_context* c)
 {
     int count;
     int table = c->currtable;
-    
+
     c->dirsindir = 0;
 
     if (!table)
@@ -1618,7 +1618,7 @@ int tagtree_load(struct tree_context* c)
         c->currextra = rootmenu;
     }
 
-    switch (table) 
+    switch (table)
     {
         case ROOT:
             count = load_root(c);
@@ -1631,12 +1631,12 @@ int tagtree_load(struct tree_context* c)
             count = retrieve_entries(c, 0, true);
             cpu_boost(false);
             break;
-        
+
         default:
             logf("Unsupported table %d\n", table);
             return -1;
     }
-    
+
     if (count < 0)
     {
         c->dirlevel = 0;
@@ -1646,7 +1646,7 @@ int tagtree_load(struct tree_context* c)
 
     /* The _total_ numer of entries available. */
     c->dirlength = c->filesindir = count;
-    
+
     return count;
 }
 
@@ -1660,10 +1660,10 @@ int tagtree_enter(struct tree_context* c)
     int source;
 
     dptr = tagtree_get_entry(c, c->selected_item);
-    
+
     c->dirfull = false;
-    seek = dptr->extraseek;   
-    if (seek == -1) 
+    seek = dptr->extraseek;
+    if (seek == -1)
     {
         if(c->filesindir<=2)
             return 0;
@@ -1685,27 +1685,27 @@ int tagtree_enter(struct tree_context* c)
     /* lock buflib for possible I/O to protect dptr */
     tree_lock_cache(c);
     tagtree_lock();
-    
+
     switch (c->currtable) {
         case ROOT:
             c->currextra = newextra;
-        
+
             if (newextra == ROOT)
             {
                 menu = menus[seek];
                 c->currextra = seek;
             }
-        
+
             else if (newextra == NAVIBROWSE)
             {
                 int i, j;
-                
+
                 csi = &menu->items[seek]->si;
                 c->currextra = 0;
-                
-                strlcpy(current_title[c->currextra], dptr->name, 
+
+                strlcpy(current_title[c->currextra], dptr->name,
                         sizeof(current_title[0]));
-    
+
                 /* Read input as necessary. */
                 for (i = 0; i < csi->tagorder_count; i++)
                 {
@@ -1717,13 +1717,13 @@ int tagtree_enter(struct tree_context* c)
                             continue;
 
                         source = csi->clause[i][j]->source;
-                        
+
                         if (source == source_constant)
                             continue;
 
                         searchstring=csi->clause[i][j]->str;
-                        *searchstring = '\0';               
-                                
+                        *searchstring = '\0';
+
                         id3 = audio_current_track();
 
                         if (source == source_current_path && id3)
@@ -1736,7 +1736,7 @@ int tagtree_enter(struct tree_context* c)
                         }
                         else if (source > source_runtime && id3)
                         {
-                            
+
                             int k = source-source_runtime;
                             int offset = id3_to_search_mapping[k].id3_offset;
                             char **src = (char**)((char*)id3 + offset);
@@ -1757,9 +1757,9 @@ int tagtree_enter(struct tree_context* c)
                             }
                             if (csi->clause[i][j]->numeric)
                                 csi->clause[i][j]->numeric_data = atoi(searchstring);
-                        }   
-                                             
-                            
+                        }
+
+
                     }
                 }
             }
@@ -1791,18 +1791,18 @@ int tagtree_enter(struct tree_context* c)
                 c->currextra++;
             else
                 c->dirlevel--;
-        
+
             /* Update the statusbar title */
-            strlcpy(current_title[c->currextra], dptr->name, 
+            strlcpy(current_title[c->currextra], dptr->name,
                     sizeof(current_title[0]));
             break;
-        
+
         default:
             c->dirlevel--;
             break;
     }
 
-    
+
     c->selected_item=0;
     gui_synclist_select_item(&tree_lists, c->selected_item);
     tree_unlock_cache(c);
@@ -1827,7 +1827,7 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
 {
     struct tagcache_search tcs;
     int extraseek = tagtree_get_entry(c, c->selected_item)->extraseek;
-    
+
 
     if (!tagcache_search(&tcs, tag_filename))
         return -1;
@@ -1839,7 +1839,7 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     }
 
     tagcache_search_finish(&tcs);
-    
+
     return 0;
 }
 
@@ -1858,7 +1858,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
         cpu_boost(false);
         return false;
     }
-    
+
     if (position == PLAYLIST_REPLACE)
     {
         if (playlist_remove_all_tracks(NULL) == 0)
@@ -1882,14 +1882,14 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
         to = c->filesindir;
         direction = 1;
     }
-    
+
     for (i = from; i != to; i += direction)
     {
         /* Count back to zero */
         if (!show_search_progress(false, files_left--))
             break;
-        
-        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek, 
+
+        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek,
                                tcs.type, buf, sizeof buf))
         {
             continue;
@@ -1905,7 +1905,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     playlist_sync(NULL);
     tagcache_search_finish(&tcs);
     cpu_boost(false);
-    
+
     return true;
 }
 
@@ -1923,10 +1923,10 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
 #endif
         , 0);
 
-    
+
     /* We need to set the table to allsubentries. */
     newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
-    
+
     /* Insert a single track? */
     if (newtable == PLAYTRACK)
     {
@@ -1936,10 +1936,10 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
             return false;
         }
         playlist_insert_track(NULL, buf, position, queue, true);
-        
+
         return true;
     }
-    
+
     if (newtable == NAVIBROWSE)
     {
         tagtree_enter(tc);
@@ -1951,14 +1951,14 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
         logf("unsupported table: %d", newtable);
         return false;
     }
-    
+
     /* Now the current table should be allsubentries. */
     if (newtable != PLAYTRACK)
     {
         tagtree_enter(tc);
         tagtree_load(tc);
         newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
-    
+
         /* And now the newtable should be playtrack. */
         if (newtable != PLAYTRACK)
         {
@@ -1976,12 +1976,12 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
         if (!insert_all_playlist(tc, position, queue))
             splash(HZ*2, ID2P(LANG_FAILED));
     }
-    
+
     /* Finally return the dirlevel to its original value. */
     while (tc->dirlevel > dirlevel)
         tagtree_exit(tc);
     tagtree_load(tc);
-    
+
     return true;
 }
 
@@ -1995,7 +1995,7 @@ static int tagtree_play_folder(struct tree_context* c)
 
     if (!insert_all_playlist(c, PLAYLIST_INSERT_LAST, false))
         return -2;
-    
+
     if (global_settings.playlist_shuffle)
         c->selected_item = playlist_shuffle(current_tick, c->selected_item);
     if (!global_settings.play_selected)
@@ -2011,7 +2011,7 @@ static struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
 {
     struct tagentry *entry;
     int realid = id - current_offset;
-    
+
     /* Load the next chunk if necessary. */
     if (realid >= current_entry_count || realid < 0)
     {
@@ -2048,12 +2048,12 @@ char *tagtree_get_title(struct tree_context* c)
     {
         case ROOT:
             return menu->title;
-        
+
         case NAVIBROWSE:
         case ALLSUBENTRIES:
             return current_title[c->currextra];
     }
-    
+
     return "?";
 }
 
@@ -2072,7 +2072,7 @@ int tagtree_get_attr(struct tree_context* c)
         case ALLSUBENTRIES:
             attr = FILE_ATTR_AUDIO;
             break;
-        
+
         default:
             attr = ATTR_DIRECTORY;
             break;

@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2002 by Daniel Stenberg
@@ -424,7 +424,7 @@ bool list_stop_handler(void)
 
         if (TIME_BEFORE(current_tick, last_off + HZ/2))
         {
-            if (charger_inserted()) 
+            if (charger_inserted())
             {
                 charging_splash();
                 ret = true;  /* screen is dirty, caller needs to refresh */
@@ -1064,7 +1064,7 @@ void format_time(char* buf, int buf_size, long t)
     int const seconds = time % 60;
     const char * const sign = &"-"[t < 0 ? 0 : 1];
 
-    if ( hours == 0 ) 
+    if ( hours == 0 )
     {
         snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
     }
@@ -1177,7 +1177,7 @@ bool parse_color(enum screen_type screen, char *text, int *value)
 {
     (void)text; (void)value; /* silence warnings on mono bitmap */
     (void)screen;
-    
+
 #ifdef HAVE_LCD_COLOR
     if (screens[screen].depth > 2)
     {
@@ -1214,7 +1214,7 @@ int clamp_value_wrap(int value, int max, int min)
 #endif
 #endif
 #define MAX_ACTIVITY_DEPTH 12
-static enum current_activity 
+static enum current_activity
         current_activity[MAX_ACTIVITY_DEPTH] = {ACTIVITY_UNKNOWN};
 static int current_activity_top = 0;
 void push_current_activity(enum current_activity screen)

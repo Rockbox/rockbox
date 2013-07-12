@@ -382,7 +382,7 @@ static void set_elapsed(struct mp3entry* id3)
                     break;
                 }
             }
-            
+
             i--;
             if (i < 0)
                 i = 0;
@@ -395,7 +395,7 @@ static void set_elapsed(struct mp3entry* id3)
             }
             else
             {
-                nextpos = 256; 
+                nextpos = 256;
             }
 
             remainder = id3->offset - (relpos * (id3->filesize / 256));
@@ -425,7 +425,7 @@ int audio_get_file_pos(void)
 {
     int pos = -1;
     struct mp3entry *id3 = audio_current_track();
-    
+
     if (id3->vbr)
     {
         if (id3->has_toc)
@@ -433,20 +433,20 @@ int audio_get_file_pos(void)
             /* Use the TOC to find the new position */
             unsigned int percent, remainder;
             int curtoc, nexttoc, plen;
-                        
+
             percent = (id3->elapsed*100)/id3->length;
             if (percent > 99)
                 percent = 99;
-                        
+
             curtoc = id3->toc[percent];
-                        
+
             if (percent < 99)
                 nexttoc = id3->toc[percent+1];
             else
                 nexttoc = 256;
-                        
+
             pos = (id3->filesize/256)*curtoc;
-                        
+
             /* Use the remainder to get a more accurate position */
             remainder   = (id3->elapsed*100)%id3->length;
             remainder   = (remainder*100)/id3->length;
@@ -478,7 +478,7 @@ int audio_get_file_pos(void)
         /* skip past id3v2 tag and other leading garbage */
         pos = id3->first_frame_offset;
     }
-    return pos;    
+    return pos;
 }
 
 unsigned long mpeg_get_last_header(void)
@@ -637,9 +637,9 @@ static void recalculate_watermark(int bitrate)
        and set a high threshold */
     if(bitrate == 0)
         bitrate = 320;
-    
+
     bytes_per_sec = bitrate * 1000 / 8;
-    
+
     if(time)
     {
         /* No drive spins up faster than 3.5s */
@@ -693,7 +693,7 @@ void audio_get_debugdata(struct audio_debug *dbgdata)
 static void dbg_timer_start(void)
 {
     /* We are using timer 2 */
-    
+
     TSTR &= ~0x04; /* Stop the timer */
     TSNC &= ~0x04; /* No synchronization */
     TMDR &= ~0x44; /* Operate normally */
@@ -813,7 +813,7 @@ void rec_tick(void)
             }
 
             data = *(unsigned char *)0x04000000; /* read data byte */
-                
+
             xor_b(0x08, &PADRH);                 /* Set PR inactive */
 
             mpeg_audiobuf[audiobuf_write++] = data;
@@ -888,7 +888,7 @@ static void transfer_end(const void** ppbuf, size_t* psize)
         audiobuf_read += last_dma_chunk_size;
         if(audiobuf_read >= audiobuflen)
             audiobuf_read = 0;
-    
+
         /* First, check if we are on a track boundary */
         if (num_tracks_in_memory() > 1)
         {
@@ -901,17 +901,17 @@ static void transfer_end(const void** ppbuf, size_t* psize)
                 }
             }
         }
-        
+
         unplayed_space_left = get_unplayed_space();
-        
+
         space_until_end_of_buffer = audiobuflen - audiobuf_read;
-        
+
         if(!filling && unplayed_space_left < low_watermark)
         {
             filling = true;
             queue_post(&mpeg_queue, MPEG_NEED_DATA, GENERATE_UNBUFFER_EVENTS);
         }
-        
+
         if(unplayed_space_left)
         {
             last_dma_chunk_size = MIN(0x2000, unplayed_space_left);
@@ -953,7 +953,7 @@ static void transfer_end(const void** ppbuf, size_t* psize)
                 /* Update the watermark debug level */
                 if(unplayed_space_left < lowest_watermark_level)
                     lowest_watermark_level = unplayed_space_left;
-                
+
                 DEBUGF("DMA underrun.\n");
                 dma_underrun = true;
             }
@@ -975,7 +975,7 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
 {
     struct trackdata *track;
     bool send_nid3_event;
-    
+
     if(num_tracks_in_memory() >= MAX_TRACK_ENTRIES)
     {
         DEBUGF("Tag memory is full\n");
@@ -983,7 +983,7 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
     }
 
     track = &trackdata[track_write_idx];
-    
+
     /* grab id3 tag of new file and
        remember where in memory it starts */
     if(mp3info(&track->id3, filename))
@@ -1032,14 +1032,14 @@ static int new_file(int steps)
             start += track->load_ahead_index;
         }
     }
-    
+
     do {
         trackname = playlist_peek(start + steps, name_buf, sizeof(name_buf));
         if ( !trackname )
             return -1;
-        
+
         DEBUGF("Loading %s\n", trackname);
-        
+
         mpeg_file = open(trackname, O_RDONLY);
         if(mpeg_file < 0) {
             DEBUGF("Couldn't open file: %s\n",trackname);
@@ -1065,7 +1065,7 @@ static int new_file(int steps)
             else
             {
                 /* skip past id3v2 tag */
-                lseek(mpeg_file, 
+                lseek(mpeg_file,
                       track->id3.first_frame_offset,
                       SEEK_SET);
                 track->id3.index = steps;
@@ -1079,7 +1079,7 @@ static int new_file(int steps)
                 else
                     recalculate_watermark(
                         track->id3.bitrate);
-                    
+
             }
         }
 
@@ -1212,7 +1212,7 @@ static void start_playback_if_ready(void)
     playable_space = audiobuf_swapwrite - audiobuf_read;
     if(playable_space < 0)
         playable_space += audiobuflen;
-    
+
     /* See if we have started playing yet. If not, do it. */
     if(play_pending || dma_underrun)
     {
@@ -1273,7 +1273,7 @@ static bool swap_one_chunk(void)
         else
             amount_to_swap = MIN(MPEG_SWAP_CHUNKSIZE, free_space_left);
     }
-    
+
     if(audiobuf_write < audiobuf_swapwrite)
         amount_to_swap = MIN(audiobuflen - audiobuf_swapwrite,
                              amount_to_swap);
@@ -1342,7 +1342,7 @@ static void mpeg_thread(void)
         }
 
         start_playback_if_ready();
-        
+
         switch(ev.id)
         {
             case MPEG_PLAY:
@@ -1376,8 +1376,8 @@ static void mpeg_thread(void)
                 }
                 else {
                     /* skip past id3v2 tag */
-                    lseek(mpeg_file, 
-                          get_trackdata(0)->id3.first_frame_offset, 
+                    lseek(mpeg_file,
+                          get_trackdata(0)->id3.first_frame_offset,
                           SEEK_SET);
 
                 }
@@ -1421,7 +1421,7 @@ static void mpeg_thread(void)
                     if ( current_track_counter == pause_track )
                         last_dma_tick += current_tick - pause_tick;
                     else
-                        last_dma_tick = current_tick;                        
+                        last_dma_tick = current_tick;
                     pause_tick = 0;
                     mp3_play_pause(true);
                 }
@@ -1481,7 +1481,7 @@ static void mpeg_thread(void)
                         /* Make it read more data */
                         filling = true;
                         queue_post(&mpeg_queue, MPEG_NEED_DATA, 0);
-                        
+
                         /* Tell the file loading code that we want
                            to start playing as soon as we have some data */
                         play_pending = true;
@@ -1498,7 +1498,7 @@ static void mpeg_thread(void)
 
                 if (!playlist_check(-1))
                     break;
-                
+
                 /* stop the current stream */
                 end_current_track();
 
@@ -1540,7 +1540,7 @@ static void mpeg_thread(void)
                     id3->elapsed = oldtime;
                     break;
                 }
-                
+
                 if (mpeg_file >= 0)
                     curpos = lseek(mpeg_file, 0, SEEK_CUR);
                 else
@@ -1581,7 +1581,7 @@ static void mpeg_thread(void)
                        hasn't yet advanced up to the new location of the read
                        pointer. We just move it, there is no need to swap
                        data that won't be played anyway. */
-                    
+
                     if (unswapped_space_left > unplayed_space_left)
                     {
                         DEBUGF("Moved swapwrite\n");
@@ -1599,9 +1599,9 @@ static void mpeg_thread(void)
                     else
                     {
                         /* resume will start at new position */
-                        last_dma_chunk_size = 
+                        last_dma_chunk_size =
                             MIN(0x2000, get_unplayed_space_current_song());
-                        mp3_play_data(mpeg_audiobuf + audiobuf_read, 
+                        mp3_play_data(mpeg_audiobuf + audiobuf_read,
                             last_dma_chunk_size, transfer_end);
                         dma_underrun = false;
                     }
@@ -1696,7 +1696,7 @@ static void mpeg_thread(void)
 
                 /* Make sure that we don't fill the entire buffer */
                 free_space_left -= MPEG_HIGH_WATER;
-                
+
                 if (ev.data == GENERATE_UNBUFFER_EVENTS)
                     generate_unbuffer_events();
 
@@ -1748,12 +1748,12 @@ static void mpeg_thread(void)
                             static const unsigned char tag[] = "TAG";
                             int taglen = 128;
                             int tagptr = audiobuf_write + len - 128;
-                            
+
                             /* Really rare case: entire potential tag wasn't
                                read in this call AND audiobuf_write < 128 */
                             if (tagptr < 0)
                                 tagptr += audiobuflen;
-                            
+
                             for(i = 0;i < 3;i++)
                             {
                                 if(tagptr >= audiobuflen)
@@ -1801,10 +1801,10 @@ static void mpeg_thread(void)
                         {
                             DEBUGF("MPEG read error\n");
                         }
-                        
+
                         close(mpeg_file);
                         mpeg_file = -1;
-                    
+
                         if(new_file(1) < 0)
                         {
                             /* No more data to play */
@@ -1819,7 +1819,7 @@ static void mpeg_thread(void)
                     }
                 }
                 break;
-                
+
             case MPEG_TRACK_CHANGE:
                 track_change();
                 break;
@@ -1838,7 +1838,7 @@ static void mpeg_thread(void)
                 usb_wait_for_disconnect(&mpeg_queue);
                 break;
 #endif /* !USB_NONE */
-                
+
 #if CONFIG_CODEC == MAS3587F
             case MPEG_INIT_RECORDING:
                 init_recording();
@@ -1876,7 +1876,7 @@ static void mpeg_thread(void)
                                mpeg_audiobuf+startpos, startpos);
 
                         saved_header = mpeg_get_last_header();
-                        
+
                         mem_find_next_frame(startpos, &offset, 1800,
                                             saved_header, mpeg_audiobuf,
                                             audiobuflen);
@@ -1912,10 +1912,10 @@ static void mpeg_thread(void)
 
                     /* delayed until buffer is saved, don't open yet */
                     strcpy(delayed_filename, recording_filename);
-                    mpeg_file = -1; 
+                    mpeg_file = -1;
 
                     break;
-                    
+
                 case MPEG_STOP:
                     DEBUGF("MPEG_STOP\n");
 
@@ -1974,7 +1974,7 @@ static void mpeg_thread(void)
 
                     mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT,
                                 &frame_count_end, 1);
- 
+
                     last_rec_time = current_tick - record_start_time;
                     record_start_time = current_tick;
                     if (paused)
@@ -2014,7 +2014,7 @@ static void mpeg_thread(void)
                     queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
                     break;
 
-                case MPEG_SAVE_DATA:    
+                case MPEG_SAVE_DATA:
                     if (saving_status == BUFFER_FULL)
                         save_endpos = audiobuf_write;
 
@@ -2098,7 +2098,7 @@ static void mpeg_thread(void)
                         queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
 
                     break;
-                    
+
                 case MPEG_PRERECORDING_TICK:
                     if(!is_prerecording)
                         break;
@@ -2118,21 +2118,21 @@ static void mpeg_thread(void)
                     break;
 
                 case MPEG_INIT_PLAYBACK:
-                    /* Stop the prerecording */ 
+                    /* Stop the prerecording */
                     stop_recording();
                     reset_mp3_buffer();
                     mp3_play_init();
                     init_playback_done = true;
                     break;
-                    
+
                 case MPEG_PAUSE_RECORDING:
                     pause_recording();
                     break;
-                   
+
                 case MPEG_RESUME_RECORDING:
                     resume_recording();
                     break;
-                   
+
                 case SYS_USB_CONNECTED:
                     /* We can safely go to USB mode if no recording
                        is taking place */
@@ -2142,11 +2142,11 @@ static void mpeg_thread(void)
                            function, to put the MAS in monitoring mode,
                            to save power. */
                         stop_recording();
-                
+
                         /* Tell the USB thread that we are safe */
                         DEBUGF("mpeg_thread got SYS_USB_CONNECTED\n");
                         usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                    
+
                         /* Wait until the USB cable is extracted again */
                         usb_wait_for_disconnect(&mpeg_queue);
                     }
@@ -2166,7 +2166,7 @@ struct mp3entry* audio_current_track(void)
     if(num_tracks_in_memory())
     {
         struct mp3entry *id3 = &get_trackdata(0)->id3;
-#endif        
+#endif
         if (!checked_for_cuesheet && curr_cuesheet && id3->cuesheet == NULL)
         {
             checked_for_cuesheet = true; /* only check once per track */
@@ -2239,9 +2239,9 @@ static void init_recording(void)
     is_prerecording = false;
 
     mpeg_stop_done = true;
-    
+
     mas_reset();
-    
+
     /* Enable the audio CODEC and the DSP core, max analog voltage range */
     rc = mas_direct_config_write(MAS_CONTROL, 0x8c00);
     if(rc < 0)
@@ -2257,7 +2257,7 @@ static void init_recording(void)
 
     /* Perform black magic as described by the data sheet */
     if((mas_version_code & 0x0fff) == 0x0102)
-    {       
+    {
         DEBUGF("Performing MAS black magic for B2 version\n");
         mas_writereg(0xa3, 0x98);
         mas_writereg(0x94, 0xfffff);
@@ -2272,7 +2272,7 @@ static void init_recording(void)
 
     /* Copy left channel to right (mono mode) */
     mas_codec_writereg(8, 0x8000);
-    
+
     /* ADC scale 0%, DSP scale 100%
        We use the DSP output for monitoring, because it works with all
        sources including S/PDIF */
@@ -2282,7 +2282,7 @@ static void init_recording(void)
     /* No mute */
     shadow_soft_mute = 0;
     mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute, 1);
-    
+
 #ifdef HAVE_SPDIF_OUT
     val = 0x09; /* Disable SDO and SDI, low impedance S/PDIF outputs */
 #else
@@ -2308,7 +2308,7 @@ static void init_recording(void)
        DMA transfer has taken place.
        Now let's wait for some data to be encoded. */
     sleep(HZ/5);
-    
+
     /* Now set it to Monitoring mode as default, saves power */
     shadow_io_control_main = 0x525;
     mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
@@ -2331,7 +2331,7 @@ static void init_recording(void)
 void audio_record(const char *filename)
 {
     mpeg_errno = 0;
-    
+
     strlcpy(recording_filename, filename, MAX_PATH);
 
     queue_post(&mpeg_queue, MPEG_RECORD, 0);
@@ -2412,13 +2412,13 @@ static void start_prerecording(void)
     unsigned long val;
 
     DEBUGF("Starting prerecording\n");
-    
+
     prerecord_index = 0;
     prerecord_count = 0;
     prerecord_timeout = current_tick + HZ;
     memset(prerecord_buffer, 0, sizeof(prerecord_buffer));
     reset_mp3_buffer();
-    
+
     is_prerecording = true;
 
     /* Stop monitoring and start the encoder */
@@ -2431,7 +2431,7 @@ static void start_prerecording(void)
     {
         mas_readmem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val,1);
     } while(val & 1);
-    
+
     is_recording = true;
     saving_status = NOT_SAVING;
 
@@ -2463,7 +2463,7 @@ static void start_recording(void)
             mas_readmem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &val,1);
         } while(val & 1);
     }
-    
+
     is_recording = true;
     saving_status = NOT_SAVING;
     paused = false;
@@ -2493,7 +2493,7 @@ static void pause_recording(void)
 static void resume_recording(void)
 {
     paused = false;
-    
+
     /* Clear the pause bit */
     shadow_soft_mute &= ~2;
     mas_writemem(MAS_BANK_D0,  MAS_D0_SOFT_MUTE, &shadow_soft_mute, 1);
@@ -2515,7 +2515,7 @@ static void stop_recording(void)
     if(!paused)
        pause_recording();
     sleep(HZ/5);
-    
+
     demand_irq_enable(false);
 
     is_recording = false;
@@ -2529,7 +2529,7 @@ static void stop_recording(void)
     shadow_io_control_main |= (1 << 10);
     mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
     DEBUGF("mas_writemem(MAS_BANK_D0, IO_CONTROL_MAIN, %x)\n", shadow_io_control_main);
-    
+
     /* Wait until the DSP has accepted the settings */
     do
     {
@@ -2565,7 +2565,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
         mas_store_pllfreq(24576000);
     else
         mas_store_pllfreq(22579000);
-#endif    
+#endif
 
     shadow_soft_mute = options->rec_editable?4:0;
     mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute,1);
@@ -2647,7 +2647,7 @@ unsigned long audio_recorded_time(void)
 {
     if(is_prerecording)
         return prerecord_count * HZ;
-    
+
     if(is_recording)
     {
        if(paused)
@@ -2663,7 +2663,7 @@ unsigned long audio_num_recorded_bytes(void)
 {
     int num_bytes;
     int index;
-    
+
     if(is_recording)
     {
         if(is_prerecording)
@@ -2671,11 +2671,11 @@ unsigned long audio_num_recorded_bytes(void)
             index = prerecord_index - prerecord_count;
             if(index < 0)
                 index += prerecording_max_seconds;
-            
+
             num_bytes = audiobuf_write - prerecord_buffer[index].mempos;
             if(num_bytes < 0)
                 num_bytes += audiobuflen;
-            
+
             return num_bytes;
         }
         else
@@ -2796,7 +2796,7 @@ void audio_play(long offset)
     int steps=0;
 
     is_playing = true;
-    
+
     do {
         trackname = playlist_peek(steps, name_buf, sizeof(name_buf));
         if (!trackname)
@@ -2849,7 +2849,7 @@ void audio_stop(void)
 /* dummy */
 void audio_stop_recording(void)
 {
-    audio_stop(); 
+    audio_stop();
 }
 
 void audio_hard_stop(void)
@@ -2966,7 +2966,7 @@ int audio_status(void)
 
     if(paused)
         ret |= AUDIO_STATUS_PAUSE;
-    
+
 #if (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR)
     if(is_recording && !is_prerecording)
         ret |= AUDIO_STATUS_RECORD;
@@ -2977,7 +2977,7 @@ int audio_status(void)
 
     if(mpeg_errno)
         ret |= AUDIO_STATUS_ERROR;
-    
+
     return ret;
 }
 

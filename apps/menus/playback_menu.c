@@ -62,7 +62,7 @@ static int setcrossfadeonexit_callback(int action,const struct menu_item_ex *thi
 /***********************************/
 /*    PLAYBACK MENU                */
 static int playback_callback(int action,const struct menu_item_ex *this_item);
-    
+
 MENUITEM_SETTING(shuffle_item, &global_settings.playlist_shuffle, playback_callback);
 MENUITEM_SETTING(repeat_mode, &global_settings.repeat_mode, playback_callback);
 MENUITEM_SETTING(play_selected, &global_settings.play_selected, NULL);
@@ -84,7 +84,7 @@ static int buffermargin_callback(int action,const struct menu_item_ex *this_item
     }
     return action;
 }
-#else 
+#else
 # define buffermargin_callback NULL
 #endif
 MENUITEM_SETTING(buffer_margin, &global_settings.buffer_margin,
@@ -120,7 +120,7 @@ static int replaygain_callback(int action,const struct menu_item_ex *this_item)
     (void)this_item;
     switch (action)
     {
-        case ACTION_EXIT_MENUITEM: /* on exit */    
+        case ACTION_EXIT_MENUITEM: /* on exit */
             replaygain_update();
             break;
     }
@@ -137,7 +137,7 @@ MENUITEM_SETTING(replaygain_preamp,
                  replaygain_callback);
 MAKE_MENU(replaygain_settings_menu,ID2P(LANG_REPLAYGAIN),0, Icon_NOICON,
           &replaygain_type, &replaygain_noclip, &replaygain_preamp);
-          
+
 MENUITEM_SETTING(beep, &global_settings.beep ,NULL);
 #endif /* CONFIG_CODEC == SWCODEC */
 
@@ -155,7 +155,7 @@ static int audioscrobbler_callback(int action,const struct menu_item_ex *this_it
         case ACTION_EXIT_MENUITEM: /* on exit */
             if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
                 scrobbler_init();
-        
+
             if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
                 scrobbler_shutdown();
             break;
@@ -205,13 +205,13 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
           Icon_Playback_menu,
           &shuffle_item, &repeat_mode, &play_selected,
           &ff_rewind_settings_menu,
-#ifdef HAVE_DISK_STORAGE 
+#ifdef HAVE_DISK_STORAGE
           &buffer_margin,
 #endif
           &fade_on_stop, &party_mode,
-          
+
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
-          &crossfade_settings_menu, 
+          &crossfade_settings_menu,
 #endif
 
 #if CONFIG_CODEC == SWCODEC
@@ -235,7 +235,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
           ,&play_frequency
 #endif
          );
-         
+
 static int playback_callback(int action,const struct menu_item_ex *this_item)
 {
     static bool old_shuffle = false;
