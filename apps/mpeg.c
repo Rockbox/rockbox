@@ -129,8 +129,6 @@ static unsigned int current_track_counter = 0;
 
 #ifndef SIMULATOR
 static void stop_playing(void);
-/* Play time of the previous track */
-static unsigned long prev_track_elapsed;
 
 static int track_read_idx = 0;
 static int track_write_idx = 0;
@@ -362,7 +360,15 @@ static bool audio_dispatch_event(unsigned short event, unsigned long data)
     }
     return false;
 }
-#endif
+
+static void send_track_event(unsigned int id, struct mp3entry *id3)
+{
+    struct mp3entry *cur_id3 =
+        &trackdata[track_read_idx & MAX_TRACK_ENTRIES_MASK].id3;
+    unsigned int flags = id3 == cur_id3 ? TEF_CURRENT : 0;
+    send_event(id, &(struct track_event){ .flags = flags, .id3 = id3 });
+}
+#endif /* SIMULATOR */
 
 /***********************************************************************/
 
@@ -609,7 +615,7 @@ static void generate_unbuffer_events(void)
     for (i = 0; i < numentries; i++)
     {
         /* Send an event to notify that track has finished. */
-        send_event(PLAYBACK_EVENT_TRACK_FINISH, &trackdata[cur_idx].id3);
+        send_track_event(PLAYBACK_EVENT_TRACK_FINISH, &trackdata[cur_idx].id3);
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
     }
 }
@@ -623,7 +629,7 @@ static void generate_postbuffer_events(void)
 
     for (i = 0; i < numentries; i++)
     {
-        send_event(PLAYBACK_EVENT_TRACK_BUFFER, &trackdata[cur_idx].id3);
+        send_track_event(PLAYBACK_EVENT_TRACK_BUFFER, &trackdata[cur_idx].id3);
         cur_idx = (cur_idx + 1) & MAX_TRACK_ENTRIES_MASK;
     }
 }
@@ -1006,7 +1012,7 @@ static struct trackdata *add_track_to_tag_list(const char *filename)
     send_nid3_event = (track_write_idx == track_read_idx + 1);
     track_write_idx = (track_write_idx+1) & MAX_TRACK_ENTRIES_MASK;
     if (send_nid3_event)
-        send_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, NULL);
+        send_track_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, &track->id3);
     debug_tags();
     return track;
 }
@@ -1093,16 +1099,10 @@ static int new_file(int steps)
 
 static void stop_playing(void)
 {
-    struct trackdata *track;
-
     /* Stop the current stream */
     mp3_play_stop();
     playing = false;
     filling = false;
-
-    track = get_trackdata(0);
-    if (track != NULL)
-        prev_track_elapsed = track->id3.elapsed;
 
     if(mpeg_file >= 0)
         close(mpeg_file);
@@ -1112,16 +1112,11 @@ static void stop_playing(void)
     reset_mp3_buffer();
 }
 
-static void end_current_track(void) {
-    struct trackdata *track;
-
+static void end_current_track(void)
+{
     play_pending = false;
     playing = false;
     mp3_play_pause(false);
-
-    track = get_trackdata(0);
-    if (track != NULL)
-        prev_track_elapsed = track->id3.elapsed;
 
     reset_mp3_buffer();
     remove_all_tags();
@@ -1164,9 +1159,6 @@ static void track_change(void)
 {
     DEBUGF("Track change\n");
 
-    struct trackdata *track = get_trackdata(0);
-    prev_track_elapsed = track->id3.elapsed;
-
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     /* Reset the AVC */
     sound_set_avc(-1);
@@ -1177,15 +1169,13 @@ static void track_change(void)
         remove_current_tag();
         update_playlist();
         if (is_playing)
-            send_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_current_track());
+        {
+            send_track_event(PLAYBACK_EVENT_TRACK_CHANGE,
+                             audio_current_track());
+        }
     }
 
     current_track_counter++;
-}
-
-unsigned long audio_prev_elapsed(void)
-{
-    return prev_track_elapsed;
 }
 
 #ifdef DEBUG
@@ -1229,7 +1219,8 @@ static void start_playback_if_ready(void)
                 if (play_pending_track_change)
                 {
                     play_pending_track_change = false;
-                    send_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_current_track());
+                    send_track_event(PLAYBACK_EVENT_TRACK_CHANGE,
+                                     audio_current_track());
                 }
                 play_pending = false;
             }
@@ -2828,11 +2819,6 @@ void audio_play(long offset)
 void audio_stop(void)
 {
 #ifndef SIMULATOR
-    if (playing)
-    {
-        struct trackdata *track = get_trackdata(0);
-        prev_track_elapsed = track->id3.elapsed;
-    }
     mpeg_stop_done = false;
     queue_post(&mpeg_queue, MPEG_STOP, 0);
     while(!mpeg_stop_done)

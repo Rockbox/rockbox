@@ -31,21 +31,29 @@
 
 /** Playback events **/
 enum {
-    /* Playback is starting from a stopped state */
+    /* Playback is starting from a stopped state
+       data = NULL */
     PLAYBACK_EVENT_START_PLAYBACK = (EVENT_CLASS_PLAYBACK|1),
-    /* Audio has begun buffering for decoding track (or is already completed) */
+    /* Audio has begun buffering for decoding track (or is already completed)
+       data = &(struct track_event){} */
     PLAYBACK_EVENT_TRACK_BUFFER,
-    /* Handles for current user track are ready (other than audio or codec) */
+    /* Handles for current user track are ready (other than audio or codec)
+       data = &(struct track_event){}  */
     PLAYBACK_EVENT_CUR_TRACK_READY,
-    /* Current user track finished */
+    /* Current user track finished
+       data = &(struct track_event){}  */
     PLAYBACK_EVENT_TRACK_FINISH,
-    /* A new current user track has begun */
+    /* A new current user track has begun
+       data = &(struct track_event){} */
     PLAYBACK_EVENT_TRACK_CHANGE,
-    /* A manual skip is about to be processed */
+    /* A manual skip is about to be processed
+       data = NULL */
     PLAYBACK_EVENT_TRACK_SKIP,
-    /* Next track medadata was just loaded */
+    /* Next track medadata was just loaded
+       data = &(struct track_event){} */
     PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE,
-    /* Voice is playing: data = &(bool){true|false} */
+    /* Voice is playing
+       data = &(bool){true|false} */
     PLAYBACK_EVENT_VOICE_PLAYING,
 };
 

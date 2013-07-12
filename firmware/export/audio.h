@@ -236,12 +236,26 @@ int audio_get_spdif_sample_rate(void);
 void audio_spdif_set_monitor(int monitor_spdif);
 #endif /* HAVE_SPDIF_IN */
 
-unsigned long audio_prev_elapsed(void);
-
-#if CONFIG_CODEC != SWCODEC
 /***********************************************************************/
 /* audio event handling */
+enum track_event_flags
+{
+    TEF_NONE      = 0x0,  /* no flags are set */
+    TEF_CURRENT   = 0x1,  /* event is for the current track */
+#if CONFIG_CODEC == SWCODEC
+    TEF_AUTO_SKIP = 0x2,  /* event is sent in context of auto skip */
+    TEF_REWIND    = 0x4,  /* interpret as rewind, id3->elapsed is the
+                             position before the seek back to 0 */
+#endif /* CONFIG_CODEC == SWCODEC */
+};
 
+struct track_event
+{
+    unsigned int flags;   /* combo of enum track_event_flags values */
+    struct mp3entry *id3; /* pointer to mp3entry describing track */
+};
+
+#if CONFIG_CODEC != SWCODEC
 /* subscribe to one or more audio event(s) by OR'ing together the desired */
 /* event IDs (defined below); a handler is called with a solitary event ID */
 /* (so switch() is okay) and possibly some useful data (depending on the */

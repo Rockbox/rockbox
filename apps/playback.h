@@ -88,10 +88,6 @@ enum
 bool audio_restore_playback(int type); /* Restores the audio buffer to handle the requested playback */
 size_t audio_get_filebuflen(void);
 
-/* Automatic transition? Only valid to call during the track change events,
-   otherwise the result is undefined. */
-bool audio_automatic_skip(void);
-
 unsigned int playback_status(void);
 
 #endif /* _PLAYBACK_H */

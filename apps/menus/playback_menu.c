@@ -157,7 +157,7 @@ static int audioscrobbler_callback(int action,const struct menu_item_ex *this_it
                 scrobbler_init();
 
             if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
-                scrobbler_shutdown();
+                scrobbler_shutdown(false);
             break;
     }
     return action;

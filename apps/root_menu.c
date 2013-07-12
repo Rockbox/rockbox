@@ -89,7 +89,7 @@ static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
 static char current_track_path[MAX_PATH];
 static void rootmenu_track_changed_callback(void* param)
 {
-    struct mp3entry *id3 = (struct mp3entry *)param;
+    struct mp3entry *id3 = ((struct track_event *)param)->id3;
     strlcpy(current_track_path, id3->path, MAX_PATH);
 }
 static int browser(void* param)

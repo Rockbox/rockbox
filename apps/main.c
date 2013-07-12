@@ -420,7 +420,8 @@ static void init(void)
               global_settings.superbass);
 #endif /* CONFIG_CODEC != SWCODEC */
 
-    scrobbler_init();
+    if (global_settings.audioscrobbler)
+        scrobbler_init();
 
     audio_init();
 
@@ -700,7 +701,10 @@ static void init(void)
     playlist_init();
     tree_mem_init();
     filetype_init();
-    scrobbler_init();
+
+    if (global_settings.audioscrobbler)
+        scrobbler_init();
+
     shortcuts_init();
 
 #if CONFIG_CODEC != SWCODEC

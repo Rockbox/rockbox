@@ -46,7 +46,7 @@ static const struct dim dim = { .width = 200, .height = 200 };
  * notify about track change, and show track info */
 static void track_changed_callback(void *param)
 {
-    struct mp3entry* id3 = (struct mp3entry*)param;
+    struct mp3entry* id3 = ((struct track_event *)param)->id3;
     JNIEnv e = *env_ptr;
     if (id3)
     {
@@ -108,7 +108,9 @@ static void track_changed_callback(void *param)
  * notify about track finishing */
 static void track_finished_callback(void *param)
 {
-    (void)param;
+    if (((struct track_event *)param)->flags & TEF_REWIND)
+        return; /* Not a true track end */
+
     JNIEnv e = *env_ptr;
     e->CallVoidMethod(env_ptr, NotificationManager_instance,
                       finishNotification);

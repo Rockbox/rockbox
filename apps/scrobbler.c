@@ -52,50 +52,40 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 /* longest entry I've had is 323, add a safety margin */
 #define SCROBBLER_CACHE_LEN 512
 
-static int scrobbler_cache;
-
-static int cache_pos;
-static struct mp3entry scrobbler_entry;
-static bool pending = false;
 static bool scrobbler_initialised = false;
+static int scrobbler_cache = 0;
+static int cache_pos = 0;
+static bool pending = false;
 #if CONFIG_RTC
 static time_t timestamp;
-#else
-static unsigned long timestamp;
-#endif
-
-/* Crude work-around for Archos Sims - return a set amount */
-#if (CONFIG_CODEC != SWCODEC) && (CONFIG_PLATFORM & PLATFORM_HOSTED)
-unsigned long audio_prev_elapsed(void)
-{
-    return 120000;
-}
-#endif
+#define BASE_FILENAME       ".scrobbler.log"
+#define HDR_STR_TIMELESS
+#define get_timestamp()     ((long)timestamp)
+#define record_timestamp()  ((void)(timestamp = mktime(get_time())))
+#else /* !CONFIG_RTC */
+#define HDR_STR_TIMELESS    " Timeless"
+#define BASE_FILENAME       ".scrobbler-timeless.log"
+#define get_timestamp()     (0l)
+#define record_timestamp()  ({})
+#endif /* CONFIG_RTC */
 
 static void get_scrobbler_filename(char *path, size_t size)
 {
     int used;
-
-#if CONFIG_RTC
-    const char *base_filename = ".scrobbler.log";
-#else
-    const char *base_filename = ".scrobbler-timeless.log";
-#endif
-
 /* Get location of USB mass storage area */
 #ifdef APPLICATION
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    used = snprintf(path, size, "/home/user/MyDocs/%s", base_filename);
+    used = snprintf(path, size, "/home/user/MyDocs/%s", BASE_FILENAME);
 #elif (CONFIG_PLATFORM & PLATFORM_ANDROID)
-    used = snprintf(path, size, "/sdcard/%s", base_filename);
+    used = snprintf(path, size, "/sdcard/%s", BASE_FILENAME);
 #elif defined (SAMSUNG_YPR0)
-    used = snprintf(path, size, "%s/%s", HOME_DIR, base_filename);
+    used = snprintf(path, size, "%s/%s", HOME_DIR, BASE_FILENAME);
 #else /* SDL/unknown RaaA build */
-    used = snprintf(path, size, "%s/%s", ROCKBOX_DIR, base_filename);
+    used = snprintf(path, size, "%s/%s", ROCKBOX_DIR, BASE_FILENAME);
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
 
 #else
-    used = snprintf(path, size, "/%s", base_filename);
+    used = snprintf(path, size, "/%s", BASE_FILENAME);
 #endif
 
     if (used >= (int)size)
@@ -121,12 +111,9 @@ static void write_cache(void)
         if(fd >= 0)
         {
             fdprintf(fd, "#AUDIOSCROBBLER/" SCROBBLER_VERSION "\n"
-                         "#TZ/UNKNOWN\n"
-#if CONFIG_RTC
-                         "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION "\n");
-#else
-                         "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION " Timeless\n");
-#endif
+                         "#TZ/UNKNOWN\n" "#CLIENT/Rockbox "
+                         TARGET_NAME SCROBBLER_REVISION
+                         HDR_STR_TIMELESS "\n");
 
             close(fd);
         }
@@ -170,51 +157,43 @@ static void scrobbler_flush_callback(void *data)
         write_cache();
 }
 
-static void add_to_cache(unsigned long play_length)
+static void add_to_cache(const struct mp3entry *id)
 {
     if ( cache_pos >= SCROBBLER_MAX_CACHE )
         write_cache();
 
-    int ret;
     char rating = 'S'; /* Skipped */
     char* scrobbler_buf = core_get_data(scrobbler_cache);
 
     logf("SCROBBLER: add_to_cache[%d]", cache_pos);
 
-    if ( play_length > (scrobbler_entry.length/2) )
+    if (id->elapsed > id->length / 2)
         rating = 'L'; /* Listened */
 
-    if (scrobbler_entry.tracknum > 0)
-    {
-        ret = snprintf(scrobbler_buf+(SCROBBLER_CACHE_LEN*cache_pos),
-                SCROBBLER_CACHE_LEN,
-                "%s\t%s\t%s\t%d\t%d\t%c\t%ld\t%s\n",
-                scrobbler_entry.artist,
-                scrobbler_entry.album?scrobbler_entry.album:"",
-                scrobbler_entry.title,
-                scrobbler_entry.tracknum,
-                (int)scrobbler_entry.length/1000,
-                rating,
-                (long)timestamp,
-                scrobbler_entry.mb_track_id?scrobbler_entry.mb_track_id:"");
-    } else {
-        ret = snprintf(scrobbler_buf+(SCROBBLER_CACHE_LEN*cache_pos),
-                SCROBBLER_CACHE_LEN,
-                "%s\t%s\t%s\t\t%d\t%c\t%ld\t%s\n",
-                scrobbler_entry.artist,
-                scrobbler_entry.album?scrobbler_entry.album:"",
-                scrobbler_entry.title,
-                (int)scrobbler_entry.length/1000,
-                rating,
-                (long)timestamp,
-                scrobbler_entry.mb_track_id?scrobbler_entry.mb_track_id:"");
-    }
+    char tracknum[11] = { "" };
+
+    if (id->tracknum > 0)
+        snprintf(tracknum, sizeof (tracknum), "%d", id->tracknum);
+
+    int ret = snprintf(scrobbler_buf+(SCROBBLER_CACHE_LEN*cache_pos),
+                       SCROBBLER_CACHE_LEN,
+                       "%s\t%s\t%s\t%s\t%d\t%c\t%ld\t%s\n",
+                       id->artist,
+                       id->album ?: "",
+                       id->title,
+                       tracknum,
+                       (int)(id->length / 1000),
+                       rating,
+                       get_timestamp(),
+                       id->mb_track_id ?: "");
 
     if ( ret >= SCROBBLER_CACHE_LEN )
     {
         logf("SCROBBLER: entry too long:");
-        logf("SCROBBLER: %s", scrobbler_entry.path);
-    } else {
+        logf("SCROBBLER: %s", id->path);
+    }
+    else
+    {
         cache_pos++;
         register_storage_idle_func(scrobbler_flush_callback);
     }
@@ -223,15 +202,11 @@ static void add_to_cache(unsigned long play_length)
 
 static void scrobbler_change_event(void *data)
 {
-    struct mp3entry *id = (struct mp3entry*)data;
-    /* add entry using the previous scrobbler_entry and timestamp */
-    if (pending)
-        add_to_cache(audio_prev_elapsed());
+    struct mp3entry *id = ((struct track_event *)data)->id3;
 
     /*  check if track was resumed > %50 played
         check for blank artist or track name */
-    if ((id->elapsed > (id->length/2)) ||
-        (!id->artist ) || (!id->title ) )
+    if (id->elapsed > id->length / 2 || !id->artist || !id->title)
     {
         pending = false;
         logf("SCROBBLER: skipping file %s", id->path);
@@ -239,81 +214,85 @@ static void scrobbler_change_event(void *data)
     else
     {
         logf("SCROBBLER: add pending");
-        copy_mp3entry(&scrobbler_entry, id);
-#if CONFIG_RTC
-        timestamp = mktime(get_time());
-#else
-        timestamp = 0;
-#endif
+        record_timestamp();
         pending = true;
+    }
+}
+
+static void scrobbler_finish_event(void *data)
+{
+    struct track_event *te = (struct track_event *)data;
+
+    /* add entry using the currently ending track */
+    if (pending && (te->flags & TEF_CURRENT)
+#if CONFIG_CODEC == SWCODEC
+        && !(te->flags & TEF_REWIND)
+#endif
+    )
+    {
+        pending = false;
+        add_to_cache(te->id3);
     }
 }
 
 int scrobbler_init(void)
 {
-    logf("SCROBBLER: init %d", global_settings.audioscrobbler);
+    if (scrobbler_initialised)
+        return 1;
 
-    if(!global_settings.audioscrobbler)
-        return -1;
+    scrobbler_cache = core_alloc("scrobbler",
+        SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
 
-    scrobbler_cache = core_alloc("scrobbler", SCROBBLER_MAX_CACHE*SCROBBLER_CACHE_LEN);
     if (scrobbler_cache <= 0)
     {
         logf("SCROOBLER: OOM");
         return -1;
     }
 
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, scrobbler_change_event);
     cache_pos = 0;
     pending = false;
+
     scrobbler_initialised = true;
+
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, scrobbler_change_event);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH, false, scrobbler_finish_event);
 
     return 1;
 }
 
 static void scrobbler_flush_cache(void)
 {
-    if (scrobbler_initialised)
-    {
         /* Add any pending entries to the cache */
-        if(pending)
-            add_to_cache(audio_prev_elapsed());
-
-        /* Write the cache to disk if needed */
-        if (cache_pos)
-            write_cache();
-
+    if (pending)
+    {
         pending = false;
+        if (audio_status())
+            add_to_cache(audio_current_track());
     }
+
+    /* Write the cache to disk if needed */
+    if (cache_pos)
+        write_cache();
 }
 
-void scrobbler_shutdown(void)
+void scrobbler_shutdown(bool poweroff)
 {
+    if (!scrobbler_initialised)
+        return;
+
+    remove_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
+    remove_event(PLAYBACK_EVENT_TRACK_FINISH, scrobbler_finish_event);
+
     scrobbler_flush_cache();
 
-    if (scrobbler_initialised)
+    if (!poweroff)
     {
-        remove_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
-        scrobbler_initialised = false;
         /* get rid of the buffer */
         core_free(scrobbler_cache);
         scrobbler_cache = 0;
     }
-}
 
-void scrobbler_poweroff(void)
-{
-    if (scrobbler_initialised && pending)
-    {
-        if ( audio_status() )
-            add_to_cache(audio_current_track()->elapsed);
-        else
-            add_to_cache(audio_prev_elapsed());
-
-        /* scrobbler_shutdown is called later, the cache will be written
-        *  make sure the final track isn't added twice when that happens */
-        pending = false;
-    }
+    scrobbler_initialised = false;
 }
 
 bool scrobbler_is_enabled(void)

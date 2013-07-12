@@ -23,8 +23,7 @@
 #define __SCROBBLER_H__
 
 int scrobbler_init(void);
-void scrobbler_shutdown(void);
-void scrobbler_poweroff(void);
+void scrobbler_shutdown(bool poweroff);
 bool scrobbler_is_enabled(void);
 
 #endif /* __SCROBBLER_H__ */

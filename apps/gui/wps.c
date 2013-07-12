@@ -1190,7 +1190,7 @@ long gui_wps_show(void)
 static void track_changed_callback(void *param)
 {
     struct wps_state *state = skin_get_global_state();
-    state->id3 = (struct mp3entry*)param;
+    state->id3 = ((struct track_event *)param)->id3;
     state->nid3 = audio_next_track();
     if (state->id3->cuesheet)
     {

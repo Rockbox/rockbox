@@ -794,10 +794,13 @@ static int compare(const void *p1, const void *p2)
 static void tagtree_buffer_event(void *data)
 {
     struct tagcache_search tcs;
-    struct mp3entry *id3 = (struct mp3entry*)data;
+    struct mp3entry *id3 = ((struct track_event *)data)->id3;
+
+    bool runtimedb = global_settings.runtimedb;
+    bool autoresume = global_settings.autoresume_enable;
 
     /* Do not gather data unless proper setting has been enabled. */
-    if (!global_settings.runtimedb && !global_settings.autoresume_enable)
+    if (!runtimedb && !autoresume)
         return;
 
     logf("be:%s", id3->path);
@@ -811,7 +814,7 @@ static void tagtree_buffer_event(void *data)
         return;
     }
 
-    if (global_settings.runtimedb)
+    if (runtimedb)
     {
         id3->playcount  = tagcache_get_numeric(&tcs, tag_playcount);
         if (!id3->rating)
@@ -824,7 +827,7 @@ static void tagtree_buffer_event(void *data)
     }
 
  #if CONFIG_CODEC == SWCODEC
-    if (global_settings.autoresume_enable)
+    if (autoresume)
     {
         /* Load current file resume offset if not already defined (by
            another resume mechanism) */
@@ -846,18 +849,10 @@ static void tagtree_buffer_event(void *data)
 
 static void tagtree_track_finish_event(void *data)
 {
-    long lastplayed;
-    long tagcache_idx;
-    struct mp3entry *id3 = (struct mp3entry*)data;
+    struct track_event *te = (struct track_event *)data;
+    struct mp3entry *id3 = te->id3;
 
-    /* Do not gather data unless proper setting has been enabled. */
-    if (!global_settings.runtimedb && !global_settings.autoresume_enable)
-    {
-        logf("runtimedb gathering and autoresume not enabled");
-        return;
-    }
-
-    tagcache_idx=id3->tagcache_idx;
+    long tagcache_idx = id3->tagcache_idx;
     if (!tagcache_idx)
     {
         logf("No tagcache index pointer found");
@@ -865,26 +860,51 @@ static void tagtree_track_finish_event(void *data)
     }
     tagcache_idx--;
 
-    /* Don't process unplayed tracks, or tracks interrupted within the
-       first 15 seconds. */
-    if (id3->elapsed == 0
 #if CONFIG_CODEC == SWCODEC /* HWCODEC doesn't have automatic_skip */
-        || (id3->elapsed < 15 * 1000 && !audio_automatic_skip())
+    bool auto_skip = te->flags & TEF_AUTO_SKIP;
 #endif
-        )
+    bool runtimedb = global_settings.runtimedb;
+    bool autoresume = global_settings.autoresume_enable;
+
+    /* Don't process unplayed tracks, or tracks interrupted within the
+       first 15 seconds but always process autoresume point */
+    if (runtimedb && (id3->elapsed == 0
+#if CONFIG_CODEC == SWCODEC
+        || (id3->elapsed < 15 * 1000 && !auto_skip)
+#endif
+        ))
     {
-        logf("not logging unplayed or skipped track");
+        logf("not db logging unplayed or skipped track");
+        runtimedb = false;
+    }
+
+#if CONFIG_CODEC == SWCODEC
+    /* 3s because that is the threshold the WPS uses to rewind instead
+       of skip backwards */
+    if (autoresume && (id3->elapsed == 0
+        || (id3->elapsed < 3 * 1000 && !auto_skip)))
+    {
+        logf("not logging autoresume");
+        autoresume = false;
+    }
+#endif
+
+    /* Do not gather data unless proper setting has been enabled and at least
+       one is still slated to be recorded */
+    if (!(runtimedb || autoresume))
+    {
+        logf("runtimedb gathering and autoresume not enabled/ignored");
         return;
     }
 
-    lastplayed = tagcache_increase_serial();
+    long lastplayed = tagcache_increase_serial();
     if (lastplayed < 0)
     {
         logf("incorrect tc serial:%ld", lastplayed);
         return;
     }
 
-    if (global_settings.runtimedb)
+    if (runtimedb)
     {
         long playcount;
         long playtime;
@@ -906,10 +926,9 @@ static void tagtree_track_finish_event(void *data)
     }
 
 #if CONFIG_CODEC == SWCODEC
-    if (global_settings.autoresume_enable)
+    if (autoresume)
     {
-        unsigned long offset
-            = audio_automatic_skip() ? 0 : id3->offset;
+        unsigned long offset = auto_skip ? 0 : id3->offset;
 
         tagcache_update_numeric(tagcache_idx, tag_lastoffset, offset);
 

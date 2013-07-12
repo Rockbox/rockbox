@@ -155,13 +155,6 @@ static struct mp3entry static_id3_entries[ID3_TYPE_NUM_STATIC]; /* (A,O) */
 /* Peeking functions can yield and mess us up */
 static struct mutex id3_mutex SHAREDBSS_ATTR; /* (A,O)*/
 
-
-/** For Scrobbler support **/
-
-/* Previous track elapsed time */
-static unsigned long prev_track_elapsed = 0; /* (A,O-) */
-
-
 /** For album art support **/
 #define MAX_MULTIPLE_AA SKINNABLE_SCREENS_COUNT
 #ifdef HAVE_ALBUMART
@@ -296,9 +289,8 @@ enum track_skip_type
    would work as expected */
 
 /* Used to indicate status for the events. Must be separate to satisfy all
-   clients so the correct metadata is read when sending the change events
-   and also so that it is read correctly outside the events. */
-static bool automatic_skip = false; /* (A, O-) */
+   clients so the correct metadata is read when sending the change events. */
+static unsigned int track_event_flags = TEF_NONE; /* (A, O-) */
 
 /* Pending manual track skip offset */
 static int skip_offset = 0; /* (A, O) */
@@ -1056,6 +1048,16 @@ static void audio_handle_track_load_status(int trackstat)
     }
 }
 
+/* Send track events that use a struct track_event for data */
+static void send_track_event(unsigned int id, unsigned int flags,
+                             struct mp3entry *id3)
+{
+    if (id3 == id3_get(PLAYING_ID3))
+        flags |= TEF_CURRENT;
+
+    send_event(id, &(struct track_event){ .flags = flags, .id3 = id3 });
+}
+
 /* Announce the end of playing the current track */
 static void audio_playlist_track_finish(void)
 {
@@ -1066,12 +1068,8 @@ static void audio_playlist_track_finish(void)
 
     if (id3)
     {
-        send_event(PLAYBACK_EVENT_TRACK_FINISH, id3);
-        prev_track_elapsed = id3->elapsed;
-    }
-    else
-    {
-        prev_track_elapsed = 0;
+        send_track_event(PLAYBACK_EVENT_TRACK_FINISH,
+                         track_event_flags, id3);
     }
 }
 
@@ -1081,7 +1079,10 @@ static void audio_playlist_track_change(void)
     struct mp3entry *id3 = valid_mp3entry(id3_get(PLAYING_ID3));
 
     if (id3)
-        send_event(PLAYBACK_EVENT_TRACK_CHANGE, id3);
+    {
+        send_track_event(PLAYBACK_EVENT_TRACK_CHANGE,
+                         track_event_flags, id3);
+    }
 
     position_key = pcmbuf_get_position_key();
 
@@ -1092,8 +1093,8 @@ static void audio_playlist_track_change(void)
 static void audio_update_and_announce_next_track(const struct mp3entry *id3_next)
 {
     id3_write_locked(NEXTTRACK_ID3, id3_next);
-    send_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE,
-               id3_get(NEXTTRACK_ID3));
+    send_track_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE,
+                     0,  id3_get(NEXTTRACK_ID3));
 }
 
 /* Bring the user current mp3entry up to date and set a new offset for the
@@ -1441,7 +1442,7 @@ static bool audio_start_codec(bool auto_skip)
         bool resume = !auto_skip;
 
         /* Send the "buffer" event to obtain the resume position for the codec */
-        send_event(PLAYBACK_EVENT_TRACK_BUFFER, cur_id3);
+        send_track_event(PLAYBACK_EVENT_TRACK_BUFFER, 0, cur_id3);
 
         if (!resume)
         {
@@ -1497,7 +1498,7 @@ static bool audio_start_codec(bool auto_skip)
 #endif
     {
         /* Send the "buffer" event now */
-        send_event(PLAYBACK_EVENT_TRACK_BUFFER, cur_id3);
+        send_track_event(PLAYBACK_EVENT_TRACK_BUFFER, 0, cur_id3);
     }
 
     buf_pin_handle(info->id3_hid, false);
@@ -1893,7 +1894,8 @@ static int audio_finish_load_track(struct track_info *info)
         /* Send only when the track handles could not all be opened ahead of
            time for the user's current track - otherwise everything is ready
            by the time PLAYBACK_EVENT_TRACK_CHANGE is sent */
-        send_event(PLAYBACK_EVENT_CUR_TRACK_READY, id3_get(PLAYING_ID3));
+        send_track_event(PLAYBACK_EVENT_CUR_TRACK_READY, 0,
+                         id3_get(PLAYING_ID3));
     }
 
 #ifdef HAVE_CODEC_BUFFERING
@@ -2157,7 +2159,7 @@ static void audio_on_finish_load_track(int id3_hid)
         buf_read_cuesheet(info->cuesheet_hid);
     }
 
-    if (audio_start_codec(automatic_skip))
+    if (audio_start_codec(track_event_flags & TEF_AUTO_SKIP))
     {
         if (is_user_current)
         {
@@ -2356,7 +2358,7 @@ static void audio_on_codec_complete(int status)
 
     int trackstat = LOAD_TRACK_OK;
 
-    automatic_skip = true;
+    track_event_flags = TEF_AUTO_SKIP;
     skip_pending = TRACK_SKIP_AUTO;
 
     /* Does this track have an entry allocated? */
@@ -2471,7 +2473,7 @@ static void audio_start_playback(size_t offset, unsigned int flags)
 
         halt_decoding_track(true);
 
-        automatic_skip = false;
+        track_event_flags = TEF_NONE;
         ff_rw_mode = false;
 
         if (flags & AUDIO_START_RESTART)
@@ -2595,7 +2597,7 @@ static void audio_stop_playback(void)
     audio_playlist_track_finish();
 
     skip_pending = TRACK_SKIP_NONE;
-    automatic_skip = false;
+    track_event_flags = TEF_NONE;
 
     /* Close all tracks and mark them NULL */
     remove_event(BUFFER_EVENT_REBUFFER, buffer_event_rebuffer_callback);
@@ -2667,7 +2669,7 @@ static void audio_on_skip(void)
     ff_rw_mode = false;
 
     /* Manual skip */
-    automatic_skip = false;
+    track_event_flags = TEF_NONE;
 
     /* If there was an auto skip in progress, there will be residual
        advancement of the playlist and/or track list so compensation will be
@@ -2755,7 +2757,7 @@ static void audio_on_dir_skip(int direction)
     ff_rw_mode = false;
 
     /* Manual skip */
-    automatic_skip = false;
+    track_event_flags = TEF_NONE;
 
     audio_playlist_track_finish();
 
@@ -2820,14 +2822,14 @@ static void audio_on_ff_rewind(long time)
         struct mp3entry *id3 = id3_get(PLAYING_ID3);
         struct mp3entry *ci_id3 = id3_get(CODEC_ID3);
 
-        automatic_skip = false;
+        track_event_flags = TEF_NONE;
 
-        /* Send event before clobbering the time */
-        /* FIXME: Nasty, but the tagtree expects this so that rewinding and
-           then skipping back to this track resumes properly. Something else
-           should be sent. We're not _really_ finishing the track are we? */
+        /* Send event before clobbering the time if rewinding. */
         if (time == 0)
-            send_event(PLAYBACK_EVENT_TRACK_FINISH, id3);
+        {
+            send_track_event(PLAYBACK_EVENT_TRACK_FINISH,
+                             track_event_flags | TEF_REWIND, id3);
+        }
 
         id3->elapsed = time;
         queue_reply(&audio_queue, 1);
@@ -3662,25 +3664,11 @@ void playback_release_aa_slot(int slot)
 }
 #endif /* HAVE_ALBUMART */
 
-/* Is an automatic skip in progress? If called outside transition callbacks,
-   indicates the last skip type at the time it was processed and isn't very
-   meaningful. */
-bool audio_automatic_skip(void)
-{
-    return automatic_skip;
-}
-
 /* Would normally calculate byte offset from an elapsed time but is not
    used on SWCODEC */
 int audio_get_file_pos(void)
 {
     return 0;
-}
-
-/* Return the elapsed time of the track previous to the current */
-unsigned long audio_prev_elapsed(void)
-{
-    return prev_track_elapsed;
 }
 
 /* Return total file buffer length after accounting for the talk buf */

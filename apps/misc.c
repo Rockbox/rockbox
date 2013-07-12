@@ -269,8 +269,6 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
     long msg_id = -1;
 
-    scrobbler_poweroff();
-
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
 #endif
@@ -349,6 +347,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             audio_close_recording();
 #endif
+            scrobbler_shutdown(true);
 
             if(global_settings.talk_menu)
             {
