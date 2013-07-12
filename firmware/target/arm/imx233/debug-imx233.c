@@ -21,7 +21,6 @@
 
 #include "system.h"
 #include "dma-imx233.h"
-#include "action.h"
 #include "lcd.h"
 #include "font.h"
 #include "adc.h"
@@ -35,10 +34,54 @@
 #include "ocotp-imx233.h"
 #include "pwm-imx233.h"
 #include "emi-imx233.h"
+#include "audioout-imx233.h"
 #include "string.h"
 #include "stdio.h"
+#include "button.h"
 
-#define DEBUG_CANCEL  BUTTON_BACK
+#define ACT_NONE    0
+#define ACT_CANCEL  1
+#define ACT_OK      2
+#define ACT_PREV    3
+#define ACT_NEXT    4
+#define ACT_LEFT    5
+#define ACT_RIGHT   6
+#define ACT_REPEAT  0x1000
+
+int my_get_action(int tmo)
+{
+    int btn = button_get_w_tmo(tmo);
+    while(btn & BUTTON_REL)
+        btn = button_get_w_tmo(tmo);
+    bool repeat = btn & BUTTON_REPEAT;
+    int act = ACT_NONE;
+    switch(btn)
+    {
+        case BUTTON_POWER:
+        case BUTTON_BACK:
+            act = ACT_CANCEL;
+            break;
+#ifdef BUTTON_SELECT
+        case BUTTON_SELECT:
+#endif
+#if !defined(BUTTON_SELECT) && defined(BUTTON_PLAYPAUSE)
+        case BUTTON_PLAYPAUSE:
+#endif
+            act = ACT_OK;
+            break;
+        case BUTTON_UP:
+            act = ACT_PREV;
+            break;
+        case BUTTON_DOWN:
+            act = ACT_NEXT;
+            break;
+        default:
+            yield();
+    }
+    if(repeat)
+        act |= ACT_REPEAT;
+    return act;
+}
 
 static struct
 {
@@ -97,23 +140,22 @@ static struct
 bool dbg_hw_info_dma(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 25);
+        int button = my_get_action(HZ / 25);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
-        
+
         lcd_clear_display();
 
         lcd_putsf(0, 0, "S C name bar      apb ahb una");
@@ -126,7 +168,7 @@ bool dbg_hw_info_dma(void)
                 dbg_channels[i].name, info.bar, info.apb_bytes, info.ahb_bytes,
                 info.nr_unaligned);
         }
-        
+
         lcd_update();
         yield();
     }
@@ -135,23 +177,22 @@ bool dbg_hw_info_dma(void)
 bool dbg_hw_info_power(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
-        
+
         lcd_clear_display();
 
         struct imx233_power_info_t info = imx233_power_get_info(POWER_INFO_ALL);
@@ -187,32 +228,31 @@ bool dbg_hw_info_power(void)
         lcd_putsf(0, line++, "5V: dcdc: %d  xfer: %d", info._5v_enable_dcdc, info._5v_dcdc_xfer);
         lcd_putsf(0, line++, "5V: thr: %d mV use: %d cmps: %d", info._5v_vbusvalid_thr,
             info._5v_vbusvalid_detect, info._5v_vbus_cmps);
-        
+
         lcd_update();
         yield();
     }
 }
 
-bool dbg_hw_info_adc(void)
+bool dbg_hw_info_lradc(void)
 {
     lcd_setfont(FONT_SYSFIXED);
     
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 25);
+        int button = my_get_action(HZ / 25);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
-        
+
         lcd_clear_display();
 
         /* add battery readout in mV, this it is not the direct output of a channel */
@@ -222,7 +262,7 @@ bool dbg_hw_info_adc(void)
             lcd_putsf(0, i + 1, "%s %d", imx233_adc_channel_name[i],
                 adc_read(i));
         }
-        
+
         lcd_update();
         yield();
     }
@@ -255,19 +295,18 @@ static struct
 bool dbg_hw_info_clkctrl(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
@@ -313,23 +352,22 @@ bool dbg_hw_info_powermgmt(void)
 
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
-        
+
         lcd_clear_display();
         struct imx233_powermgmt_info_t info = imx233_powermgmt_get_info();
-        
+
         lcd_putsf(0, 0, "state: %s",
             info.state == DISCHARGING ? "discharging" :
 #if CONFIG_CHARGING >= CHARGING_MONITOR
@@ -345,7 +383,7 @@ bool dbg_hw_info_powermgmt(void)
         lcd_putsf(0, 1, "charging tmo: %d", info.charging_timeout);
         lcd_putsf(0, 2, "topoff tmo: %d", info.topoff_timeout);
         lcd_putsf(0, 3, "4p2ilimit tmo: %d", info.incr_4p2_ilimit_timeout);
-        
+
         lcd_update();
         yield();
     }
@@ -354,30 +392,29 @@ bool dbg_hw_info_powermgmt(void)
 bool dbg_hw_info_rtc(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
-        
+
         lcd_clear_display();
         struct imx233_rtc_info_t info = imx233_rtc_get_info();
-        
+
         lcd_putsf(0, 0, "seconds: %lu", info.seconds);
         for(int i = 0; i < 6; i++)
             lcd_putsf(0, i + 1, "persistent%d: 0x%lx", i, info.persistent[i]);
-        
+
         lcd_update();
         yield();
     }
@@ -387,26 +424,25 @@ bool dbg_hw_info_rtc(void)
 bool dbg_hw_info_dcp(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
-        
+
         lcd_clear_display();
         struct imx233_dcp_info_t info = imx233_dcp_get_info(DCP_INFO_ALL);
-        
+
         lcd_putsf(0, 0, "crypto: %d  csc: %d", info.has_crypto, info.has_csc);
         lcd_putsf(0, 1, "keys: %d  channels: %d", info.num_keys, info.num_channels);
         lcd_putsf(0, 2, "ciphers: 0x%lx  hash: 0x%lx", info.ciphers, info.hashs);
@@ -446,24 +482,23 @@ bool dbg_hw_info_icoll(void)
 
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
+            case ACT_NEXT:
                 first_irq++;
                 if(first_irq >= dbg_irqs_count)
                     first_irq = dbg_irqs_count - 1;
                 break;
-            case ACTION_STD_PREV:
+            case ACT_PREV:
                 first_irq--;
                 if(first_irq < 0)
                     first_irq = 0;
                 break;
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
@@ -490,25 +525,24 @@ bool dbg_hw_info_pinctrl(void)
 #endif
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
+            case ACT_NEXT:
 #ifdef IMX233_PINCTRL_DEBUG
                 top_user++;
                 break;
 #endif
-            case ACTION_STD_PREV:
+            case ACT_PREV:
 #ifdef IMX233_PINCTRL_DEBUG
                 if(top_user > 0)
                     top_user--;
                 break;
 #endif
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
@@ -587,21 +621,20 @@ bool dbg_hw_info_ocotp(void)
 
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
+            case ACT_NEXT:
                 top_user++;
                 break;
-            case ACTION_STD_PREV:
+            case ACT_PREV:
                 if(top_user > 0)
                     top_user--;
                 break;
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
@@ -634,18 +667,17 @@ bool dbg_hw_info_pwm(void)
 
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
+            case ACT_NEXT:
+            case ACT_PREV:
                 detailled_view = !detailled_view;
                 break;
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
@@ -693,22 +725,21 @@ bool dbg_hw_info_usb(void)
 
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
+            case ACT_NEXT:
                 BF_SET(USBPHY_CTRL, ENOTGIDDETECT);
                 BF_SET(USBPHY_CTRL, ENDEVPLUGINDETECT);
                 break;
-            case ACTION_STD_PREV:
+            case ACT_PREV:
                 BF_CLR(USBPHY_CTRL, ENOTGIDDETECT);
                 BF_CLR(USBPHY_CTRL, ENDEVPLUGINDETECT);
                 break;
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
@@ -739,16 +770,15 @@ bool dbg_hw_info_emi(void)
 
     while(1)
     {
-        int button = get_action(CONTEXT_STD, HZ / 10);
+        int button = my_get_action(HZ / 10);
         switch(button)
         {
-            case ACTION_STD_NEXT:
-            case ACTION_STD_PREV:
-            case ACTION_STD_OK:
-            case ACTION_STD_MENU:
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
-            case ACTION_STD_CANCEL:
+            case ACT_CANCEL:
                 lcd_setfont(FONT_UI);
                 return false;
         }
@@ -769,13 +799,138 @@ bool dbg_hw_info_emi(void)
     }
 }
 
+bool dbg_hw_info_audioout(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        switch(button)
+        {
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACT_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        struct imx233_audioout_info_t info = imx233_audioout_get_info();
+        int line = 0;
+#define display_sys(sys, name) \
+        if(info.sys) \
+        { \
+            char buffer[64]; \
+            snprintf(buffer, 64, "%s: ", name); \
+            for(int i = 0; i < 2; i++) \
+            { \
+                if(info.sys##mute[i]) \
+                    strcat(buffer, "mute"); \
+                else \
+                    snprintf(buffer + strlen(buffer), 64,  "%d.%d", \
+                        /* properly handle negative values ! */ \
+                        info.sys##vol[i] / 10, (10 + (info.sys##vol[i]) % 10) % 10); \
+                if(i == 0) \
+                    strcat(buffer, " / "); \
+                else \
+                    strcat(buffer, " dB"); \
+            } \
+            lcd_putsf(0, line++, "%s", buffer); \
+        } \
+        else \
+            lcd_putsf(0, line++, "%s: powered down", name);
+        display_sys(dac, "DAC");
+        display_sys(hp, "HP");
+        display_sys(spkr, "SPKR");
+#undef display_sys
+        lcd_putsf(0, line++, "capless: %d", info.capless);
+
+        lcd_update();
+        yield();
+    }
+}
+
+static struct
+{
+    const char *name;
+    bool (*fn)(void);
+} debug_screens[] =
+{
+    {"clock", dbg_hw_info_clkctrl},
+    {"dma", dbg_hw_info_dma},
+    {"lradc", dbg_hw_info_lradc},
+    {"power", dbg_hw_info_power},
+    {"powermgmt", dbg_hw_info_powermgmt},
+    {"rtc", dbg_hw_info_rtc},
+    {"dcp", dbg_hw_info_dcp},
+    {"pinctrl", dbg_hw_info_pinctrl},
+    {"icoll", dbg_hw_info_icoll},
+    {"ocotp", dbg_hw_info_ocotp},
+    {"pwm", dbg_hw_info_pwm},
+    {"usb", dbg_hw_info_usb},
+    {"emi", dbg_hw_info_emi},
+    {"audioout", dbg_hw_info_audioout},
+    {"target", dbg_hw_target_info},
+};
+
 bool dbg_hw_info(void)
 {
-    return dbg_hw_info_clkctrl() && dbg_hw_info_dma() && dbg_hw_info_adc() &&
-        dbg_hw_info_power() && dbg_hw_info_powermgmt() && dbg_hw_info_rtc() &&
-        dbg_hw_info_dcp() && dbg_hw_info_pinctrl() && dbg_hw_info_icoll() &&
-        dbg_hw_info_ocotp() && dbg_hw_info_pwm() && dbg_hw_info_usb() && dbg_hw_info_emi() &&
-        dbg_hw_target_info();
+    int nr_lines = lcd_getheight() / font_get(lcd_getfont())->height;
+    int len = ARRAYLEN(debug_screens);
+    int top_visible = 0;
+    int highlight = 0;
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        switch(button)
+        {
+            case ACT_NEXT:
+                highlight = (highlight + 1) % len;
+                break;
+            case ACT_PREV:
+                highlight = (highlight + len - 1) % len;
+                break;
+            case ACT_OK:
+                // if the screen returns true, advance to next screen
+                while(debug_screens[highlight].fn())
+                    highlight = (highlight + 1) % len;
+                lcd_setfont(FONT_UI);
+                break;
+            case ACT_CANCEL:
+                return false;
+        }
+        // adjust top visible if needed
+        if(highlight < top_visible)
+            top_visible = highlight;
+        else if(highlight >= top_visible + nr_lines)
+            top_visible = highlight - nr_lines + 1;
+
+        lcd_clear_display();
+
+        for(int i = top_visible; i < len && i < top_visible + nr_lines; i++)
+        {
+            if(i == highlight)
+            {
+                lcd_set_foreground(LCD_BLACK);
+                lcd_set_background(LCD_RGBPACK(255, 255, 0));
+            }
+            else
+            {
+                lcd_set_foreground(LCD_WHITE);
+                lcd_set_background(LCD_BLACK);
+            }
+            lcd_putsf(0, i - top_visible, "%s", debug_screens[i].name);
+        }
+        lcd_set_foreground(LCD_WHITE);
+        lcd_set_background(LCD_BLACK);
+
+        lcd_update();
+        yield();
+    }
 }
 
 bool dbg_ports(void)
