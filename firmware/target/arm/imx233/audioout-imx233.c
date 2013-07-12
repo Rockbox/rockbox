@@ -22,6 +22,7 @@
 #include "clkctrl-imx233.h"
 #include "rtc-imx233.h"
 #include "pcm_sampr.h"
+#include "string.h"
 
 static int hp_vol_l, hp_vol_r;
 static bool input_line1;
@@ -241,4 +242,31 @@ void imx233_audioout_set_3d_effect(int val)
         /* others: off */
         default: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 0); break;
     }
+}
+
+struct imx233_audioout_info_t imx233_audioout_get_info(void)
+{
+    struct imx233_audioout_info_t info;
+    memset(&info, 0, sizeof(info));
+    /* 6*10^6*basemult/(src_frac*8*(src_hold+1)) in Hz */
+    info.freq = 60000000 * BF_RD(AUDIOOUT_DACSRR, BASEMULT) / 8 /
+        BF_RD(AUDIOOUT_DACSRR, SRC_FRAC) / (1 + BF_RD(AUDIOOUT_DACSRR, SRC_HOLD));
+    info.hp_line1 = BF_RD(AUDIOOUT_HPVOL, SELECT);
+    /* convert half-dB to tenth-dB */
+    info.dacvol[0] = MAX((int)BF_RD(AUDIOOUT_DACVOLUME, VOLUME_LEFT) - 0xff, -100) * 5;
+    info.dacvol[1] = MAX((int)BF_RD(AUDIOOUT_DACVOLUME, VOLUME_RIGHT) - 0xff, -100) * 5;
+    info.dacmute[0] = BF_RD(AUDIOOUT_DACVOLUME, MUTE_LEFT);
+    info.dacmute[1] = BF_RD(AUDIOOUT_DACVOLUME, MUTE_RIGHT);
+    info.hpvol[0] = (info.hp_line1 ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_LEFT);
+    info.hpvol[1] = (info.hp_line1 ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_RIGHT);
+    info.hpmute[0] = info.hpmute[1] = BF_RD(AUDIOOUT_HPVOL, MUTE);
+    info.spkrvol[0] = info.spkrvol[1] = 155;
+    info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_SPEAKERCTRL, MUTE);
+    info.ss3d = BF_RD(AUDIOOUT_CTRL, SS3D_EFFECT);
+    info.ss3d = info.ss3d == 0 ? 0 : 15 * (1 + info.ss3d);
+    info.hp = !BF_RD(AUDIOOUT_PWRDN, HEADPHONE);
+    info.dac = !BF_RD(AUDIOOUT_PWRDN, DAC);
+    info.capless = BF_RD(AUDIOOUT_PWRDN, CAPLESS);
+    info.spkr = !BF_RD(AUDIOOUT_PWRDN, SPEAKER);
+    return info;
 }

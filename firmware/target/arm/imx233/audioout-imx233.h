@@ -27,6 +27,23 @@
 
 #include "regs/regs-audioout.h"
 
+struct imx233_audioout_info_t
+{
+    int freq; // in mHz
+    bool hp_line1;
+    bool dac;
+    int dacvol[2]; // in tenth-dB, l/r
+    bool dacmute[2]; // l/r
+    bool hp;
+    int hpvol[2]; // in tenth-db, l/r
+    bool hpmute[2]; // l/r
+    bool spkr;
+    int spkrvol[2]; // in tenth-db, l/r
+    int spkrmute[2]; // l/r
+    int ss3d; // in tenth-db
+    bool capless;
+};
+
 void imx233_audioout_preinit(void);
 void imx233_audioout_postinit(void);
 void imx233_audioout_close(void);
@@ -38,5 +55,7 @@ void imx233_audioout_set_freq(int fsel);
 void imx233_audioout_select_hp_input(bool line1);
 /* value in 1.5dB steps, from 0dB to 6dB */
 void imx233_audioout_set_3d_effect(int val);
+
+struct imx233_audioout_info_t imx233_audioout_get_info(void);
 
 #endif /* __audioout_imx233__ */
