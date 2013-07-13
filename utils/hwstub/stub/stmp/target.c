@@ -196,6 +196,11 @@ int target_get_info(int info, void **buffer)
         *buffer = &g_stmp;
         return sizeof(g_stmp);
     }
+    else if(info == HWSTUB_INFO_TARGET)
+    {
+        *buffer = &g_target;
+        return sizeof(g_target);
+    }
     else
         return -1;
 }

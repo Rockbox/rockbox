@@ -26,8 +26,8 @@
 #define HWSTUB_PROTOCOL     0x1d
 
 #define HWSTUB_VERSION_MAJOR    2
-#define HWSTUB_VERSION_MINOR    9
-#define HWSTUB_VERSION_REV      2
+#define HWSTUB_VERSION_MINOR    11
+#define HWSTUB_VERSION_REV      1
 
 #define HWSTUB_USB_VID  0xfee1
 #define HWSTUB_USB_PID  0xdead
@@ -46,17 +46,18 @@
 #define HWSTUB_RW_MEM       2 /* optional */
 #define HWSTUB_CALL         3 /* optional */
 #define HWSTUB_JUMP         4 /* optional */
-#define HWSTUB_AES_OTP      5 /* optional */
+#define HWSTUB_STOP         5 /* optional */
 
 /**
  * HWSTUB_GET_INFO: get some information about an aspect of the device.
  * The wIndex field of the SETUP specifies which information to get. */
 
 /* list of possible information */
-#define HWSTUB_INFO_VERSION     0
-#define HWSTUB_INFO_LAYOUT      1
-#define HWSTUB_INFO_STMP        2
-#define HWSTUB_INFO_FEATURES    3
+#define HWSTUB_INFO_VERSION     0 /* mandatory */
+#define HWSTUB_INFO_LAYOUT      1 /* mandatory */
+#define HWSTUB_INFO_STMP        2 /* optional */
+#define HWSTUB_INFO_FEATURES    3 /* mandatory */
+#define HWSTUB_INFO_TARGET      4 /* mandatory */
 
 struct usb_resp_info_version_t
 {
@@ -89,12 +90,21 @@ struct usb_resp_info_stmp_t
 #define HWSTUB_FEATURE_LOG      (1 << 0)
 #define HWSTUB_FEATURE_MEM      (1 << 1)
 #define HWSTUB_FEATURE_CALL     (1 << 2)
-#define HWSTUB_FEATURE_JUMP     (1 << 2)
-#define HWSTUB_FEATURE_AES_OTP  (1 << 3)
+#define HWSTUB_FEATURE_JUMP     (1 << 3)
+#define HWSTUB_FEATURE_STOP     (1 << 4)
 
 struct usb_resp_info_features_t
 {
     uint32_t feature_mask;
+};
+
+#define HWSTUB_TARGET_UNK       ('U' | 'N' << 8 | 'K' << 16 | ' ' << 24)
+#define HWSTUB_TARGET_STMP      ('S' | 'T' << 8 | 'M' << 16 | 'P' << 24)
+
+struct usb_resp_info_target_t
+{
+    uint32_t id;
+    char name[60];
 };
 
 /**
@@ -119,11 +129,12 @@ struct usb_resp_info_features_t
  * the transfer is either a read or a write. */
 
 /**
- * HWSTUB_AES_OTP: only if has HWSTUB_FEATURE_AES_OTP.
- * The control transfer contains the data to be en/decrypted and the data
- * is sent back on the interrupt endpoint. The first 16-bytes of the data
- * are interpreted as the IV. The output format is the same.
- * The wValue field contains the parameters of the process. */
-#define HWSTUB_AES_OTP_ENCRYPT  (1 << 0)
+ * HWSTUB_STOP: only if has HWSTUB_FEATURE_STOP.
+ * Stop hwstub. Several methods can be employed (not all may be supported).
+ * The method is stored in wValue and interpreted as follows:
+ * - reboot: immediately reboot the device
+ * - off: wait for USB disconnection and power off */
+#define HWSTUB_STOP_REBOOT  0
+#define HWSTUB_STOP_OFF     1
 
 #endif /* __HWSTUB_PROTOCOL__ */

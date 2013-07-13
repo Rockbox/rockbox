@@ -40,6 +40,7 @@ do
     h:add("It contains some information about the device and the following methods.");
     h:add("* read8/16/32(a) reads a 8/16/32-bit integer at address a");
     h:add("* write8/16/32(a, v) writes the 8/16/32-bit integer v at address a");
+    h:add("* print_log() prints the device log");
 
     h = HELP:create_topic("HW");
     h:add("This variable redirects to the current soc under hwstub.soc and should be changed by calling hwstub:soc:select only.");
@@ -70,6 +71,13 @@ if not hwstub.options.quiet then
     print("  device")
     print("    version: " .. string.format("%d.%d.%d", hwstub.dev.version.major,
         hwstub.dev.version.minor, hwstub.dev.version.revision))
+    print("    target")
+    local id_str = string.char(bit32.extract(hwstub.dev.target.id, 0, 8),
+        bit32.extract(hwstub.dev.target.id, 8, 8),
+        bit32.extract(hwstub.dev.target.id, 16, 8),
+        bit32.extract(hwstub.dev.target.id, 24, 8))
+    print("      id: " .. string.format("%#x (%s)", hwstub.dev.target.id, id_str))
+    print("      name: " .. hwstub.dev.target.name)
     print("    layout")
     print("      on-chip ram")
     print("        code: " .. string.format("%#x bytes @ %#x",
@@ -83,7 +91,6 @@ if not hwstub.options.quiet then
     print("      mem: " .. tostring(hwstub.dev.features.mem))
     print("      call: " .. tostring(hwstub.dev.features.call))
     print("      jump: " .. tostring(hwstub.dev.features.jump))
-    print("      aes_otp: " .. tostring(hwstub.dev.features.aes_otp))
 end
 
 --
