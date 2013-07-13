@@ -21,17 +21,10 @@
 #ifndef __HWSTUB_CONFIG__
 #define __HWSTUB_CONFIG__
 
-#define MEMORYSIZE      0
+#include "target-config.h"
+
 #define STACK_SIZE      0x1000
 #define MAX_LOGF_SIZE   128
-
-#define IRAM_ORIG       0
-#define IRAM_SIZE       0x8000
-#define DRAM_ORIG       0x40000000
-#define DRAM_SIZE       (MEMORYSIZE * 0x100000)
-
-#define CPU_ARM
-#define ARM_ARCH    5
 
 #if defined(CPU_ARM) && defined(__ASSEMBLER__)
 /* ARMv4T doesn't switch the T bit when popping pc directly, we must use BX */

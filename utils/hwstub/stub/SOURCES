@@ -1,0 +1,12 @@
+main.c
+crt0.S
+logf.c
+memcpy.S
+memmove.S
+memset.S
+string.c
+format.c
+#ifdef CONFIG_STMP
+usb_drv_arc.c
+stmp/target.c
+#endif

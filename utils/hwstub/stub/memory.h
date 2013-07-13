@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 by Amaury Pouly
+ * Copyright (C) 2013 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,14 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-sources
-{
-    hwstub = "hwstub.elf";
-}
+#ifndef __HWSTUB_MEMORY__
+#define __HWSTUB_MEMORY__
 
-section(0)
-{
-    load hwstub;
-    jump hwstub(1);
-}
+#include "stddef.h"
 
+void memset(void *dst, int c, size_t n);
+void memcpy(void *dst, const void *src, size_t n);
+void memmove(void *dst, const void *src, size_t n);
+
+#endif /* __HWSTUB_MEMORY__ */

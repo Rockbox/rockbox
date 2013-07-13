@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 by Amaury Pouly
+ * Copyright (C) 2007 by Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +18,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __HWSTUB_STRING__
-#define __HWSTUB_STRING__
+#ifndef _USB_DRV_H
+#define _USB_DRV_H
 
-#include "stddef.h"
+#include "usb_ch9.h"
 
-void memset(void *dst, int c, size_t n);
-void memcpy(void *dst, const void *src, size_t n);
-size_t strlen(const char *s);
+#define EP_CONTROL 0
 
-#endif /* __HWSTUB_STRING__ */
+#define DIR_OUT 0
+#define DIR_IN 1
+
+#define EP_DIR(ep) (((ep) & USB_ENDPOINT_DIR_MASK) ? DIR_IN : DIR_OUT)
+#define EP_NUM(ep) ((ep) & USB_ENDPOINT_NUMBER_MASK)
+
+void usb_drv_init(void);
+void usb_drv_exit(void);
+void usb_drv_stall(int endpoint, bool stall,bool in);
+int usb_drv_send(int endpoint, void* ptr, int length);
+int usb_drv_send_nonblocking(int endpoint, void* ptr, int length);
+int usb_drv_recv(int endpoint, void* ptr, int length);// blocking !
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length);
+int usb_drv_recv_setup(struct usb_ctrlrequest *req);
+void usb_drv_set_address(int address);
+int usb_drv_port_speed(void);
+void usb_drv_configure_endpoint(int ep_num, int type);
+
+#endif /* _USB_DRV_H */
+ 

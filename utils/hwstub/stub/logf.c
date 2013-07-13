@@ -22,6 +22,7 @@
 #include "logf.h"
 #include "format.h"
 #include "string.h"
+#include "memory.h"
 
 static unsigned char logfbuffer[MAX_LOGF_SIZE];
 static int logfread = 0;
