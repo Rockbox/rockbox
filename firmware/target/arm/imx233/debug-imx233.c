@@ -34,6 +34,7 @@
 #include "ocotp-imx233.h"
 #include "pwm-imx233.h"
 #include "emi-imx233.h"
+#include "audioin-imx233.h"
 #include "audioout-imx233.h"
 #include "string.h"
 #include "stdio.h"
@@ -799,8 +800,10 @@ bool dbg_hw_info_emi(void)
     }
 }
 
-bool dbg_hw_info_audioout(void)
+bool dbg_hw_info_audio(void)
 {
+    static const char *hp_sel[2] = {"DAC", "Line1"};
+    static const char *mux_sel[4] = {"Mic", "Line1", "HP", "Line2"};
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)
@@ -819,21 +822,22 @@ bool dbg_hw_info_audioout(void)
         }
 
         lcd_clear_display();
-        struct imx233_audioout_info_t info = imx233_audioout_get_info();
+        struct imx233_audioout_info_t out = imx233_audioout_get_info();
+        struct imx233_audioin_info_t in = imx233_audioin_get_info();
         int line = 0;
-#define display_sys(sys, name) \
-        if(info.sys) \
+#define display_sys(st, sys, name) \
+        if(st.sys) \
         { \
             char buffer[64]; \
             snprintf(buffer, 64, "%s: ", name); \
             for(int i = 0; i < 2; i++) \
             { \
-                if(info.sys##mute[i]) \
+                if(st.sys##mute[i]) \
                     strcat(buffer, "mute"); \
                 else \
                     snprintf(buffer + strlen(buffer), 64,  "%d.%d", \
                         /* properly handle negative values ! */ \
-                        info.sys##vol[i] / 10, (10 + (info.sys##vol[i]) % 10) % 10); \
+                        st.sys##vol[i] / 10, (10 + (st.sys##vol[i]) % 10) % 10); \
                 if(i == 0) \
                     strcat(buffer, " / "); \
                 else \
@@ -843,11 +847,16 @@ bool dbg_hw_info_audioout(void)
         } \
         else \
             lcd_putsf(0, line++, "%s: powered down", name);
-        display_sys(dac, "DAC");
-        display_sys(hp, "HP");
-        display_sys(spkr, "SPKR");
+        display_sys(out, dac, "DAC");
+        display_sys(out, hp, "HP");
+        display_sys(out, spkr, "SPKR");
+        display_sys(in, adc, "ADC");
+        display_sys(in, mux, "MUX");
+        display_sys(in, mic, "MIC");
 #undef display_sys
-        lcd_putsf(0, line++, "capless: %d", info.capless);
+        lcd_putsf(0, line++, "capless: %d", out.capless);
+        lcd_putsf(0, line++, "HP select: %s", hp_sel[out.hpselect]);
+        lcd_putsf(0, line++, "MUX select: %s / %s", mux_sel[in.muxselect[0]], mux_sel[in.muxselect[1]]);
 
         lcd_update();
         yield();
@@ -873,7 +882,7 @@ static struct
     {"pwm", dbg_hw_info_pwm},
     {"usb", dbg_hw_info_usb},
     {"emi", dbg_hw_info_emi},
-    {"audioout", dbg_hw_info_audioout},
+    {"audio", dbg_hw_info_audio},
     {"target", dbg_hw_target_info},
 };
 

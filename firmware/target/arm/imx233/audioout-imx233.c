@@ -251,14 +251,14 @@ struct imx233_audioout_info_t imx233_audioout_get_info(void)
     /* 6*10^6*basemult/(src_frac*8*(src_hold+1)) in Hz */
     info.freq = 60000000 * BF_RD(AUDIOOUT_DACSRR, BASEMULT) / 8 /
         BF_RD(AUDIOOUT_DACSRR, SRC_FRAC) / (1 + BF_RD(AUDIOOUT_DACSRR, SRC_HOLD));
-    info.hp_line1 = BF_RD(AUDIOOUT_HPVOL, SELECT);
+    info.hpselect = BF_RD(AUDIOOUT_HPVOL, SELECT);
     /* convert half-dB to tenth-dB */
     info.dacvol[0] = MAX((int)BF_RD(AUDIOOUT_DACVOLUME, VOLUME_LEFT) - 0xff, -100) * 5;
     info.dacvol[1] = MAX((int)BF_RD(AUDIOOUT_DACVOLUME, VOLUME_RIGHT) - 0xff, -100) * 5;
     info.dacmute[0] = BF_RD(AUDIOOUT_DACVOLUME, MUTE_LEFT);
     info.dacmute[1] = BF_RD(AUDIOOUT_DACVOLUME, MUTE_RIGHT);
-    info.hpvol[0] = (info.hp_line1 ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_LEFT);
-    info.hpvol[1] = (info.hp_line1 ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_RIGHT);
+    info.hpvol[0] = (info.hpselect ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_LEFT);
+    info.hpvol[1] = (info.hpselect ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_RIGHT);
     info.hpmute[0] = info.hpmute[1] = BF_RD(AUDIOOUT_HPVOL, MUTE);
     info.spkrvol[0] = info.spkrvol[1] = 155;
     info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_SPEAKERCTRL, MUTE);

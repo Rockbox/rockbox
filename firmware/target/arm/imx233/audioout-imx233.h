@@ -29,8 +29,9 @@
 
 struct imx233_audioout_info_t
 {
+    // NOTE there is a convention here: dac -> dacvol -> dacmute
     int freq; // in mHz
-    bool hp_line1;
+    bool hpselect;
     bool dac;
     int dacvol[2]; // in tenth-dB, l/r
     bool dacmute[2]; // l/r
