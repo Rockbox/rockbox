@@ -3457,15 +3457,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Touchpad Duyarlık"
+    gigabeatfx,sansafuzeplus: "Touchpad Duyarlık"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Touchpad Duyarlık"
+    gigabeatfx,sansafuzeplus: "Touchpad Duyarlık"
   </voice>
 </phrase>
 <phrase>

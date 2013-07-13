@@ -10497,15 +10497,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Sensibilidad de la superficie táctil"
+    gigabeatfx,sansafuzeplus: "Sensibilidad de la superficie táctil"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Sensibilidad de la superficie táctil"
+    gigabeatfx,sansafuzeplus: "Sensibilidad de la superficie táctil"
   </voice>
 </phrase>
 <phrase>

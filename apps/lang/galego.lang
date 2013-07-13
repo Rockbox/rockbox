@@ -6720,15 +6720,15 @@ iriverifp7xx: "%d%% %dh %dm"
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Sensibilidade do touchpad"
+    gigabeatfx,sansafuzeplus: "Sensibilidade do touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Sensibilidade do touchpad"
+    gigabeatfx,sansafuzeplus: "Sensibilidade do touchpad"
   </voice>
 </phrase>
 <phrase>

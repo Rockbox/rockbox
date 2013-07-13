@@ -10589,11 +10589,11 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Citlivosť Dotykovej Plochy"
+    gigabeatfx,sansafuzeplus: "Citlivosť Dotykovej Plochy"
   </dest>
   <voice>
     *: none

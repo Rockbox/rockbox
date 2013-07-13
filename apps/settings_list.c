@@ -1965,10 +1965,20 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
                   "keypress restarts sleeptimer", set_keypress_restarts_sleep_timer),
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+/* If specific values are set for touchpad sensitivity setting we use those */
+#if (defined(MAX_TOUCHPAD_SENSITIVITY_SETTING) \
+  && defined(MIN_TOUCHPAD_SENSITIVITY_SETTING) \
+  && defined(DEFAULT_TOUCHPAD_SENSITIVITY_SETTING))
+    INT_SETTING(F_NO_WRAP, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY,
+                DEFAULT_TOUCHPAD_SENSITIVITY_SETTING, "touchpad sensitivity",UNIT_INT,
+                MIN_TOUCHPAD_SENSITIVITY_SETTING, MAX_TOUCHPAD_SENSITIVITY_SETTING, 1,
+                NULL, NULL, touchpad_set_sensitivity),
+#else /* we failback to boolean normal/high values */
     CHOICE_SETTING(0, touchpad_sensitivity, LANG_TOUCHPAD_SENSITIVITY, 0,
                    "touchpad sensitivity", "normal,high", touchpad_set_sensitivity, 2,
                    ID2P(LANG_NORMAL), ID2P(LANG_HIGH)),
-#endif
+#endif /* boolean or analogig values */
+#endif /* HAVE_TOUCHPAD_SENSITIVITY_SETTING */
 #ifdef HAVE_QUICKSCREEN
    CUSTOM_SETTING(0, qs_items[QUICKSCREEN_TOP], LANG_TOP_QS_ITEM,
                   NULL, "qs top",

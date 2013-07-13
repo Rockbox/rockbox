@@ -10618,15 +10618,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Sensibilité du pavé tactile"
+    gigabeatfx,sansafuzeplus: "Sensibilité du pavé tactile"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Sensibilité du pavé tactile"
+    gigabeatfx,sansafuzeplus: "Sensibilité du pavé tactile"
   </voice>
 </phrase>
 <phrase>

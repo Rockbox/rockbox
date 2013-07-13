@@ -10593,15 +10593,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Sensibilità Touchpad"
+    gigabeatfx,sansafuzeplus: "Sensibilità Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Sensibilità Touchpad"
+    gigabeatfx,sansafuzeplus: "Sensibilità Touchpad"
   </voice>
 </phrase>
 <phrase>
