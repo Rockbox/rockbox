@@ -70,8 +70,8 @@ int my_get_action(int tmo)
             break;
 #if defined(BUTTON_SELECT)
         case BUTTON_SELECT:
-#elif defined(BUTTON_PLAYPAUSE)
-        case BUTTON_PLAYPAUSE:
+#elif defined(BUTTON_PLAY)
+        case BUTTON_PLAY:
 #elif defined(BUTTON_CENTER)
         case BUTTON_CENTER:
 #else
