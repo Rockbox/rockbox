@@ -73,6 +73,8 @@ void audiohw_disable_recording(void)
 
 void audiohw_set_recvol(int left, int right, int type)
 {
+    left /= 5;
+    right /= 5;
     if(type == AUDIO_GAIN_LINEIN)
     {
         imx233_audioin_set_vol(false, left, AUDIOIN_SELECT_LINE1);
