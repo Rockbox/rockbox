@@ -59,14 +59,23 @@ int my_get_action(int tmo)
     switch(btn)
     {
         case BUTTON_POWER:
+#if defined(BUTTON_BACK)
         case BUTTON_BACK:
+#elif defined(BUTTON_LEFT)
+        case BUTTON_LEFT:
+#else
+#error no key for ACT_CANCEL
+#endif
             act = ACT_CANCEL;
             break;
-#ifdef BUTTON_SELECT
+#if defined(BUTTON_SELECT)
         case BUTTON_SELECT:
-#endif
-#if !defined(BUTTON_SELECT) && defined(BUTTON_PLAYPAUSE)
+#elif defined(BUTTON_PLAYPAUSE)
         case BUTTON_PLAYPAUSE:
+#elif defined(BUTTON_CENTER)
+        case BUTTON_CENTER:
+#else
+#error no key for ACT_OK
 #endif
             act = ACT_OK;
             break;
