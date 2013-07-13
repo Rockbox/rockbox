@@ -37,6 +37,7 @@
  * Global variables
  */
 bool g_quiet = false;
+bool g_exit = false;
 struct hwstub_device_t g_hwdev;
 struct usb_resp_info_version_t g_hwdev_ver;
 struct usb_resp_info_layout_t g_hwdev_layout;
@@ -210,6 +211,12 @@ int my_lua_printlog(lua_State *state)
     return 0;
 }
 
+int my_lua_exit(lua_State *state)
+{
+    g_exit = true;
+    return 0;
+}
+
 bool my_lua_import_hwstub()
 {
     int oldtop = lua_gettop(g_lua);
@@ -339,6 +346,12 @@ bool my_lua_import_hwstub()
 
     lua_pushcfunction(g_lua, my_lua_help);
     lua_setglobal(g_lua, "help");
+
+    lua_pushcfunction(g_lua, my_lua_exit);
+    lua_setglobal(g_lua, "exit");
+
+    lua_pushcfunction(g_lua, my_lua_exit);
+    lua_setglobal(g_lua, "quit");
 
     if(lua_gettop(g_lua) != oldtop)
     {
@@ -824,7 +837,7 @@ int main(int argc, char **argv)
 
     // use readline to provide some history and completion
     rl_bind_key('\t', rl_complete);
-    while(1)
+    while(!g_exit)
     {
         char *input = readline("> ");
         if(!input)
