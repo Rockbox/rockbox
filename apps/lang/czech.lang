@@ -10593,11 +10593,11 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Citlivost touchpadu"
+    gigabeatfx,sansafuzeplus: "Citlivost touchpadu"
   </dest>
   <voice>
     *: none

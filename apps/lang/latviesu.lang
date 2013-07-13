@@ -10594,11 +10594,11 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Skārienvirsmas Jūtība"
+    gigabeatfx,sansafuzeplus: "Skārienvirsmas Jūtība"
   </dest>
   <voice>
     *: none

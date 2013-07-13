@@ -10452,15 +10452,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Sensitibo Touchpad"
+    gigabeatfx,sansafuzeplus: "Sensitibo Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Sensitibo Touchpad"
+    gigabeatfx,sansafuzeplus: "Sensitibo Touchpad"
   </voice>
 </phrase>
 <phrase>

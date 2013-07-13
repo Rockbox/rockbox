@@ -10369,15 +10369,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Styreputefølsemd"
+    gigabeatfx,sansafuzeplus: "Styreputefølsemd"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Styreputefølsemd"
+    gigabeatfx,sansafuzeplus: "Styreputefølsemd"
   </voice>
 </phrase>
 <phrase>

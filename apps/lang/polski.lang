@@ -10600,15 +10600,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx: "Czułość panelu dotykowego"
+    gigabeatfx,sansafuzeplus: "Czułość panelu dotykowego"
   </dest>
   <voice>
     *: none
-    gigabeatfx: "Czułość panelu dotykowego"
+    gigabeatfx,sansafuzeplus: "Czułość panelu dotykowego"
   </voice>
 </phrase>
 <phrase>
