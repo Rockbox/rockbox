@@ -101,16 +101,11 @@ static void select_audio_path(void)
 #if (INPUT_SRC_CAPS & SRC_CAP_FMRADIO)
         /* recording and playback */
         case AUDIO_SRC_FMRADIO:
-            if (recording)
-            {
-                audiohw_set_monitor(false);
+            audiohw_set_monitor(true);
+            if(recording)
                 audiohw_enable_recording(false);
-            }
             else
-            {
                 audiohw_disable_recording();
-                audiohw_set_monitor(true); /* line 2 analog audio path */
-            }
             break;
 #endif /* (INPUT_SRC_CAPS & SRC_CAP_FMRADIO) */
     }
