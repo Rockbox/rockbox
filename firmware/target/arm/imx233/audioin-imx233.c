@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "audioin-imx233.h"
 #include "pcm_sampr.h"
+#include "string.h"
 
 /* values in half-dB, one for each setting */
 static int audioin_vol[2][4]; /* 0=left, 1=right */
@@ -79,7 +80,7 @@ static void apply_config(void)
      * - microphone: -100dB -> 62dB in 0.5dB steps
      */
 
-    /* First apply mic gain of possible and necessary
+    /* First apply mic gain if possible and necessary
      * Only left volume is relevant with microphone
      * If gain is > 22dB, use mic gain */
     if(select_l == AUDIOIN_SELECT_MICROPHONE && vol_l > 22 * 2)
@@ -187,4 +188,29 @@ void imx233_audioin_set_freq(int fsel)
     HW_AUDIOIN_ADCSRR = BF_OR4(AUDIOIN_ADCSRR,
         SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
         SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
+}
+
+struct imx233_audioin_info_t imx233_audioin_get_info(void)
+{
+    struct imx233_audioin_info_t info;
+    memset(&info, 0, sizeof(info));
+    /* 6*10^6*basemult/(src_frac*8*(src_hold+1)) in Hz */
+    info.freq = 60000000 * BF_RD(AUDIOIN_ADCSRR, BASEMULT) / 8 /
+        BF_RD(AUDIOIN_ADCSRR, SRC_FRAC) / (1 + BF_RD(AUDIOIN_ADCSRR, SRC_HOLD));
+    info.muxselect[0] = BF_RD(AUDIOIN_ADCVOL, SELECT_LEFT);
+    info.muxselect[1] = BF_RD(AUDIOIN_ADCVOL, SELECT_RIGHT);
+    /* convert half-dB to tenth-dB */
+    info.muxvol[0] = BF_RD(AUDIOIN_ADCVOL, GAIN_LEFT) * 15;
+    info.muxvol[1] = BF_RD(AUDIOIN_ADCVOL, GAIN_RIGHT) * 15;
+    info.muxmute[0] = info.adcmute[1] = BF_RD(AUDIOIN_ADCVOL, MUTE);
+    info.adcvol[0] = MAX((int)BF_RD(AUDIOIN_ADCVOLUME, VOLUME_LEFT) - 0xff, -100) * 5;
+    info.adcvol[1] = MAX((int)BF_RD(AUDIOIN_ADCVOLUME, VOLUME_RIGHT) - 0xff, -100) * 5;
+    info.adcmute[0] = info.adcmute[1] = false;
+    info.micvol[0] = BF_RD(AUDIOIN_MICLINE, MIC_GAIN);
+    if(info.micvol[0] != 0)
+        info.micvol[0] = info.micvol[1] = info.micvol[0] * 100 + 100;
+    info.micmute[0] = info.micmute[1] = false;
+    info.adc = !BF_RD(AUDIOOUT_PWRDN, ADC);
+    info.mic = info.mux = true;
+    return info;
 }

@@ -34,6 +34,22 @@
 #define AUDIOIN_SELECT_HEADPHONE    2
 #define AUDIOIN_SELECT_LINE2        3
 
+struct imx233_audioin_info_t
+{
+    // NOTE there is a convention here: adc -> adcvol -> adcmute
+    int freq; // in mHz
+    int muxselect[2];
+    bool adc;
+    int adcvol[2]; // in tenth-dB, l/r
+    bool adcmute[2]; // l/r
+    bool mux;
+    int muxvol[2]; // in tenth-db, l/r
+    bool muxmute[2]; // l/r
+    bool mic;
+    int micvol[2]; // in tenth-db, l/r
+    int micmute[2]; // l/r
+};
+
 void imx233_audioin_preinit(void);
 void imx233_audioin_postinit(void);
 void imx233_audioin_open(void);
@@ -46,5 +62,7 @@ void imx233_audioin_set_vol(bool right, int vol, int select);
 void imx233_audioin_set_freq(int fsel);
 /* enable microphone */
 void imx233_audioin_enable_mic(bool enable);
+
+struct imx233_audioin_info_t imx233_audioin_get_info(void);
 
 #endif /* __audioin_imx233__ */
