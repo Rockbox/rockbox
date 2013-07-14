@@ -458,6 +458,7 @@ static bool update_playlist(bool force)
         {
             global_status.resume_index = -1;
             global_status.resume_offset = -1;
+            global_status.resume_elapsed = -1;
             return false;
         }
         playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD,
@@ -466,6 +467,7 @@ static bool update_playlist(bool force)
         {
             global_status.resume_index = -1;
             global_status.resume_offset = -1;
+            global_status.resume_elapsed = -1;
             return false;
         }
     }
@@ -526,7 +528,7 @@ static int onplay_menu(int index)
                         if (current_track->display_index!=viewer.num_tracks ||
                             global_settings.repeat_mode == REPEAT_ALL)
                         {
-                            audio_play(0);
+                            audio_play(0, 0);
                             viewer.current_playing_track = -1;
                         }
                     }
@@ -773,7 +775,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     /* play new track */
                     if (!global_settings.party_mode)
                     {
-                        playlist_start(current_track->index, 0);
+                        playlist_start(current_track->index, 0, 0);
                         update_playlist(false);
                     }
                 }
@@ -790,7 +792,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                         goto exit;
                     if (global_settings.playlist_shuffle)
                         start_index = playlist_shuffle(current_tick, start_index);
-                    playlist_start(start_index, 0);
+                    playlist_start(start_index, 0, 0);
 
                     /* Our playlist is now the current list */
                     if (!playlist_viewer_init(&viewer, NULL, true))
@@ -937,7 +939,7 @@ bool search_playlist(void)
             case ACTION_STD_OK:
             {
                 int sel = gui_synclist_get_sel_pos(&playlist_lists);
-                playlist_start(found_indicies[sel], 0);
+                playlist_start(found_indicies[sel], 0, 0);
                 exit = 1;
             }
                 break;
