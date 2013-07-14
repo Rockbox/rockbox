@@ -621,7 +621,7 @@ static int create_and_play_dir(int direction, bool play_last)
 #if (CONFIG_CODEC == SWCODEC)
         current_playlist.started = true;
 #else
-        playlist_start(index, 0);
+        playlist_start(index, 0, 0);
 #endif
     }
 
@@ -2565,7 +2565,8 @@ unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
 }
 
 /* resume a playlist track with the given crc_32 of the track name. */
-void playlist_resume_track(int start_index, unsigned int crc, int offset)
+void playlist_resume_track(int start_index, unsigned int crc,
+                           unsigned long elapsed, unsigned long offset)
 {
     int i;
     unsigned int tmp_crc;
@@ -2573,7 +2574,7 @@ void playlist_resume_track(int start_index, unsigned int crc, int offset)
     tmp_crc = playlist_get_filename_crc32(playlist, start_index);
     if (tmp_crc == crc)
     {
-        playlist_start(start_index, offset);
+        playlist_start(start_index, elapsed, offset);
         return;
     }
 
@@ -2582,17 +2583,18 @@ void playlist_resume_track(int start_index, unsigned int crc, int offset)
         tmp_crc = playlist_get_filename_crc32(playlist, i);
         if (tmp_crc == crc)
         {
-            playlist_start(i, offset);
+            playlist_start(i, elapsed, offset);
             return;
         }
     }
 
     /* If we got here the file wasnt found, so start from the beginning */
-    playlist_start(0,0);
+    playlist_start(0, 0, 0);
 }
 
 /* start playing current playlist at specified index/offset */
-void playlist_start(int start_index, int offset)
+void playlist_start(int start_index, unsigned long elapsed,
+                    unsigned long offset)
 {
     struct playlist_info* playlist = &current_playlist;
 
@@ -2605,7 +2607,7 @@ void playlist_start(int start_index, int offset)
 
     playlist->started = true;
     sync_control(playlist, false);
-    audio_play(offset);
+    audio_play(elapsed, offset);
 }
 
 /* Returns false if 'steps' is out of bounds, else true */
@@ -2723,7 +2725,7 @@ int playlist_next(int steps)
 #if CONFIG_CODEC == SWCODEC
             playlist->started = true;
 #else
-            playlist_start(0, 0);
+            playlist_start(0, 0, 0);
 #endif
             playlist->index = 0;
             index = 0;
@@ -2801,11 +2803,13 @@ int playlist_update_resume_info(const struct mp3entry* id3)
     if (id3)
     {
         if (global_status.resume_index  != playlist->index ||
+            global_status.resume_elapsed != id3->elapsed ||
             global_status.resume_offset != id3->offset)
         {
             unsigned int crc = crc_32(id3->path, strlen(id3->path), -1);
             global_status.resume_index  = playlist->index;
             global_status.resume_crc32 = crc;
+            global_status.resume_elapsed = id3->elapsed;
             global_status.resume_offset = id3->offset;
             status_save();
         }
@@ -2814,6 +2818,7 @@ int playlist_update_resume_info(const struct mp3entry* id3)
     {
         global_status.resume_index  = -1;
         global_status.resume_crc32 = -1;
+        global_status.resume_elapsed = -1;
         global_status.resume_offset = -1;
         status_save();
     }

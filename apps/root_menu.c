@@ -306,6 +306,7 @@ static int wpsscrn(void* param)
         {
             playlist_resume_track(global_status.resume_index,
                 global_status.resume_crc32,
+                global_status.resume_elapsed,
                 global_status.resume_offset);
             ret_val = gui_wps_show();
         }

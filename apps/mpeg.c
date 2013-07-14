@@ -177,6 +177,13 @@ static long low_watermark;          /* Dynamic low watermark level */
 static long low_watermark_margin = 0;   /* Extra time in seconds for watermark */
 static long lowest_watermark_level; /* Debug value to observe the buffer
                                        usage */
+
+struct audio_resume_info
+{
+    unsigned long elapsed;
+    unsigned long offset;
+};
+
 #if CONFIG_CODEC == MAS3587F
 static char recording_filename[MAX_PATH]; /* argument to thread */
 static char delayed_filename[MAX_PATH];   /* internal copy of above */
@@ -430,10 +437,9 @@ static void set_elapsed(struct mp3entry* id3)
         id3->elapsed = id3->offset / (id3->bitrate / 8);
 }
 
-int audio_get_file_pos(void)
+static int audio_get_file_pos_int(struct mp3entry *id3)
 {
     int pos = -1;
-    struct mp3entry *id3 = audio_current_track();
 
     if (id3->vbr)
     {
@@ -488,6 +494,12 @@ int audio_get_file_pos(void)
         pos = id3->first_frame_offset;
     }
     return pos;
+}
+
+int audio_get_file_pos(void)
+{
+    struct mp3entry *id3 = audio_current_track();
+    return id3 ? audio_get_file_pos_int(id3) : 0;
 }
 
 unsigned long mpeg_get_last_header(void)
@@ -545,7 +557,13 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     }
     /* TODO: Do it without stopping playback, if possible */
     bool playing = (audio_status() & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY;
-    long offset = audio_current_track()->offset;
+    struct mp3entry *id3 = audio_current_track();
+    unsigned long elapsed = 0, offset = 0;
+    if (id3)
+    {
+        elapsed = id3->elapsed;
+        offset  = id3->offset;
+    }
     /* don't call audio_hard_stop() as it frees this handle */
     if (thread_self() == audio_thread_id)
     {   /* inline case MPEG_STOP (audio_stop()) response
@@ -574,7 +592,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     }
     if (playing)
     {   /* safe to call even from the audio thread (due to queue_post()) */
-        audio_play(offset);
+        audio_play(elapsed, offset);
     }
 
     return BUFLIB_CB_OK;
@@ -1274,7 +1292,7 @@ static void mpeg_thread(void)
     int unplayed_space_left;
     int amount_to_read;
     int t1, t2;
-    int start_offset;
+    unsigned long start_elapsed, start_offset;
 #if CONFIG_CODEC == MAS3587F
     int amount_to_save;
     int save_endpos = 0;
@@ -1337,9 +1355,16 @@ static void mpeg_thread(void)
                     break;
                 }
 
-                start_offset = (int)ev.data;
+                start_elapsed = ((struct audio_resume_info *)ev.data)->elapsed;
+                start_offset = ((struct audio_resume_info *)ev.data)->offset;
 
                 /* mid-song resume? */
+                if (!start_offset && start_elapsed) {
+                    struct mp3entry *id3 = &get_trackdata(0)->id3;
+                    id3->elapsed = start_elapsed;
+                    start_offset = audio_get_file_pos_int(id3);
+                }
+
                 if (start_offset) {
                     struct mp3entry* id3 = &get_trackdata(0)->id3;
                     lseek(mpeg_file, start_offset, SEEK_SET);
@@ -1506,7 +1531,7 @@ static void mpeg_thread(void)
 
                 id3->elapsed = newtime;
 
-                newpos = audio_get_file_pos();
+                newpos = audio_get_file_pos_int(id3);
                 if(newpos < 0)
                 {
                     id3->elapsed = oldtime;
@@ -2765,7 +2790,7 @@ static void audio_reset_buffer(void)
     audio_reset_buffer_noalloc(core_get_data(audiobuf_handle), bufsize);
 }
 
-void audio_play(long offset)
+void audio_play(unsigned long elapsed, unsigned long offset)
 {
     audio_reset_buffer();
 #ifdef SIMULATOR
@@ -2789,15 +2814,28 @@ void audio_play(long offset)
         real_mpeg_play(trackname);
 #endif
         playlist_next(steps);
-        taginfo.offset = offset;
-        set_elapsed(&taginfo);
+        if (!offset && elapsed)
+        {
+            /* has an elapsed time but no offset; elapsed may take
+               precedence in this case */
+            taginfo.elapsed = elapsed;
+            taginfo.offset = audio_get_file_pos_int(&taginfo);
+        }
+        else
+        {
+            taginfo.offset = offset;
+            set_elapsed(&taginfo);
+        }
         is_playing = true;
         playing = true;
         break;
     } while(1);
 #else /* !SIMULATOR */
+    static struct audio_resume_info resume;
     is_playing = true;
-    queue_post(&mpeg_queue, MPEG_PLAY, offset);
+    resume.elapsed = elapsed;
+    resume.offset = offset;
+    queue_post(&mpeg_queue, MPEG_PLAY, (intptr_t)&resume);
 #endif /* !SIMULATOR */
 
     mpeg_errno = 0;
