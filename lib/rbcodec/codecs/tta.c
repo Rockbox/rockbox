@@ -82,10 +82,20 @@ enum codec_status codec_run(void)
     decodedsamples = 0;
     endofstream = 0;
 
-    if (ci->id3->offset > 0)
+    if (ci->id3->offset || ci->id3->elapsed)
     {
-        /* Need to save offset for later use (cleared indirectly by advance_buffer) */
-        new_pos = set_position(ci->id3->offset, TTA_SEEK_POS);
+        /* Need to save offset for later use (cleared indirectly by
+           advance_buffer) */
+        unsigned int pos = ci->id3->offset;
+        enum tta_seek_type type = TTA_SEEK_POS;
+
+        if (!pos) {
+            pos = ci->id3->elapsed / SEEK_STEP;
+            type = TTA_SEEK_TIME;
+        }
+
+        new_pos = set_position(pos, type);
+
         if (new_pos >= 0)
             decodedsamples = new_pos;
     }

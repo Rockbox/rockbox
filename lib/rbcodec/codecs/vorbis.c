@@ -126,7 +126,6 @@ enum codec_status codec_run(void)
     long n;
     int current_section;
     int previous_section;
-    int eof;
     ogg_int64_t vf_offsets[2];
     ogg_int64_t vf_dataoffsets;
     ogg_uint32_t vf_serialnos;
@@ -193,16 +192,17 @@ enum codec_status codec_run(void)
     if (ci->id3->offset) {
         ci->seek_buffer(ci->id3->offset);
         ov_raw_seek(&vf, ci->id3->offset);
-        ci->set_elapsed(ov_time_tell(&vf));
         ci->set_offset(ov_raw_tell(&vf));
     }
-    else {
-        ci->set_elapsed(0);
+    else if (ci->id3->elapsed) {
+        ov_time_seek(&vf, ci->id3->elapsed);
     }
 
+    ci->set_elapsed(ov_time_tell(&vf));
+
     previous_section = -1;
-    eof = 0;
-    while (!eof) {
+
+    while (1) {
         enum codec_command_action action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
@@ -230,7 +230,7 @@ enum codec_status codec_run(void)
         }
 
         if (n == 0) {
-            eof = 1;
+            break;
         } else if (n < 0) {
             DEBUGF("Vorbis: Error decoding frame\n");
         } else {

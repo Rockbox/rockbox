@@ -1319,7 +1319,16 @@ enum codec_status codec_run(void)
     loadmod(modfile);
 
     /* The main decoder loop */
-    ci->set_elapsed(0);
+#if 0
+    /* Needs to be a bit more elaborate or critical stuff is missed */
+    if (ci->id3->elapsed) {
+        modplayer.patterntableposition = ci->id3->elapsed/1000;
+        modplayer.currentline = 0;
+    }
+#endif
+
+    ci->set_elapsed(modplayer.patterntableposition*1000);
+
     bytesdone = 0;
     old_patterntableposition = 0;
 

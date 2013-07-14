@@ -49,7 +49,7 @@
 
 
 void audio_init(void) INIT_ATTR;
-void audio_play(long offset);
+void audio_play(unsigned long elapsed, unsigned long offset);
 void audio_stop(void);
 /* Stops audio from serving playback and frees resources*/
 void audio_hard_stop(void);

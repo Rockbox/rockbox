@@ -155,6 +155,7 @@ enum codec_status codec_run(void)
     int res;
     int firstbyte;
     size_t resume_offset;
+    enum codec_command_action action;
     intptr_t param;
 
     if (codec_init()) {
@@ -162,8 +163,12 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
+    action = CODEC_ACTION_NULL;
+    param = 0;
+
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
+    elapsedtime = ci->id3->elapsed;
     resume_offset = ci->id3->offset;
 
     ci->seek_buffer(0);
@@ -213,14 +218,21 @@ enum codec_status codec_run(void)
 
         ape_resume(&ape_ctx, resume_offset, 
                    &currentframe, &samplesdone, &samplestoskip, &firstbyte);
-    } else {
+        elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
+    }
+    else {
         currentframe = 0;
         samplesdone = 0;
         samplestoskip = 0;
         firstbyte = 3;  /* Take account of the little-endian 32-bit byte ordering */
+
+        if (elapsedtime) {
+            /* Resume by simulated seeking */
+            param = elapsedtime;
+            action = CODEC_ACTION_SEEK_TIME;
+        }
     }
 
-    elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
     ci->set_elapsed(elapsedtime);
 
     /* Initialise the buffer */
@@ -247,36 +259,44 @@ frame_start:
         /* Decode the frame a chunk at a time */
         while (nblocks > 0)
         {
-            enum codec_command_action action = ci->get_command(&param);
+            if (action == CODEC_ACTION_NULL)
+                action = ci->get_command(&param);
 
-            if (action == CODEC_ACTION_HALT)
-                goto done;
+            if (action != CODEC_ACTION_NULL) {
+                if (action == CODEC_ACTION_HALT)
+                    goto done;
 
-            /* Deal with any pending seek requests */
-            if (action == CODEC_ACTION_SEEK_TIME) 
-            {
-                if (ape_calc_seekpos(&ape_ctx,
-                    (param/10) * (ci->id3->frequency/100),
-                    &currentframe,
-                    &newfilepos,
-                    &samplestoskip))
+                /* Deal with any pending seek requests */
+                if (action == CODEC_ACTION_SEEK_TIME)
                 {
-                    samplesdone = currentframe * ape_ctx.blocksperframe;
+                    if (ape_calc_seekpos(&ape_ctx,
+                        (param/10) * (ci->id3->frequency/100),
+                        &currentframe,
+                        &newfilepos,
+                        &samplestoskip))
+                    {
+                        samplesdone = currentframe * ape_ctx.blocksperframe;
 
-                    /* APE's bytestream is weird... */
-                    firstbyte = 3 - (newfilepos & 3);
-                    newfilepos &= ~3;
+                        /* APE's bytestream is weird... */
+                        firstbyte = 3 - (newfilepos & 3);
+                        newfilepos &= ~3;
 
-                    ci->seek_buffer(newfilepos);
-                    inbuffer = ci->request_buffer(&bytesleft, INPUT_CHUNKSIZE);
+                        ci->seek_buffer(newfilepos);
+                        inbuffer = ci->request_buffer(&bytesleft,
+                                                      INPUT_CHUNKSIZE);
 
-                    elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
-                    ci->set_elapsed(elapsedtime);
+                        elapsedtime = (samplesdone*10)/
+                                      (ape_ctx.samplerate/100);
+                        ci->set_elapsed(elapsedtime);
+                        ci->seek_complete();
+                        action = CODEC_ACTION_NULL;
+                        goto frame_start;  /* Sorry... */
+                    }
+
                     ci->seek_complete();
-                    goto frame_start;  /* Sorry... */
                 }
 
-                ci->seek_complete();
+                action = CODEC_ACTION_NULL;
             }
 
             blockstodecode = MIN(BLOCKS_PER_LOOP, nblocks);
