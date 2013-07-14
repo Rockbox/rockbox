@@ -2580,7 +2580,7 @@ play:
      * if shuffle, we can't predict the playing track easily, and for either
      * case the track list doesn't get auto scrolled*/
     if(!append)
-        rb->playlist_start(position, 0);
+        rb->playlist_start(position, 0, 0);
     old_playlist = center_slide.slide_index;
     old_shuffle = shuffle;
 }

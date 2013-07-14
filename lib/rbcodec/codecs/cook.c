@@ -56,14 +56,16 @@ enum codec_status codec_run(void)
     uint32_t packet_count;
     int scrambling_unit_size, num_units;
     size_t resume_offset;
-    intptr_t param = 0;
-    enum codec_command_action action = CODEC_ACTION_NULL;
+    intptr_t param;
+    enum codec_command_action action;
 
     if (codec_init()) {
         DEBUGF("codec init failed\n");
         return CODEC_ERROR;
     }
 
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
     resume_offset = ci->id3->offset;
 
     codec_set_replaygain(ci->id3);
@@ -97,12 +99,15 @@ enum codec_status codec_run(void)
     }
 
     /* check for a mid-track resume and force a seek time accordingly */
-    if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
-        resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
+    if(resume_offset) {
+        resume_offset -= MIN(resume_offset, rmctx.data_offset + DATA_HEADER_SIZE);
         num_units = (int)resume_offset / scrambling_unit_size;    
         /* put number of subpackets to skip in resume_offset */
         resume_offset /= (sps + PACKET_HEADER_SIZE);
         param = (int)resume_offset * ((sps * 8 * 1000)/rmctx.bit_rate);
+    }
+
+    if (param) {
         action = CODEC_ACTION_SEEK_TIME;
     }
     else {
