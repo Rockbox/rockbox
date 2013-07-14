@@ -1954,6 +1954,7 @@
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -1962,6 +1963,7 @@
     iriverh10,iriverh10_5gb: "SELECT=लगा PREV=बंद"
     vibe500: "OK=लगा C=बंद"
     mpiohd300: "ENTER=लगा MENU=बंद"
+    sansafuzeplus: "SELECT=लगा  BACK=बंद"
   </dest>
   <voice>
     *: none

@@ -137,6 +137,17 @@
 #define FM_PREV_PRESET
 #define FM_NEXT_PRESET
 
+#elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#define FM_PRESET_ADD
+#define FM_PRESET_ACTION
+#define FM_MENU
+#define FM_PRESET
+#define FM_STOP
+#define FM_MODE
+#define FM_EXIT
+#define FM_PLAY
+#define FM_RECORD
+
 #endif
 
 /* presets.c needs these so keep unstatic or redo the whole thing! */

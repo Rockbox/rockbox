@@ -3284,6 +3284,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3298,6 +3299,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3547,6 +3549,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -3556,6 +3559,7 @@
     gigabeats: "SELECT=Vista POWER=Hætta við"
     vibe500: "OK=Vista C=Hætta við"
     mpiohd300: "ENTER=Vista MENU=Hætta við"
+    sansafuzeplus: "SELECT=Vista  BACK=Hætta við"
   </dest>
   <voice>
     *: none
@@ -5809,6 +5813,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
     *: "OFF to abort"
   <dest>
     *: "OFF til að slíta vinnslu"
@@ -5818,6 +5823,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV til að slíta vinnslu"
     gigabeats: "BACK til að slíta vinnslu"
     gigabeatfx: "POWER til að slíta vinnslu"
+    sansafuzeplus: "BACK til að slíta vinnslu"
   </dest>
   <voice>
     *: ""

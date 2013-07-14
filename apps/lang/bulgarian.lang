@@ -20,7 +20,6 @@
 # - Hristo Kovachev
 # - Vencislav Atanasov
 #- Zahari yurukov <zahari.yurukov@gmail.com>
-
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -3984,6 +3983,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3998,6 +3998,7 @@
     iaudiox5,iaudiom5: "RECORD = отказ"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = отказ"
     gigabeatfx: "POWER = отказ"
+    sansafuzeplus: "BACK = отказ"
     mrobe100: "DISPLAY = отказ"
     gigabeats: "BACK = отказ"
     gogearsa9200: "LEFT = отказ"
@@ -4532,6 +4533,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4541,6 +4543,7 @@
     gigabeats: "SELECT=Установяване POWER=Отказ"
     vibe500: "OK=Установяване C=Отказ"
     mpiohd300: "ENTER=Установяване MENU=Отказ"
+    sansafuzeplus: "SELECT=Установяване  BACK=Отказ"
   </dest>
   <voice>
     *: none
@@ -8087,6 +8090,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF за отказ"
@@ -8096,6 +8100,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV за отказ"
     gigabeats: "BACK за отказ"
     gigabeatfx: "POWER за отказ"
+    sansafuzeplus: "BACK за отказ"
   </dest>
   <voice>
     *: ""
