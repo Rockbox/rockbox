@@ -72,6 +72,7 @@ enum codec_status codec_run(void)
     uint32_t sbr_fac = 1;
     unsigned char c = 0;
     void *ret;
+    enum codec_command_action action;
     intptr_t param;
     bool empty_first_frame = false;
 
@@ -82,6 +83,8 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
     file_offset = ci->id3->offset;
 
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
@@ -138,11 +141,16 @@ enum codec_status codec_run(void)
             sound_samples_done = 0;
         }
         NeAACDecPostSeekReset(decoder, i);
+        elapsed_time = (sound_samples_done * 10) /
+                       (ci->id3->frequency / 100);
+    } else if (param) {
+        elapsed_time = param;
+        action = CODEC_ACTION_SEEK_TIME;
     } else {
+        elapsed_time = 0;
         sound_samples_done = 0;
     }
 
-    elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
     ci->set_elapsed(elapsed_time);
     
     if (i == 0) 
@@ -152,7 +160,8 @@ enum codec_status codec_run(void)
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
-        enum codec_command_action action = ci->get_command(&param);
+        if (action == CODEC_ACTION_NULL)
+            action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
@@ -179,6 +188,8 @@ enum codec_status codec_run(void)
             NeAACDecPostSeekReset(decoder, i);
             ci->seek_complete();
         }
+
+        action = CODEC_ACTION_NULL;
 
         /* There can be gaps between chunks, so skip ahead if needed. It
          * doesn't seem to happen much, but it probably means that a 

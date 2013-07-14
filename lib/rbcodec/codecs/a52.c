@@ -150,18 +150,27 @@ enum codec_status codec_run(void)
 
     samplesdone = 0;
 
-    /* The main decoding loop */
     if (ci->id3->offset) {
-        if (ci->seek_buffer(ci->id3->offset)) {
-            samplesdone = (ci->id3->offset / ci->id3->bytesperframe) *
-                A52_SAMPLESPERFRAME;
-            ci->set_elapsed(samplesdone/(ci->id3->frequency / 1000));
-        }
+        sample_loc = (ci->id3->offset / ci->id3->bytesperframe) *
+                        A52_SAMPLESPERFRAME;
+        param = ci->id3->offset;
+    }
+    else if (ci->id3->elapsed) {
+        sample_loc = ci->id3->elapsed/1000 * ci->id3->frequency;
+        param = sample_loc/A52_SAMPLESPERFRAME*ci->id3->bytesperframe;
     }
     else {
-        ci->seek_buffer(ci->id3->first_frame_offset);
-        ci->set_elapsed(0);
+        sample_loc = 0;
+        param = ci->id3->first_frame_offset;
     }
+
+    if (ci->seek_buffer(param)) {
+        samplesdone = sample_loc;
+    }
+
+    ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
+
+    /* The main decoding loop */
 
     while (1) {
         enum codec_command_action action = ci->get_command(&param);
@@ -172,7 +181,8 @@ enum codec_status codec_run(void)
         if (action == CODEC_ACTION_SEEK_TIME) {
             sample_loc = param/1000 * ci->id3->frequency;
 
-            if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*ci->id3->bytesperframe)) {
+            if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*
+                                ci->id3->bytesperframe)) {
                 samplesdone = sample_loc;
                 ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
             }

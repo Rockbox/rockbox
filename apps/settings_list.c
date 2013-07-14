@@ -789,6 +789,9 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
     SYSTEM_SETTING(NVRAM(4), resume_crc32, -1),
+#if CONFIG_CODEC == SWCODEC
+    SYSTEM_SETTING(NVRAM(4), resume_elapsed, -1),
+#endif
     SYSTEM_SETTING(NVRAM(4), resume_offset, -1),
     CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_OFF, "repeat",
                    "off,all,one,shuffle"

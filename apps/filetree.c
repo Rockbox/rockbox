@@ -118,7 +118,7 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
             playlist_shuffle(current_tick, -1);
         }
         
-        playlist_start(0, 0);
+        playlist_start(0, 0, 0);
         return true;
     }
     
@@ -498,7 +498,7 @@ int ft_enter(struct tree_context* c)
                             start_index = 0;
                     }
 
-                    playlist_start(start_index, 0);
+                    playlist_start(start_index, 0, 0);
                     play = true;
                 }
                 break;
@@ -705,6 +705,7 @@ int ft_enter(struct tree_context* c)
             global_status.resume_index = start_index;
             global_status.resume_crc32 =
                 playlist_get_filename_crc32(NULL, start_index);
+            global_status.resume_elapsed = 0;
             global_status.resume_offset = 0;
             status_save();
             rc = GO_TO_WPS;
