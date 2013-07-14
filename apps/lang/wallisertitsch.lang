@@ -2688,11 +2688,13 @@
     *: "PLAY=Set OFF=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: "PLAY=Ok OFF=Abbrächu"
     vibe500: "OK=Ok C=Abbrächu"
     mpiohd300: "ENTER=Ok MENU=Abbrächu"
+    sansafuzeplus: "SELECT=Ok  BACK=Abbrächu"
   </dest>
   <voice>
     *: ""

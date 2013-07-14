@@ -3946,6 +3946,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3960,6 +3961,7 @@
     iaudiox5,iaudiom5: "RECORD = ยกเลิก"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = ยกเลิก"
     gigabeatfx: "POWER = ยกเลิก"
+    sansafuzeplus: "BACK = ยกเลิก"
     mrobe100: "DISPLAY = ยกเลิก"
     gigabeats: "BACK = ยกเลิก"
     gogearsa9200: "LEFT = ยกเลิก"
@@ -4493,6 +4495,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4502,6 +4505,7 @@
     gigabeats: "SELECT=ตั้งเวลา POWER=ยกเลิก"
     vibe500: "OK=ตั้งเวลา C=ยกเลิก"
     mpiohd300: "ENTER=ตั้งเวลา MENU=ยกเลิก"
+    sansafuzeplus: "SELECT=ตั้งเวลา  BACK=ยกเลิก"
   </dest>
   <voice>
     *: none
@@ -8046,6 +8050,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF เพื่อยกเลิก"
@@ -8055,6 +8060,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV เพื่อยกเลิก"
     gigabeats: "BACK เพื่อยกเลิก"
     gigabeatfx: "POWER เพื่อยกเลิก"
+    sansafuzeplus: "BACK เพื่อยกเลิก"
   </dest>
   <voice>
     *: ""

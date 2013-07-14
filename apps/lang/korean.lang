@@ -4721,6 +4721,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -7197,6 +7198,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "[꺼짐]: 중지"
