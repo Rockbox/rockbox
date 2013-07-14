@@ -618,6 +618,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             if (resume && playlist_resume() != -1)
             {
                 playlist_start(global_status.resume_index,
+                               global_status.resume_elapsed,
                                global_status.resume_offset);
             }
             resume = false;
@@ -657,6 +658,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                 if (playlist_resume() != -1)
                 {
                     playlist_start(global_status.resume_index,
+                                   global_status.resume_elapsed,
                                    global_status.resume_offset);
                 }
             return event;

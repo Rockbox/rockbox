@@ -56,6 +56,7 @@ enum codec_status codec_run(void)
     /* reset values */
     track = is_multitrack = 0;
     elapsed_time = 0;
+    param = ci->id3->elapsed;
 
     DEBUGF("AY: next_track\n");
     if (codec_init()) {
@@ -87,6 +88,10 @@ enum codec_status codec_run(void)
         is_multitrack = 1;
     }
 
+    if (param) {
+        goto resume_start;
+    }
+
 next_track:
     set_codec_track(track, is_multitrack);
 
@@ -98,6 +103,7 @@ next_track:
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
+        resume_start:
             if (is_multitrack) {
                 track = param/1000;
                 ci->seek_complete();

@@ -108,6 +108,7 @@ enum codec_status codec_run(void)
      * sample seek position from the file offset, the sampling frequency and
      * the bitrate. As the saved position is exactly calculated the reverse way 
      * there is no loss of information except rounding. */
+    elapsed_time = ci->id3->elapsed;
     samplesdone = 100 * (((mpc_uint64_t)ci->id3->offset * frequency) / byterate);
         
     /* Set up digital signal processing for correct number of channels */
@@ -122,19 +123,24 @@ enum codec_status codec_run(void)
     
     codec_set_replaygain(ci->id3);
 
-    /* Resume to saved sample offset. */
-    elapsed_time = 0;
-
-    if (samplesdone > 0) 
+    if (samplesdone > 0 || elapsed_time)
     {
-        if (mpc_demux_seek_sample(demux, samplesdone) == MPC_STATUS_OK) 
+        mpc_int64_t new_offset = samplesdone;
+
+        if (new_offset <= 0)
+            new_offset = (elapsed_time/10)*frequency; /* by time */
+
+        /* Resume to sample offset. */
+        if (mpc_demux_seek_sample(demux, new_offset) == MPC_STATUS_OK)
         {
-            elapsed_time = (samplesdone*10)/frequency;
+            samplesdone = new_offset;
         } 
         else 
         {
             samplesdone = 0;
         }
+
+        elapsed_time = (samplesdone*10)/frequency;
     }
 
     ci->set_elapsed(elapsed_time);

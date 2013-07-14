@@ -972,7 +972,7 @@ static bool play_bookmark(const char* bookmark)
         if (!warn_on_pl_erase())
             return false;
         return bookmark_play(global_temp_buffer, bm.resume_index,
-            bm.resume_offset, bm.resume_seed, global_filename);
+            bm.resume_time, bm.resume_offset, bm.resume_seed, global_filename);
     }
     
     return false;

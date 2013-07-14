@@ -139,8 +139,8 @@ struct tree_context* tree_get_context(void);
 void tree_flush(void);
 void tree_restore(void);
 
-bool bookmark_play(char* resume_file, int index, int offset, int seed,
-                   char *filename);
+bool bookmark_play(char* resume_file, int index, unsigned long elapsed,
+                   unsigned long offset, int seed, char *filename);
 
 extern struct gui_synclist tree_lists;
 #endif

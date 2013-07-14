@@ -160,12 +160,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 226
+#define PLUGIN_API_VERSION 227
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 226
+#define PLUGIN_MIN_API_VERSION 227
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -723,8 +723,10 @@ struct plugin_api {
     /* playback control */
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
-    void (*playlist_resume_track)(int start_index, unsigned int crc, int offset);
-    void (*playlist_start)(int start_index, int offset);
+    void (*playlist_resume_track)(int start_index, unsigned int crc,
+                                  unsigned long elapsed, unsigned long offset);
+    void (*playlist_start)(int start_index, unsigned long elapsed,
+                           unsigned long offset);
     int (*playlist_add)(const char *filename);
     void (*playlist_sync)(struct playlist_info* playlist);
     int (*playlist_remove_all_tracks)(struct playlist_info *playlist);
@@ -735,7 +737,7 @@ struct plugin_api {
                               const char *dirname, int position, bool queue,
                               bool recurse);
     int (*playlist_shuffle)(int random_seed, int start_index);
-    void (*audio_play)(long offset);
+    void (*audio_play)(unsigned long elapsed, unsigned long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);

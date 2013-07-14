@@ -39,6 +39,7 @@ static bool play(void)
         {
             rb->playlist_resume_track(rb->global_status->resume_index,
                 rb->global_status->resume_crc32,
+                rb->global_status->resume_elapsed,
                 rb->global_status->resume_offset);
         }
     }

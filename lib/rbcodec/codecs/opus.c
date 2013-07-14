@@ -314,6 +314,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 enum codec_status codec_run(void)
 {
     int error = CODEC_ERROR;
+    enum codec_command_action action;
     intptr_t param;
     ogg_sync_state oy;
     ogg_page og;
@@ -325,12 +326,16 @@ enum codec_status codec_run(void)
     OpusDecoder *st = NULL;
     OpusHeader header;
     int ret;
-    unsigned long strtoffset = ci->id3->offset;
+    unsigned long strtoffset;
     int skip = 0;
     int64_t seek_target;
     uint64_t granule_pos;
 
     ogg_malloc_init();
+
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
+    strtoffset = ci->id3->offset;
 
     global_stack = 0;
 
@@ -351,28 +356,40 @@ enum codec_status codec_run(void)
     ci->seek_buffer(0);
     ci->set_elapsed(0);
 
+    if (!strtoffset && param) {
+        action = CODEC_ACTION_SEEK_TIME;
+    }
+
+    goto next_page;
+
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        if (action == CODEC_ACTION_NULL)
+            action = ci->get_command(&param);
 
-        if (action == CODEC_ACTION_HALT)
-            break;
+        if (action != CODEC_ACTION_NULL) {
+            if (action == CODEC_ACTION_HALT)
+                break;
 
-        if (action == CODEC_ACTION_SEEK_TIME) {
-            if (st != NULL) {
-                /* calculate granule to seek to (including seek rewind) */
-                seek_target = (48LL * param) + header.preskip;
-                skip = MIN(seek_target, SEEK_REWIND);
-                seek_target -= skip;
+            if (action == CODEC_ACTION_SEEK_TIME) {
+                if (st != NULL) {
+                    /* calculate granule to seek to (including seek rewind) */
+                    seek_target = (48LL * param) + header.preskip;
+                    skip = MIN(seek_target, SEEK_REWIND);
+                    seek_target -= skip;
 
-                LOGF("Opus seek page:%lld,%lld,%ld\n",
-		            seek_target, page_granule, (long)param);
-                speex_seek_page_granule(seek_target, page_granule, &oy, &os);
+                    LOGF("Opus seek page:%lld,%lld,%ld\n",
+    		            seek_target, page_granule, (long)param);
+                    speex_seek_page_granule(seek_target, page_granule, &oy, &os);
+                }
+
+                ci->set_elapsed(param);
+                ci->seek_complete();
             }
 
-            ci->set_elapsed(param);
-            ci->seek_complete();
+            action = CODEC_ACTION_NULL;
         }
 
+    next_page:
         /*Get the ogg buffer for writing*/
         if (get_more_data(&oy) < 1) {
             goto done;

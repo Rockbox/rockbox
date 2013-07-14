@@ -1253,6 +1253,7 @@ enum codec_status codec_run(void)
     unsigned char subSongsMax, subSong, song_speed;
     unsigned char *sidfile = NULL;
     intptr_t param;
+    bool resume;
 
     if (codec_init()) {
         return CODEC_ERROR;
@@ -1269,15 +1270,10 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
     
-    c64Init(SAMPLE_RATE);
-    LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
-            &subSongsMax, &subSong, &song_speed, (unsigned short)filesize);
-    sidPoke(24, 15);                /* Turn on full volume */
-    cpuJSR(init_addr, subSong);     /* Start the song initialize */
+    param = ci->id3->elapsed;
+    resume = param != 0;
     
-
-    /* Set the elapsed time to the current subsong (in seconds) */
-    ci->set_elapsed(subSong*1000);
+    goto sid_start;
 
     /* The main decoder loop */    
     while (1) {
@@ -1287,20 +1283,26 @@ enum codec_status codec_run(void)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
+        sid_start:
             /* New time is ready in param */
 
             /* Start playing from scratch */
             c64Init(SAMPLE_RATE);
             LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
-                              &subSongsMax, &subSong, &song_speed, (unsigned short)filesize);
+                              &subSongsMax, &subSong, &song_speed,
+                              (unsigned short)filesize);
             sidPoke(24, 15);            /* Turn on full volume */            
-            subSong = param / 1000;     /* Now use the current seek time in seconds as subsong */
+            if (!resume || (resume && param))
+                subSong = param / 1000; /* Now use the current seek time in
+                                           seconds as subsong */
             cpuJSR(init_addr, subSong); /* Start the song initialize */
             nSamplesToRender = 0;       /* Start the rendering from scratch */
 
             /* Set the elapsed time to the current subsong (in seconds) */
             ci->set_elapsed(subSong*1000);
             ci->seek_complete();
+
+            resume = false;
         }
         
         nSamplesRendered = 0;

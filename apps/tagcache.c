@@ -130,7 +130,7 @@ static long tempbuf_pos;
 static const char *tags_str[] = { "artist", "album", "genre", "title", 
     "filename", "composer", "comment", "albumartist", "grouping", "year", 
     "discnumber", "tracknumber", "bitrate", "length", "playcount", "rating", 
-    "playtime", "lastplayed", "commitid", "mtime", "lastoffset" };
+    "playtime", "lastplayed", "commitid", "mtime", "lastelapsed", "lastoffset" };
 
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
@@ -196,7 +196,7 @@ static const char * const tagfile_entry_ec   = "ll";
 /**
  Note: This should be (1 + TAG_COUNT) amount of l's.
  */
-static const char * const index_entry_ec     = "llllllllllllllllllllll";
+static const char * const index_entry_ec     = "lllllllllllllllllllllll";
 
 static const char * const tagcache_header_ec = "lll";
 static const char * const master_header_ec   = "llllll";
@@ -1752,6 +1752,10 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
 #if CONFIG_CODEC == SWCODEC 
     if (global_settings.autoresume_enable)
     {
+        id3->elapsed = get_tag_numeric(entry, tag_lastelapsed, idx_id);
+        logf("tagcache_fill_tags: Set elapsed for %s to %lX\n",
+             id3->title, id3->elapsed);
+
         id3->offset = get_tag_numeric(entry, tag_lastoffset, idx_id);
         logf("tagcache_fill_tags: Set offset for %s to %lX\n", 
              id3->title, id3->offset);
@@ -2348,6 +2352,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
                 tmpdb_copy_tag(tag_playtime);
                 tmpdb_copy_tag(tag_lastplayed);
                 tmpdb_copy_tag(tag_commitid);
+                tmpdb_copy_tag(tag_lastelapsed);
                 tmpdb_copy_tag(tag_lastoffset);
                 
                 /* Avoid processing this entry again. */
@@ -3419,7 +3424,8 @@ static int parse_changelog_line(int line_n, char *buf, void *parameters)
     int idx_id;
     long masterfd = (long)parameters;
     const int import_tags[] = { tag_playcount, tag_rating, tag_playtime,
-                                tag_lastplayed, tag_commitid, tag_lastoffset };
+                                tag_lastplayed, tag_commitid, tag_lastelapsed,
+                                tag_lastoffset };
     int i;
     (void)line_n;
     

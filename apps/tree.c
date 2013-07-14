@@ -1052,8 +1052,8 @@ void tree_mem_init(void)
     tree_get_filetypes(&filetypes, &filetypes_count);
 }
 
-bool bookmark_play(char *resume_file, int index, int offset, int seed,
-                   char *filename)
+bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
+                   unsigned long offset, int seed, char *filename)
 {
     int i;
     char* suffix = strrchr(resume_file, '.');
@@ -1082,7 +1082,7 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
             {
                 if (global_settings.playlist_shuffle)
                     playlist_shuffle(seed, -1);
-                playlist_start(index,offset);
+                playlist_start(index, elapsed, offset);
                 started = true;
             }
             *slash='/';
@@ -1133,7 +1133,7 @@ bool bookmark_play(char *resume_file, int index, int offset, int seed,
                 else
                     return false;
             }
-            playlist_start(index,offset);
+            playlist_start(index, elapsed, offset);
             started = true;
         }
     }

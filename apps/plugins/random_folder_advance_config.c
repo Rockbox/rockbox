@@ -541,7 +541,7 @@ static int start_shuffled_play(void)
         }
     }
     rb->splash(HZ, "Done");
-    rb->playlist_start(0,0);
+    rb->playlist_start(0, 0, 0);
     return 1;
 }
 

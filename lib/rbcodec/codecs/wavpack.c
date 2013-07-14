@@ -55,12 +55,16 @@ enum codec_status codec_run(void)
     int bps;
     */
     int nchans, sr_100;
+    unsigned long offset;
     intptr_t param;
 
     if (codec_init())
         return CODEC_ERROR;
 
-    ci->seek_buffer (ci->id3->offset);
+    param = ci->id3->elapsed;
+    offset = ci->id3->offset;
+
+    ci->seek_buffer (offset);
 
     /* Create a decoder instance */
     wpc = WavpackOpenFileInput (read_callback, error);
@@ -75,7 +79,12 @@ enum codec_status codec_run(void)
     ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? STEREO_INTERLEAVED : STEREO_MONO);
     sr_100 = ci->id3->frequency / 100;
 
-    ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
+    if (!offset && param) {
+        goto resume_start; /* resume by elapsed */
+    }
+    else {
+        ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
+    }
 
     /* The main decoder loop */
 
@@ -87,6 +96,7 @@ enum codec_status codec_run(void)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
+        resume_start:;
             int curpos_ms = WavpackGetSampleIndex (wpc) / sr_100 * 10;
             int n, d, skip;
 

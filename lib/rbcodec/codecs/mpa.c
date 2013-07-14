@@ -346,6 +346,11 @@ enum codec_status codec_run(void)
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
     
+    if (!ci->id3->offset && ci->id3->elapsed) {
+        /* Have elapsed time but not offset */
+        ci->id3->offset = get_file_pos(ci->id3->elapsed);
+    }
+
     if (ci->id3->offset) {
         ci->seek_buffer(ci->id3->offset);
         set_elapsed(ci->id3);

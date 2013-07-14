@@ -997,8 +997,8 @@ void set_play(void)
     }
     else
     {
-        print_scroll("audio_play(0)");
-        rb->audio_play(0);
+        print_scroll("audio_play(0, 0)");
+        rb->audio_play(0, 0);
     }
 }
 

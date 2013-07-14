@@ -52,13 +52,16 @@ enum codec_status codec_run(void)
     int audiobufsize;
     int packetlength = 0;
     int errcount = 0;
+    enum codec_command_action action;
     intptr_t param;
 
     /* Remember the resume position - when the codec is opened, the
        playback engine will reset it. */
+    elapsedtime = ci->id3->elapsed;
     resume_offset = ci->id3->offset;
 
 restart_track:
+    action = CODEC_ACTION_NULL;
 
     /* Proper reset of the decoder context. */
     memset(&wmadec, 0, sizeof(wmadec));
@@ -78,13 +81,20 @@ restart_track:
         return CODEC_ERROR;
     }
 
-    if (resume_offset > ci->id3->first_frame_offset)
+    if (resume_offset > ci->id3->first_frame_offset || elapsedtime)
     {
-        /* Get start of current packet */
-        int packet_offset = (resume_offset - ci->id3->first_frame_offset)
-            % wfx.packet_size;
-        ci->seek_buffer(resume_offset - packet_offset);
-        elapsedtime = asf_get_timestamp(&i);
+        if (resume_offset) {
+            /* Get start of current packet */
+            int packet_offset = (resume_offset -
+                    MIN(resume_offset, ci->id3->first_frame_offset))
+                % wfx.packet_size;
+            ci->seek_buffer(resume_offset - packet_offset);
+            elapsedtime = asf_get_timestamp(&i);
+        }
+        else {
+            param = elapsedtime;
+            action = CODEC_ACTION_SEEK_TIME;
+        }
     }
     else
     {
@@ -104,7 +114,8 @@ restart_track:
     /* The main decoding loop */
     while (res >= 0)
     {
-        enum codec_command_action action = ci->get_command(&param);
+        if (action == CODEC_ACTION_NULL)
+            action = ci->get_command(&param);
 
         if (action != CODEC_ACTION_NULL) {
 
@@ -126,6 +137,7 @@ restart_track:
                 if (param == 0) {
                     ci->set_elapsed(0);
                     ci->seek_complete();
+                    elapsedtime = 0;
                     goto restart_track; /* Pretend you never saw this... */
                 }
 
@@ -140,6 +152,8 @@ restart_track:
                 ci->set_elapsed(elapsedtime);
                 ci->seek_complete();
             }
+
+            action = CODEC_ACTION_NULL;
         }
 
         errcount = 0;

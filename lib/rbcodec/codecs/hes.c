@@ -76,6 +76,11 @@ enum codec_status codec_run(void)
     if (hes_emu.m3u.size > 0)
         hes_emu.track_count = hes_emu.m3u.size;
 
+    if (ci->id3->elapsed) {
+        track = ci->id3->elapsed/1000;
+        if (track >= hes_emu.track_count) return CODEC_OK;
+    }
+
 next_track:
     set_codec_track(track);
 

@@ -63,14 +63,16 @@ enum codec_status codec_run(void)
     unsigned char c = 0; /* channels */
     int playback_on = -1;
     size_t resume_offset;
+    enum codec_command_action action;
     intptr_t param;
-    enum codec_command_action action = CODEC_ACTION_NULL;
 
     if (codec_init()) {
         DEBUGF("FAAD: Codec init error\n");
         return CODEC_ERROR;
     }
 
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
     resume_offset = ci->id3->offset;
 
     ci->memset(&rmctx,0,sizeof(RMContext));
@@ -104,15 +106,21 @@ enum codec_status codec_run(void)
     }
     
     /* check for a mid-track resume and force a seek time accordingly */
-    if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
-        resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
+    if (resume_offset) {
+        resume_offset -= MIN(resume_offset, rmctx.data_offset + DATA_HEADER_SIZE);
         /* put number of subpackets to skip in resume_offset */
         resume_offset /= (rmctx.block_align + PACKET_HEADER_SIZE);
         param = (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);
+    }
+
+    if (param > 0) {
         action = CODEC_ACTION_SEEK_TIME;
     }
-    ci->set_elapsed(0);
-    ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
+    else {
+        /* Seek to the first packet */
+        ci->set_elapsed(0);
+        ci->advance_buffer(rmctx.data_offset + DATA_HEADER_SIZE);
+    }
 
     /* The main decoding loop */
     while (1) {
@@ -124,7 +132,7 @@ enum codec_status codec_run(void)
 
         if (action == CODEC_ACTION_SEEK_TIME) {
             /* Do not allow seeking beyond the file's length */
-            if ((unsigned) param > ci->id3->length) {
+            if ((unsigned long)param > ci->id3->length) {
                 ci->set_elapsed(ci->id3->length);
                 ci->seek_complete();
                 break;
@@ -164,6 +172,7 @@ enum codec_status codec_run(void)
                 
                 ci->advance_buffer(pkt.length);
             }           
+
             ci->seek_buffer(pkt_offset + rmctx.data_offset + DATA_HEADER_SIZE);
             buffer = ci->request_buffer(&n,rmctx.audio_framesize + 1000);
             NeAACDecPostSeekReset(decoder, decoder->frame);

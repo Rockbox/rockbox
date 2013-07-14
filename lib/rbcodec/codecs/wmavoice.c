@@ -67,7 +67,6 @@ enum codec_status codec_run(void)
 {
     uint32_t elapsedtime;
     asf_waveformatex_t wfx;     /* Holds the stream properties */
-    size_t resume_offset;
     int res;                    /* Return values from asf_read_packet() and decode_packet() */
     uint8_t* audiobuf;          /* Pointer to the payload of one wma pro packet */
     int audiobufsize;           /* Payload size */
@@ -76,8 +75,8 @@ enum codec_status codec_run(void)
     int pktcnt = 0;             /* Count of the packets played */
     intptr_t param;
 
-    /* Remember the resume position */
-    resume_offset = ci->id3->offset;
+    elapsedtime = ci->id3->elapsed;
+
 restart_track:
     if (codec_init()) {
         LOGF("(WMA Voice) Error: Error initialising codec\n");
@@ -105,13 +104,17 @@ restart_track:
         return CODEC_ERROR;
     }
 
-    /* Now advance the file position to the first frame */
-    ci->seek_buffer(ci->id3->first_frame_offset);
-    
-    elapsedtime = 0;
-    ci->set_elapsed(0);
+    if (elapsedtime) {
+        elapsedtime = asf_seek(elapsedtime, &wfx);
+        if (elapsedtime < 1)
+            return CODEC_OK;
+    }
+    else {
+        /* Now advance the file position to the first frame */
+        ci->seek_buffer(ci->id3->first_frame_offset);
+    }
 
-    resume_offset = 0;
+    ci->set_elapsed(elapsedtime);
     
     /* The main decoding loop */
 
@@ -129,6 +132,7 @@ restart_track:
             if (param == 0) {
                 ci->set_elapsed(0);
                 ci->seek_complete();
+                elapsedtime = 0;
                 goto restart_track; /* Pretend you never saw this... */
             }
 
@@ -136,7 +140,7 @@ restart_track:
             if (elapsedtime < 1){
                 ci->set_elapsed(0);
                 ci->seek_complete();
-                goto next_track;
+                break;
             }
 
             ci->set_elapsed(elapsedtime);

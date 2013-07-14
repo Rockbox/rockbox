@@ -2414,10 +2414,12 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
             (((wps_data->last_albumart_height != aa->height) ||
             (wps_data->last_albumart_width != aa->width)))))
         {
-            long offset = audio_current_track()->offset;
+            struct mp3entry *id3 = audio_current_track();
+            unsigned long elapsed = id3->elapsed;
+            unsigned long offset = id3->offset;
             audio_stop();
             if (!(status & AUDIO_STATUS_PAUSE))
-                audio_play(offset);
+                audio_play(elapsed, offset);
         }
     }
 #endif

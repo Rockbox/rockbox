@@ -127,7 +127,10 @@ enum codec_status codec_run(void)
 
     Vgm_start_track(&vgm_emu); 
 
-    ci->set_elapsed(0);
+    if (ci->id3->elapsed != 0)
+        Track_seek(&vgm_emu, ci->id3->elapsed);
+
+    codec_update_elapsed();
     codec_update_fade();
 
     /* The main decoder loop */

@@ -55,6 +55,8 @@ enum codec_status codec_run(void)
     int size;                   /* Size of the input frame to the decoder */
     intptr_t param;
 
+    elapsedtime = ci->id3->elapsed;
+
 restart_track:
     if (codec_init()) {
         LOGF("(WMA PRO) Error: Error initialising codec\n");
@@ -75,11 +77,17 @@ restart_track:
         return CODEC_ERROR;
     }
 
-    /* Now advance the file position to the first frame */
-    ci->seek_buffer(ci->id3->first_frame_offset);
+    if (elapsedtime) {
+        elapsedtime = asf_seek(elapsedtime, &wfx);
+        if (elapsedtime < 1)
+            return CODEC_OK;
+    }
+    else {
+        /* Now advance the file position to the first frame */
+        ci->seek_buffer(ci->id3->first_frame_offset);
+    }
     
-    elapsedtime = 0;
-    ci->set_elapsed(0);
+    ci->set_elapsed(elapsedtime);
     
     /* The main decoding loop */
 
@@ -95,6 +103,7 @@ restart_track:
             if (param == 0) {
                 ci->set_elapsed(0);
                 ci->seek_complete();
+                elapsedtime = 0;
                 goto restart_track; /* Pretend you never saw this... */
             }
 

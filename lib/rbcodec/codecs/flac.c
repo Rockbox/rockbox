@@ -468,7 +468,8 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    /* Need to save offset for later use (cleared indirectly by flac_init) */
+    /* Need to save resume for later use (cleared indirectly by flac_init) */
+    elapsedtime = ci->id3->elapsed;
     samplesdone = ci->id3->offset;
     
     if (!flac_init(&fc,ci->id3->first_frame_offset)) {
@@ -481,9 +482,16 @@ enum codec_status codec_run(void)
                   STEREO_MONO : STEREO_NONINTERLEAVED);
     codec_set_replaygain(ci->id3);
 
-    flac_seek_offset(&fc, samplesdone);
-    samplesdone=fc.samplenumber+fc.blocksize;
-    elapsedtime=((uint64_t)samplesdone*1000)/(ci->id3->frequency);
+    if (samplesdone || !elapsedtime) {
+        flac_seek_offset(&fc, samplesdone);
+        samplesdone=fc.samplenumber+fc.blocksize;
+        elapsedtime=((uint64_t)samplesdone*1000)/(ci->id3->frequency);
+    }
+    else if (!flac_seek(&fc,(uint32_t)((uint64_t)elapsedtime
+                            *ci->id3->frequency/1000))) {
+        elapsedtime = 0;
+    }
+
     ci->set_elapsed(elapsedtime);
 
     /* The main decoding loop */

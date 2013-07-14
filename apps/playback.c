@@ -151,6 +151,12 @@ enum audio_id3_types
 };
 static struct mp3entry static_id3_entries[ID3_TYPE_NUM_STATIC]; /* (A,O) */
 
+struct audio_resume_info
+{
+    unsigned long elapsed;
+    unsigned long offset;
+};
+
 /* Peeking functions can yield and mess us up */
 static struct mutex id3_mutex SHAREDBSS_ATTR; /* (A,O)*/
 
@@ -325,7 +331,8 @@ enum audio_start_playback_flags
     AUDIO_START_NEWBUF  = 0x2, /* Mark the audiobuffer as invalid */
 };
 
-static void audio_start_playback(size_t offset, unsigned int flags);
+static void audio_start_playback(const struct audio_resume_info *resume_info,
+                                 unsigned int flags);
 static void audio_stop_playback(void);
 static void buffer_event_buffer_low_callback(void *data);
 static void buffer_event_rebuffer_callback(void *data);
@@ -792,7 +799,11 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
         /* codec messages */
         { Q_AUDIO_PLAY, Q_AUDIO_PLAY },
     };
+
+    static struct audio_resume_info resume;
+
     bool give_up = false;
+
     /* filebuflen is, at this point, the buffering.c buffer size,
      * i.e. the audiobuf except voice, scratch mem, pcm, ... */
     ssize_t extradata_size = old_size - filebuflen;
@@ -813,7 +824,9 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
 
 
     /* TODO: Do it without stopping playback, if possible */
-    long offset = audio_current_track()->offset;
+    struct mp3entry *id3 = audio_current_track();
+    unsigned long elapsed = id3->elapsed;
+    unsigned long offset = id3->offset;
     /* resume if playing */
     bool playing = (audio_status() == AUDIO_STATUS_PLAY);
     /* There's one problem with stoping and resuming: If it happens in a too
@@ -825,10 +838,20 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
      * queue_post from the last call to get the correct offset. This also
      * lets us conviniently remove the queue event so Q_AUDIO_PLAY is only
      * processed once. */
-    bool play_queued = queue_peek_ex(&audio_queue, &ev, QPEEK_REMOVE_EVENTS, filter_list);
+    bool play_queued = queue_peek_ex(&audio_queue, &ev, QPEEK_REMOVE_EVENTS,
+                                     filter_list);
 
-    if (playing && offset > 0) /* current id3->offset is king */
-        ev.data = offset;
+    if (playing && ev.data != (intptr_t)&resume)
+    {
+        resume = *(struct audio_resume_info *)ev.data;
+
+        /* current id3->elapsed/offset are king */
+        if (elapsed > 0)
+            resume.elapsed = elapsed;
+
+        if (offset > 0)
+            resume.offset = offset;
+    }
 
     /* don't call audio_hard_stop() as it frees this handle */
     if (thread_self() == audio_thread_id)
@@ -867,7 +890,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     if (playing || play_queued)
     {
         /* post, to make subsequent calls not break the resume position */
-        audio_queue_post(Q_AUDIO_PLAY, ev.data);
+        audio_queue_post(Q_AUDIO_PLAY, (intptr_t)&resume);
     }
 
     return BUFLIB_CB_OK;
@@ -1099,7 +1122,8 @@ static void audio_update_and_announce_next_track(const struct mp3entry *id3_next
 
 /* Bring the user current mp3entry up to date and set a new offset for the
    buffered metadata */
-static void playing_id3_sync(struct track_info *user_info, off_t offset)
+static void playing_id3_sync(struct track_info *user_info,
+                             unsigned long elapsed, unsigned long offset)
 {
     id3_mutex_lock();
 
@@ -1113,9 +1137,14 @@ static void playing_id3_sync(struct track_info *user_info, off_t offset)
 
     id3_write(PLAYING_ID3, id3);
 
-    if (offset < 0)
+    if (elapsed == (unsigned long)-1)
     {
         playing_id3->elapsed = e;
+        elapsed = 0;
+    }
+
+    if (offset == (unsigned long)-1)
+    {
         playing_id3->offset = o;
         offset = 0;
     }
@@ -1123,7 +1152,10 @@ static void playing_id3_sync(struct track_info *user_info, off_t offset)
     pcm_play_unlock();
 
     if (id3)
+    {
+        id3->elapsed = elapsed;
         id3->offset = offset;
+    }
 
     id3_mutex_unlock();
 }
@@ -1299,19 +1331,16 @@ static bool audio_get_track_metadata(int offset, struct mp3entry *id3)
     return false;
 }
 
-/* Get a resume rewind adjusted offset from the ID3 */
-static unsigned long resume_rewind_adjusted_offset(const struct mp3entry *id3)
+/* Get resume rewind adjusted progress from the ID3 */
+static void resume_rewind_adjust_progress(const struct mp3entry *id3,
+                                          unsigned long *elapsed,
+                                          unsigned long *offset)
 {
-    unsigned long offset = id3->offset;
-    size_t resume_rewind = global_settings.resume_rewind *
-                           id3->bitrate * (1000/8);
-
-    if (offset < resume_rewind)
-        offset = 0;
-    else
-        offset -= resume_rewind;
-
-    return offset;
+    unsigned int rewind = MAX(global_settings.resume_rewind, 0);
+    unsigned long d_e = rewind*1000;
+    *elapsed = id3->elapsed - MIN(id3->elapsed, d_e);
+    unsigned long d_o = rewind * id3->bitrate * (1000/8);
+    *offset = id3->offset - MIN(id3->offset, d_o);
 }
 
 /* Get the codec into ram and initialize it - keep it if it's ready */
@@ -1436,7 +1465,7 @@ static bool audio_start_codec(bool auto_skip)
 #ifdef HAVE_TAGCACHE
     bool autoresume_enable = global_settings.autoresume_enable;
 
-    if (autoresume_enable && !cur_id3->offset)
+    if (autoresume_enable && !(cur_id3->elapsed || cur_id3->offset))
     {
         /* Resume all manually selected tracks */
         bool resume = !auto_skip;
@@ -1466,10 +1495,13 @@ static bool audio_start_codec(bool auto_skip)
         }
 
         if (!resume)
+        {
+            cur_id3->elapsed = 0;
             cur_id3->offset = 0;
+        }
 
-        logf("%s: Set offset for %s to %lX\n", __func__,
-             cur_id3->title, cur_id3->offset);
+        logf("%s: Set resume for %s to %lu %lX", __func__,
+             cur_id3->title, cur_id3->elapsed, cur_id3->offset);
     }
 #endif /* HAVE_TAGCACHE */
 
@@ -1481,7 +1513,8 @@ static bool audio_start_codec(bool auto_skip)
        and back again will cause accumulation of silent rewinds - that's not
        our job to track directly nor could it be in any reasonable way
      */
-    cur_id3->offset = resume_rewind_adjusted_offset(cur_id3);
+    resume_rewind_adjust_progress(cur_id3, &cur_id3->elapsed,
+                                  &cur_id3->offset);
 
     /* Update the codec API with the metadata and track info */
     id3_write(CODEC_ID3, cur_id3);
@@ -1494,7 +1527,7 @@ static bool audio_start_codec(bool auto_skip)
     codec_go();
 
 #ifdef HAVE_TAGCACHE
-    if (!autoresume_enable || cur_id3->offset)
+    if (!autoresume_enable || cur_id3->elapsed || cur_id3->offset)
 #endif
     {
         /* Send the "buffer" event now */
@@ -1923,7 +1956,9 @@ static int audio_finish_load_track(struct track_info *info)
 
     /** Finally, load the audio **/
     size_t file_offset = 0;
-    track_id3->elapsed = 0;
+
+    if (track_id3->elapsed > track_id3->length)
+        track_id3->elapsed = 0;
 
     if (track_id3->offset >= info->filesize)
         track_id3->offset = 0;
@@ -1933,7 +1968,11 @@ static int audio_finish_load_track(struct track_info *info)
 
     /* Adjust for resume rewind so we know what to buffer - starting the codec
        calls it again, so we don't save it (and they shouldn't accumulate) */
-    size_t offset = resume_rewind_adjusted_offset(track_id3);
+    unsigned long elapsed, offset;
+    resume_rewind_adjust_progress(track_id3, &elapsed, &offset);
+
+    logf("%s: Set resume for %s to %lu %lX", __func__,
+         id3->title, elapsed, offset);
 
     enum data_type audiotype = rbcodec_format_is_atomic(track_id3->codectype) ?
                                       TYPE_ATOMIC_AUDIO : TYPE_PACKET_AUDIO;
@@ -2168,7 +2207,7 @@ static void audio_on_finish_load_track(int id3_hid)
                change otherwise */
             bool was_valid = valid_mp3entry(id3_get(PLAYING_ID3));
 
-            playing_id3_sync(info, -1);
+            playing_id3_sync(info, -1, -1);
 
             if (!was_valid)
             {
@@ -2306,7 +2345,7 @@ static void audio_begin_track_change(enum pcm_track_change_type type,
         if (audio_start_codec(auto_skip))
         {
             if (!auto_skip)
-                playing_id3_sync(info, -1);
+                playing_id3_sync(info, -1, -1);
             return;
         }
 
@@ -2455,8 +2494,11 @@ static void audio_on_track_changed(void)
 /* Begin playback from an idle state, transition to a new playlist or
    invalidate the buffer and resume (if playing).
    (usually Q_AUDIO_PLAY, Q_AUDIO_REMAKE_AUDIO_BUFFER) */
-static void audio_start_playback(size_t offset, unsigned int flags)
+static void audio_start_playback(const struct audio_resume_info *resume_info,
+                                 unsigned int flags)
 {
+    struct audio_resume_info resume =
+        *(resume_info ?: &(struct audio_resume_info){ 0, 0 } );
     enum play_status old_status = play_status;
 
     if (flags & AUDIO_START_NEWBUF)
@@ -2469,7 +2511,8 @@ static void audio_start_playback(size_t offset, unsigned int flags)
 
     if (old_status != PLAY_STOPPED)
     {
-        logf("%s(%lu): skipping", __func__, (unsigned long)offset);
+        logf("%s(%lu, %lu): skipping", __func__, resume.elapsed,
+             resume.offset);
 
         halt_decoding_track(true);
 
@@ -2481,7 +2524,8 @@ static void audio_start_playback(size_t offset, unsigned int flags)
             /* Clear out some stuff to resume the current track where it
                left off */
             pcmbuf_play_stop();
-            offset = id3_get(PLAYING_ID3)->offset;
+            resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
+            resume.offset = id3_get(PLAYING_ID3)->offset;
             track_list_clear(TRACK_LIST_CLEAR_ALL);
         }
         else
@@ -2505,7 +2549,8 @@ static void audio_start_playback(size_t offset, unsigned int flags)
             return; /* Must already be playing */
 
         /* Cold playback start from a stopped state */
-        logf("%s(%lu): starting", __func__, offset);
+        logf("%s(%lu, %lu): starting", __func__, resume.elapsed,
+             resume.offset);
 
         /* Set audio parameters */
 #if INPUT_SRC_CAPS != 0
@@ -2555,7 +2600,7 @@ static void audio_start_playback(size_t offset, unsigned int flags)
     if (trackstat >= LOAD_TRACK_OK)
     {
         /* This is the currently playing track - get metadata, stat */
-        playing_id3_sync(track_list_current(0), offset);
+        playing_id3_sync(track_list_current(0), resume.elapsed, resume.offset);
 
         if (valid_mp3entry(id3_get(PLAYING_ID3)))
         {
@@ -2892,7 +2937,9 @@ static void audio_on_ff_rewind(long time)
 
         if (!haltres)
         {
-            /* If codec must be (re)started, reset the offset */
+            /* If codec must be (re)started, reset the resume info so that
+               it doesn't execute resume procedures */
+            ci_id3->elapsed = 0;
             ci_id3->offset = 0;
         }
 
@@ -2970,7 +3017,7 @@ static void audio_on_audio_flush(void)
            not possible so a restart is required in order to continue the
            currently playing track without the now invalid future track
            playing */
-        audio_start_playback(0, AUDIO_START_RESTART);
+        audio_start_playback(NULL, AUDIO_START_RESTART);
         break;
 
     default: /* Nothing else is a state */
@@ -3008,7 +3055,7 @@ void audio_playback_handler(struct queue_event *ev)
         /** Control messages **/
         case Q_AUDIO_PLAY:
             LOGFQUEUE("playback < Q_AUDIO_PLAY");
-            audio_start_playback(ev->data, 0);
+            audio_start_playback((struct audio_resume_info *)ev->data, 0);
             break;
 
 #ifdef HAVE_RECORDING
@@ -3082,7 +3129,7 @@ void audio_playback_handler(struct queue_event *ev)
         case Q_AUDIO_REMAKE_AUDIO_BUFFER:
             /* buffer needs to be reinitialized */
             LOGFQUEUE("playback < Q_AUDIO_REMAKE_AUDIO_BUFFER");
-            audio_start_playback(0, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
+            audio_start_playback(NULL, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
             if (play_status == PLAY_STOPPED)
                 return; /* just need to change buffer state */
             break;
@@ -3368,8 +3415,8 @@ struct mp3entry * audio_next_track(void)
     return id3;
 }
 
-/* Start playback at the specified offset */
-void audio_play(long offset)
+/* Start playback at the specified elapsed time or offset */
+void audio_play(unsigned long elapsed, unsigned long offset)
 {
     logf("audio_play");
 
@@ -3379,8 +3426,9 @@ void audio_play(long offset)
     talk_force_shutup();
 #endif
 
-    LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %ld", offset);
-    audio_queue_send(Q_AUDIO_PLAY, offset);
+    LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %lu %lX", elapsed, offset);
+    audio_queue_send(Q_AUDIO_PLAY,
+                     (intptr_t)&(struct audio_resume_info){ elapsed, offset });
 }
 
 /* Stop playback if playing */
@@ -3582,11 +3630,10 @@ void playback_release_aa_slot(int slot)
 }
 #endif /* HAVE_ALBUMART */
 
-/* Would normally calculate byte offset from an elapsed time but is not
-   used on SWCODEC */
+/* Return file byte offset */
 int audio_get_file_pos(void)
 {
-    return 0;
+    return id3_get(PLAYING_ID3)->offset;
 }
 
 /* Return total file buffer length after accounting for the talk buf */

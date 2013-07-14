@@ -52,6 +52,8 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
+    param = ci->id3->elapsed;
+
     codec_set_replaygain(ci->id3);
         
     int bytes_done =0;   
@@ -86,8 +88,6 @@ enum codec_status codec_run(void)
         ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
         bytesPerSample = 4; 
     }    
-    /* reset eleapsed */
-    ci->set_elapsed(0);
 
     song = asap.module_info->default_song;
     duration = asap.module_info->durations[song];
@@ -100,6 +100,11 @@ enum codec_status codec_run(void)
     ASAP_PlaySong(&asap, song, duration);
     ASAP_MutePokeyChannels(&asap, 0);
     
+    if (param)
+        goto resume_start;
+
+    ci->set_elapsed(0);
+
     /* The main decoder loop */    
     while (1) {
         enum codec_command_action action = ci->get_command(&param);
@@ -108,6 +113,7 @@ enum codec_status codec_run(void)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
+        resume_start:
             /* New time is ready in param */
 
             /* seek to pos */

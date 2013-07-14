@@ -109,6 +109,7 @@ static void resume_audio(void)
         if (rb->playlist_resume() != -1) {
             rb->playlist_resume_track(rb->global_status->resume_index,
                 rb->global_status->resume_crc32,
+                rb->global_status->resume_elapsed,
                 rb->global_status->resume_offset);
         }
     }
