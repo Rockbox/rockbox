@@ -171,7 +171,7 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
                     offset = ret;
                     continue;
                 }
-            } else if (ret == -3) 
+            } else if (ret == -3)
                 return(-3);
             else if (ret<=0)
                 break;
@@ -190,8 +190,8 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
 static int speex_seek_page_granule(int64_t pos, int64_t curpos,
                                    ogg_sync_state *oy, ogg_stream_state *os)
 {
-    /* TODO: Someone may want to try to implement seek to packet, 
-             instead of just to page (should be more accurate, not be any 
+    /* TODO: Someone may want to try to implement seek to packet,
+             instead of just to page (should be more accurate, not be any
              faster) */
 
     int64_t crofs;
@@ -208,7 +208,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
         /* if seeking for more that 10sec,
            headersize is known & more than 10kb is played,
            try to guess a place to seek from the number of
-           bytes playe for this position, this works best when 
+           bytes playe for this position, this works best when
            the bitrate is relativly constant.
          */
 
@@ -279,7 +279,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
 
             lastgranule = ogg_page_granulepos(&og);
 
-            if ( ((lastgranule - (avgpagelen/4)) < pos && ( lastgranule + 
+            if ( ((lastgranule - (avgpagelen/4)) < pos && ( lastgranule +
                   avgpagelen + (avgpagelen / 4)) > pos) ||
                  lastgranule > pos) {
 
@@ -314,6 +314,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 enum codec_status codec_run(void)
 {
     int error = CODEC_ERROR;
+    enum codec_command_action action;
     intptr_t param;
     ogg_sync_state oy;
     ogg_page og;
@@ -325,12 +326,16 @@ enum codec_status codec_run(void)
     OpusDecoder *st = NULL;
     OpusHeader header;
     int ret;
-    unsigned long strtoffset = ci->id3->offset;
+    unsigned long strtoffset;
     int skip = 0;
     int64_t seek_target;
     uint64_t granule_pos;
 
     ogg_malloc_init();
+
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
+    strtoffset = ci->id3->offset;
 
     global_stack = 0;
 
@@ -351,28 +356,40 @@ enum codec_status codec_run(void)
     ci->seek_buffer(0);
     ci->set_elapsed(0);
 
+    if (!strtoffset && param) {
+        action = CODEC_ACTION_SEEK_TIME;
+    }
+
+    goto next_page;
+
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        if (action == CODEC_ACTION_NULL)
+            action = ci->get_command(&param);
 
-        if (action == CODEC_ACTION_HALT)
-            break;
+        if (action != CODEC_ACTION_NULL) {
+            if (action == CODEC_ACTION_HALT)
+                break;
 
-        if (action == CODEC_ACTION_SEEK_TIME) {
-            if (st != NULL) {
-                /* calculate granule to seek to (including seek rewind) */
-                seek_target = (48LL * param) + header.preskip;
-                skip = MIN(seek_target, SEEK_REWIND);
-                seek_target -= skip;
+            if (action == CODEC_ACTION_SEEK_TIME) {
+                if (st != NULL) {
+                    /* calculate granule to seek to (including seek rewind) */
+                    seek_target = (48LL * param) + header.preskip;
+                    skip = MIN(seek_target, SEEK_REWIND);
+                    seek_target -= skip;
 
-                LOGF("Opus seek page:%lld,%lld,%ld\n",
-		            seek_target, page_granule, (long)param);
-                speex_seek_page_granule(seek_target, page_granule, &oy, &os);
+                    LOGF("Opus seek page:%lld,%lld,%ld\n",
+    		            seek_target, page_granule, (long)param);
+                    speex_seek_page_granule(seek_target, page_granule, &oy, &os);
+                }
+
+                ci->set_elapsed(param);
+                ci->seek_complete();
             }
 
-            ci->set_elapsed(param);
-            ci->seek_complete();
+            action = CODEC_ACTION_NULL;
         }
 
+    next_page:
         /*Get the ogg buffer for writing*/
         if (get_more_data(&oy) < 1) {
             goto done;
@@ -400,7 +417,7 @@ enum codec_status codec_run(void)
             while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
                 if (op.packetno == 0){
                     /* identification header */
-                
+
                     if (opus_header_parse(op.packet, op.bytes, &header) == 0) {
                         LOGF("Could not parse header");
                         goto done;

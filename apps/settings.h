@@ -266,6 +266,7 @@ struct system_status
 {
     int resume_index;  /* index in playlist (-1 for no active resume) */
     uint32_t resume_crc32; /* crc32 of the name of the file */
+    uint32_t resume_elapsed; /* elapsed time in last file */
     uint32_t resume_offset; /* byte offset in mp3 file */
     int runtime;       /* current runtime since last charge */
     int topruntime;    /* top known runtime */
@@ -282,6 +283,7 @@ struct system_status
 #ifdef HAVE_LCD_BITMAP
     int font_id[NB_SCREENS]; /* font id of the settings font for each screen */
 #endif
+
 };
 
 struct user_settings
@@ -522,7 +524,7 @@ struct user_settings
     int statusbar;    /* STATUSBAR_* enum values */
 #ifdef HAVE_REMOTE_LCD
     int remote_statusbar;
-#endif        
+#endif
 
 #if CONFIG_KEYPAD == RECORDER_PAD
     bool buttonbar;    /* 0=hide, 1=show */
@@ -677,7 +679,7 @@ struct user_settings
     bool backlight_fade_in;
     bool backlight_fade_out;
 #endif
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
     int brightness;
 #endif
 

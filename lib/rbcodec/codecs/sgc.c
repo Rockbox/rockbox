@@ -2,7 +2,7 @@
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
 
 #include <codecs/lib/codeclib.h>
-#include "libgme/sgc_emu.h" 
+#include "libgme/sgc_emu.h"
 
 CODEC_HEADER
 
@@ -20,7 +20,7 @@ static char coleco_bios[0x2000];
 /****************** rockbox interface ******************/
 
 static void set_codec_track(int t) {
-    Sgc_start_track(&sgc_emu, t); 
+    Sgc_start_track(&sgc_emu, t);
 
     /* for REPEAT_ONE we disable track limits */
     if (!ci->loop_track()) {
@@ -81,7 +81,7 @@ enum codec_status codec_run(void)
         DEBUGF("SGC: file load failed\n");
         return CODEC_ERROR;
     }
-   
+
     if ((err = Sgc_load_mem(&sgc_emu, buf, ci->filesize))) {
         DEBUGF("SGC: Sgc_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
@@ -90,6 +90,11 @@ enum codec_status codec_run(void)
     /* Update internal track count */
     if (sgc_emu.m3u.size > 0)
         sgc_emu.track_count = sgc_emu.m3u.size;
+
+    if (ci->id3->elapsed) {
+        track = ci->id3->elapsed/1000;
+        if (track >= sgc_emu.track_count) return CODEC_OK;
+    }
 
 next_track:
     set_codec_track(track);

@@ -5,7 +5,7 @@
 #include <codecs/lib/codeclib.h>
 
 #include "libgme/blargg_endian.h"
-#include "libgme/vgm_emu.h" 
+#include "libgme/vgm_emu.h"
 #include "libgme/inflate/mallocer.h"
 #include "libgme/inflate/inflate.h"
 
@@ -91,32 +91,32 @@ enum codec_status codec_run(void)
         DEBUGF("VGM: file load failed\n");
         return CODEC_ERROR;
     }
-    
+
     /* If couldn't get the whole buffer
         will trim file and put and 'end_command'
         at the end*/
     if (n < (size_t)ci->filesize) {
         DEBUGF("VGM: file was trimmed\n");
     }
-    
+
     /* If is gzipped decompress it */
     if ( get_le16( buf ) == 0x8b1f ) {
         wpw_init_mempool(MAINMEMBUF);
         inflatebuf=wpw_malloc(MAINMEMBUF,0x13500);
-            
-        /* Will use available remaining memory 
+
+        /* Will use available remaining memory
             as output buffer */
         songbuflen=wpw_available(MAINMEMBUF);
         songbuf=wpw_malloc(MAINMEMBUF,songbuflen);
 
-        songlen=decompress(buf,n,songbuf,songbuflen,0,inflatebuf);  
+        songlen=decompress(buf,n,songbuf,songbuflen,0,inflatebuf);
 
         if ((err = Vgm_load_mem(&vgm_emu, songbuf, songlen, true))) {
             DEBUGF("VGM: Vgm_load_mem failed (%s)\n", err);
             return CODEC_ERROR;
         }
 
-        /* Since metadata parser doesn't support VGZ 
+        /* Since metadata parser doesn't support VGZ
              will set song length here */
         codec_vgz_update_length();
     }
@@ -125,9 +125,12 @@ enum codec_status codec_run(void)
         return CODEC_ERROR;
     }
 
-    Vgm_start_track(&vgm_emu); 
+    Vgm_start_track(&vgm_emu);
 
-    ci->set_elapsed(0);
+    if (ci->id3->elapsed != 0)
+        Track_seek(&vgm_emu, ci->id3->elapsed);
+
+    codec_update_elapsed();
     codec_update_fade();
 
     /* The main decoder loop */
@@ -141,7 +144,7 @@ enum codec_status codec_run(void)
             Track_seek(&vgm_emu, param);
             codec_update_elapsed();
             ci->seek_complete();
-            
+
             /* Set fade again in case we seek to start of song */
             codec_update_fade();
         }

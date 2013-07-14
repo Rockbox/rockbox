@@ -120,7 +120,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                 bufptr = buf;
                 bufpos = buf + 7;
             }
-        }   
+        }
     }
 }
 
@@ -134,7 +134,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     }
     else if (reason == CODEC_UNLOAD) {
         if (state)
-            a52_free(state);        
+            a52_free(state);
     }
 
     return CODEC_OK;
@@ -148,13 +148,15 @@ enum codec_status codec_run(void)
     int consumed, packet_offset;
     int playback_on = -1;
     size_t resume_offset;
+    enum codec_command_action action;
     intptr_t param;
-    enum codec_command_action action = CODEC_ACTION_NULL;
 
     if (codec_init()) {
         return CODEC_ERROR;
     }
 
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
     resume_offset = ci->id3->offset;
 
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
@@ -164,18 +166,21 @@ enum codec_status codec_run(void)
 
     /* Intializations */
     state = a52_init(0);
-    ci->memset(&rmctx,0,sizeof(RMContext)); 
+    ci->memset(&rmctx,0,sizeof(RMContext));
     ci->memset(&pkt,0,sizeof(RMPacket));
     init_rm(&rmctx);
 
     samplesdone = 0;
 
     /* check for a mid-track resume and force a seek time accordingly */
-    if(resume_offset > rmctx.data_offset + DATA_HEADER_SIZE) {
-        resume_offset -= rmctx.data_offset + DATA_HEADER_SIZE;
+    if (resume_offset) {
+        resume_offset -= MIN(resume_offset, rmctx.data_offset + DATA_HEADER_SIZE);
         /* put number of subpackets to skip in resume_offset */
         resume_offset /= (rmctx.block_align + PACKET_HEADER_SIZE);
         param = (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);
+    }
+
+    if (param > 0) {
         action = CODEC_ACTION_SEEK_TIME;
     }
     else {

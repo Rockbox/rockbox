@@ -46,19 +46,21 @@ enum codec_status codec_run(void)
     char* module;
     int bytesPerSample =2;
     intptr_t param;
-    
+
     if (codec_init()) {
         DEBUGF("codec init failed\n");
         return CODEC_ERROR;
     }
 
+    param = ci->id3->elapsed;
+
     codec_set_replaygain(ci->id3);
-        
-    int bytes_done =0;   
+
+    int bytes_done =0;
     size_t filesize;
     ci->seek_buffer(0);
     module = ci->request_buffer(&filesize, ci->filesize);
-    if (!module || (size_t)filesize < (size_t)ci->filesize) 
+    if (!module || (size_t)filesize < (size_t)ci->filesize)
     {
         DEBUGF("loading error\n");
         return CODEC_ERROR;
@@ -69,8 +71,8 @@ enum codec_status codec_run(void)
     {
         DEBUGF("%s: format not supported",ci->id3->path);
         return CODEC_ERROR;
-    }  
-    
+    }
+
       /* Make use of 44.1khz */
     ci->configure(DSP_SET_FREQUENCY, 44100);
     /* Sample depth is 16 bit little endian */
@@ -84,23 +86,26 @@ enum codec_status codec_run(void)
     else
     {
         ci->configure(DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
-        bytesPerSample = 4; 
-    }    
-    /* reset eleapsed */
-    ci->set_elapsed(0);
+        bytesPerSample = 4;
+    }
 
     song = asap.module_info->default_song;
     duration = asap.module_info->durations[song];
     if (duration < 0)
         duration = 180 * 1000;
-    
+
     /* set id3 length, because metadata parse might not have done it */
     ci->id3->length = duration;
-    
+
     ASAP_PlaySong(&asap, song, duration);
     ASAP_MutePokeyChannels(&asap, 0);
-    
-    /* The main decoder loop */    
+
+    if (param)
+        goto resume_start;
+
+    ci->set_elapsed(0);
+
+    /* The main decoder loop */
     while (1) {
         enum codec_command_action action = ci->get_command(&param);
 
@@ -108,33 +113,34 @@ enum codec_status codec_run(void)
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
+        resume_start:
             /* New time is ready in param */
 
             /* seek to pos */
             ASAP_Seek(&asap,param);
             /* update bytes_done */
-            bytes_done = param*44.1*2;    
+            bytes_done = param*44.1*2;
             /* update elapsed */
             ci->set_elapsed((bytes_done / 2) / 44.1);
-            /* seek ready */    
-            ci->seek_complete();            
+            /* seek ready */
+            ci->seek_complete();
         }
-        
+
         /* Generate a buffer full of Audio */
         #ifdef ROCKBOX_LITTLE_ENDIAN
         n_bytes = ASAP_Generate(&asap, samples, sizeof(samples), ASAP_FORMAT_S16_LE);
         #else
         n_bytes = ASAP_Generate(&asap, samples, sizeof(samples), ASAP_FORMAT_S16_BE);
         #endif
-        
+
         ci->pcmbuf_insert(samples, NULL, n_bytes /bytesPerSample);
-        
+
         bytes_done += n_bytes;
         ci->set_elapsed((bytes_done / 2) / 44.1);
-        
+
         if(n_bytes != sizeof(samples))
             break;
     }
- 
-    return CODEC_OK;    
+
+    return CODEC_OK;
 }

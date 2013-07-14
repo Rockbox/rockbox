@@ -88,12 +88,12 @@ int ft_build_playlist(struct tree_context* c, int start_index)
  * or started via bookmark autoload, true otherwise.
  *
  * Pointers to both the full pathname and the separated parts needed to
- * avoid allocating yet another path buffer on the stack (and save some 
+ * avoid allocating yet another path buffer on the stack (and save some
  * code; the caller typically needs to create the full pathname anyway)...
  */
 bool ft_play_playlist(char* pathname, char* dirname, char* filename)
 {
-    if (global_settings.party_mode && audio_status()) 
+    if (global_settings.party_mode && audio_status())
     {
         splash(HZ, ID2P(LANG_PARTY_MODE));
         return false;
@@ -117,11 +117,11 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
         {
             playlist_shuffle(current_tick, -1);
         }
-        
-        playlist_start(0, 0);
+
+        playlist_start(0, 0, 0);
         return true;
     }
-    
+
     return false;
 }
 
@@ -406,7 +406,7 @@ static void ft_load_font(char *file)
     int current_font_id;
     enum screen_type screen = SCREEN_MAIN;
 #if NB_SCREENS > 1
-    MENUITEM_STRINGLIST(menu, ID2P(LANG_CUSTOM_FONT), NULL, 
+    MENUITEM_STRINGLIST(menu, ID2P(LANG_CUSTOM_FONT), NULL,
                         ID2P(LANG_MAIN_SCREEN), ID2P(LANG_REMOTE_SCREEN))
     switch (do_menu(&menu, NULL, NULL, false))
     {
@@ -429,7 +429,7 @@ static void ft_load_font(char *file)
     screens[screen].setuifont(
         font_load_ex(file,0,global_settings.glyphs_to_cache));
     viewportmanager_theme_changed(THEME_UI_VIEWPORT);
-}    
+}
 #endif
 
 int ft_enter(struct tree_context* c)
@@ -478,7 +478,7 @@ int ft_enter(struct tree_context* c)
                 if (!warn_on_pl_erase())
                     break;
 
-                if (global_settings.party_mode && audio_status()) 
+                if (global_settings.party_mode && audio_status())
                 {
                     playlist_insert_track(NULL, buf,
                                           PLAYLIST_INSERT_LAST, true, true);
@@ -498,7 +498,7 @@ int ft_enter(struct tree_context* c)
                             start_index = 0;
                     }
 
-                    playlist_start(start_index, 0);
+                    playlist_start(start_index, 0, 0);
                     play = true;
                 }
                 break;
@@ -705,6 +705,7 @@ int ft_enter(struct tree_context* c)
             global_status.resume_index = start_index;
             global_status.resume_crc32 =
                 playlist_get_filename_crc32(NULL, start_index);
+            global_status.resume_elapsed = 0;
             global_status.resume_offset = 0;
             status_save();
             rc = GO_TO_WPS;

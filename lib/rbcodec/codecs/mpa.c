@@ -39,7 +39,7 @@ static volatile short die IBSS_ATTR = 0;          /*thread should die*/
 #if (CONFIG_CPU == PP5024) || (CONFIG_CPU == PP5022)
 static mad_fixed_t sbsample_prev[2][36][32] IBSS_ATTR;
 #else
-static mad_fixed_t sbsample_prev[2][36][32] SHAREDBSS_ATTR; 
+static mad_fixed_t sbsample_prev[2][36][32] SHAREDBSS_ATTR;
 #endif
 
 static struct semaphore synth_done_sem IBSS_ATTR;
@@ -71,13 +71,13 @@ static void init_mad(void)
 #endif
 
     /* We do this so libmad doesn't try to call codec_calloc(). This needs to
-     * be called before mad_stream_init(), mad_frame_inti() and 
+     * be called before mad_stream_init(), mad_frame_inti() and
      * mad_synth_init(). */
     frame.overlap    = &mad_frame_overlap;
     stream.main_data = &mad_main_data;
-    
+
     /* Call mad initialization. Those will zero the arrays frame.overlap,
-     * frame.sbsample and frame.sbsample_prev. Therefore there is no need to 
+     * frame.sbsample and frame.sbsample_prev. Therefore there is no need to
      * zero them here. */
     mad_stream_init(&stream);
     mad_frame_init(&frame);
@@ -94,7 +94,7 @@ static int get_file_pos(int newtime)
          * avoid overflow */
         unsigned int newtime_s = newtime/1000;
         unsigned int length_s  = id3->length/1000;
-        
+
         if (id3->has_toc) {
             /* Use the TOC to find the new position */
             unsigned int percent, remainder;
@@ -200,7 +200,7 @@ static void set_elapsed(struct mp3entry* id3)
 #ifdef MPA_SYNTH_ON_COP
 
 /*
- * Run the synthesis filter on the COProcessor 
+ * Run the synthesis filter on the COProcessor
  */
 
 static int mad_synth_thread_stack[DEFAULT_STACK_SIZE/sizeof(int)] IBSS_ATTR;
@@ -214,12 +214,12 @@ static void mad_synth_thread(void)
     while(1) {
         ci->semaphore_release(&synth_done_sem);
         ci->semaphore_wait(&synth_pending_sem, TIMEOUT_BLOCK);
-        
+
         if(die)
             break;
 
         mad_synth_frame(&synth, &frame);
-    }    
+    }
 }
 
 /* wait for the synth thread to go idle which indicates a PCM frame has been
@@ -254,14 +254,14 @@ static bool mad_synth_thread_create(void)
 {
     ci->semaphore_init(&synth_done_sem, 1, 0);
     ci->semaphore_init(&synth_pending_sem, 1, 0);
-       
-    mad_synth_thread_id = ci->create_thread(mad_synth_thread, 
+
+    mad_synth_thread_id = ci->create_thread(mad_synth_thread,
                             mad_synth_thread_stack,
                             sizeof(mad_synth_thread_stack), 0,
-                            mad_synth_thread_name 
+                            mad_synth_thread_name
                             IF_PRIO(, PRIORITY_PLAYBACK)
                             IF_COP(, COP));
-    
+
     if (mad_synth_thread_id == 0)
         return false;
 
@@ -345,7 +345,12 @@ enum codec_status codec_run(void)
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
-    
+
+    if (!ci->id3->offset && ci->id3->elapsed) {
+        /* Have elapsed time but not offset */
+        ci->id3->offset = get_file_pos(ci->id3->elapsed);
+    }
+
     if (ci->id3->offset) {
         ci->seek_buffer(ci->id3->offset);
         set_elapsed(ci->id3);
@@ -459,7 +464,7 @@ enum codec_status codec_run(void)
         mad_synth_thread_wait_pcm();
 
         if (framelength > 0) {
-            
+
             /* In case of a mono file, the second array will be ignored. */
             ci->pcmbuf_insert(&synth.pcm.samples[0][samples_to_skip],
                               &synth.pcm.samples[1][samples_to_skip],

@@ -166,7 +166,7 @@ static spx_int64_t seek_backwards(spx_ogg_sync_state *oy, spx_ogg_page *og,
                     offset = ret;
                     continue;
                 }
-            } else if (ret == -3) 
+            } else if (ret == -3)
                 return(-3);
             else if (ret<=0)
                 break;
@@ -186,8 +186,8 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
                                    spx_ogg_sync_state *oy,
                                    spx_int64_t headerssize)
 {
-    /* TODO: Someone may want to try to implement seek to packet, 
-             instead of just to page (should be more accurate, not be any 
+    /* TODO: Someone may want to try to implement seek to packet,
+             instead of just to page (should be more accurate, not be any
              faster) */
 
     spx_int64_t crofs;
@@ -204,7 +204,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
         /* if seeking for more that 10sec,
            headersize is known & more than 10kb is played,
            try to guess a place to seek from the number of
-           bytes playe for this position, this works best when 
+           bytes playe for this position, this works best when
            the bitrate is relativly constant.
          */
 
@@ -270,7 +270,7 @@ static int speex_seek_page_granule(spx_int64_t pos, spx_int64_t curpos,
 
             lastgranule = spx_ogg_page_granulepos(&og);
 
-            if ( ((lastgranule - (avgpagelen/4)) < pos && ( lastgranule + 
+            if ( ((lastgranule - (avgpagelen/4)) < pos && ( lastgranule +
                   avgpagelen + (avgpagelen / 4)) > pos) ||
                  lastgranule > pos) {
 
@@ -338,7 +338,7 @@ static void *process_header(spx_ogg_packet *op,
         DEBUGF("Too old bitstream");
         return NULL;
     }
-   
+
     st = speex_decoder_init(mode);
     if (!st){
         DEBUGF("Decoder init failed");
@@ -381,7 +381,6 @@ enum codec_status codec_run(void)
     int error = CODEC_ERROR;
 
     SpeexBits bits;
-    int eof = 0;
     spx_ogg_sync_state oy;
     spx_ogg_page og;
     spx_ogg_packet op;
@@ -403,9 +402,10 @@ enum codec_status codec_run(void)
     int packet_count = 0;
     int lookahead;
     int headerssize = 0;
-    unsigned long strtoffset = ci->id3->offset;
+    unsigned long strtoffset;
     void *st = NULL;
     int j = 0;
+    enum codec_command_action action;
     intptr_t param;
 
     memset(&bits, 0, sizeof(bits));
@@ -416,6 +416,10 @@ enum codec_status codec_run(void)
         goto exit;
     }
 
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
+    strtoffset = ci->id3->offset;
+
     ci->seek_buffer(0);
     ci->set_elapsed(0);
 
@@ -425,29 +429,39 @@ enum codec_status codec_run(void)
 
     codec_set_replaygain(ci->id3);
 
-    eof = 0;
-    while (!eof) {
-        enum codec_command_action action = ci->get_command(&param);
+    if (!strtoffset && param) {
+        action = CODEC_ACTION_SEEK_TIME;
+    }
 
-        if (action == CODEC_ACTION_HALT)
-            break;
+    goto next_page;
 
-        /*seek (seeks to the page before the position) */
-        if (action == CODEC_ACTION_SEEK_TIME) {
-            if(samplerate!=0&&packet_count>1){
-                LOGF("Speex seek page:%lld,%lld,%ld,%lld,%d\n",
-                     ((spx_int64_t)param/1000) *
-                     (spx_int64_t)samplerate,
-                     page_granule, (long)param,
-                     (page_granule/samplerate)*1000, samplerate);
+    while (1) {
+        if (action == CODEC_ACTION_NULL)
+            action = ci->get_command(&param);
 
-                speex_seek_page_granule(((spx_int64_t)param/1000) *
-                                        (spx_int64_t)samplerate,
-                                        page_granule, &oy, headerssize);
+        if (action != CODEC_ACTION_NULL) {
+            if (action == CODEC_ACTION_HALT)
+                break;
+
+            /*seek (seeks to the page before the position) */
+            if (action == CODEC_ACTION_SEEK_TIME) {
+                if(samplerate!=0&&packet_count>1){
+                    LOGF("Speex seek page:%lld,%lld,%ld,%lld,%d\n",
+                         ((spx_int64_t)param/1000) *
+                         (spx_int64_t)samplerate,
+                         page_granule, (long)param,
+                         (page_granule/samplerate)*1000, samplerate);
+
+                    speex_seek_page_granule(((spx_int64_t)param/1000) *
+                                            (spx_int64_t)samplerate,
+                                            page_granule, &oy, headerssize);
+                }
+
+                ci->set_elapsed(param);
+                ci->seek_complete();
             }
 
-            ci->set_elapsed(param);
-            ci->seek_complete();
+            action = CODEC_ACTION_NULL;
         }
 
 next_page:

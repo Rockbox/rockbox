@@ -89,7 +89,7 @@ struct choice_setting {
 #define F_CHOICE_SETTING 0x100
 #define F_CHOICETALKS    0x200 /* uses .talks in the above struct for the talks */
                                /* and cfg_vals for the strings to display */
-                               
+
 struct table_setting {
     void (*option_callback)(int);
     const char* (*formatter)(char*, size_t, int, const char*);
@@ -113,7 +113,7 @@ struct table_setting {
 struct custom_setting {
     /* load the saved value from the .cfg
         setting: pointer into global_settings
-        value: the text from the .cfg 
+        value: the text from the .cfg
      */
     void (*load_from_cfg)(void* setting, char*value);
     /* store the value into a .cfg
@@ -142,7 +142,7 @@ struct custom_setting {
 
 #define F_NVRAM_BYTES_MASK     0xE0000 /*0-4 bytes can be stored */
 #define F_NVRAM_MASK_SHIFT     17
-#define NVRAM_CONFIG_VERSION 7
+#define NVRAM_CONFIG_VERSION   8
 /* Above define should be bumped if
 - a new NVRAM setting is added between 2 other NVRAM settings
 - number of bytes for a NVRAM setting is changed

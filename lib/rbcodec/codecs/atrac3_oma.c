@@ -50,18 +50,20 @@ enum codec_status codec_run(void)
     int elapsed = 0;
     size_t resume_offset;
     intptr_t param;
-    enum codec_command_action action = CODEC_ACTION_NULL;
+    enum codec_command_action action;
 
     if (codec_init()) {
         DEBUGF("codec init failed\n");
         return CODEC_ERROR;
     }
 
+    action = CODEC_ACTION_NULL;
+    param = ci->id3->elapsed;
     resume_offset = ci->id3->offset;
 
     codec_set_replaygain(ci->id3);
     ci->memset(&q,0,sizeof(ATRAC3Context));
- 
+
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
     ci->configure(DSP_SET_STEREO_MODE, ci->id3->channels == 1 ?
@@ -77,13 +79,15 @@ enum codec_status codec_run(void)
 
     total_frames = (ci->id3->filesize - ci->id3->first_frame_offset) / FRAMESIZE;
     frame_counter = 0;
-    
+
     /* check for a mid-track resume and force a seek time accordingly */
-    if(resume_offset > ci->id3->first_frame_offset) {
-        resume_offset -= ci->id3->first_frame_offset;
+    if (resume_offset) {
+        resume_offset -= MIN(resume_offset, ci->id3->first_frame_offset);
         /* calculate resume_offset in frames */
-        resume_offset = (int)resume_offset / FRAMESIZE;
-        param = (int)resume_offset * ((FRAMESIZE * 8)/BITRATE);
+        param = (resume_offset/FRAMESIZE) * ((FRAMESIZE * 8)/BITRATE);
+    }
+
+    if ((unsigned long)param) {
         action = CODEC_ACTION_SEEK_TIME;
     }
     else {
@@ -91,7 +95,7 @@ enum codec_status codec_run(void)
         ci->seek_buffer(ci->id3->first_frame_offset);
     }
 
-    /* The main decoder loop */  
+    /* The main decoder loop */
     while(frame_counter < total_frames)
     {
         if (action == CODEC_ACTION_NULL)
@@ -100,15 +104,13 @@ enum codec_status codec_run(void)
         if (action == CODEC_ACTION_HALT)
             break;
 
-        bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, FRAMESIZE);
-
         if (action == CODEC_ACTION_SEEK_TIME) {
             /* Do not allow seeking beyond the file's length */
-            if ((unsigned) param > ci->id3->length) {
+            if ((unsigned long) param > ci->id3->length) {
                 ci->set_elapsed(ci->id3->length);
                 ci->seek_complete();
                 break;
-            }       
+            }
 
             /* Seek to the start of the track */
             if (param == 0) {
@@ -117,19 +119,20 @@ enum codec_status codec_run(void)
                 ci->seek_buffer(ci->id3->first_frame_offset);
                 ci->seek_complete();
                 action = CODEC_ACTION_NULL;
-                continue;           
-            }                                                                
+                continue;
+            }
 
             seek_frame_offset = (param * BITRATE) / (8 * FRAMESIZE);
             frame_counter = seek_frame_offset;
             ci->seek_buffer(ci->id3->first_frame_offset + seek_frame_offset* FRAMESIZE);
-            bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, FRAMESIZE);
             elapsed = param;
             ci->set_elapsed(elapsed);
-            ci->seek_complete(); 
+            ci->seek_complete();
         }
 
         action = CODEC_ACTION_NULL;
+
+        bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, FRAMESIZE);
 
         res = atrac3_decode_frame(FRAMESIZE, &q, &datasize, bit_buffer, FRAMESIZE);
 
@@ -149,5 +152,5 @@ enum codec_status codec_run(void)
         frame_counter++;
     }
 
-    return CODEC_OK;    
+    return CODEC_OK;
 }

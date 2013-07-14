@@ -4,7 +4,7 @@
 #define GME_NSF_TYPE
 
 #include <codecs/lib/codeclib.h>
-#include "libgme/nsf_emu.h" 
+#include "libgme/nsf_emu.h"
 
 CODEC_HEADER
 
@@ -17,7 +17,7 @@ static struct Nsf_Emu nsf_emu;
 /****************** rockbox interface ******************/
 
 static void set_codec_track(int t, int multitrack) {
-    Nsf_start_track(&nsf_emu, t); 
+    Nsf_start_track(&nsf_emu, t);
 
     /* for REPEAT_ONE we disable track limits */
     if (!ci->loop_track()) {
@@ -57,14 +57,15 @@ enum codec_status codec_run(void)
 
     track = is_multitrack = 0;
     elapsed_time = 0;
+    param = ci->id3->elapsed;
 
     DEBUGF("NSF: next_track\n");
     if (codec_init()) {
         return CODEC_ERROR;
-    }  
+    }
 
     codec_set_replaygain(ci->id3);
-        
+
     /* Read the entire file */
     DEBUGF("NSF: request file\n");
     ci->seek_buffer(0);
@@ -73,7 +74,7 @@ enum codec_status codec_run(void)
         DEBUGF("NSF: file load failed\n");
         return CODEC_ERROR;
     }
-   
+
     if ((err = Nsf_load_mem(&nsf_emu, buf, ci->filesize))) {
         DEBUGF("NSF: Nsf_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
@@ -84,6 +85,10 @@ enum codec_status codec_run(void)
         nsf_emu.track_count = nsf_emu.m3u.size;
 
     if (nsf_emu.track_count > 1) is_multitrack = 1;
+
+    if (param) {
+        goto resume_start;
+    }
 
 next_track:
     set_codec_track(track, is_multitrack);
@@ -96,6 +101,7 @@ next_track:
             break;
 
         if (action == CODEC_ACTION_SEEK_TIME) {
+        resume_start:
             if (is_multitrack) {
                 track = param/1000;
                 ci->seek_complete();
@@ -107,7 +113,7 @@ next_track:
             elapsed_time = param;
             Track_seek(&nsf_emu, param);
             ci->seek_complete();
-            
+
             /* Set fade again */
             if (!ci->loop_track()) {
                 Track_set_fade(&nsf_emu, Track_length( &nsf_emu, track ), 4000);

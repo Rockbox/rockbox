@@ -12,7 +12,7 @@
  *
  * Alpine CD changer Project
  * This is a feasibility study for Archos emulating an Alpine M-Bus CD changer.
- * 
+ *
  * Currently it will do seeks and change tracks, but nothing like disks.
  * The debug version shows a dump of the M-Bus communication on screen.
  *
@@ -149,7 +149,7 @@ typedef struct
 
 
 /* information owned by the timer transmit ISR */
-struct 
+struct
 {
     unsigned char send_buf[MBUS_MAX_SIZE]; /* M-Bus message */
     unsigned send_size; /* current length of data in the buffer */
@@ -164,7 +164,7 @@ struct
 
 
 /* information owned by the UART receive ISR */
-struct 
+struct
 {
     t_rcv_queue_entry queue[MBUS_RCV_QUEUESIZE]; /* M-Bus message queue */
     unsigned buf_read; /* readout maintained by the user application */
@@ -197,7 +197,7 @@ struct
 
 
 /* communication to the worker thread */
-struct 
+struct
 {
     bool foreground; /* set as long as we're owning the UI */
     bool exiting; /* signal to the thread that we want to exit */
@@ -212,7 +212,7 @@ struct
 void timer_init(unsigned hz, unsigned to)
 {
     rb->memset(&gTimer, 0, sizeof(gTimer));
-    
+
     gTimer.transmit = TIMER_FREQ / hz; /* time for bit transitions */
     gTimer.timeout = TIMER_FREQ / to; /* time for receive timeout */
 }
@@ -311,7 +311,7 @@ void transmit_isr(void)
     case 4: /* 2.4 ms */
         if ((PBDR & PB10) == 0)
             gSendIRQ.collision = true;
-        
+
         /* prepare next round */
         gSendIRQ.step = 0;
         gSendIRQ.bitmask >>= 1;
@@ -362,7 +362,7 @@ void transmit_isr(void)
  *    |   |   |   |   |   |   |   |   |   |   |    serial sampling interval
  *    Start 0   1   2   3   4   5   6   7  Stop    bit (LSB first!)
  *
- * By looking at the bit pattern in the serial byte we can distinguish 
+ * By looking at the bit pattern in the serial byte we can distinguish
  * the short low from the longer low, tell "zero" and "one" apart.
  * So we receive 0xFE for a "zero", 0xE0 for a "one".
  * It may be necessary to treat the bits next to transitions as don't care,
@@ -371,7 +371,7 @@ void transmit_isr(void)
  */
 
 
-void uart_init(unsigned baudrate) 
+void uart_init(unsigned baudrate)
 {
     RXI1 = (unsigned long)uart_rx_isr; /* install ISR */
     ERI1 = (unsigned long)uart_err_isr; /* install ISR */
@@ -379,7 +379,7 @@ void uart_init(unsigned baudrate)
     SCR1 = 0x00; /* disable everything; select async mode with SCK pin as I/O */
     SMR1 = 0x00; /* async, 8N1, NoMultiProc, sysclock/1 */
     BRR1 = ((FREQ/(32*baudrate))-1);
-                 
+
     IPRE = (IPRE & ~0xf000) | 0xc000; /* interrupt on level 12 */
 
     rb->sleep(1); /* hardware needs to settle for at least one bit interval */
@@ -393,9 +393,9 @@ void uart_rx_isr(void) /* RXI1 */
 {
     unsigned char data;
     t_rcv_queue_entry* p_entry = &gRcvIRQ.queue[gRcvIRQ.buf_write]; /* short cut */
-    
+
     data = RDR1; /* get data */
-    
+
     and_b(~SCI_RDRF, &SSR1); /* clear data received flag */
 
     if (gTimer.mode == TM_TRANSMIT)
@@ -445,7 +445,7 @@ void uart_err_isr(void) /* ERI1 */
 
     if (p_entry->error == RX_BUSY)
     {   /* terminate reception in case of error */
-        if (SSR1 & SCI_FER) 
+        if (SSR1 & SCI_FER)
             p_entry->error = RX_FRAMING;
         else if (SSR1 & SCI_ORER)
             p_entry->error = RX_OVERRUN;
@@ -492,13 +492,13 @@ unsigned char calc_checksum(unsigned char* p_msg, int digits)
 {
     int chk = 0;
     int i;
-    
+
     for (i=0; i<digits; i++)
     {
         chk ^= p_msg[i];
     }
     chk = (chk+1) % 16;
-    
+
     return chk;
 }
 
@@ -523,7 +523,7 @@ int mbus_send(unsigned char* p_msg, int digits)
     /* wait for previous transmit/receive to end */
     while(gTimer.mode != TM_OFF) /* wait for "free line" */
         rb->sleep(1);
-    
+
     /* fill in our part */
     rb->memcpy(gSendIRQ.send_buf, p_msg, digits);
 
@@ -553,7 +553,7 @@ int mbus_send(unsigned char* p_msg, int digits)
     /* last chance to wait for a new detected receive to end */
     while(gTimer.mode != TM_OFF) /* wait for "free line" */
         rb->sleep(1);
-    
+
     and_b(~0x30, PBCR1_ADDR+1); /* GPIO for PB10 */
     timer_set_mode(TM_TRANSMIT); /* run */
 
@@ -594,7 +594,7 @@ int mbus_receive(unsigned char* p_msg, unsigned bufsize, int timeout)
             {   /* an error occured */
                 retval = - p_entry->error; /* return negative number */
             }
-            
+
             /* next queue readout position */
             gRcvIRQ.buf_read++;
             if (gRcvIRQ.buf_read >= MBUS_RCV_QUEUESIZE)
@@ -602,12 +602,12 @@ int mbus_receive(unsigned char* p_msg, unsigned bufsize, int timeout)
 
             return retval; /* exit */
         }
-        
+
         if (timeout != 0 || gTimer.mode != TM_OFF) /* also carry on if reception in progress */
         {
             if (timeout != -1 && timeout != 0) /* if not infinite or expired */
                 timeout--;
-    
+
             rb->sleep(1); /* wait a while */
         }
 
@@ -639,7 +639,7 @@ void print_scroll(char* string)
 
         pos = LINES-1;
     }
-    
+
     /* no strncpy avail. */
     rb->snprintf(screen[(pos+screentop) % LINES], sizeof(screen[0]), "%s", string);
 
@@ -726,14 +726,14 @@ void emu_process_packet(unsigned char* mbus_msg, int msg_size)
             gEmu.set_state = EMU_PLAYING;
             playmsg_dirty = true;
         }
-        
+
         if (bit_test(mbus_msg, 17))
         {
             gEmu.set_state = EMU_PAUSED;
             playmsg_dirty = true;
             set_pause();
         }
-        
+
         if (bit_test(mbus_msg, 14))
         {
             gEmu.set_state = EMU_STOPPED;
@@ -832,7 +832,7 @@ void emu_tick(void)
     if (bit_test(gEmu.playmsg, 56)) /* play bit */
     {
         unsigned remain; /* helper as we walk down the digits */
-        
+
         switch(gEmu.set_state)
         {
         case EMU_FF:
@@ -844,7 +844,7 @@ void emu_tick(void)
                 gEmu.time = 0;
             else if (gEmu.time > get_tracklength())
                 gEmu.time = get_tracklength();
-        
+
             /* convert value to MM:SS */
             remain = (unsigned)gEmu.time;
             gEmu.playmsg[7] = remain / (10*60);
@@ -997,8 +997,8 @@ void set_play(void)
     }
     else
     {
-        print_scroll("audio_play(0)");
-        rb->audio_play(0);
+        print_scroll("audio_play(0, 0)");
+        rb->audio_play(0, 0);
     }
 }
 
@@ -1081,7 +1081,7 @@ void thread(void)
                 dump_packet(buf, sizeof(buf), mbus_msg, msg_size);
                 /*print_scroll(buf); */
             }
-            if (msg_size > 2 && mbus_msg[0] == 1 
+            if (msg_size > 2 && mbus_msg[0] == 1
                 && mbus_msg[msg_size-1] == calc_checksum(mbus_msg, msg_size-1))
             {   /* sanity and checksum OK */
                 if (!connected)
@@ -1176,7 +1176,7 @@ int main(const void* parameter)
 
     gTread.foreground = false; /* we're in the background now */
     rb->plugin_tsr(exit_tsr); /* stay resident */
-    
+
 #ifdef DEBUG
     return rb->default_event_handler(button);
 #else

@@ -27,13 +27,14 @@
 #include "metadata.h"
 
 /**
- Note: When adding new tags, make sure to update index_entry_ec and tags_str in 
+ Note: When adding new tags, make sure to update index_entry_ec and tags_str in
  tagcache.c and bump up the header version too.
  */
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
-    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year, 
+    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year,
     tag_discnumber, tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating,
-    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime, tag_lastoffset,
+    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime, tag_lastelapsed,
+    tag_lastoffset,
     /* Real tags end here, count them. */
     TAG_COUNT,
     /* Virtual tags */
@@ -51,7 +52,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x5443480e
+#define TAGCACHE_MAGIC  0x5443480f
 
 /* Dump store/restore header version 'TCSxx'. */
 #define TAGCACHE_STATEFILE_MAGIC 0x54435301
@@ -59,9 +60,9 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
 
-/** 
+/**
  * Define how long one entry must be at least (longer -> less memory at commit).
- * Must be at least 4 bytes in length for correct alignment. 
+ * Must be at least 4 bytes in length for correct alignment.
  */
 #define TAGFILE_ENTRY_CHUNK_LENGTH   8
 
@@ -107,10 +108,11 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     (1LU << tag_tracknumber) | (1LU << tag_length) | (1LU << tag_bitrate) | \
     (1LU << tag_playcount) | (1LU << tag_rating) | (1LU << tag_playtime) | \
     (1LU << tag_lastplayed) | (1LU << tag_commitid) | (1LU << tag_mtime) | \
-    (1LU << tag_lastoffset) | (1LU << tag_virt_basename) | \
-    (1LU << tag_virt_length_min) | (1LU << tag_virt_length_sec) | \
-    (1LU << tag_virt_playtime_min) | (1LU << tag_virt_playtime_sec) | \
-    (1LU << tag_virt_entryage) | (1LU << tag_virt_autoscore))
+    (1LU << tag_lastelapsed) | (1LU << tag_lastoffset) | \
+    (1LU << tag_virt_basename) | (1LU << tag_virt_length_min) | \
+    (1LU << tag_virt_length_sec) | (1LU << tag_virt_playtime_min) | \
+    (1LU << tag_virt_playtime_sec) | (1LU << tag_virt_entryage) | \
+    (1LU << tag_virt_autoscore))
 
 #define TAGCACHE_IS_NUMERIC(tag) (BIT_N(tag) & TAGCACHE_NUMERIC_TAGS)
 
@@ -122,7 +124,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define FLAG_RESURRECTED 0x0010  /* Statistics data has been resurrected */
 
 enum clause { clause_none, clause_is, clause_is_not, clause_gt, clause_gteq,
-    clause_lt, clause_lteq, clause_contains, clause_not_contains, 
+    clause_lt, clause_lteq, clause_contains, clause_not_contains,
     clause_begins_with, clause_not_begins_with, clause_ends_with,
     clause_not_ends_with, clause_oneof, clause_logical_or };
 
@@ -139,16 +141,16 @@ struct tagcache_stat {
     int  progress;           /* Current progress of disk scan */
     int  processed_entries;  /* Scanned disk entries so far */
     int  queue_length;       /* Command queue length */
-    volatile const char 
+    volatile const char
         *curentry;           /* Path of the current entry being scanned. */
     volatile bool syncscreen;/* Synchronous operation with debug screen? */
     // const char *uimessage;   /* Pending error message. Implement soon. */
 };
 
-enum source_type {source_constant, 
-                  source_runtime, 
+enum source_type {source_constant,
+                  source_runtime,
                   source_current_path /* dont add items after this.
-                                       it is used as an index 
+                                       it is used as an index
                                        into id3_to_search_mapping */
                  };
 
@@ -221,7 +223,7 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
 bool tagcache_search_add_clause(struct tagcache_search *tcs,
                                 struct tagcache_search_clause *clause);
 bool tagcache_get_next(struct tagcache_search *tcs);
-bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
+bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
                        int tag, char *buf, long size);
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
@@ -229,7 +231,7 @@ long tagcache_increase_serial(void);
 bool tagcache_import_changelog(void);
 bool tagcache_create_changelog(struct tagcache_search *tcs);
 void tagcache_update_numeric(int idx_id, int tag, long data);
-bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
+bool tagcache_modify_numeric_entry(struct tagcache_search *tcs,
                                    int tag, long data);
 
 struct tagcache_stat* tagcache_get_stat(void);

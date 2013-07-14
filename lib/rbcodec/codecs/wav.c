@@ -26,7 +26,7 @@
 CODEC_HEADER
 
 /* WAVE (RIFF) codec:
- * 
+ *
  *  For a good documentation on WAVE files, see:
  *  http://www.tsp.ece.mcgill.ca/MMSP/Documents/AudioFormats/WAVE/WAVE.html
  *  and
@@ -181,8 +181,9 @@ enum codec_status codec_run(void)
     }
 
     codec_set_replaygain(ci->id3);
-    
-    /* Need to save offset for later use (cleared indirectly by advance_buffer) */
+
+    /* Need to save resume for later use (cleared indirectly by advance_buffer) */
+    param = ci->id3->elapsed;
     bytesdone = ci->id3->offset;
 
     /* get RIFF chunk header */
@@ -278,7 +279,7 @@ enum codec_status codec_run(void)
             codec = get_wave_codec(format.formattag);
             if (!codec)
             {
-                DEBUGF("CODEC_ERROR: unsupported wave format 0x%x\n", 
+                DEBUGF("CODEC_ERROR: unsupported wave format 0x%x\n",
                     (unsigned int) format.formattag);
                 return CODEC_ERROR;
             }
@@ -361,10 +362,21 @@ enum codec_status codec_run(void)
     }
 
     /* make sure we're at the correct offset */
-    if (bytesdone > (uint32_t) firstblockposn) {
+    if (bytesdone > (uint32_t) firstblockposn || param) {
+        uint32_t seek_val;
+        int seek_mode;
+
+        if (bytesdone) {
+            seek_val = bytesdone - MIN((uint32_t) firstblockposn, bytesdone);
+            seek_mode = PCM_SEEK_POS;
+        } else {
+            seek_val = param;
+            seek_mode = PCM_SEEK_TIME;
+        }
+
         /* Round down to previous block */
-        struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
-                                                     PCM_SEEK_POS, &read_buffer);
+        struct pcm_pos *newpos = codec->get_seek_pos(seek_val, seek_mode,
+                                                     &read_buffer);
 
         if (newpos->pos > format.numbytes)
             return CODEC_OK;

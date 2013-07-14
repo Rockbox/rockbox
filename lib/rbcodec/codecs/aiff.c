@@ -97,8 +97,9 @@ enum codec_status codec_run(void)
     }
 
     codec_set_replaygain(ci->id3);
-    
+
     /* Need to save offset for later use (cleared indirectly by advance_buffer) */
+    param = ci->id3->elapsed;
     bytesdone = ci->id3->offset;
 
     /* assume the AIFF header is less than 1024 bytes */
@@ -152,7 +153,7 @@ enum codec_status codec_run(void)
             num_sample_frames = ((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)
                                 |buf[13]);
             */
-            
+
             /* sample_size */
             format.bitspersample = ((buf[14]<<8)|buf[15]);
             /* sample_rate (don't use last 4 bytes, only integer fs) */
@@ -224,7 +225,7 @@ enum codec_status codec_run(void)
     codec = get_codec(format.formattag);
     if (codec == 0)
     {
-        DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n", 
+        DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n",
             (unsigned int)format.formattag);
         return CODEC_ERROR;
     }
@@ -270,10 +271,20 @@ enum codec_status codec_run(void)
     ci->advance_buffer(firstblockposn);
 
     /* make sure we're at the correct offset */
-    if (bytesdone > (uint32_t) firstblockposn) {
+    if (bytesdone > (uint32_t) firstblockposn || param) {
+        uint32_t seek_val;
+        int seek_mode;
+
+        if (bytesdone) {
+            seek_val = bytesdone - MIN((uint32_t) firstblockposn, bytesdone);
+            seek_mode = PCM_SEEK_POS;
+        } else {
+            seek_val = param;
+            seek_mode = PCM_SEEK_TIME;
+        }
+
         /* Round down to previous block */
-        struct pcm_pos *newpos = codec->get_seek_pos(bytesdone - firstblockposn,
-                                                     PCM_SEEK_POS, NULL);
+        struct pcm_pos *newpos = codec->get_seek_pos(seek_val, seek_mode, NULL);
 
         if (newpos->pos > format.numbytes)
             return CODEC_OK;

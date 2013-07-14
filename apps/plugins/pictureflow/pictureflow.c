@@ -1151,7 +1151,7 @@ static void draw_progressbar(int step)
     rb->yield();
 }
 
-/* Calculate modified FNV hash of string 
+/* Calculate modified FNV hash of string
  * has good avalanche behaviour and uniform distribution
  * see http://home.comcast.net/~bretm/hash/ */
 static unsigned int mfnv(char *str)
@@ -1159,7 +1159,7 @@ static unsigned int mfnv(char *str)
     const unsigned int p = 16777619;
     unsigned int hash = 0x811C9DC5; // 2166136261;
 
-    while(*str) 
+    while(*str)
         hash = (hash ^ *str++) * p;
     hash += hash << 13;
     hash ^= hash >> 7;
@@ -2222,7 +2222,7 @@ static int settings_menu(void)
 
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
                         "Spacing", "Centre margin", "Number of slides", "Zoom",
-                        "Show album title", "Resize Covers", "Rebuild cache", 
+                        "Show album title", "Resize Covers", "Rebuild cache",
                         "WPS Integration", "Backlight");
 
     static const struct opt_items album_name_options[] = {
@@ -2345,7 +2345,7 @@ static int main_menu(void)
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
-            case PF_MENU_CLEAR_PLAYLIST: 
+            case PF_MENU_CLEAR_PLAYLIST:
                 if(rb->playlist_remove_all_tracks(NULL) == 0) {
                     rb->playlist_create(NULL, NULL);
                     rb->splash(HZ*2, "Playlist Cleared");
@@ -2580,7 +2580,7 @@ play:
      * if shuffle, we can't predict the playing track easily, and for either
      * case the track list doesn't get auto scrolled*/
     if(!append)
-        rb->playlist_start(position, 0);
+        rb->playlist_start(position, 0, 0);
     old_playlist = center_slide.slide_index;
     old_shuffle = shuffle;
 }
@@ -2663,7 +2663,7 @@ static int pictureflow_main(void)
         }
     }
 
-    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION); 
+    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     if(auto_wps == 0)
         draw_splashscreen();
     if(backlight_mode == 0) {

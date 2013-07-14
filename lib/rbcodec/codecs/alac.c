@@ -25,7 +25,7 @@
 
 CODEC_HEADER
 
-/* The maximum buffer size handled. This amount of bytes is buffered for each 
+/* The maximum buffer size handled. This amount of bytes is buffered for each
  * frame. */
 #define ALAC_BYTE_BUFFER_SIZE 32768
 
@@ -50,7 +50,7 @@ enum codec_status codec_run(void)
     demux_res_t demux_res;
     stream_t input_stream;
     uint32_t samplesdone;
-    uint32_t elapsedtime = 0;
+    uint32_t elapsedtime;
     int samplesdecoded;
     unsigned int i;
     unsigned char* buffer;
@@ -71,10 +71,10 @@ enum codec_status codec_run(void)
 
     stream_create(&input_stream,ci);
 
-    /* Read from ci->id3->offset before calling qtmovie_read. */
-    samplesdone = (uint32_t)(((uint64_t)(ci->id3->offset) * ci->id3->frequency) /  
-                  (ci->id3->bitrate*128));
-  
+    /* Read resume info before calling qtmovie_read. */
+    elapsedtime = ci->id3->elapsed;
+    samplesdone = ci->id3->offset;
+
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
@@ -84,19 +84,27 @@ enum codec_status codec_run(void)
 
     /* initialise the sound converter */
     alac_set_info(&alac, demux_res.codecdata);
-  
+
     /* Set i for first frame, seek to desired sample position for resuming. */
     i=0;
-    if (samplesdone > 0) {
-        if (m4a_seek(&demux_res, &input_stream, samplesdone,
+
+    if (elapsedtime || samplesdone) {
+        if (samplesdone) {
+            samplesdone =
+                (uint32_t)((uint64_t)samplesdone*ci->id3->frequency /
+                           (ci->id3->bitrate*128));
+        }
+        else {
+            samplesdone = (elapsedtime/10) * (ci->id3->frequency/100);
+        }
+
+        if (!m4a_seek(&demux_res, &input_stream, samplesdone,
                       &samplesdone, (int*) &i)) {
-            elapsedtime = (samplesdone * 10) / (ci->id3->frequency / 100);
-            ci->set_elapsed(elapsedtime);
-        } else {
             samplesdone = 0;
         }
     }
 
+    elapsedtime = (samplesdone*10)/(ci->id3->frequency/100);
     ci->set_elapsed(elapsedtime);
 
     /* The main decoding loop */
@@ -105,9 +113,6 @@ enum codec_status codec_run(void)
 
         if (action == CODEC_ACTION_HALT)
             break;
-
-        /* Request the required number of bytes from the input buffer */
-        buffer=ci->request_buffer(&n, ALAC_BYTE_BUFFER_SIZE);
 
         /* Deal with any pending seek requests */
         if (action == CODEC_ACTION_SEEK_TIME) {

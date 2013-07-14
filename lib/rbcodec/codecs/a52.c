@@ -111,7 +111,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                 bufptr = buf;
                 bufpos = buf + 7;
             }
-        }   
+        }
     }
 }
 
@@ -144,24 +144,33 @@ enum codec_status codec_run(void)
 
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
-    
+
     /* Intialise the A52 decoder and check for success */
     state = a52_init(0);
 
     samplesdone = 0;
 
-    /* The main decoding loop */
     if (ci->id3->offset) {
-        if (ci->seek_buffer(ci->id3->offset)) {
-            samplesdone = (ci->id3->offset / ci->id3->bytesperframe) *
-                A52_SAMPLESPERFRAME;
-            ci->set_elapsed(samplesdone/(ci->id3->frequency / 1000));
-        }
+        sample_loc = (ci->id3->offset / ci->id3->bytesperframe) *
+                        A52_SAMPLESPERFRAME;
+        param = ci->id3->offset;
+    }
+    else if (ci->id3->elapsed) {
+        sample_loc = ci->id3->elapsed/1000 * ci->id3->frequency;
+        param = sample_loc/A52_SAMPLESPERFRAME*ci->id3->bytesperframe;
     }
     else {
-        ci->seek_buffer(ci->id3->first_frame_offset);
-        ci->set_elapsed(0);
+        sample_loc = 0;
+        param = ci->id3->first_frame_offset;
     }
+
+    if (ci->seek_buffer(param)) {
+        samplesdone = sample_loc;
+    }
+
+    ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
+
+    /* The main decoding loop */
 
     while (1) {
         enum codec_command_action action = ci->get_command(&param);
@@ -172,7 +181,8 @@ enum codec_status codec_run(void)
         if (action == CODEC_ACTION_SEEK_TIME) {
             sample_loc = param/1000 * ci->id3->frequency;
 
-            if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*ci->id3->bytesperframe)) {
+            if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*
+                                ci->id3->bytesperframe)) {
                 samplesdone = sample_loc;
                 ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
             }
@@ -183,7 +193,7 @@ enum codec_status codec_run(void)
 
         if (n == 0) /* End of Stream */
             break;
-  
+
         a52_decode_data(filebuf, filebuf + n);
         ci->advance_buffer(n);
     }

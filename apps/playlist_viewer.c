@@ -97,7 +97,7 @@ struct playlist_viewer {
     int selected_track;         /* The selected track, relative (first is 0) */
     int moving_track;           /* The track to move, relative (first is 0)
                                    or -1 if nothing is currently being moved */
-    int moving_playlist_index;  /* Playlist-relative index (as opposed to 
+    int moving_playlist_index;  /* Playlist-relative index (as opposed to
                                    viewer-relative index) of moving track    */
     struct playlist_buffer buffer;
 };
@@ -294,7 +294,7 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
            the name_buffer is probably too small to store enough
            titles to fill the screen, and preload data in the short
            direction.
-          
+
            If this happens then scrolling performance will probably
            be quite low, but it's better then having Data Abort errors */
         playlist_buffer_load_entries(pb, index, FORWARD);
@@ -318,7 +318,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     }
     if (!have_list && (playlist_amount() > 0))
     {
-         /*If dynamic playlist still exists, view it anyway even 
+         /*If dynamic playlist still exists, view it anyway even
         if playback has reached the end of the playlist */
         have_list = true;
     }
@@ -457,6 +457,7 @@ static bool update_playlist(bool force)
         {
             global_status.resume_index = -1;
             global_status.resume_offset = -1;
+            global_status.resume_elapsed = -1;
             return false;
         }
         playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD,
@@ -465,6 +466,7 @@ static bool update_playlist(bool force)
         {
             global_status.resume_index = -1;
             global_status.resume_offset = -1;
+            global_status.resume_elapsed = -1;
             return false;
         }
     }
@@ -479,7 +481,7 @@ static int onplay_menu(int index)
     int result, ret = 0;
     struct playlist_entry * current_track =
         playlist_buffer_get_track(&viewer.buffer, index);
-    MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL, 
+    MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL,
                         ID2P(LANG_CURRENT_PLAYLIST), ID2P(LANG_CATALOG),
                         ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_SHUFFLE),
                         ID2P(LANG_SAVE_DYNAMIC_PLAYLIST));
@@ -524,7 +526,7 @@ static int onplay_menu(int index)
                         if (current_track->display_index!=viewer.num_tracks ||
                             global_settings.repeat_mode == REPEAT_ALL)
                         {
-                            audio_play(0);
+                            audio_play(0, 0);
                             viewer.current_playing_track = -1;
                         }
                     }
@@ -766,7 +768,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     /* play new track */
                     if (!global_settings.party_mode)
                     {
-                        playlist_start(current_track->index, 0);
+                        playlist_start(current_track->index, 0, 0);
                         update_playlist(false);
                     }
                 }
@@ -783,7 +785,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                         goto exit;
                     if (global_settings.playlist_shuffle)
                         start_index = playlist_shuffle(current_tick, start_index);
-                    playlist_start(start_index, 0);
+                    playlist_start(start_index, 0, 0);
 
                     /* Our playlist is now the current list */
                     if (!playlist_viewer_init(&viewer, NULL, true))
@@ -925,7 +927,7 @@ bool search_playlist(void)
             case ACTION_STD_OK:
             {
                 int sel = gui_synclist_get_sel_pos(&playlist_lists);
-                playlist_start(found_indicies[sel], 0);
+                playlist_start(found_indicies[sel], 0, 0);
                 exit = 1;
             }
                 break;

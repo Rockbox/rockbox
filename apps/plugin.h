@@ -155,12 +155,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 224
+#define PLUGIN_API_VERSION 225
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 223
+#define PLUGIN_MIN_API_VERSION 225
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -183,7 +183,7 @@ enum plugin_status {
 struct plugin_api {
 
     /* lcd */
-    
+
 #ifdef HAVE_LCD_CONTRAST
     void (*lcd_set_contrast)(int x);
 #endif
@@ -371,7 +371,7 @@ struct plugin_api {
                               int width, int height);
 #endif
     void (*viewport_set_defaults)(struct viewport *vp,
-                                  const enum screen_type screen);                                  
+                                  const enum screen_type screen);
 #ifdef HAVE_LCD_BITMAP
     void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
                                          struct viewport *viewport);
@@ -715,7 +715,8 @@ struct plugin_api {
     size_t (*mixer_channel_get_bytes_waiting)(enum pcm_mixer_channel channel);
     void (*mixer_channel_set_buffer_hook)(enum pcm_mixer_channel channel,
                                           chan_buffer_hook_fn_type fn);
-
+    void (*mixer_set_frequency)(unsigned int samplerate);
+    unsigned int (*mixer_get_frequency)(void);
     void (*system_sound_play)(enum system_sound sound);
     void (*keyclick_click)(bool rawbutton, int action);
 #endif /* CONFIG_CODEC == SWCODC */
@@ -723,8 +724,10 @@ struct plugin_api {
     /* playback control */
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
-    void (*playlist_resume_track)(int start_index, unsigned int crc, int offset);
-    void (*playlist_start)(int start_index, int offset);
+    void (*playlist_resume_track)(int start_index, unsigned int crc,
+                                  unsigned long elapsed, unsigned long offset);
+    void (*playlist_start)(int start_index, unsigned long elapsed,
+                           unsigned long offset);
     int (*playlist_add)(const char *filename);
     void (*playlist_sync)(struct playlist_info* playlist);
     int (*playlist_remove_all_tracks)(struct playlist_info *playlist);
@@ -735,7 +738,7 @@ struct plugin_api {
                               const char *dirname, int position, bool queue,
                               bool recurse);
     int (*playlist_shuffle)(int random_seed, int start_index);
-    void (*audio_play)(long offset);
+    void (*audio_play)(unsigned long elapsed, unsigned long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);
@@ -969,11 +972,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#if CONFIG_CODEC == SWCODEC
-    void (*mixer_set_frequency)(unsigned int samplerate);
-    unsigned int (*mixer_get_frequency)(void);
-#endif
 };
 
 /* plugin header */

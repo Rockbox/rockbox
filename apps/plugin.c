@@ -292,7 +292,7 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_undo,
     viewport_set_fullscreen,
 #endif
-    
+
     /* list */
     gui_synclist_init,
     gui_synclist_set_nb_items,
@@ -327,7 +327,7 @@ static const struct plugin_api rockbox_api = {
     touchscreen_set_mode,
     touchscreen_get_mode,
 #endif
-    
+
 #ifdef HAVE_BUTTON_LIGHT
     buttonlight_set_timeout,
     buttonlight_off,
@@ -507,7 +507,7 @@ static const struct plugin_api rockbox_api = {
     utf8encode,
     utf8length,
     utf8seek,
-    
+
     /* the buflib memory management library */
     buflib_init,
     buflib_available,
@@ -588,6 +588,8 @@ static const struct plugin_api rockbox_api = {
     mixer_channel_set_amplitude,
     mixer_channel_get_bytes_waiting,
     mixer_channel_set_buffer_hook,
+    mixer_set_frequency,
+    mixer_get_frequency,
 
     system_sound_play,
     keyclick_click,
@@ -798,10 +800,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#if CONFIG_CODEC == SWCODEC
-    mixer_set_frequency,
-    mixer_get_frequency,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)
@@ -832,7 +830,7 @@ int plugin_load(const char* plugin, const void* parameter)
     p_hdr = lc_get_header(current_plugin_handle);
 
     hdr = p_hdr ? &p_hdr->lc_hdr : NULL;
-    
+
 
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
@@ -876,7 +874,7 @@ int plugin_load(const char* plugin, const void* parameter)
 
     FOR_NB_SCREENS(i)
        viewportmanager_theme_enable(i, false, NULL);
-    
+
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
@@ -886,7 +884,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     int rc = p_hdr->entry_point(parameter);
-    
+
     tree_unlock_cache(tree_get_context());
     pop_current_activity();
 
@@ -938,14 +936,14 @@ int plugin_load(const char* plugin, const void* parameter)
     {
         int fd;
         logf("Plugin '%s' leaks file handles", plugin);
-        
-        static const char *lines[] = 
+
+        static const char *lines[] =
             { ID2P(LANG_PLUGIN_ERROR),
               "#leak-file-handles" };
         static const struct text_message message={ lines, 2 };
         button_clear_queue(); /* Empty the keyboard buffer */
         gui_syncyesno_run(&message, NULL, NULL);
-        
+
         for(fd=0; fd < MAX_OPEN_FILES; fd++)
             if(open_files & (1<<fd))
                 close_wrapper(fd);

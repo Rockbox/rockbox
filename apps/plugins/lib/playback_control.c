@@ -39,6 +39,7 @@ static bool play(void)
         {
             rb->playlist_resume_track(rb->global_status->resume_index,
                 rb->global_status->resume_crc32,
+                rb->global_status->resume_elapsed,
                 rb->global_status->resume_offset);
         }
     }
@@ -63,30 +64,30 @@ static bool nexttrack(void)
 
 static bool volume(void)
 {
-    const struct settings_list* vol = 
+    const struct settings_list* vol =
         rb->find_setting(&rb->global_settings->volume, NULL);
     return rb->option_screen((struct settings_list*)vol, parentvp, false, "Volume");
 }
 
 static bool shuffle(void)
 {
-    const struct settings_list* shuffle = 
+    const struct settings_list* shuffle =
         rb->find_setting(&rb->global_settings->playlist_shuffle, NULL);
     return rb->option_screen((struct settings_list*)shuffle, parentvp, false, "Shuffle");
 }
 
 static bool repeat_mode(void)
 {
-    const struct settings_list* repeat = 
+    const struct settings_list* repeat =
         rb->find_setting(&rb->global_settings->repeat_mode, NULL);
     int old_repeat = rb->global_settings->repeat_mode;
-  
+
     rb->option_screen((struct settings_list*)repeat, parentvp, false, "Repeat");
-  
+
     if (old_repeat != rb->global_settings->repeat_mode &&
         (rb->audio_status() & AUDIO_STATUS_PLAY))
         rb->audio_flush_and_reload_tracks();
-  
+
     return false;
 }
 MENUITEM_FUNCTION(prevtrack_item, 0, "Previous Track",
