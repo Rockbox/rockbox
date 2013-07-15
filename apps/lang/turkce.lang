@@ -1995,6 +1995,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -2009,6 +2010,7 @@
     iaudiox5,iaudiom5: "RECORD = Geri Döndür"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Geri Döndür"
     gigabeatfx: "POWER = Geri Döndür"
+    sansafuzeplus: "BACK = Geri Döndür"
     mrobe100: "DISPLAY = Geri Döndür"
     gigabeats: "LEFT =  Revert"
     gogearsa9200: "LEFT = Geri Döndür"
@@ -2672,6 +2674,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF to abort"

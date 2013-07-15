@@ -3978,6 +3978,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3992,6 +3993,7 @@
     iaudiox5,iaudiom5: "RECORD = Povrati"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Povrati"
     gigabeatfx: "POWER = Povrati"
+    sansafuzeplus: "BACK = Povrati"
     mrobe100: "DISPLAY = Povrati"
     gigabeats: "BACK = Povrati"
     gogearsa9200: "LEFT = Povrati"
@@ -4525,6 +4527,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4534,6 +4537,7 @@
     gigabeats: "SELECT=Na POWER=Otkaži"
     vibe500: "OK=Na C=Otkaži"
     mpiohd300: "ENTER=Na MENU=Otkaži"
+    sansafuzeplus: "SELECT=Na  BACK=Otkaži"
   </dest>
   <voice>
     *: none
@@ -8078,6 +8082,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF za prekid"
@@ -8087,6 +8092,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV za prekid"
     gigabeats: "BACK za prekid"
     gigabeatfx: "POWER za prekid"
+    sansafuzeplus: "BACK za prekid"
   </dest>
   <voice>
     *: ""

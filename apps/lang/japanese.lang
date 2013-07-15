@@ -3983,6 +3983,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3997,6 +3998,7 @@
     iaudiox5,iaudiom5: "RECORD = 元に戻す"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 元に戻す"
     gigabeatfx: "POWER = 元に戻す"
+    sansafuzeplus: "BACK = 元に戻す"
     mrobe100: "DISPLAY = 元に戻す"
     gigabeats: "BACK = 元に戻す"
     gogearsa9200: "LEFT = 元に戻す"
@@ -4531,6 +4533,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4540,6 +4543,7 @@
     gigabeats: "SELECT=設定 POWER=取り消し"
     vibe500: "OK=設定 C=取り消し"
     mpiohd300: "ENTER=設定 MENU=取り消し"
+    sansafuzeplus: "SELECT=設定  BACK=取り消し"
   </dest>
   <voice>
     *: none
@@ -8084,6 +8088,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF: 取り消し"
@@ -8093,6 +8098,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV: 取り消し"
     gigabeats: "BACK: 取り消し"
     gigabeatfx: "POWER: 取り消し"
+    sansafuzeplus: "BACK: 取り消し"
   </dest>
   <voice>
     *: ""

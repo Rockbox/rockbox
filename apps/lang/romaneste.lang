@@ -1511,6 +1511,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -1525,6 +1526,7 @@
     iaudiox5,iaudiom5: "RECORD pentru anulare"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV pentru anulare"
     gigabeatfx: "POWER pentru anulare"
+    sansafuzeplus: "BACK pentru anulare"
     mrobe100: "DISPLAY pentru anulare"
     gigabeats: "BACK  pentru anulare"
     gogearsa9200: "LEFT pentru anulare"
@@ -1631,6 +1633,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -1640,6 +1643,7 @@
     gigabeats: "SELECT=Setat POWER=Anulare"
     vibe500: "OK=Setat C=Anulare"
     mpiohd300: "ENTER=Setat MENU=Anulare"
+    sansafuzeplus: "SELECT=Setat  BACK=Anulare"
   </dest>
   <voice>
     *: none
@@ -4929,7 +4933,6 @@
   </source>
   <dest>
     *: none
-
     masf: "Frecvență centrală BDM"
   </dest>
   <voice>
@@ -5087,6 +5090,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF pentru anulare"
@@ -5096,6 +5100,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV pentru anulare"
     gigabeats: "BACK pentru anulare"
     gigabeatfx: "POWER pentru anulare"
+    sansafuzeplus: "BACK pentru anulare"
   </dest>
   <voice>
     *: ""
@@ -11441,7 +11446,6 @@
   </source>
   <dest>
     *: none
-
     swcodec: "Compresor"
   </dest>
   <voice>
@@ -12036,8 +12040,6 @@
     *: "Inserare la capăt aleator"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_COMPRESSOR_SOFT_KNEE
   desc: in sound settings
@@ -12072,8 +12074,6 @@
     touchscreen: "Șterge"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_USB_KEYPAD_MODE
   desc: in settings_menu
@@ -12091,8 +12091,6 @@
     usb_hid: "Regimul USB"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_COMPRESSOR_HARD_KNEE
   desc: in sound settings
@@ -12110,8 +12108,6 @@
     swcodec: "Limita dură"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_REMOTE_BASE_SKIN
   desc: browse for the base skin in theme settings
@@ -12129,8 +12125,6 @@
     lcd_bitmap: "Skin de bază la distanță"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_BROWSER_MODE
   desc: in settings_menu
@@ -12148,8 +12142,6 @@
     usb_hid: "Răsfoire"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_USB_HID
   desc: in settings_menu
@@ -12167,8 +12159,6 @@
     usb_hid: "USB Human Interface Device"
   </voice>
 </phrase>
-
-
 <phrase>
   id: VOICE_EXT_RFMS
   desc: spoken only, for file extension
@@ -12186,8 +12176,6 @@
     radio_remote: "remote radio screen skin"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_HOTKEY_FILE_BROWSER
   desc: hotkey menu
@@ -12205,8 +12193,6 @@
     hotkey: "Buton rapid răsfoire fișiere"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_STRETCH_LIMIT
   desc: "limit" in pitch screen
@@ -12224,8 +12210,6 @@
     pitchscreen: "Limita"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_RESUME_REWIND
   desc: in playback settings menu
@@ -12243,8 +12227,6 @@
     swcodec: "Rebobinare înainte de reluare"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_TAGNAVI_UNTAGGED
   desc: "<untagged>" entry in tag browser
@@ -12259,8 +12241,6 @@
     *: "fără taguri"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_COMPRESSOR_RATIO_10
   desc: in sound settings
@@ -12278,8 +12258,6 @@
     swcodec: "10 la 1"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_MORSE_INPUT
   desc: in Settings -> System
@@ -12297,8 +12275,6 @@
     morse_input: "Introducere cu cod Morse"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_AUTORESUME_ENABLE_YES
   desc: deprecated
@@ -12313,8 +12289,6 @@
     *: ""
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
   desc: in sound_menu, advanced settings for hardware equalizer tone controls
@@ -12332,8 +12306,6 @@
     gigabeats: "Setări avansate de control al tonalității"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_DEPTH_3D
   desc: in sound_menu, amount of 3D enhancement effect
@@ -12365,8 +12337,6 @@
     *: "Pornire explorare fișiere la /"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_COMPRESSOR_RATIO_2
   desc: in sound settings
@@ -12384,8 +12354,6 @@
     swcodec: "2 la 1"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_FM_RSSI
   desc: Signal strength of a received FM station
@@ -12403,8 +12371,6 @@
     radio: "Puterea semnalului:"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_MOUSE_MODE
   desc: in settings_menu
@@ -12422,8 +12388,6 @@
     usb_hid: "Maus"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_TOUCHSCREEN_GRID
   desc: in Settings -> General -> Display -> Touchscreen Settings
@@ -12441,8 +12405,6 @@
     touchscreen: "Grilă 3x3"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_COMPRESSOR_RATIO_LIMIT
   desc: in sound settings
@@ -12460,8 +12422,6 @@
     swcodec: "Limita"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_MULTIMEDIA_MODE
   desc: in settings_menu
@@ -12479,8 +12439,6 @@
     usb_hid: "Multimedia"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_STATUSBAR_CUSTOM
   desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
@@ -12495,8 +12453,6 @@
     *: "Personalizat"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_SKIN_RAM_USAGE
   desc: deprecated
@@ -12511,8 +12467,6 @@
     *: ""
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_SKIP_OUTRO
   desc: skipping to the 5 seconds before the end of a track
@@ -12527,8 +12481,6 @@
     *: "Sari spre capăt"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_RADIOSCREEN
   desc: in the theme menu
@@ -12546,8 +12498,6 @@
     radio: "Ecran radio"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_AUTOTRACKSKIP
   desc: in crossfade settings
@@ -12565,8 +12515,6 @@
     crossfade: "Numai schimbare automată a pistei"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_TIMESTRETCH
   desc: timestretch enable
@@ -12584,8 +12532,6 @@
     swcodec: "Scara temporală"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_COMPRESSOR_RATIO_6
   desc: in sound settings
@@ -12603,8 +12549,6 @@
     swcodec: "6 la 1"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_ONPLAY_PICTUREFLOW
   desc: Onplay pictureflow
@@ -12619,8 +12563,6 @@
     *: "Răsfoire ilustraţii albume"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_AUTORESUME_ENABLE
   desc: deprecated
@@ -12635,8 +12577,6 @@
     *: ""
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_FORCE
   desc: alternative to yes/no for tristate settings
@@ -12651,8 +12591,6 @@
     *: "Forțat"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_HOTKEY
   desc: hotkey menu
@@ -12670,8 +12608,6 @@
     hotkey: "Scurtătură"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_COMPRESSOR_RATIO_4
   desc: in sound settings
@@ -12689,8 +12625,6 @@
     swcodec: "4 la 1"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_AUTORESUME_CUSTOM
   desc: enable customization of resume on automatic track change
@@ -12705,8 +12639,6 @@
     *: "Doar în dosare personalizate"
   </voice>
 </phrase>
-
-
 <phrase>
   id: LANG_SET_AS_START_DIR
   desc: used in the onplay menu to set a starting browser dir
