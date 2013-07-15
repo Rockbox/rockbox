@@ -22,7 +22,6 @@
 # Last Update: 04/06/06
 # If updates or corrections are needed, message me.
 # Se vi trovas erarojn, sendu mesaĝon al mi.
-
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -4547,11 +4546,13 @@
     *: "PLAY=Set OFF=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: "LEGI=Validigi OFF=Malvalidigi"
     vibe500: "OK=Validigi C=Malvalidigi"
     mpiohd300: "ENTER=Validigi MENU=Malvalidigi"
+    sansafuzeplus: "SELECT=Validigi  BACK=Malvalidigi"
   </dest>
   <voice>
     *: ""

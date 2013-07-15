@@ -4453,6 +4453,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -4467,6 +4468,7 @@
     iaudiox5,iaudiom5: "RECORD = Peruuta"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Peruuta"
     gigabeatfx: "POWER = Peruuta"
+    sansafuzeplus: "BACK = Peruuta"
     mrobe100: "DISPLAY = Peruuta"
     gigabeats: "BACK = Peruuta"
     gogearsa9200: "VASEN = Revert"
@@ -4701,6 +4703,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4710,6 +4713,7 @@
     gigabeats: "SELECT=Aseta POWER=Peruuta"
     vibe500: "OK=Aseta C=Peruuta"
     mpiohd300: "ENTER=Aseta MENU=Peruuta"
+    sansafuzeplus: "SELECT=Aseta  BACK=Peruuta"
   </dest>
   <voice>
     *: none
@@ -7192,6 +7196,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF keskeyttää"
@@ -7201,6 +7206,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV keskeyttää"
     gigabeats: "BACK keskeyttää"
     gigabeatfx: "POWER keskeyttää"
+    sansafuzeplus: "BACK keskeyttää"
   </dest>
   <voice>
     *: ""
