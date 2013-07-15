@@ -23,6 +23,7 @@
 
 #include <stdbool.h>
 bool button_debug_screen(void);
+void touchpad_set_sensitivity(int level);
 
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001
