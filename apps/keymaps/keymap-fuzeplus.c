@@ -169,11 +169,16 @@ static const struct button_mapping button_context_list[]  = {
 
 #ifdef CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
+
+    { ACTION_FM_MODE,                  BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
     { ACTION_FM_MENU,                  BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_FM_PRESET,                BUTTON_BOTTOMRIGHT,                 BUTTON_SELECT },
+
     { ACTION_FM_PLAY,                  BUTTON_PLAYPAUSE|BUTTON_REL,        BUTTON_PLAYPAUSE },
     { ACTION_FM_STOP,                  BUTTON_PLAYPAUSE|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_FM_MODE,                  BUTTON_BOTTOMLEFT,                  BUTTON_BOTTOMLEFT },
+
+    { ACTION_FM_RECORD,                BUTTON_BOTTOMLEFT|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_FM_PRESET,                BUTTON_BOTTOMRIGHT,                 BUTTON_NONE },
+
     { ACTION_SETTINGS_INC,             BUTTON_VOL_UP,                      BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,       BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_SETTINGS_DEC,             BUTTON_VOL_DOWN,                    BUTTON_NONE },
@@ -187,7 +192,8 @@ static const struct button_mapping button_context_radio[]  = {
 
 #ifdef HAVE_RECORDING
 static const struct button_mapping button_context_recscreen[]  = {
-    { ACTION_REC_PAUSE,                BUTTON_PLAYPAUSE|BUTTON_REL,        BUTTON_PLAYPAUSE },
+
+    { ACTION_REC_PAUSE,                BUTTON_PLAYPAUSE,                   BUTTON_NONE },
     { ACTION_REC_NEWFILE,              BUTTON_BOTTOMRIGHT,                 BUTTON_NONE },
     { ACTION_SETTINGS_INC,             BUTTON_RIGHT,                       BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,       BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
