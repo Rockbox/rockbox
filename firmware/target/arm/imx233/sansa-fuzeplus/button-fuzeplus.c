@@ -198,7 +198,8 @@ static struct button_area_t button_areas[] =
     {0, 0, 0, 0, 0},
 };
 
-#define RMI_INTERRUPT   1
+#define RMI_INTERRUPT       1
+#define RMI_SET_SENSITIVITY 2
 
 static int touchpad_btns = 0;
 static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
@@ -232,6 +233,11 @@ static void rmi_attn_cb(int bank, int pin, intptr_t user)
     queue_post(&rmi_queue, RMI_INTERRUPT, 0);
 }
 
+void touchpad_set_sensitivity(int level)
+{
+    queue_post(&rmi_queue, RMI_SET_SENSITIVITY, level);
+}
+
 static void rmi_thread(void)
 {
     struct queue_event ev;
@@ -243,6 +249,12 @@ static void rmi_thread(void)
         if(ev.id == SYS_USB_CONNECTED)
         {
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            continue;
+        }
+        else if(ev.id == RMI_SET_SENSITIVITY)
+        {
+            /* handle negative values as well ! */
+            rmi_write_single(RMI_2D_SENSITIVITY_ADJ, (unsigned char)(int8_t)ev.data);
             continue;
         }
         else if(ev.id != RMI_INTERRUPT)
