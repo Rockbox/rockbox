@@ -535,6 +535,26 @@ static int sd_init_card(const int drive)
     /*  Card back to full speed  */
     MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 */
 
+    if (sd_v2)
+    {
+        /* Attempt to switch cards to HS timings, non HS cards just ignore this */
+        /*  CMD7 w/rca: Select card to put it in TRAN state */
+        if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
+            return -7;
+
+        if(sd_wait_for_tran_state(drive))
+            return -8;
+
+        /* CMD6 */
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_RESP, &response))
+            return -9;
+
+        /*  We need to go back to STBY state now so we can read csd */
+        /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
+        if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+            return -10;
+    }
+
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
                  MCI_RESP|MCI_LONG_RESP, card_info[drive].csd))
