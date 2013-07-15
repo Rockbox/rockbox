@@ -4456,6 +4456,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -4470,6 +4471,7 @@
     iaudiox5,iaudiom5: "RECORD = terugzetten"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = terugzetten"
     gigabeatfx: "POWER = terugzetten"
+    sansafuzeplus: "BACK = terugzetten"
     mrobe100: "DISPLAY = terugzetten"
     gigabeats: "BACK = terugzetten"
     gogearsa9200: "LINKS = terugzetten"
@@ -4700,6 +4702,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4709,6 +4712,7 @@
     gigabeats: "SELECT=Instellen POWER=Afbreken"
     vibe500: "OK=Instellen C=Afbreken"
     mpiohd300: "ENTER=Instellen MENU=Afbreken"
+    sansafuzeplus: "SELECT=Instellen  BACK=Afbreken"
   </dest>
   <voice>
     *: none
@@ -7194,6 +7198,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF om af te breken"
@@ -7203,6 +7208,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV om af te breken"
     gigabeats: "BACK om af te breken"
     gigabeatfx: "POWER om af te breken"
+    sansafuzeplus: "BACK om af te breken"
   </dest>
   <voice>
     *: ""

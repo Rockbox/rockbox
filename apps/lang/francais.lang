@@ -4008,6 +4008,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -4022,6 +4023,7 @@
     iaudiox5,iaudiom5: "RECORD = Annuler"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Annuler"
     gigabeatfx: "POWER = Annuler"
+    sansafuzeplus: "BACK = Annuler"
     mrobe100: "DISPLAY = Annuler"
     gigabeats: "BACK = Annuler"
     gogearsa9200: "LEFT = Annuler"
@@ -4556,6 +4558,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4565,6 +4568,7 @@
     gigabeats: "SELECT=Valider POWER=Annuler"
     vibe500: "OK=Valider C=Annuler"
     mpiohd300: "ENTER=Valider MENU=Annuler"
+    sansafuzeplus: "SELECT=Valider  BACK=Annuler"
   </dest>
   <voice>
     *: none
@@ -8109,6 +8113,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF pour Annuler"
@@ -8118,6 +8123,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV pour Annuler"
     gigabeats: "BACK pour Annuler"
     gigabeatfx: "POWER pour Annuler"
+    sansafuzeplus: "BACK pour Annuler"
   </dest>
   <voice>
     *: ""

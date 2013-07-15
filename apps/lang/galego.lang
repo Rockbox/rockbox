@@ -2954,6 +2954,7 @@ iriverifp7xx: "%d%% %dh %dm"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -2968,6 +2969,7 @@ iriverifp7xx: "%d%% %dh %dm"
     iaudiox5,iaudiom5: "RECORD = desfacer"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = desfacer"
     gigabeatfx: "POWER = desfacer"
+    sansafuzeplus: "BACK = desfacer"
     mrobe100: "DISPLAY = desfacer"
     gigabeats: "BACK = desfacer"
     gogearsa9200: "LEFT = desfacer"
@@ -2982,6 +2984,7 @@ iriverifp7xx: "%d%% %dh %dm"
     iaudiox5,iaudiom5: "RECORD = desfacer"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = desfacer"
     gigabeatfx: "POWER = desfacer"
+    sansafuzeplus: "BACK = desfacer"
     mrobe100: "DISPLAY = desfacer"
     gigabeats: "BACK = desfacer"
     gogearsa9200: "LEFT = desfacer"
@@ -3230,6 +3233,7 @@ iriverifp7xx: "%d%% %dh %dm"
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -3239,6 +3243,7 @@ iriverifp7xx: "%d%% %dh %dm"
     gigabeats: "SELECT=Aceptar POWER=Cancelar"
     vibe500: "OK=Aceptar C=Cancelar"
     mpiohd300: "ENTER=Aceptar MENU=Cancelar"
+    sansafuzeplus: "SELECT=Aceptar  BACK=Cancelar"
   </dest>
   <voice>
     *: none
@@ -3248,6 +3253,7 @@ iriverifp7xx: "%d%% %dh %dm"
     gigabeats: "SELECT=Aceptar POWER=Cancelar"
     vibe500: "OK=Aceptar C=Cancelar"
     mpiohd300: "ENTER=Aceptar MENU=Cancelar"
+    sansafuzeplus: "SELECT=Aceptar  BACK=Cancelar"
   </voice>
 </phrase>
 <phrase>
@@ -5438,6 +5444,7 @@ iriverifp7xx: "%d%% %dh %dm"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF para abortar"
@@ -5447,6 +5454,7 @@ iriverifp7xx: "%d%% %dh %dm"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV para abortar"
     gigabeats: "BACK para abortar"
     gigabeatfx: "POWER para abortar"
+    sansafuzeplus: "BACK para abortar"
   </dest>
   <voice>
     *: "OFF para abortar"
@@ -5456,6 +5464,7 @@ iriverifp7xx: "%d%% %dh %dm"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV para abortar"
     gigabeats: "BACK para abortar"
     gigabeatfx: "POWER para abortar"
+    sansafuzeplus: "BACK para abortar"
   </voice>
 </phrase>
 <phrase>

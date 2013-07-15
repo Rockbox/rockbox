@@ -3962,6 +3962,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
@@ -3976,6 +3977,7 @@
     iaudiox5,iaudiom5: "RECORD = Mabalik"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Mabalik"
     gigabeatfx: "POWER = Mabalik"
+    sansafuzeplus: "BACK = Mabalik"
     mrobe100: "DISPLAY = Mabalik"
     gigabeats: "BACK = Mabalik"
     gogearsa9200: "LEFT = Mabalik"
@@ -4509,6 +4511,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
  </source>
  <dest>
     *: none
@@ -4518,6 +4521,7 @@
     gigabeats: "SELECT = Ilagay POWER = Kanselahin"
     vibe500: "OK=Ilagay C=Kanselahin"
     mpiohd300: "ENTER=Ilagay MENU=Kanselahin"
+    sansafuzeplus: "SELECT=Ilagay  BACK=Kanselahin"
  </dest>
  <voice>
     *: none
@@ -7523,6 +7527,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF sa agas"
@@ -7532,6 +7537,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV sa agas"
     gigabeats: "BACK sa agas"
     gigabeatfx: "POWER sa agas"
+    sansafuzeplus: "BACK sa agas"
   </dest>
   <voice>
     *: ""

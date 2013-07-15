@@ -4454,6 +4454,7 @@
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     vibe500: "CANCEL = Revert"
@@ -4466,6 +4467,7 @@
     iaudiox5,iaudiom5: "RECORD = 回去"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 返回"
     gigabeatfx: "POWER = 返回"
+    sansafuzeplus: "BACK = 返回"
     mrobe100: "DISPLAY = 返回"
     gigabeats: "BACK = 返回"
     vibe500: "CANCEL = 返回"
@@ -4707,6 +4709,7 @@
     gigabeats: "SELECT=Set POWER=Cancel"
     vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
+    sansafuzeplus: "SELECT=Set  BACK=Cancel"
   </source>
   <dest>
     *: none
@@ -4716,6 +4719,7 @@
     gigabeats: "SELECT=設定 POWER=取消"
     vibe500: "OK=設定 C=取消"
     mpiohd300: "ENTER=設定 MENU=取消"
+    sansafuzeplus: "SELECT=設定  BACK=取消"
   </dest>
   <voice>
     *: none
@@ -7201,6 +7205,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
     gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
+    sansafuzeplus: "BACK to abort"
   </source>
   <dest>
     *: "OFF: 離開"
@@ -7210,6 +7215,7 @@
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV: 離開"
     gigabeats: "BACK: 離開"
     gigabeatfx: "POWER: 離開"
+    sansafuzeplus: "BACK: 離開"
   </dest>
   <voice>
     *: ""
