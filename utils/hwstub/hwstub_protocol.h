@@ -27,7 +27,7 @@
 
 #define HWSTUB_VERSION_MAJOR    2
 #define HWSTUB_VERSION_MINOR    11
-#define HWSTUB_VERSION_REV      1
+#define HWSTUB_VERSION_REV      2
 
 #define HWSTUB_USB_VID  0xfee1
 #define HWSTUB_USB_PID  0xdead
@@ -46,7 +46,8 @@
 #define HWSTUB_RW_MEM       2 /* optional */
 #define HWSTUB_CALL         3 /* optional */
 #define HWSTUB_JUMP         4 /* optional */
-#define HWSTUB_STOP         5 /* optional */
+#define HWSTUB_EXIT         5 /* optional */
+#define HWSTUB_ATEXIT       6 /* optional */
 
 /**
  * HWSTUB_GET_INFO: get some information about an aspect of the device.
@@ -91,7 +92,7 @@ struct usb_resp_info_stmp_t
 #define HWSTUB_FEATURE_MEM      (1 << 1)
 #define HWSTUB_FEATURE_CALL     (1 << 2)
 #define HWSTUB_FEATURE_JUMP     (1 << 3)
-#define HWSTUB_FEATURE_STOP     (1 << 4)
+#define HWSTUB_FEATURE_EXIT     (1 << 4)
 
 struct usb_resp_info_features_t
 {
@@ -129,12 +130,23 @@ struct usb_resp_info_target_t
  * the transfer is either a read or a write. */
 
 /**
- * HWSTUB_STOP: only if has HWSTUB_FEATURE_STOP.
- * Stop hwstub. Several methods can be employed (not all may be supported).
- * The method is stored in wValue and interpreted as follows:
- * - reboot: immediately reboot the device
- * - off: wait for USB disconnection and power off */
-#define HWSTUB_STOP_REBOOT  0
-#define HWSTUB_STOP_OFF     1
+ * HWSTUB_EXIT: only if has HWSTUB_FEATURE_EXIT.
+ * Stop hwstub now, performing the atexit action. Default exit action
+ * is target dependent. */
+
+/**
+ * HWSTUB_ATEXIT: only if has HWSTUB_FEATURE_EXIT.
+ * Sets the action to perform at exit. Exit happens by sending HWSTUB_EXIT
+ * or on USB disconnection. The following actions are available:
+ * - nop: don't do anything, wait for next connection
+ * - reboot: reboot the device
+ * - off: power off
+ * NOTE the power off action might have to wait for USB disconnection as some
+ * targets cannot power off while plugged.
+ * NOTE appart from nop which is mandatory, all other methods can be
+ * unavailable and thus the atexit command can fail. */
+#define HWSTUB_ATEXIT_REBOOT    0
+#define HWSTUB_ATEXIT_OFF       1
+#define HWSTUB_ATEXIT_NOP       2
 
 #endif /* __HWSTUB_PROTOCOL__ */

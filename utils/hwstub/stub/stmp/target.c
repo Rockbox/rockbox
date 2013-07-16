@@ -49,7 +49,35 @@ enum stmp_family_t
     STMP3780
 };
 
-enum stmp_family_t g_stmp_family = UNKNOWN;
+static enum stmp_family_t g_stmp_family = UNKNOWN;
+static int g_atexit = HWSTUB_ATEXIT_OFF;
+
+/**
+ *
+ * Power
+ *
+ */
+
+#define HW_POWER_BASE       0x80044000
+
+void power_off(void)
+{
+    switch(g_stmp_family)
+    {
+        case STMP3600:
+            *(volatile uint32_t *)(HW_POWER_BASE + 0xc0) = 0x3e770014;
+            break;
+        case STMP3700:
+        case STMP3770:
+            *(volatile uint32_t *)(HW_POWER_BASE + 0xe0) = 0x3e770003;
+            break;
+        case STMP3780:
+            *(volatile uint32_t *)(HW_POWER_BASE + 0x100) = 0x3e770003;
+            break;
+        default:
+            break;
+    }
+}
 
 /**
  *
@@ -85,6 +113,25 @@ enum stmp_family_t g_stmp_family = UNKNOWN;
 #define HW_CLKCTRL_UTMICLKCTRL  (*(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x70))
 #define HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK30M_GATE    (1 << 30)
 #define HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK120M_GATE   (1 << 31)
+
+void clkctrl_reset(void)
+{
+    switch(g_stmp_family)
+    {
+        case STMP3600:
+            *(volatile uint32_t *)(HW_POWER_BASE + 0xc0) = 0x3e770002;
+            break;
+        case STMP3700:
+        case STMP3770:
+            *(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xf0) = 0x1;
+            break;
+        case STMP3780:
+            *(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x100) = 0x1;
+            break;
+        default:
+            break;
+    }
+}
 
 /**
  *
@@ -205,6 +252,24 @@ int target_get_info(int info, void **buffer)
         return -1;
 }
 
+int target_atexit(int method)
+{
+    g_atexit = method;
+    return 0;
+}
+
 void target_exit(void)
 {
+    switch(g_atexit)
+    {
+        case HWSTUB_ATEXIT_OFF:
+            power_off();
+            // fallthrough in case of return
+        case HWSTUB_ATEXIT_REBOOT:
+            clkctrl_reset();
+            // fallthrough in case of return
+        case HWSTUB_ATEXIT_NOP:
+        default:
+            return;
+    }
 }

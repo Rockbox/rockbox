@@ -158,17 +158,18 @@ const char *hwstub_get_rev_string(struct usb_resp_info_stmp_t *stmp)
     }
 }
 
-int hwstub_aes_otp(struct hwstub_device_t *dev, void *buf, size_t sz, uint16_t param)
+int hwstub_atexit(struct hwstub_device_t *dev, int method)
 {
-    int ret = libusb_control_transfer(dev->handle,
+    return libusb_control_transfer(dev->handle,
             LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWSTUB_AES_OTP, param, 0, buf, sz,
+            LIBUSB_ENDPOINT_OUT, HWSTUB_ATEXIT, 0, method, NULL, 0,
             1000);
-    if(ret <0 || (unsigned)ret != sz)
-        return -1;
-    int xfer;
-    ret = libusb_interrupt_transfer(dev->handle, dev->int_in, buf, sz, &xfer, 1000);
-    if(ret < 0 || (unsigned)xfer != sz)
-        return -1;
-    return ret;
+}
+
+int hwstub_exit(struct hwstub_device_t *dev)
+{
+    return libusb_control_transfer(dev->handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
+            LIBUSB_ENDPOINT_OUT, HWSTUB_EXIT, 0, 0, NULL, 0,
+            1000);
 }

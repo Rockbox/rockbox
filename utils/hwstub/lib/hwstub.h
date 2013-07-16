@@ -57,8 +57,9 @@ int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *bu
 /* Returns <0 on error */
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);
 int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr);
-/* Returns <0 on error. The size must be a multiple of 16. */
-int hwstub_aes_otp(struct hwstub_device_t *dev, void *buf, size_t sz, uint16_t param);
+/* Returns <0 on error */
+int hwstub_atexit(struct hwstub_device_t *dev, int action);
+int hwstub_exit(struct hwstub_device_t *dev);
 
 const char *hwstub_get_product_string(struct usb_resp_info_stmp_t *stmp);
 const char *hwstub_get_rev_string(struct usb_resp_info_stmp_t *stmp);

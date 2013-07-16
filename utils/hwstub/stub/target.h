@@ -23,9 +23,13 @@
 
 #include "protocol.h"
 
+/* do target specific init */
 void target_init(void);
+/* exit, performing the atexit action (default is target specific) */
 void target_exit(void);
-/* return actual size or -1 if error */
+/* get information, return actual size or -1 if error */
 int target_get_info(int info, void **buffer);
+/* set atexit action or return -1 on error */
+int target_atexit(int action);
 
 #endif /* __TARGET_H__ */
