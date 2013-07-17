@@ -52,24 +52,6 @@ int g_extern_count;
  * command file to sb conversion
  */
 
-static bool elf_read(void *user, uint32_t addr, void *buf, size_t count)
-{
-    if(fseek((FILE *)user, addr, SEEK_SET) == -1)
-        return false;
-    return fread(buf, 1, count, (FILE *)user) == count;
-}
-
-static void elf_printf(void *user, bool error, const char *fmt, ...)
-{
-    if(!g_debug && !error)
-        return;
-    (void) user;
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-}
-
 static void resolve_extern(struct cmd_source_t *src)
 {
     if(!src->is_extern)
@@ -102,7 +84,7 @@ static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
     if(g_debug)
         printf("Loading ELF file '%s'...\n", src->filename);
     elf_init(&src->elf);
-    src->loaded = elf_read_file(&src->elf, elf_read, elf_printf, fd);
+    src->loaded = elf_read_file(&src->elf, elf_std_read, elf_std_printf, fd);
     fclose(fd);
     if(!src->loaded)
         bug("error loading elf file '%s' (id '%s')\n", src->filename, id);
@@ -333,12 +315,6 @@ static void usage(void)
     exit(1);
 }
 
-static struct crypto_key_t g_zero_key =
-{
-    .method = CRYPTO_KEY,
-    .u.key = {0}
-};
-
 int main(int argc, char **argv)
 {
     char *cmd_filename = NULL;
@@ -385,6 +361,8 @@ int main(int argc, char **argv)
             }
             case 'z':
             {
+                struct crypto_key_t g_zero_key;
+                sb_get_zero_key(&g_zero_key);
                 add_keys(&g_zero_key, 1);
                 break;
             }
@@ -407,7 +385,7 @@ int main(int argc, char **argv)
                 break;
             }
             default:
-                abort();
+                bug("Internal error: unknown option '%c'\n", c);
         }
     }
 

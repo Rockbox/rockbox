@@ -115,7 +115,7 @@ static uint32_t do_unround(union xorcrypt_key_t *key)
     return 0;
 }
 
-static void test_round(union xorcrypt_key_t keys[2])
+static void __attribute__((unused)) test_round(union xorcrypt_key_t keys[2])
 {
     union xorcrypt_key_t save[2];
     memcpy(save, keys, sizeof(save));

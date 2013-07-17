@@ -63,4 +63,14 @@ extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
 void color(color_t c);
 void enable_color(bool enable);
 
+enum sb_version_guess_t
+{
+    SB_VERSION_1,
+    SB_VERSION_2,
+    SB_VERSION_UNK,
+    SB_VERSION_ERR,
+};
+
+enum sb_version_guess_t guess_sb_version(const char *filename);
+
 #endif /* __MISC_H__ */

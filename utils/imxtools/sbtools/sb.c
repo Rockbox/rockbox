@@ -22,6 +22,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include "misc.h"
 #include "crypto.h"
 #include "sb.h"
@@ -1244,4 +1245,21 @@ void sb_dump(struct sb_file_t *file, void *u, sb_color_printf cprintf)
 
     #undef printf
     #undef print_hex
+}
+
+void sb_get_zero_key(struct crypto_key_t *key)
+{
+    key->method = CRYPTO_KEY;
+    memset(key->u.key, 0, sizeof(key->u.key));
+}
+
+void sb_std_printf(void *user, bool error, color_t c, const char *fmt, ...)
+{
+    (void) user;
+    (void) error;
+    va_list args;
+    va_start(args, fmt);
+    color(c);
+    vprintf(fmt, args);
+    va_end(args);
 }

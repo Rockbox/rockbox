@@ -305,3 +305,44 @@ void color(color_t c)
     if(g_color_enable)
         printf("%s", (char *)c);
 }
+
+enum sb_version_guess_t guess_sb_version(const char *filename)
+{
+#define ret(x) do { fclose(f); return x; } while(0)
+    FILE *f = fopen(filename, "rb");
+    if(f == NULL)
+        ret(SB_VERSION_ERR);
+    // check signature
+    uint8_t sig[4];
+    if(fseek(f, 20, SEEK_SET))
+        ret(SB_VERSION_UNK);
+    if(fread(sig, 4, 1, f) != 1)
+        ret(SB_VERSION_UNK);
+    if(memcmp(sig, "STMP", 4) != 0)
+        ret(SB_VERSION_UNK);
+    // check header size (v1)
+    uint32_t hdr_size;
+    if(fseek(f, 8, SEEK_SET))
+        ret(SB_VERSION_UNK);
+    if(fread(&hdr_size, 4, 1, f) != 1)
+        ret(SB_VERSION_UNK);
+    if(hdr_size == 0x34)
+        ret(SB_VERSION_1);
+    // check header params relationship
+    struct
+    {
+        uint16_t nr_keys; /* Number of encryption keys */
+        uint16_t key_dict_off; /* Offset to key dictionary (in blocks) */
+        uint16_t header_size; /* In blocks */
+        uint16_t nr_sections; /* Number of sections */
+        uint16_t sec_hdr_size; /* Section header size (in blocks) */
+    } __attribute__((packed)) u;
+    if(fseek(f, 0x28, SEEK_SET))
+        ret(SB_VERSION_UNK);
+    if(fread(&u, sizeof(u), 1, f) != 1)
+        ret(SB_VERSION_UNK);
+    if(u.sec_hdr_size == 1 && u.header_size == 6 && u.key_dict_off == u.header_size + u.nr_sections)
+        ret(SB_VERSION_2);
+    ret(SB_VERSION_UNK);
+#undef ret
+}

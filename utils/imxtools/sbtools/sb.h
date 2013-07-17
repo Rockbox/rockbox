@@ -239,5 +239,9 @@ void sb_dump(struct sb_file_t *file, void *u, sb_color_printf printf);
 void sb_free_instruction(struct sb_inst_t inst);
 void sb_free_section(struct sb_section_t file);
 void sb_free(struct sb_file_t *file);
+void sb_get_zero_key(struct crypto_key_t *key);
+
+/* standard implementation: user is unused*/
+void sb_std_printf(void *user, bool error, color_t c, const char *fmt, ...);
 
 #endif /* __SB_H__ */

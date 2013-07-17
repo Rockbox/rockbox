@@ -445,6 +445,7 @@ int main(int argc, char **argv)
                 }
                 break;
             default:
+                printf("Internal error: unknown option '%c'\n", c);
                 abort();
         }
     }

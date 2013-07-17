@@ -60,24 +60,6 @@
 static char *g_out_prefix;
 static bool g_elf_simplify = true;
 
-static void elf_printf(void *user, bool error, const char *fmt, ...)
-{
-    if(!g_debug && !error)
-        return;
-    (void) user;
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-}
-
-static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
-{
-    FILE *f = user;
-    fseek(f, addr, SEEK_SET);
-    fwrite(buf, count, 1, f);
-}
-
 static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id)
 {
     char name[5];
@@ -94,7 +76,7 @@ static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id
         return;
     if(g_elf_simplify)
         elf_simplify(elf);
-    elf_write_file(elf, elf_write, elf_printf, fd);
+    elf_write_file(elf, elf_std_write, elf_std_printf, fd);
     fclose(fd);
 }
 
@@ -174,7 +156,7 @@ static void extract_elf(struct elf_params_t *elf, int count)
         return;
     if(g_elf_simplify)
         elf_simplify(elf);
-    elf_write_file(elf, elf_write, elf_printf, fd);
+    elf_write_file(elf, elf_std_write, elf_std_printf, fd);
     fclose(fd);
 }
 
@@ -236,73 +218,6 @@ static void usage(void)
     exit(1);
 }
 
-static void sb_printf(void *user, bool error, color_t c, const char *fmt, ...)
-{
-    (void) user;
-    (void) error;
-    va_list args;
-    va_start(args, fmt);
-    color(c);
-    vprintf(fmt, args);
-    va_end(args);
-}
-
-static struct crypto_key_t g_zero_key =
-{
-    .method = CRYPTO_KEY,
-    .u.key = {0}
-};
-
-
-
-enum sb_version_guess_t
-{
-    SB_VERSION_1,
-    SB_VERSION_2,
-    SB_VERSION_UNK,
-};
-
-enum sb_version_guess_t guess_sb_version(const char *filename)
-{
-#define ret(x) do { fclose(f); return x; } while(0)
-    FILE *f = fopen(filename, "rb");
-    if(f == NULL)
-        bugp("Cannot open file for reading\n");
-    // check signature
-    uint8_t sig[4];
-    if(fseek(f, 20, SEEK_SET))
-        ret(SB_VERSION_UNK);
-    if(fread(sig, 4, 1, f) != 1)
-        ret(SB_VERSION_UNK);
-    if(memcmp(sig, "STMP", 4) != 0)
-        ret(SB_VERSION_UNK);
-    // check header size (v1)
-    uint32_t hdr_size;
-    if(fseek(f, 8, SEEK_SET))
-        ret(SB_VERSION_UNK);
-    if(fread(&hdr_size, 4, 1, f) != 1)
-        ret(SB_VERSION_UNK);
-    if(hdr_size == 0x34)
-        ret(SB_VERSION_1);
-    // check header params relationship
-    struct
-    {
-        uint16_t nr_keys; /* Number of encryption keys */
-        uint16_t key_dict_off; /* Offset to key dictionary (in blocks) */
-        uint16_t header_size; /* In blocks */
-        uint16_t nr_sections; /* Number of sections */
-        uint16_t sec_hdr_size; /* Section header size (in blocks) */
-    } __attribute__((packed)) u;
-    if(fseek(f, 0x28, SEEK_SET))
-        ret(SB_VERSION_UNK);
-    if(fread(&u, sizeof(u), 1, f) != 1)
-        ret(SB_VERSION_UNK);
-    if(u.sec_hdr_size == 1 && u.header_size == 6 && u.key_dict_off == u.header_size + u.nr_sections)
-        ret(SB_VERSION_2);
-    ret(SB_VERSION_UNK);
-#undef ret
-}
-
 int main(int argc, char **argv)
 {
     bool raw_mode = false;
@@ -361,8 +276,12 @@ int main(int argc, char **argv)
                 break;
             }
             case 'z':
+            {
+                struct crypto_key_t g_zero_key;
+                sb_get_zero_key(&g_zero_key);
                 add_keys(&g_zero_key, 1);
                 break;
+            }
             case 'x':
             {
                 struct crypto_key_t key;
@@ -397,7 +316,7 @@ int main(int argc, char **argv)
                 brute_force = true;
                 break;
             default:
-                abort();
+                bug("Internal error: unknown option '%c'\n", c);
         }
     }
 
@@ -413,11 +332,16 @@ int main(int argc, char **argv)
     const char *sb_filename = argv[optind];
 
     enum sb_version_guess_t ver = guess_sb_version(sb_filename);
+    if(ver == SB_VERSION_ERR)
+    {
+        printf("Cannot open/read SB file: %m\n");
+        return 1;
+    }
 
     if(force_sb2 || ver == SB_VERSION_2)
     {
         enum sb_error_t err;
-        struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_printf, &err);
+        struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_std_printf, &err);
         if(file == NULL)
         {
             color(OFF);
@@ -432,7 +356,7 @@ int main(int argc, char **argv)
         {
             color(GREY);
             printf("[Debug output]\n");
-            sb_dump(file, NULL, sb_printf);
+            sb_dump(file, NULL, sb_std_printf);
         }
         if(loopback)
         {
@@ -451,7 +375,7 @@ int main(int argc, char **argv)
         {
             struct crypto_key_t key;
             enum sb1_error_t err;
-            if(!sb1_brute_force(sb_filename, NULL, sb_printf, &err, &key))
+            if(!sb1_brute_force(sb_filename, NULL, sb_std_printf, &err, &key))
             {
                 color(OFF);
                 printf("Brute force failed: %d\n", err);
@@ -475,7 +399,7 @@ int main(int argc, char **argv)
         }
 
         enum sb1_error_t err;
-        struct sb1_file_t *file = sb1_read_file(sb_filename, NULL, sb_printf, &err);
+        struct sb1_file_t *file = sb1_read_file(sb_filename, NULL, sb_std_printf, &err);
         if(file == NULL)
         {
             color(OFF);
@@ -490,7 +414,7 @@ int main(int argc, char **argv)
         {
             color(GREY);
             printf("[Debug output]\n");
-            sb1_dump(file, NULL, sb_printf);
+            sb1_dump(file, NULL, sb_std_printf);
         }
         if(loopback)
             sb1_write_file(file, loopback);

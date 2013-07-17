@@ -81,7 +81,7 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
                 image_size += 8;
                 break;
             default:
-                bugp("Unknown SB instruction: %#x\n", sb->insts[i].cmd);
+                bugp("Internal error: unknown SB instruction: %#x\n", sb->insts[i].cmd);
         }
     }
     // now take crypto marks and sector size into account:
@@ -140,7 +140,7 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
                     sb->insts[i].sdram.size_index);
                 break;
             default:
-                bugp("Unknown SB instruction: %#x\n", sb->insts[i].cmd);
+                bugp("Internal error: unknown SB instruction: %#x\n", sb->insts[i].cmd);
         }
 
         /* handle most common cases */

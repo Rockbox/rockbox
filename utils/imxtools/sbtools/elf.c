@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "elf.h"
 #include "misc.h"
+#include <stdarg.h>
 
 /**
  * Definitions
@@ -722,4 +723,29 @@ void elf_release(struct elf_params_t *params)
         free(seg);
         seg = next_seg;
     }
+}
+
+void elf_std_printf(void *user, bool error, const char *fmt, ...)
+{
+    if(!g_debug && !error)
+        return;
+    (void) user;
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+
+void elf_std_write(void *user, uint32_t addr, const void *buf, size_t count)
+{
+    FILE *f = user;
+    fseek(f, addr, SEEK_SET);
+    fwrite(buf, count, 1, f);
+}
+
+bool elf_std_read(void *user, uint32_t addr, void *buf, size_t count)
+{
+    if(fseek((FILE *)user, addr, SEEK_SET) == -1)
+        return false;
+    return fread(buf, 1, count, (FILE *)user) == count;
 }

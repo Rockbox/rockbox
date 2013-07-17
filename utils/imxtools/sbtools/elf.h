@@ -93,4 +93,10 @@ bool elf_get_start_addr(struct elf_params_t *params, uint32_t *addr);
 int elf_get_nr_sections(struct elf_params_t *params);
 void elf_release(struct elf_params_t *params);
 
+/* standard implementation of read/write/printf functions
+ * with user being a FILE* pointer */
+void elf_std_printf(void *user, bool error, const char *fmt, ...);
+void elf_std_write(void *user, uint32_t addr, const void *buf, size_t count);
+bool elf_std_read(void *user, uint32_t addr, void *buf, size_t count);
+
 #endif /* __ELF_H__ */

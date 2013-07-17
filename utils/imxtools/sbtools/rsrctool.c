@@ -158,7 +158,7 @@ int main(int argc, char **argv)
                 break;
             }
             default:
-                abort();
+                bug("Internal error: unknown option '%c'\n", c);
         }
     }
 
