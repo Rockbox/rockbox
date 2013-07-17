@@ -517,14 +517,14 @@ void radio_screen(void)
 
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
-                global_settings.volume++;
+                global_settings.volume += sound_steps(SOUND_VOLUME);
                 setvol();
                 update_type = SKIN_REFRESH_NON_STATIC;
                 break;
 
             case ACTION_SETTINGS_DEC:
             case ACTION_SETTINGS_DECREPEAT:
-                global_settings.volume--;
+                global_settings.volume -= sound_steps(SOUND_VOLUME);
                 setvol();
                 update_type = SKIN_REFRESH_NON_STATIC;
                 break;
