@@ -16,23 +16,26 @@ the \setting{Virtual Keyboard} (see \reference{sec:virtual_keyboard}).
   \item When finished editing exit the Text Editor. You'll be shown a list of
         save options. 
 \end{itemize}
-\note{When you have not changed the file the Text Editor will quit immediately.}
+\note{if you did not change the file, the Text Editor will quit immediately.}
 
 \begin{btnmap}
-    \ActionStdOk 
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdOk}
+    \PluginUp{} / \PluginDown
+       \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp{} / \PluginRCDown}
+    & Navigate through the text file\\
+    \PluginSelect
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCSelect}
     & Edit Line / Select Character\\
 
-    \ActionStdCancel 
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdCancel} 
+    \PluginExit
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCExit}
     & Exit / Abort Editing\\
 
-    \ActionStdMenu 
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdMenu} 
+    \PluginSelectRepeat
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCSelectRepeat}
     & Show Item Menu\\
 
-    \ActionStdContext 
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdContext} 
+    \PluginCancel
+      \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
     & Delete Line\\
 \end{btnmap}
 
