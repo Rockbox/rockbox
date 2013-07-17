@@ -20,9 +20,15 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "lib/playback_control.h"
-
+#include "lib/pluginlib_actions.h"
 #define MAX_LINE_LEN 2048
-
+/* this set the context to use with PLA */
+static const struct button_mapping *plugin_contexts[] = {
+    pla_main_ctx,
+#if defined(HAVE_REMOTE_LCD)
+    pla_remote_ctx,
+#endif
+};
 
 static unsigned char *buffer;
 static size_t buffer_size;
@@ -43,6 +49,23 @@ static bool newfile;
 #define ACTION_REMOVE 2
 #define ACTION_UPDATE 3
 #define ACTION_CONCAT 4
+
+#   define TEXT_EDITOR_EDITLINE               PLA_SELECT_REL
+#   define TEXT_EDITOR_DELETELINE             PLA_CANCEL
+#   define TEXT_EDITOR_MENUITEM               PLA_SELECT_REPEAT
+#   define TEXT_EDITOR_EXIT                   PLA_EXIT
+
+#ifdef HAVE_SCROLLWHEEL
+#   define TEXT_EDITOR_SROLL_UP               PLA_SCROLL_BACK
+#   define TEXT_EDITOR_SROLL_DOWN             PLA_SCROLL_FWD
+#   define TEXT_EDITOR_SROLL_UP_REPEAT        PLA_SCROLL_BACK_REPEAT
+#   define TEXT_EDITOR_SROLL_DOWN_REPEAT      PLA_SCROLL_FWD_REPEAT
+#else
+#   define TEXT_EDITOR_SROLL_UP               PLA_UP
+#   define TEXT_EDITOR_SROLL_DOWN             PLA_DOWN
+#   define TEXT_EDITOR_SROLL_UP_REPEAT        PLA_UP_REPEAT
+#   define TEXT_EDITOR_SROLL_DOWN_REPEAT      PLA_DOWN_REPEAT
+#endif /* HAVE_SCROLLWHEEL */
 
 static char* _do_action(int action, char* str, int line);
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
@@ -394,12 +417,24 @@ enum plugin_status plugin_start(const void* parameter)
     {
         rb->gui_synclist_draw(&lists);
         cur_sel = rb->gui_synclist_get_sel_pos(&lists);
-        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        button = pluginlib_getaction(TIMEOUT_BLOCK, plugin_contexts,
+                                     ARRAYLEN(plugin_contexts));
         if (rb->gui_synclist_do_button(&lists,&button,LIST_WRAP_UNLESS_HELD))
             continue;
         switch (button)
         {
-            case ACTION_STD_OK:
+        case TEXT_EDITOR_SROLL_UP:
+        case TEXT_EDITOR_SROLL_UP_REPEAT:
+            cur_sel--;
+            rb->gui_synclist_select_item(&lists,cur_sel);
+        break;
+        case TEXT_EDITOR_SROLL_DOWN:
+        case TEXT_EDITOR_SROLL_DOWN_REPEAT:
+            cur_sel++;
+            rb->gui_synclist_select_item(&lists,cur_sel);
+        break;
+
+            case TEXT_EDITOR_EDITLINE:
             {
                 if (line_count)
                     rb->strlcpy(temp_line, do_action(ACTION_GET, 0, cur_sel),
@@ -456,14 +491,14 @@ enum plugin_status plugin_start(const void* parameter)
                 }
             }
             break;
-            case ACTION_STD_CONTEXT:
+            case TEXT_EDITOR_DELETELINE:
                 if (!line_count) break;
                 rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
                             MAX_LINE_LEN);
                 do_action(ACTION_REMOVE, 0, cur_sel);
                 changed = true;
             break;
-            case ACTION_STD_MENU:
+            case TEXT_EDITOR_MENUITEM:
             {
                 /* do the item menu */
                 switch (do_item_menu(cur_sel))
@@ -480,7 +515,7 @@ enum plugin_status plugin_start(const void* parameter)
                 }
             }
             break;
-            case ACTION_STD_CANCEL:
+            case TEXT_EDITOR_EXIT:
                 if (changed)
                 {
                     MENUITEM_STRINGLIST(menu, "Do What?", NULL,
