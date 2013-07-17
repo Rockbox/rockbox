@@ -42,30 +42,20 @@
 
 #define CUE_DIR ROCKBOX_DIR "/cue"
 
-bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cue_file)
+static bool search_for_cuesheet(const char *path, struct cuesheet_file *cue_file)
 {
-    /* DEBUGF("look for cue file\n"); */
     size_t len;
     char cuepath[MAX_PATH];
     char *dot, *slash, *slash_cuepath;
 
-    if (track_id3->has_embedded_cuesheet)
-    {
-        cue_file->pos = track_id3->embedded_cuesheet.pos;
-        cue_file->size = track_id3->embedded_cuesheet.size;
-        cue_file->encoding = track_id3->embedded_cuesheet.encoding;
-        strlcpy(cue_file->path, track_id3->path, MAX_PATH);
-        return true;
-    }
-
     cue_file->pos = 0;
     cue_file->size = 0;
     cue_file->path[0] = '\0';
-    slash = strrchr(track_id3->path, '/');
+    slash = strrchr(path, '/');
     if (!slash)
         return false;
-    len = strlcpy(cuepath, track_id3->path, MAX_PATH);
-    slash_cuepath = &cuepath[slash - track_id3->path];
+    len = strlcpy(cuepath, path, MAX_PATH);
+    slash_cuepath = &cuepath[slash - path];
     dot = strrchr(slash_cuepath, '.');
     if (dot)
         strlcpy(dot, ".cue", MAX_PATH - (dot-cuepath));
@@ -82,7 +72,7 @@ bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cu
 skip:
             if ((len+4) >= MAX_PATH)
                 return false;
-            strlcpy(cuepath, track_id3->path, MAX_PATH);
+            strlcpy(cuepath, path, MAX_PATH);
             strlcat(cuepath, ".cue", MAX_PATH);
             if (!file_exists(cuepath))
                 return false;
@@ -91,6 +81,21 @@ skip:
 
     strlcpy(cue_file->path, cuepath, MAX_PATH);
     return true;
+}
+
+bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cue_file)
+{
+    /* DEBUGF("look for cue file\n"); */
+    if (track_id3->has_embedded_cuesheet)
+    {
+        cue_file->pos = track_id3->embedded_cuesheet.pos;
+        cue_file->size = track_id3->embedded_cuesheet.size;
+        cue_file->encoding = track_id3->embedded_cuesheet.encoding;
+        strlcpy(cue_file->path, track_id3->path, MAX_PATH);
+        return true;
+    }
+
+    return search_for_cuesheet(track_id3->path, cue_file);
 }
 
 static char *get_string(const char *line)
@@ -169,6 +174,9 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
     strcpy(cue->path, cue_file->path);
     cue->curr_track = cue->tracks;
 
+    if (is_embedded)
+        strcpy(cue->file, cue->path);
+
     while ((line_len = read_line(fd, line, read_bytes)) > 0
         && cue->track_count < MAX_TRACKS )
     {
@@ -208,12 +216,16 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         }
         else if (!strncmp(s, "TITLE", 5)
                  || !strncmp(s, "PERFORMER", 9)
-                 || !strncmp(s, "SONGWRITER", 10))
+                 || !strncmp(s, "SONGWRITER", 10)
+                 || !strncmp(s, "FILE", 4))
         {
             char *dest = NULL;
             char *string = get_string(s);
             if (!string)
                 break;
+
+            size_t count = MAX_NAME*3 + 1;
+            size_t count8859 = MAX_NAME;
 
             switch (*s)
             {
@@ -231,6 +243,15 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                     dest = (cue->track_count <= 0) ? cue->songwriter :
                             cue->tracks[cue->track_count-1].songwriter;
                     break;
+
+                case 'F': /* FILE */
+                    if (is_embedded || cue->track_count > 0)
+                        break;
+
+                    dest = cue->file;
+                    count = MAX_PATH;
+                    count8859 = MAX_PATH/3;
+                    break;
             }
 
             if (dest) 
@@ -238,12 +259,12 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                 if (char_enc == CHAR_ENC_ISO_8859_1)
                 {
                     dest = iso_decode(string, dest, -1,
-                        MIN(strlen(string), MAX_NAME));
+                        MIN(strlen(string), count8859));
                     *dest = '\0';
                 }
                 else
                 {
-                    strlcpy(dest, string, MAX_NAME*3 + 1);
+                    strlcpy(dest, string, count);
                 }
             }    
         }
@@ -257,6 +278,16 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         }
     }
     close(fd);
+
+    /* If just a filename, add path information from cuesheet path */
+    if (*cue->file && !strrchr(cue->file, '/'))
+    {
+        strcpy(line, cue->file);
+        strcpy(cue->file, cue->path);
+        char *slash = strrchr(cue->file, '/');
+        if (!slash++) slash = cue->file;
+        strlcpy(slash, line, MAX_PATH - (slash - cue->file));
+    }
 
     /* If some songs don't have performer info, we copy the cuesheet performer */
     int i;
@@ -329,7 +360,6 @@ void browse_cuesheet(struct cuesheet *cue)
     struct gui_synclist lists;
     int action;
     bool done = false;
-    int sel;
     char title[MAX_PATH];
     struct cuesheet_file cue_file;
     struct mp3entry *id3 = audio_current_track();
@@ -355,17 +385,41 @@ void browse_cuesheet(struct cuesheet *cue)
         switch (action)
         {
             case ACTION_STD_OK:
+            {
+                bool startit = true;
+                unsigned long elapsed =
+                    cue->tracks[gui_synclist_get_sel_pos(&lists)/2].offset;
+
                 id3 = audio_current_track();
-                if (id3 && *id3->path && strcmp(id3->path, "No file!"))
+                if (id3 && *id3->path)
                 {
                     look_for_cuesheet_file(id3, &cue_file);
-                    if (id3->cuesheet && !strcmp(cue->path, cue_file.path))
-                    {
-                        sel = gui_synclist_get_sel_pos(&lists);
-                        seek(cue->tracks[sel/2].offset);
-                    }
+                    if (!strcmp(cue->path, cue_file.path))
+                        startit = false;
+                }
+
+                if (!startit)
+                    startit = !seek(elapsed);
+
+                if (!startit || !*cue->file)
+                    break;
+
+                /* check that this cue is the same one that would be found by
+                   a search from playback */
+                char file[MAX_PATH];
+                strlcpy(file, cue->file, MAX_PATH);
+
+                if (!strcmp(cue->path, file) || /* if embedded */
+                    (search_for_cuesheet(file, &cue_file) &&
+                     !strcmp(cue->path, cue_file.path)))
+                {
+                    char *fname = strrsplt(file, '/');
+                    char *dirname = fname <= file + 1 ? "/" : file;
+                    bookmark_play(dirname, 0, elapsed, 0, current_tick, fname);
                 }
                 break;
+                } /* ACTION_STD_OK */
+
             case ACTION_STD_CANCEL:
                 done = true;
         }
