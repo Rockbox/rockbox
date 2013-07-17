@@ -324,11 +324,11 @@ static void setoptions (void)
         options.LEFT   = BUTTON_LEFT;
         options.RIGHT  = BUTTON_RIGHT;
 
-        options.A      = BUTTON_BACK;
-        options.B      = BUTTON_PLAYPAUSE;
+        options.A      = BUTTON_VOL_UP;
+        options.B      = BUTTON_VOL_DOWN;
         options.START  = BUTTON_SELECT;
-        options.SELECT = (BUTTON_PLAYPAUSE | BUTTON_REPEAT);
-        options.MENU   = (BUTTON_SELECT | BUTTON_REPEAT);
+        options.SELECT = BUTTON_PLAYPAUSE;
+        options.MENU   = BUTTON_BACK;
 
 #elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
         options.UP     = BUTTON_UP;
