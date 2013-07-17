@@ -158,6 +158,9 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
     strcpy(cue->path, cue_file->path);
     cue->curr_track = cue->tracks;
 
+    if (is_embedded)
+        strcpy(cue->file, cue_file->path);
+
     while ((line_len = read_line(fd, line, read_bytes)) > 0
         && cue->track_count < MAX_TRACKS )
     {
@@ -197,12 +200,16 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         }
         else if (!strncmp(s, "TITLE", 5)
                  || !strncmp(s, "PERFORMER", 9)
-                 || !strncmp(s, "SONGWRITER", 10))
+                 || !strncmp(s, "SONGWRITER", 10)
+                 || !strncmp(s, "FILE", 4))
         {
             char *dest = NULL;
             char *string = get_string(s);
             if (!string)
                 break;
+
+            size_t count = MAX_NAME*3 + 1;
+            size_t count8859 = MAX_NAME;
 
             switch (*s)
             {
@@ -220,6 +227,15 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                     dest = (cue->track_count <= 0) ? cue->songwriter :
                             cue->tracks[cue->track_count-1].songwriter;
                     break;
+
+                case 'F': /* FILE */
+                    if (is_embedded || cue->track_count > 0)
+                        break;
+
+                    dest = cue->file;
+                    count = MAX_PATH;
+                    count8859 = MAX_PATH/3;
+                    break;
             }
 
             if (dest) 
@@ -227,12 +243,12 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                 if (char_enc == CHAR_ENC_ISO_8859_1)
                 {
                     dest = iso_decode(string, dest, -1,
-                        MIN(strlen(string), MAX_NAME));
+                        MIN(strlen(string), count8859));
                     *dest = '\0';
                 }
                 else
                 {
-                    strlcpy(dest, string, MAX_NAME*3 + 1);
+                    strlcpy(dest, string, count);
                 }
             }    
         }
@@ -246,6 +262,16 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         }
     }
     close(fd);
+
+    /* If just a filename, add path information from cuesheet path */
+    if (*cue->file && !strrchr(cue->file, '/'))
+    {
+        strcpy(line, cue->file);
+        strcpy(cue->file, cue->path);
+        char *slash = strrchr(cue->file, '/');
+        if (!slash++) slash = cue->file;
+        strlcpy(slash, line, MAX_PATH - (slash - cue->file));
+    }
 
     /* If some songs don't have performer info, we copy the cuesheet performer */
     int i;
@@ -318,7 +344,6 @@ void browse_cuesheet(struct cuesheet *cue)
     struct gui_synclist lists;
     int action;
     bool done = false;
-    int sel;
     char title[MAX_PATH];
     struct cuesheet_file cue_file;
     struct mp3entry *id3 = audio_current_track();
@@ -343,16 +368,26 @@ void browse_cuesheet(struct cuesheet *cue)
             continue;
         switch (action)
         {
-            case ACTION_STD_OK:
+            case ACTION_STD_OK:;
+                bool startit = true;
+                unsigned long elapsed =
+                    cue->tracks[gui_synclist_get_sel_pos(&lists)/2].offset;
+
                 id3 = audio_current_track();
-                if (id3 && *id3->path && strcmp(id3->path, "No file!"))
+                if (id3 && *id3->path)
                 {
                     look_for_cuesheet_file(id3, &cue_file);
                     if (id3->cuesheet && !strcmp(cue->path, cue_file.path))
-                    {
-                        sel = gui_synclist_get_sel_pos(&lists);
-                        seek(cue->tracks[sel/2].offset);
-                    }
+                        startit = !seek(elapsed);
+                }
+
+                if (startit && *cue->file)
+                {
+                    char file[MAX_PATH];
+                    strlcpy(file, cue->file, MAX_PATH);
+                    char *fname = strrsplt(file, '/');
+                    char *dirname = fname <= file + 1 ? HOME_DIR : file;
+                    bookmark_play(dirname, 0, elapsed, 0, 0, fname);
                 }
                 break;
             case ACTION_STD_CANCEL:
