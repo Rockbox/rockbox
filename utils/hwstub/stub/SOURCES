@@ -1,5 +1,4 @@
 main.c
-crt0.S
 logf.c
 memcpy.S
 memmove.S
@@ -7,6 +6,11 @@ memset.S
 string.c
 format.c
 #ifdef CONFIG_STMP
-usb_drv_arc.c
+stmp/crt0.S
 stmp/target.c
+usb_drv_arc.c
+#elif defined(CONFIG_RK27XX)
+rk27xx/crt0.S
+rk27xx/usb_drv_rk27xx.c
+rk27xx/target.c
 #endif

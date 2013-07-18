@@ -826,24 +826,6 @@ int main(int argc, char **argv)
             goto Lerr;
         }
     }
-
-    // dump ROM
-    if(!g_quiet)
-    {
-        void *rom = malloc(64 * 1024);
-        ret = hwstub_rw_mem(&g_hwdev, 1, 0xc0000000, rom, 64 * 1024);
-        if(ret != 64 * 1024)
-        {
-            printf("Cannot read ROM: %d\n", ret);
-            goto Lerr;
-        }
-    
-        printf("ROM successfully read!\n");
-        FILE *f = fopen("rom.bin", "wb");
-        fwrite(rom, 64 * 1024, 1, f);
-        fclose(f);
-    }
-
     /** Init lua */
 
     // create lua state

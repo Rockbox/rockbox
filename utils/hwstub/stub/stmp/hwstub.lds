@@ -23,7 +23,7 @@
 ENTRY(start)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-STARTUP(crt0.o)
+STARTUP(stmp/crt0.o)
 
 #define IRAM_END_ADDR   (IRAM_ORIG + IRAM_SIZE)
 
