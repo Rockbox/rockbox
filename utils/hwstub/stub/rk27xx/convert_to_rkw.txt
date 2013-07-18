@@ -1,0 +1,2 @@
+/home/wodz/rockbox-dev/bin/arm-elf-eabi-objcopy  -O binary hwstub.elf hwstub.bin
+/home/wodz/rockbox/tools/scramble -rkw -modelnum=73 hwstub.bin hwstub.rkw
