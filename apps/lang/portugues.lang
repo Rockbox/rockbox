@@ -13032,3 +13032,45 @@
     *: "Constrangir mudança automática"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Lento"
+  </dest>
+  <voice>
+    *: "Lento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Agudo"
+  </dest>
+  <voice>
+    *: "Agudo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Filtro Roll-off do CAD"
+  </dest>
+  <voice>
+    *: "Filtro Roll-off do CAD"
+  </voice>
+</phrase>
