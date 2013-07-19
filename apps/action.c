@@ -294,6 +294,11 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
+#if (defined(BUTTON_HOLD_DISABLE_TOUCHPAD) \
+     && defined(DISABLE_TOUCHPAD_SENSITIVITY_SETTING))
+            /* reactivate touchpad on unlocking */
+            touchpad_set_sensitivity(global_settings.touchpad_sensitivity);
+#endif
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
@@ -373,7 +378,11 @@ static int get_action_worker(int context, int timeout,
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
-
+#if (defined(BUTTON_HOLD_DISABLE_TOUCHPAD) \
+     && defined(DISABLE_TOUCHPAD_SENSITIVITY_SETTING))
+        /* disable touchpad on keylock */
+        touchpad_set_sensitivity(DISABLE_TOUCHPAD_SENSITIVITY_SETTING);
+#endif
         button_clear_queue();
         return ACTION_REDRAW;
     }
