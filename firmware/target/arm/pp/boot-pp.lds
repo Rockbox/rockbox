@@ -15,7 +15,7 @@ STARTUP(target/arm/pp/crt0-pp-bl.o)
 #define IRAMSIZE 0x20000
 #define FLASHORIG 0x001f0000
 #define FLASHSIZE 2M
-#if CONFIG_CPU == PP5020
+#elif CONFIG_CPU == PP5020
 #define DRAMORIG 0x10000000
 #define IRAMORIG 0x40000000
 #define IRAMSIZE 0x18000
