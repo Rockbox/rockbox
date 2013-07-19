@@ -1,0 +1,429 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//+2M\u003d",
+        "filename": "apps/keymaps/keymap-rk27xx-generic.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "This should be in another commit, this is not really related to the usb driver.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1o\u003d",
+        "filename": "firmware/export/config/hifimanhm60x.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "seems unrelated and be part of another commit ?",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1k\u003d",
+        "filename": "firmware/export/config/hifimanhm801.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "seems unrelated and should be part of another commit",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1g\u003d",
+        "filename": "firmware/export/config/hifimanhm801.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "same.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1c\u003d",
+        "filename": "firmware/export/config/rk27generic.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "should be part of another commit.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1Y\u003d",
+        "filename": "firmware/export/config/rk27generic.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "idem.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1U\u003d",
+        "filename": "firmware/export/rk27xx.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "use standard define CACHEALIGN_SIZE instead of raw value",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2I\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "remove this ?",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2E\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "avoid tabulations",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2A\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "inconsistent style for space after if",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+18\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "extra space at end of line",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+14\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 584,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Maybe point to the comment in usb_drv_send or split/copy the comment ?",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+10\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "extra space.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1w\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+1s\u003d",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2Y\u003d",
+        "filename": "firmware/usb.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please remove this",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2U\u003d",
+        "filename": "firmware/usb.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please put this in a different commit about debug or even remove it",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2Q\u003d",
+        "filename": "firmware/usb.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please put this in a different commit about debug, or even remove it.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2s\u003d",
+        "filename": "firmware/usbstack/usb_core.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please put this in a different commit about debug.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2o\u003d",
+        "filename": "firmware/usbstack/usb_core.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please put this in a different commit about handling of clear feature.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2k\u003d",
+        "filename": "firmware/usbstack/usb_core.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 824,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "idem.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2g\u003d",
+        "filename": "firmware/usbstack/usb_core.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 830,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please put this in a different commit about debug.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2c\u003d",
+        "filename": "firmware/usbstack/usb_core.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 965,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please put this in a different commit about debug.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+2w\u003d",
+        "filename": "firmware/usbstack/usb_storage.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "maybe commit this as part of another commit: this is useful for debug.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+20\u003d",
+        "filename": "firmware/usbstack/usb_storage.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1155,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-19T20:31:47Z",
+      "side": 1,
+      "message": "Please commit this as part of a different commit: this is only to make usbstorage more correct.",
+      "revId": "bbd049b68e9caac6bdb3e17d53b92db739554988",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
