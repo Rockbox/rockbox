@@ -297,10 +297,14 @@ static int get_action_worker(int context, int timeout,
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
-        else
+        else if(1
 #if (BUTTON_REMOTE != 0)
-            if ((button & BUTTON_REMOTE) == 0)
+                && ((button & BUTTON_REMOTE) == 0)
 #endif
+#ifdef DO_NOT_LOCK_HARD_KEYS
+                && (button != (button&(BUTTON_HARD_KEYS|BUTTON_REL|BUTTON_REPEAT)))
+#endif
+                )
         {
             if ((button & BUTTON_REL))
                 splash(HZ/2, str(LANG_KEYLOCK_ON));
