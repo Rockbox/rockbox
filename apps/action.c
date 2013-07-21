@@ -294,6 +294,10 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
+#ifdef HAS_TOUCH_DEVICE_DISABLED_ON_KEYLOCK
+            /* reactivate touchpad on unlocking */
+            touchdev_wakeup();
+#endif
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
@@ -373,7 +377,10 @@ static int get_action_worker(int context, int timeout,
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
-
+#ifdef HAS_TOUCH_DEVICE_DISABLED_ON_KEYLOCK
+        /* disable touchpad on keylock */
+        touchdev_disable();
+#endif
         button_clear_queue();
         return ACTION_REDRAW;
     }
