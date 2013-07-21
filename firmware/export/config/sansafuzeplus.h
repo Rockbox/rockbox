@@ -93,6 +93,10 @@
 #define MAX_TOUCHPAD_SENSITIVITY_SETTING        25
 #define DEFAULT_TOUCHPAD_SENSITIVITY_SETTING    13
 
+/* define this to disable softlock for some keys */
+#define DO_NOT_LOCK_HARD_KEYS
+#define BUTTON_HARD_KEYS (BUTTON_VOL_UP|BUTTON_VOL_DOWN|BUTTON_POWER)
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
