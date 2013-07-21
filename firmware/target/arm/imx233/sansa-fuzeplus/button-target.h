@@ -24,6 +24,8 @@
 #include <stdbool.h>
 bool button_debug_screen(void);
 void touchpad_set_sensitivity(int level);
+void touchdev_disable(void);
+void touchdev_wakeup(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001
