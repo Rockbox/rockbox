@@ -84,7 +84,7 @@ bool button_debug_screen(void)
             rmi_read_single(RMI_INTERRUPT_REQUEST));
         lcd_putsf(0, 4, "sensi: %d min_dist: %d", (int)sensitivity.value, min_dist);
         lcd_putsf(0, 5, "gesture: %x", gesture_settings);
-        
+
         union
         {
             unsigned char data[10];
@@ -238,6 +238,30 @@ void touchpad_set_sensitivity(int level)
     queue_post(&rmi_queue, RMI_SET_SENSITIVITY, level);
 }
 
+/* the register value for power management are:
+0x40 or 0x80 for report rate (0x40 doesn't work that well, 0x80 is default)
++ sleep mode code 0 to 4, 1 is default */
+#define TOUCHPAD_PM_FORCE_FULLY_AWARE   0x80
+#define TOUCHPAD_PM_NORMAL              0x81
+#define TOUCHPAD_PM_LOW_POWER           0x82
+#define TOUCHPAD_PM_VERY_LOW_POWER      0x83
+#define TOUCHPAD_PM_SENSOR_SLEEP        0x84
+void touchpad_set_power_mode(unsigned char power_mode)
+{
+    if ((power_mode >= 0x80) && (power_mode <= 0x84))
+        queue_post(&rmi_queue, RMI_DEVICE_CONTROL, power_mode);
+}
+
+void touchdev_disable(void)
+{
+    touchpad_set_power_mode(TOUCHPAD_PM_SENSOR_SLEEP);
+}
+
+void touchdev_wakeup(void)
+{
+    touchpad_set_power_mode(TOUCHPAD_PM_VERY_LOW_POWER);
+}
+
 static void rmi_thread(void)
 {
     struct queue_event ev;
@@ -256,6 +280,10 @@ static void rmi_thread(void)
             /* handle negative values as well ! */
             rmi_write_single(RMI_2D_SENSITIVITY_ADJ, (unsigned char)(int8_t)ev.data);
             continue;
+        }
+        else if(ev.id == RMI_DEVICE_CONTROL)
+        {
+            rmi_write_single(RMI_DEVICE_CONTROL, ev.data);
         }
         else if(ev.id != RMI_INTERRUPT)
             continue;
@@ -337,6 +365,8 @@ void button_init_device(void)
     queue_init(&rmi_queue, true);
     create_thread(rmi_thread, rmi_stack, sizeof(rmi_stack), 0,
             rmi_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
+    /* low power mode seems to be enough for normal use */
+    touchpad_set_power_mode(TOUCHPAD_PM_LOW_POWER);
     /* enable interrupt */
     imx233_pinctrl_acquire(0, 27, "touchpad int");
     imx233_pinctrl_set_function(0, 27, PINCTRL_FUNCTION_GPIO);
