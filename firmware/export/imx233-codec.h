@@ -27,20 +27,18 @@
 #define AUDIOHW_CAPS    (DEPTH_3D_CAP | BASS_CAP | TREBLE_CAP | \
                          LIN_GAIN_CAP | MIC_GAIN_CAP)
 
-/* Work with half dB since the i.MX233 doesn't have a better resolution */
-
 /* minimum is -57.5dB and max is 6dB in DAC mode
  * and -51.5dB / 12dB in Line1 mode */
-AUDIOHW_SETTING(VOLUME,     "dB", 1, 5,-580, 120, -250)
+AUDIOHW_SETTING(VOLUME,     "dB", 0, 1, -58,  12,  -25)
 /* HAVE_SW_TONE_CONTROLS */
 #ifdef HAVE_RECORDING
 /* Depending on the input, we have three available volumes to tweak:
  * - adc volume: -100dB -> -0.5dB in 0.5dB steps
  * - mux gain: 0dB -> 22.5dB in 1.5dB steps
  * - mic gain: 0dB -> 40dB in 10dB steps (except for 10) */
-AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1, 5,-1000, 220,   0)
-AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1, 5,-1000, 220,   0)
-AUDIOHW_SETTING(MIC_GAIN,   "dB", 1, 5,-1000, 600, 200)
+AUDIOHW_SETTING(LEFT_GAIN,  "dB", 0, 1, -100,  22,   0)
+AUDIOHW_SETTING(RIGHT_GAIN, "dB", 0, 1, -100,  22,   0)
+AUDIOHW_SETTING(MIC_GAIN,   "dB", 0, 1, -100,  60,  20)
 #endif /* HAVE_RECORDING */
 /* i.MX233 has four settings: 0dB, 3dB, 4.5dB, 6dB so fake 1.5dB steps */
 AUDIOHW_SETTING(DEPTH_3D,   "dB", 1,15,   0,   60,   0)
