@@ -15,8 +15,8 @@ hwclock -s
 alias ls='ls --color=auto'
 alias ll='ls -l --color=auto'
 
-# Start with lorenzo92's safe mode
-SCRIPT="/etc/mods/safe_mode.sh"
+# Start with safe mode
+SCRIPT="/etc/safemode/smode"
 if [ -f $SCRIPT ]
 then
     /bin/sh $SCRIPT
@@ -29,24 +29,16 @@ then
     fi
 fi
 
-if [ -e "/mnt/media1/r0" ]
+# Ironically, r1's ROM contains a lot of r0's executables, including the main one.
+# So we need to check against r1 before!
+if [ -e "/usr/local/bin/r1" ]
 then
-    MAINFILE="/mnt/media1/r0"
-elif [ -f "/mnt/media0/r0" ]
-then
-    # copy to media1 since USB wouldn't work
-    cp /mnt/media0/r0 /mnt/media1/r0_media0
-    if [ "$?" = "0" ]
-    then # perhaps cp failed due to insufficient storage or so
-        MAINFILE="/mnt/media1/r0_media0"
-    else
-        MAINFILE="/usr/local/bin/r0"
-    fi
+    MAINFILE="/usr/local/bin/r1"
 else
     MAINFILE="/usr/local/bin/r0"
 fi
 
-# Parameters for r0
+# Parameters for the application
 MAINFILE_ARGV="Application AppMain"
 
 # source the rockbox loader script
