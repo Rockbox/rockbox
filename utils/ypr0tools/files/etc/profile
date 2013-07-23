@@ -15,8 +15,8 @@ hwclock -s
 alias ls='ls --color=auto'
 alias ll='ls -l --color=auto'
 
-# Start with lorenzo92's safe mode
-SCRIPT="/etc/mods/safe_mode.sh"
+# Start with safe mode
+SCRIPT="/etc/safemode/smode"
 if [ -f $SCRIPT ]
 then
     /bin/sh $SCRIPT

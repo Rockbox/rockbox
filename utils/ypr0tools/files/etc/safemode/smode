@@ -1,0 +1,206 @@
+#!/bin/sh
+
+######################################################################
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+#
+#   * Safe Mode for Samsung YP-R0 / YP-R1 *
+######################################################################
+
+####################################################################################
+############################ YP-R0 Light System Startup ############################
+##################################### By VanniX ####################################
+######################### Thanks to Lorenzo92 and lebellium ########################
+####################################################################################
+
+#slightly modified version
+
+BACK=$(dd if=/dev/r0Btn bs=4 count=1)
+KEY=$(echo -e -n "\x08")
+if [[ "$BACK" != "$KEY" ]]; then
+    # do not enter safe mode and continue normal boot
+    exit 0
+fi
+
+DefIMG="/etc/safemode/safemode.raw"
+RbtIMG="/etc/safemode/rebtmode.raw"
+PreIMG="/etc/safemode/pre-smod.raw"
+PMK=$(echo -e -n "\x01")
+NOUSB=true
+SAFE=true
+
+cd /usr/local/bin
+
+if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+    echo "Displaying Pre-SafeMode picture..."
+    echo -n "0" > /sys/devices/platform/afe.0/bli
+    echo -n "1" > /sys/class/graphics/fb0/blank
+    echo -n "0" >> /sys/class/graphics/fb0/blank
+    cat $PreIMG > "/dev/fb0"
+    echo -n "1" > /sys/devices/platform/afe.0/bli
+    while $NOUSB
+    do
+        if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+            echo "USB not connected - Waiting"
+        else
+            sleep 1
+            if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+                echo "USB first check OK - Waiting"
+            else
+                sleep 1
+                if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+                    echo "USB second check OK - Waiting"
+                else
+                    NOUSB=false
+                    USB=true
+                fi
+            fi
+        fi
+    done
+    echo "Waiting a second to establish real USB connection..."
+    sleep 1
+    echo "USB OK - Continue loading SafeMode..."
+else
+    #NOUSB=false
+    #echo "USB OK - Continue loading SafeMode..."
+    while $NOUSB
+    do
+        if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+            echo "USB not connected - Waiting"
+        else
+            sleep 1
+            if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+                echo "USB first check OK - Waiting"
+            else
+                NOUSB=false
+                USB=true
+            fi
+        fi
+    done
+    echo "Waiting a second to establish real USB connection..."
+    sleep 1
+    echo "USB OK - Continue loading SafeMode..."
+fi
+
+
+# Clear the screen and show a nice picture :D
+echo "Displaying SafeMode picture..."
+echo -n "0" > /sys/devices/platform/afe.0/bli
+echo -n "1" > /sys/class/graphics/fb0/blank
+echo -n "0" >> /sys/class/graphics/fb0/blank
+cat $DefIMG > "/dev/fb0"
+echo -n "1" > /sys/devices/platform/afe.0/bli
+
+echo "Enabling usb storage..."
+lsmod | grep g_file_storage
+if [ $? == 0 ]
+then
+    umount /mnt/media1/dev/gadget
+fi
+#if [ -d /mnt/media0 ]
+#then
+umount /mnt/media1
+umount /mnt/media0
+#umount /mnt/mmc
+#fi
+    lsmod | grep rfs
+if [ $? == 0 ]
+then
+    rmmod rfs
+fi
+    lsmod | grep g_file_storage
+if [ $? == 0 ]
+then
+    rmmod gadgetfs
+    rmmod g_file_storage
+    rmmod arcotg_udc
+fi
+    lsmod | grep g_serial
+if [ $? == 0 ]
+then
+    rmmod g_serial
+fi
+    lsmod | grep g_file_storage
+if [ $? != 0 ]
+then
+    modprobe g-file-storage file=/dev/stl3,/dev/stl2,/dev/mmcblk0 removable=1
+fi
+sleep 2
+echo "Safemode loaded, unmount media from PC before reboot."
+
+#power key exit patch
+while $SAFE
+do
+VAR=$(dd if=/dev/r0Btn bs=4 count=1)
+if [[ "$VAR" = "$PMK" ]]; then
+    sleep 1
+    VAR=$(dd if=/dev/r0Btn bs=4 count=1)
+    if [[ "$VAR" = "$PMK" ]]; then
+        sleep 0.5
+        VAR=$(dd if=/dev/r0Btn bs=4 count=1)
+        if [[ "$VAR" = "$PMK" ]]; then
+            sleep 0.5
+            VAR=$(dd if=/dev/r0Btn bs=4 count=1)
+            if [[ "$VAR" = "$PMK" ]]; then
+                SAFE=false
+            else
+                SAFE=true
+            fi
+        else
+            SAFE=true
+        fi
+    else
+        SAFE=true
+    fi
+else
+    SAFE=true
+fi
+done
+echo "Removing loaded modules..."
+rmmod g_file_storage
+rmmod arcotg_udc
+echo "Displaying rebooting picture..."
+echo -n "0" > /sys/devices/platform/afe.0/bli
+echo -n "1" > /sys/class/graphics/fb0/blank
+echo -n "0" >> /sys/class/graphics/fb0/blank
+cat $RbtIMG > "/dev/fb0"
+echo -n "1" > /sys/devices/platform/afe.0/bli
+sleep 1
+
+echo "Please, disconnect cable to exit safemode!"
+
+while $USB
+do
+    if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+        sleep 0.5
+        if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+            sleep 0.3
+            if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+                sleep 0.2
+                if [[ `minird 0x0a | cut -b12-13` != "04" ]] ; then
+                    USB=false
+                else
+                    echo "USB connected - Waiting"
+                    USB=true
+                fi
+            else
+                echo "USB connected - Waiting"
+                USB=true
+            fi
+        else
+            echo "USB connected - Waiting"
+            USB=true
+        fi
+    else
+        echo "USB connected - Waiting"
+        USB=true
+    fi
+done
+echo "Done. Exiting..."
+
+#power key pressed for almost 2 sec and cable disconnected. Power off!
+exit 1
