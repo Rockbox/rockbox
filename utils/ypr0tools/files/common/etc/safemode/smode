@@ -1,0 +1,250 @@
+#!/bin/sh
+
+######################################################################
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+#
+#   * Safe Mode for Samsung YP-R0 / YP-R1 *
+#   * Copyright (C) 2013 Lorenzo Miori and VanniX
+######################################################################
+
+# 0 = R0 ; 1 = R1
+PLATFORM=0
+BUTTON_DEVICE="/dev/r0Btn"
+PMK=$(echo -e -n "\x01") # same for both devices
+STORAGES="/dev/stl3,/dev/stl2,/dev/mmcblk0"
+
+MODE="normal"
+
+if [ $# -eq 1 ]
+then
+    MODE=$1
+fi
+
+# rather simple but effective check
+# different key codes to trigger safe mode
+if [ -e "/usr/local/bin/r1" ]
+then
+    # running on YP-R1 model
+    BACK=$(echo -e -n "\x02")
+    PLATFORM=1
+    BUTTON_DEVICE="/dev/r1Button"
+    STORAGES="/dev/stl3,/dev/stl2"
+else
+    BACK=$(echo -e -n "\x08")
+    PLATFORM=0
+    BUTTON_DEVICE="/dev/r0Btn"
+    STORAGES="/dev/stl3,/dev/stl2,/dev/mmcblk0"
+fi
+
+power_pressed()
+{
+    VAR=$(dd if=$BUTTON_DEVICE bs=4 count=1)
+    [[ "$VAR" = "$PMK" ]]
+    return $?
+}
+
+cable_disconnected()
+{
+    if [ $PLATFORM -eq 0 ]
+    then
+        /usr/local/bin/minird 0x0a | grep -q 0x00
+        return $?
+    else
+        /etc/safemode/cable_detect
+        return $?
+    fi
+}
+
+enable_display()
+{
+    echo -n "0" > /sys/devices/platform/afe.0/bli
+    echo -n "1" > /sys/class/graphics/fb0/blank
+    echo -n "0" >> /sys/class/graphics/fb0/blank
+    echo -n "1" > /sys/devices/platform/afe.0/bli
+}
+
+display_image()
+{
+    cat $1 > "/dev/fb0"
+}
+
+if [ $MODE != "forced" ]
+then
+    KEY=$(dd if=$BUTTON_DEVICE bs=4 count=1)
+    if [[ "$KEY" != "$BACK" ]]; then
+        # do not enter safe mode and continue normal boot
+        exit 0
+    fi
+fi
+
+# Here we entered safe mode, so first clean the display
+# and turn on backlight at minimum level
+enable_display
+
+# there are different ROMs around...
+if [ -e "/etc/safemode/safemode.raw" ]
+then
+    DefIMG="/etc/safemode/safemode.raw"
+else
+    DefIMG="/etc/mods/safe_mode.raw"
+fi
+RbtIMG="/etc/safemode/post_smode.raw"
+PreIMG="/etc/safemode/pre_smode.raw"
+
+NOUSB=true
+
+if cable_disconnected
+then
+
+    display_image $PreIMG
+
+    while $NOUSB
+    do
+
+        # User aborts safe mode before mounting anything, just exit
+        # and continue normal boot
+        if power_pressed
+        then
+            sleep 1
+            if power_pressed
+            then
+                exit 1
+            fi
+        fi
+
+        if cable_disconnected
+        then
+            echo "USB not connected - Waiting"
+        else
+            sleep 1
+            if cable_disconnected
+            then
+                echo "USB first check OK - Waiting"
+            else
+                sleep 1
+                if cable_disconnected
+                then
+                    echo "USB second check OK - Waiting"
+                else
+                    NOUSB=false
+                    USB=true
+                fi
+            fi
+        fi
+    done
+else
+    while $NOUSB
+    do
+        if cable_disconnected
+        then
+            echo "USB not connected - Waiting"
+        else
+            sleep 1
+            if cable_disconnected
+            then
+                echo "USB first check OK - Waiting"
+            else
+                NOUSB=false
+                USB=true
+            fi
+        fi
+    done
+fi
+
+display_image $DefIMG
+
+echo "Enabling usb storage..."
+lsmod | grep g_file_storage
+if [ $? == 0 ]
+then
+    umount /mnt/media1/dev/gadget
+fi
+
+umount /mnt/media1
+umount /mnt/media0
+
+lsmod | grep rfs
+if [ $? == 0 ]
+then
+    rmmod rfs
+fi
+
+lsmod | grep g_file_storage
+if [ $? == 0 ]
+then
+    rmmod gadgetfs
+    rmmod g_file_storage
+    rmmod arcotg_udc
+fi
+
+lsmod | grep g_serial
+if [ $? == 0 ]
+then
+    rmmod g_serial
+fi
+
+lsmod | grep g_file_storage
+if [ $? != 0 ]
+then
+    modprobe g-file-storage file=$STORAGES removable=1
+fi
+
+SAFE=true
+while $SAFE
+do
+    if power_pressed
+    then
+        sleep 1
+        if power_pressed
+        then
+            SAFE=false
+        fi
+    fi
+done
+
+echo "Removing loaded modules..."
+rmmod g_file_storage
+rmmod arcotg_udc
+
+display_image $RbtIMG
+
+USB=true
+
+while $USB
+do
+    if cable_disconnected
+    then
+        sleep 1
+        if cable_disconnected
+        then
+            if cable_disconnected
+            then
+                sleep 1
+                if cable_disconnected
+                then
+                    USB=false
+                else
+                    echo "USB connected - Waiting"
+                    USB=true
+                fi
+            else
+                echo "USB connected - Waiting"
+                USB=true
+            fi
+        else
+            echo "USB connected - Waiting"
+            USB=true
+        fi
+    else
+        echo "USB connected - Waiting"
+        USB=true
+    fi
+done
+
+#power key pressed for almost 2 sec and cable disconnected. Power off!
+exit 1
