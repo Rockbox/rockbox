@@ -902,7 +902,7 @@ enum plugin_status plugin_start(const void* parameter)
             case CUBE_RC_QUIT:
 #endif
             case CUBE_QUIT:
-                exit(EXIT_SUCCESS);
+                quit = true;
                 break;
 
             default:
