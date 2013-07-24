@@ -834,7 +834,6 @@ Lyre prototype 1 */
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_REQUEST
 #elif CONFIG_USBOTG == USBOTG_RK27XX
-#define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_REQUEST
 #endif /* CONFIG_USB == */
 #endif /* HAVE_USBSTACK */
@@ -1069,7 +1068,8 @@ Lyre prototype 1 */
 #elif (CONFIG_USBOTG == USBOTG_ARC) || \
     (CONFIG_USBOTG == USBOTG_JZ4740) || \
     (CONFIG_USBOTG == USBOTG_M66591) || \
-    (CONFIG_USBOTG == USBOTG_AS3525)
+    (CONFIG_USBOTG == USBOTG_AS3525) || \
+    (CONFIG_USBOTG == USBOTG_RK27XX)
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
