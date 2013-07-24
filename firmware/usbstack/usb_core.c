@@ -687,6 +687,16 @@ static void usb_core_do_set_config(uint8_t config)
     #endif
 }
 
+static void usb_core_do_clear_feature(int recip, int recip_nr, int feature)
+{
+    logf("usb_core: CLEAR FEATURE (%d,%d,%d)", recip, recip_nr, feature);
+    if(recip == USB_RECIP_ENDPOINT)
+    {
+        if(feature == USB_ENDPOINT_HALT)
+            usb_drv_stall(EP_NUM(recip_nr), false, EP_DIR(recip_nr));
+    }
+}
+
 static void request_handler_device(struct usb_ctrlrequest* req)
 {
     switch(req->bRequest) {
@@ -809,9 +819,9 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
 {
     switch (req->bRequest) {
         case USB_REQ_CLEAR_FEATURE:
-            if(req->wValue == USB_ENDPOINT_HALT)
-                usb_drv_stall(EP_NUM(req->wIndex), false, EP_DIR(req->wIndex));
-            
+            usb_core_do_clear_feature(USB_RECIP_ENDPOINT,
+                                      req->wIndex,
+                                      req->wValue);
             usb_drv_send(EP_CONTROL, NULL, 0);
             break;
         case USB_REQ_SET_FEATURE:
