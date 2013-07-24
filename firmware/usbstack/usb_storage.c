@@ -753,6 +753,7 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     unsigned int block_size_mult = 1;
 
     if(letoh32(cbw->signature) != CBW_SIGNATURE) {
+        logf("ums: bad cbw signature (%x)", cbw->signature);
         usb_drv_stall(ep_in, true,true);
         usb_drv_stall(ep_out, true,false);
         return;

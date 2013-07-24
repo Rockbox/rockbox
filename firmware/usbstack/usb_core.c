@@ -440,7 +440,10 @@ void usb_core_handle_transfer_completion(
 
     switch(ep) {
         case EP_CONTROL:
-            logf("ctrl handled %ld",current_tick);
+            logf("ctrl handled %ld req=0x%x",
+                 current_tick,
+                 ((struct usb_ctrlrequest*)event->data)->bRequest);
+
             usb_core_control_request_handler(
                 (struct usb_ctrlrequest*)event->data);
             break;
@@ -825,6 +828,7 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
             usb_drv_send(EP_CONTROL, NULL, 0);
             break;
         case USB_REQ_SET_FEATURE:
+            logf("usb_core: SET FEATURE (%d)", req->wValue);
             if(req->wValue == USB_ENDPOINT_HALT)
                usb_drv_stall(EP_NUM(req->wIndex), true, EP_DIR(req->wIndex));
             
@@ -959,7 +963,7 @@ void usb_core_control_request(struct usb_ctrlrequest* req)
     completion_event->data = (void*)req;
     completion_event->status = 0;
     completion_event->length = 0;
-    logf("ctrl received %ld", current_tick);
+    logf("ctrl received %ld, req=0x%x", current_tick, req->bRequest);
     usb_signal_transfer_completion(completion_event);
 }
 
