@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "screendump.h"
+#include "rbpaths.h"
 
 #include "file.h"
 #include "general.h"
@@ -120,9 +121,9 @@ void screen_dump(void)
 #endif
 
 #if CONFIG_RTC
-    create_datetime_filename(filename, "", "dump ", ".bmp", false);
+    create_datetime_filename(filename, HOME_DIR, "dump ", ".bmp", false);
 #else
-    create_numbered_filename(filename, "", "dump_", ".bmp", 4
+    create_numbered_filename(filename, HOME_DIR, "dump_", ".bmp", 4
                              IF_CNFN_NUM_(, NULL));
 #endif
 
