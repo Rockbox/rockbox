@@ -25,6 +25,8 @@
 static int rmi_cur_page;
 static int rmi_i2c_addr;
 
+static unsigned char current_power_register;
+
 /* NOTE:
  * RMI over i2c supports some special aliases on page 0x2 but this driver don't
  * use them */
@@ -74,4 +76,41 @@ int rmi_write(int address, int byte_count, const unsigned char *buffer)
 int rmi_write_single(int address, unsigned char byte)
 {
     return rmi_write(address, 1, &byte);
+}
+
+/* set the device to the given sleep mode */
+void rmi_set_sleep_mode(unsigned char sleep_mode)
+{
+    current_power_register = rmi_read_single(RMI_DEVICE_CONTROL);
+    /*valid value different from the actual one*/
+    if ((sleep_mode <= 0x4) \
+        && ((current_power_register &= 0x0f) != sleep_mode))
+    {
+        if (sleep_mode != RMI_SLEEP_MODE_SENSOR_SLEEP)
+        {
+            current_power_register &= 0xf0;
+            current_power_register |= sleep_mode;
+            rmi_write_single(RMI_DEVICE_CONTROL, current_power_register);
+        }
+        else
+        {
+            /* no need to report like hell when sensor is disable */
+            current_power_register = RMI_REPORT_RATE_LOW | RMI_SLEEP_MODE_SENSOR_SLEEP;
+            rmi_write_single(RMI_DEVICE_CONTROL, current_power_register); 
+        }
+    }
+}
+
+/* set the device's report rate to the given value */
+void rmi_set_report_rate_mode(unsigned char report_rate)
+{
+    current_power_register = rmi_read_single(RMI_DEVICE_CONTROL);
+    /*valid value different from the actual one*/
+    if (((report_rate == RMI_REPORT_RATE_NORMAL) || (report_rate == RMI_REPORT_RATE_NORMAL)) \
+        && ((current_power_register & 0xf0) != report_rate))
+    {
+        current_power_register &= 0x0f;
+        current_power_register |= report_rate;
+        rmi_write_single(RMI_DEVICE_CONTROL, current_power_register);    
+    }
 }
