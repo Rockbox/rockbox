@@ -25,6 +25,8 @@
 static int rmi_cur_page;
 static int rmi_i2c_addr;
 
+static unsigned char dev_ctl_reg;
+
 /* NOTE:
  * RMI over i2c supports some special aliases on page 0x2 but this driver don't
  * use them */
@@ -33,6 +35,7 @@ int rmi_init(int i2c_dev_addr)
 {
     rmi_i2c_addr = i2c_dev_addr;
     rmi_cur_page = 0x4;
+    dev_ctl_reg = rmi_read_single(RMI_DEVICE_CONTROL);
     return 0;
 }
 
@@ -74,4 +77,28 @@ int rmi_write(int address, int byte_count, const unsigned char *buffer)
 int rmi_write_single(int address, unsigned char byte)
 {
     return rmi_write(address, 1, &byte);
+}
+
+/* set the device to the given sleep mode */
+void rmi_set_sleep_mode(unsigned char sleep_mode)
+{
+    /* valid value different from the actual one*/
+    if((dev_ctl_reg & RMI_SLEEP_MODE_BM) != sleep_mode)
+    {
+        dev_ctl_reg &= ~RMI_SLEEP_MODE_BM;
+        dev_ctl_reg |= sleep_mode;
+        rmi_write_single(RMI_DEVICE_CONTROL, dev_ctl_reg);
+    }
+}
+
+/* set the device's report rate to the given value */
+void rmi_set_report_rate(unsigned char report_rate)
+{
+    /* valid value different from the actual one*/
+    if((dev_ctl_reg & RMI_REPORT_RATE_BM) != report_rate)
+    {
+        dev_ctl_reg &= ~RMI_REPORT_RATE_BM;
+        dev_ctl_reg |= report_rate;
+        rmi_write_single(RMI_DEVICE_CONTROL, dev_ctl_reg);
+    }
 }
