@@ -97,6 +97,17 @@ struct rmi_2d_absolute_data_t
 #define RMI_2D_GEST_FLICK_X_BM          0x0f
 #define RMI_2D_GEST_FLICK_Y_BM          0xf0
 #define RMI_2D_GEST_FLICK_Y_BP          4
+/* RMI Device Control register */
+#define RMI_REPORT_RATE_BM               0xc0
+#define RMI_SLEEP_MODE_BM                0x07
+#define RMI_REPORT_RATE_NORMAL           0x80
+#define RMI_REPORT_RATE_LOW              0x40
+#define RMI_SLEEP_MODE_FORCE_FULLY_AWAKE 0x00
+#define RMI_SLEEP_MODE_NORMAL            0x01
+#define RMI_SLEEP_MODE_LOW_POWER         0x02
+#define RMI_SLEEP_MODE_VERY_LOW_POWER    0x03
+#define RMI_SLEEP_MODE_SENSOR_SLEEP      0x04
+
 
 struct rmi_2d_relative_data_t
 {
@@ -127,5 +138,9 @@ int rmi_write(int address, int byte_count, const unsigned char *buffer);
 /* Write one register
  * WARNING: don't cross a page boundary ! */
 int rmi_write_single(int address, unsigned char byte);
+/* set the device to the given sleep mode */
+void rmi_set_sleep_mode(unsigned char sleep_mode);
+/* set the device's report rate to the given value */
+void rmi_set_report_rate(unsigned char report_rate);
 
 #endif
