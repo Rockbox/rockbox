@@ -42,7 +42,8 @@ bool button_debug_screen(void)
     int sensor_resol = rmi_read_single(RMI_2D_SENSOR_RESOLUTION(0));
     int min_dist = rmi_read_single(RMI_2D_MIN_DIST);
     int gesture_settings = rmi_read_single(RMI_2D_GESTURE_SETTINGS);
-    int sensibility_counter = 0;
+    int volkeys_delay_counter = 0;
+    unsigned char sleep_mode = rmi_read_single(RMI_DEVICE_CONTROL) & RMI_SLEEP_MODE_BM;
     union
     {
         unsigned char data;
@@ -84,7 +85,7 @@ bool button_debug_screen(void)
             rmi_read_single(RMI_INTERRUPT_REQUEST));
         lcd_putsf(0, 4, "sensi: %d min_dist: %d", (int)sensitivity.value, min_dist);
         lcd_putsf(0, 5, "gesture: %x", gesture_settings);
-        
+
         union
         {
             unsigned char data[10];
@@ -100,12 +101,13 @@ bool button_debug_screen(void)
         int nr_fingers = u.s.absolute.misc & 7;
         bool gesture = (u.s.absolute.misc & 8) == 8;
         int palm_width = u.s.absolute.misc >> 4;
+
         rmi_read(RMI_DATA_REGISTER(0), 10, u.data);
         lcd_putsf(0, 6, "abs: %d %d %d", absolute_x, absolute_y, (int)u.s.absolute.z);
         lcd_putsf(0, 7, "rel: %d %d", (int)u.s.relative.x, (int)u.s.relative.y);
         lcd_putsf(0, 8, "gesture: %x %x", u.s.gesture.misc, u.s.gesture.flick);
         lcd_putsf(0, 9, "misc: w=%d g=%d f=%d", palm_width, gesture, nr_fingers);
-
+        lcd_putsf(30, 7, "sleep_mode: %d", 1 - sleep_mode);
         lcd_set_viewport(&report_vp);
         lcd_set_drawinfo(DRMODE_SOLID, LCD_RGBPACK(0xff, 0, 0), LCD_BLACK);
         lcd_drawrect(0, 0, zone_w, zone_h);
@@ -153,21 +155,23 @@ bool button_debug_screen(void)
             }
         }
         lcd_update();
-        
+        sleep_mode = rmi_read_single(RMI_DEVICE_CONTROL) & RMI_SLEEP_MODE_BM;
         if(btns & BUTTON_POWER)
             break;
-        if(btns & BUTTON_VOL_DOWN || btns & BUTTON_VOL_UP)
+        if((btns & BUTTON_VOL_DOWN) || (btns & BUTTON_VOL_UP))
         {
-            if(btns & BUTTON_VOL_UP)
-                sensibility_counter++;
-            if(btns & BUTTON_VOL_DOWN)
-                sensibility_counter--;
-            if((sensibility_counter == -15) || (sensibility_counter == 15))
+            volkeys_delay_counter++;
+            if(volkeys_delay_counter == 15)
             {
-                sensitivity.value += (sensibility_counter / 15);
-                sensibility_counter = 0;
+                if(btns & BUTTON_VOL_UP)
+                    if(sleep_mode > RMI_SLEEP_MODE_FORCE_FULLY_AWAKE)
+                        sleep_mode--;
+                if(btns & BUTTON_VOL_DOWN)
+                    if(sleep_mode < RMI_SLEEP_MODE_SENSOR_SLEEP)
+                        sleep_mode++;
+                rmi_set_sleep_mode(sleep_mode);
+                volkeys_delay_counter = 0;
             }
-            rmi_write(RMI_2D_SENSITIVITY_ADJ, 1, &sensitivity.data); 
         }
         
         yield();
@@ -200,11 +204,15 @@ static struct button_area_t button_areas[] =
 
 #define RMI_INTERRUPT       1
 #define RMI_SET_SENSITIVITY 2
+#define RMI_SET_SLEEP_MODE  3
+/* timeout before lowering touchpad power from lack of activity */
+#define ACTIVITY_TMO (60 * HZ)
 
 static int touchpad_btns = 0;
 static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
 static const char rmi_thread_name[] = "rmi";
 static struct event_queue rmi_queue;
+static unsigned last_activity = 0;
 
 static int find_button(int x, int y)
 {
@@ -233,6 +241,44 @@ static void rmi_attn_cb(int bank, int pin, intptr_t user)
     queue_post(&rmi_queue, RMI_INTERRUPT, 0);
 }
 
+static void do_interrupt(void)
+{
+    /* rmi_set_sleep_mode() does not do anything if the value
+     * it is given is already the one setted */
+    rmi_set_sleep_mode(RMI_SLEEP_MODE_LOW_POWER);
+    last_activity = current_tick;
+    /* clear interrupt */
+    rmi_read_single(RMI_INTERRUPT_REQUEST);
+    /* read data */
+    union
+    {
+        unsigned char data[10];
+        struct
+        {
+            struct rmi_2d_absolute_data_t absolute;
+            struct rmi_2d_relative_data_t relative;
+            struct rmi_2d_gesture_data_t gesture;
+        }s;
+    }u;
+    rmi_read(RMI_DATA_REGISTER(0), 10, u.data);
+    int absolute_x = u.s.absolute.x_msb << 8 | u.s.absolute.x_lsb;
+    int absolute_y = u.s.absolute.y_msb << 8 | u.s.absolute.y_lsb;
+    int nr_fingers = u.s.absolute.misc & 7;
+
+    if(nr_fingers == 1)
+        touchpad_btns = find_button(absolute_x, absolute_y);
+    else
+        touchpad_btns = 0;
+
+    /* enable interrupt */
+    imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
+}
+
+void touchpad_enable(bool en)
+{
+    queue_post(&rmi_queue, RMI_SET_SLEEP_MODE, en ? RMI_SLEEP_MODE_LOW_POWER : RMI_SLEEP_MODE_SENSOR_SLEEP);
+}
+
 void touchpad_set_sensitivity(int level)
 {
     queue_post(&rmi_queue, RMI_SET_SENSITIVITY, level);
@@ -244,47 +290,33 @@ static void rmi_thread(void)
     
     while(1)
     {
-        queue_wait(&rmi_queue, &ev);
+        queue_wait_w_tmo(&rmi_queue, &ev, HZ);
         /* handle usb connect and ignore all messages except rmi interrupts */
-        if(ev.id == SYS_USB_CONNECTED)
+        switch(ev.id)
         {
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            continue;
+            case SYS_USB_CONNECTED:
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                break;
+            case RMI_SET_SENSITIVITY:
+                /* handle negative values as well ! */
+                rmi_write_single(RMI_2D_SENSITIVITY_ADJ, (unsigned char)(int8_t)ev.data);
+                break;
+            case RMI_SET_SLEEP_MODE:
+                /* reset activity */
+                last_activity = current_tick;
+                rmi_set_sleep_mode(ev.data);
+                break;
+            case RMI_INTERRUPT:
+                do_interrupt();
+                break;
+            default:
+                 /* activity timeout */
+                if(TIME_AFTER(current_tick, last_activity + ACTIVITY_TMO))
+                {
+                    rmi_set_sleep_mode(RMI_SLEEP_MODE_VERY_LOW_POWER);
+                }
+                break;
         }
-        else if(ev.id == RMI_SET_SENSITIVITY)
-        {
-            /* handle negative values as well ! */
-            rmi_write_single(RMI_2D_SENSITIVITY_ADJ, (unsigned char)(int8_t)ev.data);
-            continue;
-        }
-        else if(ev.id != RMI_INTERRUPT)
-            continue;
-        /* clear interrupt */
-        rmi_read_single(RMI_INTERRUPT_REQUEST);
-        /* read data */
-        union
-        {
-            unsigned char data[10];
-            struct
-            {
-                struct rmi_2d_absolute_data_t absolute;
-                struct rmi_2d_relative_data_t relative;
-                struct rmi_2d_gesture_data_t gesture;
-            }s;
-        }u;
-        rmi_read(RMI_DATA_REGISTER(0), 10, u.data);
-        int absolute_x = u.s.absolute.x_msb << 8 | u.s.absolute.x_lsb;
-        int absolute_y = u.s.absolute.y_msb << 8 | u.s.absolute.y_lsb;
-        int nr_fingers = u.s.absolute.misc & 7;
-
-
-        if(nr_fingers == 1)
-            touchpad_btns = find_button(absolute_x, absolute_y);
-        else
-            touchpad_btns = 0;
-        
-        /* enable interrupt */
-        imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
     }
 }
 
@@ -337,6 +369,8 @@ void button_init_device(void)
     queue_init(&rmi_queue, true);
     create_thread(rmi_thread, rmi_stack, sizeof(rmi_stack), 0,
             rmi_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
+    /* low power mode seems to be enough for normal use */
+    rmi_set_sleep_mode(RMI_SLEEP_MODE_LOW_POWER);
     /* enable interrupt */
     imx233_pinctrl_acquire(0, 27, "touchpad int");
     imx233_pinctrl_set_function(0, 27, PINCTRL_FUNCTION_GPIO);
