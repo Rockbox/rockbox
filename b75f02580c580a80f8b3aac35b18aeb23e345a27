@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//+xw\u003d",
+        "filename": "firmware/drivers/synaptics-rmi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T12:29:03Z",
+      "side": 1,
+      "message": "replace 0x7 by RMI_SLEEP_MODE_BM",
+      "revId": "b75f02580c580a80f8b3aac35b18aeb23e345a27",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+xs\u003d",
+        "filename": "firmware/drivers/synaptics-rmi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T12:29:03Z",
+      "side": 1,
+      "message": "same",
+      "revId": "b75f02580c580a80f8b3aac35b18aeb23e345a27",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+xo\u003d",
+        "filename": "firmware/drivers/synaptics-rmi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T12:29:03Z",
+      "side": 1,
+      "message": "replace 0xc0 by RMI_REPORT_RATE_BM",
+      "revId": "b75f02580c580a80f8b3aac35b18aeb23e345a27",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+xk\u003d",
+        "filename": "firmware/drivers/synaptics-rmi.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T12:29:03Z",
+      "side": 1,
+      "message": "same",
+      "revId": "b75f02580c580a80f8b3aac35b18aeb23e345a27",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+x4\u003d",
+        "filename": "firmware/export/synaptics-rmi.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T12:29:03Z",
+      "side": 1,
+      "message": "Could you add a define for the mask:\n#define RMI_REPORT_RATE_BM 0xc0",
+      "revId": "b75f02580c580a80f8b3aac35b18aeb23e345a27",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+x0\u003d",
+        "filename": "firmware/export/synaptics-rmi.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T12:29:03Z",
+      "side": 1,
+      "message": "could you add a define for the mask: #define RMI_SLEEP_MODE_BM 0x7",
+      "revId": "b75f02580c580a80f8b3aac35b18aeb23e345a27",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
