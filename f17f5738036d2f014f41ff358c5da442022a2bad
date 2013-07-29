@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//+zE\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "extra space at end of line.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+zA\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "extra space.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+y8\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "either display in hexadecimal or only display shift field: (power_reg \u0026 0xc0) \u003e\u003e 6.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+yk\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "I don\u0027t like this code: first sensibility_counter should be renamed and not use the -15..15 range. I would rather see something like this: https://gist.github.com/pamaury/6103169",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+ys\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "style: all comment lines start with a *",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+yg\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "I would prefer that we don\u0027t touch the report rate in this commit at least.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+y4\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "extra spaces.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+y0\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "extra spaces.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+yw\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "extra spaces.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+yc\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "I would prefer that we don\u0027t touch the report rate in this commit at least.",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+yo\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:22:47Z",
+      "side": 1,
+      "message": "extra empty lines ?",
+      "revId": "f17f5738036d2f014f41ff358c5da442022a2bad",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
