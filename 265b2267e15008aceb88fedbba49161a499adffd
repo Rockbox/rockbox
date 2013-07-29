@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//+wk\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "move this at the beginning of the loop.",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+wg\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "remove this",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+wY\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "can be shorten to btns \u0026 (BUTTON_VOL_DOWN | BUTTON_VOL_UP)",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+wo\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "factor code by writing t_enable \u003d en;\nand probably keep the old conditional expression en ? RMI_SLEE_MODE_LOW_POWER : ....",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+ws\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "extra space at end of line.",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+wU\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "add comment about timeout:\n/* make sure to timeout often enough for the activity timeout to take place */",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+wc\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "add comment about why t_enable is needed:\n/* don\u0027t change power mode if touchpad is disabled, it\u0027s already in sleep mode */",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+ww\u003d",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T19:26:42Z",
+      "side": 1,
+      "message": "extra space/line",
+      "revId": "265b2267e15008aceb88fedbba49161a499adffd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
