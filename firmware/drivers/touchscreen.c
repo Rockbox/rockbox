@@ -30,7 +30,9 @@
 /* Size of the 'dead zone' around each 3x3 button */
 #define BUTTON_MARGIN_X (int)(LCD_WIDTH * 0.03)
 #define BUTTON_MARGIN_Y (int)(LCD_HEIGHT * 0.03)
-
+/* switch to disable the touchscreen - can also be used at driver level to 
+ * put the touchscreen in power save mode if available */
+bool t_enable = true;
 static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
 static const int touchscreen_buttons[3][3] =
 {
@@ -49,6 +51,16 @@ struct touchscreen_parameter calibration_parameters
                                               = DEFAULT_TOUCHSCREEN_CALIBRATION;
 const struct touchscreen_parameter default_calibration_parameters
                                               = DEFAULT_TOUCHSCREEN_CALIBRATION;
+
+void touchdev_disable(void)
+{
+    t_enable = false;
+}
+
+void touchdev_wakeup(void)
+{
+    t_enable = true;
+}
 
 void touchscreen_disable_mapping(void)
 {
@@ -121,42 +133,46 @@ static void map_pixels(int *x, int *y)
 /* TODO: add jitter (and others) filter */
 int touchscreen_to_pixels(int x, int y, int *data)
 {
-    x &= 0xFFFF;
-    y &= 0xFFFF;
-
-    map_pixels(&x, &y);
-
-    if (current_mode == TOUCHSCREEN_BUTTON)
+    if(t_enable)
     {
-        int column = 0, row = 0;
+        x &= 0xFFFF;
+        y &= 0xFFFF;
 
-        if (x < LCD_WIDTH/3 - BUTTON_MARGIN_X)
-           column = 0;
-        else if (x > LCD_WIDTH/3 + BUTTON_MARGIN_X &&
-                 x < 2*LCD_WIDTH/3 - BUTTON_MARGIN_X)
-           column = 1;
-        else if (x > 2*LCD_WIDTH/3 + BUTTON_MARGIN_X)
-           column = 2;
-        else
-           return BUTTON_NONE;
+        map_pixels(&x, &y);
 
-        if (y < LCD_HEIGHT/3 - BUTTON_MARGIN_Y)
-           row = 0;
-        else if (y > LCD_HEIGHT/3 + BUTTON_MARGIN_Y &&
-                 y < 2*LCD_HEIGHT/3 - BUTTON_MARGIN_Y)
-           row = 1;
-        else if (y > 2*LCD_HEIGHT/3 + BUTTON_MARGIN_Y)
-           row = 2;
-        else
-            return BUTTON_NONE;
+        if (current_mode == TOUCHSCREEN_BUTTON)
+        {
+            int column = 0, row = 0;
+
+            if (x < LCD_WIDTH/3 - BUTTON_MARGIN_X)
+                column = 0;
+            else if (x > LCD_WIDTH/3 + BUTTON_MARGIN_X &&
+                     x < 2*LCD_WIDTH/3 - BUTTON_MARGIN_X)
+                column = 1;
+            else if (x > 2*LCD_WIDTH/3 + BUTTON_MARGIN_X)
+                column = 2;
+            else
+                return BUTTON_NONE;
+
+            if (y < LCD_HEIGHT/3 - BUTTON_MARGIN_Y)
+                row = 0;
+            else if (y > LCD_HEIGHT/3 + BUTTON_MARGIN_Y &&
+                     y < 2*LCD_HEIGHT/3 - BUTTON_MARGIN_Y)
+                row = 1;
+            else if (y > 2*LCD_HEIGHT/3 + BUTTON_MARGIN_Y)
+                row = 2;
+            else
+                return BUTTON_NONE;
         
-        return touchscreen_buttons[row][column];
+            return touchscreen_buttons[row][column];
+        }
+        else
+        {
+            *data = (x << 16 | y);
+            return BUTTON_TOUCHSCREEN;
+        }
     }
-    else
-    {
-        *data = (x << 16 | y);
-        return BUTTON_TOUCHSCREEN;
-    }
+    return BUTTON_NONE;
 }
 
 void touchscreen_set_mode(enum touchscreen_mode mode)

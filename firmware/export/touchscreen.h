@@ -42,6 +42,9 @@ enum touchscreen_mode
                               from button_get_data */
 };
 
+/* those are used to silent the device when needed */
+void touchdev_disable(void);
+void touchdev_wakeup(void);
 extern struct touchscreen_parameter calibration_parameters;
 extern const struct touchscreen_parameter default_calibration_parameters;
 int touchscreen_calibrate(struct touchscreen_calibration *cal);
