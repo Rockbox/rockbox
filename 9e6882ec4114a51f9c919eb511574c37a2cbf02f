@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAASX//+zU\u003d",
+        "filename": "firmware/drivers/synaptics-rmi.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:02:33Z",
+      "side": 1,
+      "message": "style: don\u0027t put extra space before if and ( because it\u0027s not consistent with the rest of the file. Same for comment: put extra space between /* and first character.",
+      "revId": "9e6882ec4114a51f9c919eb511574c37a2cbf02f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+zQ\u003d",
+        "filename": "firmware/drivers/synaptics-rmi.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:02:33Z",
+      "side": 1,
+      "message": "idem.",
+      "revId": "9e6882ec4114a51f9c919eb511574c37a2cbf02f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAASX//+zM\u003d",
+        "filename": "firmware/export/synaptics-rmi.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-07-29T10:02:33Z",
+      "side": 1,
+      "message": "Remove comment on register structure: the callers of rmi_set_sleep_mode and rmi_set_report_rate need not be aware of it.",
+      "revId": "9e6882ec4114a51f9c919eb511574c37a2cbf02f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
