@@ -107,16 +107,20 @@ static void extract_sb_section(struct sb_section_t *sec)
     struct elf_params_t elf;
     elf_init(&elf);
 
+    int bss_idx = 0, text_idx = 0;
+    char secname[32];
     for(int i = 0; i < sec->nr_insts; i++)
     {
         struct sb_inst_t *inst = &sec->insts[i];
         switch(inst->inst)
         {
             case SB_INST_LOAD:
-                elf_add_load_section(&elf, inst->addr, inst->size, inst->data);
+                sprintf(secname, ".text%d", text_idx++);
+                elf_add_load_section(&elf, inst->addr, inst->size, inst->data, secname);
                 break;
             case SB_INST_FILL:
-                elf_add_fill_section(&elf, inst->addr, inst->size, inst->pattern);
+                sprintf(secname, ".bss%d", bss_idx++);
+                elf_add_fill_section(&elf, inst->addr, inst->size, inst->pattern, secname);
                 break;
             case SB_INST_CALL:
             case SB_INST_JUMP:
@@ -124,6 +128,7 @@ static void extract_sb_section(struct sb_section_t *sec)
                 extract_elf_section(&elf, elf_count++, sec->identifier);
                 elf_release(&elf);
                 elf_init(&elf);
+                bss_idx = text_idx = 0;
                 break;
             default:
                 /* ignore mode and nop */
@@ -166,16 +171,20 @@ static void extract_sb1_file(struct sb1_file_t *file)
     struct elf_params_t elf;
     elf_init(&elf);
 
+    int bss_idx = 0, text_idx = 0;
+    char secname[32];
     for(int i = 0; i < file->nr_insts; i++)
     {
         struct sb1_inst_t *inst = &file->insts[i];
         switch(inst->cmd)
         {
             case SB1_INST_LOAD:
-                elf_add_load_section(&elf, inst->addr, inst->size, inst->data);
+                sprintf(secname, ".text%d", text_idx++);
+                elf_add_load_section(&elf, inst->addr, inst->size, inst->data, secname);
                 break;
             case SB1_INST_FILL:
-                elf_add_fill_section(&elf, inst->addr, inst->size, inst->pattern);
+                sprintf(secname, ".bss%d", bss_idx++);
+                elf_add_fill_section(&elf, inst->addr, inst->size, inst->pattern, secname);
                 break;
             case SB1_INST_CALL:
             case SB1_INST_JUMP:

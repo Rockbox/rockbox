@@ -39,6 +39,7 @@ enum elf_section_type_t
 
 struct elf_section_t
 {
+    char *name;
     uint32_t addr; /* virtual address */
     uint32_t size; /* virtual size */
     enum elf_section_type_t type;
@@ -77,9 +78,9 @@ typedef void (*elf_printf_fn_t)(void *user, bool error, const char *fmt, ...);
 
 void elf_init(struct elf_params_t *params);
 void elf_add_load_section(struct elf_params_t *params,
-    uint32_t load_addr, uint32_t size, const void *section);
+    uint32_t load_addr, uint32_t size, const void *section, const char *name);
 void elf_add_fill_section(struct elf_params_t *params,
-    uint32_t fill_addr, uint32_t size, uint32_t pattern);
+    uint32_t fill_addr, uint32_t size, uint32_t pattern, const char *name);
 uint32_t elf_translate_virtual_address(struct elf_params_t *params, uint32_t addr);
 void elf_translate_addresses(struct elf_params_t *params);
 void elf_simplify(struct elf_params_t *params);
