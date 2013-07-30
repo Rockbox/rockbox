@@ -532,24 +532,11 @@ static enum imx_error_t compute_md5sum_buf(void *buf, size_t sz, uint8_t file_md
 /* compute MD5 of a file */
 static enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16])
 {
-    FILE *f = fopen(file, "rb");
-    if(f == NULL)
-    {
-        printf("[ERR] Cannot open input file\n");
-        return IMX_OPEN_ERROR;
-    }
-    fseek(f, 0, SEEK_END);
-    size_t sz = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    void *buf = xmalloc(sz);
-    if(fread(buf, sz, 1, f) != 1)
-    {
-        fclose(f);
-        free(buf);
-        printf("[ERR] Cannot read file\n");
-        return IMX_READ_ERROR;
-    }
-    fclose(f);
+    void *buf;
+    size_t sz;
+    enum imx_error_t err = read_file(file, &buf, &sz);
+    if(err != IMX_SUCCESS)
+        return err;
     compute_md5sum_buf(buf, sz, file_md5sum);
     free(buf);
     return IMX_SUCCESS;
