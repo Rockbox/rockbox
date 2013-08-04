@@ -551,6 +551,19 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
     free(strtbl_content);
 }
 
+bool elf_guess(elf_read_fn_t read, void *user)
+{
+    /* read header */
+    Elf32_Ehdr ehdr;
+    if(!read(user, 0, &ehdr, sizeof(ehdr)))
+        return false;
+    /* basic checks */
+    return ehdr.e_ident[EI_MAG0] == ELFMAG0 && ehdr.e_ident[EI_MAG1] == ELFMAG1 &&
+            ehdr.e_ident[EI_MAG2] == ELFMAG2 && ehdr.e_ident[EI_MAG3] == ELFMAG3 &&
+            ehdr.e_ehsize == sizeof(ehdr) && ehdr.e_phentsize == sizeof(Elf32_Phdr) &&
+            ehdr.e_shentsize == sizeof(Elf32_Shdr);
+}
+
 bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     elf_printf_fn_t printf, void *user)
 {

@@ -94,6 +94,8 @@ bool elf_get_start_addr(struct elf_params_t *params, uint32_t *addr);
 int elf_get_nr_sections(struct elf_params_t *params);
 void elf_release(struct elf_params_t *params);
 
+bool elf_guess(elf_read_fn_t read, void *user);
+
 /* standard implementation of read/write/printf functions
  * with user being a FILE* pointer */
 void elf_std_printf(void *user, bool error, const char *fmt, ...);
