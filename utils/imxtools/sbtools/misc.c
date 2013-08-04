@@ -308,7 +308,7 @@ void color(color_t c)
 
 enum sb_version_guess_t guess_sb_version(const char *filename)
 {
-#define ret(x) do { fclose(f); return x; } while(0)
+#define ret(x) do { if(f) fclose(f); return x; } while(0)
     FILE *f = fopen(filename, "rb");
     if(f == NULL)
         ret(SB_VERSION_ERR);

@@ -733,7 +733,10 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
                 sym->name = strdup(&symstrtab[symdata[j].st_name]);
                 sym->addr = symdata[j].st_value;
                 sym->size = symdata[j].st_size;
-                sym->section = strdup(&strtab[shdr[symdata[j].st_shndx].sh_name]);
+                if(symdata[j].st_shndx == SHN_ABS)
+                    sym->section = NULL;
+                else
+                    sym->section = strdup(&strtab[shdr[symdata[j].st_shndx].sh_name]);
                 switch(type)
                 {
                     case STT_FUNC: sym->type = ESYT_FUNC; break;
