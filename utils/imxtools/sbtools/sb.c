@@ -1255,8 +1255,9 @@ void sb_get_zero_key(struct crypto_key_t *key)
 
 void sb_std_printf(void *user, bool error, color_t c, const char *fmt, ...)
 {
-    (void) user;
-    (void) error;
+    (void)user;
+    if(!g_debug && !error)
+        return;
     va_list args;
     va_start(args, fmt);
     color(c);
