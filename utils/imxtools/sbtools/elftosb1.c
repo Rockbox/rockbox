@@ -19,8 +19,6 @@
  *
  ****************************************************************************/
 
-#define _ISOC99_SOURCE
-#define _POSIX_C_SOURCE 200809L /* for strdup */
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>

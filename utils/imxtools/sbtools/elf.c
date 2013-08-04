@@ -96,6 +96,7 @@ typedef struct
 #define EF_ARM_HASENTRY     0x00000002
 
 #define SHN_UNDEF   0 /* Undefined section */
+#define SHN_ABS     0xfff1 /* Associated symbol is absolute */
 
 typedef struct
 {
@@ -154,6 +155,44 @@ typedef struct
 #define PF_W    (1 << 1) /* Segment is writable */
 #define PF_R    (1 << 2) /* Segment is readable */
 
+typedef struct
+{
+    Elf32_Word    st_name; /* Symbol name (string tbl index) */
+    Elf32_Addr    st_value; /* Symbol value */
+    Elf32_Word    st_size; /* Symbol size */
+    unsigned char st_info; /* Symbol type and binding */
+    unsigned char st_other; /* Symbol visibility */
+    Elf32_Section st_shndx; /* Section index */
+}Elf32_Sym;
+
+#define ELF32_ST_BIND(val)          (((unsigned char) (val)) >> 4)
+#define ELF32_ST_TYPE(val)          ((val) & 0xf)
+#define ELF32_ST_INFO(bind, type)   (((bind) << 4) + ((type) & 0xf))
+
+#define STB_LOCAL   0       /* Local symbol */
+#define STB_GLOBAL  1       /* Global symbol */
+#define STB_WEAK    2       /* Weak symbol */
+#define STB_NUM     3       /* Number of defined types.  */
+#define STB_LOOS    10      /* Start of OS-specific */
+#define STB_GNU_UNIQUE  10      /* Unique symbol.  */
+#define STB_HIOS    12      /* End of OS-specific */
+#define STB_LOPROC  13      /* Start of processor-specific */
+#define STB_HIPROC  15      /* End of processor-specific */
+
+#define STT_NOTYPE  0       /* Symbol type is unspecified */
+#define STT_OBJECT  1       /* Symbol is a data object */
+#define STT_FUNC    2       /* Symbol is a code object */
+#define STT_SECTION 3       /* Symbol associated with a section */
+#define STT_FILE    4       /* Symbol's name is file name */
+#define STT_COMMON  5       /* Symbol is a common data object */
+#define STT_TLS     6       /* Symbol is thread-local data object*/
+#define STT_NUM     7       /* Number of defined types.  */
+#define STT_LOOS    10      /* Start of OS-specific */
+#define STT_GNU_IFUNC   10      /* Symbol is indirect code object */
+#define STT_HIOS    12      /* End of OS-specific */
+#define STT_LOPROC  13      /* Start of processor-specific */
+#define STT_HIPROC  15      /* End of processor-specific */
+
 void elf_init(struct elf_params_t *params)
 {
     memset(params, 0, sizeof(struct elf_params_t));
@@ -164,6 +203,7 @@ extern void *xmalloc(size_t s);
 static struct elf_section_t *elf_add_section(struct elf_params_t *params)
 {
     struct elf_section_t *sec = xmalloc(sizeof(struct elf_section_t));
+    memset(sec, 0, sizeof(struct elf_section_t));
     if(params->first_section == NULL)
         params->first_section = params->last_section = sec;
     else
@@ -174,6 +214,22 @@ static struct elf_section_t *elf_add_section(struct elf_params_t *params)
     sec->next = NULL;
 
     return sec;
+}
+
+static struct elf_symbol_t *elf_add_symbol(struct elf_params_t *params)
+{
+    struct elf_symbol_t *sym = xmalloc(sizeof(struct elf_symbol_t));
+    memset(sym, 0, sizeof(struct elf_symbol_t));
+    if(params->first_symbol == NULL)
+        params->first_symbol = params->last_symbol = sym;
+    else
+    {
+        params->last_symbol->next = sym;
+        params->last_symbol = sym;
+    }
+    sym->next = NULL;
+
+    return sym;
 }
 
 static struct elf_segment_t *elf_add_segment(struct elf_params_t *params)
@@ -551,6 +607,18 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
     free(strtbl_content);
 }
 
+static void *elf_load_section(Elf32_Shdr *sh, elf_read_fn_t read, elf_printf_fn_t printf, void *user)
+{
+    void *data = xmalloc(sh->sh_size);
+    if(!read(user, sh->sh_offset, data, sh->sh_size))
+    {
+        free(data);
+        printf(user, true, "error reading elf section data\n");
+        return NULL;
+    }
+    return data;
+}
+
 bool elf_guess(elf_read_fn_t read, void *user)
 {
     /* read header */
@@ -598,56 +666,94 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
         error_printf("invalid elf file: section header size mismatch\n");
     elf_set_start_addr(params, ehdr.e_entry);
 
-    char *strtab = NULL;
-    if(ehdr.e_shstrndx != SHN_UNDEF)
-    {
-        Elf32_Shdr shstrtab;
-        if(read(user, ehdr.e_shoff + ehdr.e_shstrndx * ehdr.e_shentsize,
-                &shstrtab, sizeof(shstrtab)))
-        {
-            strtab = xmalloc(shstrtab.sh_size);
-            if(!read(user, shstrtab.sh_offset, strtab, shstrtab.sh_size))
-            {
-                free(strtab);
-                strtab = NULL;
-            }
-        }
-    }
     /* run through sections */
     printf(user, false, "ELF file:\n");
+    Elf32_Shdr *shdr = xmalloc(sizeof(Elf32_Shdr) * ehdr.e_shnum);
+    if(!read(user, ehdr.e_shoff, shdr, sizeof(Elf32_Shdr) * ehdr.e_shnum))
+    {
+        printf(user, true, "cannot read elf section headers\n");
+        return false;
+    }
+    char *strtab = elf_load_section(&shdr[ehdr.e_shstrndx], read, printf, user);
+    if(!strtab)
+        printf(user, false, "elf file has no valid section string table\n");
     for(int i = 1; i < ehdr.e_shnum; i++)
     {
-        uint32_t off = ehdr.e_shoff + i * ehdr.e_shentsize;
-        Elf32_Shdr shdr;
-        memset(&shdr, 0, sizeof(shdr));
-        if(!read(user, off, &shdr, sizeof(shdr)))
-            error_printf("error reading elf section header");
+        const char *sec_name = &strtab[shdr[i].sh_name];
+        if(strtab == NULL)
+            sec_name = NULL;
 
-        if(shdr.sh_type == SHT_PROGBITS && shdr.sh_flags & SHF_ALLOC)
+        if(shdr[i].sh_type == SHT_PROGBITS && shdr[i].sh_flags & SHF_ALLOC)
         {
-            void *data = xmalloc(shdr.sh_size);
-            if(!read(user, shdr.sh_offset, data, shdr.sh_size))
-                error_printf("error read self section data\n");
-            elf_add_load_section(params, shdr.sh_addr, shdr.sh_size, data, &strtab[shdr.sh_name]);
+            void *data = elf_load_section(&shdr[i], read, printf, user);
+            if(!data)
+            {
+                printf(user, true, "cannot read elf section %s\n", sec_name);
+                goto Lerr;
+            }
+            elf_add_load_section(params, shdr[i].sh_addr, shdr[i].sh_size, data, sec_name);
             free(data);
 
-            if(strtab)
-                printf(user, false, "create load segment for %s\n", &strtab[shdr.sh_name]);
+            printf(user, false, "create load segment for %s\n", sec_name);
         }
-        else if(shdr.sh_type == SHT_NOBITS && shdr.sh_flags & SHF_ALLOC)
+        else if(shdr[i].sh_type == SHT_NOBITS && shdr[i].sh_flags & SHF_ALLOC)
         {
-            elf_add_fill_section(params, shdr.sh_addr, shdr.sh_size, 0, &strtab[shdr.sh_name]);
-            if(strtab)
-                printf(user, false, "create fill segment for %s\n", &strtab[shdr.sh_name]);
+            elf_add_fill_section(params, shdr[i].sh_addr, shdr[i].sh_size, 0, sec_name);
+            printf(user, false, "create fill segment for %s\n", sec_name);
+        }
+        else if(shdr[i].sh_type == SHT_SYMTAB)
+        {
+            // load string table
+            char *symstrtab = elf_load_section(&shdr[shdr[i].sh_link], read, printf, user);
+            if(!symstrtab)
+            {
+                printf(user, true, "cannot load string table for symbol table %s\n", sec_name);
+                goto Lerr;
+            }
+            // load symbol table data
+            Elf32_Sym *symdata = elf_load_section(&shdr[i], read, printf, user);
+            if(!symdata)
+            {
+                printf(user, true, "cannot read elf section %s\n", sec_name);
+                free(symstrtab);
+                goto Lerr;
+            }
+            // load symbols (only global ones)
+            int nr_symbols = shdr[i].sh_size / sizeof(Elf32_Sym);
+            for(int j = shdr[i].sh_info; j < nr_symbols; j++)
+            {
+                if(ELF32_ST_BIND(symdata[j].st_info) != STB_GLOBAL)
+                    continue;
+                int type = ELF32_ST_TYPE(symdata[j].st_info);
+                if(type != STT_NOTYPE && type != STT_FUNC && type != STT_OBJECT)
+                    continue;
+                if(symdata[j].st_shndx == SHN_UNDEF)
+                    continue;
+                struct elf_symbol_t *sym = elf_add_symbol(params);
+                sym->name = strdup(&symstrtab[symdata[j].st_name]);
+                sym->addr = symdata[j].st_value;
+                sym->size = symdata[j].st_size;
+                sym->section = strdup(&strtab[shdr[symdata[j].st_shndx].sh_name]);
+                switch(type)
+                {
+                    case STT_FUNC: sym->type = ESYT_FUNC; break;
+                    case STT_OBJECT: sym->type = ESYT_OBJECT; break;
+                    case STT_NOTYPE: default: sym->type = ESYT_NOTYPE; break;
+                }
+                printf(user, false, "add symbol %s at %#x, type %d, size %d, section %s\n",
+                    sym->name, sym->addr, sym->type, sym->size, sym->section);
+            }
+            free(symdata);
+            free(symstrtab);
         }
         else
         {
-            if(strtab)
-                printf(user, false, "filter out %s\n", &strtab[shdr.sh_name], shdr.sh_type);
+            printf(user, false, "filter out %s, type %d\n", sec_name, shdr[i].sh_type);
         }
 
     }
     free(strtab);
+    free(shdr);
     /* run through segments */
     for(int i = 1; i < ehdr.e_phnum; i++)
     {
@@ -668,6 +774,10 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     }
 
     return true;
+Lerr:
+    free(strtab);
+    free(shdr);
+    return false;
 }
 
 uint32_t elf_translate_virtual_address(struct elf_params_t *params, uint32_t addr)
@@ -741,6 +851,15 @@ void elf_release(struct elf_params_t *params)
         struct elf_segment_t *next_seg = seg->next;
         free(seg);
         seg = next_seg;
+    }
+    struct elf_symbol_t *sym = params->first_symbol;
+    while(sym)
+    {
+        free(sym->name);
+        free(sym->section);
+        struct elf_symbol_t *next_sym = sym->next;
+        free(sym);
+        sym = next_sym;
     }
 }
 

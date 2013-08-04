@@ -61,6 +61,23 @@ struct elf_segment_t
     struct elf_segment_t *next;
 };
 
+enum elf_symbol_type_t
+{
+    ESYT_NOTYPE,
+    ESYT_OBJECT,
+    ESYT_FUNC,
+};
+
+struct elf_symbol_t
+{
+    char *name;
+    uint32_t addr;
+    uint32_t size;
+    enum elf_symbol_type_t type;
+    char *section;
+    struct elf_symbol_t *next;
+};
+
 struct elf_params_t
 {
     bool has_start_addr;
@@ -69,6 +86,8 @@ struct elf_params_t
     struct elf_section_t *last_section;
     struct elf_segment_t *first_segment;
     struct elf_segment_t *last_segment;
+    struct elf_symbol_t *first_symbol;
+    struct elf_symbol_t *last_symbol;
 };
 
 typedef bool (*elf_read_fn_t)(void *user, uint32_t addr, void *buf, size_t count);
