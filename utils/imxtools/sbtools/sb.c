@@ -674,6 +674,25 @@ struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t si
     #undef fatal
 }
 
+struct printer_t
+{
+    void *user;
+    sb_color_printf cprintf;
+    const char *color;
+    bool error;
+};
+
+static void sb_printer(void *user, const char *fmt, ...)
+{
+    struct printer_t *p = user;
+    va_list args;
+    va_start(args, fmt);
+    char buffer[1024];
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    p->cprintf(p->user, p->error, p->color, "%s", buffer);
+    va_end(args);
+}
+
 struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, void *u,
     sb_color_printf cprintf, enum sb_error_t *err)
 {
@@ -686,8 +705,9 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
             cprintf(u, true, GREY, __VA_ARGS__); \
             sb_free(sb_file); \
             return NULL; } while(0)
+    struct printer_t printer = {.user = u, .cprintf = cprintf, .color = OFF, .error = false };
     #define print_hex(c, p, len, nl) \
-        do { printf(c, ""); print_hex(p, len, nl); } while(0)
+        do { printer.color = c; print_hex(&printer, sb_printer, p, len, nl); } while(0)
 
     struct sha_1_params_t sha_1_params;
     sb_file = xmalloc(sizeof(struct sb_file_t));
@@ -798,8 +818,8 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
         {
             printf(RED, "  Key %d\n", i),
             printf(GREEN, "    Key: ");
-            printf(YELLOW, "");
-            print_key(&g_key_array[i], true);
+            printer.color = YELLOW;
+            print_key(&printer, sb_printer, &g_key_array[i], true);
             printf(GREEN, "    CBC-MAC: ");
             /* check it */
             byte zero[16];
@@ -1137,8 +1157,9 @@ void sb_free(struct sb_file_t *file)
 void sb_dump(struct sb_file_t *file, void *u, sb_color_printf cprintf)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
+    struct printer_t printer = {.user = u, .cprintf = cprintf, .color = OFF, .error = false };
     #define print_hex(c, p, len, nl) \
-        do { printf(c, ""); print_hex(p, len, nl); } while(0)
+        do { printer.color = c; print_hex(&printer, sb_printer, p, len, nl); } while(0)
 
     #define TREE    RED
     #define HEADER  GREEN

@@ -43,6 +43,10 @@ typedef struct crypto_key_t *key_array_t;
 int g_nr_keys;
 key_array_t g_key_array;
 
+typedef void (*misc_printf_t)(void *user, const char *fmt, ...);
+
+void misc_std_printf(void *user, const char *fmt, ...);
+
 void *memdup(const void *p, size_t len);
 void *augment_array(void *arr, size_t elem_sz, size_t cnt, void *aug, size_t aug_cnt);
 void augment_array_ex(void **arr, size_t elem_sz, int *cnt, int *capacity,
@@ -50,14 +54,14 @@ void augment_array_ex(void **arr, size_t elem_sz, int *cnt, int *capacity,
 void generate_random_data(void *buf, size_t sz);
 void *xmalloc(size_t s);
 int convxdigit(char digit, byte *val);
-void print_hex(byte *data, int len, bool newline);
+void print_hex(void *user, misc_printf_t printf, byte *data, int len, bool newline);
 void add_keys(key_array_t ka, int kac);
 bool parse_key(char **str, struct crypto_key_t *key);
 bool add_keys_from_file(const char *key_file);
-void print_key(struct crypto_key_t *key, bool newline);
+void print_key(void *user, misc_printf_t printf, struct crypto_key_t *key, bool newline);
 void clear_keys();
 
-typedef char color_t[];
+typedef const char color_t[];
 
 extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
 void color(color_t c);

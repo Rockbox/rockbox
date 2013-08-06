@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include "misc.h"
 
 bool g_debug = false;
@@ -193,6 +194,15 @@ void clear_keys()
     g_key_array = NULL;
 }
 
+void misc_std_printf(void *user, const char *fmt, ...)
+{
+    (void) user;
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+}
+
 bool add_keys_from_file(const char *key_file)
 {
     int size;
@@ -233,7 +243,7 @@ bool add_keys_from_file(const char *key_file)
         if(g_debug)
         {
             printf("Add key: ");
-            print_key(&k, true);
+            print_key(NULL, misc_std_printf, &k, true);
         }
         add_keys(&k, 1);
         /* request at least one space character before next key, or end of file */
@@ -253,45 +263,45 @@ bool add_keys_from_file(const char *key_file)
     return true;
 }
 
-void print_hex(byte *data, int len, bool newline)
+void print_hex(void *user, misc_printf_t printf, byte *data, int len, bool newline)
 {
     for(int i = 0; i < len; i++)
-        printf("%02X ", data[i]);
+        printf(user, "%02X ", data[i]);
     if(newline)
-        printf("\n");
+        printf(user, "\n");
 }
 
-void print_key(struct crypto_key_t *key, bool newline)
+void print_key(void *user, misc_printf_t printf, struct crypto_key_t *key, bool newline)
 {
     switch(key->method)
     {
         case CRYPTO_KEY:
-            print_hex(key->u.key, 16, false);
+            print_hex(user, printf, key->u.key, 16, false);
             break;
         case CRYPTO_USBOTP:
-            printf("USB-OTP(%04x:%04x)", key->u.vid_pid >> 16, key->u.vid_pid & 0xffff);
+            printf(user, "USB-OTP(%04x:%04x)", key->u.vid_pid >> 16, key->u.vid_pid & 0xffff);
             break;
         case CRYPTO_NONE:
-            printf("none");
+            printf(user, "none");
             break;
         case CRYPTO_XOR_KEY:
-            print_hex(&key->u.xor_key[0].key[0], 64, false);
-            print_hex(&key->u.xor_key[1].key[0], 64, false);
+            print_hex(user, printf, &key->u.xor_key[0].key[0], 64, false);
+            print_hex(user, printf, &key->u.xor_key[1].key[0], 64, false);
             break;
         default:
-            printf("unknown");
+            printf(user, "unknown");
     }
     if(newline)
-        printf("\n");
+        printf(user, "\n");
 }
 
-char OFF[] = { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
+const char OFF[] = { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
 
-char GREY[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
-char RED[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
-char GREEN[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
-char YELLOW[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
-char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
+const char GREY[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
+const char RED[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
+const char GREEN[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
+const char YELLOW[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
+const char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 static bool g_color_enable = true;
 
