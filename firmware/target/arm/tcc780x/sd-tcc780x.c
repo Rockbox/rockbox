@@ -28,7 +28,6 @@
 #include "led.h"
 #include "thread.h"
 #include "disk.h"
-#include "fat.h"
 #include "ata_idle_notify.h"
 #include "usb.h"
 
@@ -657,35 +656,30 @@ static void sd_thread(void)
         {
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:
-            fat_lock();          /* lock-out FAT activity first -
-                                    prevent deadlocking via disk_mount that
-                                    would cause a reverse-order attempt with
-                                    another thread */
-            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
-                                    into driver that bypass the fat cache */
+        case SYS_HOTSWAP_EXTRACTED:;
+            int success = 1;
 
-            /* We now have exclusive control of fat cache and ata */
-
-            /* Release "by force", ensure file descriptors aren't leaked and
-               any busy ones are invalid if mounting */
+            /* Release "by force" */
             disk_unmount(sd_first_drive + CARD_NUM_SLOT); 
+
+            mutex_lock(&sd_mtx); /* lock-out card activity */
 
             /* Force card init for new card, re-init for re-inserted one or
              * clear if the last attempt to init failed with an error. */
             card_info[CARD_NUM_SLOT].initialized = 0;
             sd_status[CARD_NUM_SLOT].retry = 0; 
 
-            if (ev.id == SYS_HOTSWAP_INSERTED)
-                disk_mount(sd_first_drive + CARD_NUM_SLOT);
-
-            queue_broadcast(SYS_FS_CHANGED, 0);
-
-            /* Access is now safe */
             mutex_unlock(&sd_mtx);
-            fat_unlock();
+
+            if (ev.id == SYS_HOTSWAP_INSERTED)
+                success = disk_mount(sd_first_drive + CARD_NUM_SLOT);
+
+            if (success)
+                queue_broadcast(SYS_FS_CHANGED, 0);
+
             break;
-#endif
+#endif /* HAVE_HOTSWAP */
+
         case SYS_TIMEOUT:
             if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
             {

@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-
+#ifndef STRING_EXTRA_H
+#define STRING_EXTRA_H
 #include <string.h>
 #include "strlcpy.h"
 #include "strlcat.h"
@@ -27,3 +27,39 @@
 #include "strcasestr.h"
 #include "strtok_r.h"
 #include "memset16.h"
+
+/* copies a buffer of len bytes and null terminates it */
+static inline char * strmemcpy(char *dst, const char *src, size_t len)
+{
+    /* NOTE: for now, assumes valid parameters! */
+    *(char *)mempcpy(dst, src, len) = '\0';
+    return dst;
+}
+
+/* duplicate and null-terminate a memory block on the stack with alloca() */
+#define strmemdupa(s, l) \
+    ({ const char *__s = (s);         \
+       size_t __l = (l);              \
+       char *__buf = alloca(__l + 1); \
+       strmemcpy(__buf, __s, __l); })
+
+/* strdupa and strndupa may already be provided by a system's string.h */
+
+#ifndef strdupa
+/* duplicate an entire string on the stack with alloca() */
+#define strdupa(s) \
+    ({ const char *_s = (s); \
+       strmemdupa((_s), strlen(_s)); })
+#endif /* strdupa */
+
+#ifndef strndupa
+/* duplicate a string on the stack with alloca(), truncating it if it is too
+   long */
+#define strndupa(s, n) \
+    ({ const char *_s = (s);     \
+       size_t _n = (n);          \
+       size_t _len = strlen(_s); \
+       strmemdupa(_s, MIN(_n, _len)); })
+#endif /* strndupa */
+
+#endif /* STRING_EXTRA_H */
