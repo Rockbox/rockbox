@@ -57,28 +57,28 @@ void ll_init(struct ll_head *list)
 /**
  * Adds a node to s singly-linked list using "insert next"
  */
-void ll_insert_next(struct ll_head *list, struct ll_node *node,
-                    struct ll_node *newnode)
+void ll_insert_next(struct ll_head *list, struct ll_node *prevnode,
+                    struct ll_node *node)
 {
-    if (node == NULL)
+    if (prevnode == NULL)   /* at head */
     {
-        node = list->head;
+        node->next = list->head;
 
-        newnode->next = node;
-        list->head = newnode;
-
-        if (node == NULL)
+        if (list->head == NULL)
             list->tail = node;
-    }
-    else
-    {
-        struct ll_node *next = node->next;
 
-        newnode->next = next;
-        node->next = newnode;
+        list->head = node;
+    }
+    else                    /* anywhere else */
+    {
+        struct ll_node *next = prevnode->next;
+
+        node->next = next;
 
         if (next == NULL)
-            list->tail = newnode;
+            list->tail = node;
+
+        prevnode->next = node;
     }
 }
 
