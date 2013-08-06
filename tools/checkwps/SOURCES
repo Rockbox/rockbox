@@ -1,13 +1,21 @@
+#undef unix /* messes up filesystem-unix.c below */
 ../../apps/gui/skin_engine/skin_parser.c
 ../../apps/gui/skin_engine/skin_backdrops.c
 ../../apps/gui/viewport.c
 ../../apps/misc.c
 ../../firmware/common/strlcpy.c
-checkwps.c
-
+../../firmware/common/pathfuncs.c
+../../firmware/asm/mempcpy.c
+../../firmware/target/hosted/filesystem-unix.c
 #ifdef APPLICATION
-../../firmware/common/rbpaths.c
+../../firmware/target/hosted/filesystem-app.c
+#else
+../../uisimulator/common/filesystem-sim.c
 #endif
+#ifdef DEBUG
+../../firmware/debug.c
+#endif
+checkwps.c
 
 #ifdef HAVE_LCD_BITMAP
 ../../apps/recorder/bmp.c

@@ -209,12 +209,12 @@ static int dircache_callback(int action,const struct menu_item_ex *this_item)
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
-            if (global_settings.dircache && !dircache_is_enabled())
+            if (global_settings.dircache)
             {
-                if (dircache_build(0) < 0)
+                if (dircache_enable() < 0)
                     splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
             }
-            else if (!global_settings.dircache && dircache_is_enabled())
+            else
             {
                 dircache_disable();
             }

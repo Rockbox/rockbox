@@ -19,11 +19,12 @@
  *
  ****************************************************************************/
 #include "config.h"
+#include "system.h"
 
 #include "gcc_extensions.h"
 #include "storage.h"
 #include "disk.h"
-#include "fat.h"
+#include "file_internal.h"
 #include "lcd.h"
 #include "rtc.h"
 #include "debug.h"
@@ -34,7 +35,6 @@
 #include "filetypes.h"
 #include "panic.h"
 #include "menu.h"
-#include "system.h"
 #include "usb.h"
 #include "powermgmt.h"
 #include "adc.h"
@@ -203,80 +203,53 @@ int main(void)
     root_menu();
 }
 
-static int init_dircache(bool preinit) INIT_ATTR;
-static int init_dircache(bool preinit)
-{
 #ifdef HAVE_DIRCACHE
-    int result = 0;
-    bool clear = false;
-
+static int INIT_ATTR init_dircache(bool preinit)
+{
     if (preinit)
-        dircache_init();
+        dircache_init(MAX(global_status.dircache_size, 0));
 
     if (!global_settings.dircache)
-        return 0;
+        return -1;
 
-# ifdef HAVE_EEPROM_SETTINGS
-    if (firmware_settings.initialized && firmware_settings.disk_clean
-        && preinit)
+    int result = -1;
+
+#ifdef HAVE_EEPROM_SETTINGS
+    if (firmware_settings.initialized &&
+        firmware_settings.disk_clean &&
+        preinit)
     {
         result = dircache_load();
-
         if (result < 0)
-        {
             firmware_settings.disk_clean = false;
-            if (global_status.dircache_size <= 0)
-            {
-                /* This will be in default language, settings are not
-                   applied yet. Not really any easy way to fix that. */
-                splash(0, str(LANG_SCANNING_DISK));
-                clear = true;
-            }
-
-            dircache_build(global_status.dircache_size);
-        }
     }
     else
-# endif
+#endif /* HAVE_EEPROM_SETTINGS */
+    if (!preinit)
     {
-        if (preinit)
-            return -1;
-
-        if (!dircache_is_enabled()
-            && !dircache_is_initializing())
+        result = dircache_enable();
+        if (result != 0)
         {
-            if (global_status.dircache_size <= 0)
+            if (result > 0)
             {
+                /* Print "Scanning disk..." to the display. */
                 splash(0, str(LANG_SCANNING_DISK));
-                clear = true;
+                dircache_wait();
+                backlight_on();
+                show_logo();
             }
-            result = dircache_build(global_status.dircache_size);
-        }
 
-        if (result < 0)
-        {
-            /* Initialization of dircache failed. Manual action is
-             * necessary to enable dircache again.
-             */
-            splashf(0, "Dircache failed, disabled. Result: %d", result);
-            global_settings.dircache = false;
+            struct dircache_info info;
+            dircache_get_info(&info);
+            global_status.dircache_size = info.size;
+            status_save();
         }
-    }
-
-    if (clear)
-    {
-        backlight_on();
-        show_logo();
-        global_status.dircache_size = dircache_get_cache_size();
-        status_save();
+        /* else don't wait or already enabled by load */
     }
 
     return result;
-#else
-    (void)preinit;
-    return 0;
-#endif
 }
+#endif /* HAVE_DIRCACHE */
 
 #ifdef HAVE_TAGCACHE
 static void init_tagcache(void) INIT_ATTR;
@@ -363,6 +336,7 @@ static void init(void)
     button_init();
     powermgmt_init();
     backlight_init();
+    unicode_init();
 #ifdef SIMULATOR
     sim_tasks_init();
 #endif
@@ -392,8 +366,10 @@ static void init(void)
     settings_reset();
     settings_load(SETTINGS_ALL);
     settings_apply(true);
+#ifdef HAVE_DIRCACHE
     init_dircache(true);
     init_dircache(false);
+#endif
 #ifdef HAVE_TAGCACHE
     init_tagcache();
 #endif
@@ -429,6 +405,8 @@ static void init(void)
 
 #else
 
+#include "errno.h"
+
 static void init(void) INIT_ATTR;
 static void init(void)
 {
@@ -442,6 +420,9 @@ static void init(void)
     system_init();
     core_allocator_init();
     kernel_init();
+
+    /* early early early! */
+    filesystem_init();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     set_cpu_frequency(CPUFREQ_NORMAL);
@@ -462,6 +443,7 @@ static void init(void)
     /* current_tick should be ticking by now */
     CHART("ticking");
 
+    unicode_init();
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
@@ -558,8 +540,6 @@ static void init(void)
     }
 #endif
 
-
-    disk_init_subsystem();
     CHART(">storage_init");
     rc = storage_init();
     CHART("<storage_init");
@@ -661,22 +641,24 @@ static void init(void)
         CHART("<settings_load(ALL)");
     }
 
+#ifdef HAVE_DIRCACHE
     CHART(">init_dircache(true)");
     rc = init_dircache(true);
     CHART("<init_dircache(true)");
-    if (rc < 0)
-    {
 #ifdef HAVE_TAGCACHE
+    if (rc < 0)
         remove(TAGCACHE_STATEFILE);
-#endif
-    }
+#endif /* HAVE_TAGCACHE */
+#endif /* HAVE_DIRCACHE */
 
     CHART(">settings_apply(true)");
     settings_apply(true);
     CHART("<settings_apply(true)");
+#ifdef HAVE_DIRCACHE
     CHART(">init_dircache(false)");
     init_dircache(false);
     CHART("<init_dircache(false)");
+#endif
 #ifdef HAVE_TAGCACHE
     CHART(">init_tagcache");
     init_tagcache();

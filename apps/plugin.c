@@ -18,6 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define DIRFUNCTIONS_DEFINED
+#define FILEFUNCTIONS_DEFINED
 #include "plugin.h"
 #include <ctype.h>
 #include <string.h>
@@ -40,8 +42,9 @@
 #include "pcmbuf.h"
 #include "errno.h"
 #include "diacritic.h"
-#include "filefuncs.h"
+#include "pathfuncs.h"
 #include "load_code.h"
+#include "file.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -58,51 +61,7 @@
 #include "usbstack/usb_hid.h"
 #endif
 
-#if defined (SIMULATOR)
-#define PREFIX(_x_) sim_ ## _x_
-#elif defined (APPLICATION)
-#define PREFIX(_x_) app_ ## _x_
-#else
-#define PREFIX(_x_) _x_
-#endif
-
-#if defined (APPLICATION)
-/* For symmetry reasons (we want app_ and sim_ to behave similarly), some
- * wrappers are needed */
-static int app_close(int fd)
-{
-    return close(fd);
-}
-
-static ssize_t app_read(int fd, void *buf, size_t count)
-{
-    return read(fd,buf,count);
-}
-
-static off_t app_lseek(int fd, off_t offset, int whence)
-{
-    return lseek(fd,offset,whence);
-}
-
-static ssize_t app_write(int fd, const void *buf, size_t count)
-{
-    return write(fd,buf,count);
-}
-
-static int app_ftruncate(int fd, off_t length)
-{
-    return ftruncate(fd,length);
-}
-#endif
-
-#if defined(HAVE_PLUGIN_CHECK_OPEN_CLOSE) && (MAX_OPEN_FILES>32)
-#warning "MAX_OPEN_FILES>32, disabling plugin file open/close checking"
-#undef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-#endif
-
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-static unsigned int open_files;
-#endif
+#define WRAPPER(_x_) _x_ ## _wrapper
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
@@ -122,16 +81,99 @@ static void *current_plugin_handle;
 
 char *plugin_get_current_filename(void);
 
-/* Some wrappers used to monitor open and close and detect leaks*/
-static int open_wrapper(const char* pathname, int flags, ...);
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-static int close_wrapper(int fd);
-static int creat_wrapper(const char *pathname, mode_t mode);
-#endif
-
 static void* plugin_get_audio_buffer(size_t *buffer_size);
 static void plugin_release_audio_buffer(void);
 static void plugin_tsr(bool (*exit_callback)(bool));
+
+
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+/* File handle leak prophylaxis */
+#include "bitarray.h"
+#include "file_internal.h" /* for MAX_OPEN_FILES */
+
+#define PCOC_WRAPPER(_x_)   WRAPPER(_x_)
+
+BITARRAY_TYPE_DECLARE(plugin_check_open_close_bitmap_t, open_files_bitmap,
+                      MAX_OPEN_FILES)
+
+static plugin_check_open_close_bitmap_t open_files_bitmap;
+
+static void plugin_check_open_close__enter(void)
+{
+    if (!current_plugin_handle)
+        open_files_bitmap_clear(&open_files_bitmap);
+}
+
+static void plugin_check_open_close__open(int fildes)
+{
+    if (fildes >= 0)
+        open_files_bitmap_set_bit(&open_files_bitmap, fildes);
+}
+
+static void plugin_check_open_close__close(int fildes)
+{
+    if (fildes < 0)
+        return;
+
+    if (!open_files_bitmap_test_bit(&open_files_bitmap, fildes))
+    {
+        logf("double close from plugin");
+    }
+
+    open_files_bitmap_clear_bit(&open_files_bitmap, fildes);
+}
+
+static int WRAPPER(open)(const char *path, int oflag, ...)
+{
+    int fildes = FS_PREFIX(open)(path, oflag __OPEN_MODE_ARG);
+    plugin_check_open_close__open(fildes);
+    return fildes;
+}
+
+static int WRAPPER(creat)(const char *path, mode_t mode)
+{
+    int fildes = FS_PREFIX(creat)(path __CREAT_MODE_ARG);
+    plugin_check_open_close__open(fildes);
+    return fildes;
+    (void)mode;
+}
+
+static int WRAPPER(close)(int fildes)
+{
+    int rc = FS_PREFIX(close)(fildes);
+    if (rc >= 0)
+        plugin_check_open_close__close(fildes);
+
+    return rc;
+}
+
+static void plugin_check_open_close__exit(void)
+{
+    if (current_plugin_handle)
+        return;
+
+    if (open_files_bitmap_is_clear(&open_files_bitmap))
+        return;
+
+    logf("Plugin '%s' leaks file handles", plugin);
+
+    static const char *lines[] =
+        { ID2P(LANG_PLUGIN_ERROR), "#leak-file-handles" };
+    static const struct text_message message = { lines, 2 };
+    button_clear_queue(); /* Empty the keyboard buffer */
+    gui_syncyesno_run(&message, NULL, NULL);
+
+    FOR_EACH_BITARRAY_SET_BIT(&open_files_bitmap, fildes)
+        WRAPPER(close)(fildes);
+}
+
+#else /* !HAVE_PLUGIN_CHECK_OPEN_CLOSE */
+
+#define PCOC_WRAPPER(_x_) FS_PREFIX(_x_)
+#define plugin_check_open_close__enter()
+#define plugin_check_open_close__exit()
+
+#endif /* HAVE_PLUGIN_CHECK_OPEN_CLOSE */
 
 static const struct plugin_api rockbox_api = {
 
@@ -339,24 +381,16 @@ static const struct plugin_api rockbox_api = {
 
     /* file */
     open_utf8,
-    (open_func)open_wrapper,
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    close_wrapper,
-#else
-    PREFIX(close),
-#endif
-    (read_func)PREFIX(read),
-    PREFIX(lseek),
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    (creat_func)creat_wrapper,
-#else
-    PREFIX(creat),
-#endif
-    (write_func)PREFIX(write),
-    PREFIX(remove),
-    PREFIX(rename),
-    PREFIX(ftruncate),
-    filesize,
+    PCOC_WRAPPER(open),
+    PCOC_WRAPPER(creat),
+    PCOC_WRAPPER(close),
+    FS_PREFIX(read),
+    FS_PREFIX(lseek),
+    FS_PREFIX(write),
+    FS_PREFIX(remove),
+    FS_PREFIX(rename),
+    FS_PREFIX(ftruncate),
+    FS_PREFIX(filesize),
     fdprintf,
     read_line,
     settings_parseline,
@@ -369,18 +403,18 @@ static const struct plugin_api rockbox_api = {
 #endif /* USING_STORAGE_CALLBACK */
     reload_directory,
     create_numbered_filename,
-    file_exists,
+    FS_PREFIX(file_exists),
     strip_extension,
     crc_32,
     filetype_get_attr,
 
     /* dir */
-    (opendir_func)opendir,
-    (closedir_func)closedir,
-    (readdir_func)readdir,
-    mkdir,
-    rmdir,
-    dir_exists,
+    FS_PREFIX(opendir),
+    FS_PREFIX(closedir),
+    FS_PREFIX(readdir),
+    FS_PREFIX(mkdir),
+    FS_PREFIX(rmdir),
+    FS_PREFIX(dir_exists),
     dir_get_info,
 
     /* browsing */
@@ -688,10 +722,11 @@ static const struct plugin_api rockbox_api = {
 #endif
     srand,
     rand,
-    (qsort_func)qsort,
+    (void *)qsort,
     kbd_input,
     get_time,
     set_time,
+    gmtime_r,
 #if CONFIG_RTC
     mktime,
 #endif
@@ -891,9 +926,7 @@ int plugin_load(const char* plugin, const void* parameter)
     /* allow voice to back off if the plugin needs lots of memory */
     talk_buffer_set_policy(TALK_BUFFER_LOOSE);
 
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    open_files = 0;
-#endif
+    plugin_check_open_close__enter();
 
     int rc = p_hdr->entry_point(parameter);
     
@@ -947,24 +980,7 @@ int plugin_load(const char* plugin, const void* parameter)
     FOR_NB_SCREENS(i)
         viewportmanager_theme_undo(i, true);
 
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    if(open_files != 0 && !current_plugin_handle)
-    {
-        int fd;
-        logf("Plugin '%s' leaks file handles", plugin);
-        
-        static const char *lines[] = 
-            { ID2P(LANG_PLUGIN_ERROR),
-              "#leak-file-handles" };
-        static const struct text_message message={ lines, 2 };
-        button_clear_queue(); /* Empty the keyboard buffer */
-        gui_syncyesno_run(&message, NULL, NULL);
-        
-        for(fd=0; fd < MAX_OPEN_FILES; fd++)
-            if(open_files & (1<<fd))
-                close_wrapper(fd);
-    }
-#endif
+    plugin_check_open_close__exit();
 
     if (rc == PLUGIN_ERROR)
         splash(HZ*2, str(LANG_PLUGIN_ERROR));
@@ -1027,55 +1043,3 @@ char *plugin_get_current_filename(void)
 {
     return current_plugin;
 }
-
-static int open_wrapper(const char* pathname, int flags, ...)
-{
-/* we don't have an 'open' function. it's a define. and we need
- * the real file_open, hence PREFIX() doesn't work here */
-    int fd;
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-    if (flags & O_CREAT)
-    {
-        va_list ap;
-        va_start(ap, flags);
-        fd = open(pathname, flags, va_arg(ap, unsigned int));
-        va_end(ap);
-    }
-    else
-        fd = open(pathname, flags);
-#else
-    fd = file_open(pathname,flags);
-#endif
-
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    if(fd >= 0)
-        open_files |= 1<<fd;
-#endif
-    return fd;
-}
-
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-static int close_wrapper(int fd)
-{
-    if((~open_files) & (1<<fd))
-    {
-        logf("double close from plugin");
-    }
-    if(fd >= 0)
-        open_files &= (~(1<<fd));
-
-    return PREFIX(close)(fd);
-}
-
-static int creat_wrapper(const char *pathname, mode_t mode)
-{
-    (void)mode;
-
-    int fd = PREFIX(creat)(pathname, mode);
-
-    if(fd >= 0)
-        open_files |= (1<<fd);
-
-    return fd;
-}
-#endif /* HAVE_PLUGIN_CHECK_OPEN_CLOSE */
