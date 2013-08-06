@@ -88,6 +88,7 @@ extern int * __errno(void);
 #define ELBIN 75        /* Inode is remote (not really error) */
 #define EDOTDOT 76      /* Cross mount point (not really error) */
 #define EBADMSG 77      /* Trying to read unreadable message */
+#define EOVERFLOW 78    /* Value too large to be stored in data type */
 #define ENOTUNIQ 80     /* Given log. name not unique */
 #define EBADFD 81       /* f.d. invalid for this operation */
 #define EREMCHG 82      /* Remote address changed */

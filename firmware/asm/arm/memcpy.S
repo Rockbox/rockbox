@@ -36,17 +36,25 @@
 #endif
 
 /* Prototype: void *memcpy(void *dest, const void *src, size_t n); */
+/* Prototype: void *mempcpy(void *dest, const void *src, size_t n); */
 
     .section    .icode,"ax",%progbits
 
     .align      2
     .global     memcpy
     .type       memcpy,%function
+    .global     mempcpy
+    .type       mempcpy,%function
+
+mempcpy:
+        add     r3, r0, r2
+        stmfd   sp!, {r3, r4, lr}
+        b   0f
 
 memcpy:
         stmfd   sp!, {r0, r4, lr}
 
-        subs    r2, r2, #4
+0:      subs    r2, r2, #4
         blt 8f
         ands    ip, r0, #3
         bne 9f

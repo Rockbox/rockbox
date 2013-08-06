@@ -38,6 +38,7 @@
 #include "rb-loader.h"
 #include "loader_strerror.h"
 #include "storage.h"
+#include "file_internal.h"
 #include "disk.h"
 #include "panic.h"
 #include "power.h"
@@ -118,6 +119,8 @@ void main(void)
     if(ret < 0)
         error(EATA, ret, true);
 
+    filesystem_init();
+
 #ifdef USE_ROCKBOX_USB
     usb_init();
     usb_start_monitoring();
@@ -126,13 +129,6 @@ void main(void)
     if(btn & BUTTON_SELECT && usb_detect() == USB_INSERTED)
         usb_mode();
 #endif /* USE_ROCKBOX_USB */
-
-    while(!disk_init(IF_MV(0)))
-#ifdef USE_ROCKBOX_USB
-        usb_mode();
-#else
-        panicf("disk_init failed!");
-#endif
 
     while((ret = disk_mount_all()) <= 0)
     {
