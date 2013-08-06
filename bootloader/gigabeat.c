@@ -30,6 +30,7 @@
 #include "../kernel-internal.h"
 #include "storage.h"
 #include "fat.h"
+#include "file_internal.h"
 #include "disk.h"
 #include "font.h"
 #include "adc.h"
@@ -185,7 +186,7 @@ void main(void)
         error(EATA, rc, true);
     }
 
-    disk_init();
+    filesystem_init();
 
     rc = disk_mount_all();
     if (rc<=0)

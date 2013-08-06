@@ -528,14 +528,19 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
 {
     (void)data;
     int partition = selected_item/2;
-    struct partinfo* p = disk_partinfo(partition);
+
+    struct partinfo p;
+    if (!disk_partinfo(partition, &p))
+        return buffer;
+
     if (selected_item%2)
     {
-        snprintf(buffer, buffer_len, "   T:%x %ld MB", p->type, p->size / ( 2048 / ( SECTOR_SIZE / 512 )));
+        snprintf(buffer, buffer_len, "   T:%x %ld MB", p.type,
+                 p.size / ( 2048 / ( SECTOR_SIZE / 512 )));
     }
     else
     {
-        snprintf(buffer, buffer_len, "P%d: S:%lx", partition, p->start);
+        snprintf(buffer, buffer_len, "P%d: S:%lx", partition, p.start);
     }
     return buffer;
 }
@@ -1377,7 +1382,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Size: %s", buf);
     unsigned long free;
-    fat_size( IF_MV(0,) NULL, &free );
+    volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
     simplelist_addline(
@@ -1469,7 +1474,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                 "No timing info");
     }
     simplelist_addline(
-             "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
+             "Cluster size: %d bytes", volume_get_cluster_size(IF_MV(0)));
 #ifdef HAVE_ATA_DMA
     i = ata_get_dma_mode();
     if (i == 0) {
@@ -1496,11 +1501,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Size: %ld MB", info.num_sectors*(info.sector_size/512)/2024);
     unsigned long free;
-    fat_size( IF_MV(0,) NULL, &free );
+    volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
     simplelist_addline(
-             "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
+             "Cluster size: %d bytes", volume_get_cluster_size(IF_MV(0)));
     return btn;
 }
 #endif
@@ -1542,29 +1547,64 @@ static bool dbg_disk_info(void)
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int btn, struct gui_synclist *lists)
 {
-    (void)lists;
+    struct dircache_info info;
+    dircache_get_info(&info);
+
+    if (global_settings.dircache)
+    {
+        switch (btn)
+        {
+        case ACTION_STD_CONTEXT:
+            splash(HZ/2, "Rebuilding cache");
+            dircache_suspend();
+            *(int *)lists->data = dircache_resume();
+        case ACTION_UNKNOWN:
+            btn = ACTION_NONE;
+            break;
+    #ifdef DIRCACHE_DUMPSTER
+        case ACTION_STD_OK:
+            splash(0, "Dumping cache");
+            dircache_dump();
+            btn = ACTION_NONE;
+            break;
+    #endif /* DIRCACHE_DUMPSTER */
+        case ACTION_STD_CANCEL:
+            if (*(int *)lists->data > 0 && info.status == DIRCACHE_SCANNING)
+            {
+                splash(HZ, str(LANG_SCANNING_DISK));
+                btn = ACTION_NONE;
+            }
+            break;
+        }
+    }
+
     simplelist_set_line_count(0);
-    simplelist_addline("Cache initialized: %s",
-             dircache_is_enabled() ? "Yes" : "No");
-    simplelist_addline("Cache size: %d B",
-             dircache_get_cache_size());
-    simplelist_addline("Last size: %d B",
-             global_status.dircache_size);
-    simplelist_addline("Limit: %d B",
-             DIRCACHE_LIMIT);
-    simplelist_addline("Reserve: %d/%d B",
-             dircache_get_reserve_used(), DIRCACHE_RESERVE);
-    simplelist_addline("Scanning took: %d s",
-             dircache_get_build_ticks() / HZ);
-    simplelist_addline("Entry count: %d",
-             dircache_get_entry_count());
+
+    simplelist_addline("Cache status: %s", info.statusdesc);
+    simplelist_addline("Last size: %lu B", info.last_size);
+    simplelist_addline("Size: %lu B", info.size);
+    unsigned int utilized = info.size ? 1000ull*info.sizeused / info.size : 0;
+    simplelist_addline("Used: %lu B (%u.%u%%)", info.sizeused,
+                       utilized / 10, utilized % 10);
+    simplelist_addline("Limit: %lu B", info.size_limit);
+    simplelist_addline("Reserve: %lu/%lu B", info.reserve_used, info.reserve);
+    long ticks = ALIGN_UP(info.build_ticks, HZ / 10);
+    simplelist_addline("Scanning took: %ld.%ld s",
+                       ticks / HZ, (ticks*10 / HZ) % 10);
+    simplelist_addline("Entry count: %u", info.entry_count);
+
+    if (btn == ACTION_NONE)
+        btn = ACTION_REDRAW;
+
     return btn;
+    (void)lists;
 }
 
 static bool dbg_dircache_info(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Dircache Info", 7, NULL);
+    int syncbuild = 0;
+    simplelist_info_init(&info, "Dircache Info", 8, &syncbuild);
     info.action_callback = dircache_callback;
     info.hide_selection = true;
     info.scroll_all = true;
