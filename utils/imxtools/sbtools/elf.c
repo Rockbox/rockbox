@@ -519,8 +519,8 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
             phdr.p_offset = sec->offset;
         else
             phdr.p_offset = 0;
-        phdr.p_paddr = sec->addr;
-        phdr.p_vaddr = phdr.p_paddr; /* assume identity map ? */
+        phdr.p_paddr = elf_translate_virtual_address(params, sec->addr);
+        phdr.p_vaddr = sec->addr; /* assume identity map ? */
         phdr.p_memsz = sec->size;
         if(sec->type == EST_LOAD)
             phdr.p_filesz = phdr.p_memsz;
@@ -793,17 +793,6 @@ uint32_t elf_translate_virtual_address(struct elf_params_t *params, uint32_t add
         seg = seg->next;
     }
     return addr;
-}
-
-void elf_translate_addresses(struct elf_params_t *params)
-{
-    struct elf_section_t *sec = params->first_section;
-    while(sec)
-    {
-        sec->addr = elf_translate_virtual_address(params, sec->addr);
-        sec = sec->next;
-    }
-    params->start_addr = elf_translate_virtual_address(params, params->start_addr);
 }
 
 bool elf_is_empty(struct elf_params_t *params)
