@@ -60,13 +60,13 @@ ___memcpy_fwd_entry:
     cmp/hs  r0,r6       /* at least 11 bytes to copy? (ensures 2 aligned longs) */
     add     r5,r6       /* r6 = source_end */
     bf      .start_b2   /* no: jump directly to byte loop */
-    
+
     mov     #3,r0
     neg     r5,r3
     and     r0,r3       /* r3 = (4 - align_offset) % 4 */
     tst     r3,r3       /* already aligned? */
     bt      .end_b1     /* yes: skip leading byte loop */
-    
+
     add     r5,r3       /* r3 = first source long bound */
 
     /* leading byte loop: copies 0..3 bytes */
@@ -89,7 +89,7 @@ ___memcpy_fwd_entry:
     mov     r6,r3       /* move end address to r3 */
     jmp     @r1         /* and jump to it */
     add     #-7,r3      /* adjust end addr for main loops doing 2 longs/pass */
-    
+
     /** main loops, copying 2 longs per pass to profit from fast page mode **/
 
     /* long aligned destination (fastest) */
@@ -102,11 +102,11 @@ ___memcpy_fwd_entry:
     mov.l   r0,@-r4     /* store second long */
     mov.l   r1,@-r4     /* store first long; NOT ALIGNED - no speed loss here! */
     bt      .loop_do0
-           
+
     add     #4,r3       /* readjust end address */
     cmp/hi  r5,r3       /* one long left? */
     bf      .start_b2   /* no, jump to trailing byte loop */
-    
+
     mov.l   @r5+,r0     /* load last long & increment source addr */
     add     #4,r4       /* increment dest addr */
     bra     .start_b2   /* jump to trailing byte loop */

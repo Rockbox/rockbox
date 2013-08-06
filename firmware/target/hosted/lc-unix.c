@@ -50,14 +50,3 @@ void lc_close(void *handle)
 {
     dlclose(handle);
 }
-
-void *lc_open_from_mem(void *addr, size_t blob_size)
-{
-    (void)addr;
-    (void)blob_size;
-    /* we don't support loading code from memory on application builds,
-     * it doesn't make sense (since it means writing the blob to disk again and
-     * then falling back to load from disk) and requires the ability to write
-     * to an executable directory */
-    return NULL;
-}

@@ -104,6 +104,10 @@ int get_cpu_boost_counter(void);
 /* return number of elements in array a */
 #define ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
 
+/* is the given pointer "p" inside the said bounds of array "a"? */
+#define PTR_IN_ARRAY(a, p, numelem) \
+    ((uintptr_t)(p) - (uintptr_t)(a) < (uintptr_t)(numelem)*sizeof ((a)[0]))
+
 /* return p incremented by specified number of bytes */
 #define SKIPBYTES(p, count) ((typeof (p))((char *)(p) + (count)))
 
@@ -188,9 +192,13 @@ enum {
 #include "system-target.h"
 #elif defined(HAVE_SDL) /* SDL build */
 #include "system-sdl.h"
-#elif defined(__PCTOOL__)
-#include "system-sdl.h"
+#ifdef SIMULATOR
+#include "system-sim.h"
 #endif
+#elif defined(__PCTOOL__)
+#include "system-hosted.h"
+#endif
+
 #include "bitswap.h"
 #include "rbendian.h"
 

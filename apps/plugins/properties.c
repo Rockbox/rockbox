@@ -99,13 +99,12 @@ static bool file_properties(char* selected_file)
                 log = human_size_log((unsigned long)info.size);
                 rb->snprintf(str_size, sizeof str_size, "%lu %cB",
                              ((unsigned long)info.size) >> (log*10), human_size_prefix[log]);
+                struct tm tm;
+                rb->gmtime_r(&info.mtime, &tm);
                 rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
-                    ((info.wrtdate >> 9 ) & 0x7F) + 1980, /* year    */
-                    ((info.wrtdate >> 5 ) & 0x0F),        /* month   */
-                    ((info.wrtdate      ) & 0x1F));       /* day     */
-                rb->snprintf(str_time, sizeof str_time, "%02d:%02d",
-                    ((info.wrttime >> 11) & 0x1F),        /* hour    */
-                    ((info.wrttime >> 5 ) & 0x3F));       /* minutes */
+                    tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+                rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d",
+                    tm.tm_hour, tm.tm_min, tm.tm_sec);
 
                 num_properties = 5;
 
@@ -175,7 +174,10 @@ static bool _dir_properties(DPS* dps)
     dirlen = rb->strlen(dps->dirname);
     dir = rb->opendir(dps->dirname);
     if (!dir)
+    {
+        rb->splashf(HZ*2, "%s", dps->dirname);
         return false; /* open error */
+    }
 
     /* walk through the directory content */
     while(result && (0 != (entry = rb->readdir(dir))))

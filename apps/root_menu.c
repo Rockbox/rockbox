@@ -146,11 +146,10 @@ static int browser(void* param)
                 int i;
                 for (i = 0; i < NUM_VOLUMES; i++)
                 {
-                    char vol_string[VOL_ENUM_POS + 8];
+                    char vol_string[VOL_MAX_LEN + 1];
                     if (!volume_removable(i))
                         continue;
-                    /* VOL_NAMES contains a %d */
-                    snprintf(vol_string, sizeof(vol_string), "/"VOL_NAMES, i);
+                    get_volume_name(i, vol_string);
                     /* test whether we would browse the external card */
                     if (!volume_present(i) &&
                             (strstr(last_folder, vol_string)

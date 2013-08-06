@@ -35,6 +35,7 @@
 #include "rb-loader.h"
 #include "loader_strerror.h"
 #include "storage.h"
+#include "file_internal.h"
 #include "disk.h"
 #include "panic.h"
 #include "power.h"
@@ -171,7 +172,7 @@ void main(uint32_t arg, uint32_t addr)
     if(ret < 0)
         error(EATA, ret, true);
 
-    disk_init_subsystem();
+    filesystem_init();
 
     /* NOTE: disk_mount_all to fail since we can do USB after.
      * We need this order to determine the correct logical sector size */

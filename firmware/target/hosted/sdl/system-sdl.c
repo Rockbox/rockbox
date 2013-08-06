@@ -51,6 +51,8 @@
 
 #endif
 
+#define SIMULATOR_DEFAULT_ROOT "simdisk"
+
 SDL_Surface    *gui_surface;
 
 bool            background = true;          /* use backgrounds by default */
@@ -63,7 +65,7 @@ bool            debug_buttons = false;
 bool            lcd_display_redraw = true;  /* Used for player simulator */
 char            having_new_lcd = true;      /* Used for player simulator */
 bool            sim_alarm_wakeup = false;
-const char     *sim_root_dir = NULL;
+const char     *sim_root_dir = SIMULATOR_DEFAULT_ROOT;
 
 static SDL_Thread *evt_thread = NULL;
 

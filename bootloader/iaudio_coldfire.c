@@ -196,7 +196,7 @@ void main(void)
     if(rc)
         error(EATA, rc, true);
 
-    disk_init();
+    filesystem_init();
 
     rc = disk_mount_all();
     if (rc<=0)

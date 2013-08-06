@@ -128,7 +128,7 @@ struct codec_api ci = {
     logf,
 #endif
 
-    (qsort_func)qsort,
+    (void *)qsort,
 
 #ifdef RB_PROFILE
     profile_thread,

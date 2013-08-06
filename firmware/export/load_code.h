@@ -45,7 +45,17 @@ static inline void lc_close(void *handle) { (void)handle; }
 
 #elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
 
+#ifdef APPLICATION
+/* App doesn't simulate code loading from a buffer */
+static inline void * lc_open_from_mem(void *addr, size_t blob_size)
+{
+    return NULL;
+    (void)addr; (void)blob_size;
+}
+#else
 extern void *lc_open_from_mem(void* addr, size_t blob_size);
+#endif
+
 extern void *lc_get_header(void *handle);
 extern void  lc_close(void *handle);
 

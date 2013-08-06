@@ -86,7 +86,7 @@
 #include "screens.h"
 #include "core_alloc.h"
 #include "misc.h"
-#include "filefuncs.h"
+#include "pathfuncs.h"
 #include "button.h"
 #include "filetree.h"
 #include "abrepeat.h"
@@ -106,6 +106,8 @@
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
 #include "panic.h"
 #include "logdiskf.h"
+
+#undef HAVE_DIRCACHE
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
@@ -180,8 +182,8 @@ static int get_next_directory(char *dir);
 static int get_next_dir(char *dir, bool is_forward);
 static int get_previous_directory(char *dir);
 static int check_subdir_for_music(char *dir, const char *subdir, bool recurse);
-static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             const char *dir);
+static ssize_t format_track_path(char *dest, char *src, int buf_length,
+                                 const char *dir);
 static void display_playlist_count(int count, const unsigned char *fmt,
                                    bool final);
 static void display_buffer_full(void);
@@ -526,7 +528,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     int result = 0;
     /* get emergency buffer so we don't fail horribly */
     if (!buflen)
-        buffer = __builtin_alloca((buflen = 64));
+        buffer = alloca((buflen = 64));
 
     if(-1 == playlist->fd)
         playlist->fd = open_utf8(playlist->filename, O_RDONLY);
@@ -1429,7 +1431,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
 
     strlcpy(dir_buf, playlist->filename, playlist->dirlen);
 
-    return (format_track_path(buf, tmp_buf, buf_length, max, dir_buf));
+    return format_track_path(buf, tmp_buf, buf_length, dir_buf);
 }
 
 static int get_next_directory(char *dir){
@@ -1629,7 +1631,7 @@ static int get_next_dir(char *dir, bool is_forward)
 static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
 {
     int result = -1;
-    int dirlen = strlen(dir);
+    size_t dirlen = strlen(dir);
     int num_files = 0;
     int i;
     struct entry *files;
@@ -1637,12 +1639,11 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
     bool has_subdir = false;
     struct tree_context* tc = tree_get_context();
 
-    snprintf(
-        dir + dirlen, MAX_PATH - dirlen,
-        /* only add a trailing slash if we need one */
-        dirlen && dir[dirlen - 1] == '/' ? "%s" : "/%s",
-        subdir
-    );
+    if (path_append(dir + dirlen, PA_SEP_HARD, subdir, MAX_PATH - dirlen) >=
+            MAX_PATH - dirlen)
+    {
+        return 0;
+    }
     
     if (ft_load(tc, dir) < 0)
     {
@@ -1695,7 +1696,7 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
         }
         else
         {
-            strcpy(dir, "/");
+            strcpy(dir, PATH_ROOTSTR);
         }
 
         /* we now need to reload our current directory */
@@ -1708,79 +1709,31 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
 /*
  * Returns absolute path of track
  */
-static int format_track_path(char *dest, char *src, int buf_length, int max,
-                             const char *dir)
+static ssize_t format_track_path(char *dest, char *src, int buf_length,
+                                 const char *dir)
 {
-    int i = 0;
-    int j;
-    char *temp_ptr;
+    size_t len;
 
-    /* Look for the end of the string */
-    while((i < max) &&
-          (src[i] != '\n') &&
-          (src[i] != '\r') &&
-          (src[i] != '\0'))
-        i++;
-
-    /* Now work back killing white space */
-    while((i > 0) &&
-          ((src[i-1] == ' ') ||
-          (src[i-1] == '\t')))
-        i--;
-
-    /* Zero-terminate the file name */
-    src[i]=0;
+    /* strip whitespace at beginning and end */
+    len = path_trim_whitespace(src, (const char **)&src);
+    src[len] = '\0';
 
     /* replace backslashes with forward slashes */
-    for ( j=0; j<i; j++ )
-        if ( src[j] == '\\' )
-            src[j] = '/';
+    path_correct_separators(src, src);
 
-    if('/' == src[0])
-    {
-        strlcpy(dest, src, buf_length);
-    }
-    else
-    {
-        /* handle dos style drive letter */
-        if (':' == src[1])
-            strlcpy(dest, &src[2], buf_length);
-        else if (!strncmp(src, "../", 3))
-        {
-            /* handle relative paths */
-            i=3;
-            while(!strncmp(&src[i], "../", 3))
-                i += 3;
-            for (j=0; j<i/3; j++) {
-                temp_ptr = strrchr(dir, '/');
-                if (temp_ptr)
-                    *temp_ptr = '\0';
-                else
-                    break;
-            }
-            snprintf(dest, buf_length, "%s/%s", dir, &src[i]);
-        }
-        else if ( '.' == src[0] && '/' == src[1] ) {
-            snprintf(dest, buf_length, "%s/%s", dir, &src[2]);
-        }
-        else {
-            snprintf(dest, buf_length, "%s/%s", dir, src);
-        }
-    }
-#ifdef HAVE_MULTIVOLUME 
+    /* handle DOS style drive letter and parse non-greedily so that:
+     * 1) "c:/foo" becomes "/foo" and the result is absolute
+     * 2) "c:foo becomes "foo" and the result is relative
+     * This is how Windows seems to handle it except drive letters are of no
+     * meaning here. */
+    path_strip_drive(src, (const char **)&src, false);
 
-    char vol_string[VOL_ENUM_POS + 8];
-    snprintf(vol_string, sizeof(vol_string), "/"VOL_NAMES, 1);
+    /* prepends directory only if src is relative */
+    len = path_append(dest, *dir ? dir : PATH_ROOTSTR, src, buf_length);
+    if (len >= (size_t)buf_length)
+        return -1; /* buffer too small */
 
-    /*check if the playlist is on a external card, and correct path if needed */
-    if(strstr(dir, vol_string) && (strstr(dest, vol_string) == NULL)){
-        char temp[buf_length];
-        strlcpy(temp, dest, buf_length);
-        snprintf(dest, buf_length, "%s%s", vol_string, temp);
-    }
-#endif
-
-    return 0;
+    return len;
 }
 
 /*
@@ -3113,8 +3066,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 {
     int fd;
     int max;
-    char *temp_ptr;
-    const char *dir;
+    char *dir;
     unsigned char *count_str;
     char temp_buf[MAX_PATH+1];
     char trackname[MAX_PATH+1];
@@ -3139,13 +3091,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     }
 
     /* we need the directory name for formatting purposes */
-    dir = filename;
-
-    temp_ptr = strrchr(filename+1,'/');
-    if (temp_ptr)
-        *temp_ptr = 0;
-    else
-        dir = "/";
+    size_t dirlen = path_dirname(filename, (const char **)&dir);
+    dir = strmemdupa(dir, dirlen);
 
     if (queue)
         count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
@@ -3183,8 +3130,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
             /* we need to format so that relative paths are correctly
                handled */
-            if (format_track_path(trackname, temp_buf, sizeof(trackname), max,
-                    dir) < 0)
+            if (format_track_path(trackname, temp_buf, sizeof(trackname),
+                                  dir) < 0)
             {
                 result = -1;
                 break;
@@ -3222,9 +3169,6 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     }
 
     close(fd);
-
-    if (temp_ptr)
-        *temp_ptr = '/';
 
     sync_control(playlist, false);
 
@@ -3537,9 +3481,9 @@ int playlist_save(struct playlist_info* playlist, char *filename,
     char path[MAX_PATH+1];
     char tmp_buf[MAX_PATH+1];
     int result = 0;
-    bool overwrite_current = false;
     int *seek_buf;
     bool reparse;
+    ssize_t pathlen;
 
     ALIGN_BUFFER(temp_buffer, temp_buffer_size, sizeof(int));
     seek_buf = temp_buffer;
@@ -3557,21 +3501,17 @@ int playlist_save(struct playlist_info* playlist, char *filename,
         return -1;
 
     /* use current working directory as base for pathname */
-    if (format_track_path(path, filename, sizeof(tmp_buf),
-                          strlen(filename)+1, "/") < 0)
+    pathlen = format_track_path(path, filename, sizeof(path), PATH_ROOTSTR);
+    if (pathlen < 0)
+        return -1;
+
+    /* Use temporary pathname and overwrite/rename later */
+    if (strlcat(path, "_temp", sizeof(path)) >= sizeof (path))
         return -1;
 
     /* can ignore volatile here, because core_get_data() is called later */
     char* old_buffer = (char*)playlist->buffer;
     size_t old_buffer_size = playlist->buffer_size;
-
-    if (!strncmp(playlist->filename, path, strlen(path)))
-    {
-        /* Attempting to overwrite current playlist file.
-         * use temporary pathname and overwrite later */
-        strlcat(path, "_temp", sizeof(path));
-        overwrite_current = true;
-    }
 
     if (is_m3u8(path))
     {
@@ -3621,8 +3561,8 @@ int playlist_save(struct playlist_info* playlist, char *filename,
                 break;
             }
 
-            if (overwrite_current && !reparse)
-                seek_buf[count] = lseek(fd, 0, SEEK_CUR);
+            if (!reparse)
+                seek_buf[count] = filesize(fd);
 
             if (fdprintf(fd, "%s\n", tmp_buf) < 0)
             {
@@ -3647,56 +3587,60 @@ int playlist_save(struct playlist_info* playlist, char *filename,
         index = (index+1)%playlist->amount;
     }
 
+    close(fd);
+    fd = -1;
+
     display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), true);
 
-    close(fd);
-
-    if (overwrite_current && result >= 0)
+    if (result >= 0)
     {
-        result = -1;
+        strmemcpy(tmp_buf, path, pathlen); /* remove "_temp" */
 
         mutex_lock(playlist->control_mutex);
 
-        /* Replace the current playlist with the new one and update indices */
-        close(playlist->fd);
-        playlist->fd = -1;
-        if (remove(playlist->filename) >= 0)
+        if (!rename(path, tmp_buf))
         {
-            if (rename(path, playlist->filename) >= 0)
+            fd = open_utf8(tmp_buf, O_RDONLY);
+            if (fsamefile(fd, playlist->fd) > 0)
             {
-                playlist->fd = open_utf8(playlist->filename, O_RDONLY);
-                if (playlist->fd >= 0)
+                /* Replace the current playlist with the new one and update
+                   indices */
+                close(playlist->fd);
+                playlist->fd = fd;
+                fd = -1;
+
+                if (!reparse)
                 {
-                    if (!reparse)
+                    index = playlist->first_index;
+                    for (i=0, count=0; i<playlist->amount; i++)
                     {
-                        index = playlist->first_index;
-                        for (i=0, count=0; i<playlist->amount; i++)
+                        if (!(playlist->indices[index] & PLAYLIST_QUEUE_MASK))
                         {
-                            if (!(playlist->indices[index] & PLAYLIST_QUEUE_MASK))
-                            {
-                                playlist->indices[index] = seek_buf[count];
-                                count++;
-                            }
-                            index = (index+1)%playlist->amount;
+                            playlist->indices[index] = seek_buf[count];
+                            count++;
                         }
+                        index = (index+1)%playlist->amount;
                     }
-                    else
-                    {
-                        NOTEF("reparsing current playlist (slow)");
-                        playlist->amount = 0;
-                        add_indices_to_playlist(playlist, temp_buffer, temp_buffer_size);
-                    }
-                    /* we need to recreate control because inserted tracks are
-                       now part of the playlist and shuffle has been
-                       invalidated */
-                    result = recreate_control(playlist);
                 }
+                else
+                {
+                    NOTEF("reparsing current playlist (slow)");
+                    playlist->amount = 0;
+                    add_indices_to_playlist(playlist, temp_buffer,
+                                            temp_buffer_size);
+                }
+
+                /* we need to recreate control because inserted tracks are
+                   now part of the playlist and shuffle has been invalidated */
+                result = recreate_control(playlist);
             }
-       }
+        }
 
-       mutex_unlock(playlist->control_mutex);
-
+        mutex_unlock(playlist->control_mutex);
     }
+
+    if (fd >= 0)
+        close(fd);
 
     cpu_boost(false);
 
@@ -3759,8 +3703,12 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
             if (recurse)
             {
                 /* recursively add directories */
-                snprintf(buf, sizeof(buf), "%s/%s",
-                            dirname[1]? dirname: "", files[i].name);
+                if (path_append(buf, dirname, files[i].name, sizeof(buf))
+                        >= sizeof(buf))
+                {
+                    continue;
+                }
+
                 result = playlist_directory_tracksearch(buf, recurse,
                     callback, context);
                 if (result < 0)
@@ -3785,8 +3733,11 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
         }
         else if ((files[i].attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO)
         {
-            snprintf(buf, sizeof(buf), "%s/%s",
-                        dirname[1]? dirname: "", files[i].name);
+            if (path_append(buf, dirname, files[i].name, sizeof(buf))
+                    >= sizeof(buf))
+            {
+                continue;
+            }
 
             if (callback(buf, context) != 0)
             {

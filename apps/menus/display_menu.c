@@ -43,6 +43,7 @@
 #endif
 #include "viewport.h"
 #include "statusbar.h" /* statusbar_vals enum*/
+#include "rbunicode.h"
 
 #ifdef HAVE_BACKLIGHT
 static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
@@ -524,8 +525,25 @@ MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, 
             &touchscreen_menu_calibrate, &touchscreen_menu_reset_calibration);
 #endif
 
+static int codepage_callback(int action, const struct menu_item_ex *this_item)
+{
+    static int old_codepage;
+    int new_codepage = global_settings.default_codepage;
+    (void)this_item;
+    switch (action)
+    {
+        case ACTION_ENTER_MENUITEM:
+            old_codepage = new_codepage;
+            break;
+        case ACTION_EXIT_MENUITEM:
+            if (new_codepage != old_codepage)
+                set_codepage(new_codepage);
+            break;
+    }
+    return action;
+}
 
-MENUITEM_SETTING(codepage_setting, &global_settings.default_codepage, NULL);
+MENUITEM_SETTING(codepage_setting, &global_settings.default_codepage, codepage_callback);
 
 
 MAKE_MENU(display_menu, ID2P(LANG_DISPLAY),

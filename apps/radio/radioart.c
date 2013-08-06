@@ -31,7 +31,7 @@
 #include "file.h"
 #include "kernel.h"
 #include "string-extra.h"
-#include "filefuncs.h"
+#include "pathfuncs.h"
 #include "core_alloc.h"
 
 #define MAX_RADIOART_IMAGES 10

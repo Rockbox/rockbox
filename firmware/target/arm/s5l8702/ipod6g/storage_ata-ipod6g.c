@@ -32,7 +32,7 @@
 #include "s5l8702.h"
 #include "led.h"
 #include "ata_idle_notify.h"
-#include "fat.h"
+#include "disk_cache.h"
 #include "splash.h"
 
 
@@ -68,6 +68,7 @@ static struct semaphore mmc_wakeup;
 static struct semaphore mmc_comp_wakeup;
 static int spinup_time = 0;
 static int dma_mode = 0;
+static char aligned_buffer[SECTOR_SIZE] __attribute__((aligned(0x10)));
 
 
 #ifdef ATA_HAVE_BBT
@@ -857,8 +858,25 @@ int ata_bbt_translate(uint64_t sector, uint32_t count, uint64_t* phys, uint32_t*
 static int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool write)
 {
     if (((uint32_t)buffer) & 0xf)
-        panicf("ATA: Misaligned data buffer at %08X (sector %lu, count %lu)",
-               (unsigned int)buffer, (long unsigned int)sector,  (long unsigned int)count);
+    {
+        while (count)
+        {
+            if (write)
+                memcpy(aligned_buffer, buffer, SECTOR_SIZE);
+
+            PASS_RC(ata_rw_sectors(sector, 1, aligned_buffer, write), 0, 0);
+
+            if (!write)
+                memcpy(buffer, aligned_buffer, SECTOR_SIZE);
+
+            buffer += SECTOR_SIZE;
+            sector++;
+            count--;
+        }
+
+        return 0;
+    }
+
 #ifdef ATA_HAVE_BBT
     if (sector + count > ata_virtual_sectors) RET_ERR(0);
     if (ata_bbt)
@@ -1117,14 +1135,13 @@ int ata_init(void)
          -- Michael Sparmann (theseven), 2011-10-22 */
     if (!ceata)
     {
-        unsigned char* sector = fat_get_sector_buffer();
+        unsigned char* sector = aligned_buffer;
         ata_rw_sectors(0, 1, sector, false);
         if (sector[510] == 0xaa && sector[511] == 0x55)
         {
             ata_swap = true;
             splashf(5000, "Wrong HDD endianness, please update your emCORE version!");
         }
-        fat_release_sector_buffer();
     }
     
     create_thread(ata_thread, ata_stack,

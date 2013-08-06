@@ -376,9 +376,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         ++files_in_dir;
 
         dptr->name = core_get_data(c->cache.name_buffer_handle)+name_buffer_used;
-        dptr->time_write =
-            (long)info.wrtdate<<16 |
-            (long)info.wrttime; /* in one # */
+        dptr->time_write = info.mtime;
         strcpy(dptr->name, (char *)entry->d_name);
         name_buffer_used += len + 1;
 

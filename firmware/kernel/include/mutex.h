@@ -31,21 +31,12 @@ struct mutex
     struct blocker      blocker;   /* priority inheritance info
                                       for waiters and owner*/
     IF_COP( struct corelock cl; )  /* multiprocessor sync */
-#ifdef HAVE_PRIORITY_SCHEDULING
-    bool                no_preempt;
-#endif
 };
 
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);
 extern void mutex_unlock(struct mutex *m);
-#ifdef HAVE_PRIORITY_SCHEDULING
-/* Deprecated temporary function to disable mutex preempting a thread on
- * unlock - firmware/drivers/fat.c and a couple places in apps/buffering.c -
- * reliance on it is a bug! */
-static inline void mutex_set_preempt(struct mutex *m, bool preempt)
-    { m->no_preempt = !preempt; }
-#else
+#ifndef HAVE_PRIORITY_SCHEDULING
 /* Deprecated but needed for now - firmware/drivers/ata_mmc.c */
 static inline bool mutex_test(const struct mutex *m)
     { return m->blocker.thread != NULL; }

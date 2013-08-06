@@ -449,21 +449,12 @@ static void sd_thread(void)
         {
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:
-        {
-            int microsd_init = 1;
-            fat_lock();          /* lock-out FAT activity first -
-                                    prevent deadlocking via disk_mount that
-                                    would cause a reverse-order attempt with
-                                    another thread */
-            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
-                                    into driver that bypass the fat cache */
+        case SYS_HOTSWAP_EXTRACTED:;
+            int success = 1;
 
-            /* We now have exclusive control of fat cache and ata */
+            disk_unmount(SD_SLOT_AS3525); /* release "by force" */
 
-            disk_unmount(SD_SLOT_AS3525);     /* release "by force", ensure file
-                                    descriptors aren't leaked and any busy
-                                    ones are invalid if mounting */
+            mutex_lock(&sd_mtx); /* lock-out card activity */
 
             /* Force card init for new card, re-init for re-inserted one or
              * clear if the last attempt to init failed with an error. */
@@ -471,29 +462,32 @@ static void sd_thread(void)
 
             if (ev.id == SYS_HOTSWAP_INSERTED)
             {
+                success = 0;
                 sd_enable(true);
                 init_pl180_controller(SD_SLOT_AS3525);
-                microsd_init = sd_init_card(SD_SLOT_AS3525);
-                if (microsd_init < 0) /* initialisation failed */
-                    panicf("microSD init failed : %d", microsd_init);
-
-                microsd_init = disk_mount(SD_SLOT_AS3525); /* 0 if fail */
+                int rc = sd_init_card(SD_SLOT_AS3525);
+                sd_enable(false);
+                if (rc >= 0)
+                    success = 2;
+                else /* initialisation failed */
+                    panicf("microSD init failed : %d", rc);
             }
+
+            mutex_unlock(&sd_mtx);
+
+            if (success > 1)
+                success = disk_mount(SD_SLOT_AS3525); /* 0 if fail */
 
             /*
              * Mount succeeded, or this was an EXTRACTED event,
              * in both cases notify the system about the changed filesystems
              */
-            if (microsd_init)  
+            if (success)
                 queue_broadcast(SYS_FS_CHANGED, 0);
 
-            /* Access is now safe */
-            mutex_unlock(&sd_mtx);
-            fat_unlock();
-            sd_enable(false);
-        }
             break;
-#endif
+#endif /* HAVE_HOTSWAP */
+
         case SYS_TIMEOUT:
             if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
             {

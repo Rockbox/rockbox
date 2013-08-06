@@ -766,14 +766,7 @@ static void sdmmc_thread(void)
         case SYS_HOTSWAP_INSERTED:
         case SYS_HOTSWAP_EXTRACTED:
         {
-            int microsd_init = 1;
-             /* lock-out FAT activity first -
-              * prevent deadlocking via disk_mount that
-              * would cause a reverse-order attempt with
-              * another thread */
-#ifdef HAVE_HOTSWAP
-            fat_lock();
-#endif
+            int microsd_init = ev.id == SYS_HOTSWAP_INSERTED ? 0 : 1;
 
             /* We now have exclusive control of fat cache and sd.
              * Release "by force", ensure file
@@ -785,35 +778,37 @@ static void sdmmc_thread(void)
                 /* Skip non-removable drivers */
                 if(!sdmmc_removable(drive))
                     continue;
-                /* lock-out card activity - direct calls
-                 * into driver that bypass the fat cache */
-                mutex_lock(&mutex[drive]);
+
                 disk_unmount(sd_first_drive + sd_drive);
+
+                mutex_lock(&mutex[drive]); /* lock-out card activity */
+
                 /* Force card init for new card, re-init for re-inserted one or
                  * clear if the last attempt to init failed with an error. */
                 SDMMC_INFO(sd_map[sd_drive]).initialized = 0;
 
+                int rc = -1;
                 if(ev.id == SYS_HOTSWAP_INSERTED)
                 {
-                    microsd_init = init_drive(drive);
-                    if(microsd_init < 0) /* initialisation failed */
-                        panicf("%s init failed : %d", SDMMC_CONF(sd_map[sd_drive]).name, microsd_init);
-
-                    microsd_init = disk_mount(sd_first_drive + sd_drive); /* 0 if fail */
+                    rc = init_drive(drive);
+                    if(rc < 0) /* initialisation failed */
+                        panicf("%s init failed : %d", SDMMC_CONF(sd_map[sd_drive]).name, rc);
                 }
-                /*
-                * Mount succeeded, or this was an EXTRACTED event,
-                * in both cases notify the system about the changed filesystems
-                */
-                if(microsd_init)
-                    queue_broadcast(SYS_FS_CHANGED, 0);
+
                 /* unlock card */
                 mutex_unlock(&mutex[drive]);
+
+                if (rc >= 0)
+                    microsd_init += disk_mount(sd_first_drive + sd_drive); /* 0 if fail */
             }
             /* Access is now safe */
-#ifdef HAVE_HOTSWAP
-            fat_unlock();
-#endif
+           /*
+            * One or more mounts succeeded, or this was an EXTRACTED event,
+            * in both cases notify the system about the changed filesystems
+            */
+            if(microsd_init)
+                queue_broadcast(SYS_FS_CHANGED, 0);
+
             break;
         }
 #endif

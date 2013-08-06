@@ -51,7 +51,8 @@ enum codepages {
     KSX_1001,       /* Korean */
     BIG_5,          /* Trad. Chinese */
     UTF_8,          /* Unicode */
-    NUM_CODEPAGES
+    NUM_CODEPAGES,
+    INIT_CODEPAGE = ISO_8859_1,
 };
 
 #else /* !HAVE_LCD_BITMAP, reduced support */
@@ -65,7 +66,8 @@ enum codepages {
     WIN_1250,       /* Central European */
     WIN_1252,       /* Western European */
     UTF_8,          /* Unicode */
-    NUM_CODEPAGES
+    NUM_CODEPAGES,
+    INIT_CODEPAGE = ISO_8859_1,
 };
 
 #endif
@@ -78,9 +80,19 @@ unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, in
 unsigned long utf8length(const unsigned char *utf8);
 const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs);
 void set_codepage(int cp);
+int get_codepage(void);
 int utf8seek(const unsigned char* utf8, int offset);
 const char* get_codepage_name(int cp);
-#if defined(APPLICATION) && defined(__linux__)
+#ifdef APPLICATION
+#if defined(__linux__)
 const char *get_current_codepage_name_linux(void);
 #endif
+#endif /* APPLICATION */
+
+#if 0 /* not needed just now */
+void unicode_init(void);
+#else
+#define unicode_init() do {} while (0)
+#endif
+
 #endif /* _RBUNICODE_H_ */
