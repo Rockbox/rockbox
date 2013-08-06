@@ -197,7 +197,7 @@
 
 #define SECTOR_SIZE 4096
 
-#define STORAGE_NEEDS_ALIGN
+#define STORAGE_WANTS_ALIGN
 
 /* define this if the device has larger sectors when accessed via USB */
 /* (only relevant in disk.c, fat.c now always supports large virtual sectors) */

@@ -36,9 +36,52 @@
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
+#ifndef O_NOISODECODE
+#define O_NOISODECODE 0
+#endif
+
+#define getle16(p) (p[0] | (p[1] >> 8))
+#define getbe16(p) ((p[1] << 8) | p[0])
 
 static int default_codepage = 0;
 static int loaded_cp_table = 0;
+static int cp_table_refcount = 0;
+
+#ifndef APPLICATION
+/* This needs special handling for the sake of filesystem driver code to
+   prevent infinite recursion into the codepage loading function and
+   deadlocking since codepages are loaded on demand.
+
+   FAT uses iso_decode when encountering short names during dir scanning
+   and the codepage file may have to be loaded to service the request.
+   Loading the file, of course, uses directory scanning to find it, which
+   may have to do conversions to UTF-8, leading to another request to
+   load the codepage file; ad infinitum.
+   */
+#include "dir.h"
+#include "fileobj_mgr.h"
+#define cp_lock_enter() file_internal_aux_lock()
+#define cp_lock_leave() file_internal_aux_unlock()
+#else /* APPLICATION */
+static struct mutex cp_mutex SHAREDBSS_ATTR;
+#define cp_lock_enter() mutex_lock(&cp_mutex)
+#define cp_lock_leave() mutex_unlock(&cp_mutex)
+static ssize_t file_open_read_and_close_internal(
+    const char *path, int oflag, void *buf, size_t nbyte, off_t offset)
+{
+    ssize_t bytesread = -1;
+
+    int fd = open(pathname, flags);
+
+    if (fd >= 0) {
+        bytesread = read(fd, buf, count);
+        close(fd);
+    }
+
+    return bytesread;
+    (void)offset;
+}
+#endif /* !APPLICATION */
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -145,44 +188,28 @@ static const unsigned char utf8comp[6] =
 };
 
 /* Load codepage file into memory */
-static int load_cp_table(int cp)
+static bool load_cp_table(int table)
 {
-    int i = 0;
-    int table = cp_2_table[cp];
-    int file, tablesize;
-    unsigned char tmp[2];
-
-    if (table == 0 || table == loaded_cp_table)
-        return 1;
-
-    file = open(filename[table-1], O_RDONLY|O_BINARY);
-
-    if (file < 0) {
-        DEBUGF("Can't open codepage file: %s.cp\n", filename[table-1]);
-        return 0;
+    bool retval = false;
+    ssize_t filesize = file_open_read_and_close_internal(
+                            filename[table - 1],
+                            O_RDONLY|O_BINARY|O_NOISODECODE,
+                            codepage_table, MAX_CP_TABLE_SIZE, 0);
+    if (filesize < 0) {
+        DEBUGF("Can't open or read codepage file (%d): %s.cp\n",
+               (int)filesize, filename[table - 1]);
+    } else if (filesize > 2 && filesize <= MAX_CP_TABLE_SIZE*2) {
+#ifdef ROCKBOX_BIG_ENDIAN
+        for (int i = 0; i < filesize / 2; i++)
+            codepage_table[i] = letoh16(codepage_table[i]);
+#endif /* ROCKBOX_BIG_ENDIAN */
+        loaded_cp_table = table;
+        retval = true;
+    } else {
+        loaded_cp_table = 0;
     }
 
-    tablesize = filesize(file) / 2;
-
-    if (tablesize > MAX_CP_TABLE_SIZE) {
-        DEBUGF("Invalid codepage file: %s.cp\n", filename[table-1]);
-        close(file);
-        return 0;
-    }
-
-    while (i < tablesize) {
-        if (!read(file, tmp, 2)) {
-            DEBUGF("Can't read from codepage file: %s.cp\n", 
-                    filename[table-1]);
-            loaded_cp_table = 0;
-            return 0;
-        }
-        codepage_table[i++] = (tmp[1] << 8) | tmp[0];
-    }
-
-    loaded_cp_table = table;
-    close(file);
-    return 1;
+    return retval;
 }
 
 /* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */
@@ -205,14 +232,37 @@ unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8)
 unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
                           int cp, int count)
 {
-    unsigned short ucs, tmp;
-
-    if (cp == -1) /* use default codepage */
+    if (cp < 0 || cp >= NUM_CODEPAGES)
         cp = default_codepage;
 
-    if (!load_cp_table(cp)) cp = 0;
+    int table = cp_2_table[cp];
+    bool cp_lock = table != 0;
+
+    if (cp_lock) {
+        cp_lock_enter();
+
+        while (table != loaded_cp_table) {
+            if (cp_table_refcount > 0) {
+                cp_lock_leave();
+                yield();
+                cp_lock_enter();
+            } else {
+                cp_lock = load_cp_table(table);
+                if (!cp_lock)
+                    cp = 0;
+                break;
+            }
+        }
+
+        if (cp_lock)
+            cp_table_refcount++;
+
+        cp_lock_leave();
+    }
 
     while (count--) {
+        unsigned short ucs, tmp;
+
         if (*iso < 128 || cp == UTF_8) /* Already UTF-8 */
             *utf8++ = *iso++;
 
@@ -271,6 +321,13 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
             utf8 = utf8encode(ucs, utf8);
         }
     }
+
+    if (cp_lock) {
+        cp_lock_enter();
+        cp_table_refcount--;
+        cp_lock_leave();
+    }
+
     return utf8;
 }
 
@@ -288,7 +345,7 @@ unsigned char* utf16LEdecode(const unsigned char *utf16, unsigned char *utf8,
             utf16 += 4;
             count -= 2;
         } else {
-            ucs = (utf16[0] | (utf16[1] << 8));
+            ucs = getle16(utf16);
             utf16 += 2;
             count -= 1;
         }
@@ -310,7 +367,7 @@ unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8,
             utf16 += 4;
             count -= 2;
         } else {
-            ucs = (utf16[0] << 8) | utf16[1];
+            ucs = getbe16(utf16);
             utf16 += 2;
             count -= 1;
         }
@@ -400,8 +457,15 @@ const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
 
 void set_codepage(int cp)
 {
+    if (cp < 0 || cp >= NUM_CODEPAGES)
+        cp = 0;
+
     default_codepage = cp;
-    return;
+}
+
+int get_codepage(void)
+{
+    return default_codepage;
 }
 
 /* seek to a given char in a utf8 string and
@@ -424,3 +488,10 @@ const char* get_codepage_name(int cp)
         return name_codepages[NUM_CODEPAGES];
     return name_codepages[cp];
 }
+
+#if !(CONFIG_PLATFORM & PLATFORM_NATIVE)
+void unicode_init(void)
+{
+    mutex_init(&cp_mutex);
+}
+#endif

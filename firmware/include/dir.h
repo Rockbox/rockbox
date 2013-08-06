@@ -18,46 +18,64 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef _DIR_H_
 #define _DIR_H_
 
 #include "config.h"
+#include <sys/types.h>
+#include "fs_attr.h"
 
-#define ATTR_READ_ONLY   0x01
-#define ATTR_HIDDEN      0x02
-#define ATTR_SYSTEM      0x04
-#define ATTR_VOLUME_ID   0x08
-#define ATTR_DIRECTORY   0x10
-#define ATTR_ARCHIVE     0x20
-#define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
-#define ATTR_LINK        0x80
-
-#ifdef HAVE_DIRCACHE
-# include "dircache.h"
-# define DIR DIR_CACHED
-# define dirent dirent_cached
-# define opendir opendir_cached
-# define closedir closedir_cached
-# define readdir readdir_cached
-# define closedir closedir_cached
-# define mkdir mkdir_cached
-# define rmdir rmdir_cached
-#else
-# include "dir_uncached.h"
-# define DIR DIR_UNCACHED
-# define dirent dirent_uncached
-# define opendir opendir_uncached
-# define closedir closedir_uncached
-# define readdir readdir_uncached
-# define closedir closedir_uncached
-# define mkdir mkdir_uncached
-# define rmdir rmdir_uncached
+#ifndef DIRFUNCTIONS_DEFINED
+#if defined (SIMULATOR) || defined (__PCTOOL__)
+#   define dirent       sim_dirent
+#   define opendir      sim_opendir
+#   define readdir      sim_readdir
+#   define closedir     sim_closedir
+#   define mkdir        sim_mkdir
+#   define rmdir        sim_rmdir
+#elif defined (APPLICATION)
+#   define DIRENT_DEFINED
+#   include "rbpaths.h"
+#   define opendir      app_opendir
+#   define readdir      app_readdir
+#   define closedir     app_closedir
+#   define mkdir        app_mkdir
+#   define rmdir        app_rmdir
 #endif
 
+#endif /* DIRFUNCTIONS_DEFINED */
 
-typedef DIR* (*opendir_func)(const char* name);
-typedef int (*closedir_func)(DIR* dir);
-typedef struct dirent* (*readdir_func)(DIR* dir);
+#ifndef DIR_DEFINED
+typedef struct {} DIR;
+#endif /* DIR_DEFINED */
 
+struct dirinfo
+{
+    int            attribute;
+    off_t          size;
+    unsigned short wrtdate;
+    unsigned short wrttime;
+};
+
+#ifndef DIRENT_DEFINED
+struct dirent
+{
+    unsigned char d_name[MAX_PATH]; /* UTF-8 */
+    struct dirinfo info;
+};
+#endif /* DIRENT_DEFINED */
+
+#ifndef DIRFUNCIONS_DEFINED
+DIR * opendir(const char *dirname);
+int closedir(DIR *dirp);
+struct dirent * readdir(DIR *dirp);
+#if 0 /* not included right now but probably should be */
+int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result);
+void rewinddir(DIR *dirp);
 #endif
+int samedir(DIR *dirp1, DIR *dirp2);
+int mkdir(const char *path);
+int rmdir(const char *path);
+#endif /* DIRFUNCTIONS_DEFINED */
+
+#endif /* _DIR_H_ */

@@ -42,6 +42,7 @@
 #include "diacritic.h"
 #include "filefuncs.h"
 #include "load_code.h"
+#include "file.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -95,15 +96,6 @@ static int app_ftruncate(int fd, off_t length)
 }
 #endif
 
-#if defined(HAVE_PLUGIN_CHECK_OPEN_CLOSE) && (MAX_OPEN_FILES>32)
-#warning "MAX_OPEN_FILES>32, disabling plugin file open/close checking"
-#undef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-#endif
-
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-static unsigned int open_files;
-#endif
-
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 static unsigned char pluginbuf[PLUGIN_BUFFER_SIZE];
 void sim_lcd_ex_init(unsigned long (*getpixel)(int, int));
@@ -132,6 +124,70 @@ static int creat_wrapper(const char *pathname, mode_t mode);
 static void* plugin_get_audio_buffer(size_t *buffer_size);
 static void plugin_release_audio_buffer(void);
 static void plugin_tsr(bool (*exit_callback)(bool));
+
+
+#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
+#include "bitarray.h"
+#include "file_internal.h"
+
+BITARRAY_TYPE_DECLARE(plugin_check_open_close_bitmap_t, open_files_bitmap,
+                      MAX_OPEN_FILES)
+
+static plugin_check_open_close_bitmap_t open_files_bitmap;
+
+static void plugin_check_open_close__enter(void)
+{
+    if (!current_plugin_handle)
+        open_files_bitmap_clear(&open_files_bitmap);
+}
+
+static void plugin_check_open_close__exit(void)
+{
+    if (current_plugin_handle)
+        return;
+
+    if (open_files_bitmap_is_clear(&open_files_bitmap))
+        return;
+
+    logf("Plugin '%s' leaks file handles", plugin);
+
+    static const char *lines[] =
+        { ID2P(LANG_PLUGIN_ERROR), "#leak-file-handles" };
+    static const struct text_message message = { lines, 2 };
+    button_clear_queue(); /* Empty the keyboard buffer */
+    gui_syncyesno_run(&message, NULL, NULL);
+
+    FOR_EACH_BITARRAY_SET_BIT(&open_files_bitmap, fd)
+        close_wrapper(fd);
+}
+
+static void plugin_check_open_close__open(int fd)
+{
+    if (fd >= 0)
+        open_files_bitmap_set_bit(&open_files_bitmap, fd);
+}
+
+static void plugin_check_open_close__close(int fd)
+{
+    if (fd < 0)
+        return;
+
+    if (!open_files_bitmap_test_bit(&open_files_bitmap, fd))
+    {
+        logf("double close from plugin");
+    }
+
+    open_files_bitmap_clear_bit(&open_files_bitmap, fd);
+}
+
+#else /* ! HAVE_PLUGIN_CHECK_OPEN_CLOSE */
+
+#define plugin_check_open_close__enter()
+#define plugin_check_open_close__exit()
+#define plugin_check_open_close__open(fd)
+#define plugin_check_open_close__close(fd)
+
+#endif /* HAVE_PLUGIN_CHECK_OPEN_CLOSE */
 
 static const struct plugin_api rockbox_api = {
 
@@ -339,24 +395,24 @@ static const struct plugin_api rockbox_api = {
 
     /* file */
     open_utf8,
-    (open_func)open_wrapper,
+    (void *)open_wrapper,
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
     close_wrapper,
 #else
     PREFIX(close),
 #endif
-    (read_func)PREFIX(read),
+    (void *)PREFIX(read),
     PREFIX(lseek),
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    (creat_func)creat_wrapper,
+    (void *)creat_wrapper,
 #else
-    PREFIX(creat),
+    (void *)PREFIX(creat),
 #endif
-    (write_func)PREFIX(write),
+    PREFIX(write),
     PREFIX(remove),
     PREFIX(rename),
     PREFIX(ftruncate),
-    filesize,
+    PREFIX(filesize),
     fdprintf,
     read_line,
     settings_parseline,
@@ -375,11 +431,11 @@ static const struct plugin_api rockbox_api = {
     filetype_get_attr,
 
     /* dir */
-    (opendir_func)opendir,
-    (closedir_func)closedir,
-    (readdir_func)readdir,
-    mkdir,
-    rmdir,
+    PREFIX(opendir),
+    PREFIX(closedir),
+    PREFIX(readdir),
+    PREFIX(mkdir),
+    PREFIX(rmdir),
     dir_exists,
     dir_get_info,
 
@@ -688,7 +744,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     srand,
     rand,
-    (qsort_func)qsort,
+    (void *)qsort,
     kbd_input,
     get_time,
     set_time,
@@ -891,9 +947,7 @@ int plugin_load(const char* plugin, const void* parameter)
     /* allow voice to back off if the plugin needs lots of memory */
     talk_buffer_set_policy(TALK_BUFFER_LOOSE);
 
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    open_files = 0;
-#endif
+    plugin_check_open_close__enter();
 
     int rc = p_hdr->entry_point(parameter);
     
@@ -947,24 +1001,7 @@ int plugin_load(const char* plugin, const void* parameter)
     FOR_NB_SCREENS(i)
         viewportmanager_theme_undo(i, true);
 
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    if(open_files != 0 && !current_plugin_handle)
-    {
-        int fd;
-        logf("Plugin '%s' leaks file handles", plugin);
-        
-        static const char *lines[] = 
-            { ID2P(LANG_PLUGIN_ERROR),
-              "#leak-file-handles" };
-        static const struct text_message message={ lines, 2 };
-        button_clear_queue(); /* Empty the keyboard buffer */
-        gui_syncyesno_run(&message, NULL, NULL);
-        
-        for(fd=0; fd < MAX_OPEN_FILES; fd++)
-            if(open_files & (1<<fd))
-                close_wrapper(fd);
-    }
-#endif
+    plugin_check_open_close__exit();
 
     if (rc == PLUGIN_ERROR)
         splash(HZ*2, str(LANG_PLUGIN_ERROR));
@@ -1042,29 +1079,21 @@ static int open_wrapper(const char* pathname, int flags, ...)
         va_end(ap);
     }
     else
-        fd = open(pathname, flags);
-#else
-    fd = file_open(pathname,flags);
 #endif
-
-#ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
-    if(fd >= 0)
-        open_files |= 1<<fd;
-#endif
+    fd = open(pathname, flags);
+    plugin_check_open_close__open(fd);
     return fd;
 }
 
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 static int close_wrapper(int fd)
 {
-    if((~open_files) & (1<<fd))
-    {
-        logf("double close from plugin");
-    }
-    if(fd >= 0)
-        open_files &= (~(1<<fd));
+    int rc = PREFIX(close)(fd);
 
-    return PREFIX(close)(fd);
+    if (rc >= 0)
+        plugin_check_open_close__close(fd);
+
+    return rc;
 }
 
 static int creat_wrapper(const char *pathname, mode_t mode)
@@ -1072,10 +1101,7 @@ static int creat_wrapper(const char *pathname, mode_t mode)
     (void)mode;
 
     int fd = PREFIX(creat)(pathname, mode);
-
-    if(fd >= 0)
-        open_files |= (1<<fd);
-
+    plugin_check_open_close__open(fd);
     return fd;
 }
 #endif /* HAVE_PLUGIN_CHECK_OPEN_CLOSE */

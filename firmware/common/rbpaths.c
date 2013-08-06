@@ -85,8 +85,8 @@ static const char *handle_special_links(const char* link, unsigned flags,
                                 char *buf, const size_t bufsize)
 {
     (void) flags;
-    char vol_string[VOL_ENUM_POS + 8];
-    int len = sprintf(vol_string, VOL_NAMES, 1);
+    char vol_string[VOL_MAX_LEN + 1];
+    get_volume_name(-1, vol_string);
 
     /* link might be passed with or without HOME_DIR expanded. To handle
      * both perform substring matching (VOL_NAMES is unique enough) */

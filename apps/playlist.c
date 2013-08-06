@@ -107,6 +107,8 @@
 #include "panic.h"
 #include "logdiskf.h"
 
+#undef HAVE_DIRCACHE
+
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
 /*
@@ -526,7 +528,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     int result = 0;
     /* get emergency buffer so we don't fail horribly */
     if (!buflen)
-        buffer = __builtin_alloca((buflen = 64));
+        buffer = alloca((buflen = 64));
 
     if(-1 == playlist->fd)
         playlist->fd = open_utf8(playlist->filename, O_RDONLY);
@@ -1767,10 +1769,9 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
             snprintf(dest, buf_length, "%s/%s", dir, src);
         }
     }
-#ifdef HAVE_MULTIVOLUME 
-
-    char vol_string[VOL_ENUM_POS + 8];
-    snprintf(vol_string, sizeof(vol_string), "/"VOL_NAMES, 1);
+#if 0//def HAVE_MULTIVOLUME 
+    char vol_string[VOL_MAX_LEN + 1];
+    get_volume_name(-1, vol_string);
 
     /*check if the playlist is on a external card, and correct path if needed */
     if(strstr(dir, vol_string) && (strstr(dest, vol_string) == NULL)){

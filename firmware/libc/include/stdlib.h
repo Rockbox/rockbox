@@ -31,6 +31,11 @@ void free(void *);
 void *realloc(void *, size_t);
 int  atexit(void (*)(void));
 
+#ifdef  __GNUC__
+# undef  alloca
+# define alloca(size)   __builtin_alloca (size)
+#endif /* GCC.  */
+
 #define RAND_MAX INT_MAX
 
 void srand(unsigned int seed);

@@ -466,11 +466,11 @@ struct plugin_api {
 
 
     /* dir */
-    DIR* (*opendir)(const char* name);
-    int (*closedir)(DIR* dir);
-    struct dirent* (*readdir)(DIR* dir);
-    int (*mkdir)(const char *name);
-    int (*rmdir)(const char *name);
+    DIR* (*opendir)(const char* dirname);
+    int (*closedir)(DIR* dirp);
+    struct dirent* (*readdir)(DIR* dirp);
+    int (*mkdir)(const char *path);
+    int (*rmdir)(const char *path);
     bool (*dir_exists)(const char *path);
     struct dirinfo (*dir_get_info)(DIR* parent, struct dirent *entry);
 

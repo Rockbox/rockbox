@@ -175,7 +175,10 @@ static bool _dir_properties(DPS* dps)
     dirlen = rb->strlen(dps->dirname);
     dir = rb->opendir(dps->dirname);
     if (!dir)
+    {
+        rb->splashf(HZ*2, "%s", dps->dirname);
         return false; /* open error */
+    }
 
     /* walk through the directory content */
     while(result && (0 != (entry = rb->readdir(dir))))

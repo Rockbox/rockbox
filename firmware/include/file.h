@@ -31,68 +31,65 @@
 #include <stdio.h>
 #endif
 
-
 #undef MAX_PATH /* this avoids problems when building simulator */
 #define MAX_PATH 260
-#define MAX_OPEN_FILES 11
 
 #if !defined(PLUGIN) && !defined(CODEC)
+
 #if defined(APPLICATION) && !defined(__PCTOOL__)
 #include "rbpaths.h"
-#   define open(x, ...)     app_open(x, __VA_ARGS__)
-#   define creat(x,m)       app_creat(x, m)
-#   define remove(x)        app_remove(x)
-#   define rename(x,y)      app_rename(x,y)
-#   define readlink(x,y,z)  app_readlink(x,y,z)
-#   if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
+#  define open(path, mode...)           app_open(path, mode)
+#  define creat(path, mode)             app_creat(path, mode)
+#  define remove(path)                  app_remove(path)
+#  define rename(old, new)              app_rename(old, new)
+#  define readlink(path, buf, bufsize)  app_readlink(path, buf, bufsize)
+#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 /* SDL overrides a few more */
-#   define read(x,y,z)      sim_read(x,y,z)
-#   define write(x,y,z)     sim_write(x,y,z)
-#   endif
+#  define read(fildes, buf, nbyte)      sim_read(fildes, buf, nbyte)
+#  define write(fildes, buf, nbyte)     sim_write(fildes, buf, nbyte)
+#endif
 #elif defined(SIMULATOR) || defined(DBTOOL)
-#   define open(x, ...)     sim_open(x, __VA_ARGS__)
-#   define creat(x,m)       sim_creat(x,m)
-#   define remove(x)        sim_remove(x)
-#   define rename(x,y)      sim_rename(x,y)
-#   define fsync(x)         sim_fsync(x)
-#   define ftruncate(x,y)   sim_ftruncate(x,y)
-#   define lseek(x,y,z)     sim_lseek(x,y,z)
-#   define read(x,y,z)      sim_read(x,y,z)
-#   define write(x,y,z)     sim_write(x,y,z)
-#   define close(x)         sim_close(x)
+#  define open(path, mode...)           sim_open(path, mode)
+#  define creat(path, mode)             sim_creat(path, mode)
+#  define close(fildes)                 sim_close(fildes)
+#  define ftruncate(fildes, length)     sim_ftruncate(fildes, length)
+#  define fsync(fildes)                 sim_fsync(fildes)
+#  define lseek(fildes, offset, whench) sim_lseek(fildes, offset, whence)
+#  define read(fildes, buf, nbyte)      sim_read(fildes, buf, nbyte)
+#  define write(fildes, buf, nbyte)     sim_write(fildes, buf, nbyte)
+#  define remove(path)                  sim_remove(path)
+#  define rename(old, new)              sim_rename(old, new)
+
 /* readlink() not used in the sim yet */
-extern int sim_open(const char *name, int o, ...);
-extern int sim_creat(const char *name, mode_t mode);
-#endif
+int sim_open(const char *name, int o, ...);
+int sim_creat(const char *name, mode_t mode);
 
-typedef int (*open_func)(const char* pathname, int flags, ...);
-typedef ssize_t (*read_func)(int fd, void *buf, size_t count);
-typedef int (*creat_func)(const char *pathname, mode_t mode);
-typedef ssize_t (*write_func)(int fd, const void *buf, size_t count);
-typedef void (*qsort_func)(void *base, size_t nmemb,  size_t size,
-                           int(*_compar)(const void *, const void *));
+#else /* Native */
 
-extern int file_open(const char* pathname, int flags);
-extern int close(int fd);
-extern int fsync(int fd);
-extern ssize_t read(int fd, void *buf, size_t count);
-extern off_t lseek(int fildes, off_t offset, int whence);
-extern int file_creat(const char *pathname);
-#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(__PCTOOL__)) || \
-    defined(TEST_FAT)
-#define creat(x, y) file_creat(x)
+/** POSIX **/
+int open(const char *path, int oflag);
+int creat(const char *path);
+int close(int fildes);
+int ftruncate(int fildes, off_t length);
+int fsync(int fildes);
+off_t lseek(int fildes, off_t offset, int whence);
+ssize_t read(int fildes, void *buf, size_t nbyte);
+ssize_t write(int fildes, const void *buf, size_t nbyte);
+int remove(const char *path);
+int rename(const char *old, const char *new);
 
-#if !defined(CODEC) && !defined(PLUGIN)
-#define open(x, y, ...) file_open(x,y)
-#endif
-#endif
+/** Extensions **/
+off_t filesize(int fildes);
+int fsamefile(int fildes1, int fildes2);
+int fdprintf(int fildes, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 
-extern ssize_t write(int fd, const void *buf, size_t count);
-extern int remove(const char* pathname);
-extern int rename(const char* path, const char* newname);
-extern int ftruncate(int fd, off_t length);
-extern off_t filesize(int fd);
-extern int release_files(int volume);
-int fdprintf (int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
+#ifndef _FILE_C_
+#  define open(path, oflag, mode...)  open(path, oflag)
+#  define creat(path, mode)           creat(path)
+#endif /* _FILE_C_ */
+
+#endif /* CONFIG_PLATFORM */
+
 #endif /* !CODEC && !PLUGIN */
-#endif
+
+#endif /* _FILE_H_ */

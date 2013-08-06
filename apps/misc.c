@@ -28,6 +28,9 @@
 #include "misc.h"
 #include "system.h"
 #include "lcd.h"
+#ifdef HAVE_DIRCACHE
+#include "dircache.h"
+#endif
 #include "file.h"
 #ifndef __PCTOOL__
 #include "filefuncs.h"

@@ -88,6 +88,8 @@
 #include "eeprom_settings.h"
 #endif
 
+#undef HAVE_DIRCACHE
+
 #ifdef __PCTOOL__
 #define yield() do { } while(0)
 #define sim_sleep(timeout) do { } while(0)
@@ -2986,20 +2988,21 @@ static bool commit(void)
     /* Try to steal every buffer we can :) */
     if (tempbuf_size == 0)
         local_allocation = true;
-    
+
+#if 0 /* FIXME: How much big? dircache buffer can no longer be taken but
+                may be freed to make room and the cache resumed. --jethead71 */
 #ifdef HAVE_DIRCACHE
     if (tempbuf_size == 0)
     {
-        /* Try to steal the dircache buffer. */
-        tempbuf = dircache_steal_buffer(&tempbuf_size);
-        tempbuf_size &= ~0x03;
-        
+        /* Shut down dircache to free its allocation. */
+        dircache_free_buffer();
         if (tempbuf_size > 0)
         {
             dircache_buffer_stolen = true;
         }
     }
-#endif    
+#endif
+#endif
     
 #ifdef HAVE_TC_RAMCACHE
     if (tempbuf_size == 0 && tc_stat.ramcache_allocated > 0)

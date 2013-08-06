@@ -153,7 +153,7 @@ int fat_startsector(void)
     return 63;
 }
 
-bool fat_ismounted(int volume)
+bool volume_ismounted(int volume)
 {
     (void)volume;
     return true;

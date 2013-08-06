@@ -18,7 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
+#define DIR_DEFINED
+#define DIRFUNCTIONS_DEFINED
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,7 +30,8 @@
 #include "config.h"
 #include "system.h"
 #include "ata_idle_notify.h"
-#include "mv.h"
+#include "dir.h"
+#include "file_internal.h"
 
 #define HAVE_STATVFS (!defined(WIN32))
 #define HAVE_LSTAT   (!defined(WIN32))
@@ -151,100 +153,30 @@ extern int _wrmdir(const wchar_t*);
 
 #endif /* !__MINGW32__ */
 
-
-#ifdef HAVE_DIRCACHE
-int dircache_get_entry_id(const char *filename);
-void dircache_add_file(const char *name, long startcluster);
-void dircache_remove(const char *name);
-void dircache_rename(const char *oldname, const char *newname);
-#endif
-
 #ifndef APPLICATION
-
-#define SIMULATOR_DEFAULT_ROOT "simdisk"
 extern const char *sim_root_dir;
-
 static int num_openfiles = 0;
+static int num_opendirs  = 0;
 
-/* from dir.h */
-struct dirinfo {
-    int attribute;
-    long size;
-    unsigned short wrtdate;
-    unsigned short wrttime;
-};
-
-struct sim_dirent {
-    unsigned char d_name[MAX_PATH];
-    struct dirinfo info;
-    long startcluster;
-};
-
-struct dirstruct {
-    void *dir; /* actually a DIR* dir */
-    char *name;
-} SIM_DIR;
-
-struct mydir {
-    DIR_T *dir;
-    IF_MV(int volumes_returned);
-    char *name;
-};
-
-typedef struct mydir MYDIR;
-
-static unsigned int rockbox2sim(int opt)
+struct dirstr_desc
 {
-#if 0
-/* this shouldn't be needed since we use the host's versions */
-    int newopt = O_BINARY;
-
-    if(opt & 1)
-        newopt |= O_WRONLY;
-    if(opt & 2)
-        newopt |= O_RDWR;
-    if(opt & 4)
-        newopt |= O_CREAT;
-    if(opt & 8)
-        newopt |= O_APPEND;
-    if(opt & 0x10)
-        newopt |= O_TRUNC;
-
-    return newopt;
-#else
-    return opt|O_BINARY;
+    DIR_T             *dir;
+    char              *name;
+    struct sim_dirent entry;
+#ifdef HAVE_MULTIVOLUME
+    int               volumecounter;
 #endif
-}
-
+};
 #endif /* APPLICATION */
 
 /** Simulator I/O engine routines **/
 #define IO_YIELD_THRESHOLD 512
-
-enum io_dir
-{
-    IO_READ,
-    IO_WRITE,
-};
-
-struct sim_io
-{
-    struct mutex sim_mutex; /* Rockbox mutex */
-    int cmd; /* The command to perform */
-    int ready; /* I/O ready flag - 1= ready */
-    int fd; /* The file to read/write */
-    void *buf; /* The buffer to read/write */
-    size_t count; /* Number of bytes to read/write */
-    size_t accum; /* Acculated bytes transferred */
-};
-
-static struct sim_io io;
+static struct mutex sim_io_mutex;
 
 int ata_init(void)
 {
-    /* Initialize the rockbox kernel objects on a rockbox thread */
-    mutex_init(&io.sim_mutex);
-    io.accum = 0;
+    /* initialize the rockbox kernel objects on a rockbox thread */
+    mutex_init(&sim_io_mutex);
     return 1;
 }
 
@@ -253,88 +185,56 @@ int ata_spinup_time(void)
     return HZ;
 }
 
-static ssize_t io_trigger_and_wait(enum io_dir cmd)
+static ssize_t sim_readwrite(int fildes, void *buf, size_t nbyte, bool writeop)
 {
     void *mythread = NULL;
-    ssize_t result;
 
-    if (io.count > IO_YIELD_THRESHOLD ||
-        (io.accum += io.count) >= IO_YIELD_THRESHOLD)
-    {
-        /* Allow other rockbox threads to run */
-        io.accum = 0;
+    if (nbyte > IO_YIELD_THRESHOLD)
         mythread = sim_thread_unlock();
-    }
 
-    switch (cmd)
-    {
-    case IO_READ:
-        result = read(io.fd, io.buf, io.count);
-        break;
-    case IO_WRITE:
-        result = write(io.fd, io.buf, io.count);
-        break;
-        /* shut up gcc */
-    default:
-        result = -1;
-    }
+    ssize_t rc = writeop ? write(fildes, buf, nbyte) :
+                           read(fildes, buf, nbyte);
 
-    call_storage_idle_notifys(false);
-
-    /* Regain our status as current */
-    if (mythread != NULL)
-    {
+    if (mythread)
         sim_thread_lock(mythread);
+
+    if (rc >= 0)
+    {
+        /* don't let callback mess up errno (it shouldn't be altered when
+           successful) */
+        int myerrno = errno;
+        call_storage_idle_notifys(false);
+        errno = myerrno;
     }
 
-    return result;
+    return rc;
 }
 
-
-ssize_t sim_read(int fd, void *buf, size_t count)
+ssize_t sim_read(int fildes, void *buf, size_t nbyte)
 {
-    ssize_t result;
-
-    mutex_lock(&io.sim_mutex);
-
-    /* Setup parameters */
-    io.fd = fd;
-    io.buf = buf;
-    io.count = count;
-
-    result = io_trigger_and_wait(IO_READ);
-
-    mutex_unlock(&io.sim_mutex);
-
-    return result;
+    mutex_lock(&sim_io_mutex);
+    ssize_t rc = sim_readwrite(fildes, buf, nbyte, false);
+    mutex_unlock(&sim_io_mutex);
+    return rc;
 }
 
-
-ssize_t sim_write(int fd, const void *buf, size_t count)
+ssize_t sim_write(int fildes, const void *buf, size_t nbyte)
 {
-    ssize_t result;
-
-    mutex_lock(&io.sim_mutex);
-
-    io.fd = fd;
-    io.buf = (void*)buf;
-    io.count = count;
-
-    result = io_trigger_and_wait(IO_WRITE);
-
-    mutex_unlock(&io.sim_mutex);
-
-    return result;
+    mutex_lock(&sim_io_mutex);
+    ssize_t rc = sim_readwrite(fildes, (void *)buf, nbyte, true);
+    mutex_unlock(&sim_io_mutex);
+    return rc;
 }
 
 #if !defined(APPLICATION)
 
-static const char *handle_special_links(const char* link)
+static const char * handle_special_links(const char *link)
 {
 #ifdef HAVE_MULTIDRIVE
+################################
     static char buffer[MAX_PATH]; /* sufficiently big */
-    char vol_string[VOL_ENUM_POS + 8];
-    int len = sprintf(vol_string, VOL_NAMES, 1);
+    char vol_string[VOL_MAX_LEN + 1];
+    int len = get_volume_name(-1, vol_string);
 
     /* link might be passed with or without HOME_DIR expanded. To handle
      * both perform substring matching (VOL_NAMES is unique enough) */
@@ -345,7 +245,7 @@ static const char *handle_special_links(const char* link)
          * we want to copy the remainder of the paths, prefixed by
          * the actual mount point (the remainder might be "") */
         snprintf(buffer, sizeof(buffer), "%s/../simext/%s",
-                 sim_root_dir ?: SIMULATOR_DEFAULT_ROOT, begin + len);
+                 sim_root_dir, begin + len);
         return buffer;
     }
     else
@@ -354,64 +254,69 @@ static const char *handle_special_links(const char* link)
 }
 
 
-static const char *get_sim_pathname(const char *name)
+static const char * get_sim_pathname(const char *name)
 {
     static char buffer[MAX_PATH]; /* sufficiently big */
 
-    if(name[0] == '/')
+    if (!PATH_IS_ABSOLUTE(name))
     {
-        snprintf(buffer, sizeof(buffer), "%s%s", 
-                 sim_root_dir ?: SIMULATOR_DEFAULT_ROOT, name);
-        return handle_special_links(buffer);
+        DEBUGF("WARNING, bad file name lacks slash: \"%s\"\n", name);
+        errno = ENOENT;
+        return NULL;
     }
-    fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
-    return name;
-}
 
-
-MYDIR *sim_opendir(const char *name)
-{
-    DIR_T *dir;
-    dir = (DIR_T *) OPENDIR(get_sim_pathname(name));
-
-    if (dir)
+    size_t size = append_to_path(buffer, sim_root_dir, name, sizeof (buffer));
+    if (size >= sizeof (buffer))
     {
-        MYDIR *my = (MYDIR *)malloc(sizeof(MYDIR));
-        my->dir = dir;
-        my->name = (char *)malloc(strlen(name)+1);
-        strcpy(my->name, name);
-        IF_MV(my->volumes_returned = 0);
-
-        return my;
+        errno = ENAMETOOLONG;
+        return NULL;
     }
-    /* failed open, return NULL */
-    return (MYDIR *)0;
+
+    return handle_special_links(buffer);
 }
 
-#if defined(WIN32)
-static inline struct tm* localtime_r (const time_t *clock, struct tm *result) {
-       if (!clock || !result) return NULL;
-       memcpy(result,localtime(clock),sizeof(*result));
-       return result;
-}
-#endif
-
-struct sim_dirent *sim_readdir(MYDIR *dir)
-{
-    char buffer[MAX_PATH]; /* sufficiently big */
-    static struct sim_dirent secret;
-    STAT_T s;
-    struct tm tm;
-    DIRENT_T *x11;
-
-#ifdef EOVERFLOW
-read_next:
-#endif
-
-#define ATTR_LINK      0x80 /* see dir.h */
-
-    secret.info.attribute = 0;
 #ifdef HAVE_MULTIVOLUME
+static int readdir_volume_inner(struct dirstr_desc *dirstr, struct sim_dirent *entry)
+{
+    /* Volumes (secondary file systems) get inserted into the system root
+     * directory. If the path specified volume 0, enumeration will not
+     * include other volumes, but just its own files and directories.
+     *
+     * Fake special directories, which don't really exist, that will get
+     * redirected upon opendir()
+     */
+    while (++dir->volumecounter < NUM_VOLUMES)
+    {
+        /* on the system root */
+        if (!volume_ismounted(dir->volumecounter))
+            continue;
+
+        get_volume_name(dirstr->volumecounter, entry->d_name);
+        entry->info.attribute = ATTR_DIRECTORY | ATTR_VOLUME | ATTR_LINK;
+        entry->info.size      = 0;
+        entry->info.wrtdate   = 0;
+        entry->info.wrttime   = 0;
+
+        return 1;
+    }
+
+    /* do normal directory entry fetching */
+    return 0;
+}
+#endif /* HAVE_MULTIVOLUME */
+
+static inline int readdir_volume(struct dirstr_desc *dirstr, struct sim_dirent *entry)
+{
+#ifdef HAVE_MULTIVOLUME
+    if (dir->volumecounter < NUM_VOLUMES && dir->volumecounter >= 0)
+        return readdir_volume_inner(dir, entry);
+#endif /* HAVE_MULTIVOLUME */
+
+    /* do normal directory entry fetching */
+    return 0;
+    (void)dirstr; (void)entry;
+
+#if 0
     if (dir->name[0] == '/' && dir->name[1] == '\0'
             && dir->volumes_returned++ < (NUM_VOLUMES-1)
             && volume_present(dir->volumes_returned))
@@ -419,16 +324,82 @@ read_next:
         sprintf((char *)secret.d_name, VOL_NAMES, dir->volumes_returned);
         secret.info.attribute = ATTR_LINK;
         /* build file name for stat() which is the actual mount point */
-        snprintf(buffer, sizeof(buffer), "%s/../simext",
-                 sim_root_dir ?: SIMULATOR_DEFAULT_ROOT);
+        snprintf(buffer, sizeof(buffer), "%s/../simext", sim_root_dir);
     }
     else
 #endif
-    {
-        x11 = READDIR(dir->dir);
+}
 
-        if(!x11)
-            return (struct sim_dirent *)0;
+
+DIR * sim_opendir(const char *dirname)
+{
+    const char *simpath = get_sim_pathname(dirname);
+    if (!simpath)
+        return NULL;
+
+    DIR_T *hostdirp = (DIR_T *)OPENDIR(simpath);
+    if (!hostdirp)
+        return NULL;
+
+    struct dirstr_desc *dirstr = malloc(sizeof (*dirstr));
+    if (dirstr)
+    {
+        dirstr->hostdirp = hostdirp;
+        dirstr->name     = strdup(name);
+
+        if (dirstr->name)
+        {
+        #ifdef HAVE_MULTIVOLUME
+            const char *basename;
+            size_t length = path_basename(name, &basename);
+            dirstr->volumecounter = basename[0] == PATH_SEPCH ? 0 : -1;
+        #endif
+
+            return (DIR *)dirstr; /* A-Okay */
+        }
+
+        free(dirstr);
+    }
+
+    closedir(hostdirp);
+
+    /* failed open, return NULL */
+    return NULL;
+}
+
+#if defined(WIN32)
+static inline struct tm * localtime_r(const time_t *clock, struct tm *result)
+{
+    if (!clock || !result)
+        return NULL;
+
+    memcpy(result, localtime(clock), sizeof(*result));
+    return result;
+}
+#endif
+
+
+
+struct sim_dirent * sim_readdir(DIR *dirp)
+{
+    struct dirstr_desc *dirstr = GET_DIRSTR(dirp);
+    if (!dirstr)
+        return NULL;
+
+    char buffer[MAX_PATH]; /* sufficiently big */
+    STAT_T s;
+    struct tm tm;
+#ifdef EOVERFLOW
+read_next:
+#endif
+
+    dirstr->entry.info.attribute = 0;
+
+    if (!readdir_volume(dirstr, &dirstr->entry))
+    {
+        DIRENT_T *dirent = READDIR(dirstr->dir);
+        if (!dirent)
+            return NULL;
 
         strcpy((char *)secret.d_name, OS_TO_UTF8(x11->d_name));
         /* build file name for stat() */
@@ -450,8 +421,6 @@ read_next:
         return NULL;
     }
 
-#define ATTR_DIRECTORY 0x10
-
     if (S_ISDIR(s.st_mode))
         secret.info.attribute = ATTR_DIRECTORY;
 
@@ -459,6 +428,7 @@ read_next:
     
     if (localtime_r(&(s.st_mtime), &tm) == NULL)
         return NULL;
+
     secret.info.wrtdate = ((tm.tm_year - 80) << 9) |
                         ((tm.tm_mon + 1) << 5) |
                         tm.tm_mday;
@@ -476,28 +446,36 @@ read_next:
     return &secret;
 }
 
-void sim_closedir(MYDIR *dir)
+int sim_closedir(DIR *dirp)
 {
-    free(dir->name);
-    CLOSEDIR(dir->dir);
+    struct dirstr_desc *dirstr = GET_DIRSTR(dirp);
+    if (!dirstr)
+        return -1;
 
-    free(dir);
+    DIR_T *dir = dirstr->dir;
+    free(dirstr->name);
+    free(dirstr);
+
+    return CLOSEDIR(dir);
 }
 
-int sim_open(const char *name, int o, ...)
+int sim_open(const char *path, int oflag, ...)
 {
-    int opts = rockbox2sim(o);
-    int ret;
+    int fildes;
+
+    int rboflag = oflag | O_BINARY;
     if (num_openfiles >= MAX_OPEN_FILES)
         return -2;
 
-    if (opts & O_CREAT)
+    if (rboflag & O_CREAT)
     {
+        /* read the mode argument */
         va_list ap;
         va_start(ap, o);
-        mode_t mode = va_arg(ap, unsigned int);
+        mode_t mode = va_arg(ap, mode_t);
         ret = OPEN(get_sim_pathname(name), opts, mode);
 #ifdef HAVE_DIRCACHE
+############################
         if (ret >= 0 && (dircache_get_entry_id(name) < 0))
             dircache_add_file(name, 0);
 #endif
@@ -508,27 +486,22 @@ int sim_open(const char *name, int o, ...)
 
     if (ret >= 0)
         num_openfiles++;
+
     return ret;
 }
 
 int sim_close(int fd)
 {
-    int ret;
-    ret = CLOSE(fd);
+    int ret = CLOSE(fd);
     if (ret == 0)
         num_openfiles--;
+
     return ret;
 }
 
 int sim_creat(const char *name, mode_t mode)
 {
-    int ret = OPEN(get_sim_pathname(name),
-                   O_BINARY | O_WRONLY | O_CREAT | O_TRUNC, mode);
-#ifdef HAVE_DIRCACHE
-    if (ret >= 0 && (dircache_get_entry_id(name) < 0))
-        dircache_add_file(name, 0);
-#endif
-    return ret;
+    return sim_open(name, O_WRONLY|O_CREAT|O_TRUNC, mode);
 }
 
 int sim_mkdir(const char *name)
@@ -545,6 +518,7 @@ int sim_remove(const char *name)
 {
     int ret = REMOVE(get_sim_pathname(name));
 #ifdef HAVE_DIRCACHE
+    ################################################
     if (ret >= 0)
         dircache_remove(name);
 #endif
@@ -644,15 +618,19 @@ int sim_fsync(int fd)
 #include <SDL_loadso.h>
 void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 {
-    (void)buf;
-    (void)buf_size;
-    void *handle = SDL_LoadObject(get_sim_pathname(filename));
+    filename = get_sim_pathname(filename);
+    if (!filename)
+        return NULL;
+
+    void *handle = SDL_LoadObject(filename);
     if (handle == NULL)
     {
         DEBUGF("failed to load %s\n", filename);
         DEBUGF("lc_open(%s): %s\n", filename, SDL_GetError());
     }
+
     return handle;
+    (void)buf; (void)buf_size;
 }
 
 void *lc_get_header(void *handle)

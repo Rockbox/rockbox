@@ -439,8 +439,10 @@ unsigned int wakeup_thread(struct thread_entry **list)
     return THREAD_NONE;
 }
 
-unsigned int thread_queue_wake(struct thread_entry **list)
+unsigned int thread_queue_wake(struct thread_entry **list,
+                               volatile int *count)
 {
+    int num = 0;
     unsigned int result = THREAD_NONE;
 
     for (;;)
@@ -448,10 +450,14 @@ unsigned int thread_queue_wake(struct thread_entry **list)
         unsigned int rc = wakeup_thread(list);
 
         if (rc == THREAD_NONE)
-            break;
+            break; /* No more threads */
 
-        result |= rc;        
+        result |= rc;
+        num++;
     }
+
+    if (count)
+        *count = num;
 
     return result;
 }
@@ -615,7 +621,7 @@ void remove_thread(unsigned int thread_id)
 
     new_thread_id(thread->id, thread);
     thread->state = STATE_KILLED;
-    thread_queue_wake(&thread->queue);
+    thread_queue_wake(&thread->queue, NULL);
 
     SDL_DestroySemaphore(s);
 
