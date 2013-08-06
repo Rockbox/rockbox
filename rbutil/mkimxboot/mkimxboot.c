@@ -649,7 +649,6 @@ static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
         printf("[ERR] Error parsing ELF file\n");
         return IMX_BOOT_INVALID;
     }
-    elf_translate_addresses(&elf);
     fw->nr_insts = elf_get_nr_sections(&elf) + 1;
     fw->insts = xmalloc(fw->nr_insts * sizeof(struct sb_inst_t));
     fw->entry_idx = fw->nr_insts - 1;
@@ -657,7 +656,7 @@ static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
     struct elf_section_t *sec = elf.first_section;
     for(int i = 0; sec; i++, sec = sec->next)
     {
-        fw->insts[i].addr = sec->addr;
+        fw->insts[i].addr = elf_translate_virtual_address(&elf, sec->addr);
         fw->insts[i].size = sec->size;
         if(sec->type == EST_LOAD)
         {
@@ -735,7 +734,7 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     if(ret != IMX_SUCCESS)
         return ret;
     printf("[INFO] MD5 sum of the file: ");
-    print_hex(file_md5sum, 16, true);
+    print_hex(NULL, misc_std_printf, file_md5sum, 16, true);
     /* find model */
     int md5_idx;
     ret = find_model_by_md5sum(file_md5sum, &md5_idx);
@@ -791,7 +790,7 @@ enum imx_error_t extract_firmware(const char *infile,
         return ret;
     }
     printf("[INFO] MD5 sum of the file: ");
-    print_hex(file_md5sum, 16, true);
+    print_hex(NULL, misc_std_printf, file_md5sum, 16, true);
     /* find model */
     int md5_idx;
     ret = find_model_by_md5sum(file_md5sum, &md5_idx);
