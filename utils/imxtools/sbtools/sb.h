@@ -137,6 +137,14 @@ struct sb_instruction_mode_t
     uint32_t mode;
 } __attribute__((packed));
 
+struct sb_instruction_nop_t
+{
+    struct sb_instruction_header_t hdr;
+    uint32_t zero1;
+    uint32_t zero2;
+    uint32_t zero3;
+} __attribute__((packed));
+
 struct sb_instruction_call_t
 {
     struct sb_instruction_header_t hdr;

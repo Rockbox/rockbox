@@ -122,6 +122,13 @@ static void compute_sb_offsets(struct sb_file_t *sb)
                 sb->image_size += ROUND_UP(inst->size, BLOCK_SIZE) / BLOCK_SIZE;
                 sec->sec_size += ROUND_UP(inst->size, BLOCK_SIZE) / BLOCK_SIZE;
             }
+            else if(inst->inst == SB_INST_NOP)
+            {
+                if(g_debug)
+                    printf("  NOOP\n");
+                sb->image_size += sizeof(struct sb_instruction_nop_t) / BLOCK_SIZE;
+                sec->sec_size += sizeof(struct sb_instruction_nop_t) / BLOCK_SIZE;
+            }
             else
             {
                 if(g_debug)
@@ -445,7 +452,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename)
     if(buf_p - buf != sb_hdr.image_size * BLOCK_SIZE)
     {
         if(g_debug)
-            printf("SB image buffer was not entirely filled !");
+            printf("SB image buffer was not entirely filled !\n");
         return SB_ERROR;
     }
 
