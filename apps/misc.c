@@ -28,9 +28,12 @@
 #include "misc.h"
 #include "system.h"
 #include "lcd.h"
+#ifdef HAVE_DIRCACHE
+#include "dircache.h"
+#endif
 #include "file.h"
 #ifndef __PCTOOL__
-#include "filefuncs.h"
+#include "pathfuncs.h"
 #include "lang.h"
 #include "dir.h"
 #ifdef HAVE_REMOTE_LCD
@@ -744,8 +747,7 @@ int show_logo( void )
 */
 void check_bootfile(bool do_rolo)
 {
-    static unsigned short wrtdate = 0;
-    static unsigned short wrttime = 0;
+    static time_t mtime = 0;
     DIR* dir = NULL;
     struct dirent* entry = NULL;
 
@@ -761,10 +763,9 @@ void check_bootfile(bool do_rolo)
         {
             struct dirinfo info = dir_get_info(dir, entry);
             /* found the bootfile */
-            if(wrtdate && do_rolo)
+            if(mtime && do_rolo)
             {
-                if((info.wrtdate != wrtdate) ||
-                   (info.wrttime != wrttime))
+                if(info.mtime != mtime)
                 {
                     static const char *lines[] = { ID2P(LANG_BOOT_CHANGED),
                                                    ID2P(LANG_REBOOT_NOW) };
@@ -777,8 +778,7 @@ void check_bootfile(bool do_rolo)
                     }
                 }
             }
-            wrtdate = info.wrtdate;
-            wrttime = info.wrttime;
+            mtime = info.mtime;
         }
     }
     closedir(dir);
