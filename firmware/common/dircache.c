@@ -303,7 +303,8 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     sab.dir->entrycount = 0;
     sab.dir->file.firstcluster = 0;
     /* open directory */
-    int rc = fat_opendir(IF_MV2(sab.volume,) sab.dir, startcluster, sab.dir);
+    int rc = fat_opendir(IF_MV2(sab.volume,) sab.dir, startcluster,
+                         startcluster ? sab.dir : NULL);
     if(rc < 0)
     {
         logf("fat_opendir failed: %d", rc);
@@ -314,7 +315,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     struct dircache_entry *first_ce = ce;
     
     /* read through directory */
-    while((rc = fat_getnext(sab.dir, sab.direntry)) >= 0 && sab.direntry->name[0])
+    while((rc = fat_getnext(sab.dir, sab.direntry)) > 0)
     {
         if(!strcmp(".", sab.direntry->name) ||
                 !strcmp("..", sab.direntry->name))
@@ -344,6 +345,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
             /* Stop if we got an external signal. */
             if(check_event_queue())
                 return -6;
+
             yield();
         }
     }
@@ -374,7 +376,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
         
         ce = ce->next;
     }
-    
+
     return rc;
 }
 
@@ -408,7 +410,11 @@ static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce
     sab.dir = &sab_fat_dir;
     sab.direntry = &direntry;
     
-    return sab_process_dir(0, ce);
+    int rc = sab_process_dir(0, ce);
+
+    fat_closedir(sab.dir);
+
+    return rc;
 }
 #elif (CONFIG_PLATFORM & PLATFORM_HOSTED) /* PLATFORM_HOSTED */
 static char sab_path[MAX_PATH];

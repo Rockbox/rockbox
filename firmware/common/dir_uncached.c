@@ -44,17 +44,15 @@ int release_dirs(int volume)
     int closed = 0;
     for ( dd=0; dd<MAX_OPEN_DIRS; dd++, pdir++)
     {
-#ifdef HAVE_MULTIVOLUME
-        if (pdir->fatdir.file.volume == volume)
-#else
-        (void)volume;
-#endif
+        if (pdir->busy IF_MV(&& pdir->fatdir.file.volume == volume))
         {
+            fat_closedir(&pdir->fatdir);
             pdir->busy = false; /* mark as available, no further action */
             closed++;
         }
     }
     return closed; /* return how many we did */
+    (void)volume;
 }
 
 DIR_UNCACHED* opendir_uncached(const char* name)
@@ -65,7 +63,7 @@ DIR_UNCACHED* opendir_uncached(const char* name)
     struct fat_direntry entry;
     int dd;
     DIR_UNCACHED* pdir = opendirs;
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_MULTIVOLUME 
     int volume;
 #endif
 
@@ -101,33 +99,26 @@ DIR_UNCACHED* opendir_uncached(const char* name)
         return NULL;
     }
 
+    /* go down each path component, starting at the root */
     for ( part = strtok_r(namecopy, "/", &end); part;
           part = strtok_r(NULL, "/", &end)) {
+
         /* scan dir for name */
         while (1) {
-            if ((fat_getnext(&pdir->fatdir,&entry) < 0) ||
-                (!entry.name[0])) {
+            if (fat_getnext(&pdir->fatdir, &entry) <= 0) {
+                fat_closedir(&pdir->fatdir);
                 pdir->busy = false;
                 return NULL;
             }
             if ( (entry.attr & FAT_ATTR_DIRECTORY) &&
                  (!strcasecmp(part, entry.name)) ) {
-                /* In reality, the parent_dir parameter of fat_opendir seems
-                 * useless because it's sole purpose it to have a way to
-                 * update the file metadata, but here we are only reading
-                 * a directory so there's no need for that kind of stuff.
-                 * However, the rmdir_uncached function uses a ugly hack to
-                 * avoid opening a directory twice when deleting it and thus
-                 * needs those information. That's why we pass pdir->fatdir both
-                 * as the parent directory and the resulting one (this is safe,
-                 * in doubt, check fat_open(dir) code) which will allow this kind of
-                 * (ugly) things */
-                if ( fat_opendir(IF_MV2(volume,)
-                                 &pdir->fatdir,
-                                 entry.firstcluster,
-                                 &pdir->fatdir) < 0 ) {
+                /* FAT driver re-opens parent handle to refer to child item if
+                   passing the same one for new handle and parent */
+                if ( fat_opendir(IF_MV2(volume,) &pdir->fatdir,
+                                 entry.firstcluster, &pdir->fatdir) < 0 ) {
                     DEBUGF("Failed opening dir '%s' (%ld)\n",
                            part, entry.firstcluster);
+                    fat_closedir(&pdir->fatdir);
                     pdir->busy = false;
                     return NULL;
                 }
@@ -137,6 +128,7 @@ DIR_UNCACHED* opendir_uncached(const char* name)
                 break;
             }
         }
+
     }
 
     return pdir;
@@ -144,7 +136,12 @@ DIR_UNCACHED* opendir_uncached(const char* name)
 
 int closedir_uncached(DIR_UNCACHED* dir)
 {
-    dir->busy=false;
+    if (dir->busy)
+    {
+        fat_closedir(&dir->fatdir);
+        dir->busy = false;
+    }
+
     return 0;
 }
 
@@ -178,10 +175,7 @@ struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
     }
 #endif
     /* normal directory entry fetching follows here */
-    if (fat_getnext(&(dir->fatdir),&entry) < 0)
-        return NULL;
-
-    if ( !entry.name[0] )
+    if (fat_getnext(&(dir->fatdir),&entry) <= 0)
         return NULL;
 
     strlcpy(theent->d_name, entry.name, sizeof(theent->d_name));
@@ -249,7 +243,7 @@ int mkdir_uncached(const char *name)
 
     if(basename[0] == 0) {
         DEBUGF("mkdir: Empty dir name\n");
-        pdir->busy = false;
+        closedir_uncached(dir);
         errno = EINVAL;
         return -3;
     }
@@ -265,11 +259,8 @@ int mkdir_uncached(const char *name)
         }
     }
 
-    memset(newdir, 0, sizeof(struct fat_dir));
-    
     rc = fat_create_dir(basename, newdir, &(dir->fatdir));
     closedir_uncached(dir);
-    pdir->busy = false;
     
     return rc;
 }

@@ -49,7 +49,7 @@
 #endif
 
 #ifndef USBSTOR_WRITE_SECTORS_FILTER
-#define USBSTOR_WRITE_SECTORS_FILTER() ({ 0; }) 
+#define USBSTOR_WRITE_SECTORS_FILTER() ({ 0; })
 #endif
 
 /* the ARC driver currently supports up to 64k USB transfers. This is
@@ -347,23 +347,11 @@ static void yearday_to_daymonth(int yd, int y, int *d, int *m)
 }
 #endif /* CONFIG_RTC */
 
-static bool check_disk_present(IF_MD_NONVOID(int volume))
-{
-#ifdef USB_USE_RAMDISK
-    return true;
-#else
-    unsigned char* sector = fat_get_sector_buffer();
-    bool success = storage_read_sectors(IF_MD2(volume,)0,1,sector) == 0;
-    fat_release_sector_buffer();
-    return success;
-#endif
-}
-
 #ifdef HAVE_HOTSWAP
 void usb_storage_notify_hotswap(int volume,bool inserted)
 {
     logf("notify %d",inserted);
-    if(inserted && check_disk_present(IF_MD(volume))) {
+    if(inserted && disk_present(IF_MD(volume))) {
         ejected[volume] = false;
     }
     else {
@@ -471,7 +459,7 @@ void usb_storage_init_connection(void)
     int i;
     for(i=0;i<storage_num_drives();i++) {
         locked[i] = false;
-        ejected[i] = !check_disk_present(IF_MD(i));
+        ejected[i] = !disk_present(IF_MD(i));
         queue_broadcast(SYS_USB_LUN_LOCKED, (i<<16)+0);
     }
 }

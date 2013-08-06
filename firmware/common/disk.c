@@ -42,11 +42,14 @@
    12-15: nr of sectors in partition
 */
 
-#define BYTES2INT32(array,pos)                  \
-    ((long)array[pos] | ((long)array[pos+1] << 8 ) |        \
+#define BYTES2INT32(array, pos) \
+    ((long)array[pos] | ((long)array[pos+1] << 8 ) | \
      ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
+#define BYTES2INT16(array, pos) \
+    ((long)array[pos] | ((long)array[pos+1] << 8))
 
-static const unsigned char fat_partition_types[] = {
+static const unsigned char fat_partition_types[] =
+{
     0x0b, 0x1b, /* FAT32 + hidden variant */
     0x0c, 0x1c, /* FAT32 (LBA) + hidden variant */
 #ifdef HAVE_FAT16SUPPORT
@@ -56,113 +59,15 @@ static const unsigned char fat_partition_types[] = {
 #endif
 };
 
-static struct partinfo part[NUM_DRIVES*4]; /* space for 4 partitions on 2 drives */
-static int vol_drive[NUM_VOLUMES]; /* mounted to which drive (-1 if none) */
-static struct mutex disk_mutex;
-
-#ifdef MAX_LOG_SECTOR_SIZE
-static int disk_sector_multiplier[NUM_DRIVES] = {[0 ... NUM_DRIVES-1] = 1};
-
-int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
-{
-    #ifdef HAVE_MULTIDRIVE
-    return disk_sector_multiplier[drive];
-    #else
-    return disk_sector_multiplier[0];
-    #endif
-}
-#endif
-
-struct partinfo* disk_init(IF_MD_NONVOID(int drive))
-{
-    int i;
-#ifdef HAVE_MULTIDRIVE
-    /* For each drive, start at a different position, in order not to destroy 
-       the first entry of drive 0. 
-       That one is needed to calculate config sector position. */
-    struct partinfo* pinfo = &part[drive*4];
-    if ((size_t)drive >= sizeof(part)/sizeof(*part)/4)
-        return NULL; /* out of space in table */
-#else
-    struct partinfo* pinfo = part;
-    const int drive = 0;
-    (void)drive;
-#endif
-
-    unsigned char* sector = fat_get_sector_buffer();
-    storage_read_sectors(IF_MD2(drive,) 0,1, sector);
-    /* check that the boot sector is initialized */
-    if ( (sector[510] != 0x55) ||
-         (sector[511] != 0xaa)) {
-        fat_release_sector_buffer();
-        DEBUGF("Bad boot sector signature\n");
-        return NULL;
-    }
-
-    /* parse partitions */
-    for ( i=0; i<4; i++ ) {
-        unsigned char* ptr = sector + 0x1be + 16*i;
-        pinfo[i].type  = ptr[4];
-        pinfo[i].start = BYTES2INT32(ptr, 8);
-        pinfo[i].size  = BYTES2INT32(ptr, 12);
-
-        DEBUGF("Part%d: Type %02x, start: %08lx size: %08lx\n",
-               i,pinfo[i].type,pinfo[i].start,pinfo[i].size);
-
-        /* extended? */
-        if ( pinfo[i].type == 5 ) {
-            /* not handled yet */
-        }
-    }
-    fat_release_sector_buffer();
-    return pinfo;
-}
-
-struct partinfo* disk_partinfo(int partition)
-{
-    return &part[partition];
-}
-
-void disk_init_subsystem(void)
-{
-   mutex_init(&disk_mutex);
-}
-
-int disk_mount_all(void)
-{
-    int mounted=0;
-    int i;
-    
-#ifdef HAVE_HOTSWAP
-    mutex_lock(&disk_mutex);
-#endif
-
-    fat_init(); /* reset all mounted partitions */
-    for (i=0; i<NUM_VOLUMES; i++)
-        vol_drive[i] = -1; /* mark all as unassigned */
-
-#ifndef HAVE_MULTIDRIVE
-    mounted = disk_mount(0);
-#else
-    for(i=0;i<NUM_DRIVES;i++)
-    {
-#ifdef HAVE_HOTSWAP
-        if (storage_present(i))
-#endif
-            mounted += disk_mount(i); 
-    }
-#endif
-
-#ifdef HAVE_HOTSWAP
-    mutex_unlock(&disk_mutex);
-#endif
-    return mounted;
-}
+/* space for 4 partitions on 2 drives */
+static struct partinfo part[NUM_DRIVES*4];
+/* mounted to which drive (-1 if none) */
+static int vol_drive[NUM_VOLUMES];
+static struct mutex disk_mutex SHAREDBSS_ATTR;
 
 static int get_free_volume(void)
 {
-    int i;
-    for (i=0; i<NUM_VOLUMES; i++)
+    for (int i = 0; i < NUM_VOLUMES; i++)
     {
         if (vol_drive[i] == -1) /* unassigned? */
             return i;
@@ -171,46 +76,135 @@ static int get_free_volume(void)
     return -1; /* none found */
 }
 
+static inline void disk_lock(void)
+{
+    mutex_lock(&disk_mutex);
+}
+
+static inline void disk_unlock(void)
+{
+    mutex_unlock(&disk_mutex);
+}
+
+#ifdef MAX_LOG_SECTOR_SIZE
+static int disk_sector_multiplier[NUM_DRIVES] =
+    { [0 ... NUM_DRIVES-1] = 1 };
+
+int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
+{
+    if ((unsigned)drive >= NUM_DRIVES)
+        return 0;
+
+    disk_lock();
+    int multiplier = disk_sector_multiplier[IF_MD_DRIVE(drive)];
+    disk_unlock();
+    return multiplier;
+}
+#endif /* MAX_LOG_SECTOR_SIZE */
+
+bool disk_init(IF_MD_NONVOID(int drive))
+{
+    bool init = false;
+
+    /* For each drive, start at a different position, in order not to destroy
+       the first entry of drive 0.
+       That one is needed to calculate config sector position. */
+    struct partinfo *pinfo = &part[IF_MD_DRIVE(drive)*4];
+
+    if ((size_t)IF_MD_DRIVE(drive) >= ARRAYLEN(part) / 4)
+        return false; /* out of space in table */
+
+    disk_lock();
+
+    unsigned char *sector = fat_get_sector_buffer();
+
+    if (!sector)
+    {
+        disk_unlock();
+        return false;
+    }
+
+    storage_read_sectors(IF_MD(drive,) 0, 1, sector);
+
+    /* check that the boot sector is initialized */
+    if (BYTES2INT16(sector, 510) == 0xaa55)
+    {
+        /* parse partitions */
+        for (int i = 0; i < 4; i++)
+        {
+            unsigned char* ptr = sector + 0x1be + 16*i;
+            pinfo[i].type  = ptr[4];
+            pinfo[i].start = BYTES2INT32(ptr, 8);
+            pinfo[i].size  = BYTES2INT32(ptr, 12);
+
+            DEBUGF("Part%d: Type %02x, start: %08lx size: %08lx\n",
+                   i,pinfo[i].type,pinfo[i].start,pinfo[i].size);
+
+            /* extended? */
+            if ( pinfo[i].type == 5 )
+            {
+                /* not handled yet */
+            }
+        }
+
+        init = true;
+    }
+    else
+    {
+        DEBUGF("Bad boot sector signature\n");
+    }
+
+    fat_release_sector_buffer(sector);
+    disk_unlock();
+    return init;
+}
+
+bool disk_partinfo(int partition, struct partinfo *info)
+{
+    if ((unsigned)partition >= ARRAYLEN(part) || !info)
+        return false;
+
+    disk_lock();
+    *info = part[partition];
+    disk_unlock();
+    return true;
+}
+
 int disk_mount(int drive)
 {
     int mounted = 0; /* reset partition-on-drive flag */
-    int volume;
-    struct partinfo* pinfo;
 
-#ifdef HAVE_HOTSWAP
-    mutex_lock(&disk_mutex);
-#endif
+    disk_lock();
 
-    volume = get_free_volume();
-    pinfo = disk_init(IF_MD(drive));
-#ifdef MAX_LOG_SECTOR_SIZE
-    disk_sector_multiplier[drive] = 1;
-#endif
+    int volume = get_free_volume();
 
-    if (pinfo == NULL)
+    if (!disk_init(IF_MD(drive)))
     {
-#ifdef HAVE_HOTSWAP
-        mutex_unlock(&disk_mutex);
-#endif
+        disk_unlock();
         return 0;
     }
+
+    struct partinfo *pinfo = &part[IF_MD_DRIVE(drive)*4];
+#ifdef MAX_LOG_SECTOR_SIZE
+    disk_sector_multiplier[IF_MD_DRIVE(drive)] = 1;
+#endif
+
 #if defined(TOSHIBA_GIGABEAT_S)
     int i = 1;  /* For the Gigabeat S, we mount the second partition */
 #else
     int i = 0;
 #endif
-    for (; volume != -1 && i<4 && mounted<NUM_VOLUMES_PER_DRIVE; i++)
+
+    for (; volume != -1 && i < 4 && mounted < NUM_VOLUMES_PER_DRIVE; i++)
     {
         if (memchr(fat_partition_types, pinfo[i].type,
                    sizeof(fat_partition_types)) == NULL)
             continue;  /* not an accepted partition type */
 
 #ifdef MAX_LOG_SECTOR_SIZE
-        int j;
-        
-        for (j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
+        for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
-            if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) pinfo[i].start * j))
+            if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
             {
                 pinfo[i].start *= j;
                 pinfo[i].size *= j;
@@ -222,7 +216,7 @@ int disk_mount(int drive)
             }
         }
 #else
-        if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) pinfo[i].start))
+        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
         {
             mounted++;
             vol_drive[volume] = drive; /* remember the drive for this volume */
@@ -234,54 +228,75 @@ int disk_mount(int drive)
     if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
     {   /* try "superfloppy" mode */
         DEBUGF("No partition found, trying to mount sector 0.\n");
-        if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) 0))
+
+        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
         {
 #ifdef MAX_LOG_SECTOR_SIZE
-            disk_sector_multiplier[drive] = fat_get_bytes_per_sector(IF_MV(volume))/SECTOR_SIZE;
+            disk_sector_multiplier[drive] =
+                fat_get_bytes_per_sector(IF_MV(volume)) / SECTOR_SIZE;
 #endif
             mounted = 1;
             vol_drive[volume] = drive; /* remember the drive for this volume */
         }
     }
+
+    disk_unlock();
+    return mounted;
+}
+
+int disk_mount_all(void)
+{
+    int mounted = 0;
+
+    disk_lock();
+
+    fat_init(); /* reset all mounted partitions */
+    for (int i = 0; i < NUM_VOLUMES; i++)
+        vol_drive[i] = -1; /* mark all as unassigned */
+
+    for (int i = 0; i < NUM_DRIVES; i++)
+    {
 #ifdef HAVE_HOTSWAP
-    mutex_unlock(&disk_mutex);
+        if (storage_present(i))
 #endif
+            mounted += disk_mount(i);
+    }
+
+    disk_unlock();
     return mounted;
 }
 
 int disk_unmount(int drive)
 {
     int unmounted = 0;
-    int i;
-#ifdef HAVE_HOTSWAP
-    mutex_lock(&disk_mutex);
-#endif
-    for (i=0; i<NUM_VOLUMES; i++)
+
+    disk_lock();
+
+    for (int i = 0; i < NUM_VOLUMES; i++)
     {
         if (vol_drive[i] == drive)
         {   /* force releasing resources */
             vol_drive[i] = -1; /* mark unused */
-            unmounted++;
+
             release_files(i);
             release_dirs(i);
-            fat_unmount(i, false);
+            fat_unmount(IF_MV(i,) false);
+
+            unmounted++;
         }
     }
-#ifdef HAVE_HOTSWAP
-    mutex_unlock(&disk_mutex);
-#endif
 
+    disk_unlock();
     return unmounted;
 }
 
 int disk_unmount_all(void)
 {
-#ifndef HAVE_MULTIDRIVE
-    return disk_unmount(0);
-#else  /* HAVE_MULTIDRIVE */
     int unmounted = 0;
-    int i;
-    for (i = 0; i < NUM_DRIVES; i++)
+
+    disk_lock();
+
+    for (int i = 0; i < NUM_DRIVES; i++)
     {
 #ifdef HAVE_HOTSWAP
         if (storage_present(i))
@@ -289,6 +304,30 @@ int disk_unmount_all(void)
             unmounted += disk_unmount(i);
     }
 
+    disk_unlock();
+
     return unmounted;
-#endif  /* HAVE_MULTIDRIVE */
+}
+
+bool disk_present(IF_MD_NONVOID(int volume))
+{
+    int rc = -1;
+
+    disk_lock();
+
+    unsigned char *sector = fat_get_sector_buffer();
+    if (sector)
+    {
+        rc = storage_read_sectors(IF_MD(volume,) 0, 1, sector);
+        fat_release_sector_buffer(sector);
+    }
+
+    disk_unlock();
+
+    return rc == 0;
+}
+
+void disk_init_subsystem(void)
+{
+    mutex_init(&disk_mutex);
 }

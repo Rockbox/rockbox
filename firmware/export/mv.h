@@ -29,22 +29,26 @@
 
 /* Drives are things like a disk, a card, a flash chip. They can have volumes on them */
 #ifdef HAVE_MULTIDRIVE
-#define IF_MD(x) x /* optional drive parameter */
+#define IF_MD_DRIVE(x) x
+#define IF_MD(...) __VA_ARGS__ /* optional drive parameter */
 #define IF_MD2(x,y) x,y /* same, for a list of arguments */
 #define IF_MD_NONVOID(x) x /* for prototype with sole volume parameter */
 #else /* empty definitions if no multi-drive */
-#define IF_MD(x)
+#define IF_MD_DRIVE(x) 0
+#define IF_MD(...)
 #define IF_MD2(x,y)
 #define IF_MD_NONVOID(x) void
 #endif
 
 /* Volumes mean things that have filesystems on them, like partitions */
 #ifdef HAVE_MULTIVOLUME
-#define IF_MV(x) x /* optional volume parameter */
+#define IF_MV_VOL(x) x
+#define IF_MV(...) __VA_ARGS__ /* optional volume parameter */
 #define IF_MV2(x,y) x,y /* same, for a list of arguments */
 #define IF_MV_NONVOID(x) x /* for prototype with sole volume parameter */
 #else /* empty definitions if no multi-volume */
-#define IF_MV(x)
+#define IF_MV_VOL(x) 0
+#define IF_MV(...)
 #define IF_MV2(x,y)
 #define IF_MV_NONVOID(x) void
 #endif
