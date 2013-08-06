@@ -41,7 +41,7 @@
 #include "list.h"
 #include "plugin.h"
 #include "file.h"
-#include "filefuncs.h"
+#include "pathfuncs.h"
 
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
@@ -1090,10 +1090,10 @@ static bool generate_bookmark_file_name(const char *in)
     {
 #ifdef HAVE_MULTIVOLUME
         /* The "root" of an extra volume need special handling too. */
-        bool volume_root = (strip_volume(in, global_bookmark_file_name) && 
-            !strcmp("/", global_bookmark_file_name));
+        const char *filename;
+        path_strip_volume(in, &filename, true);
+        bool volume_root = *filename == '\0';
 #endif
-        
         strcpy(global_bookmark_file_name, in);
         if(global_bookmark_file_name[len-1] == '/')
             len--;

@@ -93,6 +93,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
             #define storage_removable(drive) hostfs_removable(IF_MD(drive))
             #define storage_present(drive) hostfs_present(IF_MD(drive))
         #endif
+        #define storage_driver_type(drive) hostfs_driver_type(IF_MV(drive))
     #elif (CONFIG_STORAGE & STORAGE_ATA)
         #define STORAGE_FUNCTION(NAME) (ata_## NAME)
         #define storage_spindown ata_spindown
@@ -119,6 +120,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
             #define storage_removable(drive) ata_removable(IF_MD(drive))
             #define storage_present(drive) ata_present(IF_MD(drive))
         #endif
+        #define storage_driver_type(drive) (STORAGE_ATA_NUM)
     #elif (CONFIG_STORAGE & STORAGE_SD)
         #define STORAGE_FUNCTION(NAME) (sd_## NAME)
         #define storage_spindown sd_spindown
@@ -145,6 +147,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
             #define storage_removable(drive) sd_removable(IF_MD(drive))
             #define storage_present(drive) sd_present(IF_MD(drive))
         #endif
+        #define storage_driver_type(drive) (STORAGE_SD_NUM)
      #elif (CONFIG_STORAGE & STORAGE_MMC)
         #define STORAGE_FUNCTION(NAME) (mmc_## NAME)
         #define storage_spindown mmc_spindown
@@ -170,6 +173,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
             #define storage_removable(drive) mmc_removable(IF_MD(drive))
             #define storage_present(drive) mmc_present(IF_MD(drive))
         #endif
+        #define storage_driver_type(drive) (STORAGE_MMC_NUM)
     #elif (CONFIG_STORAGE & STORAGE_NAND)
         #define STORAGE_FUNCTION(NAME) (nand_## NAME)
         #define storage_spindown nand_spindown
@@ -195,6 +199,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
             #define storage_removable(drive) nand_removable(IF_MD(drive))
             #define storage_present(drive) nand_present(IF_MD(drive))
         #endif
+        #define storage_driver_type(drive) (STORAGE_NAND_NUM)
     #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
         #define STORAGE_FUNCTION(NAME) (ramdisk_## NAME)
         #define storage_spindown ramdisk_spindown
@@ -220,6 +225,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
             #define storage_removable(drive) ramdisk_removable(IF_MD(drive))
             #define storage_present(drive) ramdisk_present(IF_MD(drive))
         #endif
+        #define storage_driver_type(drive) (STORAGE_RAMDISK_NUM)
     #else
         //#error No storage driver!
     #endif
@@ -246,6 +252,7 @@ void storage_get_info(int drive, struct storage_info *info);
 bool storage_removable(int drive);
 bool storage_present(int drive);
 #endif
+int storage_driver_type(int drive);
 
 #endif /* NOT CONFIG_STORAGE_MULTI and NOT SIMULATOR*/
 

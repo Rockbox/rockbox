@@ -34,7 +34,6 @@
 #ifdef HAVE_HOTSWAP
 #include "sdmmc.h"
 #include "disk.h"
-#include "fat.h"
 #endif
 #include "dma-target.h"     
 #include "system-target.h"
@@ -585,48 +584,29 @@ static void sd_thread(void)
         {
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:
-        {
+        case SYS_HOTSWAP_EXTRACTED:;
             int success = 1;
-            fat_lock();          /* lock-out FAT activity first -
-                                    prevent deadlocking via disk_mount that
-                                    would cause a reverse-order attempt with
-                                    another thread */
-            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
-                                    into driver that bypass the fat cache */
 
-            /* We now have exclusive control of fat cache and ata */
+            disk_unmount(0);     /* release "by force" */
 
-            disk_unmount(0);     /* release "by force", ensure file
-                                    descriptors aren't leaked and any busy
-                                    ones are invalid if mounting */
+            mutex_lock(&sd_mtx); /* lock-out card activity */
 
             /* Force card init for new card, re-init for re-inserted one or
              * clear if the last attempt to init failed with an error. */
             card_info[0].initialized = 0;
 
+            /* Access is now safe */
+            mutex_unlock(&sd_mtx);
+
             if (ev.id == SYS_HOTSWAP_INSERTED)
-            {
-                /* FIXME: once sd_enabled is implement properly,
-                 * reinitializing the controllers might be needed */
-                sd_enable(true);
-                if (success < 0) /* initialisation failed */
-                    panicf("SD init failed : %d", success);
                 success = disk_mount(0); /* 0 if fail */
-            }
 
             /* notify the system about the changed filesystems
              */
             if (success)
                 queue_broadcast(SYS_FS_CHANGED, 0);
-
-            /* Access is now safe */
-            mutex_unlock(&sd_mtx);
-            fat_unlock();
-            sd_enable(false);
-        }
             break;
-#endif
+#endif /* HAVE_HOTSWAP */
         }        
     }
 }

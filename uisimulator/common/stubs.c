@@ -153,10 +153,9 @@ int fat_startsector(void)
     return 63;
 }
 
-bool fat_ismounted(int volume)
+int ata_spinup_time(void)
 {
-    (void)volume;
-    return true;
+    return 100;
 }
 
 int storage_spinup_time(void)

@@ -41,7 +41,6 @@ void mutex_init(struct mutex *m)
     m->blocker.thread = NULL;
 #ifdef HAVE_PRIORITY_SCHEDULING
     m->blocker.priority = PRIORITY_IDLE;
-    m->no_preempt = false;
 #endif
 }
 
@@ -122,7 +121,7 @@ void mutex_unlock(struct mutex *m)
     corelock_unlock(&m->cl);
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-    if((result & THREAD_SWITCH) && !m->no_preempt)
+    if(result & THREAD_SWITCH)
         switch_thread();
 #endif
     (void)result;

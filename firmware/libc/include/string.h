@@ -20,6 +20,7 @@ extern "C" {
 _PTR     _EXFUN(memchr,(const _PTR, int, size_t));
 int      _EXFUN(memcmp,(const _PTR, const _PTR, size_t));
 _PTR     _EXFUN(memcpy,(_PTR, const _PTR, size_t));
+_PTR     _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
 _PTR     _EXFUN(memmove,(_PTR, const _PTR, size_t));
 _PTR     _EXFUN(memset,(_PTR, int, size_t));
 char    *_EXFUN(strcat,(char *, const char *));
@@ -30,6 +31,7 @@ char    *_EXFUN(strcpy,(char *, const char *));
 size_t   _EXFUN(strcspn,(const char *, const char *));
 char    *_EXFUN(strerror,(int));
 size_t   _EXFUN(strlen,(const char *));
+size_t   _EXFUN(strnlen,(const char *, size_t));
 char    *_EXFUN(strncat,(char *, const char *, size_t));
 int      _EXFUN(strncmp,(const char *, const char *, size_t));
 char    *_EXFUN(strpbrk,(const char *, const char *));
