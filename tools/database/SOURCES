@@ -1,15 +1,21 @@
+#undef unix /* messes up filesystem-unix.c below */
 database.c
 ../../apps/misc.c
 ../../apps/tagcache.c
 ../../firmware/common/crc32.c
-../../firmware/common/filefuncs.c
+../../firmware/common/pathfuncs.c
 ../../firmware/common/strlcpy.c
 ../../firmware/common/strcasestr.c
 ../../firmware/common/structec.c
 ../../firmware/common/unicode.c
 ../../firmware/target/hosted/debug-hosted.c
 ../../firmware/logf.c
-../../uisimulator/common/io.c
+../../firmware/target/hosted/filesystem-unix.c
+#ifdef APPLICATION
+../../firmware/target/hosted/filesystem-app.c
+#else /* !APPLICATION */
+../../uisimulator/common/filesystem-sim.c
+#endif /* APPLICATION */
 #if CONFIG_CODEC != SWCODEC
 ../../lib/rbcodec/metadata/id3tags.c
 ../../lib/rbcodec/metadata/metadata.c

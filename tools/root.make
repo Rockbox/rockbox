@@ -356,22 +356,22 @@ endif
 
 ifeq (,$(findstring android, $(APP_TYPE)))
 
-simext:
+simext1:
 	$(SILENT)mkdir -p $@
 
 bininstall: $(BUILDDIR)/$(BINARY)
 	@echo "Installing your rockbox binary in your '$(RBPREFIX)' dir"
 	$(SILENT)cp $(BINARY) "$(RBPREFIX)/.rockbox/"
 
-install: simext
+install: simext1
 	@echo "Installing your build in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
 
-fullinstall: simext
+fullinstall: simext1
 	@echo "Installing a full setup in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
 
-symlinkinstall: simext
+symlinkinstall: simext1
 	@echo "Installing a full setup with links in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY) -l
 endif

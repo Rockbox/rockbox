@@ -119,8 +119,8 @@
 #include "pmu-target.h"
 #endif
 
-#ifdef HAVE_USBSTACK     
-#include "usb_core.h"    
+#ifdef HAVE_USBSTACK
+#include "usb_core.h"
 #endif
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
@@ -405,7 +405,7 @@ static void dbg_audio_task(void)
 static bool dbg_buffering_thread(void)
 {
     int button;
-    int line;    
+    int line;
     bool done = false;
     size_t bufused;
     size_t bufsize = pcmbuf_get_bufsize();
@@ -420,10 +420,10 @@ static bool dbg_buffering_thread(void)
     ticks = freq_sum = 0;
 
     tick_add_task(dbg_audio_task);
-    
+
     FOR_NB_SCREENS(i)
         screens[i].setfont(FONT_SYSFIXED);
-        
+
     while(!done)
     {
         button = get_action(CONTEXT_STD,HZ/5);
@@ -443,7 +443,7 @@ static bool dbg_buffering_thread(void)
         buffering_get_debugdata(&d);
         bufused = bufsize - pcmbuf_free();
 
-        FOR_NB_SCREENS(i) 
+        FOR_NB_SCREENS(i)
         {
             line = 0;
             screens[i].clear_display();
@@ -520,7 +520,7 @@ static bool dbg_buffering_thread(void)
     }
 
     tick_remove_task(dbg_audio_task);
-    
+
     FOR_NB_SCREENS(i)
         screens[i].setfont(FONT_UI);
 
@@ -577,15 +577,21 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
 {
     (void)data;
     int partition = selected_item/2;
-    struct partinfo* p = disk_partinfo(partition);
+
+    struct partinfo p;
+    if (!disk_partinfo(partition, &p))
+        return buffer;
+
     if (selected_item%2)
     {
-        snprintf(buffer, buffer_len, "   T:%x %ld MB", p->type, p->size / ( 2048 / ( SECTOR_SIZE / 512 )));
+        snprintf(buffer, buffer_len, "   T:%x %ld MB", p.type,
+                 p.size / ( 2048 / ( SECTOR_SIZE / 512 )));
     }
     else
     {
-        snprintf(buffer, buffer_len, "P%d: S:%lx", partition, p->start);
+        snprintf(buffer, buffer_len, "P%d: S:%lx", partition, p.start);
     }
+
     return buffer;
 }
 
@@ -942,7 +948,7 @@ static bool view_battery(void)
                 }
                 /* print header */
 #if (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
-                /* adjust grid scale */ 
+                /* adjust grid scale */
                 if ((maxv - minv) > 50)
                     grid = 50;
                 else
@@ -954,7 +960,7 @@ static bool view_battery(void)
                           minv / 1000, minv % 1000, maxv / 1000, maxv % 1000,
                           grid);
 #elif (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
-                /* adjust grid scale */ 
+                /* adjust grid scale */
                 if ((maxv - minv) > 10)
                     grid = 10;
                 else
@@ -962,31 +968,31 @@ static bool view_battery(void)
                 lcd_putsf(0, 0, "battery %d%%", power_history[0]);
                 lcd_putsf(0, 1, "%d%%-%d%% (%d %%)", minv, maxv, grid);
 #endif
-                
+
                 i = 1;
                 while ((y = (minv - (minv % grid)+i*grid)) < maxv)
                 {
                     graph = ((y-minv)*BAT_YSPACE)/(maxv-minv);
                     graph = LCD_HEIGHT-1 - graph;
-             
-                    /* draw dotted horizontal grid line */      
+
+                    /* draw dotted horizontal grid line */
                     for (x=0; x<LCD_WIDTH;x=x+2)
                         lcd_drawpixel(x,graph);
 
                     i++;
                 }
-                
+
                 x = 0;
                 /* draw plot of power history
                  * skip empty entries
                  */
-                for (i = BAT_LAST_VAL - 1; i > 0; i--) 
+                for (i = BAT_LAST_VAL - 1; i > 0; i--)
                 {
                     if (power_history[i] && power_history[i-1])
                     {
-                        y1 = (power_history[i] - minv) * BAT_YSPACE / 
+                        y1 = (power_history[i] - minv) * BAT_YSPACE /
                             (maxv - minv);
-                        y1 = MIN(MAX(LCD_HEIGHT-1 - y1, BAT_TSPACE), 
+                        y1 = MIN(MAX(LCD_HEIGHT-1 - y1, BAT_TSPACE),
                                  LCD_HEIGHT-1);
                         y2 = (power_history[i-1] - minv) * BAT_YSPACE /
                             (maxv - minv);
@@ -996,13 +1002,13 @@ static bool view_battery(void)
                         lcd_set_drawmode(DRMODE_SOLID);
 
                         /* make line thicker */
-                        lcd_drawline(((x*LCD_WIDTH)/(BAT_LAST_VAL)), 
-                                     y1, 
-                                     (((x+1)*LCD_WIDTH)/(BAT_LAST_VAL)), 
+                        lcd_drawline(((x*LCD_WIDTH)/(BAT_LAST_VAL)),
+                                     y1,
+                                     (((x+1)*LCD_WIDTH)/(BAT_LAST_VAL)),
                                      y2);
-                        lcd_drawline(((x*LCD_WIDTH)/(BAT_LAST_VAL))+1, 
-                                     y1+1, 
-                                     (((x+1)*LCD_WIDTH)/(BAT_LAST_VAL))+1, 
+                        lcd_drawline(((x*LCD_WIDTH)/(BAT_LAST_VAL))+1,
+                                     y1+1,
+                                     (((x+1)*LCD_WIDTH)/(BAT_LAST_VAL))+1,
                                      y2+1);
                         x++;
                     }
@@ -1013,7 +1019,7 @@ static bool view_battery(void)
 #if CONFIG_CHARGING >= CHARGING_MONITOR
                 lcd_putsf(0, 0, "Pwr status: %s",
                          charging_state() ? "charging" : "discharging");
-#else 
+#else
                 lcd_puts(0, 0, "Power status: unknown");
 #endif
                 battery_read_info(&y, &z);
@@ -1132,7 +1138,7 @@ static bool view_battery(void)
                     /* Conversion disabled */
                     lcd_puts(0, line++, "T Battery: ?");
                 }
-                    
+
 #elif defined(HAVE_AS3514) && defined(CONFIG_CHARGING)
                 static const char * const chrgstate_strings[] =
                 {
@@ -1396,7 +1402,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
-#elif  (CONFIG_STORAGE & STORAGE_ATA) 
+#elif  (CONFIG_STORAGE & STORAGE_ATA)
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
@@ -1426,7 +1432,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Size: %s", buf);
     unsigned long free;
-    fat_size( IF_MV(0,) NULL, &free );
+    volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
     simplelist_addline(
@@ -1518,7 +1524,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                 "No timing info");
     }
     simplelist_addline(
-             "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
+             "Cluster size: %d bytes", volume_get_cluster_size(IF_MV(0)));
 #ifdef HAVE_ATA_DMA
     i = ata_get_dma_mode();
     if (i == 0) {
@@ -1545,16 +1551,16 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Size: %ld MB", info.num_sectors*(info.sector_size/512)/2024);
     unsigned long free;
-    fat_size( IF_MV(0,) NULL, &free );
+    volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
     simplelist_addline(
-             "Cluster size: %d bytes", fat_get_cluster_size(IF_MV(0)));
+             "Cluster size: %d bytes", volume_get_cluster_size(IF_MV(0)));
     return btn;
 }
 #endif
 
-#if  (CONFIG_STORAGE & STORAGE_ATA) 
+#if  (CONFIG_STORAGE & STORAGE_ATA)
 static bool dbg_identify_info(void)
 {
     int fd = creat("/identify_info.bin", 0666);
@@ -1591,29 +1597,64 @@ static bool dbg_disk_info(void)
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int btn, struct gui_synclist *lists)
 {
-    (void)lists;
+    struct dircache_info info;
+    dircache_get_info(&info);
+
+    if (global_settings.dircache)
+    {
+        switch (btn)
+        {
+        case ACTION_STD_CONTEXT:
+            splash(HZ/2, "Rebuilding cache");
+            dircache_suspend();
+            *(int *)lists->data = dircache_resume();
+        case ACTION_UNKNOWN:
+            btn = ACTION_NONE;
+            break;
+    #ifdef DIRCACHE_DUMPSTER
+        case ACTION_STD_OK:
+            splash(0, "Dumping cache");
+            dircache_dump();
+            btn = ACTION_NONE;
+            break;
+    #endif /* DIRCACHE_DUMPSTER */
+        case ACTION_STD_CANCEL:
+            if (*(int *)lists->data > 0 && info.status == DIRCACHE_SCANNING)
+            {
+                splash(HZ, str(LANG_SCANNING_DISK));
+                btn = ACTION_NONE;
+            }
+            break;
+        }
+    }
+
     simplelist_set_line_count(0);
-    simplelist_addline("Cache initialized: %s",
-             dircache_is_enabled() ? "Yes" : "No");
-    simplelist_addline("Cache size: %d B",
-             dircache_get_cache_size());
-    simplelist_addline("Last size: %d B",
-             global_status.dircache_size);
-    simplelist_addline("Limit: %d B",
-             DIRCACHE_LIMIT);
-    simplelist_addline("Reserve: %d/%d B",
-             dircache_get_reserve_used(), DIRCACHE_RESERVE);
-    simplelist_addline("Scanning took: %d s",
-             dircache_get_build_ticks() / HZ);
-    simplelist_addline("Entry count: %d",
-             dircache_get_entry_count());
+
+    simplelist_addline("Cache status: %s", info.statusdesc);
+    simplelist_addline("Last size: %lu B", info.last_size);
+    simplelist_addline("Size: %lu B", info.size);
+    unsigned int utilized = info.size ? 1000ull*info.sizeused / info.size : 0;
+    simplelist_addline("Used: %lu B (%u.%u%%)", info.sizeused,
+                       utilized / 10, utilized % 10);
+    simplelist_addline("Limit: %lu B", info.size_limit);
+    simplelist_addline("Reserve: %lu/%lu B", info.reserve_used, info.reserve);
+    long ticks = ALIGN_UP(info.build_ticks, HZ / 10);
+    simplelist_addline("Scanning took: %ld.%ld s",
+                       ticks / HZ, (ticks*10 / HZ) % 10);
+    simplelist_addline("Entry count: %u", info.entry_count);
+
+    if (btn == ACTION_NONE)
+        btn = ACTION_REDRAW;
+
     return btn;
+    (void)lists;
 }
 
 static bool dbg_dircache_info(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Dircache Info", 7, NULL);
+    int syncbuild = 0;
+    simplelist_info_init(&info, "Dircache Info", 8, &syncbuild);
     info.action_callback = dircache_callback;
     info.hide_selection = true;
     info.scroll_all = true;
@@ -1648,9 +1689,9 @@ static int database_callback(int btn, struct gui_synclist *lists)
     simplelist_addline("Commit delayed: %s",
              stat->commit_delayed ? "Yes" : "No");
 
-    simplelist_addline("Queue length: %d", 
+    simplelist_addline("Queue length: %d",
              stat->queue_length);
-    
+
     if (synced)
     {
         synced = false;
@@ -1675,7 +1716,7 @@ static bool dbg_tagcache_info(void)
     info.action_callback = database_callback;
     info.hide_selection = true;
     info.scroll_all = true;
-    
+
     /* Don't do nonblock here, must give enough processing time
        for tagcache thread. */
     /* info.timeout = TIMEOUT_NOBLOCK; */
@@ -1958,7 +1999,7 @@ static bool dbg_fm_radio(void)
     struct simplelist_info info;
 #ifdef CONFIG_TUNER_MULTI
     tuner_type = tuner_detect_type();
-#endif    
+#endif
     info.scroll_all = true;
     simplelist_info_init(&info, "FM Radio", 1, NULL);
     simplelist_set_line_count(0);
@@ -2225,7 +2266,7 @@ static bool dbg_isp1583(void)
     struct simplelist_info isp1583;
     isp1583.scroll_all = true;
     simplelist_info_init(&isp1583, "ISP1583", dbg_usb_num_items(), NULL);
-    isp1583.timeout = HZ/100; 
+    isp1583.timeout = HZ/100;
     isp1583.hide_selection = true;
     isp1583.get_name = dbg_usb_item;
     isp1583.action_callback = isp1583_action_callback;
@@ -2251,7 +2292,7 @@ static bool dbg_pic(void)
     struct simplelist_info pic;
     pic.scroll_all = true;
     simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
-    pic.timeout = HZ/100; 
+    pic.timeout = HZ/100;
     pic.hide_selection = true;
     pic.get_name = pic_dbg_item;
     pic.action_callback = pic_action_callback;

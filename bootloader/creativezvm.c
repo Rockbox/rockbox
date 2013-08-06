@@ -23,6 +23,7 @@
 #include "thread.h"
 #include "storage.h"
 #include "ata-target.h"
+#include "file_internal.h"
 #include "disk.h"
 #include "font.h"
 #include "backlight.h"
@@ -74,6 +75,8 @@ void main(void)
     ret = storage_init();
     if(ret)
         printf("ATA error: %d", ret);
+
+    filesystem_init();
       
     /* If no button is held, start the OF */
     if(button_read_device() == 0)
@@ -94,8 +97,6 @@ void main(void)
     }
     else
     {
-        disk_init();
-
         ret = disk_mount_all();
         if (ret <= 0)
             error(EDISK, ret, true);
