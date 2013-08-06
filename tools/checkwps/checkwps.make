@@ -7,7 +7,7 @@
 # $Id$
 #
 
-GCCOPTS=-g -D__PCTOOL__ -DCHECKWPS $(TARGET)
+GCCOPTS=-std=gnu99 -g -D__PCTOOL__ -DCHECKWPS $(TARGET)
 
 CHECKWPS_SRC = $(call preprocess, $(TOOLSDIR)/checkwps/SOURCES)
 CHECKWPS_OBJ = $(call c2obj,$(CHECKWPS_SRC))

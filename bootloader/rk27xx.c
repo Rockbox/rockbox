@@ -12,6 +12,7 @@
 #include "button.h"
 #include "common.h"
 #include "storage.h"
+#include "file_internal.h"
 #include "disk.h"
 #include "panic.h"
 #include "power.h"
@@ -146,8 +147,7 @@ void main(void)
     if(ret < 0)
         error(EATA, ret, true);
 
-    while(!disk_init(IF_MV(0)))
-        panicf("disk_init failed!");
+    filesystem_init();
 
     while((ret = disk_mount_all()) <= 0)
         error(EDISK, ret, true);
