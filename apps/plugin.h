@@ -75,7 +75,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "profile.h"
 #endif
 #include "misc.h"
-#include "filefuncs.h"
+#include "pathfuncs.h"
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcm_mixer.h"
 #include "dsp-util.h"
@@ -160,12 +160,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 231
+#define PLUGIN_API_VERSION 232
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 231
+#define PLUGIN_MIN_API_VERSION 232
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -433,17 +433,17 @@ struct plugin_api {
 
     /* file */
     int (*open_utf8)(const char* pathname, int flags);
-    int (*open)(const char* pathname, int flags, ...);
-    int (*close)(int fd);
-    ssize_t (*read)(int fd, void* buf, size_t count);
-    off_t (*lseek)(int fd, off_t offset, int whence);
-    int (*creat)(const char *pathname, mode_t mode);
-    ssize_t (*write)(int fd, const void* buf, size_t count);
-    int (*remove)(const char* pathname);
-    int (*rename)(const char* path, const char* newname);
-    int (*ftruncate)(int fd, off_t length);
-    off_t (*filesize)(int fd);
-    int (*fdprintf)(int fd, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
+    int (*open)(const char *path, int oflag, ...);
+    int (*creat)(const char *path, mode_t mode);
+    int (*close)(int fildes);
+    ssize_t (*read)(int fildes, void *buf, size_t nbyte);
+    off_t (*lseek)(int fildes, off_t offset, int whence);
+    ssize_t (*write)(int fildes, const void *buf, size_t nbyte);
+    int (*remove)(const char *path);
+    int (*rename)(const char *old, const char *new);
+    int (*ftruncate)(int fildes, off_t length);
+    off_t (*filesize)(int fildes);
+    int (*fdprintf)(int fildes, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);
     void (*storage_sleep)(void);
@@ -457,7 +457,7 @@ struct plugin_api {
     char *(*create_numbered_filename)(char *buffer, const char *path,
                                       const char *prefix, const char *suffix,
                                       int numberlen IF_CNFN_NUM_(, int *num));
-    bool (*file_exists)(const char *file);
+    bool (*file_exists)(const char *path);
     char* (*strip_extension)(char* buffer, int buffer_size, const char *filename);
     uint32_t (*crc_32)(const void *src, uint32_t len, uint32_t crc32);
 
@@ -466,13 +466,13 @@ struct plugin_api {
 
 
     /* dir */
-    DIR* (*opendir)(const char* name);
-    int (*closedir)(DIR* dir);
-    struct dirent* (*readdir)(DIR* dir);
-    int (*mkdir)(const char *name);
-    int (*rmdir)(const char *name);
-    bool (*dir_exists)(const char *path);
-    struct dirinfo (*dir_get_info)(DIR* parent, struct dirent *entry);
+    DIR * (*opendir)(const char *dirname);
+    int (*closedir)(DIR *dirp);
+    struct dirent * (*readdir)(DIR *dirp);
+    int (*mkdir)(const char *path);
+    int (*rmdir)(const char *path);
+    bool (*dir_exists)(const char *dirname);
+    struct dirinfo (*dir_get_info)(DIR *dirp, struct dirent *entry);
 
     /* browsing */
     void (*browse_context_init)(struct browse_context *browse,
@@ -838,6 +838,7 @@ struct plugin_api {
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
+    struct tm * (*gmtime_r)(const time_t *timep, struct tm *tm);
 #if CONFIG_RTC
     time_t (*mktime)(struct tm *t);
 #endif

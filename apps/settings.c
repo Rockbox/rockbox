@@ -822,6 +822,10 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_LCD_BITMAP
     int rc;
 #endif
+    CHART(">set_codepage");
+    set_codepage(global_settings.default_codepage);
+    CHART("<set_codepage");
+
     sound_settings_apply();
 
 #ifdef HAVE_DISK_STORAGE
@@ -1007,10 +1011,6 @@ void settings_apply(bool read_disk)
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay);
 
-
-    CHART(">set_codepage");
-    set_codepage(global_settings.default_codepage);
-    CHART("<set_codepage");
 
 #ifdef HAVE_PLAY_FREQ
     settings_apply_play_freq(global_settings.play_frequency, false);

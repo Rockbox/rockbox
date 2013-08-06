@@ -21,13 +21,16 @@
 #include "config.h"
 #include "system.h"
 #include <stdio.h>
+#include <errno.h>
 #include "../kernel-internal.h"
 #include "gcc_extensions.h"
 #include "string.h"
 #include "adc.h"
 #include "powermgmt.h"
 #include "storage.h"
+#include "file_internal.h"
 #include "dir.h"
+#include "file.h"
 #include "disk.h"
 #include "common.h"
 #include "rb-loader.h"
@@ -219,7 +222,7 @@ static void untar(int tar_fd)
 
             /* Create the dir */
             ret = mkdir(path);
-            if (ret < 0 && ret != -4)
+            if (ret < 0 && errno != EEXIST)
             {
                 printf("failed to create dir (%d)", ret);
             }
@@ -233,14 +236,14 @@ static void handle_untar(void)
     char buf[MAX_PATH];
     char tarstring[6];
     char model[5];
-    struct dirent_uncached* entry;
-    DIR_UNCACHED* dir;
+    struct dirent* entry;
+    DIR* dir;
     int fd;
     int rc;
 
-    dir = opendir_uncached(basedir);
+    dir = opendir(basedir);
 
-    while ((entry = readdir_uncached(dir)))
+    while ((entry = readdir(dir)))
     {
         if (*entry->d_name == '.')
             continue;
@@ -262,7 +265,6 @@ static void handle_untar(void)
                 verbose = true;
                 printf("Found rockbox binary. Moving...");
                 close(fd);
-                remove( BOOTDIR "/" BOOTFILE);
                 int ret = rename(buf, BOOTDIR "/" BOOTFILE);
                 printf("returned %d", ret);
                 sleep(HZ);
@@ -365,7 +367,7 @@ void main(void)
     if(rc)
         error(EATA, rc, true);
 
-    disk_init();
+    filesystem_init();
 
     rc = disk_mount_all();
     if (rc <= 0)

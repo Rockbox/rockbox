@@ -26,12 +26,13 @@
 #include <stdlib.h>
 #include "common.h"
 #include "cpu.h"
-#include "file.h"
 #include "system.h"
 #include "../kernel-internal.h"
 #include "lcd.h"
 #include "font.h"
 #include "storage.h"
+#include "file_internal.h"
+#include "file.h"
 #include "button.h"
 #include "disk.h"
 #include "crc32-mi4.h"
@@ -92,7 +93,7 @@ void* main(void)
     int num_partitions;
     int crc32;
     char sector[512];
-    struct partinfo* pinfo;
+    struct partinfo pinfo;
 
     system_init();
     kernel_init();
@@ -117,7 +118,7 @@ void* main(void)
     printf("");
 
     i=storage_init();
-    disk_init(IF_MV(0));
+    filesystem_init();
     num_partitions = disk_mount_all();
 
     if (num_partitions<=0)
@@ -125,17 +126,17 @@ void* main(void)
         error(EDISK, num_partitions, true);
     }
 
-    pinfo = disk_partinfo(1);
+    disk_partinfo(1, &pinfo);
 
 #if 0 /* not needed in release builds */
     printf("--- Partition info ---");
-    printf("start: %x", pinfo->start);
-    printf("size: %x", pinfo->size);
-    printf("type: %x", pinfo->type);
+    printf("start: %x", pinfo.start);
+    printf("size: %x", pinfo.size);
+    printf("type: %x", pinfo.type);
     printf("reading: %x", (START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK)*512);
 #endif
 
-    storage_read_sectors(pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
+    storage_read_sectors(pinfo.start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                          1 , sector);
     crc32 = chksum_crc32 (sector, 512);
 
@@ -157,7 +158,7 @@ void* main(void)
         memcpy(&sector[HACK_OFFSET], changedBytes,
                 sizeof(changedBytes)/sizeof(*changedBytes));
         storage_write_sectors(
-                        pinfo->start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
+                        pinfo.start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                         1 , sector);
         printf("Firmware unlocked");
         printf("Proceed to Step 2");
