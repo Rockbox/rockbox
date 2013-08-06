@@ -287,7 +287,7 @@ int fsync(int fd)
             if (rc < 0)
             {
                 /* when failing, try to close the file anyway */
-                fat_closewrite(&(file->fatfile), file->size, file->attr);
+                fat_closewrite(&(file->fatfile), file->size);
                 return rc * 10 - 3;
             }
         }
@@ -298,13 +298,13 @@ int fsync(int fd)
             if (rc < 0)
             {
                 /* when failing, try to close the file anyway */
-                fat_closewrite(&(file->fatfile), file->size, file->attr);
+                fat_closewrite(&(file->fatfile), file->size);
                 return rc * 10 - 4;
             }
         }
 
         /* tie up all loose ends */
-        rc = fat_closewrite(&(file->fatfile), file->size, file->attr);
+        rc = fat_closewrite(&(file->fatfile), file->size);
         if (rc < 0)
             return rc * 10 - 5;
     }
@@ -399,10 +399,9 @@ int rename(const char* path, const char* newpath)
 
     file = &openfiles[fd];
 
-    rc = fat_rename(&file->fatfile, &dir->fatdir, nameptr,
-                    file->size, file->attr);
+    rc = fat_rename(&file->fatfile, &dir->fatdir, nameptr);
 #ifdef HAVE_MULTIVOLUME
-    if ( rc == -1) {
+    if ( rc == -2) {
         close(fd);
         closedir_uncached(dir);
         DEBUGF("Failed renaming file across volumnes: %d\n", rc);

@@ -27,11 +27,23 @@
 #include "config.h"
 #include "system.h"
 
-/* This value can be overwritten by a target in config-[target].h, but
-   that behaviour is still experimental */
+/****************************************************************************
+ ** Values that can be overridden by a target in config-[target].h
+ **/
+
+/* If your ATA implementation can do better, go right ahead and increase
+ * this value. */
+#ifndef FAT_MAX_TRANSFER_SIZE
+#define FAT_MAX_TRANSFER_SIZE 256
+#endif
+
+/* still experimental? */
 #ifndef SECTOR_SIZE
 #define SECTOR_SIZE 512
 #endif
+
+/**
+ ****************************************************************************/
 
 /* Number of bytes reserved for a file name (including the trailing \0).
    Since names are stored in the entry as UTF-8, we won't be able to
@@ -39,11 +51,10 @@
    characters (not bytes!). Since the UTF-8 encoding of a char may take
    up to 4 bytes, there will be names that we won't be able to store
    completely. For such names, the short DOS name is used. */
-#define FAT_FILENAME_BYTES 256
-
 struct fat_direntry
 {
-    unsigned char name[FAT_FILENAME_BYTES]; /* UTF-8 encoded name plus \0 */
+    unsigned char name[256];        /* UTF-8 encoded name plus \0 */
+    unsigned char shortname[13];    /* DOS filename (OEM charset) */
     unsigned short attr;            /* Attributes */
     unsigned char crttimetenth;     /* Millisecond creation
                                        time stamp (0-199) */
@@ -52,8 +63,8 @@ struct fat_direntry
     unsigned short lstaccdate;      /* Last access date */
     unsigned short wrttime;         /* Last write time */
     unsigned short wrtdate;         /* Last write date */
-    unsigned long filesize;          /* File size in bytes */
-    long firstcluster;               /* fstclusterhi<<16 + fstcluslo */
+    unsigned long filesize;         /* File size in bytes */
+    long firstcluster;              /* fstclusterhi<<16 + fstcluslo */
 };
 
 #define FAT_ATTR_READ_ONLY   0x01
@@ -66,14 +77,14 @@ struct fat_direntry
 
 struct fat_file
 {
-    long firstcluster;    /* first cluster in file */
-    long lastcluster;     /* cluster of last access */
-    long lastsector;      /* sector of last access */
-    long clusternum;      /* current clusternum */
-    long sectornum;       /* sector number in this cluster */
-    unsigned int direntry;   /* short dir entry index from start of dir */
-    unsigned int direntries; /* number of dir entries used by this file */
-    long dircluster;      /* first cluster of dir */
+    long          firstcluster;/* first cluster in file */
+    long          lastcluster; /* cluster of last access */
+    unsigned long lastsector;  /* sector of last access */
+    long          clusternum;  /* cluster number of last access */
+    unsigned long sectornum;   /* sector number within current cluster */
+    unsigned int  direntry;    /* short dir entry index from start of dir */
+    unsigned int  direntries;  /* number of dir entries used by this file */
+    long          dircluster;  /* first cluster of dir */
     bool eof;
 #ifdef HAVE_MULTIVOLUME
     int volume;          /* file resides on which volume */
@@ -82,59 +93,55 @@ struct fat_file
 
 struct fat_dir
 {
-    unsigned char sectorcache[SECTOR_SIZE] CACHEALIGN_ATTR;
+    struct fat_file file;
     unsigned int entry;
     unsigned int entrycount;
-    long sector;
-    struct fat_file file;
-    /* There are 2-bytes per characters. We don't want to bother too much, as LFN entries are
-     * at much 255 characters longs, that's at most 20 LFN entries. Each entry hold at most
-     * 13 characters, that a total of 260 characters. So we keep a buffer of that size.
-     * Keep coherent with fat.c code. */
-    unsigned char longname[260 * 2];
-} CACHEALIGN_ATTR;
+    void *cache;
+    bool dirty;
+};
 
-#ifdef HAVE_HOTSWAP
-extern void fat_lock(void);
-extern void fat_unlock(void);
-#endif
+void fat_init(void);
+int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
+int fat_mount(IF_MV(int volume,) IF_MD(int drive,) long startsector);
+int fat_unmount(IF_MV(int volume,) bool flush);
+void fat_size(IF_MV(int volume,) /* public for info */
+              unsigned long *size,
+              unsigned long *free);
+int fat_create_dir(const char *name,
+                   struct fat_dir *newdir,
+                   struct fat_dir *dir);
+int fat_open(IF_MV(int volume,)
+             long cluster,
+             struct fat_file *ent,
+             const struct fat_dir *dir);
+int fat_create_file(const char *name,
+                    struct fat_file *ent,
+                    struct fat_dir *dir);
+long fat_readwrite(struct fat_file *ent,
+                   unsigned long sectorcount,
+                   void *buf, bool write );
+int fat_closewrite(struct fat_file *ent, unsigned long size);
+int fat_seek(struct fat_file *ent, unsigned long sector);
+int fat_remove(struct fat_file *ent);
+int fat_truncate(const struct fat_file *ent);
+int fat_rename(struct fat_file *file,
+               struct fat_dir *dir,
+               const unsigned char *newname);
 
-extern void fat_init(void);
-extern int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
-extern int fat_mount(IF_MV(int volume,) IF_MD(int drive,) long startsector);
-extern int fat_unmount(int volume, bool flush);
-extern void fat_size(IF_MV(int volume,) /* public for info */
-                     unsigned long* size,
-                     unsigned long* free);
-extern void fat_recalc_free(IF_MV_NONVOID(int volume)); /* public for debug info screen */
-extern int fat_create_dir(const char* name,
-                          struct fat_dir* newdir,
-                          struct fat_dir* dir);
-extern int fat_open(IF_MV(int volume,)
-                    long cluster,
-                    struct fat_file* ent,
-                    const struct fat_dir* dir);
-extern int fat_create_file(const char* name,
-                           struct fat_file* ent,
-                           struct fat_dir* dir);
-extern long fat_readwrite(struct fat_file *ent, long sectorcount, 
-                         void* buf, bool write );
-extern int fat_closewrite(struct fat_file *ent, long size, int attr);
-extern int fat_seek(struct fat_file *ent, unsigned long sector );
-extern int fat_remove(struct fat_file *ent);
-extern int fat_truncate(const struct fat_file *ent);
-extern int fat_rename(struct fat_file* file, 
-                      struct fat_dir* dir,
-                      const unsigned char* newname,
-                      long size, int attr);
+int fat_opendir(IF_MV(int volume,)
+                struct fat_dir *ent,
+                long startcluster,
+                const struct fat_dir *parent_dir);
+int fat_closedir(struct fat_dir *dir);
+int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
+bool fat_ismounted(IF_MV_NONVOID(int volume));
 
-extern int fat_opendir(IF_MV(int volume,)
-                       struct fat_dir *ent, unsigned long startcluster,
-                       const struct fat_dir *parent_dir);
-extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);
-extern unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume)); /* public for debug info screen */
-extern bool fat_ismounted(int volume);
-extern void* fat_get_sector_buffer(void);
-extern void fat_release_sector_buffer(void);
+/* grab a buffer from the cache as a temp */
+void * fat_get_sector_buffer(void);
+void fat_release_sector_buffer(void *buf);
 
-#endif
+/* debug screen stuff */
+void fat_recalc_free(IF_MV_NONVOID(int volume));
+unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume));
+
+#endif /* FAT_H */
