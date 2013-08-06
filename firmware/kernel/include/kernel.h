@@ -26,6 +26,7 @@
 #include "system.h"
 #include "queue.h"
 #include "mutex.h"
+#include "mrsw_lock.h"
 #include "tick.h"
 
 #ifdef INCLUDE_TIMEOUT_API

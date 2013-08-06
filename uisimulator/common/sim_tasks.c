@@ -28,6 +28,11 @@
 #include "thread.h"
 #include "debug.h"
 #include "usb.h"
+#include "mv.h"
+#include "ata_idle_notify.h"
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 static void sim_thread(void);
 static long sim_thread_stack[DEFAULT_STACK_SIZE/sizeof(long)];
@@ -46,6 +51,10 @@ enum {
 #endif
 };
 
+#ifdef HAVE_MULTIDRIVE
+extern void sim_ext_extracted(int drive);
+#endif
+
 void sim_thread(void)
 {
     struct queue_event ev;
@@ -54,9 +63,13 @@ void sim_thread(void)
     
     while (1)
     {
-        queue_wait(&sim_queue, &ev);
+        queue_wait_w_tmo(&sim_queue, &ev, 5*HZ);
         switch(ev.id)
         {
+            case SYS_TIMEOUT:
+                call_storage_idle_notifys(false);
+                break;
+    
             case SIM_SCREENDUMP:
                 screen_dump();
 #ifdef HAVE_REMOTE_LCD
@@ -102,6 +115,7 @@ void sim_thread(void)
 #ifdef HAVE_MULTIDRIVE
             case SIM_EXT_INSERTED:
             case SIM_EXT_EXTRACTED:
+                sim_ext_extracted(ev.data);
                 queue_broadcast(ev.id == SIM_EXT_INSERTED ?
                                 SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED, 0);
                 sleep(HZ/20);
@@ -174,11 +188,13 @@ static bool is_ext_inserted;
 
 void sim_trigger_external(bool inserted)
 {
-    if (inserted)
-        queue_post(&sim_queue, SIM_EXT_INSERTED, 0);
-    else
-        queue_post(&sim_queue, SIM_EXT_EXTRACTED, 0);
     is_ext_inserted = inserted;
+
+    int drive = 1; /* Can do others! */
+    if (inserted)
+        queue_post(&sim_queue, SIM_EXT_INSERTED, drive);
+    else
+        queue_post(&sim_queue, SIM_EXT_EXTRACTED, drive);
 }
 
 bool hostfs_present(int drive)
@@ -203,7 +219,13 @@ bool volume_present(int volume)
     /* volume == drive for now */
     return hostfs_present(volume);
 }
-#endif
+
+int volume_drive(int volume)
+{
+    /* volume == drive for now */
+    return volume;
+}
+#endif /* HAVE_MULTIVOLUME */
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
 bool mmc_touched(void)
@@ -212,4 +234,4 @@ bool mmc_touched(void)
 }
 #endif
 
-#endif
+#endif /* CONFIG_STORAGE & STORAGE_MMC */
