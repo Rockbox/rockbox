@@ -78,9 +78,17 @@ unsigned char* utf16BEdecode(const unsigned char *utf16, unsigned char *utf8, in
 unsigned long utf8length(const unsigned char *utf8);
 const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs);
 void set_codepage(int cp);
+int get_codepage(void);
 int utf8seek(const unsigned char* utf8, int offset);
 const char* get_codepage_name(int cp);
-#if defined(APPLICATION) && defined(__linux__)
+#ifdef APPLICATION
+#if defined(__linux__)
 const char *get_current_codepage_name_linux(void);
 #endif
+#endif /* APPLICATION */
+
+#if !(CONFIG_PLATFORM & PLATFORM_NATIVE)
+void unicode_init(void);
+#endif
+
 #endif /* _RBUNICODE_H_ */
