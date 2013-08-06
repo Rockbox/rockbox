@@ -104,6 +104,10 @@ int get_cpu_boost_counter(void);
 /* return number of elements in array a */
 #define ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
 
+/* is the given pointer "p" inside the said bounds of array "a"? */
+#define PTR_IN_ARRAY(a, p, numelem) \
+    ((uintptr_t)(p) - (uintptr_t)(a) < (uintptr_t)(numelem)*sizeof ((a)[0]))
+
 /* return p incremented by specified number of bytes */
 #define SKIPBYTES(p, count) ((typeof (p))((char *)(p) + (count)))
 
@@ -157,7 +161,12 @@ int get_cpu_boost_counter(void);
     ((type *)((intptr_t)(memberptr) - OFFSETOF(type, membername)))
 
 /* returns index of first set bit or 32 if no bits are set */
+#if defined(CPU_ARM) && ARM_ARCH >= 5 && !defined(__thumb__)
+static inline int find_first_set_bit(uint32_t val)
+    { return LIKELY(val) ? __builtin_ctz(val) : 32; }
+#else
 int find_first_set_bit(uint32_t val);
+#endif
 
 static inline __attribute__((always_inline))
 uint32_t isolate_first_bit(uint32_t val)
@@ -194,11 +203,15 @@ enum {
 #include "system-target.h"
 #elif defined(HAVE_SDL) /* SDL build */
 #include "system-sdl.h"
+#ifdef SIMULATOR
+#include "system-sim.h"
+#endif
 #define NEED_GENERIC_BYTESWAPS
 #elif defined(__PCTOOL__)
-#include "system-sdl.h"
+#include "system-hosted.h"
 #define NEED_GENERIC_BYTESWAPS
 #endif
+
 #include "bitswap.h"
 
 #ifdef NEED_GENERIC_BYTESWAPS

@@ -27,6 +27,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "storage.h"
+#include "file_internal.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
@@ -124,8 +125,8 @@ void main(void)
         error(EATA, rc, true);
     }
 
-    printf("disk");
-    disk_init();
+    printf("filesystem");
+    filesystem_init();
 
     printf("mount");
     rc = disk_mount_all();

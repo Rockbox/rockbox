@@ -28,6 +28,7 @@
 #include <stdbool.h>
 #include "gcc_extensions.h"
 #include "corelock.h"
+#include "bitarray.h"
 
 /* Priority scheduling (when enabled with HAVE_PRIORITY_SCHEDULING) works
  * by giving high priority threads more CPU time than lower priority threads
@@ -80,6 +81,10 @@
 #endif
 
 #define MAXTHREADS (BASETHREADS+TARGET_EXTRA_THREADS)
+
+BITARRAY_TYPE_DECLARE(threadbit_t, threadbit, MAXTHREADS)
+BITARRAY_TYPE_DECLARE(priobit_t, priobit, NUM_PRIORITIES)
+
 /*
  * We need more stack when we run under a host
  * maybe more expensive C lib functions?
@@ -134,32 +139,39 @@ struct thread_list
     struct thread_entry *next; /* Next thread in a list */
 };
 
-#ifdef HAVE_PRIORITY_SCHEDULING
+/* Basic structure describing the owner of an object */
 struct blocker
 {
     struct thread_entry * volatile thread; /* thread blocking other threads
                                               (aka. object owner) */
-    int priority;                  /* highest priority waiter */
-    struct thread_entry * (*wakeup_protocol)(struct thread_entry *thread);
+#ifdef HAVE_PRIORITY_SCHEDULING
+    int priority;                          /* highest priority waiter */
+#endif
 };
 
-/* Choices of wakeup protocol */
+/* If a thread has a blocker but the blocker's registered thread is NULL,
+   then it references this and the struct blocker pointer may be
+   reinterpreted as such. */
+struct blocker_splay
+{
+    struct blocker  blocker;             /* blocker info (first!) */
+#ifdef HAVE_PRIORITY_SCHEDULING
+    threadbit_t     mask;                /* mask of nonzero tcounts */
+#if NUM_CORES > 1
+    struct corelock cl;                  /* mutual exclusion */
+#endif
+#endif /* HAVE_PRIORITY_SCHEDULING */
+};
 
-/* For transfer of object ownership by one thread to another thread by
- * the owning thread itself (mutexes) */
-struct thread_entry *
-    wakeup_priority_protocol_transfer(struct thread_entry *thread);
+#ifdef HAVE_PRIORITY_SCHEDULING
 
-/* For release by owner where ownership doesn't change - other threads,
- * interrupts, timeouts, etc. (mutex timeout, queues) */
-struct thread_entry *
-    wakeup_priority_protocol_release(struct thread_entry *thread);
-
+/* Quick-disinherit of priority elevation. Must be a running thread. */
+void priority_disinherit(struct thread_entry *thread, struct blocker *bl);
 
 struct priority_distribution
 {
-    uint8_t  hist[NUM_PRIORITIES]; /* Histogram: Frequency for each priority */
-    uint32_t mask;                 /* Bitmask of hist entries that are not zero */
+    uint8_t   hist[NUM_PRIORITIES]; /* Histogram: Frequency for each priority */
+    priobit_t mask;                 /* Bitmask of hist entries that are not zero */
 };
 
 #endif /* HAVE_PRIORITY_SCHEDULING */
@@ -210,6 +222,7 @@ struct thread_entry
     volatile intptr_t retval;  /* Return value from a blocked operation/
                                   misc. use */
 #endif
+    uint32_t id;               /* Current slot id */
     int __errno;               /* Thread error number (errno tls) */
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* Priority summary of owned objects that support inheritance */
@@ -226,7 +239,6 @@ struct thread_entry
     unsigned char priority;    /* Scheduled priority (higher of base or
                                   all threads blocked by this one) */
 #endif
-    uint16_t id;               /* Current slot id */
     unsigned short stack_size; /* Size of stack in bytes */
     unsigned char state;       /* Thread slot state (STATE_*) */
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
@@ -238,11 +250,12 @@ struct thread_entry
 };
 
 /*** Macros for internal use ***/
-/* Thread ID, 16 bits = |VVVVVVVV|SSSSSSSS| */
-#define THREAD_ID_VERSION_SHIFT      8
-#define THREAD_ID_VERSION_MASK  0xff00
-#define THREAD_ID_SLOT_MASK     0x00ff
+/* Thread ID, 32 bits = |VVVVVVVV|VVVVVVVV|VVVVVVVV|SSSSSSSS| */
+#define THREAD_ID_VERSION_SHIFT 8
+#define THREAD_ID_VERSION_MASK  0xffffff00
+#define THREAD_ID_SLOT_MASK     0x000000ff
 #define THREAD_ID_INIT(n)       ((1u << THREAD_ID_VERSION_SHIFT) | (n))
+#define THREAD_ID_SLOT(id)      ((id) & THREAD_ID_SLOT_MASK)
 
 #ifdef HAVE_CORELOCK_OBJECT
 /* Operations to be performed just before stopping a thread and starting
@@ -337,11 +350,8 @@ void switch_thread(void);
 /* Blocks a thread for at least the specified number of ticks (0 = wait until
  * next tick) */
 void sleep_thread(int ticks);
-/* Indefinitely blocks the current thread on a thread queue */
-void block_thread(struct thread_entry *current);
-/* Blocks the current thread on a thread queue until explicitely woken or
- * the timeout is reached */
-void block_thread_w_tmo(struct thread_entry *current, int timeout);
+/* Blocks the current thread on a thread queue (< 0 == infinite) */
+void block_thread(struct thread_entry *current, int timeout);
 
 /* Return bit flags for thread wakeup */
 #define THREAD_NONE     0x0 /* No thread woken up (exclusive) */
@@ -350,15 +360,32 @@ void block_thread_w_tmo(struct thread_entry *current, int timeout);
                                higher priority than current were woken) */
 
 /* A convenience function for waking an entire queue of threads. */
-unsigned int thread_queue_wake(struct thread_entry **list);
+unsigned int thread_queue_wake(struct thread_entry **list,
+                               volatile int *count);
 
 /* Wakeup a thread at the head of a list */
-unsigned int wakeup_thread(struct thread_entry **list);
+enum wakeup_thread_protocol
+{
+    WAKEUP_DEFAULT,
+    WAKEUP_TRANSFER,
+    WAKEUP_RELEASE,
+    WAKEUP_TRANSFER_MULTI,
+};
+
+unsigned int wakeup_thread_(struct thread_entry **list
+                            IF_PRIO(, enum wakeup_thread_protocol proto));
 
 #ifdef HAVE_PRIORITY_SCHEDULING
+#define wakeup_thread(list, proto) \
+    wakeup_thread_((list), (proto))
+
 int thread_set_priority(unsigned int thread_id, int priority);
 int thread_get_priority(unsigned int thread_id);
+#else /* !HAVE_PRIORITY_SCHEDULING */
+#define wakeup_thread(list, proto...) \
+    wakeup_thread_((list));
 #endif /* HAVE_PRIORITY_SCHEDULING */
+
 #ifdef HAVE_IO_PRIORITY
 void thread_set_io_priority(unsigned int thread_id, int io_priority);
 int thread_get_io_priority(unsigned int thread_id);
