@@ -18,46 +18,71 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef _DIR_H_
 #define _DIR_H_
 
+#include <sys/types.h>
+#include <fcntl.h>
+#include <time.h>
 #include "config.h"
+#include "fs_attr.h"
 
-#define ATTR_READ_ONLY   0x01
-#define ATTR_HIDDEN      0x02
-#define ATTR_SYSTEM      0x04
-#define ATTR_VOLUME_ID   0x08
-#define ATTR_DIRECTORY   0x10
-#define ATTR_ARCHIVE     0x20
-#define ATTR_VOLUME      0x40 /* this is a volume, not a real directory */
-#define ATTR_LINK        0x80
-
-#ifdef HAVE_DIRCACHE
-# include "dircache.h"
-# define DIR DIR_CACHED
-# define dirent dirent_cached
-# define opendir opendir_cached
-# define closedir closedir_cached
-# define readdir readdir_cached
-# define closedir closedir_cached
-# define mkdir mkdir_cached
-# define rmdir rmdir_cached
+#if defined (APPLICATION)
+#include "filesystem-app.h"
+#elif defined(SIMULATOR) || defined(__PCTOOL__)
+#include "../../uisimulator/common/filesystem-sim.h"
 #else
-# include "dir_uncached.h"
-# define DIR DIR_UNCACHED
-# define dirent dirent_uncached
-# define opendir opendir_uncached
-# define closedir closedir_uncached
-# define readdir readdir_uncached
-# define closedir closedir_uncached
-# define mkdir mkdir_uncached
-# define rmdir rmdir_uncached
+#include "filesystem-native.h"
 #endif
 
-
-typedef DIR* (*opendir_func)(const char* name);
-typedef int (*closedir_func)(DIR* dir);
-typedef struct dirent* (*readdir_func)(DIR* dir);
-
+#ifndef DIRFUNCTIONS_DEFINED
+#ifndef opendir
+#define opendir         FS_PREFIX(opendir)
 #endif
+#ifndef readdir
+#define readdir         FS_PREFIX(readdir)
+#endif
+#ifndef readdir_r
+#define readdir_r       FS_PREFIX(readdir_r)
+#endif
+#ifndef rewinddir
+#define rewinddir       FS_PREFIX(rewinddir)
+#endif
+#ifndef closedir
+#define closedir        FS_PREFIX(closedir)
+#endif
+#ifndef mkdir
+#define mkdir           FS_PREFIX(mkdir)
+#endif
+#ifndef rmdir
+#define rmdir           FS_PREFIX(rmdir)
+#endif
+#ifndef samedir
+#define samedir         FS_PREFIX(samedir)
+#endif
+#ifndef dir_exists
+#define dir_exists      FS_PREFIX(dir_exists)
+#endif
+#endif /* !DIRFUNCTIONS_DEFINED */
+
+#ifndef DIRENT_DEFINED
+struct DIRENT
+{
+    struct dirinfo_native info; /* platform extra info */
+    char d_name[MAX_PATH];      /* UTF-8 name of entry (last!) */
+};
+#endif /* DIRENT_DEFINED */
+
+struct dirinfo
+{
+    unsigned int attribute; /* attribute bits of file */
+    off_t        size;      /* binary size of file */
+    time_t       mtime;     /* local file time */
+};
+
+#ifndef DIRFUNCTIONS_DECLARED
+/* TIP: set errno to zero before calling to see if anything failed */
+struct dirinfo dir_get_info(DIR *dirp, struct DIRENT *entry);
+#endif /* !DIRFUNCTIONS_DECLARED */
+
+#endif /* _DIR_H_ */
