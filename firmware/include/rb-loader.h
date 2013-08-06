@@ -18,5 +18,4 @@
  *
  ****************************************************************************/
 
-const char *rb_strerror(int8_t errno);
 int load_firmware(unsigned char* buf, const char* firmware, int buffer_size);

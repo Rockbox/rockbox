@@ -34,6 +34,7 @@
 #include "thread.h"
 #include "ata.h"
 #include "fat.h"
+#include "file_internal.h"
 #include "disk.h"
 #include "font.h"
 #include "adc.h"
@@ -296,7 +297,7 @@ void* main(void)
     int rc;
     bool haveramos;
     bool button_was_held;
-    struct partinfo* pinfo;
+    struct partinfo pinfo;
     unsigned short* identify_info;
 
     /* Check the button hold status as soon as possible - to 
@@ -354,7 +355,8 @@ void* main(void)
       printf("ATA: %d", i);
     }
 
-    disk_init();
+    filesystem_init();
+
     rc = disk_mount_all();
     if (rc<=0)
     {
@@ -362,9 +364,9 @@ void* main(void)
         fatal_error();
     }
 
-    pinfo = disk_partinfo(1);
+    disk_partinfo(1, &pinfo);
     printf("Partition 1: 0x%02x %ld sectors", 
-           pinfo->type, pinfo->size);
+           pinfo.type, pinfo.size);
 
     if (button_was_held || (btn==BUTTON_MENU)) {
         /* If either the hold switch was on, or the Menu button was held, then 
