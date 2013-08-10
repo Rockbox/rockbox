@@ -393,22 +393,6 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
     }
 }
 
-static void imx_printf(void *user, bool error, color_t c, const char *fmt, ...)
-{
-    (void) user;
-    (void) c;
-    va_list args;
-    va_start(args, fmt);
-    /*
-    if(error)
-        printf("[ERR] ");
-    else
-        printf("[INFO] ");
-    */
-    vprintf(fmt, args);
-    va_end(args);
-}
-
 static uint32_t get_uint32be(unsigned char *p)
 {
     return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
@@ -556,7 +540,7 @@ static enum imx_error_t load_sb_file(const char *file, int md5_idx,
     clear_keys();
     add_keys(imx_models[model].keys, imx_models[model].nr_keys);
     *sb_file = sb_read_file_ex(file, imx_sums[md5_idx].fw_variants[opt.fw_variant].offset,
-                              imx_sums[md5_idx].fw_variants[opt.fw_variant].size, false, NULL, &imx_printf, &err);
+                              imx_sums[md5_idx].fw_variants[opt.fw_variant].size, false, NULL, &sb_std_printf, &err);
     if(*sb_file == NULL)
     {
         clear_keys();
@@ -760,7 +744,7 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     ret = patch_firmware(model, opt.fw_variant, opt.output,
         sb_file, boot_fw, opt.force_version);
     if(ret == IMX_SUCCESS)
-        ret = sb_write_file(sb_file, outfile);
+        ret = sb_write_file(sb_file, outfile, NULL, sb_std_printf);
 
     clear_keys();
     rb_fw_free(&boot_fw);

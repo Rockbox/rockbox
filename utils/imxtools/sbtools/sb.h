@@ -231,9 +231,10 @@ enum sb_error_t
     SB_LAST_CRYPTO_ERROR = SB_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
 };
 
-enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename);
-
 typedef void (*sb_color_printf)(void *u, bool err, color_t c, const char *f, ...);
+
+enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *u,
+    sb_color_printf printf);
 struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
     sb_color_printf printf, enum sb_error_t *err);
 /* use size_t(-1) to use maximum size */

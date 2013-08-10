@@ -402,7 +402,7 @@ int main(int argc, char **argv)
         for(int i = 0; i < g_nr_keys; i++)
         {
             printf("  ");
-            print_key(&g_key_array[i], true);
+            print_key(NULL, misc_std_printf, &g_key_array[i], true);
         }
 
         for(int i = 0; i < g_extern_count; i++)
