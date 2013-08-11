@@ -36,11 +36,13 @@ SECTIONS
 {
     .octext :
     {
+        _copystart = .;
         oc_codestart = .;
         *(.text*)
         *(.icode*)
         *(.data*)
         *(.rodata*)
+        _copyend = .;
     } > OCRAM
 
     .bss (NOLOAD) :

@@ -496,7 +496,7 @@ void main(uint32_t arg)
     {
         struct usb_ctrlrequest req;
         usb_drv_recv_setup(&req);
-        
+
         switch(req.bRequestType & USB_TYPE_MASK)
         {
             case USB_TYPE_STANDARD:
