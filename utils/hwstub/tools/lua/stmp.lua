@@ -75,4 +75,5 @@ if STMP.info.chip ~= nil then
     require "stmp/pinctrl"
     require "stmp/lcdif"
     require "stmp/pwm"
+    require "stmp/clkctrl"
 end

@@ -44,7 +44,7 @@ do
 
     h = HELP:create_topic("HW");
     h:add("This variable redirects to the current soc under hwstub.soc and should be changed by calling hwstub:soc:select only.");
-    h:add("The complete register tree can be found under HW in a well organise fashion.");
+    h:add("The complete register tree can be found under HW in a well organised fashion.");
     h:add("* HW.dev points to device dev");
     h:add("* HW.dev[i] points to device devi if there are several copies of the device at different addresses.");
     h:add("* HW.dev.reg points to the register reg under dev");
