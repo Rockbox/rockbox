@@ -69,10 +69,10 @@ void power_off(void)
             break;
         case STMP3700:
         case STMP3770:
-            *(volatile uint32_t *)(HW_POWER_BASE + 0xe0) = 0x3e770003;
+            *(volatile uint32_t *)(HW_POWER_BASE + 0xe0) = 0x3e770001;
             break;
         case STMP3780:
-            *(volatile uint32_t *)(HW_POWER_BASE + 0x100) = 0x3e770003;
+            *(volatile uint32_t *)(HW_POWER_BASE + 0x100) = 0x3e770001;
             break;
         default:
             break;
@@ -126,7 +126,7 @@ void clkctrl_reset(void)
             *(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xf0) = 0x1;
             break;
         case STMP3780:
-            *(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x100) = 0x1;
+            *(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x120) = 0x1;
             break;
         default:
             break;
