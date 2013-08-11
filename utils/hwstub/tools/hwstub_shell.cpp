@@ -211,7 +211,34 @@ int my_lua_printlog(lua_State *state)
     return 0;
 }
 
+int my_lua_atexit(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "atexit takes one argument");
+    const char *arg = luaL_checkstring(state, 1);
+    int ret = -1;
+    if(strcmp(arg, "nop") == 0)
+        ret = hwstub_atexit(&g_hwdev, HWSTUB_ATEXIT_NOP);
+    else if(strcmp(arg, "reboot") == 0)
+        ret = hwstub_atexit(&g_hwdev, HWSTUB_ATEXIT_REBOOT);
+    else if(strcmp(arg, "off") == 0)
+        ret = hwstub_atexit(&g_hwdev, HWSTUB_ATEXIT_OFF);
+    else
+        luaL_error(state, "unknown atexit method '%s'", arg);
+    if(ret < 0)
+        luaL_error(state, "fail to set atexit method");
+    return 0;
+}
+
 int my_lua_exit(lua_State *state)
+{
+    if(hwstub_exit(&g_hwdev) < 0)
+        luaL_error(state, "fail to exit hwstub");
+    return 0;
+}
+
+int my_lua_quit(lua_State *state)
 {
     g_exit = true;
     return 0;
@@ -310,6 +337,10 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "write32");
     lua_pushcclosure(g_lua, my_lua_printlog, 0);
     lua_setfield(g_lua, -2, "print_log");
+    lua_pushcclosure(g_lua, my_lua_atexit, 0);
+    lua_setfield(g_lua, -2, "atexit");
+    lua_pushcclosure(g_lua, my_lua_exit, 0);
+    lua_setfield(g_lua, -2, "exit");
 
     lua_setfield(g_lua, -2, "dev");
 
@@ -347,10 +378,10 @@ bool my_lua_import_hwstub()
     lua_pushcfunction(g_lua, my_lua_help);
     lua_setglobal(g_lua, "help");
 
-    lua_pushcfunction(g_lua, my_lua_exit);
+    lua_pushcfunction(g_lua, my_lua_quit);
     lua_setglobal(g_lua, "exit");
 
-    lua_pushcfunction(g_lua, my_lua_exit);
+    lua_pushcfunction(g_lua, my_lua_quit);
     lua_setglobal(g_lua, "quit");
 
     if(lua_gettop(g_lua) != oldtop)
