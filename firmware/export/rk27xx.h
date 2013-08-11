@@ -8,8 +8,7 @@
 #define FLASH_BANK1 0x11000000
 
 #define USB_NUM_ENDPOINTS 16
-/* cache aligned */
-#define USB_DEVBSS_ATTR        __attribute__((aligned(CACHEALIGN_SIZE)))
+#define USB_DEVBSS_ATTR
 
 /* Timers */
 #define APB0_TIMER             (ARM_BUS0_BASE + 0x00000000)
@@ -812,7 +811,6 @@
 #define RXVOIDINTEN            (1<<5)
 #define RXERRINTEN             (1<<6)
 #define RXACKINTEN             (1<<7)
-#define RXCFINTE               (1<<12)
 /* bits 31:8 reserved for EP0 */
 /* bits 31:14 reserved for others */
 
@@ -835,7 +833,6 @@
 #define TXERRINTEN             (1<<5)
 #define TXACKINTEN             (1<<6)
 #define TXDMADNEN              (1<<7) /* reserved for EP0 */
-#define TXCFINTE               (1<<12)
 /* bits 31:8 reserved */
 
 /* TXnBUF bits */
