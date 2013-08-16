@@ -90,15 +90,6 @@ struct sdmmc_config_t sdmmc_config[] =
         .ssp = 1,
         .mode = SD_MODE,
     },
-    /* The Fuze+ uses pin #B1P29 for power */
-    {
-        .name = "eMMC",
-        .flags = POWER_PIN | POWER_INVERTED | WINDOW | POWER_DELAY,
-        .power_pin = PIN(1, 29),
-        .power_delay = HZ / 5, /* extra delay, to ramp up voltage? */
-        .ssp = 2,
-        .mode = MMC_MODE,
-    },
 #elif defined(CREATIVE_ZENXFI2)
     /* The Zen X-Fi2 uses pin B1P29 for power*/
     {

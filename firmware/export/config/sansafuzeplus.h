@@ -135,8 +135,10 @@
 #define HAVE_FLASH_STORAGE
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
-#define CONFIG_STORAGE (STORAGE_SD | STORAGE_MMC)
-#define NUM_DRIVES 2
+#define CONFIG_STORAGE STORAGE_SD
+#define HAVE_MULTIDRIVE
+#define HAVE_MULTIVOLUME
+#define NUM_DRIVES 1
 #define HAVE_HOTSWAP
 
 /* Extra threads: touchpad and rds */
