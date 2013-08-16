@@ -489,10 +489,6 @@ static void init(void)
 #endif
 #endif
 
-#ifdef ROCKBOX_HAS_LOGDISKF
-    init_logdiskf();
-#endif
-
 #if CONFIG_RTC
     rtc_init();
 #endif

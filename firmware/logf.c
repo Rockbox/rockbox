@@ -273,6 +273,8 @@ static int logdiskf_push(void *userp, unsigned char c)
     return true;
 }
 
+static void flush_buffer(void* data);
+
 void _logdiskf(const char* file, const char level, const char *fmt, ...)
 {
 
@@ -296,9 +298,9 @@ void _logdiskf(const char* file, const char level, const char *fmt, ...)
 
     vuprintf(logdiskf_push, NULL, fmt, ap);
     va_end(ap);
-
-
+    register_storage_idle_func(flush_buffer);
 }
+
 static void flush_buffer(void* data)
 {
     (void)data;
@@ -316,8 +318,4 @@ static void flush_buffer(void* data)
     logdiskfindex = 0;
 }
 
-void init_logdiskf()
-{
-    register_storage_idle_func(flush_buffer);
-}
 #endif
