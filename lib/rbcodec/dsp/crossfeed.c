@@ -164,6 +164,9 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
     crossfeed_hf_gain = hf_gain;
     crossfeed_cutoff  = cutoff;
 
+    if (crossfeed_type != CROSSFEED_TYPE_CUSTOM)
+        return;
+
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
     crossfeed_custom_update_filter(&crossfeed_state,
                                    dsp_get_output_frequency(dsp));
