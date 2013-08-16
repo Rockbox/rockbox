@@ -39,8 +39,9 @@ bool tuner_power(bool enable)
         imx233_pinctrl_enable_gpio(0, 29, enable);
         imx233_pinctrl_set_gpio(0, 29, enable);
         tuner_enable = enable;
-        /* give time to power up */
-        udelay(5);
+        /* give time to power up, datasheet states than minimum timing time is
+         * around 100µs so 1 tick should do */
+        sleep(1);
         //imx233_power_set_dcdc_freq(enable, HW_POWER_MISC__FREQSEL__24MHz);
     }
     return tuner_enable;
