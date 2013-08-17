@@ -693,7 +693,7 @@ static int sd_select_bank(signed char bank)
     return 0;
 }
 
-static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
+static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
                                int count, void* buf, const bool write)
 {
 #ifndef HAVE_MULTIDRIVE
@@ -887,19 +887,19 @@ sd_transfer_error_nodma:
     return ret;
 }
 
-int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
                      void* buf)
 {
     int ret;
 
     mutex_lock(&sd_mtx);
-    ret = sd_transfer_sectors(IF_MD2(drive,) start, count, buf, false);
+    ret = sd_transfer_sectors(IF_MD(drive,) start, count, buf, false);
     mutex_unlock(&sd_mtx);
 
     return ret;
 }
 
-int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                      const void* buf)
 {
 #ifdef VERIFY_WRITE
@@ -911,7 +911,7 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
 
     mutex_lock(&sd_mtx);
 
-    ret = sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
+    ret = sd_transfer_sectors(IF_MD(drive,) start, count, (void*)buf, true);
 
 #ifdef VERIFY_WRITE
     if (ret) {
@@ -928,10 +928,10 @@ int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
         if(transfer > UNALIGNED_NUM_SECTORS)
             transfer = UNALIGNED_NUM_SECTORS;
 
-        sd_transfer_sectors(IF_MD2(drive,) start, transfer, aligned_buffer, false);
+        sd_transfer_sectors(IF_MD(drive,) start, transfer, aligned_buffer, false);
         if (memcmp(buf, aligned_buffer, transfer * 512) != 0) {
             /* try the write again in the hope to repair the damage */
-            sd_transfer_sectors(IF_MD2(drive,) saved_start, saved_count, saved_buf, true);
+            sd_transfer_sectors(IF_MD(drive,) saved_start, saved_count, saved_buf, true);
             panicf("sd: verify failed: sec=%ld n=%d!", start, transfer);
         }
 

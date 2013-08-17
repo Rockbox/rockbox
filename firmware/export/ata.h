@@ -39,8 +39,8 @@ bool ata_disk_is_active(void);
 int ata_soft_reset(void);
 int ata_init(void) STORAGE_INIT_ATTR;
 void ata_close(void);
-int ata_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
-int ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
+int ata_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf);
+int ata_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf);
 void ata_spin(void);
 #if (CONFIG_LED == LED_REAL)
 void ata_set_led_enabled(bool enabled);
@@ -48,7 +48,7 @@ void ata_set_led_enabled(bool enabled);
 unsigned short* ata_get_identify(void);
 
 #ifdef STORAGE_GET_INFO
-void ata_get_info(IF_MD2(int drive,) struct storage_info *info);
+void ata_get_info(IF_MD(int drive,) struct storage_info *info);
 #endif
 #ifdef HAVE_HOTSWAP
 bool ata_removable(IF_MD_NONVOID(int drive));

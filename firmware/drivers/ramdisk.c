@@ -31,7 +31,7 @@ unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
 
 long last_disk_activity = -1;
 
-int ramdisk_read_sectors(IF_MD2(int drive,)
+int ramdisk_read_sectors(IF_MD(int drive,)
                      unsigned long start,
                      int count,
                      void* buf)
@@ -47,7 +47,7 @@ int ramdisk_read_sectors(IF_MD2(int drive,)
     return 0;
 }
 
-int ramdisk_write_sectors(IF_MD2(int drive,)
+int ramdisk_write_sectors(IF_MD(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -110,7 +110,7 @@ void ramdisk_spindown(int seconds)
     (void)seconds;
 }
 #ifdef STORAGE_GET_INFO
-void ramdisk_get_info(IF_MD2(int drive,) struct storage_info *info)
+void ramdisk_get_info(IF_MD(int drive,) struct storage_info *info)
 {
 #ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */

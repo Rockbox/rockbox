@@ -567,7 +567,7 @@ static int ata_transfer_sectors(unsigned long start,
 }
 
 #ifndef MAX_PHYS_SECTOR_SIZE
-int ata_read_sectors(IF_MD2(int drive,)
+int ata_read_sectors(IF_MD(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -581,7 +581,7 @@ int ata_read_sectors(IF_MD2(int drive,)
 #endif
 
 #ifndef MAX_PHYS_SECTOR_SIZE
-int ata_write_sectors(IF_MD2(int drive,)
+int ata_write_sectors(IF_MD(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -623,7 +623,7 @@ static inline int flush_current_sector(void)
                                 sector_cache.data, true);
 }
 
-int ata_read_sectors(IF_MD2(int drive,)
+int ata_read_sectors(IF_MD(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -689,7 +689,7 @@ int ata_read_sectors(IF_MD2(int drive,)
     return rc;
 }
 
-int ata_write_sectors(IF_MD2(int drive,)
+int ata_write_sectors(IF_MD(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -1480,7 +1480,7 @@ int ata_spinup_time(void)
 }
 
 #ifdef STORAGE_GET_INFO
-void ata_get_info(IF_MD2(int drive,)struct storage_info *info)
+void ata_get_info(IF_MD(int drive,)struct storage_info *info)
 {
     unsigned short *src,*dest;
     static char vendor[8];

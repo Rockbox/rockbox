@@ -603,7 +603,7 @@ static int send_block_send(unsigned char start_token, long timeout,
     return rc;
 }
 
-int mmc_read_sectors(IF_MD2(int drive,)
+int mmc_read_sectors(IF_MD(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -689,7 +689,7 @@ int mmc_read_sectors(IF_MD2(int drive,)
     return rc;
 }
 
-int mmc_write_sectors(IF_MD2(int drive,)
+int mmc_write_sectors(IF_MD(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -953,7 +953,7 @@ long mmc_last_disk_activity(void)
 }
 
 #ifdef STORAGE_GET_INFO
-void mmc_get_info(IF_MD2(int drive,) struct storage_info *info)
+void mmc_get_info(IF_MD(int drive,) struct storage_info *info)
 {
 #ifndef HAVE_MULTIDRIVE
     const int drive=0;

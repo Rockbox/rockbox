@@ -628,7 +628,7 @@ static inline int read_sector(unsigned long start, unsigned int count,
     return ret;
 }
 
-int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+int nand_read_sectors(IF_MV(int drive,) unsigned long start, int count, void* buf)
 {
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
@@ -671,7 +671,7 @@ int nand_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* b
 }
 
 /* TODO */
-int nand_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
+int nand_write_sectors(IF_MV(int drive,) unsigned long start, int count, const void* buf)
 {
     (void)start;
     (void)count;
@@ -728,7 +728,7 @@ void nand_sleepnow(void)
 }
 
 #ifdef STORAGE_GET_INFO
-void nand_get_info(IF_MV2(int drive,) struct storage_info *info)
+void nand_get_info(IF_MV(int drive,) struct storage_info *info)
 {
 #ifdef HAVE_MULTIVOLUME
     (void)drive;

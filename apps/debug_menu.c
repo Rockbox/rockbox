@@ -1424,7 +1424,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Size: %s", buf);
     unsigned long free;
-    fat_size( IF_MV2(0,) NULL, &free );
+    fat_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
     simplelist_addline(
@@ -1543,7 +1543,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
              "Size: %ld MB", info.num_sectors*(info.sector_size/512)/2024);
     unsigned long free;
-    fat_size( IF_MV2(0,) NULL, &free );
+    fat_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
              "Free: %ld MB", free / 1024);
     simplelist_addline(

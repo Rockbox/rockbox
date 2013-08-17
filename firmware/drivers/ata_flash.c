@@ -384,7 +384,7 @@ int flash_disk_read_sectors(unsigned long start,
     return done;
 }
 
-int nand_read_sectors(IF_MD2(int drive,)
+int nand_read_sectors(IF_MD(int drive,)
                      unsigned long start,
                      int incount,
                      void* inbuf)
@@ -401,7 +401,7 @@ int nand_read_sectors(IF_MD2(int drive,)
     return 0;
 }
 
-int nand_write_sectors(IF_MD2(int drive,)
+int nand_write_sectors(IF_MD(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)

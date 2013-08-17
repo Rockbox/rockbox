@@ -90,7 +90,7 @@ struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 #endif
 
     unsigned char* sector = fat_get_sector_buffer();
-    storage_read_sectors(IF_MD2(drive,) 0,1, sector);
+    storage_read_sectors(IF_MD(drive,) 0,1, sector);
     /* check that the boot sector is initialized */
     if ( (sector[510] != 0x55) ||
          (sector[511] != 0xaa)) {
@@ -210,7 +210,7 @@ int disk_mount(int drive)
         
         for (j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
-            if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) pinfo[i].start * j))
+            if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
             {
                 pinfo[i].start *= j;
                 pinfo[i].size *= j;
@@ -222,7 +222,7 @@ int disk_mount(int drive)
             }
         }
 #else
-        if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) pinfo[i].start))
+        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
         {
             mounted++;
             vol_drive[volume] = drive; /* remember the drive for this volume */
@@ -234,7 +234,7 @@ int disk_mount(int drive)
     if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
     {   /* try "superfloppy" mode */
         DEBUGF("No partition found, trying to mount sector 0.\n");
-        if (!fat_mount(IF_MV2(volume,) IF_MD2(drive,) 0))
+        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
         {
 #ifdef MAX_LOG_SECTOR_SIZE
             disk_sector_multiplier[drive] = fat_get_bytes_per_sector(IF_MV(volume))/SECTOR_SIZE;

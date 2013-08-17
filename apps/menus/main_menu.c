@@ -160,7 +160,7 @@ static const char* info_getname(int selected_item, void *data,
 #endif
     if (info->new_data)
     {
-        fat_size(IF_MV2(0,) &info->size, &info->free);
+        fat_size(IF_MV(0,) &info->size, &info->free);
 #ifdef HAVE_MULTIVOLUME
         if (fat_ismounted(1))
             fat_size(1, &info->size2, &info->free2);

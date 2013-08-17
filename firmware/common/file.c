@@ -121,7 +121,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
         }
 
         long startcluster = _dircache_get_entry_startcluster(ce);
-        fat_open(IF_MV2(volume,)
+        fat_open(IF_MV(volume,)
                  startcluster,
                  &(file->fatfile),
                  NULL);
@@ -167,7 +167,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     /* scan dir for name */
     while ((entry = readdir_uncached(dir))) {
         if ( !strcasecmp(name, entry->d_name) ) {
-            fat_open(IF_MV2(dir->fatdir.file.volume,)
+            fat_open(IF_MV(dir->fatdir.file.volume,)
                      entry->startcluster,
                      &(file->fatfile),
                      &(dir->fatdir));

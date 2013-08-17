@@ -95,7 +95,7 @@ DIR_UNCACHED* opendir_uncached(const char* name)
     strlcpy(namecopy, name, sizeof(namecopy)); /* just copy */
 #endif
 
-    if ( fat_opendir(IF_MV2(volume,) &pdir->fatdir, 0, NULL) < 0 ) {
+    if ( fat_opendir(IF_MV(volume,) &pdir->fatdir, 0, NULL) < 0 ) {
         DEBUGF("Failed opening root dir\n");
         pdir->busy = false;
         return NULL;
@@ -122,7 +122,7 @@ DIR_UNCACHED* opendir_uncached(const char* name)
                  * as the parent directory and the resulting one (this is safe,
                  * in doubt, check fat_open(dir) code) which will allow this kind of
                  * (ugly) things */
-                if ( fat_opendir(IF_MV2(volume,)
+                if ( fat_opendir(IF_MV(volume,)
                                  &pdir->fatdir,
                                  entry.firstcluster,
                                  &pdir->fatdir) < 0 ) {

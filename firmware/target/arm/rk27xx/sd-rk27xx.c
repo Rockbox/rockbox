@@ -495,7 +495,7 @@ static inline void write_sd_data(unsigned char **src)
     *src += 512;
 }
 
-int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
                     void* buf)
 {
 #ifdef HAVE_MULTIDRIVE
@@ -618,7 +618,7 @@ int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
 }
 
 /* Not tested */
-int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                      const void* buf)
 {
 #ifdef HAVE_MULTIDRIVE

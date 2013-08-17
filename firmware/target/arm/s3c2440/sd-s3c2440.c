@@ -847,7 +847,7 @@ sd_transfer_error:
     return ret;
 }
 
-int sd_read_sectors(IF_MD2(int card_no,) unsigned long start, int incount,
+int sd_read_sectors(IF_MD(int card_no,) unsigned long start, int incount,
                      void* inbuf)
 {
     int ret;
@@ -868,7 +868,7 @@ int sd_read_sectors(IF_MD2(int card_no,) unsigned long start, int incount,
 }
 
 /*****************************************************************************/
-int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 #ifdef BOOTLOADER /* we don't need write support in bootloader */

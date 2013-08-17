@@ -773,7 +773,7 @@ int sd_init(void)
     return 0;
 }
 
-static int sd_transfer_sectors(IF_MD2(int drive,) unsigned long start,
+static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
                                 int count, void* buf, bool write)
 {
     unsigned long response;
@@ -969,16 +969,16 @@ sd_transfer_error_no_dma:
     }
 }
 
-int sd_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
                     void* buf)
 {
-    return sd_transfer_sectors(IF_MD2(drive,) start, count, buf, false);
+    return sd_transfer_sectors(IF_MD(drive,) start, count, buf, false);
 }
 
-int sd_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                      const void* buf)
 {
-    return sd_transfer_sectors(IF_MD2(drive,) start, count, (void*)buf, true);
+    return sd_transfer_sectors(IF_MD(drive,) start, count, (void*)buf, true);
 }
 
 #ifndef BOOTLOADER

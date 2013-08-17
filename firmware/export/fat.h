@@ -101,16 +101,16 @@ extern void fat_unlock(void);
 
 extern void fat_init(void);
 extern int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
-extern int fat_mount(IF_MV2(int volume,) IF_MD2(int drive,) long startsector);
+extern int fat_mount(IF_MV(int volume,) IF_MD(int drive,) long startsector);
 extern int fat_unmount(int volume, bool flush);
-extern void fat_size(IF_MV2(int volume,) /* public for info */
+extern void fat_size(IF_MV(int volume,) /* public for info */
                      unsigned long* size,
                      unsigned long* free);
 extern void fat_recalc_free(IF_MV_NONVOID(int volume)); /* public for debug info screen */
 extern int fat_create_dir(const char* name,
                           struct fat_dir* newdir,
                           struct fat_dir* dir);
-extern int fat_open(IF_MV2(int volume,)
+extern int fat_open(IF_MV(int volume,)
                     long cluster,
                     struct fat_file* ent,
                     const struct fat_dir* dir);
@@ -128,7 +128,7 @@ extern int fat_rename(struct fat_file* file,
                       const unsigned char* newname,
                       long size, int attr);
 
-extern int fat_opendir(IF_MV2(int volume,)
+extern int fat_opendir(IF_MV(int volume,)
                        struct fat_dir *ent, unsigned long startcluster,
                        const struct fat_dir *parent_dir);
 extern int fat_getnext(struct fat_dir *ent, struct fat_direntry *entry);

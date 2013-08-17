@@ -35,14 +35,14 @@
 static bool initialized = false;
 
 /* API Functions */
-int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
+int nand_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
     (void)drive;
     return ftl_read(start, incount, inbuf);
 }
 
-int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
     (void)drive;
@@ -74,7 +74,7 @@ void nand_enable(bool on)
     (void)on;
 }
 
-void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
+void nand_get_info(IF_MD(int drive,) struct storage_info *info)
 {
     (void)drive;
     uint32_t ppb = ftl_banks * (*ftl_nand_type).pagesperblock;

@@ -36,8 +36,8 @@ bool nand_disk_is_active(void);
 int  nand_soft_reset(void);
 int  nand_init(void) STORAGE_INIT_ATTR;
 void nand_close(void);
-int  nand_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
-int  nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
+int  nand_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf);
+int  nand_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf);
 #ifdef HAVE_STORAGE_FLUSH
 int  nand_flush(void);
 #endif
@@ -45,7 +45,7 @@ void nand_spin(void);
 int  nand_spinup_time(void); /* ticks */
 
 #ifdef STORAGE_GET_INFO
-void nand_get_info(IF_MD2(int drive,) struct storage_info *info);
+void nand_get_info(IF_MD(int drive,) struct storage_info *info);
 #endif
 
 long nand_last_disk_activity(void);

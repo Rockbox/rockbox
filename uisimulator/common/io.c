@@ -57,7 +57,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "debug.h"
-#include "ata.h" /* for IF_MV2 et al. */
+#include "ata.h" /* for IF_MV et al. */
 #include "rbpaths.h"
 #include "load_code.h"
 
@@ -534,7 +534,7 @@ long filesize(int fd)
 #endif
 }
 
-void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
+void fat_size(IF_MV(int volume,) unsigned long* size, unsigned long* free)
 {
 #ifdef HAVE_MULTIVOLUME
     if (volume != 0) {

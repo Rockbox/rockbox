@@ -169,7 +169,7 @@ int storage_init(void)
     return 1;
 }
 
-int storage_write_sectors(IF_MV2(int drive,)
+int storage_write_sectors(IF_MV(int drive,)
                       unsigned long start,
                       int count,
                       const void* buf)
@@ -197,7 +197,7 @@ int storage_write_sectors(IF_MV2(int drive,)
     return 0;
 }
 
-int storage_read_sectors(IF_MV2(int drive,)
+int storage_read_sectors(IF_MV(int drive,)
                      unsigned long start,
                      int count,
                      void* buf)

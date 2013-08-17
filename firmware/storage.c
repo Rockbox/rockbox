@@ -83,7 +83,7 @@ static void storage_wait_turn(IF_MD_NONVOID(int drive))
 }
 #endif
 
-int storage_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int storage_read_sectors(IF_MD(int drive,) unsigned long start, int count,
                          void* buf)
 {
 #ifdef HAVE_IO_PRIORITY
@@ -98,38 +98,38 @@ int storage_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
     {
 #if (CONFIG_STORAGE & STORAGE_ATA)
     case STORAGE_ATA:
-        return ata_read_sectors(IF_MD2(ldrive,) start,count,buf);
+        return ata_read_sectors(IF_MD(ldrive,) start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
     case STORAGE_MMC:
-        return mmc_read_sectors(IF_MD2(ldrive,) start,count,buf);
+        return mmc_read_sectors(IF_MD(ldrive,) start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_SD)
     case STORAGE_SD:
-        return sd_read_sectors(IF_MD2(ldrive,) start,count,buf);
+        return sd_read_sectors(IF_MD(ldrive,) start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_NAND)
     case STORAGE_NAND:
-        return nand_read_sectors(IF_MD2(ldrive,) start,count,buf);
+        return nand_read_sectors(IF_MD(ldrive,) start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     case STORAGE_RAMDISK:
-        return ramdisk_read_sectors(IF_MD2(ldrive,) start,count,buf);
+        return ramdisk_read_sectors(IF_MD(ldrive,) start,count,buf);
 #endif
     }
     
     return -1;
 #else /* CONFIG_STORAGE_MULTI */
-    return STORAGE_FUNCTION(read_sectors)(IF_MD2(drive,)start,count,buf);
+    return STORAGE_FUNCTION(read_sectors)(IF_MD(drive,)start,count,buf);
 #endif /* CONFIG_STORAGE_MULTI */
 
 }
 
-int storage_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int storage_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                           const void* buf)
 {
 #ifdef HAVE_IO_PRIORITY
@@ -144,33 +144,33 @@ int storage_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
     {
 #if (CONFIG_STORAGE & STORAGE_ATA)
     case STORAGE_ATA:
-        return ata_write_sectors(IF_MD2(ldrive,)start,count,buf);
+        return ata_write_sectors(IF_MD(ldrive,)start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
     case STORAGE_MMC:
-        return mmc_write_sectors(IF_MD2(ldrive,)start,count,buf);
+        return mmc_write_sectors(IF_MD(ldrive,)start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_SD)
     case STORAGE_SD:
-        return sd_write_sectors(IF_MD2(ldrive,)start,count,buf);
+        return sd_write_sectors(IF_MD(ldrive,)start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_NAND)
     case STORAGE_NAND:
-        return nand_write_sectors(IF_MD2(ldrive,)start,count,buf);
+        return nand_write_sectors(IF_MD(ldrive,)start,count,buf);
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     case STORAGE_RAMDISK:
-        return ramdisk_write_sectors(IF_MD2(ldrive,)start,count,buf);
+        return ramdisk_write_sectors(IF_MD(ldrive,)start,count,buf);
 #endif
     }
     
     return -1;
 #else /* CONFIG_STORAGE_MULTI */
-    return STORAGE_FUNCTION(write_sectors)(IF_MD2(drive,)start,count,buf);
+    return STORAGE_FUNCTION(write_sectors)(IF_MD(drive,)start,count,buf);
 #endif /* CONFIG_STORAGE_MULTI */
 }
 

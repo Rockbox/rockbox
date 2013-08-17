@@ -303,7 +303,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     sab.dir->entrycount = 0;
     sab.dir->file.firstcluster = 0;
     /* open directory */
-    int rc = fat_opendir(IF_MV2(sab.volume,) sab.dir, startcluster, sab.dir);
+    int rc = fat_opendir(IF_MV(sab.volume,) sab.dir, startcluster, sab.dir);
     if(rc < 0)
     {
         logf("fat_opendir failed: %d", rc);
@@ -381,7 +381,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
 /* used during the generation */
 static struct fat_dir sab_fat_dir;
 
-static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce)
+static int dircache_scan_and_build(IF_MV(int volume,) struct dircache_entry *ce)
 {
     memset(ce, 0, sizeof(struct dircache_entry));
 
@@ -493,7 +493,7 @@ static int sab_process_dir(struct dircache_entry *ce)
     return 0;
 }
 
-static int dircache_scan_and_build(IF_MV2(int volume,) struct dircache_entry *ce)
+static int dircache_scan_and_build(IF_MV(int volume,) struct dircache_entry *ce)
 {
     #ifdef HAVE_MULTIVOLUME
     (void) volume;
@@ -786,9 +786,9 @@ static int dircache_do_rebuild(void)
 #endif
             cpu_boost(true);
 #ifdef HAVE_MULTIVOLUME
-            if (dircache_scan_and_build(IF_MV2(i,) append_position) < 0)
+            if (dircache_scan_and_build(IF_MV(i,) append_position) < 0)
 #else
-            if (dircache_scan_and_build(IF_MV2(0,) root_entry) < 0)
+            if (dircache_scan_and_build(IF_MV(0,) root_entry) < 0)
 #endif /* HAVE_MULTIVOLUME */
             {
                 logf("dircache_scan_and_build failed");

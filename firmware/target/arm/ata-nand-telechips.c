@@ -800,7 +800,7 @@ static void read_inplace_writes_cache(int bank, int phys_segment)
 }
 
 
-int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
+int nand_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
 #ifdef HAVE_MULTIDRIVE
@@ -855,7 +855,7 @@ nand_read_error:
     return ret;
 }
 
-int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
 #ifdef HAVE_MULTIDRIVE
@@ -877,7 +877,7 @@ int nand_flush(void)
 #endif
 
 #ifdef STORAGE_GET_INFO
-void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
+void nand_get_info(IF_MD(int drive,) struct storage_info *info)
 {
 #ifdef HAVE_MULTIDRIVE
     (void)drive; /* unused for now */

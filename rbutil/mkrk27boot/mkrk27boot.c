@@ -170,7 +170,7 @@ static int mkrk27_init(const char *filename) {
              || pinfo[i].type == PARTITION_TYPE_FAT16
 #endif
             ) {
-            rc = fat_mount(IF_MV2(0,) IF_MD2(0,) pinfo[i].start);
+            rc = fat_mount(IF_MV(0,) IF_MD(0,) pinfo[i].start);
             if(rc) {
                 mkrk27_set_error("mount: %d",rc);
                 return -1;
@@ -179,7 +179,7 @@ static int mkrk27_init(const char *filename) {
         }
     }
     if ( i==4 ) {
-        if(fat_mount(IF_MV2(0,) IF_MD2(0,) 0)) {
+        if(fat_mount(IF_MV(0,) IF_MD(0,) 0)) {
             mkrk27_set_error("FAT32 partition!");
             return -1;
         }

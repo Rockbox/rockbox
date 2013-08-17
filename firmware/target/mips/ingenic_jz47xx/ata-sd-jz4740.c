@@ -1266,7 +1266,7 @@ static inline void sd_stop_transfer(void)
     mutex_unlock(&sd_mtx);
 }
 
-int sd_read_sectors(IF_MV2(int drive,) unsigned long start, int count, void* buf)
+int sd_read_sectors(IF_MV(int drive,) unsigned long start, int count, void* buf)
 {
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
@@ -1320,7 +1320,7 @@ err:
     return retval;
 }
 
-int sd_write_sectors(IF_MV2(int drive,) unsigned long start, int count, const void* buf)
+int sd_write_sectors(IF_MV(int drive,) unsigned long start, int count, const void* buf)
 {
 #ifdef HAVE_MULTIVOLUME
     (void)drive;

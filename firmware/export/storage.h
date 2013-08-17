@@ -95,7 +95,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #define storage_get_identify() ata_get_identify()
 
         #ifdef STORAGE_GET_INFO
-            #define storage_get_info(drive, info) ata_get_info(IF_MD2(drive,) info)
+            #define storage_get_info(drive, info) ata_get_info(IF_MD(drive,) info)
         #endif
         #ifdef HAVE_HOTSWAP
             #define storage_removable(drive) ata_removable(IF_MD(drive))
@@ -121,7 +121,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #define storage_get_identify() sd_get_identify()
 
         #ifdef STORAGE_GET_INFO
-            #define storage_get_info(drive, info) sd_get_info(IF_MD2(drive,) info)
+            #define storage_get_info(drive, info) sd_get_info(IF_MD(drive,) info)
         #endif
         #ifdef HAVE_HOTSWAP
             #define storage_removable(drive) sd_removable(IF_MD(drive))
@@ -146,7 +146,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #define storage_get_identify() mmc_get_identify()
        
         #ifdef STORAGE_GET_INFO
-            #define storage_get_info(drive, info) mmc_get_info(IF_MD2(drive,) info)
+            #define storage_get_info(drive, info) mmc_get_info(IF_MD(drive,) info)
         #endif
         #ifdef HAVE_HOTSWAP
             #define storage_removable(drive) mmc_removable(IF_MD(drive))
@@ -171,7 +171,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #define storage_get_identify() nand_get_identify()
        
         #ifdef STORAGE_GET_INFO
-            #define storage_get_info(drive, info) nand_get_info(IF_MD2(drive,) info)
+            #define storage_get_info(drive, info) nand_get_info(IF_MD(drive,) info)
         #endif
         #ifdef HAVE_HOTSWAP
             #define storage_removable(drive) nand_removable(IF_MD(drive))
@@ -196,7 +196,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #define storage_get_identify() ramdisk_get_identify()
        
         #ifdef STORAGE_GET_INFO
-            #define storage_get_info(drive, info) ramdisk_get_info(IF_MD2(drive,) info)
+            #define storage_get_info(drive, info) ramdisk_get_info(IF_MD(drive,) info)
         #endif
         #ifdef HAVE_HOTSWAP
             #define storage_removable(drive) ramdisk_removable(IF_MD(drive))
@@ -231,6 +231,6 @@ bool storage_present(int drive);
 
 #endif /* NOT CONFIG_STORAGE_MULTI and NOT SIMULATOR*/
 
-int storage_read_sectors(IF_MD2(int drive,) unsigned long start, int count, void* buf);
-int storage_write_sectors(IF_MD2(int drive,) unsigned long start, int count, const void* buf);
+int storage_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf);
+int storage_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf);
 #endif

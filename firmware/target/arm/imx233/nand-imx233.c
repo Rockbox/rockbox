@@ -36,13 +36,13 @@ int nand_init(void)
 {
     return -1;
 }
-int nand_read_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int nand_read_sectors(IF_MD(int drive,) unsigned long start, int count,
                      void* buf)
 {
     return -1;
 }
 
-int nand_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int nand_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                      const void* buf)
 {
     return -1;
@@ -54,7 +54,7 @@ int nand_num_drives(int first_drive)
     return 1;
 }
 
-void nand_get_info(IF_MD2(int drive,) struct storage_info *info)
+void nand_get_info(IF_MD(int drive,) struct storage_info *info)
 {
     IF_MD((void)drive);
     info->sector_size = SECTOR_SIZE;

@@ -398,7 +398,7 @@ static void sd_select_device(int card_no)
     }
 }
 
-int sd_read_sectors(IF_MD2(int card_no,) unsigned long start, int incount,
+int sd_read_sectors(IF_MD(int card_no,) unsigned long start, int incount,
                      void* inbuf)
 {
 #ifndef HAVE_MULTIDRIVE
@@ -512,7 +512,7 @@ sd_read_error:
     }
 }
 
-int sd_write_sectors(IF_MD2(int card_no,) unsigned long start, int count,
+int sd_write_sectors(IF_MD(int card_no,) unsigned long start, int count,
                       const void* outbuf)
 {
 /* Write support is not finished yet */

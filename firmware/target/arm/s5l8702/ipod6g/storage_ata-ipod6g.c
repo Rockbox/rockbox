@@ -962,7 +962,7 @@ int ata_soft_reset(void)
     return rc;
 }
 
-int ata_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
+int ata_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
                      void* inbuf)
 {
     mutex_lock(&ata_mutex);
@@ -971,7 +971,7 @@ int ata_read_sectors(IF_MD2(int drive,) unsigned long start, int incount,
     return rc;
 }
 
-int ata_write_sectors(IF_MD2(int drive,) unsigned long start, int count,
+int ata_write_sectors(IF_MD(int drive,) unsigned long start, int count,
                       const void* outbuf)
 {
     mutex_lock(&ata_mutex);
@@ -1007,7 +1007,7 @@ void ata_spin(void)
     ata_set_active();
 }
 
-void ata_get_info(IF_MD2(int drive,) struct storage_info *info)
+void ata_get_info(IF_MD(int drive,) struct storage_info *info)
 {
     (*info).sector_size = SECTOR_SIZE;
 #ifdef ATA_HAVE_BBT
