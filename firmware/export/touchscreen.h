@@ -41,7 +41,10 @@ enum touchscreen_mode
                               actual pixel value will still be accessible
                               from button_get_data */
 };
-
+#ifndef HAS_BUTTON_HOLD
+/* those are used to silent the device on softlock */
+void __attribute__((weak)) touchdev_enable(bool value);
+#endif
 extern struct touchscreen_parameter calibration_parameters;
 extern const struct touchscreen_parameter default_calibration_parameters;
 int touchscreen_calibrate(struct touchscreen_calibration *cal);
