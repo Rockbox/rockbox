@@ -30,6 +30,7 @@
 #include "file.h"
 
 void scroll_init(void) INIT_ATTR;
+long scroll_do_step(void);
 void lcd_scroll_stop(const struct viewport* vp);
 void lcd_scroll_stop_line(const struct viewport* vp, int y);
 void lcd_scroll_fn(void);
@@ -83,7 +84,7 @@ struct scroll_screen_info
     int step;  /* pixels per scroll step */
 #endif
 #if defined(HAVE_REMOTE_LCD)
-    long last_scroll;
+    long next_scroll;
 #endif
 };
 

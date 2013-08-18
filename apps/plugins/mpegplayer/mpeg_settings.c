@@ -680,7 +680,7 @@ static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
 static void get_start_time_lcd_enable_hook(void *param)
 {
     (void)param;
-    rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_0, 0);
+    rb->button_queue_post(LCD_ENABLE_EVENT_0, 0);
 }
 #endif /* HAVE_LCD_ENABLE */
 

@@ -631,7 +631,7 @@ static void wps_lcd_activation_hook(void *param)
     (void)param;
     skin_request_full_update(WPS);
     /* force timeout in wps main loop, so that the update is instantly */
-    queue_post(&button_queue, BUTTON_NONE, 0);
+    button_queue_post(BUTTON_NONE, 0);
 }
 #endif
 

@@ -41,15 +41,16 @@ static const char scroll_tick_table[18] = {
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3, 2, 1
 };
 
-static void scroll_thread(void);
-static char scroll_stack[DEFAULT_STACK_SIZE*3];
-static const char scroll_name[] = "scroll";
-
 static struct scrollinfo lcd_scroll[LCD_SCROLLABLE_LINES];
+static long next_scroll_tick;
 
 #ifdef HAVE_REMOTE_LCD
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+static bool remote_enabled = false;
+#else
+#define remote_enabled = true;
+#endif
 static struct scrollinfo lcd_remote_scroll[LCD_REMOTE_SCROLLABLE_LINES];
-static struct event_queue scroll_queue SHAREDBSS_ATTR;
 #endif
 
 struct scroll_screen_info lcd_scroll_info =
@@ -221,132 +222,77 @@ void lcd_remote_bidir_scroll(int percent)
 
 static void sync_display_ticks(void)
 {
-    lcd_scroll_info.last_scroll =
-    lcd_remote_scroll_info.last_scroll = current_tick;
+    lcd_scroll_info.next_scroll =
+    lcd_remote_scroll_info.next_scroll = current_tick;
 }
 
-static bool scroll_process_message(int delay)
+long scroll_do_step(void)
 {
-    struct queue_event ev;
+    long tick = current_tick;
+    if (TIME_BEFORE(tick, next_scroll_tick))
+        return next_scroll_tick;
 
-    do
+#if CONFIG_PLATFORM & PLATFORM_NATIVE
+    if (remote_enabled != remote_initialized)
     {
-        long tick = current_tick;
-        queue_wait_w_tmo(&scroll_queue, &ev, delay);
-
-        switch (ev.id)
-        {
-        case SYS_TIMEOUT:
-            return false;
-        case SYS_USB_CONNECTED:
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            usb_wait_for_disconnect(&scroll_queue);
-            sync_display_ticks();
-            return true;
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-        case SYS_REMOTE_PLUGGED:
-            if (!remote_initialized)
-                sync_display_ticks();
-#endif
-        }
-
-        delay -= current_tick - tick;
+        remote_enabled = remote_initialized;
+        sync_display_ticks();
     }
-    while (delay > 0);
-
-    return false;
-}
-#endif /* HAVE_REMOTE_LCD */
-
-static void scroll_thread(void) NORETURN_ATTR;
-#ifdef HAVE_REMOTE_LCD
-
-static void scroll_thread(void)
-{
-    enum
-    {
-        SCROLL_LCD        = 0x1,
-        SCROLL_LCD_REMOTE = 0x2,
-    };
-
-    sync_display_ticks();
-
-    while ( 1 )
-    {
-        long delay;
-        int scroll;
-        long tick_lcd, tick_remote;
-
-        tick_lcd = lcd_scroll_info.last_scroll + lcd_scroll_info.ticks;
-        delay = current_tick;
-
-        if (
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-            !remote_initialized ||
 #endif
-            (tick_remote = lcd_remote_scroll_info.last_scroll +
-                           lcd_remote_scroll_info.ticks,
-             TIME_BEFORE(tick_lcd, tick_remote)))
-        {
-            scroll = SCROLL_LCD;
-            delay = tick_lcd - delay;
-        }
-        /* TIME_BEFORE(tick_remote, tick_lcd) */
-        else if (tick_lcd != tick_remote)
-        {
-            scroll = SCROLL_LCD_REMOTE;
-            delay = tick_remote - delay;
-        }
-        else
-        {
-            scroll = SCROLL_LCD | SCROLL_LCD_REMOTE;
-            delay = tick_lcd - delay;
-        }
 
-        if (scroll_process_message(delay))
-            continue;
-
-        if (scroll & SCROLL_LCD)
-        {
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-            if (lcd_active())
-#endif
-                lcd_scroll_fn();
-            lcd_scroll_info.last_scroll = current_tick;
-        }
-
-        if (scroll == (SCROLL_LCD | SCROLL_LCD_REMOTE))
-            yield();
-
-        if (scroll & SCROLL_LCD_REMOTE)
-        {
-            lcd_remote_scroll_fn();
-            lcd_remote_scroll_info.last_scroll = current_tick;
-        }
-    }
-}
-#else
-static void scroll_thread(void)
-{
-    while (1)
+    if (!TIME_BEFORE(tick, lcd_scroll_info.next_scroll))
     {
-        sleep(lcd_scroll_info.ticks);
+        lcd_scroll_info.next_scroll = tick + lcd_scroll_info.ticks;
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         if (lcd_active())
 #endif
             lcd_scroll_fn();
     }
+
+    if (remote_enabled &&
+        !TIME_BEFORE(tick, lcd_remote_scroll_info.next_scroll))
+    {
+        lcd_remote_scroll_info.next_scroll =
+            tick + lcd_remote_scroll_info.ticks;
+        lcd_remote_scroll_fn();
+    }
+
+    /* return the tick of the earlier of the two */
+    long next = lcd_scroll_info.next_scroll;
+    if (remote_enabled &&
+        TIME_BEFORE(lcd_remote_scroll_info.next_scroll, next))
+    {
+        next = lcd_remote_scroll_info.next_scroll;
+    }
+
+    next_scroll_tick = next;
+    return next;
+}
+#else /* ndef HAVE_REMOTE_LCD */
+static void sync_display_ticks(void)
+{
+    next_scroll_tick = current_tick;
+}
+
+long scroll_do_step(void)
+{
+    long tick = current_tick;
+
+    if (TIME_BEFORE(tick, next_scroll_tick))
+        return next_scroll_tick;
+
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+    if (lcd_active())
+#endif
+        lcd_scroll_fn();
+
+    long next = tick + lcd_scroll_info.ticks;
+    next_scroll_tick = next;
+    return next;
 }
 #endif /* HAVE_REMOTE_LCD */
 
 void scroll_init(void)
 {
-#ifdef HAVE_REMOTE_LCD
-    queue_init(&scroll_queue, true);
-#endif
-    create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), 0, scroll_name
-                  IF_PRIO(, PRIORITY_USER_INTERFACE)
-                  IF_COP(, CPU));
+    sync_display_ticks();
 }
-

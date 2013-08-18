@@ -62,15 +62,14 @@
 #if (CONFIG_STORAGE & STORAGE_MMC) && (defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
 int mmc_remove_request(void)
 {
-    struct queue_event ev;
     FOR_NB_SCREENS(i)
         screens[i].clear_display();
     splash(0, ID2P(LANG_REMOVE_MMC));
 
     while (1)
     {
-        queue_wait_w_tmo(&button_queue, &ev, HZ/2);
-        switch (ev.id)
+        long btn = button_get_w_tmo(HZ/2);
+        switch (btn)
         {
             case SYS_HOTSWAP_EXTRACTED:
                 return SYS_HOTSWAP_EXTRACTED;

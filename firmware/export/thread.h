@@ -65,12 +65,12 @@
 
 #if CONFIG_CODEC == SWCODEC
 # ifdef HAVE_HARDWARE_CLICK
-#  define BASETHREADS  17
-# else
 #  define BASETHREADS  16
+# else
+#  define BASETHREADS  15
 # endif
 #else
-# define BASETHREADS   11
+# define BASETHREADS   10
 #endif /* CONFIG_CODE == * */
 
 #ifndef TARGET_EXTRA_THREADS

@@ -84,7 +84,7 @@ Java_org_rockbox_RockboxFramebuffer_buttonHandler(JNIEnv*env, jclass class,
             /* ensure button_queue can be safely posted to */
             wait_rockbox_ready();
             reset_poweroff_timer();
-            queue_post(&button_queue, button, 0);
+            button_queue_post(button, 0);
             return true;
         }
     }
