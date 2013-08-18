@@ -65,8 +65,6 @@ int remote_type(void)
 }
 #endif
 
-struct event_queue button_queue;
-
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
 int sdl_app_has_input_focus = 1;
@@ -420,7 +418,7 @@ static void button_event(int key, bool pressed)
         buttonlight_on();
 #endif
         reset_poweroff_timer();
-        queue_post(&button_queue, new_btn, 1<<24);
+        button_queue_post(new_btn, 1<<24);
         new_btn &= ~(BUTTON_SCROLL_FWD | BUTTON_SCROLL_BACK);
     }
 #endif

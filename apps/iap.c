@@ -105,7 +105,7 @@ static void iap_task(void)
 
     /* exec every 500ms if pollspeed == 1 */
     count = 0;
-    queue_post(&button_queue, SYS_IAP_PERIODIC, 0);
+    button_queue_post(SYS_IAP_PERIODIC, 0);
 }
 
 /* called by playback when the next track starts */
@@ -246,7 +246,7 @@ bool iap_getc(unsigned char x)
         s->check += x;
         if ((s->check & 0xFF) == 0) {
             /* done, received a valid frame */
-            queue_post(&button_queue, SYS_IAP_HANDLEPKT, 0);
+            button_queue_post(SYS_IAP_HANDLEPKT, 0);
         }
         s->state = ST_SYNC;
         break;
@@ -1070,7 +1070,7 @@ void iap_handlepkt(void)
        delay the handling of the new packet */
     if(!iap_remotetick)
     {
-        queue_post(&button_queue, SYS_IAP_HANDLEPKT, 0);
+        button_queue_post(SYS_IAP_HANDLEPKT, 0);
         return;
     }
 

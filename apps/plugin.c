@@ -209,7 +209,7 @@ static const struct plugin_api rockbox_api = {
     lcd_set_mode,
 #endif
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    &button_queue,
+    button_queue_post,
 #endif
     bidi_l2v,
 #ifdef HAVE_LCD_BITMAP

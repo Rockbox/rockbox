@@ -62,6 +62,7 @@
 #if (CONFIG_STORAGE & STORAGE_MMC) && (defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
 int mmc_remove_request(void)
 {
+##########################
     struct queue_event ev;
     FOR_NB_SCREENS(i)
         screens[i].clear_display();

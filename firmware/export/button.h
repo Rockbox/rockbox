@@ -28,18 +28,20 @@
 #include "button-target.h"
 #endif
 
+#ifdef HAVE_BUTTON_DATA
+#define IF_BD(x...) x
+#define IF_BD_NONVOID(x...) x
+#else
+#define IF_BD(x...)
+#define IF_BD_NONVOID(x...) void
+#endif
+
 #ifndef BUTTON_REMOTE
 # define BUTTON_REMOTE 0
 #endif
 
-extern struct event_queue button_queue;
-
 void button_init_device(void);
-#ifdef HAVE_BUTTON_DATA
-int button_read_device(int *);
-#else
-int button_read_device(void);
-#endif
+int button_read_device(IF_BD_NONVOID(int *));
 
 #ifdef HAS_BUTTON_HOLD
 bool button_hold(void);
@@ -50,15 +52,10 @@ bool remote_button_hold(void);
 
 void button_init (void) INIT_ATTR;
 void button_close(void);
-int button_queue_count(void);
-long button_get (bool block);
-long button_get_w_tmo(int ticks);
-intptr_t button_get_data(void);
 int button_status(void);
 #ifdef HAVE_BUTTON_DATA
 int button_status_wdata(int *pdata);
 #endif
-void button_clear_queue(void);
 #ifdef HAVE_LCD_BITMAP
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
@@ -68,6 +65,18 @@ void set_backlight_filter_keypress(bool value);
 void set_remote_backlight_filter_keypress(bool value);
 #endif
 #endif
+
+/* button queue functions (in button_queue.c) */
+void button_queue_init(void) INIT_ATTR;
+void button_queue_post(long id, intptr_t data);
+void button_queue_post_remove_head(long id, intptr_t data);
+bool button_queue_try_post(long button, int data);
+int button_queue_count(void);
+bool button_queue_empty(void);
+void button_clear_queue(void);
+long button_get(bool block);
+long button_get_w_tmo(int ticks);
+intptr_t button_get_data(void);
 
 #ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void);

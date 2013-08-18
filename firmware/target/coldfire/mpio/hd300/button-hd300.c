@@ -108,8 +108,8 @@ void scrollstrip_isr(void)
     if (direction != scroll_dir)
     {
         /* post release event to the button queue */
-        if (queue_empty(&button_queue))
-            queue_post(&button_queue, direction|BUTTON_REL, 0);
+        if (button_queue_empty())
+            button_queue_post(direction|BUTTON_REL, 0);
 
         scroll.rel = true;
 
@@ -138,8 +138,8 @@ void scrollstrip_isr(void)
     count = 0;
 
     /* post scrollstrip event to the button queue */
-    if (queue_empty(&button_queue))
-        queue_post(&button_queue, scroll_dir, 0);
+    if (button_queue_empty())
+        button_queue_post(scroll_dir, 0);
 
     scroll.dir = scroll_dir;
     scroll.timeout = current_tick + SLIDER_REL_TIMEOUT;
@@ -262,9 +262,9 @@ int button_read_device(void)
     if (!scroll.rel)
         if (TIME_AFTER(current_tick, scroll.timeout))
         {
-            if (queue_empty(&button_queue))
+            if (button_queue_empty())
             {
-                queue_post(&button_queue, scroll.dir|BUTTON_REL, 0);
+                button_queue_post(scroll.dir|BUTTON_REL, 0);
                 scroll.rel = true;
             }
         }
