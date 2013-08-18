@@ -667,6 +667,9 @@ void Config::refreshMountpoint()
                 .arg((double)Utils::filesystemTotal(mps.at(i))/(1<<30), 0, 'f', 2);
             ui.mountPoint->addItem(QDir::toNativeSeparators(mps.at(i)), description);
         }
+        else {
+            qDebug() << "[Config] mountpoint not writable, skipping:" << mps.at(i);
+        }
     }
     if(!mountpoint.isEmpty()) {
         setMountpoint(mountpoint);
