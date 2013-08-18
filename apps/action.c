@@ -294,6 +294,14 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
+
+/* Touch devices that have a button hold can disable/enable touch at driver level. Those
+   that have softlock need to implement touchdev_enable at driver level and to disable it
+   here */
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))  && !defined(HAVE_BUTTON_HOLD))
+            /* reactivate touchpad on unlocking */
+            touchdev_enable(true);
+#endif
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
@@ -373,7 +381,10 @@ static int get_action_worker(int context, int timeout,
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
-
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))  && !defined(HAVE_BUTTON_HOLD))
+        /* disable touchpad on keylock */
+        touchdev_enable(false);
+#endif
         button_clear_queue();
         return ACTION_REDRAW;
     }
