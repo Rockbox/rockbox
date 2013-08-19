@@ -633,7 +633,7 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
 #endif
 /* Otherwise you group the setting in a menu with the other ones */
-#if (!defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD))
+#if (!defined(HAS_BUTTON_HOLD) && (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)))
 MENUITEM_SETTING(touchdev_disable_on_hold, &global_settings.touchdev_disable_on_hold, NULL);
 #if defined(HAVE_TOUCHPAD_SENSITIVITY_SETTING)
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
