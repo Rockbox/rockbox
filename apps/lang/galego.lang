@@ -12919,3 +12919,31 @@ ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,
     *: "Iniciar o temporizador de apagado no encendido"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCH_DEVICE
+  desc: Touch controls device settings menu
+  user: core
+  <source>
+    *: "Touch controls"
+  </source>
+  <dest>
+    *: "Touch controls"
+  </dest>
+  <voice>
+    *: "Touch controls"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHDEV_DISABLE_ON_HOLD
+  desc: Disable touch device while key are locked
+  user: core
+  <source>
+    *: "Disable touch device on keyhold"
+  </source>
+  <dest>
+    *: "Disable touch device on keyhold"
+  </dest>
+  <voice>
+    *: "Disable touch device on keyhold"
+  </voice>
+</phrase>

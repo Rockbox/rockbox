@@ -454,9 +454,12 @@ struct user_settings
     int list_accel_wait; /* ms between increases */
 #endif
 
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+    bool touchdev_disable_on_hold;
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     int touchpad_sensitivity;
-#endif
+#endif /* HAVE_TOUCHPAD_SENSITIVITY_SETTING */
+#endif /* defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN) */
 
     int  pause_rewind; /* time in s to rewind when pausing */
 #ifdef HAVE_HEADPHONE_DETECTION

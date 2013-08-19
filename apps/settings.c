@@ -72,7 +72,9 @@
 #include "viewport.h"
 #include "statusbar-skinned.h"
 #include "bootchart.h"
-
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+#include "touchdev.h"
+#endif
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
@@ -1056,8 +1058,11 @@ void settings_apply(bool read_disk)
 #endif
 #endif /* HAVE_BACKLIGHT */
 
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+    set_touchdev_disable_on_hold(global_settings.touchdev_disable_on_hold);
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     touchpad_set_sensitivity(global_settings.touchpad_sensitivity);
+#endif
 #endif
 
 #ifdef HAVE_USB_CHARGING_ENABLE
