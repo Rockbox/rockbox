@@ -41,6 +41,9 @@
 #ifdef HAVE_TOUCHSCREEN
 #include "statusbar-skinned.h"
 #endif
+#if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD)
+#include "touchdev.h"
+#endif
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
@@ -57,7 +60,7 @@ static bool short_press = false;
 static int last_action_tick = 0;
 
 /* software keylock stuff */
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD) || defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
 static bool keys_locked = false;
 static int unlock_combo = BUTTON_NONE;
 static bool screen_has_lock = false;
@@ -286,7 +289,7 @@ static int get_action_worker(int context, int timeout,
         return ACTION_NONE; /* "safest" return value */
     }
     last_context = context;
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD) || defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
     if (is_keys_locked())
     {
@@ -294,6 +297,10 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+            /* reactivate touchpad on unlocking */
+            touchdev_do_hold(false);
+#endif
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
@@ -367,13 +374,16 @@ static int get_action_worker(int context, int timeout,
         break;
     }
     /* DEBUGF("ret = %x\n",ret); */
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD) || defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
     if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
     {
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
-
+ #if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
+        /* disable touchpad on keylock */
+        touchdev_do_hold(true);
+ #endif
         button_clear_queue();
         return ACTION_REDRAW;
     }
@@ -424,7 +434,7 @@ bool action_userabort(int timeout)
     return ret;
 }
 
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD) || defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
 bool is_keys_locked(void)
 {
     return (screen_has_lock && keys_locked);

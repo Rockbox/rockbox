@@ -36,7 +36,7 @@
 #define LAST_ITEM_IN_LIST { CONTEXT_STOPSEARCHING, BUTTON_NONE, BUTTON_NONE }
 #define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
 
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD) || defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN) 
 #define ALLOW_SOFTLOCK 0x08000000 /* will be stripped.. never needed except in calls to get_action() */
 #else
 #define ALLOW_SOFTLOCK 0
@@ -347,7 +347,7 @@ bool action_userabort(int timeout);
 
 /* no other code should need this apart from action.c */
 const struct button_mapping* get_context_mapping(int context);
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD) || defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
 bool is_keys_locked(void);
 #endif
 
