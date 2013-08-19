@@ -313,10 +313,6 @@ MENUITEM_SETTING(buttonlight_timeout, &global_settings.buttonlight_timeout, NULL
 MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness, NULL);
 #endif
 
-#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
-MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
-#endif
-
 #ifdef HAVE_QUICKSCREEN
 MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
 #endif
@@ -359,9 +355,6 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #if CONFIG_CODEC == SWCODEC
             &keyclick_menu,
-#endif
-#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
-            &touchpad_sensitivity,
 #endif
 #ifdef USB_ENABLE_HID
             &usb_hid,
@@ -630,7 +623,23 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 #endif /*have_hotkey */
 /*    HOTKEY MENU                  */
 /***********************************/
-
+/***********************************/
+/*    TOUCHDEV MENU                */
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+MENUITEM_SETTING(touchdev_disable_on_hold, &global_settings.touchdev_disable_on_hold, NULL);
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
+#endif
+MAKE_MENU(touchdev_menu, ID2P(LANG_TOUCH_DEVICE),
+          0, Icon_System_menu,
+            &touchdev_disable_on_hold,
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+            &touchpad_sensitivity,
+#endif
+         );
+#endif
+/*    TOUCHDEV MENU                */
+/***********************************/
 
 /***********************************/
 /*    SETTINGS MENU                */

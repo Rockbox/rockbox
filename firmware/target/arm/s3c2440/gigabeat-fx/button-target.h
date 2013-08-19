@@ -22,7 +22,7 @@
 #define _BUTTON_TARGET_H_
 
 #define HAS_BUTTON_HOLD
-
+void touchdev_enable(bool en);
 void touchpad_set_sensitivity(int level);
 
 /* Toshiba Gigabeat specific button codes */
