@@ -56,6 +56,7 @@
  * turned off */
 #define LCD_SLEEP_TIMEOUT (5*HZ)
 
+#define HAVE_TOUCHPAD
 #define HAVE_TOUCHPAD_SENSITIVITY_SETTING
 
 #define HAVE_HARDWARE_BEEP

@@ -27,9 +27,12 @@
 #include "backlight.h"
 #include "adc.h"
 #include "backlight-target.h"
+#include "touchdev.h"
+#include "touchdev.c"
 
+static bool touch_enable = true;
 static bool headphones_detect;
-static bool hold_button        = false;
+static bool hold_button = false;
 
 #define TOUCHPAD_SENS_NORMAL ((1 << 12) | /* right++ */ \
                               (1 <<  7) | /* left++ */ \
@@ -44,6 +47,11 @@ static bool hold_button        = false;
                                            (1 <<  3))   /* Center */
 
 static int touchpad_mask = TOUCHPAD_SENS_NORMAL;
+
+void touchdev_enable(bool en)
+{
+    touch_enable = en;
+}
 
 static int const remote_buttons[] =
 {
@@ -82,6 +90,7 @@ int button_read_device(void)
     /* normal buttons */
     hold_button_old = hold_button;
     hold_button = button_hold();
+    touchdev_do_hold(hold_button);
 
 #ifndef BOOTLOADER
     /* give BL notice if HB state chaged */
@@ -112,7 +121,7 @@ int button_read_device(void)
     }
 
     /* Check for hold first - exit if asserted with no button pressed */
-    if (hold_button)
+    if(!touch_enable)
         return btn;
 
     /* the side buttons - Check before doing all of the work on each bit */
