@@ -13037,3 +13037,31 @@
     *: "Vybrat adresáře pro prohledávání"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCH_DEVICE
+  desc: Touch controls device settings menu
+  user: core
+  <source>
+    *: "Touch controls"
+  </source>
+  <dest>
+    *: "Touch controls"
+  </dest>
+  <voice>
+    *: "Touch controls"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHDEV_DISABLE_ON_HOLD
+  desc: Disable touch device while key are locked
+  user: core
+  <source>
+    *: "Disable touch device on keyhold"
+  </source>
+  <dest>
+    *: "Disable touch device on keyhold"
+  </dest>
+  <voice>
+    *: "Disable touch device on keyhold"
+  </voice>
+</phrase>
