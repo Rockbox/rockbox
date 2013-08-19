@@ -1965,9 +1965,9 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
                   "keypress restarts sleeptimer", set_keypress_restarts_sleep_timer),
 
-#if !defined(HAVE_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+#if !defined(HAVE_BUTTON_HOLD) && (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
     OFFON_SETTING(0, touchdev_disable_on_hold, LANG_TOUCHDEV_DISABLE_ON_HOLD, false,
-                  "Disable touch device on keylock", NULL),
+                  "Disable touch on keylock", NULL),
 #endif
 
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING

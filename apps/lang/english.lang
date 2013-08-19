@@ -13180,12 +13180,12 @@
   desc: Disable touch device while key are locked
   user: core
   <source>
-    *: "Disable touch device on keylock"
+    *: "Disable touch on keylock"
   </source>
   <dest>
-    *: "Disable touch device on keylock"
+    *: "Disable touch on keylock"
   </dest>
   <voice>
-    *: "Disable touch device on keylock"
+    *: "Disable touch on keylock"
   </voice>
 </phrase>

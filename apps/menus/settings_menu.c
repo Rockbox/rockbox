@@ -627,13 +627,13 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 /***********************************/
 /*    TOUCHDEV MENU                */
 
-/* Some old touchpad target with button hold don't need extra settings, so we let them
+/* Some old touch target with button hold don't need extra settings, so we let them
    with the usual sensitivity setting in system */
 #if defined(HAVE_TOUCHPAD_SENSITIVITY_SETTING) && defined(HAS_BUTTON_HOLD)
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
 #endif
 /* Otherwise you group the setting in a menu with the other ones */
-#if (!defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD))
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
 MENUITEM_SETTING(touchdev_disable_on_hold, &global_settings.touchdev_disable_on_hold, NULL);
 #if defined(HAVE_TOUCHPAD_SENSITIVITY_SETTING)
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
