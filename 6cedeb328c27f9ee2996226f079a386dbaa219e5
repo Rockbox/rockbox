@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///9s\u003d",
+        "filename": "apps/plugins/stopwatch.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-20T23:30:36Z",
+      "side": 1,
+      "message": "You didnt respond the last time: PLA_CANCEL seems like a better choice to reset the timer.",
+      "revId": "6cedeb328c27f9ee2996226f079a386dbaa219e5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
