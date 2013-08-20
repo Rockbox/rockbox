@@ -148,8 +148,7 @@ static uint8_t aligned_buffer[SDMMC_NUM_DRIVES][512] CACHEALIGN_ATTR;
 static tCardInfo sdmmc_card_info[SDMMC_NUM_DRIVES];
 static struct mutex mutex[SDMMC_NUM_DRIVES];
 static int disk_last_activity[SDMMC_NUM_DRIVES];
-#define MIN_YIELD_PERIOD 5  /* ticks */
-static int next_yield = 0;
+#define MIN_YIELD_PERIOD    5
 
 #define SDMMC_INFO(drive) sdmmc_card_info[drive]
 #define SDMMC_RCA(drive) SDMMC_INFO(drive).rca
@@ -266,7 +265,8 @@ static int wait_for_state(int drive, unsigned state)
     unsigned long response;
     unsigned int timeout = current_tick + 5*HZ;
     int cmd_retry = 10;
-    
+    int next_yield = current_tick + MIN_YIELD_PERIOD;
+
     while (1)
     {
         /* NOTE: rely on SD_SEND_STATUS=MMC_SEND_STATUS */
@@ -750,15 +750,12 @@ static void sdmmc_thread(void)
             }
             else
             {
-                next_yield = current_tick;
-
                 if(!idle_notified)
                 {
                     call_storage_idle_notifys(false);
                     idle_notified = true;
                 }
             }
-            break;
             break;
         case SYS_USB_CONNECTED:
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
