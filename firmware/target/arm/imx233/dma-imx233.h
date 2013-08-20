@@ -142,7 +142,7 @@ struct imx233_dma_info_t
 
 /* A single descriptor cannot transfer more than 2^16 bytes but because of the
  * weird 0=64KiB, it's safer to restrict to 2^15 */
-#define IMX233_MAX_SINGLE_DMA_XFER_SIZE     (1 << 15)
+#define IMX233_MAX_SINGLE_DMA_XFER_SIZE     (1 << 16)
 
 void imx233_dma_init(void);
 void imx233_dma_reset_channel(unsigned chan);
