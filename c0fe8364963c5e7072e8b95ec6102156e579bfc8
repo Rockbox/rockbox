@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///+Y\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-20T21:47:59Z",
+      "side": 1,
+      "message": "please use \"xxx: yyy\" style instead of \"[xxx] yyy\" for commit messages\n\nThis could be better phrased: \"plugins/stopwatch: PLA integration\"",
+      "revId": "c0fe8364963c5e7072e8b95ec6102156e579bfc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///+c\u003d",
+        "filename": "apps/plugins/stopwatch.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-20T21:47:59Z",
+      "side": 1,
+      "message": "PLA_CANCEL seems like a better choice to reset the timer",
+      "revId": "c0fe8364963c5e7072e8b95ec6102156e579bfc8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
