@@ -159,7 +159,7 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
         memmove(buf + i * SECTOR_SIZE, buf + i * (SECTOR_SIZE - 4), SECTOR_SIZE - 4);
 
     union xorcrypt_key_t key[2];
-    memcpy(key, sb->key.u.xor_key, sizeof(sb->key));
+    memcpy(key, sb->key.u.xor_key, sizeof(sb->key.u.xor_key));
     void *ptr = header + 1;
     int offset = header->header_size;
     for(unsigned i = 0; i < image_size / SECTOR_SIZE; i++)
