@@ -540,7 +540,7 @@ static enum imx_error_t load_sb_file(const char *file, int md5_idx,
     clear_keys();
     add_keys(imx_models[model].keys, imx_models[model].nr_keys);
     *sb_file = sb_read_file_ex(file, imx_sums[md5_idx].fw_variants[opt.fw_variant].offset,
-                              imx_sums[md5_idx].fw_variants[opt.fw_variant].size, false, NULL, &sb_std_printf, &err);
+                              imx_sums[md5_idx].fw_variants[opt.fw_variant].size, false, NULL, generic_std_printf, &err);
     if(*sb_file == NULL)
     {
         clear_keys();
@@ -595,28 +595,6 @@ struct elf_user_t
     size_t sz;
 };
 
-static bool elf_read(void *user, uint32_t addr, void *buf, size_t count)
-{
-    struct elf_user_t *u = user;
-    if(addr + count <= u->sz)
-    {
-        memcpy(buf, u->buf + addr, count);
-        return true;
-    }
-    else
-        return false;
-}
-
-static void elf_printf(void *user, bool error, const char *fmt, ...)
-{
-    if(!g_debug && !error)
-        return;
-    (void) user;
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-}
 /* Load a rockbox firwmare from a buffer. Data is copied. Assume firmware is
  * using ELF format. */
 static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
@@ -627,7 +605,7 @@ static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
     user.buf = buf;
     user.sz = sz;
     elf_init(&elf);
-    if(!elf_read_file(&elf, &elf_read, &elf_printf, &user))
+    if(!elf_read_file(&elf, elf_std_read, generic_std_printf, &user))
     {
         elf_release(&elf);
         printf("[ERR] Error parsing ELF file\n");
@@ -744,7 +722,7 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     ret = patch_firmware(model, opt.fw_variant, opt.output,
         sb_file, boot_fw, opt.force_version);
     if(ret == IMX_SUCCESS)
-        ret = sb_write_file(sb_file, outfile, NULL, sb_std_printf);
+        ret = sb_write_file(sb_file, outfile, NULL, generic_std_printf);
 
     clear_keys();
     rb_fw_free(&boot_fw);

@@ -84,7 +84,7 @@ static void load_elf_by_id(struct cmd_file_t *cmd_file, const char *id)
     if(g_debug)
         printf("Loading ELF file '%s'...\n", src->filename);
     elf_init(&src->elf);
-    src->loaded = elf_read_file(&src->elf, elf_std_read, elf_std_printf, fd);
+    src->loaded = elf_read_file(&src->elf, elf_std_read, generic_std_printf, fd);
     fclose(fd);
     if(!src->loaded)
         bug("error loading elf file '%s' (id '%s')\n", src->filename, id);
@@ -430,7 +430,7 @@ int main(int argc, char **argv)
     sb_file->flags = 0;
     sb_file->minor_version = 1;
 
-    sb_write_file(sb_file, output_filename);
+    sb_write_file(sb_file, output_filename, 0, generic_std_printf);
     sb_free(sb_file);
     clear_keys();
 

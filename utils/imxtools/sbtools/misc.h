@@ -67,6 +67,10 @@ extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
 void color(color_t c);
 void enable_color(bool enable);
 
+typedef void (*generic_printf_t)(void *u, bool err, color_t c, const char *f, ...);
+
+void generic_std_printf(void *u, bool err, color_t c, const char *f, ...);
+
 enum sb_version_guess_t
 {
     SB_VERSION_1,

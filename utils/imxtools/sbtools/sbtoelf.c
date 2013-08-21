@@ -27,6 +27,7 @@
  */
 
 #define _ISOC99_SOURCE /* snprintf() */
+#define _POSIX_C_SOURCE 200809L /* for strdup */
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -161,7 +162,7 @@ static void extract_elf(struct elf_params_t *elf, int count)
         return;
     if(g_elf_simplify)
         elf_simplify(elf);
-    elf_write_file(elf, elf_std_write, elf_std_printf, fd);
+    elf_write_file(elf, elf_std_write, generic_std_printf, fd);
     fclose(fd);
 }
 
@@ -350,7 +351,7 @@ int main(int argc, char **argv)
     if(force_sb2 || ver == SB_VERSION_2)
     {
         enum sb_error_t err;
-        struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, sb_std_printf, &err);
+        struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, generic_std_printf, &err);
         if(file == NULL)
         {
             color(OFF);
@@ -365,7 +366,7 @@ int main(int argc, char **argv)
         {
             color(GREY);
             printf("[Debug output]\n");
-            sb_dump(file, NULL, sb_std_printf);
+            sb_dump(file, NULL, generic_std_printf);
         }
         if(loopback)
         {
@@ -374,7 +375,7 @@ int main(int argc, char **argv)
             * garbage */
             file->override_real_key = false;
             file->override_crypto_iv = false;
-            sb_write_file(file, loopback);
+            sb_write_file(file, loopback, 0, generic_std_printf);
         }
         sb_free(file);
     }
@@ -384,7 +385,7 @@ int main(int argc, char **argv)
         {
             struct crypto_key_t key;
             enum sb1_error_t err;
-            if(!sb1_brute_force(sb_filename, NULL, sb_std_printf, &err, &key))
+            if(!sb1_brute_force(sb_filename, NULL, generic_std_printf, &err, &key))
             {
                 color(OFF);
                 printf("Brute force failed: %d\n", err);
@@ -408,7 +409,7 @@ int main(int argc, char **argv)
         }
 
         enum sb1_error_t err;
-        struct sb1_file_t *file = sb1_read_file(sb_filename, NULL, sb_std_printf, &err);
+        struct sb1_file_t *file = sb1_read_file(sb_filename, NULL, generic_std_printf, &err);
         if(file == NULL)
         {
             color(OFF);
@@ -423,7 +424,7 @@ int main(int argc, char **argv)
         {
             color(GREY);
             printf("[Debug output]\n");
-            sb1_dump(file, NULL, sb_std_printf);
+            sb1_dump(file, NULL, generic_std_printf);
         }
         if(loopback)
             sb1_write_file(file, loopback);

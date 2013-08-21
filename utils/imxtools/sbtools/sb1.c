@@ -189,13 +189,13 @@ enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename)
 }
 
 struct sb1_file_t *sb1_read_file(const char *filename, void *u,
-    sb1_color_printf cprintf, enum sb1_error_t *err)
+    generic_printf_t cprintf, enum sb1_error_t *err)
 {
     return sb1_read_file_ex(filename, 0, -1, u, cprintf, err);
 }
 
 struct sb1_file_t *sb1_read_file_ex(const char *filename, size_t offset, size_t size, void *u,
-    sb1_color_printf cprintf, enum sb1_error_t *err)
+    generic_printf_t cprintf, enum sb1_error_t *err)
 {
     #define fatal(e, ...) \
         do { if(err) *err = e; \
@@ -270,7 +270,7 @@ bool sb1_is_key_valid_fast(void *buffer, union xorcrypt_key_t _key[2])
     return mark == *(uint32_t *)&sector[SECTOR_SIZE - 4 - header->header_size];
 }
 
-bool sb1_brute_force(const char *filename, void *u, sb1_color_printf cprintf,
+bool sb1_brute_force(const char *filename, void *u, generic_printf_t cprintf,
     enum sb1_error_t *err, struct crypto_key_t *key)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
@@ -358,7 +358,7 @@ bool sb1_brute_force(const char *filename, void *u, sb1_color_printf cprintf,
 }
 
 struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
-    sb1_color_printf cprintf, enum sb1_error_t *err)
+    generic_printf_t cprintf, enum sb1_error_t *err)
 {
     struct sb1_file_t *file = NULL;
     uint8_t *buf = _buf;
@@ -606,7 +606,7 @@ void sb1_free(struct sb1_file_t *file)
     free(file);
 }
 
-void sb1_dump(struct sb1_file_t *file, void *u, sb1_color_printf cprintf)
+void sb1_dump(struct sb1_file_t *file, void *u, generic_printf_t cprintf)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     #define print_hex(c, p, len, nl) \

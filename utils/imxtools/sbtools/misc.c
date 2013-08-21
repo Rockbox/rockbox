@@ -316,6 +316,18 @@ void color(color_t c)
         printf("%s", (char *)c);
 }
 
+void generic_std_printf(void *u, bool err, color_t c, const char *f, ...)
+{
+    (void)u;
+    if(!g_debug && !err)
+        return;
+    va_list args;
+    va_start(args, f);
+    color(c);
+    vprintf(f, args);
+    va_end(args);
+}
+
 enum sb_version_guess_t guess_sb_version(const char *filename)
 {
 #define ret(x) do { if(f) fclose(f); return x; } while(0)

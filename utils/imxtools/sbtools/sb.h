@@ -231,26 +231,21 @@ enum sb_error_t
     SB_LAST_CRYPTO_ERROR = SB_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
 };
 
-typedef void (*sb_color_printf)(void *u, bool err, color_t c, const char *f, ...);
-
 enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *u,
-    sb_color_printf printf);
+    generic_printf_t printf);
 struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
-    sb_color_printf printf, enum sb_error_t *err);
+    generic_printf_t printf, enum sb_error_t *err);
 /* use size_t(-1) to use maximum size */
 struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size, bool raw_mode, void *u,
-    sb_color_printf printf, enum sb_error_t *err);
+    generic_printf_t printf, enum sb_error_t *err);
 struct sb_file_t *sb_read_memory(void *buffer, size_t size, bool raw_mode, void *u,
-    sb_color_printf printf, enum sb_error_t *err);
+    generic_printf_t printf, enum sb_error_t *err);
 
 void sb_fill_section_name(char name[5], uint32_t identifier);
-void sb_dump(struct sb_file_t *file, void *u, sb_color_printf printf);
+void sb_dump(struct sb_file_t *file, void *u, generic_printf_t printf);
 void sb_free_instruction(struct sb_inst_t inst);
 void sb_free_section(struct sb_section_t file);
 void sb_free(struct sb_file_t *file);
 void sb_get_zero_key(struct crypto_key_t *key);
-
-/* standard implementation: user is unused*/
-void sb_std_printf(void *user, bool error, color_t c, const char *fmt, ...);
 
 #endif /* __SB_H__ */

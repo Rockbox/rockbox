@@ -430,7 +430,7 @@ void elf_sort_by_address(struct elf_params_t *params)
 }
 
 void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
-    elf_printf_fn_t printf, void *user)
+    generic_printf_t printf, void *user)
 {
     (void) printf;
 
@@ -607,13 +607,13 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
     free(strtbl_content);
 }
 
-static void *elf_load_section(Elf32_Shdr *sh, elf_read_fn_t read, elf_printf_fn_t printf, void *user)
+static void *elf_load_section(Elf32_Shdr *sh, elf_read_fn_t read, generic_printf_t printf, void *user)
 {
     void *data = xmalloc(sh->sh_size);
     if(!read(user, sh->sh_offset, data, sh->sh_size))
     {
         free(data);
-        printf(user, true, "error reading elf section data\n");
+        printf(user, true, OFF, "error reading elf section data\n");
         return NULL;
     }
     return data;
@@ -633,15 +633,15 @@ bool elf_guess(elf_read_fn_t read, void *user)
 }
 
 bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
-    elf_printf_fn_t printf, void *user)
+    generic_printf_t printf, void *user)
 {
-    #define error_printf(...) ({printf(user, true, __VA_ARGS__); return false;})
+    #define error_printf(...) ({printf(user, true, GREY, __VA_ARGS__); return false;})
 
     /* read header */
     Elf32_Ehdr ehdr;
     if(!read(user, 0, &ehdr, sizeof(ehdr)))
     {
-        printf(user, true, "error reading elf header\n");
+        printf(user, true, GREY, "error reading elf header\n");
         return false;
     }
     /* basic checks */
@@ -667,16 +667,16 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     elf_set_start_addr(params, ehdr.e_entry);
 
     /* run through sections */
-    printf(user, false, "ELF file:\n");
+    printf(user, false, OFF, "ELF file:\n");
     Elf32_Shdr *shdr = xmalloc(sizeof(Elf32_Shdr) * ehdr.e_shnum);
     if(!read(user, ehdr.e_shoff, shdr, sizeof(Elf32_Shdr) * ehdr.e_shnum))
     {
-        printf(user, true, "cannot read elf section headers\n");
+        printf(user, true, GREY, "cannot read elf section headers\n");
         return false;
     }
     char *strtab = elf_load_section(&shdr[ehdr.e_shstrndx], read, printf, user);
     if(!strtab)
-        printf(user, false, "elf file has no valid section string table\n");
+        printf(user, false, OFF, "elf file has no valid section string table\n");
     for(int i = 1; i < ehdr.e_shnum; i++)
     {
         const char *sec_name = &strtab[shdr[i].sh_name];
@@ -688,7 +688,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
             void *data = elf_load_section(&shdr[i], read, printf, user);
             if(!data)
             {
-                printf(user, true, "cannot read elf section %s\n", sec_name);
+                printf(user, true, GREY, "cannot read elf section %s\n", sec_name);
                 goto Lerr;
             }
             elf_add_load_section(params, shdr[i].sh_addr, shdr[i].sh_size, data, sec_name);
@@ -707,7 +707,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
             char *symstrtab = elf_load_section(&shdr[shdr[i].sh_link], read, printf, user);
             if(!symstrtab)
             {
-                printf(user, true, "cannot load string table for symbol table %s\n", sec_name);
+                printf(user, true, GREY, "cannot load string table for symbol table %s\n", sec_name);
                 goto Lerr;
             }
             // load symbol table data
@@ -772,7 +772,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
         seg->paddr = phdr.p_paddr;
         seg->vsize = phdr.p_memsz;
         seg->psize = phdr.p_filesz;
-        printf(user, false, "create segment [%#x,+%#x[ -> [%#x,+%#x[\n",
+        printf(user, false, OFF, "create segment [%#x,+%#x[ -> [%#x,+%#x[\n",
             seg->vaddr, seg->vsize, seg->paddr, seg->psize);
     }
 
@@ -853,17 +853,6 @@ void elf_release(struct elf_params_t *params)
         free(sym);
         sym = next_sym;
     }
-}
-
-void elf_std_printf(void *user, bool error, const char *fmt, ...)
-{
-    if(!g_debug && !error)
-        return;
-    (void) user;
-    va_list args;
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
 }
 
 void elf_std_write(void *user, uint32_t addr, const void *buf, size_t count)

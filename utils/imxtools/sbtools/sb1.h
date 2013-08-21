@@ -145,24 +145,23 @@ enum sb1_error_t
 
 enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename);
 
-typedef void (*sb1_color_printf)(void *u, bool err, color_t c, const char *f, ...);
 struct sb1_file_t *sb1_read_file(const char *filename, void *u,
-    sb1_color_printf printf, enum sb1_error_t *err);
+    generic_printf_t printf, enum sb1_error_t *err);
 /* use size_t(-1) to use maximum size */
 struct sb1_file_t *sb1_read_file_ex(const char *filename, size_t offset, size_t size,
-    void *u, sb1_color_printf printf, enum sb1_error_t *err);
+    void *u, generic_printf_t printf, enum sb1_error_t *err);
 struct sb1_file_t *sb1_read_memory(void *buffer, size_t size, void *u,
-    sb1_color_printf printf, enum sb1_error_t *err);
+    generic_printf_t printf, enum sb1_error_t *err);
 
 /* do as little checks as possible, make sure the image is valid (advance use only).
  * Buffer should be of size SECTOR_SIZE at least. */
 bool sb1_is_key_valid_fast(void *buffer, union xorcrypt_key_t key[2]);
-bool sb1_brute_force(const char *filename, void *u, sb1_color_printf printf,
+bool sb1_brute_force(const char *filename, void *u, generic_printf_t printf,
     enum sb1_error_t *err, struct crypto_key_t *key);
 
 void sb1_get_default_key(struct crypto_key_t *key);
 
-void sb1_dump(struct sb1_file_t *file, void *u, sb1_color_printf printf);
+void sb1_dump(struct sb1_file_t *file, void *u, generic_printf_t printf);
 void sb1_free(struct sb1_file_t *file);
 
 #endif /* __SB1_H__ */

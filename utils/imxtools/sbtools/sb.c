@@ -45,7 +45,7 @@ static void fill_gaps(struct sb_file_t *sb)
     }
 }
 
-static void compute_sb_offsets(struct sb_file_t *sb, void *u, sb_color_printf cprintf)
+static void compute_sb_offsets(struct sb_file_t *sb, void *u, generic_printf_t cprintf)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     sb->image_size = 0;
@@ -283,7 +283,7 @@ static void produce_section_tag_cmd(struct sb_section_t *sec,
 }
 
 void produce_sb_instruction(struct sb_inst_t *inst,
-    struct sb_instruction_common_t *cmd, void *u, sb_color_printf cprintf)
+    struct sb_instruction_common_t *cmd, void *u, generic_printf_t cprintf)
 {
     memset(cmd, 0, sizeof(struct sb_instruction_common_t));
     cmd->hdr.opcode = inst->inst;
@@ -318,7 +318,7 @@ void produce_sb_instruction(struct sb_inst_t *inst,
 }
 
 enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *u,
-    sb_color_printf cprintf)
+    generic_printf_t cprintf)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     struct crypto_key_t real_key;
@@ -475,7 +475,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
 }
 
 static struct sb_section_t *read_section(bool data_sec, uint32_t id, byte *buf,
-    int size, const char *indent, void *u, sb_color_printf cprintf, enum sb_error_t *err)
+    int size, const char *indent, void *u, generic_printf_t cprintf, enum sb_error_t *err)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     #define fatal(e, ...) \
@@ -640,13 +640,13 @@ static uint32_t guess_alignment(uint32_t off)
 }
 
 struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
-    sb_color_printf cprintf, enum sb_error_t *err)
+    generic_printf_t cprintf, enum sb_error_t *err)
 {
     return sb_read_file_ex(filename, 0, -1, raw_mode, u, cprintf, err);
 }
 
 struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size, bool raw_mode, void *u,
-    sb_color_printf cprintf, enum sb_error_t *err)
+    generic_printf_t cprintf, enum sb_error_t *err)
 {
     #define fatal(e, ...) \
         do { if(err) *err = e; \
@@ -681,7 +681,7 @@ struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t si
 struct printer_t
 {
     void *user;
-    sb_color_printf cprintf;
+    generic_printf_t cprintf;
     const char *color;
     bool error;
 };
@@ -698,7 +698,7 @@ static void sb_printer(void *user, const char *fmt, ...)
 }
 
 struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, void *u,
-    sb_color_printf cprintf, enum sb_error_t *err)
+    generic_printf_t cprintf, enum sb_error_t *err)
 {
     struct sb_file_t *sb_file = NULL;
     uint8_t *buf = _buf;
@@ -1158,7 +1158,7 @@ void sb_free(struct sb_file_t *file)
     free(file);
 }
 
-void sb_dump(struct sb_file_t *file, void *u, sb_color_printf cprintf)
+void sb_dump(struct sb_file_t *file, void *u, generic_printf_t cprintf)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     struct printer_t printer = {.user = u, .cprintf = cprintf, .color = OFF, .error = false };
@@ -1283,16 +1283,4 @@ void sb_get_zero_key(struct crypto_key_t *key)
 {
     key->method = CRYPTO_KEY;
     memset(key->u.key, 0, sizeof(key->u.key));
-}
-
-void sb_std_printf(void *user, bool error, color_t c, const char *fmt, ...)
-{
-    (void)user;
-    if(!g_debug && !error)
-        return;
-    va_list args;
-    va_start(args, fmt);
-    color(c);
-    vprintf(fmt, args);
-    va_end(args);
 }
