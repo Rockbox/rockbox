@@ -1056,8 +1056,14 @@ void settings_apply(bool read_disk)
 #endif
 #endif /* HAVE_BACKLIGHT */
 
+/* Some old target have touchpad sensitivity but no touchpad tag (gigabeat-fx) so it's better not to
+   have those two condition related */
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     touchpad_set_sensitivity(global_settings.touchpad_sensitivity);
+#endif
+
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+    set_touchdev_disable_on_hold(global_settings.touchdev_disable_on_hold);
 #endif
 
 #ifdef HAVE_USB_CHARGING_ENABLE

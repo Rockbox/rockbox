@@ -453,9 +453,14 @@ struct user_settings
     int list_accel_start_delay; /* ms before we start increaseing step size */
     int list_accel_wait; /* ms between increases */
 #endif
-
+/* Some old target have touchpad sensitivity but no touchpad tag (gigabeat-fx) so it's better not to
++   have those two condition related, to avoid adding extra unecessary code to those. */
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     int touchpad_sensitivity;
+#endif
+
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+    bool touchdev_disable_on_hold;
 #endif
 
     int  pause_rewind; /* time in s to rewind when pausing */

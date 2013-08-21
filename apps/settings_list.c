@@ -1964,6 +1964,12 @@ const struct settings_list settings[] = {
                   "sleeptimer on startup", NULL),
     OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
                   "keypress restarts sleeptimer", set_keypress_restarts_sleep_timer),
+
+#if !defined(HAVE_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+    OFFON_SETTING(0, touchdev_disable_on_hold, LANG_TOUCHDEV_DISABLE_ON_HOLD, false,
+                  "Disable touch device on keylock", set_touchdev_disable_on_hold),
+#endif
+
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
 /* If specific values are set for touchpad sensitivity setting we use those */
 #if (defined(MAX_TOUCHPAD_SENSITIVITY_SETTING) \
@@ -1979,6 +1985,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_NORMAL), ID2P(LANG_HIGH)),
 #endif /* boolean or analogig values */
 #endif /* HAVE_TOUCHPAD_SENSITIVITY_SETTING */
+
 #ifdef HAVE_QUICKSCREEN
    CUSTOM_SETTING(0, qs_items[QUICKSCREEN_TOP], LANG_TOP_QS_ITEM,
                   NULL, "qs top",
