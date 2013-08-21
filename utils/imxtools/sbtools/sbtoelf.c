@@ -77,7 +77,7 @@ static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id
         return;
     if(g_elf_simplify)
         elf_simplify(elf);
-    elf_write_file(elf, elf_std_write, elf_std_printf, fd);
+    elf_write_file(elf, elf_std_write, generic_std_printf, fd);
     fclose(fd);
 }
 
