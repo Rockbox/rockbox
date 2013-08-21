@@ -582,15 +582,7 @@ struct cmd_file_t *db_parse_file(const char *file)
 
     /* add initial constants */
     for(int i = 0; i < NR_INITIAL_CONSTANTS; i++)
-    {
-        struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
-        memset(opt, 0, sizeof(struct cmd_option_t));
-        opt->name = strdup(init_const_name[i]);
-        opt->is_string = false;
-        opt->val = init_const_value[i];
-        opt->next = cmd_file->constant_list;
-        cmd_file->constant_list = opt;
-    }
+        db_add_int_opt(&cmd_file->constant_list, init_const_name[i], init_const_value[i]);
 
     struct lex_ctx_t lctx;
     lctx.ctx.file = file;
@@ -611,22 +603,17 @@ struct cmd_file_t *db_parse_file(const char *file)
 
         while(true)
         {
-            struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
-            memset(opt, 0, sizeof(struct cmd_option_t));
             next(true);
             if(lexem.type == LEX_RBRACE)
                 break;
             if(lexem.type != LEX_IDENTIFIER)
                 parse_error(lexem, "Identifier expected in constants\n");
-            opt->name = lexem.str;
+            const char *name = lexem.str;
             next(false); /* lexem string is kept as option name */
             if(lexem.type != LEX_EQUAL)
                 parse_error(lexem, "'=' expected after identifier\n");
             next(true);
-            opt->is_string = false;
-            opt->val = parse_intexpr(&lctx, cmd_file->constant_list);
-            opt->next = cmd_file->constant_list;
-            cmd_file->constant_list = opt;
+            db_add_int_opt(&cmd_file->constant_list, name, parse_intexpr(&lctx, cmd_file->constant_list));
             if(lexem.type != LEX_SEMICOLON)
                parse_error(lexem, "';' expected after string\n");
         }
@@ -644,28 +631,20 @@ struct cmd_file_t *db_parse_file(const char *file)
             next(true);
             if(lexem.type == LEX_RBRACE)
                 break;
-            struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
-            memset(opt, 0, sizeof(struct cmd_option_t));
             if(lexem.type != LEX_IDENTIFIER)
                 parse_error(lexem, "Identifier expected in options\n");
-            opt->name = lexem.str;
+            const char *name = lexem.str;
             next(false); /* lexem string is kept as option name */
             if(lexem.type != LEX_EQUAL)
                 parse_error(lexem, "'=' expected after identifier\n");
             next(true);
             if(lexem.type == LEX_STRING)
             {
-                opt->is_string = true;
-                opt->str = lexem.str;
-                next(false); /* lexem string is kept as option name */
+                db_add_str_opt(&cmd_file->opt_list, name, lexem.str);
+                next(true);
             }
             else
-            {
-                opt->is_string = false;
-                opt->val = parse_intexpr(&lctx, cmd_file->constant_list);
-            }
-            opt->next = cmd_file->opt_list;
-            cmd_file->opt_list = opt;
+                db_add_int_opt(&cmd_file->opt_list, name, parse_intexpr(&lctx, cmd_file->constant_list));
             if(lexem.type != LEX_SEMICOLON)
                parse_error(lexem, "';' expected after string\n");
         }
@@ -683,30 +662,27 @@ struct cmd_file_t *db_parse_file(const char *file)
         next(true);
         if(lexem.type == LEX_RBRACE)
             break;
-        struct cmd_source_t *src = xmalloc(sizeof(struct cmd_source_t));
-        memset(src, 0, sizeof(struct cmd_source_t));
         if(lexem.type != LEX_IDENTIFIER)
             parse_error(lexem, "identifier expected in sources\n");
-        src->identifier = lexem.str;
+        const char *srcid = lexem.str;
+        if(db_find_source_by_id(cmd_file, srcid) != NULL)
+            parse_error(lexem, "Duplicate source identifier\n");
         next(false); /* lexem string is kept as source name */
         if(lexem.type != LEX_EQUAL)
             parse_error(lexem, "'=' expected after identifier\n");
         next(true);
         if(lexem.type == LEX_STRING)
         {
-            src->is_extern = false;
-            src->filename = lexem.str;
-            next(false); /* lexem string is kept as file name */
+            db_add_source(cmd_file, srcid, lexem.str);
+            next(true);
         }
         else if(lexem.type == LEX_IDENTIFIER && !strcmp(lexem.str, "extern"))
         {
-            src->is_extern = true;
-            src->filename = strdup("<extern>"); /* duplicate because it will be free'd */
             next(true);
             if(lexem.type != LEX_LPAREN)
                 parse_error(lexem, "'(' expected after 'extern'\n");
             next(true);
-            src->extern_nr = parse_intexpr(&lctx, cmd_file->constant_list);
+            db_add_extern_source(cmd_file, srcid, parse_intexpr(&lctx, cmd_file->constant_list));
             if(lexem.type != LEX_RPAREN)
                 parse_error(lexem, "')' expected\n");
             next(true);
@@ -715,24 +691,14 @@ struct cmd_file_t *db_parse_file(const char *file)
             parse_error(lexem, "String or 'extern' expected after '='\n");
         if(lexem.type != LEX_SEMICOLON)
             parse_error(lexem, "';' expected\n");
-        if(db_find_source_by_id(cmd_file, src->identifier) != NULL)
-            parse_error(lexem, "Duplicate source identifier\n");
-        /* type filled later */
-        src->type = CMD_SRC_UNK;
-        src->next = cmd_file->source_list;
-        cmd_file->source_list = src;
     }
 
     /* sections */
-    struct cmd_section_t *end_sec = NULL;
     while(true)
     {
         next(true);
         if(lexem.type == LEX_EOF)
             break;
-        struct cmd_section_t *sec = xmalloc(sizeof(struct cmd_section_t));
-        struct cmd_inst_t *end_list = NULL;
-        memset(sec, 0, sizeof(struct cmd_section_t));
         if(lexem.type != LEX_IDENTIFIER || strcmp(lexem.str, "section") != 0)
             parse_error(lexem, "'section' expected\n");
         next(true);
@@ -740,35 +706,27 @@ struct cmd_file_t *db_parse_file(const char *file)
             parse_error(lexem, "'(' expected after 'section'\n");
         next(true);
         /* can be any number */
-        sec->identifier = parse_intexpr(&lctx, cmd_file->constant_list);
+        struct cmd_section_t *sec = db_add_section(cmd_file, parse_intexpr(&lctx, cmd_file->constant_list), false);
         /* options ? */
         if(lexem.type == LEX_SEMICOLON)
         {
             do
             {
                 next(true);
-                struct cmd_option_t *opt = xmalloc(sizeof(struct cmd_option_t));
-                memset(opt, 0, sizeof(struct cmd_option_t));
                 if(lexem.type != LEX_IDENTIFIER)
                     parse_error(lexem, "Identifier expected for section option\n");
-                opt->name = lexem.str;
+                const char *name = lexem.str;
                 next(false); /* lexem string is kept as option name */
                 if(lexem.type != LEX_EQUAL)
                     parse_error(lexem, "'=' expected after option identifier\n");
                 next(true);
                 if(lexem.type == LEX_STRING)
                 {
-                    opt->is_string = true;
-                    opt->str = lexem.str;
-                    next(false); /* lexem string is kept as option string */
+                    db_add_str_opt(&sec->opt_list, name, lexem.str);
+                    next(true);
                 }
                 else
-                {
-                    opt->is_string = false;
-                    opt->val = parse_intexpr(&lctx, cmd_file->constant_list);
-                }
-                opt->next = sec->opt_list;
-                sec->opt_list = opt;
+                    db_add_int_opt(&sec->opt_list, name, parse_intexpr(&lctx, cmd_file->constant_list));
             }while(lexem.type == LEX_COLON);
         }
         if(lexem.type != LEX_RPAREN)
@@ -783,8 +741,7 @@ struct cmd_file_t *db_parse_file(const char *file)
                 next(true);
                 if(lexem.type == LEX_RBRACE)
                     break;
-                struct cmd_inst_t *inst = xmalloc(sizeof(struct cmd_inst_t));
-                memset(inst, 0, sizeof(struct cmd_inst_t));
+                struct cmd_inst_t *inst = db_add_inst(&sec->inst_list, CMD_LOAD, 0);
                 if(lexem.type != LEX_IDENTIFIER)
                     parse_error(lexem, "Instruction expected in section\n");
                 if(strcmp(lexem.str, "load") == 0)
@@ -851,16 +808,6 @@ struct cmd_file_t *db_parse_file(const char *file)
                 }
                 else
                     parse_error(lexem, "Internal error");
-                if(end_list == NULL)
-                {
-                    sec->inst_list = inst;
-                    end_list = inst;
-                }
-                else
-                {
-                    end_list->next = inst;
-                    end_list = inst;
-                }
             }
         }
         else if(lexem.type == LEX_LE)
@@ -876,17 +823,6 @@ struct cmd_file_t *db_parse_file(const char *file)
         }
         else
             parse_error(lexem, "'{' or '<=' expected after section directive\n");
-
-        if(end_sec == NULL)
-        {
-            cmd_file->section_list = sec;
-            end_sec = sec;
-        }
-        else
-        {
-            end_sec->next = sec;
-            end_sec = sec;
-        }
     }
     #undef lexem
     #undef next
