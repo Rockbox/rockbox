@@ -11203,3 +11203,19 @@
     *: "Filstørrelse"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCH_DEVICE
+  desc: Touch controls device settings menu
+  user: core
+  <source>
+    *: "Touch controls"
+  </source>
+</phrase>
+<phrase>
+  id: LANG_TOUCHDEV_DISABLE_ON_HOLD
+  desc: Disable touch device while key are locked
+  user: core
+  <source>
+    *: "Disable touch device on keyhold"
+  </source>
+</phrase>
