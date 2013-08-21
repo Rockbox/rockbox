@@ -13161,3 +13161,31 @@
     *: "Slow"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHPAD
+  desc: Touch controls device settings menu
+  user: core
+  <source>
+    *: "Touchpad"
+  </source>
+  <dest>
+    *: "Touchpad"
+  </dest>
+  <voice>
+    *: "Touchpad"
+</voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHDEV_DISABLE_ON_HOLD
+  desc: Disable touch device while key are locked
+  user: core
+  <source>
+    *: "Disable touch device on keylock"
+  </source>
+  <dest>
+    *: "Disable touch device on keylock"
+  </dest>
+  <voice>
+    *: "Disable touch device on keylock"
+  </voice>
+</phrase>
