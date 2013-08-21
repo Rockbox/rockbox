@@ -316,7 +316,7 @@ static int init_sd_card(int drive)
     imx233_ssp_set_block_size(ssp, 9);
 
     SDMMC_RCA(drive) = 0;
-    bool sd_v2 = false;
+    bool sd_v2 = false, sd_hs = false;
     uint32_t resp;
     long init_timeout;
     /* go to idle state */
@@ -349,35 +349,6 @@ static int init_sd_card(int drive)
     if(!send_cmd(drive, SD_SEND_RELATIVE_ADDR, 0, MCI_RESP, &SDMMC_INFO(drive).rca))
         return -4;
 
-    /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
-    if(sd_v2)
-    {
-        /*  CMD7 w/rca: Select card to put it in TRAN state */
-        if(!send_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, NULL))
-            return -5;
-
-        if(wait_for_state(drive, SD_TRAN))
-            return -6;
-
-        /* CMD6 */
-        {
-            /* only transfer 64 bytes */
-            imx233_ssp_set_block_size(ssp, /*log2(64)*/6);
-            if(imx233_ssp_sd_mmc_transfer(ssp, SD_SWITCH_FUNC, 0x80fffff1,
-                    SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, NULL))
-            {
-                imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
-                return -12;
-            }
-            imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
-        }
-
-        /*  go back to STBY state so we can read csd */
-        /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
-        if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-            return -8;
-    }
-
     /* CMD9 send CSD */
     if(!send_cmd(drive, SD_SEND_CSD, SDMMC_RCA(drive), MCI_RESP|MCI_LONG_RESP,
             SDMMC_INFO(drive).csd))
@@ -386,10 +357,6 @@ static int init_sd_card(int drive)
     sd_parse_csd(&SDMMC_INFO(drive));
     window_start[drive] = 0;
     window_end[drive] = SDMMC_INFO(drive).numblocks;
-
-    /* SSPCLK @ 96MHz
-     * gives bitrate of 96 / 4 / 1 = 24MHz */
-    imx233_ssp_set_timings(ssp, 4, 0, 0xffff);
 
     /* CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, &resp))
@@ -407,6 +374,22 @@ static int init_sd_card(int drive)
     /* Switch to 4-bit */
     imx233_ssp_set_bus_width(ssp, 4);
 
+    /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
+    if(sd_v2)
+    {
+        /* CMD6 switch to HS */
+        {
+            /* only transfer 64 bytes */
+            imx233_ssp_set_block_size(ssp, /*log2(64)*/6);
+            if(imx233_ssp_sd_mmc_transfer(ssp, SD_SWITCH_FUNC, 0x80fffff1,
+                    SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, NULL))
+                return -12;
+            imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
+            if((aligned_buffer[drive][16] & 0xf) == 1)
+                sd_hs = true;
+        }
+    }
+
     /* probe for CMD23 support */
     support_set_block_count[drive] = false;
     /* ACMD51, only transfer 8 bytes */
@@ -421,6 +404,14 @@ static int init_sd_card(int drive)
         }
     }
     imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
+
+    /* SSPCLK @ 96MHz
+     * gives bitrate of 96 / 4 / 1 = 24MHz
+     * gives bitrate of 96 / 2 / 1 = 48MHz */
+    if(sd_hs)
+        imx233_ssp_set_timings(ssp, 2, 0, 0xffff);
+    else
+        imx233_ssp_set_timings(ssp, 4, 0, 0xffff);
 
     SDMMC_INFO(drive).initialized = 1;
 
