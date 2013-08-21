@@ -16,6 +16,24 @@
       "revId": "6cedeb328c27f9ee2996226f079a386dbaa219e5",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///9M\u003d",
+        "filename": "apps/plugins/stopwatch.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000066
+      },
+      "writtenOn": "2013-08-21T22:04:21Z",
+      "side": 1,
+      "message": "I don\u0027t know, in settings reset is usually long select. Are you sure?",
+      "parentUuid": "AAAAaX///9s\u003d",
+      "revId": "6cedeb328c27f9ee2996226f079a386dbaa219e5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
