@@ -168,24 +168,27 @@ void imx233_ssp_softreset(int ssp)
 void imx233_ssp_set_timings(int ssp, int divide, int rate, int timeout)
 {
     ASSERT_SSP(ssp)
+    if(divide == 0 || (divide % 2) == 1)
+        panicf("SSP timing divide must be event");
     SSP_REGn(SSP_TIMING, ssp) = BF_OR3(SSP_TIMING, CLOCK_DIVIDE(divide),
         CLOCK_RATE(rate), TIMEOUT(timeout));
 }
 
-void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
-    unsigned drive_strength, bool use_alt)
+void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width, bool use_alt)
 {
     (void) use_alt;
+    unsigned clk_drive = PINCTRL_DRIVE_8mA;
+    unsigned dat_drive = PINCTRL_DRIVE_4mA;
     /* SSP_{CMD,SCK} */
-    imx233_pinctrl_setup_vpin(VPIN_SSP1_CMD, "ssp1_cmd", drive_strength, enable_pullups);
-    imx233_pinctrl_setup_vpin(VPIN_SSP1_SCK, "ssp1_sck", drive_strength, false);
+    imx233_pinctrl_setup_vpin(VPIN_SSP1_CMD, "ssp1_cmd", dat_drive, enable_pullups);
+    imx233_pinctrl_setup_vpin(VPIN_SSP1_SCK, "ssp1_sck", clk_drive, false);
     /* SSP_DATA{0-3} */
-    imx233_pinctrl_setup_vpin(VPIN_SSP1_D0, "ssp1_d0", drive_strength, enable_pullups);
+    imx233_pinctrl_setup_vpin(VPIN_SSP1_D0, "ssp1_d0", dat_drive, enable_pullups);
     if(bus_width >= 4)
     {
-        imx233_pinctrl_setup_vpin(VPIN_SSP1_D1, "ssp1_d1", drive_strength, enable_pullups);
-        imx233_pinctrl_setup_vpin(VPIN_SSP1_D2, "ssp1_d2", drive_strength, enable_pullups);
-        imx233_pinctrl_setup_vpin(VPIN_SSP1_D3, "ssp1_d3", drive_strength, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP1_D1, "ssp1_d1", dat_drive, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP1_D2, "ssp1_d2", dat_drive, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP1_D3, "ssp1_d3", dat_drive, enable_pullups);
     }
     if(bus_width >= 8)
     {
@@ -193,20 +196,20 @@ void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
         if(use_alt)
         {
 #ifdef VPIN_SSP1_D4_ALT
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D4_ALT, "ssp1_d4", drive_strength, enable_pullups);
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D5_ALT, "ssp1_d5", drive_strength, enable_pullups);
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D6_ALT, "ssp1_d6", drive_strength, enable_pullups);
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D7_ALT, "ssp1_d7", drive_strength, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D4_ALT, "ssp1_d4", dat_drive, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D5_ALT, "ssp1_d5", dat_drive, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D6_ALT, "ssp1_d6", dat_drive, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D7_ALT, "ssp1_d7", dat_drive, enable_pullups);
 #else
             panicf("there is ssp1 alt on this soc!");
 #endif
         }
         else
         {
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D4, "ssp1_d4", drive_strength, enable_pullups);
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D5, "ssp1_d5", drive_strength, enable_pullups);
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D6, "ssp1_d6", drive_strength, enable_pullups);
-            imx233_pinctrl_setup_vpin(VPIN_SSP1_D7, "ssp1_d7", drive_strength, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D4, "ssp1_d4", dat_drive, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D5, "ssp1_d5", dat_drive, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D6, "ssp1_d6", dat_drive, enable_pullups);
+            imx233_pinctrl_setup_vpin(VPIN_SSP1_D7, "ssp1_d7", dat_drive, enable_pullups);
         }
 #else
         panicf("ssp1 bus width is limited to 4 on this soc!");
@@ -214,30 +217,30 @@ void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
     }
 }
 
-void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
-    unsigned drive_strength)
+void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width)
 {
     (void) enable_pullups;
     (void) bus_width;
-    (void) drive_strength;
+    unsigned clk_drive = PINCTRL_DRIVE_8mA;
+    unsigned dat_drive = PINCTRL_DRIVE_4mA;
 #ifdef VPIN_SSP2_CMD
     /* SSP_{CMD,SCK} */
-    imx233_pinctrl_setup_vpin(VPIN_SSP2_CMD, "ssp2_cmd", drive_strength, enable_pullups);
-    imx233_pinctrl_setup_vpin(VPIN_SSP2_SCK, "ssp2_sck", drive_strength, false);
+    imx233_pinctrl_setup_vpin(VPIN_SSP2_CMD, "ssp2_cmd", dat_drive, enable_pullups);
+    imx233_pinctrl_setup_vpin(VPIN_SSP2_SCK, "ssp2_sck", clk_drive, false);
     /* SSP_DATA{0-3} */
-    imx233_pinctrl_setup_vpin(VPIN_SSP2_D0, "ssp2_d0", drive_strength, enable_pullups);
+    imx233_pinctrl_setup_vpin(VPIN_SSP2_D0, "ssp2_d0", dat_drive, enable_pullups);
     if(bus_width >= 4)
     {
-        imx233_pinctrl_setup_vpin(VPIN_SSP2_D1, "ssp2_d1", drive_strength, enable_pullups);
-        imx233_pinctrl_setup_vpin(VPIN_SSP2_D2, "ssp2_d2", drive_strength, enable_pullups);
-        imx233_pinctrl_setup_vpin(VPIN_SSP2_D3, "ssp2_d3", drive_strength, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP2_D1, "ssp2_d1", dat_drive, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP2_D2, "ssp2_d2", dat_drive, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP2_D3, "ssp2_d3", dat_drive, enable_pullups);
     }
     if(bus_width >= 8)
     {
-        imx233_pinctrl_setup_vpin(VPIN_SSP2_D4, "ssp2_d4", drive_strength, enable_pullups);
-        imx233_pinctrl_setup_vpin(VPIN_SSP2_D5, "ssp2_d5", drive_strength, enable_pullups);
-        imx233_pinctrl_setup_vpin(VPIN_SSP2_D6, "ssp2_d6", drive_strength, enable_pullups);
-        imx233_pinctrl_setup_vpin(VPIN_SSP2_D7, "ssp2_d7", drive_strength, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP2_D4, "ssp2_d4", dat_drive, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP2_D5, "ssp2_d5", dat_drive, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP2_D6, "ssp2_d6", dat_drive, enable_pullups);
+        imx233_pinctrl_setup_vpin(VPIN_SSP2_D7, "ssp2_d7", dat_drive, enable_pullups);
     }
 #else
     panicf("there is no ssp2 on this soc!");

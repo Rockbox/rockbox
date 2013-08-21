@@ -98,10 +98,8 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     uint32_t cmd_arg, enum imx233_ssp_resp_t resp, void *buffer, unsigned block_count,
     bool wait4irq, bool read, uint32_t *resp_ptr);
 /* pullups/alternative are ignored on targets which don't support it */
-void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
-    unsigned drive_strength, bool use_alt);
-void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width,
-    unsigned drive_strength);
+void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width, bool use_alt);
+void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width);
 /* after callback is fired, imx233_ssp_sdmmc_setup_detect needs to be called
  * to enable detection again. If first_time is true, the callback will
  * be called if the sd card is inserted when the function is called, otherwise

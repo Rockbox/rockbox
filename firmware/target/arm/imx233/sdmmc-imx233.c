@@ -206,6 +206,17 @@ static void sdmmc_detect_callback(int ssp)
         imx233_ssp_sdmmc_is_detect_inverted(ssp));
 }
 
+static void sdmmc_enable_pullups(int drive, bool pullup)
+{
+    /* setup pins, never use alternatives pin on SSP1 because no device use it
+     * but this could be made a flag */
+    int bus_width = SDMMC_MODE(drive) == MMC_MODE ? 8 : 4;
+    if(SDMMC_SSP(drive) == 1)
+        imx233_ssp_setup_ssp1_sd_mmc_pins(pullup, bus_width, false);
+    else
+        imx233_ssp_setup_ssp2_sd_mmc_pins(pullup, bus_width);
+}
+
 static void sdmmc_power(int drive, bool on)
 {
     /* power chip if needed */
@@ -223,13 +234,8 @@ static void sdmmc_power(int drive, bool on)
     }
     if(SDMMC_FLAGS(drive) & POWER_DELAY)
         sleep(SDMMC_CONF(drive).power_delay);
-    /* setup pins, never use alternatives pin on SSP1 because no device use it
-     * but this could be made a flag */
-    int bus_width = SDMMC_MODE(drive) == MMC_MODE ? 8 : 4;
-    if(SDMMC_SSP(drive) == 1)
-        imx233_ssp_setup_ssp1_sd_mmc_pins(on, bus_width, PINCTRL_DRIVE_4mA, false);
-    else
-        imx233_ssp_setup_ssp2_sd_mmc_pins(on, bus_width, PINCTRL_DRIVE_4mA);
+    /* enable pullups for identification */
+    sdmmc_enable_pullups(drive, true);
 }
 
 #define MCI_NO_RESP     0
