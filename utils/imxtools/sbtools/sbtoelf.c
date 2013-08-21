@@ -43,6 +43,7 @@
 #include "sb.h"
 #include "sb1.h"
 #include "misc.h"
+#include "dbparser.h"
 
 /* all blocks are sized as a multiple of 0x1ff */
 #define PAD_TO_BOUNDARY(x) (((x) + 0x1ff) & ~0x1ff)
@@ -61,12 +62,21 @@
 static char *g_out_prefix;
 static bool g_elf_simplify = true;
 
-static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id)
+static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id,
+    struct cmd_file_t *cmd_file, struct cmd_section_t *section, bool is_call, uint32_t arg)
 {
     char name[5];
+    char fileid[16];
     char *filename = xmalloc(strlen(g_out_prefix) + 32);
     sb_fill_section_name(name, id);
+    sb_fill_section_name(fileid, id);
+    sprintf(fileid + strlen(fileid), "%d", count);
     sprintf(filename, "%s%s.%d.elf", g_out_prefix, name, count);
+    db_add_source(cmd_file, fileid, filename + strlen(g_out_prefix));
+    db_add_inst_id(section, CMD_LOAD, fileid, 0);
+    if(elf_get_start_addr(elf, NULL))
+        db_add_inst_id(section, is_call ? CMD_CALL : CMD_JUMP, fileid, arg);
+
     if(g_debug)
         printf("Write boot section %s to %s\n", name, filename);
 
@@ -81,14 +91,21 @@ static void extract_elf_section(struct elf_params_t *elf, int count, uint32_t id
     fclose(fd);
 }
 
-static void extract_sb_section(struct sb_section_t *sec)
+static void extract_sb_section(struct sb_section_t *sec, struct cmd_file_t *cmd_file)
 {
+    struct cmd_section_t *db_sec = db_add_section(cmd_file, sec->identifier, sec->is_data);
+    db_add_int_opt(&db_sec->opt_list, "alignment", sec->alignment);
+    db_add_int_opt(&db_sec->opt_list, "cleartext", sec->is_cleartext);
+
     if(sec->is_data)
     {
         char sec_name[5];
         char *filename = xmalloc(strlen(g_out_prefix) + 32);
         sb_fill_section_name(sec_name, sec->identifier);
         sprintf(filename, "%s%s.bin", g_out_prefix, sec_name);
+        db_add_source(cmd_file, sec_name, filename + strlen(g_out_prefix));
+        db_sec->source_id = strdup(sec_name);
+
         FILE *fd = fopen(filename, "wb");
         if(fd == NULL)
             bugp("Cannot open %s for writing\n", filename);
@@ -116,7 +133,7 @@ static void extract_sb_section(struct sb_section_t *sec)
         switch(inst->inst)
         {
             case SB_INST_LOAD:
-                sprintf(secname, ".text%d", text_idx++);
+                sprintf(secname, ".text%d", text_idx);
                 elf_add_load_section(&elf, inst->addr, inst->size, inst->data, secname);
                 break;
             case SB_INST_FILL:
@@ -126,7 +143,8 @@ static void extract_sb_section(struct sb_section_t *sec)
             case SB_INST_CALL:
             case SB_INST_JUMP:
                 elf_set_start_addr(&elf, inst->addr);
-                extract_elf_section(&elf, elf_count++, sec->identifier);
+                extract_elf_section(&elf, elf_count++, sec->identifier, cmd_file, db_sec,
+                    inst->inst == SB_INST_CALL, inst->argument);
                 elf_release(&elf);
                 elf_init(&elf);
                 bss_idx = text_idx = 0;
@@ -138,20 +156,40 @@ static void extract_sb_section(struct sb_section_t *sec)
     }
 
     if(!elf_is_empty(&elf))
-        extract_elf_section(&elf, elf_count, sec->identifier);
+        extract_elf_section(&elf, elf_count, sec->identifier, cmd_file, db_sec, false, 0);
     elf_release(&elf);
 }
 
 static void extract_sb_file(struct sb_file_t *file)
 {
+    char buffer[64];
+    struct cmd_file_t *cmd_file = xmalloc(sizeof(struct cmd_file_t));
+    memset(cmd_file, 0, sizeof(struct cmd_file_t));
+    db_generate_sb_version(&file->product_ver, buffer, sizeof(buffer));
+    db_add_str_opt(&cmd_file->opt_list, "productVersion", buffer);
+    db_generate_sb_version(&file->component_ver, buffer, sizeof(buffer));
+    db_add_str_opt(&cmd_file->opt_list, "componentVersion", buffer);
+    db_add_int_opt(&cmd_file->opt_list, "driveTag", file->drive_tag);
+    db_add_int_opt(&cmd_file->opt_list, "flags", file->flags);
+    db_add_int_opt(&cmd_file->opt_list, "timestampLow", file->timestamp & 0xffffffff);
+    db_add_int_opt(&cmd_file->opt_list, "timestampHigh", file->timestamp >> 32);
+    db_add_int_opt(&cmd_file->opt_list, "sbMinorVersion", file->minor_version);
+
     for(int i = 0; i < file->nr_sections; i++)
-        extract_sb_section(&file->sections[i]);
+        extract_sb_section(&file->sections[i], cmd_file);
+
+    char *filename = xmalloc(strlen(g_out_prefix) + 32);
+    sprintf(filename, "%smake.db", g_out_prefix);
+    if(g_debug)
+        printf("Write command file to %s\n", filename);
+    db_generate_file(cmd_file, filename, NULL, generic_std_printf);
+    db_free(cmd_file);
 }
 
 static void extract_elf(struct elf_params_t *elf, int count)
 {
     char *filename = xmalloc(strlen(g_out_prefix) + 32);
-    sprintf(filename, "%s.%d.elf", g_out_prefix, count);
+    sprintf(filename, "%s%d.elf", g_out_prefix, count);
     if(g_debug)
         printf("Write boot content to %s\n", filename);
 
@@ -375,6 +413,7 @@ int main(int argc, char **argv)
             * garbage */
             file->override_real_key = false;
             file->override_crypto_iv = false;
+            file->override_timestamp = true;
             sb_write_file(file, loopback, 0, generic_std_printf);
         }
         sb_free(file);

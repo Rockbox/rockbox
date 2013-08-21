@@ -237,7 +237,10 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
     if(sb->minor_version >= 1)
         memcpy(&sb_hdr->rand_pad0[2], "sgtl", 4);
 
-    sb_hdr->timestamp = generate_timestamp();
+    if(sb->override_timestamp)
+        sb_hdr->timestamp = sb->timestamp;
+    else
+        sb_hdr->timestamp = generate_timestamp();
     sb_hdr->product_ver = sb->product_ver;
     fix_version(&sb_hdr->product_ver);
     sb_hdr->component_ver = sb->component_ver;
@@ -789,6 +792,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
     struct tm *time = gmtime(&seconds);
     printf(GREEN, "  Creation date/time = ");
     printf(YELLOW, "%s", asctime(time));
+    sb_file->timestamp = sb_header->timestamp;
 
     struct sb_version_t product_ver = sb_header->product_ver;
     fix_version(&product_ver);
@@ -1186,6 +1190,23 @@ void sb_dump(struct sb_file_t *file, void *u, generic_printf_t cprintf)
     char name[5];
     sb_fill_section_name(name, file->first_boot_sec_id);
     printf(TEXT, "%08x (%s)\n", file->first_boot_sec_id, name);
+    printf(TREE, "+-");
+    printf(HEADER, "Timestamp: ");
+    printf(TEXT, "%#llx", file->timestamp);
+    {
+        uint64_t micros = file->timestamp;
+        time_t seconds = (micros / (uint64_t)1000000L);
+        struct tm tm_base;
+        memset(&tm_base, 0, sizeof(tm_base));
+        /* 2000/1/1 0:00:00 */
+        tm_base.tm_mday = 1;
+        tm_base.tm_year = 100;
+        seconds += mktime(&tm_base);
+        struct tm *time = gmtime(&seconds);
+        char *str = asctime(time);
+        str[strlen(str) - 1] = 0;
+        printf(TEXT2, " (%s)\n", str);
+    }
 
     if(file->override_real_key)
     {

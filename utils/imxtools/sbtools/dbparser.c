@@ -316,6 +316,84 @@ static void log_lexem(struct lexem_t *lexem)
 }
 #endif
 
+struct cmd_option_t *db_add_opt(struct cmd_option_t **opt, const char *identifier, bool is_str)
+{
+    while(*opt)
+        opt = &(*opt)->next;
+    *opt = xmalloc(sizeof(struct cmd_option_t));
+    memset(*opt, 0, sizeof(struct cmd_option_t));
+    (*opt)->name = strdup(identifier);
+    (*opt)->is_string = is_str;
+    return *opt;
+}
+
+void db_add_str_opt(struct cmd_option_t **opt, const char *name, const char *value)
+{
+    db_add_opt(opt, name, true)->str = strdup(value);
+}
+
+void db_add_int_opt(struct cmd_option_t **opt, const char *name, uint32_t value)
+{
+    db_add_opt(opt, name, false)->val = value;
+}
+
+static struct cmd_source_t *db_add_src(struct cmd_source_t **src, const char *identifier, bool is_extern)
+{
+    while(*src)
+        src = &(*src)->next;
+    *src = xmalloc(sizeof(struct cmd_source_t));
+    memset(*src, 0, sizeof(struct cmd_source_t));
+    (*src)->identifier = strdup(identifier);
+    (*src)->is_extern = is_extern;
+    return *src;
+}
+
+void db_add_source(struct cmd_file_t *cmd_file, const char *identifier, const char *filename)
+{
+    db_add_src(&cmd_file->source_list, identifier, false)->filename = strdup(filename);
+}
+
+void db_add_extern_source(struct cmd_file_t *cmd_file, const char *identifier, int extern_nr)
+{
+    db_add_src(&cmd_file->source_list, identifier, false)->extern_nr = extern_nr;
+}
+
+static struct cmd_inst_t *db_add_inst(struct cmd_inst_t **list, enum cmd_inst_type_t type,
+    uint32_t argument)
+{
+    while(*list)
+        list = &(*list)->next;
+    *list = xmalloc(sizeof(struct cmd_inst_t));
+    memset(*list, 0, sizeof(struct cmd_inst_t));
+    (*list)->type = type;
+    (*list)->argument = argument;
+    return *list;
+}
+
+void db_add_inst_id(struct cmd_section_t *cmd_section, enum cmd_inst_type_t type,
+    const char *identifier, uint32_t argument)
+{
+    db_add_inst(&cmd_section->inst_list, type, argument)->identifier = strdup(identifier);
+}
+
+void db_add_inst_addr(struct cmd_section_t *cmd_section, enum cmd_inst_type_t type,
+    uint32_t addr, uint32_t argument)
+{
+    db_add_inst(&cmd_section->inst_list, type, argument)->addr = addr;
+}
+
+struct cmd_section_t *db_add_section(struct cmd_file_t *cmd_file, uint32_t identifier, bool data)
+{
+    struct cmd_section_t **prev = &cmd_file->section_list;
+    while(*prev)
+        prev = &(*prev)->next;
+    *prev = xmalloc(sizeof(struct cmd_section_t));
+    memset(*prev, 0, sizeof(struct cmd_section_t));
+    (*prev)->identifier = identifier;
+    (*prev)->is_data = data;
+    return *prev;
+}
+
 struct cmd_source_t *db_find_source_by_id(struct cmd_file_t *cmd_file, const char *id)
 {
     struct cmd_source_t *src = cmd_file->source_list;
@@ -379,6 +457,26 @@ bool db_parse_sb_version(struct sb_version_t *ver, char *str)
     return ver->major != INVALID_SB_SUBVERSION &&
         ver->minor != INVALID_SB_SUBVERSION &&
         ver->revision != INVALID_SB_SUBVERSION;
+}
+
+static bool db_generate_sb_subversion(uint16_t subver, char *str)
+{
+    str[0] = '0' + ((subver >> 8) & 0xf);
+    str[1] = '0' + ((subver >> 4) & 0xf);
+    str[2] = '0' + (subver & 0xf);
+    return true;
+}
+
+bool db_generate_sb_version(struct sb_version_t *ver, char *str, int size)
+{
+    if(size < 12)
+        return false;
+    str[3] = '.';
+    str[7] = '.';
+    str[11] = 0;
+    return db_generate_sb_subversion(ver->major, str) &&
+        db_generate_sb_subversion(ver->minor, str + 4) &&
+        db_generate_sb_subversion(ver->revision, str + 8);
 }
 
 #undef parse_error
@@ -813,6 +911,134 @@ void db_free_option_list(struct cmd_option_t *opt_list)
         free(opt_list);
         opt_list = next;
     }
+}
+
+static bool db_generate_options(FILE *f, const char *secname, struct cmd_option_t *list)
+{
+    fprintf(f, "%s\n", secname);
+    fprintf(f, "{\n");
+    while(list)
+    {
+        fprintf(f, "    %s = ", list->name);
+        if(list->is_string)
+            fprintf(f, "\"%s\";\n", list->str); // FIXME handle escape
+        else
+            fprintf(f, "0x%x;\n", list->val);
+        list = list->next;
+    }
+    fprintf(f, "}\n");
+    return true;
+}
+
+static bool db_generate_section_options(FILE *f, struct cmd_option_t *list)
+{
+    bool first = true;
+    while(list)
+    {
+        fprintf(f, "%c %s = ", first ? ';' : ',', list->name);
+        if(list->is_string)
+            fprintf(f, "\"%s\"", list->str); // FIXME handle escape
+        else
+            fprintf(f, "0x%x", list->val);
+        first = false;
+        list = list->next;
+    }
+    return true;
+}
+
+static bool db_generate_sources(FILE *f, struct cmd_source_t *list)
+{
+    fprintf(f, "sources\n"),
+    fprintf(f, "{\n");
+    while(list)
+    {
+        fprintf(f, "    %s = ", list->identifier);
+        if(list->is_extern)
+            fprintf(f, "extern(%d);\n", list->extern_nr);
+        else
+            fprintf(f, "\"%s\";\n", list->filename); // FIXME handle escape
+        list = list->next;
+    }
+    fprintf(f, "}\n");
+    return true;
+}
+
+static bool db_generate_section(FILE *f, struct cmd_section_t *section)
+{
+    fprintf(f, "section(%#x", section->identifier);
+    db_generate_section_options(f, section->opt_list);
+    if(section->is_data)
+    {
+        fprintf(f, ") <= %s;\n", section->source_id);
+        return true;
+    }
+    fprintf(f, ")\n{\n");
+    struct cmd_inst_t *inst = section->inst_list;
+    while(inst)
+    {
+        fprintf(f, "    ");
+        switch(inst->type)
+        {
+            case CMD_LOAD:
+                fprintf(f, "load %s;\n", inst->identifier);
+                break;
+            case CMD_LOAD_AT:
+                fprintf(f, "load %s > %#x;\n", inst->identifier, inst->addr);
+                break;
+            case CMD_CALL:
+                fprintf(f, "call %s(%#x);\n", inst->identifier, inst->argument);
+                break;
+            case CMD_CALL_AT:
+                fprintf(f, "call %#x(%#x);\n", inst->addr, inst->argument);
+                break;
+            case CMD_JUMP:
+                fprintf(f, "jump %s(%#x);\n", inst->identifier, inst->argument);
+                break;
+            case CMD_JUMP_AT:
+                fprintf(f, "jump %#x(%#x);\n", inst->addr, inst->argument);
+                break;
+            case CMD_MODE:
+                fprintf(f, "mode %#x;\n", inst->argument);
+                break;
+            default:
+                bug("die");
+        }
+        inst = inst->next;
+    }
+    fprintf(f, "}\n");
+    return true;
+}
+
+static bool db_generate_sections(FILE *f, struct cmd_section_t *section)
+{
+    while(section)
+        if(!db_generate_section(f, section))
+            return false;
+        else
+            section = section->next;
+    return true;
+}
+
+bool db_generate_file(struct cmd_file_t *file, const char *filename, void *user, db_color_printf printf)
+{
+    FILE *f = fopen(filename, "w");
+    if(f == NULL)
+        return printf(user, true, GREY, "Cannot open '%s' for writing: %m\n", filename), false;
+    if(!db_generate_options(f, "constants", file->constant_list))
+        goto Lerr;
+    if(!db_generate_options(f, "options", file->opt_list))
+        goto Lerr;
+    if(!db_generate_sources(f, file->source_list))
+        goto Lerr;
+    if(!db_generate_sections(f, file->section_list))
+        goto Lerr;
+
+    fclose(f);
+    return true;
+
+    Lerr:
+    fclose(f);
+    return false;
 }
 
 void db_free(struct cmd_file_t *file)

@@ -204,6 +204,9 @@ struct sb_file_t
     /* override crypto IV, use with caution ! Use NULL to generate it */
     bool override_crypto_iv;
     uint8_t crypto_iv[16];
+    /* override timestamp */
+    bool override_timestamp;
+    uint64_t timestamp; /* In microseconds since 2000/1/1 00:00:00 */
 
     int nr_sections;
     uint16_t drive_tag;
