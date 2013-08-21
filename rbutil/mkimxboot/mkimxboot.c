@@ -94,11 +94,13 @@ static const char *imx_fw_variant[] =
 
 static const struct imx_md5sum_t imx_sums[] =
 {
+    /** Fuze+ */
     {
         /* Version 2.38.6 */
         MODEL_FUZEPLUS, "c3e27620a877dc6b200b97dcb3e0ecc7", "2.38.6",
         { [VARIANT_DEFAULT] = { 0, 34652624 } }
     },
+    /** Zen X-Fi2 */
     {
         /* Version 1.23.01 */
         MODEL_ZENXFI2, "e37e2c24abdff8e624d0a29f79157850", "1.23.01",
@@ -117,6 +119,7 @@ static const struct imx_md5sum_t imx_sums[] =
             [VARIANT_ZENXFI2_SD] = { 0x29ac380, 42304208 }
         }
     },
+    /** Zen X-Fi3 */
     {
         /* Version 1.00.15e */
         MODEL_ZENXFI3, "658a24eeef5f7186ca731085d8822a87", "1.00.15e",
@@ -127,6 +130,12 @@ static const struct imx_md5sum_t imx_sums[] =
         MODEL_ZENXFI3, "a5114cd45ea4554ec221f51a71083862", "1.00.22e",
         { [VARIANT_DEFAULT] = {0, 18110576} }
     },
+    {
+        /* Version 1.00.25e */
+        MODEL_ZENXFI3, "7aa036a349feb93d2ec397b1149c9260", "1.00.25e",
+        { [VARIANT_DEFAULT] = {0, 18110576 } }
+    },
+    /** Zen X-Fi Style */
     {
         /* Version 1.03.04e */
         MODEL_ZENXFISTYLE, "32a731b7f714e9f99a95991003759c98", "1.03.04",
