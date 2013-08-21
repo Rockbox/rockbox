@@ -41,8 +41,8 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_SELECT },
     { ACTION_STD_CONTEXT,               BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_RIGHT },
 
-    { ACTION_STD_CANCEL,                BUTTON_BACK,                       BUTTON_NONE },
-    { ACTION_STD_CANCEL,                BUTTON_BACK|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_STD_MENU,                  BUTTON_BACK,                       BUTTON_NONE },
+    { ACTION_STD_MENU,                  BUTTON_BACK|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_STD_OK,                    BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
@@ -53,7 +53,6 @@ static const struct button_mapping button_context_standard[]  = {
 /*    { ACTION_STD_QUICKSCREEN,           BUTTON_REC|BUTTON_SELECT,          BUTTON_REC },
     { ACTION_STD_REC,                   BUTTON_REC|BUTTON_REPEAT,          BUTTON_REC },
     { ACTION_STD_HOTKEY,                BUTTON_REC|BUTTON_SELECT,          BUTTON_REC },
-    { ACTION_STD_MENU,                  BUTTON_MENU|BUTTON_REL,            BUTTON_MENU },
    on some gesture later? */
 
     LAST_ITEM_IN_LIST
