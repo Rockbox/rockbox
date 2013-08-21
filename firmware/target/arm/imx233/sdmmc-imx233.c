@@ -148,6 +148,7 @@ static uint8_t aligned_buffer[SDMMC_NUM_DRIVES][512] CACHEALIGN_ATTR;
 static tCardInfo sdmmc_card_info[SDMMC_NUM_DRIVES];
 static struct mutex mutex[SDMMC_NUM_DRIVES];
 static int disk_last_activity[SDMMC_NUM_DRIVES];
+static bool support_set_block_count[SDMMC_NUM_DRIVES];
 #define MIN_YIELD_PERIOD    5
 
 #define SDMMC_INFO(drive) sdmmc_card_info[drive]
@@ -400,6 +401,21 @@ static int init_sd_card(int drive)
     /* Switch to 4-bit */
     imx233_ssp_set_bus_width(ssp, 4);
 
+    /* probe for CMD23 support */
+    support_set_block_count[drive] = false;
+    /* ACMD51, only transfer 8 bytes */
+    imx233_ssp_set_block_size(ssp, /*log2(8)*/3);
+    if(send_cmd(drive, SD_APP_CMD, SDMMC_RCA(drive), MCI_RESP, &resp))
+    {
+        if(imx233_ssp_sd_mmc_transfer(ssp, SD_SEND_SCR, 0, SSP_SHORT_RESP,
+            aligned_buffer[drive], 1, true, true, NULL) == SSP_SUCCESS)
+        {
+            if(aligned_buffer[drive][3] & 2)
+                support_set_block_count[drive] = true;
+        }
+    }
+    imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
+
     SDMMC_INFO(drive).initialized = 1;
 
     return 0;
@@ -485,6 +501,10 @@ static int init_mmc_drive(int drive)
     if(!send_cmd(drive, MMC_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
         return -13;
 
+    /* MMC always support CMD23 */
+    support_set_block_count[drive] = false;
+    SDMMC_INFO(drive).initialized = 1;
+
     return 0;
 }
 #endif
@@ -497,6 +517,9 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
     while(count != 0)
     {
         int this_count = MIN(count, IMX233_MAX_SINGLE_DMA_XFER_SIZE / 512);
+        bool need_stop = true;
+        if(support_set_block_count[drive] && send_cmd(drive, 23, this_count, MCI_RESP, &resp))
+            need_stop = false;
         /* Set bank_start to the correct unit (blocks or bytes).
          * MMC drives use block addressing, SD cards bytes or blocks */
         int bank_start = start;
@@ -508,14 +531,16 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
             read ? SD_READ_MULTIPLE_BLOCK : SD_WRITE_MULTIPLE_BLOCK,
             bank_start, SSP_SHORT_RESP, buf, this_count, false, read, &resp);
         if(ret != SSP_SUCCESS)
-            break;
+            need_stop = true;
         /* stop transmission
          * NOTE: rely on SD_STOP_TRANSMISSION=MMC_STOP_TRANSMISSION */
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP|MCI_BUSY, &resp))
+        if(need_stop && !send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP|MCI_BUSY, &resp))
         {
             ret = -15;
             break;
         }
+        if(ret != 0)
+            return ret;
         count -= this_count;
         start += this_count;
         buf += this_count * 512;
