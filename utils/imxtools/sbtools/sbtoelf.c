@@ -134,7 +134,7 @@ static void extract_sb_section(struct sb_section_t *sec, struct cmd_file_t *cmd_
         switch(inst->inst)
         {
             case SB_INST_LOAD:
-                sprintf(secname, ".text%d", text_idx);
+                sprintf(secname, ".text%d", text_idx++);
                 elf_add_load_section(&elf, inst->addr, inst->size, inst->data, secname);
                 break;
             case SB_INST_FILL:
