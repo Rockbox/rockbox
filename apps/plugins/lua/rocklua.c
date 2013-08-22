@@ -24,7 +24,6 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include "rocklib.h"
-#include "rockmalloc.h"
 #include "luadir.h"
 
 
@@ -164,8 +163,6 @@ enum plugin_status plugin_start(const void* parameter)
             rb->lcd_clear_display();
             status = docall(L);
         }
-
-        dlmalloc_stats();
 
         if (status) {
             DEBUGF("%s\n", lua_tostring(L, -1));
