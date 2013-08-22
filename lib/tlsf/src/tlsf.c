@@ -395,6 +395,14 @@ static __inline__ bhdr_t *FIND_SUITABLE_BLOCK(tlsf_t * _tlsf, int *_fl, int *_sl
         set_bit (_fl, &_tlsf -> fl_bitmap);                             \
     } while(0)
 
+#if defined(ROCKBOX)
+void * __attribute__((weak)) get_new_area(size_t * size)
+{
+    (void)size;
+    return ((void *) ~0);
+}
+#endif
+
 #if USE_SBRK || USE_MMAP
 static __inline__ void *get_new_area(size_t * size) 
 {
@@ -615,7 +623,7 @@ void *tlsf_malloc(size_t size)
 /******************************************************************/
     void *ret;
 
-#if USE_MMAP || USE_SBRK
+#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
     if (!mp) {
         size_t area_size;
         void *area;
@@ -657,7 +665,7 @@ void *tlsf_realloc(void *ptr, size_t size)
 /******************************************************************/
     void *ret;
 
-#if USE_MMAP || USE_SBRK
+#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
     if (!mp) {
         return tlsf_malloc(size);
     }
@@ -705,7 +713,7 @@ void *malloc_ex(size_t size, void *mem_pool)
        so they are not longer valid when the function fails */
     b = FIND_SUITABLE_BLOCK(tlsf, &fl, &sl);
 
-#if USE_MMAP || USE_SBRK
+#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
     if (!b) {
         size_t area_size;
         void *area;

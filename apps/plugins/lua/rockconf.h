@@ -23,6 +23,7 @@
 #define _ROCKCONF_H_
 
 #include "plugin.h"
+#include <tlsf.h>
 
 #undef LUAI_THROW
 #undef LUAI_TRY
@@ -40,9 +41,6 @@
 #define luai_jmpbuf jmp_buf
 
 extern char curpath[MAX_PATH];
-void* dlmalloc(size_t bytes);
-void *dlrealloc(void *ptr, size_t size);
-void dlfree(void *ptr);
 struct tm *gmtime(const time_t *timep);
 long strtol(const char *nptr, char **endptr, int base);
 unsigned long strtoul(const char *str, char **endptr, int base);
@@ -54,8 +52,9 @@ long lpow(long x, long y);
 #define pow     lpow
 
 /* Simple substitutions */
-#define realloc  dlrealloc
-#define free     dlfree
+#define malloc   tlsf_malloc
+#define realloc  tlsf_realloc
+#define free     tlsf_free
 #define memchr   rb->memchr
 #define snprintf rb->snprintf
 #define strcat   rb->strcat

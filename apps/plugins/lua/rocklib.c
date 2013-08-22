@@ -522,7 +522,7 @@ static void fill_text_message(lua_State *L, struct text_message * message,
     int i;
     luaL_checktype(L, pos, LUA_TTABLE);
     int n = luaL_getn(L, pos);
-    const char **lines = (const char**) dlmalloc(n * sizeof(const char*));
+    const char **lines = (const char**) tlsf_malloc(n * sizeof(const char*));
     if(lines == NULL)
         luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
     for(i=1; i<=n; i++)
@@ -548,11 +548,11 @@ RB_WRAP(gui_syncyesno_run)
 
     enum yesno_res result = rb->gui_syncyesno_run(&main_message, yes, no);
 
-    dlfree(main_message.message_lines);
+    tlsf_free(main_message.message_lines);
     if(yes)
-        dlfree(yes_message.message_lines);
+        tlsf_free(yes_message.message_lines);
     if(no)
-        dlfree(no_message.message_lines);
+        tlsf_free(no_message.message_lines);
 
     lua_pushinteger(L, result);
     return 1;
@@ -571,7 +571,7 @@ RB_WRAP(do_menu)
     start_selected = luaL_optint(L, 3, 0);
 
     n = luaL_getn(L, 2);
-    items = (const char**) dlmalloc(n * sizeof(const char*));
+    items = (const char**) tlsf_malloc(n * sizeof(const char*));
     if(items == NULL)
         luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
     for(i=1; i<=n; i++)
@@ -587,7 +587,7 @@ RB_WRAP(do_menu)
 
     int result = rb->do_menu(&menu, &start_selected, NULL, false);
 
-    dlfree(items);
+    tlsf_free(items);
 
     lua_pushinteger(L, result);
     return 1;

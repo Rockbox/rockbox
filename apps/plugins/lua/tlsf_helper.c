@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2008 Dan Everton (safetydan)
+ * Copyright (C) 2013 Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,28 +18,31 @@
  *
  ****************************************************************************/
 
-#ifndef _ROCKMALLOC_H_
-#define _ROCKMALLOC_H_
+#include "plugin.h"
+#include <tlsf.h>
 
-#undef WIN32
-#undef _WIN32
-#define LACKS_UNISTD_H
-#define LACKS_SYS_PARAM_H
-#define LACKS_SYS_MMAN_H
-#define LACKS_STRINGS_H
-#define INSECURE 1
-#define USE_DL_PREFIX 1
-#define MORECORE_CANNOT_TRIM 1
-#define HAVE_MMAP 0
-#define HAVE_MREMAP 0
-#define NO_MALLINFO 1
-#define ABORT ((void) 0)
-/* #define DEBUG */
-#define MORECORE rocklua_morecore
+void *get_new_area(size_t *size)
+{
+    static char *pluginbuf_ptr = NULL;
+    static char *audiobuf_ptr = NULL;
 
-void *rocklua_morecore(int size);
-void dlmalloc_stats(void);
+    if (pluginbuf_ptr == NULL)
+    {
+        pluginbuf_ptr = rb->plugin_get_buffer(size);
 
-#define printf DEBUGF
+        /* kill tlsf signature if any */
+        memset(pluginbuf_ptr, 0, 4);
 
-#endif
+        return pluginbuf_ptr;
+    }
+
+    if (audiobuf_ptr == NULL)
+    {
+        /* grab audiobuffer */
+        audiobuf_ptr = rb->plugin_get_audio_buffer(size);
+
+        return audiobuf_ptr;
+    }
+
+    return ((void *) ~0);
+}
