@@ -604,6 +604,18 @@ struct elf_user_t
     size_t sz;
 };
 
+static bool elf_read(void *user, uint32_t addr, void *buf, size_t count)
+{
+    struct elf_user_t *u = user;
+    if(addr + count <= u->sz)
+    {
+        memcpy(buf, u->buf + addr, count);
+        return true;
+    }
+    else
+        return false;
+}
+
 /* Load a rockbox firwmare from a buffer. Data is copied. Assume firmware is
  * using ELF format. */
 static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
@@ -614,7 +626,7 @@ static enum imx_error_t rb_fw_load_buf_elf(struct rb_fw_t *fw, uint8_t *buf,
     user.buf = buf;
     user.sz = sz;
     elf_init(&elf);
-    if(!elf_read_file(&elf, elf_std_read, generic_std_printf, &user))
+    if(!elf_read_file(&elf, elf_read, generic_std_printf, &user))
     {
         elf_release(&elf);
         printf("[ERR] Error parsing ELF file\n");
