@@ -115,6 +115,7 @@ void INT_VDD5V(void)
 
 void imx233_power_init(void)
 {
+    BF_CLR(POWER_MINPWR, HALF_FETS);
     /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
     BF_CLR(POWER_5VCTRL, VBUSVALID_TRSH);
     BF_SETV(POWER_5VCTRL, VBUSVALID_TRSH, 1);
