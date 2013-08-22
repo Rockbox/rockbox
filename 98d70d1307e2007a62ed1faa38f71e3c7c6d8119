@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///7Q\u003d",
+        "filename": "apps/menus/settings_menu.c",
+        "patchSetId": 26
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2013-08-22T22:58:37Z",
+      "side": 1,
+      "message": "Whitespace at the end of a line shouldn\u0027t really be there",
+      "revId": "98d70d1307e2007a62ed1faa38f71e3c7c6d8119",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
