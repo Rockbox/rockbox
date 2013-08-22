@@ -186,7 +186,7 @@ static void compute_sb_offsets(struct sb_file_t *sb, void *u, generic_printf_t c
     #undef printf
 }
 
-static uint64_t generate_timestamp()
+uint64_t sb_generate_timestamp(void)
 {
     struct tm tm_base;
     memset(&tm_base, 0, sizeof(tm_base));
@@ -218,11 +218,11 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
     sb_hdr->signature[2] = 'M';
     sb_hdr->signature[3] = 'P';
     sb_hdr->major_ver = IMAGE_MAJOR_VERSION;
-    sb_hdr->minor_ver = IMAGE_MINOR_VERSION;
-    sb_hdr->flags = 0;
+    sb_hdr->minor_ver = sb->minor_version;
+    sb_hdr->flags = sb->flags;
     sb_hdr->image_size = sb->image_size;
     sb_hdr->header_size = sizeof(struct sb_header_t) / BLOCK_SIZE;
-    sb_hdr->first_boot_sec_id = sb->first_boot_sec_id;
+    sb_hdr->first_boot_sec_id = sb->sections[0].identifier;
     sb_hdr->nr_keys = g_nr_keys;
     sb_hdr->nr_sections = sb->nr_sections;
     sb_hdr->sec_hdr_size = sizeof(struct sb_section_header_t) / BLOCK_SIZE;
@@ -237,10 +237,7 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
     if(sb->minor_version >= 1)
         memcpy(&sb_hdr->rand_pad0[2], "sgtl", 4);
 
-    if(sb->override_timestamp)
-        sb_hdr->timestamp = sb->timestamp;
-    else
-        sb_hdr->timestamp = generate_timestamp();
+    sb_hdr->timestamp = sb->timestamp;
     sb_hdr->product_ver = sb->product_ver;
     fix_version(&sb_hdr->product_ver);
     sb_hdr->component_ver = sb->component_ver;
@@ -261,7 +258,8 @@ static void produce_sb_section_header(struct sb_section_t *sec,
     sec_hdr->offset = sec->file_offset;
     sec_hdr->size = sec->sec_size;
     sec_hdr->flags = (sec->is_data ? 0 : SECTION_BOOTABLE)
-        | (sec->is_cleartext ? SECTION_CLEARTEXT : 0);
+        | (sec->is_cleartext ? SECTION_CLEARTEXT : 0)
+        | sec->other_flags;
 }
 
 static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
@@ -281,7 +279,8 @@ static void produce_section_tag_cmd(struct sb_section_t *sec,
     tag->identifier = sec->identifier;
     tag->len = sec->sec_size;
     tag->flags = (sec->is_data ? 0 : SECTION_BOOTABLE)
-        | (sec->is_cleartext ? SECTION_CLEARTEXT : 0);
+        | (sec->is_cleartext ? SECTION_CLEARTEXT : 0)
+        | sec->other_flags;
     tag->hdr.checksum = instruction_checksum(&tag->hdr);
 }
 
@@ -333,6 +332,11 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
         memset(cbc_macs[i], 0, 16);
 
     fill_gaps(sb);
+    if(sb->nr_sections == 0 || sb->sections[0].is_data)
+    {
+        cprintf(u, true, GREY, "First section of the image is not bootable, I cannot handle that.\n");
+        return SB_ERROR;
+    }
     compute_sb_offsets(sb, u, cprintf);
 
     generate_random_data(real_key.u.key, 16);
@@ -983,6 +987,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
                 sec, size, "      ", u, cprintf, err);
             if(s)
             {
+                s->other_flags = sec_hdr->flags & ~SECTION_STD_MASK;
                 s->is_cleartext = !encrypted;
                 s->alignment = guess_alignment(pos);
                 memcpy(&sb_file->sections[i], s, sizeof(struct sb_section_t));
@@ -1073,6 +1078,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
                     sec, size, "      ", u, cprintf, err);
                 if(s)
                 {
+                    s->other_flags = tag->flags & ~SECTION_STD_MASK;
                     s->is_cleartext = !encrypted;
                     s->alignment = guess_alignment(pos);
                     sb_file->sections = augment_array(sb_file->sections,
@@ -1136,6 +1142,19 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
     #undef printf
     #undef fatal
     #undef print_hex
+}
+
+void sb_generate_default_version(struct sb_version_t *ver)
+{
+    ver->major = ver->minor = ver->revision = 0x999;
+}
+
+void sb_build_default_image(struct sb_file_t *sb)
+{
+    sb->minor_version = IMAGE_MINOR_VERSION;
+    sb->timestamp = sb_generate_timestamp();
+    sb_generate_default_version(&sb->product_ver);
+    sb_generate_default_version(&sb->component_ver);
 }
 
 void sb_free_instruction(struct sb_inst_t inst)
@@ -1245,6 +1264,9 @@ void sb_dump(struct sb_file_t *file, void *u, generic_printf_t cprintf)
         printf(TREE, "|  +-");
         printf(HEADER, "Alignment: ");
         printf(TEXT, "%d (bytes)\n", sec->alignment);
+        printf(TREE, "|  +-");
+        printf(HEADER, "Other Flags: ");
+        printf(TEXT, "%#x\n", sec->other_flags);
         printf(TREE, "|  +-");
         printf(HEADER, "Instructions\n");
         for(int j = 0; j < sec->nr_insts; j++)

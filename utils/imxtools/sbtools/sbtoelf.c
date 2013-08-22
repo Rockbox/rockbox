@@ -96,6 +96,7 @@ static void extract_sb_section(struct sb_section_t *sec, struct cmd_file_t *cmd_
     struct cmd_section_t *db_sec = db_add_section(cmd_file, sec->identifier, sec->is_data);
     db_add_int_opt(&db_sec->opt_list, "alignment", sec->alignment);
     db_add_int_opt(&db_sec->opt_list, "cleartext", sec->is_cleartext);
+    db_add_int_opt(&db_sec->opt_list, "sectionFlags", sec->other_flags);
 
     if(sec->is_data)
     {
@@ -413,7 +414,6 @@ int main(int argc, char **argv)
             * garbage */
             file->override_real_key = false;
             file->override_crypto_iv = false;
-            file->override_timestamp = true;
             sb_write_file(file, loopback, 0, generic_std_printf);
         }
         sb_free(file);

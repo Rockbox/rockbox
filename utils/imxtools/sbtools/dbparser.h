@@ -111,7 +111,7 @@ typedef void (*db_color_printf)(void *u, bool err, color_t c, const char *f, ...
 
 struct cmd_source_t *db_find_source_by_id(struct cmd_file_t *cmd_file, const char *id);
 struct cmd_option_t *db_find_option_by_id(struct cmd_option_t *opt, const char *name);
-bool db_parse_sb_version(struct sb_version_t *ver, char *str);
+bool db_parse_sb_version(struct sb_version_t *ver, const char *str);
 bool db_generate_sb_version(struct sb_version_t *ver, char *str, int size);
 void db_generate_default_sb_version(struct sb_version_t *ver);
 struct cmd_file_t *db_parse_file(const char *file);

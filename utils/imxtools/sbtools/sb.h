@@ -81,6 +81,7 @@ struct sb_key_dictionary_entry_t
 
 #define SECTION_BOOTABLE        (1 << 0)
 #define SECTION_CLEARTEXT       (1 << 1)
+#define SECTION_STD_MASK        (3 << 0)
 
 #define SB_INST_NOP     0x0
 #define SB_INST_TAG     0x1
@@ -187,6 +188,7 @@ struct sb_section_t
     uint32_t identifier;
     bool is_data;
     bool is_cleartext;
+    uint32_t other_flags;
     uint32_t alignment;
     // data sections are handled as one or more SB_INST_DATA virtual instruction
     int nr_insts;
@@ -204,15 +206,13 @@ struct sb_file_t
     /* override crypto IV, use with caution ! Use NULL to generate it */
     bool override_crypto_iv;
     uint8_t crypto_iv[16];
-    /* override timestamp */
-    bool override_timestamp;
     uint64_t timestamp; /* In microseconds since 2000/1/1 00:00:00 */
+    uint8_t minor_version;
 
     int nr_sections;
     uint16_t drive_tag;
     uint32_t first_boot_sec_id;
     uint16_t flags;
-    uint8_t minor_version;
     struct sb_section_t *sections;
     struct sb_version_t product_ver;
     struct sb_version_t component_ver;
@@ -244,6 +244,9 @@ struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t si
 struct sb_file_t *sb_read_memory(void *buffer, size_t size, bool raw_mode, void *u,
     generic_printf_t printf, enum sb_error_t *err);
 
+uint64_t sb_generate_timestamp(void);
+void sb_generate_default_version(struct sb_version_t *ver);
+void sb_build_default_image(struct sb_file_t *file);
 void sb_fill_section_name(char name[5], uint32_t identifier);
 void sb_dump(struct sb_file_t *file, void *u, generic_printf_t printf);
 void sb_free_instruction(struct sb_inst_t inst);

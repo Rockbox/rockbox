@@ -419,44 +419,29 @@ struct cmd_option_t *db_find_option_by_id(struct cmd_option_t *opt, const char *
 
 #define INVALID_SB_SUBVERSION   0xffff
 
-static uint16_t parse_sb_subversion(char *str)
+static const char *parse_sb_subversion(const char *str, uint16_t *v)
 {
-    int len = strlen(str);
-    uint16_t n = 0;
-    if(len == 0 || len > 4)
-        return INVALID_SB_SUBVERSION;
-    for(int i = 0; i < len; i++)
-    {
-        if(!isdigit(str[i]))
-            return INVALID_SB_SUBVERSION;
-        n = n << 4 | (str[i] - '0');
-    }
-    return n;
+    int len = 0;
+    *v = 0;
+    while(isdigit(str[len]) && len < 3)
+        *v = (*v) << 4 | (str[len++] - '0');
+    if(len == 0)
+        *v = INVALID_SB_SUBVERSION;
+    return str + len;
 }
 
-bool db_parse_sb_version(struct sb_version_t *ver, char *str)
+bool db_parse_sb_version(struct sb_version_t *ver, const char *str)
 {
-    int len = strlen(str);
-    int cnt = 0;
-    int pos[2];
-
-    for(int i = 0; i < len; i++)
-    {
-        if(str[i] != '.')
-            continue;
-        if(cnt == 2)
-            return false;
-        pos[cnt++] = i + 1;
-        str[i] = 0;
-    }
-    if(cnt != 2)
+    str = parse_sb_subversion(str, &ver->major);
+    if(ver->major == INVALID_SB_SUBVERSION || *str != '.')
         return false;
-    ver->major = parse_sb_subversion(str);
-    ver->minor = parse_sb_subversion(str + pos[0]);
-    ver->revision = parse_sb_subversion(str + pos[1]);
-    return ver->major != INVALID_SB_SUBVERSION &&
-        ver->minor != INVALID_SB_SUBVERSION &&
-        ver->revision != INVALID_SB_SUBVERSION;
+    str = parse_sb_subversion(str + 1, &ver->minor);
+    if(ver->minor == INVALID_SB_SUBVERSION || *str != '.')
+        return false;
+    str = parse_sb_subversion(str + 1, &ver->revision);
+    if(ver->revision == INVALID_SB_SUBVERSION || *str != 0)
+        return false;
+    return true;
 }
 
 static bool db_generate_sb_subversion(uint16_t subver, char *str)
@@ -829,11 +814,6 @@ struct cmd_file_t *db_parse_file(const char *file)
 
     free(buf);
     return cmd_file;
-}
-
-void db_generate_default_sb_version(struct sb_version_t *ver)
-{
-    ver->major = ver->minor = ver->revision = 0x999;
 }
 
 void db_free_option_list(struct cmd_option_t *opt_list)
