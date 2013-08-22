@@ -28,7 +28,7 @@ lvm.c
 lzio.c
 rockaux.c
 rocklib.c
-rockmalloc.c
+tlsf_wrapper.c
 fscanf.c
 gmtime.c
 strcspn.c
