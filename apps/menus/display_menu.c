@@ -520,8 +520,19 @@ MENUITEM_FUNCTION(touchscreen_menu_reset_calibration, 0, ID2P(LANG_TOUCHSCREEN_R
                     NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(list_line_padding, &global_settings.list_line_padding, line_padding_callback);
 
-MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, &list_line_padding, &touch_mode,
-            &touchscreen_menu_calibrate, &touchscreen_menu_reset_calibration);
+#ifndef HAS_BUTTON_HOLD
+MENUITEM_SETTING(touchdev_disable_on_hold, &global_settings.touchdev_disable_on_hold, NULL);
+#endif
+
+MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, 
+          &list_line_padding, 
+          &touch_mode,
+          &touchscreen_menu_calibrate, 
+          &touchscreen_menu_reset_calibration,
+#ifndef HAS_BUTTON_HOLD
+          &touchdev_disable_on_hold,
+#endif
+          );
 #endif
 
 
