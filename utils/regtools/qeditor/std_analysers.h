@@ -14,7 +14,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "analyser.h"
-#include "collapsiblepanel.h"
 
 /**
  * Clock analyser

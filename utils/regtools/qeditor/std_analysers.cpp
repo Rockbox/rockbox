@@ -303,6 +303,7 @@ static TmplAnalyserFactory< ClockAnalyser > g_clock_factory(true, "Clock Analyse
 EmiAnalyser::EmiAnalyser(const soc_t& soc, IoBackend *backend)
     :Analyser(soc, backend)
 {
+    m_display_mode = DisplayCycles;
     m_group = new QGroupBox("EMI Analyser");
     QVBoxLayout *layout = new QVBoxLayout;
     m_group->setLayout(layout);
@@ -347,6 +348,8 @@ bool EmiAnalyser::SupportSoc(const QString& soc_name)
 
 void EmiAnalyser::OnChangeDisplayMode(int index)
 {
+    if(index == -1)
+        return;
     m_display_mode = (DisplayMode)m_display_selector->itemData(index).toInt();
     int idx = m_panel->currentIndex();
     FillTable();
@@ -492,11 +495,11 @@ void EmiAnalyser::FillTable()
     if(helper.ReadRegisterField("DRAM", "CTL10", "ADDR_PINS", value))
         AddLine("Address Pins", 13 - value, "");
 
-    if(helper.ReadRegisterField("DRAM", "CTL11", "ADDR_PINS", value))
+    if(helper.ReadRegisterField("DRAM", "CTL11", "COLUMN_SIZE", value))
         AddLine("Column Size", 12 - value, "-bit");
 
-    if(helper.ReadRegisterField("DRAM", "CTL11", "ADDR_PINS", value))
-        AddLine("Encoded CAS", value, "Memory device dependent");
+    if(helper.ReadRegisterField("DRAM", "CTL11", "CASLAT", value))
+        AddLine("Encoded CAS", value, "", "Memory device dependent");
 
     if(helper.ReadRegisterField("DRAM", "CTL14", "CS_MAP", value))
     {
