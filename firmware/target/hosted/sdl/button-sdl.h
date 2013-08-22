@@ -36,5 +36,7 @@ int button_read_device(int *data);
 #else
 int button_read_device(void);
 #endif
-
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHSCREEN)
+void touchscreen_enable_device(bool en);
+#endif
 #endif /* __BUTTON_SDL_H__ */

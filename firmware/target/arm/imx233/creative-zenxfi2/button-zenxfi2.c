@@ -125,3 +125,15 @@ int button_read_device(int *data)
         res |= BUTTON_MENU;
     return res | touchscreen_read_device(data);
 }
+
+void touchscreen_enable_device(bool en)
+{
+    if(en)
+    {
+        /* implement return to normal power mode here */
+    }
+    else
+    {
+        /* implement some power saving function here to apply when touch is disable */
+    }
+}

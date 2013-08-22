@@ -41,13 +41,23 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
-#if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD)
+
+#ifndef HAS_BUTTON_HOLD
+#ifdef HAVE_TOUCHPAD
 #include "touchpad.h"
 void touchdev_enable(bool en)
 {
     touchpad_enable(en);
 }
-#endif
+#endif /* HAVE_TOUCHPAD */
+#ifdef HAVE_TOUCHSCREEN
+#include "touchscreen.h"
+void touchdev_enable(bool en)
+{
+    touchscreen_enable(en);
+}
+#endif /* HAVE_TOUCHSCREEN */
+#endif /* SOFTLOCK */
 
 struct event_queue button_queue SHAREDBSS_ATTR;
 

@@ -81,7 +81,7 @@ void wheel_send_events(bool send);
 int button_apply_acceleration(const unsigned int data);
 #endif
 
-#if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD)
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)) && !defined(HAS_BUTTON_HOLD)
 void touchdev_enable(bool en);
 #endif
 

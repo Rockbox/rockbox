@@ -56,6 +56,8 @@ static int mouse_coords = 0;
 #define USB_KEY SDLK_u
 #endif
 
+
+
 #if defined(IRIVER_H100_SERIES) || defined (IRIVER_H300_SERIES)
 int _remote_type=REMOTETYPE_H100_LCD;
 
@@ -463,3 +465,17 @@ void button_init_device(void)
 {
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 }
+
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHSCREEN)
+void touchscreen_enable_device(bool en)
+{
+    if(en)
+    {
+        /* implement return to normal power mode here */
+    }
+    else
+    {
+        /* implement some power saving function here to apply when touch is disable */
+    }
+}
+#endif

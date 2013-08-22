@@ -165,3 +165,16 @@ bool headphones_inserted(void)
     return (hp_state == 0) ? false : true;
 }
 
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHSCREEN)
+void touchscreen_enable_device(bool en)
+{
+    if(en)
+    {
+        /* implement return to normal power mode here */
+    }
+    else
+    {
+        /* implement some power saving function here to apply when touch is disable */
+    }
+}
+#endif

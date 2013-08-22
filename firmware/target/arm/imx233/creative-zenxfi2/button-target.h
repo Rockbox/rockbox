@@ -27,6 +27,7 @@
 void button_init_device(void);
 int button_read_device(int *data);
 bool button_debug_screen(void);
+void touchscreen_enable_device(bool en);
 
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001
