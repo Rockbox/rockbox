@@ -601,10 +601,10 @@ void EmiAnalyser::FillTable()
 
     if(bypass_mode)
     {
-        if(helper.ReadRegisterField("DRAM", "CTL19", "DLL_DQS_DELAY_0_BYPASS", value))
+        if(helper.ReadRegisterField("DRAM", "CTL19", "DLL_DQS_DELAY_BYPASS_0", value))
             AddLine("DLL DQS Delay 0", value, "", "In 1/128 fraction of a cycle (bypass mode)");
 
-        if(helper.ReadRegisterField("DRAM", "CTL19", "DLL_DQS_DELAY_1_BYPASS", value))
+        if(helper.ReadRegisterField("DRAM", "CTL19", "DLL_DQS_DELAY_BYPASS_0", value))
             AddLine("DLL DQS Delay 1", value, "", "In 1/128 fraction of a cycle (bypass mode)");
 
         if(helper.ReadRegisterField("DRAM", "CTL19", "DQS_OUT_SHIFT_BYPASS", value))

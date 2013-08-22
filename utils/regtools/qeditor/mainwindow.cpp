@@ -104,5 +104,5 @@ void MainWindow::OnLoadDesc()
 
 void MainWindow::OnNewRegTab()
 {
-    new RegTab(m_backend, m_tab);
+    m_tab->setCurrentWidget(new RegTab(m_backend, m_tab));
 }
