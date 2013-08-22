@@ -28,62 +28,48 @@ struct emi_reg_t
     uint32_t value;
 };
 
-/* hardcode all the register values for the different settings. This is ugly
- * but I don't understand what they mean and it's faster this way so...
- * Recall that everything should be put in iram !
+/* hardcode all the register values for the different settings. This avoid
+ * computing the register values at runtime since they never change and also
+ * avoid wasting some space in iram.
+ * Values from IMX233 manual, for Mobile DDR 7.5ns (133 MHz and 64MHz)
  * Make sure the last value is written to register 40. */
-
-/* Values extracted from Sigmatel linux port (GPL) */
-
-/** mDDR value */
-static struct emi_reg_t settings_24M[15] ICONST_ATTR =
-{
-    {4, 0x01000101}, {7, 0x01000101}, {12, 0x02010002}, {13, 0x06060a02},
-    {15, 0x01030000}, {17, 0x2d000102}, {18, 0x20200000}, {19, 0x027f1414},
-    {20, 0x01021608}, {21, 0x00000002}, {26, 0x000000b3}, {32, 0x00030687},
-    {33, 0x00000003}, {34, 0x000012c1}, {40, 0x00010000}
-};
-
-static struct emi_reg_t settings_48M[15] ICONST_ATTR =
-{
-    {4, 0x01000101}, {7, 0x01000101}, {13, 0x06060a02}, {12, 0x02010002},
-    {15, 0x02040000}, {17, 0x2d000104}, {18, 0x1f1f0000}, {19, 0x027f0a0a},
-    {20, 0x01021608}, {21, 0x00000004}, {26, 0x0000016f}, {32, 0x00060d17},
-    {33, 0x00000006}, {34, 0x00002582}, {40, 0x00020000}
-};
 
 static struct emi_reg_t settings_60M[15] ICONST_ATTR =
 {
-    {4, 0x01000101}, {7, 0x01000101}, {12, 0x02020002}, {13, 0x06060a02},
-    {15, 0x02040000}, {17, 0x2d000005}, {18, 0x1f1f0000}, {19, 0x027f0a0a},
-    {20, 0x02040a10}, {21, 0x00000006}, {26, 0x000001cc}, {32, 0x00081060},
-    {33, 0x00000008}, {34, 0x00002ee5}, {40, 0x00020000}
-};
-
-static struct emi_reg_t settings_80M[15] ICONST_ATTR __attribute__((alias("settings_60M")));
-
-static struct emi_reg_t settings_96M[15] ICONST_ATTR =
-{
-    {4, 0x00000101}, {7, 0x01000001}, {12, 0x02020002}, {13, 0x06070a02},
-    {15, 0x03050000}, {17, 0x2d000808}, {18, 0x1f1f0000}, {19, 0x020c1010},
-    {20, 0x0305101c}, {21, 0x00000007}, {26, 0x000002e6}, {32, 0x000c1a3b},
-    {33, 0x0000000c}, {34, 0x00004b0d}, {40, 0x00030000}
-};
-
-static struct emi_reg_t settings_120M[15] ICONST_ATTR =
-{
-    {4, 0x00000101}, {7, 0x01000001}, {12, 0x02020002}, {13, 0x06070a02},
-    {15, 0x03050000}, {17, 0x2300080a}, {18, 0x1f1f0000}, {19, 0x020c1010},
-    {20, 0x0306101c}, {21, 0x00000009}, {26, 0x000003a1}, {32, 0x000f20ca},
-    {33, 0x0000000f}, {34, 0x00005dca}, {40, 0x00040000}
+    {4, 0x01000101}, /* DLL bypass mode, concurrent auto-precharge and bank split */
+    {7, 0x01000101}, /* Read/write grouping, extra clock for back to back, priority placement */
+    {12, 0x02020002}, /* tWR = 2 cycles, tRRD = 1 cycles, tCKE = 2 cycles */
+    {13, 0x06060a02}, /* CAS lat gate = 3.0 cycles, CAS lat = 3.0 cycles, tWTR = 2 */
+    {15, 0x02040000}, /* tRP = 2 cycles, tDAL = 4 cycles */
+    {17, 0x2d000005}, /* DDL: start point = 45, lock = 0, increment = 0, tRC = 5 cycles */
+    {18, 0x00000000}, /* */
+    {19, 0x01000b0b}, /* DLL: DQS out shift (bypass) = 1, DQS delay bypass (1/0) = 11 / 11 */
+    {20, 0x02030a00}, /* tRCD = 2 cycles, tRAS (min) = 3 cycles, DQS write shift (bypass) = 10 */
+    {21, 0x00000005}, /* tRFC = 5 cycles */
+    {26, 0x000001cc}, /* tREF = 460 cycles */
+    {32, 0x00081060}, /* tRAS (max) = 4192 cycles, tXSNR = 8 cycles */
+    {33, 0x00000008}, /* tXSR = 8 cycles */
+    {34, 0x00002ee5}, /* tINIT = 12005 cycles */
+    {40, 0x00020000} /* tPDEX = 2 */
 };
 
 static struct emi_reg_t settings_133M[15] ICONST_ATTR =
 {
-    {4, 0x00000101}, {7, 0x01000001}, {12, 0x02020002}, {13, 0x06070a02},
-    {15, 0x03050000}, {17, 0x2000080a}, {18, 0x1f1f0000}, {19, 0x020c1010},
-    {20, 0x0306101c}, {21, 0x0000000a}, {26, 0x00000408}, {32, 0x0010245f},
-    {33, 0x00000010}, {34, 0x00006808}, {40, 0x00040000}
+    {4, 0x00000101}, /* concurrent auto-precharge and bank split */
+    {7, 0x01000001}, /* Read/write grouping, priority placement */
+    {12, 0x02020002}, /* tWR = 2 cycles, tRRD = 2 cycles, tCKE = 2 cycles */
+    {13, 0x06070a02}, /* CAS lat gate = 3.0 cycles, CAS lat = 3.5 cycles, tWTR = 2 */
+    {15, 0x03050000}, /* tRP = 3 cycles, tDAL = 5 cycles */
+    {17, 0x19000f0a}, /* DDL: start point = 25, lock = 0, increment = 15, tRC = 10 cycles */
+    {18, 0x1f1f0000}, /* DLL: DQS delay (1/0) = 31 / 31 */
+    {19, 0x000a0000}, /* DLL: DQS out shift  = 10 */
+    {20, 0x03060023}, /* tRCD = 3 cycles, tRAS (min) = 6 cycles, DQS write shift = 35 */
+    {21, 0x0000000a}, /* tRFC = 10 cycles */
+    {26, 0x000003f7}, /* tREF = 1015 cycles */
+    {32, 0x001023cd}, /* tRAS (max) = 9165 cycles, tXSNR = 16 cycles */
+    {33, 0x00000010}, /* tXSR = 16 cycles */
+    {34, 0x00006665}, /* tINIT = 26213 cycles */
+    {40, 0x00040000} /* tPDEX = 4 */
 };
 
 static struct emi_reg_t settings_155M[15] ICONST_ATTR __attribute__((alias("settings_133M")));
@@ -148,7 +134,7 @@ void imx233_emi_set_frequency(unsigned long freq)
      * possible in this state anyway.
      * WARNING DANGER don't call any external function when sdram is disabled
      * otherwise you'll poke sdram and trigger a fatal data abort ! */
-    
+
     /* first disable all interrupts */
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     /* flush the cache */
@@ -159,14 +145,19 @@ void imx233_emi_set_frequency(unsigned long freq)
     while(!BF_RD(EMI_STAT, DRAM_HALTED));
     /* load timings */
     struct emi_reg_t *regs;
-    if(freq <= 24000) regs = settings_24M;
-    else if(freq <= 48000) regs = settings_48M;
-    else if(freq <= 60000) regs = settings_60M;
-    else if(freq <= 80000) regs = settings_80M;
-    else if(freq <= 96000) regs = settings_96M;
-    else if(freq <= 120000) regs = settings_120M;
-    else if(freq <= 133000) regs = settings_133M;
-    else regs = settings_155M;
+    switch(freq)
+    {
+        case IMX233_EMIFREQ_151_MHz:
+            regs = settings_155M;
+            break;
+        case IMX233_EMIFREQ_130_MHz:
+            regs = settings_133M;
+            break;
+        case IMX233_EMIFREQ_64_MHz:
+        default:
+            regs = settings_60M;
+            break;
+    }
 
     do
         HW_DRAM_CTLxx(regs->index) = regs->value;
