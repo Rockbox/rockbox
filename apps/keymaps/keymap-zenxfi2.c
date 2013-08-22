@@ -44,6 +44,7 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_CONTEXT,     BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU },
 
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -51,8 +52,9 @@ static const struct button_mapping button_context_standard[]  = {
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,          BUTTON_MENU },
     { ACTION_WPS_CONTEXT,       BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
+    { ACTION_STD_KEYLOCK,       BUTTON_POWER,                    BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_wps */
 
 static const struct button_mapping button_context_list[]  = {
@@ -128,7 +130,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,        BUTTON_MENU|BUTTON_REL,            BUTTON_NONE },
     { ACTION_FM_PRESET,      BUTTON_MENU|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_FM_STOP,        BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_STD_KEYLOCK,    BUTTON_POWER,                      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
