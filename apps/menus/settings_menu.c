@@ -635,6 +635,7 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 
 /***********************************/
 /*    TOUCHPAD MENU                */
+
 #if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
 MENUITEM_SETTING(touchdev_disable_on_hold, &global_settings.touchdev_disable_on_hold, NULL);
 

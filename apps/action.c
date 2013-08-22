@@ -294,7 +294,7 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
-#if defined(HAVE_TOUCHPAD)
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
             /* make sure we reactivate touchpad on unlocking */
                 touchdev_enable(true);
 #endif
@@ -377,7 +377,7 @@ static int get_action_worker(int context, int timeout,
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
- #if defined(HAVE_TOUCHPAD)
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
         /* disable touchpad on keylock */
         if(global_settings.touchdev_disable_on_hold)
             touchdev_enable(false);

@@ -458,7 +458,7 @@ struct user_settings
     int touchpad_sensitivity;
 #endif
 
-#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+#if !defined(HAS_BUTTON_HOLD) && (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
     bool touchdev_disable_on_hold;
 #endif
 
