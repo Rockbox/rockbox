@@ -227,6 +227,8 @@ void set_cpu_frequency(long frequency)
         return;
     /* disable auto-slow (enable back afterwards) */
     imx233_clkctrl_enable_auto_slow(false);
+    /* set VDDIO to the right value */
+    imx233_power_set_regulator(REGULATOR_VDDIO, 3300, 3125);
 
     /* WARNING watch out the order ! */
     if(frequency > cpu_frequency)
