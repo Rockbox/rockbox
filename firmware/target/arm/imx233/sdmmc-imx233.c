@@ -408,7 +408,7 @@ static int init_sd_card(int drive)
     /* SSPCLK @ 96MHz
      * gives bitrate of 96 / 4 / 1 = 24MHz
      * gives bitrate of 96 / 2 / 1 = 48MHz */
-    if(sd_hs)
+    if(/*sd_hs*/false)
         imx233_ssp_set_timings(ssp, 2, 0, 0xffff);
     else
         imx233_ssp_set_timings(ssp, 4, 0, 0xffff);
