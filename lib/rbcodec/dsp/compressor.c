@@ -32,10 +32,16 @@
 
 static struct compressor_settings curr_set; /* Cached settings */
 
-static int32_t comp_rel_slope IBSS_ATTR;   /* S7.24 format */
 static int32_t comp_makeup_gain IBSS_ATTR; /* S7.24 format */
 static int32_t comp_curve[66] IBSS_ATTR;   /* S7.24 format */
 static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
+
+/* 1-pole filter coefficients for exponential attack/release times */
+static int32_t rlsca IBSS_ATTR;            /* Release 'alpha' */
+static int32_t rlscb IBSS_ATTR;            /* Release 'beta' */
+
+static int32_t attca IBSS_ATTR;            /* Attack 'alpha' */
+static int32_t attcb IBSS_ATTR;            /* Attack 'beta'  */
 
 #define UNITY (1L << 24)                   /* unity gain in S7.24 format */
 
@@ -50,9 +56,36 @@ static bool compressor_update(struct dsp_config *dsp,
     static const int comp_ratios[] = { 2, 4, 6, 10, 0 };
     int  ratio      = comp_ratios[settings->ratio];
     bool soft_knee  = settings->knee == 1;
-    int  release    = settings->release_time *
-                            dsp_get_output_frequency(dsp) / 1000;
+    int32_t  release    = settings->release_time; 
+    
+    /* Compute Attack and Release Coefficients */
+    int32_t fs =   dsp_get_output_frequency(dsp) ;     
+    /* Release
+       Leave  a little headroom for large release times 
+    */       
+    release <<= 20;  /* Maybe a good idea to set a max release time guard here.  
+                        Nasty things happen if the rlsca coeff gets bad numbers */ 
+    release /= 1000;
+    release <<=4;    /* S7.24 format */
+    
+    /*  Interpret release time as an RC time constant (time to decay to 1/e) */
+    int32_t irc = UNITY/release;
+    rlsca = UNITY*irc;
+    rlsca /= (fs-irc);
+    rlscb = UNITY - rlsca ;
+    
+    /* Attack */
+    int32_t attack = 10;
+    attack <<= 20;      /*Probably this can be limited to a range where
+                          headroom is not necessary */
+    attack /= 1000;
+    attack <<= 4;      /* S7.24 format */
+    irc = UNITY/attack;
+    attca = UNITY*irc;
+    attca /= (fs-irc);
+    attcb = UNITY - attca ;
 
+    
     bool changed = settings == &curr_set; /* If frequency change */
     bool active  = threshold < 0;
 
@@ -220,7 +253,7 @@ static bool compressor_update(struct dsp_config *dsp,
     db_curve[3].db = 0;
 
     for (int i = 0; i <= 4; i++)
-    {
+    {FRACMUL_SHL(release_gain, rlscb, 7)
         logf("Curve[%d]: db: % 6.2f\toffset: % 6.2f", i,
             (float)db_curve[i].db / (1 << 16),
             (float)db_curve[i].offset / (1 << 16));
@@ -240,11 +273,6 @@ static bool compressor_update(struct dsp_config *dsp,
     comp_makeup_gain = auto_gain ?
         fp_factor(-(db_curve[3].offset) - 0x199A, 16) << 8 : UNITY;
     logf("Makeup gain:\t%.6f", (float)comp_makeup_gain / UNITY);
-
-    /* calculate per-sample gain change a rate of 10db over release time
-     */
-    comp_rel_slope = 0xAF0BB2 / release;
-    logf("Release slope:\t%.6f", (float)comp_rel_slope / UNITY);
 
     release_gain = UNITY;
     return active;
@@ -331,34 +359,48 @@ static void compressor_process(struct dsp_proc_entry *this,
             int32_t this_gain = get_compression_gain(&buf->format, *in_buf[ch]);
             if (this_gain < sample_gain)
                 sample_gain = this_gain;
+
         }
         
-        /* perform release slope; skip if no compression and no release slope
+        
+        /* Exponential Attack and Release
          */
-        if ((sample_gain != UNITY) || (release_gain != UNITY))
-        {
-            /* if larger offset than previous slope, start new release slope
-             */
-            if ((sample_gain <= release_gain) && (sample_gain > 0))
-            {
-                release_gain = sample_gain;
-            }
-            else
-            /* keep sloping towards unity gain (and ignore invalid value) */
-            {
-                release_gain += comp_rel_slope;
-                if (release_gain > UNITY)
-                {
-                    release_gain = UNITY;
-                }
-            }
-        }
+
+       if ((sample_gain <= release_gain) && (sample_gain > 0))
+       {
+           /* Attack */
+           int32_t this_gain = FRACMUL_SHL(release_gain, attcb, 7);
+           this_gain -=  FRACMUL_SHL(sample_gain, attca, 7);
+           release_gain = this_gain;
+       }
+       else
+       /* keep sloping towards unity gain (and ignore invalid value) */
+       {
+           /* Release */
+           int32_t this_gain = FRACMUL_SHL(release_gain, rlscb, 7);
+           this_gain +=  FRACMUL_SHL(sample_gain,rlsca,7);
+           release_gain = this_gain;
+        
+       }
+
         
         /* total gain factor is the product of release gain and makeup gain,
-           but avoid computation if possible */
-        int32_t total_gain = ((release_gain == UNITY) ? comp_makeup_gain :
-            (comp_makeup_gain == UNITY) ? release_gain :
-                FRACMUL_SHL(release_gain, comp_makeup_gain, 7));
+           but avoid computation if possible */ 
+         /* RJB Comment: Why? If CPU can't handle the compressor when it is 
+            compressing then it will sound like sh** on every attack and release 
+            cycle (most of the time, or why use compressor).
+            Inserting logic to evaluate on every sample only eats more CPU during 
+            this time of need, so it takes the hit of the multiplication while
+            compressing in addition to the conditional logic.  Removing the conditional 
+            logic lowers the peak demand, which is where the spare CPU matters the most.
+            If the CPU can't handle the compressor, it's better it sounds bad and skips 
+            so it is easy for the user to identify the source of the bad sound.
+            
+            Well maybe there is an argument for preserving CPU cycles for lower priority
+            processes to use from the "idle process" pool.  Thus I leave my comment.
+           */
+        int32_t total_gain = FRACMUL_SHL(release_gain, comp_makeup_gain, 7);
+
         
         /* Implement the compressor: apply total gain factor (if any) to the
            output buffer sample pair/mono sample */
