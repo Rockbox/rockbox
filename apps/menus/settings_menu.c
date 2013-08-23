@@ -637,10 +637,12 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 /*    TOUCHPAD MENU                */
 #if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
 MENUITEM_SETTING(touchdev_disable_on_hold, &global_settings.touchdev_disable_on_hold, NULL);
+MENUITEM_SETTING(touchdev_disable_only_touch_on_hold, &global_settings.touchdev_disable_only_touch_on_hold, NULL);
 
 MAKE_MENU(touchpad_menu, ID2P(LANG_TOUCHPAD),
           0, Icon_System_menu,
-            &touchdev_disable_on_hold,
+          &touchdev_disable_on_hold,
+          &touchdev_disable_only_touch_on_hold,
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
 #endif
