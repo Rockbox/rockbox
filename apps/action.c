@@ -288,7 +288,7 @@ static int get_action_worker(int context, int timeout,
     last_context = context;
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
-    if (is_keys_locked())
+    if (is_keys_locked()) 
     {
         if (button == unlock_combo)
         {
@@ -301,10 +301,14 @@ static int get_action_worker(int context, int timeout,
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
-        else
+        else if(1
 #if (BUTTON_REMOTE != 0)
-            if ((button & BUTTON_REMOTE) == 0)
+                && ((button & BUTTON_REMOTE) == 0)
 #endif
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
+                && (!global_settings.touchdev_disable_only_touch_on_hold)
+#endif
+                )
         {
             if ((button & BUTTON_REL))
                 splash(HZ/2, str(LANG_KEYLOCK_ON));
@@ -375,13 +379,16 @@ static int get_action_worker(int context, int timeout,
     if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
     {
         unlock_combo = button;
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)) && !defined(SIMULATOR)
+        if(global_settings.touchdev_disable_only_touch_on_hold \
+           || global_settings.touchdev_disable_on_hold)
+        {
+           /* disable touchpad on keylock */
+            touchdev_enable(false); 
+        }
+#endif
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
-#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)) && !defined(SIMULATOR)
-        /* disable touchpad on keylock */
-        if(global_settings.touchdev_disable_on_hold)
-            touchdev_enable(false);
- #endif
         button_clear_queue();
         return ACTION_REDRAW;
     }
