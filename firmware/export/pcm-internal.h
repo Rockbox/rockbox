@@ -57,6 +57,7 @@ void pcm_sw_volume_copy_buffer(void *dst, const void *src, size_t size);
 #endif
 #endif /* PCM_SW_VOLUME_UNBUFFERED */
 
+void pcm_sync_pcm_factors(void);
 #endif /* HAVE_SW_VOLUME_CONTROL */
 
 #define PCM_SAMPLE_SIZE     (2 * sizeof (int16_t))

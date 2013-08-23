@@ -35,62 +35,127 @@ static uint32_t prescale_factor = PCM_FACTOR_UNITY;
 #endif /* AUDIOHW_HAVE_PRESCALER */
 
 /* final pcm scaling factors */
+static uint32_t pcm_new_factor_l = 0, pcm_new_factor_r = 0;
 static uint32_t pcm_factor_l = 0, pcm_factor_r = 0;
+static typeof (memcpy) *pcm_scaling_fn = NULL;
 
 /***
- ** Volume scaling routine
+ ** Volume scaling routines
  ** If unbuffered, called externally by pcm driver
  **/
 
 /* TODO: #include CPU-optimized routines and move this to /firmware/asm */
-
 #if PCM_SW_VOLUME_FRACBITS <= 16
 #define PCM_F_T int32_t
 #else
 #define PCM_F_T int64_t /* Requires large integer math */
 #endif /* PCM_SW_VOLUME_FRACBITS */
 
+/* Scale and round sample by PCM factor */
 static inline int32_t pcm_scale_sample(PCM_F_T f, int32_t s)
 {
     return (f * s + (PCM_F_T)PCM_FACTOR_UNITY/2) >> PCM_SW_VOLUME_FRACBITS;
 }
 
-/* Copies buffer with volume scaling applied */
+/* Both UNITY, use direct copy */
+/* static void * memcpy(void *dst, const void *src, size_t size); */
+
+/* Either cut (both <= UNITY), no clipping needed */
+static void * pcm_scale_buffer_cut(void *dst, const void *src, size_t size)
+{
+    int16_t *d = dst;
+    const int16_t *s = src;
+    uint32_t factor_l = pcm_factor_l, factor_r = pcm_factor_r;
+
+    while (size)
+    {
+        *d++ = pcm_scale_sample(factor_l, *s++);
+        *d++ = pcm_scale_sample(factor_r, *s++);
+        size -= PCM_SAMPLE_SIZE;
+    }
+
+    return dst;
+}
+
+/* Either boost (any > UNITY) requires clipping */
+static void * pcm_scale_buffer_boost(void *dst, const void *src, size_t size)
+{
+    int16_t *d = dst;
+    const int16_t *s = src;
+    uint32_t factor_l = pcm_factor_l, factor_r = pcm_factor_r;
+
+    while (size)
+    {
+        *d++ = clip_sample_16(pcm_scale_sample(factor_l, *s++));
+        *d++ = clip_sample_16(pcm_scale_sample(factor_r, *s++));
+        size -= PCM_SAMPLE_SIZE;
+    }
+
+    return dst;
+}
+
+/* Transition the volume change smoothly across a frame */
+static void * pcm_scale_buffer_trans(void *dst, const void *src, size_t size)
+{
+    int16_t *d = dst;
+    const int16_t *s = src;
+    uint32_t factor_l = pcm_factor_l, factor_r = pcm_factor_r;
+
+    /* Transition from the old value to the new value using an inverted cosinus
+       from PI..0 in order to minimize amplitude-modulated harmonics generation
+       (zipper effects). */
+    uint32_t new_factor_l = pcm_new_factor_l;
+    uint32_t new_factor_r = pcm_new_factor_r;
+
+    int32_t diff_l = (int32_t)new_factor_l - (int32_t)factor_l;
+    int32_t diff_r = (int32_t)new_factor_r - (int32_t)factor_r;
+
+    for (size_t done = 0; done < size; done += PCM_SAMPLE_SIZE)
+    {
+        int32_t sweep = (1 << 14) - fp14_cos(180*done / size); /* 0.0..2.0 */
+        uint32_t f_l = fp_mul(sweep, diff_l, 15) + factor_l;
+        uint32_t f_r = fp_mul(sweep, diff_r, 15) + factor_r;
+        *d++ = clip_sample_16(pcm_scale_sample(f_l, *s++));
+        *d++ = clip_sample_16(pcm_scale_sample(f_r, *s++));
+    }
+
+    /* Select steady-state operation */
+    pcm_sync_pcm_factors();
+
+    return dst;
+}
+
+/* Called by completion routine to scale the next buffer of samples */
 #ifndef PCM_SW_VOLUME_UNBUFFERED
 static inline
 #endif
 void pcm_sw_volume_copy_buffer(void *dst, const void *src, size_t size)
 {
-    int16_t *d = dst;
-    const int16_t *s = src;
-    uint32_t factor_l = pcm_factor_l;
-    uint32_t factor_r = pcm_factor_r;
+    pcm_scaling_fn(dst, src, size);
+}
 
-    if (factor_l == PCM_FACTOR_UNITY && factor_r == PCM_FACTOR_UNITY)
+/* Assign the new scaling function for normal steady-state operation */
+void pcm_sync_pcm_factors(void)
+{
+    uint32_t new_factor_l = pcm_new_factor_l;
+    uint32_t new_factor_r = pcm_new_factor_r;
+
+    pcm_factor_l = new_factor_l;
+    pcm_factor_r = new_factor_r;
+
+    if (new_factor_l == PCM_FACTOR_UNITY &&
+        new_factor_r == PCM_FACTOR_UNITY)
     {
-        /* Both unity */
-        memcpy(dst, src, size);
+        pcm_scaling_fn = memcpy;
     }
-    else if (LIKELY(factor_l <= PCM_FACTOR_UNITY &&
-                    factor_r <= PCM_FACTOR_UNITY))
+    else if (new_factor_l <= PCM_FACTOR_UNITY &&
+             new_factor_r <= PCM_FACTOR_UNITY)
     {
-        /* Either cut, both <= UNITY */
-        while (size)
-        {
-            *d++ = pcm_scale_sample(factor_l, *s++);
-            *d++ = pcm_scale_sample(factor_r, *s++);
-            size -= PCM_SAMPLE_SIZE;
-        }
+        pcm_scaling_fn = pcm_scale_buffer_cut;
     }
     else
     {
-        /* Either positive gain, requires clipping */
-        while (size)
-        {
-            *d++ = clip_sample_16(pcm_scale_sample(factor_l, *s++));
-            *d++ = clip_sample_16(pcm_scale_sample(factor_r, *s++));
-            size -= PCM_SAMPLE_SIZE;
-        }
+        pcm_scaling_fn = pcm_scale_buffer_boost;
     }
 }
 
@@ -191,6 +256,9 @@ pcm_play_dma_status_callback_int(enum pcm_dma_status status)
 /* Prefill double buffer and start pcm driver */
 static void start_pcm(bool reframe)
 {
+    /* Smoothed transition might not have happened so sync now */
+    pcm_sync_pcm_factors();
+
     pcm_dbl_buf_num = 0;
     pcm_dbl_buf_size[0] = 0;
 
@@ -272,8 +340,15 @@ static void pcm_sync_prescaler(void)
     factor_l = fp_mul(prescale_factor, factor_l, PCM_SW_VOLUME_FRACBITS);
     factor_r = fp_mul(prescale_factor, factor_r, PCM_SW_VOLUME_FRACBITS);
 #endif
-    pcm_factor_l = MIN(factor_l, PCM_FACTOR_MAX);
-    pcm_factor_r = MIN(factor_r, PCM_FACTOR_MAX);
+    pcm_play_lock();
+
+    pcm_new_factor_l = MIN(factor_l, PCM_FACTOR_MAX);
+    pcm_new_factor_r = MIN(factor_r, PCM_FACTOR_MAX);
+
+    if (pcm_new_factor_l != pcm_factor_l || pcm_new_factor_r != pcm_factor_r)
+        pcm_scaling_fn = pcm_scale_buffer_trans;
+
+    pcm_play_unlock();
 }
 
 #ifdef AUDIOHW_HAVE_PRESCALER
