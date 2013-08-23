@@ -460,6 +460,7 @@ struct user_settings
 
 #if !defined(HAS_BUTTON_HOLD) && (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
     bool touchdev_disable_on_hold;
+    bool touchdev_disable_only_touch_on_hold;
 #endif
 
     int  pause_rewind; /* time in s to rewind when pausing */

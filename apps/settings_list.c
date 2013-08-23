@@ -1968,6 +1968,8 @@ const struct settings_list settings[] = {
 #if !defined(HAS_BUTTON_HOLD) && (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN))
     OFFON_SETTING(0, touchdev_disable_on_hold, LANG_TOUCHDEV_DISABLE_ON_HOLD, false,
                   "Disable touch on keylock", NULL),
+    OFFON_SETTING(0, touchdev_disable_only_touch_on_hold, LANG_TOUCHDEV_DISABLE_ONLY_TOUCH_ON_HOLD, false,
+                  "Disable only touch on keylock", NULL),
 #endif
 
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING

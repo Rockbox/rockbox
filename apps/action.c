@@ -375,13 +375,21 @@ static int get_action_worker(int context, int timeout,
     if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
     {
         unlock_combo = button;
-        keys_locked = true;
-        splash(HZ/2, str(LANG_KEYLOCK_ON));
 #if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)) && !defined(SIMULATOR)
-        /* disable touchpad on keylock */
-        if(global_settings.touchdev_disable_on_hold)
-            touchdev_enable(false);
+        if(global_settings.touchdev_disable_only_touch_on_hold \
+           || global_settings.touchdev_disable_on_hold)
+        {
+           /* disable touchpad on keylock */
+            touchdev_enable(false); 
+        }
+        if(!global_settings.touchdev_disable_only_touch_on_hold)
+        {
  #endif
+            keys_locked = true;
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)) && !defined(SIMULATOR)
+        }
+#endif
+        splash(HZ/2, str(LANG_KEYLOCK_ON));
         button_clear_queue();
         return ACTION_REDRAW;
     }

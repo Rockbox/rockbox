@@ -13189,3 +13189,17 @@
     *: "Disable touch on keylock"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHDEV_DISABLE_ONLY_TOUCH_ON_HOLD
+  desc: Disable only touch on keylock
+  user: core
+  <source>
+    *: "Disable touch but let physical keys active on keylock"
+  </source>
+  <dest>
+    *: "Disable touch but let physical keys active on keylock"
+  </dest>
+  <voice>
+    *: "Disable touch but let physical keys active on keylock"
+  </voice>
+</phrase>
