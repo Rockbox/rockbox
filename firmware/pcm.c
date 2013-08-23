@@ -111,6 +111,10 @@ void pcm_play_stop_int(void);
  ** pcm_sw_volume.c **/
 static inline void pcm_play_dma_start_int(const void *addr, size_t size)
 {
+#ifdef HAVE_SW_VOLUME_CONTROL
+    /* Smoothed transition might not have happened so sync now */
+    pcm_sync_pcm_factors();
+#endif
     pcm_play_dma_start(addr, size);
 }
 
