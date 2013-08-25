@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///4Q\u003d",
+        "filename": "lib/rbcodec/codecs/codecs.make",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000281
+      },
+      "writtenOn": "2013-08-25T20:09:51Z",
+      "side": 1,
+      "message": "I checked that none of CFLAGS, the contents of it (INLCUDES, DEFINES, EXTRA_DEFINES, STD, INC, DEBUG, VERSION, APPVERSION, TARGET, PROFILE, RBARCH, MEMORYSIZE, BUILDDATE, TOOLSDIR, FIRMWARE, GCCOPTS, SPEEXOPTS, IMXTOOLSDIR), RBCODEC_CFLAGS, nor SHARED_CFLAGS get modified by any of these included Makefiles.\n\nlibwmavoice/Makefile _does_ set CFLAGS, STD, and INC, but that is not being included here.\n\nBUILDDATE is a recursively-expanded variable that invokes a shell command, which would seem to be problematic if you wanted the same date more than once, but it only gets added to CFLAGS in firmware/test/fat/Makefile, which shouldn\u0027t matter here.\n\nI didn\u0027t do a complete audit of the build system, but I\u0027m pretty confident this won\u0027t change anything.",
+      "revId": "23b080a66357d7e1ea6c053408bef21b8381f20b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
