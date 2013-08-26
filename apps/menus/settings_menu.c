@@ -360,7 +360,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #if CONFIG_CODEC == SWCODEC
             &keyclick_menu,
 #endif
-#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+/* On non-softlock target this setting is in system. Otherwise it gets
+   grouped with others touch settings */
+#if defined(HAVE_TOUCHPAD_SENSITIVITY_SETTING) && defined(HAS_BUTTON_HOLD)
             &touchpad_sensitivity,
 #endif
 #ifdef USB_ENABLE_HID
@@ -631,6 +633,22 @@ MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
 /*    HOTKEY MENU                  */
 /***********************************/
 
+/***********************************/
+/*    TOUCHPAD MENU                */
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+MENUITEM_SETTING(touchdev_disable_on_hold, &global_settings.touchdev_disable_on_hold, NULL);
+
+MAKE_MENU(touchpad_menu, ID2P(LANG_TOUCHPAD),
+          0, Icon_System_menu,
+            &touchdev_disable_on_hold,
+#ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
+            &touchpad_sensitivity,
+#endif
+         );
+#endif /* !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD) */
+
+/*    TOUCHDEV MENU                */
+/***********************************/
 
 /***********************************/
 /*    SETTINGS MENU                */
@@ -646,7 +664,11 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
 #ifdef HAVE_TAGCACHE
           &tagcache_menu,
 #endif
-          &display_menu, &system_menu,
+          &display_menu,
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+          &touchpad_menu,
+#endif
+          &system_menu,
           &startup_shutdown_menu,
           &bookmark_settings_menu,
 #ifdef HAVE_TAGCACHE
