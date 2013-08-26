@@ -45,7 +45,7 @@ enum data_type {
 #define ERR_FILE_ERROR          -4
 #define ERR_HANDLE_NOT_DONE     -5
 #define ERR_UNSUPPORTED_TYPE    -6
-
+#define ERR_WRONG_THREAD        -7
 
 /* Initialise the buffering subsystem */
 void buffering_init(void) INIT_ATTR;
@@ -116,10 +116,6 @@ void buf_back_off_storage(bool back_off);
 #endif
 
 /* Settings */
-enum {
-    BUFFERING_SET_WATERMARK = 1,
-    BUFFERING_SET_CHUNKSIZE,
-};
 void buf_set_watermark(size_t bytes);
 size_t buf_get_watermark(void);
 
@@ -127,7 +123,6 @@ size_t buf_get_watermark(void);
 struct buffering_debug {
     int num_handles;
     size_t buffered_data;
-    size_t wasted_space;
     size_t data_rem;
     size_t useful_data;
     size_t watermark;
