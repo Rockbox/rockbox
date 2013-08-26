@@ -1734,3 +1734,9 @@ thread.c
 #endif
 
 #endif /* defined(SIMULATOR) */
+
+
+#if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD)
+touchpad.c
+touchdev.c
+#endif

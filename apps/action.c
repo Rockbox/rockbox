@@ -41,6 +41,10 @@
 #ifdef HAVE_TOUCHSCREEN
 #include "statusbar-skinned.h"
 #endif
+#if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD)
+#include "touchpad.h"
+#include "touchdev.c"
+#endif
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
@@ -62,6 +66,7 @@ static bool keys_locked = false;
 static int unlock_combo = BUTTON_NONE;
 static bool screen_has_lock = false;
 #endif /* HAVE_SOFTWARE_KEYLOCK */
+
 
 /*
  * do_button_check is the worker function for get_default_action.
@@ -294,6 +299,10 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
+#if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD) && !defined(SIMULATOR)
+            /* make sure we reactivate touchpad on unlocking */
+                touchdev_enable(true);
+#endif
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
@@ -308,7 +317,7 @@ static int get_action_worker(int context, int timeout,
         }
     }
     context &= ~ALLOW_SOFTLOCK;
-#endif /* HAS_BUTTON_HOLD */
+#endif /* HAS_SOFTWARE_KEYLOCK */
 
 #ifdef HAVE_TOUCHSCREEN
     if (button & BUTTON_TOUCHSCREEN)
@@ -373,7 +382,11 @@ static int get_action_worker(int context, int timeout,
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
-
+ #if defined(HAVE_TOUCHPAD) && !defined(SIMULATOR)
+        /* disable touchpad on keylock */
+        if(global_settings.touchdev_disable_on_hold)
+            touchdev_enable(false);
+ #endif
         button_clear_queue();
         return ACTION_REDRAW;
     }
