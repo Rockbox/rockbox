@@ -458,6 +458,10 @@ struct user_settings
     int touchpad_sensitivity;
 #endif
 
+#if !defined(HAS_BUTTON_HOLD) && defined(HAVE_TOUCHPAD)
+    bool touchdev_disable_on_hold;
+#endif
+
     int  pause_rewind; /* time in s to rewind when pausing */
 #ifdef HAVE_HEADPHONE_DETECTION
     int  unplug_mode; /* pause on headphone unplug */
