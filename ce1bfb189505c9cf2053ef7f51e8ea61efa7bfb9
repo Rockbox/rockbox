@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///30\u003d",
+        "filename": "apps/action.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-26T22:28:53Z",
+      "side": 1,
+      "message": "Why include the .c file?",
+      "revId": "ce1bfb189505c9cf2053ef7f51e8ea61efa7bfb9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///3w\u003d",
+        "filename": "apps/action.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-26T22:28:53Z",
+      "side": 1,
+      "message": "Why exclude the SIMULATOR?",
+      "revId": "ce1bfb189505c9cf2053ef7f51e8ea61efa7bfb9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///3s\u003d",
+        "filename": "apps/action.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-26T22:28:53Z",
+      "side": 1,
+      "message": "Why exclude the SIMULATOR?",
+      "revId": "ce1bfb189505c9cf2053ef7f51e8ea61efa7bfb9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///3k\u003d",
+        "filename": "firmware/drivers/touchpad.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-26T22:28:53Z",
+      "side": 1,
+      "message": "This function name is rather long-winded. How about \"touch_filter_enabled()\"?\n\nAlso: The implementaiton can be simplified to \"return button \u0026 ~BUTTON_TOUCHPAD\". This has the added bonus that combos that include a both enabled and disabled buttons return only the enabled ones (your code returns the combo as-is, i.e. doesnt disable disabled buttons within combos).",
+      "revId": "ce1bfb189505c9cf2053ef7f51e8ea61efa7bfb9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///3U\u003d",
+        "filename": "firmware/touchdev.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-26T22:28:53Z",
+      "side": 1,
+      "message": "This is so little code, I would just move it into firmware/drivers/button.c",
+      "revId": "ce1bfb189505c9cf2053ef7f51e8ea61efa7bfb9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///3g\u003d",
+        "filename": "firmware/touchpad.c",
+        "patchSetId": 28
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-08-26T22:28:53Z",
+      "side": 1,
+      "message": "This file is duplicated",
+      "revId": "ce1bfb189505c9cf2053ef7f51e8ea61efa7bfb9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
