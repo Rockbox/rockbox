@@ -128,8 +128,8 @@ static const struct button_mapping button_context_keyboard[]  = {
 }; /* button_context_keyboard */
 
 static const struct button_mapping button_context_radio[]  = {
-    { ACTION_FM_MENU,        BUTTON_MENU|BUTTON_REL,            BUTTON_NONE },
-    { ACTION_FM_PRESET,      BUTTON_MENU|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_FM_EXIT,        BUTTON_MENU|BUTTON_REL,            BUTTON_NONE },
+    { ACTION_FM_MENU,        BUTTON_MENU|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_STD_KEYLOCK,    BUTTON_POWER,                      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)

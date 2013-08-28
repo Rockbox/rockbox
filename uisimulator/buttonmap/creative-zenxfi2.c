@@ -29,18 +29,24 @@ int key_to_button(int keyboard_button)
     int new_btn = BUTTON_NONE;
     switch (keyboard_button)
     {
-        case SDLK_PAGEDOWN:
-            new_btn = BUTTON_MENU;
-            break;
-        case SDLK_HOME:
+        case SDLK_ESCAPE:
+        case SDLK_BACKSPACE:
+        case SDLK_DELETE:
             new_btn = BUTTON_POWER;
+            break;
+        case SDLK_KP_ENTER:
+        case SDLK_RETURN:
+        case SDLK_SPACE:
+        case SDLK_INSERT:
+            new_btn = BUTTON_MENU;
             break;
     }
     return new_btn;
 }
 
 struct button_map bm[] = {
-    { SDLK_PAGEDOWN, 162, 136, 26, "Menu" },
+    { SDLK_RETURN, 162, 136, 26, "Menu" },
+    { SDLK_ESCAPE, 315, 514, 26, "Power" },
     { 0, 0, 0, 0, "None" }
 };
  
