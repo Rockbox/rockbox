@@ -108,5 +108,9 @@ static inline opus_int32 silk_CLZ32(opus_int32 in32)
 #include "arm/macros_armv5e.h"
 #endif
 
+#ifdef CF_ASM
+#include "cf/macros_cf.h"
+#endif
+
 #endif /* SILK_MACROS_H */
 
