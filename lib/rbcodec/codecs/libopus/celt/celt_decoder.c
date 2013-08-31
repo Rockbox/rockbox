@@ -668,7 +668,7 @@ int celt_decode_with_ec(CELTDecoder * OPUS_RESTRICT st, const unsigned char *dat
    VARDECL(int, fine_priority);
    VARDECL(int, tf_res);
    VARDECL(unsigned char, collapse_masks);
-   celt_sig *out_mem[2];
+   celt_sig *out_mem[2] = {NULL, NULL};
    celt_sig *decode_mem[2];
    celt_sig *out_syn[2];
    opus_val16 *lpc;
