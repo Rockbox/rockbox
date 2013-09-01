@@ -31,87 +31,65 @@
 
 static struct semaphore headphone_wakeup;
 static unsigned int headphone_thread_id;
-static int headphone_stack[200/sizeof(int)]; /* Not much stack needed */
+static unsigned int headphone_stack[176/sizeof(int)]; /* Little stack needed */
 static const char * const headphone_thread_name = "headphone";
 static bool headphones_detect = false;
 
 /* Convert ADC reading into a button value. */
 static int adc_data_to_button(unsigned int data)
 {
-    int btn = BUTTON_NONE;
-
-    if (data < 505)
+    /*               _______370_______
+     *           ___149___       ___675___
+     *        ___64__ __252__ __505__ __870__
+     *        x  PLAY DSP REW FF VOL+ VOL-  x
+     *
+     * Child nodes are at 2*n and 2*n+1 per usual bintree array representation
+     */
+    static const unsigned int button_tree[16] =
     {
-        if (data < 252)
-        {
-            if (data < 149)
-            {
-                if (data >= 64)
-                {
-                    /* Play/Pause */
-                    btn = BUTTON_RC_PLAY;
-                }
-                /* else headphone direct */
-            }
-            else
-            {
-                /* DSP */
-                btn = BUTTON_RC_DSP;
-            }
-        }
-        else
-        {
-            if (data < 370)
-            {
-                /* RW */
-                btn = BUTTON_RC_REW;
-            }
-            else
-            {
-                /* FF */
-                btn = BUTTON_RC_FF;
-            }
-        }
-    }
-    else
-    {
-        if (data < 870)
-        {
-            if (data < 675)
-            {
-                /* Vol + */
-                btn = BUTTON_RC_VOL_UP;
-            }
-            else
-            {
-                /* Vol - */
-                btn = BUTTON_RC_VOL_DOWN;
-            }
-        }
-#if 0
-        else
-        {
+        [ 0] =   0,
+        [ 1] = 370,
+        [ 2] = 149,
+        [ 3] = 675,
+        [ 4] =  64,
+        [ 5] = 252,
+        [ 6] = 505,
+        [ 7] = 870,
+        [ 8] = BUTTON_NONE,
+        [ 9] = BUTTON_RC_PLAY,
+        [10] = BUTTON_RC_DSP,
+        [11] = BUTTON_RC_REW,
+        [12] = BUTTON_RC_FF,
+        [13] = BUTTON_RC_VOL_UP,
+        [14] = BUTTON_RC_VOL_DOWN,
+        [15] = BUTTON_NONE,
+    };
 
-            if (data < 951)
-            {
-                /* No buttons */                            
-            }
-            else
-            {
-                /* Not inserted */
+    int i, button;
 
-            }
-        }
-#endif
-    }
+    asm volatile (
+        "ldr    %0, [%2, #1*4]       \n" /* button = button_tree[1] */
+        "mov    %1, #1               \n" /* i = 1 */
+        "cmp    %3, %0               \n" /* C=1 if data > button */
+        "adc    %1, %1, %1           \n" /* i = 2*n + C */
+        "ldr    %0, [%2, %1, lsl #2] \n" /* button = button_tree[i] */
+        "cmp    %3, %0               \n" /* C=1 if data > button */
+        "adc    %1, %1, %1           \n" /* i = 2*n + C */
+        "ldr    %0, [%2, %1, lsl #2] \n" /* button = button_tree[i] */
+        "cmp    %3, %0               \n" /* C=1 if data > button */
+        "adc    %1, %1, %1           \n" /* i = 2*n + C */
+        "ldr    %0, [%2, %1, lsl #2] \n" /* button = button_tree[i] */
+        : "=&r"(button), "=&r"(i)
+        : "r"(button_tree), "r"(data));
 
-    return btn;
+    return button;
 }
 
-static void headphone_thread(void)
+static void NORETURN_ATTR headphone_thread(void)
 {
     int headphone_sleep_countdown = 0;
     int headphone_wait_timeout = TIMEOUT_BLOCK;
+    int last_btn = BUTTON_NONE;
 
     while (1)
     {
@@ -123,15 +101,10 @@ static void headphone_thread(void)
             if (headphone_sleep_countdown <= 0)
             {
                 /* Polling ADC */
-                int btn, btn2;
-
-                btn = adc_data_to_button(data);
-                sleep(HZ/50);
-                data = adc_read(ADC_HPREMOTE);
-                btn2 = adc_data_to_button(data);
-
-                if (btn != btn2)
+                int btn = adc_data_to_button(data);
+                if (btn != last_btn)
                 {
+                    last_btn = btn;
                     /* If the buttons dont agree twice in a row, then it's
                      * none (from meg-fx remote reader). */
                     btn = BUTTON_NONE;
@@ -154,11 +127,12 @@ static void headphone_thread(void)
 
         /* Cancel any buttons if jack readings are unstable. */
         button_headphone_set(BUTTON_NONE);
+        last_btn = BUTTON_NONE;
 
         if (data >= 64 && data <= 951)
         {
             /* Should be a remote control - accelerate */
-            headphone_wait_timeout = HZ/20-HZ/50;
+            headphone_wait_timeout = HZ/25;
             headphone_sleep_countdown = 0;
         }
         else if (rc == OBJ_WAIT_SUCCEEDED)
@@ -187,7 +161,7 @@ bool headphones_inserted(void)
 void INIT_ATTR headphone_init(void)
 {
     /* A thread is required to monitor the remote ADC and jack state. */
-    semaphore_init(&headphone_wakeup, 1, 0);
+    semaphore_init(&headphone_wakeup, 1, 1);
     headphone_thread_id = create_thread(headphone_thread, 
                                         headphone_stack,
                                         sizeof(headphone_stack),
@@ -195,7 +169,6 @@ void INIT_ATTR headphone_init(void)
                                         IF_PRIO(, PRIORITY_REALTIME)
                                         IF_COP(, CPU));
 
-    /* Initially poll and then enable PMIC event */
-    headphone_detect_event();
+    /* Enable PMIC event */
     mc13783_enable_event(MC13783_ONOFD2_EVENT, true);
 }
