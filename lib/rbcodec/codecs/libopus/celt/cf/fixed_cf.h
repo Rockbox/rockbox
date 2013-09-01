@@ -53,4 +53,37 @@ static inline int32_t MULT32_32_Q31_cf(int32_t a, int32_t b)
 }
 #define MULT32_32_Q31(a, b) (MULT32_32_Q31_cf(a, b))
 
+#define OVERRIDE_COMB_FILTER_CONST
+static void comb_filter_const(opus_val32 *y, opus_val32 *x, int T, int N,
+    opus_val16 g10, opus_val16 g11, opus_val16 g12)
+{
+  opus_val32 x0, x1, x2, x3, x4;
+  int i;
+  x4 = x[-T-2];
+  x3 = x[-T-1];
+  x2 = x[-T];
+  x1 = x[-T+1];
+  for (i=0;i<N;i++)
+  {
+    x0=x[i-T+2];
+    asm volatile("mac.l %[g10], %[x2], %%acc0;"
+                 /* just doing straight MACs here is faster than pre-adding */
+                 "mac.l %[g11], %[x1], %%acc0;"
+                 "mac.l %[g11], %[x3], %%acc0;"
+                 "mac.l %[g12], %[x0], %%acc0;"
+                 "mac.l %[g12], %[x4], %%acc0;"
+                 "move.l %[x3], %[x4];"
+                 "move.l %[x2], %[x3];"
+                 "move.l %[x1], %[x2];"
+                 "move.l %[x0], %[x1];"
+                 "movclr.l %%acc0, %[x0];"
+                 : [x0] "+r" (x0), [x1] "+r" (x1), [x2] "+r" (x2),
+                   [x3] "+r" (x3), [x4] "+r" (x4)
+                 : [g10] "r" (g10 << 16), [g11] "r" (g11 << 16),
+                   [g12] "r" (g12 << 16)
+                 : "cc");
+    y[i] = x[i] + x0;
+  }
+}
+
 #endif
