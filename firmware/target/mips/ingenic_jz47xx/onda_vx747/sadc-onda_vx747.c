@@ -300,3 +300,10 @@ void adc_close(void)
     sleep(20);
     __cpm_stop_sadc();
 }
+
+#ifndef HAS_BUTTON_HOLD
+void touchscreen_enable_device(bool en)
+{
+    (void)en; /* FIXME: do something smart */
+}
+#endif
