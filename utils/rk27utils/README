@@ -35,3 +35,37 @@ This directory contains tool which sends custom scsi commands to the
 rockchip player.
 
 You need libusb-1.0 + header files in order to compile this utility.
+
+nandextract
+This directory contains quick and dirty tool which allows to extract
+nand bootloader from raw dump of the first nand block. The main reason
+I post this tool is to somewhat document error correction scheme used by
+rk27xx chip. The tool implements BCH error correction processing with
+help of bch library taken from linux kernel (and slightly modified to
+compile standalone). Error correction is SUPER important as the nands used
+in cheap rk27 players have quite high error rates.
+
+Nand controler in rk27xx chip implements hw BCH error correction engine.
+The documentation is lacking so this info was obtained from RE and
+various other sources.
+The data on the nand is stored in 528 bytes long chunks - 512 bytes
+of actual data followed by 3 bytes of metadata (used by FTL layer to mark
+special sectors) followed by 13 bytes of BCH ECC. BCH algorithm
+uses m=13, t=8 and primitive polynomial 0x25af. Special masking
+is used such as empty sector (with all 0xff) gives all 0xff ECC bytes.
+Quoting e-mail from Ivan Djelic (the author of bch lib in linux):
+To summarize, the steps needed to compute the rk27xx ecc are the following:
+1. Reverse bits in each input byte
+2. Call encode_bch()
+3. Reverse output bits in each computed ecc byte
+4. Add a polynomial in order to get only 0xff ecc bytes for a blank page
+For more details you need to read the code.
+
+Another quirk is that rom loader assumes that there are 4 sectors in each
+nand page. This is actually not true for newer nand chips with page size
+bigger then 2k. That means that on newer 4k page chips only first half of
+every page is used in nand bootloader area. This is for compatibility reasons
+most probably.
+
+Finally, every 512 bytes block of data is encoded with rc4 algorithm.
+The key and routine were recovered from rk27xx rom dump by AleMaxx.
