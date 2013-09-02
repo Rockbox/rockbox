@@ -407,7 +407,11 @@ void radio_screen(void)
 
     if(radio_status == FMRADIO_OFF)
         audio_stop();
-    
+
+    fms_fix_displays(FMS_ENTER);
+    FOR_NB_SCREENS(i)
+        skin_update(FM_SCREEN, i, SKIN_REFRESH_ALL);
+
 #ifndef SIMULATOR
 
 #if CONFIG_CODEC != SWCODEC
@@ -445,10 +449,6 @@ void radio_screen(void)
 
     if(radio_preset_count() < 1 && yesno_pop(ID2P(LANG_FM_FIRST_AUTOSCAN)))
         presets_scan(NULL);
-
-    fms_fix_displays(FMS_ENTER);
-    FOR_NB_SCREENS(i)
-        skin_update(FM_SCREEN, i, SKIN_REFRESH_ALL);
 
     preset_set_current(preset_find(curr_freq));
     if(radio_current_preset() != -1)
