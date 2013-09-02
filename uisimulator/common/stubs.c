@@ -381,3 +381,17 @@ void touchpad_set_sensitivity(int level)
     (void)level;
 }
 #endif
+
+#if defined(HAVE_TOUCHSCREEN) && !defined HAS_BUTTON_HOLD
+void touchscreen_enable_device(bool en)
+{
+    (void)en;
+}
+#endif
+
+#if defined(HAVE_TOUCHPAD) && !defined HAS_BUTTON_HOLD
+void touchpad_enable_device(bool en)
+{
+    (void)en;
+}
+#endif

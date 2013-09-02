@@ -294,6 +294,10 @@ static int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+            /* enable back touch device */
+            button_enable_touch(true);
+#endif
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
@@ -307,6 +311,13 @@ static int get_action_worker(int context, int timeout,
             return ACTION_REDRAW;
         }
     }
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+    else
+    {
+        /* make sure touchpad get reactivated if we quit the screen */
+        button_enable_touch(true);
+    }
+#endif
     context &= ~ALLOW_SOFTLOCK;
 #endif /* HAS_BUTTON_HOLD */
 
@@ -373,7 +384,10 @@ static int get_action_worker(int context, int timeout,
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
-
+ #if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
+        /* disable touch device on keylock */
+        button_enable_touch(false);
+ #endif
         button_clear_queue();
         return ACTION_REDRAW;
     }

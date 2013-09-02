@@ -393,10 +393,14 @@ static void button_event(int key, bool pressed)
 #endif
     default:
 #ifdef HAVE_TOUCHSCREEN
-        new_btn = key_to_touch(key, mouse_coords);
+        if(touchscreen_is_enabled())
+            new_btn = key_to_touch(key, mouse_coords);
         if (!new_btn)
 #endif
             new_btn = key_to_button(key);
+#ifdef HAVE_TOUCHPAD
+        new_btn = touchpad_filter(new_btn);
+#endif
         break;
     }
     /* Call to make up for scrollwheel target implementation.  This is

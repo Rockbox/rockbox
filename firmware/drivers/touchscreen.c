@@ -31,6 +31,7 @@
 #define BUTTON_MARGIN_X (int)(LCD_WIDTH * 0.03)
 #define BUTTON_MARGIN_Y (int)(LCD_HEIGHT * 0.03)
 
+static bool touch_enabled = true;
 static enum touchscreen_mode current_mode = TOUCHSCREEN_POINT;
 static const int touchscreen_buttons[3][3] =
 {
@@ -121,6 +122,8 @@ static void map_pixels(int *x, int *y)
 /* TODO: add jitter (and others) filter */
 int touchscreen_to_pixels(int x, int y, int *data)
 {
+    if(!touch_enabled)
+        return 0;
     x &= 0xFFFF;
     y &= 0xFFFF;
 
@@ -169,6 +172,19 @@ enum touchscreen_mode touchscreen_get_mode(void)
     return current_mode;
 }
 
+void touchscreen_enable(bool en)
+{
+    if(en != touch_enabled)
+    {
+        touch_enabled = en;
+        touchscreen_enable_device(en);
+    }
+}
+
+bool touchscreen_is_enabled(void)
+{
+    return touch_enabled;
+}
 
 #if ((CONFIG_PLATFORM & PLATFORM_ANDROID) == 0)
 /* android has an API for this */
