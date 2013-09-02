@@ -28,6 +28,7 @@
 #include "string.h"
 #include "usb.h"
 #include "power-imx233.h"
+#include "touchpad.h"
 
 #ifndef BOOTLOADER
 
@@ -274,7 +275,7 @@ static void do_interrupt(void)
     imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
 }
 
-void touchdev_enable(bool en)
+void touchpad_enable_device(bool en)
 {
     t_enable = en;
     queue_post(&rmi_queue, RMI_SET_SLEEP_MODE, en ? RMI_SLEEP_MODE_LOW_POWER : RMI_SLEEP_MODE_SENSOR_SLEEP);
@@ -433,5 +434,5 @@ int button_read_device(void)
         default: 
             break;
     }
-    return res | touchpad_read_device();
+    return res | touchpad_filter(touchpad_read_device());
 }

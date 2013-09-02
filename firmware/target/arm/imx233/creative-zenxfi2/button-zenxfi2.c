@@ -66,7 +66,7 @@ void button_init_device(void)
 
     bottomright.px_x = LCD_WIDTH;
     bottomright.px_y = LCD_HEIGHT;
-    
+
     imx233_touchscreen_init();
     imx233_touchscreen_enable(true);
 
@@ -102,6 +102,11 @@ static int touch_to_pixels(int *val_x, int *val_y)
     *val_y = y;
 
     return (x<<16)|y;
+}
+
+void touchscreen_enable_device(bool en)
+{
+    imx233_touchscreen_enable(en);
 }
 
 static int touchscreen_read_device(int *data)

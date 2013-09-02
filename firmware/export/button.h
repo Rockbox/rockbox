@@ -119,4 +119,12 @@ int touchscreen_last_touch(void);
 #include "touchscreen.h"
 #endif
 
+#ifdef HAVE_TOUCHPAD
+#include "touchpad.h"
+#endif
+
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)) && !defined(HAS_BUTTON_HOLD)
+void button_enable_touch(bool en);
+#endif
+
 #endif /* _BUTTON_H_ */

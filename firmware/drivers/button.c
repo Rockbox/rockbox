@@ -672,3 +672,15 @@ int button_apply_acceleration(const unsigned int data)
     return delta;
 }
 #endif /* HAVE_WHEEL_ACCELERATION */
+
+#if (defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)) && !defined(HAS_BUTTON_HOLD)
+void button_enable_touch(bool en)
+{
+#ifdef HAVE_TOUCHPAD
+    touchpad_enable(en);
+#endif
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_enable(en);
+#endif
+}
+#endif
