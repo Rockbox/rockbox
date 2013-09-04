@@ -34,6 +34,15 @@
 
 extern struct event_queue button_queue;
 
+/* FOR TOUCHPAD FUZE+ */
+typedef struct fuzeplus_touchpad_data{
+    int abs_x, abs_y, rel_x, rel_y, max_x, max_y, num_fingers;
+}fuzeplus_touchpad_data;
+
+volatile fuzeplus_touchpad_data* fuzeplus_get_touchpad_data_ptr(void);
+/* END FOR TOUCHPAD FUZE+ */
+
+
 void button_init_device(void);
 #ifdef HAVE_BUTTON_DATA
 int button_read_device(int *);

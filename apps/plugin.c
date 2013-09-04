@@ -311,6 +311,7 @@ static const struct plugin_api rockbox_api = {
     simplelist_show_list,
 
     /* button */
+    fuzeplus_get_touchpad_data_ptr,
     button_get,
     button_get_w_tmo,
     button_status,
