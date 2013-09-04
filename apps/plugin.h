@@ -407,6 +407,7 @@ struct plugin_api {
     bool (*simplelist_show_list)(struct simplelist_info *info);
 
     /* button */
+    volatile fuzeplus_touchpad_data* (*fuzeplus_get_touchpad_data_ptr)(void);
     long (*button_get)(bool block);
     long (*button_get_w_tmo)(int ticks);
     int (*button_status)(void);

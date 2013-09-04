@@ -56,6 +56,88 @@ static int mouse_coords = 0;
 #define USB_KEY SDLK_u
 #endif
 
+/* FOR TOUCHPAD FUZE+ */
+
+#define TP_LEFT 40
+#define TP_RIGHT 285
+#define TP_TOP 385
+#define TP_BOTTOM 570
+#define TP_WIDTH (TP_RIGHT-TP_LEFT)
+#define TP_HEIGHT (TP_BOTTOM-TP_TOP)
+
+#define TP_MAX_X 3009
+#define TP_MAX_Y 1974
+
+#define TP_UPDATE_TICKS 0
+#define DIVREL 10;
+
+volatile fuzeplus_touchpad_data tp_data;
+volatile int last_x, last_y;
+volatile long last_tick;
+
+int fuzeplus_get_tp_x(int sim_x,int sim_y)
+{
+    //get relative coords referenced to 0
+    int retval = sim_x - TP_LEFT;
+    int other = sim_y - TP_TOP;
+    if((retval<0) || (other<0) || (retval>TP_WIDTH) || (other>TP_HEIGHT)) return 0; //out of bounds
+
+    return retval * TP_MAX_X / TP_WIDTH; //calculate value.
+}
+
+int fuzeplus_get_tp_y(int sim_x,int sim_y)
+{
+    //get relative coords referenced to 0
+    int retval = sim_y - TP_TOP;
+    int other = sim_x - TP_LEFT;
+    if((retval<0) || (other<0) || (retval>TP_HEIGHT) || (other>TP_WIDTH)) return 0; //out of bounds
+
+    return TP_MAX_Y - (retval * TP_MAX_Y / TP_HEIGHT); //calculate value.
+}
+
+volatile fuzeplus_touchpad_data* fuzeplus_get_touchpad_data_ptr(void)
+{
+    tp_data.abs_x = 0;
+    tp_data.abs_y = 0;
+    tp_data.rel_x = 0;
+    tp_data.rel_y = 0;
+    last_x = 0;
+    last_y = 0;
+    tp_data.max_x = TP_MAX_X;
+    tp_data.max_y = TP_MAX_Y;
+    tp_data.num_fingers = 0;
+
+    last_tick = current_tick;
+
+    return &tp_data;
+}
+
+void fuzeplus_touchpad_event(int x, int y, bool button_down, bool update_coords)
+{
+    if(!TIME_AFTER(current_tick, last_tick+TP_UPDATE_TICKS)) return; //not time yet
+
+    last_tick = current_tick;
+
+    if(update_coords || button_down)
+    {
+        tp_data.abs_x = fuzeplus_get_tp_x(x,y);
+        tp_data.abs_y = fuzeplus_get_tp_y(x,y);
+        tp_data.rel_x = (tp_data.abs_x - last_x)/DIVREL;
+        tp_data.rel_y = (tp_data.abs_y - last_y)/DIVREL;
+        last_x = tp_data.abs_x;
+        last_y = tp_data.abs_y;
+        tp_data.max_x = TP_MAX_X;
+        tp_data.max_y = TP_MAX_Y;
+    }
+
+    if(button_down && ((tp_data.abs_x != 0)||(tp_data.abs_y != 0))) tp_data.num_fingers = 1;
+    else tp_data.num_fingers = 0;
+
+    return;
+}
+
+/* END FOR TOUCHPAD FUZE+ */
+
 #if defined(IRIVER_H100_SERIES) || defined (IRIVER_H300_SERIES)
 int _remote_type=REMOTETYPE_H100_LCD;
 
@@ -127,22 +209,22 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
         case SDL_BUTTON_RIGHT:
             button_event( event->button, false );
             break;
-        /* The scrollwheel button up events are ignored as they are queued immediately */
+            /* The scrollwheel button up events are ignored as they are queued immediately */
         case SDL_BUTTON_LEFT:
             if ( mapping && background ) {
                 printf("    { SDLK_,     %d, %d, %d, \"\" },\n", x, y,
-                (int)sqrt( SQUARE(x-(int)event->x) + SQUARE(y-(int)event->y))
+                        (int)sqrt( SQUARE(x-(int)event->x) + SQUARE(y-(int)event->y))
                 );
             }
 #ifdef SIMULATOR
             if ( background && xybutton ) {
-                    button_event( xybutton, false );
-                    xybutton = 0;
-                }
+                button_event( xybutton, false );
+                xybutton = 0;
+            }
 #endif
 #ifdef HAVE_TOUCHSCREEN
-                else
-                    button_event(BUTTON_TOUCHSCREEN, false);
+            else
+                button_event(BUTTON_TOUCHSCREEN, false);
 #endif
             break;
         }
@@ -267,6 +349,21 @@ static bool event_handler(SDL_Event *event)
         break;
 #endif
 
+        /* FOR TOUCHPAD FUZE+ */
+
+    case SDL_MOUSEMOTION:
+    {
+        int x = event->motion.x / display_zoom;
+        int y = event->motion.y / display_zoom;
+        if(event->motion.state) fuzeplus_touchpad_event(x, y, true, true);
+        else fuzeplus_touchpad_event(x, y, false, true);
+
+        break;
+    }
+
+    /* END FOR TOUCHPAD FUZE+ */
+
+
     case SDL_MOUSEBUTTONUP:
     case SDL_MOUSEBUTTONDOWN:
     {
@@ -274,6 +371,9 @@ static bool event_handler(SDL_Event *event)
         mev->x /= display_zoom;
         mev->y /= display_zoom;
         mouse_event(mev, event->type == SDL_MOUSEBUTTONUP);
+        /* FOR TOUCHPAD FUZE+ */
+        fuzeplus_touchpad_event(mev->x, mev->y, event->type == SDL_MOUSEBUTTONDOWN, false);
+        /* END FOR TOUCHPAD FUZE+ */
         break;
     }
     case SDL_QUIT:
@@ -337,14 +437,14 @@ static void button_event(int key, bool pressed)
         }
         return;
 #endif
-        
+
 #ifdef HAS_REMOTE_BUTTON_HOLD
     case SDLK_j:
         if(pressed)
         {
             remote_hold_button_state = !remote_hold_button_state;
             DEBUGF("Remote hold button is %s\n",
-                   remote_hold_button_state?"ON":"OFF");
+                    remote_hold_button_state?"ON":"OFF");
         }
         return;
 #endif
@@ -354,50 +454,50 @@ static void button_event(int key, bool pressed)
         if(pressed)
             switch(_remote_type)
             {
-                case REMOTETYPE_UNPLUGGED: 
-                    _remote_type=REMOTETYPE_H100_LCD;
-                    DEBUGF("Changed remote type to H100\n");
-                    break;
-                case REMOTETYPE_H100_LCD:
-                    _remote_type=REMOTETYPE_H300_LCD;
-                    DEBUGF("Changed remote type to H300\n");
-                    break;
-                case REMOTETYPE_H300_LCD:
-                    _remote_type=REMOTETYPE_H300_NONLCD;
-                    DEBUGF("Changed remote type to H300 NON-LCD\n");
-                    break;
-                case REMOTETYPE_H300_NONLCD:
-                    _remote_type=REMOTETYPE_UNPLUGGED;
-                    DEBUGF("Changed remote type to none\n");
-                    break;
+            case REMOTETYPE_UNPLUGGED:
+                _remote_type=REMOTETYPE_H100_LCD;
+                DEBUGF("Changed remote type to H100\n");
+                break;
+            case REMOTETYPE_H100_LCD:
+                _remote_type=REMOTETYPE_H300_LCD;
+                DEBUGF("Changed remote type to H300\n");
+                break;
+            case REMOTETYPE_H300_LCD:
+                _remote_type=REMOTETYPE_H300_NONLCD;
+                DEBUGF("Changed remote type to H300 NON-LCD\n");
+                break;
+            case REMOTETYPE_H300_NONLCD:
+                _remote_type=REMOTETYPE_UNPLUGGED;
+                DEBUGF("Changed remote type to none\n");
+                break;
             }
         break;
 #endif
 #ifndef APPLICATION
-    case SDLK_KP0:
-    case SDLK_F5:
-        if(pressed)
-        {
-            sim_trigger_screendump();
-            return;
-        }
-        break;
+            case SDLK_KP0:
+            case SDLK_F5:
+                if(pressed)
+                {
+                    sim_trigger_screendump();
+                    return;
+                }
+                break;
 #endif
 #ifdef HAVE_TOUCHSCREEN
-    case SDLK_F4:
-        if(pressed)
-        {
-            touchscreen_set_mode(touchscreen_get_mode() == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
-            printf("Touchscreen mode: %s\n", touchscreen_get_mode() == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
-        }
+            case SDLK_F4:
+                if(pressed)
+                {
+                    touchscreen_set_mode(touchscreen_get_mode() == TOUCHSCREEN_POINT ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT);
+                    printf("Touchscreen mode: %s\n", touchscreen_get_mode() == TOUCHSCREEN_POINT ? "TOUCHSCREEN_POINT" : "TOUCHSCREEN_BUTTON");
+                }
 #endif
-    default:
+            default:
 #ifdef HAVE_TOUCHSCREEN
-        new_btn = key_to_touch(key, mouse_coords);
-        if (!new_btn)
+                new_btn = key_to_touch(key, mouse_coords);
+                if (!new_btn)
 #endif
-            new_btn = key_to_button(key);
-        break;
+                    new_btn = key_to_button(key);
+                break;
     }
     /* Call to make up for scrollwheel target implementation.  This is
      * not handled in the main button.c driver, but on the target
@@ -406,7 +506,7 @@ static void button_event(int key, bool pressed)
      */
 #if defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)
     if((new_btn == BUTTON_SCROLL_FWD || new_btn == BUTTON_SCROLL_BACK) && 
-        pressed)
+            pressed)
     {
         /* Clear these buttons from the data - adding them to the queue is
          *  handled in the scrollwheel drivers for the targets.  They do not
@@ -435,31 +535,31 @@ int button_read_device(int* data)
 {
     *data = mouse_coords;
 #else
-int button_read_device(void)
-{
+    int button_read_device(void)
+    {
 #endif
 #ifdef HAS_BUTTON_HOLD
-    int hold_button = button_hold();
+        int hold_button = button_hold();
 
 #ifdef HAVE_BACKLIGHT
-    /* light handling */
-    static int hold_button_old = false;
-    if (hold_button != hold_button_old)
-    {
-        hold_button_old = hold_button;
-        backlight_hold_changed(hold_button);
+        /* light handling */
+        static int hold_button_old = false;
+        if (hold_button != hold_button_old)
+        {
+            hold_button_old = hold_button;
+            backlight_hold_changed(hold_button);
+        }
+#endif
+
+        if (hold_button)
+            return BUTTON_NONE;
+        else
+#endif
+
+            return btn;
     }
-#endif
 
-    if (hold_button)
-        return BUTTON_NONE;
-    else
-#endif
-
-    return btn;
-}
-
-void button_init_device(void)
-{
-    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-}
+    void button_init_device(void)
+    {
+        SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+    }
