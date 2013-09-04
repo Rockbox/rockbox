@@ -28,8 +28,20 @@
 #include "string.h"
 #include "usb.h"
 #include "power-imx233.h"
+#include "button.h"
 
 #ifndef BOOTLOADER
+
+/* FOR FUZEPLUS TOUCHPAD */
+
+volatile fuzeplus_touchpad_data tp_data;
+
+volatile fuzeplus_touchpad_data *fuzeplus_get_touchpad_data_ptr(void)
+{
+    return &tp_data;
+}
+
+/* FOR FUZEPLUS TOUCHPAD END */
 
 bool button_debug_screen(void)
 {
@@ -265,6 +277,17 @@ static void do_interrupt(void)
     int absolute_y = u.s.absolute.y_msb << 8 | u.s.absolute.y_lsb;
     int nr_fingers = u.s.absolute.misc & 7;
 
+    /* FOR FUZEPLUS TOUCHPAD */
+
+    tp_data.num_fingers = nr_fingers;
+    tp_data.abs_x = absolute_x;
+    tp_data.abs_y = absolute_y;
+    tp_data.rel_x = u.s.relative.x;
+    tp_data.rel_y = u.s.relative.y;
+
+
+    /* FOR FUZEPLUS TOUCHPAD END*/
+
     if(nr_fingers == 1)
         touchpad_btns = find_button(absolute_x, absolute_y);
     else
@@ -349,6 +372,13 @@ void button_init_device(void)
      *
      * The B0P26 line seems to be related to the touchpad
      */
+
+    /* FOR FUZEPLUS TOUCHPAD*/
+
+    tp_data.max_x = 3009;
+    tp_data.max_y = 1974;
+
+    /* FOR FUZEPLUS TOUCHPAD END*/
      
     /* touchpad power */
     imx233_pinctrl_acquire(0, 26, "touchpad power");
