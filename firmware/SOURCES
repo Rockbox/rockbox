@@ -1735,6 +1735,6 @@ thread.c
 
 #endif /* defined(SIMULATOR) */
 
-#if defined(HAVE_TOUCHPAD)
+#if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD)
 drivers/touchpad.c
 #endif

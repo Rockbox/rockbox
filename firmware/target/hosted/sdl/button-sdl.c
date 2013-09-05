@@ -393,7 +393,9 @@ static void button_event(int key, bool pressed)
 #endif
     default:
 #ifdef HAVE_TOUCHSCREEN
+# ifndef HAS_BUTTON_HOLD
         if(touchscreen_is_enabled())
+# endif
             new_btn = key_to_touch(key, mouse_coords);
         if (!new_btn)
 #endif

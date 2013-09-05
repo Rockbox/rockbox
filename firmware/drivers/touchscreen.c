@@ -172,6 +172,7 @@ enum touchscreen_mode touchscreen_get_mode(void)
     return current_mode;
 }
 
+#ifndef HAS_BUTTON_HOLD
 void touchscreen_enable(bool en)
 {
     if(en != touch_enabled)
@@ -185,6 +186,7 @@ bool touchscreen_is_enabled(void)
 {
     return touch_enabled;
 }
+#endif
 
 #if ((CONFIG_PLATFORM & PLATFORM_ANDROID) == 0)
 /* android has an API for this */
