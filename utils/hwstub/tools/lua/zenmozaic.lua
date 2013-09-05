@@ -94,5 +94,26 @@ end
 
 function ZENMOZAIC.init()
     ZENMOZAIC.lcd_init()
+    HW.LRADC.CTRL0.SFTRST.clr()
+    HW.LRADC.CTRL0.CLKGATE.clr()
+    HW.LRADC.CHn[0].ACCUMULATE.clr()
+    HW.LRADC.CHn[0].NUM_SAMPLES.write(0)
+    HW.LRADC.CHn[0].VALUE.write(0)
+    local t = {}
+    for i = 1,1000,1 do
+        HW.LRADC.CTRL0.SCHEDULE.write(1)
+        --local time = HW.DIGCTL.MICROSECONDS.read()
+        local time = i * 1000
+        local val = HW.LRADC.CHn[0].VALUE.read()
+        t[#t + 1] = {time, val}
+    end
+    local file = io.open("data.txt", "w")
+    for i,v in ipairs(t) do
+        file:write(string.format("%d %d\n", v[1] / 1000, v[2]))
+    end
+    file:close()
+    print("Display curve using:")
+    print("gnuplot -persist");
+    print("> plot \"data.txt\" using 1:2")
 end
 

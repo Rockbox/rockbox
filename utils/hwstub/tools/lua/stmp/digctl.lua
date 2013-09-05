@@ -36,3 +36,14 @@ function STMP.digctl.package()
 
     return pack
 end
+
+function STMP.digctl.udelay(us)
+    local tend = HW.DIGCTL.MICROSECONDS.read() + us
+    while HW.DIGCTL.MICROSECONDS.read() < tend do
+        
+    end
+end
+
+function STMP.digctl.mdelay(ms)
+    STMP.digctl.udelay(ms * 1000)
+end

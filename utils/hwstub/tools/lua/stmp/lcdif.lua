@@ -29,6 +29,18 @@ function STMP.lcdif.set_reset(val)
     end
 end
 
+function STMP.lcdif.set_databus_width(bus_width)
+    local v = 0
+    if bus_width == 8 then
+        v = 1
+    elseif bus_width == 18 then
+        v = 2
+    elseif bus_width == 24 then
+        v = 3
+    end
+    HW.LCDIF.CTRL.LCD_DATABUS_WIDTH.write(v)
+end
+
 function STMP.lcdif.set_word_length(bus_width)
     if STMP.is_stmp3600() or STMP.is_stmp3700() then
         if bus_width == 8 then
@@ -37,7 +49,15 @@ function STMP.lcdif.set_word_length(bus_width)
             HW.LCDIF.CTRL.WORD_LENGTH.clr()
         end
     else
-        error("STMP.lcdif.set_word_length: unimplemented")
+        local v = 0
+        if bus_width == 8 then
+            v = 1
+        elseif bus_width == 18 then
+            v = 2
+        elseif bus_width == 24 then
+            v = 3
+        end
+        HW.LCDIF.CTRL.WORD_LENGTH.write(v)
     end
 end
 
@@ -49,7 +69,11 @@ function STMP.lcdif.get_word_length()
             return 16
         end
     else
-        error("STMP.lcdif.get_word_length: unimplemented")
+        local v = HW.LCDIF.CTRL.WORD_LENGTH.read()
+        if v == 0 then return 16
+        elseif v == 1 then return 8
+        elseif v == 2 then return 18
+        else return 24 end
     end
 end
 
@@ -62,7 +86,11 @@ function STMP.lcdif.set_data_swizzle(swizzle)
             error("unimplemented")
         end
     end
-    HW.LCDIF.CTRL.DATA_SWIZZLE.write(v)
+    if STMP.is_stmp3600() or STMP.is_stmp3700() then 
+        HW.LCDIF.CTRL.DATA_SWIZZLE.write(v)
+    else
+        HW.LCDIF.CTRL.INPUT_DATA_SWIZZLE.write(v)
+    end
 end
 
 function STMP.lcdif.is_busy()
@@ -70,6 +98,11 @@ function STMP.lcdif.is_busy()
         return HW.LCDIF.CTRL.FIFO_STATUS.read() == 0
     else
         return HW.LCDIF.STAT.TXFIFO_FULL.read() == 1
+    end
+end
+
+function STMP.lcdif.wait_ready()
+    while HW.LCDIF.CTRL.RUN.read() == 1 do
     end
 end
 
@@ -81,8 +114,16 @@ function STMP.lcdif.send_pio(data_mode, data)
         HW.LCDIF.CTRL.DATA_SELECT.clr()
     end
     STMP.debug(string.format("lcdif: count = %d", #data))
+    if STMP.is_imx233() then
+        HW.LCDIF.CTRL.LCDIF_MASTER.clr()
+    end
     HW.LCDIF.CTRL.RUN.clr()
-    HW.LCDIF.CTRL.COUNT.write(#data)
+    if STMP.is_stmp3600() or STMP.is_stmp3700() then
+        HW.LCDIF.CTRL.COUNT.write(#data)
+    else
+        HW.LCDIF.TRANSFER_COUNT.V_COUNT.write(1)
+        HW.LCDIF.TRANSFER_COUNT.H_COUNT.write(#data)
+    end
     HW.LCDIF.CTRL.RUN.set()
     local i = 1
     while i <= #data do
@@ -97,4 +138,5 @@ function STMP.lcdif.send_pio(data_mode, data)
         while STMP.lcdif.is_busy() do STMP.debug("lcdif: fifo full") end
         HW.LCDIF.DATA.write(v)
     end
+    STMP.lcdif.wait_ready()
 end
