@@ -25,6 +25,13 @@
 #include "button.h"
 #include "buttonmap.h"
 
+#ifndef HAS_BUTTON_HOLD
+void touchscreen_enable_device(bool en)
+{
+    (void)en;
+}
+#endif
+
 int key_to_button(int keyboard_key)
 {
     int new_btn = BUTTON_NONE;
