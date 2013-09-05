@@ -65,15 +65,13 @@ static int button_find(int val)
         btn = table[0].btn;
     else if(i == table_size)
         btn = table[i - 1].btn;
-    // choose best between i-1 and i (note that table[i-1]<=val<=table[i]) */
+    // choose best between i-1 and i (note that table[i-1]<=val<table[i]) */
     else if(val - table[i - 1].adc_val < table[i].adc_val - val)
         btn = table[i - 1].btn;
     else
         btn = table[i].btn;
     return btn;
 }
-
-int button_value;
 
 static void button_lradc_irq(int chan)
 {
@@ -84,7 +82,6 @@ static void button_lradc_irq(int chan)
     imx233_lradc_setup_channel(button_chan, true, true, SAMPLES - 1, LRADC_SRC(CHAN));
     imx233_lradc_setup_delay(button_delay, 1 << button_chan, 0, SAMPLES - 1, DELAY);
     imx233_lradc_kick_delay(button_delay);
-    button_value = button_val[button_idx];
     /* compute mask, compare to previous one */
     button_val[button_idx] = button_find(button_val[button_idx]);
     button_idx = 1 - button_idx;
@@ -94,6 +91,10 @@ static void button_lradc_irq(int chan)
 
 void imx233_button_lradc_init(void)
 {
+    table_size = 0;
+    while(imx233_button_lradc_mapping[table_size].btn != IMX233_BUTTON_LRADC_END)
+        table_size++;
+
     button_chan = imx233_lradc_acquire_channel(LRADC_SRC(CHAN), TIMEOUT_NOBLOCK);
     if(button_chan < 0)
         panicf("Cannot get channel for button-lradc");
@@ -105,10 +106,6 @@ void imx233_button_lradc_init(void)
     imx233_lradc_enable_channel_irq(button_chan, true);
     imx233_lradc_set_channel_irq_callback(button_chan, button_lradc_irq);
     imx233_lradc_kick_delay(button_delay);
-
-    table_size = 0;
-    while(imx233_button_lradc_mapping[table_size].btn != IMX233_BUTTON_LRADC_END)
-        table_size++;
 }
 
 bool imx233_button_lradc_hold(void)
