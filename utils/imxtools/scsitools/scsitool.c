@@ -378,6 +378,28 @@ static int stmp_get_serial_number(uint8_t info, void *data, int *len)
     return do_sense_analysis(ret, sense, sense_size);
 }
 
+static int stmp_read_logical_drive_sectors(uint8_t drive, uint64_t address,
+    uint32_t count, void *buffer, int *buffer_size)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = SCSI_STMP_CMD_READ_LOGICAL_DRIVE_SECTOR;
+    cdb[2] = drive;
+    address = fix_endian64be(address);
+    memcpy(&cdb[3], &address, sizeof(address));
+    count = fix_endian32be(count);
+    memcpy(&cdb[11], &count, sizeof(count));
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, buffer, buffer_size);
+    if(ret < 0)
+        return ret;
+    return do_sense_analysis(ret, sense, sense_size);
+}
+
 static const char *stmp_get_logical_media_type_string(uint32_t type)
 {
     switch(type)
@@ -418,10 +440,10 @@ static const char *stmp_get_logical_drive_type_string(uint32_t type)
     }
 }
 
-static int do_work(void)
+static int do_info(void)
 {
     cprintf(BLUE, "Information\n");
-    
+
     uint8_t dev_type;
     char vendor[9];
     char product[17];
@@ -590,7 +612,7 @@ static int do_work(void)
     {
         struct scsi_stmp_logical_table_t header;
         struct scsi_stmp_logical_table_entry_t entry[20];
-    }table;
+    }__attribute__((packed)) table;
 
     ret = stmp_get_logical_table(&table.header, sizeof(table.entry) / sizeof(table.entry[0]));
     if(ret)
@@ -734,19 +756,118 @@ static int do_work(void)
     return 0;
 }
 
+void do_extract(const char *file)
+{
+    FILE *f = NULL;
+    cprintf(BLUE, "Extracting firmware...\n");
+
+    struct
+    {
+        struct scsi_stmp_logical_table_t header;
+        struct scsi_stmp_logical_table_entry_t entry[20];
+    }__attribute__((packed)) table;
+
+    int ret = stmp_get_logical_table(&table.header, sizeof(table.entry) / sizeof(table.entry[0]));
+    if(ret)
+    {
+        cprintf(GREY, "Cannot get logical table: %d\n", ret);
+        goto Lend;
+    }
+    int entry = 0;
+    while(entry < table.header.count)
+        if(table.entry[entry].type == SCSI_STMP_DRIVE_TYPE_SYSTEM &&
+                table.entry[entry].tag == SCSI_STMP_DRIVE_TAG_SYSTEM_BOOT)
+            break;
+        else
+            entry++;
+    if(entry == table.header.count)
+    {
+        cprintf(GREY, "Cannot find firmware partition\n");
+        goto Lend;
+    }
+    uint8_t drive_no = table.entry[entry].drive_no;
+    uint64_t drive_sz = table.entry[entry].size;
+    if(g_debug)
+    {
+        cprintf(RED, "* ");
+        cprintf_field("Drive: ", "%#x\n", drive_no);
+        cprintf(RED, "* ");
+        cprintf_field("Size: ", "%#llx\n", (unsigned long long)drive_sz);
+    }
+    int len = 4;
+    uint32_t sector_size;
+    ret = stmp_get_logical_drive_info(drive_no, SCSI_STMP_DRIVE_INFO_SECTOR, &sector_size, &len);
+    if(ret || len != 4)
+    {
+        cprintf(GREY, "Cannot get sector size\n");
+        goto Lend;
+    }
+    sector_size = fix_endian32be(sector_size);
+    if(g_debug)
+    {
+        cprintf(RED, "* ");
+        cprintf_field("Sector size: ", "%lu\n", (unsigned long)sector_size);
+    }
+    uint8_t *sector = malloc(sector_size);
+    len = sector_size;
+    ret = stmp_read_logical_drive_sectors(drive_no, 0, 1, sector, &len);
+    if(ret || len != (int)sector_size)
+    {
+        cprintf(GREY, "Cannot read first sector\n");
+    }
+    uint32_t fw_size = *(uint32_t *)(sector + 0x1c) * 16;
+    if(g_debug)
+    {
+        cprintf(RED, "* ");
+        cprintf_field("Firmware size: ", "%#x\n", fw_size);
+    }
+
+    f = fopen(file, "wb");
+    if(f == NULL)
+    {
+        cprintf(GREY, "Cannot open '%s' for writing: %m\n", file);
+        goto Lend;
+    }
+
+    for(int sec = 0; sec * sector_size < fw_size; sec++)
+    {
+        ret = stmp_read_logical_drive_sectors(drive_no, sec, 1, sector, &len);
+        if(ret || len != (int)sector_size)
+        {
+            cprintf(GREY, "Cannot read sector %d\n", sec);
+            goto Lend;
+        }
+        if(fwrite(sector, sector_size, 1, f) != 1)
+        {
+            cprintf(GREY, "Write failed: %m\n");
+            goto Lend;
+        }
+    }
+    cprintf(BLUE, "Done\n");
+Lend:
+    if(f)
+        fclose(f);
+}
+
 static void usage(void)
 {
     printf("Usage: scsitool [options] <dev>\n");
     printf("Options:\n");
-    printf("  -f/--force\tForce to continue on errors\n");
-    printf("  -?/--help\tDisplay this message\n");
-    printf("  -d/--debug\tDisplay debug messages\n");
-    printf("  -c/--no-color\tDisable color output\n");
+    printf("  -f/--force              Force to continue on errors\n");
+    printf("  -?/--help               Display this message\n");
+    printf("  -d/--debug              Display debug messages\n");
+    printf("  -c/--no-color           Disable color output\n");
+    printf("  -x/--extract-fw <file>  Extract firmware to file\n");
+    printf("  -i/--info               Display device information\n");
     exit(1);
 }
 
 int main(int argc, char **argv)
 {
+    if(argc == 1)
+        usage();
+    const char *extract_fw = NULL;
+    bool info = false;
     while(1)
     {
         static struct option long_options[] =
@@ -755,10 +876,12 @@ int main(int argc, char **argv)
             {"debug", no_argument, 0, 'd'},
             {"no-color", no_argument, 0, 'c'},
             {"force", no_argument, 0, 'f'},
+            {"extract-fw", required_argument, 0, 'x'},
+            {"info", no_argument, 0, 'i'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcf", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dcfx:i", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -776,6 +899,12 @@ int main(int argc, char **argv)
                 break;
             case '?':
                 usage();
+                break;
+            case 'x':
+                extract_fw = optarg;
+                break;
+            case 'i':
+                info = true;
                 break;
             default:
                 abort();
@@ -797,7 +926,10 @@ int main(int argc, char **argv)
         goto Lend;
     }
 
-    do_work();
+    if(extract_fw)
+        do_extract(extract_fw);
+    if(info)
+        do_info();
 
     scsi_pt_close_device(g_dev_fd);
 Lend:

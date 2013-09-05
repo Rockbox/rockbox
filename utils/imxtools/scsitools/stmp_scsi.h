@@ -71,6 +71,13 @@ struct scsi_stmp_logical_table_entry_t
     uint64_t size; /* big-endian */
 } __attribute__((packed));
 
+#define SCSI_STMP_DRIVE_TYPE_USER   0
+#define SCSI_STMP_DRIVE_TYPE_SYSTEM 1
+#define SCSI_STMP_DRIVE_TYPE_JANUS  2
+
+#define SCSI_STMP_DRIVE_TAG_USER_STORAGE    0xa
+#define SCSI_STMP_DRIVE_TAG_SYSTEM_BOOT     0x50
+
 struct scsi_stmp_logical_table_t
 {
     uint16_t count; /* big-endian */
