@@ -80,12 +80,18 @@ void INT_I2C_DMA(void)
     semaphore_release(&i2c_sema);
 }
 
-void imx233_i2c_init(void)
+void INT_I2C_ERROR(void)
 {
-    BF_SET(I2C_CTRL0, SFTRST);
-    /* setup pins (must be done when shutdown) */
-    imx233_pinctrl_setup_vpin(VPIN_I2C_SCL, "i2c scl", PINCTRL_DRIVE_4mA, true);
-    imx233_pinctrl_setup_vpin(VPIN_I2C_SDA, "i2c sda", PINCTRL_DRIVE_4mA, true);
+    /* reset dma channel on error */
+    if(imx233_dma_is_channel_error_irq(APB_I2C))
+        imx233_dma_reset_channel(APB_I2C);
+    /* clear irq flags */
+    imx233_dma_clear_channel_interrupt(APB_I2C);
+    semaphore_release(&i2c_sema);
+}
+
+static void imx233_i2c_reset(void)
+{
     /* clear softreset */
     imx233_reset_block(&HW_I2C_CTRL0);
     /* Errata (imx233):
@@ -103,7 +109,15 @@ void imx233_i2c_init(void)
     HW_I2C_TIMING0 = 0x000F0007; /* tHIGH=0.6us, read at 0.3us */
     HW_I2C_TIMING1 = 0x001F000F; /* tLOW=1.3us, write at 0.6us */
     HW_I2C_TIMING2 = 0x0015000D;
-    
+}
+
+void imx233_i2c_init(void)
+{
+    BF_SET(I2C_CTRL0, SFTRST);
+    /* setup pins (must be done when shutdown) */
+    imx233_pinctrl_setup_vpin(VPIN_I2C_SCL, "i2c scl", PINCTRL_DRIVE_4mA, true);
+    imx233_pinctrl_setup_vpin(VPIN_I2C_SDA, "i2c sda", PINCTRL_DRIVE_4mA, true);
+    imx233_i2c_reset();
     mutex_init(&i2c_mutex);
     semaphore_init(&i2c_sema, 1, 0);
 }
@@ -183,6 +197,7 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     BF_CLR(I2C_CTRL1, ALL_IRQ);
     imx233_dma_reset_channel(APB_I2C);
     imx233_icoll_enable_interrupt(INT_SRC_I2C_DMA, true);
+    imx233_icoll_enable_interrupt(INT_SRC_I2C_ERROR, true);
     imx233_dma_enable_channel_interrupt(APB_I2C, true);
     imx233_dma_start_command(APB_I2C, &i2c_stage[0].dma);
 
@@ -195,7 +210,13 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     else if(BF_RD(I2C_CTRL1, MASTER_LOSS_IRQ))
         ret = I2C_MASTER_LOSS;
     else if(BF_RD(I2C_CTRL1, NO_SLAVE_ACK_IRQ))
+    {
+        /* the core doesn't like this error, this is a workaround to prevent lock up */
+        BF_SET(I2C_CTRL1, CLR_GOT_A_NAK);
+        imx233_dma_reset_channel(APB_I2C);
+        imx233_i2c_reset();
         ret= I2C_NO_SLAVE_ACK;
+    }
     else if(BF_RD(I2C_CTRL1, EARLY_TERM_IRQ))
         ret = I2C_SLAVE_NAK;
     else
