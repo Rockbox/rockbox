@@ -100,7 +100,7 @@ struct sdmmc_config_t sdmmc_config[] =
         .mode = MMC_MODE,
     },
 #elif defined(CREATIVE_ZENXFI2)
-    /* The Zen X-Fi2 uses pin B1P29 for power*/
+    /* The Zen X-Fi2 uses pin B1P29 for power */
     {
         .name = "microSD",
         .flags = POWER_PIN | REMOVABLE | DETECT_INVERTED,
@@ -115,7 +115,7 @@ struct sdmmc_config_t sdmmc_config[] =
         .ssp = 2,
         .mode = SD_MODE,
     },
-    /* The Zen X-Fi3 uses pin #B0P07 for power*/
+    /* The Zen X-Fi3 uses pin #B0P07 for power */
     {
         .name = "microSD",
         .flags = POWER_PIN | POWER_INVERTED | REMOVABLE | POWER_DELAY,
