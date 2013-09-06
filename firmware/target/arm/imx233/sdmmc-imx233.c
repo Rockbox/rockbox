@@ -865,7 +865,7 @@ int mmc_init(void)
     int ret = sdmmc_init();
     if(ret < 0) return ret;
 
-    _sd_num_drives = 0;
+    _mmc_num_drives = 0;
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
         if(SDMMC_MODE(drive) == MMC_MODE)
         {
@@ -936,8 +936,9 @@ bool mmc_disk_is_active(void)
     return false;
 }
 
-bool mmc_usb_active(void)
+bool mmc_usb_active(int delayticks)
 {
+    (void) delayticks;
     return mmc_disk_is_active();
 }
 
