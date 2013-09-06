@@ -982,4 +982,9 @@ int mmc_write_sectors(IF_MD(int mmc_drive,) unsigned long start, int count, cons
     return transfer_sectors(mmc_map[mmc_drive], start, count, (void *)buf, false);
 }
 
+tCardInfo *mmc_card_info(int card_no)
+{
+    return &SDMMC_INFO(mmc_map[card_no]);
+}
+
 #endif
