@@ -179,6 +179,8 @@ static void pio_send(unsigned len, unsigned bpp, uint8_t *buf)
 void imx233_lcdif_pio_send(bool data_mode, unsigned len, void *buf)
 {
     imx233_lcdif_wait_ready();
+    if(len == 0)
+        return;
 #if IMX233_SUBTARGET >= 3780
     imx233_lcdif_enable_bus_master(false);
 #endif
