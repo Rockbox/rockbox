@@ -75,8 +75,6 @@ static void select_audio_path(void)
 {
 #if defined(HAVE_RECORDING)
     const bool recording = input_flags & SRCF_RECORDING;
-#else
-    const bool recording = false;
 #endif
 
     switch(input_source)
@@ -87,7 +85,9 @@ static void select_audio_path(void)
             /* fallthrough */
         case AUDIO_SRC_PLAYBACK:
             audiohw_set_monitor(false);
+#if defined(HAVE_RECORDING)
             audiohw_disable_recording();
+#endif
             break;
 
 #if defined(HAVE_RECORDING) && (INPUT_SRC_CAPS & SRC_CAP_MIC)
@@ -102,10 +102,12 @@ static void select_audio_path(void)
         /* recording and playback */
         case AUDIO_SRC_FMRADIO:
             audiohw_set_monitor(true);
+#if defined(HAVE_RECORDING)
             if(recording)
                 audiohw_enable_recording(false);
             else
                 audiohw_disable_recording();
+#endif
             break;
 #endif /* (INPUT_SRC_CAPS & SRC_CAP_FMRADIO) */
     }

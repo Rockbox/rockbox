@@ -205,7 +205,7 @@ const void *pcm_play_dma_get_peak_buffer(int *count)
  * we can only let the tranfer finish on stop. However if the transfer is very
  * long it could take a while. We work around this by splitting big transfers
  * into small burst to make sure we can stop quickly. */
-
+#ifdef HAVE_RECORDING
 static int adc_locked = 0;
 static struct pcm_dma_command_t adc_dma;
 
@@ -322,3 +322,4 @@ const void *pcm_rec_dma_get_peak_buffer(void)
     struct imx233_dma_info_t info = imx233_dma_get_info(APB_AUDIO_ADC, DMA_INFO_BAR);
     return (void *)info.bar;
 }
+#endif /* HAVE_RECORDING */
