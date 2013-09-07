@@ -345,7 +345,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         dst_d = 16;
         break;
 
-      case 9: /* greyscale X5 remote 4-grey */
+      case 9: /* 24-bit BGR */
         dst_w = width;
         dst_h = height;
         dst_d = 24;
