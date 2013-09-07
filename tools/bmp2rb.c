@@ -77,6 +77,12 @@ struct RGBQUAD
     unsigned char rgbReserved;
 } STRUCT_PACKED;
 
+union RAWDATA {
+    void *d; /* unspecified */
+    unsigned short *d16; /* depth <= 16 */
+    struct { unsigned char b, g, r; } *d24; /* depth = 24 BGR */
+};
+
 short readshort(void* value)
 {
     unsigned char* bytes = (unsigned char*) value;
@@ -285,11 +291,13 @@ int read_bmp_file(char* filename,
  ****************************************************************************/
 
 int transform_bitmap(const struct RGBQUAD *src, int width, int height,
-                     int format, unsigned short **dest, int *dst_width,
+                     int format, union RAWDATA *dst, int *dst_width,
                      int *dst_height, int *dst_depth)
 {
     int row, col;
     int dst_w, dst_h, dst_d;
+    int alloc_size;
+    union RAWDATA dest;
 
     switch (format)
     {
@@ -337,21 +345,32 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         dst_d = 16;
         break;
 
+      case 9: /* greyscale X5 remote 4-grey */
+        dst_w = width;
+        dst_h = height;
+        dst_d = 24;
+        break;
+
       default: /* unknown */
         debugf("error - Undefined destination format\n");
         return 1;
     }
 
-    *dest = (unsigned short *)malloc(dst_w * dst_h * sizeof(short));
-    if (*dest == NULL)
+    if (dst_d <= 16)
+        alloc_size = sizeof(dest.d16[0]);
+    else /* 24 bit */
+        alloc_size = sizeof(dest.d24[0]);
+    dest.d = calloc(dst_w * dst_h, alloc_size);
+
+    if (dest.d == NULL)
     {
         debugf("error - Out of memory.\n");
         return 2;
     }
-    memset(*dest, 0, dst_w * dst_h * sizeof(short));
     *dst_width = dst_w;
     *dst_height = dst_h;
     *dst_depth = dst_d;
+    *dst = dest;
 
     switch (format)
     {
@@ -359,7 +378,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                (*dest)[(row/8) * dst_w + col] |=
+                dest.d16[(row/8) * dst_w + col] |=
                        (~brightness(src[row * width + col]) & 0x80) >> (~row & 7);
             }
         break;
@@ -368,7 +387,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                (*dest)[row * dst_w + (col/8)] |=
+                dest.d16[row * dst_w + (col/8)] |=
                        (~brightness(src[row * width + col]) & 0x80) >> (col & 7);
             }
         break;
@@ -377,7 +396,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                (*dest)[(row/4) * dst_w + col] |=
+                dest.d16[(row/4) * dst_w + col] |=
                        (~brightness(src[row * width + col]) & 0xC0) >> (2 * (~row & 3));
             }
         break;
@@ -386,7 +405,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                (*dest)[row * dst_w + col] = brightness(src[row * width + col]);
+                dest.d16[row * dst_w + col] = brightness(src[row * width + col]);
             }
         break;
 
@@ -401,9 +420,9 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                      ((src[row * width + col].rgbBlue >> 3)));
 
                 if (format == 4)
-                    (*dest)[row * dst_w + col] = rgb;
+                    dest.d16[row * dst_w + col] = rgb;
                 else
-                    (*dest)[row * dst_w + col] = ((rgb&0xff00)>>8)|((rgb&0x00ff)<<8);
+                    dest.d16[row * dst_w + col] = ((rgb&0xff00)>>8)|((rgb&0x00ff)<<8);
             }
         break;
 
@@ -411,7 +430,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
-                (*dest)[row * dst_w + (col/4)] |=
+                dest.d16[row * dst_w + (col/4)] |=
                        (~brightness(src[row * width + col]) & 0xC0) >> (2 * (col & 3));
             }
         break;
@@ -423,7 +442,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                 unsigned short data = (~brightness(src[row * width + col]) & 0xC0) >> 6;
 
                 data = (data | (data << 7)) & 0x0101;
-                (*dest)[(row/8) * dst_w + col] |= data << (row & 7);
+                dest.d16[(row/8) * dst_w + col] |= data << (row & 7);
             }
         break;
         
@@ -436,7 +455,17 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                      ((src[row * width + col].rgbGreen >> 2) << 5) |
                      ((src[row * width + col].rgbBlue >> 3)));
                      
-                (*dest)[col * dst_h + row] = rgb;
+                dest.d16[col * dst_h + row] = rgb;
+            }
+        break;
+
+      case 9: /* 24-bit RGB */
+        for (row = 0; row < height; row++)
+            for (col = 0; col < width; col++)
+            {
+                dest.d24[row * width + col].r = src[row * width + col].rgbRed;
+                dest.d24[row * width + col].g = src[row * width + col].rgbGreen;
+                dest.d24[row * width + col].b = src[row * width + col].rgbBlue;
             }
         break;
     }
@@ -452,7 +481,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
  ****************************************************************************/
 
 void generate_c_source(char *id, char* header_dir, int width, int height,
-                       const unsigned short *t_bitmap, int t_width,
+                       const union RAWDATA *t_bitmap, int t_width,
                        int t_height, int t_depth, bool t_mono, bool create_bm)
 {
     FILE *f;
@@ -461,6 +490,14 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
     char header_name[1024];
     bool have_header = header_dir && header_dir[0];
     create_bm = have_header && create_bm;
+
+    if (t_depth > 16)
+    {
+        fprintf(stderr, "Generating C source not supported for this format\n");
+        fprintf(stderr, "because Rockbox does not support this display depth yet.\n");
+        fprintf(stderr, "However you are welcome to fix this!\n");
+        return;
+    }
 
     if (!id || !id[0])
         id = "bitmap";
@@ -513,10 +550,10 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
         for (a = 0; a < t_width; a++)
         {
             if (t_depth <= 8)
-                fprintf(f, "0x%02x,%c", t_bitmap[i * t_width + a],
+                fprintf(f, "0x%02x,%c", t_bitmap->d16[i * t_width + a],
                         (a + 1) % 13 ? ' ' : '\n');
-            else
-                fprintf(f, "0x%04x,%c", t_bitmap[i * t_width + a],
+            else if (t_depth == 16)
+                fprintf(f, "0x%04x,%c", t_bitmap->d16[i * t_width + a],
                         (a + 1) % 10 ? ' ' : '\n');
         }
         fprintf(f, "\n");
@@ -538,7 +575,7 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
     }
 }
 
-void generate_raw_file(const unsigned short *t_bitmap, 
+void generate_raw_file(const union RAWDATA *t_bitmap, 
                        int t_width, int t_height, int t_depth)
 {
     FILE *f;
@@ -553,15 +590,19 @@ void generate_raw_file(const unsigned short *t_bitmap,
         {
             if (t_depth <= 8)
             {
-                lo = (t_bitmap[i * t_width + a] & 0x00ff);
+                lo = (t_bitmap->d16[i * t_width + a] & 0x00ff);
                 fwrite(&lo, 1, 1, f);
             }
-            else
+            else if (t_depth == 16)
             {
-                lo = (t_bitmap[i * t_width + a] & 0x00ff);
-                hi = (t_bitmap[i * t_width + a] & 0xff00) >> 8;
+                lo = (t_bitmap->d16[i * t_width + a] & 0x00ff);
+                hi = (t_bitmap->d16[i * t_width + a] & 0xff00) >> 8;
                 fwrite(&lo, 1, 1, f);
                 fwrite(&hi, 1, 1, f);
+            }
+            else /* 24 */
+            {
+                fwrite(&t_bitmap->d24[i * t_width + a].b, 3, 1, f);
             }
         }
     }
@@ -609,7 +650,8 @@ void print_usage(void)
            "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod, Fuzev2)\n"
            "\t         6  Greyscale iPod 4-grey\n"
            "\t         7  Greyscale X5 remote 4-grey\n"
-           "\t         8  16-bit packed 5-6-5 RGB with a vertical stride\n");
+           "\t         8  16-bit packed 5-6-5 RGB with a vertical stride\n"
+           "\t         9  24-bit BGR (raw only for now)\n");
     printf("build date: " __DATE__ "\n\n");
 }
 
@@ -622,7 +664,7 @@ int main(int argc, char **argv)
     int ascii = false;
     int format = 0;
     struct RGBQUAD *bitmap = NULL;
-    unsigned short *t_bitmap = NULL;
+    union RAWDATA t_bitmap = { NULL };
     int width, height;
     int t_width, t_height, t_depth;
     bool raw = false;
@@ -751,9 +793,9 @@ int main(int argc, char **argv)
                              &t_width, &t_height, &t_depth))
             exit(1);
         if(raw)
-            generate_raw_file(t_bitmap, t_width, t_height, t_depth);
+            generate_raw_file(&t_bitmap, t_width, t_height, t_depth);
         else
-            generate_c_source(id, header_dir, width, height, t_bitmap, 
+            generate_c_source(id, header_dir, width, height, &t_bitmap, 
                               t_width, t_height, t_depth,
                               format <= 1, create_bm);
     }
