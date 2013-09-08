@@ -602,7 +602,7 @@ void generate_raw_file(const union RAWDATA *t_bitmap,
             }
             else /* 24 */
             {
-                fwrite(&t_bitmap->d24[i * t_width + a].b, 3, 1, f);
+                fwrite(&t_bitmap->d24[i * t_width + a], 3, 1, f);
             }
         }
     }
