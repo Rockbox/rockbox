@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///y4\u003d",
+        "filename": "rbutil/rbutilqt/base/mspackutil.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-09-09T18:27:27Z",
+      "side": 1,
+      "message": "What bothers me here is that extractArchive() only implements extracting a single file. In contrast ZipUtil::extractArchive() also can extract the whole archive.\n\nI\u0027d like to either have the same functionality in here (since this implements the same function) or some kind of error (plus qDebug() message) returned in case file is empty -- comparing the current file to an empty string will never match, so if file \u003d\u003d \"\" you\u0027ll run into \"CAB doesn\u0027t contain file\". That\u0027s not really describing the exact problem :)\n\nA simple way would be to check file in the beginning (i.e. before the while() loop) and error out if file.isEmpty(). If we need extracting the whole archive we can extend the implementation when necessary so that\u0027s the way I\u0027d go right now.",
+      "revId": "ef6b45c88326d36bffb26fe5f5836fa4b368f63f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///zQ\u003d",
+        "filename": "rbutil/rbutilqt/base/mspackutil.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-09-09T18:27:27Z",
+      "side": 1,
+      "message": "Closing bracket is missing here. Though I\u0027d just drop the opening bracket :)",
+      "revId": "ef6b45c88326d36bffb26fe5f5836fa4b368f63f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///zM\u003d",
+        "filename": "rbutil/rbutilqt/base/mspackutil.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-09-09T18:27:27Z",
+      "side": 1,
+      "message": "You don\u0027t need to add a trailing space to the first string, qDebug() will add that by itself.",
+      "revId": "ef6b45c88326d36bffb26fe5f5836fa4b368f63f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
