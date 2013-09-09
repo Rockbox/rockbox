@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///zA\u003d",
+        "filename": "rbutil/rbutilqt/rbutil.ini",
+        "patchSetId": 3
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-09-09T18:11:49Z",
+      "side": 1,
+      "message": "Would be good if you\u0027d also add the picture (png, 80px height, in icons/players). It\u0027s not necessary but it looks nicer with the icon (but doing it separately is ok, or postponing it in case we don\u0027t have an icon yet).",
+      "revId": "5c133c0629f83c3bf8d44bad7172f06cd7ca75f9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
