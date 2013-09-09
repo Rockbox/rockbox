@@ -50,6 +50,23 @@
       "revId": "ef6b45c88326d36bffb26fe5f5836fa4b368f63f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///yw\u003d",
+        "filename": "rbutil/rbutilqt/rbutilqt.pri",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2013-09-09T18:32:43Z",
+      "side": 1,
+      "message": "Is it necessary to compile also all compressor functions? Right now we\u0027re only using it to extract cab files (and I assume libmspack also compiles with the compressor sources left out).",
+      "revId": "ef6b45c88326d36bffb26fe5f5836fa4b368f63f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
