@@ -40,7 +40,7 @@
 #undef rmdir
 
 
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(SAMSUNG_YPR0) && !defined(__PCTOOL__)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) && !defined(__PCTOOL__)
 #include "dir-target.h"
 #define opendir _opendir
 #define mkdir   _mkdir
@@ -63,7 +63,7 @@ extern int sim_rmdir(const char* name);
 const char *rbhome;
 #endif
 
-#if !defined(SAMSUNG_YPR0) && !defined(__PCTOOL__)
+#if !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)) && !defined(__PCTOOL__)
 
 /* flags for get_user_file_path() */
 /* whether you need write access to that file/dir, especially true
