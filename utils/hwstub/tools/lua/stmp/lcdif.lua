@@ -4,6 +4,12 @@
 
 STMP.lcdif = {}
 
+function STMP.lcdif.setup_clock()
+    HW.CLKCTRL.CLKSEQ.BYPASS_PIX.set()
+    HW.CLKCTRL.PIX.CLKGATE.write(0)
+    HW.CLKCTRL.PIX.DIV.write(1)
+end
+
 function STMP.lcdif.init()
     HW.LCDIF.CTRL.SFTRST.set()
     HW.LCDIF.CTRL.SFTRST.clr()
