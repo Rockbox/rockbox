@@ -128,6 +128,10 @@ else # core
     include $(ROOTDIR)/firmware/target/hosted/samsungypr/ypr0/ypr0.make
   endif
 
+  ifneq (,$(findstring ypr1,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/samsungypr/ypr1/ypr1.make
+  endif
+
   ifneq (,$(findstring android, $(APP_TYPE)))
 	include $(ROOTDIR)/android/android.make
   endif

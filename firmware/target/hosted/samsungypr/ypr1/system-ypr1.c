@@ -6,9 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Module wrapper for GPIO, using kernel module of Samsung YP-R0/YP-R1
- *
- * Copyright (c) 2011 Lorenzo Miori
+ * Copyright (C) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,29 +18,50 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <gpio-target.h> /* includes common ioctl device definitions */
-#include <sys/ioctl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <inttypes.h>
+#include "system.h"
+#include "panic.h"
+#include "debug.h"
 
-static int gpio_dev = 0;
+#include "gpio-target.h"
+#include "pmu-ypr1.h"
+#include "ioctl-ypr1.h"
+#include "audiohw.h"
+#include "button-target.h"
 
-void gpio_init(void)
+void power_off(void)
 {
-    gpio_dev = open(GPIO_DEVICE, O_RDONLY);
-    if (gpio_dev < 0)
-        printf("GPIO device open error!");
+    /* Something that we need to do before exit on our platform */
+    pmu_close();
+    max17040_close();
+    button_close_device();
+    gpio_close();
+    exit(EXIT_SUCCESS);
 }
 
-void gpio_close(void)
+uintptr_t *stackbegin;
+uintptr_t *stackend;
+void system_init(void)
 {
-    if (gpio_dev >= 0)
-        close(gpio_dev);
+    int *s;
+    /* fake stack, OS manages size (and growth) */
+    stackbegin = stackend = (uintptr_t*)&s;
+
+    /* Here begins our platform specific initilization for various things */
+    audiohw_init();
+    gpio_init();
+    max17040_init();
+    pmu_init();
 }
 
-int gpio_control(int request, int num, int mode, int val)
+void system_reboot(void)
 {
-    struct gpio_info r = { .num = num, .mode = mode, .val = val, };
-    return ioctl(gpio_dev, request, &r);
+    power_off();
+}
+
+void system_exception_wait(void)
+{
+    system_reboot();
 }

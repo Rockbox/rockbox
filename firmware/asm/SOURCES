@@ -10,7 +10,7 @@ strlen.c
 #if (defined(SANSA_E200) || defined(GIGABEAT_F) || defined(GIGABEAT_S) || \
     defined(CREATIVE_ZVx) || defined(SANSA_CONNECT) || defined(SANSA_FUZEPLUS) || \
     defined(COWON_D2) || defined(MINI2440) || defined(SAMSUNG_YPR0) || \
-    (defined(MROBE_500) && !defined(LCD_USE_DMA))) && \
+    defined(SAMSUNG_YPR1) || (defined(MROBE_500) && !defined(LCD_USE_DMA))) && \
     !defined(SIMULATOR)
 lcd-as-memframe.c
 #endif
