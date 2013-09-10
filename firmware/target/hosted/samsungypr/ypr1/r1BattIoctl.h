@@ -6,9 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Module wrapper for GPIO, using kernel module of Samsung YP-R0/YP-R1
- *
- * Copyright (c) 2011 Lorenzo Miori
+ * Copyright (C) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,29 +18,26 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <gpio-target.h> /* includes common ioctl device definitions */
-#include <sys/ioctl.h>
+/**
+ * This is the wrapper to r1Bat.ko module with the possible
+ * ioctl calls, retrieved by RE
+ * The "Fuel gauge" - battery controller - is the MAX17040GT
+ */
 
-static int gpio_dev = 0;
+/* A typical read spans 2 registers, so here the suitable struct */
+typedef struct {
+    uint8_t addr;
+    uint8_t reg1;
+    uint8_t reg2;
+}__attribute__((packed)) max17040_request;
 
-void gpio_init(void)
-{
-    gpio_dev = open(GPIO_DEVICE, O_RDONLY);
-    if (gpio_dev < 0)
-        printf("GPIO device open error!");
-}
 
-void gpio_close(void)
-{
-    if (gpio_dev >= 0)
-        close(gpio_dev);
-}
+/* Registers are 16-bit wide */
+#define GET_BATTERY_VOLTAGE             0x80045800
+#define GET_BATTERY_CAPACITY            0x80045801
+#define READ_MAX17040_REG               0x80035803
+#define WRITE_MAX17040_REG              0x40035802
 
-int gpio_control(int request, int num, int mode, int val)
-{
-    struct gpio_info r = { .num = num, .mode = mode, .val = val, };
-    return ioctl(gpio_dev, request, &r);
-}
+void max17040_init(void);
+void max17040_close(void);
+int max17040_ioctl(int request, int *data);
