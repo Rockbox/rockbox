@@ -30,7 +30,7 @@ fi
 if [ -e "/usr/local/bin/r1" ]
 then
     # running on YP-R1 model
-    BACK=$(echo -e -n "\x02")
+    BACK=$(echo -e -n "\x03")
     PLATFORM=1
     BUTTON_DEVICE="/dev/r1Button"
     STORAGES="/dev/stl3,/dev/stl2"

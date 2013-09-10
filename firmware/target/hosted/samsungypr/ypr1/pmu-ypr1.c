@@ -6,9 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Module wrapper for GPIO, using kernel module of Samsung YP-R0/YP-R1
- *
- * Copyright (c) 2011 Lorenzo Miori
+ * Copyright (C) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,26 +21,31 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <gpio-target.h> /* includes common ioctl device definitions */
-#include <sys/ioctl.h>
 
-static int gpio_dev = 0;
+#include "pmu-ypr1.h"
+#include "panic.h"
 
-void gpio_init(void)
+static int pmu_dev = -1;
+
+void pmu_init(void)
 {
-    gpio_dev = open(GPIO_DEVICE, O_RDONLY);
-    if (gpio_dev < 0)
-        printf("GPIO device open error!");
+    pmu_dev = open("/dev/r1Pmu", O_RDONLY);
+    if (pmu_dev < 0)
+        panicf("/dev/r1Pmu open error!");
 }
 
-void gpio_close(void)
+void pmu_close(void)
 {
-    if (gpio_dev >= 0)
-        close(gpio_dev);
+    if (pmu_dev >= 0)
+        close(pmu_dev);
 }
 
-int gpio_control(int request, int num, int mode, int val)
+int pmu_get_dev(void)
 {
-    struct gpio_info r = { .num = num, .mode = mode, .val = val, };
-    return ioctl(gpio_dev, request, &r);
+    return pmu_dev;
+}
+
+int pmu_ioctl(int request, int *data)
+{
+    return ioctl(pmu_dev, request, data);
 }

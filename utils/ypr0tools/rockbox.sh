@@ -14,11 +14,18 @@
 # expected to run $MAINFILE
 
 # Check for menu button being pressed. Return immediately to launch the OF
-var=$(dd if=/dev/r0Btn bs=4 count=1)
-# Here a workaround to detect the byte
-var2=$(echo -e -n "\x07")
+if [ -e "/dev/r1Button" ]
+then
+    # running on YP-R1 model (volume up button)
+    BTN=$(echo -e -n "\x02")
+    VAL=$(dd if=/dev/r1Button bs=4 count=1)
+else
+    # running on YP-R0 model (menu button)
+    BTN=$(echo -e -n "\x07")
+    VAL=$(dd if=/dev/r0Btn bs=4 count=1)
+fi
 
-if [[ "$var" = "$var2" ]]
+if [[ "$VAL" = "$BTN" ]]
 then
     return
 fi

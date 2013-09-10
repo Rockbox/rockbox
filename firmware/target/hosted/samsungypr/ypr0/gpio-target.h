@@ -53,6 +53,7 @@
 #define GPIO_LEFT_KEY               GPIO2_28
 #define GPIO_RIGHT_KEY              GPIO3_7
 
+#define GPIO_DEVICE                 "/dev/r0GPIO"
 
 void gpio_init(void);
 void gpio_close(void);

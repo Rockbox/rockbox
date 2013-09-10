@@ -78,7 +78,7 @@
 #endif
 #include "power.h"
 
-#if defined(SAMSUNG_YPR0) && defined(CONFIG_TUNER)
+#if (defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)) && defined(CONFIG_TUNER)
 #include "tuner.h"
 #include "radio.h"
 #endif

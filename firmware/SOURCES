@@ -101,6 +101,29 @@ target/hosted/samsungypr/radio-ypr.c
 #endif
 #endif
 
+#ifdef SAMSUNG_YPR1
+drivers/lcd-memframe.c
+target/hosted/kernel-unix.c
+target/hosted/filesystem-unix.c
+target/hosted/lc-unix.c
+target/hosted/samsungypr/ypr1/mcs5000-ypr1.c
+target/hosted/samsungypr/ypr1/button-ypr1.c
+target/hosted/samsungypr/lcd-ypr.c
+target/hosted/samsungypr/ypr1/system-ypr1.c
+thread.c
+#ifdef HAVE_BACKLIGHT
+target/hosted/samsungypr/ypr1/backlight-ypr1.c
+#endif
+target/hosted/samsungypr/ypr1/powermgmt-ypr1.c
+target/hosted/samsungypr/gpio_ypr.c
+target/hosted/samsungypr/ypr1/audio-ypr1.c
+target/hosted/samsungypr/ypr1/pmu-ypr1.c
+target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
+#if CONFIG_TUNER
+target/hosted/samsungypr/radio-ypr.c
+#endif
+#endif
+
 /* Maemo specific files */
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
 target/hosted/maemo/maemo-thread.c
@@ -318,7 +341,7 @@ drivers/rtc/rtc_imx233.c
 /* Tuner */
 #if CONFIG_TUNER
 tuner.c
-#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0))
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)  || defined(SAMSUNG_YPR1))
 #if (CONFIG_TUNER & LV24020LP)
 drivers/tuner/lv24020lp.c
 #endif /* (CONFIG_TUNER & LV24020LP) */
@@ -416,6 +439,9 @@ drivers/audio/pcm1792.c
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
 drivers/audio/as3514.c
+target/hosted/pcm-alsa.c
+#elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
+drivers/audio/wm8978.c
 target/hosted/pcm-alsa.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c

@@ -375,7 +375,7 @@ sub buildzip {
     close(IGNORE);
 
     # the samsung ypr0 has a loader script that's needed in the zip
-    if ($modelname =~ /samsungypr0/) {
+    if ($modelname =~ /samsungypr[01]/) {
         glob_copy("$ROOT/utils/ypr0tools/rockbox.sh", "$temp_dir/");
     }
     # add .nomedia on Android
@@ -695,4 +695,3 @@ elsif($exe eq "librockbox.so") {
 }
 
 runone($exe, $incfonts);
-

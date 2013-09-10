@@ -221,6 +221,9 @@
 #define CLIX_BUTTON_RIGHT         BUTTON_RIGHT
 #define CLIX_BUTTON_CLICK         BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == SAMSUNG_YPR1_PAD)
+#define CLIX_BUTTON_QUIT    BUTTON_POWER
+
 #else
 #error "no keymap"
 #endif

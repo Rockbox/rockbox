@@ -1,0 +1,76 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ * Copyright (C) 2008 by Nils Wallménius
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#include "config.h"
+#include "system.h"
+#include "audiohw.h"
+#include "audio.h"
+
+void audiohw_enable_tone_controls(bool enable);
+void audiohw_enable_depth_3d(bool enable);
+
+/* Set the audio source for IIS TX */
+void audio_set_output_source(int source)
+{
+    switch (source)
+    {
+    default:
+    case AUDIO_SRC_PLAYBACK:
+        /*
+        audiohw_enable_tone_controls(true);
+        audiohw_enable_depth_3d(true);
+        */
+        break;
+
+    case AUDIO_SRC_FMRADIO:
+        /* Analog path doesn't support these and digital radio playback
+         * cannot be done without mixing on the MCU if voice is to be
+         * heard. Any recording should match what is heard. */
+        audiohw_enable_tone_controls(false);
+        audiohw_enable_depth_3d(false);
+        break;
+    }
+}
+
+void audio_input_mux(int source, unsigned int flags)
+{
+    /* Prevent pops from unneeded switching */
+    static int last_source = AUDIO_SRC_PLAYBACK;
+    bool recording = flags & SRCF_RECORDING;
+    static bool last_recording = false;
+
+    switch (source)
+    {
+        default:
+            source = AUDIO_SRC_PLAYBACK;
+            /* Fallthrough */
+        case AUDIO_SRC_PLAYBACK: /* playback - no recording */
+            if (source != last_source)
+                audiohw_set_recsrc(AUDIO_SRC_PLAYBACK, false);
+            break;
+
+        case AUDIO_SRC_FMRADIO: /* recording and playback */
+            if (source != last_source || recording != last_recording)
+                audiohw_set_recsrc(AUDIO_SRC_FMRADIO, recording);
+            break;
+    }
+
+    last_source = source;
+    last_recording = recording;
+}
