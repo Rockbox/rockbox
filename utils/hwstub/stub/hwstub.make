@@ -14,9 +14,10 @@ OBJ=$(SRC:.c=.o)
 OBJ:=$(OBJ:.S=.o)
 OBJ_EXCEPT_CRT0=$(filter-out $(BUILD_DIR)/crt0.o,$(OBJ))
 EXEC_ELF=$(BUILD_DIR)/hwstub.elf
+EXEC_BIN=$(BUILD_DIR)/hwstub.bin
 DEPS=$(foreach obj,$(OBJ),$(obj).d)
 
-EXEC=$(EXEC_ELF)
+EXEC+=$(EXEC_ELF) $(EXEC_BIN)
 
 SILENT?=@
 PRINTS=$(SILENT)$(call info,$(1))
@@ -44,6 +45,10 @@ $(TMP_LDS): $(LINKER_FILE)
 $(EXEC_ELF): $(OBJ) $(TMP_LDS)
 	$(call PRINTS,LD $(@F))
 	$(SILENT)$(LD) $(LDFLAGS) -o $@ $(OBJ_EXCEPT_CRT0)
+	
+$(EXEC_BIN): $(EXEC_ELF)
+	$(call PRINTS,OC $(@F))
+	$(SILENT)$(OC) -O binary $< $@
 
 clean:
 	$(SILENT)rm -rf $(OBJ) $(DEPS) $(EXEC) $(TMP_LDS) $(TMP_MAP)

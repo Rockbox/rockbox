@@ -23,6 +23,7 @@
 #include "usb_drv.h"
 #include "config.h"
 #include "memory.h"
+#include "target.h"
 
 #define MAX_PKT_SIZE        1024
 #define MAX_PKT_SIZE_EP0    64
@@ -323,9 +324,11 @@ void usb_drv_init(void)
     /* we don't know if USB was connected or not. In USB recovery mode it will
      * but in other cases it might not be. In doubt, disconnect */
     REG_USBCMD &= ~USBCMD_RUN;
+    /* wait a short time for the host to realise */
+    target_mdelay(50);
     /* reset the controller */
     REG_USBCMD |= USBCMD_CTRL_RESET;
-    while (REG_USBCMD & USBCMD_CTRL_RESET);
+    while(REG_USBCMD & USBCMD_CTRL_RESET);
     /* put it in device mode */
     REG_USBMODE = USBMODE_CTRL_MODE_DEVICE;
     /* reset address */

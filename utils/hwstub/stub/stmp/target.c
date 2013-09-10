@@ -273,3 +273,18 @@ void target_exit(void)
             return;
     }
 }
+
+void target_udelay(int us)
+{
+    uint32_t cur = HW_DIGCTL_MICROSECONDS;
+    uint32_t end = cur + us;
+    if(cur < end)
+        while(HW_DIGCTL_MICROSECONDS < end) {}
+    else
+        while(HW_DIGCTL_MICROSECONDS >= cur) {}
+}
+
+void target_mdelay(int ms)
+{
+    return target_udelay(ms * 1000);
+}

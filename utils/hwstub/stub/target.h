@@ -31,5 +31,9 @@ void target_exit(void);
 int target_get_info(int info, void **buffer);
 /* set atexit action or return -1 on error */
 int target_atexit(int action);
+/* Wait a very short time (us<=1000) */
+void target_udelay(int us);
+/* Wait for a short time (ms <= 1000) */
+void target_mdelay(int ms);
 
 #endif /* __TARGET_H__ */
