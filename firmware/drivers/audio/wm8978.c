@@ -497,7 +497,7 @@ void audiohw_enable_depth_3d(bool enable)
     audiohw_set_depth_3d(wmc_vol.enh_3d);
 }
 
-#ifdef HAVE_RECORDING
+#if defined(HAVE_RECORDING) || defined(SAMSUNG_YPR1)
 void audiohw_set_recsrc(int source, bool recording)
 {
     switch (source)
@@ -559,6 +559,20 @@ void audiohw_set_recsrc(int source, bool recording)
             /* Enable bypass to L/R mixers */
             wmc_set(WMC_LEFT_MIXER_CTRL, WMC_BYPL2LMIX);
             wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_BYPR2RMIX);
+#ifdef SAMSUNG_YPR1
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_AUXL2LMIX);
+            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_AUXR2RMIX);
+            /* Set L/R gain to 0dB */
+            wmc_write_masked(WMC_LEFT_MIXER_CTRL, 0x05 << WMC_AUXLMIXVOL_POS,
+                     WMC_AUXLMIXVOL);
+            wmc_write_masked(WMC_RIGHT_MIXER_CTRL, 0x05 << WMC_AUXRMIXVOL_POS,
+                     WMC_AUXRMIXVOL);
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_DACL2LMIX);
+            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_DACR2RMIX);
+            wmc_set(WMC_POWER_MANAGEMENT1, WMC_OUT3MIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_RMIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_LMIXEN);
+#endif
         }
         break;
     }
