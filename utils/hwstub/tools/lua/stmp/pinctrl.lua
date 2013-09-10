@@ -63,7 +63,15 @@ function STMP.pinctrl.pin(bank,pin)
                 v = HW.PINCTRL.MUXSELn[2 * bank + math.floor(pin / 16)]
             end
             v.write(bit32.replace(v.read(), x, (pin % 16) * 2, 2))
-        end
+        end,
+
+        pull = function(val)
+            if val then
+                HW.PINCTRL.PULLn[bank].set(bit32.lshift(1, pin))
+            else
+                HW.PINCTRL.PULLn[bank].clr(bit32.lshift(1, pin))
+            end
+        end,
     }
     return t
 end
@@ -185,6 +193,24 @@ function STMP.pinctrl.lcdif.setup_system(bus_width, busy)
                 lcd_d6 = {bank = 1, pin = 6, muxsel = "MAIN"},
                 lcd_d7 = {bank = 1, pin = 7, muxsel = "MAIN"}
             }
+        },
+        imx233 =
+        {
+            all =
+            {
+                lcd_reset = { bank = 1, pin = 18, muxsel = "MAIN"},
+                lcd_rs = { bank = 1, pin = 19, muxsel = "MAIN"},
+                lcd_wr = { bank = 1, pin = 20, muxsel = "MAIN"},
+                lcd_cs = { bank = 1, pin = 21, muxsel = "MAIN"},
+                lcd_d0 = {bank = 1, pin = 0, muxsel = "MAIN"},
+                lcd_d1 = {bank = 1, pin = 1, muxsel = "MAIN"},
+                lcd_d2 = {bank = 1, pin = 2, muxsel = "MAIN"},
+                lcd_d3 = {bank = 1, pin = 3, muxsel = "MAIN"},
+                lcd_d4 = {bank = 1, pin = 4, muxsel = "MAIN"},
+                lcd_d5 = {bank = 1, pin = 5, muxsel = "MAIN"},
+                lcd_d6 = {bank = 1, pin = 6, muxsel = "MAIN"},
+                lcd_d7 = {bank = 1, pin = 7, muxsel = "MAIN"}
+            }
         }
     }
     local bus8_15 =
@@ -204,6 +230,20 @@ function STMP.pinctrl.lcdif.setup_system(bus_width, busy)
             }
         },
         stmp3700 =
+        {
+            all =
+            {
+                lcd_d8 = {bank = 1, pin = 8, muxsel = "MAIN"},
+                lcd_d9 = {bank = 1, pin = 9, muxsel = "MAIN"},
+                lcd_d10 = {bank = 1, pin = 10, muxsel = "MAIN"},
+                lcd_d11 = {bank = 1, pin = 11, muxsel = "MAIN"},
+                lcd_d12 = {bank = 1, pin = 12, muxsel = "MAIN"},
+                lcd_d13 = {bank = 1, pin = 13, muxsel = "MAIN"},
+                lcd_d14 = {bank = 1, pin = 14, muxsel = "MAIN"},
+                lcd_d15 = {bank = 1, pin = 15, muxsel = "MAIN"}
+            }
+        },
+        imx233 =
         {
             all =
             {
