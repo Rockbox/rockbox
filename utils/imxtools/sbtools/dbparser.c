@@ -355,7 +355,7 @@ void db_add_source(struct cmd_file_t *cmd_file, const char *identifier, const ch
 
 void db_add_extern_source(struct cmd_file_t *cmd_file, const char *identifier, int extern_nr)
 {
-    db_add_src(&cmd_file->source_list, identifier, false)->extern_nr = extern_nr;
+    db_add_src(&cmd_file->source_list, identifier, true)->extern_nr = extern_nr;
 }
 
 static struct cmd_inst_t *db_add_inst(struct cmd_inst_t **list, enum cmd_inst_type_t type,
