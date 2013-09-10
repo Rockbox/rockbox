@@ -12368,15 +12368,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </dest>
   <voice>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </voice>
 </phrase>
 <phrase>
@@ -12385,15 +12385,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </dest>
   <voice>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </voice>
 </phrase>
 <phrase>
@@ -12402,15 +12402,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Gain"
+    gigabeats,samsungypr1: "Band Gain"
   </voice>
 </phrase>
 <phrase>
@@ -12419,15 +12419,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Frequency"
+    gigabeats,samsungypr1: "Band Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -12436,15 +12436,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Width"
+    gigabeats,samsungypr1: "Band Width"
   </voice>
 </phrase>
 <phrase>
@@ -12453,15 +12453,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </dest>
   <voice>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </voice>
 </phrase>
 <phrase>
@@ -12470,15 +12470,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </dest>
   <voice>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </voice>
 </phrase>
 <phrase>

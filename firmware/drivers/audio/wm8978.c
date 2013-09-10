@@ -497,7 +497,7 @@ void audiohw_enable_depth_3d(bool enable)
     audiohw_set_depth_3d(wmc_vol.enh_3d);
 }
 
-#ifdef HAVE_RECORDING
+#if defined(HAVE_RECORDING) || defined(SAMSUNG_YPR1)
 void audiohw_set_recsrc(int source, bool recording)
 {
     switch (source)
@@ -547,18 +547,33 @@ void audiohw_set_recsrc(int source, bool recording)
         {
             /* Disable PGA and ADC, enable IP BOOSTMIX, route L/R2 directly to
              * IP BOOSTMIX */
-            wmc_clear(WMC_ADC_CONTROL, WMC_HPFEN);
-            wmc_write_masked(WMC_POWER_MANAGEMENT2, WMC_BOOSTENL | WMC_BOOSTENR,
-                WMC_BOOSTENL | WMC_BOOSTENR | WMC_INPPGAENL |
-                WMC_INPPGAENR | WMC_ADCENL | WMC_ADCENR);
-            wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA |
-                                      WMC_LIP2INPPGA | WMC_RIP2INPPGA |
-                                      WMC_LIN2INPPGA | WMC_RIN2INPPGA);
-            wmc_clear(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
-            wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
+             wmc_clear(WMC_ADC_CONTROL, WMC_HPFEN);
+             wmc_write_masked(WMC_POWER_MANAGEMENT2, WMC_BOOSTENL | WMC_BOOSTENR,
+                 WMC_BOOSTENL | WMC_BOOSTENR | WMC_INPPGAENL |
+                 WMC_INPPGAENR | WMC_ADCENL | WMC_ADCENR);
+             wmc_clear(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA |
+                                       WMC_LIP2INPPGA | WMC_RIP2INPPGA |
+                                       WMC_LIN2INPPGA | WMC_RIN2INPPGA);
+             wmc_clear(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
+             wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
             /* Enable bypass to L/R mixers */
             wmc_set(WMC_LEFT_MIXER_CTRL, WMC_BYPL2LMIX);
             wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_BYPR2RMIX);
+#ifdef SAMSUNG_YPR1
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_AUXL2LMIX);
+            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_AUXR2RMIX);
+            /* Set L/R gain to 0dB */
+            wmc_write_masked(WMC_LEFT_MIXER_CTRL, 0x05 << WMC_AUXLMIXVOL_POS,
+                     WMC_AUXLMIXVOL);
+            wmc_write_masked(WMC_RIGHT_MIXER_CTRL, 0x05 << WMC_AUXRMIXVOL_POS,
+                     WMC_AUXRMIXVOL);
+            /* Disable DAC mixing to minimize noise */
+            wmc_clear(WMC_LEFT_MIXER_CTRL, WMC_DACL2LMIX);
+            wmc_clear(WMC_RIGHT_MIXER_CTRL, WMC_DACR2RMIX);
+            wmc_set(WMC_POWER_MANAGEMENT1, WMC_OUT3MIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_RMIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_LMIXEN);
+#endif
         }
         break;
     }
