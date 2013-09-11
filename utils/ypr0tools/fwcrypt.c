@@ -47,6 +47,15 @@ static void die(int error)
     exit(error);
 }
 
+static void pad4byte(char byte, FILE* handle) {
+    int padding = 4 - ftell(handle) % 4;
+    if (padding != 4) {
+        while (padding-- > 0) {
+            fwrite(&byte, 1, 1, handle);
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
     FILE* component_handle = NULL;
@@ -136,6 +145,9 @@ int main(int argc, char **argv)
         }
     }
 
+    /* Padding */
+    pad4byte('\n', output_file);
+
     /* write final data to the firmware file */
     for (int i = 0; i < YPR0_COMPONENTS_COUNT; i++)
     {
@@ -162,7 +174,7 @@ int main(int argc, char **argv)
         }
         /* padding */
         if (i < (YPR0_COMPONENTS_COUNT-1))
-            fputs("\0\0\0\0", output_file);
+            pad4byte('\0', output_file);
     }
 
     /* free the big amount of memory and close handles */
