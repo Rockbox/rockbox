@@ -637,3 +637,147 @@ void EmiAnalyser::FillTable()
 }
 
 static TmplAnalyserFactory< EmiAnalyser > g_emi_factory(true, "EMI Analyser");
+
+/**
+ * Pin analyser
+ */
+
+namespace pin_desc
+{
+#include "../../imxtools/misc/map.h"
+}
+
+PinAnalyser::PinAnalyser(const soc_t& soc, IoBackend *backend)
+        :Analyser(soc, backend)
+{
+    m_group = new QGroupBox("Pin Analyser");
+    QVBoxLayout *layout = new QVBoxLayout;
+    m_group->setLayout(layout);
+    QLabel *label = new QLabel("Package:");
+    m_package_edit = new QLineEdit;
+    m_package_edit->setReadOnly(true);
+    m_package_edit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    hlayout->addStretch();
+    hlayout->addWidget(label);
+    hlayout->addWidget(m_package_edit);
+    hlayout->addStretch();
+    layout->addLayout(hlayout);
+    m_panel = new QToolBox;
+    layout->addWidget(m_panel);
+
+    FillList();
+}
+
+PinAnalyser::~PinAnalyser()
+{
+}
+
+QWidget *PinAnalyser::GetWidget()
+{
+    return m_group;
+}
+
+bool PinAnalyser::SupportSoc(const QString& soc_name)
+{
+    return soc_name == "imx233" || soc_name == "stmp3700";
+}
+
+void PinAnalyser::FillList()
+{
+    BackendHelper helper(m_io_backend, m_soc);
+    soc_word_t value;
+
+    while(m_panel->count() > 0)
+        m_panel->removeItem(0);
+
+    const char *package_type[8] =
+    {
+        [0] = "bga169", [1] = "bga100", [2] = "lqfp100", [3] = "lqfp128",
+    };
+
+    if(!helper.ReadRegisterField("DIGCTL", "STATUS", "PACKAGE_TYPE", value))
+    {
+        m_package_edit->setText("<read error>");
+        return;
+    }
+    if(value >= 8 || package_type[value] == NULL)
+    {
+        m_package_edit->setText("<unknown package>");
+        return;
+    }
+    const char *package = package_type[value];
+    m_package_edit->setText(package);
+    pin_desc::bank_map_t *map = NULL;
+    for(size_t i = 0; i < sizeof(pin_desc::socs) / sizeof(pin_desc::socs[0]); i++)
+        if(QString(pin_desc::socs[i].soc) == m_io_backend->GetSocName() && 
+                QString(pin_desc::socs[i].ver) == package)
+            map = pin_desc::socs[i].map;
+    if(map == NULL)
+    {
+        m_package_edit->setText(QString("%1 (no map available)").arg(package));
+        return;
+    }
+
+    QMap< unsigned, QColor > color_map;
+    color_map[PIN_GROUP_EMI] = QColor(255, 255, 64);
+    color_map[PIN_GROUP_GPIO] = QColor(171, 214, 230);
+    color_map[PIN_GROUP_I2C] = QColor(191, 191, 255);
+    color_map[PIN_GROUP_JTAG] = QColor(238, 75, 21);
+    color_map[PIN_GROUP_PWM] = QColor(255, 236, 179);
+    color_map[PIN_GROUP_SPDIF] = QColor(174, 235, 63);
+    color_map[PIN_GROUP_TIMROT] = QColor(255, 112, 237);
+    color_map[PIN_GROUP_AUART] = QColor(94, 255, 128);
+    color_map[PIN_GROUP_ETM] = QColor(168, 53, 14);
+    color_map[PIN_GROUP_GPMI] = QColor(255, 211, 147);
+    color_map[PIN_GROUP_IrDA] = QColor(64, 97, 255);
+    color_map[PIN_GROUP_LCD] = QColor(124, 255, 255);
+    color_map[PIN_GROUP_SAIF] = QColor(255, 158, 158);
+    color_map[PIN_GROUP_SSP] = QColor(222, 128, 255);
+    color_map[PIN_GROUP_DUART] = QColor(192, 191, 191);
+    color_map[PIN_GROUP_USB] = QColor(0, 255, 0);
+    color_map[PIN_GROUP_NONE] = QColor(255, 255, 255);
+
+    for(int bank = 0; bank < 4; bank++)
+    {
+        QTableWidget *table = new QTableWidget;
+        table->setColumnCount(2);
+        table->setHorizontalHeaderItem(0, new QTableWidgetItem("Pin"));
+        table->setHorizontalHeaderItem(1, new QTableWidgetItem("Function"));
+        table->verticalHeader()->setVisible(false);
+        table->horizontalHeader()->setStretchLastSection(true);
+        m_panel->addItem(table, QString("Bank %1").arg(bank));
+
+        for(int pin = 0; pin < 32; pin++)
+        {
+            /* skip all-reserved pins */
+            bool all_dis = true;
+            for(int fn = 0; fn < 4; fn++)
+                if(map[bank].pins[pin].function[fn].name != NULL)
+                    all_dis = false;
+            if(all_dis)
+                continue;
+            /* add line */
+            int row = table->rowCount();
+            table->setRowCount(row + 1);
+            /* pin name */
+            table->setItem(row, 0, new QTableWidgetItem(QString("B%1P%2")
+                .arg(bank).arg(pin, 2, 10, QChar('0'))));
+            table->item(row, 0)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* pin function */
+            int fn = -1;
+            if(helper.ReadRegister("PINCTRL", QString("MUXSEL%1").arg(bank * 2 + pin / 16), value))
+                fn = (value >> ((pin % 16) * 2)) & 3;
+            if(fn != -1)
+            {
+                table->setItem(row, 1, new QTableWidgetItem(QString(map[bank].pins[pin].function[fn].name)));
+                table->item(row, 1)->setBackground(QBrush(color_map[map[bank].pins[pin].function[fn].group]));
+            }
+            else
+                table->setItem(row, 1, new QTableWidgetItem(QString("<read error>")));
+            table->item(row, 1)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        }
+    }
+}
+
+static TmplAnalyserFactory< PinAnalyser > g_pin_factory(true, "Pin Analyser");

@@ -91,4 +91,26 @@ private:
     QLineEdit *m_emi_freq_label;
 };
 
+/**
+ * PINCTRL analyzer
+ */
+class PinAnalyser : public Analyser
+{
+    Q_OBJECT
+public:
+    PinAnalyser(const soc_t& soc, IoBackend *backend);
+    virtual ~PinAnalyser();
+    virtual QWidget *GetWidget();
+
+    static bool SupportSoc(const QString& soc_name);
+
+private:
+    void FillList();
+
+private:
+    QGroupBox *m_group;
+    QLineEdit *m_package_edit;
+    QToolBox *m_panel;
+};
+
 #endif /* _STDANALYSER_H_ */
