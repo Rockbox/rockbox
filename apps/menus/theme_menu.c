@@ -389,6 +389,10 @@ MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM,
 MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, NULL);
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+MENUITEM_SETTING(list_line_padding, &global_settings.list_line_padding, NULL);
+#endif
+
 MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
             NULL, Icon_Wps,
             &browse_themes,
@@ -418,6 +422,9 @@ MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
 #ifdef HAVE_LCD_BITMAP
             &bars_menu,
             &cursor_style,
+#endif
+#ifdef HAVE_TOUCHSCREEN
+            &list_line_padding,
 #endif
 #ifdef HAVE_LCD_COLOR
             &colors_settings,

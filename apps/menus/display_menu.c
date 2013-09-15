@@ -520,7 +520,7 @@ MENUITEM_FUNCTION(touchscreen_menu_reset_calibration, 0, ID2P(LANG_TOUCHSCREEN_R
                     NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(list_line_padding, &global_settings.list_line_padding, line_padding_callback);
 
-MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, &list_line_padding, &touch_mode,
+MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, &touch_mode,
             &touchscreen_menu_calibrate, &touchscreen_menu_reset_calibration);
 #endif
 
