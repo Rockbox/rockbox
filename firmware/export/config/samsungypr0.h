@@ -5,15 +5,14 @@
 
 /* We don't run on hardware directly */
 /* YP-R0 need it too of course */
+#ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
+#endif
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 100
 
 #define MODEL_NAME   "Samsung YP-R0"
-
-/*TODO: implement USB data transfer management -> see safe mode script and think a way to implemtent it in the code */
-#define USB_NONE
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -90,6 +89,12 @@
 #define CONFIG_KEYPAD SAMSUNG_YPR0_PAD
 #define BUTTON_DRIVER_CLOSE
 
+/** Non-simulator section **/
+#ifndef SIMULATOR
+
+/*TODO: implement USB data transfer management -> see safe mode script and think a way to implemtent it in the code */
+#define USB_NONE
+
 /* The YPR0 has a as3534 codec */
 #define HAVE_AS3514
 #define HAVE_AS3543
@@ -109,6 +114,12 @@
 /* We have a GPIO pin that detects this */
 #define HAVE_HEADPHONE_DETECTION
 
+/* Define current usage levels. */
+#define CURRENT_NORMAL     24 /* ~25h, on 600mAh that's about 24mA */
+#define CURRENT_BACKLIGHT  62 /* ~6,5h -> 92mA. Minus 24mA normal that gives us 68mA */
+
+#endif /* SIMULATOR */
+
 /* FIXME
  * Lot of people reports bad battery life and funny charging times.
  * Check what's going on...
@@ -119,10 +130,6 @@
 #define BATTERY_CAPACITY_MAX 600 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
-
-/* Define current usage levels. */
-#define CURRENT_NORMAL     24 /* ~25h, on 600mAh that's about 24mA */
-#define CURRENT_BACKLIGHT  62 /* ~6,5h -> 92mA. Minus 24mA normal that gives us 68mA */
 
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 
