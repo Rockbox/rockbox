@@ -3701,6 +3701,14 @@ if [ -z "$debug" ]; then
   GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
 fi
 
+# if building a simulator for an hosted port, APPLICATION
+# define clashes with SIMULATOR define
+
+if [ "yes" = "$simulator" ]; then
+    echo Unsetting APPLICATION define for SIMULATOR build
+    unset application
+fi
+
 if [ "yes" = "$application" ]; then
   echo Building Rockbox as an Application
   extradefines="$extradefines -DAPPLICATION"

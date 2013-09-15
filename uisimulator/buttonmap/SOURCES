@@ -75,5 +75,7 @@ creative-zenxfi2.c
 sansa-connect.c
 #elif CONFIG_KEYPAD == SONY_NWZ_PAD
 sony-nwz.c
+#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
+samsung-ypr0.c
 #endif
 #endif /* SIMULATOR */
