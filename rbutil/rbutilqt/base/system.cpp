@@ -276,7 +276,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
             if(name.isEmpty())
                 name = tr("(no description available)");
             if(id) {
-                usbids.insert(id, name);
+                usbids.insertMulti(id, name);
                 qDebug("[System] USB: 0x%08x, %s", id, name.toLocal8Bit().data());
             }
         }
@@ -322,7 +322,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
                 if(name.isEmpty()) name = tr("(no description available)");
 
                 if(id) {
-                    usbids.insert(id, name);
+                    usbids.insertMulti(id, name);
                     qDebug() << "[System] USB:" << QString("0x%1").arg(id, 8, 16) << name;
                 }
                 u = u->next;
@@ -403,7 +403,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
         }
 
         if(id) {
-            usbids.insert(id, name);
+            usbids.insertMulti(id, name);
             qDebug() << "[System] USB:" << QString("0x%1").arg(id, 8, 16) << name;
         }
 
