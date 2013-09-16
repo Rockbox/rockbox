@@ -741,9 +741,14 @@ void Config::autodetect()
         msg += tr("Detected devices:");
         msg += "<ul>";
         for(int i = 0; i < detected.size(); ++i) {
-            msg += QString("<li>%1</li>").arg(
+            QString mp = detected.at(i).mountpoint;
+            if(mp.isEmpty()) {
+                mp = tr("(unknown)");
+            }
+            msg += QString("<li>%1 at %2</li>").arg(
                         SystemInfo::platformValue(detected.at(i).device,
-                                      SystemInfo::CurPlatformName).toString());
+                                      SystemInfo::CurPlatformName).toString(),
+                        QDir::toNativeSeparators(mp));
         }
         msg += "</ul>";
         msg += tr("Note: detecting connected devices might be ambiguous. "
