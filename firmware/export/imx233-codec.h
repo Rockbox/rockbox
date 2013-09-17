@@ -29,7 +29,7 @@
 
 /* minimum is -57.5dB and max is 6dB in DAC mode
  * and -51.5dB / 12dB in Line1 mode */
-AUDIOHW_SETTING(VOLUME,     "dB", 0, 1, -58,  12,  -25)
+AUDIOHW_SETTING(VOLUME,     "dB", 0, 1, -100,  12,  -25)
 /* HAVE_SW_TONE_CONTROLS */
 #ifdef HAVE_RECORDING
 /* Depending on the input, we have three available volumes to tweak:
