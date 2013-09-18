@@ -158,6 +158,11 @@ bool imx233_us_elapsed(uint32_t ref, unsigned us_delay)
 
 void imx233_reset_block(volatile uint32_t *block_reg)
 {
+    /* deassert reset and clock gate */
+    __REG_CLR(*block_reg) = __BLOCK_SFTRST;
+    while(*block_reg & __BLOCK_SFTRST);
+    __REG_CLR(*block_reg) = __BLOCK_CLKGATE;
+    while(*block_reg & __BLOCK_CLKGATE);
     /* soft-reset */
     __REG_SET(*block_reg) = __BLOCK_SFTRST;
     /* make sure block is gated off */
