@@ -35,6 +35,7 @@ RegTab::RegTab(Backend *backend, QTabWidget *parent)
     m_splitter = new QSplitter();
     QWidget *left = new QWidget;
     m_splitter->addWidget(left);
+    m_splitter->setStretchFactor(0, 1);
     QVBoxLayout *left_layout = new QVBoxLayout;
     left->setLayout(left_layout);
 
@@ -85,6 +86,7 @@ RegTab::RegTab(Backend *backend, QTabWidget *parent)
     QWidget *w = new QWidget;
     w->setLayout(m_right_panel);
     m_splitter->addWidget(w);
+    m_splitter->setStretchFactor(1, 2);
 
     m_io_backend = m_backend->CreateDummyIoBackend();
 

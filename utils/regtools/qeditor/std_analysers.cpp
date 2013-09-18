@@ -741,13 +741,14 @@ void PinAnalyser::FillList()
     for(int bank = 0; bank < 4; bank++)
     {
         QTableWidget *table = new QTableWidget;
-        table->setColumnCount(6);
+        table->setColumnCount(7);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("Pin"));
         table->setHorizontalHeaderItem(1, new QTableWidgetItem("Function"));
-        table->setHorizontalHeaderItem(2, new QTableWidgetItem("Drive"));
-        table->setHorizontalHeaderItem(3, new QTableWidgetItem("Voltage"));
-        table->setHorizontalHeaderItem(4, new QTableWidgetItem("Value"));
+        table->setHorizontalHeaderItem(2, new QTableWidgetItem("Direction"));
+        table->setHorizontalHeaderItem(3, new QTableWidgetItem("Drive"));
+        table->setHorizontalHeaderItem(4, new QTableWidgetItem("Voltage"));
         table->setHorizontalHeaderItem(5, new QTableWidgetItem("Pull"));
+        table->setHorizontalHeaderItem(6, new QTableWidgetItem("Value"));
         table->verticalHeader()->setVisible(false);
         table->horizontalHeader()->setStretchLastSection(true);
         m_panel->addItem(table, QString("Bank %1").arg(bank));
@@ -792,24 +793,27 @@ void PinAnalyser::FillList()
             table->setItem(row, 1, new QTableWidgetItem(QString(map[bank].pins[pin].function[fn].name)));
             table->item(row, 1)->setBackground(QBrush(color_map[map[bank].pins[pin].function[fn].group]));
             table->item(row, 1)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* direction */
+            table->setItem(row, 2, new QTableWidgetItem(fn != 3 ? "" : (oe & (1 << pin)) ? "Output" : "Input"));
+            table->item(row, 2)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
             /* drive */
             int drv = (drive[pin / 8] >> ((pin % 8) * 4)) & 3;
             const char *strength[4] = {"4 mA", "8 mA", "12 mA", "16 mA"};
-            table->setItem(row, 2, new QTableWidgetItem(QString(strength[drv])));
-            table->item(row, 2)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            table->setItem(row, 3, new QTableWidgetItem(QString(strength[drv])));
+            table->item(row, 3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
             /* voltage */
             int volt = (drive[pin / 8] >> (((pin % 8) * 4) + 2)) & 1;
             if(m_io_backend->GetSocName() == "imx233")
                 volt = 1; /* cannot change voltage on imx233 */
             const char *voltage[2] = {"1.8 V", "3.3 V"};
-            table->setItem(row, 3, new QTableWidgetItem(QString(voltage[volt])));
-            table->item(row, 3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-            /* value */
-            table->setItem(row, 4, new QTableWidgetItem(QString("%1").arg((in >> pin) & 1)));
+            table->setItem(row, 4, new QTableWidgetItem(QString(voltage[volt])));
             table->item(row, 4)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
             /* pull */
             table->setItem(row, 5, new QTableWidgetItem(QString("%1").arg((pull >> pin) & 1)));
             table->item(row, 5)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* input */
+            table->setItem(row, 6, new QTableWidgetItem(QString("%1").arg((in >> pin) & 1)));
+            table->item(row, 6)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         }
     }
 }
