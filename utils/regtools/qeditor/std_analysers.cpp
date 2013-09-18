@@ -741,12 +741,35 @@ void PinAnalyser::FillList()
     for(int bank = 0; bank < 4; bank++)
     {
         QTableWidget *table = new QTableWidget;
-        table->setColumnCount(2);
+        table->setColumnCount(6);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("Pin"));
         table->setHorizontalHeaderItem(1, new QTableWidgetItem("Function"));
+        table->setHorizontalHeaderItem(2, new QTableWidgetItem("Drive"));
+        table->setHorizontalHeaderItem(3, new QTableWidgetItem("Voltage"));
+        table->setHorizontalHeaderItem(4, new QTableWidgetItem("Value"));
+        table->setHorizontalHeaderItem(5, new QTableWidgetItem("Pull"));
         table->verticalHeader()->setVisible(false);
         table->horizontalHeader()->setStretchLastSection(true);
         m_panel->addItem(table, QString("Bank %1").arg(bank));
+        uint32_t muxsel[2], drive[4], pull, in, out, oe;
+        bool error = false;
+        for(int i = 0; i < 2; i++)
+            if(!helper.ReadRegister("PINCTRL", QString("MUXSEL%1").arg(bank * 2 + i), muxsel[i]))
+                error = true;
+        /* don't make an error for those since some do not exist */
+        for(int i = 0; i < 4; i++)
+            if(!helper.ReadRegister("PINCTRL", QString("DRIVE%1").arg(bank * 4 + i), drive[i]))
+                drive[i] = 0;
+        if(error)
+            continue;
+        if(!helper.ReadRegister("PINCTRL", QString("PULL%1").arg(bank), pull))
+            pull = 0;
+        if(!helper.ReadRegister("PINCTRL", QString("DIN%1").arg(bank), in))
+            in = 0;
+        if(!helper.ReadRegister("PINCTRL", QString("DOUT%1").arg(bank), out))
+            out = 0;
+        if(!helper.ReadRegister("PINCTRL", QString("DOE%1").arg(bank), oe))
+            oe = 0;
 
         for(int pin = 0; pin < 32; pin++)
         {
@@ -760,22 +783,33 @@ void PinAnalyser::FillList()
             /* add line */
             int row = table->rowCount();
             table->setRowCount(row + 1);
-            /* pin name */
+            /* name */
             table->setItem(row, 0, new QTableWidgetItem(QString("B%1P%2")
                 .arg(bank).arg(pin, 2, 10, QChar('0'))));
             table->item(row, 0)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-            /* pin function */
-            int fn = -1;
-            if(helper.ReadRegister("PINCTRL", QString("MUXSEL%1").arg(bank * 2 + pin / 16), value))
-                fn = (value >> ((pin % 16) * 2)) & 3;
-            if(fn != -1)
-            {
-                table->setItem(row, 1, new QTableWidgetItem(QString(map[bank].pins[pin].function[fn].name)));
-                table->item(row, 1)->setBackground(QBrush(color_map[map[bank].pins[pin].function[fn].group]));
-            }
-            else
-                table->setItem(row, 1, new QTableWidgetItem(QString("<read error>")));
+            /* function */
+            int fn = (muxsel[pin / 16] >> ((pin % 16) * 2)) & 3;
+            table->setItem(row, 1, new QTableWidgetItem(QString(map[bank].pins[pin].function[fn].name)));
+            table->item(row, 1)->setBackground(QBrush(color_map[map[bank].pins[pin].function[fn].group]));
             table->item(row, 1)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* drive */
+            int drv = (drive[pin / 8] >> ((pin % 8) * 4)) & 3;
+            const char *strength[4] = {"4 mA", "8 mA", "12 mA", "16 mA"};
+            table->setItem(row, 2, new QTableWidgetItem(QString(strength[drv])));
+            table->item(row, 2)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* voltage */
+            int volt = (drive[pin / 8] >> (((pin % 8) * 4) + 2)) & 1;
+            if(m_io_backend->GetSocName() == "imx233")
+                volt = 1; /* cannot change voltage on imx233 */
+            const char *voltage[2] = {"1.8 V", "3.3 V"};
+            table->setItem(row, 3, new QTableWidgetItem(QString(voltage[volt])));
+            table->item(row, 3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* value */
+            table->setItem(row, 4, new QTableWidgetItem(QString("%1").arg((in >> pin) & 1)));
+            table->item(row, 4)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* pull */
+            table->setItem(row, 5, new QTableWidgetItem(QString("%1").arg((pull >> pin) & 1)));
+            table->item(row, 5)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         }
     }
 }
