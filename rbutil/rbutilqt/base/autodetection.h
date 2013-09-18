@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QStringList>
 
 class Autodetection :public QObject
 {
@@ -39,29 +40,29 @@ public:
         PlayerMtpMode,
         PlayerWrongFilesystem,
         PlayerError,
+        PlayerAmbiguous,
     };
 
     struct Detected {
         QString device;
+        QStringList usbdevices;
         QString mountpoint;
         enum PlayerStatus status;
     };
 
     bool detect();
 
-    QList<struct Detected> detected(void);
+    QList<struct Detected> detected(void) { return m_detected; }
 
 private:
     QString resolveMountPoint(QString);
-    bool detectUsb(void);
-    bool detectAjbrec(QString);
+    void detectUsb(void);
+    void mergeMounted(void);
+    void mergePatcher(void);
+    QString detectAjbrec(QString);
+    int findDetectedDevice(QString device);
 
     QList<struct Detected> m_detected;
-    QString m_device;
-    QString m_mountpoint;
-    QString m_errdev;
-    QString m_usberr;
-    QString m_incompat;
     QList<int> m_usbconid;
 };
 
