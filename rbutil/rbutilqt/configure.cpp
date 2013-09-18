@@ -765,7 +765,8 @@ void Config::autodetect()
                    QMessageBox::Ok ,QMessageBox::Ok);
         ui.treeDevices->setEnabled(true);
     }
-    else if(detected.at(0).status != Autodetection::PlayerOk) {
+    else if(detected.at(0).status != Autodetection::PlayerOk
+            && detected.at(0).status != Autodetection::PlayerAmbiguous) {
         QString msg;
         switch(detected.at(0).status) {
             case Autodetection::PlayerIncompatible:
@@ -796,9 +797,8 @@ void Config::autodetect()
                 }
                 break;
             case Autodetection::PlayerError:
-                msg += tr("An unknown error occured during player detection.");
-                break;
             default:
+                msg += tr("An unknown error occured during player detection.");
                 break;
         }
         QMessageBox::information(this, tr("Device Detection"), msg);
