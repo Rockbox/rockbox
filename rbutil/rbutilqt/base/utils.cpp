@@ -573,7 +573,7 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
     QStringList supported;
     QStringList tempList;
 #if defined(Q_OS_WIN32)
-    supported << "FAT32" << "FAT16" << "FAT12" << "HFS";
+    supported << "FAT32" << "FAT16" << "FAT12" << "FAT" << "HFS";
     QFileInfoList list = QDir::drives();
     for(int i=0; i<list.size();i++)
     {
