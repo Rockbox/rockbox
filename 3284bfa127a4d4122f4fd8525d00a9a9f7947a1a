@@ -16,6 +16,24 @@
       "revId": "3284bfa127a4d4122f4fd8525d00a9a9f7947a1a",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///xk\u003d",
+        "filename": "firmware/export/imx233-codec.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-09-18T11:40:07Z",
+      "side": 1,
+      "message": "I fact it would be better to simply drop the comment above, since it is redundant with the comment at the top of the file.",
+      "parentUuid": "AAAAaX///xs\u003d",
+      "revId": "3284bfa127a4d4122f4fd8525d00a9a9f7947a1a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
