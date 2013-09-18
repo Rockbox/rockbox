@@ -2,7 +2,7 @@
 ROMFILE=player.rom
 
 ifndef VERSION
-VERSION=$(shell ../../tools/version.sh)
+VERSION=$(shell ../../tools/version.sh ../../)
 endif
 
 CFLAGS=-Wall -W -I/usr/local/include -DVERSION=\"$(VERSION)\"
