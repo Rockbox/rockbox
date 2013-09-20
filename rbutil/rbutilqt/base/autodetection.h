@@ -61,6 +61,7 @@ private:
     void mergePatcher(void);
     QString detectAjbrec(QString);
     int findDetectedDevice(QString device);
+    void updateDetectedDevice(struct Detected& entry);
 
     QList<struct Detected> m_detected;
     QList<int> m_usbconid;

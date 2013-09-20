@@ -138,18 +138,11 @@ void Autodetection::mergeMounted(void)
                 QSettings log(mounts.at(i) + "/.rockbox/rbutil.log",
                               QSettings::IniFormat, this);
                 if(!log.value("platform").toString().isEmpty()) {
-                    int index = findDetectedDevice(log.value("platform").toString());
                     struct Detected d;
                     d.device = log.value("platform").toString();
                     d.mountpoint = mounts.at(i);
                     d.status = PlayerOk;
-                    if(index < 0) {
-                        m_detected.append(d);
-                    }
-                    else {
-                        m_detected.takeAt(index);
-                        m_detected.append(d);
-                    }
+                    updateDetectedDevice(d);
                     qDebug() << "[Autodetect] rbutil.log detected:"
                              << log.value("platform").toString() << mounts.at(i);
                 }
@@ -159,18 +152,11 @@ void Autodetection::mergeMounted(void)
             RockboxInfo info(mounts.at(i));
             if(info.success())
             {
-                int index = findDetectedDevice(info.target());
                 struct Detected d;
                 d.device = info.target();
                 d.mountpoint = mounts.at(i);
                 d.status = PlayerOk;
-                if(index < 0) {
-                    m_detected.append(d);
-                }
-                else {
-                    m_detected.takeAt(index);
-                    m_detected.append(d);
-                }
+                updateDetectedDevice(d);
                 qDebug() << "[Autodetect] rockbox-info.txt detected:"
                          << info.target() << mounts.at(i);
             }
@@ -185,7 +171,7 @@ void Autodetection::mergeMounted(void)
                 d.device = "player";
                 d.mountpoint = mounts.at(i);
                 d.status = PlayerOk;
-                m_detected.append(d);
+                updateDetectedDevice(d);
             }
             if(rootentries.contains("ONDIOST.BIN", Qt::CaseInsensitive))
             {
@@ -194,14 +180,7 @@ void Autodetection::mergeMounted(void)
                 d.device = "ondiofm";
                 d.mountpoint = mounts.at(i);
                 d.status = PlayerOk;
-                int index = findDetectedDevice("ondiofm");
-                if(index < 0) {
-                    m_detected.append(d);
-                }
-                else {
-                    m_detected.takeAt(index);
-                    m_detected.append(d);
-                }
+                updateDetectedDevice(d);
             }
             if(rootentries.contains("ONDIOSP.BIN", Qt::CaseInsensitive))
             {
@@ -210,14 +189,7 @@ void Autodetection::mergeMounted(void)
                 d.device = "ondiosp";
                 d.mountpoint = mounts.at(i);
                 d.status = PlayerOk;
-                int index = findDetectedDevice("ondiosp");
-                if(index < 0) {
-                    m_detected.append(d);
-                }
-                else {
-                    m_detected.takeAt(index);
-                    m_detected.append(d);
-                }
+                updateDetectedDevice(d);
             }
             if(rootentries.contains("ajbrec.ajz", Qt::CaseInsensitive))
             {
@@ -228,14 +200,7 @@ void Autodetection::mergeMounted(void)
                 d.status = PlayerOk;
                 if(!d.device.isEmpty()) {
                     qDebug() << "[Autodetect]" << d.device;
-                    int index = findDetectedDevice("ondiosp");
-                    if(index < 0) {
-                        m_detected.append(d);
-                    }
-                    else {
-                        m_detected.takeAt(index);
-                        m_detected.append(d);
-                    }
+                    updateDetectedDevice(d);
                 }
             }
             // detection based on player specific folders
@@ -247,14 +212,7 @@ void Autodetection::mergeMounted(void)
                 struct Detected d;
                 d.device = "gigabeatf";
                 d.mountpoint = mounts.at(i);
-                int index = findDetectedDevice("ondiosp");
-                if(index < 0) {
-                    m_detected.append(d);
-                }
-                else {
-                    m_detected.takeAt(index);
-                    m_detected.append(d);
-                }
+                updateDetectedDevice(d);
             }
         }
     }
@@ -315,14 +273,7 @@ void Autodetection::mergePatcher(void)
             d.status = PlayerWrongFilesystem;
         else
             d.status = PlayerOk;
-        int index = findDetectedDevice(ipod.targetname);
-        if(index < 0) {
-            m_detected.append(d);
-        }
-        else {
-            m_detected.takeAt(index);
-            m_detected.append(d);
-        }
+        updateDetectedDevice(d);
     }
     else {
         qDebug() << "[Autodetect] ipodpatcher: no Ipod found." << n;
@@ -348,14 +299,7 @@ void Autodetection::mergePatcher(void)
         d.device = QString("sansa%1").arg(sansa.targetname);
         d.mountpoint = Utils::resolveMountPoint(mp);
         d.status = PlayerOk;
-        int index = findDetectedDevice(d.device);
-        if(index < 0) {
-            m_detected.append(d);
-        }
-        else {
-            m_detected.takeAt(index);
-            m_detected.append(d);
-        }
+        updateDetectedDevice(d);
     }
     else {
         qDebug() << "[Autodetect] sansapatcher: no Sansa found." << n;
@@ -422,4 +366,17 @@ int Autodetection::findDetectedDevice(QString device)
             return i;
     }
     return -1;
+}
+
+
+void Autodetection::updateDetectedDevice(Detected& entry)
+{
+    int index = findDetectedDevice(entry.device);
+    if(index < 0) {
+        m_detected.append(entry);
+    }
+    else {
+        m_detected.takeAt(index);
+        m_detected.append(entry);
+    }
 }
