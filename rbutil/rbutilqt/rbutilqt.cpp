@@ -42,6 +42,7 @@
 #include "infowidget.h"
 #include "selectiveinstallwidget.h"
 #include "backupdialog.h"
+#include "changelog.h"
 
 #include "progressloggerinterface.h"
 
@@ -166,6 +167,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.actionUninstall_Rockbox, SIGNAL(triggered()), this, SLOT(uninstall()));
     connect(ui.action_System_Info, SIGNAL(triggered()), this, SLOT(sysinfo()));
     connect(ui.action_Trace, SIGNAL(triggered()), this, SLOT(trace()));
+    connect(ui.actionShow_Changelog, SIGNAL(triggered()), this, SLOT(changelog()));
 
 #if !defined(STATIC)
     ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
@@ -203,6 +205,14 @@ void RbUtilQt::sysinfo(void)
     Sysinfo sysinfo(this);
     sysinfo.exec();
 }
+
+void RbUtilQt::changelog(void)
+{
+
+    Changelog cl(this);
+    cl.exec();
+}
+
 
 void RbUtilQt::updateTabs(int count)
 {
@@ -317,6 +327,10 @@ void RbUtilQt::updateSettings()
     HttpGet::setGlobalCache(c.isEmpty() ? QDir::tempPath() : c);
     HttpGet::setGlobalProxy(proxy());
 
+    if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION
+            || RbSettings::value(RbSettings::ShowChangelog).toBool()) {
+        changelog();
+    }
     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
         QApplication::processEvents();
         QMessageBox::information(this, tr("New installation"),

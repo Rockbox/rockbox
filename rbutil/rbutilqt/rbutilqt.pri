@@ -79,6 +79,7 @@ SOURCES += \
  gui/comboboxviewdelegate.cpp \
  gui/selectiveinstallwidget.cpp \
  gui/backupdialog.cpp \
+ gui/changelog.cpp
 
 
 HEADERS += \
@@ -156,6 +157,7 @@ HEADERS += \
  gui/comboboxviewdelegate.h \
  gui/selectiveinstallwidget.h \
  gui/backupdialog.h \
+ gui/changelog.h
 
 
 FORMS += \
@@ -174,6 +176,7 @@ FORMS += \
  systracefrm.ui \
  gui/selectiveinstallwidgetfrm.ui \
  gui/backupdialogfrm.ui \
+ gui/changelogfrm.ui
 
 
 TRANSLATIONS += \

@@ -1,0 +1,17 @@
+# Rockbox Utility changelog.
+# This file is parsed by Rockbox Utility. Format:
+# - Lines starting with # are comments and ignored.
+# - A version starts with the string "Version" followed by the number.
+# - After the version individual entries follow. Those start with a *.
+# - After the entries an empty line has to follow.
+# - After that the next version can start.
+
+Version 1.4
+* Rework player detection functionality to provide better results.
+* Limit mountpoints ("Select your device in the filesystem") in configuration dialog to usable ones.
+* Change encoder volume configuration to allow more sensible values.
+* Save proxy password differently in configuration file (better solution for FS#12166).
+* Add support for building Rockbox Utility with Qt5.
+* Add Changelog window.
+
+

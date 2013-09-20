@@ -31,6 +31,7 @@ const static struct {
     const char* def;
 } UserSettingsList[] = {
     { RbSettings::RbutilVersion,        "rbutil_version",       "" },
+    { RbSettings::ShowChangelog,        "show_changelog",       "false" },
     { RbSettings::CurrentPlatform,      "platform",             "" },
     { RbSettings::Mountpoint,           "mountpoint",           "" },
     { RbSettings::CachePath,            "cachepath",            "" },

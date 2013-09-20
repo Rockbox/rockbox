@@ -78,6 +78,7 @@ class RbUtilQt : public QMainWindow
         void about(void);
         void help(void);
         void sysinfo(void);
+        void changelog(void);
         void trace(void);
         void eject(void);
         void configDialog(void);

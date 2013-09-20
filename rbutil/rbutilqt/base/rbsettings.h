@@ -31,6 +31,7 @@ class RbSettings : public QObject
         //! All user settings
         enum UserSettings {
             RbutilVersion,
+            ShowChangelog,
             CurrentPlatform,
             Mountpoint,
             CachePath,
