@@ -212,7 +212,9 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     else if(BF_RD(I2C_CTRL1, NO_SLAVE_ACK_IRQ))
     {
         /* the core doesn't like this error, this is a workaround to prevent lock up */
+#if IMX233_SUBTARGET >= 3780
         BF_SET(I2C_CTRL1, CLR_GOT_A_NAK);
+#endif
         imx233_dma_reset_channel(APB_I2C);
         imx233_i2c_reset();
         ret = I2C_NO_SLAVE_ACK;
