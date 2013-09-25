@@ -21,9 +21,20 @@
 #include "button-lradc-imx233.h"
 #include "stdlib.h"
 #include "lradc-imx233.h"
+#include "pinctrl-imx233.h"
 
 #ifndef IMX233_BUTTON_LRADC_CHANNEL
-#error You must define IMX233_BUTTON_LRADC_CHANNEL to use button-lradc
+# error You must define IMX233_BUTTON_LRADC_CHANNEL to use button-lradc
+#endif
+
+#if defined(HAS_BUTTON_HOLD) && !defined(IMX233_BUTTON_LRADC_HOLD_DET)
+# error You must defined IMX233_BUTTON_LRADC_HOLD_DET if you use hold
+#endif
+
+#if defined(IMX233_BUTTON_LRADC_HOLD_DET) && \
+    IMX233_BUTTON_LRADC_HOLD_DET == BLH_GPIO && \
+    (!defined(BLH_GPIO_BANK) || !defined(BLH_GPIO_PIN))
+# error You must define BLH_GPIO_BANK and BLH_GPIO_PIN when detecting hold using GPIO
 #endif
 
 /* physical channel */
@@ -49,6 +60,7 @@ static int button_val[2];
 static int button_idx;
 static int button_mask;
 static int table_size;
+static int raw_val;
 
 static int button_find(int val)
 {
@@ -77,13 +89,13 @@ static void button_lradc_irq(int chan)
 {
     (void) chan;
     /* read value, kick channel */
-    button_val[button_idx] = imx233_lradc_read_channel(button_chan) / SAMPLES;
+    raw_val = imx233_lradc_read_channel(button_chan) / SAMPLES;
     imx233_lradc_clear_channel(button_chan);
     imx233_lradc_setup_channel(button_chan, true, true, SAMPLES - 1, LRADC_SRC(CHAN));
     imx233_lradc_setup_delay(button_delay, 1 << button_chan, 0, SAMPLES - 1, DELAY);
     imx233_lradc_kick_delay(button_delay);
     /* compute mask, compare to previous one */
-    button_val[button_idx] = button_find(button_val[button_idx]);
+    button_val[button_idx] = button_find(raw_val);
     button_idx = 1 - button_idx;
     if(button_val[0] == button_val[1])
         button_mask = button_val[0];
@@ -106,14 +118,45 @@ void imx233_button_lradc_init(void)
     imx233_lradc_enable_channel_irq(button_chan, true);
     imx233_lradc_set_channel_irq_callback(button_chan, button_lradc_irq);
     imx233_lradc_kick_delay(button_delay);
+#if defined(HAS_BUTTON_HOLD) && IMX233_BUTTON_LRADC_HOLD_DET == BLH_GPIO
+    imx233_pinctrl_acquire(BLH_GPIO_BANK, BLH_GPIO_PIN, "button_lradc_hold");
+    imx233_pinctrl_set_function(BLH_GPIO_BANK, BLH_GPIO_PIN, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(BLH_GPIO_BANK, BLH_GPIO_PIN, false);
+# ifdef BLH_GPIO_PULLUP
+    imx233_pinctrl_enable_pullup(BLH_GPIO_BANK, BLH_GPIO_PIN, true);
+# endif
+#endif
 }
 
+#if defined(HAS_BUTTON_HOLD) && IMX233_BUTTON_LRADC_HOLD_DET == BLH_ADC
 bool imx233_button_lradc_hold(void)
 {
     return button_mask == IMX233_BUTTON_LRADC_HOLD;
 }
+#endif
 
-int imx233_button_lradc_read(void)
+
+#if defined(HAS_BUTTON_HOLD) && IMX233_BUTTON_LRADC_HOLD_DET == BLH_GPIO
+bool imx233_button_lradc_hold(void)
 {
-    return button_mask == IMX233_BUTTON_LRADC_HOLD ? 0 : button_mask;
+    bool res = imx233_pinctrl_get_gpio(BLH_GPIO_BANK, BLH_GPIO_PIN);
+#ifdef BLH_GPIO_INVERTED
+    res = !res;
+#endif
+    return res;
+}
+#endif
+
+int imx233_button_lradc_read(int others)
+{
+#ifdef HAS_BUTTON_HOLD
+    return imx233_button_lradc_hold() ? 0 : button_mask | others;
+#else
+    return button_mask | others;
+#endif
+}
+
+int imx233_button_lradc_read_raw(void)
+{
+    return raw_val;
 }

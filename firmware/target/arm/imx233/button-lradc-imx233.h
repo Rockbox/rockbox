@@ -29,10 +29,27 @@
  * and variables:
  * - imx233_button_lradc_mapping: target-defined table of adc values and mapping
  * - IMX233_BUTTON_LRADC_CHANNEL: lradc channel to use
+ * - IMX233_BUTTON_LRADC_HOLD_DET: define hold detection method (ignored if !HAS_BUTTON_HOLD)
+ *
+ * The available values of IMX233_BUTTON_LRADC_HOLD are:
+ * - BLH_ADC: detect hold using adc
+ * - BLH_EXT: target button driver implements imx233_button_lradc_hold() using
+ *   any external method of its choice
+ * - BLH_GPIO: detect hold using a GPIO, needs to define additional defines:
+ *   + BLH_GPIO_BANK: pin bank
+ *   + BLH_GPIO_PIN: pin in bank
+ *   + BLH_GPIO_INVERTED: define if inverted, default is active high
+ *   + BLH_GPIO_PULLUP: define if pins needs pullup
  */
 
-/* special value for btn to handle HOLD */
+/* hold detect method */
+#define BLH_ADC     0
+#define BLH_EXT     1
+#define BLH_GPIO    2
+
+/* special value for btn to indicate end of list */
 #define IMX233_BUTTON_LRADC_END     -1
+/* special value for btn to handle HOLD */
 #define IMX233_BUTTON_LRADC_HOLD    -2
 
 struct imx233_button_lradc_mapping_t
@@ -50,7 +67,12 @@ struct imx233_button_lradc_mapping_t
 extern struct imx233_button_lradc_mapping_t imx233_button_lradc_mapping[];
 
 void imx233_button_lradc_init(void);
-int imx233_button_lradc_read(void);
+/* others gives the bitmask of other buttons: the function will OR the result
+ * with them except if hold is detected in which case 0 is always returned */
+int imx233_button_lradc_read(int others);
+#ifdef HAS_BUTTON_HOLD
 bool imx233_button_lradc_hold(void);
+#endif
+int imx233_button_lradc_read_raw(void); // return raw adc value
 
 #endif /* __button_lradc_imx233__ */
