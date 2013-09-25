@@ -199,7 +199,9 @@ lineout_poweroff
 touchscreen
 #endif
 
-
+#if defined(HAVE_IMX233_CODEC) || defined(HAVE_WM8750) || defined(HAVE_WM8978)
+depth_3d
+#endif
 
 
 /* These features are only used by the manual so they won't break binary
