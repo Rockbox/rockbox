@@ -215,7 +215,7 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
         BF_SET(I2C_CTRL1, CLR_GOT_A_NAK);
         imx233_dma_reset_channel(APB_I2C);
         imx233_i2c_reset();
-        ret= I2C_NO_SLAVE_ACK;
+        ret = I2C_NO_SLAVE_ACK;
     }
     else if(BF_RD(I2C_CTRL1, EARLY_TERM_IRQ))
         ret = I2C_SLAVE_NAK;
