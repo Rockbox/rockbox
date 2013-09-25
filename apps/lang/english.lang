@@ -11911,6 +11911,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Attack Time"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Attack Time"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_COMPRESSOR_RELEASE
   desc: in sound settings
   user: core

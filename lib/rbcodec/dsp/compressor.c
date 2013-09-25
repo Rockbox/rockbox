@@ -24,20 +24,95 @@
 #include <string.h>
 
 /* Define LOGF_ENABLE to enable logf output in this file */
-/*#define LOGF_ENABLE*/
+/* #define LOGF_ENABLE */
 #include "logf.h"
 #include "dsp_proc_entry.h"
 #include "compressor.h"
 #include "dsp_misc.h"
 
+#define UNITY (1L << 24)                    /* unity gain in S7.24 format */
+#define MAX_DLY 960                         /* Max number of samples to delay
+                                               output (960 = 5ms @ 192 kHz) */
+#define MAX_CH  4                           /* Is there a good malloc() or equal
+                                               for rockbox?*/
+#define DLY_TIME 3                          /* milliseconds */
+
 static struct compressor_settings curr_set; /* Cached settings */
 
-static int32_t comp_rel_slope IBSS_ATTR;   /* S7.24 format */
-static int32_t comp_makeup_gain IBSS_ATTR; /* S7.24 format */
-static int32_t comp_curve[66] IBSS_ATTR;   /* S7.24 format */
-static int32_t release_gain IBSS_ATTR;     /* S7.24 format */
+static int32_t comp_makeup_gain IBSS_ATTR;  /* S7.24 format */
+static int32_t comp_curve[66] IBSS_ATTR;    /* S7.24 format */
+static int32_t release_gain IBSS_ATTR;      /* S7.24 format */
+static int32_t release_holdoff IBSS_ATTR;   /* S7.24 format */
 
-#define UNITY (1L << 24)                   /* unity gain in S7.24 format */
+/* 1-pole filter coefficients for exponential attack/release times */
+static int32_t rlsca IBSS_ATTR;             /* Release 'alpha' */
+static int32_t rlscb IBSS_ATTR;             /* Release 'beta' */
+
+static int32_t attca IBSS_ATTR;             /* Attack 'alpha' */
+static int32_t attcb IBSS_ATTR;             /* Attack 'beta'  */
+
+static int32_t limitca IBSS_ATTR;             /* Limiter Attack 'alpha' */
+
+/* 1-pole filter coefficients for sidechain pre-emphasis filters */
+static int32_t hp1ca IBSS_ATTR;             /* hpf1 'alpha' */
+static int32_t hp2ca IBSS_ATTR;             /* hpf2 'beta'  */
+
+/* 1-pole hp filter state variables for pre-emphasis filters */
+static int32_t hpfx1 IBSS_ATTR;             /* hpf1 and hpf2 x[n-1] */
+static int32_t hp1y1 IBSS_ATTR;             /* hpf2 y[n-1]  */
+static int32_t hp2y1 IBSS_ATTR;             /* hpf2 y[n-1]  */
+
+/* Delay Line for look-ahead compression */
+static int32_t labuf[MAX_CH][MAX_DLY];      /* look-ahead buffer */
+static int32_t  delay_time;
+static int32_t  delay_write;
+static int32_t  delay_read;
+
+/** 1-Pole LP Filter first coefficient computation
+ *  Returns S7.24 format integer used for "a" coefficient
+ *  rc: "RC Time Constant", or time to decay to 1/e
+ *  fs: Sampling Rate
+ *  Interpret attack and release time as an RC time constant
+ *    (time to decay to 1/e)
+ *  1-pole filters use approximation
+ *      a0 = 1/(fs*rc + 1)
+ *      b1 = 1.0 - a0
+ *      fs = Sampling Rate
+ *      rc = Time to decay to 1/e
+ *  y[n] = a0*x[n] + b1*y[n-1]
+ *
+ *  According to simulation on Intel hardware
+ *  this algorithm produces < 2% error for rc < ~100ms
+ *  For rc 100ms - 1000ms, error approaches 0%
+ *  For compressor attack/release times, this is more than adequate.
+ *
+ *  Error was measured against the more rigorous computation:
+ *  a0 = 1.0 - e^(-1.0/(fs*rc))
+ */
+ 
+int32_t get_lpf_coeff(int32_t rc, int32_t fs, int32_t rc_units)
+{
+    int32_t c = fs*rc;
+    c /= rc_units;
+    c += 1;
+    c = UNITY/c;
+    return c;
+}
+
+/**  Coefficients to get 10dB change per time period "rc"
+*    from 1-pole LP filter topology
+*    This function is better used to match behavior of
+*    linear release which was implemented prior to implementation
+*    of exponential attack/release function
+*/
+
+int32_t get_att_rls_coeff(int32_t rc, int32_t fs)
+{
+    int32_t c = UNITY/fs;
+    c *= 1152;              /* 1000 * 10/( 20*log10( 1/e ) ) */
+    c /= rc;
+    return c;
+}
 
 /** COMPRESSOR UPDATE
  *  Called via the menu system to configure the compressor process */
@@ -45,13 +120,43 @@ static bool compressor_update(struct dsp_config *dsp,
                               const struct compressor_settings *settings)
 {
     /* make settings values useful */
-    int  threshold  = settings->threshold;
-    bool auto_gain  = settings->makeup_gain == 1;
+    int  threshold   = settings->threshold;
+    bool auto_gain   = settings->makeup_gain == 1;
     static const int comp_ratios[] = { 2, 4, 6, 10, 0 };
-    int  ratio      = comp_ratios[settings->ratio];
-    bool soft_knee  = settings->knee == 1;
-    int  release    = settings->release_time *
-                            dsp_get_output_frequency(dsp) / 1000;
+    int  ratio       = comp_ratios[settings->ratio];
+    bool soft_knee   = settings->knee == 1;
+    int32_t  release = settings->release_time;
+    int32_t  attack  = settings->attack_time;
+
+    /* Compute Attack and Release Coefficients */
+    int32_t fs =   dsp_get_output_frequency(dsp);
+
+    /* Release */
+    rlsca = get_att_rls_coeff(release, fs);
+    rlscb = UNITY - rlsca ;
+
+    /* Attack */
+    if(attack > 0)
+    {
+        attca = get_att_rls_coeff(attack, fs);
+        attcb = UNITY - attca ;
+    }
+    else {
+        attca = UNITY;
+        attcb = 0;
+    }
+
+
+    /* Sidechain pre-emphasis filter coefficients */
+    hp1ca = fs + 0x003C1; /* The "magic" constant is 1/RC.  This filter
+                               cut-off is approximately 237 Hz */
+    hp1ca = UNITY/hp1ca;
+    hp1ca *= fs;
+
+    hp2ca = fs + 0x02065; /* The "magic" constant is 1/RC.  This filter
+                               cut-off is approximately 2.18 kHz */
+    hp2ca = UNITY/hp2ca;
+    hp2ca *= fs;
 
     bool changed = settings == &curr_set; /* If frequency change */
     bool active  = threshold < 0;
@@ -60,7 +165,7 @@ static bool compressor_update(struct dsp_config *dsp,
     {
         /* Compressor settings have changed since last call */
         changed = true;
-            
+
 #if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
         if (settings->threshold != curr_set.threshold)
         {
@@ -90,6 +195,10 @@ static bool compressor_update(struct dsp_config *dsp,
         if (settings->release_time != cur_set.release_time)
         {
             logf("   Compressor Release: %d", release);
+        }
+        if (settings->attack_time != cur_set.attack_time)
+        {
+            logf("   Compressor Attack: %d", attack);
         }
 #endif
 
@@ -212,6 +321,11 @@ static bool compressor_update(struct dsp_config *dsp,
        clipped signal */
     comp_curve[65] = fp_factor(db_curve[4].offset, 16) << 8;
 
+    /* if using auto peak, then makeup gain is max offset -
+       3dB headroom */
+    comp_makeup_gain = auto_gain ?
+        fp_factor(-(db_curve[3].offset) - 0x4AC4, 16) << 8 : UNITY;
+        
 #if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
     logf("\n   *** Compression Offsets ***");
     /* some settings for display only, not used in calculations */
@@ -233,20 +347,10 @@ static bool compressor_update(struct dsp_config *dsp,
         if (i % 4 == 0) DEBUGF("\n");
     }
     DEBUGF("\n");
+
+    logf("Makeup gain:\t%.6f", (float)comp_makeup_gain / UNITY);
 #endif
 
-    /* if using auto peak, then makeup gain is max offset -
-       .1dB headroom */
-    comp_makeup_gain = auto_gain ?
-        fp_factor(-(db_curve[3].offset) - 0x199A, 16) << 8 : UNITY;
-    logf("Makeup gain:\t%.6f", (float)comp_makeup_gain / UNITY);
-
-    /* calculate per-sample gain change a rate of 10db over release time
-     */
-    comp_rel_slope = 0xAF0BB2 / release;
-    logf("Release slope:\t%.6f", (float)comp_rel_slope / UNITY);
-
-    release_gain = UNITY;
     return active;
 }
 
@@ -258,24 +362,24 @@ static inline int32_t get_compression_gain(struct sample_format *format,
                                            int32_t sample)
 {
     const int frac_bits_offset = format->frac_bits - 15;
-    
+
     /* sample must be positive */
     if (sample < 0)
         sample = -(sample + 1);
-        
+
     /* shift sample into 15 frac bit range */
     if (frac_bits_offset > 0)
         sample >>= frac_bits_offset;
     if (frac_bits_offset < 0)
         sample <<= -frac_bits_offset;
-    
+
     /* normal case: sample isn't clipped */
     if (sample < (1 << 15))
     {
         /* index is 6 MSB, rem is 9 LSB */
         int index = sample >> 9;
         int32_t rem = (sample & 0x1FF) << 22;
-        
+
         /* interpolate from the compression curve:
             higher gain - ((rem / (1 << 31)) * (higher gain - lower gain)) */
         return comp_curve[index] - (FRACMUL(rem,
@@ -290,7 +394,7 @@ static inline int32_t get_compression_gain(struct sample_format *format,
         return comp_curve[64] - (FRACMUL(((sample - (1 << 15)) / 3) << 16,
             (comp_curve[64] - comp_curve[65])));
     }
-    
+
     /* sample is too clipped, return invalid value */
     return -1;
 }
@@ -322,55 +426,113 @@ static void compressor_process(struct dsp_proc_entry *this,
 
     while (count-- > 0)
     {
-        /* use lowest (most compressed) gain factor of the output buffer
-           sample pair for both samples (mono is also handled correctly here)
-         */
+        /* Use the average of the channels */
+
         int32_t sample_gain = UNITY;
+        int32_t x = 0;
+        int32_t tmpx = 0;
+        int32_t in_buf_max_level = 0;
         for (int ch = 0; ch < num_chan; ch++)
         {
-            int32_t this_gain = get_compression_gain(&buf->format, *in_buf[ch]);
-            if (this_gain < sample_gain)
-                sample_gain = this_gain;
+            tmpx = *in_buf[ch];
+            x += tmpx;
+            labuf[ch][delay_write] = tmpx;
+            /* Limiter detection */
+            if(tmpx < 0) tmpx = -(tmpx + 1);
+            if(tmpx > in_buf_max_level) in_buf_max_level = tmpx;
         }
-        
-        /* perform release slope; skip if no compression and no release slope
+
+        /* Divide it by the number of channels, roughly
+           It will be exact if the number of channels a power of 2
+           it will be imperfect otherwise.  Real division costs too
+           much here, and most of the time it will be 2 channels (stereo)
+        */
+        x >>= (num_chan >> 1);
+
+        /* 1p HP Filters: y[n] = a*(y[n-1] + x - x[n-1]) */
+        /* Zero and Pole in the same place to reduce computation */
+        /* Run the first pre-emphasis filter */
+        int32_t tmp1 = x - hpfx1 + hp1y1;
+        hp1y1 = FRACMUL_SHL(hp1ca, tmp1, 7);
+
+        /* Run the second pre-emphasis filter */
+        tmp1 = x - hpfx1 + hp2y1;
+        hp2y1 = FRACMUL_SHL(hp2ca, tmp1, 7);
+        hpfx1 = x;
+
+        /* Apply weighted sum to the pre-emphasis network */
+        sample_gain = (x>>1) + hp1y1 + (hp2y1<<1); /* x/2 + hp1 + 2*hp2  */
+        sample_gain >>= 1;
+        sample_gain += sample_gain >> 1;
+
+        sample_gain = get_compression_gain(&buf->format, sample_gain);
+
+        /* Exponential Attack and Release
          */
-        if ((sample_gain != UNITY) || (release_gain != UNITY))
-        {
-            /* if larger offset than previous slope, start new release slope
-             */
-            if ((sample_gain <= release_gain) && (sample_gain > 0))
-            {
+
+       if ((sample_gain <= release_gain) && (sample_gain > 0))
+       {
+           /* Attack */
+           if(attca != UNITY)
+           {
+               int32_t this_gain = FRACMUL_SHL(release_gain, attcb, 7);
+               this_gain +=  FRACMUL_SHL(sample_gain, attca, 7);
+               release_gain = this_gain;
+           }
+           else
+           {
                 release_gain = sample_gain;
+           }
+
+           release_holdoff = delay_time;   /* reset it to delay time so it
+                                              cannot release before the
+                                              delayed signal releases */
+       }
+       else
+       /* Reverse exponential decay to current gain value */
+       {
+            /* Don't start release while output is still above thresh */
+            if(release_holdoff > 0)
+            {
+                release_holdoff--;
             }
             else
-            /* keep sloping towards unity gain (and ignore invalid value) */
             {
-                release_gain += comp_rel_slope;
-                if (release_gain > UNITY)
-                {
-                    release_gain = UNITY;
-                }
+               /* Release */
+               int32_t this_gain = FRACMUL_SHL(release_gain, rlscb, 7);
+               this_gain +=  FRACMUL_SHL(sample_gain,rlsca,7);
+               release_gain = this_gain;
             }
-        }
-        
+
+       }
+
         /* total gain factor is the product of release gain and makeup gain,
            but avoid computation if possible */
-        int32_t total_gain = ((release_gain == UNITY) ? comp_makeup_gain :
-            (comp_makeup_gain == UNITY) ? release_gain :
-                FRACMUL_SHL(release_gain, comp_makeup_gain, 7));
-        
+
+        int32_t total_gain = FRACMUL_SHL(release_gain, comp_makeup_gain, 7);
+
+        /* Look-ahead limiter */
+        int32_t test_gain = FRACMUL_SHL(total_gain, in_buf_max_level, 3);
+        if( test_gain > UNITY)
+        {
+            release_gain -= limitca;
+        }
+
         /* Implement the compressor: apply total gain factor (if any) to the
            output buffer sample pair/mono sample */
         if (total_gain != UNITY)
         {
             for (int ch = 0; ch < num_chan; ch++)
             {
-                *in_buf[ch] = FRACMUL_SHL(total_gain, *in_buf[ch], 7);
+              *in_buf[ch]  = FRACMUL_SHL(total_gain, labuf[ch][delay_read], 7);
             }
         }
         in_buf[0]++;
         in_buf[1]++;
+        delay_write++;
+        delay_read++;
+        if(delay_write >= MAX_DLY) delay_write = 0;
+        if(delay_read >= MAX_DLY) delay_read = 0;
     }
 
     (void)this;
@@ -382,6 +544,8 @@ static intptr_t compressor_configure(struct dsp_proc_entry *this,
                                      unsigned int setting,
                                      intptr_t value)
 {
+    int i,j;
+
     switch (setting)
     {
     case DSP_PROC_INIT:
@@ -394,7 +558,29 @@ static intptr_t compressor_configure(struct dsp_proc_entry *this,
         /* Fall-through */
     case DSP_RESET:
     case DSP_FLUSH:
+
         release_gain = UNITY;
+        for(i=0; i<MAX_CH; i++)
+        {
+            for(j=0; j<MAX_DLY; j++)
+            {
+                labuf[i][j] = 0;  /* All Silence */
+            }
+        }
+
+        /* Delay Line Read/Write Pointers */
+        int32_t fs =   dsp_get_output_frequency(dsp);
+        delay_read = 0;
+        delay_write = (DLY_TIME*fs/1000);
+        if(delay_write >= MAX_DLY) {
+            delay_write = MAX_DLY - 1;   /* Limit to the max allocated buffer */
+        }
+
+        delay_time = delay_write;
+        release_holdoff = delay_write;
+        limitca = get_att_rls_coeff(DLY_TIME, fs);  /* Attack time for 
+                                                       look-ahead limiter
+                                                    */
         break;
 
     case DSP_SET_OUT_FREQUENCY:
