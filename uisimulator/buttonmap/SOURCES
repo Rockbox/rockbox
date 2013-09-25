@@ -73,5 +73,9 @@ creative-zenxfi3.c
 creative-zenxfi2.c
 #elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
 sansa-connect.c
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+# ifdef SONY_NWZE360
+sony-nwze360.c
+# endif
 #endif
 #endif /* SIMULATOR */

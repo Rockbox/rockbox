@@ -452,6 +452,13 @@
 #define UI_LCD_POSX                 42
 #define UI_LCD_POSY                 42
 
+#elif defined(SONY_NWZE360)
+#define UI_TITLE                    "Sony NWZ-E360"
+#define UI_WIDTH                    340 /* width of GUI window */
+#define UI_HEIGHT                   674 /* height of GUI window */
+#define UI_LCD_POSX                 50
+#define UI_LCD_POSY                 62
+
 #elif defined(APPLICATION)
 #define UI_TITLE                    "Rockbox"
 #define UI_LCD_POSX                 0
