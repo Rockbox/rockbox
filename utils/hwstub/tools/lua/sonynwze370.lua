@@ -19,6 +19,7 @@ function NWZE370.lcd_set_update_rect(x, y, w, h)
 end
 
 function NWZE370.lcd_init()
+    STMP.lcdif.setup_clock()
     STMP.pinctrl.lcdif.setup_system(8, false)
     STMP.lcdif.init()
     STMP.lcdif.set_databus_width(8)
@@ -55,9 +56,9 @@ function NWZE370.lcd_init()
        0x46, 8, 0x21, 0x29, 0x28, 0x2f, 0x3f}) --negative gamma
     NWZE370.lcd_send(0x29, {}) -- display on
 
-    NWZE370.lcd_set_update_rect(10, 10, 20, 20)
+    NWZE370.lcd_set_update_rect(10, 10, 20, 10)
     for i = 0, 19 do
-        for j = 0, 19 do
+        for j = 0, 9 do
             pix = 0xf800
             STMP.lcdif.send_pio(true, {bit32.band(pix, 0xff), bit32.rshift(pix, 8)})
         end
@@ -65,11 +66,14 @@ function NWZE370.lcd_init()
 end
 
 function NWZE370.set_backlight(val)
-    
+    STMP.pinctrl.pin(0, 10).muxsel('GPIO')
+    STMP.pinctrl.pin(0, 10).enable()
+    STMP.pinctrl.pin(0, 10).set()
 end
 
 function NWZE370.init()
     NWZE370.lcd_init()
+    NWZE370.set_backlight(100)
     --[[
     HW.LRADC.CTRL0.SFTRST.clr()
     HW.LRADC.CTRL0.CLKGATE.clr()
