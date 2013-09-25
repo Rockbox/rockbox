@@ -194,6 +194,25 @@ function STMP.pinctrl.lcdif.setup_system(bus_width, busy)
                 lcd_d7 = {bank = 1, pin = 7, muxsel = "MAIN"}
             }
         },
+        stmp3770 =
+        {
+            all =
+            {
+                lcd_reset = { bank = 1, pin = 16, muxsel = "MAIN"},
+                lcd_rs = { bank = 1, pin = 17, muxsel = "MAIN"},
+                lcd_wr = { bank = 1, pin = 18, muxsel = "MAIN"},
+                lcd_rd = { bank = 1, pin = 19, muxsel = "MAIN"},
+                lcd_cs = { bank = 1, pin = 20, muxsel = "MAIN"},
+                lcd_d0 = {bank = 1, pin = 0, muxsel = "MAIN"},
+                lcd_d1 = {bank = 1, pin = 1, muxsel = "MAIN"},
+                lcd_d2 = {bank = 1, pin = 2, muxsel = "MAIN"},
+                lcd_d3 = {bank = 1, pin = 3, muxsel = "MAIN"},
+                lcd_d4 = {bank = 1, pin = 4, muxsel = "MAIN"},
+                lcd_d5 = {bank = 1, pin = 5, muxsel = "MAIN"},
+                lcd_d6 = {bank = 1, pin = 6, muxsel = "MAIN"},
+                lcd_d7 = {bank = 1, pin = 7, muxsel = "MAIN"}
+            }
+        },
         imx233 =
         {
             all =

@@ -171,7 +171,7 @@ static inline void imx233_pinctrl_setup_vpin(vpin_t vpin, const char *name,
 #elif IMX233_SUBTARGET < 3770
 #include "pins/pins-stmp3700.h"
 #elif IMX233_SUBTARGET < 3780
-#error implement this
+#include "pins/pins-stmp3770.h"
 #else
 #include "pins/pins-imx233.h"
 #endif

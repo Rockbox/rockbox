@@ -133,6 +133,16 @@ struct sdmmc_config_t sdmmc_config[] =
         .ssp = 2,
         .mode = MMC_MODE
     },
+#elif defined(MY_FAKETARGET)
+#warning if you target uses mmc or sd, tweak this, else fix CONFIG_STORAGE in config file
+    /* The Sony NWZ-E370 uses #B1P29 for power */
+    {
+        .name = "internal/SD",
+        .flags = POWER_PIN | POWER_INVERTED | WINDOW,
+        .power_pin = PIN(1, 29),
+        .ssp = 2,
+        .mode = MMC_MODE
+    },
 #else
 #error You need to write the sd/mmc config!
 #endif

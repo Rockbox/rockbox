@@ -223,6 +223,8 @@ static void setup_data_pins(unsigned bus_width)
     imx233_pinctrl_setup_vpin(VPIN_LCD_D7, "lcd d7", PINCTRL_DRIVE_4mA, false);
     if(bus_width >= 16)
     {
+#ifdef VPIN_LCD_D8
+    /* some devices/packages don't have more than 8 data lines */
         imx233_pinctrl_setup_vpin(VPIN_LCD_D8, "lcd d8", PINCTRL_DRIVE_4mA, false);
         imx233_pinctrl_setup_vpin(VPIN_LCD_D9, "lcd d9", PINCTRL_DRIVE_4mA, false);
         imx233_pinctrl_setup_vpin(VPIN_LCD_D10, "lcd d10", PINCTRL_DRIVE_4mA, false);
@@ -231,6 +233,9 @@ static void setup_data_pins(unsigned bus_width)
         imx233_pinctrl_setup_vpin(VPIN_LCD_D13, "lcd d13", PINCTRL_DRIVE_4mA, false);
         imx233_pinctrl_setup_vpin(VPIN_LCD_D14, "lcd d14", PINCTRL_DRIVE_4mA, false);
         imx233_pinctrl_setup_vpin(VPIN_LCD_D15, "lcd d15", PINCTRL_DRIVE_4mA, false);
+#else
+        panicf("this chip cannot handle a lcd bus width of %d", bus_width);
+#endif
     }
 #if IMX233_SUBTARGET >= 3780
     if(bus_width >= 18)

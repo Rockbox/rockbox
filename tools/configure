@@ -1333,6 +1333,8 @@ cat <<EOF
  206) Android MIPS                               ==Sony==
  207) Android x86                                220) NWZ-E370 series
                                                  221) NWZ-E360 series
+ ==Fake vendor==
+ 230) Fake Target
 EOF
 
   buildfor=`input`;
@@ -3472,6 +3474,26 @@ fi
     t_cpu="arm"
     t_manufacturer="imx233"
     t_model="sony-nwz"
+    arm926ejscc
+    ;;
+
+   230|faketarget)
+    target_id=90
+    modelname="faketarget"
+    target="MY_FAKETARGET"
+    memory=1
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=ftrg"
+    output="rockbox.fake"
+    bootoutput="bootloader-faketarget.fake"
+    appextra="gui:recorder:radio"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="fake-target"
     arm926ejscc
     ;;
 

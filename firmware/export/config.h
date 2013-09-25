@@ -149,6 +149,7 @@
 #define CREATIVE_ZENXFI3_PAD 55
 #define MA_PAD            56
 #define SONY_NWZ_PAD       57
+#define FAKETARGET_PAD     58
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -253,6 +254,7 @@
 #define LCD_ILI9342   50 /* as used by HiFi E.T MA9/MA8 */
 #define LCD_NWZE370   51 /* as used by Sony NWZ-E370 series */
 #define LCD_NWZE360   52 /* as used by Sony NWZ-E360 series */
+#define LCD_FAKETARGET 53 /* as used by Fake Target */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -516,6 +518,8 @@ Lyre prototype 1 */
 #include "config/sonynwze370.h"
 #elif defined(SONY_NWZE360)
 #include "config/sonynwze360.h"
+#elif defined(MY_FAKETARGET)
+#include "config/faketarget.h"
 #else
 /* no known platform */
 #endif
