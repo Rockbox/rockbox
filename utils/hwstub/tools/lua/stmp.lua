@@ -76,4 +76,5 @@ if STMP.info.chip ~= nil then
     require "stmp/lcdif"
     require "stmp/pwm"
     require "stmp/clkctrl"
+    require "stmp/i2c"
 end
