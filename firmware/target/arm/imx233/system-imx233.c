@@ -192,7 +192,6 @@ void imx233_digctl_set_arm_cache_timings(unsigned timings)
 #endif
 }
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 struct cpufreq_profile_t
 {
     /* key */
@@ -219,7 +218,7 @@ static struct cpufreq_profile_t cpu_profiles[] =
 
 #define NR_CPU_PROFILES ((int)(sizeof(cpu_profiles)/sizeof(cpu_profiles[0])))
 
-void set_cpu_frequency(long frequency)
+void imx233_set_cpu_frequency(long frequency)
 {
     /* don't change the frequency if it is useless (changes are expensive) */
     if(cpu_frequency == frequency)
@@ -276,6 +275,12 @@ void set_cpu_frequency(long frequency)
     imx233_clkctrl_enable_auto_slow(true);
     /* update frequency */
     cpu_frequency = frequency;
+}
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void set_cpu_frequency(long frequency)
+{
+    return imx233_set_cpu_frequency(frequency);
 }
 #endif
 

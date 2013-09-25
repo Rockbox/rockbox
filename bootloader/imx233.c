@@ -141,6 +141,11 @@ void main(uint32_t arg, uint32_t addr)
     system_init();
     kernel_init();
 
+    /* some ixm233 targets needs this because the cpu and/or memory is clocked
+     * at 24MHz, resulting in terribly slow boots and unusable usb mode.
+     * While we are at it, clock at maximum speed to minimise boot time. */
+    imx233_set_cpu_frequency(CPUFREQ_MAX);
+
     power_init();
     enable_irq();
 

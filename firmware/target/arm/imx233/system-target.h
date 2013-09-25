@@ -53,6 +53,8 @@ void imx233_reset_block(volatile uint32_t *block_reg);
 void power_off(void);
 void imx233_enable_usb_controller(bool enable);
 void imx233_enable_usb_phy(bool enable);
+// NOTE: this is available even if HAVE_ADJUSTABLE_CPU_FREQ is undef
+void imx233_set_cpu_frequency(long frequency);
 
 void udelay(unsigned usecs);
 
