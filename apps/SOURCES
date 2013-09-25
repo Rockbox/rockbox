@@ -289,5 +289,7 @@ keymaps/keymap-sansa-connect.c
 keymaps/keymap-ypr0.c
 #elif CONFIG_KEYPAD == MA_PAD
 keymaps/keymap-ma.c
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+keymaps/keymap-nwz.c
 #endif
 

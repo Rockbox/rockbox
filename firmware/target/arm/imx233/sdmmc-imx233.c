@@ -124,6 +124,15 @@ struct sdmmc_config_t sdmmc_config[] =
         .ssp = 1,
         .mode = SD_MODE,
     },
+#elif defined(SONY_NWZE370) || defined(SONY_NWZE360)
+    /* The Sony NWZ-E370 uses #B1P29 for power */
+    {
+        .name = "internal/SD",
+        .flags = POWER_PIN | POWER_INVERTED | WINDOW,
+        .power_pin = PIN(1, 29),
+        .ssp = 2,
+        .mode = MMC_MODE
+    },
 #else
 #error You need to write the sd/mmc config!
 #endif

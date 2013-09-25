@@ -128,7 +128,7 @@ void usage(void)
            "\t                   9200, 1630, 6330, ldax, m200, c100, clip, e2v2,\n"
            "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
            "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
-           "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+)\n");
+           "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+, e370, e360)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -365,6 +365,10 @@ int main (int argc, char** argv)
             modelnum = 82;
         else if (!strcmp(&argv[1][5], "zxf3")) /* Creative Zen X-Fi3 */
             modelnum = 83;
+        else if (!strcmp(&argv[1][5], "e370")) /* Sony NWZ-E370 series */
+            modelnum = 88;
+        else if (!strcmp(&argv[1][5], "e360")) /* Sony NWZ-E360 series */
+            modelnum = 89;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

@@ -1184,6 +1184,23 @@ target/arm/imx233/creative-zenxfi3/adc-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
 #endif
 
+#if defined(SONY_NWZE360) || defined(SONY_NWZE370)
+target/arm/imx233/button-lradc-imx233.c
+target/arm/imx233/sony-nwz/fmradio-i2c-nwz.c
+target/arm/imx233/sony-nwz/backlight-nwz.c
+target/arm/imx233/sony-nwz/button-nwz.c
+target/arm/imx233/sony-nwz/debug-nwz.c
+target/arm/imx233/sony-nwz/power-nwz.c
+target/arm/imx233/sony-nwz/adc-nwz.c
+# if defined(SONY_NWZE360)
+target/arm/imx233/sony-nwz/lcd-nwze360.c
+target/arm/imx233/sony-nwz/powermgmt-nwze360.c
+# elif defined(SONY_NWZE370)
+target/arm/imx233/sony-nwz/lcd-nwze370.c
+target/arm/imx233/sony-nwz/powermgmt-nwze370.c
+# endif
+#endif
+
 #ifdef SANSA_CONNECT
 drivers/lcd-memframe.c
 target/arm/tms320dm320/sdmmc-dm320.c
