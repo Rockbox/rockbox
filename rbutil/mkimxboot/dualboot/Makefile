@@ -10,10 +10,12 @@ CFLAGS=-mcpu=arm926ej-s -std=gnu99 -I. -I$(REGS_PATH) -nostdlib -ffreestanding -
 # 1) add x to the list in TARGETS
 # 2) create a variable named OPT_x of the form:
 #    OPT_x=target specific defines
-TARGETS=fuzeplus zenxfi2 zenxfi3
+TARGETS=fuzeplus zenxfi2 zenxfi3 nwze370 nwze360
 OPT_fuzeplus=-DSANSA_FUZEPLUS -DIMX233_SUBTARGET=3780
 OPT_zenxfi2=-DCREATIVE_ZENXFI2 -DIMX233_SUBTARGET=3780
 OPT_zenxfi3=-DCREATIVE_ZENXFI3 -DIMX233_SUBTARGET=3780
+OPT_nwze370=-DSONY_NWZE370 -DIMX233_SUBTARGET=3780
+OPT_nwze360=-DSONY_NWZE360 -DIMX233_SUBTARGET=3780
 
 BOOTOBJS=$(patsubst %, dualboot_%.o, $(TARGETS))
 BOOTBINS=$(patsubst %, dualboot_%.arm-bin, $(TARGETS))

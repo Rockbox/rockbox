@@ -160,6 +160,18 @@ static const struct imx_md5sum_t imx_sums[] =
             [VARIANT_ZENSTYLE_RECOVERY] = {610272, 148576},
         }
     },
+    /** Sony NWZ-E370 */
+    {
+        /* Version 1.00.00 */
+        MODEL_NWZE370, "a615fdb70b3e1bfb0355a5bc2bf237ab", "1.00.00",
+        { [VARIANT_DEFAULT] = {0, 16056320 } }
+    },
+    /** Sony NWZ-E360 */
+    {
+        /* Version 1.00.00 */
+        MODEL_NWZE360, "d0047f8a87d456a0032297b3c802a1ff", "1.00.00",
+        { [VARIANT_DEFAULT] = {0, 20652032 } }
+    }
 };
 
 static struct crypto_key_t zero_key =
@@ -179,6 +191,10 @@ static const struct imx_model_desc_t imx_models[] =
     [MODEL_ZENXFISTYLE] = {"Zen X-Fi Style", NULL, 0, "", -1,
                        1, &zero_key, 0, 0x40000000 },
     [MODEL_ZENSTYLE] = {"Zen Style 100/300", NULL, 0, "", -1,
+                       1, &zero_key, 0, 0x40000000 },
+    [MODEL_NWZE370] = {"NWZ-E370", dualboot_nwze370, sizeof(dualboot_nwze370), "e370", 88,
+                       1, &zero_key, 0, 0x40000000 },
+    [MODEL_NWZE360] = {"NWZ-E360", dualboot_nwze360, sizeof(dualboot_nwze360), "e360", 89,
                        1, &zero_key, 0, 0x40000000 },
 };
 
@@ -384,6 +400,11 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
             /* The ZEN X-Fi3 uses the standard ____, hSst, pSay sections, patch after third
              * call in ____ section. Although sections names use the S variant, they are standard. */
             return patch_std_zero_host_play(3, model, type, sb_file, boot_fw);
+        case MODEL_NWZE360:
+        case MODEL_NWZE370:
+            /* The NWZ-E360/E370 uses the standard ____, host, play sections, patch after first
+             * call in ____ section. */
+            return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
         case MODEL_ZENXFI2:
             /* The ZEN X-Fi2 has two types of firmware: recovery and normal.
              * Normal uses the standard ___, host, play sections and recovery only ____ */

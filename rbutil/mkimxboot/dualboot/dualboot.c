@@ -119,6 +119,13 @@ static int boot_decision(int context)
     /* if volume down is hold, boot to OF */
     return !read_gpio(2, 7) ? BOOT_OF : BOOT_ROCK;
 }
+#elif defined(SONY_NWZE360) || defined(SONY_NWZE370)
+static int boot_decision(int context)
+{
+    /* Power button set PSWITCH to 3, all other buttons to 1. So any
+     * button press will boot OF */
+    return read_pswitch() == 1 ? BOOT_OF : BOOT_ROCK;
+}
 #else
 #warning You should define a target specific boot decision function
 static int boot_decision(int context)

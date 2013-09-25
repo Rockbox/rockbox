@@ -57,10 +57,12 @@ enum imx_model_t
 {
     MODEL_UNKNOWN = -1,
     MODEL_FUZEPLUS = 0,
-    MODEL_ZENXFI2 = 1,
-    MODEL_ZENXFI3 = 2,
-    MODEL_ZENXFISTYLE = 3,
-    MODEL_ZENSTYLE = 4, /* Style 100 and Style 300 */
+    MODEL_ZENXFI2,
+    MODEL_ZENXFI3,
+    MODEL_ZENXFISTYLE,
+    MODEL_ZENSTYLE, /* Style 100 and Style 300 */
+    MODEL_NWZE370,
+    MODEL_NWZE360,
     /* new models go here */
 
     NUM_MODELS
