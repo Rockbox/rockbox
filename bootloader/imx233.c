@@ -156,6 +156,18 @@ void main(uint32_t arg, uint32_t addr)
     backlight_init();
 
     button_init();
+    /* dummy read, might be necessary to init things */
+    button_read_device();
+
+#ifdef HAS_BUTTON_HOLD
+    if(button_hold())
+    {
+        printf("Hold switch on");
+        printf("Shutting down...");
+        sleep(HZ);
+        power_off();
+    }
+#endif
 
     printf("%s: %s", MSG(240, "Ver", "Boot version"), RBVERSION);
     printf("%s: %x ", MSG(240, "Arg", "Boot arg"), arg);
