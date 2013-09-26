@@ -51,12 +51,14 @@ int key_to_button(int keyboard_button)
         case SDLK_DELETE:
             new_btn = BUTTON_POWER;
             break;
+#ifdef SONY_NWZE360
         case SDLK_KP_PLUS:
             new_btn = BUTTON_VOL_UP;
             break;
         case SDLK_KP_MINUS:
             new_btn = BUTTON_VOL_DOWN;
             break;
+#endif
         case SDLK_KP1:
         case SDLK_HOME:
         case SDLK_BACKSPACE:
@@ -73,6 +75,7 @@ int key_to_button(int keyboard_button)
     return new_btn;
 }
 
+#if defined(SONY_NWZE360)
 struct button_map bm[] = {
     { SDLK_LEFT,        100, 548, 30, "Left" },
     { SDLK_RIGHT,       240, 548, 30, "Right" },
@@ -85,4 +88,18 @@ struct button_map bm[] = {
     { SDLK_KP_PLUS,     339,  68, 30, "Volume +" },
     { 0, 0, 0, 0, "None" }
 };
+#elif defined(SONY_NWZE370)
+struct button_map bm[] = {
+    { SDLK_LEFT,         56, 299, 20, "Left" },
+    { SDLK_RIGHT,       139, 299, 20, "Right" },
+    { SDLK_UP,           98, 256, 20, "Up" },
+    { SDLK_DOWN,         98, 340, 20, "Down" },
+    { SDLK_BACKSPACE,    44, 259, 35, "Back" },
+    { SDLK_DELETE,      152, 259, 35, "Power" },
+    { SDLK_RETURN,       98, 299, 40, "Play" },
+    { 0, 0, 0, 0, "None" }
+};
+#else
+#error please define button map
+#endif
  

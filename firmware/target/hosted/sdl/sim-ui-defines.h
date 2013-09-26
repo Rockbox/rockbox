@@ -459,6 +459,13 @@
 #define UI_LCD_POSX                 50
 #define UI_LCD_POSY                 62
 
+#elif defined(SONY_NWZE370)
+#define UI_TITLE                    "Sony NWZ-E370"
+#define UI_WIDTH                    196 /* width of GUI window */
+#define UI_HEIGHT                   398 /* height of GUI window */
+#define UI_LCD_POSX                 34
+#define UI_LCD_POSY                 32
+
 #elif defined(APPLICATION)
 #define UI_TITLE                    "Rockbox"
 #define UI_LCD_POSX                 0
