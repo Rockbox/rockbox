@@ -36,7 +36,6 @@ static bool lcd_on;
 static void lcd_write_reg(uint8_t reg, uint8_t data)
 {
     imx233_lcdif_wait_ready();
-    imx233_lcdif_set_data_swizzle(0);
     imx233_lcdif_set_word_length(8);
     imx233_lcdif_pio_send(false, 1, &reg);
     if(reg != 0x22)
@@ -86,13 +85,13 @@ static void lcd_init_seq(void)
     lcd_write_reg(0x5c, 0x1a);
     lcd_write_reg(0x5d, 0xcc);
     lcd_write_reg(0x1b, 0x1b);
-    lcd_write_reg(0x1A, 1);
+    lcd_write_reg(0x1a, 1);
     lcd_write_reg(0x24, 0x2f); // something special here
     lcd_write_reg(0x25, 0x57); // something special here
     lcd_write_reg(0x23, 0x8a);
     lcd_write_reg(0x2f, 1);
     lcd_write_reg(0x60, 0);
-    lcd_write_reg(0x16, 8);
+    lcd_write_reg(0x16, 0); // NOTE OF uses 0x8, controls BGR<->RGB
     lcd_write_reg(0x18, 0x36); // something special here
     lcd_write_reg(0x19, 1);
     udelay(5000);
