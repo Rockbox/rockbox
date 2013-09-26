@@ -117,16 +117,8 @@ void imx233_ssp_init(void)
     }
 }
 
-void imx233_ssp_start(int ssp)
+static void start_ssp_clock(void)
 {
-    ASSERT_SSP(ssp)
-    if(ssp_in_use[ssp - 1])
-        return;
-    ssp_in_use[ssp - 1] = true;
-    /* Gate block */
-    imx233_ssp_softreset(ssp);
-    /* Gate dma channel */
-    imx233_dma_clkgate_channel(APB_SSP(ssp), true);
     /* If first block to start, start SSP clock */
     if(ssp_nr_in_use == 0)
     {
@@ -140,6 +132,20 @@ void imx233_ssp_start(int ssp)
 #endif
         imx233_clkctrl_enable(CLK_SSP, true);
     }
+}
+
+void imx233_ssp_start(int ssp)
+{
+    ASSERT_SSP(ssp)
+    if(ssp_in_use[ssp - 1])
+        return;
+    ssp_in_use[ssp - 1] = true;
+    /* Enable SSP clock (need to start block) */
+    start_ssp_clock();
+    /* Gate block */
+    imx233_ssp_softreset(ssp);
+    /* Gate dma channel */
+    imx233_dma_clkgate_channel(APB_SSP(ssp), true);
     ssp_nr_in_use++;
 }
 
