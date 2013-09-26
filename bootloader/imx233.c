@@ -157,7 +157,12 @@ void main(uint32_t arg, uint32_t addr)
 
     button_init();
     /* dummy read, might be necessary to init things */
+#ifdef HAVE_BUTTON_DATA
+    int data;
+    button_read_device(&data);
+#else
     button_read_device();
+#endif
 
 #ifdef HAS_BUTTON_HOLD
     if(button_hold())
