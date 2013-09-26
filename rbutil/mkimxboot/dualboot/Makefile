@@ -19,8 +19,9 @@ OPT_nwze360=-DSONY_NWZE360 -DIMX233_SUBTARGET=3780
 
 BOOTOBJS=$(patsubst %, dualboot_%.o, $(TARGETS))
 BOOTBINS=$(patsubst %, dualboot_%.arm-bin, $(TARGETS))
+BOOTELFS=$(patsubst %, dualboot_%.arm-elf, $(TARGETS))
 
-all: ../dualboot.h ../dualboot.c
+all: ../dualboot.h ../dualboot.c $(BOOTELFS)
 
 # Dualboot bootloaders
 
@@ -43,4 +44,4 @@ bin2c: bin2c.c
 	$(CC) -o bin2c bin2c.c
 
 clean:
-	rm -f *~ bin2c $(BOOTBINS) $(BOOTOBJS)
+	rm -f *~ bin2c $(BOOTBINS) $(BOOTOBJS) $(BOOTELFS)
