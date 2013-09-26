@@ -5,6 +5,7 @@ NWZE360 = {}
 
 function NWZE360.lcd_send(cmd, data)
     STMP.lcdif.set_data_swizzle(0)
+    STMP.lcdif.set_word_length(8)
     STMP.lcdif.set_byte_packing_format(0xf)
     STMP.lcdif.send_pio(false, {cmd})
     if cmd ~= 0x22 then
@@ -45,7 +46,6 @@ function NWZE360.lcd_init()
     STMP.pinctrl.lcdif.setup_system(8, false)
     STMP.lcdif.init()
     STMP.lcdif.set_databus_width(8)
-    STMP.lcdif.set_word_length(8)
     STMP.lcdif.set_system_timing(1, 1, 1, 1)
     STMP.lcdif.set_byte_packing_format(0xf)
     STMP.lcdif.set_reset(1)
@@ -118,22 +118,26 @@ function NWZE360.lcd_init()
     STMP.digctl.udelay(40000)
     NWZE360.lcd_send(0x28, 0x3C)
 
-    --NWZE360.lcd_send(0x36, 0x0) -- experimental
+    --NWZE360.lcd_send(0x36, 0xc0) -- no effect ?
     --NWZE360.lcd_send(0x16, 8 + 0x60) -- redraw with landscape orientation
+    --NWZE360.lcd_send(0x28, 0x34) -- display control
+    --NWZE360.lcd_send(0x60, 0x8) -- no effect ?
+    NWZE360.lcd_send(0x16, 0) -- BGR <-> RGB
 
     NWZE360.set_backlight(100)
 
     NWZE360.lcd_set_update_rect(0, 0, 240, 320)
-    STMP.lcdif.set_word_length(8)
-    for i = 0, 240 do
-        for j = 0, 320 do
+    STMP.lcdif.set_word_length(16)
+    for i = 0, 319 do
+        data = {}
+        for j = 0, 239 do
             r = 0x1f
-            g = 0x3f
-            b = 0x1f
-            pix = bit32.bor(r, bit32.bor(bit32.lshift(g, 6), bit32.lshift(b, 11)))
-            STMP.lcdif.send_pio(true, {bit32.band(pix, 0xff), bit32.rshift(pix, 8)})
-            --STMP.lcdif.send_pio(true, {pix})
+            g = 0x0
+            b = 0x0
+            pix = bit32.bor(b, bit32.bor(bit32.lshift(g, 6), bit32.lshift(r, 11)))
+            data[#data + 1] = pix
         end
+        STMP.lcdif.send_pio(true, data)
     end
 end
 

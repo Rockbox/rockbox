@@ -11,6 +11,8 @@ function STMP.lcdif.setup_clock()
 end
 
 function STMP.lcdif.init()
+    HW.LCDIF.CTRL.SFTRST.clr()
+    HW.LCDIF.CTRL.CLKGATE.clr()
     HW.LCDIF.CTRL.SFTRST.set()
     HW.LCDIF.CTRL.SFTRST.clr()
     HW.LCDIF.CTRL.CLKGATE.clr()

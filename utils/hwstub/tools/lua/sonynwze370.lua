@@ -6,6 +6,7 @@ NWZE370 = {}
 function NWZE370.lcd_send(cmd, data)
     STMP.lcdif.set_data_swizzle(0)
     STMP.lcdif.set_byte_packing_format(0xf)
+    STMP.lcdif.set_word_length(8)
     STMP.lcdif.send_pio(false, {cmd})
     if #data ~= 0 then
         STMP.lcdif.send_pio(true, data)
@@ -56,12 +57,21 @@ function NWZE370.lcd_init()
        0x46, 8, 0x21, 0x29, 0x28, 0x2f, 0x3f}) --negative gamma
     NWZE370.lcd_send(0x29, {}) -- display on
 
-    NWZE370.lcd_set_update_rect(10, 10, 20, 10)
-    for i = 0, 19 do
-        for j = 0, 9 do
-            pix = 0xf800
-            STMP.lcdif.send_pio(true, {bit32.band(pix, 0xff), bit32.rshift(pix, 8)})
+    NWZE370.lcd_set_update_rect(0, 0, 128, 160)
+    STMP.lcdif.set_data_swizzle(3)
+    STMP.lcdif.set_word_length(8)
+    for i = 0, 10 do
+        data = {}
+        for j = 0, 127 do
+            r = 0x1f
+            g = 0x0
+            b = 0x0
+            pix = bit32.bor(b, bit32.bor(bit32.lshift(g, 6), bit32.lshift(r, 11)))
+            data[#data + 1] = bit32.band(pix, 0xff)
+            data[#data + 1] = bit32.rshift(pix, 8)
+            --data[#data + 1] = pix
         end
+        STMP.lcdif.send_pio(true, data)
     end
 end
 
@@ -72,8 +82,8 @@ function NWZE370.set_backlight(val)
 end
 
 function NWZE370.init()
-    NWZE370.lcd_init()
     NWZE370.set_backlight(100)
+    NWZE370.lcd_init()
     --[[
     HW.LRADC.CTRL0.SFTRST.clr()
     HW.LRADC.CTRL0.CLKGATE.clr()
