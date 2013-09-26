@@ -28,7 +28,8 @@
 
 #define YEAR1980    315532800   /* 1980/1/1 00:00:00 in UTC */
 
-#if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3)
+#if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3) || defined(SONY_NWZE360) || \
+    defined(SONY_NWZE370)
 #define USE_PERSISTENT
 #endif
 
