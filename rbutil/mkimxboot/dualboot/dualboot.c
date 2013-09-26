@@ -20,6 +20,8 @@
  ****************************************************************************/
 #include "regs-pinctrl.h"
 #include "regs-power.h"
+#include "regs-lradc.h"
+#include "regs-digctl.h"
 
 #define BOOT_ROM_CONTINUE   0 /* continue boot */
 #define BOOT_ROM_SECTION    1 /* switch to new section *result_id */
@@ -57,6 +59,28 @@ static inline int __attribute__((always_inline)) read_pswitch(void)
 #else
     return BF_RD(DIGCTL_STATUS, PSWITCH);
 #endif
+}
+
+/* only works for channels <=7, always divide by 2, never accumulates */
+static inline void __attribute__((always_inline)) setup_lradc(int src)
+{
+    BF_CLR(LRADC_CTRL0, SFTRST);
+    BF_CLR(LRADC_CTRL0, CLKGATE);
+    /* don't bother changing the source, we are early enough at boot so that
+     * channel x is mapped to source x */
+    HW_LRADC_CHn_CLR(src) = BM_OR2(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
+    BF_SETV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << src);
+}
+
+#define BP_LRADC_CTRL1_LRADCx_IRQ(x)    (x)
+#define BM_LRADC_CTRL1_LRADCx_IRQ(x)    (1 << (x))
+
+static inline int __attribute__((always_inline)) read_lradc(int src)
+{
+    BF_CLR(LRADC_CTRL1, LRADCx_IRQ(src));
+    BF_SETV(LRADC_CTRL0, SCHEDULE, 1 << src);
+    while(!BF_RD(LRADC_CTRL1, LRADCx_IRQ(src)));
+    return BF_RDn(LRADC_CHn, src, VALUE);
 }
 
 static inline void __attribute__((noreturn)) power_down()
@@ -120,11 +144,45 @@ static int boot_decision(int context)
     return !read_gpio(2, 7) ? BOOT_OF : BOOT_ROCK;
 }
 #elif defined(SONY_NWZE360) || defined(SONY_NWZE370)
+static int local_decision(void)
+{
+    /* read keys and pswitch */
+    int val = read_lradc(0);
+    /* if hold is on, power off
+     * if back is pressed, boot to OF
+     * if play is pressed, boot RB
+     * otherwise power off */
+    if(read_gpio(0, 9) == 0)
+        return BOOT_STOP;
+    if(val >= 1050 && val < 1150)
+        return BOOT_OF;
+    if(val >= 1420 && val < 1520)
+        return BOOT_ROCK;
+    return BOOT_STOP;
+}
+
 static int boot_decision(int context)
 {
-    /* Power button set PSWITCH to 3, all other buttons to 1. So any
-     * button press will boot OF */
-    return read_pswitch() == 1 ? BOOT_OF : BOOT_ROCK;
+    setup_lradc(0); // setup LRADC channel 0 to read keys
+    HW_PINCTRL_PULLn_SET(0) = 1 << 9; // enable pullup on hold key (B0P09)
+    /* make a decision */
+    int decision = local_decision();
+    /* in USB or alarm context, stick to it */
+    if(context == CONTEXT_USB || context == CONTEXT_RTC)
+    {
+        /* never power down so replace power off decision by rockbox */
+        return decision == BOOT_STOP ? BOOT_ROCK : decision;
+    }
+    /* otherwise start a 1 second timeout. Any decision change
+     * will result in power down */
+    uint32_t tmo = HW_DIGCTL_MICROSECONDS + 1000000;
+    while(HW_DIGCTL_MICROSECONDS < tmo)
+    {
+        int new_dec = local_decision();
+        if(new_dec != decision)
+            return BOOT_STOP;
+    }
+    return decision;
 }
 #else
 #warning You should define a target specific boot decision function
