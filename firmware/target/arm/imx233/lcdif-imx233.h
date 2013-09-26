@@ -31,6 +31,7 @@
 typedef void (*lcdif_irq_cb_t)(void);
 
 void imx233_lcdif_enable(bool enable);
+/* WARNING: pixclk must be running before calling lcdif_init */
 void imx233_lcdif_init(void);// reset lcdif block
 void imx233_lcdif_reset_lcd(bool enable);// set/clr reset line
 void imx233_lcdif_set_timings(unsigned data_setup, unsigned data_hold,

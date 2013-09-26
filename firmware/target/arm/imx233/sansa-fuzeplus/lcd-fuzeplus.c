@@ -387,8 +387,8 @@ void lcd_init_device(void)
     lcd_dcp_channel = imx233_dcp_acquire_channel(TIMEOUT_NOBLOCK);
     if(lcd_dcp_channel < 0)
         panicf("imx233_framebuffer_init: imx233_dcp_acquire_channel failed!");
-    setup_lcdif();
     setup_lcdif_clock();
+    setup_lcdif();
 
     for(int i = 0; i < 10; i++)
     {

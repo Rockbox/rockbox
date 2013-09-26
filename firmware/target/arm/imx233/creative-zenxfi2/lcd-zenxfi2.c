@@ -152,8 +152,8 @@ static void lcd_init_seq(void)
 
 void lcd_init_device(void)
 {
-    setup_lcdif();
     setup_lcdif_clock();
+    setup_lcdif();
 
     // reset device
     imx233_lcdif_reset_lcd(true);
