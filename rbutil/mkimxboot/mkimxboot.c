@@ -166,6 +166,11 @@ static const struct imx_md5sum_t imx_sums[] =
         MODEL_NWZE370, "a615fdb70b3e1bfb0355a5bc2bf237ab", "1.00.00",
         { [VARIANT_DEFAULT] = {0, 16056320 } }
     },
+    {
+        /* Version 1.00.01 */
+        MODEL_NWZE370, "ee83f3c6026cbcc07097867f06fd585f", "1.00.01",
+        { [VARIANT_DEFAULT] = {0, 16515072 } }
+    },
     /** Sony NWZ-E360 */
     {
         /* Version 1.00.00 */
