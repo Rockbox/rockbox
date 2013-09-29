@@ -120,6 +120,26 @@ void INT_VDD5V(void)
         BF_CLR(POWER_CTRL, VDD5V_GT_VDDIO_IRQ);
     }
 #endif
+#if IMX233_SUBTARGET >= 3700
+    /* this IRQ is shared by several sources, disable them */
+    if(BF_RD(POWER_CTRL, PSWITCH_IRQ))
+    {
+        BF_CLR(POWER_CTRL, ENIRQ_PSWITCH);
+        BF_CLR(POWER_CTRL, PSWITCH_IRQ);
+    }
+#if IMX233_SUBTARGET < 3780
+    if(BF_RD(POWER_CTRL, LINREG_OK_IRQ))
+    {
+        BF_CLR(POWER_CTRL, ENIRQ_LINREG_OK);
+        BF_CLR(POWER_CTRL, LINREG_OK_IRQ);
+    }
+#endif /* IMX233_SUBTARGET < 3780 */
+    if(BF_RD(POWER_CTRL, DC_OK_IRQ))
+    {
+        BF_CLR(POWER_CTRL, ENIRQ_DC_OK);
+        BF_CLR(POWER_CTRL, DC_OK_IRQ);
+    }
+#endif /* IMX233_SUBTARGET >= 3700 */
 }
 
 void imx233_power_init(void)
