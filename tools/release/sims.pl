@@ -231,3 +231,8 @@ runone("sansam200v4");
 runone("zenvision");
 runone("zenvisionm30gb");
 runone("zenvisionm60gb");
+runone("creativezenxfi2");
+runone("creativezenxfi3");
+runone("sonynwze360");
+runone("sonynwze370");
+runone("samsungypr0");
