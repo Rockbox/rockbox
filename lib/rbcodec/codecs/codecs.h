@@ -258,7 +258,8 @@ extern unsigned char plugin_end_addr[];
         codec_start, codec_run, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
-        const struct codec_header __header = { \
+        const struct codec_header __header \
+        __attribute__((visibility("default"))) = { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
         codec_start, codec_run, &ci, { enc_callback } };
 #endif /* SIMULATOR */
