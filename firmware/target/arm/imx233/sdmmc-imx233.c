@@ -190,17 +190,17 @@ static int init_drive(int drive);
  * refer to sd/mmc drive indexes. We keep two maps sd->sdmmc and mmc->sdmmc
  * to find the sdmmc index from the sd or mmc one */
 
-static int sdmmc_present(int drive)
-{
-    if(SDMMC_FLAGS(drive) & REMOVABLE)
-        return imx233_ssp_sdmmc_detect(SDMMC_SSP(drive));
-    else
-        return true;
-}
-
 static inline int sdmmc_removable(int drive)
 {
     return SDMMC_FLAGS(drive) & REMOVABLE;
+}
+
+static int sdmmc_present(int drive)
+{
+    if(sdmmc_removable(drive))
+        return imx233_ssp_sdmmc_detect(SDMMC_SSP(drive));
+    else
+        return true;
 }
 
 static void sdmmc_detect_callback(int ssp)
@@ -790,7 +790,7 @@ static int sdmmc_init(void)
 
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
     {
-        if(SDMMC_FLAGS(drive) & REMOVABLE)
+        if(sdmmc_removable(drive))
             imx233_ssp_sdmmc_setup_detect(SDMMC_SSP(drive), true, sdmmc_detect_callback,
                 false, SDMMC_FLAGS(drive) & DETECT_INVERTED);
     }
