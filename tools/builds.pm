@@ -327,6 +327,22 @@ $releasenotes="/wiki/ReleaseNotes313";
         name => 'MPIO HD300',
         status => 3,
     },
+    'creativezenxfi2' => {
+        name => 'Creative Zen X-Fi2',
+        status => 1,
+    },
+    'creativezenxfi3' => {
+        name => 'Creative Zen X-Fi3',
+        status => 1,
+    },
+    'sonynwze360' => {
+        name => 'Sony NWZ-E360',
+        status => 1,
+    },
+    'sonynwze370' => {
+        name => 'Sony NWZ-E370',
+        status => 1,
+    },
 );
 
 sub manualname {
