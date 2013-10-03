@@ -744,11 +744,13 @@ const void * pcm_rec_dma_get_peak_buffer(void)
     return (void *)((addr + 3) & ~3);
 }
 
+#ifdef SIMULATOR
 void audiohw_set_recvol(int left, int right, int type)
 {
     (void)left;
     (void)right;
     (void)type;
 }
+#endif
 
 #endif /* HAVE_RECORDING */
