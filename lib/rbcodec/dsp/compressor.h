@@ -28,6 +28,7 @@ struct compressor_settings
     int ratio;
     int knee;
     int release_time;
+    int attack_time;
 };
 
 void dsp_set_compressor(const struct compressor_settings *settings);
