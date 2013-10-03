@@ -60,6 +60,9 @@ void audio_input_mux(int source, unsigned flags)
             if (source == last_source)
                 break;
 
+            audiohw_enable_recording(false);
+            // TODO move this to the appropriate section ?
+            audiohw_set_recvol(23, 23, AUDIO_GAIN_LINEIN);
             audiohw_set_monitor(true);
             break;
     } /* end switch */
