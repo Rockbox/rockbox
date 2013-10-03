@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2010 Thomas Martitz
+ * Copyright (C) 2013 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,7 +38,6 @@
  * Alternatively, a version using polling in a tick task is provided. While
  * supposedly safer, it appears to use more CPU (however I didn't measure it
  * accurately, only looked at htop). At least, in this mode the "default"
- * device works which doesnt break with other apps running.
  * device works which doesnt break with other apps running.
  */
 
@@ -76,7 +76,8 @@ static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
 static short *frames;
 
 static const void  *pcm_data = 0;
-static size_t       pcm_size = 0;
+static void *pcm_data_rec = 0;
+static size_t pcm_size = 0;
 
 #ifdef USE_ASYNC_CALLBACK
 static snd_async_handler_t *ahandler;
@@ -85,6 +86,8 @@ static char signal_stack[SIGSTKSZ];
 #else
 static int recursion;
 #endif
+
+static snd_pcm_stream_t state = -1;
 
 static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
 {
@@ -212,8 +215,8 @@ error:
     return err;
 }
 
-/* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
-static bool fill_frames(void)
+/* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() and snd_pcm_readi() */
+static bool copy_frames(void)
 {
     ssize_t copy_n, frames_left = period_size;
     bool new_buffer = false;
@@ -223,23 +226,58 @@ static bool fill_frames(void)
         if (!pcm_size)
         {
             new_buffer = true;
-            if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
-                                                &pcm_size))
+            switch (state)
             {
-                return false;
+                case SND_PCM_STREAM_PLAYBACK:
+                    if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
+                                                &pcm_size))
+                    {
+                        return false;
+                    }
+                    break;
+                case SND_PCM_STREAM_CAPTURE:
+                    if (!pcm_rec_dma_complete_callback(PCM_DMAST_OK, &pcm_data_rec,
+                                                &pcm_size))
+                    {
+                        return false;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
         copy_n = MIN((ssize_t)pcm_size, frames_left*4);
-        memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n);
+        switch (state)
+        {
+            case SND_PCM_STREAM_PLAYBACK:
+                memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n);
+                pcm_data += copy_n;
+                break;
+            case SND_PCM_STREAM_CAPTURE:
+                memcpy(pcm_data_rec, &frames[2*(period_size-frames_left)], copy_n);
+                pcm_data_rec += copy_n;
+                break;
+            default:
+                break;
+        }
 
-        pcm_data += copy_n;
         pcm_size -= copy_n;
         frames_left -= copy_n/4;
 
         if (new_buffer)
         {
             new_buffer = false;
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+            switch (state)
+            {
+                case SND_PCM_STREAM_PLAYBACK:
+                    pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+                    break;
+                case SND_PCM_STREAM_CAPTURE:
+                    pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
+                    break;
+                default:
+                    break;
+            }
         }
     }
     return true;
@@ -258,24 +296,50 @@ static void pcm_tick(void)
     if (snd_pcm_state(handle) != SND_PCM_STATE_RUNNING)
         return;
 #endif
-
-    while (snd_pcm_avail_update(handle) >= period_size)
+    switch (state)
     {
-        if (fill_frames())
-        {
-            int err = snd_pcm_writei(handle, frames, period_size);
-            if (err < 0 && err != period_size && err != -EAGAIN)
+        case SND_PCM_STREAM_PLAYBACK:
+            while (snd_pcm_avail_update(handle) >= period_size)
             {
-                printf("Write error: written %i expected %li\n", err, period_size);
-                break;
+                /* start the fake DMA transfer and write frames */
+                if (copy_frames())
+                {
+                    int err = snd_pcm_writei(handle, frames, period_size);
+                    if (err < 0 && err != period_size && err != -EAGAIN)
+                    {
+                        printf("Write error: written %i expected %li\n", err, period_size);
+                        break;
+                    }
+                }
+                else
+                {
+                    DEBUGF("%s: No Data.\n", __func__);
+                    break;
+                }
             }
-        }
-        else
-        {
-            DEBUGF("%s: No Data.\n", __func__);
             break;
-        }
+        case SND_PCM_STREAM_CAPTURE:
+            while (snd_pcm_avail_update(handle) >= period_size)
+            {
+                int err = snd_pcm_readi(handle, frames, period_size);
+                if (err < 0 && err != period_size && err != -EAGAIN)
+                {
+                    printf("Read error: read %i expected %li\n", err, period_size);
+                    break;
+                }
+                /* start the fake DMA transfer */
+                if (!copy_frames())
+                {
+                    DEBUGF("%s: No Data.\n", __func__);
+                    break;
+                }
+            }
+            break;
+        default:
+            DEBUGF("Undefined state in %s", __func__);
+            break;
     }
+    
 #ifdef USE_ASYNC_CALLBACK
     pthread_mutex_unlock(&pcm_mtx);
 #endif
@@ -321,23 +385,29 @@ static int async_rw(snd_pcm_t *handle)
     }
 #endif
 
-    /* fill buffer with silence to initiate playback without noisy click */
-    sample_size = buffer_size;
-    samples = malloc(sample_size * channels * sizeof(short));
-
-    snd_pcm_format_set_silence(format, samples, sample_size);
-    err = snd_pcm_writei(handle, samples, sample_size);
-    free(samples);
-
-    if (err < 0)
+    switch (state)
     {
-            DEBUGF("Initial write error: %s\n", snd_strerror(err));
-            return err;
-    }
-    if (err != (ssize_t)sample_size)
-    {
-            DEBUGF("Initial write error: written %i expected %li\n", err, sample_size);
-            return err;
+        case SND_PCM_STREAM_PLAYBACK:
+            /* fill buffer with silence to initiate playback without noisy click */
+            sample_size = buffer_size;
+            samples = malloc(sample_size * channels * sizeof(short));
+
+            snd_pcm_format_set_silence(format, samples, sample_size);
+            err = snd_pcm_writei(handle, samples, sample_size);
+            free(samples);
+            if (err < 0)
+            {
+                    DEBUGF("Initial write error: %s\n", snd_strerror(err));
+                    return err;
+            }
+            if (err != (ssize_t)sample_size)
+            {
+                    DEBUGF("Initial write error: written %i expected %li\n", err, sample_size);
+                    return err;
+            }
+            break;
+        default:
+            break;
     }
     if (snd_pcm_state(handle) == SND_PCM_STATE_PREPARED)
     {
@@ -351,27 +421,17 @@ static int async_rw(snd_pcm_t *handle)
     return 0;
 }
 
-
-void cleanup(void)
+void open_hw_device(snd_pcm_stream_t direction)
 {
-    free(frames);
-    frames = NULL;
-    snd_pcm_close(handle);
-}
-
-
-void pcm_play_dma_init(void)
-{
-    int err;
-    audiohw_preinit();
-
-    if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
+    int err = 0;
+    state = direction;
+    printf("Opening %s with mode %d\n", device, direction);
+    if ((err = snd_pcm_open(&handle, device, direction, 0)) < 0)
     {
         printf("%s(): Cannot open device %s: %s\n", __func__, device, snd_strerror(err));
         exit(EXIT_FAILURE);
         return;
     }
-
     if ((err = snd_pcm_nonblock(handle, 1)))
         printf("Could not set non-block mode: %s\n", snd_strerror(err));
 
@@ -385,8 +445,18 @@ void pcm_play_dma_init(void)
         printf("Setting of swparams failed: %s\n", snd_strerror(err));
         exit(EXIT_FAILURE);
     }
-
     pcm_dma_apply_settings();
+}
+
+void pcm_play_dma_init(void)
+{
+    printf("Calling %s\n", __func__);
+
+#ifndef SIMULATOR
+    audiohw_preinit();
+#endif
+
+    open_hw_device(SND_PCM_STREAM_PLAYBACK);
 
 #ifdef USE_ASYNC_CALLBACK
     pthread_mutexattr_t attr;
@@ -397,8 +467,7 @@ void pcm_play_dma_init(void)
     tick_add_task(pcm_tick);
 #endif
 
-    atexit(cleanup);
-    return;
+    printf("Done with %s\n", __func__);
 }
 
 
@@ -444,7 +513,11 @@ void pcm_play_dma_pause(bool pause)
 
 void pcm_play_dma_stop(void)
 {
+    DEBUGF("%s\n", __func__);
     snd_pcm_drain(handle);
+    free(frames);
+    frames = NULL;
+    snd_pcm_close(handle);
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
@@ -513,9 +586,11 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 
 void pcm_play_dma_postinit(void)
 {
+    DEBUGF("%s\n", __func__);
+#ifndef SIMULATOR
     audiohw_postinit();
+#endif
 }
-
 
 void pcm_set_mixer_volume(int volume)
 {
@@ -524,40 +599,102 @@ void pcm_set_mixer_volume(int volume)
 #ifdef HAVE_RECORDING
 void pcm_rec_lock(void)
 {
+    pcm_play_lock();
 }
 
 void pcm_rec_unlock(void)
 {
+    pcm_play_unlock();
 }
 
 void pcm_rec_dma_init(void)
 {
-}
-
-void pcm_rec_dma_close(void)
-{
+    printf("Calling %s\n", __func__);
+    snd_pcm_close(handle);
+    /* snd_pcm_close() could behave as asynchrounous, so sleep a little */
+    sleep(HZ);
+    open_hw_device(SND_PCM_STREAM_CAPTURE);
 }
 
 void pcm_rec_dma_start(void *start, size_t size)
-{
-    (void)start;
-    (void)size;
+{    
+    DEBUGF("%s\n", __func__);
+    pcm_dma_apply_settings_nolock();
+
+    pcm_data_rec = start;
+    pcm_size = size;
+
+    while (1)
+    {
+        snd_pcm_state_t state = snd_pcm_state(handle);
+        switch (state)
+        {
+            case SND_PCM_STATE_RUNNING:
+                return;
+            case SND_PCM_STATE_XRUN:
+            {
+                DEBUGF("Trying to recover from error\n");
+                int err = snd_pcm_recover(handle, -EPIPE, 0);
+                if (err < 0)
+                    DEBUGF("Recovery failed: %s\n", snd_strerror(err));
+                continue;
+            }
+            case SND_PCM_STATE_SETUP:
+            {
+                int err = snd_pcm_prepare(handle);
+                if (err < 0)
+                    printf("Prepare error: %s\n", snd_strerror(err));
+                /* fall through */
+            }
+            case SND_PCM_STATE_PREPARED:
+            {
+                int err = async_rw(handle);
+                if (err < 0)
+                    printf("Start error: %s\n", snd_strerror(err));
+                return;
+            }
+            case SND_PCM_STATE_PAUSED:
+            {   /* paused, simply resume */
+                pcm_play_dma_pause(0);
+                return;
+            }
+            case SND_PCM_STATE_DRAINING:
+                /* run until drained */
+                continue;
+            default:
+                DEBUGF("Unhandled state: %s\n", snd_pcm_state_name(state));
+                return;
+        }
+    }
 }
 
 void pcm_rec_dma_stop(void)
 {
+    DEBUGF("%s\n", __func__);
+    snd_pcm_drain(handle);
+}
+
+void pcm_rec_dma_close(void)
+{
+    DEBUGF("%s\n", __func__);
+    snd_pcm_close(handle);
+    sleep(HZ/2);
+    open_hw_device(SND_PCM_STREAM_PLAYBACK);
 }
 
 const void * pcm_rec_dma_get_peak_buffer(void)
 {
-    return NULL;
+    uintptr_t addr = (uintptr_t)pcm_data_rec;
+    return (void *)((addr + 3) & ~3);
 }
 
+#ifdef SIMULATOR
 void audiohw_set_recvol(int left, int right, int type)
 {
     (void)left;
     (void)right;
     (void)type;
 }
+#endif
 
 #endif /* HAVE_RECORDING */
