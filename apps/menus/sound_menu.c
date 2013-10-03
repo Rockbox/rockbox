@@ -140,12 +140,15 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
     MENUITEM_SETTING(compressor_knee,
                      &global_settings.compressor_settings.knee,
                      lowlatency_callback);
+    MENUITEM_SETTING(compressor_attack,
+                     &global_settings.compressor_settings.attack_time,
+                     lowlatency_callback);
     MENUITEM_SETTING(compressor_release,
                      &global_settings.compressor_settings.release_time,
                      lowlatency_callback);
     MAKE_MENU(compressor_menu,ID2P(LANG_COMPRESSOR), NULL, Icon_NOICON,
               &compressor_threshold, &compressor_gain, &compressor_ratio,
-              &compressor_knee, &compressor_release);
+              &compressor_knee, &compressor_attack, &compressor_release);
 #endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
