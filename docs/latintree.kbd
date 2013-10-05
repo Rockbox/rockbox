@@ -1,0 +1,57 @@
+keytree
+U A-Y
+	L ABCDE
+	U FGHIJ
+	M KLMNO
+	D PQRST
+	R UVWXY
+M a-y
+	L abcde
+	U fghij
+	M klmno
+	D pqrst
+	R uvwxy
+D 0-9Z()
+	U ({Z})
+	M [<z>]
+	L 01234
+	R 56789
+	D Control
+		L $delword
+		U $cursor
+		M $enter
+		D $space
+		R $time
+L .%#-!
+	L .@*$,
+	U ~'"`%
+	M :^_#;
+	D \+=-/
+	R !|& ?
+R ½ÉüÇµ
+	R $space
+	L °²½¡¶
+		L ©°¯¨®
+		U º¹²³ª
+		M «¼½¾»
+		D ¦·¬§¶
+		R ¡±×÷¿
+	U ÀÉÎÜÕ
+		L ÀÁÂÄÃ
+		U ÈÉÊËÅ
+		M ÌÍÎÏŸ
+		D ÙÚÛÜØ
+		R ÓÒÔÖÕ
+	M àéîüõ
+		L àáâäã
+		U èéêëå
+		M ìíîïÿ
+		D ùúûüø
+		R òóôöõ
+	D ÇœÐþ¤
+		U ÇŒÆÝÑ
+		M çœæýñ
+		L ŽŠÐÞµ
+		R žšðþß
+		D ¢£¥€¤
+

@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdio.h>
 #include "kernel.h"
 #include "system.h"
 #include "string-extra.h"
@@ -79,6 +80,8 @@
 struct keyboard_parameters
 {
     unsigned short kbd_buf[KBD_BUF_SIZE];
+    /* In tree mode, kbd_buf contains tree nodes with the following format:
+     * uint16le[TREE_DIRS] childoffsets; char[] desc; char 0; */
     unsigned short max_line_len;
     int default_lines;
     int last_k;
@@ -101,6 +104,7 @@ struct keyboard_parameters
     int page;
     int x;
     int y;
+    bool tree;
     bool line_edit;
 #ifdef HAVE_TOUCHSCREEN
     bool show_buttons;
@@ -139,13 +143,19 @@ static const unsigned char morse_codes[] = {
     0x73,0x55,0x4c,0x61,0x5a,0x80 };
 #endif
 
+enum tree_dir { TREE_LEFT, TREE_UP, TREE_MID, TREE_DOWN, TREE_RIGHT, TREE_DIRS };
+static int load_kbd_tree(int fd);
+static void kbd_draw_tree(struct keyboard_parameters *pm, struct screen *sc);
+static bool kbd_move_tree(struct keyboard_parameters *pm,
+                          struct edit_state *state, enum tree_dir dir);
+
 /* Loads a custom keyboard into memory
    call with NULL to reset keyboard    */
 int load_kbd(unsigned char* filename)
 {
     int fd;
     int i, line_len, max_line_len;
-    unsigned char buf[4];
+    unsigned char buf[8];
     unsigned short *pbuf;
 
     if (filename == NULL)
@@ -157,6 +167,13 @@ int load_kbd(unsigned char* filename)
     fd = open_utf8(filename, O_RDONLY|O_BINARY);
     if (fd < 0)
         return 1;
+    if (read(fd, buf, 8) == 8 && memcmp(buf, "keytree\n", 8) == 0) {
+        i = load_kbd_tree(fd);
+        close(fd);
+        kbd_loaded = !i;
+        return i;
+    }
+    lseek(fd, 0, SEEK_SET);
 
     pbuf = kbd_param[0].kbd_buf;
     line_len = 0;
@@ -225,6 +242,7 @@ int load_kbd(unsigned char* filename)
         pm->x = pm->y = pm->page = 0;
         pm->default_lines = 0;
         pm->max_line_len = max_line_len;
+        pm->tree = false;
     }
 
     return 0;
@@ -318,8 +336,7 @@ static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc);
 static int keyboard_touchscreen(struct keyboard_parameters *pm,
                                 struct screen *sc, struct edit_state *state);
 #endif
-static void kbd_insert_selected(struct keyboard_parameters *pm,
-                                struct edit_state *state);
+static void kbd_insert_selected(struct edit_state *state, unsigned short ch);
 static void kbd_backspace(struct edit_state *state);
 static void kbd_move_cursor(struct edit_state *state, int dir);
 static void kbd_move_picker_horizontal(struct keyboard_parameters *pm,
@@ -428,6 +445,7 @@ int kbd_input(char* text, int buflen)
 
             /* initialize parameters */
             pm->x = pm->y = pm->page = 0;
+            pm->tree = false;
         }
         kbd_loaded = true;
     }
@@ -539,19 +557,23 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case ACTION_KBD_RIGHT:
-                kbd_move_picker_horizontal(pm, &state, 1);
+                if (pm->tree) done = kbd_move_tree(pm, &state, TREE_RIGHT);
+                else kbd_move_picker_horizontal(pm, &state, 1);
                 break;
 
             case ACTION_KBD_LEFT:
-                kbd_move_picker_horizontal(pm, &state, -1);
+                if (pm->tree) done = kbd_move_tree(pm, &state, TREE_LEFT);
+                else kbd_move_picker_horizontal(pm, &state, -1);
                 break;
 
             case ACTION_KBD_DOWN:
-                kbd_move_picker_vertical(pm, &state, 1);
+                if (pm->tree) done = kbd_move_tree(pm, &state, TREE_DOWN);
+                else kbd_move_picker_vertical(pm, &state, 1);
                 break;
 
             case ACTION_KBD_UP:
-                kbd_move_picker_vertical(pm, &state, -1);
+                if (pm->tree) done = kbd_move_tree(pm, &state, TREE_UP);
+                else kbd_move_picker_vertical(pm, &state, -1);
                 break;
 
 #ifdef HAVE_MORSE_INPUT
@@ -584,6 +606,7 @@ int kbd_input(char* text, int buflen)
                 /* select doubles as backspace in line_edit */
                 if (pm->line_edit)
                     kbd_backspace(&state);
+                else if (pm->tree) done = kbd_move_tree(pm, &state, TREE_MID);
                 else
 #ifdef HAVE_MORSE_INPUT
                 if (state.morse_mode)
@@ -598,11 +621,12 @@ int kbd_input(char* text, int buflen)
                 }
                 else
 #endif /* HAVE_MORSE_INPUT */
-                    kbd_insert_selected(pm, &state);
+                    kbd_insert_selected(&state, get_kbd_ch(pm, pm->x, pm->y));
                 break;
 
             case ACTION_KBD_BACKSPACE:
-                kbd_backspace(&state);
+                if (pm->tree && pm->x) pm->x = 0;
+                else kbd_backspace(&state);
                 break;
 
             case ACTION_KBD_CURSOR_RIGHT:
@@ -720,6 +744,7 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
     pm->show_buttons = (sc->screen_type == SCREEN_MAIN &&
                                 (touchscreen_get_mode() == TOUCHSCREEN_POINT));
 #endif
+    if (pm->tree) pm->x = 0;
 
     pm->curfont = pm->default_lines ? FONT_SYSFIXED : sc->getuifont();
     font = font_get(pm->curfont);
@@ -739,14 +764,18 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
     /* find max width of keyboard glyphs.
      * since we're going to be adding spaces,
      * max width is at least their width */
-    pm->font_w = font_get_width(font, ' ');
-    for (pbuf = pm->kbd_buf; *pbuf != 0xFEFF; pbuf += i)
+    if (pm->tree) pm->font_w = font_get_width(font, 'W'); /* FIXME */
+    else
     {
-        for (i = 0; ++i <= *pbuf; )
+        pm->font_w = font_get_width(font, ' ');
+        for (pbuf = pm->kbd_buf; *pbuf != 0xFEFF; pbuf += i)
         {
-            w = font_get_width(font, pbuf[i]);
-            if (pm->font_w < w)
-                pm->font_w = w;
+            for (i = 0; ++i <= *pbuf; )
+            {
+                w = font_get_width(font, pbuf[i]);
+                if (pm->font_w < w)
+                    pm->font_w = w;
+            }
         }
     }
 
@@ -803,9 +832,13 @@ recalc_param:
     if (pm->keyboard_margin > DEFAULT_MARGIN)
         pm->keyboard_margin = DEFAULT_MARGIN;
 
-    total_lines = 0;
-    for (pbuf = pm->kbd_buf; (i = *pbuf) != 0xFEFF; pbuf += i + 1)
-        total_lines += (i ? (i + pm->max_chars - 1) / pm->max_chars : 1);
+    if (pm->tree) total_lines = 3;
+    else 
+    {
+        total_lines = 0;
+        for (pbuf = pm->kbd_buf; (i = *pbuf) != 0xFEFF; pbuf += i + 1)
+            total_lines += (i ? (i + pm->max_chars - 1) / pm->max_chars : 1);
+    }
 
     pm->pages = (total_lines + pm->lines - 1) / pm->lines;
     pm->lines = (total_lines + pm->pages - 1) / pm->pages;
@@ -844,6 +877,11 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state)
 {
     char outline[8];
+    if (pm->tree)
+    {
+        kbd_draw_tree(pm, sc);
+        return;
+    }
 #ifdef HAVE_MORSE_INPUT
     if (state->morse_mode)
     {
@@ -1120,12 +1158,8 @@ static int keyboard_touchscreen(struct keyboard_parameters *pm,
 #endif
 
 /* inserts the selected char */
-static void kbd_insert_selected(struct keyboard_parameters *pm,
-                                struct edit_state *state)
+static void kbd_insert_selected(struct edit_state *state, unsigned short ch)
 {
-    /* find input char */
-    unsigned short ch = get_kbd_ch(pm, pm->x, pm->y);
-
     /* check for hangul input */
     if (ch >= 0x3131 && ch <= 0x3163)
     {
@@ -1285,4 +1319,182 @@ static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
     {
         pm->line_edit = true;
     }
+}
+
+enum tree_key { TREE_KEY_CURSOR = 1, TREE_KEY_TIME, TREE_KEY_DELWORD };
+
+static int load_kbd_tree(int fd)
+{
+    unsigned char *buf = (unsigned char*)kbd_param[0].kbd_buf;
+    unsigned int stack[8] = {0};
+    unsigned int bufpos = TREE_DIRS*2, stackpos = 0;
+    unsigned char c, *s;
+    memset(buf, 0, bufpos);
+    while (read(fd, &c, 1) == 1)
+    {
+        enum tree_dir dir = TREE_DIRS;
+        switch (c)
+        {
+            case '\n': stackpos = 0; break;
+            case '\t': stackpos++; break;
+            case 'L': dir = TREE_LEFT; break;
+            case 'U': dir = TREE_UP; break;
+            case 'M': dir = TREE_MID; break;
+            case 'D': dir = TREE_DOWN; break;
+            case 'R': dir = TREE_RIGHT; break;
+            default: return 1;
+        }
+        if (dir == TREE_DIRS) continue;
+        if (read(fd, &c, 1) != 1 || c != ' ') return 1;
+        /* store offset of current node in stack */
+        if (stackpos+1 >= sizeof stack/sizeof *stack) return 1;
+        stack[stackpos+1] = bufpos;
+        /* reference current node from parent */
+        buf[stack[stackpos]+dir*2] = bufpos & 0xff;
+        buf[stack[stackpos]+dir*2+1] = bufpos >> 8;
+        /* create node in buf */
+        if (bufpos+TREE_DIRS*2+2 > sizeof kbd_param[0].kbd_buf) return 1;
+        memset(buf+bufpos, 0, TREE_DIRS*2);
+        bufpos += TREE_DIRS*2;
+        s = buf+bufpos;
+        while(read(fd, &c, 1) == 1 && c != '\n')
+        {
+            buf[bufpos++] = c;
+            if (bufpos+1 > sizeof kbd_param[0].kbd_buf) return 1;
+        }
+        buf[bufpos++] = 0;
+        c = 0;
+        if (!strcmp(s, "$space")) c = ' ';
+        else if (!strcmp(s, "$tab")) c = '\t';
+        else if (!strcmp(s, "$backspace")) c = '\b';
+        else if (!strcmp(s, "$enter")) c = '\n';
+        else if (!strcmp(s, "$cursor")) c = TREE_KEY_CURSOR;
+        else if (!strcmp(s, "$time")) c = TREE_KEY_TIME;
+        else if (!strcmp(s, "$delword")) c = TREE_KEY_DELWORD;
+        if (c)
+        {
+            bufpos = s-buf;
+            buf[bufpos++] = c;
+            buf[bufpos++] = 0;
+        }
+        stackpos = 0;
+    }
+
+    FOR_NB_SCREENS(l)
+    {
+        struct keyboard_parameters *pm = &kbd_param[l];
+#if NB_SCREENS > 1
+        if (l > 0)
+            memcpy(pm->kbd_buf, kbd_param[0].kbd_buf, bufpos);
+#endif
+        /* initialize parameters */
+        pm->x = pm->y = pm->page = 0;
+        pm->default_lines = 0;
+        pm->max_line_len = 1;
+        pm->tree = true;
+    }
+    return 0;
+}
+
+static void kbd_draw_tree(struct keyboard_parameters *pm, struct screen *sc)
+{
+    unsigned char *buf = (unsigned char*)pm->kbd_buf;
+    int i, w, h, scw;
+    sc->setfont(pm->curfont);
+    scw = sc->getwidth();
+    for(i = 0; i < TREE_DIRS; i++) {
+        int offset = buf[pm->x+i*2] | buf[pm->x+i*2+1] << 8;
+        char *s, tmp[8];
+        if (offset) s = buf + offset + TREE_DIRS*2;
+        else {
+            int len;
+            char *start = buf + pm->x + TREE_DIRS*2;
+            start += utf8seek(start, i);
+            len = utf8seek(start, 1);
+            memcpy(tmp, start, len);
+            tmp[len] = 0;
+            s = tmp;
+        }
+        switch (*s) {
+            case ' ': s = "Space"; break;
+            case '\t': s = "Tab"; break;
+            case '\b': s = "Backspace"; break;
+            case '\n': s = "OK"; break;
+            case TREE_KEY_CURSOR: s = "Cursor"; break;
+            case TREE_KEY_TIME: s = "Ins.time"; break;
+            case TREE_KEY_DELWORD: s = "Del.word"; break;
+        }
+        sc->getstringsize(s, &w, &h);
+        sc->putsxy(i==TREE_LEFT ? pm->text_w
+                 : i==TREE_RIGHT ? scw-w-pm->text_w : (scw-w)/2,
+            (i==TREE_UP ? 0 : i==TREE_DOWN ? 2 : 1) * pm->font_h, s);
+    }
+}
+
+static bool kbd_move_tree(struct keyboard_parameters *pm,
+                          struct edit_state *state, enum tree_dir dir)
+{
+    unsigned char *buf = (unsigned char*)pm->kbd_buf;
+    int offset = buf[pm->x+dir*2] | buf[pm->x+dir*2+1] << 8;
+    char *s;
+    unsigned short ch;
+    if (pm->line_edit)
+    {
+        pm->line_edit = false;
+        return false;
+    }
+    if (offset)
+    {
+        int i;
+        char c = 0;
+        /* follow link */
+        s = buf + offset;
+        /* if has linked nodes or desc is multiple chars then move to node */
+        for (i = 0; i < TREE_DIRS*2; i++) c = c || *(s++);
+        if (c || s[utf8seek(s, 1)])
+        {
+            pm->x = offset;
+            return false;
+        }
+        /* no linked nodes, desc is 1 char -> insert */
+    }
+    else
+    {
+        /* no link to follow, insert Nth char from desc */
+        s = buf + pm->x + TREE_DIRS*2;
+        s += utf8seek(s, dir);
+    }
+    pm->x = 0;
+    switch(*s)
+    {
+        case '\b':
+            kbd_backspace(state);
+            break;
+        case '\n':
+            return true;
+        case TREE_KEY_CURSOR:
+            pm->line_edit = true;
+            break;
+        case TREE_KEY_TIME:
+            {
+                struct tm *tm = get_time();
+                char buffer[32];
+                snprintf(buffer, sizeof buffer,
+                         "%02d-%02d-%02dT%02d:%02d:%02d ",
+                         tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday,
+                         tm->tm_hour, tm->tm_min, tm->tm_sec);
+                for(s = buffer; *s; s++)
+                    kbd_insert_selected(state, *s);
+            }
+            break;
+        case TREE_KEY_DELWORD:
+            do kbd_backspace(state);
+            while (state->editpos &&
+                state->text[utf8seek(state->text, state->editpos-1)] != ' ');
+            break;
+        default:
+            utf8decode(s, &ch);
+            kbd_insert_selected(state, ch);
+    }
+    return false;
 }
