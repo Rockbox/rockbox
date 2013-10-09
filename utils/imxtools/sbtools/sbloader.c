@@ -69,9 +69,9 @@ struct dev_info_t
 
 struct dev_info_t g_dev_info[] =
 {
-    {0x066f, 0x3780, 1024, HID_DEVICE}, /* i.MX233 / STMP3780 */
-    {0x066f, 0x3770, 48, HID_DEVICE}, /* STMP3770 */
-    {0x15A2, 0x004F, 1024, HID_DEVICE}, /* i.MX28 */
+    {0x066f, 0x3780, 0, HID_DEVICE}, /* i.MX233 / STMP3780 */
+    {0x066f, 0x3770, 0, HID_DEVICE}, /* STMP3770 */
+    {0x15A2, 0x004F, 0, HID_DEVICE}, /* i.MX28 */
     {0x066f, 0x3600, 4096, RECOVERY_DEVICE}, /* STMP36xx */
 };
 
@@ -246,6 +246,7 @@ static bool is_hid_dev(struct libusb_config_descriptor *desc)
 
 static bool is_recovery_dev(struct libusb_config_descriptor *desc)
 {
+    (void) desc;
     return false;
 }
 
