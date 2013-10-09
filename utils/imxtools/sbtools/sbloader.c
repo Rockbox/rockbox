@@ -36,14 +36,6 @@ bool g_debug = false;
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #endif
 
-static void put32le(uint8_t *buf, uint32_t i)
-{
-    *buf++ = i & 0xff;
-    *buf++ = (i >> 8) & 0xff;
-    *buf++ = (i >> 16) & 0xff;
-    *buf++ = (i >> 24) & 0xff;
-}
-
 static void put32be(uint8_t *buf, uint32_t i)
 {
     *buf++ = (i >> 24) & 0xff;
@@ -75,44 +67,101 @@ struct dev_info_t g_dev_info[] =
     {0x066f, 0x3600, 4096, RECOVERY_DEVICE}, /* STMP36xx */
 };
 
+/* Command Block Descriptor (CDB) */
+struct hid_cdb_t
+{
+    uint8_t command;
+    uint32_t length; // big-endian!
+    uint8_t reserved[11];
+} __attribute__((packed));
+
+// command
+#define BLTC_DOWNLOAD_FW    2
+
+/* Command Block Wrapper (CBW) */
+struct hid_cbw_t
+{
+    uint32_t signature; // BLTC or PITC
+    uint32_t tag; // returned in CSW
+    uint32_t length; // number of bytes to transfer
+    uint8_t flags;
+    uint8_t reserved[2];
+    struct hid_cdb_t cdb;
+} __attribute__((packed));
+
+/* HID Command Report */
+struct hid_cmd_report_t
+{
+    uint8_t report_id;
+    struct hid_cbw_t cbw;
+} __attribute__((packed));
+
+// report id
+#define HID_BLTC_DATA_REPORT    2
+#define HID_BLTC_CMD_REPORT     1
+
+// signature
+#define CBW_BLTC    0x43544C42  /* "BLTC" */
+#define CBW_PITC    0x43544950  /* "PITC" */
+// flags
+#define CBW_DIR_IN  0x80
+#define CBW_DIR_OUT 0x00
+
+/* Command Status Wrapper (CSW) */
+struct hid_csw_t
+{
+    uint32_t signature; // BLTS or PITS
+    uint32_t tag; // given in CBW
+    uint32_t residue; // number of bytes not transferred
+    uint8_t status;
+} __attribute__((packed));
+// signature
+#define CSW_BLTS    0x53544C42 /* "BLTS" */
+#define CSW_PITS    0x53544950 /* "PITS" */
+// status
+#define CSW_PASSED      0x00
+#define CSW_FAILED      0x01
+#define CSW_PHASE_ERROR 0x02
+
+/* HID Status Report */
+struct hid_status_report_t
+{
+    uint8_t report_id;
+    struct hid_csw_t csw;
+} __attribute__((packed));
+
+#define HID_BLTC_STATUS_REPORT  4
+
 static int send_hid(libusb_device_handle *dev, int xfer_size, uint8_t *data, int size, int nr_xfers)
 {
     libusb_detach_kernel_driver(dev, 0);
     libusb_claim_interface(dev, 0);
 
+    int recv_size;
+    uint32_t my_tag = 0xcafebabe;
     uint8_t *xfer_buf = malloc(1 + xfer_size);
-    uint8_t *p = xfer_buf;
-
-    *p++ = 0x01;         /* Report id */
-
-    /* Command block wrapper */
-    *p++ = 'B';          /* Signature */
-    *p++ = 'L';
-    *p++ = 'T';
-    *p++ = 'C';
-    put32le(p, 0x1);     /* Tag */
-    p += 4;
-    put32le(p, size);    /* Payload size */
-    p += 4;
-    *p++ = 0;            /* Flags (host to device) */
-    p += 2;              /* Reserved */
-
-    /* Command descriptor block */
-    *p++ = 0x02;         /* Firmware download */
-    put32be(p, size);    /* Download size */
+    struct hid_cmd_report_t cmd;
+    memset(&cmd, 0, sizeof(cmd));
+    cmd.report_id = HID_BLTC_CMD_REPORT;
+    cmd.cbw.signature = CBW_BLTC;
+    cmd.cbw.tag = my_tag;
+    cmd.cbw.length = size;
+    cmd.cbw.flags = CBW_DIR_OUT;
+    cmd.cbw.cdb.command = BLTC_DOWNLOAD_FW;
+    put32be((void *)&cmd.cbw.cdb.length, size);
 
     int ret = libusb_control_transfer(dev,
         LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE, 0x9, 0x201, 0,
-        xfer_buf, xfer_size + 1, 1000);
+        (void *)&cmd, sizeof(cmd), 1000);
     if(ret < 0)
     {
         printf("transfer error at init step\n");
-        return 1;
+        goto Lstatus;
     }
 
     for(int i = 0; i < nr_xfers; i++)
     {
-        xfer_buf[0] = 0x2;
+        xfer_buf[0] = HID_BLTC_DATA_REPORT;
         memcpy(&xfer_buf[1], &data[i * xfer_size], xfer_size);
 
         ret = libusb_control_transfer(dev,
@@ -121,18 +170,53 @@ static int send_hid(libusb_device_handle *dev, int xfer_size, uint8_t *data, int
         if(ret < 0)
         {
             printf("transfer error at send step %d\n", i);
-            return 1;
+            goto Lstatus;
         }
     }
 
-    int recv_size;
-    ret = libusb_interrupt_transfer(dev, 0x81, xfer_buf, xfer_size, &recv_size,
-        1000);
-    if(ret < 0)
+    Lstatus:
+    ret = libusb_interrupt_transfer(dev, 0x81, xfer_buf, xfer_size, 
+        &recv_size, 1000);
+    if(ret == 0 && recv_size == sizeof(struct hid_status_report_t))
     {
-        printf("transfer error at final stage\n");
-        return 1;
+        struct hid_status_report_t *report = (void *)xfer_buf;
+        if(report->report_id != HID_BLTC_STATUS_REPORT)
+        {
+            printf("Error: got non-status report\n");
+            return -1;
+        }
+        if(report->csw.signature != CSW_BLTS)
+        {
+            printf("Error: status report signature mismatch\n");
+            return -2;
+        }
+        if(report->csw.tag != my_tag)
+        {
+            printf("Error: status report tag mismtahc\n");
+            return -3;
+        }
+        if(report->csw.residue != 0)
+            printf("Warning: %d byte were not transferred\n", report->csw.residue);
+        switch(report->csw.status)
+        {
+            case CSW_PASSED:
+                printf("Status: Passed\n");
+                return 0;
+            case CSW_FAILED:
+                printf("Status: Failed\n");
+                return -1;
+            case CSW_PHASE_ERROR:
+                printf("Status: Phase Error\n");
+                return -2;
+            default:
+                printf("Status: Unknown Error\n");
+                return -3;
+        }
     }
+    else if(ret < 0)
+        printf("Error: cannot get status report\n");
+    else
+        printf("Error: status report has wrong size\n");
 
     return ret;
 }
