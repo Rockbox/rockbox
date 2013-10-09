@@ -433,11 +433,62 @@ static const char *stmp_get_logical_drive_type_string(uint32_t type)
 {
     switch(type)
     {
-        case SCSI_STMP_DRIVE_TYPE_USER: return "User";
+        case SCSI_STMP_DRIVE_TYPE_DATA: return "Data";
         case SCSI_STMP_DRIVE_TYPE_SYSTEM: return "System";
-        case SCSI_STMP_DRIVE_TYPE_DRM: return "DRM";
+        case SCSI_STMP_DRIVE_TYPE_HIDDEN: return "Hidden";
+        case SCSI_STMP_DRIVE_TYPE_UNKNOWN: return "Unknown";
         default: return "?";
     }
+}
+
+static const char *stmp_get_logical_drive_tag_string(uint8_t type)
+{
+    switch(type)
+    {
+        case SCSI_STMP_DRIVE_TAG_STMPSYS_S: return "System";
+        case SCSI_STMP_DRIVE_TAG_HOSTLINK_S: return "Hostlink";
+        case SCSI_STMP_DRIVE_TAG_RESOURCE_BIN: return "Resource";
+        case SCSI_STMP_DRIVE_TAG_EXTRA_S: return "Extra";
+        case SCSI_STMP_DRIVE_TAG_RESOURCE1_BIN: return "Resource1";
+        case SCSI_STMP_DRIVE_TAG_OTGHOST_S: return "OTG";
+        case SCSI_STMP_DRIVE_TAG_HOSTRSC_BIN: return "Host Resource";
+        case SCSI_STMP_DRIVE_TAG_DATA: return "Data";
+        case SCSI_STMP_DRIVE_TAG_HIDDEN: return "Hidden";
+        case SCSI_STMP_DRIVE_TAG_BOOTMANAGER_S: return "Boot";
+        case SCSI_STMP_DRIVE_TAG_UPDATER_S: return "Updater";
+        default: return "?";
+    }
+}
+
+static const char *stmp_get_logical_media_state_string(uint8_t state)
+{
+    switch(state)
+    {
+        case SCSI_STMP_MEDIA_STATE_UNKNOWN: return "Unknown";
+        case SCSI_STMP_MEDIA_STATE_ERASED: return "Erased";
+        case SCSI_STMP_MEDIA_STATE_ALLOCATED: return "Allocated";
+        default: return "?";
+    }
+}
+
+static const char *get_size_suffix(unsigned long long size)
+{
+    int order = 0;
+    while(size >= 1024)
+    {
+        size /= 1024;
+        order++;
+    }
+    static const char *suffix[] = {"B", "KiB", "MiB", "GiB", "TiB"};
+    return suffix[order];
+}
+
+static float get_size_natural(unsigned long long size)
+{
+    float res = size;
+    while(res >= 1024)
+        res /= 1024;
+    return res;
 }
 
 static int do_info(void)
@@ -457,7 +508,7 @@ static int do_info(void)
         cprintf_field("  Vendor: ", "%s\n", vendor);
         cprintf_field("  Product: ", "%s\n", product);
     }
-    
+
     struct scsi_stmp_protocol_version_t ver;
     ret = stmp_get_protocol_version(&ver);
     if(ret)
@@ -505,11 +556,11 @@ static int do_info(void)
         }
 
         len = 2;
-        ret = stmp_get_logical_media_info(0, &u.u16, &len);
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_NR_DRIVES, &u.u16, &len);
         if(!ret && len == 2)
         {
             u.u16 = fix_endian16be(u.u16);
-            cprintf_field("  Logical Media Info (0): ", "%#x\n", u.u16);
+            cprintf_field("  Number of Drives: ", "%d\n", u.u16);
         }
 
         len = 4;
@@ -522,43 +573,56 @@ static int do_info(void)
         }
 
         len = 1;
-        ret = stmp_get_logical_media_info(5, &u.u8, &len);
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_INITIALISED, &u.u8, &len);
         if(!ret && len == 1)
-            cprintf_field("  Logical Media Info (5): ", "%#x\n", u.u8);
+            cprintf_field("  Is Initialised: ", "%d\n", u.u8);
+
+        len = 1;
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_STATE, &u.u8, &len);
+        if(!ret && len == 1)
+            cprintf_field("  State: ", "%s\n", stmp_get_logical_media_state_string(u.u8));
+
+        len = 1;
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_WRITE_PROTECTED, &u.u8, &len);
+        if(!ret && len == 1)
+            cprintf_field("  Is Write Protected: ", "%#x\n", u.u8);
 
         len = 8;
-        ret = stmp_get_logical_media_info(1, &u.u64, &len);
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SIZE, &u.u64, &len);
         if(!ret && len == 8)
         {
             u.u64 = fix_endian64be(u.u64);
-            cprintf_field("  Logical Media Info (1): ", "%#llx\n", (unsigned long long)u.u64);
+            cprintf_field("  Media Size: ", "%llu B (%.3f %s)\n", (unsigned long long)u.u64, 
+                get_size_natural(u.u64), get_size_suffix(u.u64));
         }
 
+        int serial_number_size = 0;
         len = 4;
-        ret = stmp_get_logical_media_info(7, &u.u32, &len);
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER_SIZE, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
-            cprintf_field("  Logical Media Info (7): ", "%#x\n", u.u32);
+            cprintf_field("  Serial Number Size: ", "%d\n", u.u32);
+            serial_number_size = u.u32;
         }
 
-        len = 52;
-        ret = stmp_get_logical_media_info(8, &u.buf, &len);
+        len = serial_number_size;
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER, &u.buf, &len);
         if(!ret && len != 0)
         {
-            cprintf(GREEN, "  Logical Media Info (8):");
-            /*
-            for(int i = 0; i < len; i++)
-                cprintf(YELLOW, " %02x", u.buf[i]);
-            printf("\n");
-            */
+            cprintf(GREEN, "  Serial Number:");
             print_hex(u.buf, len);
         }
-        
+
         len = 1;
-        ret = stmp_get_logical_media_info(9, &u.u8, &len);
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_SYSTEM_MEDIA, &u.u8, &len);
         if(!ret && len == 1)
-            cprintf_field("  Logical Media Info (9): ", "%#x\n", u.u8);
+            cprintf_field("  Is System Media: ", "%d\n", u.u8);
+
+        len = 1;
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_MEDIA_PRESENT, &u.u8, &len);
+        if(!ret && len == 1)
+            cprintf_field("  Is Media Present: ", "%d\n", u.u8);
 
         len = 4;
         ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_VENDOR, &u.u32, &len);
@@ -592,6 +656,14 @@ static int do_info(void)
             u.u32 = fix_endian32be(u.u32);
             cprintf_field("  Logical Media Info (14): ", "%#x\n", u.u32);
         }
+
+        len = 4;
+        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_ALLOC_UNIT_SIZE, &u.u32, &len);
+        if(!ret && len == 4)
+        {
+            u.u32 = fix_endian32be(u.u32);
+            cprintf_field("  Allocation Unit Size: ", "%d B\n", u.u32);
+        }
     }while(0);
     
     struct scsi_stmp_chip_major_rev_id_t chip_rev;
@@ -622,9 +694,12 @@ static int do_info(void)
         cprintf_field("  Logical Table: ", "%d entries\n", table.header.count);
         for(int i = 0; i < table.header.count; i++)
         {
-            cprintf_field2("    Drive No: ", "%2x", table.entry[i].drive_no);
-            cprintf_field2(" Type: ", "%2x", table.entry[i].type);
-            cprintf_field2(" Tag: ", "%2x", table.entry[i].tag);
+            cprintf(BLUE, "    Drive ");
+            cprintf_field("No: ", "%2x", table.entry[i].drive_no);
+            cprintf_field(" Type: ", "%#x ", table.entry[i].type);
+            cprintf(RED, "(%s)", stmp_get_logical_drive_type_string(table.entry[i].type));
+            cprintf_field(" Tag: ", "%#x ", table.entry[i].tag);
+            cprintf(RED, "(%s)", stmp_get_logical_drive_tag_string(table.entry[i].tag));
             unsigned long long size = table.entry[i].size;
             int order = 0;
             while(size >= 1024)
@@ -633,7 +708,7 @@ static int do_info(void)
                 order++;
             }
             static const char *suffix[] = {"B", "KiB", "MiB", "GiB", "TiB"};
-            cprintf_field2(" Size: ", "%llu %s", size, suffix[order]);
+            cprintf_field(" Size: ", "%llu %s", size, suffix[order]);
             cprintf(OFF, "\n");
         }
 
@@ -651,19 +726,21 @@ static int do_info(void)
             cprintf_field("  Drive ", "%02x\n", drive);
             
             int len = 4;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR, &u.u32, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
-                cprintf_field("    Sector Size: ", "%#x\n", u.u32);
+                cprintf_field("    Sector Size: ", "%lu B (%.3f %s)\n", (unsigned long)u.u32,
+                    get_size_natural(u.u32), get_size_suffix(u.u32));
             }
 
             len = 4;
-            ret = stmp_get_logical_drive_info(drive, 1, &u.u32, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVe_INFO_ERASE_SIZE, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
-                cprintf_field("    Info 1: ", "%#x\n", u.u32);
+                cprintf_field("    Erase Size: ", "%lu B (%.3f %s)\n", (unsigned long)u.u32,
+                    get_size_natural(u.u32), get_size_suffix(u.u32));
             }
 
             len = 8;
@@ -671,23 +748,25 @@ static int do_info(void)
             if(!ret && len == 8)
             {
                 u.u64 = fix_endian64be(u.u64);
-                cprintf_field("    Total Size: ", "%#llx\n", (unsigned long long)u.u64);
+                cprintf_field("    Total Size: ", "%llu B (%.3f %s)\n",
+                    (unsigned long long)u.u64, get_size_natural(u.u32),
+                    get_size_suffix(u.u32));
             }
 
             len = 4;
-            ret = stmp_get_logical_drive_info(drive, 3, &u.u32, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SIZE_MEGA, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
-                cprintf_field("    Info 3: ", "%#x\n", u.u32);
+                cprintf_field("    Total Size (MB): ", "%lu MB\n", (unsigned long)u.u32);
             }
 
             len = 8;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_COUNT, &u.u64, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_COUNT, &u.u64, &len);
             if(!ret && len == 8)
             {
                 u.u64 = fix_endian64be(u.u64);
-                cprintf_field("    Sector Count: ", "%#llx\n", (unsigned long long)u.u64);
+                cprintf_field("    Sector Count: ", "%llu\n", (unsigned long long)u.u64);
             }
 
             len = 4;
@@ -700,55 +779,74 @@ static int do_info(void)
             }
 
             len = 1;
-            ret = stmp_get_logical_drive_info(drive, 6, &u.u8, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_TAG, &u.u8, &len);
             if(!ret && len == 1)
             {
-                cprintf_field("    Info 6: ", "%#x\n", u.u8);
+                cprintf_field("    Tag: ", "%#x", u.u8);
+                cprintf(RED, " (%s)\n", stmp_get_logical_drive_tag_string(u.u8));
             }
 
             len = 52;
-            ret = stmp_get_logical_drive_info(drive, 7, &u.buf, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_COMPONENT_VERSION, &u.buf, &len);
             if(!ret && len != 0)
             {
-                cprintf(GREEN, "    Info 7:");
-                for(int i = 0; i < len; i++)
-                    cprintf(YELLOW, " %02x", u.buf[i]);
-                printf("\n");
+                cprintf(GREEN, "    Component Version:");
+                print_hex(u.buf, len);
             }
 
             len = 52;
-            ret = stmp_get_logical_drive_info(drive, 8, &u.buf, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_PROJECT_VERSION, &u.buf, &len);
             if(!ret && len != 0)
             {
-                cprintf(GREEN, "    Info 8:");
-                for(int i = 0; i < len; i++)
-                    cprintf(YELLOW, " %02x", u.buf[i]);
-                printf("\n");
+                cprintf(GREEN, "    Project Version:");
+                print_hex(u.buf, len);
             }
 
             len = 1;
-            ret = stmp_get_logical_drive_info(drive, 9, &u.u8, &len);
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_IS_WRITE_PROTETED, &u.u8, &len);
             if(!ret && len == 1)
             {
-                cprintf_field("    Info 9: ", "%#x\n", u.u8);
+                cprintf_field("    Is Writed Protected: ", "%d\n", u.u8);
             }
 
             len = 2;
-            ret = stmp_get_logical_drive_info(drive, 10, &u.u16, &len);
+            int serial_number_size = 0;
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER_SIZE, &u.u16, &len);
             if(!ret && len == 2)
             {
                 u.u16 = fix_endian16be(u.u16);
-                cprintf_field("    Info 10: ", "%#x\n", u.u16);
+                cprintf_field("    Serial Number Size: ", "%d\n", u.u16);
+                serial_number_size = u.u16;
             }
 
-            len = 52;
-            ret = stmp_get_logical_drive_info(drive, 11, &u.buf, &len);
+            len = serial_number_size;
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER, &u.buf, &len);
             if(!ret && len != 0)
             {
-                cprintf(GREEN, "    Info 11:");
-                for(int i = 0; i < len; i++)
-                    cprintf(YELLOW, " %02x", u.buf[i]);
-                printf("\n");
+                cprintf(GREEN, "    Serial Number:");
+                print_hex(u.buf, len);
+            }
+
+            len = 1;
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_MEDIA_PRESENT, &u.u8, &len);
+            if(!ret && len == 1)
+            {
+                cprintf_field("    Is Media Present: ", "%d\n", u.u8);
+            }
+
+            len = 1;
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_MEDIA_CHANGE, &u.u8, &len);
+            if(!ret && len == 1)
+            {
+                cprintf_field("    Media Change: ", "%d\n", u.u8);
+            }
+
+            len = 4;
+            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_ALLOCATION, &u.u32, &len);
+            if(!ret && len == 4)
+            {
+                u.u32 = fix_endian32be(u.u32);
+                cprintf_field("    Sector Allocation: ", "%lu\n", (unsigned long)u.u32);
             }
         }
     }
@@ -796,7 +894,7 @@ void do_extract(const char *file)
     }
     int len = 4;
     uint32_t sector_size;
-    ret = stmp_get_logical_drive_info(drive_no, SCSI_STMP_DRIVE_INFO_SECTOR, &sector_size, &len);
+    ret = stmp_get_logical_drive_info(drive_no, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &sector_size, &len);
     if(ret || len != 4)
     {
         cprintf(GREY, "Cannot get sector size\n");
