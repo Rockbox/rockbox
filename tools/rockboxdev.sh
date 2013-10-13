@@ -71,7 +71,7 @@ getfile() {
     if test -n "$tool"; then
       # wget download
       echo "ROCKBOXDEV: Downloading $2/$1 using wget"
-      $tool -O $dlwhere/$1 $2/$1
+      $tool -T 60 -O $dlwhere/$1 $2/$1
     fi
   else
      # curl download
