@@ -21,6 +21,7 @@
  ****************************************************************************/
 
 #include <inttypes.h>
+#include <unistd.h>
 #include "codeclib.h"
 
 CODEC_ENC_HEADER
