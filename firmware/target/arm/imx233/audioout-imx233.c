@@ -260,13 +260,25 @@ struct imx233_audioout_info_t imx233_audioout_get_info(void)
     info.hpvol[0] = (info.hpselect ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_LEFT);
     info.hpvol[1] = (info.hpselect ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_RIGHT);
     info.hpmute[0] = info.hpmute[1] = BF_RD(AUDIOOUT_HPVOL, MUTE);
-    info.spkrvol[0] = info.spkrvol[1] = 155;
+#if IMX233_SUBTARGET >= 3780
+    info.spkrvol[0] = info.spkrvol[1] = 155; // volume is fixed to 15.5 dB gain
     info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_SPEAKERCTRL, MUTE);
+    info.spkr = !BF_RD(AUDIOOUT_PWRDN, SPEAKER);
+#elif IMX233_SUBTARGET < 3700
+    /* convert 2-dB to tenth-dB */
+    info.spkrvol[0] = MIN(info.spkrvol[1] = BF_RD(AUDIOOUT_SPKRVOL, VOL), 6) * 20;
+    info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_SPKRVOL, MUTE);
+    info.spkr = !BF_RD(AUDIOOUT_PWRDN, SPEAKER);
+#else
+    /* STMP3700/3770 has not speaker amplifier */
+    info.spkrvol[0] = info.spkrvol[1] = 0;
+    info.spkrmute[0] = info.spkrmute[1] = true;
+    info.spkr = false;
+#endif
     info.ss3d = BF_RD(AUDIOOUT_CTRL, SS3D_EFFECT);
     info.ss3d = info.ss3d == 0 ? 0 : 15 * (1 + info.ss3d);
     info.hp = !BF_RD(AUDIOOUT_PWRDN, HEADPHONE);
     info.dac = !BF_RD(AUDIOOUT_PWRDN, DAC);
     info.capless = BF_RD(AUDIOOUT_PWRDN, CAPLESS);
-    info.spkr = !BF_RD(AUDIOOUT_PWRDN, SPEAKER);
     return info;
 }
