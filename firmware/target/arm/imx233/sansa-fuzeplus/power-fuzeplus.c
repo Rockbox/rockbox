@@ -32,7 +32,7 @@ bool tuner_power(bool enable)
 {
     if(enable != tuner_enable)
     {
-        /* CE is B029 (active high) */
+        /* CE is B0P29 (active high) */
         imx233_pinctrl_acquire(0, 29, "tuner power");
         imx233_pinctrl_set_function(0, 29, PINCTRL_FUNCTION_GPIO);
         imx233_pinctrl_set_drive(0, 29, PINCTRL_DRIVE_4mA);
