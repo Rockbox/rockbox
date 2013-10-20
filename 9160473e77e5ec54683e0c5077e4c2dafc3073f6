@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///tE\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2013-10-20T16:17:25Z",
+      "side": 1,
+      "message": "I\u0027m not sure who should be listed here for this one. I know as a non-committer gerrit will insist that this has to be you, but a committer can twek this, and I think Ralf has a serious claim for his name to be here. Thoughts?",
+      "revId": "9160473e77e5ec54683e0c5077e4c2dafc3073f6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///tI\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2013-10-20T16:17:25Z",
+      "side": 1,
+      "message": "I\u0027m assuming this commit message isn\u0027t final yet, but just in case, make sure you have a (short, 50..60 characters) first line, then an empty line, and then the details.",
+      "revId": "9160473e77e5ec54683e0c5077e4c2dafc3073f6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///tM\u003d",
+        "filename": "firmware/asm/arm/thread.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2013-10-20T16:17:25Z",
+      "side": 1,
+      "message": "Is this really needed? If the iap thread needs a larger stack, it\u0027s free to declare it as large as it likes without increasing the default (which will impact all stacks).\n\nIf it actually is needed (e.g. because the main thread is the issue), I think you should check for IPOD_ACCESSORY_PROTOCOL instead",
+      "revId": "9160473e77e5ec54683e0c5077e4c2dafc3073f6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///tQ\u003d",
+        "filename": "firmware/target/arm/pp/debug-pp.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2013-10-20T16:17:25Z",
+      "side": 1,
+      "message": "This looks like an unrelated change. I don\u0027t know if the original indentation was intended or not, but this shouldn\u0027t be in this commit.",
+      "revId": "9160473e77e5ec54683e0c5077e4c2dafc3073f6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
