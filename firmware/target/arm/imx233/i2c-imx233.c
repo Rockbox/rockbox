@@ -205,6 +205,7 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
     if(semaphore_wait(&i2c_sema, timeout) == OBJ_WAIT_TIMEDOUT)
     {
         imx233_dma_reset_channel(APB_I2C);
+        imx233_i2c_reset();
         ret = I2C_TIMEOUT;
     }
     else if(BF_RD(I2C_CTRL1, MASTER_LOSS_IRQ))
