@@ -82,6 +82,7 @@ void imx233_power_init(void);
 void imx233_power_set_charge_current(unsigned current); /* in mA */
 void imx233_power_set_stop_current(unsigned current); /* in mA */
 void imx233_power_enable_batadj(bool enable);
+bool imx233_power_usb_detect(void);
 
 enum imx233_regulator_t
 {

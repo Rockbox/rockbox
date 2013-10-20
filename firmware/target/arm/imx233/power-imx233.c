@@ -84,6 +84,15 @@ static struct current_step_bit_t g_4p2_charge_limit_bits[] =
 #define USE_VBUSVALID
 #endif
 
+bool imx233_power_usb_detect(void)
+{
+#ifdef USE_VBUSVALID
+    return BF_RD(POWER_STS, VBUSVALID);
+#else
+    return BF_RD(POWER_STS, VDD5V_GT_VDDIO);
+#endif
+}
+
 void INT_VDD5V(void)
 {
 #ifdef USE_VBUSVALID
