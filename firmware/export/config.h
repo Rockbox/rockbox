@@ -345,6 +345,13 @@ Lyre prototype 1 */
 #define CPU 0
 #define COP 1
 
+/* imx233 specific: IMX233_PACKAGE */
+#define IMX233_BGA100   0
+#define IMX233_BGA169   1
+#define IMX233_TQFP100  2
+#define IMX233_TQFP128  3
+#define IMX233_LQFP100  4
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config/archosplayer.h"
