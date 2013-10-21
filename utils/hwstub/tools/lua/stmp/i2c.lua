@@ -8,10 +8,7 @@ h:add("The STMP.clkctrl table handles the i2c device for all STMPs.")
 
 function STMP.i2c.init()
     HW.I2C.CTRL0.SFTRST.set()
-    STMP.pinctrl.pin(0, 30).muxsel("MAIN")
-    STMP.pinctrl.pin(0, 30).pull(true)
-    STMP.pinctrl.pin(0, 31).muxsel("MAIN")
-    STMP.pinctrl.pin(0, 31).pull(true)
+    STMP.pinctrl.i2c.setup()
     STMP.i2c.reset()
     STMP.i2c.set_speed(true)
 end
@@ -21,7 +18,9 @@ function STMP.i2c.reset()
     HW.I2C.CTRL0.SFTRST.clr()
     HW.I2C.CTRL0.CLKGATE.clr()
     -- errata for IMX233
-    HW.I2C.CTRL1.ACK_MODE.set();
+    if STMP.is_imx233() then
+        HW.I2C.CTRL1.ACK_MODE.set();
+    end
 end
 
 function STMP.i2c.set_speed(fast)
@@ -63,7 +62,9 @@ function STMP.i2c.transmit(slave_addr, buffer, send_stop)
     while HW.I2C.CTRL0.RUN.read() == 1 do
     end
     if HW.I2C.CTRL1.NO_SLAVE_ACK_IRQ.read() == 1 then
-        HW.I2C.CTRL1.CLR_GOT_A_NAK.set()
+        if STMP.is_imx233() then
+            HW.I2C.CTRL1.CLR_GOT_A_NAK.set()
+        end
         STMP.i2c.reset()
         return false
     end

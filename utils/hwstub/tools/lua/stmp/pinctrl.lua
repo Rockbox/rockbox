@@ -86,6 +86,7 @@ hh:add("* pin: pin number (mandatory) ")
 hh:add("* muxsel: same values as STMP.pinctrl.pin().muxsel (optional)")
 hh:add("* enable: enable/disable output (optional)")
 hh:add("* output: set/clear output (optional)")
+hh:add("* pull: enable/disable pullup (optional)")
 hh:add("All non-subtable entries are ignored")
 hh:add("All unknown parameters in subtablkes are ignored")
 hh:add("")
@@ -111,6 +112,10 @@ function STMP.pinctrl.configure(tbl)
                     STMP.debug(string.format("cfg B%dP%02d output %s", v.bank, v.pin, v.output))
                     if v.output then pin.set()
                     else pin.clr() end
+                end
+                if v.pull ~= nil then
+                    STMP.debug(string.format("cfg B%dP%02d pull %s", v.bank, v.pin, v.pull))
+                    pin.pull(v.pull)
                 end
             end
         end
@@ -290,4 +295,33 @@ function STMP.pinctrl.lcdif.setup_system(bus_width, busy)
     if busy then
         STMP.pinctrl.configure_ex(busy_pin)
     end
+end
+
+STMP.pinctrl.i2c = {}
+
+local hhh = hh:create_topic("setup")
+hhh:add("The STMP.pinctrl.i2c.setup() functions configure the I2C pins.")
+
+function STMP.pinctrl.i2c.setup()
+    local pins =
+    {
+        stmp3700 =
+        {
+            all =
+            {
+                i2c_scl = { bank = 2, pin = 5, muxsel = "MAIN", pull = true},
+                i2c_sda = { bank = 2, pin = 6, muxsel = "MAIN", pull = true}
+            }
+        },
+        imx233 =
+        {
+            all =
+            {
+                i2c_scl = { bank = 0, pin = 30, muxsel = "MAIN", pull = true},
+                i2c_sda = { bank = 0, pin = 31, muxsel = "MAIN", pull = true}
+            }
+        }
+    }
+
+    STMP.pinctrl.configure_ex(pins)
 end
