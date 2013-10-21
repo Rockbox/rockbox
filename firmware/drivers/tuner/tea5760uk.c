@@ -173,6 +173,7 @@ void tea5760_init(void)
     unsigned short manid, chipid;
 
     /* read all registers */
+    tuner_power(true);
     fmradio_i2c_read(I2C_ADR, buf, sizeof(buf));
 
     /* check device id */
@@ -192,6 +193,7 @@ void tea5760_init(void)
         tea5760_set_clear(3, (1<<0), 1);    /* stereo noise cancellation on */
         fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
     }
+    tuner_power(false);
 }
 
 void tea5760_dbg_info(struct tea5760_dbg_info *info)
