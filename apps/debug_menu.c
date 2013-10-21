@@ -1924,6 +1924,18 @@ static int radio_callback(int btn, struct gui_synclist *lists)
         simplelist_addline("chipid: 0x%x", nfo.chipid);
     }
 #endif /* STFM1000 */
+#if (CONFIG_TUNER & TEA5760)
+    IF_TUNER_TYPE(TEA5760)
+    {
+        struct tea5760_dbg_info nfo;
+        tea5760_dbg_info(&nfo);
+        simplelist_addline("TEA5760 regs:");
+        for (int i = 0; i < 16; i += 4) {
+            simplelist_addline("%02X: %02X %02X %02X %02X",
+                i, nfo.read_regs[i], nfo.read_regs[i+1], nfo.read_regs[i+2], nfo.read_regs[i+3]);
+        }
+    }
+#endif /* TEA5760 */
 
 #ifdef HAVE_RDS_CAP
         simplelist_addline("PI:%04X PS:'%8s'",
