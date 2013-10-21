@@ -73,9 +73,8 @@ static int output_source = AUDIO_SRC_PLAYBACK;
 
 static void select_audio_path(void)
 {
-#if defined(HAVE_RECORDING)
     const bool recording = input_flags & SRCF_RECORDING;
-#endif
+    (void) recording; // it is not always used
 
     switch(input_source)
     {
