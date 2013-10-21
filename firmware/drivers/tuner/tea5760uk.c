@@ -29,7 +29,11 @@
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
 
+#if defined(CREATIVE_ZENMOZAIC) || defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
+#define I2C_ADR 0x20
+#else
 #define I2C_ADR 0x22
+#endif
 
 /* define RSSI range */
 #define RSSI_MIN 4
