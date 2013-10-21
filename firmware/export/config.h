@@ -352,6 +352,10 @@ Lyre prototype 1 */
 #define IMX233_TQFP128  3
 #define IMX233_LQFP100  4
 
+/* IMX233_PARTITIONS */
+#define IMX233_FREESCALE    (1 << 0) /* Freescale I.MX233 nonstandard two-level MBR */
+#define IMX233_CREATIVE     (1 << 1) /* Creative MBLK windowing */
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config/archosplayer.h"

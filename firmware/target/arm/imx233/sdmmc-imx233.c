@@ -664,12 +664,10 @@ static int init_drive(int drive)
     /* compute window */
     if((SDMMC_FLAGS(drive) & WINDOW) && imx233_partitions_is_window_enabled())
     {
-        uint8_t mbr[512];
-        int ret = transfer_sectors(drive, 0, 1, mbr, true);
-        if(ret)
-            panicf("Cannot read MBR: %d", ret);
-        ret = imx233_partitions_compute_window(mbr, &window_start[drive],
-            &window_end[drive]);
+        /* NOTE: at this point the window shows the whole disk so raw disk
+         * accesses can be made to lookup partitions */
+        ret = imx233_partitions_compute_window(IF_MD(drive,) IMX233_PART_USER,
+            &window_start[drive], &window_end[drive]);
         if(ret)
             panicf("cannot compute partitions window: %d", ret);
         SDMMC_INFO(drive).numblocks = window_end[drive] - window_start[drive];
