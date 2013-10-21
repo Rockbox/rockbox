@@ -35,6 +35,10 @@
 #define RSSI_MIN 4
 #define RSSI_MAX 46
 
+#define TEA5760UK   0x5760
+#define TEA5761UK   0x5761
+
+static int model = 0;
 static bool tuner_present = false;
 static unsigned char write_bytes[7] = {
     0x00,   /* INTREG LSB */
@@ -170,19 +174,24 @@ void tea5760_init(void)
 
     /* read all registers */
     fmradio_i2c_read(I2C_ADR, buf, sizeof(buf));
-    
+
     /* check device id */
     manid = (buf[12] << 8) | buf[13];
     chipid = (buf[14] << 8) | buf[15];
     if ((manid == 0x202B) && (chipid == 0x5760))
+        model = TEA5760UK;
+    else if ((manid == 0x402B) && (chipid == 0x5761))
+        model = TEA5761UK;
+
+    if(model != 0)
     {
         tuner_present = true;
-    }
 
-    /* write initial values */
-    tea5760_set_clear(3, (1<<1), 1);    /* soft mute on */
-    tea5760_set_clear(3, (1<<0), 1);    /* stereo noise cancellation on */
-    fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+        /* write initial values */
+        tea5760_set_clear(3, (1<<1), 1);    /* soft mute on */
+        tea5760_set_clear(3, (1<<0), 1);    /* stereo noise cancellation on */
+        fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+    }
 }
 
 void tea5760_dbg_info(struct tea5760_dbg_info *info)
