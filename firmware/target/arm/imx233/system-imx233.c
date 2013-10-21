@@ -204,6 +204,7 @@ struct cpufreq_profile_t
     int arm_cache_timings;
 };
 
+#if IMX233_SUBTARGET >= 3780
 static struct cpufreq_profile_t cpu_profiles[] =
 {
     /* clk_p@454.74 MHz, clk_h@130.91 MHz, clk_emi@130.91 MHz, VDDD@1.550 V */
@@ -215,11 +216,13 @@ static struct cpufreq_profile_t cpu_profiles[] =
     /* dummy */
     {0, 0, 0, 0, 0, 0, 0, 0}
 };
+#endif
 
 #define NR_CPU_PROFILES ((int)(sizeof(cpu_profiles)/sizeof(cpu_profiles[0])))
 
 void imx233_set_cpu_frequency(long frequency)
 {
+#if IMX233_SUBTARGET >= 3780
     /* don't change the frequency if it is useless (changes are expensive) */
     if(cpu_frequency == frequency)
         return;
@@ -275,6 +278,9 @@ void imx233_set_cpu_frequency(long frequency)
     imx233_clkctrl_enable_auto_slow(true);
     /* update frequency */
     cpu_frequency = frequency;
+#else
+    (void) frequency;
+#endif
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
