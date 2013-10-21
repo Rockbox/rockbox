@@ -45,7 +45,7 @@ struct player_info_t players[] =
 {
     { "zenv", "Zen V", 85 },
     { "zmoz", "Zen Mozaic", 87 },
-    { "zen", "Zen", 88 },
+    { "zen", "Zen", 90 },
     { "zxfi", "Zen X-Fi", 86 },
     { NULL, 0 },
 };
