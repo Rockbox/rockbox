@@ -51,7 +51,7 @@ mk500boot: mk500boot.c mr500.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
 mkzenboot.o: mkzenboot.c
-	$(SILENT)$(CC) $(CFLAGS) -DSTANDALONE -c -o $@ $+
+	$(SILENT)$(CC) $(CFLAGS) -std=c99 -DSTANDALONE -c -o $@ $+
 
 mkzenboot: mkzenboot.o hmac-sha1.o
 	$(SILENT)$(CC) $(LDFLAGS) $+ -lz -o $@
