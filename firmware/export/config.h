@@ -254,6 +254,7 @@
 #define LCD_ILI9342   50 /* as used by HiFi E.T MA9/MA8 */
 #define LCD_NWZE370   51 /* as used by Sony NWZ-E370 series */
 #define LCD_NWZE360   52 /* as used by Sony NWZ-E360 series */
+#define LCD_CREATIVEZEN  55 /* as used by the Creative ZEN (X-Fi) (LMS250GF03-001(S6D0139)) */
 #define LCD_CREATIVEZENMOZAIC 56 /* as used by the Creative ZEN Mozaic (FGD0801) */
 
 /* LCD_PIXELFORMAT */
@@ -523,8 +524,12 @@ Lyre prototype 1 */
 #include "config/pandora.h"
 #elif defined(SAMSUNG_YPR0)
 #include "config/samsungypr0.h"
+#elif defined(CREATIVE_ZENXFI)
+#include "config/creativezenxfi.h"
 #elif defined(CREATIVE_ZENMOZAIC)
 #include "config/creativezenmozaic.h"
+#elif defined(CREATIVE_ZEN)
+#include "config/creativezen.h"
 #elif defined(MA9)
 #include "config/hifietma9.h"
 #elif defined(SONY_NWZE370)

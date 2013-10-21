@@ -127,6 +127,23 @@ struct sdmmc_config_t sdmmc_config[] =
         .ssp = 1,
         .mode = SD_MODE,
     },
+#elif defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZEN)
+    {
+        .name = "internal/SD",
+        .flags = WINDOW,
+        .ssp = 2,
+        .mode = SD_MODE,
+    },
+    /* The Zen X-Fi uses pin #B0P10 for power*/
+    {
+        .name = "microSD",
+        .flags = POWER_PIN | REMOVABLE | DETECT_INVERTED | POWER_DELAY | WP_PIN,
+        .power_pin = PIN(0, 10),
+        .wp_pin = PIN(0, 11),
+        .power_delay = HZ / 10, /* extra delay, to ramp up voltage? */
+        .ssp = 1,
+        .mode = SD_MODE,
+    },
 #elif defined(CREATIVE_ZENMOZAIC)
     {
         .name = "internal/SD",

@@ -2280,6 +2280,26 @@ fi
     arm926ejscc
     ;;
 
+   96|creativezenxfi)
+    target_id=86
+    modelname="creativezenxfi"
+    target="CREATIVE_ZENXFI"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zxfi"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfi.creative"
+    appextra="gui:recorder:radio"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
    97|creativezenmozaic)
     target_id=87
     modelname="creativezenmozaic"
@@ -2299,6 +2319,27 @@ fi
     t_model="creative-zenmozaic"
     arm926ejscc
     ;;
+
+  98|creativezen)
+    target_id=90
+    modelname="creativezen"
+    target="CREATIVE_ZEN"
+    memory=32
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zen"
+    output="rockbox.creative"
+    bootoutput="bootloader-zen.creative"
+    appextra="gui:recorder:radio"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
 
    50|sansae200)
     target_id=23
