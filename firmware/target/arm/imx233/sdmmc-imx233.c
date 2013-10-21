@@ -127,6 +127,13 @@ struct sdmmc_config_t sdmmc_config[] =
         .ssp = 1,
         .mode = SD_MODE,
     },
+#elif defined(CREATIVE_ZENMOZAIC)
+    {
+        .name = "internal/SD",
+        .flags = WINDOW,
+        .ssp = 2,
+        .mode = SD_MODE,
+    }
 #elif defined(SONY_NWZE370) || defined(SONY_NWZE360)
     /* The Sony NWZ-E370 uses #B1P29 for power */
     {

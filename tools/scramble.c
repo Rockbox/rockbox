@@ -365,6 +365,8 @@ int main (int argc, char** argv)
             modelnum = 82;
         else if (!strcmp(&argv[1][5], "zxf3")) /* Creative Zen X-Fi3 */
             modelnum = 83;
+        else if (!strcmp(&argv[1][5], "zmoz")) /* Creative ZEN Mozaic*/
+            modelnum = 87;
         else if (!strcmp(&argv[1][5], "e370")) /* Sony NWZ-E370 series */
             modelnum = 88;
         else if (!strcmp(&argv[1][5], "e360")) /* Sony NWZ-E360 series */

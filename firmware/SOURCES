@@ -1184,6 +1184,18 @@ target/arm/imx233/creative-zenxfi3/adc-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
 #endif
 
+#ifdef CREATIVE_ZENMOZAIC
+target/arm/imx233/creative-zenmozaic/fmradio-i2c-zenmozaic.c
+target/arm/imx233/creative-zenmozaic/backlight-zenmozaic.c
+target/arm/imx233/creative-zenmozaic/lcd-zenmozaic.c
+target/arm/imx233/creative-zenmozaic/button-zenmozaic.c
+target/arm/imx233/creative-zenmozaic/debug-zenmozaic.c
+target/arm/imx233/creative-zenmozaic/power-zenmozaic.c
+target/arm/imx233/creative-zenmozaic/adc-zenmozaic.c
+target/arm/imx233/creative-zenmozaic/powermgmt-zenmozaic.c
+target/arm/imx233/button-lradc-imx233.c
+#endif
+
 #if defined(SONY_NWZE360) || defined(SONY_NWZE370)
 target/arm/imx233/button-lradc-imx233.c
 target/arm/imx233/sony-nwz/fmradio-i2c-nwz.c

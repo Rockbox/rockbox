@@ -149,6 +149,7 @@
 #define CREATIVE_ZENXFI3_PAD 55
 #define MA_PAD            56
 #define SONY_NWZ_PAD       57
+#define CREATIVE_ZEN_PAD   58
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -253,6 +254,7 @@
 #define LCD_ILI9342   50 /* as used by HiFi E.T MA9/MA8 */
 #define LCD_NWZE370   51 /* as used by Sony NWZ-E370 series */
 #define LCD_NWZE360   52 /* as used by Sony NWZ-E360 series */
+#define LCD_CREATIVEZENMOZAIC 56 /* as used by the Creative ZEN Mozaic (FGD0801) */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -521,6 +523,8 @@ Lyre prototype 1 */
 #include "config/pandora.h"
 #elif defined(SAMSUNG_YPR0)
 #include "config/samsungypr0.h"
+#elif defined(CREATIVE_ZENMOZAIC)
+#include "config/creativezenmozaic.h"
 #elif defined(MA9)
 #include "config/hifietma9.h"
 #elif defined(SONY_NWZE370)
