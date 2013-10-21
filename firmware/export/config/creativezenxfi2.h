@@ -3,6 +3,7 @@
  */
 #define IMX233_SUBTARGET    3780
 #define IMX233_PACKAGE      IMX233_BGA169
+#define IMX233_PARTITIONS   IMX233_FREESCALE
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 82
