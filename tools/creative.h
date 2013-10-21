@@ -28,7 +28,9 @@ enum
     ZENVISIONM60 = 1,
     ZENVISION = 2,
     ZENV = 3,
-    ZEN = 4
+    ZEN = 4,
+    ZENXFI = 5,
+    ZENMOZAIC = 6
 };
 
 struct device_info

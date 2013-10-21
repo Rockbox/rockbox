@@ -140,7 +140,11 @@ static const struct device_info devices[] =
     /* Creative ZEN V */
     {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0V",                                  42, null_key_v4},
     /* Creative ZEN */
-    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N",                                        48, null_key_v3}
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N",                                        48, null_key_v3},
+    /* Creative ZEN X-Fi */
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0X\0-\0F\0i\0",                       34, null_key_v4},
+    /* Creative ZEN Mozaic */
+    {"C\0r\0e\0a\0t\0i\0v\0e\0 \0Z\0E\0N\0 \0M\0o\0z\0a\0i\0c\0",                 38, null_key_v4}
 };
 
 /*
