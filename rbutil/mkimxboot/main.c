@@ -122,10 +122,8 @@ int main(int argc, char *argv[])
                 infile = optarg;
                 break;
             case 'b':
-            {
                 bootfile = optarg;
                 break;
-            }
             case 't':
                 if(strcmp(optarg, "dualboot") == 0)
                     type = IMX_DUALBOOT;
