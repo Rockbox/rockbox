@@ -59,6 +59,7 @@ struct sdmmc_config_t
     int flags; /* flags */
     int power_pin; /* power pin */
     int power_delay; /* extra power up delay */
+    int wp_pin; /* write protect pin */
     int ssp; /* associated ssp block */
     int mode; /* mode (SD vs MMC) */
 };
@@ -70,6 +71,8 @@ struct sdmmc_config_t
 #define DETECT_INVERTED (1 << 3)
 #define POWER_DELAY     (1 << 4)
 #define WINDOW          (1 << 5)
+#define WP_PIN          (1 << 6)
+#define WP_INVERTED     (1 << 7)
 
 /* modes */
 #define SD_MODE         0
