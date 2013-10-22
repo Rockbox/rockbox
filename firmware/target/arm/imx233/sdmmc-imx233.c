@@ -672,6 +672,12 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
     return ret;
 }
 
+// user specificies the sdmmc drive
+static int part_read_fn(intptr_t user, unsigned long start, int count, void* buf)
+{
+    return transfer_sectors(user, start, count, buf, true);
+}
+
 static int init_drive(int drive)
 {
     int ret;
@@ -693,8 +699,8 @@ static int init_drive(int drive)
     {
         /* NOTE: at this point the window shows the whole disk so raw disk
          * accesses can be made to lookup partitions */
-        ret = imx233_partitions_compute_window(IF_MD(drive,) IMX233_PART_USER,
-            &window_start[drive], &window_end[drive]);
+        ret = imx233_partitions_compute_window(IF_MD_DRV(drive), part_read_fn,
+            IMX233_PART_USER, &window_start[drive], &window_end[drive]);
         if(ret)
             panicf("cannot compute partitions window: %d", ret);
         SDMMC_INFO(drive).numblocks = window_end[drive] - window_start[drive];

@@ -71,11 +71,11 @@ static const char *creative_part_name(enum imx233_part_t part)
     }
 }
 
-static int compute_window_creative(IF_MD(int drive,) enum imx233_part_t part,
-    unsigned *start, unsigned *end)
+static int compute_window_creative(intptr_t user, part_read_fn_t read_fn,
+    enum imx233_part_t part, unsigned *start, unsigned *end)
 {
     uint8_t mblk[512];
-    int ret = storage_read_sectors(IF_MD(drive,) MBLK_ADDR / 512, 1, mblk);
+    int ret = read_fn(user, MBLK_ADDR / 512, 1, mblk);
     if(ret < 0)
         return ret;
     struct mblk_header_t *hdr = (void *)mblk;
@@ -99,11 +99,11 @@ static int compute_window_creative(IF_MD(int drive,) enum imx233_part_t part,
 #endif /* #(IMX233_PARTITIONS & IMX233_CREATIVE) */
 
 #if (IMX233_PARTITIONS & IMX233_FREESCALE)
-static int compute_window_freescale(IF_MD(int drive,) enum imx233_part_t part,
-    unsigned *start, unsigned *end)
+static int compute_window_freescale(intptr_t user, part_read_fn_t read_fn,
+    enum imx233_part_t part, unsigned *start, unsigned *end)
 {
     uint8_t mbr[512];
-    int ret = storage_read_sectors(IF_MD(drive,) 0, 1, mbr);
+    int ret = read_fn(user, 0, 1, mbr);
     if(ret < 0)
         return ret;
     /**
@@ -161,17 +161,17 @@ static int compute_window_freescale(IF_MD(int drive,) enum imx233_part_t part,
 }
 #endif /* (IMX233_PARTITIONS & IMX233_FREESCALE) */
 
-int imx233_partitions_compute_window(IF_MD(int drive,) enum imx233_part_t part,
-    unsigned *start, unsigned *end)
+int imx233_partitions_compute_window(intptr_t user, part_read_fn_t read_fn,
+    enum imx233_part_t part, unsigned *start, unsigned *end)
 {
     int ret = -1;
 #if (IMX233_PARTITIONS & IMX233_CREATIVE)
-    ret = compute_window_creative(IF_MD(drive,) part, start, end);
+    ret = compute_window_creative(user, read_fn, part, start, end);
     if(ret >= 0)
         return ret;
 #endif
 #if (IMX233_PARTITIONS & IMX233_FREESCALE)
-    ret = compute_window_freescale(IF_MD(drive,) part, start, end);
+    ret = compute_window_freescale(user, read_fn, part, start, end);
     if(ret >= 0)
         return ret;
 #endif
