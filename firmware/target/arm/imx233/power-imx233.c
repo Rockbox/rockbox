@@ -120,26 +120,6 @@ void INT_VDD5V(void)
         BF_CLR(POWER_CTRL, VDD5V_GT_VDDIO_IRQ);
     }
 #endif
-#if IMX233_SUBTARGET >= 3700
-    /* this IRQ is shared by several sources, disable them */
-    if(BF_RD(POWER_CTRL, PSWITCH_IRQ))
-    {
-        BF_CLR(POWER_CTRL, ENIRQ_PSWITCH);
-        BF_CLR(POWER_CTRL, PSWITCH_IRQ);
-    }
-#if IMX233_SUBTARGET < 3780
-    if(BF_RD(POWER_CTRL, LINREG_OK_IRQ))
-    {
-        BF_CLR(POWER_CTRL, ENIRQ_LINREG_OK);
-        BF_CLR(POWER_CTRL, LINREG_OK_IRQ);
-    }
-#endif /* IMX233_SUBTARGET < 3780 */
-    if(BF_RD(POWER_CTRL, DC_OK_IRQ))
-    {
-        BF_CLR(POWER_CTRL, ENIRQ_DC_OK);
-        BF_CLR(POWER_CTRL, DC_OK_IRQ);
-    }
-#endif /* IMX233_SUBTARGET >= 3700 */
 }
 
 void imx233_power_init(void)
@@ -174,7 +154,17 @@ void imx233_power_init(void)
     else
         BF_SET(POWER_CTRL, POLARITY_VDD5V_GT_VDDIO);
     BF_SET(POWER_CTRL, ENIRQ_VDD5V_GT_VDDIO);
+    /* make the vbusvalid detection way is not enabled */
+    BF_CLR(POWER_CTRL, ENIRQ_VBUS_VALID);
 #endif
+    /* the VDD5V IRQ is shared by several sources, disable them */
+#if IMX233_SUBTARGET >= 3700
+    BF_CLR(POWER_CTRL, ENIRQ_PSWITCH);
+    BF_CLR(POWER_CTRL, ENIRQ_DC_OK);
+#if IMX233_SUBTARGET < 3780
+    BF_CLR(POWER_CTRL, ENIRQ_LINREG_OK);
+#endif /* IMX233_SUBTARGET < 3780 */
+#endif /* IMX233_SUBTARGET >= 3700 */
     imx233_icoll_enable_interrupt(INT_SRC_VDD5V, true);
 }
 
