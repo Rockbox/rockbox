@@ -32,8 +32,8 @@ ANDROID_PLATFORM_VERSION=16
 ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSION)
 
 # android tools
-AAPT=$(ANDROID_SDK_PATH)/platform-tools/aapt
-DX=$(ANDROID_SDK_PATH)/platform-tools/dx
+AAPT=$(ANDROID_SDK_PATH)/build-tools/android-4.3/aapt
+DX=$(ANDROID_SDK_PATH)/build-tools/android-4.3//dx
 APKBUILDER=$(ANDROID_SDK_PATH)/tools/apkbuilder
 ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
 KEYSTORE=$(HOME)/.android/debug.keystore
