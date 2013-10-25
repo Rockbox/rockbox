@@ -315,6 +315,17 @@ static const struct button_mapping button_context_usb_hid_mode_multimedia[] = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
 }; /* button_context_usb_hid_mode_multimedia */
 
+static const struct button_mapping button_context_usb_hid_mode_xpinstall[] = {
+    { ACTION_USB_HID_XPINSTALL_ENTER ,               BUTTON_SELECT|BUTTON_REL,      BUTTON_SELECT },
+    { ACTION_USB_HID_XPINSTALL_UP,                   BUTTON_UP|BUTTON_REL,          BUTTON_UP },
+    { ACTION_USB_HID_XPINSTALL_F8,                   BUTTON_HOME|BUTTON_REL,        BUTTON_HOME },
+    { ACTION_USB_HID_XPINSTALL_LEFT,                 BUTTON_LEFT|BUTTON_REL,        BUTTON_LEFT },
+    { ACTION_USB_HID_XPINSTALL_RIGHT,                BUTTON_RIGHT|BUTTON_REL,       BUTTON_RIGHT },
+    { ACTION_USB_HID_XPINSTALL_DOWN,                 BUTTON_DOWN|BUTTON_REL,       BUTTON_DOWN },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
+}; /* button_context_usb_hid_mode_xpinstall */
+
 static const struct button_mapping button_context_usb_hid_mode_presentation[] = {
     { ACTION_USB_HID_PRESENTATION_SLIDESHOW_START, BUTTON_UP|BUTTON_REL,          BUTTON_UP },
     { ACTION_USB_HID_PRESENTATION_SLIDESHOW_LEAVE, BUTTON_HOME|BUTTON_REL,        BUTTON_HOME },
@@ -452,6 +463,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_usb_hid_mode_presentation;
         case CONTEXT_USB_HID_MODE_BROWSER:
             return button_context_usb_hid_mode_browser;
+        case CONTEXT_USB_HID_MODE_XPINSTALL:
+            return button_context_usb_hid_mode_xpinstall;
 #ifdef HAVE_USB_HID_MOUSE
         case CONTEXT_USB_HID_MODE_MOUSE:
             return button_context_usb_hid_mode_mouse;
