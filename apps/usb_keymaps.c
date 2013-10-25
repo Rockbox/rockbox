@@ -64,6 +64,21 @@ static const hid_key_mapping_t hid_key_mapping_multimedia = {
     }
 };
 
+static const hid_key_mapping_t hid_key_mapping_xpinstall = {
+    LANG_XPINSTALL_MODE,
+    CONTEXT_USB_HID_MODE_XPINSTALL,
+    HID_USAGE_PAGE_KEYBOARD_KEYPAD,
+    {
+        { ACTION_USB_HID_XPINSTALL_ENTER,         HID_KEYBOARD_RETURN, },
+        { ACTION_USB_HID_XPINSTALL_UP,         HID_KEYBOARD_UP_ARROW },
+        { ACTION_USB_HID_XPINSTALL_F8,         HID_KEYBOARD_F8 },
+        { ACTION_USB_HID_XPINSTALL_LEFT,         HID_KEYBOARD_LEFT_ARROW },
+        { ACTION_USB_HID_XPINSTALL_RIGHT,         HID_KEYBOARD_RIGHT_ARROW },
+        { ACTION_USB_HID_XPINSTALL_DOWN,         HID_KEYBOARD_DOWN_ARROW },
+        { 0,                     0 },
+    }
+};
+
 static const hid_key_mapping_t hid_key_mapping_presentation = {
     LANG_PRESENTATION_MODE,
     CONTEXT_USB_HID_MODE_PRESENTATION,

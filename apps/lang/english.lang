@@ -11540,6 +11540,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_XPINSTALL_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "XPInstall"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "XPInstall"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "XPInstall"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PRESENTATION_MODE
   desc: in settings_menu
   user: core
