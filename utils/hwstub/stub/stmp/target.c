@@ -144,7 +144,10 @@ void clkctrl_reset(void)
 #define HW_DIGCTL_CTRL          (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0))
 #define HW_DIGCTL_CTRL__USB_CLKGATE (1 << 2)
 
+/* STMP3700+ */
 #define HW_DIGCTL_MICROSECONDS  (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xC0))
+/* STMP3600 */
+#define HW_DIGCTL_MICROSECONDS2 (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xB0))
 
 #define HW_DIGCTL_CHIPID        (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0x310))
 #define HW_DIGCTL_CHIPID__PRODUCT_CODE_BP   16
@@ -276,12 +279,13 @@ void target_exit(void)
 
 void target_udelay(int us)
 {
-    uint32_t cur = HW_DIGCTL_MICROSECONDS;
+    volatile uint32_t *reg = g_stmp_family == STMP3600 ? &HW_DIGCTL_MICROSECONDS2 : &HW_DIGCTL_MICROSECONDS;
+    uint32_t cur = *reg;
     uint32_t end = cur + us;
     if(cur < end)
-        while(HW_DIGCTL_MICROSECONDS < end) {}
+        while(*reg < end) {}
     else
-        while(HW_DIGCTL_MICROSECONDS >= cur) {}
+        while(*reg >= cur) {}
 }
 
 void target_mdelay(int ms)
