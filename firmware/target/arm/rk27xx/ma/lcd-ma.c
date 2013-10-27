@@ -27,8 +27,88 @@
 #include "cpu.h"
 #include "lcdif-rk27xx.h"
 
+#define	ILI9342		0
+#define	ILI9342C	1
+#define LCD_DRIVER	ILI9342C
+
 static bool display_on = false;
 
+#if (CONFIG_LCD == LCD_ILI9342C)
+void lcd_display_init(void)
+{
+    unsigned int x, y;
+
+	lcd_cmd(0xC8);
+	lcd_data(0xFF);
+	lcd_data(0x93);
+	lcd_data(0x42);
+
+	lcd_write_reg(0x36, 0xC8);
+
+	lcd_write_reg(0x3A, 0x55);
+
+	lcd_cmd(0xC0);
+	lcd_data(0x14);
+	lcd_data(0x0E);
+
+	lcd_write_reg(0xC1, 0x01);
+
+	lcd_write_reg(0xC5, 0xF4);
+
+	lcd_cmd(0xB1);
+	lcd_data(0x00);
+	lcd_data(0x1B);
+
+	lcd_write_reg(0xB4, 0x02);
+
+	lcd_cmd(0xE0);
+	lcd_data(0x00);
+	lcd_data(0x0A);
+	lcd_data(0x11);
+	lcd_data(0x08);
+	lcd_data(0x16);
+	lcd_data(0x0A);
+	lcd_data(0x3C);
+	lcd_data(0x9B);
+	lcd_data(0x4A);
+	lcd_data(0x09);
+	lcd_data(0x0E);
+	lcd_data(0x0A);
+	lcd_data(0x1C);
+	lcd_data(0x1D);
+	lcd_data(0x0F);
+
+	lcd_cmd(0xE1);
+	lcd_data(0x00);
+	lcd_data(0x23);
+	lcd_data(0x25);
+	lcd_data(0x04);
+	lcd_data(0x10);
+	lcd_data(0x07);
+	lcd_data(0x39);
+	lcd_data(0x46);
+	lcd_data(0x4A);
+	lcd_data(0x03);
+	lcd_data(0x0C);
+	lcd_data(0x0A);
+	lcd_data(0x31);
+	lcd_data(0x36);
+	lcd_data(0x0F);
+
+    /* exit sleep */
+    lcd_cmd(0x11);
+    udelay(5000);
+    lcd_cmd(0x29);
+
+    lcd_cmd(0x2C);
+    for (x = 0; x < LCD_WIDTH; x++)
+        for(y=0; y < LCD_HEIGHT; y++)
+            lcd_data(0x00);
+
+    display_on = true;
+}
+
+#elif (CONFIG_LCD == LCD_ILI9342)
 
 void lcd_display_init(void)
 {
@@ -131,6 +211,7 @@ void lcd_display_init(void)
 
     display_on = true;
 }
+#endif
 
 void lcd_enable (bool on)
 {

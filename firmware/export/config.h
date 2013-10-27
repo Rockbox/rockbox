@@ -256,6 +256,7 @@
 #define LCD_NWZE360   52 /* as used by Sony NWZ-E360 series */
 #define LCD_CREATIVEZEN  55 /* as used by the Creative ZEN (X-Fi) (LMS250GF03-001(S6D0139)) */
 #define LCD_CREATIVEZENMOZAIC 56 /* as used by the Creative ZEN Mozaic (FGD0801) */
+#define LCD_ILI9342C   57 /* another type of lcd used by HiFi E.T MA9/MA8 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -532,6 +533,8 @@ Lyre prototype 1 */
 #include "config/creativezen.h"
 #elif defined(MA9)
 #include "config/hifietma9.h"
+#elif defined(MA9C)
+#include "config/hifietma9c.h"
 #elif defined(SONY_NWZE370)
 #include "config/sonynwze370.h"
 #elif defined(SONY_NWZE360)

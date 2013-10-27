@@ -32,7 +32,7 @@
 
 #ifdef RK27_GENERIC
 #define DEBUG_CANCEL BUTTON_VOL
-#elif defined(HM60X) || defined(HM801) || defined(MA9)
+#elif defined(HM60X) || defined(HM801) || defined(MA_PAD)
 #define DEBUG_CANCEL BUTTON_LEFT
 #endif
 
