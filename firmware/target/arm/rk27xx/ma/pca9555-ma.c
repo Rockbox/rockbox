@@ -71,6 +71,7 @@ static void pca9555_ports_init(void)
      */
     data |= ((1<<10)|(0<<9)|(1<<8));
     pca9555_write_output(data, 0xffff);
+    pca9555_in_ports = pca9555_read_input();
 }
 
 void pca9555_target_init(void)
