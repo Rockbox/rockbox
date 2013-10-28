@@ -85,13 +85,12 @@ getfile() {
       exit
   fi
 
-  if test -z "$tool"; then 
+  if test -z "$tool"; then
     echo "ROCKBOXDEV: No downloader tool found!"
     echo "ROCKBOXDEV: Please install curl or wget and re-run the script"
     exit
   fi
 }
-
 
 build() {
     toolname="$1"
@@ -123,7 +122,7 @@ build() {
             exit
             ;;
     esac
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -252,11 +251,11 @@ build_ctng() {
 
     dlurl="http://www.rockbox.org/gcc/$ctng_target"
 
-    # download 
+    # download
     getfile "ct-ng-config" "$dlurl"
 
     test -n "$extra" && getfile "$extra" "$dlurl"
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -283,12 +282,49 @@ build_ctng() {
             tar xf "$dlwhere/$extra" -C "$prefix/$tc_arch-$ctng_target-$tc_host/$sysroot"
         fi
     fi
-    
+
     # cleanup
     cd $builddir
     rm -rf $builddir/build-$ctng_target
 }
-    
+
+build_cegcc() {
+    # Cegcc has a dedicated build and install script within
+    # their sources.
+
+    # Create build directory
+    if test -d $builddir; then
+        if test ! -w $builddir; then
+            echo "ROCKBOXDEV: No write permission for $builddir"
+            exit
+        fi
+    else
+        mkdir -p $builddir
+    fi
+    echo "ROCKBOXDEV: Creating build Directories"
+    mkdir $builddir/build-cegcc
+    cd $builddir/build-cegcc
+
+    echo "ROCKBOXDEV: Fetching CEgcc"
+    mkdir cegcc && cd cegcc
+    svn co -r1266 https://svn.code.sf.net/p/cegcc/code
+
+    echo "ROCKBOXDEV: Patching CEgcc"
+    cd code/tags/cegcc-0.55
+    wget -O patch.diff "http://foolsh.no-ip.org:81/projects/cegcc/repository/revisions/67b157f2e32aa1d6f2859f72c3239d001b34ee96/diff?format=diff&rev_to=884d0b41acb17394547f5c0e6b78c38712559f51" 
+    patch -p3 < ./patch.diff
+    rm ./patch.diff
+
+    echo "ROCKBOXDEV: Building CEgcc"
+    cd src
+    mkdir build && cd build
+    ../scripts/build-cegcc.sh --prefix=$prefix
+
+    echo "ROCKBOXDEV: Cleaning Up CEgcc"
+    cd $builddir
+    rm -rf ./build-cegcc
+}
+
 ##############################################################################
 # Code:
 
@@ -337,11 +373,12 @@ if test ! -w $prefix; then
 fi
 
 echo "Select target arch:"
-echo "s   - sh       (Archos models)"
-echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
-echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
-echo "i   - mips     (Jz4740 and ATJ-based players)"
-echo "r   - arm-app  (Samsung ypr0)"
+echo "s  - sh               (Archos models)"
+echo "m  - m68k             (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
+echo "a  - arm              (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
+echo "i  - mips             (Jz4740 and ATJ-based players)"
+echo "r  - arm-app          (Samsung ypr0)"
+echo "c  - cegcc & sdl      (Windows Ce, PocketPC, Windows Mobile)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m68k and arm)"
 echo ""
@@ -393,6 +430,9 @@ do
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
+            ;;
+        [Cc])
+            build_mingw32ce
             ;;
         *)
             echo "ROCKBOXDEV: Unsupported architecture option: $arch"
