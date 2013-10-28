@@ -85,13 +85,12 @@ getfile() {
       exit
   fi
 
-  if test -z "$tool"; then 
+  if test -z "$tool"; then
     echo "ROCKBOXDEV: No downloader tool found!"
     echo "ROCKBOXDEV: Please install curl or wget and re-run the script"
     exit
   fi
 }
-
 
 build() {
     toolname="$1"
@@ -123,7 +122,7 @@ build() {
             exit
             ;;
     esac
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -252,11 +251,11 @@ build_ctng() {
 
     dlurl="http://www.rockbox.org/gcc/$ctng_target"
 
-    # download 
+    # download
     getfile "ct-ng-config" "$dlurl"
 
     test -n "$extra" && getfile "$extra" "$dlurl"
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -283,12 +282,74 @@ build_ctng() {
             tar xf "$dlwhere/$extra" -C "$prefix/$tc_arch-$ctng_target-$tc_host/$sysroot"
         fi
     fi
-    
+
     # cleanup
     cd $builddir
     rm -rf $builddir/build-$ctng_target
 }
-    
+
+build_mingw32ce() {
+    # Cegcc's mingw32ce has a dedicated build and install script within
+    # their sources.
+
+    # Create build directory
+    if test -d $builddir; then
+        if test ! -w $builddir; then
+            echo "ROCKBOXDEV: No write permission for $builddir"
+            exit
+        fi
+    else
+        mkdir -p $builddir
+    fi
+    echo "ROCKBOXDEV: Creating build Directories"
+    mkdir $builddir/build-mingw32ce
+    cd $builddir/build-mingw32ce
+
+    # Retrieve build-mingw32ce from Gitorious
+    echo "ROCKBOXDEV: Retrieving Mingw32ce Source"
+    git clone git://gitorious.org/cegcc/cegcc-build.git
+    cd cegcc-build
+    git submodule init
+    git submodule update
+
+    # Call build-mingw32ce.sh from here
+    echo "ROCKBOXDEV: Building Mingw32ce"
+    cd build-arm-mingw32ce
+    ./build-mingw32ce.sh --prefix=$prefix
+
+    # Patch headers - include_next doesn't seem to work right so we comment them out
+    echo "ROCKBOXDEV: Patching Mingw32ce Headers"
+    dlurl="http://foolsh.no-ip.org/"
+    getfile "Remove_include_next_ifdef__COREDLL_.patch" "$dlurl"
+    cd $prefix
+    patch -p0 < $dlwhere/Remove_include_next_ifdef__COREDLL_.patch
+
+    # Call git sdl
+    echo "ROCKBOXDEV: Retrieving SDL"
+    dlurl="http://www.libsdl.org/release/"
+    getfile "SDL-1.2.6.tar.gz" "$dlurl"
+
+    echo "ROCKBOXDEV: extracting SDL-1.2.6.tar.gz"
+    cd $builddir
+    tar xjf $dlwhere/SDL-1.2.6.tar.gz
+
+    # Patch SDL Makefile
+    dlurl="http://pocketinsanity.org/scummvm/libraries/"
+    getfile "SDL-1.2.6-wince.patch" "$dlurl"
+    patch -p0 < $dlwhere/SDL-1.2.6-wince.patch
+    # build and install sdl for mingw32ce
+    cd SDL-1.2.6
+    echo "ROCKBOXDEV: Building SDL 1.2.6 for mingw32ce"
+    make
+    cp ./SDL-1.2.6/libSDL.a $prefix/arm-mingw32ce/lib/
+    cp -R ./SDL-1.2.6/* $prefix/arm-mingw32ce/INCLUDE/
+
+    # cleanup
+    cd $builddir
+    rm -rf ./SDL-1.2.6
+    rm -rf ./build-mingw32ce
+}
+
 ##############################################################################
 # Code:
 
@@ -337,11 +398,12 @@ if test ! -w $prefix; then
 fi
 
 echo "Select target arch:"
-echo "s   - sh       (Archos models)"
-echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
-echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
-echo "i   - mips     (Jz4740 and ATJ-based players)"
-echo "r   - arm-app  (Samsung ypr0)"
+echo "s  - sh               (Archos models)"
+echo "m  - m68k             (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
+echo "a  - arm              (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
+echo "i  - mips             (Jz4740 and ATJ-based players)"
+echo "r  - arm-app          (Samsung ypr0)"
+echo "c  - mingw32ce & sdl  (Windows Ce, PocketPC, Windows Mobile)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m68k and arm)"
 echo ""
@@ -393,6 +455,9 @@ do
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
+            ;;
+        [Cc])
+            build_mingw32ce
             ;;
         *)
             echo "ROCKBOXDEV: Unsupported architecture option: $arch"
