@@ -436,6 +436,13 @@ coldfirecc () {
  gccchoice="4.5.2"
 }
 
+mingw32ce () {
+ prefixtools arm-mingw32ce-
+ GCCOPTS="$CCOPTS"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+}
+
 arm7tdmicc () {
  findarmgcc
  GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
