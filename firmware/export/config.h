@@ -536,6 +536,8 @@ Lyre prototype 1 */
 #include "config/sonynwze370.h"
 #elif defined(SONY_NWZE360)
 #include "config/sonynwze360.h"
+#elif defined(SDLAPP_WINCE)
+#include "config/sdlappwince.h"
 #else
 /* no known platform */
 #endif
