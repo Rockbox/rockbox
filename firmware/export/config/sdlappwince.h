@@ -48,8 +48,8 @@
 #define LCD_PIXELFORMAT RGB565
 
 /* define this to indicate your device's keypad */
-/*#define HAVE_TOUCHSCREEN
-#define HAVE_BUTTON_DATA*/
+/*#define HAVE_TOUCHSCREEN*/
+#define HAVE_BUTTON_DATA
 
 /* define this if you have RTC RAM available for settings */
 //#define HAVE_RTC_RAM
@@ -69,7 +69,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /*#define HAVE_SCROLLWHEEL*/
-/*#define CONFIG_KEYPAD SDL_PAD*/
+#define CONFIG_KEYPAD SDL_PAD
 
 /* Use SDL audio/pcm in a SDL app build */
 #define HAVE_SDL
