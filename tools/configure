@@ -438,7 +438,7 @@ coldfirecc () {
 
 mingw32ce () {
  prefixtools arm-mingw32ce-
- GCCOPTS="$CCOPTS"
+ GCCOPTS="$GCCOPTS -I$PNDSDK/arm-mingw32ce/include/ -I$PNDSDK"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
