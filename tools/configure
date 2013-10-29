@@ -3492,7 +3492,7 @@ fi
     app_set_lcd_size
     memory=8
     uname=`uname`
-    simcc "sdl-app"
+    simcc "sdl-app-mingw32ce"
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -3500,8 +3500,8 @@ fi
     output="rockbox.exe"
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
-    plugins="yes"
-    swcodec="yes"
+    plugins="no"
+    swcodec="no"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="sdl"
