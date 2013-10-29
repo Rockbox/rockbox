@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///r8\u003d",
+        "filename": "firmware/export/config/sdlappwince.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-10-29T10:13:16Z",
+      "side": 1,
+      "message": "Comment style fault :-)",
+      "revId": "444369c398c6286a93d53e56578802f41d92035e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///r4\u003d",
+        "filename": "firmware/export/config/sdlappwince.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-10-29T10:13:16Z",
+      "side": 1,
+      "message": "Please avoid TABS",
+      "revId": "444369c398c6286a93d53e56578802f41d92035e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///sA\u003d",
+        "filename": "tools/configure",
+        "patchSetId": 1
+      },
+      "lineNbr": 3504,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2013-10-29T10:13:16Z",
+      "side": 1,
+      "message": "This looks wrong and unrelated to the advertised change",
+      "revId": "444369c398c6286a93d53e56578802f41d92035e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
