@@ -3491,7 +3491,7 @@ fi
     app_set_paths
     app_set_lcd_size
     memory=8
-    uname=wince
+    uname=`uname`
     simcc "sdl-app"
     tool="cp "
     boottool="cp "
