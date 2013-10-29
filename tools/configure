@@ -3487,7 +3487,7 @@ fi
     application="yes"
     target_id=100
     modelname="sdlappwince"
-    target="SDLAPPWINCE"
+    target="SDLAPP_WINCE"
     app_set_paths
     app_set_lcd_size
     memory=8
