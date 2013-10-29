@@ -66,14 +66,14 @@
 #define AB_REPEAT_ENABLE
 
 /* Define this if you do software codec */
-/*#define CONFIG_CODEC SWCODEC*/
+#define CONFIG_CODEC SWCODEC
 
 /*#define HAVE_SCROLLWHEEL*/
 /*#define CONFIG_KEYPAD SDL_PAD*/
 
 /* Use SDL audio/pcm in a SDL app build */
 #define HAVE_SDL
-/*#define HAVE_SDL_AUDIO*/
+#define HAVE_SDL_AUDIO
 
 /*#define HAVE_SW_TONE_CONTROLS*/
 
