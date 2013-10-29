@@ -1342,6 +1342,7 @@ cat <<EOF
  205) Samsung YP-R0                              221) NWZ-E360 series
  206) Android MIPS
  207) Android x86
+ 208) Wince SDL
 EOF
 
   buildfor=`input`;
@@ -3480,6 +3481,32 @@ fi
     t_cpu="hosted"
     t_manufacturer="android"
     t_model="app"
+    ;;
+
+   208|sdlappwince)
+    application="yes"
+    target_id=100
+    modelname="sdlappwince"
+    target="SDLAPPWINCE"
+    app_set_paths
+    app_set_lcd_size
+    memory=8
+    uname=wince
+    simcc "sdl-app"
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.exe"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="sdl"
+    t_model="app"
+    mingw32ce
     ;;
 
    210|hifietma9)
