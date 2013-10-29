@@ -19,16 +19,16 @@
 #define HAVE_LCD_COLOR
 
 /* define this if you want album art for this target */
-/*#define HAVE_ALBUMART*/
+#define HAVE_ALBUMART
 
 /* define this to enable bitmap scaling */
 #define HAVE_BMP_SCALING
 
 /* define this to enable JPEG decoding */
-/*#define HAVE_JPEG*/
+#define HAVE_JPEG
 
 /* define this if you have access to the quickscreen */
-/*#define HAVE_QUICKSCREEN*/
+#define HAVE_QUICKSCREEN
 
 /* define this if you would like tagcache to build on this target */
 /*#define HAVE_TAGCACHE*/
@@ -55,7 +55,7 @@
 //#define HAVE_RTC_RAM
 
 /* define this if you have a real-time clock */
-/*#define CONFIG_RTC APPLICATION*/
+#define CONFIG_RTC APPLICATION
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000
@@ -88,7 +88,7 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-/*#define CONFIG_LCD LCD_COWOND2*/
+#define CONFIG_LCD LCD_COWOND2
 
 /* Define this if a programmable hotkey is mapped */
 /*#define HAVE_HOTKEY*/
