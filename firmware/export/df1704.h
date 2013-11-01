@@ -87,8 +87,7 @@ AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 1, 0)
 #define DF1704_SF_32     (3<<6)
 #define DF1704_SF_48     (2<<6)
 
-void df1704_init(void);
-void df1704_mute(void);
+void audiohw_mute(void);
 void df1704_set_ml(const int);
 void df1704_set_mc(const int);
 void df1704_set_md(const int);

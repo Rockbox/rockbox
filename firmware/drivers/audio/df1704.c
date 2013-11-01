@@ -67,7 +67,7 @@ static int vol_tenthdb2hw(const int tdb)
 }
 
 
-void df1704_init(void)
+void audiohw_init(void)
 {
     df1704_write_reg(DF1704_MODE(2),
                      DF1704_OW_24     |
@@ -81,7 +81,7 @@ void df1704_init(void)
                      DF1704_I2S_ON);
 }
 
-void df1704_mute(void)
+void audiohw_mute(void)
 {
     df1704_write_reg(DF1704_MODE(2),
                      DF1704_OW_24     |
@@ -90,7 +90,7 @@ void df1704_mute(void)
                      DF1704_MUTE_ON);
 }
 
-void df1704_unmute(void)
+void audiohw_unmute(void)
 {
     df1704_write_reg(DF1704_MODE(2),
                      DF1704_OW_24     |
