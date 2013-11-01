@@ -55,7 +55,7 @@ static void amp_enable(const int val)
     pca9555_write_output(val<<3, 1<<3);
 }
 
-static void df1704_enable(const int val)
+static void dac_enable(const int val)
 {
     pca9555_write_output(val<<4, 1<<4);
 }
@@ -65,21 +65,21 @@ void audiohw_postinit(void)
 {
     pop_ctrl(0);
     sleep(HZ/4);
-    df1704_enable(1);
+    dac_enable(1);
     amp_enable(1);
     sleep(HZ/100);
-    df1704_init();
+    audiohw_init();
     sleep(HZ/4);
     pop_ctrl(1);
 }
 
 void audiohw_close(void)
 {
-    df1704_mute();
+    audiohw_mute();
     pop_ctrl(0);
     sleep(HZ/5);
     amp_enable(0);
-    df1704_enable(0);
+    dac_enable(0);
     sleep(HZ/5);
     pop_ctrl(1);
 }
