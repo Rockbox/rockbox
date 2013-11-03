@@ -156,7 +156,7 @@ dbg {
 DEFINES += RBUTIL _LARGEFILE64_SOURCE CUTELOGGER_STATIC
 
 # check version of Qt installation
-!contains(QT_MAJOR_VERSION, 5):!macx {
+!contains(QT_MAJOR_VERSION, 5):!macx:!*-msvc* {
     # suppress warnings in Qt 4.8 shown by gcc 4.8
     QMAKE_CXXFLAGS += -Wno-unused-local-typedefs
 }
