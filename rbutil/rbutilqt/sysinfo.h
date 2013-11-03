@@ -30,9 +30,13 @@ class Sysinfo : public QDialog
     Q_OBJECT
 
     public:
+        enum InfoType {
+            InfoHtml,
+            InfoText,
+        };
         Sysinfo(QWidget *parent = 0);
 
-        static QString getInfo();
+        static QString getInfo(InfoType type = InfoHtml);
     private:
         void changeEvent(QEvent *event);
         Ui::SysinfoFrm ui;

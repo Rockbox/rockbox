@@ -175,8 +175,7 @@ void ProgressLoggerGui::saveErrorLog()
                    "*********************************************\n";
 
     file.write(info.toUtf8(), info.size());
-    info = Sysinfo::getInfo();
-    info.replace(QRegExp("(<[^>]+>)+"),"\n");
+    info = Sysinfo::getInfo(Sysinfo::InfoText);
     file.write(info.toUtf8(), info.size());
 
     // trace

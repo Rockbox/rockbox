@@ -39,7 +39,7 @@ void Sysinfo::updateSysinfo(void)
     ui.textBrowser->setHtml(getInfo());
 }
 
-QString Sysinfo::getInfo()
+QString Sysinfo::getInfo(Sysinfo::InfoType type)
 {
     QString info;
     info += tr("<b>OS</b><br/>") + System::osVersionString() + "<hr/>";
@@ -76,6 +76,9 @@ QString Sysinfo::getInfo()
     }
     info += "</table>";
     info += "<hr/>";
+    if(type == InfoText) {
+        info.replace(QRegExp("(<[^>]+>)+"),"\n");
+    }
 
     return info;
 }
