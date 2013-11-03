@@ -20,6 +20,7 @@
 #include "utils.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
+#include "Logger.h"
 
 TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
 {
@@ -89,7 +90,7 @@ void TTSSapi::saveSettings()
 
 void TTSSapi::updateVoiceList()
 {
-    qDebug() << "[TTSSapi] updating voicelist";
+    LOG_INFO() << "updating voicelist";
     QStringList voiceList = getVoiceList(getSetting(eLANGUAGE)->current().toString());
     getSetting(eVOICE)->setList(voiceList);
     if(voiceList.size() > 0) getSetting(eVOICE)->setCurrent(voiceList.at(0));
@@ -122,15 +123,15 @@ bool TTSSapi::start(QString *errStr)
     execstring.replace("%voice",m_TTSVoice);
     execstring.replace("%speed",m_TTSSpeed);
 
-    qDebug() << "[TTSSapi] Start:" << execstring;
+    LOG_INFO() << "Start:" << execstring;
     voicescript = new QProcess(NULL);
     //connect(voicescript,SIGNAL(readyReadStandardError()),this,SLOT(error()));
     voicescript->start(execstring);
-    qDebug() << "[TTSSapi] wait for process";
+    LOG_INFO() << "wait for process";
     if(!voicescript->waitForStarted())
     {
         *errStr = tr("Could not start SAPI process");
-        qDebug() << "[TTSSapi] starting process timed out!";
+        LOG_ERROR() << "starting process timed out!";
         return false;
     }
 
@@ -161,7 +162,7 @@ QString TTSSapi::voiceVendor(void)
     while((vendor = voicestream->readLine()).isEmpty())
             QCoreApplication::processEvents();
 
-    qDebug() << "[TTSSAPI] TTS vendor:" << vendor;
+    LOG_INFO() << "TTS vendor:" << vendor;
     if(!keeprunning) {
         stop();
     }
@@ -184,12 +185,12 @@ QStringList TTSSapi::getVoiceList(QString language)
     execstring.replace("%exe",m_TTSexec);
     execstring.replace("%lang",language);
 
-    qDebug() << "[TTSSapi] Start:" << execstring;
+    LOG_INFO() << "Start:" << execstring;
     voicescript = new QProcess(NULL);
     voicescript->start(execstring);
-    qDebug() << "[TTSSapi] wait for process";
+    LOG_INFO() << "wait for process";
     if(!voicescript->waitForStarted()) {
-        qDebug() << "[TTSSapi] process startup timed out!";
+        LOG_INFO() << "process startup timed out!";
         return result;
     }
     voicescript->closeWriteChannel();
@@ -197,7 +198,7 @@ QStringList TTSSapi::getVoiceList(QString language)
 
     QString dataRaw = voicescript->readAllStandardError().data();
     if(dataRaw.startsWith("Error")) {
-        qDebug() << "[TTSSapi] Error:" << dataRaw;
+        LOG_INFO() << "Error:" << dataRaw;
     }
     result = dataRaw.split(";",QString::SkipEmptyParts);
     if(result.size() > 0)
@@ -226,7 +227,7 @@ TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
 {
     (void) errStr;
     QString query = "SPEAK\t"+wavfile+"\t"+text;
-    qDebug() << "[TTSSapi] voicing" << query;
+    LOG_INFO() << "voicing" << query;
     // append newline to query. Done now to keep debug output more readable.
     query.append("\r\n");
     *voicestream << query;
@@ -236,7 +237,7 @@ TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
     voicescript->waitForReadyRead();
 
     if(!QFileInfo(wavfile).isFile()) {
-        qDebug() << "[TTSSapi] output file does not exist:" << wavfile;
+        LOG_ERROR() << "output file does not exist:" << wavfile;
         return FatalError;
     }
     return NoError;

@@ -17,7 +17,7 @@
  ****************************************************************************/
 
 #include <QtCore>
-#include <QDebug>
+#include "Logger.h"
 #include "mspackutil.h"
 #include "progressloggerinterface.h"
 
@@ -27,7 +27,7 @@ MsPackUtil::MsPackUtil(QObject* parent)
     m_cabd = mspack_create_cab_decompressor(NULL);
     m_cabinet = NULL;
     if(!m_cabd)
-        qDebug() << "[MsPackUtil] CAB decompressor creation failed!";
+        LOG_ERROR() << "CAB decompressor creation failed!";
 }
 
 MsPackUtil::~MsPackUtil()
@@ -43,7 +43,7 @@ bool MsPackUtil::open(QString& mspackfile)
 
     if(m_cabd == NULL)
     {
-        qDebug() << "[MsPackUtil] No CAB decompressor available: cannot open file!";
+        LOG_ERROR() << "No CAB decompressor available: cannot open file!";
         return false;
     }
     m_cabinet = m_cabd->search(m_cabd, QFile::encodeName(mspackfile).constData());
@@ -60,10 +60,10 @@ bool MsPackUtil::close(void)
 
 bool MsPackUtil::extractArchive(const QString& dest, QString file)
 {
-    qDebug() << "[MsPackUtil] extractArchive" << dest << file;
+    LOG_INFO() << "extractArchive" << dest << file;
     if(!m_cabinet)
     {
-        qDebug() << "[MsPackUtil] CAB file not open!";
+        LOG_ERROR() << "CAB file not open!";
         return false;
     }
 
@@ -78,7 +78,7 @@ bool MsPackUtil::extractArchive(const QString& dest, QString file)
     struct mscabd_file *f = m_cabinet->files;
     if(f == NULL)
     {
-        qDebug() << "[MsPackUtil] CAB doesn't contain file" << file;
+        LOG_WARNING() << "CAB doesn't contain file" << file;
         return true;
     }
     bool found = false;
@@ -99,7 +99,7 @@ bool MsPackUtil::extractArchive(const QString& dest, QString file)
             if(!QDir().mkpath(QFileInfo(path).absolutePath()))
             {
                 emit logItem(tr("Creating output path failed"), LOGERROR);
-                qDebug() << "[MsPackUtil] creating output path failed for:" << path;
+                LOG_ERROR() << "creating output path failed for:" << path;
                 emit logProgress(1, 1);
                 return false;
             }
@@ -107,7 +107,8 @@ bool MsPackUtil::extractArchive(const QString& dest, QString file)
             if(ret != MSPACK_ERR_OK)
             {
                 emit logItem(tr("Error during CAB operation"), LOGERROR);
-                qDebug() << "[MsPackUtil] mspack error: " << ret << "(" << errorStringMsPack(ret) << ")";
+                LOG_ERROR() << "mspack error: " << ret
+                            << "(" << errorStringMsPack(ret) << ")";
                 emit logProgress(1, 1);
                 return false;
             }
@@ -125,7 +126,7 @@ QStringList MsPackUtil::files(void)
     QStringList list;
     if(!m_cabinet)
     {
-        qDebug() << "[MsPackUtil] CAB file not open!";
+        LOG_WARNING() << "CAB file not open!";
         return list;
     }
     struct mscabd_file *file = m_cabinet->files;

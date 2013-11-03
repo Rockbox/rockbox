@@ -23,6 +23,7 @@
 #include "configure.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
+#include "Logger.h"
 
 CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
 {
@@ -88,7 +89,7 @@ void CreateVoiceWindow::updateSettings(void)
             f = languages.value(uilang).at(0);
         }
         sel = ui.comboLanguage->findData(f);
-        qDebug() << "[CreateVoiceWindow] Selected language index:" << sel;
+        LOG_INFO() << "Selected language index:" << sel;
     }
     ui.comboLanguage->setCurrentIndex(sel);
 

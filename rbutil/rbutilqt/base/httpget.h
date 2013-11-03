@@ -25,6 +25,7 @@
 #include <QtCore>
 #include <QtNetwork>
 #include <QNetworkAccessManager>
+#include "Logger.h"
 
 class HttpGet : public QObject
 {
@@ -49,13 +50,13 @@ class HttpGet : public QObject
         //< set global cache path
         static void setGlobalCache(const QDir& d)
         {
-            qDebug() << "[HttpGet] Global cache set to" << d.absolutePath();
+            LOG_INFO() << "Global cache set to" << d.absolutePath();
             m_globalCache = d;
         }
         //< set global proxy value
         static void setGlobalProxy(const QUrl& p)
         {
-            qDebug() << "[HttpGet] setting global proxy" << p;
+            LOG_INFO() << "setting global proxy" << p;
             if(!p.isValid() || p.isEmpty()) {
                 HttpGet::m_globalProxy.setType(QNetworkProxy::NoProxy);
             }

@@ -20,13 +20,14 @@
 #include "encoderlame.h"
 #include "rbsettings.h"
 #include "lame/lame.h"
+#include "Logger.h"
 
 /** Resolve a symbol from loaded library.
  */
 #define SYMBOLRESOLVE(symbol, type) \
     do { m_##symbol = (type)lib->resolve(#symbol); \
         if(!m_##symbol) return; \
-        qDebug() << "[EncoderLame] Resolved symbol " #symbol; } \
+        LOG_INFO() << "Resolved symbol " #symbol; } \
     while(0)
 
 EncoderLame::EncoderLame(QObject *parent) : EncoderBase(parent)
@@ -50,7 +51,7 @@ EncoderLame::EncoderLame(QObject *parent) : EncoderBase(parent)
     SYMBOLRESOLVE(lame_encode_flush, int (*)(lame_global_flags*, unsigned char*, int));
     SYMBOLRESOLVE(lame_close, int (*)(lame_global_flags*));
 
-    qDebug() << "[EncoderLame] libmp3lame loaded:" << lib->isLoaded();
+    LOG_INFO() << "libmp3lame loaded:" << lib->isLoaded();
 
     m_encoderVolume = RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble();
     m_encoderQuality = RbSettings::subValue("lame", RbSettings::EncoderQuality).toDouble();
@@ -108,9 +109,9 @@ bool EncoderLame::start()
 
 bool EncoderLame::encode(QString input,QString output)
 {
-    qDebug() << "[EncoderLame] Encoding" << QDir::cleanPath(input);
+    LOG_INFO() << "Encoding" << QDir::cleanPath(input);
     if(!m_symbolsResolved) {
-        qDebug() << "[EncoderLame] Symbols not successfully resolved, cannot run!";
+        LOG_ERROR() << "Symbols not successfully resolved, cannot run!";
         return false;
     }
 
@@ -144,21 +145,21 @@ bool EncoderLame::encode(QString input,QString output)
     m_lame_set_bWriteVbrTag(gfp, 0);            // disable LAME tag.
 
     if(!fin.open(QIODevice::ReadOnly)) {
-        qDebug() << "[EncoderLame] Could not open input file" << input;
+        LOG_ERROR() << "Could not open input file" << input;
             return false;
     }
 
     // read RIFF header
     fin.read((char*)header, 12);
     if(memcmp("RIFF", header, 4) != 0) {
-        qDebug() << "[EncoderLame] RIFF header not found!"
-                 << header[0] << header[1] << header[2] << header[3];
+        LOG_ERROR() << "RIFF header not found!"
+                    << header[0] << header[1] << header[2] << header[3];
         fin.close();
         return false;
     }
     if(memcmp("WAVE", &header[8], 4) != 0) {
-        qDebug() << "[EncoderLame] WAVE FOURCC not found!"
-                 << header[8] << header[9] << header[10] << header[11];
+        LOG_ERROR() << "WAVE FOURCC not found!"
+                    << header[8] << header[9] << header[10] << header[11];
         fin.close();
         return false;
     }
@@ -178,7 +179,7 @@ bool EncoderLame::encode(QString input,QString output)
             // input format used should be known. In case some TTS uses a
             // different wave encoding some time this needs to get adjusted.
             if(chunkdatalen < 16) {
-                qDebug() << "[EncoderLame] fmt chunk too small!";
+                LOG_ERROR() << "fmt chunk too small!";
             }
             else {
                 unsigned char *buf = new unsigned char[chunkdatalen];
@@ -196,18 +197,18 @@ bool EncoderLame::encode(QString input,QString output)
         }
         else {
             // unknown chunk, just skip its data.
-            qDebug() << "[EncoderLame] unknown chunk, skipping."
-                     << chunkheader[0] << chunkheader[1]
-                     << chunkheader[2] << chunkheader[3];
+            LOG_WARNING() << "unknown chunk, skipping."
+                          << chunkheader[0] << chunkheader[1]
+                          << chunkheader[2] << chunkheader[3];
             fin.seek(fin.pos() + chunkdatalen);
         }
     } while(!fin.atEnd());
 
     // check format
     if(channels == 0 || samplerate == 0 || samplesize == 0 || datalength == 0) {
-        qDebug() << "[EncoderLame] invalid format. Channels:" << channels
-                 << "Samplerate:" << samplerate << "Samplesize:" << samplesize
-                 << "Data chunk length:" << datalength;
+        LOG_ERROR() << "invalid format. Channels:" << channels
+                    << "Samplerate:" << samplerate << "Samplesize:" << samplesize
+                    << "Data chunk length:" << datalength;
         fin.close();
         return false;
     }
@@ -220,7 +221,7 @@ bool EncoderLame::encode(QString input,QString output)
     // initialize encoder.
     ret = m_lame_init_params(gfp);
     if(ret != 0) {
-        qDebug() << "[EncoderLame] lame_init_params() failed with" << ret;
+        LOG_ERROR() << "lame_init_params() failed with" << ret;
         fin.close();
         return false;
     }
@@ -230,7 +231,7 @@ bool EncoderLame::encode(QString input,QString output)
     // bytes the input file has. This wastes space but should be ok.
     // Put an upper limit of 8MiB.
     if(datalength > 8*1024*1024) {
-        qDebug() << "[EncoderLame] Input file too large:" << datalength;
+        LOG_ERROR() << "Input file too large:" << datalength;
         fin.close();
         return false;
     }
@@ -255,7 +256,7 @@ bool EncoderLame::encode(QString input,QString output)
         }
     }
     else {
-        qDebug() << "[EncoderLame] Unknown samplesize:" << samplesize;
+        LOG_ERROR() << "Unknown samplesize:" << samplesize;
         fin.close();
         delete[] mp3buf;
         delete[] wavbuf;
@@ -270,10 +271,10 @@ bool EncoderLame::encode(QString input,QString output)
     fout.open(QIODevice::ReadWrite);
     ret = m_lame_encode_buffer(gfp, wavbuf, wavbuf, num_samples, mp3buf, mp3buflen);
     if(ret < 0) {
-        qDebug() << "[EncoderLame] Error during encoding:" << ret;
+        LOG_ERROR() << "Error during encoding:" << ret;
     }
     if(fout.write((char*)mp3buf, ret) != (unsigned int)ret) {
-        qDebug() << "[EncoderLame] Writing mp3 data failed!" << ret;
+        LOG_ERROR() << "Writing mp3 data failed!" << ret;
         fout.close();
         delete[] mp3buf;
         delete[] wavbuf;
@@ -282,7 +283,7 @@ bool EncoderLame::encode(QString input,QString output)
     // flush remaining data
     ret = m_lame_encode_flush(gfp, mp3buf, mp3buflen);
     if(fout.write((char*)mp3buf, ret) != (unsigned int)ret) {
-        qDebug() << "[EncoderLame] Writing final mp3 data failed!";
+        LOG_ERROR() << "Writing final mp3 data failed!";
         fout.close();
         delete[] mp3buf;
         delete[] wavbuf;

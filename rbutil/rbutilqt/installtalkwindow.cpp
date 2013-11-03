@@ -23,6 +23,7 @@
 #include "configure.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
+#include "Logger.h"
 
 InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
 {
@@ -118,8 +119,8 @@ void InstallTalkWindow::accept()
     connect(logger,SIGNAL(aborted()),talkcreator,SLOT(abort()));
 
     for(int i = 0; i < foldersToTalk.size(); i++) {
-        qDebug() << "[InstallTalkWindow] creating talk files for folder"
-                 << foldersToTalk.at(i);
+        LOG_INFO() << "creating talk files for folder"
+                   << foldersToTalk.at(i);
         talkcreator->setDir(foldersToTalk.at(i));
         talkcreator->createTalkFiles();
     }

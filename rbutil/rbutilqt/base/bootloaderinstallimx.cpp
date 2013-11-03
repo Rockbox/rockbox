@@ -21,6 +21,7 @@
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallimx.h"
 #include "../mkimxboot/mkimxboot.h"
+#include "Logger.h"
 
 // class for running mkimxboot() in a separate thread to keep the UI responsive.
 class BootloaderThreadImx : public QThread
@@ -45,7 +46,7 @@ class BootloaderThreadImx : public QThread
 
 void BootloaderThreadImx::run(void)
 {
-    qDebug() << "[BootloaderThreadImx] Thread started.";
+    LOG_INFO() << "Thread started.";
     struct imx_option_t opt;
     memset(&opt, 0, sizeof(opt));
     opt.debug = false;
@@ -55,7 +56,7 @@ void BootloaderThreadImx::run(void)
     m_error = mkimxboot(m_inputfile.toLocal8Bit().constData(),
             m_bootfile.toLocal8Bit().constData(),
             m_outputfile.toLocal8Bit().constData(), opt);
-    qDebug() << "[BootloaderThreadImx] Thread finished, result:" << m_error;
+    LOG_INFO() << "Thread finished, result:" << m_error;
 }
 
 
@@ -88,13 +89,13 @@ bool BootloaderInstallImx::install(void)
 {
     if(!QFileInfo(m_offile).isReadable())
     {
-        qDebug() << "[BootloaderInstallImx] could not read original firmware file"
+        LOG_ERROR() << "could not read original firmware file"
                  << m_offile;
         emit logItem(tr("Could not read original firmware file"), LOGERROR);
         return false;
     }
 
-    qDebug() << "[BootloaderInstallImx] downloading bootloader";
+    LOG_INFO() << "downloading bootloader";
     // download bootloader from server
     emit logItem(tr("Downloading bootloader file"), LOGINFO);
     connect(this, SIGNAL(downloadDone()), this, SLOT(installStage2()));
@@ -105,7 +106,7 @@ bool BootloaderInstallImx::install(void)
 
 void BootloaderInstallImx::installStage2(void)
 {
-    qDebug() << "[BootloaderInstallImx] patching file...";
+    LOG_INFO() << "patching file...";
     emit logItem(tr("Patching file..."), LOGINFO);
     m_tempfile.open();
 
@@ -132,26 +133,26 @@ void BootloaderInstallImx::installStage3(void)
     // if the patch failed 
     if (err != IMX_SUCCESS)
     {
-        qDebug() << "[BootloaderInstallImx] Could not patch the original firmware file";
+        LOG_ERROR() << "Could not patch the original firmware file";
         emit logItem(tr("Patching the original firmware failed"), LOGERROR);
         emit done(true);
         return;
     }
 
-    qDebug() << "[BootloaderInstallImx] Original Firmware succesfully patched";
+    LOG_INFO() << "Original Firmware succesfully patched";
     emit logItem(tr("Succesfully patched firmware file"), LOGINFO);
 
     // if a bootloader is already present delete it.
     QString fwfile(m_blfile);
     if(QFileInfo(fwfile).isFile())
     {
-        qDebug() << "[BootloaderInstallImx] deleting old target file";
+        LOG_INFO() << "deleting old target file";
         QFile::remove(fwfile);
     }
 
     // place (new) bootloader. Copy, since the temporary file will be removed
     // automatically.
-    qDebug() << "[BootloaderInstallImx] moving patched bootloader to" << fwfile;
+    LOG_INFO() << "moving patched bootloader to" << fwfile;
     if(m_patchedFile.copy(fwfile))
     {
         emit logItem(tr("Bootloader successful installed"), LOGOK);

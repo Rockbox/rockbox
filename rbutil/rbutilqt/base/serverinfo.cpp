@@ -19,6 +19,7 @@
 #include "serverinfo.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
+#include "Logger.h"
 
 #if defined(Q_OS_LINUX)
 #include <unistd.h>
@@ -181,7 +182,7 @@ QVariant ServerInfo::value(enum ServerInfos info)
 
     QString s = ServerInfoList[i].name;
     s.replace(":platform:", RbSettings::value(RbSettings::CurrentPlatform).toString());
-    qDebug() << "[ServerInfo] GET:" << s << serverInfos.value(s, ServerInfoList[i].def).toString();
+    LOG_INFO() << "GET:" << s << serverInfos.value(s, ServerInfoList[i].def).toString();
     return serverInfos.value(s, ServerInfoList[i].def);
 }
 
@@ -201,7 +202,7 @@ void ServerInfo::setPlatformValue(QString platform, enum ServerInfos info, QVari
     QString s = ServerInfoList[i].name;
     s.replace(":platform:", platform);
     serverInfos.insert(s, value);
-    qDebug() << "[ServerInfo] SET:" << s << serverInfos.value(s).toString();
+    LOG_INFO() << "SET:" << s << serverInfos.value(s).toString();
 }
 
 QVariant ServerInfo::platformValue(QString platform, enum ServerInfos info)
@@ -215,7 +216,7 @@ QVariant ServerInfo::platformValue(QString platform, enum ServerInfos info)
     s.replace(":platform:", platform);
     QString d = ServerInfoList[i].def;
     d.replace(":platform:", platform);
-    qDebug() << "[ServerInfo] GET:" << s << serverInfos.value(s, d).toString();
+    LOG_INFO() << "GET:" << s << serverInfos.value(s, d).toString();
     return serverInfos.value(s, d);
 }
 

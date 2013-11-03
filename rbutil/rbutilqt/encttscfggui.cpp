@@ -32,6 +32,7 @@
 #include <QCheckBox>
 #include <QProgressDialog>
 #include "encttscfggui.h"
+#include "Logger.h"
 
 EncTtsCfgGui::EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* iface, QString name)
         : QDialog(parent)
@@ -174,7 +175,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
         }
         default:
         {
-            qDebug() << "Warning: unknown EncTTsSetting type" << setting->type();
+            LOG_WARNING() << "Warning: unknown EncTTsSetting type" << setting->type();
             break;
         }
     }
@@ -252,7 +253,7 @@ void EncTtsCfgGui::updateSetting()
         }
         default:
         {
-            qDebug() << "unknown Settingtype !!";
+            LOG_WARNING() << "unknown setting type!";
             break;
         }
     }
@@ -331,7 +332,7 @@ void EncTtsCfgGui::updateWidget()
         }
         default:
         {
-            qDebug() << "unknown EncTTsSetting";
+            LOG_WARNING() << "unknown EncTTsSetting";
             break;
         }
     }

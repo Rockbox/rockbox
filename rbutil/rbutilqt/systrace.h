@@ -29,20 +29,12 @@ class SysTrace : public QDialog
     Q_OBJECT
     public:
         SysTrace(QWidget *parent);
-#if QT_VERSION < 0x050000
-        static void debug(QtMsgType type, const char* msg);
-#else
-        static void debug(QtMsgType type, const QMessageLogContext &context, const QString &msg);
-#endif
-        static QString getTrace() {return debugbuffer;}
+        static QString getTrace(void);
         static void save(QString filename = "");
+        static void rotateTrace(void);
     private:
-        static void flush(void);
         void changeEvent(QEvent *event);
         Ui::SysTraceFrm ui;
-        static QString debugbuffer;
-        static QString lastmessage;
-        static unsigned int repeat;
 
     private slots:
         void saveCurrentTrace(void);

@@ -20,6 +20,7 @@
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallhex.h"
 #include "utils.h"
+#include "Logger.h"
 
 #include "../../tools/iriver.h"
 #include "../../tools/mkboot.h"
@@ -74,7 +75,7 @@ bool BootloaderInstallHex::install(void)
     file.close();
     QString hash = QCryptographicHash::hash(filedata,
             QCryptographicHash::Md5).toHex();
-    qDebug() << "[BootloaderInstallHex] hexfile hash:" << hash;
+    LOG_INFO() << "hexfile hash:" << hash;
     if(file.error() != QFile::NoError) {
         emit logItem(tr("Could not verify original firmware file"), LOGERROR);
         emit done(true);
@@ -112,7 +113,7 @@ bool BootloaderInstallHex::install(void)
     int result;
     result = iriver_decode(m_offile.toLatin1().data(),
         m_descrambled.fileName().toLatin1().data(), FALSE, STRIP_NONE);
-    qDebug() << "[BootloaderInstallHex] iriver_decode" << result;
+    LOG_INFO() << "iriver_decode():" << result;
 
     if(result < 0) {
         emit logItem(tr("Error in descramble: %1").arg(scrambleError(result)), LOGERROR);
@@ -200,7 +201,7 @@ void BootloaderInstallHex::installStage2(void)
     targethex.close();
     QString hash = QCryptographicHash::hash(filedata,
             QCryptographicHash::Md5).toHex();
-    qDebug() << "[BootloaderInstallHex] created hexfile hash:" << hash;
+    LOG_INFO() << "created hexfile hash:" << hash;
 
     emit logItem(tr("Checking modified firmware file"), LOGINFO);
     if(hash != QString(md5sums[m_hashindex].patched)) {

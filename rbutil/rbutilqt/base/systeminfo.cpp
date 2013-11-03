@@ -16,10 +16,11 @@
  *
  ****************************************************************************/
 
-#include "systeminfo.h" 
+#include "systeminfo.h"
 #include "rbsettings.h"
 
 #include <QSettings>
+#include "Logger.h"
 
 #if defined(Q_OS_LINUX)
 #include <unistd.h>
@@ -89,7 +90,7 @@ QVariant SystemInfo::value(enum SystemInfos info)
     s.replace(":platform:", platform);
     QString d = SystemInfosList[i].def;
     d.replace(":platform:", platform);
-    qDebug() << "[SystemInfo] GET:" << s << systemInfos->value(s, d).toString();
+    LOG_INFO() << "GET:" << s << systemInfos->value(s, d).toString();
     return systemInfos->value(s, d);
 }
 
@@ -106,7 +107,7 @@ QVariant SystemInfo::platformValue(QString platform, enum SystemInfos info)
     s.replace(":platform:", platform);
     QString d = SystemInfosList[i].def;
     d.replace(":platform:", platform);
-    qDebug() << "[SystemInfo] GET P:" << s << systemInfos->value(s, d).toString();
+    LOG_INFO() << "GET P:" << s << systemInfos->value(s, d).toString();
     return systemInfos->value(s, d);
 }
 

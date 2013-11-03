@@ -20,6 +20,7 @@
 #include "encoderexe.h"
 #include "rbsettings.h"
 #include "utils.h"
+#include "Logger.h"
 
 EncoderExe::EncoderExe(QString name,QObject *parent) : EncoderBase(parent)
 {
@@ -69,14 +70,13 @@ bool EncoderExe::start()
 
 bool EncoderExe::encode(QString input,QString output)
 {
-    //qDebug() << "encoding..";
     QString execstring = m_EncTemplate;
 
     execstring.replace("%exe",m_EncExec);
     execstring.replace("%options",m_EncOpts);
     execstring.replace("%input",input);
     execstring.replace("%output",output);
-    qDebug() << "[EncoderExe] cmd: " << execstring;
+    LOG_INFO() << "cmd: " << execstring;
     int result = QProcess::execute(execstring);
     return (result == 0) ? true : false;
 }

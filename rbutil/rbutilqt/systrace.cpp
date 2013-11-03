@@ -22,10 +22,8 @@
 #include "ui_systracefrm.h"
 
 #include "rbsettings.h"
+#include "Logger.h"
 
-QString SysTrace::debugbuffer;
-QString SysTrace::lastmessage;
-unsigned int SysTrace::repeat = 0;
 
 SysTrace::SysTrace(QWidget *parent) : QDialog(parent)
 {
@@ -43,7 +41,28 @@ SysTrace::SysTrace(QWidget *parent) : QDialog(parent)
 void SysTrace::refresh(void)
 {
     int pos = ui.textTrace->verticalScrollBar()->value();
-    flush();
+
+    QString debugbuffer;
+    QFile tracefile(QDir::tempPath() + "/rbutil-trace.log");
+    tracefile.open(QIODevice::ReadOnly);
+    QTextStream c(&tracefile);
+    QString line;
+    QString color;
+    while(!c.atEnd()) {
+        line = c.readLine();
+        if(line.contains("WARNING"))
+            color = "orange";
+        else if(line.contains("ERROR"))
+            color = "red";
+#if 0
+        else if(line.contains("INFO"))
+            color = "green";
+#endif
+        else
+            color = "black";
+        debugbuffer += QString("<div style='color:%1;'>%2</div>").arg(color, line);
+    }
+    tracefile.close();
     ui.textTrace->setHtml("<pre>" + debugbuffer + "</pre>");
     ui.textTrace->verticalScrollBar()->setValue(pos);
     QString oldlog = RbSettings::value(RbSettings::CachePath).toString()
@@ -52,23 +71,26 @@ void SysTrace::refresh(void)
 }
 
 
+QString SysTrace::getTrace(void)
+{
+    QString debugbuffer;
+    QFile tracefile(QDir::tempPath() + "/rbutil-trace.log");
+    tracefile.open(QIODevice::ReadOnly);
+    QTextStream c(&tracefile);
+    debugbuffer = c.readAll();
+    tracefile.close();
+
+    return debugbuffer;
+}
+
+
 void SysTrace::save(QString filename)
 {
     if(filename.isEmpty())
-        filename = RbSettings::value(RbSettings::CachePath).toString()
-                    + "/rbutil-trace.log";
-    // make sure any repeat detection is flushed
-    flush();
-    // append save date to the trace. Append it directly instead of using
-    // qDebug() as the handler might have been unregistered.
-    debugbuffer.append("[SysTrace] saving trace at ");
-    debugbuffer.append(QDateTime::currentDateTime().toString(Qt::ISODate));
-    debugbuffer.append("\n");
-    QFile fh(filename);
-    if(!fh.open(QIODevice::WriteOnly))
         return;
-    fh.write(debugbuffer.toUtf8(), debugbuffer.size());
-    fh.close();
+    LOG_INFO() << "saving trace at" <<  QDateTime::currentDateTime().toString(Qt::ISODate);
+    QFile::copy(QDir::tempPath() + "/rbutil-trace.log", filename);
+
 }
 
 void SysTrace::saveCurrentTrace(void)
@@ -87,59 +109,19 @@ void SysTrace::savePreviousTrace(void)
     if(fp.isEmpty())
         return;
 
-    QString oldlog = RbSettings::value(RbSettings::CachePath).toString()
-                     + "/rbutil-trace.log";
+    QString oldlog = QDir::tempPath() + "/rbutil-trace.log.1";
     QFile::copy(oldlog, fp);
     return;
 }
 
-#if QT_VERSION < 0x050000
-void SysTrace::debug(QtMsgType type, const char* msg)
-{
-    (void)type;
-    if(lastmessage != msg) {
-        lastmessage = msg;
-        flush();
-        debugbuffer.append(QString::fromLocal8Bit(msg) + "\n");
-#if !defined(NODEBUG)
-        fprintf(stderr, "%s\n", msg);
-#endif
-        repeat = 1;
-    }
-    else {
-        repeat++;
-    }
-}
-#else
-void SysTrace::debug(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    (void)type;
-    (void)context;
-    QByteArray localMsg = msg.toLocal8Bit();
-    if(lastmessage != msg) {
-        lastmessage = msg;
-        flush();
-        debugbuffer.append(msg + "\n");
-#if !defined(NODEBUG)
-        fprintf(stderr, "%s\n", localMsg.constData());
-#endif
-        repeat = 1;
-    }
-    else {
-        repeat++;
-    }
-}
-#endif
 
-void SysTrace::flush(void)
+void SysTrace::rotateTrace(void)
 {
-    if(repeat > 1) {
-        debugbuffer.append(
-                QString("    (Last message repeated %1 times.)\n").arg(repeat));
-#if !defined(NODEBUG)
-        fprintf(stderr, "    (Last message repeated %i times.)\n", repeat);
-#endif
+    QString f = QDir::tempPath() + "/rbutil-trace.log.1";
+    if(QFileInfo(f).exists()) {
+        QFile::remove(f);
     }
+    QFile::rename(QDir::tempPath() + "/rbutil-trace.log", f);
 }
 
 

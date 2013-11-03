@@ -20,6 +20,7 @@
 #include "encoderrbspeex.h"
 #include "rbsettings.h"
 #include "rbspeex.h"
+#include "Logger.h"
 
 EncoderRbSpeex::EncoderRbSpeex(QObject *parent) : EncoderBase(parent)
 {
@@ -78,16 +79,16 @@ bool EncoderRbSpeex::start()
 
 bool EncoderRbSpeex::encode(QString input,QString output)
 {
-    qDebug() << "[RbSpeex] Encoding " << input << " to "<< output;
+    LOG_INFO() << "Encoding " << input << " to "<< output;
     char errstr[512];
 
     FILE *fin,*fout;
     if ((fin = fopen(input.toLocal8Bit(), "rb")) == NULL) {
-        qDebug() << "[RbSpeex] Error: could not open input file\n";
+        LOG_ERROR() << "Error: could not open input file\n";
         return false;
     }
     if ((fout = fopen(output.toLocal8Bit(), "wb")) == NULL) {
-        qDebug() << "[RbSpeex] Error: could not open output file\n";
+        LOG_ERROR() << "Error: could not open output file\n";
         fclose(fin);
         return false;
     }
@@ -99,7 +100,7 @@ bool EncoderRbSpeex::encode(QString input,QString output)
 
     if (!ret) {
         /* Attempt to delete unfinished output */
-        qDebug() << "[RbSpeex] Error:" << errstr;
+        LOG_ERROR() << "Error:" << errstr;
         QFile(output).remove();
         return false;
     }

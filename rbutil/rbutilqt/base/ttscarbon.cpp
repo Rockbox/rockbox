@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <inttypes.h>
+#include "Logger.h"
 
 TTSCarbon::TTSCarbon(QObject* parent) : TTSBase(parent)
 {
@@ -74,7 +75,7 @@ bool TTSCarbon::start(QString *errStr)
     if(voiceIndex == numVoices) {
         // voice not found. Add user notification here and proceed with
         // system default voice.
-        qDebug() << "[TTSCarbon] Selected voice not found, using system default!";
+        LOG_WARNING() << "Selected voice not found, using system default!";
         GetVoiceDescription(&vspec, &vdesc, sizeof(vdesc));
         if(vdesc.script != -1)
             m_voiceScript = (CFStringBuiltInEncodings)vdesc.script;

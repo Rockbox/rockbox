@@ -19,6 +19,7 @@
 #include <QtCore>
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallsansa.h"
+#include "Logger.h"
 
 #include "../sansapatcher/sansapatcher.h"
 #include "utils.h"
@@ -116,7 +117,7 @@ void BootloaderInstallSansa::installStage2(void)
     m_tempfile.close();
     if(memcmp(sansa.targetname, magic, 4) != 0) {
         emit logItem(tr("Bootloader mismatch! Aborting."), LOGERROR);
-        qDebug("[BootloaderInstallSansa] Targetname: %s, mi4 magic: %c%c%c%c",
+        LOG_INFO("Targetname: %s, mi4 magic: %c%c%c%c",
                 sansa.targetname, magic[0], magic[1], magic[2], magic[3]);
         emit done(true);
         sansa_close(&sansa);
@@ -157,7 +158,8 @@ void BootloaderInstallSansa::installStage3(bool mounted)
         emit logItem(tr("Writing log aborted"), LOGERROR);
         emit done(true);
     }
-    qDebug() << "[BootloaderInstallSansa] version installed:" << m_blversion.toString(Qt::ISODate);
+    LOG_INFO() << "version installed:"
+               << m_blversion.toString(Qt::ISODate);
 }
 
 
@@ -245,8 +247,8 @@ bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
         sprintf(sansa->diskname,
             qPrintable(devicename.remove(QRegExp("[0-9]+$"))));
 #endif
-        qDebug() << "[BootloaderInstallSansa] sansapatcher: overriding scan, using"
-                 << sansa->diskname;
+        LOG_INFO() << "sansapatcher: overriding scan, using"
+                   << sansa->diskname;
     }
     else if(sansa_scan(sansa) != 1) {
         emit logItem(tr("Can't find Sansa"), LOGERROR);

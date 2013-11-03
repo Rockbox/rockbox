@@ -19,6 +19,7 @@
 #include <QtCore>
 #include "uninstall.h"
 #include "utils.h"
+#include "Logger.h"
 
 Uninstaller::Uninstaller(QObject* parent,QString mountpoint): QObject(parent)
 {
@@ -66,7 +67,7 @@ void Uninstaller::uninstall(void)
                 if(installlog.contains(toDeleteList.at(j)))
                 {
                     deleteFile = false;
-                    qDebug() << "[Uninstaller] file still in use:" << toDeleteList.at(j);
+                    LOG_INFO() << "file still in use:" << toDeleteList.at(j);
                 }
                 installlog.endGroup();
             }
@@ -79,7 +80,7 @@ void Uninstaller::uninstall(void)
                     emit logItem(tr("Could not delete %1")
                           .arg(toDelete.filePath()), LOGWARNING);
                 installlog.remove(toDeleteList.at(j));
-                qDebug() << "[Uninstaller] deleted:" << toDelete.filePath();
+                LOG_INFO() << "deleted:" << toDelete.filePath();
             }
             else  // if it is a dir, remember it for later deletion
             {

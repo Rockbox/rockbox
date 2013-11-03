@@ -24,6 +24,7 @@
 #include "rbsettings.h"
 #include "serverinfo.h"
 #include "systeminfo.h"
+#include "Logger.h"
 
 ManualWidget::ManualWidget(QWidget *parent) : QWidget(parent)
 {
@@ -36,7 +37,7 @@ ManualWidget::ManualWidget(QWidget *parent) : QWidget(parent)
 
 void ManualWidget::updateManual()
 {
-    qDebug() << "[ManualWidget] updating manual URLs";
+    LOG_INFO() << "updating manual URLs";
     m_platform = RbSettings::value(RbSettings::Platform).toString();
     if(!m_platform.isEmpty())
     {

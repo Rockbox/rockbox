@@ -23,6 +23,7 @@
 #include <QNetworkRequest>
 
 #include "httpget.h"
+#include "Logger.h"
 
 QString HttpGet::m_globalUserAgent; //< globally set user agent for requests
 QDir HttpGet::m_globalCache; //< global cach path value for new objects
@@ -71,14 +72,14 @@ void HttpGet::setCache(bool c)
     QString path = m_cachedir.absolutePath();
 
     if(!c || m_cachedir.absolutePath().isEmpty()) {
-        qDebug() << "[HttpGet] disabling download cache";
+        LOG_INFO() << "disabling download cache";
     }
     else {
         // append the cache path to make it unique in case the path points to
         // the system temporary path. In that case using it directly might
         // cause problems. Extra path also used in configure dialog.
         path += "/rbutil-cache";
-        qDebug() << "[HttpGet] setting cache folder to" << path;
+        LOG_INFO() << "setting cache folder to" << path;
         m_cache = new QNetworkDiskCache(this);
         m_cache->setCacheDirectory(path);
     }
@@ -97,7 +98,7 @@ QByteArray HttpGet::readAll()
 
 void HttpGet::setProxy(const QUrl &proxy)
 {
-    qDebug() << "[HttpGet] Proxy set to" << proxy;
+    LOG_INFO() << "Proxy set to" << proxy;
     m_proxy.setType(QNetworkProxy::HttpProxy);
     m_proxy.setHostName(proxy.host());
     m_proxy.setPort(proxy.port());
@@ -130,10 +131,10 @@ void HttpGet::requestFinished(QNetworkReply* reply)
 {
     m_lastStatusCode
         = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    qDebug() << "[HttpGet] Request finished, status code:" << m_lastStatusCode;
+    LOG_INFO() << "Request finished, status code:" << m_lastStatusCode;
     m_lastServerTimestamp
         = reply->header(QNetworkRequest::LastModifiedHeader).toDateTime().toLocalTime();
-    qDebug() << "[HttpGet] Data from cache:"
+    LOG_INFO() << "Data from cache:"
              << reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
     m_lastRequestCached =
         reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
@@ -150,7 +151,7 @@ void HttpGet::requestFinished(QNetworkReply* reply)
 #else
         url.setQuery(org.query());
 #endif
-        qDebug() << "[HttpGet] Redirected to" << url;
+        LOG_INFO() << "Redirected to" << url;
         startRequest(url);
         return;
     }
@@ -179,7 +180,7 @@ void HttpGet::downloadProgress(qint64 received, qint64 total)
 
 void HttpGet::startRequest(QUrl url)
 {
-    qDebug() << "[HttpGet] Request started";
+    LOG_INFO() << "Request started";
     QNetworkRequest req(url);
     if(!m_globalUserAgent.isEmpty())
         req.setRawHeader("User-Agent", m_globalUserAgent.toLatin1());
@@ -194,15 +195,14 @@ void HttpGet::startRequest(QUrl url)
 
 void HttpGet::networkError(QNetworkReply::NetworkError error)
 {
-    qDebug() << "[HttpGet] NetworkError occured:"
-             << error << m_reply->errorString();
+    LOG_ERROR() << "NetworkError occured:" << error << m_reply->errorString();
     m_lastErrorString = m_reply->errorString();
 }
 
 
 bool HttpGet::getFile(const QUrl &url)
 {
-    qDebug() << "[HttpGet] Get URI" << url.toString();
+    LOG_INFO() << "Get URI" << url.toString();
     m_data.clear();
     startRequest(url);
 

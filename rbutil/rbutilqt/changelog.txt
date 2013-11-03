@@ -13,5 +13,6 @@ Version 1.4
 * Save proxy password differently in configuration file (better solution for FS#12166).
 * Add support for building Rockbox Utility with Qt5.
 * Add Changelog window.
+* Rework System Trace functionality.
 
 

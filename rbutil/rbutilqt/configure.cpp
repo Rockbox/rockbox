@@ -47,6 +47,7 @@
 #include "rbutilqt.h"
 
 #include "systrace.h"
+#include "Logger.h"
 
 #define DEFAULT_LANG "English (en)"
 #define DEFAULT_LANG_CODE "en"
@@ -125,7 +126,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
 
 void Config::accept()
 {
-    qDebug() << "[Config] checking configuration";
+    LOG_INFO() << "checking configuration";
     QString errormsg = tr("The following errors occurred:") + "<ul>";
     bool error = false;
 
@@ -154,7 +155,7 @@ void Config::accept()
     QUrl p = proxy;
     p.setPassword(proxy.password().toUtf8().toBase64());
     RbSettings::setValue(RbSettings::Proxy, p.toString());
-    qDebug() << "[Config] setting proxy to:" << proxy.toString(QUrl::RemovePassword);
+    LOG_INFO() << "setting proxy to:" << proxy.toString(QUrl::RemovePassword);
     // proxy type
     QString proxyType;
     if(ui.radioNoProxy->isChecked()) proxyType = "none";
@@ -240,7 +241,7 @@ void Config::accept()
 
 void Config::abort()
 {
-    qDebug() << "[Config] aborted.";
+    LOG_INFO() << "aborted.";
     this->close();
 }
 
@@ -334,7 +335,7 @@ void Config::showProxyPassword(bool show)
 
 void Config::showDisabled(bool show)
 {
-    qDebug() << "[Config] disabled targets shown:" << show;
+    LOG_INFO() << "disabled targets shown:" << show;
     if(show)
         QMessageBox::warning(this, tr("Showing disabled targets"),
                 tr("You just enabled showing targets that are marked disabled. "
@@ -349,7 +350,7 @@ void Config::setDevices()
 {
 
     // setup devices table
-    qDebug() << "[Config] setting up devices list";
+    LOG_INFO() << "setting up devices list";
 
     QStringList platformList;
     if(ui.showDisabled->isChecked())
@@ -393,7 +394,7 @@ void Config::setDevices()
                                 SystemInfo::CurName).toString() +
                 " (" +ServerInfo::platformValue(platformList.at(it),
                             ServerInfo::CurStatus).toString() +")";
-            qDebug() << "[Config] add supported device:" << brands.at(c) << curname;
+            LOG_INFO() << "add supported device:" << brands.at(c) << curname;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
             w2->setData(0, Qt::UserRole, platformList.at(it));
 
@@ -516,7 +517,7 @@ void Config::setSystemProxy(bool checked)
         proxy.setPort(ui.proxyPort->text().toInt());
         // show system values in input box
         QUrl envproxy = System::systemProxy();
-        qDebug() << "[Config] setting system proxy" << envproxy;
+        LOG_INFO() << "setting system proxy" << envproxy;
 
         ui.proxyHost->setText(envproxy.host());
         ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
@@ -524,7 +525,7 @@ void Config::setSystemProxy(bool checked)
         ui.proxyPass->setText(envproxy.password());
 
         if(envproxy.host().isEmpty() || envproxy.port() == -1) {
-            qDebug() << "[Config] sytem proxy is invalid.";
+            LOG_WARNING() << "system proxy is invalid.";
             QMessageBox::warning(this, tr("Proxy Detection"),
                     tr("The System Proxy settings are invalid!\n"
                         "Rockbox Utility can't work with this proxy settings. "
@@ -571,7 +572,7 @@ QStringList Config::findLanguageFiles()
         langs.append(a);
     }
     langs.sort();
-    qDebug() << "[Config] available lang files:" << langs;
+    LOG_INFO() << "available lang files:" << langs;
 
     return langs;
 }
@@ -592,7 +593,7 @@ QString Config::languageName(const QString &qmFile)
 
 void Config::updateLanguage()
 {
-    qDebug() << "[Config] update selected language";
+    LOG_INFO() << "update selected language";
 
     // remove all old translators
     for(int i = 0; i < RbUtilQt::translators.size(); ++i) {
@@ -603,7 +604,7 @@ void Config::updateLanguage()
     QList<QListWidgetItem*> a = ui.listLanguages->selectedItems();
     if(a.size() > 0)
         language = lang.value(a.at(0)->text());
-    qDebug() << "[Config] new language:" << language;
+    LOG_INFO() << "new language:" << language;
 
     QString applang = QLocale::system().name();
     QTranslator *translator = new QTranslator(qApp);
@@ -668,7 +669,7 @@ void Config::refreshMountpoint()
             ui.mountPoint->addItem(QDir::toNativeSeparators(mps.at(i)), description);
         }
         else {
-            qDebug() << "[Config] mountpoint not writable, skipping:" << mps.at(i);
+            LOG_WARNING() << "mountpoint not writable, skipping:" << mps.at(i);
         }
     }
     if(!mountpoint.isEmpty()) {
@@ -682,7 +683,7 @@ void Config::updateMountpoint(QString m)
 {
     if(!m.isEmpty()) {
         mountpoint = QDir::fromNativeSeparators(m);
-        qDebug() << "[Config] Mountpoint set to" << mountpoint;
+        LOG_INFO() << "Mountpoint set to" << mountpoint;
     }
 }
 
@@ -695,7 +696,7 @@ void Config::updateMountpoint(int idx)
     QString mp = ui.mountPoint->itemText(idx);
     if(!mp.isEmpty()) {
         mountpoint = QDir::fromNativeSeparators(mp);
-        qDebug() << "[Config] Mountpoint set to" << mountpoint;
+        LOG_INFO() << "Mountpoint set to" << mountpoint;
     }
 }
 
@@ -715,7 +716,7 @@ void Config::setMountpoint(QString m)
         ui.mountPoint->addItem(QDir::toNativeSeparators(m));
         ui.mountPoint->setCurrentIndex(ui.mountPoint->findText(m));
     }
-    qDebug() << "[Config] Mountpoint set to" << mountpoint;
+    LOG_INFO() << "Mountpoint set to" << mountpoint;
 }
 
 

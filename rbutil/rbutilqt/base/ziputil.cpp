@@ -20,6 +20,7 @@
 #include <QDebug>
 #include "ziputil.h"
 #include "progressloggerinterface.h"
+#include "Logger.h"
 
 #include "quazip/quazip.h"
 #include "quazip/quazipfile.h"
@@ -76,7 +77,7 @@ bool ZipUtil::close(void)
 //! @return true on success, false otherwise
 bool ZipUtil::extractArchive(const QString& dest, QString file)
 {
-    qDebug() << "[ZipUtil] extractArchive" << dest << file;
+    LOG_INFO() << "extractArchive" << dest << file;
     bool result = true;
     if(!m_zip) {
         return false;
@@ -122,15 +123,15 @@ bool ZipUtil::extractArchive(const QString& dest, QString file)
         if(!QDir().mkpath(QFileInfo(outfilename).absolutePath())) {
             result = false;
             emit logItem(tr("Creating output path failed"), LOGERROR);
-            qDebug() << "[ZipUtil] creating output path failed for:"
-                     << outfilename;
+            LOG_INFO() << "creating output path failed for:"
+                       << outfilename;
             break;
         }
         if(!outputFile.open(QFile::WriteOnly)) {
             result = false;
             emit logItem(tr("Creating output file failed"), LOGERROR);
-            qDebug() << "[ZipUtil] creating output file failed:"
-                     << outfilename;
+            LOG_INFO() << "creating output file failed:"
+                       << outfilename;
             break;
         }
         currentFile->open(QIODevice::ReadOnly);
@@ -138,8 +139,8 @@ bool ZipUtil::extractArchive(const QString& dest, QString file)
         if(currentFile->getZipError() != UNZ_OK) {
             result = false;
             emit logItem(tr("Error during Zip operation"), LOGERROR);
-            qDebug() << "[ZipUtil] QuaZip error:" << currentFile->getZipError()
-                     << "on file" << currentFile->getFileName();
+            LOG_INFO() << "QuaZip error:" << currentFile->getZipError()
+                       << "on file" << currentFile->getFileName();
             break;
         }
         currentFile->close();
@@ -162,7 +163,7 @@ bool ZipUtil::appendDirToArchive(QString& source, QString& basedir)
 {
     bool result = true;
     if(!m_zip || !m_zip->isOpen()) {
-        qDebug() << "[ZipUtil] Zip file not open!";
+        LOG_INFO() << "Zip file not open!";
         return false;
     }
     // get a list of all files and folders. Needed for progress info and avoids
@@ -176,14 +177,14 @@ bool ZipUtil::appendDirToArchive(QString& source, QString& basedir)
             fileList.append(iterator.filePath());
         }
     }
-    qDebug() << "[ZipUtil] Adding" << fileList.size() << "files to archive";
+    LOG_INFO() << "Adding" << fileList.size() << "files to archive";
 
     int max = fileList.size();
     for(int i = 0; i < max; i++) {
         QString current = fileList.at(i);
         if(!appendFileToArchive(current, basedir)) {
-            qDebug() << "[ZipUtil] Error appending file" << current
-                     << "to archive" << m_zip->getZipName();
+            LOG_ERROR() << "Error appending file" << current
+                        << "to archive" << m_zip->getZipName();
             result = false;
             break;
         }
@@ -199,7 +200,7 @@ bool ZipUtil::appendFileToArchive(QString& file, QString& basedir)
 {
     bool result = true;
     if(!m_zip || !m_zip->isOpen()) {
-        qDebug() << "[ZipUtil] Zip file not open!";
+        LOG_ERROR() << "Zip file not open!";
         return false;
     }
     // skip folders, we can't add them.
@@ -215,12 +216,12 @@ bool ZipUtil::appendFileToArchive(QString& file, QString& basedir)
     QFile fin(file);
 
     if(!fin.open(QFile::ReadOnly)) {
-        qDebug() << "[ZipUtil] Could not open file for reading:" << file;
+        LOG_ERROR() << "Could not open file for reading:" << file;
         return false;
     }
     if(!fout.open(QIODevice::WriteOnly, QuaZipNewInfo(newfile, infile))) {
         fin.close();
-        qDebug() << "[ZipUtil] Could not open file for writing:" << newfile;
+        LOG_ERROR() << "Could not open file for writing:" << newfile;
         return false;
     }
 
@@ -253,11 +254,11 @@ qint64 ZipUtil::totalUncompressedSize(unsigned int clustersize)
         }
     }
     if(clustersize > 0) {
-        qDebug() << "[ZipUtil] calculation rounded to cluster size for each file:"
-                 << clustersize;
+        LOG_INFO() << "calculation rounded to cluster size for each file:"
+                   << clustersize;
     }
-    qDebug() << "[ZipUtil] size of archive files uncompressed:"
-             << uncompressed;
+    LOG_INFO() << "size of archive files uncompressed:"
+               << uncompressed;
     return uncompressed;
 }
 
@@ -281,7 +282,7 @@ QList<QuaZipFileInfo> ZipUtil::contentProperties()
 {
     QList<QuaZipFileInfo> items;
     if(!m_zip || !m_zip->isOpen()) {
-        qDebug() << "[ZipUtil] Zip file not open!";
+        LOG_ERROR() << "Zip file not open!";
         return items;
     }
     QuaZipFileInfo info;
@@ -290,8 +291,8 @@ QList<QuaZipFileInfo> ZipUtil::contentProperties()
     {
         currentFile.getFileInfo(&info);
         if(currentFile.getZipError() != UNZ_OK) {
-            qDebug() << "[ZipUtil] QuaZip error:" << currentFile.getZipError()
-                     << "on file" << currentFile.getFileName();
+            LOG_ERROR() << "QuaZip error:" << currentFile.getZipError()
+                        << "on file" << currentFile.getFileName();
             return QList<QuaZipFileInfo>();
         }
         items.append(info);

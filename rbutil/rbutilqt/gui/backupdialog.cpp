@@ -26,6 +26,7 @@
 #include "progressloggergui.h"
 #include "ziputil.h"
 #include "rockboxinfo.h"
+#include "Logger.h"
 
 class BackupSizeThread : public QThread
 {
@@ -42,14 +43,14 @@ class BackupSizeThread : public QThread
 
 void BackupSizeThread::run(void)
 {
-    qDebug() << "BackupSizeThread] Thread started, calculating" << m_path;
+    LOG_INFO() << "Thread started, calculating" << m_path;
     m_currentSize = 0;
 
     QDirIterator it(m_path, QDirIterator::Subdirectories);
     while(it.hasNext()) {
         m_currentSize += QFileInfo(it.next()).size();
     }
-    qDebug() << "[BackupSizeThread] Thread done, sum:" << m_currentSize;
+    LOG_INFO() << "Thread done, sum:" << m_currentSize;
 }
 
 

@@ -19,6 +19,7 @@
 #include "rbsettings.h"
 #include "systeminfo.h"
 #include <QSettings>
+#include "Logger.h"
 
 #if defined(Q_OS_LINUX)
 #include <unistd.h>
@@ -96,13 +97,13 @@ void RbSettings::ensureRbSettingsExists()
         {
             userSettings = new QSettings(QCoreApplication::instance()->applicationDirPath()
                 + "/RockboxUtility.ini", QSettings::IniFormat, NULL);
-            qDebug() << "[Settings] configuration: portable";
+            LOG_INFO() << "configuration: portable";
         }
         else
         {
             userSettings = new QSettings(QSettings::IniFormat,
             QSettings::UserScope, "rockbox.org", "RockboxUtility",NULL);
-            qDebug() << "[Settings] configuration: system";
+            LOG_INFO() << "configuration: system";
         }
     }
 }
@@ -158,7 +159,7 @@ QVariant RbSettings::subValue(QString sub, enum UserSettings setting)
         i++;
 
     QString s = constructSettingPath(UserSettingsList[i].name, sub);
-    qDebug() << "[Settings] GET U:" << s << userSettings->value(s).toString();
+    LOG_INFO() << "GET U:" << s << userSettings->value(s).toString();
     return userSettings->value(s, UserSettingsList[i].def);
 }
 
@@ -179,7 +180,7 @@ void RbSettings::setSubValue(QString sub, enum UserSettings setting, QVariant va
 
     QString s = constructSettingPath(UserSettingsList[i].name, sub);
     userSettings->setValue(s, value);
-    qDebug() << "[Settings] SET U:" << s << userSettings->value(s).toString();
+    LOG_INFO() << "SET U:" << s << userSettings->value(s).toString();
 }
 
 QString RbSettings::constructSettingPath(QString path, QString substitute)

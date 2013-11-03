@@ -20,10 +20,11 @@
 
 #include <QtCore>
 #include <QDebug>
+#include "Logger.h"
 
 RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
 {
-    qDebug() << "[RockboxInfo] Getting version info from rockbox-info.txt";
+    LOG_INFO() << "Getting version info from rockbox-info.txt";
     QFile file(mountpoint + "/" + fname);
     m_success = false;
     m_voicefmt = 400; // default value for compatibility

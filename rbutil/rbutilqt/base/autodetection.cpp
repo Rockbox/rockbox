@@ -28,6 +28,7 @@
 #include "system.h"
 #include "utils.h"
 #include "rockboxinfo.h"
+#include "Logger.h"
 
 Autodetection::Autodetection(QObject* parent): QObject(parent)
 {
@@ -67,8 +68,8 @@ bool Autodetection::detect(void)
         }
     }
     for(int i = 0; i < m_detected.size(); ++i) {
-        qDebug() << "[Autodetect] Detected player:" << m_detected.at(i).device
-                 << "at" << m_detected.at(i).mountpoint << states[m_detected.at(i).status];
+        LOG_INFO() << "Detected player:" << m_detected.at(i).device
+                   << "at" << m_detected.at(i).mountpoint << states[m_detected.at(i).status];
     }
 
     return m_detected.size() > 0;
@@ -98,14 +99,14 @@ void Autodetection::detectUsb()
             d.status = PlayerOk;
             d.usbdevices = usbids.value(attached.at(i));
             m_detected.append(d);
-            qDebug() << "[USB] detected supported player" << d.usbdevices;
+            LOG_INFO() << "[USB] detected supported player" << d.usbdevices;
         }
         if(usberror.contains(attached.at(i))) {
             struct Detected d;
             d.status = PlayerMtpMode;
             d.device = usbids.value(attached.at(i)).at(0);
             m_detected.append(d);
-            qDebug() << "[USB] detected problem with player" << d.device;
+            LOG_WARNING() << "[USB] detected problem with player" << d.device;
         }
         QString idstring = QString("%1").arg(attached.at(i), 8, 16, QChar('0'));
         if(!SystemInfo::platformValue(idstring, SystemInfo::CurName).toString().isEmpty()) {
@@ -113,7 +114,7 @@ void Autodetection::detectUsb()
             d.status = PlayerIncompatible;
             d.device = idstring;
             m_detected.append(d);
-            qDebug() << "[USB] detected incompatible player" << d.device;
+            LOG_WARNING() << "[USB] detected incompatible player" << d.device;
         }
     }
 }
@@ -125,7 +126,7 @@ void Autodetection::detectUsb()
 void Autodetection::mergeMounted(void)
 {
     QStringList mounts = Utils::mountpoints(Utils::MountpointsSupported);
-    qDebug() << "[Autodetect] paths to check:" << mounts;
+    LOG_INFO() << "paths to check:" << mounts;
 
     for(int i = 0; i < mounts.size(); i++)
     {
@@ -143,8 +144,8 @@ void Autodetection::mergeMounted(void)
                     d.mountpoint = mounts.at(i);
                     d.status = PlayerOk;
                     updateDetectedDevice(d);
-                    qDebug() << "[Autodetect] rbutil.log detected:"
-                             << log.value("platform").toString() << mounts.at(i);
+                    LOG_INFO() << "rbutil.log detected:"
+                               << log.value("platform").toString() << mounts.at(i);
                 }
             }
 
@@ -157,8 +158,8 @@ void Autodetection::mergeMounted(void)
                 d.mountpoint = mounts.at(i);
                 d.status = PlayerOk;
                 updateDetectedDevice(d);
-                qDebug() << "[Autodetect] rockbox-info.txt detected:"
-                         << info.target() << mounts.at(i);
+                LOG_INFO() << "rockbox-info.txt detected:"
+                           << info.target() << mounts.at(i);
             }
 
             // check for some specific files in root folder
@@ -193,13 +194,13 @@ void Autodetection::mergeMounted(void)
             }
             if(rootentries.contains("ajbrec.ajz", Qt::CaseInsensitive))
             {
-                qDebug() << "[Autodetect] ajbrec.ajz found. Trying detectAjbrec()";
+                LOG_INFO() << "ajbrec.ajz found. Trying detectAjbrec()";
                 struct Detected d;
                 d.device = detectAjbrec(mounts.at(i));
                 d.mountpoint = mounts.at(i);
                 d.status = PlayerOk;
                 if(!d.device.isEmpty()) {
-                    qDebug() << "[Autodetect]" << d.device;
+                    LOG_INFO() << d.device;
                     updateDetectedDevice(d);
                 }
             }
@@ -255,7 +256,7 @@ void Autodetection::mergePatcher(void)
     n = ipod_scan(&ipod);
     // FIXME: handle more than one Ipod connected in ipodpatcher.
     if(n == 1) {
-        qDebug() << "[Autodetect] Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
+        LOG_INFO() << "Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
         // since resolveMountPoint is doing exact matches we need to select
         // the correct partition.
         QString mp(ipod.diskname);
@@ -276,7 +277,7 @@ void Autodetection::mergePatcher(void)
         updateDetectedDevice(d);
     }
     else {
-        qDebug() << "[Autodetect] ipodpatcher: no Ipod found." << n;
+        LOG_INFO() << "ipodpatcher: no Ipod found." << n;
     }
     ipod_dealloc_buffer(&ipod);
 
@@ -286,8 +287,8 @@ void Autodetection::mergePatcher(void)
     sansa_alloc_buffer(&sansa, BUFFER_SIZE);
     n = sansa_scan(&sansa);
     if(n == 1) {
-        qDebug() << "[Autodetect] Sansa found:"
-                 << sansa.targetname << "at" << sansa.diskname;
+        LOG_INFO() << "Sansa found:"
+                   << sansa.targetname << "at" << sansa.diskname;
         QString mp(sansa.diskname);
 #ifdef Q_OS_LINUX
         mp.append("1");
@@ -302,7 +303,7 @@ void Autodetection::mergePatcher(void)
         updateDetectedDevice(d);
     }
     else {
-        qDebug() << "[Autodetect] sansapatcher: no Sansa found." << n;
+        LOG_INFO() << "sansapatcher: no Sansa found." << n;
     }
     sansa_dealloc_buffer(&sansa);
 }
@@ -323,8 +324,8 @@ QString Autodetection::detectAjbrec(QString root)
     // recorder v1 has the binary length in the first 4 bytes, so check
     // for them first.
     int len = (header[0]<<24) | (header[1]<<16) | (header[2]<<8) | header[3];
-    qDebug() << "[Autodetect] ABJREC possible bin length:" << len
-             << "file len:" << f.size();
+    LOG_INFO() << "abjrec.ajz possible bin length:" << len
+               << "file len:" << f.size();
     if((f.size() - 6) == len)
         return "recorder";
 

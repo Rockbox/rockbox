@@ -23,6 +23,7 @@
 #include "utils.h"
 #include "ziputil.h"
 #include "mspackutil.h"
+#include "Logger.h"
 
 #if defined(Q_OS_MACX)
 #include <sys/param.h>
@@ -58,8 +59,8 @@ void BootloaderInstallBase::downloadBlStart(QUrl source)
 
 void BootloaderInstallBase::downloadReqFinished(int id, bool error)
 {
-    qDebug() << "[BootloaderInstallBase] Download Request" << id
-             << "finished, error:" << m_http.errorString();
+    LOG_INFO() << "Download Request" << id
+               << "finished, error:" << m_http.errorString();
 
     downloadBlFinish(error);
 }
@@ -67,8 +68,8 @@ void BootloaderInstallBase::downloadReqFinished(int id, bool error)
 
 void BootloaderInstallBase::downloadBlFinish(bool error)
 {
-    qDebug() << "[BootloaderInstallBase] Downloading bootloader finished, error:"
-             << error;
+    LOG_INFO() << "Downloading bootloader finished, error:"
+               << error;
 
     // update progress bar
     emit logProgress(100, 100);
@@ -98,7 +99,7 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
 
 void BootloaderInstallBase::installBlfile(void)
 {
-    qDebug() << "[BootloaderInstallBase] installBlFile(void)";
+    LOG_INFO() << "installBlFile(void)";
 }
 
 
@@ -107,7 +108,7 @@ void BootloaderInstallBase::installBlfile(void)
 //! @return true on success, false on error.
 bool BootloaderInstallBase::backup(QString to)
 {
-    qDebug() << "[BootloaderInstallBase] Backing up bootloader file";
+    LOG_INFO() << "Backing up bootloader file";
     QDir targetDir(".");
     emit logItem(tr("Creating backup of original firmware file."), LOGINFO);
     if(!targetDir.mkpath(to)) {
@@ -115,7 +116,7 @@ bool BootloaderInstallBase::backup(QString to)
         return false;
     }
     QString tofile = to + "/" + QFileInfo(m_blfile).fileName();
-    qDebug() << "[BootloaderInstallBase] trying to backup" << m_blfile << "to" << tofile;
+    LOG_INFO() << "trying to backup" << m_blfile << "to" << tofile;
     if(!QFile::copy(Utils::resolvePathCase(m_blfile), tofile)) {
         emit logItem(tr("Creating backup copy failed."), LOGERROR);
         return false;
@@ -137,8 +138,8 @@ int BootloaderInstallBase::logInstall(LogMode mode)
 
     if(mode == LogAdd) {
         s.setValue("Bootloader/" + section, m_blversion.toString(Qt::ISODate));
-        qDebug() << "[BootloaderInstallBase] Writing log, version:"
-                 << m_blversion.toString(Qt::ISODate);
+        LOG_INFO() << "Writing log, version:"
+                   << m_blversion.toString(Qt::ISODate);
     }
     else {
         s.remove("Bootloader/" + section);
@@ -182,7 +183,7 @@ void BootloaderInstallBase::checkRemount()
         if(!status) {
             // still not remounted, restart timer.
             QTimer::singleShot(500, this, SLOT(checkRemount()));
-            qDebug() << "[BootloaderInstallBase] Player not remounted yet" << m_remountDevice;
+            LOG_INFO() << "Player not remounted yet" << m_remountDevice;
         }
         else {
             emit logItem(tr("Player remounted"), LOGINFO);
@@ -244,11 +245,11 @@ bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
     // check if the file set is in zip format
     if(util) {
         QStringList contents = util->files();
-        qDebug() << "[BootloaderInstallBase] archive contains:" << contents;
+        LOG_INFO() << "archive contains:" << contents;
         for(int i = 0; i < blfile.size(); ++i) {
             // strip any path, we don't know the structure in the zip
             QString f = QFileInfo(blfile.at(i)).fileName();
-            qDebug() << "[BootloaderInstallBase] searching archive for" << f;
+            LOG_INFO() << "searching archive for" << f;
             // contents.indexOf() works case sensitive. Since the filename
             // casing is unknown (and might change) do this manually.
             // FIXME: support files in folders

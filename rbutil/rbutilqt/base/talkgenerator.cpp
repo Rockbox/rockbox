@@ -20,6 +20,7 @@
 #include "rbsettings.h"
 #include "systeminfo.h"
 #include "wavtrim.h"
+#include "Logger.h"
 
 TalkGenerator::TalkGenerator(QObject* parent): QObject(parent)
 {
@@ -39,7 +40,7 @@ TalkGenerator::Status TalkGenerator::process(QList<TalkEntry>* list,int wavtrimt
     m_tts = TTSBase::getTTS(this, RbSettings::value(RbSettings::Tts).toString());
     if(!m_tts)
     {
-        qDebug() << "[TalkGenerator] getting the TTS object failed!";
+        LOG_ERROR() << "getting the TTS object failed!";
         emit logItem(tr("Init of TTS engine failed"), LOGERROR);
         emit done(true);
         return eERROR;
@@ -131,7 +132,7 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
             duplicates.append(list->at(i).wavfilename);
         else
         {
-            qDebug() << "[TalkGenerator] duplicate skipped";
+            LOG_INFO() << "duplicate skipped";
             (*list)[i].voiced = true;
             emit logProgress(++m_progress,progressMax);
             continue;
@@ -152,7 +153,7 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
 
         // voice entry
         QString error;
-        qDebug() << "[TalkGenerator] voicing: " << list->at(i).toSpeak
+        LOG_INFO() << "voicing: " << list->at(i).toSpeak
                  << "to" << list->at(i).wavfilename;
         TTSStatus status = m_tts->voice(list->at(i).toSpeak,list->at(i).wavfilename, &error);
         if(status == Warning)
@@ -177,8 +178,8 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
             if(wavtrim(list->at(i).wavfilename.toLocal8Bit().data(),
                        wavtrimth, buffer, 255))
             {
-                qDebug() << "[TalkGenerator] wavtrim returned error on"
-                         << list->at(i).wavfilename;
+                LOG_ERROR() << "wavtrim returned error on"
+                            << list->at(i).wavfilename;
                 return eERROR;
             }
         }
@@ -214,8 +215,8 @@ TalkGenerator::Status TalkGenerator::encodeList(QList<TalkEntry>* list)
          //skip non-voiced entrys
         if(list->at(i).voiced == false)
         {
-            qDebug() << "[TalkGenerator] non voiced entry detected:"
-                     << list->at(i).toSpeak;
+            LOG_WARNING() << "non voiced entry detected:"
+                          << list->at(i).toSpeak;
             emit logProgress(++m_progress,progressMax);
             continue;
         }
@@ -224,15 +225,15 @@ TalkGenerator::Status TalkGenerator::encodeList(QList<TalkEntry>* list)
             duplicates.append(list->at(i).talkfilename);
         else
         {
-            qDebug() << "[TalkGenerator] duplicate skipped";
+            LOG_INFO() << "duplicate skipped";
             (*list)[i].encoded = true;
             emit logProgress(++m_progress,progressMax);
             continue;
         }
 
         //encode entry
-        qDebug() << "[TalkGenerator] encoding " << list->at(i).wavfilename
-                 << "to" << list->at(i).talkfilename;
+        LOG_INFO() << "encoding " << list->at(i).wavfilename
+                   << "to" << list->at(i).talkfilename;
         if(!m_enc->encode(list->at(i).wavfilename,list->at(i).talkfilename))
         {
             emit logItem(tr("Encoding of %1 failed").arg(
@@ -268,7 +269,7 @@ QString TalkGenerator::correctString(QString s)
     }
 
     if(corrected != s)
-        qDebug() << "[VoiceFileCreator] corrected string" << s << "to" << corrected;
+        LOG_INFO() << "corrected string" << s << "to" << corrected;
 
     return corrected;
     m_abort = true;
@@ -287,7 +288,7 @@ void TalkGenerator::setLang(QString name)
     TTSBase* tts = TTSBase::getTTS(this,RbSettings::value(RbSettings::Tts).toString());
     if(!tts)
     {
-        qDebug() << "[TalkGenerator] getting the TTS object failed!";
+        LOG_ERROR() << "getting the TTS object failed!";
         return;
     }
     QString vendor = tts->voiceVendor();
@@ -295,8 +296,8 @@ void TalkGenerator::setLang(QString name)
 
     if(m_lang.isEmpty())
         m_lang = "english";
-    qDebug() << "[TalkGenerator] building string corrections list for"
-             << m_lang << engine << vendor;
+    LOG_INFO() << "building string corrections list for"
+               << m_lang << engine << vendor;
     QTextStream stream(&correctionsFile);
     while(!stream.atEnd()) {
         QString line = stream.readLine();

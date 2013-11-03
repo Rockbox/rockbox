@@ -21,6 +21,9 @@
 #include <QSettings>
 #include "rbutilqt.h"
 #include "systrace.h"
+#include "Logger.h"
+#include "ConsoleAppender.h"
+#include "FileAppender.h"
 
 #ifdef STATIC
 #include <QtPlugin>
@@ -28,14 +31,19 @@ Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 #endif
 
 
-
 int main( int argc, char ** argv ) {
-#if QT_VERSION < 0x050000
-    qInstallMsgHandler(SysTrace::debug);
-#else
-    qInstallMessageHandler(SysTrace::debug);
-#endif
     QApplication app( argc, argv );
+    ConsoleAppender* consoleAppender = new ConsoleAppender();
+    consoleAppender->setFormat("[%f:%i %L] %m\n");
+    Logger::registerAppender(consoleAppender);
+    SysTrace::rotateTrace();
+    QString tracefile = QDir::tempPath() + "/rbutil-trace.log";
+    FileAppender* fileAppender = new FileAppender();
+    fileAppender->setFormat("[%f:%i %L] %m\n");
+    fileAppender->setFileName(tracefile);
+    Logger::registerAppender(fileAppender);
+    LOG_INFO() << "Starting trace at" << QDateTime::currentDateTime().toString(Qt::ISODate);
+
 #if defined(Q_OS_MAC)
     QDir dir(QApplication::applicationDirPath());
     dir.cdUp();

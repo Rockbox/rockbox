@@ -20,6 +20,7 @@
 #include <QDebug>
 #include "infowidget.h"
 #include "rbsettings.h"
+#include "Logger.h"
 
 InfoWidget::InfoWidget(QWidget *parent) : QWidget(parent)
 {
@@ -35,7 +36,7 @@ InfoWidget::InfoWidget(QWidget *parent) : QWidget(parent)
 
 void InfoWidget::updateInfo(void)
 {
-    qDebug() << "[InfoWidget] updating server info";
+    LOG_INFO() << "updating server info";
 
     QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
     QSettings log(mp + "/.rockbox/rbutil.log", QSettings::IniFormat, this);

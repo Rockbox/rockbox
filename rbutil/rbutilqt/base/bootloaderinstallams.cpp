@@ -19,6 +19,7 @@
 #include <QtCore>
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallams.h"
+#include "Logger.h"
 
 #include "../mkamsboot/mkamsboot.h"
 
@@ -51,7 +52,7 @@ bool BootloaderInstallAms::install(void)
     if(m_offile.isEmpty())
         return false;
 
-    qDebug() << "[BootloaderInstallAms] installing bootloader";
+    LOG_INFO() << "installing bootloader";
 
     // download firmware from server
     emit logItem(tr("Downloading bootloader file"), LOGINFO);
@@ -64,7 +65,7 @@ bool BootloaderInstallAms::install(void)
 
 void BootloaderInstallAms::installStage2(void)
 {
-    qDebug() << "[BootloaderInstallAms] installStage2";
+    LOG_INFO() << "installStage2";
 
     unsigned char* buf;
     unsigned char* of_packed;
@@ -94,7 +95,7 @@ void BootloaderInstallAms::installStage2(void)
                                     errstr,sizeof(errstr));
     if (rb_packed == NULL)
     {
-        qDebug() << "[BootloaderInstallAms] could not load bootloader: " << bootfile;
+        LOG_ERROR() << "could not load bootloader: " << bootfile;
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not load %1").arg(bootfile), LOGERROR);
         emit done(true);
@@ -107,7 +108,7 @@ void BootloaderInstallAms::installStage2(void)
                         errstr, sizeof(errstr));
     if (buf == NULL)
     {
-        qDebug() << "[BootloaderInstallAms] could not load OF: " << m_offile;
+        LOG_ERROR() << "could not load OF: " << m_offile;
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not load %1").arg(m_offile), LOGERROR);
         free(rb_packed);
@@ -121,7 +122,7 @@ void BootloaderInstallAms::installStage2(void)
 
     if (!patchable)
     {
-        qDebug() << "[BootloaderInstallAms] No room to insert bootloader";
+        LOG_ERROR() << "No room to insert bootloader";
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("No room to insert bootloader, try another firmware version"),
                      LOGERROR);
@@ -143,7 +144,7 @@ void BootloaderInstallAms::installStage2(void)
 
     if(!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
-        qDebug() << "[BootloaderInstallAms] Could not open" <<  m_blfile << "for writing";
+        LOG_ERROR() << "Could not open" <<  m_blfile << "for writing";
         emit logItem(tr("Could not open %1 for writing").arg(m_blfile),LOGERROR);
         free(buf);
         free(of_packed);
@@ -156,7 +157,7 @@ void BootloaderInstallAms::installStage2(void)
 
     if (n != len)
     {
-        qDebug() << "[BootloaderInstallAms] Could not write firmware file";
+        LOG_ERROR() << "Could not write firmware file";
         emit logItem(tr("Could not write firmware file"),LOGERROR);
         free(buf);
         free(of_packed);
@@ -172,7 +173,7 @@ void BootloaderInstallAms::installStage2(void)
     free(rb_packed);
 
     //end of install
-    qDebug() << "[BootloaderInstallAms] install successfull";
+    LOG_INFO() << "install successfull";
     emit logItem(tr("Success: modified firmware file created"), LOGINFO);
     logInstall(LogAdd);
     emit done(false);

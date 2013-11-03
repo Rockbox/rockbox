@@ -18,6 +18,7 @@
 
 #include "talkfile.h"
 #include "rbsettings.h"
+#include "Logger.h"
 
 TalkFileCreator::TalkFileCreator(QObject* parent): QObject(parent)
 {
@@ -109,7 +110,7 @@ void TalkFileCreator::doAbort()
 //! \param startDir The directory from which to start scanning
 bool TalkFileCreator::createTalkList(QDir startDir)
 {
-    qDebug() << "[TalkGenerator] generating list of files" << startDir;
+    LOG_INFO() << "generating list of files" << startDir;
     m_talkList.clear();
 
      // create Iterator
@@ -161,9 +162,9 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 entry.target = dir.path() + "/_dirname.talk";
                 entry.voiced = false;
                 entry.encoded = false;
-                qDebug() << "[TalkFileCreator] toSpeak:" << entry.toSpeak
-                         << "target:" << entry.target
-                         << "intermediates:" << entry.wavfilename << entry.talkfilename;
+                LOG_INFO() << "toSpeak:" << entry.toSpeak
+                           << "target:" << entry.target
+                           << "intermediates:" << entry.wavfilename << entry.talkfilename;
                 m_talkList.append(entry);
             }
         }
@@ -205,16 +206,16 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 entry.target =  fileInf.path() + "/" + fileInf.fileName() + ".talk";
                 entry.voiced = false;
                 entry.encoded = false;
-                qDebug() << "[TalkFileCreator] toSpeak:" << entry.toSpeak
-                         << "target:" << entry.target
-                         << "intermediates:" <<
-                            entry.wavfilename << entry.talkfilename;
+                LOG_INFO() << "toSpeak:" << entry.toSpeak
+                           << "target:" << entry.target
+                           << "intermediates:"
+                           << entry.wavfilename << entry.talkfilename;
                 m_talkList.append(entry);
             }
         }
         QCoreApplication::processEvents();
     }
-    qDebug() << "[TalkFileCreator] list created, entries:" << m_talkList.size();
+    LOG_INFO() << "list created, entries:" << m_talkList.size();
     return true;
 }
 
@@ -251,8 +252,8 @@ bool TalkFileCreator::copyTalkFiles(QString* errString)
             QFile::remove(m_talkList[i].target);
 
         // copying
-        qDebug() << "[TalkFileCreator] copying" << m_talkList[i].talkfilename
-                 << "to" << m_talkList[i].target;
+        LOG_INFO() << "copying" << m_talkList[i].talkfilename
+                   << "to" << m_talkList[i].target;
         if(!QFile::copy(m_talkList[i].talkfilename,m_talkList[i].target))
         {
             *errString = tr("Copying of %1 to %2 failed").arg(m_talkList[i].talkfilename).arg(m_talkList[i].target);

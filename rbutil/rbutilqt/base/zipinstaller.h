@@ -26,6 +26,7 @@
 
 #include "progressloggerinterface.h"
 #include "httpget.h"
+#include "Logger.h"
 
 class ZipInstaller : public QObject
 {
@@ -40,9 +41,9 @@ public:
     void setLogSection(QString name) {m_loglist = QStringList(name);}
     void setLogSection(QStringList name) { m_loglist = name; }
     void setLogVersion(QString v = "")
-    { m_verlist = QStringList(v); qDebug() << m_verlist;}
+    { m_verlist = QStringList(v); LOG_INFO() << m_verlist;}
     void setLogVersion(QStringList v)
-    { m_verlist = v; qDebug() << m_verlist;}
+    { m_verlist = v; LOG_INFO() << m_verlist;}
     void setUnzip(bool i) { m_unzip = i; }
     void setTarget(QString t) { m_target = t; }
     void setCache(QDir c) { m_cache = c; m_usecache = true; };

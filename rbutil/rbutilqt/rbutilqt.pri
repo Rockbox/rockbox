@@ -87,6 +87,11 @@ SOURCES += \
  mspack/system-mspack.c \
  base/mspackutil.cpp \
  base/archiveutil.cpp \
+ logger/AbstractAppender.cpp \
+ logger/AbstractStringAppender.cpp \
+ logger/ConsoleAppender.cpp \
+ logger/FileAppender.cpp \
+ logger/Logger.cpp \
 
 
 HEADERS += \

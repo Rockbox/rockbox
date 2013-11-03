@@ -49,6 +49,8 @@
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallhelper.h"
 
+#include "Logger.h"
+
 #if defined(Q_OS_LINUX)
 #include <stdio.h>
 #endif
@@ -66,10 +68,10 @@ QList<QTranslator*> RbUtilQt::translators;
 RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 {
     // startup log
-    qDebug() << "======================================";
-    qDebug() << "[System] Rockbox Utility " VERSION;
-    qDebug() << "[System] Qt version:" << qVersion();
-    qDebug() << "======================================";
+    LOG_INFO() << "======================================";
+    LOG_INFO() << "Rockbox Utility" << VERSION;
+    LOG_INFO() << "Qt version:" << qVersion();
+    LOG_INFO() << "======================================";
 
     absolutePath = qApp->applicationDirPath();
 
@@ -110,7 +112,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
                     "Please don't do this, running under Wine will fail. "
                     "Use the native Linux binary instead."),
                 QMessageBox::Ok, QMessageBox::Ok);
-        qDebug() << "[RbUtil] WINE DETECTED!";
+        LOG_WARNING() << "WINE DETECTED!";
         RegCloseKey(hk);
     }
 #endif
@@ -181,15 +183,6 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 
 void RbUtilQt::shutdown(void)
 {
-    // restore default message handler to prevent trace accesses during
-    // object destruction -- the trace object could already be destroyed.
-    // Fixes segfaults on exit.
-#if QT_VERSION < 0x050000
-    qInstallMsgHandler(0);
-#else
-    qInstallMessageHandler(0);
-#endif
-    SysTrace::save();
     this->close();
 }
 
@@ -229,7 +222,7 @@ void RbUtilQt::downloadInfo()
     connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
     daily->setCache(false);
     ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
-    qDebug() << "[RbUtil] downloading build info";
+    LOG_INFO() << "downloading build info";
     daily->setFile(&buildInfo);
     daily->getFile(QUrl(SystemInfo::value(SystemInfo::BuildInfoUrl).toString()));
 }
@@ -238,7 +231,7 @@ void RbUtilQt::downloadInfo()
 void RbUtilQt::downloadDone(bool error)
 {
     if(error) {
-        qDebug() << "[RbUtil] network error:" << daily->errorString();
+        LOG_INFO() << "network error:" << daily->errorString();
         ui.statusbar->showMessage(tr("Can't get version information!"));
         QMessageBox::critical(this, tr("Network error"),
                 tr("Can't get version information.\n"
@@ -246,7 +239,7 @@ void RbUtilQt::downloadDone(bool error)
                     .arg(daily->errorString()));
         return;
     }
-    qDebug() << "[RbUtil] network status:" << daily->errorString();
+    LOG_INFO() << "network status:" << daily->errorString();
 
     // read info into ServerInfo object
     buildInfo.open();
@@ -320,7 +313,7 @@ void RbUtilQt::configDialog()
 
 void RbUtilQt::updateSettings()
 {
-    qDebug() << "[RbUtil] updating current settings";
+    LOG_INFO() << "updating current settings";
     updateDevice();
     manual->updateManual();
     QString c = RbSettings::value(RbSettings::CachePath).toString();
@@ -409,7 +402,7 @@ void RbUtilQt::backup(void)
 
 void RbUtilQt::installdone(bool error)
 {
-    qDebug() << "[RbUtil] install done";
+    LOG_INFO() << "install done";
     m_installed = true;
     m_error = error;
 }
@@ -464,7 +457,7 @@ void RbUtilQt::installVoice()
     voiceurl.replace("%MODEL%", model);
     voiceurl.replace("%RELVERSION%", relversion);
 
-    qDebug() << "[RbUtil] voicefile URL:" << voiceurl;
+    LOG_INFO() << "voicefile URL:" << voiceurl;
 
     // create logger
     logger = new ProgressLoggerGui(this);
@@ -633,7 +626,7 @@ QUrl RbUtilQt::proxy()
     else if(proxytype == "system")
         proxy = System::systemProxy();
 
-    qDebug() << "[RbUtilQt] Proxy is" << proxy;
+    LOG_INFO() << "Proxy is" << proxy;
     return proxy;
 }
 
@@ -675,7 +668,7 @@ void RbUtilQt::checkUpdate(void)
 void RbUtilQt::downloadUpdateDone(bool error)
 {
     if(error) {
-        qDebug() << "[RbUtil] network error:" << update->errorString();
+        LOG_INFO() << "network error:" << update->errorString();
     }
     else {
         QString toParse(update->readAll());
@@ -688,7 +681,7 @@ void RbUtilQt::downloadUpdateDone(bool error)
             rbutilList << searchString.cap(1);
             pos += searchString.matchedLength();
         }
-        qDebug() << "[RbUtilQt] Checking for update";
+        LOG_INFO() << "Checking for update";
 
         QString newVersion = "";
         QString foundVersion = "";

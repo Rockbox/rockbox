@@ -22,10 +22,11 @@
 #include "ttsfestival.h"
 #include "utils.h"
 #include "rbsettings.h"
+#include "Logger.h"
 
 TTSFestival::~TTSFestival()
 {
-    qDebug() << "[Festival] Destroying instance";
+    LOG_INFO() << "Destroying instance";
     stop();
 }
 
@@ -87,7 +88,7 @@ void TTSFestival::updateVoiceDescription()
     currentPath = getSetting(eSERVERPATH)->current().toString();
     QString info = getVoiceInfo(getSetting(eVOICE)->current().toString());
     currentPath = "";
-    
+
     getSetting(eVOICEDESC)->setCurrent(info);
 }
 
@@ -101,7 +102,7 @@ void TTSFestival::updateVoiceList()
    currentPath = getSetting(eSERVERPATH)->current().toString();
    QStringList voiceList = getVoiceList();
    currentPath = "";
-   
+
    getSetting(eVOICE)->setList(voiceList);
    if(voiceList.size() > 0) getSetting(eVOICE)->setCurrent(voiceList.at(0));
    else getSetting(eVOICE)->setCurrent("");
@@ -130,9 +131,10 @@ void TTSFestival::startServer()
             QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
 
         if(serverProcess.state() == QProcess::Running)
-            qDebug() << "[Festival] Server is up and running";
+            LOG_INFO() << "Server is up and running";
         else
-            qDebug() << "[Festival] Server failed to start, state: " << serverProcess.state();
+            LOG_ERROR() << "Server failed to start, state:"
+                        << serverProcess.state();
     }
 }
 
@@ -147,8 +149,9 @@ bool TTSFestival::ensureServerRunning()
 
 bool TTSFestival::start(QString* errStr)
 {
-    qDebug() << "[Festival] Starting server with voice " << RbSettings::subValue("festival", RbSettings::TtsVoice).toString();
-    
+    LOG_INFO() << "Starting server with voice"
+               << RbSettings::subValue("festival", RbSettings::TtsVoice).toString();
+
     bool running = ensureServerRunning();
     if (!RbSettings::subValue("festival",RbSettings::TtsVoice).toString().isEmpty())
     {
@@ -156,17 +159,17 @@ bool TTSFestival::start(QString* errStr)
         QString voiceSelect = QString("(voice.select '%1)\n")
         .arg(RbSettings::subValue("festival", RbSettings::TtsVoice).toString());
         queryServer(voiceSelect, 3000);
-        
+
         if(prologFile.open())
         {
           prologFile.write(voiceSelect.toLatin1());
           prologFile.close();
           prologPath = QFileInfo(prologFile).absoluteFilePath();
-          qDebug() << "[Festival] Prolog created at " << prologPath;
+          LOG_INFO() << "Prolog created at" << prologPath;
         }
-        
+
     }
-    
+
     if (!running)
       (*errStr) = "Festival could not be started";
     return running;
@@ -182,13 +185,13 @@ bool TTSFestival::stop()
 
 TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 {
-    qDebug() << "[Festival] Voicing " << text << "->" << wavfile;
+    LOG_INFO() << "Voicing" << text << "->" << wavfile;
 
     QString path = RbSettings::subValue("festival-client",
             RbSettings::TtsPath).toString();
     QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp"
             " --output \"%2\" --prolog \"%3\" - ").arg(path).arg(wavfile).arg(prologPath);
-    qDebug() << "[Festival] Client cmd: " << cmd;
+    LOG_INFO() << "Client cmd:" << cmd;
 
     QProcess clientProcess;
     clientProcess.start(cmd);
@@ -200,7 +203,7 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
     response = response.trimmed();
     if(!response.contains("Utterance"))
     {
-        qDebug() << "[Festival] Could not voice string: " << response;
+        LOG_WARNING() << "Could not voice string: " << response;
         *errStr = tr("engine could not voice string");
         return Warning;
         /* do not stop the voicing process because of a single string
@@ -231,10 +234,10 @@ bool TTSFestival::configOk()
             ret = ret && (voices.indexOf(RbSettings::subValue("festival",
                             RbSettings::TtsVoice).toString()) != -1);
     }
-    else /* If we're currently configuring the server, we need to know that 
+    else /* If we're currently configuring the server, we need to know that
             the entered path is valid */
         ret = QFileInfo(currentPath).isExecutable();
-    
+
     return ret;
 }
 
@@ -245,7 +248,7 @@ QStringList TTSFestival::getVoiceList()
 
     if(voices.size() > 0)
     {
-        qDebug() << "[Festival] Using voice cache";
+        LOG_INFO() << "Using voice cache";
         return voices;
     }
 
@@ -261,9 +264,9 @@ QStringList TTSFestival::getVoiceList()
     if (voices.size() == 1 && voices[0].size() == 0)
         voices.removeAt(0);
     if (voices.size() > 0)
-        qDebug() << "[Festival] Voices: " << voices;
+        LOG_INFO() << "Voices:" << voices;
     else
-        qDebug() << "[Festival] No voices. Response was: " << response;
+        LOG_WARNING() << "No voices. Response was:" << response;
 
     return voices;
 }
@@ -290,7 +293,7 @@ QString TTSFestival::getVoiceInfo(QString voice)
     {
         response = response.remove(QRegExp("(description \"*\")",
                     Qt::CaseInsensitive, QRegExp::Wildcard));
-        qDebug() << "[Festival] voiceInfo w/o descr: " << response;
+        LOG_INFO() << "voiceInfo w/o descr:" << response;
         response = response.remove(')');
         QStringList responseLines = response.split('(', QString::SkipEmptyParts);
         responseLines.removeAt(0); // the voice name itself
@@ -327,12 +330,12 @@ QString TTSFestival::queryServer(QString query, int timeout)
 
     // this operation could take some time
     emit busy();
-    
-    qDebug() << "[Festival] queryServer with " << query;
+
+    LOG_INFO() << "queryServer with" << query;
 
     if (!ensureServerRunning())
     {
-      qDebug() << "[Festival] queryServer: ensureServerRunning failed";
+      LOG_ERROR() << "queryServer: ensureServerRunning failed";
       emit busyEnd();
       return "";
     }
@@ -393,7 +396,7 @@ QString TTSFestival::queryServer(QString query, int timeout)
         lines.removeLast();  /* should be ft_StUfF_keyOK */
     }
     else
-        qDebug() << "[Festival] Response too short: " << response;
+        LOG_ERROR() << "Response too short:" << response;
 
     emit busyEnd();
     return lines.join("\n");

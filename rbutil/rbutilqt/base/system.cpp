@@ -69,6 +69,7 @@
 
 #include "utils.h"
 #include "rbsettings.h"
+#include "Logger.h"
 
 /** @brief detect permission of user (only Windows at moment).
  *  @return enum userlevel.
@@ -242,17 +243,17 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
 {
     QMap<uint32_t, QString> usbids;
     // usb pid detection
-    qDebug() << "[System] Searching for USB devices";
+    LOG_INFO() << "Searching for USB devices";
 #if defined(Q_OS_LINUX)
 #if defined(LIBUSB1)
     libusb_device **devs;
     if(libusb_init(NULL) != 0) {
-        qDebug() << "[System] Initializing libusb-1 failed.";
+        LOG_ERROR() << "Initializing libusb-1 failed.";
         return usbids;
     }
 
     if(libusb_get_device_list(NULL, &devs) < 1) {
-        qDebug() << "[System] Error getting device list.";
+        LOG_ERROR() << "Error getting device list.";
         return usbids;
     }
     libusb_device *dev;
@@ -277,7 +278,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
                 name = tr("(no description available)");
             if(id) {
                 usbids.insertMulti(id, name);
-                qDebug("[System] USB: 0x%08x, %s", id, name.toLocal8Bit().data());
+                LOG_INFO("USB: 0x%08x, %s", id, name.toLocal8Bit().data());
             }
         }
     }
@@ -323,7 +324,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
 
                 if(id) {
                     usbids.insertMulti(id, name);
-                    qDebug() << "[System] USB:" << QString("0x%1").arg(id, 8, 16) << name;
+                    LOG_INFO() << "USB:" << QString("0x%1").arg(id, 8, 16) << name;
                 }
                 u = u->next;
             }
@@ -341,7 +342,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
     result = IOServiceGetMatchingServices(kIOMasterPortDefault, usb_matching_dictionary,
                                           &usb_iterator);
     if(result) {
-        qDebug() << "[System] USB: IOKit: Could not get matching services.";
+        LOG_ERROR() << "USB: IOKit: Could not get matching services.";
         return usbids;
     }
 
@@ -404,7 +405,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
 
         if(id) {
             usbids.insertMulti(id, name);
-            qDebug() << "[System] USB:" << QString("0x%1").arg(id, 8, 16) << name;
+            LOG_INFO() << "USB:" << QString("0x%1").arg(id, 8, 16) << name;
         }
 
     }
@@ -468,7 +469,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
             uint32_t id;
             id = vid << 16 | pid;
             usbids.insert(id, description);
-            qDebug("[System] USB VID: %04x, PID: %04x", vid, pid);
+            LOG_INFO("USB VID: %04x, PID: %04x", vid, pid);
         }
         if(buffer) free(buffer);
     }
@@ -507,7 +508,7 @@ QUrl System::systemProxy(void)
 
     RegCloseKey(hk);
 
-    //qDebug() << QString::fromWCharArray(proxyval) << QString("%1").arg(enable);
+    //LOG_INFO() << QString::fromWCharArray(proxyval) << QString("%1").arg(enable);
     if(enable != 0)
         return QUrl("http://" + QString::fromWCharArray(proxyval));
     else
@@ -537,7 +538,7 @@ QUrl System::systemProxy(void)
             bufsize = CFStringGetLength(stringref) * 2 + 1;
             buf = (char*)malloc(sizeof(char) * bufsize);
             if(buf == NULL) {
-                qDebug() << "[System] can't allocate memory for proxy string!";
+                LOG_ERROR() << "can't allocate memory for proxy string!";
                 CFRelease(dictref);
                 return QUrl("");
             }

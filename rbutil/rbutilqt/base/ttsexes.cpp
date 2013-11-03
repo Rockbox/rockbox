@@ -20,6 +20,7 @@
 #include "ttsexes.h"
 #include "utils.h"
 #include "rbsettings.h"
+#include "Logger.h"
 
 TTSExes::TTSExes(QObject* parent) : TTSBase(parent)
 {
@@ -85,15 +86,15 @@ TTSStatus TTSExes::voice(QString text, QString wavfile, QString *errStr)
     QString execstring;
     if(wavfile.isEmpty() && m_capabilities & TTSBase::CanSpeak) {
         if(m_TTSSpeakTemplate.isEmpty()) {
-            qDebug() << "[TTSExes] internal error: TTS announces CanSpeak "
-                        "but template empty!";
+            LOG_ERROR() << "internal error: TTS announces CanSpeak "
+                           "but template empty!";
             return FatalError;
         }
         execstring = m_TTSSpeakTemplate;
     }
     else if(wavfile.isEmpty()) {
-        qDebug() << "[TTSExes] no output file passed to voice() "
-                    "but TTS can't speak directly.";
+        LOG_ERROR() << "no output file passed to voice() "
+                       "but TTS can't speak directly.";
         return FatalError;
     }
     else {
@@ -108,7 +109,7 @@ TTSStatus TTSExes::voice(QString text, QString wavfile, QString *errStr)
     QProcess::execute(execstring);
 
     if(!wavfile.isEmpty() && !QFileInfo(wavfile).isFile()) {
-        qDebug() << "[TTSExes] output file does not exist:" << wavfile;
+        LOG_ERROR() << "output file does not exist:" << wavfile;
         return FatalError;
     }
     return NoError;

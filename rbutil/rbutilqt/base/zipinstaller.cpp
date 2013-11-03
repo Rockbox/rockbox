@@ -20,6 +20,7 @@
 #include "zipinstaller.h"
 #include "utils.h"
 #include "ziputil.h"
+#include "Logger.h"
 
 ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 {
@@ -31,7 +32,7 @@ ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
 
 void ZipInstaller::install()
 {
-    qDebug() << "[ZipInstall] initializing installation";
+    LOG_INFO() << "initializing installation";
 
     runner = 0;
     connect(this, SIGNAL(cont()), this, SLOT(installContinue()));
@@ -44,17 +45,17 @@ void ZipInstaller::install()
 
 void ZipInstaller::abort()
 {
-    qDebug() << "[ZipInstall] Aborted";
+    LOG_INFO() << "Aborted";
     emit internalAborted();
 }
 
 
 void ZipInstaller::installContinue()
 {
-    qDebug() << "[ZipInstall] continuing installation";
+    LOG_INFO() << "continuing installation";
 
     runner++; // this gets called when a install finished, so increase first.
-    qDebug() << "[ZipInstall] runner done:" << runner << "/" << m_urllist.size();
+    LOG_INFO() << "runner done:" << runner << "/" << m_urllist.size();
     if(runner < m_urllist.size()) {
         emit logItem(tr("done."), LOGOK);
         m_url = m_urllist.at(runner);
@@ -74,7 +75,7 @@ void ZipInstaller::installContinue()
 
 void ZipInstaller::installStart()
 {
-    qDebug() << "[ZipInstall] starting installation";
+    LOG_INFO() << "starting installation";
 
     emit logItem(tr("Downloading file %1.%2").arg(QFileInfo(m_url).baseName(),
             QFileInfo(m_url).completeSuffix()),LOGINFO);
@@ -105,7 +106,7 @@ void ZipInstaller::installStart()
 
 void ZipInstaller::downloadDone(bool error)
 {
-    qDebug() << "[ZipInstall] download done, error:" << error;
+    LOG_INFO() << "download done, error:" << error;
     QStringList zipContents; // needed later
      // update progress bar
 
@@ -127,7 +128,7 @@ void ZipInstaller::downloadDone(bool error)
     QCoreApplication::processEvents();
     if(m_unzip) {
         // unzip downloaded file
-        qDebug() << "[ZipInstall] about to unzip " << m_file << "to" << m_mountpoint;
+        LOG_INFO() << "about to unzip" << m_file << "to" << m_mountpoint;
 
         emit logItem(tr("Extracting file."), LOGINFO);
         QCoreApplication::processEvents();
@@ -159,7 +160,7 @@ void ZipInstaller::downloadDone(bool error)
     else {
         // only copy the downloaded file to the output location / name
         emit logItem(tr("Installing file."), LOGINFO);
-        qDebug() << "[ZipInstall] saving downloaded file (no extraction)";
+        LOG_INFO() << "saving downloaded file (no extraction)";
 
         m_downloadFile->open(); // copy fails if file is not opened (filename issue?)
         // make sure the required path is existing

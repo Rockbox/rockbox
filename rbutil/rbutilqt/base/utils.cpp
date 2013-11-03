@@ -21,6 +21,7 @@
 #include "system.h"
 #include "rbsettings.h"
 #include "systeminfo.h"
+#include "Logger.h"
 
 #ifdef UNICODE
 #define _UNICODE
@@ -125,7 +126,7 @@ QString Utils::resolvePathCase(QString path)
         else
             return QString("");
     }
-    qDebug() << "[Utils] resolving path" << path << "->" << realpath;
+    LOG_INFO() << "resolving path" << path << "->" << realpath;
     return realpath;
 }
 
@@ -179,7 +180,7 @@ QString Utils::filesystemName(QString path)
     } while(result == noErr);
 #endif
 
-    qDebug() << "[Utils] Volume name of" << path << "is" << name;
+    LOG_INFO() << "Volume name of" << path << "is" << name;
     return name;
 }
 
@@ -190,7 +191,7 @@ QString Utils::filesystemName(QString path)
 qulonglong Utils::filesystemFree(QString path)
 {
     qulonglong size = filesystemSize(path, FilesystemFree);
-    qDebug() << "[Utils] free disk space for" << path << size;
+    LOG_INFO() << "free disk space for" << path << size;
     return size;
 }
 
@@ -198,7 +199,7 @@ qulonglong Utils::filesystemFree(QString path)
 qulonglong Utils::filesystemTotal(QString path)
 {
     qulonglong size = filesystemSize(path, FilesystemTotal);
-    qDebug() << "[Utils] total disk space for" << path << size;
+    LOG_INFO() << "total disk space for" << path << size;
     return size;
 }
 
@@ -206,7 +207,7 @@ qulonglong Utils::filesystemTotal(QString path)
 qulonglong Utils::filesystemClusterSize(QString path)
 {
     qulonglong size = filesystemSize(path, FilesystemClusterSize);
-    qDebug() << "[Utils] cluster size for" << path << size;
+    LOG_INFO() << "cluster size for" << path << size;
     return size;
 }
 
@@ -273,7 +274,7 @@ QString Utils::findExecutable(QString name)
 #elif defined(Q_OS_WIN)
     QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
 #endif
-    qDebug() << "[Utils] system path:" << path;
+    LOG_INFO() << "system path:" << path;
     for(int i = 0; i < path.size(); i++)
     {
         QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + name;
@@ -284,11 +285,11 @@ QString Utils::findExecutable(QString name)
 #endif
         if(QFileInfo(executable).isExecutable())
         {
-            qDebug() << "[Utils] findExecutable: found" << executable;
+            LOG_INFO() << "findExecutable: found" << executable;
             return QDir::toNativeSeparators(executable);
         }
     }
-    qDebug() << "[Utils] findExecutable: could not find" << name;
+    LOG_INFO() << "findExecutable: could not find" << name;
     return "";
 }
 
@@ -299,7 +300,7 @@ QString Utils::findExecutable(QString name)
  */
 QString Utils::checkEnvironment(bool permission)
 {
-    qDebug() << "[Utils] checking environment";
+    LOG_INFO() << "checking environment";
     QString text = "";
 
     // check permission
@@ -338,7 +339,7 @@ QString Utils::checkEnvironment(bool permission)
  */
 int Utils::compareVersionStrings(QString s1, QString s2)
 {
-    qDebug() << "[Utils] comparing version strings" << s1 << "and" << s2;
+    LOG_INFO() << "comparing version strings" << s1 << "and" << s2;
     QString a = s1.trimmed();
     QString b = s2.trimmed();
     // if strings are identical return 0.
@@ -418,7 +419,7 @@ int Utils::compareVersionStrings(QString s1, QString s2)
  */
 QString Utils::resolveDevicename(QString path)
 {
-    qDebug() << "[Utils] resolving device name" << path;
+    LOG_INFO() << "resolving device name" << path;
 #if defined(Q_OS_LINUX)
     FILE *mn = setmntent("/etc/mtab", "r");
     if(!mn)
@@ -434,7 +435,7 @@ QString Utils::resolveDevicename(QString path)
            && (QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
             || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive))) {
             endmntent(mn);
-            qDebug() << "[Utils] device name is" << ent->mnt_fsname;
+            LOG_INFO() << "device name is" << ent->mnt_fsname;
             return QString(ent->mnt_fsname);
         }
     }
@@ -453,7 +454,7 @@ QString Utils::resolveDevicename(QString path)
         if(QString(mntinf->f_mntonname) == path
            && (QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
             || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive))) {
-            qDebug() << "[Utils] device name is" << mntinf->f_mntfromname;
+            LOG_INFO() << "device name is" << mntinf->f_mntfromname;
             return QString(mntinf->f_mntfromname);
         }
         mntinf++;
@@ -471,17 +472,17 @@ QString Utils::resolveDevicename(QString path)
     h = CreateFile(uncpath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
             NULL, OPEN_EXISTING, 0, NULL);
     if(h == INVALID_HANDLE_VALUE) {
-        //qDebug() << "error getting extents for" << uncpath;
+        //LOG_INFO() << "error getting extents for" << uncpath;
         return "";
     }
     // get the extents
     if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
                 NULL, 0, extents, sizeof(buffer), &written, NULL)) {
         if(extents->NumberOfDiskExtents > 1) {
-            qDebug() << "[Utils] resolving device name: volume spans multiple disks!";
+            LOG_INFO() << "resolving device name: volume spans multiple disks!";
             return "";
         }
-        qDebug() << "[Utils] device name is" << extents->Extents[0].DiskNumber;
+        LOG_INFO() << "device name is" << extents->Extents[0].DiskNumber;
         return QString("%1").arg(extents->Extents[0].DiskNumber);
     }
 #endif
@@ -496,7 +497,7 @@ QString Utils::resolveDevicename(QString path)
  */
 QString Utils::resolveMountPoint(QString device)
 {
-    qDebug() << "[Utils] resolving mountpoint:" << device;
+    LOG_INFO() << "resolving mountpoint:" << device;
 
 #if defined(Q_OS_LINUX)
     FILE *mn = setmntent("/etc/mtab", "r");
@@ -511,11 +512,11 @@ QString Utils::resolveMountPoint(QString device)
             QString result;
             if(QString(ent->mnt_type).contains("vfat", Qt::CaseInsensitive)
                     || QString(ent->mnt_type).contains("hfs", Qt::CaseInsensitive)) {
-                qDebug() << "[Utils] resolved mountpoint is:" << ent->mnt_dir;
+                LOG_INFO() << "resolved mountpoint is:" << ent->mnt_dir;
                 result = QString(ent->mnt_dir);
             }
             else {
-                qDebug() << "[Utils] mountpoint is wrong filesystem!";
+                LOG_INFO() << "mountpoint is wrong filesystem!";
             }
             endmntent(mn);
             return result;
@@ -536,11 +537,11 @@ QString Utils::resolveMountPoint(QString device)
         if(QString(mntinf->f_mntfromname) == device) {
             if(QString(mntinf->f_fstypename).contains("msdos", Qt::CaseInsensitive)
                 || QString(mntinf->f_fstypename).contains("hfs", Qt::CaseInsensitive)) {
-                qDebug() << "[Utils] resolved mountpoint is:" << mntinf->f_mntonname;
+                LOG_INFO() << "resolved mountpoint is:" << mntinf->f_mntonname;
                 return QString(mntinf->f_mntonname);
             }
             else {
-                qDebug() << "[Utils] mountpoint is wrong filesystem!";
+                LOG_INFO() << "mountpoint is wrong filesystem!";
                 return QString();
             }
         }
@@ -556,14 +557,14 @@ QString Utils::resolveMountPoint(QString device)
     for(letter = 'A'; letter <= 'Z'; letter++) {
         if(resolveDevicename(QString(letter)).toUInt() == driveno) {
             result = letter;
-            qDebug() << "[Utils] resolved mountpoint is:" << result;
+            LOG_INFO() << "resolved mountpoint is:" << result;
             break;
         }
     }
     if(!result.isEmpty())
         return result + ":/";
 #endif
-    qDebug() << "[Utils] resolving mountpoint failed!";
+    LOG_INFO() << "resolving mountpoint failed!";
     return QString("");
 }
 
@@ -589,11 +590,11 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
         QString fstype = QString::fromWCharArray(t);
         if(type == MountpointsAll || supported.contains(fstype)) {
             tempList << list.at(i).absolutePath();
-            qDebug() << "[Utils] Added:" << list.at(i).absolutePath()
+            LOG_INFO() << "Added:" << list.at(i).absolutePath()
                      << "type" << fstype;
         }
         else {
-            qDebug() << "[Utils] Ignored:" << list.at(i).absolutePath()
+            LOG_INFO() << "Ignored:" << list.at(i).absolutePath()
                      << "type" << fstype;
         }
     }
@@ -607,11 +608,11 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
     while(num--) {
         if(type == MountpointsAll || supported.contains(mntinf->f_fstypename)) {
             tempList << QString(mntinf->f_mntonname);
-            qDebug() << "[Utils] Added:" << mntinf->f_mntonname
+            LOG_INFO() << "Added:" << mntinf->f_mntonname
                      << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
         }
         else {
-            qDebug() << "[Utils] Ignored:" << mntinf->f_mntonname
+            LOG_INFO() << "Ignored:" << mntinf->f_mntonname
                      << "is" << mntinf->f_mntfromname << "type" << mntinf->f_fstypename;
         }
         mntinf++;
@@ -626,11 +627,11 @@ QStringList Utils::mountpoints(enum MountpointsFilter type)
     while((ent = getmntent(mn))) {
         if(type == MountpointsAll || supported.contains(ent->mnt_type)) {
             tempList << QString(ent->mnt_dir);
-            qDebug() << "[Utils] Added:" << ent->mnt_dir
+            LOG_INFO() << "Added:" << ent->mnt_dir
                      << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
         }
         else {
-            qDebug() << "[Utils] Ignored:" << ent->mnt_dir
+            LOG_INFO() << "Ignored:" << ent->mnt_dir
                      << "is" << ent->mnt_fsname << "type" << ent->mnt_type;
         }
     }
@@ -658,13 +659,13 @@ QStringList Utils::findRunningProcess(QStringList names)
 
     hdl = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if(hdl == INVALID_HANDLE_VALUE) {
-        qDebug() << "[Utils] CreateToolhelp32Snapshot failed.";
+        LOG_ERROR() << "CreateToolhelp32Snapshot failed.";
         return found;
     }
     entry.dwSize = sizeof(PROCESSENTRY32);
     entry.szExeFile[0] = '\0';
     if(!Process32First(hdl, &entry)) {
-        qDebug() << "[Utils] Process32First failed.";
+        LOG_ERROR() << "Process32First failed.";
         return found;
     }
 
@@ -721,7 +722,7 @@ QStringList Utils::findRunningProcess(QStringList names)
             found.append(processlist.at(index));
         }
     }
-    qDebug() << "[Utils] Found listed processes running:" << found;
+    LOG_INFO() << "Found listed processes running:" << found;
     return found;
 }
 

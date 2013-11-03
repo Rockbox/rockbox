@@ -23,6 +23,7 @@
 #include "rbsettings.h"
 #include "systeminfo.h"
 #include "ziputil.h"
+#include "Logger.h"
 
 VoiceFileCreator::VoiceFileCreator(QObject* parent) :QObject(parent)
 {
@@ -65,7 +66,7 @@ bool VoiceFileCreator::createVoiceFile()
 
     // check if voicefile is present on target
     QString fn = m_mountpoint + "/.rockbox/langs/voicestrings.zip";
-    qDebug() << "[VoiceFile] searching for zipped voicestrings at" << fn;
+    LOG_INFO() << "searching for zipped voicestrings at" << fn;
     if(QFileInfo(fn).isFile()) {
         // search for binary voice strings file in archive
         ZipUtil z(this);
@@ -79,7 +80,7 @@ bool VoiceFileCreator::createVoiceFile()
                 }
             }
             if(index < contents.size()) {
-                qDebug() << "[VoiceFile] extracting strings file from zip";
+                LOG_INFO() << "extracting strings file from zip";
                 // extract strings
                 QTemporaryFile stringsfile;
                 stringsfile.open();
@@ -153,7 +154,7 @@ bool VoiceFileCreator::createVoiceFile()
     genlang.replace("%REVISION%", version);
     genlang.replace("%FEATURES%", features);
     QUrl genlangUrl(genlang);
-    qDebug() << "[VoiceFileCreator] downloading" << genlangUrl;
+    LOG_INFO() << "downloading" << genlangUrl;
 
     //download the correct genlang output
     QTemporaryFile *downloadFile = new QTemporaryFile(this);
@@ -175,7 +176,7 @@ bool VoiceFileCreator::createVoiceFile()
 
 void VoiceFileCreator::downloadDone(bool error)
 {
-    qDebug() << "[VoiceFileCreator] download done, error:" << error;
+    LOG_INFO() << "download done, error:" << error;
 
     // update progress bar
     emit logProgress(1,1);
@@ -253,7 +254,7 @@ void VoiceFileCreator::create(void)
                 m_talkList.append(entry);
             }
             else if(entry.toSpeak.isEmpty()) {
-                qDebug() << "[Voicefile] Empty voice string for ID" << id;
+                LOG_WARNING() << "Empty voice string for ID" << id;
             }
             else {
                 m_talkList.append(entry);
@@ -314,7 +315,7 @@ void VoiceFileCreator::create(void)
         return;
     }
 
-    qDebug() << "[VoiceFile] Running voicefont, format" << m_voiceformat;
+    LOG_INFO() << "Running voicefont, format" << m_voiceformat;
     voicefont(ids2,m_targetid,m_path.toLocal8Bit().data(), output, m_voiceformat);
     // ids2 and output are closed by voicefont().
 

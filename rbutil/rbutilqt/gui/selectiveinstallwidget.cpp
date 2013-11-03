@@ -30,6 +30,7 @@
 #include "bootloaderinstallhelper.h"
 #include "themesinstallwindow.h"
 #include "utils.h"
+#include "Logger.h"
 
 SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent)
 {
@@ -147,7 +148,7 @@ void SelectiveInstallWidget::updateVersion(void)
 
 void SelectiveInstallWidget::saveSettings(void)
 {
-    qDebug() << "[SelectiveInstallWidget] saving current settings";
+    LOG_INFO() << "saving current settings";
 
     RbSettings::setValue(RbSettings::InstallRockbox, ui.rockboxCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallFonts, ui.fontsCheckbox->isChecked());
@@ -158,7 +159,7 @@ void SelectiveInstallWidget::saveSettings(void)
 
 void SelectiveInstallWidget::startInstall(void)
 {
-    qDebug() << "[SelectiveInstallWidget] starting installation";
+    LOG_INFO() << "starting installation";
     saveSettings();
 
     m_installStage = 0;
@@ -191,15 +192,15 @@ void SelectiveInstallWidget::startInstall(void)
 
 void SelectiveInstallWidget::continueInstall(bool error)
 {
-    qDebug() << "[SelectiveInstallWidget] continuing install with stage" << m_installStage;
+    LOG_INFO() << "continuing install with stage" << m_installStage;
     if(error) {
-        qDebug() << "[SelectiveInstallWidget] Last part returned error.";
+        LOG_ERROR() << "Last part returned error.";
         m_logger->setFinished();
         m_installStage = 7;
     }
     m_installStage++;
     switch(m_installStage) {
-        case 0: qDebug() << "[SelectiveInstallWidget] Something wrong!"; break;
+        case 0: LOG_ERROR() << "Something wrong!"; break;
         case 1: installBootloader(); break;
         case 2: installRockbox(); break;
         case 3: installFonts(); break;
@@ -210,7 +211,7 @@ void SelectiveInstallWidget::continueInstall(bool error)
     }
 
     if(m_installStage > 6) {
-        qDebug() << "[SelectiveInstallWidget] All install stages done.";
+        LOG_INFO() << "All install stages done.";
         m_logger->setFinished();
         if(m_blmethod != "none") {
             // check if Rockbox is installed by looking after rockbox-info.txt.
@@ -225,7 +226,7 @@ void SelectiveInstallWidget::continueInstall(bool error)
 void SelectiveInstallWidget::installBootloader(void)
 {
     if(ui.bootloaderCheckbox->isChecked()) {
-        qDebug() << "[SelectiveInstallWidget] installing bootloader";
+        LOG_INFO() << "installing bootloader";
 
         QString platform = RbSettings::value(RbSettings::Platform).toString();
         QString backupDestination = "";
@@ -292,7 +293,7 @@ void SelectiveInstallWidget::installBootloader(void)
                 if(!backupDestination.isEmpty())
                     backupDestination += "/" + targetFolder;
 
-                qDebug() << "[RbUtil] backing up to" << backupDestination;
+                LOG_INFO() << "backing up to" << backupDestination;
                 // backup needs to be done after the m_logger has been set up.
             }
         }
@@ -350,7 +351,7 @@ void SelectiveInstallWidget::installBootloader(void)
 
     }
     else {
-        qDebug() << "[SelectiveInstallWidget] Bootloader install disabled.";
+        LOG_INFO() << "Bootloader install disabled.";
         emit installSkipped(false);
     }
 }
@@ -372,7 +373,7 @@ void SelectiveInstallWidget::installBootloaderPost()
 void SelectiveInstallWidget::installRockbox(void)
 {
     if(ui.rockboxCheckbox->isChecked()) {
-        qDebug() << "[SelectiveInstallWidget] installing Rockbox";
+        LOG_INFO() << "installing Rockbox";
         QString url;
 
         QString selected = ui.selectedVersion->itemData(ui.selectedVersion->currentIndex()).toString();
@@ -405,7 +406,7 @@ void SelectiveInstallWidget::installRockbox(void)
 
     }
     else {
-        qDebug() << "[SelectiveInstallWidget] Rockbox install disabled.";
+        LOG_INFO() << "Rockbox install disabled.";
         emit installSkipped(false);
     }
 }
@@ -414,7 +415,7 @@ void SelectiveInstallWidget::installRockbox(void)
 void SelectiveInstallWidget::installFonts(void)
 {
     if(ui.fontsCheckbox->isChecked()) {
-        qDebug() << "[SelectiveInstallWidget] installing Fonts";
+        LOG_INFO() << "installing Fonts";
 
     RockboxInfo installInfo(m_mountpoint);
     QString fontsurl;
@@ -447,7 +448,7 @@ void SelectiveInstallWidget::installFonts(void)
     m_zipinstaller->install();
     }
     else {
-        qDebug() << "[SelectiveInstallWidget] Fonts install disabled.";
+        LOG_INFO() << "Fonts install disabled.";
         emit installSkipped(false);
     }
 }
@@ -465,7 +466,7 @@ void SelectiveInstallWidget::customizeThemes(void)
 void SelectiveInstallWidget::installThemes(void)
 {
     if(ui.themesCheckbox->isChecked()) {
-        qDebug() << "[SelectiveInstallWidget] installing themes";
+        LOG_INFO() << "installing themes";
         if(m_themesinstaller == NULL)
             m_themesinstaller = new ThemesInstallWindow(this);
 
@@ -475,7 +476,7 @@ void SelectiveInstallWidget::installThemes(void)
         m_themesinstaller->install();
     }
     else {
-        qDebug() << "[SelectiveInstallWidget] Themes install disabled.";
+        LOG_INFO() << "Themes install disabled.";
         emit installSkipped(false);
     }
 }
@@ -489,7 +490,7 @@ void SelectiveInstallWidget::installGamefiles(void)
             m_logger->addItem(tr("Your installation doesn't require game files, skipping."), LOGINFO);
             emit installSkipped(false);
         }
-        qDebug() << "[SelectiveInstallWidget] installing gamefiles";
+        LOG_INFO() << "installing gamefiles";
         // create new zip installer
         if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
@@ -507,7 +508,7 @@ void SelectiveInstallWidget::installGamefiles(void)
         m_zipinstaller->install();
     }
     else {
-        qDebug() << "[SelectiveInstallWidget] Gamefile install disabled.";
+        LOG_INFO() << "Gamefile install disabled.";
         emit installSkipped(false);
     }
 }

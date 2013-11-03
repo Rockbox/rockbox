@@ -22,6 +22,7 @@
 
 #include "../ipodpatcher/ipodpatcher.h"
 #include "utils.h"
+#include "Logger.h"
 
 
 BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
@@ -131,7 +132,8 @@ void BootloaderInstallIpod::installStage3(bool mounted)
         emit logItem(tr("Writing log aborted"), LOGERROR);
         emit done(true);
     }
-    qDebug() << "[BootloaderInstallIpod] version installed:" << m_blversion.toString(Qt::ISODate);
+    LOG_INFO() << "version installed:"
+               << m_blversion.toString(Qt::ISODate);
 }
 
 
@@ -190,7 +192,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallIpod::installed(void)
     BootloaderInstallBase::BootloaderType result = BootloaderRockbox;
 
     if(!ipodInitialize(&ipod)) {
-        qDebug() << "[BootloaderInstallIpod] installed: BootloaderUnknown";
+        LOG_INFO() << "installed: BootloaderUnknown";
         result = BootloaderUnknown;
     }
     else {
@@ -200,7 +202,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallIpod::installed(void)
             result = BootloaderOther;
         }
         else {
-            qDebug() << "[BootloaderInstallIpod] installed: BootloaderRockbox";
+            LOG_INFO() << "installed: BootloaderRockbox";
         }
     }
     ipod_close(&ipod);
@@ -235,12 +237,12 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
         sprintf(ipod->diskname, "%s",
             qPrintable(devicename.remove(QRegExp("[0-9]+$"))));
 #endif
-        qDebug() << "[BootloaderInstallIpod] ipodpatcher: overriding scan, using"
-                 << ipod->diskname;
+        LOG_INFO() << "ipodpatcher: overriding scan, using"
+                   << ipod->diskname;
     }
     else {
         emit logItem(tr("Error: no mountpoint specified!"), LOGERROR);
-        qDebug() << "[BootloaderInstallIpod] no mountpoint specified!";
+        LOG_ERROR() << "no mountpoint specified!";
     }
     int result = ipod_open(ipod, 1);
     if(result == -2) {
