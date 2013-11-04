@@ -247,6 +247,10 @@ void RbUtilQt::downloadDone(bool error)
     buildInfo.close();
 
     ui.statusbar->showMessage(tr("Download build information finished."), 5000);
+    if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION
+            || RbSettings::value(RbSettings::ShowChangelog).toBool()) {
+        changelog();
+    }
     updateSettings();
     m_gotInfo = true;
 
@@ -320,10 +324,6 @@ void RbUtilQt::updateSettings()
     HttpGet::setGlobalCache(c.isEmpty() ? QDir::tempPath() : c);
     HttpGet::setGlobalProxy(proxy());
 
-    if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION
-            || RbSettings::value(RbSettings::ShowChangelog).toBool()) {
-        changelog();
-    }
     if(RbSettings::value(RbSettings::RbutilVersion) != PUREVERSION) {
         QApplication::processEvents();
         QMessageBox::information(this, tr("New installation"),

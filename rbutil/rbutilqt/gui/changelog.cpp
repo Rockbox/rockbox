@@ -57,6 +57,8 @@ QString Changelog::parseChangelogFile(QString filename)
                 QString t = line.remove(QRegExp("^\\*"));
                 t.replace(QRegExp("FS#(\\d+)"),
                           "<a href='http://www.rockbox.org/tracker/task/\\1'>FS#\\1</a>");
+                t.replace(QRegExp("G#(\\d+)"),
+                          "<a href='http://gerrit.rockbox.org/r/\\1'>G#\\1</a>");
                 text.append(QString("<li>%1</li>").arg(t));
                 line = c.readLine();
                 if(line.startsWith("#"))
