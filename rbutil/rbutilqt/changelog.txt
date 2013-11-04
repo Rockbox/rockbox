@@ -12,6 +12,8 @@ Version 1.4
 * Change encoder volume configuration to allow more sensible values.
 * Save proxy password differently in configuration file (better solution for FS#12166).
 * Add support for building Rockbox Utility with Qt5.
+* Add support for extracting Original Firmware files compressed with CAB (G#418).
+* Add support for Creative Zen X-Fi3 (G#419).
 * Add Changelog window.
 * Rework System Trace functionality.
 
