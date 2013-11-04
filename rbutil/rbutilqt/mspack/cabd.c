@@ -524,6 +524,7 @@ static char *cabd_read_string(struct mspack_system *sys,
   off_t base = sys->tell(fh);
   char buf[256], *str;
   unsigned int len, i, ok;
+  (void)cab;
 
   /* read up to 256 bytes */
   len = sys->read(fh, &buf[0], 256);
