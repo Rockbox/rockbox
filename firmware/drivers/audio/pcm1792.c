@@ -84,24 +84,24 @@ static int vol_tenthdb2hw(const int tdb)
 
 void audiohw_init(void)
 {
-	pcm1792_write_reg(PCM1792_REG(18), REG18_INIT_VALUE);
-	pcm1792_write_reg(PCM1792_REG(19), REG19_INIT_VALUE);
-	pcm1792_write_reg(PCM1792_REG(20), REG20_INIT_VALUE);
-	pcm1792_write_reg(PCM1792_REG(21), REG21_INIT_VALUE);
+    pcm1792_write_reg(PCM1792_REG(18), REG18_INIT_VALUE);
+    pcm1792_write_reg(PCM1792_REG(19), REG19_INIT_VALUE);
+    pcm1792_write_reg(PCM1792_REG(20), REG20_INIT_VALUE);
+    pcm1792_write_reg(PCM1792_REG(21), REG21_INIT_VALUE);
 
     /* Left & Right volumes */
-	pcm1792_write_reg(PCM1792_REG(16), 0xff);
-	pcm1792_write_reg(PCM1792_REG(17), 0xff);
+    pcm1792_write_reg(PCM1792_REG(16), 0xff);
+    pcm1792_write_reg(PCM1792_REG(17), 0xff);
 }
 
 void audiohw_mute(void)
 {
-	pcm1792_write_reg(PCM1792_REG(18), REG18_INIT_VALUE|PCM1792_MUTE_ON);
+    pcm1792_write_reg(PCM1792_REG(18), REG18_INIT_VALUE|PCM1792_MUTE_ON);
 }
 
 void audiohw_unmute(void)
 {
-	pcm1792_write_reg(PCM1792_REG(18), REG18_INIT_VALUE);
+    pcm1792_write_reg(PCM1792_REG(18), REG18_INIT_VALUE);
 }
 
 void audiohw_preinit(void)
