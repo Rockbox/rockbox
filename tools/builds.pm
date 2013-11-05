@@ -69,6 +69,18 @@ $releasenotes="/wiki/ReleaseNotes313";
         name => 'HiFi E.T MA9',
         status => 2,
     },
+    'hifietma9c' => {
+        name => 'HiFi E.T MA9C',
+        status => 2,
+    },
+    'hifietma8' => {
+        name => 'HiFi E.T MA8',
+        status => 2,
+    },
+    'hifietma8c' => {
+        name => 'HiFi E.T MA8C',
+        status => 2,
+    },
     'hifimanhm60x' => {
         name => 'HiFiMAN HM-60x',
         status => 2,
