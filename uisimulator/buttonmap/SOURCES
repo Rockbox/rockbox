@@ -77,5 +77,7 @@ sansa-connect.c
 sony-nwz.c
 #elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
 samsung-ypr0.c
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+creative-zen.c
 #endif
 #endif /* SIMULATOR */
