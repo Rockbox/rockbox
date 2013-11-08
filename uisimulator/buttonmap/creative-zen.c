@@ -46,14 +46,20 @@ int key_to_button(int keyboard_button)
             new_btn = BUTTON_DOWN;
             break;
         case SDLK_KP9:
+            new_btn = BUTTON_TOPRIGHT;
+            break;
         case SDLK_PAGEUP:
             new_btn = BUTTON_MENU;
             break;
         case SDLK_KP1:
+            new_btn = BUTTON_BOTTOMLEFT;
+            break;
         case SDLK_END:
             new_btn = BUTTON_SHORTCUT;
             break;
         case SDLK_KP3:
+            new_btn = BUTTON_BOTTOMRIGHT;
+            break;
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_PLAYPAUSE;
             break;
@@ -70,6 +76,8 @@ int key_to_button(int keyboard_button)
             break;
 #endif
         case SDLK_KP7:
+            new_btn = BUTTON_TOPLEFT;
+            break;
         case SDLK_HOME:
         case SDLK_BACKSPACE:
             new_btn = BUTTON_BACK;
@@ -95,6 +103,23 @@ struct button_map bm[] = {
     { SDLK_DELETE,      519, 170, 20, "Power" },
     { SDLK_END,         406, 275, 20, "Shortcut" },
     { SDLK_PAGEDOWN,    462, 275, 20, "Play" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined(CREATIVE_ZENXFI)
+struct button_map bm[] = {
+    { SDLK_LEFT,        386, 166, 13, "Left" },
+    { SDLK_RIGHT,       466, 166, 13, "Right" },
+    { SDLK_UP,          426, 126, 13, "Up" },
+    { SDLK_DOWN,        426, 206, 13, "Down" },
+    { SDLK_RETURN,      426, 166, 13, "Select" },
+    { SDLK_KP7,         386, 126, 13, "Top Left" },
+    { SDLK_KP9,         466, 126, 13, "Top Right" },
+    { SDLK_KP3,         466, 166, 13, "Bottom Right" },
+    { SDLK_KP1,         386, 166, 13, "Bottom Left" },
+    { SDLK_HOME,        390,  63, 16, "Back" },
+    { SDLK_PAGEUP,      463,  63, 16, "Menu" },
+    { SDLK_END,         390, 267, 16, "Shortcut" },
+    { SDLK_PAGEDOWN,    463, 267, 16, "Play" },
     { 0, 0, 0, 0, "None" }
 };
 #else
