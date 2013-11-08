@@ -26,7 +26,6 @@
 bool button_debug_screen(void);
 
 #define HAS_BUTTON_HOLD
-#define HAVE_HEADPHONE_DETECTION
 
 #define IMX233_BUTTON_LRADC_CHANNEL 0
 #define IMX233_BUTTON_LRADC_HOLD_DET BLH_ADC

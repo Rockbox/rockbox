@@ -86,6 +86,7 @@
 #define HAVE_SW_TONE_CONTROLS
 
 #define CONFIG_KEYPAD CREATIVE_ZEN_PAD
+#define HAVE_HEADPHONE_DETECTION
 
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
