@@ -45,20 +45,11 @@ int key_to_button(int keyboard_button)
         case SDLK_DOWN:
             new_btn = BUTTON_DOWN;
             break;
-        case SDLK_KP9:
-            new_btn = BUTTON_TOPRIGHT;
-            break;
         case SDLK_PAGEUP:
             new_btn = BUTTON_MENU;
             break;
-        case SDLK_KP1:
-            new_btn = BUTTON_BOTTOMLEFT;
-            break;
         case SDLK_END:
             new_btn = BUTTON_SHORTCUT;
-            break;
-        case SDLK_KP3:
-            new_btn = BUTTON_BOTTOMRIGHT;
             break;
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_PLAYPAUSE;
@@ -67,17 +58,20 @@ int key_to_button(int keyboard_button)
         case SDLK_DELETE:
             new_btn = BUTTON_POWER;
             break;
-#ifdef CREATIVE_ZENMOZAIC
-        case SDLK_KP_PLUS:
-            new_btn = BUTTON_VOL_UP;
+#ifdef CREATIVE_ZENXFI
+        case SDLK_KP1:
+            new_btn = BUTTON_BOTTOMLEFT;
             break;
-        case SDLK_KP_MINUS:
-            new_btn = BUTTON_VOL_DOWN;
+        case SDLK_KP3:
+            new_btn = BUTTON_BOTTOMRIGHT;
             break;
-#endif
         case SDLK_KP7:
             new_btn = BUTTON_TOPLEFT;
             break;
+        case SDLK_KP9:
+            new_btn = BUTTON_TOPRIGHT;
+            break;
+#endif
         case SDLK_HOME:
         case SDLK_BACKSPACE:
             new_btn = BUTTON_BACK;
@@ -120,6 +114,19 @@ struct button_map bm[] = {
     { SDLK_PAGEUP,      463,  63, 16, "Menu" },
     { SDLK_END,         390, 267, 16, "Shortcut" },
     { SDLK_PAGEDOWN,    463, 267, 16, "Play" },
+    { 0, 0, 0, 0, "None" }
+};
+#elif defined(CREATIVE_ZENMOZAIC)
+struct button_map bm[] = {
+    { SDLK_LEFT,         37, 281, 15, "Left" },
+    { SDLK_RIGHT,       101, 281, 15, "Right" },
+    { SDLK_UP,           69, 249, 15, "Up" },
+    { SDLK_DOWN,         69, 313, 15, "Down" },
+    { SDLK_RETURN,       69, 281, 15, "Select" },
+    { SDLK_HOME,         37, 249, 15, "Back" },
+    { SDLK_PAGEUP,      101, 249, 15, "Menu" },
+    { SDLK_END,          37, 313, 15, "Shortcut" },
+    { SDLK_PAGEDOWN,    101, 313, 15, "Play" },
     { 0, 0, 0, 0, "None" }
 };
 #else
