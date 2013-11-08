@@ -16,6 +16,24 @@
       "revId": "ce433f89d4650114969994b20f50e524b7d81d4c",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///ng\u003d",
+        "filename": "firmware/export/config/sdlappwince.h",
+        "patchSetId": 29
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2013-11-08T11:03:59Z",
+      "side": 1,
+      "message": "You\u0027re right, I initially thought about editing sdlapp.h, but when I dug in further things started getting messy quickly.  I was disabling more defines than I was sure I needed or was sure if they were compatible or not.  Yes, ideally this would be #ifdef/#ifndef merged back into sdlapp.h.",
+      "parentUuid": "AAAAaX///n0\u003d",
+      "revId": "ce433f89d4650114969994b20f50e524b7d81d4c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
