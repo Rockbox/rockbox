@@ -352,7 +352,7 @@ static bool flac_seek(FLACContext* fc, uint32_t target_sample) {
             unsigned unparseable_count;
             bool got_a_frame = false;
             for(unparseable_count = 0; !got_a_frame
-                && unparseable_count < 10; unparseable_count++) {
+                && unparseable_count < 30; unparseable_count++) {
                 if(frame_sync(fc))
                     got_a_frame = true;
             }
