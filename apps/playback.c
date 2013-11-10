@@ -1714,7 +1714,7 @@ static int audio_load_track(void)
             {
                 /* Haven't finished the metadata but the notification is
                    anticipated to come soon */
-                logf("%s(): in progress ok: %d". __func__, info->id3_hid);
+                logf("%s(): in progress ok: %d", __func__, info->id3_hid);
                 return LOAD_TRACK_OK;
             }
             else if (filling == STATE_FULL)
@@ -1722,7 +1722,7 @@ static int audio_load_track(void)
                 /* Buffer was full trying to complete the load after the
                    metadata finished, so attempt to continue - older handles
                    should have been cleared already */
-                logf("%s(): finishing load: %d". __func__, info->id3_hid);
+                logf("%s(): finishing load: %d", __func__, info->id3_hid);
                 filling = STATE_FILLING;
                 buffer_event_finished_callback(&info->id3_hid);
                 return LOAD_TRACK_OK;
@@ -1730,7 +1730,7 @@ static int audio_load_track(void)
         }
 
         /* Some old, stray buffering message */
-        logf("%s(): already in progress: %d". __func__, info->id3_hid);
+        logf("%s(): already in progress: %d", __func__, info->id3_hid);
         return LOAD_TRACK_ERR_BUSY;
     }
 
@@ -1929,7 +1929,7 @@ static int audio_finish_load_track(struct track_info *info)
         track_id3->offset = 0;
 
     logf("%s: set offset for %s to %lu\n", __func__,
-         id3->title, (unsigned long)offset);
+         track_id3->title, (unsigned long)track_id3->offset);
 
     /* Adjust for resume rewind so we know what to buffer - starting the codec
        calls it again, so we don't save it (and they shouldn't accumulate) */
@@ -2061,7 +2061,7 @@ static int audio_fill_file_buffer(void)
 static int audio_reset_and_rebuffer(
     enum track_clear_action action, int peek_offset)
 {
-    logf("Forcing rebuffer: 0x%X, %d", flags, peek_offset);
+    logf("Forcing rebuffer: 0x%X, %d", action, peek_offset);
 
     id3_write_locked(UNBUFFERED_ID3, NULL);
 
