@@ -208,6 +208,11 @@ void imx233_lcdif_dma_send(void *buf, unsigned width, unsigned height)
     HW_LCDIF_TRANSFER_COUNT = BF_OR2(LCDIF_TRANSFER_COUNT, V_COUNT(height), H_COUNT(width));
     BF_SET(LCDIF_CTRL, DATA_SELECT);
     BF_SET(LCDIF_CTRL, RUN);
+#else
+    (void) buf;
+    (void) width;
+    (void) height;
+    panicf("Unimplemented");
 #endif
 }
 
