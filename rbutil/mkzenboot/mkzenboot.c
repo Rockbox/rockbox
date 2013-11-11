@@ -172,6 +172,10 @@ static const struct zen_md5sum_t zen_sums[] =
         /* Version 1.04.08e */
         MODEL_ZENXFI, "f07e2e75069289a2aa14c6583bd9643b", "1.04.08e"
     },
+    {
+        /* Version 1.04.08 */
+        MODEL_ZENXFI, "c3cddf8468d8c8982e93aa9986c5a152", "1.04.08"
+    },
     /** Zen V */
     {
         /* Version 1.32.01e */
