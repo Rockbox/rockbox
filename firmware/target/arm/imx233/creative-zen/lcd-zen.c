@@ -321,6 +321,10 @@ void lcd_enable(bool enable)
         return;
 
     lcd_on = enable;
+    if(lcd_on)
+        lcd_standby_out_seq();
+    else
+        lcd_standby_in_seq();
 }
 #endif
 
