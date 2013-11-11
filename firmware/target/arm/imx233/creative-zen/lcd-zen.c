@@ -339,13 +339,15 @@ void lcd_update_rect(int x, int y, int w, int h)
     if(!lcd_on)
         return;
     #endif
-    uint8_t *p = FRAME;
-    for(int y = 0; y < LCD_HEIGHT; y++)
-        for(int x = 0; x < LCD_WIDTH; x++)
+    for(int yy = y; yy < y + h; yy++)
+    {
+        uint16_t *pix = FBADDR(x, yy);
+        uint8_t *p = 3 * (yy * LCD_WIDTH + x) + (uint8_t *)FRAME;
+        for(int xx = 0; xx < w; xx++, pix++)
         {
-            uint16_t pix = *FBADDR(x,y);
-            *p++ = RGB_UNPACK_RED(pix);
-            *p++ = RGB_UNPACK_GREEN(pix);
-            *p++ = RGB_UNPACK_BLUE(pix);
+            *p++ = RGB_UNPACK_RED(*pix);
+            *p++ = RGB_UNPACK_GREEN(*pix);
+            *p++ = RGB_UNPACK_BLUE(*pix);
         }
+    }
 }
