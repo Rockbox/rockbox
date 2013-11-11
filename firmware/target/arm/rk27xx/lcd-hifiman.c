@@ -140,6 +140,7 @@ static void lcd_v1_enable (bool on)
         lcd_write_reg(0x26, 0xB8);
         udelay(40);
         lcd_write_reg(0x26, 0xBC);
+        udelay(50000);
     }
     else
     {
