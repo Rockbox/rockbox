@@ -30,13 +30,15 @@
 
 enum imx233_part_t
 {
-    IMX233_PART_USER,
 #if (IMX233_PARTITIONS & IMX233_FREESCALE)
     IMX233_PART_BOOT,
+    IMX233_PART_DATA,
+    IMX233_PART_USER = IMX233_PART_DATA,
 #endif
 #if (IMX233_PARTITIONS & IMX233_CREATIVE)
     IMX233_PART_CFS,
     IMX233_PART_MINIFS,
+    IMX233_PART_USER = IMX233_PART_CFS,
 #endif
 };
 
@@ -45,9 +47,13 @@ enum imx233_part_t
  * issue, one must provide a read function. */
 typedef int (*part_read_fn_t)(intptr_t user, unsigned long start, int count, void* buf);
 /* Enable/Disable window computations for internal storage following the
- * Freescale convention */
+ * Freescale/Creative convention */
 void imx233_partitions_enable_window(bool enable);
 bool imx233_partitions_is_window_enabled(void);
+/* Compute the window size. The *start and *end parameters should contain
+ * the initial window in which the computation is done. So in particular,
+ * for a whole disk, *end should be the size of the disk when the function is
+ * called */
 int imx233_partitions_compute_window(intptr_t user, part_read_fn_t read_fn,
     enum imx233_part_t part, unsigned *start, unsigned *end);
 

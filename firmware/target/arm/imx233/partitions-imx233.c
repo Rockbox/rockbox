@@ -64,7 +64,6 @@ static const char *creative_part_name(enum imx233_part_t part)
 {
     switch(part)
     {
-        case IMX233_PART_USER: return "cfs";
         case IMX233_PART_CFS: return "cfs";
         case IMX233_PART_MINIFS: return "minifs";
         default: return "";
@@ -90,7 +89,17 @@ static int compute_window_creative(intptr_t user, part_read_fn_t read_fn,
         if(strcmp(ent[i].name, name) == 0)
         {
             *start = ent[i].start * hdr->block_size / 512;
-            *end = *start + ent[i].size * hdr->block_size / 512;
+            if(part == IMX233_PART_CFS)
+            {
+                /* There is a bug in Creative's partitioner which restrict
+                * computations to 32-bit even though the format itself can
+                * handle much bigger volumes. We make the assumption
+                * that the CFS partition always extends up the end of the
+                * volume. So don't touch *end */
+            }
+            else
+                *end = *start + ent[i].size * hdr->block_size / 512;
+            
             return 0;
         }
     }
@@ -126,7 +135,7 @@ static int compute_window_freescale(intptr_t user, part_read_fn_t read_fn,
      * it seems that it is similarly truncated. */
     if(mbr[510] != 0x55 || mbr[511] != 0xAA)
         return -101; /* invalid MBR */
-    if(part == IMX233_PART_USER)
+    if(part == IMX233_PART_DATA)
     {
         /* sanity check that the first partition is greater than 2Gib */
         uint8_t *ent = &mbr[446];
