@@ -24,6 +24,7 @@ Changelog::Changelog(QWidget *parent) : QDialog(parent)
 {
     ui.setupUi(this);
     ui.browserChangelog->setOpenExternalLinks(true);
+    // FIXME: support translated changelog file (changelog.de.txt etc)
     ui.browserChangelog->setHtml(parseChangelogFile(":/docs/changelog.txt"));
     ui.browserChangelog->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
     ui.checkBoxShowAlways->setChecked(RbSettings::value(RbSettings::ShowChangelog).toBool());
@@ -44,6 +45,7 @@ QString Changelog::parseChangelogFile(QString filename)
     QFile changelog(filename);
     changelog.open(QIODevice::ReadOnly);
     QTextStream c(&changelog);
+    c.setCodec(QTextCodec::codecForName("UTF-8"));
     QString text;
     while(!c.atEnd()) {
         QString line = c.readLine();

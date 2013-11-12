@@ -16,5 +16,6 @@ Version 1.4
 * Add support for Creative Zen X-Fi3 (G#419).
 * Add Changelog window.
 * Rework System Trace functionality.
+* Add support for H300 v1.31K firmware.
 
 
