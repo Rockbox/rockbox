@@ -106,9 +106,9 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo LD $@
 	$(SILENT)$(call mkdir,$(dir $@))
 # EXTRADEPS need to be built into OBJDIR.
-	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) $(LDOPTS) -o $(BINARY) \
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -o $(BINARY) \
 	    $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) \
-	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(LDOPTS)
 
 # common rules
 $(OBJDIR)%.o:
