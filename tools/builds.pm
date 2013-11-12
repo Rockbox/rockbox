@@ -355,6 +355,18 @@ $releasenotes="/wiki/ReleaseNotes313";
         name => 'Sony NWZ-E370',
         status => 1,
     },
+    'creativezenxfi' => {
+        name => 'Creative Zen X-Fi',
+        status => 1
+    },
+    'creativezen' => {
+        name => 'Creative Zen',
+        status => 1
+    },
+    'creativezenmozaic' => {
+        name => 'Creative Zen Mozaic',
+        status => 1
+    },
 );
 
 sub manualname {
