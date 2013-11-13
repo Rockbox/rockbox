@@ -1331,7 +1331,7 @@ cat <<EOF
  201) Android             ==HiFi E.T.==          191) HM-801
  202) Nokia N8xx          210) MA9
  203) Nokia N900          211) MA9C              ==Sony==
- 204) Pandora             212) MA8               220) NWZ-E370 series
+ 204) Pandora             212) MA8               220) NWZ-E370/E380 series
  205) Samsung YP-R0       213) MA8C              221) NWZ-E360 series
  206) Android MIPS
  207) Android x86
