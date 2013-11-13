@@ -176,6 +176,12 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.00.00 */
         MODEL_NWZE360, "d0047f8a87d456a0032297b3c802a1ff", "1.00.00",
         { [VARIANT_DEFAULT] = {0, 20652032 } }
+    },
+    /** Sony NWZ-E380 */
+    {
+        /* Version 1.00.00 */
+        MODEL_NWZE370, "412f8ccd453195c0bebcc1fd8376322f", "1.00.00",
+        { [VARIANT_DEFAULT] = {0, 16429056 } }
     }
 };
 
