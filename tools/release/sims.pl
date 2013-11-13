@@ -236,3 +236,6 @@ runone("creativezenxfi3");
 runone("sonynwze360");
 runone("sonynwze370");
 runone("samsungypr0");
+runone("creativezenxfi");
+runone("creativezen");
+runone("creativezenmozaic");
