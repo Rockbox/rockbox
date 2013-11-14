@@ -253,6 +253,12 @@
 
 #define BATTERY_OFF_TXT "POWER"
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define BATTERY_ON BUTTON_PLAY
+#define BATTERY_OFF BUTTON_POWER
+#define BATTERY_ON_TXT "PLAY - start"
+#define BATTERY_OFF_TXT "Power"
+
 #else
 #error No keymap defined!
 #endif
