@@ -11,7 +11,7 @@ clock
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
-
+2600box
 #if    (CONFIG_KEYPAD != ONDIO_PAD) /* not enough buttons */ \
     && (CONFIG_KEYPAD != SANSA_M200_PAD) /* not enough buttons */ \
     && (CONFIG_KEYPAD != HM60X_PAD) /* not enough buttons */ \
