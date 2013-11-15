@@ -1443,6 +1443,18 @@ target/arm/imx233/sansa-fuzeplus/debug-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/powermgmt-fuzeplus.c
 #endif
 
+#ifdef SAMSUNG_YPZ5
+target/arm/imx233/samsung-ypz5/backlight-ypz5.c
+target/arm/imx233/samsung-ypz5/lcd-ypz5.c
+target/arm/imx233/samsung-ypz5/button-ypz5.c
+target/arm/imx233/samsung-ypz5/debug-ypz5.c
+target/arm/imx233/samsung-ypz5/powermgmt-ypz5.c
+target/arm/imx233/button-lradc-imx233.c
+#ifndef BOOTLOADER
+target/arm/imx233/fmradio-imx233.c
+#endif
+#endif
+
 #ifdef SANSA_CLIPZIP
 target/arm/as3525/sansa-clipzip/lcd-clipzip.c
 target/arm/as3525/sansa-clipzip/button-clipzip.c
