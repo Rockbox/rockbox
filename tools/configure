@@ -1325,6 +1325,7 @@ cat <<EOF
  141) YH-920              170) HD200             ==Lyre project==
  142) YH-925              171) HD300             130) Lyre proto 1
  143) YP-S3                                      131) Mini2440
+ 144) YP-Z5
                           ==ROCKCHIP==
  ==Application==          180) rk27xx generic    ==HiFiMAN==
  200) SDL                                        190) HM-60x
@@ -3142,6 +3143,26 @@ fi
     t_model="yps3"
     ;;
     
+  144|samsungypz5)
+    target_id=90
+    modelname="samsungypz5"
+    target="SAMSUNG_YPZ5"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=ypz5"
+    output="rockbox.samsung"
+    bootoutput="bootloader-ypz5.samsung"
+    appextra="gui:recorder:radio"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="samsung-ypz5"
+    arm926ejscc
+    ;;
+
    160|vibe500)
     target_id=67
     modelname="vibe500"
