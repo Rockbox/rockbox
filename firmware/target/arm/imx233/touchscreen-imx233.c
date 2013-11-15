@@ -20,23 +20,26 @@
  ****************************************************************************/
 #include "touchscreen-imx233.h"
 #include "stdlib.h"
+#ifdef SAMSUNG_YPZ5
+#include "pinctrl-imx233.h"
+#endif
 
 /* Description:
- * the driver basically has 2 modes:
- * - wait mode: use the hardware touch detect mechanism to wait for an edge
- * - measurement mode: use pull up/down and adc to measure X/Y
- * In measurement mode, we start by measuring X then Y then we check if
- * the hardware still detect a touch. When no touch is detected anymore, we
- * go back to wait mode.
- * For each axis, we handle stabilization by repeatedly measuring the position
- * until it is stable. We consider a set of measures stable when
- * no measure is further away from the average than DEBOUNCE_THRESHOLD and
- * we have at least SAMPLES_THRESHOLD measures. This avoids using magic
- * timing constants specific to the touchscreen stabilization time and
- * it is much more robust.
- *
- * Inspired by linux touchscreen driver for the stmp37xx.
- */
+* the driver basically has 2 modes:
+* - wait mode: use the hardware touch detect mechanism to wait for an edge
+* - measurement mode: use pull up/down and adc to measure X/Y
+* In measurement mode, we start by measuring X then Y then we check if
+* the hardware still detect a touch. When no touch is detected anymore, we
+* go back to wait mode.
+* For each axis, we handle stabilization by repeatedly measuring the position
+* until it is stable. We consider a set of measures stable when
+* no measure is further away from the average than DEBOUNCE_THRESHOLD and
+* we have at least SAMPLES_THRESHOLD measures. This avoids using magic
+* timing constants specific to the touchscreen stabilization time and
+* it is much more robust.
+*
+* Inspired by linux touchscreen driver for the stmp37xx.
+*/
 
 enum touch_state_t
 {
@@ -46,15 +49,15 @@ enum touch_state_t
     TOUCH_STATE_VERIFY, /* verify touch */
 };
 
-#define NR_SAMPLES  10
-#define DELAY       1
+#define NR_SAMPLES 10
+#define DELAY 1
 
 static enum touch_state_t touch_state;
 static int touch_chan = -1;
 static int touch_delay = -1;
 static int touch_x, touch_y;
 /* once a touch is confirmed, the parameters are copied to these value for
- * instant readout by button code. */
+* instant readout by button code. */
 static bool old_touch_detect = false;
 static int old_touch_x, old_touch_y;
 
@@ -72,6 +75,24 @@ static void touch_channel_irq(int chan)
     process();
 }
 
+#ifdef SAMSUNG_YPZ5
+/* On this target we need to manually setup pulldown pins,
+ * using specific GPIO lines
+ */
+static void pulldown_setup(bool xminus_enable, bool yminus_enable,
+    bool xplus_enable, bool yplus_enable)
+{
+    /* TX+ */
+    imx233_pinctrl_set_gpio(0, 25, xplus_enable);
+    /* TX- */
+    imx233_pinctrl_set_gpio(3, 15, xminus_enable);
+    /* TY+ */
+    imx233_pinctrl_set_gpio(0, 26, yplus_enable);
+    /* TY- */
+    imx233_pinctrl_set_gpio(1, 21, yminus_enable);
+}
+#endif
+
 static void kick_measure(bool pull_x, bool pull_y, bool detect, int src)
 {
     if(touch_chan >= 0)
@@ -84,6 +105,9 @@ static void kick_measure(bool pull_x, bool pull_y, bool detect, int src)
     imx233_icoll_enable_interrupt(INT_SRC_LRADC_CHx(touch_chan), true);
     imx233_lradc_enable_channel_irq(touch_chan, true);
     /* setup measurement: x- pull down and x+ pull up */
+#ifdef SAMSUNG_YPZ5
+    pulldown_setup(pull_x, pull_y, pull_x, pull_y);
+#endif
     imx233_lradc_setup_touch(pull_x, pull_y, pull_x, pull_y, detect);
     imx233_lradc_enable_touch_detect_irq(false);
     imx233_lradc_enable_channel_irq(touch_chan, true);
@@ -102,6 +126,9 @@ static void enter_state(enum touch_state_t state)
     switch(state)
     {
         case TOUCH_STATE_WAIT:
+#ifdef SAMSUNG_YPZ5
+            pulldown_setup(false, false, false, false);
+#endif
             imx233_lradc_setup_touch(false, false, false, false, true);
             imx233_lradc_enable_touch_detect_irq(true);
             break;
@@ -170,6 +197,13 @@ void imx233_touchscreen_enable(bool enable)
     if(enable)
         enter_state(TOUCH_STATE_WAIT);
     imx233_icoll_enable_interrupt(INT_SRC_TOUCH_DETECT, enable);
+#ifdef SAMSUNG_YPZ5
+    /* This seems to be required on Z5
+     * It shouldn't harm other ports but for safety is just for it now
+     * We have to put the device in a known state, i.e. clear interrupt bit
+     */
+    enter_state(TOUCH_STATE_VERIFY);
+#endif
 }
 
 bool imx233_touchscreen_get_touch(int *raw_x, int *raw_y)
