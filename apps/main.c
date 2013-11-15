@@ -613,7 +613,7 @@ static void init(void)
     }
 #endif
 
-    if (!mounted)
+    if (mounted)
     {
         CHART(">disk_mount_all");
         rc = disk_mount_all();
@@ -747,7 +747,7 @@ static void init(void)
     CHART(">check_bootfile(false)");
 #endif
     CHART("<settings_apply_skins");
-    settings_apply_skins();
+//    settings_apply_skins();
     CHART(">settings_apply_skins");
 }
 
