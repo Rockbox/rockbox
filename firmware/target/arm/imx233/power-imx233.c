@@ -124,7 +124,9 @@ void INT_VDD5V(void)
 
 void imx233_power_init(void)
 {
+#if IMX233_SUBTARGET >= 3780
     BF_CLR(POWER_MINPWR, HALF_FETS);
+#endif
     /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
     BF_CLR(POWER_5VCTRL, VBUSVALID_TRSH);
     BF_SETV(POWER_5VCTRL, VBUSVALID_TRSH, 1);
@@ -135,6 +137,8 @@ void imx233_power_init(void)
 #endif
     /* enable vbusvalid detection method for the dcdc (improves efficiency) */
     BF_SET(POWER_5VCTRL, VBUSVALID_5VDETECT);
+    /* disable shutdown on 5V fail */
+    BF_CLR(POWER_5VCTRL, PWDN_5VBRNOUT);
 #ifdef USE_VBUSVALID
     /* make sure VBUSVALID is unlocked */
     BF_CLR(POWER_DEBUG, VBUSVALIDPIOLOCK);
@@ -144,7 +148,9 @@ void imx233_power_init(void)
         BF_CLR(POWER_CTRL, POLARITY_VBUSVALID);
     else
         BF_SET(POWER_CTRL, POLARITY_VBUSVALID);
+#if IMX233_SUBTARGET >= 3780
     BF_SET(POWER_CTRL, ENIRQ_VBUS_VALID);
+#endif
     /* make sure old detection way is not enabled */
     BF_CLR(POWER_CTRL, ENIRQ_VDD5V_GT_VDDIO);
 #else
@@ -155,7 +161,9 @@ void imx233_power_init(void)
         BF_SET(POWER_CTRL, POLARITY_VDD5V_GT_VDDIO);
     BF_SET(POWER_CTRL, ENIRQ_VDD5V_GT_VDDIO);
     /* make the vbusvalid detection way is not enabled */
+#if IMX233_SUBTARGET >= 3780
     BF_CLR(POWER_CTRL, ENIRQ_VBUS_VALID);
+#endif
 #endif
     /* the VDD5V IRQ is shared by several sources, disable them */
 #if IMX233_SUBTARGET >= 3700

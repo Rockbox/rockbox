@@ -49,7 +49,9 @@ void imx233_powermgmt_init(void)
     imx233_power_set_charge_current(IMX233_CHARGE_CURRENT);
     imx233_power_set_stop_current(IMX233_STOP_CURRENT);
     /* assume that adc_init was called and battery monitoring via LRADC setup */
+#if IMX233_SUBTARGET >= 3780
     BF_WR(POWER_BATTMONITOR, EN_BATADJ, 1);
+#endif
 #if IMX233_SUBTARGET >= 3700
     /* setup linear regulator offsets to 25 mV below to prevent contention between
      * linear regulators and DCDC */
