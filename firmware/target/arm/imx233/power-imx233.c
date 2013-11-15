@@ -137,6 +137,8 @@ void imx233_power_init(void)
 #endif
     /* enable vbusvalid detection method for the dcdc (improves efficiency) */
     BF_SET(POWER_5VCTRL, VBUSVALID_5VDETECT);
+    /* disable shutdown on 5V fail */
+    BF_CLR(POWER_5VCTRL, PWDN_5VBRNOUT);
 #ifdef USE_VBUSVALID
     /* make sure VBUSVALID is unlocked */
     BF_CLR(POWER_DEBUG, VBUSVALIDPIOLOCK);
