@@ -40,6 +40,7 @@ enum imx233_part_t
     IMX233_PART_MINIFS,
     IMX233_PART_USER = IMX233_PART_CFS,
 #endif
+    IMX233_PART_UNKNOWN
 };
 
 /** The computation function can be called very early in the boot, at which point
