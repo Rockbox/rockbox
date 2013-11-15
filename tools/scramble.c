@@ -366,6 +366,8 @@ int main (int argc, char** argv)
             modelnum = 82;
         else if (!strcmp(&argv[1][5], "zxf3")) /* Creative Zen X-Fi3 */
             modelnum = 83;
+        else if (!strcmp(&argv[1][5], "ypz5")) /* Samsung YP-Z5 */
+            modelnum = 84;
         else if (!strcmp(&argv[1][5], "zenv")) /* Creative Zen V */
             modelnum = 85;
         else if (!strcmp(&argv[1][5], "zxfi")) /* Creative ZEN X-Fi */
