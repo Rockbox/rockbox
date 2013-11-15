@@ -329,7 +329,7 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
-    {PLA_CANCEL,            BUTTON_EQ|BUTOTN_REL,               BUTTON_EQ},
+    {PLA_CANCEL,            BUTTON_EQ|BUTTON_REL,               BUTTON_EQ},
     {PLA_EXIT,              BUTTON_EQ|BUTTON_REPEAT,            BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
