@@ -11,7 +11,6 @@ clock
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
-
 #if    (CONFIG_KEYPAD != ONDIO_PAD) /* not enough buttons */ \
     && (CONFIG_KEYPAD != SANSA_M200_PAD) /* not enough buttons */ \
     && (CONFIG_KEYPAD != HM60X_PAD) /* not enough buttons */ \
@@ -20,6 +19,7 @@ clock
     && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \
                                    (LCD_HEIGHT == 128) && (LCD_DEPTH == 2))
 rockboy
+2600box
 #endif
 
 #if defined(HAVE_TAGCACHE)
