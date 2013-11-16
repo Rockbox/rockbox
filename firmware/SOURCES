@@ -709,6 +709,8 @@ target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
 target/arm/s3c2440/lcd-s3c2440.c
 #elif CONFIG_LCD == LCD_ILI9342 || CONFIG_LCD == LCD_ILI9342C
 target/arm/rk27xx/ma/lcd-ma.c
+#elif CONFIG_LCD == LCD_IHIFI
+target/arm/rk27xx/ihifi/lcd-ihifi.c
 #endif
 
 /* USB Stack */
@@ -1763,6 +1765,16 @@ target/arm/rk27xx/ma/power-ma.c
 drivers/pca9555.c
 target/arm/rk27xx/ma/pca9555-ma.c
 target/arm/rk27xx/ma/audio-ma.c
+#endif
+
+#if defined(IHIFI760) || defined(IHIFI960)
+target/arm/rk27xx/ihifi/button-ihifi.c
+target/arm/rk27xx/ihifi/power-ihifi.c
+#if defined(IHIFI760)
+target/arm/rk27xx/ihifi/powermgmt-ihifi760.c
+#else
+target/arm/rk27xx/ihifi/powermgmt-ihifi960.c
+#endif
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)

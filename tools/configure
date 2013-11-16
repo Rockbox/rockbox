@@ -1336,6 +1336,11 @@ cat <<EOF
  205) Samsung YP-R0       213) MA8C              221) NWZ-E360 series
  206) Android MIPS
  207) Android x86
+
+==IHIFI==
+ 230) 760
+ 231) 960
+
 EOF
 
   buildfor=`input`;
@@ -3646,6 +3651,52 @@ fi
     t_manufacturer="imx233"
     t_model="sony-nwz"
     arm926ejscc
+    ;;
+
+   230|ihifi760)
+    target_id=92
+    modelname="ihifi760"
+    target="IHIFI760"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=92"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ihifi"
+    ;;
+
+   231|ihifi960)
+    target_id=93
+    modelname="ihifi960"
+    target="IHIFI960"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=93"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins=""
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ihifi"
     ;;
 
    *)

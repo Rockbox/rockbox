@@ -151,6 +151,7 @@
 #define SONY_NWZ_PAD       57
 #define CREATIVE_ZEN_PAD   58
 #define SAMSUNG_YPZ5_PAD   59
+#define IHIFI_PAD          60
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -260,6 +261,7 @@
 #define LCD_ILI9342C   57 /* another type of lcd used by HiFi E.T MA9/MA8 */
 #define LCD_CREATIVEZENV  58 /* as used by the Creativr Zen V (Plus) */
 #define LCD_SAMSUNGYPZ5   59 /* as used by Samsung YP-Z5 */
+#define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -550,6 +552,10 @@ Lyre prototype 1 */
 #include "config/sonynwze360.h"
 #elif defined(SAMSUNG_YPZ5)
 #include "config/samsungypz5.h"
+#elif defined(IHIFI760)
+#include "config/ihifi760.h"
+#elif defined(IHIFI960)
+#include "config/ihifi960.h"
 #else
 /* no known platform */
 #endif

@@ -299,5 +299,7 @@ keymaps/keymap-ma.c
 keymaps/keymap-nwz.c
 #elif CONFIG_KEYPAD == SAMSUNG_YPZ5_PAD
 keymaps/keymap-ypz5.c
+#elif CONFIG_KEYPAD == IHIFI_PAD
+keymaps/keymap-ihifi.c
 #endif
 
