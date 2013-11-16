@@ -150,6 +150,7 @@
 #define MA_PAD            56
 #define SONY_NWZ_PAD       57
 #define CREATIVE_ZEN_PAD   58
+#define IHIFI_PAD          59
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -257,6 +258,7 @@
 #define LCD_CREATIVEZEN  55 /* as used by the Creative ZEN (X-Fi) (LMS250GF03-001(S6D0139)) */
 #define LCD_CREATIVEZENMOZAIC 56 /* as used by the Creative ZEN Mozaic (FGD0801) */
 #define LCD_ILI9342C   57 /* another type of lcd used by HiFi E.T MA9/MA8 */
+#define LCD_IHIFI      58 /* as used by IHIFI 760 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -543,6 +545,8 @@ Lyre prototype 1 */
 #include "config/sonynwze370.h"
 #elif defined(SONY_NWZE360)
 #include "config/sonynwze360.h"
+#elif defined(IHIFI760)
+#include "config/ihifi760.h"
 #else
 /* no known platform */
 #endif

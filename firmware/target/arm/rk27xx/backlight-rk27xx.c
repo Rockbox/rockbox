@@ -40,7 +40,7 @@ static int brightness = DEFAULT_BRIGHTNESS_SETTING;
  * So the function used to calculate the values in the matrix was:
  * f(x) = (PWM_FREQ_MAX - PWM_FREQ_MIN) * ((100*x/31 + 16)/116)^3 + PWM_FREQ_MIN
  */
-#ifdef RK27_GENERIC
+#if defined(RK27_GENERIC) || defined (IHIFI760)
 static const unsigned short lin_brightness[] = {
      8110,  8191,  8304,  8455,  8649,  8892,  9189,  9545,
      9966, 10457, 11024, 11671, 12406, 13232, 14156, 15182,
@@ -61,7 +61,8 @@ static const unsigned short lin_brightness[] = {
     562, 579, 596, 616, 637, 660, 684, 711,
     739, 770, 802, 837, 874, 914, 955, 1000
 };
-#elif defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C)
+#elif defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C) \
+    || defined (IHIFI760)
 static const unsigned short lin_brightness[] = {
       2,   4,   7,  10,  15,  21,  28,  36,
      46,  58,  72,  87, 104, 124, 146, 171,

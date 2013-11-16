@@ -256,7 +256,11 @@ void lcd_init_device(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int x_end, y_end, x_align, y_align;
-
+    /*    x = 0;
+    y = 0;
+    width = LCD_WIDTH;
+    height = LCD_HEIGHT;
+    */
     /* min alowed transfer seems to be 4x4 pixels */
     x_align = x & 3;
     y_align = y & 3;

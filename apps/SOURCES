@@ -297,5 +297,7 @@ keymaps/keymap-zen.c
 keymaps/keymap-ma.c
 #elif CONFIG_KEYPAD == SONY_NWZ_PAD
 keymaps/keymap-nwz.c
+#elif CONFIG_KEYPAD == IHIFI_PAD
+keymaps/keymap-ihifi.c
 #endif
 
