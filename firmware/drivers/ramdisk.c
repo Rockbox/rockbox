@@ -25,9 +25,15 @@
 #include "storage.h"
 
 #define SECTOR_SIZE 512
-#define NUM_SECTORS 16384
 
+#ifndef HAVE_PERSISTENT_RAMDISK
+#define NUM_SECTORS 16384
 unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
+#else
+#define NUM_SECTORS (PERSISTENT_RAMDISK_SIZE / SECTOR_SIZE)
+extern char ramdisk[];
+#endif
+
 
 long last_disk_activity = -1;
 
