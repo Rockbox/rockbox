@@ -9,6 +9,13 @@ STARTUP(target/arm/imx233/crt0.o)
 /* Leave a hole at the beginning of the RAM to load the firmware */
 #define RAM_HOLE    1024 * 1024
 
+#ifndef HAVE_PERSISTENT_RAMDISK
+#define PERSISTENT_RAMDISK_SIZE 0
+#endif
+
+/* Where the persistent ramdisk should be */
+#define RAMDISKADDR (CACHED_DRAM_ADDR + DRAM_SIZE - TTB_SIZE - FRAME_SIZE - PERSISTENT_RAMDISK_SIZE)
+
 /* Make a difference between virtual and physical address so that we can use
  * the resulting elf file with the elftosb tools which loads at the *physical*
  * address */
@@ -94,5 +101,11 @@ SECTIONS
     .bssendadr (NOLOAD) :
     {
         _end = .;
+    } > DRAM
+
+    .ramdisk RAMDISKADDR (NOLOAD) :
+    {
+        _ramdisk = .;
+        ramdisk = .;
     } > DRAM
 }

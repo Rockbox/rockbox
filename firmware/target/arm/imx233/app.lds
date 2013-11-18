@@ -11,13 +11,20 @@ STARTUP(target/arm/imx233/crt0.o)
 
 #define IRAMSIZE IRAM_SIZE
 
-#define DRAMSIZE (DRAM_SIZE - PLUGINSIZE - CODECSIZE - FRAME_SIZE - TTB_SIZE)
+#ifndef HAVE_PERSISTENT_RAMDISK
+#define PERSISTENT_RAMDISK_SIZE 0
+#endif
+
+#define DRAMSIZE (DRAM_SIZE - PLUGINSIZE - CODECSIZE - FRAME_SIZE - TTB_SIZE - PERSISTENT_RAMDISK_SIZE)
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (CACHED_DRAM_ADDR + DRAMSIZE)
 
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODEC_SIZE)
+
+/* Where the persistent ramdisk should be */
+#define RAMDISKADDR (ENDADDR + PLUGINSIZE)
 
 /* INIT section is the codec buffer */
 #define INITSIZE  CODEC_SIZE
@@ -131,5 +138,11 @@ SECTIONS
     {
         _pluginbuf = .;
         pluginbuf = .;
+    } > DRAM
+    
+    .ramdisk RAMDISKADDR (NOLOAD) :
+    {
+        _ramdisk = .;
+        ramdisk = .;
     } > DRAM
 }
