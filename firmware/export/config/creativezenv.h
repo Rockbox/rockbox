@@ -126,7 +126,11 @@
 #define HAVE_FLASH_STORAGE
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
-#define CONFIG_STORAGE STORAGE_ATA
+#define CONFIG_STORAGE STORAGE_RAMDISK
+
+/* define this if the ramdisk is to be persistent */
+#define HAVE_PERSISTENT_RAMDISK
+#define PERSISTENT_RAMDISK_SIZE 0x700000
 
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */
