@@ -94,7 +94,7 @@ static struct player_info_t zen_players[] =
     {"Zen SleekPhoto", null_key_v1, tl_zsp_key, true, NULL},
     {"Zen Touch", null_key_v1, tl_zt_key, true, NULL},
     {"Zen Xtra", null_key_v1, tl_zx_key, true, NULL},
-    {"Zen V", null_key_v3, tl_zenv_key, false, NULL},
+    {"Zen V", null_key_v3, tl_zenv_key, false, "Creative ZEN V"},
     {"Zen V Plus", null_key_v3, tl_zenvp_key, false, NULL},
     {"Zen V Video", null_key_v3, tl_zenvv_key, false, NULL},
     {NULL, NULL, NULL, false, NULL}
@@ -130,7 +130,7 @@ static const struct zen_model_desc_t zen_models[] =
     },
     [MODEL_ZENV] =
     {
-        "Zen V", "zenv", 85, 0x60000000, NULL, 0
+        "Zen V", "zenv", 85, 0x61000000, dualboot_zenv, sizeof(dualboot_zenv)
     },
     [MODEL_ZENXFI] =
     {

@@ -3,3 +3,4 @@
 extern unsigned char dualboot_zenmozaic[168];
 extern unsigned char dualboot_zenxfi[168];
 extern unsigned char dualboot_zen[168];
+extern unsigned char dualboot_zenv[168];

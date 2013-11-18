@@ -59,3 +59,13 @@ bool tuner_powered(void)
 {
     return tuner_enable;
 }
+
+void ide_power_enable(bool on)
+{
+    (void) on;
+}
+
+bool ide_powered(void)
+{
+    return true;
+}

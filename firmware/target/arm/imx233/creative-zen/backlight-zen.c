@@ -29,6 +29,9 @@
 
 void _backlight_set_brightness(int level)
 {
+#ifdef CREATIVE_ZENV
+    lcd_set_contrast(level);
+#else
     unsigned val = (level + 200) * level / 1000;
     if(level != 0)
     {
@@ -39,14 +42,17 @@ void _backlight_set_brightness(int level)
     }
     else
         imx233_pinctrl_set_gpio(1, 12, false);
+#endif
 }
 
 bool _backlight_init(void)
 {
+#ifndef CREATIVE_ZENV
     imx233_pinctrl_acquire(1, 12, "backlight_enable");
     imx233_pinctrl_set_function(1, 12, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(1, 12, true);
     imx233_uartdbg_init(BAUD_38400);
+#endif
     return true;
 }
 

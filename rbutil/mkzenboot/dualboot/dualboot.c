@@ -21,6 +21,7 @@
 #include "regs-pinctrl.h"
 #include "regs-power.h"
 #include "regs-lradc.h"
+#include "regs-digctl.h"
 
 typedef unsigned long uint32_t;
 
@@ -83,7 +84,8 @@ static inline void __attribute__((noreturn)) power_down()
  * Boot decision functions
  */
 
-#if defined(CREATIVE_ZENMOZAIC) || defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
+#if defined(CREATIVE_ZENMOZAIC) || defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) \
+    || defined(CREATIVE_ZENV)
 static enum boot_t boot_decision()
 {
     setup_lradc(0); // setup LRADC channel 0 to read keys

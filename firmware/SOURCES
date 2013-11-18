@@ -1163,13 +1163,16 @@ target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
 target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* CREATIVE_ZVx */
 
-#if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC)
+#if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC) \
+    || defined(CREATIVE_ZENV)
 target/arm/imx233/creative-zen/fmradio-i2c-zen.c
 target/arm/imx233/creative-zen/backlight-zen.c
 # if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
 target/arm/imx233/creative-zen/lcd-zen.c
 # elif defined(CREATIVE_ZENMOZAIC)
 target/arm/imx233/creative-zen/lcd-zenmozaic.c
+# elif defined(CREATIVE_ZENV)
+target/arm/imx233/creative-zen/lcd-zenv.c
 #endif
 target/arm/imx233/creative-zen/button-zen.c
 target/arm/imx233/creative-zen/debug-zen.c

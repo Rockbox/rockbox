@@ -124,7 +124,9 @@ void INT_VDD5V(void)
 
 void imx233_power_init(void)
 {
+#if IMX233_SUBTARGET >= 3700
     BF_CLR(POWER_MINPWR, HALF_FETS);
+#endif
     /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
     BF_CLR(POWER_5VCTRL, VBUSVALID_TRSH);
     BF_SETV(POWER_5VCTRL, VBUSVALID_TRSH, 1);
@@ -155,7 +157,9 @@ void imx233_power_init(void)
         BF_SET(POWER_CTRL, POLARITY_VDD5V_GT_VDDIO);
     BF_SET(POWER_CTRL, ENIRQ_VDD5V_GT_VDDIO);
     /* make the vbusvalid detection way is not enabled */
+#if IMX233_SUBTARGET >= 3700
     BF_CLR(POWER_CTRL, ENIRQ_VBUS_VALID);
+#endif
 #endif
     /* the VDD5V IRQ is shared by several sources, disable them */
 #if IMX233_SUBTARGET >= 3700
