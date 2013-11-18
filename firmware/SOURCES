@@ -1163,10 +1163,14 @@ target/arm/tms320dm320/creative-zvm/powermgmt-creativezvm.c
 target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* CREATIVE_ZVx */
 
-#if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
+#if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC)
 target/arm/imx233/creative-zen/fmradio-i2c-zen.c
 target/arm/imx233/creative-zen/backlight-zen.c
+# if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
 target/arm/imx233/creative-zen/lcd-zen.c
+# elif defined(CREATIVE_ZENMOZAIC)
+target/arm/imx233/creative-zen/lcd-zenmozaic.c
+#endif
 target/arm/imx233/creative-zen/button-zen.c
 target/arm/imx233/creative-zen/debug-zen.c
 target/arm/imx233/creative-zen/power-zen.c
@@ -1196,18 +1200,6 @@ target/arm/imx233/creative-zenxfi3/debug-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/power-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/adc-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
-#endif
-
-#ifdef CREATIVE_ZENMOZAIC
-target/arm/imx233/creative-zenmozaic/fmradio-i2c-zenmozaic.c
-target/arm/imx233/creative-zenmozaic/backlight-zenmozaic.c
-target/arm/imx233/creative-zenmozaic/lcd-zenmozaic.c
-target/arm/imx233/creative-zenmozaic/button-zenmozaic.c
-target/arm/imx233/creative-zenmozaic/debug-zenmozaic.c
-target/arm/imx233/creative-zenmozaic/power-zenmozaic.c
-target/arm/imx233/creative-zenmozaic/adc-zenmozaic.c
-target/arm/imx233/creative-zenmozaic/powermgmt-zenmozaic.c
-target/arm/imx233/button-lradc-imx233.c
 #endif
 
 #if defined(SONY_NWZE360) || defined(SONY_NWZE370)

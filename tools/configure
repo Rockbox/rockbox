@@ -2318,7 +2318,7 @@ fi
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
-    t_model="creative-zenmozaic"
+    t_model="creative-zen"
     arm926ejscc
     ;;
 
