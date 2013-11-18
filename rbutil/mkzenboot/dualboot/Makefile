@@ -11,10 +11,11 @@ LDFLAGS=
 # 1) add x to the list in TARGETS
 # 2) create a variable named OPT_x of the form:
 #    OPT_x=target specific defines
-TARGETS=zenmozaic zenxfi zen
+TARGETS=zenmozaic zenxfi zen zenv
 OPT_zenmozaic=-DCREATIVE_ZENMOZAIC -DIMX233_SUBTARGET=3700
 OPT_zenxfi=-DCREATIVE_ZENXFI -DIMX233_SUBTARGET=3700
 OPT_zen=-DCREATIVE_ZEN -DIMX233_SUBTARGET=3700
+OPT_zenv=-DCREATIVE_ZENV -DIMX233_SUBTARGET=3600
 
 BOOTLDS=$(patsubst %, dualboot_%.lds, $(TARGETS))
 BOOTOBJS=$(patsubst %, dualboot_%.o, $(TARGETS))

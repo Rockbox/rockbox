@@ -119,6 +119,15 @@ static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
 }
 #endif
 
+static inline unsigned imx233_power_read_pswitch(void)
+{
+#if IMX233_SUBTARGET >= 3700
+    return BF_RD(POWER_STS, PSWITCH);
+#else
+    return BF_RD(DIGCTL_STATUS, PSWITCH);
+#endif
+}
+
 #if IMX233_SUBTARGET < 3700
 /* return -1 on error */
 int imx233_power_sense_die_temperature(int *min, int *max);

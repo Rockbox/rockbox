@@ -2282,6 +2282,26 @@ fi
     arm926ejscc
     ;;
 
+    95|creativezenv)
+    target_id=85
+    modelname="creativezenv"
+    target="CREATIVE_ZENV"
+    memory=32
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zenv"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenv.creative"
+    appextra="radio:gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
    96|creativezenxfi)
     target_id=86
     modelname="creativezenxfi"

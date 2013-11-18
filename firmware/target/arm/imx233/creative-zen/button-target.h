@@ -47,8 +47,12 @@ bool button_debug_screen(void);
 #define BUTTON_TOPLEFT              0x00001000
 #define BUTTON_TOPRIGHT             0x00002000
 #endif
+#ifdef CREATIVE_ZENV
+#define BUTTON_VOL_UP               0x00004000
+#define BUTTON_VOL_DOWN             0x00008000
+#endif
 
-#define BUTTON_MAIN                 0x00003fff
+#define BUTTON_MAIN                 0x0000ffff
 
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER

@@ -257,6 +257,7 @@
 #define LCD_CREATIVEZEN  55 /* as used by the Creative ZEN (X-Fi) (LMS250GF03-001(S6D0139)) */
 #define LCD_CREATIVEZENMOZAIC 56 /* as used by the Creative ZEN Mozaic (FGD0801) */
 #define LCD_ILI9342C   57 /* another type of lcd used by HiFi E.T MA9/MA8 */
+#define LCD_CREATIVEZENV  58 /* as used by the Creativr Zen V (Plus) */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -531,6 +532,8 @@ Lyre prototype 1 */
 #include "config/creativezenmozaic.h"
 #elif defined(CREATIVE_ZEN)
 #include "config/creativezen.h"
+#elif defined(CREATIVE_ZENV)
+#include "config/creativezenv.h"
 #elif defined(MA9)
 #include "config/hifietma9.h"
 #elif defined(MA9C)

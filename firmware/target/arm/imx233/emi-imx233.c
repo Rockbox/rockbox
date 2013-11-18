@@ -196,11 +196,13 @@ struct imx233_emi_info_t imx233_emi_get_info(void)
 {
     struct imx233_emi_info_t info;
     memset(&info, 0,  sizeof(info));
+#if IMX233_SUBTARGET >= 3700
     info.rows = 13 - BF_RD(DRAM_CTL10, ADDR_PINS);
     info.columns = 12 - BF_RD(DRAM_CTL11, COLUMN_SIZE);
     info.cas = BF_RD(DRAM_CTL13, CASLAT_LIN);
     info.banks = 4;
     info.chips = __builtin_popcount(BF_RD(DRAM_CTL14, CS_MAP));
     info.size = 2 * (1 << (info.rows + info.columns)) * info.chips * info.banks;
+#endif
     return info;
 }
