@@ -27,11 +27,29 @@
 #include "power-imx233.h"
 
 static bool tuner_enable = false;
+static bool initialised = false;
+
+static void init(void)
+{
+#ifdef CREATIVE_ZENMOZAIC
+    /* CE is B2P15 (active high) */
+    imx233_pinctrl_acquire(2, 15, "tuner power");
+    imx233_pinctrl_set_function(2, 15, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(2, 15, true);
+#endif
+    initialised = true;
+}
 
 bool tuner_power(bool enable)
 {
-    if(enable != tuner_enable)
+    if(!initialised)
+        init();
+    if(tuner_enable != enable)
     {
+#ifdef CREATIVE_ZENMOZAIC
+        imx233_pinctrl_set_gpio(2, 15, enable);
+        sleep(HZ / 5);
+#endif
         tuner_enable = enable;
     }
     return tuner_enable;
