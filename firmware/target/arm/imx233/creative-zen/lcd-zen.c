@@ -216,6 +216,7 @@ static void lcd_display_on_seq(void)
     spi_write_reg(0x7, 0x103);
 }
 
+#ifdef HAVE_LCD_ENABLE
 static void lcd_display_off_seq(void)
 {
     spi_write_reg(0xb, 0x30e1);
@@ -226,7 +227,6 @@ static void lcd_display_off_seq(void)
     spi_write_reg(0x10, 0x100);
 }
 
-#ifdef HAVE_LCD_ENABLE
 static void lcd_standby_in_seq(void)
 {
     lcd_display_off_seq();
