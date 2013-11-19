@@ -48,9 +48,9 @@ void serial_setup (void)
 {
     int tmp;
 
-#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI2G)
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
 
-    /* Route the Tx/Rx pins.  4G Ipod, ser1, dock connector */
+    /* Route the Tx/Rx pins.  4G Ipod, MINI & MINI2G ser1, dock connector */
     GPIO_CLEAR_BITWISE(GPIOD_ENABLE, 0x6);
     GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x6);
 
