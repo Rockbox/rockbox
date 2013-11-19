@@ -226,6 +226,7 @@ static void lcd_display_off_seq(void)
     spi_write_reg(0x10, 0x100);
 }
 
+#ifdef HAVE_LCD_ENABLE
 static void lcd_standby_in_seq(void)
 {
     lcd_display_off_seq();
@@ -238,6 +239,7 @@ static void lcd_standby_out_seq(void)
     lcd_power_seq();
     lcd_display_on_seq();
 }
+#endif
 
 /**
  * Rockbox

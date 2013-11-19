@@ -22,8 +22,6 @@
 #include "powermgmt-target.h"
 #include "power-imx233.h"
 
-#warning FIXME calibrate
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     0
