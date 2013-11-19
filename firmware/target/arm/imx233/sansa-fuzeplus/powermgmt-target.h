@@ -22,7 +22,6 @@
 #define POWERMGMT_TARGET_H
 
 #include "config.h"
-#include "powermgmt-imx233.h"
 
 /* Fuze+ OF settings:
  * - current ramp slope: 50 mA/s

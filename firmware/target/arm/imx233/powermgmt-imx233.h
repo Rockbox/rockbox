@@ -25,9 +25,6 @@
 #include "powermgmt.h"
 
 void imx233_powermgmt_init(void);
-void powermgmt_init_target(void);
-void charging_algorithm_step(void);
-void charging_algorithm_close(void);
 
 struct imx233_powermgmt_info_t
 {

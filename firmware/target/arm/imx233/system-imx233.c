@@ -43,7 +43,7 @@
 #include "backlight-target.h"
 #include "button.h"
 #include "fmradio_i2c.h"
-#include "powermgmt.h"
+#include "powermgmt-imx233.h"
 
 void imx233_chip_reset(void)
 {

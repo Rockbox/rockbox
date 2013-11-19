@@ -19,12 +19,14 @@
  *
  ****************************************************************************/
 
+#include "system.h"
 #include "powermgmt.h"
 #include "power-imx233.h"
 #include "usb.h"
 #include "string.h"
 //#define LOGF_ENABLE
 #include "logf.h"
+#include "powermgmt-imx233.h"
 
 #if !defined(IMX233_CHARGE_CURRENT) || !defined(IMX233_STOP_CURRENT) \
     || !defined(IMX233_CHARGING_TIMEOUT) || !defined(IMX233_TOPOFF_TIMEOUT)

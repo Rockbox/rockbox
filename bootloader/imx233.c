@@ -41,7 +41,7 @@
 #include "system-target.h"
 #include "fmradio_i2c.h"
 #include "version.h"
-#include "powermgmt.h"
+#include "powermgmt-imx233.h"
 #include "partitions-imx233.h"
 #include "adc.h"
 

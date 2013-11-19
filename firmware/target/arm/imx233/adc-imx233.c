@@ -20,6 +20,9 @@
  ****************************************************************************/
 
 #include "adc-target.h"
+#include "system.h"
+#include "powermgmt-target.h"
+#include "lradc-imx233.h"
 #include "power-imx233.h"
 
 /* Virtual channels */

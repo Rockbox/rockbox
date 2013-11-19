@@ -21,11 +21,8 @@
 #ifndef _ADC_IMX233_H_
 #define _ADC_IMX233_H_
 
-#include "system.h"
 #include "adc.h"
-#include "adc-target.h"
 #include "powermgmt-target.h"
-#include "lradc-imx233.h"
 
 enum imx233_adc_channel_t
 {
