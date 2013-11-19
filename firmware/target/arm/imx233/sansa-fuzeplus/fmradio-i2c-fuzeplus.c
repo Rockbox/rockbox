@@ -21,91 +21,17 @@
 
 #include "config.h"
 #include "system.h"
-#include "fmradio_i2c.h"
 #include "pinctrl-imx233.h"
-#include "generic_i2c.h"
 #include "rds.h"
 #include "si4700.h"
 
 /**
  * Sansa Fuze+ fmradio uses the following pins:
- * - B0P29 as CE apparently (active high)
+ * - B0P29 as CE (active high)
  * - B1P24 as SDA
  * - B1P22 as SCL
  * - B2P27 as STC/RDS
  */
-static int fmradio_i2c_bus = -1;
-
-static void i2c_scl_dir(bool out)
-{
-    imx233_pinctrl_enable_gpio(1, 22, out);
-}
-
-static void i2c_sda_dir(bool out)
-{
-    imx233_pinctrl_enable_gpio(1, 24, out);
-}
-
-static void i2c_scl_out(bool high)
-{
-    imx233_pinctrl_set_gpio(1, 22, high);
-}
-
-static void i2c_sda_out(bool high)
-{
-    imx233_pinctrl_set_gpio(1, 24, high);
-}
-
-static bool i2c_scl_in(void)
-{
-    return imx233_pinctrl_get_gpio(1, 22);
-}
-
-static bool i2c_sda_in(void)
-{
-    return imx233_pinctrl_get_gpio(1, 24);
-}
-
-static void i2c_delay(int d)
-{
-    udelay(d);
-}
-
-struct i2c_interface fmradio_i2c =
-{
-    .scl_dir = i2c_scl_dir,
-    .sda_dir = i2c_sda_dir,
-    .scl_out = i2c_scl_out,
-    .sda_out = i2c_sda_out,
-    .scl_in = i2c_scl_in,
-    .sda_in = i2c_sda_in,
-    .delay = i2c_delay,
-    .delay_hd_sta = 4,
-    .delay_hd_dat = 5,
-    .delay_su_dat = 1,
-    .delay_su_sto = 4,
-    .delay_su_sta = 5,
-    .delay_thigh = 4
-};
-
-void fmradio_i2c_init(void)
-{
-    imx233_pinctrl_acquire(1, 24, "fmradio i2c");
-    imx233_pinctrl_acquire(1, 22, "fmradio i2c");
-    imx233_pinctrl_set_function(1, 24, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_set_function(1, 22, PINCTRL_FUNCTION_GPIO);
-    fmradio_i2c_bus = i2c_add_node(&fmradio_i2c);
-}
-
-int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
-{
-    return i2c_write_data(fmradio_i2c_bus, address, -1, buf, count);
-}
-
-int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
-{
-    return i2c_read_data(fmradio_i2c_bus, address, -1, buf, count);
-}
 
 #ifdef HAVE_RDS_CAP
 /* Low-level RDS Support */

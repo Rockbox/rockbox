@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 by Amaury Pouly
+ * Copyright (C) 2013 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,23 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _FMRADIO_TARGET_H_
+#define _FMRADIO_TARGET_H_
 
-#include "config.h"
-#include "system.h"
-#include "fmradio_i2c.h"
-#include "pinctrl-imx233.h"
-#include "i2c.h"
+#define IMX233_FMRADIO_I2C  FMI_HW
 
-void fmradio_i2c_init(void)
-{
-}
+#define IMX233_FMRADIO_POWER    FMP_NONE
 
-int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
-{
-    return i2c_write(address, buf, count);
-}
-
-int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
-{
-    return i2c_read(address, buf, count);
-}
+#endif /* _FMRADIO_TARGET_H_ */

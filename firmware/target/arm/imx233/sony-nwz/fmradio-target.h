@@ -18,25 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _FMRADIO_TARGET_H_
+#define _FMRADIO_TARGET_H_
 
-#include "system.h"
-#include "power.h"
-#include "tuner.h"
-#include "fmradio_i2c.h"
-#include "pinctrl-imx233.h"
+#define IMX233_FMRADIO_I2C  FMI_HW
 
-static bool tuner_enable = false;
+#define IMX233_FMRADIO_POWER    FMP_NONE
 
-bool tuner_power(bool enable)
-{
-    if(enable != tuner_enable)
-    {
-        tuner_enable = enable;
-    }
-    return tuner_enable;
-}
-
-bool tuner_powered(void)
-{
-    return tuner_enable;
-}
+#endif /* _FMRADIO_TARGET_H_ */

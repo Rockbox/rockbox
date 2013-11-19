@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 by Amaury Pouly
+ * Copyright (C) 2013 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,19 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _FMRADIO_TARGET_H_
+#define _FMRADIO_TARGET_H_
 
-#include "system.h"
-#include "power.h"
-#include "tuner.h"
-#include "fmradio_i2c.h"
-#include "pinctrl-imx233.h"
+#define IMX233_FMRADIO_I2C  FMI_HW
 
-static bool tuner_enable = false;
+#ifdef CREATIVE_ZENMOZAIC
+#define IMX233_FMRADIO_POWER    FMP_GPIO
+#define FMP_GPIO_BANK   2
+#define FMP_GPIO_PIN    15
+#define FMP_GPIO_DELAY  (HZ / 5)
+#else
+#define IMX233_FMRADIO_POWER    FMP_NONE
+#endif
 
-bool tuner_power(bool enable)
-{
-    if(enable != tuner_enable)
-    {
-        tuner_enable = enable;
-    }
-    return tuner_enable;
-}
-
-bool tuner_powered(void)
-{
-    return tuner_enable;
-}
+#endif /* _FMRADIO_TARGET_H_ */
+ 

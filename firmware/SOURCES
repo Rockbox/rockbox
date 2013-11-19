@@ -1165,7 +1165,7 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 
 #if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC) \
     || defined(CREATIVE_ZENV)
-target/arm/imx233/creative-zen/fmradio-i2c-zen.c
+target/arm/imx233/fmradio-imx233.c
 target/arm/imx233/creative-zen/backlight-zen.c
 # if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
 target/arm/imx233/creative-zen/lcd-zen.c
@@ -1182,33 +1182,30 @@ target/arm/imx233/button-lradc-imx233.c
 #endif
 
 #ifdef CREATIVE_ZENXFI2
-target/arm/imx233/creative-zenxfi2/fmradio-i2c-zenxfi2.c
+target/arm/imx233/fmradio-imx233.c
 target/arm/imx233/creative-zenxfi2/backlight-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/lcd-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/button-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/debug-zenxfi2.c
-target/arm/imx233/creative-zenxfi2/power-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/powermgmt-zenxfi2.c
 #endif
 
 #ifdef CREATIVE_ZENXFI3
 drivers/mpr121.c
-target/arm/imx233/creative-zenxfi3/fmradio-i2c-zenxfi3.c
+target/arm/imx233/fmradio-imx233.c
 target/arm/imx233/creative-zenxfi3/backlight-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/lcd-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/button-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/debug-zenxfi3.c
-target/arm/imx233/creative-zenxfi3/power-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
 #endif
 
 #if defined(SONY_NWZE360) || defined(SONY_NWZE370)
 target/arm/imx233/button-lradc-imx233.c
-target/arm/imx233/sony-nwz/fmradio-i2c-nwz.c
+target/arm/imx233/fmradio-imx233.c
 target/arm/imx233/sony-nwz/backlight-nwz.c
 target/arm/imx233/sony-nwz/button-nwz.c
 target/arm/imx233/sony-nwz/debug-nwz.c
-target/arm/imx233/sony-nwz/power-nwz.c
 # if defined(SONY_NWZE360)
 target/arm/imx233/sony-nwz/lcd-nwze360.c
 target/arm/imx233/sony-nwz/powermgmt-nwze360.c
@@ -1427,12 +1424,12 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #ifdef SANSA_FUZEPLUS
 drivers/synaptics-rmi.c
 drivers/generic_i2c.c
+target/arm/imx233/fmradio-imx233.c
 target/arm/imx233/sansa-fuzeplus/fmradio-i2c-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/backlight-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/debug-fuzeplus.c
-target/arm/imx233/sansa-fuzeplus/power-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/powermgmt-fuzeplus.c
 #endif
 
