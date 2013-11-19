@@ -43,7 +43,7 @@
 #include "version.h"
 #include "powermgmt.h"
 #include "partitions-imx233.h"
-#include "adc-imx233.h"
+#include "adc.h"
 
 #include "usb.h"
 
@@ -111,11 +111,6 @@ static void usb_mode(int connect_timeout)
             lcd_putsf(0, 9, "%s: %d 'C [%d, %d]", MSG(240, "Die", "Die temp"),
                 adc_read(ADC_DIE_TEMP), IMX233_DIE_TEMP_HIGH,
                 IMX233_DIE_TEMP_LOW);
-            #ifdef ADC_BATT_TEMP
-            lcd_putsf(0, 10, "%s: %d 'C [%d, %d]", MSG(240, "Batt", "Batt temp"),
-                adc_read(ADC_BATT_TEMP), IMX233_BATT_TEMP_HIGH,
-                IMX233_BATT_TEMP_LOW);
-            #endif
             lcd_update();
         }
     }
