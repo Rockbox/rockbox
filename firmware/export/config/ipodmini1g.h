@@ -18,6 +18,8 @@
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING*/
 
+#define INPUT_SRC_CAPS (SRC_CAP_FMRADIO)
+
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_96 | SAMPR_CAP_88 | SAMPR_CAP_48 | \
                          SAMPR_CAP_44 | SAMPR_CAP_32 | SAMPR_CAP_8)
@@ -156,6 +158,10 @@
  * if USB/MAIN power is discernable and hardware doesn't compel charging */
 #define HAVE_USB_CHARGING_ENABLE
 
+/* Define Apple remote tuner */
+#define CONFIG_TUNER IPOD_REMOTE_TUNER
+#define HAVE_RDS_CAP
+
 /* Define this if you have a PortalPlayer PP5020 */
 #define CONFIG_CPU PP5020
 
@@ -208,6 +214,9 @@
 #define BOOTDIR "/.rockbox"
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
+
+#define IPOD_ACCESSORY_PROTOCOL
+#define HAVE_SERIAL
 
 #define IRAM_LCDFRAMEBUFFER IBSS_ATTR /* put the lcd frame buffer in IRAM */
 
