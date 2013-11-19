@@ -1177,7 +1177,6 @@ target/arm/imx233/creative-zen/lcd-zenv.c
 target/arm/imx233/creative-zen/button-zen.c
 target/arm/imx233/creative-zen/debug-zen.c
 target/arm/imx233/creative-zen/power-zen.c
-target/arm/imx233/creative-zen/adc-zen.c
 target/arm/imx233/creative-zen/powermgmt-zen.c
 target/arm/imx233/button-lradc-imx233.c
 #endif
@@ -1189,7 +1188,6 @@ target/arm/imx233/creative-zenxfi2/lcd-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/button-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/debug-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/power-zenxfi2.c
-target/arm/imx233/creative-zenxfi2/adc-zenxfi2.c
 target/arm/imx233/creative-zenxfi2/powermgmt-zenxfi2.c
 #endif
 
@@ -1201,7 +1199,6 @@ target/arm/imx233/creative-zenxfi3/lcd-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/button-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/debug-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/power-zenxfi3.c
-target/arm/imx233/creative-zenxfi3/adc-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
 #endif
 
@@ -1212,7 +1209,6 @@ target/arm/imx233/sony-nwz/backlight-nwz.c
 target/arm/imx233/sony-nwz/button-nwz.c
 target/arm/imx233/sony-nwz/debug-nwz.c
 target/arm/imx233/sony-nwz/power-nwz.c
-target/arm/imx233/sony-nwz/adc-nwz.c
 # if defined(SONY_NWZE360)
 target/arm/imx233/sony-nwz/lcd-nwze360.c
 target/arm/imx233/sony-nwz/powermgmt-nwze360.c
@@ -1437,7 +1433,6 @@ target/arm/imx233/sansa-fuzeplus/lcd-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/debug-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/power-fuzeplus.c
-target/arm/imx233/sansa-fuzeplus/adc-fuzeplus.c
 target/arm/imx233/sansa-fuzeplus/powermgmt-fuzeplus.c
 #endif
 

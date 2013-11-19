@@ -19,8 +19,45 @@
  *
  ****************************************************************************/
 
-#include "adc-imx233.h"
+#include "adc-target.h"
 #include "power-imx233.h"
+
+/* Virtual channels */
+#define IMX233_ADC_BATTERY      -1 /* Battery voltage (mV) */
+#define IMX233_ADC_DIE_TEMP     -2 /* Die temperature (°C) */
+#define IMX233_ADC_VDDIO        -3 /* VddIO voltage (mV) */
+#if IMX233_SUBTARGET >= 3700
+#define IMX233_ADC_VDD5V        -4 /* Vdd5V voltage (mV) */
+#endif
+#ifdef IMX233_BATT_TEMP_SENSOR
+#define IMX233_ADC_BATT_TEMP    -5 /* Battery temperature (°C) */
+#endif
+
+static const char *imx233_adc_channel_name[NUM_ADC_CHANNELS] =
+{
+    [ADC_BATTERY] = "Battery(raw)",
+    [ADC_DIE_TEMP] = "Die temperature(°C)",
+    [ADC_VDDIO] = "VddIO(mV)",
+#if IMX233_SUBTARGET >= 3700
+    [ADC_VDD5V] = "Vdd5V(mV)",
+#endif
+#ifdef IMX233_BATT_TEMP_SENSOR
+    [ADC_BATT_TEMP] = "Battery temperature(raw)",
+#endif
+};
+
+static int imx233_adc_mapping[NUM_ADC_CHANNELS] =
+{
+    [ADC_BATTERY] = IMX233_ADC_BATTERY,
+    [ADC_DIE_TEMP] = IMX233_ADC_DIE_TEMP,
+    [ADC_VDDIO] = IMX233_ADC_VDDIO,
+#if IMX233_SUBTARGET >= 3700
+    [ADC_VDD5V] = IMX233_ADC_VDD5V,
+#endif
+#ifdef IMX233_BATT_TEMP_SENSOR
+    [ADC_BATT_TEMP] = IMX233_ADC_BATT_TEMP,
+#endif
+};
 
 void adc_init(void)
 {
@@ -52,11 +89,11 @@ static short adc_read_virtual(int c)
             return imx233_lradc_read_battery_voltage();
         case IMX233_ADC_VDDIO:
             /* VddIO pin has a builtin 2:1 divide */
-            return adc_read_physical(LRADC_SRC_VDDIO, false);
+            return adc_read_physical(LRADC_SRC_VDDIO, true) * 2;
 #if IMX233_SUBTARGET >= 3700
         case IMX233_ADC_VDD5V:
             /* Vdd5V pin has a builtin 4:1 divide */
-            return adc_read_physical(LRADC_SRC_5V, false) * 2;
+            return adc_read_physical(LRADC_SRC_5V, true) * 4;
 #endif
         case IMX233_ADC_DIE_TEMP:
         {
@@ -101,4 +138,9 @@ unsigned short adc_read(int channel)
         return adc_read_virtual(c);
     else
         return adc_read_physical(c, true);
+}
+
+const char *adc_name(int channel)
+{
+    return imx233_adc_channel_name[channel];
 }

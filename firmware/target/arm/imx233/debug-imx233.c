@@ -24,7 +24,6 @@
 #include "lcd.h"
 #include "font.h"
 #include "adc.h"
-#include "adc-imx233.h"
 #include "power-imx233.h"
 #include "clkctrl-imx233.h"
 #include "powermgmt-imx233.h"
@@ -269,8 +268,7 @@ bool dbg_hw_info_lradc(void)
         lcd_putsf(0, 0, "Battery(mV) %d", _battery_voltage());
         for(unsigned i = 0; i < NUM_ADC_CHANNELS; i++)
         {
-            lcd_putsf(0, i + 1, "%s %d", imx233_adc_channel_name[i],
-                adc_read(i));
+            lcd_putsf(0, i + 1, "%s %d", adc_name(i), adc_read(i));
         }
 
         lcd_update();
