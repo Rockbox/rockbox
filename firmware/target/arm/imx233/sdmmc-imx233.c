@@ -853,19 +853,13 @@ int sd_num_drives(int first_drive)
     return _sd_num_drives;
 }
 
-bool sd_present(IF_MV_NONVOID(int sd_drive))
+bool sd_present(int sd_drive)
 {
-#ifndef HAVE_MULTIVOLUME
-    int sd_drive = 0;
-#endif
     return sdmmc_present(sd_map[sd_drive]);
 }
 
-bool sd_removable(IF_MV_NONVOID(int sd_drive))
+bool sd_removable(int sd_drive)
 {
-#ifndef HAVE_MULTIVOLUME
-    int sd_drive = 0;
-#endif
     return sdmmc_removable(sd_map[sd_drive]);
 }
 
@@ -934,19 +928,13 @@ int mmc_num_drives(int first_drive)
     return _mmc_num_drives;
 }
 
-bool mmc_present(IF_MV_NONVOID(int mmc_drive))
+bool mmc_present(int mmc_drive)
 {
-#ifndef HAVE_MULTIVOLUME
-    int mmc_drive = 0;
-#endif
     return sdmmc_present(mmc_map[mmc_drive]);
 }
 
-bool mmc_removable(IF_MV_NONVOID(int mmc_drive))
+bool mmc_removable(int mmc_drive)
 {
-#ifndef HAVE_MULTIVOLUME
-    int mmc_drive = 0;
-#endif
     return sdmmc_removable(mmc_map[mmc_drive]);
 }
 
