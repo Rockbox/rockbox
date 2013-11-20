@@ -293,6 +293,10 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "name");
     lua_pushinteger(g_lua, g_hwdev_target.id);
     lua_setfield(g_lua, -2, "id");
+    lua_pushinteger(g_lua, HWSTUB_TARGET_UNK);
+    lua_setfield(g_lua, -2, "UNK");
+    lua_pushinteger(g_lua, HWSTUB_TARGET_STMP);
+    lua_setfield(g_lua, -2, "STMP");
     lua_setfield(g_lua, -2, "target");
 
     if(g_hwdev_target.id == HWSTUB_TARGET_STMP)
