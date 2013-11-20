@@ -59,6 +59,7 @@
 #include "yesno.h"
 #include "viewport.h"
 #include "list.h"
+#include "disk.h"
 
 #include "debug.h"
 

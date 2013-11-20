@@ -292,3 +292,19 @@ int disk_unmount_all(void)
     return unmounted;
 #endif  /* HAVE_MULTIDRIVE */
 }
+
+#ifdef HAVE_HOTSWAP
+bool volume_removable(int volume)
+{
+    if(vol_drive[volume] == -1)
+        return false;
+    return storage_removable(vol_drive[volume]);
+}
+
+bool volume_present(int volume)
+{
+    if(vol_drive[volume] == -1)
+        return false;
+    return storage_present(vol_drive[volume]);
+}
+#endif
