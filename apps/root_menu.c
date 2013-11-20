@@ -71,6 +71,7 @@
 #endif
 #include "language.h"
 #include "plugin.h"
+#include "disk.h"
 
 struct root_items {
     int (*function)(void* param);
@@ -131,12 +132,12 @@ static int browser(void* param)
                 for (i = 0; i < NUM_VOLUMES; i++)
                 {
                     char vol_string[VOL_ENUM_POS + 8];
-                    if (!storage_removable(i))
+                    if (!volume_removable(i))
                         continue;
                     /* VOL_NAMES contains a %d */
                     snprintf(vol_string, sizeof(vol_string), "/"VOL_NAMES, i);
                     /* test whether we would browse the external card */
-                    if (!storage_present(i) &&
+                    if (!volume_present(i) &&
                             (strstr(last_folder, vol_string)
 #ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
                                                                 || (i == 0)
