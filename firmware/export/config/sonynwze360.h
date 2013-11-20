@@ -40,6 +40,9 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
+/* define this if the target has volume keys which can be used in the lists */
+#define HAVE_VOLUME_IN_LIST
+
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
