@@ -117,6 +117,32 @@ buflib_init(struct buflib_context *ctx, void *buf, size_t size)
             (unsigned long)size / 1024, ((unsigned long)size%1000)/10);
 }
 
+bool buflib_context_relocate(struct buflib_context *ctx, void *buf)
+{
+    union buflib_data *handle, *bd_buf = buf;
+    ptrdiff_t diff = bd_buf - ctx->buf_start;
+
+    /* cannot continue if the buffer is not aligned, since we would need
+     * to reduce the size of the buffer for aligning */
+    if ((uintptr_t)buf & 0x3)
+        return false;
+
+    /* relocate the handle table entries  */
+    for (handle = ctx->last_handle; handle < ctx->handle_table; handle++)
+    {
+        if (handle->alloc)
+            handle->alloc += diff * sizeof(union buflib_data);
+    }
+    /* relocate the pointers in the context */
+    ctx->handle_table       += diff;
+    ctx->last_handle        += diff;
+    ctx->first_free_handle  += diff;
+    ctx->buf_start          += diff;
+    ctx->alloc_end          += diff;
+
+    return true;
+}
+
 /* Allocate a new handle, returning 0 on failure */
 static inline
 union buflib_data* handle_alloc(struct buflib_context *ctx)
