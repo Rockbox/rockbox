@@ -100,6 +100,8 @@ In the special case where the addresses of the register follow a pattern, an
 explicit formula can be described as part of the format. There is no specific
 requirement on the formula except that the register addresses be indexed by
 a variable "n" which range from 0 to N-1 where N is the number of address.
+The formula is not used for anything except header generation where it is
+handy to have a formula rather a long list of conditionals.
 The following properties are defined:
 - "string" (mandatory,string): the equation describing the addresses.
 
