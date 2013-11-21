@@ -157,6 +157,21 @@ size_t buflib_available(struct buflib_context *ctx);
  */
 size_t buflib_allocatable(struct buflib_context *ctx);
 
+/**
+ * Relocates the fields in *ctx to the new buffer position pointed to by buf.
+ * This does _not_ move any data but updates the pointers. The data has
+ * to be moved afterwards manually and only if this function returned true.
+ *
+ * This is intended to be called from within a move_callback(), for
+ * buflib-on-buflib scenarios (i.e. a new buflib instance backed by a buffer
+ * that was allocated by another buflib instance). Be aware that if the parent
+ * move_callback() moves the underlying buffer _no_ move_callback() of the
+ * underlying buffer are called.
+ *
+ * Returns true of the relocation was successful. If it returns false no
+ * change to *ctx was made.
+ */
+bool buflib_context_relocate(struct buflib_context *ctx, void *buf);
 
 /**
  * Allocates memory from buflib's memory pool
