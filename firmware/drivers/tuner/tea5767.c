@@ -167,6 +167,7 @@ void tea5767_init(void)
 
     /* init chipid register with 0xFF in case fmradio_i2c_read fails silently */
     buf[3] = 0xFF;
+    tuner_power(true);
     if (fmradio_i2c_read(I2C_ADR, buf, sizeof(buf)) < 0) {
         /* no i2c device detected */
         tuner_present = false;
@@ -175,6 +176,7 @@ void tea5767_init(void)
         chipid = buf[3] & 0x0F;
         tuner_present = (chipid == 0);
     }
+    tuner_power(false);
 #endif
 }
 
