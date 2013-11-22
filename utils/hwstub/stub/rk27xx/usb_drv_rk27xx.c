@@ -334,14 +334,11 @@ void INT_UDC(void)
                 /* we still have data to send */
                 ctr_write();
             }
-            else if (ctrlep[DIR_IN].cnt == 0)
-            {
-                /* WARRNING: final ZLP seems to not generate irq */
-                ctr_write();
-                usb_drv_send_done = true;
-            }
             else
             {
+                if (ctrlep[DIR_IN].cnt == 0)
+                    ctr_write();
+
                 /* final ack received */
                 usb_drv_send_done = true;
             }
