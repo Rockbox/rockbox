@@ -149,15 +149,6 @@ entry_point:
     strhi   r1, [r2], #4
     bhi     1b
 
-    /* Initialise bss section to zero */
-    ldr     r2, =_edata
-    ldr     r3, =_end
-    mov     r4, #0
-1:
-    cmp     r3, r2
-    strhi   r4, [r2], #4
-    bhi     1b
-
     /* Initialise bss, ibss section to zero */
     ldr     r2, =_edata
     ldr     r3, =_end
@@ -195,4 +186,4 @@ entry_point:
     strhi   r3, [r2], #4
     bhi     1b
 
-    bl      main
+    b       main
