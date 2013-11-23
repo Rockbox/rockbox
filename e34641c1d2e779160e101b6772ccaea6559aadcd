@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAaX///j8\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/Makefile",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "space ;)",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///jw\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "spaces",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///j4\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "space",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///j0\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "space",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///js\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/hwstub.lds",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "more space !",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///jo\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/hwstub.lds",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "and more",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///jk\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/rk27xx.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "very bad spaces",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///jg\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/rk27xx.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "don\u0027t like it either",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///jc\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/rk27xx.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1062,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "space",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///jY\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/rk27xx.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 1065,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "space",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///kI\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/target.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "remove this",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///kE\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/usb_drv_rk27xx.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "avoid tab",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///kA\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/usb_drv_rk27xx.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "maybe this could be move to target.c and implemented as target_udelay() like on stmp ?",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAaX///jU\u003d",
+        "filename": "utils/hwstub/stub/rk27xx/usb_drv_rk27xx.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-23T23:16:13Z",
+      "side": 1,
+      "message": "space and plenty others",
+      "revId": "e34641c1d2e779160e101b6772ccaea6559aadcd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
