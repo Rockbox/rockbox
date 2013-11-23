@@ -184,16 +184,6 @@ static struct usb_resp_info_target_t g_target =
 
 int target_get_info(int info, void **buffer)
 {
-#if 0
-    if(info == HWSTUB_INFO_STMP)
-    {
-        g_stmp.chipid = __XTRACT(HW_DIGCTL_CHIPID, PRODUCT_CODE);
-        g_stmp.rev = __XTRACT(HW_DIGCTL_CHIPID, REVISION);
-        g_stmp.is_supported = g_stmp_family != 0;
-        *buffer = &g_stmp;
-        return sizeof(g_stmp);
-    }
-#endif
     if(info == HWSTUB_INFO_TARGET)
     {
         *buffer = &g_target;
