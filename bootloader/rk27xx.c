@@ -62,7 +62,7 @@ static void enter_rkusb(void)
         /* Read SCU_ID to determine
          * which version of bootrom we have
          * 2706A has ID 0xa1000604
-         * 2706B and 2705 have ID 0xa10002b7
+         * 2706B and 2705 have ID 0xa100027b
          */
         "ldr     r1, [r0] \n"
         "ldr     r2, =0xa1000604 \n"
