@@ -165,7 +165,7 @@ void target_init(void)
         logf("identified rk27xx REV_A \n");
         g_rk27xx_family = REV_A;
     }
-    else if(rk27xx_id == 0xa10002b7)
+    else if(rk27xx_id == 0xa100027b)
     {
         logf("identified rk27xx REV_B \n");
         g_rk27xx_family = REV_B;
