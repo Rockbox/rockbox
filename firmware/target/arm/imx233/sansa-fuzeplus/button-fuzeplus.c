@@ -188,18 +188,18 @@ struct button_area_t
     int button;
 };
 
-static struct button_area_t button_areas[] =
+struct button_area_t button_areas[] =
 {
-    {1003, 658, 2006, 1316, BUTTON_SELECT},
-    {0, 658, 1003, 1316, BUTTON_LEFT},
-    {2006, 658, 3009, 1316, BUTTON_RIGHT},
-    {1003, 0 , 2006, 658, BUTTON_DOWN},
-    {1003, 1316, 2006, 1974, BUTTON_UP},
-    {2006, 1316, 3009, 1974, BUTTON_PLAYPAUSE},
-    {0, 1316, 1003, 1974, BUTTON_BACK},
-    {0, 0 , 1003, 658, BUTTON_BOTTOMLEFT},
-    {2006, 0 , 3009, 658, BUTTON_BOTTOMRIGHT},
-    {0, 0, 0, 0, 0},
+    {(1003 + x_deadzone),   (658 + y_deadzone),  (2006 + x_deadzone),  (1316 + y_deadzone), BUTTON_SELECT},
+    {0,                     (658 + y_deadzone),  (1003 - x_deadzone),  (1316 - y_deadzone), BUTTON_LEFT},
+    {(2006 + x_deadzone),   (658 + y_deadzone),  3009,                 (1316 - y_deadzone), BUTTON_RIGHT},
+    {(1003 + x_deadzone),   0,                   (2006 - x_deadzone),  (658 - y_deadzone),  BUTTON_DOWN},
+    {(1003 + x_deadzone),   (1316 + y_deadzone), (2006 - x_deadzone),  1974,                BUTTON_UP},
+    {(2006 + x_deadzone),   (1316 + y_deadzone), 3009,                 1974,                BUTTON_PLAYPAUSE},
+    {0,                     (1316 + y_deadzone), (1003 - x_deadzone),  1974,                BUTTON_BACK},
+    {0,                     0,                   (1003 - x_deadzone),  (658 - y_deadzone),  BUTTON_BOTTOMLEFT},
+    {(2006 + x_deadzone),   0,                   3009,                 (658 - y_deadzone),  BUTTON_BOTTOMRIGHT},
+    {0,                     0,                   0,                    0,                   0},
 };
 
 #define RMI_INTERRUPT       1
@@ -225,6 +225,12 @@ static int find_button(int x, int y)
             return area->button;
     }
     return 0;
+}
+
+static void touchpad_set_deadzone(int deadzone)
+{
+    int x_deadzone == (deadzone * 50);
+    int y_deadzone == (deadzone * 40);
 }
 
 static int touchpad_read_device(void)
