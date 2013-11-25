@@ -27,6 +27,10 @@
 
 #include "regs/regs-audioout.h"
 
+/* output stage coupling method */
+#define ACM_CAPLESS    0
+#define ACM_CAP        1
+
 struct imx233_audioout_info_t
 {
     // NOTE there is a convention here: dac -> dacvol -> dacmute
