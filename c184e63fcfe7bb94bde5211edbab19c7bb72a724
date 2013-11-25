@@ -1,0 +1,429 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAan////Q\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "Use a sexier comment message. Usually we write:\n\nInitial commit for the YP-Z5 port\n\nThe port uses the imx233 soc, it\u0027s a STMP3650 based player and it\u0027s very very very cool ;)",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan////M\u003d",
+        "filename": "apps/main.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 750,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "revert this",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan////I\u003d",
+        "filename": "firmware/export/config/samsungypz5.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "I would be better to create a type called IMX233_NONE or IMX233_STANDARD in config.h, and which does nothing. Using 0 is weird",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan////E\u003d",
+        "filename": "firmware/target/arm/imx233/nand-imx233.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "I think it\u0027s better to stub the entire file, ie remove all the functions at the moment and move them to nand-z5.c, as we discussed in IRC. This file should in the future contain only low level code.",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan////A\u003d",
+        "filename": "firmware/target/arm/imx233/partitions-imx233.h",
+        "patchSetId": 12
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "As I explain before, if you be better to create a type IMX233_STANDARD or maybe IMX233_WHOLE_DISK for example, which defines only IMX233_PART_USER and which stubs all the functions by using the whole disk",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+8\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/backlight-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+4\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/backlight-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+0\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space.",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+w\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "why goto and not else if ?",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+s\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+o\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+k\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+g\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+M\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "unused variable ?",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+c\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+Y\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+U\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+Q\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+I\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "just remove this code, it\u0027s stub and #if\u0027d 0 anyway",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+E\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "__attribute__((packed)) CACHEALIGN_ATTR;\n\n__ENSURE_STRUCT_CACHE_FRIENDLY(struct lcdif_cmd_t)",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///+A\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be size/2 ?",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///94\u003d",
+        "filename": "firmware/target/arm/imx233/touchscreen-imx233.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///98\u003d",
+        "filename": "firmware/target/arm/imx233/touchscreen-imx233.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "any hint as of why ?",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///90\u003d",
+        "filename": "tools/configure",
+        "patchSetId": 12
+      },
+      "lineNbr": 3165,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///9w\u003d",
+        "filename": "tools/scramble.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T23:35:47Z",
+      "side": 1,
+      "message": "You must also add ypz5 to usage()",
+      "revId": "c184e63fcfe7bb94bde5211edbab19c7bb72a724",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
