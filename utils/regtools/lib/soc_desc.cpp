@@ -102,8 +102,8 @@ bool validate_uint32_hook(const std::string& str, uint32_t& s)
 {
     unsigned long u;
     if(!validate_unsigned_long_hook(str, u)) return false;
-#if ULONG_MAX > UINT32_MAX
-    if(u > UINT32_MAX) return false;
+#if ULONG_MAX > 0xffffffff
+    if(u > 0xffffffff) return false;
 #endif
     s = u;
     return true;
@@ -177,12 +177,23 @@ bool parse_reg_formula_elem(xmlNode *node, soc_reg_formula_t& formula)
     return true;
 }
 
+bool parse_add_trivial_addr(const std::string& str, soc_reg_t& reg)
+{
+    soc_reg_addr_t a;
+    a.name = reg.name;
+    if(!validate_uint32_hook(str, a.addr))
+        return false;
+    reg.addr.push_back(a);
+    return true;
+}
+
 bool parse_reg_elem(xmlNode *node, soc_reg_t& reg)
 {
     std::vector< soc_reg_formula_t > formulas;
     BEGIN_ATTR_MATCH(node->properties)
         MATCH_TEXT_ATTR("name", reg.name)
         SOFT_MATCH_SCT_ATTR("sct", reg.flags)
+        SOFT_MATCH_X_ATTR("addr", parse_add_trivial_addr, reg)
     END_ATTR_MATCH()
 
     BEGIN_NODE_MATCH(node->children)

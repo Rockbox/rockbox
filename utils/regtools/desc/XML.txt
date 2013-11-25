@@ -61,10 +61,23 @@ The following properties are defined:
 - "name" (mandatory,string): the mnemonic of the register.
 - "sct" (optional,"yes" or "no"): STMP specific attribute to specify the existence
   of the SCT variants of this register.
+As a shortcut, in the case the register has a single address, one can add one more
+property:
+- "addr" (optional,integer): base address of this instance of the register.
 
 Example:
 <reg name="TIMCTRLn" sct="yes">
 <!-- reg desc -->
+</reg>
+
+The address shortcut has the following standard translation:
+<reg name="GPIO_PADR" addr="0x00">
+<!-- bla -->
+</reg>
+is equivalent to:
+<reg name="GPIO_PADR">
+<addr name="GPIO_PADR" addr="0x00">
+<!-- bla -->
 </reg>
 
 Element: soc.dev.reg.addr
