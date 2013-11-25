@@ -32,6 +32,25 @@
 
 #ifndef BOOTLOADER
 
+#define TOUCHPAD_WIDTH  3010
+#define TOUCHPAD_HEIGHT 1975
+#define DEADZONE_XMUL 2.5 /* x deadzone multiplier */
+#define DEADZONE_YMUL 2 /* y deadzone multiplier */
+#define RMI_INTERRUPT       1
+#define RMI_SET_SENSITIVITY 2
+#define RMI_SET_SLEEP_MODE  3
+#define ACTIVITY_TMO (5 * HZ) /* timeout before lowering touchpad power from lack of activity */
+
+static int touchpad_btns = 0;
+static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
+static const char rmi_thread_name[] = "rmi";
+static struct event_queue rmi_queue;
+static unsigned last_activity = 0;
+static bool t_enable = true;
+int x_deadzone, y_deadzone;
+int x, y;
+int gx, gy;
+
 bool button_debug_screen(void)
 {
     char product_id[RMI_PRODUCT_ID_LEN];
@@ -70,7 +89,7 @@ bool button_debug_screen(void)
     gesture_vp.y = zone_y - 80;
     gesture_vp.width = LCD_WIDTH / 2;
     gesture_vp.height = 80;
-    
+
     while(1)
     {
         unsigned char sleep_mode = rmi_read_single(RMI_DEVICE_CONTROL) & RMI_SLEEP_MODE_BM;
@@ -139,7 +158,7 @@ bool button_debug_screen(void)
                     break;
                 default: break;
             }
-            
+
             if(u.s.gesture.misc & RMI_2D_GEST_MISC_FLICK)
             {
                 lcd_putsf(0, 1, "FLICK!");
@@ -149,7 +168,7 @@ bool button_debug_screen(void)
                     if(a & 8) a = -((a ^ 0xf) + 1);
                 SIGN4EXT(flick_x);
                 SIGN4EXT(flick_y);
-                
+
                 int center_x = (LCD_WIDTH * 2) / 3;
                 int center_y = 40;
                 lcd_drawline(center_x, center_y, center_x + flick_x * 5, center_y - flick_y * 5);
@@ -173,58 +192,63 @@ bool button_debug_screen(void)
                 volkeys_delay_counter = 0;
             }
         }
-        
+
         yield();
     }
 
     return true;
 }
 
-struct button_area_t
+/* we emulate a 3x3 grid, this gives the button mapping*/
+int button_mapping[3][3] =
 {
-    /* define a rectangle region */
-    int lx, ly;
-    int rx, ry;
-    int button;
+    {BUTTON_BOTTOMLEFT, BUTTON_LEFT, BUTTON_BACK},
+    {BUTTON_DOWN, BUTTON_SELECT, BUTTON_UP},
+    {BUTTON_BOTTOMRIGHT, BUTTON_RIGHT, BUTTON_PLAYPAUSE},
+
 };
 
-static struct button_area_t button_areas[] =
+/* Ignore deadzone function */
+static int find_button_no_deadzone(int x, int y)
 {
-    {1003, 658, 2006, 1316, BUTTON_SELECT},
-    {0, 658, 1003, 1316, BUTTON_LEFT},
-    {2006, 658, 3009, 1316, BUTTON_RIGHT},
-    {1003, 0 , 2006, 658, BUTTON_DOWN},
-    {1003, 1316, 2006, 1974, BUTTON_UP},
-    {2006, 1316, 3009, 1974, BUTTON_PLAYPAUSE},
-    {0, 1316, 1003, 1974, BUTTON_BACK},
-    {0, 0 , 1003, 658, BUTTON_BOTTOMLEFT},
-    {2006, 0 , 3009, 658, BUTTON_BOTTOMRIGHT},
-    {0, 0, 0, 0, 0},
-};
+    /* compute grid coordinate */
+    int gx = x * 3 / TOUCHPAD_WIDTH;
+    int gy = y * 3 / TOUCHPAD_HEIGHT;
 
-#define RMI_INTERRUPT       1
-#define RMI_SET_SENSITIVITY 2
-#define RMI_SET_SLEEP_MODE  3
-/* timeout before lowering touchpad power from lack of activity */
-#define ACTIVITY_TMO (5 * HZ)
+    if(gx < 0 || gx >= 3 || gy < 0 || gy >= 3)
+        return 0; /* something went wrong, these coordinates are useless */
+    return button_mapping[gx][gy];
+}
 
-static int touchpad_btns = 0;
-static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
-static const char rmi_thread_name[] = "rmi";
-static struct event_queue rmi_queue;
-static unsigned last_activity = 0;
-static bool t_enable = true;
-
+/* Ignore deadzone function */
 static int find_button(int x, int y)
 {
-    struct button_area_t *area = button_areas;
-    for(; area->button != 0; area++)
-    {
-        if(area->lx <= x && x <= area->rx &&
-                area->ly <= y && y <= area->ry)
-            return area->button;
-    }
-    return 0;
+    /* find button ignoring deadzones */
+    int btn = find_button_no_deadzone(x, y);
+    if(btn == 0)
+        return 0;
+    /* to see if we are in a deadzone, we try to shift the coordinate
+     * and see if we get the same button, however we do not want the
+     * deadzone to apply on the borders, only between buttons ! */
+    /* right deadzone: only if not in the last column */
+    if(gx != 2 && find_button_no_deadzone(x + x_deadzone, y) != btn)
+        return 0;
+    /* left deadzone: only if not in the first column */
+    if(gx != 0 && find_button_no_deadzone(x - x_deadzone, y) != btn)
+        return 0;
+    /* top deadzone: only if not in the first row */
+    if(gy != 2 && find_button_no_deadzone(x, y + y_deadzone) != btn)
+        return 0;
+    /* bottom deadzone: only if not in the last row */
+    if(gy != 0 && find_button_no_deadzone(x, y - y_deadzone) != btn)
+        return 0;
+    return btn;
+}
+
+void touchpad_set_deadzone(int touchpad_deadzone)
+{
+    x_deadzone = touchpad_deadzone * DEADZONE_XMUL;
+    y_deadzone = touchpad_deadzone * DEADZONE_YMUL;
 }
 
 static int touchpad_read_device(void)
@@ -289,7 +313,7 @@ void touchpad_set_sensitivity(int level)
 static void rmi_thread(void)
 {
     struct queue_event ev;
-    
+
     while(1)
     {
         /* make sure to timeout often enough for the activity timeout to take place */
@@ -350,13 +374,13 @@ void button_init_device(void)
      *
      * The B0P26 line seems to be related to the touchpad
      */
-     
+
     /* touchpad power */
     imx233_pinctrl_acquire(0, 26, "touchpad power");
     imx233_pinctrl_set_function(0, 26, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 26, false);
     imx233_pinctrl_set_drive(0, 26, PINCTRL_DRIVE_8mA);
-    
+
     rmi_init(0x40);
 
     char product_id[RMI_PRODUCT_ID_LEN];
@@ -365,7 +389,7 @@ void button_init_device(void)
      * Since it doesn't to work great, just hardcode the sensitivity to
      * some reasonable value for now. */
     rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 13);
-    
+
     rmi_write_single(RMI_2D_GESTURE_SETTINGS,
         RMI_2D_GESTURE_PRESS_TIME_300MS |
         RMI_2D_GESTURE_FLICK_DIST_4MM << RMI_2D_GESTURE_FLICK_DIST_BP |
@@ -413,8 +437,8 @@ int button_read_device(void)
      * events as well as recovery mode. Since the power button is the power button
      * and the volume up button is recovery, it is not possible to know whether
      * power button is down when volume up is down (except if there is another
-     * method but volume up and power don't seem to be wired to GPIO pins). 
-     * As a probable consequence of that, it has been reported that pressing 
+     * method but volume up and power don't seem to be wired to GPIO pins).
+     * As a probable consequence of that, it has been reported that pressing
      * volume up sometimes return BUTTON_POWER instead of BUTTON_VOL_UP. The
      * following volume_power_lock prevent BUTTON_POWER to happen if volume up
      * has been send since a very short time. */
@@ -423,7 +447,7 @@ int button_read_device(void)
         volume_power_lock--;
     switch(BF_RD(POWER_STS, PSWITCH))
     {
-        case 1: 
+        case 1:
             if(volume_power_lock == 0)
                 res |= BUTTON_POWER;
             break;
@@ -431,7 +455,7 @@ int button_read_device(void)
             res |= BUTTON_VOL_UP;
             volume_power_lock = 5;
             break;
-        default: 
+        default:
             break;
     }
     return res | touchpad_filter(touchpad_read_device());
