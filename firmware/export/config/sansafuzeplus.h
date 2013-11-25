@@ -94,6 +94,12 @@
 #define MAX_TOUCHPAD_SENSITIVITY_SETTING        25
 #define DEFAULT_TOUCHPAD_SENSITIVITY_SETTING    13
 
+/* Define this to enable dead zone on touchpad */
+#define HAVE_TOUCHPAD_DEADZONE
+#define DEFAULT_TOUCHPAD_DEADZONE_SETTING    0
+#define MIN_TOUCHPAD_DEADSPACE_SETTING       0
+#define MAX_TOUCHPAD_DEADSPACE_SETTING       100
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
