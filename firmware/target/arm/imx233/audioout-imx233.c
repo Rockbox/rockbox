@@ -23,6 +23,7 @@
 #include "rtc-imx233.h"
 #include "pcm_sampr.h"
 #include "string.h"
+#include "audio-target.h"
 
 static int hp_vol_l, hp_vol_r;
 static bool input_line1;
@@ -46,7 +47,17 @@ void imx233_audioout_preinit(void)
     /* Enable DAC */
     BF_CLR(AUDIOOUT_ANACLKCTRL, CLKGATE);
     /* Set capless mode */
+#ifdef IMX233_COUPLING_MODE
+#if IMX233_COUPLING_MODE == COUPLING_CAP
+    BF_SET(AUDIOOUT_PWRDN, CAPLESS);
+#elif IMX233_COUPLING_MODE == COUPLING_CAPLESS
     BF_CLR(AUDIOOUT_PWRDN, CAPLESS);
+#else
+    #error Invalid output coupling mode (COUPLING_CAP or COUPLING_CAPLESS)
+#endif
+#else
+    #error Please select output coupling mode (COUPLING_CAP or COUPLING_CAPLESS)
+#endif
     /* Set word-length to 16-bit */
     BF_SET(AUDIOOUT_CTRL, WORD_LENGTH);
     /* Power up DAC */
