@@ -693,7 +693,7 @@ void PinAnalyser::FillList()
 
     const char *package_type[8] =
     {
-        [0] = "bga169", [1] = "bga100", [2] = "lqfp100", [3] = "lqfp128",
+        "bga169", "bga100", "lqfp100", "lqfp128", 0, 0, 0, 0
     };
 
     if(!helper.ReadRegisterField("DIGCTL", "STATUS", "PACKAGE_TYPE", value))
