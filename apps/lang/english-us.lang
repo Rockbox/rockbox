@@ -10606,6 +10606,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DEADZONE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    touchpad_deadzone: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    touchpad_deadzone: "Touchpad Dead Zone"
+  </dest>
+  <voice>
+    *: none
+    touchpad_deadzone: "Touchpad Dead Zone"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_HIGH
   desc: in settings_menu
   user: core
