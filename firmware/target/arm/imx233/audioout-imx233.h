@@ -27,6 +27,14 @@
 
 #include "regs/regs-audioout.h"
 
+/* target-defined output stage coupling method
+ * its setting is IMX233_AUDIO_COUPLING_MODE and must be set for every target
+ * Use ACM_CAP if output stage (i.e. headphones) have output capacitors,
+ * ACM_CAPLESS (DC-coupled) otherwise.
+ */
+#define ACM_CAPLESS    0
+#define ACM_CAP        1
+
 struct imx233_audioout_info_t
 {
     // NOTE there is a convention here: dac -> dacvol -> dacmute
