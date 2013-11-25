@@ -21,5 +21,7 @@
 #ifndef __audio_target__
 #define __audio_target__
 
+#define IMX233_AUDIO_COUPLING_MODE ACM_CAPLESS
+
 #endif /* __audio_target__ */
  
