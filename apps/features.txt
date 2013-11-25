@@ -199,6 +199,10 @@ lineout_poweroff
 touchscreen
 #endif
 
+#if defined(HAVE_TOUCHPAD_DEADZONE)
+touchpad_deadzone
+#endif
+
 #if defined(HAVE_IMX233_CODEC) || defined(HAVE_WM8750) || defined(HAVE_WM8978)
 depth_3d
 #endif
