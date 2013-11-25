@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAan////s\u003d",
+        "filename": "firmware/target/arm/imx233/audioout-imx233.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T20:07:08Z",
+      "side": 1,
+      "message": "See comment below. Implement check here:\n#ifndef IMX233_AUDIO_COUPLING_MODE\n#error You must define IMX233_AUDIO_COUPLING_MODE\n#endif\n\n#if IMX233_AUDIO_COUPLING_MODE !\u003d ACM_CAP \u0026\u0026 IMX233_AUDIO_COUPLING_MODE !\u003d ACM_CAPLESS\n#error Invalid value for IMX233_AUDIO_COUPLING_MODE\n#endif",
+      "revId": "b0e30de53a8c16d7e562cc446428ec397de9c232",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan////w\u003d",
+        "filename": "firmware/target/arm/imx233/audioout-imx233.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T20:07:08Z",
+      "side": 1,
+      "message": "It is better to do the existence/value check at the beginning of the file instead of making the code harder to read. So change this to:\n#if IMX233_AUDIO_COUPLIG_MODE \u003d\u003d ACM_CAP\nblabla\n#else\nblabla\n#endif",
+      "revId": "b0e30de53a8c16d7e562cc446428ec397de9c232",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan////o\u003d",
+        "filename": "firmware/target/arm/imx233/audioout-imx233.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-25T20:07:08Z",
+      "side": 1,
+      "message": "mention that the setting is IMX233_AUDIO_COUPLING_MODE",
+      "revId": "b0e30de53a8c16d7e562cc446428ec397de9c232",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
