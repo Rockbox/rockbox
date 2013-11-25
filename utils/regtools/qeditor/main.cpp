@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setOrganizationName("Rockbox");
     QCoreApplication::setApplicationName("Register Editor");
-    QCoreApplication::setOrganizationDomain("rockbox.com");
+    QCoreApplication::setOrganizationDomain("rockbox.org");
     MainWindow win(backend);
     win.show();
     return app.exec();
