@@ -36,9 +36,7 @@
 #include "action.h"
 #endif
 
-#ifdef HAVE_LCD_ENABLE
 static bool lcd_on;
-#endif
 
 /**
  * DMA
@@ -71,7 +69,7 @@ static void wait_frames_cb(void)
 
 static void wait_nr_frames(int nr)
 {
-    g_wait_nr_frame = 1 + nr; // +1 because we want entire frames
+    g_wait_nr_frame = 2 + nr; // +1 because we want entire frames, +1 to be safe
     imx233_lcdif_set_vsync_edge_cb(wait_frames_cb);
     imx233_lcdif_enable_vsync_edge_irq(true);
     semaphore_wait(&g_wait_sema, TIMEOUT_BLOCK);
@@ -90,20 +88,15 @@ static void wait_nr_frames(int nr)
 #define RS      0x2
 #define RW      0x1
 
-static void spi_init(void)
+static void spi_enable(bool en)
 {
-    imx233_pinctrl_acquire(1, 9, "lcd_spi_sdo");
-    imx233_pinctrl_acquire(1, 10, "lcd_spi_scl");
-    imx233_pinctrl_acquire(1, 11, "lcd_spi_cs");
-    imx233_pinctrl_set_function(1, 9, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_set_function(1, 10, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_set_function(1, 11, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_set_gpio(1, 9, true);
-    imx233_pinctrl_set_gpio(1, 10, true);
-    imx233_pinctrl_set_gpio(1, 11, true);
-    imx233_pinctrl_enable_gpio(1, 9, true);
-    imx233_pinctrl_enable_gpio(1, 10, true);
-    imx233_pinctrl_enable_gpio(1, 11, true);
+    imx233_pinctrl_set_gpio(1, 9, en);
+    imx233_pinctrl_set_gpio(1, 10, en);
+    imx233_pinctrl_set_gpio(1, 11, en);
+    imx233_pinctrl_enable_gpio(1, 9, en);
+    imx233_pinctrl_enable_gpio(1, 10, en);
+    imx233_pinctrl_enable_gpio(1, 11, en);
+    mdelay(1);
 }
 
 static void spi_delay(void)
@@ -216,7 +209,6 @@ static void lcd_display_on_seq(void)
     spi_write_reg(0x7, 0x103);
 }
 
-#ifdef HAVE_LCD_ENABLE
 static void lcd_display_off_seq(void)
 {
     spi_write_reg(0xb, 0x30e1);
@@ -227,30 +219,69 @@ static void lcd_display_off_seq(void)
     spi_write_reg(0x10, 0x100);
 }
 
-static void lcd_standby_in_seq(void)
-{
-    lcd_display_off_seq();
-    spi_write_reg(0x10, 0x1);
-}
-
-static void lcd_standby_out_seq(void)
-{
-    spi_write_reg(0x10, 0);
-    lcd_power_seq();
-    lcd_display_on_seq();
-}
-#endif
-
 /**
  * Rockbox
  */
 
+bool lcd_active(void)
+{
+    return lcd_on;
+}
+
+void lcd_enable(bool enable)
+{
+    if(lcd_on == enable)
+        return;
+
+    lcd_on = enable;
+    if(lcd_on)
+    {
+        // enable spi
+        spi_enable(true);
+        // reset
+        imx233_lcdif_reset_lcd(true);
+        imx233_lcdif_reset_lcd(false);
+        mdelay(1);
+        imx233_lcdif_reset_lcd(true);
+        mdelay(1);
+        // "power" on
+        lcd_power(true);
+        // setup registers
+        imx233_lcdif_enable_sync_signals(true); // we need frame signals during init
+        lcd_power_seq();
+        lcd_init_seq();
+        lcd_display_on_seq();
+
+        imx233_dma_reset_channel(APB_LCDIF);
+        imx233_dma_start_command(APB_LCDIF, &lcdif_dma[0].dma);
+        BF_SET(LCDIF_CTRL, DOTCLK_MODE);
+        BF_SET(LCDIF_CTRL, RUN);
+    }
+    else
+    {
+        // power down
+        lcd_display_off_seq();
+        lcd_power(false);
+        // stop lcdif
+        BF_CLR(LCDIF_CTRL, DOTCLK_MODE);
+        // disable spi
+        spi_enable(false);
+    }
+}
+
 void lcd_init_device(void)
 {
     semaphore_init(&g_wait_sema, 1, 0);
-#ifdef HAVE_LCD_ENABLE
-    lcd_on = true;
-#endif
+    /* I'm not really sure this pin is related to power, it does not seem to do anything */
+    imx233_pinctrl_acquire(1, 8, "lcd_power");
+    imx233_pinctrl_acquire(1, 9, "lcd_spi_sdo");
+    imx233_pinctrl_acquire(1, 10, "lcd_spi_scl");
+    imx233_pinctrl_acquire(1, 11, "lcd_spi_cs");
+    imx233_pinctrl_set_function(1, 9, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_set_function(1, 10, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_set_function(1, 11, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_set_function(1, 8, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(1, 8, true);
     /** lcd is 320x240, data bus is 8-bit, depth is 24-bit so we need 3clk/pix
      * by running PIX clock at 24MHz we can sustain ~100 fps */
     imx233_clkctrl_enable(CLK_PIX, false);
@@ -275,26 +306,7 @@ void lcd_init_device(void)
         /*h_front_porch*/4, LCD_WIDTH, LCD_HEIGHT, /*clk_per_pix*/3,
         /*enable_present*/false);
     imx233_lcdif_set_byte_packing_format(0xf);
-    // prepare pins
-    spi_init();
-    imx233_pinctrl_acquire(1, 8, "lcd_power");
-    imx233_pinctrl_set_function(1, 8, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(1, 8, true);
-    // reset lcd
-    imx233_lcdif_reset_lcd(true);
-    mdelay(10);
-    imx233_lcdif_reset_lcd(false);
-    mdelay(10);
-    imx233_lcdif_reset_lcd(true);
-    mdelay(10);
-    // power up
-    lcd_power(true);
-    // setup registers
-    imx233_lcdif_enable_sync_signals(true); // we need frame signals during init
-    lcd_power_seq();
-    lcd_init_seq();
-    lcd_display_on_seq();
-    // setup refresh
+    // setup dma
     unsigned size = IMX233_FRAMEBUFFER_SIZE;
     uint8_t *frame_p = FRAME;
     for(int i = 0; i < NR_CMDS; i++)
@@ -307,28 +319,9 @@ void lcd_init_device(void)
         size -= xfer;
         frame_p += xfer;
     }
-    imx233_dma_start_command(APB_LCDIF, &lcdif_dma[0].dma);
-    BF_SET(LCDIF_CTRL, RUN);
+    // enable
+    lcd_enable(true);
 }
-
-#ifdef HAVE_LCD_ENABLE
-bool lcd_active(void)
-{
-    return lcd_on;
-}
-
-void lcd_enable(bool enable)
-{
-    if(lcd_on == enable)
-        return;
-
-    lcd_on = enable;
-    if(lcd_on)
-        lcd_standby_out_seq();
-    else
-        lcd_standby_in_seq();
-}
-#endif
 
 void lcd_update(void)
 {
@@ -353,3 +346,4 @@ void lcd_update_rect(int x, int y, int w, int h)
         }
     }
 }
+
