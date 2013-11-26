@@ -643,6 +643,13 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
                 size = usb_strings[index]->bLength;
                 ptr = usb_strings[index];
             }
+            else if(index == 0xee) {
+                // We don't have a real OS descriptor, and we don't handle
+                // STALL correctly on some devices, so we return any valid
+                // string (we arbitrarily pick the manufacturer name)
+                size = usb_string_iManufacturer.bLength;
+                ptr = &usb_string_iManufacturer;
+            }
             else {
                 logf("bad string id %d", index);
                 usb_drv_stall(EP_CONTROL, true, true);
