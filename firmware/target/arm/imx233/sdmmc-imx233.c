@@ -530,6 +530,9 @@ static int init_mmc_drive(int drive)
         window_start[drive] = 0;
         window_end[drive] = *sec_count;
     }
+    /* deselect card */
+    if(!send_cmd(drive, MMC_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+        return -13;
 
     /* MMC always support CMD23 */
     support_set_block_count[drive] = false;
@@ -608,6 +611,18 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
         ret = -201;
         goto Lend;
     }
+    /* select card.
+     * NOTE: rely on SD_SELECT_CARD=MMC_SELECT_CARD */
+    if(!send_cmd(drive, SD_SELECT_CARD, SDMMC_RCA(drive), MCI_NO_RESP, NULL))
+    {
+        ret = -20;
+        goto Lend;
+    }
+    /* wait for TRAN state */
+    /* NOTE: rely on SD_TRAN=MMC_TRAN */
+    ret = wait_for_state(drive, SD_TRAN);
+    if(ret < 0)
+        goto Ldeselect;
 
     /**
      * NOTE: we need to make sure dma transfers are aligned. This is handled
@@ -664,6 +679,12 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
         else
             ret = __xfer_sectors(drive, start, count, buf, read);
     }
+    /* deselect card */
+    Ldeselect:
+    /*  CMD7 w/rca =0 : deselects card & puts it in STBY state
+     * NOTE: rely on SD_DESELECT_CARD=MMC_DESELECT_CARD */
+    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+        ret = -23;
     Lend:
     /* update led status */
     led(false);
