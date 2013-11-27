@@ -35,7 +35,7 @@ static void reset_lcd(void)
 {
     GPIO_PCCON |= (1<<7);
     GPIO_PCDR &= ~(1<<7);
-    udelay(10);
+    udelay(1000);
     GPIO_PCDR |= (1<<7);
     udelay(5000);
 }
