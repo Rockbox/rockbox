@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAan///9Y\u003d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "change commit message.",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///9U\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/backlight-ypz5.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "not needed, rockbox will call it by itself.",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///9Q\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-target.h",
+        "patchSetId": 14
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "space after |",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///9M\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "remove commented code",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///9E\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "remove commented code",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///9I\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/button-ypz5.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "extra space",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///9A\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "I didn\u0027t pay attention before and this is not very good. Normally you should copy the relevant rect to the FRAME buffer and then send it. But maybe we\u0027ll make this part of another commit.",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAan///88\u003d",
+        "filename": "firmware/target/arm/imx233/samsung-ypz5/lcd-ypz5.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2013-11-29T16:54:47Z",
+      "side": 1,
+      "message": "usually you wait for DMA at the beginning of the function. That way the dma transfer can overlap with other unrelated code and only when you need to redraw you actually wait for the previous refresh. But we\u0027ll fix this in another commit.",
+      "revId": "76fd5a497553f25b67bfc4cfa87f57d33fed8252",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
