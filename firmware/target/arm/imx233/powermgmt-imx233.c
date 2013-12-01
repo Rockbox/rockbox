@@ -68,16 +68,22 @@ void imx233_powermgmt_init(void)
 #endif
 
 #if IMX233_SUBTARGET >= 3780
+    /* adjust arbitration between 4.2 and battery */
+    BF_WR(POWER_DCDC4P2, CMPTRIP, 0); /* 85% */
+    BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
+#endif
+
+#if IMX233_SUBTARGET >= 3700
     /* enable a few bits controlling the DC-DC as recommended by Freescale */
     BF_SET(POWER_LOOPCTRL, TOGGLE_DIF);
     BF_SET(POWER_LOOPCTRL, EN_CM_HYST);
     BF_CLR(POWER_LOOPCTRL, EN_RCSCALE);
     BF_SETV(POWER_LOOPCTRL, EN_RCSCALE, 1);
-    /* adjust arbitration between 4.2 and battery */
-    BF_WR(POWER_DCDC4P2, CMPTRIP, 0); /* 85% */
-    BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
-    /* make sure we are in a known state: disable charger and 4p2 */
+    /* make sure we are in a known state: disable charger */
     BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+#endif
+#if IMX233_SUBTARGET >= 3780
+    /* make sure we are in a known state: disable 4p2 */
     BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 0);
     BF_WR(POWER_DCDC4P2, ENABLE_4P2, 0);
     BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
@@ -91,7 +97,6 @@ void powermgmt_init_target(void)
 
 void charging_algorithm_step(void)
 {
-#if IMX233_SUBTARGET >= 3780
     bool is_5v_present = usb_detect() == USB_INSERTED;
 
     /* initial state & 5v -> battery transition */
@@ -101,9 +106,11 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: disable charger and 4p2"); 
         /* 5V has been lost: disable 4p2 power rail */
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+#if IMX233_SUBTARGET >= 3780
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 0);
         BF_WR(POWER_DCDC4P2, ENABLE_4P2, 0);
         BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+#endif
         charge_state = DISCHARGING;
     }
     /* battery -> 5v transition */
@@ -111,17 +118,20 @@ void charging_algorithm_step(void)
     {
         logf("pwrmgmt: discharging -> trickle");
         logf("pwrmgmt: begin charging 4p2");
+#if IMX233_SUBTARGET >= 3780
         /* 5V has been detected: prepare 4.2V power rail for activation */
         BF_WR(POWER_DCDC4P2, ENABLE_4P2, 1);
         BF_SET(POWER_CHARGE, ENABLE_LOAD);
         BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT, 1);
         BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);// FIXME: manual error ?
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 1);
+#endif
         timeout_4p2_ilimit_increase = current_tick + HZ / 100;
         charge_state = TRICKLE;
     }
     else if(charge_state == TRICKLE && TIME_AFTER(current_tick, timeout_4p2_ilimit_increase))
     {
+#if IMX233_SUBTARGET >= 3780
         /* if 4.2V current limit has not reached 780mA, increase it slowly to
          * charge the 4.2V capacitance */
         if(BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) != 0x3f)
@@ -132,6 +142,7 @@ void charging_algorithm_step(void)
         }
         /* we've reached the maximum, take action */
         else
+#endif
         {
             logf("pwrmgmt: enable dcdc and charger");
             logf("pwrmgmt: trickle -> charging");
@@ -149,7 +160,10 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: charging timeout exceeded!");
         logf("pwrmgmt: charging -> error");
         /* stop charging */
+#if IMX233_SUBTARGET >= 3780
         BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+#endif
+        BF_SET(POWER_CHARGE, PWD_BATTCHRG);
         /* goto error state */
         charge_state = CHARGE_STATE_ERROR;
     }
@@ -165,10 +179,12 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: charging finished");
         logf("pwrmgmt: topoff -> disabled");
         /* stop charging */
+#if IMX233_SUBTARGET >= 3780
+        BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+#endif
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
         charge_state = CHARGE_STATE_DISABLED;
     }
-#endif
 }
 
 void charging_algorithm_close(void)
