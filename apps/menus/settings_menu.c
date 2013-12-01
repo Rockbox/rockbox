@@ -317,6 +317,10 @@ MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
 #endif
 
+#ifdef HAVE_TOUCHPAD_DEADZONE
+MENUITEM_SETTING(touchpad_deadzone, &global_settings.touchpad_deadzone, NULL);
+#endif
+
 #ifdef HAVE_QUICKSCREEN
 MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
 #endif
@@ -362,6 +366,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
+#endif
+#ifdef HAVE_TOUCHPAD_DEADZONE
+            &touchpad_deadzone,
 #endif
 #ifdef USB_ENABLE_HID
             &usb_hid,
