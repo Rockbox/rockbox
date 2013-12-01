@@ -2024,6 +2024,14 @@ const struct settings_list settings[] = {
                    ID2P(LANG_NORMAL), ID2P(LANG_HIGH)),
 #endif /* boolean or analogig values */
 #endif /* HAVE_TOUCHPAD_SENSITIVITY_SETTING */
+
+#ifdef HAVE_TOUCHPAD_DEADZONE
+    INT_SETTING(F_NO_WRAP, touchpad_deadzone, LANG_DEADZONE,
+                DEFAULT_TOUCHPAD_DEADZONE_SETTING, "touchpad deadzone", UNIT_INT,
+                MIN_TOUCHPAD_DEADSPACE_SETTING, MAX_TOUCHPAD_DEADSPACE_SETTING, 1,
+                NULL, NULL, touchpad_set_deadzone),
+#endif
+
 #ifdef HAVE_QUICKSCREEN
    CUSTOM_SETTING(0, qs_items[QUICKSCREEN_TOP], LANG_TOP_QS_ITEM,
                   NULL, "qs top",

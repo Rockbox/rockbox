@@ -192,33 +192,22 @@ bool button_debug_screen(void)
     return true;
 }
 
-struct button_area_t
+/* we emulate a 3x3 grid, this gives the button mapping */
+int button_mapping[3][3] =
 {
-    /* define a rectangle region */
-    int lx, ly;
-    int rx, ry;
-    int button;
-};
-
-static struct button_area_t button_areas[] =
-{
-    {1003, 658, 2006, 1316, BUTTON_SELECT},
-    {0, 658, 1003, 1316, BUTTON_LEFT},
-    {2006, 658, 3009, 1316, BUTTON_RIGHT},
-    {1003, 0 , 2006, 658, BUTTON_DOWN},
-    {1003, 1316, 2006, 1974, BUTTON_UP},
-    {2006, 1316, 3009, 1974, BUTTON_PLAYPAUSE},
-    {0, 1316, 1003, 1974, BUTTON_BACK},
-    {0, 0 , 1003, 658, BUTTON_BOTTOMLEFT},
-    {2006, 0 , 3009, 658, BUTTON_BOTTOMRIGHT},
-    {0, 0, 0, 0, 0},
+    {BUTTON_BOTTOMLEFT, BUTTON_LEFT, BUTTON_BACK},
+    {BUTTON_DOWN, BUTTON_SELECT, BUTTON_UP},
+    {BUTTON_BOTTOMRIGHT, BUTTON_RIGHT, BUTTON_PLAYPAUSE},
 };
 
 #define RMI_INTERRUPT       1
 #define RMI_SET_SENSITIVITY 2
 #define RMI_SET_SLEEP_MODE  3
 /* timeout before lowering touchpad power from lack of activity */
-#define ACTIVITY_TMO (5 * HZ)
+#define ACTIVITY_TMO        (5 * HZ)
+#define TOUCHPAD_WIDTH      3010
+#define TOUCHPAD_HEIGHT     1975
+#define DEADZONE_MULTIPLIER 2 /* deadzone multiplier */
 
 static int touchpad_btns = 0;
 static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
@@ -226,17 +215,38 @@ static const char rmi_thread_name[] = "rmi";
 static struct event_queue rmi_queue;
 static unsigned last_activity = 0;
 static bool t_enable = true;
+static int deadzone;
+
+/* Ignore deadzone function. If outside of the pad, project to border. */
+static int find_button_no_deadzone(int x, int y)
+{
+    /* compute grid coordinate */
+    int gx = MAX(MIN(x * 3 / TOUCHPAD_WIDTH, 2), 0);
+    int gy = MAX(MIN(y * 3 / TOUCHPAD_HEIGHT, 2), 0);
+
+    return button_mapping[gx][gy];
+}
 
 static int find_button(int x, int y)
 {
-    struct button_area_t *area = button_areas;
-    for(; area->button != 0; area++)
-    {
-        if(area->lx <= x && x <= area->rx &&
-                area->ly <= y && y <= area->ry)
-            return area->button;
-    }
-    return 0;
+    /* find button ignoring deadzones */
+    int btn = find_button_no_deadzone(x, y);
+    /* To check if we are in a deadzone, we try to shift the coordinates
+     * and see if we get the same button. Not that we do not want to apply
+     * the deadzone in the borders ! The code works even in the borders because
+     * the find_button_no_deadzone() project out-of-bound coordinates to the
+     * borders */
+    if(find_button_no_deadzone(x + deadzone, y) != btn ||
+            find_button_no_deadzone(x - deadzone, y) != btn ||
+            find_button_no_deadzone(x, y + deadzone) != btn ||
+            find_button_no_deadzone(x, y - deadzone) != btn)
+        return 0;
+    return btn;
+}
+
+void touchpad_set_deadzone(int touchpad_deadzone)
+{
+    deadzone = touchpad_deadzone * DEADZONE_MULTIPLIER;
 }
 
 static int touchpad_read_device(void)

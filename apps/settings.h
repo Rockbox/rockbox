@@ -460,6 +460,10 @@ struct user_settings
     int touchpad_sensitivity;
 #endif
 
+#ifdef HAVE_TOUCHPAD_DEADZONE
+    int touchpad_deadzone;
+#endif
+
     int  pause_rewind; /* time in s to rewind when pausing */
 #ifdef HAVE_HEADPHONE_DETECTION
     int  unplug_mode; /* pause on headphone unplug */

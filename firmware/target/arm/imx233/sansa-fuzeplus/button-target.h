@@ -24,6 +24,7 @@
 #include <stdbool.h>
 bool button_debug_screen(void);
 void touchpad_set_sensitivity(int level);
+void touchpad_set_deadzone(int touchpad_deadzone);
 void touchpad_enable_device(bool en);
 
 /* Main unit's buttons */

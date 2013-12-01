@@ -1061,6 +1061,10 @@ void settings_apply(bool read_disk)
     touchpad_set_sensitivity(global_settings.touchpad_sensitivity);
 #endif
 
+#ifdef HAVE_TOUCHPAD_DEADZONE
+    touchpad_set_deadzone(global_settings.touchpad_deadzone);
+#endif
+
 #ifdef HAVE_USB_CHARGING_ENABLE
     usb_charging_enable(global_settings.usb_charging);
 #endif
