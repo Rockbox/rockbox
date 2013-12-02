@@ -142,7 +142,7 @@ void system_init(void)
 
     cpu_frequency = imx233_clkctrl_get_freq(CLK_CPU);
 
-#if CONFIG_TUNER
+#if !defined(BOOTLOADER) && CONFIG_TUNER != 0
     fmradio_i2c_init();
 #endif
 }
