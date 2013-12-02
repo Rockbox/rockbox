@@ -56,27 +56,6 @@ __ENSURE_STRUCT_CACHE_FRIENDLY(struct lcdif_dma_command_t)
 struct lcdif_dma_command_t lcdif_dma[NR_CMDS];
 
 /**
- * Utils
- */
-static int g_wait_nr_frame = 0;
-static struct semaphore g_wait_sema;
-
-static void wait_frames_cb(void)
-{
-    if(--g_wait_nr_frame == 0)
-        semaphore_release(&g_wait_sema);
-}
-
-static void wait_nr_frames(int nr)
-{
-    g_wait_nr_frame = 2 + nr; // +1 because we want entire frames, +1 to be safe
-    imx233_lcdif_set_vsync_edge_cb(wait_frames_cb);
-    imx233_lcdif_enable_vsync_edge_irq(true);
-    semaphore_wait(&g_wait_sema, TIMEOUT_BLOCK);
-    imx233_lcdif_enable_vsync_edge_irq(false);
-}
-
-/**
  * SPI
  */
 
@@ -96,7 +75,7 @@ static void spi_enable(bool en)
     imx233_pinctrl_enable_gpio(1, 9, en);
     imx233_pinctrl_enable_gpio(1, 10, en);
     imx233_pinctrl_enable_gpio(1, 11, en);
-    mdelay(1);
+    mdelay(5);
 }
 
 static void spi_delay(void)
@@ -150,18 +129,18 @@ static void spi_write_reg(uint8_t reg, uint16_t value)
 static void lcd_power(bool en)
 {
     imx233_pinctrl_set_gpio(1, 8, en);
-    mdelay(10);
+    sleep(1);
 }
 
 static void lcd_power_seq(void)
 {
     spi_write_reg(0x7, 0);
-    mdelay(10);
+    sleep(HZ * 10 / 1000);
     spi_write_reg(0x12, 0x1618);
     spi_write_reg(0x11, 0x2227);
     spi_write_reg(0x13, 0x61d1);
     spi_write_reg(0x10, 0x550c);
-    wait_nr_frames(5);
+    sleep(HZ * 50 / 1000);
     spi_write_reg(0x12, 0x0c58);
 }
 
@@ -199,9 +178,9 @@ static void lcd_init_seq(void)
 static void lcd_display_on_seq(void)
 {
     spi_write_reg(0x7, 1);
-    wait_nr_frames(1);
+    sleep(HZ * 20 / 1000);
     spi_write_reg(0x7, 0x101);
-    wait_nr_frames(2);
+    sleep(HZ * 40 / 1000);
     spi_write_reg(0x76, 0x2213);
     spi_write_reg(0x1c, 0x6650);
     spi_write_reg(0xb, 0x33e1);
@@ -213,7 +192,7 @@ static void lcd_display_off_seq(void)
 {
     spi_write_reg(0xb, 0x30e1);
     spi_write_reg(0x7, 0x102);
-    wait_nr_frames(2);
+    sleep(HZ * 40 / 1000);
     spi_write_reg(0x7, 0);
     spi_write_reg(0x12, 0);
     spi_write_reg(0x10, 0x100);
@@ -239,23 +218,21 @@ void lcd_enable(bool enable)
         // enable spi
         spi_enable(true);
         // reset
-        imx233_lcdif_reset_lcd(true);
         imx233_lcdif_reset_lcd(false);
         mdelay(1);
         imx233_lcdif_reset_lcd(true);
-        mdelay(1);
+        imx233_dma_reset_channel(APB_LCDIF);
         // "power" on
         lcd_power(true);
         // setup registers
-        imx233_lcdif_enable_sync_signals(true); // we need frame signals during init
         lcd_power_seq();
         lcd_init_seq();
         lcd_display_on_seq();
 
-        imx233_dma_reset_channel(APB_LCDIF);
         imx233_dma_start_command(APB_LCDIF, &lcdif_dma[0].dma);
         BF_SET(LCDIF_CTRL, DOTCLK_MODE);
         BF_SET(LCDIF_CTRL, RUN);
+        sleep(HZ / 5);
     }
     else
     {
@@ -271,7 +248,6 @@ void lcd_enable(bool enable)
 
 void lcd_init_device(void)
 {
-    semaphore_init(&g_wait_sema, 1, 0);
     /* I'm not really sure this pin is related to power, it does not seem to do anything */
     imx233_pinctrl_acquire(1, 8, "lcd_power");
     imx233_pinctrl_acquire(1, 9, "lcd_spi_sdo");
@@ -306,6 +282,7 @@ void lcd_init_device(void)
         /*h_front_porch*/4, LCD_WIDTH, LCD_HEIGHT, /*clk_per_pix*/3,
         /*enable_present*/false);
     imx233_lcdif_set_byte_packing_format(0xf);
+    imx233_lcdif_enable_sync_signals(true); // we need frame signals during init
     // setup dma
     unsigned size = IMX233_FRAMEBUFFER_SIZE;
     uint8_t *frame_p = FRAME;
