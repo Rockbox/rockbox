@@ -97,6 +97,7 @@ void powermgmt_init_target(void)
 
 void charging_algorithm_step(void)
 {
+#if IMX233_SUBTARGET >= 3700
     bool is_5v_present = usb_detect() == USB_INSERTED;
 
     /* initial state & 5v -> battery transition */
@@ -185,6 +186,7 @@ void charging_algorithm_step(void)
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
         charge_state = CHARGE_STATE_DISABLED;
     }
+#endif
 }
 
 void charging_algorithm_close(void)
