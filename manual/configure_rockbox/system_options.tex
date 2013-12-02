@@ -215,6 +215,20 @@ therefore result in better runtime.
     \end{description}
 }
 
+\opt{touchpad}{
+  \subsection{Touchpad}
+    These settings control the functions of touchpad devices.
+    \begin{description}
+    \opt{SANSA_FUZEPLUS_PAD,GIGABEAT_PAD}{
+      \item [Touchpad Senstivity. ]This setting controls the amount of pressure needed to
+      register a touchpad press. If set to \opt{SANSA_FUZEPLUS_PAD}{\setting{25}}\opt{GIGABEAT_PAD}
+      {\setting{High}} the lightest touch will register. If set to \opt{SANSA_FUZEPLUS_PAD}
+      {\setting{-25}}\opt{GIGABEAT_PAD}{\setting{Normal}} a firmer press will be needed to register
+      on the touchpad.
+    }
+    \end{description}
+}
+
 \opt{usb_hid}{
   \subsection{\label{ref:USB_HID}USB HID}
     This option turns the USB HID feature \setting{On} and \setting{Off}.
