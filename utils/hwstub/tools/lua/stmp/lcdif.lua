@@ -5,9 +5,11 @@
 STMP.lcdif = {}
 
 function STMP.lcdif.setup_clock()
-    HW.CLKCTRL.CLKSEQ.BYPASS_PIX.set()
-    HW.CLKCTRL.PIX.CLKGATE.write(0)
-    HW.CLKCTRL.PIX.DIV.write(1)
+    if not STMP.is_stmp3600() then
+        HW.CLKCTRL.CLKSEQ.BYPASS_PIX.set()
+        HW.CLKCTRL.PIX.CLKGATE.write(0)
+        HW.CLKCTRL.PIX.DIV.write(1)
+    end
 end
 
 function STMP.lcdif.init()
@@ -147,4 +149,12 @@ function STMP.lcdif.send_pio(data_mode, data)
         HW.LCDIF.DATA.write(v)
     end
     STMP.lcdif.wait_ready()
+end
+
+function STMP.lcdif.set_mode86(mode86)
+    if mode86 then
+        HW.LCDIF.CTRL.MODE86.set()
+    else
+        HW.LCDIF.CTRL.MODE86.clr()
+    end
 end
