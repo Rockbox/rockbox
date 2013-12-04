@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include "cpu.h"
+#include "kernel.h"
 #include "debug.h"
 #include "system.h"
 #include "kernel.h"

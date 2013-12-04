@@ -7,7 +7,8 @@
 # $Id$
 #
 
-INCLUDES += -I$(FIRMDIR) -I$(FIRMDIR)/export -I$(FIRMDIR)/drivers -I$(FIRMDIR)/include
+INCLUDES += -I$(FIRMDIR) -I$(FIRMDIR)/export -I$(FIRMDIR)/drivers \
+			-I$(FIRMDIR)/include -I$(FIRMDIR)/kernel/include
 ifndef APP_TYPE
 INCLUDES += -I$(FIRMDIR)/libc/include
 endif

@@ -18,7 +18,7 @@
  * {,U}INT{8,16,32,64}_{MIN,MAX} */
 #include "system.h"
 
-/* HZ, TIME_AFTER */
+/* HZ, TIME_AFTER, current_tick */
 #include "kernel.h"
 
 /* Structure to record some info during processing call */
