@@ -20,7 +20,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "as3525v2.h"
 #ifndef BOOTLOADER

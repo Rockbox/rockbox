@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include <stdio.h>
+#include "kernel.h"
 #include "general.h"
 #include "file.h"
 #include "dir.h"

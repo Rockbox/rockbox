@@ -27,6 +27,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "gcc_extensions.h"
+#include "corelock.h"
 
 /* Priority scheduling (when enabled with HAVE_PRIORITY_SCHEDULING) works
  * by giving high priority threads more CPU time than lower priority threads
@@ -63,6 +64,7 @@
 #define IO_PRIORITY_IMMEDIATE    0
 #define IO_PRIORITY_BACKGROUND   32
 
+
 #if CONFIG_CODEC == SWCODEC
 # ifdef HAVE_HARDWARE_CLICK
 #  define BASETHREADS  17
@@ -78,7 +80,6 @@
 #endif
 
 #define MAXTHREADS (BASETHREADS+TARGET_EXTRA_THREADS)
-
 /*
  * We need more stack when we run under a host
  * maybe more expensive C lib functions?
@@ -98,23 +99,6 @@ struct regs
 #else
 #include "asm/thread.h"
 #endif /* HAVE_SDL_THREADS */
-
-#ifdef CPU_PP
-#ifdef HAVE_CORELOCK_OBJECT
-/* No reliable atomic instruction available - use Peterson's algorithm */
-struct corelock
-{
-    volatile unsigned char myl[NUM_CORES];
-    volatile unsigned char turn;
-} __attribute__((packed));
-
-/* Too big to inline everywhere */
-void corelock_init(struct corelock *cl);
-void corelock_lock(struct corelock *cl);
-int corelock_try_lock(struct corelock *cl);
-void corelock_unlock(struct corelock *cl);
-#endif /* HAVE_CORELOCK_OBJECT */
-#endif /* CPU_PP */
 
 /* NOTE: The use of the word "queue" may also refer to a linked list of
    threads being maintained that are normally dealt with in FIFO order
@@ -149,14 +133,6 @@ struct thread_list
     struct thread_entry *prev; /* Previous thread in a list */
     struct thread_entry *next; /* Next thread in a list */
 };
-
-#ifndef HAVE_CORELOCK_OBJECT
-/* No atomic corelock op needed or just none defined */
-#define corelock_init(cl)
-#define corelock_lock(cl)
-#define corelock_try_lock(cl)
-#define corelock_unlock(cl)
-#endif /* HAVE_CORELOCK_OBJECT */
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 struct blocker
@@ -306,6 +282,9 @@ struct core_entry
     struct corelock rtr_cl;        /* Lock for rtr list */
 #endif /* NUM_CORES */
 };
+
+extern void yield(void);
+extern unsigned sleep(unsigned ticks);
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 #define IF_PRIO(...)    __VA_ARGS__

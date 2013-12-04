@@ -22,8 +22,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "lcd.h"
 #include "lcd-target.h"
 

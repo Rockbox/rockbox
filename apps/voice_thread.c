@@ -18,8 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "core_alloc.h"
 #include "thread.h"
 #include "appevents.h"

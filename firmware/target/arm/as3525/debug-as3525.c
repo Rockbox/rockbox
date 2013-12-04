@@ -20,10 +20,11 @@
  ****************************************************************************/
 
 #include <stdbool.h>
+#include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "lcd.h"
 #include "font.h"
-#include "system.h"
 #include "cpu.h"
 #include "pl180.h"
 #include "ascodec.h"

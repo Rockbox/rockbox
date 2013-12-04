@@ -33,7 +33,6 @@ usb.c
 #if defined(ROCKBOX_HAS_LOGF) || defined(ROCKBOX_HAS_LOGDISKF)
 logf.c
 #endif /* ROCKBOX_HAS_LOGF */
-kernel.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 load_code.c
 #ifdef RB_PROFILE
@@ -45,7 +44,6 @@ common/rb-loader.c
 #if !defined(BOOTLOADER) || defined(CPU_SH)
 rolo.c
 #endif /* !defined(BOOTLOADER) || defined(CPU_SH) */
-thread.c
 timer.c
 debug.c
 #endif /* PLATFORM_NATIVE */
@@ -67,7 +65,6 @@ target/hosted/sdl/system-sdl.c
 #ifdef HAVE_SDL_THREADS
 target/hosted/sdl/thread-sdl.c
 #else
-thread.c
 #endif
 target/hosted/sdl/timer-sdl.c
 #ifdef HAVE_TOUCHSCREEN
@@ -92,7 +89,6 @@ target/hosted/lc-unix.c
 target/hosted/samsungypr/ypr0/button-ypr0.c
 target/hosted/samsungypr/lcd-ypr.c
 target/hosted/samsungypr/ypr0/system-ypr0.c
-thread.c
 #ifdef HAVE_BACKLIGHT
 target/hosted/samsungypr/ypr0/backlight-ypr0.c
 #endif
@@ -1764,11 +1760,29 @@ target/hosted/android/telephony-android.c
 target/hosted/android/app/button-application.c
 #endif
 drivers/audio/android.c
-thread.c
 #endif
 
 #endif /* defined(SIMULATOR) */
 
 #if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD)
 drivers/touchpad.c
+#endif
+
+/* firmware/kernel section */
+#ifdef HAVE_CORELOCK_OBJECT
+kernel/corelock.c
+#endif
+kernel/mutex.c
+kernel/queue.c
+#ifdef HAVE_SEMAPHORE_OBJECTS
+kernel/semaphore.c
+#endif
+#if defined(HAVE_SDL_THREADS)
+target/hosted/sdl/thread-sdl.c
+#else
+kernel/thread.c
+#endif
+kernel/tick.c
+#ifdef INCLUDE_TIMEOUT_API
+kernel/timeout.c
 #endif

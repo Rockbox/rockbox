@@ -22,9 +22,9 @@
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
 
+#include <stdbool.h>
+#include <stdint.h>
 #include "cpu.h"
-#include "stdbool.h"
-#include "kernel.h"
 #include "gcc_extensions.h" /* for LIKELY/UNLIKELY */
 
 extern void system_reboot (void);
@@ -84,6 +84,10 @@ int get_cpu_boost_counter(void);
 #endif
 
 #define BAUDRATE 9600
+
+/* wrap-safe macros for tick comparison */
+#define TIME_AFTER(a,b)         ((long)(b) - (long)(a) < 0)
+#define TIME_BEFORE(a,b)        TIME_AFTER(b,a)
 
 #ifndef NULL
 #define NULL ((void*)0)
