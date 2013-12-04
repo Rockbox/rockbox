@@ -22,6 +22,7 @@
 /* Taken from button-h10.c by Barry Wardell and reverse engineering by MrH. */
 
 #include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "backlight.h"
 #include "powermgmt.h"

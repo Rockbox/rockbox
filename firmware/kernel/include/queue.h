@@ -18,26 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _KERNEL_H_
-#define _KERNEL_H_
 
-#include <stdbool.h>
-#include <inttypes.h>
+#ifndef QUEUE_H
+#define QUEUE_H
+
+#include <stdint.h>
 #include "config.h"
-
 #include "thread.h"
-
-/* wrap-safe macros for tick comparison */
-#define TIME_AFTER(a,b)         ((long)(b) - (long)(a) < 0)
-#define TIME_BEFORE(a,b)        TIME_AFTER(b,a)
-
-#define HZ      100 /* number of ticks per second */
-
-#define MAX_NUM_TICK_TASKS 8
-
-#define MAX_NUM_QUEUES 32
-#define QUEUE_LENGTH 16 /* MUST be a power of 2 */
-#define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
 
 /* System defined message ID's - |sign bit = 1|class|id| */
 /* Event class list */
@@ -85,10 +72,9 @@
 
 #define IS_SYSEVENT(ev)           ((ev & SYS_EVENT) == SYS_EVENT)
 
-#ifndef TIMEOUT_BLOCK
-#define TIMEOUT_BLOCK   -1
-#define TIMEOUT_NOBLOCK  0
-#endif
+#define MAX_NUM_QUEUES 32
+#define QUEUE_LENGTH 16 /* MUST be a power of 2 */
+#define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
 
 struct queue_event
 {
@@ -137,100 +123,6 @@ struct event_queue
     IF_COP( struct corelock cl; )       /* multiprocessor sync */
 };
 
-struct mutex
-{
-    struct thread_entry *queue;         /* waiter list */
-    int recursion;                      /* lock owner recursion count */
-#ifdef HAVE_PRIORITY_SCHEDULING
-    struct blocker blocker;             /* priority inheritance info
-                                           for waiters */
-    bool no_preempt;                    /* don't allow higher-priority thread
-                                           to be scheduled even if woken */
-#else
-    struct thread_entry *thread;        /* Indicates owner thread - an owner
-                                           implies a locked state - same goes
-                                           for priority scheduling
-                                           (in blocker struct for that) */
-#endif
-    IF_COP( struct corelock cl; )       /* multiprocessor sync */
-};
-
-#ifdef HAVE_SEMAPHORE_OBJECTS
-struct semaphore
-{
-    struct thread_entry *queue;         /* Waiter list */
-    int volatile count;                 /* # of waits remaining before unsignaled */
-    int max;                            /* maximum # of waits to remain signaled */
-    IF_COP( struct corelock cl; )       /* multiprocessor sync */
-};
-#endif
-
-/* global tick variable */
-#if defined(CPU_PP) && defined(BOOTLOADER) && \
-    !defined(HAVE_BOOTLOADER_USB_MODE)
-/* We don't enable interrupts in the PP bootloader unless USB mode is
-   enabled for it, so we need to fake the current_tick variable */
-#define current_tick (signed)(USEC_TIMER/10000)
-
-static inline void call_tick_tasks(void)
-{
-}
-#else
-extern volatile long current_tick;
-
-/* inline helper for implementing target interrupt handler */
-static inline void call_tick_tasks(void)
-{
-    extern void (*tick_funcs[MAX_NUM_TICK_TASKS+1])(void);
-    void (**p)(void) = tick_funcs;
-    void (*fn)(void);
-
-    current_tick++;
-
-    for(fn = *p; fn != NULL; fn = *(++p))
-    {
-        fn();
-    }
-}
-#endif
-
-/* kernel functions */
-extern void kernel_init(void) INIT_ATTR;
-extern void yield(void);
-extern unsigned sleep(unsigned ticks);
-int tick_add_task(void (*f)(void));
-int tick_remove_task(void (*f)(void));
-extern void tick_start(unsigned int interval_in_ms) INIT_ATTR;
-
-#ifdef INCLUDE_TIMEOUT_API
-struct timeout;
-
-/* timeout callback type
- * tmo - pointer to struct timeout associated with event
- * return next interval or <= 0 to stop event
- */
-#define MAX_NUM_TIMEOUTS 8
-typedef int (* timeout_cb_type)(struct timeout *tmo);
-
-struct timeout
-{
-    timeout_cb_type callback;/* callback - returning false cancels */
-    intptr_t        data;    /* data passed to callback */
-    long            expires; /* expiration tick */
-};
-
-void timeout_register(struct timeout *tmo, timeout_cb_type callback,
-                      int ticks, intptr_t data);
-void timeout_cancel(struct timeout *tmo);
-#endif /* INCLUDE_TIMEOUT_API */
-
-#define STATE_NONSIGNALED 0
-#define STATE_SIGNALED    1
-
-#define OBJ_WAIT_TIMEDOUT     (-1)
-#define OBJ_WAIT_FAILED       0
-#define OBJ_WAIT_SUCCEEDED    1
-
 extern void queue_init(struct event_queue *q, bool register_queue);
 extern void queue_delete(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct queue_event *ev);
@@ -260,26 +152,6 @@ extern void queue_clear(struct event_queue* q);
 extern void queue_remove_from_head(struct event_queue *q, long id);
 extern int queue_count(const struct event_queue *q);
 extern int queue_broadcast(long id, intptr_t data);
+extern void init_queues(void);
 
-extern void mutex_init(struct mutex *m);
-extern void mutex_lock(struct mutex *m);
-extern void mutex_unlock(struct mutex *m);
-#ifdef HAVE_PRIORITY_SCHEDULING
-/* Deprecated temporary function to disable mutex preempting a thread on
- * unlock - firmware/drivers/fat.c and a couple places in apps/buffering.c -
- * reliance on it is a bug! */
-static inline void mutex_set_preempt(struct mutex *m, bool preempt)
-    { m->no_preempt = !preempt; }
-#else
-/* Deprecated but needed for now - firmware/drivers/ata_mmc.c */
-static inline bool mutex_test(const struct mutex *m)
-    { return m->thread != NULL; }
-#endif /* HAVE_PRIORITY_SCHEDULING */
-
-#ifdef HAVE_SEMAPHORE_OBJECTS
-extern void semaphore_init(struct semaphore *s, int max, int start);
-extern int  semaphore_wait(struct semaphore *s, int timeout);
-extern void semaphore_release(struct semaphore *s);
-#endif /* HAVE_SEMAPHORE_OBJECTS */
-
-#endif /* _KERNEL_H_ */
+#endif /* QUEUE_H */

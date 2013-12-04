@@ -20,8 +20,6 @@
  ****************************************************************************/
 
 #include <stdio.h>
-#include "config.h"
-#include "system.h"
 #include "kernel.h"
 #include "general.h"
 #include "file.h"
