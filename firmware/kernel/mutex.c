@@ -97,12 +97,9 @@ void mutex_lock(struct mutex *m)
     current->bqp = &m->queue;
 
     disable_irq();
-    block_thread(current);
-
-    corelock_unlock(&m->cl);
-
     /* ...and turn control over to next thread */
-    switch_thread();
+    block_thread_switch(current IF_COP(, &m->cl));
+    corelock_unlock(&m->cl);
 }
 
 /* Release ownership of a mutex object - only owning thread must call this */

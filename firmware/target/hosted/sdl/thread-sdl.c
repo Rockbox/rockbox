@@ -406,17 +406,23 @@ void sleep_thread(int ticks)
     current->tmo_tick = (1000/HZ) * ticks + ((1000/HZ)-1) - rem;
 }
 
-void block_thread(struct thread_entry *current)
+/* does not handle IF_COP yet */
+void block_thread_switch(struct thread_entry *current)
 {
     current->state = STATE_BLOCKED;
     add_to_list_l(current->bqp, current);
+    /* perform the thread switch. will come back once unlocked again */
+    switch_thread();
 }
 
-void block_thread_w_tmo(struct thread_entry *current, int ticks)
+/* does not handle IF_COP yet */
+void block_thread_switch_w_tmo(struct thread_entry *current, int ticks)
 {
     current->state = STATE_BLOCKED_W_TMO;
     current->tmo_tick = (1000/HZ)*ticks;
     add_to_list_l(current->bqp, current);
+    /* perform the thread switch. will come back once unlocked again */
+    switch_thread();
 }
 
 unsigned int wakeup_thread(struct thread_entry **list)
@@ -652,8 +658,7 @@ void thread_wait(unsigned int thread_id)
     if (thread->id == thread_id && thread->state != STATE_KILLED)
     {
         current->bqp = &thread->queue;
-        block_thread(current);
-        switch_thread();
+        block_thread_switch(current);
     }
 }
 

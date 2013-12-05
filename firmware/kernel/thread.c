@@ -1298,19 +1298,26 @@ void sleep_thread(int ticks)
 }
 
 /*---------------------------------------------------------------------------
- * Indefinitely block a thread on a blocking queue for explicit wakeup.
+ * Block a thread on a blocking queue for a specified time interval or until
+ * explicitly woken - whichever happens first.
  *
  * INTERNAL: Intended for use by kernel objects and not for programs.
  *---------------------------------------------------------------------------
  */
-void block_thread(struct thread_entry *current)
+static void block_thread_w_tmo(struct thread_entry *current, int timeout)
 {
-    /* Set the state to blocked and take us off of the run queue until we
-     * are explicitly woken */
+    /* Get the entry for the current running thread. */
     LOCK_THREAD(current);
 
-    /* Set the list for explicit wakeup */
-    block_thread_on_l(current, STATE_BLOCKED);
+    if (timeout != TIMEOUT_BLOCK)
+    {
+        /* Set the state to blocked with the specified timeout */
+        current->tmo_tick = current_tick + timeout;
+        /* Set the list for explicit wakeup */
+        block_thread_on_l(current, STATE_BLOCKED_W_TMO);
+    }
+    else
+        block_thread_on_l(current, STATE_BLOCKED);
 
 #ifdef HAVE_PRIORITY_SCHEDULING
     if (current->blocker != NULL)
@@ -1325,31 +1332,37 @@ void block_thread(struct thread_entry *current)
 
 /*---------------------------------------------------------------------------
  * Block a thread on a blocking queue for a specified time interval or until
- * explicitly woken - whichever happens first.
+ * explicitly woken - whichever happens first. Another thread is elected
+ * for exection and switched to it. The corelock must be locked prior to a
+ * call to this.
  *
  * INTERNAL: Intended for use by kernel objects and not for programs.
  *---------------------------------------------------------------------------
  */
-void block_thread_w_tmo(struct thread_entry *current, int timeout)
+void block_thread_switch_w_tmo(struct thread_entry *current, int timeout IF_COP(, struct corelock *cl))
 {
-    /* Get the entry for the current running thread. */
-    LOCK_THREAD(current);
+    /* first block the thread */
+    block_thread_w_tmo(current, timeout);
+    IF_COP(current->obj_cl = cl);
+    /* release the corelock until the thread becomes runnable again */
+    corelock_unlock(cl);
+    /* perform the thread switch. will come back once unlocked again */
+    switch_thread();
+    corelock_lock(cl);
+}
 
-    /* Set the state to blocked with the specified timeout */
-    current->tmo_tick = current_tick + timeout;
-
-    /* Set the list for explicit wakeup */
-    block_thread_on_l(current, STATE_BLOCKED_W_TMO);
-
-#ifdef HAVE_PRIORITY_SCHEDULING
-    if (current->blocker != NULL)
-    {
-        /* Object supports PIP */
-        current = blocker_inherit_priority(current);
-    }
-#endif
-
-    UNLOCK_THREAD(current);
+/*---------------------------------------------------------------------------
+ * Block a thread on a blocking queue until explicitly woken. Another thread
+ * is elected for exection and switched to it. The corelock must be locked
+ * prior to a call to this.
+ *
+ * INTERNAL: Intended for use by kernel objects and not for programs.
+ *---------------------------------------------------------------------------
+ */
+void block_thread_switch(struct thread_entry *current IF_COP(, struct corelock *cl))
+{
+    /* first block the thread */
+    block_thread_switch_w_tmo(current, TIMEOUT_BLOCK IF_COP(, cl));
 }
 
 /*---------------------------------------------------------------------------
@@ -1693,7 +1706,7 @@ void thread_wait(unsigned int thread_id)
         current->bqp = &thread->queue;
 
         disable_irq();
-        block_thread(current);
+        block_thread_w_tmo(current,TIMEOUT_BLOCK);
 
         corelock_unlock(&thread->waiter_cl);
 

@@ -336,11 +336,13 @@ void switch_thread(void);
 /* Blocks a thread for at least the specified number of ticks (0 = wait until
  * next tick) */
 void sleep_thread(int ticks);
-/* Indefinitely blocks the current thread on a thread queue */
-void block_thread(struct thread_entry *current);
 /* Blocks the current thread on a thread queue until explicitely woken or
- * the timeout is reached */
-void block_thread_w_tmo(struct thread_entry *current, int timeout);
+ * the timeout is reached, and schedules the next thread. cl must
+ * be locked prior to this call. */
+void block_thread_switch_w_tmo(struct thread_entry *current, int timeout IF_COP(, struct corelock *cl));
+/* Indefinitely blocks the current thread on a thread queue
+ * and schedule the next thread. cl must be locked prior to this call */
+void block_thread_switch(struct thread_entry *current IF_COP(, struct corelock *cl));
 
 /* Return bit flags for thread wakeup */
 #define THREAD_NONE     0x0 /* No thread woken up (exclusive) */
