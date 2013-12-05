@@ -322,16 +322,10 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
         current = thread_self_entry();
 
-        IF_COP( current->obj_cl = &q->cl; )
         current->bqp = &q->queue;
 
-        block_thread(current);
-
-        corelock_unlock(&q->cl);
-        switch_thread();
-
+        block_thread_switch(current IF_COP(, &q->cl));
         disable_irq();
-        corelock_lock(&q->cl);
     } 
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -383,16 +377,10 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     {
         struct thread_entry *current = thread_self_entry();
 
-        IF_COP( current->obj_cl = &q->cl; )
         current->bqp = &q->queue;
 
-        block_thread_w_tmo(current, ticks);
-        corelock_unlock(&q->cl);    
-
-        switch_thread();
-
+        block_thread_switch_w_tmo(current, ticks IF_COP(, &q->cl));
         disable_irq();
-        corelock_lock(&q->cl);
 
         rd = q->read;
         wr = q->write;
@@ -485,7 +473,6 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 
         /* Save thread in slot, add to list and wait for reply */
         *spp = current;
-        IF_COP( current->obj_cl = &q->cl; )
         IF_PRIO( current->blocker = q->blocker_p; )
 #ifdef HAVE_WAKEUP_EXT_CB
         current->wakeup_ext_cb = queue_remove_sender_thread_cb;
@@ -493,10 +480,8 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
         current->retval = (intptr_t)spp;
         current->bqp = &send->list;
 
-        block_thread(current);
-
+        block_thread_switch(current IF_COP(, &q->cl));
         corelock_unlock(&q->cl);
-        switch_thread();
 
         return current->retval;
     }

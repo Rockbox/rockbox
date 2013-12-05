@@ -82,16 +82,13 @@ int semaphore_wait(struct semaphore *s, int timeout)
          * explicit in semaphore_release */
         current->retval = OBJ_WAIT_TIMEDOUT;
 
+        /* ...and turn control over to next thread */
         if(timeout > 0)
-            block_thread_w_tmo(current, timeout); /* ...or timed out... */
+            block_thread_switch_w_tmo(current, timeout IF_COP(, &s->cl)); /* ...or timed out... */
         else
-            block_thread(current);                /* -timeout = infinite */
+            block_thread_switch(current IF_COP(, &s->cl));                /* -timeout = infinite */
 
         corelock_unlock(&s->cl);
-
-        /* ...and turn control over to next thread */
-        switch_thread();
-
         return current->retval;
     }
 
