@@ -1,0 +1,15 @@
+options
+{
+    flags = 0x100;
+}
+
+sources
+{
+    hwstub = extern(0);
+}
+
+section(0)
+{
+    load hwstub > 0;
+    jump 0;
+}
