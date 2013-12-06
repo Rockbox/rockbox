@@ -60,29 +60,43 @@
 #include <pthread.h>
 #include <signal.h>
 
-#define USE_ASYNC_CALLBACK
+#define USE_ASYNC_THREAD
+
+#ifdef USE_ASYNC_THREAD
+#include <sched.h>
+#endif
+
 /* plughw:0,0 works with both, however "default" is recommended.
  * default doesnt seem to work with async callback but doesn't break
  * with multple applications running */
-static char device[] = "plughw:0,0";                    /* playback device */
+static char device[] = "default";                           /* playback device */
 static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
-static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format */
-static const int channels = 2;                                /* count of channels */
-static unsigned int rate = 44100;                       /* stream rate */
+static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;  /* sample format */
+static const int channels = 2;                              /* count of channels */
+static unsigned int rate = 44100;                           /* stream rate */
 
 static snd_pcm_t *handle;
-static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
-static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
+static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~32k => ~196ms */
+static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 8;  /*  ~8k =>  ~47ms */
 static short *frames;
 
 static const void  *pcm_data = 0;
 static size_t       pcm_size = 0;
 
-#ifdef USE_ASYNC_CALLBACK
+#if defined(USE_ASYNC_CALLBACK)
 static snd_async_handler_t *ahandler;
 static pthread_mutex_t pcm_mtx;
 static char signal_stack[SIGSTKSZ];
-#else
+#elif defined(USE_ASYNC_THREAD)
+static pthread_mutex_t pcm_mtx;
+static pthread_cond_t  pcm_disabed_cond = PTHREAD_COND_INITIALIZER;
+static struct thread_arg {
+    snd_pcm_t *pcm;
+    volatile bool quit;
+} thread_args;
+static pthread_t pcm_thread_id;
+
+#else /* tick task */
 static int recursion;
 #endif
 
@@ -184,7 +198,7 @@ static int set_swparams(snd_pcm_t *handle)
         printf("Unable to determine current swparams for playback: %s\n", snd_strerror(err));
         goto error;
     }
-    /* start the transfer when the buffer is haalmost full */
+    /* start the transfer when the buffer is half full */
     err = snd_pcm_sw_params_set_start_threshold(handle, swparams, buffer_size / 2);
     if (err < 0)
     {
@@ -245,13 +259,32 @@ static bool fill_frames(void)
     return true;
 }
 
-#ifdef USE_ASYNC_CALLBACK
+#if defined(USE_ASYNC_CALLBACK)
 static void async_callback(snd_async_handler_t *ahandler)
 {
     snd_pcm_t *handle = snd_async_handler_get_pcm(ahandler);
 
     if (pthread_mutex_trylock(&pcm_mtx) != 0)
         return;
+#elif defined(USE_ASYNC_THREAD)
+static void pcm_write(snd_pcm_t *handle)
+{
+    pthread_mutex_lock(&pcm_mtx);
+    /* the below suspends the threads if not RUNNING. it shall resume
+     * once the state becomes RUNNING, but we must get out when the pcm
+     * handle gets closed (at shutdown) */
+    snd_pcm_state_t state = snd_pcm_state(handle);
+    while (state != SND_PCM_STATE_RUNNING)
+    {
+        if (state == SND_PCM_STATE_SETUP)
+        {   /* return early if handle was closed in the meantime */
+            pthread_mutex_lock(&pcm_mtx);
+            return;
+        }
+        pthread_cond_wait(&pcm_disabed_cond, &pcm_mtx);
+        state = snd_pcm_state(handle);
+    }
+
 #else
 static void pcm_tick(void)
 {
@@ -259,16 +292,20 @@ static void pcm_tick(void)
         return;
 #endif
 
+#if !defined(USE_ASYNC_THREAD)
     while (snd_pcm_avail_update(handle) >= period_size)
+#else
+    while (1)
+#endif
     {
         if (fill_frames())
         {
             int err = snd_pcm_writei(handle, frames, period_size);
             if (err < 0 && err != period_size && err != -EAGAIN)
             {
-                printf("Write error: written %i expected %li\n", err, period_size);
-                break;
+                printf("Write error: written %i expected %li %s\n", err, period_size, snd_strerror(err));
             }
+            break;
         }
         else
         {
@@ -276,10 +313,28 @@ static void pcm_tick(void)
             break;
         }
     }
-#ifdef USE_ASYNC_CALLBACK
+#if defined(USE_ASYNC_CALLBACK) || defined(USE_ASYNC_THREAD)
     pthread_mutex_unlock(&pcm_mtx);
 #endif
 }
+
+#if defined(USE_ASYNC_THREAD)
+static void *pcm_thread(void *_arg)
+{
+    struct thread_arg *arg = _arg;
+    pthread_setname_np(pthread_self(), __func__);
+
+    while (!arg->quit)
+    {
+        pcm_write(arg->pcm);
+        /* yield as to give pcm_play_lock() a better chance to grab the mutex,
+         * this greately reduces track skip latency */
+        sched_yield();
+    }
+
+    return NULL;
+}
+#endif
 
 static int async_rw(snd_pcm_t *handle)
 {
@@ -287,7 +342,7 @@ static int async_rw(snd_pcm_t *handle)
     snd_pcm_sframes_t sample_size;
     short *samples;
 
-#ifdef USE_ASYNC_CALLBACK
+#if defined(USE_ASYNC_CALLBACK)
     /* assign alternative stack for the signal handlers */
     stack_t ss = {
         .ss_sp = signal_stack,
@@ -318,6 +373,14 @@ static int async_rw(snd_pcm_t *handle)
     {
         DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
         return err;
+    }
+
+#elif defined(USE_ASYNC_THREAD)
+    if (!pcm_thread_id)
+    {
+        thread_args.pcm = handle;
+        thread_args.quit = false;
+        pthread_create(&pcm_thread_id, NULL, pcm_thread, &thread_args);
     }
 #endif
 
@@ -354,9 +417,37 @@ static int async_rw(snd_pcm_t *handle)
 
 void cleanup(void)
 {
-    free(frames);
-    frames = NULL;
-    snd_pcm_close(handle);
+#ifdef USE_ASYNC_THREAD
+    thread_args.quit = true;
+#endif
+    while (1)
+    {
+#ifdef USE_ASYNC_THREAD
+        pthread_cond_signal(&pcm_disabed_cond);
+#endif
+        switch (snd_pcm_state(handle))
+        {
+            case SND_PCM_STATE_RUNNING:
+            case SND_PCM_STATE_PAUSED:
+                pcm_play_lock();
+                pcm_play_stop();
+                pcm_play_unlock();
+                continue;
+
+            case SND_PCM_STATE_SETUP:
+#ifdef USE_ASYNC_THREAD
+                pthread_join(pcm_thread_id, NULL);
+#endif
+                free(frames);
+                frames = NULL;
+                return;
+
+            default:
+                /* all other states, just close and hopefully transition to _SETUP */
+                snd_pcm_close(handle);
+                continue;
+        }
+    }
 }
 
 
@@ -372,8 +463,13 @@ void pcm_play_dma_init(void)
         return;
     }
 
+#ifndef USE_ASYNC_THREAD
     if ((err = snd_pcm_nonblock(handle, 1)))
         printf("Could not set non-block mode: %s\n", snd_strerror(err));
+#else
+    if ((err = snd_pcm_nonblock(handle, 0)))
+        printf("Could not set block mode: %s\n", snd_strerror(err));
+#endif
 
     if ((err = set_hwparams(handle, rate)) < 0)
     {
@@ -388,7 +484,7 @@ void pcm_play_dma_init(void)
 
     pcm_dma_apply_settings();
 
-#ifdef USE_ASYNC_CALLBACK
+#if defined(USE_ASYNC_CALLBACK) || defined(USE_ASYNC_THREAD)
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -404,7 +500,7 @@ void pcm_play_dma_init(void)
 
 void pcm_play_lock(void)
 {
-#ifdef USE_ASYNC_CALLBACK
+#if defined(USE_ASYNC_CALLBACK) || defined(USE_ASYNC_THREAD)
     pthread_mutex_lock(&pcm_mtx);
 #else
     if (recursion++ == 0)
@@ -414,7 +510,7 @@ void pcm_play_lock(void)
 
 void pcm_play_unlock(void)
 {
-#ifdef USE_ASYNC_CALLBACK
+#if defined(USE_ASYNC_CALLBACK) || defined(USE_ASYNC_THREAD)
     pthread_mutex_unlock(&pcm_mtx);
 #else
     if (--recursion == 0)
@@ -439,12 +535,18 @@ void pcm_dma_apply_settings(void)
 void pcm_play_dma_pause(bool pause)
 {
     snd_pcm_pause(handle, pause);
+#ifdef USE_ASYNC_THREAD
+    pthread_cond_signal(&pcm_disabed_cond);
+#endif
 }
 
 
 void pcm_play_dma_stop(void)
 {
     snd_pcm_drain(handle);
+#ifdef USE_ASYNC_THREAD
+    pthread_cond_signal(&pcm_disabed_cond);
+#endif
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
@@ -456,10 +558,16 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     while (1)
     {
+        /* the state machine runs until STATE_RUNNING is detected */
         snd_pcm_state_t state = snd_pcm_state(handle);
         switch (state)
         {
             case SND_PCM_STATE_RUNNING:
+#ifdef USE_ASYNC_THREAD
+                /* transitioned to running from earier states,
+                 * time to let the thread run */
+                pthread_cond_signal(&pcm_disabed_cond);
+#endif
                 return;
             case SND_PCM_STATE_XRUN:
             {
@@ -482,12 +590,12 @@ void pcm_play_dma_start(const void *addr, size_t size)
                 int err = async_rw(handle);
                 if (err < 0)
                     printf("Start error: %s\n", snd_strerror(err));
-                return;
+                continue;
             }
             case SND_PCM_STATE_PAUSED:
             {   /* paused, simply resume */
-                pcm_play_dma_pause(0);
-                return;
+                snd_pcm_pause(handle, 0);
+                continue;
             }
             case SND_PCM_STATE_DRAINING:
                 /* run until drained */
