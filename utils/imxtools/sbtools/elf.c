@@ -694,12 +694,12 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
             elf_add_load_section(params, shdr[i].sh_addr, shdr[i].sh_size, data, sec_name);
             free(data);
 
-            printf(user, false, "create load segment for %s\n", sec_name);
+            printf(user, false, OFF, "create load segment for %s\n", sec_name);
         }
         else if(shdr[i].sh_type == SHT_NOBITS && shdr[i].sh_flags & SHF_ALLOC)
         {
             elf_add_fill_section(params, shdr[i].sh_addr, shdr[i].sh_size, 0, sec_name);
-            printf(user, false, "create fill segment for %s\n", sec_name);
+            printf(user, false, OFF, "create fill segment for %s\n", sec_name);
         }
         else if(shdr[i].sh_type == SHT_SYMTAB)
         {
@@ -714,7 +714,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
             Elf32_Sym *symdata = elf_load_section(&shdr[i], read, printf, user);
             if(!symdata)
             {
-                printf(user, true, "cannot read elf section %s\n", sec_name);
+                printf(user, true, GREY, "cannot read elf section %s\n", sec_name);
                 free(symstrtab);
                 goto Lerr;
             }
@@ -743,7 +743,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
                     case STT_OBJECT: sym->type = ESYT_OBJECT; break;
                     case STT_NOTYPE: default: sym->type = ESYT_NOTYPE; break;
                 }
-                printf(user, false, "add symbol %s at %#x, type %d, size %d, section %s\n",
+                printf(user, false, OFF, "add symbol %s at %#x, type %d, size %d, section %s\n",
                     sym->name, sym->addr, sym->type, sym->size, sym->section);
             }
             free(symdata);
@@ -751,7 +751,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
         }
         else
         {
-            printf(user, false, "filter out %s, type %d\n", sec_name, shdr[i].sh_type);
+            printf(user, false, OFF, "filter out %s, type %d\n", sec_name, shdr[i].sh_type);
         }
 
     }
