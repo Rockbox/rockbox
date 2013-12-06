@@ -874,14 +874,14 @@ int sd_num_drives(int first_drive)
     return _sd_num_drives;
 }
 
-bool sd_present(int sd_drive)
+bool sd_present(IF_MD_NONVOID(int sd_drive))
 {
-    return sdmmc_present(sd_map[sd_drive]);
+    return sdmmc_present(sd_map[IF_MD_DRV(sd_drive)]);
 }
 
-bool sd_removable(int sd_drive)
+bool sd_removable(IF_MD_NONVOID(int sd_drive))
 {
-    return sdmmc_removable(sd_map[sd_drive]);
+    return sdmmc_removable(sd_map[IF_MD_DRV(sd_drive)]);
 }
 
 long sd_last_disk_activity(void)
@@ -949,14 +949,14 @@ int mmc_num_drives(int first_drive)
     return _mmc_num_drives;
 }
 
-bool mmc_present(int mmc_drive)
+bool mmc_present(IF_MD_NONVOID(int mmc_drive))
 {
-    return sdmmc_present(mmc_map[mmc_drive]);
+    return sdmmc_present(mmc_map[IF_MD_DRV(mmc_drive)]);
 }
 
-bool mmc_removable(int mmc_drive)
+bool mmc_removable(IF_MD_NONVOID(int mmc_drive))
 {
-    return sdmmc_removable(mmc_map[mmc_drive]);
+    return sdmmc_removable(mmc_map[IF_MD_DRV(mmc_drive)]);
 }
 
 long mmc_last_disk_activity(void)
