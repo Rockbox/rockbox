@@ -1753,36 +1753,169 @@ KIND, either express or implied.
 </field>
 </reg>
 </dev>
-<dev name="EMICTRL" long_name="External Memory Interface" desc="External Memory Interface (EMI)" version="2.3.0">
-<addr name="EMICTRL" addr="0x80020000" />
-<field name="FTRST" bitrange="31:31">
+<dev name="EMI" long_name="External Memory Interface" desc="External Memory Interface (EMI)" version="2.4.0">
+<addr name="EMI" addr="0x80020000" />
+<reg name="CTRL" sct="yes">
+<addr name="CTRL" addr="0x0" />
+<field name="SFTRST" bitrange="31:31">
 </field>
-<field name="LKGATE" bitrange="30:30">
+<field name="CLKGATE" bitrange="30:30">
 </field>
-<field name="E3_MODE" bitrange="3:3">
+<field name="CE3_MODE" bitrange="3:3">
 <value name="STATIC" value="0x0">
 </value>
 <value name="DRAM" value="0x1">
 </value>
 </field>
-<field name="E2_MODE" bitrange="2:2">
+<field name="CE2_MODE" bitrange="2:2">
 <value name="STATIC" value="0x0">
 </value>
 <value name="DRAM" value="0x1">
 </value>
 </field>
-<field name="E1_MODE" bitrange="1:1">
+<field name="CE1_MODE" bitrange="1:1">
 <value name="STATIC" value="0x0">
 </value>
 <value name="DRAM" value="0x1">
 </value>
 </field>
-<field name="E0_MODE" bitrange="0:0">
+<field name="CE0_MODE" bitrange="0:0">
 <value name="STATIC" value="0x0">
 </value>
 <value name="DRAM" value="0x1">
 </value>
 </field>
+</reg>
+<reg name="STAT" sct="no">
+<addr name="STAT" addr="0x10" />
+<field name="DRAM_PRESENT" bitrange="31:31">
+</field>
+<field name="STATIC_PRESENT" bitrange="30:30">
+</field>
+<field name="LARGE_DRAM_ENABLED" bitrange="29:29">
+</field>
+<field name="WRITE_BUFFER_DATA" bitrange="1:1">
+<value name="EMPTY" value="0x0">
+</value>
+<value name="NOT_EMPTY" value="0x1">
+</value>
+</field>
+<field name="BUSY" bitrange="0:0">
+<value name="NOT_BUSY" value="0x0">
+</value>
+<value name="BUSY" value="0x1">
+</value>
+</field>
+</reg>
+<reg name="DEBUG" sct="no">
+<addr name="DEBUG" addr="0x20" />
+<field name="STATIC_STATE" bitrange="18:16">
+</field>
+<field name="DRAM_STATE" bitrange="4:0">
+</field>
+</reg>
+<reg name="DRAMSTAT" sct="no">
+<addr name="DRAMSTAT" addr="0x80" />
+<field name="SELF_REFRESH_ACK" bitrange="2:2">
+</field>
+<field name="BUSY" bitrange="1:1">
+</field>
+<field name="READY" bitrange="0:0">
+</field>
+</reg>
+<reg name="DRAMCTRL" sct="yes">
+<addr name="DRAMCTRL" addr="0x90" />
+<field name="EMICLK_DIVIDE" bitrange="26:24">
+</field>
+<field name="AUTO_EMICLK_GATE" bitrange="23:23">
+</field>
+<field name="EMICLK_ENABLE" bitrange="21:21">
+</field>
+<field name="EMICLKEN_ENABLE" bitrange="20:20">
+</field>
+<field name="DRAM_TYPE" bitrange="19:16">
+</field>
+<field name="PRECHARGE" bitrange="2:2">
+</field>
+<field name="SELF_REFRESH" bitrange="1:1">
+</field>
+</reg>
+<reg name="DRAMADDR" sct="yes">
+<addr name="DRAMADDR" addr="0xa0" />
+<field name="MODE" bitrange="8:8">
+<value name="RBC" value="0x0">
+</value>
+<value name="BRC" value="0x1">
+</value>
+</field>
+<field name="ROW_BITS" bitrange="7:4">
+</field>
+<field name="COLUMN_BITS" bitrange="3:0">
+</field>
+</reg>
+<reg name="DRAMMODE" sct="no">
+<addr name="DRAMMODE" addr="0xb0" />
+<field name="CAS_LATENCY" bitrange="6:4">
+<value name="RESERVED0" value="0x0">
+</value>
+<value name="RESERVED1" value="0x1">
+</value>
+<value name="CAS2" value="0x2">
+</value>
+<value name="CAS3" value="0x3">
+</value>
+<value name="RESERVED4" value="0x4">
+</value>
+<value name="RESERVED5" value="0x5">
+</value>
+<value name="RESERVED6" value="0x6">
+</value>
+<value name="RESERVED7" value="0x7">
+</value>
+</field>
+</reg>
+<reg name="DRAMTIME" sct="yes">
+<addr name="DRAMTIME" addr="0xc0" />
+<field name="TRFC" bitrange="27:24">
+</field>
+<field name="TRC" bitrange="23:20">
+</field>
+<field name="TRAS" bitrange="19:16">
+</field>
+<field name="TRCD" bitrange="15:12">
+</field>
+<field name="TRP" bitrange="9:8">
+</field>
+<field name="TXSR" bitrange="7:4">
+</field>
+<field name="REFRESH_COUNTER" bitrange="3:0">
+</field>
+</reg>
+<reg name="DRAMTIME2" sct="yes">
+<addr name="DRAMTIME2" addr="0xd0" />
+<field name="PRECHARGE_COUNT" bitrange="15:0">
+</field>
+</reg>
+<reg name="STATICCTRL" sct="yes">
+<addr name="STATICCTRL" addr="0x100" />
+<field name="MEM_WIDTH" bitrange="2:2">
+</field>
+<field name="WRITE_PROTECT" bitrange="1:1">
+</field>
+<field name="RESET_OUT" bitrange="0:0">
+</field>
+</reg>
+<reg name="STATICTIME" sct="yes">
+<addr name="STATICTIME" addr="0x110" />
+<field name="THZ" bitrange="27:24">
+</field>
+<field name="TDH" bitrange="19:16">
+</field>
+<field name="TDS" bitrange="11:8">
+</field>
+<field name="TAS" bitrange="3:0">
+</field>
+</reg>
 </dev>
 <dev name="GPMI" long_name="General Purpose Media Interface" desc="General Purpose Media Interface" version="2.3.0">
 <addr name="GPMI" addr="0x8000c000" />
