@@ -432,6 +432,8 @@ int main(int argc, char **argv)
     }
 
     struct cmd_file_t *cmd_file = db_parse_file(cmd_filename);
+    if(cmd_file == NULL)
+        bug("Error parsing command file\n");
     struct sb_file_t *sb_file = apply_cmd_file(cmd_file);
     db_free(cmd_file);
 
