@@ -563,7 +563,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
                 printf(YELLOW, "    Addr:");
                 printf(RED, " %#x\n", cmd->addr);
                 printf(YELLOW, "    Argument:");
-                printf(RED, " %#x\n", inst.pattern);
+                printf(RED, " %#x\n", inst.argument);
                 break;
             default:
                 printf(GREY, "WARNING: unknown SB command !\n");
@@ -652,7 +652,9 @@ void sb1_dump(struct sb1_file_t *file, void *u, generic_printf_t cprintf)
                 printf(SEP, " | ");
                 printf(TEXT3, "crit=%d", inst->critical);
                 printf(SEP, " | ");
-                printf(TEXT, "addr=0x%08x\n", inst->addr);
+                printf(TEXT, "addr=0x%08x", inst->addr);
+                printf(SEP, " | ");
+                printf(TEXT2, "arg=0x%08x\n", inst->argument);
                 break;
             case SB1_INST_LOAD:
                 printf(HEADER, "LOAD");
