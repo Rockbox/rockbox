@@ -1,8 +1,10 @@
+#if defined(CPU_ARM)
+asm/arm/memcpy.S
+asm/arm/memmove.S
+asm/arm/memset.S
+#endif
 main.c
 logf.c
-memcpy.S
-memmove.S
-memset.S
 string.c
 format.c
 #ifdef CONFIG_STMP
