@@ -74,3 +74,37 @@ function STMP.i2c.transmit(slave_addr, buffer, send_stop)
         return true
     end
 end
+
+function STMP.i2c.receive(slave_addr, length)
+    if length > 4 then
+        error("PIO mode cannot receive mode than 4 bytes at once")
+    end
+    -- send address
+    HW.I2C.CTRL0.RETAIN_CLOCK.set()
+    STMP.i2c.transmit(bit32.bor(slave_addr, 1), {}, false, true)
+    HW.I2C.CTRL0.DIRECTION.clr()
+    HW.I2C.CTRL0.XFER_COUNT.write(length)
+    HW.I2C.CTRL0.SEND_NAK_ON_LAST.set()
+    HW.I2C.CTRL0.POST_SEND_STOP.set()
+    HW.I2C.CTRL0.RETAIN_CLOCK.clr()
+    HW.I2C.CTRL0.RUN.set()
+    while HW.I2C.CTRL0.RUN.read() == 1 do
+    end
+    if HW.I2C.CTRL1.NO_SLAVE_ACK_IRQ.read() == 1 then
+        if STMP.is_imx233() then
+            HW.I2C.CTRL1.CLR_GOT_A_NAK.set()
+        end
+        STMP.i2c.reset()
+        return nil
+    end
+    if HW.I2C.CTRL1.EARLY_TERM_IRQ.read() == 1 or HW.I2C.CTRL1.MASTER_LOSS_IRQ.read() == 1 then
+        return nil
+    else
+        local data = HW.I2C.DATA.read()
+        local res = {}
+        for i = 0, length - 1 do
+            table.insert(res, bit32.band(0xff, bit32.rshift(data, 8 * i)))
+        end
+        return res
+    end
+end
