@@ -29,6 +29,7 @@
 #include "usb.h"
 #include "power-imx233.h"
 #include "touchpad.h"
+#include "stdio.h"
 
 #ifndef BOOTLOADER
 
