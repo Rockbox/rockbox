@@ -36,10 +36,13 @@ bool button_debug_screen(void)
 {
     char product_id[RMI_PRODUCT_ID_LEN];
     rmi_read(RMI_PRODUCT_ID, RMI_PRODUCT_ID_LEN, product_id);
+    uint8_t product_info[RMI_PRODUCT_INFO_LEN];
+    rmi_read(RMI_PRODUCT_INFO, RMI_PRODUCT_INFO_LEN, product_info);
+    char product_info_str[RMI_PRODUCT_INFO_LEN * 2 + 1];
+    for(int i = 0; i < RMI_PRODUCT_INFO_LEN; i++)
+        snprintf(product_info_str + 2 * i, 3, "%02x", product_info[i]);
     int x_max = rmi_read_single(RMI_2D_SENSOR_XMAX_MSB(0)) << 8 | rmi_read_single(RMI_2D_SENSOR_XMAX_LSB(0));
     int y_max = rmi_read_single(RMI_2D_SENSOR_YMAX_MSB(0)) << 8 | rmi_read_single(RMI_2D_SENSOR_YMAX_LSB(0));
-    int func_presence = rmi_read_single(RMI_FUNCTION_PRESENCE(RMI_2D_TOUCHPAD_FUNCTION));
-    int sensor_prop = rmi_read_single(RMI_2D_SENSOR_PROP2(0));
     int sensor_resol = rmi_read_single(RMI_2D_SENSOR_RESOLUTION(0));
     int min_dist = rmi_read_single(RMI_2D_MIN_DIST);
     int gesture_settings = rmi_read_single(RMI_2D_GESTURE_SETTINGS);
@@ -70,7 +73,7 @@ bool button_debug_screen(void)
     gesture_vp.y = zone_y - 80;
     gesture_vp.width = LCD_WIDTH / 2;
     gesture_vp.height = 80;
-    
+
     while(1)
     {
         unsigned char sleep_mode = rmi_read_single(RMI_DEVICE_CONTROL) & RMI_SLEEP_MODE_BM;
@@ -78,7 +81,7 @@ bool button_debug_screen(void)
         lcd_clear_display();
         int btns = button_read_device();
         lcd_putsf(0, 0, "button bitmap: %x", btns);
-        lcd_putsf(0, 1, "RMI: id=%s p=%x s=%x", product_id, func_presence, sensor_prop);
+        lcd_putsf(0, 1, "RMI: id=%s info=%s", product_id, product_info_str);
         lcd_putsf(0, 2, "xmax=%d ymax=%d res=%d", x_max, y_max, sensor_resol);
         lcd_putsf(0, 3, "attn=%d ctl=%x int=%x",
             imx233_pinctrl_get_gpio(0, 27) ? 0 : 1,
@@ -139,7 +142,7 @@ bool button_debug_screen(void)
                     break;
                 default: break;
             }
-            
+
             if(u.s.gesture.misc & RMI_2D_GEST_MISC_FLICK)
             {
                 lcd_putsf(0, 1, "FLICK!");
@@ -149,7 +152,7 @@ bool button_debug_screen(void)
                     if(a & 8) a = -((a ^ 0xf) + 1);
                 SIGN4EXT(flick_x);
                 SIGN4EXT(flick_y);
-                
+
                 int center_x = (LCD_WIDTH * 2) / 3;
                 int center_y = 40;
                 lcd_drawline(center_x, center_y, center_x + flick_x * 5, center_y - flick_y * 5);
@@ -173,7 +176,7 @@ bool button_debug_screen(void)
                 volkeys_delay_counter = 0;
             }
         }
-        
+
         yield();
     }
 

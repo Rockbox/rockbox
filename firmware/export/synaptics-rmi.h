@@ -26,6 +26,8 @@
 #define RMI_DEVICE_CONTROL          0x0 /* $0000 */
 #define RMI_INTERRUPT_ENABLE        0x1 /* $0001 */
 #define RMI_INTERRUPT_REQUEST       0x3 /* $0003 */
+#define RMI_PRODUCT_INFO            0x204 /* $0204 */
+#define RMI_PRODUCT_INFO_LEN        4
 #define RMI_PRODUCT_ID              0x210 /* $0210 */
 #define RMI_PRODUCT_ID_LEN          16
 #define RMI_2D_TOUCHPAD_FUNCTION       0x10

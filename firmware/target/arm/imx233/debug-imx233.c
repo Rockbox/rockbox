@@ -947,6 +947,7 @@ bool dbg_hw_info(void)
         lcd_update();
         yield();
     }
+    return false;
 }
 
 bool dbg_ports(void)
