@@ -558,7 +558,6 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
     struct mp3entry* pid3 = NULL;
     struct wps_state *state = skin_get_global_state();
     struct cuesheet *cue = state->id3 ? state->id3->cuesheet : NULL;
-    const char *fname = NULL;
     if (cue && cue->curr_track_idx + offset < cue->track_count)
         pid3 = state->id3;
     else if (offset == 0)
@@ -568,13 +567,13 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
     else
     {
         static char filename_buf[MAX_PATH + 1];
-        fname = playlist_peek(offset, filename_buf, sizeof(filename_buf));
-        *filename = (char*)fname;
+        playlist_peek(offset, filename_buf, sizeof(filename_buf));
+        *filename = (char*)filename_buf;
 #if CONFIG_CODEC == SWCODEC
         static struct mp3entry tempid3;
         if (
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-            tagcache_fill_tags(&tempid3, fname) ||
+            tagcache_fill_tags(&tempid3, filename_buf) ||
 #endif 
             audio_peek_track(&tempid3, offset)
         )
@@ -1014,7 +1013,9 @@ const char *get_token_value(struct gui_wps *gwps,
             return skinlist_needs_scrollbar(gwps->display->screen_type) ? "s" : "";
 #endif
         case SKIN_TOKEN_PLAYLIST_NAME:
-            return playlist_name(NULL, buf, buf_size);
+            if (!playlist_name(NULL, buf, buf_size))
+                return buf;
+            return NULL;
 
         case SKIN_TOKEN_PLAYLIST_POSITION:
             snprintf(buf, buf_size, "%d", playlist_get_display_index()+offset);
@@ -1897,5 +1898,3 @@ const char *get_token_value(struct gui_wps *gwps,
             return NULL;
     }
 }
-
-

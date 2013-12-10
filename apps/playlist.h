@@ -37,6 +37,19 @@
 
 #define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u8"
 
+enum playlist_err_codes {
+    PLAYLIST_ERROR_ACCESS_CONTROL  =  -1,
+    PLAYLIST_ERROR_UPDATE_CONTROL  =  -2,
+    PLAYLIST_ERROR_FORMAT_CONTROL  =  -3,
+    PLAYLIST_ERROR_ACCESS_PLAYLIST =  -4,
+    PLAYLIST_ERROR_EMPTY_PLAYLIST  =  -5,
+    PLAYLIST_ERROR_INDEX_EXCEEDED  =  -6,
+    PLAYLIST_ERROR_INDEX_INVALID   =  -7,
+    PLAYLIST_ERROR_NAME_INVALID    =  -8,
+    PLAYLIST_ERROR_ABORTED         =  -9,
+    PLAYLIST_ERROR_BUFFER_FULL     = -10,
+};
+
 enum playlist_command {
     PLAYLIST_COMMAND_PLAYLIST,
     PLAYLIST_COMMAND_ADD,
@@ -136,7 +149,7 @@ unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
 void playlist_resume_track(int start_index, unsigned int crc, int offset);
 void playlist_start(int start_index, int offset);
 bool playlist_check(int steps);
-const char *playlist_peek(int steps, char* buf, size_t buf_size);
+int playlist_peek(int steps, char* buf, size_t buf_size);
 int playlist_next(int steps);
 #if CONFIG_CODEC == SWCODEC
 bool playlist_next_dir(int direction);
@@ -176,9 +189,9 @@ bool playlist_modified(const struct playlist_info* playlist);
 int playlist_get_first_index(const struct playlist_info* playlist);
 int playlist_get_seed(const struct playlist_info* playlist);
 int playlist_amount_ex(const struct playlist_info* playlist);
-char *playlist_name(const struct playlist_info* playlist, char *buf,
+int playlist_name(const struct playlist_info* playlist, char *buf,
                     int buf_size);
-char *playlist_get_name(const struct playlist_info* playlist, char *buf,
+int playlist_get_name(const struct playlist_info* playlist, char *buf,
                         int buf_size);
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);

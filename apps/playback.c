@@ -1279,7 +1279,7 @@ static bool audio_get_track_metadata(int offset, struct mp3entry *id3)
        have and return that */
 
     char path[MAX_PATH+1];
-    if (playlist_peek(offset, path, sizeof (path)))
+    if (!playlist_peek(offset, path, sizeof (path)))
     {
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
         /* Try to get it from the database */
@@ -1751,17 +1751,15 @@ static int audio_load_track(void)
          playlist_peek_offset);
 
     /* Get track name from current playlist read position */
+    int result;
     int fd = -1;
-    char name_buf[MAX_PATH + 1];
-    const char *trackname;
+    char trackname[MAX_PATH + 1];
 
     while (1)
     {
-
-        trackname = playlist_peek(playlist_peek_offset, name_buf,
-                                  sizeof (name_buf));
-
-        if (!trackname)
+        result = playlist_peek(playlist_peek_offset, trackname,
+                               sizeof (trackname));
+        if (result < 0)
             break;
 
         /* Test for broken playlists by probing for the files */
@@ -1774,11 +1772,11 @@ static int audio_load_track(void)
         playlist_skip_entry(NULL, playlist_peek_offset);
 
         /* Sync the playlist if it isn't finished */
-        if (playlist_peek(playlist_peek_offset, NULL, 0))
+        if (!playlist_peek(playlist_peek_offset, NULL, 0))
             playlist_next(0);
     }
 
-    if (!trackname)
+    if (result < 0)
     {
         /* No track - exhausted the playlist entries */
         logf("End-of-playlist");
@@ -1996,7 +1994,7 @@ audio_finish_load_track_exit:
         track_info_close(info);
         track_list_unalloc_track();
 
-        if (playlist_peek(playlist_peek_offset, NULL, 0))
+        if (!playlist_peek(playlist_peek_offset, NULL, 0))
             playlist_next(0);
 
         playlist_peek_offset--;
@@ -2219,7 +2217,7 @@ static void audio_finalise_track_change(void)
         int playlist_delta = skip_pending == TRACK_SKIP_AUTO ? 1 : 0;
         audio_playlist_track_finish();
 
-        if (!playlist_peek(playlist_delta, NULL, 0))
+        if (playlist_peek(playlist_delta, NULL, 0) < 0)
         {
             /* Track ended up rejected - push things ahead like the codec blew
                it (because it was never started and now we're here where it
@@ -2393,7 +2391,7 @@ static void audio_on_codec_complete(int status)
             /* else rebuffer at this track; status applies to the track we
                want */
         }
-        else if (!playlist_peek(1, NULL, 0))
+        else if (playlist_peek(1, NULL, 0) < 0)
         {
             /* Play sequence is complete - directory change or other playlist
                resequencing - the playlist must now be advanced in order to

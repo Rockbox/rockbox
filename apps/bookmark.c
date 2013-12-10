@@ -131,14 +131,15 @@ int bookmark_load_menu(void)
 
     push_current_activity(ACTIVITY_BOOKMARKSLIST);
 
-    char* name = playlist_get_name(NULL, global_temp_buffer,
-                                       sizeof(global_temp_buffer));
-    if (generate_bookmark_file_name(name))
+    if (!playlist_get_name(NULL, global_temp_buffer, sizeof(global_temp_buffer)))
     {
-        ret = select_bookmark(global_bookmark_file_name, false, &bookmark);
-        if (bookmark != NULL)
+        if (generate_bookmark_file_name(global_temp_buffer))
         {
-            ret = play_bookmark(bookmark) ? BOOKMARK_SUCCESS : BOOKMARK_FAIL;
+            ret = select_bookmark(global_bookmark_file_name, false, &bookmark);
+            if (bookmark != NULL)
+            {
+                ret = play_bookmark(bookmark) ? BOOKMARK_SUCCESS : BOOKMARK_FAIL;
+            }
         }
     }
 
@@ -252,16 +253,20 @@ static bool write_bookmark(bool create_bookmark_file, const char *bookmark)
         /* writing the bookmark */
         if (create_bookmark_file)
         {
-            char* name = playlist_get_name(NULL, global_temp_buffer,
-                                       sizeof(global_temp_buffer));
-            if (generate_bookmark_file_name(name))
+            if (!playlist_get_name(NULL, global_temp_buffer,
+                                       sizeof(global_temp_buffer)))
             {
-                ret = ret & add_bookmark(global_bookmark_file_name, bookmark, false);
+                if (generate_bookmark_file_name(global_temp_buffer))
+                {
+                    ret = ret & add_bookmark(global_bookmark_file_name, bookmark, false);
+                }
+                else
+                {
+                    ret = false; /* generating bookmark file failed */
+                }
             }
             else
-            {
                 ret = false; /* generating bookmark file failed */
-            }
         }
     }
 
@@ -371,6 +376,8 @@ static char* create_bookmark()
         return NULL;
 
     /* create the bookmark */
+    global_temp_buffer[0] = '\0';
+    playlist_get_name(NULL, global_temp_buffer, sizeof(global_temp_buffer));
     snprintf(global_bookmark, sizeof(global_bookmark),
              /* new optional bookmark token descriptors should be inserted
                 just before the "%s;%s" in this line... */
@@ -397,8 +404,7 @@ static char* create_bookmark()
              (long)dsp_get_timestretch(),
 #endif
              /* more mandatory tokens */
-             playlist_get_name(NULL, global_temp_buffer,
-                sizeof(global_temp_buffer)),
+             global_temp_buffer /* <- playlist name */,
              file+1);
 
     /* checking to see if the bookmark is valid */
@@ -1116,11 +1122,11 @@ bool bookmark_exists(void)
 {
     bool exist=false;
 
-    char* name = playlist_get_name(NULL, global_temp_buffer,
-                                   sizeof(global_temp_buffer));
-    if (generate_bookmark_file_name(name))
+    if (!playlist_get_name(NULL, global_temp_buffer,
+                                   sizeof(global_temp_buffer)))
     {
-        exist = file_exists(global_bookmark_file_name);
+        if (generate_bookmark_file_name(global_temp_buffer))
+            exist = file_exists(global_bookmark_file_name);
     }
     return exist;
 }
@@ -1146,4 +1152,3 @@ bool bookmark_is_bookmarkable_state(void)
 
     return true;
 }
-

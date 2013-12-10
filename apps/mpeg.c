@@ -1004,7 +1004,6 @@ static int new_file(int steps)
     int i;
     struct trackdata *track;
     char name_buf[MAX_PATH+1];
-    const char *trackname;
 
     /* Find out how many steps to advance. The load_ahead_index field tells
        us how many playlist entries it had to skip to get to a valid one.
@@ -1020,15 +1019,14 @@ static int new_file(int steps)
     }
 
     do {
-        trackname = playlist_peek(start + steps, name_buf, sizeof(name_buf));
-        if ( !trackname )
+        if ( playlist_peek(start + steps, name_buf, sizeof(name_buf) < 0 )
             return -1;
 
-        DEBUGF("Loading %s\n", trackname);
+        DEBUGF("Loading %s\n", name_buf);
 
-        mpeg_file = open(trackname, O_RDONLY);
+        mpeg_file = open(name_buf, O_RDONLY);
         if(mpeg_file < 0) {
-            DEBUGF("Couldn't open file: %s\n",trackname);
+            DEBUGF("Couldn't open file: %s\n",name_buf);
             if(steps < 0)
                steps--;
             else
@@ -1036,7 +1034,7 @@ static int new_file(int steps)
         }
         else
         {
-            struct trackdata *track = add_track_to_tag_list(trackname);
+            struct trackdata *track = add_track_to_tag_list(name_buf);
 
             if(!track)
             {
@@ -2769,23 +2767,21 @@ void audio_play(long offset)
     audio_reset_buffer();
 #ifdef SIMULATOR
     char name_buf[MAX_PATH+1];
-    const char* trackname;
     int steps=0;
 
     is_playing = true;
 
     do {
-        trackname = playlist_peek(steps, name_buf, sizeof(name_buf));
-        if (!trackname)
+        if (playlist_peek(steps, name_buf, sizeof(name_buf)) < 0)
             break;
-        if(mp3info(&taginfo, trackname)) {
+        if(mp3info(&taginfo, name_buf)) {
             /* bad mp3, move on */
             if(++steps > playlist_amount())
                 break;
             continue;
         }
 #ifdef HAVE_MPEG_PLAY
-        real_mpeg_play(trackname);
+        real_mpeg_play(name_buf);
 #endif
         playlist_next(steps);
         taginfo.offset = offset;
@@ -2864,14 +2860,12 @@ void audio_next(void)
     queue_post(&mpeg_queue, MPEG_NEXT, 0);
 #else /* SIMULATOR */
     char name_buf[MAX_PATH+1];
-    const char* file;
     int steps = 1;
 
     do {
-        file = playlist_peek(steps, name_buf, sizeof(name_buf));
-        if(!file)
+        if(playlist_peek(steps, name_buf, sizeof(name_buf)) < 0)
             break;
-        if(mp3info(&taginfo, file)) {
+        if(mp3info(&taginfo, name_buf)) {
             if(++steps > playlist_amount())
                 break;
             continue;
@@ -2892,14 +2886,12 @@ void audio_prev(void)
     queue_post(&mpeg_queue, MPEG_PREV, 0);
 #else /* SIMULATOR */
     char name_buf[MAX_PATH+1];
-    const char* file;
     int steps = -1;
 
     do {
-        file = playlist_peek(steps, name_buf, sizeof(name_buf));
-        if(!file)
+        if(playlist_peek(steps, name_buf, sizeof(name_buf) < 0))
             break;
-        if(mp3info(&taginfo, file)) {
+        if(mp3info(&taginfo, name_buf)) {
             steps--;
             continue;
         }
