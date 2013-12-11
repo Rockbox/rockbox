@@ -25,6 +25,7 @@
 #include <inttypes.h>
 #include "config.h"
 #include "screen_access.h"
+#include "playlist.h"
 
 extern const unsigned char * const byte_units[];
 extern const unsigned char * const * const kbyte_units;
@@ -167,5 +168,7 @@ void push_current_activity(enum current_activity screen);
 void pop_current_activity(void);
 enum current_activity get_current_activity(void);
 
+int default_playlist_progress_handler(enum playlist_progress_type type,
+                                      bool start, bool end, int count);
 
 #endif /* MISC_H */

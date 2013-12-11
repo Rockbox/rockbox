@@ -33,8 +33,6 @@
 #define PLAYLIST_ATTR_SKIPPED   0x04
 #define PLAYLIST_MAX_CACHE      16
 
-#define PLAYLIST_DISPLAY_COUNT  10
-
 #define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u8"
 
 enum playlist_err_codes {
@@ -59,6 +57,12 @@ enum playlist_command {
     PLAYLIST_COMMAND_UNSHUFFLE,
     PLAYLIST_COMMAND_RESET,
     PLAYLIST_COMMAND_COMMENT
+};
+
+enum playlist_progress_type {
+    PLAYLIST_PROGRESS_INSERT,
+    PLAYLIST_PROGRESS_QUEUE,
+    PLAYLIST_PROGRESS_SAVE,
 };
 
 enum {
@@ -140,6 +144,8 @@ struct playlist_track_info
 /* Exported functions only for current playlist. */
 void playlist_init(void) INIT_ATTR;
 void playlist_shutdown(void);
+void playlist_register_progress_handler(int (*func)(enum playlist_progress_type type,
+        bool start, bool end, int count));
 int playlist_create(const char *dir, const char *file);
 int playlist_resume(void);
 int playlist_add(const char *filename);
@@ -197,7 +203,8 @@ int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);
 int playlist_save(struct playlist_info* playlist, char *filename);
 int playlist_directory_tracksearch(const char* dirname, bool recurse,
-                                   int (*callback)(char*, void*),
+                                   enum playlist_progress_type progress_type,
+                                   int (*callback)(char*, int, void*),
                                    void* context);
 int playlist_remove_all_tracks(struct playlist_info *playlist);
 

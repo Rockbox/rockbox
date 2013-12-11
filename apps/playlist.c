@@ -108,6 +108,8 @@
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
+#define PLAYLIST_START_PLAYBACK_COUNT  10
+
 /*
     Each playlist index has a flag associated with it which identifies what
     type of track it is.  These flags are stored in the 4 high order bits of
@@ -142,10 +144,12 @@ struct directory_search_context {
     struct playlist_info* playlist;
     int position;
     bool queue;
-    int count;
 };
 
 static struct playlist_info current_playlist;
+
+static int (*progress_handler)(enum playlist_progress_type type,
+                               bool start, bool end, int count);
 
 static void empty_playlist(struct playlist_info* playlist, bool resume);
 static int new_playlist(struct playlist_info* playlist, const char *dir,
@@ -160,7 +164,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 static int add_track_to_playlist(struct playlist_info* playlist,
                                  const char *filename, int position,
                                  bool queue, int seek_pos);
-static int directory_search_callback(char* filename, void* context);
+static int directory_search_callback(char* filename, int count, void* context);
 static int remove_track_from_playlist(struct playlist_info* playlist,
                                       int position, bool write);
 static int randomise_playlist(struct playlist_info* playlist,
@@ -181,8 +185,6 @@ static int get_previous_directory(char *dir);
 static int check_subdir_for_music(char *dir, const char *subdir, bool recurse);
 static int format_track_path(char *dest, char *src, int buf_length, int max,
                              const char *dir);
-static void display_playlist_count(int count, const unsigned char *fmt,
-                                   bool final);
 static int flush_cached_control(struct playlist_info* playlist);
 static int update_control(struct playlist_info* playlist,
                           enum playlist_command command, int i1, int i2,
@@ -806,7 +808,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
  * Callback for playlist_directory_tracksearch to insert track into
  * playlist.
  */
-static int directory_search_callback(char* filename, void* context)
+static int directory_search_callback(char* filename, int count, void* context)
 {
     struct directory_search_context* c =
         (struct directory_search_context*) context;
@@ -818,29 +820,15 @@ static int directory_search_callback(char* filename, void* context)
     if (insert_pos < 0)
         return -1;
     
-    (c->count)++;
-    
     /* Make sure tracks are inserted in correct order if user requests
        INSERT_FIRST */
     if (c->position == PLAYLIST_INSERT_FIRST || c->position >= 0)
         c->position = insert_pos + 1;
-    
-    if (((c->count)%PLAYLIST_DISPLAY_COUNT) == 0)
-    {
-        unsigned char* count_str;
 
-        if (c->queue)
-            count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-        else
-            count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-        display_playlist_count(c->count, count_str, false);
-        
-        if ((c->count) == PLAYLIST_DISPLAY_COUNT &&
+    if ((count) == PLAYLIST_START_PLAYBACK_COUNT &&
             (audio_status() & AUDIO_STATUS_PLAY) &&
             c->playlist->started)
-            audio_flush_and_reload_tracks();
-    }
+        audio_flush_and_reload_tracks();
 
     return 0;
 }
@@ -1764,29 +1752,6 @@ static int format_track_path(char *dest, char *src, int buf_length, int max,
     return 0;
 }
 
-/*
- * Display splash message showing progress of playlist/directory insertion or
- * save.
- */
-static void display_playlist_count(int count, const unsigned char *fmt,
-                                   bool final)
-{
-    static long talked_tick = 0;
-    long id = P2ID(fmt);
-    if(global_settings.talk_menu && id>=0)
-    {
-        if(final || (count && (talked_tick == 0
-                               || TIME_AFTER(current_tick, talked_tick+5*HZ))))
-        {
-            talked_tick = current_tick;
-            talk_number(count, false);
-            talk_id(id, true);
-        }
-    }
-    fmt = P2STR(fmt);
-
-    splashf(0, fmt, count, str(LANG_OFF_ABORT));
-}
 
 /*
  * Flush any cached control commands to disk.  Called when playlist is being
@@ -2032,6 +1997,12 @@ void playlist_shutdown(void)
 
         mutex_unlock(playlist->control_mutex);
     }
+}
+
+void playlist_register_progress_handler(int (*func)(
+        enum playlist_progress_type type, bool start, bool end, int count))
+{
+    progress_handler = func;
 }
 
 /*
@@ -3015,7 +2986,6 @@ int playlist_insert_directory(struct playlist_info* playlist,
                               bool recurse)
 {
     int result;
-    unsigned char *count_str;
     struct directory_search_context context;
 
     if (!playlist)
@@ -3033,28 +3003,19 @@ int playlist_insert_directory(struct playlist_info* playlist,
             return result;
     }
 
-    if (queue)
-        count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-    else
-        count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-    display_playlist_count(0, count_str, false);
-
     context.playlist = playlist;
     context.position = position;
     context.queue = queue;
-    context.count = 0;
     
     cpu_boost(true);
 
     result = playlist_directory_tracksearch(dirname, recurse,
+        queue ? PLAYLIST_PROGRESS_QUEUE : PLAYLIST_PROGRESS_INSERT,
         directory_search_callback, &context);
 
     sync_control(playlist, false);
 
     cpu_boost(false);
-
-    display_playlist_count(context.count, count_str, true);
 
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
@@ -3076,12 +3037,13 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     int max;
     char *temp_ptr;
     const char *dir;
-    unsigned char *count_str;
     char temp_buf[MAX_PATH+1];
     char trackname[MAX_PATH+1];
     int count = 0;
     int result = 0;
     bool utf8 = is_m3u8(filename);
+    enum playlist_progress_type type = queue ?
+            PLAYLIST_PROGRESS_QUEUE : PLAYLIST_PROGRESS_INSERT;
 
     if (!playlist)
         playlist = &current_playlist;
@@ -3101,12 +3063,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     else
         dir = "/";
 
-    if (queue)
-        count_str = ID2P(LANG_PLAYLIST_QUEUE_COUNT);
-    else
-        count_str = ID2P(LANG_PLAYLIST_INSERT_COUNT);
-
-    display_playlist_count(count, count_str, false);
+    if (progress_handler)
+        progress_handler(type, true, false, 0);
 
     if (position == PLAYLIST_REPLACE)
     {
@@ -3120,11 +3078,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     cpu_boost(true);
 
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
-    {
-        /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-            break;
-    
+    {    
         if (temp_buf[0] != '#' && temp_buf[0] != '\0')
         {
             int insert_pos;
@@ -3157,16 +3111,17 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
                 position = insert_pos + 1;
 
             count++;
-            
-            if ((count%PLAYLIST_DISPLAY_COUNT) == 0)
-            {
-                display_playlist_count(count, count_str, false);
 
-                if (count == PLAYLIST_DISPLAY_COUNT &&
-                    (audio_status() & AUDIO_STATUS_PLAY) &&
-                    playlist->started)
-                    audio_flush_and_reload_tracks();
+            if (progress_handler)
+            {
+                result = progress_handler(type, false, false, count);
+                if (result < 0)
+                    break; /* user abort */
             }
+            if (count == PLAYLIST_START_PLAYBACK_COUNT &&
+                (audio_status() & AUDIO_STATUS_PLAY) &&
+                playlist->started)
+                audio_flush_and_reload_tracks();
         }
 
         /* let the other threads work */
@@ -3182,7 +3137,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
     cpu_boost(false);
 
-    display_playlist_count(count, count_str, true);
+    if (progress_handler)
+        progress_handler(type, false, true, count);
 
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
@@ -3539,7 +3495,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         goto reset_old_buffer;
     }
 
-    display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
+    if (progress_handler)
+        progress_handler(PLAYLIST_PROGRESS_SAVE, true, false, 0);
 
     cpu_boost(true);
 
@@ -3549,13 +3506,6 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         bool control_file;
         bool queue;
         int seek;
-
-        /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-        {
-            result = -1;
-            break;
-        }
 
         control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
         queue = playlist->indices[index] & PLAYLIST_QUEUE_MASK;
@@ -3582,17 +3532,20 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
             count++;
 
-            if ((count % PLAYLIST_DISPLAY_COUNT) == 0)
-                display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT),
-                                       false);
-
+            if (progress_handler)
+            {
+                result = progress_handler(PLAYLIST_PROGRESS_SAVE, false, false, count);
+                if (result < 0)
+                    break; /* user abort */
+            }
             yield();
         }
 
         index = (index+1)%playlist->amount;
     }
 
-    display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), true);
+    if (progress_handler)
+        progress_handler(PLAYLIST_PROGRESS_SAVE, false, true, count);
 
     close(fd);
 
@@ -3650,20 +3603,18 @@ reset_old_buffer:
  * Search specified directory for tracks and notify via callback.  May be
  * called recursively.
  */
-int playlist_directory_tracksearch(const char* dirname, bool recurse,
-                                   int (*callback)(char*, void*),
-                                   void* context)
+static int walk_directories(const char* dirname, bool recurse,
+                            enum playlist_progress_type progress_type,
+                            int *count, int (*callback)(char*, int, void*),
+                            void* context)
 {
     char buf[MAX_PATH+1];
     int result = 0;
     int num_files = 0;
-    int i;;
+    int i;
     struct tree_context* tc = tree_get_context();
     struct tree_cache* cache = &tc->cache;
     int old_dirfilter = *(tc->dirfilter);
-
-    if (!callback)
-        return -1;
 
     /* use the tree browser dircache to load files */
     *(tc->dirfilter) = SHOW_ALL;
@@ -3674,7 +3625,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
         *(tc->dirfilter) = old_dirfilter;
         return -1;
     }
-
+    
     num_files = tc->filesindir;
 
     /* we've overwritten the dircache so tree browser will need to be
@@ -3683,13 +3634,6 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
 
     for (i=0; i<num_files; i++)
     {
-        /* user abort */
-        if (action_userabort(TIMEOUT_NOBLOCK))
-        {
-            result = -1;
-            break;
-        }
-
         struct entry *files = core_get_data(cache->entries_handle);
         if (files[i].attr & ATTR_DIRECTORY)
         {
@@ -3698,8 +3642,8 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
                 /* recursively add directories */
                 snprintf(buf, sizeof(buf), "%s/%s",
                             dirname[1]? dirname: "", files[i].name);
-                result = playlist_directory_tracksearch(buf, recurse,
-                    callback, context);
+                result = walk_directories(buf, recurse,
+                    progress_type, count, callback, context);
                 if (result < 0)
                     break;
 
@@ -3725,12 +3669,14 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
             snprintf(buf, sizeof(buf), "%s/%s",
                         dirname[1]? dirname: "", files[i].name);
 
-            if (callback(buf, context) != 0)
-            {
-                result = -1;
-                break;
-            }
+            /* include this file in count for the callback */
+            (*count) += 1;
+            result = callback(buf, (*count), context);
+            if (!result && progress_handler)
+                result = progress_handler(progress_type, false, false, (*count));
 
+            if (result < 0)
+                break;
             /* let the other threads work */
             yield();
         }
@@ -3738,6 +3684,27 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
 
     /* restore dirfilter */
     *(tc->dirfilter) = old_dirfilter;
+
+    return result;
+}
+
+int playlist_directory_tracksearch(const char* dirname, bool recurse,
+                                   enum playlist_progress_type progress_type,
+                                   int (*callback)(char*, int, void*),
+                                   void* context)
+{
+    int count, result;
+    if (!callback)
+        return -1;
+
+    if (progress_handler)
+        progress_handler(progress_type, true, false, 0);
+
+    count = 0;
+    result = walk_directories(dirname, recurse, progress_type, &count, callback, context);
+
+    if (progress_handler)
+        progress_handler(progress_type, false, true, count);
 
     return result;
 }

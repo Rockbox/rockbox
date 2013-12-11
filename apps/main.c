@@ -401,6 +401,7 @@ static void init(void)
     tree_mem_init();
     filetype_init();
     playlist_init();
+    playlist_register_progress_handler(default_playlist_progress_handler);
     shortcuts_init();
 
 #if CONFIG_CODEC != SWCODEC
@@ -695,6 +696,7 @@ static void init(void)
     }
 #endif
     playlist_init();
+    playlist_register_progress_handler(default_playlist_progress_handler);
     tree_mem_init();
     filetype_init();
 

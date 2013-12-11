@@ -1244,3 +1244,45 @@ enum current_activity get_current_activity(void)
 }
 
 #endif
+
+#define PLAYLIST_DISPLAY_COUNT  10
+
+int default_playlist_progress_handler(enum playlist_progress_type type,
+        bool start, bool end, int count)
+{
+    const unsigned char *fmt;
+    static const long ids[] = {
+        LANG_PLAYLIST_INSERT_COUNT,
+        LANG_PLAYLIST_QUEUE_COUNT,
+        LANG_PLAYLIST_SAVE_COUNT,
+    };
+    long id;
+
+    id = ids[type];
+    fmt = ID2P(id);
+
+    if ((count % PLAYLIST_DISPLAY_COUNT) == 0)
+    {
+        static long talked_tick = 0;
+        if(global_settings.talk_menu && id>=0)
+        {
+            if(end || (count && (talked_tick == 0
+                                   || TIME_AFTER(current_tick, talked_tick+5*HZ))))
+            {
+                talked_tick = current_tick;
+                talk_number(count, false);
+                talk_id(id, true);
+            }
+        }
+
+        splashf(0, P2STR(fmt), count, str(LANG_OFF_ABORT));
+    }
+
+    if (!start && !end)
+    {
+        if (action_userabort(TIMEOUT_NOBLOCK))
+            return PLAYLIST_ERROR_ABORTED;
+    }
+
+    return 0;
+}

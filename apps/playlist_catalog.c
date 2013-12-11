@@ -49,7 +49,6 @@
 /* Use for recursive directory search */
 struct add_track_context {
     int fd;
-    int count;
 };
 
 /* keep track of most recently used playlist */
@@ -178,34 +177,14 @@ restart:
     return result;
 }
 
-/* display number of tracks inserted into playlists.  Used for directory
-   insert */
-static void display_insert_count(int count)
-{
-    static long talked_tick = 0;
-    if(global_settings.talk_menu && count && 
-        (talked_tick == 0 || TIME_AFTER(current_tick, talked_tick+5*HZ)))
-    {
-        talked_tick = current_tick;
-        talk_number(count, false);
-        talk_id(LANG_PLAYLIST_INSERT_COUNT, true);
-    }
-
-    splashf(0, str(LANG_PLAYLIST_INSERT_COUNT), count, str(LANG_OFF_ABORT));
-}
-
 /* Add specified track into playlist.  Callback from directory insert */
-static int add_track_to_playlist(char* filename, void* context)
+static int add_track_to_playlist(char* filename, int count, void* context)
 {
+    (void) count;
     struct add_track_context* c = (struct add_track_context*) context;
 
     if (fdprintf(c->fd, "%s\n", filename) <= 0)
         return -1;
-
-    (c->count)++;
-
-    if (((c->count)%PLAYLIST_DISPLAY_COUNT) == 0)
-        display_insert_count(c->count);
 
     return 0;
 }
@@ -287,14 +266,9 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
         }
 
         context.fd = fd;
-        context.count = 0;
-
-        display_insert_count(0);
 
         result = playlist_directory_tracksearch(sel, recurse,
-            add_track_to_playlist, &context);
-
-        display_insert_count(context.count);
+            PLAYLIST_PROGRESS_INSERT, add_track_to_playlist, &context);
     }
 
 exit:
