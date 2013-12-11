@@ -8,7 +8,7 @@ this list of conditions and the following disclaimer.
 - Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-- Neither the name of Internet Society, IETF or IETF Trust, nor the 
+- Neither the name of Internet Society, IETF or IETF Trust, nor the
 names of specific contributors, may be used to endorse or promote
 products derived from this software without specific prior written
 permission.
@@ -32,7 +32,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "config.h"
 #endif
 
-/* This is an inline header file for general platform. */
+#include "opus_types.h"
+#include "opus_defines.h"
+
+/* This is an OPUS_INLINE header file for general platform. */
 
 /* (a32 * (opus_int32)((opus_int16)(b32))) >> 16 output have to be 32bit int */
 #define silk_SMULWB(a32, b32)            ((((a32) >> 16) * (opus_int32)((opus_int16)(b32))) + ((((a32) & 0x0000FFFF) * (opus_int32)((opus_int16)(b32))) >> 16))
@@ -78,12 +81,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "ecintrin.h"
 
-static inline opus_int32 silk_CLZ16(opus_int16 in16)
+static OPUS_INLINE opus_int32 silk_CLZ16(opus_int16 in16)
 {
     return 32 - EC_ILOG(in16<<16|0x8000);
 }
 
-static inline opus_int32 silk_CLZ32(opus_int32 in32)
+static OPUS_INLINE opus_int32 silk_CLZ32(opus_int32 in32)
 {
     return in32 ? 32 - EC_ILOG(in32) : 32;
 }
@@ -100,15 +103,15 @@ static inline opus_int32 silk_CLZ32(opus_int32 in32)
     (*((Matrix_base_adr) + ((row)+(M)*(column))))
 #endif
 
-#ifdef ARMv4_ASM
+#ifdef OPUS_ARM_INLINE_ASM
 #include "arm/macros_armv4.h"
 #endif
 
-#ifdef ARMv5E_ASM
+#ifdef OPUS_ARM_INLINE_EDSP
 #include "arm/macros_armv5e.h"
 #endif
 
-#ifdef CF_ASM
+#ifdef OPUS_CF_INLINE_ASM
 #include "cf/macros_cf.h"
 #endif
 

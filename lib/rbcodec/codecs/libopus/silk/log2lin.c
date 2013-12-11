@@ -8,7 +8,7 @@ this list of conditions and the following disclaimer.
 - Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-- Neither the name of Internet Society, IETF or IETF Trust, nor the 
+- Neither the name of Internet Society, IETF or IETF Trust, nor the
 names of specific contributors, may be used to endorse or promote
 products derived from this software without specific prior written
 permission.
@@ -41,7 +41,9 @@ opus_int32 silk_log2lin(
 
     if( inLog_Q7 < 0 ) {
         return 0;
-    }
+    } else if ( inLog_Q7 >= 3967 ) {
+		return silk_int32_MAX;
+	}
 
     out = silk_LSHIFT( 1, silk_RSHIFT( inLog_Q7, 7 ) );
     frac_Q7 = inLog_Q7 & 0x7F;

@@ -63,6 +63,7 @@ silk/tables_pitch_lag.c
 silk/tables_pulses_per_block.c
 
 /* OPUS sources */
+opus.c
 opus_decoder.c
 opus_header.c
 

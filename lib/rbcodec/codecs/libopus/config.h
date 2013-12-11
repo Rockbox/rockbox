@@ -41,14 +41,14 @@
 
 #if defined(CPU_ARM)
 #if ARM_ARCH == 4
-#define ARMv4_ASM
+#define OPUS_ARM_INLINE_ASM
 #elif ARM_ARCH > 4
-#define ARMv5E_ASM
+#define OPUS_ARM_INLINE_EDSP
 #endif
 #endif
 
 #if defined(CPU_COLDFIRE)
-#define CF_ASM
+#define OPUS_CF_INLINE_ASM
 #endif
 
 #endif /* CONFIG_H */

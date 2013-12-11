@@ -8,7 +8,7 @@ this list of conditions and the following disclaimer.
 - Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-- Neither the name of Internet Society, IETF or IETF Trust, nor the 
+- Neither the name of Internet Society, IETF or IETF Trust, nor the
 names of specific contributors, may be used to endorse or promote
 products derived from this software without specific prior written
 permission.
@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "main.h"
 
 /* Predictive dequantizer for NLSF residuals */
-static inline void silk_NLSF_residual_dequant(               /* O    Returns RD value in Q30                     */
+static OPUS_INLINE void silk_NLSF_residual_dequant(               /* O    Returns RD value in Q30                     */
           opus_int16         x_Q10[],                        /* O    Output [ order ]                            */
     const opus_int8          indices[],                      /* I    Quantization indices [ order ]              */
     const opus_uint8         pred_coef_Q8[],                 /* I    Backward predictor coefs [ order ]          */
