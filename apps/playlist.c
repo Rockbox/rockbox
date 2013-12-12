@@ -521,8 +521,6 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     if((i = lseek(playlist->fd, 0, SEEK_CUR)) > 0)
         playlist->utf8 = true; /* Override any earlier indication. */
 
-    splash(0, ID2P(LANG_WAIT));
-
     store_index = true;
 
     while(1)
@@ -2070,7 +2068,6 @@ int playlist_resume(void)
 
     empty_playlist(playlist, true);
 
-    splash(0, ID2P(LANG_WAIT));
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
     if (playlist->control_fd < 0)
     {
