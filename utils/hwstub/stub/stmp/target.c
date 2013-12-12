@@ -168,6 +168,15 @@ void clkctrl_reset(void)
 
 #define HW_USBPHY_CTRL          (*(volatile uint32_t *)(HW_USBPHY_BASE + 0x30))
 
+/**
+ *
+ * RTC
+ *
+ */
+#define HW_RTC_BASE             0x8005C000
+#define HW_RTC_CTRL             (*(volatile uint32_t *)(HW_RTC_BASE + 0))
+#define HW_RTC_CTRL__WATCHDOGEN (1 << 4)
+
 void target_init(void)
 {
     /* detect family */
@@ -194,6 +203,8 @@ void target_init(void)
     }
     else
         logf("cannot identify family: 0x%x\n", product_code);
+    /* disable watchdog */
+    __REG_CLR(HW_RTC_CTRL) = HW_RTC_CTRL__WATCHDOGEN;
 
     if(g_stmp_family == STMP3600)
     {
