@@ -1255,19 +1255,31 @@ int default_playlist_progress_handler(enum playlist_progress_type type,
         LANG_PLAYLIST_INSERT_COUNT,
         LANG_PLAYLIST_QUEUE_COUNT,
         LANG_PLAYLIST_SAVE_COUNT,
+        LANG_LOADING_PERCENT,
     };
     long id;
+    bool splash = false;
+    static long splashed_tick;
+    static long talked_tick;
 
     id = ids[type];
     fmt = ID2P(id);
 
-    if ((count % PLAYLIST_DISPLAY_COUNT) == 0)
+    if (start)
+        splashed_tick = talked_tick = current_tick;
+
+    /* Show progress earlier for percentage because that increases less
+     * often (and possibly does not increment by 1) */
+    if (type == PLAYLIST_PROGRESS_PERCENTAGE)
+        splash = true;
+    else
+        splash = (count % PLAYLIST_DISPLAY_COUNT) == 0;
+
+    if (splash || end)
     {
-        static long talked_tick = 0;
         if(global_settings.talk_menu && id>=0)
         {
-            if(end || (count && (talked_tick == 0
-                                   || TIME_AFTER(current_tick, talked_tick+5*HZ))))
+            if(end || TIME_AFTER(current_tick, talked_tick+5*HZ))
             {
                 talked_tick = current_tick;
                 talk_number(count, false);
@@ -1275,7 +1287,11 @@ int default_playlist_progress_handler(enum playlist_progress_type type,
             }
         }
 
-        splashf(0, P2STR(fmt), count, str(LANG_OFF_ABORT));
+        if(end || TIME_AFTER(current_tick, splashed_tick+HZ/4))
+        {
+            splashf(0, P2STR(fmt), count, str(LANG_OFF_ABORT));
+            splashed_tick = current_tick;
+        }
     }
 
     if (!start && !end)

@@ -2092,6 +2092,9 @@ int playlist_resume(void)
         goto out;
     }
 
+    if (progress_handler)
+        progress_handler(PLAYLIST_PROGRESS_PERCENTAGE, true, false, 0);
+
     playlist->started = true;
 
     while (1)
@@ -2107,25 +2110,20 @@ int playlist_resume(void)
         char *str1 = NULL;
         char *str2 = NULL;
         char *str3 = NULL;
-        unsigned long last_tick = current_tick;
         bool useraborted = false;
         
         for(count=0; count<nread && !exit_loop && !useraborted; count++,p++)
         {
-            /* So a splash while we are loading. */
-            if (TIME_AFTER(current_tick, last_tick + HZ/4))
+            if (progress_handler)
             {
-                splashf(0, str(LANG_LOADING_PERCENT), 
-                           (total_read+count)*100/control_file_size,
-                           str(LANG_OFF_ABORT));
-                if (action_userabort(TIMEOUT_NOBLOCK))
+                result = progress_handler(PLAYLIST_PROGRESS_PERCENTAGE, false,
+                                false, (total_read+count)*100/control_file_size);
+                if (result < 0)
                 {
                     useraborted = true;
                     break;
                 }
-                last_tick = current_tick;
             }
-            
             /* Are we on a new line? */
             if((*p == '\n') || (*p == '\r'))
             {
@@ -2431,6 +2429,9 @@ int playlist_resume(void)
             break;
         }
     }
+    
+    if (progress_handler)
+        progress_handler(PLAYLIST_PROGRESS_PERCENTAGE, false, true, 100);
 
 #ifdef HAVE_DIRCACHE
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
