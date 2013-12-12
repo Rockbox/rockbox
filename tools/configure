@@ -1315,35 +1315,35 @@ cat <<EOF
  96) Zen X-Fi             110) M6SL              60) Sansa Clipv2
  97) Zen X-Mozaic         111) M6SP              61) Sansa View
  98) Zen                  112) M3                62) Sansa Clip+
-                                                 63) Sansa Fuze v2
- ==Onda==                 ==Tatung==             64) Sansa Fuze+
- 120) VX747               150) Elio TPJ-1022     65) Sansa Clip Zip
- 121) VX767                                      66) Sansa Connect
- 122) VX747+              ==Packard Bell==
- 123) VX777               160) Vibe 500          ==Logik==
-                                                 80) DAX 1GB MP3/DAB
- ==Samsung==              ==MPIO==
- 140) YH-820              170) HD200             ==Lyre project==
- 141) YH-920              171) HD300             130) Lyre proto 1
- 142) YH-925                                     131) Mini2440
- 143) YP-S3
- 144) YP-Z5 ==ROCKCHIP==
-                          180) rk27xx generic    ==HiFiMAN==
- ==Application==                                 190) HM-60x
- 200) SDL                 ==HiFi E.T.==          191) HM-801
- 201) Android             210) MA9
- 202) Nokia N8xx          211) MA9C              ==Sony==
- 203) Nokia N900          212) MA8               220) NWZ-E370/E380 series
- 204) Pandora             213) MA8C              221) NWZ-E360 series
+ 99) Zen MX                                      63) Sansa Fuze v2
+                          ==Tatung==             64) Sansa Fuze+
+ ==Onda==                 150) Elio TPJ-1022     65) Sansa Clip Zip
+ 120) VX747                                      66) Sansa Connect
+ 121) VX767               ==Packard Bell==
+ 122) VX747+              160) Vibe 500          ==Logik==
+ 123) VX777                                      80) DAX 1GB MP3/DAB
+                          ==MPIO==
+ ==Samsung==              170) HD200             ==Lyre project==
+ 140) YH-820              171) HD300             130) Lyre proto 1
+ 141) YH-920                                     131) Mini2440
+ 142) YH-925
+ 143) YP-S3               ==ROCKCHIP==
+ 144) YP-Z5               180) rk27xx generic    ==HiFiMAN==
+                                                 190) HM-60x
+ ==Application==          ==HiFi E.T.==          191) HM-801
+ 200) SDL                 210) MA9
+ 201) Android             211) MA9C              ==Sony==
+ 202) Nokia N8xx          212) MA8               220) NWZ-E370/E380 series
+ 203) Nokia N900          213) MA8C              221) NWZ-E360 series
+ 204) Pandora
  205) Samsung YP-R0
  206) Android MIPS
  207) Android x86
  208) Samsung YP-R1
 
-==IHIFI==
+ ==IHIFI==
  230) 760
  231) 960
-
 EOF
 
   buildfor=`input`;
@@ -2391,6 +2391,25 @@ fi
     arm926ejscc
     ;;
 
+   99|creativezenmx)
+    target_id=91
+    modelname="creativezenmx"
+    target="CREATIVE_ZENMX"
+    memory=2
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=znmx"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenmx.creative"
+    appextra="gui:recorder:radio"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
 
    50|sansae200)
     target_id=23

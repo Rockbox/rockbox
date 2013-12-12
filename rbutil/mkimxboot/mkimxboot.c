@@ -85,11 +85,9 @@ struct imx_model_desc_t
 static const char *imx_fw_variant[] =
 {
     [VARIANT_DEFAULT] = "default",
-    [VARIANT_ZENXFI2_RECOVERY] = "ZEN X-Fi2 Recovery",
+    [VARIANT_RECOVERY] = "recovery",
     [VARIANT_ZENXFI2_NAND] = "ZEN X-Fi2 NAND",
     [VARIANT_ZENXFI2_SD] = "ZEN X-Fi2 eMMC/SD",
-    [VARIANT_ZENXFISTYLE_RECOVERY] = "ZEN X-Fi Style Recovery",
-    [VARIANT_ZENSTYLE_RECOVERY] = "ZEN Style 100/300 Recovery",
 };
 
 static const struct imx_md5sum_t imx_sums[] =
@@ -105,7 +103,7 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.23.01 */
         MODEL_ZENXFI2, "e37e2c24abdff8e624d0a29f79157850", "1.23.01",
         {
-            [VARIANT_ZENXFI2_RECOVERY] = { 602128, 684192},
+            [VARIANT_RECOVERY] = { 602128, 684192},
             [VARIANT_ZENXFI2_NAND] = { 1286320, 42406608 },
             [VARIANT_ZENXFI2_SD] = { 43692928, 42304208 }
         }
@@ -114,7 +112,7 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.23.01e */
         MODEL_ZENXFI2, "2beff2168212d332f13cfc36ca46989d", "1.23.01e",
         {
-            [VARIANT_ZENXFI2_RECOVERY] = { 0x93010, 684192},
+            [VARIANT_RECOVERY] = { 0x93010, 684192},
             [VARIANT_ZENXFI2_NAND] = { 0x13a0b0, 42410704 },
             [VARIANT_ZENXFI2_SD] = { 0x29ac380, 42304208 }
         }
@@ -146,7 +144,7 @@ static const struct imx_md5sum_t imx_sums[] =
         MODEL_ZENXFISTYLE, "32a731b7f714e9f99a95991003759c98", "1.03.04",
         {
             [VARIANT_DEFAULT] = {842960, 29876944},
-            [VARIANT_ZENXFISTYLE_RECOVERY] = {610272, 232688},
+            [VARIANT_RECOVERY] = {610272, 232688},
         }
     },
     {
@@ -154,7 +152,7 @@ static const struct imx_md5sum_t imx_sums[] =
         MODEL_ZENXFISTYLE, "2c7ee52d9984d85dd39aa49b3331e66c", "1.03.04e",
         {
             [VARIANT_DEFAULT] = {842960, 29876944},
-            [VARIANT_ZENXFISTYLE_RECOVERY] = {610272, 232688},
+            [VARIANT_RECOVERY] = {610272, 232688},
         }
     },
     {
@@ -162,7 +160,7 @@ static const struct imx_md5sum_t imx_sums[] =
         MODEL_ZENSTYLE, "dbebec8fe666412061d9740ff68605dd", "1.03.04e",
         {
             [VARIANT_DEFAULT] = {758848, 6641344},
-            [VARIANT_ZENSTYLE_RECOVERY] = {610272, 148576},
+            [VARIANT_RECOVERY] = {610272, 148576},
         }
     },
     /** Sony NWZ-E370 */
@@ -187,6 +185,15 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.00.00 */
         MODEL_NWZE370, "412f8ccd453195c0bebcc1fd8376322f", "1.00.00",
         { [VARIANT_DEFAULT] = {0, 16429056 } }
+    },
+    /** Creative ZEN MX */
+    {
+        /* Version 1.04.01 */
+        MODEL_ZENMX, "b04bafa46ffd7c7e70c27d79b350b4cc", "1.04.01",
+        {
+            [VARIANT_DEFAULT] = {438192, 29575888 },
+            [VARIANT_RECOVERY] = {30014080, 228192},
+        }
     }
 };
 
@@ -212,6 +219,8 @@ static const struct imx_model_desc_t imx_models[] =
                        1, &zero_key, 0, 0x40000000 },
     [MODEL_NWZE360] = {"NWZ-E360", dualboot_nwze360, sizeof(dualboot_nwze360), "e360", 89,
                        1, &zero_key, 0, 0x40000000 },
+    [MODEL_ZENMX] = {"Zen MX", dualboot_zenmx, sizeof(dualboot_zenmx), "znmx", 91,
+                     1, &zero_key, 0, 0x40000000 },
 };
 
 #define NR_IMX_SUMS     (sizeof(imx_sums) / sizeof(imx_sums[0]))
@@ -460,7 +469,7 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
              * Normal uses the standard ___, host, play sections and recovery only ____ */
             switch(variant)
             {
-                case VARIANT_ZENXFI2_RECOVERY:
+                case VARIANT_RECOVERY:
                 case VARIANT_ZENXFI2_NAND:
                 case VARIANT_ZENXFI2_SD:
                     return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
@@ -468,8 +477,13 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
                     return IMX_DONT_KNOW_HOW_TO_PATCH;
             }
             break;
+<<<<<<< HEAD
         case MODEL_ZENXFISTYLE:
             /* The ZEN X-Fi Style uses the standard ____, host, play sections, patch after first
+=======
+        case MODEL_ZENMX:
+            /* The Zen MX uses the standard ____, host, play sections, patch after first
+>>>>>>> Initial commit for the Creative ZEN MX
              * call in ____ section. */
             return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
         default:

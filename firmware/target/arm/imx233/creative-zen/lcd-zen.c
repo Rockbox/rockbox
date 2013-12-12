@@ -149,12 +149,6 @@ static void spi_write_reg(uint8_t reg, uint16_t value)
  * LCD control
  */
 
-static void lcd_power(bool en)
-{
-    imx233_pinctrl_set_gpio(1, 8, en);
-    mdelay(10);
-}
-
 static void lcd_power_seq(void)
 {
     spi_write_reg(0x7, 0);
@@ -170,11 +164,11 @@ static void lcd_power_seq(void)
 static void lcd_init_seq(void)
 {
     /* NOTE I don't understand why I have to use BGR, logic would say I should not */
-    spi_write_reg(0x1, 0x2b1d);// inversion
+    spi_write_reg(0x1, 0x2b1d); // inversion
     spi_write_reg(0x2, 0x300);
     /* NOTE by default stmp3700 has vsync/hsync active low and data launch
      * at negative edge of dotclk, reflect this in the polarity settings */
-    spi_write_reg(0x3, 0xd040);// polarity (OF uses 0xc040, seems incorrect)
+    spi_write_reg(0x3, 0xd040); // polarity (OF uses 0xc040, seems incorrect)
     spi_write_reg(0x8, 0); // vsync back porch (0=3H)
     spi_write_reg(0x9, 0); // hsync back porch (0=24clk)
     spi_write_reg(0x76, 0x2213);
@@ -246,8 +240,6 @@ void lcd_enable(bool enable)
         mdelay(1);
         imx233_lcdif_reset_lcd(true);
         mdelay(1);
-        // "power" on
-        lcd_power(true);
         // setup registers
         lcd_power_seq();
         lcd_init_seq();
@@ -260,7 +252,6 @@ void lcd_enable(bool enable)
     {
         // power down
         lcd_display_off_seq();
-        lcd_power(false);
         // stop lcdif
         BF_CLR(LCDIF_CTRL, DOTCLK_MODE);
         /* stmp37xx errata: clearing DOTCLK_MODE won't clear RUN: wait until
@@ -294,6 +285,8 @@ void lcd_init_device(void)
     imx233_pinctrl_set_function(1, 11, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_set_function(1, 8, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(1, 8, true);
+    imx233_pinctrl_set_gpio(1, 8, true);
+    mdelay(10);
     /** lcd is 320x240, data bus is 8-bit, depth is 24-bit so we need 3clk/pix
      * by running PIX clock at 24MHz we can sustain ~100 fps */
     imx233_clkctrl_enable(CLK_PIX, false);

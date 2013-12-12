@@ -188,7 +188,7 @@ bool button_debug_screen(void)
 
         yield();
     }
-
+    sleep(HZ * 2);
     return true;
 }
 

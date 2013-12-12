@@ -151,6 +151,17 @@ struct sdmmc_config_t sdmmc_config[] =
         .ssp = 1,
         .mode = SD_MODE,
     },
+#elif defined(CREATIVE_ZENMX)
+    /* The Zen MX uses pin #B2P03 for power*/
+    {
+        .name = "microSD",
+        .flags = POWER_PIN | REMOVABLE | DETECT_INVERTED | POWER_DELAY | WP_PIN,
+        .power_pin = PIN(2, 3),
+        .wp_pin = PIN(2, 4),
+        .power_delay = HZ / 10, /* extra delay, to ramp up voltage? */
+        .ssp = 1,
+        .mode = SD_MODE,
+    },
 #elif defined(CREATIVE_ZENMOZAIC)
     {
         .name = "internal/SD",

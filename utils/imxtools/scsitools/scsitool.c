@@ -629,12 +629,15 @@ static int do_info(void)
             serial_number_size = u.u32;
         }
 
-        len = serial_number_size;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER, &u.buf, &len);
-        if(!ret && len != 0)
+        if(serial_number_size > 0)
         {
-            cprintf(GREEN, "  Serial Number:");
-            print_hex(u.buf, len);
+            len = serial_number_size;
+            ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER, &u.buf, &len);
+            if(!ret && len != 0)
+            {
+                cprintf(GREEN, "  Serial Number:");
+                print_hex(u.buf, len);
+            }
         }
 
         len = 1;
@@ -747,7 +750,7 @@ static int do_info(void)
             }u;
             uint8_t drive = table.entry[i].drive_no;
             cprintf_field("  Drive ", "%02x\n", drive);
-            
+
             int len = 4;
             ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &u.u32, &len);
             if(!ret && len == 4)
@@ -842,12 +845,15 @@ static int do_info(void)
                 serial_number_size = u.u16;
             }
 
-            len = serial_number_size;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER, &u.buf, &len);
-            if(!ret && len != 0)
+            if(serial_number_size > 0)
             {
-                cprintf(GREEN, "    Serial Number:");
-                print_hex(u.buf, len);
+                len = serial_number_size;
+                ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER, &u.buf, &len);
+                if(!ret && len != 0)
+                {
+                    cprintf(GREEN, "    Serial Number:");
+                    print_hex(u.buf, len);
+                }
             }
 
             len = 1;

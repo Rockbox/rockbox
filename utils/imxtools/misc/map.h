@@ -243,11 +243,11 @@ struct pin_desc_t BANK(STMP3700,BGA169,0)[NR_PINS] =
     {{P(GPMI,"d8"), P(EMI,"a15"), RES, IO}}, /* B0P08 */
     {{P(GPMI,"d9"), P(EMI,"a16"), RES, IO}}, /* B0P09 */
     {{P(GPMI,"d10"), P(EMI,"a17"), RES, IO}}, /* B0P10 */
-    {{P(GPMI,"d11"), P(EMI,"a18"), P(GPMI,"ce0n"), IO}}, /* B0P11 */
-    {{P(GPMI,"d12"), P(EMI,"a19"), P(GPMI,"ce1n"), IO}}, /* B0P12 */
-    {{P(GPMI,"d13"), P(EMI,"a20"), P(GPMI,"ce2n"), IO}}, /* B0P13 */
-    {{P(GPMI,"d14"), P(EMI,"a21"), P(GPMI,"ce3n"), IO}}, /* B0P14 */
-    {{P(GPMI,"d15"), P(EMI,"a22"), RES, IO}}, /* B0P15 */
+    {{P(GPMI,"d11"), P(EMI,"a18"), RES, IO}}, /* B0P11 */
+    {{P(GPMI,"d12"), P(EMI,"a19"), P(GPMI,"ce0n"), IO}}, /* B0P12 */
+    {{P(GPMI,"d13"), P(EMI,"a20"), P(GPMI,"ce1n"), IO}}, /* B0P13 */
+    {{P(GPMI,"d14"), P(EMI,"a21"), P(GPMI,"ce2n"), IO}}, /* B0P14 */
+    {{P(GPMI,"d15"), P(EMI,"a22"), P(GPMI,"ce3n"), IO}}, /* B0P15 */
     {{P(GPMI,"a0"), P(EMI,"a23"), RES, IO}}, /* B0P16 */
     {{P(GPMI,"a1"), P(EMI,"a24"), RES, IO}}, /* B0P17 */
     {{P(GPMI,"a2"), P(EMI,"a25"), P(IrDA,"dout"), IO}}, /* B0P18 */

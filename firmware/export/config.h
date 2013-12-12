@@ -541,6 +541,8 @@ Lyre prototype 1 */
 #include "config/creativezenmozaic.h"
 #elif defined(CREATIVE_ZEN)
 #include "config/creativezen.h"
+#elif defined(CREATIVE_ZENMX)
+#include "config/creativezenmx.h"
 #elif defined(CREATIVE_ZENV)
 #include "config/creativezenv.h"
 #elif defined(MA9)

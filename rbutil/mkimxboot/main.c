@@ -34,11 +34,9 @@ struct imx_variant_t
 struct imx_variant_t imx_variants[] =
 {
     { "default", VARIANT_DEFAULT },
-    { "zenxfi2-recovery", VARIANT_ZENXFI2_RECOVERY },
+    { "recovery", VARIANT_RECOVERY },
     { "zenxfi2-nand", VARIANT_ZENXFI2_NAND },
     { "zenxfi2-sd", VARIANT_ZENXFI2_SD },
-    { "zenxfistyle-recovery", VARIANT_ZENXFISTYLE_RECOVERY },
-    { "zenstyle-recovery", VARIANT_ZENSTYLE_RECOVERY },
 };
 
 #define NR_VARIANTS sizeof(imx_variants) / sizeof(imx_variants[0])
