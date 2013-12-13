@@ -97,6 +97,73 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
 
 #ifdef HAVE_LCD_BITMAP
 
+
+#ifdef AB_REPEAT_ENABLE
+
+#define DIRECTION_RIGHT 1
+#define DIRECTION_LEFT -1
+
+static int ab_calc_mark_x_pos(int mark, int capacity, 
+        int offset, int size)
+{
+    return offset + ( (size * mark) / capacity );
+}
+
+static void ab_draw_vertical_line_mark(struct screen * screen,
+                                              int x, int y, int h)
+{
+    screen->set_drawmode(DRMODE_COMPLEMENT);
+    screen->vline(x, y, y+h-1);
+}
+
+static void ab_draw_arrow_mark(struct screen * screen,
+                                      int x, int y, int h, int direction)
+{
+    /* draw lines in decreasing size until a height of zero is reached */
+    screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    while( h > 0 )
+    {
+        screen->vline(x, y, y+h-1);
+        h -= 2;
+        y++;
+        x += direction;
+        screen->set_drawmode(DRMODE_COMPLEMENT);
+    }
+}
+
+void ab_draw_markers(struct screen * screen, int capacity, 
+                     int x, int y, int w, int h)
+{
+    bool a_set, b_set;
+    unsigned int a, b;
+    int xa, xb;
+
+    a_set = ab_get_A_marker(&a);
+    b_set = ab_get_B_marker(&b);
+    xa = ab_calc_mark_x_pos(a, capacity, x, w);
+    xb = ab_calc_mark_x_pos(b, capacity, x, w);
+    /* if both markers are set, determine if they're far enough apart
+    to draw arrows */
+    if ( a_set && b_set )
+    {
+        int arrow_width = (h+1) / 2;
+        if ( (xb-xa) < (arrow_width*2) )
+        {
+            ab_draw_vertical_line_mark(screen, xa, y, h);
+            ab_draw_vertical_line_mark(screen, xb, y, h);
+            return;
+        }
+    }
+
+    if (a_set)
+        ab_draw_arrow_mark(screen, xa, y, h, DIRECTION_RIGHT);
+
+    if (b_set)
+        ab_draw_arrow_mark(screen, xb, y, h, DIRECTION_LEFT);
+}
+
+#endif
+
 void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 {
     struct screen *display = gwps->display;
