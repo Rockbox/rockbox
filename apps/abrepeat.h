@@ -37,13 +37,12 @@ void ab_jump_to_A_marker(void);
 void ab_reset_markers(void);
 void ab_set_A_marker(unsigned int song_position);
 void ab_set_B_marker(unsigned int song_position);
+/* These return whether the marker are actually set.
+ * The actual positions are returned via output parameter */
+bool ab_get_A_marker(unsigned int *song_position);
+bool ab_get_B_marker(unsigned int *song_position);
 #if (CONFIG_CODEC == SWCODEC)
 void ab_end_of_track_report(void);
-#endif
-#ifdef HAVE_LCD_BITMAP
-#include "screen_access.h"
-void ab_draw_markers(struct screen * screen, int capacity,
-                     int x, int y, int w, int h);
 #endif
 
 /* These functions really need to be inlined for speed */

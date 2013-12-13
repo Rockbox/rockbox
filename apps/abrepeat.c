@@ -27,6 +27,7 @@
 unsigned int ab_A_marker IDATA_ATTR = AB_MARKER_NONE;
 unsigned int ab_B_marker IDATA_ATTR = AB_MARKER_NONE;
 
+
 static inline bool ab_A_marker_set(void)
 {
     return ab_A_marker != AB_MARKER_NONE;
@@ -36,6 +37,7 @@ static inline bool ab_B_marker_set(void)
 {
     return ab_B_marker != AB_MARKER_NONE;
 }
+
 
 #if (CONFIG_CODEC == SWCODEC)
 void ab_end_of_track_report(void)
@@ -158,67 +160,16 @@ void ab_set_B_marker(unsigned int song_position)
         ab_A_marker = AB_MARKER_NONE;
 }
 
-#ifdef HAVE_LCD_BITMAP
-
-static int ab_calc_mark_x_pos(int mark, int capacity, 
-        int offset, int size)
+bool ab_get_A_marker(unsigned *song_position)
 {
-    return offset + ( (size * mark) / capacity );
+    *song_position = ab_A_marker;
+    return ab_A_marker_set();
 }
 
-static void ab_draw_vertical_line_mark(struct screen * screen,
-                                              int x, int y, int h)
+bool ab_get_B_marker(unsigned *song_position)
 {
-    screen->set_drawmode(DRMODE_COMPLEMENT);
-    screen->vline(x, y, y+h-1);
+    *song_position = ab_B_marker;
+    return ab_B_marker_set();
 }
-
-#define DIRECTION_RIGHT 1
-#define DIRECTION_LEFT -1
-
-static void ab_draw_arrow_mark(struct screen * screen,
-                                      int x, int y, int h, int direction)
-{
-    /* draw lines in decreasing size until a height of zero is reached */
-    screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    while( h > 0 )
-    {
-        screen->vline(x, y, y+h-1);
-        h -= 2;
-        y++;
-        x += direction;
-        screen->set_drawmode(DRMODE_COMPLEMENT);
-    }
-}
-
-void ab_draw_markers(struct screen * screen, int capacity, 
-                     int x, int y, int w, int h)
-{
-    int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x, w);
-    int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x, w);
-    /* if both markers are set, determine if they're far enough apart
-    to draw arrows */
-    if ( ab_A_marker_set() && ab_B_marker_set() )
-    {
-        int arrow_width = (h+1) / 2;
-        if ( (xb-xa) < (arrow_width*2) )
-        {
-            ab_draw_vertical_line_mark(screen, xa, y, h);
-            ab_draw_vertical_line_mark(screen, xb, y, h);
-            return;
-        }
-    }
-
-    if (ab_A_marker_set())
-    {
-        ab_draw_arrow_mark(screen, xa, y, h, DIRECTION_RIGHT);
-    }
-    if (ab_B_marker_set())
-    {
-        ab_draw_arrow_mark(screen, xb, y, h, DIRECTION_LEFT);
-    }
-}
-
-#endif /* HAVE_LCD_BITMAP */
 
 #endif /* AB_REPEAT_ENABLE */
