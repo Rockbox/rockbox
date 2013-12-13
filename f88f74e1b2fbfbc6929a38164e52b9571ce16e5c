@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_37521814",
+        "filename": "lib/rbcodec/metadata/flac.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-13T12:17:59Z",
+      "side": 1,
+      "message": "Do not use id3-\u003eid3v2buf, it holds strings for other tags. Instead, id3-\u003epath can be used as a temp buffer. This file already uses it above through the buf variable. id3-\u003epath is MAX_PATH (260) bytes long so it should be more than sufficient for the PICTURE_BLOCK",
+      "revId": "f88f74e1b2fbfbc6929a38164e52b9571ce16e5c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
