@@ -588,6 +588,8 @@ static const struct plugin_api rockbox_api = {
     mixer_channel_set_amplitude,
     mixer_channel_get_bytes_waiting,
     mixer_channel_set_buffer_hook,
+    mixer_set_frequency,
+    mixer_get_frequency,
 
     system_sound_play,
     keyclick_click,
@@ -797,11 +799,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-#if CONFIG_CODEC == SWCODEC
-    mixer_set_frequency,
-    mixer_get_frequency,
-#endif
 };
 
 int plugin_load(const char* plugin, const void* parameter)
