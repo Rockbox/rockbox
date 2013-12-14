@@ -575,6 +575,7 @@ bool set_time_screen(const char* title, struct tm *tm)
 #endif /* defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0) */
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
+#include "scroll_engine.h"
 bool shutdown_screen(void)
 {
     int button;

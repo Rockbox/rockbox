@@ -413,7 +413,7 @@ void LCDFN(clear_viewport)(void)
 
         current_vp->drawmode = lastmode;
 
-        LCDFN(scroll_stop)(current_vp);
+        LCDFN(scroll_stop_viewport)(current_vp);
     }
 }
 
