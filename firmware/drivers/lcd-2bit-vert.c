@@ -387,7 +387,7 @@ void lcd_clear_viewport(void)
 
         current_vp->drawmode = lastmode;
 
-        lcd_scroll_stop(current_vp);
+        lcd_scroll_stop_viewport(current_vp);
     }
 }
 

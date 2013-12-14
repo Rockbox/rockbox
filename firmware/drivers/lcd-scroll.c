@@ -132,10 +132,10 @@ static void LCDFN(scroll_worker)(void)
     struct scroll_screen_info *si = &LCDFN(scroll_info);
     struct scrollinfo *s;
     struct viewport *vp;
+    int step;
 
-    unsigned fg_pattern, bg_pattern, drawmode;
-
-    for ( index = 0; index < si->lines; index++ ) {
+    for ( index = 0; index < si->lines; index++ )
+    {
         s = &si->scroll[index];
 
         /* check pause */
@@ -154,14 +154,19 @@ static void LCDFN(scroll_worker)(void)
 
         width = LCDFN(getstringsize)(s->linebuffer, NULL, NULL);
         makedelay = false;
-        
+#ifdef HAVE_LCD_BITMAP
+        step = si->step;
+#else
+        step = 1;
+#endif
+
         if (s->backward)
-            s->offset -= si->step;
+            s->offset -= step;
         else
-            s->offset += si->step;
+            s->offset += step;
 
-        if (s->bidir) { /* scroll bidirectional */
-
+        if (s->bidir)
+        {   /* scroll bidirectional */
             s->line = s->linebuffer;
             if (s->offset <= 0) {
                 /* at beginning of line */
@@ -169,15 +174,15 @@ static void LCDFN(scroll_worker)(void)
                 s->backward = false;
                 makedelay = true;
             }
-            else if (s->offset >= width - (s->width - s->x)) {
+            else if (s->offset >= width - s->width) {
                 /* at end of line */
-                s->offset = width - (s->width - s->x);
+                s->offset = width - s->width;
                 s->backward = true;
                 makedelay = true;
             }
         }
-        else {
-
+        else
+        {
             snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
                 s->linebuffer, "   ", s->linebuffer);
             s->line = line_buf;
@@ -191,17 +196,26 @@ static void LCDFN(scroll_worker)(void)
 
         /* Stash and restore these three, so that the scroll_func
          * can do whatever it likes without destroying the state */
+#ifdef HAVE_LCD_BITMAP
+        unsigned drawmode;
+#if LCD_DEPTH > 1
+        unsigned fg_pattern, bg_pattern;
         fg_pattern = s->vp->fg_pattern;
         bg_pattern = s->vp->bg_pattern;
+#endif
         drawmode   = s->vp->drawmode;
-
+#endif
         s->scroll_func(s);
+
         LCDFN(update_viewport_rect)(s->x, s->y, s->width, s->height);
 
+#ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1
         s->vp->fg_pattern = fg_pattern;
         s->vp->bg_pattern = bg_pattern;
+#endif
         s->vp->drawmode = drawmode;
-
+#endif
         LCDFN(set_viewport)(vp);
 
         if (makedelay)

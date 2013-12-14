@@ -195,6 +195,7 @@ extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 extern void lcd_set_viewport(struct viewport* vp);
 extern void lcd_update(void);
 extern void lcd_update_viewport(void);
+extern void lcd_update_viewport_rect(int x, int y, int width, int height);
 extern void lcd_clear_viewport(void);
 extern void lcd_clear_display(void);
 extern void lcd_putsxy(int x, int y, const unsigned char *string);
@@ -234,7 +235,6 @@ extern void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
 
 /* update a fraction of the screen */
 extern void lcd_update_rect(int x, int y, int width, int height);
-extern void lcd_update_viewport_rect(int x, int y, int width, int height);
 
 #ifdef HAVE_REMOTE_LCD
 extern void lcd_remote_update(void);

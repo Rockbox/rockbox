@@ -24,6 +24,7 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#include "scroll_engine.h"
 #include "thread.h"
 #include "kernel.h"
 #include "button.h"

@@ -62,9 +62,6 @@ struct scrollinfo
     struct viewport* vp;
     char linebuffer[9*MAX_PATH/10];
     const char *line;
-#ifdef HAVE_LCD_CHARCELLS
-    int len;    /* length of line in chars */
-#endif
     /* rectangle for the line */
     int x, y; /* relative to the viewort */
     int width, height;
