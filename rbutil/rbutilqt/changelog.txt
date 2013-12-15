@@ -17,5 +17,7 @@ Version 1.4
 * Add Changelog window.
 * Rework System Trace functionality.
 * Add support for H300 v1.31K firmware.
+* Add support for Sandisk Sansa Clip Zip v01.01.21 firmware.
+* Fix manual link for Archos Recorder V2.
 
 
