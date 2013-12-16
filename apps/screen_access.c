@@ -91,6 +91,15 @@ static void screen_helper_setuifont(int font)
 }
 #endif
 
+static void screen_helper_set_drawmode(int mode)
+{
+#ifdef HAVE_LCD_BITMAP
+    lcd_set_drawmode(mode);
+#else
+    (void) mode;
+#endif
+}
+
 #if NB_SCREENS == 2
 static int screen_helper_remote_getcharwidth(void)
 {
@@ -172,6 +181,7 @@ struct screen screens[NB_SCREENS] =
 #elif defined(HAVE_REMOTE_LCD)
         .has_disk_led=true,
 #endif
+        .set_drawmode=&screen_helper_set_drawmode,
         .set_viewport=&lcd_set_viewport,
         .getwidth=&lcd_getwidth,
         .getheight=&lcd_getheight,
@@ -182,7 +192,6 @@ struct screen screens[NB_SCREENS] =
         .setuifont=screen_helper_setuifont,
         .mono_bitmap=&lcd_mono_bitmap,
         .mono_bitmap_part=&lcd_mono_bitmap_part,
-        .set_drawmode=&lcd_set_drawmode,
         .bitmap=(screen_bitmap_func*)&lcd_bitmap,
         .bitmap_part=(screen_bitmap_part_func*)&lcd_bitmap_part,
 #if LCD_DEPTH <= 2
@@ -284,6 +293,7 @@ struct screen screens[NB_SCREENS] =
         .getcharwidth=screen_helper_remote_getcharwidth,
         .getcharheight=screen_helper_remote_getcharheight,
         .has_disk_led=false,
+        .set_drawmode=&lcd_remote_set_drawmode,
         .set_viewport=&lcd_remote_set_viewport,
         .getwidth=&lcd_remote_getwidth,
         .getheight=&lcd_remote_getheight,
@@ -296,7 +306,6 @@ struct screen screens[NB_SCREENS] =
         .mono_bitmap_part=&lcd_remote_mono_bitmap_part,
         .bitmap=(screen_bitmap_func*)&lcd_remote_bitmap,
         .bitmap_part=(screen_bitmap_part_func*)&lcd_remote_bitmap_part,
-        .set_drawmode=&lcd_remote_set_drawmode,
 #if LCD_REMOTE_DEPTH <= 2
         /* No transparency yet for grayscale and mono lcd */
         .transparent_bitmap=(screen_bitmap_func*)&lcd_remote_bitmap,
