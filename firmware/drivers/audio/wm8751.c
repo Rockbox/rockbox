@@ -277,6 +277,7 @@ void audiohw_postinit(void)
 
 #if defined(MROBE_100)
     /* enable headphone output */
+    sleep(1);
     GPIOL_OUTPUT_VAL &= ~0x10;
     GPIOL_OUTPUT_EN  |=  0x10;
 #elif defined(MPIO_HD200)
