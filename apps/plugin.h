@@ -113,6 +113,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "crc32.h"
 #include "rbpaths.h"
 #include "core_alloc.h"
+#include "screen_access.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"

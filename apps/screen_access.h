@@ -26,6 +26,7 @@
 #include "buttonbar.h"
 #include "scroll_engine.h"
 #include "backdrop.h"
+#include "line.h"
 
 #if defined(HAVE_REMOTE_LCD) && !defined (ROCKBOX_HAS_LOGF)
 #define NB_SCREENS 2
@@ -177,6 +178,7 @@ struct screen
     void (*nine_segment_bmp)(const struct bitmap* bm, int x, int y,
                                 int width, int height);
 #endif
+    void (*put_line)(int x, int y, struct line_desc *line, const char *fmt, ...);
 };
 
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)
