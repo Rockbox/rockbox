@@ -24,6 +24,7 @@
 
 #include "lcd.h"
 #include "buttonbar.h"
+#include "scroll_engine.h"
 #include "backdrop.h"
 
 #if defined(HAVE_REMOTE_LCD) && !defined (ROCKBOX_HAS_LOGF)
@@ -143,6 +144,9 @@ struct screen
     void (*puts_scroll)(int x, int y, const unsigned char *string);
     void (*puts_scroll_offset)(int x, int y, const unsigned char *string,
                                  int x_offset);
+    void (*putsxy_scroll_func)(int x, int y, const unsigned char *string,
+                               void (*scroll_func)(struct scrollinfo *),
+                               void *data, int x_offset);
     void (*scroll_speed)(int speed);
     void (*scroll_delay)(int ms);
     void (*clear_display)(void);
