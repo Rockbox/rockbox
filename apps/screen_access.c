@@ -268,6 +268,7 @@ struct screen screens[NB_SCREENS] =
         .set_framebuffer = (void*)lcd_set_framebuffer,
 #if defined(HAVE_LCD_COLOR)    
         .gradient_fillrect = lcd_gradient_fillrect,
+        .gradient_fillrect_part = lcd_gradient_fillrect_part,
 #endif
 #endif
     },
