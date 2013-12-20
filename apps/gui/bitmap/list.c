@@ -41,8 +41,10 @@
 #include "viewport.h"
 #include "statusbar-skinned.h"
 #include "debug.h"
+#include "line.h"
 
 #define ICON_PADDING 1
+#define ICON_PADDING_S "1"
 
 /* these are static to make scrolling work */
 static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
@@ -52,10 +54,12 @@ static int y_offset;
 static bool hide_selection;
 #endif
 
+/* list-private helpers from the generic list.c (move to header?) */
 int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
                              int text_pos, struct screen * display,
                              struct viewport *vp);
 bool list_display_title(struct gui_synclist *list, enum screen_type screen);
+int list_get_nb_lines(struct gui_synclist *list, enum screen_type screen);
 
 void gui_synclist_scroll_stop(struct gui_synclist *lists)
 {
@@ -87,16 +91,11 @@ static int list_icon_width(enum screen_type screen)
     return get_icon_width(screen) + ICON_PADDING * 2;
 }
 
-static int list_icon_height(enum screen_type screen)
-{
-    return get_icon_height(screen);
-}
-
 static bool draw_title(struct screen *display, struct gui_synclist *list)
 {
     const int screen = display->screen_type;
-    int style = STYLE_DEFAULT;
     struct viewport *title_text_vp = &title_text[screen];
+    struct line_desc line = LINE_DESC_DEFINIT;
 
     if (sb_set_title_text(list->title, list->title_icon, screen))
         return false; /* the sbs is handling the title */
@@ -104,65 +103,46 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
     if (!list_display_title(list, screen))
         return false;
     *title_text_vp = *(list->parent[screen]);
-    title_text_vp->height = title_text_vp->line_height;
+    line.height = list->line_height[screen];
+    title_text_vp->height = line.height;
 
-    if (list->title_icon != Icon_NOICON && global_settings.show_icons)
-    {
-        struct viewport title_icon = *title_text_vp;
-
-        title_icon.width = list_icon_width(screen);
-        title_icon.y += (title_icon.height - list_icon_height(screen)) / 2;
-        title_icon.height = list_icon_height(screen);
-        if (VP_IS_RTL(&title_icon))
-        {
-            title_icon.x += title_text_vp->width - title_icon.width;
-        }
-        else
-        {
-            title_text_vp->x += title_icon.width;
-        }
-        title_text_vp->width -= title_icon.width;
-
-        display->set_viewport(&title_icon);
-        screen_put_iconxy(display, ICON_PADDING, 0, list->title_icon);
-    }
 #ifdef HAVE_LCD_COLOR
     if (list->title_color >= 0)
-    {
-        style |= (STYLE_COLORED|list->title_color);
-    }
+        line.style |= (STYLE_COLORED|list->title_color);
 #endif
+    line.scroll = true;
+
     display->set_viewport(title_text_vp);
-    display->puts_scroll_style(0, 0, list->title, style);
+
+    if (list->title_icon != Icon_NOICON && global_settings.show_icons)
+        put_line(display, 0, 0, &line, "$"ICON_PADDING_S"I$t",
+                 list->title_icon, list->title);
+    else
+        put_line(display, 0, 0, &line, "$t", list->title);
+
     return true;
 }
 
 void list_draw(struct screen *display, struct gui_synclist *list)
 {
-    struct viewport list_icons;
-    int start, end, line_height, style, item_offset, i;
+    int start, end, item_offset, i;
     const int screen = display->screen_type;
     const int list_start_item = list->start_item[screen];
-    const int icon_width = list_icon_width(screen);
     const bool scrollbar_in_left = (global_settings.scrollbar == SCROLLBAR_LEFT);
     const bool scrollbar_in_right = (global_settings.scrollbar == SCROLLBAR_RIGHT);
     const bool show_cursor = !global_settings.cursor_style &&
                         list->show_selection_marker;
+    const bool have_icons = global_settings.show_icons && list->callback_get_item_icon;
     struct viewport *parent = (list->parent[screen]);
-#ifdef HAVE_LCD_COLOR
-    unsigned char cur_line = 0;
-#endif
-    int icon_yoffset = 0; /* to center the icon */
+    struct line_desc linedes = LINE_DESC_DEFINIT;
     bool show_title;
     struct viewport *list_text_vp = &list_text[screen];
     int indent = 0;
 
-    line_height = parent->line_height;
     display->set_viewport(parent);
     display->clear_viewport();
     display->scroll_stop_viewport(list_text_vp);
     *list_text_vp = *parent;
-    list_text_vp->line_height = line_height;
     if ((show_title = draw_title(display, list)))
     {
         int title_height = title_text[screen].height;
@@ -170,7 +150,10 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         list_text_vp->height -= title_height;
     }
 
-    const int nb_lines = viewport_get_nb_lines(list_text_vp);
+    const int nb_lines = list_get_nb_lines(list, screen);
+
+    linedes.height = list->line_height[screen];
+    linedes.nlines = list->selected_size;
 
     start = list_start_item;
     end = start + nb_lines;
@@ -185,7 +168,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     {
         /* make it negative for more consistent apparence when switching
          * directions */
-        draw_offset -= line_height;
+        draw_offset -= linedes.height;
         if (start > 0)
             start--;
     }
@@ -196,110 +179,71 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 #endif
 
     /* draw the scrollbar if its needed */
-    if (global_settings.scrollbar && nb_lines < list->nb_items)
+    if (global_settings.scrollbar != SCROLLBAR_OFF)
     {
-        struct viewport vp = *list_text_vp;
-        vp.width = SCROLLBAR_WIDTH;
-        vp.height = line_height * nb_lines;
-        vp.x = parent->x;
-        list_text_vp->width -= SCROLLBAR_WIDTH;
-        if (scrollbar_in_left)
-            list_text_vp->x += SCROLLBAR_WIDTH;
-        else
-            vp.x += list_text_vp->width;
-        display->set_viewport(&vp);
-        gui_scrollbar_draw(display,
-                (scrollbar_in_left? 0: 1), 0, SCROLLBAR_WIDTH-1, vp.height,
-                list->nb_items, list_start_item, list_start_item + nb_lines,
-                VERTICAL);
-    }
-    else if (show_title)
-    {
-        /* shift everything a bit in relation to the title... */
-        if (!VP_IS_RTL(list_text_vp) && scrollbar_in_left)
+        /* if the scrollbar is shown the text viewport needs to shrink */
+        if (nb_lines < list->nb_items)
         {
+            struct viewport vp = *list_text_vp;
+            vp.width = SCROLLBAR_WIDTH;
+            vp.height = linedes.height * nb_lines;
             list_text_vp->width -= SCROLLBAR_WIDTH;
-            list_text_vp->x += SCROLLBAR_WIDTH;
+            if (scrollbar_in_right)
+                vp.x += list_text_vp->width;
+            else /* left */
+                list_text_vp->x += SCROLLBAR_WIDTH;
+            display->set_viewport(&vp);
+            gui_scrollbar_draw(display,
+                    (scrollbar_in_left? 0: 1), 0, SCROLLBAR_WIDTH-1, vp.height,
+                    list->nb_items, list_start_item, list_start_item + nb_lines,
+                    VERTICAL);
         }
+        /* shift everything a bit in relation to the title */
+        else if (!VP_IS_RTL(list_text_vp) && scrollbar_in_left)
+            indent += SCROLLBAR_WIDTH;
         else if (VP_IS_RTL(list_text_vp) && scrollbar_in_right)
-        {
-            list_text_vp->width -= SCROLLBAR_WIDTH;
-        }
-    }
-
-    /* setup icon placement */
-    list_icons = *list_text_vp;
-    int icon_count = (list->callback_get_item_icon != NULL) ? 1 : 0;
-    if (show_cursor)
-        icon_count++;
-    if (icon_count)
-    {
-        list_icons.width = icon_width * icon_count;
-        list_text_vp->width -= list_icons.width + ICON_PADDING;
-        if (VP_IS_RTL(&list_icons))
-            list_icons.x += list_text_vp->width + ICON_PADDING;
-        else
-            list_text_vp->x += list_icons.width + ICON_PADDING;
-        icon_yoffset = (line_height - list_icon_height(screen)) / 2;
+            indent += SCROLLBAR_WIDTH;
     }
 
     for (i=start; i<end && i<list->nb_items; i++)
     {
         /* do the text */
+        enum themable_icons icon;
         unsigned const char *s;
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
         int text_pos = 0;
         int line = i - start;
-        indent = 0;
+        int line_indent = 0;
+        int style = STYLE_DEFAULT;
+        bool is_selected = false;
+        icon = list->callback_get_item_icon ?
+                    list->callback_get_item_icon(i, list->data) : Icon_NOICON;
         s = list->callback_get_item_name(i, list->data, entry_buffer,
                                          sizeof(entry_buffer));
         entry_name = P2STR(s);
 
         while (*entry_name == '\t')
         {
-            indent++;
+            line_indent++;
             entry_name++;
         }
-        if (indent)
+        if (line_indent)
         {
-            if (icon_width)
-                indent *= icon_width;
+            if (global_settings.show_icons)
+                line_indent *= list_icon_width(screen);
             else
-                indent *= display->getcharwidth();
-
-            if (VP_IS_RTL(&list_icons))
-            {
-                list_icons.x -= indent;
-            }
-            else
-            {
-                list_icons.x += indent;
-                list_text_vp->x += indent;
-            }
-            list_text_vp->width -= indent;
+                line_indent *= display->getcharwidth();
         }
+        line_indent += indent;
 
         display->set_viewport(list_text_vp);
-        style = STYLE_DEFAULT;
         /* position the string at the correct offset place */
         int item_width,h;
         display->getstringsize(entry_name, &item_width, &h);
         item_offset = gui_list_get_item_offset(list, item_width, text_pos,
                 display, list_text_vp);
 
-#ifdef HAVE_LCD_COLOR
-        /* if the list has a color callback */
-        if (list->callback_get_item_color)
-        {
-            int color = list->callback_get_item_color(i, list->data);
-            /* if color selected */
-            if (color >= 0)
-            {
-                style |= STYLE_COLORED|color;
-            }
-        }
-#endif
         /* draw the selected line */
         if(
 #ifdef HAVE_TOUCHSCREEN
@@ -327,73 +271,53 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             {
                 /* Display colour line selector */
                 style = STYLE_COLORBAR;
+                linedes.text_color = global_settings.lst_color;
+                linedes.line_color = global_settings.lss_color;
             }
             else if (global_settings.cursor_style == 3)
             {
                 /* Display gradient line selector */
                 style = STYLE_GRADIENT;
-
-                /* Make the lcd driver know how many lines the gradient should
-                   cover and current line number */
-                /* number of selected lines */
-                style |= NUMLN_PACK(list->selected_size);
-                /* current line number, zero based */
-                style |= CURLN_PACK(cur_line);
-                cur_line++;
+                linedes.text_color = global_settings.lst_color;
+                linedes.line_color = global_settings.lss_color;
+                linedes.line_end_color = global_settings.lse_color;
             }
 #endif
-            /* if the text is smaller than the viewport size */
-            if (item_offset> item_width - (list_text_vp->width - text_pos))
-            {
-                /* don't scroll */
-                display->puts_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
-            }
-            else
-            {
-                display->puts_scroll_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
+            is_selected = true;
+        }
+        
+#ifdef HAVE_LCD_COLOR
+        /* if the list has a color callback */
+        if (list->callback_get_item_color)
+        {
+            int c = list->callback_get_item_color(i, list->data);
+            if (c >= 0)
+            {   /* if color selected */
+                linedes.text_color = c;
+                style |= STYLE_COLORED;
             }
         }
+#endif
+
+        linedes.style = style;
+        linedes.scroll = is_selected ?: list->scroll_all;
+        linedes.line = i % list->selected_size;
+
+        /* the list can have both, one of or neither of cursor and item icons,
+         * if both don't apply icon padding twice between the icons */
+        if (show_cursor && have_icons)
+            put_line(display, 0, line * linedes.height + draw_offset,
+                    &linedes, "$*s$"ICON_PADDING_S"I$i$"ICON_PADDING_S"s$*t",
+                    line_indent, is_selected ? Icon_Cursor : Icon_NOICON,
+                    icon, item_offset, entry_name);
+        else if (show_cursor || have_icons)
+            put_line(display, 0, line * linedes.height + draw_offset,
+                    &linedes, "$*s$"ICON_PADDING_S"I$*t", line_indent,
+                    show_cursor ? (is_selected ? Icon_Cursor:Icon_NOICON):icon,
+                    item_offset, entry_name);
         else
-        {
-            if (list->scroll_all)
-                display->puts_scroll_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
-            else
-                display->puts_style_xyoffset(0, line, entry_name,
-                        style, item_offset, draw_offset);
-        }
-        /* do the icon */
-        display->set_viewport(&list_icons);
-        if (list->callback_get_item_icon != NULL)
-        {
-            int xoff = show_cursor ? list_icon_width(screen) : ICON_PADDING;
-            screen_put_iconxy(display, xoff,
-                            line*line_height + draw_offset + icon_yoffset,
-                            list->callback_get_item_icon(i, list->data));
-        }
-        /* do the cursor */
-        if (show_cursor && i >= list->selected_item &&
-                i <  list->selected_item + list->selected_size)
-        {
-            screen_put_iconxy(display, ICON_PADDING,
-                            line*line_height + draw_offset + icon_yoffset,
-                            Icon_Cursor);
-        }
-        if (indent)
-        {
-            if (VP_IS_RTL(&list_icons))
-            {
-                list_icons.x += indent;
-            }
-            else
-            {
-                list_icons.x -= indent;
-                list_text_vp->x -= indent;
-            }
-            list_text_vp->width += indent;
-        }
+            put_line(display, 0, line * linedes.height + draw_offset,
+                    &linedes, "$*s$*t", line_indent, item_offset, entry_name);
     }
     display->set_viewport(parent);
     display->update_viewport();
@@ -417,13 +341,13 @@ static int scrollbar_scroll(struct gui_synclist * gui_list,
                                               int y)
 {
     const int screen = screens[SCREEN_MAIN].screen_type;
-    const int nb_lines = viewport_get_nb_lines(&list_text[screen]);
+    const int nb_lines = list_get_nb_lines(gui_list, screen);
 
     if (nb_lines <  gui_list->nb_items)
     {
         /* scrollbar scrolling is still line based */
         y_offset = 0;
-        int scrollbar_size = nb_lines*gui_list->parent[screen]->line_height;
+        int scrollbar_size = nb_lines*gui_list->line_height[screen];
         int actual_y = y - list_text[screen].y;
 
         int new_selection = (actual_y * gui_list->nb_items)
@@ -547,8 +471,8 @@ static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
 {
     /* fixme */
     const enum screen_type screen = screens[SCREEN_MAIN].screen_type;
-    const int nb_lines = viewport_get_nb_lines(&list_text[screen]);
-    const int line_height = gui_list->parent[0]->line_height;
+    const int nb_lines = list_get_nb_lines(gui_list, screen);
+    const int line_height = gui_list->line_height[screen];
 
     if (UNLIKELY(scroll_begin_threshold == 0))
         scroll_begin_threshold = touchscreen_get_scroll_threshold();
@@ -752,7 +676,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     
     screen = SCREEN_MAIN;
     parent = list->parent[screen];
-    line_height = list->parent[screen]->line_height;
+    line_height = list->line_height[screen];
     list_start_item = list->start_item[screen];
     /* start with getting the action code and finding the click location */
     action = action_get_touchscreen_press(&x, &y);
