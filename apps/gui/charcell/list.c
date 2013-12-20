@@ -49,9 +49,8 @@ void gui_synclist_scroll_stop(struct gui_synclist *lists)
 
 void list_draw(struct screen *display, struct gui_synclist *gui_list)
 {
-    int text_pos;
     bool draw_icons = (gui_list->callback_get_item_icon != NULL);
-    bool draw_cursor;
+    bool selected;
     int i;
     int start, end;
 
@@ -61,12 +60,13 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
     start = 0;
     end = display->getnblines();
 
-    /* Adjust the position of icon, cursor, text for the list */
-    draw_cursor = true;
-    if(draw_icons)
-        text_pos = 2; /* here it's in chars */
-    else
-        text_pos = 1;
+    struct line_desc desc = {
+        .height = -1,
+        .text_color = 1,
+        .line_color = 1,
+        .line_end_color = 1,
+        .style = STYLE_DEFAULT
+    };
 
     for (i = start; i < end; i++)
     {
@@ -85,43 +85,26 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
                                              sizeof(entry_buffer));
         entry_name = P2STR(s);
 
-
-        if(gui_list->show_selection_marker &&
-           current_item >= gui_list->selected_item &&
-           current_item <  gui_list->selected_item + gui_list->selected_size)
-        {/* The selected item must be displayed scrolling */
-            display->puts_scroll(text_pos, i, entry_name);
-
-            if (draw_cursor)
-            {
-                screen_put_icon_with_offset(display, 0, i,
-                                           (draw_scrollbar || SHOW_LIST_TITLE)?
-                                                   SCROLLBAR_WIDTH: 0,
-                                           0, Icon_Cursor);
-            }
-        }
+        if (gui_list->show_selection_marker &&
+                current_item >= gui_list->selected_item &&
+                current_item <  gui_list->selected_item + gui_list->selected_size)
+            selected = true; /* The selected item must be displayed scrolling */
         else
-        {/* normal item */
-            if(gui_list->scroll_all)
-            {
-                display->puts_scroll(text_pos, i, entry_name);
-            }
-            else
-            {
-                display->puts(text_pos, i, entry_name);
-            }
-        }
-        /* Icons display */
-        if(draw_icons)
-        {
-            enum themable_icons icon;
-            icon = gui_list->callback_get_item_icon(current_item,
-                                                    gui_list->data);
-            if(icon > Icon_NOICON)
-            {
-                screen_put_icon(display, 1, i, icon);
-            }
-        }
+            selected = false;
+
+        desc.nlines = gui_list->selected_size,
+        desc.line = gui_list->selected_size > 1 ? i : 0,
+        desc.scroll = selected ? true : gui_list->scroll_all;
+
+        if (draw_icons)
+            put_line(display, 0, i, &desc, "$i$i$t",
+                selected ? Icon_Cursor : Icon_NOICON,
+                gui_list->callback_get_item_icon(current_item, gui_list->data),
+                entry_name);
+        else
+            put_line(display, 0, i, &desc, "$i$t",
+                selected ? Icon_Cursor : Icon_NOICON, 
+                entry_name);
     }
 
     display->update_viewport();
