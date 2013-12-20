@@ -59,7 +59,7 @@ struct skin_draw_info {
     struct skin_viewport *skin_vp;
     int line_number;
     unsigned long refresh_type;
-    unsigned text_style;
+    struct line_desc line_desc;
     
     char* cur_align_start;
     struct align_pos align;
@@ -105,6 +105,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #ifdef HAVE_LCD_BITMAP
     struct wps_data *data = gwps->data;
     bool do_refresh = (element->tag->flags & info->refresh_type) > 0;
+    struct line_desc *linedes = &info->line_desc;
 #endif
     switch (token->type)
     {   
@@ -124,16 +125,33 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         }
         break;
         case SKIN_TOKEN_VIEWPORT_TEXTSTYLE:
-            info->text_style = token->value.l;
-            break;
+        {
+            struct line_desc *data = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            /* gradient colors are handled with a separate tag
+             * (SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP, see below). since it may
+             * come before the text style tag color fields need to be preserved */
+            if (data->style & STYLE_GRADIENT)
+            {
+                fb_data tc  = linedes->text_color,
+                        lc  = linedes->line_color,
+                        lec = linedes->line_end_color;
+                *linedes = *data;
+                linedes->text_color     = tc;
+                linedes->line_color     = lc;
+                linedes->line_end_color = lec;
+            }
+            else
+                *linedes = *data;
+        }
+        break;
 #endif
 #ifdef HAVE_LCD_COLOR
         case SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP:
         {
             struct gradient_config *cfg = SKINOFFSETTOPTR(skin_buffer, token->value.data);
-            vp->lss_pattern = cfg->start;
-            vp->lse_pattern = cfg->end;
-            vp->lst_pattern = cfg->text;
+            linedes->text_color     = cfg->text;
+            linedes->line_color     = cfg->start;
+            linedes->line_end_color = cfg->end;
         }
         break;
 #endif
@@ -713,7 +731,7 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         .refresh_type = refresh_type,
         .skin_vp = skin_viewport,
         .offset = 0,
-        .text_style = STYLE_DEFAULT
+        .line_desc = LINE_DESC_DEFINIT,
     };
     
     struct align_pos * align = &info.align;
@@ -742,14 +760,10 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         info.line_scrolls = false;
         info.force_redraw = false;
 #ifdef HAVE_LCD_COLOR
-        if (info.text_style&STYLE_GRADIENT)
+        if (info.line_desc.style&STYLE_GRADIENT)
         {
-            int cur = CURLN_UNPACK(info.text_style);
-            int num = NUMLN_UNPACK(info.text_style);
-            if (cur+1 == num)
-                info.text_style = STYLE_DEFAULT;
-            else
-                info.text_style = STYLE_GRADIENT|CURLN_PACK(cur+1)|NUMLN_PACK(num);
+            if (++info.line_desc.line > info.line_desc.nlines)
+                info.line_desc.style = STYLE_DEFAULT;
         }
 #endif    
         info.cur_align_start = info.buf;
@@ -783,7 +797,7 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
                     0, info.line_number*display->getcharheight(),
                     skin_viewport->vp.width, display->getcharheight());
             write_line(display, align, info.line_number,
-                    info.line_scrolls, info.text_style);
+                    info.line_scrolls, &info.line_desc);
         }
         if (!info.no_line_break)
             info.line_number++;
@@ -917,7 +931,7 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
         .refresh_type = refresh_type,
         .skin_vp = skin_viewport,
         .offset = viewer->start_offset,
-        .text_style = STYLE_DEFAULT
+        .line_desc = LINE_DESC_DEFINIT,
     };
     
     struct align_pos * align = &info.align;
@@ -975,7 +989,7 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
                     0, info.line_number*display->getcharheight(),
                     vp->width, display->getcharheight());
             write_line(display, align, info.line_number,
-                    info.line_scrolls, info.text_style);
+                    info.line_scrolls, &info.line_desc);
         }
         info.line_number++;
         info.offset++;

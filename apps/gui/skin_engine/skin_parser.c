@@ -589,20 +589,22 @@ static int parse_viewporttextstyle(struct skin_element *element,
                                    struct wps_data *wps_data)
 {
     (void)wps_data;
-    int style;
     char *mode = get_param_text(element, 0);
+    struct line_desc *line = skin_buffer_alloc(sizeof(*line));
+    *line = (struct line_desc)LINE_DESC_DEFINIT;
     unsigned colour;
 
     if (!strcmp(mode, "invert"))
     {
-        style = STYLE_INVERT;
+        line->style = STYLE_INVERT;
     }
     else if (!strcmp(mode, "colour") || !strcmp(mode, "color"))
     {
         if (element->params_count < 2 ||
             !parse_color(curr_screen, get_param_text(element, 1), &colour))
             return 1;
-        style = STYLE_COLORED|(STYLE_COLOR_MASK&colour);
+        line->style = STYLE_COLORED;
+        line->text_color = colour;
     }
 #ifdef HAVE_LCD_COLOR
     else if (!strcmp(mode, "gradient"))
@@ -614,16 +616,18 @@ static int parse_viewporttextstyle(struct skin_element *element,
               * will select the number for something which looks like a colour
               * making the "colour" case (above) harder to parse */
             num_lines = atoi(get_param_text(element, 1));
-        style = STYLE_GRADIENT|NUMLN_PACK(num_lines)|CURLN_PACK(0);
+        line->style = STYLE_GRADIENT;
+        line->nlines = num_lines;
     }
 #endif
     else if (!strcmp(mode, "clear"))
     {
-        style = STYLE_DEFAULT;
+        line->style = STYLE_DEFAULT;
     }
     else
         return 1;
-    token->value.l = style;
+
+    token->value.data = PTRTOSKINOFFSET(skin_buffer, line);
     return 0;
 }
 

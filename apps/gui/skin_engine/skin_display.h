@@ -53,7 +53,7 @@ int evaluate_conditional(struct gui_wps *gwps, int offset,
    scroll indicates whether the line is a scrolling one or not.
 */
 void write_line(struct screen *display, struct align_pos *format_align,
-                int line, bool scroll, unsigned style);
+                int line, bool scroll, struct line_desc *line_desc);
 void draw_peakmeters(struct gui_wps *gwps, int line_number,
                      struct viewport *viewport);
 #endif
