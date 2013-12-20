@@ -563,6 +563,16 @@ void lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
     lcd_scroll_info.lines++;
 }
 
+void lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
+                                     void (*scroll_func)(struct scrollinfo *),
+                                     void *data, int x_offset)
+{
+    if (!scroll_func)
+        lcd_putsxyofs(x, y, x_offset, string);
+    else
+        lcd_puts_scroll_worker(x, y, string, x_offset, scroll_func, data);
+}
+
 void lcd_scroll_fn(struct scrollinfo* s)
 {
     lcd_putsxyofs(s->x, s->y, s->offset, s->line);

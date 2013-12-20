@@ -196,6 +196,9 @@ extern void lcd_remote_puts_scroll_style_xyoffset(int x, int y,
                                                   const unsigned char *string,
                                                   int style, int x_offset,
                                                   int y_offset);
+extern void lcd_remote_putsxy_scroll_func(int x, int y, const unsigned char *string,
+                                          void (*scroll_func)(struct scrollinfo *),
+                                          void *data, int x_offset);
 
 extern void lcd_remote_update(void);
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
