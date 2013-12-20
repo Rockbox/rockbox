@@ -134,9 +134,6 @@ void screen_put_iconxy(struct screen * display,
     {
         iconset = inbuilt_iconset[screen];
     }
-    /* add some left padding to the icons if they are on the edge */
-    if (xpos == 0)
-        xpos++;
 
     if (is_rtl)
         xpos = display->getwidth() - xpos - width;
