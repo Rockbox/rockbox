@@ -66,6 +66,7 @@ struct screen
 #ifdef HAVE_BUTTONBAR
     bool has_buttonbar;
 #endif
+    void (*set_drawmode)(int mode);
     void (*set_viewport)(struct viewport* vp);
     int (*getwidth)(void);
     int (*getheight)(void);
@@ -101,7 +102,6 @@ struct screen
     void (*bmp)(const struct bitmap *bm, int x, int y);
     void (*bmp_part)(const struct bitmap* bm, int src_x, int src_y,
                                 int x, int y, int width, int height);
-    void (*set_drawmode)(int mode);
 #if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1
     unsigned (*color_to_native)(unsigned color);
 #endif
