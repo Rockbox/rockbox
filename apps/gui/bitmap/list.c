@@ -124,7 +124,7 @@ static bool draw_title(struct screen *display, struct gui_synclist *list)
         title_text_vp->width -= title_icon.width;
 
         display->set_viewport(&title_icon);
-        screen_put_iconxy(display, 0, 0, list->title_icon);
+        screen_put_iconxy(display, ICON_PADDING, 0, list->title_icon);
     }
 #ifdef HAVE_LCD_COLOR
     if (list->title_color >= 0)
@@ -368,7 +368,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         display->set_viewport(&list_icons);
         if (list->callback_get_item_icon != NULL)
         {
-            int xoff = show_cursor ? list_icon_width(screen) : 0;
+            int xoff = show_cursor ? list_icon_width(screen) : ICON_PADDING;
             screen_put_iconxy(display, xoff,
                             line*line_height + draw_offset + icon_yoffset,
                             list->callback_get_item_icon(i, list->data));
@@ -377,7 +377,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         if (show_cursor && i >= list->selected_item &&
                 i <  list->selected_item + list->selected_size)
         {
-            screen_put_iconxy(display, 0,
+            screen_put_iconxy(display, ICON_PADDING,
                             line*line_height + draw_offset + icon_yoffset,
                             Icon_Cursor);
         }
