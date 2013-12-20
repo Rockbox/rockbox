@@ -777,6 +777,19 @@ static int save(
     return retval;
 }
 
+static void puts_wrapper(int x, int y, const char *str, bool scroll, bool selected)
+{
+    struct line_desc line = LINE_DESC_DEFINIT;
+    struct screen *lcd = rb->screens[SCREEN_MAIN];
+    int w = lcd->getcharwidth();
+    int h = lcd->getcharheight();
+
+    line.scroll = scroll;
+    line.style = selected ? STYLE_INVERT : STYLE_DEFAULT;
+
+    rb->screens[0]->put_line(x * w, y * h, &line, str);
+}
+
 /**
  * Let the user choose which file to save with which name
  */
@@ -804,8 +817,8 @@ static void save_editor(struct mp3entry *mp3, int splittime)
         rb->lcd_clear_display();
 
         /* Save file1? */
-        rb->lcd_puts_style(0, 0, "Save part 1?", choice == SE_PART1_SAVE);
-        rb->lcd_puts(13, 0, part1_save?"yes":"no");
+        puts_wrapper(0, 0, "Save part 1?", false, choice == SE_PART1_SAVE);
+        puts_wrapper(7, 0, part1_save?"yes":"no", false, false);
 
         /* trim to display the filename without path */
         for (pos = rb->strlen(part1_name); pos > 0; pos--)
@@ -816,12 +829,11 @@ static void save_editor(struct mp3entry *mp3, int splittime)
         pos++;
 
         /* File name 1 */
-        rb->lcd_puts_scroll_style(0, 1,
-            &part1_name[pos], choice == SE_PART1_NAME);
+        puts_wrapper(0, 1, &part1_name[pos], true, choice == SE_PART1_NAME);
 
         /* Save file2? */
-        rb->lcd_puts_style(0, 3, "Save part 2?", choice == SE_PART2_SAVE);
-        rb->lcd_puts(13, 3, part2_save?"yes":"no");
+        puts_wrapper(0, 3, "Save part 2?", false, choice == SE_PART2_SAVE);
+        puts_wrapper(7, 3, part2_save?"yes":"no", false, false);
 
         /* trim to display the filename without path */
         for (pos = rb->strlen(part2_name); pos > 0; pos --)
@@ -832,11 +844,10 @@ static void save_editor(struct mp3entry *mp3, int splittime)
         pos++;
 
         /* File name 2 */
-        rb->lcd_puts_scroll_style(0, 4,
-            &part2_name[pos], choice == SE_PART2_NAME);
+        puts_wrapper(0, 4, &part2_name[pos], true, choice == SE_PART2_NAME);
 
         /* Save */
-        rb->lcd_puts_style(0, 6, "Save", choice == SE_SAVE);
+        puts_wrapper(0, 6, "Save", false, choice == SE_SAVE);
 
         rb->lcd_update();
 
