@@ -724,6 +724,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Maximum Volume Limit"
+  </dest>
+  <voice>
+    *: "Maximum Volume Limit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT_EXCEEDED
+  desc: in splash when volume is set higher than volume limit
+  user: core
+  <source>
+    *: "Volume limit is set to %ddB"
+  </source>
+  <dest>
+    *: "Volume limit is set to %ddB"
+  </dest>
+  <voice>
+    *: "Volume limit has been exceeded. Currently it is set to %d decibels."
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BASS
   desc: in sound_settings
   user: core
