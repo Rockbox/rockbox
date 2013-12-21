@@ -828,6 +828,7 @@ struct user_settings
 #ifdef HAVE_PLAY_FREQ
     int play_frequency; /* core audio output frequency selection */
 #endif
+    int volume_limit; /* maximum volume limit */
 };
 
 /** global variables **/

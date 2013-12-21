@@ -345,7 +345,8 @@ static int selection_to_val(const struct settings_list *setting, int selection)
         int setting_id = setting->sound_setting->setting;
 #ifndef ASCENDING_INT_SETTINGS
         step = sound_steps(setting_id);
-        max = sound_max(setting_id);
+        max = (setting_id == SOUND_VOLUME) ?
+            global_settings.volume_limit : sound_max(setting_id);
         /* min = sound_min(setting_id); */
 #else
         step = -sound_steps(setting_id);
@@ -429,7 +430,8 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
             int setting_id = setting->sound_setting->setting;
             int steps = sound_steps(setting_id);
             int min = sound_min(setting_id);
-            int max = sound_max(setting_id);
+            int max = (setting_id == SOUND_VOLUME) ?
+                global_settings.volume_limit : sound_max(setting_id);
             *nb_items = (max-min)/steps + 1;
 #ifndef ASCENDING_INT_SETTINGS
             *selected = (max - oldvalue) / steps;

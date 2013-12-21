@@ -661,9 +661,39 @@ static int32_t hotkey_getlang(int value, int unit)
     return get_hotkey_lang_id(value);
 }
 #endif /* HAVE_HOTKEY */
+
+/* volume limiter */
+static void volume_limit_load_from_cfg(void* var, char*value)
+{
+    *(int*)var = atoi(value);
+}
+static char* volume_limit_write_to_cfg(void* setting, char*buf, int buf_len)
+{
+    int current = *(int*)setting;
+    snprintf(buf, buf_len, "%d", current);
+    return buf;
+}
+static bool volume_limit_is_changed(void* setting, void* defaultval)
+{
+    int current = *(int*)setting;
+
+    if ((int*)defaultval == NULL)
+        *(int*)defaultval = sound_max(SOUND_VOLUME);
+    return (current != sound_max(SOUND_VOLUME));
+}
+static void volume_limit_set_default(void* setting, void* defaultval)
+{
+    (void)defaultval;
+    *(int*)setting = sound_max(SOUND_VOLUME);
+}
+
 const struct settings_list settings[] = {
     /* sound settings */
-    SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    SOUND_SETTING(F_NO_WRAP, volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    CUSTOM_SETTING(F_NO_WRAP, volume_limit, LANG_VOLUME_LIMIT,
+                  NULL, "volume limit",
+                  volume_limit_load_from_cfg, volume_limit_write_to_cfg,
+                  volume_limit_is_changed, volume_limit_set_default),
     SOUND_SETTING(0, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
 /* Tone controls */
 #ifdef AUDIOHW_HAVE_BASS
