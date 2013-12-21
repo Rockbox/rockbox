@@ -34,10 +34,50 @@
 #include "menu_common.h"
 #include "splash.h"
 #include "kernel.h"
+#include "talk.h"
+#include "option_select.h"
+#include "misc.h"
+
+static int32_t get_dec_talkid(int value, int unit)
+{
+    return TALK_ID_DECIMAL(value, 1, unit);
+}
+
+static int volume_limit_callback(int action,const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+
+    static struct int_setting volume_limit_int_setting;
+    volume_limit_int_setting.option_callback = NULL;
+    volume_limit_int_setting.unit = UNIT_DB;
+    volume_limit_int_setting.min = sound_min(SOUND_VOLUME);
+    volume_limit_int_setting.max = sound_max(SOUND_VOLUME);
+    volume_limit_int_setting.step = sound_steps(SOUND_VOLUME);
+    volume_limit_int_setting.formatter = NULL;
+    volume_limit_int_setting.get_talk_id = get_dec_talkid;
+
+    struct settings_list setting;
+    setting.flags = F_BANFROMQS|F_INT_SETTING|F_T_INT|F_NO_WRAP;
+    setting.lang_id = LANG_VOLUME_LIMIT;
+    setting.default_val.int_ = sound_max(SOUND_VOLUME);
+    setting.int_setting = &volume_limit_int_setting;
+
+    switch (action)
+    {
+        case ACTION_ENTER_MENUITEM:
+            setting.setting = &global_settings.volume_limit;
+            option_screen(&setting, NULL, false, ID2P(LANG_VOLUME_LIMIT));
+        case ACTION_EXIT_MENUITEM: /* on exit */
+            setvol();
+            break;
+    }
+    return action;
+}
 
 /***********************************/
 /*    SOUND MENU                   */
 MENUITEM_SETTING(volume, &global_settings.volume, NULL);
+MENUITEM_SETTING(volume_limit, &global_settings.volume_limit, volume_limit_callback);
 #ifdef AUDIOHW_HAVE_BASS
 MENUITEM_SETTING(bass, &global_settings.bass,
 #ifdef HAVE_SW_TONE_CONTROLS
@@ -171,6 +211,7 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 
 MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           &volume
+          ,&volume_limit
 #ifdef AUDIOHW_HAVE_BASS
           ,&bass
 #endif
