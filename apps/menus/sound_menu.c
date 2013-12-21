@@ -34,10 +34,12 @@
 #include "menu_common.h"
 #include "splash.h"
 #include "kernel.h"
+#include "volume_limit_menu.h"
 
 /***********************************/
 /*    SOUND MENU                   */
 MENUITEM_SETTING(volume, &global_settings.volume, NULL);
+MENUITEM_SETTING(volume_limit, &global_settings.volume_limit, volume_limit_callback);
 #ifdef AUDIOHW_HAVE_BASS
 MENUITEM_SETTING(bass, &global_settings.bass,
 #ifdef HAVE_SW_TONE_CONTROLS
@@ -171,6 +173,7 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 
 MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           &volume
+          ,&volume_limit
 #ifdef AUDIOHW_HAVE_BASS
           ,&bass
 #endif
