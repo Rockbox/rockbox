@@ -38,6 +38,10 @@
 #define AUDIOHW_SETTING_ENT(name, fn) \
     [SOUND_##name] = { .info = &_audiohw_setting_##name, .function = fn },
 
+/* Enable us to clone preferences of an existing audio_setting target */
+#define AUDIOHW_SETTING_CLN(name, source, fn) \
+    [SOUND_##name] = { .info = &_audiohw_setting_##source, .function = fn },
+
 #elif defined(AUDIOHW_SOUND_SETTINGS_VAL2PHYS)
 #undef AUDIOHW_SOUND_SETTINGS_VAL2PHYS
 
@@ -56,6 +60,9 @@
 #define AUDIOHW_SETTING_ENT(name, fn) \
     case SOUND_##name: return _sound_val2phys_##name(value);
 
+#define AUDIOHW_SETTING_CLN(name, source, fn) \
+    case SOUND_##name: return _sound_val2phys_##source(value);
+
 #else
 
 /* Generate enumeration of SOUND_xxx constants */
@@ -69,12 +76,16 @@
 #define AUDIOHW_SETTING_ENT(name, fn) \
     SOUND_##name,
 
+#define AUDIOHW_SETTING_CLN(name, source, fn) \
+    SOUND_##name,
+
 #endif /* setting table type selection */
 
 AUDIOHW_SETTINGS(
     /* TODO: Volume shouldn't be needed if device doesn't have digital
        control */
     AUDIOHW_SETTING_ENT(VOLUME,             sound_set_volume)
+    AUDIOHW_SETTING_CLN(VOLUME_LIMIT,             VOLUME, NULL)
 #if defined(AUDIOHW_HAVE_BASS)
     AUDIOHW_SETTING_ENT(BASS,               sound_set_bass)
 #endif
@@ -157,3 +168,4 @@ AUDIOHW_SETTINGS(
 
 #undef AUDIOHW_SETTINGS
 #undef AUDIOHW_SETTING_ENT
+#undef AUDIOHW_SETTING_CLN
