@@ -767,6 +767,7 @@ void sound_settings_apply(void)
     sound_set(SOUND_BALANCE, global_settings.balance);
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
     sound_set(SOUND_VOLUME, global_settings.volume);
+    sound_set(SOUND_VOLUME_LIMIT, global_settings.volume_limit);
 #endif
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
