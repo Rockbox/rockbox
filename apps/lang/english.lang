@@ -724,6 +724,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Maximum Volume Limit"
+  </dest>
+  <voice>
+    *: "Maximum Volume Limit"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_BASS
   desc: in sound_settings
   user: core
