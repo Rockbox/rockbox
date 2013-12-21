@@ -289,6 +289,7 @@ struct user_settings
     /* audio settings */
 
     int volume;     /* audio output volume in decibels range depends on the dac */
+    int volume_limit;  /* maximum volume limit*/
     int balance;    /* stereo balance:          0-100 0=left  50=bal 100=right  */
     int bass;       /* bass boost/cut in decibels                               */
     int treble;     /* treble boost/cut in decibels                             */
