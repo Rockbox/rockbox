@@ -663,7 +663,8 @@ static int32_t hotkey_getlang(int value, int unit)
 #endif /* HAVE_HOTKEY */
 const struct settings_list settings[] = {
     /* sound settings */
-    SOUND_SETTING(F_NO_WRAP,volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    SOUND_SETTING(F_NO_WRAP, volume, LANG_VOLUME, "volume", SOUND_VOLUME),
+    SOUND_SETTING(F_NO_WRAP, volume_limit, LANG_VOLUME_LIMIT, "volume limit", SOUND_VOLUME_LIMIT),
     SOUND_SETTING(0, balance, LANG_BALANCE, "balance", SOUND_BALANCE),
 /* Tone controls */
 #ifdef AUDIOHW_HAVE_BASS

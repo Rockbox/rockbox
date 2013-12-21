@@ -429,8 +429,15 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
             int setting_id = setting->sound_setting->setting;
             int steps = sound_steps(setting_id);
             int min = sound_min(setting_id);
-            int max = sound_max(setting_id);
+            int max = (setting_id == SOUND_VOLUME) ?
+            global_settings.volume_limit : sound_max(setting_id);
             *nb_items = (max-min)/steps + 1;
+            if ((setting_id == SOUND_VOLUME) &&
+                (global_settings.volume > global_settings.volume_limit))
+           {
+                    global_settings.volume = global_settings.volume_limit;
+                    setvol();
+           }
 #ifndef ASCENDING_INT_SETTINGS
             *selected = (max - oldvalue) / steps;
 #else
