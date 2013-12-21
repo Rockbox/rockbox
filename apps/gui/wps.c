@@ -853,7 +853,8 @@ long gui_wps_show(void)
                 break;
 
             case ACTION_WPS_VOLUP:
-                global_settings.volume++;
+                if (global_settings.volume_limit > global_settings.volume)
+                    global_settings.volume++;
                 vol_changed = true;
                 break;
             case ACTION_WPS_VOLDOWN:
