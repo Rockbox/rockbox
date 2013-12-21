@@ -429,8 +429,15 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
             int setting_id = setting->sound_setting->setting;
             int steps = sound_steps(setting_id);
             int min = sound_min(setting_id);
-            int max = sound_max(setting_id);
+            int max = (setting_id == SOUND_VOLUME) ?
+	        global_settings.volume_limit : sound_max(setting_id);
             *nb_items = (max-min)/steps + 1;
+            if ((setting_id == SOUND_VOLUME) &&
+                (global_settings.volume > global_settings.volume_limit))
+	       {
+                    global_settings.volume = global_settings.volume_limit;
+                    setvol();
+	       }
 #ifndef ASCENDING_INT_SETTINGS
             *selected = (max - oldvalue) / steps;
 #else
@@ -570,6 +577,10 @@ bool option_screen(const struct settings_list *setting,
         /* if the volume is changing we need to let the skins know */
         if (function == sound_get_fn(SOUND_VOLUME))
             global_status.last_volume_change = current_tick;
+        /* and check if volume is higher than volume limit */
+        else if ((function == sound_get_fn(SOUND_VOLUME_LIMIT)) &&
+                 (global_settings.volume_limit < global_settings.volume))
+            setvol();
     }
     pop_current_activity();
     return false;
