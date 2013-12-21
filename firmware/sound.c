@@ -136,6 +136,8 @@ static struct
 #endif
 } sound_prescaler;
 
+static short current_volume, volume_limit;
+
 #if defined(AUDIOHW_HAVE_BASS) || defined (AUDIOHW_HAVE_TREBLE) \
         || defined(AUDIOHW_HAVE_EQ)
 #define TONE_PRESCALER
@@ -217,12 +219,25 @@ void sound_set_volume(int value)
     if (!audio_is_initialized)
         return;
 
+    if (value > volume_limit)
+        value = volume_limit;
+    current_volume = value;
 #if defined(AUDIOHW_HAVE_CLIPPING)
     audiohw_set_volume(value);
 #else
     sound_prescaler.volume = sound_value_to_cb(SOUND_VOLUME, value);
     set_prescaled_volume();
 #endif
+}
+
+void sound_set_volume_limit(int value)
+{
+    if (!audio_is_initialized)
+        return;
+
+    if (current_volume > value)
+        sound_set_volume(value);
+    volume_limit = value;
 }
 
 void sound_set_balance(int value)
