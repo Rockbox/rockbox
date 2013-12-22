@@ -718,11 +718,11 @@ int read_bmp_fd(int fd,
 
       case 32:
         if (compression == 3) { /* BI_BITFIELDS */
-            bool found;
+            bool found = false;
             int i, j;
 
             /* (i == 0) is 15bit, (i == 1) is 16bit, (i == 2) is 32bit */
-            for (i = 0; i < ARRAY_SIZE(bitfields); i++) {
+            for (i = 0; i < ARRAY_SIZE(bitfields) && !found; i++) {
                 /* for 15bpp and higher numcolors has the number of color masks */
                 for (j = 0; j < numcolors; j++) {
                     if (!rgbcmp(&palette[j], &bitfields[i][j])) {
@@ -732,16 +732,13 @@ int read_bmp_fd(int fd,
                         break;
                     }
                 }
-                if (found) {
-                    if (i == 0) /* 15bit */
-                        depth = 15;
-                    else if (i == 3) /* 32bit, ABGR bitmap */
-                        order = ABGR;
-                    break;
-                }
             }
-            if (found)
-                break;
+            if (found) {
+                if (i == 0) /* 15bit */
+                    depth = 15;
+                else if (i == 3) /* 32bit, ABGR bitmap */
+                    order = ABGR;
+            }
         }   /* else fall through */
 
       default:
