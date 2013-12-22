@@ -721,7 +721,7 @@ int read_bmp_fd(int fd,
             bool found = false;
             int i, j;
 
-            /* (i == 0) is 15bit, (i == 1) is 16bit, (i == 2) is 32bit */
+            /* (i == 0) is 15bit, (i == 1) is 16bit, (i == {2,3}) is 32bit */
             for (i = 0; i < ARRAY_SIZE(bitfields) && !found; i++) {
                 /* for 15bpp and higher numcolors has the number of color masks */
                 for (j = 0; j < numcolors; j++) {
@@ -734,10 +734,11 @@ int read_bmp_fd(int fd,
                 }
             }
             if (found) {
-                if (i == 0) /* 15bit */
+                if (i == 1) /* 15bit */
                     depth = 15;
-                else if (i == 3) /* 32bit, ABGR bitmap */
+                else if (i == 4) /* 32bit, ABGR bitmap */
                     order = ABGR;
+                break;
             }
         }   /* else fall through */
 
