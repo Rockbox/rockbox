@@ -528,7 +528,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
     ssize_t size = (ssize_t)old_size - wanted_size;
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) && (CONFIG_CODEC == MAS3587F)
     /* FIXME: Cannot give the buffer during recording yet */
     if (is_recording)
         return BUFLIB_CB_CANNOT_SHRINK;
