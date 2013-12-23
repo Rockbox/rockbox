@@ -430,7 +430,7 @@ void LCDFN(puts_style_xyoffset)(int x, int y, const unsigned char *str,
         xpos = x;
         ypos = y;
     }
-    LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, current_vp->width - x, h);
+    LCDFN(scroll_stop_viewport_rect)(current_vp, xpos, ypos, current_vp->width - xpos, h);
     LCDFN(putsxyofs_style)(xpos, ypos+y_offset, str, style, h, x_offset);
 }
 
@@ -495,7 +495,7 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
 {
     struct scrollinfo* s;
     int width, height;
-    int w, h, cwidth, margin;
+    int w, h, cwidth;
     bool restart;
 
     if (!string)
@@ -529,8 +529,7 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
 
     /* check if scrolling is actually necessary (consider the actual start
      * of the line) */
-    margin = x * linebased ? cwidth : 1;
-    if (current_vp->width >= margin+w)
+    if (width >= w)
         return;
 
     if (restart) {
