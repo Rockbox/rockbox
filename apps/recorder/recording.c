@@ -691,9 +691,10 @@ void rec_set_source(int source, unsigned flags)
 
 void rec_set_recording_options(struct audio_recording_options *options)
 {
+#if CONFIG_CODEC == SWCODEC
     rec_set_source(options->rec_source,
                    options->rec_source_flags | SRCF_RECORDING);
-
+#endif
     audio_set_recording_options(options);
 }
 
