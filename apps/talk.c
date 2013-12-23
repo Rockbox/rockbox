@@ -528,6 +528,7 @@ static bool load_voicefile_index(int fd)
 static bool load_voicefile_data(int fd, size_t max_size)
 {
 #ifdef TALK_PARTIAL_LOAD
+    (void)fd;
     /* just allocate, populate on an as-needed basis later */
     talk_handle = core_alloc_ex("voice data", max_size, &talk_ops);
     if (talk_handle < 0)
