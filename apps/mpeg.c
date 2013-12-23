@@ -258,6 +258,9 @@ static void pause_recording(void);
 static void resume_recording(void);
 #endif /* (CONFIG_CODEC == MAS3587F) && !defined(SIMULATOR) */
 
+static void audio_reset_buffer_noalloc(void* buf, size_t bufsize);
+static void audio_reset_buffer(void);
+
 
 #ifndef SIMULATOR
 static int num_tracks_in_memory(void)
@@ -517,7 +520,6 @@ static void do_stop(void)
 #endif
 }
 
-static void audio_reset_buffer_noalloc(void* buf, size_t bufsize);
 /* Buffer must not move. */
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
 {
@@ -525,6 +527,13 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     /* check what buflib requests */
     size_t wanted_size = (hints & BUFLIB_SHRINK_SIZE_MASK);
     ssize_t size = (ssize_t)old_size - wanted_size;
+
+#ifndef SIMULATOR
+    /* FIXME: Cannot give the buffer during recording yet */
+    if (is_recording)
+        return BUFLIB_CB_CANNOT_SHRINK;
+#endif
+
     /* keep at least 256K for the buffering */
     if ((size - extradata_size) < AUDIO_BUFFER_RESERVE)
     {
@@ -2200,6 +2209,9 @@ static void init_recording(void)
     /* Init the recording variables */
     is_recording = false;
     is_prerecording = false;
+
+    /* Have to grab the audio buffer in case voice had it */
+    audio_reset_buffer();
 
     mpeg_stop_done = true;
 
