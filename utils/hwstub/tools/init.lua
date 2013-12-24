@@ -108,4 +108,11 @@ end
 --
 DEV = hwstub.dev
 
+--
+-- Misc
+--
+function hwstub.mdelay(msec)
+    hwstub.udelay(msec * 1000)
+end
+
 require "lua/load"

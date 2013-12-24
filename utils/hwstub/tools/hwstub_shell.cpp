@@ -27,6 +27,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <lua.hpp>
+#include <unistd.h>
 #include "soc_desc.hpp"
 
 #if LUA_VERSION_NUM < 502
@@ -244,6 +245,16 @@ int my_lua_quit(lua_State *state)
     return 0;
 }
 
+int my_lua_udelay(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "udelay takes one argument");
+    long usec = lua_tointeger(state, -1);
+    usleep(usec);
+    return 0;
+}
+
 bool my_lua_import_hwstub()
 {
     int oldtop = lua_gettop(g_lua);
@@ -376,6 +387,9 @@ bool my_lua_import_hwstub()
     lua_pushstring(g_lua, "Example: help(\"hwstub\").");
     lua_settable(g_lua, -3);
     lua_setfield(g_lua, -2, "help");
+
+    lua_pushcclosure(g_lua, my_lua_udelay, 0);
+    lua_setfield(g_lua, -2, "udelay");
 
     lua_setglobal(g_lua, "hwstub");
 
