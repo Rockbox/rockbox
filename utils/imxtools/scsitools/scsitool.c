@@ -400,6 +400,28 @@ static int stmp_read_logical_drive_sectors(uint8_t drive, uint64_t address,
     return do_sense_analysis(ret, sense, sense_size);
 }
 
+static int stmp_write_logical_drive_sectors(uint8_t drive, uint64_t address,
+    uint32_t count, void *buffer, int *buffer_size)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_WRITE;
+    cdb[1] = SCSI_STMP_CMD_WRITE_LOGICAL_DRIVE_SECTOR;
+    cdb[2] = drive;
+    address = fix_endian64be(address);
+    memcpy(&cdb[3], &address, sizeof(address));
+    count = fix_endian32be(count);
+    memcpy(&cdb[11], &count, sizeof(count));
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int ret = do_scsi(cdb, sizeof(cdb), DO_WRITE, sense, &sense_size, buffer, buffer_size);
+    if(ret < 0)
+        return ret;
+    return do_sense_analysis(ret, sense, sense_size);
+}
+
 static const char *stmp_get_logical_media_type_string(uint32_t type)
 {
     switch(type)
@@ -912,6 +934,7 @@ void do_extract(const char *file)
     if(ret || len != (int)sector_size)
     {
         cprintf(GREY, "Cannot read first sector\n");
+        return;
     }
     uint32_t fw_size = *(uint32_t *)(sector + 0x1c) * 16;
     if(g_debug)
@@ -947,6 +970,130 @@ Lend:
         fclose(f);
 }
 
+void do_write(const char *file, int want_a_brick)
+{
+    if(!want_a_brick)
+    {
+        cprintf(GREY, "Writing a new firmware is a dangerous operation that should be attempted\n");
+        cprintf(GREY, "if you know what you are doing. If you do, please add the --yes-i-want-a-brick\n");
+        cprintf(GREY, "option on the command line and do not complain if you end up with a brick ;)\n");
+        return;
+    }
+    FILE *f = NULL;
+    cprintf(BLUE, "Writing firmware...\n");
+
+    struct
+    {
+        struct scsi_stmp_logical_table_t header;
+        struct scsi_stmp_logical_table_entry_t entry[20];
+    }__attribute__((packed)) table;
+
+    int ret = stmp_get_logical_table(&table.header, sizeof(table.entry) / sizeof(table.entry[0]));
+    if(ret)
+    {
+        cprintf(GREY, "Cannot get logical table: %d\n", ret);
+        goto Lend;
+    }
+    int entry = 0;
+    while(entry < table.header.count)
+        if(table.entry[entry].type == SCSI_STMP_DRIVE_TYPE_SYSTEM &&
+                table.entry[entry].tag == SCSI_STMP_DRIVE_TAG_SYSTEM_BOOT)
+            break;
+        else
+            entry++;
+    if(entry == table.header.count)
+    {
+        cprintf(GREY, "Cannot find firmware partition\n");
+        goto Lend;
+    }
+    uint8_t drive_no = table.entry[entry].drive_no;
+    uint64_t drive_sz = table.entry[entry].size;
+    if(g_debug)
+    {
+        cprintf(RED, "* ");
+        cprintf_field("Drive: ", "%#x\n", drive_no);
+        cprintf(RED, "* ");
+        cprintf_field("Size: ", "%#llx\n", (unsigned long long)drive_sz);
+    }
+    int len = 4;
+    uint32_t sector_size;
+    ret = stmp_get_logical_drive_info(drive_no, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &sector_size, &len);
+    if(ret || len != 4)
+    {
+        cprintf(GREY, "Cannot get sector size\n");
+        goto Lend;
+    }
+    sector_size = fix_endian32be(sector_size);
+    if(g_debug)
+    {
+        cprintf(RED, "* ");
+        cprintf_field("Sector size: ", "%lu\n", (unsigned long)sector_size);
+    }
+    uint8_t *sector = malloc(sector_size);
+
+    /* sanity check by reading first sector */
+    len = sector_size;
+    ret = stmp_read_logical_drive_sectors(drive_no, 0, 1, sector, &len);
+    if(ret || len != (int)sector_size)
+    {
+        cprintf(GREY, "Cannot read first sector\n");
+        return;
+    }
+    uint32_t sig = *(uint32_t *)(sector + 0x14);
+    if(sig != 0x504d5453)
+    {
+        cprintf(GREY, "There is something wrong: the first sector doesn't have the STMP signature. Bailing out...\n");
+        return;
+    }
+
+    f = fopen(file, "rb");
+    if(f == NULL)
+    {
+        cprintf(GREY, "Cannot open '%s' for writing: %m\n", file);
+        goto Lend;
+    }
+    fseek(f, 0, SEEK_END);
+    int fw_size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if(g_debug)
+    {
+        cprintf(RED, "* ");
+        cprintf_field("Firmware size: ", "%#x\n", fw_size);
+    }
+    /* sanity check size */
+    if((uint64_t)fw_size > drive_sz)
+    {
+        cprintf(GREY, "You cannot write a firmware greater than the partition size.\n");
+        goto Lend;
+    }
+
+    for(int off = 0; off < fw_size; off += sector_size)
+    {
+        int sec = off / sector_size;
+        int xfer_len = MIN(fw_size - off, (int)sector_size);
+        if(fread(sector, xfer_len, 1, f) != 1)
+        {
+            cprintf(GREY, "Read failed: %m\n");
+            goto Lend;
+        }
+        /* NOTE transfer a whole sector even if incomplete, the device won't access
+         * partial sectors */
+        if(xfer_len < (int)sector_size)
+            memset(sector + xfer_len, 0, sector_size - xfer_len);
+        len = sector_size;
+        ret = stmp_write_logical_drive_sectors(drive_no, sec, 1, sector, &len);
+        if(ret || len != (int)sector_size)
+        {
+            cprintf(GREY, "Cannot write sector %d\n", sec);
+            goto Lend;
+        }
+    }
+    cprintf(BLUE, "Done\n");
+Lend:
+    if(f)
+        fclose(f);
+}
+
 static void usage(void)
 {
     printf("Usage: scsitool [options] <dev>\n");
@@ -956,15 +1103,20 @@ static void usage(void)
     printf("  -d/--debug              Display debug messages\n");
     printf("  -c/--no-color           Disable color output\n");
     printf("  -x/--extract-fw <file>  Extract firmware to file\n");
+    printf("  -w/--write-fw <file>    Write firmware to device\n");
     printf("  -i/--info               Display device information\n");
+    printf("  --yes-i-want-a-brick    Allow the tool to turn your device into a brick\n");
     exit(1);
 }
+
+static int g_yes_i_want_a_brick = 0;
 
 int main(int argc, char **argv)
 {
     if(argc == 1)
         usage();
     const char *extract_fw = NULL;
+    const char *write_fw = NULL;
     bool info = false;
     while(1)
     {
@@ -975,15 +1127,19 @@ int main(int argc, char **argv)
             {"no-color", no_argument, 0, 'c'},
             {"force", no_argument, 0, 'f'},
             {"extract-fw", required_argument, 0, 'x'},
+            {"write-fw", required_argument, 0, 'w'},
             {"info", no_argument, 0, 'i'},
+            {"yes-i-want-a-brick", no_argument, &g_yes_i_want_a_brick, 1},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcfx:i", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dcfx:iw:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
         {
+            case 0:
+                continue;
             case -1:
                 break;
             case 'c':
@@ -1000,6 +1156,9 @@ int main(int argc, char **argv)
                 break;
             case 'x':
                 extract_fw = optarg;
+                break;
+            case 'w':
+                write_fw = optarg;
                 break;
             case 'i':
                 info = true;
@@ -1028,6 +1187,8 @@ int main(int argc, char **argv)
         do_extract(extract_fw);
     if(info)
         do_info();
+    if(write_fw)
+        do_write(write_fw, g_yes_i_want_a_brick);
 
     scsi_pt_close_device(g_dev_fd);
 Lend:
