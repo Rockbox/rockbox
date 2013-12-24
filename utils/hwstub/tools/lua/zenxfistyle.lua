@@ -150,19 +150,15 @@ function ZENXFISTYLE.lcd_init()
         ZENXFISTYLE.lcd_write(0x22, 0)
     end
 
-    local pix = {}
-    for i=0,239 do
-        for j=0,319 do
-            local r = bit32.rshift(0, 3)
-            local g = bit32.rshift(0, 2)
-            local b = bit32.rshift(0xff, 3)
-            local px = bit32.lshift(r, 11) + bit32.lshift(g, 5) + b
-            px = bit32.lshift(1, i)
-            --table.insert(pix, px)
-            STMP.lcdif.send_pio(true, {px})
-        end
+    for i = 0, 319 do
+        STMP.lcdif.send_pio(true, {0x3f})
     end
-    STMP.lcdif.send_pio(true, pix)
+    for i = 0, 319 do
+        STMP.lcdif.send_pio(true, {0xfc0})
+    end
+    for i = 0, 319 do
+        STMP.lcdif.send_pio(true, {0x3f000})
+    end
 end
 
 function ZENXFISTYLE.backlight_init()
