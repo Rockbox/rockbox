@@ -135,6 +135,9 @@ function STMP.lcdif.send_pio(data_mode, data)
         HW.LCDIF.TRANSFER_COUNT.H_COUNT.write(#data)
     end
     HW.LCDIF.CTRL.RUN.set()
+    if wl == 18 then
+        wl = 32
+    end
     local i = 1
     while i <= #data do
         local v = 0
@@ -146,8 +149,10 @@ function STMP.lcdif.send_pio(data_mode, data)
         end
         STMP.debug(string.format("lcdif: i=%d send 0x%x", i, v))
         while STMP.lcdif.is_busy() do STMP.debug("lcdif: fifo full") end
+        STMP.debug(string.format("lcdif: write 0x%x", v))
         HW.LCDIF.DATA.write(v)
     end
+    STMP.debug("lcdif: wait end of command")
     STMP.lcdif.wait_ready()
 end
 
