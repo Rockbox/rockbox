@@ -50,11 +50,6 @@ static inline uint32_t encode_16_to_18(uint32_t a)
     return ((a & 0xff) << 1) | (((a >> 8) & 0xff) << 10);
 }
 
-static inline uint32_t decode_18_to_16(uint32_t a)
-{
-    return ((a >> 1) & 0xff) | ((a >> 2) & 0xff00);
-}
-
 static void setup_lcdif_clock(void)
 {
     /* the LCD seems to work at 24Mhz, so use the xtal clock with no divider */
