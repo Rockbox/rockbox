@@ -875,6 +875,11 @@ bool talk_voice_required(void)
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
 void talk_buffer_set_policy(int policy)
 {
+#if CONFIG_CODEC != SWCODEC
+    /* always grab the voice buffer for now */
+    (void) policy;
+    give_buffer_away = true;
+#else
     switch(policy)
     {
         case TALK_BUFFER_DEFAULT:
@@ -882,6 +887,7 @@ void talk_buffer_set_policy(int policy)
         case TALK_BUFFER_LOOSE: give_buffer_away = true;             break;
         default:           DEBUGF("Ignoring unknown policy\n"); break;
     }
+#endif
 }
 
 /* play a voice ID from voicefile */
