@@ -1416,7 +1416,7 @@ static void on_init_recording(void)
     static struct buflib_callbacks dummy_ops;
     talk_buffer_set_policy(TALK_BUFFER_LOOSE);
     pcmrec_handle = core_alloc_maximum("pcmrec", &rec_buffer_size, &dummy_ops);
-    if (pcmrec_handle)
+    if (pcmrec_handle <= 0)
     /* someone is abusing core_alloc_maximum(). Fix this evil guy instead of
      * trying to handle OOM without hope */
         panicf("%s(): OOM\n", __func__);
