@@ -55,6 +55,8 @@ MainWindow::MainWindow(Backend *backend)
     setCentralWidget(m_tab);
 
     ReadSettings();
+
+    OnNewRegTab();
 }
 
 void MainWindow::ReadSettings()
