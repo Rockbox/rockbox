@@ -265,7 +265,14 @@ function STMP.pinctrl.lcdif.setup_system(bus_width, busy)
     }
     local bus16_17 =
     {
-        
+        imx233 =
+        {
+            all =
+            {
+                lcd_d16 = {bank = 1, pin = 16, muxsel = "MAIN"},
+                lcd_d17 = {bank = 1, pin = 17, muxsel = "MAIN"},
+            }
+        }
     }
     local busy_pin =
     {
