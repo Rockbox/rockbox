@@ -25,4 +25,7 @@
 #include "system-hosted.h"
 
 #define NEED_GENERIC_BYTESWAPS
+
+bool dbg_hw_target_info(void);
+
 #endif /* __SYSTEM_TARGET_H__ */

@@ -24,6 +24,7 @@
 /* Specifies device name and ioctl magic */
 #include "gpio-target.h"
 #include "sys/ioctl.h"
+#include "stdbool.h"
 
 struct gpio_info {
     int num;
@@ -197,5 +198,6 @@ void gpio_init(void);
 void gpio_close(void);
 int gpio_control_struct(int request, struct gpio_info pin);
 int gpio_control(int request, int num, int mode, int val);
+bool gpio_debug_screen(void);
 
 #endif

@@ -21,7 +21,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-void button_close_device(void);
+#include "stdbool.h"
 
 /* Logical buttons key codes */
 #define BUTTON_VOL_UP           0x00000001
@@ -59,5 +59,8 @@ void button_close_device(void);
 #define POWEROFF_BUTTON         BUTTON_POWER
 /* About 3 seconds */
 #define POWEROFF_COUNT          10
+
+void button_close_device(void);
+bool button_debug_screen(void);
 
 #endif /* _BUTTON_TARGET_H_ */

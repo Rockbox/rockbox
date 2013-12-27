@@ -402,7 +402,7 @@ static inline uint32_t swaw32_hw(uint32_t value)
 #ifndef SIMULATOR
 bool dbg_ports(void);
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 bool dbg_hw_info(void);
 #endif
 

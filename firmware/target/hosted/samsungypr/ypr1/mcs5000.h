@@ -146,6 +146,9 @@ typedef struct {
 #define MCS5000_MAX_XC                  0x3ff
 #define MCS5000_MAX_YC                  0x3ff
 
+#define MCS5000_SLAVE_ADDRESS       0x40
+#define MCS5000_REG_SIZE            1
+#define MCS5000_NUM_REGS            0x23
 typedef struct {
     unsigned char inputInfo;
     unsigned char xHigh;
@@ -179,3 +182,6 @@ void mcs5000_set_hand(int hand_setting);
 void mcs5000_set_sensitivity(int level);
 /* Read controller's data */
 int mcs5000_read(mcs5000_raw_data *touchData);
+/* i2c low-lever read-write */
+int mcs5000_read_reg(unsigned char reg, unsigned char *data);
+int mcs5000_write_reg(unsigned char reg, unsigned char *data);
