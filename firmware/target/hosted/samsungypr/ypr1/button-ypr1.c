@@ -27,6 +27,12 @@
 
 #include "gpio-ypr.h" /* For headphones sense and buttons */
 #include "mcs5000.h" /* Touchscreen controller */
+/* debug screen */
+#include "button.h"
+#include "font.h"
+#include "action.h"
+#include "list.h"
+#include "stdio.h"
 
 enum {
     STATE_UNKNOWN,
@@ -37,11 +43,11 @@ enum {
 static int last_x = 0;
 static int last_y = 0;
 static int last_touch_state = STATE_UNKNOWN;
+static mcs5000_raw_data touchData;
 
 int button_read_device(int *data)
 {
     int key = BUTTON_NONE;
-    static mcs5000_raw_data touchData;
     int read_size;
 
     /* Check for all the keys */
@@ -127,3 +133,67 @@ void button_close_device(void)
     mcs5000_close();
 }
 #endif /* BUTTON_DRIVER_CLOSE */
+
+static const char* mcs5000_debug_get_value(int selected_item, void* data,
+                                    char* buffer, size_t buffer_len)
+{
+    (void)data;
+    int ver;
+    unsigned char reg_data = -1;
+    switch(selected_item) {
+        case 0:
+            mcs5000_ioctl(DEV_CTRL_TOUCH_GET_VER, &ver);
+            snprintf(buffer, buffer_len, "FW revision: %d", ver);
+            break;
+        case 1:
+            snprintf(buffer, buffer_len, "X,Y,Z: %d,%d,%d", last_x, last_y, touchData.z);
+            break;
+        case 2:
+            snprintf(buffer, buffer_len, "Radius: %d", touchData.width);
+            break;
+        case 3:
+            snprintf(buffer, buffer_len, "State: %d", last_touch_state);
+            break;
+        case 4:
+            snprintf(buffer, buffer_len, "Gesture: %d", touchData.gesture);
+            break;
+        case 5:
+             ver = mcs5000_read_reg(MCS5000_TS_FIRMWARE_VER, &reg_data);
+             snprintf(buffer, buffer_len, "REG[0x%02x]: 0x%02x - %d", MCS5000_TS_FIRMWARE_VER, reg_data, ver);
+             break;
+        case 6:
+             ver = mcs5000_read_reg(MCS5000_TS_MODULE_REV, &reg_data);
+             snprintf(buffer, buffer_len, "REG[0x%02x]: 0x%02x - %d", MCS5000_TS_MODULE_REV, reg_data, ver);
+             break;
+//         default:
+//             mcs5000_read_reg(selected_item-5, &reg_data);
+//             snprintf(buffer, buffer_len, "REG[0x%02x]: 0x%02x", selected_item-5, reg_data);
+            break;
+    }
+    return buffer;
+}
+
+bool mcs5000_debug_screen(void)
+{
+    struct gui_synclist lists;
+    int action;
+    gui_synclist_init(&lists, mcs5000_debug_get_value, NULL, false, 1, NULL);
+    gui_synclist_set_title(&lists, "MCS5000 touch controller", NOICON);
+    gui_synclist_set_icon_callback(&lists, NULL);
+    gui_synclist_set_color_callback(&lists, NULL);
+    gui_synclist_set_nb_items(&lists, 7);
+
+    while(1)
+    {
+        gui_synclist_draw(&lists);
+        list_do_action(CONTEXT_STD, HZ / 15, &lists, &action, LIST_WRAP_UNLESS_HELD);
+        if(action == ACTION_STD_CANCEL)
+            return false;
+        if(action == ACTION_STD_OK) {
+            return true;
+        }
+        yield();
+    }
+
+    return true;
+}

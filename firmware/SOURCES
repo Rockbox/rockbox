@@ -82,6 +82,7 @@ thread.c
 drivers/lcd-memframe.c
 target/hosted/samsungypr/lcd-ypr.c
 target/hosted/samsungypr/gpio-ypr.c
+target/hosted/samsungypr/debug-ypr.c
 #if CONFIG_TUNER
 target/hosted/samsungypr/radio-ypr.c
 #endif
@@ -102,6 +103,7 @@ target/hosted/samsungypr/ypr0/backlight-ypr0.c
 target/hosted/samsungypr/ypr0/ascodec-ypr0.c
 target/hosted/samsungypr/ypr0/powermgmt-ypr0.c
 target/hosted/samsungypr/ypr0/audio-ypr0.c
+target/hosted/samsungypr/ypr0/debug-ypr0.c
 #endif
 
 #if defined(SAMSUNG_YPR1) && !defined(SIMULATOR)
@@ -115,6 +117,7 @@ target/hosted/samsungypr/ypr1/powermgmt-ypr1.c
 target/hosted/samsungypr/ypr1/audio-ypr1.c
 target/hosted/samsungypr/ypr1/pmu-ypr1.c
 target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
+target/hosted/samsungypr/ypr1/debug-ypr1.c
 #endif
 
 /* Maemo specific files */
