@@ -24,6 +24,7 @@
 #define GPIO_YPR0_H
 
 #include "r0GPIOIoctl.h"
+#include "stdbool.h"
 
 /* Some meaningful pins used in the R0 */
 
@@ -57,5 +58,6 @@
 void gpio_init(void);
 void gpio_close(void);
 int gpio_control(int request, int num, int mode, int val);
+bool gpio_debug_screen(void);
 
 #endif
