@@ -95,6 +95,7 @@ target/hosted/samsungypr/ypr0/backlight-ypr0.c
 target/hosted/samsungypr/ypr0/ascodec-ypr0.c
 target/hosted/samsungypr/ypr0/powermgmt-ypr0.c
 target/hosted/samsungypr/gpio_ypr.c
+target/hosted/samsungypr/debug-ypr.c
 target/hosted/samsungypr/ypr0/audio-ypr0.c
 #if CONFIG_TUNER
 target/hosted/samsungypr/radio-ypr.c
