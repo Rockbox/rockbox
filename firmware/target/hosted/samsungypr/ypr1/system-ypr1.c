@@ -25,7 +25,7 @@
 #include "panic.h"
 #include "debug.h"
 
-#include "gpio-target.h"
+#include "gpio-ypr.h"
 #include "pmu-ypr1.h"
 #include "ioctl-ypr1.h"
 #include "audiohw.h"

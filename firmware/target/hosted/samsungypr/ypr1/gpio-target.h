@@ -23,8 +23,6 @@
 #ifndef GPIO_TARGET_H
 #define GPIO_TARGET_H
 
-#include "ioctl-ypr1.h"
-
 /* Some meaningful pins used in the YP-R1 */
 
 #define GPIO_HEADPHONE_SENSE        GPIO1_31
@@ -58,10 +56,7 @@
 #define GPIO_POWER_KEY              GPIO2_16
 
 #define GPIO_DEVICE                 "/dev/r1Gpio"
-
-void gpio_init(void);
-void gpio_close(void);
-int gpio_control_struct(int request, struct gpio_info pin);
-int gpio_control(int request, int num, int mode, int val);
+/* Strangely for whatever reason magic differs from R0 (A vs. G) */
+#define GPIO_IOCTL_MAGIC            'A'
 
 #endif /* GPIO_TARGET_H */

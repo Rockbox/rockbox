@@ -30,7 +30,7 @@
 #endif
 
 #include "ascodec.h"
-#include "gpio-target.h"
+#include "gpio-ypr.h"
 
 void power_off(void)
 {

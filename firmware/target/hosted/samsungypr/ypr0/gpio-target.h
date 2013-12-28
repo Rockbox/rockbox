@@ -23,8 +23,6 @@
 #ifndef GPIO_YPR0_H
 #define GPIO_YPR0_H
 
-#include "r0GPIOIoctl.h"
-
 /* Some meaningful pins used in the R0 */
 
 #define GPIO_HEADPHONE_SENSE        GPIO1_5
@@ -54,9 +52,6 @@
 #define GPIO_RIGHT_KEY              GPIO3_7
 
 #define GPIO_DEVICE                 "/dev/r0GPIO"
-
-void gpio_init(void);
-void gpio_close(void);
-int gpio_control(int request, int num, int mode, int val);
+#define GPIO_IOCTL_MAGIC            'G'
 
 #endif

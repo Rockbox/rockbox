@@ -24,7 +24,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "button-target.h"
-#include <gpio-target.h> /* For headphones sense and buttons */
+#include "gpio-ypr.h" /* For headphones sense and buttons */
 
 int button_read_device(void)
 {
