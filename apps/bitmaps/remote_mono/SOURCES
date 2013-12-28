@@ -1,3 +1,7 @@
+#ifdef HAVE_LCD_BITMAP
+remote_default_icons.bmp
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
 osx_remote_dummy.bmp
 #endif
