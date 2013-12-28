@@ -25,9 +25,8 @@
 #include "system.h"
 #include "button-target.h"
 
-#include <gpio-target.h> /* For headphones sense and buttons */
+#include "gpio-ypr.h" /* For headphones sense and buttons */
 #include "mcs5000.h" /* Touchscreen controller */
-#include "ioctl-ypr1.h"
 
 enum {
     STATE_UNKNOWN,
