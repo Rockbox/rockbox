@@ -113,6 +113,14 @@ void icons_init(void);
 #else
 int get_icon_width(enum screen_type screen_type);
 int get_icon_height(enum screen_type screen_type);
+int get_icon_format(enum screen_type screen_type);
+#endif
+
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) \
+    && !defined(HAVE_LCD_CHARCELLS)
+int get_icon_format(enum screen_type screen_type);
+#else
+# define get_icon_format(a) FORMAT_MONO
 #endif
 
 

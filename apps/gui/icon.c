@@ -277,3 +277,17 @@ int get_icon_height(enum screen_type screen_type)
 {
     return ICON_HEIGHT(screen_type);
 }
+
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+int get_icon_format(enum screen_type screen)
+{
+    const struct bitmap *iconset;
+
+    if (iconsets[Iconset_user][screen].loaded)
+        iconset = &iconsets[Iconset_user][screen].bmp;
+    else
+        iconset = inbuilt_iconset[screen];
+
+    return iconset->format;
+}
+#endif
