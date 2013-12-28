@@ -11242,6 +11242,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "启动时间"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "启动时间"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_COMPRESSOR_RELEASE
   desc: in sound settings
   user: core
@@ -11251,11 +11268,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "压限释放时间"
+    swcodec: "恢复时间"
   </dest>
   <voice>
     *: none
-    swcodec: "压限释放时间"
+    swcodec: "恢复时间"
   </voice>
 </phrase>
 <phrase>
@@ -11449,11 +11466,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "压限比例"
+    swcodec: "压缩比"
   </dest>
   <voice>
     *: none
-    swcodec: "压限比例"
+    swcodec: "压缩比例"
   </voice>
 </phrase>
 <phrase>
