@@ -133,6 +133,8 @@ void gui_sync_skin_init(void)
         FOR_NB_SCREENS(i)
         {
             skin_data_free_buflib_allocs(&skins[j][i].data);
+            if (skins[j][i].data.backdrop_id != -1)
+                skin_backdrop_unload(skins[j][i].data.backdrop_id);
             gui_skin_reset(&skins[j][i]);
             skins[j][i].gui_wps.display = &screens[i];
         }
