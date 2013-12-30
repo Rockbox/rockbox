@@ -2289,7 +2289,7 @@ fi
     ;;
 
     95|creativezenv)
-    target_id=85
+    target_id=92
     modelname="creativezenv"
     target="CREATIVE_ZENV"
     memory=32

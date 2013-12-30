@@ -6,7 +6,7 @@
 #define IMX233_PARTITIONS   IMX233_CREATIVE
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 85
+#define MODEL_NUMBER 92
 #define MODEL_NAME   "Creative ZEN V"
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
