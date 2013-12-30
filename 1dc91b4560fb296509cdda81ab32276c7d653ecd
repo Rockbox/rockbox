@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_b7e38804",
+        "filename": "apps/SOURCES",
+        "patchSetId": 16
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 0,
+      "message": "I think that was deleted by accident? IIRC files should end with an empty line to make (certain versions of) gcc happy.",
+      "revId": "1dc91b4560fb296509cdda81ab32276c7d653ecd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}

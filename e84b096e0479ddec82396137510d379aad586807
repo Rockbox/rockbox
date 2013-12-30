@@ -1,0 +1,497 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_d7f0fccb",
+        "filename": "apps/keymaps/keymap-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "What\u0027s up here? is there radio or not? If not remove this mapping altogether. If yes remove the commented-out actions.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_f7ed00f1",
+        "filename": "firmware/asm/SOURCES",
+        "patchSetId": 16
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "This seems mis-placed, the new defined() should be outside (defined(MROBE_500) \u0026\u0026 !defined(LCD_USE_DMA)), or am I wrong?",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_17ba74e1",
+        "filename": "firmware/drivers/audio/wm8978.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Uhm, shouldn\u0027t config-samsungypr1.h should just define HAVE_RECORDING?",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_37bf78d2",
+        "filename": "firmware/drivers/audio/wm8978.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Perhaps add a commit why these extra commands are needed on the ypr1? Assuming you even know it that is. Perhaps because it\u0027s WM1808 and not wm8978?",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_57b4ecf1",
+        "filename": "firmware/export/config.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "s/LCD_YPR1/LCD_SAMSUNG_YPR1/",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_97cda489",
+        "filename": "firmware/export/config/samsungypr1.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "No if 0\u0027s please. Add a TODO comment or similar instead. Do you know which sample rates can be supported (by the codec)?",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_77b9f0e8",
+        "filename": "firmware/export/config/samsungypr1.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "LCD_SAMSUNG_YPR1",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_779e5058",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/audio-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Shouldnt this be inside HAVE_RECORDING? And check INPUT_SRC_CAPS mask",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_b7caa86c",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/button-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "This can be non-static",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_d7c71c63",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "You should have read docs/CONTRIBUTING by now. For functions the opening brace must be on the next line.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_f7c42061",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Remove braces for single-statement if.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_17a194a9",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Prefer { on new line for newly written code.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_37a698c2",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "No typedef here. brace on the next line too.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_57ab0c89",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "brace on next line.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_77b010f5",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000.h",
+        "patchSetId": 16
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Declarations should be prefixed with extern in headers. But we don\u0027t have a strict rule for that so I don\u0027t require you to change this. +1 for the basic comments though :)",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_9794c445",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/pmu-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "No { for single-statement if",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_b791c854",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/pmu-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "No { for single-statement if",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_d79e3c63",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/pmu-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Opening brace on new line.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_f79b4070",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/pmu-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Opening brace on new line.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_1788b421",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Opening brace on new line.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_378db832",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Opening brace on new line.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_57822c01",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "No { } for single-statement if",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_77873010",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Remove braces here please.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_977be428",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/system-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "is SDL used on the ypr1? It seems not, so it shouldnt have the left-over code, probably from copy\u0026paste?",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_b778e82c",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/system-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Is there no ondemand govenor available? I think we shouldnt tamper with the cpu frequencies unless necessary.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_d7755c33",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/wmcodec-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "Replace the commented-out stuff with a TODO comment. Do not introduce dead code.",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_f7726048",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/wmcodec-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "No { } for single-statement if",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_178fd424",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/wmcodec-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "No { } for single-statement if",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_3794d836",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/ypr1.make",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2013-12-30T01:12:44Z",
+      "side": 1,
+      "message": "This file can probably be unified with ypr0.make, but it can be a later patch. Don\u0027t worry for now",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
