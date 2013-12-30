@@ -359,6 +359,57 @@
     },
     {
       "key": {
+        "uuid": "9ab29df4_f7a9807c",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-12-30T12:19:39Z",
+      "side": 1,
+      "message": "This could be done without floating point arithmetic.\n int step \u003d (ret.reg1 \u003c\u003c 4) | (ret.reg2 \u003e\u003e 4);\n level  \u003d step + (step \u003e\u003e 2);",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_97c9245d",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-12-30T12:19:39Z",
+      "side": 1,
+      "message": "remove \u0027;\u0027",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_77b570cc",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-12-30T12:19:39Z",
+      "side": 1,
+      "message": "remove \u0027;\u0027",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab29df4_57822c01",
         "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
         "patchSetId": 16
@@ -370,6 +421,24 @@
       "writtenOn": "2013-12-30T01:12:44Z",
       "side": 1,
       "message": "No { } for single-statement if",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_17b6f4dc",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 16
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-12-30T12:19:39Z",
+      "side": 1,
+      "message": "AFAIK we don\u0027t have such rule. But we do have a rule to not mix code styles in one file.\nEither braces should be removed here or added above.",
+      "parentUuid": "9ab29df4_57822c01",
       "revId": "e84b096e0479ddec82396137510d379aad586807",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -489,6 +558,23 @@
       "writtenOn": "2013-12-30T01:12:44Z",
       "side": 1,
       "message": "This file can probably be unified with ypr0.make, but it can be a later patch. Don\u0027t worry for now",
+      "revId": "e84b096e0479ddec82396137510d379aad586807",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_d7ac7c8f",
+        "filename": "tools/configure",
+        "patchSetId": 16
+      },
+      "lineNbr": 3527,
+      "author": {
+        "id": 1000038
+      },
+      "writtenOn": "2013-12-30T12:19:39Z",
+      "side": 1,
+      "message": "s/85/93",
       "revId": "e84b096e0479ddec82396137510d379aad586807",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
