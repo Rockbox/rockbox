@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_172b54ec",
+        "filename": "apps/settings.h",
+        "patchSetId": 8
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-02T14:14:57Z",
+      "side": 1,
+      "message": "this has to go at the end of the struct unless you bump the plugin api version numbers",
+      "revId": "562d7438f026b86d8d8b9c20b288a89c084ceb4b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_37305856",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 667,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-02T14:14:57Z",
+      "side": 1,
+      "message": "This should not be a SOUND_SETTING(). I think an INT_SETTING() is better (with a suitable formatter function). IIRC if you also add a callback for when it changes you can then do the limit check in there (modifying global_settings.volume) so the volume in the UI will match what the player is using.\n\nThe only problem with doing it like this is using vol+/- in the WPS will bypass this limit so extra checking will be required in the set_vol() also.",
+      "revId": "562d7438f026b86d8d8b9c20b288a89c084ceb4b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
