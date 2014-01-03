@@ -49,11 +49,11 @@ void ldebugf(const char* file, int line, const char *fmt, ...)
 
 void dbg_dump_sector(int sec)
 {
-    unsigned char buf[512];
+    unsigned char buf[SECTOR_SIZE];
 
     storage_read_sectors(sec,1,buf);
     DEBUGF("---< Sector %d >-----------------------------------------\n", sec);
-    dbg_dump_buffer(buf, 512, 0);
+    dbg_dump_buffer(buf, SECTOR_SIZE, 0);
 }
 
 void dbg_dump_buffer(unsigned char *buf, int len, int offset)
@@ -427,7 +427,7 @@ void dbg_tail(char* name)
         return;
     DEBUGF("Got file descriptor %d\n",fd);
     
-    rc = lseek(fd,-512,SEEK_END);
+    rc = lseek(fd,-SECTOR_SIZE,SEEK_END);
     if ( rc >= 0 ) {
         rc = read(fd, buf, SECTOR_SIZE);
         if( rc > 0 )

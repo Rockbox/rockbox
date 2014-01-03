@@ -3,8 +3,6 @@
 #include <string.h>
 #include "debug.h"
 
-#define BLOCK_SIZE 512
-
 static FILE* file;
 
 void panicf( const char *fmt, ... );
@@ -17,11 +15,11 @@ int storage_read_sectors(unsigned long start, int count, void* buf)
     else
         DEBUGF("[Reading block 0x%lx]\n", start); 
 
-    if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
+    if(fseek(file,start*SECTOR_SIZE,SEEK_SET)) {
         perror("fseek");
         return -1;
     }
-    if(!fread(buf,BLOCK_SIZE,count,file)) {
+    if(!fread(buf,SECTOR_SIZE,count,file)) {
         DEBUGF("ata_write_sectors(0x%lx, 0x%x, %p)\n", start, count, buf );
         perror("fread");
         panicf("Disk error\n");
@@ -40,11 +38,11 @@ int storage_write_sectors(unsigned long start, int count, void* buf)
     if (start == 0)
         panicf("Writing on sector 0!\n");
 
-    if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
+    if(fseek(file,start*SECTOR_SIZE,SEEK_SET)) {
         perror("fseek");
         return -1;
     }
-    if(!fwrite(buf,BLOCK_SIZE,count,file)) {
+    if(!fwrite(buf,SECTOR_SIZE,count,file)) {
         DEBUGF("ata_write_sectors(0x%lx, 0x%x, %p)\n", start, count, buf );
         perror("fwrite");
         panicf("Disk error\n");

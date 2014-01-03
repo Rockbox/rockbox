@@ -1,3 +1,4 @@
+SECTOR_SIZE = 512
 FIRMWARE = ../..
 
 DRIVERS = ../../drivers
@@ -7,8 +8,8 @@ BUILDDATE=$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')
 INCLUDE = -I$(EXPORT) -I$(FIRMWARE)/include -I$(FIRMWARE)/target/hosted -I$(FIRMWARE)/target/hosted/sdl
 DEFINES =  -DTEST_FAT -DDEBUG -DDISK_WRITE -DHAVE_FAT16SUPPORT -D__PCTOOL__
 
-CFLAGS = -g -Wall -std=gnu99 -Wno-pointer-sign $(DEFINES) $(BUILDDATE) -I. $(INCLUDE) -I$(FIRMWARE)/libc/include
-SIMFLAGS = -g -Wall -std=gnu99 -Wno-pointer-sign $(DEFINES) -I. $(INCLUDE)
+CFLAGS = -g -Wall -std=gnu99 -Wno-pointer-sign $(DEFINES) $(BUILDDATE) -I. $(INCLUDE) -I$(FIRMWARE)/libc/include -DROCKBOX_DIR='".rockbox"' -DSECTOR_SIZE=$(SECTOR_SIZE)
+SIMFLAGS = -g -Wall -std=gnu99 -Wno-pointer-sign $(DEFINES) -I. $(INCLUDE) -DSECTOR_SIZE=$(SECTOR_SIZE)
 
 TARGET = fat
 
