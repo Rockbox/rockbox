@@ -75,7 +75,12 @@ bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cu
         char *dot = strrchr(cuepath, '.');
         strcpy(dot, ".cue");
         if (!file_exists(cuepath))
-            return false;
+        {
+            strlcpy(cuepath, track_id3->path, MAX_PATH);
+            strlcat(cuepath, ".cue", MAX_PATH);
+            if (!file_exists(cuepath))
+                return false;
+        }
     }
 
     strlcpy(cue_file->path, cuepath, MAX_PATH);
