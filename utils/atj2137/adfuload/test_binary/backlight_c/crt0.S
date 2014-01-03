@@ -11,9 +11,13 @@
 
 start:
     di                         # disable interrupts
-    bal get_pc                 # v0 = PC + 8 actually
+    bltzal zero, load_addr     # ra = PC + 8, branch not taken
     nop
-    addiu v0, -12              # calc real load address
+
+load_addr:
+    addiu v0, ra, -12          # calc real load address
+                               # account for branch delay slot
+                               # and very first 'di' instruction
     la t0, relocstart
     la t1, relocend
     beq t0, v0, entry_point    # no relocation needed
@@ -29,11 +33,6 @@ reloc_loop:
 entry_point_jump:
     la t0, entry_point
     jr t0
-    nop
-
-get_pc:
-    move v0, ra
-    jr ra
     nop
 
 entry_point:
