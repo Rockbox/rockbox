@@ -624,13 +624,18 @@ static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb))
                 fat_bpb->bpb_bytspersec);
         return -1;
     }
-    if((long)fat_bpb->bpb_secperclus * (long)fat_bpb->bpb_bytspersec
-                                                                   > 128L*1024L)
+    if((long)fat_bpb->bpb_secperclus * SECTOR_SIZE > 128L*1024L)
     {
+        /* We don't multiply by bpb_bytspersec here, because
+         * back in fat_mount_internal() bpb_secperclus has been
+         * "normalised" to 512 byte clusters, by multiplying with
+         * secmult. */
         DEBUGF( "bpb_is_sane() - Error: cluster size is larger than 128K "
                 "(%d * %d = %d)\n",
-                fat_bpb->bpb_bytspersec, fat_bpb->bpb_secperclus,
-                fat_bpb->bpb_bytspersec * fat_bpb->bpb_secperclus);
+                fat_bpb->bpb_bytspersec,
+                fat_bpb->bpb_secperclus / (fat_bpb->bpb_bytspersec / SECTOR_SIZE),
+                fat_bpb->bpb_bytspersec * fat_bpb->bpb_secperclus /
+                (fat_bpb->bpb_bytspersec / SECTOR_SIZE));
         return -2;
     }
     if(fat_bpb->bpb_numfats != 2)
