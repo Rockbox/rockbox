@@ -16,14 +16,26 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include <sys/ioctl.h>
 #include "kernel.h"
 #include "powermgmt.h"
 #include "power.h"
 #include "file.h"
 #include "adc.h"
-#include "sc900776.h"
 #include "radio-ypr.h"
+#include "ascodec.h"
+#include "stdbool.h"
+
+enum
+{
+    BATT_CHARGING,
+    BATT_NOT_CHARGING,
+    CHARGER_CONNECTED,
+    CHARGER_NOT_CONNECTED,
+};
+
+static bool first_readout = true;
+static int power_status = CHARGER_NOT_CONNECTED;
+static int charging_status = BATT_NOT_CHARGING;
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -49,17 +61,36 @@ const unsigned short const percent_to_volt_charge[11] =
       3450, 3670, 3721, 3751, 3782, 3821, 3876, 3941, 4034, 4125, 4200
 };
 
+static void read_charger(void)
+{
+    charging_status = ascodec_endofch() ? BATT_NOT_CHARGING : BATT_CHARGING;
+    power_status = ascodec_chg_status() ? CHARGER_CONNECTED : CHARGER_NOT_CONNECTED;
+    /* Sync the filter due to new charging state */
+    reset_battery_filter(_battery_voltage());
+}
+
 unsigned int power_input_status(void)
 {
-    unsigned status = POWER_INPUT_NONE;
-    int fd = open("/dev/minivet", O_RDONLY);
-    if (fd >= 0)
+    if (first_readout)
     {
-        if (ioctl(fd, IOCTL_MINIVET_DET_VBUS, NULL) > 0)
-            status = POWER_INPUT_MAIN_CHARGER;
-        close(fd);
+        /* 350mA, 4.20V */
+        ascodec_write_pmu(AS3543_CHARGER, 0x1, 0x5C);
+        /* Enable interrupt for charging detection */
+        ascodec_write(AS3514_IRQ_ENRD0, CHG_CHANGED);
+        read_charger();
+        first_readout = false;
     }
-    return status;
+
+    if (ascodec_read(AS3514_IRQ_ENRD0) & CHG_CHANGED)
+    {
+        /* Something has changed... */
+        read_charger();
+    }
+
+    if (power_status == CHARGER_CONNECTED)
+        return POWER_INPUT_MAIN_CHARGER;
+    else
+        return POWER_INPUT_NONE;
 }
 
 #endif /* CONFIG_CHARGING */
@@ -74,10 +105,7 @@ int _battery_voltage(void)
 
 bool charging_state(void)
 {
-    const unsigned short charged_thres = 4170;
-    bool ret = (power_input_status() == POWER_INPUT_MAIN_CHARGER);
-    /* dont indicate for > ~95% */
-    return ret && (_battery_voltage() <= charged_thres);
+    return (power_status == CHARGER_CONNECTED && charging_status == BATT_CHARGING);
 }
 
 #if CONFIG_TUNER
