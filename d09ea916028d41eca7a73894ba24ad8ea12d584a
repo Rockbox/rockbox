@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_d748fcce",
+        "filename": "apps/plugin.h",
+        "patchSetId": 9
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-04T15:25:22Z",
+      "side": 1,
+      "message": "revert this and put the setting at the bottom of the struct",
+      "revId": "d09ea916028d41eca7a73894ba24ad8ea12d584a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
