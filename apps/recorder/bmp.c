@@ -276,7 +276,7 @@ static unsigned int read_part_line(struct bmp_args *ba)
             break;
           case 15:
           case 16:
-            data = letoh16(*(uint16_t*)ibuf);
+            data = ibuf[0] | (ibuf[1]<<8);
             component = (data << 3) & 0xf8;
             component |= component >> 5;
             buf->blue = component;
