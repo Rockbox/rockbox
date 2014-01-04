@@ -122,11 +122,6 @@
 
 #endif /* SIMULATOR */
 
-/* FIXME
- * Lot of people reports bad battery life and funny charging times.
- * Check what's going on...
- */
-
 #define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 600 /* max. capacity selectable */
@@ -137,6 +132,9 @@
 
 /* Linux controlls charging, we can monitor */
 #define CONFIG_CHARGING CHARGING_MONITOR
+
+/* We want to be able to reset the averaging filter */
+#define HAVE_RESET_BATTERY_FILTER
 
 /* same dimensions as gigabeats */
 #define CONFIG_LCD LCD_YPR0
