@@ -74,7 +74,8 @@
 #endif /* CONFIG_CPU == AS3525 */
 #endif /* USB_READ_BUFFER_SIZE */
 
-#define MAX_CBW_SIZE 1024
+/* We don't use sizeof() here, because we *need* a multiple of 32 */
+#define MAX_CBW_SIZE 32
 
 #ifdef USB_WRITE_BUFFER_SIZE
 #define WRITE_BUFFER_SIZE USB_WRITE_BUFFER_SIZE
@@ -453,18 +454,16 @@ void usb_storage_init_connection(void)
     ramdisk_buffer = _ramdisk_buffer;
 #endif
 #else
-    /* TODO : check if bufsize is at least 32K ? */
-    size_t bufsize;
     unsigned char * buffer;
     /* dummy ops with no callbacks, needed because by
      * default buflib buffers can be moved around which must be avoided */
     static struct buflib_callbacks dummy_ops;
 
-    usb_handle = core_alloc_maximum("usb storage", &bufsize, &dummy_ops);
+    // Add 31 to handle worst-case misalignment
+    usb_handle = core_alloc_ex("usb storage", ALLOCATE_BUFFER_SIZE + MAX_CBW_SIZE + 31, &dummy_ops);
     if (usb_handle < 0)
         panicf("%s(): OOM", __func__);
-    if (bufsize < ALLOCATE_BUFFER_SIZE + MAX_CBW_SIZE + 31)
-        panicf("%s(): got only %d, not enough", __func__, bufsize);
+
     buffer = core_get_data(usb_handle);
 #if defined(UNCACHED_ADDR) && CONFIG_CPU != AS3525
     cbw_buffer = (void *)UNCACHED_ADDR((unsigned int)(buffer+31) & 0xffffffe0);
