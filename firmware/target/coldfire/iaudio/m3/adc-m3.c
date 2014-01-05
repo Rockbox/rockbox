@@ -21,9 +21,10 @@
 
 #include "config.h"
 
+#include "system.h"
+#include "kernel.h"
 #include "adc.h"
 #include "i2c-coldfire.h"
-#include "system.h"
 
 #define ADC_I2C_ADDR 0xa0
 

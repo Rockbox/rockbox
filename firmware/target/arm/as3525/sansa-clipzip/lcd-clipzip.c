@@ -18,12 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
+#include "cpu.h"
+#include "system.h"
+#include "kernel.h"
 
 #include "lcd.h"
 #include "lcd-target.h"
-#include "system.h"
-#include "cpu.h"
 
 /* the detected lcd type (0 or 1) */
 static int lcd_type;
