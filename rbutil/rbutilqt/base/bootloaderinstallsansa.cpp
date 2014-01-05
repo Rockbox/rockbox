@@ -242,10 +242,10 @@ bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
         sprintf(sansa->diskname, "\\\\.\\PhysicalDrive%i", devicename.toInt());
 #elif defined(Q_OS_MACX)
         sprintf(sansa->diskname,
-            qPrintable(devicename.remove(QRegExp("s[0-9]+$"))));
+            "%s", qPrintable(devicename.remove(QRegExp("s[0-9]+$"))));
 #else
         sprintf(sansa->diskname,
-            qPrintable(devicename.remove(QRegExp("[0-9]+$"))));
+            "%s", qPrintable(devicename.remove(QRegExp("[0-9]+$"))));
 #endif
         LOG_INFO() << "sansapatcher: overriding scan, using"
                    << sansa->diskname;
