@@ -1137,6 +1137,11 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../configure.cpp" line="749"/>
+        <source>%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../configure.cpp" line="755"/>
         <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
         <translation type="unfinished"></translation>
