@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "file.h"
 #include "lcd.h"
 #include "scroll_engine.h"

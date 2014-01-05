@@ -23,6 +23,7 @@
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "backlight.h"
 #include "adc.h"

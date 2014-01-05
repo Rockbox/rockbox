@@ -28,8 +28,9 @@
  */
 
 #include "config.h"
-#include "as3525.h"
+#include "cpu.h"
 #include "system.h"
+#include "kernel.h"
 #include "tuner.h"
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
@@ -237,4 +238,3 @@ void si4700_rds_init(void)
                   IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }
 #endif /* HAVE_RDS_CAP */
-

@@ -18,10 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include <sys/types.h> /* off_t */
 #include <string.h>
+
 #include "cpu.h"
 #include "system.h"
+#include "kernel.h"
 #include "backlight-target.h"
 #include "lcd.h"
 #include "lcdif-imx233.h"

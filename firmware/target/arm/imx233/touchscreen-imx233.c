@@ -18,6 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include "config.h"
+#include "kernel.h"
 #include "touchscreen-imx233.h"
 #include "stdlib.h"
 #ifdef SAMSUNG_YPZ5

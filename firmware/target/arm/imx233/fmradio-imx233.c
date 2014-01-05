@@ -18,6 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include "config.h"
+#include "kernel.h"
 #include "fmradio-imx233.h"
 #include "fmradio-target.h"
 #include "pinctrl-imx233.h"

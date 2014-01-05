@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "pinctrl-imx233.h"
 #include "rds.h"
 #include "si4700.h"

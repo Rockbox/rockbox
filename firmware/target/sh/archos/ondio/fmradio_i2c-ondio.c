@@ -19,8 +19,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "cpu.h"
+#include "kernel.h"
 #include "logf.h"
 #include "system.h"
 #include "fmradio_i2c.h"

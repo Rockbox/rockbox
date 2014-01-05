@@ -18,9 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
-#include "file.h"
+#include "kernel.h"
 #include "lcd-remote.h"
 #include "scroll_engine.h"
 
