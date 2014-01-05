@@ -1119,6 +1119,11 @@ Veuillez sélectionner manuellement le type de périphérique et le point de mon
         <translation>L&apos;initialisation du TTS sélectionné a échoué. Vous ne pouvez pas utiliser ce TTS. </translation>
     </message>
     <message>
+        <location filename="../configure.cpp" line="665"/>
+        <source>%1 (%2 GiB of %3 GiB free)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
         <translation>Plusieurs périphériques ont été détectés. Veuillez déconnecter tous les lecteurs sauf un et essayer à nouveau s&apos;il vous plait.</translation>
@@ -1132,6 +1137,11 @@ Veuillez sélectionner manuellement le type de périphérique et le point de mon
         <location filename="../configure.cpp" line="747"/>
         <source>(unknown)</source>
         <translation>(inconnu)</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="749"/>
+        <source>%1 at %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="755"/>

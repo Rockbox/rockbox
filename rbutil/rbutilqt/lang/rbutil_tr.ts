@@ -1103,6 +1103,11 @@ Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../configure.cpp" line="665"/>
+        <source>%1 (%2 GiB of %3 GiB free)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
         <translation type="unfinished"></translation>
@@ -1115,6 +1120,11 @@ Aygitinizi ve baglama noktasini kendiniz se�iniz.</translation>
     <message>
         <location filename="../configure.cpp" line="747"/>
         <source>(unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="749"/>
+        <source>%1 at %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

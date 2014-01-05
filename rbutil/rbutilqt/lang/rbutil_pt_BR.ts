@@ -1025,6 +1025,14 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
         <source>An unknown error occured during player detection.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 (%2 GiB of %3 GiB free)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConfigForm</name>

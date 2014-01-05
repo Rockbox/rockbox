@@ -1184,6 +1184,11 @@ Rockbox Utility kann mit diesen Proxy-Einstellungen nicht arbeiten. Bitte sicher
         <translation>Cache-Pfad einstellen</translation>
     </message>
     <message>
+        <location filename="../configure.cpp" line="665"/>
+        <source>%1 (%2 GiB of %3 GiB free)</source>
+        <translation>%1 (%2 GiB von %3 GiB frei)</translation>
+    </message>
+    <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
         <translation>Mehrere Geräte gefunden. Bitte alle bis auf eins entfernen und erneut versuchen.</translation>

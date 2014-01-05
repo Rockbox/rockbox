@@ -1129,6 +1129,11 @@ Rockbox Utility nie może pracować z tymi ustawieniami. Proszę sprawdź, że u
         <translation>Ustaw ścieżkę do bufora</translation>
     </message>
     <message>
+        <location filename="../configure.cpp" line="665"/>
+        <source>%1 (%2 GiB of %3 GiB free)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
         <translation type="unfinished"></translation>
@@ -1141,6 +1146,11 @@ Rockbox Utility nie może pracować z tymi ustawieniami. Proszę sprawdź, że u
     <message>
         <location filename="../configure.cpp" line="747"/>
         <source>(unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="749"/>
+        <source>%1 at %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

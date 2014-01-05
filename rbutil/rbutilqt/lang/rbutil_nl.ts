@@ -1116,6 +1116,11 @@ Selecteer uw apparaat en Mountpunt manueel.</translation>
         <translation>Het initialiseren van de gekozen TTS is mislukt. Deze TTS kan niet gebruikt worden.</translation>
     </message>
     <message>
+        <location filename="../configure.cpp" line="665"/>
+        <source>%1 (%2 GiB of %3 GiB free)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
         <translation>Er zijn meerdere apparaten gedetecteerd. Ontkoppel alle spelers op een na en probeer opnieuw.</translation>
@@ -1129,6 +1134,11 @@ Selecteer uw apparaat en Mountpunt manueel.</translation>
         <location filename="../configure.cpp" line="747"/>
         <source>(unknown)</source>
         <translation>(onbekend)</translation>
+    </message>
+    <message>
+        <location filename="../configure.cpp" line="749"/>
+        <source>%1 at %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="755"/>
