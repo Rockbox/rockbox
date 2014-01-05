@@ -157,7 +157,7 @@ static int compute_window_freescale(intptr_t user, part_read_fn_t read_fn,
 
         if(ent[4] == 0x53)
             return -102; /* sigmatel partition */
-        if((*end - *start) < 4 * 1024 * 1024)
+        if((*end - *start) < 1 * 1024 * 1024)
             return -103; /* partition too small */
         return 0;
     }
