@@ -125,14 +125,22 @@ static int compute_window_freescale(intptr_t user, part_read_fn_t read_fn,
      * The first table uses 512-byte sector size and the second one usually uses
      * 2048-byte logical sector size.
      *
-     * We restrict the window to the user partition
-     *
      * WARNING HACK FIXME BUG
-     * Reverse engineering and experiments suggests that the OF ignores the lowest 2 bits
-     * of the LBAs in the partition table. There is at least one example
-     * (the Creative Zen X-Fi3) where this is important because the LBA of the user partition
-     * is not a multiple of 4. The behaviour of the size field is less clear but
-     * it seems that it is similarly truncated. */
+     * Reverse engineering suggests that OF has a notion of "internal sector size"
+     * which can either be 512 or 2048 bytes. When applied to the main data drive,
+     * it internally converts LBA from sectors to "internal sectors". Consequently,
+     * if the internal sector size is 2048 and the sector size of 512, it will
+     * drop the lowest 2 bits of the LBA from the partition table. This is the case
+     * of the ZEN X-Fi3 for example. However, if the internal sector size is 512
+     * bytes, then there is no such loss. This is the case of the Zen X-Fi Style
+     * for example.
+     * The behaviour of the size field is less clear but it seems that it is similarly
+     * truncated. */
+#if defined(CREATIVE_ZENXFISTYLE)
+#define DROP_MASK   0
+#else
+#define DROP_MASK   3
+#endif
     if(mbr[510] != 0x55 || mbr[511] != 0xAA)
         return -101; /* invalid MBR */
     if(part == IMX233_PART_DATA)
@@ -141,9 +149,9 @@ static int compute_window_freescale(intptr_t user, part_read_fn_t read_fn,
         uint8_t *ent = &mbr[446];
         *start = ent[8] | ent[9] << 8 | ent[10] << 16 | ent[11] << 24;
         /* ignore two lowest bits(see comment above) */
-        *start &= ~3;
+        *start &= ~DROP_MASK;
         *end = (ent[12] | ent[13] << 8 | ent[14] << 16 | ent[15] << 24);
-        *end &= ~3;
+        *end &= ~DROP_MASK;
         /* ignore two lowest bits(order is important, first truncate then add start) */
         *end += *start;
 
