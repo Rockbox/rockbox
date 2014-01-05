@@ -89,7 +89,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voor installatie van de bootloader is het nodig dat u een kopie van de originele Sandisk firmware (bin bestand) aanlevert. Dit bestand zal aangepast en dan geïnstalleerd worden op uw speler, samen met de rockbox bootloader. U moet dit bestand zelf downloaden om juridische redenen. Kijk op &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; of op &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;handleiding&lt;/a&gt; en de &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wikipagina hoe u dit bestand kan verkrijgen.&lt;br/&gt;Druk Ok om door te gaan en om op uw computer te bladeren naar het firmware bestand.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="58"/>
@@ -105,7 +105,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="127"/>
         <source>No room to insert bootloader, try another firmware version</source>
-        <translation>Geen ruimte om de bootloader in te voegen, probeer een andere firmwareversie.</translation>
+        <translation>Geen ruimte om de bootloader in te voegen, probeer een andere firmwareversie</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="137"/>
@@ -130,7 +130,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="185"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation>Voer een normale upgrade met een ongewijzigde originele firmware, om the deïnstalleren.</translation>
+        <translation>Voer een normale upgrade met een ongewijzigde originele firmware, om the deïnstalleren</translation>
     </message>
 </context>
 <context>
@@ -188,7 +188,7 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="238"/>
         <source>CAB file format detected</source>
-        <translation type="unfinished"></translation>
+        <translation>CAB bestandsformaat gedetecteerd</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="259"/>
@@ -825,7 +825,7 @@ Zie http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="127"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation>Voer een normale upgrade met een originele firmware uit, om te deïnstalleren.</translation>
+        <translation>Voer een normale upgrade met een originele firmware uit, om te deïnstalleren</translation>
     </message>
 </context>
 <context>
@@ -1003,7 +1003,7 @@ Zie http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="151"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware</source>
-        <translation>Voer een normale upgrade met een ongewijzigde firmware uit, om te deïnstalleren.</translation>
+        <translation>Voer een normale upgrade met een ongewijzigde firmware uit, om te deïnstalleren</translation>
     </message>
 </context>
 <context>
@@ -1011,17 +1011,17 @@ Zie http://www.rockbox.org/wiki/SansaE200Install</translation>
     <message>
         <location filename="../gui/changelogfrm.ui" line="17"/>
         <source>Changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Wijzigingsoverzicht</translation>
     </message>
     <message>
         <location filename="../gui/changelogfrm.ui" line="39"/>
         <source>Show on startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon bij opstarten</translation>
     </message>
     <message>
         <location filename="../gui/changelogfrm.ui" line="46"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
 </context>
 <context>
@@ -1107,51 +1107,52 @@ Selecteer uw apparaat en Mountpunt manueel.</translation>
         <location filename="../configure.cpp" line="448"/>
         <location filename="../configure.cpp" line="914"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>TTS-fout</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="449"/>
         <location filename="../configure.cpp" line="915"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het initialiseren van de gekozen TTS is mislukt. Deze TTS kan niet gebruikt worden.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn meerdere apparaten gedetecteerd. Ontkoppel alle spelers op een na en probeer opnieuw.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="742"/>
         <source>Detected devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gedetecteerde apparaten:</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="747"/>
         <source>(unknown)</source>
-        <translation type="unfinished"></translation>
+        <translation>(onbekend)</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="755"/>
         <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
-        <translation type="unfinished"></translation>
+        <translation>Let op: het detecteren van aangesloten apparaten is niet altijd betrouwbaar. Er zijn mogelijk minder apparaten aangesloten dan aangegeven. In dat geval is het misschien niet mogelijk om uw speler betrouwbaar te detecteren.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="759"/>
         <location filename="../configure.cpp" line="763"/>
         <location filename="../configure.cpp" line="805"/>
         <source>Device Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Apparaatdetectie</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="794"/>
         <source>The player contains an incompatible filesystem.
 Make sure you selected the correct mountpoint and the player is set up to use a filesystem compatible with Rockbox.</source>
-        <translation type="unfinished"></translation>
+        <translation>De speler bevat een incompatibel bestandsysteem.
+Controleer dat het juiste MountPoint geselecteerd is en dat de speler geconfigureerd is met een bestandsysteem dat compatibel is met Rockbox.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="802"/>
         <source>An unknown error occured during player detection.</source>
-        <translation type="unfinished"></translation>
+        <translation>Een onbekende fout is opgetreden tijdens detectie van de speler.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="869"/>
@@ -1379,7 +1380,7 @@ Gelieve de TTS engine te configureren.</translation>
     <message>
         <location filename="../configurefrm.ui" line="219"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="260"/>
@@ -1575,12 +1576,12 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../createvoicewindow.cpp" line="100"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>TTS-fout</translation>
     </message>
     <message>
         <location filename="../createvoicewindow.cpp" line="101"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het initialiseren van de gekozen TTS is mislukt. Deze TTS kan niet gebruikt worden.</translation>
     </message>
     <message>
         <location filename="../createvoicewindow.cpp" line="105"/>
@@ -1792,22 +1793,22 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../installtalkwindow.cpp" line="96"/>
         <source>Empty selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Lege selectie</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="97"/>
         <source>No files or folders selected. Please select files or folders first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen bestanden of mappen geselecteerd. Kies bestanden of mappen.</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="137"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>TTS-fout</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="138"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het initialiseren van de gekozen TTS is mislukt. Deze TTS kan niet gebruikt worden.</translation>
     </message>
 </context>
 <context>
@@ -1891,12 +1892,12 @@ Pas op: u moet eerst deze installatie doen met een internet verbinding om ze lat
     <message>
         <location filename="../base/mspackutil.cpp" line="101"/>
         <source>Creating output path failed</source>
-        <translation type="unfinished">Aanmaken uitvoerlokatie mislukt</translation>
+        <translation>Aanmaken uitvoerlokatie mislukt</translation>
     </message>
     <message>
         <location filename="../base/mspackutil.cpp" line="109"/>
         <source>Error during CAB operation</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout tijdens CAB-bewerking</translation>
     </message>
 </context>
 <context>
@@ -2159,22 +2160,22 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="759"/>
         <source>Device ejected</source>
-        <translation type="unfinished"></translation>
+        <translation>Apparaat ontkoppeld</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="760"/>
         <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Apparaat succesvol ontkoppeld. U kunt nu de speler van de PC loskoppelen.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="764"/>
         <source>Ejecting failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ontkoppelen mislukt</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="765"/>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ontkoppelen van het apparaat mislukt. Controleer dat er geen programma&apos;s zijn die bestanden op het apparaat benaderen. Als ontkoppelen dan nog steeds mislukt, gebruik dan de ontkoppelfunctie van de computer.  </translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="337"/>
@@ -2444,7 +2445,7 @@ Netwerkfout: %1. Controleer uw netwerk- en proxy-instellingen.</translation>
     <message>
         <location filename="../rbutilqtfrm.ui" line="103"/>
         <source>&amp;Eject</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ontkoppelen</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="221"/>
@@ -2535,7 +2536,7 @@ Netwerkfout: %1. Controleer uw netwerk- en proxy-instellingen.</translation>
     <message>
         <location filename="../rbutilqtfrm.ui" line="663"/>
         <source>Show &amp;Changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon &amp;Wijzigingsoverzicht</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="521"/>
@@ -2563,7 +2564,7 @@ Netwerkfout: %1. Controleer uw netwerk- en proxy-instellingen.</translation>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="35"/>
         <source>Version information not available yet.</source>
-        <translation>Versie-informatie nog niet beschikbaar</translation>
+        <translation>Versie-informatie nog niet beschikbaar.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="54"/>
@@ -2725,7 +2726,7 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="319"/>
         <source>Bootloader files (%1)</source>
-        <translation>Bootloader-bestanden</translation>
+        <translation>Bootloader-bestanden (%1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="321"/>
@@ -2977,17 +2978,17 @@ Kies &quot;Nee&quot; om deze stap over te slaan.</translation>
     <message>
         <location filename="../base/ttsbase.cpp" line="51"/>
         <source>SAPI4 TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>SAPI4 TTS</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="53"/>
         <source>SAPI5 TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>SAPI5 TTS</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="54"/>
         <source>MS Speech Platform</source>
-        <translation type="unfinished"></translation>
+        <translation>MS Speech Platform</translation>
     </message>
     <message>
         <source>SAPI TTS Engine</source>
