@@ -39,6 +39,8 @@ extern bool logfwrap;
 #define logf _logf
 void _logf(const char *format, ...) ATTRIBUTE_PRINTF(1, 2);
 
+void logf_panic_dump(int *y);
+
 #else /* !ROCKBOX_HAS_LOGF */
 
 /* built without logf() support enabled, replace logf() by DEBUGF() */
