@@ -35,6 +35,7 @@
 #include "timefuncs.h"
 #endif
 #include "core_alloc.h"
+#include "panic.h"
 
 #ifdef USB_USE_RAMDISK
 #define RAMDISK_SIZE 2048
@@ -460,6 +461,10 @@ void usb_storage_init_connection(void)
     static struct buflib_callbacks dummy_ops;
 
     usb_handle = core_alloc_maximum("usb storage", &bufsize, &dummy_ops);
+    if (usb_handle < 0)
+        panicf("%s(): OOM", __func__);
+    if (bufsize < ALLOCATE_BUFFER_SIZE + MAX_CBW_SIZE + 31)
+        panicf("%s(): got only %d, not enough", __func__, bufsize);
     buffer = core_get_data(usb_handle);
 #if defined(UNCACHED_ADDR) && CONFIG_CPU != AS3525
     cbw_buffer = (void *)UNCACHED_ADDR((unsigned int)(buffer+31) & 0xffffffe0);
