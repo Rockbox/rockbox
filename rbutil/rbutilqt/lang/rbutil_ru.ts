@@ -100,7 +100,11 @@
     </message>
     <message>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation>Установка загрузчика потребует от вас копию оригинальной прошивки Sandisk\&apos;а (bin файл). Эта прошивка будет пропатчена и затем установлена в ваш плеер вместе с зарузчиком Rockbox\&apos;а. По причинам легальности данного действия вам нужно будет самим скачать загрузчик. Зайдите на &lt;a href=\&apos;http://forums.sandisk.com/sansa/\&apos;&gt;Sansa Forums\&apos;&lt;/a&gt; или обратитесь к &lt;a href=\&apos;http://www.rockbox.org/manual.shtml\&apos;&gt;инструкции&lt;/a&gt; и вики-странице &lt;a href=\&apos;http://www.rockbox.org/wiki/SansaAMS\&apos;&gt;SansaAMS&lt;/a&gt; за помощью с получением файла.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
+        <translation type="obsolete">Установка загрузчика потребует от вас копию оригинальной прошивки Sandisk\&apos;а (bin файл). Эта прошивка будет пропатчена и затем установлена в ваш плеер вместе с зарузчиком Rockbox\&apos;а. По причинам легальности данного действия вам нужно будет самим скачать загрузчик. Зайдите на &lt;a href=\&apos;http://forums.sandisk.com/sansa/\&apos;&gt;Sansa Forums\&apos;&lt;/a&gt; или обратитесь к &lt;a href=\&apos;http://www.rockbox.org/manual.shtml\&apos;&gt;инструкции&lt;/a&gt; и вики-странице &lt;a href=\&apos;http://www.rockbox.org/wiki/SansaAMS\&apos;&gt;SansaAMS&lt;/a&gt; за помощью с получением файла.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
+    </message>
+    <message>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -171,6 +175,10 @@
     </message>
     <message>
         <source>Could not find firmware in archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CAB file format detected</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -801,6 +809,21 @@ See http://www.rockbox.org/wiki/SansaE200Install
     </message>
 </context>
 <context>
+    <name>Changelog</name>
+    <message>
+        <source>Changelog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+</context>
+<context>
     <name>Config</name>
     <message>
         <source>Autodetection</source>
@@ -836,7 +859,7 @@ Select your device and Mountpoint manually.</source>
     </message>
     <message>
         <source>Fatal error</source>
-        <translation>Фатальная ошибка</translation>
+        <translation type="obsolete">Фатальная ошибка</translation>
     </message>
     <message>
         <source>Current cache size is %L1 kiB.</source>
@@ -896,7 +919,7 @@ Sorry, Rockbox doesn&apos;t run on your player.</source>
     </message>
     <message>
         <source>Fatal: player incompatible</source>
-        <translation>Ошибка: плеер несовместим</translation>
+        <translation type="obsolete">Ошибка: плеер несовместим</translation>
     </message>
     <message>
         <source>TTS configuration invalid</source>
@@ -968,11 +991,48 @@ You need to change your player to MSC mode for installation. </source>
     </message>
     <message>
         <source>Until you change this installation will fail!</source>
-        <translation>Пока вы это не измените, установка не пройдёт успешно!</translation>
+        <translation type="obsolete">Пока вы это не измените, установка не пройдёт успешно!</translation>
     </message>
     <message>
         <source>Could not voice test string.
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TTS error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detected devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The player contains an incompatible filesystem.
+Make sure you selected the correct mountpoint and the player is set up to use a filesystem compatible with Rockbox.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown error occured during player detection.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1076,11 +1136,11 @@ You need to change your player to MSC mode for installation. </source>
     </message>
     <message>
         <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;Эта функция попытается использовать всю информацию из кэша, даже информацию об обновлениях. Используйте эту возможность только если вы хотите устанавливать без подключения к сети. Примечание: Вам необходимо выполнить такую-же установку, которую вы хотите выполнить потом, пока подключение к сети действует, чтобы загрузить все нужные файлы в кэш.&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;p&gt;Эта функция попытается использовать всю информацию из кэша, даже информацию об обновлениях. Используйте эту возможность только если вы хотите устанавливать без подключения к сети. Примечание: Вам необходимо выполнить такую-же установку, которую вы хотите выполнить потом, пока подключение к сети действует, чтобы загрузить все нужные файлы в кэш.&lt;/p&gt;</translation>
     </message>
     <message>
         <source>O&amp;ffline mode</source>
-        <translation>Ав&amp;тономный режим</translation>
+        <translation type="obsolete">Ав&amp;тономный режим</translation>
     </message>
     <message>
         <source>Clean cache &amp;now</source>
@@ -1146,6 +1206,10 @@ You need to change your player to MSC mode for installation. </source>
         <source>&amp;Use string corrections for TTS</source>
         <translation>&amp;Использовать корекции строк для TTS</translation>
     </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Configure</name>
@@ -1202,6 +1266,14 @@ You need to change your player to MSC mode for installation. </source>
     <name>CreateVoiceWindow</name>
     <message>
         <source>Engine: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TTS error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1365,7 +1437,19 @@ You need to change your player to MSC mode for installation. </source>
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <source>&lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Empty selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No files or folders selected. Please select files or folders first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TTS error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1428,6 +1512,17 @@ You need to change your player to MSC mode for installation. </source>
     </message>
     <message>
         <source>Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MsPackUtil</name>
+    <message>
+        <source>Creating output path failed</source>
+        <translation type="unfinished">Ошибка создания выходной папки</translation>
+    </message>
+    <message>
+        <source>Error during CAB operation</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1685,6 +1780,22 @@ Network error: %1. Please check your network and proxy settings.</source>
         <source>No Rockbox bootloader found.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Device ejected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
@@ -1925,6 +2036,14 @@ Network error: %1. Please check your network and proxy settings.</source>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Backup current installation.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Create a backup by archiving the contents of the Rockbox installation folder.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Eject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show &amp;Changelog</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SelectiveInstallWidget</name>
@@ -2104,7 +2223,7 @@ Press &quot;No&quot; to skip this step.</source>
     </message>
     <message>
         <source>Aborted!</source>
-        <translation type="unfinished">Отменено!</translation>
+        <translation type="obsolete">Отменено!</translation>
     </message>
     <message>
         <source>Your installation doesn&apos;t require game files, skipping.</source>
@@ -2273,7 +2392,7 @@ Press &quot;No&quot; to skip this step.</source>
     </message>
     <message>
         <source>SAPI TTS Engine</source>
-        <translation>SAPI TTS движок</translation>
+        <translation type="obsolete">SAPI TTS движок</translation>
     </message>
     <message>
         <source>Festival TTS Engine</source>
@@ -2282,6 +2401,18 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <source>OS X System Engine</source>
         <translation>Системный движок OS X</translation>
+    </message>
+    <message>
+        <source>SAPI4 TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAPI5 TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MS Speech Platform</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

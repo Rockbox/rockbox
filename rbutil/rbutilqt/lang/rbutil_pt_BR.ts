@@ -99,7 +99,7 @@
         <translation>Para desinstalar, faça uma atualização normal com um firmware original não modificado</translation>
     </message>
     <message>
-        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -171,6 +171,10 @@
     </message>
     <message>
         <source>Could not find firmware in archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CAB file format detected</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -801,6 +805,21 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
 </context>
 <context>
+    <name>Changelog</name>
+    <message>
+        <source>Changelog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Ok</source>
+        <translation type="unfinished">&amp;Ok</translation>
+    </message>
+</context>
+<context>
     <name>Config</name>
     <message>
         <source>The following errors occurred:</source>
@@ -852,7 +871,7 @@ Veja http://www.rockbox.org/wiki/SansaE200Install</translation>
     </message>
     <message>
         <source>Fatal error</source>
-        <translation>Erro fatal</translation>
+        <translation type="obsolete">Erro fatal</translation>
     </message>
     <message>
         <source>Autodetection</source>
@@ -896,7 +915,7 @@ Desculpe, o Rockbox não funciona no seu reprodutor.</translation>
     </message>
     <message>
         <source>Fatal: player incompatible</source>
-        <translation>Fatal: reprodutor incompatível</translation>
+        <translation type="obsolete">Fatal: reprodutor incompatível</translation>
     </message>
     <message>
         <source>TTS configuration invalid</source>
@@ -970,7 +989,40 @@ You need to change your player to MSC mode for installation. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Until you change this installation will fail!</source>
+        <source>TTS error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detected devices:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The player contains an incompatible filesystem.
+Make sure you selected the correct mountpoint and the player is set up to use a filesystem compatible with Rockbox.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An unknown error occured during player detection.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1074,11 +1126,11 @@ You need to change your player to MSC mode for installation. </source>
     </message>
     <message>
         <source>&lt;p&gt;This will try to use all information from the cache, even information about updates. Only use this option if you want to install without network connection. Note: you need to do the same install you want to perform later with network access first to download all required files to the cache.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;Isto tentará usar toda a informação do cache, incluindo informação de atualizações. Somente use esta opção se você quer instalar sem uma conecção de rede. Nota: primeiro você precisa fazer a mesma instalação que você quer efetuar posteriormente, com acesso a rede para que sejam transferidos para o cache todos os arquivos necessários.&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;p&gt;Isto tentará usar toda a informação do cache, incluindo informação de atualizações. Somente use esta opção se você quer instalar sem uma conecção de rede. Nota: primeiro você precisa fazer a mesma instalação que você quer efetuar posteriormente, com acesso a rede para que sejam transferidos para o cache todos os arquivos necessários.&lt;/p&gt;</translation>
     </message>
     <message>
         <source>O&amp;ffline mode</source>
-        <translation>Modo o&amp;ffline</translation>
+        <translation type="obsolete">Modo o&amp;ffline</translation>
     </message>
     <message>
         <source>Clean cache &amp;now</source>
@@ -1144,6 +1196,10 @@ You need to change your player to MSC mode for installation. </source>
         <source>&amp;Use string corrections for TTS</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Configure</name>
@@ -1200,6 +1256,14 @@ You need to change your player to MSC mode for installation. </source>
     <name>CreateVoiceWindow</name>
     <message>
         <source>Engine: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TTS error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1367,7 +1431,19 @@ You need to change your player to MSC mode for installation. </source>
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <source>&lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Empty selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No files or folders selected. Please select files or folders first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TTS error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1430,6 +1506,17 @@ You need to change your player to MSC mode for installation. </source>
     </message>
     <message>
         <source>Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MsPackUtil</name>
+    <message>
+        <source>Creating output path failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error during CAB operation</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1687,6 +1774,22 @@ Erro de rede: %1. Por favor, verifique sua configuração de rede e proxy.</tran
         <source>No Rockbox bootloader found.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Device ejected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RbUtilQtFrm</name>
@@ -1928,6 +2031,14 @@ se você instalar o arquivo de voz, o Rockbox falará.</translation>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Backup current installation.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Create a backup by archiving the contents of the Rockbox installation folder.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Eject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show &amp;Changelog</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SelectiveInstallWidget</name>
@@ -2107,7 +2218,7 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
     </message>
     <message>
         <source>Aborted!</source>
-        <translation type="unfinished">Abortado!</translation>
+        <translation type="obsolete">Abortado!</translation>
     </message>
     <message>
         <source>Your installation doesn&apos;t require game files, skipping.</source>
@@ -2275,15 +2386,23 @@ Pressione &quot;Não&quot; para pular esse passo.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SAPI TTS Engine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Festival TTS Engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>OS X System Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAPI4 TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SAPI5 TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MS Speech Platform</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
