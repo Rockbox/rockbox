@@ -175,13 +175,15 @@ enum color_order {
 };
 
 struct bmp_args {
+    /* needs to be at least 2byte aligned for faster 16bit reads.
+     * but aligning to cache should be even faster */
+    unsigned char buf[BM_MAX_WIDTH * 4] CACHEALIGN_AT_LEAST_ATTR(2);
     int fd;
     short padded_width;
     short read_width;
     short width;
     short depth;
     enum color_order order;
-    unsigned char buf[BM_MAX_WIDTH * 4];
     struct uint8_rgb *palette;
 #if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \
     defined(HAVE_BMP_SCALING) || defined(PLUGIN)
@@ -276,7 +278,7 @@ static unsigned int read_part_line(struct bmp_args *ba)
             break;
           case 15:
           case 16:
-            data = ibuf[0] | (ibuf[1]<<8);
+            data = letoh16(*(uint16_t*)ibuf);
             component = (data << 3) & 0xf8;
             component |= component >> 5;
             buf->blue = component;
