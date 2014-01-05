@@ -662,7 +662,7 @@ void Config::refreshMountpoint()
         // later (to include volume label or similar)
         // Skip unwritable mountpoints, they are not useable for us.
         if(QFileInfo(mps.at(i)).isWritable()) {
-            QString description = QString("%1 (%2 GiB of %3 GiB free)")
+            QString description = tr("%1 (%2 GiB of %3 GiB free)")
                 .arg(Utils::filesystemName(mps.at(i)))
                 .arg((double)Utils::filesystemFree(mps.at(i))/(1<<30), 0, 'f', 2)
                 .arg((double)Utils::filesystemTotal(mps.at(i))/(1<<30), 0, 'f', 2);
@@ -746,10 +746,10 @@ void Config::autodetect()
             if(mp.isEmpty()) {
                 mp = tr("(unknown)");
             }
-            msg += QString("<li>%1 at %2</li>").arg(
+            msg += QString("<li>%1</li>").arg(tr("%1 at %2").arg(
                         SystemInfo::platformValue(detected.at(i).device,
-                                      SystemInfo::CurPlatformName).toString(),
-                        QDir::toNativeSeparators(mp));
+                            SystemInfo::CurPlatformName).toString(),
+                        QDir::toNativeSeparators(mp)));
         }
         msg += "</ul>";
         msg += tr("Note: detecting connected devices might be ambiguous. "
