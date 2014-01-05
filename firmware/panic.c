@@ -30,6 +30,7 @@
 #include "led.h"
 #include "power.h"
 #include "system.h"
+#include "logf.h"
 
 #if defined(CPU_ARM)
 #include "gcc_extensions.h"
@@ -114,6 +115,9 @@ void panicf( const char *fmt, ...)
 
 #if defined(CPU_ARM)
     backtrace(pc, sp, &y);
+#endif
+#ifdef ROCKBOX_HAS_LOGF
+    logf_panic_dump(&y);
 #endif
 #else
     /* no LCD */
