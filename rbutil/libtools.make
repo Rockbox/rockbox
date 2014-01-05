@@ -23,7 +23,7 @@ endif
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 ifeq ($(OS),Windows_NT)
 mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
-rm = del /q /s $(subst /,\,$(1))
+rm = if exist $(subst /,\,$(1)) del /q /s $(subst /,\,$(1))
 else
 mkdir = mkdir -p $(1)
 rm = rm -rf $(1)
