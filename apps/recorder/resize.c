@@ -31,12 +31,14 @@
  *
  ****************************************************************************/
 
-#include <system.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <general.h>
-#include "inttypes.h"
+#include <stdint.h>
+
+#include "general.h"
+#include "kernel.h"
+#include "system.h"
 #ifndef PLUGIN
 #include "debug.h"
 #endif

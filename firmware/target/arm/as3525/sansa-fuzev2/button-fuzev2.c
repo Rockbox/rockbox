@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "backlight.h"
 

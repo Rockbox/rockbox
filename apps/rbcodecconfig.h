@@ -18,6 +18,9 @@
  * {,U}INT{8,16,32,64}_{MIN,MAX} */
 #include "system.h"
 
+/* HZ, TIME_AFTER */
+#include "kernel.h"
+
 /* Structure to record some info during processing call */
 struct dsp_loop_context
 {

@@ -24,14 +24,16 @@
  * loaded at startup, as well as their mapping into
  * the FONT_SYSFIXED, FONT_UI and FONT_MP3 ids.
  */
-#include "config.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "inttypes.h"
-#include "lcd.h"
+#include <stdint.h>
+#include <stddef.h>
+
+#include "config.h"
 #include "system.h"
+#include "kernel.h"
+#include "lcd.h"
 #include "font.h"
 #include "file.h"
 #include "core_alloc.h"

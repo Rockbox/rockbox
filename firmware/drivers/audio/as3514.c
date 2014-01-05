@@ -21,9 +21,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "cpu.h"
 #include "debug.h"
 #include "system.h"
+#include "kernel.h"
 #include "audio.h"
 #include "sound.h"
 

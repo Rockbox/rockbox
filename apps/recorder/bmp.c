@@ -38,6 +38,7 @@
    ahead by whole lines, or read the next chunk of the current line
 */
 
+#define ROCKBOX_DEBUG_BMP_LOADER
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,7 +54,7 @@
 #include "lcd-remote.h"
 #endif
 #ifdef ROCKBOX_DEBUG_BMP_LOADER
-#define BDEBUGF DEBUGF
+#define BDEBUGF printf
 #else
 #define BDEBUGF(...)
 #endif
@@ -774,6 +775,7 @@ int read_bmp_fd(int fd,
 #endif
         .alpha_detected = false, .first_alpha_byte = 0x80,
         .order = order,
+        .buf = NULL,
     };
 
 #if (LCD_DEPTH > 1 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)) && \

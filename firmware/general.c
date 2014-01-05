@@ -19,8 +19,10 @@
  *
  ****************************************************************************/
 
-#include "config.h"
 #include <stdio.h>
+#include "config.h"
+#include "system.h"
+#include "kernel.h"
 #include "general.h"
 #include "file.h"
 #include "dir.h"
@@ -28,7 +30,6 @@
 #include "limits.h"
 #include "stdlib.h"
 #include "string-extra.h"
-#include "system.h"
 #include "time.h"
 #include "timefuncs.h"
 

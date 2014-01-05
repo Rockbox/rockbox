@@ -22,8 +22,9 @@
 #include <jni.h>
 #include <stdbool.h>
 #define _SYSTEM_WITH_JNI /* for getJavaEnvironment */
-#include <system.h>
 #include <pthread.h>
+#include "system.h"
+#include "kernel.h"
 #include "debug.h"
 #include "pcm.h"
 #include "pcm-internal.h"

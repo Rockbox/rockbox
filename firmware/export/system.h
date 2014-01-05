@@ -22,9 +22,10 @@
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #include "cpu.h"
-#include "stdbool.h"
-#include "kernel.h"
 #include "gcc_extensions.h" /* for LIKELY/UNLIKELY */
 
 extern void system_reboot (void);

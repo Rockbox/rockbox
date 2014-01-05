@@ -26,8 +26,10 @@
 #include <errno.h>
 #include <unistd.h>
 #include <pthread.h>
+
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "audio.h"
 #include "panic.h"
@@ -165,4 +167,3 @@ void timer_unregister(void)
     timer_delete(timer_tid);
     timer_prio = -1;
 }
-
