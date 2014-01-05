@@ -23,8 +23,10 @@ endif
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 ifeq ($(OS),Windows_NT)
 mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+rm = del /q /s $(1)
 else
 mkdir = mkdir -p $(1)
+rm = rm -rf $(1)
 endif
 
 # overwrite for releases
@@ -135,11 +137,12 @@ $(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo AR $(notdir $@)
 	$(SILENT)$(call mkdir,$(dir $@))
+	$(SILENT)$(call rm,$@)
 	$(SILENT)$(AR) rcs $@ $^
 
 clean:
-	rm -f $(OBJS) $(OUTPUT) $(TARGET_DIR)lib$(OUTPUT)*.a $(OUTPUT).dmg
-	rm -rf $(OUTPUT)-* i386 ppc $(OBJDIR)
+	$(call rm, $(OBJS) $(OUTPUT) $(TARGET_DIR)lib$(OUTPUT)*.a $(OUTPUT).dmg)
+	$(call rm, $(OUTPUT)-* i386 ppc $(OBJDIR))
 
 %.d:
 	$(SILENT)$(call mkdir,$(BUILD_DIR))
