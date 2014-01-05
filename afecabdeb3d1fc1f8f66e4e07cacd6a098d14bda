@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_7711f0ab",
+        "filename": "firmware/export/audiohw_settings.h",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-05T03:20:16Z",
+      "side": 1,
+      "message": "this and the other firmware/ level changes seems redundant. Everything should be handled at the apps/ level",
+      "revId": "afecabdeb3d1fc1f8f66e4e07cacd6a098d14bda",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
