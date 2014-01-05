@@ -25,10 +25,16 @@
 
 bool button_debug_screen(void);
 
+#if !defined(CREATIVE_ZENXFISTYLE)
 #define HAS_BUTTON_HOLD
-
-#define IMX233_BUTTON_LRADC_CHANNEL 0
 #define IMX233_BUTTON_LRADC_HOLD_DET BLH_ADC
+#endif
+
+#if defined(CREATIVE_ZENXFISTYLE)
+#define IMX233_BUTTON_LRADC_CHANNEL 2
+#else
+#define IMX233_BUTTON_LRADC_CHANNEL 0
+#endif
 
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001

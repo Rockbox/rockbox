@@ -129,7 +129,7 @@ void usage(void)
            "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
            "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
            "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+, e370, e360,\n"
-           "\t                   zxfi, zmoz, zen, zenv, ypz5)\n");
+           "\t                   zxfi, zmoz, zen, zenv, ypz5, zxfs)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -380,6 +380,8 @@ int main (int argc, char** argv)
             modelnum = 89;
         else if (!strcmp(&argv[1][5], "zen")) /* Creative ZEN */
             modelnum = 90;
+        else if (!strcmp(&argv[1][5], "zxfs")) /* Creative ZEN X-Fi Style */
+            modelnum = 94;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

@@ -25,6 +25,14 @@
 #include "power-imx233.h"
 #include "button-lradc-imx233.h"
 
+#if defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC)
+#define JACK_DET_BANK   2
+#define JACK_DET_PIN    8
+#elif defined(CREATIVE_ZENXFISTYLE)
+#define JACK_DET_BANK   2
+#define JACK_DET_PIN    7
+#endif
+
 struct imx233_button_lradc_mapping_t imx233_button_lradc_mapping[] =
 {
 #if defined(CREATIVE_ZEN)
@@ -84,6 +92,18 @@ struct imx233_button_lradc_mapping_t imx233_button_lradc_mapping[] =
     {2945, BUTTON_PLAYPAUSE},
     {3400, 0},
     {0, IMX233_BUTTON_LRADC_END},
+#elif defined(CREATIVE_ZENXFISTYLE)
+    {230, BUTTON_MENU},
+    {480, BUTTON_SHORTCUT},
+    {690, BUTTON_UP},
+    {920, BUTTON_LEFT},
+    {1120, BUTTON_RIGHT},
+    {1335, BUTTON_DOWN},
+    {1565, BUTTON_SELECT},
+    {2850, BUTTON_BACK},
+    {3110, BUTTON_PLAYPAUSE},
+    {3620, 0},
+    {0, IMX233_BUTTON_LRADC_END},
 #else
 #error wrong target
 #endif
@@ -92,29 +112,43 @@ struct imx233_button_lradc_mapping_t imx233_button_lradc_mapping[] =
 void button_init_device(void)
 {
     imx233_button_lradc_init();
-#if defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC)
-    imx233_pinctrl_acquire(2, 8, "jack_detect");
-    imx233_pinctrl_set_function(2, 8, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(2, 8, false);
+#ifdef HAVE_HEADPHONE_DETECTION
+    imx233_pinctrl_acquire(JACK_DET_BANK, JACK_DET_PIN, "jack_detect");
+    imx233_pinctrl_set_function(JACK_DET_BANK, JACK_DET_PIN, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(JACK_DET_BANK, JACK_DET_PIN, false);
+#endif
+#ifdef CREATIVE_ZENXFISTYLE
+    imx233_pinctrl_acquire(0, 11, "power_detect");
+    imx233_pinctrl_set_function(0, 11, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(0, 11, false);
 #endif
 }
 
+#ifdef HAS_BUTTON_HOLD
 bool button_hold(void)
 {
     return imx233_button_lradc_hold();
 }
+#endif
 
-#if defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC)
+#ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void)
 {
-    return !imx233_pinctrl_get_gpio(2, 8);
+    return !imx233_pinctrl_get_gpio(JACK_DET_BANK, JACK_DET_PIN);
 }
 #endif
 
 int button_read_device(void)
 {
     int btn = 0;
+#ifdef CREATIVE_ZENXFISTYLE
+    /* The ZEN X-Fi Style uses a GPIO because both select and power are wired
+     * to PSWITCH resulting in slow and unreliable readings */
+    if(!imx233_pinctrl_get_gpio(0, 11))
+        btn |= BUTTON_POWER;
+#else
     if(imx233_power_read_pswitch() == 1)
         btn |= BUTTON_POWER;
+#endif
     return imx233_button_lradc_read(btn);
 }

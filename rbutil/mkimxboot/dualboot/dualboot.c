@@ -184,6 +184,20 @@ static int boot_decision(int context)
     }
     return decision;
 }
+#elif defined(CREATIVE_ZENXFISTYLE)
+static int boot_decision(int context)
+{
+    setup_lradc(2); // setup LRADC channel 2 to read keys
+    /* make a decision */
+    int val = read_lradc(2);
+    /* boot to OF if left is hold
+     * NOTE: VDDIO is set to 3.1V initially and the resistor ladder is wired to
+     * VDDIO so these values are not the same as in the main binary which is
+     * calibrated for VDDIO=3.3V */
+    if(val >= 815 && val < 915)
+        return BOOT_OF;
+    return BOOT_ROCK;
+}
 #else
 #warning You should define a target specific boot decision function
 static int boot_decision(int context)

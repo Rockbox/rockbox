@@ -259,9 +259,10 @@
 #define LCD_CREATIVEZEN  55 /* as used by the Creative ZEN (X-Fi) (LMS250GF03-001(S6D0139)) */
 #define LCD_CREATIVEZENMOZAIC 56 /* as used by the Creative ZEN Mozaic (FGD0801) */
 #define LCD_ILI9342C   57 /* another type of lcd used by HiFi E.T MA9/MA8 */
-#define LCD_CREATIVEZENV  58 /* as used by the Creativr Zen V (Plus) */
+#define LCD_CREATIVEZENV  58 /* as used by the Creative Zen V (Plus) */
 #define LCD_SAMSUNGYPZ5   59 /* as used by Samsung YP-Z5 */
 #define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
+#define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -556,6 +557,8 @@ Lyre prototype 1 */
 #include "config/ihifi760.h"
 #elif defined(IHIFI960)
 #include "config/ihifi960.h"
+#elif defined(CREATIVE_ZENXFISTYLE)
+#include "config/creativezenxfistyle.h"
 #else
 /* no known platform */
 #endif

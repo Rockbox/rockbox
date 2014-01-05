@@ -1308,35 +1308,36 @@ cat <<EOF
  34) M3/M3L               71) M:Robe 100         51) Sansa e200R
                                                  52) Sansa c200
  ==Creative==             ==Philips==            53) Sansa m200
- 90) Zen Vision:M 30GB    100) GoGear SA9200     54) Sansa c100
- 91) Zen Vision:M 60GB    101) GoGear HDD1630/   55) Sansa Clip
- 92) Zen Vision                HDD1830           56) Sansa e200v2
- 93) Zen X-Fi2            102) GoGear HDD6330    57) Sansa m200v4
- 94) Zen X-Fi3                                   58) Sansa Fuze
- 96) Zen X-Fi             ==Meizu==              59) Sansa c200v2
- 97) Zen X-Mozaic         110) M6SL              60) Sansa Clipv2
- 98) Zen                  111) M6SP              61) Sansa View
-                          112) M3                62) Sansa Clip+
- ==Onda==                                        63) Sansa Fuze v2
- 120) VX747               ==Tatung==             64) Sansa Fuze+
- 121) VX767               150) Elio TPJ-1022     65) Sansa Clip Zip
- 122) VX747+                                     66) Sansa Connect
- 123) VX777               ==Packard Bell==
-                          160) Vibe 500          ==Logik==
- ==Samsung==                                     80) DAX 1GB MP3/DAB
- 140) YH-820              ==MPIO==
- 141) YH-920              170) HD200             ==Lyre project==
- 142) YH-925              171) HD300             130) Lyre proto 1
- 143) YP-S3                                      131) Mini2440
- 144) YP-Z5
-                          ==ROCKCHIP==
- ==Application==          180) rk27xx generic    ==HiFiMAN==
- 200) SDL                                        190) HM-60x
- 201) Android             ==HiFi E.T.==          191) HM-801
- 202) Nokia N8xx          210) MA9
- 203) Nokia N900          211) MA9C              ==Sony==
- 204) Pandora             212) MA8               220) NWZ-E370/E380 series
- 205) Samsung YP-R0       213) MA8C              221) NWZ-E360 series
+ 89) Zen X-Fi Style       100) GoGear SA9200     54) Sansa c100
+ 90) Zen Vision:M 30GB    101) GoGear HDD1630/   55) Sansa Clip
+ 91) Zen Vision:M 60GB         HDD1830           56) Sansa e200v2
+ 92) Zen Vision           102) GoGear HDD6330    57) Sansa m200v4
+ 93) Zen X-Fi2                                   58) Sansa Fuze
+ 94) Zen X-Fi3            ==Meizu==              59) Sansa c200v2
+ 96) Zen X-Fi             110) M6SL              60) Sansa Clipv2
+ 97) Zen X-Mozaic         111) M6SP              61) Sansa View
+ 98) Zen                  112) M3                62) Sansa Clip+
+                                                 63) Sansa Fuze v2
+ ==Onda==                 ==Tatung==             64) Sansa Fuze+
+ 120) VX747               150) Elio TPJ-1022     65) Sansa Clip Zip
+ 121) VX767                                      66) Sansa Connect
+ 122) VX747+              ==Packard Bell==
+ 123) VX777               160) Vibe 500          ==Logik==
+                                                 80) DAX 1GB MP3/DAB
+ ==Samsung==              ==MPIO==
+ 140) YH-820              170) HD200             ==Lyre project==
+ 141) YH-920              171) HD300             130) Lyre proto 1
+ 142) YH-925                                     131) Mini2440
+ 143) YP-S3
+ 144) YP-Z5 ==ROCKCHIP==
+                          180) rk27xx generic    ==HiFiMAN==
+ ==Application==                                 190) HM-60x
+ 200) SDL                 ==HiFi E.T.==          191) HM-801
+ 201) Android             210) MA9
+ 202) Nokia N8xx          211) MA9C              ==Sony==
+ 203) Nokia N900          212) MA8               220) NWZ-E370/E380 series
+ 204) Pandora             213) MA8C              221) NWZ-E360 series
+ 205) Samsung YP-R0
  206) Android MIPS
  207) Android x86
 
@@ -2182,6 +2183,26 @@ fi
     t_model="logikdax"
     ;;
 	
+    89|creativezenxfistyle)
+    target_id=94
+    modelname="creativezenxfistyle"
+    target="CREATIVE_ZENXFISTYLE"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=zxfs"
+    output="rockbox.creative"
+    bootoutput="bootloader-zenxfistyle.creative"
+    appextra="gui:recorder:radio"
+    plugins=""
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="creative-zen"
+    arm926ejscc
+    ;;
+
     90|zenvisionm30gb)
     target_id=35
     modelname="zenvisionm30gb"

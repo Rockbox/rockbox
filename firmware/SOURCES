@@ -1165,8 +1165,8 @@ target/arm/tms320dm320/creative-zvm/usb-creativezvm.c
 #endif /* CREATIVE_ZVx */
 
 #if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC) \
-    || defined(CREATIVE_ZENV)
-    #ifndef BOOTLOADER
+    || defined(CREATIVE_ZENV) || defined(CREATIVE_ZENXFISTYLE)
+#ifndef BOOTLOADER
 target/arm/imx233/fmradio-imx233.c
 #endif
 target/arm/imx233/creative-zen/backlight-zen.c
@@ -1176,6 +1176,8 @@ target/arm/imx233/creative-zen/lcd-zen.c
 target/arm/imx233/creative-zen/lcd-zenmozaic.c
 # elif defined(CREATIVE_ZENV)
 target/arm/imx233/creative-zen/lcd-zenv.c
+# elif defined(CREATIVE_ZENXFISTYLE)
+target/arm/imx233/creative-zen/lcd-zenxfistyle.c
 #endif
 target/arm/imx233/creative-zen/button-zen.c
 target/arm/imx233/creative-zen/debug-zen.c

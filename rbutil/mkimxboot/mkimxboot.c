@@ -199,7 +199,7 @@ static const struct imx_model_desc_t imx_models[] =
                        1, &zero_key, 0, 0x40000000 },
     [MODEL_ZENXFI3] = {"Zen X-Fi3", dualboot_zenxfi3, sizeof(dualboot_zenxfi3), "zxf3", 83,
                        1, &zero_key, 0, 0x40000000 },
-    [MODEL_ZENXFISTYLE] = {"Zen X-Fi Style", NULL, 0, "", -1,
+    [MODEL_ZENXFISTYLE] = {"Zen X-Fi Style", dualboot_zenxfistyle, sizeof(dualboot_zenxfistyle), "zxfs", 94,
                        1, &zero_key, 0, 0x40000000 },
     [MODEL_ZENSTYLE] = {"Zen Style 100/300", NULL, 0, "", -1,
                        1, &zero_key, 0, 0x40000000 },
@@ -429,6 +429,10 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
                     return IMX_DONT_KNOW_HOW_TO_PATCH;
             }
             break;
+        case MODEL_ZENXFISTYLE:
+            /* The ZEN X-Fi Style uses the standard ____, host, play sections, patch after first
+             * call in ____ section. */
+            return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
         default:
             return IMX_DONT_KNOW_HOW_TO_PATCH;
     }

@@ -26,10 +26,14 @@
 #include "backlight-target.h"
 #include "uartdbg-imx233.h"
 #include "pinctrl-imx233.h"
+#include "pwm-imx233.h"
 
 void _backlight_set_brightness(int level)
 {
-#ifdef CREATIVE_ZENV
+#if defined(CREATIVE_ZENXFISTYLE)
+    imx233_pwm_setup_simple(4, 24000, level);
+    imx233_pwm_enable(4, true);
+#elif defined(CREATIVE_ZENV)
     lcd_set_contrast(level);
 #else
     unsigned val = (level + 200) * level / 1000;
@@ -47,7 +51,7 @@ void _backlight_set_brightness(int level)
 
 bool _backlight_init(void)
 {
-#ifndef CREATIVE_ZENV
+#if !defined(CREATIVE_ZENV) && !defined(CREATIVE_ZENXFISTYLE)
     imx233_pinctrl_acquire(1, 12, "backlight_enable");
     imx233_pinctrl_set_function(1, 12, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(1, 12, true);
