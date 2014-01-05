@@ -131,8 +131,13 @@ static const struct imx_md5sum_t imx_sums[] =
         { [VARIANT_DEFAULT] = {0, 18110576} }
     },
     {
+        /* Version 1.00.25 */
+        MODEL_ZENXFI3, "a41a3a78f86a4ac2879d194c6d528059", "1.00.25",
+        { [VARIANT_DEFAULT] = {0, 18110576 } }
+    },
+    {
         /* Version 1.00.25e */
-        MODEL_ZENXFI3, "7aa036a349feb93d2ec397b1149c9260", "1.00.25e",
+        MODEL_ZENXFI3, "c180f57e2b2d62620f87a1d853f349ff", "1.00.25e",
         { [VARIANT_DEFAULT] = {0, 18110576 } }
     },
     /** Zen X-Fi Style */
