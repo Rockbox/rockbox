@@ -168,6 +168,7 @@ static const struct usb_string_descriptor* const usb_strings[] =
 
 static int usb_address = 0;
 static bool initialized = false;
+static bool drivers_connected = false;
 static enum { DEFAULT, ADDRESS, CONFIGURED } usb_state;
 
 #ifdef HAVE_USB_CHARGING_ENABLE
@@ -413,12 +414,16 @@ void usb_core_init(void)
 void usb_core_exit(void)
 {
     int i;
-    for(i = 0; i < USB_NUM_DRIVERS; i++)
-        if(drivers[i].enabled && drivers[i].disconnect != NULL)
-        {
-            drivers[i].disconnect();
-            drivers[i].enabled = false;
-        }
+    if(drivers_connected)
+    {
+        for(i = 0; i < USB_NUM_DRIVERS; i++)
+            if(drivers[i].enabled && drivers[i].disconnect != NULL)
+            {
+                drivers[i].disconnect();
+                drivers[i].enabled = false;
+            }
+        drivers_connected = false;
+    }
 
     if(initialized) {
         usb_drv_exit();
@@ -676,12 +681,19 @@ static void usb_core_do_set_addr(uint8_t address)
 
 static void usb_core_do_set_config(uint8_t config)
 {
-    logf("usb_core: SET_CONFIG");
+    logf("usb_core: SET_CONFIG %d",config);
     if(config) {
         usb_state = CONFIGURED;
+
+        if(drivers_connected)
+            for(int i = 0; i < USB_NUM_DRIVERS; i++)
+                if(drivers[i].enabled && drivers[i].disconnect != NULL)
+                    drivers[i].disconnect();
+
         for(int i = 0; i < USB_NUM_DRIVERS; i++)
             if(drivers[i].enabled && drivers[i].init_connection)
                 drivers[i].init_connection();
+        drivers_connected = true;
     }
     else
         usb_state = ADDRESS;
@@ -718,7 +730,6 @@ static void request_handler_device(struct usb_ctrlrequest* req)
             }
         case USB_REQ_SET_ADDRESS: {
                 unsigned char address = req->wValue;
-                logf("usb_core: SET_ADR %d", address);
                 usb_drv_send(EP_CONTROL, NULL, 0);
                 usb_drv_cancel_all_transfers();
                 usb_drv_set_address(address);
@@ -906,6 +917,7 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 /* called by usb_drv_int() */
 void usb_core_bus_reset(void)
 {
+    logf("usb_core: bus reset");
     usb_address = 0;
     usb_state = DEFAULT;
 #ifdef HAVE_USB_CHARGING_ENABLE
