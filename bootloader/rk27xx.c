@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <system.h>
 #include <inttypes.h>
 #include "config.h"
+#include "system.h"
+#include "kernel.h"
 #include "gcc_extensions.h"
 #include "lcd.h"
 #include "font.h"

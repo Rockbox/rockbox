@@ -21,8 +21,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "system.h"
-#include "thread.h"
+#include "kernel.h"
 #include "i2c-dm320.h"
 
 #ifdef HAVE_SOFTWARE_I2C

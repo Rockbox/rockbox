@@ -19,7 +19,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "system.h"
+#include "kernel.h"
 #include "audio.h"
 #include "string.h"
 #include "panic.h"

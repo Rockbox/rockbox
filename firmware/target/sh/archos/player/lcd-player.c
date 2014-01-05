@@ -20,10 +20,11 @@
  *
  ****************************************************************************/
 
-#include "config.h"
 #include <string.h>
-#include "hwcompat.h"
+#include "config.h"
 #include "system.h"
+#include "kernel.h"
+#include "hwcompat.h"
 #include "lcd.h"
 #include "lcd-charcell.h"
 

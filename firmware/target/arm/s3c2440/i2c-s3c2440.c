@@ -18,7 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "system.h"
+#include "kernel.h"
 #include "i2c-s3c2440.h"
 
 static struct semaphore i2c_complete; /* Transfer completion signal */

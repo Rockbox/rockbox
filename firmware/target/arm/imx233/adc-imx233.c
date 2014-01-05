@@ -19,8 +19,10 @@
  *
  ****************************************************************************/
 
+#include "config.h"
 #include "adc-target.h"
 #include "system.h"
+#include "kernel.h"
 #include "powermgmt-target.h"
 #include "lradc-imx233.h"
 #include "power-imx233.h"

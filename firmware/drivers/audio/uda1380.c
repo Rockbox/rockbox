@@ -23,6 +23,7 @@
 #include "config.h"
 #include "logf.h"
 #include "system.h"
+#include "kernel.h"
 #include "audio.h"
 #include "debug.h"
 #include "udacodec.h"

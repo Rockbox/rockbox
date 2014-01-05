@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "system.h"
+#include "kernel.h"
 #include "i2c-rk27xx.h"
 #include "pca9555.h"
 

@@ -18,10 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include <string.h>
+#include "system.h"
+#include "kernel.h"
 #include "nand.h"
 #include "ata-nand-target.h"
-#include "system.h"
-#include <string.h>
 #include "led.h"
 #include "panic.h"
 #include "nand_id.h"

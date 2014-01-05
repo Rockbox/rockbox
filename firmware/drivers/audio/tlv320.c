@@ -18,9 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
-#include "logf.h"
 #include "system.h"
+#include "kernel.h"
+#include "logf.h"
 #include "string.h"
 #include "audio.h"
 
@@ -313,4 +315,3 @@ void audiohw_set_monitor(bool enable)
     tlv320_write_reg(REG_PC,  value_pc);
 }
 #endif /* HAVE_RECORDING */
-

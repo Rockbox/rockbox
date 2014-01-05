@@ -19,7 +19,9 @@
  *
  ****************************************************************************/
 
+#include "cpu.h"
 #include "system.h"
+#include "kernel.h"
 #include "dma-imx233.h"
 #include "lcd.h"
 #include "font.h"

@@ -22,6 +22,7 @@
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
+#include "kernel.h"
 #include "string.h"
 #include <stdbool.h>
 #include "button.h"

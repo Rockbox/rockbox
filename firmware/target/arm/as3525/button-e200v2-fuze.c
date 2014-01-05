@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "backlight.h"
 #include "dbop-as3525.h"
@@ -122,4 +123,3 @@ int button_read_device(void)
 
     return btn;
 }
-

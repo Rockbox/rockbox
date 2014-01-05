@@ -18,8 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include <stdlib.h>
+
+#include "cpu.h"
+#include "kernel.h"
 #include "button-lradc-imx233.h"
-#include "stdlib.h"
 #include "lradc-imx233.h"
 #include "pinctrl-imx233.h"
 

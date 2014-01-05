@@ -19,10 +19,12 @@
  *
  ****************************************************************************/
 
-#include "config.h"
-#include "system.h"
 #include <stdbool.h>
 #include <string.h>
+
+#include "config.h"
+#include "system.h"
+#include "kernel.h"
 #include "font.h"
 #include "lcd.h"
 #include "button.h"

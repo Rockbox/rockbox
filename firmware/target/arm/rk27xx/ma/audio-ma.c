@@ -19,11 +19,12 @@
  *
  ****************************************************************************/
 
+#include "system.h"
+#include "kernel.h"
 #include "audiohw.h"
 #include "df1704.h"
 #include "pca9555.h"
 #include "i2c-rk27xx.h"
-#include "system.h"
 
 void df1704_set_ml_dir(const int dir)
 {

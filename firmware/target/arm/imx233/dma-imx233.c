@@ -18,8 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "dma-imx233.h"
 #include "lcd.h"
 #include "string.h"
@@ -287,4 +289,3 @@ struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags)
     s.nr_unaligned = apb_nr_unaligned[chan];
     return s;
 }
-

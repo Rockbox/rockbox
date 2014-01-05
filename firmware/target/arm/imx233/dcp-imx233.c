@@ -18,8 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "dcp-imx233.h"
 #include "string.h"
 #include "kernel-imx233.h"

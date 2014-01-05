@@ -18,11 +18,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include <string.h>
+
+#include "config.h"
+#include "kernel.h"
 #include "audioout-imx233.h"
 #include "clkctrl-imx233.h"
 #include "rtc-imx233.h"
 #include "pcm_sampr.h"
-#include "string.h"
 #include "audio-target.h"
 
 #ifndef IMX233_AUDIO_COUPLING_MODE
