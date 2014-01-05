@@ -67,7 +67,7 @@
     <message>
         <location filename="../gui/backupdialog.cpp" line="125"/>
         <source>Starting backup ...</source>
-        <translation>Démarrage de la sauvegarder...</translation>
+        <translation>Démarrage de la sauvegarde ...</translation>
     </message>
     <message>
         <location filename="../gui/backupdialog.cpp" line="144"/>
@@ -89,7 +89,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;installation du bootloader nécessite que vous fournissiez une copie du firmware original (fichier bin). Ce firmware sera alors modifié et installé sur votre lecteur avec le bootloader de Rockbox. Vous devez télécharger ce fichier par vous-même pour des raisons légales. Veuillez vous référer aux &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Forums de Sansa&lt;/a&gt; ou au &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manuel&lt;/a&gt; et à la page wiki &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; pour obtenir ce fichier.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt;Ce fichier n&apos;est pas présent sur votre lecteur et disparaîtra automatiquement après l&apos;avoir installé.&lt;/br/&gt;&lt;br/&gt;Appuyez sur Ok pour continuer et parcourir les fichiers sur votre ordinateur pour indiquer le fichier du firmware.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="58"/>
@@ -188,7 +188,7 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="238"/>
         <source>CAB file format detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Format de fichier CAB détecté</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="259"/>
@@ -1013,17 +1013,17 @@ Veuillez vous référer à http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../gui/changelogfrm.ui" line="17"/>
         <source>Changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Historique des modifications</translation>
     </message>
     <message>
         <location filename="../gui/changelogfrm.ui" line="39"/>
         <source>Show on startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer au démarrage</translation>
     </message>
     <message>
         <location filename="../gui/changelogfrm.ui" line="46"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;OK</translation>
+        <translation>&amp;OK</translation>
     </message>
 </context>
 <context>
@@ -1110,51 +1110,52 @@ Veuillez sélectionner manuellement le type de périphérique et le point de mon
         <location filename="../configure.cpp" line="448"/>
         <location filename="../configure.cpp" line="914"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur TTS</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="449"/>
         <location filename="../configure.cpp" line="915"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;initialisation du TTS sélectionné a échoué. Vous ne pouvez pas utiliser ce TTS. </translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plusieurs périphériques ont été détectés. Veuillez déconnecter tous les lecteurs sauf un et essayer à nouveau s&apos;il vous plait.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="742"/>
         <source>Detected devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphériques détectés:</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="747"/>
         <source>(unknown)</source>
-        <translation type="unfinished"></translation>
+        <translation>(inconnu)</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="755"/>
         <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
-        <translation type="unfinished"></translation>
+        <translation>Note: la détection des périphériques connectés n&apos;est pas toujours fiable. Il peut y avoir moins de périphériques connectés qu&apos;indiqué. Dans ce cas, détecter votre lecteur de manière parfaitement fiable peut s&apos;avérer impossible. </translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="759"/>
         <location filename="../configure.cpp" line="763"/>
         <location filename="../configure.cpp" line="805"/>
         <source>Device Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Détection de périphérique</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="794"/>
         <source>The player contains an incompatible filesystem.
 Make sure you selected the correct mountpoint and the player is set up to use a filesystem compatible with Rockbox.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le lecteur contient un système de fichier incompatible.
+Vérifiez que vous avez sélectionné le bon point de montage et que le baladeur est paramétré pour utiliser un système de fichier compatible avec Rockbox.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="802"/>
         <source>An unknown error occured during player detection.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur inconnue s&apos;est produite pendant la détection du lecteur.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="869"/>
@@ -1376,7 +1377,7 @@ Veuillez configurer le moteur TTS.</translation>
     <message>
         <location filename="../configurefrm.ui" line="219"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="260"/>
@@ -1578,12 +1579,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../createvoicewindow.cpp" line="100"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur TTS</translation>
     </message>
     <message>
         <location filename="../createvoicewindow.cpp" line="101"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;initialisation du TTS sélectionné a échoué. Vous ne pouvez pas utiliser ce TTS.</translation>
     </message>
     <message>
         <location filename="../createvoicewindow.cpp" line="105"/>
@@ -1795,22 +1796,22 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../installtalkwindow.cpp" line="96"/>
         <source>Empty selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection vide</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="97"/>
         <source>No files or folders selected. Please select files or folders first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de fichiers ou dossiers sélectionnés. Veuillez d&apos;abord sélectionner des fichiers ou des dossiers s&apos;il vous plait.</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="137"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur TTS</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="138"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;initialisation du TTS sélectionné a échoué. Vous ne pouvez pas utiliser ce TTS.</translation>
     </message>
 </context>
 <context>
@@ -1894,12 +1895,12 @@ pour télécharger tous les fichiers néecessaires dans le cache.&lt;/p&gt;</tra
     <message>
         <location filename="../base/mspackutil.cpp" line="101"/>
         <source>Creating output path failed</source>
-        <translation type="unfinished">La création du chemin d&apos;installation a échoué</translation>
+        <translation>La création du chemin d&apos;accès cible a échoué</translation>
     </message>
     <message>
         <location filename="../base/mspackutil.cpp" line="109"/>
         <source>Error during CAB operation</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur pendant l&apos;opération CAB</translation>
     </message>
 </context>
 <context>
@@ -2163,22 +2164,22 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <message>
         <location filename="../rbutilqt.cpp" line="759"/>
         <source>Device ejected</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique éjecté</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="760"/>
         <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique éjecté avec succès. Vous pouvez maintenant déconnecter le lecteur du PC.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="764"/>
         <source>Ejecting failed</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;éjection a échoué</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="765"/>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;éjection du périphérique a échoué. Veuillez vérifier que les fichiers sur le lecteur ne sont pas utilisés par un autre programme. Si l&apos;éjection échoue à nouveau, veuillez utiliser la fonction d&apos;éjection de votre ordinateur s&apos;il vous plait.  </translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="337"/>
@@ -2443,7 +2444,7 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
     <message>
         <location filename="../rbutilqtfrm.ui" line="103"/>
         <source>&amp;Eject</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ejecter</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="221"/>
@@ -2539,7 +2540,7 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
     <message>
         <location filename="../rbutilqtfrm.ui" line="663"/>
         <source>Show &amp;Changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer l&apos;&amp;historique des modifications</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="521"/>
@@ -2980,17 +2981,17 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <location filename="../base/ttsbase.cpp" line="51"/>
         <source>SAPI4 TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Moteur TTS SAPI4</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="53"/>
         <source>SAPI5 TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Moteur TTS SAPI5</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="54"/>
         <source>MS Speech Platform</source>
-        <translation type="unfinished"></translation>
+        <translation>Plateforme MS Speech</translation>
     </message>
     <message>
         <source>SAPI TTS Engine</source>
