@@ -105,7 +105,6 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #ifdef HAVE_LCD_BITMAP
     struct wps_data *data = gwps->data;
     bool do_refresh = (element->tag->flags & info->refresh_type) > 0;
-    struct line_desc *linedes = &info->line_desc;
 #endif
     switch (token->type)
     {   
@@ -132,6 +131,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
              * come before the text style tag color fields need to be preserved */
             if (data->style & STYLE_GRADIENT)
             {
+                struct line_desc *linedes = &info->line_desc;
                 fb_data tc  = linedes->text_color,
                         lc  = linedes->line_color,
                         lec = linedes->line_end_color;
@@ -149,6 +149,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP:
         {
             struct gradient_config *cfg = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            struct line_desc *linedes = &info->line_desc;
             linedes->text_color     = cfg->text;
             linedes->line_color     = cfg->start;
             linedes->line_end_color = cfg->end;

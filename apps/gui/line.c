@@ -31,6 +31,7 @@
 #include "screens.h"
 #include "settings.h"
 #include "debug.h"
+#include "viewport.h"
 
 #ifdef HAVE_REMOTE_LCD
 #define MAX_LINES (LCD_SCROLLABLE_LINES + LCD_REMOTE_SCROLLABLE_LINES)
@@ -278,7 +279,7 @@ static void style_line(struct screen *display,
 
     switch (style & _STYLE_DECO_MASK)
     {
-#if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
+#ifdef HAVE_LCD_COLOR
         case STYLE_GRADIENT:
             display->set_drawmode(DRMODE_FG);
             display->gradient_fillrect_part(x, y, width, height,
@@ -318,7 +319,7 @@ static void style_line(struct screen *display,
         else if (style & (STYLE_GRADIENT|STYLE_COLORBAR))
             display->set_foreground(line->text_color);
         else
-            display->set_foreground(global_settings.fg_color);
+            display->set_foreground(get_viewport_default_colour(display->screen_type, true));
     }
 #endif
 }
@@ -332,7 +333,7 @@ void vput_line(struct screen *display,
     print_line(display, x, y, line, fmt, ap);
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
     if (display->depth > 1)
-        display->set_foreground(global_settings.fg_color);
+        display->set_foreground(get_viewport_default_colour(display->screen_type, true));
 #endif
     display->set_drawmode(DRMODE_SOLID);
 }
