@@ -126,12 +126,12 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_VIEWPORT_TEXTSTYLE:
         {
             struct line_desc *data = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            struct line_desc *linedes = &info->line_desc;
             /* gradient colors are handled with a separate tag
              * (SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP, see below). since it may
              * come before the text style tag color fields need to be preserved */
             if (data->style & STYLE_GRADIENT)
             {
-                struct line_desc *linedes = &info->line_desc;
                 fb_data tc  = linedes->text_color,
                         lc  = linedes->line_color,
                         lec = linedes->line_end_color;
