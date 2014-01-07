@@ -198,10 +198,6 @@ struct _grey_info
     struct viewport *vp;         /* current viewport in use */
 };
 
-/* Stuff these here for now. LCD depth of 1 has no 'pattern' members. */
-#define _GREY_FG_BRIGHTNESS(vp)  ((vp)->flags)
-#define _GREY_BG_BRIGHTNESS(vp)  ((vp)->line_height)
-
 /* Global variable, defined in the plugin */
 extern struct _grey_info _grey_info;
 

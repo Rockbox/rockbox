@@ -44,8 +44,7 @@ struct viewport {
     int flags;
     int font;
     int drawmode;
-#endif
-#if LCD_DEPTH > 1
+    /* needed for even for mono displays to support greylib */
     unsigned fg_pattern;
     unsigned bg_pattern;
 #endif

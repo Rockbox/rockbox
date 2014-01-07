@@ -79,25 +79,25 @@ int  grey_get_drawmode(void)
 /* Set the foreground shade for subsequent drawing operations */
 void grey_set_foreground(unsigned brightness)
 {
-    _GREY_FG_BRIGHTNESS(_grey_info.vp) = brightness;
+    _grey_info.vp->fg_pattern = brightness;
 }
 
 /* Return the current foreground shade */
 unsigned grey_get_foreground(void)
 {
-    return _GREY_FG_BRIGHTNESS(_grey_info.vp);
+    return _grey_info.vp->fg_pattern;
 }
 
 /* Set the background shade for subsequent drawing operations */
 void grey_set_background(unsigned brightness)
 {
-    _GREY_BG_BRIGHTNESS(_grey_info.vp) = brightness;
+    _grey_info.vp->bg_pattern = brightness;
 }
 
 /* Return the current background shade */
 unsigned grey_get_background(void)
 {
-    return _GREY_BG_BRIGHTNESS(_grey_info.vp);
+    return _grey_info.vp->bg_pattern;
 }
 
 /* Set draw mode, foreground and background shades at once */
@@ -177,8 +177,8 @@ void grey_viewport_set_fullscreen(struct viewport *vp,
     vp->y = 0;
     vp->width = _grey_info.width;
     vp->height = _grey_info.height;
-    _GREY_FG_BRIGHTNESS(vp) = 0;
-    _GREY_BG_BRIGHTNESS(vp) = 255;
+    vp->fg_pattern = 0;
+    vp->bg_pattern = 255;
     vp->drawmode = DRMODE_SOLID;
     vp->font = FONT_SYSFIXED;
 
@@ -258,4 +258,3 @@ void grey_framebuffer_set_pos(int x, int y, int width, int height)
 
     grey_update_clip_rect();    
 }
-

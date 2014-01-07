@@ -48,8 +48,7 @@ void grey_scroll_left(int count)
     data = _grey_info.buffer;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = _grey_info.width - count;
-    blank = (vp->drawmode & DRMODE_INVERSEVID) ?
-             _GREY_FG_BRIGHTNESS(vp) : _GREY_BG_BRIGHTNESS(vp);
+    blank = (vp->drawmode & DRMODE_INVERSEVID) ? vp->fg_pattern : vp->bg_pattern;
 
     do
     {
@@ -77,8 +76,7 @@ void grey_scroll_right(int count)
     data = _grey_info.buffer;
     data_end = data + _GREY_MULUQ(_grey_info.width, _grey_info.height);
     length = _grey_info.width - count;
-    blank = (vp->drawmode & DRMODE_INVERSEVID) ?
-             _GREY_FG_BRIGHTNESS(vp) : _GREY_BG_BRIGHTNESS(vp);
+    blank = (vp->drawmode & DRMODE_INVERSEVID) ? vp->fg_pattern : vp->bg_pattern;
 
     do
     {
@@ -104,8 +102,7 @@ void grey_scroll_up(int count)
 
     shift = _GREY_MULUQ(_grey_info.width, count);
     length = _GREY_MULUQ(_grey_info.width, _grey_info.height - count);
-    blank = (vp->drawmode & DRMODE_INVERSEVID) ?
-             _GREY_FG_BRIGHTNESS(vp) : _GREY_BG_BRIGHTNESS(vp);
+    blank = (vp->drawmode & DRMODE_INVERSEVID) ? vp->fg_pattern : vp->bg_pattern;
 
     rb->memmove(_grey_info.buffer, _grey_info.buffer + shift,
                            length);
@@ -127,8 +124,7 @@ void grey_scroll_down(int count)
 
     shift = _GREY_MULUQ(_grey_info.width, count);
     length = _GREY_MULUQ(_grey_info.width, _grey_info.height - count);
-    blank = (vp->drawmode & DRMODE_INVERSEVID) ?
-             _GREY_FG_BRIGHTNESS(vp) : _GREY_BG_BRIGHTNESS(vp);
+    blank = (vp->drawmode & DRMODE_INVERSEVID) ? vp->fg_pattern : vp->bg_pattern;
 
     rb->memmove(_grey_info.buffer + shift, _grey_info.buffer,
                            length);
@@ -155,8 +151,7 @@ void grey_ub_scroll_left(int count)
     length = (_grey_info.width - count) << _GREY_BSHIFT;
     count <<= _GREY_BSHIFT;
     blank = _grey_info.gvalue[(vp->drawmode & DRMODE_INVERSEVID) ?
-                              _GREY_FG_BRIGHTNESS(vp) :
-                              _GREY_BG_BRIGHTNESS(vp)];
+                              vp->fg_pattern : vp->bg_pattern];
     do
     {
         rb->memmove(data, data + count, length);
@@ -189,8 +184,7 @@ void grey_ub_scroll_right(int count)
     length = (_grey_info.width - count) << _GREY_BSHIFT;
     count <<= _GREY_BSHIFT;
     blank = _grey_info.gvalue[(vp->drawmode & DRMODE_INVERSEVID) ?
-                              _GREY_FG_BRIGHTNESS(vp) :
-                              _GREY_BG_BRIGHTNESS(vp)];
+                              vp->fg_pattern : vp->bg_pattern];
     do
     {
         rb->memmove(data + count, data, length);
@@ -220,8 +214,7 @@ void grey_ub_scroll_up(int count)
     dst   = _grey_info.values;
     end   = dst + _GREY_MULUQ(_grey_info.height, _grey_info.width);
     blank = _grey_info.gvalue[(vp->drawmode & DRMODE_INVERSEVID) ?
-                              _GREY_FG_BRIGHTNESS(vp) :
-                              _GREY_BG_BRIGHTNESS(vp)];
+                              vp->fg_pattern : vp->bg_pattern];
 
 #if (LCD_PIXELFORMAT == VERTICAL_PACKING) \
  || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
@@ -296,8 +289,7 @@ void grey_ub_scroll_down(int count)
     start = _grey_info.values;
     dst   = start + _GREY_MULUQ(_grey_info.height, _grey_info.width);
     blank = _grey_info.gvalue[(vp->drawmode & DRMODE_INVERSEVID) ?
-                              _GREY_FG_BRIGHTNESS(vp) :
-                              _GREY_BG_BRIGHTNESS(vp)];
+                              vp->fg_pattern : vp->bg_pattern];
 
 #if (LCD_PIXELFORMAT == VERTICAL_PACKING) \
  || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)

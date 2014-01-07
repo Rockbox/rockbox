@@ -34,12 +34,12 @@ extern struct viewport _grey_default_vp;
 
 static void setpixel(unsigned char *address)
 {
-    *address = _GREY_FG_BRIGHTNESS(_grey_info.vp);
+    *address = _grey_info.vp->fg_pattern;
 }
 
 static void clearpixel(unsigned char *address)
 {
-    *address = _GREY_BG_BRIGHTNESS(_grey_info.vp);
+    *address = _grey_info.vp->bg_pattern;
 }
 
 static void flippixel(unsigned char *address)
@@ -75,7 +75,7 @@ void grey_clear_display(void)
     struct viewport *vp = &_grey_default_vp;
 
     int value = (vp->drawmode & DRMODE_INVERSEVID) ?
-                 _GREY_FG_BRIGHTNESS(vp) : _GREY_BG_BRIGHTNESS(vp);
+                 vp->fg_pattern : vp->bg_pattern;
 
     rb->memset(_grey_info.curbuffer, value,
                _GREY_MULUQ(_grey_info.cb_width, _grey_info.cb_height));
@@ -207,7 +207,7 @@ void grey_hline(int x1, int x2, int y)
         if (vp->drawmode & DRMODE_BG)
         {
             fillopt = true;
-            value = _GREY_BG_BRIGHTNESS(vp);
+            value = vp->bg_pattern;
         }
     }
     else
@@ -215,7 +215,7 @@ void grey_hline(int x1, int x2, int y)
         if (vp->drawmode & DRMODE_FG)
         {
             fillopt = true;
-            value = _GREY_FG_BRIGHTNESS(vp);
+            value = vp->fg_pattern;
         }
     }
     if (!fillopt && vp->drawmode != DRMODE_COMPLEMENT)
@@ -386,7 +386,7 @@ void grey_fillrect(int x, int y, int width, int height)
         if (vp->drawmode & DRMODE_BG)
         {
             fillopt = true;
-            value = _GREY_BG_BRIGHTNESS(vp);
+            value = vp->bg_pattern;
         }
     }
     else
@@ -394,7 +394,7 @@ void grey_fillrect(int x, int y, int width, int height)
         if (vp->drawmode & DRMODE_FG)
         {
             fillopt = true;
-            value = _GREY_FG_BRIGHTNESS(vp);
+            value = vp->fg_pattern;
 
         }
     }
@@ -544,7 +544,7 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             break;
 
           case DRMODE_BG:
-            bg = _GREY_BG_BRIGHTNESS(vp);
+            bg = vp->bg_pattern;
             do
             {
                 if (!(data & 0x01))
@@ -557,7 +557,7 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             break;
 
           case DRMODE_FG:
-            fg = _GREY_FG_BRIGHTNESS(vp);
+            fg = vp->fg_pattern;
             do
             {
                 if (data & 0x01)
@@ -570,8 +570,8 @@ void grey_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             break;
 
           case DRMODE_SOLID:
-            fg = _GREY_FG_BRIGHTNESS(vp);
-            bg = _GREY_BG_BRIGHTNESS(vp);
+            fg = vp->fg_pattern;
+            bg = vp->bg_pattern;
             do
             {
                 *dst_col = (data & 0x01) ? fg : bg;
@@ -699,8 +699,7 @@ void grey_ub_clear_display(void)
 {
     struct viewport *vp = &_grey_default_vp;
     int value = _grey_info.gvalue[(vp->drawmode & DRMODE_INVERSEVID) ?
-                                  _GREY_FG_BRIGHTNESS(vp) :
-                                  _GREY_BG_BRIGHTNESS(vp)];
+                                   vp->fg_pattern : vp->bg_pattern];
 
     rb->memset(_grey_info.values, value,
                           _GREY_MULUQ(_grey_info.width, _grey_info.height));
