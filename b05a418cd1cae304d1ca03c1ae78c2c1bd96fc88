@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_1760b434",
+        "filename": "apps/misc.c",
+        "patchSetId": 13
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-01-07T13:11:24Z",
+      "side": 1,
+      "message": "try to avoid TABS",
+      "revId": "b05a418cd1cae304d1ca03c1ae78c2c1bd96fc88",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_3765b845",
+        "filename": "firmware/export/audiohw_settings.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-01-07T13:11:24Z",
+      "side": 1,
+      "message": "This looks really awkward. There should be cleaner solution (although I don\u0027t know this part of code after Mike\u0027s refactoring)",
+      "revId": "b05a418cd1cae304d1ca03c1ae78c2c1bd96fc88",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
