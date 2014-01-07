@@ -25,6 +25,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include "system.h"
+#include "kernel.h"
 #include "thread-sdl.h"
 #include "system-sdl.h"
 #include "sim-ui-defines.h"
