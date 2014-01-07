@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_d780fc8d",
+        "filename": "apps/gui/option_select.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-07T23:29:14Z",
+      "side": 1,
+      "message": "tabs",
+      "revId": "966bbe1ecae5373b4f57e74ef2dc752581b02936",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_f77d00b3",
+        "filename": "apps/gui/option_select.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-07T23:29:14Z",
+      "side": 1,
+      "message": "you want to use the menu callback to remove this code",
+      "revId": "966bbe1ecae5373b4f57e74ef2dc752581b02936",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_b77388e6",
+        "filename": "apps/menus/sound_menu.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-07T23:29:14Z",
+      "side": 1,
+      "message": "this callback isnt doing anything... you want to use it to at least call setvol()",
+      "revId": "966bbe1ecae5373b4f57e74ef2dc752581b02936",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
