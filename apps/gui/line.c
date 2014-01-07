@@ -103,7 +103,7 @@ static void put_icon(struct screen *display, int x, int y,
     /* Need to change the drawmode:
      * mono icons should behave like text, inverted on the selector bar
      * native (colored) icons should be drawn as-is */
-    if (!get_icon_format(display->screen_type) == FORMAT_MONO && (line->style & STYLE_INVERT))
+    if (get_icon_format(display->screen_type) == FORMAT_MONO && (line->style & STYLE_INVERT))
         drmode = DRMODE_SOLID | DRMODE_INVERSEVID;
 
     display->set_drawmode(drmode);

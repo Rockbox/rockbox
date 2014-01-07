@@ -66,4 +66,3 @@ extern int xchar_info_size;      /* number of entries */
 extern const unsigned char xfont_fixed[][HW_PATTERN_SIZE];
 
 void lcd_charset_init(void);
-

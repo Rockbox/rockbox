@@ -251,6 +251,15 @@ extern void lcd_jump_scroll(int mode); /* 0=off, 1=once, ..., ALWAYS */
 extern void lcd_jump_scroll_delay(int ms);
 #endif /* HAVE_LCD_CHARCELLS */
 
+/* Bitmap formats */
+enum
+{
+    FORMAT_MONO,
+    FORMAT_NATIVE,
+    FORMAT_ANY   /* For passing to read_bmp_file() */
+};
+
+
 /* Draw modes */
 #define DRMODE_COMPLEMENT 0
 #define DRMODE_BG         1
@@ -425,14 +434,6 @@ extern bool lcd_active(void);
 #ifdef HAVE_LCD_SHUTDOWN
 extern void lcd_shutdown(void);
 #endif
-
-/* Bitmap formats */
-enum
-{
-    FORMAT_MONO,
-    FORMAT_NATIVE,
-    FORMAT_ANY   /* For passing to read_bmp_file() */
-};
 
 #define FORMAT_TRANSPARENT 0x40000000
 #define FORMAT_DITHER      0x20000000
