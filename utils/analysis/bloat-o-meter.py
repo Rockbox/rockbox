@@ -25,10 +25,11 @@ nm_args = " ".join([x for x in sys.argv[3:]])
 def getsizes(file):
     sym = {}
     for l in os.popen("nm --size-sort %s %s" % (nm_args, file)).readlines():
-    	l = l.strip()
-	# Skip empty lines
-        if not len(l): continue
-	# Skip archive members
+        l = l.strip()
+    # Skip empty lines
+        if not len(l):
+            continue
+    # Skip archive members
         if len(l.split()) == 1 and l.endswith(':'):
           continue
         size, type, name = l.split()
@@ -71,10 +72,10 @@ for name in common:
 delta.sort()
 delta.reverse()
 
-print "%-48s %7s %7s %+7s" % ("function", "old", "new", "delta")
+print("%-48s %7s %7s %+7s" % ("function", "old", "new", "delta"))
 for d, n in delta:
-    if d: print "%-48s %7s %7s %+7d" % (n, old.get(n,"-"), new.get(n,"-"), d)
-print "-"*78
+    if d: print("%-48s %7s %7s %+7d" % (n, old.get(n,"-"), new.get(n,"-"), d))
+print("-" * 78)
 total="(add/remove: %s/%s grow/shrink: %s/%s up/down: %s/%s)%%s\nTotal: %s bytes"\
     % (add, remove, grow, shrink, up, -down, up-down)
-print total % (" "*(80-len(total)))
+print(total % (" "*(80-len(total))))
