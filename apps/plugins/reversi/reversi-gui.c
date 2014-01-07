@@ -180,12 +180,12 @@ static bool game_finished;
 
 /* This is the button initialization/definition.  The first element is the 
  *  Viewport.  This is defined in lcd.h, but the elements are:
- *      int x       - X location of button/viewport
- *      int y       - Y location of button/viewport
- *      int width   - Width of button/viewport
- *      int height  - Height of button/viewport
- *      int font    - Font to be used on button/viewport
- *      int drawmode- Modes defined in lcd.h
+ *      int x                   - X location of button/viewport
+ *      int y                   - Y location of button/viewport
+ *      int width               - Width of button/viewport
+ *      int height              - Height of button/viewport
+ *      int font                - Font to be used on button/viewport
+ *      int drawmode            - Modes defined in lcd.h
  *      unsigned fg_pattern     - foreground color
  *      unsigned bg_pattern     - backbround color
  *
@@ -198,16 +198,13 @@ static bool game_finished;
  */
 struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] = 
   {
-    { {B_MENU_X, B_MENU_Y, B_MENU_W, B_MENU_H, 0, FONT_UI, 
-        -1, STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+    { {B_MENU_X, B_MENU_Y, B_MENU_W, B_MENU_H, 0, FONT_UI, DRMODE_SOLID, 0, 0xFFFF},
       false, REVERSI_BUTTON_MENU, false, "Menu", NULL },
       
-    { {B_QUIT_X, B_QUIT_Y, B_QUIT_W, B_QUIT_H, 0, FONT_UI, 
-        -1, STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+    { {B_QUIT_X, B_QUIT_Y, B_QUIT_W, B_QUIT_H, 0, FONT_UI, DRMODE_SOLID, 0, 0xFFFF},
       false, REVERSI_BUTTON_QUIT, false, "Quit", NULL },
       
-    { {0, 0, XOFS+BOARD_WIDTH, YOFS+BOARD_HEIGHT, 0, 0, 
-        -1, STYLE_DEFAULT, 0, 0xFFFF, 0, 0, 0}, 
+    { {0, 0, XOFS+BOARD_WIDTH, YOFS+BOARD_HEIGHT, 0, 0,  DRMODE_SOLID, 0, 0xFFFF},
       false, REVERSI_BUTTON_MAKE_MOVE, true, NULL, NULL }
 };
 #endif
