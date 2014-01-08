@@ -447,44 +447,67 @@ void LCDFN(bmp)(const struct bitmap* bm, int x, int y)
 void LCDFN(nine_segment_bmp)(const struct bitmap* bm, int x, int y,
                                 int width, int height)
 {
-    int seg_w = bm->width / 3;
-    int seg_h = bm->height / 3;
-    int src_x, src_y, dst_x, dst_y;
+    int seg_w, seg_h, src_x, src_y, dst_x, dst_y;
+    /* if the bitmap dimensions are not multiples of 3 bytes reduce the
+     * inner segments accordingly. A 8x8 image becomes 3x3 for each
+     * corner, and 2x2 for the inner segments */
+    int corner_w = (bm->width + 2) / 3;
+    int corner_h = (bm->height + 2) / 3;
+    seg_w = bm->width  - (2 * corner_w);
+    seg_h = bm->height - (2 * corner_h);
 
-    /* top */
-    src_x = seg_w; src_y = 0;
-    dst_x = seg_w; dst_y = 0;
+    /* top & bottom in a single loop*/
+    src_x = corner_w;
+    dst_x = corner_w;
+    int src_y_top = 0;
+    int dst_y_top = 0;
+    int src_y_btm = bm->height - corner_h;
+    int dst_y_btm = height - corner_h;
     for (; dst_x < width - seg_w; dst_x += seg_w)
-        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
-    /* bottom */
-    src_x = seg_w; src_y = bm->height - seg_h;
-    dst_x = seg_w; dst_y = height - seg_h;
-    for (; dst_x < width - seg_w; dst_x += seg_w)
-        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
+    {
+        /* cap the last segment to the remaining width */
+        int w = MIN(seg_w, (width - dst_x - seg_w));
+        LCDFN(bmp_part)(bm, src_x, src_y_top, dst_x, dst_y_top, w, seg_h);
+        LCDFN(bmp_part)(bm, src_x, src_y_btm, dst_x, dst_y_btm, w, seg_h);
+    }
         
-    /* left */
-    src_x = 0; src_y = seg_h;
-    dst_x = 0; dst_y = seg_h;
-    for (; dst_y < height - seg_h; dst_y += seg_h)
-        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
-    /* right */
-    src_x = bm->width - seg_w; src_y = seg_h;
-    dst_x = width - seg_w; dst_y = seg_h;
-    for (; dst_y < height - seg_h; dst_y += seg_h)
-        LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
-    /* center */
-    dst_y = seg_h; src_y = seg_h; src_x = seg_w;
+    /* left & right in a single loop */
+    src_y = corner_h;
+    dst_y = corner_h;
+    int src_x_l = 0;
+    int dst_x_l = 0;
+    int src_x_r = bm->width - corner_w;
+    int dst_x_r = width - corner_w;
     for (; dst_y < height - seg_h; dst_y += seg_h)
     {
-        dst_x = seg_w;
-        for (; dst_x < width - seg_w; dst_x += seg_w)
-            LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, seg_w, seg_h);
+        /* cap the last segment to the remaining height */
+        int h = MIN(seg_h, (height - dst_y - seg_h));
+        LCDFN(bmp_part)(bm, src_x_l, src_y, dst_x_l, dst_y, seg_w, h);
+        LCDFN(bmp_part)(bm, src_x_r, src_y, dst_x_r, dst_y, seg_w, h);
     }
-
+    /* center, need not be drawn if the desired rectangle is smaller than
+     * the sides. in that case the rect is completely filled already */
+    if (width > (2*corner_w) && height > (2*corner_h))
+    {
+        dst_y = src_y = corner_h;
+        src_x = corner_w;
+        for (; dst_y < height - seg_h; dst_y += seg_h)
+        {
+            /* cap the last segment to the remaining height */
+            int h = MIN(seg_h, (height - dst_y - seg_h));
+            dst_x = corner_w;
+            for (; dst_x < width - seg_w; dst_x += seg_w)
+            {
+                /* cap the last segment to the remaining width */
+                int w = MIN(seg_w, (width - dst_x - seg_w));
+                LCDFN(bmp_part)(bm, src_x, src_y, dst_x, dst_y, w, h);
+            }
+        }
+    }
     /* 4 corners */
-    LCDFN(bmp_part)(bm, 0, 0, x, y, seg_w, seg_h);
-    LCDFN(bmp_part)(bm, bm->width - seg_w, 0, width - seg_w, 0, seg_w, seg_h);
-    LCDFN(bmp_part)(bm, 0, bm->width - seg_h, 0, height - seg_h, seg_w, seg_h);
-    LCDFN(bmp_part)(bm, bm->width - seg_w, bm->width - seg_h,
-            width - seg_w, height - seg_h, seg_w, seg_h);
+    LCDFN(bmp_part)(bm, 0, 0, x, y, corner_w, corner_h);
+    LCDFN(bmp_part)(bm, bm->width - corner_w, 0, width - corner_w, 0, corner_w, corner_h);
+    LCDFN(bmp_part)(bm, 0, bm->width - corner_h, 0, height - corner_h, corner_w, corner_h);
+    LCDFN(bmp_part)(bm, bm->width - corner_w, bm->width - corner_h,
+            width - corner_w, height - corner_h, corner_w, corner_h);
 }
