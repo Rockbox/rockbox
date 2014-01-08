@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_975da44b",
+        "filename": "apps/plugins/crypto/sha256.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-01-08T08:15:35Z",
+      "side": 1,
+      "message": "Is it seed or some const start value?",
+      "revId": "d9b04590aa373ce6ec3f621c5f288aa6dcbc670f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_7749f08a",
+        "filename": "apps/plugins/crypto/sha256.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-01-08T08:15:35Z",
+      "side": 1,
+      "message": "That is very inefficient way of reversing byte order unless compiler does something clever with this (I doubt it)",
+      "revId": "d9b04590aa373ce6ec3f621c5f288aa6dcbc670f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
