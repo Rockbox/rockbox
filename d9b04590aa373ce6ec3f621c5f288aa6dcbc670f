@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9ab29df4_77401057",
+        "filename": "apps/plugins/crypto/sha256.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2014-01-08T15:40:28Z",
+      "side": 1,
+      "message": "These eight are the sha256 initial hash values.  The first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19 according to wikipedia.  They help build the crypto standards.  Example SHA224 is identical to SHA256, except that the initial hash values 0 through 7 are different, and the output is constructed by omitting 7.",
+      "parentUuid": "9ab29df4_975da44b",
+      "revId": "d9b04590aa373ce6ec3f621c5f288aa6dcbc670f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab29df4_7749f08a",
         "filename": "apps/plugins/crypto/sha256.c",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2014-01-08T08:15:35Z",
       "side": 1,
       "message": "That is very inefficient way of reversing byte order unless compiler does something clever with this (I doubt it)",
+      "revId": "d9b04590aa373ce6ec3f621c5f288aa6dcbc670f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_9724c4c7",
+        "filename": "apps/plugins/crypto/sha256.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2014-01-08T15:40:28Z",
+      "side": 1,
+      "message": "I\u0027m really quite an inexperianced C programmer.  This code was taken from https://github.com/B-Con/crypto-algorithms and as the site says \"are primarily intended for educational and pragmatic purposes\".  I wouldn\u0027t know the first thing about optimizing this, but patches are welcome ;-)",
+      "parentUuid": "9ab29df4_7749f08a",
       "revId": "d9b04590aa373ce6ec3f621c5f288aa6dcbc670f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
