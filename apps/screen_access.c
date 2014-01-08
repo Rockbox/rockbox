@@ -105,7 +105,7 @@ static void screen_helper_put_line(int x, int y, struct line_desc *line,
 {
     va_list ap;
     va_start(ap, fmt);
-    vput_line(&screens[0], x, y, line, fmt, ap);
+    vput_line(&screens[SCREEN_MAIN], x, y, line, fmt, ap);
     va_end(ap);
 }
 
@@ -170,7 +170,7 @@ static void screen_helper_remote_put_line(int x, int y, struct line_desc *line,
 {
     va_list ap;
     va_start(ap, fmt);
-    vput_line(&screens[0], x, y, line, fmt, ap);
+    vput_line(&screens[SCREEN_REMOTE], x, y, line, fmt, ap);
     va_end(ap);
 }
 
