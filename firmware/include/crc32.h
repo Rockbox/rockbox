@@ -18,10 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdint.h>
+
 #ifndef _CRC32_H
 #define _CRC32_H
 
-unsigned crc_32(const void *src, unsigned len, unsigned crc32);
+uint32_t crc_32(const void *src, uint32_t len, uint32_t crc32);
 
 #endif
 

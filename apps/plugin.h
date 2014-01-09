@@ -457,7 +457,7 @@ struct plugin_api {
                                       int numberlen IF_CNFN_NUM_(, int *num));
     bool (*file_exists)(const char *file);
     char* (*strip_extension)(char* buffer, int buffer_size, const char *filename);
-    unsigned (*crc_32)(const void *src, unsigned len, unsigned crc32);
+    uint32_t (*crc_32)(const void *src, uint32_t len, uint32_t crc32);
 
     int (*filetype_get_attr)(const char* file);
 

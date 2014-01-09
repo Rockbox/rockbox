@@ -96,3 +96,10 @@ void core_print_block_at(int block_num, char* buf, size_t bufsize)
 {
     buflib_print_block_at(&core_ctx, block_num, buf, bufsize);
 }
+
+#ifdef DEBUG
+void core_check_valid(void)
+{
+    buflib_check_valid(&core_ctx);
+}
+#endif

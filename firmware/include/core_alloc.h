@@ -17,6 +17,9 @@ bool core_shrink(int handle, void* new_start, size_t new_size);
 int core_free(int handle);
 size_t core_available(void);
 size_t core_allocatable(void);
+#ifdef DEBUG
+void core_check_valid(void);
+#endif
 
 /* DO NOT ADD wrappers for buflib_buffer_out/in. They do not call
  * the move callbacks and are therefore unsafe in the core */
