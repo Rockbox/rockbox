@@ -306,7 +306,8 @@ static void style_line(struct screen *display,
             break;
     }
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
-    /* fg color and bg color are left as-is for text drawing */
+    /* prepare fg and bg colors for text drawing, be careful to not
+     * override any previously set colors unless mandated by the style */
     if (display->depth > 1)
     {
         if (style & STYLE_COLORED)
@@ -318,8 +319,6 @@ static void style_line(struct screen *display,
         }
         else if (style & (STYLE_GRADIENT|STYLE_COLORBAR))
             display->set_foreground(line->text_color);
-        else
-            display->set_foreground(get_viewport_default_colour(display->screen_type, true));
     }
 #endif
 }
@@ -329,11 +328,23 @@ void vput_line(struct screen *display,
               int x, int y, struct line_desc *line,
               const char *fmt, va_list ap)
 {
+#if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
+    /* push and pop fg and bg colors as to not compromise unrelated lines */
+    unsigned fg = 0, bg = 0; /* shut up gcc */
+    if (display->depth > 1 && line->style > STYLE_INVERT)
+    {
+        fg = display->get_foreground();
+        bg = display->get_background();
+    }
+#endif
     style_line(display, x, y, line);
     print_line(display, x, y, line, fmt, ap);
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
-    if (display->depth > 1)
-        display->set_foreground(get_viewport_default_colour(display->screen_type, true));
+    if (display->depth > 1 && line->style > STYLE_INVERT)
+    {    
+        display->set_foreground(fg);
+        display->set_background(bg);
+    }
 #endif
     display->set_drawmode(DRMODE_SOLID);
 }
