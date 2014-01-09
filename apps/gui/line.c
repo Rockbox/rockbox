@@ -32,6 +32,7 @@
 #include "settings.h"
 #include "debug.h"
 #include "viewport.h"
+#include "debug.h"
 
 #ifdef HAVE_REMOTE_LCD
 #define MAX_LINES (LCD_SCROLLABLE_LINES + LCD_REMOTE_SCROLLABLE_LINES)
@@ -158,8 +159,8 @@ static void print_line(struct screen *display,
     int xpos = x;
     int icon_y, icon_h, icon_w;
     enum themable_icons icon;
-    char tempbuf[128];
-    int tempbuf_idx;
+    char tempbuf[MAX_PATH+32];
+    unsigned int tempbuf_idx;
 
     height = line->height == -1 ? display->getcharheight() : line->height;
     icon_h = get_icon_height(display->screen_type);
@@ -246,7 +247,15 @@ next:
         }
         else
         {   /* handle string constant in format string */
-            tempbuf[tempbuf_idx++] = ch;
+            if (tempbuf_idx < sizeof(tempbuf)-1)
+            {
+                tempbuf[tempbuf_idx++] = ch;
+            }
+            else if (tempbuf_idx == sizeof(tempbuf)-1)
+            {
+                tempbuf[tempbuf_idx++] = '\0';
+                DEBUGF("%s ", ch ? "put_line: String truncated" : "");
+            }
             if (!ch)
             {   /* end of string. put it online */
                 put_text(display, xpos, y, line, tempbuf, false, 0);

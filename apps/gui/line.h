@@ -108,9 +108,14 @@ struct line_desc {
  * $*t     - skips the first n pixels when displaying the string. put_line()
  *           expects a correspinding paramter of the type 'int' that specifies n.
  *
- * Inline text will be printed as is and can be freely intermixed with tags,
- * except when the line can scroll. Due to limitations of the scroll engine
- * only the last piece of text (whether inline or via $t) can scroll.
+ * Inline text will be printed as is (be sure to escape '$') and can be freely
+ * intermixed with tags. Inline text will be truncated after MAX_PATH+31 bytes.
+ * If you have a longer inline string use a separate buffer and pass that via $t,
+ * which does not suffer from this truncation.
+ * 
+ * Text can appear anywhere, before or after (or both) tags. However, when the
+ * line can scroll, only the last piece of text (whether inline or via $t) can
+ * scroll. This is due to a scroll_engine limitation.
  *
  * x, y - pixel postion of the line.
  * line - holds information for the line decorations
