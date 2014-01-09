@@ -32,6 +32,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "debug.h"
+#include "buflib.h"
 
 /* Define this as 1 to show informational messages that are not errors. */
 #define THREAD_SDL_DEBUGF_ENABLED 0
@@ -307,6 +308,7 @@ struct thread_entry* thread_self_entry(void)
     return cores[CURRENT_CORE].running;
 }
 
+extern struct buflib_context core_ctx;
 void switch_thread(void)
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
@@ -382,6 +384,9 @@ void switch_thread(void)
         } /* STATE_SLEEPING: */
     }
 
+#ifdef DEBUG
+    buflib_check_valid(&core_ctx);
+#endif
     cores[CURRENT_CORE].running = current;
 
     if (threads_status != THREADS_RUN)
