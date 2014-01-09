@@ -40,6 +40,7 @@ union buflib_data
     struct buflib_callbacks* ops;
     char* alloc;
     union buflib_data *handle;
+    uint32_t crc;
 };
 
 struct buflib_context
@@ -346,4 +347,9 @@ int buflib_get_num_blocks(struct buflib_context *ctx);
  */
 void buflib_print_block_at(struct buflib_context *ctx, int block_num,
                             char* buf, size_t bufsize);
+
+/**
+ * Check integrity of given buflib context
+ */
+void buflib_check_valid(struct buflib_context *ctx);
 #endif

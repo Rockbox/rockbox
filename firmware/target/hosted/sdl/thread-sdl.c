@@ -32,6 +32,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "debug.h"
+#include "core_alloc.h"
 
 /* Define this as 1 to show informational messages that are not errors. */
 #define THREAD_SDL_DEBUGF_ENABLED 0
@@ -382,6 +383,9 @@ void switch_thread(void)
         } /* STATE_SLEEPING: */
     }
 
+#ifdef DEBUG
+    core_check_valid();
+#endif
     cores[CURRENT_CORE].running = current;
 
     if (threads_status != THREADS_RUN)

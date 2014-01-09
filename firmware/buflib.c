@@ -31,6 +31,8 @@
 #include "buflib.h"
 #include "string-extra.h" /* strlcpy() */
 #include "debug.h"
+#include "panic.h"
+#include "crc32.h"
 #include "system.h" /* for ALIGN_*() */
 
 /* The main goal of this design is fast fetching of the pointer for a handle.
@@ -54,13 +56,14 @@
  *
  * Example:
  * |<- alloc block #1 ->|<- unalloc block ->|<- alloc block #2      ->|<-handle table->|
- * |L|H|C|cccc|L2|XXXXXX|-L|YYYYYYYYYYYYYYYY|L|H|C|cc|L2|XXXXXXXXXXXXX|AAA|
+ * |L|H|C|cccc|L2|crc|XXXXXX|-L|YYYYYYYYYYYYYYYY|L|H|C|cc|L2|crc|XXXXXXXXXXXXX|AAA|
  *
  * L - length marker (negative if block unallocated)
  * H - handle table enry pointer
  * C - pointer to struct buflib_callbacks
  * c - variable sized string identifier
  * L2 - second length marker for string identifier
+ * crc - crc32 protecting buflib cookie integrity
  * X - actual payload
  * Y - unallocated space
  * 
@@ -224,8 +227,17 @@ static bool
 move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
 {
     char* new_start;
-    union buflib_data *new_block, *tmp = block[1].handle;
+    union buflib_data *new_block, *tmp = block[1].handle, *crc_slot;
     struct buflib_callbacks *ops = block[2].ops;
+    crc_slot = (union buflib_data*)tmp->alloc - 1;
+    int cookie_size = (crc_slot - block)*sizeof(union buflib_data);
+    uint32_t crc = crc_32((void *)block, cookie_size, 0xffffffff);
+
+    /* check for cookie validity */
+    if (crc != crc_slot->crc)
+        panicf("buflib cookie corrupted, crc: 0x%08x, expected: 0x%08x",
+               (unsigned int)crc, (unsigned int)crc_slot->crc);
+
     if (!IS_MOVABLE(block))
         return false;
 
@@ -299,6 +311,7 @@ buflib_compact(struct buflib_context *ctx)
                 ret = true;
                 /* Move was successful. The memory at block is now free */
                 block->val = -len;
+
                 /* add its length to shift */
                 shift += -len;
                 /* Reduce the size of the hole accordingly
@@ -474,9 +487,9 @@ buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
     size += name_len;
     size = (size + sizeof(union buflib_data) - 1) /
            sizeof(union buflib_data)
-           /* add 4 objects for alloc len, pointer to handle table entry and
-            * name length, and the ops pointer */
-           + 4;
+           /* add 5 objects for alloc len, pointer to handle table entry and
+            * name length, the ops pointer and crc */
+           + 5;
 handle_alloc:
     handle = handle_alloc(ctx);
     if (!handle)
@@ -555,14 +568,22 @@ buffer_alloc:
     /* Set up the allocated block, by marking the size allocated, and storing
      * a pointer to the handle.
      */
-    union buflib_data *name_len_slot;
+    union buflib_data *name_len_slot, *crc_slot;
     block->val = size;
     block[1].handle = handle;
     block[2].ops = ops;
     strcpy(block[3].name, name);
     name_len_slot = (union buflib_data*)B_ALIGN_UP(block[3].name + name_len);
     name_len_slot->val = 1 + name_len/sizeof(union buflib_data);
-    handle->alloc = (char*)(name_len_slot + 1);
+    crc_slot = (union buflib_data*)(name_len_slot + 1);
+    crc_slot->crc = crc_32((void *)block,
+                           (crc_slot - block)*sizeof(union buflib_data),
+                           0xffffffff);
+    handle->alloc = (char*)(crc_slot + 1);
+
+    BDEBUGF("buflib_alloc_ex: size=%d handle=%p clb=%p crc=0x%0x name=\"%s\"\n",
+            (unsigned int)size, (void *)handle, (void *)ops,
+            (unsigned int)crc_slot->crc, block[3].name);
 
     block += size;
     /* alloc_end must be kept current if we're taking the last block. */
@@ -778,6 +799,8 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
 bool
 buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t new_size)
 {
+    union buflib_data *crc_slot;
+    int cookie_size;
     char* oldstart = buflib_get_data(ctx, handle);
     char* newstart = new_start;
     char* newend = newstart + new_size;
@@ -823,6 +846,11 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
         block = new_block;
     }
 
+    /* update crc of the cookie */
+    crc_slot = (union buflib_data*)new_block[1].handle->alloc - 1;
+    cookie_size = (crc_slot - new_block)*sizeof(union buflib_data);
+    crc_slot->crc = crc_32((void *)new_block, cookie_size, 0xffffffff);
+
     /* Now deal with size changes that create free blocks after the allocation */
     if (old_next_block != new_next_block)
     {
@@ -847,11 +875,37 @@ const char* buflib_get_name(struct buflib_context *ctx, int handle)
     union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
     if (!data)
         return NULL;
-    size_t len = data[-1].val;
+    size_t len = data[-2].val;
     if (len <= 1)
         return NULL;
-    return data[-len].name;
+    return data[-len-1].name;
 }
+
+#ifdef DEBUG
+void buflib_check_valid(struct buflib_context *ctx)
+{
+    union buflib_data *crc_slot;
+    int cookie_size;
+    uint32_t crc;
+
+    for(union buflib_data* this = ctx->buf_start;
+                           this < ctx->alloc_end;
+                           this += abs(this->val))
+    {
+        if (this->val < 0)
+            continue;
+
+        crc_slot = (union buflib_data*)
+                       ((union buflib_data*)this[1].handle)->alloc - 1;
+        cookie_size = (crc_slot - this)*sizeof(union buflib_data);
+        crc = crc_32((void *)this, cookie_size, 0xffffffff);
+
+        if (crc != crc_slot->crc)
+            panicf("buflib check crc: 0x%08x, expected: 0x%08x",
+                   (unsigned int)crc, (unsigned int)crc_slot->crc);
+    }
+}
+#endif
 
 #ifdef BUFLIB_DEBUG_BLOCKS
 void buflib_print_allocs(struct buflib_context *ctx,

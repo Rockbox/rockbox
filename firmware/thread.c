@@ -39,6 +39,7 @@
 #ifdef RB_PROFILE
 #include <profile.h>
 #endif
+#include "core_alloc.h"
 #include "gcc_extensions.h"
 
 /****************************************************************************
@@ -1160,6 +1161,11 @@ void switch_thread(void)
      * restore the state of the current thread later to the point prior
      * to this call. */
     store_context(&thread->context);
+
+#ifdef DEBUG
+    /* Check core_ctx buflib integrity */
+    core_check_valid();
+#endif
 
     /* Check if the current thread stack is overflown */
     if (UNLIKELY(thread->stack[0] != DEADBEEF) && thread->stack_size > 0)
