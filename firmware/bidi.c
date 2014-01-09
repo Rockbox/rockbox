@@ -144,6 +144,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     unsigned short *heb_str; /* *broken_str */
     int block_start, block_end, block_type, block_length, i;
     int length = utf8length(str);
+    length=length>=SCROLL_LINE_SIZE?SCROLL_LINE_SIZE-1:length;
 #endif
     /*
     long max_chars=0;
@@ -152,7 +153,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     tmp = str;
     */
     target = tmp = utf16_buf;
-    while (*str)
+    while (*str && target < &utf16_buf[SCROLL_LINE_SIZE-1])
         str = utf8decode(str, target++);
     *target = 0;
 
