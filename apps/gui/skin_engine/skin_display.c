@@ -509,8 +509,10 @@ void write_line(struct screen *display, struct align_pos *format_align,
                    (center_width > scroll_width) ||
                    (right_width > scroll_width)))
     {
+        /* strings can be as large as MAX_LINE which exceeds put_lines()
+         * limit for inline strings. Use $t to avoid truncation */
         linedes->scroll = true;
-        display->put_line(0, line * string_height, linedes, (unsigned char *)format_align->left);
+        display->put_line(0, line * string_height, linedes, "$t", format_align->left);
     }
     else
     {
@@ -532,13 +534,13 @@ void write_line(struct screen *display, struct align_pos *format_align,
 #endif
         /* print aligned strings */
         if (left_width != 0)
-            display->put_line(0, line, linedes, format_align->left);
+            display->put_line(0, line, linedes, "$t", format_align->left);
 
         if (center_width != 0)
-            display->put_line(center_xpos, line, linedes, format_align->center);
+            display->put_line(center_xpos, line, linedes, "$t", format_align->center);
 
         if (right_width != 0)
-            display->put_line(right_xpos, line, linedes, format_align->right);
+            display->put_line(right_xpos, line, linedes, "$t", format_align->right);
     }
 }
 
