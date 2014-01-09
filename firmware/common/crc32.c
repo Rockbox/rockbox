@@ -25,7 +25,7 @@
 
 /* Tool function to calculate a CRC32 across some buffer */
 /* third argument is either 0xFFFFFFFF to start or value from last piece */
-unsigned crc_32(const void *src, unsigned len, unsigned crc32)
+uint32_t crc_32(const void *src, uint32_t len, uint32_t crc32)
 {
     const unsigned char *buf = (const unsigned char *)src;
     
@@ -39,7 +39,7 @@ unsigned crc_32(const void *src, unsigned len, unsigned crc32)
     };
 
     unsigned char byte;
-    unsigned t;
+    uint32_t t;
 
     while (len--)
     {

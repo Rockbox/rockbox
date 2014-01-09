@@ -40,6 +40,7 @@ union buflib_data
     struct buflib_callbacks* ops;
     char* alloc;
     union buflib_data *handle;
+    uint32_t crc;
 };
 
 struct buflib_context
