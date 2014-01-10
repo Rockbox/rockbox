@@ -22,6 +22,10 @@ STARTUP(target/arm/rk27xx/crt0.o)
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 #define CODECORIG (ENDAUDIOADDR)
 
+/* .init is copied to codec buffer */
+#define INITORIG CODECORIG
+#define INITSIZE CODECSIZE
+
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
 
@@ -29,21 +33,14 @@ MEMORY
 {
     DRAM  : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
     IRAM  : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+    INIT  : ORIGIN = INITORIG, LENGTH = INITSIZE
 }
 
 SECTIONS
 {
   loadaddress = DRAMORIG;
 
-  .intvect : {
-    _intvectstart = . ;
-    KEEP(*(.intvect))
-    _intvectend = . ;  
-  } > IRAM AT > DRAM
-  _intvectcopy = LOADADDR(.intvect);
-
   .text : {
-    *(.init.text)
     *(.text*)
     *(.icode*)
     *(.glue_7*)
@@ -61,7 +58,27 @@ SECTIONS
     . = ALIGN(0x4);
   } > DRAM
 
-  .stack (NOLOAD) :
+  /* NOLOAD sections at end start here. Any part of the binary image past
+   * this point is discarded or copied elsewhere. */
+  _noloaddram = .;
+
+  .intvect : {
+    _intvectstart = . ;
+    KEEP(*(.intvect))
+    _intvectend = . ;
+  } > IRAM AT > DRAM
+  _intvectcopy = LOADADDR(.intvect);
+  
+  .init : {
+    . = ALIGN(4);
+    _initstart = .;
+    *(.init*)
+    *(.initdata*)
+    _initend = .;
+  } > INIT AT > DRAM
+  _initcopy = LOADADDR(.init);
+
+  .stack _noloaddram (NOLOAD) :
   {
      *(.stack)
      _stackbegin = .;

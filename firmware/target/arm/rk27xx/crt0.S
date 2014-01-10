@@ -149,6 +149,20 @@ entry_point:
     strhi   r1, [r2], #4
     bhi     1b
 
+#ifdef HAVE_INIT_ATTR
+    /* Copy init section to the codec buffer
+     * before .bss zeroing
+     */
+    ldr     r2, =_initstart
+    ldr     r3, =_initend
+    ldr     r4, =_initcopy
+1:
+    cmp     r3, r2
+    ldrhi   r1, [r4], #4
+    strhi   r1, [r2], #4
+    bhi     1b
+#endif
+
     /* Initialise bss, ibss section to zero */
     ldr     r2, =_edata
     ldr     r3, =_end
