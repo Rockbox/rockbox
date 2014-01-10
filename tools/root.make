@@ -201,7 +201,11 @@ ifndef APP_TYPE
 
 ## target build
 CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
+ifeq ($(wildcard $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/app.lds),)
+RAMLDS := $(FIRMDIR)/target/$(CPU)/app.lds
+else
 RAMLDS := $(FIRMDIR)/target/$(CPU)/$(MANUFACTURER)/app.lds
+endif
 LINKRAM := $(BUILDDIR)/ram.link
 ROMLDS := $(FIRMDIR)/rom.lds
 LINKROM := $(BUILDDIR)/rom.link
