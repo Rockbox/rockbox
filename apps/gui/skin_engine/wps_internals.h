@@ -186,10 +186,9 @@ struct skin_viewport {
     bool is_infovp;
     OFFSETTYPE(char*) label;
     int   parsed_fontid;
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     bool output_to_backdrop_buffer;
-    unsigned start_fgcolour;
-    unsigned start_bgcolour;
+    bool fgbg_changed;
 #ifdef HAVE_LCD_COLOR
     struct gradient_config start_gradient;
 #endif

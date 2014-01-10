@@ -700,15 +700,9 @@ static int parse_viewportcolour(struct skin_element *element,
     if (element->line == curr_viewport_element->line)
     {
         if (token->type == SKIN_TOKEN_VIEWPORT_FGCOLOUR)
-        {
-            curr_vp->start_fgcolour = colour->colour;
             curr_vp->vp.fg_pattern = colour->colour;
-        }
         else
-        {
-            curr_vp->start_bgcolour = colour->colour;
             curr_vp->vp.bg_pattern = colour->colour;
-        }
     }
     return 0;
 }
@@ -1953,8 +1947,6 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     skin_vp->output_to_backdrop_buffer = false;
-    skin_vp->start_fgcolour = skin_vp->vp.fg_pattern;
-    skin_vp->start_bgcolour = skin_vp->vp.bg_pattern;
 #endif
 #ifdef HAVE_LCD_COLOR
     skin_vp->start_gradient.start = global_settings.lss_color;
