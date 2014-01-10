@@ -12,7 +12,11 @@ STARTUP(target/coldfire/crt0.o)
 
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10000000
+#if CONFIG_CPU == MCF5250
+#define IRAMSIZE 0xc800
+#else
 #define IRAMSIZE 0xc000
+#endif
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
@@ -102,7 +106,7 @@ SECTIONS
        stackend = .;
     } > IRAM
 
-    .bss _noloaddram (NOLOAD) :
+    .bss _noloaddram (NOLOAD):
     {
        _edata = .;
         *(.bss*)
@@ -113,7 +117,7 @@ SECTIONS
 
     .audiobuf (NOLOAD) :
     {
-    	. = ALIGN(4);
+        . = ALIGN(4);
         _audiobuffer = .;
         audiobuffer = .;
     } > DRAM
