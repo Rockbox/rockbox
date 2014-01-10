@@ -20,6 +20,11 @@ STARTUP(target/coldfire/crt0.o)
 
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
+#define CODECORIG ENDAUDIOADDR
+
+/* .init is copied to codec buffer */
+#define INITORIG CODECORIG
+#define INITSIZE CODECSIZE
 
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)
@@ -28,6 +33,7 @@ MEMORY
 {
     DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
     IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+    INIT : ORIGIN = INITORIG, LENGTH = INITSIZE
 }
 
 SECTIONS
@@ -45,7 +51,7 @@ SECTIONS
     .text :
     {
         . = ALIGN(0x200);
-        *(.init.text)
+        KEEP(*(.startup*));
         *(.text*)
         . = ALIGN(0x4);
     } > DRAM
@@ -89,6 +95,15 @@ SECTIONS
 
     _iramcopy = LOADADDR(.iram);
     _noloaddram = LOADADDR(.iram);
+
+    .init :
+    {
+        _initstart = .;
+        *(.init*)
+        *(.initdata*)
+        _initend = .;
+    } > INIT AT > DRAM
+    _initcopy = LOADADDR(.init);
 
     .ibss (NOLOAD) :
     {
