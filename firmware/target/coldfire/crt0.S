@@ -290,6 +290,17 @@ start:
     /* .iram copy is done first since it is reclaimed for other
      * uninitialized sections */
 
+    /* copy .init section */
+    lea     _initcopy,%a2
+    lea     _initstart,%a3
+    lea     _initend,%a4
+    bra.b   .initstart
+.initloop:
+    move.l  (%a2)+,(%a3)+
+.initstart:
+    cmp.l   %a3,%a4
+    bhi.b   .initloop
+
     /* copy the .iram section */
     lea     _iramcopy,%a2
     lea     _iramstart,%a3
