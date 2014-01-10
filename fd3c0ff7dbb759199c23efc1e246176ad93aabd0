@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_3a04bd14",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-10T22:52:35Z",
+      "side": 1,
+      "message": "If the CRC field would be the last (after the name_len field) then you could crc the entire cookie with a single call",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_d7055c15",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-10T22:52:35Z",
+      "side": 1,
+      "message": "As mentioned on IRC I think the entire cookie should be checked, not just the first half.",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_1afff902",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-10T22:52:35Z",
+      "side": 1,
+      "message": "Normally you would use 0xffffffff as initial for crc_32() (this is also mentioned by the comment for crc_32(), but it doesn\u0027t matter.",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_f702600a",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-10T22:52:35Z",
+      "side": 1,
+      "message": "If this-\u003eval is \u003c0 then this is an unallocated block. In this case the crc check should not be performed.",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
