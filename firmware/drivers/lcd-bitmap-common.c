@@ -398,6 +398,9 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
         s->height = height;
         s->vp = current_vp;
         LCDFN(scroll_info).lines++;
+    } else {
+        /* if only the text was updated render immediately */
+        LCDFN(scroll_now(s));
     }
 }
 

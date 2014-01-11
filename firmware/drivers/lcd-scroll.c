@@ -123,11 +123,78 @@ void LCDFN(jump_scroll_delay)(int ms)
 }
 #endif
 
+/* This renders the scrolling line described by s immediatly.
+ * This can be called to update a scrolling line if the text has changed
+ * without waiting for the next scroll tick
+ *
+ * Returns true if the text scrolled to the end */
+bool LCDFN(scroll_now)(struct scrollinfo *s)
+{
+    int width = LCDFN(getstringsize)(s->linebuffer, NULL, NULL);
+    bool ended = false;
+    /* assume s->scroll_func() don't yield; otherwise this buffer might need
+     * to be mutex'd (the worst case would be minor glitches though) */
+    static char line_buf[SCROLL_LINE_SIZE];
+
+    if (s->bidir)
+    {   /* scroll bidirectional */
+        s->line = s->linebuffer;
+        if (s->offset <= 0) {
+            /* at beginning of line */
+            s->offset = 0;
+            s->backward = false;
+            ended = true;
+        }
+        else if (s->offset >= width - s->width) {
+            /* at end of line */
+            s->offset = width - s->width;
+            s->backward = true;
+            ended = true;
+        }
+    }
+    else
+    {
+        snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
+            s->linebuffer, "   ", s->linebuffer);
+        s->line = line_buf;
+        width += LCDFN(getstringsize)("   ", NULL, NULL);
+        /* scroll forward the whole time */
+        if (s->offset >= width) {
+            s->offset = 0;
+            ended = true;
+        }
+    }
+
+    /* Stash and restore these three, so that the scroll_func
+     * can do whatever it likes without destroying the state */
+#ifdef HAVE_LCD_BITMAP
+    unsigned drawmode;
+#if LCD_DEPTH > 1
+    unsigned fg_pattern, bg_pattern;
+    fg_pattern = s->vp->fg_pattern;
+    bg_pattern = s->vp->bg_pattern;
+#endif
+    drawmode   = s->vp->drawmode;
+#endif
+    s->scroll_func(s);
+
+    LCDFN(update_viewport_rect)(s->x, s->y, s->width, s->height);
+
+#ifdef HAVE_LCD_BITMAP
+#if LCD_DEPTH > 1
+    s->vp->fg_pattern = fg_pattern;
+    s->vp->bg_pattern = bg_pattern;
+#endif
+    s->vp->drawmode = drawmode;
+#endif
+
+    return ended;
+}
+
 static void LCDFN(scroll_worker)(void)
 {
-    int index, width;
+    int index;
     bool makedelay;
-    static char line_buf[SCROLL_LINE_SIZE];
     bool is_default;
     struct scroll_screen_info *si = &LCDFN(scroll_info);
     struct scrollinfo *s;
@@ -152,7 +219,6 @@ static void LCDFN(scroll_worker)(void)
         vp = LCDFN(get_viewport)(&is_default);
         LCDFN(set_viewport)(s->vp);
 
-        width = LCDFN(getstringsize)(s->linebuffer, NULL, NULL);
         makedelay = false;
 #ifdef HAVE_LCD_BITMAP
         step = si->step;
@@ -160,62 +226,15 @@ static void LCDFN(scroll_worker)(void)
         step = 1;
 #endif
 
+
         if (s->backward)
             s->offset -= step;
         else
             s->offset += step;
 
-        if (s->bidir)
-        {   /* scroll bidirectional */
-            s->line = s->linebuffer;
-            if (s->offset <= 0) {
-                /* at beginning of line */
-                s->offset = 0;
-                s->backward = false;
-                makedelay = true;
-            }
-            else if (s->offset >= width - s->width) {
-                /* at end of line */
-                s->offset = width - s->width;
-                s->backward = true;
-                makedelay = true;
-            }
-        }
-        else
-        {
-            snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
-                s->linebuffer, "   ", s->linebuffer);
-            s->line = line_buf;
-            width += LCDFN(getstringsize)("   ", NULL, NULL);
-            /* scroll forward the whole time */
-            if (s->offset >= width) {
-                s->offset = 0;
-                makedelay = true;
-            }
-        }
+        /* put the line onto the display now */
+        makedelay = LCDFN(scroll_now(s));
 
-        /* Stash and restore these three, so that the scroll_func
-         * can do whatever it likes without destroying the state */
-#ifdef HAVE_LCD_BITMAP
-        unsigned drawmode;
-#if LCD_DEPTH > 1
-        unsigned fg_pattern, bg_pattern;
-        fg_pattern = s->vp->fg_pattern;
-        bg_pattern = s->vp->bg_pattern;
-#endif
-        drawmode   = s->vp->drawmode;
-#endif
-        s->scroll_func(s);
-
-        LCDFN(update_viewport_rect)(s->x, s->y, s->width, s->height);
-
-#ifdef HAVE_LCD_BITMAP
-#if LCD_DEPTH > 1
-        s->vp->fg_pattern = fg_pattern;
-        s->vp->bg_pattern = bg_pattern;
-#endif
-        s->vp->drawmode = drawmode;
-#endif
         LCDFN(set_viewport)(vp);
 
         if (makedelay)

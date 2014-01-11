@@ -30,6 +30,7 @@
 #include "file.h"
 
 struct viewport;
+struct scrollinfo;
 
 extern void scroll_init(void) INIT_ATTR;
 
@@ -40,6 +41,7 @@ extern void lcd_scroll_delay(int ms);
 extern void lcd_scroll_stop(void);
 extern void lcd_scroll_stop_viewport(const struct viewport *vp);
 extern void lcd_scroll_stop_viewport_rect(const struct viewport *vp, int x, int y, int width, int height);
+extern bool lcd_scroll_now(struct scrollinfo *scroll);
 #ifdef HAVE_REMOTE_LCD
 extern void lcd_remote_scroll_speed(int speed);
 extern void lcd_remote_scroll_delay(int ms);
@@ -47,7 +49,10 @@ extern void lcd_remote_scroll_delay(int ms);
 extern void lcd_remote_scroll_stop(void);
 extern void lcd_remote_scroll_stop_viewport(const struct viewport *vp);
 extern void lcd_remote_scroll_stop_viewport_rect(const struct viewport *vp, int x, int y, int width, int height);
+extern bool lcd_remote_scroll_now(struct scrollinfo *scroll);
 #endif
+
+
 
 /* internal usage, but in multiple drivers
  * larger than the normal linebuffer since it holds the line a second
