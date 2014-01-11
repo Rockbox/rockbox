@@ -824,6 +824,11 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                         viewer.selected_track = viewer.num_tracks-1;
                     dirty = true;
                 }
+                /* the show_icons option in the playlist viewer settings
+                 * menu might have changed */
+                gui_synclist_set_icon_callback(&playlist_lists,
+                              global_settings.playlist_viewer_icons?
+                              &playlist_callback_icons:NULL);
                 gui_synclist_draw(&playlist_lists);
                 break;
             }
