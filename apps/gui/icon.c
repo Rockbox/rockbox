@@ -178,7 +178,7 @@ static void load_icons(const char* filename, enum Iconset iconset,
                         enum screen_type screen)
 {
     int size_read;
-    int bmpformat = (FORMAT_NATIVE|FORMAT_DITHER|FORMAT_TRANSPARENT);
+    int bmpformat = (FORMAT_ANY|FORMAT_DITHER|FORMAT_TRANSPARENT);
     struct iconset *ic = &iconsets[iconset][screen];
     int fd;
     
