@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_9a406937",
+        "filename": "firmware/usbstack/usb_storage.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-11T11:44:19Z",
+      "side": 1,
+      "message": "The panic is not required anymore with core_alloc_ex(). it won\u0027t allocate less that what you requested.",
+      "revId": "161fb7cf644f2134ee2e0937e67e8c45bbe89e44",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
