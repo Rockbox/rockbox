@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9ab29df4_fa19657a",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-11T11:06:33Z",
+      "side": 1,
+      "message": "It\u0027s common practice for CRC in general to use 0xffffffff as initial (not specific to rockbox or eeproms, also in ethernet for example). However, as I said, it doesnt really matter. The initial does not affect the error-detecting properties of CRC.",
+      "parentUuid": "9ab29df4_7a0e3536",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab29df4_f702600a",
         "filename": "firmware/buflib.c",
         "patchSetId": 1
