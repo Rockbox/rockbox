@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9ab29df4_ba0fed2d",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-01-11T11:02:21Z",
+      "side": 1,
+      "message": "Agreed",
+      "parentUuid": "9ab29df4_3a04bd14",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab29df4_d7055c15",
         "filename": "firmware/buflib.c",
         "patchSetId": 1
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "9ab29df4_7a0e3536",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-01-11T11:02:21Z",
+      "side": 1,
+      "message": "The only reason AFAIK is that crc_32() is used to protect eeprom saved settings integrity and empty eeprom is all 0xff\u0027s.",
+      "parentUuid": "9ab29df4_1afff902",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab29df4_f702600a",
         "filename": "firmware/buflib.c",
         "patchSetId": 1
@@ -64,6 +100,24 @@
       "writtenOn": "2014-01-10T22:52:35Z",
       "side": 1,
       "message": "If this-\u003eval is \u003c0 then this is an unallocated block. In this case the crc check should not be performed.",
+      "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_9a122957",
+        "filename": "firmware/buflib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-01-11T11:02:21Z",
+      "side": 1,
+      "message": "Yes, I missed that thanks. This may explain why I couldn\u0027t make it work with sdl threads.",
+      "parentUuid": "9ab29df4_f702600a",
       "revId": "fd3c0ff7dbb759199c23efc1e246176ad93aabd0",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
