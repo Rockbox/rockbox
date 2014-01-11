@@ -39,6 +39,7 @@ extern const struct menu_item_ex
         settings_menu_item,         /* settings_menu.c  */
         bookmark_settings_menu,
         playlist_settings,          /* playlist_menu.c  */
+        viewer_settings_menu,       /* playlist_menu.c  */
         equalizer_menu,             /* eq_menu.c        */
 #ifdef AUDIOHW_HAVE_EQ
         audiohw_eq_tone_controls,   /* audiohw_eq_menu.c */
@@ -54,4 +55,3 @@ int browse_folder(void *param); /* in theme_menu.c as it is mostly used there */
 
 #endif /* ! PLUGIN */
 #endif /*_EXPORTED_MENUS_H */
-
