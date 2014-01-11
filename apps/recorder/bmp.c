@@ -512,7 +512,7 @@ int read_bmp_fd(int fd,
     int padded_width;
     int read_width;
     int depth, numcolors, compression, totalsize;
-    int ret;
+    int ret, hdr_size;
     bool return_size = format & FORMAT_RETURN_SIZE;
     bool read_alpha = format & FORMAT_TRANSPARENT;
     enum color_order order = BGRA;
@@ -675,13 +675,15 @@ int read_bmp_fd(int fd,
         return -6;
     }
 
+    hdr_size = letoh32(bmph.struct_size);
     compression = letoh32(bmph.compression);
     if (depth <= 8) {
         numcolors = letoh32(bmph.clr_used);
         if (numcolors == 0)
             numcolors = BIT_N(depth);
+        /* forward to the color table */
+        lseek(fd, 14+hdr_size, SEEK_SET);
     } else {
-        int hdr_size = letoh32(bmph.struct_size);
         numcolors = 0;
         if (compression == 3) {
             if (hdr_size >= 56)
