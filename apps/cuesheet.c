@@ -45,9 +45,9 @@
 bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cue_file)
 {
     /* DEBUGF("look for cue file\n"); */
-
+    size_t len;
     char cuepath[MAX_PATH];
-    char *dot, *slash;
+    char *dot, *slash, *slash_cuepath;
 
     if (track_id3->has_embedded_cuesheet)
     {
@@ -64,18 +64,22 @@ bool look_for_cuesheet_file(struct mp3entry *track_id3, struct cuesheet_file *cu
     slash = strrchr(track_id3->path, '/');
     if (!slash)
         return false;
-    strlcpy(cuepath, track_id3->path, MAX_PATH);
-    dot = strrchr(cuepath, '.');
-    strcpy(dot, ".cue");
+    len = strlcpy(cuepath, track_id3->path, MAX_PATH);
+    slash_cuepath = &cuepath[slash - track_id3->path];
+    dot = strrchr(slash_cuepath, '.');
+    if (dot)
+        strlcpy(dot, ".cue", MAX_PATH - (dot-cuepath));
 
-    if (!file_exists(cuepath))
+    if (!dot || !file_exists(cuepath))
     {
         strcpy(cuepath, CUE_DIR);
-        strcat(cuepath, slash);
+        strlcat(cuepath, slash, MAX_PATH);
         char *dot = strrchr(cuepath, '.');
         strcpy(dot, ".cue");
         if (!file_exists(cuepath))
         {
+            if ((len+4) >= MAX_PATH)
+                return false;
             strlcpy(cuepath, track_id3->path, MAX_PATH);
             strlcat(cuepath, ".cue", MAX_PATH);
             if (!file_exists(cuepath))
