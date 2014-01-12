@@ -210,6 +210,8 @@ static void print_line(struct screen *display,
                 tempbuf_idx = tempbuf[tempbuf_idx] = 0;
                 put_text(display, xpos, y, line, tempbuf, false, 0);
                 xpos += display->getstringsize(tempbuf, NULL, NULL);
+                if (xpos >= max_width)
+                    return;
             }
 next:
             ch = *fmt++;
