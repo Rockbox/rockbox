@@ -281,9 +281,12 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,                 BUTTON_NONE },
 
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                               BUTTON_NONE },
-    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT|BUTTON_REPEAT,                 BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,                    BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                              BUTTON_NONE },
-    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,                   BUTTON_NONE },
+
+    { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,                 BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT,                BUTTON_NONE },
 
     { ACTION_PS_TOGGLE_MODE,    BUTTON_BOTTOMRIGHT,                        BUTTON_NONE },
 
