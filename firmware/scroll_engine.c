@@ -79,6 +79,10 @@ static bool scroll_process_message(int delay)
 {
     struct queue_event ev;
 
+    /* just poll once for negative delays */
+    if (delay < 0)
+        delay = TIMEOUT_NOBLOCK;
+
     do
     {
         long tick = current_tick;
@@ -199,4 +203,3 @@ void scroll_init(void)
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
 }
-
