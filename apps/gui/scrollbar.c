@@ -94,11 +94,20 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
         max_shown = items;
     }
 
-    inner_x  = x + 1;
-    inner_y  = y + 1;
-    inner_wd = width  - 2;
-    inner_ht = height - 2;
-
+    if (flags & BORDER_NOFILL)
+    {
+        inner_x  = x;
+        inner_y  = y;
+        inner_wd = width;
+        inner_ht = height;
+    }
+    else
+    {
+        inner_x  = x + 1;
+        inner_y  = y + 1;
+        inner_wd = width  - 2;
+        inner_ht = height - 2;
+    }
     /* Boundary check to make sure that height is reasonable, otherwise nothing
      *  to do 
      */
@@ -113,16 +122,18 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
     scrollbar_helper(min_shown, max_shown, items, inner_len, &size, &start);
 
     /* draw box */
+    if (!(flags & BORDER_NOFILL))
+    {
 #ifdef HAVE_LCD_COLOR
-    /* must avoid corners if case of (flags & FOREGROUND) */
-    screen->hline(inner_x, x + inner_wd, y);
-    screen->hline(inner_x, x + inner_wd, y + height - 1);
-    screen->vline(x, inner_y, y + inner_ht);
-    screen->vline(x + width - 1, inner_y, y + inner_ht);
+        /* must avoid corners if case of (flags & FOREGROUND) */
+        screen->hline(inner_x, x + inner_wd, y);
+        screen->hline(inner_x, x + inner_wd, y + height - 1);
+        screen->vline(x, inner_y, y + inner_ht);
+        screen->vline(x + width - 1, inner_y, y + inner_ht);
 #else
-    screen->drawrect(x, y, width, height);
+        screen->drawrect(x, y, width, height);
 #endif
-
+    }
     screen->set_drawmode(DRMODE_SOLID | DRMODE_INVERSEVID);
 
 #ifdef HAVE_LCD_COLOR

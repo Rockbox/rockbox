@@ -202,6 +202,11 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         flags |= INNER_NOFILL;
     }
 
+    if (pb->noborder)
+    {
+        flags |= BORDER_NOFILL;
+    }
+
     if (SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->slider))
     {
         struct gui_img *img = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->slider);

@@ -901,6 +901,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     pb->vp = PTRTOSKINOFFSET(skin_buffer, vp);
     pb->follow_lang_direction = follow_lang_direction > 0;
     pb->nofill = false;
+    pb->noborder = false;
     pb->nobar = false;
     pb->image = PTRTOSKINOFFSET(skin_buffer, NULL);
     pb->slider = PTRTOSKINOFFSET(skin_buffer, NULL);
@@ -978,6 +979,8 @@ static int parse_progressbar_tag(struct skin_element* element,
             pb->invert_fill_direction = true;
         else if (!strcmp(text, "nofill"))
             pb->nofill = true;
+        else if (!strcmp(text, "noborder"))
+            pb->noborder = true;
         else if (!strcmp(text, "nobar"))
             pb->nobar = true;
         else if (!strcmp(text, "slider"))
@@ -1051,6 +1054,11 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     if (image_filename)
     {
+        /* noborder is incompatible together with image. There is no border
+         * anyway. */
+        if (pb->noborder)
+            return WPS_ERROR_INVALID_PARAM;
+
         pb->image = PTRTOSKINOFFSET(skin_buffer,
                 skin_find_item(image_filename, SKIN_FIND_IMAGE, wps_data));
         if (!SKINOFFSETTOPTR(skin_buffer, pb->image)) /* load later */
