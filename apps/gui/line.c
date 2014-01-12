@@ -184,6 +184,7 @@ static void print_line(struct screen *display,
     enum themable_icons icon;
     char tempbuf[MAX_PATH+32];
     unsigned int tempbuf_idx;
+    int max_width = display->getwidth();
 
     height = line->height == -1 ? display->getcharheight() : line->height;
     icon_h = get_icon_height(display->screen_type);
@@ -195,7 +196,7 @@ static void print_line(struct screen *display,
     y += height/2 - display->getcharheight()/2;
 
     /* parse format string */
-    while (1)
+    while (xpos < max_width)
     {
         ch = *fmt++;
         /* need to check for escaped '$' */
@@ -280,8 +281,9 @@ next:
                 DEBUGF("%s ", ch ? "put_line: String truncated" : "");
             }
             if (!ch)
-            {   /* end of string. put it online */
-                put_text(display, xpos, y, line, tempbuf, false, 0);
+            {   /* end of format string. flush pending inline string, if any */
+                if (tempbuf[0])
+                    put_text(display, xpos, y, line, tempbuf, false, 0);
                 return;
             }
             else if (ch == '$')
