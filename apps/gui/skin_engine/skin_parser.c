@@ -922,30 +922,43 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     /* (x, y, width, height, ...) */
     if (!isdefault(param))
+    {
         pb->x = param->data.number;
+        if (pb->x < 0 || pb->x >= vp->width)
+            return WPS_ERROR_INVALID_PARAM;
+    }
     else
         pb->x = 0;
     param++;
 
     if (!isdefault(param))
+    {
         pb->y = param->data.number;
+        if (pb->y < 0 || pb->y >= vp->height)
+            return WPS_ERROR_INVALID_PARAM;
+    }
     else
         pb->y = -1; /* computed at rendering */
     param++;
 
     if (!isdefault(param))
+    {
         pb->width = param->data.number;
+        if (pb->width <= 0 || (pb->x + pb->width) > vp->width)
+            return WPS_ERROR_INVALID_PARAM;
+    }
     else
         pb->width = vp->width - pb->x;
     param++;
 
     if (!isdefault(param))
     {
-        /* A zero height makes no sense - reject it */
-        if (param->data.number == 0)
-            return WPS_ERROR_INVALID_PARAM;
-
+        int max;
         pb->height = param->data.number;
+        /* include y in check only if it was non-default */
+        max = (pb->y > 0) ? pb->y + pb->height : pb->height;
+        if (pb->height <= 0 || max > vp->height)
+            return WPS_ERROR_INVALID_PARAM;
     }
     else
     {
