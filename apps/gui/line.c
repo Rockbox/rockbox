@@ -51,9 +51,17 @@ static void put_text(struct screen *display, int x, int y, struct line_desc *lin
                       const char *text, bool prevent_scroll, int text_skip_pixels);
 
 struct line_desc_scroll {
-    struct line_desc desc; /* must be first! */
+    struct line_desc desc;
     bool used;
-} lines[MAX_LINES];
+};
+
+/* Allocate MAX_LINES+1 because at the time get_line_desc() is called
+ * the scroll engine did not yet determine that it ran out of lines
+ * (because puts_scroll_func() wasn't called yet. Therefore we can
+ * run out of lines before setting the used field. By allocating
+ * one item more we can survive that point and set used to false
+ * if the scroll engine runs out of lines */
+static struct line_desc_scroll lines[MAX_LINES+1];
 
 static struct line_desc_scroll *get_line_desc(void)
 {
