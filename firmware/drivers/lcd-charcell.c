@@ -511,7 +511,7 @@ void lcd_putsf(int x, int y, const unsigned char *fmt, ...)
 
 /** scrolling **/
 
-void lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
+bool lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
                             int offset,
                             void (*scroll_func)(struct scrollinfo *), void *data)
 {
@@ -519,12 +519,13 @@ void lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
     int len;
 
     if ((unsigned)y >= (unsigned)current_vp->height)
-        return;
+        return false;
 
     /* remove any previously scrolling line at the same location */
     lcd_scroll_stop_viewport_rect(current_vp, x, y, current_vp->width - x, 1);
 
-    if (lcd_scroll_info.lines >= LCD_SCROLLABLE_LINES) return;
+    if (lcd_scroll_info.lines >= LCD_SCROLLABLE_LINES)
+        return false;
 
     s = &lcd_scroll_info.scroll[lcd_scroll_info.lines];
 
@@ -534,7 +535,7 @@ void lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
     len = utf8length(string);
 
     if (current_vp->width - x >= len)
-        return;
+        return false;
     /* prepare scroll line */
     strlcpy(s->linebuffer, string, sizeof s->linebuffer);
 
@@ -558,19 +559,24 @@ void lcd_puts_scroll_worker(int x, int y, const unsigned char *string,
     s->offset = offset;
     s->backward = false;
     lcd_scroll_info.lines++;
+
+    return true;
 }
 
-void lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
+bool lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
                                      void (*scroll_func)(struct scrollinfo *),
                                      void *data, int x_offset)
 {
+    bool retval = false;
     if (!scroll_func)
         lcd_putsxyofs(x, y, x_offset, string);
     else
-        lcd_puts_scroll_worker(x, y, string, x_offset, scroll_func, data);
+        retval = lcd_puts_scroll_worker(x, y, string, x_offset, scroll_func, data);
+
+    return retval;
 }
 
-void lcd_scroll_fn(struct scrollinfo* s)
+static void lcd_scroll_fn(struct scrollinfo* s)
 {
     lcd_putsxyofs(s->x, s->y, s->offset, s->line);
     if (lcd_cursor.enabled)
@@ -583,7 +589,7 @@ void lcd_scroll_fn(struct scrollinfo* s)
     }
 }
 
-void lcd_puts_scroll(int x, int y, const unsigned char *string)
+bool lcd_puts_scroll(int x, int y, const unsigned char *string)
 {
-    lcd_puts_scroll_worker(x, y, string, 0, lcd_scroll_fn, NULL);
+    return lcd_puts_scroll_worker(x, y, string, 0, lcd_scroll_fn, NULL);
 }

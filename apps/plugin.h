@@ -326,7 +326,7 @@ struct plugin_api {
     void (*lcd_remote_set_contrast)(int x);
     void (*lcd_remote_clear_display)(void);
     void (*lcd_remote_puts)(int x, int y, const unsigned char *string);
-    void (*lcd_remote_puts_scroll)(int x, int y, const unsigned char* string);
+    bool (*lcd_remote_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_remote_scroll_stop)(void);
     void (*lcd_remote_set_drawmode)(int mode);
     int  (*lcd_remote_get_drawmode)(void);

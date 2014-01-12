@@ -53,18 +53,15 @@ static void put_text(struct screen *display, int x, int y, struct line_desc *lin
 struct line_desc_scroll {
     struct line_desc desc; /* must be first! */
     bool used;
-};
+} lines[MAX_LINES];
 
-#define NOINLINE __attribute__ ((noinline))
-
-struct line_desc_scroll *get_line_desc(void) NOINLINE;
-struct line_desc_scroll *get_line_desc(void)
+static struct line_desc_scroll *get_line_desc(void)
 {
-    static struct line_desc_scroll lines[MAX_LINES];
     static unsigned line_index;
     struct line_desc_scroll *this;
 
-    do {
+    do
+    {
         this = &lines[line_index++];
         if (line_index >= ARRAYLEN(lines))
             line_index = 0;
@@ -87,7 +84,6 @@ static void scroller(struct scrollinfo *s, struct screen *display)
         line->used = false;
     }
     else
-    if (s->line)
     {
         style_line(display, s->x, s->y - (line->desc.height/2 - display->getcharheight()/2), &line->desc);
         put_text(display, s->x, s->y, &line->desc, s->line, true, s->offset);
