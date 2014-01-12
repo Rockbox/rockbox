@@ -197,7 +197,7 @@ struct plugin_api {
     void (*lcd_putsxyf)(int x, int y, const unsigned char *fmt, ...);
     void (*lcd_puts)(int x, int y, const unsigned char *string);
     void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
-    void (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
+    bool (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_scroll_stop)(void);
 #ifdef HAVE_LCD_CHARCELLS
     void (*lcd_define_pattern)(unsigned long ucs, const char *pattern);

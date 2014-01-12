@@ -50,18 +50,27 @@ static void style_line(struct screen *display, int x, int y, struct line_desc *l
 static void put_text(struct screen *display, int x, int y, struct line_desc *line,
                       const char *text, bool prevent_scroll, int text_skip_pixels);
 
+struct line_desc_scroll {
+    struct line_desc desc; /* must be first! */
+    bool used;
+};
 
-static struct line_desc *get_line_desc(void)
+#define NOINLINE __attribute__ ((noinline))
+
+struct line_desc_scroll *get_line_desc(void) NOINLINE;
+struct line_desc_scroll *get_line_desc(void)
 {
-    static struct line_desc lines[MAX_LINES];
+    static struct line_desc_scroll lines[MAX_LINES];
     static unsigned line_index;
-    struct line_desc *ret;
+    struct line_desc_scroll *this;
 
-    ret = &lines[line_index++];
-    if (line_index >= ARRAYLEN(lines))
-        line_index = 0;
+    do {
+        this = &lines[line_index++];
+        if (line_index >= ARRAYLEN(lines))
+            line_index = 0;
+    } while (this->used);
 
-    return ret;
+    return this;
 }
 
 static void scroller(struct scrollinfo *s, struct screen *display)
@@ -72,9 +81,17 @@ static void scroller(struct scrollinfo *s, struct screen *display)
      * line padding. this needs to be corrected for calling style_line().
      * The alternative would be to really redraw only the text area,
      * but that would complicate the code a lot */ 
-    struct line_desc *line = s->userdata;
-    style_line(display, s->x, s->y - (line->height/2 - display->getcharheight()/2), line);
-    put_text(display, s->x, s->y, line, s->line, true, s->offset);
+    struct line_desc_scroll *line = s->userdata;
+    if (!s->line)
+    {
+        line->used = false;
+    }
+    else
+    if (s->line)
+    {
+        style_line(display, s->x, s->y - (line->desc.height/2 - display->getcharheight()/2), &line->desc);
+        put_text(display, s->x, s->y, &line->desc, s->line, true, s->offset);
+    }
 }
 
 static void scroller_main(struct scrollinfo *s)
@@ -126,14 +143,16 @@ static void put_text(struct screen *display,
 
     if (line->scroll && !prevent_scroll)
     {
-        struct line_desc *line_data = get_line_desc();
-        *line_data = *line;
+        bool scrolls;
+        struct line_desc_scroll *line_data = get_line_desc();
+        line_data->desc = *line;
         /* precalculate to avoid doing it in the scroller, it's save to
          * do this on the copy of the original line_desc*/
-        if (line_data->height == -1)
-            line_data->height = display->getcharheight();
-        display->putsxy_scroll_func(x, y, text,
+        if (line_data->desc.height == -1)
+            line_data->desc.height = display->getcharheight();
+        scrolls = display->putsxy_scroll_func(x, y, text,
             scrollers[display->screen_type], line_data, text_skip_pixels);
+        line_data->used = scrolls;
     }
     else
         display->putsxy_scroll_func(x, y, text, NULL, NULL, text_skip_pixels);

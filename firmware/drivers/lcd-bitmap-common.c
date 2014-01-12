@@ -316,15 +316,19 @@ static struct scrollinfo* find_scrolling_line(int x, int y)
 
 void LCDFN(scroll_fn)(struct scrollinfo* s)
 {
+    /* with line == NULL when scrolling stops. This scroller
+     * maintains no userdata so there is nothing left to do */
+    if (!s->line)
+        return;
     /* Fill with background/backdrop to clear area.
-     * cannot use clear_viewport_rect() since stops scrolling as well */
+     * cannot use clear_viewport_rect() since would stop scrolling as well */
     LCDFN(set_drawmode)(DRMODE_SOLID|DRMODE_INVERSEVID);
     LCDFN(fillrect)(s->x, s->y, s->width, s->height);
     LCDFN(set_drawmode)(DRMODE_SOLID);
     LCDFN(putsxyofs)(s->x, s->y, s->offset, s->line);
 }
 
-static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
+static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
                                      int x_offset,
                                      bool linebased,
                                      void (*scroll_func)(struct scrollinfo *),
@@ -336,7 +340,7 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     bool restart;
 
     if (!string)
-        return;
+        return false;
 
     /* prepare rectangle for scrolling. x and y must be calculated early
      * for find_scrolling_line() to work */
@@ -347,32 +351,25 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     width = current_vp->width - x;
 
     if (y >= current_vp->height)
-        return;
+        return false;
 
     s = find_scrolling_line(x, y);
     restart = !s;
 
-    if (restart) {
-        /* remove any previously scrolling line at the same location */
-        LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, width, height);
-        LCDFN(putsxyofs)(x, y, x_offset, string);
-
-        if (LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES))
-            return;
-    }
-
     /* get width (pixeks) of the string */
     LCDFN(getstringsize)(string, &w, &h);
 
-    /* check if scrolling is actually necessary (consider the actual start
-     * of the line) */
-    if (width >= w)
-        return;
-
-    if (restart) {
-        /* prepare scroll line */
+    /* Remove any previously scrolling line at the same location. If
+     * the string width is too small to scroll the scrolling line is
+     * cleared as well */
+    if (w < width || restart) {
+        LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, width, height);
+        LCDFN(putsxyofs)(x, y, x_offset, string);
+        /* nothing to scroll, or out of scrolling lines. Either way, get out */
+        if (w < width || LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES))
+            return false;
+        /* else restarting: prepare scroll line */
         s = &LCDFN(scroll_info).scroll[LCDFN(scroll_info).lines];
-        s->start_tick = current_tick + LCDFN(scroll_info).delay;
     }
 
     /* copy contents to the line buffer */
@@ -385,9 +382,6 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     else
         s->bidir = false;
 
-    s->scroll_func = scroll_func;
-    s->userdata = data;
-
     if (restart) {
         s->offset = x_offset;
         s->backward = false;
@@ -397,26 +391,41 @@ static void LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
         s->width = width;
         s->height = height;
         s->vp = current_vp;
+        s->start_tick = current_tick + LCDFN(scroll_info).delay;
         LCDFN(scroll_info).lines++;
     } else {
-        /* if only the text was updated render immediately */
-        LCDFN(scroll_now(s));
+        /* not restarting, however we are about to assign new userdata;
+         * therefore tell the scroller that it can release the previous userdata */
+        s->line = NULL;
+        s->scroll_func(s);
     }
+
+    s->scroll_func = scroll_func;
+    s->userdata = data;
+
+    /* if only the text was updated render immediately */
+    if (!restart)
+        LCDFN(scroll_now(s));
+
+    return true;
 }
 
-void LCDFN(putsxy_scroll_func)(int x, int y, const unsigned char *string,
+bool LCDFN(putsxy_scroll_func)(int x, int y, const unsigned char *string,
                                      void (*scroll_func)(struct scrollinfo *),
                                      void *data, int x_offset)
 {
+    bool retval = false;
     if (!scroll_func)
         LCDFN(putsxyofs)(x, y, x_offset, string);
     else
-        LCDFN(puts_scroll_worker)(x, y, string, x_offset, false, scroll_func, data);
+        retval = LCDFN(puts_scroll_worker)(x, y, string, x_offset, false, scroll_func, data);
+
+    return retval;
 }
 
-void LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
+bool LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 {
-    LCDFN(puts_scroll_worker)(x, y, string, 0, true, LCDFN(scroll_fn), NULL);
+    return LCDFN(puts_scroll_worker)(x, y, string, 0, true, LCDFN(scroll_fn), NULL);
 }
 
 #if !defined(HAVE_LCD_COLOR) || !defined(MAIN_LCD)

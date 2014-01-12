@@ -79,7 +79,10 @@ struct scrollinfo
     bool bidir;
     long start_tick;
 
-    /* support for custom scrolling functions */
+    /* support for custom scrolling functions,
+     * must be called with ::line == NULL to indicate that the line
+     * stops scrolling or when the userdata pointer is going to be changed
+     * (the custom scroller can release the userdata then) */
     void (*scroll_func)(struct scrollinfo *s);
     void *userdata;
 };

@@ -30,7 +30,7 @@
 #define MAIN_LCD
 #endif
 
-static struct scrollinfo LCDFN(scroll)[LCD_SCROLLABLE_LINES];
+static struct scrollinfo LCDFN(scroll)[LCDM(SCROLLABLE_LINES)];
 
 struct scroll_screen_info LCDFN(scroll_info) =
 {
@@ -51,6 +51,13 @@ struct scroll_screen_info LCDFN(scroll_info) =
 
 void LCDFN(scroll_stop)(void)
 {
+    for (int i = 0; i < LCDFN(scroll_info).lines; i++)
+    {
+        /* inform scroller about end of scrolling */
+        struct scrollinfo *s = &LCDFN(scroll_info).scroll[i];
+        s->line = NULL;
+        s->scroll_func(s);
+    }
     LCDFN(scroll_info).lines = 0;
 }
 
@@ -66,6 +73,9 @@ void LCDFN(scroll_stop_viewport_rect)(const struct viewport *vp, int x, int y, i
             && (x < (s->x+s->width) && (x+width) >= s->x)
             && (y < (s->y+s->height) && (y+height) >= s->y))
         {
+            /* inform scroller about end of scrolling */
+            s->line = NULL;
+            s->scroll_func(s);
             /* If i is not the last active line in the array, then move
                the last item to position i. This compacts
                the scroll array at the same time of removing the line */

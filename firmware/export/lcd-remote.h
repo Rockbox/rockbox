@@ -176,8 +176,8 @@ extern void lcd_remote_clear_viewport(void);
 extern void lcd_remote_puts(int x, int y, const unsigned char *str);
 extern void lcd_remote_putsf(int x, int y, const unsigned char *fmt, ...);
 extern void lcd_remote_putc(int x, int y, unsigned short ch);
-extern void lcd_remote_puts_scroll(int x, int y, const unsigned char *str);
-extern void lcd_remote_putsxy_scroll_func(int x, int y, const unsigned char *string,
+extern bool lcd_remote_puts_scroll(int x, int y, const unsigned char *str);
+extern bool lcd_remote_putsxy_scroll_func(int x, int y, const unsigned char *string,
                                           void (*scroll_func)(struct scrollinfo *),
                                           void *data, int x_offset);
 
