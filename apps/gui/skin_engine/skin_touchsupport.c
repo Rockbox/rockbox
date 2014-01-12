@@ -111,8 +111,8 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                                     SKINOFFSETTOPTR(skin_buffer, r->bar);
                             if(r->width > r->height)
                                 *edge_offset = vx*100/r->width;
-                            else
-                                *edge_offset = vy*100/r->height;
+                            else /* vertical bars are bottom-up by default */
+                                *edge_offset = 100 - vy*100/r->height;
                             if (r->reverse_bar || (bar && bar->invert_fill_direction))
                                 *edge_offset = 100 - *edge_offset;
                         }
