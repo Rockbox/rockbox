@@ -483,16 +483,16 @@ target/arm/ata-as-arm.S
 #endif
 
 #if defined(CPU_PP) && defined(IPOD_ARCH)
-target/arm/ipod/power-ipod.c
+target/arm/pp/ipod/power-ipod.c
 # if LCD_DEPTH == 2
-target/arm/ipod/lcd-as-gray.S
+target/arm/pp/ipod/lcd-as-gray.S
 # endif
 # ifndef IPOD_1G2G
 #  ifndef IPOD_3G
-target/arm/ipod/piezo.c
+target/arm/pp/ipod/piezo.c
 #  endif /* IPOD_3G */
 drivers/pcf50605.c
-target/arm/ipod/powermgmt-ipod-pcf.c
+target/arm/pp/ipod/powermgmt-ipod-pcf.c
 # endif /* IPOD_1G2G */
 #endif /* CPU_PP && IPOD_ARCH */
 
@@ -700,9 +700,9 @@ target/arm/lcd-c200_c200v2.c
 #elif CONFIG_LCD == LCD_FUZE
 target/arm/as3525/lcd-fuze.c
 #elif CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO
-target/arm/ipod/lcd-color_nano.c
+target/arm/pp/ipod/lcd-color_nano.c
 #elif CONFIG_LCD == LCD_IPODMINI || CONFIG_LCD == LCD_IPOD2BPP
-target/arm/ipod/lcd-gray.c
+target/arm/pp/ipod/lcd-gray.c
 #elif CONFIG_LCD == LCD_GIGABEATS
 target/arm/imx31/gigabeat-s/lcd-gigabeat-s.c
 #elif CONFIG_LCD == LCD_GIGABEAT || CONFIG_LCD == LCD_MINI2440
@@ -769,16 +769,16 @@ target/arm/powermgmt-ascodec.c
 
 #if CONFIG_I2C == I2C_PP5020
 # ifdef IPOD_ARCH
-target/arm/ipod/adc-ipod-pcf.c
+target/arm/pp/ipod/adc-ipod-pcf.c
 # else
 target/arm/pp/adc-pp5020.c
 # endif /* IPOD_ARCH */
 
 #elif CONFIG_I2C == I2C_PP5002
 # ifdef IPOD_1G2G
-target/arm/ipod/1g2g/adc-ipod-1g2g.c
+target/arm/pp/ipod/1g2g/adc-ipod-1g2g.c
 # else
-target/arm/ipod/adc-ipod-pcf.c
+target/arm/pp/ipod/adc-ipod-pcf.c
 # endif /* IPOD_1G2G */
 
 #elif CONFIG_I2C == I2C_S3C2440
@@ -881,35 +881,35 @@ target/sh/archos/ondio/fmradio_i2c-ondio.c
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 
 #if defined(SANSA_E200) || defined(SANSA_C200)
-target/arm/sandisk/backlight-c200_e200.c
-target/arm/sandisk/power-c200_e200.c
+target/arm/pp/sandisk/backlight-c200_e200.c
+target/arm/pp/sandisk/power-c200_e200.c
 #ifndef BOOTLOADER
-target/arm/sandisk/audio-c200_e200.c
+target/arm/pp/sandisk/audio-c200_e200.c
 #endif /* BOOTLOADER */
 #endif /* SANSA_E200 || SANSA_C200 */
 
 #ifdef SANSA_E200
 drivers/lcd-memframe.c
-target/arm/sandisk/sansa-e200/lcd-e200.c
-target/arm/sandisk/sansa-e200/button-e200.c
-target/arm/sandisk/sansa-e200/powermgmt-e200.c
+target/arm/pp/sandisk/sansa-e200/lcd-e200.c
+target/arm/pp/sandisk/sansa-e200/button-e200.c
+target/arm/pp/sandisk/sansa-e200/powermgmt-e200.c
 #endif /* SANSA_E200 */
 
 #ifdef SANSA_C200
-target/arm/sandisk/sansa-c200/lcd-as-c200.S
-target/arm/sandisk/sansa-c200/button-c200.c
-target/arm/sandisk/sansa-c200/powermgmt-c200.c
+target/arm/pp/sandisk/sansa-c200/lcd-as-c200.S
+target/arm/pp/sandisk/sansa-c200/button-c200.c
+target/arm/pp/sandisk/sansa-c200/powermgmt-c200.c
 #endif /* SANSA_C200 */
 
 #ifdef SANSA_VIEW
-target/arm/sandisk/sansa-view/backlight-view.c
-target/arm/sandisk/sansa-view/adc-view.c
-target/arm/sandisk/sansa-view/power-view.c
-target/arm/sandisk/sansa-view/lcd-view.c
-target/arm/sandisk/sansa-view/button-view.c
-target/arm/sandisk/sansa-view/powermgmt-view.c
+target/arm/pp/sandisk/sansa-view/backlight-view.c
+target/arm/pp/sandisk/sansa-view/adc-view.c
+target/arm/pp/sandisk/sansa-view/power-view.c
+target/arm/pp/sandisk/sansa-view/lcd-view.c
+target/arm/pp/sandisk/sansa-view/button-view.c
+target/arm/pp/sandisk/sansa-view/powermgmt-view.c
 #ifndef BOOTLOADER
-/* target/arm/sandisk/audio-view.c */
+/* target/arm/pp/sandisk/audio-view.c */
 #endif /* BOOTLOADER */
 #endif /* SANSA_VIEW */
 
@@ -917,36 +917,36 @@ target/arm/sandisk/sansa-view/powermgmt-view.c
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 #endif /* BOOTLOADER */
-target/arm/philips/sa9200/backlight-sa9200.c
-target/arm/philips/sa9200/button-sa9200.c
-target/arm/philips/sa9200/lcd-sa9200.c
-target/arm/philips/sa9200/lcd-as-sa9200.S
-target/arm/philips/sa9200/power-sa9200.c
-target/arm/philips/sa9200/powermgmt-sa9200.c
+target/arm/pp/philips/sa9200/backlight-sa9200.c
+target/arm/pp/philips/sa9200/button-sa9200.c
+target/arm/pp/philips/sa9200/lcd-sa9200.c
+target/arm/pp/philips/sa9200/lcd-as-sa9200.S
+target/arm/pp/philips/sa9200/power-sa9200.c
+target/arm/pp/philips/sa9200/powermgmt-sa9200.c
 #endif /* PHILIPS_SA9200 */
 
 #if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
 #endif /* BOOTLOADER */
-target/arm/philips/power-hdd.c
-target/arm/philips/fmradio_i2c-hdd.c
+target/arm/pp/philips/power-hdd.c
+target/arm/pp/philips/fmradio_i2c-hdd.c
 #endif /* PHILIPS_HDD1630 || PHILIPS_HDD6330 */
 
 #ifdef PHILIPS_HDD1630
-target/arm/philips/hdd1630/backlight-hdd1630.c
-target/arm/philips/hdd1630/button-hdd1630.c
-target/arm/philips/hdd1630/lcd-hdd1630.c
-target/arm/philips/hdd1630/lcd-as-hdd1630.S
-target/arm/philips/hdd1630/powermgmt-hdd1630.c
+target/arm/pp/philips/hdd1630/backlight-hdd1630.c
+target/arm/pp/philips/hdd1630/button-hdd1630.c
+target/arm/pp/philips/hdd1630/lcd-hdd1630.c
+target/arm/pp/philips/hdd1630/lcd-as-hdd1630.S
+target/arm/pp/philips/hdd1630/powermgmt-hdd1630.c
 #endif /* PHILIPS_HDD1630 */
 
 #ifdef PHILIPS_HDD6330
-target/arm/philips/hdd6330/backlight-hdd6330.c
-target/arm/philips/hdd6330/button-hdd6330.c
-target/arm/philips/hdd6330/lcd-hdd6330.c
-target/arm/philips/hdd6330/lcd-as-hdd6330.S
-target/arm/philips/hdd6330/powermgmt-hdd6330.c
+target/arm/pp/philips/hdd6330/backlight-hdd6330.c
+target/arm/pp/philips/hdd6330/button-hdd6330.c
+target/arm/pp/philips/hdd6330/lcd-hdd6330.c
+target/arm/pp/philips/hdd6330/lcd-as-hdd6330.S
+target/arm/pp/philips/hdd6330/powermgmt-hdd6330.c
 #endif /* PHILIPS_HDD6330 */
 
 #if defined(IAUDIO_X5) || defined(IAUDIO_M5)
@@ -1051,20 +1051,20 @@ target/coldfire/iriver/h100/usb-h100.c
 #endif /* IRIVER_H100_SERIES */
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-target/arm/iriver/h10/backlight-h10.c
-target/arm/iriver/h10/button-h10.c
-target/arm/iriver/h10/fmradio_i2c-h10.c
-target/arm/iriver/h10/power-h10.c
-target/arm/iriver/h10/powermgmt-h10.c
+target/arm/pp/iriver/h10/backlight-h10.c
+target/arm/pp/iriver/h10/button-h10.c
+target/arm/pp/iriver/h10/fmradio_i2c-h10.c
+target/arm/pp/iriver/h10/power-h10.c
+target/arm/pp/iriver/h10/powermgmt-h10.c
 #endif /* IRIVER_H10 || IRIVER_H10_5GB */
 
 #ifdef IRIVER_H10
-target/arm/iriver/h10/lcd-h10_20gb.c
-target/arm/iriver/h10/lcd-as-h10.S
+target/arm/pp/iriver/h10/lcd-h10_20gb.c
+target/arm/pp/iriver/h10/lcd-as-h10.S
 #endif /* IRIVER_H10 */
 
 #ifdef IRIVER_H10_5GB
-target/arm/iriver/h10/lcd-h10_5gb.c
+target/arm/pp/iriver/h10/lcd-h10_5gb.c
 #endif /* IRIVER_H10_5GB */
 
 #ifdef GIGABEAT_F
@@ -1243,73 +1243,73 @@ target/arm/tms320dm320/dma-dm320.c
 #ifdef MROBE_100
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
-target/arm/olympus/mrobe-100/lcd-remote-mr100.c
+target/arm/pp/olympus/mrobe-100/lcd-remote-mr100.c
 #endif /* BOOTLOADER */
 drivers/sw_i2c.c
-target/arm/olympus/mrobe-100/backlight-mr100.c
-target/arm/olympus/mrobe-100/button-mr100.c
-target/arm/olympus/mrobe-100/lcd-mr100.c
-target/arm/olympus/mrobe-100/lcd-as-mr100.S
-target/arm/olympus/mrobe-100/power-mr100.c
-target/arm/olympus/mrobe-100/powermgmt-mr100.c
+target/arm/pp/olympus/mrobe-100/backlight-mr100.c
+target/arm/pp/olympus/mrobe-100/button-mr100.c
+target/arm/pp/olympus/mrobe-100/lcd-mr100.c
+target/arm/pp/olympus/mrobe-100/lcd-as-mr100.S
+target/arm/pp/olympus/mrobe-100/power-mr100.c
+target/arm/pp/olympus/mrobe-100/powermgmt-mr100.c
 #endif /* MROBE_100 */
 
 #ifdef TATUNG_TPJ1022
-target/arm/tatung/tpj1022/backlight-tpj1022.c
-target/arm/tatung/tpj1022/button-tpj1022.c
-target/arm/tatung/tpj1022/lcd-tpj1022.c
-target/arm/tatung/tpj1022/power-tpj1022.c
-target/arm/tatung/tpj1022/powermgmt-tpj1022.c
+target/arm/pp/tatung/tpj1022/backlight-tpj1022.c
+target/arm/pp/tatung/tpj1022/button-tpj1022.c
+target/arm/pp/tatung/tpj1022/lcd-tpj1022.c
+target/arm/pp/tatung/tpj1022/power-tpj1022.c
+target/arm/pp/tatung/tpj1022/powermgmt-tpj1022.c
 #endif /* TATUNG_TPJ1022 */
 
 #ifdef IPOD_4G
-target/arm/ipod/backlight-4g_color.c
-target/arm/ipod/button-clickwheel.c
+target/arm/pp/ipod/backlight-4g_color.c
+target/arm/pp/ipod/button-clickwheel.c
 #endif /* IPOD_4G */
 
 #ifdef IPOD_COLOR
-target/arm/ipod/backlight-4g_color.c
-target/arm/ipod/button-clickwheel.c
-target/arm/ipod/lcd-as-color-nano.S
+target/arm/pp/ipod/backlight-4g_color.c
+target/arm/pp/ipod/button-clickwheel.c
+target/arm/pp/ipod/lcd-as-color-nano.S
 #endif /* IPOD_COLOR */
 
 #ifdef IPOD_NANO
-target/arm/ipod/backlight-nano_video.c
-target/arm/ipod/button-clickwheel.c
-target/arm/ipod/lcd-as-color-nano.S
+target/arm/pp/ipod/backlight-nano_video.c
+target/arm/pp/ipod/button-clickwheel.c
+target/arm/pp/ipod/lcd-as-color-nano.S
 #endif /* IPOD_NANO */
 
 #ifdef IPOD_VIDEO
-target/arm/ipod/backlight-nano_video.c
-target/arm/ipod/button-clickwheel.c
-target/arm/ipod/video/lcd-as-video.S
-target/arm/ipod/video/lcd-video.c
+target/arm/pp/ipod/backlight-nano_video.c
+target/arm/pp/ipod/button-clickwheel.c
+target/arm/pp/ipod/video/lcd-as-video.S
+target/arm/pp/ipod/video/lcd-video.c
 #ifndef BOOTLOADER
-target/arm/ipod/video/battery-video.c
+target/arm/pp/ipod/video/battery-video.c
 #endif /* BOOTLOADER */
 #endif /* IPOD_VIDEO */
 
 #ifdef IPOD_3G
-target/arm/ipod/3g/backlight-3g.c
-target/arm/ipod/button-1g-3g.c
+target/arm/pp/ipod/3g/backlight-3g.c
+target/arm/pp/ipod/button-1g-3g.c
 #endif /* IPOD_3G */
 
 #ifdef IPOD_1G2G
-target/arm/ipod/1g2g/backlight-1g2g.c
-target/arm/ipod/1g2g/powermgmt-1g2g.c
-target/arm/ipod/button-1g-3g.c
+target/arm/pp/ipod/1g2g/backlight-1g2g.c
+target/arm/pp/ipod/1g2g/powermgmt-1g2g.c
+target/arm/pp/ipod/button-1g-3g.c
 #endif /* IPOD_1G2G */
 
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-target/arm/ipod/backlight-mini1g_mini2g.c
+target/arm/pp/ipod/backlight-mini1g_mini2g.c
 #endif
 
 #ifdef IPOD_MINI
-target/arm/ipod/button-mini1g.c
+target/arm/pp/ipod/button-mini1g.c
 #endif /* IPOD_MINI */
 
 #ifdef IPOD_MINI2G
-target/arm/ipod/button-clickwheel.c
+target/arm/pp/ipod/button-clickwheel.c
 #endif /* IPOD_MINI2G */
 
 #ifdef IRIVER_IFP7XX
@@ -1537,7 +1537,7 @@ target/arm/s5l8700/udacodec-meizu.c
 #endif /* MEIZU_M3 */
 
 #ifdef IPOD_NANO2G
-target/arm/ipod/button-clickwheel.c
+target/arm/pp/ipod/button-clickwheel.c
 target/arm/s5l8700/postmortemstub.S
 target/arm/s5l8700/ipodnano2g/backlight-nano2g.c
 target/arm/s5l8700/ipodnano2g/lcd-nano2g.c
@@ -1556,7 +1556,7 @@ target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 #endif
 
 #ifdef IPOD_6G
-target/arm/ipod/button-clickwheel.c
+target/arm/pp/ipod/button-clickwheel.c
 target/arm/s5l8702/ipod6g/storage_ata-ipod6g.c
 target/arm/s5l8702/ipod6g/cscodec-ipod6g.c
 target/arm/s5l8702/ipod6g/backlight-ipod6g.c
@@ -1673,30 +1673,30 @@ target/arm/s3c2440/mini2440/pcm-mini2440.c
 #endif /* MINI2440 */
 
 #if defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
-target/arm/samsung/akcodec-yh82x_yh92x.c
-target/arm/samsung/button-yh82x_yh92x.c
-target/arm/samsung/power-yh82x_yh92x.c
+target/arm/pp/samsung/akcodec-yh82x_yh92x.c
+target/arm/pp/samsung/button-yh82x_yh92x.c
+target/arm/pp/samsung/power-yh82x_yh92x.c
 #endif /* SAMSUNG_YH820 ||  SAMSUNG_YH920 || SAMSUNG_YH925 */
 
 #ifdef SAMSUNG_YH820
-target/arm/samsung/yh820/backlight-yh820.c
-target/arm/samsung/yh820/lcd-yh820.c
-target/arm/samsung/yh820/lcd-as-yh820.S
-target/arm/samsung/yh820/powermgmt-yh820.c
+target/arm/pp/samsung/yh820/backlight-yh820.c
+target/arm/pp/samsung/yh820/lcd-yh820.c
+target/arm/pp/samsung/yh820/lcd-as-yh820.S
+target/arm/pp/samsung/yh820/powermgmt-yh820.c
 #endif /* SAMSUNG_YH820 */
 
 #ifdef SAMSUNG_YH920
-target/arm/samsung/yh920/backlight-yh920.c
-target/arm/samsung/yh920/lcd-yh920.c
-target/arm/samsung/yh920/lcd-as-yh920.S
-target/arm/samsung/yh920/powermgmt-yh920.c
+target/arm/pp/samsung/yh920/backlight-yh920.c
+target/arm/pp/samsung/yh920/lcd-yh920.c
+target/arm/pp/samsung/yh920/lcd-as-yh920.S
+target/arm/pp/samsung/yh920/powermgmt-yh920.c
 #endif /* SAMSUNG_YH920 */
 
 #ifdef SAMSUNG_YH925
-target/arm/samsung/yh925/backlight-yh925.c
-target/arm/samsung/yh925/lcd-yh925.c
-target/arm/samsung/yh925/lcd-as-yh925.S
-target/arm/samsung/yh925/powermgmt-yh925.c
+target/arm/pp/samsung/yh925/backlight-yh925.c
+target/arm/pp/samsung/yh925/lcd-yh925.c
+target/arm/pp/samsung/yh925/lcd-as-yh925.S
+target/arm/pp/samsung/yh925/powermgmt-yh925.c
 #endif /* SAMSUNG_YH925 */
 
 #ifdef SAMSUNG_YPS3
@@ -1710,12 +1710,12 @@ target/arm/s5l8700/yps3/power-yps3.c
 
 #ifdef PBELL_VIBE500
 drivers/synaptics-mep.c
-target/arm/pbell/vibe500/lcd-vibe500.c
-target/arm/pbell/vibe500/button-vibe500.c
-target/arm/pbell/vibe500/power-vibe500.c
-target/arm/pbell/vibe500/backlight-vibe500.c
-target/arm/pbell/vibe500/lcd-as-vibe500.S
-target/arm/pbell/vibe500/powermgmt-vibe500.c
+target/arm/pp/pbell/vibe500/lcd-vibe500.c
+target/arm/pp/pbell/vibe500/button-vibe500.c
+target/arm/pp/pbell/vibe500/power-vibe500.c
+target/arm/pp/pbell/vibe500/backlight-vibe500.c
+target/arm/pp/pbell/vibe500/lcd-as-vibe500.S
+target/arm/pp/pbell/vibe500/powermgmt-vibe500.c
 #endif
 
 #if defined(MPIO_HD200) || defined(MPIO_HD300)
