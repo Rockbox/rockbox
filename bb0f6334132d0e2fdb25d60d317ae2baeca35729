@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9ab29df4_7aaab5d5",
+        "filename": "apps/gui/option_select.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-13T00:15:03Z",
+      "side": 1,
+      "message": "The braces are wrongly indented.",
+      "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab29df4_fa5ec511",
         "filename": "apps/menus/volume_limit_menu.c",
         "patchSetId": 18
@@ -19,6 +36,40 @@
     },
     {
       "key": {
+        "uuid": "9ab29df4_9aaea9e6",
+        "filename": "apps/menus/volume_limit_menu.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-13T00:15:03Z",
+      "side": 1,
+      "message": "Indentation is bad",
+      "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_baab6dd5",
+        "filename": "apps/misc.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-13T00:15:03Z",
+      "side": 1,
+      "message": "I disagree with this splashf(). The user set the volume limit himself, so he is aware of it. There doesn\u0027t need to be an annoying splash for something you enabled yourself.",
+      "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab29df4_da6101d5",
         "filename": "apps/settings_list.c",
         "patchSetId": 18
@@ -30,6 +81,24 @@
       "writtenOn": "2014-01-13T00:06:17Z",
       "side": 1,
       "message": "this looks wrong. set_default() just needs to reset the value. it should just be *(int*)setting \u003d sound_max(SOUND_VOLUME);",
+      "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_5aa5f102",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-13T00:15:03Z",
+      "side": 1,
+      "message": "I was about to say this too. Looks copied from the quickscreen default setter where it\u0027s also wrong.",
+      "parentUuid": "9ab29df4_da6101d5",
       "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
