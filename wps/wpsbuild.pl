@@ -10,6 +10,7 @@
 
 use strict;
 use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DTYPE_STUFF
+use IPC::Open2;
 
 my $ROOT="..";
 my $wpsdir;
@@ -87,11 +88,11 @@ if(!$wpslist) {
 sub getlcdsizes
 {
     my ($remote) = @_;
+    my $str;
 
-    open(GCC, ">gcctemp");
     if($remote) {
         # Get the remote LCD screen size
-    print GCC <<STOP
+    $str = <<STOP
 \#include "config.h"
 #ifdef HAVE_REMOTE_LCD
 Height: LCD_REMOTE_HEIGHT
@@ -102,24 +103,25 @@ STOP
 ;
     }
     else {
-    print GCC <<STOP
+    $str = <<STOP
 \#include "config.h"
 Height: LCD_HEIGHT
 Width: LCD_WIDTH
 Depth: LCD_DEPTH
 STOP
 ;
-}
+    }
     close(GCC);
 
-    my $c="cat gcctemp | gcc $cppdef -I. -I$firmdir/export -E -P -";
+    my $cmd = "gcc $cppdef -I. -I$firmdir/export -E -P -";
+    my $pid = open2(*COUT, *CIN, $cmd) or die "Could not spawn child: $!\n";
 
-    #print "CMD $c\n";
+    print CIN $str;
+    close(CIN);
+    waitpid($pid, 0);
 
-    open(GETSIZE, "$c|");
-
-    my ($height, $width, $depth);
-    while(<GETSIZE>) {
+    my ($height, $width, $depth, $touch);
+    while(<COUT>) {
         if($_ =~ /^Height: (\d*)/) {
             $height = $1;
         }
@@ -129,12 +131,11 @@ STOP
         elsif($_ =~ /^Depth: (\d*)/) {
             $depth = $1;
         }
-        if($height && $width && $depth) {
-            last;
+        if($_ =~ /^Touchscreen/) {
+            $touch = 1;
         }
     }
-    close(GETSIZE);
-    unlink("gcctemp");
+    close(COUT);
 
     return ($height, $width, $depth);
 }
