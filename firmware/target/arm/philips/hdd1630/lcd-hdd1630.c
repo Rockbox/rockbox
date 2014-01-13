@@ -77,6 +77,9 @@
 #define RDEV    0xd4
 #define RDRR    0xd5
 
+/* Whether the lcd is currently enabled or not */
+static bool lcd_enabled;
+
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 static unsigned mad_ctrl = 0;
@@ -239,7 +242,44 @@ void lcd_init_device(void)
 
     lcd_send_cmd(DISPON);
 #endif
+    lcd_enabled = true;
 }
+
+#ifdef HAVE_LCD_ENABLE
+/* enable / disable lcd */
+void lcd_enable(bool on)
+{
+    if (on == lcd_enabled)
+        return;
+
+    if (on) /* lcd_display_on() */
+    {
+        /* from the OF */
+        lcd_send_cmd(SLPOUT);
+        sleep(HZ/5); /* 200ms */
+
+        /* Probably out of sync and we don't wanna pepper the code with
+           lcd_update() calls for this. */
+        lcd_update();
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+
+        lcd_enabled = true;
+    }
+    else /* lcd_display_off() */
+    {
+        /* from the OF */
+        lcd_send_cmd(SLPIN);
+
+        lcd_enabled = false;
+    }
+}
+
+
+bool lcd_active(void)
+{
+    return lcd_enabled;
+}
+#endif /* HAVE_LCD_ENABLE */
 
 /*** hardware configuration ***/
 int lcd_default_contrast(void)
