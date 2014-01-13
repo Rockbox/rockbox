@@ -675,10 +675,8 @@ static char* volume_limit_write_to_cfg(void* setting, char*buf, int buf_len)
 }
 static bool volume_limit_is_changed(void* setting, void* defaultval)
 {
+    (void)defaultval;
     int current = *(int*)setting;
-
-    if ((int*)defaultval == NULL)
-        *(int*)defaultval = sound_max(SOUND_VOLUME);
     return (current != sound_max(SOUND_VOLUME));
 }
 static void volume_limit_set_default(void* setting, void* defaultval)
