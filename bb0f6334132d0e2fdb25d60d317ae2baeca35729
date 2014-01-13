@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_fa5ec511",
+        "filename": "apps/menus/volume_limit_menu.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-13T00:06:17Z",
+      "side": 1,
+      "message": "no real need for this file, the callback can be put in sound_menu.c",
+      "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_da6101d5",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-13T00:06:17Z",
+      "side": 1,
+      "message": "this looks wrong. set_default() just needs to reset the value. it should just be *(int*)setting \u003d sound_max(SOUND_VOLUME);",
+      "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_1a9b79ca",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-01-13T00:06:17Z",
+      "side": 1,
+      "message": "change this to F_NO_WRAP also",
+      "revId": "bb0f6334132d0e2fdb25d60d317ae2baeca35729",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
