@@ -409,8 +409,6 @@ void radio_screen(void)
         audio_stop();
 
     fms_fix_displays(FMS_ENTER);
-    FOR_NB_SCREENS(i)
-        skin_update(FM_SCREEN, i, SKIN_REFRESH_ALL);
 
 #ifndef SIMULATOR
 
@@ -453,6 +451,11 @@ void radio_screen(void)
     preset_set_current(preset_find(curr_freq));
     if(radio_current_preset() != -1)
          radio_mode = RADIO_PRESET_MODE;
+
+    /* Load/update the skin at last, when fully initialzed, so that it can
+     * display the right content from the beginning */
+    FOR_NB_SCREENS(i)
+        skin_update(FM_SCREEN, i, SKIN_REFRESH_ALL);
 
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(true);
