@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_3ad59d43",
+        "filename": "apps/gui/bitmap/list.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1000030
+      },
+      "writtenOn": "2014-01-14T11:04:29Z",
+      "side": 1,
+      "message": "Can\u0027t build due to lcd_get_dpi(), which isn\u0027t implemented on non-touchscreen targets. Use HAVE_TOUCHSCREEN in this feature or implement lcd_get_dpi() for all targets.",
+      "revId": "bd5be89e8faae471ffa96c92c1e6fa056b8a273a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
