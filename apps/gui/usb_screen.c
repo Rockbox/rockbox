@@ -40,6 +40,7 @@
 #include "usb_screen.h"
 #include "skin_engine/skin_engine.h"
 #include "playlist.h"
+#include "misc.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"
@@ -249,6 +250,8 @@ void gui_usb_screen_run(bool early_usb)
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
 
+    push_current_activity(ACTIVITY_USBSCREEN);
+
 #ifdef USB_ENABLE_HID
     usb_hid = global_settings.usb_hid;
     usb_keypad_mode = global_settings.usb_keypad_mode;
@@ -338,4 +341,5 @@ void gui_usb_screen_run(bool early_usb)
         viewportmanager_theme_undo(i, false);
     }
 
+    pop_current_activity();
 }
