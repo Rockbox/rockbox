@@ -125,6 +125,7 @@ static int search(struct font_cache* fcache,
 struct font_cache_entry* font_cache_get(
     struct font_cache* fcache,
     unsigned short char_code,
+    bool cache_only,
     void (*callback) (struct font_cache_entry* p, void *callback_data),
     void *callback_data)
 {
@@ -166,6 +167,8 @@ struct font_cache_entry* font_cache_get(
     }
     
     /* not found */
+    if (cache_only)
+        return NULL;
 
     /* find index to replace */
     short lru_handle_to_replace = fcache->_lru._head;

@@ -17,8 +17,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #ifndef _FONT_CACHE_H_
 #define _FONT_CACHE_H_
+#include <stdbool.h>
 #include "lru.h"
 
 /*******************************************************************************
@@ -45,10 +47,16 @@ struct font_cache_entry
 /* Create an auto sized font cache from buf */
 void font_cache_create(
     struct font_cache* fcache, void* buf, int buf_size, int bitmap_bytes_size);
-/* Get font cache entry */
+
+/* Get font cache entry for the given char_code
+ *
+ * cache_only: true if only a cache lookup should be performed and loading on miss should be avoided
+ *
+ * Note: With cache_only this can return NULL, which otherwise never happens */
 struct font_cache_entry* font_cache_get(
     struct font_cache* fcache,
     unsigned short char_code,
+    bool cache_only,
     void (*callback) (struct font_cache_entry* p, void *callback_data),
     void *callback_data);
 
