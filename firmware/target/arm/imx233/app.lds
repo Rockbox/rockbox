@@ -47,6 +47,20 @@ SECTIONS
         *(.rodata*)
     } > DRAM
 
+    .dramcopyend (NOLOAD) :
+    {
+        _dramcopyend = .;
+    } > DRAM
+
+    .init ENDAUDIOADDR :
+    {
+        _initstart = .;
+        *(.init*)
+        _initend = .;
+    } AT> DRAM
+
+    _initcopy = LOADADDR(.init);
+
     .itext :
     {
         _iramstart = .; // always 0
@@ -68,21 +82,7 @@ SECTIONS
         _iend = .;
     } > IRAM
 
-    .init ENDAUDIOADDR :
-    {
-        _initstart = .;
-        *(.init*)
-        _initend = .;
-    } AT> DRAM
-
-    _initcopy = LOADADDR(.init);
-
-    .dramcopyend (NOLOAD) :
-    {
-        _dramcopyend = .;
-    } > DRAM
-
-    .stack (NOLOAD) :
+    .stack _dramcopyend (NOLOAD) :
     {
         *(.stack)
         stackbegin = .;
