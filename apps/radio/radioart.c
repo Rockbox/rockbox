@@ -47,10 +47,10 @@ static struct radioart radioart[MAX_RADIOART_IMAGES];
 
 static int find_oldest_image_index(void)
 {
-    int i;
+    unsigned i;
     long oldest_tick = current_tick;
     int oldest_idx = -1;
-    for(i = 0; ARRAYLEN(radioart); i++)
+    for(i = 0; i < ARRAYLEN(radioart); i++)
     {
         struct radioart *ra = &radioart[i];
         /* last_tick is only valid if it's actually loaded, i.e. valid handle */
