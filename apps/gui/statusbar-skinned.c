@@ -170,9 +170,9 @@ void sb_skin_update(enum screen_type screen, bool force)
         if (lcd_active() || (i != SCREEN_MAIN))
 #endif
         {
-            bool full_update = skin_do_full_update(CUSTOM_STATUSBAR, screen);
-            skin_update(CUSTOM_STATUSBAR, screen, force || 
-                        full_update ? SKIN_REFRESH_ALL : SKIN_REFRESH_NON_STATIC);
+            if (force)
+                skin_request_full_update(CUSTOM_STATUSBAR);
+            skin_update(CUSTOM_STATUSBAR, screen, SKIN_REFRESH_NON_STATIC);
         }
         next_update[i] = current_tick + update_delay; /* don't update too often */
     }
