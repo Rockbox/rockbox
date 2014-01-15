@@ -142,10 +142,8 @@ static void usb_screen_fix_viewports(struct screen *screen,
 #ifdef HAVE_REMOTE_LCD
     if (screen->screen_type == SCREEN_REMOTE)
     {
-        logo_width = (BMPWIDTH_remote_usblogo > LCD_REMOTE_WIDTH) ?
-        LCD_REMOTE_WIDTH : BMPWIDTH_remote_usblogo;
-        logo_height = (BMPHEIGHT_remote_usblogo > LCD_REMOTE_HEIGHT) ?
-        LCD_REMOTE_HEIGHT : BMPHEIGHT_remote_usblogo;
+        logo_width = BMPWIDTH_remote_usblogo;
+        logo_height = BMPHEIGHT_remote_usblogo;
     }
     else
 #endif
@@ -155,6 +153,11 @@ static void usb_screen_fix_viewports(struct screen *screen,
     }
 
     viewportmanager_theme_enable(screen->screen_type, true, parent);
+
+    if (logo_width  > parent->width)
+        logo_width  = parent->width;
+    if (logo_height > parent->height)
+        logo_height = parent->height;
 
     *logo = *parent;
     logo->x = parent->x + parent->width - logo_width;
