@@ -244,6 +244,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 
 void gui_usb_screen_run(bool early_usb)
 {
+    (void) early_usb;
     struct usb_screen_vps_t usb_screen_vps_ar[NB_SCREENS];
 #if defined HAVE_TOUCHSCREEN
     enum touchscreen_mode old_mode = touchscreen_get_mode();
