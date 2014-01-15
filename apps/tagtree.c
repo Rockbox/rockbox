@@ -53,6 +53,7 @@
 #include "storage.h"
 #include "dir.h"
 #include "playback.h"
+#include "strnatcmp.h"
 #include "panic.h"
 
 #define str_or_empty(x) (x ? x : "(NULL)")
@@ -789,6 +790,17 @@ static int compare(const void *p1, const void *p2)
         return strncasecmp(e2->name, e1->name, MAX_PATH);
 
     return strncasecmp(e1->name, e2->name, MAX_PATH);
+}
+
+static int nat_compare(const void *p1, const void *p2)
+{
+    struct tagentry *e1 = (struct tagentry *)p1;
+    struct tagentry *e2 = (struct tagentry *)p2;
+
+    if (sort_inverse)
+        return strnatcasecmp(e2->name, e1->name);
+
+    return strnatcasecmp(e1->name, e2->name);
 }
 
 static void tagtree_buffer_event(void *data)
@@ -1530,7 +1542,8 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         struct tagentry *entries = get_entries(c);
         qsort(&entries[special_entry_count],
               current_entry_count - special_entry_count,
-              sizeof(struct tagentry), compare);
+              sizeof(struct tagentry),
+              global_settings.interpret_numbers ? nat_compare : compare);
     }
 
     if (!init)
