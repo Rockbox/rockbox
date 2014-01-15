@@ -134,7 +134,6 @@ struct usb_screen_vps_t
 static void usb_screen_fix_viewports(struct screen *screen,
         struct usb_screen_vps_t *usb_screen_vps)
 {
-    bool disable = true;
     int logo_width, logo_height;
     struct viewport *parent = &usb_screen_vps->parent;
     struct viewport *logo = &usb_screen_vps->logo;
@@ -154,11 +153,7 @@ static void usb_screen_fix_viewports(struct screen *screen,
         logo_height = BMPHEIGHT_usblogo;
     }
 
-    viewport_set_defaults(parent, screen->screen_type);
-    disable = (parent->width < logo_width || parent->height < logo_height);
-    viewportmanager_theme_enable(screen->screen_type, !disable, parent);
-    screen->clear_display();
-    screen->scroll_stop();
+    viewportmanager_theme_enable(screen->screen_type, true, parent);
 
     *logo = *parent;
     logo->x = parent->x + parent->width - logo_width;
@@ -259,19 +254,6 @@ void gui_usb_screen_run(bool early_usb)
     usb_keypad_mode = global_settings.usb_keypad_mode;
 #endif
 
-    if(!early_usb)
-    {
-        /* The font system leaves the .fnt fd's open, so we need for force close them all */
-#ifdef HAVE_LCD_BITMAP
-        FOR_NB_SCREENS(i)
-        {
-            font_unload(screens[i].getuifont());
-            screens[i].setuifont(FONT_SYSFIXED);
-        }
-        skin_unload_all();
-#endif
-    }
-
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
@@ -284,6 +266,17 @@ void gui_usb_screen_run(bool early_usb)
         usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
 #endif
     }
+
+    /* update the UI before disabling fonts, this maximizes the propability
+     * that font cache lookups succeed during USB */
+    send_event(GUI_EVENT_ACTIONUPDATE, NULL);
+#ifdef HAVE_LCD_BITMAP
+    if(!early_usb)
+    {
+        /* The font system leaves the .fnt fd's open, so we need for force close them all */
+        font_disable_all();
+    }
+#endif
 
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
@@ -327,12 +320,13 @@ void gui_usb_screen_run(bool early_usb)
 #ifdef HAVE_LCD_CHARCELLS
     status_set_usb(false);
 #endif /* HAVE_LCD_CHARCELLS */
+
 #ifdef HAVE_LCD_BITMAP
     if(!early_usb)
     {
+        font_enable_all();
         /* Not pretty, reload all settings so fonts are loaded again correctly */
         settings_apply(true);
-        settings_apply_skins();
         /* Reload playlist */
         playlist_resume();
     }
@@ -345,4 +339,3 @@ void gui_usb_screen_run(bool early_usb)
     }
 
 }
-
