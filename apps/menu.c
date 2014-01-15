@@ -670,6 +670,9 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         }
         else
         {
+            if (action == SYS_USB_CONNECTED)
+                gui_synclist_scroll_stop(&lists);
+
             switch(default_event_handler(action))
             {
                 case SYS_USB_CONNECTED:
@@ -692,6 +695,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             gui_synclist_speak_item(&lists);
         }
     }
+
     if (start_selected)
     {
         /* make sure the start_selected variable is set to
