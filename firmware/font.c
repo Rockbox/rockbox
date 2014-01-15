@@ -88,9 +88,10 @@ extern struct font sysfont;
 #ifndef BOOTLOADER
 
 struct buflib_alloc_data {
-    struct font font;
-    int handle_locks; /* is the buflib handle currently locked? */
-    int refcount;       /* how many times has this font been loaded? */
+    struct font font;    /* must be the first member! */
+    int handle_locks;    /* is the buflib handle currently locked? */
+    int refcount;        /* how many times has this font been loaded? */
+    int disabled;  /* font disabled (use fallback glyphs, from sysfont) */
     unsigned char buffer[];
 };
 static int buflib_allocations[MAXFONTS];
@@ -285,6 +286,7 @@ static struct font* font_load_cached(struct font* pf,
                                      int32_t noffset)
 {
     /* We are now at the bitmap data, this is fixed at 36.. */
+    pf->width = NULL;
     pf->bits = NULL;
 
     /* Calculate offset to offset data */
@@ -412,11 +414,10 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     /* load font struct f with file header */
     int file_size = filesize( fd );
     struct font header;
-    struct font *pheader = &header;
     struct font f;
 
     uint32_t nwidth, noffset;     
-    if ( !font_load_header( fd, pheader, &f, &nwidth, &noffset )
+    if ( !font_load_header( fd, &header, &f, &nwidth, &noffset )
 #if LCD_DEPTH < 16
         || f.depth
 #endif  
@@ -470,6 +471,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
             old_id = font_id;
             old_refcount = pd->refcount;
             pd->refcount = 1;
+            pd->disabled = false;
             font_unload(font_id);
             font_id = font_load_ex(path, bufsize, glyphs);
             if (font_id < 0)
@@ -623,6 +625,58 @@ void font_unload_all(void)
     }
 }
 
+static void font_disable(int font_id)
+{
+    if ( font_id < 0 || font_id >= MAXFONTS )
+        return;
+    int handle = buflib_allocations[font_id];
+    if ( handle < 0 )
+        return;
+    struct buflib_alloc_data *pdata = core_get_data(handle);
+    struct font *pf = &pdata->font;
+
+    if (pf->fd >= 0)
+    {
+        /* save the cache, but it keep it in-RAM so that cache lookups
+         * can still succeed on the same font */
+        glyph_cache_save(font_id);
+        close(pf->fd);
+        pf->fd = -1;
+        pdata->disabled = true;
+    }
+}
+
+void font_disable_all(void)
+{
+    for(int i = 0; i < MAXFONTS; i++)
+        font_disable(i);
+}
+
+static void font_enable(int font_id)
+{
+    if ( font_id < 0 || font_id >= MAXFONTS )
+        return;
+    int handle = buflib_allocations[font_id];
+    if ( handle < 0 )
+        return;
+    struct buflib_alloc_data *pdata = core_get_data(handle);
+    struct font *pf = &pdata->font;
+
+    if (pdata->disabled && pf->fd < 0)
+    {
+        const char *filename = font_filename(font_id);
+        pf->fd = open(filename, O_RDONLY);
+        pdata->disabled = false;
+    }
+}
+
+void font_enable_all(void)
+{
+    for(int i = 0; i < MAXFONTS; i++)
+        font_enable(i);
+}
+
+
 /*
  * Return a pointer to an incore font structure.
  * If the requested font isn't loaded/compiled-in,
@@ -715,10 +769,15 @@ load_cache_entry(struct font_cache_entry* p, void* callback_data)
 static void cache_create(struct font* pf)
 {
     /* maximum size of rotated bitmap */
-    int bitmap_size = glyph_bytes( pf, pf->maxwidth);
-  
+    int bitmap_size = glyph_bytes(pf, pf->maxwidth);
+    /* reserve one blank glyph that is guaranteed to be available, even
+     * when the font file is closed during USB */
+    unsigned char *cache_buf = pf->buffer_start + bitmap_size;
+    size_t cache_size = pf->buffer_size - (cache_buf - pf->buffer_start);
+    ALIGN_BUFFER(cache_buf, cache_size, 2);
+    memset(pf->buffer_start, 0, bitmap_size);
     /* Initialise cache */
-    font_cache_create(&pf->cache, pf->buffer_start, pf->buffer_size, bitmap_size);
+    font_cache_create(&pf->cache, cache_buf, cache_size, bitmap_size);
 }
 
 /*
@@ -726,32 +785,65 @@ static void cache_create(struct font* pf)
  */
 int font_get_width(struct font* pf, unsigned short char_code)
 {
+    int width;
+    struct font_cache_entry *e;
+    struct buflib_alloc_data *data = (struct buflib_alloc_data *) pf;
+    bool cache_only = data->disabled;
+
     /* check input range*/
     if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
         char_code = pf->defaultchar;
     char_code -= pf->firstchar;
 
-    return (pf->fd >= 0 && pf != &sysfont)?
-        font_cache_get(&pf->cache,char_code,load_cache_entry,pf)->width:
-        pf->width? pf->width[char_code]: pf->maxwidth;
+    if ((pf->fd >= 0 || cache_only) && pf != &sysfont
+            && (e = font_cache_get(&pf->cache,char_code,cache_only,load_cache_entry,pf)))
+        width = e->width;
+    else if (pf->width)
+        width = pf->width[char_code];
+    else
+        width = pf->maxwidth;
+
+    return width;
 }
 
 const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 {
     const unsigned char* bits;
+    struct buflib_alloc_data *data;
 
     /* check input range*/
     if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
         char_code = pf->defaultchar;
     char_code -= pf->firstchar;
 
+    data = (struct buflib_alloc_data *) pf;
+
     if (pf->fd >= 0 && pf != &sysfont)
     {
         bits = 
-            (unsigned char*)font_cache_get(&pf->cache,char_code,load_cache_entry, pf)->bitmap;
+            (unsigned char*)font_cache_get(&pf->cache, char_code,
+                                false, load_cache_entry, data)->bitmap;
+    }
+    else if (data->disabled)
+    {
+        /* the font handle is closed, but the cache is intact. Attempt
+         * a lookup, which is very likely to succeed. Return a placeholder
+         * glyph on miss (again, this is very unlikely */
+        struct font_cache_entry *e = font_cache_get(&pf->cache, char_code,
+                                                    true, NULL, NULL);
+        if (LIKELY(e))
+            bits = (unsigned char *) e->bitmap;
+        else
+        {
+            /* Could attempt to find a suitable fallback glyph from the same
+             * font. For now just return blank space which is
+             * reserved by cache_create() at buffer_start */
+            bits = pf->buffer_start;
+        }
     }
     else
     {
+        /* This font is entirely in RAM */
         bits = pf->bits;
         if (pf->offset)
         {

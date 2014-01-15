@@ -125,6 +125,13 @@ void font_unload(int font_id);
 void font_unload_all(void);
 void font_lock(int font_id, bool lock);
 
+/* Closes the file descriptor if the font file (if cached) but keeps
+ * the cache intact, so font_get_{bits,width} still work. */
+void font_disable_all(void);
+/* Re-opens the file descriptor of the font file. Should be called as
+ * counter-part of font_disable_all(); */
+void font_enable_all(void);
+
 struct font* font_get(int font);
 
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber);
