@@ -1218,26 +1218,25 @@ static int current_activity_top = 0;
 void push_current_activity(enum current_activity screen)
 {
     current_activity[current_activity_top++] = screen;
+#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
-#ifdef HAVE_LCD_BITMAP
         skinlist_set_cfg(i, NULL);
-#endif
         skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
     }
+#endif
 }
 
 void pop_current_activity(void)
 {
     current_activity_top--;
+#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
-#ifdef HAVE_LCD_BITMAP
         skinlist_set_cfg(i, NULL);
-#endif
         skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
     }
-
+#endif
 }
 enum current_activity get_current_activity(void)
 {
