@@ -70,6 +70,17 @@ int key_to_button(int keyboard_button)
     return new_btn;
 }
 
+#ifdef SANSA_CLIPZIP
+struct button_map bm[] = {
+    { SDLK_KP_MULTIPLY,  31, 171,  12, "Home" },
+    { SDLK_KP5,          81, 211,  10, "Select" },
+    { SDLK_KP8,          81, 186,  13, "Play" },
+    { SDLK_KP4,          32, 211,  14, "Left" },
+    { SDLK_KP6,         112, 211,  14, "Right" },
+    { SDLK_KP2,          81, 231,  14, "Menu" },
+    { 0, 0, 0, 0, "None" }
+};
+#else
 struct button_map bm[] = {
     { SDLK_KP_MULTIPLY, 165, 158,  17, "Home" },
     { SDLK_KP5,         102, 230,  29, "Select" },
@@ -79,3 +90,4 @@ struct button_map bm[] = {
     { SDLK_KP2,         105, 275,  22, "Menu" },
     { 0, 0, 0, 0, "None" }
 };
+#endif
