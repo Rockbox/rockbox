@@ -529,7 +529,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     pdata->disabled     = false;
 
     /* load and init */
-    struct font *pf = &pdata->pf;
+    struct font *pf = &pdata->font;
     memcpy(pf, &f, sizeof( struct font) );
 
     pf->fd = fd;
