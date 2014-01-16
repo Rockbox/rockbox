@@ -1704,10 +1704,10 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: "瀏覽 .wps 檔案"
+    *: "瀏覽音樂撥放接口主題"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "瀏覽音樂撥放接口主題"
   </voice>
 </phrase>
 <phrase>
@@ -11169,10 +11169,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "不要讓歌化"
+    *: "阻止曲目跳轉"
   </dest>
   <voice>
-    *: "不要讓歌化"
+    *: "阻止曲目跳轉"
   </voice>
 </phrase>
 <phrase>
@@ -11252,5 +11252,273 @@
   </dest>
   <voice>
     *: "音量限制"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "開機/關機"
+  </dest>
+  <voice>
+    *: "開機和關機"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "啓動睡眠計時器"
+  </source>
+  <dest>
+    *: "啓動睡眠計時器"
+  </dest>
+  <voice>
+    *: "Start Sleep Timer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "停止睡眠計時器"
+  </dest>
+  <voice>
+    *: "停止睡眠計時器"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "睡眠倒計時長度"
+  </dest>
+  <voice>
+    *: "睡眠倒計時長度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "開機即啓動睡眠計時"
+  </dest>
+  <voice>
+    *: "開機後立即啓動睡眠計時"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "偵測到按鍵時重置睡眠計時器"
+  </dest>
+  <voice>
+    *: "偵測到按鍵時重置睡眠計時器"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "單檔案斷點續撥"
+  </dest>
+  <voice>
+    *: "爲每個檔案保存斷點續撥"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "曲目自動跳轉時斷點續撥"
+  </dest>
+  <voice>
+    *: "曲目自動跳轉時斷點續撥"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "僅針對自定資料夾中的檔案"
+  </dest>
+  <voice>
+    *: "僅針對自定資料夾中的檔案"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "設爲起始檔案瀏覽位置"
+  </dest>
+  <voice>
+    *: "設爲起始檔案瀏覽位置"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "復原檔案瀏覽起始位置"
+  </dest>
+  <voice>
+    *: "復原檔案瀏覽起始位置"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "自定要掃描的資料夾"
+  </dest>
+  <voice>
+    *: "自定資料庫要進行媒體掃描的資料夾"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "使用快捷選單替代快捷熒幕"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "使用快捷選單替代快捷熒幕"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "收音機接口主題"
+  </dest>
+  <voice>
+    *: none
+    radio: "收音機接口主題"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "狀態列佈景主題"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "狀態列佈景主題"
+  </voice>
+</phrase>
+<phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "捲動軸寬度"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "捲動軸寬度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "暫停時自動倒退"
+  </dest>
+  <voice>
+    *: "暫停時自動倒退"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "暫停時自動倒退長度"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "暫停時自動倒退長度"
   </voice>
 </phrase>
