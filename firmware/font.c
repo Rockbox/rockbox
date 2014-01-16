@@ -526,9 +526,10 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     pdata = core_get_data(handle);
     pdata->handle_locks = 1;
     pdata->refcount     = 1;
+    pdata->disabled     = false;
 
     /* load and init */
-    struct font *pf = pf_from_handle( handle );
+    struct font *pf = &pdata->pf;
     memcpy(pf, &f, sizeof( struct font) );
 
     pf->fd = fd;
