@@ -511,7 +511,7 @@ void iap_send_tx(void)
     }
     *(iap_txnext) = 0x100 - (chksum & 0xFF);
 
-#ifdef LOGF_ENABLE
+#if defined(LOGF_ENABLE) && defined(ROCKBOX_HAS_LOGF)
     logf("T: %s", hexstring(txstart+3, (iap_txnext - txstart)-3));
 #endif
     for (i=0; i <= (iap_txnext - txstart); i++)
@@ -1253,7 +1253,7 @@ void iap_handlepkt(void)
 
     /* handle command by mode */
     length = get_u16(iap_rxstart);
-#ifdef LOGF_ENABLE
+#if defined(LOGF_ENABLE) && defined(ROCKBOX_HAS_LOGF)
     logf("R: %s", hexstring(iap_rxstart+2, (length)));
 #endif
 
