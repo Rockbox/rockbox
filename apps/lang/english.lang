@@ -13192,3 +13192,20 @@
     *: "Maximum Volume Limit"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>

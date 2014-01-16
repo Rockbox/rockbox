@@ -7747,74 +7747,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
-  </source>
-  <dest>
-    *: none
-    swcodec: "编辑模式: %s %s"
-  </dest>
-  <voice>
-    *: none
-    swcodec: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: none
-    swcodec: "Cutoff"
-  </source>
-  <dest>
-    *: none
-    swcodec: "截止频率"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "截止频率"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "品质"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "品质"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "频率"
-  </dest>
-  <voice>
-    *: none
-    recording: "频率"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORDING_SOURCE
   desc: in the recording settings
   user: core
@@ -8770,23 +8702,6 @@
   <voice>
     *: "曲目列表结束"
     archosplayer: "列表结束"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: none
-    swcodec: "Gain"
-  </source>
-  <dest>
-    *: none
-    swcodec: "增益"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "增益"
   </voice>
 </phrase>
 <phrase>

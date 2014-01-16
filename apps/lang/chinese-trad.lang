@@ -8749,23 +8749,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: none
-    swcodec: "Gain"
-  </source>
-  <dest>
-    *: none
-    swcodec: "增加"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "Gain"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_WAKEUP_SCREEN
   desc: in alarm menu setting
   user: core
@@ -10623,23 +10606,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
-  </source>
-  <dest>
-    *: none
-    swcodec: "Edit mode: %s %s"
-  </dest>
-  <voice>
-    *: none
-    swcodec: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ENABLE_SPEAKER
   desc: in Settings -> Sound Settings
   user: core
@@ -10654,23 +10620,6 @@
   <voice>
     *: none
     speaker: "使用喇叭"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: none
-    swcodec: "Cutoff"
-  </source>
-  <dest>
-    *: none
-    swcodec: "截止頻率"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "截止頻率"
   </voice>
 </phrase>
 <phrase>

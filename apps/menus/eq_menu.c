@@ -647,7 +647,7 @@ bool eq_menu_graphical(void)
                 max = EQ_Q_MAX;
 
                 snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
-                         str(LANG_EQUALIZER_BAND_Q), "");
+                         str(LANG_SYSFONT_EQUALIZER_BAND_Q), "");
 
                 screens[i].putsxy(0, 0, buf);
             }
