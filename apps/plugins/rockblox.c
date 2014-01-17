@@ -546,7 +546,7 @@
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
 
 /* no room for the space in the highscore list */
-#define _SPACE ""
+#define HIGHSCORE_SPACE ""
 
 #define BLOCK_WIDTH 10
 #define BLOCK_HEIGHT 10
@@ -708,8 +708,8 @@ extern const fb_data rockblox_background[];
 
 #endif
 
-#ifndef _SPACE
-#define _SPACE " "
+#ifndef HIGHSCORE_SPACE
+#define HIGHSCORE_SPACE " "
 #endif
 /* <<Explanation on Rockblox shapes>>
 
@@ -926,7 +926,7 @@ static void show_highscores (void)
 
     for (i = 0; i<NUM_SCORES; i++)
         rb->lcd_putsxyf (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * i),
-            "%06d" _SPACE "L%1d", highscores[i].score, highscores[i].level);
+            "%06d" HIGHSCORE_SPACE "L%1d", highscores[i].score, highscores[i].level);
 }
 #endif
 
