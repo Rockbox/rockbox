@@ -108,17 +108,16 @@ target/hosted/maemo/maemo-thread.c
 
 /* Standard library */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__MINGW32__) || defined(__CYGWIN__)
-libc/errno.c
 libc/strtok.c
-/* alsa on linux requires a more advanced sprintf, i.e. not ours */
-libc/sprintf.c
 #endif /* PLATFORM_NATIVE || __MINGW32__ || __CYGWIN__ */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
 libc/atoi.c
-
+libc/errno.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* our ctype.[ch] comes from newlib and is incompitble with most desktop's ctype */
 libc/ctype.c
+/* alsa on linux requires a more advanced sprintf, i.e. not ours */
+libc/sprintf.c
 #endif
 
 libc/memchr.c
