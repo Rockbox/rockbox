@@ -258,7 +258,10 @@ simcc () {
    fibers=`check_fiber`
    endian="little" # windows is little endian
    echo "Enabling MMX support"
-   GCCOPTS="$GCCOPTS -mmmx"
+   # -mno-ms-bitfields is a workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991
+   # mingw-gcc >= 4.7 defaults to -mms-bitfields which breaks __attribute__((packed))
+   # disable it explicitly for the time being (it doesn't appear to be required for us)
+   GCCOPTS="$GCCOPTS -mmmx -mno-ms-bitfields"
  else
  case $uname in
    CYGWIN*)
