@@ -32,7 +32,7 @@ SECTIONS
 {
     .vectors :
     {
-        *(.init.text)
+        KEEP(*(.startup*));
         _datacopy = .;
     } > FLASH
 

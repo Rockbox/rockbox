@@ -56,7 +56,7 @@ SECTIONS
        "by hand" */
     .text LOADADDR(.data) + SIZEOF(.data) :
     {
-        *(.init.text)
+        KEEP(*(.startup*));
         *(.text*)
         . = ALIGN(0x4);
     } > FLASH
