@@ -36,7 +36,7 @@ struct fb fb IBSS_ATTR;
 
 extern int debug_trace;
 
-unsigned int oldbuttonstate = 0, newbuttonstate,holdbutton;
+static unsigned int oldbuttonstate;
 #ifdef HAVE_WHEEL_POSITION
 int oldwheel = -1, wheel;
 
@@ -54,39 +54,30 @@ static int wheelmap[8] = {
 
 int released, pressed;
 
-
-#ifdef ROCKBOY_SCROLLWHEEL
-/* Scrollwheel events are posted directly and not polled by the button
-   driver - synthesize polling */
-static inline unsigned int read_scroll_wheel(void)
-{
-    unsigned int buttons = BUTTON_NONE;
-    unsigned int btn;
-
-    /* Empty out the button queue and see if any scrollwheel events were
-       posted */
-    do
-    {
-        btn = rb->button_get_w_tmo(0);
-        buttons |= btn;
-    }
-    while (btn != BUTTON_NONE);
-
-    return buttons & (ROCKBOY_SCROLLWHEEL_CC | ROCKBOY_SCROLLWHEEL_CW);
-}
-#endif
-
 void ev_poll(void)
 {
     event_t ev;
-    newbuttonstate = rb->button_status();
-#ifdef ROCKBOY_SCROLLWHEEL
-    newbuttonstate |= read_scroll_wheel();
+
+    unsigned int buttons = BUTTON_NONE;
+    unsigned int btn;
+
+    /* loop until all button events are popped off */
+    do
+    {
+        btn = rb->button_get(false);
+        buttons |= btn;
+#if defined(HAVE_SCROLLWHEEL) && !defined(ROCKBOY_SCROLLWHEEL)
+        /* filter out scroll wheel events if not supported */
+        buttons &= ~(BUTTON_SCROLL_FWD|BUTTON_SCROLL_BACK);
 #endif
-    released = ~newbuttonstate & oldbuttonstate;
-    pressed = newbuttonstate & ~oldbuttonstate;
-    oldbuttonstate = newbuttonstate;
+    }
+    while (btn != BUTTON_NONE);
+
+    released = ~buttons & oldbuttonstate;
+    pressed = buttons & ~oldbuttonstate;
+    oldbuttonstate = buttons;
 #if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
+    static unsigned int holdbutton;
     if (rb->button_hold()&~holdbutton)
         fb.mode=(fb.mode+1)%4;
     holdbutton=rb->button_hold();
@@ -374,4 +365,3 @@ void vid_update(int scanline)
 #endif /* LCD_HEIGHT */
 }
 #endif
-
