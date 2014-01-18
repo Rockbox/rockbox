@@ -54,13 +54,20 @@ STARTUP(crt0.o)
 
 /* End of the audio buffer, where the codec/plugin buffer starts */
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
+#define CODECORIG ENDAUDIOADDR
+
+/* .init is copied to codec buffer */
+#define INITORIG CODECORIG
+#define INITSIZE CODECSIZE
 
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
    FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
+   INIT : ORIGIN = INITORIG, LENGTH = INITSIZE
 }
+
 SECTIONS
 {
     .flashheader : 
@@ -101,6 +108,7 @@ SECTIONS
     .text LOADADDR(.data) + SIZEOF(.data) :
     {
         *(.init.text)
+        KEEP(*(.startup*));
         *(.text*)
         . = ALIGN(0x4);
     } > FLASH
@@ -122,6 +130,17 @@ SECTIONS
         *(.idata)
         _iramend = .;
     } > IRAM
+
+#ifdef HAVE_INIT_ATTR
+    .init INITORIG : AT ( _iramcopy + SIZEOF(.iram) )
+    {
+        _initstart = .;
+        *(.init*)
+        *(.initdata*)
+        _initend = .;
+    } > INIT
+    _initcopy = LOADADDR(.init);
+#endif
 
     .ibss (NOLOAD) :
     {
