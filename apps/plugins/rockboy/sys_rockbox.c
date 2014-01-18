@@ -36,9 +36,8 @@ struct fb fb IBSS_ATTR;
 
 extern int debug_trace;
 
-static unsigned int oldbuttonstate;
 #ifdef HAVE_WHEEL_POSITION
-int oldwheel = -1, wheel;
+static int oldwheel = -1, wheel;
 
 static int wheelmap[8] = {
     PAD_UP,     /* Top */
@@ -52,29 +51,40 @@ static int wheelmap[8] = {
 };
 #endif
 
-int released, pressed;
-
 void ev_poll(void)
 {
     event_t ev;
 
+    static unsigned int oldbuttonstate;
     unsigned int buttons = BUTTON_NONE;
+    unsigned int released, pressed;
     unsigned int btn;
+    bool quit = false;
 
-    /* loop until all button events are popped off */
     do
     {
         btn = rb->button_get(false);
+        /* BUTTON_NONE doesn't necessarily mean no button is pressed,
+         * it just means the button queue became empty for this tick.
+         * One can only be sure that no button is pressed by
+         * calling button_status(). */
+        if (btn == BUTTON_NONE)
+        {
+            /* loop only until all button events are popped off */
+            quit = true;
+            btn = rb->button_status();
+        }
         buttons |= btn;
 #if defined(HAVE_SCROLLWHEEL) && !defined(ROCKBOY_SCROLLWHEEL)
         /* filter out scroll wheel events if not supported */
         buttons &= ~(BUTTON_SCROLL_FWD|BUTTON_SCROLL_BACK);
 #endif
     }
-    while (btn != BUTTON_NONE);
+    while (!quit);
 
     released = ~buttons & oldbuttonstate;
     pressed = buttons & ~oldbuttonstate;
+
     oldbuttonstate = buttons;
 #if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
     static unsigned int holdbutton;
