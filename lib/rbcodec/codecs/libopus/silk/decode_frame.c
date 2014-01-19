@@ -47,13 +47,10 @@ opus_int silk_decode_frame(
 {
     VARDECL( silk_decoder_control, psDecCtrl );
     opus_int         L, mv_len, ret = 0;
-    VARDECL( opus_int, pulses );
     SAVE_STACK;
 
     L = psDec->frame_length;
     ALLOC( psDecCtrl, 1, silk_decoder_control );
-    ALLOC( pulses, (L + SHELL_CODEC_FRAME_LENGTH - 1) &
-                   ~(SHELL_CODEC_FRAME_LENGTH - 1), opus_int );
     psDecCtrl->LTP_scale_Q14 = 0;
 
     /* Safety checks */
@@ -62,6 +59,9 @@ opus_int silk_decode_frame(
     if(   lostFlag == FLAG_DECODE_NORMAL ||
         ( lostFlag == FLAG_DECODE_LBRR && psDec->LBRR_flags[ psDec->nFramesDecoded ] == 1 ) )
     {
+        VARDECL( opus_int16, pulses );
+        ALLOC( pulses, (L + SHELL_CODEC_FRAME_LENGTH - 1) &
+                       ~(SHELL_CODEC_FRAME_LENGTH - 1), opus_int16 );
         /*********************************************/
         /* Decode quantization indices of side info  */
         /*********************************************/
@@ -107,15 +107,15 @@ opus_int silk_decode_frame(
     silk_memmove( psDec->outBuf, &psDec->outBuf[ psDec->frame_length ], mv_len * sizeof(opus_int16) );
     silk_memcpy( &psDec->outBuf[ mv_len ], pOut, psDec->frame_length * sizeof( opus_int16 ) );
 
-    /****************************************************************/
-    /* Ensure smooth connection of extrapolated and good frames     */
-    /****************************************************************/
-    silk_PLC_glue_frames( psDec, pOut, L );
-
     /************************************************/
     /* Comfort noise generation / estimation        */
     /************************************************/
     silk_CNG( psDec, psDecCtrl, pOut, L );
+
+    /****************************************************************/
+    /* Ensure smooth connection of extrapolated and good frames     */
+    /****************************************************************/
+    silk_PLC_glue_frames( psDec, pOut, L );
 
     /* Update some decoder state variables */
     psDec->lagPrev = psDecCtrl->pitchL[ psDec->nb_subfr - 1 ];

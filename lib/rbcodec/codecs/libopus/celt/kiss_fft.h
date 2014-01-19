@@ -79,8 +79,9 @@ typedef struct {
 
 typedef struct kiss_fft_state{
     int nfft;
-#ifndef FIXED_POINT
-    kiss_fft_scalar scale;
+    opus_val16 scale;
+#ifdef FIXED_POINT
+    int scale_shift;
 #endif
     int shift;
     opus_int16 factors[2*MAXFACTORS];
@@ -128,14 +129,10 @@ kiss_fft_state *opus_fft_alloc(int nfft,void * mem,size_t * lenmem);
     f[k].r and f[k].i
  * */
 void opus_fft(const kiss_fft_state *cfg,const kiss_fft_cpx *fin,kiss_fft_cpx *fout);
+void opus_ifft(const kiss_fft_state *cfg,const kiss_fft_cpx *fin,kiss_fft_cpx *fout);
 
-#if defined(CPU_COLDFIRE)
-#define IFFT_ICODE ICODE_ATTR
-#else
-#define IFFT_ICODE
-#endif
-
-void opus_ifft(const kiss_fft_state *cfg,const kiss_fft_cpx *fin,kiss_fft_cpx *fout) IFFT_ICODE;
+void opus_fft_impl(const kiss_fft_state *st,kiss_fft_cpx *fout);
+void opus_ifft_impl(const kiss_fft_state *st,kiss_fft_cpx *fout);
 
 void opus_fft_free(const kiss_fft_state *cfg);
 

@@ -337,8 +337,6 @@ enum codec_status codec_run(void)
     param = ci->id3->elapsed;
     strtoffset = ci->id3->offset;
 
-    global_stack = 0;
-
 #if defined(CPU_COLDFIRE)
     /* EMAC rounding is disabled because of MULT16_32_Q15, which will be
        inaccurate with rounding in its current incarnation */

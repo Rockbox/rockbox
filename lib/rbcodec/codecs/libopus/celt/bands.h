@@ -41,7 +41,7 @@
  * @param X Spectrum
  * @param bandE Square root of the energy for each band (returned)
  */
-void compute_band_energies(const CELTMode *m, const celt_sig *X, celt_ener *bandE, int end, int C, int M);
+void compute_band_energies(const CELTMode *m, const celt_sig *X, celt_ener *bandE, int end, int C, int LM);
 
 /*void compute_noise_energies(const CELTMode *m, const celt_sig *X, const opus_val16 *tonality, celt_ener *bandE);*/
 
@@ -59,14 +59,15 @@ void normalise_bands(const CELTMode *m, const celt_sig * OPUS_RESTRICT freq, cel
  * @param bandE Square root of the energy for each band
  */
 void denormalise_bands(const CELTMode *m, const celt_norm * OPUS_RESTRICT X,
-      celt_sig * OPUS_RESTRICT freq, const opus_val16 *bandE, int start, int end, int C, int M);
+      celt_sig * OPUS_RESTRICT freq, const opus_val16 *bandE, int start,
+      int end, int M, int downsample, int silence);
 
 #define SPREAD_NONE       (0)
 #define SPREAD_LIGHT      (1)
 #define SPREAD_NORMAL     (2)
 #define SPREAD_AGGRESSIVE (3)
 
-int spreading_decision(const CELTMode *m, celt_norm *X, int *average,
+int spreading_decision(const CELTMode *m, const celt_norm *X, int *average,
       int last_decision, int *hf_average, int *tapset_decision, int update_hf,
       int end, int C, int M);
 
@@ -104,8 +105,8 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
       opus_int32 total_bits, opus_int32 balance, ec_ctx *ec, int M, int codedBands, opus_uint32 *seed);
 
 void anti_collapse(const CELTMode *m, celt_norm *X_, unsigned char *collapse_masks, int LM, int C, int size,
-      int start, int end, opus_val16 *logE, opus_val16 *prev1logE,
-      opus_val16 *prev2logE, int *pulses, opus_uint32 seed);
+      int start, int end, const opus_val16 *logE, const opus_val16 *prev1logE,
+      const opus_val16 *prev2logE, const int *pulses, opus_uint32 seed);
 
 opus_uint32 celt_lcg_rand(opus_uint32 seed);
 

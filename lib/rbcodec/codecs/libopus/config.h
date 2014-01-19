@@ -9,7 +9,8 @@
 #define OPUS_BUILD
 
 /* alloc stuff */
-#define NONTHREADSAFE_PSEUDOSTACK
+#define VAR_ARRAYS
+#define NORM_ALIASING_HACK
 
 #define OVERRIDE_OPUS_ALLOC
 #define OVERRIDE_OPUS_FREE
@@ -40,6 +41,7 @@
 #endif
 
 #if defined(CPU_ARM)
+#define OPUS_ARM_ASM
 #if ARM_ARCH == 4
 #define OPUS_ARM_INLINE_ASM
 #elif ARM_ARCH > 4

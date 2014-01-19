@@ -39,7 +39,7 @@ void silk_decode_core(
     silk_decoder_state          *psDec,                         /* I/O  Decoder state                               */
     silk_decoder_control        *psDecCtrl,                     /* I    Decoder control                             */
     opus_int16                  xq[],                           /* O    Decoded speech                              */
-    const opus_int              pulses[ MAX_FRAME_LENGTH ]      /* I    Pulse signal                                */
+    const opus_int16            pulses[ MAX_FRAME_LENGTH ]      /* I    Pulse signal                                */
 )
 {
     opus_int   i, k, lag = 0, start_idx, sLTP_buf_idx, NLSF_interpolation_flag, signalType;
@@ -49,7 +49,7 @@ void silk_decode_core(
     opus_int32 LTP_pred_Q13, LPC_pred_Q10, Gain_Q10, inv_gain_Q31, gain_adj_Q16, rand_seed, offset_Q10;
     opus_int32 *pred_lag_ptr, *pexc_Q14, *pres_Q14;
     VARDECL( opus_int32, res_Q14 );
-/*    VARDECL( opus_int32, sLPC_Q14 ); */
+    VARDECL( opus_int32, sLPC_Q14 );
     SAVE_STACK;
 
     silk_assert( psDec->prev_gain_Q16 != 0 );
@@ -57,8 +57,7 @@ void silk_decode_core(
     ALLOC( sLTP, psDec->ltp_mem_length, opus_int16 );
     ALLOC( sLTP_Q15, psDec->ltp_mem_length + psDec->frame_length, opus_int32 );
     ALLOC( res_Q14, psDec->subfr_length, opus_int32 );
-/*    ALLOC( sLPC_Q14, psDec->subfr_length + MAX_LPC_ORDER, opus_int32 ); */
-    opus_int32 sLPC_Q14[psDec->subfr_length + MAX_LPC_ORDER]; /* worst case is 80 + 16 */
+    ALLOC( sLPC_Q14, psDec->subfr_length + MAX_LPC_ORDER, opus_int32 );
 
     offset_Q10 = silk_Quantization_Offsets_Q10[ psDec->indices.signalType >> 1 ][ psDec->indices.quantOffsetType ];
 
