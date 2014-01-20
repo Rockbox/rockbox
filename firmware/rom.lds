@@ -56,18 +56,11 @@ STARTUP(crt0.o)
 #define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 #define CODECORIG ENDAUDIOADDR
 
-/* .init is copied to codec buffer */
-#define INITORIG CODECORIG
-#define INITSIZE CODECSIZE
-
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
    FLASH : ORIGIN = FLASHORIG, LENGTH = FLASHSIZE
-#ifdef HAVE_INIT_ATTR
-   INIT : ORIGIN = INITORIG, LENGTH = INITSIZE
-#endif
 }
 
 SECTIONS
@@ -93,6 +86,9 @@ SECTIONS
         KEEP(*(.resetvectors));
         KEEP(*(.vectors));
         . = ALIGN(0x200);
+#ifdef HAVE_INIT_ATTR
+        *(.initdata*)
+#endif
         *(.data*)
         . = ALIGN(0x4);
         _dataend = .;        
@@ -111,6 +107,14 @@ SECTIONS
     {
         *(.init.text)
         KEEP(*(.startup*));
+#ifdef HAVE_INIT_ATTR
+        /* all this symbols are set to the same address so .init copy loop
+           will be skiped in crt0.S */
+        _initstart = .;
+        _initend = .;
+        _initcopy = .;
+        *(.init*)
+#endif
         *(.text*)
         . = ALIGN(0x4);
     } > FLASH
@@ -132,17 +136,6 @@ SECTIONS
         *(.idata)
         _iramend = .;
     } > IRAM
-
-#ifdef HAVE_INIT_ATTR
-    .init INITORIG : AT ( _iramcopy + SIZEOF(.iram) )
-    {
-        _initstart = .;
-        *(.init*)
-        *(.initdata*)
-        _initend = .;
-    } > INIT
-    _initcopy = LOADADDR(.init);
-#endif
 
     .ibss (NOLOAD) :
     {
