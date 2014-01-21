@@ -22,9 +22,12 @@
 #include "regs-power.h"
 #include "regs-lradc.h"
 #include "regs-digctl.h"
+#include "regs-clkctrl.h"
 
 #define BOOT_ROM_CONTINUE   0 /* continue boot */
 #define BOOT_ROM_SECTION    1 /* switch to new section *result_id */
+
+#define BOOT_ARG_CHARGE     ('c' | 'h' << 8 | 'r' << 16 | 'g' << 24)
 
 typedef unsigned long uint32_t;
 
@@ -225,8 +228,43 @@ static inline enum context_t get_context(void)
 #endif
 }
 
+/**
+ * Charging function
+ */
+static inline void do_charge(void)
+{
+    BF_CLR(LRADC_CTRL0, SFTRST);
+    BF_CLR(LRADC_CTRL0, CLKGATE);
+    BF_WRn(LRADC_DELAYn, 0, TRIGGER_LRADCS, 0x80);
+    BF_WRn(LRADC_DELAYn, 0, TRIGGER_DELAYS, 0x1);
+    BF_WRn(LRADC_DELAYn, 0, DELAY, 200);
+    BF_SETn(LRADC_DELAYn, 0, KICK);
+    BF_SET(LRADC_CONVERSION, AUTOMATIC);
+    BF_WR_V(LRADC_CONVERSION, SCALE_FACTOR, LI_ION);
+    BF_WR(POWER_CHARGE, STOP_ILIMIT, 1);
+    BF_WR(POWER_CHARGE, BATTCHRG_I, 0x10);
+    BF_CLR(POWER_CHARGE, PWD_BATTCHRG);
+#if IMX233_SUBTARGET >= 3780
+    BF_WR(POWER_DCDC4P2, ENABLE_4P2, 1);
+    BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);
+    BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT, 0x10);
+#endif
+    while(1)
+    {
+        BF_WR(CLKCTRL_CPU, INTERRUPT_WAIT, 1);
+        asm volatile (
+            "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
+            "nop\n" /* Datasheet unclear: "The lr sent to handler points here after RTI"*/
+            "nop\n"
+            : : "r"(0)
+        );
+    }
+}
+
 int main(uint32_t arg, uint32_t *result_id)
 {
+    if(arg == BOOT_ARG_CHARGE)
+        do_charge();
     switch(boot_decision(get_context()))
     {
         case BOOT_ROCK:

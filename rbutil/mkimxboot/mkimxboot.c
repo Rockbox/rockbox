@@ -220,6 +220,7 @@ static const struct imx_model_desc_t imx_models[] =
 #define MAGIC_ROCK      0x726f636b /* 'rock' */
 #define MAGIC_RECOVERY  0xfee1dead
 #define MAGIC_NORMAL    0xcafebabe
+#define MAGIC_CHARGE    0x67726863 /* 'chrg' */
 
 static int rb_fw_get_sb_inst_count(struct rb_fw_t *fw)
 {
@@ -332,6 +333,39 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
         free(sec->insts);
         sec->insts = new_insts;
         sec->nr_insts = jump_idx + nr_boot_inst;
+        /* remove all other sections */
+        for(int i = 1; i < sb_file->nr_sections; i++)
+            sb_free_section(sb_file->sections[i]);
+        struct sb_section_t *new_sec = xmalloc(sizeof(struct sb_section_t));
+        memcpy(new_sec, &sb_file->sections[0], sizeof(struct sb_section_t));
+        free(sb_file->sections);
+        sb_file->sections = new_sec;
+        sb_file->nr_sections = 1;
+
+        return IMX_SUCCESS;
+    }
+    else if(type == IMX_CHARGE)
+    {
+        /* throw away everything except the dualboot stub with a special argument */
+        struct sb_inst_t *new_insts = xmalloc(sizeof(struct sb_inst_t) * 2);
+        /* first instruction is be a load */
+        struct sb_inst_t *load = &new_insts[0];
+        memset(load, 0, sizeof(struct sb_inst_t));
+        load->inst = SB_INST_LOAD;
+        load->size = imx_models[model].dualboot_size;
+        load->addr = imx_models[model].dualboot_addr;
+        /* duplicate memory because it will be free'd */
+        load->data = memdup(imx_models[model].dualboot, imx_models[model].dualboot_size);
+        /* second instruction is a call */
+        struct sb_inst_t *call = &new_insts[1];
+        memset(call, 0, sizeof(struct sb_inst_t));
+        call->inst = SB_INST_CALL;
+        call->addr = imx_models[model].dualboot_addr;
+        call->argument = MAGIC_CHARGE;
+        /* free old instruction array */
+        free(sec->insts);
+        sec->insts = new_insts;
+        sec->nr_insts = 2;
         /* remove all other sections */
         for(int i = 1; i < sb_file->nr_sections; i++)
             sb_free_section(sb_file->sections[i]);

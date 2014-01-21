@@ -50,6 +50,7 @@ enum imx_output_type_t
     IMX_DUALBOOT = 0,
     IMX_RECOVERY = 1,
     IMX_SINGLEBOOT = 2,
+    IMX_CHARGE = 3,
 };
 
 /* Supported models */

@@ -131,6 +131,8 @@ int main(int argc, char *argv[])
                     type = IMX_SINGLEBOOT;
                 else if(strcmp(optarg, "recovery") == 0)
                     type = IMX_RECOVERY;
+                else if(strcmp(optarg, "charge") == 0)
+                    type = IMX_CHARGE;
                 else
                 {
                     printf("Invalid boot type '%s'\n", optarg);
