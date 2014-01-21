@@ -63,9 +63,17 @@
    latency */
 #define PRIORITY_VOICE (PRIORITY_PLAYBACK-4)
 
+/* A speex frame generally consists of 20ms of audio
+ * (http://www.speex.org/docs/manual/speex-manual/node10.html)
+ * for wideband mode this results in 320 samples of decoded PCM.
+ */
 #define VOICE_FRAME_COUNT   320 /* Samples / frame */
 #define VOICE_SAMPLE_RATE 16000 /* Sample rate in HZ */
 #define VOICE_SAMPLE_DEPTH   16 /* Sample depth in bits */
+/* The max. wideband bitrate is 42.4 kbps
+ * (http://www.speex.org/docs/manual/speex-manual/node11.html). For 20ms
+ * this gives a maximum of 106 bytes for an encoded speex frame */
+#define VOICE_MAX_ENCODED_FRAME_SIZE 106
 
 /* Voice thread variables */
 static unsigned int voice_thread_id = 0;
@@ -449,6 +457,23 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
     }
     else
     {
+        if (td->vi.size > VOICE_MAX_ENCODED_FRAME_SIZE
+            && td->bits.charPtr > (td->vi.size - VOICE_MAX_ENCODED_FRAME_SIZE)
+            && td->vi.get_more != NULL)
+        {
+            /* request more data _before_ running out of data (requesting
+             * more after the fact prevents speex from successful decoding)
+             * place a hint telling the callback how much of the
+             * previous buffer we have consumed such that it can rewind
+             * as necessary */
+            int bitPtr = td->bits.bitPtr;
+            td->vi.size = td->bits.charPtr;
+            td->vi.get_more(&td->vi.start, &td->vi.size);
+            speex_bits_set_bit_buffer(&td->bits, (void *)td->vi.start,
+                                      td->vi.size);
+            td->bits.bitPtr = bitPtr;
+        }
+
         yield();
 
         /* Output the decoded frame */
