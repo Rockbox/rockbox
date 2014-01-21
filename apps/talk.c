@@ -636,11 +636,10 @@ static bool load_voicefile_data(int fd)
     return true;
 }
 
-/* most, if not all, clips should be well below 32k (largest in english.lang is
- * 4.5K). Currently there is a problem with voice decoding such that clips
- * cannot be decoded in chunks. Once that is resolved this buffer could be
- * smaller and clips be decoded in multiple chunks */
-static unsigned char commit_buffer[32<<10];
+/* Use a static buffer to avoid difficulties with buflib during DMA
+ * (hwcodec)/buffer passing to the voice_thread (swcodec). Clips
+ * can be played in chunks so the size is not that important */
+static unsigned char commit_buffer[1<<10];
 
 static void* commit_transfer(struct queue_entry *qe, size_t *size)
 {
@@ -658,7 +657,6 @@ static void* commit_transfer(struct queue_entry *qe, size_t *size)
     memcpy(bufpos, buf, sent);
     *size = sent;
 
-
     return commit_buffer;
 }
 
@@ -674,6 +672,13 @@ static inline bool is_silence(struct queue_entry *qe)
 static void mp3_callback(const void** start, size_t* size)
 {
     struct queue_entry *qe = &queue[queue_read];
+#if CONFIG_CODEC == SWCODEC
+    /* voice_thread.c hints us how many of the buffer we provided it actually
+     * consumed. Because buffers have to be frame-aligned for speex
+     * it might be less than what we presented */
+    if (*size)
+        sent = *size;
+#endif
     qe->remaining -= sent; /* we completed this */
 
     if (qe->remaining > 0) /* current clip not finished? */
