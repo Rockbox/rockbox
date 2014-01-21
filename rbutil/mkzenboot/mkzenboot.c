@@ -130,7 +130,7 @@ static const struct zen_model_desc_t zen_models[] =
     },
     [MODEL_ZENV] =
     {
-        "Zen V", "zenv", 85, 0x61000000, dualboot_zenv, sizeof(dualboot_zenv)
+        "Zen V", "zenv", 92, 0x61000000, dualboot_zenv, sizeof(dualboot_zenv)
     },
     [MODEL_ZENXFI] =
     {

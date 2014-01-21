@@ -198,7 +198,7 @@ static struct crypto_key_t zero_key =
 
 static const struct imx_model_desc_t imx_models[] =
 {
-    [MODEL_FUZEPLUS] = { "Fuze+",  dualboot_fuzeplus, sizeof(dualboot_fuzeplus), "fuz+", 72,
+    [MODEL_FUZEPLUS] = {"Fuze+",  dualboot_fuzeplus, sizeof(dualboot_fuzeplus), "fuz+", 72,
                           1, &zero_key, 0, 0x40000000 },
     [MODEL_ZENXFI2] = {"Zen X-Fi2", dualboot_zenxfi2, sizeof(dualboot_zenxfi2), "zxf2", 82,
                        1, &zero_key, 0, 0x40000000 },
