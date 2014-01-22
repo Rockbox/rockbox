@@ -181,6 +181,9 @@ void settings_apply_skins(void)
         }
     }
     first_run = false;
+    /* any backdrop that was loaded with "-" has to be reloaded because
+     * the setting may have changed */
+    skin_backdrop_load_setting();
     viewportmanager_theme_changed(THEME_STATUSBAR);
 #ifdef HAVE_BACKDROP_IMAGE
     FOR_NB_SCREENS(i)

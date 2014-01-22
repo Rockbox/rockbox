@@ -178,18 +178,18 @@ bool skin_backdrops_preload(void)
                 if (backdrops[i].buflib_handle > 0)
                 {
                     backdrops[i].buffer = core_get_data(backdrops[i].buflib_handle);
-                    handle_being_loaded = backdrops[i].buflib_handle;
                     if (strcmp(filename, BACKDROP_BUFFERNAME))
                     {
+                        handle_being_loaded = backdrops[i].buflib_handle;
                         backdrops[i].loaded =
                                 screens[screen].backdrop_load(filename, backdrops[i].buffer);
-                        handle_being_loaded = -1;
                         if (!backdrops[i].loaded)
                         {
                             core_free(backdrops[i].buflib_handle);
                             backdrops[i].buflib_handle = -1;
                             retval = false;
                         }
+                        handle_being_loaded = -1;
                     }
                     else
                         backdrops[i].loaded = true;
