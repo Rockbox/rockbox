@@ -55,6 +55,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  138
 #define LCD_HEIGHT 110
+/* sqrt(138^2 + 110^2) / 1.7 = 105.7 */
+#define LCD_DPI 106
 #define LCD_DEPTH  2   /* 4 colours - 2bpp */
 
 #define LCD_PIXELFORMAT HORIZONTAL_PACKING

@@ -44,6 +44,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 128
+/* sqrt(128^2 + 128^2) / 1.8 = 100.6 */
+#define LCD_DPI 101
 /* The LCD used is just rgb444, 64 colours. We do a bit conversion on LCD
  * drivers. */
 #define LCD_DEPTH  16   /* 65536 colours */

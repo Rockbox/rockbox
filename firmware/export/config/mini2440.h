@@ -59,6 +59,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  240
 #define LCD_HEIGHT 320
+/* sqrt(240^2 + 320^2) / 3.5 = 114.3 */
+#define LCD_DPI 114
 #define LCD_DPI    114  /* 400 pixels diagonally / 3.5 inch */
 /* The LCD is configured for RGB565 */
 #define LCD_DEPTH  16          /* 65536 colours */

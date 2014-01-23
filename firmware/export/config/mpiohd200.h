@@ -53,6 +53,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 128
+/* sqrt(128^2 + 128^2) / 1.6 = 113.1 */
+#define LCD_DPI 113
 #define LCD_DEPTH  2
 
 #define LCD_PIXELFORMAT VERTICAL_INTERLEAVED

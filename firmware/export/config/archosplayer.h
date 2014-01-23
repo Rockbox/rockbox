@@ -11,6 +11,8 @@
 
 #define LCD_WIDTH  11
 #define LCD_HEIGHT  2
+/* sqrt(11^2 + 2^2) / 1.5 = 7.5 */
+#define LCD_DPI 7
 #define LCD_DEPTH   1
 #define SIM_LCD_WIDTH  132 /* pixels */
 #define SIM_LCD_HEIGHT  64 /* pixels */

@@ -42,6 +42,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64
+/* sqrt(128^2 + 64^2) / 1.8 = 79.5 */
+#define LCD_DPI 80
 #define LCD_DEPTH  1
 
 #define LCD_PIXELFORMAT VERTICAL_PACKING
