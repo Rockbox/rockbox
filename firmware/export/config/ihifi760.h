@@ -67,6 +67,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  320
 #define LCD_HEIGHT 240
+/* sqrt(320^2 + 240^2) / 2.4 = 166.7 */
+#define LCD_DPI 167
 #define LCD_DEPTH  16   /* pseudo 262.144 colors */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 

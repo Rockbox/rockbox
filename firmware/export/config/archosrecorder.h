@@ -31,6 +31,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  112
 #define LCD_HEIGHT 64
+/* sqrt(112^2 + 64^2) / 1.5 = 85.4 */
+#define LCD_DPI 85
 #define LCD_DEPTH  1
 
 #define LCD_PIXEL_ASPECT_WIDTH 4

@@ -44,6 +44,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  240
 #define LCD_HEIGHT 320
+/* sqrt(240^2 + 320^2) / 2.6 = 153.8 */
+#define LCD_DPI 154
 
 #define LCD_DEPTH  16
 /* Check that but should not matter */
