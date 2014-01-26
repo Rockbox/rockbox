@@ -354,7 +354,7 @@ void lcd_clear_display(void)
     int x, y;
     struct viewport* old_vp = current_vp;
 
-    lcd_scroll_info.lines = 0;
+    lcd_scroll_stop();
     lcd_remove_cursor();
 
     /* Set the default viewport - required for lcd_putxchar */
@@ -578,6 +578,10 @@ bool lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
 
 static void lcd_scroll_fn(struct scrollinfo* s)
 {
+    /* with line == NULL when scrolling stops. This scroller
+     * maintains no userdata so there is nothing left to do */
+    if (!s->line)
+        return;
     lcd_putsxyofs(s->x, s->y, s->offset, s->line);
     if (lcd_cursor.enabled)
     {
