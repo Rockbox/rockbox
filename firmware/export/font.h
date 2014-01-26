@@ -107,6 +107,7 @@ struct font {
     unsigned char *buffer_position; /* position in the buffer */    
     unsigned char *buffer_end;      /* end of the buffer */
     size_t         buffer_size;     /* size of the buffer in bytes */
+    bool         disabled;        /* font disabled (use blank as fallback if not in cache) */
 #ifndef __PCTOOL__    
     struct font_cache cache;
     uint32_t file_width_offset;    /* offset to file width data    */
