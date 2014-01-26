@@ -38,7 +38,7 @@ $(FIRMLIB): $(FIRMLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-$(BUILDDIR)/sysfont.h: $(SYSFONT) $(TOOLS)
+$(BUILDDIR)/sysfont.h: $(SYSFONT) $(TOOLS) $(BUILDDIR)/firmware/common/config.o
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -h -o $@ $<
 
 $(BUILDDIR)/sysfont.o: $(SYSFONT) $(BUILDDIR)/sysfont.h
