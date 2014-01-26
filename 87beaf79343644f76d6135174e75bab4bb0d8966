@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ab29df4_da190124",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/button-ypr1.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-26T16:24:02Z",
+      "side": 1,
+      "message": "I didnt meant to say \"move it out of the function\" but \"it shouldnt be static but an automatic (on stack) variable\".",
+      "revId": "87beaf79343644f76d6135174e75bab4bb0d8966",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_fa16c5f0",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-26T16:24:02Z",
+      "side": 1,
+      "message": "No typedef here. brace on the next line too.",
+      "revId": "87beaf79343644f76d6135174e75bab4bb0d8966",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_1ad37939",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/mcs5000.h",
+        "patchSetId": 17
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-26T16:24:02Z",
+      "side": 1,
+      "message": "brace on next line.",
+      "revId": "87beaf79343644f76d6135174e75bab4bb0d8966",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_3ad83d53",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/pmu-ypr1.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-26T16:24:02Z",
+      "side": 1,
+      "message": "Could be panic instead or is there a legitimate reason for this to fail?",
+      "revId": "87beaf79343644f76d6135174e75bab4bb0d8966",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_5addf141",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/powermgmt-ypr1.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-26T16:24:02Z",
+      "side": 1,
+      "message": "See Andrews comment: \"This could be done without floating point arithmetic.\nint step \u003d (ret.reg1 \u003c\u003c 4) | (ret.reg2 \u003e\u003e 4);\nlevel \u003d step + (step \u003e\u003e 2);\"",
+      "revId": "87beaf79343644f76d6135174e75bab4bb0d8966",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ab29df4_7ae2b504",
+        "filename": "firmware/target/hosted/samsungypr/ypr1/wmcodec-ypr1.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-01-26T16:24:02Z",
+      "side": 1,
+      "message": "No { } for single-statement if",
+      "revId": "87beaf79343644f76d6135174e75bab4bb0d8966",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
