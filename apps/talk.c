@@ -208,31 +208,47 @@ static int move_callback(int handle, void *current, void *new)
     return BUFLIB_CB_OK;
 }
 
-static int shrink_callback(int handle, unsigned hints, void *start, size_t old_size)
+static int clip_shrink_callback(int handle, unsigned hints, void *start, size_t old_size)
 {
     (void)start;(void)old_size;
-    int *h;
-    if (handle == talk_handle)
-        h = &talk_handle;
-    else // if (handle == thumb_handle)
-        h = &thumb_handle;
 
     if (LIKELY(!talk_handle_locked)
             && give_buffer_away
             && (hints & BUFLIB_SHRINK_POS_MASK) == BUFLIB_SHRINK_POS_MASK)
     {
-        *h = core_free(handle);
+        talk_handle = core_free(handle);
         return BUFLIB_CB_OK;
     }
     return BUFLIB_CB_CANNOT_SHRINK;
 }
 
-static struct buflib_callbacks talk_ops = {
+static int thumb_shrink_callback(int handle, unsigned hints, void *start, size_t old_size)
+{
+    (void)start;(void)old_size;(void)hints;
+
+    /* be generous about the thumbnail buffer unless currently used */
+    if (LIKELY(!talk_handle_locked) && thumbnail_buf_used == 0)
+    {
+        thumb_handle = core_free(handle);
+        return BUFLIB_CB_OK;
+    }
+    return BUFLIB_CB_CANNOT_SHRINK;
+}
+
+static struct buflib_callbacks clip_ops = {
     .move_callback = move_callback,
 #if CONFIG_CODEC != SWCODEC
     .sync_callback = sync_callback,
 #endif
-    .shrink_callback = shrink_callback,
+    .shrink_callback = clip_shrink_callback,
+};
+
+static struct buflib_callbacks thumb_ops = {
+    .move_callback = move_callback,
+#if CONFIG_CODEC != SWCODEC
+    .sync_callback = sync_callback,
+#endif
+    .shrink_callback = thumb_shrink_callback,
 };
 
 
@@ -458,7 +474,7 @@ static bool load_data(int fd, ssize_t size_to_read)
     if (size_to_read < 0)
         return false;
 
-    talk_handle = core_alloc_ex("voice data", size_to_read, &talk_ops);
+    talk_handle = core_alloc_ex("voice data", size_to_read, &clip_ops);
     if (talk_handle < 0)
         return false;
 
@@ -484,16 +500,16 @@ static bool alloc_thumbnail_buf(void)
     /* try to allocate the max. first, and take whatever we can get if that
      * fails */
     size = MAX_THUMBNAIL_BUFSIZE;
-    handle = core_alloc_ex("voice thumb", MAX_THUMBNAIL_BUFSIZE, &talk_ops);
+    handle = core_alloc_ex("voice thumb", MAX_THUMBNAIL_BUFSIZE, &thumb_ops);
     if (handle < 0)
     {
         size = core_allocatable();
-        handle = core_alloc_ex("voice thumb", size, &talk_ops);
+        handle = core_alloc_ex("voice thumb", size, &thumb_ops);
     }
 #else
     /* on HWCODEC, just use the rest of the remaining buffer,
      * normal playback cannot happen anyway */
-    handle = core_alloc_maximum("voice thumb", &size, &talk_ops);
+    handle = core_alloc_maximum("voice thumb", &size, &thumb_ops);
 #endif
     thumb_handle = handle;
     size_for_thumbnail = (handle > 0) ? size : 0;
@@ -530,7 +546,7 @@ static bool load_voicefile_data(int fd, size_t max_size)
 #ifdef TALK_PARTIAL_LOAD
     (void)fd;
     /* just allocate, populate on an as-needed basis later */
-    talk_handle = core_alloc_ex("voice data", max_size, &talk_ops);
+    talk_handle = core_alloc_ex("voice data", max_size, &clip_ops);
     if (talk_handle < 0)
         goto load_err_free;
 #else
@@ -875,11 +891,6 @@ bool talk_voice_required(void)
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
 void talk_buffer_set_policy(int policy)
 {
-#if CONFIG_CODEC != SWCODEC
-    /* always grab the voice buffer for now */
-    (void) policy;
-    give_buffer_away = true;
-#else
     switch(policy)
     {
         case TALK_BUFFER_DEFAULT:
@@ -887,7 +898,6 @@ void talk_buffer_set_policy(int policy)
         case TALK_BUFFER_LOOSE: give_buffer_away = true;             break;
         default:           DEBUGF("Ignoring unknown policy\n"); break;
     }
-#endif
 }
 
 /* play a voice ID from voicefile */

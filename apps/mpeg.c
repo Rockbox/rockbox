@@ -2989,7 +2989,6 @@ void audio_init(void)
 {
     mpeg_errno = 0;
 
-    talk_init();
     audio_reset_buffer();
 
 #ifndef SIMULATOR
@@ -3008,6 +3007,8 @@ void audio_init(void)
     else
         or_b(0x08, &PADRH);
 #endif /* CONFIG_CODEC == MAS3587F */
+
+    talk_init();
 
 #ifdef DEBUG
 #ifndef SIMULATOR
