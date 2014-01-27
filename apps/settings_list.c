@@ -1733,7 +1733,7 @@ const struct settings_list settings[] = {
 #else /* !HAVE_LCD_BITMAP */
                    /* The order must match with that in unicode.c */
                    "iso8859-1,iso8859-7,cp1251,iso8859-9,iso8859-2,cp1250,cp1252,utf-8",
-                   set_codepage, 7,
+                   set_codepage, 8,
                    ID2P(LANG_CODEPAGE_LATIN1), ID2P(LANG_CODEPAGE_GREEK),
                    ID2P(LANG_CODEPAGE_CYRILLIC), ID2P(LANG_CODEPAGE_TURKISH),
                    ID2P(LANG_CODEPAGE_LATIN_EXTENDED),
