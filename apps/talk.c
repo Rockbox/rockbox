@@ -908,12 +908,14 @@ int talk_id(int32_t id, bool enqueue)
     int32_t unit;
     int decimals;
 
+    if (!has_voicefile)
+        return 0; /* no voicefile loaded, not an error -> pretent success */
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
     if (!check_audio_status())
         return -1;
 
-    if (has_voicefile && (talk_handle <= 0 || index_handle <= 0)) /* reload needed? */
+    if (talk_handle <= 0 || index_handle <= 0) /* reload needed? */
     {
         int fd = open_voicefile();
         if (fd < 0
