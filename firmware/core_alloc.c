@@ -19,7 +19,7 @@ extern unsigned char audiobufend[];
 /* defined in linker script */
 extern unsigned char audiobuffer[];
 #else /* PLATFORM_HOSTED */
-unsigned char audiobuffer[(MEMORYSIZE*1024-256)*1024];
+unsigned char audiobuffer[((MEMORYSIZE)*1024-768)*1024];
 unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
 extern unsigned char *audiobufend;
 #endif
