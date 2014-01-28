@@ -170,10 +170,6 @@ void INIT_ATTR audio_init(void)
     recording_init();
 #endif
 
-    /* ...now...audio_reset_buffer must know the size of voicefile buffer so
-       init talk first which will init the buffers */
-    talk_init();
-
    /* Probably safe to say */
     audio_is_initialized = true;
 

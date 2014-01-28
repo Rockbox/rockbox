@@ -971,10 +971,10 @@ void settings_apply(bool read_disk)
             CHART(">lang_core_load");
             lang_core_load(buf);
             CHART("<lang_core_load");
-            CHART(">talk_init");
-            talk_init(); /* use voice of same language */
-            CHART("<talk_init");
         }
+        CHART(">talk_init");
+        talk_init(); /* use voice of same language */
+        CHART("<talk_init");
 
         /* load the icon set */
         CHART(">icons_init");

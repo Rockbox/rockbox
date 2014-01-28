@@ -3008,8 +3008,6 @@ void audio_init(void)
         or_b(0x08, &PADRH);
 #endif /* CONFIG_CODEC == MAS3587F */
 
-    talk_init();
-
 #ifdef DEBUG
 #ifndef SIMULATOR
     dbg_timer_start();
