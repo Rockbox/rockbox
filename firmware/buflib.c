@@ -55,6 +55,8 @@
  * to find the start of the character array (and therefore the start of the
  * entire block) when only the handle or payload start is known.
  *
+ * UPDATE BUFLIB_ALLOC_OVERHEAD (buflib.h) WHEN THIS COOKIE CHANGES!
+ *
  * Example:
  * |<- alloc block #1 ->|<- unalloc block ->|<- alloc block #2      ->|<-handle table->|
  * |L|H|C|cccc|L2|crc|XXXXXX|-L|YYYYYYYYYYYYYYYY|L|H|C|cc|L2|crc|XXXXXXXXXXXXX|AAA|
