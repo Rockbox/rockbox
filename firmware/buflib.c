@@ -25,6 +25,7 @@
 *
 ****************************************************************************/
 
+#include <stdarg.h>
 #include <stdlib.h> /* for abs() */
 #include <stdio.h> /* for snprintf() */
 #include <stddef.h> /* for ptrdiff_t */
@@ -92,6 +93,8 @@
     #define BDEBUGF(...) do { } while(0)
 #endif
 
+#define BPANICF panicf
+
 #define IS_MOVABLE(a) (!a[2].ops || a[2].ops->move_callback)
 static union buflib_data* find_first_free(struct buflib_context *ctx);
 static union buflib_data* find_block_before(struct buflib_context *ctx,
@@ -145,6 +148,19 @@ bool buflib_context_relocate(struct buflib_context *ctx, void *buf)
     ctx->alloc_end          += diff;
 
     return true;
+}
+
+static void buflib_panic(struct buflib_context *ctx, const char *message, ...)
+{
+    char buf[128];
+    va_list ap;
+
+    va_start(ap, message);
+    vsnprintf(buf, sizeof(buf), message, ap);
+    va_end(ap);
+
+    BPANICF("buflib error (CTX:%p, %zd bytes):\n%s", ctx,
+        (ctx->handle_table - ctx->buf_start) * sizeof(union buflib_data), buf);
 }
 
 /* Allocate a new handle, returning 0 on failure */
@@ -235,7 +251,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
 
     /* check for cookie validity */
     if (crc != crc_slot->crc)
-        panicf("buflib cookie corrupted, crc: 0x%08x, expected: 0x%08x",
+        buflib_panic(ctx, "buflib cookie corrupted, crc: 0x%08x, expected: 0x%08x",
                (unsigned int)crc, (unsigned int)crc_slot->crc);
 
     if (!IS_MOVABLE(block))
@@ -901,7 +917,7 @@ void buflib_check_valid(struct buflib_context *ctx)
         crc = crc_32((void *)this, cookie_size, 0xffffffff);
 
         if (crc != crc_slot->crc)
-            panicf("buflib check crc: 0x%08x, expected: 0x%08x",
+            buflib_panic(ctx, "crc mismatch: 0x%08x, expected: 0x%08x",
                    (unsigned int)crc, (unsigned int)crc_slot->crc);
     }
 }
