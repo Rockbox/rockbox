@@ -237,10 +237,14 @@ int buflib_alloc_maximum(struct buflib_context* ctx, const char* name,
  *
  * Returns: The start pointer of the allocation
  */
-static inline void* buflib_get_data(struct buflib_context *context, int handle)
+#ifdef DEBUG
+void* buflib_get_data(struct buflib_context *ctx, int handle);
+#else
+static inline void* buflib_get_data(struct buflib_context *ctx, int handle)
 {
-    return (void*)(context->handle_table[-handle].alloc);
+    return (void*)(ctx->handle_table[-handle].alloc);
 }
+#endif
 
 /**
  * Shrink the memory allocation associated with the given handle

@@ -898,6 +898,15 @@ const char* buflib_get_name(struct buflib_context *ctx, int handle)
 }
 
 #ifdef DEBUG
+
+void *buflib_get_data(struct buflib_context *ctx, int handle)
+{
+    if (handle <= 0)
+        buflib_panic(ctx, "invalid handle access: %d", handle);
+
+    return (void*)(ctx->handle_table[-handle].alloc);
+}
+
 void buflib_check_valid(struct buflib_context *ctx)
 {
     union buflib_data *crc_slot;
