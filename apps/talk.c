@@ -210,11 +210,20 @@ static int move_callback(int handle, void *current, void *new)
 
 static int clip_shrink_callback(int handle, unsigned hints, void *start, size_t old_size)
 {
-    (void)start;(void)old_size;
+    (void)start;(void)old_size;(void)hints;
 
+#if (!defined(TALK_PARTIAL_LOAD) || (MEMORYSIZE > 2))
+    /* on low-mem and when the voice buffer size is not limited (i.e.
+     * on 2MB HWCODEC) we effectively own the entire buffer because
+     * the voicefile takes up all RAM. This blocks other Rockbox parts
+     * from allocating, especially during bootup. Therefore always give
+     * up the buffer and reload when clips are played back. On high-mem
+     * or when the clip buffer is limited to a few 100K this provision is
+     * not necessary. */
     if (LIKELY(!talk_handle_locked)
             && give_buffer_away
             && (hints & BUFLIB_SHRINK_POS_MASK) == BUFLIB_SHRINK_POS_MASK)
+#endif
     {
         talk_handle = core_free(handle);
         return BUFLIB_CB_OK;
