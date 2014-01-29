@@ -196,6 +196,14 @@ static int sdl_event_thread(void * param)
     return 0;
 }
 
+static bool quitting;
+
+void sdl_sys_quit(void)
+{
+    quitting = true;
+    sys_poweroff();
+}
+
 void power_off(void)
 {
     /* Shut down SDL event loop */
@@ -270,6 +278,11 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
+    if (evt_thread)
+    {
+        while (!quitting)
+            SDL_Delay(10);
+    }
     system_reboot();
 }
 

@@ -278,7 +278,7 @@ static bool event_handler(SDL_Event *event)
     }
     case SDL_QUIT:
         /* Will post SDL_USEREVENT in shutdown_hw() if successful. */
-        sys_poweroff();
+        sdl_sys_quit();
         break;
     case SDL_USEREVENT:
         return true;

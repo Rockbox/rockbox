@@ -56,6 +56,7 @@ void sys_poweroff(void);
 void sys_handle_argv(int argc, char *argv[]);
 void gui_message_loop(void);
 void sim_do_exit(void) NORETURN_ATTR;
+void sdl_sys_quit(void);
 
 extern bool background;  /* True if the background image is enabled */
 extern bool showremote;
