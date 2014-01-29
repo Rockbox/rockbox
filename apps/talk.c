@@ -797,6 +797,16 @@ static void queue_clip(unsigned long clip_offset, long size, bool enqueue)
     return;
 }
 
+#if CONFIG_CODEC == SWCODEC
+/* return if a voice codec is required or not */
+static bool talk_voice_required(void)
+{
+    return (has_voicefile) /* Voice file is available */
+        || (global_settings.talk_dir_clip)  /* Thumbnail clips are required */
+        || (global_settings.talk_file_clip);
+}
+#endif
+
 /***************** Public implementation *****************/
 
 void talk_init(void)
@@ -877,25 +887,15 @@ void talk_init(void)
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    /* Safe to init voice playback engine now since we now know if talk is
-       required or not */
-    voice_thread_init();
+    /* Initialize the actual voice clip playback engine as well */
+    if (talk_voice_required())
+        voice_thread_init();
 #endif
 
 out:
     close(filehandle); /* close again, this was just to detect presence */
     filehandle = -1;
 }
-
-#if CONFIG_CODEC == SWCODEC
-/* return if a voice codec is required or not */
-bool talk_voice_required(void)
-{
-    return (has_voicefile) /* Voice file is available */
-        || (global_settings.talk_dir_clip)  /* Thumbnail clips are required */
-        || (global_settings.talk_file_clip);
-}
-#endif
 
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
 void talk_buffer_set_policy(int policy)

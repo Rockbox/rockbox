@@ -526,12 +526,6 @@ void voice_thread_init(void)
     if (voice_thread_id != 0)
         return; /* Already did an init and succeeded at it */
 
-    if (!talk_voice_required())
-    {
-        logf("No voice required");
-        return;
-    }
-
     voice_buf_hid = core_alloc_ex("voice buf", sizeof (*voice_buf), &ops);
 
     if (voice_buf_hid <= 0)

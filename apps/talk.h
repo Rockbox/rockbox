@@ -96,9 +96,6 @@ extern const char* const dir_thumbnail_name; /* "_dirname.talk" */
 extern const char* const file_thumbnail_ext; /* ".talk" for file voicing */
 
 void talk_init(void);
-#if CONFIG_CODEC == SWCODEC
-bool talk_voice_required(void); /* returns true if voice codec required */
-#endif
 int talk_get_bufsize(void); /* get the loaded voice file size */
 size_t talkbuf_init(char* bufstart);
 bool is_voice_queued(void); /* Are there more voice clips to be spoken? */
