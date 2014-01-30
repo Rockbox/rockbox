@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define VERSION "v0.1"
 
@@ -190,7 +191,7 @@ static int get_sense(libusb_device_handle *hdev)
 {
     struct CBWCB_t cbwcb;
     unsigned char sense[0x12];
-    int size, ret;
+    int size;
     uint32_t reftag;
 
     memset(&cbwcb, 0, sizeof(cbwcb));
@@ -199,7 +200,7 @@ static int get_sense(libusb_device_handle *hdev)
     cbwcb.LBA = 0;
     cbwcb.cbLen = 0x12;
 
-    ret = send_msc_cmd(hdev, &cbwcb, 0x12, &reftag);
+    send_msc_cmd(hdev, &cbwcb, 0x12, &reftag);
     libusb_bulk_transfer(hdev, IN_EP, (unsigned char*)&sense, 0x12, &size, USB_TIMEOUT);
 
     return get_msc_csw(hdev, reftag);
@@ -213,14 +214,17 @@ static void usage(void)
     printf("-d|--dfu          Put device into DFU mode\n");
     printf("-s|--sysdisk      Open system disk\n");
     printf("-c|--checkusb     Check if dev is in System or Loader USB mode\n");
+    printf("-u|--usb <p>:<v>  Override device PID and PIVD\n");
 }
 
 int main (int argc, char **argv)
 {
     libusb_device_handle *hdev;
     int ret;
-    int i = 0, action = NONE;
+    int i = 1, action = NONE;
     uint32_t ver[3];
+    uint16_t pid = PRODUCTID;
+    uint16_t vid = VENDORID;
 
     if (argc < 2)
     {
@@ -253,10 +257,44 @@ int main (int argc, char **argv)
         {
             action |= CHECKUSB;
         }
-        else if ((strcmp(argv[i],"-h")==0) || (strcmp(argv[i],"--help")==0))
+        else if ((strcmp(argv[i],"-u")==0) || (strcmp(argv[i],"--usb")==0))
+        {
+            if (i + 1 == argc)
+            {
+                fprintf(stderr,"Missing argument for USB IDs\n");
+                return -1;
+            }
+            char *svid = argv[i + 1];
+            char *spid = strchr(svid, ':');
+            if(svid == NULL)
+            {
+                fprintf(stderr,"Invalid argument for USB IDs (missing ':')\n");
+                return -2;
+            }
+            char *end;
+            vid = strtoul(svid, &end, 0);
+            if(*end != ':')
+            {
+                fprintf(stderr,"Invalid argument for USB VID\n");
+                return -3;
+            }
+            pid = strtoul(spid + 1, &end, 0);
+            if(*end)
+            {
+                fprintf(stderr,"Invalid argument for USB PID\n");
+                return -4;
+            }
+            i++;
+        }
+        else if((strcmp(argv[i],"-h")==0) || (strcmp(argv[i],"--help")==0))
         {
             usage();
             return 0;
+        }
+        else
+        {
+            fprintf(stderr,"Unknown argument '%s'\n", argv[i]);
+            return -5;
         }
         i++;
     }
@@ -265,7 +303,7 @@ int main (int argc, char **argv)
     libusb_init(NULL);
     /* usb_set_debug(2); */
 
-    hdev = libusb_open_device_with_vid_pid(NULL, VENDORID, PRODUCTID);
+    hdev = libusb_open_device_with_vid_pid(NULL, vid, pid);
     if (hdev == NULL)
     {
         printf("error: can't open device\n");

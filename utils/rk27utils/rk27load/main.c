@@ -91,6 +91,12 @@ int main(int argc, char **argv)
         }
     }
 
+    if(filenames[0] == NULL || filenames[1] == NULL || filenames[2] == NULL)
+    {
+        usage(argv[0]);
+        return -5;
+    }
+
  
     fprintf(stderr,"rk27load " VERSION "\n");
     fprintf(stderr,"(C) Marcin Bukat 2011\n");
