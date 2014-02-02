@@ -23,6 +23,7 @@
 
 #include "system.h"
 #include "cpu.h"
+#include "icoll-imx233.h"
 
 #include "regs/regs-timrot.h"
 
@@ -48,6 +49,7 @@ typedef void (*imx233_timer_fn_t)(void);
 void imx233_timrot_init(void);
 void imx233_timrot_setup(unsigned timer_nr, bool reload, unsigned count,
     unsigned src, unsigned prescale, bool polarity, imx233_timer_fn_t fn);
+void imx233_timrot_set_priority(unsigned timer_nr, unsigned prio);
 struct imx233_timrot_info_t imx233_timrot_get_info(unsigned timer_nr);
 
 #endif /* TIMROT_IMX233_H */

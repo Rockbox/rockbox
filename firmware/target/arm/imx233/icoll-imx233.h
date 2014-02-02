@@ -78,6 +78,12 @@
 #define BM_ICOLL_PRIORITYn_SOFTIRQx(x)  (1 << (3 + 8 * (x)))
 #endif
 
+/* Interrupt priorities for typical tasks */
+#define ICOLL_PRIO_NORMAL   0
+#define ICOLL_PRIO_AUDIO    1
+#define ICOLL_PRIO_DPC      2
+#define ICOLL_PRIO_WATCHDOG 3
+
 struct imx233_icoll_irq_info_t
 {
     bool enabled;

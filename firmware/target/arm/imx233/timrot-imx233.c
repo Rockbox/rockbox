@@ -55,6 +55,11 @@ void imx233_timrot_setup(unsigned timer_nr, bool reload, unsigned count,
     restore_interrupt(oldstatus);
 }
 
+void imx233_timrot_set_priority(unsigned timer_nr, unsigned prio)
+{
+    imx233_icoll_set_priority(INT_SRC_TIMER(timer_nr), prio);
+}
+
 struct imx233_timrot_info_t imx233_timrot_get_info(unsigned timer_nr)
 {
     struct imx233_timrot_info_t info;
