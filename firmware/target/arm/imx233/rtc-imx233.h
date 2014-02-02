@@ -37,11 +37,6 @@ struct imx233_rtc_info_t
     bool alarm_en, alarm_wake_en, alarm_wake, alarm_irq;
 };
 
-static inline void imx233_rtc_init(void)
-{
-    BF_CLR(RTC_CTRL, CLKGATE);
-}
-
 static inline uint32_t imx233_rtc_read_seconds(void)
 {
     return HW_RTC_SECONDS;
@@ -69,6 +64,25 @@ static inline void imx233_rtc_enable_msec_irq(bool enable)
 static inline uint32_t imx233_rtc_read_alarm(void)
 {
     return HW_RTC_ALARM;
+}
+
+static inline void imx233_rtc_enable_watchdog(bool en)
+{
+    if(en)
+        BF_SET(RTC_CTRL, WATCHDOGEN);
+    else
+        BF_CLR(RTC_CTRL, WATCHDOGEN);
+}
+
+static inline void imx233_rtc_reset_watchdog(uint32_t ms)
+{
+    HW_RTC_WATCHDOG = ms;
+}
+
+static inline void imx233_rtc_init(void)
+{
+    BF_CLR(RTC_CTRL, CLKGATE);
+    imx233_rtc_enable_watchdog(false);
 }
 
 void imx233_rtc_write_seconds(uint32_t seconds);
