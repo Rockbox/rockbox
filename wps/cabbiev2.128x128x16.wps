@@ -48,7 +48,7 @@
 %?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
 #
 # Next Track Info
-%V(3,70,122,12,-)
+%V(3,73,122,12,-)
 %s%ac%Sx(Next:) %?It<%It|%Fn>
 #
 # Time Elapsed/Remaining
