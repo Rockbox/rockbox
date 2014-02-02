@@ -32,6 +32,7 @@ enum
 {
     TIMER_TICK, /* for tick task */
     TIMER_USER, /* for user timer */
+    TIMER_WATCHDOG, /* for watchdog */
 };
 
 struct imx233_timrot_info_t

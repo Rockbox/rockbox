@@ -146,6 +146,7 @@ struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 
 static void do_irq_stat(void)
 {
+    imx233_keep_alive();
     static unsigned counter = 0;
     if(counter++ >= HZ)
     {
@@ -180,6 +181,8 @@ void irq_handler(void)
     asm volatile(
         "sub    lr, lr, #4               \n" /* Create return address */
         "stmfd  sp!, { r0-r5, r12, lr }  \n" /* Save what gets clobbered */
+        "ldr    r5, =0x8001c290          \n" /* Save pointer to instruction */
+        "str    lr, [r5]                 \n" /* in HW_DIGCTL_SCRATCH0 */
         "ldr    r4, =0x80000000          \n" /* Read HW_ICOLL_VECTOR  */
         "ldr    r0, [r4]                 \n" /* and notify as side-effect */
         "mrs    lr, spsr                 \n" /* Save SPSR_irq */

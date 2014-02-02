@@ -45,6 +45,55 @@
 #include "fmradio_i2c.h"
 #include "powermgmt-imx233.h"
 
+#define WATCHDOG_HW_DELAY   (10 * HZ)
+#define WATCHDOG_SW_DELAY   (5 * HZ)
+
+static void woof_woof(void)
+{
+    /* stop hadrware watchdog, we catched the error */
+    imx233_rtc_enable_watchdog(false);
+    uint32_t pc = HW_DIGCTL_SCRATCH0;
+    /* write a "SWI #0xdead" instruction at the faulty instruction so that it
+     * will trigger a proper backtrace */
+    *(uint32_t *)pc = 0xef00dead;
+    commit_discard_idcache();
+}
+
+static void good_dog(void)
+{
+    imx233_rtc_reset_watchdog(WATCHDOG_HW_DELAY * 1000 / HZ); /* ms */
+    imx233_rtc_enable_watchdog(true);
+    imx233_timrot_setup(TIMER_WATCHDOG, false, WATCHDOG_SW_DELAY * 1000 / HZ,
+        BV_TIMROT_TIMCTRLn_SELECT__1KHZ_XTAL, BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_1,
+        false, &woof_woof);
+    imx233_timrot_set_priority(TIMER_WATCHDOG, ICOLL_PRIO_WATCHDOG);
+}
+
+void imx233_keep_alive(void)
+{
+    /* setting up a timer is not exactly a cheap operation so only do so
+     * every second */
+    static uint32_t last_alive = 0;
+    if(imx233_us_elapsed(last_alive, 1000000))
+    {
+        good_dog();
+        last_alive = HW_DIGCTL_MICROSECONDS;
+    }
+}
+
+static void watchdog_init(void)
+{
+    /* setup two mechanisms:
+     * - hardware watchdog to reset the player after 10 seconds
+     * - software watchdog using a timer to panic after 5 seconds
+     * The hardware mechanism ensures reset when the player is completely
+     * dead and it actually resets the whole chip. On the contrary, the software
+     * mechanism allows partial recovery by panicing and printing (maybe) useful
+     * information, it uses a dedicated timer with the highest level of interrupt
+     * priority so it works even if the player is stuck in IRQ context */
+    good_dog();
+}
+
 void imx233_chip_reset(void)
 {
 #if IMX233_SUBTARGET >= 3700
@@ -60,7 +109,6 @@ void system_reboot(void)
 
     disable_irq();
 
-    /* use watchdog to reset */
     imx233_chip_reset();
     while(1);
 }
@@ -134,6 +182,8 @@ void system_init(void)
     imx233_power_init();
     imx233_i2c_init();
     imx233_powermgmt_init();
+    /* setup watchdog */
+    watchdog_init();
 
     /* make sure auto-slow is disable now, we don't know at which frequency we
      * are running and auto-slow could violate constraints on {xbus,hbus} */

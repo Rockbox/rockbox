@@ -68,4 +68,7 @@ void usb_remove_int(void);
 
 bool dbg_hw_target_info(void);
 
+/* for watchdog */
+void imx233_keep_alive(void);
+
 #endif /* SYSTEM_TARGET_H */
