@@ -37,6 +37,7 @@
 #include "emi-imx233.h"
 #include "audioin-imx233.h"
 #include "audioout-imx233.h"
+#include "timrot-imx233.h"
 #include "string.h"
 #include "stdio.h"
 #include "button.h"
@@ -872,6 +873,87 @@ bool dbg_hw_info_audio(void)
     }
 }
 
+bool dbg_hw_info_timrot(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        switch(button)
+        {
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACT_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        int line = 0;
+        for(int i = 0; i < 4; i++)
+        {
+            struct imx233_timrot_info_t info = imx233_timrot_get_info(i);
+            const char *unit = NULL;
+            const char *unit_prefix = "";
+            int src_freq = 1;
+            switch(info.src)
+            {
+                case BV_TIMROT_TIMCTRLn_SELECT__NEVER_TICK: src_freq = 0; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__PWM0: unit = "PWM0"; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__PWM1: unit = "PWM1"; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__PWM2: unit = "PWM2"; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__PWM3: unit = "PWM3"; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__PWM4: unit = "PWM4"; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__ROTARYA: unit = "ROTA"; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__ROTARYB: unit = "ROTB"; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__32KHZ_XTAL: src_freq = 32000; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__8KHZ_XTAL: src_freq = 8000; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__4KHZ_XTAL: src_freq = 4000; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__1KHZ_XTAL: src_freq = 1000; break;
+                case BV_TIMROT_TIMCTRLn_SELECT__TICK_ALWAYS: 
+                default: src_freq = 24000000 / (1 << info.prescale); break;
+            }
+            int count = info.reload ? info.fixed_count + 1 : info.run_count;
+            if(src_freq == 0 || count == 0)
+                continue;
+            unsigned long long freq;
+            if(info.reload)
+                freq = (unsigned long long)src_freq * 1000 / count;
+            else
+                freq = count * 1000 / src_freq;
+
+            if(freq >= 1000000000)
+            {
+                unit_prefix = "M";
+                freq /= 1000000;
+            }
+            else if(freq >= 1000000)
+            {
+                unit_prefix = "k";
+                freq /= 1000;
+            }
+            char str[32];
+            if(freq % 1000)
+                snprintf(str, sizeof(str), "%lu.%lu", (unsigned long)freq / 1000, (unsigned long)freq % 1000);
+            else
+                snprintf(str, sizeof(str), "%lu", (unsigned long)freq / 1000);
+            char str2[32];
+            if(unit)
+                snprintf(str2, sizeof(str2), "%s%s(%s)", unit_prefix, info.reload ? "H" : "", unit);
+            else
+                snprintf(str2, sizeof(str2), "%s%s", unit_prefix, info.reload ? "Hz" : "s");
+            lcd_putsf(0, line++, "%ctimer %d: %s %s", info.polarity ? '+' : '-', i, str, str2);
+        }
+
+        lcd_update();
+        yield();
+    }
+}
+
 static struct
 {
     const char *name;
@@ -892,6 +974,7 @@ static struct
     {"usb", dbg_hw_info_usb},
     {"emi", dbg_hw_info_emi},
     {"audio", dbg_hw_info_audio},
+    {"timrot", dbg_hw_info_timrot},
     {"target", dbg_hw_target_info},
 };
 
