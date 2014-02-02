@@ -132,11 +132,12 @@ remap:
 
     /* Set up stack for FIQ mode */ 
     msr     cpsr_c, #0xd1
-    ldr     sp, =fiq_stack
-
-    /* Let svc, abort and undefined modes use irq stack */
-    msr     cpsr_c, #0xd3
     ldr     sp, =irq_stack
+
+    /* Let abort and undefined modes use irq stack, svc uses its own stack
+     * for interrupt processing */
+    msr     cpsr_c, #0xd3
+    ldr     sp, =svc_stack
     msr     cpsr_c, #0xd7
     ldr     sp, =irq_stack
     msr     cpsr_c, #0xdb
@@ -161,11 +162,13 @@ remap:
 1:
     b       1b
 
+/* Cache-align interrupt stacks */
+    .balign    32
 /* 256 words of IRQ stack */
     .space 256*4
 irq_stack:
 
 /* 256 words of FIQ stack */
     .space 256*4
-fiq_stack:
+svc_stack:
 end:

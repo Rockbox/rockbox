@@ -29,7 +29,7 @@
     extern __attribute__((weak, alias("UIRQ"))) void name(void)
 
 static void UIRQ (void) __attribute__((interrupt ("IRQ")));
-void irq_handler(void) __attribute__((interrupt("IRQ")));
+void irq_handler(void) __attribute__((naked));
 void fiq_handler(void) __attribute__((interrupt("FIQ")));
 
 default_interrupt(INT_USB_CTRL);
@@ -161,17 +161,40 @@ static void UIRQ(void)
         (unsigned int)(HW_ICOLL_VECTOR - (uint32_t)isr_table) / 4);
 }
 
-void irq_handler(void)
+/* return the priority level */
+int _irq_handler(uint32_t vec)
 {
-    HW_ICOLL_VECTOR = HW_ICOLL_VECTOR; /* notify icoll that we entered ISR */
-    int irq_nr = (HW_ICOLL_VECTOR - HW_ICOLL_VBASE) / 4;
+    int irq_nr = (vec - HW_ICOLL_VBASE) / 4;
     if(irq_count[irq_nr]++ > IRQ_STORM_THRESHOLD)
         panicf("IRQ %d: storm detected", irq_nr);
     if(irq_nr == INT_SRC_TIMER(TIMER_TICK))
         do_irq_stat();
-    (*(isr_t *)HW_ICOLL_VECTOR)();
-    /* acknowledge completion of IRQ (all use the same priority 0) */
-    HW_ICOLL_LEVELACK = BV_ICOLL_LEVELACK_IRQLEVELACK__LEVEL0;
+    (*(isr_t *)vec)();
+    /* acknowledge completion of IRQ */
+    return imx233_icoll_get_irq_info(irq_nr).priority;
+}
+
+void irq_handler(void)
+{
+    /* save stuff */
+    asm volatile(
+        "sub    lr, lr, #4               \n" /* Create return address */
+        "stmfd  sp!, { r0-r5, r12, lr }  \n" /* Save what gets clobbered */
+        "ldr    r4, =0x80000000          \n" /* Read HW_ICOLL_VECTOR  */
+        "ldr    r0, [r4]                 \n" /* and notify as side-effect */
+        "mrs    lr, spsr                 \n" /* Save SPSR_irq */
+        "stmfd  sp!, { lr }              \n" /* Push it on the IRQ stack */
+        "msr    cpsr_c, #0x13            \n" /* Switch to SVC mode, enable IRQ */
+        "stmfd  sp!, { lr }              \n" /* Save lr_SVC */
+        "blx    _irq_handler             \n" /* Process IRQ, returns ack level */
+        "ldmfd  sp!, { lr }              \n" /* Restore lr_SVC */
+        "msr    cpsr_c, #0x92            \n" /* Mask IRQ, return to IRQ mode */
+        "ldmfd  sp!, { lr }              \n" /* Pop back SPSR */
+        "msr    spsr_cxsf, lr            \n" /* Restore SPSR_irq */
+        "mov    r3, #1                   \n" /* Compute ack level value */
+        "lsl    r0, r3, r0               \n" /* (1 << ack_lvl) */
+        "str    r0, [r4, #0x10]          \n" /* and write it to HW_ICOLL_LEVELACK */
+        "ldmfd  sp!, { r0-r5, r12, pc }^ \n" /* Restore regs, and RFE */);
 }
 
 void fiq_handler(void)
@@ -220,6 +243,8 @@ void imx233_icoll_set_priority(int src, unsigned prio)
 void imx233_icoll_init(void)
 {
     imx233_reset_block(&HW_ICOLL_CTRL);
+    /* enable read side-effect mode for nested interrupts */
+    BF_SET(ICOLL_CTRL, ARM_RSE_MODE);
     /* disable all interrupts */
     /* priority = 0, disable, disable fiq */
 #if IMX233_SUBTARGET >= 3780
