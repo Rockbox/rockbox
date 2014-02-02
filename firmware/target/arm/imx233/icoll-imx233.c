@@ -70,10 +70,14 @@ default_interrupt(INT_LCDIF_ERROR);
 /* STMP3780+ specific */
 #if IMX233_SUBTARGET >= 3780
 #endif
+default_interrupt(INT_SOFTWARE0);
+default_interrupt(INT_SOFTWARE1);
+default_interrupt(INT_SOFTWARE2);
+default_interrupt(INT_SOFTWARE3);
 
 typedef void (*isr_t)(void);
 
-static isr_t isr_table[INT_SRC_NR_SOURCES] =
+static isr_t isr_table[INT_SRC_COUNT] =
 {
     [INT_SRC_USB_CTRL] = INT_USB_CTRL,
     [INT_SRC_TIMER(0)] = INT_TIMER0,
@@ -111,13 +115,17 @@ static isr_t isr_table[INT_SRC_NR_SOURCES] =
 #endif
 #if IMX233_SUBTARGET >= 3780
 #endif
+    [INT_SRC_SOFTWARE(0)] = INT_SOFTWARE0,
+    [INT_SRC_SOFTWARE(1)] = INT_SOFTWARE1,
+    [INT_SRC_SOFTWARE(2)] = INT_SOFTWARE2,
+    [INT_SRC_SOFTWARE(3)] = INT_SOFTWARE3,
 };
 
 #define IRQ_STORM_DELAY         100 /* ms */
 #define IRQ_STORM_THRESHOLD     100000 /* allows irq / delay */
 
-static uint32_t irq_count_old[INT_SRC_NR_SOURCES];
-static uint32_t irq_count[INT_SRC_NR_SOURCES];
+static uint32_t irq_count_old[INT_SRC_COUNT];
+static uint32_t irq_count[INT_SRC_COUNT];
 
 struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 {
@@ -215,10 +223,10 @@ void imx233_icoll_init(void)
     /* disable all interrupts */
     /* priority = 0, disable, disable fiq */
 #if IMX233_SUBTARGET >= 3780
-    for(int i = 0; i < INT_SRC_NR_SOURCES; i++)
+    for(int i = 0; i < INT_SRC_COUNT; i++)
         HW_ICOLL_INTERRUPTn(i) = 0;
 #else
-    for(int i = 0; i < INT_SRC_NR_SOURCES / 4; i++)
+    for(int i = 0; i < INT_SRC_COUNT / 4; i++)
         HW_ICOLL_PRIORITYn(i) = 0;
 #endif
     /* setup vbase as isr_table */
@@ -226,4 +234,3 @@ void imx233_icoll_init(void)
     /* enable final irq bit */
     BF_SET(ICOLL_CTRL, IRQ_FINAL_ENABLE);
 }
-

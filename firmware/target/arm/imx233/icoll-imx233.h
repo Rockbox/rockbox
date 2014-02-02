@@ -44,7 +44,6 @@
 #define INT_SRC_TOUCH_DETECT    36
 #define INT_SRC_LRADC_CHx(x)    (37 + (x))
 #define INT_SRC_RTC_1MSEC   48
-#define INT_SRC_NR_SOURCES  64
 /* STMP3700+ specific */
 #if IMX233_SUBTARGET >= 3700
 #define INT_SRC_SSP2_ERROR  2
@@ -55,7 +54,18 @@
 #endif
 /* STMP3780+ specific */
 #if IMX233_SUBTARGET >= 3780
+#endif
 
+/* Software IRQ and IRQ count*/
+#if IMX233_SUBTARGET >= 3780
+#define INT_SRC_SOFTWARE(x) (66 + (x))
+#define INT_SRC_COUNT       128
+#elif IMX233_SUBTARGET >= 3700
+#define INT_SRC_SOFTWARE(x) (55 + (x))
+#define INT_SRC_COUNT       64
+#elif IMX233_SUBTARGET >= 3600
+#define INT_SRC_SOFTWARE(x) (60 + (x))
+#define INT_SRC_COUNT       64
 #endif
 
 /* helpers */
