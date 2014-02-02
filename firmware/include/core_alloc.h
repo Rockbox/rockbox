@@ -17,6 +17,7 @@ bool core_shrink(int handle, void* new_start, size_t new_size);
 int core_free(int handle);
 size_t core_available(void);
 size_t core_allocatable(void);
+const char* core_get_name(int handle);
 #ifdef DEBUG
 void core_check_valid(void);
 #endif
@@ -41,12 +42,6 @@ static inline void* core_get_data(int handle)
 {
     extern struct buflib_context core_ctx;
     return buflib_get_data(&core_ctx, handle);
-}
-
-static inline const char* core_get_name(int handle)
-{
-    extern struct buflib_context core_ctx;
-    return buflib_get_name(&core_ctx, handle);
 }
 
 #endif /* __CORE_ALLOC_H__ */

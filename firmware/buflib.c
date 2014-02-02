@@ -105,6 +105,8 @@ void
 buflib_init(struct buflib_context *ctx, void *buf, size_t size)
 {
     union buflib_data *bd_buf = buf;
+    BDEBUGF("buflib initialized with %lu.%02lu kiB",
+            (unsigned long)size / 1024, ((unsigned long)size%1000)/10);
 
     /* Align on sizeof(buflib_data), to prevent unaligned access */
     ALIGN_BUFFER(bd_buf, size, sizeof(union buflib_data));
@@ -119,9 +121,6 @@ buflib_init(struct buflib_context *ctx, void *buf, size_t size)
      */
     ctx->alloc_end = bd_buf;
     ctx->compact = true;
-
-    BDEBUGF("buflib initialized with %lu.%2lu kiB",
-            (unsigned long)size / 1024, ((unsigned long)size%1000)/10);
 }
 
 bool buflib_context_relocate(struct buflib_context *ctx, void *buf)
@@ -206,12 +205,16 @@ void handle_free(struct buflib_context *ctx, union buflib_data *handle)
 }
 
 /* Get the start block of an allocation */
-static union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
+static inline
+union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
 {
-    union buflib_data* name_field =
-                (union buflib_data*)buflib_get_name(ctx, handle);
-
-    return name_field ? name_field - 3 : NULL;
+    union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
+    /* this is a valid case, e.g. during buflib_alloc_ex() when the handle
+     * has already been allocated but not the data */
+    if (!data)
+        return NULL;
+    volatile size_t len = data[-2].val;
+    return data - (len + 4);
 }
 
 /* Shrink the handle table, returning true if its size was reduced, false if
@@ -480,7 +483,7 @@ buflib_buffer_in(struct buflib_context *ctx, int size)
 int
 buflib_alloc(struct buflib_context *ctx, size_t size)
 {
-    return buflib_alloc_ex(ctx, size, "<anonymous>", NULL);
+    return buflib_alloc_ex(ctx, size, NULL, NULL);
 }
 
 /* Allocate a buffer of size bytes, returning a handle for it.
@@ -588,7 +591,8 @@ buffer_alloc:
     block->val = size;
     block[1].handle = handle;
     block[2].ops = ops;
-    strcpy(block[3].name, name);
+    if (name_len > 0)
+        strcpy(block[3].name, name);
     name_len_slot = (union buflib_data*)B_ALIGN_UP(block[3].name + name_len);
     name_len_slot->val = 1 + name_len/sizeof(union buflib_data);
     crc_slot = (union buflib_data*)(name_len_slot + 1);
@@ -599,7 +603,7 @@ buffer_alloc:
 
     BDEBUGF("buflib_alloc_ex: size=%d handle=%p clb=%p crc=0x%0x name=\"%s\"\n",
             (unsigned int)size, (void *)handle, (void *)ops,
-            (unsigned int)crc_slot->crc, block[3].name);
+            (unsigned int)crc_slot->crc, name ? block[3].name:"");
 
     block += size;
     /* alloc_end must be kept current if we're taking the last block. */
@@ -889,8 +893,6 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
 {
     union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
-    if (!data)
-        return NULL;
     size_t len = data[-2].val;
     if (len <= 1)
         return NULL;

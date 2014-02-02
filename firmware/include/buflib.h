@@ -303,12 +303,14 @@ void buflib_buffer_in(struct buflib_context *ctx, int size);
 /* debugging */
 
 /**
- * Returns the name, as given to core_alloc() and core_allloc_ex(), of the
- * allocation associated with the given handle
+ * Returns the name, as given to buflib_alloc() and buflib_allloc_ex(), of the
+ * allocation associated with the given handle. As naming allocations
+ * is optional, there might be no name associated.
  *
  * handle: The handle indicating the allocation
  *
- * Returns: A pointer to the string identifier of the allocation
+ * Returns: A pointer to the string identifier of the allocation, or NULL
+ * if none was specified with buflib_alloc_ex/(.
  */
 const char* buflib_get_name(struct buflib_context *ctx, int handle);
 

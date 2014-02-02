@@ -87,6 +87,12 @@ bool core_shrink(int handle, void* new_start, size_t new_size)
     return buflib_shrink(&core_ctx, handle, new_start, new_size);
 }
 
+const char* core_get_name(int handle)
+{
+    const char *name = buflib_get_name(&core_ctx, handle);
+    return name ?: "<anonymous>";
+}
+
 int core_get_num_blocks(void)
 {
     return buflib_get_num_blocks(&core_ctx);
