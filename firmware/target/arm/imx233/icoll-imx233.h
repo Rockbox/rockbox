@@ -62,16 +62,23 @@
 #if IMX233_SUBTARGET >= 3600 && IMX233_SUBTARGET < 3780
 #define BP_ICOLL_PRIORITYn_ENABLEx(x)   (2 + 8 * (x))
 #define BM_ICOLL_PRIORITYn_ENABLEx(x)   (1 << (2 + 8 * (x)))
+#define BP_ICOLL_PRIORITYn_PRIORITYx(x) (0 + 8 * (x))
+#define BM_ICOLL_PRIORITYn_PRIORITYx(x) (3 << (0 + 8 * (x)))
+#define BP_ICOLL_PRIORITYn_SOFTIRQx(x)  (3 + 8 * (x))
+#define BM_ICOLL_PRIORITYn_SOFTIRQx(x)  (1 << (3 + 8 * (x)))
 #endif
 
 struct imx233_icoll_irq_info_t
 {
     bool enabled;
     unsigned freq;
+    unsigned priority;
 };
 
 void imx233_icoll_init(void);
 void imx233_icoll_enable_interrupt(int src, bool enable);
+void imx233_icoll_set_priority(int src, unsigned prio);
 struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src);
+void imx233_icoll_force_irq(unsigned src, bool enable);
 
 #endif /* ICOLL_IMX233_H */

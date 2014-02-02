@@ -518,7 +518,8 @@ bool dbg_hw_info_icoll(void)
         for(int i = first_irq, j = 0; i < dbg_irqs_count && j < line_count; i++, j++)
         {
             struct imx233_icoll_irq_info_t info = imx233_icoll_get_irq_info(dbg_irqs[i].src);
-            lcd_putsf(0, j, "%s", dbg_irqs[i].name);
+            static char prio[4] = {'-', '+', '^', '!'};
+            lcd_putsf(0, j, "%c%s", prio[info.priority & 3], dbg_irqs[i].name);
             if(info.enabled || info.freq > 0)
                 lcd_putsf(10, j, "%d", info.freq);
         }

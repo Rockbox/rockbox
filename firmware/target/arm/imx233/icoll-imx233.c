@@ -127,6 +127,11 @@ struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 #else
     info.enabled = BF_RDn(ICOLL_INTERRUPTn, src, ENABLE);
 #endif
+#if IMX233_SUBTARGET < 3780
+    info.priority = BF_RDn(ICOLL_PRIORITYn, src / 4, PRIORITYx(src % 4));
+#else
+    info.priority = BF_RDn(ICOLL_INTERRUPTn, src, PRIORITY);
+#endif
     info.freq = irq_count_old[src];
     return info;
 }
@@ -165,6 +170,21 @@ void fiq_handler(void)
 {
 }
 
+void imx233_icoll_force_irq(unsigned src, bool enable)
+{
+#if IMX233_SUBTARGET < 3780
+    if(enable)
+        BF_SETn(ICOLL_PRIORITYn, src / 4, SOFTIRQx(src % 4));
+    else
+        BF_CLRn(ICOLL_PRIORITYn, src / 4, SOFTIRQx(src % 4));
+#else
+    if(enable)
+        BF_SETn(ICOLL_INTERRUPTn, src, SOFTIRQ);
+    else
+        BF_CLRn(ICOLL_INTERRUPTn, src, SOFTIRQ);
+#endif
+}
+
 void imx233_icoll_enable_interrupt(int src, bool enable)
 {
 #if IMX233_SUBTARGET < 3780
@@ -177,6 +197,15 @@ void imx233_icoll_enable_interrupt(int src, bool enable)
         BF_SETn(ICOLL_INTERRUPTn, src, ENABLE);
     else
         BF_CLRn(ICOLL_INTERRUPTn, src, ENABLE);
+#endif
+}
+
+void imx233_icoll_set_priority(int src, unsigned prio)
+{
+#if IMX233_SUBTARGET < 3780
+    BF_WRn(ICOLL_PRIORITYn, src / 4, PRIORITYx(src % 4), prio);
+#else
+    BF_WRn(ICOLL_INTERRUPTn, src, PRIORITY, prio);
 #endif
 }
 
