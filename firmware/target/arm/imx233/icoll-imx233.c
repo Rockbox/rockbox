@@ -23,6 +23,7 @@
 #include "rtc-imx233.h"
 #include "kernel-imx233.h"
 #include "string.h"
+#include "timrot-imx233.h"
 
 #define default_interrupt(name) \
     extern __attribute__((weak, alias("UIRQ"))) void name(void)
@@ -153,7 +154,7 @@ void irq_handler(void)
     int irq_nr = (HW_ICOLL_VECTOR - HW_ICOLL_VBASE) / 4;
     if(irq_count[irq_nr]++ > IRQ_STORM_THRESHOLD)
         panicf("IRQ %d: storm detected", irq_nr);
-    if(irq_nr == INT_SRC_TIMER(TICK_TIMER_NR))
+    if(irq_nr == INT_SRC_TIMER(TIMER_TICK))
         do_irq_stat();
     (*(isr_t *)HW_ICOLL_VECTOR)();
     /* acknowledge completion of IRQ (all use the same priority 0) */

@@ -26,10 +26,28 @@
 
 #include "regs/regs-timrot.h"
 
+/* list of timers */
+enum
+{
+    TIMER_TICK, /* for tick task */
+    TIMER_USER, /* for user timer */
+};
+
+struct imx233_timrot_info_t
+{
+    unsigned fixed_count, run_count;
+    unsigned src;
+    unsigned prescale;
+    bool reload;
+    bool polarity;
+    bool irqen;
+};
+
 typedef void (*imx233_timer_fn_t)(void);
 
 void imx233_timrot_init(void);
-void imx233_setup_timer(unsigned timer_nr, bool reload, unsigned count,
+void imx233_timrot_setup(unsigned timer_nr, bool reload, unsigned count,
     unsigned src, unsigned prescale, bool polarity, imx233_timer_fn_t fn);
+struct imx233_timrot_info_t imx233_timrot_get_info(unsigned timer_nr);
 
 #endif /* TIMROT_IMX233_H */

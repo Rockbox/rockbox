@@ -23,8 +23,6 @@
 
 #include "kernel.h"
 
-#define TICK_TIMER_NR   0
-
 /* The i.MX233 uses in several places virtual channels to multiplex the work.
  * To arbiter the use of the different channels, we use a simple channel arbiter
  * based on a semaphore to count the number of channels in use, and a bitmask

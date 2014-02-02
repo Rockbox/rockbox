@@ -22,8 +22,6 @@
 #include "timrot-imx233.h"
 #include "timer.h"
 
-#define USER_TIMER_NR   1
-
 static long timer_cycles = 0;
 
 static void timer_fn(void)
@@ -49,14 +47,14 @@ bool timer_set(long cycles, bool start)
 
 bool timer_start(IF_COP_VOID(int core))
 {
-    imx233_setup_timer(USER_TIMER_NR, true, timer_cycles,
+    imx233_timrot_setup(TIMER_USER, true, timer_cycles,
         BV_TIMROT_TIMCTRLn_SELECT__32KHZ_XTAL, BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_1,
-            false, &timer_fn);
+        false, &timer_fn);
     return true;
 }
 
 void timer_stop(void)
 {
-    imx233_setup_timer(USER_TIMER_NR, false, 0, BV_TIMROT_TIMCTRLn_SELECT__NEVER_TICK,
+    imx233_timrot_setup(TIMER_USER, false, 0, BV_TIMROT_TIMCTRLn_SELECT__NEVER_TICK,
         BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_1, false, NULL);
 }
