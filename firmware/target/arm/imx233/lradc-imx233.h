@@ -65,6 +65,9 @@
 /* frequency of the delay counter */
 #define LRADC_DELAY_FREQ    2000
 
+/* maximum value of a sample (without accumulation), defines the precision */
+#define LRADC_MAX_VALUE     4096
+
 typedef void (*lradc_irq_fn_t)(int chan);
 
 void imx233_lradc_init(void);

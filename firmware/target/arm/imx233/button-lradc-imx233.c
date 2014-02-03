@@ -58,6 +58,10 @@
 /* delay's delay */
 #define DELAY   (LRADC_DELAY_FREQ / RATE / SAMPLES)
 
+#ifdef IMX233_BUTTON_LRADC_VDDIO
+#define HAS_VDDIO
+#endif
+
 static int button_delay;
 static int button_chan;
 static int button_val[2];
@@ -65,9 +69,18 @@ static int button_idx;
 static int button_mask;
 static int table_size;
 static int raw_val;
+#ifdef HAS_VDDIO
+static int vddio_chan;
+static int vddio_val;
+#endif
+static int delay_chan_mask; // trigger channel mask
+static int irq_chan_mask; // triggered channel mask
 
 static int button_find(int val)
 {
+#ifdef IMX233_BUTTON_LRADC_VDDIO
+        val = (val * IMX233_BUTTON_LRADC_VDDIO) / vddio_val;
+#endif
     // shortcuts
     struct imx233_button_lradc_mapping_t *table = imx233_button_lradc_mapping;
     /* FIXME use a dichotomy */
@@ -91,18 +104,35 @@ static int button_find(int val)
 
 static void button_lradc_irq(int chan)
 {
-    (void) chan;
-    /* read value, kick channel */
-    raw_val = imx233_lradc_read_channel(button_chan) / SAMPLES;
-    imx233_lradc_clear_channel(button_chan);
-    imx233_lradc_setup_channel(button_chan, true, true, SAMPLES - 1, LRADC_SRC(CHAN));
-    imx233_lradc_setup_delay(button_delay, 1 << button_chan, 0, SAMPLES - 1, DELAY);
-    imx233_lradc_kick_delay(button_delay);
-    /* compute mask, compare to previous one */
-    button_val[button_idx] = button_find(raw_val);
-    button_idx = 1 - button_idx;
-    if(button_val[0] == button_val[1])
-        button_mask = button_val[0];
+    /* read value, clear channel */
+#ifdef HAS_VDDIO
+    if(chan == vddio_chan)
+    {
+        vddio_val = imx233_lradc_read_channel(vddio_chan) / SAMPLES;
+        vddio_val *= 2; /* VDDIO channel has internal divider */
+        imx233_lradc_clear_channel(vddio_chan);
+        imx233_lradc_setup_channel(vddio_chan, true, true, SAMPLES - 1, LRADC_SRC_VDDIO);
+    }
+#endif
+    if(chan == button_chan)
+    {
+        raw_val = imx233_lradc_read_channel(button_chan) / SAMPLES;
+        imx233_lradc_clear_channel(button_chan);
+        imx233_lradc_setup_channel(button_chan, true, true, SAMPLES - 1, LRADC_SRC(CHAN));
+    }
+    /* record irq, trigger delay if all IRQs have been fired */
+    irq_chan_mask |= 1 << chan;
+    if(irq_chan_mask == delay_chan_mask)
+    {
+        irq_chan_mask = 0;
+        imx233_lradc_setup_delay(button_delay, delay_chan_mask, 0, SAMPLES - 1, DELAY);
+        imx233_lradc_kick_delay(button_delay);
+        /* compute mask, compare to previous one */
+        button_val[button_idx] = button_find(raw_val);
+        button_idx = 1 - button_idx;
+        if(button_val[0] == button_val[1])
+            button_mask = button_val[0];
+    }
 }
 
 void imx233_button_lradc_init(void)
@@ -118,9 +148,19 @@ void imx233_button_lradc_init(void)
     if(button_delay < 0)
         panicf("Cannot get delay for button-lradc");
     imx233_lradc_setup_channel(button_chan, true, true, SAMPLES - 1, LRADC_SRC(CHAN));
-    imx233_lradc_setup_delay(button_delay, 1 << button_chan, 0, SAMPLES - 1, DELAY);
     imx233_lradc_enable_channel_irq(button_chan, true);
     imx233_lradc_set_channel_irq_callback(button_chan, button_lradc_irq);
+    delay_chan_mask = 1 << button_chan;
+#ifdef HAS_VDDIO
+    vddio_chan = imx233_lradc_acquire_channel(LRADC_SRC_VDDIO, TIMEOUT_NOBLOCK);
+    if(vddio_chan < 0)
+        panicf("Cannot get vddio channel for button-lradc");
+    imx233_lradc_setup_channel(vddio_chan, true, true, SAMPLES - 1, LRADC_SRC_VDDIO);
+    imx233_lradc_enable_channel_irq(vddio_chan, true);
+    imx233_lradc_set_channel_irq_callback(vddio_chan, button_lradc_irq);
+    delay_chan_mask |= 1 << vddio_chan;
+#endif
+    imx233_lradc_setup_delay(button_delay, delay_chan_mask, 0, SAMPLES - 1, DELAY);
     imx233_lradc_kick_delay(button_delay);
 #if defined(HAS_BUTTON_HOLD) && IMX233_BUTTON_LRADC_HOLD_DET == BLH_GPIO
     imx233_pinctrl_acquire(BLH_GPIO_BANK, BLH_GPIO_PIN, "button_lradc_hold");
@@ -164,3 +204,10 @@ int imx233_button_lradc_read_raw(void)
 {
     return raw_val;
 }
+
+#ifdef HAS_VDDIO
+int imx233_button_lradc_read_vddio(void)
+{
+    return vddio_val; // the VDDIO channel has an internal divider
+}
+#endif

@@ -25,11 +25,22 @@
 
 bool button_debug_screen(void);
 
+/* HOLD button */
 #if !defined(CREATIVE_ZENXFISTYLE)
 #define HAS_BUTTON_HOLD
 #define IMX233_BUTTON_LRADC_HOLD_DET BLH_ADC
 #endif
 
+/* VDDIO value */
+#if defined(CREATIVE_ZENXFISTYLE)
+#define IMX233_BUTTON_LRADC_VDDIO   3660
+#elif defined(CREATIVE_ZEN)
+#define IMX233_BUTTON_LRADC_VDDIO   3480
+#elif defined(CREATIVE_ZENXFI)
+#define IMX233_BUTTON_LRADC_VDDIO   3500
+#endif
+
+/* LRADC channel */
 #if defined(CREATIVE_ZENXFISTYLE)
 #define IMX233_BUTTON_LRADC_CHANNEL 2
 #else
