@@ -266,11 +266,11 @@ struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags)
         s.ahb_bytes = apbx ? BF_RDn(APBX_CHn_DEBUG2, dmac, AHB_BYTES) : BF_RDn(APBH_CHn_DEBUG2, dmac, AHB_BYTES);
     if(flags & DMA_INFO_APB_BYTES)
         s.apb_bytes = apbx ? BF_RDn(APBX_CHn_DEBUG2, dmac, APB_BYTES) : BF_RDn(APBH_CHn_DEBUG2, dmac, APB_BYTES);
-    if(flags & DMA_INFO_FREEZED)
+    if(flags & DMA_INFO_FROZEN)
 #if IMX233_SUBTARGET < 3780
-        s.freezed = !!((apbx ? BF_RD(APBX_CTRL0, FREEZE_CHANNEL) : BF_RD(APBH_CTRL0, FREEZE_CHANNEL)) & bm);
+        s.frozen = !!((apbx ? BF_RD(APBX_CTRL0, FREEZE_CHANNEL) : BF_RD(APBH_CTRL0, FREEZE_CHANNEL)) & bm);
 #else
-        s.freezed = !!((apbx ? BF_RD(APBX_CHANNEL_CTRL, FREEZE_CHANNEL) : BF_RD(APBH_CTRL0, FREEZE_CHANNEL)) & bm);
+        s.frozen = !!((apbx ? BF_RD(APBX_CHANNEL_CTRL, FREEZE_CHANNEL) : BF_RD(APBH_CTRL0, FREEZE_CHANNEL)) & bm);
 #endif
     if(flags & DMA_INFO_GATED)
         s.gated = apbx ? false : !!(BF_RD(APBH_CTRL0, CLKGATE_CHANNEL) & bm);

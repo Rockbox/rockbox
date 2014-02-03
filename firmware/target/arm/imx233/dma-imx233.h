@@ -75,7 +75,7 @@ struct apb_dma_command_t
 #define DMA_INFO_BAR        (1 << 3)
 #define DMA_INFO_APB_BYTES  (1 << 4)
 #define DMA_INFO_AHB_BYTES  (1 << 5)
-#define DMA_INFO_FREEZED    (1 << 6)
+#define DMA_INFO_FROZEN     (1 << 6)
 #define DMA_INFO_GATED      (1 << 7)
 #define DMA_INFO_INTERRUPT  (1 << 8)
 #define DMA_INFO_ALL        0x1ff
@@ -88,7 +88,7 @@ struct imx233_dma_info_t
     unsigned long bar;
     unsigned apb_bytes;
     unsigned ahb_bytes;
-    bool freezed;
+    bool frozen;
     bool gated;
     bool int_enabled;
     bool int_cmdcomplt;
