@@ -176,7 +176,7 @@ static void lcd_init_seq(void)
      * at negative edge of dotclk, reflect this in the polarity settings */
     spi_write_reg(0x3, 0xd040);// polarity (OF uses 0xc040, seems incorrect)
     spi_write_reg(0x8, 0); // vsync back porch (0=3H)
-    spi_write_reg(0x9, 0); // hsync back porhc (0=24clk)
+    spi_write_reg(0x9, 0); // hsync back porch (0=24clk)
     spi_write_reg(0x76, 0x2213);
     spi_write_reg(0xb, 0x33e1);
     spi_write_reg(0xc, 0x23);
@@ -296,10 +296,10 @@ void lcd_init_device(void)
     imx233_lcdif_setup_dotclk_pins(8, false);
     imx233_lcdif_set_word_length(8);
     /** Datasheet states:
-     * 257H >= VBP >= 3H, VBP > VLW, VFP > 1H
+     * 257H >= VBP >= 3H, VBP > VLW, VFP >= 1H
      * 1533clk >= HBP >= 24clk, HBP > HLW, HFP >= 4clk
      * 
-     * Take VLW=1H, VBP=3H, VFP=2H, HLW=8, HBP=24, HFP=4
+     * Take VLW=1H, VBP=3H, VFP=1H, HLW=8, HBP=24, HFP=4
      * Take 3clk/pix because we send 24-bit/pix with 8-bit data bus
      * Keep consistent with register setting in lcd_init_seq
      */
