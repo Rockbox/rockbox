@@ -58,35 +58,13 @@ void imx233_powermgmt_init(void)
     BF_WR(POWER_VDDDCTRL, LINREG_OFFSET, 2);
     BF_WR(POWER_VDDACTRL, LINREG_OFFSET, 2);
     BF_WR(POWER_VDDIOCTRL, LINREG_OFFSET, 2);
-    /* enable DCDC (more efficient) */
-    BF_SET(POWER_5VCTRL, ENABLE_DCDC);
-    BF_CLR(POWER_5VCTRL, DCDC_XFER);
-#else
-    BF_SET(POWER_5VCTRL, LINREG_OFFSET);
-    BF_SET(POWER_5VCTRL, EN_DCDC1);
-    BF_SET(POWER_5VCTRL, EN_DCDC2);
-#endif
-
-#if IMX233_SUBTARGET >= 3780
-    /* adjust arbitration between 4.2 and battery */
-    BF_WR(POWER_DCDC4P2, CMPTRIP, 0); /* 85% */
-    BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
-#endif
-
-#if IMX233_SUBTARGET >= 3700
     /* enable a few bits controlling the DC-DC as recommended by Freescale */
     BF_SET(POWER_LOOPCTRL, TOGGLE_DIF);
     BF_SET(POWER_LOOPCTRL, EN_CM_HYST);
     BF_CLR(POWER_LOOPCTRL, EN_RCSCALE);
     BF_SETV(POWER_LOOPCTRL, EN_RCSCALE, 1);
-    /* make sure we are in a known state: disable charger */
-    BF_SET(POWER_CHARGE, PWD_BATTCHRG);
-#endif
-#if IMX233_SUBTARGET >= 3780
-    /* make sure we are in a known state: disable 4p2 */
-    BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 0);
-    BF_WR(POWER_DCDC4P2, ENABLE_4P2, 0);
-    BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+#else
+    BF_SET(POWER_5VCTRL, LINREG_OFFSET);
 #endif
 }
 
@@ -110,6 +88,7 @@ void charging_algorithm_step(void)
 #if IMX233_SUBTARGET >= 3780
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 0);
         BF_WR(POWER_DCDC4P2, ENABLE_4P2, 0);
+        BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT, 1);
         BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
 #endif
         charge_state = DISCHARGING;
@@ -120,10 +99,14 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: discharging -> trickle");
         logf("pwrmgmt: begin charging 4p2");
 #if IMX233_SUBTARGET >= 3780
-        /* 5V has been detected: prepare 4.2V power rail for activation */
+        /* 5V has been detected: prepare 4.2V power rail for activation
+         * WARNING we can reach this situation when starting after Freescale bootloader
+         * or after RoLo in a state where the DCDC is running. In this case,
+         * we must *NOT* disable it or this will shutdown the device. This procedure
+         * is safe: it will never disable the DCDC and will not reduce the charge
+         * limit on the 4P2 rail. */
         BF_WR(POWER_DCDC4P2, ENABLE_4P2, 1);
         BF_SET(POWER_CHARGE, ENABLE_LOAD);
-        BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT, 1);
         BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);// FIXME: manual error ?
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 1);
 #endif
@@ -147,6 +130,12 @@ void charging_algorithm_step(void)
         {
             logf("pwrmgmt: enable dcdc and charger");
             logf("pwrmgmt: trickle -> charging");
+#if IMX233_SUBTARGET >= 3780
+            /* adjust arbitration between 4.2 and battery */
+            BF_WR(POWER_DCDC4P2, CMPTRIP, 0); /* 85% */
+            BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
+#endif
+            /* switch to DCDC */
             BF_CLR(POWER_5VCTRL, DCDC_XFER);
             BF_SET(POWER_5VCTRL, ENABLE_DCDC);
             /* enable battery charging */
