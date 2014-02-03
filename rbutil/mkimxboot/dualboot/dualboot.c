@@ -28,6 +28,9 @@
 #define BOOT_ROM_SECTION    1 /* switch to new section *result_id */
 
 #define BOOT_ARG_CHARGE     ('c' | 'h' << 8 | 'r' << 16 | 'g' << 24)
+/** additional defines */
+#define BP_LRADC_CTRL4_LRADCxSELECT(x)  (4 * (x))
+#define BM_LRADC_CTRL4_LRADCxSELECT(x)  (0xf << (4 * (x)))
 
 typedef unsigned long uint32_t;
 
@@ -69,8 +72,10 @@ static inline void __attribute__((always_inline)) setup_lradc(int src)
 {
     BF_CLR(LRADC_CTRL0, SFTRST);
     BF_CLR(LRADC_CTRL0, CLKGATE);
-    /* don't bother changing the source, we are early enough at boot so that
-     * channel x is mapped to source x */
+#if IMX233_SUBTARGET >= 3700
+    HW_LRADC_CTRL4_CLR = BM_LRADC_CTRL4_LRADCxSELECT(src);
+    HW_LRADC_CTRL4_SET = src << BP_LRADC_CTRL4_LRADCxSELECT(src);
+#endif
     HW_LRADC_CHn_CLR(src) = BM_OR2(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
     BF_SETV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << src);
 }
