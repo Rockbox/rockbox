@@ -41,6 +41,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "button.h"
+#include "button-lradc-imx233.h"
 
 #define ACT_NONE    0
 #define ACT_CANCEL  1
@@ -996,6 +997,81 @@ bool dbg_hw_info_timrot(void)
     }
 }
 
+bool dbg_hw_info_button(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+    int orig_vddio_val, orig_vddio_brownout;
+    imx233_power_get_regulator(REGULATOR_VDDIO, &orig_vddio_val, &orig_vddio_brownout);
+    int vddio_val = orig_vddio_val;
+    int vddio_brownout = orig_vddio_brownout;
+#endif
+
+    while(1)
+    {
+        int btn = my_get_action(0);
+        switch(btn)
+        {
+#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+            case ACT_PREV:
+                vddio_val -= 100; /* mV */
+                vddio_brownout -= 100; /* mV */
+                imx233_power_set_regulator(REGULATOR_VDDIO, vddio_val, vddio_brownout);
+                break;
+            case ACT_NEXT:
+                vddio_val += 100; /* mV */
+                vddio_brownout += 100; /* mV */
+                imx233_power_set_regulator(REGULATOR_VDDIO, vddio_val, vddio_brownout);
+                break;
+#endif
+            case ACT_OK:
+#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+                imx233_power_set_regulator(REGULATOR_VDDIO, orig_vddio_val, orig_vddio_brownout);
+#endif
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACT_CANCEL:
+#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+                imx233_power_set_regulator(REGULATOR_VDDIO, orig_vddio_val, orig_vddio_brownout);
+#endif
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        int line = 0;
+
+#ifdef HAVE_BUTTON_DATA
+        int data;
+        btn = button_read_device(&data);
+#else
+        btn = button_read_device();
+#endif
+        lcd_putsf(0, line++, "raw buttons: %x", btn);
+#ifdef IMX233_BUTTON_LRADC_CHANNEL
+        lcd_putsf(0, line++, "raw lradc: %d", imx233_button_lradc_read_raw());
+#ifdef IMX233_BUTTON_LRADC_VDDIO
+        lcd_putsf(0, line++, "vddio: %d", imx233_button_lradc_read_vddio());
+#endif
+#endif
+#ifdef HAS_BUTTON_HOLD
+        lcd_putsf(0, line++, "hold: %d", button_hold());
+#endif
+#ifdef HAVE_HEADPHONE_DETECTION
+        lcd_putsf(0, line++, "headphones: %d", headphones_inserted());
+#endif
+#ifdef HAVE_BUTTON_DATA
+#ifdef HAVE_TOUCHSCREEN
+        lcd_putsf(0, line++, "touch: x=%d y=%d", data >> 16, data & 0xffff);
+#else
+        lcd_putsf(0, line++, "data: %d", data);
+#endif
+#endif
+        lcd_update();
+        yield();
+    }
+}
+
 static struct
 {
     const char *name;
@@ -1017,6 +1093,7 @@ static struct
     {"emi", dbg_hw_info_emi},
     {"audio", dbg_hw_info_audio},
     {"timrot", dbg_hw_info_timrot},
+    {"button", dbg_hw_info_button},
     {"target", dbg_hw_target_info},
 };
 
