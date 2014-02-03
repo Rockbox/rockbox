@@ -458,7 +458,7 @@ static enum voice_state voice_decode(struct voice_thread_data *td)
     else
     {
         if (td->vi.size > VOICE_MAX_ENCODED_FRAME_SIZE
-            && td->bits.charPtr > (td->vi.size - VOICE_MAX_ENCODED_FRAME_SIZE)
+            && td->bits.charPtr > (int)(td->vi.size - VOICE_MAX_ENCODED_FRAME_SIZE)
             && td->vi.get_more != NULL)
         {
             /* request more data _before_ running out of data (requesting

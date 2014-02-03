@@ -312,6 +312,7 @@ static int id2index(int id)
     return index;
 }
 
+#ifndef TALK_PROGRESSIVE_LOAD
 static int index2id(int index)
 {
     int id = index;
@@ -329,6 +330,7 @@ static int index2id(int index)
 
     return id;
 }
+#endif
 
 static int free_oldest_clip(void)
 {
