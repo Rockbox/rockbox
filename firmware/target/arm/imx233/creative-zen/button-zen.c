@@ -28,6 +28,7 @@
 #if defined(CREATIVE_ZENXFI) || defined(CREATIVE_ZENMOZAIC)
 #define JACK_DET_BANK   2
 #define JACK_DET_PIN    8
+#define JACK_DET_INVERTED
 #elif defined(CREATIVE_ZENXFISTYLE)
 #define JACK_DET_BANK   2
 #define JACK_DET_PIN    7
@@ -134,7 +135,11 @@ bool button_hold(void)
 #ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void)
 {
-    return !imx233_pinctrl_get_gpio(JACK_DET_BANK, JACK_DET_PIN);
+    bool det = imx233_pinctrl_get_gpio(JACK_DET_BANK, JACK_DET_PIN);
+#ifdef JACK_DET_INVERTED
+    det = !det;
+#endif
+    return det;
 }
 #endif
 
