@@ -207,6 +207,14 @@ static void sync_callback(int handle, bool sync_on)
         mutex_lock(&read_buffer_mutex);
     else
         mutex_unlock(&read_buffer_mutex);
+#if CONFIG_CPU == SH7034
+    /* DMA must not interrupt during buffer move or commit_buffer copies
+     * from inconsistent buflib buffer */
+    if (sync_on)
+        CHCR3 &= ~0x0001; /* disable the DMA (and therefore the interrupt also) */
+    else
+        CHCR3 |=  0x0001; /* re-enable the DMA */
+#endif
 }
 
 static ssize_t read_to_handle_ex(int fd, struct buflib_context *ctx, int handle,
@@ -641,7 +649,7 @@ static bool load_voicefile_data(int fd)
 /* Use a static buffer to avoid difficulties with buflib during DMA
  * (hwcodec)/buffer passing to the voice_thread (swcodec). Clips
  * can be played in chunks so the size is not that important */
-static unsigned char commit_buffer[1<<10];
+static unsigned char commit_buffer[2<<10];
 
 static void* commit_transfer(struct queue_entry *qe, size_t *size)
 {
