@@ -5,12 +5,10 @@
 start:
     sub     r7, pc, #8 /* Copy running address */
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
-    /* Disable MMU, disable caching and buffering;
-     * use low exception range address */
-    mrc     p15, 0, r0, c1, c0, 0
-    ldr     r1, =0x3005
-    bic     r0, r1
-    mcr     p15, 0, r0, c1, c0, 0
+    /* The stub could be located at a virtual address so killing the MMU at
+     * this point would be mere suicide. We assume that the remap location
+     * is identically mapped and kill the MMU after the copy */
+
     /* Relocate to right address */
     mov    r2, r7
     ldr    r3, =_copystart
@@ -25,6 +23,12 @@ start:
     /* Jump to real location */
     ldr     pc, =remap
 remap:
+    /* Disable MMU, disable caching and buffering;
+     * use low exception range address */
+    mrc     p15, 0, r0, c1, c0, 0
+    ldr     r1, =0x3005
+    bic     r0, r1
+    mcr     p15, 0, r0, c1, c0, 0
     /* clear bss */
     ldr     r2, =bss_start
     ldr     r3, =bss_end
