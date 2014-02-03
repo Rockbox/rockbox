@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QFileDialog>
+#include <QDebug>
 #include "backend.h"
 #include "analyser.h"
 
@@ -65,6 +66,9 @@ RegTab::RegTab(Backend *backend, QTabWidget *parent)
     m_data_selector = new QComboBox;
     m_data_selector->addItem(QIcon::fromTheme("face-sad"), "None", QVariant(DataSelNothing));
     m_data_selector->addItem(QIcon::fromTheme("document-open"), "File...", QVariant(DataSelFile));
+#ifdef HAVE_HWSTUB
+    m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "Device...", QVariant(DataSelDevice));
+#endif
     m_data_sel_edit = new QLineEdit;
     m_data_sel_edit->setReadOnly(true);
     m_data_soc_label = new QLabel;
@@ -72,6 +76,10 @@ RegTab::RegTab(Backend *backend, QTabWidget *parent)
     data_sel_reload->setIcon(QIcon::fromTheme("view-refresh"));
     data_sel_layout->addWidget(m_data_selector);
     data_sel_layout->addWidget(m_data_sel_edit);
+#ifdef HAVE_HWSTUB
+    m_dev_selector = new QComboBox;
+    data_sel_layout->addWidget(m_dev_selector, 1);
+#endif
     data_sel_layout->addWidget(m_data_soc_label);
     data_sel_layout->addWidget(data_sel_reload);
     data_sel_group->setLayout(data_sel_layout);
@@ -107,6 +115,10 @@ RegTab::RegTab(Backend *backend, QTabWidget *parent)
         this, SLOT(OnAnalyserChanged(QListWidgetItem *, QListWidgetItem *)));
     connect(m_analysers_list, SIGNAL(itemClicked(QListWidgetItem *)), this,
         SLOT(OnAnalyserClicked(QListWidgetItem *)));
+#ifdef HAVE_HWSTUB
+    connect(m_dev_selector, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(OnDevChanged(int)));
+#endif
 
     OnSocListChanged();
     OnDataSelChanged(DataSelNothing);
@@ -141,6 +153,10 @@ void RegTab::OnDataSelChanged(int index)
     QVariant var = m_data_selector->itemData(index);
     if(var == DataSelFile)
     {
+        m_data_sel_edit->show();
+#ifdef HAVE_HWSTUB
+        m_dev_selector->hide();
+#endif
         QFileDialog *fd = new QFileDialog(m_data_selector);
         fd->setFilter("Textual files (*.txt);;All files (*)");
         fd->setDirectory(Settings::Get()->value("regtab/loaddatadir", QDir::currentPath()).toString());
@@ -155,8 +171,20 @@ void RegTab::OnDataSelChanged(int index)
         }
         Settings::Get()->setValue("regtab/loaddatadir", fd->directory().absolutePath());
     }
+#ifdef HAVE_HWSTUB
+    else if(var == DataSelDevice)
+    {
+        m_data_sel_edit->hide();
+        m_dev_selector->show();
+        OnDevListChanged();
+    }
+#endif
     else
     {
+        m_data_sel_edit->show();
+#ifdef HAVE_HWSTUB
+        m_dev_selector->hide();
+#endif
         delete m_io_backend;
         m_io_backend = m_backend->CreateDummyIoBackend();
         SetDataSocName("");
@@ -204,7 +232,7 @@ void RegTab::OnAnalyserClicked(QListWidgetItem *current)
     delete m_right_content;
     AnalyserFactory *ana = AnalyserFactory::GetAnalyserByName(current->text());
     m_right_content = ana->Create(m_cur_soc, m_io_backend)->GetWidget();
-    m_right_panel->addWidget(m_right_content);
+    m_right_panel->addWidget(m_right_content, 1);
 }
 
 void RegTab::DisplayRegister(soc_dev_t& dev, soc_dev_addr_t& dev_addr,
@@ -256,8 +284,8 @@ void RegTab::DisplayRegister(soc_dev_t& dev, soc_dev_addr_t& dev_addr,
     top_layout->addStretch();
 
     soc_word_t value;
-    bool has_value = m_io_backend->ReadRegister(QString().sprintf("HW.%s.%s",
-        dev_addr.name.c_str(), reg_addr.name.c_str()), value);
+    BackendHelper helper(m_io_backend, m_cur_soc);
+    bool has_value = helper.ReadRegister(dev_addr.name.c_str(), reg_addr.name.c_str(), value);
 
     QHBoxLayout *raw_val_layout = 0;
     if(has_value)
@@ -347,6 +375,37 @@ void RegTab::OnSocListChanged()
     for(int i = 0; i < socs.size(); i++)
         m_soc_selector->addItem(socs[i]);
 }
+
+#ifdef HAVE_HWSTUB
+void RegTab::OnDevListChanged()
+{
+    m_dev_selector->clear();
+    QList< HWStubDevice* > list = m_hwstub_helper.GetDevList();
+    foreach(HWStubDevice *dev, list)
+    {
+        QString name = QString("Bus %1 Device %2: %3").arg(dev->GetBusNumber())
+            .arg(dev->GetDevAddress()).arg(dev->GetTargetInfo().bName);
+        m_dev_selector->addItem(QIcon::fromTheme("multimedia-player"), name,
+            QVariant::fromValue((void *)dev));
+    }
+    if(list.size() > 0)
+        m_dev_selector->setCurrentIndex(0);
+    else
+        SetDataSocName("");
+}
+
+void RegTab::OnDevChanged(int index)
+{
+    if(index == -1)
+        return;
+    HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(index).value< void* >());
+    delete m_io_backend;
+    m_io_backend = m_backend->CreateHWStubIoBackend(dev);
+    SetDataSocName(m_io_backend->GetSocName());
+    OnDataSocActivated(m_io_backend->GetSocName());
+    OnDataChanged();
+}
+#endif
 
 void RegTab::FillDevSubTree(RegTreeItem *item)
 {

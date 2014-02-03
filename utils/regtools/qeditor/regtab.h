@@ -25,6 +25,9 @@ enum
 {
     DataSelNothing,
     DataSelFile,
+#ifdef HAVE_HWSTUB
+    DataSelDevice,
+#endif
 };
 
 class RegTreeItem : public QTreeWidgetItem
@@ -56,6 +59,10 @@ protected:
         soc_reg_t& reg, soc_reg_addr_t& reg_addr);
     void SetDataSocName(const QString& socname);
     QComboBox *m_soc_selector;
+#ifdef HAVE_HWSTUB
+    QComboBox *m_dev_selector;
+    HWStubBackendHelper m_hwstub_helper;
+#endif
     Backend *m_backend;
     QTreeWidget *m_reg_tree;
     soc_t m_cur_soc;
@@ -71,6 +78,10 @@ protected:
     QListWidget *m_analysers_list;
 
 private slots:
+#ifdef HAVE_HWSTUB
+    void OnDevListChanged();
+    void OnDevChanged(int index);
+#endif
     void OnSocChanged(const QString& text);
     void OnSocListChanged();
     void OnRegItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
