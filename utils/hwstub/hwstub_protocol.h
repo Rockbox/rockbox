@@ -21,13 +21,13 @@
 #ifndef __HWSTUB_PROTOCOL__
 #define __HWSTUB_PROTOCOL__
 
-#define HWSTUB_CLASS        0xfe
+#define HWSTUB_CLASS        0xff
 #define HWSTUB_SUBCLASS     0xac
 #define HWSTUB_PROTOCOL     0x1d
 
-#define HWSTUB_VERSION_MAJOR    2
-#define HWSTUB_VERSION_MINOR    11
-#define HWSTUB_VERSION_REV      2
+#define HWSTUB_VERSION_MAJOR    3
+#define HWSTUB_VERSION_MINOR    0
+#define HWSTUB_VERSION_REV      0
 
 #define HWSTUB_USB_VID  0xfee1
 #define HWSTUB_USB_PID  0xdead
@@ -41,81 +41,77 @@
  */
 
 /* list of commands */
-#define HWSTUB_GET_INFO     0 /* mandatory */
-#define HWSTUB_GET_LOG      1 /* optional */
-#define HWSTUB_RW_MEM       2 /* optional */
-#define HWSTUB_CALL         3 /* optional */
-#define HWSTUB_JUMP         4 /* optional */
-#define HWSTUB_EXIT         5 /* optional */
-#define HWSTUB_ATEXIT       6 /* optional */
+#define HWSTUB_GET_LOG      0 /* optional */
+#define HWSTUB_RW_MEM       1 /* optional */
+#define HWSTUB_CALL         2 /* optional */
+#define HWSTUB_JUMP         3 /* optional */
 
 /**
- * HWSTUB_GET_INFO: get some information about an aspect of the device.
- * The wIndex field of the SETUP specifies which information to get. */
+ * Descriptors can be retrieve using configuration descriptor or individually
+ * using the standard GetDescriptor request on the interface.
+ */
 
 /* list of possible information */
-#define HWSTUB_INFO_VERSION     0 /* mandatory */
-#define HWSTUB_INFO_LAYOUT      1 /* mandatory */
-#define HWSTUB_INFO_STMP        2 /* optional */
-#define HWSTUB_INFO_FEATURES    3 /* mandatory */
-#define HWSTUB_INFO_TARGET      4 /* mandatory */
+#define HWSTUB_DT_VERSION     0x41 /* mandatory */
+#define HWSTUB_DT_LAYOUT      0x42 /* mandatory */
+#define HWSTUB_DT_TARGET      0x43 /* mandatory */
+#define HWSTUB_DT_STMP        0x44 /* optional */
 
-struct usb_resp_info_version_t
+struct hwstub_version_desc_t
 {
-    uint8_t major;
-    uint8_t minor;
-    uint8_t revision;
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    /* full version information */
+    uint8_t bMajor;
+    uint8_t bMinor;
+    uint8_t bRevision;
 } __attribute__((packed));
 
-struct usb_resp_info_layout_t
+struct hwstub_layout_desc_t
 {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
     /* describe the range of memory used by the running code */
-    uint32_t oc_code_start;
-    uint32_t oc_code_size;
+    uint32_t dCodeStart;
+    uint32_t dCodeSize;
     /* describe the range of memory used by the stack */
-    uint32_t oc_stack_start;
-    uint32_t oc_stack_size;
+    uint32_t dStackStart;
+    uint32_t dStackSize;
     /* describe the range of memory available as a buffer */
-    uint32_t oc_buffer_start;
-    uint32_t oc_buffer_size;
+    uint32_t dBufferStart;
+    uint32_t dBufferSize;
 } __attribute__((packed));
 
-struct usb_resp_info_stmp_t
+struct hwstub_stmp_desc_t
 {
-    uint16_t chipid; /* 0x3780 for STMP3780 for example */
-    uint8_t rev; /* 0=TA1 on STMP3780 for example */
-    uint8_t is_supported; /* 1 if the chip is supported */
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    /* Chip ID and revision */
+    uint16_t wChipID; /* 0x3780 for STMP3780 for example */
+    uint8_t bRevision; /* 0=TA1 on STMP3780 for example */
+    uint8_t bPackage; /* 0=169BGA for example */
 } __attribute__((packed));
-
-/* list of possible features */
-#define HWSTUB_FEATURE_LOG      (1 << 0)
-#define HWSTUB_FEATURE_MEM      (1 << 1)
-#define HWSTUB_FEATURE_CALL     (1 << 2)
-#define HWSTUB_FEATURE_JUMP     (1 << 3)
-#define HWSTUB_FEATURE_EXIT     (1 << 4)
-
-struct usb_resp_info_features_t
-{
-    uint32_t feature_mask;
-};
 
 #define HWSTUB_TARGET_UNK       ('U' | 'N' << 8 | 'K' << 16 | ' ' << 24)
 #define HWSTUB_TARGET_STMP      ('S' | 'T' << 8 | 'M' << 16 | 'P' << 24)
 #define HWSTUB_TARGET_RK27      ('R' | 'K' << 8 | '2' << 16 | '7' << 24)
 
-struct usb_resp_info_target_t
+struct hwstub_target_desc_t
 {
-    uint32_t id;
-    char name[60];
-};
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    /* Target ID and name */
+    uint32_t dID;
+    char bName[58];
+} __attribute__((packed));
 
 /**
- * HWSTUB_GET_LOG: only if has HWSTUB_FEATURE_LOG.
+ * HWSTUB_GET_LOG:
  * The log is returned as part of the control transfer.
  */
 
 /**
- * HWSTUB_RW_MEM: only if has HWSTUB_FEATURE_MEM.
+ * HWSTUB_RW_MEM:
  * The 32-bit address is split into two parts.
  * The low 16-bit are stored in wValue and the upper
  * 16-bit are stored in wIndex. Depending on the transfer direction,
@@ -124,30 +120,10 @@ struct usb_resp_info_target_t
  * possible, making it suitable to read/write registers. */
 
 /**
- * HWSTUB_x: only if has HWSTUB_FEATURE_x where x=CALL or JUMP.
+ * HWSTUB_{CALL,JUMP}:
  * The 32-bit address is split into two parts.
  * The low 16-bit are stored in wValue and the upper
  * 16-bit are stored in wIndex. Depending on the transfer direction,
  * the transfer is either a read or a write. */
-
-/**
- * HWSTUB_EXIT: only if has HWSTUB_FEATURE_EXIT.
- * Stop hwstub now, performing the atexit action. Default exit action
- * is target dependent. */
-
-/**
- * HWSTUB_ATEXIT: only if has HWSTUB_FEATURE_EXIT.
- * Sets the action to perform at exit. Exit happens by sending HWSTUB_EXIT
- * or on USB disconnection. The following actions are available:
- * - nop: don't do anything, wait for next connection
- * - reboot: reboot the device
- * - off: power off
- * NOTE the power off action might have to wait for USB disconnection as some
- * targets cannot power off while plugged.
- * NOTE appart from nop which is mandatory, all other methods can be
- * unavailable and thus the atexit command can fail. */
-#define HWSTUB_ATEXIT_REBOOT    0
-#define HWSTUB_ATEXIT_OFF       1
-#define HWSTUB_ATEXIT_NOP       2
 
 #endif /* __HWSTUB_PROTOCOL__ */

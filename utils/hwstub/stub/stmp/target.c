@@ -22,6 +22,7 @@
 #include "target.h"
 #include "system.h"
 #include "logf.h"
+#include "memory.h"
 
 #define __REG_SET(reg)  (*((volatile uint32_t *)(&reg + 1)))
 #define __REG_CLR(reg)  (*((volatile uint32_t *)(&reg + 2)))
@@ -50,34 +51,6 @@ enum stmp_family_t
 };
 
 static enum stmp_family_t g_stmp_family = UNKNOWN;
-static int g_atexit = HWSTUB_ATEXIT_OFF;
-
-/**
- *
- * Power
- *
- */
-
-#define HW_POWER_BASE       0x80044000
-
-void power_off(void)
-{
-    switch(g_stmp_family)
-    {
-        case STMP3600:
-            *(volatile uint32_t *)(HW_POWER_BASE + 0xc0) = 0x3e770014;
-            break;
-        case STMP3700:
-        case STMP3770:
-            *(volatile uint32_t *)(HW_POWER_BASE + 0xe0) = 0x3e770001;
-            break;
-        case STMP3780:
-            *(volatile uint32_t *)(HW_POWER_BASE + 0x100) = 0x3e770001;
-            break;
-        default:
-            break;
-    }
-}
 
 /**
  *
@@ -114,25 +87,6 @@ void power_off(void)
 #define HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK30M_GATE    (1 << 30)
 #define HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK120M_GATE   (1 << 31)
 
-void clkctrl_reset(void)
-{
-    switch(g_stmp_family)
-    {
-        case STMP3600:
-            *(volatile uint32_t *)(HW_POWER_BASE + 0xc0) = 0x3e770002;
-            break;
-        case STMP3700:
-        case STMP3770:
-            *(volatile uint32_t *)(HW_CLKCTRL_BASE + 0xf0) = 0x1;
-            break;
-        case STMP3780:
-            *(volatile uint32_t *)(HW_CLKCTRL_BASE + 0x120) = 0x1;
-            break;
-        default:
-            break;
-    }
-}
-
 /**
  *
  * Digctl
@@ -143,11 +97,18 @@ void clkctrl_reset(void)
 #define HW_DIGCTL_BASE          0x8001C000
 #define HW_DIGCTL_CTRL          (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0))
 #define HW_DIGCTL_CTRL__USB_CLKGATE (1 << 2)
+#define HW_DIGCTL_CTRL__PACKAGE_SENSE_ENABLE_STMP3600 (1 << 0)
+
+#define HW_DIGCTL_STATUS          (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0x10))
+#define HW_DIGCTL_STATUS__PACKAGE_TYPE_BP   1
+#define HW_DIGCTL_STATUS__PACKAGE_TYPE_BM   (7 << 1)
+#define HW_DIGCTL_STATUS__PACKAGE_TYPE_STMP3600_BP  1
+#define HW_DIGCTL_STATUS__PACKAGE_TYPE_STMP3600_BM  (1 << 1)
 
 /* STMP3700+ */
 #define HW_DIGCTL_MICROSECONDS  (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xC0))
 /* STMP3600 */
-#define HW_DIGCTL_MICROSECONDS2 (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xB0))
+#define HW_DIGCTL_MICROSECONDS_STMP3600 (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0xB0))
 
 #define HW_DIGCTL_CHIPID        (*(volatile uint32_t *)(HW_DIGCTL_BASE + 0x310))
 #define HW_DIGCTL_CHIPID__PRODUCT_CODE_BP   16
@@ -177,8 +138,25 @@ void clkctrl_reset(void)
 #define HW_RTC_CTRL             (*(volatile uint32_t *)(HW_RTC_BASE + 0))
 #define HW_RTC_CTRL__WATCHDOGEN (1 << 4)
 
+struct hwstub_target_desc_t __attribute__((aligned(2))) target_descriptor =
+{
+    sizeof(struct hwstub_target_desc_t),
+    HWSTUB_DT_TARGET,
+    HWSTUB_TARGET_STMP,
+    "STMP3600 / STMP3700 / STMP3780 (i.MX233)"
+};
+
+static struct hwstub_stmp_desc_t __attribute__((aligned(2))) stmp_descriptor =
+{
+    sizeof(struct hwstub_stmp_desc_t),
+    HWSTUB_DT_STMP,
+    0, 0, 0
+};
+
 void target_init(void)
 {
+    stmp_descriptor.wChipID = __XTRACT(HW_DIGCTL_CHIPID, PRODUCT_CODE);
+    stmp_descriptor.bRevision = __XTRACT(HW_DIGCTL_CHIPID, REVISION);
     /* detect family */
     uint16_t product_code = __XTRACT(HW_DIGCTL_CHIPID, PRODUCT_CODE);
     if(product_code >= 0x3600 && product_code < 0x3700)
@@ -208,6 +186,7 @@ void target_init(void)
 
     if(g_stmp_family == STMP3600)
     {
+        stmp_descriptor.bPackage = __XTRACT(HW_DIGCTL_STATUS, PACKAGE_TYPE);
         /* CPU clock is always derived from PLL, if we switch to PLL, cpu will
          * run at 480 MHz unprepared ! That's bad so prepare to run at slow sleed
          * (1.2MHz) for a safe transition */
@@ -230,7 +209,13 @@ void target_init(void)
         __REG_CLR(HW_CLKCTRL_UTMICLKCTRL) = HW_CLKCTRL_UTMICLKCTRL__UTMI_CLK30M_GATE;
     }
     else
+    {
+        __REG_SET(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__PACKAGE_SENSE_ENABLE_STMP3600;
+        stmp_descriptor.bPackage = __XTRACT(HW_DIGCTL_STATUS, PACKAGE_TYPE_STMP3600);
+        __REG_CLR(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__PACKAGE_SENSE_ENABLE_STMP3600;
+
         __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__POWER;
+    }
     /* enable USB PHY PLL */
     __REG_SET(HW_CLKCTRL_PLLCTRL0) = HW_CLKCTRL_PLLCTRL0__EN_USB_CLKS;
     /* power up USB PHY */
@@ -240,57 +225,24 @@ void target_init(void)
     __REG_CLR(HW_DIGCTL_CTRL) = HW_DIGCTL_CTRL__USB_CLKGATE;
 }
 
-static struct usb_resp_info_stmp_t g_stmp;
-static struct usb_resp_info_target_t g_target =
+void target_get_desc(int desc, void **buffer)
 {
-    .id = HWSTUB_TARGET_STMP,
-    .name = "STMP3600 / STMP3700 / STMP3780 (i.MX233)"
-};
-
-int target_get_info(int info, void **buffer)
-{
-    if(info == HWSTUB_INFO_STMP)
-    {
-        g_stmp.chipid = __XTRACT(HW_DIGCTL_CHIPID, PRODUCT_CODE);
-        g_stmp.rev = __XTRACT(HW_DIGCTL_CHIPID, REVISION);
-        g_stmp.is_supported = g_stmp_family != 0;
-        *buffer = &g_stmp;
-        return sizeof(g_stmp);
-    }
-    else if(info == HWSTUB_INFO_TARGET)
-    {
-        *buffer = &g_target;
-        return sizeof(g_target);
-    }
+    if(desc == HWSTUB_DT_STMP)
+        *buffer = &stmp_descriptor;
     else
-        return -1;
+        *buffer = NULL;
 }
 
-int target_atexit(int method)
+void target_get_config_desc(void *buffer, int *size)
 {
-    g_atexit = method;
-    return 0;
-}
-
-void target_exit(void)
-{
-    switch(g_atexit)
-    {
-        case HWSTUB_ATEXIT_OFF:
-            power_off();
-            // fallthrough in case of return
-        case HWSTUB_ATEXIT_REBOOT:
-            clkctrl_reset();
-            // fallthrough in case of return
-        case HWSTUB_ATEXIT_NOP:
-        default:
-            return;
-    }
+    memcpy(buffer, &stmp_descriptor, sizeof(stmp_descriptor));
+    *size += sizeof(stmp_descriptor);
 }
 
 void target_udelay(int us)
 {
-    volatile uint32_t *reg = g_stmp_family == STMP3600 ? &HW_DIGCTL_MICROSECONDS2 : &HW_DIGCTL_MICROSECONDS;
+    volatile uint32_t *reg = g_stmp_family == STMP3600 ? 
+        &HW_DIGCTL_MICROSECONDS_STMP3600 : &HW_DIGCTL_MICROSECONDS;
     uint32_t cur = *reg;
     uint32_t end = cur + us;
     if(cur < end)

@@ -19,69 +19,55 @@
  *
  ****************************************************************************/
 #include "hwstub.h"
+#include <string.h>
+#include <stdlib.h>
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
-/* requires then ->handle field only */
-int hwstub_probe(struct hwstub_device_t *dev)
+struct hwstub_device_t
 {
+    libusb_device_handle *handle;
+    int intf;
+    int bulk_in;
+    int bulk_out;
+    int int_in;
+};
+
+struct hwstub_device_t *hwstub_open(libusb_device_handle *handle)
+{
+    struct hwstub_device_t *dev = malloc(sizeof(struct hwstub_device_t));
+    memset(dev, 0, sizeof(struct hwstub_device_t));
+    dev->handle = handle;
     libusb_device *mydev = libusb_get_device(dev->handle);
 
     int config_id;
     libusb_get_configuration(dev->handle, &config_id);
-    struct libusb_config_descriptor *config;
-    libusb_get_active_config_descriptor(mydev, &config);
+    struct libusb_device_descriptor dev_desc;
+    libusb_get_device_descriptor(mydev, &dev_desc);
+    if(dev_desc.bDeviceClass != HWSTUB_CLASS ||
+            dev_desc.bDeviceSubClass != HWSTUB_SUBCLASS ||
+            dev_desc.bDeviceProtocol != HWSTUB_PROTOCOL)
+        goto Lerr;
+    return dev;
 
-    const struct libusb_endpoint_descriptor *endp = NULL;
-    int intf;
-    for(intf = 0; intf < config->bNumInterfaces; intf++)
-    {
-        if(config->interface[intf].num_altsetting != 1)
-            continue;
-        const struct libusb_interface_descriptor *interface =
-            &config->interface[intf].altsetting[0];
-        if(interface->bNumEndpoints != 3 ||
-                interface->bInterfaceClass != HWSTUB_CLASS ||
-                interface->bInterfaceSubClass != HWSTUB_SUBCLASS ||
-                interface->bInterfaceProtocol != HWSTUB_PROTOCOL)
-            continue;
-        dev->intf = intf;
-        dev->bulk_in = dev->bulk_out = dev->int_in = -1;
-        for(int ep = 0; ep < interface->bNumEndpoints; ep++)
-        {
-            endp = &interface->endpoint[ep];
-            if((endp->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) == LIBUSB_TRANSFER_TYPE_INTERRUPT &&
-                    (endp->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN)
-                dev->int_in = endp->bEndpointAddress;
-            if((endp->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) == LIBUSB_TRANSFER_TYPE_BULK &&
-                    (endp->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN)
-                dev->bulk_in = endp->bEndpointAddress;
-            if((endp->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) == LIBUSB_TRANSFER_TYPE_BULK &&
-                    (endp->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT)
-                dev->bulk_out = endp->bEndpointAddress;
-        }
-        if(dev->bulk_in == -1 || dev->bulk_out == -1 || dev->int_in == -1)
-            continue;
-        break;
-    }
-    if(intf == config->bNumInterfaces)
-        return 1;
-
-    return libusb_claim_interface(dev->handle, intf);
+Lerr:
+    free(dev);
+    return NULL;
 }
 
 int hwstub_release(struct hwstub_device_t *dev)
 {
-    return libusb_release_interface(dev->handle, dev->intf);
+    free(dev);
+    return 0;
 }
 
-int hwstub_get_info(struct hwstub_device_t *dev, uint16_t idx, void *info, size_t sz)
+int hwstub_get_desc(struct hwstub_device_t *dev, uint16_t desc, void *info, size_t sz)
 {
     return libusb_control_transfer(dev->handle,
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_IN,
-        HWSTUB_GET_INFO, 0, idx, info, sz, 1000);
+        LIBUSB_REQUEST_TYPE_STANDARD | LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_IN,
+        LIBUSB_REQUEST_GET_DESCRIPTOR, desc << 8, 0, info, sz, 1000);
 }
 
 int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz)
@@ -124,52 +110,5 @@ int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr)
     return libusb_control_transfer(dev->handle,
             LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
             LIBUSB_ENDPOINT_OUT, HWSTUB_JUMP, addr & 0xffff, addr >> 16, NULL, 0,
-            1000);
-}
-
-const char *hwstub_get_product_string(struct usb_resp_info_stmp_t *stmp)
-{
-    switch(stmp->chipid)
-    {
-        case 0x3700: return "STMP 3700";
-        case 0x37b0: return "STMP 3770";
-        case 0x3780: return "STMP 3780 / i.MX233";
-        default: return "unknown";
-    }
-}
-
-const char *hwstub_get_rev_string(struct usb_resp_info_stmp_t *stmp)
-{
-    switch(stmp->chipid)
-    {
-        case 0x37b0:
-        case 0x3780:
-            switch(stmp->rev)
-            {
-                case 0: return "TA1";
-                case 1: return "TA2";
-                case 2: return "TA3";
-                case 3: return "TA4";
-                default: return "unknown";
-            }
-            break;
-        default:
-            return "unknown";
-    }
-}
-
-int hwstub_atexit(struct hwstub_device_t *dev, int method)
-{
-    return libusb_control_transfer(dev->handle,
-            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWSTUB_ATEXIT, 0, method, NULL, 0,
-            1000);
-}
-
-int hwstub_exit(struct hwstub_device_t *dev)
-{
-    return libusb_control_transfer(dev->handle,
-            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWSTUB_EXIT, 0, 0, NULL, 0,
             1000);
 }

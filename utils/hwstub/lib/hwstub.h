@@ -34,22 +34,15 @@ extern "C" {
  *
  */
 
-struct hwstub_device_t
-{
-    libusb_device_handle *handle;
-    int intf;
-    int bulk_in;
-    int bulk_out;
-    int int_in;
-};
+struct hwstub_device_t;
 
-/* Requires then ->handle field only. Returns 0 on success */
-int hwstub_probe(struct hwstub_device_t *dev);
-/* Returns 0 on success */
+/* Returns NULL on error */
+struct hwstub_device_t *hwstub_open(libusb_device_handle *handle);
+/* Returns 0 on success. Does *NOT* close the usb handle */
 int hwstub_release(struct hwstub_device_t *dev);
 
 /* Returns number of bytes filled */
-int hwstub_get_info(struct hwstub_device_t *dev, uint16_t idx, void *info, size_t sz);
+int hwstub_get_desc(struct hwstub_device_t *dev, uint16_t desc, void *info, size_t sz);
 /* Returns number of bytes filled */
 int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz);
 /* Returns number of bytes written/read or <0 on error */
@@ -57,12 +50,6 @@ int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *bu
 /* Returns <0 on error */
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);
 int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr);
-/* Returns <0 on error */
-int hwstub_atexit(struct hwstub_device_t *dev, int action);
-int hwstub_exit(struct hwstub_device_t *dev);
-
-const char *hwstub_get_product_string(struct usb_resp_info_stmp_t *stmp);
-const char *hwstub_get_rev_string(struct usb_resp_info_stmp_t *stmp);
 
 #ifdef __cplusplus
 } // extern "C"

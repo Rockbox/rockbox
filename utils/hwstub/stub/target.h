@@ -25,15 +25,16 @@
 
 /* do target specific init */
 void target_init(void);
-/* exit, performing the atexit action (default is target specific) */
-void target_exit(void);
-/* get information, return actual size or -1 if error */
-int target_get_info(int info, void **buffer);
-/* set atexit action or return -1 on error */
-int target_atexit(int action);
+/* get descriptor, set buffer to NULL on error */
+void target_get_desc(int desc, void **buffer);
+/* pack all descriptors for config desc */
+void target_get_config_desc(void *buffer, int *size);
 /* Wait a very short time (us<=1000) */
 void target_udelay(int us);
 /* Wait for a short time (ms <= 1000) */
 void target_mdelay(int ms);
+
+/* mandatory for all targets */
+extern struct hwstub_target_desc_t target_descriptor;
 
 #endif /* __TARGET_H__ */

@@ -33,7 +33,6 @@ enum rk27xx_family_t
 };
 
 static enum rk27xx_family_t g_rk27xx_family = UNKNOWN;
-static int g_atexit = HWSTUB_ATEXIT_OFF;
 
 static void _enable_irq(void)
 {
@@ -41,23 +40,6 @@ static void _enable_irq(void)
                   "bic r0, r0, #0x80\n"
                   "msr cpsr_c, r0\n"
                  );
-}
-
-static void power_off(void)
-{
-    GPIO_PCCON &= ~(1<<0);
-    while(1);
-}
-
-static void rk27xx_reset(void)
-{
-    /* use Watchdog to reset */
-    SCU_CLKCFG &= ~CLKCFG_WDT;
-    WDTLR = 1;
-    WDTCON = (1<<4) | (1<<3);
-
-    /* Wait for reboot to kick in */
-    while(1);
 }
 
 /* us may be at most 2^31/200 (~10 seconds) for 200MHz max cpu freq */
@@ -132,41 +114,22 @@ void target_init(void)
     }
 }
 
-static struct usb_resp_info_target_t g_target =
+struct hwstub_target_desc_t __attribute__((aligned(2))) target_descriptor =
 {
-    .id = HWSTUB_TARGET_RK27,
-    .name = "Rockchip RK27XX"
+    sizeof(struct hwstub_target_desc_t),
+    HWSTUB_DT_TARGET,
+    HWSTUB_TARGET_RK27,
+    "Rockchip RK27XX"
 };
 
-int target_get_info(int info, void **buffer)
+void target_get_desc(int desc, void **buffer)
 {
-    if(info == HWSTUB_INFO_TARGET)
-    {
-        *buffer = &g_target;
-        return sizeof(g_target);
-    }
-    else
-        return -1;
+    (void) desc;
+    *buffer = NULL;
 }
 
-int target_atexit(int method)
+void target_get_config_desc(void *buffer, int *size)
 {
-    g_atexit = method;
-    return 0;
-}
-
-void target_exit(void)
-{
-    switch(g_atexit)
-    {
-        case HWSTUB_ATEXIT_OFF:
-            power_off();
-            // fallthrough in case of return
-        case HWSTUB_ATEXIT_REBOOT:
-            rk27xx_reset();
-            // fallthrough in case of return
-        case HWSTUB_ATEXIT_NOP:
-        default:
-            return;
-    }
+    (void) buffer;
+    (void) size;
 }

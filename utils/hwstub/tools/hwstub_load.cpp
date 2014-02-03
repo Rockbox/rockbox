@@ -121,7 +121,7 @@ void usage(void)
 int main(int argc, char **argv)
 {
     bool quiet = false;
-    struct hwstub_device_t hwdev;
+    struct hwstub_device_t *hwdev;
     enum image_type_t type = IT_DETECT;
 
     // parse command line
@@ -244,73 +244,52 @@ int main(int argc, char **argv)
             libusb_get_bus_number(mydev),
             libusb_get_device_address(mydev));
     }
-    hwdev.handle = handle;
-    if(hwstub_probe(&hwdev))
+    hwdev = hwstub_open(handle);
+    if(hwdev == NULL)
     {
         fprintf(stderr, "Cannot probe device!\n");
         return 1;
     }
 
     // get hwstub information
-    struct usb_resp_info_version_t hwdev_ver;
-    int ret = hwstub_get_info(&hwdev, HWSTUB_INFO_VERSION, &hwdev_ver, sizeof(hwdev_ver));
+    struct hwstub_version_desc_t hwdev_ver;
+    int ret = hwstub_get_desc(hwdev, HWSTUB_DT_VERSION, &hwdev_ver, sizeof(hwdev_ver));
     if(ret != sizeof(hwdev_ver))
     {
         fprintf(stderr, "Cannot get version!\n");
         goto Lerr;
     }
-    if(hwdev_ver.major != HWSTUB_VERSION_MAJOR || hwdev_ver.minor < HWSTUB_VERSION_MINOR)
+    if(hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR || hwdev_ver.bMinor < HWSTUB_VERSION_MINOR)
     {
         printf("Warning: this tool is possibly incompatible with your device:\n");
-        printf("Device version: %d.%d.%d\n", hwdev_ver.major, hwdev_ver.minor, hwdev_ver.revision);
+        printf("Device version: %d.%d.%d\n", hwdev_ver.bMajor, hwdev_ver.bMinor, hwdev_ver.bRevision);
         printf("Host version: %d.%d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR, HWSTUB_VERSION_REV);
     }
 
-    // get features
-    struct usb_resp_info_features_t hwdev_features;
-    ret = hwstub_get_info(&hwdev, HWSTUB_INFO_FEATURES, &hwdev_features, sizeof(hwdev_features));
-    if(ret != sizeof(hwdev_features))
-    {
-        fprintf(stderr, "Cannot get features: %d\n", ret);
-        goto Lerr;
-    }
-    if(!(hwdev_features.feature_mask & HWSTUB_RW_MEM))
-    {
-        fprintf(stderr, "Device doesn't support R/W commands\n");
-        goto Lerr;
-    }
-    if(!(hwdev_features.feature_mask & HWSTUB_JUMP))
-    {
-        fprintf(stderr, "Device doesn't support jump commands\n");
-        goto Lerr;
-    }
-    ret = hwstub_rw_mem(&hwdev, 0, addr, buffer, size);
+    ret = hwstub_rw_mem(hwdev, 0, addr, buffer, size);
     if(ret != (int)size)
     {
         fprintf(stderr, "Image write failed\n");
         goto Lerr;
     }
-    hwstub_jump(&hwdev, addr);
+    hwstub_jump(hwdev, addr);
 
-    hwstub_release(&hwdev);
+    hwstub_release(hwdev);
     return 0;
 
     Lerr:
     // display log if handled
-    if(hwdev_features.feature_mask & HWSTUB_FEATURE_LOG)
+    fprintf(stderr, "Device log:\n");
+    do
     {
-        fprintf(stderr, "Device log:\n");
-        do
-        {
-            char buffer[128];
-            int length = hwstub_get_log(&hwdev, buffer, sizeof(buffer) - 1);
-            if(length <= 0)
-                break;
-            buffer[length] = 0;
-            fprintf(stderr, "%s", buffer);
-        }while(1);
-    }
-    hwstub_release(&hwdev);
+        char buffer[128];
+        int length = hwstub_get_log(hwdev, buffer, sizeof(buffer) - 1);
+        if(length <= 0)
+            break;
+        buffer[length] = 0;
+        fprintf(stderr, "%s", buffer);
+    }while(1);
+    hwstub_release(hwdev);
     return 1;
 }
  

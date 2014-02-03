@@ -79,18 +79,12 @@ if not hwstub.options.quiet then
     print("      id: " .. string.format("%#x (%s)", hwstub.dev.target.id, id_str))
     print("      name: " .. hwstub.dev.target.name)
     print("    layout")
-    print("      on-chip ram")
-    print("        code: " .. string.format("%#x bytes @ %#x",
-        hwstub.dev.layout.ocram.code.size, hwstub.dev.layout.ocram.code.start))
-    print("        stack: " .. string.format("%#x bytes @ %#x",
-        hwstub.dev.layout.ocram.stack.size, hwstub.dev.layout.ocram.stack.start))
-    print("        buffer: " .. string.format("%#x bytes @ %#x",
-        hwstub.dev.layout.ocram.buffer.size, hwstub.dev.layout.ocram.buffer.start))
-    print("    features");
-    print("      log: " .. tostring(hwstub.dev.features.log))
-    print("      mem: " .. tostring(hwstub.dev.features.mem))
-    print("      call: " .. tostring(hwstub.dev.features.call))
-    print("      jump: " .. tostring(hwstub.dev.features.jump))
+    print("      code: " .. string.format("%#x bytes @ %#x",
+        hwstub.dev.layout.code.size, hwstub.dev.layout.code.start))
+    print("      stack: " .. string.format("%#x bytes @ %#x",
+        hwstub.dev.layout.stack.size, hwstub.dev.layout.stack.start))
+    print("      buffer: " .. string.format("%#x bytes @ %#x",
+        hwstub.dev.layout.buffer.size, hwstub.dev.layout.buffer.start))
 end
 
 --
