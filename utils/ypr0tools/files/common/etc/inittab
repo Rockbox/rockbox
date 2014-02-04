@@ -1,0 +1,7 @@
+# see busybox-1.00rc2/examples/inittab for more examples
+::sysinit:/etc/rc.d/rc.start
+::respawn:/etc/autologin ttymxc0 login -f root
+::ctrlaltdel:/sbin/reboot
+::shutdown:/etc/rc.d/rc.reboot
+::restart:/sbin/init
+::respawn:/sbin/getty -n -l /bin/sh 115200 /dev/ttyGS0

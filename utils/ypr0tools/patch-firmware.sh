@@ -113,6 +113,8 @@ echo "Patching rootfs ($MODEL files)"
 MODEL_FILES="$FILES/$MODEL"
 echo "cp -r $MODEL_FILES/* $ROOTFS/"
 cp -r $MODEL_FILES/* $ROOTFS/
+rm -rf $ROOTFS/dev/ttyGS0
+mknod $ROOTFS/dev/ttyGS0 c 127 0
 
 echo "Packing new cramfs image"
 cramfs-1.1/mkcramfs $ROOTFS $CRAMFS
