@@ -73,6 +73,7 @@ struct sdmmc_config_t
 #define WINDOW          (1 << 5)
 #define WP_PIN          (1 << 6)
 #define WP_INVERTED     (1 << 7)
+#define PROBE           (1 << 8)
 
 /* modes */
 #define SD_MODE         0
@@ -103,6 +104,12 @@ struct sdmmc_config_t sdmmc_config[] =
         .mode = MMC_MODE,
     },
 #elif defined(CREATIVE_ZENXFI2)
+    {
+        .name = "internal/SD",
+        .flags = WINDOW | PROBE,
+        .ssp = 2,
+        .mode = SD_MODE,
+    },
     /* The Zen X-Fi2 uses pin B1P29 for power */
     {
         .name = "microSD",
@@ -866,7 +873,16 @@ int sd_init(void)
     _sd_num_drives = 0;
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
         if(SDMMC_MODE(drive) == SD_MODE)
+        {
+            /* if asked to probe, try to init it and ignore it if it fails */
+            if(SDMMC_FLAGS(drive) & PROBE)
+            {
+                int ret = init_drive(drive);
+                if(ret < 0)
+                    continue;
+            }
             sd_map[_sd_num_drives++] = drive;
+        }
     return 0;
 }
 
@@ -931,8 +947,16 @@ int mmc_init(void)
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
         if(SDMMC_MODE(drive) == MMC_MODE)
         {
+            /* try to init drive, panic on failure or skip if probing */
+            int ret = init_drive(drive);
+            if(ret < 0)
+            {
+                if(SDMMC_FLAGS(drive) & PROBE)
+                    continue;
+                else
+                    panicf("init_drive(%d) failed: %d (mmc)", ret);
+            }
             mmc_map[_mmc_num_drives++] = drive;
-            init_drive(drive);
         }
     return 0;
 }

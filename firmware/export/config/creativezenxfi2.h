@@ -132,7 +132,7 @@
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE (/*STORAGE_NAND |*/ STORAGE_SD)
-#define NUM_DRIVES 1
+#define NUM_DRIVES 2
 #define HAVE_MULTIDRIVE
 #define HAVE_MULTIVOLUME
 #define HAVE_HOTSWAP_STORAGE_AS_MAIN
