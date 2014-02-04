@@ -30,13 +30,12 @@ void RegTreeItem::SetPath(int dev_idx, int dev_addr_idx, int reg_idx, int reg_ad
     m_reg_addr_idx = reg_addr_idx;
 }
 
-RegTab::RegTab(Backend *backend, QTabWidget *parent)
+RegTab::RegTab(Backend *backend)
     :m_backend(backend)
 {
-    m_splitter = new QSplitter();
     QWidget *left = new QWidget;
-    m_splitter->addWidget(left);
-    m_splitter->setStretchFactor(0, 1);
+    this->addWidget(left);
+    this->setStretchFactor(0, 1);
     QVBoxLayout *left_layout = new QVBoxLayout;
     left->setLayout(left_layout);
 
@@ -93,12 +92,10 @@ RegTab::RegTab(Backend *backend, QTabWidget *parent)
     m_right_panel->addWidget(m_right_content);
     QWidget *w = new QWidget;
     w->setLayout(m_right_panel);
-    m_splitter->addWidget(w);
-    m_splitter->setStretchFactor(1, 2);
+    this->addWidget(w);
+    this->setStretchFactor(1, 2);
 
     m_io_backend = m_backend->CreateDummyIoBackend();
-
-    parent->addTab(m_splitter, "Register Tab");
 
     connect(m_soc_selector, SIGNAL(currentIndexChanged(const QString&)),
         this, SLOT(OnSocChanged(const QString&)));

@@ -22,7 +22,9 @@ MyTabWidget::MyTabWidget()
 
 void MyTabWidget::OnCloseTab(int index)
 {
+    QWidget *w = this->widget(index);
     removeTab(index);
+    delete w;
 }
 
 MainWindow::MainWindow(Backend *backend)
@@ -106,5 +108,5 @@ void MainWindow::OnLoadDesc()
 
 void MainWindow::OnNewRegTab()
 {
-    new RegTab(m_backend, m_tab);
+    m_tab->addTab(new RegTab(m_backend), "Register Tab");
 }

@@ -44,11 +44,11 @@ private:
     int m_dev_idx, m_dev_addr_idx, m_reg_idx, m_reg_addr_idx;
 };
 
-class RegTab : public QObject
+class RegTab : public QSplitter
 {
     Q_OBJECT
 public:
-    RegTab(Backend *backend, QTabWidget *parent);
+    RegTab(Backend *backend);
 
 protected:
     void FillDevSubTree(RegTreeItem *item);
@@ -68,7 +68,6 @@ protected:
     soc_t m_cur_soc;
     QVBoxLayout *m_right_panel;
     QWidget *m_right_content;
-    QSplitter *m_splitter;
     QLineEdit *m_data_sel_edit;
     QLabel *m_data_soc_label;
     QPushButton *m_data_sel_reload;
