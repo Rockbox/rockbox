@@ -25,10 +25,6 @@
 #include "panic.h"
 #include "debug.h"
 
-#if defined(HAVE_SDL_AUDIO) || defined(HAVE_SDL_THREADS) || defined(HAVE_SDL)
-#include <SDL.h>
-#endif
-
 #include "ascodec.h"
 #include "gpio-ypr.h"
 
@@ -47,11 +43,6 @@ void system_init(void)
     int *s;
     /* fake stack, OS manages size (and growth) */
     stackbegin = stackend = (uintptr_t*)&s;
-
-#if defined(HAVE_SDL_AUDIO) || defined(HAVE_SDL_THREADS) || defined(HAVE_SDL)
-    SDL_Init(0); /* need this if using any SDL subsystem */
-#endif
-
     /* Here begins our platform specific initilization for various things */
     ascodec_init();
     gpio_init();
