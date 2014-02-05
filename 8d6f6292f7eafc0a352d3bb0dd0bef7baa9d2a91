@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_1731f4ec",
+        "filename": "firmware/target/hosted/samsungypr/ypr0/powermgmt-ypr0.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-02-05T22:07:45Z",
+      "side": 1,
+      "message": "I guess these can be static.",
+      "revId": "8d6f6292f7eafc0a352d3bb0dd0bef7baa9d2a91",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_f74c4078",
+        "filename": "firmware/target/hosted/samsungypr/ypr0/powermgmt-ypr0.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-02-05T22:07:45Z",
+      "side": 1,
+      "message": "Does the voltage change this quickly? The readouts are immediately after another so I\u0027d expect the voltage to be the same, making it unnecessary to calculate the average.",
+      "revId": "8d6f6292f7eafc0a352d3bb0dd0bef7baa9d2a91",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
