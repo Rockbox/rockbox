@@ -1413,7 +1413,7 @@ fi
     tool="$rootdir/tools/scramble"
     output="archos.mod"
     appextra="player:gui"
-    archosrom="$pwd/rombox.ucl"
+    #archosrom="$pwd/rombox.ucl"
     flash="$pwd/rockbox.ucl"
     plugins="yes"
     swcodec=""
