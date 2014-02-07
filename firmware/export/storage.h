@@ -41,6 +41,9 @@
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
 #include "ramdisk.h"
 #endif
+#if (CONFIG_STORAGE & STORAGE_HOSTED)
+#include "hstorage.h"
+#endif
 
 struct storage_info
 {
@@ -51,7 +54,7 @@ struct storage_info
     char *revision;
 };
 
-#if (CONFIG_STORAGE == 0)
+#if (CONFIG_STORAGE == 0) || (CONFIG_STORAGE & STORAGE_HOSTED)
 /* stubs for the plugin api */
 static inline void stub_storage_sleep(void) {}
 static inline void stub_storage_spin(void) {}
@@ -201,6 +204,31 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #ifdef HAVE_HOTSWAP
             #define storage_removable(drive) ramdisk_removable(IF_MD(drive))
             #define storage_present(drive) ramdisk_present(IF_MD(drive))
+        #endif
+    #elif (CONFIG_STORAGE & STORAGE_HOSTED)
+        #define STORAGE_FUNCTION(NAME) (stub_## NAME)
+        #define storage_spindown stub_storage_spindown
+        #define storage_sleep stub_storage_sleep
+        #define storage_spin stub_storage_spin
+
+        #define storage_enable(on)
+        #define storage_sleepnow()
+        #define storage_disk_is_active() 0
+        #define storage_soft_reset()
+        #define storage_init() hstorage_init()
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() hstorage_flush()
+        #endif
+        #define storage_last_disk_activity() (-1)
+        #define storage_spinup_time() 0
+        #define storage_get_identify() (NULL) /* not actually called anywher */
+
+        #ifdef STORAGE_GET_INFO
+            #error storage_get_info not implemented
+        #endif
+        #ifdef HAVE_HOTSWAP
+            #define storage_removable(drive) hstorage_removable(IF_MD(drive))
+            #define storage_present(drive) hstorage_present(IF_MD(drive))
         #endif
     #else
         //#error No storage driver!
