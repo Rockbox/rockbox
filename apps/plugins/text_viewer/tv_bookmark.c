@@ -159,6 +159,8 @@ void tv_create_system_bookmark(void)
         bookmarks[idx].flag |= TV_BOOKMARK_SYSTEM;
     else
     {
+        if (bookmark_count == TV_MAX_BOOKMARKS) /* we can't add a bookmark if there is no room left! */
+          return;
         bookmarks[bookmark_count].pos  = *pos;
         bookmarks[bookmark_count].flag = TV_BOOKMARK_SYSTEM;
         bookmark_count++;
