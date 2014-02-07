@@ -80,4 +80,7 @@ const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs);
 void set_codepage(int cp);
 int utf8seek(const unsigned char* utf8, int offset);
 const char* get_codepage_name(int cp);
+#if defined(APPLICATION) && defined(__linux__)
+const char *get_current_codepage_name_linux(void);
+#endif
 #endif /* _RBUNICODE_H_ */

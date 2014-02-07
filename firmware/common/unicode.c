@@ -79,6 +79,35 @@ static const char * const name_codepages[NUM_CODEPAGES+1] =
     "unknown"
 };
 
+#if defined(APPLICATION) && defined(__linux__)
+static const char * const name_codepages_linux[NUM_CODEPAGES+1] =
+{
+    "iso8859-1",
+    "iso8859-7",
+    "iso8859-8",
+    "cp1251",
+    "iso8859-11",
+    "cp1256",
+    "iso8859-9",
+    "iso8859-2",
+    "cp1250",
+    "iso8859-15" /* closest, linux doesnt have a codepage named cp1252 */
+    "cp932",
+    "cp936",
+    "cp949",
+    "cp950",
+    "utf8",
+    "cp437"
+};
+
+const char *get_current_codepage_name_linux(void)
+{
+    if (default_codepage < 0 || default_codepage >= NUM_CODEPAGES)
+        return name_codepages_linux[NUM_CODEPAGES];
+    return name_codepages_linux[default_codepage];
+}
+#endif
+
 #else /* !HAVE_LCD_BITMAP, reduced support */
 
 #define MAX_CP_TABLE_SIZE  768
