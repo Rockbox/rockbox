@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#ifdef __unix__
+#include <unistd.h>
+#endif
 #include "system.h"
 #include "kernel.h"
 #include "thread-sdl.h"
@@ -285,6 +288,21 @@ void system_exception_wait(void)
     }
     system_reboot();
 }
+
+void hostfs_init(void)
+{
+    /* stub */
+}
+
+#ifdef HAVE_STORAGE_FLUSH
+int hostfs_flush(void)
+{
+#ifdef __unix__
+    sync();
+#endif
+    return 0;
+}
+#endif /* HAVE_STORAGE_FLUSH */
 
 void sys_handle_argv(int argc, char *argv[])
 {

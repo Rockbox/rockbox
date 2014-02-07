@@ -26,6 +26,10 @@
 #include "config.h" /* for HAVE_MULTIDRIVE or not */
 #include "mv.h"
 
+#if (CONFIG_STORAGE & STORAGE_HOSTFS) || defined(SIMULATOR)
+#define HAVE_HOSTFS
+#endif
+
 #if (CONFIG_STORAGE & STORAGE_SD)
 #include "sd.h"
 #endif
@@ -51,19 +55,20 @@ struct storage_info
     char *revision;
 };
 
-#if (CONFIG_STORAGE == 0)
+#ifdef HAVE_HOSTFS
+#include "hostfs.h"
 /* stubs for the plugin api */
 static inline void stub_storage_sleep(void) {}
 static inline void stub_storage_spin(void) {}
 static inline void stub_storage_spindown(int timeout) { (void)timeout; }
 #endif
 
-#if defined(CONFIG_STORAGE) && !defined(CONFIG_STORAGE_MULTI)
+#if !defined(CONFIG_STORAGE_MULTI) || defined(HAVE_HOSTFS)
 /* storage_spindown, storage_sleep and storage_spin are passed as
  * pointers, which doesn't work with argument-macros.
  */
     #define storage_num_drives() NUM_DRIVES
-    #if (CONFIG_STORAGE == 0) /* application */
+    #if defined(HAVE_HOSTFS)
         #define STORAGE_FUNCTION(NAME) (stub_## NAME)
         #define storage_spindown stub_storage_spindown
         #define storage_sleep stub_storage_sleep
@@ -73,8 +78,21 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
         #define storage_sleepnow()
         #define storage_disk_is_active() 0
         #define storage_soft_reset()
-        #define storage_init()
-        #define storage_close()
+        #define storage_init() hostfs_init()
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() hostfs_flush()
+        #endif
+        #define storage_last_disk_activity() (-1)
+        #define storage_spinup_time() 0
+        #define storage_get_identify() (NULL) /* not actually called anywher */
+
+        #ifdef STORAGE_GET_INFO
+            #error storage_get_info not implemented
+        #endif
+        #ifdef HAVE_HOTSWAP
+            #define storage_removable(drive) hostfs_removable(IF_MD(drive))
+            #define storage_present(drive) hostfs_present(IF_MD(drive))
+        #endif
     #elif (CONFIG_STORAGE & STORAGE_ATA)
         #define STORAGE_FUNCTION(NAME) (ata_## NAME)
         #define storage_spindown ata_spindown
@@ -205,9 +223,9 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
     #else
         //#error No storage driver!
     #endif
-#else /* NOT CONFIG_STORAGE_MULTI and PLATFORM_NATIVE*/
+#else /* CONFIG_STORAGE_MULTI || !HAVE_HOSTFS */
 
-/* Simulator and multi-driver use normal functions */
+/* Multi-driver use normal functions */
 
 void storage_enable(bool on);
 void storage_sleep(void);

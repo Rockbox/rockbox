@@ -160,3 +160,7 @@
 
 /* This folder resides in the ReadOnly CRAMFS. It is binded to /mnt/media0/.rockbox */
 #define BOOTDIR "/.rockbox"
+
+/* No special storage */
+#define CONFIG_STORAGE STORAGE_HOSTFS
+#define HAVE_STORAGE_FLUSH

@@ -32,6 +32,7 @@
 #define STORAGE_SD      0x04
 #define STORAGE_NAND    0x08
 #define STORAGE_RAMDISK 0x10
+#define STORAGE_HOSTFS  0x20 /* meant for APPLICATION targets (implicit for SIMULATOR) */
 
 /* CONFIG_TUNER (note these are combineable bit-flags) */
 #define S1A0903X01 0x01 /* Samsung */
@@ -574,7 +575,6 @@ Lyre prototype 1 */
 
 #ifdef APPLICATION
 #define CONFIG_CPU 0
-#define CONFIG_STORAGE 0
 #endif
 
 /* keep this include after the target configs */

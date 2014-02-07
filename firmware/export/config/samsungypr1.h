@@ -150,3 +150,7 @@
 
 /* This mount point resides in the rootfs, binded to /mnt/media0/.rockbox */
 #define BOOTDIR "/.rockbox"
+
+/* No special storage */
+#define CONFIG_STORAGE STORAGE_HOSTFS
+#define HAVE_STORAGE_FLUSH

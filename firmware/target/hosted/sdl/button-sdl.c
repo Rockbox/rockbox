@@ -36,6 +36,7 @@
 #include "buttonmap.h"
 #include "debug.h"
 #include "powermgmt.h"
+#include "storage.h"
 
 #ifdef HAVE_TOUCHSCREEN
 #include "touchscreen.h"

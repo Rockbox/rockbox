@@ -23,6 +23,7 @@
 #include <setjmp.h>
 #include <jni.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "config.h"
 #include "system.h"
 #include "power.h"
@@ -64,6 +65,17 @@ void system_init(void)
 {
     /* no better place yet */
     telephony_init_device();
+}
+
+void hostfs_init(void)
+{
+    /* stub */
+}
+
+int hostfs_flush(void)
+{
+    sync();
+    return 0;
 }
 
 JNIEXPORT jint JNICALL
