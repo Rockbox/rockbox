@@ -22,6 +22,7 @@
 #ifndef __MV_H__
 #define __MV_H__
 
+#include <stdbool.h>
 #include "config.h"
 
 /* FixMe: These macros are a bit nasty and perhaps misplaced here.

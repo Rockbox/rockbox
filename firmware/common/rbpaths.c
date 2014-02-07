@@ -48,6 +48,7 @@
 #undef rmdir
 #undef dirent
 #undef DIR
+#undef readlink
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 static const char rbhome[] = "/sdcard";
@@ -61,6 +62,9 @@ const char *rbhome;
  * over the ones where Rockbox is installed to. Classic example would be
  * $HOME/.config/rockbox.org vs /usr/share/rockbox */
 #define HAVE_SPECIAL_DIRS
+#define IS_HOME(p) (!strcmp(p, rbhome))
+#else
+#define IS_HOME(p) (!strcmp(p, HOME_DIR))
 #endif
 
 /* flags for get_user_file_path() */
@@ -69,6 +73,35 @@ const char *rbhome;
 #define NEED_WRITE          (1<<0)
 /* file or directory? */
 #define IS_FILE             (1<<1)
+
+#ifdef HAVE_MULTIDRIVE
+/* A special link is created under e.g. HOME_DIR/<microSD1>, e.g. to access
+ * external storage in a convinient location, much similar to the mount
+ * point on our native targets. Here they are treated as symlink (one which
+ * doesn't actually exist in the filesystem and therefore we have to override
+ * readlink() */
+static const char *handle_special_links(const char* link, unsigned flags,
+                                char *buf, const size_t bufsize)
+{
+    (void) flags;
+    char vol_string[VOL_ENUM_POS + 8];
+    int len = sprintf(vol_string, VOL_NAMES, 1);
+
+    /* link might be passed with or without HOME_DIR expanded. To handle
+     * both perform substring matching (VOL_NAMES is unique enough) */
+    const char *begin = strstr(link, vol_string);
+    if (begin)
+    {
+        /* begin now points to the start of vol_string within link,
+         * we want to copy the remainder of the paths, prefixed by
+         * the actual mount point (the remainder might be "") */
+        snprintf(buf, bufsize, MULTIDRIVE_DIR"%s", begin + len);
+        return buf;
+    }
+
+    return link;
+}
+#endif
 
 #ifdef HAVE_SPECIAL_DIRS
 void paths_init(void)
@@ -156,26 +189,7 @@ static const char* _get_user_file_path(const char *path,
     return ret;
 }
 
-
-static const char* handle_special_dirs(const char* dir, unsigned flags,
-                                char *buf, const size_t bufsize)
-{
-    if (!strncmp(HOME_DIR, dir, HOME_DIR_LEN))
-    {
-        const char *p = dir + HOME_DIR_LEN;
-        while (*p == '/') p++;
-        snprintf(buf, bufsize, "%s/%s", rbhome, p);
-        return buf;
-    }
-    else if (!strncmp(ROCKBOX_DIR, dir, ROCKBOX_DIR_LEN))
-        return _get_user_file_path(dir, flags, buf, bufsize);
-
-    return dir;
-}
-
-#else /* !HAVE_SPECIAL_DIRS */
-
-#ifndef paths_init
+#elif !defined(paths_init)
 void paths_init(void) { }
 #endif
 
@@ -183,10 +197,22 @@ static const char* handle_special_dirs(const char* dir, unsigned flags,
                                 char *buf, const size_t bufsize)
 {
     (void) flags; (void) buf; (void) bufsize;
+#ifdef HAVE_SPECIAL_DIRS
+    if (!strncmp(HOME_DIR, dir, HOME_DIR_LEN))
+    {
+        const char *p = dir + HOME_DIR_LEN;
+        while (*p == '/') p++;
+        snprintf(buf, bufsize, "%s/%s", rbhome, p);
+        dir = buf;
+    }
+    else if (!strncmp(ROCKBOX_DIR, dir, ROCKBOX_DIR_LEN))
+        dir = _get_user_file_path(dir, flags, buf, bufsize);
+#endif
+#ifdef HAVE_MULTIDRIVE
+    dir = handle_special_links(dir, flags, buf, bufsize);
+#endif
     return dir;
 }
-
-#endif
 
 int app_open(const char *name, int o, ...)
 {
@@ -235,6 +261,7 @@ int app_rename(const char *old, const char *new)
  * get_dir_info() */
 struct __dir {
     DIR *dir;
+    IF_MD(int volumes_returned);
     char path[];
 };
 
@@ -246,23 +273,31 @@ struct dirinfo dir_get_info(DIR* _parent, struct dirent *dir)
     struct dirinfo ret;
     char path[MAX_PATH];
 
-    snprintf(path, sizeof(path), "%s/%s", parent->path, dir->d_name);
     memset(&ret, 0, sizeof(ret));
+
+#ifdef HAVE_MULTIDRIVE
+    char vol_string[VOL_ENUM_POS + 8];
+    sprintf(vol_string, VOL_NAMES, 1);
+    if (!strcmp(vol_string, dir->d_name))
+    {
+        ret.attribute = ATTR_LINK;
+        strcpy(path, MULTIDRIVE_DIR);
+    }
+    else
+#endif
+        snprintf(path, sizeof(path), "%s/%s", parent->path, dir->d_name);
 
     if (!stat(path, &s))
     {
         if (S_ISDIR(s.st_mode))
-        {
-            ret.attribute = ATTR_DIRECTORY;
-        }
+            ret.attribute |= ATTR_DIRECTORY;
+
         ret.size = s.st_size;
         tm = localtime(&(s.st_mtime));
     }
 
     if (!lstat(path, &s) && S_ISLNK(s.st_mode))
-    {
         ret.attribute |= ATTR_LINK;
-    }
 
     if (tm)
     {
@@ -296,6 +331,7 @@ DIR* app_opendir(const char *_name)
         free(buf);
         return NULL;
     }
+    IF_MD(this->volumes_returned = 0);
     return (DIR*)this;
 }
 
@@ -311,6 +347,18 @@ int app_closedir(DIR *dir)
 struct dirent* app_readdir(DIR* dir)
 {
     struct __dir *d = (struct __dir*)dir;
+#ifdef HAVE_MULTIDRIVE
+    /* this is not MT-safe but OK according to man readdir */
+    static struct dirent voldir;
+    if (d->volumes_returned < (NUM_VOLUMES-1)
+            && volume_present(d->volumes_returned+1)
+            && IS_HOME(d->path))
+    {
+        d->volumes_returned += 1;
+        sprintf(voldir.d_name, VOL_NAMES, d->volumes_returned);
+        return &voldir;
+    }
+#endif
     return readdir(d->dir);
 }
 
@@ -328,4 +376,27 @@ int app_rmdir(const char* name)
     char realpath[MAX_PATH];
     const char *fname = handle_special_dirs(name, NEED_WRITE, realpath, sizeof(realpath));
     return rmdir(fname);
+}
+
+
+/* On MD we create a virtual symlink for the external drive,
+ * for this we need to override readlink(). */
+ssize_t app_readlink(const char *path, char *buf, size_t bufsiz)
+{
+    char _buf[MAX_PATH];
+    (void) path; (void) buf; (void) bufsiz;
+    path = handle_special_dirs(path, 0, _buf, sizeof(_buf));
+#ifdef HAVE_MULTIDRIVE
+    /* if path == _buf then we can be sure handle_special_dir() did something
+     * and path is not an ordinary directory */
+    if (path == _buf && !strncmp(path, MULTIDRIVE_DIR, sizeof(MULTIDRIVE_DIR)-1))
+    {
+        /* copying NUL is not required as per readlink specification */
+        ssize_t len = strlen(path);
+        memcpy(buf, path, len);
+        return len;
+    }
+#endif
+    /* does not append NUL !! */
+    return readlink(path, buf, bufsiz);
 }

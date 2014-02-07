@@ -43,6 +43,7 @@
 #   define creat(x,m)       app_creat(x, m)
 #   define remove(x)        app_remove(x)
 #   define rename(x,y)      app_rename(x,y)
+#   define readlink(x,y,z)  app_readlink(x,y,z)
 #   if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
 /* SDL overrides a few more */
 #   define read(x,y,z)      sim_read(x,y,z)
@@ -59,6 +60,7 @@
 #   define read(x,y,z)      sim_read(x,y,z)
 #   define write(x,y,z)     sim_write(x,y,z)
 #   define close(x)         sim_close(x)
+/* readlink() not used in the sim yet */
 extern int sim_open(const char *name, int o, ...);
 extern int sim_creat(const char *name, mode_t mode);
 #endif
