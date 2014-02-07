@@ -40,7 +40,6 @@ extern int  _mkdir(const char* name);
 extern int  _rmdir(const char* name);
 extern int  _closedir(DIR* dir);
 extern struct dirent *_readdir(DIR* dir);
-extern void fat_size(unsigned long *size, unsigned long *free);
 
 #define DIRFUNCTIONS_DEFINED
 #define DIRENT_DEFINED

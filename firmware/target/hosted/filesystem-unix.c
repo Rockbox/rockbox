@@ -43,8 +43,9 @@ long filesize(int fd)
 }
 
 /* do we really need this in the app? */
-void fat_size(unsigned long* size, unsigned long* free)
+void fat_size(IF_MV(int volume,) unsigned long* size, unsigned long* free)
 {
+    IF_MV((void) volume);
     *size = *free = 0;
 }
 

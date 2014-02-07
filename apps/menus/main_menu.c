@@ -162,9 +162,11 @@ static const char* info_getname(int selected_item, void *data,
     {
         fat_size(IF_MV(0,) &info->size, &info->free);
 #ifdef HAVE_MULTIVOLUME
+#ifndef APPLICATION
         if (fat_ismounted(1))
             fat_size(1, &info->size2, &info->free2);
         else
+#endif
             info->size2 = 0;
 #endif
         info->new_data = false;
@@ -432,4 +434,3 @@ MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
         );
 /*    MAIN MENU                    */
 /***********************************/
-
