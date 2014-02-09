@@ -17,17 +17,100 @@
 #include "backend.h"
 #include "analyser.h"
 
-RegTreeItem::RegTreeItem(const QString& string, int type)
-    :QTreeWidgetItem(QStringList(string), type)
+SocFieldValidator::SocFieldValidator(QObject *parent)
+    :QValidator(parent)
+{
+    m_field.first_bit = 0;
+    m_field.last_bit = 31;
+}
+
+SocFieldValidator::SocFieldValidator(const soc_reg_field_t& field, QObject *parent)
+    :QValidator(parent), m_field(field)
 {
 }
 
-void RegTreeItem::SetPath(int dev_idx, int dev_addr_idx, int reg_idx, int reg_addr_idx)
+void SocFieldValidator::fixup(QString& input) const
 {
-    m_dev_idx = dev_idx;
-    m_dev_addr_idx = dev_addr_idx;
-    m_reg_idx = reg_idx;
-    m_reg_addr_idx = reg_addr_idx;
+    input = input.trimmed();
+}
+
+QValidator::State SocFieldValidator::validate(QString& input, int& pos) const
+{
+    (void) pos;
+    soc_word_t val;
+    State state = parse(input, val);
+    qDebug() << "validate(" << input << "): " << state;
+    return state;
+}
+
+QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val) const
+{
+    // the empty string is all alwats intermediate
+    if(input.size() == 0)
+        return Intermediate;
+    // first check named values
+    State state = Invalid;
+    foreach(const soc_reg_field_value_t& value, m_field.value)
+    {
+        QString name = QString::fromLocal8Bit(value.name.c_str());
+        // cannot be a substring if too long or empty
+        if(input.size() > name.size())
+            continue;
+        // check equal string
+        if(input == name)
+        {
+            state = Acceptable;
+            val = value.value;
+            break;
+        }
+        // check substring
+        if(name.startsWith(input))
+            state = Intermediate;
+    }
+    // early return for exact match
+    if(state == Acceptable)
+        return state;
+    // do a few special cases for convenience
+    if(input.compare("0x", Qt::CaseInsensitive) == 0 ||
+            input.compare("0b", Qt::CaseInsensitive) == 0)
+        return Intermediate;
+    // try by parsing
+    unsigned basis, pos;
+    if(input.size() >= 2 && input.startsWith("0x", Qt::CaseInsensitive))
+    {
+        basis = 16;
+        pos = 2;
+    }
+    else if(input.size() >= 2 && input.startsWith("0b", Qt::CaseInsensitive))
+    {
+        basis = 2;
+        pos = 2;
+    }
+    else if(input.size() >= 2 && input.startsWith("0"))
+    {
+        basis = 8;
+        pos = 1;
+    }
+    else
+    {
+        basis = 10;
+        pos = 0;
+    }
+    bool ok = false;
+    unsigned long v = input.mid(pos).toULong(&ok, basis);
+    // if not ok, return result of name parsing
+    if(!ok)
+        return state;
+    // if ok, check if it fits in the number of bits
+    unsigned nr_bits = m_field.last_bit - m_field.first_bit + 1;
+    unsigned long max = nr_bits == 32 ? 0xffffffff : (1 << nr_bits) - 1;
+    if(v <= max)
+    {
+        val = v;
+        return Acceptable;
+    }
+
+    return state;
 }
 
 RegTab::RegTab(Backend *backend)
@@ -167,6 +250,7 @@ void RegTab::OnDataSelChanged(int index)
             OnDataSocActivated(m_io_backend->GetSocName());
         }
         Settings::Get()->setValue("regtab/loaddatadir", fd->directory().absolutePath());
+        SetReadOnlyIndicator();
     }
 #ifdef HAVE_HWSTUB
     else if(var == DataSelDevice)
@@ -187,6 +271,10 @@ void RegTab::OnDataSelChanged(int index)
         SetDataSocName("");
     }
     OnDataChanged();
+}
+
+void RegTab::SetReadOnlyIndicator()
+{
 }
 
 void RegTab::OnDataChanged()
@@ -229,6 +317,8 @@ void RegTab::OnAnalyserClicked(QListWidgetItem *current)
 void RegTab::DisplayRegister(const SocRegRef& ref)
 {
     delete m_right_content;
+
+    bool read_only = m_io_backend->IsReadOnly();
 
     QVBoxLayout *right_layout = new QVBoxLayout;
 
@@ -286,9 +376,11 @@ void RegTab::DisplayRegister(const SocRegRef& ref)
         QLabel *raw_val_name = new QLabel;
         raw_val_name->setText("Raw value:");
         QLineEdit *raw_val_edit = new QLineEdit;
-        raw_val_edit->setReadOnly(true);
+        raw_val_edit->setReadOnly(read_only);
         raw_val_edit->setText(QString().sprintf("0x%08x", value));
         raw_val_edit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        raw_val_edit->setValidator(new SocFieldValidator(raw_val_edit));
+        connect(raw_val_edit, SIGNAL(returnPressed()), this, SLOT(OnRawRegValueReturnPressed()));
         raw_val_layout = new QHBoxLayout;
         raw_val_layout->addStretch();
         raw_val_layout->addWidget(raw_val_name);
@@ -444,4 +536,13 @@ void RegTab::OnSocChanged(const QString& soc)
         return;
     FillRegTree();
     FillAnalyserList();
+}
+
+void RegTab::OnRawRegValueReturnPressed()
+{
+    QObject *obj = sender();
+    QLineEdit *edit = dynamic_cast< QLineEdit* >(obj);
+    const SocFieldValidator *validator = dynamic_cast< const SocFieldValidator* >(edit->validator());
+    soc_word_t val;
+    QValidator::State state = validator->parse(edit->text(), val);
 }

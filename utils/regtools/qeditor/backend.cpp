@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <QFileInfo>
 #include "backend.h"
 
 /**
@@ -99,7 +100,36 @@ bool FileIoBackend::Reload()
         else if(ok)
             m_map[key] = val;
     }
+
+    m_readonly = !QFileInfo(file).isWritable();
+    m_dirty = false;
     return true;
+}
+
+bool FileIoBackend::WriteRegister(const QString& name, soc_word_t value)
+{
+    m_dirty = true;
+    m_map[name] = value;
+    return true;
+}
+
+bool FileIoBackend::Commit()
+{
+    if(!m_dirty)
+        return true;
+    QFile file(m_filename);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+        return false;
+    QTextStream out(&file);
+    out << "HW = " << m_soc << "\n";
+    QMapIterator< QString, soc_word_t > it(m_map);
+    while(it.hasNext())
+    {
+        it.next();
+        out << it.key() << " = " << it.value() << "\n";
+    }
+    out.flush();
+    return file.flush();
 }
 
 #ifdef HAVE_HWSTUB
@@ -195,6 +225,14 @@ bool HWStubDevice::ReadMem(soc_addr_t addr, size_t length, void *buffer)
     return ret >= 0 && (size_t)ret == length;
 }
 
+bool HWStubDevice::WriteMem(soc_addr_t addr, size_t length, void *buffer)
+{
+    if(!m_hwdev)
+        return false;
+    int ret = hwstub_rw_mem(m_hwdev, 0, addr, buffer, length);
+    return ret >= 0 && (size_t)ret == length;
+}
+
 bool HWStubDevice::IsValid()
 {
     return m_valid;
@@ -241,6 +279,11 @@ HWStubIoBackend::~HWStubIoBackend()
 bool HWStubIoBackend::ReadRegister(soc_addr_t addr, soc_word_t& value)
 {
     return m_dev->ReadMem(addr, sizeof(value), &value);
+}
+
+bool HWStubIoBackend:: WriteRegister(soc_addr_t addr, soc_word_t value)
+{
+    return m_dev->WriteMem(addr, sizeof(value), &value);
 }
 
 bool HWStubIoBackend::Reload()

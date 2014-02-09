@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QListWidget>
+#include <QValidator>
 #include <soc_desc.hpp>
 #include "backend.h"
 #include "settings.h"
@@ -52,6 +53,22 @@ private:
     SocRegRef m_ref;
 };
 
+class SocFieldValidator : public QValidator
+{
+    Q_OBJECT
+public:
+    SocFieldValidator(QObject *parent = 0);
+    SocFieldValidator(const soc_reg_field_t& field, QObject *parent = 0);
+
+    virtual void fixup(QString& input) const;
+    virtual State validate(QString& input, int& pos) const;
+    /* validate and return the interpreted value */
+    State parse(const QString& input, soc_word_t& val) const;
+
+protected:
+    soc_reg_field_t m_field;
+};
+
 };
 
 class RegTab : public QSplitter
@@ -90,6 +107,7 @@ private slots:
     void OnDevListChanged();
     void OnDevChanged(int index);
 #endif
+    void SetReadOnlyIndicator();
     void OnSocChanged(const QString& text);
     void OnSocListChanged();
     void OnRegItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
@@ -99,6 +117,7 @@ private slots:
     void OnDataSocActivated(const QString&);
     void OnAnalyserChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void OnAnalyserClicked(QListWidgetItem *clicked);
+    void OnRawRegValueReturnPressed();
 };
 
 #endif /* REGTAB_H */

@@ -32,6 +32,17 @@ public:
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value) = 0;
     /* reload content (if it makes sense) */
     virtual bool Reload() = 0;
+    /* check whether backend supports writing */
+    virtual bool IsReadOnly() = 0;
+    /* write a register by name or address
+     * NOTE: even on a read-only backend, a write is allowed be successful as long
+     * as commit fails */
+    virtual bool WriteRegister(const QString& name, soc_word_t value) = 0;
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value) = 0;
+    /* check whether backend contains uncommitted (ie cached) writes */
+    virtual bool IsDirty() = 0;
+    /* commit all writes */
+    virtual bool Commit() = 0;
 };
 
 class DummyIoBackend : public IoBackend
@@ -47,8 +58,17 @@ public:
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value) 
         { (void) addr; (void) value; return false; }
     virtual bool Reload() { return false; }
+    virtual bool IsReadOnly() { return true; }
+    virtual bool WriteRegister(const QString& name, soc_word_t value)
+        { (void) name; (void) value; return false; }
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value)
+        { (void) addr; (void) value; return false; }
+    virtual bool IsDirty() { return false; }
+    virtual bool Commit() { return false; }
 };
 
+/** NOTE the File backend makes a difference between writes and commits:
+ * a write will *never* touch the underlying file unless it was committed. */
 class FileIoBackend : public IoBackend
 {
     Q_OBJECT
@@ -61,10 +81,18 @@ public:
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value)
         { (void) addr; (void) value; return false; }
     virtual bool Reload();
+    virtual bool IsReadOnly() { return m_readonly; }
+    virtual bool WriteRegister(const QString& name, soc_word_t value);
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value)
+        { (void) addr; (void) value; return false; }
+    virtual bool IsDirty() { return m_dirty; }
+    virtual bool Commit();
 
 protected:
     QString m_filename;
     QString m_soc;
+    bool m_readonly;
+    bool m_dirty;
     QMap< QString, soc_word_t > m_map;
 };
 
@@ -85,6 +113,7 @@ public:
     inline struct hwstub_stmp_desc_t GetSTMPInfo() { return m_hwdev_stmp; }
     /* Calls below require the device to be opened */
     bool ReadMem(soc_addr_t addr, size_t length, void *buffer);
+    bool WriteMem(soc_addr_t addr, size_t length, void *buffer);
 
 protected:
     bool Probe();
@@ -98,6 +127,7 @@ protected:
     struct hwstub_stmp_desc_t m_hwdev_stmp;
 };
 
+/** NOTE the HWStub backend is never dirty: all writes are immediately committed */
 class HWStubIoBackend : public IoBackend
 {
     Q_OBJECT
@@ -111,6 +141,12 @@ public:
         { (void) name; (void) value; return false; }
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value);
     virtual bool Reload();
+    virtual bool IsReadOnly() { return false; }
+    virtual bool WriteRegister(const QString& name, soc_word_t value)
+        { (void) name; (void) value; return false; }
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value);
+    virtual bool IsDirty() { return false; }
+    virtual bool Commit() { return true; }
 
 protected:
     QString m_soc;
