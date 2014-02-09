@@ -204,6 +204,11 @@ RegTab::RegTab(Backend *backend)
     OnDataSelChanged(DataSelNothing);
 }
 
+RegTab::~RegTab()
+{
+    delete m_io_backend;
+}
+
 void RegTab::SetDataSocName(const QString& socname)
 {
     if(socname.size() != 0)

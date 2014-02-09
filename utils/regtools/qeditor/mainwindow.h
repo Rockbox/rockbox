@@ -33,6 +33,7 @@ private:
 private slots:
     void OnQuit();
     void OnAbout();
+    void OnAboutQt();
     void OnLoadDesc();
     void OnNewRegTab();
 

@@ -76,6 +76,7 @@ class RegTab : public QSplitter
     Q_OBJECT
 public:
     RegTab(Backend *backend);
+    ~RegTab();
 
 protected:
     void FillDevSubTree(DevTreeItem *item);
