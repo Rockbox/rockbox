@@ -64,14 +64,14 @@
 #define MATCH_ELEM_NODE(node_name, array, parse_fn) \
     if(sub->type == XML_ELEMENT_NODE && strcmp(XML_CHAR_TO_CHAR(sub->name), node_name) == 0) { \
         array.resize(array.size() + 1); \
-        if(!parse_fn(sub, array[array.size() - 1])) \
+        if(!parse_fn(sub, array.back())) \
             return false; \
     }
 
 #define SOFT_MATCH_ELEM_NODE(node_name, array, parse_fn) \
     if(sub->type == XML_ELEMENT_NODE && strcmp(XML_CHAR_TO_CHAR(sub->name), node_name) == 0) { \
         array.resize(array.size() + 1); \
-        if(!parse_fn(sub, array[array.size() - 1])) \
+        if(!parse_fn(sub, array.back())) \
             array.pop_back(); \
     }
 
@@ -189,7 +189,7 @@ bool parse_add_trivial_addr(const std::string& str, soc_reg_t& reg)
 
 bool parse_reg_elem(xmlNode *node, soc_reg_t& reg)
 {
-    std::vector< soc_reg_formula_t > formulas;
+    std::list< soc_reg_formula_t > formulas;
     BEGIN_ATTR_MATCH(node->properties)
         MATCH_TEXT_ATTR("name", reg.name)
         SOFT_MATCH_SCT_ATTR("sct", reg.flags)
@@ -208,7 +208,7 @@ bool parse_reg_elem(xmlNode *node, soc_reg_t& reg)
         return false;
     }
     if(formulas.size() == 1)
-        reg.formula = formulas[0];
+        reg.formula = formulas.front();
 
     return true;
 }
@@ -252,7 +252,7 @@ bool parse_soc_elem(xmlNode *node, soc_t& soc)
     return true;
 }
 
-bool parse_root_elem(xmlNode *node, std::vector< soc_t >& soc)
+bool parse_root_elem(xmlNode *node, std::list< soc_t >& soc)
 {
     BEGIN_NODE_MATCH(node)
         MATCH_ELEM_NODE("soc", soc, parse_soc_elem)
@@ -260,7 +260,7 @@ bool parse_root_elem(xmlNode *node, std::vector< soc_t >& soc)
     return true;
 }
 
-bool soc_desc_parse_xml(const std::string& filename, std::vector< soc_t >& socs)
+bool soc_desc_parse_xml(const std::string& filename, std::list< soc_t >& socs)
 {
     LIBXML_TEST_VERSION
 

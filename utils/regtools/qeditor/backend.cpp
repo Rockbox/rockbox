@@ -14,17 +14,17 @@ Backend::Backend()
 QStringList Backend::GetSocNameList()
 {
     QStringList sl;
-    for(size_t i = 0; i < m_socs.size(); i++)
-        sl.append(QString(m_socs[i].name.c_str()));
+    foreach(const soc_t& soc, m_socs)
+        sl.append(QString(soc.name.c_str()));
     return sl;
 }
 
 bool Backend::GetSocByName(const QString& name, soc_t& s)
 {
-    for(size_t i = 0; i < m_socs.size(); i++)
-        if(m_socs[i].name == name.toStdString())
+    for(std::list< soc_t >::iterator it = m_socs.begin(); it != m_socs.end(); ++it)
+        if(it->name == name.toStdString())
         {
-            s = m_socs[i];
+            s = *it;
             return true;
         }
     return false;
