@@ -33,7 +33,6 @@ is as follows (a list in braces means that those file extensions are tried in
 that order):
 
 \begin{enumerate}
-\item  embedded (JPEG images in ID3v2 or MP4 tags only)
 \item  \fname{./filename.\{jpeg,jpg,bmp\}}
 \item  \fname{./albumtitle.\{jpeg,jpg,bmp\}}
 \item  \fname{./cover.\{jpeg,jpg,bmp\}}
@@ -42,6 +41,8 @@ that order):
 \item  \fname{../albumtitle.\{jpeg,jpg,bmp\}}
 \item  \fname{../cover.\{jpeg,jpg,bmp\}}
 \end{enumerate}
+
+By default, embedded art (JPEG images in ID3v2 or MP4 tags only) is preferred over any file-based art, but this can be changed with \setting{Prefer embedded album art}.
 
 The following characters will be replaced with an underscore (\_) when looking
 for albumtitle.bmp or albumartist-albumtitle.bmp: \textbackslash{} / : <

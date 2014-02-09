@@ -1597,7 +1597,7 @@ static bool audio_load_albumart(struct track_info *info,
 #endif
 
         /* We can only decode jpeg for embedded AA */
-        if (track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
+        if (global_settings.prefer_embedded_aa && track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
         {
             user_data.embedded_albumart = &track_id3->albumart;
             hid = bufopen(track_id3->path, 0, TYPE_BITMAP, &user_data);
@@ -1613,6 +1613,16 @@ static bool audio_load_albumart(struct track_info *info,
             {
                 user_data.embedded_albumart = NULL;
                 hid = bufopen(path, 0, TYPE_BITMAP, &user_data);
+            }
+
+            if (hid < 0 && hid != ERR_BUFFER_FULL)
+            {
+                /* We can only decode jpeg for embedded AA */
+                if (!global_settings.prefer_embedded_aa && track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
+                {
+                    user_data.embedded_albumart = &track_id3->albumart;
+                    hid = bufopen(track_id3->path, 0, TYPE_BITMAP, &user_data);
+                }
             }
         }
 

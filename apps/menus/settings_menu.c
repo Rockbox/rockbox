@@ -293,6 +293,9 @@ MENUITEM_SETTING(accessory_supply, &global_settings.accessory_supply, NULL);
 #ifdef HAVE_LINEOUT_POWEROFF
 MENUITEM_SETTING(lineout_onoff, &global_settings.lineout_active, NULL);
 #endif
+#ifdef HAVE_ALBUMART
+MENUITEM_SETTING(prefer_embedded_aa, &global_settings.prefer_embedded_aa, NULL);
+#endif
 #ifdef USB_ENABLE_HID
 MENUITEM_SETTING(usb_hid, &global_settings.usb_hid, NULL);
 MENUITEM_SETTING(usb_keypad_mode, &global_settings.usb_keypad_mode, NULL);
@@ -350,6 +353,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_LINEOUT_POWEROFF
             &lineout_onoff,
+#endif
+#ifdef HAVE_ALBUMART
+            &prefer_embedded_aa,
 #endif
 #ifdef HAVE_BUTTON_LIGHT
             &buttonlight_timeout,

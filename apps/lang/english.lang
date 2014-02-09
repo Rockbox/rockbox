@@ -13209,3 +13209,20 @@
     swcodec: "Q"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED_AA
+  desc: setting, prefer embedded album art over file-based album art
+  user: core
+  <source>
+    *: none
+    swcodec: "Prefer embedded album art"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Prefer embedded album art"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Prefer embedded album art"
+  </voice>
+</phrase>

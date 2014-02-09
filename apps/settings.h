@@ -506,6 +506,9 @@ struct user_settings
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
 #ifdef HAVE_LCD_BITMAP
     unsigned char sbs_file[MAX_FILENAME+1];  /* last statusbar skin */
+#ifdef HAVE_ALBUMART
+    bool prefer_embedded_aa;
+#endif
 #endif
 #ifdef HAVE_REMOTE_LCD
     unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */

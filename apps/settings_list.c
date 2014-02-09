@@ -993,6 +993,10 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, lineout_active, LANG_LINEOUT_ONOFF,
                   true, "lineout", lineout_set),
 #endif
+#ifdef HAVE_ALBUMART
+    OFFON_SETTING(0, prefer_embedded_aa, LANG_PREFER_EMBEDDED_AA, true, "prefer embedded aa", NULL),
+#endif
+
     /* tuner */
 #if CONFIG_TUNER
     OFFON_SETTING(0,fm_force_mono, LANG_FM_MONO_MODE,
