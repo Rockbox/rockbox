@@ -30,18 +30,28 @@ enum
 #endif
 };
 
+class DevTreeItem : public QTreeWidgetItem
+{
+public:
+    DevTreeItem(const QString& string, const SocDevRef& ref)
+        :QTreeWidgetItem(QStringList(string), RegTreeDevType), m_ref(ref) {}
+
+    const SocDevRef& GetRef() { return m_ref; }
+private:
+    SocDevRef m_ref;
+};
+
 class RegTreeItem : public QTreeWidgetItem
 {
 public:
-    RegTreeItem(const QString& string, int type);
+    RegTreeItem(const QString& string, const SocRegRef& ref)
+        :QTreeWidgetItem(QStringList(string), RegTreeRegType), m_ref(ref) {}
 
-    void SetPath(int dev_idx, int dev_addr_idx, int reg_idx = -1, int reg_addr_idx = -1);
-    int GetDevIndex() const { return m_dev_idx; }
-    int GetDevAddrIndex() const { return m_dev_addr_idx; }
-    int GetRegIndex() const { return m_reg_idx; }
-    int GetRegAddrIndex() const { return m_reg_addr_idx; }
+    const SocRegRef& GetRef() { return m_ref; }
 private:
-    int m_dev_idx, m_dev_addr_idx, m_reg_idx, m_reg_addr_idx;
+    SocRegRef m_ref;
+};
+
 };
 
 class RegTab : public QSplitter
@@ -51,12 +61,11 @@ public:
     RegTab(Backend *backend);
 
 protected:
-    void FillDevSubTree(RegTreeItem *item);
+    void FillDevSubTree(DevTreeItem *item);
     void FillRegTree();
     void FillAnalyserList();
     void UpdateSocList();
-    void DisplayRegister(soc_dev_t& dev, soc_dev_addr_t& dev_addr,
-        soc_reg_t& reg, soc_reg_addr_t& reg_addr);
+    void DisplayRegister(const SocRegRef& ref);
     void SetDataSocName(const QString& socname);
     QComboBox *m_soc_selector;
 #ifdef HAVE_HWSTUB
@@ -65,7 +74,7 @@ protected:
 #endif
     Backend *m_backend;
     QTreeWidget *m_reg_tree;
-    soc_t m_cur_soc;
+    SocRef m_cur_soc;
     QVBoxLayout *m_right_panel;
     QWidget *m_right_content;
     QLineEdit *m_data_sel_edit;

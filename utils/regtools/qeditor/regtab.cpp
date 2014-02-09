@@ -203,17 +203,11 @@ void RegTab::OnRegItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previou
 void RegTab::OnRegItemClicked(QTreeWidgetItem *current, int col)
 {
     (void) col;
-    if(current == 0)
+    if(current == 0 || current->type() != RegTreeRegType)
         return;
     RegTreeItem *item = dynamic_cast< RegTreeItem * >(current);
-    if(item->type() != RegTreeRegType)
-        return;
-    soc_dev_t& dev = m_cur_soc.dev[item->GetDevIndex()];
-    soc_dev_addr_t& dev_addr = dev.addr[item->GetDevAddrIndex()];
-    soc_reg_t& reg = dev.reg[item->GetRegIndex()];
-    soc_reg_addr_t& reg_addr = reg.addr[item->GetRegAddrIndex()];
 
-    DisplayRegister(dev, dev_addr, reg, reg_addr);
+    DisplayRegister(item->GetRef());
 }
 
 void RegTab::OnAnalyserChanged(QListWidgetItem *current, QListWidgetItem *previous)
@@ -232,13 +226,15 @@ void RegTab::OnAnalyserClicked(QListWidgetItem *current)
     m_right_panel->addWidget(m_right_content, 1);
 }
 
-void RegTab::DisplayRegister(soc_dev_t& dev, soc_dev_addr_t& dev_addr,
-    soc_reg_t& reg, soc_reg_addr_t& reg_addr)
+void RegTab::DisplayRegister(const SocRegRef& ref)
 {
-    (void) dev;
     delete m_right_content;
 
     QVBoxLayout *right_layout = new QVBoxLayout;
+
+    const soc_dev_addr_t& dev_addr = ref.GetDevAddr();
+    const soc_reg_t& reg = ref.GetReg();
+    const soc_reg_addr_t& reg_addr = ref.GetRegAddr();
 
     QString reg_name;
     reg_name.sprintf("HW_%s_%s", dev_addr.name.c_str(), reg_addr.name.c_str());
@@ -303,29 +299,29 @@ void RegTab::DisplayRegister(soc_dev_t& dev, soc_dev_addr_t& dev_addr,
     QTableWidget *value_table = new QTableWidget;
     value_table->setRowCount(reg.field.size());
     value_table->setColumnCount(4);
-    for(size_t i = 0; i < reg.field.size(); i++)
+    int row = 0;
+    foreach(const soc_reg_field_t& field, reg.field)
     {
         QString bits_str;
-        if(reg.field[i].first_bit == reg.field[i].last_bit)
-            bits_str.sprintf("%d", reg.field[i].first_bit);
+        if(field.first_bit == field.last_bit)
+            bits_str.sprintf("%d", field.first_bit);
         else
-            bits_str.sprintf("%d:%d", reg.field[i].last_bit, reg.field[i].first_bit);
+            bits_str.sprintf("%d:%d", field.last_bit, field.first_bit);
         QTableWidgetItem *item = new QTableWidgetItem(bits_str);
         item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        value_table->setItem(i, 0, item);
-        item = new QTableWidgetItem(QString(reg.field[i].name.c_str()));
+        value_table->setItem(row, 0, item);
+        item = new QTableWidgetItem(QString(field.name.c_str()));
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        value_table->setItem(i, 1, item);
+        value_table->setItem(row, 1, item);
         item = new QTableWidgetItem();
         if(has_value)
         {
-            const soc_reg_field_t& field = reg.field[i];
             soc_word_t v = (value & field.bitmask()) >> field.first_bit;
             QString value_name;
-            for(size_t j = 0; j < field.value.size(); j++)
-                if(v == field.value[j].value)
-                    value_name = field.value[j].name.c_str();
+            foreach(const soc_reg_field_value_t& rval, field.value)
+                if(v == rval.value)
+                    value_name = rval.name.c_str();
             const char *fmt = "%lu";
             // heuristic
             if((field.last_bit - field.first_bit + 1) > 16)
@@ -338,11 +334,12 @@ void RegTab::DisplayRegister(soc_dev_t& dev, soc_dev_addr_t& dev_addr,
                 QTableWidgetItem *t = new QTableWidgetItem(value_name);
                 t->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
                 t->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-                value_table->setItem(i, 3, t);
+                value_table->setItem(row, 3, t);
             }
         }
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        value_table->setItem(i, 2, item);
+        value_table->setItem(row, 2, item);
+        row++;
     }
     value_table->setHorizontalHeaderItem(0, new QTableWidgetItem("Bits"));
     value_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Name"));
@@ -404,16 +401,16 @@ void RegTab::OnDevChanged(int index)
 }
 #endif
 
-void RegTab::FillDevSubTree(RegTreeItem *item)
+void RegTab::FillDevSubTree(DevTreeItem *item)
 {
-    soc_dev_t& sd = m_cur_soc.dev[item->GetDevIndex()];
-    for(size_t i = 0; i < sd.reg.size(); i++)
+    const soc_dev_t& dev = item->GetRef().GetDev();
+    for(size_t i = 0; i < dev.reg.size(); i++)
     {
-        soc_reg_t& reg = sd.reg[i];
+        const soc_reg_t& reg = dev.reg[i];
         for(size_t j = 0; j < reg.addr.size(); j++)
         {
-            RegTreeItem *reg_item = new RegTreeItem(reg.addr[j].name.c_str(), RegTreeRegType);
-            reg_item->SetPath(item->GetDevIndex(), item->GetDevAddrIndex(), i, j);
+            RegTreeItem *reg_item = new RegTreeItem(reg.addr[j].name.c_str(),
+                SocRegRef(item->GetRef(), i, j));
             item->addChild(reg_item);
         }
     }
@@ -421,13 +418,13 @@ void RegTab::FillDevSubTree(RegTreeItem *item)
 
 void RegTab::FillRegTree()
 {
-    for(size_t i = 0; i < m_cur_soc.dev.size(); i++)
+    for(size_t i = 0; i < m_cur_soc.GetSoc().dev.size(); i++)
     {
-        soc_dev_t& sd = m_cur_soc.dev[i];
-        for(size_t j = 0; j < sd.addr.size(); j++)
+        const soc_dev_t& dev = m_cur_soc.GetSoc().dev[i];
+        for(size_t j = 0; j < dev.addr.size(); j++)
         {
-            RegTreeItem *dev_item = new RegTreeItem(sd.addr[j].name.c_str(), RegTreeDevType);
-            dev_item->SetPath(i, j);
+            DevTreeItem *dev_item = new DevTreeItem(dev.addr[j].name.c_str(),
+                SocDevRef(m_cur_soc, i, j));
             FillDevSubTree(dev_item);
             m_reg_tree->addTopLevelItem(dev_item);
         }
@@ -437,7 +434,7 @@ void RegTab::FillRegTree()
 void RegTab::FillAnalyserList()
 {
     m_analysers_list->clear();
-    m_analysers_list->addItems(AnalyserFactory::GetAnalysersForSoc(m_cur_soc.name.c_str()));
+    m_analysers_list->addItems(AnalyserFactory::GetAnalysersForSoc(m_cur_soc.GetSoc().name.c_str()));
 }
 
 void RegTab::OnSocChanged(const QString& soc)

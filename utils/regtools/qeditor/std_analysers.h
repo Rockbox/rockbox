@@ -23,7 +23,7 @@ class ClockAnalyser : public Analyser
 {
     Q_OBJECT
 public:
-    ClockAnalyser(const soc_t& soc, IoBackend *backend);
+    ClockAnalyser(const SocRef& soc, IoBackend *backend);
     virtual ~ClockAnalyser();
     virtual QWidget *GetWidget();
     static bool SupportSoc(const QString& soc_name);
@@ -54,7 +54,7 @@ class EmiAnalyser : public Analyser
 {
     Q_OBJECT
 public:
-    EmiAnalyser(const soc_t& soc, IoBackend *backend);
+    EmiAnalyser(const SocRef& soc, IoBackend *backend);
     virtual ~EmiAnalyser();
     virtual QWidget *GetWidget();
 
@@ -98,7 +98,7 @@ class PinAnalyser : public Analyser
 {
     Q_OBJECT
 public:
-    PinAnalyser(const soc_t& soc, IoBackend *backend);
+    PinAnalyser(const SocRef& soc, IoBackend *backend);
     virtual ~PinAnalyser();
     virtual QWidget *GetWidget();
 

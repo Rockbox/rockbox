@@ -23,10 +23,14 @@ public:
         ByAddress,
     };
 
+    /* report whether backend supports register access type */
     virtual bool SupportAccess(AccessType type) = 0;
+    /* get SoC name */
     virtual QString GetSocName() = 0;
+    /* read a register by name or address */
     virtual bool ReadRegister(const QString& name, soc_word_t& value) = 0;
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value) = 0;
+    /* reload content (if it makes sense) */
     virtual bool Reload() = 0;
 };
 
@@ -140,6 +144,56 @@ protected:
 };
 #endif
 
+class SocRef
+{
+public:
+    SocRef():m_soc(0) {}
+    SocRef(const soc_t *soc):m_soc(soc) {}
+    const soc_t& GetSoc() const { return *m_soc; }
+protected:
+    const soc_t *m_soc;
+};
+
+class SocDevRef : public SocRef
+{
+public:
+    SocDevRef() {}
+    SocDevRef(const SocRef& soc, int dev_idx, int dev_addr_idx)
+        :SocRef(soc), m_dev_idx(dev_idx), m_dev_addr_idx(dev_addr_idx) {}
+    int GetDevIndex() const { return m_dev_idx; }
+    const soc_dev_t& GetDev() const { return GetSoc().dev[GetDevIndex()]; }
+    int GetDevAddrIndex() const { return m_dev_addr_idx; }
+    const soc_dev_addr_t& GetDevAddr() const { return GetDev().addr[GetDevAddrIndex()]; }
+protected:
+    int m_dev_idx, m_dev_addr_idx;
+};
+
+class SocRegRef : public SocDevRef
+{
+public:
+    SocRegRef() {}
+    SocRegRef(const SocDevRef& dev, int reg_idx, int reg_addr_idx)
+        :SocDevRef(dev), m_reg_idx(reg_idx), m_reg_addr_idx(reg_addr_idx) {}
+    int GetRegIndex() const { return m_reg_idx; }
+    const soc_reg_t& GetReg() const { return GetDev().reg[GetRegIndex()]; }
+    int GetRegAddrIndex() const { return m_reg_addr_idx; }
+    const soc_reg_addr_t& GetRegAddr() const { return GetReg().addr[GetRegAddrIndex()]; }
+protected:
+    int m_reg_idx, m_reg_addr_idx;
+};
+
+class SocFieldRef : public SocRegRef
+{
+public:
+    SocFieldRef(){}
+    SocFieldRef(const SocRegRef& reg, int field_idx)
+        :SocRegRef(reg), m_field_idx(field_idx) {}
+    int GetFieldIndex() const { return m_field_idx; }
+    const soc_reg_field_t& GetField() const { return GetReg().field[GetFieldIndex()]; }
+protected:
+    int m_field_idx;
+};
+
 class Backend : public QObject
 {
     Q_OBJECT
@@ -148,7 +202,7 @@ public:
 
     QStringList GetSocNameList();
     bool LoadSocDesc(const QString& filename);
-    bool GetSocByName(const QString& name, soc_t& s);
+    bool GetSocByName(const QString& name, SocRef& s);
     IoBackend *CreateDummyIoBackend();
     IoBackend *CreateFileIoBackend(const QString& filename);
 #ifdef HAVE_HWSTUB
@@ -158,23 +212,23 @@ public:
 signals:
     void OnSocListChanged();
 private:
-    std::vector< soc_t > m_socs;
+    std::list< soc_t > m_socs;
 };
 
 class BackendHelper
 {
 public:
-    BackendHelper(IoBackend *io_backend, const soc_t& soc);
+    BackendHelper(IoBackend *io_backend, const SocRef& soc);
     bool ReadRegister(const QString& dev, const QString& reg, soc_word_t& v);
     bool ReadRegisterField(const QString& dev, const QString& reg,
         const QString& field, soc_word_t& v);
-    bool GetDeviceDesc(const QString& dev, soc_dev_t& dev_desc, size_t& index);
-    bool GetRegisterDesc(const soc_dev_t& dev, const QString& reg, soc_reg_t& reg_desc, size_t& index);
-    bool GetFieldDesc(const soc_reg_t& reg_desc, const QString& field, soc_reg_field_t& field_desc);
+    bool GetDevRef(const QString& dev, SocDevRef& ref);
+    bool GetRegRef(const SocDevRef& dev, const QString& reg, SocRegRef& ref);
+    bool GetFieldRef(const SocRegRef& reg, const QString& field, SocFieldRef& ref);
     bool GetRegisterAddress(const QString& dev, const QString& reg, soc_addr_t& addr);
 private:
     IoBackend *m_io_backend;
-    soc_t m_soc;
+    const SocRef& m_soc;
 };
 
 #endif /* __BACKEND_H__ */

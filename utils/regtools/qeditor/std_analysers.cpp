@@ -4,7 +4,7 @@
  * Clock analyser
  */
 
-ClockAnalyser::ClockAnalyser(const soc_t& soc, IoBackend *backend)
+ClockAnalyser::ClockAnalyser(const SocRef& soc, IoBackend *backend)
         :Analyser(soc, backend)
 {
     m_group = new QGroupBox("Clock Analyser");
@@ -300,7 +300,7 @@ static TmplAnalyserFactory< ClockAnalyser > g_clock_factory(true, "Clock Analyse
 /**
  * EMI analyser
  */
-EmiAnalyser::EmiAnalyser(const soc_t& soc, IoBackend *backend)
+EmiAnalyser::EmiAnalyser(const SocRef& soc, IoBackend *backend)
     :Analyser(soc, backend)
 {
     m_display_mode = DisplayCycles;
@@ -647,7 +647,7 @@ namespace pin_desc
 #include "../../imxtools/misc/map.h"
 }
 
-PinAnalyser::PinAnalyser(const soc_t& soc, IoBackend *backend)
+PinAnalyser::PinAnalyser(const SocRef& soc, IoBackend *backend)
         :Analyser(soc, backend)
 {
     m_group = new QGroupBox("Pin Analyser");

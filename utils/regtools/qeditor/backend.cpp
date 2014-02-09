@@ -19,12 +19,12 @@ QStringList Backend::GetSocNameList()
     return sl;
 }
 
-bool Backend::GetSocByName(const QString& name, soc_t& s)
+bool Backend::GetSocByName(const QString& name, SocRef& s)
 {
     for(std::list< soc_t >::iterator it = m_socs.begin(); it != m_socs.end(); ++it)
         if(it->name == name.toStdString())
         {
-            s = *it;
+            s = SocRef(&(*it));
             return true;
         }
     return false;
@@ -326,7 +326,7 @@ bool HWStubBackendHelper::HasHotPlugSupport()
  * BackendHelper
  */
 
-BackendHelper::BackendHelper(IoBackend *io_backend, const soc_t& soc)
+BackendHelper::BackendHelper(IoBackend *io_backend, const SocRef& soc)
     :m_io_backend(io_backend), m_soc(soc)
 {
 }
@@ -345,75 +345,72 @@ bool BackendHelper::ReadRegister(const QString& dev, const QString& reg, soc_wor
 }
 
 
-bool BackendHelper::GetDeviceDesc(const QString& dev, soc_dev_t& dev_desc, size_t& index)
+bool BackendHelper::GetDevRef(const QString& sdev, SocDevRef& ref)
 {
-    for(size_t i = 0; i < m_soc.dev.size(); i++)
+    for(size_t i = 0; i < m_soc.GetSoc().dev.size(); i++)
     {
-        for(size_t j = 0; j < m_soc.dev[i].addr.size(); j++)
-            if(m_soc.dev[i].addr[j].name.c_str() == dev)
+        const soc_dev_t& dev = m_soc.GetSoc().dev[i];
+        for(size_t j = 0; j < dev.addr.size(); j++)
+            if(dev.addr[j].name.c_str() == sdev)
             {
-                dev_desc = m_soc.dev[i];
-                index = j;
+                ref = SocDevRef(m_soc, i, j);
                 return true;
             }
     }
     return false;
 }
 
-bool BackendHelper::GetRegisterDesc(const soc_dev_t& dev, const QString& reg,
-    soc_reg_t& reg_desc, size_t& index)
+bool BackendHelper::GetRegRef(const SocDevRef& dev, const QString& sreg, SocRegRef& ref)
 {
-    for(size_t i = 0; i < dev.reg.size(); i++)
+    const soc_dev_t& sdev = dev.GetDev();
+    for(size_t i = 0; i < sdev.reg.size(); i++)
     {
-        for(size_t j = 0; j < dev.reg[i].addr.size(); j++)
-            if(dev.reg[i].addr[j].name.c_str() == reg)
+        const soc_reg_t& reg = sdev.reg[i];
+        for(size_t j = 0; j < reg.addr.size(); j++)
+        {
+            if(reg.addr[j].name.c_str() == sreg)
             {
-                index = j;
-                reg_desc = dev.reg[i];
+                ref = SocRegRef(dev, i, j);
                 return true;
             }
+        }
     }
     return false;
 }
 
-bool BackendHelper::GetFieldDesc(const soc_reg_t& reg_desc, const QString& field,
-    soc_reg_field_t& field_desc)
+bool BackendHelper::GetFieldRef(const SocRegRef& reg, const QString& sfield, SocFieldRef& ref)
 {
-    for(size_t i = 0; i < reg_desc.field.size(); i++)
-        if(reg_desc.field[i].name.c_str() == field)
-            field_desc = reg_desc.field[i];
+    for(size_t i = 0; i < reg.GetReg().field.size(); i++)
+        if(reg.GetReg().field[i].name.c_str() == sfield)
+        {
+            ref = SocFieldRef(reg, i);
+            return true;
+        }
     return false;
 }
 
 bool BackendHelper::GetRegisterAddress(const QString& dev, const QString& reg,
     soc_addr_t& addr)
 {
-    size_t dev_index, reg_index;
-    soc_dev_t dev_desc;
-    soc_reg_t reg_desc;
-    if(!GetDeviceDesc(dev, dev_desc, dev_index))
+    SocDevRef dev_ref;
+    SocRegRef reg_ref;
+    if(!GetDevRef(dev, dev_ref) || !GetRegRef(dev_ref, reg, reg_ref))
         return false;
-    if(!GetRegisterDesc(dev_desc, reg, reg_desc, reg_index))
-        return false;
-    addr = dev_desc.addr[dev_index].addr + reg_desc.addr[reg_index].addr;
+    addr = dev_ref.GetDevAddr().addr + reg_ref.GetRegAddr().addr;
     return true;
 }
 
 bool BackendHelper::ReadRegisterField(const QString& dev, const QString& reg,
     const QString& field, soc_word_t& v)
 {
-    size_t dev_index, reg_index;
-    soc_dev_t dev_desc;
-    soc_reg_t reg_desc;
-    soc_reg_field_t field_desc;
-    if(!GetDeviceDesc(dev, dev_desc, dev_index))
-        return false;
-    if(!GetRegisterDesc(dev_desc, reg, reg_desc, reg_index))
-        return false;
-    if(!GetFieldDesc(reg_desc, field, field_desc))
+    SocDevRef dev_ref;
+    SocRegRef reg_ref;
+    SocFieldRef field_ref;
+    if(!GetDevRef(dev, dev_ref) || !GetRegRef(dev_ref, reg, reg_ref) || 
+            !GetFieldRef(reg_ref, field, field_ref))
         return false;
     if(!ReadRegister(dev, reg, v))
         return false;
-    v = (v & field_desc.bitmask()) >> field_desc.first_bit;
+    v = (v & field_ref.GetField().bitmask()) >> field_ref.GetField().first_bit;
     return true;
 }
