@@ -568,7 +568,7 @@ static void qs_load_from_cfg(void* var, char*value)
 static char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
 {
     int index = *(int*)setting;
-    if (index < 0 || index >= nb_settings - 1)
+    if (index < 0 || index >= nb_settings)
     {
         strlcpy(buf, "-", buf_len);
         return buf;
