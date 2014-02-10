@@ -266,6 +266,8 @@ void lcd_enable(bool enable)
         lcd_power(false);
         // stop lcdif
         BF_CLR(LCDIF_CTRL, DOTCLK_MODE);
+        // stmp37xx errata: clearing DOTCLK_MODE won't clear RUN
+        BF_CLR(LCDIF_CTRL, RUN);
         // disable spi
         spi_enable(false);
     }
