@@ -17,12 +17,21 @@ public:
     IoBackend() {}
     virtual ~IoBackend() {}
 
+    enum WriteMode
+    {
+        Write, Set, Clear, Toggle
+    };
+
     enum AccessType
     {
         ByName,
         ByAddress,
     };
 
+    /** Register naming convention: name based access are of the form:
+     * HW.dev.reg
+     * where <dev> is the device name (including index like APPUART1)
+     * and <reg> is the register name (including index like PRIORITY29) */
     /* report whether backend supports register access type */
     virtual bool SupportAccess(AccessType type) = 0;
     /* get SoC name */
@@ -37,8 +46,10 @@ public:
     /* write a register by name or address
      * NOTE: even on a read-only backend, a write is allowed be successful as long
      * as commit fails */
-    virtual bool WriteRegister(const QString& name, soc_word_t value) = 0;
-    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value) = 0;
+    virtual bool WriteRegister(const QString& name, soc_word_t value,
+        WriteMode mode = Write) = 0;
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value,
+        WriteMode mode = Write) = 0;
     /* check whether backend contains uncommitted (ie cached) writes */
     virtual bool IsDirty() = 0;
     /* commit all writes */
@@ -59,10 +70,10 @@ public:
         { (void) addr; (void) value; return false; }
     virtual bool Reload() { return false; }
     virtual bool IsReadOnly() { return true; }
-    virtual bool WriteRegister(const QString& name, soc_word_t value)
-        { (void) name; (void) value; return false; }
-    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value)
-        { (void) addr; (void) value; return false; }
+    virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
+        { (void) name; (void) value; (void) mode; return false; }
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
+        { (void) addr; (void) value; (void) mode; return false; }
     virtual bool IsDirty() { return false; }
     virtual bool Commit() { return false; }
 };
@@ -82,9 +93,9 @@ public:
         { (void) addr; (void) value; return false; }
     virtual bool Reload();
     virtual bool IsReadOnly() { return m_readonly; }
-    virtual bool WriteRegister(const QString& name, soc_word_t value);
-    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value)
-        { (void) addr; (void) value; return false; }
+    virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode);
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
+        { (void) addr; (void) value; (void) mode; return false; }
     virtual bool IsDirty() { return m_dirty; }
     virtual bool Commit();
 
@@ -142,9 +153,9 @@ public:
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value);
     virtual bool Reload();
     virtual bool IsReadOnly() { return false; }
-    virtual bool WriteRegister(const QString& name, soc_word_t value)
-        { (void) name; (void) value; return false; }
-    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value);
+    virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
+        { (void) name; (void) value; (void) mode; return false; }
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode);
     virtual bool IsDirty() { return false; }
     virtual bool Commit() { return true; }
 
@@ -258,6 +269,8 @@ public:
     bool ReadRegister(const QString& dev, const QString& reg, soc_word_t& v);
     bool ReadRegisterField(const QString& dev, const QString& reg,
         const QString& field, soc_word_t& v);
+    bool WriteRegister(const QString& dev, const QString& reg, soc_word_t v,
+        IoBackend::WriteMode mode = IoBackend::Write);
     bool GetDevRef(const QString& dev, SocDevRef& ref);
     bool GetRegRef(const SocDevRef& dev, const QString& reg, SocRegRef& ref);
     bool GetFieldRef(const SocRegRef& reg, const QString& field, SocFieldRef& ref);

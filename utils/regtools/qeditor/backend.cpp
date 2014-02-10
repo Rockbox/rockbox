@@ -106,11 +106,17 @@ bool FileIoBackend::Reload()
     return true;
 }
 
-bool FileIoBackend::WriteRegister(const QString& name, soc_word_t value)
+bool FileIoBackend::WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
 {
     m_dirty = true;
-    m_map[name] = value;
-    return true;
+    switch(mode)
+    {
+        case Write: m_map[name] = value; return true;
+        case Set: m_map[name] |= value; return true;
+        case Clear: m_map[name] &= ~value; return true;
+        case Toggle: m_map[name] ^= value; return true;
+        default: return false;
+    }
 }
 
 bool FileIoBackend::Commit()
@@ -281,8 +287,15 @@ bool HWStubIoBackend::ReadRegister(soc_addr_t addr, soc_word_t& value)
     return m_dev->ReadMem(addr, sizeof(value), &value);
 }
 
-bool HWStubIoBackend:: WriteRegister(soc_addr_t addr, soc_word_t value)
+bool HWStubIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
 {
+    switch(mode)
+    {
+        case Set: addr += 4; break;
+        case Clear: addr += 8; break;
+        case Toggle: addr += 12; break;
+        default: break;
+    }
     return m_dev->WriteMem(addr, sizeof(value), &value);
 }
 
@@ -387,6 +400,19 @@ bool BackendHelper::ReadRegister(const QString& dev, const QString& reg, soc_wor
     return false;
 }
 
+bool BackendHelper::WriteRegister(const QString& dev, const QString& reg,
+    soc_word_t v, IoBackend::WriteMode mode)
+{
+    if(m_io_backend->SupportAccess(IoBackend::ByName))
+        return m_io_backend->WriteRegister("HW." + dev + "." + reg, v, mode);
+    if(m_io_backend->SupportAccess(IoBackend::ByAddress))
+    {
+        soc_addr_t addr;
+        if(GetRegisterAddress(dev, reg, addr))
+            return m_io_backend->WriteRegister(addr, v, mode);
+    }
+    return false;
+}
 
 bool BackendHelper::GetDevRef(const QString& sdev, SocDevRef& ref)
 {
