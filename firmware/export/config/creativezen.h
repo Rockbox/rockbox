@@ -49,9 +49,6 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* define this if you have LCD enable function */
-#define HAVE_LCD_ENABLE
-
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well.
 #define HAVE_LCD_SLEEP
@@ -73,6 +70,9 @@
 #define HAVE_RTC_ALARM
 
 #endif /* !BOOTLOADER */
+
+/* define this if you have LCD enable function */
+#define HAVE_LCD_ENABLE
 
 /* define this if you have an i.MX23 codec */
 #define HAVE_IMX233_CODEC

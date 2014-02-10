@@ -43,6 +43,7 @@
 #include "version.h"
 #include "powermgmt-imx233.h"
 #include "partitions-imx233.h"
+#include "backlight-target.h"
 #include "adc.h"
 
 #include "usb.h"
@@ -211,6 +212,12 @@ void main(uint32_t arg, uint32_t addr)
     printf("Executing");
     /* stop what was initialized to start from clean state */
     system_prepare_fw_start();
+    /* if target defines lcd_enable() in bootloader, take this as a hint that
+     * we should use it to properly stop the lcd before moving one, the
+     * _backlight_off() routine is supposed to disable the lcd at the same time */
+#ifdef HAVE_LCD_ENABLE
+    _backlight_off();
+#endif
     disable_interrupt(IRQ_FIQ_STATUS);
     commit_discard_idcache();
     kernel_entry();
