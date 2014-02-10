@@ -45,12 +45,17 @@ void imx233_timrot_setup(unsigned timer_nr, bool reload, unsigned count,
     bool irq = fn != NULL;
     timer_fns[timer_nr] = fn;
 
-    /* manual says count - 1 for reload timers */
-    HW_TIMROT_TIMCTRLn(timer_nr) = BF_OR7(TIMROT_TIMCTRLn, SELECT(src),
-        PRESCALE(prescale), POLARITY(polarity), RELOAD(reload), IRQ(irq),
-        IRQ_EN(irq), UPDATE(1));
-    imx233_icoll_enable_interrupt(INT_SRC_TIMER(timer_nr), irq);
+    /* make sure we start from stop state */
+    HW_TIMROT_TIMCTRLn(timer_nr) = BF_OR2(TIMROT_TIMCTRLn,
+        SELECT(BV_TIMROT_TIMCTRLn_SELECT__NEVER_TICK), UPDATE(1));
+    /* write count and take effect immediately with UPDATE
+     * manual says count-1 for reload timers */
     HW_TIMROT_TIMCOUNTn(timer_nr) = reload ? count - 1 : count;
+    /* start timer */
+    HW_TIMROT_TIMCTRLn(timer_nr) = BF_OR6(TIMROT_TIMCTRLn, SELECT(src),
+        PRESCALE(prescale), POLARITY(polarity), RELOAD(reload), IRQ(irq),
+        IRQ_EN(irq));
+    imx233_icoll_enable_interrupt(INT_SRC_TIMER(timer_nr), irq);
 
     restore_interrupt(oldstatus);
 }
