@@ -2,7 +2,6 @@
 
 #include <QSplitter>
 #include <QVBoxLayout>
-#include <QGroupBox>
 #include <QAbstractListModel>
 #include <QMessageBox>
 #include <QSizePolicy>
@@ -14,8 +13,13 @@
 #include <QHeaderView>
 #include <QFileDialog>
 #include <QDebug>
+#include <QStyle>
 #include "backend.h"
 #include "analyser.h"
+
+/**
+ * SocFieldValidator
+ */
 
 SocFieldValidator::SocFieldValidator(QObject *parent)
     :QValidator(parent)
@@ -39,7 +43,6 @@ QValidator::State SocFieldValidator::validate(QString& input, int& pos) const
     (void) pos;
     soc_word_t val;
     State state = parse(input, val);
-    qDebug() << "validate(" << input << "): " << state;
     return state;
 }
 
@@ -113,6 +116,289 @@ QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val
     return state;
 }
 
+/**
+ * RegLineEdit
+ */
+RegLineEdit::RegLineEdit(QWidget *parent)
+    :QWidget(parent)
+{
+    m_layout = new QHBoxLayout(this);
+    m_button = new QToolButton(this);
+    m_button->setCursor(Qt::ArrowCursor);
+    m_button->setStyleSheet("QToolButton { font-weight: bold; color: white; background: black; }");
+    m_button->setPopupMode(QToolButton::InstantPopup);
+    m_edit = new QLineEdit(this);
+    m_layout->addWidget(m_button);
+    m_layout->addWidget(m_edit);
+    m_menu = new QMenu(this);
+    connect(m_menu->addAction("Write"), SIGNAL(triggered()), this, SLOT(OnWriteAct()));
+    connect(m_menu->addAction("Set"), SIGNAL(triggered()), this, SLOT(OnSetAct()));
+    connect(m_menu->addAction("Clear"), SIGNAL(triggered()), this, SLOT(OnClearAct()));
+    connect(m_menu->addAction("Toggle"), SIGNAL(triggered()), this, SLOT(OnToggleAct()));
+    EnableSCT(false);
+    SetReadOnly(false);
+    ShowMode(true);
+    SetMode(Write);
+}
+
+void RegLineEdit::SetReadOnly(bool ro)
+{
+    m_edit->setReadOnly(ro);
+    m_readonly = ro;
+    ShowMode(!ro);
+}
+
+void RegLineEdit::EnableSCT(bool en)
+{
+    m_has_sct = en;
+    if(!m_has_sct)
+    {
+        m_button->setMenu(0);
+        SetMode(Write);
+    }
+    else
+        m_button->setMenu(m_menu);
+}
+
+RegLineEdit::~RegLineEdit()
+{
+}
+
+QLineEdit *RegLineEdit::GetLineEdit()
+{
+    return m_edit;
+}
+
+void RegLineEdit::ShowMode(bool show)
+{
+    if(show)
+        m_button->show();
+    else
+        m_button->hide();
+}
+
+void RegLineEdit::OnWriteAct()
+{
+    SetMode(Write);
+}
+
+void RegLineEdit::OnSetAct()
+{
+    SetMode(Set);
+}
+
+void RegLineEdit::OnClearAct()
+{
+    SetMode(Clear);
+}
+
+void RegLineEdit::OnToggleAct()
+{
+    SetMode(Toggle);
+}
+
+void RegLineEdit::SetMode(EditMode mode)
+{
+    m_mode = mode;
+    switch(m_mode)
+    {
+        case Write: m_button->setText("WR"); break;
+        case Set: m_button->setText("SET"); break;
+        case Clear: m_button->setText("CLR"); break;
+        case Toggle: m_button->setText("TOG"); break;
+        default: break;
+    }
+}
+
+RegLineEdit::EditMode RegLineEdit::GetMode()
+{
+    return m_mode;
+}
+
+/**
+ * RegDisplayPanel
+ */
+
+RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const SocRegRef& reg_ref)
+    :QGroupBox(parent), m_io_backend(io_backend), m_reg(reg_ref)
+{
+    bool read_only = m_io_backend->IsReadOnly();
+
+    QVBoxLayout *right_layout = new QVBoxLayout;
+
+    const soc_dev_addr_t& dev_addr = m_reg.GetDevAddr();
+    const soc_reg_t& reg = m_reg.GetReg();
+    const soc_reg_addr_t& reg_addr = m_reg.GetRegAddr();
+
+    QString reg_name;
+    reg_name.sprintf("HW_%s_%s", dev_addr.name.c_str(), reg_addr.name.c_str());
+    QStringList names;
+    QVector< soc_addr_t > addresses;
+    names.append(reg_name);
+    addresses.append(reg_addr.addr);
+    if(reg.flags & REG_HAS_SCT)
+    {
+        names.append(reg_name + "_SET");
+        names.append(reg_name + "_CLR");
+        names.append(reg_name + "_TOG");
+        addresses.append(reg_addr.addr + 4);
+        addresses.append(reg_addr.addr + 8);
+        addresses.append(reg_addr.addr + 12);
+    }
+
+    QString str;
+    str += "<table align=left>";
+    for(int i = 0; i < names.size(); i++)
+        str += "<tr><td><b>" + names[i] + "</b></td></tr>";
+    str += "</table>";
+    QLabel *label_names = new QLabel;
+    label_names->setTextFormat(Qt::RichText);
+    label_names->setText(str);
+
+    QString str_addr;
+    str_addr += "<table align=left>";
+    for(int i = 0; i < names.size(); i++)
+        str_addr += "<tr><td><b>" + QString().sprintf("0x%03x", addresses[i]) + "</b></td></tr>";
+    str_addr += "</table>";
+    QLabel *label_addr = new QLabel;
+    label_addr->setTextFormat(Qt::RichText);
+    label_addr->setText(str_addr);
+
+    QHBoxLayout *top_layout = new QHBoxLayout;
+    top_layout->addStretch();
+    top_layout->addWidget(label_names);
+    top_layout->addWidget(label_addr);
+    top_layout->addStretch();
+
+    soc_word_t value;
+    BackendHelper helper(m_io_backend, m_reg);
+    bool has_value = helper.ReadRegister(dev_addr.name.c_str(), reg_addr.name.c_str(), value);
+
+    QHBoxLayout *raw_val_layout = 0;
+    if(has_value)
+    {
+        QLabel *raw_val_name = new QLabel;
+        raw_val_name->setText("Raw value:");
+        m_raw_val_edit = new RegLineEdit;
+        m_raw_val_edit->SetReadOnly(read_only);
+        m_raw_val_edit->GetLineEdit()->setText(QString().sprintf("0x%08x", value));
+        m_raw_val_edit->GetLineEdit()->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        m_raw_val_edit->GetLineEdit()->setValidator(new SocFieldValidator(m_raw_val_edit));
+        m_raw_val_edit->EnableSCT(!!(reg.flags & REG_HAS_SCT));
+        connect(m_raw_val_edit->GetLineEdit(), SIGNAL(returnPressed()), this, SLOT(OnRawRegValueReturnPressed()));
+        raw_val_layout = new QHBoxLayout;
+        raw_val_layout->addStretch();
+        raw_val_layout->addWidget(raw_val_name);
+        raw_val_layout->addWidget(m_raw_val_edit);
+        raw_val_layout->addStretch();
+    }
+    else
+        m_raw_val_edit = 0;
+
+    QTableWidget *value_table = new QTableWidget;
+    value_table->setRowCount(reg.field.size());
+    value_table->setColumnCount(4);
+    int row = 0;
+    foreach(const soc_reg_field_t& field, reg.field)
+    {
+        QString bits_str;
+        if(field.first_bit == field.last_bit)
+            bits_str.sprintf("%d", field.first_bit);
+        else
+            bits_str.sprintf("%d:%d", field.last_bit, field.first_bit);
+        QTableWidgetItem *item = new QTableWidgetItem(bits_str);
+        item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        value_table->setItem(row, 0, item);
+        item = new QTableWidgetItem(QString(field.name.c_str()));
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        value_table->setItem(row, 1, item);
+        item = new QTableWidgetItem();
+        if(has_value)
+        {
+            soc_word_t v = (value & field.bitmask()) >> field.first_bit;
+            QString value_name;
+            foreach(const soc_reg_field_value_t& rval, field.value)
+                if(v == rval.value)
+                    value_name = rval.name.c_str();
+            const char *fmt = "%lu";
+            // heuristic
+            if((field.last_bit - field.first_bit + 1) > 16)
+                fmt = "0x%lx";
+            item->setText(QString().sprintf(fmt, (unsigned long)v));
+            item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+
+            if(value_name.size() != 0)
+            {
+                QTableWidgetItem *t = new QTableWidgetItem(value_name);
+                t->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+                t->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                value_table->setItem(row, 3, t);
+            }
+        }
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        value_table->setItem(row, 2, item);
+        row++;
+    }
+    value_table->setHorizontalHeaderItem(0, new QTableWidgetItem("Bits"));
+    value_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Name"));
+    value_table->setHorizontalHeaderItem(2, new QTableWidgetItem("Value"));
+    value_table->setHorizontalHeaderItem(3, new QTableWidgetItem("Meaning"));
+    value_table->verticalHeader()->setVisible(false);
+    value_table->resizeColumnsToContents();
+    value_table->horizontalHeader()->setStretchLastSection(true);
+    value_table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    right_layout->addLayout(top_layout);
+    if(raw_val_layout)
+        right_layout->addLayout(raw_val_layout);
+    //right_layout->addWidget(bits_label);
+    right_layout->addWidget(value_table);
+    //right_layout->addStretch();
+
+    setTitle("Register Description");
+    setLayout(right_layout);
+    AllowWrite(false);
+}
+
+void RegDisplayPanel::AllowWrite(bool en)
+{
+    m_allow_write = en;
+    if(m_raw_val_edit)
+        m_raw_val_edit->SetReadOnly(m_io_backend->IsReadOnly() || !m_allow_write);
+}
+
+IoBackend::WriteMode RegDisplayPanel::EditModeToWriteMode(RegLineEdit::EditMode mode)
+{
+    switch(mode)
+    {
+        case RegLineEdit::Write: return IoBackend::Write;
+        case RegLineEdit::Set: return IoBackend::Set;
+        case RegLineEdit::Clear: return IoBackend::Clear;
+        case RegLineEdit::Toggle: return IoBackend::Toggle;
+        default: return IoBackend::Write;
+    }
+}
+
+void RegDisplayPanel::OnRawRegValueReturnPressed()
+{
+    soc_word_t val;
+    QLineEdit *edit = m_raw_val_edit->GetLineEdit();
+    const SocFieldValidator *validator = dynamic_cast< const SocFieldValidator *>(edit->validator());
+    QValidator::State state = validator->parse(edit->text(), val);
+    if(state != QValidator::Acceptable)
+        return;
+    IoBackend::WriteMode mode = EditModeToWriteMode(m_raw_val_edit->GetMode());
+    BackendHelper helper(m_io_backend, m_reg);
+    helper.WriteRegister(m_reg.GetDevAddr().name.c_str(), m_reg.GetRegAddr().name.c_str(),
+        val, mode);
+    // FIXME: we should notify the UI to read value back because it has changed
+}
+
+/**
+ * RegTab
+ */
+
 RegTab::RegTab(Backend *backend)
     :m_backend(backend)
 {
@@ -153,15 +439,19 @@ RegTab::RegTab(Backend *backend)
 #endif
     m_data_sel_edit = new QLineEdit;
     m_data_sel_edit->setReadOnly(true);
+    m_readonly_check = new QCheckBox("Read-only");
+    m_readonly_check->setCheckState(Qt::Checked);
     m_data_soc_label = new QLabel;
     QPushButton *data_sel_reload = new QPushButton;
     data_sel_reload->setIcon(QIcon::fromTheme("view-refresh"));
+    data_sel_reload->setToolTip("Reload data");
     data_sel_layout->addWidget(m_data_selector);
     data_sel_layout->addWidget(m_data_sel_edit);
 #ifdef HAVE_HWSTUB
     m_dev_selector = new QComboBox;
     data_sel_layout->addWidget(m_dev_selector, 1);
 #endif
+    data_sel_layout->addWidget(m_readonly_check);
     data_sel_layout->addWidget(m_data_soc_label);
     data_sel_layout->addWidget(data_sel_reload);
     data_sel_group->setLayout(data_sel_layout);
@@ -199,6 +489,7 @@ RegTab::RegTab(Backend *backend)
     connect(m_dev_selector, SIGNAL(currentIndexChanged(int)),
         this, SLOT(OnDevChanged(int)));
 #endif
+    connect(m_readonly_check, SIGNAL(clicked(bool)), this, SLOT(OnReadOnlyClicked(bool)));
 
     OnSocListChanged();
     OnDataSelChanged(DataSelNothing);
@@ -280,6 +571,8 @@ void RegTab::OnDataSelChanged(int index)
 
 void RegTab::SetReadOnlyIndicator()
 {
+    if(m_io_backend->IsReadOnly())
+        m_readonly_check->setCheckState(Qt::Checked);
 }
 
 void RegTab::OnDataChanged()
@@ -322,140 +615,9 @@ void RegTab::OnAnalyserClicked(QListWidgetItem *current)
 void RegTab::DisplayRegister(const SocRegRef& ref)
 {
     delete m_right_content;
-
-    bool read_only = m_io_backend->IsReadOnly();
-
-    QVBoxLayout *right_layout = new QVBoxLayout;
-
-    const soc_dev_addr_t& dev_addr = ref.GetDevAddr();
-    const soc_reg_t& reg = ref.GetReg();
-    const soc_reg_addr_t& reg_addr = ref.GetRegAddr();
-
-    QString reg_name;
-    reg_name.sprintf("HW_%s_%s", dev_addr.name.c_str(), reg_addr.name.c_str());
-    QStringList names;
-    QVector< soc_addr_t > addresses;
-    names.append(reg_name);
-    addresses.append(reg_addr.addr);
-    if(reg.flags & REG_HAS_SCT)
-    {
-        names.append(reg_name + "_SET");
-        names.append(reg_name + "_CLR");
-        names.append(reg_name + "_TOG");
-        addresses.append(reg_addr.addr + 4);
-        addresses.append(reg_addr.addr + 8);
-        addresses.append(reg_addr.addr + 12);
-    }
-
-    QString str;
-    str += "<table align=left>";
-    for(int i = 0; i < names.size(); i++)
-        str += "<tr><td><b>" + names[i] + "</b></td></tr>";
-    str += "</table>";
-    QLabel *label_names = new QLabel;
-    label_names->setTextFormat(Qt::RichText);
-    label_names->setText(str);
-
-    QString str_addr;
-    str_addr += "<table align=left>";
-    for(int i = 0; i < names.size(); i++)
-        str_addr += "<tr><td><b>" + QString().sprintf("0x%03x", addresses[i]) + "</b></td></tr>";
-    str_addr += "</table>";
-    QLabel *label_addr = new QLabel;
-    label_addr->setTextFormat(Qt::RichText);
-    label_addr->setText(str_addr);
-
-    QHBoxLayout *top_layout = new QHBoxLayout;
-    top_layout->addStretch();
-    top_layout->addWidget(label_names);
-    top_layout->addWidget(label_addr);
-    top_layout->addStretch();
-
-    soc_word_t value;
-    BackendHelper helper(m_io_backend, m_cur_soc);
-    bool has_value = helper.ReadRegister(dev_addr.name.c_str(), reg_addr.name.c_str(), value);
-
-    QHBoxLayout *raw_val_layout = 0;
-    if(has_value)
-    {
-        QLabel *raw_val_name = new QLabel;
-        raw_val_name->setText("Raw value:");
-        QLineEdit *raw_val_edit = new QLineEdit;
-        raw_val_edit->setReadOnly(read_only);
-        raw_val_edit->setText(QString().sprintf("0x%08x", value));
-        raw_val_edit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-        raw_val_edit->setValidator(new SocFieldValidator(raw_val_edit));
-        connect(raw_val_edit, SIGNAL(returnPressed()), this, SLOT(OnRawRegValueReturnPressed()));
-        raw_val_layout = new QHBoxLayout;
-        raw_val_layout->addStretch();
-        raw_val_layout->addWidget(raw_val_name);
-        raw_val_layout->addWidget(raw_val_edit);
-        raw_val_layout->addStretch();
-    }
-
-    QTableWidget *value_table = new QTableWidget;
-    value_table->setRowCount(reg.field.size());
-    value_table->setColumnCount(4);
-    int row = 0;
-    foreach(const soc_reg_field_t& field, reg.field)
-    {
-        QString bits_str;
-        if(field.first_bit == field.last_bit)
-            bits_str.sprintf("%d", field.first_bit);
-        else
-            bits_str.sprintf("%d:%d", field.last_bit, field.first_bit);
-        QTableWidgetItem *item = new QTableWidgetItem(bits_str);
-        item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        value_table->setItem(row, 0, item);
-        item = new QTableWidgetItem(QString(field.name.c_str()));
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        value_table->setItem(row, 1, item);
-        item = new QTableWidgetItem();
-        if(has_value)
-        {
-            soc_word_t v = (value & field.bitmask()) >> field.first_bit;
-            QString value_name;
-            foreach(const soc_reg_field_value_t& rval, field.value)
-                if(v == rval.value)
-                    value_name = rval.name.c_str();
-            const char *fmt = "%lu";
-            // heuristic
-            if((field.last_bit - field.first_bit + 1) > 16)
-                fmt = "0x%lx";
-            item->setText(QString().sprintf(fmt, (unsigned long)v));
-            item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
-
-            if(value_name.size() != 0)
-            {
-                QTableWidgetItem *t = new QTableWidgetItem(value_name);
-                t->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
-                t->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-                value_table->setItem(row, 3, t);
-            }
-        }
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        value_table->setItem(row, 2, item);
-        row++;
-    }
-    value_table->setHorizontalHeaderItem(0, new QTableWidgetItem("Bits"));
-    value_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Name"));
-    value_table->setHorizontalHeaderItem(2, new QTableWidgetItem("Value"));
-    value_table->setHorizontalHeaderItem(3, new QTableWidgetItem("Meaning"));
-    value_table->verticalHeader()->setVisible(false);
-    value_table->resizeColumnsToContents();
-    value_table->horizontalHeader()->setStretchLastSection(true);
-    value_table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    right_layout->addLayout(top_layout);
-    if(raw_val_layout)
-        right_layout->addLayout(raw_val_layout);
-    //right_layout->addWidget(bits_label);
-    right_layout->addWidget(value_table);
-    //right_layout->addStretch();
-
-    m_right_content = new QGroupBox("Register Description");
-    m_right_content->setLayout(right_layout);
+    RegDisplayPanel *panel = new RegDisplayPanel(this, m_io_backend, ref);
+    panel->AllowWrite(m_readonly_check->checkState() == Qt::Unchecked);
+    m_right_content = panel;
     m_right_panel->addWidget(m_right_content);
 }
 
@@ -483,6 +645,7 @@ void RegTab::OnDevListChanged()
         m_dev_selector->setCurrentIndex(0);
     else
         SetDataSocName("");
+    SetReadOnlyIndicator();
 }
 
 void RegTab::OnDevChanged(int index)
@@ -543,11 +706,14 @@ void RegTab::OnSocChanged(const QString& soc)
     FillAnalyserList();
 }
 
-void RegTab::OnRawRegValueReturnPressed()
+void RegTab::OnReadOnlyClicked(bool checked)
 {
-    QObject *obj = sender();
-    QLineEdit *edit = dynamic_cast< QLineEdit* >(obj);
-    const SocFieldValidator *validator = dynamic_cast< const SocFieldValidator* >(edit->validator());
-    soc_word_t val;
-    QValidator::State state = validator->parse(edit->text(), val);
+    if(m_io_backend->IsReadOnly())
+        return SetReadOnlyIndicator();
+    if(m_right_content == 0)
+        return;
+    RegDisplayPanel *panel = dynamic_cast< RegDisplayPanel* >(m_right_content);
+    if(panel == 0)
+        return;
+    panel->AllowWrite(!checked);
 }

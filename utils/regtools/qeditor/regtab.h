@@ -12,6 +12,10 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QValidator>
+#include <QGroupBox>
+#include <QToolButton>
+#include <QMenu>
+#include <QCheckBox>
 #include <soc_desc.hpp>
 #include "backend.h"
 #include "settings.h"
@@ -20,15 +24,6 @@ enum
 {
     RegTreeDevType = QTreeWidgetItem::UserType,
     RegTreeRegType
-};
-
-enum
-{
-    DataSelNothing,
-    DataSelFile,
-#ifdef HAVE_HWSTUB
-    DataSelDevice,
-#endif
 };
 
 class DevTreeItem : public QTreeWidgetItem
@@ -69,6 +64,57 @@ protected:
     soc_reg_field_t m_field;
 };
 
+class RegLineEdit : public QWidget
+{
+    Q_OBJECT
+public:
+    enum EditMode
+    {
+        Write, Set, Clear, Toggle
+    };
+
+    RegLineEdit(QWidget *parent = 0);
+    ~RegLineEdit();
+    void SetReadOnly(bool ro);
+    void EnableSCT(bool en);
+    void SetMode(EditMode mode);
+    EditMode GetMode();
+    QLineEdit *GetLineEdit();
+
+protected slots:
+    void OnWriteAct();
+    void OnSetAct();
+    void OnClearAct();
+    void OnToggleAct();
+protected:
+    void ShowMode(bool show);
+
+    QHBoxLayout *m_layout;
+    QToolButton *m_button;
+    QLineEdit *m_edit;
+    EditMode m_mode;
+    bool m_has_sct;
+    bool m_readonly;
+    QMenu *m_menu;
+};
+
+class RegDisplayPanel : public QGroupBox
+{
+    Q_OBJECT
+public:
+    RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const SocRegRef& reg);
+    void AllowWrite(bool en);
+
+protected:
+    IoBackend::WriteMode EditModeToWriteMode(RegLineEdit::EditMode mode);
+
+    IoBackend *m_io_backend;
+    const SocRegRef& m_reg;
+    bool m_allow_write;
+    RegLineEdit *m_raw_val_edit;
+
+private slots:
+    void OnRawRegValueReturnPressed();
 };
 
 class RegTab : public QSplitter
@@ -79,6 +125,15 @@ public:
     ~RegTab();
 
 protected:
+    enum
+    {
+        DataSelNothing,
+        DataSelFile,
+    #ifdef HAVE_HWSTUB
+        DataSelDevice,
+    #endif
+    };
+
     void FillDevSubTree(DevTreeItem *item);
     void FillRegTree();
     void FillAnalyserList();
@@ -96,6 +151,7 @@ protected:
     QVBoxLayout *m_right_panel;
     QWidget *m_right_content;
     QLineEdit *m_data_sel_edit;
+    QCheckBox *m_readonly_check;
     QLabel *m_data_soc_label;
     QPushButton *m_data_sel_reload;
     QComboBox *m_data_selector;
@@ -118,7 +174,7 @@ private slots:
     void OnDataSocActivated(const QString&);
     void OnAnalyserChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void OnAnalyserClicked(QListWidgetItem *clicked);
-    void OnRawRegValueReturnPressed();
+    void OnReadOnlyClicked(bool);
 };
 
 #endif /* REGTAB_H */
