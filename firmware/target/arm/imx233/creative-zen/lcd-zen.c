@@ -292,11 +292,11 @@ void lcd_init_device(void)
     imx233_clkctrl_set_div(CLK_PIX, 2);
     imx233_clkctrl_set_bypass(CLK_PIX, true); /* use XTAL */
     imx233_clkctrl_enable(CLK_PIX, true);
-    imx233_dma_reset_channel(APB_LCDIF);
-    imx233_dma_clkgate_channel(APB_LCDIF, true);
     imx233_lcdif_init();
     imx233_lcdif_setup_dotclk_pins(8, false);
     imx233_lcdif_set_word_length(8);
+    imx233_dma_clkgate_channel(APB_LCDIF, true);
+    imx233_dma_reset_channel(APB_LCDIF);
     /** Datasheet states:
      * 257H >= VBP >= 3H, VBP > VLW, VFP >= 1H
      * 1533clk >= HBP >= 24clk, HBP > HLW, HFP >= 4clk
