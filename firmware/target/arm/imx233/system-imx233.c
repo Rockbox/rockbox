@@ -197,6 +197,13 @@ void system_init(void)
 #endif
 }
 
+void system_prepare_fw_start(void)
+{
+    /* keep alive to get enough time, stop watchdog */
+    imx233_keep_alive();
+    imx233_rtc_enable_watchdog(false);
+}
+
 bool imx233_us_elapsed(uint32_t ref, unsigned us_delay)
 {
     uint32_t cur = HW_DIGCTL_MICROSECONDS;

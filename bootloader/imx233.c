@@ -209,6 +209,8 @@ void main(uint32_t arg, uint32_t addr)
 
     kernel_entry = (void*) loadbuffer;
     printf("Executing");
+    /* stop what was initialized to start from clean state */
+    system_prepare_fw_start();
     disable_interrupt(IRQ_FIQ_STATUS);
     commit_discard_idcache();
     kernel_entry();
