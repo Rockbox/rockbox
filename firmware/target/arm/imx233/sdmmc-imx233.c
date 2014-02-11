@@ -427,17 +427,15 @@ static int init_sd_card(int drive)
     /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
     if(sd_v2)
     {
+        /* only transfer 64 bytes */
+        imx233_ssp_set_block_size(ssp, /*log2(64)*/6);
         /* CMD6 switch to HS */
-        {
-            /* only transfer 64 bytes */
-            imx233_ssp_set_block_size(ssp, /*log2(64)*/6);
-            if(imx233_ssp_sd_mmc_transfer(ssp, SD_SWITCH_FUNC, 0x80fffff1,
-                    SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, NULL))
-                return -12;
-            imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
-            if((aligned_buffer[drive][16] & 0xf) == 1)
-                sd_hs = true;
-        }
+        if(imx233_ssp_sd_mmc_transfer(ssp, SD_SWITCH_FUNC, 0x80fffff1,
+                SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, NULL))
+            return -12;
+        imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
+        if((aligned_buffer[drive][16] & 0xf) == 1)
+            sd_hs = true;
     }
 
     /* probe for CMD23 support */
@@ -954,7 +952,7 @@ int mmc_init(void)
                 if(SDMMC_FLAGS(drive) & PROBE)
                     continue;
                 else
-                    panicf("init_drive(%d) failed: %d (mmc)", ret);
+                    panicf("init_drive(%d) failed: %d (mmc)", drive, ret);
             }
             mmc_map[_mmc_num_drives++] = drive;
         }
