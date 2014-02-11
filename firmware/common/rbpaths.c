@@ -23,6 +23,9 @@
 #include <stdio.h> /* snprintf */
 #include <stdlib.h>
 #include <stdarg.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
 #include "config.h"
 #include "rbpaths.h"
 #include "file.h" /* MAX_PATH */
@@ -31,39 +34,34 @@
 #include "string-extra.h"
 #include "filefuncs.h"
 
+/* In this file we need the actual OS library functions, not the shadowed
+ * wrapper used within Rockbox' application code (except SDL adds
+ * another layer) */
 #undef open
 #undef creat
 #undef remove
 #undef rename
 #undef opendir
+#undef closedir
+#undef readdir
 #undef mkdir
 #undef rmdir
+#undef dirent
+#undef DIR
 
-
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) && !defined(__PCTOOL__)
-#include "dir-target.h"
-#define opendir _opendir
-#define mkdir   _mkdir
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 static const char rbhome[] = "/sdcard";
 #endif
-#elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) && !defined(__PCTOOL__)
-#define open    sim_open
-#define remove  sim_remove
-#define rename  sim_rename
-#define opendir sim_opendir
-#define mkdir   sim_mkdir
-#define rmdir   sim_rmdir
-extern int sim_open(const char* name, int o, ...);
-extern int sim_remove(const char* name);
-extern int sim_rename(const char* old, const char* new);
-extern DIR* sim_opendir(const char* name);
-extern int sim_mkdir(const char* name);
-extern int sim_rmdir(const char* name);
+#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) && !defined(__PCTOOL__)
 const char *rbhome;
 #endif
 
 #if !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)) && !defined(__PCTOOL__)
+/* Special dirs are user-accessible (and user-writable) dirs which take priority
+ * over the ones where Rockbox is installed to. Classic example would be
+ * $HOME/.config/rockbox.org vs /usr/share/rockbox */
+#define HAVE_SPECIAL_DIRS
+#endif
 
 /* flags for get_user_file_path() */
 /* whether you need write access to that file/dir, especially true
@@ -72,12 +70,13 @@ const char *rbhome;
 /* file or directory? */
 #define IS_FILE             (1<<1)
 
+#ifdef HAVE_SPECIAL_DIRS
 void paths_init(void)
 {
     /* make sure $HOME/.config/rockbox.org exists, it's needed for config.cfg */
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
-    mkdir("/sdcard/rockbox");
-    mkdir("/sdcard/rockbox/rocks.data");
+    mkdir("/sdcard/rockbox", 0777);
+    mkdir("/sdcard/rockbox/rocks.data", 0777);
 #else
     char config_dir[MAX_PATH];
 
@@ -94,13 +93,14 @@ void paths_init(void)
 
     rbhome = home;
     snprintf(config_dir, sizeof(config_dir), "%s/.config", home);
-    mkdir(config_dir);
+    mkdir(config_dir, 0777);
     snprintf(config_dir, sizeof(config_dir), "%s/.config/rockbox.org", home);
-    mkdir(config_dir);
+    mkdir(config_dir, 0777);
     /* Plugin data directory */
     snprintf(config_dir, sizeof(config_dir), "%s/.config/rockbox.org/rocks.data", home);
-    mkdir(config_dir);
+    mkdir(config_dir, 0777);
 #endif
+
 }
 
 static bool try_path(const char* filename, unsigned flags)
@@ -173,6 +173,21 @@ static const char* handle_special_dirs(const char* dir, unsigned flags,
     return dir;
 }
 
+#else /* !HAVE_SPECIAL_DIRS */
+
+#ifndef paths_init
+void paths_init(void) { }
+#endif
+
+static const char* handle_special_dirs(const char* dir, unsigned flags,
+                                char *buf, const size_t bufsize)
+{
+    (void) flags; (void) buf; (void) bufsize;
+    return dir;
+}
+
+#endif
+
 int app_open(const char *name, int o, ...)
 {
     char realpath[MAX_PATH];
@@ -215,19 +230,98 @@ int app_rename(const char *old, const char *new)
     return rename(final_old, final_new);
 }
 
-DIR *app_opendir(const char *name)
+/* need to wrap around DIR* because we need to save the parent's
+ * directory path in order to determine dirinfo, required to implement
+ * get_dir_info() */
+struct __dir {
+    DIR *dir;
+    char path[];
+};
+
+struct dirinfo dir_get_info(DIR* _parent, struct dirent *dir)
+{
+    struct __dir *parent = (struct __dir*)_parent;
+    struct stat s;
+    struct tm *tm = NULL;
+    struct dirinfo ret;
+    char path[MAX_PATH];
+
+    snprintf(path, sizeof(path), "%s/%s", parent->path, dir->d_name);
+    memset(&ret, 0, sizeof(ret));
+
+    if (!stat(path, &s))
+    {
+        if (S_ISDIR(s.st_mode))
+        {
+            ret.attribute = ATTR_DIRECTORY;
+        }
+        ret.size = s.st_size;
+        tm = localtime(&(s.st_mtime));
+    }
+
+    if (!lstat(path, &s) && S_ISLNK(s.st_mode))
+    {
+        ret.attribute |= ATTR_LINK;
+    }
+
+    if (tm)
+    {
+        ret.wrtdate = ((tm->tm_year - 80) << 9) |
+                            ((tm->tm_mon + 1) << 5) |
+                            tm->tm_mday;
+        ret.wrttime = (tm->tm_hour << 11) |
+                            (tm->tm_min << 5) |
+                            (tm->tm_sec >> 1);
+    }
+
+    return ret;
+}
+   
+DIR* app_opendir(const char *_name)
 {
     char realpath[MAX_PATH];
-    const char *fname = handle_special_dirs(name, 0, realpath, sizeof(realpath));
-    return opendir(fname);
+    const char *name = handle_special_dirs(_name, 0, realpath, sizeof(realpath));
+    char *buf = malloc(sizeof(struct __dir) + strlen(name)+1);
+    if (!buf)
+        return NULL;
+
+    struct __dir *this = (struct __dir*)buf;
+    /* definitely fits due to strlen() */
+    strcpy(this->path, name);
+
+    this->dir = opendir(name);
+
+    if (!this->dir)
+    {
+        free(buf);
+        return NULL;
+    }
+    return (DIR*)this;
 }
+
+int app_closedir(DIR *dir)
+{
+    struct __dir *this = (struct __dir*)dir;
+    int ret = closedir(this->dir);
+    free(this);
+    return ret;
+}
+
+
+struct dirent* app_readdir(DIR* dir)
+{
+    struct __dir *d = (struct __dir*)dir;
+    return readdir(d->dir);
+}
+
 
 int app_mkdir(const char* name)
 {
     char realpath[MAX_PATH];
     const char *fname = handle_special_dirs(name, NEED_WRITE, realpath, sizeof(realpath));
-    return mkdir(fname);
+    return mkdir(fname, 0777);
 }
+
 
 int app_rmdir(const char* name)
 {
@@ -235,28 +329,3 @@ int app_rmdir(const char* name)
     const char *fname = handle_special_dirs(name, NEED_WRITE, realpath, sizeof(realpath));
     return rmdir(fname);
 }
-
-#else
-
-int app_open(const char *name, int o, ...)
-{
-    if (o & O_CREAT)
-    {
-        int ret;
-        va_list ap;
-        va_start(ap, o);
-        ret = open(name, o, va_arg(ap, mode_t));
-        va_end(ap);
-        return ret;
-    }
-    return open(name, o);
-}
-
-int app_creat(const char* name, mode_t mode) { return creat(name, mode); }
-int app_remove(const char *name) { return remove(name); }
-int app_rename(const char *old, const char *new) { return rename(old,new); }
-DIR *app_opendir(const char *name) { return (DIR*)opendir(name); } /* cast to remove warning in checkwps */
-int app_mkdir(const char* name) { return mkdir(name); }
-int app_rmdir(const char* name) { return rmdir(name); }
-
-#endif

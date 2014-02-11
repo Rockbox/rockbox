@@ -93,7 +93,7 @@ bool dir_exists(const char *path)
 }
 
 
-#if (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA))
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SIMULATOR)
 struct dirinfo dir_get_info(DIR* parent, struct dirent *entry)
 {
     (void)parent;

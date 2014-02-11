@@ -155,6 +155,7 @@ void dircache_remove(const char *name);
 void dircache_rename(const char *oldname, const char *newname);
 #endif
 
+#ifndef APPLICATION
 
 #define SIMULATOR_DEFAULT_ROOT "simdisk"
 extern const char *sim_root_dir;
@@ -209,6 +210,8 @@ static unsigned int rockbox2sim(int opt)
     return opt|O_BINARY;
 #endif
 }
+
+#endif /* APPLICATION */
 
 /** Simulator I/O engine routines **/
 #define IO_YIELD_THRESHOLD 512
@@ -282,6 +285,43 @@ static ssize_t io_trigger_and_wait(enum io_dir cmd)
     return result;
 }
 
+
+ssize_t sim_read(int fd, void *buf, size_t count)
+{
+    ssize_t result;
+
+    mutex_lock(&io.sim_mutex);
+
+    /* Setup parameters */
+    io.fd = fd;
+    io.buf = buf;
+    io.count = count;
+
+    result = io_trigger_and_wait(IO_READ);
+
+    mutex_unlock(&io.sim_mutex);
+
+    return result;
+}
+
+
+ssize_t sim_write(int fd, const void *buf, size_t count)
+{
+    ssize_t result;
+
+    mutex_lock(&io.sim_mutex);
+
+    io.fd = fd;
+    io.buf = (void*)buf;
+    io.count = count;
+
+    result = io_trigger_and_wait(IO_WRITE);
+
+    mutex_unlock(&io.sim_mutex);
+
+    return result;
+}
+
 #if !defined(APPLICATION)
 static const char *get_sim_pathname(const char *name)
 {
@@ -296,9 +336,6 @@ static const char *get_sim_pathname(const char *name)
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
     return name;
 }
-#else
-#define get_sim_pathname(name) name
-#endif
 
 MYDIR *sim_opendir(const char *name)
 {
@@ -446,41 +483,6 @@ int sim_creat(const char *name, mode_t mode)
     return ret;
 }
 
-ssize_t sim_read(int fd, void *buf, size_t count)
-{
-    ssize_t result;
-
-    mutex_lock(&io.sim_mutex);
-
-    /* Setup parameters */
-    io.fd = fd;
-    io.buf = buf;
-    io.count = count;
-
-    result = io_trigger_and_wait(IO_READ);
-
-    mutex_unlock(&io.sim_mutex);
-
-    return result;
-}
-
-ssize_t sim_write(int fd, const void *buf, size_t count)
-{
-    ssize_t result;
-
-    mutex_lock(&io.sim_mutex);
-
-    io.fd = fd;
-    io.buf = (void*)buf;
-    io.count = count;
-
-    result = io_trigger_and_wait(IO_WRITE);
-
-    mutex_unlock(&io.sim_mutex);
-
-    return result;
-}
-
 int sim_mkdir(const char *name)
 {
     return MKDIR(get_sim_pathname(name), 0777);
@@ -519,6 +521,10 @@ long sim_lseek(int fildes, long offset, int whence)
 {
     return lseek(fildes, offset, whence);
 }
+
+#else
+#define get_sim_pathname(x) x
+#endif
 
 long filesize(int fd)
 {

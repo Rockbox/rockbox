@@ -33,7 +33,7 @@ struct dirinfo {
 #include <stdbool.h>
 #include "file.h"
 
-#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) || defined(__PCTOOL__)
+#if defined(SIMULATOR) || defined(__PCTOOL__)
 #   define dirent_uncached sim_dirent
 #   define DIR_UNCACHED SIM_DIR
 #   define opendir_uncached sim_opendir
@@ -41,10 +41,21 @@ struct dirinfo {
 #   define closedir_uncached sim_closedir
 #   define mkdir_uncached sim_mkdir
 #   define rmdir_uncached sim_rmdir
+#elif defined(APPLICATION)
+#   include "rbpaths.h"
+#   define DIRENT_DEFINED
+#   define DIR_DEFINED
+#   define dirent_uncached dirent
+#   define DIR_UNCACHED DIR
+#   define opendir_uncached app_opendir
+#   define readdir_uncached app_readdir
+#   define closedir_uncached app_closedir
+#   define mkdir_uncached app_mkdir
+#   define rmdir_uncached app_rmdir
 #endif
 
-#ifndef DIRENT_DEFINED
 
+#ifndef DIRENT_DEFINED
 struct dirent_uncached {
     unsigned char d_name[MAX_PATH];
     struct dirinfo info;
@@ -70,23 +81,6 @@ typedef struct {
     char *name;
 #endif
 } DIR_UNCACHED CACHEALIGN_ATTR;
-#endif
-
-
-#if defined(APPLICATION) && !defined(__PCTOOL__)
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
-#include "dir-target.h"
-#endif
-# undef opendir_uncached
-# define opendir_uncached app_opendir
-# undef mkdir_uncached
-# define mkdir_uncached app_mkdir
-# undef rmdir_uncached
-# define rmdir_uncached app_rmdir
-/* defined in rbpaths.c */
-extern DIR_UNCACHED* app_opendir(const char* name);
-extern int app_rmdir(const char* name);
-extern int app_mkdir(const char* name);
 #endif
 
 #ifdef HAVE_HOTSWAP
