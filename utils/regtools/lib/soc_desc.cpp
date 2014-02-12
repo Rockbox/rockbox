@@ -252,7 +252,7 @@ bool parse_soc_elem(xmlNode *node, soc_t& soc)
     return true;
 }
 
-bool parse_root_elem(xmlNode *node, std::list< soc_t >& soc)
+bool parse_root_elem(xmlNode *node, std::vector< soc_t >& soc)
 {
     BEGIN_NODE_MATCH(node)
         MATCH_ELEM_NODE("soc", soc, parse_soc_elem)
@@ -260,7 +260,7 @@ bool parse_root_elem(xmlNode *node, std::list< soc_t >& soc)
     return true;
 }
 
-bool soc_desc_parse_xml(const std::string& filename, std::list< soc_t >& socs)
+bool soc_desc_parse_xml(const std::string& filename, std::vector< soc_t >& socs)
 {
     LIBXML_TEST_VERSION
 

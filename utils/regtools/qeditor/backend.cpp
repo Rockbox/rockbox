@@ -33,7 +33,10 @@ bool Backend::GetSocByName(const QString& name, SocRef& s)
 
 bool Backend::LoadSocDesc(const QString& filename)
 {
-    bool ret = soc_desc_parse_xml(filename.toStdString(), m_socs);
+    std::vector< soc_t > new_socs;
+    bool ret = soc_desc_parse_xml(filename.toStdString(), new_socs);
+    for(size_t i = 0; i < new_socs.size(); i++)
+        m_socs.push_back(new_socs[i]);
     emit OnSocListChanged();
     return ret;
 }

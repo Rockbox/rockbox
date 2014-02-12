@@ -647,13 +647,13 @@ bool my_lua_import_soc(const soc_t& soc)
     return true;
 }
 
-bool my_lua_import_soc(const std::list< soc_t >& socs)
+bool my_lua_import_soc(const std::vector< soc_t >& socs)
 {
-    for(std::list< soc_t >::const_iterator it = socs.begin(); it != socs.end(); ++it)
+    for(size_t i = 0; i < socs.size(); i++)
     {
         if(!g_quiet)
-            printf("importing %s...\n", it->name.c_str());
-        if(!my_lua_import_soc(*it))
+            printf("importing %s...\n", socs[i].name.c_str());
+        if(!my_lua_import_soc(socs[i]))
             return false;
     }
     return true;
@@ -711,7 +711,7 @@ int main(int argc, char **argv)
     }
 
     // load register descriptions
-    std::list< soc_t > socs;
+    std::vector< soc_t > socs;
     for(int i = optind; i < argc; i++)
         if(!soc_desc_parse_xml(argv[i], socs))
         {

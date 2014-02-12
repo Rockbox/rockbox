@@ -143,6 +143,6 @@ struct soc_t
 
 /** Parse a SoC description from a XML file, append it to <soc>. A file
  * can contain multiple SoC descriptions */
-bool soc_desc_parse_xml(const std::string& filename, std::list< soc_t >& soc);
+bool soc_desc_parse_xml(const std::string& filename, std::vector< soc_t >& soc);
 
 #endif /* __SOC_DESC__ */
