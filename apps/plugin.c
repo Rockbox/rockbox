@@ -792,6 +792,11 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     rbversion,
+    root_menu_get_options,
+    root_menu_set_default,
+    root_menu_write_to_cfg,
+    root_menu_load_from_cfg,
+    settings_save,
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

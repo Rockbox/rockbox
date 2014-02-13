@@ -11,6 +11,7 @@ keybox.c
 logo.c
 lrcplayer.c
 mosaique.c
+main_menu_config.c
 properties.c
 random_folder_advance_config.c
 rockblox.c

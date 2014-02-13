@@ -48,6 +48,7 @@ logo,demos
 lrcplayer,apps
 lua,viewers
 fractals,demos
+main_menu_config,apps
 matrix,demos
 maze,games
 mazezam,games

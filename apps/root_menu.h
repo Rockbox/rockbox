@@ -25,6 +25,12 @@
 #include "gcc_extensions.h"
 
 void root_menu(void) NORETURN_ATTR;
+struct menu_table {
+    char *string;
+    const struct menu_item_ex *item;
+};
+
+struct menu_table *root_menu_get_options(int *nb_options);
 
 enum {
     /* from old menu api, but still required*/
@@ -60,7 +66,7 @@ enum {
     GO_TO_SYSTEM_SCREEN,
     GO_TO_SHORTCUTMENU
 };
-
+#ifndef PLUGIN
 extern struct menu_item_ex root_menu_;
 
 extern void previous_music_is_wps(void);
@@ -69,7 +75,7 @@ void root_menu_load_from_cfg(void* setting, char *value);
 char* root_menu_write_to_cfg(void* setting, char*buf, int buf_len);
 void root_menu_set_default(void* setting, void* defaultval);
 bool root_menu_is_changed(void* setting, void* defaultval);
-
+#endif
 
 
 #endif /* __ROOT_MENU_H__ */

@@ -484,10 +484,7 @@ MENUITEM_FUNCTION(do_shutdown_item, 0, ID2P(LANG_SHUTDOWN),
 struct menu_item_ex root_menu_;
 static struct menu_callback_with_desc root_menu_desc = {
         item_callback, ID2P(LANG_ROCKBOX_TITLE), Icon_Rockbox };
-struct menu_table {
-    char *string;
-    const struct menu_item_ex *item;
-};
+
 static struct menu_table menu_table[] = {
     /* Order here represents the default ordering */
     { "bookmarks", &bookmarks },
@@ -513,6 +510,13 @@ static struct menu_table menu_table[] = {
 };
 #define MAX_MENU_ITEMS (sizeof(menu_table) / sizeof(struct menu_table))
 static struct menu_item_ex *root_menu__[MAX_MENU_ITEMS];
+
+struct menu_table *root_menu_get_options(int *nb_options)
+{
+    *nb_options = MAX_MENU_ITEMS;
+
+    return menu_table;
+}
 
 void root_menu_load_from_cfg(void* setting, char *value)
 {
