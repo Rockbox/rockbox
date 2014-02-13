@@ -1,0 +1,1387 @@
+<?xml version="1.0"?>
+<!--
+             __________               __   ___.
+   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+                     \/            \/     \/    \/            \/
+Copyright (C) 2013 by Marcin Bukat
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+KIND, either express or implied.
+-->
+<soc name="rk27xx" desc="Rockchip rk27xx">
+  <dev name="TIMER" long_name="TIMER" desc="Timer module" version="1.0">
+    <addr name="TIMER0" addr="0x18000000" />
+    <addr name="TIMER1" addr="0x18000010" />
+    <addr name="TIMER2" addr="0x18000020" />
+      <reg name="TMRnLR">
+        <formula string="n*0x10" />
+        <addr name="TMR0LR" addr="0x00" />
+        <addr name="TMR1LR" addr="0x10" />
+        <addr name="TMR2LR" addr="0x20" />
+      </reg>
+      <reg name="TMRnCVR">
+        <formula string="0x04+n*0x10" />
+        <addr name="TMR0CVR" addr="0x04" />
+        <addr name="TMR1CVR" addr="0x14" />
+        <addr name="TMR2CVR" addr="0x24" />
+      </reg>
+      <reg name="TMRnCON">
+        <formula string="0x08+n*0x10" />
+        <addr name="TMR0CON" addr="0x08" />
+        <addr name="TMR1CON" addr="0x18" />
+        <addr name="TMR2CON" addr="0x28" />
+      </reg>
+  </dev>
+  <dev name="UART" long_name="UART" desc="UART" version="1.0">
+    <addr name="UART0" addr="0x18004000" />
+    <addr name="UART1" addr="0x18008000" />
+      <reg name="UARTn_RBR" addr="0x00">
+        <formula string="n*0x4000" />
+        <addr name="UART0_RBR" addr="0x00" />
+        <addr name="UART1_RBR" addr="0x4000" />
+      </reg>
+      <reg name="UARTn_THR" addr="0x00">
+        <formula string="n*0x4000" />
+        <addr name="UART0_THR" addr="0x00" />
+        <addr name="UART1_THR" addr="0x4000" />
+      </reg>
+      <reg name="UARTn_DLL" addr="0x00">
+        <formula string="n*0x4000" />
+        <addr name="UART0_DLL" addr="0x00" />
+        <addr name="UART1_DLL" addr="0x4000" />
+      </reg>
+      <reg name="UARTn_DLH" addr="0x04">
+        <formula string="0x04+n*0x4000" />
+        <addr name="UART0_DLH" addr="0x04" />
+        <addr name="UART1_DLH" addr="0x4004" />
+      </reg>
+      <reg name="UARTn_IER" addr="0x04">
+        <formula string="0x04+n*0x4000" />
+        <addr name="UART0_IER" addr="0x04" />
+        <addr name="UART1_IER" addr="0x4004" />
+      </reg>
+      <reg name="UARTn_IIR" addr="0x08">
+        <formula string="0x08+n*0x4000" />
+        <addr name="UART0_IIR" addr="0x08" />
+        <addr name="UART1_IIR" addr="0x4008" />
+      </reg>
+      <reg name="UARTn_FCR" addr="0x08">
+        <formula string="0x08+n*0x4000" />
+        <addr name="UART0_FCR" addr="0x08" />
+        <addr name="UART1_FCR" addr="0x4008" />
+      </reg>
+      <reg name="UARTn_LCR" addr="0x0c">
+        <formula string="0x0c+n*0x4000" />
+        <addr name="UART0_LCR" addr="0x0c" />
+        <addr name="UART1_LCR" addr="0x400c" />
+      </reg>
+      <reg name="UARTn_MCR" addr="0x10">
+        <formula string="0x10+n*0x4000" />
+        <addr name="UART0_MCR" addr="0x10" />
+        <addr name="UART1_MCR" addr="0x4010" />
+      </reg>
+      <reg name="UARTn_LSR" addr="0x14">
+        <formula string="0x14+n*0x4000" />
+        <addr name="UART0_LSR" addr="0x14" />
+        <addr name="UART1_LSR" addr="0x4014" />
+      </reg>
+      <reg name="UARTn_MSR" addr="0x18">
+        <formula string="0x18+n*0x4000" />
+        <addr name="UART0_MSR" addr="0x18" />
+        <addr name="UART1_MSR" addr="0x4018" />
+      </reg>
+  </dev>
+  <dev name="GPIO" long_name="GPIO" desc="GPIO" version="1.0">
+    <addr name="GPIO0" addr="0x1800c000" />
+      <reg name="GPIO_PADR" addr="0x00">
+      </reg>
+      <reg name="GPIO_PACON" addr="0x04">
+      </reg>
+      <reg name="GPIO_PBDR" addr="0x08">
+      </reg>
+      <reg name="GPIO_PBCON" addr="0x0c">
+      </reg>
+      <reg name="GPIO_PCDR" addr="0x10">
+      </reg>
+      <reg name="GPIO_PCCON" addr="0x14">
+      </reg>
+      <reg name="GPIO_PDDR" addr="0x18">
+      </reg>
+      <reg name="GPIO_PDCON" addr="0x1c">
+      </reg>
+      <reg name="GPIO_TEST" addr="0x20">
+      </reg>
+      <reg name="GPIO_IEA" addr="0x24">
+      </reg>
+      <reg name="GPIO_IEB" addr="0x28">
+      </reg>
+      <reg name="GPIO_IEC" addr="0x2c">
+      </reg>
+      <reg name="GPIO_IED" addr="0x30">
+      </reg>
+      <reg name="GPIO_ISA" addr="0x34">
+      </reg>
+      <reg name="GPIO_ISB" addr="0x38">
+      </reg>
+      <reg name="GPIO_ISC" addr="0x3c">
+      </reg>
+      <reg name="GPIO_ISD" addr="0x40">
+      </reg>
+      <reg name="GPIO_IBEA" addr="0x44">
+      </reg>
+      <reg name="GPIO_IBEB" addr="0x48">
+      </reg>
+      <reg name="GPIO_IBEC" addr="0x4c">
+      </reg>
+      <reg name="GPIO_IBED" addr="0x50">
+      </reg>
+      <reg name="GPIO_IEVA" addr="0x54">
+      </reg>
+      <reg name="GPIO_IEVB" addr="0x58">
+      </reg>
+      <reg name="GPIO_IEVC" addr="0x5c">
+      </reg>
+      <reg name="GPIO_IEVD" addr="0x60">
+      </reg>
+      <reg name="GPIO_ICA" addr="0x64">
+      </reg>
+      <reg name="GPIO_ICB" addr="0x68">
+      </reg>
+      <reg name="GPIO_ICC" addr="0x6c">
+      </reg>
+      <reg name="GPIO_ICD" addr="0x70">
+      </reg>
+      <reg name="GPIO_ISR" addr="0x74">
+      </reg>
+  </dev>
+  <dev name="WDT" long_name="Watchdog" desc="Watchdog" version="1.0">
+    <addr name="WDT" addr="0x18010000" />
+      <reg name="WDTLR" addr="0x00">
+      </reg>
+      <reg name="WDTCVR" addr="0x04">
+      </reg>
+      <reg name="WDTCON" addr="0x08">
+      </reg>
+  </dev>
+  <dev name="RTC" long_name="Real time clock" desc="Real time clock" version="1.0">
+    <addr name="RTC" addr="0x18014000" />
+      <reg name="RTC_TIME" addr="0x00">
+      </reg>
+      <reg name="RTC_DATE" addr="0x04">
+      </reg>
+      <reg name="RTC_TALARM" addr="0x08">
+      </reg>
+      <reg name="RTC_DALARM" addr="0x0c">
+      </reg>
+      <reg name="RTC_CTRL" addr="0x10">
+      </reg>
+      <reg name="RTC_RESET" addr="0x14">
+      </reg>
+      <reg name="RTC_PWOFF" addr="0x18">
+      </reg>
+      <reg name="RTC_PWFAIL" addr="0x1c">
+      </reg>
+  </dev>
+  <dev name="SPI" long_name="Serial peripherial interface" desc="Serial peripherial interface" version="1.0">
+     <addr name="SPI" addr="0x18018000" />
+       <reg name="SPI_TXR" addr="0x00">
+       </reg>
+       <reg name="SPI_RXR" addr="0x00">
+       </reg>
+       <reg name="SPI_IER" addr="0x04">
+       </reg>
+       <reg name="SPI_FCR" addr="0x08">
+       </reg>
+       <reg name="SPI_FWCR" addr="0x0c">
+       </reg>
+       <reg name="SPI_DLYCR" addr="0x10">
+       </reg>
+       <reg name="SPI_TXCR" addr="0x14">
+       </reg>
+       <reg name="SPI_RXCR" addr="0x18">
+       </reg>
+       <reg name="SPI_SSCR" addr="0x1c">
+       </reg>
+       <reg name="SPI_ISR" addr="0x20">
+       </reg>
+  </dev>
+  <dev name="SCU" long_name="System control unit" desc="System control unit" version="1.0">
+    <addr name="SCU" addr="0x1801c000" />
+    <reg name="SCU_ID" addr="0x00">
+      <field name="SOC_ID" bitrange="31:0">
+        <value name="REVISION_A" value="0xa1000604" />
+        <value name="REVISION_B" value="0xa100027b" />
+      </field>
+    </reg>
+    <reg name="SCU_REMAP" addr="0x04">
+      <field name="MEM_REMAP" bitrange="31:0">
+        <value name="IRAM_0x000000" value="0xdeadbeef" />
+        <value name="ROM_0x000000" value="0x00000000" />
+      </field>
+    </reg>
+    <reg name="SCU_PLLCON1" addr="0x08">
+      <field name="ARM_PLL_TEST_CONTROL" bitrange="25:25">
+        <value name="TEST" value="0x01" />
+        <value name="NORMAL" value="0x00" />
+      </field>
+      <field name="ARM_PLL_SATURATION" bitrange="24:24">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+      <field name="ARM_PLL_FAST_LOCK" bitrange="23:23">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+      <field name="ARM_PLL_POWERDOWN" bitrange="22:22">
+         <value name="PLL_OFF" value="0x01" />
+         <value name="PLL_ON" value="0x00" />
+      </field>
+      <field name="ARM_PLL_CLKR" bitrange="21:16"></field>
+      <field name="ARM_PLL_CLKF" bitrange="15:4"></field>
+      <field name="ARM_PLL_CLKOD" bitrange="3:1"></field>
+      <field name="ARM_PLL_BYPASS" bitrange="0:0">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_PLLCON2" addr="0x0c">
+      <field name="DSP_PLL_TEST_CONTROL" bitrange="25:25">
+        <value name="TEST" value="0x01" />
+        <value name="NORMAL" value="0x00" />
+      </field>
+      <field name="DSP_PLL_SATURATION" bitrange="24:24">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+      <field name="DSP_PLL_FAST_LOCK" bitrange="23:23">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+      <field name="DSP_PLL_POWERDOWN" bitrange="22:22">
+         <value name="PLL_OFF" value="0x01" />
+         <value name="PLL_ON" value="0x00" />
+      </field>
+      <field name="DSP_PLL_CLKR" bitrange="21:16"></field>
+      <field name="DSP_PLL_CLKF" bitrange="15:4"></field>
+      <field name="DSP_PLL_CLKOD" bitrange="3:1"></field>
+      <field name="DSP_PLL_BYPASS" bitrange="0:0">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_PLLCON3" addr="0x10">
+      <field name="CODEC_PLL_TEST_CONTROL" bitrange="25:25">
+        <value name="TEST" value="0x01" />
+        <value name="NORMAL" value="0x00" />
+      </field>
+      <field name="CODEC_PLL_SATURATION" bitrange="24:24">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+      <field name="CODEC_PLL_FAST_LOCK" bitrange="23:23">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+      <field name="CODEC_PLL_POWERDOWN" bitrange="22:22">
+         <value name="PLL_OFF" value="0x01" />
+         <value name="PLL_ON" value="0x00" />
+      </field>
+      <field name="CODEC_PLL_CLKR" bitrange="21:16"></field>
+      <field name="CODEC_PLL_CLKF" bitrange="15:4"></field>
+      <field name="CODEC_PLL_CLKOD" bitrange="3:1"></field>
+      <field name="CODEC_PLL_BYPASS" bitrange="0:0">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_DIVCON1" addr="0x14">
+      <field name="USB_PHY_CLK" bitrange="31:31">
+        <value name="12MHz" value="0x01" />
+        <value name="24MHz" value="0x00" />
+      </field>
+      <field name="VIP_SENSOR_CLK" bitrange="30:29">
+        <value name="27MHz" value="0x02" />
+        <value name="48MHz" value="0x01" />
+        <value name="24MHz" value="0x00" />
+      </field>
+      <field name="LCDC_CLK" bitrange="28:28">
+        <value name="LCDC_CLK_DIV_OUT" value="0x01" />
+        <value name="EXT_SOC_27MHz" value="0x00" />
+      </field>
+      <field name="LCDC_CLK_DIV" bitrange="27:20"></field>
+      <field name="LCDC_CLK_DIV_SRC" bitrange="19:18">
+        <value name="CODEC_PLL" value="0x02" />
+        <value name="DSP_PLL" value="0x01" />
+        <value name="ARM_PLL" value="0x00" />
+      </field>
+      <field name="LSADC_CLK_DIV" bitrange="17:10"></field>
+      <field name="CODEC_CLK_SRC" bitrange="9:9">
+        <value name="12MHz_OSC" value="0x01" />
+        <value name="CODEC_CLK_DIV_OUT" value="0x00" />
+      </field>
+      <field name="CODEC_CLK_DIV" bitrange="8:5"></field>
+      <field name="PCLK_CLK_DIV" bitrange="4:3">
+        <value name="HCLK/PCLK_4:1" value="0x02" />
+        <value name="HCLK/PCLK_2:1" value="0x01" />
+        <value name="HCLK/PCLK_1:1" value="0x00" />
+      </field>
+      <field name="ARM_CLK_DIV" bitrange="2:2">
+        <value name="ARMPLL/ARMCLK_2:1" value="0x01" />
+        <value name="ARMPLL/ARMCLK_1:1" value="0x00" />
+      </field>
+      <field name="DSP_SLOW_MODE" bitrange="1:1">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+      <field name="ARM_SLOW_MODE" bitrange="0:0">
+        <value name="ENABLE" value="0x01" />
+        <value name="DISABLE" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_CLKCFG" addr="0x18">
+      <field name="WDT_PCLK" bitrange="31:31">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="RTC_PCLK" bitrange="30:30">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="PWM_PCLK" bitrange="29:29">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="TIMER_PCLK" bitrange="28:28">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="GPIO_PCLK" bitrange="27:27">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="HSADC_PCLK" bitrange="26:26">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="HSADC_HCLK" bitrange="25:25">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="LSADC_CLK" bitrange="24:24">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="LSADC_PCLK" bitrange="23:23">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="SD_CLK" bitrange="22:22">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="SPI_CLK" bitrange="21:21">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="I2C_CLK" bitrange="20:20">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="UART1_CLK" bitrange="19:19">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="UART0_CLK" bitrange="18:18">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="I2S_PCLK" bitrange="17:17">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="I2S_CLK" bitrange="16:16">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="VIP_CLK" bitrange="15:15">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="VIP_HCLK" bitrange="14:14">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="LCDC_CLK" bitrange="13:13">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="LCDC_HCLK" bitrange="12:12">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="IRAM_HCLK" bitrange="11:11">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="A2A_HCLK" bitrange="10:10">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="NANDC_HCLK" bitrange="9:9">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="UDC_CLK" bitrange="6:6">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="UHC_CLK" bitrange="5:5">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="DWDMA_CLK" bitrange="4:4">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="HDMA_CLK" bitrange="3:3">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="SDRAM_HCLK" bitrange="2:2">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="DSP_CLK" bitrange="1:1">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+      <field name="OTP_CLK" bitrange="0:0">
+        <value name="GATE" value="0x01" />
+        <value name="UNGATE" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_RSTCFG" addr="0x1c">
+      <field name="ARM_RST" bitrange="12:12">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="DUALCORE_ECT_RST" bitrange="11:11">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="DUALCORE_MAILBOX_RST" bitrange="10:10">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="SD_RST" bitrange="9:9">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="HSADC_RST" bitrange="8:8">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="LSADC_RST" bitrange="7:7">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="CODEC_RST" bitrange="6:6">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="DSP_PERIPHERAL_RST" bitrange="5:5">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="DSP_CORE_RST" bitrange="4:4">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="VIP_RST" bitrange="3:3">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="LCDC_RST" bitrange="2:2">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="UDC_RST" bitrange="1:1">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+      <field name="UHC_RST" bitrange="0:0">
+        <value name="ASSERT" value="0x01" />
+        <value name="DEASSERT" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_PWM" addr="0x20">
+      <field name="PLL_LOCK_PERIOD" bitrange="31:16"></field>
+      <field name="EXT_WAKEUP_PIN_POLARITY" bitrange="6:6">
+        <value name="NEGATIVE" value="0x01" />
+        <value name="POSITIVE" value="0x00" />
+      </field>
+      <field name="RTC_ALARM_WAKEUP" bitrange="5:5">
+        <value name="DISABLE" value="0x01" />
+        <value name="ENABLE" value="0x00" />
+      </field>
+      <field name="EXT_WAKEUP" bitrange="4:4">
+        <value name="DISABLE" value="0x01" />
+        <value name="ENABLE" value="0x00" />
+      </field>
+      <field name="SCU_IRQ_CLEAR" bitrange="3:3">
+        <value name="CLEAR" value="0x01" />
+        <value name="PENDING" value="0x00" />
+      </field>
+      <field name="POWERMANAGEMENT_MODE" bitrange="2:0">
+        <value name="STOP" value="0x08" />
+        <value name="NORMAL" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_CPUPD" addr="0x24"></reg>
+    <reg name="SCU_CHIPCFG" addr="0x28">
+      <field name="NOR_FLASH_BUSWIDTH" bitrange="19:19">
+        <value name="8BIT" value="0x01" />
+        <value name="16BIT" value="0x00" />
+      </field>
+      <field name="DSP2ARM_IRQ" bitrange="17:17"></field>
+      <field name="ARM2DSP_IRQ" bitrange="16:16"></field>
+      <field name="ARM_HIGHVECTOR" bitrange="3:3"></field>
+      <field name="UHC_DATABUS_WIDTH" bitrange="2:2">
+        <value name="16BIT" value="0x01" />
+        <value name="8BIT" value="0x00" />
+      </field>
+      <field name="USB_PHY_MUX" bitrange="1:1">
+        <value name="USB_PHY_UHC" value="0x01" />
+        <value name="USB_PHY_UDC" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_STATUS" addr="0x2c">
+      <field name="DSPSYSCLKVALID" bitrange="4:4">
+        <value name="VALID" value="0x01" />
+        <value name="UNSTABLE" value="0x00" />
+      </field>
+      <field name="ARMSYSCLKVALID" bitrange="3:3">
+        <value name="VALID" value="0x01" />
+        <value name="UNSTABLE" value="0x00" />
+      </field>
+      <field name="CODEC_PLL_LOCKED" bitrange="2:2">
+        <value name="LOCKED" value="0x01" />
+        <value name="UNSTABLE" value="0x00" />
+      </field>
+      <field name="DSP_PLL_LOCKED" bitrange="1:1">
+        <value name="LOCKED" value="0x01" />
+        <value name="UNSTABLE" value="0x00" />
+      </field>
+      <field name="ARM_PLL_LOCKED" bitrange="0:0">
+        <value name="LOCKED" value="0x01" />
+        <value name="UNSTABLE" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_IOMUXA_CON" addr="0x30">
+      <field name="I2S_CODEC_EXT_SEL" bitrange="19:19">
+        <value name="PIN" value="0x01" />
+        <value name="INTERNAL_CODEC" value="0x00" />
+      </field>
+      <field name="I2C_CODEC_EXT_SEL" bitrange="18:18">
+        <value name="PIN" value="0x01" />
+        <value name="INTERNAL_CODEC" value="0x00" />
+      </field>
+      <field name="I2C_FLASHCS3_GPIOB_SEL" bitrange="17:16">
+        <value name="GPIOB7" value="0x02" />
+        <value name="FLASH_CS3" value="0x01" />
+        <value name="I2C_SDA" value="0x00" />
+      </field>
+      <field name="I2C_FLASHCS2_GPIOB_SEL" bitrange="15:14">
+        <value name="GPIOB6" value="0x02" />
+        <value name="FLASH_CS2" value="0x01" />
+        <value name="I2C_SCL" value="0x00" />
+      </field>
+      <field name="GPIOB_SD_SPI_SEL" bitrange="13:12">
+        <value name="SPI" value="0x02" />
+        <value name="SD" value="0x01" />
+        <value name="GPIOB[0:5]" value="0x00" />
+      </field>
+      <field name="GPIO_LCDVSYN_SEL" bitrange="11:11">
+        <value name="LCD_VSYN" value="0x01" />
+        <value name="GPIOA7" value="0x00" />
+      </field>
+      <field name="GPIO_LCDEN_SEL" bitrange="10:10">
+        <value name="LCD_DATA_ENABLE" value="0x01" />
+        <value name="GPIOA6" value="0x00" />
+      </field>
+      <field name="GPIO_FLASHCS1_SEL" bitrange="9:9">
+        <value name="FLASH_CS1" value="0x01" />
+        <value name="GPIOA5" value="0x00" />
+      </field>
+      <field name="GPIO_LCD22_SEL" bitrange="8:8">
+        <value name="LCD_DATA22" value="0x01" />
+        <value name="GPIOA4" value="0x00" />
+      </field>
+      <field name="GPIOA_LCD20_NRTS0_SEL" bitrange="7:6">
+        <value name="UART0_NRTS" value="0x02" />
+        <value name="LCD_DATA20" value="0x01" />
+        <value name="GPIOA3" value="0x00" />
+      </field>
+      <field name="GPIOA_LCD18_NCTS0_SEL" bitrange="5:4">
+        <value name="UART0_NCTS" value="0x02" />
+        <value name="LCD_DATA18" value="0x01" />
+        <value name="GPIOA2" value="0x00" />
+      </field>
+      <field name="GPIOA_LCD17_TXD0_SEL" bitrange="3:2">
+        <value name="UART0_TXD" value="0x02" />
+        <value name="LCD_DATA17" value="0x01" />
+        <value name="GPIOA1" value="0x00" />
+      </field>
+      <field name="GPIOA_LCD16_RXD0_SEL" bitrange="1:0">
+        <value name="UART0_RXD" value="0x02" />
+        <value name="LCD_DATA16" value="0x01" />
+        <value name="GPIOA0" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_IOMUXB_CON" addr="0x34">
+      <field name="VIP_HSADC_SEL" bitrange="22:22">
+        <value name="HSADC" value="0x01" />
+        <value name="VIP" value="0x00" />
+      </field>
+      <field name="GPIOD_SDCKE_SEL" bitrange="21:21">
+        <value name="SDRAM_CKE" value="0x01" />
+        <value name="GPIOD3" value="0x00" />
+      </field>
+      <field name="GPIOF_UHCVBUS_SEL" bitrange="20:20">
+        <value name="UHC_VBUS" value="0x01" />
+        <value name="GPIOF4" value="0x00" />
+      </field>
+      <field name="GPIOF_UHCOCUR_SEL" bitrange="19:19">
+        <value name="UHC_OCUR" value="0x01" />
+        <value name="GPIOF3" value="0x00" />
+      </field>
+      <field name="SDTADDR12_GPIOF_SEL" bitrange="18:18">
+        <value name="GPIOF2" value="0x01" />
+        <value name="SDT_ADDR12" value="0x00" />
+      </field>
+      <field name="SDTADDR11_GPIOF_SEL" bitrange="17:17">
+        <value name="GPIOF1" value="0x01" />
+        <value name="SDT_ADDR11" value="0x00" />
+      </field>
+      <field name="GPIOF_VIPCLK_SEL" bitrange="16:16">
+        <value name="VIP_CLK" value="0x01" />
+        <value name="GPIOF0" value="0x00" />
+      </field>
+      <field name="GPIOE_LCD_SEL" bitrange="15:15">
+        <value name="LCD_DATA[8:15]" value="0x01" />
+        <value name="GPIOE[0:7]" value="0x00" />
+      </field>
+      <field name="GPIOD_PWM3_SEL" bitrange="14:14">
+        <value name="PWM3" value="0x01" />
+        <value name="GPIOD7" value="0x00" />
+      </field>
+      <field name="GPIOD_PWM2_SEL" bitrange="13:13">
+        <value name="PWM2" value="0x01" />
+        <value name="GPIOD6" value="0x00" />
+      </field>
+      <field name="GPIOD_PWM1_SEL" bitrange="12:12">
+        <value name="PWM1" value="0x01" />
+        <value name="GPIOD5" value="0x00" />
+      </field>
+      <field name="GPIOD_PWM0_SEL" bitrange="11:11">
+        <value name="PWM0" value="0x01" />
+        <value name="GPIOD4" value="0x00" />
+      </field>
+      <field name="GPIOD_SDWPA_SEL" bitrange="10:10">
+        <value name="SD_WPA" value="0x01" />
+        <value name="GPIOD2" value="0x00" />
+      </field>
+      <field name="GPIOD_SDCDA_RXD1_SEL" bitrange="9:8">
+        <value name="UART1_RXD" value="0x02" />
+        <value name="SD_CDA" value="0x01" />
+        <value name="GPIOD1" value="0x00" />
+      </field>
+      <field name="GPIOD_SDPCA_TXD1_SEL" bitrange="7:6">
+        <value name="UART1_RXD" value="0x02" />
+        <value name="SD_PCA" value="0x01" />
+        <value name="GPIOD0" value="0x00" />
+      </field>
+      <field name="GPIOC_STCS1_SEL" bitrange="5:5">
+        <value name="ST_CS1" value="0x01" />
+        <value name="GPIOC7" value="0x00" />
+      </field>
+      <field name="GPIOC_I2SCLK1_SEL" bitrange="4:4">
+        <value name="I2S_CLK" value="0x01" />
+        <value name="GPIOC6" value="0x00" />
+      </field>
+      <field name="GPIOC_I2SSDO_SEL" bitrange="3:3">
+        <value name="I2S_SDO" value="0x01" />
+        <value name="GPIOC5" value="0x00" />
+      </field>
+      <field name="GPIOC_I2SSDI_SEL" bitrange="2:2">
+        <value name="I2S_SDI" value="0x01" />
+        <value name="GPIOC4" value="0x00" />
+      </field>
+      <field name="GPIOC_I2SLRCK_SEL" bitrange="1:1">
+        <value name="I2S_LRCK" value="0x01" />
+        <value name="GPIOC3" value="0x00" />
+      </field>
+      <field name="GPIOC_I2SSCLK_SEL" bitrange="0:0">
+        <value name="I2S_SCLK" value="0x01" />
+        <value name="GPIOC2" value="0x00" />
+      </field>
+    </reg>
+    <reg name="SCU_GPIOUPCON" addr="0x38"></reg>
+    <reg name="SCU_DIVCON2" addr="0x3c"></reg>
+  </dev>
+  <dev name="I2C" long_name="I2C controller" desc="I2C controller" version="1.0">
+    <addr name="I2C" addr="0x18020000" />
+    <reg name="I2C_MTXR" addr="0x00"></reg>
+    <reg name="I2C_MRXR" addr="0x04"></reg>
+    <reg name="I2C_STXR" addr="0x08"></reg>
+    <reg name="I2C_SRXR" addr="0x0c"></reg>
+    <reg name="I2C_SADDR" addr="0x10"></reg>
+    <reg name="I2C_IER" addr="0x14"></reg>
+    <reg name="I2C_ISR" addr="0x18"></reg>
+    <reg name="I2C_LCMR" addr="0x1c"></reg>
+    <reg name="I2C_LSR" addr="0x20"></reg>
+    <reg name="I2C_CONR" addr="0x24"></reg>
+    <reg name="I2C_OPR" addr="0x28"></reg>
+  </dev>
+  <dev name="SD" long_name="SD controller" desc="SD controller" version="1.0">
+    <addr name="SD" addr="0x18024000" />
+    <reg name="MMU_CTRL" addr="0x00"></reg>
+    <reg name="MMU_PNRI" addr="0x04"></reg>
+    <reg name="CUR_PNRI" addr="0x08"></reg>
+    <reg name="MMU_PNRII" addr="0x0c"></reg>
+    <reg name="CUR_PNRII" addr="0x10"></reg>
+    <reg name="MMU_ADDR" addr="0x14"></reg>
+    <reg name="CUR_ADDR" addr="0x18"></reg>
+    <reg name="MMU_DATA" addr="0x1c"></reg>
+    <reg name="SD_CTRL" addr="0x20"></reg>
+    <reg name="SD_INT" addr="0x24"></reg>
+    <reg name="SD_CARD" addr="0x28"></reg>
+    <reg name="SD_CMDREST" addr="0x30"></reg>
+    <reg name="SD_CMDRES" addr="0x34"></reg>
+    <reg name="SD_DATAT" addr="0x3c"></reg>
+    <reg name="SD_CMD" addr="0x40"></reg>
+    <reg name="SD_RES3" addr="0x44"></reg>
+    <reg name="SD_RES2" addr="0x48"></reg>
+    <reg name="SD_RES1" addr="0x4c"></reg>
+    <reg name="SD_RES0" addr="0x50"></reg>
+  </dev>
+  <dev name="I2S" long_name="I2S controller" desc="I2S controller" version="1.0">
+    <addr name="I2S" addr="0x18028000" />
+    <reg name="I2S_OPR" addr="0x00"></reg>
+    <reg name="I2S_TXR" addr="0x04"></reg>
+    <reg name="I2S_RXR" addr="0x08"></reg>
+    <reg name="I2S_TXCTL" addr="0x0c"></reg>
+    <reg name="I2S_RXCTL" addr="0x10"></reg>
+    <reg name="I2S_FIFOSTS" addr="0x14"></reg>
+    <reg name="I2S_IER" addr="0x18"></reg>
+    <reg name="I2S_ISR" addr="0x1c"></reg>
+  </dev>
+  <dev name="PWM" long_name="PWM timer" desc="PWM timer" version="1.0">
+    <addr name="PWM0" addr="0x1802c000" />
+    <addr name="PWM1" addr="0x1802c010" />
+    <addr name="PWM2" addr="0x1802c020" />
+    <addr name="PWM3" addr="0x1802c030" />
+    <reg name="PWMTn_CNTR">
+      <formula string="n*0x10" />
+      <addr name="PWMT0_CNTR" addr="0x00" />
+      <addr name="PWMT1_CNTR" addr="0x10" />
+      <addr name="PWMT2_CNTR" addr="0x20" />
+      <addr name="PWMT3_CNTR" addr="0x30" />
+    </reg>
+    <reg name="PWMTn_HRC">
+      <formula string="n*0x10 + 0x04" />
+      <addr name="PWMT0_HRC" addr="0x04" />
+      <addr name="PWMT1_HRC" addr="0x14" />
+      <addr name="PWMT2_HRC" addr="0x24" />
+      <addr name="PWMT3_HRC" addr="0x34" />
+    </reg>
+    <reg name="PWMTn_LRC">
+      <formula string="n*0x10 + 0x08" />
+      <addr name="PWMT0_LRC" addr="0x08" />
+      <addr name="PWMT1_LRC" addr="0x18" />
+      <addr name="PWMT2_LRC" addr="0x28" />
+      <addr name="PWMT3_LRC" addr="0x38" />
+    </reg>
+    <reg name="PWMTn_CTRL">
+      <formula string="n*0x10 + 0x0c" />
+      <addr name="PWMT0_CTRL" addr="0x0c" />
+      <addr name="PWMT1_CTRL" addr="0x1c" />
+      <addr name="PWMT2_CTRL" addr="0x2c" />
+      <addr name="PWMT3_CTRL" addr="0x3c" />
+    </reg>
+  </dev>
+  <dev name="ADC" long_name="ADC" desc="4 channels 10-bit SAR A/D converter" version="1.0">
+    <addr name="ADC" addr="0x18030000" />
+    <reg name="ADC_DATA" addr="0x00"></reg>
+    <reg name="ADC_STAT" addr="0x04"></reg>
+    <reg name="ADC_CTRL" addr="0x08"></reg>
+  </dev>
+  <dev name="GPIO" long_name="GPIO" desc="GPIO" version="1.0">
+    <addr name="GPIO1" addr="0x18038000" />
+    <reg name="GPIO_PEDR" addr="0x00"></reg>
+    <reg name="GPIO_PECON" addr="0x04"></reg>
+    <reg name="GPIO_PFDR" addr="0x08"></reg>
+    <reg name="GPIO_PFCON" addr="0x0c"></reg>
+    <reg name="GPIO1_TEST" addr="0x20"></reg>
+    <reg name="GPIO_IEE" addr="0x24"></reg>
+    <reg name="GPIO_IEF" addr="0x28"></reg>
+    <reg name="GPIO_ISE" addr="0x34"></reg>
+    <reg name="GPIO_ISF" addr="0x38"></reg>
+    <reg name="GPIO_IBEE" addr="0x44"></reg>
+    <reg name="GPIO_IBEF" addr="0x48"></reg>
+    <reg name="GPIO_IEVE" addr="0x54"></reg>
+    <reg name="GPIO_IEVF" addr="0x58"></reg>
+    <reg name="GPIO_ICE" addr="0x64"></reg>
+    <reg name="GPIO_ICF" addr="0x68"></reg>
+    <reg name="GPIO1_ISR" addr="0x74"></reg>
+  </dev>
+  <dev name="INTC" long_name="Interrupt controller" desc="Interrupt controller" version="1.0">
+    <addr name="INTC" addr="0x18080000" />
+    <reg name="INTC_SCRn">
+      <formula string="n*0x04" />
+      <addr name="INTC_SCR0" addr="0x00" />
+      <addr name="INTC_SCR1" addr="0x04" />
+      <addr name="INTC_SCR2" addr="0x08" />
+      <addr name="INTC_SCR3" addr="0x0c" />
+      <addr name="INTC_SCR4" addr="0x10" />
+      <addr name="INTC_SCR5" addr="0x14" />
+      <addr name="INTC_SCR6" addr="0x18" />
+      <addr name="INTC_SCR7" addr="0x1c" />
+      <addr name="INTC_SCR8" addr="0x20" />
+      <addr name="INTC_SCR9" addr="0x24" />
+      <addr name="INTC_SCR10" addr="0x28" />
+      <addr name="INTC_SCR11" addr="0x2c" />
+      <addr name="INTC_SCR12" addr="0x30" />
+      <addr name="INTC_SCR13" addr="0x34" />
+      <addr name="INTC_SCR14" addr="0x38" />
+      <addr name="INTC_SCR15" addr="0x3c" />
+      <addr name="INTC_SCR16" addr="0x40" />
+      <addr name="INTC_SCR17" addr="0x44" />
+      <addr name="INTC_SCR18" addr="0x48" />
+      <addr name="INTC_SCR19" addr="0x4c" />
+      <addr name="INTC_SCR20" addr="0x50" />
+      <addr name="INTC_SCR21" addr="0x54" />
+      <addr name="INTC_SCR22" addr="0x58" />
+      <addr name="INTC_SCR23" addr="0x5c" />
+      <addr name="INTC_SCR24" addr="0x60" />
+      <addr name="INTC_SCR25" addr="0x64" />
+      <addr name="INTC_SCR26" addr="0x68" />
+      <addr name="INTC_SCR27" addr="0x6c" />
+      <addr name="INTC_SCR28" addr="0x70" />
+      <addr name="INTC_SCR29" addr="0x74" />
+      <addr name="INTC_SCR30" addr="0x78" />
+      <addr name="INTC_SCR31" addr="0x7c" />
+    </reg>
+    <reg name="INTC_ISR" addr="0x104"></reg>
+    <reg name="INTC_IPR" addr="0x108"></reg>
+    <reg name="INTC_IMR" addr="0x10c"></reg>
+    <reg name="INTC_IECR" addr="0x114"></reg>
+    <reg name="INTC_ICCR" addr="0x118"></reg>
+    <reg name="INTC_ISCR" addr="0x11c"></reg>
+    <reg name="INTC_TEST" addr="0x124"></reg>
+  </dev>
+  <dev name="ARB" long_name="AHB bus arbiter" desc="AHB bus arbiter" version="1.0">
+    <addr name="ARB" addr="0x18084000" />
+    <reg name="ARB_MODE" addr="0x00"></reg>
+    <reg name="ARB_PRIOn">
+      <formula string="n*0x04 + 0x04" />
+      <addr name="ARB_PRIO1" addr="0x04" />
+      <addr name="ARB_PRIO2" addr="0x08" />
+      <addr name="ARB_PRIO3" addr="0x0c" />
+      <addr name="ARB_PRIO4" addr="0x10" />
+      <addr name="ARB_PRIO5" addr="0x14" />
+      <addr name="ARB_PRIO6" addr="0x18" />
+      <addr name="ARB_PRIO7" addr="0x1c" />
+      <addr name="ARB_PRIO8" addr="0x20" />
+      <addr name="ARB_PRIO9" addr="0x24" />
+      <addr name="ARB_PRIO10" addr="0x28" />
+      <addr name="ARB_PRIO11" addr="0x2c" />
+      <addr name="ARB_PRIO12" addr="0x30" />
+      <addr name="ARB_PRIO13" addr="0x34" />
+      <addr name="ARB_PRIO14" addr="0x38" />
+      <addr name="ARB_PRIO15" addr="0x3c" />
+    </reg>
+  </dev>
+  <dev name="MAILBOX" long_name="CPU-DSP mailbox" desc="CPU-DSP mailbox" version="1.0">
+    <addr name="MAILBOX" addr="0x18088000" />
+    <reg name="MAILBOX_ID" addr="0x00"></reg>
+    <reg name="H2C_STA" addr="0x10"></reg>
+    <reg name="H2Cn_DATA">
+      <formula string="n*0x08 + 0x20" />
+      <addr name="H2C0_DATA" addr="0x20" />
+      <addr name="H2C1_DATA" addr="0x28" />
+      <addr name="H2C2_DATA" addr="0x30" />
+      <addr name="H2C3_DATA" addr="0x38" />
+    </reg>
+    <reg name="H2Cn_CMD">
+      <formula string="n*0x08 + 0x24" />
+      <addr name="H2C0_CMD" addr="0x24" />
+      <addr name="H2C1_CMD" addr="0x2c" />
+      <addr name="H2C2_CMD" addr="0x34" />
+      <addr name="H2C3_CMD" addr="0x3c" />
+    </reg>
+    <reg name="C2H_STA" addr="0x40"></reg>
+    <reg name="C2Hn_DATA">
+      <formula string="n*0x08 + 0x50" />
+      <addr name="C2H0_DATA" addr="0x50" />
+      <addr name="C2H1_DATA" addr="0x58" />
+      <addr name="C2H2_DATA" addr="0x60" />
+      <addr name="C2H3_DATA" addr="0x68" />
+    </reg>
+    <reg name="C2Hn_CMD">
+      <formula string="n*0x08 + 0x54" />
+      <addr name="C2H0_CMD" addr="0x54" />
+      <addr name="C2H1_CMD" addr="0x5c" />
+      <addr name="C2H2_CMD" addr="0x64" />
+      <addr name="C2H3_CMD" addr="0x6c" />
+    </reg>
+  </dev>
+  <dev name="HDMA" long_name="AHB DMA" desc="AHB DMA" version="1.0">
+    <addr name="HDMA" addr="0x18090000" />
+    <reg name="HDMA_CON0" addr="0x00"></reg>
+    <reg name="HDMA_CON1" addr="0x04"></reg>
+    <reg name="HDMA_ISRC0" addr="0x08"></reg>
+    <reg name="HDMA_IDST0" addr="0x0C"></reg>
+    <reg name="HDMA_ICNT0" addr="0x10"></reg>
+    <reg name="HDMA_ISRC1" addr="0x14"></reg>
+    <reg name="HDMA_IDST1" addr="0x18"></reg>
+    <reg name="HDMA_ICNT1" addr="0x1C"></reg>
+    <reg name="HDMA_CSRC0" addr="0x20"></reg>
+    <reg name="HDMA_CDST0" addr="0x24"></reg>
+    <reg name="HDMA_CCNT0" addr="0x28"></reg>
+    <reg name="HDMA_CSRC1" addr="0x2C"></reg>
+    <reg name="HDMA_CDST1" addr="0x30"></reg>
+    <reg name="HDMA_CCNT1" addr="0x34"></reg>
+    <reg name="HDMA_ISR" addr="0x38"></reg>
+    <reg name="HDMA_DSR" addr="0x3C"></reg>
+    <reg name="HDMA_ISCNT0" addr="0x40"></reg>
+    <reg name="HDMA_IPNCNTD0" addr="0x44"></reg>
+    <reg name="HDMA_IADDR_BS0" addr="0x48"></reg>
+    <reg name="HDMA_ISCNT1" addr="0x4C"></reg>
+    <reg name="HDMA_IPNCNTD1" addr="0x50"></reg>
+    <reg name="HDMA_IADDR_BS1" addr="0x54"></reg>
+    <reg name="HDMA_CSCNT0" addr="0x58"></reg>
+    <reg name="HDMA_CPNCNTD0" addr="0x5C"></reg>
+    <reg name="HDMA_CADDR_BS0" addr="0x60"></reg>
+    <reg name="HDMA_CSCNT1" addr="0x64"></reg>
+    <reg name="HDMA_CPNCNTD1" addr="0x68"></reg>
+    <reg name="HDMA_CADDR_BS1" addr="0x6C"></reg>
+    <reg name="HDMA_PACNT0" addr="0x70"></reg>
+    <reg name="HDMA_PACNT1" addr="0x74"></reg>
+  </dev>
+  <dev name="A2A_DMA" long_name="AHB-to-AHB bridge" desc="AHB-to-AHB bridge with DMA" version="1.0">
+    <addr name="A2A_DMA" addr="0x18094000" />
+    <reg name="A2A_CON0" addr="0x00"></reg>
+    <reg name="A2A_ISRC0" addr="0x04"></reg>
+    <reg name="A2A_IDST0" addr="0x08"></reg>
+    <reg name="A2A_ICNT0" addr="0x0C"></reg>
+    <reg name="A2A_CSRC0" addr="0x10"></reg>
+    <reg name="A2A_CDST0" addr="0x14"></reg>
+    <reg name="A2A_CCNT0" addr="0x18"></reg>
+    <reg name="A2A_CON1" addr="0x1C"></reg>
+    <reg name="A2A_ISRC1" addr="0x20"></reg>
+    <reg name="A2A_IDST1" addr="0x24"></reg>
+    <reg name="A2A_ICNT1" addr="0x28"></reg>
+    <reg name="A2A_CSRC1" addr="0x2C"></reg>
+    <reg name="A2A_CDST1" addr="0x30"></reg>
+    <reg name="A2A_CCNT1" addr="0x34"></reg>
+    <reg name="A2A_INT_STS" addr="0x38"></reg>
+    <reg name="A2A_DMA_STS" addr="0x3C"></reg>
+    <reg name="A2A_ERR_ADR0" addr="0x40"></reg>
+    <reg name="A2A_ERR_OP0" addr="0x44"></reg>
+    <reg name="A2A_ERR_ADR1" addr="0x48"></reg>
+    <reg name="A2A_ERR_OP1" addr="0x4C"></reg>
+    <reg name="A2A_LCNT0" addr="0x50"></reg>
+    <reg name="A2A_LCNT1" addr="0x54"></reg>
+    <reg name="A2A_DOMAIN" addr="0x58"></reg>
+  </dev>
+  <dev name="UDC" long_name="USB 2.0 Device Controller" desc="USB 2.0 Device Controller" version="1.0">
+    <addr name="UDC" addr="0x180a0000" />
+    <reg name="DEV_CTL" addr="0x08"></reg>
+    <reg name="DEV_INFO" addr="0x10"></reg>
+    <reg name="EN_INT" addr="0x14"></reg>
+    <reg name="INT2FLAG" addr="0x18"></reg>
+    <reg name="INTCON" addr="0x1C"></reg>
+    <reg name="SETUP1" addr="0x20"></reg>
+    <reg name="SETUP2" addr="0x24"></reg>
+    <reg name="AHBCON" addr="0x28"></reg>
+    <reg name="RX0STAT" addr="0x30"></reg>
+    <reg name="RX0CON" addr="0x34"></reg>
+    <reg name="RX0DMACTLO" addr="0x38"></reg>
+    <reg name="RX0DMAOUTLMADDR" addr="0x3C"></reg>
+    <reg name="TX0STAT" addr="0x40"></reg>
+    <reg name="TX0CON" addr="0x44"></reg>
+    <reg name="TX0BUF" addr="0x48"></reg>
+    <reg name="TX0DMAINCTL" addr="0x4C"></reg>
+    <reg name="TX0DMALM_IADDR" addr="0x50"></reg>
+    <reg name="RX1STAT" addr="0x54"></reg>
+    <reg name="RX1CON" addr="0x58"></reg>
+    <reg name="RX1DMACTLO" addr="0x5C"></reg>
+    <reg name="RX1DMAOUTLMADDR" addr="0x60"></reg>
+    <reg name="TX2STAT" addr="0x64"></reg>
+    <reg name="TX2CON" addr="0x68"></reg>
+    <reg name="TX2BUF" addr="0x6C"></reg>
+    <reg name="TX2DMAINCTL" addr="0x70"></reg>
+    <reg name="TX2DMALM_IADDR" addr="0x74"></reg>
+    <reg name="TX3STAT" addr="0x78"></reg>
+    <reg name="TX3CON" addr="0x7C"></reg>
+    <reg name="TX3BUF" addr="0x80"></reg>
+    <reg name="TX3DMAINCTL" addr="0x84"></reg>
+    <reg name="TX3DMALM_IADDR" addr="0x88"></reg>
+    <reg name="RX4STAT" addr="0x8C"></reg>
+    <reg name="RX4CON" addr="0x90"></reg>
+    <reg name="RX4DMACTLO" addr="0x94"></reg>
+    <reg name="RX4DMAOUTLMADDR" addr="0x98"></reg>
+    <reg name="TX5STAT" addr="0x9C"></reg>
+    <reg name="TX5CON" addr="0xA0"></reg>
+    <reg name="TX5BUF" addr="0xA4"></reg>
+    <reg name="TX5DMAINCTL" addr="0xA8"></reg>
+    <reg name="TX5DMALM_IADDR" addr="0xAC"></reg>
+    <reg name="TX6STAT" addr="0xB0"></reg>
+    <reg name="TX6CON" addr="0xB4"></reg>
+    <reg name="TX6BUF" addr="0xB8"></reg>
+    <reg name="TX6DMAINCTL" addr="0xBC"></reg>
+    <reg name="TX6DMALM_IADDR" addr="0xC0"></reg>
+    <reg name="RX7STAT" addr="0xC4"></reg>
+    <reg name="RX7CON" addr="0xC8"></reg>
+    <reg name="RX7DMACTLO" addr="0xCC"></reg>
+    <reg name="RX7DMAOUTLMADDR" addr="0xD0"></reg>
+    <reg name="TX8STAT" addr="0xD4"></reg>
+    <reg name="TX8CON" addr="0xD8"></reg>
+    <reg name="TX8BUF" addr="0xDC"></reg>
+    <reg name="TX8DMAINCTL" addr="0xE0"></reg>
+    <reg name="TX8DMALM_IADDR" addr="0xE4"></reg>
+    <reg name="TX9STAT" addr="0xE8"></reg>
+    <reg name="TX9CON" addr="0xEC"></reg>
+    <reg name="TX9BUF" addr="0xF0"></reg>
+    <reg name="TX9DMAINCTL" addr="0xF4"></reg>
+    <reg name="TX9DMALM_IADDR" addr="0xF8"></reg>
+    <reg name="RX10STAT" addr="0xFC"></reg>
+    <reg name="RX10CON" addr="0x100"></reg>
+    <reg name="RX10DMACTLO" addr="0x104"></reg>
+    <reg name="RX10DMAOUTLMADDR" addr="0x108"></reg>
+    <reg name="TX11STAT" addr="0x10C"></reg>
+    <reg name="TX11CON" addr="0x110"></reg>
+    <reg name="TX11BUF" addr="0x114"></reg>
+    <reg name="TX11DMAINCTL" addr="0x118"></reg>
+    <reg name="TX11DMALM_IADDR" addr="0x11C"></reg>
+    <reg name="TX12STAT" addr="0x120"></reg>
+    <reg name="TX12CON" addr="0x124"></reg>
+    <reg name="TX12BUF" addr="0x128"></reg>
+    <reg name="TX12DMAINCTL" addr="0x12C"></reg>
+    <reg name="TX12DMALM_IADDR" addr="0x130"></reg>
+    <reg name="RX13STAT" addr="0x134"></reg>
+    <reg name="RX13CON" addr="0x138"></reg>
+    <reg name="RX13DMACTLO" addr="0x13C"></reg>
+    <reg name="RX13DMAOUTLMADDR" addr="0x140"></reg>
+    <reg name="TX14STAT" addr="0x144"></reg>
+    <reg name="TX14CON" addr="0x148"></reg>
+    <reg name="TX14BUF" addr="0x14C"></reg>
+    <reg name="TX14DMAINCTL" addr="0x150"></reg>
+    <reg name="TX14DMALM_IADDR" addr="0x154"></reg>
+    <reg name="TX15STAT" addr="0x158"></reg>
+    <reg name="TX15CON" addr="0x15C"></reg>
+    <reg name="TX15BUF" addr="0x160"></reg>
+    <reg name="TX15DMAINCTL" addr="0x164"></reg>
+    <reg name="TX15DMALM_IADDR" addr="0x168"></reg>
+  </dev>
+  <dev name="UHC" long_name="USB 2.0 Host Controller" desc="USB 2.0 Host Controller" version="1.0">
+    <addr name="UHC" addr="0x180a4000" />
+  </dev>
+  <dev name="SDRSTMC" long_name="SDRSTMC Static/SDRAM Memory Controller" desc="SDRSTMC Static/SDRAM Memory Controller" version="1.0">
+    <addr name="SDRSTMC" addr="0x180b0000" />
+    <reg name="MCSDR_MODE" addr="0x100"></reg>
+    <reg name="MCSDR_ADDMAP" addr="0x104"></reg>
+    <reg name="MCSDR_ADDCFG" addr="0x108"></reg>
+    <reg name="MCSDR_BASIC" addr="0x10C"></reg>
+    <reg name="MCSDR_T_REF" addr="0x110"></reg>
+    <reg name="MCSDR_T_RFC" addr="0x114"></reg>
+    <reg name="MCSDR_T_MRD" addr="0x118"></reg>
+    <reg name="MCSDR_T_RP" addr="0x120"></reg>
+    <reg name="MCSDR_T_RCD" addr="0x124"></reg>
+    <reg name="MCST0_T_CEWD" addr="0x200"></reg>
+    <reg name="MCST0_T_CE2WE" addr="0x204"></reg>
+    <reg name="MCST0_WEWD" addr="0x208"></reg>
+    <reg name="MCST0_T_WE2CE" addr="0x20C"></reg>
+    <reg name="MCST0_T_CEWDR" addr="0x210"></reg>
+    <reg name="MCST0_T_CE2RD" addr="0x214"></reg>
+    <reg name="MCST0_T_RDWD" addr="0x218"></reg>
+    <reg name="MCST0_T_RD2CE" addr="0x21C"></reg>
+    <reg name="MCST0_BASIC" addr="0x220"></reg>
+    <reg name="MCST1_T_CEWD" addr="0x300"></reg>
+    <reg name="MCST1_T_CE2WE" addr="0x304"></reg>
+    <reg name="MCST1_WEWD" addr="0x308"></reg>
+    <reg name="MCST1_T_WE2CE" addr="0x30C"></reg>
+    <reg name="MCST1_T_CEWDR" addr="0x310"></reg>
+    <reg name="MCST1_T_CE2RD" addr="0x314"></reg>
+    <reg name="MCST1_T_RDWD" addr="0x318"></reg>
+    <reg name="MCST1_T_RD2CE" addr="0x31C"></reg>
+    <reg name="MCST1_BASIC" addr="0x320"></reg>
+  </dev>
+  <dev name="VIP" long_name="VIP Video Input Processor" desc="VIP Video Input Processor" version="1.0">
+    <addr name="VIP" addr="0x180c0000" />
+  </dev>
+  <dev name="NANDC" long_name="NAND Flash Controller" desc="NAND Flash Controller" version="1.0">
+    <addr name="NANDC" addr="0x180e8000" />
+    <reg name="FMCTL" addr="0x00"></reg>
+    <reg name="FMWAIT" addr="0x04"></reg>
+    <reg name="FLCTL" addr="0x08"></reg>
+    <reg name="BCHCTL" addr="0x0C"></reg>
+    <reg name="BCHST" addr="0xD0"></reg>
+    <reg name="FLASH_DATAn">
+      <formula string="0x200*n+0x200" />
+      <addr name="FLASH_DATA0" addr="0x200" />
+      <addr name="FLASH_DATA1" addr="0x400" />
+      <addr name="FLASH_DATA2" addr="0x600" />
+      <addr name="FLASH_DATA3" addr="0x800" />
+    </reg>
+    <reg name="FLASH_ADDRn">
+      <formula string="0x200*n+0x204" />
+      <addr name="FLASH_ADDR0" addr="0x204" />
+      <addr name="FLASH_ADDR1" addr="0x404" />
+      <addr name="FLASH_ADDR2" addr="0x604" />
+      <addr name="FLASH_ADDR3" addr="0x804" />
+    </reg>
+    <reg name="FLASH_CMDn">
+      <formula string="0x200*n+0x208" />
+      <addr name="FLASH_CMD0" addr="0x208" />
+      <addr name="FLASH_CMD1" addr="0x408" />
+      <addr name="FLASH_CMD2" addr="0x608" />
+      <addr name="FLASH_CMD3" addr="0x808" />
+    </reg>
+    <reg name="PAGE_BUF" addr="0xA00"></reg>
+    <reg name="SPARE_BUF" addr="0x1200"></reg>
+  </dev>
+  <dev name="LCDC" long_name="LCD Interface Controller" desc="LCD Interface Controller" version="1.0">
+    <addr name="LCDC" addr="0x186e8000" />
+    <reg name="LCDC_CTRL" addr="0x00"></reg>
+    <reg name="MCU_CTRL" addr="0x04"></reg>
+    <reg name="HOR_PERIOD" addr="0x08"></reg>
+    <reg name="VERT_PERIOD" addr="0x0C"></reg>
+    <reg name="HOR_PW" addr="0x10"></reg>
+    <reg name="VERT_PW" addr="0x14"></reg>
+    <reg name="HOR_BP" addr="0x18"></reg>
+    <reg name="VERT_BP" addr="0x1C"></reg>
+    <reg name="HOR_ACT" addr="0x20"></reg>
+    <reg name="VERT_ACT" addr="0x24"></reg>
+    <reg name="LINE0_YADDR" addr="0x28"></reg>
+    <reg name="LINE0_UVADDR" addr="0x2C"></reg>
+    <reg name="LINE1_YADDR" addr="0x30"></reg>
+    <reg name="LINE1_UVADDR" addr="0x34"></reg>
+    <reg name="LINE2_YADDR" addr="0x38"></reg>
+    <reg name="LINE2_UVADDR" addr="0x3C"></reg>
+    <reg name="LINE3_YADDR" addr="0x40"></reg>
+    <reg name="LINE3_UVADDR" addr="0x44"></reg>
+    <reg name="START_X" addr="0x48"></reg>
+    <reg name="START_Y" addr="0x4C"></reg>
+    <reg name="DELTA_X" addr="0x50"></reg>
+    <reg name="DELTA_Y" addr="0x54"></reg>
+    <reg name="LCDC_INTR_MASK" addr="0x58"></reg>
+    <reg name="ALPHA_ALX" addr="0x5C"></reg>
+    <reg name="ALPHA_ATY" addr="0x60"></reg>
+    <reg name="ALPHA_ARX" addr="0x64"></reg>
+    <reg name="ALPHA_ABY" addr="0x68"></reg>
+    <reg name="ALPHA_BLX" addr="0x6C"></reg>
+    <reg name="ALPHA_BTY" addr="0x70"></reg>
+    <reg name="ALPHA_BRX" addr="0x74"></reg>
+    <reg name="ALPHA_BBY" addr="0x78"></reg>
+    <reg name="LCDC_STA" addr="0x7C"></reg>
+    <reg name="LCD_COMMAND" addr="0x1000"></reg>
+    <reg name="LCD_DATA" addr="0x1004"></reg>
+    <reg name="LCD_BUFF" addr="0x2000"></reg>
+  </dev>
+  <dev name="HSADC" long_name="High Speed ADC" desc="High Speed ADC" version="1.0">
+    <reg name="HSADC_DATA" addr="0x00"></reg>
+    <reg name="HSADC_CTRL" addr="0x04"></reg>
+    <reg name="HSADC_IER" addr="0x08"></reg>
+    <reg name="HSADC_ISR" addr="0x0C"></reg>
+  </dev>
+  <dev name="DWDMA" long_name="DMA Controller" desc="DMA Controller" version="1.0">
+    <reg name="DWDMA_SARn">
+      <formula string="n*0x58+0x00" />
+      <addr name="DWDMA_SAR0" addr="0x00" />
+      <addr name="DWDMA_SAR1" addr="0x58" />
+      <addr name="DWDMA_SAR2" addr="0xb0" />
+      <addr name="DWDMA_SAR3" addr="0x108" />
+    </reg>
+    <reg name="DWDMA_DARn">
+      <formula string="n*0x58+0x08" />
+      <addr name="DWDMA_DAR0" addr="0x08" />
+      <addr name="DWDMA_DAR1" addr="0x60" />
+      <addr name="DWDMA_DAR2" addr="0xb8" />
+      <addr name="DWDMA_DAR3" addr="0x110" />
+    </reg>
+    <reg name="DWDMA_LLPn">
+      <formula string="n*0x58+0x10" />
+      <addr name="DWDMA_LLP0" addr="0x10" />
+      <addr name="DWDMA_LLP1" addr="0x68" />
+      <addr name="DWDMA_LLP2" addr="0xc0" />
+      <addr name="DWDMA_LLP3" addr="0x118" />
+    </reg>
+    <reg name="DWDMA_CTL_Ln">
+      <formula string="n*0x58+0x18" />
+      <addr name="DWDMA_CTL_L0" addr="0x18" />
+      <addr name="DWDMA_CTL_L1" addr="0x70" />
+      <addr name="DWDMA_CTL_L2" addr="0xc8" />
+      <addr name="DWDMA_CTL_L3" addr="0x120" />
+    </reg>
+    <reg name="DWDMA_CTL_Hn">
+      <formula string="n*0x58+0x1c" />
+      <addr name="DWDMA_CTL_H0" addr="0x1c" />
+      <addr name="DWDMA_CTL_H1" addr="0x74" />
+      <addr name="DWDMA_CTL_H2" addr="0xcc" />
+      <addr name="DWDMA_CTL_H3" addr="0x124" />
+    </reg>
+    <reg name="DWDMA_SSTATn">
+      <formula string="n*0x58+0x20" />
+      <addr name="DWDMA_SSTAT0" addr="0x20" />
+      <addr name="DWDMA_SSTAT1" addr="0x78" />
+      <addr name="DWDMA_SSTAT2" addr="0xd0" />
+      <addr name="DWDMA_SSTAT3" addr="0x128" />
+    </reg>
+    <reg name="DWDMA_DSTATn">
+      <formula string="n*0x58+0x28" />
+      <addr name="DWDMA_DSTAT0" addr="0x28" />
+      <addr name="DWDMA_DSTAT1" addr="0x80" />
+      <addr name="DWDMA_DSTAT2" addr="0xd8" />
+      <addr name="DWDMA_DSTAT3" addr="0x130" />
+    </reg>
+    <reg name="DWDMA_SSTATARn">
+      <formula string="n*0x58+0x30" />
+      <addr name="DWDMA_SSTATAR0" addr="0x30" />
+      <addr name="DWDMA_SSTATAR1" addr="0x88" />
+      <addr name="DWDMA_SSTATAR2" addr="0xe0" />
+      <addr name="DWDMA_SSTATAR3" addr="0x138" />
+    </reg>
+    <reg name="DWDMA_DSTATARn">
+      <formula string="n*0x58+0x38" />
+      <addr name="DWDMA_DSTATAR0" addr="0x38" />
+      <addr name="DWDMA_DSTATAR1" addr="0x90" />
+      <addr name="DWDMA_DSTATAR2" addr="0xe8" />
+      <addr name="DWDMA_DSTATAR3" addr="0x140" />
+    </reg>
+    <reg name="DWDMA_CFG_Ln">
+      <formula string="n*0x58+0x40" />
+      <addr name="DWDMA_CFG_L0" addr="0x40" />
+      <addr name="DWDMA_CFG_L1" addr="0x98" />
+      <addr name="DWDMA_CFG_L2" addr="0xf0" />
+      <addr name="DWDMA_CFG_L3" addr="0x148" />
+    </reg>
+    <reg name="DWDMA_CFG_Hn">
+      <formula string="n*0x58+0x44" />
+      <addr name="DWDMA_CFG_H0" addr="0x44" />
+      <addr name="DWDMA_CFG_H1" addr="0x9c" />
+      <addr name="DWDMA_CFG_H2" addr="0xf4" />
+      <addr name="DWDMA_CFG_H3" addr="0x14c" />
+    </reg>
+    <reg name="DWDMA_SGRn">
+      <formula string="n*0x58+0x48" />
+      <addr name="DWDMA_SGR0" addr="0x48" />
+      <addr name="DWDMA_SGR1" addr="0xa0" />
+      <addr name="DWDMA_SGR2" addr="0xf8" />
+      <addr name="DWDMA_SGR3" addr="0x150" />
+    </reg>
+    <reg name="DWDMA_DSRn">
+      <formula string="n*0x58+0x50" />
+      <addr name="DWDMA_DSR0" addr="0x50" />
+      <addr name="DWDMA_DSR1" addr="0xa8" />
+      <addr name="DWDMA_DSR2" addr="0x100" />
+      <addr name="DWDMA_DSR3" addr="0x158" />
+    </reg>
+    <reg name="DWDMA_RAW_TFR" addr="0x2C0"></reg>
+    <reg name="DWDMA_RAW_BLOCK" addr="0x2C8"></reg>
+    <reg name="DWDMA_RAW_SRCTRAN" addr="0x2D0"></reg>
+    <reg name="DWDMA_RAW_DSTTRAN" addr="0x2D8"></reg>
+    <reg name="DWDMA_RAW_ERR" addr="0x2E0"></reg>
+    <reg name="DWDMA_STATUS_TFR" addr="0x2E8"></reg>
+    <reg name="DWDMA_STATUS_BLOCK" addr="0x2F0"></reg>
+    <reg name="DWDMA_STATUS_SRCTRAN" addr="0x2F8"></reg>
+    <reg name="DWDMA_STATUS_DSTTRAN" addr="0x300"></reg>
+    <reg name="DWDMA_STATUS_ERR" addr="0x308"></reg>
+    <reg name="DWDMA_MASK_TFR" addr="0x310"></reg>
+    <reg name="DWDMA_MASK_BLOCK" addr="0x318"></reg>
+    <reg name="DWDMA_MASK_SRCTRAN" addr="0x320"></reg>
+    <reg name="DWDMA_MASK_DSTTRAN" addr="0x328"></reg>
+    <reg name="DWDMA_MASK_ERR" addr="0x330"></reg>
+    <reg name="DWDMA_CLEAR_TFR" addr="0x338"></reg>
+    <reg name="DWDMA_CLEAR_BLOCK" addr="0x340"></reg>
+    <reg name="DWDMA_CLEAR_SRCTRAN" addr="0x348"></reg>
+    <reg name="DWDMA_CLEAR_DSTTRAN" addr="0x350"></reg>
+    <reg name="DWDMA_CLEAR_ERR" addr="0x358"></reg>
+    <reg name="DWDMA_STATUS_INT" addr="0x360"></reg>
+    <reg name="DWDMA_REQ_SRC" addr="0x368"></reg>
+    <reg name="DWDMA_REQ_DST" addr="0x370"></reg>
+    <reg name="DWDMA_S_REQ_SRC" addr="0x378"></reg>
+    <reg name="DWDMA_S_REQ_DST" addr="0x380"></reg>
+    <reg name="DWDMA_L_REQ_SRC" addr="0x388"></reg>
+    <reg name="DWDMA_L_REQ_DST" addr="0x390"></reg>
+    <reg name="DWDMA_DMA_CFG" addr="0x398"></reg>
+    <reg name="DWDMA_DMA_CHEN" addr="0x3A0"></reg>
+  </dev>
+  <dev name="CACHE" long_name="CACHE Controller" desc="CACHE Controller" version="1.0">
+    <addr name="CACHE" addr="0xEFFF0000" />
+    <reg name="DEVID" addr="0x00">
+      <field name="CACHE_EN" bitrange="31:31"></field>
+    </reg>
+    <reg name="CACHEOP" addr="0x04">
+      <field name="ADDRESS" bitrange="31:2"></field>
+      <field name="OPCODE" bitrange="1:0">
+        <value name="NOP" value="0x00" />
+        <value name="INVALIDATE_SINGLE_ENTRY" value="0x01" />
+        <value name="INVALIDATE_WAY" value="0x2" />
+      </field>
+    </reg>
+    <reg name="CACHELKDN" addr="0x08">
+      <field name="RESERVED" bitrange="31:2"></field>
+      <field name="WAY_SELECT" bitrange="1:0">
+        <value name="LOCK_NONE" value="0x00" />
+        <value name="LOCK_WAY0" value="0x01" />
+        <value name="LOCK_WAY1" value="0x02" />
+      </field>
+    </reg>
+    <reg name="MEMMAPA" addr="0x10">
+      <field name="MEMBASE" bitrange="31:25"></field>
+      <field name="MAPSIZE" bitrange="7:0">
+        <value name="MAP_32MB" value="0xfe" />
+        <value name="MAP_64MB" value="0xfc" />
+        <value name="MAP_128MB" value="0xf8" />
+      </field>
+    </reg>
+    <reg name="MEMMAPB" addr="0x14">
+      <field name="MEMBASE" bitrange="31:25"></field>
+      <field name="MAPSIZE" bitrange="7:0">
+        <value name="MAP_32MB" value="0xfe" />
+        <value name="MAP_64MB" value="0xfc" />
+        <value name="MAP_128MB" value="0xf8" />
+      </field>
+    </reg>
+    <reg name="MEMMAPC" addr="0x18">
+      <field name="MEMBASE" bitrange="31:25"></field>
+      <field name="MAPSIZE" bitrange="7:0">
+        <value name="MAP_32MB" value="0xfe" />
+        <value name="MAP_64MB" value="0xfc" />
+        <value name="MAP_128MB" value="0xf8" />
+      </field>
+    </reg>
+    <reg name="MEMMAPD" addr="0x1C">
+      <field name="MEMBASE" bitrange="31:25"></field>
+      <field name="MAPSIZE" bitrange="7:0">
+        <value name="MAP_32MB" value="0xfe" />
+        <value name="MAP_64MB" value="0xfc" />
+        <value name="MAP_128MB" value="0xf8" />
+      </field>
+    </reg>
+    <reg name="PFCNTRA_CTRL" addr="0x20"></reg>
+    <reg name="PFCNTRA" addr="0x24"></reg>
+    <reg name="PFCNTRB_CTRL" addr="0x28"></reg>
+    <reg name="PFCNTRB" addr="0x2C"></reg>
+  </dev>
+</soc>
