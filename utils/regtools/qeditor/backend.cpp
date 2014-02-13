@@ -211,6 +211,7 @@ bool HWStubDevice::Open()
     if(m_hwdev == 0)
     {
         libusb_close(m_handle);
+        m_handle = 0;
         return false;
     }
     return true;
