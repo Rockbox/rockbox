@@ -45,6 +45,7 @@
 #undef strcmp
 #undef strncmp
 #undef strchr
+#undef strtok_r
 
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);

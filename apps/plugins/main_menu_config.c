@@ -62,7 +62,7 @@ void load_from_cfg(void)
 
     rb->root_menu_write_to_cfg(NULL, config_str, sizeof(config_str));
 
-    token = strtok_r(config_str, ", ", &save);
+    token = rb->strtok_r(config_str, ", ", &save);
 
     while (token)
     {
@@ -78,7 +78,7 @@ void load_from_cfg(void)
             menu_items[done].enabled = true;
             done++;
         }
-        token = strtok_r(NULL, ", ", &save);
+        token = rb->strtok_r(NULL, ", ", &save);
     }
 
     if (done < menu_item_count)
