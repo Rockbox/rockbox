@@ -18,9 +18,12 @@ load_addr:
     addiu v0, ra, -12          # calc real load address
                                # account for branch delay slot
                                # and very first 'di' instruction
-    la t0, relocstart
+    lui t3, 0xa000             # use KSEG1 uncached unmapped
+    la t0, relocstart          #   addresses as we don't know
+    or t0, t0, t3              #   the state of caches
     la t1, relocend
-    beq t0, v0, entry_point    # no relocation needed
+    or t1, t1, t3
+    beq t0, v0, cache_init     # no relocation needed
     nop
 
 reloc_loop:
@@ -30,12 +33,7 @@ reloc_loop:
     bne t0, t1, reloc_loop
     addiu t0, 4                # inc dst addr
 
-entry_point_jump:
-    la t0, entry_point
-    jr t0
-    nop
-
-entry_point:
+cache_init:
     # setup caches
     # 4-way, 256 sets, 16 bytes cacheline I/D
     li      t0, 3              # enable cache for kseg0 accesses
@@ -91,7 +89,8 @@ stack_munge_loop:
     addiu t0, 4
 
     # jump to C code with enabled interrupts
-    j main
+    la t0, main
+    jr t0
     ei
 
     .set at
