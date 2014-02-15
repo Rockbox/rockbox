@@ -52,9 +52,6 @@
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 
-/* define this if you have LCD enable function */
-#define HAVE_LCD_ENABLE
-
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well.
 #define HAVE_LCD_SLEEP
@@ -76,6 +73,9 @@
 #define HAVE_RTC_ALARM
 
 #endif /* !BOOTLOADER */
+
+/* define this if you have LCD enable function */
+#define HAVE_LCD_ENABLE
 
 /* define this if you have an i.MX23 codec */
 #define HAVE_IMX233_CODEC
