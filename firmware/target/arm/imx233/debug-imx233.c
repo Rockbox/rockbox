@@ -563,7 +563,7 @@ bool dbg_hw_info_icoll(void)
             static char prio[4] = {'-', '+', '^', '!'};
             lcd_putsf(0, j, "%c%s", prio[info.priority & 3], dbg_irqs[i].name);
             if(info.enabled || info.freq > 0)
-                lcd_putsf(10, j, "%d", info.freq);
+                lcd_putsf(11, j, "%d", info.freq);
         }
         lcd_update();
         yield();
