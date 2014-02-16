@@ -78,6 +78,10 @@ void button_init_device(void)
     imx233_pinctrl_acquire(0, 14, "select");
     imx233_pinctrl_set_function(0, 14, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 14, false);
+    /* jack detect */
+    imx233_pinctrl_acquire(2, 7, "jack_detect");
+    imx233_pinctrl_set_function(2, 7, PINCTRL_FUNCTION_GPIO);
+    imx233_pinctrl_enable_gpio(2, 7, false);
 }
 
 static int touch_to_pixels(int *val_x, int *val_y)
@@ -117,6 +121,11 @@ static int touchscreen_read_device(int *data)
     if(data)
         *data = touch_to_pixels(&x, &y);
     return touchscreen_to_pixels(x, y, data);
+}
+
+bool headphones_inserted(void)
+{
+    return imx233_pinctrl_get_gpio(2, 7);
 }
 
 int button_read_device(int *data)
