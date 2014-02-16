@@ -127,6 +127,15 @@ static isr_t isr_table[INT_SRC_COUNT] =
 static uint32_t irq_count_old[INT_SRC_COUNT];
 static uint32_t irq_count[INT_SRC_COUNT];
 
+unsigned imx233_icoll_get_priority(int src)
+{
+#if IMX233_SUBTARGET < 3780
+    return BF_RDn(ICOLL_PRIORITYn, src / 4, PRIORITYx(src % 4));
+#else
+    return BF_RDn(ICOLL_INTERRUPTn, src, PRIORITY);
+#endif
+}
+
 struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 {
     struct imx233_icoll_irq_info_t info;
@@ -135,11 +144,7 @@ struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 #else
     info.enabled = BF_RDn(ICOLL_INTERRUPTn, src, ENABLE);
 #endif
-#if IMX233_SUBTARGET < 3780
-    info.priority = BF_RDn(ICOLL_PRIORITYn, src / 4, PRIORITYx(src % 4));
-#else
-    info.priority = BF_RDn(ICOLL_INTERRUPTn, src, PRIORITY);
-#endif
+    info.priority = imx233_icoll_get_priority(src);
     info.freq = irq_count_old[src];
     return info;
 }
@@ -163,16 +168,23 @@ static void UIRQ(void)
 }
 
 /* return the priority level */
-int _irq_handler(uint32_t vec)
+void _irq_handler(void)
 {
+    /* read vector and notify as side effect */
+    uint32_t vec = HW_ICOLL_VECTOR;
     int irq_nr = (vec - HW_ICOLL_VBASE) / 4;
+    /* check for IRQ storm */
     if(irq_count[irq_nr]++ > IRQ_STORM_THRESHOLD)
         panicf("IRQ %d: storm detected", irq_nr);
+    /* do some regular stat */
     if(irq_nr == INT_SRC_TIMER(TIMER_TICK))
         do_irq_stat();
+    /* enable interrupts again */
+    //enable_irq();
+    /* process interrupt */
     (*(isr_t *)vec)();
     /* acknowledge completion of IRQ */
-    return imx233_icoll_get_irq_info(irq_nr).priority;
+    HW_ICOLL_LEVELACK = 1 << imx233_icoll_get_priority(irq_nr);
 }
 
 void irq_handler(void)
@@ -181,22 +193,20 @@ void irq_handler(void)
     asm volatile(
         "sub    lr, lr, #4               \n" /* Create return address */
         "stmfd  sp!, { r0-r5, r12, lr }  \n" /* Save what gets clobbered */
-        "ldr    r5, =0x8001c290          \n" /* Save pointer to instruction */
-        "str    lr, [r5]                 \n" /* in HW_DIGCTL_SCRATCH0 */
-        "ldr    r4, =0x80000000          \n" /* Read HW_ICOLL_VECTOR  */
-        "ldr    r0, [r4]                 \n" /* and notify as side-effect */
+        "ldr    r1, =0x8001c290          \n" /* Save pointer to instruction */
+        "str    lr, [r1]                 \n" /* in HW_DIGCTL_SCRATCH0 */
         "mrs    lr, spsr                 \n" /* Save SPSR_irq */
-        "stmfd  sp!, { lr }              \n" /* Push it on the IRQ stack */
-        "msr    cpsr_c, #0x13            \n" /* Switch to SVC mode, enable IRQ */
-        "stmfd  sp!, { lr }              \n" /* Save lr_SVC */
-        "blx    _irq_handler             \n" /* Process IRQ, returns ack level */
-        "ldmfd  sp!, { lr }              \n" /* Restore lr_SVC */
+        "stmfd  sp!, { r1, lr }          \n" /* Push it on the stack */
+        "msr    cpsr_c, #0x93            \n" /* Switch to SVC mode, IRQ disabled */
+        "mov    r4, lr                   \n" /* Save lr_SVC */
+        "and    r5, sp, #4               \n" /* Align SVC stack */
+        "sub    sp, sp, r5               \n" /* on 8-byte boundary */
+        "blx    _irq_handler             \n" /* Process IRQ */
+        "add    sp, sp, r5               \n" /* Undo alignement */
+        "mov    lr, r4                   \n" /* Restore lr_SVC */
         "msr    cpsr_c, #0x92            \n" /* Mask IRQ, return to IRQ mode */
-        "ldmfd  sp!, { lr }              \n" /* Pop back SPSR */
+        "ldmfd  sp!, { r1, lr }          \n" /* Reload saved value */
         "msr    spsr_cxsf, lr            \n" /* Restore SPSR_irq */
-        "mov    r3, #1                   \n" /* Compute ack level value */
-        "lsl    r0, r3, r0               \n" /* (1 << ack_lvl) */
-        "str    r0, [r4, #0x10]          \n" /* and write it to HW_ICOLL_LEVELACK */
         "ldmfd  sp!, { r0-r5, r12, pc }^ \n" /* Restore regs, and RFE */);
 }
 
