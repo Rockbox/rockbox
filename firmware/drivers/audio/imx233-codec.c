@@ -101,3 +101,11 @@ void audiohw_set_monitor(bool enable)
 {
     imx233_audioout_select_hp_input(enable);
 }
+
+#ifdef HAVE_SPEAKER
+void audiohw_enable_speaker(bool en)
+{
+    imx233_audioout_enable_spkr(en);
+    imx233_audio_enable_spkr(en);
+}
+#endif

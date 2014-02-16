@@ -261,6 +261,24 @@ void imx233_audioout_set_3d_effect(int val)
     }
 }
 
+void imx233_audioout_enable_spkr(bool en)
+{
+#if IMX233_SUBTARGET >= 3780
+    if(en)
+    {
+        BF_CLR(AUDIOOUT_PWRDN, SPEAKER);
+        BF_CLR(AUDIOOUT_SPEAKERCTRL, MUTE);
+    }
+    else
+    {
+        BF_SET(AUDIOOUT_SPEAKERCTRL, MUTE);
+        BF_SET(AUDIOOUT_PWRDN, SPEAKER);
+    }
+#else
+    (void) en;
+#endif
+}
+
 struct imx233_audioout_info_t imx233_audioout_get_info(void)
 {
     struct imx233_audioout_info_t info;

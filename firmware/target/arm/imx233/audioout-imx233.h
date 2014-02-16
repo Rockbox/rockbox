@@ -64,6 +64,8 @@ void imx233_audioout_set_freq(int fsel);
 void imx233_audioout_select_hp_input(bool line1);
 /* value in 1.5dB steps, from 0dB to 6dB */
 void imx233_audioout_set_3d_effect(int val);
+/* enable/disable speaker amplifier */
+void imx233_audioout_enable_spkr(bool en);
 
 struct imx233_audioout_info_t imx233_audioout_get_info(void);
 
