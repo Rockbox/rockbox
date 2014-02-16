@@ -23,5 +23,10 @@
 
 #define IMX233_AUDIO_COUPLING_MODE ACM_CAPLESS
 
+#ifdef CREATIVE_ZENXFISTYLE
+#define IMX233_AUDIO_SPKR_GATE_BANK 0
+#define IMX233_AUDIO_SPKR_GATE_PIN  12
+#endif
+
 #endif /* __audio_target__ */
  
