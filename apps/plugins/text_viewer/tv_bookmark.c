@@ -249,7 +249,15 @@ void tv_select_bookmark(void)
     if (preferences->vertical_scroll_mode == VS_PAGE)
         select_pos.line = 0;
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+
     tv_move_screen(select_pos.page, select_pos.line, SEEK_SET);
+    
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
 }
 
 /* serialize or deserialize of the bookmark array */
