@@ -79,6 +79,9 @@
 /* define this if you have an i.MX23 codec */
 #define HAVE_IMX233_CODEC
 
+/* Define this if you have a speaker */
+#define HAVE_SPEAKER
+
 #define CONFIG_TUNER STFM1000
 
 /* There is no hardware tone control */
