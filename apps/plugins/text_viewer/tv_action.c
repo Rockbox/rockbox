@@ -172,9 +172,17 @@ void tv_top(void)
 
 void tv_bottom(void)
 {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+
     tv_move_screen(0, 0, SEEK_END);
     if (preferences->vertical_scroll_mode == VS_PAGE)
         tv_move_screen(0, -tv_get_screen_pos()->line, SEEK_CUR);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
 }
 
 unsigned tv_menu(void)
@@ -187,9 +195,17 @@ unsigned tv_menu(void)
 
     if (res == TV_MENU_RESULT_EXIT_MENU)
     {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost(true);
+#endif
+
         tv_convert_fpos(cur_file_pos, &cur_pos);
 
         tv_move_screen(cur_pos.page, cur_pos.line, SEEK_SET);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost(false);
+#endif
     }
     else if (res == TV_MENU_RESULT_MOVE_PAGE)
         res = TV_MENU_RESULT_EXIT_MENU;
