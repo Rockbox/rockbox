@@ -129,6 +129,19 @@ struct button_map bm[] = {
     { SDLK_PAGEDOWN,    101, 313, 15, "Play" },
     { 0, 0, 0, 0, "None" }
 };
+#elif defined(CREATIVE_ZENXFISTYLE)
+struct button_map bm[] = {
+    { SDLK_LEFT,        437, 157, 13, "Left" },
+    { SDLK_RIGHT,       504, 157, 13, "Right" },
+    { SDLK_UP,          471, 125, 13, "Up" },
+    { SDLK_DOWN,        471, 192, 13, "Down" },
+    { SDLK_RETURN,      471, 157, 25, "Select" },
+    { SDLK_HOME,        447,  57, 15, "Back" },
+    { SDLK_PAGEUP,      495,  57, 15, "Menu" },
+    { SDLK_END,         447, 259, 15, "Shortcut" },
+    { SDLK_PAGEDOWN,    495, 259, 15, "Play" },
+    { 0, 0, 0, 0, "None" }
+};
 #else
 #error please define button map
 #endif

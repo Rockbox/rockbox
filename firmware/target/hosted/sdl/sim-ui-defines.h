@@ -501,6 +501,13 @@
 #define UI_LCD_POSX                 27
 #define UI_LCD_POSY                 48
 
+#elif defined(CREATIVE_ZENXFISTYLE)
+#define UI_TITLE                    "Creative ZEN X-Fi Style"
+#define UI_WIDTH                    548 /* width of GUI window */
+#define UI_HEIGHT                   318/* height of GUI window */
+#define UI_LCD_POSX                 46
+#define UI_LCD_POSY                 40
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif
