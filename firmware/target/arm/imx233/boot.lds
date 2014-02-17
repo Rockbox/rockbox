@@ -74,7 +74,7 @@ SECTIONS
     } > DRAM
 
     /* physical address of the stack */
-    stackend_phys = stackend - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR;
+    crt0_tmpstack_phys = stackend - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR;
 
     /* treat .bss and .ncbss as a single section */
     .bss (NOLOAD) :

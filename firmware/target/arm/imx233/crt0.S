@@ -56,9 +56,12 @@ start:
     bic     r0, r1
     mcr     p15, 0, r0, c1, c0, 0
 
-    /* To call the C code we need a stack, since the stack is in virtual memory
-     * use the stack's physical address */
-    ldr     sp, =stackend_phys
+    /* To call the C code we need a stack, since the loader's stack might be
+     * in virtual memory, we need a physical address for the stack. Furthermore,
+     * we cannot use the main firmware stack yet because it overlaps with the
+     * init code which will be moved later. We rely on the linker to provide
+     * a safe, temporary stack */
+    ldr     sp, =crt0_tmpstack_phys
 
     /* Enable MMU */
     bl      memory_init
