@@ -27,6 +27,7 @@
 # - Simon Zhukovsky
 # - Desu Rozen
 # - James Hunt
+# - Dmitriy Gamza
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -13021,7 +13022,7 @@
     *: "Select one or more directories"
   </source>
   <dest>
-    *: "Select one or more directories"
+    *: "Выберите одну или несколько папок"
   </dest>
   <voice>
     *: "Выберите одну или несколько папок"
@@ -13035,7 +13036,7 @@
     *: "Select directories to scan"
   </source>
   <dest>
-    *: "Select directories to scan"
+    *: "Выберите папки для сканирования"
   </dest>
   <voice>
     *: "Выберите папки для сканирования"
@@ -13049,10 +13050,10 @@
     *: "Maximum Volume Limit"
   </source>
   <dest>
-    *: "Ограничит Махималнуу Громкост"
+    *: "Ограничение максимальной громкости"
   </dest>
   <voice>
-    *: "Ограничит Махималнуу Громкост"
+    *: "Ограничение максимальной громкости"
   </voice>
 </phrase>
 <phrase>
@@ -13080,10 +13081,10 @@
     *: "Slow"
   </source>
   <dest>
-    *: "Медленно"
+    *: "Slow"
   </dest>
   <voice>
-    *: "Медленно"
+    *: "Slow"
   </voice>
 </phrase>
 <phrase>
@@ -13094,10 +13095,10 @@
     *: "Sharp"
   </source>
   <dest>
-    *: "Диез"
+    *: "Sharp"
   </dest>
   <voice>
-    *: "Диез"
+    *: "Sharp"
   </voice>
 </phrase>
 <phrase>
@@ -13110,11 +13111,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Время Атаки"
+    swcodec: "Время атаки"
   </dest>
   <voice>
     *: none
-    swcodec: "Время Атаки"
+    swcodec: "Время атаки"
   </voice>
 </phrase>
 <phrase>
@@ -13125,9 +13126,9 @@
     *: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "DAC Фильтр Уменшение "
+    *: "Цифровой фильтр ЦАП"
   </dest>
   <voice>
-    *: "DAC Фильтр Уменшение "
+    *: "Цифровой фильтр ЦАП"
   </voice>
 </phrase>
