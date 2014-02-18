@@ -41,7 +41,7 @@
 
 #ifdef HAVE_HOTSWAP
 #include "storage.h"
-#include "dir.h"
+#include "mv.h"
 #endif
 /* gui api */
 #include "list.h"

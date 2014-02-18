@@ -75,7 +75,7 @@
 #include "ata_idle_notify.h"
 #include "file.h"
 #include "action.h"
-#include "dir.h"
+#include "mv.h"
 #include "debug.h"
 #include "audio.h"
 #include "lcd.h"
