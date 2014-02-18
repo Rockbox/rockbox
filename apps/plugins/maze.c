@@ -54,7 +54,7 @@
 #else
 #   include "lib/pluginlib_actions.h"
 #   define MAZE_NEW             PLA_SELECT_REPEAT
-#   define MAZE_QUIT            PLA_CANCEL
+#   define MAZE_QUIT            PLA_EXIT
 #   define MAZE_SOLVE           PLA_SELECT_REL
 #   define MAZE_RIGHT           PLA_RIGHT
 #   define MAZE_RIGHT_REPEAT    PLA_RIGHT_REPEAT

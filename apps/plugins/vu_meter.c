@@ -225,6 +225,17 @@
 #define LABEL_MENU "MENU"
 #define LABEL_VOLUME "UP/DOWN"
 
+#elif (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD)
+#define VUMETER_QUIT        BUTTON_POWER
+#define VUMETER_HELP        BUTTON_MENU|BUTTON_REPEAT
+#define VUMETER_MENU        BUTTON_MENU|BUTTON_REL
+#define VUMETER_UP          BUTTON_VOL_UP
+#define VUMETER_DOWN        BUTTON_VOL_DOWN
+#define LABEL_HELP          "Hold Menu"
+#define LABEL_QUIT          "Power"
+#define LABEL_MENU          "Menu"
+#define LABEL_VOLUME        "Volume +/-"
+
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #define VUMETER_QUIT BUTTON_POWER
 #define VUMETER_HELP BUTTON_VIEW

@@ -44,7 +44,7 @@ const struct button_mapping* plugin_contexts[]={
 
 #define ACTION_COUNTER_TOGGLE           PLA_SELECT
 #define ACTION_COUNTER_RESET            PLA_SELECT_REPEAT
-#define ACTION_MENU                     PLA_CANCEL
+#define ACTION_MENU                     PLA_EXIT
 #define ACTION_MODE_NEXT                PLA_RIGHT
 #define ACTION_MODE_NEXT_REPEAT         PLA_RIGHT_REPEAT
 #define ACTION_MODE_PREV                PLA_LEFT
