@@ -28,7 +28,7 @@
 #include <sys/types.h>
 #include <getopt.h>
 
-#define HEADERGEN_VERSION   "2.1.7"
+#define HEADERGEN_VERSION   "2.1.8"
 
 #define error(...) do{ fprintf(stderr, __VA_ARGS__); exit(1); } while(0)
 
@@ -493,9 +493,9 @@ void gen_macro(const std::string& filename, bool variadic)
         gen_macro_list(f, "_", MAX_NARGS, 1, ", ");
         fprintf(f, ", N, ...) N\n\n");
 
-        fprintf(f, "#define REG_VARIADIC(macro, reg, ...) REG_VARIADIC_(macro, NARG(__VA_ARGS__), reg, __VA_ARGS__)\n");
+        fprintf(f, "#define REG_VARIADIC(macro, reg, ...) REG_VARIADIC_(macro, REG_NARG(__VA_ARGS__), reg, __VA_ARGS__)\n");
         fprintf(f, "#define REG_VARIADIC_(macro, cnt, reg, ...) REG_VARIADIC__(macro, cnt, reg, __VA_ARGS__)\n");
-        fprintf(f, "#define REG_VARIADIC__(macro, cnt, reg, ...) REG_VARIADIC___(macro##cnt, reg, ...)\n");
+        fprintf(f, "#define REG_VARIADIC__(macro, cnt, reg, ...) REG_VARIADIC___(macro##cnt, reg, __VA_ARGS__)\n");
         fprintf(f, "#define REG_VARIADIC___(macro, reg, ...) macro(reg, __VA_ARGS__)\n\n");
 
         fprintf(f, "#define BM_OR(reg, ...) REG_VARIADIC(BM_OR, reg, __VA_ARGS__)\n");
