@@ -99,6 +99,20 @@ static const struct button_mapping button_context_wps[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_wps */
 
+static const struct button_mapping button_context_wps_locked[]  = {
+    { ACTION_WPS_VOLUP,                 BUTTON_VOL_UP,                     BUTTON_NONE },
+    { ACTION_WPS_VOLUP,                 BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_WPS_VOLUP,                 BUTTON_UP,                         BUTTON_NONE },
+    { ACTION_WPS_VOLUP,                 BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
+
+    { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN,                   BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,               BUTTON_DOWN,                       BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,               BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_wps */
+
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,                  BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_KBD_LEFT,                  BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
@@ -414,7 +428,9 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_WPS:
-            return button_context_wps; 
+            return button_context_wps;
+        case CONTEXT_WPS_LOCKED:
+            return button_context_wps_locked;
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;
         case CONTEXT_SETTINGS_TIME:
