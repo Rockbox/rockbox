@@ -237,6 +237,16 @@ static void setoptions (void)
         options.SELECT  = BUTTON_SELECT;
         options.MENU    = BUTTON_MENU;
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
+
+        options.A       = BUTTON_BACK;
+        options.B       = BUTTON_MENU;
+        options.START   = BUTTON_VOL_UP;
+        options.SELECT  = BUTTON_VOL_DOWN;
+        options.MENU    = BUTTON_PLAY;
+
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
         options.UP      = BUTTON_UP;
         options.DOWN    = BUTTON_DOWN;
