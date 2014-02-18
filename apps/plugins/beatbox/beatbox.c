@@ -111,6 +111,12 @@
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
+#define BTN_QUIT         BUTTON_PLAY
+#define BTN_RIGHT        BUTTON_MENU
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
 #endif
 
 
