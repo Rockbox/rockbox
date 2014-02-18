@@ -373,6 +373,26 @@
 #   define HK_CUR2STACK    "PLAY.."
 #   define HK_REM2STACK    "PLAY+RIGHT"
 
+#elif (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD)
+#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_UP            BUTTON_UP
+#   define SOL_DOWN          BUTTON_DOWN
+#   define SOL_LEFT          BUTTON_VOL_DOWN
+#   define SOL_RIGHT         BUTTON_VOL_UP
+#   define SOL_MOVE          (BUTTON_PLAY|BUTTON_REL)
+#   define SOL_DRAW          (BUTTON_PLAY|BUTTON_REPEAT)
+#   define SOL_REM2CUR       BUTTON_BACK
+#   define SOL_CUR2STACK_PRE (BUTTON_MENU | BUTTON_REPEAT)
+#   define SOL_CUR2STACK     BUTTON_MENU
+#   define SOL_REM2STACK     (BUTTON_BACK|BUTTON_REPEAT)
+#   define SOL_REM2STACK_PRE BUTTON_BACK
+
+#   define HK_MOVE           "SHORT PLAY"
+#   define HK_DRAW           "LONG PLAY"
+#   define HK_REM2CUR        "BACK"
+#   define HK_CUR2STACK      "DOUBLE MENU"
+#   define HK_REM2STACK      "BACK"
+
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #   define SOL_QUIT         BUTTON_POWER
 #   define SOL_UP           BUTTON_UP
