@@ -115,6 +115,8 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
+    /* stop hadrware watchdog, IRQs are stopped */
+    imx233_rtc_enable_watchdog(false);
     /* make sure lcd and backlight are on */
     lcd_update();
     _backlight_on();
