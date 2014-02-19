@@ -42,6 +42,7 @@
 
 #define LRADC_NUM_CHANNELS  8
 #define LRADC_NUM_DELAYS    4
+#define LRADC_NUM_SOURCES   16
 
 #define LRADC_SRC(x)            (x)
 #define LRADC_SRC_XPLUS         LRADC_SRC(2)
@@ -71,7 +72,9 @@
 typedef void (*lradc_irq_fn_t)(int chan);
 
 void imx233_lradc_init(void);
-void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples, int src);
+void imx233_lradc_setup_source(int channel, bool div2, int src);
+/* variant of the above only for accumulation changes */
+void imx233_lradc_setup_sampling(int channel, bool acc, int nr_samples);
 void imx233_lradc_setup_delay(int dchan, int trigger_lradc, int trigger_delays,
     int loop_count, int delay);
 void imx233_lradc_clear_channel_irq(int channel);

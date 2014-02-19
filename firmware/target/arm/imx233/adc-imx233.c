@@ -80,7 +80,8 @@ static short adc_read_physical(int src, bool div2)
 {
     int virt = imx233_lradc_acquire_channel(src, TIMEOUT_BLOCK);
     // divide by two for wider ranger
-    imx233_lradc_setup_channel(virt, div2, false, 0, src);
+    imx233_lradc_setup_source(virt, div2, src);
+    imx233_lradc_setup_sampling(virt, false, 0);
     int val = adc_read_physical_ex(virt);
     imx233_lradc_release_channel(virt);
     return val;

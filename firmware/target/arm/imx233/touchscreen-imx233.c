@@ -115,7 +115,8 @@ static void kick_measure(bool pull_x, bool pull_y, bool detect, int src)
     imx233_lradc_enable_touch_detect_irq(false);
     imx233_lradc_enable_channel_irq(touch_chan, true);
     /* measure channel, no accumulation */
-    imx233_lradc_setup_channel(touch_chan, false, true, NR_SAMPLES - 1, src);
+    imx233_lradc_setup_source(touch_chan, false, src);
+    imx233_lradc_setup_sampling(touch_chan, true, NR_SAMPLES - 1);
     imx233_lradc_clear_channel(touch_chan);
     /* use a delay */
     imx233_lradc_setup_delay(touch_delay, 1 << touch_chan, 1 << touch_delay,

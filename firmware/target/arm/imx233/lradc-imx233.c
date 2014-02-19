@@ -66,10 +66,8 @@ void imx233_lradc_set_channel_irq_callback(int channel, lradc_irq_fn_t cb)
     imx233_icoll_enable_interrupt(INT_SRC_LRADC_CHx(channel), cb != NULL);
 }
 
-void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples, int src)
+void imx233_lradc_setup_source(int channel, bool div2, int src)
 {
-    HW_LRADC_CHn_CLR(channel) = BM_OR2(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
-    HW_LRADC_CHn_SET(channel) = BF_OR2(LRADC_CHn, NUM_SAMPLES(nr_samples), ACCUMULATE(acc));
     if(div2)
         BF_SETV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << channel);
     else
@@ -91,6 +89,12 @@ void imx233_lradc_setup_channel(int channel, bool div2, bool acc, int nr_samples
     else if(channel != src)
         panicf("cannot configure channel %d for source %d", channel, src);
 #endif
+}
+
+void imx233_lradc_setup_sampling(int channel, bool acc, int nr_samples)
+{
+    HW_LRADC_CHn_CLR(channel) = BM_OR2(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
+    HW_LRADC_CHn_SET(channel) = BF_OR2(LRADC_CHn, NUM_SAMPLES(nr_samples), ACCUMULATE(acc));
 }
 
 void imx233_lradc_setup_delay(int dchan, int trigger_lradc, int trigger_delays,
@@ -202,8 +206,10 @@ void imx233_lradc_reserve_delay(int channel)
 #if IMX233_SUBTARGET >= 3700
 int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
 {
-    imx233_lradc_setup_channel(nmos_chan, false, false, 0, LRADC_SRC_NMOS_THIN);
-    imx233_lradc_setup_channel(pmos_chan, false, false, 0, LRADC_SRC_PMOS_THIN);
+    imx233_lradc_setup_source(nmos_chan, false, LRADC_SRC_NMOS_THIN);
+    imx233_lradc_setup_sampling(nmos_chan, false, 0);
+    imx233_lradc_setup_source(pmos_chan, false, LRADC_SRC_PMOS_THIN);
+    imx233_lradc_setup_sampling(pmos_chan, false, 0);
     // mux sensors
     BF_CLR(LRADC_CTRL2, TEMPSENSE_PWD);
     imx233_lradc_clear_channel(nmos_chan);
@@ -247,7 +253,8 @@ int imx233_lradc_sense_ext_temperature(int chan, int sensor)
 {
 #define EXT_TEMP_ACC_COUNT  5
     /* setup channel */
-    imx233_lradc_setup_channel(chan, false, false, 0, sensor);
+    imx233_lradc_setup_source(chan, false, sensor);
+    imx233_lradc_setup_sampling(chan, false, 0);
     /* set current source to 300µA */
     imx233_lradc_set_temp_isrc(sensor, BV_LRADC_CTRL2_TEMP_ISRC0__300);
     /* read value and accumulate */
@@ -350,7 +357,8 @@ void imx233_lradc_init(void)
     battery_chan = 7;
     imx233_lradc_reserve_channel(battery_chan);
     /* setup them for the simplest use: no accumulation, no division*/
-    imx233_lradc_setup_channel(battery_chan, false, false, 0, LRADC_SRC_BATTERY);
+    imx233_lradc_setup_source(battery_chan, false, LRADC_SRC_BATTERY);
+    imx233_lradc_setup_sampling(battery_chan, false, 0);
     /* setup delay channel for battery for automatic reading and scaling */
     battery_delay_chan = 0;
     imx233_lradc_reserve_delay(battery_delay_chan);
