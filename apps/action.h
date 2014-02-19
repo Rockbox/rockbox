@@ -37,9 +37,11 @@
 #define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
 
 #ifndef HAS_BUTTON_HOLD
-#define ALLOW_SOFTLOCK 0x08000000 /* will be stripped.. never needed except in calls to get_action() */
+#define ALLOW_SOFTLOCK 0x08000000 /* | this against context to allow soft lock (get_action() only) */
+#define HANDLE_SOFTLOCK 0x04000000 /* | this against context to search keys even if locked (get_action() only) */
 #else
 #define ALLOW_SOFTLOCK 0
+#define HANDLE_SOFTLOCK 0x04000000
 #endif
 
 enum {
@@ -82,6 +84,7 @@ enum {
     CONTEXT_USB_HID_MODE_PRESENTATION,
     CONTEXT_USB_HID_MODE_BROWSER,
     CONTEXT_USB_HID_MODE_MOUSE,
+    CONTEXT_WPS_LOCKED,
 };
 
 

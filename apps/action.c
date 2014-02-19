@@ -288,6 +288,7 @@ static int get_action_worker(int context, int timeout,
     last_context = context;
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
+    bool screen_handle_lock = ((context & HANDLE_SOFTLOCK) == HANDLE_SOFTLOCK);
     if (is_keys_locked())
     {
         if (button == unlock_combo)
@@ -301,10 +302,11 @@ static int get_action_worker(int context, int timeout,
             splash(HZ/2, str(LANG_KEYLOCK_OFF));
             return ACTION_REDRAW;
         }
-        else
+        else if(1
 #if (BUTTON_REMOTE != 0)
-            if ((button & BUTTON_REMOTE) == 0)
+            && (button & BUTTON_REMOTE) == 0
 #endif
+            && !screen_handle_lock)
         {
             if ((button & BUTTON_REL))
                 splash(HZ/2, str(LANG_KEYLOCK_ON));
@@ -318,7 +320,7 @@ static int get_action_worker(int context, int timeout,
         button_enable_touch(true);
     }
 #endif
-    context &= ~ALLOW_SOFTLOCK;
+    context &= ~(ALLOW_SOFTLOCK | HANDLE_SOFTLOCK);
 #endif /* HAS_BUTTON_HOLD */
 
 #ifdef HAVE_TOUCHSCREEN

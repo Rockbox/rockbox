@@ -296,6 +296,15 @@ static int skintouch_to_wps(struct wps_data *data)
 }
 #endif /* HAVE_TOUCHSCREEN */
 
+static int get_context(void)
+{
+#ifndef HAS_BUTTON_HOLD
+    if(is_keys_locked())
+        return CONTEXT_WPS_LOCKED|ALLOW_SOFTLOCK|HANDLE_SOFTLOCK;
+#endif
+    return CONTEXT_WPS|ALLOW_SOFTLOCK|HANDLE_SOFTLOCK;
+}
+
 bool ffwd_rew(int button)
 {
     unsigned int step = 0;     /* current ff/rewind step */
@@ -424,7 +433,7 @@ bool ffwd_rew(int button)
         }
         if (!exit)
         {
-            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_BLOCK);
+            button = get_action(get_context(),TIMEOUT_BLOCK);
 #ifdef HAVE_TOUCHSCREEN
             if (button == ACTION_TOUCHSCREEN)
                 button = skintouch_to_wps(skin_get_gwps(WPS, SCREEN_MAIN)->data);
@@ -773,7 +782,7 @@ long gui_wps_show(void)
 #endif
             }
         }
-        button = skin_wait_for_action(WPS, CONTEXT_WPS|ALLOW_SOFTLOCK,
+        button = skin_wait_for_action(WPS, get_context(),
                                       restore ? 1 : HZ/5);
 
         /* Exit if audio has stopped playing. This happens e.g. at end of

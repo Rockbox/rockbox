@@ -87,8 +87,8 @@ struct button_map bm[] = {
     { SDLK_KP1,        82, 535, 34, "Bottom-Left" },
     { SDLK_KP2,       162, 532, 33, "Down" },
     { SDLK_KP3,       234, 535, 42, "Bottom-Right" },
-    { SDLK_KP_PLUS,     1, 128, 29, "Vol+" },
-    { SDLK_KP_MINUS,    5, 187, 30, "Vol-" },
+    { SDLK_KP_PLUS,     1, 138, 29, "Vol+" },
+    { SDLK_KP_MINUS,    5, 198, 30, "Vol-" },
     { SDLK_HOME,      170,   6, 50, "Power" },
     { 0, 0, 0, 0, "None" }
 };
