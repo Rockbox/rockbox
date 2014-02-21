@@ -56,6 +56,7 @@ static int mouse_coords = 0;
 #else
 #define USB_KEY SDLK_u
 #endif
+#define EXT_KEY SDLK_e
 
 #if defined(IRIVER_H100_SERIES) || defined (IRIVER_H300_SERIES)
 int _remote_type=REMOTETYPE_H100_LCD;
@@ -322,6 +323,12 @@ static void button_event(int key, bool pressed)
             sim_trigger_usb(usb_connected);
         }
         return;
+#ifdef HAVE_MULTIDRIVE
+    case EXT_KEY:
+        if (!pressed)
+            sim_trigger_external(!storage_present(1));
+        return;
+#endif
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_PANDORA)
     case SDLK_LCTRL:

@@ -40,6 +40,10 @@ enum {
     SIM_SCREENDUMP,
     SIM_USB_INSERTED,
     SIM_USB_EXTRACTED,
+#ifdef HAVE_MULTIDRIVE
+    SIM_EXT_INSERTED,
+    SIM_EXT_EXTRACTED,
+#endif
 };
 
 void sim_thread(void)
@@ -95,6 +99,15 @@ void sim_thread(void)
                  * do it here anyway but don't depend on the acks */
                 queue_broadcast(SYS_USB_DISCONNECTED, 0);
                 break;
+#ifdef HAVE_MULTIDRIVE
+            case SIM_EXT_INSERTED:
+            case SIM_EXT_EXTRACTED:
+                queue_broadcast(ev.id == SIM_EXT_INSERTED ?
+                                SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED, 0);
+                sleep(HZ/20);
+                queue_broadcast(SYS_FS_CHANGED, 0);
+                break;
+#endif /* HAVE_MULTIDRIVE */
             default:
                 DEBUGF("sim_tasks: unhandled event: %ld\n", ev.id);
                 break;
@@ -155,3 +168,48 @@ void usb_wait_for_disconnect(struct event_queue *q)
             return;
     }
 }
+
+#ifdef HAVE_MULTIDRIVE
+static bool is_ext_inserted;
+
+void sim_trigger_external(bool inserted)
+{
+    if (inserted)
+        queue_post(&sim_queue, SIM_EXT_INSERTED, 0);
+    else
+        queue_post(&sim_queue, SIM_EXT_EXTRACTED, 0);
+    is_ext_inserted = inserted;
+}
+
+bool hostfs_present(int drive)
+{
+    return drive > 0  ? is_ext_inserted : true;
+}
+
+bool hostfs_removable(int drive)
+{
+    return drive > 0;
+}
+
+#ifdef HAVE_MULTIVOLUME
+bool volume_removable(int volume)
+{
+    /* volume == drive for now */
+    return hostfs_removable(volume);
+}
+
+bool volume_present(int volume)
+{
+    /* volume == drive for now */
+    return hostfs_present(volume);
+}
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_MMC)
+bool mmc_touched(void)
+{
+    return hostfs_present(1);
+}
+#endif
+
+#endif

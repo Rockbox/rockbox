@@ -395,10 +395,3 @@ void touchpad_enable_device(bool en)
     (void)en;
 }
 #endif
-
-#if (CONFIG_STORAGE & STORAGE_MMC)
-bool mmc_touched(void)
-{
-    return false;
-}
-#endif
