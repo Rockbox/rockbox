@@ -27,9 +27,17 @@
 #include "lcd.h"
 #include "string.h"
 #include "usb.h"
-#include "power-imx233.h"
+#include "button-imx233.h"
 #include "touchpad.h"
 #include "stdio.h"
+
+struct imx233_button_map_t imx233_button_map[] =
+{
+    IMX233_BUTTON(VOL_DOWN, GPIO(1, 30), "vol_down", INVERTED),
+    IMX233_BUTTON(POWER, PSWITCH(1), "power"),
+    IMX233_BUTTON(VOL_UP, PSWITCH(3), "vol_up"),
+    IMX233_BUTTON_(END, END(), "")
+};
 
 #ifndef BOOTLOADER
 
@@ -293,7 +301,7 @@ void touchpad_set_sensitivity(int level)
 static void rmi_thread(void)
 {
     struct queue_event ev;
-    
+
     while(1)
     {
         /* make sure to timeout often enough for the activity timeout to take place */
@@ -329,7 +337,7 @@ static void rmi_thread(void)
     }
 }
 
-void button_init_device(void)
+static void touchpad_init(void)
 {
     /* Synaptics TouchPad information:
      * - product id: 1533
@@ -349,18 +357,13 @@ void button_init_device(void)
      * - Maximum X: 3009
      * - Maxumum Y: 1974
      * - Resolution: 82
-     *
-     * ATTENTION line: B0P27 asserted low
-     *
-     * The B0P26 line seems to be related to the touchpad
      */
-     
-    /* touchpad power */
+
     imx233_pinctrl_acquire(0, 26, "touchpad power");
     imx233_pinctrl_set_function(0, 26, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 26, false);
     imx233_pinctrl_set_drive(0, 26, PINCTRL_DRIVE_8mA);
-    
+
     rmi_init(0x40);
 
     char product_id[RMI_PRODUCT_ID_LEN];
@@ -369,7 +372,7 @@ void button_init_device(void)
      * Since it doesn't to work great, just hardcode the sensitivity to
      * some reasonable value for now. */
     rmi_write_single(RMI_2D_SENSITIVITY_ADJ, 13);
-    
+
     rmi_write_single(RMI_2D_GESTURE_SETTINGS,
         RMI_2D_GESTURE_PRESS_TIME_300MS |
         RMI_2D_GESTURE_FLICK_DIST_4MM << RMI_2D_GESTURE_FLICK_DIST_BP |
@@ -385,58 +388,25 @@ void button_init_device(void)
     imx233_pinctrl_set_function(0, 27, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 27, false);
     imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
-    /* Volume down */
-    imx233_pinctrl_acquire(1, 30, "volume down");
-    imx233_pinctrl_set_function(1, 30, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(1, 30, false);
 }
 
 #else
-
-void button_init_device(void)
-{
-    /* Volume down */
-    imx233_pinctrl_acquire(1, 30, "volume down");
-    imx233_pinctrl_set_function(1, 30, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(1, 30, false);
-}
-
 int touchpad_read_device(void)
 {
     return 0;
 }
-
 #endif
+
+void button_init_device(void)
+{
+#ifndef BOOTLOADER
+    touchpad_init();
+#endif
+    /* generic */
+    imx233_button_init();
+}
 
 int button_read_device(void)
 {
-    int res = 0;
-    if(!imx233_pinctrl_get_gpio(1, 30))
-        res |= BUTTON_VOL_DOWN;
-    /* The imx233 uses the voltage on the PSWITCH pin to detect power up/down
-     * events as well as recovery mode. Since the power button is the power button
-     * and the volume up button is recovery, it is not possible to know whether
-     * power button is down when volume up is down (except if there is another
-     * method but volume up and power don't seem to be wired to GPIO pins). 
-     * As a probable consequence of that, it has been reported that pressing 
-     * volume up sometimes return BUTTON_POWER instead of BUTTON_VOL_UP. The
-     * following volume_power_lock prevent BUTTON_POWER to happen if volume up
-     * has been send since a very short time. */
-    static int volume_power_lock = 0;
-    if(volume_power_lock > 0)
-        volume_power_lock--;
-    switch(BF_RD(POWER_STS, PSWITCH))
-    {
-        case 1: 
-            if(volume_power_lock == 0)
-                res |= BUTTON_POWER;
-            break;
-        case 3:
-            res |= BUTTON_VOL_UP;
-            volume_power_lock = 5;
-            break;
-        default: 
-            break;
-    }
-    return res | touchpad_filter(touchpad_read_device());
+    return imx233_button_read(touchpad_filter(touchpad_read_device()));
 }
