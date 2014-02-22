@@ -96,6 +96,9 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
+/* Define this if you have a speaker */
+#define HAVE_SPEAKER
+
 /* LCD dimensions */
 #define LCD_WIDTH  176
 #define LCD_HEIGHT 220
