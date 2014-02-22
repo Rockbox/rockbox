@@ -27,6 +27,15 @@
 #include "usb.h"
 #include "touchscreen.h"
 #include "touchscreen-imx233.h"
+#include "button-imx233.h"
+
+struct imx233_button_map_t imx233_button_map[] =
+{
+    IMX233_BUTTON(POWER, GPIO(0, 11), "power", INVERTED),
+    IMX233_BUTTON(MENU, GPIO(0, 14), "menu", INVERTED),
+    IMX233_BUTTON_(JACK, GPIO(2, 7), "jack"),
+    IMX233_BUTTON_(END, END(), "")
+};
 
 struct touch_calibration_point
 {
@@ -69,19 +78,8 @@ void button_init_device(void)
 
     imx233_touchscreen_init();
     imx233_touchscreen_enable(true);
-
-    /* power button */
-    imx233_pinctrl_acquire(0, 11, "power");
-    imx233_pinctrl_set_function(0, 11, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(0, 11, false);
-    /* select button */
-    imx233_pinctrl_acquire(0, 14, "select");
-    imx233_pinctrl_set_function(0, 14, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(0, 14, false);
-    /* jack detect */
-    imx233_pinctrl_acquire(2, 7, "jack_detect");
-    imx233_pinctrl_set_function(2, 7, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(2, 7, false);
+    /* generic */
+    imx233_button_init();
 }
 
 static int touch_to_pixels(int *val_x, int *val_y)
@@ -123,19 +121,7 @@ static int touchscreen_read_device(int *data)
     return touchscreen_to_pixels(x, y, data);
 }
 
-bool headphones_inserted(void)
-{
-    return imx233_pinctrl_get_gpio(2, 7);
-}
-
 int button_read_device(int *data)
 {
-    int res = 0;
-    /* B0P11: #power
-     * B0P14: #select */
-    if(!imx233_pinctrl_get_gpio(0, 11))
-        res |= BUTTON_POWER;
-    if(!imx233_pinctrl_get_gpio(0, 14))
-        res |= BUTTON_MENU;
-    return res | touchscreen_read_device(data);
+    return imx233_button_read(touchscreen_read_device(data));
 }
