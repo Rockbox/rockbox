@@ -1203,7 +1203,6 @@ target/arm/imx233/creative-zen/button-zen.c
 target/arm/imx233/creative-zen/debug-zen.c
 target/arm/imx233/creative-zen/power-zen.c
 target/arm/imx233/creative-zen/powermgmt-zen.c
-target/arm/imx233/button-lradc-imx233.c
 #endif
 
 #ifdef CREATIVE_ZENXFI2
