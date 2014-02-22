@@ -41,7 +41,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "button.h"
-#include "button-lradc-imx233.h"
+#include "button-imx233.h"
 
 #define ACT_NONE    0
 #define ACT_CANCEL  1
@@ -1000,7 +1000,7 @@ bool dbg_hw_info_timrot(void)
 bool dbg_hw_info_button(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+#if IMX233_SUBTARGET >= 3700
     int orig_vddio_val, orig_vddio_brownout;
     imx233_power_get_regulator(REGULATOR_VDDIO, &orig_vddio_val, &orig_vddio_brownout);
     int vddio_val = orig_vddio_val;
@@ -1012,7 +1012,7 @@ bool dbg_hw_info_button(void)
         int btn = my_get_action(0);
         switch(btn)
         {
-#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+#if IMX233_SUBTARGET >= 3700
             case ACT_PREV:
                 vddio_val -= 100; /* mV */
                 vddio_brownout -= 100; /* mV */
@@ -1025,13 +1025,13 @@ bool dbg_hw_info_button(void)
                 break;
 #endif
             case ACT_OK:
-#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+#if IMX233_SUBTARGET >= 3700
                 imx233_power_set_regulator(REGULATOR_VDDIO, orig_vddio_val, orig_vddio_brownout);
 #endif
                 lcd_setfont(FONT_UI);
                 return true;
             case ACT_CANCEL:
-#if IMX233_SUBTARGET >= 3700 && defined(IMX233_BUTTON_LRADC_VDDIO)
+#if IMX233_SUBTARGET >= 3700
                 imx233_power_set_regulator(REGULATOR_VDDIO, orig_vddio_val, orig_vddio_brownout);
 #endif
                 lcd_setfont(FONT_UI);
@@ -1048,12 +1048,6 @@ bool dbg_hw_info_button(void)
         btn = button_read_device();
 #endif
         lcd_putsf(0, line++, "raw buttons: %x", btn);
-#ifdef IMX233_BUTTON_LRADC_CHANNEL
-        lcd_putsf(0, line++, "raw lradc: %d", imx233_button_lradc_read_raw());
-#ifdef IMX233_BUTTON_LRADC_VDDIO
-        lcd_putsf(0, line++, "vddio: %d", imx233_button_lradc_read_vddio());
-#endif
-#endif
 #ifdef HAS_BUTTON_HOLD
         lcd_putsf(0, line++, "hold: %d", button_hold());
 #endif
@@ -1067,6 +1061,45 @@ bool dbg_hw_info_button(void)
         lcd_putsf(0, line++, "data: %d", data);
 #endif
 #endif
+
+#define MAP imx233_button_map
+        for(int i = 0; MAP[i].btn != IMX233_BUTTON_END; i++)
+        {
+            bool val = imx233_button_read_btn(i);
+            int raw = imx233_button_read_raw(i);
+            char path[128];
+            char flags[128];
+            if(MAP[i].periph == IMX233_BUTTON_GPIO)
+                snprintf(path, sizeof(path), "gpio(%d,%d)", MAP[i].u.gpio.bank, MAP[i].u.gpio.pin);
+            else if(MAP[i].periph == IMX233_BUTTON_LRADC)
+            {
+                if(MAP[i].u.lradc.relative == -1)
+                    snprintf(path, sizeof(path), "lradc(%d,%d)", MAP[i].u.lradc.src,
+                        MAP[i].u.lradc.value);
+                else
+                    snprintf(path, sizeof(path), "lradc(%d,%d,%s)", MAP[i].u.lradc.src,
+                        MAP[i].u.lradc.value, MAP[MAP[i].u.lradc.relative].name);
+            }
+            else if(MAP[i].periph == IMX233_BUTTON_PSWITCH)
+                snprintf(path, sizeof(path), "pswitch(%d)", MAP[i].u.pswitch.level);
+            else
+                snprintf(path, sizeof(path), "unknown");
+            flags[0] = 0;
+            if(MAP[i].flags & IMX233_BUTTON_INVERTED)
+                strcat(flags, " inv");
+            if(MAP[i].flags & IMX233_BUTTON_PULLUP)
+                strcat(flags, " pull");
+#if LCD_WIDTH < 240
+            lcd_putsf(0, line++, "%s: %d[%d/%d] (raw=%d)", MAP[i].name, val,
+                MAP[i].rounds, MAP[i].threshold, raw);
+            lcd_putsf(0, line++, "    %s%s", path, flags);
+#else
+            lcd_putsf(0, line++, "%s: %d[%d/%d] (raw=%d) %s%s", MAP[i].name, val,
+                MAP[i].rounds, MAP[i].threshold, raw, path, flags);
+#endif
+        }
+#undef MAP
+
         lcd_update();
         yield();
     }
