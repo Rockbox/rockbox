@@ -23,10 +23,24 @@
 #include "system-target.h"
 #include "pinctrl-imx233.h"
 #include "power-imx233.h"
+#include "button-imx233.h"
 #include "string.h"
 #include "usb.h"
 #include "backlight.h"
 #include "mpr121.h"
+
+#define I_VDDIO 0 /* index in the table */
+
+struct imx233_button_map_t imx233_button_map[] =
+{
+    [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3640), "vddio"), /* we need VDDIO for relative */
+    IMX233_BUTTON_(HOLD, GPIO(0, 4), "jack", INVERTED),
+    IMX233_BUTTON(VOL_DOWN, GPIO(2, 7), "vol_down", INVERTED),
+    IMX233_BUTTON(VOL_UP, GPIO(2, 8), "vol_up", INVERTED),
+    IMX233_BUTTON_(JACK, LRADC_REL(5, 3520, I_VDDIO), "jack"),
+    IMX233_BUTTON(POWER, PSWITCH(1), "power"),
+    IMX233_BUTTON_(END, END(), "")
+};
 
 static struct mpr121_config_t config =
 {
@@ -118,33 +132,17 @@ void button_init_device(void)
     mpr121_init(0xb4);
     mpr121_soft_reset();
     mpr121_set_config(&config);
-    
+
     queue_init(&mpr121_queue, true);
     create_thread(mpr121_thread, mpr121_stack, sizeof(mpr121_stack), 0,
         mpr121_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
     /* enable interrupt */
-    imx233_pinctrl_acquire(0, 18, "mpr121 int");
+    imx233_pinctrl_acquire(0, 18, "mpr121_int");
     imx233_pinctrl_set_function(0, 18, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 18, false);
     imx233_pinctrl_setup_irq(0, 18, true, true, false, &mpr121_irq_cb, 0);
-    /* hold button */
-    imx233_pinctrl_acquire(0, 4, "hold");
-    imx233_pinctrl_set_function(0, 4, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(0, 4, false);
-    /* volume down button */
-    imx233_pinctrl_acquire(2, 7, "volume down");
-    imx233_pinctrl_set_function(2, 7, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(2, 7, false);
-    /* volume up button */
-    imx233_pinctrl_acquire(2, 8, "volume up");
-    imx233_pinctrl_set_function(2, 8, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(2, 8, false);
-}
-
-bool button_hold(void)
-{
-    /* B0P04: #hold */
-    return !imx233_pinctrl_get_gpio(0, 4);
+    /* generic part */
+    imx233_button_init();
 }
 
 int button_read_device(void)
@@ -158,25 +156,12 @@ int button_read_device(void)
     if(hold != old_hold)
     {
         old_hold = hold;
-#ifndef BOOTLOADER
-        backlight_hold_changed(hold);
-#endif /* BOOTLOADER */
         if(!hold)
             power_ignore_counter = HZ;
     }
-
-    if(power_ignore_counter)
+    int res = imx233_button_read(touchpad_btns);
+    if(power_ignore_counter >= 0)
+        res &= ~BUTTON_POWER;
+    else
         power_ignore_counter--;
-    
-    int res = 0;
-    /* B2P07: #volume-
-     * B2P08: #volume+
-     * PSWITCH: power */
-    if(!imx233_pinctrl_get_gpio(2, 7))
-        res |= BUTTON_VOL_DOWN;
-    if(!imx233_pinctrl_get_gpio(2, 8))
-        res |= BUTTON_VOL_UP;
-    if(BF_RD(POWER_STS, PSWITCH) != 0 && power_ignore_counter == 0)
-        res |= BUTTON_POWER;
-    return res | touchpad_btns;
 }
