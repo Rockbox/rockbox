@@ -164,4 +164,5 @@ int button_read_device(void)
         res &= ~BUTTON_POWER;
     else
         power_ignore_counter--;
+    return res;
 }
