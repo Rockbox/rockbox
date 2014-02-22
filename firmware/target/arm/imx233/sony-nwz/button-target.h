@@ -29,16 +29,8 @@ int button_read_device(void);
 bool button_debug_screen(void);
 
 #ifdef SONY_NWZE360
-// Sony NWZ-E360 has hold detect on B0P09, inverted using pullup
 #define HAS_BUTTON_HOLD
-#define IMX233_BUTTON_LRADC_HOLD_DET    BLH_GPIO
-#define BLH_GPIO_BANK   0
-#define BLH_GPIO_PIN    9
-#define BLH_GPIO_INVERTED
-#define BLH_GPIO_PULLUP
 #endif
-
-#define IMX233_BUTTON_LRADC_CHANNEL 0
 
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001

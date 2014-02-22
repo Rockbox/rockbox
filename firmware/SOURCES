@@ -1229,7 +1229,6 @@ target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
 #endif
 
 #if defined(SONY_NWZE360) || defined(SONY_NWZE370)
-target/arm/imx233/button-lradc-imx233.c
 #ifndef BOOTLOADER
 target/arm/imx233/fmradio-imx233.c
 #endif
