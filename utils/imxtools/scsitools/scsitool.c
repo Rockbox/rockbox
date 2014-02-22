@@ -1068,9 +1068,18 @@ void do_write(const char *file, int want_a_brick)
         goto Lend;
     }
 
+    int percent = -1;
     for(int off = 0; off < fw_size; off += sector_size)
     {
         int sec = off / sector_size;
+        int this_percent = (sec * 100) / (fw_size / sector_size);
+        if(this_percent != percent && (this_percent % 5) == 0)
+        {
+            cprintf(RED, "%d%%", this_percent);
+            cprintf(YELLOW, "...");
+            fflush(stdout);
+        }
+        percent = this_percent;
         int xfer_len = MIN(fw_size - off, (int)sector_size);
         if(fread(sector, xfer_len, 1, f) != 1)
         {
