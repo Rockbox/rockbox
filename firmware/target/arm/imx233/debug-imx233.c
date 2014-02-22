@@ -484,50 +484,9 @@ bool dbg_hw_info_dcp(void)
 }
 #endif
 
-/** Nested IRQ check code */
-void INT_SOFTWARE(unsigned nr)
-{
-    imx233_icoll_force_irq(INT_SRC_SOFTWARE(nr), false);
-    HW_DIGCTL_SCRATCH0 = nr;
-    if(nr < 3)
-    {
-        imx233_icoll_force_irq(INT_SRC_SOFTWARE(nr + 1), true);
-        udelay(10);
-        if(HW_DIGCTL_SCRATCH0 == nr)
-            panicf("Nestes IRQ bug (%d)", nr);
-    }
-}
-
-void INT_SOFTWARE0(void) { INT_SOFTWARE(0); }
-void INT_SOFTWARE1(void) { INT_SOFTWARE(1); }
-void INT_SOFTWARE2(void) { INT_SOFTWARE(2); }
-void INT_SOFTWARE3(void) { INT_SOFTWARE(3); }
-
-static void check_nested_irq(void)
-{
-    /* Test protocol: setup SOFTWAREn IRQ as level n and apply:
-     * - enable SOFTWARE0 and soft IRQ'it
-     * - in SOFTWAREn, enable SOFTWARE(n+1) and soft IRQ'it, check it ran
-     */
-    for(int i = 0; i < 4; i++)
-    {
-        imx233_icoll_enable_interrupt(INT_SRC_SOFTWARE(i), true);
-        imx233_icoll_set_priority(INT_SRC_SOFTWARE(i), i);
-    }
-    HW_DIGCTL_SCRATCH0 = 0;
-    imx233_icoll_force_irq(INT_SRC_SOFTWARE(0), true);
-    udelay(100);
-    if(HW_DIGCTL_SCRATCH0 != 3)
-        panicf("Nested IRQ broken (%lu)", HW_DIGCTL_SCRATCH0);
-    for(int i = 0; i < 4; i++)
-        imx233_icoll_enable_interrupt(INT_SRC_SOFTWARE(i), false);
-}
-
 bool dbg_hw_info_icoll(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-
-    check_nested_irq();
 
     int first_irq = 0;
     int dbg_irqs_count = sizeof(dbg_irqs) / sizeof(dbg_irqs[0]);
