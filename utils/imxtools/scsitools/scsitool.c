@@ -555,7 +555,7 @@ static int do_info(void)
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
-            cprintf_field("    Info 0: ", "%lu", (unsigned long)u.u32);
+            cprintf_field("    Info 0: ", "%lu\n", (unsigned long)u.u32);
         }
 
         len = 4;
@@ -563,7 +563,7 @@ static int do_info(void)
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
-            cprintf_field("    Info 1: ", "%lu", (unsigned long)u.u32);
+            cprintf_field("    Info 1: ", "%lu\n", (unsigned long)u.u32);
         }
 
         len = 2;
@@ -575,6 +575,7 @@ static int do_info(void)
             ret = stmp_get_serial_number(1, u.buf, &len);
             cprintf_field("    Serial Number:", " ");
             print_hex(u.buf, len);
+            cprintf(OFF, "\n");
         }
 
         len = 2;
