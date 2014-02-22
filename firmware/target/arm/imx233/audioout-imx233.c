@@ -28,6 +28,7 @@
 #include "rtc-imx233.h"
 #include "pcm_sampr.h"
 #include "audio-target.h"
+#include "power-imx233.h"
 
 #ifndef IMX233_AUDIO_COUPLING_MODE
 #error You must define IMX233_AUDIO_COUPLING_MODE

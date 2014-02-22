@@ -137,7 +137,7 @@ int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_
         set_scsi_pt_data_in(obj, buffer, *buf_size);
     if(flags & DO_WRITE)
         set_scsi_pt_data_out(obj, buffer, *buf_size);
-    int ret = do_scsi_pt(obj, g_dev_fd, 1, 0);
+    int ret = do_scsi_pt(obj, g_dev_fd, 10, 0);
     switch(get_scsi_pt_result_category(obj))
     {
         case SCSI_PT_RESULT_SENSE:
