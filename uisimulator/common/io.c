@@ -27,7 +27,9 @@
 #include <time.h>
 #include <errno.h>
 #include "config.h"
+#include "system.h"
 #include "ata_idle_notify.h"
+#include "mv.h"
 
 #define HAVE_STATVFS (!defined(WIN32))
 #define HAVE_LSTAT   (!defined(WIN32))
@@ -124,7 +126,8 @@ extern int _wrmdir(const wchar_t*);
 #define CLOSE(a)    (close)(a)
 #define REMOVE(a)   (_wremove)(UTF8_TO_OS(a))
 #define RENAME(a,b) (_wrename)(UTF8_TO_OS(a),utf8_to_ucs2(b,convbuf2))
-
+/* readlink isn't used in the sim yet (FIXME) */
+#define READLINK(a,b,c) ({ fprintf(stderr, "no readlink on windows yet"); abort(); })
 #else  /* !__MINGW32__ */
 
 #define UTF8_TO_OS(a) (a)
@@ -144,6 +147,7 @@ extern int _wrmdir(const wchar_t*);
 #define CLOSE(x)    (close)(x)
 #define REMOVE(a)   (remove)(a)
 #define RENAME(a,b) (rename)(a,b)
+#define READLINK(a,b,c) (readlink)(a,b,c)
 
 #endif /* !__MINGW32__ */
 
@@ -183,6 +187,7 @@ struct dirstruct {
 
 struct mydir {
     DIR_T *dir;
+    IF_MV(int volumes_returned);
     char *name;
 };
 
@@ -323,6 +328,30 @@ ssize_t sim_write(int fd, const void *buf, size_t count)
 }
 
 #if !defined(APPLICATION)
+
+static const char *handle_special_links(const char* link)
+{
+    static char buffer[MAX_PATH]; /* sufficiently big */
+    char vol_string[VOL_ENUM_POS + 8];
+    int len = sprintf(vol_string, VOL_NAMES, 1);
+
+    /* link might be passed with or without HOME_DIR expanded. To handle
+     * both perform substring matching (VOL_NAMES is unique enough) */
+    const char *begin = strstr(link, vol_string);
+    if (begin)
+    {
+        /* begin now points to the start of vol_string within link,
+         * we want to copy the remainder of the paths, prefixed by
+         * the actual mount point (the remainder might be "") */
+        snprintf(buffer, sizeof(buffer), "%s/../simext/%s",
+                 sim_root_dir ?: SIMULATOR_DEFAULT_ROOT, begin + len);
+        return buffer;
+    }
+    else
+        return link;
+}
+
+
 static const char *get_sim_pathname(const char *name)
 {
     static char buffer[MAX_PATH]; /* sufficiently big */
@@ -330,12 +359,13 @@ static const char *get_sim_pathname(const char *name)
     if(name[0] == '/')
     {
         snprintf(buffer, sizeof(buffer), "%s%s", 
-            sim_root_dir != NULL ? sim_root_dir : SIMULATOR_DEFAULT_ROOT, name);
-        return buffer;
+                 sim_root_dir ?: SIMULATOR_DEFAULT_ROOT, name);
+        return handle_special_links(buffer);
     }
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n", name);
     return name;
 }
+
 
 MYDIR *sim_opendir(const char *name)
 {
@@ -348,6 +378,7 @@ MYDIR *sim_opendir(const char *name)
         my->dir = dir;
         my->name = (char *)malloc(strlen(name)+1);
         strcpy(my->name, name);
+        IF_MV(my->volumes_returned = 0);
 
         return my;
     }
@@ -374,16 +405,34 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
 #ifdef EOVERFLOW
 read_next:
 #endif
-    x11 = READDIR(dir->dir);
 
-    if(!x11)
-        return (struct sim_dirent *)0;
+#define ATTR_LINK      0x80 /* see dir.h */
 
-    strcpy((char *)secret.d_name, OS_TO_UTF8(x11->d_name));
+    secret.info.attribute = 0;
+#ifdef HAVE_MULTIVOLUME
+    if (dir->name[0] == '/' && dir->name[1] == '\0'
+            && dir->volumes_returned++ < (NUM_VOLUMES-1)
+            && volume_present(dir->volumes_returned))
+    {
+        sprintf((char *)secret.d_name, VOL_NAMES, dir->volumes_returned);
+        secret.info.attribute = ATTR_LINK;
+        /* build file name for stat() which is the actual mount point */
+        snprintf(buffer, sizeof(buffer), "%s/../simext",
+                 sim_root_dir ?: SIMULATOR_DEFAULT_ROOT);
+    }
+    else
+#endif
+    {
+        x11 = READDIR(dir->dir);
 
-    /* build file name */
-    snprintf(buffer, sizeof(buffer), "%s/%s", 
-        get_sim_pathname(dir->name), secret.d_name);
+        if(!x11)
+            return (struct sim_dirent *)0;
+
+        strcpy((char *)secret.d_name, OS_TO_UTF8(x11->d_name));
+        /* build file name for stat() */
+        snprintf(buffer, sizeof(buffer), "%s/%s",
+                get_sim_pathname(dir->name), secret.d_name);
+    }
 
     if (STAT(buffer, &s)) /* get info */
     {
@@ -401,8 +450,6 @@ read_next:
 
 #define ATTR_DIRECTORY 0x10
 
-    secret.info.attribute = 0;
-
     if (S_ISDIR(s.st_mode))
         secret.info.attribute = ATTR_DIRECTORY;
 
@@ -418,7 +465,6 @@ read_next:
                         (tm.tm_sec >> 1);
 
 #if HAVE_LSTAT
-#define ATTR_LINK      0x80
     if (!lstat(buffer, &s) && S_ISLNK(s.st_mode))
     {
         secret.info.attribute |= ATTR_LINK;

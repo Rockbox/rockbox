@@ -50,9 +50,4 @@ int disk_unmount(int drive);
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive));
 #endif
 
-#ifdef HAVE_HOTSWAP
-bool volume_removable(int volume);
-bool volume_present(int volume);
-#endif
-
 #endif

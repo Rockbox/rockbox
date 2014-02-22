@@ -355,19 +355,23 @@ voice: voicetools $(BUILDDIR)/apps/features
 endif
 
 ifeq (,$(findstring android, $(APP_TYPE)))
+
+simext:
+	$(SILENT)mkdir -p $@
+
 bininstall: $(BUILDDIR)/$(BINARY)
 	@echo "Installing your rockbox binary in your '$(RBPREFIX)' dir"
 	$(SILENT)cp $(BINARY) "$(RBPREFIX)/.rockbox/"
 
-install:
+install: simext
 	@echo "Installing your build in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 0 $(TARGET) $(BINARY)
 
-fullinstall:
+fullinstall: simext
 	@echo "Installing a full setup in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY)
 
-symlinkinstall:
+symlinkinstall: simext
 	@echo "Installing a full setup with links in your '$(RBPREFIX)' dir"
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m "$(MODELNAME)" -i "$(TARGET_ID)" $(INSTALL) -z "zip -r0" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" -f 2 $(TARGET) $(BINARY) -l
 endif

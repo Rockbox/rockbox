@@ -56,6 +56,12 @@
 #define VOL_NAMES "<HD%d>"
 #define VOL_ENUM_POS 3
 #endif /* CONFIG_STORAGE */
+
+#ifdef HAVE_HOTSWAP
+bool volume_removable(int volume);
+bool volume_present(int volume);
+#endif
+
 #else /* empty definitions if no multi-volume */
 #define IF_MV(x...)
 #define IF_MV_NONVOID(x...) void
