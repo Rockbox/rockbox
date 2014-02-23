@@ -21,8 +21,8 @@
  ****************************************************************************/
 
 #include <stdbool.h>
-#include "backlight-target.h"
 #include "config.h"
+#include "backlight-target.h"
 #include "system.h"
 #include "backlight.h"
 #include "backlight-sw-fading.h"
