@@ -331,6 +331,7 @@ ssize_t sim_write(int fd, const void *buf, size_t count)
 
 static const char *handle_special_links(const char* link)
 {
+#ifdef HAVE_MULTIDRIVE
     static char buffer[MAX_PATH]; /* sufficiently big */
     char vol_string[VOL_ENUM_POS + 8];
     int len = sprintf(vol_string, VOL_NAMES, 1);
@@ -348,6 +349,7 @@ static const char *handle_special_links(const char* link)
         return buffer;
     }
     else
+#endif
         return link;
 }
 
