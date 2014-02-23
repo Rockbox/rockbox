@@ -1109,8 +1109,10 @@ Lyre prototype 1 */
 #define INCLUDE_TIMEOUT_API
 #endif /* HAVE_GUI_BOOST && HAVE_ADJUSTABLE_CPU_FREQ */
 
+#ifndef SIMULATOR
 #if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND)
 #define STORAGE_GET_INFO
+#endif
 #endif
 
 #ifdef CPU_MIPS
