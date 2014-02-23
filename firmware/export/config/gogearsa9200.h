@@ -94,6 +94,9 @@
 
 #define AB_REPEAT_ENABLE
 
+/* Define this if you can detect headphones */
+#define HAVE_HEADPHONE_DETECTION
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
