@@ -28,7 +28,7 @@ const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 static int current = 0;
 static bool tomorrow = false;
-static int alarm[2] = {0, 0}, maxval[2] = {24, 60}, prev_tick = 3600 * 24;
+static int alarms[2] = {0, 0}, maxval[2] = {24, 60}, prev_tick = 3600 * 24;
 static bool quit = false, usb = false, waiting = false, done = false;
 
 static inline int get_button(void)
@@ -39,8 +39,8 @@ static inline int get_button(void)
 
 static int rem_seconds(void)
 {
-    int seconds = (((alarm[0] - rb->get_time()->tm_hour) * 3600)
-                  +((alarm[1] - rb->get_time()->tm_min)  * 60)
+    int seconds = (((alarms[0] - rb->get_time()->tm_hour) * 3600)
+                  +((alarms[1] - rb->get_time()->tm_min)  * 60)
                   -(rb->get_time()->tm_sec));
 
     /* The tomorrow flag means that the alarm should ring on the next day */
@@ -79,12 +79,12 @@ static void draw(struct screen * display)
     else {
         if (current == 0)
             rb->snprintf(info, sizeof(info), "Set alarm at [%02d]:%02d.",
-                                                                 alarm[0],
-                                                                 alarm[1]);
+                                                                 alarms[0],
+                                                                 alarms[1]);
         else
             rb->snprintf(info, sizeof(info), "Set alarm at %02d:[%02d].",
-                                                                 alarm[0],
-                                                                 alarm[1]);
+                                                                 alarms[0],
+                                                                 alarms[1]);
     }
     draw_centered_string(display, info);
 }
@@ -102,7 +102,7 @@ static bool can_play(void)
     return false;
 }
 
-static void play(void)
+static void resume_audio(void)
 {
     int audio_status = rb->audio_status();
     if (!audio_status && rb->global_status->resume_index != -1) {
@@ -116,7 +116,7 @@ static void play(void)
         rb->audio_resume();
 }
 
-static void pause(void)
+static void pause_audio(void)
 {
     if (rb->audio_status() & AUDIO_STATUS_PLAY)
         rb->audio_pause();
@@ -132,7 +132,7 @@ enum plugin_status plugin_start(const void* parameter)
                          "Play or pause one first.");
         return PLUGIN_ERROR;
     }
-    pause();
+    pause_audio();
 
     while(!quit) {
         button = get_button();
@@ -146,7 +146,7 @@ enum plugin_status plugin_start(const void* parameter)
         if (waiting) {
             if (rem_seconds() <= 0) {
                 quit = done = true;
-                play();
+                resume_audio();
             }
         }
         else {
@@ -157,7 +157,7 @@ enum plugin_status plugin_start(const void* parameter)
                 case PLA_SCROLL_FWD:
                 case PLA_SCROLL_FWD_REPEAT:
 #endif
-                    alarm[current] = (alarm[current] + 1) % maxval[current];
+                    alarms[current] = (alarms[current] + 1) % maxval[current];
                     break;
                 case PLA_DOWN:
                 case PLA_DOWN_REPEAT:
@@ -165,7 +165,7 @@ enum plugin_status plugin_start(const void* parameter)
                 case PLA_SCROLL_BACK:
                 case PLA_SCROLL_BACK_REPEAT:
 #endif
-                    alarm[current] = (alarm[current] + maxval[current] - 1)
+                    alarms[current] = (alarms[current] + maxval[current] - 1)
                         % maxval[current];
                     break;
 

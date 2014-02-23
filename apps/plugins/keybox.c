@@ -78,7 +78,7 @@ static void decrypt_buffer(char *buf, size_t size, uint32_t *key);
    David Wheeler and Roger Needham taken from 
    http://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm */
 
-static void encrypt(uint32_t* v, uint32_t* k)
+static void do_encrypt(uint32_t* v, uint32_t* k)
 {
     uint32_t v0=v[0], v1=v[1], sum=0, i;           /* set up */
     static const uint32_t delta=0x9e3779b9;        /* a key schedule constant */
@@ -91,7 +91,7 @@ static void encrypt(uint32_t* v, uint32_t* k)
     v[0]=v0; v[1]=v1;
 }
 
-static void decrypt(uint32_t* v, uint32_t* k)
+static void do_decrypt(uint32_t* v, uint32_t* k)
 {
     uint32_t v0=v[0], v1=v[1], sum=0xC6EF3720, i;  /* set up */
     static const uint32_t delta=0x9e3779b9;        /* a key schedule constant */
@@ -365,7 +365,7 @@ static void decrypt_buffer(char *buf, size_t size, uint32_t *key)
         block[0] = letoh32(block[0]);
         block[1] = letoh32(block[1]);
 
-        decrypt(&block[0], key);
+        do_decrypt(&block[0], key);
 
         /* byte swap one block */
         block[0] = letoh32(block[0]);
@@ -388,7 +388,7 @@ static void encrypt_buffer(char *buf, size_t size, uint32_t *key)
         block[0] = htole32(block[0]);
         block[1] = htole32(block[1]);
 
-        encrypt(&block[0], key);
+        do_encrypt(&block[0], key);
 
         block[0] = htole32(block[0]);
         block[1] = htole32(block[1]);
@@ -670,4 +670,3 @@ enum plugin_status plugin_start(const void *parameter)
 
     return PLUGIN_OK;
 }
-
