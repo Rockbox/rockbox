@@ -71,6 +71,7 @@ void system_exception_wait(void)
     system_reboot();
 }
 
+#ifdef HAVE_MULTIDRIVE
 /* MicroSD card removal / insertion management */
 
 bool hostfs_removable(IF_MD_NONVOID(int drive))
@@ -209,16 +210,20 @@ static void NORETURN_ATTR sd_thread(void)
 
 #endif
 
+#endif /* HAVE_MULTIDRIVE */
+
 void hostfs_init(void)
 {
     /* Setup GPIO pin for microSD sense, copied from OF */
     gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_SD_SENSE, CONFIG_DEFAULT, 0);
     gpio_control(DEV_CTRL_GPIO_SET_INPUT, GPIO_SD_SENSE, CONFIG_DEFAULT, 0);
+#ifdef HAVE_MULTIDRIVE
     if (storage_present(IF_MD(1)))
         mount_sd();
 #ifdef HAVE_HOTSWAP
     create_thread(sd_thread, sd_thread_stack, sizeof(sd_thread_stack), 0,
         "sd thread" IF_PRIO(, PRIORITY_BACKGROUND) IF_COP(, CPU));
+#endif
 #endif
 }
 
