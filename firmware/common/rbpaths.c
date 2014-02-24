@@ -300,26 +300,31 @@ struct dirinfo dir_get_info(DIR* _parent, struct dirent *dir)
 #endif
         snprintf(path, sizeof(path), "%s/%s", parent->path, dir->d_name);
 
-    if (!stat(path, &s))
+
+    if (!lstat(path, &s))
     {
-        if (S_ISDIR(s.st_mode))
-            ret.attribute |= ATTR_DIRECTORY;
+        int err = 0;
+        if (S_ISLNK(s.st_mode))
+        {
+            ret.attribute |= ATTR_LINK;
+            err = stat(path, &s);
+        }
+        if (!err)
+        {
+            if (S_ISDIR(s.st_mode))
+                ret.attribute |= ATTR_DIRECTORY;
 
-        ret.size = s.st_size;
-        tm = localtime(&(s.st_mtime));
-    }
-
-    if (!lstat(path, &s) && S_ISLNK(s.st_mode))
-        ret.attribute |= ATTR_LINK;
-
-    if (tm)
-    {
-        ret.wrtdate = ((tm->tm_year - 80) << 9) |
-                            ((tm->tm_mon + 1) << 5) |
-                            tm->tm_mday;
-        ret.wrttime = (tm->tm_hour << 11) |
-                            (tm->tm_min << 5) |
-                            (tm->tm_sec >> 1);
+            ret.size = s.st_size;
+            if ((tm = localtime(&(s.st_mtime))))
+            {
+                ret.wrtdate = ((tm->tm_year - 80) << 9) |
+                                  ((tm->tm_mon + 1) << 5) |
+                                    tm->tm_mday;
+                ret.wrttime = (tm->tm_hour << 11) |
+                                  (tm->tm_min << 5) |
+                                  (tm->tm_sec >> 1);
+            }
+        }
     }
 
     return ret;
