@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include "config.h"
 #include "rbpaths.h"
+#include "crc32.h"
 #include "file.h" /* MAX_PATH */
 #include "logf.h"
 #include "gcc_extensions.h"
@@ -52,9 +53,11 @@
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 static const char rbhome[] = "/sdcard";
-#endif
-#if (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) && !defined(__PCTOOL__)
+#elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) && !defined(__PCTOOL__)
 const char *rbhome;
+#else
+/* YPR0, YPR1 */
+static const char rbhome[] = HOME_DIR;
 #endif
 
 #if !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)) && !defined(__PCTOOL__)
@@ -62,9 +65,6 @@ const char *rbhome;
  * over the ones where Rockbox is installed to. Classic example would be
  * $HOME/.config/rockbox.org vs /usr/share/rockbox */
 #define HAVE_SPECIAL_DIRS
-#define IS_HOME(p) (!strcmp(p, rbhome))
-#else
-#define IS_HOME(p) (!strcmp(p, HOME_DIR))
 #endif
 
 /* flags for get_user_file_path() */
@@ -75,6 +75,7 @@ const char *rbhome;
 #define IS_FILE             (1<<1)
 
 #ifdef HAVE_MULTIDRIVE
+static uint32_t rbhome_hash;
 /* A special link is created under e.g. HOME_DIR/<microSD1>, e.g. to access
  * external storage in a convinient location, much similar to the mount
  * point on our native targets. Here they are treated as symlink (one which
@@ -103,9 +104,9 @@ static const char *handle_special_links(const char* link, unsigned flags,
 }
 #endif
 
-#ifdef HAVE_SPECIAL_DIRS
 void paths_init(void)
 {
+#ifdef HAVE_SPECIAL_DIRS
     /* make sure $HOME/.config/rockbox.org exists, it's needed for config.cfg */
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
     mkdir("/sdcard/rockbox", 0777);
@@ -133,9 +134,14 @@ void paths_init(void)
     snprintf(config_dir, sizeof(config_dir), "%s/.config/rockbox.org/rocks.data", home);
     mkdir(config_dir, 0777);
 #endif
+#endif /* HAVE_SPECIAL_DIRS */
 
+#ifdef HAVE_MULTIDRIVE
+    rbhome_hash = crc_32((const void *) rbhome, strlen(rbhome), 0xffffffff);
+#endif /* HAVE_MULTIDRIVE */
 }
 
+#ifdef HAVE_SPECIAL_DIRS
 static bool try_path(const char* filename, unsigned flags)
 {
     if (flags & IS_FILE)
@@ -189,8 +195,6 @@ static const char* _get_user_file_path(const char *path,
     return ret;
 }
 
-#elif !defined(paths_init)
-void paths_init(void) { }
 #endif
 
 static const char* handle_special_dirs(const char* dir, unsigned flags,
@@ -261,7 +265,14 @@ int app_rename(const char *old, const char *new)
  * get_dir_info() */
 struct __dir {
     DIR *dir;
-    IF_MD(int volumes_returned);
+#ifdef HAVE_MULTIDRIVE
+    int volumes_returned;
+    /* A crc of rbhome is used to speed op the common case where
+     * readdir()/get_dir_info() is called on non-rbhome paths, because
+     * each call needs to check against rbhome for the virtual
+     * mount point of the external storage */
+    uint32_t path_hash;
+#endif
     char path[];
 };
 
@@ -278,7 +289,9 @@ struct dirinfo dir_get_info(DIR* _parent, struct dirent *dir)
 #ifdef HAVE_MULTIDRIVE
     char vol_string[VOL_ENUM_POS + 8];
     sprintf(vol_string, VOL_NAMES, 1);
-    if (!strcmp(vol_string, dir->d_name))
+    if (UNLIKELY(rbhome_hash == parent->path_hash) &&
+            /* compare path anyway because of possible hash collision */
+            !strcmp(vol_string, dir->d_name))
     {
         ret.attribute = ATTR_LINK;
         strcpy(path, MULTIDRIVE_DIR);
@@ -314,9 +327,11 @@ struct dirinfo dir_get_info(DIR* _parent, struct dirent *dir)
    
 DIR* app_opendir(const char *_name)
 {
+    size_t name_len;
     char realpath[MAX_PATH];
     const char *name = handle_special_dirs(_name, 0, realpath, sizeof(realpath));
-    char *buf = malloc(sizeof(struct __dir) + strlen(name)+1);
+    name_len = strlen(name);
+    char *buf = malloc(sizeof(struct __dir) + name_len+1);
     if (!buf)
         return NULL;
 
@@ -331,7 +346,11 @@ DIR* app_opendir(const char *_name)
         free(buf);
         return NULL;
     }
-    IF_MD(this->volumes_returned = 0);
+#ifdef HAVE_MULTIDRIVE
+    this->volumes_returned = 0;
+    this->path_hash = crc_32((const void *)this->path, name_len, 0xffffffff);
+#endif
+
     return (DIR*)this;
 }
 
@@ -350,9 +369,11 @@ struct dirent* app_readdir(DIR* dir)
 #ifdef HAVE_MULTIDRIVE
     /* this is not MT-safe but OK according to man readdir */
     static struct dirent voldir;
-    if (d->volumes_returned < (NUM_VOLUMES-1)
+    if (UNLIKELY(rbhome_hash == d->path_hash)
+            && d->volumes_returned < (NUM_VOLUMES-1)
             && volume_present(d->volumes_returned+1)
-            && IS_HOME(d->path))
+            /* compare path anyway because of possible hash collision */
+            && !strcmp(d->path, rbhome))
     {
         d->volumes_returned += 1;
         sprintf(voldir.d_name, VOL_NAMES, d->volumes_returned);

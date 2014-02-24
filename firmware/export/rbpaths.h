@@ -55,8 +55,6 @@
 #define PLUGIN_DIR          ROCKBOX_DIR "/rocks"
 #define CODECS_DIR          ROCKBOX_DIR "/codecs"
 
-#define paths_init()
-
 #else /* APPLICATION */
 
 #define HOME_DIR "<HOME>" /* replaced at runtime */
@@ -67,8 +65,6 @@
 #else
 #define CODECS_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/codecs"
 #endif
-
-extern void paths_init(void);
 
 #endif /* !APPLICATION || SAMSUNG_YPR0 */
 
@@ -90,6 +86,8 @@ struct dirent* app_readdir(DIR* dir);
 int app_mkdir(const char* name);
 int app_rmdir(const char* name);
 ssize_t app_readlink(const char *path, char *buf, size_t bufsiz);
+
+extern void paths_init(void);
 
 #endif
 
