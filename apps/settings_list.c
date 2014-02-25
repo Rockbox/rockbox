@@ -215,7 +215,8 @@ static const char graphic_numeric[] = "graphic,numeric";
 #elif LCD_HEIGHT <= 80
   #define DEFAULT_FONT_HEIGHT 11
   #define DEFAULT_FONTNAME "11-Sazanami-Mincho"
-#elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 96)   /* sandisk sansa clip zip */
+/* sandisk sansa clip zip and samsung yh-820 */
+#elif (LCD_HEIGHT == 96) && ((LCD_WIDTH == 96) || (LCD_WIDTH == 128))
   #define DEFAULT_FONT_HEIGHT 8
   #define DEFAULT_FONTNAME "08-Rockfont"
 #elif LCD_HEIGHT <= 220
