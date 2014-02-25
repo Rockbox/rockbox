@@ -369,6 +369,31 @@ static bool test_speed(void)
     rb->snprintf(text_buf, sizeof(text_buf), "Dirscan: %d files/s", n / TEST_TIME);
     log_text(text_buf, true);
 
+    dir = NULL;
+    entry = NULL;
+    /* Directory scan speed 2 */
+    time = *rb->current_tick + TEST_TIME*HZ;
+    for (n = 0; TIME_BEFORE(*rb->current_tick, time); n++)
+    {
+        if (entry == NULL)
+        {
+            if (dir != NULL)
+                rb->closedir(dir);
+            dir = rb->opendir(testbasedir);
+            if (dir == NULL)
+            {
+                rb->splash(HZ, "opendir() failed.");
+                goto error;
+            }
+        }
+        else
+            (void) rb->dir_get_info(dir, entry);
+        entry = rb->readdir(dir);
+    }
+    rb->closedir(dir);
+    rb->snprintf(text_buf, sizeof(text_buf), "Dirscan w info: %d files/s", n / TEST_TIME);
+    log_text(text_buf, true);
+
     /* File delete speed */
     time = *rb->current_tick;
     for (i = 0; i < last_file; i++)
