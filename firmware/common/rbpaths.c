@@ -341,10 +341,14 @@ DIR* app_opendir(const char *_name)
         return NULL;
 
     struct __dir *this = (struct __dir*)buf;
-    /* definitely fits due to strlen() */
-    strcpy(this->path, name);
-
-    this->dir = opendir(name);
+    /* carefully remove any trailing slash from the input, so that
+     * hash/path matching in readdir() works properly */
+    while (name[name_len-1] == '/')
+        name_len -= 1;
+    /* strcpy cannot be used because of trailing slashes */
+    memcpy(this->path, name, name_len);
+    this->path[name_len] = 0;
+    this->dir = opendir(this->path);
 
     if (!this->dir)
     {
