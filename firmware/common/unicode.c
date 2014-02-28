@@ -82,22 +82,22 @@ static const char * const name_codepages[NUM_CODEPAGES+1] =
 #if defined(APPLICATION) && defined(__linux__)
 static const char * const name_codepages_linux[NUM_CODEPAGES+1] =
 {
-    "iso8859-1",
-    "iso8859-7",
-    "iso8859-8",
-    "cp1251",
-    "iso8859-11",
-    "cp1256",
-    "iso8859-9",
-    "iso8859-2",
-    "cp1250",
-    "iso8859-15" /* closest, linux doesnt have a codepage named cp1252 */
-    "cp932",
-    "cp936",
-    "cp949",
-    "cp950",
-    "utf8",
-    "cp437"
+    /* "ISO-8859-1" */ "iso8859-1",
+    /* "ISO-8859-7" */ "iso8859-7",
+    /* "ISO-8859-8" */ "iso8859-8",
+    /* "CP1251"     */ "cp1251",
+    /* "ISO-8859-11"*/ "iso8859-11",
+    /* "CP1256"     */ "cp1256",
+    /* "ISO-8859-9" */ "iso8859-9",
+    /* "ISO-8859-2" */ "iso8859-2",
+    /* "CP1250"     */ "cp1250",
+    /* "CP1252"     */ "iso8859-15", /* closest, linux doesnt have a codepage named cp1252 */
+    /* "SJIS"       */ "cp932",
+    /* "GB-2312"    */ "cp936",
+    /* "KSX-1001"   */ "cp949",
+    /* "BIG5"       */ "cp950",
+    /* "UTF-8"      */ "utf8",
+    /* "unknown"    */ "cp437"
 };
 
 const char *get_current_codepage_name_linux(void)
