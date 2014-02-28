@@ -192,8 +192,12 @@ static void print_line(struct screen *display,
     tempbuf_idx = 0;
     /* vertically center string on the line
      * x/2 - y/2 rounds up compared to (x-y)/2 if one of x and y is odd */
-    icon_y = y + height/2 - icon_h/2;
     y += height/2 - display->getcharheight()/2;
+    /* For the icon use a differnet calculation which to round down instead.
+     * This tends to align better with the font's baseline for small heights.
+     * A proper aligorithm would take the baseline into account but this has
+     * worked sufficiently well for us (fix this if needed) */
+    icon_y = y + (height - icon_h)/2;
 
     /* parse format string */
     while (xpos < max_width)
