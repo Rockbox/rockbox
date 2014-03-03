@@ -212,7 +212,7 @@ static void NORETURN_ATTR sd_thread(void)
 
 #endif /* HAVE_MULTIDRIVE */
 
-void hostfs_init(void)
+int hostfs_init(void)
 {
     /* Setup GPIO pin for microSD sense, copied from OF */
     gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_SD_SENSE, CONFIG_DEFAULT, 0);
@@ -225,6 +225,7 @@ void hostfs_init(void)
         "sd thread" IF_PRIO(, PRIORITY_BACKGROUND) IF_COP(, CPU));
 #endif
 #endif
+    return 0;
 }
 
 int hostfs_flush(void)

@@ -289,9 +289,10 @@ void system_exception_wait(void)
     system_reboot();
 }
 
-void hostfs_init(void)
+int hostfs_init(void)
 {
     /* stub */
+    return 0;
 }
 
 #ifdef HAVE_STORAGE_FLUSH

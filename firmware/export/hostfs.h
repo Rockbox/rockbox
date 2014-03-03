@@ -33,7 +33,7 @@
 #endif
 #include "config.h"
 
-extern void hostfs_init(void);
+extern int  hostfs_init(void);
 extern int  hostfs_flush(void);
 
 #ifdef HAVE_HOTSWAP

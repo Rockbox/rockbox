@@ -68,9 +68,10 @@ void system_exception_wait(void)
     system_reboot();
 }
 
-void hostfs_init()
+int hostfs_init()
 {
     /* stub */
+    return 0;
 }
 
 int hostfs_flush(void)

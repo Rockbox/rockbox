@@ -67,9 +67,10 @@ void system_init(void)
     telephony_init_device();
 }
 
-void hostfs_init(void)
+int hostfs_init(void)
 {
     /* stub */
+    return 0;
 }
 
 int hostfs_flush(void)
