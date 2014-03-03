@@ -19,14 +19,16 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
+#include "thread.h"
 #include "mc13783.h"
 #include "iomuxc-imx31.h"
 #include "gpio-imx31.h"
 #include "i2c-imx31.h"
 #include "fmradio_i2c.h"
-#include "thread.h"
 #include "rds.h"
 #include "tuner.h"
 

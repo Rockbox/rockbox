@@ -22,6 +22,7 @@
 #define I2C_IMX31_H
 
 #include <stdbool.h>
+#include "semaphore.h"
 
 /* I2C module usage masks */
 #define USE_I2C1_MODULE         (1 << 0)

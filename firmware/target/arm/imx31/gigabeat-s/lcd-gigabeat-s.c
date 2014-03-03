@@ -18,11 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #ifdef BOOTLOADER
 #include <string.h> /* memset */
 #endif
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "lcd.h"
 #include "lcd-target.h"
 #include "backlight-target.h"

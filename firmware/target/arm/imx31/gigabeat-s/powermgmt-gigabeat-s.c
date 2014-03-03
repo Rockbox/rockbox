@@ -18,9 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include <stdlib.h>
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "thread.h"
 #include "mc13783.h"
 #include "adc.h"

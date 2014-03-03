@@ -625,13 +625,7 @@ static void ci_logf(const char *fmt, ...)
 }
 #endif
 
-static void ci_yield(void)
-{
-}
-
-static void commit_dcache(void) {}
-static void commit_discard_dcache(void) {}
-static void commit_discard_idcache(void) {}
+static void stub_void_void(void) { }
 
 static struct codec_api ci = {
 
@@ -654,7 +648,7 @@ static struct codec_api ci = {
     ci_should_loop,
 
     ci_sleep,
-    ci_yield,
+    stub_void_void, /* yield */
 
 #if NUM_CORES > 1
     ci_create_thread,
@@ -665,9 +659,9 @@ static struct codec_api ci = {
     ci_semaphore_release,
 #endif
 
-    commit_dcache,
-    commit_discard_dcache,
-    commit_discard_idcache,
+    stub_void_void, /* commit_dcache */
+    stub_void_void, /* commit_discard_dcache */
+    stub_void_void, /* commit_discard_idcache */
 
     /* strings and memory */
     strcpy,
