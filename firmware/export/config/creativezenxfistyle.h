@@ -101,6 +101,8 @@
 #define LCD_WIDTH  320
 #define LCD_HEIGHT 240
 #define LCD_DEPTH  16   /* 65536 colours */
+/* sqrt(320^2 + 240^2) / 2.4 = 166.66 */
+#define LCD_DPI 167
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 /* Define this if you have a software controlled poweroff */
@@ -199,5 +201,3 @@
 #define BOOTDIR "/.rockbox"
 
 #define INCLUDE_TIMEOUT_API
- 
- 
