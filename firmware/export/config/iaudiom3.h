@@ -50,10 +50,12 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-/* LCD dimensions */
+/* Remote LCD dimensions (no main display) */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 96
 #define LCD_DEPTH  2
+/* sqrt(128^2 + 96^2) / 1.25 = 128 */
+#define LCD_DPI 128
 
 #define LCD_PIXELFORMAT VERTICAL_INTERLEAVED
 
