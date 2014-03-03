@@ -324,7 +324,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_TAGCACHE_SCAN_PATHS "/"
 #endif
 
-
+#if LCD_DEPTH > 1
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
@@ -347,6 +347,7 @@ static int32_t list_pad_getlang(int value, int unit)
         default: return TALK_ID(value, unit);
     }
 }
+#endif
 
 static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
@@ -914,8 +915,10 @@ const struct settings_list settings[] = {
                   0, "list separator height", "auto,off", UNIT_PIXEL,
                   list_pad_formatter, list_pad_getlang, NULL, 15,
                   -1,0,1,2,3,4,5,7,9,11,13,16,20,25,30),
+#ifdef HAVE_LCD_COLOR
     {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.list_separator_color,-1,
         INT(DEFAULT_THEME_SEPARATOR),"list separator color",NULL,UNUSED},
+#endif
 #endif
 #if CONFIG_KEYPAD == RECORDER_PAD
     OFFON_SETTING(F_THEMESETTING,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),

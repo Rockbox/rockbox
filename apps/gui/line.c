@@ -318,12 +318,12 @@ static void style_line(struct screen *display,
     {
         int sep_height = MIN(line->separator_height, height);
         display->set_drawmode(DRMODE_FG);
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
         display->set_foreground(global_settings.list_separator_color);
 #endif
         display->fillrect(x, y + height - sep_height, width, sep_height);
         bar_height -= sep_height;
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
         display->set_foreground(global_settings.fg_color);
 #endif
     }
