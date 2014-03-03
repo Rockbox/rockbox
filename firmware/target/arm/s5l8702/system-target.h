@@ -23,7 +23,6 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
-#include "kernel.h"
 
 #define CPUFREQ_SLEEP      32768
 #define CPUFREQ_MAX     216000000
