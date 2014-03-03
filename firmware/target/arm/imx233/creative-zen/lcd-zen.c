@@ -266,7 +266,9 @@ void lcd_enable(bool enable)
         lcd_power(false);
         // stop lcdif
         BF_CLR(LCDIF_CTRL, DOTCLK_MODE);
-        // stmp37xx errata: clearing DOTCLK_MODE won't clear RUN
+        /* stmp37xx errata: clearing DOTCLK_MODE won't clear RUN: wait until
+         * fifo is empty and then clear manually */
+        while(!BF_RD(LCDIF_STAT, TXFIFO_EMPTY));
         BF_CLR(LCDIF_CTRL, RUN);
         // disable spi
         spi_enable(false);
