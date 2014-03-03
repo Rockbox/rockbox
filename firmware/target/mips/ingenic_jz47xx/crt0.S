@@ -60,10 +60,10 @@
     la     t2, _bootend
 _relocate_loop:
     lw     t3, 0(t0)
-    sw     t3, 0(t1)
     addiu  t1, 4
-    bne    t1, t2, _relocate_loop
     addiu  t0, 4
+    bne    t1, t2, _relocate_loop
+    sw     t3, 0(t1)
 #endif
 
 _start:
@@ -104,8 +104,8 @@ _start:
 _cache_loop:
     cache   0x8, 0(t0)       # index store icache tag
     cache   0x9, 0(t0)       # index store dcache tag
-    bne     t0, t1, _cache_loop
     addiu   t0, t0, 0x20     # 32 bytes per cache line
+    bne     t0, t1, _cache_loop
     nop
 
     /*
@@ -131,11 +131,11 @@ _cache_loop:
     la     t2, _iramend
 _iram_loop:
     lw     t3, 0(t0)
-    sw     t3, 0(t1)
     addiu  t1, 4
-    bne    t1, t2, _iram_loop
     addiu  t0, 4
-    
+    bne    t1, t2, _iram_loop
+    sw     t3, 0(t1)
+   
     /*
       ----------------------------------------------------
        Clear BSS section
@@ -144,9 +144,9 @@ _iram_loop:
     la     t0, _edata
     la     t1, _end
 _bss_loop:
-    sw     zero, 0(t0)
+    addiu  t1, -4
     bne    t0, t1, _bss_loop
-    addiu  t0, 4
+    sw     zero, 0(t1)
 
     /*
       ----------------------------------------------------
@@ -155,12 +155,13 @@ _bss_loop:
     */
     la      sp, stackend
     la      t0, stackbegin
-    li      t1, 0xDEADBEEF
+    move    t1, sp
+    li      t2, 0xDEADBEEF
     
-_stack_loop:    
-    sw      t1, 0(t0)
-    bne     t0, sp, _stack_loop
-    addiu   t0, t0, 4
+_stack_loop:
+    addiu   t1, -4
+    bne     t0, t1, _stack_loop
+    sw      t2, 0(t1)
 
     /*
       ----------------------------------------------------
