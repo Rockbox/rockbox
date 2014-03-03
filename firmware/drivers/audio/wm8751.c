@@ -25,6 +25,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include "config.h"
 #include "kernel.h"
 #include "wmcodec.h"
 #include "audio.h"

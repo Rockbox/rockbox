@@ -20,6 +20,8 @@
  ****************************************************************************/
 
 #include "config.h"
+#include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "pcf50606.h"
 #include "touchscreen.h"

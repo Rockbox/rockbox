@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "system.h"
+#include "kernel.h"
 #include "file.h"
 #include "debug.h"
 #include "load_code.h"

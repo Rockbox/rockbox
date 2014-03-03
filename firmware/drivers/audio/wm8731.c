@@ -25,9 +25,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
 #include "config.h"
 #include "logf.h"
 #include "system.h"
+#include "kernel.h"
 #include "string.h"
 
 #include "pcm_sampr.h"

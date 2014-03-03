@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "system.h"
+#include "kernel.h"
 #include "i2c.h"
 #include "i2c-target.h"
 

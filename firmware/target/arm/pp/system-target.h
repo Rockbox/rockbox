@@ -25,7 +25,6 @@
 #include <stdbool.h>
 #include "config.h"
 #include "system-arm.h"
-#include "kernel.h"
 
 /* TODO: This header could be split in 2 */
 

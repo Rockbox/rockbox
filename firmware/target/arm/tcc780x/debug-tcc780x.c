@@ -24,6 +24,7 @@
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
+#include "kernel.h"
 #include "string.h"
 #include "button.h"
 #include "lcd.h"

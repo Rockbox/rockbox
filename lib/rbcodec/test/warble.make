@@ -18,7 +18,9 @@ SRC= $(call preprocess, $(ROOTDIR)/lib/rbcodec/test/SOURCES)
 
 INCLUDES += -I$(ROOTDIR)/lib/rbcodec/test \
 	-I$(ROOTDIR)/apps -I$(ROOTDIR)/apps/gui \
-	-I$(ROOTDIR)/firmware/export -I$(ROOTDIR)/firmware/include \
+	-I$(FIRMDIR)/kernel/include \
+    -I$(ROOTDIR)/firmware/export \
+    -I$(ROOTDIR)/firmware/include \
 	-I$(ROOTDIR)/firmware/target/hosted \
 	-I$(ROOTDIR)/firmware/target/hosted/sdl
 

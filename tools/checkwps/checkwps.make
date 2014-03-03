@@ -16,6 +16,7 @@ OTHER_SRC += $(CHECKWPS_SRC)
 
 INCLUDES = -I$(ROOTDIR)/apps/gui \
            -I$(ROOTDIR)/apps/gui/skin_engine \
+           -I$(FIRMDIR)/kernel/include \
            -I$(ROOTDIR)/firmware/export \
            -I$(ROOTDIR)/firmware/include \
            -I$(ROOTDIR)/firmware/target/hosted \

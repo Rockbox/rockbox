@@ -32,13 +32,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "buffering.h" /* TYPE_PACKET_AUDIO */
+#include "kernel.h"
 #include "codecs.h"
 #include "dsp_core.h"
 #include "metadata.h"
 #include "settings.h"
 #include "sound.h"
 #include "tdspeed.h"
-#include "kernel.h"
 #include "platform.h"
 
 /***************** EXPORTED *****************/

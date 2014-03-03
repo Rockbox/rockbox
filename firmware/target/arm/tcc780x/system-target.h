@@ -23,7 +23,6 @@
 
 #include "system-arm.h"
 #include "mmu-arm.h"
-#include "kernel.h" /* TIME_BEFORE */
 
 #define CPUFREQ_DEFAULT 32000000
 #define CPUFREQ_NORMAL  48000000

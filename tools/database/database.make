@@ -26,6 +26,7 @@ DATABASE_OBJ = $(call c2obj,$(DATABASE_SRC))
 OTHER_SRC += $(DATABASE_SRC)
 
 INCLUDES += -I$(ROOTDIR)/apps/gui \
+            -I$(FIRMDIR)/kernel/include \
             -I$(ROOTDIR)/firmware/export \
             -I$(ROOTDIR)/firmware/include \
             -I$(ROOTDIR)/apps \
