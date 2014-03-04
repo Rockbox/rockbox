@@ -63,7 +63,7 @@ _relocate_loop:
     addiu  t1, 4
     addiu  t0, 4
     bne    t1, t2, _relocate_loop
-    sw     t3, 0(t1)
+    sw     t3, -4(t1)
 #endif
 
 _start:
@@ -134,7 +134,7 @@ _iram_loop:
     addiu  t1, 4
     addiu  t0, 4
     bne    t1, t2, _iram_loop
-    sw     t3, 0(t1)
+    sw     t3, -4(t1)
    
     /*
       ----------------------------------------------------
@@ -144,9 +144,9 @@ _iram_loop:
     la     t0, _edata
     la     t1, _end
 _bss_loop:
-    addiu  t1, -4
+    addiu  t1, 4
     bne    t0, t1, _bss_loop
-    sw     zero, 0(t1)
+    sw     zero, -4(t1)
 
     /*
       ----------------------------------------------------
@@ -159,9 +159,9 @@ _bss_loop:
     li      t2, 0xDEADBEEF
     
 _stack_loop:
-    addiu   t1, -4
+    addiu   t1, 4
     bne     t0, t1, _stack_loop
-    sw      t2, 0(t1)
+    sw      t2, -4(t1)
 
     /*
       ----------------------------------------------------
