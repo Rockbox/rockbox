@@ -26,9 +26,9 @@ load_addr:
 reloc_loop:
     lw t2, 0(v0)               # src
     addiu v0, 4                # inc src addr
-    sw t2, 0(t0)               # dst
-    bne t0, t1, reloc_loop
     addiu t0, 4                # inc dst addr
+    bne t0, t1, reloc_loop
+    sw t2, -4(t0)              # dst
 
 entry_point_jump:
     la t0, entry_point
@@ -49,17 +49,18 @@ entry_point:
 cache_init_loop:
     cache   8, 0(t0)           # index store icache tag
     cache   9, 0(t0)           # index store dcache tag
-    bne     t0, t1, cache_init_loop
     addiu   t0, t0, 0x10
+    bne     t0, t1, cache_init_loop
+    nop
 
     # clear bss
     la t0, bssbegin
     la t1, bssend
 
 clear_bss_loop:
-    sw zero, 0(t0)
-    bne t0, t1, clear_bss_loop
     addiu t0, 4
+    bne t0, t1, clear_bss_loop
+    sw zero, -4(t0)
 
     # setup stack
     la sp, stackend
@@ -67,9 +68,9 @@ clear_bss_loop:
     li t1, 0xdeadbeef
 
 stack_munge_loop:
-    sw t1, 0(t0)
-    bne t0, sp, stack_munge_loop
     addiu t0, 4
+    bne t0, sp, stack_munge_loop
+    sw t1, -4(t0)
 
     # jump to C code
     j main

@@ -83,7 +83,7 @@ irq_handler:
     lw fp, 68(sp)
     lw ra, 72(sp)
 
-    addiu sp, sp, 88
+    addiu sp, sp, 84
     move sp, k1
     eret
 
