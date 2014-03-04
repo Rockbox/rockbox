@@ -144,9 +144,9 @@ _iram_loop:
     la     t0, _edata
     la     t1, _end
 _bss_loop:
-    addiu  t1, 4
+    addiu  t0, 4
     bne    t0, t1, _bss_loop
-    sw     zero, -4(t1)
+    sw     zero, -4(t0)
 
     /*
       ----------------------------------------------------
@@ -155,13 +155,12 @@ _bss_loop:
     */
     la      sp, stackend
     la      t0, stackbegin
-    move    t1, sp
     li      t2, 0xDEADBEEF
     
 _stack_loop:
-    addiu   t1, 4
-    bne     t0, t1, _stack_loop
-    sw      t2, -4(t1)
+    addiu   t0, 4
+    bne     t0, sp, _stack_loop
+    sw      t2, -4(t0)
 
     /*
       ----------------------------------------------------
