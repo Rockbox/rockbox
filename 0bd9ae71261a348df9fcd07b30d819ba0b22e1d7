@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_7772707e",
+        "filename": "apps/plugins/text_viewer/tv_bookmark.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-03-05T13:44:48Z",
+      "side": 1,
+      "message": "The indentation here is still bad. Preprocessor tokens should be left-most (you corrected that), but normal code lines should be properly indented like the surrounding code (indentation level increases for each if/for/while (and others) keyword).",
+      "revId": "0bd9ae71261a348df9fcd07b30d819ba0b22e1d7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
