@@ -604,7 +604,7 @@ struct configdata disk_config[] =
    { TYPE_ENUM, 0, MAX_OSC, { .int_p = &osc_disk.orientation }, "orientation",
      orientation_str },
 #ifdef OSCILLOSCOPE_GRAPHMODE
-   { TYPE_INT, MAX_SPEED, MAX_SPEED,
+   { TYPE_INT, MIN_SPEED, MAX_SPEED,
      { .int_p = &osc_disk.speed[GRAPH_WAVEFORM] }, "wavespeed", NULL },
    { TYPE_ENUM, 0, MAX_GRAPH, { .int_p = &osc_disk.graphmode }, "graphmode",
      graphmode_str },
