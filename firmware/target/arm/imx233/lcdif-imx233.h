@@ -65,6 +65,8 @@ void imx233_lcdif_enable_frame_done_irq(bool en);
 void imx233_lcdif_set_frame_done_cb(lcdif_irq_cb_t cb);
 void imx233_lcdif_enable_vsync_edge_irq(bool en);
 void imx233_lcdif_set_vsync_edge_cb(lcdif_irq_cb_t cb);
+void imx233_lcdif_enable_underflow_irq(bool en);
+void imx233_lcdif_set_underflow_cb(lcdif_irq_cb_t cb);
 void imx233_lcdif_enable_sync_signals(bool en);
 #endif
 

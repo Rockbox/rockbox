@@ -25,6 +25,7 @@
 #if IMX233_SUBTARGET >= 3700
 static lcdif_irq_cb_t g_cur_frame_cb = NULL;
 static lcdif_irq_cb_t g_vsync_edge_cb = NULL;
+static lcdif_irq_cb_t g_underflow_cb = NULL;
 #endif
 
 /* for some crazy reason, all "non-dma" interrupts are routed to the ERROR irq */
@@ -42,6 +43,12 @@ void INT_LCDIF_ERROR(void)
         if(g_vsync_edge_cb)
             g_vsync_edge_cb();
         BF_CLR(LCDIF_CTRL1, VSYNC_EDGE_IRQ);
+    }
+    if(BF_RD(LCDIF_CTRL1, UNDERFLOW_IRQ))
+    {
+        if(g_underflow_cb)
+            g_underflow_cb();
+        BF_CLR(LCDIF_CTRL1, UNDERFLOW_IRQ);
     }
 }
 #endif
@@ -340,6 +347,20 @@ void imx233_lcdif_enable_vsync_edge_irq(bool en)
 void imx233_lcdif_set_vsync_edge_cb(lcdif_irq_cb_t cb)
 {
     g_vsync_edge_cb = cb;
+}
+
+void imx233_lcdif_enable_underflow_irq(bool en)
+{
+    if(en)
+        BF_SET(LCDIF_CTRL1, UNDERFLOW_IRQ_EN);
+    else
+        BF_CLR(LCDIF_CTRL1, UNDERFLOW_IRQ_EN);
+    BF_CLR(LCDIF_CTRL1, UNDERFLOW_IRQ);
+}
+
+void imx233_lcdif_set_underflow_cb(lcdif_irq_cb_t cb)
+{
+    g_underflow_cb = cb;
 }
 #endif
 
