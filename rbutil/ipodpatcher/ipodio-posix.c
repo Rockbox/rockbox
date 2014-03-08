@@ -130,8 +130,8 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
 #include <sys/disk.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
-#include <IOKit/scsi-commands/SCSITaskLib.h>
-#include <IOKit/scsi-commands/SCSICommandOperationCodes.h>
+#include <IOKit/scsi/SCSITaskLib.h>
+#include <IOKit/scsi/SCSICommandOperationCodes.h>
 #define IPOD_SECTORSIZE_IOCTL DKIOCGETBLOCKSIZE
 
 /* TODO: Implement this function for Mac OS X */
