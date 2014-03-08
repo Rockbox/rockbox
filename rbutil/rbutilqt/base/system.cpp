@@ -39,11 +39,6 @@
 
 // Linux and Mac includes
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
-#if defined(LIBUSB1)
-#include <libusb-1.0/libusb.h>
-#else
-#include <usb.h>
-#endif
 #include <sys/utsname.h>
 #include <unistd.h>
 #include <pwd.h>
@@ -51,6 +46,11 @@
 
 // Linux includes
 #if defined(Q_OS_LINUX)
+#if defined(LIBUSB1)
+#include <libusb-1.0/libusb.h>
+#else
+#include <usb.h>
+#endif
 #include <mntent.h>
 #endif
 
