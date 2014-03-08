@@ -355,6 +355,19 @@ void imx233_power_get_regulator(enum imx233_regulator_t reg, unsigned *value_mv,
         *brownout_mv = 0;
 }
 
+#if IMX233_SUBTARGET >= 3700 && IMX233_SUBTARGET < 3780
+static void update_dcfuncv(void)
+{
+    int vddd, vdda, vddio;
+    imx233_power_get_regulator(REGULATOR_VDDD, &vddd, NULL);
+    imx233_power_get_regulator(REGULATOR_VDDA, &vdda, NULL);
+    imx233_power_get_regulator(REGULATOR_VDDIO, &vddio, NULL);
+    // assume Li-Ion, to divide by 6.25, do *100 and /625
+    HW_POWER_DCFUNCV = BF_OR2(POWER_DCFUNCV, VDDIO(((vddio - vdda) * 100) / 625),
+        VDDD(((vdda - vddd) * 100) / 625));
+}
+#endif
+
 void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
     unsigned brownout_mv)
 {
@@ -392,6 +405,10 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
         yield();
     if(!BF_RD(POWER_STS, DC1_OK) || !BF_RD(POWER_STS, DC2_OK))
         panicf("regulator %d: failed to stabilize", reg);
+#endif
+    /* On STMP37xx, we need to update the weird HW_POWER_DCFUNCV register */
+#if IMX233_SUBTARGET >= 3700 && IMX233_SUBTARGET < 3780
+    update_dcfuncv();
 #endif
 }
 
