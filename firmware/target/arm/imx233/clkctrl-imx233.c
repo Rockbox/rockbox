@@ -189,6 +189,38 @@ bool imx233_clkctrl_get_bypass(enum imx233_clock_t clk)
         default: return false;
     }
 }
+
+void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_div)
+{
+    /* disable interrupts to avoid an IRQ being triggered at the point
+     * where we are slow/weird speeds, that would result in massive slow-down... */
+    int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
+    /* we need to be very careful here: putting the wrong dividers could blow-up the
+     * frequency and result in crash, also the cpu could be running from XTAL or
+     * PLL at this point */
+    int old_cpu_fdiv = imx233_clkctrl_get_frac_div(CLK_CPU);
+    int old_hbus_div = imx233_clkctrl_get_div(CLK_HBUS);
+    /* since HBUS is tied to cpu, we first ensure that the HBUS is safe to handle
+     * both old and new speed: take maximum of old and new dividers */
+    if(hbus_div > old_hbus_div)
+        imx233_clkctrl_set_div(CLK_HBUS, hbus_div);
+    /* we are about to change cpu speed: we first ensure that the fractional
+     * divider is safe to handle both old and new integer divided frequency: take max */
+    if(cpu_fdiv > old_cpu_fdiv)
+        imx233_clkctrl_set_frac_div(CLK_CPU, cpu_fdiv);
+    /* we are safe for major divider change */
+    imx233_clkctrl_set_div(CLK_CPU, cpu_idiv);
+    /* if the final fractional divider is lower than previous one, it's time to switch */
+    if(cpu_fdiv < old_cpu_fdiv)
+        imx233_clkctrl_set_frac_div(CLK_CPU, cpu_fdiv);
+    /* if we were running from XTAL, switch to PLL */
+    imx233_clkctrl_set_bypass(CLK_CPU, false);
+    /* finally restore HBUS to its proper value */
+    if(hbus_div < old_hbus_div)
+        imx233_clkctrl_set_div(CLK_HBUS, hbus_div);
+    /* we are free again */
+    restore_interrupt(oldstatus);
+}
 #endif
 
 void imx233_clkctrl_enable_usb(bool enable)
