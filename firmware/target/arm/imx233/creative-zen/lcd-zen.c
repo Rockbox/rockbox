@@ -48,7 +48,7 @@ static bool lcd_on;
 struct lcdif_dma_command_t
 {
     struct apb_dma_command_t dma;
-    uint32_t pad;
+    uint32_t ctrl;
 } __attribute__((packed)) CACHEALIGN_ATTR;
 
 __ENSURE_STRUCT_CACHE_FRIENDLY(struct lcdif_dma_command_t)
@@ -249,15 +249,12 @@ void lcd_enable(bool enable)
         // "power" on
         lcd_power(true);
         // setup registers
-        imx233_lcdif_enable_sync_signals(true); // we need frame signals during init
         lcd_power_seq();
         lcd_init_seq();
         lcd_display_on_seq();
 
         imx233_dma_reset_channel(APB_LCDIF);
         imx233_dma_start_command(APB_LCDIF, &lcdif_dma[0].dma);
-        BF_SET(LCDIF_CTRL, DOTCLK_MODE);
-        BF_SET(LCDIF_CTRL, RUN);
     }
     else
     {
@@ -273,6 +270,15 @@ void lcd_enable(bool enable)
         // disable spi
         spi_enable(false);
     }
+}
+
+static void lcd_underflow(void)
+{
+    /* on underflow, current frame is dead so stop lcdif and prepare for next frame
+     * don't bother with the errata, fifo is empty since we are underflowing ! */
+    BF_CLR(LCDIF_CTRL, DOTCLK_MODE);
+    imx233_dma_reset_channel(APB_LCDIF);
+    imx233_dma_start_command(APB_LCDIF, &lcdif_dma[0].dma);
 }
 
 void lcd_init_device(void)
@@ -297,6 +303,8 @@ void lcd_init_device(void)
     imx233_lcdif_init();
     imx233_lcdif_setup_dotclk_pins(8, false);
     imx233_lcdif_set_word_length(8);
+    imx233_lcdif_set_underflow_cb(&lcd_underflow);
+    imx233_lcdif_enable_underflow_irq(true);
     imx233_dma_clkgate_channel(APB_LCDIF, true);
     imx233_dma_reset_channel(APB_LCDIF);
     /** Datasheet states:
@@ -312,6 +320,7 @@ void lcd_init_device(void)
         /*h_front_porch*/4, LCD_WIDTH, LCD_HEIGHT, /*clk_per_pix*/3,
         /*enable_present*/false);
     imx233_lcdif_set_byte_packing_format(0xf);
+    imx233_lcdif_enable_sync_signals(true); // we need frame signals during init
     // setup dma
     unsigned size = IMX233_FRAMEBUFFER_SIZE;
     uint8_t *frame_p = FRAME;
@@ -325,6 +334,10 @@ void lcd_init_device(void)
         size -= xfer;
         frame_p += xfer;
     }
+    // first transfer: enable run, dotclk and so on
+    lcdif_dma[0].dma.cmd |= BF_OR1(APB_CHx_CMD, CMDWORDS(1));
+    lcdif_dma[0].ctrl = BF_OR4(LCDIF_CTRL, BYPASS_COUNT(1), DOTCLK_MODE(1),
+        RUN(1), WORD_LENGTH(1));
     // enable
     lcd_enable(true);
 }
