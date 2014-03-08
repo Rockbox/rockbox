@@ -160,13 +160,23 @@ QString Utils::filesystemName(QString path)
 
         if(result == noErr) {
             GetVolParmsInfoBuffer volparms;
+            /* PBHGetVolParmsSync() is not available for 64bit while
+            FSGetVolumeParms() is available in 10.5+. Thus we need to use
+            PBHGetVolParmsSync() for 10.4, and that also requires 10.4 to
+            always use 32bit.
+            Qt 4 supports 32bit on 10.6 Cocoa only.
+            */
+#if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050
+            if(FSGetVolumeParms(volrefnum, &volparms, sizeof(volparms)) == noErr)
+#else
             HParamBlockRec hpb;
             hpb.ioParam.ioNamePtr = NULL;
             hpb.ioParam.ioVRefNum = volrefnum;
             hpb.ioParam.ioBuffer = (Ptr)&volparms;
             hpb.ioParam.ioReqCount = sizeof(volparms);
-
-            if(PBHGetVolParmsSync(&hpb) == noErr) {
+            if(PBHGetVolParmsSync(&hpb) == noErr)
+#endif
+            {
                 if(volparms.vMServerAdr == 0) {
                     if(bsd == (char*)volparms.vMDeviceID) {
                         name = QString::fromUtf16((const ushort*)volname.unicode,
@@ -798,13 +808,19 @@ bool Utils::ejectDevice(QString device)
                 kFSVolInfoFSInfo, NULL, NULL, NULL);
         if(result == noErr) {
             GetVolParmsInfoBuffer volparms;
+            /* See above -- PBHGetVolParmsSync() is not available for 64bit,
+             * and FSGetVolumeParms() on 10.5+ only. */
+#if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050
+            if(FSGetVolumeParms(volrefnum, &volparms, sizeof(volparms)) == noErr)
+#else
             HParamBlockRec hpb;
             hpb.ioParam.ioNamePtr = NULL;
             hpb.ioParam.ioVRefNum = volrefnum;
             hpb.ioParam.ioBuffer = (Ptr)&volparms;
             hpb.ioParam.ioReqCount = sizeof(volparms);
-
-            if(PBHGetVolParmsSync(&hpb) == noErr) {
+            if(PBHGetVolParmsSync(&hpb) == noErr)
+#endif
+            {
                 if(volparms.vMServerAdr == 0) {
                     if(bsd == (char*)volparms.vMDeviceID) {
                         pid_t dissenter;
