@@ -295,8 +295,6 @@ void imx233_set_cpu_frequency(long frequency)
         return;
     /* disable auto-slow (enable back afterwards) */
     imx233_clkctrl_enable_auto_slow(false);
-    /* set VDDIO to the right value */
-    imx233_power_set_regulator(REGULATOR_VDDIO, 3300, 3125);
 
     /* WARNING watch out the order ! */
     if(frequency > cpu_frequency)
@@ -305,29 +303,15 @@ void imx233_set_cpu_frequency(long frequency)
         imx233_power_set_regulator(REGULATOR_VDDD, prof->vddd, prof->vddd_bo);
         /* Change ARM cache timings */
         imx233_digctl_set_arm_cache_timings(prof->arm_cache_timings);
-        /* Switch CPU to crystal at 24MHz */
-        imx233_clkctrl_set_bypass(CLK_CPU, true);
-        /* Program CPU divider for PLL */
-        imx233_clkctrl_set_frac_div(CLK_CPU, prof->cpu_fdiv);
-        imx233_clkctrl_set_div(CLK_CPU, prof->cpu_idiv);
-        /* Change the HBUS divider to its final value */
-        imx233_clkctrl_set_div(CLK_HBUS, prof->hbus_div);
-        /* Switch back CPU to PLL */
-        imx233_clkctrl_set_bypass(CLK_CPU, false);
+        /* Change CPU and HBUS frequencies */
+        imx233_clkctrl_set_cpu_hbus_div(prof->cpu_idiv, prof->cpu_fdiv, prof->hbus_div);
         /* Set the new EMI frequency */
         imx233_emi_set_frequency(prof->emi_freq);
     }
     else
     {
-        /* Switch CPU to crystal at 24MHz */
-        imx233_clkctrl_set_bypass(CLK_CPU, true);
-        /* Program HBUS divider to its final value */
-        imx233_clkctrl_set_div(CLK_HBUS, prof->hbus_div);
-        /* Program CPU divider for PLL */
-        imx233_clkctrl_set_frac_div(CLK_CPU, prof->cpu_fdiv);
-        imx233_clkctrl_set_div(CLK_CPU, prof->cpu_idiv);
-        /* Switch back CPU to PLL */
-        imx233_clkctrl_set_bypass(CLK_CPU, false);
+        /* Change CPU and HBUS frequencies */
+        imx233_clkctrl_set_cpu_hbus_div(prof->cpu_idiv, prof->cpu_fdiv, prof->hbus_div);
         /* Set the new EMI frequency */
         imx233_emi_set_frequency(prof->emi_freq);
         /* Change ARM cache timings */
