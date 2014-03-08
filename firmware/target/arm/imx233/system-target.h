@@ -32,19 +32,22 @@
 #include "regs/regs-usbphy.h"
 
 /**
- * Absolute maximum CPU speed: 454.74 MHz
- * Intermediate CPU speeds: 392.73 MHz, 360MHz, 261.82 MHz, 64 MHz
+ * Absolute maximum CPU speed: 454.74 MHz (STMP3780), 320.00 MHz (STMP3700)
+ * Intermediate CPU speeds: 261.82 MHz, 64 MHz
  * Absolute minimum CPU speed: 24 MHz */
 #define IMX233_CPUFREQ_454_MHz  454740
-#define IMX233_CPUFREQ_392_MHz  392730
-#define IMX233_CPUFREQ_360_MHz  360000
+#define IMX233_CPUFREQ_320_MHz  320000
 #define IMX233_CPUFREQ_261_MHz  261820
 #define IMX233_CPUFREQ_64_MHz    64000
 #define IMX233_CPUFREQ_24_MHz    24000
 
 #define CPUFREQ_DEFAULT     IMX233_CPUFREQ_64_MHz
 #define CPUFREQ_NORMAL      IMX233_CPUFREQ_64_MHz
+#if IMX233_SUBTARGET >= 3780
 #define CPUFREQ_MAX         IMX233_CPUFREQ_454_MHz
+#elif IMX233_SUBTARGET >= 3700
+#define CPUFREQ_MAX         IMX233_CPUFREQ_320_MHz
+#endif
 #define CPUFREQ_SLEEP       IMX233_CPUFREQ_64_MHz
 
 void system_prepare_fw_start(void);
