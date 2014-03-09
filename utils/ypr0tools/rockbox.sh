@@ -38,6 +38,19 @@ echo -n "0" >> /sys/class/graphics/fb0/blank
 
 amixer sset 'Soft Mute' 0
 amixer sset 'Master' 85%
+# These are needed only for the R1. TODO: Move all of this into the firmware
+if [ -e "/usr/local/bin/r1" ]
+then
+    amixer cset numid=7,iface=MIXER,name='Master Power witch' 2
+    amixer cset numid=6,iface=MIXER,name='Master Handfree Switch' 0
+    amixer cset numid=5,iface=MIXER,name='Master Mute' 0
+    amixer cset numid=9,iface=MIXER,name='Master samplerate' 44100
+    amixer cset numid=2,iface=MIXER,name='Master Volume' 28
+    amixer cset numid=1,iface=MIXER,name='PCM PlayBack Switch' 2
+    amixer cset numid=8,iface=MIXER,name='FM Mute' 0
+    amixer cset numid=4,iface=MIXER,name='Capture FM Switch' 0
+    amixer cset numid=3,iface=MIXER,name='Capture Mic Switch' 0
+fi
 
 # We set-up various settings for the cpu governor: default are
 # Every 1,5 s the kernel evaluates if it's the case to down/up clocking the cpu
