@@ -34,7 +34,6 @@ extern jobject RockboxService_instance;
 static jobject RockboxFramebuffer_instance;
 static jmethodID java_lcd_update;
 static jmethodID java_lcd_update_rect;
-static jmethodID java_lcd_init;
 
 static jclass    AndroidRect_class;
 static jmethodID AndroidRect_constructor;
@@ -42,6 +41,7 @@ static jmethodID AndroidRect_constructor;
 static int dpi;
 static int scroll_threshold;
 static bool display_on;
+static bool connected;
 
 /* this might actually be called before lcd_init_device() or even main(), so
  * be sure to only access static storage initalized at library loading,
@@ -49,38 +49,26 @@ static bool display_on;
 static void connect_with_java(JNIEnv* env, jobject fb_instance)
 {
     JNIEnv e = *env;
-    static bool have_class;
 
-    if (!have_class)
-    {
-        jclass fb_class = e->GetObjectClass(env, fb_instance);
-        /* cache update functions */
-        java_lcd_update      = e->GetMethodID(env, fb_class,
-                                             "update",
-                                             "(Ljava/nio/ByteBuffer;)V");
-        java_lcd_update_rect = e->GetMethodID(env, fb_class,
-                                             "update",
-                                             "(Ljava/nio/ByteBuffer;"
-                                              "Landroid/graphics/Rect;)V");
-        jmethodID get_dpi    = e->GetMethodID(env, fb_class,
-                                             "getDpi", "()I");
-        jmethodID thresh     = e->GetMethodID(env, fb_class,
-                                             "getScrollThreshold", "()I");
-        /* these don't change with new instances so call them now */
-        dpi                  = e->CallIntMethod(env, fb_instance, get_dpi);
-        scroll_threshold     = e->CallIntMethod(env, fb_instance, thresh);
+    jclass fb_class = e->GetObjectClass(env, fb_instance);
+    /* cache update functions */
+    java_lcd_update      = e->GetMethodID(env, fb_class,
+                                         "update",
+                                         "(Ljava/nio/ByteBuffer;)V");
+    java_lcd_update_rect = e->GetMethodID(env, fb_class,
+                                         "update",
+                                         "(Ljava/nio/ByteBuffer;"
+                                          "Landroid/graphics/Rect;)V");
+    jmethodID get_dpi    = e->GetMethodID(env, fb_class,
+                                         "getDpi", "()I");
+    jmethodID thresh     = e->GetMethodID(env, fb_class,
+                                         "getScrollThreshold", "()I");
+    /* these don't change with new instances so call them now */
+    dpi                  = e->CallIntMethod(env, fb_instance, get_dpi);
+    scroll_threshold     = e->CallIntMethod(env, fb_instance, thresh);
 
-        java_lcd_init        = e->GetMethodID(env, fb_class,
-                                             "initialize", "(II)V");
-        AndroidRect_class    = e->FindClass(env, "android/graphics/Rect");
-        AndroidRect_constructor = e->GetMethodID(env, AndroidRect_class,
-                                             "<init>", "(IIII)V");
-        have_class           = true;
-    }
-
-    /* we need to setup parts for the java object every time */
-    (*env)->CallVoidMethod(env, fb_instance, java_lcd_init,
-                          (jint)LCD_WIDTH, (jint)LCD_HEIGHT);
+    AndroidRect_constructor = e->GetMethodID(env, AndroidRect_class,
+                                         "<init>", "(IIII)V");
 }
 
 /*
@@ -132,12 +120,18 @@ Java_org_rockbox_RockboxFramebuffer_surfaceCreated(JNIEnv *env, jobject this,
                                                      jobject surfaceholder)
 {
     (void)surfaceholder;
+    jclass rect;
 
     /* Update RockboxFramebuffer_instance */
     RockboxFramebuffer_instance = (*env)->NewGlobalRef(env, this);
-
+    rect = (*env)->FindClass(env, "android/graphics/Rect");
+    AndroidRect_class = (*env)->NewGlobalRef(env, rect);
     /* possibly a new instance - reconnect */
-    connect_with_java(env, this);
+    if (!connected)
+    {
+        connect_with_java(env, this);
+        connected = true;
+    }
     display_on = true;
 
     /* need to wait for button_queue to be valid to post to */
@@ -163,6 +157,8 @@ Java_org_rockbox_RockboxFramebuffer_surfaceDestroyed(JNIEnv *e, jobject this,
 
     (*e)->DeleteGlobalRef(e, RockboxFramebuffer_instance);
     RockboxFramebuffer_instance = NULL;
+    (*e)->DeleteGlobalRef(e, AndroidRect_class);
+    AndroidRect_class = NULL;
 }
 
 bool lcd_active(void)

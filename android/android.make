@@ -28,16 +28,17 @@ $(CPUFEAT_BUILD)/cpu-features.o: $(CPUFEAT)/cpu-features.c
 .PHONY: apk classes clean dex dirs libs jar
 
 # API version
-ANDROID_PLATFORM_VERSION=16
+ANDROID_PLATFORM_VERSION=19
 ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSION)
 
 # android tools
-AAPT=$(ANDROID_SDK_PATH)/platform-tools/aapt
-DX=$(ANDROID_SDK_PATH)/platform-tools/dx
-APKBUILDER=$(ANDROID_SDK_PATH)/tools/apkbuilder
+BUILD_TOOLS_VERSION=19.0.3
+AAPT=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/aapt
+DX=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/dx
 ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
 KEYSTORE=$(HOME)/.android/debug.keystore
 ADB=$(ANDROID_SDK_PATH)/platform-tools/adb
+BUILDAPK=$(ANDROID_DIR)/buildapk.sh
 
 CLASSPATH   := $(BUILDDIR)/bin/classes
 
@@ -130,8 +131,7 @@ $(BINLIB_DIR)/lib%.so: $(RBCODEC_BLD)/codecs/%.codec
 libs: $(DIRS) $(LIBS)
 
 $(TEMP_APK): $(AP_) $(LIBS) $(DEX) | $(DIRS)
-	$(call PRINTS,APK $(subst $(BUILDDIR)/,,$@))$(APKBUILDER) $@ \
-	-u -z $(AP_) -f $(DEX) -nf $(BUILDDIR)/libs
+	$(call PRINTS,APK $(subst $(BUILDDIR)/,,$@))$(BUILDAPK) $(BUILDDIR) $(notdir $@) $(BUILD_TOOLS_VERSION)
 
 $(KEYSTORE):
 	$(SILENT)mkdir -p $(HOME)/.android

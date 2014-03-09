@@ -673,11 +673,11 @@ androidcc () {
     LDOPTS="$LDOPTS -Wl,-soname,librockbox.so -shared -ldl -llog"
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack -shared"
     ANDROID_ARCH=$1 # for android.make too
+    gccchoice="4.6"
     # arch dependant stuff
     case $ANDROID_ARCH in
         armeabi)
             endian="little"
-            gccchoice="4.4.3"
             gcctarget="arm-linux-androideabi-"
             # sigaltstack is not available in pre-android-9, however asm
             # threads work fine so far
@@ -688,7 +688,6 @@ androidcc () {
             ;;
         mips)
             endian="little"
-            gccchoice="4.4.3"
             gcctarget="mipsel-linux-android-"
             thread_support="HAVE_SIGALTSTACK_THREADS"
             GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer \
@@ -696,8 +695,7 @@ androidcc () {
             LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips"
             ;;
         x86)
-            endian=little
-            gccchoice="4.4.3"
+            endian="little"
             gcctarget="i686-linux-android-"
             gccdir=x86-$gccchoice
             thread_support="HAVE_SIGALTSTACK_THREADS"
