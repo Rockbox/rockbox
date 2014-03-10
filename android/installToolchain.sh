@@ -12,7 +12,7 @@ NDK_DOWNLOAD_URL="http://developer.android.com/sdk/ndk/index.html"
 find_url() {
     base_url="$1"
     os="$2"
-    wget -q -O - $base_url | grep dl.google.com | sed 's/.*"\(http:\/\/.*\)".*/\1/' | grep $os | grep -v .exe # Windows hack
+    wget -q -O - $base_url | grep dl.google.com | sed 's/.*"\(http:\/\/.*\)".*/\1/' | grep $os | grep -v bundle | grep -v .exe # Windows hack
 }
 
 OS=`uname`
@@ -52,14 +52,14 @@ download_and_extract() {
     fi
 
     echo " * Extracting $name..."
-    case ${local_file#*.} in
-        zip)
+    case ${local_file} in
+        *.zip)
             unzip -qo -d "$prefix" "$local_file"
             ;;
-        tgz|tar.gz)
-            (cd $prefix; tar -xf "$local_file")
+        *.tgz|*.tar.gz)
+            (cd $prefix; tar -xzf "$local_file")
             ;;
-        tar.bz2)
+        *.tar.bz2)
             (cd $prefix; tar -xjf "$local_file")
             ;;
         *)
