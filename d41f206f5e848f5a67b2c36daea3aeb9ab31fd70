@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_97b864e7",
+        "filename": "apps/buffering.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1649,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-03-11T08:00:57Z",
+      "side": 1,
+      "message": "Strange indentation of closing brace!",
+      "revId": "d41f206f5e848f5a67b2c36daea3aeb9ab31fd70",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
