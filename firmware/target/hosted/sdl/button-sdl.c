@@ -444,10 +444,14 @@ static void button_event(int key, bool pressed)
     else
         btn &= ~new_btn;
 }
-#if defined(HAVE_BUTTON_DATA) && defined(HAVE_TOUCHSCREEN)
+#if defined(HAVE_BUTTON_DATA)
 int button_read_device(int* data)
 {
+#if defined(HAVE_TOUCHSCREEN)
     *data = mouse_coords;
+#else
+    (void) *data;   /* suppress compiler warnings */
+#endif
 #else
 int button_read_device(void)
 {
