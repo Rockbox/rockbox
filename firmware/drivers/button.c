@@ -87,13 +87,13 @@ static bool phones_present = false;
 
 #ifdef HAVE_BUTTON_DATA
 static int button_read(int *data);
+static int lastdata = 0;
 #else
 static int button_read(void);
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
 static int last_touchscreen_touch;
-static int lastdata = 0;
 #endif    
 #if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
