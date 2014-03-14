@@ -146,6 +146,6 @@ void notification_init(void)
     finishNotification = e->GetMethodID(env_ptr, class, "finishNotification",
                                         "()V");
 
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE track_changed_callback);
-    add_event(PLAYBACK_EVENT_TRACK_FINISH track_finished_callback);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, track_changed_callback);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH, track_finished_callback);
 }

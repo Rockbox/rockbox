@@ -25,6 +25,7 @@
 #include "kernel.h"
 #include "string.h"
 
+#if USING_STORAGE_CALLBACK
 static void wrapper(unsigned short id, void *ev_data, void *user_data)
 {
     (void)id;
@@ -32,6 +33,7 @@ static void wrapper(unsigned short id, void *ev_data, void *user_data)
     void (*func)(void) = user_data;
     func();
 }
+#endif
 
 void register_storage_idle_func(void (*function)(void))
 {
