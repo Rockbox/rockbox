@@ -349,8 +349,9 @@ static void iap_thread(void)
 }
 
 /* called by playback when the next track starts */
-static void iap_track_changed(void *ignored)
+static void iap_track_changed(unsigned short id, void *ignored)
 {
+    (void)id;
     (void)ignored;
     if ((interface_state == IST_EXTENDED) && device.do_notify) {
         long playlist_pos = playlist_next(0);
@@ -401,7 +402,7 @@ static void iap_start(void)
     if (!tid)
         panicf("Could not create iap thread");
     timeout_register(&iap_task_tmo, iap_task, MS_TO_TICKS(100), (intptr_t)NULL);
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, iap_track_changed);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, iap_track_changed);
 
     /* Since we cannot allocate memory while in interrupt context
      * post a message to our own queue to get that done

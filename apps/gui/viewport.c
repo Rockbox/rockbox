@@ -69,7 +69,7 @@ struct viewport_stack_item
 };
 
 #ifdef HAVE_LCD_BITMAP
-static void viewportmanager_redraw(void* data);
+static void viewportmanager_redraw(unsigned short id, void* data);
 
 static int theme_stack_top[NB_SCREENS]; /* the last item added */
 static struct viewport_stack_item theme_stack[NB_SCREENS][VPSTACK_DEPTH];
@@ -80,14 +80,12 @@ static void toggle_events(bool enable)
 {
     if (enable)
     {
-        add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
+        add_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        add_event(LCD_EVENT_ACTIVATION, false, do_sbs_update_callback);
+        add_event(LCD_EVENT_ACTIVATION, do_sbs_update_callback);
 #endif
-        add_event(PLAYBACK_EVENT_TRACK_CHANGE, false,
-                                                do_sbs_update_callback);
-        add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false,
-                                                do_sbs_update_callback);
+        add_event(PLAYBACK_EVENT_TRACK_CHANGE, do_sbs_update_callback);
+        add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, do_sbs_update_callback);
     }
     else
     {
@@ -232,8 +230,9 @@ int viewport_get_nb_lines(const struct viewport *vp)
 #endif
 }
 
-static void viewportmanager_redraw(void* data)
+static void viewportmanager_redraw(unsigned short id, void* data)
 {
+    (void)id;
     FOR_NB_SCREENS(i)
     {
 #ifdef HAVE_LCD_BITMAP
@@ -256,7 +255,7 @@ void viewportmanager_init()
         viewportmanager_theme_enable(i, true, NULL);
     }
 #else
-    add_event(GUI_EVENT_ACTIONUPDATE, false, viewportmanager_redraw);
+    add_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
 #endif
 }
 

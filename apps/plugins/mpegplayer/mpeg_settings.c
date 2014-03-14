@@ -677,8 +677,9 @@ static uint32_t increment_time(uint32_t val, int32_t amount, uint32_t range)
 }
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-static void get_start_time_lcd_enable_hook(void *param)
+static void get_start_time_lcd_enable_hook(unsigned short id, void *param)
 {
+    (void)id;
     (void)param;
     rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_0, 0);
 }
@@ -698,7 +699,7 @@ static int get_start_time(uint32_t duration)
     mylcd_update();
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-    rb->add_event(LCD_EVENT_ACTIVATION, false, get_start_time_lcd_enable_hook);
+    rb->add_event(LCD_EVENT_ACTIVATION, get_start_time_lcd_enable_hook);
 #endif
 
     draw_slider(0, 100, &rc_bound);

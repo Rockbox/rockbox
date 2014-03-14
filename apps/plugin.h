@@ -160,12 +160,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 227
+#define PLUGIN_API_VERSION 228
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 227
+#define PLUGIN_MIN_API_VERSION 228
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -450,8 +450,8 @@ struct plugin_api {
     void (*storage_spin)(void);
     void (*storage_spindown)(int seconds);
 #if USING_STORAGE_CALLBACK
-    void (*register_storage_idle_func)(void (*function)(void *data));
-    void (*unregister_storage_idle_func)(void (*function)(void *data), bool run);
+    void (*register_storage_idle_func)(void (*function)(void));
+    void (*unregister_storage_idle_func)(void (*function)(void), bool run);
 #endif /* USING_STORAGE_CALLBACK */
     void (*reload_directory)(void);
     char *(*create_numbered_filename)(char *buffer, const char *path,
@@ -569,8 +569,8 @@ struct plugin_api {
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
     /* event api */
-    bool (*add_event)(unsigned short id, bool oneshot, void (*handler)(void *data));
-    void (*remove_event)(unsigned short id, void (*handler)(void *data));
+    bool (*add_event)(unsigned short id, void (*handler)(unsigned short id, void *data));
+    void (*remove_event)(unsigned short id, void (*handler)(unsigned short id, void *data));
     void (*send_event)(unsigned short id, void *data);
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)

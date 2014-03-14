@@ -322,7 +322,7 @@ static int logdiskf_push(void *userp, unsigned char c)
     return true;
 }
 
-static void flush_buffer(void* data);
+static void flush_buffer(void);
 
 void _logdiskf(const char* file, const char level, const char *fmt, ...)
 {
@@ -350,9 +350,8 @@ void _logdiskf(const char* file, const char level, const char *fmt, ...)
     register_storage_idle_func(flush_buffer);
 }
 
-static void flush_buffer(void* data)
+static void flush_buffer(void)
 {
-    (void)data;
     int fd;
     if(logdiskfindex < 1)
         return;

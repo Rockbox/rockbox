@@ -88,8 +88,9 @@ static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
 
 
 static char current_track_path[MAX_PATH];
-static void rootmenu_track_changed_callback(void* param)
+static void rootmenu_track_changed_callback(unsigned short id, void* param)
 {
+    (void)id;
     struct mp3entry *id3 = ((struct track_event *)param)->id3;
     strlcpy(current_track_path, id3->path, MAX_PATH);
 }
@@ -746,7 +747,7 @@ void root_menu(void)
     if (global_settings.start_in_screen == 0)
         next_screen = (int)global_status.last_screen;
     else next_screen = global_settings.start_in_screen - 2;
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, rootmenu_track_changed_callback);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, rootmenu_track_changed_callback);
 #ifdef HAVE_RTC_ALARM
     if ( rtc_check_alarm_started(true) )
     {

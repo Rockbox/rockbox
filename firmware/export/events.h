@@ -23,12 +23,24 @@
 #define _EVENTS_H
 
 #include <stdbool.h>
-
-/** Only CLASS defines and firmware/ level events should be defined here.
- *  apps/ level events are defined in apps/appevents.h 
- */
-
 /**
+ * Synchronouos event system.
+ *
+ * Callbacks are subscribed with add_event() or add_event_ex(). events
+ * are fired using send_event().
+ *
+ * Events are always dispatched synchronously: the callbacks are called
+ * in the thread context of the event sender, without context switch. This
+ * also means that callbacks should be as simple as possible to avoid
+ * blocking the sender and other callbacks
+ *
+ * Use the kernel-level event_queue for cross-thread event dispatching.
+ * */
+
+/*
+ * Only CLASS defines and firmware/ level events should be defined here.
+ * apps/ level events are defined in apps/appevents.h
+ * 
  * High byte = Event class definition
  * Low byte  = Event ID
  */
@@ -40,9 +52,50 @@
 #define EVENT_CLASS_RECORDING  0x1000
 #define EVENT_CLASS_LCD        0x2000
 
-bool add_event(unsigned short id, bool oneshot, void (*handler)(void *data));
-void remove_event(unsigned short id, void (*handler)(void *data));
+/**
+ * Subscribe to an event with a simple callback. The callback will be called
+ * synchronously everytime the event fires, passing the event id and data to
+ * the callback.
+ *
+ * Must be removed with remove_event(). 
+ */
+bool add_event(unsigned short id, void (*handler)(unsigned short id, void *event_data));
+
+/**
+ * Subscribe to an event with a detailed callback. The callback will be called
+ * synchronously everytime the event fires, passing the event id and data, as
+ * well as the user_data pointer passed here, to the callback.
+ *
+ * With oneshot == true, the callback is unsubscribed automatically after
+ * the event fired for the first time. In this case the event need not to be
+ * removed with remove_event_ex().
+ *
+ * Must be removed with remove_event_ex(). remove_event() will never remove
+ * events added with this function. 
+ */
+bool add_event_ex(unsigned short id, bool oneshot, void (*handler)(unsigned short id, void *event_data, void *user_data), void *user_data);
+
+/**
+ * Unsubscribe a callback from an event. The handler pointer is matched.
+ *
+ * This will only work for subscriptions made with add_event().
+ */
+void remove_event(unsigned short id, void (*handler)(unsigned short id, void *data));
+
+/**
+ * Unsubscribe a callback from an event. The handler and user_data pointers
+ * are matched. That means the same user_data that was passed to add_event_ex()
+ * must be passed to this too.
+ *
+ * This will only work for subscriptions made with add_event_ex().
+ */
+void remove_event_ex(unsigned short id, void (*handler)(unsigned short id, void *event_data, void *user_data), void *user_data);
+
+/**
+ * Fire an event, which synchronously calls all subscribed callbacks. The
+ * event id and data pointer are passed to the callbacks as well, and
+ * optionally the user_data pointer from add_event_ex().
+ */
 void send_event(unsigned short id, void *data);
 
 #endif
-

@@ -359,9 +359,8 @@ static unsigned int charge_state(void)
 #endif
 
 
-static void flush_buffer(void* data)
+static void flush_buffer(void)
 {
-    (void)data;
     int fd;
     unsigned int i;
 
@@ -445,7 +444,7 @@ static void thread(void)
            for this to occur because it requires > 16 hours of no disk activity.
          */
         if (buf_idx == BUF_ELEMENTS) {
-            flush_buffer(NULL);
+            flush_buffer();
         }
         
         /* sleep some time until next measurement */
@@ -479,7 +478,7 @@ static void thread(void)
     /* unregister flush callback and flush to disk */
     rb->unregister_storage_idle_func(flush_buffer, true);
 #else
-    flush_buffer(NULL);
+    flush_buffer();
 #endif
     
     /* log end of bench and exit reason */

@@ -1223,9 +1223,8 @@ static int compare(const void* p1, const void* p2)
  * without affecting playlist load up performance.  This thread also flushes
  * any pending control commands when the disk spins up.
  */
-static void playlist_flush_callback(void *param)
+static void playlist_flush_callback(void)
 {
-    (void)param;
     struct playlist_info *playlist;
     playlist = &current_playlist;
     if (playlist->control_fd >= 0)

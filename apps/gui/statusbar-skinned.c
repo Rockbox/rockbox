@@ -178,8 +178,9 @@ void sb_skin_update(enum screen_type screen, bool force)
     }
 }
 
-void do_sbs_update_callback(void *param)
+void do_sbs_update_callback(unsigned short id, void *param)
 {
+    (void)id;
     (void)param;
     /* the WPS handles changing the actual id3 data in the id3 pointers
      * we imported, we just want a full update */

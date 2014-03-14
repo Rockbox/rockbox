@@ -48,9 +48,9 @@ enum {
  */
 #define USING_STORAGE_CALLBACK  !defined(BOOTLOADER) && !defined(APPLICATION) && !defined(__PCTOOL__)
 
-extern void register_storage_idle_func(void (*function)(void *data));
+extern void register_storage_idle_func(void (*function)(void));
 #if USING_STORAGE_CALLBACK
-extern void unregister_storage_idle_func(void (*function)(void *data), bool run);
+extern void unregister_storage_idle_func(void (*function)(void), bool run);
 extern bool call_storage_idle_notifys(bool force);
 #else
 #define unregister_storage_idle_func(f,r)

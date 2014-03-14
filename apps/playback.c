@@ -334,17 +334,18 @@ enum audio_start_playback_flags
 static void audio_start_playback(const struct audio_resume_info *resume_info,
                                  unsigned int flags);
 static void audio_stop_playback(void);
-static void buffer_event_buffer_low_callback(void *data);
-static void buffer_event_rebuffer_callback(void *data);
-static void buffer_event_finished_callback(void *data);
+static void buffer_event_buffer_low_callback(unsigned short id, void *data, void *user_data);
+static void buffer_event_rebuffer_callback(unsigned short id, void *data);
+static void buffer_event_finished_callback(unsigned short id, void *data);
 void audio_pcmbuf_sync_position(void);
 
 
 /**************************************/
 
 /** --- voice event --- **/
-void playback_voice_event(void *data)
+void playback_voice_event(unsigned short id, void *data)
 {
+    (void)id;
     /* Make audio play softly while voice is speaking */
     pcmbuf_soft_mode(*(bool *)data);
 }
@@ -1757,7 +1758,7 @@ static int audio_load_track(void)
                    should have been cleared already */
                 logf("%s(): finishing load: %d", __func__, info->id3_hid);
                 filling = STATE_FILLING;
-                buffer_event_finished_callback(&info->id3_hid);
+                buffer_event_finished_callback(BUFFER_EVENT_FINISHED, &info->id3_hid);
                 return LOAD_TRACK_OK;
             }
         }
@@ -2585,8 +2586,8 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
 
     /* Add these now - finish event for the first id3 will most likely be sent
        immediately */
-    add_event(BUFFER_EVENT_REBUFFER, false, buffer_event_rebuffer_callback);
-    add_event(BUFFER_EVENT_FINISHED, false, buffer_event_finished_callback);
+    add_event(BUFFER_EVENT_REBUFFER, buffer_event_rebuffer_callback);
+    add_event(BUFFER_EVENT_FINISHED, buffer_event_finished_callback);
 
     if (old_status == PLAY_STOPPED)
     {
@@ -2647,7 +2648,7 @@ static void audio_stop_playback(void)
     /* Close all tracks and mark them NULL */
     remove_event(BUFFER_EVENT_REBUFFER, buffer_event_rebuffer_callback);
     remove_event(BUFFER_EVENT_FINISHED, buffer_event_finished_callback);
-    remove_event(BUFFER_EVENT_BUFFER_LOW, buffer_event_buffer_low_callback);
+    remove_event_ex(BUFFER_EVENT_BUFFER_LOW, buffer_event_buffer_low_callback, NULL);
 
     track_list_clear(TRACK_LIST_CLEAR_ALL);
 
@@ -3164,8 +3165,8 @@ void audio_playback_handler(struct queue_event *ev)
                 /* End of buffering for now, let's calculate the watermark,
                    register for a low buffer event and unboost */
                 audio_update_filebuf_watermark(0);
-                add_event(BUFFER_EVENT_BUFFER_LOW, true,
-                          buffer_event_buffer_low_callback);
+                add_event_ex(BUFFER_EVENT_BUFFER_LOW, true,
+                        buffer_event_buffer_low_callback, NULL);
             }
             /* Fall-through */
         case STATE_FINISHED:
@@ -3200,27 +3201,31 @@ void audio_playback_handler(struct queue_event *ev)
 /* --- Buffering callbacks --- */
 
 /* Called when fullness is below the watermark level */
-static void buffer_event_buffer_low_callback(void *data)
+static void buffer_event_buffer_low_callback(unsigned short id, void *ev_data, void *user_data)
 {
     logf("low buffer callback");
     LOGFQUEUE("buffering > audio Q_AUDIO_BUFFERING: buffer low");
     audio_queue_post(Q_AUDIO_BUFFERING, BUFFER_EVENT_BUFFER_LOW);
-    (void)data;
+    (void)id;
+    (void)ev_data;
+    (void)user_data;
 }
 
 /* Called when handles must be discarded in order to buffer new data */
-static void buffer_event_rebuffer_callback(void *data)
+static void buffer_event_rebuffer_callback(unsigned short id, void *ev_data)
 {
     logf("rebuffer callback");
     LOGFQUEUE("buffering > audio Q_AUDIO_BUFFERING: rebuffer");
     audio_queue_post(Q_AUDIO_BUFFERING, BUFFER_EVENT_REBUFFER);
-    (void)data;
+    (void)id;
+    (void)ev_data;
 }
 
 /* A handle has completed buffering and all required data is available */
-static void buffer_event_finished_callback(void *data)
+static void buffer_event_finished_callback(unsigned short id, void *ev_data)
 {
-    int hid = *(const int *)data;
+    (void)id;
+    int hid = *(const int *)ev_data;
     const enum data_type htype = buf_handle_data_type(hid);
 
     logf("handle %d finished buffering (type:%u)", hid, (unsigned)htype);
@@ -3717,7 +3722,7 @@ void INIT_ATTR playback_init(void)
     track_list_init();
     buffering_init();
     pcmbuf_update_frequency();
-    add_event(PLAYBACK_EVENT_VOICE_PLAYING, false, playback_voice_event);
+    add_event(PLAYBACK_EVENT_VOICE_PLAYING, playback_voice_event);
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);

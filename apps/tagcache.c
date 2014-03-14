@@ -3195,9 +3195,8 @@ static bool command_queue_is_full(void)
     return (next == command_queue_ridx);
 }
 
-static void command_queue_sync_callback(void *data)
+static void command_queue_sync_callback(void)
 {
-    (void)data;
     struct master_header myhdr;
     int masterfd;
         
@@ -3246,7 +3245,7 @@ static void run_command_queue(bool force)
         return;
     
     if (force || command_queue_is_full())
-        command_queue_sync_callback(NULL);
+        command_queue_sync_callback();
     else
         register_storage_idle_func(command_queue_sync_callback);
 }
@@ -4898,4 +4897,3 @@ int tagcache_get_max_commit_step(void)
 {
     return (int)(SORTED_TAGS_COUNT)+1;
 }
-

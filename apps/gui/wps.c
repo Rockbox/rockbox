@@ -74,8 +74,7 @@
 
 /* initial setup of wps_data  */
 static void wps_state_init(void);
-static void track_changed_callback(void *param);
-static void nextid3available_callback(void* param);
+static void track_info_callback(unsigned short id, void *param);
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #ifdef HAVE_REMOTE_LCD
@@ -626,8 +625,9 @@ static void play_hop(int direction)
  * we suppress updates until the wps is activated again (the lcd driver will
  * call this hook to issue an instant update)
  * */
-static void wps_lcd_activation_hook(void *param)
+static void wps_lcd_activation_hook(unsigned short id, void *param)
 {
+    (void)id;
     (void)param;
     skin_request_full_update(WPS);
     /* force timeout in wps main loop, so that the update is instantly */
@@ -1119,7 +1119,7 @@ long gui_wps_show(void)
             restore = false;
             restoretimer = RESTORE_WPS_INSTANTLY;
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-            add_event(LCD_EVENT_ACTIVATION, false, wps_lcd_activation_hook);
+            add_event(LCD_EVENT_ACTIVATION, wps_lcd_activation_hook);
 #endif
         /* we remove the update delay since it's not very usable in the wps,
          * e.g. during volume changing or ffwd/rewind */
@@ -1187,35 +1187,27 @@ long gui_wps_show(void)
 }
 
 /* this is called from the playback thread so NO DRAWING! */
-static void track_changed_callback(void *param)
+static void track_info_callback(unsigned short id, void *param)
 {
     struct wps_state *state = skin_get_global_state();
-    state->id3 = ((struct track_event *)param)->id3;
-    state->nid3 = audio_next_track();
-    if (state->id3->cuesheet)
+
+    if (id == PLAYBACK_EVENT_TRACK_CHANGE || id == PLAYBACK_EVENT_CUR_TRACK_READY)
     {
-        cue_find_current_track(state->id3->cuesheet, state->id3->elapsed);
+        state->id3 = ((struct track_event *)param)->id3;
+        if (state->id3->cuesheet)
+        {
+            cue_find_current_track(state->id3->cuesheet, state->id3->elapsed);
+        }
     }
-    skin_request_full_update(WPS);
-}
-static void nextid3available_callback(void* param)
-{
-    (void)param;
+#ifdef AUDIO_FAST_SKIP_PREVIEW
+    else if (id == PLAYBACK_EVENT_TRACK_SKIP)
+    {
+        state->id3 = audio_current_track();
+    }
+#endif
     skin_get_global_state()->nid3 = audio_next_track();
     skin_request_full_update(WPS);
 }
-
-#ifdef AUDIO_FAST_SKIP_PREVIEW
-/* this is called on the audio_skip caller thread */
-static void track_skip_callback(void *param)
-{
-    struct wps_state *state = skin_get_global_state();
-    state->id3 = audio_current_track();
-    state->nid3 = audio_next_track();
-    skin_request_full_update(WPS);
-    (void)param;
-}
-#endif /* AUDIO_FAST_SKIP_PREVIEW */
 
 static void wps_state_init(void)
 {
@@ -1235,15 +1227,15 @@ static void wps_state_init(void)
     /* We'll be updating due to restore initialized with true */
     skin_request_full_update(WPS);
     /* add the WPS track event callbacks */
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
-    add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, false, nextid3available_callback);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, track_info_callback);
+    add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, track_info_callback);
 #if CONFIG_CODEC == SWCODEC
     /* Use the same callback as ..._TRACK_CHANGE for when remaining handles have
        finished */
-    add_event(PLAYBACK_EVENT_CUR_TRACK_READY, false, track_changed_callback);
+    add_event(PLAYBACK_EVENT_CUR_TRACK_READY, track_info_callback);
 #endif
 #ifdef AUDIO_FAST_SKIP_PREVIEW
-    add_event(PLAYBACK_EVENT_TRACK_SKIP, false, track_skip_callback);
+    add_event(PLAYBACK_EVENT_TRACK_SKIP, track_info_callback);
 #endif
 }
 

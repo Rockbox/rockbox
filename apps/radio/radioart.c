@@ -145,7 +145,7 @@ int radio_get_art_hid(struct dim *requested_dim)
     return -1;
 }
 
-static void buffer_reset_handler(void *data)
+static void buffer_reset_handler(unsigned short id, void *data, void *user_data)
 {
     buf = NULL;
     for(int i=0;i<MAX_RADIOART_IMAGES;i++)
@@ -156,7 +156,9 @@ static void buffer_reset_handler(void *data)
         radioart[i].name[0] = '\0';
     }
 
+    (void)id;
     (void)data;
+    (void)user_data;
 }
 
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
@@ -183,7 +185,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
         buf = start;
 
         /* one-shot */
-        add_event(BUFFER_EVENT_BUFFER_RESET, true, buffer_reset_handler);
+        add_event_ex(BUFFER_EVENT_BUFFER_RESET, true, buffer_reset_handler, NULL);
     }
 
     return BUFLIB_CB_OK;
@@ -203,7 +205,7 @@ void radioart_init(bool entering_screen)
         buffering_reset(core_get_data(handle), bufsize);
         buf = core_get_data(handle);
         /* one-shot */
-        add_event(BUFFER_EVENT_BUFFER_RESET, true, buffer_reset_handler);
+        add_event_ex(BUFFER_EVENT_BUFFER_RESET, true, buffer_reset_handler, NULL);
     }
     else /* init at startup */
     {

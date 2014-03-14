@@ -184,9 +184,8 @@ static void init_shortcut(struct shortcut* sc)
 
 static int first_idx_to_writeback = -1;
 static bool overwrite_shortcuts = false;
-static void shortcuts_ata_idle_callback(void* data)
+static void shortcuts_ata_idle_callback(void)
 {
-    (void)data;
     int fd;
     char buf[MAX_PATH];
     int current_idx = first_idx_to_writeback;
@@ -387,7 +386,7 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
             gui_synclist_select_item(lists, shortcut_count - 1);
         first_idx_to_writeback = 0;
         overwrite_shortcuts = true;
-        shortcuts_ata_idle_callback(NULL);
+        shortcuts_ata_idle_callback();
         if (shortcut_count == 0)
             return ACTION_STD_CANCEL;
         return ACTION_REDRAW;

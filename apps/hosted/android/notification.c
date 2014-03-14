@@ -44,8 +44,9 @@ static const struct dim dim = { .width = 200, .height = 200 };
 
 /*
  * notify about track change, and show track info */
-static void track_changed_callback(void *param)
+static void track_changed_callback(unsigned short id, void *param)
 {
+    (void)id;
     struct mp3entry* id3 = ((struct track_event *)param)->id3;
     JNIEnv e = *env_ptr;
     if (id3)
@@ -106,8 +107,9 @@ static void track_changed_callback(void *param)
 
 /*
  * notify about track finishing */
-static void track_finished_callback(void *param)
+static void track_finished_callback(unsigned short id, void *param)
 {
+    (void)id;
     if (((struct track_event *)param)->flags & TEF_REWIND)
         return; /* Not a true track end */
 
@@ -144,6 +146,6 @@ void notification_init(void)
     finishNotification = e->GetMethodID(env_ptr, class, "finishNotification",
                                         "()V");
 
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, track_changed_callback);
-    add_event(PLAYBACK_EVENT_TRACK_FINISH, false, track_finished_callback);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE track_changed_callback);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH track_finished_callback);
 }

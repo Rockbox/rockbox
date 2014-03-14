@@ -804,10 +804,11 @@ static int nat_compare(const void *p1, const void *p2)
     return strnatcasecmp(e1->name, e2->name);
 }
 
-static void tagtree_buffer_event(void *data)
+static void tagtree_buffer_event(unsigned short id, void *ev_data)
 {
+    (void)id;
     struct tagcache_search tcs;
-    struct mp3entry *id3 = ((struct track_event *)data)->id3;
+    struct mp3entry *id3 = ((struct track_event *)ev_data)->id3;
 
     bool runtimedb = global_settings.runtimedb;
     bool autoresume = global_settings.autoresume_enable;
@@ -868,9 +869,10 @@ static void tagtree_buffer_event(void *data)
     tagcache_search_finish(&tcs);
 }
 
-static void tagtree_track_finish_event(void *data)
+static void tagtree_track_finish_event(unsigned short id, void *ev_data)
 {
-    struct track_event *te = (struct track_event *)data;
+    (void)id;
+    struct track_event *te = (struct track_event *)ev_data;
     struct mp3entry *id3 = te->id3;
 
     long tagcache_idx = id3->tagcache_idx;
@@ -1183,8 +1185,8 @@ void tagtree_init(void)
     if (rootmenu < 0)
         rootmenu = 0;
 
-    add_event(PLAYBACK_EVENT_TRACK_BUFFER, false, tagtree_buffer_event);
-    add_event(PLAYBACK_EVENT_TRACK_FINISH, false, tagtree_track_finish_event);
+    add_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
 
     core_shrink(tagtree_handle, core_get_data(tagtree_handle), tagtree_buf_used);
 }

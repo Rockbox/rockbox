@@ -591,15 +591,13 @@ static bool settings_write_config(const char* filename, int options)
     return true;
 }
 #ifndef HAVE_RTC_RAM
-static void flush_global_status_callback(void *data)
+static void flush_global_status_callback(void)
 {
-    (void)data;
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
 }
 #endif
-static void flush_config_block_callback(void *data)
+static void flush_config_block_callback(void)
 {
-    (void)data;
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
     settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
 }
@@ -1307,4 +1305,3 @@ void set_file(const char* filename, char* setting, const int maxlen)
     strlcpy(setting, fptr, len);
     settings_save();
 }
-

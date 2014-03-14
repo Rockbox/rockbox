@@ -66,5 +66,5 @@ int sb_postproccess(enum screen_type screen, struct wps_data *data);
 #define sb_preproccess NULL
 #define sb_postproccess NULL
 #endif
-void do_sbs_update_callback(void *param);
+void do_sbs_update_callback(unsigned short id, void *param);
 #endif /* __STATUSBAR_SKINNED_H__ */

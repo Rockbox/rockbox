@@ -1026,8 +1026,9 @@ static void fps_init(void)
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 /* So we can refresh the overlay */
-static void osd_lcd_enable_hook(void* param)
+static void osd_lcd_enable_hook(unsigned short id, void* param)
 {
+    (void)id;
     (void)param;
     rb->queue_post(rb->button_queue, LCD_ENABLE_EVENT_1, 0);
 }
@@ -1043,7 +1044,7 @@ static void osd_backlight_on_video_mode(bool video_on)
 #endif
     } else {
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
-        rb->add_event(LCD_EVENT_ACTIVATION, false, osd_lcd_enable_hook);
+        rb->add_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif
         /* Revert to user's backlight settings */
         backlight_use_settings();

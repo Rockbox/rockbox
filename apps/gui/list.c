@@ -66,16 +66,17 @@ static bool list_is_dirty(struct gui_synclist *list)
     return TIME_BEFORE(list->dirty_tick, last_dirty_tick);
 }
 
-static void list_force_reinit(void *param)
+static void list_force_reinit(unsigned short id, void *param, void *last_dirty_tick)
 {
+    (void)id;
     (void)param;
-    last_dirty_tick = current_tick;
+    *(int *)last_dirty_tick = current_tick;
 }
 
 void list_init(void)
 {
     last_dirty_tick = current_tick;
-    add_event(GUI_EVENT_THEME_CHANGED, false, list_force_reinit);
+    add_event_ex(GUI_EVENT_THEME_CHANGED, false, list_force_reinit, &last_dirty_tick);
 }
 
 static void list_init_viewports(struct gui_synclist *list)
@@ -611,8 +612,9 @@ bool gui_synclist_keyclick_callback(int action, void* data)
  */
 static struct gui_synclist *current_lists;
 static bool ui_update_event_registered = false;
-static void _lists_uiviewport_update_callback(void *data)
+static void _lists_uiviewport_update_callback(unsigned short id, void *data)
 {
+    (void)id;
     (void)data;
     if (current_lists)
         gui_synclist_draw(current_lists);
@@ -801,8 +803,7 @@ int list_do_action_timeout(struct gui_synclist *lists, int timeout)
     {
         if (!ui_update_event_registered)
             ui_update_event_registered = 
-                    add_event(GUI_EVENT_NEED_UI_UPDATE, false,
-                            _lists_uiviewport_update_callback);
+                    add_event(GUI_EVENT_NEED_UI_UPDATE, _lists_uiviewport_update_callback);
         current_lists = lists;
     }
     if(lists->scheduled_talk_tick)

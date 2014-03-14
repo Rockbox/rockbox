@@ -28,30 +28,41 @@
 struct sysevent {
     unsigned short id;
     bool oneshot;
-    void (*callback)(void *data);
+    bool has_user_data;
+    union {
+        void (*callback)(unsigned short id, void *event_data);
+        struct {
+            void (*callback2)(unsigned short id, void *event_data, void *user_data);
+            void *user_data;
+        };
+    } handler;
 };
 
 static struct sysevent events[MAX_SYS_EVENTS];
 
-bool add_event(unsigned short id, bool oneshot, void (*handler)(void *data))
+static bool do_add_event(unsigned short id, bool oneshot, bool user_data_valid,
+                         void *handler, void *user_data)
 {
     int i;
     
     /* Check if the event already exists. */
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
-        if (events[i].callback == handler && events[i].id == id)
+        if (events[i].handler.callback == handler && events[i].id == id
+                && (!user_data_valid || (user_data == events[i].handler.callback)))
             return false;
     }
     
     /* Try to find a free slot. */
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
-        if (events[i].callback == NULL)
+        if (events[i].handler.callback == NULL)
         {
             events[i].id = id;
             events[i].oneshot = oneshot;
-            events[i].callback = handler;
+            if ((events[i].has_user_data = user_data_valid))
+                events[i].handler.user_data = user_data;
+            events[i].handler.callback = handler;
             return true;
         }
     }
@@ -60,18 +71,42 @@ bool add_event(unsigned short id, bool oneshot, void (*handler)(void *data))
     return false;
 }
 
-void remove_event(unsigned short id, void (*handler)(void *data))
+bool add_event(unsigned short id, void (*handler)(unsigned short id, void *data))
+{
+    return do_add_event(id, false, false, handler, NULL);
+}
+
+bool add_event_ex(unsigned short id, bool oneshot, void (*handler)(unsigned short id, void *event_data, void *user_data), void *user_data)
+{
+    return do_add_event(id, oneshot, true, handler, user_data);
+}
+
+void do_remove_event(unsigned short id, bool user_data_valid,
+                  void *handler, void *user_data)
 {
     int i;
     
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
-        if (events[i].id == id && events[i].callback == handler)
+        if (events[i].id == id && events[i].handler.callback == handler
+                && (!user_data_valid || (user_data == events[i].handler.callback)))
         {
-            events[i].callback = NULL;
+            events[i].handler.callback = NULL;
             return;
         }
     }
+}
+
+void remove_event(unsigned short id, void (*handler)(unsigned short id, void *data))
+{
+    do_remove_event(id, false, handler, NULL);
+}
+
+void remove_event_ex(unsigned short id,
+                     void (*handler)(unsigned short id, void *event_data, void *user_data),
+                     void *user_data)
+{
+    do_remove_event(id, true, handler, user_data);
 }
 
 void send_event(unsigned short id, void *data)
@@ -80,13 +115,15 @@ void send_event(unsigned short id, void *data)
     
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
-        if (events[i].id == id && events[i].callback != NULL)
+        if (events[i].id == id && events[i].handler.callback != NULL)
         {
-            events[i].callback(data);
+            if (events[i].has_user_data)
+                events[i].handler.callback2(id, data, events[i].handler.user_data);
+            else
+                events[i].handler.callback(id, data);
             
             if (events[i].oneshot)
-                events[i].callback = NULL;
+                events[i].handler.callback = NULL;
         }
     }
 }
-

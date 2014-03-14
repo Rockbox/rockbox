@@ -150,9 +150,8 @@ static void write_cache(void)
     cache_pos = 0;
 }
 
-static void scrobbler_flush_callback(void *data)
+static void scrobbler_flush_callback(void)
 {
-    (void)data;
     if (scrobbler_initialised && cache_pos)
         write_cache();
 }
@@ -200,16 +199,17 @@ static void add_to_cache(const struct mp3entry *id)
 
 }
 
-static void scrobbler_change_event(void *data)
+static void scrobbler_change_event(unsigned short id, void *ev_data)
 {
-    struct mp3entry *id = ((struct track_event *)data)->id3;
+    (void)id;
+    struct mp3entry *id3 = ((struct track_event *)ev_data)->id3;
 
     /*  check if track was resumed > %50 played
         check for blank artist or track name */
-    if (id->elapsed > id->length / 2 || !id->artist || !id->title)
+    if (id3->elapsed > id3->length / 2 || !id3->artist || !id3->title)
     {
         pending = false;
-        logf("SCROBBLER: skipping file %s", id->path);
+        logf("SCROBBLER: skipping file %s", id3->path);
     }
     else
     {
@@ -219,8 +219,9 @@ static void scrobbler_change_event(void *data)
     }
 }
 
-static void scrobbler_finish_event(void *data)
+static void scrobbler_finish_event(unsigned short id, void *data)
 {
+    (void)id;
     struct track_event *te = (struct track_event *)data;
 
     /* add entry using the currently ending track */
@@ -254,8 +255,8 @@ int scrobbler_init(void)
 
     scrobbler_initialised = true;
 
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, false, scrobbler_change_event);
-    add_event(PLAYBACK_EVENT_TRACK_FINISH, false, scrobbler_finish_event);
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, scrobbler_change_event);
+    add_event(PLAYBACK_EVENT_TRACK_FINISH, scrobbler_finish_event);
 
     return 1;
 }
