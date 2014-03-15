@@ -49,7 +49,7 @@ static bool do_add_event(unsigned short id, bool oneshot, bool user_data_valid,
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
         if (events[i].handler.callback == handler && events[i].id == id
-                && (!user_data_valid || (user_data == events[i].handler.callback)))
+                && (!user_data_valid || (user_data == events[i].handler.user_data)))
             return false;
     }
     
@@ -89,7 +89,7 @@ void do_remove_event(unsigned short id, bool user_data_valid,
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
         if (events[i].id == id && events[i].handler.callback == handler
-                && (!user_data_valid || (user_data == events[i].handler.callback)))
+                && (!user_data_valid || (user_data == events[i].handler.user_data)))
         {
             events[i].handler.callback = NULL;
             return;
