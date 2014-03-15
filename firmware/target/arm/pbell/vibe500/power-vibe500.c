@@ -29,6 +29,14 @@
 #include "usb.h"
 #include "synaptics-mep.h"
 
+
+/* sensitivity settings for capacitive buttons and scrollstrip.
+   The values are signed 4-bit two's complement,
+   reaching from -8 (least sensitive) to +7 (most sensitive)    */
+#define MEP_SENSITIVITY_BTN     2
+#define MEP_SENSITIVITY_STRIP   4
+
+
 void power_init(void)
 {
     GPIOD_ENABLE |= 0x80;          /* enable ACK */
@@ -46,10 +54,11 @@ void power_init(void)
     {
         logf("touchpad not ready");
     }
-    /* Max touch sensivity = 0x77, Rate=80/s,NoFilter=0,
+    /* Set touch sensivity, Rate=80/s,NoFilter=0,
        KeyMatrix=0,Buttons=1,Relative=0,Absolute=1.
        MEP parameter 0x20 - Report Modes */
-    touchpad_set_parameter(0,0x20,0x7785);
+    touchpad_set_parameter(0,0x20,0x0085 | (MEP_SENSITIVITY_BTN & 0x0F)<<12
+                                         | (MEP_SENSITIVITY_STRIP & 0x0F)<<8);
     /* MinAbsReporting=0, NotAllCapButtons=0,SingleCapButton=0,
        50msDebounce=0,MotionReporting=1 (reduce transmission overhead),
        ClipZifnoFinger=0,DisableDeceleration=0,Dribble=0.
