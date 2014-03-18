@@ -438,7 +438,7 @@ bool quick_screen_quick(int button_enter)
 bool quick_screen_f3(int button_enter)
 {
     struct gui_quickscreen qs;
-    bool usb = false:
+    bool usb = false;
     qs.items[QUICKSCREEN_TOP] = NULL;
     qs.items[QUICKSCREEN_LEFT] =
                     find_setting(&global_settings.scrollbar, NULL);
@@ -451,7 +451,7 @@ bool quick_screen_f3(int button_enter)
                     NULL;
 #endif
     qs.callback = NULL;
-    if (gui_syncquickscreen_run(&qs, button_enter), &usb)
+    if (gui_syncquickscreen_run(&qs, button_enter, &usb))
     {
         settings_save();
         settings_apply(false);
