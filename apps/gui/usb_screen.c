@@ -264,8 +264,12 @@ void gui_usb_screen_run(bool early_usb)
     FOR_NB_SCREENS(i)
     {
         struct screen *screen = &screens[i];
-
+        /* we might be coming from anywhere, and the originating screen
+         * can't be practically expected to cleanup the UI because
+         * we're invoked via default_event_handler(), therefore we make a
+         * generic cleanup here */
         screen->set_viewport(NULL);
+        screen->scroll_stop();
 #ifdef HAVE_LCD_CHARCELLS
         /* Quick fix. Viewports should really be enabled proper for charcell */
         viewport_set_defaults(&usb_screen_vps_ar[i].parent, i);
