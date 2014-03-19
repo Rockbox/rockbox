@@ -133,6 +133,7 @@ print <<EOF
 
 #define _ROCKCONF_H_ /* We don't need strcmp() etc. wrappers */
 #include "lua.h"
+#include "rocklib.h"
 #include "lauxlib.h"
 #include "plugin.h"
 
@@ -207,7 +208,7 @@ sub in_string
 sub in_bool
 {
     my ($name, $type, $pos) = @_;
-    return sprintf("\tbool %s = luaL_checkboolean(L, %d);\n", $name, $pos)
+    return sprintf("\tbool %s = rli_checkboolean(L, %d);\n", $name, $pos)
 }
 
 sub out_void

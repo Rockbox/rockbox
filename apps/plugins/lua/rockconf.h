@@ -25,10 +25,6 @@
 #include "plugin.h"
 #include <tlsf.h>
 
-#undef LUAI_THROW
-#undef LUAI_TRY
-#undef luai_jmpbuf
-
 #undef LUA_PATH_DEFAULT
 #define LUA_PATH_DEFAULT  "$/?.lua;" "$/?/init.lua;" VIEWERS_DIR"/lua/?.lua;" VIEWERS_DIR"/lua/?/init.lua;"
 
@@ -36,20 +32,11 @@
 
 #include "lib/pluginlib_exit.h"
 
-#define LUAI_THROW(L,c) longjmp((c)->b, 1)
-#define LUAI_TRY(L,c,a) if (setjmp((c)->b) == 0) { a }
-#define luai_jmpbuf jmp_buf
-
 extern char curpath[MAX_PATH];
 struct tm *gmtime(const time_t *timep);
 long strtol(const char *nptr, char **endptr, int base);
 unsigned long strtoul(const char *str, char **endptr, int base);
 size_t strftime(char* dst, size_t max, const char* format, const struct tm* tm);
-long lfloor(long x);
-long lpow(long x, long y);
-
-#define floor   lfloor
-#define pow     lpow
 
 /* Simple substitutions */
 #define malloc   tlsf_malloc
@@ -62,6 +49,18 @@ long lpow(long x, long y);
 #define strcmp   rb->strcmp
 #define strcpy   rb->strcpy
 #define strlen   rb->strlen
+
+#define getlocaledecpoint() '.'
+#define abort()  exit(EXIT_FAILURE)
+#define difftime(t1,t0) ((t1) - (t0))
+#define localtime       gmtime
+#if CONFIG_RTC
+#define time(x)  mktime(rb->get_time())
+#define mktime   rb->mktime
+#else
+#define time(x)   (0)
+#define mktime(x) (0)
+#endif
 
 #endif /* _ROCKCONF_H_ */
 
