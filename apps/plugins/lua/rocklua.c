@@ -26,7 +26,8 @@
 #include "rocklib.h"
 #include "luadir.h"
 
-
+#undef LUA_BITLIBNAME
+#define LUA_BITLIBNAME	"bit"
 
 static const luaL_Reg lualibs[] = {
   {"",              luaopen_base},
@@ -34,7 +35,7 @@ static const luaL_Reg lualibs[] = {
   {LUA_STRLIBNAME,  luaopen_string},
   {LUA_OSLIBNAME,   luaopen_os},
   {LUA_ROCKLIBNAME, luaopen_rock},
-  {LUA_BITLIBNAME,  luaopen_bit},
+  {LUA_BITLIBNAME,  luaopen_bit32},
   {LUA_IOLIBNAME,   luaopen_io},
   {LUA_LOADLIBNAME, luaopen_package},
   {LUA_MATHLIBNAME, luaopen_math},
@@ -43,11 +44,10 @@ static const luaL_Reg lualibs[] = {
 };
 
 static void rocklua_openlibs(lua_State *L) {
-  const luaL_Reg *lib = lualibs;
-  for (; lib->func; lib++) {
-    lua_pushcfunction(L, lib->func);
-    lua_pushstring(L, lib->name);
-    lua_call(L, 1, 0);
+  const luaL_Reg *lib;
+  for (lib = lualibs; lib->func; lib++) {
+    luaL_requiref(L, lib->name, lib->func, 1);
+    lua_pop(L, 1);  /* remove lib */
   }
 }
 

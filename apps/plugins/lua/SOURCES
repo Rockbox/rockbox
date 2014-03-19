@@ -31,12 +31,13 @@ rocklib.c
 tlsf_helper.c
 fscanf.c
 gmtime.c
-strcspn.c
+strspn.c
 strftime.c
 strncat.c
 strpbrk.c
 strtoul.c
 strtol.c
 strstr.c
+getc.c
 rocklua.c
 luadir.c
