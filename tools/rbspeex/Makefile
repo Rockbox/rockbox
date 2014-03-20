@@ -35,15 +35,21 @@ COMPILETARGET = mingw
 else
 # OS X specifics. Needs to consider cross compiling for Windows.
 ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
-# when building libs for OS X build for both i386 and ppc at the same time.
+# When building for 10.4+ we need to use gcc. Otherwise clang is used, so use
+# that to determine if we need to set arch and isysroot.
+ifeq ($(findstring __clang__,$(CPPDEFINES)),__clang__)
+CFLAGS += -mmacosx-version-min=10.5
+else
+# when building libs for OS X 10.4+ build for both i386 and ppc at the same time.
 # This creates fat objects, and ar can only create the archive but not operate
 # on it. As a result the ar call must NOT use the u (update) flag.
-ARCHFLAGS = -arch ppc -arch i386
+ARCHFLAGS += -arch ppc -arch i386
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
-CC ?= gcc-4.0
+CC = gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 NATIVECC ?= gcc-4.0
+endif
 COMPILETARGET = darwin
 else
 COMPILETARGET = posix
