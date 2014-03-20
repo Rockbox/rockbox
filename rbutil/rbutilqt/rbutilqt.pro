@@ -140,6 +140,9 @@ contains(QT_MAJOR_VERSION, 5) {
     win32 {
         QT += multimedia
     }
+    macx {
+        QT += multimedia
+    }
 }
 
 dbg {
@@ -187,6 +190,12 @@ unix:!macx:static {
 }
 
 # if -config intel is specified use 10.5 SDK and don't build for PPC
+contains(QT_MAJOR_VERSION, 5) {
+    macx {
+        CONFIG += intel
+        message("Qt5 doesn't support PPC anymore, building x86 only")
+    }
+}
 macx:!intel {
     CONFIG += ppc
     QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
@@ -195,7 +204,12 @@ macx:!intel {
 }
 macx:intel {
     QMAKE_LFLAGS_X86=-mmacosx-version-min=10.5 -arch i386
-    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
+    contains(QT_MAJOR_VERSION, 5) {
+        QMAKE_MAC_SDK=macosx
+    }
+    !contains(QT_MAJOR_VERSION, 5) {
+        QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
+    }
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 }
 macx {
