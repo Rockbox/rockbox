@@ -37,7 +37,7 @@
 #define MIN_POLYGONS 1
 
 /* Key assignement */
-#define DEMYSTIFY_QUIT                      PLA_CANCEL
+#define DEMYSTIFY_QUIT                      PLA_EXIT
 
 #ifdef HAVE_SCROLLWHEEL
 

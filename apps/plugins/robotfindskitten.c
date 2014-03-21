@@ -469,7 +469,7 @@ static char* messages[] =
 
 #define RFK_VERSION "v1.4142135.406"
 
-#   define RFK_QUIT     PLA_CANCEL
+#   define RFK_QUIT     PLA_EXIT
 #   define RFK_RIGHT    PLA_RIGHT
 #   define RFK_LEFT     PLA_LEFT
 #   define RFK_UP       PLA_UP

@@ -28,7 +28,7 @@
 #define INITIAL_NB_DICES 1
 #define INITIAL_NB_SIDES 2 /* corresponds to 6 sides in the array */
 
-#define DICE_QUIT PLA_CANCEL
+#define DICE_QUIT PLA_EXIT
 #define DICE_ROLL PLA_SELECT
 
 

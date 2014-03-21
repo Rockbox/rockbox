@@ -164,6 +164,17 @@
 #define  GBN_BUTTON_CONTEXT            BUTTON_SELECT | BUTTON_REPEAT
 #define  GBN_BUTTON_NEXT_VAR           BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD)
+#define  GBN_BUTTON_UP                 BUTTON_UP | BUTTON_REL
+#define  GBN_BUTTON_DOWN               BUTTON_DOWN
+#define  GBN_BUTTON_LEFT               BUTTON_BACK
+#define  GBN_BUTTON_RIGHT              BUTTON_MENU
+#define  GBN_BUTTON_RETREAT            BUTTON_VOL_DOWN
+#define  GBN_BUTTON_ADVANCE            BUTTON_VOL_UP
+#define  GBN_BUTTON_MENU               BUTTON_POWER
+#define  GBN_BUTTON_PLAY               BUTTON_PLAY | BUTTON_REL
+#define  GBN_BUTTON_CONTEXT            BUTTON_PLAY | BUTTON_REPEAT
+
 #elif (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN

@@ -54,7 +54,7 @@ const struct button_mapping* plugin_contexts[]= {
 #endif
 };
 
-#define FIRE_QUIT                   PLA_CANCEL
+#define FIRE_QUIT                   PLA_EXIT
 #define FIRE_SWITCH_FLAMES_TYPE     PLA_LEFT
 #define FIRE_SWITCH_FLAMES_MOVING   PLA_RIGHT
 
