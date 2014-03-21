@@ -51,6 +51,8 @@
 #define LOGFQUEUE(...)
 #endif
 
+static char pcmbuf[1024*1024] __attribute__((aligned(16)));
+
 bool audio_is_initialized = false;
 
 /* Event queues */
@@ -68,6 +70,7 @@ static void NORETURN_ATTR audio_thread(void)
     ev.id = Q_NULL; /* something not in switch below */
 
     pcm_postinit();
+    pcmbuf_init(pcmbuf + sizeof(pcmbuf));
 
     while (1)
     {
@@ -149,7 +152,6 @@ void INIT_ATTR audio_init(void)
     }
 
     logf("audio: initializing");
-
     /* Initialize queues before giving control elsewhere in case it likes
        to send messages. Thread creation will be delayed however so nothing
        starts running until ready if something yields such as talk_init. */

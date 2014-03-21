@@ -201,6 +201,7 @@ struct track_info
     int codec_hid;              /* Buffered codec handle ID */
 #endif
     int audio_hid;              /* Main audio data handle ID */
+    size_t seek_pos;            /* Initial seek position, usually 0 */
     size_t filesize;            /* File total length on disk
                                    TODO: This should be stored
                                          in the handle or the
@@ -486,7 +487,7 @@ static void track_info_wipe(struct track_info * info)
     info->codec_hid = ERR_HANDLE_NOT_FOUND;
 #endif
     info->audio_hid = ERR_HANDLE_NOT_FOUND;
-    info->filesize = 0;
+    info->seek_pos = info->filesize = 0;
 }
 
 
@@ -748,6 +749,7 @@ static void audio_reset_buffer_noalloc(
        changed, do check the adjustments after the buffer_alloc call
        as it will likely be affected and need sliding over */
     size_t allocsize;
+#if 0
     /* Subtract whatever the pcm buffer says it used plus the guard
        buffer */
     allocsize = pcmbuf_init(filebuf + filebuflen);
@@ -759,7 +761,7 @@ static void audio_reset_buffer_noalloc(
         goto bufpanic;
 
     filebuflen -= allocsize;
-
+#endif
     /* Scratch memory */
     allocsize = scratch_mem_size();
     if (allocsize > filebuflen)
@@ -773,15 +775,16 @@ static void audio_reset_buffer_noalloc(
 
     buffer_state = AUDIOBUF_STATE_INITIALIZED;
 
-#if defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
+#if 1//defined(ROCKBOX_HAS_LOGF) && defined(LOGF_ENABLE)
     /* Make sure everything adds up - yes, some info is a bit redundant but
        aids viewing and the summation of certain variables should add up to
        the location of others. */
     {
-        logf("fbuf:   %08X", (unsigned)filebuf);
-        logf("fbufe:  %08X", (unsigned)(filebuf + filebuflen));
-        logf("sbuf:   %08X", (unsigned)audio_scratch_memory);
-        logf("sbufe:  %08X", (unsigned)(audio_scratch_memory + allocsize));
+        printf("fbuflen:%d\n", (unsigned)filebuflen);
+        printf("fbuf:   %08X\n", (unsigned)filebuf);
+        printf("fbufe:  %08X\n", (unsigned)(filebuf + filebuflen));
+        printf("sbuf:   %08X\n", (unsigned)audio_scratch_memory);
+        printf("sbufe:  %08X\n", (unsigned)(audio_scratch_memory + allocsize));
     }
 #endif
 
@@ -794,7 +797,7 @@ bufpanic:
 /* Buffer must not move. */
 static int shrink_callback(int handle, unsigned hints, void* start, size_t old_size)
 {
-    struct queue_event ev;
+    static struct queue_event ev;
     static const long filter_list[][2] =
     {
         /* codec messages */
@@ -842,7 +845,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     bool play_queued = queue_peek_ex(&audio_queue, &ev, QPEEK_REMOVE_EVENTS,
                                      filter_list);
 
-    if (playing && ev.data != (intptr_t)&resume)
+    if (play_queued && playing && ev.data != (intptr_t)&resume)
     {
         resume = *(struct audio_resume_info *)ev.data;
 
@@ -1522,6 +1525,9 @@ static bool audio_start_codec(bool auto_skip)
 
     ci.audio_hid = info->audio_hid;
     ci.filesize = info->filesize;
+    if (info->seek_pos > 0)
+        bufseek(info->audio_hid, info->seek_pos);
+    info->seek_pos = 0;
     buf_set_base_handle(info->audio_hid);
 
     /* All required data is now available for the codec */
@@ -2501,6 +2507,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     struct audio_resume_info resume =
         *(resume_info ?: &(struct audio_resume_info){ 0, 0 } );
     enum play_status old_status = play_status;
+    ssize_t seek_pos = 0;
 
     if (flags & AUDIO_START_NEWBUF)
     {
@@ -2514,19 +2521,23 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     {
         logf("%s(%lu, %lu): skipping", __func__, resume.elapsed,
              resume.offset);
+        bool restart = flags & AUDIO_START_RESTART;
+        struct track_info *info = track_list_current(0);
 
-        halt_decoding_track(true);
+        halt_decoding_track(!restart);
 
         track_event_flags = TEF_NONE;
         ff_rw_mode = false;
 
-        if (flags & AUDIO_START_RESTART)
+        if (restart)
         {
             /* Clear out some stuff to resume the current track where it
                left off */
-            pcmbuf_play_stop();
+            //~ pcmbuf_play_stop();
             resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
             resume.offset = id3_get(PLAYING_ID3)->offset;
+            seek_pos = bufftell(info->audio_hid);
+            printf("seek: %ld\n", seek_pos);
             track_list_clear(TRACK_LIST_CLEAR_ALL);
         }
         else
@@ -2601,6 +2612,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     if (trackstat >= LOAD_TRACK_OK)
     {
         /* This is the currently playing track - get metadata, stat */
+        track_list_current(0)->seek_pos = seek_pos;
         playing_id3_sync(track_list_current(0), resume.elapsed, resume.offset);
 
         if (valid_mp3entry(id3_get(PLAYING_ID3)))
@@ -3669,6 +3681,12 @@ void audio_set_cuesheet(bool enable)
         LOGFQUEUE("audio >| audio Q_AUDIO_REMAKE_AUDIO_BUFFER");
         audio_queue_send(Q_AUDIO_REMAKE_AUDIO_BUFFER, 0);
     }
+}
+
+void audio_remake_buffer(void)
+{
+    LOGFQUEUE("audio >| audio Q_AUDIO_REMAKE_AUDIO_BUFFER");
+    audio_queue_send(Q_AUDIO_REMAKE_AUDIO_BUFFER, 0);
 }
 
 #ifdef HAVE_DISK_STORAGE

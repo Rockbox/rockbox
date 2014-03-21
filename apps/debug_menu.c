@@ -408,9 +408,9 @@ static bool dbg_buffering_thread(void)
     int line;    
     bool done = false;
     size_t bufused;
+    struct buffering_debug d;
     size_t bufsize = pcmbuf_get_bufsize();
     int pcmbufdescs = pcmbuf_descs();
-    struct buffering_debug d;
     size_t filebuflen = audio_get_filebuflen();
     /* This is a size_t, but call it a long so it puts a - when it's bad. */
 
@@ -426,9 +426,16 @@ static bool dbg_buffering_thread(void)
         
     while(!done)
     {
+        extern void audio_remake_buffer(void);
         button = get_action(CONTEXT_STD,HZ/5);
         switch(button)
         {
+            case ACTION_STD_CONTEXT:
+                audio_remake_buffer();
+                bufsize = pcmbuf_get_bufsize();
+                pcmbufdescs = pcmbuf_descs();
+                filebuflen = audio_get_filebuflen();
+                break;
             case ACTION_STD_NEXT:
                 audio_next();
                 break;
