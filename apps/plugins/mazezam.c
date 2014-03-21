@@ -40,7 +40,7 @@
 
 #else
 #   include "lib/pluginlib_actions.h"
-#   define MAZEZAM_MENU     PLA_CANCEL
+#   define MAZEZAM_MENU     PLA_EXIT
 #   define MAZEZAM_RIGHT    PLA_RIGHT
 #   define MAZEZAM_LEFT     PLA_LEFT
 #   define MAZEZAM_UP       PLA_UP

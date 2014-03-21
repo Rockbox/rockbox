@@ -316,7 +316,7 @@ enum plugin_status plugin_start(const void* parameter)
                                 plugin_contexts, ARRAYLEN(plugin_contexts));
         switch ( action )
         {
-            case PLA_CANCEL:
+            case PLA_EXIT:
                 return PLUGIN_OK;
             case PLA_SELECT:
                 jackpot_play_turn(&game);

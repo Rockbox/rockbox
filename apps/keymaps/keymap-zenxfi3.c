@@ -47,7 +47,7 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_CANCEL,                BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_STD_OK,                    BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT },
+    { ACTION_STD_OK,                    BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
 
     { ACTION_STD_KEYLOCK,               BUTTON_POWER,                      BUTTON_NONE },
 
@@ -79,8 +79,8 @@ static const struct button_mapping button_context_wps[]  = {
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,                  BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_KBD_LEFT,                  BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_KBD_RIGHT,                 BUTTON_RIGHT,                      BUTTON_NONE },
-    { ACTION_KBD_RIGHT,                 BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_KBD_RIGHT,                 BUTTON_PLAY,                      BUTTON_NONE },
+    { ACTION_KBD_RIGHT,                 BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_KBD_UP,                    BUTTON_UP,                         BUTTON_NONE },
     { ACTION_KBD_UP,                    BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
     { ACTION_KBD_DOWN,                  BUTTON_DOWN,                       BUTTON_NONE },
@@ -102,7 +102,7 @@ static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_TOP,                    BUTTON_UP,                         BUTTON_NONE },
     { ACTION_QS_DOWN,                   BUTTON_DOWN,                       BUTTON_NONE },
     { ACTION_QS_LEFT,                   BUTTON_LEFT,                       BUTTON_NONE },
-    { ACTION_QS_RIGHT,                  BUTTON_RIGHT,                      BUTTON_NONE },
+    { ACTION_QS_RIGHT,                  BUTTON_PLAY,                      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
@@ -149,7 +149,7 @@ static const struct button_mapping button_context_recscreen[]  = {
 
 static const struct button_mapping button_context_settings[]  = {
     /* we overwrite this to avoid select from std */
-    { ACTION_NONE,                      BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT },
+    { ACTION_NONE,                      BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
 
     { ACTION_SETTINGS_INC,              BUTTON_VOL_UP,                     BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,        BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE },
