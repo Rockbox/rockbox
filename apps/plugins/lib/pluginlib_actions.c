@@ -420,11 +420,11 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD)
-    {PLA_CANCEL,            BUTTON_VOL_DOWN,                    BUTTON_NONE},
-    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_VOL_UP,                      BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_VOL_UP|BUTTON_REL,           BUTTON_VOL_UP},
-    {PLA_SELECT_REPEAT,     BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == SONY_NWZ_PAD)
     {PLA_CANCEL,            BUTTON_BACK,                        BUTTON_NONE},
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
