@@ -41,7 +41,7 @@ bool button_debug_screen(void);
 #define BUTTON_VOL_DOWN             0x00000080
 /* For compatibility */
 #define BUTTON_LEFT  BUTTON_BACK
-#define BUTTON_RIGHT BUTTON_PLAY
+#define BUTTON_RIGHT BUTTON_MENU
 
 #define BUTTON_MAIN 0xff
 

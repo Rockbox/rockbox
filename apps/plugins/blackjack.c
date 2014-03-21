@@ -315,6 +315,22 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
+#define BJACK_SELECT_NAME   "PLAY"
+#define BJACK_STAY_NAME     "MENU"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "BACK"
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_MENU
+#define BJACK_DOUBLEDOWN    BUTTON_BACK
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_MENU
+#define BJACK_LEFT          BUTTON_BACK
+
 #elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
 #define BJACK_SELECT_NAME    "SELECT"
 #define BJACK_STAY_NAME     "VOL-"
