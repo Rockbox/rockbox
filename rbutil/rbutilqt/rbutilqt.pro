@@ -89,8 +89,13 @@ extralibs.commands = $$SILENT \
 # flags in this order, put libucl at the end.
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
          mkmpioboot chinachippatcher mkimxboot ucl
-QMAKE_EXTRA_TARGETS += extralibs
-PRE_TARGETDEPS += extralibs
+!msvc {
+    QMAKE_EXTRA_TARGETS += extralibs
+    PRE_TARGETDEPS += extralibs
+}
+msvc {
+    INCLUDEPATH += msvc
+}
 
 # rule for creating ctags file
 tags.commands = ctags -R --c++-kinds=+p --fields=+iaS --extra=+q $(SOURCES)
@@ -105,7 +110,7 @@ QMAKE_EXTRA_TARGETS += lrelease
 }
 
 # Needed by QT on Win
-INCLUDEPATH = $$_PRO_FILE_PWD_ $$_PRO_FILE_PWD_/irivertools \
+INCLUDEPATH += $$_PRO_FILE_PWD_ $$_PRO_FILE_PWD_/irivertools \
             $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/base \
             $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/gui
 INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher \
