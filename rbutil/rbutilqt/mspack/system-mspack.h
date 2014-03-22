@@ -108,7 +108,12 @@ extern int mspack_valid_system(struct mspack_system *sys);
 # define mspack_memcmp memcmp
 #else
 /* inline memcmp() */
-static inline int mspack_memcmp(const void *s1, const void *s2, size_t n) {
+#ifdef _MSC_VER /* MSVC requires use of __inline instead of inline */
+#define INLINE __inline
+#else
+#define INLINE inline
+#endif
+static INLINE int mspack_memcmp(const void *s1, const void *s2, size_t n) {
   unsigned char *c1 = (unsigned char *) s1;
   unsigned char *c2 = (unsigned char *) s2;
   if (n == 0) return 0;
