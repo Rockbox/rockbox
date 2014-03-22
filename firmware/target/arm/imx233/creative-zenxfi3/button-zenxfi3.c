@@ -160,9 +160,10 @@ int button_read_device(void)
             power_ignore_counter = HZ;
     }
     int res = imx233_button_read(touchpad_btns);
-    if(power_ignore_counter >= 0)
-        res &= ~BUTTON_POWER;
-    else
+    if(power_ignore_counter > 0)
+    {
         power_ignore_counter--;
+        res &= ~BUTTON_POWER;
+    }
     return res;
 }
