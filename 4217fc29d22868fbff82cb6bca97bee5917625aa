@@ -1,0 +1,361 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_d7e13cd2",
+        "filename": "apps/plugins/clock/clock.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "I\u0027m not sure it\u0027s a good idea to do that, it might break all other targets. See my general comment.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_b7e6c8e6",
+        "filename": "apps/plugins/demystify.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "Same comment.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_97ebc4b0",
+        "filename": "apps/plugins/dice.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "Same.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_77d150fb",
+        "filename": "apps/plugins/fire.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "Same.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_57ce4c5b",
+        "filename": "apps/plugins/jackpot.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "same.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_37dbd81d",
+        "filename": "apps/plugins/maze.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "same.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_17d8d41c",
+        "filename": "apps/plugins/mazezam.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "same",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_f7032075",
+        "filename": "apps/plugins/minesweeper.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "I would rather putting volume up, I think it\u0027s more natural and less error prone.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_d7081c94",
+        "filename": "apps/plugins/minesweeper.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "And here volume down.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_b7fda870",
+        "filename": "apps/plugins/mp3_encoder.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 2460,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "Why not up/down ?",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_9702a46e",
+        "filename": "apps/plugins/robotfindskitten.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "same.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_77f8307d",
+        "filename": "apps/plugins/rockblox.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "remove space around |",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_57f52c81",
+        "filename": "apps/plugins/rockboy/rockboy.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "why not map BUTTON_BACK to SELECT ?",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_37f2b89b",
+        "filename": "apps/plugins/rockboy/rockboy.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "and BUTTON_MENU to menu ?",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_17efb4b1",
+        "filename": "apps/plugins/rocklife.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "same.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_f72a00e7",
+        "filename": "apps/plugins/rockpaint.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "I\u0027m not sure how practical these combos are, maybe volume up/down can be used to make this simpler. Especially for menu which should be easy to access.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_d72ffcf4",
+        "filename": "apps/plugins/sliding_puzzle.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "volume up or down would be better I think",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_b734884a",
+        "filename": "apps/plugins/sokoban.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "why not volume up/down for level up/down ?",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_573c0c2f",
+        "filename": "apps/plugins/star.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "wouldn\u0027t play|repeat be better ? or is it too error prone ?",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_97398444",
+        "filename": "apps/plugins/star.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "string doesn\u0027t match actual key",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_773f1026",
+        "filename": "apps/plugins/star.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-03-23T12:58:31Z",
+      "side": 1,
+      "message": "also here.",
+      "revId": "4217fc29d22868fbff82cb6bca97bee5917625aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
