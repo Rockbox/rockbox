@@ -89,12 +89,14 @@ extralibs.commands = $$SILENT \
 # flags in this order, put libucl at the end.
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
          mkmpioboot chinachippatcher mkimxboot ucl
-!msvc {
+!win32-msvc* {
     QMAKE_EXTRA_TARGETS += extralibs
     PRE_TARGETDEPS += extralibs
 }
-msvc {
+win32-msvc* {
     INCLUDEPATH += msvc
+    LIBS += -L$$_PRO_FILE_/msvc
+    LIBS += -ladvapi32 # required for MSVC / Qt Creator combination
 }
 
 # rule for creating ctags file
