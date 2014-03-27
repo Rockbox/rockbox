@@ -21,6 +21,8 @@ main-e200r-installer.c
 #elif defined(SANSA_PP_ERASE)
 main-ppsansawipe.c
 fat32format.c
+#elif defined(SANSA_VIEW)
+sansaview.c
 #else
 show_logo.c
 main-pp.c
