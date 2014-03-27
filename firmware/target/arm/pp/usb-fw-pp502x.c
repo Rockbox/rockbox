@@ -93,6 +93,12 @@
 #define USB_GPIO_MASK   0x04
 #define USB_GPIO_VAL    0x04
 
+#elif defined(SANSA_VIEW)
+    /* GPIO A bit 7 is usb detect */
+#define USB_GPIO        GPIOA
+#define USB_GPIO_MASK   0x80
+#define USB_GPIO_VAL    0x80
+
 #else
 #error No USB GPIO config specified
 #endif
