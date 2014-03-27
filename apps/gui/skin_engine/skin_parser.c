@@ -1826,7 +1826,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
     {
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, list->token);
         struct gui_img *img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
-        if (img->bm.data)
+        if (!img->loaded)
         {
             if (img->using_preloaded_icons)
             {
@@ -1835,10 +1835,30 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
             }
             else
             {
-                img->buflib_handle = load_skin_bmp(wps_data, &img->bm, bmpdir);
+                char path[MAX_PATH];
+                int handle;
+                strcpy(path, img->bm.data);
+                handle = load_skin_bmp(wps_data, &img->bm, bmpdir);
+                img->buflib_handle = handle;
                 img->loaded = img->buflib_handle >= 0;
                 if (img->loaded)
+                {
+                    struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, list->next);
+
                     img->subimage_height = img->bm.height / img->num_subimages;
+                    while (imglist)
+                    {
+                        token = SKINOFFSETTOPTR(skin_buffer, imglist->token);
+                        img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
+                        if (!strcmp(path, img->bm.data))
+                        {
+                            img->loaded = true;
+                            img->buflib_handle = handle;
+                            img->subimage_height = img->bm.height / img->num_subimages;
+                        }
+                        imglist = SKINOFFSETTOPTR(skin_buffer, imglist->next);
+                    }
+                }
                 else
                     retval = false;
             }
