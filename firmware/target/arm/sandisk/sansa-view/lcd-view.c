@@ -22,6 +22,7 @@
  ****************************************************************************/
 #include <string.h>
 #include "cpu.h"
+#include "kernel.h"
 #include "system.h"
 #include "backlight-target.h"
 #include "lcd.h"
