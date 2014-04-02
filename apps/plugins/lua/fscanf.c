@@ -266,7 +266,7 @@ static int scan(int (*peek)(void *userp),
 
 static int fspeek(void *userp)
 {
-    int fd = ((int) userp);
+    int fd = *((int*) userp);
     char buf = 0;
     if(rb->read(fd, &buf, 1) == 1)
         rb->lseek(fd, -1, SEEK_CUR);
@@ -275,11 +275,11 @@ static int fspeek(void *userp)
 
 static void fspop(void *userp)
 {
-    int fd = ((int) userp);
+    int fd = *((int*) userp);
     rb->lseek(fd, 1, SEEK_CUR);
 }
 
-int PREFIX(fscanf)(void *fd, const char *fmt, ...)
+int PREFIX(fscanf)(int fd, const char *fmt, ...)
 {
     int r;
     va_list ap;

@@ -30,7 +30,6 @@
 #include <errno.h>
 #define PREFIX(_x_) sim_ ## _x_
 #else
-#undef errno
 extern int errno;
 #define EINVAL          22      /* Invalid argument */
 #define ERANGE          34      /* Math result not representable */
@@ -44,8 +43,7 @@ extern int errno;
 #define memcmp rb->memcmp
 #define strlen rb->strlen
 
-extern int PREFIX(fscanf)(void *fd, const char *fmt, ...);
-extern int PREFIX(getc)(int fd);
+extern int PREFIX(fscanf)(int fd, const char *fmt, ...);
 
 #endif /* _ROCKLIBC_H_ */
 

@@ -1,5 +1,5 @@
 /*
-** $Id: ltm.c,v 2.14.1.1 2013/04/12 18:48:47 roberto Exp $
+** $Id: ltm.c,v 2.8.1.1 2007/12/27 13:02:25 roberto Exp $
 ** Tag methods
 ** See Copyright Notice in lua.h
 */
@@ -19,22 +19,20 @@
 #include "ltm.h"
 
 
-static const char udatatypename[] = "userdata";
 
-LUAI_DDEF const char *const luaT_typenames_[LUA_TOTALTAGS] = {
-  "no value",
-  "nil", "boolean", udatatypename, "number",
-  "string", "table", "function", udatatypename, "thread",
-  "proto", "upval"  /* these last two cases are used for tests only */
+const char *const luaT_typenames[] = {
+  "nil", "boolean", "userdata", "number",
+  "string", "table", "function", "userdata", "thread",
+  "proto", "upval"
 };
 
 
 void luaT_init (lua_State *L) {
   static const char *const luaT_eventname[] = {  /* ORDER TM */
     "__index", "__newindex",
-    "__gc", "__mode", "__len", "__eq",
+    "__gc", "__mode", "__eq",
     "__add", "__sub", "__mul", "__div", "__mod",
-    "__pow", "__unm", "__lt", "__le",
+    "__pow", "__unm", "__len", "__lt", "__le",
     "__concat", "__call"
   };
   int i;
@@ -62,7 +60,7 @@ const TValue *luaT_gettm (Table *events, TMS event, TString *ename) {
 
 const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
   Table *mt;
-  switch (ttypenv(o)) {
+  switch (ttype(o)) {
     case LUA_TTABLE:
       mt = hvalue(o)->metatable;
       break;
@@ -70,7 +68,7 @@ const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
       mt = uvalue(o)->metatable;
       break;
     default:
-      mt = G(L)->mt[ttypenv(o)];
+      mt = G(L)->mt[ttype(o)];
   }
   return (mt ? luaH_getstr(mt, G(L)->tmname[event]) : luaO_nilobject);
 }

@@ -1,212 +1,126 @@
-/*
-** $Id: lbitlib.c,v 1.18.1.2 2013/07/09 18:01:41 roberto Exp $
-** Standard library for bitwise operations
-** See Copyright Notice in lua.h
-*/
+/* Bitwise operations library */
+/* (c) Reuben Thomas 2000-2008 */
+/* bitlib is copyright Reuben Thomas 2000-2008, and is released under the MIT
+   license, like Lua (see http://www.lua.org/copyright.html; it's
+   basically the same as the BSD license). There is no warranty. */
 
-#define lbitlib_c
-#define LUA_LIB
+#include "config.h"
 
 #include "lua.h"
-
 #include "lauxlib.h"
 #include "lualib.h"
+#include <limits.h>
 
 
-/* number of bits to consider in a number */
-#if !defined(LUA_NBITS)
-#define LUA_NBITS	32
+/* FIXME: Assume lua_Integer is ptrdiff_t */
+#define LUA_INTEGER_MAX INTPTR_MAX
+#define LUA_INTEGER_MIN INTPTR_MIN
+
+/* FIXME: Assume size_t is an unsigned lua_Integer */
+typedef size_t lua_UInteger;
+#define LUA_UINTEGER_MAX UINT_MAX
+
+
+/* Bit type size and limits */
+
+#define BIT_BITS (CHAR_BIT * sizeof(lua_Integer))
+
+/* This code may give warnings if BITLIB_FLOAT_* are too big to fit in
+   long, but that doesn't matter since in that case they won't be
+   used. */
+#define BIT_MAX  (LUA_INTEGER_MAX)
+
+#define BIT_MIN  (LUA_INTEGER_MIN)
+
+#define BIT_UMAX (LUA_UINTEGER_MAX)
+
+
+/* Define TOBIT to get a bit value */
+#ifdef BUILTIN_CAST
+#define 
+#define TOBIT(L, n, res)                    \
+  ((void)(res), luaL_checkinteger((L), (n)))
+#else
+
+#define TOBIT(L, n, res)                                            \
+  ((lua_Integer)(((res) = luaL_checknumber(L, (n)) % BIT_UMAX), \
+                 (res) > BIT_MAX ? ((res) -= BIT_UMAX, (res) -= 1) : \
+                 ((res) < BIT_MIN ? ((res) += BIT_UMAX, (res) += 1) : (res))))
 #endif
 
 
-#define ALLONES		(~(((~(lua_Unsigned)0) << (LUA_NBITS - 1)) << 1))
-
-/* macro to trim extra bits */
-#define trim(x)		((x) & ALLONES)
+#define BIT_TRUNCATE(i)                         \
+  ((i) & BIT_UMAX)
 
 
-/* builds a number with 'n' ones (1 <= n <= LUA_NBITS) */
-#define mask(n)		(~((ALLONES << 1) << ((n) - 1)))
+/* Operations
 
+   The macros MONADIC and VARIADIC only deal with bitwise operations.
 
-typedef lua_Unsigned b_uint;
+   LOGICAL_SHIFT truncates its left-hand operand before shifting so
+   that any extra bits at the most-significant end are not shifted
+   into the result.
 
-
-
-static b_uint andaux (lua_State *L) {
-  int i, n = lua_gettop(L);
-  b_uint r = ~(b_uint)0;
-  for (i = 1; i <= n; i++)
-    r &= luaL_checkunsigned(L, i);
-  return trim(r);
-}
-
-
-static int b_and (lua_State *L) {
-  b_uint r = andaux(L);
-  lua_pushunsigned(L, r);
-  return 1;
-}
-
-
-static int b_test (lua_State *L) {
-  b_uint r = andaux(L);
-  lua_pushboolean(L, r != 0);
-  return 1;
-}
-
-
-static int b_or (lua_State *L) {
-  int i, n = lua_gettop(L);
-  b_uint r = 0;
-  for (i = 1; i <= n; i++)
-    r |= luaL_checkunsigned(L, i);
-  lua_pushunsigned(L, trim(r));
-  return 1;
-}
-
-
-static int b_xor (lua_State *L) {
-  int i, n = lua_gettop(L);
-  b_uint r = 0;
-  for (i = 1; i <= n; i++)
-    r ^= luaL_checkunsigned(L, i);
-  lua_pushunsigned(L, trim(r));
-  return 1;
-}
-
-
-static int b_not (lua_State *L) {
-  b_uint r = ~luaL_checkunsigned(L, 1);
-  lua_pushunsigned(L, trim(r));
-  return 1;
-}
-
-
-static int b_shift (lua_State *L, b_uint r, int i) {
-  if (i < 0) {  /* shift right? */
-    i = -i;
-    r = trim(r);
-    if (i >= LUA_NBITS) r = 0;
-    else r >>= i;
+   ARITHMETIC_SHIFT does not truncate its left-hand operand, so that
+   the sign bits are not removed and right shift work properly.
+   */
+  
+#define MONADIC(name, op)                                       \
+  static int bit_ ## name(lua_State *L) {                       \
+    lua_Number f;                                               \
+    lua_pushinteger(L, BIT_TRUNCATE(op TOBIT(L, 1, f)));        \
+    return 1;                                                   \
   }
-  else {  /* shift left */
-    if (i >= LUA_NBITS) r = 0;
-    else r <<= i;
-    r = trim(r);
+
+#define VARIADIC(name, op)                      \
+  static int bit_ ## name(lua_State *L) {       \
+    lua_Number f;                               \
+    int n = lua_gettop(L), i;                   \
+    lua_Integer w = TOBIT(L, 1, f);             \
+    for (i = 2; i <= n; i++)                    \
+      w op TOBIT(L, i, f);                      \
+    lua_pushinteger(L, BIT_TRUNCATE(w));        \
+    return 1;                                   \
   }
-  lua_pushunsigned(L, r);
-  return 1;
-}
 
-
-static int b_lshift (lua_State *L) {
-  return b_shift(L, luaL_checkunsigned(L, 1), luaL_checkint(L, 2));
-}
-
-
-static int b_rshift (lua_State *L) {
-  return b_shift(L, luaL_checkunsigned(L, 1), -luaL_checkint(L, 2));
-}
-
-
-static int b_arshift (lua_State *L) {
-  b_uint r = luaL_checkunsigned(L, 1);
-  int i = luaL_checkint(L, 2);
-  if (i < 0 || !(r & ((b_uint)1 << (LUA_NBITS - 1))))
-    return b_shift(L, r, -i);
-  else {  /* arithmetic shift for 'negative' number */
-    if (i >= LUA_NBITS) r = ALLONES;
-    else
-      r = trim((r >> i) | ~(~(b_uint)0 >> i));  /* add signal bit */
-    lua_pushunsigned(L, r);
-    return 1;
+#define LOGICAL_SHIFT(name, op)                                         \
+  static int bit_ ## name(lua_State *L) {                               \
+    lua_Number f;                                                       \
+    lua_pushinteger(L, BIT_TRUNCATE(BIT_TRUNCATE((lua_UInteger)TOBIT(L, 1, f)) op \
+                                    (unsigned)luaL_checknumber(L, 2))); \
+    return 1;                                                           \
   }
-}
 
+#define ARITHMETIC_SHIFT(name, op)                                      \
+  static int bit_ ## name(lua_State *L) {                               \
+    lua_Number f;                                                       \
+    lua_pushinteger(L, BIT_TRUNCATE((lua_Integer)TOBIT(L, 1, f) op      \
+                                    (unsigned)luaL_checknumber(L, 2))); \
+    return 1;                                                           \
+  }
 
-static int b_rot (lua_State *L, int i) {
-  b_uint r = luaL_checkunsigned(L, 1);
-  i &= (LUA_NBITS - 1);  /* i = i % NBITS */
-  r = trim(r);
-  if (i != 0)  /* avoid undefined shift of LUA_NBITS when i == 0 */
-    r = (r << i) | (r >> (LUA_NBITS - i));
-  lua_pushunsigned(L, trim(r));
-  return 1;
-}
+MONADIC(bnot,  ~)
+VARIADIC(band, &=)
+VARIADIC(bor,  |=)
+VARIADIC(bxor, ^=)
+ARITHMETIC_SHIFT(lshift,  <<)
+LOGICAL_SHIFT(rshift,     >>)
+ARITHMETIC_SHIFT(arshift, >>)
 
-
-static int b_lrot (lua_State *L) {
-  return b_rot(L, luaL_checkint(L, 2));
-}
-
-
-static int b_rrot (lua_State *L) {
-  return b_rot(L, -luaL_checkint(L, 2));
-}
-
-
-/*
-** get field and width arguments for field-manipulation functions,
-** checking whether they are valid.
-** ('luaL_error' called without 'return' to avoid later warnings about
-** 'width' being used uninitialized.)
-*/
-static int fieldargs (lua_State *L, int farg, int *width) {
-  int f = luaL_checkint(L, farg);
-  int w = luaL_optint(L, farg + 1, 1);
-  luaL_argcheck(L, 0 <= f, farg, "field cannot be negative");
-  luaL_argcheck(L, 0 < w, farg + 1, "width must be positive");
-  if (f + w > LUA_NBITS)
-    luaL_error(L, "trying to access non-existent bits");
-  *width = w;
-  return f;
-}
-
-
-static int b_extract (lua_State *L) {
-  int w;
-  b_uint r = luaL_checkunsigned(L, 1);
-  int f = fieldargs(L, 2, &w);
-  r = (r >> f) & mask(w);
-  lua_pushunsigned(L, r);
-  return 1;
-}
-
-
-static int b_replace (lua_State *L) {
-  int w;
-  b_uint r = luaL_checkunsigned(L, 1);
-  b_uint v = luaL_checkunsigned(L, 2);
-  int f = fieldargs(L, 3, &w);
-  int m = mask(w);
-  v &= m;  /* erase bits outside given width */
-  r = (r & ~(m << f)) | (v << f);
-  lua_pushunsigned(L, r);
-  return 1;
-}
-
-
-static const luaL_Reg bitlib[] = {
-  {"arshift", b_arshift},
-  {"band", b_and},
-  {"bnot", b_not},
-  {"bor", b_or},
-  {"bxor", b_xor},
-  {"btest", b_test},
-  {"extract", b_extract},
-  {"lrotate", b_lrot},
-  {"lshift", b_lshift},
-  {"replace", b_replace},
-  {"rrotate", b_rrot},
-  {"rshift", b_rshift},
+static const struct luaL_reg bitlib[] = {
+  {"bnot",    bit_bnot},
+  {"band",    bit_band},
+  {"bor",     bit_bor},
+  {"bxor",    bit_bxor},
+  {"lshift",  bit_lshift},
+  {"rshift",  bit_rshift},
+  {"arshift", bit_arshift},
   {NULL, NULL}
 };
 
-
-
-LUAMOD_API int luaopen_bit32 (lua_State *L) {
-  luaL_newlib(L, bitlib);
+LUALIB_API int luaopen_bit (lua_State *L) {
+  luaL_register(L, "bit", bitlib);
+  lua_pushnumber(L, BIT_BITS);
+  lua_setfield(L, -2, "bits");
   return 1;
 }
-

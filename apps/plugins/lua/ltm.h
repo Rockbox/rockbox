@@ -1,5 +1,5 @@
 /*
-** $Id: ltm.h,v 2.11.1.1 2013/04/12 18:48:47 roberto Exp $
+** $Id$
 ** Tag methods
 ** See Copyright Notice in lua.h
 */
@@ -20,7 +20,6 @@ typedef enum {
   TM_NEWINDEX,
   TM_GC,
   TM_MODE,
-  TM_LEN,
   TM_EQ,  /* last tag method with `fast' access */
   TM_ADD,
   TM_SUB,
@@ -29,6 +28,7 @@ typedef enum {
   TM_MOD,
   TM_POW,
   TM_UNM,
+  TM_LEN,
   TM_LT,
   TM_LE,
   TM_CONCAT,
@@ -43,10 +43,7 @@ typedef enum {
 
 #define fasttm(l,et,e)	gfasttm(G(l), et, e)
 
-#define ttypename(x)	luaT_typenames_[(x) + 1]
-#define objtypename(x)	ttypename(ttypenv(x))
-
-LUAI_DDEC const char *const luaT_typenames_[LUA_TOTALTAGS];
+LUAI_DATA const char *const luaT_typenames[];
 
 
 LUAI_FUNC const TValue *luaT_gettm (Table *events, TMS event, TString *ename);

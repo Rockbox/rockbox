@@ -98,7 +98,7 @@ static int dir_iter_factory (lua_State *L) {
     lua_setmetatable (L, -2);
     d->dir = rb->opendir (path);
     if (d->dir == NULL)
-        luaL_error (L, "cannot open dir %s: %d", path, errno);
+        luaL_error (L, "cannot open %s: %d", path, errno);
 
     return 2;
 }
@@ -125,7 +125,7 @@ static int dir_create_meta (lua_State *L) {
     return 1;
 }
 
-static const struct luaL_Reg fslib[] = {
+static const struct luaL_reg fslib[] = {
     {"dir", dir_iter_factory},
     {"mkdir", make_dir},
     {"rmdir", remove_dir},

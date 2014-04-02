@@ -156,19 +156,7 @@ static int rli_tostring(lua_State *L)
     return 1;
 }
 
-int rli_checkboolean (lua_State *L, int narg) {
-    int b = lua_toboolean(L, narg);
-    if (b == 0)
-        luaL_checktype(L, narg, LUA_TBOOLEAN);
-    return b;
-}
-
-
-int rli_optboolean (lua_State *L, int narg, int def) {
-  return luaL_opt(L, rli_checkboolean, narg, def);
-}
-
-static const struct luaL_Reg rli_lib [] =
+static const struct luaL_reg rli_lib [] =
 {
     {"__tostring", rli_tostring},
     {"set", rli_set},
@@ -484,8 +472,8 @@ RB_WRAP(read_bmp_file)
 {
     struct bitmap bm;
     const char* filename = luaL_checkstring(L, 1);
-    bool dither = rli_optboolean(L, 2, true);
-    bool transparent = rli_optboolean(L, 3, false);
+    bool dither = luaL_optboolean(L, 2, true);
+    bool transparent = luaL_optboolean(L, 3, false);
     int format = FORMAT_NATIVE;
 
     if(dither)
@@ -528,7 +516,7 @@ static void fill_text_message(lua_State *L, struct text_message * message,
 {
     int i;
     luaL_checktype(L, pos, LUA_TTABLE);
-    int n = lua_rawlen(L, pos);
+    int n = luaL_getn(L, pos);
     const char **lines = (const char**) tlsf_malloc(n * sizeof(const char*));
     if(lines == NULL)
         luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
@@ -577,7 +565,7 @@ RB_WRAP(do_menu)
     luaL_checktype(L, 2, LUA_TTABLE);
     start_selected = luaL_optint(L, 3, 0);
 
-    n = lua_rawlen(L, 2);
+    n = luaL_getn(L, 2);
     items = (const char**) tlsf_malloc(n * sizeof(const char*));
     if(items == NULL)
         luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
@@ -770,9 +758,8 @@ extern const luaL_Reg rocklib_aux[];
  */
 LUALIB_API int luaopen_rock(lua_State *L)
 {
-    rli_init(L);
-    luaL_newlib(L, rocklib);
-    luaL_setfuncs(L, rocklib_aux, 0);
+    luaL_register(L, LUA_ROCKLIBNAME, rocklib);
+    luaL_register(L, LUA_ROCKLIBNAME, rocklib_aux);
 
     RB_CONSTANT(HZ);
 
@@ -810,6 +797,7 @@ LUALIB_API int luaopen_rock(lua_State *L)
     RB_STRING_CONSTANT(PLUGIN_DATA_DIR);
     RB_STRING_CONSTANT(VIEWERS_DATA_DIR);
 
+    rli_init(L);
 
     return 1;
 }
