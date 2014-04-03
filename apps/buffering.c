@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 #include <string.h>
+#include "strlcpy.h"
 #include "system.h"
 #include "storage.h"
 #include "thread.h"
