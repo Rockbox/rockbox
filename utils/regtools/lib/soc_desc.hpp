@@ -63,15 +63,17 @@ const soc_reg_flags_t REG_HAS_SCT = 1 << 0; /// register SCT variants
 /** SoC register field named value */
 struct soc_reg_field_value_t
 {
-    std::string name;
-    soc_word_t value;
+    std::string name; /// name of the value
+    soc_word_t value; /// numeric value
+    std::string desc; /// human description
 };
 
 /** SoC register field */
 struct soc_reg_field_t
 {
-    std::string name;
-    unsigned first_bit, last_bit;
+    std::string name; /// name of the field
+    std::string desc; /// human description
+    unsigned first_bit, last_bit; /// bit range of the field
 
     soc_word_t bitmask() const
     {
@@ -94,7 +96,7 @@ struct soc_reg_field_t
 struct soc_reg_addr_t
 {
     std::string name; /// actual register name
-    soc_addr_t addr;
+    soc_addr_t addr; /// actual register address (relative to device)
 };
 
 /** SoC register formula */
@@ -108,8 +110,9 @@ struct soc_reg_formula_t
 struct soc_reg_t
 {
     std::string name; /// generic name (for multi registers) or actual name
-    std::vector< soc_reg_addr_t > addr;
-    soc_reg_formula_t formula;
+    std::string desc; /// human description
+    std::vector< soc_reg_addr_t > addr; /// instances of the registers
+    soc_reg_formula_t formula; /// formula for the instance addresses
     soc_reg_flags_t flags; /// ORed value
 
     std::vector< soc_reg_field_t > field;
@@ -126,6 +129,8 @@ struct soc_dev_addr_t
 struct soc_dev_t
 {
     std::string name; /// generic name (of multi devices) or actual name
+    std::string long_name; /// human friendly name
+    std::string desc; /// human description
     std::string version; /// description version
     std::vector< soc_dev_addr_t > addr;
 
