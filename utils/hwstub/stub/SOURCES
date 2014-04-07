@@ -15,4 +15,8 @@ usb_drv_arc.c
 rk27xx/crt0.S
 rk27xx/usb_drv_rk27xx.c
 rk27xx/target.c
+#elif defined(CONFIG_PP)
+pp/crt0.S
+pp/target.c
+usb_drv_arc.c
 #endif
