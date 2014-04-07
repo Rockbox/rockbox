@@ -5,6 +5,36 @@
 #include "backend.h"
 
 /**
+ * SocFile
+ */
+SocFile::SocFile()
+    :m_valid(false)
+{
+}
+
+SocFile::SocFile(const QString& filename)
+    :m_filename(filename)
+{
+    m_valid = soc_desc_parse_xml(filename.toStdString(), m_soc);
+    soc_desc_normalize(m_soc);
+}
+
+bool SocFile::IsValid()
+{
+    return m_valid;
+}
+
+SocRef SocFile::GetSocRef()
+{
+    return SocRef(this);
+}
+
+QString SocFile::GetFilename()
+{
+    return m_filename;
+}
+
+/**
  * Backend
  */
 
@@ -12,33 +42,31 @@ Backend::Backend()
 {
 }
 
-QStringList Backend::GetSocNameList()
+
+QList< SocFileRef > Backend::GetSocFileList()
 {
-    QStringList sl;
-    foreach(const soc_t& soc, m_socs)
-        sl.append(QString(soc.name.c_str()));
-    return sl;
+    QList< SocFileRef > list;
+    for(std::list< SocFile >::iterator it = m_socs.begin(); it != m_socs.end(); ++it)
+        list.append(SocFileRef(&(*it)));
+    return list;
 }
 
-bool Backend::GetSocByName(const QString& name, SocRef& s)
+QList< SocRef > Backend::GetSocList()
 {
-    for(std::list< soc_t >::iterator it = m_socs.begin(); it != m_socs.end(); ++it)
-        if(it->name == name.toStdString())
-        {
-            s = SocRef(&(*it));
-            return true;
-        }
-    return false;
+    QList< SocRef > list;
+    for(std::list< SocFile >::iterator it = m_socs.begin(); it != m_socs.end(); ++it)
+        list.append(it->GetSocRef());
+    return list;
 }
 
 bool Backend::LoadSocDesc(const QString& filename)
 {
-    std::vector< soc_t > new_socs;
-    bool ret = soc_desc_parse_xml(filename.toStdString(), new_socs);
-    for(size_t i = 0; i < new_socs.size(); i++)
-        m_socs.push_back(new_socs[i]);
+    SocFile f(filename);
+    if(!f.IsValid())
+        return false;
+    m_socs.push_back(f);
     emit OnSocListChanged();
-    return ret;
+    return true;
 }
 
 IoBackend *Backend::CreateFileIoBackend(const QString& filename)
@@ -321,7 +349,7 @@ HWStubBackendHelper::HWStubBackendHelper()
     if(m_hotplug)
     {
         m_hotplug = LIBUSB_SUCCESS == libusb_hotplug_register_callback(
-            NULL, LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+            NULL,   (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
             LIBUSB_HOTPLUG_ENUMERATE, HWSTUB_USB_VID, HWSTUB_USB_PID, HWSTUB_CLASS,
             &HWStubBackendHelper::HotPlugCallback, reinterpret_cast< void* >(this), &m_hotplug_handle);
     }
@@ -364,6 +392,7 @@ void HWStubBackendHelper::OnHotPlug(bool arrived, struct libusb_device *dev)
 int HWStubBackendHelper::HotPlugCallback(struct libusb_context *ctx, struct libusb_device *dev,
     libusb_hotplug_event event, void *user_data)
 {
+    Q_UNUSED(ctx);
     HWStubBackendHelper *helper = reinterpret_cast< HWStubBackendHelper* >(user_data);
     switch(event)
     {

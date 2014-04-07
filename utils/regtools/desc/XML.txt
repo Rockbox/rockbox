@@ -9,6 +9,11 @@ Example:
 <!-- desc -->
 </xml>
 
+Root Element: root
+------------------
+The root element can either be "soc" tag if the file contains a single description,
+or "root" with no properties and one or more "soc" tags as children.
+
 Element: soc
 ------------
 The XML can contain one or more SoC description. Each description is enclosed in

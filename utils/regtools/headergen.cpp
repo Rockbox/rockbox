@@ -574,11 +574,15 @@ int main(int argc, char **argv)
 
     std::vector< soc_t > socs;
     for(int i = optind; i < argc - 1; i++)
-        if(!soc_desc_parse_xml(argv[i], socs))
+    {
+        soc_t s;
+        if(!soc_desc_parse_xml(argv[i], s))
         {
             printf("Cannot parse %s\n", argv[i]);
             return 1;
         }
+        socs.push_back(s);
+    }
 
     g_gen_selector = force_selector || socs.size() > 1;
 

@@ -25,6 +25,7 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <map>
 
 /**
  * These data structures represent the SoC register in a convenient way.
@@ -50,6 +51,21 @@ typedef uint32_t soc_addr_t;
 typedef uint32_t soc_word_t;
 typedef uint32_t soc_reg_flags_t;
 
+/** SoC error gravity level */
+enum soc_error_level_t
+{
+    SOC_ERROR_WARNING,
+    SOC_ERROR_FATAL,
+};
+
+/** SoC description error */
+struct soc_error_t
+{
+    soc_error_level_t level; /// level (warning, fatal, ...)
+    std::string location; /// human description of the location
+    std::string message; /// message
+};
+
 /** SoC register generic formula */
 enum soc_reg_formula_type_t
 {
@@ -66,6 +82,8 @@ struct soc_reg_field_value_t
     std::string name; /// name of the value
     soc_word_t value; /// numeric value
     std::string desc; /// human description
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
 /** SoC register field */
@@ -90,6 +108,8 @@ struct soc_reg_field_t
     }
 
     std::vector< soc_reg_field_value_t > value;
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
 /** SoC register address */
@@ -97,6 +117,8 @@ struct soc_reg_addr_t
 {
     std::string name; /// actual register name
     soc_addr_t addr; /// actual register address (relative to device)
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
 /** SoC register formula */
@@ -104,6 +126,8 @@ struct soc_reg_formula_t
 {
     enum soc_reg_formula_type_t type;
     std::string string; /// for STRING
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
 /** SoC register */
@@ -116,6 +140,8 @@ struct soc_reg_t
     soc_reg_flags_t flags; /// ORed value
 
     std::vector< soc_reg_field_t > field;
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
 /** Soc device address */
@@ -123,6 +149,8 @@ struct soc_dev_addr_t
 {
     std::string name; /// actual device name
     soc_addr_t addr;
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
 /** SoC device */
@@ -135,6 +163,8 @@ struct soc_dev_t
     std::vector< soc_dev_addr_t > addr;
 
     std::vector< soc_reg_t > reg;
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
 /** SoC */
@@ -144,10 +174,23 @@ struct soc_t
     std::string desc; /// SoC name
 
     std::vector< soc_dev_t > dev;
+
+    std::vector< soc_error_t > errors(bool recursive);
 };
 
-/** Parse a SoC description from a XML file, append it to <soc>. A file
- * can contain multiple SoC descriptions */
-bool soc_desc_parse_xml(const std::string& filename, std::vector< soc_t >& soc);
+/** Parse a SoC description from a XML file, append it to <soc>. */
+bool soc_desc_parse_xml(const std::string& filename, soc_t& soc);
+/** Write a SoC description to a XML file, overwriting it. A file can contain
+ * multiple Soc descriptions */
+bool soc_desc_produce_xml(const std::string& filename, const soc_t& soc);
+/** Normalise a soc description by reordering elemnts so that:
+ * - devices are sorted by first name
+ * - registers are sorted by first address
+ * - fields are sorted by last bit
+ * - values are sorted by value */
+void soc_desc_normalize(soc_t& soc);
+/** Formula parser: try to parse and evaluate a formula to a specific value of 'n' */
+bool soc_desc_evaluate_formula(const std::string& formula,
+    const std::map< std::string, soc_word_t>& var, soc_word_t& result, std::string& error);
 
 #endif /* __SOC_DESC__ */

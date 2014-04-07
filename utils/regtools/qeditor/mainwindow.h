@@ -7,11 +7,19 @@
 #include "backend.h"
 #include "settings.h"
 
+class DocumentTab
+{
+public:
+    virtual bool Quit() = 0;
+    virtual void OnModified(bool modified) = 0;
+};
+
 class MyTabWidget : public QTabWidget
 {
     Q_OBJECT
 public:
     MyTabWidget();
+    bool CloseTab(int index);
 
 private slots:
     void OnCloseTab(int index);
@@ -30,15 +38,21 @@ public:
 private:
     void closeEvent(QCloseEvent *event);
 
+protected:
+    void AddTab(QWidget *tab, const QString& title);
+    bool Quit();
+
 private slots:
     void OnQuit();
     void OnAbout();
     void OnAboutQt();
     void OnLoadDesc();
     void OnNewRegTab();
+    void OnNewRegEdit();
+    void OnTabModified(bool modified);
 
 private:
-    QTabWidget *m_tab;
+    MyTabWidget *m_tab;
     Backend *m_backend;
 };
 

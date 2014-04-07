@@ -23,6 +23,7 @@ ClockAnalyser::ClockAnalyser(const SocRef& soc, IoBackend *backend)
 
 ClockAnalyser::~ClockAnalyser()
 {
+    delete m_group;
 }
 
 QWidget *ClockAnalyser::GetWidget()
@@ -287,9 +288,9 @@ void ClockAnalyser::FillTree()
     else
         AddClock(ref_xtal, "clk_rtc32k", INVALID);
 
-    (void) clk_x;
-    (void) clk_gpmi;
-    (void) clk_h;
+    Q_UNUSED(clk_x);
+    Q_UNUSED(clk_gpmi);
+    Q_UNUSED(clk_h);
 
     m_tree_widget->expandAll();
     m_tree_widget->resizeColumnToContents(0);
@@ -334,6 +335,7 @@ EmiAnalyser::EmiAnalyser(const SocRef& soc, IoBackend *backend)
 
 EmiAnalyser::~EmiAnalyser()
 {
+    delete m_group;
 }
 
 QWidget *EmiAnalyser::GetWidget()
@@ -671,6 +673,7 @@ PinAnalyser::PinAnalyser(const SocRef& soc, IoBackend *backend)
 
 PinAnalyser::~PinAnalyser()
 {
+    delete m_group;
 }
 
 QWidget *PinAnalyser::GetWidget()

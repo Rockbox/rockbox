@@ -1,0 +1,28 @@
+<!-- Format specification of the 1.0 register description files. Files are
+ considered to be version 1.0 if no version field is specified -->
+<!ELEMENT soc (dev)*>
+<!ATTLIST soc name CDATA #REQUIRED>
+<!ATTLIST soc desc CDATA #IMPLIED>
+<!ELEMENT dev (addr|reg)*>
+<!ATTLIST dev name CDATA #REQUIRED>
+<!ATTLIST dev long_name CDATA #IMPLIED>
+<!ATTLIST dev desc CDATA #IMPLIED>
+<!ATTLIST dev version CDATA #IMPLIED>
+<!ELEMENT addr EMPTY>
+<!ATTLIST addr name CDATA #REQUIRED>
+<!ATTLIST addr addr CDATA #REQUIRED>
+<!ELEMENT reg (addr|field|formula)*>
+<!ATTLIST reg name CDATA #REQUIRED>
+<!ATTLIST reg addr CDATA #IMPLIED>
+<!ATTLIST reg desc CDATA #IMPLIED>
+<!ATTLIST reg sct (yes|no) "no">
+<!ELEMENT formula EMPTY>
+<!ATTLIST formula string CDATA #IMPLIED>
+<!ELEMENT field (value)*>
+<!ATTLIST field name CDATA #REQUIRED>
+<!ATTLIST field desc CDATA #IMPLIED>
+<!ATTLIST field bitrange CDATA #REQUIRED>
+<!ELEMENT value EMPTY>
+<!ATTLIST value name CDATA #REQUIRED>
+<!ATTLIST value value CDATA #REQUIRED>
+<!ATTLIST value desc CDATA #IMPLIED>

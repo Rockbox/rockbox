@@ -5,13 +5,14 @@
 #include <QVector>
 #include <QString>
 #include "backend.h"
+#include "regtab.h"
 
-class Analyser : public QObject
+class Analyser : public RegTabPanel
 {
-    Q_OBJECT
 public:
     Analyser(const SocRef& soc, IoBackend *backend);
     virtual ~Analyser();
+    virtual void AllowWrite(bool en) { Q_UNUSED(en); }
     virtual QWidget *GetWidget() = 0;
 
 protected:

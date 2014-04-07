@@ -12,6 +12,7 @@
 
 #include "mainwindow.h"
 #include "regtab.h"
+#include "regedit.h"
 
 MyTabWidget::MyTabWidget()
 {
@@ -20,23 +21,37 @@ MyTabWidget::MyTabWidget()
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
 }
 
-void MyTabWidget::OnCloseTab(int index)
+bool MyTabWidget::CloseTab(int index)
 {
     QWidget *w = this->widget(index);
-    removeTab(index);
-    delete w;
+    DocumentTab *doc = dynamic_cast< DocumentTab* >(w);
+    if(doc->Quit())
+    {
+        removeTab(index);
+        delete w;
+        return true;
+    }
+    else
+        return false;
+}
+
+void MyTabWidget::OnCloseTab(int index)
+{
+    CloseTab(index);
 }
 
 MainWindow::MainWindow(Backend *backend)
     :m_backend(backend)
 {
-    QAction *new_regtab_act = new QAction(QIcon::fromTheme("document-new"), tr("&Register Tab"), this);
+    QAction *new_regtab_act = new QAction(QIcon::fromTheme("document-new"), tr("Register &Tab"), this);
+    QAction *new_regedit_act = new QAction(QIcon::fromTheme("document-edit"), tr("Register &Editor"), this);
     QAction *load_desc_act = new QAction(QIcon::fromTheme("document-open"), tr("&Soc Description"), this);
     QAction *quit_act = new QAction(QIcon::fromTheme("application-exit"), tr("&Quit"), this);
     QAction *about_act = new QAction(QIcon::fromTheme("help-about"), tr("&About"), this);
     QAction *about_qt_act = new QAction(QIcon::fromTheme("help-about"), tr("About &Qt"), this);
 
     connect(new_regtab_act, SIGNAL(triggered()), this, SLOT(OnNewRegTab()));
+    connect(new_regedit_act, SIGNAL(triggered()), this, SLOT(OnNewRegEdit()));
     connect(load_desc_act, SIGNAL(triggered()), this, SLOT(OnLoadDesc()));
     connect(quit_act, SIGNAL(triggered()), this, SLOT(OnQuit()));
     connect(about_act, SIGNAL(triggered()), this, SLOT(OnAbout()));
@@ -48,6 +63,7 @@ MainWindow::MainWindow(Backend *backend)
     file_menu->addAction(quit_act);
 
     new_submenu->addAction(new_regtab_act);
+    new_submenu->addAction(new_regedit_act);
 
     load_submenu->addAction(load_desc_act);
 
@@ -91,6 +107,8 @@ void MainWindow::OnAboutQt()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if(!Quit())
+        return event->ignore();
     WriteSettings();
     event->accept();
 }
@@ -100,7 +118,7 @@ void MainWindow::OnLoadDesc()
     QFileDialog *fd = new QFileDialog(this);
     fd->setFilter("XML files (*.xml);;All files (*)");
     fd->setFileMode(QFileDialog::ExistingFiles);
-    fd->setDirectory(Settings::Get()->value("mainwindow/loaddescdir", QDir::currentPath()).toString());
+    fd->setDirectory(Settings::Get()->value("loaddescdir", QDir::currentPath()).toString());
     if(fd->exec())
     {
         QStringList filenames = fd->selectedFiles();
@@ -111,11 +129,42 @@ void MainWindow::OnLoadDesc()
                 msg.setText(QString("Cannot load ") + filenames[i]);
                 msg.exec();
             }
-        Settings::Get()->setValue("mainwindow/loaddescdir", fd->directory().absolutePath());
+        Settings::Get()->setValue("loaddescdir", fd->directory().absolutePath());
     }
+}
+
+void MainWindow::OnTabModified(bool modified)
+{
+    QWidget *sender = qobject_cast< QWidget* >(QObject::sender());
+    int index = m_tab->indexOf(sender);
+    if(modified)
+        m_tab->setTabIcon(index, QIcon::fromTheme("document-save"));
+    else
+        m_tab->setTabIcon(index, QIcon());
+}
+
+void MainWindow::AddTab(QWidget *tab, const QString& title)
+{
+    connect(tab, SIGNAL(OnModified(bool)), this, SLOT(OnTabModified(bool)));
+    m_tab->setCurrentIndex(m_tab->addTab(tab, title));
 }
 
 void MainWindow::OnNewRegTab()
 {
-    m_tab->addTab(new RegTab(m_backend), "Register Tab");
+    AddTab(new RegTab(m_backend, this), "Register Tab");
+}
+
+void MainWindow::OnNewRegEdit()
+{
+    AddTab(new RegEdit(m_backend, this), "Register Editor");
+}
+
+bool MainWindow::Quit()
+{
+    while(m_tab->count() > 0)
+    {
+        if(!m_tab->CloseTab(0))
+            return false;
+    }
+    return true;
 }

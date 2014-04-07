@@ -21,7 +21,6 @@
 
 class ClockAnalyser : public Analyser
 {
-    Q_OBJECT
 public:
     ClockAnalyser(const SocRef& soc, IoBackend *backend);
     virtual ~ClockAnalyser();
@@ -50,7 +49,7 @@ private:
 /**
  * EMI analyser
  */
-class EmiAnalyser : public Analyser
+class EmiAnalyser : public QObject, public Analyser
 {
     Q_OBJECT
 public:
@@ -96,7 +95,6 @@ private:
  */
 class PinAnalyser : public Analyser
 {
-    Q_OBJECT
 public:
     PinAnalyser(const SocRef& soc, IoBackend *backend);
     virtual ~PinAnalyser();

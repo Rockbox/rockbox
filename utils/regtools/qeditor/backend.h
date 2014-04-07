@@ -5,10 +5,11 @@
 #include <QStringList>
 #include <QMap>
 #include <QVector>
-#include "soc_desc.hpp"
+#include <QMetaType>
 #ifdef HAVE_HWSTUB
 #include "hwstub.h"
 #endif
+#include "soc.h"
 
 class IoBackend : public QObject
 {
@@ -62,18 +63,18 @@ class DummyIoBackend : public IoBackend
 public:
     DummyIoBackend() {}
 
-    virtual bool SupportAccess(AccessType type) { (void) type; return false; }
+    virtual bool SupportAccess(AccessType type) { Q_UNUSED(type); return false; }
     virtual QString GetSocName() { return ""; }
     virtual bool ReadRegister(const QString& name, soc_word_t& value) 
-        { (void) name; (void) value; return false; }
+        { Q_UNUSED(name); Q_UNUSED(value); return false; }
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value) 
-        { (void) addr; (void) value; return false; }
+        { Q_UNUSED(addr); Q_UNUSED(value); return false; }
     virtual bool Reload() { return false; }
     virtual bool IsReadOnly() { return true; }
     virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
-        { (void) name; (void) value; (void) mode; return false; }
+        { Q_UNUSED(name); Q_UNUSED(value); Q_UNUSED(mode); return false; }
     virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
-        { (void) addr; (void) value; (void) mode; return false; }
+        { Q_UNUSED(addr); Q_UNUSED(value); Q_UNUSED(mode); return false; }
     virtual bool IsDirty() { return false; }
     virtual bool Commit() { return false; }
 };
@@ -90,12 +91,12 @@ public:
     virtual QString GetSocName();
     virtual bool ReadRegister(const QString& name, soc_word_t& value);
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value)
-        { (void) addr; (void) value; return false; }
+        { Q_UNUSED(addr); Q_UNUSED(value); return false; }
     virtual bool Reload();
     virtual bool IsReadOnly() { return m_readonly; }
     virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode);
     virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
-        { (void) addr; (void) value; (void) mode; return false; }
+        { Q_UNUSED(addr); Q_UNUSED(value); Q_UNUSED(mode); return false; }
     virtual bool IsDirty() { return m_dirty; }
     virtual bool Commit();
 
@@ -149,12 +150,12 @@ public:
     virtual bool SupportAccess(AccessType type) { return type == ByAddress; }
     virtual QString GetSocName();
     virtual bool ReadRegister(const QString& name, soc_word_t& value)
-        { (void) name; (void) value; return false; }
+        { Q_UNUSED(name); Q_UNUSED(value); return false; }
     virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value);
     virtual bool Reload();
     virtual bool IsReadOnly() { return false; }
     virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
-        { (void) name; (void) value; (void) mode; return false; }
+        { Q_UNUSED(name); Q_UNUSED(value); Q_UNUSED(mode); return false; }
     virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode);
     virtual bool IsDirty() { return false; }
     virtual bool Commit() { return true; }
@@ -191,15 +192,47 @@ protected:
 };
 #endif
 
-class SocRef
+class SocRef;
+
+class SocFile
 {
 public:
-    SocRef():m_soc(0) {}
-    SocRef(const soc_t *soc):m_soc(soc) {}
-    const soc_t& GetSoc() const { return *m_soc; }
+    SocFile();
+    SocFile(const QString& filename);
+    bool IsValid();
+
+    SocRef GetSocRef();
+    QString GetFilename();
+    soc_t& GetSoc() { return m_soc; }
+
 protected:
-    const soc_t *m_soc;
+    bool m_valid;
+    QString m_filename;
+    soc_t m_soc;
 };
+
+class SocFileRef
+{
+public:
+    SocFileRef():m_socfile(0) {}
+    SocFileRef(SocFile *file):m_socfile(file) {}
+    SocFile *GetSocFile() const { return m_socfile; }
+
+protected:
+    SocFile *m_socfile;
+};
+
+Q_DECLARE_METATYPE(SocFileRef)
+
+class SocRef : public SocFileRef
+{
+public:
+    SocRef() {}
+    SocRef(SocFile *file):SocFileRef(file) {}
+    soc_t& GetSoc() const { return GetSocFile()->GetSoc(); }
+};
+
+Q_DECLARE_METATYPE(SocRef)
 
 class SocDevRef : public SocRef
 {
@@ -208,9 +241,9 @@ public:
     SocDevRef(const SocRef& soc, int dev_idx, int dev_addr_idx)
         :SocRef(soc), m_dev_idx(dev_idx), m_dev_addr_idx(dev_addr_idx) {}
     int GetDevIndex() const { return m_dev_idx; }
-    const soc_dev_t& GetDev() const { return GetSoc().dev[GetDevIndex()]; }
+    soc_dev_t& GetDev() const { return GetSoc().dev[GetDevIndex()]; }
     int GetDevAddrIndex() const { return m_dev_addr_idx; }
-    const soc_dev_addr_t& GetDevAddr() const { return GetDev().addr[GetDevAddrIndex()]; }
+    soc_dev_addr_t& GetDevAddr() const { return GetDev().addr[GetDevAddrIndex()]; }
 protected:
     int m_dev_idx, m_dev_addr_idx;
 };
@@ -222,9 +255,9 @@ public:
     SocRegRef(const SocDevRef& dev, int reg_idx, int reg_addr_idx)
         :SocDevRef(dev), m_reg_idx(reg_idx), m_reg_addr_idx(reg_addr_idx) {}
     int GetRegIndex() const { return m_reg_idx; }
-    const soc_reg_t& GetReg() const { return GetDev().reg[GetRegIndex()]; }
+    soc_reg_t& GetReg() const { return GetDev().reg[GetRegIndex()]; }
     int GetRegAddrIndex() const { return m_reg_addr_idx; }
-    const soc_reg_addr_t& GetRegAddr() const { return GetReg().addr[GetRegAddrIndex()]; }
+    soc_reg_addr_t& GetRegAddr() const { return GetReg().addr[GetRegAddrIndex()]; }
 protected:
     int m_reg_idx, m_reg_addr_idx;
 };
@@ -236,7 +269,7 @@ public:
     SocFieldRef(const SocRegRef& reg, int field_idx)
         :SocRegRef(reg), m_field_idx(field_idx) {}
     int GetFieldIndex() const { return m_field_idx; }
-    const soc_reg_field_t& GetField() const { return GetReg().field[GetFieldIndex()]; }
+    soc_reg_field_t& GetField() const { return GetReg().field[GetFieldIndex()]; }
 protected:
     int m_field_idx;
 };
@@ -247,9 +280,9 @@ class Backend : public QObject
 public:
     Backend();
 
-    QStringList GetSocNameList();
+    QList< SocFileRef > GetSocFileList();
+    QList< SocRef > GetSocList();
     bool LoadSocDesc(const QString& filename);
-    bool GetSocByName(const QString& name, SocRef& s);
     IoBackend *CreateDummyIoBackend();
     IoBackend *CreateFileIoBackend(const QString& filename);
 #ifdef HAVE_HWSTUB
@@ -259,7 +292,7 @@ public:
 signals:
     void OnSocListChanged();
 private:
-    std::list< soc_t > m_socs;
+    std::list< SocFile > m_socs;
 };
 
 class BackendHelper
