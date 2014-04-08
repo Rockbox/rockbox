@@ -88,10 +88,7 @@ struct playlist_info
     bool in_ram;         /* playlist stored in ram (dirplay)        */
     int buffer_handle;   /* handle to the below buffer (-1 if non-buflib) */
 
-    union {
-        volatile char *buffer;/* buffer for in-ram playlists        */
-        int  *seek_buf;       /* buffer for seeks in real playlists */
-    };
+    volatile char *buffer;/* buffer for in-ram playlists        */
     int  buffer_size;    /* size of buffer                          */
     int  buffer_end_pos; /* last position where buffer was written  */
     int  index;          /* index of current playing track          */
@@ -184,7 +181,8 @@ char *playlist_get_name(const struct playlist_info* playlist, char *buf,
                         int buf_size);
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);
-int playlist_save(struct playlist_info* playlist, char *filename);
+int playlist_save(struct playlist_info* playlist, char *filename,
+                  void* temp_buffer, size_t temp_buffer_size);
 int playlist_directory_tracksearch(const char* dirname, bool recurse,
                                    int (*callback)(char*, void*),
                                    void* context);

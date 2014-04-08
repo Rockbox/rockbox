@@ -61,7 +61,7 @@ int save_playlist_screen(struct playlist_info* playlist)
 
     if (!kbd_input(temp, sizeof(temp)))
     {
-        playlist_save(playlist, temp);
+        playlist_save(playlist, temp, NULL, 0);
 
         /* reload in case playlist was saved to cwd */
         reload_directory();
@@ -113,4 +113,3 @@ MAKE_MENU(playlist_options, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
           &create_playlist_item, &view_cur_playlist,
           &save_playlist, &clear_catalog_directory_item);
-
