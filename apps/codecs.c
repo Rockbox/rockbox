@@ -71,8 +71,6 @@ extern unsigned char codecbuf[];
 
 static size_t codec_size;
 
-extern void* plugin_get_audio_buffer(size_t *buffer_size);
-
 struct codec_api ci = {
 
     0,    /* filesize */

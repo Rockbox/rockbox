@@ -160,7 +160,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 228
+#define PLUGIN_API_VERSION 229
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -976,6 +976,7 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    void (*plugin_release_audio_buffer)(void);
 };
 
 /* plugin header */
@@ -1006,12 +1007,6 @@ extern unsigned char plugin_end_addr[];
 #endif /* PLUGIN */
 
 int plugin_load(const char* plugin, const void* parameter);
-void* plugin_get_audio_buffer(size_t *buffer_size);
-
-/* plugin_tsr,
-    callback returns true to allow the new plugin to load,
-    reenter means the currently running plugin is being reloaded */
-void plugin_tsr(bool (*exit_callback)(bool reenter));
 
 /* defined by the plugin */
 extern const struct plugin_api *rb;
