@@ -316,3 +316,15 @@ you to configure settings related to audio playback.
   This option rewinds the current track by a small amount whenever it is
   paused (not stopped).  The amount to rewind can be set between 0 and
   15 seconds.
+
+\opt{swcodec}{
+  \opt{play_frequency}{
+    \section{Frequency}\index{Frequency}
+      This is the sampling frequency used for the rockbox playback engine.  Audio
+      at a different sampling rate will be converted to this sampling rate prior to
+      mixing using a cubic Hermite polynomial resampler.
+      \note{For best quality and battery life, select the sampling rate used by
+      your audio.  This is typically 44.1kHz.}
+      \note{Opus files are always 48kHz.}
+  }
+}%\opt{swcodec}
