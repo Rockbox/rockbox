@@ -7,7 +7,7 @@ AS=arm-elf-eabi-gcc
 OC=arm-elf-eabi-objcopy
 DEFINES=
 INCLUDES=-I$(CURDIR)
-GCCOPTS=-mcpu=arm926ej-s
+GCCOPTS=-mcpu=arm7tdmi
 BUILD_DIR=$(CURDIR)/build/
 ROOT_DIR=$(CURDIR)/..
 

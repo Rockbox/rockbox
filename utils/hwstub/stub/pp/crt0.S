@@ -5,9 +5,25 @@
 start:
     sub     r7, pc, #8 /* Copy running address */
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
-    /* The stub could be located at a virtual address so killing the MMU at
-     * this point would be mere suicide. We assume that the remap location
-     * is identically mapped and kill the MMU after the copy */
+
+    /* Get processor ID */
+    ldr     r0, =0x60000000 /* PROC_ID */
+    ldrb    r4, [r0]
+
+    /* Halt the COP */
+    ldr     r6, =0x60007004 /* COP_CTL */
+    cmp     r4, #0x55   /* CPU_ID */
+1:
+    ldrne   r1, [r6]
+    orrne   r1, #0x80000000 /* PROC_SLEEP */
+    strne   r1, [r6]
+    bne     1b
+
+    /* Wait for the COP to be stopped */
+1:
+    ldr     r0, [r6]
+    tst     r0, #0x80000000 /* PROC_SLEEP */
+    beq     1b
 
     /* Relocate to right address */
     mov    r2, r7
@@ -19,16 +35,11 @@ start:
     strhi   r5, [r3], #4
     bhi     1b
     mov     r2, #0
-    mcr     p15, 0, r2, c7, c5, 0   @ Invalidate ICache
+    /* FIXME invalid Icache here ? */
     /* Jump to real location */
     ldr     pc, =remap
 remap:
-    /* Disable MMU, disable caching and buffering;
-     * use low exception range address */
-    mrc     p15, 0, r0, c1, c0, 0
-    ldr     r1, =0x3005
-    bic     r0, r1
-    mcr     p15, 0, r0, c1, c0, 0
+    /* NOTE on PP611x, we should make sure the MMU is disabled at this point */
     /* clear bss */
     ldr     r2, =bss_start
     ldr     r3, =bss_end

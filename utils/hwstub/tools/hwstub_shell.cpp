@@ -44,6 +44,7 @@ struct hwstub_version_desc_t g_hwdev_ver;
 struct hwstub_layout_desc_t g_hwdev_layout;
 struct hwstub_target_desc_t g_hwdev_target;
 struct hwstub_stmp_desc_t g_hwdev_stmp;
+struct hwstub_pp_desc_t g_hwdev_pp;
 lua_State *g_lua;
 
 /**
@@ -278,6 +279,8 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "UNK");
     lua_pushinteger(g_lua, HWSTUB_TARGET_STMP);
     lua_setfield(g_lua, -2, "STMP");
+    lua_pushinteger(g_lua, HWSTUB_TARGET_PP);
+    lua_setfield(g_lua, -2, "PP");
     lua_pushinteger(g_lua, HWSTUB_TARGET_RK27);
     lua_setfield(g_lua, -2, "RK27");
     lua_setfield(g_lua, -2, "target");
@@ -292,6 +295,15 @@ bool my_lua_import_hwstub()
         lua_pushinteger(g_lua, g_hwdev_stmp.bPackage);
         lua_setfield(g_lua, -2, "package");
         lua_setfield(g_lua, -2, "stmp");
+    }
+    else if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
+    {
+        lua_newtable(g_lua); // pp
+        lua_pushinteger(g_lua, g_hwdev_pp.wChipID);
+        lua_setfield(g_lua, -2, "chipid");
+        lua_pushlstring(g_lua, (const char *)g_hwdev_pp.bRevision, 2);
+        lua_setfield(g_lua, -2, "rev");
+        lua_setfield(g_lua, -2, "pp");
     }
 
     lua_pushlightuserdata(g_lua, (void *)&hw_read8);
@@ -788,6 +800,17 @@ int main(int argc, char **argv)
         if(ret != sizeof(g_hwdev_stmp))
         {
             printf("Cannot get stmp: %d\n", ret);
+            goto Lerr;
+        }
+    }
+
+    // get PP specific information
+    if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
+    {
+        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_PP, &g_hwdev_pp, sizeof(g_hwdev_pp));
+        if(ret != sizeof(g_hwdev_pp))
+        {
+            printf("Cannot get pp: %d\n", ret);
             goto Lerr;
         }
     }

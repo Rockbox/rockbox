@@ -56,6 +56,7 @@
 #define HWSTUB_DT_LAYOUT      0x42 /* mandatory */
 #define HWSTUB_DT_TARGET      0x43 /* mandatory */
 #define HWSTUB_DT_STMP        0x44 /* optional */
+#define HWSTUB_DT_PP          0x45 /* optional */
 
 struct hwstub_version_desc_t
 {
@@ -90,6 +91,15 @@ struct hwstub_stmp_desc_t
     uint16_t wChipID; /* 0x3780 for STMP3780 for example */
     uint8_t bRevision; /* 0=TA1 on STMP3780 for example */
     uint8_t bPackage; /* 0=169BGA for example */
+} __attribute__((packed));
+
+struct hwstub_pp_desc_t
+{
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    /* Chip ID and revision */
+    uint16_t wChipID; /* 0x5002 for PP5002 for example */
+    uint8_t bRevision[2]; /* 'B1' for B1 for example */
 } __attribute__((packed));
 
 #define HWSTUB_TARGET_UNK       ('U' | 'N' << 8 | 'K' << 16 | ' ' << 24)
