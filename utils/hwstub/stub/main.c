@@ -171,7 +171,7 @@ static void handle_std_dev_desc(struct usb_ctrlrequest *req)
             }
             else
             {
-                max_packet_size=(usb_drv_port_speed() ? 64 : 512);
+                max_packet_size = (usb_drv_port_speed() ? 64 : 512);
                 config_descriptor.bDescriptorType = USB_DT_OTHER_SPEED_CONFIG;
             }
             size = sizeof(struct usb_config_descriptor);
@@ -193,7 +193,6 @@ static void handle_std_dev_desc(struct usb_ctrlrequest *req)
             /* target specific descriptors */
             target_get_config_desc(usb_buffer + size, &size);
             /* fix config descriptor */
-            config_descriptor.bNumInterfaces = 1;
             config_descriptor.wTotalLength = size;
             memcpy(usb_buffer, (void *)&config_descriptor, sizeof(config_descriptor));
 

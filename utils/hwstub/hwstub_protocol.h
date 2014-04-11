@@ -27,7 +27,7 @@
 
 #define HWSTUB_VERSION_MAJOR    3
 #define HWSTUB_VERSION_MINOR    0
-#define HWSTUB_VERSION_REV      0
+#define HWSTUB_VERSION_REV      1
 
 #define HWSTUB_USB_VID  0xfee1
 #define HWSTUB_USB_PID  0xdead
