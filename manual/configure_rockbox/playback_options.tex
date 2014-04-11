@@ -316,3 +316,17 @@ you to configure settings related to audio playback.
   This option rewinds the current track by a small amount whenever it is
   paused (not stopped).  The amount to rewind can be set between 0 and
   15 seconds.
+
+\opt{swcodec}{
+  \opt{play_frequency}{
+    \section{Frequency}\index{Frequency}
+      This option sets output samplerate of the decoder. The default is
+      44.1 kHz which is what most people need. In case most of your digital
+      library is encoded with 48 kHz sampling rate you may be interested
+      to change the default to avoid unnecessary resampling during decode.
+      \note{It is worth stressing that this option doesn't affect whether
+        file will be played or not. It affects whether output from decoder
+        will be resampled or not. If it is unclear for you that means
+        you probably don't need to tweak this setting.}
+  }
+}%\opt{swcodec}
