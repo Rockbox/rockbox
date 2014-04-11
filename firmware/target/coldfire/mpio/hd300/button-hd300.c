@@ -90,20 +90,20 @@ void scrollstrip_isr(void)
     /* read GPIO6 and GPIO7 state*/
     new_scroll_lines = (GPIO_READ >> 6) & 0x03;
     
+    /* was it initialized? */
     if ( prev_scroll_lines == -1 )
     {
         prev_scroll_lines = new_scroll_lines;
-        ack_scrollstrip_interrupt();
-        enable_scrollstrip_interrupts();
-        return;
+        goto end;
     }
 
+    /* calculate the direction according to the sequence order */
     scroll_dir = scroll_state[prev_scroll_lines][new_scroll_lines];
     prev_scroll_lines = new_scroll_lines;
 
     /* catch sequence error */
     if (scroll_dir == BUTTON_NONE)
-        return;
+        goto end;
 
     /* direction reversal */
     if (direction != scroll_dir)
@@ -116,9 +116,7 @@ void scrollstrip_isr(void)
 
         direction = scroll_dir;
         count = 0;
-        ack_scrollstrip_interrupt();
-        enable_scrollstrip_interrupts();
-        return;
+        goto end;
     }
 
     /* poke backlight */
@@ -129,12 +127,9 @@ void scrollstrip_isr(void)
         next_backlight_on = current_tick + HZ/4;
     }
 
+    /* apply sensitivity filter */
     if (++count < SLIDER_BASE_SENSITIVITY)
-    {
-        ack_scrollstrip_interrupt();
-        enable_scrollstrip_interrupts();
-        return;
-    }
+        goto end;
 
     count = 0;
 
@@ -146,6 +141,10 @@ void scrollstrip_isr(void)
     scroll.timeout = current_tick + SLIDER_REL_TIMEOUT;
     scroll.rel = false;
 
+end:
+    /* acknowledge the interrupt
+     * and reenable scrollstrip interrupts
+     */
     ack_scrollstrip_interrupt();
     enable_scrollstrip_interrupts();
 }
