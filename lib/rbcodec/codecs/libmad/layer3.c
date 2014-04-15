@@ -339,7 +339,7 @@ unsigned char const pretab[22] = {
  * format rq_table: bit31-27=exponent bit26-0=mantissa
  */
 static
-unsigned long const rq_table[8207] = {
+uint32_t const rq_table[8207] = {
 # include "rq_table.dat"
 };
 
@@ -885,7 +885,7 @@ mad_fixed_t III_requantize(unsigned int value, signed int exp)
 {
   mad_fixed_t requantized;
   signed int frac;
-  unsigned long power;
+  uint32_t power;
 
   frac = exp % 4;  /* assumes sign(frac) == sign(exp) */
   exp /= 4;
