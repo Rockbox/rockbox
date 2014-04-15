@@ -69,8 +69,6 @@ enum {
 #ifndef PLUGIN
 extern struct menu_item_ex root_menu_;
 
-extern void previous_music_is_wps(void);
-
 void root_menu_load_from_cfg(void* setting, char *value);
 char* root_menu_write_to_cfg(void* setting, char*buf, int buf_len);
 void root_menu_set_default(void* setting, void* defaultval);

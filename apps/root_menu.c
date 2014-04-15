@@ -86,6 +86,20 @@ static int last_screen = GO_TO_ROOT; /* unfortunatly needed so we can resume
                                         or goto current track based on previous
                                         screen */
 
+static int previous_music = GO_TO_WPS; /* Toggles behavior of the return-to
+                                        * playback-button depending
+                                        * on FM radio */
+
+#if (CONFIG_TUNER)
+static void rootmenu_start_playback_callback(unsigned short id, void *param)
+{
+    (void) id; (void) param;
+    /* Cancel FM radio selection as previous music. For cases where we start
+       playback without going to the WPS, such as playlist insert or
+       playlist catalog. */
+    previous_music = GO_TO_WPS;
+}
+#endif
 
 static char current_track_path[MAX_PATH];
 static void rootmenu_track_changed_callback(unsigned short id, void* param)
@@ -730,13 +744,6 @@ static int load_plugin_screen(char *plug_path)
 }
 #endif
 
-static int previous_music = GO_TO_WPS;
-
-void previous_music_is_wps(void)
-{
-    previous_music = GO_TO_WPS;
-}
-
 void root_menu(void)
 {
     int previous_browser = GO_TO_FILEBROWSER;
@@ -747,6 +754,9 @@ void root_menu(void)
     if (global_settings.start_in_screen == 0)
         next_screen = (int)global_status.last_screen;
     else next_screen = global_settings.start_in_screen - 2;
+#if CONFIG_TUNER
+    add_event(PLAYBACK_EVENT_START_PLAYBACK, rootmenu_start_playback_callback);
+#endif
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, rootmenu_track_changed_callback);
 #ifdef HAVE_RTC_ALARM
     if ( rtc_check_alarm_started(true) )
@@ -829,18 +839,16 @@ void root_menu(void)
                 break;
 #endif
             default:
-                if (next_screen == GO_TO_FILEBROWSER
 #ifdef HAVE_TAGCACHE
-                    || next_screen == GO_TO_DBBROWSER
-#endif
-                   )
+/* With !HAVE_TAGCACHE previous_browser is always GO_TO_FILEBROWSER */
+                if (next_screen == GO_TO_FILEBROWSER || next_screen == GO_TO_DBBROWSER)
                     previous_browser = next_screen;
-                if (next_screen == GO_TO_WPS
-#if CONFIG_TUNER
-                    || next_screen == GO_TO_FM
 #endif
-                   )
+#if CONFIG_TUNER
+/* With !CONFIG_TUNER previous_music is always GO_TO_WPS */
+                if (next_screen == GO_TO_WPS || next_screen == GO_TO_FM)
                     previous_music = next_screen;
+#endif
                 next_screen = load_screen(next_screen);
                 break;
         } /* switch() */

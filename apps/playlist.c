@@ -2599,11 +2599,6 @@ void playlist_start(int start_index, unsigned long elapsed,
 {
     struct playlist_info* playlist = &current_playlist;
 
-    /* Cancel FM radio selection as previous music. For cases where we start
-       playback without going to the WPS, such as playlist insert.. or
-       playlist catalog. */
-    previous_music_is_wps();
-
     playlist->index = start_index;
 
     playlist->started = true;
