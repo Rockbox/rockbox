@@ -36,7 +36,7 @@ LCD
 
       Update the given rectangle to the LCD. Give arguments measured in
       pixels. Notice that the smallest vertical resolution in updates that the
-      hardware supports is even 8 pixels. This function will adjust to those.
+      hardware supports is 8 pixels. This function will adjust to those.
 
     lcd_setfont(int font) set default font
     lcd_setmargins(int x, int y) set top/left margins
@@ -78,7 +78,7 @@ Files
   int open(const char *path, int oflag);
 
      The open() function establishes the connection between a file and a file
-     descriptor. It creates an open file descrip- tion that refers to a file
+     descriptor. It creates an open file description that refers to a file
      and a file descriptor that refers to that open file description. The file
      descriptor is used by other I/O functions to refer to that file.
 
@@ -158,6 +158,8 @@ Directories
 
 String/Memory
 
+  These are standard C library functions.
+
   #include <string.h>
 
   strcmp()
@@ -209,20 +211,24 @@ Various
 
   #include <kernel.h>
 
+  #define HZ 100
+  
+     Number of ticks/second
+
   void kernel_init(void)
 
      Inits the kernel and starts the tick interrupt
 
   void sleep(ticks)
 
-     Sleep a specified number of ticks, we have HZ ticks per second.
+     Sleep a specified number of ticks
 
   void yield(void)
 
      Let another thread run. This should be used as soon as you have to "wait"
      for something or similar, and also if you do anything that takes "a long
      time". This function is the entire foundation that our "cooperative
-     multitasking" is based on. Use it.
+     multitasking" is based on. USE IT.
 
   int set_irq_level(int level)
 
@@ -272,6 +278,6 @@ Various
      Lock a mutex. This will block the thread if the mutex is already locked.
      Note that you will geta deadlock if you lock the mutex twice!
 
-void mutex_unlock(struct mutex *m)
+  void mutex_unlock(struct mutex *m)
 
      Unlock a mutex.
