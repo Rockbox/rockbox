@@ -604,15 +604,15 @@ void write_line(struct screen *display, struct align_pos *format_align,
         center_xpos = (viewport_width-center_width)/2;
         right_xpos = viewport_width-right_width;
 #endif
-        /* print aligned strings */
-        if (left_width != 0)
-            display->put_line(0, line, linedes, "$t", format_align->left);
+        /* print aligned strings. print whole line at once so that %Vs works
+         * across the full viewport width */
+        char *left   = format_align->left   ?: "";
+        char *center = format_align->center ?: "";
+        char *right  = format_align->right  ?: "";
 
-        if (center_width != 0)
-            display->put_line(center_xpos, line, linedes, "$t", format_align->center);
-
-        if (right_width != 0)
-            display->put_line(right_xpos, line, linedes, "$t", format_align->right);
+        display->put_line(0, line, linedes, "$t$*s$t$*s$t", left,
+                center_xpos - left_width, center,
+                right_xpos - (center_xpos + center_width), right);
     }
 }
 
