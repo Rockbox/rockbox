@@ -28,17 +28,16 @@
 #include "synaptics-mep.h"
 
 static int int_btn = BUTTON_NONE;
-static int old_pos = -1;
+static int strip_pos = -1;
 
-static int scroll_repeat = BUTTON_NONE;
-static int repeat = 0;
 
 void button_init_device(void)
 {
 }
 
-/*
- * Button interrupt handler
+/**
+ * Button interrupt handler.
+ * Records capacitive button contact and scrollstrip position.
  */
 void button_int(void)
 {
@@ -66,33 +65,27 @@ void button_int(void)
         if (data[1] & MEP_FINGER)
         {
             /* Absolute packet - the finger is on the vertical strip.
-               Position ranges from 1-4095, with 1 at the bottom. */
+               Position ranges from 1-4095, with 1 at the top. */
             val = ((data[1] >> 4) << 8) | data[2]; /* position */
 
-            int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
-            if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
-            if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
-
-            old_pos = scr_pos;
-
-            /* repeat button */
-            repeat = 0;
-            if (int_btn!=BUTTON_NONE)
-            {
-                if (int_btn!=scroll_repeat)
-                scroll_repeat = int_btn;
-                else repeat = BUTTON_REPEAT;
-            }
+            strip_pos = val;
         }
         else
         {
-            old_pos = -1; 
-            scroll_repeat = BUTTON_NONE; 
+            strip_pos = -1;
         }
     }
 }
 
-int button_read_device(void)
+/**
+ * Get state of buttons and scrollstrip.
+ * @param[out] data     This is the finger position on the scrollstrip as an
+ *                      absolute value between 0 and SCROLLSTRIP_MAX_VAL.
+ *                      A negative value indicates that the strip isn't
+ *                      touched.
+ * @return              state of physical and capacitive buttons
+ */
+int button_read_device(int *data)
 {
     int buttons = int_btn;
     unsigned char state;
@@ -118,25 +111,21 @@ int button_read_device(void)
         if ((state & 0x40)==0) buttons|=BUTTON_OK;
         if ((state & 0x08)==0) buttons|=BUTTON_CANCEL;
 
+        /* Scrollstrip position. Note that the value is scaled up to
+           reduce rounding errors with integer math in the strip driver. */
+        *data = strip_pos<<4;
+
         /* Read POWER button */
         if ((GPIOD_INPUT_VAL & 0x40)==0) buttons|=BUTTON_POWER;
-
-        /* Scrollstrip direct button post - much better response */
-        if ((buttons==BUTTON_UP) || (buttons==BUTTON_DOWN))
-        {
-            queue_post(&button_queue,buttons|repeat,0);
-            backlight_on();
-            buttonlight_on();
-            reset_poweroff_timer();
-            buttons = BUTTON_NONE;
-            int_btn = BUTTON_NONE;
-            repeat = BUTTON_NONE;
-        }
     }
     else return BUTTON_NONE;
     return buttons;
 }
 
+/**
+ * Get the state of the hold switch.
+ * @return  true if hold is enabled, false otherwise.
+ */
 bool button_hold(void)
 {
     /* GPIOK 01000000B - HOLD when bit not set */

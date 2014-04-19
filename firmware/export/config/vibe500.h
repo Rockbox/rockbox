@@ -72,6 +72,9 @@
 
 #define CONFIG_KEYPAD PBELL_VIBE500_PAD
 
+/* Define this if you have a ScrollStrip. */
+#define HAVE_SCROLLSTRIP
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 

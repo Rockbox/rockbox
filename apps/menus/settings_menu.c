@@ -317,6 +317,11 @@ MENUITEM_SETTING(buttonlight_brightness, &global_settings.buttonlight_brightness
 MENUITEM_SETTING(touchpad_sensitivity, &global_settings.touchpad_sensitivity, NULL);
 #endif
 
+#ifdef HAVE_SCROLLSTRIP
+MENUITEM_SETTING(scrollstrip_speed, &global_settings.scrollstrip_speed, NULL);
+MENUITEM_SETTING(scrollstrip_afterscroll, &global_settings.scrollstrip_afterscroll, NULL);
+#endif
+
 #ifdef HAVE_QUICKSCREEN
 MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
 #endif
@@ -362,6 +367,10 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
+#endif
+#ifdef HAVE_SCROLLSTRIP
+            &scrollstrip_speed,
+            &scrollstrip_afterscroll,
 #endif
 #ifdef USB_ENABLE_HID
             &usb_hid,
