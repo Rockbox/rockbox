@@ -47,6 +47,7 @@ lamp,apps
 logo,demos
 lrcplayer,apps
 lua,viewers
+rockphys,demos
 fractals,demos
 main_menu_config,apps
 matrix,demos
@@ -89,6 +90,7 @@ rockpaint,apps
 search,viewers
 searchengine,viewers
 settings_dumper,apps
+shell,apps
 shopper,viewers
 shortcuts_append,viewers
 shortcuts_view,viewers

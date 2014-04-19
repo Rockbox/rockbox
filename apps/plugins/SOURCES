@@ -6,6 +6,7 @@ chessclock.c
 credits.c
 cube.c
 dict.c
+helloworld.c
 jackpot.c
 keybox.c
 logo.c
@@ -33,6 +34,9 @@ disktidy.c
 flipit.c
 shopper.c
 resistor.c
+
+/*shell.c*/
+rockphys.c
 
 #ifdef USB_ENABLE_HID
 remote_control.c
