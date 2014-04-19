@@ -54,7 +54,7 @@ Playing MPEG
 
   The DEMAND signal is connected to a port pin on the CPU which can generate
   an IRQ, but only on the falling edge. That means that the mpeg driver code
-  must poll the DEMAND signal every ms to keep the MAS happy. The mpeg code
+  must poll the DEMAND signal every ms to keep the MAS happy. The mpeg code
   does use the IRQ to detect the falling edge when the MAS is "full".
 
   Unfortunately, the serial port on the CPU sends the LSB first, and the MAS
@@ -156,7 +156,7 @@ Saving Config Data
   also get some data stored in the battery-backuped area).
 
   The config is only saved when the disk is spinning. This is important to
-  realize, as if you change a config setting and then immediately shuts your
+  realize, as if you change a config setting and then immediately shut your
   unit down, the new config is not saved.
 
   DEVELOPERS:
