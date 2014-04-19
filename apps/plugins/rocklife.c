@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 /*
- * This is an implementatino of Conway's Game of Life
+ * This is an implementation of Conway's Game of Life
  *
  * from http://en.wikipedia.org/wiki/Conway's_Game_of_Life:
  *
