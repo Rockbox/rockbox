@@ -1,4 +1,4 @@
-/* My physics sim ported to Sansa c200 */
+/* My physics sim ported to Rockbox */
 #include <plugin.h>
 #include <stdlib.h>
 #include "lib/pluginlib_actions.h"
@@ -11,12 +11,12 @@
 #define NUM_BALLS 1
 #define MANUAL_SPEED 1
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
-void pxl_on(int x, int y)
+static void pxl_on(int x, int y)
 {
   rb->lcd_set_foreground(LCD_WHITE);
   rb->lcd_fillrect(x, y, BALL_SIZE,BALL_SIZE);
 }
-void pxl_off(int x, int y)
+static void pxl_off(int x, int y)
 {
   rb->lcd_set_foreground(LCD_BLACK);
   rb->lcd_fillrect(x,y,BALL_SIZE,BALL_SIZE);
@@ -26,7 +26,8 @@ struct ball {
 };
 struct ball balls[NUM_BALLS];
 struct ball next_world[NUM_BALLS];
-void step(struct ball *b)
+
+static void step(struct ball *b)
 {
   const double gravity=.5;
   int oldx=b->x, oldy=b->y;
@@ -54,16 +55,17 @@ void step(struct ball *b)
   pxl_off(oldx, oldy);
   pxl_on(b->x, b->y);
 }
-signed int rand_range(int min, int max)
+static signed int rand_range(int min, int max)
 {
   return rb->rand()%(max-min)+min;
 }
 enum plugin_status plugin_start(const void* parameter)
 {
   (void)parameter;
-  rb->srand((unsigned int)rb->current_tick+(unsigned int)parameter);
+  bool backlight_status=rb->is_backlight_on(true);
+  rb->srand((*rb->current_tick));
   rb->lcd_clear_display();
-  rb->lcd_puts(0,0,"RockPhys v0.1-alpha");
+  rb->lcd_puts(0,0,"RockPhys v1.1");
   rb->lcd_puts(0,1,"(C) Franklin Wei");
   rb->lcd_update();
   rb->sleep(HZ*2);
@@ -88,6 +90,12 @@ enum plugin_status plugin_start(const void* parameter)
 	case 0:
 	  break;
 	case KEY_QUIT:
+	  if(backlight_status)
+	    {
+	      rb->backlight_on();
+	    }
+	  else
+	    rb->backlight_off();
 	  return PLUGIN_OK;
 	case KEY_UP:
 	  {
@@ -131,5 +139,5 @@ enum plugin_status plugin_start(const void* parameter)
       rb->lcd_update();
       rb->yield();
     }
-  return PLUGIN_OK;
+  return PLUGIN_OK; // make GCC happy
 }
