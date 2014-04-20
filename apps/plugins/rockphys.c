@@ -1,12 +1,12 @@
 /* My physics sim ported to Sansa c200 */
 #include <plugin.h>
 #include <stdlib.h>
-#include <button.h>
-#define KEY_QUIT BUTTON_MENU
-#define KEY_UP BUTTON_UP
-#define KEY_DOWN BUTTON_DOWN
-#define KEY_LEFT BUTTON_LEFT
-#define KEY_RIGHT BUTTON_RIGHT
+#include "lib/pluginlib_actions.h"
+#define KEY_QUIT PLA_CANCEL
+#define KEY_UP PLA_UO
+#define KEY_DOWN PLA_DOWN
+#define KEY_LEFT PLA_LEFT
+#define KEY_RIGHT PLA_RIGHT
 #define BALL_SIZE 2
 #define NUM_BALLS 128
 void pxl_on(int x, int y)
@@ -47,10 +47,7 @@ void step(struct ball *b)
       b->dx*=b->friction;
       b->y+=2*b->dy;
     }
-  /* Calculate collisions with other balls */
-  for(int i=0;i<NUM_BALLS;++i)
-    {
-      if(balls[i].x-b->x>=BALL_SIZE && 
+  /* TODO: Calculate collisions with other balls!!! */
   pxl_off(oldx, oldy);
   pxl_on(b->x, b->y);
 }
@@ -86,4 +83,5 @@ enum plugin_status plugin_start(const void* parameter)
       rb->lcd_update();
       rb->yield();
     }
+  return PLUGIN_OK;
 }
