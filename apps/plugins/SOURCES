@@ -35,7 +35,6 @@ flipit.c
 shopper.c
 resistor.c
 
-/*shell.c*/
 rockphys.c
 
 #ifdef USB_ENABLE_HID
