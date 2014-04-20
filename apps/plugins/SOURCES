@@ -6,7 +6,7 @@ chessclock.c
 credits.c
 cube.c
 dict.c
-helloworld.c
+#helloworld.c
 jackpot.c
 keybox.c
 logo.c
