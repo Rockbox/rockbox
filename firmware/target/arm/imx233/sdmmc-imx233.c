@@ -596,6 +596,9 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
 static int transfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
 {
     int ret = 0;
+    // the function doesn't work when count is 0
+    if(count == 0)
+        return ret;
 
     /* update disk activity */
     disk_last_activity[drive] = current_tick;
