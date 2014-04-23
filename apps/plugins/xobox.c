@@ -23,6 +23,7 @@
 #include "plugin.h"
 #include "lib/helper.h"
 #include "lib/playback_control.h"
+#include "lib/highscore.h"
 
 
 
@@ -417,6 +418,12 @@ static int difficulty = 75; /* Percentage of screen that needs to be filled
                              * in order to win the game */
 
 static bool quit = false;
+static bool _ingame = false;
+
+#define RESUME_FILE PLUGIN_GAMES_DATA_DIR "/xobox.resume"
+#define SCORE_FILE PLUGIN_GAMES_DATA_DIR "/xobox.score"
+#define NUM_SCORES 5
+static struct highscore highscores[NUM_SCORES];
 
 static unsigned int board[BOARD_H][BOARD_W];
 static int testboard[BOARD_H][BOARD_W];
@@ -1019,12 +1026,66 @@ static void init_game (void)
     rb->splash (HZ * 2, "Ready?");
 }
 
+static bool load_game(void)
+{
+    int fd = rb->open(RESUME_FILE, O_RDONLY);
+
+    if (fd < 0) {
+        return true;
+    }
+
+    bool load_success =
+    rb->read(fd, &player, sizeof(player)) == sizeof(player) &&
+    rb->read(fd, &qixes, sizeof(qixes)) == sizeof(qixes) &&
+    rb->read(fd, &stack, sizeof(stack)) == sizeof(stack) &&
+    rb->read(fd, &board, sizeof(board)) == sizeof(board) &&
+    rb->read(fd, &testboard, sizeof(testboard)) == sizeof(testboard) &&
+    rb->read(fd, &speed, sizeof(speed)) == sizeof(speed) &&
+    rb->read(fd, &difficulty, sizeof(difficulty)) == sizeof(difficulty) &&
+    rb->read(fd, &stackPointer, sizeof(stackPointer)) == sizeof(stackPointer) &&
+    rb->read(fd, &percentage_cache,
+        sizeof(percentage_cache)) == sizeof(percentage_cache);
+
+    rb->close(fd);
+    _ingame = load_success;
+
+    return load_success;
+}
+
+static bool save_game(void)
+{
+    int fd = rb->open(RESUME_FILE, O_WRONLY|O_CREAT, 0666);
+
+    if (fd < 0) {
+        return false;
+    }
+
+    bool save_success =
+    rb->write(fd, &player, sizeof(player)) > 0 &&
+    rb->write(fd, &qixes, sizeof(qixes)) > 0 &&
+    rb->write(fd, &stack, sizeof(stack)) > 0 &&
+    rb->write(fd, &board, sizeof(board)) > 0 &&
+    rb->write(fd, &testboard, sizeof(testboard)) > 0 &&
+    rb->write(fd, &speed, sizeof(speed)) > 0 &&
+    rb->write(fd, &difficulty, sizeof(difficulty)) > 0 &&
+    rb->write(fd, &stackPointer, sizeof(stackPointer)) > 0 &&
+    rb->write(fd, &percentage_cache, sizeof(percentage_cache)) > 0;
+
+    rb->close(fd);
+
+    if (!save_success) {
+        rb->remove(RESUME_FILE);
+    }
+
+    return save_success;
+}
+
 /* the main menu */
-static bool _ingame;
 static int xobox_menu_cb(int action, const struct menu_item_ex *this_item)
 {
+    intptr_t item = (intptr_t)this_item;
     if(action == ACTION_REQUEST_MENUITEM
-       && !_ingame && ((intptr_t)this_item)==0)
+       && !_ingame && (item == 0 || item == 6))
         return ACTION_EXIT_MENUITEM;
     return action;
 }
@@ -1037,12 +1098,16 @@ static int xobox_menu(bool ingame)
     MENUITEM_STRINGLIST(main_menu, "Xobox Menu", xobox_menu_cb,
                         "Resume Game", "Start New Game",
                         "Speed", "Difficulty",
-                        "Playback Control", "Quit");
+                        "High Scores", "Playback Control",
+                        "Quit Without Saving", "Quit");
     _ingame = ingame;
 
     while (true) {
         switch (rb->do_menu(&main_menu, &selection, NULL, false)) {
             case 0:
+                rb->remove(RESUME_FILE);
+                refresh_board();
+                rb->splash (HZ*2, "Ready?");
                 return 0;
             case 1:
                 init_game ();
@@ -1055,9 +1120,22 @@ static int xobox_menu(bool ingame)
                             5, 50, 95, NULL);
                 break;
             case 4:
-                playback_control(NULL);
+                highscore_show(-1, highscores, NUM_SCORES, true);
                 break;
             case 5:
+                playback_control(NULL);
+                break;
+            case 6:
+                return 1;
+            case 7:
+                if (_ingame) {
+                    rb->splash(HZ, "Saving game...");
+
+                    if (!save_game()) {
+                        rb->splash(HZ, "Failed to save game");
+                    }
+                }
+
                 return 1;
             case MENU_ATTACHED_USB:
                 return 1;
@@ -1074,7 +1152,7 @@ static int xobox_loop (void)
     bool pause = false;
     int end;
 
-    if (xobox_menu(false)) {
+    if (xobox_menu(_ingame)) {
         return PLUGIN_OK;
     }
 
@@ -1129,6 +1207,18 @@ static int xobox_loop (void)
         }
         if (player.gameover) {
             rb->splash (HZ, "Game Over!");
+
+            int pos = highscore_update(player.score, player.level, "",
+                                 highscores, NUM_SCORES);
+
+            if (pos != -1) {
+                if (pos == 0) {
+                    rb->splashf(HZ, "New High Score: %d", player.score);
+                }
+
+                highscore_show(-1, highscores, NUM_SCORES, true);
+            }
+
             if (xobox_menu(false)) {
                 quit = true;
             }
@@ -1158,12 +1248,20 @@ enum plugin_status plugin_start (const void *parameter)
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 
+    highscore_load(SCORE_FILE, highscores, NUM_SCORES);
+
+    if (!load_game()) {
+        rb->splash(HZ, "Failed to load saved game");
+    }
+
     randomize ();
     ret = xobox_loop ();
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
     rb->lcd_setfont (FONT_UI);
+
+    highscore_save(SCORE_FILE, highscores, NUM_SCORES);
 
     return ret;
 }
