@@ -648,14 +648,15 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
      * Read transfers:
      *   If the buffer is already aligned, transfer everything at once.
      *   Otherwise, transfer all sectors but one to the sub-buffer starting
-     *   on the next cache ligned and then move the data. Then transfer the
+     *   on the next cache line and then move the data. Then transfer the
      *   last sector to the aligned_buffer and then copy to the buffer.
      *
      * Write transfers:
      *   If the buffer is already aligned, transfer everything at once.
      *   Otherwise, copy the first sector to the aligned_buffer and transfer.
      *   Then move all other sectors within the buffer to make it cache
-     *   aligned and transfer it.
+     *   aligned and transfer it. Then move data to pretend the buffer was
+     *   never modified.
      */
     if(read)
     {
@@ -689,6 +690,9 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
                 // move within the buffer and transfer
                 memmove(ptr, buf + 512, 512 * (count - 1));
                 ret = __xfer_sectors(drive, start + 1, count - 1, ptr, read);
+                // move back
+                memmove(buf + 512, ptr, 512 * (count - 1));
+                memcpy(buf, aligned_buffer[drive], 512);
             }
         }
         else
