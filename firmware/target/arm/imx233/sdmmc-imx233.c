@@ -554,7 +554,7 @@ static int init_mmc_drive(int drive)
 }
 #endif
 
-// low-level function, don't call directly!
+/* low-level function, don't call directly! */
 static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
 {
     uint32_t resp;
@@ -596,7 +596,7 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
 static int transfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
 {
     int ret = 0;
-    // the function doesn't work when count is 0
+    /* the function doesn't work when count is 0 */
     if(count == 0)
         return ret;
 
@@ -663,12 +663,12 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
         void *ptr = CACHEALIGN_UP(buf);
         if(buf != ptr)
         {
-            // copy count-1 sector and then move within the buffer
+            /* copy count-1 sector and then move within the buffer */
             ret = __xfer_sectors(drive, start, count - 1, ptr, read);
             memmove(buf, ptr, 512 * (count - 1));
             if(ret >= 0)
             {
-                // transfer the last sector the aligned_buffer and copy
+                /* transfer the last sector the aligned_buffer and copy */
                 ret = __xfer_sectors(drive, start + count - 1, 1,
                     aligned_buffer[drive], read);
                 memcpy(buf + 512 * (count - 1), aligned_buffer[drive], 512);
@@ -682,15 +682,15 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
         void *ptr = CACHEALIGN_UP(buf);
         if(buf != ptr)
         {
-            // transfer the first sector to aligned_buffer and copy
+            /* transfer the first sector to aligned_buffer and copy */
             memcpy(aligned_buffer[drive], buf, 512);
             ret = __xfer_sectors(drive, start, 1, aligned_buffer[drive], read);
             if(ret >= 0)
             {
-                // move within the buffer and transfer
+                /* move within the buffer and transfer */
                 memmove(ptr, buf + 512, 512 * (count - 1));
                 ret = __xfer_sectors(drive, start + 1, count - 1, ptr, read);
-                // move back
+                /* move back */
                 memmove(buf + 512, ptr, 512 * (count - 1));
                 memcpy(buf, aligned_buffer[drive], 512);
             }
@@ -712,7 +712,7 @@ static int transfer_sectors(int drive, unsigned long start, int count, void *buf
     return ret;
 }
 
-// user specificies the sdmmc drive
+/* user specifies the sdmmc drive */
 static int part_read_fn(intptr_t user, unsigned long start, int count, void* buf)
 {
     return transfer_sectors(user, start, count, buf, true);
