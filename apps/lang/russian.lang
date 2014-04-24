@@ -9843,11 +9843,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Фасонирование"
+    swcodec: "Дизеринг"
   </dest>
   <voice>
     *: none
-    swcodec: "Фасонирование"
+    swcodec: "Дизеринг"
   </voice>
 </phrase>
 <phrase>
