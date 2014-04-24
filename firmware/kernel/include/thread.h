@@ -349,7 +349,8 @@ void block_thread_w_tmo(struct thread_entry *current, int timeout);
                                higher priority than current were woken) */
 
 /* A convenience function for waking an entire queue of threads. */
-unsigned int thread_queue_wake(struct thread_entry **list);
+unsigned int thread_queue_wake(struct thread_entry **list,
+                               volatile int *count);
 
 /* Wakeup a thread at the head of a list */
 unsigned int wakeup_thread(struct thread_entry **list);
