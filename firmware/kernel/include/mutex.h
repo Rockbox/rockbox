@@ -28,20 +28,14 @@
 
 struct mutex
 {
-    struct thread_entry *queue;         /* waiter list */
-    int recursion;                      /* lock owner recursion count */
+    struct thread_entry *queue;   /* waiter list */
+    int recursion;                /* lock owner recursion count */
+    struct blocker blocker;       /* priority inheritance info
+                                     for waiters and owner*/
+    IF_COP( struct corelock cl; ) /* multiprocessor sync */
 #ifdef HAVE_PRIORITY_SCHEDULING
-    struct blocker blocker;             /* priority inheritance info
-                                           for waiters */
-    bool no_preempt;                    /* don't allow higher-priority thread
-                                           to be scheduled even if woken */
-#else
-    struct thread_entry *thread;        /* Indicates owner thread - an owner
-                                           implies a locked state - same goes
-                                           for priority scheduling
-                                           (in blocker struct for that) */
+    bool no_preempt;
 #endif
-    IF_COP( struct corelock cl; )       /* multiprocessor sync */
 };
 
 extern void mutex_init(struct mutex *m);
@@ -56,7 +50,7 @@ static inline void mutex_set_preempt(struct mutex *m, bool preempt)
 #else
 /* Deprecated but needed for now - firmware/drivers/ata_mmc.c */
 static inline bool mutex_test(const struct mutex *m)
-    { return m->thread != NULL; }
+    { return m->blocker.thread != NULL; }
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
 #endif /* MUTEX_H */
