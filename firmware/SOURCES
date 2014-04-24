@@ -1825,6 +1825,9 @@ drivers/touchpad.c
 #ifdef HAVE_CORELOCK_OBJECT
 kernel/corelock.c
 #endif
+#if 0 /* pending dependent code */
+kernel/mrsw_lock.c
+#endif
 kernel/mutex.c
 kernel/queue.c
 #ifdef HAVE_SEMAPHORE_OBJECTS

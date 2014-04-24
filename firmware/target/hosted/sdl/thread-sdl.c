@@ -406,20 +406,20 @@ void sleep_thread(int ticks)
     current->tmo_tick = (1000/HZ) * ticks + ((1000/HZ)-1) - rem;
 }
 
-void block_thread(struct thread_entry *current)
+void block_thread(struct thread_entry *current, int ticks)
 {
-    current->state = STATE_BLOCKED;
+    if (ticks < 0)
+        current->state = STATE_BLOCKED;
+    else
+    {
+        current->state = STATE_BLOCKED_W_TMO;
+        current->tmo_tick = (1000/HZ)*ticks;
+    }
+
     add_to_list_l(current->bqp, current);
 }
 
-void block_thread_w_tmo(struct thread_entry *current, int ticks)
-{
-    current->state = STATE_BLOCKED_W_TMO;
-    current->tmo_tick = (1000/HZ)*ticks;
-    add_to_list_l(current->bqp, current);
-}
-
-unsigned int wakeup_thread(struct thread_entry **list)
+unsigned int wakeup_thread_(struct thread_entry **list)
 {
     struct thread_entry *thread = *list;
 
@@ -439,19 +439,25 @@ unsigned int wakeup_thread(struct thread_entry **list)
     return THREAD_NONE;
 }
 
-unsigned int thread_queue_wake(struct thread_entry **list)
+unsigned int thread_queue_wake(struct thread_entry **list,
+                               volatile int *count)
 {
     unsigned int result = THREAD_NONE;
+    int num = 0;
 
     for (;;)
     {
-        unsigned int rc = wakeup_thread(list);
+        unsigned int rc = wakeup_thread_(list);
 
         if (rc == THREAD_NONE)
             break;
 
-        result |= rc;        
+        result |= rc;
+        num++;
     }
+
+    if (count)
+        *count = num;
 
     return result;
 }
@@ -615,7 +621,7 @@ void remove_thread(unsigned int thread_id)
 
     new_thread_id(thread->id, thread);
     thread->state = STATE_KILLED;
-    thread_queue_wake(&thread->queue);
+    thread_queue_wake(&thread->queue, NULL);
 
     SDL_DestroySemaphore(s);
 
@@ -652,7 +658,7 @@ void thread_wait(unsigned int thread_id)
     if (thread->id == thread_id && thread->state != STATE_KILLED)
     {
         current->bqp = &thread->queue;
-        block_thread(current);
+        block_thread(current, TIMEOUT_BLOCK);
         switch_thread();
     }
 }

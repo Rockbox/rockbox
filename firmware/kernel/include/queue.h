@@ -143,6 +143,8 @@ extern bool queue_peek(struct event_queue *q, struct queue_event *ev);
 #define QPEEK_FILTER_COUNT_MASK (0xffu) /* 0x00=1 filter, 0xff=256 filters */
 #define QPEEK_FILTER_HEAD_ONLY  (1u << 8) /* Ignored if no filters */
 #define QPEEK_REMOVE_EVENTS     (1u << 9) /* Remove or discard events */
+#define QPEEK_FILTER1(a)    QPEEK_FILTER2((a), (a))
+#define QPEEK_FILTER2(a, b) (&(const long [2]){ (a), (b) })
 extern bool queue_peek_ex(struct event_queue *q,
                           struct queue_event *ev,
                           unsigned int flags,
