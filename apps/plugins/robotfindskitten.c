@@ -464,7 +464,7 @@ static char* messages[] =
   "Just a man selling an albatross.",
   "The intermission from a 1930s silent movie.",
   "It's an inverted billiard ball!",
-  "The spectre of Sherlock Holmes wills you onwards.",
+  "The spectre of Sherlock Holmes wills you onwards."
 };
 
 #define RFK_VERSION "v1.4142135.406"
@@ -769,6 +769,8 @@ static int validchar(char a)
 static void play_animation(int input)
 {
   int counter;
+  /* Clear the message line */
+  message("                                             ");
   struct screen_object left;
   struct screen_object right;
   /*The grand cinema scene.*/
