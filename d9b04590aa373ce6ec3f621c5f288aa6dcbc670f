@@ -86,6 +86,24 @@
       "revId": "d9b04590aa373ce6ec3f621c5f288aa6dcbc670f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_b76c8809",
+        "filename": "apps/plugins/crypto/sha256.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-04-27T01:24:47Z",
+      "side": 1,
+      "message": "Implementation of reverse_bytes():\nvoid reverse_bytes(*n)\n*n\u003d((x\u00260x00FF00FF)\u003e\u003erot8)|((x\u003c\u003crot8)\u00260x00FF00FF);",
+      "parentUuid": "9ab29df4_9724c4c7",
+      "revId": "d9b04590aa373ce6ec3f621c5f288aa6dcbc670f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
