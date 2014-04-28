@@ -210,6 +210,7 @@ struct thread_entry
     volatile intptr_t retval;  /* Return value from a blocked operation/
                                   misc. use */
 #endif
+    int __errno;               /* Thread error number (errno tls) */
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* Priority summary of owned objects that support inheritance */
     struct blocker *blocker;   /* Pointer to blocker when this thread is blocked
