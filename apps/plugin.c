@@ -684,7 +684,7 @@ static const struct plugin_api rockbox_api = {
 
     /* misc */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    &errno,
+    __errno,
 #endif
     srand,
     rand,
