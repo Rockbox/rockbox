@@ -172,6 +172,7 @@ common/dircache.c
 #endif /* HAVE_DIRCACHE */
 common/filefuncs.c
 common/format.c
+common/linked_list.c
 #ifdef APPLICATION
 common/rbpaths.c
 #endif
