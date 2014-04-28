@@ -10,10 +10,12 @@
 
 #ifndef _SYS_ERRNO_H_
 
+extern int * __errno(void);
+
 #ifdef PLUGIN
-#define errno   (*rb->__errno)
+#define errno  (*rb->__errno())
 #else
-extern int errno;
+#define errno  (*__errno())
 #endif
 
 #define EPERM 1         /* Not super-user */
