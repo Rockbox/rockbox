@@ -43,7 +43,7 @@ function PP.is_pp500x()
 end
 
 if PP.is_pp611x() then
-    identify("PP6110x (aka GoForce6110)", "pp6110", "pp6110")
+    identify("PP611x (aka GoForce6110)", "pp6110", "pp6110")
 elseif PP.is_pp502x() then
     identify("PP502x", "pp502x", "pp502x")
 elseif PP.is_pp500x() then

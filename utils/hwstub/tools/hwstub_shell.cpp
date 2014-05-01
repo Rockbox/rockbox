@@ -725,11 +725,14 @@ int main(int argc, char **argv)
     // load register descriptions
     std::vector< soc_t > socs;
     for(int i = optind; i < argc; i++)
-        if(!soc_desc_parse_xml(argv[i], socs))
+    {
+        socs.push_back(soc_t());
+        if(!soc_desc_parse_xml(argv[i], socs[socs.size() - 1]))
         {
             printf("Cannot load description '%s'\n", argv[i]);
             return 2;
         }
+    }
 
     // create usb context
     libusb_context *ctx;
