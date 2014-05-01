@@ -1,6 +1,6 @@
-CC=gcc
-CXX=g++
-AR=ar
+CC?=gcc
+CXX?=g++
+AR?=ar
 CFLAGS=-Wall -O2 `xml2-config --cflags` -std=c99 -g -fPIC
 CXXFLAGS=-Wall -O2 `xml2-config --cflags` -g -fPIC
 LIB=libsocdesc.a

@@ -1,7 +1,7 @@
 DEFINES=
-CC=gcc
-CXX=g++
-LD=g++
+CC?=gcc
+CXX?=g++
+LD?=g++
 CFLAGS=-g -std=c99 -Wall $(DEFINES) -Ilib
 CXXFLAGS=-g -Wall $(DEFINES) -Ilib
 LDFLAGS=-Llib -lsocdesc `xml2-config --libs`
