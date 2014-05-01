@@ -9,7 +9,7 @@
 #ifdef HAVE_HWSTUB
 #include "hwstub.h"
 #endif
-#include "soc.h"
+#include "soc_desc.hpp"
 
 class IoBackend : public QObject
 {
