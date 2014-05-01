@@ -206,6 +206,7 @@ void DevEditPanel::OnInstActivated(int row, int column)
     {
         m_ref.GetDev().addr.erase(m_ref.GetDev().addr.begin() + row);
         m_instances_table->removeRow(row);
+        emit OnModified(true);
     }
     else if(type == DevInstNewType)
     {
@@ -526,6 +527,7 @@ void RegEditPanel::OnInstActivated(int row, int column)
     {
         m_ref.GetReg().addr.erase(m_ref.GetReg().addr.begin() + row);
         m_instances_table->removeRow(row);
+        emit OnModified(true);
     }
     else if(type == RegInstNewType)
     {
@@ -729,6 +731,7 @@ void FieldEditPanel::OnValueActivated(int row, int column)
     {
         m_ref.GetField().value.erase(m_ref.GetField().value.begin() + row);
         m_value_table->removeRow(row);
+        emit OnModified(true);
     }
     else if(type == FieldValueNewType)
     {
@@ -921,6 +924,11 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
     m_soc_tree = new QTreeWidget(this);
     m_soc_tree->setColumnCount(1);
     m_soc_tree->setHeaderLabel(QString("Name"));
+    m_soc_tree->setContextMenuPolicy(Qt::ActionsContextMenu);
+    QAction *soc_tree_delete_action = new QAction("&Delete", this);
+    soc_tree_delete_action->setIcon(QIcon::fromTheme("list-remove"));
+    connect(soc_tree_delete_action, SIGNAL(triggered()), this, SLOT(OnSocItemDelete()));
+    m_soc_tree->addAction(soc_tree_delete_action);
     m_splitter->addWidget(m_soc_tree);
     m_splitter->setStretchFactor(0, 0);
 
@@ -962,12 +970,11 @@ bool RegEdit::CloseSoc()
 {
     if(!m_modified)
         return true;
-    QMessageBox msgBox;
-    msgBox.setText("The description has been modified.");
-    msgBox.setInformativeText("Do you want to save your changes?");
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Save);
-    int ret = msgBox.exec();
+    QMessageBox msgbox(QMessageBox::Question, "Save changes ?", 
+        "The description has been modified. Do you want to save your changes ?",
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, this);
+    msgbox.setDefaultButton(QMessageBox::Cancel);
+    int ret = msgbox.exec();
     if(ret == QMessageBox::Discard)
         return true;
     if(ret == QMessageBox::Cancel)
@@ -1188,6 +1195,66 @@ void RegEdit::SetModified(bool add, bool mod)
     emit OnModified(mod);
 }
 
+namespace
+{
+
+template< typename T >
+void my_remove_at(std::vector< T >& v, size_t at)
+{
+    v.erase(v.begin() + at);
+}
+
+}
+
+void RegEdit::OnSocItemDelete()
+{
+    QTreeWidgetItem *current = m_soc_tree->currentItem();
+    if(current == 0)
+        return;
+    QMessageBox msgbox(QMessageBox::Question, "Delete item ?",
+        "Are you sure you want to delete this item ?",
+        QMessageBox::Yes | QMessageBox::No, this);
+    msgbox.setDefaultButton(QMessageBox::No);
+    int ret = msgbox.exec();
+    if(ret != QMessageBox::Yes)
+        return;
+    if(current->type() == SocTreeSocType)
+    {
+        SocTreeItem *item = dynamic_cast< SocTreeItem * >(current);
+        item->GetRef().GetSoc().dev.clear();
+        item->takeChildren();
+        FillSocTreeItem(item);
+        m_soc_tree->expandItem(item);
+    }
+    else if(current->type() == SocTreeDevType)
+    {
+        DevTreeItem *item = dynamic_cast< DevTreeItem * >(current);
+        my_remove_at(item->GetRef().GetSoc().dev, item->GetRef().GetDevIndex());
+        QTreeWidgetItem *parent = item->parent();
+        parent->takeChildren();
+        FillSocTreeItem(parent);
+        m_soc_tree->expandItem(parent);
+    }
+    else if(current->type() == SocTreeRegType)
+    {
+        RegTreeItem *item = dynamic_cast< RegTreeItem * >(current);
+        my_remove_at(item->GetRef().GetDev().reg, item->GetRef().GetRegIndex());
+        QTreeWidgetItem *parent = item->parent();
+        parent->takeChildren();
+        FillDevTreeItem(parent);
+        m_soc_tree->expandItem(parent);
+    }
+    else if(current->type() == SocTreeFieldType)
+    {
+        FieldTreeItem *item = dynamic_cast< FieldTreeItem * >(current);
+        my_remove_at(item->GetRef().GetReg().field, item->GetRef().GetFieldIndex());
+        QTreeWidgetItem *parent = item->parent();
+        parent->takeChildren();
+        FillRegTreeItem(parent);
+        m_soc_tree->expandItem(parent);
+    }
+}
+
 void RegEdit::OnSocModified(bool modified)
 {
     // we might need to update the name in the tree
@@ -1293,6 +1360,7 @@ void RegEdit::AddDevice(QTreeWidgetItem *_item)
     item->parent()->insertChild(item->parent()->indexOfChild(item), dev_item);
     CreateNewRegisterItem(dev_item);
     m_soc_tree->setCurrentItem(dev_item);
+    emit OnModified(true);
 }
 
 void RegEdit::AddRegister(QTreeWidgetItem *_item)
@@ -1305,6 +1373,7 @@ void RegEdit::AddRegister(QTreeWidgetItem *_item)
     item->parent()->insertChild(item->parent()->indexOfChild(item), reg_item);
     CreateNewFieldItem(reg_item);
     m_soc_tree->setCurrentItem(reg_item);
+    emit OnModified(true);
 }
 
 void RegEdit::AddField(QTreeWidgetItem *_item)
@@ -1316,6 +1385,7 @@ void RegEdit::AddField(QTreeWidgetItem *_item)
     FixupEmptyItem(field_item);
     item->parent()->insertChild(item->parent()->indexOfChild(item), field_item);
     m_soc_tree->setCurrentItem(field_item);
+    emit OnModified(true);
 }
 
 bool RegEdit::Quit()

@@ -97,7 +97,18 @@ void MainWindow::OnQuit()
 
 void MainWindow::OnAbout()
 {
-    QMessageBox::about(this, "About", "Written by Amaury Pouly for Rockbox");
+    QMessageBox::about(this, "About", 
+        "<h1>QEditor</h1>"
+        "<h2>Version "APP_VERSION"</h2>"
+        "<p>Written by Amaury Pouly</p>"
+        "<p>Libraries:</p>"
+        "<ul><li>soc_desc: "SOCDESC_VERSION"</li>"
+#ifdef HAVE_HWSTUB
+        "<li>hwstub: "HWSTUB_VERSION"</li>"
+#else
+        "<li>hwstub: not compiled in</li>"
+#endif
+        "</ul>");
 }
 
 void MainWindow::OnAboutQt()

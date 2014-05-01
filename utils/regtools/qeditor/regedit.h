@@ -238,6 +238,7 @@ protected slots:
     void OnSaveAs();
     void OnSocModified(bool modified);
     void OnNew();
+    void OnSocItemDelete();
 
 protected:
     void LoadSocFile(const QString& filename);

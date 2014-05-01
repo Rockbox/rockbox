@@ -7,6 +7,10 @@ SOURCES += main.cpp mainwindow.cpp regtab.cpp backend.cpp analyser.cpp \
 LIBS += -L../lib/ -lsocdesc -lxml2
 INCLUDEPATH += ../lib/ ../../hwstub/lib
 
+VERSION = 2.0.1
+
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
 unix {
     !nohwstub {
         message("Use 'qmake -config nohwstub' if you want to disable hwstub support")

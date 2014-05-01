@@ -5,6 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    app.setApplicationVersion(APP_VERSION);
 
     Backend backend;;
     QDir dir(QCoreApplication::applicationDirPath());
