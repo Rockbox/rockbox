@@ -24,7 +24,6 @@
 
 #include <stdbool.h>
 
-#define _backlight_init() true
 void _backlight_on(void);
 void _backlight_off(void);
 
