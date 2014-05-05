@@ -682,15 +682,22 @@ void usage(void)
     printf("\n");
     printf("usage: hwstub_tool [options] <soc desc files>\n");
     printf("options:\n");
-    printf("  --help/-?\tDisplay this help\n");
-    printf("  --quiet/-q\tQuiet non-command messages\n");
-    printf("  -i <init>\tSet lua init file (default is init.lua)\n");
+    printf("  --help/-?   Display this help\n");
+    printf("  --quiet/-q  Quiet non-command messages\n");
+    printf("  -i <init>   Set lua init file (default is init.lua)\n");
+    printf("  -e <cmd>    Execute <cmd> at startup\n");
+    printf("  -f <file>   Execute <file> at startup\n");
+    printf("Relative order of -e and -f commands are preserved.\n");
+    printf("They are executed after init file.\n");
     exit(1);
 }
+
+enum exec_type { exec_cmd, exec_file };
 
 int main(int argc, char **argv)
 {
     const char *lua_init = "init.lua";
+    std::vector< std::pair< exec_type, std::string > > startup_cmds;
     // parse command line
     while(1)
     {
@@ -701,7 +708,7 @@ int main(int argc, char **argv)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qi:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?qi:e:f:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -716,6 +723,12 @@ int main(int argc, char **argv)
                 break;
             case 'i':
                 lua_init = optarg;
+                break;
+            case 'e':
+                startup_cmds.push_back(std::make_pair(exec_cmd, std::string(optarg)));
+                break;
+            case 'f':
+                startup_cmds.push_back(std::make_pair(exec_file, std::string(optarg)));
                 break;
             default:
                 abort();
@@ -842,6 +855,20 @@ int main(int argc, char **argv)
     /** start interactive mode */
     if(!g_quiet)
         printf("Starting interactive lua session. Type 'help()' to get some help\n");
+
+    /** run startup commands */
+    for(size_t i = 0; i < startup_cmds.size(); i++)
+    {
+        bool ret = false;
+        if(!g_quiet)
+            printf("Running '%s'...\n", startup_cmds[i].second.c_str());
+        if(startup_cmds[i].first == exec_file)
+            ret = luaL_dofile(g_lua, startup_cmds[i].second.c_str());
+        else if(startup_cmds[i].first == exec_cmd)
+            ret = luaL_dostring(g_lua, startup_cmds[i].second.c_str());
+        if(ret)
+            printf("error: %s\n", lua_tostring(g_lua, -1));
+    }
 
     // use readline to provide some history and completion
     rl_bind_key('\t', rl_complete);
