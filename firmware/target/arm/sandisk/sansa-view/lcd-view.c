@@ -27,12 +27,7 @@
 #include "backlight-target.h"
 #include "lcd.h"
 
-#include "bitmaps/rockboxlogo.h"
-
-/* Power and display status */
-static bool power_on   = false; /* Is the power turned on?   */
-static bool display_on SHAREDBSS_ATTR = false; /* Is the display turned on? */
-static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
+static bool display_on SHAREDBSS_ATTR = true;
 static int lcd_type;
 
 #define LCD_DATA_OUT_GPIO GPIOH_OUTPUT_VAL
@@ -44,147 +39,109 @@ static int lcd_type;
 #define LCD_CS_GPIO GPIOH_OUTPUT_VAL
 #define LCD_CS_PIN 7
 
-#ifdef BOOTLOADER
+
+
 static void lcd_init_gpio(void)
 {
-    /* BOOT: 0x5CC8
-       OF: 0x88284 */
+    DEV_INIT1 |= 0xfc000000;
+    DEV_INIT3 |= 0xc300000;
 
-    outl(inl(0x70000010) | 0xFC000000, 0x70000010);
-    outl(inl(0x70000014) | 0xC300000, 0x70000014);
-
-    GPIOE_ENABLE     = 0;
-    GPIOM_ENABLE     &= ~0x3;
-    GPIOF_ENABLE     = 0;
-    GPIOJ_ENABLE     &= ~0x1a;
-    GPIOB_ENABLE     &= ~0x8;
+    GPIOE_ENABLE = 0;
+    GPIOM_ENABLE &= ~0x3;
+    GPIOF_ENABLE = 0;
+    GPIOJ_ENABLE &= ~0x1a;
+    // reset low
+    GPIOB_ENABLE &= ~0x8;
+    // SPI chip select
     GPIOH_OUTPUT_VAL |= 0x80;
-    GPIOH_OUTPUT_EN  |= 0x80;
-    GPIOH_ENABLE     |= 0x80;
+    GPIOH_OUTPUT_EN |= 0x80;
+    GPIOH_ENABLE |= 0x80;
+    // SPI clock
     GPIOH_OUTPUT_VAL |= 0x40;
-    GPIOH_OUTPUT_EN  |= 0x40;
-    GPIOH_ENABLE     |= 0x40;
+    GPIOH_OUTPUT_EN |= 0x40;
+    GPIOH_ENABLE |= 0x40;
+    // unk
     GPIOH_OUTPUT_VAL |= 0x20;
     GPIOH_OUTPUT_EN  |= 0x20;
-    GPIOH_ENABLE     |= 0x20;
+    GPIOH_ENABLE |= 0x20;
+    // SPI data
     GPIOH_OUTPUT_VAL |= 0x10;
-    GPIOH_OUTPUT_EN  |= 0x10;
-    GPIOH_ENABLE     |= 0x10;
-    GPIOD_OUTPUT_VAL |= 0x1;   /* backlight on */
-    GPIOD_ENABLE     |= 0x1;
+    GPIOH_OUTPUT_EN |= 0x10;
+    GPIOH_ENABLE |= 0x10;
+    // LCD reset
     GPIOB_OUTPUT_VAL |= 0x4;
-    GPIOB_ENABLE     |= 0x4;
-    GPIOB_OUTPUT_EN  |= 0x4;
-    DEV_INIT2        = 0x40000000;
-    GPIOG_ENABLE     |= 0x8;
-    GPIOG_OUTPUT_EN  &= ~0x8;
+    GPIOB_ENABLE |= 0x4;
+    GPIOB_OUTPUT_EN |= 0x4;
+    DEV_INIT2 = 0x40000000;
+    // LCD type
+    GPIOG_ENABLE |= 0x8;
+    GPIOG_OUTPUT_EN &= ~0x8;
 
-    if (GPIOG_INPUT_VAL & 0x8)
-        lcd_type = 1;
-    else
+    if(GPIOG_INPUT_VAL & 0x8)
         lcd_type = 0;
+    else
+        lcd_type = 1;
 }
-#endif
 
 static void lcd_send_msg(unsigned char count, unsigned int data)
 {
-    /* BOOT: 0x645C
-       OF: 0x88E90 */
-    int i;
+    GPIO_SET_BITWISE(LCD_CLOCK_GPIO, 1 << LCD_CLOCK_PIN);
+    GPIO_CLEAR_BITWISE(LCD_CS_GPIO, 1 << LCD_CS_PIN);
 
-    LCD_CLOCK_GPIO |= (1 << LCD_CLOCK_PIN);
-    LCD_CS_GPIO &= ~(1 << LCD_CS_PIN);
-
-    for (i = count - 1; i >= 0; i--)
+    for(int i = count - 1; i >= 0; i--)
     {
-        if (data & (1 << i))
-        {
-            LCD_DATA_OUT_GPIO &= ~(1 << LCD_DATA_OUT_PIN);
-        } else {
-            LCD_DATA_OUT_GPIO |= (1 << LCD_DATA_OUT_PIN);
-        }
-        LCD_CLOCK_GPIO &= ~(1 << LCD_CLOCK_PIN);
+        if(data & (1 << i))
+            GPIO_SET_BITWISE(LCD_DATA_OUT_GPIO, 1 << LCD_DATA_OUT_PIN);
+        else
+            GPIO_CLEAR_BITWISE(LCD_DATA_OUT_GPIO, 1 << LCD_DATA_OUT_PIN);
+        GPIO_CLEAR_BITWISE(LCD_CLOCK_GPIO, 1 << LCD_CLOCK_PIN);
         udelay(1);
-        LCD_CLOCK_GPIO |= (1 << LCD_CLOCK_PIN);
+        GPIO_SET_BITWISE(LCD_CLOCK_GPIO, 1 << LCD_CLOCK_PIN);
         udelay(2);
     }
 
-    LCD_CS_GPIO |= (1 << LCD_CS_PIN);
-    LCD_CLOCK_GPIO |= (1 << LCD_CLOCK_PIN);
-    udelay(1);
+    GPIO_SET_BITWISE(LCD_CS_GPIO, 1 << LCD_CS_PIN);
 }
 
-/*
-static void lcd_write_reg(unsigned int reg, unsigned int data)
+static void lcd_send_cmd(unsigned int cmd)
 {
-//  OF: 0x6278 - referenced from 0x62840
-
-//  So far this function is always called with shift = 0x0 ?
-//    If so can remove and simplify 
-
-    unsigned int cmd;
-    unsigned int shift = 0;
-
-    cmd = shift << 0x2;
-    cmd |= 0x70;
-    cmd = cmd << 0x10;
-    cmd |= reg;
-    lcd_send_msg(0x18, cmd);
-
-    cmd = shift << 0x2;
-    cmd |= 0x72;
-    cmd = cmd << 0x10;
-    cmd |= data;
-    lcd_send_msg(0x18, cmd);
-
-//     lcd_send_msg(0x70, reg);
-//     lcd_send_msg(0x72, data);
-}
-*/
-
-static void lcd_write_cmd(unsigned int cmd)
-{
-    lcd_send_msg(0x18, (0x700000 | cmd));
+    lcd_send_msg(24, (0x700000 | cmd));
 }
 
-static void lcd_write_info(unsigned int data)
+static void lcd_send_data(unsigned int data)
 {
-    lcd_send_msg(0x18, (0x720000 | data));
+    lcd_send_msg(24, (0x720000 | data));
 }
 
 static void lcd_write_reg(unsigned int cmd, unsigned int data)
 {
-    lcd_write_cmd(cmd);
-    lcd_write_info(data);
+    lcd_send_cmd(cmd);
+    lcd_send_data(data);
 }
 
 void lcd_reset(void)
 {
-    /* BOOT: 0x623C
-       OF: 0x88BDC */
-
-    GPIOB_OUTPUT_VAL |= 0x4;
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x4);
     udelay(1000);
-    GPIOB_OUTPUT_VAL &= ~0x4;
+    GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x4);
     udelay(10000);
-    GPIOB_OUTPUT_VAL |= 0x4;
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x4);
     udelay(50000);
 }
 
 /* Run the powerup sequence for the driver IC */
 static void lcd_power_on(void)
 {
+    lcd_init_gpio();
     lcd_reset();
-    /* OF: 0x5DC0 *
-    * r2: cmd    *
-    * r3: data   */
+
     lcd_write_reg(0xE5, 0x8000);
     lcd_write_reg(0x0, 0x1);
     lcd_write_reg(0x1, 0x100);
     lcd_write_reg(0x2, 0x700);
-    lcd_write_reg(0x3, 0x1230);
+    lcd_write_reg(0x3, 0x5230);
     lcd_write_reg(0x4, 0x0);
-    lcd_write_reg(0x8, 0x408);
+    lcd_write_reg(0x8, 0x408); /* back porch = 8, front porch = 4 */
     lcd_write_reg(0x9, 0x0);
     lcd_write_reg(0xa, 0x0);
     lcd_write_reg(0xd, 0x0);
@@ -199,8 +156,6 @@ static void lcd_power_on(void)
     sleep(HZ/20);
     lcd_write_reg(0x12, 0x13c);
     sleep(HZ/20);
-
-    /* BOOT: BNE 0x5fb2 */
 
     if (lcd_type == 0)
     {
@@ -234,19 +189,17 @@ static void lcd_power_on(void)
         lcd_write_reg(0x36, 0x504);
         lcd_write_reg(0x37, 0x707);
         lcd_write_reg(0x38, 0x306);
-        lcd_write_reg(0x39, 0x9);
+        lcd_write_reg(0x39, 0x7);
     }
 
-    /* BOOT: 0x6066 */
     lcd_write_reg(0x3c, 0x700);
     lcd_write_reg(0x3d, 0x700);
 
     lcd_write_reg(0x50, 0x0);
-    lcd_write_reg(0x51, 0xef);  /* 239 - LCD_WIDTH */
+    lcd_write_reg(0x51, 0xef);
     lcd_write_reg(0x52, 0x0);
-    lcd_write_reg(0x53, 0x13f); /* 319 - LCD_HEIGHT */
+    lcd_write_reg(0x53, 0x13f);
 
-    /* BOOT: b 0x6114 */
     lcd_write_reg(0x60, 0x2700);
     lcd_write_reg(0x61, 0x1);
     lcd_write_reg(0x6a, 0x0);
@@ -258,7 +211,6 @@ static void lcd_power_on(void)
     lcd_write_reg(0x84, 0x0);
     lcd_write_reg(0x85, 0x0);
 
-    /* BOOT: 0x61A8 */
     lcd_write_reg(0x90, 0x10);
     lcd_write_reg(0x92, 0x0);
     lcd_write_reg(0x93, 0x3);
@@ -266,28 +218,14 @@ static void lcd_power_on(void)
     lcd_write_reg(0x97, 0x0);
     lcd_write_reg(0x98, 0x0);
 
-    lcd_write_reg(0xc, 0x110);
+    lcd_write_reg(0xc, 0x000); // SYSTEM mode
     lcd_write_reg(0x7, 0x173);
     sleep(HZ/10);
-
-    power_on = true;
 }
 
-/* unknown 01 and 02 - sleep or enable on and off funcs? */
-void unknown01(void)
 {
-    /* BOOT: 0x62C4
-       OF: 0x88CA0 */
 
-    lcd_write_reg(0x10, 0x17B0);
-    udelay(100);
-    lcd_write_reg(0x7, 0x173);
-}
-
-void unknown02(void)
-{
-    /* BOOT: 0x6308
-       OF: 0x88D0C */
+    lcd_power_on();
 
     lcd_write_reg(0x7, 0x160);
     lcd_write_reg(0x10, 0x17B1);
@@ -295,9 +233,6 @@ void unknown02(void)
 
 void unknown03(bool r0)
 {
-    /* BOOT: 0x6410
-       OF: 0x88E30 */
-
     if (r0)
         GPIOJ_ENABLE &= ~0x2;
     else
@@ -308,76 +243,71 @@ void unknown03(bool r0)
     }
 }
 
-/* Run the display on sequence for the driver IC */
-static void lcd_display_on(void)
+void lcd_init_device(void)
 {
-    display_on = true;
+    lcd_power_on();
 }
 
-
-#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+#if defined(HAVE_LCD_ENABLE)
 bool lcd_active(void)
 {
     return display_on;
 }
 
-/* Turn off visible display operations */
-static void lcd_display_off(void)
-{
-    display_on = false;
-}
-#endif
-
-void lcd_init_device(void)
-{
-
-#ifdef BOOTLOADER /* Bother at all to do this again? */
-/* Init GPIO ports */
-    lcd_init_gpio();
-    lcd_power_on();
-    lcd_display_on();
-#else
-
-    power_on = true;
-    display_on = true;
-
-    lcd_set_invert_display(false);
-    lcd_set_flip(false);
-#endif
-}
-
-#if defined(HAVE_LCD_ENABLE)
 void lcd_enable(bool on)
 {
-    (void)on;
+    display_on = on;
+    if(on)
+    {
+        lcd_write_reg(0x10, 0x17B0);
+        udelay(100);
+        lcd_write_reg(0x7, 0x173);
+    }
+    else
+    {
+        lcd_write_reg(0x7, 0x160);
+        lcd_write_reg(0x10, 0x17B1);
+    }
 }
 #endif
 
-#if defined(HAVE_LCD_SLEEP)
-void lcd_sleep(void)
+static inline void lcd_send_frame_byte(unsigned char data)
 {
-
+    for(int bit = 0; bit < 8; bit++)
+    {
+        if(data & 0x80)
+            GPIO_SET_BITWISE(LCD_DATA_OUT_GPIO, 1 << LCD_DATA_OUT_PIN);
+        else
+            GPIO_CLEAR_BITWISE(LCD_DATA_OUT_GPIO, 1 << LCD_DATA_OUT_PIN);
+        data <<= 1;
+        GPIO_CLEAR_BITWISE(LCD_CLOCK_GPIO, 1 << LCD_CLOCK_PIN);
+        GPIO_SET_BITWISE(LCD_CLOCK_GPIO, 1 << LCD_CLOCK_PIN);
+    }
 }
-#endif
+
+static void lcd_send_frame(const fb_data *addr, int count)
+{
+    GPIO_SET_BITWISE(LCD_CLOCK_GPIO, 1 << LCD_CLOCK_PIN);
+    GPIO_CLEAR_BITWISE(LCD_CS_GPIO, 1 << LCD_CS_PIN);
+
+    lcd_send_frame_byte(0x72);
+    while(count-- > 0)
+    {
+        lcd_send_frame_byte(*addr >> 8);
+        lcd_send_frame_byte(*addr++ & 0xff);
+    }
+
+    GPIO_SET_BITWISE(LCD_CS_GPIO, 1 << LCD_CS_PIN);
+}
 
 void lcd_update(void)
 {
-    const fb_data *addr;
-
-    addr = FBADDR(LCD_WIDTH,LCD_HEIGHT);
-
+    if(!display_on)
+        return;
     lcd_write_reg(0x20, 0x0);
     lcd_write_reg(0x21, 0x0);
-
-    int i,j;
-    for(i=0; i < LCD_HEIGHT; i++)
-    {
-        for(j=0; j < LCD_WIDTH; j++)
-        {
-            lcd_write_reg(0x22, *addr);
-            addr++;
-        }
-    }
+    lcd_send_cmd(0x22);
+    lcd_send_frame(FBADDR(0, 0), LCD_WIDTH * LCD_HEIGHT);
 }
 
 /* Update a fraction of the display. */
@@ -407,37 +337,4 @@ void lcd_set_invert_display(bool yesno)
 void lcd_set_flip(bool yesno)
 {
     (void)yesno;
-}
-
-/* Blitting functions */
-
-void lcd_yuv_set_options(unsigned options)
-{
-    lcd_yuv_options = options;
-}
-
-/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(fb_data *dst,
-                                   unsigned char const * const src[3],
-                                   int width,
-                                   int stride);
-extern void lcd_write_yuv420_lines_odither(fb_data *dst,
-                                           unsigned char const * const src[3],
-                                           int width,
-                                           int stride,
-                                           int x_screen, /* To align dither pattern */
-                                           int y_screen);
-
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
 }

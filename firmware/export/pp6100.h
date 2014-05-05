@@ -104,4 +104,6 @@
 #define GPIOS 18
 #define GPIOT 19
 
+#define DEV_INIT3        (*(volatile unsigned long *)(0x70000014))
+
 #endif
