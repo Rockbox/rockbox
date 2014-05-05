@@ -223,6 +223,12 @@ bool HWStubDevice::Probe()
         if(ret != sizeof(m_hwdev_stmp))
             goto Lerr;
     }
+    else if(m_hwdev_target.dID == HWSTUB_TARGET_PP)
+    {
+        ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_PP, &m_hwdev_pp, sizeof(m_hwdev_pp));
+        if(ret != sizeof(m_hwdev_pp))
+            goto Lerr;
+    }
     Close();
     return true;
 
@@ -300,6 +306,14 @@ HWStubIoBackend::HWStubIoBackend(HWStubDevice *dev)
     }
     else if(target.dID == HWSTUB_TARGET_RK27)
         m_soc = "rk27x";
+    else if(target.dID == HWSTUB_TARGET_PP)
+    {
+        struct hwstub_pp_desc_t pp = m_dev->GetPPInfo();
+        if(pp.wChipID == 0x6110 )
+            m_soc = "pp6110";
+        else
+            m_soc = QString("pp%1").arg(pp.wChipID, 4, 16, QChar('0'));
+    }
     else
         m_soc = target.bName;
 }

@@ -123,6 +123,7 @@ public:
     inline struct hwstub_version_desc_t GetVersionInfo() { return m_hwdev_ver; }
     inline struct hwstub_target_desc_t GetTargetInfo() { return m_hwdev_target; }
     inline struct hwstub_stmp_desc_t GetSTMPInfo() { return m_hwdev_stmp; }
+    inline struct hwstub_pp_desc_t GetPPInfo() { return m_hwdev_pp; }
     /* Calls below require the device to be opened */
     bool ReadMem(soc_addr_t addr, size_t length, void *buffer);
     bool WriteMem(soc_addr_t addr, size_t length, void *buffer);
@@ -137,6 +138,7 @@ protected:
     struct hwstub_version_desc_t m_hwdev_ver;
     struct hwstub_target_desc_t m_hwdev_target;
     struct hwstub_stmp_desc_t m_hwdev_stmp;
+    struct hwstub_pp_desc_t m_hwdev_pp;
 };
 
 /** NOTE the HWStub backend is never dirty: all writes are immediately committed */
