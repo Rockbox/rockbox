@@ -60,3 +60,12 @@ PP.debug_on = false
 function PP.debug(...)
     if PP.debug_on then print(...) end
 end
+
+hh = h:create_topic("debug")
+hh:add("PP.debug(...) prints some debug output if PP.debug_on is true and does nothing otherwise.")
+
+PP.debug_on = false
+
+if PP.info.chip ~= nil then
+    require "pp/gpio"
+end
