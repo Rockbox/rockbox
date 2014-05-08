@@ -36,7 +36,7 @@ shopper.c
 resistor.c
 
 rockphys.c
-
+2048.c
 #ifdef USB_ENABLE_HID
 remote_control.c
 #endif
