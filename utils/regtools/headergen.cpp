@@ -137,6 +137,68 @@ void fprint_include_guard(FILE *f, bool begin)
     fprint_include_guard_ex(f, begin, name);
 }
 
+struct limited_column_context_t
+{
+    limited_column_context_t(size_t nr_col = 80)
+        :m_nr_col(nr_col), m_prevent_wordcut(true) {}
+    void set_prefix(const std::string& prefix) { m_prefix = prefix; }
+    void add(const std::string& text)
+    {
+        for(size_t i = 0; i < text.size();)
+        {
+            size_t offset = 0;
+            if(m_cur_line.size() == 0)
+                m_cur_line = m_prefix;
+            size_t len = std::min(text.size() - i, m_nr_col - m_cur_line.size());
+            // prevent word cut
+            if(m_prevent_wordcut && !isspace(text[i + len - 1]) && 
+                    i + len < text.size() && !isspace(text[i + len]))
+            {
+                size_t pos = text.find_last_of(" \t\n\v\r\f", i + len - 1);
+                if(pos == std::string::npos || pos < i)
+                    len = 0;
+                else
+                    len = pos - i + 1;
+            }
+            size_t pos = text.find('\n', i);
+            if(pos != std::string::npos && pos <= i + len)
+            {
+                offset = 1;
+                len = pos - i;
+            }
+            m_cur_line += text.substr(i, len);
+            // len == 0 means we need a new line
+            if(m_cur_line.size() == m_nr_col || len == 0)
+            {
+                m_lines.push_back(m_cur_line);
+                m_cur_line = "";
+            }
+            i += len + offset;
+        }
+    }
+
+    std::string to_string()
+    {
+        std::string str;
+        for(size_t i = 0; i < m_lines.size(); i++)
+            str += m_lines[i] + "\n";
+        if(m_cur_line.size() != 0)
+            str += m_cur_line + "\n";
+        return str;
+    }
+
+    void print(FILE *f)
+    {
+        fprintf(f, "%s", to_string().c_str());
+    }
+
+    std::vector< std::string > m_lines;
+    std::string m_cur_line;
+    std::string m_prefix;
+    size_t m_nr_col;
+    bool m_prevent_wordcut;
+};
+
 struct define_align_context_t
 {
     define_align_context_t():m_max_name(0) {}
@@ -144,6 +206,11 @@ struct define_align_context_t
     {
         m_lines.push_back(std::make_pair(name, val));
         m_max_name = std::max(m_max_name, name.size());
+    }
+
+    void add_raw(const std::string& line)
+    {
+        m_lines.push_back(std::make_pair("", line));
     }
 
     void print(FILE *f)
@@ -155,6 +222,12 @@ struct define_align_context_t
         for(size_t i = 0; i < m_lines.size(); i++)
         {
             std::string name = m_lines[i].first;
+            // raw entry ?
+            if(name.size() == 0)
+            {
+                fprintf(f, "%s", m_lines[i].second.c_str());
+                continue;
+            }
             name.insert(name.end(), align - define.size() - name.size(), ' ');
             fprintf(f, "%s%s%s\n", define.c_str(), name.c_str(), m_lines[i].second.c_str());
         }
@@ -164,8 +237,36 @@ struct define_align_context_t
     std::vector< std::pair< std::string, std::string > > m_lines;
 };
 
+limited_column_context_t print_description(const std::string& desc, const std::string& prefix)
+{
+    limited_column_context_t ctx;
+    if(desc.size() == 0)
+        return ctx;
+    ctx.set_prefix(prefix);
+    ctx.add(desc);
+    return ctx;
+}
+
+void fprint_description(FILE *f, const std::string& desc, const std::string& prefix)
+{
+    limited_column_context_t ctx = print_description(desc, prefix);
+    ctx.print(f);
+}
+
+void fprint_description(define_align_context_t& ctx, const std::string& desc, const std::string& prefix)
+{
+    limited_column_context_t ctx2 = print_description(desc, prefix);
+    ctx.add_raw(ctx2.to_string());
+}
+
 void gen_soc_field(define_align_context_t& ctx, bool multidev, bool multireg, const soc_reg_field_t& field)
 {
+    if(field.desc.size() != 0)
+    {
+        ctx.add_raw("/* Field: " + field.name + "\n");
+        fprint_description(ctx, "Description: " + field.desc + " */\n", " * ");
+    }
+
     std::string prefix = g_soc_dev + "_" + g_soc_reg + "_" + g_soc_field;
     ctx.add("BP_" + prefix, to_str(field.first_bit));
     ctx.add("BM_" + prefix, "0x" + to_hex(field.bitmask()));
@@ -200,8 +301,9 @@ void gen_soc_reg(FILE *f, bool multidev, const soc_reg_t& reg)
         fprintf(f, "\n");
     }
     fprintf(f, " * SCT: %s\n", sct ? "yes" : "no");
-
-    fprintf(f, "*/\n");
+    if(reg.desc.size() != 0)
+        fprint_description(f, "Description: " + reg.desc, " * ");
+    fprintf(f, " */\n");
 
     define_align_context_t ctx;
 
@@ -307,7 +409,7 @@ void gen_soc_dev_header(const std::string& filename, const xml_ver_t& ver, const
 
 void gen_soc_headers(const std::string& prefix, const soc_t& soc)
 {
-    printf("Generate headers for soc %s: use directory %s\n", soc.desc.c_str(),
+    printf("Generate headers for soc %s: use directory %s\n", soc.name.c_str(),
         prefix.c_str());
     mkdir(prefix.c_str(), 0770);
 

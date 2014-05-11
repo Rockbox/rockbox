@@ -47,7 +47,7 @@
 
 #define SOCDESC_VERSION_MAJOR   1
 #define SOCDESC_VERSION_MINOR   1
-#define SOCDESC_VERSION_REV     0
+#define SOCDESC_VERSION_REV     1
 
 #define SOCDESC_VERSION__(maj,min,rev) #maj"."#min"."#rev
 #define SOCDESC_VERSION_(maj,min,rev) SOCDESC_VERSION__(maj,min,rev)
@@ -100,6 +100,8 @@ struct soc_reg_field_t
     std::string name; /// name of the field
     std::string desc; /// human description
     unsigned first_bit, last_bit; /// bit range of the field
+
+    soc_reg_field_t():first_bit(0), last_bit(31) {}
 
     soc_word_t bitmask() const
     {
