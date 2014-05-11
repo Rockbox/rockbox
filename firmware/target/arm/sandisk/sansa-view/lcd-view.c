@@ -39,7 +39,23 @@ static int lcd_type;
 #define LCD_CS_GPIO GPIOH_OUTPUT_VAL
 #define LCD_CS_PIN 7
 
+#define HPW 4 /* HSYNC pulse width */
+#define HBP 4 /* HSYNC back porch */
+#define HFP 0 /* HSYNC front porch */
+#define VPW 1 /* VSYNC pulse width */
+#define VBP 3 /* VSYNC back porch */
+#define VFP 5 /* VSYNC front porch */
 
+#define FPS     60 /* frame per second */
+#define DOTCLK  ((LCD_WIDTH + HPW + HBP + HFP) * (LCD_HEIGHT + VPW + VBP + VFP) * FPS)
+
+#define DMABUF  0x14e00000
+
+#include "regs/regs-clock.h"
+#include "regs/regs-lcd3.h"
+#include "regs/regs-unk.h"
+
+#define USE_DVO2TFT
 
 static void lcd_init_gpio(void)
 {
@@ -139,7 +155,11 @@ static void lcd_power_on(void)
     lcd_write_reg(0x0, 0x1);
     lcd_write_reg(0x1, 0x100);
     lcd_write_reg(0x2, 0x700);
+#ifdef USE_DVO2TFT
+    lcd_write_reg(0x3, 0x1230);
+#else
     lcd_write_reg(0x3, 0x5230);
+#endif
     lcd_write_reg(0x4, 0x0);
     lcd_write_reg(0x8, 0x408); /* back porch = 8, front porch = 4 */
     lcd_write_reg(0x9, 0x0);
@@ -157,7 +177,7 @@ static void lcd_power_on(void)
     lcd_write_reg(0x12, 0x13c);
     sleep(HZ/20);
 
-    if (lcd_type == 0)
+    if(lcd_type == 0)
     {
         lcd_write_reg(0x13, 0x1700);
         lcd_write_reg(0x29, 0x10);
@@ -218,18 +238,81 @@ static void lcd_power_on(void)
     lcd_write_reg(0x97, 0x0);
     lcd_write_reg(0x98, 0x0);
 
+#ifdef USE_DVO2TFT
+    lcd_write_reg(0xc, 0x110); // RGB mode
+#else
     lcd_write_reg(0xc, 0x000); // SYSTEM mode
+#endif
     lcd_write_reg(0x7, 0x173);
     sleep(HZ/10);
 }
 
+#ifdef USE_DVO2TFT
+void setup_dvo2tft(void)
 {
+    BF_WR(CLOCK_ENABLE, LCD3, 1);
+    BF_WR(CLOCK_LCD3, DIV, 24000000 / DOTCLK); /* 24MHz / dotclk */
+    BF_WR_V(LCD3_CTRL1, WORDLENGTH, 18BIT);
+    BF_WR(LCD3_UNK4C, UNK15, 0);
+    BF_WR(LCD3_UNK4C, UNK12_8, 0);
+    BF_WR(LCD3_UNK4C, UNK19_16, 0);
+    BF_WR(LCD3_UNK4C, UNK14, 1);
+    BF_WR(LCD3_UNK4C, UNK7_0, 8);
+    BF_WR(LCD3_UNK4C, UNK20, 0);
+    BF_WR(LCD3_UNK4C, UNK23, 0);
+    BF_WR(LCD3_UNK4C, UNK22, 0);
+    BF_WR(LCD3_VDCTRL0, HSYNC_FIRST_DATA, HBP);
+    BF_WR(LCD3_VDCTRL0, HSYNC_LAST_DATA, HBP + LCD_WIDTH - 1);
+    BF_WR(LCD3_VDCTRL2, HSYNC_LAST_ENABLE, HBP - 1);
+    BF_WR(LCD3_VDCTRL2, HSYNC_FIRST_ENABLE, HBP + LCD_WIDTH);
+    BF_WR(LCD3_VDCTRL2, DISABLE, 0);
+    BF_WR(LCD3_VDCTRL1, HSYNC_LAST_LOW, HPW - 1);
+    BF_WR(LCD3_VDCTRL1, HSYNC_LAST_HIGH, HBP + LCD_WIDTH + HFP - 1);
+    BF_WR(LCD3_VDCTRL3, VSYNC_FIRST_DATA, VBP);
+    BF_WR(LCD3_VDCTRL3, VSYNC_LAST_DATA, VBP + LCD_HEIGHT - 1);
+    BF_WR(LCD3_VDCTRL4, VSYNC_LAST_LOW, VPW - 1);
+    BF_WR(LCD3_VDCTRL4, VSYNC_LAST_HIGH, VBP + LCD_HEIGHT + VFP - 1); // FIXME: OF doesn't have the -1
+    BF_WR(LCD3_VDCTRL5, VSYNC_LAST_ENABLE, VBP - 1);
+    BF_WR(LCD3_VDCTRL5, VSYNC_FIRST_ENABLE, VBP + LCD_HEIGHT);
+    BF_WR(LCD3_VDCTRL5, DISABLE, 0);
+    BF_WR(LCD3_WINDOW0, TOP, 0);
+    BF_WR(LCD3_WINDOW0, LEFT, 0);
+    BF_WR(LCD3_WINDOW1, BOTTOM, LCD_HEIGHT - 1);
+    BF_WR(LCD3_WINDOW1, RIGHT, LCD_WIDTH - 1);
+    BF_WR(LCD3_CTRL0, UNK7, 1);
+    BF_WR(LCD3_CTRL0, UNK6, 1);
+    BF_WR(LCD3_CTRL0, UNK5, 1);
+    HW_LCD3_UNK28 = 0;
+    HW_LCD3_UNK40 = 0;
+    BF_WR(LCD3_CTRL1, UNK0, 1);
+    BF_WR(LCD3_CTRL1, UNK3_2, 3);
+    BF_WR(LCD3_CTRL1, UNK9_8, 0);
+    BF_WR(LCD3_CTRL1, UNK10, 0);
+    BF_WR(LCD3_CTRL1, UNK11, 0);
+    BF_WR(LCD3_CTRL1, UNK12, 0);
+    BF_WR(LCD3_CTRL1, UNK13, 0);
+    BF_WR(LCD3_CTRL1, UNK14, 0);
+    BF_WR(LCD3_CTRL1, UNK15, 0);
+    BF_WR(LCD3_CTRL1, UNK18_16, 0);
+    BF_WR(LCD3_CTRL1, UNK19, 0);
+    BF_WR(LCD3_CTRL1, UNK30_22, 0);
+
+    BF_WR(UNK_UNK0, UNK21_19, 2);
+    BF_WR(UNK_UNK80, WIDTH, LCD_WIDTH / 16);
+    BF_WR(UNK_UNK80, HEIGHT, LCD_HEIGHT / 16);
+    BF_WR(UNK_UNK0, UNK18_0, 0x4e000);
+    BF_WR(UNK_UNK0, UNK22, 0);
+    BF_WR(UNK_UNK0, UNK24_23, 1);
+    BF_WR(UNK_UNK0, UNK26_25, 1);
+
+    HW_LCD3_UNK30 = 0x821;
 
     lcd_power_on();
 
-    lcd_write_reg(0x7, 0x160);
-    lcd_write_reg(0x10, 0x17B1);
+    BF_WR_V(LCD3_UNK80, MAGIC, MAGIC);
+    //unknown03(1);
 }
+#endif
 
 void unknown03(bool r0)
 {
@@ -245,7 +328,11 @@ void unknown03(bool r0)
 
 void lcd_init_device(void)
 {
+#ifdef USE_DVO2TFT
+    setup_dvo2tft();
+#else
     lcd_power_on();
+#endif
 }
 
 #if defined(HAVE_LCD_ENABLE)
@@ -304,10 +391,15 @@ void lcd_update(void)
 {
     if(!display_on)
         return;
+#ifdef USE_DVO2TFT
+    memcpy(DMABUF, FBADDR(0, 0), LCD_WIDTH * LCD_HEIGHT * sizeof(fb_data));
+    BF_WR(LCD3_CTRL1, UNK15, 1);
+#else
     lcd_write_reg(0x20, 0x0);
     lcd_write_reg(0x21, 0x0);
     lcd_send_cmd(0x22);
     lcd_send_frame(FBADDR(0, 0), LCD_WIDTH * LCD_HEIGHT);
+#endif
 }
 
 /* Update a fraction of the display. */
