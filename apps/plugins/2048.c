@@ -21,13 +21,14 @@
  *
  ***************************************************************************/
 #include <plugin.h>
-
+#include "lib/helper.h"
 #define WINNING_TILE 2048
 #define MAX_STARTING_TILES 2
 static int grid[4][4];
 static bool merged_grid[4][4];
 static int old_grid[4][4];
 static int score=0;
+static int max_numeral_width=-1, max_numeral_height=-1, winning_tile_length;
 extern void exit(int);
 /* TODO 
  * Add nice colors
@@ -38,6 +39,10 @@ extern void exit(int);
 static int rand_range(int min, int max)
 {
   return rb->rand()%(max-min+1)+min;
+}
+static void cleanup(void)
+{
+  backlight_use_settings();
 }
 static int rand_2_or_4(void)
 {
@@ -74,7 +79,7 @@ static void slide_internal(int startx, int starty, int stopx, int stopy, int dx,
    2 ^ ^ ^ ^
    1 ^ ^ ^ ^
    0 ^ ^ ^ ^
-     0 1 2 3
+   0 1 2 3
 */
 static void up(void)
 {
@@ -88,7 +93,7 @@ static void up(void)
    2 v v v v
    1 v v v v
    0 
-     0 1 2 3
+   0 1 2 3
 */ 
 static void down(void)
 {
@@ -102,7 +107,7 @@ static void down(void)
    2   < < <
    1   < < <
    0   < < <
-     0 1 2 3
+   0 1 2 3
 */ 
 static void left(void)
 {
@@ -116,7 +121,7 @@ static void left(void)
    2 > > >  
    1 > > >  
    0 > > >  
-     0 1 2 3
+   0 1 2 3
 */ 
 static void right(void)
 {
@@ -128,27 +133,30 @@ static void right(void)
 static void draw(void)
 {
   rb->lcd_clear_display();
+  /* Draw the grid */
+  char str[32];
   for(int y=3;y>=0;--y)
     {
       for(int x=0;x<4;++x)
         {
           if(grid[x][y])
-            rb->lcd_putsf(5*x,y+1,"%d",grid[x][y]);
+            {
+              rb->snprintf(str,32,"%d", grid[x][y]);
+              rb->lcd_putsxy(winning_tile_length*x,y*max_numeral_height+max_numeral_height,str);
+            }
         }
     }
-
-  char str[32];
-
+  /* Now draw the score, and the game title */
   rb->snprintf(str, 32, "Score: %d", score);
   int str_width, str_height;
   rb->font_getstringsize(str, &str_width, &str_height, FONT_UI);
   int score_leftmost=LCD_WIDTH-str_width-1;
-  /* Check if there is enough space to display the Score:, otherwise, only display the score */
+  /* Check if there is enough space to display "Score: ", otherwise, only display the score */
   if(score_leftmost>=0)
     rb->lcd_putsxy(score_leftmost,0,str);
   else
     rb->lcd_putsxy(score_leftmost,0,str+rb->strlen("Score: "));
-  /* Reusing the same string for the title */
+  /* Reuse the same string for the title */
   
   rb->snprintf(str, 32, "%d", WINNING_TILE);
   rb->font_getstringsize(str, &str_width, &str_height, FONT_UI);
@@ -232,7 +240,7 @@ static void check_gameover(void)
       exit(PLUGIN_OK);
     }
 }
-static enum plugin_status do_game(void)
+static void init_game(void)
 {
   for(int y=0;y<4;++y)
     {
@@ -241,10 +249,28 @@ static enum plugin_status do_game(void)
     }
   for(int i=0;i<MAX_STARTING_TILES;++i)
     {
-      grid[rand_range(0,3)][rand_range(0,3)]=rand_2_or_4();
+      place_random();
     }
+  /* Find the width of the widest character so the drawing can be nicer */
+  for(char c='0';c<='9';++c)
+    {
+      int width=rb->font_get_width(rb->font_get(FONT_UI), c);
+      if(width>max_numeral_width)
+        max_numeral_width=width;
+    }
+  /* Now get the height of the font */
+  rb->font_getstringsize("0123456789", NULL, &max_numeral_height,FONT_UI);
+  /* Size of the winning tile: */
+  char winning_tile_buf[32];
+  rb->snprintf(winning_tile_buf,32,"%d", WINNING_TILE);
+  winning_tile_length=rb->strlen(winning_tile_buf)*max_numeral_width+1;
+  backlight_ignore_timeout();
   rb->lcd_clear_display();
   draw();
+}
+static enum plugin_status do_game(void)
+{
+  init_game();
   int made_move=0;
   while(1)
     {
@@ -279,6 +305,7 @@ static enum plugin_status do_game(void)
           made_move=1;
           break;
         case BUTTON_POWER:
+          cleanup();
           return PLUGIN_OK;
           break;
         default:
