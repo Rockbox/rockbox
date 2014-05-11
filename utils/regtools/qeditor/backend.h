@@ -85,7 +85,7 @@ class FileIoBackend : public IoBackend
 {
     Q_OBJECT
 public:
-    FileIoBackend(const QString& filename);
+    FileIoBackend(const QString& filename, const QString& soc_name = "");
 
     virtual bool SupportAccess(AccessType type) { return type == ByName; }
     virtual QString GetSocName();
@@ -113,6 +113,7 @@ class HWStubDevice
 {
 public:
     HWStubDevice(struct libusb_device *dev);
+    HWStubDevice(const HWStubDevice *dev);
     ~HWStubDevice();
     bool IsValid();
     bool Open();
@@ -130,6 +131,7 @@ public:
 
 protected:
     bool Probe();
+    void Init(struct libusb_device *dev);
 
     bool m_valid;
     struct libusb_device *m_dev;
@@ -146,6 +148,7 @@ class HWStubIoBackend : public IoBackend
 {
     Q_OBJECT
 public:
+    // NOTE: HWStubIoBackend takes ownership of the device and will delete it
     HWStubIoBackend(HWStubDevice *dev);
     virtual ~HWStubIoBackend();
 
@@ -310,6 +313,8 @@ public:
     bool GetRegRef(const SocDevRef& dev, const QString& reg, SocRegRef& ref);
     bool GetFieldRef(const SocRegRef& reg, const QString& field, SocFieldRef& ref);
     bool GetRegisterAddress(const QString& dev, const QString& reg, soc_addr_t& addr);
+    bool DumpAllRegisters(const QString& filename);
+
 private:
     IoBackend *m_io_backend;
     const SocRef& m_soc;

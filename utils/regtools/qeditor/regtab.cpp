@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QStyle>
+#include <QMessageBox>
 #include "backend.h"
 #include "analyser.h"
 #include "regdisplaypanel.h"
@@ -111,9 +112,11 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     m_readonly_check = new QCheckBox("Read-only");
     m_readonly_check->setCheckState(Qt::Checked);
     m_data_soc_label = new QLabel;
-    QPushButton *data_sel_reload = new QPushButton;
-    data_sel_reload->setIcon(QIcon::fromTheme("view-refresh"));
-    data_sel_reload->setToolTip("Reload data");
+    m_dump = new QPushButton("Dump", this);
+    m_dump->setIcon(QIcon::fromTheme("system-run"));
+    m_data_sel_reload = new QPushButton(this);
+    m_data_sel_reload->setIcon(QIcon::fromTheme("view-refresh"));
+    m_data_sel_reload->setToolTip("Reload data");
     data_sel_layout->addWidget(m_data_selector);
     data_sel_layout->addWidget(m_data_sel_edit, 1);
     data_sel_layout->addStretch(0);
@@ -123,7 +126,8 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
 #endif
     data_sel_layout->addWidget(m_readonly_check);
     data_sel_layout->addWidget(m_data_soc_label);
-    data_sel_layout->addWidget(data_sel_reload);
+    data_sel_layout->addWidget(m_dump);
+    data_sel_layout->addWidget(m_data_sel_reload);
     data_sel_group->setLayout(data_sel_layout);
     m_data_soc_label->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
 
@@ -153,6 +157,7 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
         this, SLOT(OnDevChanged(int)));
 #endif
     connect(m_readonly_check, SIGNAL(clicked(bool)), this, SLOT(OnReadOnlyClicked(bool)));
+    connect(m_dump, SIGNAL(clicked(bool)), this, SLOT(OnDumpRegs(bool)));
 
     OnSocListChanged();
     OnDataSelChanged(0);
@@ -205,6 +210,8 @@ void RegTab::OnDataSelChanged(int index)
         m_dev_selector->hide();
 #endif
         m_readonly_check->show();
+        m_data_sel_reload->show();
+        m_dump->hide();
         QFileDialog *fd = new QFileDialog(m_data_selector);
         fd->setFilter("Textual files (*.txt);;All files (*)");
         fd->setDirectory(Settings::Get()->value("loaddatadir", QDir::currentPath()).toString());
@@ -226,6 +233,8 @@ void RegTab::OnDataSelChanged(int index)
         m_data_sel_edit->hide();
         m_readonly_check->show();
         m_dev_selector->show();
+        m_data_sel_reload->hide();
+        m_dump->show();
         OnDevListChanged();
     }
 #endif
@@ -236,6 +245,8 @@ void RegTab::OnDataSelChanged(int index)
         m_dev_selector->hide();
 #endif
         m_readonly_check->hide();
+        m_data_sel_reload->hide();
+        m_dump->hide();
 
         delete m_io_backend;
         m_io_backend = m_backend->CreateDummyIoBackend();
@@ -363,7 +374,10 @@ void RegTab::OnDevChanged(int index)
         return;
     HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(index).value< void* >());
     delete m_io_backend;
-    m_io_backend = m_backend->CreateHWStubIoBackend(dev);
+    /* NOTE: make a copy of the HWStubDevice device because the one in the list
+     * might get destroyed when clearing the list while the backend is still
+     * active: this would result in a double free when the backend is also destroyed */
+    m_io_backend = m_backend->CreateHWStubIoBackend(new HWStubDevice(dev));
     SetDataSocName(m_io_backend->GetSocName());
     OnDataSocActivated(m_io_backend->GetSocName());
     OnDataChanged();
@@ -434,4 +448,23 @@ void RegTab::OnReadOnlyClicked(bool checked)
         return SetReadOnlyIndicator();
     m_right_content->AllowWrite(!checked);
     UpdateSocFilename();
+}
+
+void RegTab::OnDumpRegs(bool c)
+{
+    Q_UNUSED(c);
+    QFileDialog *fd = new QFileDialog(this);
+    fd->setAcceptMode(QFileDialog::AcceptSave);
+    fd->setFilter("Textual files (*.txt);;All files (*)");
+    fd->setDirectory(Settings::Get()->value("loaddatadir", QDir::currentPath()).toString());
+    if(!fd->exec())
+        return;
+    QStringList filenames = fd->selectedFiles();
+    Settings::Get()->setValue("loaddatadir", fd->directory().absolutePath());
+    BackendHelper bh(m_io_backend, m_cur_soc);
+    if(!bh.DumpAllRegisters(filenames[0]))
+    {
+        QMessageBox::warning(this, "The register dump was not saved",
+            "There was an error when dumping the registers");
+    }
 }

@@ -90,9 +90,10 @@ IoBackend *Backend::CreateHWStubIoBackend(HWStubDevice *dev)
  * FileIoBackend
  */
 
-FileIoBackend::FileIoBackend(const QString& filename)
+FileIoBackend::FileIoBackend(const QString& filename, const QString& soc_name)
 {
     m_filename = filename;
+    m_soc = soc_name;
     Reload();
 }
 
@@ -163,7 +164,7 @@ bool FileIoBackend::Commit()
     while(it.hasNext())
     {
         it.next();
-        out << it.key() << " = " << it.value() << "\n";
+        out << it.key() << " = " << hex << showbase << it.value() << "\n";
     }
     out.flush();
     return file.flush();
@@ -174,6 +175,16 @@ bool FileIoBackend::Commit()
  * HWStubDevice
  */
 HWStubDevice::HWStubDevice(struct libusb_device *dev)
+{
+    Init(dev);
+}
+
+HWStubDevice::HWStubDevice(const HWStubDevice *dev)
+{
+    Init(dev->m_dev);
+}
+
+void HWStubDevice::Init(struct libusb_device *dev)
 {
     libusb_ref_device(dev);
     m_dev = dev;
@@ -325,7 +336,7 @@ QString HWStubIoBackend::GetSocName()
 
 HWStubIoBackend::~HWStubIoBackend()
 {
-    m_dev->Close();
+    delete m_dev;
 }
 
 bool HWStubIoBackend::ReadRegister(soc_addr_t addr, soc_word_t& value)
@@ -529,4 +540,32 @@ bool BackendHelper::ReadRegisterField(const QString& dev, const QString& reg,
         return false;
     v = (v & field_ref.GetField().bitmask()) >> field_ref.GetField().first_bit;
     return true;
+}
+
+bool BackendHelper::DumpAllRegisters(const QString& filename)
+{
+    FileIoBackend b(filename, QString::fromStdString(m_soc.GetSoc().name));
+    BackendHelper bh(&b, m_soc);
+    for(size_t i = 0; i < m_soc.GetSoc().dev.size(); i++)
+    {
+        const soc_dev_t& dev = m_soc.GetSoc().dev[i];
+        for(size_t j = 0; j < dev.addr.size(); j++)
+        {
+            QString devname = QString::fromStdString(dev.addr[j].name);
+            for(size_t k = 0; k < dev.reg.size(); k++)
+            {
+                const soc_reg_t& reg = dev.reg[k];
+                for(size_t l = 0; l < reg.addr.size(); l++)
+                {
+                    QString regname = QString::fromStdString(reg.addr[l].name);
+                    soc_word_t val;
+                    if(!ReadRegister(devname, regname, val))
+                        return false;
+                    if(!bh.WriteRegister(devname, regname, val))
+                        return false;
+                }
+            }
+        }
+    }
+    return b.Commit();
 }

@@ -80,6 +80,7 @@ protected:
     QCheckBox *m_readonly_check;
     QLabel *m_data_soc_label;
     QPushButton *m_data_sel_reload;
+    QPushButton *m_dump;
     QComboBox *m_data_selector;
     IoBackend *m_io_backend;
     QTabWidget *m_type_selector;
@@ -102,6 +103,7 @@ private slots:
     void OnAnalyserChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void OnAnalyserClicked(QListWidgetItem *clicked);
     void OnReadOnlyClicked(bool);
+    void OnDumpRegs(bool);
 };
 
 #endif /* REGTAB_H */

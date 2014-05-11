@@ -55,6 +55,15 @@ public:
 protected:
     IoBackend::WriteMode EditModeToWriteMode(RegLineEdit::EditMode mode);
 
+    enum
+    {
+        FieldBitsColumn = 0,
+        FieldNameColumn = 1,
+        FieldValueColumn = 2,
+        FieldMeaningColumn = 3,
+        FieldDescColumn = 4,
+    };
+
     IoBackend *m_io_backend;
     const SocRegRef& m_reg;
     bool m_allow_write;
@@ -69,9 +78,11 @@ protected:
     QLabel *m_desc;
     QWidget *m_viewport;
     QScrollArea *m_scroll;
+    bool m_ignore_cell_change;
 
 private slots:
     void OnRawRegValueReturnPressed();
+    void OnRegFieldValueChanged(int row, int col);
 };
 
 #endif /* REGDISPLAYPANEL_H */ 

@@ -321,6 +321,47 @@ void SocFieldEditor::setField(uint field)
 }
 
 /**
+ * SocFieldCachedItemDelegate
+ */
+
+QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
+{
+    // FIXME see QTBUG-30392
+    if(value.type() == QVariant::UserType && value.userType() == qMetaTypeId< SocFieldCachedValue >())
+    {
+        const SocFieldCachedValue& v = value.value< SocFieldCachedValue >();
+        int bitcount = v.field().last_bit - v.field().first_bit;
+        return QString("0x%1").arg(v.value(), (bitcount + 3) / 4, 16, QChar('0'));
+    }
+    else
+        return QStyledItemDelegate::displayText(value, locale);
+}
+
+/**
+ * SocFieldCachedEditor
+ */
+SocFieldCachedEditor::SocFieldCachedEditor(QWidget *parent)
+    :SocFieldEditor(soc_reg_field_t(), parent)
+{
+}
+
+SocFieldCachedEditor::~SocFieldCachedEditor()
+{
+}
+
+SocFieldCachedValue SocFieldCachedEditor::value() const
+{
+    return SocFieldCachedValue(m_value.field(), field());
+}
+
+void SocFieldCachedEditor::setValue(SocFieldCachedValue val)
+{
+    m_value = val;
+    SetRegField(m_value.field());
+    setField(m_value.value());
+}
+
+/**
  * SocFieldEditorCreator
  */
 QWidget *SocFieldEditorCreator::createWidget(QWidget *parent) const
@@ -331,6 +372,19 @@ QWidget *SocFieldEditorCreator::createWidget(QWidget *parent) const
 QByteArray SocFieldEditorCreator::valuePropertyName() const
 {
     return QByteArray("field");
+}
+
+/**
+ * SocFieldCachedEditorCreator
+ */
+QWidget *SocFieldCachedEditorCreator::createWidget(QWidget *parent) const
+{
+    return new SocFieldCachedEditor(parent);
+}
+
+QByteArray SocFieldCachedEditorCreator::valuePropertyName() const
+{
+    return QByteArray("value");
 }
 
 /**

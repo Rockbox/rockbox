@@ -106,6 +106,7 @@ public:
 
     uint field() const;
     void setField(uint field);
+    void SetRegField(const soc_reg_field_t& field) { m_reg_field = field; }
 
 protected:
     SocFieldValidator *m_validator;
@@ -124,6 +125,55 @@ public:
 
 protected:
     soc_reg_field_t m_field;
+};
+
+class SocFieldCachedValue
+{
+public:
+    SocFieldCachedValue():m_value(0) {}
+    SocFieldCachedValue(const soc_reg_field_t& field, uint value)
+        :m_field(field), m_value(value) {}
+    virtual ~SocFieldCachedValue() {}
+    const soc_reg_field_t& field() const { return m_field; }
+    uint value() const { return m_value; }
+protected:
+    soc_reg_field_t m_field;
+    uint m_value;
+};
+
+Q_DECLARE_METATYPE(SocFieldCachedValue)
+
+class SocFieldCachedItemDelegate : public QStyledItemDelegate
+{
+public:
+    SocFieldCachedItemDelegate(QObject *parent = 0):QStyledItemDelegate(parent) {}
+
+    virtual QString displayText(const QVariant& value, const QLocale& locale) const;
+};
+
+class SocFieldCachedEditor : public SocFieldEditor
+{
+    Q_OBJECT
+    Q_PROPERTY(SocFieldCachedValue value READ value WRITE setValue USER true)
+public:
+    SocFieldCachedEditor(QWidget *parent = 0);
+    virtual ~SocFieldCachedEditor();
+
+    SocFieldCachedValue value() const;
+    void setValue(SocFieldCachedValue field);
+protected:
+    SocFieldCachedValue m_value;
+};
+
+class SocFieldCachedEditorCreator : public QItemEditorCreatorBase
+{
+public:
+    SocFieldCachedEditorCreator() {}
+
+    virtual QWidget *createWidget(QWidget *parent) const;
+    virtual QByteArray valuePropertyName() const;
+
+protected:
 };
 
 class RegSexyDisplay : public QWidget
