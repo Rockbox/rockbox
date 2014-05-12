@@ -12,7 +12,7 @@
 #include <soc_desc.hpp>
 #include "backend.h"
 #include "settings.h"
-#include "aux.h"
+#include "utils.h"
 #include "regtab.h"
 
 class RegItemEditorCreator : public QItemEditorCreatorBase

@@ -21,7 +21,7 @@
 #include "backend.h"
 #include "settings.h"
 #include "mainwindow.h"
-#include "aux.h"
+#include "utils.h"
 
 class AbstractRegEditPanel
 {
