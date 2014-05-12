@@ -179,12 +179,12 @@ static void place_random(void)
   for(int y=0;y<4;++y)
     for(int x=0;x<4;++x)
       {
-	if(!grid[x][y])
-	  {
-	    xpos[back]=x;
-	    ypos[back]=y;
-	    ++back;
-	  }
+        if(!grid[x][y])
+          {
+            xpos[back]=x;
+            ypos[back]=y;
+            ++back;
+          }
       }
   if(!back)
     return;
