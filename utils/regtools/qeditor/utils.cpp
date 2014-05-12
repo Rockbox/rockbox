@@ -1,4 +1,4 @@
-#include "aux.h"
+#include "utils.h"
 #include <QFontMetrics>
 #include <QPainter>
 #include <QTextDocument>
