@@ -297,92 +297,70 @@ static int do_info(void)
     return 0;
 }
 
+struct rw_fw_context_t
+{
+    int tot_size;
+    int cur_size;
+    int last_percent;
+    FILE *f;
+    bool read;
+};
+
+int rw_fw(void *user, void *buf, size_t size)
+{
+    struct rw_fw_context_t *ctx = user;
+    int this_percent = (ctx->cur_size * 100LLU) / ctx->tot_size;
+    if(this_percent != ctx->last_percent && (this_percent % 5) == 0)
+    {
+        cprintf(RED, "%d%%", this_percent);
+        cprintf(YELLOW, "...");
+        fflush(stdout);
+    }
+    ctx->last_percent = this_percent;
+    int ret = -1;
+    if(ctx->read)
+        ret = fread(buf, size, 1, ctx->f);
+    else
+        ret = fwrite(buf, size, 1, ctx->f);
+    ctx->cur_size += size;
+    if(ret != 1)
+        return -1;
+    else
+        return size;
+}
+
+void rw_finish(struct rw_fw_context_t *ctx)
+{
+    if(ctx->last_percent == 100)
+        return;
+    cprintf(RED, "100%%\n");
+}
+
 void do_extract(const char *file)
 {
-    FILE *f = NULL;
-    cprintf(BLUE, "Extracting firmware...\n");
-
-    struct stmp_logical_media_table_t *table = NULL;
-    int ret = stmp_get_logical_media_table(g_dev_fd, &table);
-    if(ret)
-    {
-        cprintf(GREY, "Cannot get logical table: %d\n", ret);
-        goto Lend;
-    }
-    int entry = 0;
-    while(entry < table->header.count)
-        if(table->entry[entry].type == SCSI_STMP_DRIVE_TYPE_SYSTEM &&
-                table->entry[entry].tag == SCSI_STMP_DRIVE_TAG_SYSTEM_BOOT)
-            break;
-        else
-            entry++;
-    if(entry == table->header.count)
-    {
-        cprintf(GREY, "Cannot find firmware partition\n");
-        goto Lend;
-    }
-    uint8_t drive_no = table->entry[entry].drive_no;
-    uint64_t drive_sz = table->entry[entry].size;
-    if(g_debug)
-    {
-        cprintf(RED, "* ");
-        cprintf_field("Drive: ", "%#x\n", drive_no);
-        cprintf(RED, "* ");
-        cprintf_field("Size: ", "%#llx\n", (unsigned long long)drive_sz);
-    }
-    struct stmp_logical_drive_info_t info;
-    ret = stmp_get_logical_drive_info(g_dev_fd, drive_no, &info);
-    if(ret || !info.has.sector_size)
-    {
-        cprintf(GREY, "Cannot get sector size\n");
-        goto Lend;
-    }
-    unsigned sector_size = info.sector_size;
-    if(g_debug)
-    {
-        cprintf(RED, "* ");
-        cprintf_field("Sector size: ", "%lu\n", (unsigned long)sector_size);
-    }
-    uint8_t *sector = malloc(sector_size);
-    ret = stmp_read_logical_drive_sectors(g_dev_fd, drive_no, 0, 1, sector, sector_size);
-    if(ret)
-    {
-        cprintf(GREY, "Cannot read first sector: %d\n", ret);
-        goto Lend;
-    }
-    uint32_t fw_size = *(uint32_t *)(sector + 0x1c) * 16;
-    if(g_debug)
-    {
-        cprintf(RED, "* ");
-        cprintf_field("Firmware size: ", "%#x\n", fw_size);
-    }
-
-    f = fopen(file, "wb");
+    FILE *f = fopen(file, "wb");
     if(f == NULL)
     {
-        cprintf(GREY, "Cannot open '%s' for writing: %m\n", file);
-        goto Lend;
+        cprintf(GREY, "Cannot open output file: %m\n");
+        return;
     }
-
-    for(int sec = 0; sec * sector_size < fw_size; sec++)
+    int ret = stmp_read_firmware(g_dev_fd, NULL, NULL);
+    if(ret < 0)
     {
-        ret = stmp_read_logical_drive_sectors(g_dev_fd, drive_no, sec, 1, sector, sector_size);
-        if(ret)
-        {
-            cprintf(GREY, "Cannot read sector %d: %d\n", sec, ret);
-            goto Lend;
-        }
-        if(fwrite(sector, sector_size, 1, f) != 1)
-        {
-            cprintf(GREY, "Write failed: %m\n");
-            goto Lend;
-        }
+        cprintf(GREY, "Cannot get firmware size: %d\n", ret);
+        return;
     }
-    cprintf(BLUE, "Done\n");
-Lend:
-    free(table);
-    if(f)
-        fclose(f);
+    struct rw_fw_context_t ctx;
+    ctx.tot_size = ret;
+    ctx.cur_size = 0;
+    ctx.f = f;
+    ctx.last_percent = -1;
+    ctx.read = false;
+    ret = stmp_read_firmware(g_dev_fd, &ctx, &rw_fw);
+    if(ret < 0)
+        cprintf(GREY, "Cannot read firmware: %d\n", ret);
+    rw_finish(&ctx);
+    fclose(f);
 }
 
 void do_write(const char *file, int want_a_brick)
@@ -394,115 +372,25 @@ void do_write(const char *file, int want_a_brick)
         cprintf(GREY, "option on the command line and do not complain if you end up with a brick ;)\n");
         return;
     }
-    FILE *f = NULL;
-    cprintf(BLUE, "Writing firmware...\n");
-
-    struct stmp_logical_media_table_t *table = NULL;
-    int ret = stmp_get_logical_media_table(g_dev_fd, &table);
-    if(ret)
-    {
-        cprintf(GREY, "Cannot get logical table: %d\n", ret);
-        goto Lend;
-    }
-    int entry = 0;
-    while(entry < table->header.count)
-        if(table->entry[entry].type == SCSI_STMP_DRIVE_TYPE_SYSTEM &&
-                table->entry[entry].tag == SCSI_STMP_DRIVE_TAG_SYSTEM_BOOT)
-            break;
-        else
-            entry++;
-    if(entry == table->header.count)
-    {
-        cprintf(GREY, "Cannot find firmware partition\n");
-        goto Lend;
-    }
-    uint8_t drive_no = table->entry[entry].drive_no;
-    uint64_t drive_sz = table->entry[entry].size;
-    if(g_debug)
-    {
-        cprintf(RED, "* ");
-        cprintf_field("Drive: ", "%#x\n", drive_no);
-        cprintf(RED, "* ");
-        cprintf_field("Size: ", "%#llx\n", (unsigned long long)drive_sz);
-    }
-    struct stmp_logical_drive_info_t info;
-    ret = stmp_get_logical_drive_info(g_dev_fd, drive_no, &info);
-    if(ret || !info.has.sector_size)
-    {
-        cprintf(GREY, "Cannot get sector size\n");
-        goto Lend;
-    }
-    unsigned sector_size = info.sector_size;
-    uint8_t *sector = malloc(sector_size);
-
-    /* sanity check by reading first sector */
-    ret = stmp_read_logical_drive_sectors(g_dev_fd, drive_no, 0, 1, sector, sector_size);
-    if(ret)
-    {
-        cprintf(GREY, "Cannot read first sector: %d\n", ret);
-        return;
-    }
-    uint32_t sig = *(uint32_t *)(sector + 0x14);
-    if(sig != 0x504d5453)
-    {
-        cprintf(GREY, "There is something wrong: the first sector doesn't have the STMP signature. Bailing out...\n");
-        return;
-    }
-
-    f = fopen(file, "rb");
+    FILE *f = fopen(file, "rb");
     if(f == NULL)
     {
-        cprintf(GREY, "Cannot open '%s' for writing: %m\n", file);
-        goto Lend;
+        cprintf(GREY, "Cannot open output file: %m\n");
+        return;
     }
+    struct rw_fw_context_t ctx;
     fseek(f, 0, SEEK_END);
-    int fw_size = ftell(f);
+    ctx.tot_size = ftell(f);
     fseek(f, 0, SEEK_SET);
-    if(g_debug)
-    {
-        cprintf(RED, "* ");
-        cprintf_field("Firmware size: ", "%#x\n", fw_size);
-    }
-    /* sanity check size */
-    if((uint64_t)fw_size > drive_sz)
-    {
-        cprintf(GREY, "You cannot write a firmware greater than the partition size.\n");
-        goto Lend;
-    }
-
-    int percent = -1;
-    for(int off = 0; off < fw_size; off += sector_size)
-    {
-        int sec = off / sector_size;
-        int this_percent = (sec * 100) / (fw_size / sector_size);
-        if(this_percent != percent && (this_percent % 5) == 0)
-        {
-            cprintf(RED, "%d%%", this_percent);
-            cprintf(YELLOW, "...");
-            fflush(stdout);
-        }
-        percent = this_percent;
-        int xfer_len = MIN(fw_size - off, (int)sector_size);
-        if(fread(sector, xfer_len, 1, f) != 1)
-        {
-            cprintf(GREY, "Read failed: %m\n");
-            goto Lend;
-        }
-        /* NOTE transfer a whole sector even if incomplete, the device won't access
-         * partial sectors */
-        if(xfer_len < (int)sector_size)
-            memset(sector + xfer_len, 0, sector_size - xfer_len);
-        ret = stmp_write_logical_drive_sectors(g_dev_fd, drive_no, sec, 1, sector, sector_size);
-        if(ret)
-        {
-            cprintf(GREY, "Cannot write sector %d: %d\n", sec, ret);
-            goto Lend;
-        }
-    }
-    cprintf(BLUE, "Done\n");
-Lend:
-    if(f)
-        fclose(f);
+    ctx.cur_size = 0;
+    ctx.f = f;
+    ctx.last_percent = -1;
+    ctx.read = true;
+    int ret = stmp_write_firmware(g_dev_fd, &ctx, &rw_fw);
+    if(ret < 0)
+        cprintf(GREY, "Cannot write firmware: %d\n", ret);
+    rw_finish(&ctx);
+    fclose(f);
 }
 
 static void usage(void)
