@@ -59,7 +59,7 @@ public class RockboxYesno
             {
                 Listener l = new Listener();
                 new AlertDialog.Builder(c)
-                .setTitle(R.string.KbdInputTitle)
+                .setTitle(R.string.YesNoTitle)
                 .setIcon(R.drawable.icon)
                 .setMessage(text)
                 .setPositiveButton(yes, l)
