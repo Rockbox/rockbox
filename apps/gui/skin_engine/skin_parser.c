@@ -422,6 +422,7 @@ static int parse_image_load(struct skin_element *element,
     img->using_preloaded_icons = false;
     img->buflib_handle = -1;
     img->is_9_segment = false;
+    img->loaded = false;
 
     /* save current viewport */
     img->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
