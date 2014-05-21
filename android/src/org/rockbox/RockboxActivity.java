@@ -111,6 +111,7 @@ public class RockboxActivity extends Activity
     {
         super.onResume();
         setVisible(true);
+        setServiceActivity(true);
     }
     
     /* this is also called when the backlight goes off,

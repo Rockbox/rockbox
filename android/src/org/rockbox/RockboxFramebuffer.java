@@ -61,6 +61,9 @@ public class RockboxFramebuffer extends SurfaceView
     {
         SurfaceHolder holder = getHolder();                            
         Canvas c = holder.lockCanvas();
+        if (c == null)
+			return;
+
         btm.copyPixelsFromBuffer(framebuffer);
         synchronized (holder)
         { /* draw */
@@ -73,6 +76,10 @@ public class RockboxFramebuffer extends SurfaceView
     {
         SurfaceHolder holder = getHolder();         
         Canvas c = holder.lockCanvas(dirty);
+        
+        if (c == null)
+			return;
+
         /* can't copy a partial buffer, but it doesn't make a noticeable difference anyway */
         btm.copyPixelsFromBuffer(framebuffer);
         synchronized (holder)
