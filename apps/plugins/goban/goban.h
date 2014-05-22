@@ -318,7 +318,8 @@
 #define  GBN_BUTTON_PLAY               BUTTON_MENU | BUTTON_REL
 #define  GBN_BUTTON_NAV_MODE           BUTTON_OFF
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
+      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN
 #define  GBN_BUTTON_LEFT               BUTTON_LEFT

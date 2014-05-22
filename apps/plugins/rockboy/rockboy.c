@@ -295,7 +295,8 @@ static void setoptions (void)
         options.SELECT  = BUTTON_RIGHT;
         options.MENU    = BUTTON_LEFT;
 
-#elif CONFIG_KEYPAD == SAMSUNG_YH_PAD
+#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
+      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
         options.UP      = BUTTON_UP;
         options.DOWN    = BUTTON_DOWN;
 
