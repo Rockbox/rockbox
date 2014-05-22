@@ -90,7 +90,7 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-#define CONFIG_KEYPAD SAMSUNG_YH_PAD
+#define CONFIG_KEYPAD SAMSUNG_YH820_PAD
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC

@@ -391,7 +391,8 @@
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_QUIT_NAME      "POWER"
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
+      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
 
 #define STAR_QUIT           BUTTON_REC
 #define STAR_LEFT           BUTTON_LEFT

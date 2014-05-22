@@ -82,7 +82,8 @@ enum {
 #define BUBBLES_QUIT2       PLA_CANCEL
 
 /* these are better off shooting with up */
-#if (CONFIG_KEYPAD == SAMSUNG_YH_PAD) \
+#if (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
+ || (CONFIG_KEYPAD == SAMSUNG_YH920_PAD) \
  || (CONFIG_KEYPAD == ONDIO_PAD) \
  || (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #define SHOOT_WITH_UP

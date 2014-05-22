@@ -130,7 +130,7 @@
 #define SANSA_CLIP_PAD     35
 #define SANSA_FUZE_PAD     36
 #define LYRE_PROTO1_PAD    37
-#define SAMSUNG_YH_PAD     38
+#define SAMSUNG_YH820_PAD  38
 #define ONDAVX777_PAD      39
 #define SAMSUNG_YPS3_PAD   40
 #define MINI2440_PAD       41
@@ -154,6 +154,7 @@
 #define SAMSUNG_YPZ5_PAD   59
 #define IHIFI_PAD          60
 #define SAMSUNG_YPR1_PAD  61
+#define SAMSUNG_YH920_PAD  62
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1

@@ -452,7 +452,8 @@
 CONFIG_KEYPAD == MROBE500_PAD
 #   define SOL_QUIT          BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH_PAD)
+#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
+      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
 #   define SOL_QUIT          BUTTON_REC
 #   define SOL_UP            BUTTON_UP
 #   define SOL_DOWN          BUTTON_DOWN
