@@ -114,7 +114,7 @@ static const char default_game[9][9] =
 #define MARK_SIZE   1   /* Mark width and height */
 
 #elif ((LCD_HEIGHT==96) && (LCD_WIDTH==128))
-/* iAudio M3, 9 cells @ 9x9 with 14 border lines */
+/* iAudio M3, Samsung YH820, 9 cells @ 9x9 with 14 border lines */
 #define MARK_OFFS   1   /* Pixels between border and mark */
 #define MARK_SPACE  2   /* Pixels between two marks */
 #define MARK_SIZE   1   /* Mark width and height */
