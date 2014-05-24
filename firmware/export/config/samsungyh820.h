@@ -7,7 +7,7 @@
 #define MODEL_NAME   "Samsung YH-820"
 
 /* define this if you have recording possibility */
-/* todo #define HAVE_RECORDING */
+#define HAVE_RECORDING
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
