@@ -85,7 +85,6 @@ void Autodetection::detectUsb()
     // the ini file needs to hold the IDs as hex values.
     QMap<int, QStringList> usbids = SystemInfo::usbIdMap(SystemInfo::MapDevice);
     QMap<int, QStringList> usberror = SystemInfo::usbIdMap(SystemInfo::MapError);
-    QMap<int, QStringList> usbincompat = SystemInfo::usbIdMap(SystemInfo::MapIncompatible);
 
     // usb pid detection
     QList<uint32_t> attached;
@@ -104,7 +103,7 @@ void Autodetection::detectUsb()
         if(usberror.contains(attached.at(i))) {
             struct Detected d;
             d.status = PlayerMtpMode;
-            d.device = usbids.value(attached.at(i)).at(0);
+            d.device = usberror.value(attached.at(i)).at(0);
             m_detected.append(d);
             LOG_WARNING() << "[USB] detected problem with player" << d.device;
         }
