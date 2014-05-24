@@ -54,11 +54,7 @@ int key_to_button(int keyboard_button)
         case SDLK_PAGEUP:
             new_btn = BUTTON_FFWD;
             break;
-#ifdef SAMSUNG_YH820
         case SDLK_KP7:
-#else
-        case SDLK_KP3:
-#endif
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_REW;
             break;
@@ -69,8 +65,7 @@ int key_to_button(int keyboard_button)
     return new_btn;
 }
 
-struct button_map bm[] = {  
-#if defined (SAMSUNG_YH820)
+struct button_map bm[] = {
     { SDLK_KP_PLUS, 330,  53, 23, "Record" },
     { SDLK_KP7,     132, 208, 21, "Left" },
     { SDLK_KP5,     182, 210, 18, "Play" },
@@ -79,16 +74,5 @@ struct button_map bm[] = {
     { SDLK_KP4,     122, 277, 29, "Menu" },
     { SDLK_KP6,     238, 276, 25, "Select" },
     { SDLK_KP2,     183, 321, 24, "Down" },
-#elif defined (SAMSUNG_YH920) || defined (SAMSUNG_YH925)
-    { SDLK_KP9,     370,  32, 15, "FF" },
-    { SDLK_KP5,     369,  84, 25, "Play" },
-    { SDLK_KP5,     367, 125, 27, "Play" },
-    { SDLK_KP3,     369, 188, 17, "Rew" },
-    { SDLK_KP_PLUS, 370, 330, 30, "Record" },
-    { SDLK_KP4,     146, 252, 32, "Menu" },
-    { SDLK_KP8,     204, 226, 27, "Up" },
-    { SDLK_KP6,     257, 250, 34, "Select" },
-    { SDLK_KP2,     205, 294, 35, "Down" },
-#endif
     { 0, 0, 0, 0, "None" }
 };
