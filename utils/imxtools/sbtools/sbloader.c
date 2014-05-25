@@ -61,9 +61,9 @@ struct dev_info_t
 
 struct dev_info_t g_dev_info[] =
 {
-    {0x066f, 0x3780, 0, HID_DEVICE}, /* i.MX233 / STMP3780 */
-    {0x066f, 0x3770, 0, HID_DEVICE}, /* STMP3770 */
-    {0x15A2, 0x004F, 0, HID_DEVICE}, /* i.MX28 */
+    {0x066f, 0x3780, 1024, HID_DEVICE}, /* i.MX233 / STMP3780 */
+    {0x066f, 0x3770, 48, HID_DEVICE}, /* STMP3770 */
+    {0x15A2, 0x004F, 1024, HID_DEVICE}, /* i.MX28 */
     {0x066f, 0x3600, 4096, RECOVERY_DEVICE}, /* STMP36xx */
 };
 
@@ -427,8 +427,7 @@ static int probe_hid_xfer_size(libusb_device_handle *dev)
     return xfer_size / 8;
 
     Lerr:
-    printf("Cannot probe transfer size, please specify it on command line.\n");
-    exit(11);
+    printf("Cannot probe transfer size, using default.\n");
     return 0;
 }
 
@@ -436,8 +435,7 @@ static int probe_xfer_size(enum dev_type_t prot, libusb_device_handle *dev)
 {
     if(prot == HID_DEVICE)
         return probe_hid_xfer_size(dev);
-    printf("Cannot probe transfer size, please specify it on command line.\n");
-    exit(10);
+    printf("Cannot probe transfer size, using default.\n");
     return 0;
 }
 
@@ -593,12 +591,19 @@ int main(int argc, char **argv)
         dev_type = g_dev_info[db_idx].dev_type;
         xfer_size = g_dev_info[db_idx].xfer_size;
     }
+    /* if not forced, try to probe transfer size */
+    if(force_xfer_size == 0)
+        force_xfer_size = probe_xfer_size(dev_type, dev);
+    /* make a decision */
     if(force_xfer_size > 0)
         xfer_size = force_xfer_size;
+    else if(xfer_size == 0)
+    {
+        printf("Cannot probe transfer size, please specify it on the command line.\n");
+        exit(10);
+    }
     if(dev_type == PROBE_DEVICE)
         dev_type = probe_protocol(dev);
-    if(xfer_size == 0)
-        xfer_size = probe_xfer_size(dev_type, dev);
     /* open file */
     FILE *f = fopen(filename, "r");
     if(f == NULL)
