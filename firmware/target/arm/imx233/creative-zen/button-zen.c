@@ -66,7 +66,6 @@ struct imx233_button_map_t imx233_button_map[] =
     IMX233_BUTTON_(END, END(), "")
 };
 #elif defined(CREATIVE_ZENXFI)
-<<<<<<< HEAD
 #define CHAN    0
 #define I_VDDIO 0 /* index in the table */
 
@@ -90,56 +89,6 @@ struct imx233_button_map_t imx233_button_map[] =
     IMX233_BUTTON(POWER, PSWITCH(1), "power"),
     IMX233_BUTTON_(JACK, GPIO(2, 8), "jack", INVERTED),
     IMX233_BUTTON_(END, END(), "")
-=======
-    {0, IMX233_BUTTON_LRADC_HOLD},
-    {200, BUTTON_MENU},
-    {445, BUTTON_SHORTCUT},
-    {645, BUTTON_UP},
-    {860, BUTTON_LEFT},
-    {1060, BUTTON_RIGHT},
-    {1260, BUTTON_DOWN},
-    {1480, BUTTON_SELECT},
-    {1700, BUTTON_TOPRIGHT},
-    {1920, BUTTON_BOTTOMLEFT},
-    {2145, BUTTON_TOPLEFT},
-    {2460, BUTTON_BOTTOMRIGHT},
-    {2700, BUTTON_BACK},
-    {2945, BUTTON_PLAYPAUSE},
-    {3400, 0},
-    {0, IMX233_BUTTON_LRADC_END},
-#elif defined(CREATIVE_ZENV)
-    {190, IMX233_BUTTON_LRADC_HOLD},
-    {250, BUTTON_PLAYPAUSE},
-    {530, BUTTON_BACK},
-    {785, BUTTON_VOL_UP},
-    {1040, BUTTON_VOL_DOWN},
-    {1295, BUTTON_MENU},
-    {1540, BUTTON_UP},
-    {1800, BUTTON_SELECT},
-    {2070, BUTTON_LEFT},
-    {2315, BUTTON_RIGHT},
-    {2550, BUTTON_DOWN},
-    {3450, 0},
-    {0, IMX233_BUTTON_LRADC_END},
-#elif defined(CREATIVE_ZENMOZAIC)
-    {0, IMX233_BUTTON_LRADC_HOLD},
-    {200, BUTTON_MENU},
-    {445, BUTTON_SHORTCUT},
-    {645, BUTTON_UP},
-    {860, BUTTON_LEFT},
-    {1060, BUTTON_RIGHT},
-    {1260, BUTTON_DOWN},
-    {1480, BUTTON_SELECT},
-    {2700, BUTTON_BACK},
-    {2945, BUTTON_PLAYPAUSE},
-    {3400, 0},
-    {0, IMX233_BUTTON_LRADC_END},
-#elif defined(CREATIVE_ZENMX)
-    {0, IMX233_BUTTON_LRADC_END},
-#else
-#error wrong target
-#endif
->>>>>>> Initial commit for the Creative ZEN MX
 };
 #elif defined(CREATIVE_ZENMOZAIC)
 #define CHAN    0
@@ -166,7 +115,6 @@ struct imx233_button_map_t imx233_button_map[] =
 #define CHAN    0
 #define I_VDDIO 0 /* index in the table */
 
-<<<<<<< HEAD
 struct imx233_button_map_t imx233_button_map[] =
 {
     [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3500), "vddio"), /* we need VDDIO for relative */
@@ -184,15 +132,20 @@ struct imx233_button_map_t imx233_button_map[] =
     IMX233_BUTTON(POWER, PSWITCH(1), "power"),
     IMX233_BUTTON_(END, END(), "")
 };
+#elif defined(CREATIVE_ZENMX)
+#define CHAN    2
+#define I_VDDIO 0 /* index in the table */
+
+struct imx233_button_map_t imx233_button_map[] =
+{
+    [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3440), "vddio"), /* we need VDDIO for relative */
+    IMX233_BUTTON(MENU, LRADC_REL(CHAN, 2680, I_VDDIO), "back"),
+    IMX233_BUTTON(MENU, LRADC_REL(CHAN, 2050, I_VDDIO), "menu"),
+    IMX233_BUTTON(POWER, PSWITCH(1), "power"),
+    IMX233_BUTTON_(END, END(), "")
+};
 #else
 #error wrong target
-=======
-#ifdef HAS_BUTTON_HOLD
-bool button_hold(void)
-{
-    return imx233_button_lradc_hold();
-}
->>>>>>> Initial commit for the Creative ZEN MX
 #endif
 
 void button_init_device(void)

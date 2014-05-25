@@ -26,7 +26,7 @@
 bool button_debug_screen(void);
 
 /* HOLD button */
-#if !defined(CREATIVE_ZENXFISTYLE)
+#if !defined(CREATIVE_ZENXFISTYLE) && !defined(CREATIVE_ZENMX)
 #define HAS_BUTTON_HOLD
 #endif
 
