@@ -45,15 +45,14 @@ static bool g_exit = false;
  * 
  */
 
-static struct usb_device_descriptor __attribute__((aligned(2)))
-    device_descriptor=
+static struct usb_device_descriptor device_descriptor=
 {
     .bLength            = sizeof(struct usb_device_descriptor),
     .bDescriptorType    = USB_DT_DEVICE,
     .bcdUSB             = 0x0200,
-    .bDeviceClass       = HWSTUB_CLASS,
-    .bDeviceSubClass    = HWSTUB_SUBCLASS,
-    .bDeviceProtocol    = HWSTUB_PROTOCOL,
+    .bDeviceClass       = USB_CLASS_PER_INTERFACE,
+    .bDeviceSubClass    = 0,
+    .bDeviceProtocol    = 0,
     .bMaxPacketSize0    = 64,
     .idVendor           = HWSTUB_USB_VID,
     .idProduct          = HWSTUB_USB_PID,
@@ -66,29 +65,41 @@ static struct usb_device_descriptor __attribute__((aligned(2)))
 
 #define USB_MAX_CURRENT 200
 
-static struct usb_config_descriptor __attribute__((aligned(2)))
-                                    config_descriptor =
+static struct usb_config_descriptor config_descriptor =
 {
     .bLength             = sizeof(struct usb_config_descriptor),
     .bDescriptorType     = USB_DT_CONFIG,
     .wTotalLength        = 0, /* will be filled in later */
-    .bNumInterfaces      = 0,
+    .bNumInterfaces      = 1,
     .bConfigurationValue = 1,
     .iConfiguration      = 0,
     .bmAttributes        = USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
     .bMaxPower           = (USB_MAX_CURRENT + 1) / 2, /* In 2mA units */
 };
 
-static const struct usb_string_descriptor __attribute__((aligned(2)))
-    usb_string_iManufacturer =
+#define USB_HWSTUB_INTF 0
+
+static struct usb_interface_descriptor interface_descriptor =
+{
+    .bLength            = sizeof(struct usb_interface_descriptor),
+    .bDescriptorType    = USB_DT_INTERFACE,
+    .bInterfaceNumber   = USB_HWSTUB_INTF,
+    .bAlternateSetting  = 0,
+    .bNumEndpoints      = 0,
+    .bInterfaceClass    = HWSTUB_CLASS,
+    .bInterfaceSubClass = HWSTUB_SUBCLASS,
+    .bInterfaceProtocol = HWSTUB_PROTOCOL,
+    .iInterface         = 3
+};
+
+static const struct usb_string_descriptor usb_string_iManufacturer =
 {
     24,
     USB_DT_STRING,
     {'R', 'o', 'c', 'k', 'b', 'o', 'x', '.', 'o', 'r', 'g'}
 };
 
-static const struct usb_string_descriptor __attribute__((aligned(2)))
-    usb_string_iProduct =
+static const struct usb_string_descriptor usb_string_iProduct =
 {
     44,
     USB_DT_STRING,
@@ -97,17 +108,22 @@ static const struct usb_string_descriptor __attribute__((aligned(2)))
      's', 't', 'u', 'b'}
 };
 
+static const struct usb_string_descriptor usb_string_iInterface =
+{
+    14,
+    USB_DT_STRING,
+    {'H', 'W', 'S', 't', 'u', 'b'}
+};
+
 /* this is stringid #0: languages supported */
-static const struct usb_string_descriptor __attribute__((aligned(2)))
-    lang_descriptor =
+static const struct usb_string_descriptor lang_descriptor =
 {
     4,
     USB_DT_STRING,
     {0x0409} /* LANGID US English */
 };
 
-static struct hwstub_version_desc_t __attribute__((aligned(2)))
-    version_descriptor =
+static struct hwstub_version_desc_t version_descriptor =
 {
     sizeof(struct hwstub_version_desc_t),
     HWSTUB_DT_VERSION,
@@ -116,8 +132,7 @@ static struct hwstub_version_desc_t __attribute__((aligned(2)))
     HWSTUB_VERSION_REV
 };
 
-static struct hwstub_layout_desc_t __attribute__((aligned(2)))
-    layout_descriptor =
+static struct hwstub_layout_desc_t layout_descriptor =
 {
     sizeof(struct hwstub_layout_desc_t),
     HWSTUB_DT_LAYOUT,
@@ -131,6 +146,7 @@ static const struct usb_string_descriptor* const usb_strings[USB_NUM_STRINGS] =
    &lang_descriptor,
    &usb_string_iManufacturer,
    &usb_string_iProduct,
+   &usb_string_iInterface
 };
 
 uint8_t *usb_buffer = oc_bufferstart;
@@ -176,6 +192,10 @@ static void handle_std_dev_desc(struct usb_ctrlrequest *req)
             }
             size = sizeof(struct usb_config_descriptor);
 
+            /* interface desc */
+            memcpy(usb_buffer + size, (void *)&interface_descriptor,
+                sizeof(interface_descriptor));
+            size += sizeof(interface_descriptor);
             /* hwstub version */
             memcpy(usb_buffer + size, (void *)&version_descriptor,
                 sizeof(version_descriptor));
@@ -194,7 +214,8 @@ static void handle_std_dev_desc(struct usb_ctrlrequest *req)
             target_get_config_desc(usb_buffer + size, &size);
             /* fix config descriptor */
             config_descriptor.wTotalLength = size;
-            memcpy(usb_buffer, (void *)&config_descriptor, sizeof(config_descriptor));
+            memcpy(usb_buffer, (void *)&config_descriptor,
+                sizeof(config_descriptor));
 
             ptr = usb_buffer;
             break;
@@ -208,22 +229,7 @@ static void handle_std_dev_desc(struct usb_ctrlrequest *req)
             else
                 usb_drv_stall(EP_CONTROL, true, true);
             break;
-        case HWSTUB_DT_VERSION:
-            ptr = &version_descriptor;
-            size = sizeof(version_descriptor);
-            break;
-        case HWSTUB_DT_LAYOUT:
-            ptr = &layout_descriptor;
-            size = sizeof(layout_descriptor);
-            break;
-        case HWSTUB_DT_TARGET:
-            ptr = &target_descriptor;
-            size = sizeof(target_descriptor);
-            break;
         default:
-            target_get_desc(req->wValue >> 8, &ptr);
-            if(ptr != 0)
-                size = ((struct usb_descriptor_header *)ptr)->bLength;
             break;
     }
 
@@ -271,12 +277,70 @@ static void handle_std_dev_req(struct usb_ctrlrequest *req)
     }
 }
 
+static void handle_std_intf_desc(struct usb_ctrlrequest *req)
+{
+    int size;
+    void* ptr = NULL;
+
+    switch(req->wValue >> 8)
+    {
+        case HWSTUB_DT_VERSION:
+            ptr = &version_descriptor;
+            size = sizeof(version_descriptor);
+            break;
+        case HWSTUB_DT_LAYOUT:
+            ptr = &layout_descriptor;
+            size = sizeof(layout_descriptor);
+            break;
+        case HWSTUB_DT_TARGET:
+            ptr = &target_descriptor;
+            size = sizeof(target_descriptor);
+            break;
+        default:
+            target_get_desc(req->wValue >> 8, &ptr);
+            if(ptr != 0)
+                size = ((struct usb_descriptor_header *)ptr)->bLength;
+            break;
+    }
+
+    if(ptr)
+    {
+        int length = MIN(size, req->wLength);
+
+        if(ptr != usb_buffer)
+            memcpy(usb_buffer, ptr, length);
+
+        usb_drv_send(EP_CONTROL, usb_buffer, length);
+        usb_drv_recv(EP_CONTROL, NULL, 0);
+    }
+    else
+        usb_drv_stall(EP_CONTROL, true, true);
+}
+
+static void handle_std_intf_req(struct usb_ctrlrequest *req)
+{
+    unsigned intf = req->wIndex & 0xff;
+    if(intf != USB_HWSTUB_INTF)
+        return usb_drv_stall(EP_CONTROL, true, true);
+
+    switch(req->bRequest)
+    {
+        case USB_REQ_GET_DESCRIPTOR:
+            handle_std_intf_desc(req);
+            break;
+        default:
+            usb_drv_stall(EP_CONTROL, true, true);
+    }
+}
+
 static void handle_std_req(struct usb_ctrlrequest *req)
 {
     switch(req->bRequestType & USB_RECIP_MASK)
     {
         case USB_RECIP_DEVICE:
             return handle_std_dev_req(req);
+        case USB_RECIP_INTERFACE:
+            return handle_std_intf_req(req);
         default:
             usb_drv_stall(EP_CONTROL, true, true);
     }
@@ -291,36 +355,56 @@ static void handle_get_log(struct usb_ctrlrequest *req)
     enable_logf(true);
 }
 
-static void handle_rw_mem(struct usb_ctrlrequest *req)
+static void handle_read(struct usb_ctrlrequest *req)
 {
-    uint32_t addr = req->wValue | req->wIndex << 16;
-    uint16_t length = req->wLength;
-    
-    if(req->bRequestType & USB_DIR_IN)
+    static uint32_t last_addr = 0;
+    static uint16_t last_id = 0xffff;
+    uint16_t id = req->wValue;
+
+    if(req->bRequest == HWSTUB_READ)
     {
-        memcpy(usb_buffer, (void *)addr, length);
+        int size = usb_drv_recv(EP_CONTROL, usb_buffer, req->wLength);
+        if(size != sizeof(struct hwstub_read_req_t))
+            return usb_drv_stall(EP_CONTROL, true, true);
         asm volatile("nop" : : : "memory");
-        usb_drv_send(EP_CONTROL, usb_buffer, length);
-        usb_drv_recv(EP_CONTROL, NULL, 0);
+        struct hwstub_read_req_t *read = (void *)usb_buffer;
+        last_addr = read->dAddress;
+        last_id = id;
+        usb_drv_send(EP_CONTROL, NULL, 0);
     }
     else
     {
-        int size = usb_drv_recv(EP_CONTROL, usb_buffer, length);
+        if(id != last_id)
+            return usb_drv_stall(EP_CONTROL, true, true);
+        memcpy((void *)last_addr, usb_buffer, req->wLength);
+        memcpy(usb_buffer, (void *)last_addr, req->wLength);
         asm volatile("nop" : : : "memory");
-        if(size != length)
-            usb_drv_stall(EP_CONTROL, true, true);
-        else
-        {
-            memcpy((void *)addr, usb_buffer, length);
-            usb_drv_send(EP_CONTROL, NULL, 0);
-        }
+        usb_drv_send(EP_CONTROL, usb_buffer, req->wLength);
+        usb_drv_recv(EP_CONTROL, NULL, 0);
     }
+};
+
+static void handle_write(struct usb_ctrlrequest *req)
+{
+    int size = usb_drv_recv(EP_CONTROL, usb_buffer, req->wLength);
+    asm volatile("nop" : : : "memory");
+    struct hwstub_write_req_t *write = (void *)usb_buffer;
+    int sz_hdr = sizeof(struct hwstub_write_req_t);
+    if(size < sz_hdr)
+        return usb_drv_stall(EP_CONTROL, true, true);
+    memcpy((void *)write->dAddress, usb_buffer + sz_hdr, req->wLength - sz_hdr);
+    usb_drv_send(EP_CONTROL, NULL, 0);
 }
 
-static void handle_call_jump(struct usb_ctrlrequest *req)
+static void handle_exec(struct usb_ctrlrequest *req)
 {
-    uint32_t addr = req->wValue | req->wIndex << 16;
-
+    int size = usb_drv_recv(EP_CONTROL, usb_buffer, req->wLength);
+    asm volatile("nop" : : : "memory");
+    struct hwstub_exec_req_t *exec = (void *)usb_buffer;
+    if(size != sizeof(struct hwstub_exec_req_t))
+        return usb_drv_stall(EP_CONTROL, true, true);
+    usb_drv_send(EP_CONTROL, NULL, 0);
+#if 0
     if(req->bRequest == HWSTUB_CALL)
         ((void (*)(void))addr)();
     else
@@ -329,23 +413,26 @@ static void handle_call_jump(struct usb_ctrlrequest *req)
         usb_drv_exit();
         asm volatile("bx %0\n" : : "r" (addr) : "memory");
     }
+#endif
 }
 
-static void handle_class_dev_req(struct usb_ctrlrequest *req)
+static void handle_class_intf_req(struct usb_ctrlrequest *req)
 {
+    unsigned intf = req->wIndex & 0xff;
+    if(intf != USB_HWSTUB_INTF)
+        return usb_drv_stall(EP_CONTROL, true, true);
+
     switch(req->bRequest)
     {
         case HWSTUB_GET_LOG:
-            handle_get_log(req);
-            break;
-        case HWSTUB_RW_MEM:
-            handle_rw_mem(req);
-            break;
-        case HWSTUB_CALL:
-        case HWSTUB_JUMP:
-            handle_call_jump(req);
-            break;
-            break;
+            return handle_get_log(req);
+        case HWSTUB_READ:
+        case HWSTUB_READ2:
+            return handle_read(req);
+        case HWSTUB_WRITE:
+            return handle_write(req);
+        case HWSTUB_EXEC:
+            return handle_exec(req);
         default:
             usb_drv_stall(EP_CONTROL, true, true);
     }
@@ -355,8 +442,10 @@ static void handle_class_req(struct usb_ctrlrequest *req)
 {
     switch(req->bRequestType & USB_RECIP_MASK)
     {
+        case USB_RECIP_INTERFACE:
+            return handle_class_intf_req(req);
         case USB_RECIP_DEVICE:
-            return handle_class_dev_req(req);
+            //return handle_class_dev_req(req);
         default:
             usb_drv_stall(EP_CONTROL, true, true);
     }

@@ -36,6 +36,12 @@ extern "C" {
 
 struct hwstub_device_t;
 
+/* Returns hwstub interface, or -1 if none was found */
+int hwstub_probe(libusb_device *dev);
+/* Helper function which returns a list of all hwstub devices found. The caller
+ * must unref all of them when done, possibly using  libusb_free_device_list().
+ * Return number of devices or <0 on error */
+ssize_t hwstub_get_device_list(libusb_context *ctx, libusb_device ***list);
 /* Returns NULL on error */
 struct hwstub_device_t *hwstub_open(libusb_device_handle *handle);
 /* Returns 0 on success. Does *NOT* close the usb handle */
@@ -46,6 +52,8 @@ int hwstub_get_desc(struct hwstub_device_t *dev, uint16_t desc, void *info, size
 /* Returns number of bytes filled */
 int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz);
 /* Returns number of bytes written/read or <0 on error */
+int hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
+int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
 int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
 /* Returns <0 on error */
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);
