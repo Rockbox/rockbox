@@ -562,6 +562,7 @@ target/arm/imx233/button-imx233.c
 target/arm/imx233/dcp-imx233.c
 #endif
 target/arm/imx233/emi-imx233.c
+target/arm/imx233/dri-imx233.c
 target/arm/imx233/uartdbg-imx233.c
 # if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD_IMX233)
 target/arm/imx233/touchscreen-imx233.c
