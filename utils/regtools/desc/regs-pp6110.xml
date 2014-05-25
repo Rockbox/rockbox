@@ -1,0 +1,539 @@
+<?xml version="1.0"?>
+<soc name="pp6110" desc="The PP6110 series (aka GoForce 6110) series is a modified PP5024 with upgraded processor and some new hardware blocks, made by NVIDIA when they bought PortalPlayer.">
+  <dev name="CACHE" long_name="Global cache control" desc="" version="1.0">
+    <addr name="CACHE" addr="0x60000000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+      <field name="BUSY" desc="" bitrange="15:15"/>
+      <field name="READY" desc="unsure about this one" bitrange="14:14"/>
+      <field name="VECT_REMAP" desc="Setting this bit to 1 will make the processor use the local interrupt vector table." bitrange="4:4"/>
+      <field name="INIT" desc="" bitrange="2:2"/>
+      <field name="RUN" desc="" bitrange="1:1"/>
+      <field name="ENABLE" desc="Set this bit to 1 to enable the cache and 0 to disable it." bitrange="0:0">
+        <value name="DISABLE" value="0x0" desc=""/>
+        <value name="ENABLE" value="0x1" desc=""/>
+      </field>
+    </reg>
+    <reg name="DRAM" desc="Might have something to do with DRAM.">
+      <addr name="DRAM" addr="0x10"/>
+      <field name="UNK7" desc="" bitrange="7:7"/>
+      <field name="UNK2" desc="" bitrange="2:2"/>
+      <field name="UNK0" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="UNK24" desc="">
+      <addr name="UNK24" addr="0x24"/>
+      <field name="UNK" desc="" bitrange="0:0"/>
+    </reg>
+  </dev>
+  <dev name="CLOCK" long_name="" desc="" version="">
+    <addr name="CLOCK" addr="0x60006000"/>
+    <reg name="RESET" desc="">
+      <addr name="RESET" addr="0x4"/>
+      <field name="CACHE" desc="Cache or ICache ?" bitrange="31:31"/>
+      <field name="LCD3" desc="" bitrange="24:24"/>
+      <field name="USB1" desc="" bitrange="22:22"/>
+    </reg>
+    <reg name="RESET2" desc="">
+      <addr name="RESET2" addr="0x8"/>
+    </reg>
+    <reg name="ENABLE" desc="">
+      <addr name="ENABLE" addr="0xc"/>
+      <field name="CACHE" desc="Unsure" bitrange="31:31"/>
+      <field name="LCD3" desc="" bitrange="24:24"/>
+      <field name="USB1" desc="" bitrange="22:22"/>
+    </reg>
+    <reg name="ENABLE2" desc="">
+      <addr name="ENABLE2" addr="0x10"/>
+    </reg>
+    <reg name="SOURCE" desc="">
+      <addr name="SOURCE" addr="0x20"/>
+      <field name="SELECT" desc="" bitrange="30:28">
+        <value name="SRC1" value="0x1" desc=""/>
+        <value name="SRC2" value="0x2" desc=""/>
+        <value name="SRC3" value="0x3" desc=""/>
+        <value name="SRC4" value="0x4" desc=""/>
+      </field>
+      <field name="DIV_FAST" desc="FAST = PLL   / (DIV_FAST + 1)" bitrange="23:20"/>
+      <field name="DIV_SLOW" desc="SLOW = 24MHz / (DIV_SLOW + 1)" bitrange="19:16"/>
+      <field name="SRC4" desc="" bitrange="15:12"/>
+      <field name="SRC3" desc="" bitrange="11:8"/>
+      <field name="SRC2" desc="" bitrange="7:4"/>
+      <field name="SRC1" desc="" bitrange="3:0">
+        <value name="32KHz" value="0x0" desc=""/>
+        <value name="16MHz" value="0x1" desc=""/>
+        <value name="24MHz" value="0x2" desc=""/>
+        <value name="33MHz" value="0x3" desc=""/>
+        <value name="48MHz" value="0x4" desc=""/>
+        <value name="SLOW" value="0x5" desc=""/>
+        <value name="FAST" value="0x6" desc=""/>
+        <value name="PLL" value="0x7" desc=""/>
+      </field>
+    </reg>
+    <reg name="SOURCE2" desc="">
+      <addr name="SOURCE2" addr="0x24"/>
+      <field name="SELECT" desc="" bitrange="30:28">
+        <value name="SRC1" value="0x1" desc=""/>
+        <value name="SRC2" value="0x2" desc=""/>
+        <value name="SRC3" value="0x3" desc=""/>
+        <value name="SRC4" value="0x4" desc=""/>
+      </field>
+      <field name="DIV_FAST" desc="" bitrange="23:20"/>
+      <field name="DIV_SLOW" desc="" bitrange="19:16"/>
+      <field name="SRC4" desc="" bitrange="15:12"/>
+      <field name="SRC3" desc="" bitrange="11:8"/>
+      <field name="SRC2" desc="" bitrange="7:4"/>
+      <field name="SRC1" desc="" bitrange="3:0">
+        <value name="32KHz" value="0x0" desc=""/>
+        <value name="16MHz" value="0x1" desc=""/>
+        <value name="24MHz" value="0x2" desc=""/>
+        <value name="33MHz" value="0x3" desc=""/>
+        <value name="48MHz" value="0x4" desc=""/>
+        <value name="SLOW" value="0x5" desc=""/>
+        <value name="FAST" value="0x6" desc=""/>
+        <value name="PLL" value="0x7" desc=""/>
+      </field>
+    </reg>
+    <reg name="MLCD_SCLK_DIV" desc="">
+      <addr name="MLCD_SCLK_DIV" addr="0x2c"/>
+    </reg>
+    <reg name="PLL_CTRL" desc="">
+      <addr name="PLL_CTRL" addr="0x34"/>
+      <field name="RESET" desc="" bitrange="23:23"/>
+    </reg>
+    <reg name="PLL_CTRL2" desc="">
+      <addr name="PLL_CTRL2" addr="0x38"/>
+      <field name="LOCK_STATUS" desc="Unsure" bitrange="31:30"/>
+      <field name="RESET" desc="" bitrange="23:23"/>
+    </reg>
+    <reg name="PLL_STATUS" desc="">
+      <addr name="PLL_STATUS" addr="0x3c"/>
+    </reg>
+    <reg name="CACHE" desc="Unsure">
+      <addr name="CACHE" addr="0x50"/>
+      <field name="ENABLE" desc="Unsure" bitrange="5:5"/>
+    </reg>
+    <reg name="LCD3" desc="">
+      <addr name="LCD3" addr="0xdc"/>
+      <field name="DIV" desc="Derive DOTCLK frequency from 24MHz source." bitrange="31:0"/>
+    </reg>
+  </dev>
+  <dev name="DEVICE" long_name="" desc="" version="1.0">
+    <addr name="DEVICE" addr="0x70000000"/>
+    <reg name="VER1" desc="">
+      <addr name="VER1" addr="0x0"/>
+      <field name="LOW_ID" desc="Low part of the chip ID" bitrange="31:16">
+        <value name="10" value="0x3130" desc="The string &quot;10&quot;"/>
+      </field>
+      <field name="REV" desc="Chip revision" bitrange="15:0">
+        <value name="B1" value="0x4231" desc="The string &quot;B1&quot;"/>
+      </field>
+    </reg>
+    <reg name="VER2" desc="">
+      <addr name="VER2" addr="0x4"/>
+      <field name="PP" desc="" bitrange="31:16">
+        <value name="PP" value="0x5050" desc="The string &quot;PP&quot;"/>
+      </field>
+      <field name="HIGH_ID" desc="High part of the chip ID" bitrange="15:0">
+        <value name="61" value="0x3631" desc="The string &quot;61&quot;"/>
+      </field>
+    </reg>
+    <reg name="STRAP_OPT_A" desc="">
+      <addr name="STRAP_OPT_A" addr="0x8"/>
+    </reg>
+    <reg name="STRAP_OPT_B" desc="">
+      <addr name="STRAP_OPT_B" addr="0xc"/>
+    </reg>
+    <reg name="INIT1" desc="">
+      <addr name="INIT1" addr="0x10"/>
+    </reg>
+    <reg name="INIT3" desc="">
+      <addr name="INIT3" addr="0x14"/>
+    </reg>
+    <reg name="INIT4" desc="">
+      <addr name="INIT4" addr="0x18"/>
+      <field name="PLL2" desc="unsure" bitrange="4:4"/>
+    </reg>
+    <reg name="INIT2" desc="">
+      <addr name="INIT2" addr="0x20"/>
+      <field name="USB" desc="" bitrange="31:31"/>
+      <field name="PLL" desc="" bitrange="30:30"/>
+    </reg>
+    <reg name="USB" desc="">
+      <addr name="USB" addr="0x28"/>
+      <field name="RESET" desc="" bitrange="11:11"/>
+      <field name="READY" desc="" bitrange="7:7"/>
+      <field name="UNK1" desc="" bitrange="1:1"/>
+      <field name="UNK0" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="INIT6" desc="">
+      <addr name="INIT6" addr="0x30"/>
+    </reg>
+    <reg name="TIMING" desc="">
+      <addr name="TIMING" addr="0x34"/>
+    </reg>
+    <reg name="NOR_CFG" desc="">
+      <addr name="NOR_CFG" addr="0x38"/>
+    </reg>
+    <reg name="RAM_CFG" desc="">
+      <addr name="RAM_CFG" addr="0x3c"/>
+    </reg>
+    <reg name="INIT7" desc="">
+      <addr name="INIT7" addr="0x48"/>
+      <field name="UNK7_0" desc="" bitrange="7:0"/>
+    </reg>
+  </dev>
+  <dev name="GPIO" long_name="General Purpose I/O" desc="" version="1.0">
+    <addr name="GPIO" addr="0x6000d000"/>
+    <reg name="ENABLEn" desc="">
+      <formula string="((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="ENABLE0" addr="0x0"/>
+      <addr name="ENABLE1" addr="0x4"/>
+      <addr name="ENABLE2" addr="0x8"/>
+      <addr name="ENABLE3" addr="0xc"/>
+      <addr name="ENABLE4" addr="0x80"/>
+      <addr name="ENABLE5" addr="0x84"/>
+      <addr name="ENABLE6" addr="0x88"/>
+      <addr name="ENABLE7" addr="0x8c"/>
+      <addr name="ENABLE8" addr="0x100"/>
+      <addr name="ENABLE9" addr="0x104"/>
+      <addr name="ENABLE10" addr="0x108"/>
+      <addr name="ENABLE11" addr="0x10c"/>
+      <addr name="ENABLE12" addr="0x180"/>
+      <addr name="ENABLE13" addr="0x184"/>
+      <addr name="ENABLE14" addr="0x188"/>
+      <addr name="ENABLE15" addr="0x18c"/>
+      <addr name="ENABLE16" addr="0x200"/>
+      <addr name="ENABLE17" addr="0x204"/>
+      <addr name="ENABLE18" addr="0x208"/>
+      <addr name="ENABLE19" addr="0x20c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="OUTPUT_ENn" desc="">
+      <formula string="0x10+((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="OUTPUT_EN0" addr="0x10"/>
+      <addr name="OUTPUT_EN1" addr="0x14"/>
+      <addr name="OUTPUT_EN2" addr="0x18"/>
+      <addr name="OUTPUT_EN3" addr="0x1c"/>
+      <addr name="OUTPUT_EN4" addr="0x90"/>
+      <addr name="OUTPUT_EN5" addr="0x94"/>
+      <addr name="OUTPUT_EN6" addr="0x98"/>
+      <addr name="OUTPUT_EN7" addr="0x9c"/>
+      <addr name="OUTPUT_EN8" addr="0x110"/>
+      <addr name="OUTPUT_EN9" addr="0x114"/>
+      <addr name="OUTPUT_EN10" addr="0x118"/>
+      <addr name="OUTPUT_EN11" addr="0x11c"/>
+      <addr name="OUTPUT_EN12" addr="0x190"/>
+      <addr name="OUTPUT_EN13" addr="0x194"/>
+      <addr name="OUTPUT_EN14" addr="0x198"/>
+      <addr name="OUTPUT_EN15" addr="0x19c"/>
+      <addr name="OUTPUT_EN16" addr="0x210"/>
+      <addr name="OUTPUT_EN17" addr="0x214"/>
+      <addr name="OUTPUT_EN18" addr="0x218"/>
+      <addr name="OUTPUT_EN19" addr="0x21c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="OUTPUT_VALn" desc="">
+      <formula string="0x20+((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="OUTPUT_VAL0" addr="0x20"/>
+      <addr name="OUTPUT_VAL1" addr="0x24"/>
+      <addr name="OUTPUT_VAL2" addr="0x28"/>
+      <addr name="OUTPUT_VAL3" addr="0x2c"/>
+      <addr name="OUTPUT_VAL4" addr="0xa0"/>
+      <addr name="OUTPUT_VAL5" addr="0xa4"/>
+      <addr name="OUTPUT_VAL6" addr="0xa8"/>
+      <addr name="OUTPUT_VAL7" addr="0xac"/>
+      <addr name="OUTPUT_VAL8" addr="0x120"/>
+      <addr name="OUTPUT_VAL9" addr="0x124"/>
+      <addr name="OUTPUT_VAL10" addr="0x128"/>
+      <addr name="OUTPUT_VAL11" addr="0x12c"/>
+      <addr name="OUTPUT_VAL12" addr="0x1a0"/>
+      <addr name="OUTPUT_VAL13" addr="0x1a4"/>
+      <addr name="OUTPUT_VAL14" addr="0x1a8"/>
+      <addr name="OUTPUT_VAL15" addr="0x1ac"/>
+      <addr name="OUTPUT_VAL16" addr="0x220"/>
+      <addr name="OUTPUT_VAL17" addr="0x224"/>
+      <addr name="OUTPUT_VAL18" addr="0x228"/>
+      <addr name="OUTPUT_VAL19" addr="0x22c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="INPUT_VALn" desc="">
+      <formula string="0x30+((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="INPUT_VAL0" addr="0x30"/>
+      <addr name="INPUT_VAL1" addr="0x34"/>
+      <addr name="INPUT_VAL2" addr="0x38"/>
+      <addr name="INPUT_VAL3" addr="0x3c"/>
+      <addr name="INPUT_VAL4" addr="0xb0"/>
+      <addr name="INPUT_VAL5" addr="0xb4"/>
+      <addr name="INPUT_VAL6" addr="0xb8"/>
+      <addr name="INPUT_VAL7" addr="0xbc"/>
+      <addr name="INPUT_VAL8" addr="0x130"/>
+      <addr name="INPUT_VAL9" addr="0x134"/>
+      <addr name="INPUT_VAL10" addr="0x138"/>
+      <addr name="INPUT_VAL11" addr="0x13c"/>
+      <addr name="INPUT_VAL12" addr="0x1b0"/>
+      <addr name="INPUT_VAL13" addr="0x1b4"/>
+      <addr name="INPUT_VAL14" addr="0x1b8"/>
+      <addr name="INPUT_VAL15" addr="0x1bc"/>
+      <addr name="INPUT_VAL16" addr="0x230"/>
+      <addr name="INPUT_VAL17" addr="0x234"/>
+      <addr name="INPUT_VAL18" addr="0x238"/>
+      <addr name="INPUT_VAL19" addr="0x23c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="INT_STATn" desc="">
+      <formula string="0x40+((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="INT_STAT0" addr="0x40"/>
+      <addr name="INT_STAT1" addr="0x44"/>
+      <addr name="INT_STAT2" addr="0x48"/>
+      <addr name="INT_STAT3" addr="0x4c"/>
+      <addr name="INT_STAT4" addr="0xc0"/>
+      <addr name="INT_STAT5" addr="0xc4"/>
+      <addr name="INT_STAT6" addr="0xc8"/>
+      <addr name="INT_STAT7" addr="0xcc"/>
+      <addr name="INT_STAT8" addr="0x140"/>
+      <addr name="INT_STAT9" addr="0x144"/>
+      <addr name="INT_STAT10" addr="0x148"/>
+      <addr name="INT_STAT11" addr="0x14c"/>
+      <addr name="INT_STAT12" addr="0x1c0"/>
+      <addr name="INT_STAT13" addr="0x1c4"/>
+      <addr name="INT_STAT14" addr="0x1c8"/>
+      <addr name="INT_STAT15" addr="0x1cc"/>
+      <addr name="INT_STAT16" addr="0x240"/>
+      <addr name="INT_STAT17" addr="0x244"/>
+      <addr name="INT_STAT18" addr="0x248"/>
+      <addr name="INT_STAT19" addr="0x24c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="INT_ENABLEn" desc="">
+      <formula string="0x50+((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="INT_ENABLE0" addr="0x50"/>
+      <addr name="INT_ENABLE1" addr="0x54"/>
+      <addr name="INT_ENABLE2" addr="0x58"/>
+      <addr name="INT_ENABLE3" addr="0x5c"/>
+      <addr name="INT_ENABLE4" addr="0xd0"/>
+      <addr name="INT_ENABLE5" addr="0xd4"/>
+      <addr name="INT_ENABLE6" addr="0xd8"/>
+      <addr name="INT_ENABLE7" addr="0xdc"/>
+      <addr name="INT_ENABLE8" addr="0x150"/>
+      <addr name="INT_ENABLE9" addr="0x154"/>
+      <addr name="INT_ENABLE10" addr="0x158"/>
+      <addr name="INT_ENABLE11" addr="0x15c"/>
+      <addr name="INT_ENABLE12" addr="0x1d0"/>
+      <addr name="INT_ENABLE13" addr="0x1d4"/>
+      <addr name="INT_ENABLE14" addr="0x1d8"/>
+      <addr name="INT_ENABLE15" addr="0x1dc"/>
+      <addr name="INT_ENABLE16" addr="0x250"/>
+      <addr name="INT_ENABLE17" addr="0x254"/>
+      <addr name="INT_ENABLE18" addr="0x258"/>
+      <addr name="INT_ENABLE19" addr="0x25c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="INT_LEVn" desc="">
+      <formula string="0x60+((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="INT_LEV0" addr="0x60"/>
+      <addr name="INT_LEV1" addr="0x64"/>
+      <addr name="INT_LEV2" addr="0x68"/>
+      <addr name="INT_LEV3" addr="0x6c"/>
+      <addr name="INT_LEV4" addr="0xe0"/>
+      <addr name="INT_LEV5" addr="0xe4"/>
+      <addr name="INT_LEV6" addr="0xe8"/>
+      <addr name="INT_LEV7" addr="0xec"/>
+      <addr name="INT_LEV8" addr="0x160"/>
+      <addr name="INT_LEV9" addr="0x164"/>
+      <addr name="INT_LEV10" addr="0x168"/>
+      <addr name="INT_LEV11" addr="0x16c"/>
+      <addr name="INT_LEV12" addr="0x1e0"/>
+      <addr name="INT_LEV13" addr="0x1e4"/>
+      <addr name="INT_LEV14" addr="0x1e8"/>
+      <addr name="INT_LEV15" addr="0x1ec"/>
+      <addr name="INT_LEV16" addr="0x260"/>
+      <addr name="INT_LEV17" addr="0x264"/>
+      <addr name="INT_LEV18" addr="0x268"/>
+      <addr name="INT_LEV19" addr="0x26c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="INT_CLRn" desc="">
+      <formula string="0x70+((n)/4)*0x80+((n)%4)*4"/>
+      <addr name="INT_CLR0" addr="0x70"/>
+      <addr name="INT_CLR1" addr="0x74"/>
+      <addr name="INT_CLR2" addr="0x78"/>
+      <addr name="INT_CLR3" addr="0x7c"/>
+      <addr name="INT_CLR4" addr="0xf0"/>
+      <addr name="INT_CLR5" addr="0xf4"/>
+      <addr name="INT_CLR6" addr="0xf8"/>
+      <addr name="INT_CLR7" addr="0xfc"/>
+      <addr name="INT_CLR8" addr="0x170"/>
+      <addr name="INT_CLR9" addr="0x174"/>
+      <addr name="INT_CLR10" addr="0x178"/>
+      <addr name="INT_CLR11" addr="0x17c"/>
+      <addr name="INT_CLR12" addr="0x1f0"/>
+      <addr name="INT_CLR13" addr="0x1f4"/>
+      <addr name="INT_CLR14" addr="0x1f8"/>
+      <addr name="INT_CLR15" addr="0x1fc"/>
+      <addr name="INT_CLR16" addr="0x270"/>
+      <addr name="INT_CLR17" addr="0x274"/>
+      <addr name="INT_CLR18" addr="0x278"/>
+      <addr name="INT_CLR19" addr="0x27c"/>
+      <field name="VALUE" desc="" bitrange="7:0"/>
+    </reg>
+  </dev>
+  <dev name="LCD3" long_name="TFT LCD controller" desc="" version="1.0">
+    <addr name="LCD3" addr="0x70009200"/>
+    <reg name="VDCTRL0" desc="">
+      <addr name="VDCTRL0" addr="0x0"/>
+      <field name="HSYNC_LAST_DATA" desc="Last clock at which pixel data is sent. This is the back porch (HBP) + number of pixels per row (WIDTH) - 1" bitrange="26:16"/>
+      <field name="HSYNC_FIRST_DATA" desc="First clock at which pixel data starts. This is the back porch (HBP)" bitrange="10:0"/>
+    </reg>
+    <reg name="VDCTRL1" desc="">
+      <addr name="VDCTRL1" addr="0x4"/>
+      <field name="HSYNC_LAST_HIGH" desc="Last clock at which the HSYNC signal is high in the row. This is the total the back porch (HBP) + number of pixels per row (WIDTH) + front porch (HFP) - 1 (also VSYNC period - 1)." bitrange="24:16"/>
+      <field name="HSYNC_LAST_LOW" desc="Last clock at which the HSYNC signal is low in the row. This is the HSYNC pulse width (HPW) - 1." bitrange="7:0"/>
+    </reg>
+    <reg name="VDCTRL2" desc="">
+      <addr name="VDCTRL2" addr="0x8"/>
+      <field name="DISABLE" desc="Disable HSYNC ENABLE signal ?" bitrange="31:31"/>
+      <field name="HSYNC_FIRST_ENABLE" desc="First clock at which the ENABLE signal is high again in the row. This is usually the back porch (HBP) + number of pixels per row (WIDTH)" bitrange="26:16"/>
+      <field name="HSYNC_LAST_ENABLE" desc="Last clock at which the ENABLE signal is high at the beginning of the row. This is usually the back porch (HBP) - 1." bitrange="10:0"/>
+    </reg>
+    <reg name="VDCTRL3" desc="">
+      <addr name="VDCTRL3" addr="0xc"/>
+      <field name="VSYNC_LAST_DATA" desc="Last row at which pixel data is sent. This is the back porch (VBP) + number of rows (HEIGHT) - 1" bitrange="26:16"/>
+      <field name="VSYNC_FIRST_DATA" desc="First riw at which pixel data starts. This is the back porch (VBP)" bitrange="10:0"/>
+    </reg>
+    <reg name="VDCTRL4" desc="">
+      <addr name="VDCTRL4" addr="0x10"/>
+      <field name="VSYNC_LAST_HIGH" desc="Last row at which the VSYNC signal is high in the frame. This is the total the back porch (VBP) + number of rows (HEIGHT) + front porch (VFP) - 1 (also VSYNC period - 1)." bitrange="24:16"/>
+      <field name="VSYNC_LAST_LOW" desc="Last row at which the VSYNC signal is low in the frame. This is the VSYNC pulse width (VPW) - 1." bitrange="7:0"/>
+    </reg>
+    <reg name="VDCTRL5" desc="">
+      <addr name="VDCTRL5" addr="0x14"/>
+      <field name="DISABLE" desc="Disable VSYNC ENABLE signal ?" bitrange="31:31"/>
+      <field name="VSYNC_FIRST_ENABLE" desc="First row at which the ENABLE signal is high again in the frame. This is usually the back porch (VBP) + number of rows (HEIGHT)." bitrange="26:16"/>
+      <field name="VSYNC_LAST_ENABLE" desc="Last row at which the ENABLE signal is high. This is usually the back porch (VBP) - 1" bitrange="10:0"/>
+    </reg>
+    <reg name="CTRL0" desc="">
+      <addr name="CTRL0" addr="0x20"/>
+      <field name="UNK7" desc="" bitrange="7:7"/>
+      <field name="UNK6" desc="" bitrange="6:6"/>
+      <field name="UNK5" desc="" bitrange="5:5"/>
+    </reg>
+    <reg name="CTRL1" desc="">
+      <addr name="CTRL1" addr="0x24"/>
+      <field name="UNK30_22" desc="" bitrange="30:22"/>
+      <field name="UNK19" desc="" bitrange="19:19"/>
+      <field name="UNK18_16" desc="" bitrange="18:16"/>
+      <field name="UNK15" desc="" bitrange="15:15"/>
+      <field name="UNK14" desc="" bitrange="14:14"/>
+      <field name="UNK13" desc="" bitrange="13:13"/>
+      <field name="UNK12" desc="" bitrange="12:12"/>
+      <field name="UNK11" desc="" bitrange="11:11"/>
+      <field name="UNK10" desc="" bitrange="10:10"/>
+      <field name="UNK9_8" desc="" bitrange="9:8"/>
+      <field name="UNK7" desc="" bitrange="7:7"/>
+      <field name="WORDLENGTH" desc="" bitrange="6:4">
+        <value name="8BIT" value="0x1" desc=""/>
+        <value name="16BIT" value="0x2" desc=""/>
+        <value name="18BIT" value="0x3" desc=""/>
+        <value name="24BIT" value="0x4" desc=""/>
+      </field>
+      <field name="UNK3_2" desc="" bitrange="3:2"/>
+      <field name="UNK0" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="UNK28" desc="">
+      <addr name="UNK28" addr="0x28"/>
+    </reg>
+    <reg name="UNK30" desc="">
+      <addr name="UNK30" addr="0x30"/>
+    </reg>
+    <reg name="WINDOW0" desc="">
+      <addr name="WINDOW0" addr="0x34"/>
+      <field name="LEFT" desc="First pixel on the row to send." bitrange="26:16"/>
+      <field name="TOP" desc="First row to update" bitrange="10:0"/>
+    </reg>
+    <reg name="WINDOW1" desc="">
+      <addr name="WINDOW1" addr="0x38"/>
+      <field name="RIGHT" desc="Last pixel on the row to send." bitrange="26:16"/>
+      <field name="BOTTOM" desc="Last row to send." bitrange="11:0"/>
+    </reg>
+    <reg name="UNK40" desc="">
+      <addr name="UNK40" addr="0x40"/>
+    </reg>
+    <reg name="UNK4C" desc="">
+      <addr name="UNK4C" addr="0x4c"/>
+      <field name="UNK23" desc="" bitrange="23:23"/>
+      <field name="UNK22" desc="" bitrange="22:22"/>
+      <field name="UNK20" desc="" bitrange="20:20"/>
+      <field name="UNK19_16" desc="" bitrange="19:16"/>
+      <field name="UNK15" desc="" bitrange="15:15"/>
+      <field name="UNK14" desc="" bitrange="14:14"/>
+      <field name="UNK12_8" desc="" bitrange="12:8"/>
+      <field name="UNK7_0" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="UNK80" desc="">
+      <addr name="UNK80" addr="0x80"/>
+      <field name="MAGIC" desc="Set to 0xABCD" bitrange="31:0">
+        <value name="MAGIC" value="0xabcd" desc=""/>
+      </field>
+    </reg>
+  </dev>
+  <dev name="LINT" long_name="Local interrupt collector" desc="" version="1.0">
+    <addr name="LINT" addr="0x6000f000"/>
+    <reg name="VECTORn" desc="">
+      <formula string="0x100+(n)*4"/>
+      <addr name="VECTOR0" addr="0x100"/>
+      <addr name="VECTOR1" addr="0x104"/>
+      <addr name="VECTOR2" addr="0x108"/>
+      <addr name="VECTOR3" addr="0x10c"/>
+      <addr name="VECTOR4" addr="0x110"/>
+      <addr name="VECTOR5" addr="0x114"/>
+      <addr name="VECTOR6" addr="0x118"/>
+      <addr name="VECTOR7" addr="0x11c"/>
+      <field name="ENTRY" desc="" bitrange="31:0"/>
+    </reg>
+  </dev>
+  <dev name="PROC" long_name="Processor control" desc="" version="1.0">
+    <addr name="PROC" addr="0x60000000"/>
+    <reg name="ID" desc="This registers gives the ID of the processor, which can either be the main CPU or the COP.">
+      <addr name="ID" addr="0x0"/>
+      <field name="ID" desc="Processor ID" bitrange="7:0">
+        <value name="CPU" value="0x55" desc=""/>
+        <value name="COP" value="0xaa" desc=""/>
+      </field>
+    </reg>
+  </dev>
+  <dev name="TIMER" long_name="Timers" desc="" version="1.0">
+    <addr name="TIMER" addr="0x60005000"/>
+    <reg name="CFGn" desc="">
+      <formula string="(n)*8"/>
+      <addr name="CFG0" addr="0x0"/>
+      <addr name="CFG1" addr="0x8"/>
+    </reg>
+    <reg name="VALn" desc="">
+      <formula string="0x4+(n)*8"/>
+      <addr name="VAL0" addr="0x4"/>
+      <addr name="VAL1" addr="0xc"/>
+    </reg>
+    <reg name="USEC" desc="">
+      <addr name="USEC" addr="0x10"/>
+    </reg>
+    <reg name="RTC" desc="">
+      <addr name="RTC" addr="0x14"/>
+    </reg>
+  </dev>
+  <dev name="UNK" long_name="" desc="" version="">
+    <addr name="UNK" addr="0x60010000"/>
+    <reg name="UNK0" desc="">
+      <addr name="UNK0" addr="0x0"/>
+      <field name="UNK26_25" desc="" bitrange="26:25"/>
+      <field name="UNK24_23" desc="" bitrange="24:23"/>
+      <field name="UNK22" desc="" bitrange="22:22"/>
+      <field name="UNK21_19" desc="" bitrange="21:19"/>
+      <field name="UNK18_0" desc="" bitrange="18:0"/>
+    </reg>
+    <reg name="UNK80" desc="">
+      <addr name="UNK80" addr="0x80"/>
+      <field name="WIDTH" desc="Width divided by 16" bitrange="31:16"/>
+      <field name="HEIGHT" desc="Height divided by 16" bitrange="15:0"/>
+    </reg>
+  </dev>
+</soc>
