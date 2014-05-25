@@ -21,46 +21,46 @@
 #ifndef __HWSTUB_PROTOCOL__
 #define __HWSTUB_PROTOCOL__
 
-#define HWSTUB_CLASS        0xff
-#define HWSTUB_SUBCLASS     0xac
-#define HWSTUB_PROTOCOL     0x1d
+/**
+ * HWStub protocol version
+ */
 
-#define HWSTUB_VERSION_MAJOR    3
+#define HWSTUB_VERSION_MAJOR    4
 #define HWSTUB_VERSION_MINOR    0
-#define HWSTUB_VERSION_REV      1
+#define HWSTUB_VERSION_REV      0
 
 #define HWSTUB_VERSION__(maj,min,rev) #maj"."#min"."#rev
 #define HWSTUB_VERSION_(maj,min,rev) HWSTUB_VERSION__(maj,min,rev)
 #define HWSTUB_VERSION HWSTUB_VERSION_(HWSTUB_VERSION_MAJOR,HWSTUB_VERSION_MINOR,HWSTUB_VERSION_REV)
 
+/**
+ * A device can use any VID:PID but in case hwstub is in full control of the
+ * device, the preferred VID:PID is the following.
+ */
+
 #define HWSTUB_USB_VID  0xfee1
 #define HWSTUB_USB_PID  0xdead
 
 /**
- * Control commands
- *
- * These commands are sent to the device, using the standard bRequest field
- * of the SETUP packet. This is to take advantage of both wIndex and wValue
- * although it would have been more correct to send them to the interface.
+ * The device class should be per interface and the hwstub interface must use
+ * the following class, subclass and protocol.
  */
 
-/* list of commands */
-#define HWSTUB_GET_LOG      0 /* optional */
-#define HWSTUB_RW_MEM       1 /* optional */
-#define HWSTUB_CALL         2 /* optional */
-#define HWSTUB_JUMP         3 /* optional */
+#define HWSTUB_CLASS        0xff
+#define HWSTUB_SUBCLASS     0x57
+#define HWSTUB_PROTOCOL     0x0b
 
 /**
- * Descriptors can be retrieve using configuration descriptor or individually
+ * Descriptors can be retrieved using configuration descriptor or individually
  * using the standard GetDescriptor request on the interface.
  */
 
-/* list of possible information */
-#define HWSTUB_DT_VERSION     0x41 /* mandatory */
-#define HWSTUB_DT_LAYOUT      0x42 /* mandatory */
-#define HWSTUB_DT_TARGET      0x43 /* mandatory */
-#define HWSTUB_DT_STMP        0x44 /* optional */
-#define HWSTUB_DT_PP          0x45 /* optional */
+#define HWSTUB_DT_VERSION   0x41 /* mandatory */
+#define HWSTUB_DT_LAYOUT    0x42 /* mandatory */
+#define HWSTUB_DT_TARGET    0x43 /* mandatory */
+#define HWSTUB_DT_STMP      0x44 /* optional */
+#define HWSTUB_DT_PP        0x45 /* optional */
+#define HWSTUB_DT_DEVICE    0x46 /* optional */
 
 struct hwstub_version_desc_t
 {
@@ -120,25 +120,70 @@ struct hwstub_target_desc_t
     char bName[58];
 } __attribute__((packed));
 
+struct hwstub_device_desc_t
+{
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    /* Give the bRequest value for */
+} __attribute__((packed));
+
+/**
+ * Control commands
+ *
+ * These commands are sent to the interface, using the standard bRequest field
+ * of the SETUP packet. The wIndex contains the interface number. The wValue
+ * contains an ID which is used for requests requiring several transfers.
+ */
+
+#define HWSTUB_GET_LOG  0x40
+#define HWSTUB_READ     0x41
+#define HWSTUB_READ2    0x42
+#define HWSTUB_WRITE    0x43
+#define HWSTUB_EXEC     0x44
+
 /**
  * HWSTUB_GET_LOG:
  * The log is returned as part of the control transfer.
  */
 
 /**
- * HWSTUB_RW_MEM:
- * The 32-bit address is split into two parts.
- * The low 16-bit are stored in wValue and the upper
- * 16-bit are stored in wIndex. Depending on the transfer direction,
- * the transfer is either a read or a write.
- * The read/write on the device are guaranteed to be 16-bit/32-bit when
- * possible, making it suitable to read/write registers. */
+ * HWSTUB_READ and HWSTUB_READ2:
+ * Read a range of memory. The request works in two steps: first the host
+ * sends HWSTUB_READ with the parameters (address, length) and then
+ * a HWSTUB_READ2 to retrieve the buffer. Both requests must use the same
+ * ID in wValue, otherwise the second request will be STALLed.
+ */
+
+struct hwstub_read_req_t
+{
+    uint32_t dAddress;
+} __attribute__((packed));
 
 /**
- * HWSTUB_{CALL,JUMP}:
- * The 32-bit address is split into two parts.
- * The low 16-bit are stored in wValue and the upper
- * 16-bit are stored in wIndex. Depending on the transfer direction,
- * the transfer is either a read or a write. */
+ * HWSTUB_WRITE
+ * Write a range of memory. The payload starts with the following header, everything
+ * which follows is data.
+ */
+struct hwstub_write_req_t
+{
+    uint32_t dAddress;
+} __attribute__((packed));
+
+/**
+ * HWSTUB_EXEC:
+ * Execute code at an address. Several options are available regarding ARM vs Thumb,
+ * jump vs call.
+ */
+
+#define HWSTUB_EXEC_ARM     (0 << 0) /* target code is ARM */
+#define HWSTUB_EXEC_THUMB   (1 << 0) /* target code is Thumb */
+#define HWSTUB_EXEC_JUMP    (0 << 1) /* branch, code will never turn */
+#define HWSTUB_EXEC_CALL    (1 << 1) /* call and expect return */
+
+struct hwstub_exec_req_t
+{
+    uint32_t dAddress;
+    uint16_t bmFlags;
+};
 
 #endif /* __HWSTUB_PROTOCOL__ */

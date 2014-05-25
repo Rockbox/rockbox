@@ -754,15 +754,22 @@ int main(int argc, char **argv)
 
     // look for device
     if(!g_quiet)
-        printf("Looking for device %#04x:%#04x...\n", HWSTUB_USB_VID, HWSTUB_USB_PID);
-
-    libusb_device_handle *handle = libusb_open_device_with_vid_pid(ctx,
-        HWSTUB_USB_VID, HWSTUB_USB_PID);
-    if(handle == NULL)
+        printf("Looking for hwstub device ...\n");
+    // open first device
+    libusb_device **list;
+    ssize_t cnt = hwstub_get_device_list(ctx, &list);
+    if(cnt <= 0)
     {
         printf("No device found\n");
         return 1;
     }
+    libusb_device_handle *handle;
+    if(libusb_open(list[0], &handle) != 0)
+    {
+        printf("Cannot open device\n");
+        return 1;
+    }
+    libusb_free_device_list(list, 1);
 
     // admin stuff
     libusb_device *mydev = libusb_get_device(handle);
