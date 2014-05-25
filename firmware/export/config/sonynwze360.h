@@ -121,6 +121,9 @@
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE STORAGE_MMC
 
+/* Extra threads: stfm1000 */
+#define TARGET_EXTRA_THREADS 1
+
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 550        /* min. capacity selectable */

@@ -136,8 +136,8 @@
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
 
-/* Extra threads: touchpad and rds */
-#define TARGET_EXTRA_THREADS 2
+/* Extra threads: rds */
+#define TARGET_EXTRA_THREADS 1
 
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */

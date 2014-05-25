@@ -44,6 +44,7 @@
 #include "button.h"
 #include "fmradio_i2c.h"
 #include "powermgmt-imx233.h"
+#include "dri-imx233.h"
 
 #include "regs/digctl.h"
 #include "regs/usbphy.h"
@@ -185,6 +186,7 @@ void system_init(void)
     imx233_power_init();
     imx233_i2c_init();
     imx233_powermgmt_init();
+    imx233_dri_init();
     /* setup watchdog */
     watchdog_init();
 

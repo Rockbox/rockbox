@@ -2070,6 +2070,36 @@ static int tuner_type = 0;
 #define IF_TUNER_TYPE(type)
 #endif
 
+#if (CONFIG_TUNER & STFM1000)
+static int stfm1000_callback(int btn, struct gui_synclist *lists)
+{
+    (void)lists;
+    if (btn == ACTION_STD_CANCEL)
+        return btn;
+    int selection = gui_synclist_get_sel_pos(lists);
+    if (btn == ACTION_STD_OK && selection == 0 /* raw stream */)
+    {
+        int raw_stream = tuner_get(STFM1000_RAW_STREAM);
+        tuner_set(STFM1000_RAW_STREAM, !raw_stream);
+    }
+    simplelist_set_line_count(0);
+
+    simplelist_addline("raw stream: %d", tuner_get(STFM1000_RAW_STREAM));
+
+    return ACTION_REDRAW;
+}
+
+static bool dbg_stfm1000_opt(void)
+{
+    struct simplelist_info info;
+    info.scroll_all = true;
+    simplelist_info_init(&info, "STFM1000 options", 1, NULL);
+    simplelist_set_line_count(0);
+    info.action_callback = stfm1000_callback;
+    return simplelist_show_list(&info);
+}
+#endif /* STFM1000 */
+
 static int radio_callback(int btn, struct gui_synclist *lists)
 {
     (void)lists;
@@ -2142,8 +2172,19 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     {
         struct stfm1000_dbg_info nfo;
         stfm1000_dbg_info(&nfo);
-        simplelist_addline("STFM1000 regs:");
+        simplelist_addline("STFM1000");
+        simplelist_addline("pilot present: %d", nfo.pilot_present);
+        simplelist_addline("raw stream: %d", tuner_get(STFM1000_RAW_STREAM));
         simplelist_addline("chipid: 0x%x", nfo.chipid);
+        simplelist_addline("tune1: 0x%x", nfo.tune1);
+        simplelist_addline("sdnominal: 0x%x", nfo.sdnominal);
+        simplelist_addline("pilottracking: 0x%x", nfo.pilottracking);
+        simplelist_addline("rssi_tone: 0x%x", nfo.rssi_tone);
+        simplelist_addline("pilotcorrection: 0x%x", nfo.pilotcorrection);
+        simplelist_addline("datapath: 0x%x", nfo.datapath);
+        for(int i = 0; i < 6; i++)
+            simplelist_addline("init%d: 0x%x", i, nfo.initialization[i]);
+        simplelist_addline("attention: 0x%x", nfo.attention);
     }
 #endif /* STFM1000 */
 #if (CONFIG_TUNER & TEA5760)
@@ -2620,6 +2661,9 @@ static const struct {
 #ifndef SIMULATOR
 #if CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },
+#if CONFIG_TUNER & STFM1000
+        { "STFM1000 options", dbg_stfm1000_opt },
+#endif /* STFM1000 */
 #endif
 #endif
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)

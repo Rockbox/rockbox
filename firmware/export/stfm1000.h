@@ -31,14 +31,31 @@
 
 struct stfm1000_dbg_info
 {
+    /* driver */
+    bool pilot_present;
+    /* registers */
+    uint32_t tune1;
+    uint32_t sdnominal;
+    uint32_t pilottracking;
+    uint32_t rssi_tone;
+    uint32_t pilotcorrection;
     uint32_t chipid;
+    uint32_t initialization[6];
+    uint32_t datapath;
+    uint32_t attention;
 };
+
+/* debug stream: when enabled, the audio output will be replaced by the raw
+ * radio data: the stream will alternate between L+R/L-R frames and RDS/RSSI
+ * frames. Use the magical STFM1000_RAW_STREAM with stfm1000_set to enable */
+#define STFM1000_RAW_STREAM ('r' << 24 | 'a' << 16 | 'w')
 
 bool stfm1000_detect(void);
 void stfm1000_init(void);
 int stfm1000_set(int setting, int value);
 int stfm1000_get(int setting);
 void stfm1000_dbg_info(struct stfm1000_dbg_info *nfo);
+
 
 #ifndef CONFIG_TUNER_MULTI
 #define tuner_set stfm1000_set

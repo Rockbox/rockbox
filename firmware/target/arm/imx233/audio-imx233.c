@@ -100,7 +100,12 @@ static void select_audio_path(void)
 #if (INPUT_SRC_CAPS & SRC_CAP_FMRADIO)
         /* recording and playback */
         case AUDIO_SRC_FMRADIO:
+#if CONFIG_TUNER == STFM1000
+            /* the STFM1000 is a digital tuner, we need to playback and not bypass */
+            audiohw_set_monitor(false);
+#else
             audiohw_set_monitor(true);
+#endif
 #if defined(HAVE_RECORDING)
             if(recording)
                 audiohw_enable_recording(false);

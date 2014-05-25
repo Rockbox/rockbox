@@ -143,6 +143,9 @@
 #define HAVE_HOTSWAP
 #define CONFIG_NAND NAND_IMX233
 
+/* Extra threads: stfm1000 */
+#define TARGET_EXTRA_THREADS 1
+
 /* todo */
 #define BATTERY_CAPACITY_DEFAULT 550    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 550        /* min. capacity selectable */

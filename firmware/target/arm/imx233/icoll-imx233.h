@@ -42,6 +42,8 @@
 #define INT_SRC_TOUCH_DETECT    36
 #define INT_SRC_LRADC_CHx(x)    (37 + (x))
 #define INT_SRC_RTC_1MSEC   48
+#define INT_SRC_DRI_DMA     49
+#define INT_SRC_DRI_ATTENTION   50
 /* STMP3700+ specific */
 #if IMX233_SUBTARGET >= 3700
 #define INT_SRC_SSP2_ERROR  2

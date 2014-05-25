@@ -144,7 +144,7 @@
 #define HAVE_MULTIVOLUME
 #define HAVE_HOTSWAP
 
-/* Extra threads: touchpad */
+/* Extra threads: stfm1000 */
 #define TARGET_EXTRA_THREADS 1
 
 /* todo */

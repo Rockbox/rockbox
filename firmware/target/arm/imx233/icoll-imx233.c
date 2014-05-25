@@ -73,6 +73,8 @@ default_interrupt(INT_ADC_DMA);
 default_interrupt(INT_ADC_ERROR);
 default_interrupt(INT_TOUCH_DETECT);
 default_interrupt(INT_RTC_1MSEC);
+default_interrupt(INT_DRI_DMA);
+default_interrupt(INT_DRI_ATTENTION);
 /* STMP3700+ specific */
 #if IMX233_SUBTARGET >= 3700
 default_interrupt(INT_SSP2_DMA);
@@ -120,6 +122,8 @@ static isr_t isr_table[INT_SRC_COUNT] =
     [INT_SRC_ADC_ERROR] = INT_ADC_ERROR,
     [INT_SRC_TOUCH_DETECT] = INT_TOUCH_DETECT,
     [INT_SRC_RTC_1MSEC] = INT_RTC_1MSEC,
+    [INT_SRC_DRI_DMA] = INT_DRI_DMA,
+    [INT_SRC_DRI_ATTENTION] = INT_DRI_ATTENTION,
 #if IMX233_SUBTARGET >= 3700
     [INT_SRC_SSP2_DMA] = INT_SSP2_DMA,
     [INT_SRC_SSP2_ERROR] = INT_SSP2_ERROR,

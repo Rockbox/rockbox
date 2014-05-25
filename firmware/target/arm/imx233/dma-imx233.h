@@ -90,7 +90,6 @@ struct imx233_dma_info_t
     bool int_enabled;
     bool int_cmdcomplt;
     bool int_error;
-    int nr_unaligned;
 };
 
 #define BM_APB_CHx_CMD_COMMAND          0x3

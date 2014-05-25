@@ -25,12 +25,8 @@
 #include "dma-imx233.h"
 #include "lcd.h"
 #include "string.h"
-
 #include "regs/apbh.h"
 #include "regs/apbx.h"
-
-// statistics about unaligned transfers
-static int apb_nr_unaligned[32];
 
 void imx233_dma_init(void)
 {
@@ -162,6 +158,7 @@ bool imx233_dma_is_channel_error_irq(unsigned chan)
  * real ones */
 void imx233_dma_prepare_command(unsigned chan, struct apb_dma_command_t *cmd)
 {
+    (void) chan;
     /* We handle circular descriptors by using unused bits:
      * bits 8-11 are not used by the hardware so we first go through the whole
      * list and mark them all a special value at the same time we commit buffers
@@ -180,8 +177,6 @@ void imx233_dma_prepare_command(unsigned chan, struct apb_dma_command_t *cmd)
         /* host > device: commit and discard */
         else if(op == BV_APB_CHx_CMD_COMMAND__READ)
             commit_discard_dcache_range(cur->buffer, sz);
-        if((uint32_t)cur->buffer % CACHEALIGN_SIZE)
-            apb_nr_unaligned[chan]++;
         /* Virtual to physical buffer pointer conversion */
         cur->buffer = PHYSICAL_ADDR(cur->buffer);
         /* chain ? */
@@ -289,6 +284,5 @@ struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags)
         s.int_error = false;
 #endif
     }
-    s.nr_unaligned = apb_nr_unaligned[chan];
     return s;
 }

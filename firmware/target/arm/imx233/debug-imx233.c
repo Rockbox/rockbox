@@ -45,6 +45,7 @@
 #include "button-imx233.h"
 #include "sdmmc-imx233.h"
 #include "storage.h"
+#include "dri-imx233.h"
 
 #include "regs/usbphy.h"
 #include "regs/timrot.h"
@@ -118,6 +119,7 @@ static struct
     { "dac", APB_AUDIO_DAC },
     { "ssp1", APB_SSP(1) },
     { "ssp2", APB_SSP(2) },
+    { "dri", APB_DRI },
 };
 
 static struct
@@ -160,6 +162,8 @@ static struct
     { "lradc_ch6", INT_SRC_LRADC_CHx(6) },
     { "lradc_ch7", INT_SRC_LRADC_CHx(7) },
     { "rtc_1msec", INT_SRC_RTC_1MSEC },
+    { "dri_dma", INT_SRC_DRI_DMA },
+    { "dri_att", INT_SRC_DRI_ATTENTION },
 };
 
 bool dbg_hw_info_dma(void)
@@ -183,15 +187,14 @@ bool dbg_hw_info_dma(void)
 
         lcd_clear_display();
 
-        lcd_putsf(0, 0, "S C name bar      apb ahb una");
+        lcd_putsf(0, 0, "S C name bar      apb ahb");
         for(unsigned i = 0; i < ARRAYLEN(dbg_channels); i++)
         {
             struct imx233_dma_info_t info = imx233_dma_get_info(dbg_channels[i].chan, DMA_INFO_ALL);
-            lcd_putsf(0, i + 1, "%c %c %4s %8x %3x %3x %3x",
+            lcd_putsf(0, i + 1, "%c %c %4s %8x %3x %3x",
                 info.gated ? 'g' : info.frozen ? 'f' : ' ',
                 !info.int_enabled ? '-' : info.int_error ? 'e' : info.int_cmdcomplt ? 'c' : ' ',
-                dbg_channels[i].name, info.bar, info.apb_bytes, info.ahb_bytes,
-                info.nr_unaligned);
+                dbg_channels[i].name, info.bar, info.apb_bytes, info.ahb_bytes);
         }
 
         lcd_update();
@@ -922,6 +925,41 @@ bool dbg_hw_info_emi(void)
     }
 }
 
+bool dbg_hw_info_dri(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        switch(button)
+        {
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACT_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        struct imx233_dri_info_t info = imx233_dri_get_info();
+        int line = 0;
+        lcd_putsf(0, line++, "DRI");
+        lcd_putsf(0, line++, "running: %d", info.running);
+        lcd_putsf(0, line++, "inputs_enabled: %d", info.inputs_enabled);
+        lcd_putsf(0, line++, "attention: %d", info.attention);
+        lcd_putsf(0, line++, "pilot_sync_loss: %d", info.pilot_sync_loss);
+        lcd_putsf(0, line++, "overflow: %d", info.overflow);
+        lcd_putsf(0, line++, "pilot_phase: %d", info.pilot_phase);
+
+        lcd_update();
+        yield();
+    }
+}
+
 bool dbg_hw_info_audio(void)
 {
     static const char *hp_sel[2] = {"DAC", "Line1"};
@@ -1278,6 +1316,7 @@ static struct
     {"timrot", dbg_hw_info_timrot},
     {"button", dbg_hw_info_button},
     {"sdmmc", dbg_hw_info_sdmmc},
+    {"dri", dbg_hw_info_dri},
     {"target", dbg_hw_target_info},
 };
 
