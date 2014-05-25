@@ -1,0 +1,165 @@
+/*
+ * Copyright 2008-2009 Freescale Semiconductor, Inc. All Rights Reserved.
+ */
+
+/*
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+#ifndef STFM1000_REGS_H
+#define STFM1000_REGS_H
+
+/* registers */
+#define STFM1000_TUNE1              0x00
+#define STFM1000_SDNOMINAL          0x04
+#define STFM1000_PILOTTRACKING      0x08
+#define STFM1000_INITIALIZATION1    0x10
+#define STFM1000_INITIALIZATION2    0x14
+#define STFM1000_INITIALIZATION3    0x18
+#define STFM1000_INITIALIZATION4    0x1C
+#define STFM1000_INITIALIZATION5    0x20
+#define STFM1000_INITIALIZATION6    0x24
+#define STFM1000_REF                0x28
+#define STFM1000_LNA                0x2C
+#define STFM1000_MIXFILT            0x30
+#define STFM1000_CLK1               0x34
+#define STFM1000_CLK2               0x38
+#define STFM1000_ADC                0x3C
+#define STFM1000_AGC_CONTROL1       0x44
+#define STFM1000_AGC_CONTROL2       0x48
+#define STFM1000_DATAPATH           0x5C
+#define STFM1000_RMS                0x60
+#define STFM1000_AGC_STAT           0x64
+#define STFM1000_SIGNALQUALITY      0x68
+#define STFM1000_DCEST              0x6C
+#define STFM1000_RSSI_TONE          0x70
+#define STFM1000_PILOTCORRECTION    0x74
+#define STFM1000_ATTENTION          0x78
+#define STFM1000_CLK3               0x7C
+#define STFM1000_CHIPID             0x80
+
+/* number of registers */
+#define STFM1000_NUM_REGS           ((0x80 + 4) / 4)
+
+#define STFM1000_FREQUENCY_100KHZ_MIN     758
+#define STFM1000_FREQUENCY_100KHZ_RANGE   325
+#define STFM1000_FREQUENCY_100KHZ_MAX     (STFM1000_FREQUENCY_100KHZ_MIN + \
+                              STFM1000_FREQUENCY_100KHZ_RANGE)
+
+#define STFM1000_TUNE1_B2_MIX       0x001C0000
+#define STFM1000_TUNE1_CICOSR       0x00007E00
+#define STFM1000_TUNE1_PLL_DIV      0x000001FF
+
+#define STFM1000_CHIP_REV_TA1       0x00000001
+#define STFM1000_CHIP_REV_TA2       0x00000002
+#define STFM1000_CHIP_REV_TB1       0x00000011
+#define STFM1000_CHIP_REV_TB2       0x00000012
+
+/* DATAPATH bits we use */
+#define STFM1000_DP_EN              0x01000000
+#define STFM1000_DB_ACCEPT          0x00010000
+#define STFM1000_SAI_CLK_DIV_MASK   0x7c
+#define STFM1000_SAI_CLK_DIV_SHIFT  2
+#define STFM1000_SAI_CLK_DIV(x) \
+      (((x) << STFM1000_SAI_CLK_DIV_SHIFT) & STFM1000_SAI_CLK_DIV_MASK)
+#define STFM1000_SAI_EN             0x00000001
+
+/* AGC_CONTROL1 bits we use */
+#define STFM1000_B2_BYPASS_AGC_CTL  0x00004000
+#define STFM1000_B2_BYPASS_FILT_MASK      0x0000000C
+#define STFM1000_B2_BYPASS_FILT_SHIFT     2
+#define STFM1000_B2_BYPASS_FILT(x) \
+      (((x) << STFM1000_B2_BYPASS_FILT_SHIFT) & STFM1000_B2_BYPASS_FILT_MASK)
+#define STFM1000_B2_LNATH_MASK            0x001F0000
+#define STFM1000_B2_LNATH_SHIFT           16
+#define STFM1000_B2_LNATH(x) \
+      (((x) << STFM1000_B2_LNATH_SHIFT) & STFM1000_B2_LNATH_MASK)
+
+/* AGC_STAT bits we use */
+#define STFM1000_AGCOUT_STAT_MASK   0x1F000000
+#define STFM1000_AGCOUT_STAT_SHIFT  24
+#define STFM1000_LNA_RMS_MASK       0x00001F00
+#define STFM1000_LNA_RMS_SHIFT            8
+
+/* PILOTTRACKING bits we use */
+#define STFM1000_B2_PILOTTRACKING_EN            0x00008000
+#define STFM1000_B2_PILOTLPF_TIMECONSTANT_MASK  0x00000f00
+#define STFM1000_B2_PILOTLPF_TIMECONSTANT_SHIFT 8
+#define STFM1000_B2_PILOTLPF_TIMECONSTANT(x)    \
+      (((x) << STFM1000_B2_PILOTLPF_TIMECONSTANT_SHIFT) & \
+            STFM1000_B2_PILOTLPF_TIMECONSTANT_MASK)
+#define STFM1000_B2_PFDSCALE_MASK         0x000000f0
+#define STFM1000_B2_PFDSCALE_SHIFT        4
+#define STFM1000_B2_PFDSCALE(x)     \
+      (((x) << STFM1000_B2_PFDSCALE_SHIFT) & STFM1000_B2_PFDSCALE_MASK)
+#define STFM1000_B2_PFDFILTER_SPEEDUP_MASK      0x0000000f
+#define STFM1000_B2_PFDFILTER_SPEEDUP_SHIFT     0
+#define STFM1000_B2_PFDFILTER_SPEEDUP(x)  \
+      (((x) << STFM1000_B2_PFDFILTER_SPEEDUP_SHIFT) & \
+            STFM1000_B2_PFDFILTER_SPEEDUP_MASK)
+
+/* PILOTCORRECTION bits we use */
+#define STFM1000_PILOTEST_TA2_MASK  0xff000000
+#define STFM1000_PILOTEST_TA2_SHIFT 24
+#define STFM1000_PILOTEST_TB2_MASK  0xfe000000
+#define STFM1000_PILOTEST_TB2_SHIFT 25
+
+/* INITIALIZATION1 bits we use */
+#define STFM1000_B2_BYPASS_FILT_MASK      0x0000000C
+#define STFM1000_B2_BYPASS_FILT_SHIFT     2
+#define STFM1000_B2_BYPASS_FILT(x)  \
+      (((x) << STFM1000_B2_BYPASS_FILT_SHIFT) & STFM1000_B2_BYPASS_FILT_MASK)
+
+/* INITIALIZATION2 bits we use */
+#define STFM1000_DRI_CLK_EN         0x80000000
+#define STFM1000_DEEMPH_50_75B            0x00000100
+#define STFM1000_RDS_ENABLE         0x00100000
+#define STFM1000_RDS_MIXOFFSET            0x00200000
+
+/* INITIALIZATION3 bits we use */
+#define STFM1000_B2_NEAR_CHAN_MIX_MASK    0x1c000000
+#define STFM1000_B2_NEAR_CHAN_MIX_SHIFT   26
+#define STFM1000_B2_NEAR_CHAN_MIX(x)      \
+      (((x) << STFM1000_B2_NEAR_CHAN_MIX_SHIFT) & \
+            STFM1000_B2_NEAR_CHAN_MIX_MASK)
+
+/* CLK1 bits we use */
+#define STFM1000_ENABLE_TAPDELAYFIX 0x00000020
+
+/* REF bits we use */
+#define STFM1000_LNA_AMP1_IMPROVE_DISTORTION 0x08000000
+
+/* LNA bits we use */
+#define STFM1000_AMP2_IMPROVE_DISTORTION 0x08000000
+#define STFM1000_ANTENNA_TUNECAP_MASK     0x001F0000
+#define STFM1000_ANTENNA_TUNECAP_SHIFT    16
+#define STFM1000_ANTENNA_TUNECAP(x) \
+      (((x) << STFM1000_ANTENNA_TUNECAP_SHIFT) & \
+            STFM1000_ANTENNA_TUNECAP_MASK)
+#define STFM1000_IBIAS2_UP          0x00000008
+#define STFM1000_IBIAS2_DN          0x00000004
+#define STFM1000_IBIAS1_UP          0x00000002
+#define STFM1000_IBIAS1_DN          0x00000001
+#define STFM1000_USEATTEN_MASK            0x00600000
+#define STFM1000_USEATTEN_SHIFT           21
+#define STFM1000_USEATTEN(x)  \
+      (((x) << STFM1000_USEATTEN_SHIFT) & STFM1000_USEATTEN_MASK)
+
+/* SIGNALQUALITY bits we use */
+#define STFM1000_NEAR_CHAN_AMPLITUDE_MASK 0x0000007F
+#define STFM1000_NEAR_CHAN_AMPLITUDE_SHIFT      0
+#define STFM1000_NEAR_CHAN_AMPLITUDE(x)   \
+      (((x) << STFM1000_NEAR_CHAN_AMPLITUDE_SHIFT) & \
+            STFM1000_NEAR_CHAN_AMPLITUDE_MASK)
+
+/* precalc tables elements */
+struct stfm1000_tune1 {
+      unsigned int tune1;     /* at least 32 bit */
+      unsigned int sdnom;
+};
+
+#endif

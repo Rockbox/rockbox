@@ -5,12 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
  * $Id$
  *
- * Tuner header for the STFM1000
- *
- * Copyright (C) 2012 Amaury Pouly
+ * Copyright (C) 2014 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,34 +18,25 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __dri_imx233__
+#define __dri_imx233__
 
-#ifndef __STFM1000__
-#define __STFM1000__
-#include <stdint.h>
+#include "config.h"
+#include "cpu.h"
+#include "system.h"
 
-#define HAVE_RADIO_REGION
-#define HAVE_RADIO_RSSI
-
-struct stfm1000_dbg_info
+struct imx233_dri_info_t
 {
-    uint32_t tune1;
-    uint32_t sdnominal;
-    uint32_t pilottracking;
-    uint32_t rssi_tone;
-    uint32_t pilotcorrection;
-    uint32_t chipid;
-    uint32_t initialization[6];
+    bool running;
+    bool inputs_enabled;
+    bool attention;
+    bool pilot_sync_loss;
+    bool overflow;
+    int pilot_phase;
 };
 
-bool stfm1000_detect(void);
-void stfm1000_init(void);
-int stfm1000_set(int setting, int value);
-int stfm1000_get(int setting);
-void stfm1000_dbg_info(struct stfm1000_dbg_info *nfo);
+void imx233_dri_init(void);
+void imx233_dri_enable(bool en);
+struct imx233_dri_info_t imx233_dri_get_info(void);
 
-#ifndef CONFIG_TUNER_MULTI
-#define tuner_set stfm1000_set
-#define tuner_get stfm1000_get
-#endif
-
-#endif /* __STFM1000__ */
+#endif /* __dri_imx233__ */
