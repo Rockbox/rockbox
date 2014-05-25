@@ -477,13 +477,12 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
                     return IMX_DONT_KNOW_HOW_TO_PATCH;
             }
             break;
-<<<<<<< HEAD
         case MODEL_ZENXFISTYLE:
             /* The ZEN X-Fi Style uses the standard ____, host, play sections, patch after first
-=======
+             * call in ____ section. */
+            return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
         case MODEL_ZENMX:
-            /* The Zen MX uses the standard ____, host, play sections, patch after first
->>>>>>> Initial commit for the Creative ZEN MX
+            /* The ZEN MX uses the standard ____, host, play sections, patch after first
              * call in ____ section. */
             return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
         default:
