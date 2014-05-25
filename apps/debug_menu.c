@@ -1924,6 +1924,13 @@ static int radio_callback(int btn, struct gui_synclist *lists)
         stfm1000_dbg_info(&nfo);
         simplelist_addline("STFM1000 regs:");
         simplelist_addline("chipid: 0x%x", nfo.chipid);
+        simplelist_addline("tune1: 0x%x", nfo.tune1);
+        simplelist_addline("sdnominal: 0x%x", nfo.sdnominal);
+        simplelist_addline("pilottracking: 0x%x", nfo.pilottracking);
+        simplelist_addline("rssi_tone: 0x%x", nfo.rssi_tone);
+        simplelist_addline("pilotcorrection: 0x%x", nfo.pilotcorrection);
+        for(int i = 0; i < 6; i++)
+            simplelist_addline("init%d: 0x%x", nfo.initialization[i]);
     }
 #endif /* STFM1000 */
 #if (CONFIG_TUNER & TEA5760)
