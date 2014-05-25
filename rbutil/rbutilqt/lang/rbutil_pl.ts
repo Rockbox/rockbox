@@ -22,7 +22,7 @@
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="56"/>
         <source>Backup to: unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utwórz do: nieznany</translation>
     </message>
     <message>
         <location filename="../gui/backupdialogfrm.ui" line="76"/>
@@ -89,7 +89,7 @@
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instalacja bootloadera wymaga oryginalnego pliku firmware dostarczanego przez Sandisk (plik bin). Oryginalny plik zostanie zmodyfikowany tak aby zawierał bootloader rockboxa, a następnie zostanie wgrany do urządzenia. Oryginalny firmware musisz pobrać samodzielnie z powodów licencyjnych. Proszę przejdź pod adres &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt; forum Sansy&lt;/a&gt; lub zapoznaj się z &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;instrukcją&lt;/a&gt; oraz stroną wiki o &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt;, gdzie dowiesz się jak pobrać plik.&lt;br/&gt;&lt;b&gt;Uwaga:&lt;/b&gt; Ten plik nie jest obecny na twoim odtwarzaczu i zniknie automatycznie po jego instalacji.&lt;br/&gt;&lt;/br&gt;Naciśnij Ok aby kontynuować i wyszukać plik na komputerze.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallams.cpp" line="58"/>
@@ -193,7 +193,7 @@
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="238"/>
         <source>CAB file format detected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wykryto format CAB</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbase.cpp" line="259"/>
@@ -540,7 +540,7 @@
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="72"/>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (firmware.sb file). This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished">Przy instalacji bootloadera potrzebny jest oryginalny firmware dostarczany przez Sandisk (plik sb). Oryginalny plik zostanie zmodyfikowany tak aby zawierał bootloader rockboxa, a następnie zostanie wgrany do urządzenia. Oryginalny firmware musisz pobrać samodzielnie z powodów licencyjnych. Proszę przejdź pod adres &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;forum Sansy&lt;/a&gt; lub zapoznaj się ze stroną wiki o &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt;, gdzie dowiesz się jak pobrać plik.&lt;/br&gt;Naciśnij Ok aby kontynuować i wyszukać plik na komputerze.</translation>
+        <translation type="unfinished">Instalacja bootloadera wymaga oryginalnego pliku firmware dostarczanego przez Sandisk (plik sb). Oryginalny plik zostanie zmodyfikowany tak aby zawierał bootloader rockboxa, a następnie zostanie wgrany do urządzenia. Oryginalny firmware musisz pobrać samodzielnie z powodów licencyjnych. Proszę przejdź pod adres &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;forum Sansy&lt;/a&gt; lub zapoznaj się ze stroną wiki o &lt;a href= &apos;http://www.rockbox.org/wiki/SansaFuzePlus&apos;&gt;SansaFuzePlus&lt;/a&gt;, gdzie dowiesz się jak pobrać plik.&lt;/br&gt;Naciśnij Ok aby kontynuować.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallimx.cpp" line="94"/>
@@ -668,7 +668,7 @@ Zobacz http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="228"/>
         <source>Error: could not retrieve device name</source>
-        <translation>Błąd: Nie można pobrać nazwy urządzenia</translation>
+        <translation type="unfinished">Błąd: Nie można znaleźć nazwy urządzenia</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="244"/>
@@ -755,7 +755,7 @@ Zobacz http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="34"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished">Przy instalacji bootloadera potrzebny jest plik z oryginalnym firmware (plik binarny). Oryginalny firmware musisz pobrać samodzielnie z powodów licencyjnych. Proszę zapoznaj się z &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;instrukcją&lt;/a&gt; oraz stroną wiki o &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt;, gdzie dowiesz się jak pobrać plik.&lt;/br&gt;Naciśnij Ok aby kontynuować i wyszukać plik na komputerze.</translation>
+        <translation type="unfinished">Instalacja bootloadera wymaga dostarczenia oryginalnego pliku firmware (plik binarny). Oryginalny firmware musisz pobrać samodzielnie z powodów licencyjnych. Proszę zapoznaj się z &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;instrukcją&lt;/a&gt; oraz stroną wiki o &lt;a href=&apos;http://www.rockbox.org/wiki/MPIOHD200Port&apos;&gt;MPIOHD200Port&lt;/a&gt;, gdzie dowiesz się jak pobrać plik.&lt;/br&gt;Naciśnij Ok aby kontynuować.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallmpio.cpp" line="53"/>
@@ -930,7 +930,7 @@ Zobacz http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="238"/>
         <source>Error: could not retrieve device name</source>
-        <translation>Błąd: Nie można pobrać nazwy urządzenia</translation>
+        <translation type="unfinished">Błąd: Nie można znaleźć nazwy urządzenia</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="254"/>
@@ -958,7 +958,7 @@ Zobacz http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="33"/>
         <source>Bootloader installation requires you to provide a firmware file of the original firmware (bin file). You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2Info&lt;/a&gt; wiki page on how to obtain the file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished">Przy instalacji bootloadera potrzebny jest plik z oryginalnym firmware (plik binarny). Oryginalny firmware musisz pobrać samodzielnie z powodów licencyjnych. Proszę zapoznaj się z &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;instrukcją&lt;/a&gt; oraz stroną wiki o &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2&lt;/a&gt;, gdzie dowiesz się jak pobrać plik.&lt;/br&gt;Naciśnij Ok aby kontynuować i wyszukać plik na komputerze.</translation>
+        <translation type="unfinished">Instalacja bootloadera wymaga dostarczenia oryginalnego pliku firmware (plik binarny). Oryginalny firmware musisz pobrać samodzielnie z powodów licencyjnych. Proszę zapoznaj się z &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;instrukcją&lt;/a&gt; oraz stroną wiki o &lt;a href=&apos;http://www.rockbox.org/wiki/CowonD2Info&apos;&gt;CowonD2&lt;/a&gt;, gdzie dowiesz się jak pobrać plik.&lt;/br&gt;Naciśnij Ok aby kontynuować.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalltcc.cpp" line="50"/>
@@ -1012,17 +1012,17 @@ Zobacz http://www.rockbox.org/wiki/SansaE200Install
     <message>
         <location filename="../gui/changelogfrm.ui" line="17"/>
         <source>Changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista zmian</translation>
     </message>
     <message>
         <location filename="../gui/changelogfrm.ui" line="39"/>
         <source>Show on startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokazuj przy starcie</translation>
     </message>
     <message>
         <location filename="../gui/changelogfrm.ui" line="46"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished">&amp;Ok</translation>
+        <translation>&amp;Ok</translation>
     </message>
 </context>
 <context>
@@ -1091,13 +1091,13 @@ Zobacz http://www.rockbox.org/wiki/SansaE200Install
         <location filename="../configure.cpp" line="448"/>
         <location filename="../configure.cpp" line="914"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Błąd TTS</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="449"/>
         <location filename="../configure.cpp" line="915"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wybrany silnik TTS nie mógł zostać zainicjowany. Nie możesz wybrać tego silnika TTS.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="455"/>
@@ -1131,39 +1131,39 @@ Rockbox Utility nie może pracować z tymi ustawieniami. Proszę sprawdź, że u
     <message>
         <location filename="../configure.cpp" line="665"/>
         <source>%1 (%2 GiB of %3 GiB free)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 (%2 GiB z %3 GiB wolnego)</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="739"/>
         <source>Multiple devices have been detected. Please disconnect all players but one and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wykryto wiele urządzeń. Prosze odłącz urządzenia pozostawiając tylko jedno i spróbuj ponownie.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="742"/>
         <source>Detected devices:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wykryte urządzenia:</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="747"/>
         <source>(unknown)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(nieznany)</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="749"/>
         <source>%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 przy %2</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="755"/>
         <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uwaga: wykrywanie podłączonych urządzeń nie zawsze może być pewne. Możesz mieć mniej urządzeń podłączonych niż wyświetlonych na liście. W tym przypadku może nie być możliwym wykryć twój odtwarzacz z całkowitą pewnością.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="759"/>
         <location filename="../configure.cpp" line="763"/>
         <location filename="../configure.cpp" line="805"/>
         <source>Device Detection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wykrywanie urządzenia</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="788"/>
@@ -1212,12 +1212,13 @@ Wybierz ręcznie urządzenie i punkt montowania.</translation>
         <location filename="../configure.cpp" line="794"/>
         <source>The player contains an incompatible filesystem.
 Make sure you selected the correct mountpoint and the player is set up to use a filesystem compatible with Rockbox.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Odtwarzacz zawiera niekompatybilny system plików.
+Upewnij się że wybrałeś prawidłowy punkt montowania i że odtwarzacz jest ustawiony na działanie w systemie plików kompatybilnym z Rockboxem.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="802"/>
         <source>An unknown error occured during player detection.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wystąpił nieznany błąd podczas wykrywania odtwarzacza.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="869"/>
@@ -1394,7 +1395,7 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../configurefrm.ui" line="219"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pokaż</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="260"/>
@@ -1452,7 +1453,7 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../configurefrm.ui" line="385"/>
         <source>&amp;TTS &amp;&amp; Encoder</source>
-        <translation>&amp;TTS &amp;&amp; Enkoder</translation>
+        <translation type="unfinished">&amp;TTS &amp;&amp; Koder</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="391"/>
@@ -1493,17 +1494,17 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../configurefrm.ui" line="462"/>
         <source>Encoder Engine</source>
-        <translation>Silnik enkodera</translation>
+        <translation type="unfinished">Silnik kodera</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="485"/>
         <source>Configure &amp;Enc</source>
-        <translation>&amp;Konfiguruj enkoder</translation>
+        <translation type="unfinished">&amp;Konfiguruj koder</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="496"/>
         <source>encoder name</source>
-        <translation>nazwa enkodera</translation>
+        <translation type="unfinished">nazwa kodera</translation>
     </message>
     <message>
         <location filename="../configurefrm.ui" line="536"/>
@@ -1583,12 +1584,12 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../createvoicewindow.cpp" line="100"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd TTS</translation>
     </message>
     <message>
         <location filename="../createvoicewindow.cpp" line="101"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany silnik TTS nie mógł zostać zainicjowany. Nie możesz wybrać tego silnika TTS.</translation>
     </message>
     <message>
         <location filename="../createvoicewindow.cpp" line="105"/>
@@ -1635,12 +1636,12 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../base/encoderexe.cpp" line="41"/>
         <source>Path to Encoder:</source>
-        <translation>Ścieżka do enkodera:</translation>
+        <translation>Ścieżka do kodera:</translation>
     </message>
     <message>
         <location filename="../base/encoderexe.cpp" line="43"/>
         <source>Encoder options:</source>
-        <translation>Opcje enkodera:</translation>
+        <translation>Opcje kodera:</translation>
     </message>
 </context>
 <context>
@@ -1748,7 +1749,7 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../installtalkfrm.ui" line="95"/>
         <source>Recurse into folders</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rekursuj do folderów</translation>
     </message>
     <message>
         <location filename="../installtalkfrm.ui" line="111"/>
@@ -1800,22 +1801,22 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../installtalkwindow.cpp" line="96"/>
         <source>Empty selection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nic nie wybrano</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="97"/>
         <source>No files or folders selected. Please select files or folders first.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nie zaznaczono żadnych plików ani folderów. Prosze wybierz najpierw pliki lub foldery.</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="137"/>
         <source>TTS error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd TTS</translation>
     </message>
     <message>
         <location filename="../installtalkwindow.cpp" line="138"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybrany silnik TTS nie mógł zostać zainicjowany. Nie możesz wybrać tego silnika TTS.</translation>
     </message>
 </context>
 <context>
@@ -1904,7 +1905,7 @@ Prosze skonfigurować silnik TTS.</translation>
     <message>
         <location filename="../base/mspackutil.cpp" line="109"/>
         <source>Error during CAB operation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Błąd podczas działania na CAB</translation>
     </message>
 </context>
 <context>
@@ -2225,22 +2226,22 @@ Problem z połączeniem sieciowym: %1. Sprawdź ustawienia sieciowe oraz konfigu
     <message>
         <location filename="../rbutilqt.cpp" line="759"/>
         <source>Device ejected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Urządzenie wysunięto</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="760"/>
         <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Urządzenie zostało pomyślnie wysunięte. Możesz teraz odłączyć odtwarzać od komputera.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="764"/>
         <source>Ejecting failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wysuwanie zakończone niepowodzeniem</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="765"/>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wysuwanie urządzenia zakończyło się niepowodzeniem. Proszę upewnij się, że żadne programy nie próbują uzyskać dostępu do urządzenia.Jeśli wysuwanie dalej zakończy się niepowodzeniem użyj wysuwania systemowego.</translation>
     </message>
 </context>
 <context>
@@ -2448,7 +2449,7 @@ Problem z połączeniem sieciowym: %1. Sprawdź ustawienia sieciowe oraz konfigu
     <message>
         <location filename="../rbutilqtfrm.ui" line="103"/>
         <source>&amp;Eject</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Wysuń</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="512"/>
@@ -2553,7 +2554,7 @@ Problem z połączeniem sieciowym: %1. Sprawdź ustawienia sieciowe oraz konfigu
     <message>
         <location filename="../rbutilqtfrm.ui" line="663"/>
         <source>Show &amp;Changelog</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż &amp;Listę zmian</translation>
     </message>
 </context>
 <context>
@@ -2985,17 +2986,17 @@ Naciśnij &quot;Nie&quot; aby pominąć ten etap.</translation>
     <message>
         <location filename="../base/ttsbase.cpp" line="51"/>
         <source>SAPI4 TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Silnik TTS SAPI4</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="53"/>
         <source>SAPI5 TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Silnik TTS SAPI5</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="54"/>
         <source>MS Speech Platform</source>
-        <translation type="unfinished"></translation>
+        <translation>Silnik MS Speech Platform</translation>
     </message>
     <message>
         <source>SAPI TTS Engine</source>
@@ -3183,12 +3184,12 @@ Naciśnij &quot;Nie&quot; aby pominąć ten etap.</translation>
     <message>
         <location filename="../base/talkgenerator.cpp" line="58"/>
         <source>Starting Encoder Engine</source>
-        <translation>Uruchamianie silnika enkodera</translation>
+        <translation type="unfinished">Uruchamianie silnika kodera</translation>
     </message>
     <message>
         <location filename="../base/talkgenerator.cpp" line="62"/>
         <source>Init of Encoder engine failed</source>
-        <translation>Nie można uruchomić silnika enkodera</translation>
+        <translation type="unfinished">Nie można uruchomić silnika kodera</translation>
     </message>
     <message>
         <location filename="../base/talkgenerator.cpp" line="72"/>
@@ -3485,17 +3486,17 @@ Wymagane są prawa administratora.&lt;/li&gt;</translation>
     <message>
         <location filename="../base/voicefile.cpp" line="90"/>
         <source>Extracted voice strings from installation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wyodrębniono ścieżki głosowe z instalacji</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="100"/>
         <source>Extracted voice strings incompatible</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Wyodrębnione ścieżki głosowe są niekompatybilne</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="145"/>
         <source>Could not retrieve strings from installation, downloading</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nie można znaleźć ścieżek w instalacji, pobieranie</translation>
     </message>
     <message>
         <location filename="../base/voicefile.cpp" line="171"/>
