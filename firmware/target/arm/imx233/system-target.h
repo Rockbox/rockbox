@@ -35,7 +35,9 @@
  * Absolute maximum CPU speed: 454.74 MHz (STMP3780), 320.00 MHz (STMP3700)
  * Intermediate CPU speeds: 261.82 MHz, 64 MHz
  * Absolute minimum CPU speed: 24 MHz */
+#if IMX233_SUBTARGET >= 3780
 #define IMX233_CPUFREQ_454_MHz  454740
+#endif
 #define IMX233_CPUFREQ_320_MHz  320000
 #define IMX233_CPUFREQ_261_MHz  261820
 #define IMX233_CPUFREQ_64_MHz    64000

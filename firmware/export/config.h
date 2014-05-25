@@ -370,6 +370,10 @@ Lyre prototype 1 */
 #define IMX233_FREESCALE    (1 << 0) /* Freescale I.MX233 nonstandard two-level MBR */
 #define IMX233_CREATIVE     (1 << 1) /* Creative MBLK windowing */
 
+/* IMX233_RAM */
+#define IMX233_DDR      0 /* Dual Data Rate */
+#define IMX233_SDR      1 /* Single Data Rate */
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config/archosplayer.h"

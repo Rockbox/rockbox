@@ -31,8 +31,10 @@ struct emi_reg_t
 /* hardcode all the register values for the different settings. This avoid
  * computing the register values at runtime since they never change and also
  * avoid wasting some space in iram.
- * Values from IMX233 manual, for Mobile DDR 7.5ns (133 MHz and 64MHz)
  * Make sure the last value is written to register 40. */
+
+#if IMX233_RAM == IMX233_DDR
+/* Values from IMX233 manual, for Mobile DDR 7.5ns (133 MHz and 64MHz) */
 
 static struct emi_reg_t settings_60M[15] ICONST_ATTR =
 {
@@ -74,6 +76,29 @@ static struct emi_reg_t settings_133M[15] ICONST_ATTR =
 
 static struct emi_reg_t settings_155M[15] ICONST_ATTR __attribute__((alias("settings_133M")));
 
+#else /* IMX233_SDR */
+
+static struct emi_reg_t settings_60M[15] ICONST_ATTR =
+{
+    {4, 0x01000101}, /* DLL bypass mode, concurrent auto-precharge and bank split */
+    {7, 0x01000001}, /* Read/write grouping, extra clock for back to back, priority placement */
+    {12, 0x02010000}, /* tWR = 2 cycles, tRRD = 1 cycles, tCKE = 0 cycles */
+    {13, 0x06060a01}, /* CAS lat gate = 3.0 cycles, CAS lat = 3.0 cycles, tWTR = 1 */
+    {15, 0x0103000d}, /* tRP = 1 cycles, tDAL = 3 cycles */
+    {17, 0x3e015502}, /* DDL: start point = 64, lock = 0, increment = 85, tRC = 2 cycles */
+    {18, 0x00000000}, /* */
+    {19, 0x02000202}, /* DLL: DQS out shift (bypass) = 2, DQS delay bypass (1/0) = 2 / 11 */
+    {20, 0x01020200}, /* tRCD = 1 cycles, tRAS (min) = 2 cycles, DQS write shift (bypass) = 2 */
+    {21, 0x00000002}, /* tRFC = 2 cycles */
+    {26, 0x00000179}, /* tREF = 377 cycles */
+    {32, 0x00020957}, /* tRAS (max) = 2391 cycles, tXSNR = 2 cycles */
+    {33, 0x00000002}, /* tXSR = 2 cycles */
+    {34, 0x00000961}, /* tINIT = 2401 cycles */
+    {40, 0x00010000} /* tPDEX = 1 */
+};
+
+#endif
+
 static void set_frequency(unsigned long freq) ICODE_ATTR;
 
 #if IMX233_SUBTARGET >= 3700
@@ -85,6 +110,7 @@ static void set_frequency(unsigned long freq)
     unsigned div;
     switch(freq)
     {
+#ifdef IMX233_EMIFREQ_151_MHz
         case IMX233_EMIFREQ_151_MHz:
             /* clk_emi@ref_emi/3*18/19 */
             fracdiv = 19;
@@ -92,6 +118,8 @@ static void set_frequency(unsigned long freq)
             /* ref_emi@480 MHz
              * clk_emi@151.58 MHz */
             break;
+#endif
+#ifdef IMX233_EMIFREQ_130_MHz
         case IMX233_EMIFREQ_130_MHz:
             /* clk_emi@ref_emi/2*18/33 */
             fracdiv = 33;
@@ -99,6 +127,7 @@ static void set_frequency(unsigned long freq)
             /* ref_emi@480 MHz
              * clk_emi@130.91 MHz */
             break;
+#endif
         case IMX233_EMIFREQ_64_MHz:
         default:
             /* clk_emi@ref_emi/5*18/27 */
@@ -147,12 +176,16 @@ void imx233_emi_set_frequency(unsigned long freq)
     struct emi_reg_t *regs;
     switch(freq)
     {
+#ifdef IMX233_EMIFREQ_151_MHz
         case IMX233_EMIFREQ_151_MHz:
             regs = settings_155M;
             break;
+#endif
+#ifdef IMX233_EMIFREQ_130_MHz
         case IMX233_EMIFREQ_130_MHz:
             regs = settings_133M;
             break;
+#endif
         case IMX233_EMIFREQ_64_MHz:
         default:
             regs = settings_60M;

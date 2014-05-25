@@ -40,15 +40,25 @@ struct imx233_emi_info_t
     int size;
 };
 
+#ifndef IMX233_RAM
+#error You must define IMX233_RAM to either IMX233_SDR or IMX233_DDR
+#endif
+
 /**
  * Absolute maximum EMI speed:  151.58 MHz (mDDR),  130.91 MHz (DDR)
  * Intermediate EMI speeds: 130.91 MHz,  120.00 MHz, 64 MHz, 24 MHz
- * Absolute minimum CPU speed: 24 MHz */
+ * Absolute minimum CPU speed: 24 MHz
+ * In SDRAM mode, 64MHz is the maximum */
+#if IMX233_RAM == IMX233_DDR
 #define IMX233_EMIFREQ_151_MHz  151580
 #define IMX233_EMIFREQ_130_MHz  130910
-#define IMX233_EMIFREQ_120_MHz  120000
-#define IMX233_EMIFREQ_64_MHz    64000
-#define IMX233_EMIFREQ_24_MHz    24000
+#define IMX233_EMIFREQ_MAX      IMX233_EMIFREQ_130_MHz
+#else
+#define IMX233_EMIFREQ_MAX      IMX233_EMIFREQ_64_MHz
+#endif
+
+#define IMX233_EMIFREQ_64_MHz   64000
+#define IMX233_EMIFREQ_MIN      IMX233_EMIFREQ_64_MHz
 
 void imx233_emi_set_frequency(unsigned long freq);
 struct imx233_emi_info_t imx233_emi_get_info(void);

@@ -4,6 +4,7 @@
 #define IMX233_SUBTARGET    3700
 #define IMX233_PACKAGE      IMX233_BGA169
 #define IMX233_PARTITIONS   IMX233_CREATIVE
+#define IMX233_RAM          IMX233_SDR
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 91
@@ -186,7 +187,7 @@
 #define HAVE_BOOTLOADER_USB_MODE
 
 /* Define this if you have adjustable CPU frequency */
-//#define HAVE_ADJUSTABLE_CPU_FREQ
+#define HAVE_ADJUSTABLE_CPU_FREQ
 
 #define BOOTFILE_EXT    "creative"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT

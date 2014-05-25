@@ -266,14 +266,16 @@ struct cpufreq_profile_t
 #if IMX233_SUBTARGET >= 3700
 static struct cpufreq_profile_t cpu_profiles[] =
 {
+#if IMX233_SUBTARGET >= 3780
     /* clk_p@454.74 MHz, clk_h@151.58 MHz, clk_emi@130.91 MHz, VDDD@1.550 V */
-    {IMX233_CPUFREQ_454_MHz, 1550, 1450, 3, 1, 19, IMX233_EMIFREQ_130_MHz, 0},
+    {IMX233_CPUFREQ_454_MHz, 1550, 1450, 3, 1, 19, IMX233_EMIFREQ_MAX, 0},
+#endif
     /* clk_p@320.00 MHz, clk_h@106.66 MHz, clk_emi@130.91 MHz, VDDD@1.450 V */
-    {IMX233_CPUFREQ_320_MHz, 1450, 1350, 3, 1, 27, IMX233_EMIFREQ_130_MHz, 0},
+    {IMX233_CPUFREQ_320_MHz, 1450, 1350, 3, 1, 27, IMX233_EMIFREQ_MAX, 0},
     /* clk_p@261.82 MHz, clk_h@130.91 MHz, clk_emi@130.91 MHz, VDDD@1.275 V */
-    {IMX233_CPUFREQ_261_MHz, 1275, 1175, 2, 1, 33, IMX233_EMIFREQ_130_MHz, 0},
+    {IMX233_CPUFREQ_261_MHz, 1275, 1175, 2, 1, 33, IMX233_EMIFREQ_MAX, 0},
     /* clk_p@64 MHz, clk_h@64 MHz, clk_emi@64 MHz, VDDD@1.050 V */
-    {IMX233_CPUFREQ_64_MHz, 1050, 975, 1, 5, 27, IMX233_EMIFREQ_64_MHz, 3},
+    {IMX233_CPUFREQ_64_MHz, 1050, 975, 1, 5, 27, IMX233_EMIFREQ_MIN, 3},
     /* dummy */
     {0, 0, 0, 0, 0, 0, 0, 0}
 };
