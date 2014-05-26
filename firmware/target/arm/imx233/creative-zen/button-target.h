@@ -31,7 +31,12 @@ bool button_debug_screen(void);
 #endif
 
 /* Main unit's buttons */
+#ifndef CREATIVE_ZENMX
 #define BUTTON_POWER                0x00000001
+#else
+// ZEN MX only has play/pause/power button
+#define BUTTON_POWER                BUTTON_PLAYPAUSE
+#endif
 #define BUTTON_LEFT                 0x00000002
 #define BUTTON_UP                   0x00000004
 #define BUTTON_RIGHT                0x00000008

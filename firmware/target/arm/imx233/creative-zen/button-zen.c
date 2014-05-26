@@ -138,10 +138,16 @@ struct imx233_button_map_t imx233_button_map[] =
 
 struct imx233_button_map_t imx233_button_map[] =
 {
-    [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3440), "vddio"), /* we need VDDIO for relative */
-    IMX233_BUTTON(MENU, LRADC_REL(CHAN, 2680, I_VDDIO), "back"),
-    IMX233_BUTTON(MENU, LRADC_REL(CHAN, 2050, I_VDDIO), "menu"),
-    IMX233_BUTTON(POWER, PSWITCH(1), "power"),
+    [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3450), "vddio"), /* we need VDDIO for relative */
+    IMX233_BUTTON(MENU, LRADC_REL(CHAN, 205, I_VDDIO), "menu"),
+    IMX233_BUTTON(SHORTCUT, LRADC_REL(CHAN, 440, I_VDDIO), "shortcut"),
+    IMX233_BUTTON(UP, LRADC_REL(CHAN, 640, I_VDDIO), "up"),
+    IMX233_BUTTON(LEFT, LRADC_REL(CHAN, 850, I_VDDIO), "left"),
+    IMX233_BUTTON(RIGHT, LRADC_REL(CHAN, 1050, I_VDDIO), "right"),
+    IMX233_BUTTON(DOWN, LRADC_REL(CHAN, 1245, I_VDDIO), "down"),
+    IMX233_BUTTON(SELECT, LRADC_REL(CHAN, 1465, I_VDDIO), "select"),
+    IMX233_BUTTON(BACK, LRADC_REL(CHAN, 2680, I_VDDIO), "back"),
+    IMX233_BUTTON(PLAYPAUSE, LRADC_REL(CHAN, 2920, I_VDDIO), "play"),
     IMX233_BUTTON_(END, END(), "")
 };
 #else
