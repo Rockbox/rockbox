@@ -28,32 +28,41 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3695
+    3200
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3627
+    3000
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
+/* NOTE: readout clips at 3995mV */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3695, 3714, 3772, 3791, 3811, 3850, 3908, 3985, 4024, 4111, 4198 }
+    { 3200, 3550, 3610, 3680, 3710, 3740, 3800, 3880, 3910, 3995, 4150 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
+/* NOTE: readout clips at 3995mV */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3850, 3888, 3927, 3966, 4024, 4063, 4111, 4150, 4198, 4237, 4286
+      3750, 3860, 3880, 3900, 3930, 3994, 4080, 4135, 4200, 4200, 4200
 };
 
-#define BATTERY_SCALE_FACTOR 4650
 /* full-scale ADC readout (2^10) in millivolt */
+#define BATTERY_SCALE_FACTOR 4000
+/* NOTE1: the ADC's 10 bit clip at aprox. 4000mV.
+   NOTE2: the scale factor is only accurate at higher voltages.
+          You get an error of +2.7%@3500mV and +6.7%@3000mV, so
+          the scale factor is not used. See _battery_voltage().
+*/
 
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
-    /* return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10; */
-    return 4100;
+    /* scale factor alone would give an error up to 6.7%@3000mV.
+       With the advanced formula the overall error is reduced to < 1.5% */
+/*  return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10; */
+    return ((adc_read(ADC_UNREG_POWER) * 5000) >> 10) - 1000;
 }
