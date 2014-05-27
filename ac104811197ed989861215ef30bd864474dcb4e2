@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_3af17dce",
+        "filename": "apps/plugins/disktidy.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-05-27T23:45:54Z",
+      "side": 1,
+      "message": "Instead of this, you might want to use a function (see BlackJack plugin) to decide whether or not to show this menu item.",
+      "revId": "ac104811197ed989861215ef30bd864474dcb4e2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
