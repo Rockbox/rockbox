@@ -24,36 +24,34 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-/* TODO: Not yet calibrated */
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3695
+    3400
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3627
+    3199
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
+/* NOTE: readout clips at around 4000mV */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3695, 3714, 3772, 3791, 3811, 3850, 3908, 3985, 4024, 4111, 4198 }
+    { 3199, 3492, 3543, 3601, 3626, 3651, 3702, 3769, 3794, 3865, 3995 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
+/* NOTE: these values may be rather inaccurate. Readout clips at around 4000mV */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3850, 3888, 3927, 3966, 4024, 4063, 4111, 4150, 4198, 4237, 4286
+      3750, 3860, 3880, 3900, 3930, 3994, 4080, 4135, 4200, 4200, 4200
 };
 
-#define BATTERY_SCALE_FACTOR 4650
-/* full-scale ADC readout (2^10) in millivolt */
+#define BATTERY_SCALE_FACTOR 5000
 
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
-    /* return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10; */
-    return 4100;
+    return ((adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10) - 1000;
 }
