@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_9ae1a901",
+        "filename": "firmware/target/arm/pp/adc-pp5020.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-05-27T23:20:13Z",
+      "side": 1,
+      "message": "The problem is, that I want a full scale reading. The readout is already clipping at ~4000mV, and line 70,71 will produce an additional cut off of ~100mV.\nMaybe the best thing is to deactivate this two lines (for YH-820 at least). I\u0027ll check the source to see if it\u0027s safe to return \u003e10 Bit values and change this if applicable.\nHowever the PLL control doesn\u0027t seem to change, so it appeared safe to me :)",
+      "parentUuid": "9abe1de1_fad2e533",
+      "revId": "f1120de011cc7e9a104208ba881020f3dc3f54dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_1a17d9ee",
         "filename": "firmware/target/arm/samsung/yh820/powermgmt-yh820.c",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2014-05-27T21:44:33Z",
       "side": 1,
       "message": "Why not just give it value of 5000 and use it in the formula. The formula is linear, so value 5000 is the battery scale factor (excluding shifting of course).",
+      "revId": "f1120de011cc7e9a104208ba881020f3dc3f54dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_7ae7f512",
+        "filename": "firmware/target/arm/samsung/yh820/powermgmt-yh820.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-05-27T23:20:13Z",
+      "side": 1,
+      "message": "This way the function returns the absolute battery voltage. If the function is expected to just return a relative millivolt value, I\u0027ll change it.",
+      "parentUuid": "9abe1de1_1a17d9ee",
       "revId": "f1120de011cc7e9a104208ba881020f3dc3f54dd",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
