@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_fad2e533",
+        "filename": "firmware/target/arm/pp/adc-pp5020.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-05-27T21:44:33Z",
+      "side": 1,
+      "message": "This is wrong :) Like i said on IRC, OF substract something from ADC, in contrast with GoGears. I\u0027ll try to find it and i will post it here.",
+      "revId": "f1120de011cc7e9a104208ba881020f3dc3f54dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_1a17d9ee",
+        "filename": "firmware/target/arm/samsung/yh820/powermgmt-yh820.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-05-27T21:44:33Z",
+      "side": 1,
+      "message": "Why not just give it value of 5000 and use it in the formula. The formula is linear, so value 5000 is the battery scale factor (excluding shifting of course).",
+      "revId": "f1120de011cc7e9a104208ba881020f3dc3f54dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
