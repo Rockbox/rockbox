@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_faa0a5a7",
+        "filename": "apps/plugins/disktidy.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-05-28T23:48:31Z",
+      "side": 1,
+      "message": "Recursive function call might cause a stack overflow on some targets with small memory and deep file hierarchies. Maybe a loop would be better?",
+      "revId": "697e599c3a3a4833644c98ef15625ea8aa276811",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_1ac5995a",
+        "filename": "apps/plugins/disktidy.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-05-28T23:48:31Z",
+      "side": 1,
+      "message": "Maybe this should only be called if a file type is selected to be cleaned?",
+      "revId": "697e599c3a3a4833644c98ef15625ea8aa276811",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
