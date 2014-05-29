@@ -597,8 +597,77 @@ static enum imx_error_t compute_md5sum_buf(void *buf, size_t sz, uint8_t file_md
     return IMX_SUCCESS;
 }
 
+/* compute MD5 sum of a buffer */
+static enum imx_error_t compute_soft_md5sum_buf(struct sb_file_t *sb, uint8_t file_md5sum[16])
+{
+    md5_context ctx;
+    md5_starts(&ctx);
+#define hash(obj) \
+    md5_update(&ctx, (void *)&obj, sizeof(obj))
+    /* various header fiels */
+    hash(sb->timestamp);
+    hash(sb->drive_tag);
+    hash(sb->drive_tag);
+    hash(sb->first_boot_sec_id);
+    hash(sb->flags);
+    hash(sb->product_ver);
+    hash(sb->component_ver);
+
+    for(int i = 0; i < sb->nr_sections; i++)
+    {
+        struct sb_section_t *sec = &sb->sections[i];
+        hash(sec->identifier);
+        uint32_t flags = sec->other_flags;
+        if(!sec->is_data)
+            flags |= SECTION_BOOTABLE;
+        if(sec->is_cleartext)
+            flags |= SECTION_CLEARTEXT;
+        hash(flags);
+
+        for(int j = 0; j < sec->nr_insts; j++)
+        {
+            struct sb_inst_t *inst = &sec->insts[j];
+            switch(inst->inst)
+            {
+                case SB_INST_NOP:
+                    /* ignore them totally because they are used for padding */
+                    break;
+                case SB_INST_LOAD:
+                    hash(inst->inst);
+                    hash(inst->addr);
+                    md5_update(&ctx, inst->data, inst->size);
+                    break;
+                case SB_INST_FILL:
+                    hash(inst->inst);
+                    hash(inst->addr);
+                    hash(inst->pattern);
+                    break;
+                case SB_INST_JUMP:
+                case SB_INST_CALL:
+                    hash(inst->inst);
+                    hash(inst->addr);
+                    hash(inst->argument);
+                    break;
+                case SB_INST_MODE:
+                    hash(inst->inst);
+                    hash(inst->argument);
+                    break;
+                case SB_INST_DATA:
+                    md5_update(&ctx, inst->data, inst->size);
+                    break;
+                default:
+                    printf("[ERR][INTERNAL] Unexpected instruction %d\n", inst->inst);
+                    return IMX_ERROR;
+            }
+        }
+    }
+#undef hash
+    md5_finish(&ctx, file_md5sum);
+    return IMX_SUCCESS;
+}
+
 /* compute MD5 of a file */
-static enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16])
+enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16])
 {
     void *buf;
     size_t sz;
@@ -608,6 +677,32 @@ static enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16]
     compute_md5sum_buf(buf, sz, file_md5sum);
     free(buf);
     return IMX_SUCCESS;
+}
+
+/* compute soft MD5 of a file */
+enum imx_error_t compute_soft_md5sum(const char *file, enum imx_model_t model,
+    uint8_t soft_md5sum[16])
+{
+    if(model == MODEL_UNKNOWN)
+    {
+        printf("[ERR] Cannot compute soft MD5 without knowing the model\n");
+        return IMX_ERROR;
+    }
+    clear_keys();
+    add_keys(imx_models[model].keys, imx_models[model].nr_keys);
+    /* read file */
+    enum sb_error_t err;
+    struct sb_file_t *sb = sb_read_file(file, false, NULL, generic_std_printf, &err);
+    if(sb == NULL)
+    {
+        printf("[ERR] Cannot load SB file: %d\n", err);
+        return err;
+    }
+    /* compute sum */
+    err = compute_soft_md5sum_buf(sb, soft_md5sum);
+    /* release file */
+    sb_free(sb);
+    return err;
 }
 
 static enum imx_error_t load_sb_file(const char *file, int md5_idx,
@@ -792,7 +887,9 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     if(ret != IMX_SUCCESS)
         return ret;
     printf("[INFO] MD5 sum of the file: ");
-    print_hex(NULL, misc_std_printf, file_md5sum, 16, true);
+    for(int i = 0; i < 16; i++)
+        printf("%02x", file_md5sum[i]);
+    printf("\n");
     /* find model */
     int md5_idx;
     ret = find_model_by_md5sum(file_md5sum, &md5_idx);

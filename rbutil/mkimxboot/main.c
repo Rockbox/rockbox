@@ -43,6 +43,26 @@ static struct imx_variant_t imx_variants[] =
 
 #define NR_VARIANTS sizeof(imx_variants) / sizeof(imx_variants[0])
 
+struct model_t
+{
+    const char *name;
+    enum imx_model_t model;
+};
+
+struct model_t imx_models[] =
+{
+    { "unknown", MODEL_UNKNOWN },
+    { "fuzeplus", MODEL_FUZEPLUS },
+    { "zenxfi2", MODEL_ZENXFI2 },
+    { "zenxfi3", MODEL_ZENXFI3 },
+    { "zenxfistyle", MODEL_ZENXFISTYLE },
+    { "zenstyle", MODEL_ZENSTYLE },
+    { "nwze370", MODEL_NWZE370 },
+    { "nwze360", MODEL_NWZE360 },
+};
+
+#define NR_MODELS sizeof(imx_models) / sizeof(imx_models[0])
+
 static void usage(void)
 {
     printf("Usage: mkimxboot [options | file]...\n");
@@ -57,6 +77,8 @@ static void usage(void)
     printf("  -x          Dump device informations\n");
     printf("  -w          Extract the original firmware\n");
     printf("  -p <ver>    Force product and component version\n");
+    printf("  -5 <type>   Compute <type> MD5 sum of the input file\n");
+    printf("  -m <model>  Specify model (useful for soft MD5 sum)\n");
     printf("Supported variants: (default is standard)\n");
     printf("  ");
     for(size_t i = 0; i < NR_VARIANTS; i++)
@@ -66,13 +88,49 @@ static void usage(void)
         printf("%s", imx_variants[i].name);
     }
     printf("\n");
+    printf("Supported models: (default is unknown)\n");
+    for(size_t i = 0; i < NR_MODELS; i++)
+    {
+        if(i != 0)
+            printf(", ");
+        printf("%s", imx_models[i].name);
+    }
+    printf("\n");
     printf("By default a dualboot image is built\n");
     printf("This tools supports the following format for the boot file:\n");
     printf("- rockbox scramble format\n");
     printf("- elf format\n");
     printf("Additional checks will be performed on rockbox scramble format to\n");
     printf("ensure soundness of operation.\n");
+    printf("There are two types of MD5 sums: 'full' or 'soft'.\n");
+    printf("- full MD5 sum applies to the whole file\n");
+    printf("- soft MD5 sum for SB files accounts for relevant parts only\n");
     exit(1);
+}
+
+static int print_md5(const char *file, enum imx_model_t model, const char *type)
+{
+    uint8_t md5sum[16];
+    enum imx_error_t err;
+    if(strcmp(type, "full") == 0)
+        err = compute_md5sum(file, md5sum);
+    else if(strcmp(type, "soft") == 0)
+        err = compute_soft_md5sum(file, model, md5sum);
+    else
+    {
+        printf("Invalid md5sum type '%s'\n", type);
+        return 1;
+    }
+    if(err != IMX_SUCCESS)
+    {
+        printf("There was an error when computing the MD5 sum: %d\n", err);
+        return 2;
+    }
+    printf("%s MD5 sum: ", type);
+    for(int i = 0; i < 16; i++)
+        printf("%02x", md5sum[i]);
+    printf("\n");
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -82,8 +140,10 @@ int main(int argc, char *argv[])
     char *bootfile = NULL;
     enum imx_firmware_variant_t variant = VARIANT_DEFAULT;
     enum imx_output_type_t type = IMX_DUALBOOT;
+    enum imx_model_t model = MODEL_UNKNOWN;
     bool debug = false;
     bool extract_of = false;
+    const char *md5type = NULL;
     const char *force_version = NULL;
 
     if(argc == 1)
@@ -101,10 +161,12 @@ int main(int argc, char *argv[])
             {"type", required_argument, 0, 't'},
             {"variant", required_argument, 0, 'v'},
             {"dev-info", no_argument, 0, 'x'},
+            {"model", required_argument, 0, 'm'},
+            {"md5", required_argument, 0, '5'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?di:o:b:t:v:xwp:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?di:o:b:t:v:xwp:m:5:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -167,6 +229,24 @@ int main(int argc, char *argv[])
             case 'p':
                 force_version = optarg;
                 break;
+            case '5':
+                md5type = optarg;
+                break;
+            case 'm':
+                if(model != MODEL_UNKNOWN)
+                {
+                    printf("You cannot specify two models\n");
+                    return 1;
+                }
+                for(int i = 0; i < NR_MODELS; i++)
+                    if(strcmp(optarg, imx_models[i].name) == 0)
+                    {
+                        model = imx_models[i].model;
+                        break;
+                    }
+                if(model == MODEL_UNKNOWN)
+                    printf("Unknown model '%s'\n", optarg);
+                break;
             default:
                 abort();
         }
@@ -177,6 +257,10 @@ int main(int argc, char *argv[])
         printf("You must specify an input file\n");
         return 1;
     }
+
+    if(md5type)
+        return print_md5(infile, md5type);
+
     if(!outfile)
     {
         printf("You must specify an output file\n");
