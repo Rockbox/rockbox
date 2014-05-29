@@ -167,15 +167,6 @@ void main(uint32_t arg, uint32_t addr)
         imx233_partitions_enable_window(false);
     }
 
-    while(1)
-    {
-        lcd_putsf(0, 5, "din: %08x %08x %08x %08x", HW_PINCTRL_DINn(0),
-            HW_PINCTRL_DINn(1), HW_PINCTRL_DINn(2), HW_PINCTRL_DINn(3));
-        lcd_putsf(0, 6, "btn: %d", imx233_button_lradc_read_raw());
-        lcd_putsf(0, 7, "pswitch: %d", imx233_power_read_pswitch());
-        lcd_update();
-    }
-
     ret = storage_init();
     if(ret < 0)
         error(EATA, ret, true);
