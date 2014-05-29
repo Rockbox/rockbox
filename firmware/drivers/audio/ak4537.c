@@ -223,22 +223,116 @@ void audiohw_set_frequency(int fsel)
 #if defined(HAVE_RECORDING)
 void audiohw_enable_recording(bool source_mic)
 {
-    (void)source_mic;
+    if (source_mic)
+    {
+        /* enable mic power supply */
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+        /* additionally select external mic */
+        akc_set(AK4537_MIC, MPWRE | MSEL);
+#else
+        akc_set(AK4537_MIC, MPWRI);
+#endif
+
+        /* mic out is connected to line1 input */
+        akc_clear(AK4537_PM3, INL | INR);
+
+        /* route ALC output to ADC input */
+        akc_set(AK4537_MIC, MICAD);
+        /* set ALC (automatic level control) to manual mode */
+        akc_clear(AK4537_ALC1, ALC1);
+        /* set gain control to 'dependent' (left&right at the same time) */
+        akc_clear(AK4537_MIC, IPGAC);
+        /* power up mic preamp, left channel ADC and line in */
+        akc_set(AK4537_PM1, PMMICL | PMIPGL | PMADL);
+        /* power up right channel ADC and line in */
+        akc_set(AK4537_PM3, PMADR | PMIPGR);
+    }
+    else
+    {
+        /* disable mic power supply */
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+        akc_clear(AK4537_MIC, MPWRE);
+#else
+        akc_clear(AK4537_MIC, MPWRI);
+#endif
+        /* disable mic preamp */
+        akc_clear(AK4537_PM1, PMMICL);
+
+        /* Select line1 input */
+        akc_clear(AK4537_PM3, INL | INR);
+        /* route ALC output to ADC input */
+        akc_set(AK4537_MIC, MICAD);
+        /* set ALC (automatic level control) to manual mode */
+        akc_clear(AK4537_ALC1, ALC1);
+
+        /* set gain control to independent left & right gain */
+        akc_set(AK4537_MIC, IPGAC);
+
+        /* power up left channel input and ADC */
+        akc_set(AK4537_PM1, PMADL | PMIPGL);
+        /* power up right channel input and ADC */
+        akc_set(AK4537_PM3, PMADR | PMIPGR);
+    }
 }
 
 void audiohw_disable_recording(void)
 {
+    /* disable mic power supply */
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+        akc_clear(AK4537_MIC, MPWRE);
+#else
+        akc_clear(AK4537_MIC, MPWRI);
+#endif
+    /* power down ADC, mic preamp and line amp */
+    akc_clear(AK4537_PM1, PMADL | PMMICL | PMIPGL);
+    akc_clear(AK4537_PM3, PMADR | PMMICR | PMIPGR);
 }
 
 void audiohw_set_recvol(int left, int right, int type)
 {
-    (void)left;
-    (void)right;
-    (void)type;
+    switch (type)
+    {
+    case AUDIO_GAIN_MIC:
+        /* the mic preamp has a fixed gain of +15 dB. There's an additional
+         * activatable +20dB mic gain stage. The signal is then routed to
+         * the Line1 input, where you find the line attenuator with a range
+         * from -23.5 to +12dB, so we have a total gain range of -8.0 .. +47dB.
+         * NOTE: the datasheet state's different attenuator levels for mic and
+         * line input, but that's not precise. The +15dB difference result only
+         * from the mic stage.
+         * NOTE2: the mic is connected to the line1 input (via mic preamp),
+         * so if a line signal is present, you will always record a mixup.
+         */
+        /* If gain is > 20 dB we use the additional gain stage */
+        if (left > 20) {
+            akc_set(AK4537_MIC, MGAIN);
+            left -= 20;
+        }
+        else {
+            akc_clear(AK4537_MIC, MGAIN);
+        }
+        /* the remains is done by the line input amp */
+        left = (left+8)*2;
+        akc_write(AK4537_IPGAL, left);
+        break;
+    case AUDIO_GAIN_LINEIN:
+        /* convert dB to register value */
+        left = (left+23)*2+1;
+        right = (right+23)*2+1;
+        akc_write(AK4537_IPGAL, left);
+        akc_write(AK4537_IPGAR, right);
+        break;
+    default:
+        return;
+    }
 }
 
 void audiohw_set_monitor(bool enable)
 {
-    (void)enable;
+    if (enable)
+        /* mix input signal to headphone output */
+        akc_set(AK4537_SIGSEL2, MICL);
+    else
+        akc_clear(AK4537_SIGSEL2, MICL);
 }
 #endif /* HAVE_RECORDING */
