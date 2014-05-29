@@ -94,6 +94,8 @@
 /* LCD dimensions */
 #define LCD_WIDTH  320
 #define LCD_HEIGHT 240
+/* sqrt(320^2 + 240^2) / 2.5 = 160.0 */
+#define LCD_DPI 160
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 /* framebuffer uses 24-bit/pix */
@@ -106,10 +108,10 @@
 #define HAVE_FAT16SUPPORT
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x30000
+#define CODEC_SIZE 0x00000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x30000
+#define PLUGIN_BUFFER_SIZE 0x00000
 
 #define AB_REPEAT_ENABLE
 
