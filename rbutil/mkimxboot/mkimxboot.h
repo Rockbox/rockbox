@@ -98,6 +98,9 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt);
 enum imx_error_t extract_firmware(const char *infile,
     enum imx_firmware_variant_t fw_variant, const char *outfile);
+enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16]);
+enum imx_error_t compute_soft_md5sum(const char *file, enum imx_model_t model,
+    uint8_t soft_md5sum[16]);
 
 #ifdef __cplusplus
 }
