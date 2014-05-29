@@ -253,17 +253,14 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 
 static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_PLAY|BUTTON_REL,     BUTTON_NONE },
-#ifdef SAMSUNG_YH820
-    /* the yh-820 has a rec button */
-    { ACTION_REC_NEWFILE,           BUTTON_REC,                 BUTTON_NONE },
-#else
-    /* the yh-920 & yh-925 have a rec switch */
-    { ACTION_REC_NEWFILE,           BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE },
-#endif
+    { ACTION_REC_NEWFILE,           BUTTON_FFWD|BUTTON_REL,     BUTTON_NONE },
+
+    { ACTION_STD_MENU,              BUTTON_REC,                 BUTTON_NONE },
+    { ACTION_STD_MENU,              BUTTON_REW|BUTTON_REPEAT,   BUTTON_REW },
+    { ACTION_STD_CANCEL,            BUTTON_REW|BUTTON_REL,      BUTTON_NONE },
 
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
 
