@@ -62,10 +62,26 @@ start:
 #endif
 
     msr    cpsr_c, #0xdf /* enter sys mode, disable IRQ */
+    b skip_space
+.space 6*4
+
+#ifdef SANSA_VIEW
+       /* This magic must exist for the recovery mode of the Sansa View */
+.ascii "NVIDIA  "
+       /* For builds on targets with mi4 firmware, scramble writes data to
+       0xe0-0xeb. Space must then exist at an address >= 0xec */
+.space 59*4
+#elif  !defined(E200R_INSTALLER) && !defined(IPOD_ARCH)
+.space 61*4
+#endif
+
+skip_space:
+
 #ifndef E200R_INSTALLER
 /* 1 - Copy the bootloader to IRAM */
     /* get the high part of our execute address */
-    bic    r0, pc, #0xff /* r4 = pc & 0xffffff00 */
+    bic    r0, pc, #0x0ff; /* r0 = pc & 0xfffff000 */
+    bic    r0, r0, #0xf00;
 
     /* Copy bootloader to safe area - 0x40000000 (IRAM) */
     mov    r1, #0x40000000
@@ -76,23 +92,12 @@ start:
     strhi  r3, [r1], #4
     bhi    1b
 
-#ifndef IPOD_ARCH
-    /* For builds on targets with mi4 firmware, scramble writes data to 
-       0xe0-0xeb, so jump past that. pad_skip must then exist at an
-       address >= 0xec */
-    b      pad_skip
-
-.space 60*4 
-
-pad_skip:
-#endif /* IPOD_ARCH */
-
-
 /* 2 - Jump both CPU and COP there */
     ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
 #endif /* E200R_INSTALLER */
 
 start_loc:
+
     /* Find out which processor we are */
     ldr    r0, =PROC_ID
     ldrb   r0, [r0]

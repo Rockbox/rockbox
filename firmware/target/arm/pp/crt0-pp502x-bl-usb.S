@@ -69,10 +69,16 @@ boot_table:
     /* here comes the boot table, don't move its offset - preceding
        code+data must stay <= 256 bytes */
     .space  400
-#else /* !IPOD_ARCH */
+#elif defined(SANSA_VIEW)
+.space 7*4
+    /* This magic must exist for the recovery mode of the Sansa View */
+.ascii "NVIDIA  "
+    /* (more than enough) space for exception vectors and mi4 magic */
+.space 59*4
+#else
     /* (more than enough) space for exception vectors and mi4 magic */
     .space  68*4
-#endif /* IPOD_ARCH */
+#endif
 
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
