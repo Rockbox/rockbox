@@ -57,11 +57,11 @@
 #define HAVE_BACKLIGHT
 
 /* Define this if your LCD can set contrast */
-/* todo #define HAVE_LCD_CONTRAST */
+#define HAVE_LCD_CONTRAST
 
-#define MIN_CONTRAST_SETTING        0
-#define MAX_CONTRAST_SETTING        30
-#define DEFAULT_CONTRAST_SETTING    14 /* Match boot contrast */
+#define MIN_CONTRAST_SETTING        50
+#define MAX_CONTRAST_SETTING        70
+#define DEFAULT_CONTRAST_SETTING    61 /* Match boot contrast */
 
 /* define this if you can flip your LCD */
 /* todo #define HAVE_LCD_FLIP */
