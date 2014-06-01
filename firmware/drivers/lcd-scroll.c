@@ -188,7 +188,9 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
 #endif
     s->scroll_func(s);
 
+#ifndef PLATFORM_ANDROID
     LCDFN(update_viewport_rect)(s->x, s->y, s->width, s->height);
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
