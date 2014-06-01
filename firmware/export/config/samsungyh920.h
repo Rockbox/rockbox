@@ -67,7 +67,7 @@
 /* todo #define HAVE_LCD_FLIP */
 
 /* define this if you can invert the colours on your LCD */
-/* todo #define HAVE_LCD_INVERT */
+#define HAVE_LCD_INVERT
 
 /* put the lcd frame buffer in IRAM */
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR */
