@@ -33,15 +33,22 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewConfiguration;
+import android.graphics.PixelFormat;
 
-public class RockboxFramebuffer extends SurfaceView 
+public class RockboxFramebuffer extends SurfaceView
                                  implements SurfaceHolder.Callback
 {
     private final DisplayMetrics metrics;
     private final ViewConfiguration view_config;
     private Bitmap btm;
 
-    /* first stage init; needs to run from a thread that has a Looper 
+    private int srcWidth=0,srcHeight=0;            /* static value from Rockbox internal framebuffer */
+    private int desWidth, desHeight;               /* from the current running android device */
+    private int paddingHeight=0,paddingWidth=0;    /* the size of black bar to keep scale aspect ratio*/
+    private int fixedWidth, fixedHeight;           /* srcWidth+paddingWidth, srcHeight+paddingHeight */
+    private float scaleWidthFactor,scaleHeightFactor;
+
+    /* first stage init; needs to run from a thread that has a Looper
      * setup stuff that needs a Context */
     public RockboxFramebuffer(Context c)
     {
@@ -55,14 +62,46 @@ public class RockboxFramebuffer extends SurfaceView
         setClickable(true);
         /* don't draw until native is ready (2nd stage) */
         setEnabled(false);
+        desWidth = metrics.widthPixels;
+        desHeight = metrics.heightPixels;
+    }
+
+    private void initialize(int lcd_width, int lcd_height)
+    {
+        srcWidth = lcd_width;
+        srcHeight = lcd_height;
+        scaleWidthFactor = ((float)desWidth) / srcWidth;
+        scaleHeightFactor = ((float)desHeight) / srcHeight;
+
+        /* padding to keep screen aspect ratio*/
+        if (scaleHeightFactor > scaleWidthFactor)
+            paddingHeight = (int)Math.ceil(srcWidth * desHeight / desWidth) - srcHeight;
+
+        if ( scaleWidthFactor > scaleHeightFactor)
+            paddingWidth = (int)Math.ceil(srcHeight * desWidth / desHeight) - srcWidth;
+
+        fixedWidth = srcWidth + paddingWidth;
+        fixedHeight = srcHeight + paddingHeight;
+
+        /* setFixedSize to use hardware scaler */
+        getHolder().setFixedSize(fixedWidth,fixedHeight);
+        getHolder().setFormat(new PixelFormat().RGB_565);
+
+        btm = Bitmap.createBitmap(srcWidth, srcHeight, Bitmap.Config.RGB_565);
+
+        setEnabled(true);
     }
 
     private void update(ByteBuffer framebuffer)
     {
-        SurfaceHolder holder = getHolder();                            
-        Canvas c = holder.lockCanvas();
+        SurfaceHolder holder = getHolder();
+        Canvas c;
+        Rect dirty = new Rect();
+        holder.setFixedSize(fixedWidth,fixedHeight);
+        dirty.set(0,0,fixedWidth,fixedHeight);
+        c = holder.lockCanvas(dirty);
         if (c == null)
-			return;
+            return;
 
         btm.copyPixelsFromBuffer(framebuffer);
         synchronized (holder)
@@ -71,28 +110,34 @@ public class RockboxFramebuffer extends SurfaceView
         }
         holder.unlockCanvasAndPost(c);
     }
-    
+
     private void update(ByteBuffer framebuffer, Rect dirty)
     {
-        SurfaceHolder holder = getHolder();         
-        Canvas c = holder.lockCanvas(dirty);
-        
+        SurfaceHolder holder = getHolder();
+        Canvas c;
+        holder.setFixedSize(fixedWidth,fixedHeight);
+        if(dirty.isEmpty()) /*  (left >= right or top >= bottom) */
+            dirty.sort();
+        c = holder.lockCanvas(dirty);
         if (c == null)
-			return;
+            return;
 
         /* can't copy a partial buffer, but it doesn't make a noticeable difference anyway */
         btm.copyPixelsFromBuffer(framebuffer);
         synchronized (holder)
         {   /* draw */
-            c.drawBitmap(btm, dirty, dirty, null);   
+            c.drawBitmap(btm, dirty, dirty, null);
         }
         holder.unlockCanvasAndPost(c);
     }
 
     public boolean onTouchEvent(MotionEvent me)
     {
-        int x = (int) me.getX();
-        int y = (int) me.getY();
+        int x = (int) me.getRawX();
+        int y = (int) me.getRawY();
+        /* convert */
+        x =  (paddingWidth  > 0) ? (int)( x / scaleHeightFactor):(int)( x / scaleWidthFactor);
+        y =  (paddingHeight > 0) ? (int)( y / scaleWidthFactor) :(int)( y / scaleHeightFactor);
 
         switch (me.getAction())
         {
@@ -118,12 +163,14 @@ public class RockboxFramebuffer extends SurfaceView
     {
         return buttonHandler(keyCode, false);
     }
- 
+
     private int getDpi()
     {
+        if (desHeight > srcHeight)
+            return  (int)(metrics.densityDpi / scaleHeightFactor);
         return metrics.densityDpi;
     }
-    
+
 
     private int getScrollThreshold()
     {
@@ -137,7 +184,6 @@ public class RockboxFramebuffer extends SurfaceView
     public native void surfaceDestroyed(SurfaceHolder holder);
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
-        btm = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-        setEnabled(true);
+
     }
 }
