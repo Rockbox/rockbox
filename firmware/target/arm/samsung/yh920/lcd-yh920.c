@@ -106,17 +106,17 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
     {
         lcd_send_cmd(LCD_CNTL_COLUMN_ADDRESS_DIR | 1);
-        lcd_send_cmd(LCD_CNTL_COMMON_OUTPUT_STATUS | 0);
-        lcd_write_reg_ex(LCD_CNTL_DUTY_SET, 0x20, 0);
+        lcd_send_cmd(LCD_CNTL_COMMON_OUTPUT_STATUS | 1);
+        lcd_write_reg_ex(LCD_CNTL_DUTY_SET, 0x1f, 1);
     }
     else
     {
         lcd_send_cmd(LCD_CNTL_COLUMN_ADDRESS_DIR | 0);
-        lcd_send_cmd(LCD_CNTL_COMMON_OUTPUT_STATUS | 1);
-        lcd_write_reg_ex(LCD_CNTL_DUTY_SET, 0x20, 1);
+        lcd_send_cmd(LCD_CNTL_COMMON_OUTPUT_STATUS | 0);
+        lcd_write_reg_ex(LCD_CNTL_DUTY_SET, 0x1f, 0);
     }
 }
 
