@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_7a7c9520",
+        "filename": "firmware/drivers/lcd-scroll.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-06-02T09:13:03Z",
+      "side": 1,
+      "message": "Yeah, this is no good. surely lcd_update_viewport_rect() can handle the scaling?",
+      "revId": "611d1918636e6f3735df75286f2e559ec496c4d4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
