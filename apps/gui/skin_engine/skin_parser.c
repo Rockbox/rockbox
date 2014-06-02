@@ -1666,7 +1666,19 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, list->token);
         struct gui_img *img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
         if (img->buflib_handle > 0)
+        {
+            struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, list->next);;
             core_free(img->buflib_handle);
+
+            while (imglist)
+            {
+				struct wps_token *freetoken = SKINOFFSETTOPTR(skin_buffer, imglist->token);
+				struct gui_img *freeimg = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, freetoken->value.data);
+				if (img->buflib_handle == freeimg->buflib_handle)
+					freeimg->buflib_handle = -1;
+				imglist = SKINOFFSETTOPTR(skin_buffer, imglist->next);
+			}
+		}
         list = SKINOFFSETTOPTR(skin_buffer, list->next);
     }
     wps_data->images = PTRTOSKINOFFSET(skin_buffer, NULL);
