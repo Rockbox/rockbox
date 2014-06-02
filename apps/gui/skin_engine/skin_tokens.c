@@ -1059,14 +1059,13 @@ const char *get_token_value(struct gui_wps *gwps,
             return buf;
 #ifdef HAVE_ALBUMART
         case SKIN_TOKEN_ALBUMART_FOUND:
-            if (SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart))
+            if (data->albumart >= 0)
             {
-                int handle = -1;
-                handle = playback_current_aa_hid(data->playback_aa_slot);
+				struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
+                int handle = playback_current_aa_hid(aa->playback_aa_slot);
 #if CONFIG_TUNER
                 if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
                 {
-                    struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
                     struct dim dim = {aa->width, aa->height};
                     handle = radio_get_art_hid(&dim);
                 }

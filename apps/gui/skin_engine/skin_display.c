@@ -417,7 +417,7 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     if (aa && SKINOFFSETTOPTR(get_skin_buffer(data), aa->vp) == vp
         && aa->draw_handle >= 0)
     {
-        draw_album_art(gwps, aa->draw_handle, false);
+        draw_album_art(gwps, aa, aa->draw_handle, false);
         aa->draw_handle = -1;
     }
 #endif

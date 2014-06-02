@@ -270,10 +270,10 @@ struct skin_albumart {
 
     unsigned char xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
     unsigned char yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
-    unsigned char state; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
     
     OFFSETTYPE(struct viewport *) vp;
     int draw_handle;
+    int playback_aa_slot;
 };
 #endif
     
@@ -360,7 +360,6 @@ struct wps_data
 #endif
 #ifdef HAVE_ALBUMART
     OFFSETTYPE(struct skin_albumart *) albumart;
-    int    playback_aa_slot;
     /* copy of albumart to survive skin resets, used to check if albumart
      * dimensions changed on skin change */
     short last_albumart_width, last_albumart_height;

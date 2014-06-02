@@ -167,6 +167,7 @@ enum skin_token_type {
     
     /* Albumart */
     SKIN_TOKEN_ALBUMART_LOAD,
+    SKIN_TOKEN_ALBUMART_LOAD2,
     SKIN_TOKEN_ALBUMART_DISPLAY,
     SKIN_TOKEN_ALBUMART_FOUND,
 

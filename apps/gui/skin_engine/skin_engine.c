@@ -99,6 +99,7 @@ static void gui_skin_reset(struct gui_skin *skin)
         memset(data, 0, sizeof(struct wps_data));
         data->last_albumart_width = old_width;
         data->last_albumart_height = old_height;
+        // TODO: copy over the playback handle
     }
     else
 #endif
@@ -118,7 +119,6 @@ static void gui_skin_reset(struct gui_skin *skin)
 #endif
 #ifdef HAVE_ALBUMART
     skin->data.albumart = -1;
-    skin->data.playback_aa_slot = -1;
 #endif
 #ifdef HAVE_BACKDROP_IMAGE
     skin->gui_wps.data->backdrop_id = -1;

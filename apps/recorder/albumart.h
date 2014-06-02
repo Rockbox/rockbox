@@ -38,7 +38,7 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
 #ifndef PLUGIN
 /* Draw the album art bitmap from the given handle ID onto the given Skin.
    Call with clear = true to clear the bitmap instead of drawing it. */
-void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear);
+void draw_album_art(struct gui_wps *gwps, struct skin_albumart *aa, int handle_id, bool clear);
 #endif
 
 bool search_albumart_files(const struct mp3entry *id3, const char *size_string,

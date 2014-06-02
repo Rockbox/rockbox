@@ -297,12 +297,19 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         }
 #ifdef HAVE_ALBUMART
         case SKIN_TOKEN_ALBUMART_DISPLAY:
+        case SKIN_TOKEN_ALBUMART_LOAD2:
         {
             struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, data->albumart);
-            /* now draw the AA */
+            
+            if (token->type == SKIN_TOKEN_ALBUMART_LOAD2)
+				aa = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+
+            /* AA is drawn now if it is the SKIN_TOKEN_ALBUMART_LOAD2 tag
+             * otherwise it is fixed to draw with the viewport images.
+             */
             if (do_refresh && aa)
             {
-                int handle = playback_current_aa_hid(data->playback_aa_slot);
+                int handle = playback_current_aa_hid(aa->playback_aa_slot);
 #if CONFIG_TUNER
                 if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
                 {
@@ -310,7 +317,10 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                     handle = radio_get_art_hid(&dim);
                 }
 #endif
-                aa->draw_handle = handle;
+				if (token->type == SKIN_TOKEN_ALBUMART_LOAD2)
+					draw_album_art(gwps, aa, handle, false);
+				else
+					aa->draw_handle = handle;
             }
             break;
         }
@@ -468,9 +478,16 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
 #ifdef HAVE_ALBUMART
             else if (data->albumart && token->type == SKIN_TOKEN_ALBUMART_DISPLAY)
             {
-                draw_album_art(gwps,
-                        playback_current_aa_hid(data->playback_aa_slot), true);
+				struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, data->albumart);
+                draw_album_art(gwps, aa,
+                        playback_current_aa_hid(aa->playback_aa_slot), true);
             }
+            else if (token->type == SKIN_TOKEN_ALBUMART_LOAD2)
+            {
+                struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+                draw_album_art(gwps, aa,
+                        playback_current_aa_hid(aa->playback_aa_slot), true);
+			}
 #endif
             child = SKINOFFSETTOPTR(skin_buffer, child->next);
         }

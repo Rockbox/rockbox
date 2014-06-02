@@ -184,6 +184,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF|I", 0|NOBREAK },
     { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "IIII|ss", 0|NOBREAK },
     { SKIN_TOKEN_ALBUMART_DISPLAY,      "Cd" , "", SKIN_REFRESH_STATIC },
+    { SKIN_TOKEN_ALBUMART_LOAD2,        "Cx" , "IIII|ss", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_ALBUMART_FOUND,        "C" , "", SKIN_REFRESH_STATIC },
     
     { SKIN_TOKEN_VIEWPORT_ENABLE,       "Vd" , "S", SKIN_REFRESH_STATIC },

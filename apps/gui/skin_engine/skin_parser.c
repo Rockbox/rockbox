@@ -1195,10 +1195,8 @@ static int parse_albumart_load(struct skin_element* element,
                                struct wps_data *wps_data)
 {
     struct dim dimensions;
-    int albumart_slot;
     bool swap_for_rtl = lang_is_rtl() && follow_lang_direction;
     struct skin_albumart *aa = skin_buffer_alloc(sizeof(*aa));
-    (void)token; /* silence warning */
     if (!aa)
         return -1;
 
@@ -1226,16 +1224,16 @@ static int parse_albumart_load(struct skin_element* element,
     if (swap_for_rtl)
         aa->x = (curr_vp->vp.width - aa->width - aa->x);
 
-    aa->state = WPS_ALBUMART_LOAD;
-    wps_data->albumart = PTRTOSKINOFFSET(skin_buffer, aa);
+    if (token->type == SKIN_TOKEN_ALBUMART_LOAD2)
+        token->value.data = PTRTOSKINOFFSET(skin_buffer, aa);
+    
+    if (wps_data->albumart < 0)
+        wps_data->albumart = PTRTOSKINOFFSET(skin_buffer, aa);
 
     dimensions.width = aa->width;
     dimensions.height = aa->height;
 
-    albumart_slot = playback_claim_aa_slot(&dimensions);
-
-    if (0 <= albumart_slot)
-        wps_data->playback_aa_slot = albumart_slot;
+    aa->playback_aa_slot = playback_claim_aa_slot(&dimensions);
 
     if (element->params_count > 4 && !isdefault(get_param(element, 4)))
     {
@@ -1687,6 +1685,15 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
         while (wps_data->font_count > 0)
             font_unload(font_ids[--wps_data->font_count]);
     }
+#ifdef HAVE_ALBUMART
+    if (SKINOFFSETTOPTR(skin_buffer, wps_data->albumart))
+    {
+		struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);
+        playback_release_aa_slot(aa->playback_aa_slot);
+        aa->playback_aa_slot = -1;
+    }
+    wps_data->albumart = INVALID_OFFSET;
+#endif
     wps_data->font_ids = PTRTOSKINOFFSET(skin_buffer, NULL);
     if (wps_data->buflib_handle > 0)
         core_free(wps_data->buflib_handle);
@@ -1718,15 +1725,6 @@ static void skin_data_reset(struct wps_data *wps_data)
 #ifdef HAVE_SKIN_VARIABLES
     wps_data->skinvars = INVALID_OFFSET;
 #endif
-#ifdef HAVE_ALBUMART
-    wps_data->albumart = INVALID_OFFSET;
-    if (wps_data->playback_aa_slot >= 0)
-    {
-        playback_release_aa_slot(wps_data->playback_aa_slot);
-        wps_data->playback_aa_slot = -1;
-    }
-#endif
-
 #ifdef HAVE_LCD_BITMAP
     wps_data->peak_meter_enabled = false;
     wps_data->wps_sb_tag = false;
@@ -2263,6 +2261,7 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     }
                     break;
                 case SKIN_TOKEN_ALBUMART_LOAD:
+                case SKIN_TOKEN_ALBUMART_LOAD2:
                     function = parse_albumart_load;
                     break;
 #endif
@@ -2444,10 +2443,11 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     {
         /* last_albumart_{width,height} is either both 0 or valid AA dimensions */
         struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);
-        if (aa && (aa->state != WPS_ALBUMART_NONE ||
+        if (aa ||
             (((wps_data->last_albumart_height != aa->height) ||
-            (wps_data->last_albumart_width != aa->width)))))
+            (wps_data->last_albumart_width != aa->width))))
         {
+            //FIXME
             struct mp3entry *id3 = audio_current_track();
             unsigned long elapsed = id3->elapsed;
             unsigned long offset = id3->offset;

@@ -299,15 +299,9 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
 
 /* Draw the album art bitmap from the given handle ID onto the given WPS.
    Call with clear = true to clear the bitmap instead of drawing it. */
-void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
+void draw_album_art(struct gui_wps *gwps, struct skin_albumart *aa, int handle_id, bool clear)
 {
-    if (!gwps || !gwps->data || !gwps->display || handle_id < 0)
-        return;
-
-    struct wps_data *data = gwps->data;
-    struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
-
-    if (!aa)
+    if (!gwps || !gwps->display || !aa || handle_id < 0)
         return;
         
     struct bitmap *bmp;
