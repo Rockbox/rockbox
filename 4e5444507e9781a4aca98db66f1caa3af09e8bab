@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_5aa0b190",
+        "filename": "apps/plugins/disktidy.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-06-04T00:59:19Z",
+      "side": 1,
+      "message": "Maybe a bit bigger?",
+      "revId": "4e5444507e9781a4aca98db66f1caa3af09e8bab",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
