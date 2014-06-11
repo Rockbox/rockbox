@@ -33,6 +33,10 @@ static int lasttick;
 #define RFA_FILE_TEXT ROCKBOX_DIR "/folder_advance_list.txt"
 #define MAX_REMOVED_DIRS 10
 
+#define RFA_MAGICSTART "RockboxMagic__version"
+#define RFA_VERSION "1"
+#define RFA_MAGIC RFA_MAGICSTART RFA_VERSION
+
 char *buffer = NULL;
 size_t buffer_size;
 int num_replaced_dirs = 0;
@@ -57,13 +61,42 @@ static void update_screen(bool clear)
     }
 }
 
-static void traversedir(char* location, char* name)
+static uint8_t check_weight(char* folder, bool *children_inherit)
+{
+    char temp[MAX_PATH];
+    int myfd;
+    char *name, *value;
+    int weight = 100;
+    
+    *children_inherit = true;
+    snprintf(temp, MAX_PATH, "%s/rfa_config.txt", folder);
+    myfd = rb->open(temp, O_RDONLY);
+    if (myfd < 0)
+        return 100;
+    
+    while (rb->read_line(myfd, temp, sizeof(temp)) > 0)
+    {
+        if (!rb->settings_parseline(temp, &name, &value))
+            continue;
+            
+        if (!rb->strncmp(name, "weight", rb->strlen("weight")))
+            weight = rb->atoi(value);
+        else if (!rb->strncmp(name, "recursive", rb->strlen("recursive")))
+            *children_inherit = *value == 'y' || *value == 'Y';
+    }
+
+    rb->close(myfd);
+    return weight <= 100 ? weight : 100;
+}
+
+static void traversedir(char* location, char* name, int parent_weight)
 {
     struct dirent *entry;
     DIR* dir;
     char fullpath[MAX_PATH], path[MAX_PATH];
     bool check = false;
     int i;
+    bool children_inherit_weight;
 
     /* behave differently if we're at root to avoid
        duplication of the initial slash later on */
@@ -107,13 +140,16 @@ static void traversedir(char* location, char* name)
             {
                 struct dirinfo info = rb->dir_get_info(dir, entry);
                 if (info.attribute & ATTR_DIRECTORY) {
-                    char *start;
+                    char *start, t;
                     dirs_count++;
                     rb->snprintf(path,MAX_PATH,"%s/%s",fullpath,entry->d_name);
                     start = &path[rb->strlen(path)];
                     rb->memset(start,0,&path[MAX_PATH-1]-start);
                     rb->write(fd,path,MAX_PATH);
-                    traversedir(fullpath, entry->d_name);
+                    t = check_weight(path, &children_inherit_weight);
+                    rb->write(fd, &t, 1);
+                    traversedir(fullpath, entry->d_name,
+                            children_inherit_weight ? t : parent_weight);
                 }
             }
             if (*rb->current_tick - lasttick > (HZ/2)) {
@@ -193,7 +229,7 @@ static bool custom_dir(void)
                         rb->write(fd, formatted_line, MAX_PATH);
                     }
 
-                    traversedir("", line);
+                    traversedir("", line, 100);
                 }
                 else
                 {
@@ -223,6 +259,7 @@ static void generate(void)
     dirs_count = 0;
     cancel = false;
     fd = rb->open(RFA_FILE,O_CREAT|O_WRONLY, 0666);
+    rb->write(fd, RFA_MAGIC, strlen(RFA_MAGIC));
     rb->write(fd,&dirs_count,sizeof(int));
     if (fd < 0)
     {
@@ -235,9 +272,9 @@ static void generate(void)
     lasttick = *rb->current_tick;
 
     if(!custom_dir())
-        traversedir("", "");
+        traversedir("", "", 100);
 
-    rb->lseek(fd,0,SEEK_SET);
+    rb->lseek(fd,strlen(RFA_MAGIC),SEEK_SET);
     rb->write(fd,&dirs_count,sizeof(int));
     rb->close(fd);
     rb->splash(HZ, "Done");
@@ -264,7 +301,7 @@ static int load_list(void)
     
     rb->read(myfd,buffer,buffer_size);
     rb->close(myfd);
-    list = (struct file_format *)buffer;
+    list = (struct file_format *)buffer; // FIXME
     
     return 0;
 }
@@ -278,6 +315,7 @@ static int save_list(void)
         return -1;
     }
     int dirs_count = 0, i = 0;
+    rb->write(myfd, RFA_MAGIC, strlen(RFA_MAGIC));
     rb->write(myfd,&dirs_count,sizeof(int));
     for ( ;i<list->count;i++)
     {
@@ -285,6 +323,7 @@ static int save_list(void)
         {
             dirs_count++;
             rb->write(myfd,list->folder[i],MAX_PATH);
+            // FIXME this should have the weight
         }
     }
     rb->lseek(myfd,0,SEEK_SET);

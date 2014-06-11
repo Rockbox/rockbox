@@ -1480,27 +1480,63 @@ static int get_next_dir(char *dir, bool is_forward)
         int fd = open(ROCKBOX_DIR "/folder_advance_list.dat", O_RDONLY);
         if (fd >= 0)
         {
+            char buffer[MAX_PATH];
+            const char magic_prefix[] = "RockboxMagic__version";
+            int magic_len = strlen(magic_prefix);
             int folder_count = 0;
-            read(fd,&folder_count,sizeof(int));
+            int version = 0, data_start;
+            /* check plugin version */
+            read(fd, buffer, MAX_PATH);
+            if (!strncmp(buffer, magic_prefix, magic_len))
+            {
+                if (buffer[magic_len] == '1')
+                {
+                    version = 1;
+                    folder_count = *(int*)(&buffer[magic_len + 1]);
+                }
+                else
+                {
+                    folder_count = 0; // error
+                }
+                data_start = magic_len + 1 + sizeof(int);
+            }
+            else
+            {
+                folder_count = *(int*)buffer;
+                data_start = sizeof(int);
+            }
             if (folder_count)
             {
-                char buffer[MAX_PATH];
                 /* give up looking for a directory after we've had four
                    times as many tries as there are directories. */
                 unsigned long allowed_tries = folder_count * 4;
-                int i;
+                int i = 0, weight = 100, weight_extra = 1;
+                char w;
                 srand(current_tick);
                 *(tc->dirfilter) = SHOW_MUSIC;
                 tc->sort_dir = global_settings.sort_dir;
                 while (!exit && allowed_tries--)
                 {
                     i = rand() % folder_count;
-                    lseek(fd, sizeof(int) + (MAX_PATH * i), SEEK_SET);
+                    lseek(fd, data_start + (MAX_PATH + (version ? 1 : 0)) * i,
+                            SEEK_SET);
                     read(fd, buffer, MAX_PATH);
+                    if (version == 1)
+                    {
+                        read(fd, &w, 1);
+                        weight = w;
+                    }
                     /* is the current dir within our base dir and has music? */
                     if ((base_len == 0 || !strncmp(buffer, dir, base_len))
                         && check_subdir_for_music(buffer, "", false) == 0)
+                    {
+                        // the weight_extra is used to guarentee it will exit
+                        // after at most 7 tries
+                        if (!version || ((rand() % 100) + weight_extra >= weight))
                             exit = true;
+                        else
+                            weight_extra <<= 1;
+                    }
                 }
                 close(fd);
                 *(tc->dirfilter) = saved_dirfilter;
