@@ -223,12 +223,16 @@
 /* USB defines */
 #define HAVE_USBSTACK
 #define HAVE_USB_HID_MOUSE
-#define CONFIG_USBOTG USBOTG_S3C6400X
+#define CONFIG_USBOTG USBOTG_DESIGNWARE
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1260
 #define USB_NUM_ENDPOINTS 6
+#define USB_ENDPOINTS 0b0000000000010110000000000010101
 #define USE_ROCKBOX_USB
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
+#define USB_DW_CLOCK 0
+#define USB_DW_AHB_BURST_LEN 5
+#define USB_DW_TURNAROUND 5
 
 /* Define this if you can switch on/off the accessory power supply */
 #define HAVE_ACCESSORY_SUPPLY
