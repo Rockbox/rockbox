@@ -176,6 +176,8 @@ enable_mmu:
 
 /** Cache coherency **/
 
+#ifdef HAVE_TEST_AND_CLEAN_CACHE
+
 /*
  * Write DCache back to RAM for the given range and remove cache lines
  * from DCache afterwards
@@ -325,6 +327,9 @@ discard_dcache_range:
     mcr     p15, 0, r0, c7, c10, 4  @ Drain write buffer
     bx      lr                      @
     .size   discard_dcache_range, .-discard_dcache_range
+    
+#endif
+
 
 /*
  * Write entire DCache back to RAM
@@ -341,6 +346,9 @@ commit_dcache:
     bne     commit_dcache
     mov     r1, #0
 #else
+    .global     commit_dcache_range
+    .type       commit_dcache_range, %function
+commit_dcache_range:
     mov     r1, #0x00000000         @
 1:  @ commit_start                   @
     mcr     p15, 0, r1, c7, c10, 2  @ Clean entry by index
@@ -356,6 +364,9 @@ commit_dcache:
     mcr     p15, 0, r1, c7, c10, 4  @ Drain write buffer
     bx      lr                      @
     .size   commit_dcache, .-commit_dcache
+#ifndef HAVE_TEST_AND_CLEAN_CACHE
+    .size   commit_dcache_range, .-commit_dcache_range
+#endif
 
 /*
  * Commit and discard entire DCache, will do writeback
@@ -372,6 +383,12 @@ commit_discard_dcache:
     bne     commit_discard_dcache
     mov     r1, #0
 #else
+    .global     commit_discard_dcache_range
+    .type       commit_discard_dcache_range, %function
+commit_discard_dcache_range:
+    .global     discard_dcache_range
+    .type       discard_dcache_range, %function
+discard_dcache_range:
     mov     r1, #0x00000000         @
 1:  @ inv_start                     @
     mcr     p15, 0, r1, c7, c14, 2  @ Clean and invalidate entry by index
@@ -387,6 +404,10 @@ commit_discard_dcache:
     mcr     p15, 0, r1, c7, c10, 4  @ Drain write buffer
     bx      lr                      @
     .size   commit_discard_dcache, .-commit_discard_dcache
+#ifndef HAVE_TEST_AND_CLEAN_CACHE
+    .size   commit_discard_dcache_range, .-commit_discard_dcache_range
+    .size   discard_dcache_range, .-discard_dcache_range
+#endif
 
 /*
  * Discards the entire ICache, and commit+discards the entire DCache
