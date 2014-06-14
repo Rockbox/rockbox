@@ -264,6 +264,25 @@ static const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+#ifdef HAVE_RECORDING
+const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_NEWFILE,        BUTTON_VIEW|BUTTON_REL,            BUTTON_VIEW },
+    { ACTION_STD_MENU,           BUTTON_MENU,                       BUTTON_NONE },
+    { ACTION_REC_PAUSE,          BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
+    { ACTION_STD_CANCEL,         BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_DOWN,                       BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_UP,                         BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                       BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_recscreen */
+#endif
+
 #if CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,        BUTTON_MENU | BUTTON_REL,              BUTTON_MENU },
@@ -436,6 +455,10 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_KEYBOARD:
         case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
+#ifdef HAVE_RECORDING
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
+#endif
 #if CONFIG_TUNER
         case CONTEXT_FM:
             return button_context_radio;
