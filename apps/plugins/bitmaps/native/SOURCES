@@ -512,7 +512,7 @@ pegbox_pieces.9x7x1.bmp
 
 
 /* Rockblox */
-#if LCD_DEPTH == 16 /* colour versions*/
+#if LCD_DEPTH >= 16 /* colour versions*/
 #if   (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
 rockblox_background.640x480x16.bmp
 #elif   (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
@@ -755,7 +755,7 @@ sudoku_inverse.112x64x1.bmp
 sudoku_start.128x96x2.bmp
 sudoku_normal.128x96x2.bmp
 sudoku_inverse.128x96x2.bmp
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 96) && (LCD_DEPTH >= 16)
 sudoku_start.128x96x16.bmp
 sudoku_normal.128x96x16.bmp
 sudoku_inverse.128x96x16.bmp
@@ -775,12 +775,12 @@ sudoku_inverse.132x80x16.bmp
 sudoku_start.96x70x14.bmp
 sudoku_normal.96x70x14.bmp
 sudoku_inverse.96x70x14.bmp
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 16)
 sudoku_start.128x128x16.bmp
 sudoku_normal.128x128x16.bmp
 sudoku_inverse.128x128x16.bmp
-#elif ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)) || \
-      ((LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16))
+#elif ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 16)) || \
+      ((LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH >= 16))
 sudoku_start.160x128x16.bmp
 sudoku_normal.160x128x16.bmp
 sudoku_inverse.160x128x16.bmp
@@ -792,7 +792,7 @@ sudoku_inverse.160x128x2.bmp
 sudoku_start.160x128x1.bmp
 sudoku_normal.160x128x1.bmp
 sudoku_inverse.160x128x1.bmp
-#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176) && (LCD_DEPTH >= 16)
 sudoku_start.220x176x16.bmp
 sudoku_normal.220x176x16.bmp
 sudoku_inverse.220x176x16.bmp
@@ -801,25 +801,25 @@ sudoku_inverse.220x176x16.bmp
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH >= 16)
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
-#elif (LCD_WIDTH == 640) && (LCD_HEIGHT == 480) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 640) && (LCD_HEIGHT == 480) && (LCD_DEPTH >= 16)
 sudoku_start.640x480x16.bmp
 sudoku_normal.640x480x16.bmp
 sudoku_inverse.640x480x16.bmp
 #endif
 #else /* LCD_WIDTH < LCD_HEIGHT */
-#if ((LCD_WIDTH == 128) && (LCD_HEIGHT == 160) && (LCD_DEPTH == 16))
+#if ((LCD_WIDTH == 128) && (LCD_HEIGHT == 160) && (LCD_DEPTH >= 16))
 sudoku_start.128x128x16.bmp
 sudoku_normal.128x128x16.bmp
 sudoku_inverse.128x128x16.bmp
-#elif ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220) && (LCD_DEPTH == 16))
+#elif ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220) && (LCD_DEPTH >= 16))
 sudoku_start.220x176x16.bmp
 sudoku_normal.220x176x16.bmp
 sudoku_inverse.220x176x16.bmp
-#elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 320) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 320) && (LCD_DEPTH >= 16)
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
@@ -827,7 +827,7 @@ sudoku_inverse.320x240x16.bmp
 #endif
 
 /* Superdom */
-#if LCD_DEPTH == 16
+#if LCD_DEPTH >= 16
 #if ((LCD_WIDTH == 220) && (LCD_HEIGHT == 176))
 superdom_boarditems.220x176x16.bmp
 #elif ((LCD_WIDTH == 176) && (LCD_HEIGHT == 132)) || \
@@ -888,7 +888,7 @@ sliding_puzzle.80x64x1.bmp
 #endif
 
 /* Logo */
-#if LCD_DEPTH == 16
+#if LCD_DEPTH >= 16
 #if (LCD_WIDTH >= 320)
 rockboxlogo.220x68x16.bmp
 #elif (LCD_WIDTH > 160)

@@ -9,33 +9,33 @@ rockboxlogo.128x42x1.bmp
 #else
 rockboxlogo.112x30x1.bmp
 #endif
-#elif (LCD_WIDTH == 96) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 96) && (LCD_DEPTH >= 16)
 rockboxlogo.96x30x16.bmp
 #elif (LCD_WIDTH == 128) && (LCD_DEPTH == 2)
 rockboxlogo.128x42x2.bmp
 #elif (LCD_WIDTH == 128) && (LCD_DEPTH == 16)
 rockboxlogo.128x40x16.bmp
-#elif (LCD_WIDTH == 132) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 132) && (LCD_DEPTH >= 16)
 rockboxlogo.132x40x16.bmp
-#elif (LCD_WIDTH == 138) && (LCD_DEPTH == 2)
+#elif (LCD_WIDTH == 138) && (LCD_DEPTH >= 2)
 rockboxlogo.138x46x2.bmp
 #elif (LCD_WIDTH == 160) && (LCD_DEPTH == 2)
 rockboxlogo.160x53x2.bmp
 #elif (LCD_WIDTH == 320) && (LCD_DEPTH == 2)
 rockboxlogo.160x53x2.bmp
-#elif (LCD_WIDTH == 160) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 160) && (LCD_DEPTH >= 16)
 rockboxlogo.160x50x16.bmp
-#elif (LCD_WIDTH == 176) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 176) && (LCD_DEPTH >= 16)
 rockboxlogo.176x54x16.bmp
-#elif (LCD_WIDTH == 220) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 220) && (LCD_DEPTH >= 16)
 rockboxlogo.220x68x16.bmp
-#elif (LCD_WIDTH == 240) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 240) && (LCD_DEPTH >= 16)
 rockboxlogo.240x74x16.bmp
-#elif (LCD_WIDTH >= 320) && (LCD_WIDTH < 480)  && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH >= 320) && (LCD_WIDTH < 480)  && (LCD_DEPTH >= 16)
 rockboxlogo.320x98x16.bmp
-#elif (LCD_WIDTH >= 480) && (LCD_WIDTH < 640) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH >= 480) && (LCD_WIDTH < 640) && (LCD_DEPTH >= 16)
 rockboxlogo.480x149x16.bmp
-#elif (LCD_WIDTH >= 640) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH >= 640) && (LCD_DEPTH >= 16)
 rockboxlogo.640x198x16.bmp
 #endif
 
