@@ -52,15 +52,31 @@ unsigned int power_input_status(void)
 
 void ide_power_enable(bool on)
 {
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+    if (on)
+    {
+        GPIO_CLEAR_BITWISE(GPIOF_OUTPUT_VAL, 0x10);
+        DEV_EN |= DEV_IDE0;
+    }
+    else
+    {
+        DEV_EN &= ~DEV_IDE0;
+        GPIO_SET_BITWISE(GPIOF_OUTPUT_VAL, 0x10);
+    }
+#else
     (void)on;
     /* We do nothing */
+#endif
 }
-
 
 bool ide_powered(void)
 {
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+    return ((GPIOF_INPUT_VAL & 0x10) == 0);
+#else
     /* pretend we are always powered - we don't turn it off */
     return true;
+#endif
 }
 
 void power_off(void)

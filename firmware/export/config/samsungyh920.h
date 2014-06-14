@@ -113,7 +113,7 @@
 #define HAVE_LBA48
 
 /* We're able to shut off power to the HDD */
-/* todo #define HAVE_ATA_POWER_OFF */
+#define HAVE_ATA_POWER_OFF
 
 /* Software controlled LED */
 #define CONFIG_LED LED_REAL
