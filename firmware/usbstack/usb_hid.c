@@ -712,10 +712,10 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
             break;
         }
 
-        if (dest != orig_dest)
+        if (dest != orig_dest &&
+            !usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest))
         {
-            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
-            usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
+            usb_core_ack_control(req);
             return true;
         }
         break;
@@ -732,7 +732,7 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
             if (usb_hid_set_report(req))
                 break;
         case USB_HID_SET_IDLE:
-            usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
+            usb_core_ack_control(req);
             return true;
         }
         break;
