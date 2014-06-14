@@ -27,15 +27,27 @@
 
 #if (CONFIG_LED == LED_REAL)
 
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+
+#define LED_ON  GPIO_CLEAR_BITWISE(GPIOF_OUTPUT_VAL, 0x20)
+#define LED_OFF GPIO_SET_BITWISE(GPIOF_OUTPUT_VAL, 0x20)
+
+#else
+
+#define LED_ON  or_b(0x40, &PBDRL)
+#define LED_OFF and_b(~0x40, &PBDRL)
+
+#endif /* SAMSUNG_YH920 || SAMSUNG_YH925 */
+
 void led(bool on)
 {
     if ( on )
     {
-        or_b(0x40, &PBDRL);
+        LED_ON;
     }
     else
     {
-        and_b(~0x40, &PBDRL);
+        LED_OFF;
     }
 }
 

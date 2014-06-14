@@ -112,6 +112,9 @@
 /* We're able to shut off power to the HDD */
 /* todo #define HAVE_ATA_POWER_OFF */
 
+/* Software controlled LED */
+#define CONFIG_LED LED_REAL
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
