@@ -363,6 +363,7 @@ Lyre prototype 1 */
 #define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701/S5L8702/S5L8720 */
+#define USBOTG_DESIGNWARE 6401 /* Synopsys DesignWare OTG, used in S5L8701/S5L8702/S5L8720/AS3252v2 */
 #define USBOTG_RK27XX   2700 /* Rockchip rk27xx */
 #define USBOTG_TNETV105 105  /* TI TNETV105 */
 
@@ -1147,7 +1148,8 @@ Lyre prototype 1 */
 #elif (CONFIG_USBOTG == USBOTG_ARC) || \
     (CONFIG_USBOTG == USBOTG_JZ4740) || \
     (CONFIG_USBOTG == USBOTG_M66591) || \
-    (CONFIG_USBOTG == USBOTG_AS3525)
+    (CONFIG_USBOTG == USBOTG_AS3525) || \
+    (CONFIG_USBOTG == USBOTG_DESIGNWARE)
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)

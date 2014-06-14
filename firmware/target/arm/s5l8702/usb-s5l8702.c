@@ -20,14 +20,12 @@
 ****************************************************************************/
 
 #include "config.h"
-
 #include <inttypes.h>
+#include "s5l8702.h"
 #include "usb-designware.h"
-#include "s5l8700.h"
 
 const struct usb_dw_config usb_dw_config = 
 {
-    .core = (struct usb_dw_core_regs*)OTGBASE, \
     .phy_16bit = true, \
     .phy_ulpi = false, \
     .use_dma = true, \
@@ -39,11 +37,9 @@ const struct usb_dw_config usb_dw_config =
 
 void usb_dw_target_enable_clocks()
 {
-    PWRCON &= ~0x4000;
-    PWRCONEXT &= ~0x800;
-    DESIGNWARE_PCGCCTL = 0;
-
-//    usb_dw_config.core->pcgcctl.d32 = 0;
+    PWRCON(0) &= ~0x4;
+    PWRCON(1) &= ~0x8;
+    DESIGNWARE_PCGCCTL = 0; //usb_dw_config.core->pcgcctl.d32 = 0;
     *((volatile uint32_t*)(PHYBASE + 0x00)) = 0;  /* PHY: Power up */
     udelay(10);
     *((volatile uint32_t*)(PHYBASE + 0x1c)) = 1;
@@ -63,20 +59,19 @@ void usb_dw_target_disable_clocks()
     udelay(10);
     *((volatile uint32_t*)(PHYBASE + 0x08)) = 7;  /* PHY: Assert Software Reset */
     udelay(10);
-    DESIGNWARE_PCGCCTL = 0;
-//    usb_dw_config.core->pcgcctl.d32 = 0;
-    PWRCON |= 0x4000;
-    PWRCONEXT |= 0x800;
+    DESIGNWARE_PCGCCTL = 0; //usb_dw_config.core->pcgcctl.d32 = 0;
+    PWRCON(0) |= 0x4;
+    PWRCON(1) |= 0x8;
 }
 
 void usb_dw_target_enable_irq()
 {
-    INTMSK |= INTMSK_USB_OTG;
+    VICINTENABLE(IRQ_USB_FUNC >> 5) = 1 << (IRQ_USB_FUNC & 0x1f);
 }
 
 void usb_dw_target_disable_irq()
 {
-    INTMSK &= ~INTMSK_USB_OTG;
+    VICINTENCLEAR(IRQ_USB_FUNC >> 5) = 1 << (IRQ_USB_FUNC & 0x1f);
 }
 
 void usb_dw_target_clear_irq()
