@@ -52,6 +52,7 @@ volatile bool setup_data_valid = false;
 static volatile uint32_t setup_data[2];
 
 static volatile bool usb_drv_send_done = false;
+static volatile bool usb_drv_rcv_done = false;
 
 void usb_drv_configure_endpoint(int ep_num, int type)
 {
@@ -81,7 +82,7 @@ static void setup_irq_handler(void)
 }
 
 /* service ep0 IN transaction */
-static void ctr_write(void)
+static void ep0_in_dma_setup(void)
 {
     int xfer_size = MIN(ctrlep[DIR_IN].cnt, CTL_MAX_SIZE);
 
@@ -91,31 +92,20 @@ static void ctr_write(void)
     TX0STAT = xfer_size;                           /* size of the transfer */
     TX0DMALM_IADDR = (uint32_t)ctrlep[DIR_IN].buf; /* local buffer address */
     TX0DMAINCTL = DMA_START;                       /* start DMA */
-    TX0CON &= ~TXNAK;                              /* clear NAK */
 
-    /* Decrement by max packet size is intentional.
-     * This way if we have final packet short one we will get negative len
-     * after transfer, which in turn indicates we *don't* need to send
-     * zero length packet. If the final packet is max sized packet we will
-     * get zero len after transfer which indicates we need to send
-     * zero length packet to signal host end of the transfer.
-     */
     ctrlep[DIR_IN].cnt -= CTL_MAX_SIZE;
     ctrlep[DIR_IN].buf += xfer_size;
+
+    TX0CON &= ~TXNAK;                              /* clear NAK */
 }
 
-static void ctr_read(void)
+static void ep0_out_dma_setup(void)
 {
-    int xfer_size = RX0STAT & 0xffff;
+    RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf; /* buffer address */
+    RX0DMACTLO = DMA_START;                          /* start DMA */
 
     /* clear NAK bit */
     RX0CON &= ~RXNAK;
-
-    ctrlep[DIR_OUT].cnt -= xfer_size;
-    ctrlep[DIR_OUT].buf += xfer_size;
-
-    RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf; /* buffer address */
-    RX0DMACTLO = DMA_START;                          /* start DMA */
 }
 
 static void udc_phy_reset(void)
@@ -158,7 +148,7 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     ep->buf = ptr;
     ep->len = ep->cnt = length;
 
-    ctr_write();
+    ep0_in_dma_setup();
 
     /* wait for transfer to end */
     while(!usb_drv_send_done)
@@ -169,7 +159,7 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     return 0;
 }
 
-/* Setup a receive transfer. (non blocking) */
+/* Setup a receive transfer. (blocking) */
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
     (void)endpoint;
@@ -178,12 +168,23 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     ep->buf = ptr;
     ep->len = ep->cnt = length;
 
-    /* clear NAK bit */
-    RX0CON &= ~RXNAK;
-    RX0DMAOUTLMADDR = (uint32_t)ptr; /* buffer address */
-    RX0DMACTLO = DMA_START;          /* start DMA */
+    if (length)
+    {
+        usb_drv_rcv_done = false;
 
-    return 0;
+        ep0_out_dma_setup();
+
+        /* block here until the transfer is finished */
+        while (!usb_drv_rcv_done)
+            ;
+    }
+    else
+    {
+        /* ZLP, clear NAK bit */
+        RX0CON &= ~RXNAK;
+    }
+
+    return (length - ep->cnt);
 }
 
 /* Stall the endpoint. Usually set a flag in the controller */
@@ -260,6 +261,8 @@ void INT_UDC(void)
                                     * endpoint does not respond to an SETUP
                                     * or OUT token */
                  RXNAK;            /* Set as one to response NAK handshake */
+
+        usb_drv_rcv_done = true;
     }
 
     if (intsrc & SETUP_INTR)       /* setup interrupt */
@@ -274,15 +277,25 @@ void INT_UDC(void)
         /* TODO handle errors */
         if (txstat & TXACK)        /* check TxACK flag */
         {
+            /* Decrement by max packet size is intentional.
+             * This way if we have final packet short one we will get negative len
+             * after transfer, which in turn indicates we *don't* need to send
+             * zero length packet. If the final packet is max sized packet we will
+             * get zero len after transfer which indicates we need to send
+             * zero length packet to signal host end of the transfer.
+             */
             if (ctrlep[DIR_IN].cnt > 0)
             {
                 /* we still have data to send */
-                ctr_write();
+                ep0_in_dma_setup();
+
             }
             else
             {
                 if (ctrlep[DIR_IN].cnt == 0)
-                    ctr_write();
+                {
+                    ep0_in_dma_setup();
+                }
 
                 /* final ack received */
                 usb_drv_send_done = true;
@@ -297,8 +310,17 @@ void INT_UDC(void)
         /* TODO handle errors */
         if (rxstat & RXACK)        /* RxACK */
         {
-            if (ctrlep[DIR_OUT].cnt > 0)
-                ctr_read();
+            int xfer_size = RX0STAT & 0xffff;
+            ctrlep[DIR_OUT].cnt -= xfer_size;
+
+            if (ctrlep[DIR_OUT].cnt > 0 && xfer_size == 64)
+            {
+                /* advance the buffer */
+                ctrlep[DIR_OUT].buf += xfer_size;
+                ep0_out_dma_setup();
+            }
+            else
+                usb_drv_rcv_done = true;
         }
     }
 
