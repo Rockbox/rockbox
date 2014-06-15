@@ -273,6 +273,8 @@ void audiohw_enable_recording(bool source_mic)
         /* power up right channel input and ADC */
         akc_set(AK4537_PM3, PMADR | PMIPGR);
     }
+    /* ADC -> DAC, external data to DAC ignored */
+    akc_set(AK4537_MODE2, LOOP);
 }
 
 void audiohw_disable_recording(void)
@@ -286,6 +288,9 @@ void audiohw_disable_recording(void)
     /* power down ADC, mic preamp and line amp */
     akc_clear(AK4537_PM1, PMADL | PMMICL | PMIPGL);
     akc_clear(AK4537_PM3, PMADR | PMMICR | PMIPGR);
+
+    /* break ADC -> DAC connection */
+    akc_clear(AK4537_MODE2, LOOP);
 }
 
 void audiohw_set_recvol(int left, int right, int type)
@@ -329,10 +334,6 @@ void audiohw_set_recvol(int left, int right, int type)
 
 void audiohw_set_monitor(bool enable)
 {
-    if (enable)
-        /* mix input signal to headphone output */
-        akc_set(AK4537_SIGSEL2, MICL);
-    else
-        akc_clear(AK4537_SIGSEL2, MICL);
+    (void)enable;
 }
 #endif /* HAVE_RECORDING */
