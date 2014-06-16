@@ -399,6 +399,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MPEG_RW         BUTTON_PREV
 #define MPEG_FF         BUTTON_NEXT
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define MPEG_MENU	BUTTON_POWER
+#define MPEG_PAUSE	BUTTON_PLAY
+#define MPEG_STOP	BUTTON_BACK
+#define MPEG_VOLDOWN	BUTTON_DOWN
+#define MPEG_VOLUP	BUTTON_UP
+#define MPEG_RW		BUTTON_LEFT
+#define MPEG_FF		BUTTON_RIGHT
+
 #else
 #error No keymap defined!
 #endif
