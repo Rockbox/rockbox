@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 /* Created from power.c using some iPod code, and some custom stuff based on 
-   GPIO analysis 
+   GPIO analysis
 */
 
 #include "config.h"
@@ -32,9 +32,26 @@
 #include "power.h"
 #include "logf.h"
 #include "usb.h"
+#include "fmradio_3wire.h"
+
+#if CONFIG_TUNER
+bool tuner_power(bool status)
+{
+    GPIO_SET_BITWISE(GPIOL_ENABLE, 0x04);
+    GPIO_SET_BITWISE(GPIOL_OUTPUT_EN, 0x04);
+    if (status)
+        GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 0x04);
+    else
+        GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x04);
+    return status;
+}
+#endif
 
 void power_init(void)
 {
+#if CONFIG_TUNER
+    fmradio_3wire_init();
+#endif
 }
 
 unsigned int power_input_status(void)

@@ -30,6 +30,25 @@ void audio_set_output_source(int source)
         source = AUDIO_SRC_PLAYBACK;
 } /* audio_set_output_source */
 
+#ifdef HAVE_AK4537
+void audio_input_mux(int source, unsigned flags)
+{
+    (void)flags;
+    /* Prevent pops from unneeded switching */
+    static int last_source = AUDIO_SRC_PLAYBACK;
+
+#ifdef HAVE_FMRADIO_REC
+    bool recording = flags & SRCF_RECORDING;
+
+    if ((source == AUDIO_SRC_FMRADIO) && (!recording))
+        audiohw_set_recvol(0, 0, AUDIO_GAIN_LINEIN); /* Set line-in vol to 0dB*/
+#endif
+    if (source != last_source)
+        audiohw_set_recsrc(source);
+
+    last_source = source;
+}
+#else
 void audio_input_mux(int source, unsigned flags)
 {
     (void)flags;
@@ -132,4 +151,6 @@ void audio_input_mux(int source, unsigned flags)
 
     last_source = source;
 } /* audio_input_mux */
+#endif
+
 #endif /* INPUT_SRC_CAPS != 0 */

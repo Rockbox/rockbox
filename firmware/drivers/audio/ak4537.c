@@ -221,34 +221,64 @@ void audiohw_set_frequency(int fsel)
 }
 
 #if defined(HAVE_RECORDING)
-void audiohw_enable_recording(bool source_mic)
+void audiohw_set_recsrc(int source)
 {
-    if (source_mic)
+    switch(source)
     {
-        /* enable mic power supply */
+    case AUDIO_SRC_PLAYBACK:
+        /* disable mic power supply */
 #if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
-        /* additionally select external mic */
-        akc_set(AK4537_MIC, MPWRE | MSEL);
+        akc_clear(AK4537_MIC, MPWRE);
 #else
-        akc_set(AK4537_MIC, MPWRI);
+        akc_clear(AK4537_MIC, MPWRI);
 #endif
+        /* power down ADC, mic preamp and line amp */
+        akc_clear(AK4537_PM1, PMADL | PMMICL | PMIPGL);
+        akc_clear(AK4537_PM3, PMADR | PMMICR | PMIPGR);
 
-        /* mic out is connected to line1 input */
-        akc_clear(AK4537_PM3, INL | INR);
+        /* break ADC -> DAC connection */
+        akc_clear(AK4537_MODE2, LOOP);
 
+        break;
+
+#if (INPUT_SRC_CAPS & SRC_CAP_FMRADIO)
+    case AUDIO_SRC_FMRADIO:
+        /* disable mic power supply */
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+        akc_clear(AK4537_MIC, MPWRE);
+#else
+        akc_clear(AK4537_MIC, MPWRI);
+#endif
+        /* disable mic preamp */
+        akc_clear(AK4537_PM1, PMMICL);
+
+        /* Select line2 input: Radio */
+        akc_set(AK4537_PM3, INL | INR);
         /* route ALC output to ADC input */
         akc_set(AK4537_MIC, MICAD);
         /* set ALC (automatic level control) to manual mode */
         akc_clear(AK4537_ALC1, ALC1);
-        /* set gain control to 'dependent' (left&right at the same time) */
-        akc_clear(AK4537_MIC, IPGAC);
-        /* power up mic preamp, left channel ADC and line in */
-        akc_set(AK4537_PM1, PMMICL | PMIPGL | PMADL);
-        /* power up right channel ADC and line in */
+
+        /* set gain control to independent left & right gain */
+        akc_set(AK4537_MIC, IPGAC);
+
+        /* power up left channel input and ADC */
+        akc_set(AK4537_PM1, PMADL | PMIPGL);
+        /* power up right channel input and ADC */
         akc_set(AK4537_PM3, PMADR | PMIPGR);
-    }
-    else
-    {
+
+        /* set line in vol = 0 dB */
+        akc_write(AK4537_IPGAL, 0x2f);
+        akc_write(AK4537_IPGAR, 0x2f);
+
+        /* ADC -> DAC, external data to DAC ignored */
+        akc_set(AK4537_MODE2, LOOP);
+
+        break;
+#endif /* INPUT_SRC_CAPS & SRC_CAP_FMRADIO */
+
+#if (INPUT_SRC_CAPS & SRC_CAP_LINEIN)
+    case AUDIO_SRC_LINEIN:
         /* disable mic power supply */
 #if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
         akc_clear(AK4537_MIC, MPWRE);
@@ -272,25 +302,44 @@ void audiohw_enable_recording(bool source_mic)
         akc_set(AK4537_PM1, PMADL | PMIPGL);
         /* power up right channel input and ADC */
         akc_set(AK4537_PM3, PMADR | PMIPGR);
-    }
-    /* ADC -> DAC, external data to DAC ignored */
-    akc_set(AK4537_MODE2, LOOP);
-}
 
-void audiohw_disable_recording(void)
-{
-    /* disable mic power supply */
+        /* ADC -> DAC, external data to DAC ignored */
+        akc_set(AK4537_MODE2, LOOP);
+
+        break;
+#endif /* INPUT_SRC_CAPS & SRC_CAP_LINEIN */
+
+#if (INPUT_SRC_CAPS & SRC_CAP_MIC)
+    case AUDIO_SRC_MIC:
+        /* enable mic power supply */
 #if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
-        akc_clear(AK4537_MIC, MPWRE);
+        /* additionally select external mic */
+        akc_set(AK4537_MIC, MPWRE | MSEL);
 #else
-        akc_clear(AK4537_MIC, MPWRI);
+        akc_set(AK4537_MIC, MPWRI);
 #endif
-    /* power down ADC, mic preamp and line amp */
-    akc_clear(AK4537_PM1, PMADL | PMMICL | PMIPGL);
-    akc_clear(AK4537_PM3, PMADR | PMMICR | PMIPGR);
 
-    /* break ADC -> DAC connection */
-    akc_clear(AK4537_MODE2, LOOP);
+        /* mic out is connected to line1 input */
+        akc_clear(AK4537_PM3, INL | INR);
+
+        /* route ALC output to ADC input */
+        akc_set(AK4537_MIC, MICAD);
+        /* set ALC (automatic level control) to manual mode */
+        akc_clear(AK4537_ALC1, ALC1);
+        /* set gain control to 'dependent' (left&right at the same time) */
+        akc_clear(AK4537_MIC, IPGAC);
+        /* power up mic preamp, left channel ADC and line in */
+        akc_set(AK4537_PM1, PMMICL | PMIPGL | PMADL);
+        /* power up right channel ADC and line in */
+        akc_set(AK4537_PM3, PMADR | PMIPGR);
+
+        /* ADC -> DAC, external data to DAC ignored */
+        akc_set(AK4537_MODE2, LOOP);
+
+        break;
+#endif /* INPUT_SRC_CAPS & SRC_CAP_MIC) */
+
+    } /* switch(source) */
 }
 
 void audiohw_set_recvol(int left, int right, int type)
@@ -330,10 +379,5 @@ void audiohw_set_recvol(int left, int right, int type)
     default:
         return;
     }
-}
-
-void audiohw_set_monitor(bool enable)
-{
-    (void)enable;
 }
 #endif /* HAVE_RECORDING */

@@ -34,6 +34,8 @@ AUDIOHW_SETTING(RIGHT_GAIN, "dB", 0,  1, -23, 12, 0)
 /* mic gain: +15dB fixed +20dB switchable mic preamp gain
    and the line stage of -23..+12dB make a total range of -8..+47dB */
 AUDIOHW_SETTING(MIC_GAIN,   "dB", 0,  1,   -8,   47,   20)
+
+void audiohw_set_recsrc(int source);
 #endif /* HAVE_RECORDING */
 
 #define AKC_NUM_REGS        0x11

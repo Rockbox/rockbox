@@ -27,7 +27,9 @@
 #include "power.h"
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h"
-#include "fmradio_i2c.h" /* physical interface driver */
+#include "fmradio_i2c.h"   /* physical interface driver - i2c */
+#include "fmradio_3wire.h" /* physical interface driver - 3-wire bus */
+
 
 #if defined(PHILIPS_HDD1630) || defined(ONDA_VX747) || defined(ONDA_VX777) || defined(PHILIPS_HDD6330)
 #define I2C_ADR 0x60
@@ -109,7 +111,11 @@ int tea5767_set(int setting, int value)
 
     if(setting == RADIO_SLEEP && !value)
         tuner_power(true); /* wakeup */
+#if defined(CONFIG_TUNER_3WIRE)
+    fmradio_3wire_write(write_bytes);
+#else
     fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+#endif
     if(setting == RADIO_SLEEP && value)
         tuner_power(false); /* sleep */
     return 1;
@@ -121,7 +127,11 @@ int tea5767_get(int setting)
     unsigned char read_bytes[5];
     int val = -1; /* default for unsupported query */
 
+#if defined(CONFIG_TUNER_3WIRE)
+    fmradio_3wire_read(read_bytes);
+#else
     fmradio_i2c_read(I2C_ADR, read_bytes, sizeof(read_bytes));
+#endif
 
     switch(setting)
     {
@@ -141,7 +151,7 @@ int tea5767_get(int setting)
         case RADIO_STEREO:
             val = read_bytes[2] >> 7;
             break;
-        
+
         case RADIO_RSSI:
             val = 10 + 3*(read_bytes[3] >> 4);
             break;
@@ -161,15 +171,22 @@ int tea5767_get(int setting)
 void tea5767_init(void)
 {
 /* save binsize by only detecting presence for targets where it may be absent */
-#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
+#if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) || defined(SAMSUNG_YH920)
     unsigned char buf[5];
     unsigned char chipid;
 
     /* init chipid register with 0xFF in case fmradio_i2c_read fails silently */
     buf[3] = 0xFF;
     tuner_power(true);
-    if (fmradio_i2c_read(I2C_ADR, buf, sizeof(buf)) < 0) {
-        /* no i2c device detected */
+
+#if defined(CONFIG_TUNER_3WIRE)
+    int res = fmradio_3wire_read(buf);
+#else
+    int res = fmradio_i2c_read(I2C_ADR, buf, sizeof(buf));
+#endif
+
+    if (res < 0) {
+        /* no device detected on bus */
         tuner_present = false;
     } else {
         /* check chip id */
@@ -182,6 +199,10 @@ void tea5767_init(void)
 
 void tea5767_dbg_info(struct tea5767_dbg_info *info)
 {
+#if defined(CONFIG_TUNER_3WIRE)
+    fmradio_3wire_read(info->read_regs);
+#else
     fmradio_i2c_read(I2C_ADR, info->read_regs, 5);
+#endif
     memcpy(info->write_regs, write_bytes, 5);
 }
