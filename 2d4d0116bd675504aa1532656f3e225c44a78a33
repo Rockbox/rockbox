@@ -16,6 +16,23 @@
       "revId": "2d4d0116bd675504aa1532656f3e225c44a78a33",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_d625a4ae",
+        "filename": "android/src/org/rockbox/RockboxFramebuffer.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2014-06-18T14:06:01Z",
+      "side": 1,
+      "message": "Should this be dirty.set(0,0,srcWidth,srcHeight); ?",
+      "revId": "2d4d0116bd675504aa1532656f3e225c44a78a33",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
