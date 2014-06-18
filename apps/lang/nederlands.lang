@@ -21,6 +21,7 @@
 # - Jacco Koning
 # - Stijn Hisken
 # - Sam Bouwer
+# - Bertrik Sikken
 # Maintainer: Peter D'Hoye
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -12136,15 +12137,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d versterking"
+    gigabeats,samsungypr1: "Band %d Versterking"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band versterking"
+    gigabeats,samsungypr1: "Band versterking"
   </voice>
 </phrase>
 <phrase>
@@ -12187,15 +12188,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Breed"
+    gigabeats,samsungypr1: "Breed"
   </dest>
   <voice>
     *: none
-    gigabeats: "Breed"
+    gigabeats,samsungypr1: "Breed"
   </voice>
 </phrase>
 <phrase>
@@ -12221,15 +12222,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Smal"
+    gigabeats,samsungypr1: "Smal"
   </dest>
   <voice>
     *: none
-    gigabeats: "Smal"
+    gigabeats,samsungypr1: "Smal"
   </voice>
 </phrase>
 <phrase>
@@ -12286,15 +12287,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Uitgebreide klank instellingen"
+    gigabeats,samsungypr1: "Uitgebreide klank instellingen"
   </dest>
   <voice>
     *: none
-    gigabeats: "Uitgebreide klank instellingen"
+    gigabeats,samsungypr1: "Uitgebreide klank instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -12303,15 +12304,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Verbetering"
+    depth_3d: "3-D Verbetering"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Verbetering"
+    depth_3d: "3-D Verbetering"
   </voice>
 </phrase>
 <phrase>
@@ -12320,15 +12321,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d Frequentie"
+    gigabeats,samsungypr1: "Band %d Frequentie"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Frequentie"
+    gigabeats,samsungypr1: "Band Frequentie"
   </voice>
 </phrase>
 <phrase>
@@ -12337,15 +12338,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Band %d Breedte"
+    gigabeats,samsungypr1: "Band %d Breedte"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Breedte"
+    gigabeats,samsungypr1: "Band Breedte"
   </voice>
 </phrase>
 <phrase>
@@ -12371,15 +12372,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Klank instellingen"
+    gigabeats,samsungypr1: "Klank instellingen"
   </dest>
   <voice>
     *: none
-    gigabeats: "Klank instellingen"
+    gigabeats,samsungypr1: "Klank instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -13038,5 +13039,123 @@
   <voice>
     *: none
     swcodec: "Aangepast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Maximum volumelimiet"
+  </dest>
+  <voice>
+    *: "Maximum volumelimiet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Scheidingslijnkleur"
+  </dest>
+  <voice>
+    *: "Scheidingslijnkleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Steil"
+  </dest>
+  <voice>
+    *: "Steil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Scheidingslijn"
+  </dest>
+  <voice>
+    *: "Scheidingslijn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Vlak"
+  </dest>
+  <voice>
+    *: "Vlak"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Stijgtijd"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Stijgtijd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "DAC filtersteilheid"
+  </dest>
+  <voice>
+    *: "DAC filtersteilheid"
   </voice>
 </phrase>
