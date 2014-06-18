@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_96088c2a",
+        "filename": "firmware/export/usb-designware-regs.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-06-18T07:35:39Z",
+      "side": 1,
+      "message": "You should not use bitfields as discussed on IRC",
+      "revId": "889d502ec9b500e31a68a857091df1c378f4d9ed",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_dae161d2",
+        "filename": "firmware/target/arm/s5l8700/usb-s5l8700.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-06-18T07:35:39Z",
+      "side": 1,
+      "message": "Can you give these register names, similar to PWERCON above?",
+      "revId": "889d502ec9b500e31a68a857091df1c378f4d9ed",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_b60d8839",
+        "filename": "firmware/target/arm/usb-designware.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-06-18T07:35:39Z",
+      "side": 1,
+      "message": "No c++ comments please",
+      "revId": "889d502ec9b500e31a68a857091df1c378f4d9ed",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_5613d45c",
+        "filename": "firmware/target/arm/usb-designware.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-06-18T07:35:39Z",
+      "side": 1,
+      "message": "extra whitespaces",
+      "revId": "889d502ec9b500e31a68a857091df1c378f4d9ed",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
