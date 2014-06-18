@@ -184,7 +184,7 @@ static const struct plugin_api rockbox_api = {
     lcd_get_backdrop,
     lcd_set_backdrop,
 #endif
-#if LCD_DEPTH == 16
+#if LCD_DEPTH >= 16
     lcd_bitmap_transparent_part,
     lcd_bitmap_transparent,
 #if MEMORYSIZE > 2

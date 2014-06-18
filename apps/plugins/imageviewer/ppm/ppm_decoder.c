@@ -197,7 +197,7 @@ static int read_ppm_row(int fd, struct ppm_info *ppm, int row)
                 {
                     return PLUGIN_ERROR;
                 }
-                *dst = LCD_RGBPACK(
+                *dst = FB_RGBPACK(
                     (255 * r)/ppm->maxval,
                     (255 * g)/ppm->maxval,
                     (255 * b)/ppm->maxval);
@@ -216,7 +216,7 @@ static int read_ppm_row(int fd, struct ppm_info *ppm, int row)
                 {
                     return PLUGIN_ERROR;
                 }
-                *dst = LCD_RGBPACK(
+                *dst = FB_RGBPACK(
                     (255 * r)/ppm->maxval,
                     (255 * g)/ppm->maxval,
                     (255 * b)/ppm->maxval);

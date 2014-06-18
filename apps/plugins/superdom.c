@@ -23,8 +23,6 @@
 #include "lib/display_text.h"
 #include "pluginbitmaps/superdom_boarditems.h"
 
-
-extern const fb_data superdom_boarditems[];
 char buf[255];
 
 #define COLOUR_DARK 0
@@ -32,7 +30,7 @@ char buf[255];
 
 #define MARGIN 5
 
-#if (LCD_DEPTH == 16)
+#if (LCD_DEPTH >= 16)
 #define MY_BITMAP_PART   rb->lcd_bitmap_transparent_part
 #else
 #define MY_BITMAP_PART   rb->lcd_mono_bitmap_part

@@ -231,4 +231,3 @@ void codec_free(void* ptr)
 #endif
     (void)ptr;
 }
-

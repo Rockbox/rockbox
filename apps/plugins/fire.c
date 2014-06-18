@@ -100,20 +100,20 @@ static void color_palette_init(fb_data* palette)
     int i;
     for (i = 0; i < 32; i++){
         /* black to blue, 32 values*/
-        palette[i]=LCD_RGBPACK(0, 0, 2*i);
+        palette[i]=FB_RGBPACK(0, 0, 2*i);
 
         /* blue to red, 32 values*/
-        palette[i +  32]=LCD_RGBPACK(8*i, 0, 64 - 2*i);
+        palette[i +  32]=FB_RGBPACK(8*i, 0, 64 - 2*i);
 
         /* red to yellow, 32 values*/
-        palette[i +  64]=LCD_RGBPACK(255, 8*i, 0);
+        palette[i +  64]=FB_RGBPACK(255, 8*i, 0);
 
         /* yellow to white, 162 values */
-        palette[i +  96]=LCD_RGBPACK(255, 255,   0 + 4*i);
-        palette[i + 128]=LCD_RGBPACK(255, 255,  64 + 4*i);
-        palette[i + 160]=LCD_RGBPACK(255, 255, 128 + 4*i);
-        palette[i + 192]=LCD_RGBPACK(255, 255, 192 + i);
-        palette[i + 224]=LCD_RGBPACK(255, 255, 224 + i);
+        palette[i +  96]=FB_RGBPACK(255, 255,   0 + 4*i);
+        palette[i + 128]=FB_RGBPACK(255, 255,  64 + 4*i);
+        palette[i + 160]=FB_RGBPACK(255, 255, 128 + 4*i);
+        palette[i + 192]=FB_RGBPACK(255, 255, 192 + i);
+        palette[i + 224]=FB_RGBPACK(255, 255, 224 + i);
     }
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_pal256_update_pal(palette);

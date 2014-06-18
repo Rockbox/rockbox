@@ -60,7 +60,7 @@ struct rgb_pick
 /* list of primary colors */
 #define SB_PRIM 0
 #define SB_FILL 1
-static const fb_data prim_rgb[][3] =
+static const unsigned prim_rgb[][3] =
 {
     /* Foreground colors for sliders */
     {
@@ -87,13 +87,13 @@ static const unsigned char rgb_max[3] =
 /* Unpacks the color value into native rgb values and 24 bit rgb values */
 static void unpack_rgb(struct rgb_pick *rgb)
 {
-    unsigned color = _LCD_UNSWAP_COLOR(rgb->color);
-    rgb->red   = _RGB_UNPACK_RED(color);
-    rgb->green = _RGB_UNPACK_GREEN(color);
-    rgb->blue  = _RGB_UNPACK_BLUE(color);
-    rgb->r     = _RGB_UNPACK_RED_LCD(color);
-    rgb->g     = _RGB_UNPACK_GREEN_LCD(color);
-    rgb->b     = _RGB_UNPACK_BLUE_LCD(color);
+    unsigned color = rgb->color;
+    rgb->red   = RGB_UNPACK_RED(color);
+    rgb->green = RGB_UNPACK_GREEN(color);
+    rgb->blue  = RGB_UNPACK_BLUE(color);
+    rgb->r     = RGB_UNPACK_RED_LCD(color);
+    rgb->g     = RGB_UNPACK_GREEN_LCD(color);
+    rgb->b     = RGB_UNPACK_BLUE_LCD(color);
 }
 
 /* Packs the native rgb colors into a color value */
@@ -159,6 +159,7 @@ static void draw_screen(struct screen *display, char *title,
     int       max_label_width;
     int       text_x, text_top;
     int       slider_x, slider_width;
+    int       value_width;
     bool      display_three_rows;
     struct viewport vp;
 
@@ -185,7 +186,12 @@ static void draw_screen(struct screen *display, char *title,
                    TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
     text_x       = SELECTOR_WIDTH;
     slider_x     = text_x + max_label_width + SLIDER_TEXT_MARGIN;
-    slider_width = vp.width - slider_x*2 - max_label_width;
+    slider_width = vp.width - text_x - slider_x - SLIDER_TEXT_MARGIN;
+    if (display->depth >= 24)
+        display->getstringsize("255", &value_width, NULL);
+    else
+        display->getstringsize("63", &value_width, NULL);
+    slider_width -= value_width;
     line_height  = char_height + 2*SELECTOR_TB_MARGIN;
 
     /* Find out if there's enough room for three sliders or just
@@ -252,7 +258,10 @@ static void draw_screen(struct screen *display, char *title,
         vp.flags &= ~VP_FLAG_ALIGNMENT_MASK;
         display->putsxy(text_x, text_top, buf);
         /* Draw color value */
-        snprintf(buf, 3, "%02d", rgb->rgb_val[i]);
+        if (display->depth >= 24)
+            snprintf(buf, 4, "%03d", rgb->rgb_val[i]);
+        else
+            snprintf(buf, 3, "%02d", rgb->rgb_val[i]);
         vp.flags |= VP_FLAG_ALIGN_RIGHT;
         display->putsxy(text_x, text_top, buf);
 
@@ -324,7 +333,7 @@ static int touchscreen_slider(struct screen *display,
 {
     short     x, y;
     int       char_height, line_height;
-    int       max_label_width;
+    int       max_label_width, value_width;
     int       text_top, slider_x, slider_width;
     bool      display_three_rows;
     int       button;
@@ -345,7 +354,12 @@ static int touchscreen_slider(struct screen *display,
     text_top     = MARGIN_TOP + char_height +
                    TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
     slider_x     = SELECTOR_WIDTH + max_label_width + SLIDER_TEXT_MARGIN;
-    slider_width = vp.width - slider_x*2 - max_label_width;
+    slider_width = vp.width - SELECTOR_WIDTH - slider_x - SLIDER_TEXT_MARGIN;
+    if (display->depth >= 24)
+        display->getstringsize("255", &value_width, NULL);
+    else
+        display->getstringsize("63", &value_width, NULL);
+    slider_width -= value_width;
     line_height  = char_height + 2*SELECTOR_TB_MARGIN;
 
     /* same logic as in draw_screen */

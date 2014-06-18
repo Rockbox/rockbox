@@ -66,10 +66,10 @@ struct line_desc {
     int16_t line;
     /* line text color if STYLE_COLORED is specified, in native
      * lcd format (convert with LCD_RGBPACK() if necessary) */
-    fb_data text_color;
+    unsigned text_color;
     /* line color if STYLE_COLORBAR or STYLE_GRADIENT is specified, in native
      * lcd format (convert with LCD_RGBPACK() if necessary) */
-    fb_data line_color, line_end_color;
+    unsigned line_color, line_end_color;
     /* line decorations, see STYLE_DEFAULT etc. */
     enum line_styles style;
     /* whether the line can scroll */

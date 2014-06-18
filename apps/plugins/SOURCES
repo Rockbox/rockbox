@@ -195,7 +195,8 @@ codebuster.c
 fireworks.c
 #endif
 
-#if LCD_DEPTH >= 16
+#if LCD_DEPTH == 16
+/* FIXME: make it work with 24bit (needs lot of memory) */
 rockpaint.c
 #endif
 

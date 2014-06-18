@@ -789,7 +789,7 @@ static const short scoring[4] = {  /* scoring for each number of lines */
 struct figure
 {
 #if LCD_DEPTH >= 2
-    unsigned short color[3];    /* color of figure (light,middle,shadow) */
+    unsigned int color[3];    /* color of figure (light,middle,shadow) */
 #endif
     unsigned short max_or;      /* max orientations */
     signed short shapeX[4], shapeY[4];  /* implementation of figures */

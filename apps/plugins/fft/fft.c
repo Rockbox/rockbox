@@ -929,13 +929,15 @@ static void draw_spectrogram_vertical(unsigned this_max, unsigned graph_max)
         if(bins_acc >= ARRAYLEN_PLOT)
         {
             unsigned index = (SHADES-1)*bins_max / graph_max;
+            unsigned color;
 
             /* These happen because we exaggerate the graph a little for
              * linear mode */
             if(index >= SHADES)
                 index = SHADES-1;
 
-            mylcd_set_foreground(SPECTROGRAPH_PALETTE(index));
+            color = FB_UNPACK_SCALAR_LCD(SPECTROGRAPH_PALETTE(index));
+            mylcd_set_foreground(color);
             mylcd_drawpixel(fft_spectrogram_pos, y);
 
             if(--y < 0)
@@ -973,13 +975,15 @@ static void draw_spectrogram_horizontal(unsigned this_max, unsigned graph_max)
         if(bins_acc >= ARRAYLEN_PLOT)
         {
             unsigned index = (SHADES-1)*bins_max / graph_max;
+            unsigned color;
 
             /* These happen because we exaggerate the graph a little for
              * linear mode */
             if(index >= SHADES)
                 index = SHADES-1;
 
-            mylcd_set_foreground(SPECTROGRAPH_PALETTE(index));
+            color = FB_UNPACK_SCALAR_LCD(SPECTROGRAPH_PALETTE(index));
+            mylcd_set_foreground(color);
             mylcd_drawpixel(x, fft_spectrogram_pos);
 
             if(++x >= LCD_WIDTH)

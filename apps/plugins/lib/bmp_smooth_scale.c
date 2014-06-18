@@ -130,38 +130,38 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
 
                     if (XAP > 0) {
                         pix = ypoint + xpoint;
-                        r = RGB_UNPACK_RED(*pix) * INV_XAP;
-                        g = RGB_UNPACK_GREEN(*pix) * INV_XAP;
-                        b = RGB_UNPACK_BLUE(*pix) * INV_XAP;
+                        r = FB_UNPACK_RED(*pix) * INV_XAP;
+                        g = FB_UNPACK_GREEN(*pix) * INV_XAP;
+                        b = FB_UNPACK_BLUE(*pix) * INV_XAP;
                         pix++;
-                        r += RGB_UNPACK_RED(*pix) * XAP;
-                        g += RGB_UNPACK_GREEN(*pix) * XAP;
-                        b += RGB_UNPACK_BLUE(*pix) * XAP;
+                        r += FB_UNPACK_RED(*pix) * XAP;
+                        g += FB_UNPACK_GREEN(*pix) * XAP;
+                        b += FB_UNPACK_BLUE(*pix) * XAP;
                         pix += sow;
-                        rr = RGB_UNPACK_RED(*pix) * XAP;
-                        gg = RGB_UNPACK_GREEN(*pix) * XAP;
-                        bb = RGB_UNPACK_BLUE(*pix) * XAP;
+                        rr = FB_UNPACK_RED(*pix) * XAP;
+                        gg = FB_UNPACK_GREEN(*pix) * XAP;
+                        bb = FB_UNPACK_BLUE(*pix) * XAP;
                         pix--;
-                        rr += RGB_UNPACK_RED(*pix) * INV_XAP;
-                        gg += RGB_UNPACK_GREEN(*pix) * INV_XAP;
-                        bb += RGB_UNPACK_BLUE(*pix) * INV_XAP;
+                        rr += FB_UNPACK_RED(*pix) * INV_XAP;
+                        gg += FB_UNPACK_GREEN(*pix) * INV_XAP;
+                        bb += FB_UNPACK_BLUE(*pix) * INV_XAP;
                         r = ((rr * YAP) + (r * INV_YAP)) >> 16;
                         g = ((gg * YAP) + (g * INV_YAP)) >> 16;
                         b = ((bb * YAP) + (b * INV_YAP)) >> 16;
-                        *dptr++ = LCD_RGBPACK(r, g, b);
+                        *dptr++ = FB_RGBPACK(r, g, b);
                     } else {
                         pix = ypoint + xpoint;
-                        r = RGB_UNPACK_RED(*pix) * INV_YAP;
-                        g = RGB_UNPACK_GREEN(*pix) * INV_YAP;
-                        b = RGB_UNPACK_BLUE(*pix) * INV_YAP;
+                        r = FB_UNPACK_RED(*pix) * INV_YAP;
+                        g = FB_UNPACK_GREEN(*pix) * INV_YAP;
+                        b = FB_UNPACK_BLUE(*pix) * INV_YAP;
                         pix += sow;
-                        r += RGB_UNPACK_RED(*pix) * YAP;
-                        g += RGB_UNPACK_GREEN(*pix) * YAP;
-                        b += RGB_UNPACK_BLUE(*pix) * YAP;
+                        r += FB_UNPACK_RED(*pix) * YAP;
+                        g += FB_UNPACK_GREEN(*pix) * YAP;
+                        b += FB_UNPACK_BLUE(*pix) * YAP;
                         r >>= 8;
                         g >>= 8;
                         b >>= 8;
-                        *dptr++ = LCD_RGBPACK(r, g, b);
+                        *dptr++ = FB_RGBPACK(r, g, b);
                     }
                 }
             } else {
@@ -176,17 +176,17 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
 
                     if (XAP > 0) {
                         pix = ypoint + xpoint;
-                        r = RGB_UNPACK_RED(*pix) * INV_XAP;
-                        g = RGB_UNPACK_GREEN(*pix) * INV_XAP;
-                        b = RGB_UNPACK_BLUE(*pix) * INV_XAP;
+                        r = FB_UNPACK_RED(*pix) * INV_XAP;
+                        g = FB_UNPACK_GREEN(*pix) * INV_XAP;
+                        b = FB_UNPACK_BLUE(*pix) * INV_XAP;
                         pix++;
-                        r += RGB_UNPACK_RED(*pix) * XAP;
-                        g += RGB_UNPACK_GREEN(*pix) * XAP;
-                        b += RGB_UNPACK_BLUE(*pix) * XAP;
+                        r += FB_UNPACK_RED(*pix) * XAP;
+                        g += FB_UNPACK_GREEN(*pix) * XAP;
+                        b += FB_UNPACK_BLUE(*pix) * XAP;
                         r >>= 8;
                         g >>= 8;
                         b >>= 8;
-                        *dptr++ = LCD_RGBPACK(r, g, b);
+                        *dptr++ = FB_RGBPACK(r, g, b);
                     } else
                         *dptr++ = sptr[xpoint];
                 }
@@ -221,37 +221,37 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
                 val_x += inc_x;
 
                 pix = ypoint + xpoint;
-                r = (RGB_UNPACK_RED(*pix) * yap) >> 10;
-                g = (RGB_UNPACK_GREEN(*pix) * yap) >> 10;
-                b = (RGB_UNPACK_BLUE(*pix) * yap) >> 10;
+                r = (FB_UNPACK_RED(*pix) * yap) >> 10;
+                g = (FB_UNPACK_GREEN(*pix) * yap) >> 10;
+                b = (FB_UNPACK_BLUE(*pix) * yap) >> 10;
                 pix += sow;
                 for (j = (1 << 14) - yap; j > Cy; j -= Cy) {
-                    r += (RGB_UNPACK_RED(*pix) * Cy) >> 10;
-                    g += (RGB_UNPACK_GREEN(*pix) * Cy) >> 10;
-                    b += (RGB_UNPACK_BLUE(*pix) * Cy) >> 10;
+                    r += (FB_UNPACK_RED(*pix) * Cy) >> 10;
+                    g += (FB_UNPACK_GREEN(*pix) * Cy) >> 10;
+                    b += (FB_UNPACK_BLUE(*pix) * Cy) >> 10;
                     pix += sow;
                 }
                 if (j > 0) {
-                    r += (RGB_UNPACK_RED(*pix) * j) >> 10;
-                    g += (RGB_UNPACK_GREEN(*pix) * j) >> 10;
-                    b += (RGB_UNPACK_BLUE(*pix) * j) >> 10;
+                    r += (FB_UNPACK_RED(*pix) * j) >> 10;
+                    g += (FB_UNPACK_GREEN(*pix) * j) >> 10;
+                    b += (FB_UNPACK_BLUE(*pix) * j) >> 10;
                 }
                 if (XAP > 0) {
                     pix = ypoint + xpoint + 1;
-                    rr = (RGB_UNPACK_RED(*pix) * yap) >> 10;
-                    gg = (RGB_UNPACK_GREEN(*pix) * yap) >> 10;
-                    bb = (RGB_UNPACK_BLUE(*pix) * yap) >> 10;
+                    rr = (FB_UNPACK_RED(*pix) * yap) >> 10;
+                    gg = (FB_UNPACK_GREEN(*pix) * yap) >> 10;
+                    bb = (FB_UNPACK_BLUE(*pix) * yap) >> 10;
                     pix += sow;
                     for (j = (1 << 14) - yap; j > Cy; j -= Cy) {
-                        rr += (RGB_UNPACK_RED(*pix) * Cy) >> 10;
-                        gg += (RGB_UNPACK_GREEN(*pix) * Cy) >> 10;
-                        bb += (RGB_UNPACK_BLUE(*pix) * Cy) >> 10;
+                        rr += (FB_UNPACK_RED(*pix) * Cy) >> 10;
+                        gg += (FB_UNPACK_GREEN(*pix) * Cy) >> 10;
+                        bb += (FB_UNPACK_BLUE(*pix) * Cy) >> 10;
                         pix += sow;
                     }
                     if (j > 0) {
-                        rr += (RGB_UNPACK_RED(*pix) * j) >> 10;
-                        gg += (RGB_UNPACK_GREEN(*pix) * j) >> 10;
-                        bb += (RGB_UNPACK_BLUE(*pix) * j) >> 10;
+                        rr += (FB_UNPACK_RED(*pix) * j) >> 10;
+                        gg += (FB_UNPACK_GREEN(*pix) * j) >> 10;
+                        bb += (FB_UNPACK_BLUE(*pix) * j) >> 10;
                     }
                     r = r * INV_XAP;
                     g = g * INV_XAP;
@@ -264,7 +264,7 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
                     g >>= 4;
                     b >>= 4;
                 }
-                *dptr = LCD_RGBPACK(r, g, b);
+                *dptr = FB_RGBPACK(r, g, b);
                 dptr++;
             }
         }
@@ -297,37 +297,37 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
                 xap = XAP & 0xffff;
 
                 pix = ypoint + xpoint;
-                r = (RGB_UNPACK_RED(*pix) * xap) >> 10;
-                g = (RGB_UNPACK_GREEN(*pix) * xap) >> 10;
-                b = (RGB_UNPACK_BLUE(*pix) * xap) >> 10;
+                r = (FB_UNPACK_RED(*pix) * xap) >> 10;
+                g = (FB_UNPACK_GREEN(*pix) * xap) >> 10;
+                b = (FB_UNPACK_BLUE(*pix) * xap) >> 10;
                 pix++;
                 for (j = (1 << 14) - xap; j > Cx; j -= Cx) {
-                    r += (RGB_UNPACK_RED(*pix) * Cx) >> 10;
-                    g += (RGB_UNPACK_GREEN(*pix) * Cx) >> 10;
-                    b += (RGB_UNPACK_BLUE(*pix) * Cx) >> 10;
+                    r += (FB_UNPACK_RED(*pix) * Cx) >> 10;
+                    g += (FB_UNPACK_GREEN(*pix) * Cx) >> 10;
+                    b += (FB_UNPACK_BLUE(*pix) * Cx) >> 10;
                     pix++;
                 }
                 if (j > 0) {
-                    r += (RGB_UNPACK_RED(*pix) * j) >> 10;
-                    g += (RGB_UNPACK_GREEN(*pix) * j) >> 10;
-                    b += (RGB_UNPACK_BLUE(*pix) * j) >> 10;
+                    r += (FB_UNPACK_RED(*pix) * j) >> 10;
+                    g += (FB_UNPACK_GREEN(*pix) * j) >> 10;
+                    b += (FB_UNPACK_BLUE(*pix) * j) >> 10;
                 }
                 if (YAP > 0) {
                     pix = ypoint + xpoint + sow;
-                    rr = (RGB_UNPACK_RED(*pix) * xap) >> 10;
-                    gg = (RGB_UNPACK_GREEN(*pix) * xap) >> 10;
-                    bb = (RGB_UNPACK_BLUE(*pix) * xap) >> 10;
+                    rr = (FB_UNPACK_RED(*pix) * xap) >> 10;
+                    gg = (FB_UNPACK_GREEN(*pix) * xap) >> 10;
+                    bb = (FB_UNPACK_BLUE(*pix) * xap) >> 10;
                     pix++;
                     for (j = (1 << 14) - xap; j > Cx; j -= Cx) {
-                        rr += (RGB_UNPACK_RED(*pix) * Cx) >> 10;
-                        gg += (RGB_UNPACK_GREEN(*pix) * Cx) >> 10;
-                        bb += (RGB_UNPACK_BLUE(*pix) * Cx) >> 10;
+                        rr += (FB_UNPACK_RED(*pix) * Cx) >> 10;
+                        gg += (FB_UNPACK_GREEN(*pix) * Cx) >> 10;
+                        bb += (FB_UNPACK_BLUE(*pix) * Cx) >> 10;
                         pix++;
                     }
                     if (j > 0) {
-                        rr += (RGB_UNPACK_RED(*pix) * j) >> 10;
-                        gg += (RGB_UNPACK_GREEN(*pix) * j) >> 10;
-                        bb += (RGB_UNPACK_BLUE(*pix) * j) >> 10;
+                        rr += (FB_UNPACK_RED(*pix) * j) >> 10;
+                        gg += (FB_UNPACK_GREEN(*pix) * j) >> 10;
+                        bb += (FB_UNPACK_BLUE(*pix) * j) >> 10;
                     }
                     r = r * INV_YAP;
                     g = g * INV_YAP;
@@ -340,7 +340,7 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
                     g >>= 4;
                     b >>= 4;
                 }
-                *dptr = LCD_RGBPACK(r, g, b);
+                *dptr = FB_RGBPACK(r, g, b);
                 dptr++;
             }
         }
@@ -378,20 +378,20 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
 
                 pix = sptr;
                 sptr += sow;
-                rx = (RGB_UNPACK_RED(*pix) * xap) >> 9;
-                gx = (RGB_UNPACK_GREEN(*pix) * xap) >> 9;
-                bx = (RGB_UNPACK_BLUE(*pix) * xap) >> 9;
+                rx = (FB_UNPACK_RED(*pix) * xap) >> 9;
+                gx = (FB_UNPACK_GREEN(*pix) * xap) >> 9;
+                bx = (FB_UNPACK_BLUE(*pix) * xap) >> 9;
                 pix++;
                 for (i = (1 << 14) - xap; i > Cx; i -= Cx) {
-                    rx += (RGB_UNPACK_RED(*pix) * Cx) >> 9;
-                    gx += (RGB_UNPACK_GREEN(*pix) * Cx) >> 9;
-                    bx += (RGB_UNPACK_BLUE(*pix) * Cx) >> 9;
+                    rx += (FB_UNPACK_RED(*pix) * Cx) >> 9;
+                    gx += (FB_UNPACK_GREEN(*pix) * Cx) >> 9;
+                    bx += (FB_UNPACK_BLUE(*pix) * Cx) >> 9;
                     pix++;
                 }
                 if (i > 0) {
-                    rx += (RGB_UNPACK_RED(*pix) * i) >> 9;
-                    gx += (RGB_UNPACK_GREEN(*pix) * i) >> 9;
-                    bx += (RGB_UNPACK_BLUE(*pix) * i) >> 9;
+                    rx += (FB_UNPACK_RED(*pix) * i) >> 9;
+                    gx += (FB_UNPACK_GREEN(*pix) * i) >> 9;
+                    bx += (FB_UNPACK_BLUE(*pix) * i) >> 9;
                 }
 
                 r = (rx * yap) >> 14;
@@ -401,20 +401,20 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
                 for (j = (1 << 14) - yap; j > Cy; j -= Cy) {
                     pix = sptr;
                     sptr += sow;
-                    rx = (RGB_UNPACK_RED(*pix) * xap) >> 9;
-                    gx = (RGB_UNPACK_GREEN(*pix) * xap) >> 9;
-                    bx = (RGB_UNPACK_BLUE(*pix) * xap) >> 9;
+                    rx = (FB_UNPACK_RED(*pix) * xap) >> 9;
+                    gx = (FB_UNPACK_GREEN(*pix) * xap) >> 9;
+                    bx = (FB_UNPACK_BLUE(*pix) * xap) >> 9;
                     pix++;
                     for (i = (1 << 14) - xap; i > Cx; i -= Cx) {
-                        rx += (RGB_UNPACK_RED(*pix) * Cx) >> 9;
-                        gx += (RGB_UNPACK_GREEN(*pix) * Cx) >> 9;
-                        bx += (RGB_UNPACK_BLUE(*pix) * Cx) >> 9;
+                        rx += (FB_UNPACK_RED(*pix) * Cx) >> 9;
+                        gx += (FB_UNPACK_GREEN(*pix) * Cx) >> 9;
+                        bx += (FB_UNPACK_BLUE(*pix) * Cx) >> 9;
                         pix++;
                     }
                     if (i > 0) {
-                        rx += (RGB_UNPACK_RED(*pix) * i) >> 9;
-                        gx += (RGB_UNPACK_GREEN(*pix) * i) >> 9;
-                        bx += (RGB_UNPACK_BLUE(*pix) * i) >> 9;
+                        rx += (FB_UNPACK_RED(*pix) * i) >> 9;
+                        gx += (FB_UNPACK_GREEN(*pix) * i) >> 9;
+                        bx += (FB_UNPACK_BLUE(*pix) * i) >> 9;
                     }
 
                     r += (rx * Cy) >> 14;
@@ -424,20 +424,20 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
                 if (j > 0) {
                     pix = sptr;
                     sptr += sow;
-                    rx = (RGB_UNPACK_RED(*pix) * xap) >> 9;
-                    gx = (RGB_UNPACK_GREEN(*pix) * xap) >> 9;
-                    bx = (RGB_UNPACK_BLUE(*pix) * xap) >> 9;
+                    rx = (FB_UNPACK_RED(*pix) * xap) >> 9;
+                    gx = (FB_UNPACK_GREEN(*pix) * xap) >> 9;
+                    bx = (FB_UNPACK_BLUE(*pix) * xap) >> 9;
                     pix++;
                     for (i = (1 << 14) - xap; i > Cx; i -= Cx) {
-                        rx += (RGB_UNPACK_RED(*pix) * Cx) >> 9;
-                        gx += (RGB_UNPACK_GREEN(*pix) * Cx) >> 9;
-                        bx += (RGB_UNPACK_BLUE(*pix) * Cx) >> 9;
+                        rx += (FB_UNPACK_RED(*pix) * Cx) >> 9;
+                        gx += (FB_UNPACK_GREEN(*pix) * Cx) >> 9;
+                        bx += (FB_UNPACK_BLUE(*pix) * Cx) >> 9;
                         pix++;
                     }
                     if (i > 0) {
-                        rx += (RGB_UNPACK_RED(*pix) * i) >> 9;
-                        gx += (RGB_UNPACK_GREEN(*pix) * i) >> 9;
-                        bx += (RGB_UNPACK_BLUE(*pix) * i) >> 9;
+                        rx += (FB_UNPACK_RED(*pix) * i) >> 9;
+                        gx += (FB_UNPACK_GREEN(*pix) * i) >> 9;
+                        bx += (FB_UNPACK_BLUE(*pix) * i) >> 9;
                     }
 
                     r += (rx * j) >> 14;
@@ -445,7 +445,7 @@ void smooth_resize_bitmap(struct bitmap *src_bmp,  struct bitmap *dest_bmp)
                     b += (bx * j) >> 14;
                 }
 
-                *dptr = LCD_RGBPACK(r >> 5, g >> 5, b >> 5);
+                *dptr = FB_RGBPACK(r >> 5, g >> 5, b >> 5);
                 dptr++;
             }
         }

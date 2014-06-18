@@ -43,8 +43,8 @@ static fb_data imgbuffer[LCD_HEIGHT];
 #endif
 
 #ifdef HAVE_LCD_COLOR
-#define COLOR(iter) (fb_data)LCOLOR(iter)
-#define CONVERGENCE_COLOR LCD_RGBPACK(0, 0, 0)
+#define COLOR(iter)         FB_SCALARPACK(LCOLOR(iter))
+#define CONVERGENCE_COLOR   FB_RGBPACK(0, 0, 0)
 #else /* greyscale */
 #define COLOR(iter) (unsigned char)LCOLOR(iter)
 #define CONVERGENCE_COLOR 0
@@ -413,4 +413,3 @@ static int mandelbrot_precision(int d)
 
     return changed;
 }
-

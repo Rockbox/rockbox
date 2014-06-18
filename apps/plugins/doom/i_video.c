@@ -790,7 +790,7 @@ static void I_UploadNewPalette(int pal)
 #ifndef HAVE_LCD_COLOR
       paldata[i]=(3*r+6*g+b)/10;
 #else
-      paldata[i] = LCD_RGBPACK(r,g,b);
+      paldata[i] = FB_RGBPACK(r,g,b);
 #endif
     }
 

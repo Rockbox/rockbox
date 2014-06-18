@@ -112,6 +112,9 @@ static struct osd grey_osd;
 #    define _OSD_WIDTH2BYTES(w)    ((w)*2)
 #    define _OSD_BYTES2WIDTH(b)    ((b)/2)
 #  endif /* end stride type selection */
+#elif LCD_DEPTH == 24
+#    define _OSD_WIDTH2BYTES(w)    ((w)*3)
+#    define _OSD_BYTES2WIDTH(b)    ((b)/3)
 #else /* other LCD depth */
 #  error Unknown LCD depth; please define macros
 #endif /* LCD_DEPTH */

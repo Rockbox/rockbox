@@ -218,6 +218,8 @@ drivers/lcd-16bit-vert.c
 #else
 drivers/lcd-16bit.c
 #endif
+#elif LCD_DEPTH == 24
+drivers/lcd-24bit.c
 #endif /* LCD_DEPTH */
 common/diacritic.c
 #endif /* HAVE_LCD_BITMAP */

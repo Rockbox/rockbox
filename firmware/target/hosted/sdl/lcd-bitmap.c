@@ -112,6 +112,8 @@ static unsigned long get_lcd_pixel(int x, int y)
 #else
     return *FBADDR(x, y);
 #endif
+#elif LCD_DEPTH == 24
+    return FB_UNPACK_SCALAR_LCD(*FBADDR(x, y));
 #endif
 }
 
@@ -172,7 +174,7 @@ void sim_backlight(int value)
 /* initialise simulator lcd driver */
 void lcd_init_device(void)
 {
-#if LCD_DEPTH == 16
+#if LCD_DEPTH >= 16
     lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
                                        SIM_LCD_WIDTH * display_zoom,
                                        SIM_LCD_HEIGHT * display_zoom,

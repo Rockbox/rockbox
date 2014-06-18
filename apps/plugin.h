@@ -242,7 +242,7 @@ struct plugin_api {
     fb_data* (*lcd_get_backdrop)(void);
     void (*lcd_set_backdrop)(fb_data* backdrop);
 #endif
-#if LCD_DEPTH == 16
+#if LCD_DEPTH >= 16
     void (*lcd_bitmap_transparent_part)(const fb_data *src,
             int src_x, int src_y, int stride,
             int x, int y, int width, int height);

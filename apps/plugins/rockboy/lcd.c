@@ -19,7 +19,7 @@ struct scan scan IBSS_ATTR;
 #define BG (scan.bg)
 #define WND (scan.wnd)
 
-#if LCD_DEPTH ==16
+#if LCD_DEPTH >= 16
 #define BUF (scan.buf)
 #else
 #define BUF (scan.buf[scanline_ind])
@@ -1154,6 +1154,7 @@ void set_pal(void)
 static void updatepalette(int i)
 {
     int c, r, g, b;
+    fb_data px;
 
     c = (lcd.pal[i<<1] | ((int)lcd.pal[(i<<1)|1] << 8)) & 0x7FFF;
     r = (c & 0x001F) << 3;
@@ -1167,18 +1168,16 @@ static void updatepalette(int i)
     g = (g >> fb.cc[1].r) << fb.cc[1].l;
     b = (b >> fb.cc[2].r) << fb.cc[2].l;
 
-#if LCD_PIXELFORMAT == RGB565
     c = r|g|b;
-#elif LCD_PIXELFORMAT == RGB565SWAPPED
-    c = swap16(r|g|b);
-#endif
+
+    px = FB_SCALARPACK_LCD(c);
 
     /* updatepalette might get called, but the pallete does not necessarily
      *  need to be updated.
      */
-    if(PAL[i]!=c) 
+    if(memcmp(&PAL[i], &px, sizeof(fb_data)))
     {
-        PAL[i] = c;
+        PAL[i] = px;
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
         rb->lcd_pal256_update_pal(PAL);
 #endif
@@ -1256,4 +1255,3 @@ void lcd_reset(void)
     lcd_begin();
     vram_dirty();
 }
-

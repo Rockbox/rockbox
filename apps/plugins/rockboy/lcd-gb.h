@@ -3,6 +3,7 @@
 #ifndef __LCD_GB_H__
 #define __LCD_GB_H__
 
+#include "lcd.h"
 #include "defs.h"
 
 struct vissprite
@@ -23,7 +24,7 @@ struct scan
 #elif LCD_DEPTH > 4
     byte buf[256];
 #endif
-    un16 pal[64];
+    fb_data pal[64];
     byte pri[256];
     struct vissprite vs[16];
     int ns, l, x, y, s, t, u, v, wx, wy, wt, wv;
@@ -61,6 +62,3 @@ void pal_dirty(void) ICODE_ATTR;
 void lcd_reset(void);
 
 #endif
-
-
-

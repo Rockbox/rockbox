@@ -118,6 +118,9 @@ void screen_dump(void)
 #elif LCD_DEPTH <= 16
     unsigned short *dst, *dst_end;
     unsigned short linebuf[DUMP_BMP_LINESIZE/2];
+#else /* 24bit */
+    unsigned char *dst, *dst_end;
+    unsigned char linebuf[DUMP_BMP_LINESIZE * 3];
 #endif
 
 #if CONFIG_RTC
@@ -225,6 +228,17 @@ void screen_dump(void)
 #else
                 *dst++ = htole16(*src++);
 #endif
+            }
+            while (dst < dst_end);
+#elif LCD_DEPTH == 24
+            dst_end = dst + LCD_WIDTH*3;
+            src = FBADDR(0, y);
+            do
+            {
+                *dst++ = src->b;
+                *dst++ = src->g;
+                *dst++ = src->r;
+                ++src;
             }
             while (dst < dst_end);
 

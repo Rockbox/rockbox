@@ -470,7 +470,6 @@ static int pf_state;
 
 /** code */
 static bool free_slide_prio(int prio);
-static inline unsigned fade_color(pix_t c, unsigned a);
 bool load_new_slide(void);
 int load_surface(int);
 
@@ -646,10 +645,15 @@ static inline PFreal fcos(int iangle)
     return fsin(iangle + (IANGLE_MAX >> 2));
 }
 
-static inline unsigned scale_val(unsigned val, unsigned bits)
+/* scales the 8bit subpixel value to native lcd format, indicated by bits */
+static inline unsigned scale_subpixel_lcd(unsigned val, unsigned bits)
 {
+    (void) bits;
+#if LCD_PIXELFORMAT != RGB888
     val = val * ((1 << bits) - 1);
-    return ((val >> 8) + val + 128) >> 8;
+    val = ((val >> 8) + val + 128) >> 8;
+#endif
+    return val;
 }
 
 static void output_row_8_transposed(uint32_t row, void * row_in,
@@ -666,10 +670,10 @@ static void output_row_8_transposed(uint32_t row, void * row_in,
     unsigned r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
-        r = scale_val(qp->red, 5);
-        g = scale_val(qp->green, 6);
-        b = scale_val((qp++)->blue, 5);
-        *dest = LCD_RGBPACK_LCD(r,g,b);
+        r = scale_subpixel_lcd(qp->red, 5);
+        g = scale_subpixel_lcd(qp->green, 6);
+        b = scale_subpixel_lcd((qp++)->blue, 5);
+        *dest = FB_RGBPACK_LCD(r,g,b);
     }
 #endif
 }
@@ -690,11 +694,11 @@ static void output_row_32_transposed(uint32_t row, void * row_in,
     int r, g, b;
     for (; dest < end; dest += ctx->bm->height)
     {
-        r = scale_val(SC_OUT(qp->r, ctx), 5);
-        g = scale_val(SC_OUT(qp->g, ctx), 6);
-        b = scale_val(SC_OUT(qp->b, ctx), 5);
+        r = scale_subpixel_lcd(SC_OUT(qp->r, ctx), 5);
+        g = scale_subpixel_lcd(SC_OUT(qp->g, ctx), 6);
+        b = scale_subpixel_lcd(SC_OUT(qp->b, ctx), 5);
         qp++;
-        *dest = LCD_RGBPACK_LCD(r,g,b);
+        *dest = FB_RGBPACK_LCD(r,g,b);
     }
 #endif
 }
@@ -714,10 +718,10 @@ static void output_row_32_transposed_fromyuv(uint32_t row, void * row_in,
         v = SC_OUT(qp->r, ctx);
         qp++;
         yuv_to_rgb(y, u, v, &r, &g, &b);
-        r = scale_val(r, 5);
-        g = scale_val(g, 6);
-        b = scale_val(b, 5);
-        *dest = LCD_RGBPACK_LCD(r, g, b);
+        r = scale_subpixel_lcd(r, 5);
+        g = scale_subpixel_lcd(g, 6);
+        b = scale_subpixel_lcd(b, 5);
+        *dest = FB_RGBPACK_LCD(r, g, b);
     }
 }
 #endif
@@ -1793,14 +1797,13 @@ static void recalc_offsets(void)
     offsetY = DISPLAY_WIDTH / 2 * (fsin(itilt) + PFREAL_ONE / 2);
 }
 
-
 /**
-   Fade the given color by spreading the fb_data (ushort)
-   to an uint, multiply and compress the result back to a ushort.
+   Fade the given color by spreading the fb_data
+   to an uint, multiply and compress the result back to a fb_data.
  */
-#if (LCD_PIXELFORMAT == RGB565SWAPPED)
-static inline unsigned fade_color(pix_t c, unsigned a)
+static inline pix_t fade_color(pix_t c, unsigned a)
 {
+#if (LCD_PIXELFORMAT == RGB565SWAPPED)
     unsigned int result;
     c = swap16(c);
     a = (a + 2) & 0x1fc;
@@ -1808,24 +1811,29 @@ static inline unsigned fade_color(pix_t c, unsigned a)
     result |= ((c & 0x7e0) * a) & 0x7e000;
     result >>= 8;
     return swap16(result);
-}
+
 #elif LCD_PIXELFORMAT == RGB565
-static inline unsigned fade_color(pix_t c, unsigned a)
-{
     unsigned int result;
     a = (a + 2) & 0x1fc;
     result = ((c & 0xf81f) * a) & 0xf81f00;
     result |= ((c & 0x7e0) * a) & 0x7e000;
     result >>= 8;
     return result;
-}
+
+#elif LCD_PIXELFORMAT == RGB888
+    unsigned int pixel = FB_UNPACK_SCALAR_LCD(c);
+    unsigned int result;
+    a = (a + 2) & 0x1fc;
+    result  = ((pixel & 0xff00ff) * a) & 0xff00ff00;
+    result |= ((pixel & 0x00ff00) * a) & 0x00ff0000;
+    result >>= 8;
+    return FB_SCALARPACK(result);
+
 #else
-static inline unsigned fade_color(pix_t c, unsigned a)
-{
     unsigned val = c;
     return MULUQ(val, a) >> 8;
-}
 #endif
+}
 
 /**
  * Render a single slide

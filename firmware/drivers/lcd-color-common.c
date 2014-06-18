@@ -422,7 +422,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                 b = clamp(b, 0, 64*256-1);
             }
 
-            *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
             dst++;
@@ -442,7 +442,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                 b = clamp(b, 0, 64*256-1);
             }
 
-            *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
             dst++;
@@ -487,7 +487,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                 b = clamp(b, 0, 64*256-1);
             }
 
-            *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
             dst++;
@@ -507,7 +507,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                 b = clamp(b, 0, 64*256-1);
             }
 
-            *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
             dst++;

@@ -136,9 +136,9 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
              * come before the text style tag color fields need to be preserved */
             if (data->style & STYLE_GRADIENT)
             {
-                fb_data tc  = linedes->text_color,
-                        lc  = linedes->line_color,
-                        lec = linedes->line_end_color;
+                unsigned tc  = linedes->text_color,
+                         lc  = linedes->line_color,
+                         lec = linedes->line_end_color;
                 *linedes = *data;
                 linedes->text_color     = tc;
                 linedes->line_color     = lc;

@@ -53,8 +53,8 @@
 #define LCD_HEIGHT 220
 /* sqrt(176^2 + 220^2) / 1.8 = 156.5 */
 #define LCD_DPI 157
-#define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565 /* rgb565 */
+#define LCD_DEPTH  24   /* 65536 colours */
+#define LCD_PIXELFORMAT RGB888 /* rgb565 */
 
 #ifndef BOOTLOADER
 /* define this if you have LCD enable function */

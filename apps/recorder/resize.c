@@ -680,6 +680,7 @@ static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
     unsigned r, g, b, y, u, v;
     
     for (col = 0; col < ctx->bm->width; col++) {
+        (void) delta;
         if (ctx->dither)
             delta = DITHERXDY(col,dy);
         y = SC_OUT(qp->b, ctx);
@@ -687,10 +688,12 @@ static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
         v = SC_OUT(qp->r, ctx);
         qp++;
         yuv_to_rgb(y, u, v, &r, &g, &b);
+#if LCD_DEPTH < 24
         r = (31 * r + (r >> 3) + delta) >> 8;
         g = (63 * g + (g >> 2) + delta) >> 8;
         b = (31 * b + (b >> 3) + delta) >> 8;
-        *dest = LCD_RGBPACK_LCD(r, g, b);
+#endif
+        *dest = FB_RGBPACK_LCD(r, g, b);
         dest += DEST_STEP;
     }
 }
@@ -764,7 +767,7 @@ static void output_row_32_native(uint32_t row, void * row_in,
                     *dest++ |= vi_pattern[bright] << shift;
                 }
 #endif /* LCD_PIXELFORMAT */
-#elif LCD_DEPTH == 16
+#elif LCD_DEPTH >= 16
                 /* iriver h300, colour iPods, X5 */
                 (void)fb_width;
                 fb_data *dest = STRIDE_MAIN((fb_data *)ctx->bm->data + fb_width * row,
@@ -780,16 +783,19 @@ static void output_row_32_native(uint32_t row, void * row_in,
                     bm_alpha += ALIGN_UP(ctx->bm->width, 2)*row/2;
 
                 for (col = 0; col < ctx->bm->width; col++) {
+                    (void) delta;
                     if (ctx->dither)
                         delta = DITHERXDY(col,dy);
                     q0 = *qp++;
                     r = SC_OUT(q0.r, ctx);
                     g = SC_OUT(q0.g, ctx);
                     b = SC_OUT(q0.b, ctx);
+#if LCD_DEPTH < 24
                     r = (31 * r + (r >> 3) + delta) >> 8;
                     g = (63 * g + (g >> 2) + delta) >> 8;
                     b = (31 * b + (b >> 3) + delta) >> 8;
-                    *dest = LCD_RGBPACK_LCD(r, g, b);
+#endif
+                    *dest = FB_RGBPACK_LCD(r, g, b);
                     dest += STRIDE_MAIN(1, ctx->bm->height);
                     if (bm_alpha) {
                         /* pack alpha channel for 2 pixels into 1 byte */

@@ -170,7 +170,7 @@ void xlcd_filltriangle_screen(struct screen* display,
         xlcd_filltriangle_vertical(display, x1, y1, x2, y2, x3, y3);
 }
 
-#if LCD_DEPTH >= 8
+#if LCD_DEPTH >= 8 && LCD_DEPTH <= 16
 
 #ifdef HAVE_LCD_COLOR
 static const fb_data graylut[256] = {
@@ -244,6 +244,8 @@ static const fb_data graylut[256] = {
 };
 #endif /* HAVE_LCD_COLOR */
 
+/* unused functions, enable when needed */
+#if 0
 /* Draw a partial greyscale bitmap, canonical 8 bit format */
 void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height)
@@ -286,7 +288,13 @@ void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
 #ifdef HAVE_LCD_COLOR
         do
+#if LCD_DEPTH == 16
             *dst_row++ = graylut[*src_row++];
+#else
+            /* untested change because this function is completely unused */
+            *dst_row->r = *dst_row->g = *dst_row->b = *src_row++;
+            dst_row++;
+#endif
         while (src_row < row_end);
 #endif
 
@@ -302,6 +310,7 @@ void xlcd_gray_bitmap(const unsigned char *src, int x, int y, int width,
 {
     xlcd_gray_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
+#endif
 
 #ifdef HAVE_LCD_COLOR
 /* Draw a partial colour bitmap, canonical 24 bit RGB format */
@@ -379,4 +388,3 @@ void xlcd_color_bitmap(const unsigned char *src, int x, int y, int width,
 #endif /* LCD_DEPTH >= 8 */
 
 #endif /* HAVE_LCD_BITMAP */
-

@@ -47,7 +47,7 @@
 /* sqrt(240^2 + 320^2) / 2.6 = 153.8 */
 #define LCD_DPI 154
 
-#define LCD_DEPTH  16
+#define LCD_DEPTH  24
 /* Check that but should not matter */
 #define LCD_PIXELFORMAT RGB565
 

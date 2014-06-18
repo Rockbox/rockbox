@@ -70,9 +70,9 @@ int save_bmp_file( char* filename, struct bitmap *bm )
             fb_data *d = (fb_data*)( bm->data ) + (x+y*bm->width);
             unsigned char c[] =
             {
-                RGB_UNPACK_BLUE( *d ),
-                RGB_UNPACK_GREEN( *d ),
-                RGB_UNPACK_RED( *d )
+                FB_UNPACK_BLUE( *d ),
+                FB_UNPACK_GREEN( *d ),
+                FB_UNPACK_RED( *d )
             };
             rb->write( fh, c, 3 );
         }

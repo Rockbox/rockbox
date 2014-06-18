@@ -22,7 +22,7 @@ clock
 rockboy
 #endif
 
-#ifdef HAVE_TAGCACHE
+#if defined(HAVE_TAGCACHE)
 pictureflow
 #endif
 

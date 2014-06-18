@@ -127,7 +127,13 @@ typedef unsigned char fb_data;
 #elif LCD_DEPTH <= 16
 typedef unsigned short fb_data;
 #define FB_DATA_SZ 2
-#else /* LCD_DEPTH > 16 */
+#elif LCD_DEPTH <= 24
+struct _fb_pixel {
+    unsigned char b, g, r;
+};
+typedef struct _fb_pixel fb_data;
+#define FB_DATA_SZ 3
+#else /* LCD_DEPTH > 24 */
 typedef unsigned long fb_data;
 #define FB_DATA_SZ 4
 #endif /* LCD_DEPTH */
@@ -341,6 +347,31 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define RGB_UNPACK_GREEN_LCD(x)  _RGB_UNPACK_GREEN_LCD(x)
 #define RGB_UNPACK_BLUE_LCD(x)   _RGB_UNPACK_BLUE_LCD(x)
 #endif /* RGB565* */
+
+#elif LCD_PIXELFORMAT == RGB888
+#define LCD_MAX_RED    255
+#define LCD_MAX_GREEN  255
+#define LCD_MAX_BLUE   255
+#define LCD_RED_BITS   8
+#define LCD_GREEN_BITS 8
+#define LCD_BLUE_BITS  8
+
+/* pack/unpack native RGB values */
+#define _RGBPACK(r, g, b)        ( r << 16 | g << 8 | b )
+#define _RGB_UNPACK_RED(x)       ((x >> 16) & 0xff)
+#define _RGB_UNPACK_GREEN(x)     ((x >>  8) & 0xff)
+#define _RGB_UNPACK_BLUE(x)      ((x >>  0) & 0xff)
+
+#define _LCD_UNSWAP_COLOR(x)     (x)
+#define LCD_RGBPACK(r, g, b)     _RGBPACK((r), (g), (b))
+#define LCD_RGBPACK_LCD(r, g, b) _RGBPACK((r), (g), (b))
+#define RGB_UNPACK_RED(x)        _RGB_UNPACK_RED(x)
+#define RGB_UNPACK_GREEN(x)      _RGB_UNPACK_GREEN(x)
+#define RGB_UNPACK_BLUE(x)       _RGB_UNPACK_BLUE(x)
+#define RGB_UNPACK_RED_LCD(x)    _RGB_UNPACK_RED(x)
+#define RGB_UNPACK_GREEN_LCD(x)  _RGB_UNPACK_GREEN(x)
+#define RGB_UNPACK_BLUE_LCD(x)   _RGB_UNPACK_BLUE(x)
+
 #else
 /* other colour depths */
 #endif
@@ -366,6 +397,58 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define LCD_DEFAULT_BG LCD_WHITE
 
 #endif /* HAVE_LCD_COLOR */
+
+/* Framebuffer conversion macros: Convert from and to the native display data
+ * format (fb_data).
+ *
+ * FB_RGBPACK:          Convert the three r,g,b values to fb_data. r,g,b are
+ *                      assumed to in 8-bit format.
+ * FB_RGBPACK_LCD       Like FB_RGBPACK, except r,g,b shall be in display-native
+ *                      bit format (e.g. 5-bit r for RGB565)
+ * FB_UNPACK_RED        Extract the red component of fb_data into 8-bit red value.
+ * FB_UNPACK_GREEN      Like FB_UNPACK_RED, just for the green component.
+ * FB_UNPACK_BLIE       Like FB_UNPACK_RED, just for the green component.
+ * FB_SCALARPACK        Similar to FB_RGBPACK, except that the channels are already
+ *                      combined into a single scalar value. Again, 8-bit per channel.
+ * FB_SCALARPACK_LCD    Like FB_SCALARPACK, except the channels shall be in
+ *                      display-native format (i.e. the scalar is 16bits on RGB565)
+ * FB_UNPACK_SCALAR_LCD Converts an fb_data to a scalar value in display-native
+ *                      format, so it's the reverse of FB_SCALARPACK_LCD
+ */
+#if LCD_DEPTH >= 24
+static inline fb_data scalar_to_fb(unsigned p)
+{
+    union { fb_data st; unsigned sc; } convert;
+    convert.sc = p; return convert.st;
+}
+static inline unsigned fb_to_scalar(fb_data p)
+{
+    union { fb_data st; unsigned sc; } convert;
+    convert.st = p; return convert.sc;
+}
+#define FB_RGBPACK(r_, g_, b_)      ((fb_data){.r = r_, .g = g_, .b = b_})
+#define FB_RGBPACK_LCD(r_, g_, b_)  FB_RGBPACK(r_, g_, b_)
+#define FB_UNPACK_RED(fb)           ((fb).r)
+#define FB_UNPACK_GREEN(fb)         ((fb).g)
+#define FB_UNPACK_BLUE(fb)          ((fb).b)
+#define FB_SCALARPACK(c)            scalar_to_fb(c)
+#define FB_SCALARPACK_LCD(c)        scalar_to_fb(c)
+#define FB_UNPACK_SCALAR_LCD(fb)    fb_to_scalar(fb)
+#elif defined(HAVE_LCD_COLOR)
+#define FB_RGBPACK(r_, g_, b_)      LCD_RGBPACK(r_, g_, b_)
+#define FB_RGBPACK_LCD(r_, g_, b_)  LCD_RGBPACK_LCD(r_, g_, b_)
+#define FB_UNPACK_RED(fb)           RGB_UNPACK_RED(fb)
+#define FB_UNPACK_GREEN(fb)         RGB_UNPACK_GREEN(fb)
+#define FB_UNPACK_BLUE(fb)          RGB_UNPACK_BLUE(fb)
+#define FB_SCALARPACK(c)            LCD_RGBPACK(RGB_UNPACK_RED(c), RGB_UNPACK_GREEN(c), RGB_UNPACK_BLUE(c))
+#define FB_SCALARPACK_LCD(c)        (c)
+#define FB_UNPACK_SCALAR_LCD(fb)    (fb)
+#else
+#define FB_SCALARPACK(c)            (c)
+#define FB_SCALARPACK_LCD(c)        (c)
+#define FB_UNPACK_SCALAR_LCD(fb)    (fb)
+#endif
+
 
 /* Frame buffer dimensions */
 #if LCD_DEPTH == 1

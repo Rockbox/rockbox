@@ -105,7 +105,7 @@ static void shades_generate(int time)
         if (blue > 255)
             blue= 510 - blue;
 
-        colours[i] = LCD_RGBPACK(red, green, blue);
+        colours[i] = FB_RGBPACK(red, green, blue);
 
         r++; g++; b++;
     }

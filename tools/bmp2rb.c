@@ -491,14 +491,6 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
     bool have_header = header_dir && header_dir[0];
     create_bm = have_header && create_bm;
 
-    if (t_depth > 16)
-    {
-        fprintf(stderr, "Generating C source not supported for this format\n");
-        fprintf(stderr, "because Rockbox does not support this display depth yet.\n");
-        fprintf(stderr, "However you are welcome to fix this!\n");
-        return;
-    }
-
     if (!id || !id[0])
         id = "bitmap";
 
@@ -520,8 +512,11 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
                 id, height, id, width);
         if (t_depth <= 8)
             fprintf(fh, "extern const unsigned char %s[];\n", id);
-        else
+        else if (t_depth <= 16)
             fprintf(fh, "extern const unsigned short %s[];\n", id);
+        else
+            fprintf(fh, "extern const fb_data %s[];\n", id);
+
 
         if (create_bm)
         {
@@ -542,8 +537,10 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
 
     if (t_depth <= 8)
         fprintf(f, "const unsigned char %s[] = {\n", id);
-    else
+    else if (t_depth == 16)
         fprintf(f, "const unsigned short %s[] = {\n", id);
+    else if (t_depth == 24)
+        fprintf(f, "const fb_data %s[] = {\n", id);
 
     for (i = 0; i < t_height; i++)
     {
@@ -555,6 +552,12 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
             else if (t_depth == 16)
                 fprintf(f, "0x%04x,%c", t_bitmap->d16[i * t_width + a],
                         (a + 1) % 10 ? ' ' : '\n');
+            else if (t_depth == 24)
+                fprintf(f, "{ .r = 0x%02x, .g = 0x%02x, .b = 0x%02x },%c",
+                        t_bitmap->d24[i * t_width + a].r,
+                        t_bitmap->d24[i * t_width + a].g,
+                        t_bitmap->d24[i * t_width + a].b,
+                        (a + 1) % 4 ? ' ' : '\n');
         }
         fprintf(f, "\n");
     }
@@ -651,7 +654,7 @@ void print_usage(void)
            "\t         6  Greyscale iPod 4-grey\n"
            "\t         7  Greyscale X5 remote 4-grey\n"
            "\t         8  16-bit packed 5-6-5 RGB with a vertical stride\n"
-           "\t         9  24-bit BGR (raw only for now)\n");
+           "\t         9  24-bit BGR\n");
     printf("build date: " __DATE__ "\n\n");
 }
 

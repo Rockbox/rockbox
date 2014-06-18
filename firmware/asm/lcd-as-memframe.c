@@ -78,7 +78,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
             b = clamp(b, 0, 64*256-1);
         }
 
-        *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+        *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
         dst++;
@@ -98,7 +98,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
             b = clamp(b, 0, 64*256-1);
         }
 
-        *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+        *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
         dst++;
@@ -143,7 +143,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
             b = clamp(b, 0, 64*256-1);
         }
 
-        *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+        *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
 #if LCD_WIDTH >= LCD_HEIGHT
         dst++;
@@ -163,7 +163,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
             b = clamp(b, 0, 64*256-1);
         }
 
-        *dst = LCD_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+        *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
 
 #if LCD_WIDTH >= LCD_HEIGHT
         dst++;

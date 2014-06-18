@@ -106,7 +106,7 @@ static fb_data pixel_to_lcd_colour(void)
     b = component_to_lcd(p->b, LCD_BLUE_BITS, NODITHER_DELTA);
     b = clamp_component_bits(b, LCD_BLUE_BITS);
 
-    return LCD_RGBPACK_LCD(r, g, b);
+    return FB_RGBPACK_LCD(r, g, b);
 }
 
 /** write a monochrome pixel to the colour LCD **/
@@ -119,7 +119,7 @@ static fb_data pixel_to_lcd_gray(void)
     b = component_to_lcd(g, LCD_BLUE_BITS, NODITHER_DELTA);
     g = component_to_lcd(g, LCD_GREEN_BITS, NODITHER_DELTA);
 
-    return LCD_RGBPACK_LCD(r, g, b);
+    return FB_RGBPACK_LCD(r, g, b);
 }
 
 /**
@@ -163,7 +163,7 @@ static fb_data pixel_odither_to_lcd(void)
 
     p->col += p->inc;
 
-    return LCD_RGBPACK_LCD(r, g, b);
+    return FB_RGBPACK_LCD(r, g, b);
 } 
 
 /**
@@ -217,7 +217,7 @@ static fb_data pixel_fsdither_to_lcd(void)
     distribute_error(&p->ce[BLU], &p->e[BLU], bc, epos, inc);
 
     /* Pack and return pixel */
-    return LCD_RGBPACK_LCD(r, g, b);
+    return FB_RGBPACK_LCD(r, g, b);
 }
 
 /* Functions for each output mode, colour then grayscale. */

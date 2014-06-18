@@ -53,11 +53,11 @@
 #define LCD_HEIGHT 240
 #endif
 
-#define LCD_DEPTH  16
+#define LCD_DEPTH  24
 /* Calculated value, important for touch sensor */
 #define LCD_DPI    180
 /* Check that but should not matter */
-#define LCD_PIXELFORMAT RGB565
+#define LCD_PIXELFORMAT RGB888
 
 /* Capacitive touchscreen */
 #define HAVE_TOUCHSCREEN

@@ -138,14 +138,14 @@ static fb_data* rli_element(lua_State *L)
 
 static int rli_set(lua_State *L)
 {
-    fb_data newvalue = (fb_data) luaL_checknumber(L, 4);
+    fb_data newvalue = FB_SCALARPACK((unsigned)luaL_checknumber(L, 4));
     *rli_element(L) = newvalue;
     return 0;
 }
 
 static int rli_get(lua_State *L)
 {
-    lua_pushnumber(L, *rli_element(L));
+    lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(*rli_element(L)));
     return 1;
 }
 

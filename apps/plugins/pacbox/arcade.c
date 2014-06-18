@@ -340,7 +340,7 @@ void decodeROMs(void)
     for( i=0; i<256; i++ ) {
         c = decoded_palette[ color_data_[i] & 0x0F ];
 #ifdef HAVE_LCD_COLOR
-        palette[i] = LCD_RGBPACK((unsigned char) (c),
+        palette[i] = FB_RGBPACK((unsigned char) (c),
                                  (unsigned char) (c >> 8),
                                  (unsigned char) (c >> 16));
 #else

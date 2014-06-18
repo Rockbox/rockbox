@@ -42,14 +42,12 @@ static const struct button_mapping *plugin_contexts[]
 #define REMOTE_LOGO_WIDTH BMPWIDTH_remote_rockboxlogo
 #define REMOTE_LOGO_HEIGHT BMPHEIGHT_remote_rockboxlogo
 #define REMOTE_LOGO remote_rockboxlogo
-extern const fb_remote_data remote_rockboxlogo[];
 #endif /* HAVE_REMOTE_LCD */
 
 #define LOGO rockboxlogo
 #include "pluginbitmaps/rockboxlogo.h"
 #define LOGO_WIDTH BMPWIDTH_rockboxlogo
 #define LOGO_HEIGHT BMPHEIGHT_rockboxlogo
-extern const fb_data rockboxlogo[];
 
 #else /* !LCD_BITMAP */
 #define DISPLAY_WIDTH 55
@@ -103,10 +101,10 @@ enum plugin_status plugin_start(const void* parameter) {
     while (1) {
 #ifdef HAVE_LCD_BITMAP
         rb->lcd_clear_display();
-        rb->lcd_bitmap(LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT);
+        rb->lcd_bitmap((const fb_data*)LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT);
 #ifdef REMOTE_LOGO
         rb->lcd_remote_clear_display();
-        rb->lcd_remote_bitmap(REMOTE_LOGO,
+        rb->lcd_remote_bitmap((const fb_data*)REMOTE_LOGO,
                 (x * (REMOTE_WIDTH - REMOTE_LOGO_WIDTH)) / (DISPLAY_WIDTH - LOGO_WIDTH),
                 (y * (REMOTE_HEIGHT - REMOTE_LOGO_HEIGHT)) / (DISPLAY_HEIGHT - LOGO_HEIGHT),
                 REMOTE_LOGO_WIDTH, REMOTE_LOGO_HEIGHT);
@@ -195,5 +193,3 @@ enum plugin_status plugin_start(const void* parameter) {
         }
     }
 }
-
-
