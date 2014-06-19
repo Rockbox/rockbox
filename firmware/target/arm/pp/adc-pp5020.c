@@ -67,8 +67,11 @@ unsigned short adc_scan(int channel)
     /* ADC values read low if PLL is enabled */
     if(PLL_CONTROL & 0x80000000){
         adcdata[channel] += 0x14;
+#if !defined(SAMSUNG_YH820) /* YH820 battery readout already clips around 4000mV, */
+                            /* we don't want an additional cutoff */
         if(adcdata[channel] > 0x400)
             adcdata[channel] = 0x400;
+#endif
     }
 #endif
 
