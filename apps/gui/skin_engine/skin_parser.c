@@ -1752,6 +1752,16 @@ static int buflib_move_callback(int handle, void* current, void* new)
     (void)new;
     if (handle == currently_loading_handle)
         return BUFLIB_CB_CANNOT_MOVE;
+    /* Any active skins may be scrolling - which means using viewports which
+     * will be moved after this callback returns. This is a hammer to make that
+     * safe. TODO: use a screwdriver instead.
+     */
+    FOR_NB_SCREENS(i)
+        screens[i].scroll_stop();
+
+    for (int i = 0; i < SKINNABLE_SCREENS_COUNT; i++)
+        skin_request_full_update(i);
+
     return BUFLIB_CB_OK;
 }
 static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
