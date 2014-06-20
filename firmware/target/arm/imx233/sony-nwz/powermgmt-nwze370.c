@@ -23,19 +23,24 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3659
+/* 3659 mV is dangerous voltage default for nwz */
+    3350
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3630
+/* 3630 mV is poweroff voltage default for nwz */
+    3300
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* Toshiba Gigabeat S Li Ion 700mAH figured from discharge curve */
-    { 3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121 },
+    /* Toshiba Gigabeat S Li Ion 700mAH figured from discharge curve */    	
+    /*{ 3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121 },*/
+
+    /* values for iphone battery mod */
+    { 3350, 3480, 3590, 3720, 3770, 3813, 3856, 3926, 3984, 4040, 4125 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
