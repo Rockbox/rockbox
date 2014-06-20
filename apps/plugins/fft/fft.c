@@ -303,13 +303,13 @@ GREY_INFO_STRUCT
 #   define FFT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SONY_NWZ_PAD)
-#define	FFT_PREV_GRAPH		BUTTON_LEFT
-#define FFT_NEXT_GRAPH		BUTTON_RIGHT
-#define FFT_AMP_SCALE		BUTTON_UP
-#define FFT_FREQ_SCALE		BUTTON_DOWN
-#define FFT_QUIT		BUTTON_BACK
-#define FFT_ORIENTATION		BUTTON_POWER
-#define FFT_WINDOW		BUTTON_PLAY
+#define FFT_PREV_GRAPH      BUTTON_LEFT
+#define FFT_NEXT_GRAPH      BUTTON_RIGHT
+#define FFT_AMP_SCALE       BUTTON_UP
+#define FFT_FREQ_SCALE      BUTTON_DOWN
+#define FFT_QUIT            BUTTON_BACK
+#define FFT_ORIENTATION     BUTTON_POWER
+#define FFT_WINDOW          BUTTON_PLAY
 
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
@@ -1088,7 +1088,7 @@ static void fft_thread_entry(void)
     fft_thread_run = true;
 
     while(fft_thread_run)
-	{
+    {
         if (!is_playing())
         {
             rb->sleep(HZ/5);
@@ -1118,7 +1118,7 @@ static void fft_thread_entry(void)
 
             rb->sleep(0);
         }
-	}
+    }
 }
 
 static bool fft_have_fft(void)
@@ -1542,7 +1542,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     while(run)
     {
-	    long delay = fft_draw();
+        long delay = fft_draw();
 
         if(delay <= 0)
         {
@@ -1550,7 +1550,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->yield(); /* tmo = 0 won't yield */
         }
 
-		int button = rb->button_get_w_tmo(delay);
+        int button = rb->button_get_w_tmo(delay);
 
         switch (button)
         {

@@ -194,9 +194,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTIONTEXT "SELECT"
 
 #elif CONFIG_KEYPAD == SONY_NWZ_PAD
-#define QUIT	BUTTON_BACK
-#define ACTION	BUTTON_PLAY
-#define ACTIONTEXT	"PLAY"
+#define QUIT       BUTTON_BACK
+#define ACTION     BUTTON_PLAY
+#define ACTIONTEXT "PLAY"
 
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
