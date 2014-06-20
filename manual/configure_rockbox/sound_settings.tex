@@ -333,13 +333,28 @@ change to customise your listening experience.
 \opt{swcodec}{
 \section{\label{ref:EQ}Equalizer}
   \screenshot{configure_rockbox/images/ss-equalizer}{The graphical equalizer}{}
-  Rockbox features a parametric equalizer (EQ). As the name suggests, a
-  parametric EQ lets you control several different parameters for each
-  band of the EQ. \nopt{gigabeats}{In some ways the EQ is similar to the
+  Rockbox features a parametric equalizer (EQ). In contrast to non-parametric
+  equalizers, a parametric EQ enables adjusting the center frequency, gain, and
+  width of EQ bands separately.  The ability to adjust the frequency and width
+  of bands enables more precise control of the EQ frequency response while 
+  avoiding the use of a large number of bands (often 12+) needed in a 
+  non-parametric EQ.
+  
+  The graphic below illustrates how the width of 10kHz band can be adjusted to
+  cover a wider (lower Q) or narrower (higher Q) range of frequencies.
+  
+  \includegraphics[width=14cm]{configure_rockbox/images/Q_factor.png}
+  
+  \nopt{gigabeats}{In some ways the EQ is similar to the
   \setting{Bass} and \setting{Treble} settings described earlier, but the EQ
-  allows you to control the sound much more carefully.} \opt{gigabeats}{The EQ
-  is similar to the \setting{Tone Controls} described above, but allows more
-  delicate control.}\\
+  allows you to control the sound much more carefully.  Note that the parameteric
+  EQ bands will be applied in addition to any bass or treble tone controls. 
+  } \opt{gigabeats}{The EQ  is similar to the \setting{Tone Controls} described 
+  above, but allows more delicate control.}\\
+  
+  \note{A maximum of 10 EQ bands are possible on most devices, but using more
+        than are required will waste battery and introduce additional rounding
+        noise.  For best results, use the fewest number of bands required.}
 
   Rockbox's parametric EQ is composed of five different bands:
   \begin{description}
@@ -362,7 +377,7 @@ change to customise your listening experience.
         centre frequency chosen.
         Graphic equalizers in home stereos are usually peaking
         filters. The peaking filters in Rockbox's EQ lets you adjust three
-        different parameters for EQ bands 1 through 3. The ``centre'' parameter
+        different parameters for EQ bands 1 through 8. The ``centre'' parameter
         controls the centre frequency of the frequency range that is affected
         as described above.
         The ``gain'' parameter controls how much each band is adjusted, and
