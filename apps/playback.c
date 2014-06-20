@@ -842,9 +842,10 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     bool play_queued = queue_peek_ex(&audio_queue, &ev, QPEEK_REMOVE_EVENTS,
                                      filter_list);
 
-    if (playing && ev.data != (intptr_t)&resume)
+    if (playing && (elapsed > 0 || offset > 0))
     {
-        resume = *(struct audio_resume_info *)ev.data;
+        if (play_queued)
+            resume = *(struct audio_resume_info *)ev.data;
 
         /* current id3->elapsed/offset are king */
         if (elapsed > 0)
