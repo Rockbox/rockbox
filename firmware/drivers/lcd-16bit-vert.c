@@ -41,6 +41,16 @@
 #define ROW_INC 1
 #define COL_INC LCD_HEIGHT
 
+extern lcd_fastpixelfunc_type* const lcd_fastpixelfuncs_backdrop[];
+extern lcd_fastpixelfunc_type* const lcd_fastpixelfuncs_bgcolor[];
+
+static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
+                                      const unsigned char *src, int src_x,
+                                      int src_y, int x, int y,
+                                      int width, int height,
+                                      int stride_image, int stride_src);
+
+#include "lcd-color-common.c"
 #include "lcd-16bit-common.c"
 #include "lcd-bitmap-common.c"
 

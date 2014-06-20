@@ -600,9 +600,7 @@ int read_bmp_fd(int fd,
         resize &= ~IMG_RESIZE;
         resize |= IMG_NORESIZE;
 #endif
-#ifdef HAVE_REMOTE_LCD
         remote = false;
-#endif
     }
 #elif !defined(PLUGIN)
     if (src_dim.width > BM_MAX_WIDTH)
@@ -652,9 +650,7 @@ int read_bmp_fd(int fd,
         totalsize = cformat->get_size(bm);
     else {
         totalsize = BM_SIZE(bm->width,bm->height,format,remote);
-#ifdef HAVE_REMOTE_LCD
         if (!remote)
-#endif
             if (depth == 32 && read_alpha) /* account for possible 4bit alpha per pixel */
                 totalsize += alphasize;
     }

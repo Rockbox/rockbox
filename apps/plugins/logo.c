@@ -104,7 +104,7 @@ enum plugin_status plugin_start(const void* parameter) {
         rb->lcd_bitmap((const fb_data*)LOGO, x, y, LOGO_WIDTH, LOGO_HEIGHT);
 #ifdef REMOTE_LOGO
         rb->lcd_remote_clear_display();
-        rb->lcd_remote_bitmap((const fb_data*)REMOTE_LOGO,
+        rb->lcd_remote_bitmap((const fb_remote_data*)REMOTE_LOGO,
                 (x * (REMOTE_WIDTH - REMOTE_LOGO_WIDTH)) / (DISPLAY_WIDTH - LOGO_WIDTH),
                 (y * (REMOTE_HEIGHT - REMOTE_LOGO_HEIGHT)) / (DISPLAY_HEIGHT - LOGO_HEIGHT),
                 REMOTE_LOGO_WIDTH, REMOTE_LOGO_HEIGHT);
