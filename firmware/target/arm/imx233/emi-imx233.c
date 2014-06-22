@@ -135,6 +135,12 @@ void imx233_emi_set_frequency(unsigned long freq)
      * WARNING DANGER don't call any external function when sdram is disabled
      * otherwise you'll poke sdram and trigger a fatal data abort ! */
 
+    static unsigned long cur_freq = -1;
+    /* avoid changes if unneeded */
+    if(cur_freq == freq)
+        return;
+    cur_freq = freq;
+
     /* first disable all interrupts */
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
     /* flush the cache */

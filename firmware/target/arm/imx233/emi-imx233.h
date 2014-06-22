@@ -46,9 +46,7 @@ struct imx233_emi_info_t
  * Absolute minimum CPU speed: 24 MHz */
 #define IMX233_EMIFREQ_151_MHz  151580
 #define IMX233_EMIFREQ_130_MHz  130910
-#define IMX233_EMIFREQ_120_MHz  120000
 #define IMX233_EMIFREQ_64_MHz    64000
-#define IMX233_EMIFREQ_24_MHz    24000
 
 void imx233_emi_set_frequency(unsigned long freq);
 struct imx233_emi_info_t imx233_emi_get_info(void);
