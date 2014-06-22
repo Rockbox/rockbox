@@ -30,15 +30,13 @@
 #include "clkctrl-imx233.h"
 #include "pinctrl-imx233.h"
 #include "dma-imx233.h"
-#include "regs/regs-uartdbg.h"
 #include "logf.h"
+#include "lcd-target.h"
 #ifndef BOOTLOADER
 #include "button.h"
 #include "font.h"
 #include "action.h"
 #endif
-
-static bool lcd_on;
 
 /**
  * DMA
@@ -170,7 +168,7 @@ static void lcd_power_seq(void)
 static void lcd_init_seq(void)
 {
     /* NOTE I don't understand why I have to use BGR, logic would say I should not */
-    spi_write_reg(0x1, 0x2b1d);// inversion
+    spi_write_reg(0x1, 0x231d);// no inversion
     spi_write_reg(0x2, 0x300);
     /* NOTE by default stmp3700 has vsync/hsync active low and data launch
      * at negative edge of dotclk, reflect this in the polarity settings */
@@ -225,18 +223,13 @@ static void lcd_display_off_seq(void)
  * Rockbox
  */
 
-bool lcd_active(void)
-{
-    return lcd_on;
-}
-
 void lcd_enable(bool enable)
 {
-    if(lcd_on == enable)
+    if(lcd_active() == enable)
         return;
 
-    lcd_on = enable;
-    if(lcd_on)
+    lcd_set_active(enable);
+    if(lcd_active())
     {
         // enable spi
         spi_enable(true);
@@ -340,28 +333,4 @@ void lcd_init_device(void)
         RUN(1), WORD_LENGTH(1));
     // enable
     lcd_enable(true);
-}
-
-void lcd_update(void)
-{
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-}
-
-void lcd_update_rect(int x, int y, int w, int h)
-{
-    #ifdef HAVE_LCD_ENABLE
-    if(!lcd_on)
-        return;
-    #endif
-    for(int yy = y; yy < y + h; yy++)
-    {
-        uint16_t *pix = FBADDR(x, yy);
-        uint8_t *p = 3 * (yy * LCD_WIDTH + x) + (uint8_t *)FRAME;
-        for(int xx = 0; xx < w; xx++, pix++)
-        {
-            *p++ = RGB_UNPACK_RED(*pix);
-            *p++ = RGB_UNPACK_GREEN(*pix);
-            *p++ = RGB_UNPACK_BLUE(*pix);
-        }
-    }
 }

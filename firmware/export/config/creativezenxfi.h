@@ -102,10 +102,8 @@
 #define LCD_HEIGHT 240
 /* sqrt(320^2 + 240^2) / 2.5 = 160.0 */
 #define LCD_DPI 160
-#define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565 /* rgb565 */
-/* framebuffer uses 24-bit/pix */
-#define IMX233_FRAMEBUFFER_SIZE (LCD_WIDTH * LCD_HEIGHT * 3)
+#define LCD_DEPTH  24   /* 65536 colours */
+#define LCD_PIXELFORMAT RGB888 /* rgb565 */
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF

@@ -1189,6 +1189,7 @@ target/arm/imx233/fmradio-imx233.c
 #endif
 target/arm/imx233/creative-zen/backlight-zen.c
 # if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
+drivers/lcd-memframe.c
 target/arm/imx233/creative-zen/lcd-zen.c
 # elif defined(CREATIVE_ZENMOZAIC)
 target/arm/imx233/creative-zen/lcd-zenmozaic.c

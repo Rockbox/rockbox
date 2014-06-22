@@ -23,4 +23,9 @@
 
 bool lcd_debug_screen(void);
 
+#if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
+#define LCD_FRAMEBUF_ADDR(col, row) (row*LCD_WIDTH + col + (fb_data *)FRAME)
+extern void lcd_set_active(bool active);
+#endif
+
 #endif /* LCD_TARGET_H */
