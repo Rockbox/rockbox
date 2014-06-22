@@ -226,7 +226,7 @@ void lcd_enable(bool enable)
         return;
 
     lcd_on = enable;
-    
+
     lcd_enable_seq(enable);
     if(enable)
         send_event(LCD_EVENT_ACTIVATION, NULL);
