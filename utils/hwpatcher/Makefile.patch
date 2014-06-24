@@ -1,0 +1,25 @@
+PREFIX?=arm-elf-eabi-
+AS=$(PREFIX)gcc
+ASFLAGS=-nostdlib -ffreestanding -mcpu=arm926ej-s
+OC=$(PREFIX)objcopy
+TARGETS=fuzeplus zenxfi2 zenxfi3 zen nwz zenxfistyle
+OPT_fuzeplus=-DSANSA_FUZEPLUS
+OPT_zenxfi2=-DCREATIVE_ZENXFI2
+OPT_zenxfi3=-DCREATIVE_ZENXFI3
+OPT_zen=-DCREATIVE_ZEN
+OPT_nwz=-DSONY_NWZ
+OPT_zenxfistyle=-DCREATIVE_ZENXFISTYLE
+
+BOOTBINS=$(patsubst %, patch_%.bin, $(TARGETS))
+BOOTELF=$(patsubst %, patch_%.elf, $(TARGETS))
+
+all: $(BOOTBINS)
+
+patch_%.bin: patch_%.elf
+	$(OC) -O binary $^ $@
+
+patch_%.elf: patch.S
+	$(AS) $(ASFLAGS) $(OPT_$(@:patch_%.elf=%)) -o $@ $<
+
+clean:
+	rm -rf $(BOOTBINS) $(BOOTELF)
