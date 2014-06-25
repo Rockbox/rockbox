@@ -95,8 +95,8 @@
 #define LCD_HEIGHT 240
 /* sqrt(320^2 + 240^2) / 2.5 = 160.0 */
 #define LCD_DPI 160
-#define LCD_DEPTH  24   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB888 /* rgb565 */
+#define LCD_DEPTH  24   /* 16M colours */
+#define LCD_PIXELFORMAT RGB888 /* rgb888 */
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
