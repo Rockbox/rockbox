@@ -513,6 +513,20 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_BACK
+#define BJACK_STAY          (BUTTON_POWER|BUTTON_PLAY)
+#define BJACK_DOUBLEDOWN    (BUTTON_POWER|BUTTON_DOWN)
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
+#define BJACK_SELECT_NAME   "Play"
+#define BJACK_STAY_NAME     "Option+Play"
+#define BJACK_QUIT_NAME     "Back"
+#define BJACK_DOUBLE_NAME   "Option+Down"
+
 #else
 #error No keymap defined!
 #endif

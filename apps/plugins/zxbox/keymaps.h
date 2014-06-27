@@ -246,6 +246,14 @@
 #define ZX_LEFT         BUTTON_LEFT
 #define ZX_RIGHT        BUTTON_RIGHT
 
+#elif (CONFIG_KEYPAD == SONY_NWZ_PAD)
+#define ZX_MENU         BUTTON_POWER
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+#define ZX_LEFT         BUTTON_LEFT
+#define ZX_RIGHT        BUTTON_RIGHT
+#define ZX_SELECT       BUTTON_PLAY
+
 #else
 #error Keymap not defined!
 
