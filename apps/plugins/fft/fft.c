@@ -1088,7 +1088,7 @@ static void fft_thread_entry(void)
     fft_thread_run = true;
 
     while(fft_thread_run)
-	{
+    {
         if (!is_playing())
         {
             rb->sleep(HZ/5);
@@ -1118,7 +1118,7 @@ static void fft_thread_entry(void)
 
             rb->sleep(0);
         }
-	}
+    }
 }
 
 static bool fft_have_fft(void)
@@ -1542,7 +1542,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     while(run)
     {
-	    long delay = fft_draw();
+        long delay = fft_draw();
 
         if(delay <= 0)
         {
@@ -1550,7 +1550,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->yield(); /* tmo = 0 won't yield */
         }
 
-		int button = rb->button_get_w_tmo(delay);
+        int button = rb->button_get_w_tmo(delay);
 
         switch (button)
         {

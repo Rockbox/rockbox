@@ -142,7 +142,7 @@ void I_ShutdownGraphics(void)
 {
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_set_mode(LCD_MODE_RGB565);
+    rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
 #endif
 
@@ -821,7 +821,7 @@ static void I_UploadNewPalette(int pal)
 
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_pal256_update_pal(paldata+256*pal);
+    rb->lcd_pal256_update_pal(paldata+256*pal);
 #endif
 #endif
 }
@@ -940,7 +940,7 @@ void I_FinishUpdate (void)
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
     (void) count;
-	rb->lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+    rb->lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 #elif defined(HAVE_LCD_COLOR)
 #if(LCD_HEIGHT>LCD_WIDTH)
@@ -1019,7 +1019,7 @@ void I_InitGraphics(void)
    
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_set_mode(LCD_MODE_PAL256);
+    rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
 #endif
 
