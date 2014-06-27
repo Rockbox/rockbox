@@ -1,0 +1,599 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_d69a84c5",
+        "filename": "apps/plugins/calculator.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "For consistency with other plugins, I would rather use a long press:\nBUTTON_BACK|BUTTON_REPEAT",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_f69f80b2",
+        "filename": "apps/plugins/chessbox/chessbox_pgn.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "CB_PLAY \u003d BUTTON_PLAY|BUTTON_REPEAT",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_56af54e3",
+        "filename": "apps/plugins/chessbox/chessbox_pgn.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "CB_LEVEL \u003d BUTTON_POWER",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_76acd0ed",
+        "filename": "apps/plugins/chessclock.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "CHC_QUIT \u003d BUTTON_BACK\n(you can use the same button for cancel settings and quit, these are different context)",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_16b9dc2e",
+        "filename": "apps/plugins/cube.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "Don\u0027t you think that BUTTON_POWER|BUTTON_LEFT or BUTTON_DOWN would be better ? Phyiscally speaking, power and right is the worst possible combo it seems to me",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_36b6583e",
+        "filename": "apps/plugins/doom/i_video.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "The QUIT button doesn\u0027t exist, that\u0027s a terrible typo (not your fault). Just discard this line.",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_f686a064",
+        "filename": "apps/plugins/doom/i_video.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "This is the actual quit button, use BUTTON_BACK|BUTTON_REPEAT",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_d681244f",
+        "filename": "apps/plugins/doom/i_video.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "BUTTON_PLAY\n(you can use the same button for enter and shoot)",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_967bac7b",
+        "filename": "apps/plugins/doom/i_video.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "BUTTON_POWER ?",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_b6802848",
+        "filename": "apps/plugins/doom/i_video.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "BUTTON_POWER|BUTTON_REPEAT ?",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_769370a4",
+        "filename": "apps/plugins/flipit.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "Maybe this could be changed to:\nQUIT\u003dlong back\nSHUFFLE\u003dback\nSOLVE\u003dlong play\nSTEP_BY_STEP\u003dlong power",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_1690fc94",
+        "filename": "apps/plugins/goban/goban.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "maybe\nMENU\u003dlong back\nRETRAT\u003dback\nADVANCE\u003dlong play",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_368df87b",
+        "filename": "apps/plugins/imageviewer/imageviewer_button.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "why not:\nremove QUIT (possible, just use the menu)\nZOOM_PRE\u003dpower\nZOOM_IN\u003dpower|BUTTON_REL\nZOOM_OUT\u003dpower|BUTTON_REPEAT\n(means each \"power\" increases zoom except for long presses which zoom out)\nPREVIOUS\u003dback\nMENU\u003dlong back",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_d6e84419",
+        "filename": "apps/plugins/minesweeper.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "maybe long play ?",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_f6ed4026",
+        "filename": "apps/plugins/minesweeper.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "and power for this one ?",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_b6f7c8f4",
+        "filename": "apps/plugins/oscilloscope.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "maybe\nQUIt\u003dlong back\nDRAWMODE\u003dback\nADVMODE\u003dlong power\nORIENTATION\u003dpower",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_96f2cc05",
+        "filename": "apps/plugins/oscilloscope.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "It means to means volume up/down should be up/down for consistency with WPS, and speed up/down be left/right",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_56dd146f",
+        "filename": "apps/plugins/pacbox/pacbox.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "The 2UP is optional, so maybe remove it and map power to 1UP",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_16e79c41",
+        "filename": "apps/plugins/pegbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 611,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "maybe:\nLVL_UP\u003dpower\nLVL_DOWN\u003dback\nRESTART\u003dlong play\nQUIT\u003dlong back",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_76da907a",
+        "filename": "apps/plugins/pegbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "remove the SAVE button, it\u0027s unused, I will remove other instances",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_96c96caf",
+        "filename": "apps/plugins/rockblox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "map back to off",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_36e4183a",
+        "filename": "apps/plugins/rockblox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "ROTATE_CCW is optional: remove it",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_f6d46048",
+        "filename": "apps/plugins/rockblox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "map ROTATE_CW to UP",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_d6cfe4b1",
+        "filename": "apps/plugins/rockblox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "ROTATE is synonym for ROTATE_CW, remove it",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_b6cee8b2",
+        "filename": "apps/plugins/rockboy/rockboy.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "there are still a few tabs here",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_56c43491",
+        "filename": "apps/plugins/rockboy/rockboy.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "this keymap looks unusable to me but I must admit I don\u0027t know how to map the buttons in a usable way either.",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_76c13080",
+        "filename": "apps/plugins/rockpaint.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "maybe\nQUIT\u003dlong back\nmenu\u003dback\ntoolbar\u003dpower\ntoolbar2\u003dlong power",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_16bebcff",
+        "filename": "apps/plugins/sokoban.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "Some keys can be shared because there two contexts (play and solution) so map:\nUNDO\u003dback\nMENU\u003dpower\nSAVE\u003dplay\ndon\u0027t map redo (optional and can be done by repeating the move)\ndon\u0027t map the level up/down/repeat (use the menu)",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_36bbb810",
+        "filename": "apps/plugins/solitaire.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 626,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "don\u0027t use MOVE_PRE, that\u0027s when MOVE is done on button release for example",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_96408c09",
+        "filename": "apps/plugins/sudoku/sudoku.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "don\u0027t map quit, use menu",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_b6458818",
+        "filename": "apps/plugins/sudoku/sudoku.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "menu\u003dback",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_564bd42b",
+        "filename": "apps/plugins/sudoku/sudoku.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "don\u0027t map toggleback (optional)",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_7648502e",
+        "filename": "apps/plugins/sudoku/sudoku.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "map possible to power",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_f63b009b",
+        "filename": "apps/plugins/sudoku/sudoku.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "alttoggle is optional and just another key for toggle, remove it",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_16555cc5",
+        "filename": "apps/plugins/text_viewer/tv_button.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-06-27T17:41:13Z",
+      "side": 1,
+      "message": "map quit to long back, menu to back, autoscroll to power and bookmark to long power ?",
+      "revId": "df5a26a83f0b33719fba4e3c78df3190fa729d03",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
