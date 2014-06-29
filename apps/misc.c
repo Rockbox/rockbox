@@ -1111,6 +1111,7 @@ int split_string(char *str, const char split_char, char *vector[], const int vec
 
 int open_utf8(const char* pathname, int flags)
 {
+    ssize_t ret;
     int fd;
     unsigned char bom[BOM_UTF_8_SIZE];
 
@@ -1120,16 +1121,23 @@ int open_utf8(const char* pathname, int flags)
 
     if(flags & (O_TRUNC | O_WRONLY))
     {
-        write(fd, BOM_UTF_8, BOM_UTF_8_SIZE);
+        ret = write(fd, BOM_UTF_8, BOM_UTF_8_SIZE);
     }
     else
     {
-        read(fd, bom, BOM_UTF_8_SIZE);
+        ret = read(fd, bom, BOM_UTF_8_SIZE);
         /* check for BOM */
-        if(memcmp(bom, BOM_UTF_8, BOM_UTF_8_SIZE))
-            lseek(fd, 0, SEEK_SET);
+        if (ret == BOM_UTF_8_SIZE)
+        {
+            if(memcmp(bom, BOM_UTF_8, BOM_UTF_8_SIZE))
+                lseek(fd, 0, SEEK_SET);
+        }
     }
-    return fd;
+    /* read or write failure, do not continue */
+    if (ret < 0)
+        close(fd);
+
+    return ret >= 0 ? fd : -1;
 }
 
 
