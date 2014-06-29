@@ -1,0 +1,16 @@
+\subsection{2048}
+%\screenshot{plugins/images/ss-2048}{2048}{fig:2048}
+
+2048 is a simple, addictive puzzle game played by moving tiles in around on a 4x4 grid. Tiles slide as far as possible in the direction chosen by the player each turn until they are stopped by either another tile or the edge of the grid. If two tiles of the same number collide while moving, they merge into a tile with the total value of the two tiles that collided. The resulting tile cannot merge with another the same move. After each move, a tile with the value of 2 or 4 is created in an empty spot on the grid.
+
+The game is won when a tile with a value of 2048 is created, and the player loses when there are no more possible moves.
+
+\begin{btnmap}
+  \PluginUp, \PluginDown, \PluginLeft, \PluginRight
+  \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp, \PluginRCDown, \PluginRCLeft, \PluginRCRight}
+  & Slide tiles\\
+
+  \PluginCancel
+  \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
+  & Go to menu\\
+\end{btnmap}
