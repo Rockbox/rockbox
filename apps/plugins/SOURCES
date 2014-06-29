@@ -134,13 +134,7 @@ wavrecord.c
 
 #endif /* PLATFORM_NATIVE */
 
-
-
-#if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR) /* Not for hwcodec sims */
 metronome.c
-#endif
-
-
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Archos Player */
 
