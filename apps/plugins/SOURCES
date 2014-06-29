@@ -187,6 +187,8 @@ fire.c
 plasma.c
 
 #ifdef HAVE_LCD_COLOR
+/* 2048 runs on 1-bit LCDs, but it is unplayable */
+2048.c
 clix.c
 codebuster.c
 #endif
