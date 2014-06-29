@@ -1,6 +1,23 @@
 \subsection{Metronome}
+
 This plugin can be used as a metronome to keep time during music
-practice. Adjust the tempo through the interface or by tapping it out
+practice. It supports two modes of operation, depending on it being
+started from the plugin menu or as viewer for tempomap (\verb:.tempo:)
+files.
+
+The sound is a piercing square wave that can be heard well also
+through loud music from a band.
+In addition, the display also indicates the beats while playing
+so that you can discreetly place the device
+in your sight for checking the tempo instead of wearing
+headphones at a concert.
+
+\subsubsection{Simple Interactive Mode}
+
+This is the mode of operation that is active when starting the
+plugin directly from the menu. It offers a uniform metronome sound at
+a constant tempo.
+You can adjust the tempo through the interface or by tapping it out
 on the appropriate button.
 
 \begin{btnmap}
@@ -34,3 +51,159 @@ on the appropriate button.
         \opt{HAVEREMOTEKEYMAP}{& }
         & Sync tap \\}
 \end{btnmap}
+
+
+\subsubsection{Programmed Track Mode}
+
+When starting the plugin as a viewer for tempomap files
+(ending in \verb:.tempo:), it starts in the track mode that offers
+playback of a preprogrammed metronome track consisting out of
+multiple parts, each with possibly different properties.
+
+In contrast to the simple mode, there exists the notion of
+meter and bars, along with emphasis on certain beats.
+Parts can have these properties:
+
+\begin{itemize}
+    \item finite or infinite duration in bars (navigation only jumps
+        to the beginning of infinite parts),
+    \item differing meters (4/4, 3/4, 6/8, etc., default 4/4),
+    \item differing tempo (always in quarter beats per minute,
+        default 120) with
+    \begin{itemize}
+        \item one tempo per bar or even one tempo per beat, or
+        \item smooth tempo changes with configurable acceleration, and
+    \end{itemize}
+    \item custom beat patterns (tick/tock/silence on each beat),
+        default being emphasis (tick) on first beat, normal sound
+        (tock) on others.
+\end{itemize}
+
+\paragraph{The button mapping}
+is different to enable navigation in the programmed track.
+\begin{btnmap}
+    \PluginExit
+       \opt{HAVEREMOTEKEYMAP}{& }
+        & Exit plugin \\
+
+    \PluginCancel
+       \opt{HAVEREMOTEKEYMAP}{& \PluginRCCancel}
+        & Stop (stay at position) \\
+        
+    \PluginSelect
+       \opt{HAVEREMOTEKEYMAP}{& \PluginRCSelect}
+        & Start from / Stop at current position \\
+
+    \PluginLeft{} / \PluginRight
+       \opt{HAVEREMOTEKEYMAP}{& \PluginRCLeft{} / \PluginRCRight}
+        & Seek in track \\
+
+    \opt{scrollwheel}{\PluginScrollFwd{} / \PluginScrollBack}
+    \nopt{scrollwheel}{\PluginUp{} / \PluginDown}
+        \opt{HAVEREMOTEKEYMAP}{& \PluginRCUp{} / \PluginRCDown}
+        & Adjust volume \\
+
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD}{
+      \ButtonRec
+        \opt{HAVEREMOTEKEYMAP}{& }
+        & Sync tap \\}
+\end{btnmap}
+
+\paragraph{Navigation}
+The display indicates the part properties and position in track as such:
+\begin{verbatim}
+    Metronome Track
+    ---------------
+       "Interlude"
+    3/4@120 V-25
+    P2/13: B1/5+2
+\end{verbatim}
+In this example, the part label is ``Interlude'', the meter is 3/4 and
+the tempo 120 quarter beats per minute (bpm). The volume setting is at -25
+and this is the second part of a track with 13 total. In that part,
+the position is at the second beat of the first bar of five.
+
+\paragraph{The syntax of programmed tracks}
+in tempomap files follows the format defined by
+\url{http://das.nasophon.de/klick/}.
+Actually, the goal is to keep compatibility between klick and this
+Rockbox metronome.
+The parts of a track are specified one line each in this scheme
+(pieces in [] optional):
+\begin{verbatim}
+[name:] bars [meter ]tempo[-tempo2[*accel|/accel] [pattern] [volume]
+\end{verbatim}
+The bar count and tempo always have to be specified, the rest is optional.
+
+One example is
+\begin{verbatim}
+part I: 12 3/4 133
+\end{verbatim}
+for a part named ``part I'' , 12 bars long, in 3/4 meter with
+a tempo of 133 quarter beats per minute.
+Tempo changes are indicated by specifying a tempo range and the
+acceleration in one of these ways:
+\begin{verbatim}
+0 4/4 90-150*0.25
+0 4/4 150-90/4
+16 4/4 100-200
+\end{verbatim}
+The first one goes from 90 to 150 bpm in an endless part with 0.25 bpm
+increase per bar. The second one goes down from 150 to 90 with
+4 bars per bpm change, which is the same acceleration as in the first line.
+The last one is a part of 16 bars length that changes tempo from 100 to 200
+smoothly during its whole lifetime (6.25 bpm/bar). For details on how the
+acceleration works, see
+\url{http://thomas.orgis.org/science/metronome-tempomath/tempomath.html}.
+
+It is also possible to provide a tempo for each individual beat in a part
+by separating values with a comma (no spaces),
+\begin{verbatim}
+varibeat: 3 4/4 135,90,78,100,120,120,99,100,43,94,120,133
+\end{verbatim}
+where the beat duration is first according to 135 bpm, then 90 bpm,
+and so forth. You are required to provide a value for each beat
+in all bars of the part.
+
+You can provide a pattern that controls how the beats are played:
+\begin{center}
+\begin{tabular}{c|l}
+    Symbol & Meaning \\
+    \hline
+    X & emphasized beat (Tick) \\
+    x & normal beat (Tock) \\
+    . & silent beat
+\end{tabular}
+\end{center}
+
+Some examples:
+\begin{verbatim}
+default: 0 4/4 120 Xxxx
+rockon2: 0 4/4 120 xXxX
+  solea: 0 12/4 180 xxXxxXxXxXxX
+shuffle: 0 12/12 120 x.xX.xx.xX..
+  funky: 0 16/16 120 x.x.X..X.Xx.X..X
+\end{verbatim}
+The 12/12 for the shuffle create 1/4 triplets. Just do a bit of math;-)
+This is still a metronome, not a drum machine, but it can act like a basic
+one, helping you to figure out a certain rhythm within the meter.
+
+The UI is developed so that it fits into the display of a Sansa Clip+ and
+that is the hardware device it is tested on. It seems to work reasonably
+on some other models in the simulator.
+
+At last, a more complete tempomap file:
+\begin{verbatim}
+# An example track exercising the programmable Rockbox metronome
+# or also http://das.nasophon.de/klick/.
+     lead-in: 1 4/4 120 XXXX 0.5 # 4 emphasized but less loud ticks
+       intro: 4 4/4 120          # standard beat
+tearing down: 4     120-90       # changing tempo from 120 to 90
+       break: 2 1/4 90           # 2 1/4 bars at 90
+     rolling: 2 6/8 90           # 2 6/8 at same tempo (quarters!)
+    rumbling: 4 3/4 90 X.x       # 3/4, first (tick) and last (tock)
+     ramp-up: 8 2/4 90-150       # speeding up to 150 bpm again
+        flow: 4     150          # steady 4/4 at 150 bpm
+       death: 8     150-60       # going down to 60
+       final: 1 1/1 60           # one last hit
+\end{verbatim}
