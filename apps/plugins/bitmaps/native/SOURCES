@@ -1,5 +1,27 @@
 #ifdef HAVE_LCD_BITMAP
 
+/* 2048 */
+
+#define MIN(x,y) ((x<y)?x:y)
+#if MIN(LCD_WIDTH, LCD_HEIGHT)>=240
+_2048_tiles.48x48x24.bmp
+_2048_background.224x224x24.bmp
+#elif MIN(LCD_WIDTH, LCD_HEIGHT)>=176
+_2048_tiles.36x36x24.bmp
+_2048_background.168x168x24.bmp
+#elif MIN(LCD_WIDTH, LCD_HEIGHT)>=132 || MIN(LCD_WIDTH, LCD_HEIGHT)>=128
+_2048_tiles.26x26x24.bmp
+_2048_background.121x121x24.bmp
+#elif MIN(LCD_WIDTH, LCD_HEIGHT)>=110
+_2048_tiles.22x22x24.bmp
+_2048_background.103x103x24.bmp
+#else
+/* default to smallest bitmaps */
+_2048_tiles.12x12x24.bmp
+_2048_background.56x56x24.bmp
+#endif
+#undef MIN
+
 /* Brickmania */
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 112
