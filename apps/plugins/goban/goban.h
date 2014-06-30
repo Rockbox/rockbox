@@ -392,6 +392,14 @@
 #define  GBN_BUTTON_PLAY               BUTTON_SELECT
 #define  GBN_BUTTON_MENU               BUTTON_MENU
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define GBN_BUTTON_UP                  BUTTON_UP
+#define GBN_BUTTON_DOWN                BUTTON_DOWN
+#define GBN_BUTTON_LEFT                BUTTON_LEFT
+#define GBN_BUTTON_RIGHT               BUTTON_RIGHT
+#define GBN_BUTTON_PLAY                BUTTON_PLAY
+#define GBN_BUTTON_MENU                BUTTON_BACK
+
 #elif (CONFIG_KEYPAD == HM60X_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN
