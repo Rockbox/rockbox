@@ -71,6 +71,15 @@ On Windows, run
 This will build the DLL files (if missing) and create LIB files from them.
 
 
+Create translations
+-------------------
+Create the translations .qm files. This is only necessary if qmake has been
+called without -config dbg (in which case translations will be left out and not
+compiled into the binary)
+
+  c:\QtSDK\Desktop\Qt\4.7.4\msvc2008\bin\lrelease.exe ..\rbutilqt.pro
+
+
 Create a VS project file
 ------------------------
 To create a project file for VS, run
