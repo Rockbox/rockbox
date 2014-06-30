@@ -18,11 +18,15 @@ LIBS = ipodpatcher sansapatcher chinachippatcher \
        mkamsboot mkimxboot mkmpioboot mktccboot \
        ucl rbspeex
 
-ifeq ($(findstring Linux,$(shell uname)),Linux)
+# on Windows uname is not available. However, the environment variable OS holds
+# Windows_NT so check that instead.
+ifneq ($(OS),Windows_NT)
 PWD=$(shell pwd)
+RM=rm -rf
 all: dll
 else
 PWD=$(abspath $(TOP))
+RM=del /q /f
 all: lib
 endif
 
@@ -50,8 +54,8 @@ lib: $(addsuffix .lib,$(LIBS))
 	@lib /machine:x86 /nologo /def:$(basename $<).def
 
 clean:
-	rm -rf $(addsuffix .dll,$(LIBS))
-	rm -rf $(addsuffix .def,$(LIBS))
-	rm -rf $(addsuffix .exp,$(LIBS))
-	rm -rf $(addsuffix .lib,$(LIBS))
-	rm -rf build-dll
+	$(RM) $(addsuffix .dll,$(LIBS))
+	$(RM) $(addsuffix .def,$(LIBS))
+	$(RM) $(addsuffix .exp,$(LIBS))
+	$(RM) $(addsuffix .lib,$(LIBS))
+	$(RM) build-dll
