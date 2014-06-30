@@ -617,6 +617,23 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK    "POWER + LEFT"
 #   define HK_REM2STACK    "POWER + RIGHT"
 
+#elif (CONFIG_KEYPAD == SONY_NWZ_PAD)
+#define SOL_QUIT      BUTTON_BACK
+#define SOL_UP        BUTTON_UP
+#define SOL_DOWN      BUTTON_DOWN
+#define SOL_LEFT      BUTTON_LEFT
+#define SOL_RIGHT     BUTTON_RIGHT
+#define SOL_MOVE      BUTTON_PLAY
+#define SOL_DRAW      (BUTTON_POWER|BUTTON_UP)
+#define SOL_REM2CUR   (BUTTON_POWER|BUTTON_DOWN)
+#define SOL_CUR2STACK (BUTTON_POWER|BUTTON_LEFT)
+#define SOL_REM2STACK (BUTTON_POWER|BUTTON_RIGHT)
+#define HK_MOVE       "Play"
+#define HK_DRAW       "Option+Up"
+#define HK_REM2CUR    "Option+Down"
+#define HK_CUR2STACK  "Option+Left"
+#define HK_REM2STACK  "Option+Right"
+
 #else
 #error No keymap defined!
 #endif

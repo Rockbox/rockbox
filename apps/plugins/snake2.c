@@ -365,6 +365,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define SNAKE2_PLAYPAUSE BUTTON_SELECT
 #define SNAKE2_PLAYPAUSE_TEXT "Select"
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define SNAKE2_LEFT         BUTTON_LEFT
+#define SNAKE2_RIGHT        BUTTON_RIGHT
+#define SNAKE2_UP           BUTTON_UP
+#define SNAKE2_DOWN         BUTTON_DOWN
+#define SNAKE2_QUIT         BUTTON_BACK
+#define SNAKE2_PLAYPAUSE    BUTTON_PLAY
+#define SNAKE2_PLAYPAUSE_TEXT    "Play"
+
+
 #else
 #error No keymap defined!
 #endif

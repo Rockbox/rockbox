@@ -367,6 +367,16 @@
 #define CHC_SETTINGS_OK BUTTON_SELECT
 #define CHC_SETTINGS_CANCEL BUTTON_PREV
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define CHC_QUIT             BUTTON_BACK
+#define CHC_STARTSTOP        BUTTON_PLAY
+#define CHC_RESET            BUTTON_LEFT
+#define CHC_MENU             BUTTON_POWER
+#define CHC_SETTINGS_INC     BUTTON_UP
+#define CHC_SETTINGS_DEC     BUTTON_DOWN
+#define CHC_SETTINGS_OK      BUTTON_RIGHT
+#define CHC_SETTINGS_CANCEL  BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

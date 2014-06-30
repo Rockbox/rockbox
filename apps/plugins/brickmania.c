@@ -295,6 +295,14 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define QUIT      BUTTON_BACK
+#define LEFT      BUTTON_LEFT
+#define RIGHT     BUTTON_RIGHT
+#define SELECT    BUTTON_PLAY
+#define UP        BUTTON_UP
+#define DOWN      BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

@@ -429,6 +429,16 @@
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define ROCKBLOX_OFF           (BUTTON_BACK|BUTTON_REPEAT)
+#define ROCKBLOX_ROTATE_CCW    BUTTON_POWER
+#define ROCKBLOX_ROTATE_CW     BUTTON_UP
+#define ROCKBLOX_DOWN          BUTTON_DOWN
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_DROP          BUTTON_PLAY
+#define ROCKBLOX_RESTART       BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

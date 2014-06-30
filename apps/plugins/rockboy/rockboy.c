@@ -378,6 +378,19 @@ static void setoptions (void)
         options.SELECT = BUTTON_SELECT;
         options.MENU   = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_LEFT;
+        options.RIGHT  = BUTTON_RIGHT;
+
+        options.START  = BUTTON_PLAY;
+        options.MENU   = BUTTON_BACK;
+        options.SELECT = (BUTTON_POWER|BUTTON_PLAY);
+        options.A      = (BUTTON_POWER|BUTTON_LEFT);
+        options.B      = (BUTTON_POWER|BUTTON_RIGHT);
+
+
 #else
 #error No Keymap Defined!
 #endif

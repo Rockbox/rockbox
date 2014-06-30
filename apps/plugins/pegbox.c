@@ -594,6 +594,23 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_DOWN_TEXT "PREV"
 #define SELECT_TEXT "SELECT"
 
+#elif CONFIG_KEYPAD == SONY_NWZ_PAD
+#define PEGBOX_RIGHT      BUTTON_RIGHT
+#define PEGBOX_LEFT       BUTTON_LEFT
+#define PEGBOX_UP         BUTTON_UP
+#define PEGBOX_DOWN       BUTTON_DOWN
+#define PEGBOX_QUIT       BUTTON_POWER
+#define PEGBOX_SELECT     BUTTON_PLAY
+#define PEGBOX_RESTART    BUTTON_BACK
+
+#define SAVE_TEXT         "BACK+PLAY"
+#define QUIT_TEXT         "POWER"
+#define RESTART_TEXT      "BACK+POWER"
+#define LVL_UP_TEXT       "BACK+RIGHT"
+#define LVL_DOWN_TEXT     "BACK+LEFT"
+#define SELECT_TEXT       "PLAY"
+
+
 #else
 #error Unsupported keymap!
 #endif
