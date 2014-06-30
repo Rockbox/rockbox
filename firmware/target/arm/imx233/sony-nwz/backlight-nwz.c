@@ -29,8 +29,10 @@
 
 void _backlight_set_brightness(int brightness)
 {
+    bool en = brightness > 0;
     imx233_pwm_setup_simple(2, 24000, 100 - brightness);
-    imx233_pwm_enable(2, true);
+    imx233_pwm_enable(2, en);
+    imx233_pinctrl_set_gpio(0, 10, en);
 }
 
 bool _backlight_init(void)
