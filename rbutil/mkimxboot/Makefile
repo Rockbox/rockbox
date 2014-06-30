@@ -8,7 +8,8 @@
 # We use the SB code available in the Rockbox utils/sbtools directory
 IMXTOOLS_DIR=../../utils/imxtools/sbtools/
 CFLAGS += -I$(IMXTOOLS_DIR) -Wall
-CFLAGS += -std=c99 -g -O3
+# std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
+CFLAGS += -std=gnu99 -g -O3
 
 OUTPUT = mkimxboot
 
