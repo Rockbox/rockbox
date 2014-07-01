@@ -207,6 +207,8 @@ int load_mi4(unsigned char* buf,
         return EREAD_IMAGE_FAILED;
 
     /* Check CRC32 to see if we have a valid file */
+    chksum_crc32gentab();
+
     sum = chksum_crc32 (buf, mi4header.mi4size - MI4_HEADER_SIZE);
 
     if(sum != mi4header.crc32)
