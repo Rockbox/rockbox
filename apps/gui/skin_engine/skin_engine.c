@@ -71,6 +71,20 @@ static struct gui_skin {
     bool                needs_full_update;
 } skins[SKINNABLE_SCREENS_COUNT][NB_SCREENS];
 
+/* internal use only */
+struct wps_data* skin_from_buflib_handle(int handle)
+{
+    for (int i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+    {
+        FOR_NB_SCREENS(j)
+        {
+            if (skins[i][j].data.buflib_handle == handle)
+                return &skins[i][j].data;
+        }
+    }
+    return NULL;
+}
+
 int skin_get_num_skins(void)
 {
     return SKINNABLE_SCREENS_COUNT;
@@ -89,9 +103,8 @@ static void gui_skin_reset(struct gui_skin *skin)
     skin->gui_wps.data = data = &skin->data;
 #ifdef HAVE_ALBUMART
     struct skin_albumart *aa_save;
-    unsigned char *buffer = get_skin_buffer(data);
     /* copy to temp var to protect against memset */
-    if (buffer && (aa_save = SKINOFFSETTOPTR(buffer, data->albumart)))
+    if ((aa_save = data->albumart.__data))
     {
         short old_width, old_height;
         old_width = aa_save->width;
@@ -105,19 +118,19 @@ static void gui_skin_reset(struct gui_skin *skin)
         memset(data, 0, sizeof(struct wps_data));
     skin->data.wps_loaded = false;
     skin->data.buflib_handle = -1;
-    skin->data.tree = -1;
+    skin->data.tree = NULL;
 #ifdef HAVE_TOUCHSCREEN
-    skin->data.touchregions = -1;
+    skin->data.touchregions.__data = NULL;
 #endif
 #ifdef HAVE_SKIN_VARIABLES
-    skin->data.skinvars = -1;
+    skin->data.skinvars.__data = NULL;
 #endif
 #ifdef HAVE_LCD_BITMAP
-    skin->data.font_ids = -1;
-    skin->data.images = -1;
+    skin->data.font_ids.__data = NULL;
+    skin->data.images.__data = NULL;
 #endif
 #ifdef HAVE_ALBUMART
-    skin->data.albumart = -1;
+    skin->data.albumart.__data = NULL;
     skin->data.playback_aa_slot = -1;
 #endif
 #ifdef HAVE_BACKDROP_IMAGE

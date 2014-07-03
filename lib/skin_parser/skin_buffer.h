@@ -28,7 +28,7 @@
 void skin_buffer_init(char* buffer, size_t size);
 /* Allocate size bytes from the buffer */
 
-#ifndef __PCTOOL__
+#if 0 //ndef __PCTOOL__
 #define INVALID_OFFSET (-1)
 #define IS_VALID_OFFSET(o) ((o) >= 0)
 long skin_buffer_to_offset(void *pointer);
@@ -40,7 +40,7 @@ void* skin_buffer_from_offset(long offset);
 #define skin_buffer_from_offset(o) o
 #endif
 
-/* #define DEBUG_SKIN_ALLOCATIONS */
+// #define DEBUG_SKIN_ALLOCATIONS 
 
 #ifdef DEBUG_SKIN_ALLOCATIONS 
 #define FOO(X) #X

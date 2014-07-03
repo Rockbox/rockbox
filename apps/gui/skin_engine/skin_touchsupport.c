@@ -37,14 +37,13 @@
 /** Disarms all touchregions. */
 void skin_disarm_touchregions(struct wps_data *data)
 {
-    char* skin_buffer = get_skin_buffer(data);
-    struct skin_token_list *regions = SKINOFFSETTOPTR(skin_buffer, data->touchregions);
+    struct skin_token_list *regions = data->touchregions.__data;
     while (regions)
     {
-        struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, regions->token);
-        struct touchregion *region = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+        struct wps_token *token = regions->token.__data;
+        struct touchregion *region = token->value.data;
         region->armed = false;
-        regions = SKINOFFSETTOPTR(skin_buffer, regions->next);
+        regions = regions->next.__data;
     }
 }
 
@@ -61,28 +60,27 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
     int type = action_get_touchscreen_press(&x, &y);
     struct skin_viewport *wvp;
     struct touchregion *r, *temp = NULL;
-    char* skin_buffer = get_skin_buffer(data);
     bool repeated = (type == BUTTON_REPEAT);
     bool released = (type == BUTTON_REL);
     bool pressed = (type == BUTTON_TOUCHSCREEN);
-    struct skin_token_list *regions = SKINOFFSETTOPTR(skin_buffer, data->touchregions);
+    struct skin_token_list *regions = data->touchregions.__data;
     bool needs_repeat;
 
     while (regions)
     {
-        struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, regions->token);
-        r = SKINOFFSETTOPTR(skin_buffer, token->value.data);
-        wvp = SKINOFFSETTOPTR(skin_buffer, r->wvp);
+        struct wps_token *token = regions->token.__data;
+        r = token->value.data;
+        wvp = r->wvp.__data;
         /* make sure this region's viewport is visible */
         if (wvp->hidden_flags&VP_DRAW_HIDDEN)
         {
-            regions = SKINOFFSETTOPTR(skin_buffer, regions->next);
+            regions = regions->next.__data;
             continue;
         }
         if (data->touchscreen_locked && 
             (r->action != ACTION_TOUCH_SOFTLOCK && !r->allow_while_locked))
         {
-            regions = SKINOFFSETTOPTR(skin_buffer, regions->next);
+            regions = regions->next.__data;
             continue;
         }
         needs_repeat = r->press_length != PRESS;
@@ -107,8 +105,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                     case ACTION_TOUCH_SETTING:
                         if (edge_offset)
                         {
-                            struct progressbar *bar =
-                                    SKINOFFSETTOPTR(skin_buffer, r->bar);
+                            struct progressbar *bar = r->bar.__data;
                             if(r->width > r->height)
                                 *edge_offset = vx*100/r->width;
                             else /* vertical bars are bottom-up by default */
@@ -136,7 +133,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                 }
             }
         }
-        regions = SKINOFFSETTOPTR(skin_buffer, regions->next);
+        regions = regions->next.__data;
     }
 
     /* On release, all regions are disarmed. */
@@ -224,7 +221,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                 {
                     case F_T_CUSTOM:
                         s->custom_setting
-                            ->load_from_cfg(s->setting, SKINOFFSETTOPTR(skin_buffer, data->value.text));
+                            ->load_from_cfg(s->setting, data->value.text.__data);
                         break;                          
                     case F_T_INT:
                     case F_T_UINT:
@@ -288,8 +285,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
             break;
             case ACTION_TOUCH_SETTING:
             {                
-                struct progressbar *bar =
-                        SKINOFFSETTOPTR(skin_buffer, temp->bar);
+                struct progressbar *bar = temp->bar.__data;
                 if (bar && edge_offset)
                 {                    
                     int val, count;
