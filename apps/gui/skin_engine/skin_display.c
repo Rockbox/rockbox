@@ -167,7 +167,7 @@ void ab_draw_markers(struct screen * screen, int capacity,
 void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 {
     struct screen *display = gwps->display;
-    struct viewport *vp = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->vp);
+    struct viewport *vp = pb->vp.__data;
     struct wps_state *state = skin_get_global_state();
     struct mp3entry *id3 = state->id3;
     int x = pb->x, y = pb->y, width = pb->width, height = pb->height;
@@ -274,9 +274,9 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         flags |= BORDER_NOFILL;
     }
 
-    if (SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->slider))
+    if (pb->slider.__data)
     {
-        struct gui_img *img = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->slider);
+        struct gui_img *img = pb->slider.__data;
         /* clear the slider */
         screen_clear_area(display, x, y, width, height);
 
@@ -291,9 +291,9 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         }
     }
 
-    if (SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->backdrop))
+    if (pb->backdrop.__data)
     {
-        struct gui_img *img = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->backdrop);
+        struct gui_img *img = pb->backdrop.__data;
         img->bm.data = core_get_data(img->buflib_handle);
         display->bmp_part(&img->bm, 0, 0, x, y, pb->width, height);
         flags |= DONT_CLEAR_EXCESS;
@@ -301,7 +301,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
 
     if (!pb->nobar)
     {
-        struct gui_img *img = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->image);
+        struct gui_img *img = pb->image.__data;
         if (img)
         {
             char *img_data = core_get_data(img->buflib_handle);
@@ -315,11 +315,11 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
                                length, 0, end, flags);
     }
 
-    if (SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->slider))
+    if (pb->slider.__data)
     {
         int xoff = 0, yoff = 0;
         int w = width, h = height;
-        struct gui_img *img = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->slider);
+        struct gui_img *img = pb->slider.__data;
         img->bm.data = core_get_data(img->buflib_handle);
 
         if (flags&HORIZONTAL)
@@ -392,12 +392,12 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     (void)vp;
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
-    struct skin_token_list *list = SKINOFFSETTOPTR(get_skin_buffer(data), data->images);
+    struct skin_token_list *list = data->images.__data;
 
     while (list)
     {
-        struct wps_token *token = SKINOFFSETTOPTR(get_skin_buffer(data), list->token);
-        struct gui_img *img = (struct gui_img*)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
+        struct wps_token *token = list->token.__data;
+        struct gui_img *img = (struct gui_img*)token->value.data;
         if (img->using_preloaded_icons && img->display >= 0)
         {
             screen_put_icon(display, img->x, img->y, img->display);
@@ -409,12 +409,12 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
                 wps_draw_image(gwps, img, img->display, vp);
             }
         }
-        list = SKINOFFSETTOPTR(get_skin_buffer(data), list->next);
+        list = list->next.__data;
     }
 #ifdef HAVE_ALBUMART
     /* now draw the AA */
-    struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
-    if (aa && SKINOFFSETTOPTR(get_skin_buffer(data), aa->vp) == vp
+    struct skin_albumart *aa = data->albumart.__data;
+    if (aa && aa->vp.__data == vp
         && aa->draw_handle >= 0)
     {
         draw_album_art(gwps, aa->draw_handle, false);
@@ -441,7 +441,7 @@ int evaluate_conditional(struct gui_wps *gwps, int offset,
 
     int intval = num_options < 2 ? 2 : num_options;
     /* get_token_value needs to know the number of options in the enum */
-    value = get_token_value(gwps, SKINOFFSETTOPTR(get_skin_buffer(gwps->data), conditional->token),
+    value = get_token_value(gwps, conditional->token.__data,
                     offset, result, sizeof(result), &intval);
 
     /* intval is now the number of the enum option we want to read,

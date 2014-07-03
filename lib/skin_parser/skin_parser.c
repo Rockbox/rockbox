@@ -108,7 +108,7 @@ struct skin_element* skin_parse(const char* document)
         }
 
         /* Making sure last is at the end */
-        while(IS_VALID_OFFSET(last->next))
+        while(last->next)
             last = skin_buffer_from_offset(last->next);
 
     }
@@ -130,7 +130,7 @@ static struct skin_element* skin_parse_viewport(const char** document)
     retval->line = skin_line;
     viewport_line = skin_line;
 
-    OFFSETTYPE(struct skin_element*)* children;
+    struct skin_element **children;
 
     const char* cursor = *document; /* Keeps track of location in the document */
     const char* bookmark; /* Used when we need to look ahead */
@@ -245,7 +245,7 @@ static struct skin_element* skin_parse_viewport(const char** document)
 
         }
         /* Making sure last is at the end */
-        while(IS_VALID_OFFSET(last->next))
+        while(last->next)
             last = skin_buffer_from_offset(last->next);
 
         if(*cursor == '\n')
@@ -295,7 +295,7 @@ static struct skin_element* skin_parse_line_optional(const char** document,
     struct skin_element* root = NULL;
     struct skin_element* current = NULL;
     struct skin_element* retval = NULL;
-    OFFSETTYPE(struct skin_element*)* children = NULL;
+    struct skin_element **children = NULL;
 
     /* A wrapper for the line */
     retval = skin_alloc_element();
@@ -408,7 +408,7 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
                                                   int conditional)
 {
     struct skin_element* retval;
-    OFFSETTYPE(struct skin_element*)* children;
+    struct skin_element **children;
     const char* cursor = *document;
     int sublines = 1;
     int i;
@@ -459,8 +459,8 @@ static struct skin_element* skin_parse_sublines_optional(const char** document,
     cursor = *document;
     for(i = 0; i < sublines; i++)
     {
-        children[i] = skin_buffer_to_offset(skin_parse_line_optional(&cursor, conditional));
-        if (children[i] < 0)
+        children[i] = skin_parse_line_optional(&cursor, conditional);
+        if (!children[i])
             return NULL;
         skip_whitespace(&cursor);
 
@@ -768,7 +768,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             /* Recursively parsing a code argument */
             params[i].type = CODE;
             params[i].data.code = skin_buffer_to_offset(skin_parse_code_as_arg(&cursor));
-            if(params[i].data.code < 0)
+            if(!params[i].data.code)
                 return 0;
         }
         else if (tolower(type_code) == 't')
@@ -885,7 +885,7 @@ static int skin_parse_text(struct skin_element* element, const char** document,
     element->next = skin_buffer_to_offset(NULL);
     text = skin_alloc_string(length);
     element->data = skin_buffer_to_offset(text);
-    if (element->data < 0)
+    if (!element->data)
         return 0;
     
     for(dest = 0; dest < length; dest++)
@@ -927,7 +927,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
     const char *false_branch = NULL;
     const char *conditional_end = NULL;
 #endif
-    OFFSETTYPE(struct skin_element*)* children_array = NULL;
+    struct skin_element **children_array = NULL;
 
     /* Some conditional tags allow for target feature checking,
      * so to handle that call the callback as usual with type == TAG
@@ -1042,7 +1042,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
                 cursor++;
             }
             children_array[i] = skin_buffer_to_offset(skin_parse_code_as_arg(&cursor));
-            if (children_array[i] < 0)
+            if (!children_array[i])
                 return 0;
             skip_whitespace(&cursor);
 #ifdef ROCKBOX
@@ -1089,7 +1089,7 @@ static int skin_parse_comment(struct skin_element* element, const char** documen
     element->type = COMMENT;
     element->line = skin_line;
 #ifdef ROCKBOX 
-    element->data = INVALID_OFFSET;
+    element->data = NULL;
 #else    
     element->data = text = skin_alloc_string(length);
     if (!element->data)
@@ -1154,16 +1154,12 @@ struct skin_element* skin_alloc_element()
     retval->tag = NULL;
     retval->params_count = 0;
     retval->children_count = 0;
-    retval->data = INVALID_OFFSET;
+    retval->data = NULL;
 
     return retval;
 
 }
-/* On a ROCKBOX build we try to save space as much as possible
- * so if we can, use a shared param pool which should be more then large
- * enough for any tag. params should be used straight away by the callback
- * so this is safe.
- */
+
 struct skin_tag_parameter* skin_alloc_params(int count)
 {
     size_t size = sizeof(struct skin_tag_parameter) * count;
@@ -1176,10 +1172,9 @@ char* skin_alloc_string(int length)
     return (char*)skin_buffer_alloc(sizeof(char) * (length + 1));
 }
 
-OFFSETTYPE(struct skin_element*)* skin_alloc_children(int count)
+struct skin_element **skin_alloc_children(int count)
 {
-    return (OFFSETTYPE(struct skin_element*)*)
-            skin_buffer_alloc(sizeof(struct skin_element*) * count);
+    return (struct skin_element**)skin_buffer_alloc(sizeof(struct skin_element*) * count);
 }
 
 void skin_free_tree(struct skin_element* root)

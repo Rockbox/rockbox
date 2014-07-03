@@ -51,18 +51,6 @@ static size_t buf_size;
 static unsigned char *buffer_start = NULL;
 static unsigned char *buffer_front = NULL;
 
-#ifndef __PCTOOL__
-long skin_buffer_to_offset(void *pointer)
-{
-    return pointer == NULL ? -1 : (void*)pointer - (void*)buffer_start;
-}
-
-void* skin_buffer_from_offset(long offset)
-{
-    return offset < 0 ? NULL : buffer_start + offset;
-}
-#endif
-
 void skin_buffer_init(char* buffer, size_t size)
 {
     buffer_start = buffer_front = buffer;

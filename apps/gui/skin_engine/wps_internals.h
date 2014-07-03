@@ -31,6 +31,13 @@
 #include "core_alloc.h"
 #endif
 
+/*
+ * This macro should be used for all embedded pointers which are allocated
+ * from the skin buffer - which means they live in a buflib handle which needs
+ * to be carefully moved byt eh move callbacks.
+ */
+#define BUFLIB_PTR(a) struct { a __data; } 
+
 struct skin_stats {
     size_t buflib_handles;
     size_t tree_size;
@@ -57,39 +64,55 @@ bool skin_backdrop_get_debug(int index, char **path, int *ref_count, size_t *siz
 
 #define TOKEN_VALUE_ONLY 0x0DEADC0D
 
+struct gui_wps;
+struct wps_data;
+struct wps_token;
+
+struct skin_tag_callbacks {
+    enum skin_token_type type;
+    int (*parse)(struct skin_element *element, struct wps_data *wps_data);
+    const char *(*get_token_value)(struct gui_wps *gwps, struct wps_token *token,
+            int offset, char *buf, int buf_size, int *intval);
+    void (*move)(struct skin_element *element, ptrdiff_t diff);
+    void (*destroy)(struct skin_element *element);
+};
+
 /* wps_data*/
 struct wps_token {
+    const struct skin_tag_callbacks *callbacks;
     union {
         char c;
         unsigned short i;
         long l;
-        OFFSETTYPE(void*) data;
+        void* data; // This is a buflib pointer but BUFLIB_PTR() is overkill
     } value;
 
     enum skin_token_type type; /* enough to store the token type */
     /* Whether the tag (e.g. track name or the album) refers the
        current or the next song (false=current, true=next) */
-    bool next;
+    bool next; // FIXME: remove this
 };
 
 char* get_dir(char* buf, int buf_size, const char* path, int level);
 
 
+
 struct skin_token_list {
-    OFFSETTYPE(struct wps_token *) token;
-    OFFSETTYPE(struct skin_token_list *) next;
+    BUFLIB_PTR(struct wps_token *) token;
+    BUFLIB_PTR(struct skin_token_list *) next;
+    bool new_token;
 };
 
 #ifdef HAVE_LCD_BITMAP
 struct gui_img {
-    OFFSETTYPE(struct viewport*) vp;    /* The viewport to display this image in */
+    BUFLIB_PTR(struct viewport*) vp;    /* The viewport to display this image in */
     short int x;                  /* x-pos */
     short int y;                  /* y-pos */
     short int num_subimages;      /* number of sub-images */
     short int subimage_height;    /* height of each sub-image */
     struct bitmap bm;
     int buflib_handle;
-    OFFSETTYPE(char*) label;
+    BUFLIB_PTR(char*) label;
     bool loaded;            /* load state */
     int display;
     bool using_preloaded_icons; /* using the icon system instead of a bmp */
@@ -97,15 +120,15 @@ struct gui_img {
 };
 
 struct image_display {
-    OFFSETTYPE(char*) label;
+    BUFLIB_PTR(char*) label;
     int subimage;
-    OFFSETTYPE(struct wps_token*) token; /* the token to get the subimage number from */
+    BUFLIB_PTR(struct wps_token*) token; /* the token to get the subimage number from */
     int offset; /* offset into the bitmap strip to start */
 };
 
 struct progressbar {
     enum skin_token_type type;
-    OFFSETTYPE(struct viewport *) vp;
+    BUFLIB_PTR(struct viewport *) vp;
     /* regular pb */
     short x;
     /* >=0: explicitly set in the tag -> y-coord within the viewport
@@ -116,15 +139,15 @@ struct progressbar {
     short height;
     bool  follow_lang_direction;
     
-    OFFSETTYPE(struct gui_img *) image;
+    BUFLIB_PTR(struct gui_img *) image;
     
     bool invert_fill_direction;
     bool nofill;
     bool noborder;
     bool nobar;
-    OFFSETTYPE(struct gui_img *) slider;
+    BUFLIB_PTR(struct gui_img *) slider;
     bool horizontal;
-    OFFSETTYPE(struct gui_img *) backdrop;
+    BUFLIB_PTR(struct gui_img *) backdrop;
     int setting_id; /* for the setting bar type */
     
 };
@@ -175,17 +198,15 @@ struct gradient_config {
 #define VP_DRAW_WASHIDDEN   0x4
 /* these are never drawn, nor cleared, i.e. just ignored */
 #define VP_NEVER_VISIBLE    0x8
-#ifndef __PCTOOL__
-#define VP_DEFAULT_LABEL    -200
-#else
 #define VP_DEFAULT_LABEL    NULL
-#endif
 #define VP_DEFAULT_LABEL_STRING "|"
 struct skin_viewport {
+    const struct skin_tag_callbacks *callbacks;
     struct viewport vp;   /* The LCD viewport struct */
+    struct screen *display;
     char hidden_flags;
     bool is_infovp;
-    OFFSETTYPE(char*) label;
+    BUFLIB_PTR(char*) label;
     int   parsed_fontid;
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
     bool output_to_backdrop_buffer;
@@ -196,14 +217,14 @@ struct skin_viewport {
 #endif
 };
 struct viewport_colour {
-    OFFSETTYPE(struct viewport *) vp;
+    BUFLIB_PTR(struct viewport *) vp;
     unsigned colour;
 };
 
 #ifdef HAVE_TOUCHSCREEN
 struct touchregion {
-    OFFSETTYPE(char*) label;            /* label to identify this region */
-    OFFSETTYPE(struct skin_viewport*) wvp;/* The viewport this region is in */
+    BUFLIB_PTR(char*) label;            /* label to identify this region */
+    BUFLIB_PTR(struct skin_viewport*) wvp;/* The viewport this region is in */
     short int x;             /* x-pos */
     short int y;             /* y-pos */
     short int width;         /* width */
@@ -223,28 +244,30 @@ struct touchregion {
             const struct settings_list *setting; /* setting being controlled */
             union {         /* Value to set the setting to for ACTION_SETTING_SET */
                 int number;
-                OFFSETTYPE(char*) text;
+                BUFLIB_PTR(char*) text;
             } value;
+            bool using_text;
         } setting_data;
         int   value;
     };
     long last_press;        /* last tick this was pressed */
-    OFFSETTYPE(struct progressbar*) bar;
+    BUFLIB_PTR(struct progressbar*) bar;
 };
 
 
 
 struct touchregion_lastpress {
-    OFFSETTYPE(struct touchregion *) region;
+    BUFLIB_PTR(struct touchregion *) region;
     long timeout;
 };
 #endif
 
+
 struct playlistviewer {
-    OFFSETTYPE(struct viewport *) vp;
+    BUFLIB_PTR(struct viewport *) vp;
     bool show_icons;
     int start_offset;
-    OFFSETTYPE(struct skin_element *) line;
+    BUFLIB_PTR(struct skin_element *) line;
 };
 
 
@@ -272,7 +295,7 @@ struct skin_albumart {
     unsigned char yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
     unsigned char state; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
     
-    OFFSETTYPE(struct viewport *) vp;
+    BUFLIB_PTR(struct viewport *) vp;
     int draw_handle;
 };
 #endif
@@ -289,11 +312,11 @@ struct line_alternator {
 
 struct conditional {
     int last_value;
-    OFFSETTYPE(struct wps_token *) token;
+    BUFLIB_PTR(struct wps_token *) token;
 };
 
 struct logical_if {
-    OFFSETTYPE(struct wps_token *) token;
+    BUFLIB_PTR(struct wps_token *) token;
     enum {
         IF_EQUALS, /* == */
         IF_NOTEQUALS, /* != */
@@ -310,7 +333,7 @@ struct substring {
     int start;
     int length;
     bool expect_number;
-    OFFSETTYPE(struct wps_token *) token;
+    BUFLIB_PTR(struct wps_token *) token;
 };
 
 struct listitem {
@@ -320,16 +343,16 @@ struct listitem {
 
 #ifdef HAVE_SKIN_VARIABLES
 struct skin_var {
-    OFFSETTYPE(const char *) label;
+    BUFLIB_PTR(const char *) label;
     int value;
     long last_changed;
 };
 struct skin_var_lastchange {
-    OFFSETTYPE(struct skin_var *) var;
+    BUFLIB_PTR(struct skin_var *) var;
     long timeout;
 };
 struct skin_var_changer {
-    OFFSETTYPE(struct skin_var *) var;
+    BUFLIB_PTR(struct skin_var *) var;
     int newval;
     bool direct; /* true to make val=newval, false for val += newval */
     int max;
@@ -343,10 +366,10 @@ struct wps_data
 {
     int buflib_handle;
 
-    OFFSETTYPE(struct skin_element *) tree;
+    struct skin_element *tree; /* This obviously is a buflib pointer */
 #ifdef HAVE_LCD_BITMAP
-    OFFSETTYPE(struct skin_token_list *) images;
-    OFFSETTYPE(int *) font_ids;
+    BUFLIB_PTR(struct skin_token_list *) images;
+    BUFLIB_PTR(int *) font_ids;
     int font_count;
 #endif
 #ifdef HAVE_BACKDROP_IMAGE
@@ -355,11 +378,11 @@ struct wps_data
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-    OFFSETTYPE(struct skin_token_list *) touchregions;
+    BUFLIB_PTR(struct skin_token_list *) touchregions;
     bool touchscreen_locked;
 #endif
 #ifdef HAVE_ALBUMART
-    OFFSETTYPE(struct skin_albumart *) albumart;
+    BUFLIB_PTR(struct skin_albumart *) albumart;
     int    playback_aa_slot;
     /* copy of albumart to survive skin resets, used to check if albumart
      * dimensions changed on skin change */
@@ -367,7 +390,7 @@ struct wps_data
 #endif
 
 #ifdef HAVE_SKIN_VARIABLES
-    OFFSETTYPE(struct skin_token_list *) skinvars;
+    BUFLIB_PTR(struct skin_token_list *) skinvars;
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -380,17 +403,6 @@ struct wps_data
 #endif
     bool wps_loaded;
 };
-
-#ifndef __PCTOOL__
-static inline char* get_skin_buffer(struct wps_data* data)
-{
-    if (data->buflib_handle >= 0)
-        return core_get_data(data->buflib_handle);
-    return NULL;
-}
-#else
-#define get_skin_buffer(d) skin_buffer
-#endif
 
 /* wps_data end */
 

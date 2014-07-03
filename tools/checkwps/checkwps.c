@@ -332,7 +332,7 @@ int main(int argc, char **argv)
 
         printf("WPS parsed OK\n\n");
         if (wps_verbose_level>2)
-            skin_debug_tree(SKINOFFSETTOPTR(skin_buffer, wps.tree));
+            skin_debug_tree(wps.tree);
     }
     return 0;
 }
