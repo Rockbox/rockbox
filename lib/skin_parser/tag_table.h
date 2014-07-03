@@ -28,10 +28,10 @@ extern "C"
 #endif
 
 #define MAX_TAG_LENGTH 4 /* includes the \0 */
-#define MAX_TAG_PARAMS 12
 
-#define NOBREAK 0x1 /* Flag to tell the renderer not to insert a line break */
-#define FEATURE_TAG 0x2 /* Parse time conditional for feature checks (e.g HAVE_RTC) */
+#define NOBREAK (1<<0) /* Flag to tell the renderer not to insert a line break */
+#define FEATURE_TAG (1<<1) /* Parse time conditional for feature checks (e.g HAVE_RTC) */
+#define NEXT_TRACK (1<<2) /* Tag is for the next track data */
 
 /* constants used in line_type and as refresh_mode for wps_refresh */
 #define SKIN_REFRESH_SHIFT           16
