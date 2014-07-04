@@ -22,6 +22,4 @@
 #define _CRC32_MI4_H
 
 unsigned int chksum_crc32 (unsigned char *block, unsigned int length);
-void chksum_crc32gentab (void);
-
 #endif

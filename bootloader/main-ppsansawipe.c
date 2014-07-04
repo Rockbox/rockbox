@@ -29,7 +29,6 @@
 #include "storage.h"
 #include "button.h"
 #include "disk.h"
-#include "crc32-mi4.h"
 #include <string.h>
 #include "i2c.h"
 #include "backlight-target.h"
@@ -175,8 +174,6 @@ void* main(void)
 {
     int i;
     int btn;
-
-    chksum_crc32gentab ();
 
     system_init();
     kernel_init();

@@ -94,8 +94,6 @@ void* main(void)
     char sector[512];
     struct partinfo* pinfo;
 
-    chksum_crc32gentab ();
-
     system_init();
     kernel_init();
     lcd_init();
