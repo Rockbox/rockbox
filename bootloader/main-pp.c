@@ -298,8 +298,6 @@ void* main(void)
 #endif
     int usb = USB_EXTRACTED;
 
-    chksum_crc32gentab ();
-
     system_init();
     kernel_init();
 
