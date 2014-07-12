@@ -681,10 +681,11 @@ androidcc () {
             gcctarget="arm-linux-androideabi-"
             # sigaltstack is not available in pre-android-9, however asm
             # threads work fine so far
-            thread_support="ASSEMBLER_THREADS"
+            #thread_support="ASSEMBLER_THREADS"
+            thread_support="HAVE_SIGALTSTACK_THREADS"
             GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
+                    --sysroot=$ANDROID_NDK_PATH/platforms/android-19/arch-arm"
+            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-19/arch-arm"
             ;;
         mips)
             endian="little"

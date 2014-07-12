@@ -200,10 +200,12 @@ void pcm_play_dma_init(void)
      **/
     JNIEnv e = *env_ptr;
     /* get the class and its constructor */
-    RockboxPCM_class = e->FindClass(env_ptr, "org/rockbox/RockboxPCM");
+    jclass cls = e->FindClass(env_ptr, "org/rockbox/RockboxPCM");
+    RockboxPCM_class = e->NewGlobalRef(env_ptr, cls);
     jmethodID constructor = e->GetMethodID(env_ptr, RockboxPCM_class, "<init>", "()V");
     /* instance = new RockboxPCM() */
-    RockboxPCM_instance = e->NewObject(env_ptr, RockboxPCM_class, constructor);
+    jobject local_RockboxPCM_instance = e->NewObject(env_ptr, RockboxPCM_class, constructor);
+    RockboxPCM_instance = e->NewGlobalRef(env_ptr,local_RockboxPCM_instance);
     /* cache needed methods */
     play_pause_method = e->GetMethodID(env_ptr, RockboxPCM_class, "play_pause", "(Z)V");
     set_volume_method = e->GetMethodID(env_ptr, RockboxPCM_class, "set_volume", "(I)V");
