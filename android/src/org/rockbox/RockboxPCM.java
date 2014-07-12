@@ -53,6 +53,7 @@ public class RockboxPCM extends AudioTrack
     private float minpcmvolume;
     private float curpcmvolume = 0;
     private float pcmrange;
+    private static RockboxPCM rockboxPCM_instance = null;
 
     /* 8k is plenty, but some devices may have a higher minimum.
      * 8k represents 125ms of audio */
@@ -81,6 +82,7 @@ public class RockboxPCM extends AudioTrack
 
         setupVolumeHandler();
         postVolume(audiomanager.getStreamVolume(streamtype));
+        rockboxPCM_instance = this;
     }
 
     /**
@@ -108,6 +110,9 @@ public class RockboxPCM extends AudioTrack
             Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
             while (!quit)
             {
+                if (rockboxPCM_instance == null)
+                    continue;
+
                 switch(getPlayState())
                 {
                     case PLAYSTATE_PLAYING:

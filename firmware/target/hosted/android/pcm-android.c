@@ -74,6 +74,14 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
 {
     bool new_buffer = false;
 
+    jclass pcm_class =  (*env)->FindClass(env, "org/rockbox/RockboxPCM");
+    if (pcm_class == NULL)
+    {
+        pcm_play_dma_init();
+    }
+    pcm_class =  (*env)->FindClass(env, "org/rockbox/RockboxPCM");
+    write_method = (*env)->GetMethodID(env, pcm_class, "write", "([BII)I");
+
     lock_audio();
 
     jint left = max_size;
@@ -114,6 +122,7 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
         if (ret < 0)
         {
             unlock_audio();
+            (*env)->DeleteLocalRef(env, pcm_class);
             return ret;
         }
 
@@ -130,6 +139,7 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 
     unlock_audio();
+    (*env)->DeleteLocalRef(env, pcm_class);
     return max_size - left;
 }
 
@@ -163,9 +173,16 @@ void pcm_play_dma_stop(void)
      * possibly called from nativeWrite(), i.e. another (host) thread
      * => need to discover the appropriate JNIEnv* */
     JNIEnv* env = getJavaEnvironment();
+    jclass pcm_class =  (*env)->FindClass(env, "org/rockbox/RockboxPCM");
+    if (pcm_class == NULL)
+    {
+        return;
+    }
+    stop_method  = (*env)->GetMethodID(env, pcm_class, "stop", "()V");
     (*env)->CallVoidMethod(env,
                            RockboxPCM_instance,
                            stop_method);
+    (*env)->DeleteLocalRef(env, pcm_class);
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -200,10 +217,12 @@ void pcm_play_dma_init(void)
      **/
     JNIEnv e = *env_ptr;
     /* get the class and its constructor */
-    RockboxPCM_class = e->FindClass(env_ptr, "org/rockbox/RockboxPCM");
+    jclass local_RockboxPCM_class = e->FindClass(env_ptr, "org/rockbox/RockboxPCM");
+    RockboxPCM_class = e->NewGlobalRef(env_ptr, local_RockboxPCM_class);
     jmethodID constructor = e->GetMethodID(env_ptr, RockboxPCM_class, "<init>", "()V");
     /* instance = new RockboxPCM() */
-    RockboxPCM_instance = e->NewObject(env_ptr, RockboxPCM_class, constructor);
+    jobject local_RockboxPCM_instance = e->NewObject(env_ptr, RockboxPCM_class, constructor);
+    RockboxPCM_instance = e->NewGlobalRef(env_ptr,local_RockboxPCM_instance);
     /* cache needed methods */
     play_pause_method = e->GetMethodID(env_ptr, RockboxPCM_class, "play_pause", "(Z)V");
     set_volume_method = e->GetMethodID(env_ptr, RockboxPCM_class, "set_volume", "(I)V");
