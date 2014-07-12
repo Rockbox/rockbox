@@ -111,8 +111,9 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
     {
         env_ptr = env;
 
-        RockboxService_instance = this;
-        RockboxService_class = (*env)->GetObjectClass(env, this);
+        RockboxService_instance = (*env)->NewGlobalRef(env_ptr,this);
+        jclass local_RockboxService_class = (*env)->GetObjectClass(env, this);
+        RockboxService_class =(*env)->NewGlobalRef(env_ptr,local_RockboxService_class);
 
         main();
     }
