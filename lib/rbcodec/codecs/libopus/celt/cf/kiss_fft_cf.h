@@ -32,6 +32,27 @@
 
 #ifdef FIXED_POINT
 
+#undef C_MUL
+#define C_MUL(m,a,b) \
+    { \
+      asm volatile("move.l (%[bp]), %%d2;" \
+                   "clr.l %%d3;" \
+                   "move.w %%d2, %%d3;" \
+                   "swap %%d3;" \
+                   "clr.w %%d2;" \
+                   "movem.l (%[ap]), %%d0-%%d1;" \
+                   "mac.l %%d0, %%d2, %%acc0;" \
+                   "msac.l %%d1, %%d3, %%acc0;" \
+                   "mac.l %%d1, %%d2, %%acc1;" \
+                   "mac.l %%d0, %%d3, %%acc1;" \
+                   "movclr.l %%acc0, %[mr];" \
+                   "movclr.l %%acc1, %[mi];" \
+                   : [mr] "=r" ((m).r), [mi] "=r" ((m).i) \
+                   : [ap] "a" (&(a)), [bp] "a" (&(b)) \
+                   : "d0", "d1", "d2", "d3", "cc"); \
+    }
+
+
 #undef C_MULC
 #define C_MULC(m,a,b) \
     { \
