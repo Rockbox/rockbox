@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_f608e093",
+        "filename": "android/src/org/rockbox/RockboxPCM.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-07-14T10:58:36Z",
+      "side": 1,
+      "message": "How can this possibly happen? By java definitons a Streamer instance cannot exist without an existing RockboxPCM instance ???",
+      "revId": "c286313e250760a3ccd2a831fec5b8b1dc038cfe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_96fdec70",
+        "filename": "firmware/target/hosted/android/pcm-android.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-07-14T10:58:36Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be necessary, you can use the this parameter if you need the ubstabce and env-\u003eGetObjectClass() to get the class.",
+      "revId": "c286313e250760a3ccd2a831fec5b8b1dc038cfe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
