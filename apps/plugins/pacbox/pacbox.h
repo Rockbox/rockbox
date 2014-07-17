@@ -319,6 +319,15 @@
 #define PACMAN_1UP      BUTTON_POWER
 #define PACMAN_COIN     BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define PACMAN_UP       BUTTON_UP
+#define PACMAN_DOWN     BUTTON_DOWN
+#define PACMAN_LEFT     BUTTON_LEFT
+#define PACMAN_RIGHT    BUTTON_RIGHT
+#define PACMAN_MENU     BUTTON_MENU
+#define PACMAN_1UP      BUTTON_SELECT
+#define PACMAN_COIN     BUTTON_PLAYPAUSE
+
 #else
 
 #error Keymap not defined!

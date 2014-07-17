@@ -599,6 +599,22 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_DOWN_TEXT     ""
 #define SELECT_TEXT       "PLAY"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define PEGBOX_RIGHT      BUTTON_RIGHT
+#define PEGBOX_LEFT       BUTTON_LEFT
+#define PEGBOX_UP         BUTTON_UP
+#define PEGBOX_DOWN       BUTTON_DOWN
+#define PEGBOX_QUIT       BUTTON_BACK
+#define PEGBOX_SELECT     BUTTON_SELECT
+#define PEGBOX_RESTART    BUTTON_SHORTCUT
+#define PEGBOX_LVL_UP     BUTTON_MENU
+#define PEGBOX_LVL_DOWN   BUTTON_PLAYPAUSE
+
+#define QUIT_TEXT         "POWER"
+#define RESTART_TEXT      "SHORTCUT"
+#define LVL_UP_TEXT       "MENU"
+#define LVL_DOWN_TEXT     "PLAY/PAUSE"
+#define SELECT_TEXT       "SELECT"
 
 #else
 #error Unsupported keymap!

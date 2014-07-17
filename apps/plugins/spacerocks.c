@@ -324,6 +324,15 @@
 #define AST_RIGHT       BUTTON_RIGHT
 #define AST_FIRE        BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define AST_PAUSE       BUTTON_PLAYPAUSE
+#define AST_QUIT        BUTTON_BACK
+#define AST_THRUST      BUTTON_UP
+#define AST_HYPERSPACE  BUTTON_DOWN
+#define AST_LEFT        BUTTON_LEFT
+#define AST_RIGHT       BUTTON_RIGHT
+#define AST_FIRE        BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

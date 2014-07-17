@@ -122,7 +122,8 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD) \
     || (CONFIG_KEYPAD == HM60X_PAD) \
     || (CONFIG_KEYPAD == HM801_PAD) \
-    || (CONFIG_KEYPAD == SONY_NWZ_PAD))
+    || (CONFIG_KEYPAD == SONY_NWZ_PAD) \
+    || (CONFIG_KEYPAD == CREATIVE_ZEN_PAD))
     { PLA_UP,               BUTTON_UP,                          BUTTON_NONE },
     { PLA_DOWN,             BUTTON_DOWN,                        BUTTON_NONE },
     { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
@@ -415,7 +416,7 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)                                      
+#elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD) || (CONFIG_KEYPAD == CREATIVE_ZEN_PAD)
     {PLA_CANCEL,            BUTTON_BACK,                        BUTTON_NONE},
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},

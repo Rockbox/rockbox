@@ -527,6 +527,20 @@ enum {
 #define BJACK_QUIT_NAME     "Back"
 #define BJACK_DOUBLE_NAME   "Option+Down"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_BACK
+#define BJACK_STAY          BUTTON_PLAYPAUSE
+#define BJACK_DOUBLEDOWN    BUTTON_SHORTCUT
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
+#define BJACK_SELECT_NAME   "Select"
+#define BJACK_STAY_NAME     "Play/Pause"
+#define BJACK_QUIT_NAME     "Back"
+#define BJACK_DOUBLE_NAME   "Shortcut"
+
 #else
 #error No keymap defined!
 #endif

@@ -565,6 +565,22 @@
 #define STAR_TOGGLE_CONTROL_NAME "Play"
 #define STAR_QUIT_NAME           "Back"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define STAR_QUIT                BUTTON_BACK
+#define STAR_LEFT                BUTTON_LEFT
+#define STAR_RIGHT               BUTTON_RIGHT
+#define STAR_UP                  BUTTON_UP
+#define STAR_DOWN                BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL      BUTTON_SELECT
+#define STAR_LEVEL_UP            BUTTON_MENU
+#define STAR_LEVEL_DOWN          BUTTON_PLAYPAUSE
+#define STAR_LEVEL_REPEAT        BUTTON_SHORTCUT
+#define STAR_LEVEL_UP_NAME       "Menu"
+#define STAR_LEVEL_DOWN_NAME     "Play/pause"
+#define STAR_LEVEL_REPEAT_NAME   "Shortcut"
+#define STAR_TOGGLE_CONTROL_NAME "Select"
+#define STAR_QUIT_NAME           "Back"
+
 #else
 #error No keymap defined!
 #endif

@@ -475,6 +475,16 @@
 #define CB_MENU    BUTTON_BACK
 #define CB_LEVEL   BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define CB_SELECT  BUTTON_SELECT
+#define CB_UP      BUTTON_UP
+#define CB_DOWN    BUTTON_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_PLAYPAUSE
+#define CB_MENU    BUTTON_MENU
+#define CB_LEVEL   BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

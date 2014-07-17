@@ -634,6 +634,23 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define HK_CUR2STACK  "Option+Left"
 #define HK_REM2STACK  "Option+Right"
 
+#elif (CONFIG_KEYPAD == CREATIVE_ZEN_PAD)
+#define SOL_QUIT      BUTTON_POWER
+#define SOL_UP        BUTTON_UP
+#define SOL_DOWN      BUTTON_DOWN
+#define SOL_LEFT      BUTTON_LEFT
+#define SOL_RIGHT     BUTTON_RIGHT
+#define SOL_MOVE      BUTTON_SELECT
+#define SOL_DRAW      BUTTON_PLAYPAUSE
+#define SOL_REM2CUR   BUTTON_BACK
+#define SOL_CUR2STACK BUTTON_MENU
+#define SOL_REM2STACK BUTTON_SHORTCUT
+#define HK_MOVE       "Select"
+#define HK_DRAW       "Play/pause"
+#define HK_REM2CUR    "Back"
+#define HK_CUR2STACK  "Menu"
+#define HK_REM2STACK  "Shortcut"
+
 #else
 #error No keymap defined!
 #endif

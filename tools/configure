@@ -2193,7 +2193,7 @@ fi
     output="rockbox.creative"
     bootoutput="bootloader-zenxfistyle.creative"
     appextra="gui:recorder:radio"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2337,12 +2337,12 @@ fi
     target="CREATIVE_ZENXFI"
     memory=64
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
     tool="$rootdir/tools/scramble -add=zxfi"
     output="rockbox.creative"
     bootoutput="bootloader-zenxfi.creative"
     appextra="gui:recorder:radio"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2362,7 +2362,7 @@ fi
     output="rockbox.creative"
     bootoutput="bootloader-zenmozaic.creative"
     appextra="gui:recorder:radio"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2382,7 +2382,7 @@ fi
     output="rockbox.creative"
     bootoutput="bootloader-zen.creative"
     appextra="gui:recorder:radio"
-    plugins=""
+    plugins="yes"
     swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"

@@ -384,6 +384,17 @@
 #define LABEL_MENU      "Left"
 #define LABEL_VOLUME    "Up/Down"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define VUMETER_QUIT    BUTTON_BACK
+#define VUMETER_HELP    BUTTON_SELECT
+#define VUMETER_MENU    BUTTON_MENU
+#define VUMETER_UP      BUTTON_UP
+#define VUMETER_DOWN    BUTTON_DOWN
+#define LABEL_HELP      "Select"
+#define LABEL_QUIT      "Back"
+#define LABEL_MENU      "Menu"
+#define LABEL_VOLUME    "Up/Down"
+
 #else
 #error No keymap defined!
 #endif

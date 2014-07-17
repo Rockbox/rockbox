@@ -361,6 +361,15 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define BTN_QUIT          BUTTON_BACK
 #define BTN_STOPRESET     BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
+#define BTN_DIR_UP        BUTTON_UP
+#define BTN_DIR_DOWN      BUTTON_DOWN
+#define BTN_DIR_LEFT      BUTTON_LEFT
+#define BTN_DIR_RIGHT     BUTTON_RIGHT
+#define BTN_STARTPAUSE    BUTTON_PLAYPAUSE
+#define BTN_QUIT          BUTTON_BACK
+#define BTN_STOPRESET     BUTTON_SHORTCUT
+
 #else
 #error No keymap defined!
 #endif
