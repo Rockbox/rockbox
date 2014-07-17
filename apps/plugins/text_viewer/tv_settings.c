@@ -75,7 +75,7 @@
  * file count                 2
  * [1st file]
  *   file path                MAX_PATH
- *   next file pos            2 (prefences size + bookmark count * bookmark size + 1)
+ *   next file pos            2 (preferences size + bookmark count * bookmark size + 1)
  *   [preferences]
  *     word_mode              1
  *     line_mode              1

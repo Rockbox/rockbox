@@ -1,8 +1,8 @@
-about the text viewer plugin.
+About the text viewer plugin.
 
 Limitation
     for the target which PLUGIN_BUFFER_SIZE < 0x13000 (i.e., archos series),
-    can only be read up to 999 pages.
+    Only 999 pages can be read.
 
 
 Difference between viewer.rock
@@ -13,7 +13,7 @@ Difference between viewer.rock
       Note: when viewer.dat(viewer_file.dat) exists, tv_global.dat(tv_file.dat) is created by
             using viewer.dat(viewer_file.dat).
 
-    [wod wrap]
+    [word wrap]
           - add the following characters which can be split the line.
                 '!', ',', '.', ':', ';', '?', 
                 U+00b7, U+2010, U+3000, U+3001, U+3002, U+30fb, U+30fc, 
@@ -35,12 +35,12 @@ Difference between viewer.rock
            - the right alignment supports the player which does not define HAVE_LCD_BITMAP.
 
     [bookmark]
-           - increased to 16 the number of bookmarks that can be registered.
+           - increased the number of bookmarks that can be registered to 16.
 
 
 TODO list
   - for the target which PLUGIN_BUFFER_SIZE < 0x13000 (i.e., archos series),   
-    supports more than 999 pages of text.
+    support more than 999 pages of text.
 
   - add History feature.
 
