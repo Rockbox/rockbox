@@ -61,11 +61,21 @@ void usb_charging_maxcurrent_change(int maxcurrent)
 
 unsigned int power_input_status(void)
 {
-    return (PDAT14 & 8) ? POWER_INPUT_NONE : POWER_INPUT_MAIN_CHARGER;
+    /* This checks if USB Vbus is present. */
+    if (!(PDAT14 & 0x8)) return POWER_INPUT_USB_CHARGER;
+
+    /* If USB Vbus is not present, check if we have a positive power balance
+       regardless. This would indicate FireWire charging. Note that this will
+       drop to POWER_INPUT_NONE if FireWire isn't able to supply enough current
+       for device operation, e.g. during disk spinup. */
+    if (PDAT11 & 0x20) return POWER_INPUT_NONE;
+
+    /* Looks like we have FireWire power. */
+    return POWER_INPUT_MAIN_CHARGER;
 }
 
 bool charging_state(void)
 {
-    return (PDAT11 & 0x10) ? false : true;
+    return (PDAT11 & 0x10) ? 0 : 1;
 }
 #endif /* CONFIG_CHARGING */

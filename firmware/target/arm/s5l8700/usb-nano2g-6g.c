@@ -37,7 +37,7 @@ void usb_enable(bool on)
 
 int usb_detect(void)
 {
-    if (charger_inserted())
+    if (power_input_status() & POWER_INPUT_USB)
         return USB_INSERTED;
     return USB_EXTRACTED;
 }
