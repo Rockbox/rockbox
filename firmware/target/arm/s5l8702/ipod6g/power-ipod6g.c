@@ -77,11 +77,11 @@ void usb_charging_maxcurrent_change(int maxcurrent)
 
 unsigned int power_input_status(void)
 {
-    return (PDAT(12) & 8) ? POWER_INPUT_NONE : POWER_INPUT_MAIN_CHARGER;
+    return (PDAT(11) & 0x20) ? POWER_INPUT_NONE : POWER_INPUT_MAIN_CHARGER;
 }
 
 bool charging_state(void)
 {
-    return false; //TODO: Figure out
+    return (PDAT(11) & 0x10) ? 0 : 1;
 }
 #endif /* CONFIG_CHARGING */
