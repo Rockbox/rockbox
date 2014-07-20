@@ -31,7 +31,6 @@ int pmu_read_multiple(int address, int count, unsigned char* buffer);
 int pmu_write_multiple(int address, int count, unsigned char* buffer);
 int pmu_read_adc(unsigned int adc);
 int pmu_read_battery_voltage(void);
-int pmu_read_battery_current(void);
 void pmu_init(void);
 void pmu_ldo_on_in_standby(unsigned int ldo, int onoff);
 void pmu_ldo_set_voltage(unsigned int ldo, unsigned char voltage);

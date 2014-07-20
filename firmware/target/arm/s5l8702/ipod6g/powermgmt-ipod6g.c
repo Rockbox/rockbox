@@ -57,9 +57,9 @@ const unsigned short percent_to_volt_charge[11] =
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
-    int compensation = (10 * (pmu_read_battery_current() - 7)) / 12;
-    if (charging_state()) return pmu_read_battery_voltage() - compensation;
-    return pmu_read_battery_voltage() + compensation;
+    int voltage = pmu_read_battery_voltage();
+    if (voltage < 0) return 5000;  /* No battery present, prevent low battery shutdown. */
+    return voltage;
 }
 
 
