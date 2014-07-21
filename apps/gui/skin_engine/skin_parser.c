@@ -398,8 +398,15 @@ static int parse_image_load(struct skin_element *element,
         subimages = get_param(element, 2)->data.number;
     else if (element->params_count > 3)
     {
-        x = get_param(element, 2)->data.number;
-        y = get_param(element, 3)->data.number;
+        if (get_param(element, 2)->type == PERCENT)
+            x = get_param(element, 2)->data.number * curr_vp->vp.width / 1000;
+        else
+            x = get_param(element, 2)->data.number;
+        if (get_param(element, 3)->type == PERCENT)
+            y = get_param(element, 3)->data.number * curr_vp->vp.height / 1000;
+        else
+            y = get_param(element, 3)->data.number;
+
         if (element->params_count == 5)
             subimages = get_param(element, 4)->data.number;
     }
@@ -642,16 +649,27 @@ static int parse_drawrectangle( struct skin_element *element,
     if (!rect)
         return -1;
 
-    rect->x = get_param(element, 0)->data.number;
-    rect->y = get_param(element, 1)->data.number;
+    if (get_param(element, 0)->type == PERCENT)
+        rect->x = get_param(element, 0)->data.number * curr_vp->vp.width / 1000;
+    else
+        rect->x = get_param(element, 0)->data.number;
+
+    if (get_param(element, 1)->type == PERCENT)
+        rect->y = get_param(element, 1)->data.number * curr_vp->vp.height / 1000;
+    else
+        rect->y = get_param(element, 1)->data.number;
 
     if (isdefault(get_param(element, 2)))
         rect->width = curr_vp->vp.width - rect->x;
+    else if (get_param(element, 2)->type == PERCENT)
+        rect->width = get_param(element, 2)->data.number * curr_vp->vp.width / 1000;
     else
         rect->width = get_param(element, 2)->data.number;
 
     if (isdefault(get_param(element, 3)))
         rect->height = curr_vp->vp.height - rect->y;
+    else if (get_param(element, 3)->type == PERCENT)
+        rect->height = get_param(element, 3)->data.number * curr_vp->vp.height / 1000;
     else
         rect->height = get_param(element, 3)->data.number;
 
@@ -924,7 +942,12 @@ static int parse_progressbar_tag(struct skin_element* element,
     /* (x, y, width, height, ...) */
     if (!isdefault(param))
     {
-        pb->x = param->data.number;
+        if (param->type == PERCENT)
+        {
+            pb->x = param->data.number *  vp->width / 1000;
+        }
+        else
+            pb->x = param->data.number;
         if (pb->x < 0 || pb->x >= vp->width)
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -934,7 +957,12 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     if (!isdefault(param))
     {
-        pb->y = param->data.number;
+        if (param->type == PERCENT)
+        {
+           pb->y = param->data.number *  vp->height / 1000;
+        }
+        else
+            pb->y = param->data.number;
         if (pb->y < 0 || pb->y >= vp->height)
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -944,7 +972,12 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     if (!isdefault(param))
     {
-        pb->width = param->data.number;
+        if (param->type == PERCENT)
+        {
+           pb->width = param->data.number *  vp->width / 1000;
+        }
+        else
+            pb->width = param->data.number;
         if (pb->width <= 0 || (pb->x + pb->width) > vp->width)
             return WPS_ERROR_INVALID_PARAM;
     }
@@ -955,7 +988,12 @@ static int parse_progressbar_tag(struct skin_element* element,
     if (!isdefault(param))
     {
         int max;
-        pb->height = param->data.number;
+        if (param->type == PERCENT)
+        {
+           pb->height = param->data.number *  vp->height / 1000;
+        }
+        else
+           pb->height = param->data.number;
         /* include y in check only if it was non-default */
         max = (pb->y > 0) ? pb->y + pb->height : pb->height;
         if (pb->height <= 0 || max > vp->height)
@@ -1212,6 +1250,18 @@ static int parse_albumart_load(struct skin_element* element,
     aa->y = get_param(element, 1)->data.number;
     aa->width = get_param(element, 2)->data.number;
     aa->height = get_param(element, 3)->data.number;
+
+    if (!isdefault(get_param(element, 0)) && get_param(element, 0)->type == PERCENT)
+        aa->x = get_param(element, 0)->data.number * curr_vp->vp.width / 1000;
+
+    if (!isdefault(get_param(element, 1)) && get_param(element, 1)->type == PERCENT)
+        aa->y = get_param(element, 1)->data.number * curr_vp->vp.height / 1000;
+
+    if (!isdefault(get_param(element, 2)) && get_param(element, 2)->type == PERCENT)
+        aa->width = get_param(element, 2)->data.number * curr_vp->vp.width / 1000;
+
+    if (!isdefault(get_param(element, 3)) && get_param(element, 3)->type == PERCENT)
+        aa->height = get_param(element, 3)->data.number * curr_vp->vp.height / 1000;
 
     aa->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
     aa->draw_handle = -1;
@@ -1521,10 +1571,7 @@ static int parse_touchregion(struct skin_element *element,
     {
         region->label = PTRTOSKINOFFSET(skin_buffer, get_param_text(element, 0));
         p = 1;
-        /* "[SI]III[SI]|SS" is the param list. There MUST be 4 numbers
-         * followed by at least one string. Verify that here */
-        if (element->params_count < 6 ||
-            get_param(element, 4)->type != INTEGER)
+        if (element->params_count < 6)
             return WPS_ERROR_INVALID_PARAM;
     }
     else
@@ -1532,11 +1579,48 @@ static int parse_touchregion(struct skin_element *element,
         region->label = PTRTOSKINOFFSET(skin_buffer, NULL);
         p = 0;
     }
+/*x*/
+    struct skin_tag_parameter *param = get_param(element, p);
+    region->x = 0;
+    if (!isdefault(param))
+    {
+        if (param->type == INTEGER)
+            region->x = param->data.number;
+        else if (param->type == PERCENT)
+            region->x = param->data.number * curr_vp->vp.width / 1000;
+    }
+/*y*/
+    param = get_param(element, ++p);
+    region->y = 0;
+    if (!isdefault(param))
+    {
+        if (param->type == INTEGER)
+            region->y = param->data.number;
+        else if (param->type == PERCENT)
+            region->y  =param->data.number * curr_vp->vp.width / 1000;
+    }
+/*width*/
+    param = get_param(element, ++p);
+    region->width = curr_vp->vp.width;
+    if (!isdefault(param))
+    {
+        if (param->type == INTEGER)
+            region->width =param->data.number;
+        else if (param->type == PERCENT)
+            region->width = curr_vp->vp.width  * param->data.number / 1000;
+    }
+/*height*/
+    param = get_param(element, ++p);
+    region->height = curr_vp->vp.height;
+    if (!isdefault(param))
+    {
+        if (param->type == INTEGER)
+            region->height =param->data.number;
+        else if (param->type == PERCENT)
+            region->height = curr_vp->vp.height  * param->data.number / 1000;
+    }
+    p++;
 
-    region->x = get_param(element, p++)->data.number;
-    region->y = get_param(element, p++)->data.number;
-    region->width = get_param(element, p++)->data.number;
-    region->height = get_param(element, p++)->data.number;
     region->wvp = PTRTOSKINOFFSET(skin_buffer, curr_vp);
     region->armed = false;
     region->reverse_bar = false;

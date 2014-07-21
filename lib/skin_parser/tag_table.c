@@ -22,7 +22,7 @@
 #include "tag_table.h"
 
 #include <string.h>
-#define BAR_PARAMS "?iiii|s*"
+#define BAR_PARAMS "?[iP][iP][iP][iP]|s*"
 /* The tag definition table */
 static const struct tag_info legal_tags[] = 
 {
@@ -176,13 +176,13 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_DISABLE_THEME,         "wd", "", 0|NOBREAK },
     { SKIN_TOKEN_DRAW_INBUILTBAR,       "wi", "", SKIN_REFRESH_STATIC|NOBREAK },
     
-    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SF|III", 0|NOBREAK },
+    { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SF|[IP][IP]I", 0|NOBREAK },
     { SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY, "xd", "S|[IT]I", 0 },
     { SKIN_TOKEN_IMAGE_DISPLAY,         "x", "SF|II", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT, "x9", "S", 0 },
     
     { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF|I", 0|NOBREAK },
-    { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "IIII|ss", 0|NOBREAK },
+    { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "[iP][iP][iP][iP]|ss", 0|NOBREAK },
     { SKIN_TOKEN_ALBUMART_DISPLAY,      "Cd" , "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_ALBUMART_FOUND,        "C" , "", SKIN_REFRESH_STATIC },
     
@@ -214,7 +214,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK },
     /* This uses the bar tag params also but the first item can be a string
      * and we don't allow no params. */
-    { SKIN_TOKEN_SETTING,               "St" , "[Si]|iiis*", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_SETTING,               "St" , "[Sip]|[ip][ip][ip]s*", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_TRANSLATEDSTRING,      "Sx" , "S", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_LANG_IS_RTL,           "Sr" , "", SKIN_REFRESH_STATIC },
     
@@ -224,8 +224,7 @@ static const struct tag_info legal_tags[] =
      * [SI]III[SI]|SN <- SIIIIS|S or IIIIS|S 
      *  keep in sync with parse_touchregion() and parse_lasttouch() */
     { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|[SD]D", SKIN_REFRESH_DYNAMIC },
-    { SKIN_TOKEN_TOUCHREGION,           "T"  , "[SI]III[SI]|S*", 0|NOBREAK },
-    
+    { SKIN_TOKEN_TOUCHREGION,           "T"  , "[Sip][ip][ip][ip][Sip]|S*", 0|NOBREAK },
     { SKIN_TOKEN_HAVE_TOUCH,            "Tp", "", FEATURE_TAG },
     
     { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "", SKIN_REFRESH_DYNAMIC },
@@ -246,7 +245,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_VAR_TIMEOUT,           "vl",   "S|D", SKIN_REFRESH_DYNAMIC },
 
     { SKIN_TOKEN_SUBSTRING,             "ss",   "IiT|s", SKIN_REFRESH_DYNAMIC },
-    { SKIN_TOKEN_DRAWRECTANGLE,         "dr",   "IIii|ss", SKIN_REFRESH_STATIC },
+    { SKIN_TOKEN_DRAWRECTANGLE,         "dr",   "[IP][IP][ip][ip]|ss", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_UNKNOWN,                ""   , "", 0 }
     /* Keep this here to mark the end of the table */
 };
