@@ -70,6 +70,7 @@
 #define os_opendir      opendir
 #define os_readdir      readdir
 #define os_closedir     closedir
+#define os_rewinddir    rewinddir
 #define os_mkdir        mkdir
 #define os_rmdir        rmdir
 #define os_dirfd        dirfd /* NOTE: might have to wrap on some platforms */

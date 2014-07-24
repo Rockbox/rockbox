@@ -418,6 +418,20 @@ struct dirent * app_readdir(DIR *dirp)
     return (struct dirent *)osdirent;
 }
 
+void app_rewinddir(DIR *dirp)
+{
+    struct __dir *this = (struct __dir *)dirp;
+    if (!this)
+        FILE_ERROR_RETURN(EBADF);
+
+    os_rewinddir(this->osdirp);
+
+#ifdef HAVE_MULTIDRIVE
+    if (this->volumes_returned != INT_MAX)
+        this->volumes_returned = 0;
+#endif /* HAVE_MULTIDRIVE */
+}
+
 int app_mkdir(const char *path)
 {
     char realpath[MAX_PATH];

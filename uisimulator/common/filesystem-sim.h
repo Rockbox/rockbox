@@ -98,6 +98,7 @@ struct dirinfo_native
 DIR * sim_opendir(const char *dirname);
 struct sim_dirent * sim_readdir(DIR *dirp);
 int   sim_closedir(DIR *dirp);
+void  sim_rewinddir(DIR *dirp);
 int   sim_mkdir(const char *path);
 int   sim_rmdir(const char *path);
 int   sim_samedir(DIR *dirp1, DIR *dirp2);

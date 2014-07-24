@@ -680,6 +680,20 @@ struct sim_dirent * sim_readdir(DIR *dirp)
     return entry;
 }
 
+void sim_rewinddir(DIR *dirp)
+{
+    struct dirstr_desc *dirstr = get_dirstr(dirp);
+    if (!dirstr)
+        return;
+
+    os_rewinddir(dirstr->osdirp);
+
+#ifdef HAVE_MULTIVOLUME
+    if (dirstr->volumecounter != INT_MAX)
+        dirstr->volumecounter = 0;
+#endif /* HAVE_MULTIVOLUME */
+}
+
 int sim_mkdir(const char *path)
 {
     char ospath[SIM_TMPBUF_MAX_PATH];

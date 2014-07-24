@@ -4268,21 +4268,37 @@ static bool check_deleted_files(void)
     return true;
 }
 
-
-/* Note that this function must not be inlined, otherwise the whole point
- * of having the code in a separate function is lost.
- */
-static void __attribute__ ((noinline)) check_ignore(const char *dirname,
-    int *ignore, int *unignore)
+static int NO_INLINE check_ignore(DIR *dir, bool add_files)
 {
-    char newpath[MAX_PATH];
+    bool scanned = false;
+    struct dirent *entry;
 
-    /* check for a database.ignore file */
-    snprintf(newpath, MAX_PATH, "%s/database.ignore", dirname);
-    *ignore = file_exists(newpath);
-    /* check for a database.unignore file */
-    snprintf(newpath, MAX_PATH, "%s/database.unignore", dirname);
-    *unignore = file_exists(newpath);
+    while ((entry = readdir(dir)))
+    {
+        scanned = true;
+
+        if (add_files)
+        {
+            if (!strcasecmp(entry->d_name, "database.ignore"))
+            {
+                /* finding any 'ignore' is the final word */
+                add_files = false;
+                break;
+            }
+        }
+        else if (!strcasecmp(entry->d_name, "database.unignore"))
+        {
+            /* consider adding again but the search for 'ignore' continues
+               since it overrides 'unignore' if both are present */
+            add_files = true;
+        }
+    }
+
+    /* if we read something then rewind it for the upcoming scan */
+    if (scanned)
+        rewinddir(dir);
+
+    return add_files;
 }
 
 /* max roots on native. on application more can be added via malloc() */
@@ -4400,12 +4416,11 @@ static int free_search_roots(struct search_roots_ll * start)
 #define free_search_roots(a) do {} while(0)
 #endif
 
-static bool check_dir(const char *dirname, int add_files)
+static bool check_dir(const char *dirname, bool add_files)
 {
     DIR *dir;
     int len;
     int success = false;
-    int ignore, unignore;
 
     dir = opendir(dirname);
     if (!dir)
@@ -4413,12 +4428,9 @@ static bool check_dir(const char *dirname, int add_files)
         logf("tagcache: opendir(%s) failed", dirname);
         return false;
     }
-    /* check for a database.ignore and database.unignore */
-    check_ignore(dirname, &ignore, &unignore);
 
-    /* don't do anything if both ignore and unignore are there */
-    if (ignore != unignore)
-        add_files = unignore;
+    /* check for a database.ignore and database.unignore */
+    add_files = check_ignore(dir, add_files);
 
     /* Recursively scan the dir. */
 #ifdef __PCTOOL__

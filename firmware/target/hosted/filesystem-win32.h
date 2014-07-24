@@ -96,6 +96,7 @@ _WDIR * os_opendir(const char *osdirname);
 int os_opendirfd(const char *osdirname);
 #define os_readdir      _wreaddir
 #define os_closedir     _wclosedir
+#define os_rewinddir    _wrewinddir
 int os_mkdir(const char *ospath, mode_t mode);
 int os_rmdir(const char *ospath);
 

@@ -280,6 +280,7 @@ file_error:
 
     return rc;
 }
+#endif /* 0 */
 
 /* reset the position of a directory stream to the beginning of a directory */
 void rewinddir(DIR *dirp)
@@ -297,8 +298,6 @@ void rewinddir(DIR *dirp)
 
     RELEASE_DIRSTR(READER, dir);
 }
-
-#endif /* 0 */
 
 /* make a directory */
 int mkdir(const char *path)
