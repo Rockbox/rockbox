@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_b65ee874",
+        "filename": "firmware/target/arm/as3525/sd-as3525v2.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2014-07-24T18:16:59Z",
+      "side": 1,
+      "message": "Colon should be comma.",
+      "revId": "a5b0f28f35bc57d0eb5417eebb2e3c6ac2f67e01",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a2fa921_56543453",
+        "filename": "firmware/target/arm/as3525/sd-as3525v2.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2014-07-24T18:16:59Z",
+      "side": 1,
+      "message": "Is sd_mutex defined anywhere?  I can\u0027t find it in the patch or our source.",
+      "revId": "a5b0f28f35bc57d0eb5417eebb2e3c6ac2f67e01",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
