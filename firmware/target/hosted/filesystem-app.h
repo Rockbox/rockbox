@@ -106,6 +106,7 @@ ssize_t app_readlink(const char *path, char *buf, size_t bufsize);
 DIR * app_opendir(const char *dirname);
 struct dirent * app_readdir(DIR *dirp);
 int   app_closedir(DIR *dirp);
+void  app_rewinddir(DIR *dirp);
 int   app_mkdir(const char *path);
 int   app_rmdir(const char *path);
 int   app_samedir(DIR *dirp1, DIR *dirp2);
