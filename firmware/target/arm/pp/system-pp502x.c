@@ -489,6 +489,8 @@ void system_init(void)
         DEV_RS         = 0x00000000;
         DEV_RS2        = 0x00000000;
 #elif defined(PHILIPS_SA9200)
+        DEV_INIT1      = 0x00000000;
+        DEV_INIT2      = 0x40004000;
         /* reset all allowed devices */
         DEV_RS         = 0x3ffffef8;
         DEV_RS2        = 0xffffffff;

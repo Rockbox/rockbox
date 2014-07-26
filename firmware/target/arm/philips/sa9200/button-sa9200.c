@@ -29,6 +29,19 @@
 
 static int int_btn = BUTTON_NONE;
 
+/*
+ * Generate a click sound from the player (not in headphones yet)
+ * TODO: integrate this with the "key click" option
+ */
+static void button_click(void)
+{
+    GPIOF_ENABLE     |=  0x08;
+    GPIOF_OUTPUT_VAL |=  0x08;
+    GPIOF_OUTPUT_EN  |=  0x08;
+    udelay(1000);
+    GPIOF_OUTPUT_VAL &= ~0x08;
+}
+
 #ifndef BOOTLOADER
 static bool hold_button_old = false;
 
@@ -135,6 +148,7 @@ bool button_hold(void)
  */
 int button_read_device(void)
 {
+    static int btn_old = BUTTON_NONE;
     int btn = int_btn;
     bool hold = !(GPIOL_INPUT_VAL & 0x40);
 
@@ -153,6 +167,9 @@ int button_read_device(void)
     if (!(GPIOB_INPUT_VAL & 0x20)) btn |= BUTTON_POWER;
     if (!(GPIOF_INPUT_VAL & 0x10)) btn |= BUTTON_VOL_UP;
     if (!(GPIOF_INPUT_VAL & 0x04)) btn |= BUTTON_VOL_DOWN;
+
+    if ((btn != btn_old) && (btn != BUTTON_NONE)) button_click();
+    btn_old = btn;
 
     return btn;
 }
