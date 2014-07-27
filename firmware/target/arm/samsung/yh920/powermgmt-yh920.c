@@ -24,31 +24,29 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-/* TODO: Not yet calibrated */
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3733
+    3523 /* 5% */
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3627
+    3507 /* 3% */
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3733, 3772, 3821, 3840, 3869, 3917, 3985, 4034, 4072, 4140, 4198 }
+    { 3486, 3557, 3628, 3699, 3770, 3841, 3912, 3983, 4054, 4125, 4196 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3956, 3995, 4024, 4043, 4063, 4082, 4111, 4140, 4179, 4218, 4266
+    3486, 3557, 3628, 3699, 3770, 3841, 3912, 3983, 4054, 4125, 4196
 };
 
-#define BATTERY_SCALE_FACTOR 4650
+#define BATTERY_SCALE_FACTOR 4200
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */

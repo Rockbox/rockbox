@@ -63,7 +63,8 @@ unsigned short adc_scan(int channel)
 
     adcdata[channel] = (adc_data_1<<2 | adc_data_2);
 
-#if !(defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) || defined(SAMSUNG_YH820))
+#if !(defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) ||\
+      defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920))
     /* ADC values read low if PLL is enabled */
     if(PLL_CONTROL & 0x80000000){
         adcdata[channel] += 0x14;
