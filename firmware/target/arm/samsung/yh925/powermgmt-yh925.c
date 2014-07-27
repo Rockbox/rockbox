@@ -24,28 +24,26 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-/* TODO: Not yet calibrated */
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3750
+    3659
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3700
+    3609
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3700, 3822, 3880, 3909, 3946, 3976, 4024, 4086, 4141, 4223, 4307 }
+    { 3609, 3731, 3789, 3818, 3855, 3885, 3933, 3995, 4050, 4132, 4216 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3868, 3971, 3988, 3998, 4018, 4036, 4097, 4116, 4165, 4222, 4307
+    3777, 3880, 3897, 3907, 3927, 3945, 4006, 4025, 4074, 4131, 4216
 };
 
 #define BATTERY_SCALE_FACTOR 4650
