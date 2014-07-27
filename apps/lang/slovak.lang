@@ -12265,15 +12265,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Šírka Pásma %d"
+    gigabeats,samsungypr1: "Hlasitosť Pásma %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Šírka pásma"
+    gigabeats,samsungypr1: "Hlasitosť Pásma"
   </voice>
 </phrase>
 <phrase>
@@ -12282,15 +12282,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Široké"
+    gigabeats,samsungypr1: "Široký"
   </dest>
   <voice>
     *: none
-    gigabeats: "Široké"
+    gigabeats,samsungypr1: "Široký"
   </voice>
 </phrase>
 <phrase>
@@ -12299,15 +12299,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Úzke"
+    gigabeats,samsungypr1: "Úzky"
   </dest>
   <voice>
     *: none
-    gigabeats: "Úzke"
+    gigabeats,samsungypr1: "Úzky"
   </voice>
 </phrase>
 <phrase>
@@ -12330,15 +12330,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Pokročilé Nastavenia Tónu"
+    gigabeats,samsungypr1: "Pokročilé Nastavenia Tónov"
   </dest>
   <voice>
     *: none
-    gigabeats: "Pokročilé nastavenia tónu"
+    gigabeats,samsungypr1: "Pokročilé Nastavenia Tónov"
   </voice>
 </phrase>
 <phrase>
@@ -12347,15 +12347,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-d Rozšírenie"
+    depth_3d: "3-D Rozšírenie"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Rozšírenie"
+    depth_3d: "3-D Rozšírenie"
   </voice>
 </phrase>
 <phrase>
@@ -12364,15 +12364,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Frekvencia Pásma %d"
+    gigabeats,samsungypr1: "Frekvencia Pásma %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Frekvencia pásma"
+    gigabeats,samsungypr1: "Frekvencia Pásma"
   </voice>
 </phrase>
 <phrase>
@@ -12381,15 +12381,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Šírka Pásma %d"
+    gigabeats,samsungypr1: "Šírka Pásma %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Šírka pásma"
+    gigabeats,samsungypr1: "Šírka Pásma "
   </voice>
 </phrase>
 <phrase>
@@ -12415,15 +12415,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Nastavenia Tónu"
+    gigabeats,samsungypr1: "Ovládanie Tónov"
   </dest>
   <voice>
     *: none
-    gigabeats: "Nastavenia tónu"
+    gigabeats,samsungypr1: "Ovládanie Tónov"
   </voice>
 </phrase>
 <phrase>
@@ -13031,5 +13031,123 @@
   </dest>
   <voice>
     *: "Vyberte Priečinky Pre Prehľadávanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Farba Oddeľovačov Riadkov"
+  </dest>
+  <voice>
+    *: "Farba Oddeľovačov Riadkov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Oddeľovač Riadkov"
+  </dest>
+  <voice>
+    *: "Oddeľovač Riadkov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Obmedzenie Maximálnej Hlasitosti"
+  </dest>
+  <voice>
+    *: "Obmedzenie Maximálnej Hlasitosti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "roll-off DAC filtra "
+  </dest>
+  <voice>
+    *: "roll-off DAC filtra "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Čas Začiatku"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Čas Začiatku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Výrazný"
+  </dest>
+  <voice>
+    *: "Výrazný"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Pomalý"
+  </dest>
+  <voice>
+    *: "Pomalý"
   </voice>
 </phrase>
