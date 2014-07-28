@@ -12,6 +12,7 @@ logo.c
 lrcplayer.c
 mosaique.c
 main_menu_config.c
+music_quiz.c
 properties.c
 random_folder_advance_config.c
 rockblox.c

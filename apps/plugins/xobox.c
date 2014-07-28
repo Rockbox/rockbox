@@ -1233,7 +1233,7 @@ static int xobox_loop (void)
                     rb->splashf(HZ, "New High Score: %d", player.score);
                 }
 
-                highscore_show(-1, highscores, NUM_SCORES, true);
+                highscore_show(pos, highscores, NUM_SCORES, true);
             }
 
             if (xobox_menu(false)) {
