@@ -22,11 +22,64 @@
 #include "system.h"
 #include "button.h"
 #include "backlight.h"
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+#include "adc.h"
+
+static int int_btn = BUTTON_NONE;
 
 void button_init_device(void)
 {
-    /* TODO...for now, hardware initialisation is done by the OF bootloader */
+    /* remote interrupt - low when key is pressed */
+    GPIOD_ENABLE |= 0x01;
+    GPIOD_OUTPUT_EN &= ~0x01;
+
+    /* disable/reset int */
+    GPIOD_INT_EN  &= ~0x01;
+    GPIOD_INT_CLR |=  0x01;
+
+    /* enable int */
+    GPIOD_INT_LEV &= ~0x01;
+    GPIOD_INT_EN  |=  0x01;
+
+    /* remote PLAY */
+    GPIOD_ENABLE |= 0x02;
+    GPIOD_OUTPUT_EN &= ~0x02;
 }
+
+/* Remote buttons */
+void remote_int(void)
+{
+    int state = 0x01 & ~GPIOD_INPUT_VAL;
+
+    GPIO_CLEAR_BITWISE(GPIOD_INT_EN, 0x01);
+    GPIO_WRITE_BITWISE(GPIOD_INT_LEV, state, 0x01);
+
+    if (state != 0)
+    {
+        /* necessary delay 1msec */
+        udelay(1000);
+        unsigned int val = adc_scan(ADC_REMOTE);
+        if (val > 750) int_btn = BUTTON_RC_MINUS;
+        else
+        if (val > 375) int_btn = BUTTON_RC_PLUS;
+        else
+        if (val > 100) int_btn = BUTTON_RC_REW;
+        else
+        int_btn = BUTTON_RC_FFWD;
+    }
+    else
+    int_btn = BUTTON_NONE;
+
+    GPIO_SET_BITWISE(GPIOD_INT_CLR, 0x01);
+    GPIO_SET_BITWISE(GPIOD_INT_EN, 0x01);
+}
+#else
+void button_init_device(void)
+{
+    /* nothing */
+}
+#endif /* (SAMSUNG_YH920) || (SAMSUNG_YH925) */
+
 
 bool button_hold(void)
 {
@@ -38,7 +91,11 @@ bool button_hold(void)
  */
 int button_read_device(void)
 {
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+    int btn = int_btn;
+#else
     int btn = BUTTON_NONE;
+#endif /* (SAMSUNG_YH920) || (SAMSUNG_YH925) */
     static bool hold_button = false;
     bool hold_button_old;
 
@@ -65,6 +122,7 @@ int button_read_device(void)
         if ( GPIOB_INPUT_VAL & 0x80) btn |= BUTTON_PLAY;
 #elif defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
         if ( GPIOD_INPUT_VAL & 0x04) btn |= BUTTON_PLAY;
+        if ( GPIOD_INPUT_VAL & 0x02) btn |= BUTTON_RC_PLAY; /* Remote PLAY */
 #endif
     }
 

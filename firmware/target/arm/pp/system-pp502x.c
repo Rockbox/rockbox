@@ -154,6 +154,10 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
         else if (CPU_HI_INT_STAT & GPIO0_MASK) {
             if (GPIOD_INT_STAT & 0x10)
                 usb_insert_int();
+#if !defined(SAMSUNG_YH820)
+            if (GPIOD_INT_STAT & 0x01)
+                remote_int();
+#endif
         }
 /* end SAMSUNG_YHxxx */
 #elif defined(PBELL_VIBE500)

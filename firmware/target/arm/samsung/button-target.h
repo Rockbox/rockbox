@@ -26,6 +26,10 @@
 
 /* Button codes for Samsung YH-820, 920, 925 */
 
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+void remote_int(void);
+#endif /* (SAMSUNG_YH920) || (SAMSUNG_YH925) */
+
 /* Main unit's buttons */
 /* Left = Menu, Right = Sel */
 #define BUTTON_LEFT         0x00000001
@@ -38,6 +42,12 @@
 #define BUTTON_REC          0x00000080
 
 #define BUTTON_MAIN         0x000000ff
+
+#define BUTTON_RC_PLUS      BUTTON_UP
+#define BUTTON_RC_MINUS     BUTTON_DOWN
+#define BUTTON_RC_PLAY      BUTTON_PLAY
+#define BUTTON_RC_REW       BUTTON_REW
+#define BUTTON_RC_FFWD      BUTTON_FFWD
 
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT  15
