@@ -114,7 +114,7 @@ build() {
             url="$GNU_MIRROR/binutils"
             ;;
 
-        ctng)
+        crosstool-ng)
             file="crosstool-ng-$version.tar.bz2"
             url="http://crosstool-ng.org/download/crosstool-ng"
             ;;
@@ -205,7 +205,7 @@ build() {
 
     echo "ROCKBOXDEV: $toolname/configure"
     case $toolname in
-        ctng) # ct-ng doesnt support out-of-tree build and the src folder is named differently
+        crosstool-ng) # ct-ng doesnt support out-of-tree build and the src folder is named differently
             toolname="crosstool-ng"
             cp -r ../$toolname-$version/* ../$toolname-$version/.version .
             ./configure --prefix=$prefix $configure_params
@@ -236,7 +236,7 @@ make_ctng() {
 
     if test ! -n "$ctng"; then
         if test ! -f "$prefix/bin/ct-ng"; then # look if we build it already
-            build "ctng" "" "1.13.2"
+            build "crosstool-ng" "" "1.13.2" "crosstool-ng-1.13.2.diff"
         fi
     fi
     ctng=`PATH=$prefix/bin:$PATH which ct-ng`
