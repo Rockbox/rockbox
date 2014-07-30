@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_56b0b48b",
+        "filename": "firmware/target/arm/as3525/sd-as3525.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2014-07-30T04:18:58Z",
+      "side": 1,
+      "message": "Return code from sd_init_card is dropped above, so this doesn\u0027t work.",
+      "revId": "1a818698b4f86709db63d94b8b60a405f76124b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
