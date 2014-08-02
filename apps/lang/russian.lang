@@ -12790,6 +12790,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Линия разделитель"
+  </dest>
+  <voice>
+    *: "Линия разделитель"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Цвет линии разделителя"
+  </dest>
+  <voice>
+    *: "Цвет линии разделителя"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SLEEP_TIMER_DURATION
   desc: default sleep timer duration in minutes
   user: core
