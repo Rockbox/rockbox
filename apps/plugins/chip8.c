@@ -990,13 +990,16 @@ STATIC void chip8 (void)
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define CHIP8_OFF  BUTTON_MENU
-#define CHIP8_KEY2 BUTTON_SCROLL_BACK
+#define CHIP8_OFF  (BUTTON_MENU | BUTTON_SELECT)
+#define CHIP8_KEY1 (BUTTON_MENU | BUTTON_LEFT)
+#define CHIP8_KEY2 BUTTON_MENU
+#define CHIP8_KEY3 (BUTTON_MENU | BUTTON_RIGHT)
 #define CHIP8_KEY4 BUTTON_LEFT
-#define CHIP8_KEY5 BUTTON_PLAY
+#define CHIP8_KEY5 BUTTON_SELECT
 #define CHIP8_KEY6 BUTTON_RIGHT
-#define CHIP8_KEY8 BUTTON_SCROLL_FWD
-
+#define CHIP8_KEY7 (BUTTON_PLAY | BUTTON_LEFT)
+#define CHIP8_KEY8 BUTTON_PLAY
+#define CHIP8_KEY9 (BUTTON_PLAY | BUTTON_RIGHT)
 #elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 #define CHIP8_OFF  BUTTON_POWER
 #define CHIP8_KEY2 BUTTON_UP
@@ -1541,8 +1544,7 @@ static bool chip8_run(const char* file)
     rb->lcd_drawrect(CHIP8_X-1,CHIP8_Y-1,CHIP8_LCDWIDTH+2,CHIP8_HEIGHT+2);
 #endif
     rb->lcd_update();
-
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_CODEC != SWCODEC)
     /* init sound */
     is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
     if (!is_playing) /* no? then we can make sound */
