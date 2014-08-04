@@ -47,8 +47,8 @@
  */
 
 #define HWSTUB_CLASS        0xff
-#define HWSTUB_SUBCLASS     0x57
-#define HWSTUB_PROTOCOL     0x0b
+#define HWSTUB_SUBCLASS     0xde
+#define HWSTUB_PROTOCOL     0xad
 
 /**
  * Descriptors can be retrieved using configuration descriptor or individually
@@ -184,6 +184,6 @@ struct hwstub_exec_req_t
 {
     uint32_t dAddress;
     uint16_t bmFlags;
-};
+} __attribute__((packed));
 
 #endif /* __HWSTUB_PROTOCOL__ */
