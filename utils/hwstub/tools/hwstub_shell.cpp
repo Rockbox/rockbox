@@ -444,7 +444,30 @@ int my_lua_write_field(lua_State *state)
         value = value << shift | (hw_read32(state, addr) & ~(mask << shift));
     else
         value <<= shift;
-    
+
+    hw_write32(state, addr, value);
+    return 0;
+}
+
+int my_lua_sct_reg(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "sct() takes one argument");
+    soc_addr_t addr = lua_tounsigned(state, lua_upvalueindex(1));
+    char op = lua_tounsigned(state, lua_upvalueindex(2));
+
+    soc_word_t mask = luaL_checkunsigned(state, 1);
+    soc_word_t value = hw_read32(state, addr);
+    if(op == 's')
+        value |= mask;
+    else if(op == 'c')
+        value &= ~mask;
+    else if(op == 't')
+        value ^= mask;
+    else
+        luaL_error(state, "sct() internal error");
+
     hw_write32(state, addr, value);
     return 0;
 }
@@ -556,6 +579,23 @@ void my_lua_create_reg(soc_addr_t addr, size_t index, const soc_reg_t& reg)
 
         lua_pushunsigned(g_lua, addr + reg.addr[index].addr + 12);
         lua_pushcclosure(g_lua, my_lua_write_reg, 1);
+        lua_setfield(g_lua, -2, "tog");
+    }
+    else
+    {
+        lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
+        lua_pushunsigned(g_lua, 's');
+        lua_pushcclosure(g_lua, my_lua_sct_reg, 2);
+        lua_setfield(g_lua, -2, "set");
+
+        lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
+        lua_pushunsigned(g_lua, 'c');
+        lua_pushcclosure(g_lua, my_lua_sct_reg, 2);
+        lua_setfield(g_lua, -2, "clr");
+
+        lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
+        lua_pushunsigned(g_lua, 't');
+        lua_pushcclosure(g_lua, my_lua_sct_reg, 2);
         lua_setfield(g_lua, -2, "tog");
     }
 
