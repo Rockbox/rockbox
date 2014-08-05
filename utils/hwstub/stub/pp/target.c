@@ -73,7 +73,7 @@ void target_init(void)
     /* try to read version for PP502x */
     if(PP_VER2 >> 16 != ('P' | 'P' << 8))
     {
-        logf("unidentified PP family");
+        logf("unidentified PP family\n");
         g_pp_family = UNKNOWN;
     }
     else
@@ -86,12 +86,12 @@ void target_init(void)
         pp_descriptor.bRevision[1] = PP_VER1 & 0xff;
         if(pp_descriptor.wChipID >= 0x6110)
         {
-            logf("identified PP611x family");
+            logf("identified PP611x family\n");
             g_pp_family = PP611x;
         }
         else
         {
-            logf("identified PP502x family");
+            logf("identified PP502x family\n");
             g_pp_family = PP502x;
         }
     }
