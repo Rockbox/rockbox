@@ -376,7 +376,6 @@ static void handle_read(struct usb_ctrlrequest *req)
     {
         if(id != last_id)
             return usb_drv_stall(EP_CONTROL, true, true);
-        memcpy((void *)last_addr, usb_buffer, req->wLength);
         memcpy(usb_buffer, (void *)last_addr, req->wLength);
         asm volatile("nop" : : : "memory");
         usb_drv_send(EP_CONTROL, usb_buffer, req->wLength);
@@ -392,7 +391,7 @@ static void handle_write(struct usb_ctrlrequest *req)
     int sz_hdr = sizeof(struct hwstub_write_req_t);
     if(size < sz_hdr)
         return usb_drv_stall(EP_CONTROL, true, true);
-    memcpy((void *)write->dAddress, usb_buffer + sz_hdr, req->wLength - sz_hdr);
+    memcpy((void *)write->dAddress, usb_buffer + sz_hdr, size - sz_hdr);
     usb_drv_send(EP_CONTROL, NULL, 0);
 }
 
