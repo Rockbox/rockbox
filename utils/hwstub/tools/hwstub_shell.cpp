@@ -231,7 +231,7 @@ int my_lua_udelay(lua_State *state)
 bool my_lua_import_hwstub()
 {
     int oldtop = lua_gettop(g_lua);
-    
+
     lua_newtable(g_lua); // hwstub
 
     lua_newtable(g_lua); // options
@@ -336,8 +336,6 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "major");
     lua_pushinteger(g_lua, HWSTUB_VERSION_MINOR);
     lua_setfield(g_lua, -2, "minor");
-    lua_pushinteger(g_lua, HWSTUB_VERSION_REV);
-    lua_setfield(g_lua, -2, "revision");
     lua_setfield(g_lua, -2, "version");
     lua_setfield(g_lua, -2, "host");
 
@@ -677,8 +675,8 @@ bool my_lua_import_soc(const std::vector< soc_t >& socs)
 
 void usage(void)
 {
-    printf("hwstub_tool, compiled with hwstub %d.%d.%d\n",
-        HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR, HWSTUB_VERSION_REV);
+    printf("hwstub_tool, compiled with hwstub protocol %d.%d\n",
+        HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
     printf("\n");
     printf("usage: hwstub_tool [options] <soc desc files>\n");
     printf("options:\n");
@@ -797,7 +795,7 @@ int main(int argc, char **argv)
     {
         printf("Warning: this tool is possibly incompatible with your device:\n");
         printf("Device version: %d.%d.%d\n", g_hwdev_ver.bMajor, g_hwdev_ver.bMinor, g_hwdev_ver.bRevision);
-        printf("Host version: %d.%d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR, HWSTUB_VERSION_REV);
+        printf("Host version: %d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
     }
 
     // get memory layout information

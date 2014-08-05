@@ -66,8 +66,8 @@ end
 if not hwstub.options.quiet then
     print("information")
     print("  hwstub")
-    print("    version: " .. string.format("%d.%d.%d", hwstub.host.version.major,
-        hwstub.host.version.minor, hwstub.host.version.revision))
+    print("    version: " .. string.format("%d.%d", hwstub.host.version.major,
+        hwstub.host.version.minor))
     print("  device")
     print("    version: " .. string.format("%d.%d.%d", hwstub.dev.version.major,
         hwstub.dev.version.minor, hwstub.dev.version.revision))
