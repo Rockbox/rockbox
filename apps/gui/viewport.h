@@ -38,18 +38,20 @@ int viewport_get_nb_lines(const struct viewport *vp);
 #define THEME_LISTS                 (BIT_N(3))
 #define THEME_ALL                   (~(0u))
 
-#ifndef __PCTOOL__
-/*
- * Initialize the viewportmanager, which in turns initializes the UI vp and
- * statusbar stuff
- */
-void viewportmanager_init(void) INIT_ATTR;
-
+/* These are needed in checkwps */
 void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen);
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen);
 int get_viewport_default_colour(enum screen_type screen, bool fgcolour);
+
+#ifndef __PCTOOL__
+
+/*
+ * Initialize the viewportmanager, which in turns initializes the UI vp and
+ * statusbar stuff
+ */
+void viewportmanager_init(void) INIT_ATTR;
 
 #ifdef HAVE_LCD_BITMAP
 void viewportmanager_theme_enable(enum screen_type screen, bool enable,

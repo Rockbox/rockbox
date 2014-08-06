@@ -157,7 +157,12 @@ int get_cpu_boost_counter(void);
     ((type *)((intptr_t)(memberptr) - OFFSETOF(type, membername)))
 
 /* returns index of first set bit or 32 if no bits are set */
+#if defined(CPU_ARM) && ARM_ARCH >= 5 && !defined(__thumb__)
+static inline int find_first_set_bit(uint32_t val)
+    { return LIKELY(val) ? __builtin_ctz(val) : 32; }
+#else
 int find_first_set_bit(uint32_t val);
+#endif
 
 static inline __attribute__((always_inline))
 uint32_t isolate_first_bit(uint32_t val)
