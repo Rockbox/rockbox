@@ -12997,6 +12997,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Обмеження максимальної гучності"
+  </dest>
+  <voice>
+    *: "Обмеження максимальної гучності"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CODEPAGE_WESTERN_EUROPEAN
   desc: in codepage setting menu
   user: core
