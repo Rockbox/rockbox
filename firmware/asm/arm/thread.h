@@ -30,6 +30,7 @@ struct regs
 };
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+  #include <errno.h>
   #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
 #else
   #define DEFAULT_STACK_SIZE 0x400  /* Bytes */
