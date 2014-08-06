@@ -1,5 +1,5 @@
 /* buffer.c - Text buffering and word wrapping
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * This file is part of Frotz.
  *
@@ -46,7 +46,7 @@ void flush_buffer (void)
        might execute any arbitrary opcode, which might flush the buffer. */
 
     if (locked || bufpos == 0)
-	return;
+        return;
 
     /* Send the buffer to the output streams */
 
@@ -55,7 +55,7 @@ void flush_buffer (void)
 
     locked = TRUE;
 
-    stream_word (buffer); 
+    stream_word (buffer);
 
 #ifdef SPEECH_OUTPUT
     os_speech_output(buffer);
@@ -83,39 +83,39 @@ void print_char (zchar c)
 
     if (message || ostream_memory || enable_buffering) {
 
-	if (!flag) {
+        if (!flag) {
 
-	    /* Characters 0 and ZC_RETURN are special cases */
+            /* Characters 0 and ZC_RETURN are special cases */
 
-	    if (c == ZC_RETURN)
-		{ new_line (); return; }
-	    if (c == 0)
-		return;
+            if (c == ZC_RETURN)
+                { new_line (); return; }
+            if (c == 0)
+                return;
 
-	    /* Flush the buffer before a whitespace or after a hyphen */
+            /* Flush the buffer before a whitespace or after a hyphen */
 
-	    if (c == ' ' || c == ZC_INDENT || c == ZC_GAP || (prev_c == '-' && c != '-'))
+            if (c == ' ' || c == ZC_INDENT || c == ZC_GAP || (prev_c == '-' && c != '-'))
 
 
-		flush_buffer ();
+                flush_buffer ();
 
-	    /* Set the flag if this is part one of a style or font change */
+            /* Set the flag if this is part one of a style or font change */
 
-	    if (c == ZC_NEW_FONT || c == ZC_NEW_STYLE)
-		flag = TRUE;
+            if (c == ZC_NEW_FONT || c == ZC_NEW_STYLE)
+                flag = TRUE;
 
-	    /* Remember the current character code */
+            /* Remember the current character code */
 
-	    prev_c = c;
+            prev_c = c;
 
-	} else flag = FALSE;
+        } else flag = FALSE;
 
-	/* Insert the character into the buffer */
+        /* Insert the character into the buffer */
 
-	buffer[bufpos++] = c;
+        buffer[bufpos++] = c;
 
-	if (bufpos == TEXT_BUFFER_SIZE)
-	    runtime_error (ERR_TEXT_BUF_OVF);
+        if (bufpos == TEXT_BUFFER_SIZE)
+            runtime_error (ERR_TEXT_BUF_OVF);
 
     } else stream_char (c);
 
@@ -149,4 +149,3 @@ void init_buffer(void)
     bufpos = 0;
     prev_c = 0;
 }
-

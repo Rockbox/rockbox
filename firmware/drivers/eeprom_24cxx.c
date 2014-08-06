@@ -32,7 +32,7 @@ static char data_cache[EEPROM_SIZE];
 static uint8_t cached_bitfield[EEPROM_SIZE/8];
 
 #define IS_CACHED(addr) (cached_bitfield[addr/8] & (1 << (addr % 8)))
-#define SET_CACHED(addr) (cached_bitfield[addr/8] |= 1 << (addr % 8)) 
+#define SET_CACHED(addr) (cached_bitfield[addr/8] |= 1 << (addr % 8))
 
 void eeprom_24cxx_init(void)
 {
@@ -51,7 +51,7 @@ static int eeprom_24cxx_read_byte(unsigned int address, char *c)
         logf("EEPROM address: %d", address);
         return -9;
     }
-    
+
     /* Check from cache. */
     if (IS_CACHED(address))
     {
@@ -59,7 +59,7 @@ static int eeprom_24cxx_read_byte(unsigned int address, char *c)
         *c = data_cache[address];
         return 0;
     }
-    
+
     *c = 0;
     do
     {
@@ -71,17 +71,17 @@ static int eeprom_24cxx_read_byte(unsigned int address, char *c)
         logf("EEPROM RFail: %d/%d/%d", ret, address, count);
         return ret;
     }
-    
+
     if (count)
     {
         /* keep between {} as logf is whitespace in normal builds */
         logf("EEPROM rOK: %d retries", count);
     }
-    
+
     /* Cache the byte. */
     data_cache[address] = byte;
     SET_CACHED(address);
-    
+
     *c = byte;
     return 0;
 }
@@ -96,14 +96,14 @@ static int eeprom_24cxx_write_byte(unsigned int address, char c)
         logf("EEPROM address: %d", address);
         return -9;
     }
-    
+
     /* Check from cache. */
     if (IS_CACHED(address) && data_cache[address] == c)
     {
         logf("EEPROM WCached: %d", address);
         return 0;
     }
-    
+
     do
     {
         ret = sw_i2c_write(EEPROM_ADDR, address, &c, 1);
@@ -114,16 +114,16 @@ static int eeprom_24cxx_write_byte(unsigned int address, char c)
         logf("EEPROM WFail: %d/%d", ret, address);
         return ret;
     }
-    
+
     if (count)
     {
         /* keep between {} as logf is whitespace in normal builds */
         logf("EEPROM wOK: %d retries", count);
     }
-    
+
     SET_CACHED(address);
     data_cache[address] = c;
-    
+
     return 0;
 }
 
@@ -132,14 +132,14 @@ int eeprom_24cxx_read(unsigned char address, void *dest, int length)
     char *buf = (char *)dest;
     int ret = 0;
     int i;
-    
+
     for (i = 0; i < length; i++)
     {
         ret = eeprom_24cxx_read_byte(address+i, &buf[i]);
         if (ret < 0)
             return ret;
     }
-    
+
     return ret;
 }
 
@@ -147,13 +147,12 @@ int eeprom_24cxx_write(unsigned char address, const void *src, int length)
 {
     const char *buf = (const char *)src;
     int i;
-    
+
     for (i = 0; i < length; i++)
     {
         if (eeprom_24cxx_write_byte(address+i, buf[i]) < 0)
             return -1;
     }
-    
+
     return 0;
 }
-

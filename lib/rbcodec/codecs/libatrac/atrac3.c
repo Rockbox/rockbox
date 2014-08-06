@@ -54,14 +54,14 @@
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 
-#if defined(CPU_ARM) && (ARM_ARCH >= 5)  
+#if defined(CPU_ARM) && (ARM_ARCH >= 5)
     #define QMFWIN_TYPE int16_t /* ARMv5e+ uses 32x16 multiplication */
 #else
     #define QMFWIN_TYPE int32_t
 #endif
 
 static VLC          spectral_coeff_tab[7]     IBSS_ATTR_LARGE_IRAM;
-static QMFWIN_TYPE  qmf_window[48]            IBSS_ATTR MEM_ALIGN_ATTR; 
+static QMFWIN_TYPE  qmf_window[48]            IBSS_ATTR MEM_ALIGN_ATTR;
 static int32_t      atrac3_spectrum [2][1024] IBSS_ATTR MEM_ALIGN_ATTR;
 static int32_t      atrac3_IMDCT_buf[2][ 512] IBSS_ATTR MEM_ALIGN_ATTR;
 static int32_t      atrac3_prevFrame[2][1024] IBSS_ATTR MEM_ALIGN_ATTR;
@@ -79,9 +79,9 @@ static int          vlcs_initialized = 0;
  * @param inhi      higher part of spectrum
  * @param nIn       size of spectrum buffer
  */
- 
+
 #if defined(CPU_ARM)
-    extern void 
+    extern void
     atrac3_iqmf_matrixing(int32_t *p3,
                           int32_t *inlo,
                           int32_t *inhi,
@@ -126,7 +126,7 @@ static int          vlcs_initialized = 0;
  *          out += 2;
  *      }
  */
- 
+
 #if defined(CPU_ARM) && (ARM_ARCH >= 5)
     extern void
     atrac3_iqmf_dewindowing_armv5e(int32_t *out,
@@ -142,15 +142,15 @@ static int          vlcs_initialized = 0;
          atrac3_iqmf_dewindowing_armv5e(out, in, win, nIn);
 
     }
-                            
-                            
-#elif defined(CPU_ARM) 
+
+
+#elif defined(CPU_ARM)
     extern void
     atrac3_iqmf_dewindowing(int32_t *out,
                             int32_t *in,
                             int32_t *win,
-                            unsigned int nIn);    
-                            
+                            unsigned int nIn);
+
 #elif defined (CPU_COLDFIRE)
     #define MULTIPLY_ADD_BLOCK \
         "movem.l (%[win]), %%d0-%%d7             \n\t" \
@@ -176,7 +176,7 @@ static int          vlcs_initialized = 0;
         for (j = nIn; j != 0; j--, in+=2, out+=2) {
             _in = in;
             _win = win;
-            
+
             asm volatile (
             "move.l (%[in])+, %%a5                    \n\t" /* preload frist in value */
             MULTIPLY_ADD_BLOCK /*  0.. 7 */
@@ -220,10 +220,10 @@ static int          vlcs_initialized = 0;
                             unsigned int nIn)
     {
         int32_t i, j, s1, s2;
-        
+
         for (j = nIn; j != 0; j--, in+=2, out+=2) {
             s1 = s2 = i = 0;
-            
+
             MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /*  0.. 7 */
             MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /*  8..15 */
             MULTIPLY_ADD_BLOCK(s1, s2, in, win, i); /* 16..23 */
@@ -233,9 +233,9 @@ static int          vlcs_initialized = 0;
 
             out[0] = s2;
             out[1] = s1;
-            
+
         }
-        
+
     }
 #endif
 
@@ -246,7 +246,7 @@ static int          vlcs_initialized = 0;
  * @param buffer        sample buffer
  * @param win           window coefficients
  */
- 
+
 static inline void
 atrac3_imdct_windowing(int32_t *buffer,
                        const int32_t *win)
@@ -270,7 +270,7 @@ atrac3_imdct_windowing(int32_t *buffer,
  * @param delayBuf  delayBuf buffer
  * @param temp      temp buffer
  */
- 
+
 static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut, int32_t *delayBuf, int32_t *temp)
 {
 
@@ -304,7 +304,7 @@ static void IMLT(int32_t *pInput, int32_t *pOutput)
 
     /* Windowing. */
     atrac3_imdct_windowing(pOutput, window_lookup);
-   
+
 }
 
 
@@ -357,7 +357,7 @@ static void init_atrac3_transforms(void)
         qmf_window[i] = qmf_window[47-i] = s;
         #endif
     }
-    
+
 }
 
 
@@ -431,12 +431,12 @@ static void readQuantSpectralCoeffs (GetBitContext *gb, int selector, int coding
  * @param last          last spectral line in subband
  * @param SF            scalefactor for all spectral lines of this band
  */
- 
+
 static void inverseQuantizeSpectrum(int *mantissas, int32_t *pOut,
                                     int32_t first, int32_t last, int32_t SF)
 {
     int *pIn = mantissas;
-    
+
     /* Inverse quantize the coefficients. */
     if((first/256) &1) {
         /* Odd band - Reverse coefficients */
@@ -511,7 +511,7 @@ static int decodeSpectrum (GetBitContext *gb, int32_t *pOut)
             SF = fixmul31(SFTable_fixed[SF_idxs[cnt]], iMaxQuant_fix[subband_vlc_index[cnt]]);
             /* Remark: Hardcoded hack to add 2 bits (empty) fract part to internal sample
              * representation. Needed for higher accuracy in internal calculations as
-             * well as for DSP configuration. See also: ../atrac3_rm.c, DSP_SET_SAMPLE_DEPTH 
+             * well as for DSP configuration. See also: ../atrac3_rm.c, DSP_SET_SAMPLE_DEPTH
              */
             SF <<= 2;
 
@@ -590,7 +590,7 @@ static int decodeTonalComponents (GetBitContext *gb, tonal_component *pComponent
                 scalefactor = fixmul31(SFTable_fixed[sfIndx], iMaxQuant_fix[quant_step_index]);
                 /* Remark: Hardcoded hack to add 2 bits (empty) fract part to internal sample
                  * representation. Needed for higher accuracy in internal calculations as
-                 * well as for DSP configuration. See also: ../atrac3_rm.c, DSP_SET_SAMPLE_DEPTH 
+                 * well as for DSP configuration. See also: ../atrac3_rm.c, DSP_SET_SAMPLE_DEPTH
                  */
                 scalefactor <<= 2;
 
@@ -659,14 +659,14 @@ static int decodeGainControl (GetBitContext *gb, gain_block *pGb, int numBands)
  * @param start         index to start with (always a multiple of 8)
  * @param gain          gain to apply
  */
- 
-static void applyFixGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut, 
+
+static void applyFixGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
                           int32_t start, int32_t gain)
 {
     int32_t i = start;
-    
-    /* start is always a multiple of 8 and therefore allows us to unroll the 
-     * loop to 8 calculation per loop 
+
+    /* start is always a multiple of 8 and therefore allows us to unroll the
+     * loop to 8 calculation per loop
      */
     if (ONE_16 == gain) {
         /* gain1 = 1.0 -> no multiplication needed, just adding */
@@ -711,13 +711,13 @@ static void applyFixGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
  * @param gain2         next bands gain to apply
  * @param gain_inc      stepwise adaption from gain1 to gain2
  */
- 
-static int applyVariableGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut, 
-                              int32_t start, int32_t end, 
+
+static int applyVariableGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
+                              int32_t start, int32_t end,
                               int32_t gain1, int32_t gain2, int32_t gain_inc)
 {
     int32_t i = start;
-    
+
     /* Apply fix gains until end index is reached */
     do {
         pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
@@ -747,7 +747,7 @@ static int applyVariableGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
     gain2 = fixmul16(gain2, gain_inc);
     pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
     gain2 = fixmul16(gain2, gain_inc);
-    
+
     return i;
 }
 
@@ -762,7 +762,7 @@ static int applyVariableGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
  * @param pGain2        next band gain info
  */
 
-static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOut, 
+static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
                                       gain_info *pGain1, gain_info *pGain2)
 {
     /* gain compensation function */
@@ -783,7 +783,7 @@ static void gainCompensateAndOverlap (int32_t *pIn, int32_t *pPrev, int32_t *pOu
         numdata = pGain1->num_gain_data;
         pGain1->loccode[numdata] = 32;
         pGain1->levcode[numdata] = 4;
-        
+
         nsample = 0; /* starting loop with =0 */
 
         for (cnt = 0; cnt < numdata; cnt++) {
@@ -1156,7 +1156,7 @@ int atrac3_decode_frame(unsigned long block_align, ATRAC3Context *q,
  * Atrac3 initialization
  *
  * @param rmctx     pointer to the RMContext
- */ 
+ */
 int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
 {
     int i;
@@ -1174,7 +1174,7 @@ int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
     q->bytes_per_frame = id3->bytesperframe;
 
     /* Take care of the codec-specific extradata. */
-    
+
     if (id3->extradata_size == 14) {
         /* Parse the extradata, WAV format */
         DEBUGF("[0-1] %d\n",rm_get_uint16le(&edata_ptr[0]));    /* Unknown value always 1 */
@@ -1278,7 +1278,7 @@ int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
         q->matrix_coeff_index_now[i] = 3;
         q->matrix_coeff_index_next[i] = 3;
     }
-   
+
     /* Link the iram'ed arrays to the decoder's data structure */
     q->pUnits = channel_units;
     q->pUnits[0].spectrum  = &atrac3_spectrum [0][0];
@@ -1287,7 +1287,6 @@ int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3)
     q->pUnits[1].IMDCT_buf = &atrac3_IMDCT_buf[1][0];
     q->pUnits[0].prevFrame = &atrac3_prevFrame[0][0];
     q->pUnits[1].prevFrame = &atrac3_prevFrame[1][0];
-    
+
     return 0;
 }
-

@@ -113,15 +113,15 @@ bool tuner_power(bool status)
                in host read mode: */
 
             /* 1. Set direction of the DATA-line to input-mode. */
-            GPIOA_DIR &= ~TUNNER_DATA; 
+            GPIOA_DIR &= ~TUNNER_DATA;
 
             /* 2. Drive NR_W low */
             GPIOA &= ~TUNNER_NR_W;
-            GPIOA_DIR |= TUNNER_NR_W; 
+            GPIOA_DIR |= TUNNER_NR_W;
 
             /* 3. Drive CLOCK high */
-            GPIOA |= TUNNER_CLK; 
-            GPIOA_DIR |= TUNNER_CLK; 
+            GPIOA |= TUNNER_CLK;
+            GPIOA_DIR |= TUNNER_CLK;
 
             lv24020lp_power(true);
         }

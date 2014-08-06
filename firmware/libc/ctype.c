@@ -19,4 +19,3 @@ const unsigned char _ctype_[257]={
     _L,     _L,     _L,     _L,     _L,     _L,     _L,     _L,
     _L,     _L,     _L,     _P,     _P,     _P,     _P,     _C
 };
-

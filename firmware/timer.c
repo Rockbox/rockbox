@@ -61,4 +61,3 @@ void timer_unregister(void)
     pfn_unregister = NULL;
     timer_prio = -1;
 }
-

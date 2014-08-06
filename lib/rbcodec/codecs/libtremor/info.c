@@ -86,7 +86,7 @@ void vorbis_info_clear(vorbis_info *vi){
     for(i=0;i<ci->floors;i++) /* unpack does the range checking */
       if(ci->floor_param[i])
         _floor_P[ci->floor_type[i]]->free_info(ci->floor_param[i]);
-    
+
     for(i=0;i<ci->residues;i++) /* unpack does the range checking */
       if(ci->residue_param[i])
         _residue_P[ci->residue_type[i]]->free_info(ci->residue_param[i]);
@@ -101,7 +101,7 @@ void vorbis_info_clear(vorbis_info *vi){
     }
     if(ci->fullbooks)
         _ogg_free(ci->fullbooks);
-    
+
     _ogg_free(ci);
   }
 
@@ -128,13 +128,13 @@ static int _vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
   ci->blocksizes_nbits[1]=oggpack_read(opb,4);
   ci->blocksizes[0]=1<<(ci->blocksizes_nbits[0]);
   ci->blocksizes[1]=1<<(ci->blocksizes_nbits[1]);
-  
+
   if(vi->rate<1)goto err_out;
   if(vi->channels<1)goto err_out;
-  if(ci->blocksizes[0]<64)goto err_out; 
+  if(ci->blocksizes[0]<64)goto err_out;
   if(ci->blocksizes[1]<ci->blocksizes[0])goto err_out;
   if(ci->blocksizes[1]>8192)goto err_out;
-  
+
   if(oggpack_read(opb,1)!=1)goto err_out; /* EOP check */
 
   return(0);
@@ -216,7 +216,7 @@ static int _vorbis_unpack_books(vorbis_info *vi,oggpack_buffer *opb){
     ci->map_param[i]=_mapping_P[ci->map_type[i]]->unpack(vi,opb);
     if(!ci->map_param[i])goto err_out;
   }
-  
+
   /* mode settings */
   ci->modes=oggpack_read(opb,6)+1;
   if(ci->modes<=0)goto err_out;
@@ -232,7 +232,7 @@ static int _vorbis_unpack_books(vorbis_info *vi,oggpack_buffer *opb){
     if(ci->mode_param[i]->mapping>=ci->maps)goto err_out;
     if(ci->mode_param[i]->mapping<0)goto err_out;
   }
-  
+
   if(oggpack_read(opb,1)!=1)goto err_out; /* top level EOP check */
 
   return(0);
@@ -327,4 +327,3 @@ int vorbis_synthesis_headerin(vorbis_info *vi,ogg_packet *op){
   }
   return(OV_EBADHEADER);
 }
-

@@ -160,7 +160,7 @@ static void scrollwheel(unsigned int wheel_value)
         if (repeat && TIME_BEFORE(time,
                 last_wheel_post + WHEEL_REPEAT_INTERVAL))
             btn |= BUTTON_REPEAT;
-            
+
         last_wheel_post = time;
 
         if (queue_empty(&button_queue))

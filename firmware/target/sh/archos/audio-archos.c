@@ -77,7 +77,7 @@ static void mas_poll_start(void)
     count = 9 * FREQ / 10000 / 8; /* 0.9 ms */
 
     /* We are using timer 1 */
-    
+
     TSTR &= ~0x02; /* Stop the timer */
     TSNC &= ~0x02; /* No synchronization */
     TMDR &= ~0x02; /* Operate normally */
@@ -88,7 +88,7 @@ static void mas_poll_start(void)
 
     /* Enable interrupt on level 5 */
     IPRC = (IPRC & ~0x000f) | 0x0005;
-    
+
     TSR1 &= ~0x02;
     TIER1 = 0xf9; /* Enable GRA match interrupt */
 
@@ -102,7 +102,7 @@ static void postpone_dma_tick(void)
     count = 8 * FREQ / 10000 / 8; /* 0.8 ms */
 
     /* We are using timer 1 */
-    
+
     TSTR &= ~0x02; /* Stop the timer */
     TSNC &= ~0x02; /* No synchronization */
     TMDR &= ~0x02; /* Operate normally */
@@ -113,7 +113,7 @@ static void postpone_dma_tick(void)
 
     /* Enable interrupt on level 5 */
     IPRC = (IPRC & ~0x000f) | 0x0005;
-    
+
     TSR1 &= ~0x02;
     TIER1 = 0xf9; /* Enable GRA match interrupt */
 
@@ -125,7 +125,7 @@ static void postpone_dma_tick(void)
 void demand_irq_enable(bool on)
 {
     int oldlevel = disable_irq_save();
-    
+
     if(on)
     {
         IPRA = (IPRA & 0xfff0) | 0x000b;
@@ -163,7 +163,7 @@ void DEI3(void)
     {
         callback_for_more(&start, &size);
     }
-    
+
     if (size > 0)
     {
         DTCR3 = size & 0xffff;
@@ -219,7 +219,7 @@ static void setup_sci0(void)
 {
     /* PB15 is I/O, PB14 is IRQ6, PB12 is SCK0, PB9 is TxD0 */
     PBCR1 = (PBCR1 & 0x0cff) | 0x1208;
-    
+
     /* Set PB12 to output */
     or_b(0x10, &PBIORH);
 
@@ -247,7 +247,7 @@ static void setup_sci0(void)
 
     /* Enable End of DMA interrupt at prio 8 */
     IPRC = (IPRC & 0xf0ff) | 0x0800;
-    
+
     /* Enable Tx (only!) */
     SCR0 |= 0x20;
 }
@@ -259,7 +259,7 @@ static void init_playback(void)
     int rc;
 
     mp3_play_pause(false);
-    
+
     mas_reset();
 
     /* Enable the audio CODEC and the DSP core, max analog voltage range */
@@ -274,7 +274,7 @@ static void init_playback(void)
     {
         mas_readmem(MAS_BANK_D0, MAS_D0_APP_RUNNING, &val, 1);
     } while(val);
-    
+
     /* Enable the D/A Converter */
     shadow_codec_reg0 = 0x0001;
     mas_codec_writereg(0x0, shadow_codec_reg0);
@@ -346,7 +346,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 #elif CONFIG_CODEC == MAS3587F
     or_b(0x08, &PAIORH); /* output for /PR */
     init_playback();
-    
+
     mas_version_code = mas_readver();
     DEBUGF("MAS3587 derivate %d, version %c%d\n",
            (mas_version_code & 0xf000) >> 12,
@@ -354,7 +354,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 #elif CONFIG_CODEC == MAS3539F
     or_b(0x08, &PAIORH); /* output for /PR */
     init_playback();
-    
+
     mas_version_code = mas_readver();
     DEBUGF("MAS3539 derivate %d, version %c%d\n",
            (mas_version_code & 0xf000) >> 12,
@@ -364,7 +364,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 #ifdef HAVE_DAC3550A
     dac_init();
 #endif
-    
+
 #if CONFIG_CODEC == MAS3507D
     /* set IRQ6 to edge detect */
     ICR |= 0x02;
@@ -373,7 +373,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     IPRB = ( IPRB & 0xff0f ) | 0x0080;
 
     mas_readmem(MAS_BANK_D1, 0xff7, &mas_version_code, 1);
-    
+
     mas_writereg(0x3b, 0x20); /* Don't ask why. The data sheet doesn't say */
     mas_run(1);
     sleep(HZ);
@@ -381,7 +381,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     /* Clear the upper 12 bits of the 32-bit samples */
     mas_writereg(0xc5, 0);
     mas_writereg(0xc6, 0);
-    
+
     /* We need to set the PLL for a 14.31818MHz crystal */
     if(mas_version_code == 0x0601) /* Version F10? */
     {
@@ -403,7 +403,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
         mas_writemem(MAS_BANK_D0, 0x36f, &val, 1);
         mas_run(0xfcb);
     }
-    
+
 #endif
 
 #if CONFIG_CODEC == MAS3507D
@@ -427,7 +427,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     sound_set(SOUND_VOLUME, volume);
     sound_set(SOUND_CHANNELS, channel_config);
     sound_set(SOUND_STEREO_WIDTH, stereo_width);
-    
+
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, loudness);
     sound_set(SOUND_AVC, avc);
@@ -477,7 +477,7 @@ void mp3_play_data(const void* start, size_t size,
     CHCR3 &= ~0x0002; /* Clear interrupt */
     CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
     DMAOR = 0x0001; /* Enable DMA */
-    
+
     callback_for_more = get_more;
 
     SAR3 = (unsigned int)start;
@@ -505,7 +505,7 @@ void mp3_play_pause(bool play)
         SCR0 &= 0x7f;
         paused = true;
     }
-}     
+}
 
 bool mp3_pause_done(void)
 {
@@ -513,7 +513,7 @@ bool mp3_pause_done(void)
 
     if (!paused)
         return false;
-    
+
     mas_readmem(MAS_BANK_D0, MAS_D0_MPEG_FRAME_COUNT, &frame_count, 1);
     /* This works because the frame counter never wraps,
      * i.e. zero always means lost sync. */

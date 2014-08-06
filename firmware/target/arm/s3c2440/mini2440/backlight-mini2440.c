@@ -141,8 +141,8 @@ bool _backlight_init(void)
     backlight_control = BACKLIGHT_CONTROL_ON;
 
     _backlight_set_state (1);
-    S3C2440_GPIO_CONFIG (GPGCON, 4, GPIO_OUTPUT);    
-    
+    S3C2440_GPIO_CONFIG (GPGCON, 4, GPIO_OUTPUT);
+
 #ifndef BOOTLOADER
     /* put the led control on the tick list */
     tick_add_task(led_control_service);

@@ -198,7 +198,7 @@ void lcd_set_flip(bool yesno)
     {
         xoffset = 132 - LCD_WIDTH; /* 132 colums minus the 128 we have */
     }
-    else 
+    else
     {
         xoffset = 0;
     }
@@ -276,7 +276,7 @@ void lcd_shutdown(void)
     if (lcd_type == 0)
     {
         s5l_lcd_write_cmd_data(R_DISPLAY_CONTROL_1, 0x0232);
-        s5l_lcd_write_cmd_data(R_POWER_CONTROL_3  , 0x1137); 
+        s5l_lcd_write_cmd_data(R_POWER_CONTROL_3  , 0x1137);
         s5l_lcd_write_cmd_data(R_DISPLAY_CONTROL_1, 0x0201);
         s5l_lcd_write_cmd_data(R_POWER_CONTROL_3  , 0x0137);
         s5l_lcd_write_cmd_data(R_DISPLAY_CONTROL_1, 0x0200);
@@ -320,7 +320,7 @@ void lcd_init_device(void)
         lcd_type   = 1;     /* Similar to LDS176  - aka "type 7" */
         LCD_CON   |= 0x100; /* use 16 bit bus width, little endian */
     }
-    
+
     LCD_PHTIME = 0x00; /* Set Phase Time (faster LCD IF than Apple OF) */
 
     lcd_ispowered = true;
@@ -346,7 +346,7 @@ static void lcd_setup_drawing_region(int, int, int, int) ICODE_ATTR;
 static void lcd_setup_drawing_region(int x, int y, int width, int height)
 {
     int y0, x0, y1, x1;
-    
+
     x0 = x;                         /* start horiz */
     y0 = y;                         /* start vert */
     x1 = (x + width) - 1;           /* max horiz */
@@ -377,7 +377,7 @@ static void lcd_setup_drawing_region(int x, int y, int width, int height)
 }
 
 /* Line write helper function. */
-extern void lcd_write_line(const fb_data *addr, 
+extern void lcd_write_line(const fb_data *addr,
                            int pixelcount,
                            const unsigned int lcd_base_addr);
 
@@ -386,7 +386,7 @@ void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
     fb_data* p;
-    
+
     /* Both x and width need to be preprocessed due to asm optimizations */
     x     = x & ~1;                 /* ensure x is even */
     width = (width + 3) & ~3;       /* ensure width is a multiple of 4 */
@@ -420,7 +420,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 {
     unsigned int z;
     unsigned char const * yuv_src[3];
-    
+
     width = (width + 1) & ~1;       /* ensure width is even */
 
     lcd_setup_drawing_region(x, y, width, height);

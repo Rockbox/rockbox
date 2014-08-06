@@ -374,7 +374,7 @@ void btn_thread(void)
     while (1)
     {
         queue_wait(&btn_queue, &ev);
-        
+
         /* Ignore all messages except BTN_INTERRUPT */
         if (ev.id != BTN_INTERRUPT)
             continue;
@@ -481,4 +481,3 @@ void lcd_enable(bool on)
 {
     (void)on;
 }
-

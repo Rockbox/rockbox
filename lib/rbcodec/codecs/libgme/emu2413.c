@@ -9,7 +9,7 @@
              : Version 0.32 -- LPF implemented.
   2001 01-18 : Version 0.33 -- Fixed the drum problem, refine the mix-down method.
                             -- Fixed the LFO bug.
-  2001 01-24 : Version 0.35 -- Fixed the drum problem, 
+  2001 01-24 : Version 0.35 -- Fixed the drum problem,
                                support undocumented EG behavior.
   2001 02-02 : Version 0.38 -- Improved the performance.
                                Fixed the hi-hat and cymbal model.
@@ -33,10 +33,10 @@
   2002 03-02 : Version 0.55 -- Removed OPLL_init & OPLL_close.
   2002 05-30 : Version 0.60 -- Fixed HH&CYM generator and all voice datas.
   2004 04-10 : Version 0.61 -- Added YMF281B tone (defined by Chabin).
-  
+
   2011 03-22 : --------------- Modified by gama to use precalculated tables.
 
-  References: 
+  References:
     fmopl.c        -- 1999,2000 written by Tatsuyuki Satoh (MAME development).
     fmopl.c(fixed) -- (C) 2002 Jarek Burczynski.
     s_opl.c        -- 2001 written by Mamiya (NEZplug development).
@@ -55,10 +55,10 @@
 
 #include "emutables.h"
 #if !defined(ROCKBOX)
-	#define EMU2413_CALCUL_TABLES
+        #define EMU2413_CALCUL_TABLES
 #else
-	#define EMU2413_COMPACTION
-	#include "emutables.h"
+        #define EMU2413_COMPACTION
+        #include "emutables.h"
 #endif
 
 #if defined(EMU2413_COMPACTION) && !defined(ROCKBOX)
@@ -71,8 +71,8 @@ static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
 #else
 #define OPLL_TONE_NUM 3
 static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
-  { 
-#include "2413tone.h" 
+  {
+#include "2413tone.h"
   },
   {
 #include "vrc7tone.h"
@@ -223,7 +223,7 @@ static OPLL_PATCH null_patch = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static OPLL_PATCH default_patch[OPLL_TONE_NUM][(16 + 3) * 2];
 
 /* Definition of envelope mode */
-enum OPLL_EG_STATE 
+enum OPLL_EG_STATE
 { READY, ATTACK, DECAY, SUSHOLD, SUSTINE, RELEASE, SETTLE, FINISH };
 
 /* Phase incr table for Attack */
@@ -242,9 +242,9 @@ static e_uint32 dphaseTable[512][8][16];
 #endif
 
 /***************************************************
- 
+
                   Create tables
- 
+
 ****************************************************/
 #ifdef EMU2413_CALCUL_TABLES
 INLINE static e_int32
@@ -345,7 +345,7 @@ makePmTable (void)
 
   for (i = 0; i < PM_PG_WIDTH; i++)
     /* pmtable[i] = (e_int32) ((double) PM_AMP * pow (2, (double) PM_DEPTH * sin (2.0 * PI * i / PM_PG_WIDTH) / 1200)); */
-    pmtable[i] = (e_int32) ((double) PM_AMP * pow (2, (double) PM_DEPTH * saw (2.0 * PI * i / PM_PG_WIDTH) / 1200));    
+    pmtable[i] = (e_int32) ((double) PM_AMP * pow (2, (double) PM_DEPTH * saw (2.0 * PI * i / PM_PG_WIDTH) / 1200));
 }
 
 /* Table for Amp Modulator */
@@ -486,7 +486,7 @@ makeDphaseARTable (void)
         dphaseARTable[AR][Rks] = 0;
         break;
       case 15:
-        dphaseARTable[AR][Rks] = 0;/*EG_DP_WIDTH;*/ 
+        dphaseARTable[AR][Rks] = 0;/*EG_DP_WIDTH;*/
         break;
       default:
 #ifdef USE_SPEC_ENV_SPEED
@@ -1313,7 +1313,7 @@ calc_envelope (OPLL_SLOT * slot, e_int32 lfo)
 
   if (egout >= DB_MUTE)
     egout = DB_MUTE - 1;
-  
+
   slot->egout = egout | 3;
 }
 
@@ -1379,24 +1379,24 @@ calc_slot_snare (OPLL_SLOT * slot, e_uint32 noise)
 {
   if(slot->egout>=(DB_MUTE-1))
     return 0;
-  
+
   if(BIT(slot->pgout,7))
     return DB2LIN_TABLE[(noise?DB_POS(0):DB_POS(15))+slot->egout];
   else
     return DB2LIN_TABLE[(noise?DB_NEG(0):DB_NEG(15))+slot->egout];
 }
 
-/* 
-  TOP-CYM 
+/*
+  TOP-CYM
  */
 INLINE static e_int32
 calc_slot_cym (OPLL_SLOT * slot, e_uint32 pgout_hh)
 {
   e_uint32 dbout;
 
-  if (slot->egout >= (DB_MUTE - 1)) 
+  if (slot->egout >= (DB_MUTE - 1))
     return 0;
-  else if( 
+  else if(
       /* the same as fmopl.c */
       ((BIT(pgout_hh,PG_BITS-8)^BIT(pgout_hh,PG_BITS-1))|BIT(pgout_hh,PG_BITS-7)) ^
       /* different from fmopl.c */
@@ -1409,17 +1409,17 @@ calc_slot_cym (OPLL_SLOT * slot, e_uint32 pgout_hh)
   return DB2LIN_TABLE[dbout + slot->egout];
 }
 
-/* 
-  HI-HAT 
+/*
+  HI-HAT
 */
 INLINE static e_int32
 calc_slot_hat (OPLL_SLOT *slot, e_int32 pgout_cym, e_uint32 noise)
 {
   e_uint32 dbout;
 
-  if (slot->egout >= (DB_MUTE - 1)) 
+  if (slot->egout >= (DB_MUTE - 1))
     return 0;
-  else if( 
+  else if(
       /* the same as fmopl.c */
       ((BIT(slot->pgout,PG_BITS-8)^BIT(slot->pgout,PG_BITS-1))|BIT(slot->pgout,PG_BITS-7)) ^
       /* different from fmopl.c */
@@ -1465,13 +1465,13 @@ calc (OPLL * opll)
   }
 
   e_int32 mix = 0;
-  
+
   /* CH6 */
   if (opll->patch_number[6] & 0x10) {
     if (channel_mask & OPLL_MASK_CH (6)) {
       mix += calc_slot_car (CAR(opll,6), calc_slot_mod(MOD(opll,6)));
       channel_mask &= ~(1 << 6);
-	}
+        }
   }
 
   /* CH7 */
@@ -1481,7 +1481,7 @@ calc (OPLL * opll)
     if (channel_mask & OPLL_MASK_SD) {
       mix -= calc_slot_snare (CAR(opll,7), opll->noise_seed&1);
       channel_mask &= ~OPLL_MASK_SD;
-	}
+        }
   }
 
   /* CH8 */
@@ -1493,9 +1493,9 @@ calc (OPLL * opll)
       channel_mask &= ~OPLL_MASK_CYM;
     }
   }
-  
+
   mix <<= 1;
-  
+
   opll->current_mask = channel_mask;
   for (i = 0; channel_mask; channel_mask >>= 1, ++i) {
     if (channel_mask & 1) {
@@ -1515,12 +1515,12 @@ OPLL_set_internal_mute(OPLL * opll, e_uint32 mute)
 e_uint32
 OPLL_is_internal_muted(OPLL * opll)
 {
-  return opll->internal_mute; 
+  return opll->internal_mute;
 }
 
 static e_uint32
 check_mute_helper(OPLL * opll)
-{		
+{
   for (int i = 0; i < 6; i++) {
     /* if (ch[i].car.eg_mode != FINISH) return 0; */
     if (!(opll->current_mask & OPLL_MASK_CH (i)) && (CAR(opll,i)->eg_mode != FINISH)) return 0;
@@ -1543,7 +1543,7 @@ check_mute_helper(OPLL * opll)
     if (!(opll->current_mask & OPLL_MASK_CH (8)) && (MOD(opll,8)->eg_mode != FINISH)) return 0;
     if (!(opll->current_mask & OPLL_MASK_CH (8)) && (CAR(opll,8)->eg_mode != FINISH)) return 0;
   }
-  
+
   return 1;    /* nothing is playing, then mute */
 }
 
@@ -1879,8 +1879,8 @@ OPLL_read(OPLL * opll, e_uint32 a)
 {
   if( !(a&1) )
     {
-	/* status port */
-	return opll->status;
+        /* status port */
+        return opll->status;
   }
   return 0xff;
 }

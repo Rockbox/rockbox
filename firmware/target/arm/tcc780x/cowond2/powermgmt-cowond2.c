@@ -68,7 +68,7 @@ int _battery_voltage(void)
     if (TIME_BEFORE(last_tick+HZ, current_tick))
     {
         short adc_val;
-        
+
         if (get_pmu_type() == PCF50606)
             pcf50606_read_adc(PCF5060X_ADC_BATVOLT_RES, &adc_val, NULL);
         else

@@ -216,4 +216,3 @@ void lcd_update_rect(int x, int y, int w, int h)
     }
     imx233_lcdif_dma_send((void *)FRAME_PHYS_ADDR, w * 2, h);
 }
-

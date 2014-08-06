@@ -614,14 +614,14 @@ static void jewels_drawboard(struct game_context* bj) {
                                 TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
-                           STRIDE(  SCREEN_MAIN, 
-                                    BMPWIDTH_jewels, BMPHEIGHT_jewels), 
+                           STRIDE(  SCREEN_MAIN,
+                                    BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
 #else
             rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
-                           STRIDE(  SCREEN_MAIN, 
+                           STRIDE(  SCREEN_MAIN,
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
@@ -637,7 +637,7 @@ static void jewels_drawboard(struct game_context* bj) {
 
     rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, 18);
     rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, LCD_HEIGHT-10);
-    
+
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
@@ -660,7 +660,7 @@ static void jewels_drawboard(struct game_context* bj) {
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
                      ((LCD_HEIGHT-10)-18)*tempscore/size+1);
 #endif
-    
+
     /* print text */
     rb->lcd_getstringsize(title, &w, &h);
     rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2, 1, title);
@@ -682,7 +682,7 @@ static void jewels_drawboard(struct game_context* bj) {
     rb->lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
     rb->lcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-14);
     rb->lcd_vline(LCD_WIDTH/2, LCD_HEIGHT-14, LCD_HEIGHT-1);
-    
+
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
@@ -703,10 +703,10 @@ static void jewels_drawboard(struct game_context* bj) {
                      LCD_WIDTH*tempscore/size+1,
                      (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2);
 #endif
-    
+
     /* print text */
     rb->lcd_putsxyf(1, LCD_HEIGHT-10, "%s %d", title, bj->level);
-    
+
     if (bj->type == GAME_TYPE_NORMAL) {
         rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
         rb->lcd_getstringsize(str, &w, &h);
@@ -748,7 +748,7 @@ static void jewels_drawboard(struct game_context* bj) {
     /* print text */
     rb->lcd_putsxyf(1, LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3,"%s %d",
                    title, bj->level);
-    
+
     if (bj->type == GAME_TYPE_NORMAL) {
         rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
         rb->lcd_getstringsize(str, &w, &h);
@@ -833,8 +833,8 @@ static void jewels_putjewels(struct game_context* bj){
 #ifdef HAVE_LCD_COLOR
                         rb->lcd_bitmap_transparent_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
-                                       STRIDE(  SCREEN_MAIN, 
-                                                BMPWIDTH_jewels, 
+                                       STRIDE(  SCREEN_MAIN,
+                                                BMPWIDTH_jewels,
                                                 BMPHEIGHT_jewels),
                                        j*TILE_WIDTH,
                                        (i-1)*TILE_HEIGHT+YOFS+
@@ -843,8 +843,8 @@ static void jewels_putjewels(struct game_context* bj){
 #else
                         rb->lcd_bitmap_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
-                                       STRIDE(  SCREEN_MAIN, 
-                                                BMPWIDTH_jewels, 
+                                       STRIDE(  SCREEN_MAIN,
+                                                BMPWIDTH_jewels,
                                                 BMPHEIGHT_jewels),
                                        j*TILE_WIDTH,
                                        (i-1)*TILE_HEIGHT+YOFS+
@@ -1065,7 +1065,7 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
             rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type),
-                           STRIDE(  SCREEN_MAIN, 
+                           STRIDE(  SCREEN_MAIN,
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            (x+horzmod)*TILE_WIDTH-horzmod*
                                ((((movelen<<10)*k)/8)>>10),
@@ -1074,7 +1074,7 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
                            TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
-                           STRIDE(  SCREEN_MAIN, 
+                           STRIDE(  SCREEN_MAIN,
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            x*TILE_WIDTH+horzmod*
                                ((((movelen<<10)*k)/8)>>10),
@@ -1085,7 +1085,7 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
             rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type),
-                           STRIDE(  SCREEN_MAIN, 
+                           STRIDE(  SCREEN_MAIN,
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            (x+horzmod)*TILE_WIDTH-horzmod*
                                ((((movelen<<10)*k)/8)>>10),
@@ -1095,7 +1095,7 @@ static unsigned int jewels_swapjewels(struct game_context* bj,
             rb->lcd_set_drawmode(DRMODE_FG);
             rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
-                           STRIDE(  SCREEN_MAIN, 
+                           STRIDE(  SCREEN_MAIN,
                                     BMPWIDTH_jewels, BMPHEIGHT_jewels),
                            x*TILE_WIDTH+horzmod*
                                ((((movelen<<10)*k)/8)>>10),
@@ -1382,7 +1382,7 @@ static bool jewels_help(void)
 {
     static char *help_text[] = {
         "Jewels", "", "Aim", "",
-        "Swap", "pairs", "of", "jewels", "to", "form", "connected", 
+        "Swap", "pairs", "of", "jewels", "to", "form", "connected",
         "segments", "of", "three", "or", "more", "of", "the", "same",
         "type.", "",
         "The", "goal", "of", "the", "game", "is", "to", "score", "as", "many",

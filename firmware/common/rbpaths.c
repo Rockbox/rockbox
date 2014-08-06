@@ -182,7 +182,7 @@ static const char* _get_user_file_path(const char *path,
         ret = buf;
     else if (try_path(buf, flags))
         ret = buf;
-        
+
     if (ret != buf) /* not found in $HOME, try ROCKBOX_BASE_DIR, !NEED_WRITE only */
     {
         if (snprintf(buf, bufsize, ROCKBOX_SHARE_PATH "/%s", pos) >= (int)bufsize)
@@ -226,13 +226,13 @@ int app_open(const char *name, int o, ...)
     int flags = IS_FILE;
     if (o & (O_CREAT|O_RDWR|O_TRUNC|O_WRONLY))
         flags |= NEED_WRITE;
-    
+
     name = handle_special_dirs(name, flags, realpath, sizeof(realpath));
 
     va_start(ap, o);
     fd = open(name, o, va_arg(ap, unsigned int));
     va_end(ap);
-    
+
     return fd;
 }
 
@@ -329,7 +329,7 @@ struct dirinfo dir_get_info(DIR* _parent, struct dirent *dir)
 
     return ret;
 }
-   
+
 DIR* app_opendir(const char *_name)
 {
     size_t name_len;

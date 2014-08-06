@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 
 #include "inttypes.h"
@@ -54,23 +54,23 @@ unsigned short adc_read(int channel)
     unsigned short data;
 
     mutex_lock(&adc_mtx);
-    
+
     /* set channel and start conversion */
-    ADCCON = ADC_DEFAULT | 
+    ADCCON = ADC_DEFAULT |
              (channel << 3) |
              (1 << 0);          /* enable start */
-    
+
     /* wait for conversion */
     semaphore_wait(&adc_wakeup, TIMEOUT_BLOCK);
-    
+
     /* get the converted data */
     data = ADCDAT0 & 0x3FF;
-    
+
     /* put ADC back into standby */
     ADCCON |= (1 << 2);
 
     mutex_unlock(&adc_mtx);
-    
+
     return data;
 }
 
@@ -81,14 +81,13 @@ void adc_init(void)
 
     /* enable clock to ADC */
     PWRCON &= ~(1 << 10);
-    
+
     /* configure ADC and put in standby */
     ADCCON = ADC_DEFAULT | (1 << 2);
-    
+
     /* configure conversion delay (use default) */
     ADCDLY = 0xFF;
-    
+
     /* enable interrupt */
     INTMSK |= (1 << 31);
 }
-

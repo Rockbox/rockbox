@@ -72,7 +72,7 @@ static char* strip_filename(char* buf, int buf_size, const char* fullpath)
 }
 
 /* Make sure part of path only contain chars valid for a FAT32 long name.
- * Double quotes are replaced with single quotes, other unsupported chars 
+ * Double quotes are replaced with single quotes, other unsupported chars
  * are replaced with an underscore.
  *
  * path   - path to modify.
@@ -83,9 +83,9 @@ static void fix_path_part(char* path, int offset, int count)
 {
     static const char invalid_chars[] = "*/:<>?\\|";
     int i;
-    
+
     path += offset;
-    
+
     for (i = 0; i <= count; i++, path++)
     {
         if (*path == 0)
@@ -309,7 +309,7 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
 
     if (!aa)
         return;
-        
+
     struct bitmap *bmp;
     if (bufgetdata(handle_id, 0, (void *)&bmp) <= 0)
         return;
@@ -346,8 +346,8 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
     if (!clear)
     {
         /* Draw the bitmap */
-        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0, 
-                                    STRIDE(gwps->display->screen_type, 
+        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0,
+                                    STRIDE(gwps->display->screen_type,
                                         bmp->width, bmp->height),
                                    x, y, width, height);
 #ifdef HAVE_LCD_INVERT

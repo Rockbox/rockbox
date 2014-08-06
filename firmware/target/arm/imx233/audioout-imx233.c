@@ -209,7 +209,7 @@ void imx233_audioout_set_freq(int fsel)
     HW_AUDIOOUT_DACSRR = BF_OR4(AUDIOOUT_DACSRR,
         SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
         SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
-    
+
     #if 0
     /* Select base_mult and src_hold depending on the audio range:
      *     0 < f <= 12000   --> base_mult = 1, src_hold = 3 (div by 4)

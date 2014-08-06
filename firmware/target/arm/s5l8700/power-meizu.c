@@ -41,13 +41,13 @@ void power_init(void)
     /* configure PWRON_M (P1.3) as output and set it to keep power turned on */
     PCON1 = (PCON1 & ~(0xF << 12)) | (0x1 << 12);
     PDAT1 |= (1 << 3);
-    
+
     /* configure PBSTAT (P1.4) as input */
     PCON1 &= ~(0xF << 16);
-    
+
     /* configure CHRG (P5.7) as input to monitor charging state */
     PCON5 &= ~(0xF << 28);
-    
+
     /* enable USB2.0 function controller to allow VBUS monitoring */
     PWRCON &= ~(1 << 15);
 }
@@ -59,7 +59,7 @@ unsigned int power_input_status(void)
     if (USB_TR & (1 << 15)) {
         return POWER_INPUT_USB;
     }
-    
+
     return POWER_INPUT_NONE;
 }
 
@@ -81,7 +81,7 @@ bool tuner_power(bool status)
         status = !status;
     }
 
-    return status;    
+    return status;
 }
 
 bool tuner_powered(void)
@@ -89,4 +89,3 @@ bool tuner_powered(void)
     return tuner_on; /* No debug info */
 }
 #endif /* CONFIG_TUNER */
-

@@ -4,7 +4,7 @@ Original copyright
     AUTHOR......: David Rowe
     DATE CREATED: 24/2/93
 
-Heavily modified by Jean-Marc Valin (c) 2002-2006 (fixed-point, 
+Heavily modified by Jean-Marc Valin (c) 2002-2006 (fixed-point,
                        optimizations, additional functions, ...)
 
    This file contains functions for converting Linear Prediction
@@ -17,18 +17,18 @@ Heavily modified by Jean-Marc Valin (c) 2002-2006 (fixed-point,
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -171,7 +171,7 @@ static inline spx_word32_t cheb_poly_eva(
        b1 = tmp;
        sum = ADD32(sum, EXTEND32(MULT16_16_P14(coef[m-i],b0)));
     }
-    
+
     return sum;
 }
 #endif
@@ -422,14 +422,14 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
     VARDECL(spx_word32_t *xqmem);
     int m = lpcrdr>>1;
 
-    /* 
-    
+    /*
+
        Reconstruct P(z) and Q(z) by cascading second order polynomials
        in form 1 - 2cos(w)z(-1) + z(-2), where w is the LSP frequency.
        In the time domain this is:
 
        y(n) = x(n) - 2cos(w)x(n-1) + x(n-2)
-    
+
        This is what the ALLOCS below are trying to do:
 
          int xp[m+1][lpcrdr+1+2]; // P matrix in QIMP
@@ -451,7 +451,7 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
 
     ALLOC(xq, (m+1), spx_word32_t*);
     ALLOC(xqmem, (m+1)*(lpcrdr+1+2), spx_word32_t);
-    
+
     for(i=0; i<=m; i++) {
       xp[i] = xpmem + i*(lpcrdr+1+2);
       xq[i] = xqmem + i*(lpcrdr+1+2);
@@ -460,15 +460,15 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
     /* work out 2cos terms in Q14 */
 
     ALLOC(freqn, lpcrdr, spx_word16_t);
-    for (i=0;i<lpcrdr;i++) 
+    for (i=0;i<lpcrdr;i++)
        freqn[i] = ANGLE2X(freq[i]);
 
     #define QIMP  21   /* scaling for impulse */
 
     xin = SHL32(EXTEND32(1), (QIMP-1)); /* 0.5 in QIMP format */
-   
+
     /* first col and last non-zero values of each row are trivial */
-    
+
     for(i=0;i<=m;i++) {
      xp[i][1] = 0;
      xp[i][2] = xin;
@@ -510,16 +510,16 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
       int shift = QIMP-13;
 
       /* final filter sections */
-      a = PSHR32(xp[m][j+2] + xout1 + xq[m][j+2] - xout2, shift); 
+      a = PSHR32(xp[m][j+2] + xout1 + xq[m][j+2] - xout2, shift);
       xout1 = xp[m][j+2];
       xout2 = xq[m][j+2];
-      
+
       /* hard limit ak's to +/- 32767 */
 
       if (a < -32767) a = -32767;
       if (a > 32767) a = 32767;
       ak[j-1] = (short)a;
-     
+
     }
 
 }
@@ -602,7 +602,7 @@ void lsp_enforce_margin(spx_lsp_t *lsp, int len, spx_word16_t margin)
    int i;
    spx_word16_t m = margin;
    spx_word16_t m2 = 25736-margin;
-  
+
    if (lsp[0]<m)
       lsp[0]=m;
    if (lsp[len-1]>m2)

@@ -231,13 +231,13 @@ static void init_mad(void)
     frame.sbsample = &sbsample;
 
     /* We do this so libmad doesn't try to call codec_calloc(). This needs to
-     * be called before mad_stream_init(), mad_frame_inti() and 
+     * be called before mad_stream_init(), mad_frame_inti() and
      * mad_synth_init(). */
     frame.overlap = &mad_frame_overlap;
     stream.main_data = &mad_main_data;
 
     /* Call mad initialization. Those will zero the arrays frame.overlap,
-     * frame.sbsample and frame.sbsample_prev. Therefore there is no need to 
+     * frame.sbsample and frame.sbsample_prev. Therefore there is no need to
      * zero them here. */
     mad_stream_init(&stream);
     mad_frame_init(&frame);
@@ -270,7 +270,7 @@ static int audio_sync(struct audio_thread_data *td,
         time = INVALID_TIMESTAMP;
         str = &tmp_str;
         str->id = audio_str.id;
-    }        
+    }
 
     str->hdr.pos = sd->sk.pos;
     str->hdr.limit = sd->sk.pos + sd->sk.len;
@@ -401,7 +401,7 @@ static void audio_thread_msg(struct audio_thread_data *td)
             td->state = TSTATE_EOS;
 
             reply = true;
-            break;            
+            break;
 
         case STREAM_RESET:
             if (td->state == TSTATE_DATA)

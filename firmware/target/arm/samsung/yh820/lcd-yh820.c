@@ -106,7 +106,7 @@ void lcd_init_device(void)
     tmp = DEV_INIT1;
     DEV_INIT1 = tmp;
     DEV_INIT2 &= ~0x400;
-    
+
     LCD1_CONTROL &= ~0x4;
     udelay(15);
     LCD1_CONTROL |= 0x4;
@@ -181,7 +181,7 @@ void lcd_init_device(void)
     lcd_send_command(R_X_ADDR_AREA);         /* vertical dimensions */
     lcd_send_command(0x00);                  /* y1 */
     lcd_send_command(LCD_HEIGHT - 1);        /* y2 */
-    
+
     lcd_send_command(R_Y_ADDR_AREA);         /* horizontal dimensions */
     lcd_send_command(0x04);                  /* x1 + 4 */
     lcd_send_command(LCD_WIDTH - 1 + 4);     /* x2 + 4 */
@@ -280,7 +280,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
     height >>= 1;
-    
+
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
@@ -338,18 +338,18 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *addr;
-    
+
     if (x + width >= LCD_WIDTH)
         width = LCD_WIDTH - x;
     if (y + height >= LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-        
+
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
     addr = FBADDR(x,y);
 
-    if (width <= 1) {                    
+    if (width <= 1) {
         lcd_send_command(R_ENTRY_MODE);  /* The X end address must be larger */
         lcd_send_command(0x03);          /* that the X start address, so we */
         lcd_send_command(R_Y_ADDR_AREA); /* switch to vertical mode for */

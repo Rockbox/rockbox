@@ -40,21 +40,21 @@ typedef struct _sfwrite
 } t_sfwrite;
 
 
-static void sfwrite_wave_setup(t_sfwrite* x,t_wave* w) 
+static void sfwrite_wave_setup(t_sfwrite* x,t_wave* w)
 {
-     
-    strncpy(w->w_fileid,"RIFF",4);	    	    /* chunk id 'RIFF'     */
-    w->w_chunksize = x->size + sizeof(t_wave) -8;     	    /* chunk size  */
-    strncpy(w->w_waveid,"WAVE",4);	    	    /* wave chunk id 'WAVE'  */
-    strncpy(w->w_fmtid,"fmt ",4);	    	    /* format chunk id 'fmt '*/
-    w->w_fmtchunksize = 16;   	    /* format chunk size          */
-    w->w_fmttag = 1;	    	    /* format tag, 1 for PCM      */
-    w->w_nchannels = x->x_channels;    	    /* number of channels         */
-    w->w_samplespersec = 44100;  	    /* sample rate in hz          */
-    w->w_navgbytespersec = 44100*x->x_channels*2; 	    /* average bytes per second   */
-    w->w_nblockalign = 4;    	    /* number of bytes per sample */
-    w->w_nbitspersample = 16; 	    /* number of bits in a sample */
-    strncpy(w->w_datachunkid,"data",4); 	    /* data chunk id 'data'*/
+
+    strncpy(w->w_fileid,"RIFF",4);                  /* chunk id 'RIFF'     */
+    w->w_chunksize = x->size + sizeof(t_wave) -8;           /* chunk size  */
+    strncpy(w->w_waveid,"WAVE",4);                  /* wave chunk id 'WAVE'  */
+    strncpy(w->w_fmtid,"fmt ",4);                   /* format chunk id 'fmt '*/
+    w->w_fmtchunksize = 16;         /* format chunk size          */
+    w->w_fmttag = 1;                /* format tag, 1 for PCM      */
+    w->w_nchannels = x->x_channels;         /* number of channels         */
+    w->w_samplespersec = 44100;             /* sample rate in hz          */
+    w->w_navgbytespersec = 44100*x->x_channels*2;           /* average bytes per second   */
+    w->w_nblockalign = 4;           /* number of bytes per sample */
+    w->w_nbitspersample = 16;       /* number of bits in a sample */
+    strncpy(w->w_datachunkid,"data",4);             /* data chunk id 'data'*/
     w->w_datachunksize = x->size;         /* length of data chunk       */
 }
 
@@ -63,11 +63,11 @@ static void sfwrite_wave_setup(t_sfwrite* x,t_wave* w)
 static void sfwrite_close(t_sfwrite *x)
 {
      if (x->x_file > 0) {
-	  t_wave w;
-	  sfwrite_wave_setup(x,&w);
-	  lseek(x->x_file,0,SEEK_SET);
-	  write(x->x_file,&w,sizeof(w));
-	  close(x->x_file);
+          t_wave w;
+          sfwrite_wave_setup(x,&w);
+          lseek(x->x_file,0,SEEK_SET);
+          write(x->x_file,&w,sizeof(w));
+          close(x->x_file);
      }
      x->x_file = -1;
 }
@@ -78,12 +78,12 @@ static void sfwrite_open(t_sfwrite *x,t_symbol *filename)
      char fname[MAXPDSTRING];
 
      if (filename == &s_) {
-	  post("sfwrite: open without filename");
-	  return;
+          post("sfwrite: open without filename");
+          return;
      }
 
      canvas_makefilename(glist_getcanvas(x->x_glist), filename->s_name,
-			 fname, MAXPDSTRING);
+                         fname, MAXPDSTRING);
 
      x->x_blocked = 0;
      x->filename = filename;
@@ -93,8 +93,8 @@ static void sfwrite_open(t_sfwrite *x,t_symbol *filename)
 
      if ((x->x_file = open(fname,O_RDWR | O_CREAT,0664)) < 0)
      {
-	  error("can't create %s",fname);
-	  return;
+          error("can't create %s",fname);
+          return;
      }
 
      /* skip the header */
@@ -115,11 +115,11 @@ static void sfwrite_float(t_sfwrite *x, t_floatarg f)
 {
   int t = f;
   if (t) {
-       post("sfwrite: start", f); 
+       post("sfwrite: start", f);
        x->rec=1;
   }
   else {
-       post("sfwrite: stop", f); 
+       post("sfwrite: stop", f);
        x->rec=0;
   }
 
@@ -142,7 +142,7 @@ static t_int *sfwrite_perform(t_int *w)
 #endif
 
      for (i=0;i < c;i++) {
-	  in[i] = (t_sample *)(w[2+i]);     
+          in[i] = (t_sample *)(w[2+i]);
      }
 
      n = num = (int)(w[2+c]);
@@ -151,36 +151,36 @@ static t_int *sfwrite_perform(t_int *w)
 
      if (x->rec && x->x_file) {
 
-	  while (n--) {
-	       for (i=0;i<c;i++)  {
-		    *tout++ = (*(in[i])++)>>(fix1-16);
-	       }
-	  }
-	  
-#ifndef ROCKBOX
-	  timebefore = sys_getrealtime();
-#endif
-	  if ((ret =write(x->x_file,out,sizeof(short)*num*c)) < (signed int)sizeof(short)*num*c) {
-	       post("sfwrite: short write %d",ret);
+          while (n--) {
+               for (i=0;i<c;i++)  {
+                    *tout++ = (*(in[i])++)>>(fix1-16);
+               }
+          }
 
-	       }
 #ifndef ROCKBOX
-	  timeafter = sys_getrealtime();
-	  late = timeafter - timebefore;
+          timebefore = sys_getrealtime();
+#endif
+          if ((ret =write(x->x_file,out,sizeof(short)*num*c)) < (signed int)sizeof(short)*num*c) {
+               post("sfwrite: short write %d",ret);
+
+               }
+#ifndef ROCKBOX
+          timeafter = sys_getrealtime();
+          late = timeafter - timebefore;
 #endif
 
 #if 0
-	  /* OK, we let only 10 ms block here */
-	  if (late > BLOCKTIME && x->x_blockwarn) { 
-	       post("sfwrite blocked %f ms",late*1000);
-	       x->x_blocked++;
-	       if (x->x_blocked > x->x_blockwarn) {
-		    x->rec = 0;
-		    post("maximum blockcount %d reached, recording stopped (set blockcount with \"block <num>\"",x->x_blockwarn);
-	       }
-	  }
+          /* OK, we let only 10 ms block here */
+          if (late > BLOCKTIME && x->x_blockwarn) {
+               post("sfwrite blocked %f ms",late*1000);
+               x->x_blocked++;
+               if (x->x_blocked > x->x_blockwarn) {
+                    x->rec = 0;
+                    post("maximum blockcount %d reached, recording stopped (set blockcount with \"block <num>\"",x->x_blockwarn);
+               }
+          }
 #endif
-	  x->size +=64*x->x_channels*sizeof(short) ;
+          x->size +=64*x->x_channels*sizeof(short) ;
      }
 
      return (w+3+c);
@@ -192,20 +192,20 @@ static void sfwrite_dsp(t_sfwrite *x, t_signal **sp)
 {
      switch (x->x_channels) {
      case 1:
-	  dsp_add(sfwrite_perform, 3, x, sp[0]->s_vec, 
-		   sp[0]->s_n);
-	  break;
+          dsp_add(sfwrite_perform, 3, x, sp[0]->s_vec,
+                   sp[0]->s_n);
+          break;
      case 2:
-	  dsp_add(sfwrite_perform, 4, x, sp[0]->s_vec, 
-		  sp[1]->s_vec, sp[0]->s_n);
-	  break;
+          dsp_add(sfwrite_perform, 4, x, sp[0]->s_vec,
+                  sp[1]->s_vec, sp[0]->s_n);
+          break;
      case 4:
-	  dsp_add(sfwrite_perform, 6, x, sp[0]->s_vec, 
-		  sp[1]->s_vec,
-		  sp[2]->s_vec,
-		  sp[3]->s_vec,
-		  sp[0]->s_n);
-	  break;
+          dsp_add(sfwrite_perform, 6, x, sp[0]->s_vec,
+                  sp[1]->s_vec,
+                  sp[2]->s_vec,
+                  sp[3]->s_vec,
+                  sp[0]->s_n);
+          break;
      }
 }
 
@@ -230,7 +230,7 @@ static void *sfwrite_new(t_floatarg chan)
     x->x_blocked = 0;
     x->x_blockwarn = 10;
     while (c--) {
-	 inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
+         inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
     }
 
 
@@ -240,7 +240,7 @@ static void *sfwrite_new(t_floatarg chan)
 void sfwrite_tilde_setup(void)
 {
      sfwrite_class = class_new(gensym("sfwrite~"), (t_newmethod)sfwrite_new, (t_method)sfwrite_free,
-    	sizeof(t_sfwrite), 0,A_DEFFLOAT,0);
+        sizeof(t_sfwrite), 0,A_DEFFLOAT,0);
      class_addmethod(sfwrite_class,nullfn,gensym("signal"), 0);
      class_addmethod(sfwrite_class, (t_method) sfwrite_dsp, gensym("dsp"), 0);
      class_addmethod(sfwrite_class, (t_method) sfwrite_open, gensym("open"), A_SYMBOL,A_NULL);
@@ -248,4 +248,3 @@ void sfwrite_tilde_setup(void)
     class_addmethod(sfwrite_class, (t_method)sfwrite_block,gensym("block"),A_DEFFLOAT,0);
      class_addfloat(sfwrite_class, sfwrite_float);
 }
-

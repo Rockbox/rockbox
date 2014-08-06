@@ -102,4 +102,3 @@ struct button_map bm[] = {
 #else
 #error please define button map
 #endif
- 

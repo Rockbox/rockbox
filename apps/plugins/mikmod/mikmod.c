@@ -305,7 +305,7 @@ static void showinfo(void)
     rb->lcd_putsxy(1, 1, statustext);
     sprintf(statustext, "Type: %s", module->modtype);
     rb->lcd_putsxy(1, 11, statustext);
-    
+
     sprintf(statustext, "Samples: %d", module->numsmp);
     rb->lcd_putsxy(1, 21, statustext);
 
@@ -315,25 +315,25 @@ static void showinfo(void)
         rb->lcd_putsxy(1, 31, statustext);
     }
 
-    sprintf(statustext, "pat: %03d/%03d  %2.2X", 
+    sprintf(statustext, "pat: %03d/%03d  %2.2X",
         module->sngpos, module->numpos - 1, module->patpos);
     rb->lcd_putsxy(1, 51, statustext);
 
-    sprintf(statustext, "spd: %d/%d", 
+    sprintf(statustext, "spd: %d/%d",
         module->sngspd, module->bpm);
     rb->lcd_putsxy(1, 61, statustext);
 
     sprintf(statustext, "vol: %ddB", rb->global_settings->volume);
     rb->lcd_putsxy(1, 71, statustext);
 
-    sprintf(statustext, "time: %d:%02d", 
+    sprintf(statustext, "time: %d:%02d",
         (playingtime / 60) % 60, playingtime % 60);
     rb->lcd_putsxy(1, 81, statustext);
 
     if (module->flags & UF_NNA)
     {
         sprintf(statustext, "chn: %d/%d+%d->%d",
-            module->realchn, module->numchn, 
+            module->realchn, module->numchn,
             module->totalchn - module->realchn,
             module->totalchn);
     }
@@ -670,7 +670,7 @@ static int playfile(char* filename)
 #ifdef USETHREADS
     rb->queue_init(&thread_q, true);
     if ((thread_id = rb->create_thread(thread, thread_stack,
-        sizeof(thread_stack), 0, "render buffering thread" 
+        sizeof(thread_stack), 0, "render buffering thread"
         IF_PRIO(, PRIORITY_PLAYBACK)
         IF_COP(, CPU))) == 0)
     {
@@ -826,11 +826,11 @@ static int playfile(char* filename)
             rb->lcd_setfont(FONT_SYSFIXED);
             screenupdated = false;
             break;
-            
+
         case ACTION_WPS_STOP:
             quit = true;
             break;
-            
+
         default:
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
             {
@@ -852,14 +852,14 @@ static int playfile(char* filename)
 
     Player_Stop();
     Player_Free(module);
-    
+
     memset(gmbuf, '\0', sizeof(gmbuf));
-    
+
     if ( retval == PLUGIN_OK && entries > 1 && !quit )
     {
         retval = change_filename(DIR_NEXT);
     }
-    
+
     return retval;
 }
 
@@ -888,7 +888,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->pcm_set_frequency(SAMPLE_RATE);
 
     audio_buffer = rb->plugin_get_audio_buffer((size_t *)&audio_buffer_free);
-    
+
     rb->strcpy(np_file, parameter);
     get_mod_list();
     if(!entries) {
@@ -897,7 +897,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     //add_pool(audio_buffer, audio_buffer_free);
     init_memory_pool(audio_buffer_free, audio_buffer);
-    
+
     MikMod_RegisterDriver(&drv_nos);
     MikMod_RegisterAllLoaders();
     MikMod_RegisterErrorHandler(mm_errorhandler);
@@ -934,7 +934,7 @@ enum plugin_status plugin_start(const void* parameter)
                         ARRAYLEN(config), MIKMOD_SETTINGS_MINVERSION);
         }
     }
-    
+
     destroy_memory_pool(audio_buffer);
 
     return retval;

@@ -4,7 +4,7 @@ static t_class *zerox_class;
 
 typedef struct _zerox
 {
-    t_object x_obj; 
+    t_object x_obj;
     t_sample x_f;
     t_int   x_zeros;
 } t_zerox;
@@ -20,8 +20,8 @@ static t_int *zerox_perform(t_int *w)
     n--;
     while (n--)
     {
-    	float f = *(in++);
-	x->x_zeros += f * *in < 0;
+        float f = *(in++);
+        x->x_zeros += f * *in < 0;
     }
     return (w+4);
 }
@@ -50,9 +50,8 @@ static void *zerox_new(void)
 void zerox_tilde_setup(void)
 {
     zerox_class = class_new(gensym("zerox~"), (t_newmethod)zerox_new, 0,
-    	sizeof(t_zerox), 0, A_DEFFLOAT, 0);
+        sizeof(t_zerox), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(zerox_class, t_zerox, x_f);
     class_addmethod(zerox_class, (t_method)zerox_dsp, gensym("dsp"), 0);
     class_addbang(zerox_class, (t_method)zerox_bang);
 }
-

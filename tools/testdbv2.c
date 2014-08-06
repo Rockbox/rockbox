@@ -11,29 +11,29 @@
 
 
 #define BE32(_x_) (((_x_ & 0xff000000) >> 24) | \
-		                   ((_x_ & 0x00ff0000) >> 8) | \
-		                   ((_x_ & 0x0000ff00) << 8) | \
-		                   ((_x_ & 0x000000ff) << 24))
+                                   ((_x_ & 0x00ff0000) >> 8) | \
+                                   ((_x_ & 0x0000ff00) << 8) | \
+                                   ((_x_ & 0x000000ff) << 24))
 #define BE16(_x_)  ( ((_x_&0xff00) >> 8) | ((_x_&0xff)<<8))
 
 struct header {
-	int version;
-	int artiststart;
-	int albumstart;
-	int songstart;
-	int filestart;
-	int artistcount;
-	int albumcount;
-	int songcount;
-	int filecount;
-	int artistlen;
-	int albumlen;
-	int songlen;
-	int genrelen;
-	int filelen;
-	int songarraylen;
-	int albumarraylen;
-	int rundbdirty;
+        int version;
+        int artiststart;
+        int albumstart;
+        int songstart;
+        int filestart;
+        int artistcount;
+        int albumcount;
+        int songcount;
+        int filecount;
+        int artistlen;
+        int albumlen;
+        int songlen;
+        int genrelen;
+        int filelen;
+        int songarraylen;
+        int albumarraylen;
+        int rundbdirty;
 } header;
 
 struct FileEntry {
@@ -146,8 +146,8 @@ int main() {
    fread(&header,sizeof(header),1,fp);
    p=&header;
    for(i=0;i<17;i++) {
-	   *p=BE32(*p);
-	   p++;
+           *p=BE32(*p);
+           p++;
    }
    if(fp2>=0) {
        fread(&RundbHeader,sizeof(RundbHeader),1,fp2);
@@ -179,7 +179,7 @@ int main() {
        printf("Rundb entrys  : %d\n",RundbHeader.entrycount);
    }
    if( sizeof(struct SongEntry)!=(header.songlen+header.genrelen+16)) {
-		printf("Song Entry Size mismatch.. update the code to correct size.\n");
+                printf("Song Entry Size mismatch.. update the code to correct size.\n");
               return;
    }
    if(sizeof(struct AlbumEntry)!=(header.albumlen+4+header.songarraylen*4)) {
@@ -191,8 +191,8 @@ printf("Artist Entry Size mismatch.. update the code to correct size.\n");
               return;
    }
    if(sizeof(struct FileEntry)!=(header.filelen+12)) {
-	   printf("File Entry Size mismatch.. update the code to correct size.\n");
-	   return;
+           printf("File Entry Size mismatch.. update the code to correct size.\n");
+           return;
    }
 
    do {
@@ -206,47 +206,47 @@ printf("Artist Entry Size mismatch.. update the code to correct size.\n");
      fflush(stdout);
      scanf("%d",&temp2);
      if(temp2==-1) {
-	  printf("Offset ? 0x");
-	  fflush(stdout);
-	  scanf("%x",&temp3);
+          printf("Offset ? 0x");
+          fflush(stdout);
+          scanf("%x",&temp3);
      }
      switch(temp) {
-	     case 1:
-		     if(temp2==-1)
-			     showartist(temp3);
-		     else
-			     showartist(header.artiststart + 
-					     temp2*sizeof(struct ArtistEntry));
-		     break;
-	     case 2:
+             case 1:
+                     if(temp2==-1)
+                             showartist(temp3);
+                     else
+                             showartist(header.artiststart +
+                                             temp2*sizeof(struct ArtistEntry));
+                     break;
+             case 2:
                      if(temp2==-1)
                              showalbum(temp3);
                      else
                              showalbum(header.albumstart +
                                              temp2*sizeof(struct AlbumEntry));
-		     break;
-	     case 3:
+                     break;
+             case 3:
                      if(temp2==-1)
                              showsong(temp3);
                      else
                              showsong(header.songstart +
                                              temp2*sizeof(struct SongEntry));
-		     break;
-	     case 4:
+                     break;
+             case 4:
                      if(temp2==-1)
                              showfile(temp3);
                      else
                              showfile(header.filestart +
                                              temp2*sizeof(struct FileEntry));
-		     break;
+                     break;
          case 5:    if(temp2==-1)
                              showrundb(temp3);
                     else
                              showrundb(8+temp2*sizeof(struct RundbEntry));
              break;
              default:
-		     return;
-		     break;
+                     return;
+                     break;
      }
    } while(1);
    fclose(fp);

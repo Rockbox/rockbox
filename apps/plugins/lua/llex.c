@@ -30,7 +30,7 @@
 
 
 
-#define currIsNewline(ls)	(ls->current == '\n' || ls->current == '\r')
+#define currIsNewline(ls)       (ls->current == '\n' || ls->current == '\r')
 
 
 /* ORDER RESERVED */
@@ -458,4 +458,3 @@ void luaX_lookahead (LexState *ls) {
   lua_assert(ls->lookahead.token == TK_EOS);
   ls->lookahead.token = llex(ls, &ls->lookahead.seminfo);
 }
-

@@ -41,7 +41,7 @@ static bool reset_config(void)
     firmware_settings.bootmethod = BOOT_RECOVERY;
     firmware_settings.bl_version = 0;
 #endif
-    
+
     return firmware_settings.initialized;
 }
 
@@ -49,9 +49,9 @@ bool eeprom_settings_init(void)
 {
     int ret;
     uint32_t sum;
-    
+
     eeprom_24cxx_init();
-    
+
     /* Check if player has been flashed. */
     if (detect_original_firmware())
     {
@@ -60,8 +60,8 @@ bool eeprom_settings_init(void)
         logf("Rockbox in flash is required");
         return false;
     }
-    
-    ret = eeprom_24cxx_read(0, &firmware_settings, 
+
+    ret = eeprom_24cxx_read(0, &firmware_settings,
                             sizeof(struct eeprom_settings));
 
     if (ret < 0)
@@ -70,23 +70,23 @@ bool eeprom_settings_init(void)
         firmware_settings.initialized = false;
         return false;
     }
-    
+
     sum = crc_32(&firmware_settings, sizeof(struct eeprom_settings)-4,
                  0xffffffff);
-    
+
     logf("BL version: %d", firmware_settings.bl_version);
     if (firmware_settings.version != EEPROM_SETTINGS_VERSION)
     {
         logf("Version mismatch");
         return reset_config();
     }
-    
+
     if (firmware_settings.checksum != sum)
     {
         logf("Checksum mismatch");
         return reset_config();
     }
-    
+
 #ifndef BOOTLOADER
     if (firmware_settings.bl_version < EEPROM_SETTINGS_BL_MINVER)
     {
@@ -94,7 +94,7 @@ bool eeprom_settings_init(void)
         return reset_config();
     }
 #endif
-    
+
     return true;
 }
 
@@ -102,23 +102,22 @@ bool eeprom_settings_store(void)
 {
     int ret;
     uint32_t sum;
-    
+
     if (!firmware_settings.initialized || detect_original_firmware())
     {
         logf("Rockbox in flash is required");
         return false;
     }
-    
+
     /* Update the checksum. */
     sum = crc_32(&firmware_settings, sizeof(struct eeprom_settings)-4,
                  0xffffffff);
     firmware_settings.checksum = sum;
     ret = eeprom_24cxx_write(0, &firmware_settings,
                              sizeof(struct eeprom_settings));
-    
+
     if (ret < 0)
         firmware_settings.initialized = false;
-    
+
     return ret;
 }
-

@@ -154,4 +154,3 @@ int sansa_write(struct sansa_t* sansa, int nbytes)
     return write(sansa->dh, sansa->sectorbuf, nbytes);
 }
 #endif
-

@@ -104,7 +104,7 @@ static FORCE_INLINE void write_samples(int16_t *out,
             *out++ = h;
         }
         while ((size -= 2*sizeof(int16_t)) > 0);
-    }     
+    }
 }
 
 

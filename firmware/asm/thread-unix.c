@@ -214,7 +214,7 @@ void bootstrap_context(void)
      * in the meantime */
     void (*thread_entry)(void) = thread_func;
     struct ctx *t = thread_context;
-    
+
     /*
      * Save current machine state (on new stack) and
      * go back to caller until we're scheduled for real...

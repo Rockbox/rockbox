@@ -42,7 +42,7 @@ enum old_values{
 
 static const unsigned short icons[Icon_Last_Themeable] = {
     [0 ... Icon_Last_Themeable-1] = ' ',
-    
+
     [Icon_Audio] = old_Icon_Audio,
     [Icon_Folder] = old_Icon_Folder,
     [Icon_Playlist] = old_Icon_Playlist,
@@ -55,7 +55,7 @@ static const unsigned short icons[Icon_Last_Themeable] = {
     [Icon_Bookmark] = old_Icon_Bookmark,
     [Icon_Queued] = old_Icon_Queued,
     [Icon_Moving] = old_Icon_Moving,
-    
+
     /*
     [Icon_Keyboard] = ,
     [Icon_Font] = ,

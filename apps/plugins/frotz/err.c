@@ -1,5 +1,5 @@
 /* err.c - Runtime error reporting functions
- *	Written by Jim Dunleavy <jim.dunleavy@erha.ie>
+ *      Written by Jim Dunleavy <jim.dunleavy@erha.ie>
  *
  * This file is part of Frotz.
  *
@@ -22,7 +22,7 @@
 
 /* Define stuff for stricter Z-code error checking, for the generic
    Unix/DOS/etc terminal-window interface. Feel free to change the way
-   player prefs are specified, or replace report_zstrict_error() 
+   player prefs are specified, or replace report_zstrict_error()
    completely if you want to change the way errors are reported. */
 
 /* int err_report_mode = ERR_DEFAULT_REPORT_MODE; */
@@ -78,7 +78,7 @@ void init_err (void)
     int i;
 
     /* Initialize the counters. */
-    
+
     for (i = 0; i < ERR_NUM_ERRORS; i++)
         error_count[i] = 0;
 }
@@ -96,39 +96,39 @@ void init_err (void)
 void runtime_error (int errnum)
 {
     int wasfirst;
-    
+
     if (errnum <= 0 || errnum > ERR_NUM_ERRORS)
-	return;
+        return;
 
     if (f_setup.err_report_mode == ERR_REPORT_FATAL
-	|| (!f_setup.ignore_errors && errnum <= ERR_MAX_FATAL)) {
-	flush_buffer ();
-	os_fatal (err_messages[errnum - 1]);
-	return;
+        || (!f_setup.ignore_errors && errnum <= ERR_MAX_FATAL)) {
+        flush_buffer ();
+        os_fatal (err_messages[errnum - 1]);
+        return;
     }
 
     wasfirst = (error_count[errnum - 1] == 0);
     error_count[errnum - 1]++;
-    
-    if ((f_setup.err_report_mode == ERR_REPORT_ALWAYS)
-	|| (f_setup.err_report_mode == ERR_REPORT_ONCE && wasfirst)) {
-	long pc;
 
-	GET_PC (pc);
-	print_string ("Warning: ");
-	print_string (err_messages[errnum - 1]);
-	print_string (" (PC = ");
-	print_long (pc, 16);
-	print_char (')');
-        
-	if (f_setup.err_report_mode == ERR_REPORT_ONCE) {
-	    print_string (" (will ignore further occurrences)");
-	} else {
-	    print_string (" (occurence ");
-	    print_long (error_count[errnum - 1], 10);
-	    print_char (')');
-	}
-	new_line ();
+    if ((f_setup.err_report_mode == ERR_REPORT_ALWAYS)
+        || (f_setup.err_report_mode == ERR_REPORT_ONCE && wasfirst)) {
+        long pc;
+
+        GET_PC (pc);
+        print_string ("Warning: ");
+        print_string (err_messages[errnum - 1]);
+        print_string (" (PC = ");
+        print_long (pc, 16);
+        print_char (')');
+
+        if (f_setup.err_report_mode == ERR_REPORT_ONCE) {
+            print_string (" (will ignore further occurrences)");
+        } else {
+            print_string (" (occurence ");
+            print_long (error_count[errnum - 1], 10);
+            print_char (')');
+        }
+        new_line ();
     }
 
 } /* report_error */
@@ -146,9 +146,9 @@ static void print_long (unsigned long value, int base)
     char c;
 
     for (i = (base == 10 ? 1000000000 : 0x10000000); i != 0; i /= base)
-	if (value >= i || i == 1) {
-	    c = (value / i) % base;
-	    print_char (c + (c <= 9 ? '0' : 'a' - 10));
-	}
+        if (value >= i || i == 1) {
+            c = (value / i) % base;
+            print_char (c + (c <= 9 ? '0' : 'a' - 10));
+        }
 
 }/* print_long */

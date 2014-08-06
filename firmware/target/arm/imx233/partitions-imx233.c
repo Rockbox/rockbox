@@ -99,7 +99,7 @@ static int compute_window_creative(intptr_t user, part_read_fn_t read_fn,
             }
             else
                 *end = *start + ent[i].size * hdr->block_size / 512;
-            
+
             return 0;
         }
     }

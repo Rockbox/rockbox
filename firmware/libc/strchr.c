@@ -54,7 +54,7 @@ QUICKREF
 #endif
 #endif
 
-/* DETECTCHAR returns nonzero if (long)X contains the byte used 
+/* DETECTCHAR returns nonzero if (long)X contains the byte used
    to fill (long)MASK. */
 #define DETECTCHAR(X,MASK) (DETECTNULL(X ^ MASK))
 

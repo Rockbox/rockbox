@@ -94,7 +94,7 @@ void lcd_write_data(const fb_data* p_bytes, int count)
         /* While push fifo is not empty */
         while ((DBOP_STAT & (1<<10)) == 0)
             ;
-        /* delay a bit. value arbitrary */    
+        /* delay a bit. value arbitrary */
         int i = 0;
         while(i < 15)
            i++;
@@ -155,7 +155,7 @@ void lcd_init_device(void)
 void lcd_write_command(int byte)
 {
     LCD_CMD = byte;
-        
+
     asm volatile (
         "nop      \n\t"
         "nop      \n\t"
@@ -241,9 +241,9 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
         lcd_write_command(LCD_SET_REVERSE_DISPLAY);
-    else 
+    else
         lcd_write_command(LCD_SET_NORMAL_DISPLAY);
 }
 

@@ -28,13 +28,13 @@ static t_int *mtof_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	t_sample f = *in;
-	if (f <= ftofix(-1500.)) *out = 0;
-	else
-	{
-	    if (f > ftofix(1499.)) f = ftofix(1499.);
-	    *out = ftofix(8.17579891564 * exp(.0577622650 * fixtof(f)));
-    	}
+        t_sample f = *in;
+        if (f <= ftofix(-1500.)) *out = 0;
+        else
+        {
+            if (f > ftofix(1499.)) f = ftofix(1499.);
+            *out = ftofix(8.17579891564 * exp(.0577622650 * fixtof(f)));
+        }
     }
     return (w + 4);
 }
@@ -51,8 +51,7 @@ static void mtof_tilde_dsp(t_mtof_tilde *x, t_signal **sp)
 void mtof_tilde_setup(void)
 {
     mtof_tilde_class = class_new(gensym("mtof~"), (t_newmethod)mtof_tilde_new, 0,
-    	sizeof(t_mtof_tilde), 0, 0);
+        sizeof(t_mtof_tilde), 0, 0);
     CLASS_MAINSIGNALIN(mtof_tilde_class, t_mtof_tilde, x_f);
     class_addmethod(mtof_tilde_class, (t_method)mtof_tilde_dsp, gensym("dsp"), 0);
 }
-

@@ -64,7 +64,7 @@ int tea5767_set(int setting, int value)
             write_bytes[3] |= (1<<4) | (1<<3) | (1<<1);
 #else
             /* soft mute, stereo noise cancelling */
-            write_bytes[3] |= (1<<3) | (1<<1); 
+            write_bytes[3] |= (1<<3) | (1<<1);
 #endif
             /* sleep / standby mode */
             tea5767_set_clear(3, (1<<6), value);

@@ -380,4 +380,3 @@ void unloadFile(struct MIDIfile * mf)
     free(mf);   //Unload the main struct
 }
 */
-

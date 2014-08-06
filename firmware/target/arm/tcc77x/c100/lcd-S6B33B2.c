@@ -71,7 +71,7 @@ static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
 static void lcd_send_command(unsigned cmd)
 {
     LCD_CMD = cmd;
-        
+
     asm volatile (
         "nop      \n\t"
         "nop      \n\t"
@@ -102,13 +102,13 @@ void lcd_init_device(void)
              (2 << 11) |                 /* Setup time = 2 cycles */
              (2 << 3) |                  /* Pulse width = 2+1 cycles */
              (2 << 0);                   /* Hold time = 2 cycle */
-             
+
     GPIOE &= ~0x8;
     sleep(HZ/100);   /* 10ms */
 
     GPIOE |= 0x08;
     sleep(HZ/100);   /* 10ms */
-    
+
     lcd_send_command(R_STANDBY_OFF);
     sleep(HZ/20);    /* 50ms */
 
@@ -178,7 +178,7 @@ void lcd_init_device(void)
 
     lcd_send_command(R_SPEC_DISPLAY_PATTERN);
     lcd_send_command(0x0);
-    
+
     /* Rockbox init */
     lcd_clear_display();
     lcd_update();
@@ -243,18 +243,18 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *addr;
-    
+
     if (x + width >= LCD_WIDTH)
         width = LCD_WIDTH - x;
     if (y + height >= LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-        
+
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 
     addr = FBADDR(x,y);
 
-    if (width <= 1) {                    
+    if (width <= 1) {
         lcd_send_command(R_ENTRY_MODE);  /* The X end address must be larger */
         lcd_send_command(0x80);          /* that the X start address, so we */
         lcd_send_command(R_X_ADDR_AREA); /* switch to vertical mode for */

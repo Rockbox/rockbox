@@ -145,20 +145,20 @@ void lcd_init_device(void)
     GPIOJ_ENABLE     |= 0x4;
     GPIOJ_OUTPUT_VAL |= 0x4;
     GPIOJ_OUTPUT_EN  |= 0x4;
-    
+
     lcd_send_cmd(SWRESET);
     udelay(10000);
-    
+
     lcd_send_cmd(WRCNTR);
     lcd_send_data(0x3f);
-    
+
     lcd_send_cmd(SLPOUT);
     udelay(120000);
-    
+
     lcd_send_cmd(INVOFF);
     lcd_send_cmd(IDMOFF);
     lcd_send_cmd(NORON);
-    
+
     lcd_send_cmd(FRMSEL);
     lcd_send_data(0x2);
     lcd_send_data(0x6);
@@ -189,7 +189,7 @@ void lcd_init_device(void)
 
     lcd_send_cmd(COLMOD);
     lcd_send_data(0x5);
-    
+
     lcd_send_cmd(RGBSET);
     lcd_send_data(0x1);
     lcd_send_data(0x2);
@@ -295,7 +295,7 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
         lcd_send_cmd(INVON);
     else
         lcd_send_cmd(INVOFF);
@@ -308,7 +308,7 @@ void lcd_set_flip(bool yesno)
         mad_ctrl |= ((1<<7) | (1<<6));  /* flip */
     else
         mad_ctrl &= ~((1<<7) | (1<<6)); /* normal */
-    
+
     lcd_send_cmd(MADCTR);
     lcd_send_data(mad_ctrl);
 }
@@ -337,7 +337,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     /* Sorry, but width and height must be >= 2 or else */
     width &= ~1;
     height >>= 1;
-    
+
     z = stride*src_y;
     yuv_src[0] = src[0] + z + src_x;
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
@@ -404,12 +404,12 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *addr;
-    
+
     if (x + width >= LCD_WIDTH)
         width = LCD_WIDTH - x;
     if (y + height >= LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-        
+
     if ((width <= 0) || (height <= 0))
         return; /* Nothing left to do. */
 

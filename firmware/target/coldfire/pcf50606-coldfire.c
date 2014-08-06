@@ -293,7 +293,7 @@ inline bool pcf50606_i2c_getack(void)
     DELAY;
 
     ret = !SDA;
-               
+
     SCL_LO_OUT;
 #endif
     return ret;
@@ -556,4 +556,3 @@ int pcf50606_write(int address, unsigned char val)
 {
     return pcf50606_write_multiple(address, &val, 1);
 }
-

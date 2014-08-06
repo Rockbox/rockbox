@@ -860,8 +860,8 @@ static void draw_card( card_t *card, int x, int y,
     if( card->known )
     {
         rb->lcd_bitmap_part( card_deck, CARD_GFX_WIDTH * card->num,
-                             CARD_GFX_HEIGHT * card->suit, 
-                             STRIDE(SCREEN_MAIN, 
+                             CARD_GFX_HEIGHT * card->suit,
+                             STRIDE(SCREEN_MAIN,
                                     BMPWIDTH_card_deck, BMPHEIGHT_card_deck),
                              x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
     }
@@ -877,7 +877,7 @@ static void draw_card( card_t *card, int x, int y,
 static void draw_empty_stack( int s, int x, int y, bool cursor )
 {
     rb->lcd_bitmap_part( solitaire_suitsi, 0,
-                 CARD_GFX_HEIGHT * s, 
+                 CARD_GFX_HEIGHT * s,
                  STRIDE( SCREEN_MAIN,
                          BMPWIDTH_solitaire_suitsi, BMPHEIGHT_solitaire_suitsi),
                  x+1, y+1, CARD_GFX_WIDTH, CARD_GFX_HEIGHT );
@@ -1525,11 +1525,11 @@ static int save_game( void )
 static int load_game( void )
 {
     int checksum, retval;
-    
+
     int fd = open_save_file( O_RDONLY );
     if( fd < 0 )
         return -1;
-    
+
     retval = 0; /* Assume good case */
     if(    ( rb->lseek( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
         || ( rb->read( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
@@ -1553,7 +1553,7 @@ static int load_game( void )
         rb->splash( 2*HZ, "Save file was corrupted. Aborting." );
         retval = -3;
     }
-    
+
     rb->close( fd );
     delete_save_file();
     return retval;

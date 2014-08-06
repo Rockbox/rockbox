@@ -1,8 +1,8 @@
 
 /*
-   Based on the wiki viewer mallocer 
+   Based on the wiki viewer mallocer
    Copyright (C) 2005 Dave Chapman
-   
+
    @ Modified to decompress memory buffer by gama
  */
 

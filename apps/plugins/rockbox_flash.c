@@ -62,7 +62,7 @@ static volatile UINT8* FB = (UINT8*)0x02000000; /* Flash base address */
 #define KEYNAME2 "F2"
 #endif
 
-typedef struct 
+typedef struct
 {
     UINT32 destination; /* address to copy it to */
     UINT32 size;        /* how many bytes of payload (to the next header) */
@@ -85,7 +85,7 @@ typedef enum
     eBadRomLink
 } tCheckResult;
 
-typedef struct 
+typedef struct
 {
     UINT8 manufacturer;
     UINT8 id;
@@ -119,12 +119,12 @@ static bool ReadID(volatile UINT8* pBase, UINT8* pManufacturerID,
 
     manu = pBase[0];
     id   = pBase[1];
-    
+
     pBase[0] = 0xF0;  /* reset flash (back to normal read mode) */
     rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
 
     /* I assume success if the obtained values are different from
-       the normal flash content. This is not perfectly bulletproof, they 
+       the normal flash content. This is not perfectly bulletproof, they
        could theoretically be the same by chance, causing us to fail. */
     if (not_manu != manu || not_id != id) /* a value has changed */
     {
@@ -358,7 +358,7 @@ tCheckResult CheckImageFile(char* filename, int space,
             rb->close(fd);
             return eReadErr;
         }
-        if (reset_vector >= (UINT32)FB 
+        if (reset_vector >= (UINT32)FB
          && reset_vector <  (UINT32)FB+512*1024) /* ROM address? */
         {
             /* assume in-place, executing directly in flash */
@@ -384,19 +384,19 @@ tCheckResult CheckImageFile(char* filename, int space,
 
         pHeader->execute = reset_vector;
     }
-    
+
     /* check if we can read the whole file */
     do
     {
         read = rb->read(fd, sector, SECTORSIZE);
         fileread += read;
     } while (read == SECTORSIZE);
-    
+
     rb->close(fd);
 
     if (fileread != filesize)
         return eReadErr;
-    
+
     return eOK;
 }
 
@@ -432,7 +432,7 @@ static unsigned ProgramImageFile(char* filename, UINT8* pos,
         {
             /* nothing we can do, let the programming count the errors */
         }
-        
+
         for (i=0; i<read; i++)
         {
             if (!ProgramByte(pos + i, sector[i]))
@@ -446,7 +446,7 @@ static unsigned ProgramImageFile(char* filename, UINT8* pos,
         /* payload for next sector */
         size -= read;
     } while (read > 0);
-    
+
     rb->close(fd);
 
     return failures;
@@ -488,15 +488,15 @@ static unsigned VerifyImageFile(char* filename, UINT8* pos,
                 failures++;
             }
         }
-        
+
         pos += SECTORSIZE;
         read = rb->read(fd, sector, (size > SECTORSIZE) ? SECTORSIZE : size);
         /* payload for next sector */
         size -= read;
     } while (read);
-    
+
     rb->close(fd);
-    
+
     return failures;
 }
 
@@ -506,12 +506,12 @@ static unsigned VerifyImageFile(char* filename, UINT8* pos,
 static int WaitForButton(void)
 {
     int button;
-    
+
     do
     {
         button = rb->button_get(true);
     } while (IS_SYSEVENT(button) || (button & BUTTON_REL));
-    
+
     return button;
 }
 
@@ -537,7 +537,7 @@ static void ShowFlashInfo(tFlashInfo* pInfo, tImageHeader* pImageHeader)
         {
             rb->lcd_puts_scroll(0, 0, "Unsupported chip");
         }
-        
+
     }
 
     if (pImageHeader)
@@ -566,7 +566,7 @@ static void DoUserDialog(char* filename)
     size_t memleft;
     unsigned bl_version;
     bool show_greet = false;
-    
+
     /* this can only work if Rockbox runs in DRAM, not flash ROM */
     if ((UINT8*)rb >= FB && (UINT8*)rb < FB + 4096*1024) /* 4 MB max */
     {   /* we're running from flash */
@@ -580,7 +580,7 @@ static void DoUserDialog(char* filename)
         rb->splash(HZ*3, "Battery too low!");
         return; /* exit */
     }
-    
+
     /* "allocate" memory */
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
@@ -630,13 +630,13 @@ static void DoUserDialog(char* filename)
         rb->lcd_clear_display();
     }
 #endif
-    
+
     rb->lcd_puts(0, show_greet ? 0 : 3, "Checking...");
     rb->lcd_update();
 
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
-    
+
     rc = CheckImageFile(filename, space, &ImageHeader, pos);
     if (rc != eOK)
     {
@@ -712,7 +712,7 @@ static void DoUserDialog(char* filename)
     {
         return;
     }
-    
+
     true_size = ImageHeader.size;
     aligned_size = ((sizeof(tImageHeader) + true_size + SECTORSIZE-1) &
                     ~(SECTORSIZE-1)) - sizeof(tImageHeader); /* round up to
@@ -720,7 +720,7 @@ static void DoUserDialog(char* filename)
                                                                 sector */
     ImageHeader.size = aligned_size; /* increase image size such that we reach
                                         the next sector */
-    
+
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Programming...");
     rb->lcd_update();
@@ -735,7 +735,7 @@ static void DoUserDialog(char* filename)
         rb->lcd_update();
         button = WaitForButton();
     }
-    
+
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Verifying...");
     rb->lcd_update();
@@ -789,7 +789,7 @@ static void DoUserDialog(char* filename)
         rb->splash(HZ*3, "Batt. too low!");
         return; /* exit */
     }
-    
+
     /* "allocate" memory */
     sector = rb->plugin_get_buffer(&memleft);
     if (memleft < SECTORSIZE) /* need buffer for a flash sector */
@@ -811,7 +811,7 @@ static void DoUserDialog(char* filename)
         rb->splash(HZ*3, "No image");
         return; /* exit */
     }
-    
+
     bl_version = BootloaderVersion();
     if (bl_version < LATEST_BOOTLOADER_VERSION)
     {
@@ -831,7 +831,7 @@ static void DoUserDialog(char* filename)
 
     space = FlashInfo.size - (pos-FB + sizeof(ImageHeader));
     /* size minus start */
-    
+
     rc = CheckImageFile(filename, space, &ImageHeader, pos);
     rb->lcd_puts(0, 0, "Checked:");
     switch (rc) {
@@ -896,7 +896,7 @@ static void DoUserDialog(char* filename)
     {
         return;
     }
-    
+
     true_size = ImageHeader.size;
     aligned_size = ((sizeof(tImageHeader) + true_size + SECTORSIZE-1) &
                     ~(SECTORSIZE-1)) - sizeof(tImageHeader); /* round up to
@@ -904,7 +904,7 @@ static void DoUserDialog(char* filename)
                                                                 sector */
     ImageHeader.size = aligned_size; /* increase image size such that we reach
                                         the next sector */
-    
+
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Programming...");
     rb->lcd_update();
@@ -919,7 +919,7 @@ static void DoUserDialog(char* filename)
         rb->lcd_update();
         button = WaitForButton();
     }
-    
+
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Verifying...");
     rb->lcd_update();

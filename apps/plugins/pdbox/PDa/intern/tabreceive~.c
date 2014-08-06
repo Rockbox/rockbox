@@ -25,20 +25,20 @@ static void tabreceive_dsp(t_tabreceive *x, t_signal **sp)
 {
     t_garray *a;
     int vecsize;
-    
+
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
     {
-    	if (*x->x_arrayname->s_name)
-    	    error("tabsend~: %s: no such array", x->x_arrayname->s_name);
+        if (*x->x_arrayname->s_name)
+            error("tabsend~: %s: no such array", x->x_arrayname->s_name);
     }
     else if (!garray_getfloatarray(a, &vecsize, &x->x_vec))
-    	error("%s: bad template for tabreceive~", x->x_arrayname->s_name);
-    else 
+        error("%s: bad template for tabreceive~", x->x_arrayname->s_name);
+    else
     {
-    	int n = sp[0]->s_n;
-    	if (n < vecsize) vecsize = n;
-    	garray_usedindsp(a);
-    	dsp_add(tabreceive_perform, 3, x, sp[0]->s_vec, vecsize);
+        int n = sp[0]->s_n;
+        if (n < vecsize) vecsize = n;
+        garray_usedindsp(a);
+        dsp_add(tabreceive_perform, 3, x, sp[0]->s_vec, vecsize);
     }
 }
 
@@ -53,9 +53,8 @@ static void *tabreceive_new(t_symbol *s)
 void tabreceive_tilde_setup(void)
 {
     tabreceive_class = class_new(gensym("tabreceive~"),
-    	(t_newmethod)tabreceive_new, 0,
-    	sizeof(t_tabreceive), 0, A_DEFSYM, 0);
+        (t_newmethod)tabreceive_new, 0,
+        sizeof(t_tabreceive), 0, A_DEFSYM, 0);
     class_addmethod(tabreceive_class, (t_method)tabreceive_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
 }
-

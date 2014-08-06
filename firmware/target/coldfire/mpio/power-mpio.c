@@ -63,7 +63,7 @@ void power_init(void)
     and_l(~(1<<31), &GPIO_OUT);
     or_l((1<<31),&GPIO_ENABLE);
     or_l((1<<31),&GPIO_FUNCTION);
-   
+
     /* turn off charger by default*/
     or_l((1<<23), &GPIO_OUT);
     or_l((1<<23), &GPIO_ENABLE);

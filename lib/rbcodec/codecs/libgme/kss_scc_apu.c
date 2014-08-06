@@ -23,121 +23,121 @@ int const wave_size = 0x20;
 
 static void set_output( struct Scc_Apu* this, struct Blip_Buffer* buf )
 {
-	int i;
-	for ( i = 0; i < scc_osc_count; ++i )
-		Scc_set_output( this, i, buf );
+        int i;
+        for ( i = 0; i < scc_osc_count; ++i )
+                Scc_set_output( this, i, buf );
 }
 
 void Scc_volume( struct Scc_Apu* this, int v )
 {
-	Synth_volume( &this->synth, (v/2 - (v*7)/100) / scc_osc_count / scc_amp_range );
+        Synth_volume( &this->synth, (v/2 - (v*7)/100) / scc_osc_count / scc_amp_range );
 }
 
 void Scc_reset( struct Scc_Apu* this )
 {
-	this->last_time = 0;
+        this->last_time = 0;
 
-	int i;
-	for ( i = scc_osc_count; --i >= 0; )
-		memset( &this->oscs [i], 0, offsetof (struct scc_osc_t,output) );
+        int i;
+        for ( i = scc_osc_count; --i >= 0; )
+                memset( &this->oscs [i], 0, offsetof (struct scc_osc_t,output) );
 
-	memset( this->regs, 0, sizeof this->regs );
+        memset( this->regs, 0, sizeof this->regs );
 }
 
 void Scc_init( struct Scc_Apu* this )
 {
-	Synth_init( &this->synth);
-	
-	set_output( this, NULL );
-	Scc_volume( this, (int)FP_ONE_VOLUME );
-	Scc_reset( this );
+        Synth_init( &this->synth);
+
+        set_output( this, NULL );
+        Scc_volume( this, (int)FP_ONE_VOLUME );
+        Scc_reset( this );
 }
 
 static void run_until( struct Scc_Apu* this, blip_time_t end_time )
 {
-	int index;
-	for ( index = 0; index < scc_osc_count; index++ )
-	{
-		struct scc_osc_t* osc = &this->oscs [index];
+        int index;
+        for ( index = 0; index < scc_osc_count; index++ )
+        {
+                struct scc_osc_t* osc = &this->oscs [index];
 
-		struct Blip_Buffer* const output = osc->output;
-		if ( !output )
-			continue;
+                struct Blip_Buffer* const output = osc->output;
+                if ( !output )
+                        continue;
 
-		blip_time_t period = (this->regs [0xA0 + index * 2 + 1] & 0x0F) * 0x100 +
-				this->regs [0xA0 + index * 2] + 1;
-		int volume = 0;
-		if ( this->regs [0xAF] & (1 << index) )
-		{
-			blip_time_t inaudible_period = (unsigned) (Blip_clock_rate( output ) +
-					inaudible_freq * 32) / (unsigned) (inaudible_freq * 16);
-			if ( period > inaudible_period )
-				volume = (this->regs [0xAA + index] & 0x0F) * (scc_amp_range / 256 / 15);
-		}
+                blip_time_t period = (this->regs [0xA0 + index * 2 + 1] & 0x0F) * 0x100 +
+                                this->regs [0xA0 + index * 2] + 1;
+                int volume = 0;
+                if ( this->regs [0xAF] & (1 << index) )
+                {
+                        blip_time_t inaudible_period = (unsigned) (Blip_clock_rate( output ) +
+                                        inaudible_freq * 32) / (unsigned) (inaudible_freq * 16);
+                        if ( period > inaudible_period )
+                                volume = (this->regs [0xAA + index] & 0x0F) * (scc_amp_range / 256 / 15);
+                }
 
-		int8_t const* wave = (int8_t*) this->regs + index * wave_size;
-		/*if ( index == osc_count - 1 )
-			wave -= wave_size; // last two oscs share same wave RAM*/
+                int8_t const* wave = (int8_t*) this->regs + index * wave_size;
+                /*if ( index == osc_count - 1 )
+                        wave -= wave_size; // last two oscs share same wave RAM*/
 
-		{
-			int delta = wave [osc->phase] * volume - osc->last_amp;
-			if ( delta )
-			{
-				osc->last_amp += delta;
-				Blip_set_modified( output );
-				Synth_offset( &this->synth, this->last_time, delta, output );
-			}
-		}
+                {
+                        int delta = wave [osc->phase] * volume - osc->last_amp;
+                        if ( delta )
+                        {
+                                osc->last_amp += delta;
+                                Blip_set_modified( output );
+                                Synth_offset( &this->synth, this->last_time, delta, output );
+                        }
+                }
 
-		blip_time_t time = this->last_time + osc->delay;
-		if ( time < end_time )
-		{
-			int phase = osc->phase;
-			if ( !volume )
-			{
-				// maintain phase
-				int count = (end_time - time + period - 1) / period;
-				phase += count; // will be masked below
-				time  += count * period;
-			}
-			else
-			{
-				int last_wave = wave [phase];
-				phase = (phase + 1) & (wave_size - 1); // pre-advance for optimal inner loop
-				do
-				{
-					int delta = wave [phase] - last_wave;
-					phase = (phase + 1) & (wave_size - 1);
-					if ( delta )
-					{
-						last_wave += delta;
-						Synth_offset_inline( &this->synth, time, delta * volume, output );
-					}
-					time += period;
-				}
-				while ( time < end_time );
+                blip_time_t time = this->last_time + osc->delay;
+                if ( time < end_time )
+                {
+                        int phase = osc->phase;
+                        if ( !volume )
+                        {
+                                // maintain phase
+                                int count = (end_time - time + period - 1) / period;
+                                phase += count; // will be masked below
+                                time  += count * period;
+                        }
+                        else
+                        {
+                                int last_wave = wave [phase];
+                                phase = (phase + 1) & (wave_size - 1); // pre-advance for optimal inner loop
+                                do
+                                {
+                                        int delta = wave [phase] - last_wave;
+                                        phase = (phase + 1) & (wave_size - 1);
+                                        if ( delta )
+                                        {
+                                                last_wave += delta;
+                                                Synth_offset_inline( &this->synth, time, delta * volume, output );
+                                        }
+                                        time += period;
+                                }
+                                while ( time < end_time );
 
-				osc->last_amp = last_wave * volume;
-				Blip_set_modified( output );
-				phase--; // undo pre-advance
-			}
-			osc->phase = phase & (wave_size - 1);
-		}
-		osc->delay = time - end_time;
-	}
-	this->last_time = end_time;
+                                osc->last_amp = last_wave * volume;
+                                Blip_set_modified( output );
+                                phase--; // undo pre-advance
+                        }
+                        osc->phase = phase & (wave_size - 1);
+                }
+                osc->delay = time - end_time;
+        }
+        this->last_time = end_time;
 }
 
 void Scc_write( struct Scc_Apu* this, blip_time_t time, int addr, int data )
 {
-	//assert( (unsigned) addr < reg_count );
-	assert( ( addr >= 0x9800 && addr <= 0x988F ) || ( addr >= 0xB800 && addr <= 0xB8AF ) );
-	run_until( this, time );
+        //assert( (unsigned) addr < reg_count );
+        assert( ( addr >= 0x9800 && addr <= 0x988F ) || ( addr >= 0xB800 && addr <= 0xB8AF ) );
+        run_until( this, time );
 
-	addr -= 0x9800;
-	if ( ( unsigned ) addr < 0x90 )
-	{
-	    if ( ( unsigned ) addr < 0x60 )
+        addr -= 0x9800;
+        if ( ( unsigned ) addr < 0x90 )
+        {
+            if ( ( unsigned ) addr < 0x60 )
             this->regs [addr] = data;
         else if ( ( unsigned ) addr < 0x80 )
         {
@@ -147,20 +147,20 @@ void Scc_write( struct Scc_Apu* this, blip_time_t time, int addr, int data )
         {
             this->regs [addr + 0x20] = data;
         }
-	}
-	else
-	{
-	    addr -= 0xB800 - 0x9800;
-	    if ( ( unsigned ) addr < 0xB0 )
+        }
+        else
+        {
+            addr -= 0xB800 - 0x9800;
+            if ( ( unsigned ) addr < 0xB0 )
             this->regs [addr] = data;
-	}
+        }
 }
 
 void Scc_end_frame( struct Scc_Apu* this, blip_time_t end_time )
 {
-	if ( end_time > this->last_time )
-		run_until( this, end_time );
+        if ( end_time > this->last_time )
+                run_until( this, end_time );
 
-	this->last_time -= end_time;
-	assert( this->last_time >= 0 );
+        this->last_time -= end_time;
+        assert( this->last_time >= 0 );
 }

@@ -214,4 +214,3 @@ int sansa_write(struct sansa_t* sansa, int nbytes)
     return count;
 }
 #endif
-

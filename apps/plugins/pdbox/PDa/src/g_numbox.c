@@ -46,9 +46,9 @@ static void my_numbox_tick_reset(t_my_numbox *x)
 {
     if(x->x_gui.x_fsf.x_change)
     {
-	x->x_gui.x_fsf.x_change = 0;
-	glist_grab(x->x_gui.x_glist, 0, 0, 0, 0, 0);
-	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+        x->x_gui.x_fsf.x_change = 0;
+        glist_grab(x->x_gui.x_glist, 0, 0, 0, 0, 0);
+        (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
     }
 }
 
@@ -60,9 +60,9 @@ static void my_numbox_tick_wait(t_my_numbox *x)
 void my_numbox_clip(t_my_numbox *x)
 {
     if(x->x_val < x->x_min)
-	x->x_val = x->x_min;
+        x->x_val = x->x_min;
     if(x->x_val > x->x_max)
-	x->x_val = x->x_max;
+        x->x_val = x->x_max;
 }
 
 void my_numbox_calc_fontwidth(t_my_numbox *x)
@@ -70,9 +70,9 @@ void my_numbox_calc_fontwidth(t_my_numbox *x)
     int w, f=31;
 
     if(x->x_gui.x_fsf.x_font_style == 1)
-	f = 27;
+        f = 27;
     else if(x->x_gui.x_fsf.x_font_style == 2)
-	f = 25;
+        f = 25;
 
     w = x->x_gui.x_fontsize * f * x->x_gui.x_w;
     w /= 36;
@@ -92,51 +92,51 @@ void my_numbox_ftoa(t_my_numbox *x)
     bufsize = strlen(x->x_buf);
     if(bufsize >= 5)/* if it is in exponential mode */
     {
-	i = bufsize - 4;
-	if((x->x_buf[i] == 'e') || (x->x_buf[i] == 'E'))
-	    is_exp = 1;
+        i = bufsize - 4;
+        if((x->x_buf[i] == 'e') || (x->x_buf[i] == 'E'))
+            is_exp = 1;
     }
     if(bufsize > x->x_gui.x_w)/* if to reduce */
     {
-	if(is_exp)
-	{
-	    if(x->x_gui.x_w <= 5)
-	    {
-		x->x_buf[0] = (f < 0.0 ? '-' : '+');
-		x->x_buf[1] = 0;
-	    }
-	    i = bufsize - 4;
-	    for(idecimal=0; idecimal < i; idecimal++)
-		if(x->x_buf[idecimal] == '.')
-		    break;
-	    if(idecimal > (x->x_gui.x_w - 4))
-	    {
-		x->x_buf[0] = (f < 0.0 ? '-' : '+');
-		x->x_buf[1] = 0;
-	    }
-	    else
-	    {
-		int new_exp_index=x->x_gui.x_w-4, old_exp_index=bufsize-4;
+        if(is_exp)
+        {
+            if(x->x_gui.x_w <= 5)
+            {
+                x->x_buf[0] = (f < 0.0 ? '-' : '+');
+                x->x_buf[1] = 0;
+            }
+            i = bufsize - 4;
+            for(idecimal=0; idecimal < i; idecimal++)
+                if(x->x_buf[idecimal] == '.')
+                    break;
+            if(idecimal > (x->x_gui.x_w - 4))
+            {
+                x->x_buf[0] = (f < 0.0 ? '-' : '+');
+                x->x_buf[1] = 0;
+            }
+            else
+            {
+                int new_exp_index=x->x_gui.x_w-4, old_exp_index=bufsize-4;
 
-		for(i=0; i < 4; i++, new_exp_index++, old_exp_index++)
-		    x->x_buf[new_exp_index] = x->x_buf[old_exp_index];
-		x->x_buf[x->x_gui.x_w] = 0;
-	    }
+                for(i=0; i < 4; i++, new_exp_index++, old_exp_index++)
+                    x->x_buf[new_exp_index] = x->x_buf[old_exp_index];
+                x->x_buf[x->x_gui.x_w] = 0;
+            }
 
-	}
-	else
-	{
-	    for(idecimal=0; idecimal < bufsize; idecimal++)
-		if(x->x_buf[idecimal] == '.')
-		    break;
-	    if(idecimal > x->x_gui.x_w)
-	    {
-		x->x_buf[0] = (f < 0.0 ? '-' : '+');
-		x->x_buf[1] = 0;
-	    }
-	    else
-		x->x_buf[x->x_gui.x_w] = 0;
-	}
+        }
+        else
+        {
+            for(idecimal=0; idecimal < bufsize; idecimal++)
+                if(x->x_buf[idecimal] == '.')
+                    break;
+            if(idecimal > x->x_gui.x_w)
+            {
+                x->x_buf[0] = (f < 0.0 ? '-' : '+');
+                x->x_buf[1] = 0;
+            }
+            else
+                x->x_buf[x->x_gui.x_w] = 0;
+        }
     }
 }
 
@@ -148,42 +148,42 @@ static void my_numbox_draw_update(t_my_numbox *x, t_glist *glist)
 #else /* ROCKBOX */
     if (glist_isvisible(glist))
     {
-	if(x->x_gui.x_fsf.x_change)
-	{
-	    if(x->x_buf[0])
-	    {
-		char *cp=x->x_buf;
-		int sl = strlen(x->x_buf);
+        if(x->x_gui.x_fsf.x_change)
+        {
+            if(x->x_buf[0])
+            {
+                char *cp=x->x_buf;
+                int sl = strlen(x->x_buf);
 
-		x->x_buf[sl] = '>';
-		x->x_buf[sl+1] = 0;
-		if(sl >= x->x_gui.x_w)
-		    cp += sl - x->x_gui.x_w + 1;
-		sys_vgui(
-		    ".x%x.c itemconfigure %xNUMBER -fill #%6.6x -text {%s} \n",
-			 glist_getcanvas(glist), x, IEM_GUI_COLOR_EDITED, cp);
-		x->x_buf[sl] = 0;
-	    }
-	    else
-	    {
-		my_numbox_ftoa(x);
-		sys_vgui(
-		    ".x%x.c itemconfigure %xNUMBER -fill #%6.6x -text {%s} \n",
-		    glist_getcanvas(glist), x, IEM_GUI_COLOR_EDITED, x->x_buf);
-		x->x_buf[0] = 0;
-	    }
-	}
-	else
-	{
-	    my_numbox_ftoa(x);
+                x->x_buf[sl] = '>';
+                x->x_buf[sl+1] = 0;
+                if(sl >= x->x_gui.x_w)
+                    cp += sl - x->x_gui.x_w + 1;
+                sys_vgui(
+                    ".x%x.c itemconfigure %xNUMBER -fill #%6.6x -text {%s} \n",
+                         glist_getcanvas(glist), x, IEM_GUI_COLOR_EDITED, cp);
+                x->x_buf[sl] = 0;
+            }
+            else
+            {
+                my_numbox_ftoa(x);
+                sys_vgui(
+                    ".x%x.c itemconfigure %xNUMBER -fill #%6.6x -text {%s} \n",
+                    glist_getcanvas(glist), x, IEM_GUI_COLOR_EDITED, x->x_buf);
+                x->x_buf[0] = 0;
+            }
+        }
+        else
+        {
+            my_numbox_ftoa(x);
             sys_vgui(
-	    	".x%x.c itemconfigure %xNUMBER -fill #%6.6x -text {%s} \n",
-		glist_getcanvas(glist), x,
-		x->x_gui.x_fsf.x_selected?
-		    IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol,
-		x->x_buf);
-	    x->x_buf[0] = 0;
-	}
+                ".x%x.c itemconfigure %xNUMBER -fill #%6.6x -text {%s} \n",
+                glist_getcanvas(glist), x,
+                x->x_gui.x_fsf.x_selected?
+                    IEM_GUI_COLOR_SELECTED:x->x_gui.x_fcol,
+                x->x_buf);
+            x->x_buf[0] = 0;
+        }
     }
 #endif /* ROCKBOX */
 }
@@ -202,18 +202,18 @@ static void my_numbox_draw_new(t_my_numbox *x, t_glist *glist)
     sys_vgui(
 ".x%x.c create polygon %d %d %d %d %d %d %d %d %d %d -outline #%6.6x \
 -fill #%6.6x -tags %xBASE1\n",
-	     canvas, xpos, ypos,
-	     xpos + x->x_numwidth-4, ypos,
-	     xpos + x->x_numwidth, ypos+4,
-	     xpos + x->x_numwidth, ypos + x->x_gui.x_h,
-	     xpos, ypos + x->x_gui.x_h,
-	     IEM_GUI_COLOR_NORMAL, x->x_gui.x_bcol, x);
+             canvas, xpos, ypos,
+             xpos + x->x_numwidth-4, ypos,
+             xpos + x->x_numwidth, ypos+4,
+             xpos + x->x_numwidth, ypos + x->x_gui.x_h,
+             xpos, ypos + x->x_gui.x_h,
+             IEM_GUI_COLOR_NORMAL, x->x_gui.x_bcol, x);
     sys_vgui(
-    	".x%x.c create line %d %d %d %d %d %d -fill #%6.6x -tags %xBASE2\n",
-	canvas, xpos, ypos,
-	xpos + half, ypos + half,
-	xpos, ypos + x->x_gui.x_h,
-	x->x_gui.x_fcol, x);
+        ".x%x.c create line %d %d %d %d %d %d -fill #%6.6x -tags %xBASE2\n",
+        canvas, xpos, ypos,
+        xpos + half, ypos + half,
+        xpos, ypos + x->x_gui.x_h,
+        x->x_gui.x_fcol, x);
     sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 	-font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
 	canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
@@ -660,7 +660,7 @@ static void my_numbox_log_height(t_my_numbox *x, t_floatarg lh)
 	x->x_k = exp(log(x->x_max/x->x_min)/(double)(x->x_log_height));
     else
 	x->x_k = 1.0;
-    
+
 }
 
 static void my_numbox_float(t_my_numbox *x, t_floatarg f)
@@ -998,4 +998,3 @@ void g_numbox_setup(void)
     class_setsavefn(my_numbox_class, my_numbox_save);
     class_setpropertiesfn(my_numbox_class, my_numbox_properties);
 }
-

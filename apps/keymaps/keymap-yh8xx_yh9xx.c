@@ -29,17 +29,17 @@
 #include "button.h"
 #include "settings.h"
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 
 /* CONTEXT_CUSTOM's used in this file...
 
 CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions)
-CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker screens 
+CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker screens
                                   i.e where up/down is inc/dec
                CONTEXT_SETTINGS = up/down is prev/next, l/r is inc/dec
 
@@ -99,10 +99,10 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_HOTKEY,        BUTTON_REC|BUTTON_REL,          BUTTON_REC },
     { ACTION_WPS_VIEW_PLAYLIST, BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
     { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
-   
+
 static const struct button_mapping button_context_list[]  = {
 #ifdef SAMSUNG_YH820
     { ACTION_LISTTREE_PGUP,     BUTTON_REC|BUTTON_UP,           BUTTON_REC },
@@ -156,7 +156,7 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
 
     { ACTION_SETTINGS_RESET,    BUTTON_PLAY,                    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
@@ -325,34 +325,34 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
-            
+
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_TREE:
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;
-            else 
+            else
                 return button_context_listtree_scroll_with_combo;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
-        
+
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_right_is_inc;
-        
+
         case CONTEXT_SETTINGS_COLOURCHOOSER:
             return button_context_colorchooser;
         case CONTEXT_SETTINGS_EQ:
             return button_context_eq;
-            
+
         case CONTEXT_SETTINGS_TIME:
             return button_context_time;
-            
+
         case CONTEXT_YESNOSCREEN:
-            return button_context_yesno;            
+            return button_context_yesno;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:

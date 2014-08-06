@@ -164,7 +164,7 @@ static fb_data pixel_odither_to_lcd(void)
     p->col += p->inc;
 
     return FB_RGBPACK_LCD(r, g, b);
-} 
+}
 
 /**
  * Floyd/Steinberg dither to lcd depth.

@@ -74,11 +74,11 @@ void sim_lcd_update_rect(int x_start, int y_start, int width, int height)
 void lcd_update(void)
 {
     int x, y;
-    
+
     for (y = 0; y < lcd_pattern_count; y++)
         if (lcd_patterns[y].count > 0)
             sim_lcd_define_pattern(y, lcd_patterns[y].pattern);
-        
+
     for (y = 0; y < LCD_HEIGHT; y++)
         for (x = 0; x < LCD_WIDTH; x++)
             lcd_print_char(x, y, lcd_charbuffer[y][x]);
@@ -108,7 +108,7 @@ void sim_backlight(int value)
 /* initialise simulator lcd driver */
 void lcd_init_device(void)
 {
-    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 
+    lcd_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,
                                        SIM_LCD_WIDTH * display_zoom,
                                        SIM_LCD_HEIGHT * display_zoom,
                                        8, 0, 0, 0, 0);
@@ -177,7 +177,7 @@ void screen_dump(void)
     /* BMP image goes bottom up */
     for (y = SIM_LCD_HEIGHT - 1; y >= 0; y--)
     {
-        Uint8 *src = (Uint8 *)lcd_surface->pixels 
+        Uint8 *src = (Uint8 *)lcd_surface->pixels
                    + y * SIM_LCD_WIDTH * (int)display_zoom * (int)display_zoom;
         unsigned char *dst = line;
         unsigned dst_mask = 0x80;

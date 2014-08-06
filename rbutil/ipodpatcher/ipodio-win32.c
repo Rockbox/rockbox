@@ -40,21 +40,21 @@
 
 #include "ipodio.h"
 
-static int lock_volume(HANDLE hDisk) 
-{ 
+static int lock_volume(HANDLE hDisk)
+{
   DWORD dummy;
 
   return DeviceIoControl(hDisk, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0,
-			 &dummy, NULL); 
+                         &dummy, NULL);
 }
 
-static int unlock_volume(HANDLE hDisk) 
-{ 
+static int unlock_volume(HANDLE hDisk)
+{
   DWORD dummy;
 
   return DeviceIoControl(hDisk, FSCTL_UNLOCK_VOLUME, NULL, 0, NULL, 0,
-			 &dummy, NULL); 
-} 
+                         &dummy, NULL);
+}
 
 void ipod_print_error(char* msg)
 {
@@ -223,4 +223,3 @@ ssize_t ipod_write(struct ipod_t* ipod, int nbytes)
 }
 
 #endif
-

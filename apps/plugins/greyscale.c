@@ -22,7 +22,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include "lib/helper.h" 
+#include "lib/helper.h"
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "lib/grey.h"
@@ -159,7 +159,7 @@ int main(void)
        0x00, 0x1C, 0x22, 0x22, 0x22, 0x1C, 0x00, 0x22, 0x14, 0x08,
        0x14, 0x22, 0x00
     };
-    
+
     static const unsigned char showing[] = {
     /* .......................................
      * ..####.#...#..###..#...#.#.#...#..####.
@@ -175,7 +175,7 @@ int main(void)
        0x20, 0x18, 0x20, 0x1E, 0x00, 0x3E, 0x00, 0x3E, 0x04, 0x08,
        0x10, 0x3E, 0x00, 0x1C, 0x22, 0x22, 0x2A, 0x3A, 0x00
     };
-    
+
     static const unsigned char grayscale_grey[] = {
     /* .......................................................
      * ..####.####...###..#...#..####..###...###..#.....#####.
@@ -304,7 +304,7 @@ int main(void)
     rb->cpu_boost(false);
 #endif
 
-    /* drawing is now finished, play around with scrolling 
+    /* drawing is now finished, play around with scrolling
      * until you press OFF or connect USB
      */
     grey_set_background(255);
@@ -381,4 +381,3 @@ enum plugin_status plugin_start(const void* parameter)
 }
 
 #endif /* #ifdef HAVE_LCD_BITMAP */
-

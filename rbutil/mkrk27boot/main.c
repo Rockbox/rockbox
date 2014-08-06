@@ -52,4 +52,3 @@ int main(int argc, char **argv)
     fprintf(stdout, "Success!\n");
     return 0;
 }
-

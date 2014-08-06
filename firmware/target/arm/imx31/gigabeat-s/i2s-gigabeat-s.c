@@ -30,7 +30,7 @@ void i2s_reset(void)
      *
      * SSI post dividers (SSI2 PODF=4, SSI2 PRE PODF=0):
      * 338688000Hz / 5 = 67737600Hz = ssi1_clk
-     * 
+     *
      * SSI bit clock dividers (DIV2=1, PSR=0, PM=0):
      * ssi1_clk / 4 = 16934400Hz = INT_BIT_CLK (MCLK)
      *
@@ -62,7 +62,7 @@ void i2s_reset(void)
     AUDMUX_PTCR2 = AUDMUX_PTCR_TFS_DIR | AUDMUX_PTCR_TFSEL_PORT4 |
                    AUDMUX_PTCR_TCLKDIR | AUDMUX_PTCR_TCSEL_PORT4 |
                    AUDMUX_PTCR_SYN;
- 
+
     /* Receive data from port 4 */
     AUDMUX_PDCR2 = AUDMUX_PDCR_RXDSEL_PORT4;
     /* All clock lines are inputs sourced from the master mode codec and

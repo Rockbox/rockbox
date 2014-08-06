@@ -24,7 +24,7 @@
 void picture_draw(struct screen* display, const struct picture* picture,
                   int x, int y){
     display->bitmap(
-        picture->data, 
+        picture->data,
         x, y,
         picture->width, picture->slide_height
     );
@@ -46,7 +46,7 @@ void vertical_picture_draw_part(struct screen* display, const struct picture* pi
                        int yoffset,
                        int x, int y){
     display->bitmap_part(
-        picture->data, 
+        picture->data,
         /*slice into picture->data */
         0, yoffset,
         STRIDE(display->screen_type, picture->width, picture->height),
@@ -68,6 +68,6 @@ void vertical_picture_draw_part(struct screen* display, const struct picture* pi
 void vertical_picture_draw_sprite(struct screen* display, const struct picture* picture,
                        int sprite_no,
                        int x, int y){
-    vertical_picture_draw_part( display, picture, 
+    vertical_picture_draw_part( display, picture,
                                 sprite_no*picture->slide_height, x, y);
 }

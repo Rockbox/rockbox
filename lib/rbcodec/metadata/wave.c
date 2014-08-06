@@ -62,7 +62,7 @@ enum {
 #define WAVE_CHUNKNAME_LENGTH 4
 #define WAVE_CHUNKSIZE_LENGTH 4
 
-static const unsigned char * const wave_chunklist 
+static const unsigned char * const wave_chunklist
                                            = "RIFF"
                                              "WAVE"
                                              "fmt "
@@ -230,7 +230,7 @@ static void parse_riff_format(unsigned char* buf, int fmtsize, struct wave_fmt *
         id3->channels = 2;
         id3->codectype = AFMT_OMA_ATRAC3;
         id3->bytesperframe = fmt->blockalign;
-        
+
         /* Store the extradata for the codec */
         AV_WL16(&id3->id3v2buf[0],  1);             // always 1
         AV_WL32(&id3->id3v2buf[2],  id3->frequency);// samples rate
@@ -306,7 +306,7 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
     int read_data;
 
     memset(&fmt, 0, sizeof(struct wave_fmt));
- 
+
     id3->vbr = false;   /* All Wave/Wave64 files are CBR */
     id3->filesize = filesize(fd);
 

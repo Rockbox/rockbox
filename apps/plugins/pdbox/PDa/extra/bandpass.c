@@ -5,7 +5,7 @@
 /*
 
  These filter coefficients computations are taken from
- http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt  
+ http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt
 
  written by Robert Bristow-Johnson
 
@@ -44,7 +44,7 @@ void bandpass_bang(t_rbjfilter *x)
      t_float a2 = 1 - alpha;
 
 /*     post("bang %f %f %f",x->x_freq, x->x_gain, x->x_bw); */
-     
+
      if (!check_stability(-a1/a0,-a2/a0,b0/a0,b1/a0,b2/a0)) {
        post("bandpass: filter unstable -> resetting");
        a0=1.;a1=0.;a2=0.;
@@ -56,7 +56,7 @@ void bandpass_bang(t_rbjfilter *x)
      SETFLOAT(at+2,b0/a0);
      SETFLOAT(at+3,b1/a0);
      SETFLOAT(at+4,b2/a0);
-     
+
      outlet_list(x->x_obj.ob_outlet,&s_list,5,at);
 }
 
@@ -85,11 +85,7 @@ static void *bandpass_new(t_floatarg f,t_floatarg bw)
 void bandpass_setup(void)
 {
     bandpass_class = class_new(gensym("bandpass"), (t_newmethod)bandpass_new, 0,
-				sizeof(t_rbjfilter), 0,A_DEFFLOAT,A_DEFFLOAT,0);
+                                sizeof(t_rbjfilter), 0,A_DEFFLOAT,A_DEFFLOAT,0);
     class_addbang(bandpass_class,bandpass_bang);
     class_addfloat(bandpass_class,bandpass_float);
 }
-
-
-
-

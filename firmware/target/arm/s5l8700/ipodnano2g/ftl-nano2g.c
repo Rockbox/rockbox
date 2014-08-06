@@ -2107,7 +2107,7 @@ uint32_t ftl_sync(void)
     if (ftl_cxt.clean_flag == 1) return 0;
 
     mutex_lock(&ftl_mtx);
-    
+
 #ifdef FTL_TRACE
     DEBUGF("FTL: Syncing\n");
 #endif

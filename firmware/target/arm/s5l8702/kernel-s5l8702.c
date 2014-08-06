@@ -38,7 +38,7 @@ void INT_TIMERB(void)
 void tick_start(unsigned int interval_in_ms)
 {
     int cycles = 10 * interval_in_ms;
-    
+
     /* configure timer for 10 kHz (external source) */
     TBCMD = (1 << 1);   /* TB_CLR */
     TBPRE = 75 - 1;     /* prescaler */         /* 12 MHz / 16 / 75 = 10 KHz */
@@ -54,4 +54,3 @@ void tick_start(unsigned int interval_in_ms)
     /* enable timer interrupt */
     VIC0INTENABLE = 1 << IRQ_TIMER;
 }
-

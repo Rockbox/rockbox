@@ -271,4 +271,3 @@ int mtp_wmp_version(void)
 
     return version;
 }
-

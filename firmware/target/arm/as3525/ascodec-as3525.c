@@ -24,7 +24,7 @@
     This part is on address 0x46 of the internal i2c bus in the as3525.
     Registers in the codec part seem to be nearly identical to the registers
     in the AS3514 (used in the "v1" versions of the sansa c200 and e200).
-    
+
     I2C register description:
     * I2C2_CNTRL needs to be set to 0x51 for transfers to work at all.
       bit 0: ? possibly related to using ACKs during transfers
@@ -39,7 +39,7 @@
     * I2C2_SLAD0 contains the i2c slave address to read from / write to.
     * I2C2_CPSR0/1 is the divider from the peripheral clock to the i2c clock.
     * I2C2_DACNT sets the number of bytes to transfer and actually starts it.
-    
+
     When a transfer is attempted to a non-existing i2c slave address,
     interrupt bit 7 is raised and DACNT is not decremented after the transfer.
  */
@@ -271,7 +271,7 @@ void ascodec_init(void)
     prescaler = AS3525_I2C_PRESCALER;
     I2C2_CPSR0 = prescaler & 0xFF;          /* 8 lsb */
     I2C2_CPSR1 = (prescaler >> 8) & 0x3;    /* 2 msb */
-    
+
     /* set i2c slave address of codec part */
     I2C2_SLAD0 = AS3514_I2C_ADDR << 1;
 

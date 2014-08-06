@@ -563,7 +563,7 @@ mad_fixed_t const D[17][32] ICONST_ATTR MEM_ALIGN_ATTR = {
     asm volatile ( \
     "movclr.l %%acc0, %0                   \n\t" \
     : "=d" (res));
-    
+
 #define SYNTH_EMAC2(res, f1, f2, pD) \
     asm volatile( \
     "movem.l (%0), %%d0-%%d7                \n\t" \
@@ -591,7 +591,7 @@ mad_fixed_t const D[17][32] ICONST_ATTR MEM_ALIGN_ATTR = {
     asm volatile ( \
     "movclr.l %%acc0, %0                    \n\t" \
     : "=d" (res));
-    
+
 #define SYNTH_EMAC_ODD_SBSAMPLE(f1, f2, pD1, pD2, res1, res2) \
     asm volatile ( \
     "movem.l (%0), %%d0-%%d7                 \n\t" \
@@ -636,7 +636,7 @@ mad_fixed_t const D[17][32] ICONST_ATTR MEM_ALIGN_ATTR = {
     "movclr.l %%acc0, %0\n\t" \
     "movclr.l %%acc1, %1\n\t" \
     : "=d" (res1), "=d" (res2) );
-    
+
 #define SYNTH_EMAC_EVEN_SBSAMPLE(f1, f2, pD1, pD2, res1, res2) \
     asm volatile ( \
     "movem.l (%0), %%d0-%%d7                 \n\t" \
@@ -921,7 +921,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         MLA(hi, lo, (*f)[5], ptr[ 6+offset]); \
         MLA(hi, lo, (*f)[6], ptr[ 4+offset]); \
         MLA(hi, lo, (*f)[7], ptr[ 2+offset]);
-        
+
 #define PROD_A(hi, lo, f, ptr, offset) \
         MLA(hi, lo, (*f)[0], ptr[ 0+offset]); \
         MLA(hi, lo, (*f)[1], ptr[14+offset]); \
@@ -931,7 +931,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         MLA(hi, lo, (*f)[5], ptr[ 6+offset]); \
         MLA(hi, lo, (*f)[6], ptr[ 4+offset]); \
         MLA(hi, lo, (*f)[7], ptr[ 2+offset]);
-        
+
 #define PROD_SB(hi, lo, ptr, offset, first_idx, last_idx) \
         ML0(hi, lo, (*fe)[0], ptr[first_idx]); \
         MLA(hi, lo, (*fe)[1], ptr[16+offset]); \
@@ -1222,7 +1222,7 @@ void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)
 
     synth_frame = synth_half;
   }
-  
+
   synth_frame(synth, frame, nch, ns);
 #else
   synth_full(synth, frame, nch, ns);

@@ -24,13 +24,13 @@
 #endif
 
 void error_die(const char* msg)
-{	
+{
     (void)msg;
 }
 
 void error_msg(const char* msg)
 {
-	(void)msg;
+        (void)msg;
 }
 
 size_t safe_read(struct mbreader_t *md, void *buf, size_t count)

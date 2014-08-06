@@ -116,7 +116,7 @@ void adc_done(void)
     semaphore_release(&adc_done_signal);
 }
 
-void adc_init(void) 
+void adc_init(void)
 {
     semaphore_init(&adc_done_signal, 1, 0);
     mutex_init(&adc_mtx);

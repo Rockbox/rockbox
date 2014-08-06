@@ -132,7 +132,7 @@ void imx233_lcdif_wait_fifo(void)
 
 /* The following function set byte packing often, ifdefing everytime is painful */
 #if IMX233_SUBTARGET < 3700
-#define imx233_lcdif_set_byte_packing_format(a) 
+#define imx233_lcdif_set_byte_packing_format(a)
 #endif
 
 // bbp = bytes per pixel

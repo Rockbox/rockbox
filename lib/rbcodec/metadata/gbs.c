@@ -23,7 +23,7 @@ static bool parse_gbs_header(int fd, struct mp3entry* id3)
 
     /* If meta info was found in the m3u skip next step */
     if (id3->title && id3->title[0]) return true;
-    
+
     char *p = id3->id3v2buf;
 
     /* Some metadata entries have 32 bytes length */

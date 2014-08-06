@@ -364,7 +364,7 @@ static int runcurrent(void)
 #endif
 
 #endif /* BOOTLOADER */
-    
+
     return current;
 }
 
@@ -660,7 +660,7 @@ static inline void power_thread_step(void)
         average_step_low();
         /* update battery status every time an update is available */
         battery_status_update();
-        
+
         /*
          * If battery is low, observe voltage during disk activity.
          * Shut down if voltage drops below shutoff level and we are not

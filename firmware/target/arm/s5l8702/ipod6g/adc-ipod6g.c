@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 
 #include "inttypes.h"
@@ -36,4 +36,3 @@ unsigned short adc_read(int channel)
 void adc_init(void)
 {
 }
-

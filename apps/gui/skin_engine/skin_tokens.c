@@ -169,7 +169,7 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
     struct cuesheet *cue = id3?id3->cuesheet:NULL;
     if (!cue || !cue->curr_track)
         return NULL;
-    
+
     struct cue_track_info *track = cue->curr_track;
     if (offset_tracks)
     {
@@ -191,7 +191,7 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
         case SKIN_TOKEN_METADATA_TRACK_TITLE:
             return *track->title ? track->title : NULL;
         case SKIN_TOKEN_METADATA_TRACK_NUMBER:
-            snprintf(buf, buf_size, "%d/%d",  
+            snprintf(buf, buf_size, "%d/%d",
                      cue->curr_track_idx+offset_tracks+1, cue->track_count);
             return buf;
         default:
@@ -206,7 +206,7 @@ static const char* get_filename_token(struct wps_token *token, char* filename,
     if (filename)
     {
         switch (token->type)
-        {        
+        {
             case SKIN_TOKEN_FILE_PATH:
                 return filename;
             case SKIN_TOKEN_FILE_NAME:
@@ -496,7 +496,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 {
                     *intval = val;
                 }
-                else 
+                else
                 {
                     *intval = 1+(limit-1)*(val-min)/(max-1-min);
                 }
@@ -532,7 +532,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             return buf;
         }
         case SKIN_TOKEN_PRESET_COUNT:
-            snprintf(buf, buf_size, "%d", radio_preset_count());        
+            snprintf(buf, buf_size, "%d", radio_preset_count());
             if (intval)
                 *intval = radio_preset_count();
             return buf;
@@ -575,13 +575,13 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
         if (
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
             tagcache_fill_tags(&tempid3, fname) ||
-#endif 
+#endif
             audio_peek_track(&tempid3, offset)
         )
         {
             pid3 = &tempid3;
         }
-#endif  
+#endif
     }
     return pid3;
 }
@@ -740,7 +740,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
     int b;
     bool number_set = true;
     struct wps_token *liftoken = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), lif->token);
-    const char* out_text = get_token_value(gwps, liftoken, offset, buf, buf_size, &a);            
+    const char* out_text = get_token_value(gwps, liftoken, offset, buf, buf_size, &a);
     if (a == -1 && liftoken->type != SKIN_TOKEN_VOLUME)
     {
         a = (out_text && *out_text) ? 1 : 0;
@@ -773,7 +773,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
             struct wps_token *token = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), element->data);
             b = lif->num_options;
             outb = get_token_value(gwps, token, offset, temp_buf,
-                                   sizeof(temp_buf), &b);            
+                                   sizeof(temp_buf), &b);
             if (b == -1 && liftoken->type != SKIN_TOKEN_VOLUME)
             {
                 if (!out_text || !outb)
@@ -791,7 +791,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
         case DEFAULT:
             break;
     }
-            
+
     switch (lif->op)
     {
         case IF_EQUALS:
@@ -829,7 +829,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
     struct wps_data *data = gwps->data;
     struct wps_state *state = skin_get_global_state();
-    struct mp3entry *id3; /* Think very carefully about using this. 
+    struct mp3entry *id3; /* Think very carefully about using this.
                              maybe get_id3_token() is the better place? */
     const char *out_text = NULL;
     char *filename = NULL;
@@ -840,7 +840,7 @@ const char *get_token_value(struct gui_wps *gwps,
     id3 = get_mp3entry_from_offset(token->next? 1: offset, &filename);
     if (id3)
         filename = id3->path;
-        
+
 #if CONFIG_RTC
     struct tm* tm = NULL;
 
@@ -862,10 +862,10 @@ const char *get_token_value(struct gui_wps *gwps,
         limit = *intval;
         *intval = -1;
     }
-    
+
     if (id3 && id3 == state->id3 && id3->cuesheet )
     {
-        out_text = get_cuesheetid3_token(token, id3, 
+        out_text = get_cuesheetid3_token(token, id3,
                                          token->next?1:offset, buf, buf_size);
         if (out_text)
             return out_text;
@@ -916,7 +916,7 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_SUBSTRING:
         {
             struct substring *ss = SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
-            const char *token_val = get_token_value(gwps, 
+            const char *token_val = get_token_value(gwps,
                             SKINOFFSETTOPTR(get_skin_buffer(data), ss->token), offset,
                                                     buf, buf_size, intval);
             if (token_val)
@@ -948,13 +948,13 @@ const char *get_token_value(struct gui_wps *gwps,
                 if (ss->expect_number &&
                     intval && (buf[0] >= '0' && buf[0] <= '9'))
                     *intval = atoi(buf) + 1; /* so 0 is the first item */
-                    
+
                 return buf;
             }
             return NULL;
         }
-        break;        
-            
+        break;
+
         case SKIN_TOKEN_CHARACTER:
             if (token->value.c == '\n')
                 return NULL;
@@ -962,7 +962,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_STRING:
             return (char*)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
-            
+
         case SKIN_TOKEN_TRANSLATEDSTRING:
             return (char*)P2STR(ID2P(token->value.i));
 
@@ -1071,7 +1071,7 @@ const char *get_token_value(struct gui_wps *gwps,
                     handle = radio_get_art_hid(&dim);
                 }
 #endif
-                if (handle >= 0)    
+                if (handle >= 0)
                     return "C";
             }
             return NULL;
@@ -1173,7 +1173,7 @@ const char *get_token_value(struct gui_wps *gwps,
             int mode = 1; /* stop */
             if (status == STATUS_PLAY)
                 mode = 2; /* play */
-            if (state->is_fading || 
+            if (state->is_fading ||
                (status == STATUS_PAUSE  && !status_get_ffmode()))
                 mode = 3; /* pause */
             else
@@ -1532,7 +1532,7 @@ const char *get_token_value(struct gui_wps *gwps,
                                           token->value.i))
                 return "v";
             return NULL;
-            
+
         case SKIN_TOKEN_LASTTOUCH:
             {
 #ifdef HAVE_TOUCHSCREEN
@@ -1713,7 +1713,7 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             snprintf(buf, buf_size, "%lu.%1lu", samprk/1000,samprk%1000);
 #else /* HWCODEC */
-            
+
             static const char * const freq_strings[] =
                 {"--", "44", "48", "32", "22", "24", "16"};
             int freq = 1 + global_settings.rec_frequency;
@@ -1826,7 +1826,7 @@ const char *get_token_value(struct gui_wps *gwps,
             if (!global_settings.rec_channels)
                 return "m";
             return NULL;
-            
+
         case SKIN_TOKEN_REC_SECONDS:
         {
             int time = (audio_recorded_time() / HZ) % 60;
@@ -1897,5 +1897,3 @@ const char *get_token_value(struct gui_wps *gwps,
             return NULL;
     }
 }
-
-

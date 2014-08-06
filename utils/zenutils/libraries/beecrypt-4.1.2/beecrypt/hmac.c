@@ -40,83 +40,83 @@
  * \{
  */
 
-#define HMAC_IPAD	0x36
-#define HMAC_OPAD	0x5c
+#define HMAC_IPAD       0x36
+#define HMAC_OPAD       0x5c
 
 int hmacSetup(byte* kxi, byte* kxo, const hashFunction* hash, hashFunctionParam* param, const byte* key, size_t keybits)
 {
-	register unsigned int i;
+        register unsigned int i;
 
-	size_t keybytes = keybits >> 3;
+        size_t keybytes = keybits >> 3;
 
-	/* if the key is too large, hash it first */
-	if (keybytes > hash->blocksize)
-	{
-		/* if the hash digest is too large, this doesn't help; this is really a sanity check */
-		if (hash->digestsize > hash->blocksize)
-			return -1;
+        /* if the key is too large, hash it first */
+        if (keybytes > hash->blocksize)
+        {
+                /* if the hash digest is too large, this doesn't help; this is really a sanity check */
+                if (hash->digestsize > hash->blocksize)
+                        return -1;
 
-		if (hash->reset(param))
-			return -1;
+                if (hash->reset(param))
+                        return -1;
 
-		if (hash->update(param, key, keybytes))
-			return -1;
+                if (hash->update(param, key, keybytes))
+                        return -1;
 
-		if (hash->digest(param, kxi))
-			return -1;
+                if (hash->digest(param, kxi))
+                        return -1;
 
-		memcpy(kxo, kxi, keybytes = hash->digestsize);
-	}
-	else if (keybytes > 0)
-	{
-		memcpy(kxi, key, keybytes);
-		memcpy(kxo, key, keybytes);
-	}
-	else
-		return -1;
+                memcpy(kxo, kxi, keybytes = hash->digestsize);
+        }
+        else if (keybytes > 0)
+        {
+                memcpy(kxi, key, keybytes);
+                memcpy(kxo, key, keybytes);
+        }
+        else
+                return -1;
 
-	for (i = 0; i < keybytes; i++)
-	{
-		kxi[i] ^= HMAC_IPAD;
-		kxo[i] ^= HMAC_OPAD;
-	}
+        for (i = 0; i < keybytes; i++)
+        {
+                kxi[i] ^= HMAC_IPAD;
+                kxo[i] ^= HMAC_OPAD;
+        }
 
-	for (i = keybytes; i < hash->blocksize; i++)
-	{
-		kxi[i] = HMAC_IPAD;
-		kxo[i] = HMAC_OPAD;
-	}
+        for (i = keybytes; i < hash->blocksize; i++)
+        {
+                kxi[i] = HMAC_IPAD;
+                kxo[i] = HMAC_OPAD;
+        }
 
-	return hmacReset(kxi, hash, param);
+        return hmacReset(kxi, hash, param);
 }
 
 int hmacReset(const byte* kxi, const hashFunction* hash, hashFunctionParam* param)
 {
-	if (hash->reset(param))
-		return -1;
-	if (hash->update(param, kxi, hash->blocksize))
-		return -1;
+        if (hash->reset(param))
+                return -1;
+        if (hash->update(param, kxi, hash->blocksize))
+                return -1;
 
-	return 0;
+        return 0;
 }
 
 int hmacUpdate(const hashFunction* hash, hashFunctionParam* param, const byte* data, size_t size)
 {
-	return hash->update(param, data, size);
+        return hash->update(param, data, size);
 }
 
 int hmacDigest(const byte* kxo, const hashFunction* hash, hashFunctionParam* param, byte* data)
 {
-	if (hash->digest(param, data))
-		return -1;
-	if (hash->update(param, kxo, hash->blocksize))
-		return -1;
-	if (hash->update(param, data, hash->digestsize))
-		return -1;
-	if (hash->digest(param, data))
-		return -1;
+        if (hash->digest(param, data))
+                return -1;
+        if (hash->update(param, kxo, hash->blocksize))
+                return -1;
+        if (hash->update(param, data, hash->digestsize))
+                return -1;
+        if (hash->digest(param, data))
+                return -1;
 
-	return 0;
+        return 0;
 }
 
 /*!\}

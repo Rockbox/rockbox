@@ -38,7 +38,7 @@ void power_off(void)
 
     /* Send shutdown command to PMU */
     byte = ascodec_read(AS3514_SYSTEM);
-    byte &= ~0x1;   
+    byte &= ~0x1;
     ascodec_write(AS3514_SYSTEM, byte);
 
     /* Stop interrupts on both cores */
@@ -65,7 +65,7 @@ unsigned int power_input_status(void)
 #else
     #define _charger_present() 0
 #endif
-    
+
     if (_charger_present())
         status = POWER_INPUT_MAIN_CHARGER;
 
@@ -107,17 +107,17 @@ bool tuner_power(bool status)
                in host read mode: */
 
             /* 1. Set direction of the DATA-line to input-mode. */
-            GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_EN, 1 << 5); 
-            GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 5); 
+            GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_EN, 1 << 5);
+            GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 5);
 
             /* 2. Drive NR_W low */
-            GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_VAL, 1 << 3); 
-            GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 1 << 3); 
-            GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 3); 
+            GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_VAL, 1 << 3);
+            GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 1 << 3);
+            GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 3);
 
             /* 3. Drive CLOCK high */
-            GPIO_SET_BITWISE(GPIOH_OUTPUT_VAL, 1 << 4); 
-            GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 1 << 4); 
+            GPIO_SET_BITWISE(GPIOH_OUTPUT_VAL, 1 << 4);
+            GPIO_SET_BITWISE(GPIOH_OUTPUT_EN, 1 << 4);
             GPIO_SET_BITWISE(GPIOH_ENABLE, 1 << 4);
 
             lv24020lp_power(true);
@@ -128,7 +128,7 @@ bool tuner_power(bool status)
 
             /* set all as inputs */
             GPIO_CLEAR_BITWISE(GPIOH_OUTPUT_EN, (1 << 5) | (1 << 3) | (1 << 4));
-            GPIO_CLEAR_BITWISE(GPIOH_ENABLE, (1 << 3) | (1 << 4)); 
+            GPIO_CLEAR_BITWISE(GPIOH_ENABLE, (1 << 3) | (1 << 4));
 
             /* turn off mystery amplification device */
 #if defined (SANSA_E200)

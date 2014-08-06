@@ -29,7 +29,7 @@
 
 #define EV_EXIT 1337
 
-/* seems to work with 1300, but who knows... */ 
+/* seems to work with 1300, but who knows... */
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -63,7 +63,7 @@
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-      
+
 #define BATTERY_ON BUTTON_ON
 #define BATTERY_RC_ON BUTTON_RC_ON
 
@@ -205,7 +205,7 @@
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
       (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
-      
+
 #define BATTERY_ON      BUTTON_LEFT
 #define BATTERY_OFF     BUTTON_RIGHT
 #define BATTERY_ON_TXT  "LEFT"
@@ -335,7 +335,7 @@ static bool exit_tsr(bool reenter)
 #define BIT_CHARGING    0x2
 #define BIT_USB_POWER   0x4
 
-#define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60 
+#define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60
 
 /* use long for aligning */
 static unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
@@ -356,7 +356,7 @@ static unsigned int charge_state(void)
     if (rb->usb_powered())
         ret |= BIT_USB_POWER;
 #endif
-    return ret; 
+    return ret;
 }
 #endif
 
@@ -438,7 +438,7 @@ static void thread(void)
             rb->register_storage_idle_func(flush_buffer);
 #endif
         }
-        
+
         /* What to do when the measurement buffer is full:
            1) save our measurements to disk but waste some power doing so?
            2) throw away measurements to save some power?
@@ -448,12 +448,12 @@ static void thread(void)
         if (buf_idx == BUF_ELEMENTS) {
             flush_buffer();
         }
-        
+
         /* sleep some time until next measurement */
         rb->queue_wait_w_tmo(&thread_q, &ev, sleep_time);
         switch (ev.id)
         {
-            case SYS_USB_CONNECTED: 
+            case SYS_USB_CONNECTED:
                 in_usb_mode = true;
                 rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 break;
@@ -482,7 +482,7 @@ static void thread(void)
 #else
     flush_buffer();
 #endif
-    
+
     /* log end of bench and exit reason */
     fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND, 0666);
     if (fd >= 0)
@@ -514,7 +514,7 @@ enum plugin_status plugin_start(const void* parameter)
     int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
                            "for more info", BATTERY_ON_TXT, BATTERY_OFF_TXT " - quit" };
-#endif    
+#endif
     rb->lcd_clear_display();
 
 #ifdef HAVE_LCD_BITMAP
@@ -528,7 +528,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_puts_scroll(0, 1, "PLAY/STOP");
 #endif
     rb->lcd_update();
-    
+
 #ifdef HAVE_REMOTE_LCD
     rb->lcd_remote_clear_display();
     put_centered_str(msgs[0],rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,0);
@@ -538,7 +538,7 @@ enum plugin_status plugin_start(const void* parameter)
                     rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,2);
     rb->lcd_remote_update();
 #endif
-    
+
     do
     {
         button = rb->button_get(true);
@@ -547,10 +547,10 @@ enum plugin_status plugin_start(const void* parameter)
             case BATTERY_ON:
 #ifdef BATTERY_RC_ON
             case BATTERY_RC_ON:
-#endif                         
+#endif
                 on = true;
-                break;        
-            case BATTERY_OFF: 
+                break;
+            case BATTERY_OFF:
 #ifdef BATTERY_RC_OFF
             case BATTERY_RC_OFF:
 #endif
@@ -561,7 +561,7 @@ enum plugin_status plugin_start(const void* parameter)
                     return PLUGIN_USB_CONNECTED;
         }
     }while(!on);
-    
+
     fd = rb->open(BATTERY_LOG, O_RDONLY);
     if (fd < 0)
     {
@@ -626,18 +626,18 @@ enum plugin_status plugin_start(const void* parameter)
             HMS((unsigned)start_tick/HZ));
         rb->close(fd);
     }
-    
+
     rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
     if ((thread_id = rb->create_thread(thread, thread_stack,
-        sizeof(thread_stack), 0, "Battery Benchmark" 
+        sizeof(thread_stack), 0, "Battery Benchmark"
         IF_PRIO(, PRIORITY_BACKGROUND)
         IF_COP(, CPU))) == 0)
     {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;
     }
-            
+
     rb->plugin_tsr(exit_tsr);
-    
+
     return PLUGIN_OK;
 }

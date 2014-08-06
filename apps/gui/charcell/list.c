@@ -103,7 +103,7 @@ void list_draw(struct screen *display, struct gui_synclist *gui_list)
                 entry_name);
         else
             put_line(display, 0, i, &desc, "$i$t",
-                selected ? Icon_Cursor : Icon_NOICON, 
+                selected ? Icon_Cursor : Icon_NOICON,
                 entry_name);
     }
 

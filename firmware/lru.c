@@ -118,4 +118,3 @@ void *lru_data(struct lru* pl, short handle)
 {
     return lru_node_p(pl, handle)->data;
 }
-

@@ -85,7 +85,7 @@ int mcs5000_read(struct mcs5000_raw_data *touchData)
      * touchscreen misbehaves). The bug seems fixed in gcc 4.6.x
      * See http://http://gcc.gnu.org/bugzilla/show_bug.cgi?id=16660
      * Also: packet and aligned attributes don't really work together so
-     * the aligned attribute cannot be attached to the struct declaration */ 
+     * the aligned attribute cannot be attached to the struct declaration */
     static struct mcs5000_raw_data touchpad_data __attribute__((aligned(256)));
     ssize_t ret;
     ret = read(mcs5000_dev, &touchpad_data, sizeof(struct mcs5000_raw_data));

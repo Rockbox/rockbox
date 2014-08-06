@@ -79,4 +79,3 @@ void audio_input_mux(int source, unsigned int flags)
     last_source = source;
     last_recording = recording;
 }
-

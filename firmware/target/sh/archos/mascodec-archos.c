@@ -37,7 +37,7 @@ int mas_default_read(unsigned short *buf)
     int ret = 0;
 
     i2c_begin();
-    
+
     i2c_start();
     i2c_outb(MAS_DEV_WRITE);
     if (i2c_getack()) {
@@ -57,7 +57,7 @@ int mas_default_read(unsigned short *buf)
     }
     else
         ret = -1;
-    
+
     i2c_stop();
 
     i2c_end();
@@ -72,7 +72,7 @@ int mas_run(unsigned short address)
     unsigned char buf[3];
 
     i2c_begin();
-    
+
     buf[0] = MAS_DATA_WRITE;
     buf[1] = address >> 8;
     buf[2] = address & 0xff;
@@ -150,7 +150,7 @@ int mas_writemem(int bank, int addr, const unsigned long* src, int len)
 #endif
         j += 4;
     }
-    
+
     /* send write command */
     if (i2c_write(MAS_DEV_WRITE,buf,i))
     {
@@ -229,7 +229,7 @@ static int mas_devread(unsigned long *dest, int len)
     int ret = 0;
     unsigned char* ptr = (unsigned char*)dest;
     int i;
-    
+
     /* handle read-back */
     /* Remember, the MAS values are only 20 bits, so we set
        the upper 12 bits to 0 */
@@ -271,7 +271,7 @@ static int mas_devread(unsigned long *dest, int len)
     }
     else
         ret = -1;
-    
+
     i2c_stop();
 
     return ret;
@@ -316,7 +316,7 @@ int mas_direct_config_read(unsigned char reg)
 {
     int ret = 0;
     unsigned char tmp[2];
-    
+
     i2c_begin();
 
     i2c_start();
@@ -339,7 +339,7 @@ int mas_direct_config_read(unsigned char reg)
     }
     else
         ret = -1;
-    
+
     i2c_stop();
 
     i2c_end();
@@ -386,7 +386,7 @@ int mas_codec_writereg(int reg, unsigned int val)
     {
         ret = -1;
     }
-    
+
     i2c_end();
     return ret;
 }
@@ -433,7 +433,7 @@ int mas_codec_readreg(int reg)
 
         i2c_stop();
     }
-    
+
     i2c_end();
     return ret;
 }
@@ -486,6 +486,3 @@ int mas_get_pllfreq(void)
     return pllfreq;
 }
 #endif
-
-
-

@@ -49,5 +49,3 @@ int button_read_device(void) {
     }
     return gpio_btn;
 }
-
-

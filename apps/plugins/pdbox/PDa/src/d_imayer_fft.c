@@ -1,11 +1,11 @@
 /*
 ** Algorithm: complex multiplication
-** 
+**
 ** Performance: Bad accuracy, great speed.
-** 
+**
 ** The simplest, way of generating trig values.  Note, this method is
 ** not stable, and errors accumulate rapidly.
-** 
+**
 ** Computation: 2 *, 1 + per value.
 */
 
@@ -45,9 +45,9 @@ char mtrig_algorithm[] = "Simple";
 
 /*
 ** Algorithm: O. Buneman's trig generator.
-** 
+**
 ** Performance: Good accuracy, mediocre speed.
-** 
+**
 **   Manipulates a log(n) table to stably create n evenly spaced trig
 **   values. The newly generated values lay halfway between two
 **   known values, and are calculated by appropriatelly scaling the
@@ -121,58 +121,58 @@ void imayer_fht(t_fixed *fz, int n)
      t_fixed aa;
      for (k=n>>1; (!((k2^=k)&k)); k>>=1);
      if (k1>k2)
-	{
-	     aa=fz[k1];fz[k1]=fz[k2];fz[k2]=aa;
-	}
+        {
+             aa=fz[k1];fz[k1]=fz[k2];fz[k2]=aa;
+        }
     }
  for ( k=0 ; (1<<k)<n ; k++ );
  k  &= 1;
  if (k==0)
     {
-	 for (fi=fz,fn=fz+n;fi<fn;fi+=4)
-	    {
-	     t_fixed f0,f1,f2,f3;
-	     f1     = fi[0 ]-fi[1 ];
-	     f0     = fi[0 ]+fi[1 ];
-	     f3     = fi[2 ]-fi[3 ];
-	     f2     = fi[2 ]+fi[3 ];
-	     fi[2 ] = (f0-f2);	
-	     fi[0 ] = (f0+f2);
-	     fi[3 ] = (f1-f3);	
-	     fi[1 ] = (f1+f3);
-	    }
+         for (fi=fz,fn=fz+n;fi<fn;fi+=4)
+            {
+             t_fixed f0,f1,f2,f3;
+             f1     = fi[0 ]-fi[1 ];
+             f0     = fi[0 ]+fi[1 ];
+             f3     = fi[2 ]-fi[3 ];
+             f2     = fi[2 ]+fi[3 ];
+             fi[2 ] = (f0-f2);
+             fi[0 ] = (f0+f2);
+             fi[3 ] = (f1-f3);
+             fi[1 ] = (f1+f3);
+            }
     }
  else
     {
-	 for (fi=fz,fn=fz+n,gi=fi+1;fi<fn;fi+=8,gi+=8)
-	    {
-	     t_fixed bs1,bc1,bs2,bc2,bs3,bc3,bs4,bc4,
-	     	bg0,bf0,bf1,bg1,bf2,bg2,bf3,bg3;
-	     bc1     = fi[0 ] - gi[0 ];
-	     bs1     = fi[0 ] + gi[0 ];
-	     bc2     = fi[2 ] - gi[2 ];
-	     bs2     = fi[2 ] + gi[2 ];
-	     bc3     = fi[4 ] - gi[4 ];
-	     bs3     = fi[4 ] + gi[4 ];
-	     bc4     = fi[6 ] - gi[6 ];
-	     bs4     = fi[6 ] + gi[6 ];
-	     bf1     = (bs1 - bs2);	
-	     bf0     = (bs1 + bs2);
-	     bg1     = (bc1 - bc2);	
-	     bg0     = (bc1 + bc2);
-	     bf3     = (bs3 - bs4);	
-	     bf2     = (bs3 + bs4);
-	     bg3     = FFTmult(SQRT2,bc4);		
-	     bg2     = FFTmult(SQRT2,bc3);
-	     fi[4 ] = bf0 - bf2;
-	     fi[0 ] = bf0 + bf2;
-	     fi[6 ] = bf1 - bf3;
-	     fi[2 ] = bf1 + bf3;
-	     gi[4 ] = bg0 - bg2;
-	     gi[0 ] = bg0 + bg2;
-	     gi[6 ] = bg1 - bg3;
-	     gi[2 ] = bg1 + bg3;
-	    }
+         for (fi=fz,fn=fz+n,gi=fi+1;fi<fn;fi+=8,gi+=8)
+            {
+             t_fixed bs1,bc1,bs2,bc2,bs3,bc3,bs4,bc4,
+                bg0,bf0,bf1,bg1,bf2,bg2,bf3,bg3;
+             bc1     = fi[0 ] - gi[0 ];
+             bs1     = fi[0 ] + gi[0 ];
+             bc2     = fi[2 ] - gi[2 ];
+             bs2     = fi[2 ] + gi[2 ];
+             bc3     = fi[4 ] - gi[4 ];
+             bs3     = fi[4 ] + gi[4 ];
+             bc4     = fi[6 ] - gi[6 ];
+             bs4     = fi[6 ] + gi[6 ];
+             bf1     = (bs1 - bs2);
+             bf0     = (bs1 + bs2);
+             bg1     = (bc1 - bc2);
+             bg0     = (bc1 + bc2);
+             bf3     = (bs3 - bs4);
+             bf2     = (bs3 + bs4);
+             bg3     = FFTmult(SQRT2,bc4);
+             bg2     = FFTmult(SQRT2,bc3);
+             fi[4 ] = bf0 - bf2;
+             fi[0 ] = bf0 + bf2;
+             fi[6 ] = bf1 - bf3;
+             fi[2 ] = bf1 + bf3;
+             gi[4 ] = bg0 - bg2;
+             gi[0 ] = bg0 + bg2;
+             gi[6 ] = bg1 - bg3;
+             gi[2 ] = bg1 + bg3;
+            }
     }
  if (n<16) return;
 
@@ -186,71 +186,71 @@ void imayer_fht(t_fixed *fz, int n)
      k4  = k2 << 1;
      k3  = k2 + k1;
      kx  = k1 >> 1;
-	 fi  = fz;
-	 gi  = fi + kx;
-	 fn  = fz + n;
-	 do
-	    {
-	     t_fixed g0,f0,f1,g1,f2,g2,f3,g3;
-	     f1      = fi[0 ] - fi[k1];
-	     f0      = fi[0 ] + fi[k1];
-	     f3      = fi[k2] - fi[k3];
-	     f2      = fi[k2] + fi[k3];
-	     fi[k2]  = f0	  - f2;
-	     fi[0 ]  = f0	  + f2;
-	     fi[k3]  = f1	  - f3;
-	     fi[k1]  = f1	  + f3;
-	     g1      = gi[0 ] - gi[k1];
-	     g0      = gi[0 ] + gi[k1];
-	     g3      = FFTmult(SQRT2, gi[k3]);
-	     g2      = FFTmult(SQRT2, gi[k2]);
-	     gi[k2]  = g0	  - g2;
-	     gi[0 ]  = g0	  + g2;
-	     gi[k3]  = g1	  - g3;
-	     gi[k1]  = g1	  + g3;
-	     gi     += k4;
-	     fi     += k4;
-	    } while (fi<fn);
+         fi  = fz;
+         gi  = fi + kx;
+         fn  = fz + n;
+         do
+            {
+             t_fixed g0,f0,f1,g1,f2,g2,f3,g3;
+             f1      = fi[0 ] - fi[k1];
+             f0      = fi[0 ] + fi[k1];
+             f3      = fi[k2] - fi[k3];
+             f2      = fi[k2] + fi[k3];
+             fi[k2]  = f0         - f2;
+             fi[0 ]  = f0         + f2;
+             fi[k3]  = f1         - f3;
+             fi[k1]  = f1         + f3;
+             g1      = gi[0 ] - gi[k1];
+             g0      = gi[0 ] + gi[k1];
+             g3      = FFTmult(SQRT2, gi[k3]);
+             g2      = FFTmult(SQRT2, gi[k2]);
+             gi[k2]  = g0         - g2;
+             gi[0 ]  = g0         + g2;
+             gi[k3]  = g1         - g3;
+             gi[k1]  = g1         + g3;
+             gi     += k4;
+             fi     += k4;
+            } while (fi<fn);
      TRIG_INIT(k,c1,s1);
      for (ii=1;ii<kx;ii++)
         {
-	 t_fixed c2,s2;
+         t_fixed c2,s2;
          TRIG_NEXT(k,c1,s1);
          c2 = FFTmult(c1,c1) - FFTmult(s1,s1);
          s2 = 2*FFTmult(c1,s1);
-	     fn = fz + n;
-	     fi = fz +ii;
-	     gi = fz +k1-ii;
-	     do
-		{
-		 t_fixed a,b,g0,f0,f1,g1,f2,g2,f3,g3;
-		 b       = FFTmult(s2,fi[k1]) - FFTmult(c2,gi[k1]);
-		 a       = FFTmult(c2,fi[k1]) + FFTmult(s2,gi[k1]);
-		 f1      = fi[0 ]    - a;
-		 f0      = fi[0 ]    + a;
-		 g1      = gi[0 ]    - b;
-		 g0      = gi[0 ]    + b;
-		 b       = FFTmult(s2,fi[k3]) - FFTmult(c2,gi[k3]);
-		 a       = FFTmult(c2,fi[k3]) + FFTmult(s2,gi[k3]);
-		 f3      = fi[k2]    - a;
-		 f2      = fi[k2]    + a;
-		 g3      = gi[k2]    - b;
-		 g2      = gi[k2]    + b;
-		 b       = FFTmult(s1,f2)     - FFTmult(c1,g3);
-		 a       = FFTmult(c1,f2)     + FFTmult(s1,g3);
-		 fi[k2]  = f0        - a;
-		 fi[0 ]  = f0        + a;
-		 gi[k3]  = g1        - b;
-		 gi[k1]  = g1        + b;
-		 b       = FFTmult(c1,g2)     - FFTmult(s1,f3);
-		 a       = FFTmult(s1,g2)     + FFTmult(c1,f3);
-		 gi[k2]  = g0        - a;
-		 gi[0 ]  = g0        + a;
-		 fi[k3]  = f1        - b;
-		 fi[k1]  = f1        + b;
-		 gi     += k4;
-		 fi     += k4;
-		} while (fi<fn);
+             fn = fz + n;
+             fi = fz +ii;
+             gi = fz +k1-ii;
+             do
+                {
+                 t_fixed a,b,g0,f0,f1,g1,f2,g2,f3,g3;
+                 b       = FFTmult(s2,fi[k1]) - FFTmult(c2,gi[k1]);
+                 a       = FFTmult(c2,fi[k1]) + FFTmult(s2,gi[k1]);
+                 f1      = fi[0 ]    - a;
+                 f0      = fi[0 ]    + a;
+                 g1      = gi[0 ]    - b;
+                 g0      = gi[0 ]    + b;
+                 b       = FFTmult(s2,fi[k3]) - FFTmult(c2,gi[k3]);
+                 a       = FFTmult(c2,fi[k3]) + FFTmult(s2,gi[k3]);
+                 f3      = fi[k2]    - a;
+                 f2      = fi[k2]    + a;
+                 g3      = gi[k2]    - b;
+                 g2      = gi[k2]    + b;
+                 b       = FFTmult(s1,f2)     - FFTmult(c1,g3);
+                 a       = FFTmult(c1,f2)     + FFTmult(s1,g3);
+                 fi[k2]  = f0        - a;
+                 fi[0 ]  = f0        + a;
+                 gi[k3]  = g1        - b;
+                 gi[k1]  = g1        + b;
+                 b       = FFTmult(c1,g2)     - FFTmult(s1,f3);
+                 a       = FFTmult(s1,g2)     + FFTmult(c1,f3);
+                 gi[k2]  = g0        - a;
+                 gi[0 ]  = g0        + a;
+                 fi[k3]  = f1        - b;
+                 fi[k1]  = f1        + b;
+                 gi     += k4;
+                 fi     += k4;
+                } while (fi<fn);
         }
      TRIG_RESET(k,c1,s1);
     } while (k4<n);
@@ -446,7 +446,7 @@ int main()
   int i;
 
   TRIG_VARS;
- 
+
   for (k=2;k<10;k+=2) {
     TRIG_INIT(k,c1,s1);
     for (i=0;i<8;i++) {
@@ -463,7 +463,7 @@ int main()
 
   #define NP 16
 
-  for (i=0;i<NP;i++) { 
+  for (i=0;i<NP;i++) {
     fr[i] = 0.;
     r[i] = 0.;
     fim[i] = 0.;
@@ -471,19 +471,19 @@ int main()
   }
 
 #if 0
-  for (i=0;i<NP;i++) { 
+  for (i=0;i<NP;i++) {
     if (i&1) {
       fr[i] = 0.1*i;
       r[i] = ftofix(0.1*i);
     }
     else {
-	 fr[i] = 0.;
-	 r[i] = 0.;
+         fr[i] = 0.;
+         r[i] = 0.;
     }
   }
 #endif
 #if 0
-  for (i=0;i<NP;i++) { 
+  for (i=0;i<NP;i++) {
        fr[i] = 0.1;
        r[i] = ftofix(0.1);
   }
@@ -504,7 +504,7 @@ int main()
 //  mayer_fht(fr,NP);
 
 #if 1
-  for (i=0;i<NP;i++) { 
+  for (i=0;i<NP;i++) {
        r[i] = mult(ftofix(0.01),r[i]);
        fr[i] = 0.01*fr[i];
   }
@@ -525,4 +525,3 @@ int main()
 }
 
 #endif
-

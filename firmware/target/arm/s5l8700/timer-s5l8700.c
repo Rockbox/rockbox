@@ -37,7 +37,7 @@ void INT_TIMERC(void)
 {
     /* clear interrupt */
     TCCON = TCCON;
-    
+
     if (pfn_timer != NULL) {
         pfn_timer();
     }
@@ -67,7 +67,7 @@ bool timer_set(long cycles, bool start)
             break;
         }
     }
-    
+
     /* scale the count down with the prescaler */
     prescale = 1;
     while (count >= 65536) {
@@ -85,7 +85,7 @@ bool timer_set(long cycles, bool start)
 
     /* enable interrupt */
     INTMSK |=  INTMSK_TIMERC;
-    
+
     return true;
 }
 
@@ -99,4 +99,3 @@ void timer_stop(void)
 {
     TCCMD = (0 << 0);       /* TD_ENABLE */
 }
-

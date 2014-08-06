@@ -10,7 +10,7 @@ typedef struct _phasor
     t_object x_obj;
     unsigned int x_phase;
     t_sample x_conv;
-    t_sample x_f;	    /* scalar frequency */
+    t_sample x_f;           /* scalar frequency */
 } t_phasor;
 
 static void *phasor_new(t_floatarg f)
@@ -34,9 +34,9 @@ static t_int *phasor_perform(t_int *w)
     int conv = x->x_conv;
 
     while (n--) {
-	 phase+= mult(conv , (*in++));
-	 phase &= (itofix(1) - 1);
-	 *out++ = phase;
+         phase+= mult(conv , (*in++));
+         phase &= (itofix(1) - 1);
+         *out++ = phase;
     }
     x->x_phase = phase;
 
@@ -59,11 +59,10 @@ static void phasor_ft1(t_phasor *x, t_float f)
 void phasor_tilde_setup(void)
 {
     phasor_class = class_new(gensym("phasor~"), (t_newmethod)phasor_new, 0,
-    	sizeof(t_phasor), 0, A_DEFFLOAT, 0);
+        sizeof(t_phasor), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(phasor_class, t_phasor, x_f);
     class_addmethod(phasor_class, (t_method)phasor_dsp, gensym("dsp"), 0);
     class_addmethod(phasor_class, (t_method)phasor_ft1,
-    	gensym("ft1"), A_FLOAT, 0);
+        gensym("ft1"), A_FLOAT, 0);
     class_sethelpsymbol(phasor_class, gensym("osc~-help.pd"));
 }
-

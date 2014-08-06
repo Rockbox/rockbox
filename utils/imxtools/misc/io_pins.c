@@ -76,13 +76,13 @@ int main(int argc, char **argv)
         if(set_fn == 0 && clr_fn == 0)
             continue;
         bool partial_mask = (set_fn | clr_fn) != 3;
-        
+
         printf("B%dP%02d => %s (select = %d)", bank, pin,
             map[bank].pins[pin].function[set_fn].name, set_fn);
         if(partial_mask)
             printf(" (warning: partial mask)");
         printf("\n");
     }
-    
+
     return 0;
 }

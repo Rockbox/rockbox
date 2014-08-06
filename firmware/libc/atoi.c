@@ -26,12 +26,12 @@ int atoi (const char *str)
 {
     int value = 0;
     int sign = 1;
-    
+
     while (isspace(*str))
     {
         str++;
     }
-    
+
     if ('-' == *str)
     {
         sign = -1;
@@ -41,7 +41,7 @@ int atoi (const char *str)
     {
         str++;
     }
-    
+
     while ('0' == *str)
     {
         str++;
@@ -52,6 +52,6 @@ int atoi (const char *str)
         value = (value * 10) + (*str - '0');
         str++;
     }
-    
+
     return value * sign;
 }

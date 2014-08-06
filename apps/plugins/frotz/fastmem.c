@@ -426,7 +426,7 @@ static void free_undo (int count)
 
 void reset_memory (void)
 {
-    if (story_fp != -1) 
+    if (story_fp != -1)
     fclose (story_fp);
     story_fp = -1;
 

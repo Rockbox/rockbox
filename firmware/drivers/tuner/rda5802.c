@@ -116,7 +116,7 @@ static void rda5802_read(int len)
     unsigned char buf[sizeof(cache)];
     unsigned char *ptr = buf;
     uint16_t data;
-    
+
     fmradio_i2c_read(I2C_ADR, buf, len * 2);
     for (i = 0; i < len; i++) {
         data = ptr[0] << 8 | ptr[1];
@@ -228,7 +228,7 @@ static void rda5802_set_frequency(int freq)
         sleep(HZ * 70 / 1000);
         rda5802_write_clear(CHANNEL, CHANNEL_TUNE);
         rda5802_write_cache();
-        
+
         /* check if tuning was successful */
         readchan = rda5802_read_reg(READCHAN);
         if (readchan & READCHAN_STC) {
@@ -356,4 +356,3 @@ void rda5802_dbg_info(struct rda5802_dbg_info *nfo)
     rda5802_read(6);
     memcpy(nfo->regs, cache, sizeof (nfo->regs));
 }
-

@@ -89,13 +89,13 @@ static int write_settings_file(void* param)
     return settings_save_config((intptr_t)param);
 }
 
-MENUITEM_FUNCTION(browse_configs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG), 
+MENUITEM_FUNCTION(browse_configs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG),
         browse_folder, (void*)&config, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_settings_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SETTINGS), 
+MENUITEM_FUNCTION(save_settings_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SETTINGS),
         write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_theme_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_THEME), 
+MENUITEM_FUNCTION(save_theme_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_THEME),
         write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_sound_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SOUND), 
+MENUITEM_FUNCTION(save_sound_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SOUND),
         write_settings_file, (void*)SETTINGS_SAVE_SOUND, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_settings_item, 0, ID2P(LANG_RESET),
                   reset_settings, NULL, NULL, Icon_NOICON);
@@ -129,7 +129,7 @@ static bool show_credits(void)
 #else
 #define SIZE_FMT "%s %s"
 #endif
-struct info_data 
+struct info_data
 
 {
     bool new_data;
@@ -174,7 +174,7 @@ static const char* info_getname(int selected_item, void *data,
     switch (selected_item)
     {
         case INFO_VERSION:
-            snprintf(buffer, buffer_len, "%s: %s", 
+            snprintf(buffer, buffer_len, "%s: %s",
                      str(LANG_VERSION), rbversion);
             break;
 
@@ -234,7 +234,7 @@ static const char* info_getname(int selected_item, void *data,
                 snprintf(buffer, buffer_len, "%s %s/%s", str(LANG_DISK_NAME_MMC),
                          s1, s2);
             }
-            else 
+            else
             {
                 snprintf(buffer, buffer_len, "%s %s", str(LANG_DISK_NAME_MMC),
                          str(LANG_NOT_PRESENT));
@@ -326,7 +326,7 @@ static int info_speak_item(int selected_item, void * data)
             output_dyn_value(NULL, 0, info->size, kbyte_units, true);
 #endif
             break;
-            
+
     }
     return 0;
 }

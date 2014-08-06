@@ -10,9 +10,9 @@ extern int ugen_getsortno(void);
 
 #include "delay.h"
 
-#define DEFDELVS 64	    	/* LATER get this from canvas at DSP time */
+#define DEFDELVS 64             /* LATER get this from canvas at DSP time */
 #ifndef ROCKBOX
-static int delread_zero = 0;	/* four bytes of zero for delread~, vd~ */
+static int delread_zero = 0;    /* four bytes of zero for delread~, vd~ */
 #endif
 
 static t_class *sigdelread_class;
@@ -21,11 +21,11 @@ typedef struct _sigdelread
 {
     t_object x_obj;
     t_symbol *x_sym;
-    t_float x_deltime;	/* delay in msec */
-    int x_delsamps; 	/* delay in samples */
-    t_float x_sr;   	/* samples per msec */
-    t_float x_n;   	/* vector size */
-    int x_zerodel;  	/* 0 or vecsize depending on read/write order */
+    t_float x_deltime;  /* delay in msec */
+    int x_delsamps;     /* delay in samples */
+    t_float x_sr;       /* samples per msec */
+    t_float x_n;        /* vector size */
+    int x_zerodel;      /* 0 or vecsize depending on read/write order */
 } t_sigdelread;
 
 static void sigdelread_float(t_sigdelread *x, t_float f);
@@ -48,18 +48,18 @@ static void sigdelread_float(t_sigdelread *x, t_float f)
     int samps;
 #endif
     t_sigdelwrite *delwriter =
-    	(t_sigdelwrite *)pd_findbyclass(x->x_sym, sigdelwrite_class);
+        (t_sigdelwrite *)pd_findbyclass(x->x_sym, sigdelwrite_class);
     x->x_deltime = f;
     if (delwriter)
     {
 #ifndef ROCKBOX
-    	int delsize = delwriter->x_cspace.c_n;
+        int delsize = delwriter->x_cspace.c_n;
 #endif
-    	x->x_delsamps = (int)(0.5 + x->x_sr * x->x_deltime)
-    	    + x->x_n - x->x_zerodel;
-    	if (x->x_delsamps < x->x_n) x->x_delsamps = x->x_n;
-    	else if (x->x_delsamps > delwriter->x_cspace.c_n - DEFDELVS)
-    	    x->x_delsamps = delwriter->x_cspace.c_n - DEFDELVS;
+        x->x_delsamps = (int)(0.5 + x->x_sr * x->x_deltime)
+            + x->x_n - x->x_zerodel;
+        if (x->x_delsamps < x->x_n) x->x_delsamps = x->x_n;
+        else if (x->x_delsamps > delwriter->x_cspace.c_n - DEFDELVS)
+            x->x_delsamps = delwriter->x_cspace.c_n - DEFDELVS;
     }
 }
 
@@ -76,8 +76,8 @@ static t_int *sigdelread_perform(t_int *w)
     bp = vp + phase;
     while (n--)
     {
-    	*out++ = *bp++;
-    	if (bp == ep) bp -= nsamps;
+        *out++ = *bp++;
+        if (bp == ep) bp -= nsamps;
     }
     return (w+5);
 }
@@ -85,29 +85,28 @@ static t_int *sigdelread_perform(t_int *w)
 static void sigdelread_dsp(t_sigdelread *x, t_signal **sp)
 {
     t_sigdelwrite *delwriter =
-    	(t_sigdelwrite *)pd_findbyclass(x->x_sym, sigdelwrite_class);
+        (t_sigdelwrite *)pd_findbyclass(x->x_sym, sigdelwrite_class);
     x->x_sr = sp[0]->s_sr * 0.001;
     x->x_n = sp[0]->s_n;
     if (delwriter)
     {
-    	sigdelwrite_checkvecsize(delwriter, sp[0]->s_n);
-    	x->x_zerodel = (delwriter->x_sortno == ugen_getsortno() ?
-    	    0 : delwriter->x_vecsize);
-    	sigdelread_float(x, x->x_deltime);
-    	dsp_add(sigdelread_perform, 4,
-    	    sp[0]->s_vec, &delwriter->x_cspace, &x->x_delsamps, sp[0]->s_n);
+        sigdelwrite_checkvecsize(delwriter, sp[0]->s_n);
+        x->x_zerodel = (delwriter->x_sortno == ugen_getsortno() ?
+            0 : delwriter->x_vecsize);
+        sigdelread_float(x, x->x_deltime);
+        dsp_add(sigdelread_perform, 4,
+            sp[0]->s_vec, &delwriter->x_cspace, &x->x_delsamps, sp[0]->s_n);
     }
     else if (*x->x_sym->s_name)
-    	error("delread~: %s: no such delwrite~",x->x_sym->s_name);
+        error("delread~: %s: no such delwrite~",x->x_sym->s_name);
 }
 
 void delread_tilde_setup(void)
 {
     sigdelread_class = class_new(gensym("delread~"),
-    	(t_newmethod)sigdelread_new, 0,
-    	sizeof(t_sigdelread), 0, A_DEFSYM, A_DEFFLOAT, 0);
+        (t_newmethod)sigdelread_new, 0,
+        sizeof(t_sigdelread), 0, A_DEFSYM, A_DEFFLOAT, 0);
     class_addmethod(sigdelread_class, (t_method)sigdelread_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
     class_addfloat(sigdelread_class, (t_method)sigdelread_float);
 }
-

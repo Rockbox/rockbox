@@ -32,7 +32,7 @@ enum filter_shift
     FILTER_SHELF_SHIFT = 6,   /* Each high/low shelving filter */
 };
 
-/** 
+/**
  * Calculate first order shelving filter. Filter is not directly usable by the
  * filter_process() function.
  * @param cutoff shelf midpoint frequency. See eq_pk_coefs for format.
@@ -73,7 +73,7 @@ void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c)
 }
 
 #ifdef HAVE_SW_TONE_CONTROLS
-/** 
+/**
  * Calculate second order section filter consisting of one low-shelf and one
  * high-shelf section.
  * @param cutoff_low low-shelf midpoint frequency. See filter_pk_coefs for format.
@@ -124,7 +124,7 @@ void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
  * in the filtering equation.
  */
 
-/** 
+/**
  * Calculate second order section peaking filter coefficients.
  * @param cutoff a value from 0 to 0x80000000, where 0 represents 0 Hz and
  * 0x80000000 represents the Nyquist frequency (samplerate/2).
@@ -184,7 +184,7 @@ void filter_ls_coefs(unsigned long cutoff, unsigned long Q, long db,
     const long twosqrtalpha = 2*FRACMUL(sqrtA, alpha);
     int32_t a0, a1, a2; /* these are all s6.25 format */
     int32_t b0, b1, b2;
-    
+
     /* [0.1 .. 40] */
     b0 = FRACMUL_SHL(A, ap1 - am1_cs + twosqrtalpha, 2);
     /* [-16 .. 63.4] */

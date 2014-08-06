@@ -17,13 +17,13 @@
   * KIND, either express or implied.
   *
   ***************************************************************************/
- 
+
 #include <speex/speex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
 #include "rbspeex.h"
-  
+
  #define USAGE_TEXT \
 "Usage: rbspeexdec infile outfile\n"\
 "rbspeexdec outputs mono 16 bit 16 kHz WAV files.\n"\
@@ -50,13 +50,13 @@ int main(int argc, char **argv)
 
     /* Rockbox speex streams are always assumed to be WB */
     st = speex_decoder_init(&speex_wb_mode);
- 
+
     /* Set the perceptual enhancement on (is default, but doesn't hurt) */
     tmp = 1;
     speex_decoder_ctl(st, SPEEX_SET_ENH, &tmp);
     speex_decoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
     speex_decoder_ctl(st, SPEEX_GET_FRAME_SIZE, &frame_size);
- 
+
     if ((fin = fopen(argv[1], "rb")) == NULL) {
         printf("Error: could not open input file\n");
         return 1;
@@ -114,4 +114,3 @@ int main(int argc, char **argv)
     free(indata);
     return 0;
 }
-

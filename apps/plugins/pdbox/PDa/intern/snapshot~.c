@@ -31,7 +31,7 @@ static t_int *snapshot_tilde_perform(t_int *w)
 static void snapshot_tilde_dsp(t_snapshot *x, t_signal **sp)
 {
     dsp_add(snapshot_tilde_perform, 2, sp[0]->s_vec + (sp[0]->s_n-1),
-    	&x->x_value);
+        &x->x_value);
 }
 
 static void snapshot_tilde_bang(t_snapshot *x)
@@ -47,12 +47,11 @@ static void snapshot_tilde_set(t_snapshot *x, t_floatarg f)
 void snapshot_tilde_setup(void)
 {
     snapshot_tilde_class = class_new(gensym("snapshot~"), snapshot_tilde_new, 0,
-    	sizeof(t_snapshot), 0, 0);
+        sizeof(t_snapshot), 0, 0);
     CLASS_MAINSIGNALIN(snapshot_tilde_class, t_snapshot, x_f);
     class_addmethod(snapshot_tilde_class, (t_method)snapshot_tilde_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
     class_addmethod(snapshot_tilde_class, (t_method)snapshot_tilde_set,
-    	gensym("set"), A_DEFFLOAT, 0);
+        gensym("set"), A_DEFFLOAT, 0);
     class_addbang(snapshot_tilde_class, snapshot_tilde_bang);
 }
-

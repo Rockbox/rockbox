@@ -253,9 +253,9 @@ static void cfs_init(void)
     /* Read root inode */
     _ata_read_sectors(CFS_CLUSTER2CLUSTER(cfs->first_inode), 64, &sector2);
     root_inode = (struct cfs_inode*)&sector2;
-    
+
     logf("Root inode = 0x%x", root_inode);
-    
+
     logf("0x%x 0x%x", CFS_CLUSTER2CLUSTER(root_inode->first_class_chain[0]), root_inode->first_class_chain[0]);
 
     /* Read root inode's first sector */
@@ -277,9 +277,9 @@ static void cfs_init(void)
                 vfat_inode_nr = root_direntry_items[i].inode_number;
         }
     }
-    
+
     logf("VFAT inode = 0x%x", vfat_inode_nr);
-    
+
     if(vfat_inode_nr != 0)
     {
         /* Read VFAT inode */

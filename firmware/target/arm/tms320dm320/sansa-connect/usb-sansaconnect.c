@@ -67,7 +67,7 @@ static int usb_detect_callback(struct timeout *tmo)
 
         usb_is_connected = true;
     }
- 
+
     return 0;
 }
 

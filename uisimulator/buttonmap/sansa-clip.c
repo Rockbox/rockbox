@@ -45,7 +45,7 @@ int key_to_button(int keyboard_button)
         case SDLK_DOWN:
             new_btn = BUTTON_DOWN;
             break;
-        
+
         case SDLK_INSERT:
         case SDLK_KP_MULTIPLY:
             new_btn = BUTTON_HOME;

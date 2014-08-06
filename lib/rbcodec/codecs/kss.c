@@ -2,7 +2,7 @@
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
 
 #include <codecs/lib/codeclib.h>
-#include "libgme/kss_emu.h" 
+#include "libgme/kss_emu.h"
 
 CODEC_HEADER
 
@@ -15,7 +15,7 @@ static struct Kss_Emu kss_emu;
 /****************** rockbox interface ******************/
 
 static void set_codec_track(int t) {
-    Kss_start_track(&kss_emu, t); 
+    Kss_start_track(&kss_emu, t);
 
     /* for REPEAT_ONE we disable track limits */
     if (!ci->loop_track()) {
@@ -57,10 +57,10 @@ enum codec_status codec_run(void)
     DEBUGF("KSS: next_track\n");
     if (codec_init()) {
         return CODEC_ERROR;
-    }  
+    }
 
     codec_set_replaygain(ci->id3);
-        
+
     /* Read the entire file */
     DEBUGF("KSS: request file\n");
     ci->seek_buffer(0);
@@ -69,7 +69,7 @@ enum codec_status codec_run(void)
         DEBUGF("KSS: file load failed\n");
         return CODEC_ERROR;
     }
-   
+
     if ((err = Kss_load_mem(&kss_emu, buf, ci->filesize))) {
         DEBUGF("KSS: Kss_load failed (%s)\n", err);
         return CODEC_ERROR;

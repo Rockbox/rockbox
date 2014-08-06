@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Michiel van der Kolk 
+ * Copyright (C) 2005 by Michiel van der Kolk
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,7 +46,7 @@ int database_init() {
     entryarray=(struct dbentry *)my_malloc(sizeof(struct dbentry)*rb->tagdbheader->filecount);
     p=(char *)entryarray;
     // zero all entries.
-    for(i=0;i<sizeof(struct dbentry)*rb->tagdbheader->filecount;i++) 
+    for(i=0;i<sizeof(struct dbentry)*rb->tagdbheader->filecount;i++)
         *(p++)=0;
     if(!*rb->tagdb_initialized) {
         if(!rb->tagdb_init()) {
@@ -94,7 +94,7 @@ void loadentry(int filerecord) {
 }
 
 void loadsongdata() {
-    if(currententry->loadedsongdata) 
+    if(currententry->loadedsongdata)
         return;
     currententry->title=(char *)my_malloc(rb->tagdbheader->songlen);
     currententry->genre=(char *)my_malloc(rb->tagdbheader->genrelen);
@@ -114,7 +114,7 @@ void loadsongdata() {
 
 void loadrundbdata() {
     currententry->loadedrundbdata=1;
-    if(!*rb->rundb_initialized) 
+    if(!*rb->rundb_initialized)
         return;
     if(currententry->rundbentry==-1)
         return;
@@ -143,7 +143,7 @@ void loadartistname() {
 void loadalbumname() {
    /* see the note at loadartistname */
    if(currententry->loadedalbumname)
-       return;      
+       return;
    loadsongdata();
    currententry->albumname=(char *)my_malloc(rb->tagdbheader->albumlen);
    rb->lseek(*rb->tagdb_fd,currententry->albumoffset,SEEK_SET);

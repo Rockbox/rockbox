@@ -354,7 +354,7 @@ enum codec_status codec_run(void)
     off_t firstblockposn;     /* position of the first block in file */
     const struct pcm_codec *codec;
     intptr_t param;
-  
+
     if (codec_init())
         return CODEC_ERROR;
 

@@ -74,7 +74,7 @@ bool dbg_ports(void)
         lcd_putsf(0, line++, "GPJCON: %08lx", GPJCON);
         lcd_putsf(0, line++, "GPJDAT: %08lx", GPJDAT);
         lcd_putsf(0, line++, "GPJUP:  %08lx", GPJUP);
-        
+
         line++;
 
         lcd_putsf(0, line++, "SRCPND:  %08lx INTMOD:  %08lx", SRCPND, INTMOD);
@@ -88,4 +88,4 @@ bool dbg_ports(void)
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
     }
-}  
+}

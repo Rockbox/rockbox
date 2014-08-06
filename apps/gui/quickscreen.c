@@ -174,7 +174,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     int temp;
     display->set_viewport(parent);
     display->clear_viewport();
-    
+
     for (i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
     {
         struct viewport *vp = &vps[i];
@@ -319,7 +319,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     bool can_quit = false;
 
     push_current_activity(ACTIVITY_QUICKSCREEN);
-    
+
     FOR_NB_SCREENS(i)
     {
         screens[i].set_viewport(NULL);

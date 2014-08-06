@@ -34,19 +34,19 @@ static const struct nand_info samsung[] =
 /*
     id1, id2
     pages/block, blocks, page_size, spare_size, col_cycles, row_cycles, planes
-*/      
+*/
     {0xDC, 0x10, /* K9F4G08UOM */
      64,         4096,   2048,      64,         2,          3,          1 },
-                                              
+
     {0xD3, 0x51, /* K9K8G08UOM */
      64,         8192,   2048,      64,         2,          3,          1 },
-                                              
+
     {0xD5, 0x14, /* K9GAG08UOM */
      128,        4096,   4096,      128,        2,          3,          2 },
-                                              
+
     {0xD5, 0x55, /* K9LAG08UOM, K9HBG08U1M, K9MCG08U5M */
      128,        8192,   2048,      64,         2,          3,          4 },
-                                 
+
     {0xD7, 0x55, /* K9LBG08UOM */
      128,        8192,   4096,      128,        2,          3,          4 },
 };
@@ -63,7 +63,7 @@ struct nand_info* nand_identify(unsigned char data[5])
  {
     unsigned int i;
     int found = -1;
-    
+
     for(i = 0; i < (sizeof(all)/sizeof(struct nand_manufacturer)); i++)
     {
         if(data[0] == all[i].id)
@@ -72,16 +72,16 @@ struct nand_info* nand_identify(unsigned char data[5])
             break;
         }
     }
-    
+
     if(found < 0)
         return NULL;
-    
+
     for(i = 0; i < all[found].total; i++)
     {
         if(data[1] == all[found].info[i].dev_id &&
            data[2] == all[found].info[i].dev_id2)
             return &all[found].info[i];
     }
-    
+
     return NULL;
 }

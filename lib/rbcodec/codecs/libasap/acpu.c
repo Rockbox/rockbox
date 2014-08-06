@@ -44,7 +44,7 @@
    Explanation is welcome.
 
    Emulation of POKEY timer interrupts is included.
- 
+
    Two preprocessor symbols may be used to strip the size of this emulator.
    Define ACPU_NO_DECIMAL to disable emulation of the BCD mode.
    Define ACPU_NO_UNOFFICIAL to disable emulation of unofficial opcodes. */

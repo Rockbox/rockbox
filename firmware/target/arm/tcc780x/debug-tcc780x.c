@@ -52,7 +52,7 @@ bool dbg_hw_info(void)
 
     line++;
     oldline=line;
-    
+
     while (1)
     {
         line = oldline;
@@ -62,16 +62,16 @@ bool dbg_hw_info(void)
 
         lcd_putsf(0, line++, "current tick: %08lx Seconds running: %08ld",
             current_tick, current_tick/HZ);
-            
+
         lcd_putsf(0, line++, "GPIOA: 0x%08lx  GPIOB: 0x%08lx", GPIOA, GPIOB);
         lcd_putsf(0, line++, "GPIOC: 0x%08lx  GPIOD: 0x%08lx", GPIOC, GPIOD);
         lcd_putsf(0, line++, "GPIOE: 0x%08lx",                 GPIOE);
 
         for (i = 0; i<4; i++)
             lcd_putsf(0, line++, "ADC%d: 0x%04x", i, adc_read(i));
-        
+
         lcd_putsf(0, line++, "STS: 0x%08lx  SRC: 0x%08lx", STS, SRC);
-        
+
         lcd_update();
     }
     return false;

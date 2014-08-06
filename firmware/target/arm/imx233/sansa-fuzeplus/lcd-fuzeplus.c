@@ -128,7 +128,7 @@ static void setup_lcd_pins_i80(bool i80)
     else
     {
         HW_PINCTRL_DOUTn_SET(1) = (1 << 19) | (1 << 20) | (1 << 21) | (1 << 23);
-        
+
         imx233_pinctrl_set_drive(1, 19, PINCTRL_DRIVE_4mA); /* lcd_rs */
         imx233_pinctrl_set_drive(1, 20, PINCTRL_DRIVE_4mA); /* lcd_wr */
         imx233_pinctrl_set_drive(1, 21, PINCTRL_DRIVE_4mA); /* lcd_cs */
@@ -224,7 +224,7 @@ static void lcd_write_reg(uint32_t reg, uint32_t data)
     imx233_lcdif_set_word_length(18);
     reg = encode_16_to_18(reg);
     data = encode_16_to_18(data);
-    
+
     imx233_lcdif_pio_send(false, 1, &reg);
     if(old_reg != 0x22)
         imx233_lcdif_pio_send(true, 1, &data);
@@ -295,11 +295,11 @@ static void lcd_init_seq_7783(void)
     _lcd_write_reg(0x39, 0x206)
     _lcd_write_reg(0x3c, 0x206)
     _lcd_write_reg(0x3d, 0x408)
-    _lcd_write_reg(0x50, 0) /* left X ? */ 
+    _lcd_write_reg(0x50, 0) /* left X ? */
     _lcd_write_reg(0x51, 0xef) /* right X ? */
     _lcd_write_reg(0x52, 0) /* top Y ? */
     _lcd_write_reg(0x53, 0x13f) /* bottom Y ? */
-    _lcd_write_reg(0x20, 0) /* left X ? */ 
+    _lcd_write_reg(0x20, 0) /* left X ? */
     _lcd_write_reg(0x21, 0) /* top Y ? */
     _lcd_write_reg(0x60, 0xa700)
     _lcd_write_reg(0x61, 1)
@@ -511,7 +511,7 @@ void lcd_enable(bool enable)
         return;
 
     lcd_on = enable;
-    
+
     if(enable)
         common_lcd_enable(true);
     switch(lcd_kind)

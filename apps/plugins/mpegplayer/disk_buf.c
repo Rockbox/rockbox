@@ -307,7 +307,7 @@ static void disk_buf_on_reset(ssize_t pos)
         {
             if (--tag, --page < 0)
                 page = disk_buf.pgcount - 1;
-    
+
             if (disk_buf.cache[page] != tag)
                 break;
 
@@ -466,7 +466,7 @@ static void disk_buf_thread(void)
     disk_buf.state = TSTATE_EOS;
     disk_buf.status = STREAM_STOPPED;
 
-    while (1)    
+    while (1)
     {
         if (disk_buf.state != TSTATE_EOS)
         {
@@ -591,7 +591,7 @@ static ssize_t disk_buf_probe(off_t start, size_t length, void **p)
             rng.tag_start = tag;
             rng.tag_end = tag_end;
             rng.pg_start = page;
-            
+
             result = rb->queue_send(disk_buf.q, DISK_BUF_CACHE_RANGE,
                                     (intptr_t)&rng);
 

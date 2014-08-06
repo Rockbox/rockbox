@@ -86,7 +86,7 @@ int button_read_device(void)
             last_valid = data;
         prev_data = data;
         data = last_valid;
-        
+
         if (data < 0xf0)
         {
             if(data < 0x7c)

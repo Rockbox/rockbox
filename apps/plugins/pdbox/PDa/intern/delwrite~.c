@@ -3,9 +3,9 @@
 
 extern int ugen_getsortno(void);
 
-#define DEFDELVS 64	    	/* LATER get this from canvas at DSP time */
+#define DEFDELVS 64             /* LATER get this from canvas at DSP time */
 #ifndef ROCKBOX
-static int delread_zero = 0;	/* four bytes of zero for delread~, vd~ */
+static int delread_zero = 0;    /* four bytes of zero for delread~, vd~ */
 #endif
 
 #include "delay.h"
@@ -25,7 +25,7 @@ static void *sigdelwrite_new(t_symbol *s, t_floatarg msec)
     nsamps += DEFDELVS;
     x->x_cspace.c_n = nsamps;
     x->x_cspace.c_vec =
-    	(t_sample *)getbytes((nsamps + XTRASAMPS) * sizeof(float));
+        (t_sample *)getbytes((nsamps + XTRASAMPS) * sizeof(float));
     x->x_cspace.c_phase = XTRASAMPS;
     x->x_sortno = 0;
     x->x_vecsize = 0;
@@ -43,21 +43,21 @@ static t_int *sigdelwrite_perform(t_int *w)
     phase += n;
     while (n--)
     {
-    	t_sample f = *in++;
-    	if (PD_BADFLOAT(f))
-	    f = 0;
-    	*bp++ = f;
-    	if (bp == ep)
-    	{
-    	    vp[0] = ep[-4];
-    	    vp[1] = ep[-3];
-    	    vp[2] = ep[-2];
-    	    vp[3] = ep[-1];
-    	    bp = vp + XTRASAMPS;
-    	    phase -= nsamps;
-    	}
+        t_sample f = *in++;
+        if (PD_BADFLOAT(f))
+            f = 0;
+        *bp++ = f;
+        if (bp == ep)
+        {
+            vp[0] = ep[-4];
+            vp[1] = ep[-3];
+            vp[2] = ep[-2];
+            vp[3] = ep[-1];
+            bp = vp + XTRASAMPS;
+            phase -= nsamps;
+        }
     }
-    c->c_phase = phase; 
+    c->c_phase = phase;
     return (w+4);
 }
 
@@ -72,16 +72,15 @@ static void sigdelwrite_free(t_sigdelwrite *x)
 {
     pd_unbind(&x->x_obj.ob_pd, x->x_sym);
     freebytes(x->x_cspace.c_vec,
-    	(x->x_cspace.c_n + XTRASAMPS) * sizeof(float));
+        (x->x_cspace.c_n + XTRASAMPS) * sizeof(float));
 }
 
 void delwrite_tilde_setup(void)
 {
-    sigdelwrite_class = class_new(gensym("delwrite~"), 
-    	(t_newmethod)sigdelwrite_new, (t_method)sigdelwrite_free,
-    	sizeof(t_sigdelwrite), 0, A_DEFSYM, A_DEFFLOAT, 0);
+    sigdelwrite_class = class_new(gensym("delwrite~"),
+        (t_newmethod)sigdelwrite_new, (t_method)sigdelwrite_free,
+        sizeof(t_sigdelwrite), 0, A_DEFSYM, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(sigdelwrite_class, t_sigdelwrite, x_f);
     class_addmethod(sigdelwrite_class, (t_method)sigdelwrite_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
 }
-

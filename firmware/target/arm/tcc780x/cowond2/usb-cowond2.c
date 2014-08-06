@@ -36,10 +36,10 @@ void usb_enable(bool on)
 {
     if (on)
     {
-    
+
     }
     else
     {
-    
+
     }
 }

@@ -35,20 +35,20 @@ static int acked;
 interrupt void handle_int0(void) {
     IFR = 1;
     int0_count++;
-    
+
 #if defined(HAVE_DEBUG)
     acked = 1;
 #endif
 
     waiting = 0;
-    
+
     if(dma0_stopped==0)
     {
         if(!(DMPREC&0x01))
         {
             /* Give the HPIB access to refill first */
             rebuffer();
-            
+
             /* Start the MCBSP DMA */
             DMPREC |= 1;
             audiohw_start();
@@ -74,7 +74,7 @@ static void startack(void)
 static void waitack(void)
 {
     /* Wait until ARM has picked up data. */
-    while (!acked) 
+    while (!acked)
     {
         /* IDLE alone never seems to wake up :( */
         asm("        IDLE 1");
@@ -110,4 +110,3 @@ void int_arm(void)
     /* Disable Image Buffer clock */
     CP_CLKC &= ~(1 << 0);
 }
-

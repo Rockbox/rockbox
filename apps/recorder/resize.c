@@ -678,7 +678,7 @@ static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
     fb_data *dest = (fb_data *)ctx->bm->data + Y_STEP * row;
     int delta = 127;
     unsigned r, g, b, y, u, v;
-    
+
     for (col = 0; col < ctx->bm->width; col++) {
         (void) delta;
         if (ctx->dither)

@@ -79,12 +79,12 @@ static void fill_rastered(int bx, int by, int bw, int bh, int step)
 {
     int x, xmax, y, ymax;
     int level;
-    
+
     if (step < 0)
         step = 0;
     else if (step > STEPS)
         step = STEPS;
-        
+
     level = input_levels[step];
     level += (level-1) >> 7;
 
@@ -111,7 +111,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* standard stuff */
     (void)parameter;
-    
+
     gbuf = (unsigned char *) rb->plugin_get_buffer(&gbuf_size);
 
     if (!grey_init(gbuf, gbuf_size,
@@ -184,7 +184,7 @@ enum plugin_status plugin_start(const void* parameter)
                             lcd_levels[i] = l;
                 }
                 break;
-                
+
             case GREY_OK:
 
                 /* dump result in form suitable for lcdlinear[] */
@@ -203,8 +203,8 @@ enum plugin_status plugin_start(const void* parameter)
                     {
                         for (j=0; j < STEPS; j++)
                         {
-                            rb->fdprintf(fd, "%3d, ", 
-                                lcd_levels[i-1] + 
+                            rb->fdprintf(fd, "%3d, ",
+                                lcd_levels[i-1] +
                                 ((lcd_levels[i] - lcd_levels[i-1])*j)/STEPS);
                         }
                         rb->fdprintf(fd, "\n");

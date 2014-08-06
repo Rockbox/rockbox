@@ -52,7 +52,7 @@ static int LoadID666(unsigned char *buf) {
     unsigned char *ib=buf;
     int isbinary = 1;
     int i;
-  
+
     memcpy(ID666.song,ib,32);
     ID666.song[31]=0;
     ib+=32;
@@ -70,26 +70,26 @@ static int LoadID666(unsigned char *buf) {
     ib+=32;
 
     /* Ok, now comes the fun part. */
-   
+
     /* Date check */
     if(ib[2] == '/'  && ib[5] == '/' )
         isbinary = 0;
-  
+
     /* Reserved bytes check */
     if(ib[0xD2 - 0x2E - 112] >= '0' &&
        ib[0xD2 - 0x2E - 112] <= '9' &&
        ib[0xD3 - 0x2E - 112] == 0x00)
         isbinary = 0;
-    
+
     /* is length & fade only digits? */
-    for (i=0;i<8 && ( 
+    for (i=0;i<8 && (
         (ib[0xA9 - 0x2E - 112+i]>='0'&&ib[0xA9 - 0x2E - 112+i]<='9') ||
         ib[0xA9 - 0x2E - 112+i]=='\0');
         i++);
     if (i==8) isbinary=0;
-    
+
     ID666.isBinary = isbinary;
-  
+
     if(isbinary) {
         DEBUGF("binary tag detected\n");
         ID666.year=*ib;
@@ -97,7 +97,7 @@ static int LoadID666(unsigned char *buf) {
         ID666.year|=*ib<<8;
         ib++;
         ID666.month=*ib;
-        ib++;    
+        ib++;
         ID666.day=*ib;
         ib++;
 
@@ -105,17 +105,17 @@ static int LoadID666(unsigned char *buf) {
 
         ID666.length=*ib;
         ib++;
-    
+
         ID666.length|=*ib<<8;
         ib++;
-    
+
         ID666.length|=*ib<<16;
         ID666.length*=1000;
         ib++;
-    
+
         ID666.fade=*ib;
         ib++;
-        ID666.fade|=*ib<<8; 
+        ID666.fade|=*ib<<8;
         ib++;
         ID666.fade|=*ib<<16;
         ib++;
@@ -130,36 +130,36 @@ static int LoadID666(unsigned char *buf) {
         ib++;
 
         ID666.emulator=*ib;
-        ib++;    
+        ib++;
     } else {
         unsigned long tmp;
         char buf[64];
-        
+
         DEBUGF("text tag detected\n");
-        
+
         memcpy(buf, ib, 2);
-        buf[2] = 0; 
+        buf[2] = 0;
         tmp = 0;
         for (i=0;i<2 && buf[i]>='0' && buf[i]<='9';i++) tmp=tmp*10+buf[i]-'0';
         ID666.month = tmp;
         ib+=3;
-        
+
         memcpy(buf, ib, 2);
-        buf[2] = 0; 
+        buf[2] = 0;
         tmp = 0;
         for (i=0;i<2 && buf[i]>='0' && buf[i]<='9';i++) tmp=tmp*10+buf[i]-'0';
         ID666.day = tmp;
         ib+=3;
-        
+
         memcpy(buf, ib, 4);
-        buf[4] = 0; 
+        buf[4] = 0;
         tmp = 0;
         for (i=0;i<4 && buf[i]>='0' && buf[i]<='9';i++) tmp=tmp*10+buf[i]-'0';
         ID666.year = tmp;
         ib+=5;
-    
+
         memcpy(buf, ib, 3);
-        buf[3] = 0; 
+        buf[3] = 0;
         tmp = 0;
         for (i=0;i<3 && buf[i]>='0' && buf[i]<='9';i++) tmp=tmp*10+buf[i]-'0';
         ID666.length = tmp * 1000;
@@ -280,7 +280,7 @@ static intptr_t emu_thread_send_msg(long id, intptr_t data)
         ci->semaphore_wait(&sample_queue.emu_evt_reply, TIMEOUT_BLOCK);
     }
 
-    return sample_queue.retval;    
+    return sample_queue.retval;
 }
 
 /* thread function */
@@ -439,16 +439,16 @@ static inline int32_t * spc_play_get_samples(void)
 static int play_track( void )
 {
     int sampleswritten=0;
-    
+
     unsigned long fadestartsample = ID666.length*(long long) SAMPLE_RATE/1000;
     unsigned long fadeendsample = (ID666.length+ID666.fade)*(long long) SAMPLE_RATE/1000;
     int fadedec = 0;
     int fadevol = 0x7fffffffl;
     intptr_t param;
-    
+
     if (fadeendsample>fadestartsample)
         fadedec=0x7fffffffl/(fadeendsample-fadestartsample)+1;
-        
+
     ENTER_TIMER(total);
 
     while ( 1 )
@@ -518,7 +518,7 @@ static int play_track( void )
         else
             ci->set_elapsed(sampleswritten*1000LL/SAMPLE_RATE);
     }
-    
+
     EXIT_TIMER(total);
     return 0;
 }

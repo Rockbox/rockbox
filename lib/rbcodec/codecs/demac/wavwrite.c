@@ -96,7 +96,7 @@ int open_wav(struct ape_ctx_t* ape_ctx, char* filename)
 
     // Bits per sample
     wav_header[34]=ape_ctx->bps;
-    
+
     // Subchunk2Size
     x=filesize-44;
     wav_header[40]=(x&0xff);

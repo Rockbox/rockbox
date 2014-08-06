@@ -8,7 +8,7 @@
  * $Id$
  *
  * SID Codec for rockbox based on the TinySID engine
- * 
+ *
  * Written by Tammo Hinrichs (kb) and Rainer Sinsch in 1998-1999
  * Ported to rockbox on 14 April 2006
  *
@@ -29,7 +29,7 @@
  * on rockbox
  *
  *****************************/
- 
+
  /*********************
  * v1.1
  * Added 16-04-2006: Rainer Sinsch
@@ -39,22 +39,22 @@
  * Added 17-04-2006: Rainer Sinsch
  * Improved quick & dirty integer calculations for the resonant filter
  * Improved audio quality by 4 bits
- * 
+ *
  * v1.2
  * Added 17-04-2006: Dave Chapman
  * Improved file loading
- * 
+ *
  * Added 17-04-2006: Rainer Sinsch
  * Added sample routines
  * Added cia timing routines
  * Added fast forwarding capabilities
  * Corrected bug in sid loading
- * 
+ *
  * v1.2.1
  * Added 04-05-2006: Rainer Sinsch
  * Implemented Marco Alanens suggestion for subsong selection:
  * Select the subsong by seeking: Each second represents a subsong
- * 
+ *
  **************************/
 
 #define USE_FILTER
@@ -70,7 +70,7 @@ CODEC_HEADER
 #define SAMPLE_RATE 44100
 
 /* This codec supports SID Files:
- * 
+ *
  */
 
 static int32_t samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
@@ -99,7 +99,7 @@ void sidPoke(int reg, unsigned char val) ICODE_ATTR;
 #define acc 12
 #define rel 13
 
-enum { 
+enum {
     adc, _and, asl, bcc, bcs, beq, bit, bmi, bne, bpl, _brk, bvc, bvs, clc,
     cld, cli, clv, cmp, cpx, cpy, dec, dex, dey, eor, inc, inx, iny, jmp,
     jsr, lda, ldx, ldy, lsr, _nop, ora, pha, php, pla, plp, rol, ror, rti,
@@ -215,9 +215,9 @@ static const unsigned long attacks[16] ICONST_ATTR =
 };
 static const unsigned long releases[16] ICONST_ATTR =
 {
-    DIV(0.00891777693), DIV(0.0245940510), DIV(0.0484185907), DIV(0.0730116639), 
-    DIV(0.11451247500), DIV(0.1690783560), DIV(0.2051994320), DIV(0.2405519750), 
-    DIV(0.30126612500), DIV(0.7508582450), DIV(1.5017155100), DIV(2.4024368200), 
+    DIV(0.00891777693), DIV(0.0245940510), DIV(0.0484185907), DIV(0.0730116639),
+    DIV(0.11451247500), DIV(0.1690783560), DIV(0.2051994320), DIV(0.2405519750),
+    DIV(0.30126612500), DIV(0.7508582450), DIV(1.5017155100), DIV(2.4024368200),
     DIV(3.00189298000), DIV(9.0072140500), DIV(15.010998000), DIV(24.018211100)
 };
 #endif
@@ -299,13 +299,13 @@ static inline int GenerateDigi(int sIn)
     if ((sample_position < sample_end) && (sample_position >= sample_start))
     {
         sIn += sample;
-        
+
         fracPos += 985248/sample_period;
-        
-        if (fracPos > mixing_frequency) 
+
+        if (fracPos > mixing_frequency)
         {
-            fracPos%=mixing_frequency;        
-                        
+            fracPos%=mixing_frequency;
+
             // N�hstes Samples holen
             if (sample_order == 0) {
                 sample_nibble++;                        // Nähstes Sample-Nibble
@@ -320,24 +320,24 @@ static inline int GenerateDigi(int sIn)
                     sample_nibble=1;
                     sample_position++;
                 }
-            }       
+            }
             if (sample_repeats)
             {
                 if  (sample_position > sample_end)
                 {
                     sample_repeats--;
                     sample_position = sample_repeat_start;
-                }                       
+                }
                 else sample_active = 0;
             }
-            
+
             sample = memory[sample_position&0xffff];
-            if (sample_nibble==1)   // Hi-Nibble holen?     
+            if (sample_nibble==1)   // Hi-Nibble holen?
                 sample = (sample & 0xf0)>>4;
             else sample = sample & 0x0f;
-            
+
             sample -= 7;
-            sample <<= 10;  
+            sample <<= 10;
         }
     }
 
@@ -367,7 +367,7 @@ void synth_init(unsigned long mixfrq)
     memset(&filter,0,sizeof(filter));
     osc[0].noiseval = 0xffffff;
     osc[1].noiseval = 0xffffff;
-    osc[2].noiseval = 0xffffff;  
+    osc[2].noiseval = 0xffffff;
 }
 
 /* render a buffer of n samples with the actual register contents */
@@ -392,7 +392,7 @@ void synth_render (int32_t *buffer, unsigned long len)
 
 #ifdef USE_FILTER
     filter.freq  = (16*sid.ffreqhi + (sid.ffreqlo&0x7)) * filtmul;
-  
+
     if (filter.freq>quickfloat_ConvertFromInt(1))
         filter.freq=quickfloat_ConvertFromInt(1);
     /* the above line isnt correct at all - the problem is that the filter
@@ -404,14 +404,14 @@ void synth_render (int32_t *buffer, unsigned long len)
     filter.h_ena = get_bit(sid.ftp_vol,6);
     filter.v3ena = !get_bit(sid.ftp_vol,7);
     filter.vol   = (sid.ftp_vol & 0xf);
-    filter.rez   = quickfloat_ConvertFromFloat(1.2f) - 
+    filter.rez   = quickfloat_ConvertFromFloat(1.2f) -
                     quickfloat_ConvertFromFloat(0.04f)*(sid.res_ftv >> 4);
-    
+
     /* We precalculate part of the quick float operation, saves time in loop later */
     filter.rez>>=8;
 #endif
-  
-  
+
+
     /* now render the buffer */
     for (bp=0;bp<len;bp++) {
 #ifdef USE_FILTER
@@ -473,7 +473,7 @@ void synth_render (int32_t *buffer, unsigned long len)
             if (osc[v].wave & 0x20) outv &= sawout;
             if (osc[v].wave & 0x40) outv &= plsout;
             if (osc[v].wave & 0x80) outv &= nseout;
-            
+
             /* so now process the volume according to the phase and adsr values */
             switch (osc[v].envphase) {
                 case 0 : {                          /* Phase 0 : Attack */
@@ -515,12 +515,12 @@ void synth_render (int32_t *buffer, unsigned long len)
                     break;
                 }
             }
-  
+
 #ifdef USE_FILTER
 
             /* now route the voice output to either the non-filtered or the
                filtered channel and dont forget to blank out osc3 if desired */
-  
+
             if (v<2 || filter.v3ena)
             {
                 if (osc[v].filter)
@@ -559,7 +559,7 @@ void synth_render (int32_t *buffer, unsigned long len)
         if (filter.b_ena) outf+=quickfloat_ConvertToInt(filter.b);
         if (filter.h_ena) outf+=quickfloat_ConvertToInt(filter.h);
 
-        int final_sample = (filter.vol*(outo+outf));        
+        int final_sample = (filter.vol*(outo+outf));
         *(buffer+bp)= GenerateDigi(final_sample)<<13;
 #endif
 #ifndef USE_FILTER
@@ -574,18 +574,18 @@ void synth_render (int32_t *buffer, unsigned long len)
 * C64 Mem Routines
 */
 static inline unsigned char getmem(unsigned short addr)
-{    
+{
     return memory[addr];
 }
 
 static inline void setmem(unsigned short addr, unsigned char value)
 {
     if ((addr&0xfc00)==0xd400)
-    {        
-        sidPoke(addr&0x1f,value);    
+    {
+        sidPoke(addr&0x1f,value);
         /* New SID-Register */
         if (addr > 0xd418)
-        {                
+        {
             switch (addr)
             {
                 case 0xd41f:    /* Start-Hi */
@@ -610,10 +610,10 @@ static inline void setmem(unsigned short addr, unsigned char value)
                     internal_order = value; break;
                 case 0xd45f:    /* Sample Add */
                     internal_add = value; break;
-                case 0xd41d:    /* Start sampling */                
+                case 0xd41d:    /* Start sampling */
                     sample_repeats = internal_repeat_times;
                     sample_position = internal_start;
-                    sample_start = internal_start; 
+                    sample_start = internal_start;
                     sample_end = internal_end;
                     sample_repeat_start = internal_repeat_start;
                     sample_period = internal_period;
@@ -621,13 +621,13 @@ static inline void setmem(unsigned short addr, unsigned char value)
                     switch (value)
                     {
                         case 0xfd: sample_active = 0; break;
-                        case 0xfe: 
+                        case 0xfe:
                         case 0xff: sample_active = 1; break;
                         default: return;
                     }
                     break;
-            }            
-        } 
+            }
+        }
     }
     else memory[addr]=value;
 }
@@ -660,10 +660,10 @@ void sidPoke(int reg, unsigned char val)
             sid.v[voice].pulse = (sid.v[voice].pulse&0xff)+(val<<8);
             break;
         }
-        case 4: { sid.v[voice].wave = val; 
+        case 4: { sid.v[voice].wave = val;
             /* Directly look at GATE-Bit!
              * a change may happen twice or more often during one cpujsr
-             * Put the Envelope Generator into attack or release phase if desired 
+             * Put the Envelope Generator into attack or release phase if desired
             */
             if ((val & 0x01) == 0) osc[voice].envphase=3;
             else if (osc[voice].envphase==3) osc[voice].envphase=0;
@@ -683,7 +683,7 @@ void sidPoke(int reg, unsigned char val)
 
 static inline unsigned char getaddr(int mode)
 {
-    unsigned short ad,ad2;  
+    unsigned short ad,ad2;
     switch(mode)
     {
         case imp:
@@ -702,7 +702,7 @@ static inline unsigned char getaddr(int mode)
         case absy:
             ad=getmem(pc++);
             ad|=256*getmem(pc++);
-            ad2=ad+y;                
+            ad2=ad+y;
             return getmem(ad2);
         case zp:
             ad=getmem(pc++);
@@ -726,11 +726,11 @@ static inline unsigned char getaddr(int mode)
             ad=getmem(pc++);
             ad2=getmem(ad);
             ad2|=getmem((ad+1)&0xff)<<8;
-            ad=ad2+y;                
+            ad=ad2+y;
             return getmem(ad);
         case acc:
             return a;
-    }  
+    }
     return 0;
 }
 
@@ -747,7 +747,7 @@ static inline void setaddr(int mode, unsigned char val)
         case absx:
             ad=getmem(pc-2);
             ad|=256*getmem(pc-1);
-            ad2=ad+x;                
+            ad2=ad+x;
             setmem(ad2,val);
             return;
         case zp:
@@ -785,7 +785,7 @@ static inline void putaddr(int mode, unsigned char val)
         case absy:
             ad=getmem(pc++);
             ad|=getmem(pc++)<<8;
-            ad2=ad+y;                
+            ad2=ad+y;
             setmem(ad2,val);
             return;
         case zp:
@@ -810,7 +810,7 @@ static inline void putaddr(int mode, unsigned char val)
             ad2|=getmem(ad&0xff)<<8;
             setmem(ad2,val);
             return;
-        case indy:      
+        case indy:
             ad=getmem(pc++);
             ad2=getmem(ad);
             ad2|=getmem((ad+1)&0xff)<<8;
@@ -856,8 +856,8 @@ void cpuReset(void)
 {
     a=x=y=0;
     p=0;
-    s=255; 
-    pc=getaddr(0xfffc);  
+    s=255;
+    pc=getaddr(0xfffc);
 }
 
 void cpuResetTo(unsigned short npc, unsigned char na) ICODE_ATTR;
@@ -868,7 +868,7 @@ void cpuResetTo(unsigned short npc, unsigned char na)
     y=0;
     p=0;
     s=255;
-    pc=npc; 
+    pc=npc;
 }
 
 static inline void cpuParse(void)
@@ -876,7 +876,7 @@ static inline void cpuParse(void)
     unsigned char opc=getmem(pc++);
     int cmd=opcodes[opc];
     int addr=modes[opc];
-    int c;  
+    int c;
     switch (cmd)
     {
         case adc:
@@ -957,14 +957,14 @@ static inline void cpuParse(void)
             bval=getaddr(addr);
             wval=(unsigned short)x-bval;
             setflags(FLAG_Z,!wval);
-            setflags(FLAG_N,wval&0x80);      
+            setflags(FLAG_N,wval&0x80);
             setflags(FLAG_C,x>=bval);
             break;
         case cpy:
             bval=getaddr(addr);
             wval=(unsigned short)y-bval;
             setflags(FLAG_Z,!wval);
-            setflags(FLAG_N,wval&0x80);      
+            setflags(FLAG_N,wval&0x80);
             setflags(FLAG_C,y>=bval);
             break;
         case dec:
@@ -1043,7 +1043,7 @@ static inline void cpuParse(void)
             setflags(FLAG_Z,!y);
             setflags(FLAG_N,y&0x80);
             break;
-        case lsr:      
+        case lsr:
             bval=getaddr(addr); wval=(unsigned char)bval;
             wval>>=1;
             setaddr(addr,(unsigned char)wval);
@@ -1100,7 +1100,7 @@ static inline void cpuParse(void)
             wval|=pop()<<8;
             pc=wval+1;
             break;
-        case sbc:      
+        case sbc:
             bval=getaddr(addr)^0xff;
             wval=(unsigned short)a+bval+((p&FLAG_C)?1:0);
             setflags(FLAG_C, wval&0x100);
@@ -1154,13 +1154,13 @@ static inline void cpuParse(void)
             a=y;
             setflags(FLAG_Z, !a);
             setflags(FLAG_N, a&0x80);
-            break;  
-    }        
+            break;
+    }
 }
 
 void cpuJSR(unsigned short npc, unsigned char na) ICODE_ATTR;
 void cpuJSR(unsigned short npc, unsigned char na)
-{  
+{
     a=na;
     x=0;
     y=0;
@@ -1172,16 +1172,16 @@ void cpuJSR(unsigned short npc, unsigned char na)
 
     while (pc > 1)
         cpuParse();
- 
+
 }
 
 void c64Init(int nSampleRate)  ICODE_ATTR;
 void c64Init(int nSampleRate)
-{        
+{
     synth_init(nSampleRate);
     memset(memory, 0, sizeof(memory));
-  
-    cpuReset();    
+
+    cpuReset();
 }
 
 
@@ -1211,12 +1211,12 @@ unsigned short LoadSIDFromMemory(void *pSidData, unsigned short *load_addr,
 
     *load_addr = pData[data_file_offset];
     *load_addr|= pData[data_file_offset+1]<<8;
-    
+
     *speed = pData[0x15];
-    
+
     memset(memory, 0, sizeof(memory));
     memcpy(&memory[*load_addr], &pData[data_file_offset+2], size-(data_file_offset+2));
-    
+
     if (*play_addr == 0)
     {
         cpuJSR(*init_addr, 0);
@@ -1260,7 +1260,7 @@ enum codec_status codec_run(void)
     }
 
     codec_set_replaygain(ci->id3);
-    
+
     /* Load SID file the read_filebuf callback will return the full requested
      * size if at all possible, so there is no need to loop */
     ci->seek_buffer(0);
@@ -1269,13 +1269,13 @@ enum codec_status codec_run(void)
     if (filesize == 0) {
         return CODEC_ERROR;
     }
-    
+
     param = ci->id3->elapsed;
     resume = param != 0;
-    
+
     goto sid_start;
 
-    /* The main decoder loop */    
+    /* The main decoder loop */
     while (1) {
         enum codec_command_action action = ci->get_command(&param);
 
@@ -1291,7 +1291,7 @@ enum codec_status codec_run(void)
             LoadSIDFromMemory(sidfile, &load_addr, &init_addr, &play_addr,
                               &subSongsMax, &subSong, &song_speed,
                               (unsigned short)filesize);
-            sidPoke(24, 15);            /* Turn on full volume */            
+            sidPoke(24, 15);            /* Turn on full volume */
             if (!resume || (resume && param))
                 subSong = param / 1000; /* Now use the current seek time in
                                            seconds as subsong */
@@ -1304,21 +1304,21 @@ enum codec_status codec_run(void)
 
             resume = false;
         }
-        
+
         nSamplesRendered = 0;
         while (nSamplesRendered < CHUNK_SIZE)
         {
             if (nSamplesToRender == 0)
             {
                 cpuJSR(play_addr, 0);
-                
+
                 /* Find out if cia timing is used and how many samples
                    have to be calculated for each cpujsr */
-                int nRefreshCIA = (int)(20000*(memory[0xdc04]|(memory[0xdc05]<<8))/0x4c00); 
-                if ((nRefreshCIA==0) || (song_speed == 0)) 
+                int nRefreshCIA = (int)(20000*(memory[0xdc04]|(memory[0xdc05]<<8))/0x4c00);
+                if ((nRefreshCIA==0) || (song_speed == 0))
                     nRefreshCIA = 20000;
                 nSamplesPerCall = mixing_frequency*nRefreshCIA/1000000;
-          
+
                 nSamplesToRender = nSamplesPerCall;
             }
             if (nSamplesRendered + nSamplesToRender > CHUNK_SIZE)
@@ -1332,9 +1332,9 @@ enum codec_status codec_run(void)
                 synth_render(samples+nSamplesRendered, nSamplesToRender);
                 nSamplesRendered += nSamplesToRender;
                 nSamplesToRender = 0;
-            } 
+            }
         }
-        
+
         ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE);
     }
 

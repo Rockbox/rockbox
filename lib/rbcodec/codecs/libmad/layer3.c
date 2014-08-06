@@ -22,7 +22,7 @@
 # ifdef HAVE_CONFIG_H
 #  include "config.h"
 # endif
-     
+
 # include "global.h"
 
 # include <string.h>
@@ -982,7 +982,7 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xrarr[576],
     region     = -1;
     exp        = 0x3210; /* start value */
     bitcache   = 0;
-    linbits    = startbits = 0; 
+    linbits    = startbits = 0;
     table      = NULL;
     xr_big_val = xr + 2 * channel->big_values;
 
@@ -1619,7 +1619,7 @@ void III_imdct_l(mad_fixed_t const [18], mad_fixed_t [36], unsigned int);
  */
 #  if defined(CPU_COLDFIRE)
 /* emac optimized imdct36, it is very ugly and i hope to replace it soon.
- * for now it is actually somewhat faster than the stock implementation. 
+ * for now it is actually somewhat faster than the stock implementation.
  */
 static inline
 void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
@@ -1643,7 +1643,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
   /* MAD_F_MLA(hi, lo, (t15 = X[7] + X[16]),  MAD_F(0x061f78aa)); */
   /* t4 = MAD_F_MLZ(hi, lo);                                      */
   /* MAD_F_MLA(hi, lo, t14, -MAD_F(0x061f78aa));                  */
-  /* MAD_F_MLA(hi, lo, t15, -MAD_F(0x0ec835e8));                  */ 
+  /* MAD_F_MLA(hi, lo, t15, -MAD_F(0x0ec835e8));                  */
   /* t0 = MAD_F_MLZ(hi, lo);                                      */
     "sub.l (10*4, %[X]), %%d0\n" /* t14 */
     "msac.l %%d0, %%d1,                    %%acc1\n"
@@ -1657,7 +1657,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "move.l %%acc0, %%d0\n"
     "asl.l #3, %%d0\n" /* t0 */
     "move.l %%d0, (0*4, %[t])\n"
-    
+
   /* MAD_F_MLA(hi, lo, (t8 =X[0]-X[11]-X[12]),  MAD_F(0x0216a2a2)); */
   /* MAD_F_MLA(hi, lo, (t9 =X[2]-X[ 9]-X[14]),  MAD_F(0x09bd7ca0)); */
   /* MAD_F_MLA(hi, lo, (t10=X[3]-X[ 8]-X[15]), -MAD_F(0x0cb19346)); */
@@ -1716,7 +1716,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "msac.l %%d3, %%d7,                    %%acc1\n"
     "msac.l %%d2, %%d7,                    %%acc2\n"
     "msac.l %%d1, %%d7, (1*4, %[X]), %%d5, %%acc3\n"
-    
+
     "movclr.l %%acc0, %%d7\n"
     "asl.l #3, %%d7\n"
     "move.l %%d7, (7*4, %[x])\n"
@@ -1728,21 +1728,21 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "sub.l %%d0, %%d7\n"
     "move.l %%d7, (19*4, %[x])\n"
     "move.l %%d7, (34*4, %[x])\n"
-    
+
     "movclr.l %%acc2, %%d7\n"
     "asl.l #3, %%d7\n"
     "move.l %%d7, ( 1*4, %[x])\n"
-    
+
     "movclr.l %%acc3, %%d7\n"
     "asl.l #3, %%d7\n"
     "move.l %%d7, (25*4, %[x])\n"
-    
+
   /* MAD_F_ML0(hi, lo, X[1],  -MAD_F(0x09bd7ca0)); */
   /* MAD_F_MLA(hi, lo, X[7],   MAD_F(0x0216a2a2)); */
   /* MAD_F_MLA(hi, lo, X[10], -MAD_F(0x0fdcf549)); */
   /* MAD_F_MLA(hi, lo, X[16],  MAD_F(0x0cb19346)); */
   /* t1 = MAD_F_MLZ(hi, lo) + t6; */
-  
+
   /* MAD_F_ML0(hi, lo, X[1],  -MAD_F(0x0216a2a2)); */
   /* MAD_F_MLA(hi, lo, X[7],  -MAD_F(0x09bd7ca0)); */
   /* MAD_F_MLA(hi, lo, X[10],  MAD_F(0x0cb19346)); */
@@ -1770,10 +1770,10 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "movclr.l %%acc0, %%d7\n"
     "asl.l #3, %%d7\n"
     "add.l (6*4, %[t]), %%d7\n" /* t1 */
-    
+
     "movclr.l %%acc1, %%d5\n"
     "asl.l #3, %%d5\n"          /* t3 */
-    
+
     "movclr.l %%acc2, %%d6\n"
     "asl.l #3, %%d6\n"
     "sub.l (6*4, %[t]), %%d6\n" /* t5 */
@@ -1873,19 +1873,19 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "move.l %%d6, (6*4, %[x])\n"
     "neg.l %%d6\n"
     "move.l %%d6, (11*4, %[x])\n"
-    
+
     "movclr.l %%acc1, %%d6\n"
     "asl.l #3, %%d6\n"
     "add.l %%d7, %%d6\n"
     "move.l %%d6, (23*4, %[x])\n"
     "move.l %%d6, (30*4, %[x])\n"
-    
+
     "movclr.l %%acc2, %%d6\n"
     "asl.l #3, %%d6\n"
     "sub.l %%d7, %%d6\n"
     "move.l %%d6, (18*4, %[x])\n"
     "move.l %%d6, (35*4, %[x])\n"
-    
+
   /* MAD_F_ML0(hi, lo, X[4],   MAD_F(0x061f78aa)); */
   /* MAD_F_MLA(hi, lo, X[13], -MAD_F(0x0ec835e8)); */
   /* t3 += (t7 = MAD_F_MLZ(hi, lo)); */
@@ -1900,7 +1900,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "move.l (4*4, %[t]), %%d1\n"
     "sub.l %%d6, %%d1\n" /* t4 */
     "move.l %%d1, (4*4, %[t])\n"
-    
+
   /* MAD_F_MLA(hi, lo, X[1],  -MAD_F(0x0cb19346)); */
   /* MAD_F_MLA(hi, lo, X[7],   MAD_F(0x0fdcf549)); */
   /* MAD_F_MLA(hi, lo, X[10],  MAD_F(0x0216a2a2)); */
@@ -1916,7 +1916,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "msac.l %%d1, %%d0, (      %[X]), %%d0, %%acc0\n"
     "move.l %%acc0, %%d7\n"
     "asl.l #3, %%d7\n" /* t2 */
-    
+
   /* MAD_F_MLA(hi, lo, X[0],   MAD_F(0x04cfb0e2)); */
   /* MAD_F_MLA(hi, lo, X[2],   MAD_F(0x0ffc19fd)); */
   /* MAD_F_MLA(hi, lo, X[3],  -MAD_F(0x0d7e8807)); */
@@ -2010,14 +2010,14 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "move.l %%d6, ( 5*4, %[x])\n"
     "neg.l %%d6\n"
     "move.l %%d6, (12*4, %[x])\n"
-    
+
     "movclr.l %%acc1, %%d6\n"
     "asl.l #3, %%d6\n"
     "add.l %%d7, %%d6\n"
     "move.l %%d6, (      %[x])\n"
     "neg.l %%d6\n"
     "move.l %%d6, (17*4, %[x])\n"
-    
+
     "movclr.l %%acc2, %%d6\n"
     "asl.l #3, %%d6\n"
     "add.l %%d7, %%d6\n"
@@ -2120,19 +2120,19 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "move.l %%d6, (8*4, %[x])\n"
     "neg.l %%d6\n"
     "move.l %%d6, (9*4, %[x])\n"
-    
+
     "movclr.l %%acc1, %%d6\n"
     "asl.l #3, %%d6\n"
     "add.l %%d5, %%d6\n"
     "move.l %%d6, (21*4, %[x])\n"
     "move.l %%d6, (32*4, %[x])\n"
-    
+
     "movclr.l %%acc2, %%d6\n"
     "asl.l #3, %%d6\n"
     "sub.l %%d5, %%d6\n"
     "move.l %%d6, (20*4, %[x])\n"
     "move.l %%d6, (33*4, %[x])\n"
-    
+
   /* MAD_F_ML0(hi, lo, t12, -MAD_F(0x0ec835e8)); */
   /* MAD_F_MLA(hi, lo, t13,  MAD_F(0x061f78aa)); */
   /* x[22] = x[31] = MAD_F_MLZ(hi, lo) + t0; */
@@ -2145,7 +2145,7 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "add.l (0*4, %[t]), %%d6\n"
     "move.l %%d6, (22*4, %[x])\n"
     "move.l %%d6, (31*4, %[x])\n"
-    
+
   /* MAD_F_ML0(hi, lo, t12, MAD_F(0x061f78aa)); */
   /* MAD_F_MLA(hi, lo, t13, MAD_F(0x0ec835e8)); */
   /* x[13] = -(x[4] = MAD_F_MLZ(hi, lo) + t4); */
@@ -2263,21 +2263,21 @@ void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
     "move.l %%d7, (2*4, %[x])\n"
     "neg.l %%d7\n"
     "move.l %%d7, (15*4, %[x])\n"
-    
+
     "movclr.l %%acc1, %%d7\n"
     "asl.l #3, %%d7\n"
     "add.l %%d6, %%d7\n"
     "move.l %%d7, (3*4, %[x])\n"
     "neg.l %%d7\n"
     "move.l %%d7, (14*4, %[x])\n"
-    
+
     "movclr.l %%acc2, %%d7\n"
     "asl.l #3, %%d7\n"
     "add.l %%d6, %%d7\n"
     "move.l %%d7, (26*4, %[x])\n"
     "move.l %%d7, (27*4, %[x])\n"
 
-    : : [X] "a" (X), [x] "a" (x), [t] "a" (t) 
+    : : [X] "a" (X), [x] "a" (x), [t] "a" (t)
     : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7");
   /* pfew */
 }

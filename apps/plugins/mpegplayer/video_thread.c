@@ -338,7 +338,7 @@ static int sync_decoder(struct video_thread_data *td,
             {
                 DEBUGF("  STATE_PICTURE (%c): -\n", pic_coding_type_char(type));
             }
-            
+
             break;
             }
 
@@ -797,7 +797,7 @@ static void video_thread(void)
                 }
 
                 if (skip != 0)
-                    td.skip_level--; 
+                    td.skip_level--;
                 break;
 
             case PIC_FLAG_CODING_TYPE_B:
@@ -824,7 +824,7 @@ static void video_thread(void)
             td.group_est--;
 
             mpeg2_skip(td.mpeg2dec, skip);
-            break;  
+            break;
             }
 
         case STATE_SLICE:
@@ -921,7 +921,7 @@ static void video_thread(void)
                 TIME_BEFORE(*rb->current_tick, td.last_render + HZ/2))
             {
                 /* Frame skip was set previously but either there wasn't anything
-                   dropped yet or not dropped enough. So we quit at least rendering 
+                   dropped yet or not dropped enough. So we quit at least rendering
                    the actual frame to avoid further increase of a/v-drift. */
                 td.skip_level--;
                 goto picture_skip;
@@ -969,7 +969,7 @@ static void video_thread(void)
 
                 td.stream_time = TICKS_TO_TS(stream_get_time());
             }
-       
+
         picture_draw:
             /* Record last frame time */
             td.last_render = *rb->current_tick;
@@ -1056,4 +1056,3 @@ void video_thread_get_stats(struct video_output_stats *s)
     if (now > start)
         s->fps = muldiv_uint32(CLOCK_RATE*100, s->num_drawn, now - start);
 }
-

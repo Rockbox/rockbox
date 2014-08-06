@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,7 +44,7 @@ static int parity(int b)
 {
   int i;
   int par;
-  
+
   par = 0;
   for(i = 8; i; i--) par ^= (b & 1), b >>= 1;
   return par;
@@ -80,7 +80,7 @@ void PRNM(local_init)(void)
     int cr, c1, c2;
     int hr, h1, h2;
     int b5r;
-    
+
     cr  = i & 0x80;
     c1  = i & 0x40;
     b5r = i & 0x20;
@@ -104,7 +104,7 @@ void PRNM(local_init)(void)
       z80c_addf_tbl[i] |= B3F;
       z80c_subf_tbl[i] |= B3F;
     }
-  
+
     if((c1 && c2) || (!cr && (c1 || c2))) z80c_addf_tbl[i] |= CF;
     if((h1 && h2) || (!hr && (h1 || h2))) z80c_addf_tbl[i] |= HF;
 
@@ -113,13 +113,13 @@ void PRNM(local_init)(void)
 
     if((c2 && cr) || (!c1 && (c2 || cr))) z80c_subf_tbl[i] |= CF;
     if((h2 && hr) || (!h1 && (h2 || hr))) z80c_subf_tbl[i] |= HF;
-    
+
     if((!c2 && !cr && c1) || (c2 && cr && !c1)) z80c_subf_tbl[i] |= PVF;
 
-    
+
     z80c_subf_tbl[i] |= NF;
   }
-  
+
 
 #ifdef PROCP
   TAB(incf_tbl) = z80c_incf_tbl;
@@ -150,7 +150,7 @@ int PRNM(step)(int tc)
   if(DANM(haltstate)) {
     register int nn;
     nn = (DANM(tc) - 1) / 4 + 1;
-    
+
     DANM(tc) -= 4 * nn;
     RR += nn;
   }
@@ -160,7 +160,7 @@ int PRNM(step)(int tc)
 #ifdef DEBUG_Z80
     debug_z80();
 #endif
-    nextop = *PCP; 
+    nextop = *PCP;
     PC++;
 
 #ifdef PROCP
@@ -168,7 +168,7 @@ int PRNM(step)(int tc)
 #else
     (*z80c_op_tab[nextop])();
 #endif
-    RR++; 
+    RR++;
   } while(DANM(tc) > 0);
 
   RR = (RR & 0x7F) | DANM(rl7);

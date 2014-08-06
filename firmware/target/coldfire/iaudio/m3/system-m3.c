@@ -58,7 +58,7 @@ void set_cpu_frequency(long frequency)
 #else
 void cf_set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void cf_set_cpu_frequency(long frequency)
-#endif    
+#endif
 {
     switch(frequency)
     {

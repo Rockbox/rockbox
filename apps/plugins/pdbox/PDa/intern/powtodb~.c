@@ -31,13 +31,13 @@ static t_int *powtodb_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	float f = *in;
-	if (f <= 0) *out = 0;
-	else
-	{
-	    float g = 100 + 10./LOGTEN * log(f);
-	    *out = (g < 0 ? 0 : g);
-	}
+        float f = *in;
+        if (f <= 0) *out = 0;
+        else
+        {
+            float g = 100 + 10./LOGTEN * log(f);
+            *out = (g < 0 ? 0 : g);
+        }
     }
     return (w + 4);
 }
@@ -54,8 +54,7 @@ static void powtodb_tilde_dsp(t_powtodb_tilde *x, t_signal **sp)
 void powtodb_tilde_setup(void)
 {
     powtodb_tilde_class = class_new(gensym("powtodb~"), (t_newmethod)powtodb_tilde_new, 0,
-    	sizeof(t_powtodb_tilde), 0, 0);
+        sizeof(t_powtodb_tilde), 0, 0);
     CLASS_MAINSIGNALIN(powtodb_tilde_class, t_powtodb_tilde, x_f);
     class_addmethod(powtodb_tilde_class, (t_method)powtodb_tilde_dsp, gensym("dsp"), 0);
 }
-

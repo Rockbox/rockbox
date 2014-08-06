@@ -380,7 +380,7 @@ int mad_header_decode(struct mad_header *header, struct mad_stream *stream)
   mad_timer_set(&header->duration, 0,
                 32 * MAD_NSBSAMPLES(header), header->samplerate);
   */
-    
+
   /* calculate free bit rate */
   if (header->bitrate == 0) {
     if ((stream->freerate == 0 || !stream->sync ||
@@ -476,9 +476,9 @@ int mad_frame_decode(struct mad_frame *frame, struct mad_stream *stream)
 
     mad_bit_finish(&next_frame);
   }
-    
- 
-    
+
+
+
   return 0;
 
  fail:

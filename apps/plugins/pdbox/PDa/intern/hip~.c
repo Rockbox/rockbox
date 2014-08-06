@@ -54,12 +54,12 @@ static t_int *sighip_perform(t_int *w)
     t_sample coef = c->c_coef;
     for (i = 0; i < n; i++)
     {
-	t_sample new = *in++ + mult(coef,last);
-	*out++ = new - last;
-	last = new;
+        t_sample new = *in++ + mult(coef,last);
+        *out++ = new - last;
+        last = new;
     }
     if (PD_BADFLOAT(last))
-	last = 0; 
+        last = 0;
     c->c_x = last;
     return (w+5);
 }
@@ -69,8 +69,8 @@ static void sighip_dsp(t_sighip *x, t_signal **sp)
     x->x_sr = sp[0]->s_sr;
     sighip_ft1(x,  x->x_hz);
     dsp_add(sighip_perform, 4,
-	sp[0]->s_vec, sp[1]->s_vec, 
-	    x->x_ctl, sp[0]->s_n);
+        sp[0]->s_vec, sp[1]->s_vec,
+            x->x_ctl, sp[0]->s_n);
 
 }
 
@@ -85,12 +85,11 @@ static void sighip_clear(t_sighip *x, t_floatarg q)
 void hip_tilde_setup(void)
 {
     sighip_class = class_new(gensym("hip~"), (t_newmethod)sighip_new, 0,
-	sizeof(t_sighip), 0, A_DEFFLOAT, 0);
+        sizeof(t_sighip), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(sighip_class, t_sighip, x_f);
     class_addmethod(sighip_class, (t_method)sighip_dsp, gensym("dsp"), 0);
     class_addmethod(sighip_class, (t_method)sighip_ft1,
-    	gensym("ft1"), A_FLOAT, 0);
+        gensym("ft1"), A_FLOAT, 0);
     class_addmethod(sighip_class, (t_method)sighip_clear, gensym("clear"), 0);
     class_sethelpsymbol(sighip_class, gensym("lop~-help.pd"));
 }
-

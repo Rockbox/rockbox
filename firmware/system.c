@@ -202,4 +202,3 @@ bool detect_original_firmware(void)
 {
     return !(detect_flashed_ramimage() || detect_flashed_romimage());
 }
-

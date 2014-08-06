@@ -76,4 +76,3 @@ ucl_nrv2b_test_overlap_le32     ( const ucl_bytep src, ucl_uint src_off,
 /*
 vi:ts=4:et
 */
-

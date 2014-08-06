@@ -249,4 +249,3 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
          ,&speaker_enabled
 #endif
          );
-

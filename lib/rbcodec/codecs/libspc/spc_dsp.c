@@ -41,7 +41,7 @@
 #include "cpu/spc_dsp_coldfire.c"
 #endif
 
-/* Above may still use generic implementations. Also defines final 
+/* Above may still use generic implementations. Also defines final
    function names. */
 #include "spc_dsp_generic.c"
 
@@ -129,7 +129,7 @@ static int16_t gauss_table [512] IDATA_ATTR_SPC MEM_ALIGN_ATTR =
 void DSP_write( struct Spc_Dsp* this, int i, int data )
 {
     assert( (unsigned) i < REGISTER_COUNT );
-    
+
     this->r.reg [i] = data;
     int high = i >> 4;
     int low  = i & 0x0F;
@@ -363,7 +363,7 @@ brr_decode_cache( struct Spc_Dsp* this, struct src_dir const* sd,
         /* if next block has end flag set, this block ends early */
         /* (verified) */
         if ( (block_header & 3) != 3 && (start_addr[ram.ram] & 3) == 1 )
-        { 
+        {
             /* skip last 9 samples */
             DEBUGF( "block early end (wave #%u)\n", waveform );
             out -= 9;
@@ -582,7 +582,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
        update, and not at the time of the write.  Only need to do this
        once however, since the regs haven't changed over the whole
        period we need to catch up with. */
-    
+
     {
         int key_ons  = this->r.g.key_ons;
         int key_offs = this->r.g.key_offs;
@@ -590,7 +590,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         this->r.g.wave_ended &= ~key_ons;
         /* key_off bits prevent key_on from being acknowledged */
         this->r.g.key_ons = key_ons & key_offs;
-        
+
         /* process key events outside loop, since they won't re-occur */
         struct voice_t* voice = this->voice_state + 8;
         int vbit = 0x80;
@@ -610,7 +610,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         while ( (vbit >>= 1) != 0 );
     }
 
-    struct src_dir const* const sd = 
+    struct src_dir const* const sd =
         &ram.sd [this->r.g.wave_page * 0x100/sizeof(struct src_dir)];
 
 #if !SPC_NOINTERP
@@ -622,10 +622,10 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
     int const echo_delay = (this->r.g.echo_delay & 15) * 0x800;
 #endif
     /* (g.flags & 0x40) ? 30 : 14 */
-    int const global_muting = ((this->r.g.flags & 0x40) >> 2) + 14 - 8; 
+    int const global_muting = ((this->r.g.flags & 0x40) >> 2) + 14 - 8;
     int const global_vol_0  = this->r.g.volume_0;
     int const global_vol_1  = this->r.g.volume_1;
-    
+
     do /* one pair of output samples per iteration */
     {
         /* Noise */
@@ -640,7 +640,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 this->noise = (feedback & 0x8000) ^ (this->noise >> 1 & ~1);
             }
         }
-        
+
     #if !SPC_NOECHO
         int echo_0 = 0, echo_1 = 0;
     #endif /* !SPC_NOECHO */
@@ -655,13 +655,13 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         {
             /* pregen involves checking keyon, etc */
             ENTER_TIMER(dsp_pregen);
-            
+
             /* Key on events are delayed */
             int key_on_delay = voice->key_on_delay;
 
             if ( UNLIKELY ( --key_on_delay >= 0 ) ) /* <1% of the time */
                 key_on( this, voice, sd, raw_voice, key_on_delay, vbit );
-            
+
             if ( !(this->keys_down & vbit) ) /* Silent channel */
             {
             silent_chan:
@@ -670,7 +670,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                 prev_outx = 0;
                 continue;
             }
-            
+
             /* Envelope */
             {
                 int const ENV_RANGE = 0x800;
@@ -687,7 +687,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                         {
                             if ( (env_timer -= env_rates [adsr1 & 0x1F]) > 0 )
                                 goto write_env_timer;
-                            
+
                             int envx = voice->envx;
                             envx--; /* envx *= 255 / 256 */
                             envx -= envx >> 8;
@@ -709,11 +709,11 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                                 raw_voice->envx = envx >> 4;
                                 env_timer = ENV_RATE_INIT;
                             }
-                            
+
                             int sustain_level = adsr1 >> 5;
                             if ( envx <= (sustain_level + 1) * 0x100 )
                                 voice->env_mode = state_sustain;
-                            
+
                             goto write_env_timer;
                         }
                         else /* state_attack */
@@ -721,14 +721,14 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                             int t = adsr0 & 0x0F;
                             if ( (env_timer -= env_rates [t * 2 + 1]) > 0 )
                                 goto write_env_timer;
-                            
+
                             int envx = voice->envx;
-                            
+
                             int const step = ENV_RANGE / 64;
                             envx += step;
                             if ( t == 15 )
                                 envx += ENV_RANGE / 2 - step;
-                            
+
                             if ( envx >= ENV_RANGE )
                             {
                                 envx = ENV_RANGE - 1;
@@ -753,7 +753,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                         {
                             if ( (env_timer -= env_rates [t & 0x1F]) > 0 )
                                 goto write_env_timer;
-                            
+
                             int envx = voice->envx;
                             int mode = t >> 5;
                             if ( mode <= 5 ) /* decay */
@@ -778,7 +778,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
                                 if ( mode == 7 &&
                                      envx >= ENV_RANGE * 3 / 4 + step )
                                     envx += ENV_RANGE / 256 - step;
-                                
+
                                 if ( envx >= ENV_RANGE )
                                     envx = ENV_RANGE - 1;
                             }
@@ -814,14 +814,14 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             }
 
             EXIT_TIMER(dsp_pregen);
-            
+
             ENTER_TIMER(dsp_gen);
 
             switch ( brr_decode( this, sd, voice, raw_voice ) )
             {
             case 2:
                 /* bit was set, so this clears it */
-                this->keys_down ^= vbit; 
+                this->keys_down ^= vbit;
 
                 /* since voice->envx is 0,
                    samples and position don't matter */
@@ -844,13 +844,13 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 
         #if !SPC_NOINTERP
             /* Gaussian interpolation using most recent 4 samples */
-           
+
             /* Only left half of gaussian kernel is in table, so we must mirror
                for right half */
             int offset = ( position >> 4 ) & 0xFF;
             int16_t const* fwd = gauss_table       + offset * 2;
             int16_t const* rev = gauss_table + 510 - offset * 2;
-            
+
             /* Use faster gaussian interpolation when exact result isn't needed
                by pitch modulator of next channel */
             if ( LIKELY ( !(slow_gaussian & vbit) ) ) /* 99% of the time */
@@ -877,9 +877,9 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
 
             prev_outx = output;
             raw_voice->outx = output >> 8;
-        
+
             EXIT_TIMER(dsp_gen);
-            
+
             ENTER_TIMER(dsp_mix);
 
             chans_0 += amp_0;
@@ -895,7 +895,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
             EXIT_TIMER(dsp_mix);
         }
         /* end of voice loop */
-        
+
         /* Generate output */
         int amp_0, amp_1;
     #if !SPC_NOECHO
@@ -921,7 +921,7 @@ void DSP_run_( struct Spc_Dsp* this, long count, int32_t* out_buf )
         }
     #endif /* !SPC_NOECHO */
 
-        mix_output( this, global_muting, global_vol_0, global_vol_1, 
+        mix_output( this, global_muting, global_vol_0, global_vol_1,
                     chans_0, chans_1, fb_0, fb_1, &amp_0, &amp_1 );
 
         out_buf [             0] = amp_0;
@@ -939,19 +939,19 @@ void DSP_reset( struct Spc_Dsp* this )
     this->keys_down   = 0;
     this->noise_count = 0;
     this->noise       = 2;
-    
+
     this->r.g.flags   = 0xE0; /* reset, mute, echo off */
     this->r.g.key_ons = 0;
-    
+
     ci->memset( this->voice_state, 0, sizeof this->voice_state );
-    
+
     for ( int i = VOICE_COUNT; --i >= 0; )
     {
         struct voice_t* v = this->voice_state + i;
         v->env_mode = state_release;
         v->wave.start_addr = 0;
     }
-    
+
 #if SPC_BRRCACHE
     this->oldsize = 0;
     for ( int i = 0; i < 256; i++ )

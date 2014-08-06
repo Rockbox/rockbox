@@ -97,14 +97,14 @@ static void reset_shortcuts(void)
     }
     first_handle = 0;
     shortcut_count = 0;
-}   
+}
 
 static struct shortcut* get_shortcut(int index)
 {
     int handle_count, handle_index;
     int current_handle = first_handle;
     struct shortcut_handle *h = NULL;
-    
+
     if (first_handle == 0)
     {
         first_handle = core_alloc("shortcuts_head", sizeof(struct shortcut_handle));
@@ -190,7 +190,7 @@ static void shortcuts_ata_idle_callback(void)
     char buf[MAX_PATH];
     int current_idx = first_idx_to_writeback;
     int append = overwrite_shortcuts ? O_TRUNC : O_APPEND;
-    
+
     if (first_idx_to_writeback < 0)
         return;
     fd = open(SHORTCUTS_FILENAME, append|O_RDWR|O_CREAT, 0644);
@@ -528,7 +528,7 @@ int do_shortcut_menu(void *ignored)
                     {
                         char timer_buf[10];
                         set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
-                        splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER), 
+                        splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER),
                                 sleep_timer_formatter(timer_buf, sizeof(timer_buf),
                                                       sc->u.timedata.sleep_timeout, NULL));
                     }

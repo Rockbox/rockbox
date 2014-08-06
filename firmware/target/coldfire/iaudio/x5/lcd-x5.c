@@ -465,7 +465,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
         memcpy(c_ibuf, usrc, width >> 1);
         memcpy(c_ibuf + (width >> 1), vsrc, width >> 1);
         lcd_write_yuv420_lines(y_ibuf, c_ibuf, width >> 1);
-        
+
         y += 2;
         ysrc += 2 * stride;
         usrc += stride >> 1;
@@ -487,7 +487,7 @@ void lcd_update(void)
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_SOLID_VERT);
     /* Set start position and window */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS,
                   ((y_offset + LCD_HEIGHT-1) << 8) | y_offset);
     lcd_write_reg(R_VERT_RAM_ADDR_POS, (LCD_WIDTH-1) << 8);
     lcd_write_reg(R_RAM_ADDR_SET, y_offset);
@@ -523,7 +523,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_SOLID_VERT);
     /* Set start position and window */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS,
                   ((y_offset + LCD_HEIGHT-1) << 8) | y_offset);
     lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
     lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | (y + y_offset));

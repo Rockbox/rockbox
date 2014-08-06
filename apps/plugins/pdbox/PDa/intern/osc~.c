@@ -17,7 +17,7 @@ typedef struct _osc
     t_object x_obj;
     unsigned int x_phase;
     t_sample x_conv;
-    t_sample x_f;	    /* frequency if scalar */
+    t_sample x_f;           /* frequency if scalar */
 } t_osc;
 
 static void *osc_new(t_floatarg f)
@@ -44,20 +44,20 @@ static t_int *osc_perform(t_int *w)
     int off;
     int frac;
     while (n--) {
-	 phase+= mult(conv ,(*in++));
-	 phase &= (itofix(1) -1);
-	 off =  fixtoi((long long)phase<<ILOGCOSTABSIZE);
+         phase+= mult(conv ,(*in++));
+         phase &= (itofix(1) -1);
+         off =  fixtoi((long long)phase<<ILOGCOSTABSIZE);
 
 #ifdef NO_INTERPOLATION
-	 *out = *(tab+off);
+         *out = *(tab+off);
 #else
-//	 frac = phase & (itofix(1)-1);
-	 frac = phase & ((1<<ILOGCOSTABSIZE)-1);
+//       frac = phase & (itofix(1)-1);
+         frac = phase & ((1<<ILOGCOSTABSIZE)-1);
          frac <<= (fix1-ILOGCOSTABSIZE);
-	 *out = mult(*(tab + off),(itofix(1) - frac)) + 
-	      mult(*(tab + off + 1),frac);	 
+         *out = mult(*(tab + off),(itofix(1) - frac)) +
+              mult(*(tab + off + 1),frac);
 #endif
-	 out++;
+         out++;
     }
     x->x_phase = phase;
 
@@ -66,7 +66,7 @@ static t_int *osc_perform(t_int *w)
 
 static void osc_dsp(t_osc *x, t_signal **sp)
 {
-	post("samplerate %f",sp[0]->s_sr);
+        post("samplerate %f",sp[0]->s_sr);
     x->x_conv = ftofix(1000.)/sp[0]->s_sr;
      post("conf %d",x->x_conv);
     x->x_conv = mult(x->x_conv + 500,ftofix(0.001));
@@ -80,11 +80,10 @@ static void osc_ft1(t_osc *x, t_float f)
 }
 
 void osc_tilde_setup(void)
-{    
+{
     osc_class = class_new(gensym("osc~"), (t_newmethod)osc_new, 0,
-    	sizeof(t_osc), 0, A_DEFFLOAT, 0);
+        sizeof(t_osc), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(osc_class, t_osc, x_f);
     class_addmethod(osc_class, (t_method)osc_dsp, gensym("dsp"), 0);
     class_addmethod(osc_class, (t_method)osc_ft1, gensym("ft1"), A_FLOAT, 0);
 }
-

@@ -48,7 +48,7 @@ bool tsc200x_read_coords(short* x, short* y)
 {
     int rc = 0;
     unsigned char x_val[2], y_val[2];
-    
+
     rc |= i2c_readmem(TSC_SLAVE_ADDR, TSC_REG_READ_Y, y_val, 2);
     rc |= i2c_readmem(TSC_SLAVE_ADDR, TSC_REG_READ_X, x_val, 2);
 

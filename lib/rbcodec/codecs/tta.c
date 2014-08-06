@@ -53,7 +53,7 @@ enum codec_status codec_run(void)
     int new_pos = 0;
     int sample_count;
     intptr_t param;
-  
+
     if (codec_init())
     {
         DEBUGF("codec_init() error\n");
@@ -124,7 +124,7 @@ enum codec_status codec_run(void)
         sample_count = get_samples(samples);
         if (sample_count < 0)
             break;
- 
+
         ci->pcmbuf_insert(samples, NULL, sample_count);
         decodedsamples += sample_count;
         if (decodedsamples >= info.DATALENGTH)

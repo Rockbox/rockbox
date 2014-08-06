@@ -31,12 +31,12 @@
 
 #include <usb.h>
 
-#define	bswap_16(value)  \
- 	((((value) & 0xff) << 8) | ((value) >> 8))
+#define bswap_16(value)  \
+        ((((value) & 0xff) << 8) | ((value) >> 8))
 
-#define	bswap_32(value)	\
- 	(((uint32_t)bswap_16((uint16_t)((value) & 0xffff)) << 16) | \
- 	(uint32_t)bswap_16((uint16_t)((value) >> 16)))
+#define bswap_32(value) \
+        (((uint32_t)bswap_16((uint16_t)((value) & 0xffff)) << 16) | \
+        (uint32_t)bswap_16((uint16_t)((value) >> 16)))
 
 #define host_to_le32(_x) bswap_32(htonl(_x))
 #define host_to_le16(_x) bswap_16(htons(_x))
@@ -438,4 +438,3 @@ int main(int argc, char **argv)
 
   return 0;
 }
-

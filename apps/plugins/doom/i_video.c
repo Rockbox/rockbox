@@ -142,7 +142,7 @@ void I_ShutdownGraphics(void)
 {
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_set_mode(LCD_MODE_RGB565);
+        rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
 #endif
 
@@ -633,7 +633,7 @@ static inline void getkey()
          D_PostEvent(&event);
          break;
    }
-#endif   
+#endif
    newbuttonstate = rb->button_status();
 #ifdef DOOMBUTTON_SCROLLWHEEL
    newbuttonstate |= read_scroll_wheel();
@@ -829,7 +829,7 @@ static void I_UploadNewPalette(int pal)
 
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_pal256_update_pal(paldata+256*pal);
+        rb->lcd_pal256_update_pal(paldata+256*pal);
 #endif
 #endif
 }
@@ -842,7 +842,7 @@ void I_FinishUpdate (void)
 {
     int count;
     byte *src = d_screens[0];
-    
+
 #if (CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
     count = SCREENWIDTH*SCREENHEIGHT;
 
@@ -948,7 +948,7 @@ void I_FinishUpdate (void)
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
     (void) count;
-	rb->lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+        rb->lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 #elif defined(HAVE_LCD_COLOR)
 #if(LCD_HEIGHT>LCD_WIDTH)
@@ -979,7 +979,7 @@ void I_FinishUpdate (void)
             *dst++ = palette[*src++];
         while (--count);
     }
-    rb->lcd_update(); 
+    rb->lcd_update();
 #else /* !HAVE_LCD_COLOR */
 
     unsigned char *dst;
@@ -996,8 +996,8 @@ void I_FinishUpdate (void)
 
         grey_ub_gray_bitmap(greybuffer, 0, y, SCREENWIDTH, 1);
     }
-#endif 
-#endif  
+#endif
+#endif
 }
 
 //
@@ -1024,10 +1024,10 @@ void I_InitGraphics(void)
    printf("Starting Graphics engine\n");
 
    noprintf=1;
-   
+
 #if defined(HAVE_LCD_MODES)
 #if (HAVE_LCD_MODES & LCD_MODE_PAL256)
-	rb->lcd_set_mode(LCD_MODE_PAL256);
+        rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
 #endif
 

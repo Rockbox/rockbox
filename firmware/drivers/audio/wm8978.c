@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2008 by Michael Sevakis
  *
- * Driver for WM8978 audio codec 
+ * Driver for WM8978 audio codec
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

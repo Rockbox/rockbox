@@ -104,7 +104,7 @@ void audiohw_preinit(void)
     udelay(100000);
 
     /* setup AK4537_SIGSEL1 */
-    akc_set(AK4537_SIGSEL1, ALCS | MOUT2);        
+    akc_set(AK4537_SIGSEL1, ALCS | MOUT2);
     udelay(100000);
 
     /* setup AK4537_SIGSEL2 */

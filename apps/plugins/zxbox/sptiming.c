@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos 2006 Anton Romanov
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,29 +27,29 @@
 long shouldbe_tick;
 
 void spti_init(void){
-	spti_reset();
+        spti_reset();
 }
 void spti_sleep(unsigned long usecs){
-/*	unsigned long now,need;
-	now = *rb->current_tick;
-	need = now + usecs;
-	rb -> sleep ( need - now );*/
+/*      unsigned long now,need;
+        now = *rb->current_tick;
+        need = now + usecs;
+        rb -> sleep ( need - now );*/
     rb->sleep ( usecs );
 }
 void spti_reset(void){
-	shouldbe_tick = *rb -> current_tick;
+        shouldbe_tick = *rb -> current_tick;
 }
 void spti_wait(void){
-	long rem;
-	long now;
-	
-	now = *rb -> current_tick;
-    shouldbe_tick+=SKIPTICKS;
-	rem = shouldbe_tick - now;
+        long rem;
+        long now;
 
-	if(rem > 0) {
-		if(rem > SKIPTICKS) rem = SKIPTICKS;
-			spti_sleep((unsigned long) rem);
-	}
+        now = *rb -> current_tick;
+    shouldbe_tick+=SKIPTICKS;
+        rem = shouldbe_tick - now;
+
+        if(rem > 0) {
+                if(rem > SKIPTICKS) rem = SKIPTICKS;
+                        spti_sleep((unsigned long) rem);
+        }
     if(rem == SKIPTICKS || rem < -10 * SKIPTIME) spti_reset();
 }

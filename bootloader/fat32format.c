@@ -12,8 +12,8 @@
  *
  * Fat32 formatter version 1.03
  * (c) Tom Thornhill 2005
- * This software is covered by the GPL. 
- * By using this tool, you agree to absolve Ridgecrop of an liabilities for 
+ * This software is covered by the GPL.
+ * By using this tool, you agree to absolve Ridgecrop of an liabilities for
  * lost data.
  * Please backup any data you value before using this tool.
  *
@@ -65,7 +65,7 @@ static uint16_t rb_htole16(uint16_t x)
 {
     uint16_t test = 0x1234;
     unsigned char* p = (unsigned char*)&test;
-    
+
     if (p[0]==0x12) {
         /* Big-endian */
         return swap16(x);
@@ -78,7 +78,7 @@ static uint32_t rb_htole32(uint32_t x)
 {
     uint32_t test = 0x12345678;
     unsigned char* p = (unsigned char*)&test;
-    
+
     if (p[0]==0x12) {
         /* Big-endian */
         return swap32(x);
@@ -101,9 +101,9 @@ static uint32_t ReservedSectCount = 32;
 static uint32_t NumFATs = 2;
 static uint32_t BackupBootSect = 6;
 static uint32_t VolumeId=0; /* calculated before format */
-    
+
 /* Calculated later */
-static uint32_t FatSize=0; 
+static uint32_t FatSize=0;
 static uint32_t BytesPerSect=0;
 static uint32_t SectorsPerCluster=0;
 static uint32_t TotalSectors=0;
@@ -218,7 +218,7 @@ static uint32_t get_volume_id ( void )
 
     hi = s.wMinute + ( s.wHour << 8 );
     hi += s.wYear;
-   
+
     d = lo + (hi << 16);
     return(d);
 #endif
@@ -227,7 +227,7 @@ static uint32_t get_volume_id ( void )
 
 /*
 This is the Microsoft calculation from FATGEN
-    
+
     uint32_t RootDirSectors = 0;
     uint32_t TmpVal1, TmpVal2, FATSz;
 
@@ -241,14 +241,14 @@ This is the Microsoft calculation from FATGEN
 
 
 static uint32_t get_fat_size_sectors(uint32_t DskSize, uint32_t ReservedSecCnt,
-                                     uint32_t SecPerClus, uint32_t NumFATs, 
+                                     uint32_t SecPerClus, uint32_t NumFATs,
                                      uint32_t BytesPerSect)
 {
     uint32_t Numerator, Denominator;
     uint32_t FatElementSize = 4;
     uint32_t FatSz;
 
-    /* This is based on 
+    /* This is based on
        http://hjem.get2net.dk/rune_moeller_barnkob/filesystems/fat.html
        I've made the obvious changes for FAT32
      */
@@ -269,7 +269,7 @@ static uint8_t get_spc(uint32_t ClusterSizeKB, uint32_t BytesPerSect)
     return( (uint8_t) spc );
 }
 
-static uint8_t get_sectors_per_cluster(uint32_t DiskSizeSectors, 
+static uint8_t get_sectors_per_cluster(uint32_t DiskSizeSectors,
                                        uint32_t BytesPerSect)
 {
     uint8_t ret = 0x01; /* 1 sector per cluster */
@@ -278,7 +278,7 @@ static uint8_t get_sectors_per_cluster(uint32_t DiskSizeSectors,
     /* 512 MB to 8,191 MB 4 KB */
     if ( DiskSizeMB > 512 )
         ret = get_spc( 4, BytesPerSect );   /* ret = 0x8; */
-        
+
     /* 8,192 MB to 16,383 MB 8 KB */
     if ( DiskSizeMB > 8192 )
         ret = get_spc( 8, BytesPerSect );   /* ret = 0x10; */
@@ -290,12 +290,12 @@ static uint8_t get_sectors_per_cluster(uint32_t DiskSizeSectors,
     /* Larger than 32,768 MB 32 KB */
     if ( DiskSizeMB > 32768 )
         ret = get_spc( 32, BytesPerSect );  /* ret = 0x40; */
-    
+
     return( ret );
 
 }
 
-static void create_boot_sector(unsigned char* buf) 
+static void create_boot_sector(unsigned char* buf)
 {
     struct FAT_BOOTSECTOR32* pFAT32BootSect = (struct FAT_BOOTSECTOR32*)buf;
 
@@ -346,7 +346,7 @@ static void create_fsinfo(unsigned char* buf)
     pFAT32FsInfo->dFree_Count = rb_htole32((UserAreaSize/SectorsPerCluster)-1);
 
     /* clusters 0-1 reserved, we used cluster 2 for the root dir */
-    pFAT32FsInfo->dNxt_Free = rb_htole32(3); 
+    pFAT32FsInfo->dNxt_Free = rb_htole32(3);
 }
 
 static void create_firstfatsector(unsigned char* buf)
@@ -412,7 +412,7 @@ int format_partition(int start, int size)
 
     TotalSectors = (uint32_t)  qTotalSectors;
 
-    FatSize = get_fat_size_sectors(TotalSectors, ReservedSectCount, 
+    FatSize = get_fat_size_sectors(TotalSectors, ReservedSectCount,
                                    SectorsPerCluster, NumFATs, BytesPerSect );
 
     UserAreaSize = TotalSectors - ReservedSectCount - (NumFATs*FatSize);
@@ -432,7 +432,7 @@ int format_partition(int start, int size)
 
     /* Sanity check, make sure the fat is big enough.
        Convert the cluster count into a Fat sector count, and check
-       the fat size value we calculated earlier is OK.  */ 
+       the fat size value we calculated earlier is OK.  */
 
     FatNeeded *=4;
     FatNeeded += (BytesPerSect-1);
@@ -446,7 +446,7 @@ int format_partition(int start, int size)
     /*
        Write boot sector, fats
        Sector 0 Boot Sector
-       Sector 1 FSInfo 
+       Sector 1 FSInfo
        Sector 2 More boot code - we write zeros here
        Sector 3 unused
        Sector 4 unused
@@ -460,7 +460,7 @@ int format_partition(int start, int size)
        FATn  ReservedSectCount to ReservedSectCount + FatSize
        RootDir - allocated to cluster2
      */
-    
+
 
     printf("[INFO] Formatting partition:...");
 
@@ -487,7 +487,7 @@ int format_partition(int start, int size)
 
     /* Create the first FAT sector */
     create_firstfatsector(sectorbuf);
-    
+
     /* Write the first fat sector in the right places */
     for ( i=0; i<NumFATs; i++ ) {
         int SectorStart = ReservedSectCount + (i * FatSize );

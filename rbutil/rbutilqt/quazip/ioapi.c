@@ -73,7 +73,7 @@ voidpf ZCALLBACK fopen_file_func (opaque, filename, mode)
     FILE* file = NULL;
     const char* mode_fopen = NULL;
     (void) opaque; /* avoid "unused parameter" warning */
-	if ((mode & ZLIB_FILEFUNC_MODE_READWRITEFILTER)==ZLIB_FILEFUNC_MODE_READ)
+        if ((mode & ZLIB_FILEFUNC_MODE_READWRITEFILTER)==ZLIB_FILEFUNC_MODE_READ)
         mode_fopen = "rb";
     else
     if (mode & ZLIB_FILEFUNC_MODE_EXISTING)

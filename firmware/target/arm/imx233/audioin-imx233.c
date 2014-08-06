@@ -87,7 +87,7 @@ static void apply_config(void)
     {
         /* take lowest microphone gain to get back into the -100..22 range
          * achievable with mux+adc.*/
-        
+
         /* from 52.5 dB and beyond: 40dB gain */
         if(vol_l > 52 * 2)
         {
@@ -115,7 +115,7 @@ static void apply_config(void)
     vol_r = MIN(vol_r, 44);
     /* we use the mux volume to reach the volume or higher with 1.5dB steps
      * and then we use the ADC to go below 0dB or to obtain 0.5dB accuracy */
-    
+
     int mux_vol_l = MAX(0, (vol_l + 2) / 3); /* 1.5dB = 3 * 0.5dB */
     int mux_vol_r = MAX(0, (vol_r + 2) / 3);
 #if IMX233_SUBTARGET >= 3700

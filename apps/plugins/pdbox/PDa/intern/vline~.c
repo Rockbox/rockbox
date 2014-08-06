@@ -48,42 +48,42 @@ static t_int *vline_tilde_perform(t_int *w)
     t_vseg *s = x->x_list;
     for (i = 0; i < n; i++)
     {
-    	t_time timenext = timenow + msecpersamp;
+        t_time timenext = timenow + msecpersamp;
     checknext:
-	if (s)
-	{
-	    /* has starttime elapsed?  If so update value and increment */
-	    if (s->s_starttime < timenext)
-	    {
-		if (x->x_targettime <= timenext)
-		    f = x->x_target, inc = 0;
-	    	    /* if zero-length segment bash output value */
-	    	if (s->s_targettime <= s->s_starttime)
-		{
-		    f = s->s_target;
-		    inc = 0;
-		}
-		else
-		{
-		    t_time incpermsec = idiv((s->s_target - f),
-		    	(s->s_targettime - s->s_starttime));
-		    f = mult(f + incpermsec,(timenext - s->s_starttime));
-		    inc = mult(incpermsec,msecpersamp);
-		}
-    	    	x->x_inc = inc;
-		x->x_target = s->s_target;
-		x->x_targettime = s->s_targettime;
-		x->x_list = s->s_next;
-		t_freebytes(s, sizeof(*s));
-		s = x->x_list;
-		goto checknext;
-	    }
-	}
-	if (x->x_targettime <= timenext)
-	    f = x->x_target, inc = 0;
-	*out++ = f;
-	f = f + inc;
-	timenow = timenext;
+        if (s)
+        {
+            /* has starttime elapsed?  If so update value and increment */
+            if (s->s_starttime < timenext)
+            {
+                if (x->x_targettime <= timenext)
+                    f = x->x_target, inc = 0;
+                    /* if zero-length segment bash output value */
+                if (s->s_targettime <= s->s_starttime)
+                {
+                    f = s->s_target;
+                    inc = 0;
+                }
+                else
+                {
+                    t_time incpermsec = idiv((s->s_target - f),
+                        (s->s_targettime - s->s_starttime));
+                    f = mult(f + incpermsec,(timenext - s->s_starttime));
+                    inc = mult(incpermsec,msecpersamp);
+                }
+                x->x_inc = inc;
+                x->x_target = s->s_target;
+                x->x_targettime = s->s_targettime;
+                x->x_list = s->s_next;
+                t_freebytes(s, sizeof(*s));
+                s = x->x_list;
+                goto checknext;
+            }
+        }
+        if (x->x_targettime <= timenext)
+            f = x->x_target, inc = 0;
+        *out++ = f;
+        f = f + inc;
+        timenow = timenext;
     }
     x->x_value = f;
     return (w+4);
@@ -93,7 +93,7 @@ static void vline_tilde_stop(t_vline *x)
 {
     t_vseg *s1, *s2;
     for (s1 = x->x_list; s1; s1 = s2)
-    	s2 = s1->s_next, t_freebytes(s1, sizeof(*s1));
+        s2 = s1->s_next, t_freebytes(s1, sizeof(*s1));
     x->x_list = 0;
     x->x_inc = 0;
     x->x_inlet1 = x->x_inlet2 = 0;
@@ -106,50 +106,50 @@ static void vline_tilde_float(t_vline *x, t_float f)
     t_sample inlet2 = (t_sample) x->x_inlet2;
     t_time starttime = timenow + inlet2;
     t_vseg *s1, *s2, *deletefrom = 0,
-    	*snew = (t_vseg *)t_getbytes(sizeof(*snew));
+        *snew = (t_vseg *)t_getbytes(sizeof(*snew));
     if (PD_BADFLOAT(f))
-	f = 0;
+        f = 0;
 
-    	/* negative delay input means stop and jump immediately to new value */
+        /* negative delay input means stop and jump immediately to new value */
     if (inlet2 < 0)
     {
-    	vline_tilde_stop(x);
-	x->x_value = ftofix(f);
-	return;
+        vline_tilde_stop(x);
+        x->x_value = ftofix(f);
+        return;
     }
-    	/* check if we supplant the first item in the list.  We supplant
-	an item by having an earlier starttime, or an equal starttime unless
-	the equal one was instantaneous and the new one isn't (in which case
-	we'll do a jump-and-slide starting at that time.) */
+        /* check if we supplant the first item in the list.  We supplant
+        an item by having an earlier starttime, or an equal starttime unless
+        the equal one was instantaneous and the new one isn't (in which case
+        we'll do a jump-and-slide starting at that time.) */
     if (!x->x_list || x->x_list->s_starttime > starttime ||
-    	(x->x_list->s_starttime == starttime &&
-	    (x->x_list->s_targettime > x->x_list->s_starttime || inlet1 <= 0)))
+        (x->x_list->s_starttime == starttime &&
+            (x->x_list->s_targettime > x->x_list->s_starttime || inlet1 <= 0)))
     {
-    	deletefrom = x->x_list;
-	x->x_list = snew;
+        deletefrom = x->x_list;
+        x->x_list = snew;
     }
     else
     {
-    	for (s1 = x->x_list; (s2 = s1->s_next); s1 = s2)
-	{
-    	    if (s2->s_starttime > starttime ||
-    		(s2->s_starttime == starttime &&
-		    (s2->s_targettime > s2->s_starttime || inlet1 <= 0)))
-	    {
-    		deletefrom = s2;
-		s1->s_next = snew;
-		goto didit;
-	    }
-	}
-	s1->s_next = snew;
-	deletefrom = 0;
+        for (s1 = x->x_list; (s2 = s1->s_next); s1 = s2)
+        {
+            if (s2->s_starttime > starttime ||
+                (s2->s_starttime == starttime &&
+                    (s2->s_targettime > s2->s_starttime || inlet1 <= 0)))
+            {
+                deletefrom = s2;
+                s1->s_next = snew;
+                goto didit;
+            }
+        }
+        s1->s_next = snew;
+        deletefrom = 0;
     didit: ;
     }
     while (deletefrom)
     {
-    	s1 = deletefrom->s_next;
-	t_freebytes(deletefrom, sizeof(*deletefrom));
-	deletefrom = s1;
+        s1 = deletefrom->s_next;
+        t_freebytes(deletefrom, sizeof(*deletefrom));
+        deletefrom = s1;
     }
     snew->s_next = 0;
     snew->s_target = f;
@@ -181,12 +181,11 @@ static void *vline_tilde_new(void)
 
 void vline_tilde_setup(void)
 {
-    vline_tilde_class = class_new(gensym("vline~"), vline_tilde_new, 
-    	(t_method)vline_tilde_stop, sizeof(t_vline), 0, 0);
+    vline_tilde_class = class_new(gensym("vline~"), vline_tilde_new,
+        (t_method)vline_tilde_stop, sizeof(t_vline), 0, 0);
     class_addfloat(vline_tilde_class, (t_method)vline_tilde_float);
     class_addmethod(vline_tilde_class, (t_method)vline_tilde_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
     class_addmethod(vline_tilde_class, (t_method)vline_tilde_stop,
-    	gensym("stop"), 0);
+        gensym("stop"), 0);
 }
-

@@ -38,7 +38,7 @@
 #define MAX_PRINTF_BUF        1024
 
 /****************************************************************************
- * serial driver API 
+ * serial driver API
  ****************************************************************************/
 void serial_setup (void)
 {
@@ -132,13 +132,13 @@ bool uart_init_device (unsigned dev)
         default:
             return false;
     }
-    
+
     /* set a default configuration */
-    uart_config (dev, 115200, 8, UART_NO_PARITY, UART_1_STOP_BIT); 
+    uart_config (dev, 115200, 8, UART_NO_PARITY, UART_1_STOP_BIT);
     return true;
 }
 
-bool uart_config (unsigned dev, unsigned speed, unsigned num_bits, 
+bool uart_config (unsigned dev, unsigned speed, unsigned num_bits,
                   unsigned parity, unsigned stop_bits)
 {
     switch (dev)
@@ -161,7 +161,7 @@ bool uart_config (unsigned dev, unsigned speed, unsigned num_bits,
         UBRDIV2 = PCLK / (speed*16);
         break;
     }
-    
+
     return true;
 }
 
@@ -198,7 +198,7 @@ bool uart_send_byte (unsigned dev, char ch)
     /* wait for transmit buffer empty */
     while (!uart_tx_ready(dev))
         ;
-        
+
     switch (dev)
     {
     case 0:
@@ -211,7 +211,7 @@ bool uart_send_byte (unsigned dev, char ch)
         UTXH2 = ch;
         break;
     }
-    
+
     return true;
 }
 
@@ -260,7 +260,7 @@ char uart_read_byte (unsigned dev)
         return URXH2;
         break;
     }
-    
+
     return '\0';
 }
 

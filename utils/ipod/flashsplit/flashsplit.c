@@ -135,9 +135,9 @@ static void dump_app(char* name, unsigned char* p, unsigned char* flash)
     unknown3 = le2int(p+0x24);
 
     modelname = get_modelname(version);
-    sum = 0; 
+    sum = 0;
 
-    for (i = offset; i < offset+length ; i++) { 
+    for (i = offset; i < offset+length ; i++) {
         sum += flash[i];
     }
 
@@ -153,7 +153,7 @@ static void dump_app(char* name, unsigned char* p, unsigned char* flash)
     printf("unknown3: %08x\n",unknown3);
     printf("\n");
 
-    if (modelname == NULL) { 
+    if (modelname == NULL) {
         printf("Unknown version, not exporting to .ipod file\n");
         return;
     } else if (checksum != sum) {

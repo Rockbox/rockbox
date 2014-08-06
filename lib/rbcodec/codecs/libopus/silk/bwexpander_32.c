@@ -47,4 +47,3 @@ void silk_bwexpander_32(
     }
     ar[ d - 1 ] = silk_SMULWW( chirp_Q16, ar[ d - 1 ] );
 }
-

@@ -48,9 +48,9 @@
 #include "loader_strerror.h"
 #include "version.h"
 
-/* Safety measure - maximum allowed firmware image size. 
-   The largest known current (October 2009) firmware is about 6.2MB so 
-   we set this to 8MB. 
+/* Safety measure - maximum allowed firmware image size.
+   The largest known current (October 2009) firmware is about 6.2MB so
+   we set this to 8MB.
 */
 #define MAX_LOADSIZE (8*1024*1024)
 
@@ -122,10 +122,10 @@ static int readfw(char* filename, void* address, int* size)
     uint32_t startsector = 0;
     uint32_t buffer[0x200];
 
-    if (nand_read_sectors(0, 1, buffer) != 0) 
+    if (nand_read_sectors(0, 1, buffer) != 0)
         return -1;
 
-    if (*((uint16_t*)((uint32_t)buffer + 0x1FE)) != 0xAA55) 
+    if (*((uint16_t*)((uint32_t)buffer + 0x1FE)) != 0xAA55)
         return -2;
 
     for (i = 0x1C2; i < 0x200; i += 0x10) {
@@ -139,13 +139,13 @@ static int readfw(char* filename, void* address, int* size)
     if (startsector == 0)
         return -3;
 
-    if (nand_read_sectors(startsector, 1, buffer) != 0) 
+    if (nand_read_sectors(startsector, 1, buffer) != 0)
         return -4;
 
-    if (buffer[0x40] != 0x5B68695D) 
+    if (buffer[0x40] != 0x5B68695D)
         return -5;
 
-    if (nand_read_sectors(startsector + 1 + (buffer[0x41] >> 11), 1, buffer) != 0) 
+    if (nand_read_sectors(startsector + 1 + (buffer[0x41] >> 11), 1, buffer) != 0)
         return -6;
 
     for (i = 0; i < 0x1FE; i += 10) {
@@ -153,7 +153,7 @@ static int readfw(char* filename, void* address, int* size)
             uint32_t filesector = startsector + 1 + (buffer[i + 3] >> 11);
             *size = buffer[i + 4];
 
-            if (nand_read_sectors(filesector, ((*size + 0x7FF) >> 11), address) != 0) 
+            if (nand_read_sectors(filesector, ((*size + 0x7FF) >> 11), address) != 0)
                 return -7;
 
             /* Success! */
@@ -173,7 +173,7 @@ void main(void)
     int rc;
     bool button_was_held;
 
-    /* Check the button hold status as soon as possible - to 
+    /* Check the button hold status as soon as possible - to
        give the user maximum chance to turn it on in order to
        reset the settings in rockbox. */
     button_was_held = button_hold();
@@ -223,7 +223,7 @@ void main(void)
     }
 
     if (button_was_held || (btn==BUTTON_MENU)) {
-        /* If either the hold switch was on, or the Menu button was held, then 
+        /* If either the hold switch was on, or the Menu button was held, then
            try the Apple firmware */
         printf("Loading original firmware...");
 

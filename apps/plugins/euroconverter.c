@@ -25,7 +25,7 @@
 /* Euro converter for the player */
 /*
 Use:
-+ : Digit +1 
++ : Digit +1
 - : Digit -1
 PLAY : Next digit
 STOP : Prev digit
@@ -159,7 +159,7 @@ static char *currency_str[12] = {
 
 static int country;     /*Country selected*/
 static int cur_pos;     /*Cursor position*/
-static longlong_t inc;   
+static longlong_t inc;
 
 /* Persistent settings */
 static struct configdata config[] = {
@@ -233,7 +233,7 @@ static void round(longlong_t* i, longlong_t* f, int n)
 
 
 /* Display the imput and the result
-    pos: false : first line 
+    pos: false : first line
        : true  : second line
 */
 static void display(longlong_t euro, longlong_t home, bool pos)
@@ -289,7 +289,7 @@ static void display(longlong_t euro, longlong_t home, bool pos)
     }
     else
         rb->lcd_puts_scroll(1,1,str);
-        
+
     rb->lcd_update();
 }
 

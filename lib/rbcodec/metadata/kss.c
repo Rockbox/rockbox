@@ -24,7 +24,7 @@ static bool parse_kss_header(int fd, struct mp3entry* id3)
     if (buf[14] == 0x10) {
         id3->length = (get_short_le((void *)(buf + 26)) + 1) * 1000;
     }
-    
+
     if (id3->length <= 0)
         id3->length = 255 * 1000; /* 255 tracks */
 
@@ -44,7 +44,7 @@ bool get_kss_metadata(int fd, struct mp3entry* id3)
     /* we only render 16 bits, 44.1KHz, Stereo */
     id3->bitrate = 706;
     id3->frequency = 44100;
-  
+
     /* Make sure this is an SGC file */
     if (kss_type != FOURCC('K','S','C','C') && kss_type != FOURCC('K','S','S','X'))
         return false;

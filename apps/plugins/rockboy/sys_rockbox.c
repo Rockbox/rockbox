@@ -98,13 +98,13 @@ void ev_poll(void)
 
 #ifdef HAVE_WHEEL_POSITION
     /* Get the current wheel position - 0..95 or -1 for untouched */
-    wheel = rb->wheel_status(); 
+    wheel = rb->wheel_status();
 
     /* Convert to number from 0 to 7 - clockwise from top */
     if ( wheel > 0 ){
         wheel += 6;
         wheel /= 12;
-        if ( wheel > 7 ) wheel = 0; 
+        if ( wheel > 7 ) wheel = 0;
     }
 
     if ( wheel != oldwheel ) {
@@ -131,7 +131,7 @@ void ev_poll(void)
         ev.type = EV_PRESS;
         if ( pressed & (~BUTTON_SELECT) ) { ev.code=PAD_B; ev_postevent(&ev); }
         if ( pressed & BUTTON_SELECT ) { ev.code=PAD_A; ev_postevent(&ev); }
-    }    
+    }
 #else
     if(released) {
         ev.type = EV_RELEASE;
@@ -208,7 +208,7 @@ void ev_poll(void)
         if(pressed & options.B) { ev.code=PAD_B; ev_postevent(&ev); }
         if(pressed & options.START) {
             ev.code=PAD_START;
-            ev_postevent(&ev); 
+            ev_postevent(&ev);
         }
         if(pressed & options.SELECT) {
             ev.code=PAD_SELECT;
@@ -224,7 +224,7 @@ void ev_poll(void)
 #ifdef HAVE_WHEEL_POSITION
             rb->wheel_send_events(true);
 #endif
-            if (do_user_menu() == USER_MENU_QUIT) 
+            if (do_user_menu() == USER_MENU_QUIT)
 #endif
             {
                 die("");
@@ -237,7 +237,7 @@ void ev_poll(void)
 
 #ifndef HAVE_WHEEL_POSITION
     }
-#endif    
+#endif
 }
 
 /* New frameskip, makes more sense to me and performs as well */
@@ -284,8 +284,8 @@ void vid_init(void)
 #if !defined(HAVE_LCD_COLOR)
 /* Color targets are handled in lcd.c */
 fb_data *frameb;
-void vid_update(int scanline) 
-{ 
+void vid_update(int scanline)
+{
    register int cnt=0;
     int scanline_remapped;
 #if (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) /* Archos, Clip, m200v4 */

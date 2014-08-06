@@ -2778,7 +2778,7 @@ static void audio_reset_buffer(void)
 {
     size_t bufsize = audiobuflen;
 
-    /* alloc buffer if it's was never allocated or freed by audio_hard_stop() 
+    /* alloc buffer if it's was never allocated or freed by audio_hard_stop()
      * because voice cannot be played during audio playback make
      * talk.c give up all buffers and disable itself */
     if (!audiobuf_handle)

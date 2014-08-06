@@ -855,4 +855,3 @@ sgf_to_pos (char *buffer)
     }
     return POS (buffer[0] - 'a', buffer[1] - 'a');
 }
-

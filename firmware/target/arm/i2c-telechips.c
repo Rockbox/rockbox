@@ -46,11 +46,11 @@ void i2c_init(void)
 void i2c_start(void)
 {
     SDA_OUTPUT;
-    
+
     SCL_HI;
     SDA_HI;
     DELAY;
-    
+
     SDA_LO;
     DELAY;
     SCL_LO;
@@ -63,7 +63,7 @@ void i2c_stop(void)
 
     SDA_LO;
     DELAY;
-    
+
     SCL_HI;
     DELAY;
     SDA_HI;
@@ -75,14 +75,14 @@ void i2c_outb(unsigned char byte)
     int bit;
 
     SDA_OUTPUT;
-    
+
     for (bit = 0; bit < 8; bit++)
     {
         if ((byte<<bit) & 0x80)
           SDA_HI;
         else
           SDA_LO;
-          
+
         DELAY;
 
         SCL_HI;
@@ -96,21 +96,21 @@ unsigned char i2c_inb(int ack)
 {
     int i;
     unsigned char byte = 0;
-    
+
     SDA_INPUT;
-    
+
     /* clock in each bit, MSB first */
     for ( i=0x80; i; i>>=1 )
     {
         SCL_HI;
         DELAY;
-        
+
         if ( SDA ) byte |= i;
-        
+
         SCL_LO;
         DELAY;
     }
-    
+
     i2c_ack(ack);
     return byte;
 }
@@ -133,18 +133,18 @@ void i2c_ack(int bit)
 int i2c_getack(void)
 {
     bool ack_bit;
-    
+
     SDA_INPUT;
 
     SCL_HI;
     DELAY;
-    
+
     ack_bit = SDA;
     DELAY;
 
     SCL_LO;
     DELAY;
-    
+
     return ack_bit;
 }
 
@@ -153,15 +153,15 @@ int i2c_write(int device, const unsigned char* buf, int count )
 {
     int i = 0;
     mutex_lock(&i2c_mtx);
-    
+
     i2c_start();
     i2c_outb(device & 0xfe);
-    
+
     while (!i2c_getack() && i < count)
     {
         i2c_outb(buf[i++]);
     }
-    
+
     i2c_stop();
     mutex_unlock(&i2c_mtx);
     return 0;
@@ -173,18 +173,18 @@ int i2c_readmem(int device, int address, unsigned char* buf, int count )
 {
     int i = 0;
     mutex_lock(&i2c_mtx);
-    
+
     i2c_start();
     i2c_outb(device & 0xfe);
     if (i2c_getack()) goto exit;
-    
+
     i2c_outb(address);
     if (i2c_getack()) goto exit;
 
     i2c_start();
     i2c_outb(device | 1);
     if (i2c_getack()) goto exit;
-    
+
     while (i < count)
     {
         buf[i] = i2c_inb(i == (count-1));

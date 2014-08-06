@@ -1022,4 +1022,3 @@ void ogg_packet_clear(ogg_packet *op) {
   _ogg_free(op->packet);
   memset(op, 0, sizeof(*op));
 }
-

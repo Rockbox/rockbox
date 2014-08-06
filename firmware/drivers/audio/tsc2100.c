@@ -48,7 +48,7 @@ void audiohw_init(void)
     short val = tsc2100_readreg(TSAC4_PAGE, TSAC4_ADDRESS);
     /* disable DAC PGA soft-stepping */
     val |= TSAC4_DASTDP;
-    
+
     tsc2100_writereg(TSAC4_PAGE, TSAC4_ADDRESS, val);
 }
 
@@ -58,10 +58,10 @@ static void audiohw_mute(bool mute)
     /* left  mute bit == 1<<15
        right mute bit == 1<<7
      */
-    if (mute) 
+    if (mute)
     {
         vol |= (1<<15)|(1<<7);
-    } else 
+    } else
     {
         vol &= ~((1<<15)|(1<<7));
     }
@@ -92,10 +92,10 @@ void audiohw_set_frequency(int fsel)
 {
     int reg_val;
     reg_val = tsc2100_readreg(CONTROL_PAGE2, TSAC1_ADDRESS);
-    
+
     reg_val &= ~(0x07<<3);
-    
-    switch(fsel) 
+
+    switch(fsel)
     {
     case HW_FREQ_8:
         reg_val |= (0x06<<3);

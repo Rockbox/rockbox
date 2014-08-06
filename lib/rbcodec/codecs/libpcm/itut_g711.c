@@ -201,4 +201,3 @@ const struct pcm_codec *get_itut_g711_mulaw_codec(void)
 {
     return &mulaw_codec;
 }
-

@@ -183,4 +183,3 @@ ucl_nrv2e_decompress_le32       ( const ucl_bytep src, ucl_uint  src_len,
 /*
 vi:ts=4:et
 */
-

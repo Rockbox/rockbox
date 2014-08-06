@@ -135,7 +135,7 @@ void lcd_init_device(void)
     lcd_wait_write();
     LCD1_CONTROL = 0x01730084; /* fastest setting */
 #elif defined(IPOD_1G2G) || defined(IPOD_3G)
-    LCD1_CONTROL = (LCD1_CONTROL & 0x0002) | 0x0084; 
+    LCD1_CONTROL = (LCD1_CONTROL & 0x0002) | 0x0084;
                    /* fastest setting, keep backlight bit */
 #else
     LCD1_CONTROL = 0x0084; /* fastest setting */
@@ -212,14 +212,14 @@ void lcd_set_invert_display(bool yesno)
 void lcd_set_flip(bool yesno)
 {
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-    if (yesno) 
+    if (yesno)
     {    /* 168x112, inverse COM order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x020d);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8316);    /* 22..131 */
         addr_offset = (22 << 5) | (20 - 4);
         pix_offset = -2;
     }
-    else 
+    else
     {   /* 168x112,  inverse SEG order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x010d);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x6d00);    /* 0..109 */
@@ -227,13 +227,13 @@ void lcd_set_flip(bool yesno)
         pix_offset = 0;
     }
 #else
-    if (yesno) 
+    if (yesno)
     {   /* 168x128, inverse SEG & COM order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x030f);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8304);    /* 4..131 */
         addr_offset = (4 << 5) | (20 - 1);
-    } 
-    else 
+    }
+    else
     {   /* 168x128 */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x000f);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x7f00);    /* 0..127 */
@@ -320,7 +320,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         width = LCD_WIDTH - x;
     if (width <= 0)
         return;
-    
+
     ymax = y + height - 1;
     if (ymax >= LCD_HEIGHT)
         ymax = LCD_HEIGHT - 1;
@@ -333,7 +333,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     x >>= 3;
     width = xmax - x + 1;
 
-    for (; y <= ymax; y++) 
+    for (; y <= ymax; y++)
     {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y << 5) + addr_offset - x);
         lcd_prepare_cmd(R_RAM_DATA);

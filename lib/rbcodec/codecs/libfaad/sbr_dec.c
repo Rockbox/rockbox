@@ -1,19 +1,19 @@
 /*
 ** FAAD2 - Freeware Advanced Audio (AAC) Decoder including SBR decoding
 ** Copyright (C) 2003-2004 M. Bakker, Ahead Software AG, http://www.nero.com
-**  
+**
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
-** 
+**
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software 
+** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 **
 ** Any non-GPL usage of this software or parts of this software is strictly
@@ -73,13 +73,13 @@ static void sbr_save_matrix(sbr_info *sbr, uint8_t ch);
 
 
 sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac, uint8_t id_ele,
-                        uint32_t sample_rate, uint8_t downSampledSBR, 
+                        uint32_t sample_rate, uint8_t downSampledSBR,
                         uint8_t IsDRM)
 {
     (void)downSampledSBR;
 #ifndef DRM
     (void)IsDRM;
-#endif 
+#endif
 
     /* Allocate sbr_info. */
 #if defined(FAAD_STATIC_ALLOC)
@@ -94,13 +94,13 @@ sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac, uint8_t id_ele,
     }
 #endif
     memset(sbr, 0, sizeof(sbr_info));
-    
+
 #ifdef PS_DEC
     /* initialize PS variables */
     ps_init(&sbr->ps);
 #endif
-    
-    /* Allocate XLR temporary variable. Use static allocation if either 
+
+    /* Allocate XLR temporary variable. Use static allocation if either
      * FAAD_STATIC_ALLOC is set or XLR fits to IRAM. */
 #if defined(FAAD_STATIC_ALLOC) || defined(HAVE_FAAD_XLR_IN_IRAM)
     p_XLR  = &s_XLR;

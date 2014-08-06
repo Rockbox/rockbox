@@ -25,7 +25,7 @@
 
 CODEC_HEADER
 
-/* The maximum buffer size handled. This amount of bytes is buffered for each 
+/* The maximum buffer size handled. This amount of bytes is buffered for each
  * frame. */
 #define ALAC_BYTE_BUFFER_SIZE 32768
 
@@ -74,7 +74,7 @@ enum codec_status codec_run(void)
     /* Read resume info before calling qtmovie_read. */
     elapsedtime = ci->id3->elapsed;
     samplesdone = ci->id3->offset;
-  
+
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
@@ -84,7 +84,7 @@ enum codec_status codec_run(void)
 
     /* initialise the sound converter */
     alac_set_info(&alac, demux_res.codecdata);
-  
+
     /* Set i for first frame, seek to desired sample position for resuming. */
     i=0;
 

@@ -53,7 +53,7 @@ static int plugins_menu(void* param)
 
     browse_context_init(&browse, SHOW_PLUGINS, 0, str(items[item].id),
                          Icon_Plugin, items[item].path, NULL);
-                        
+
     ret = rockbox_browse(&browse);
     if (ret == GO_TO_PREVIOUS)
         return 0;
@@ -62,11 +62,11 @@ static int plugins_menu(void* param)
 
 #define ITEM_FLAG (MENU_FUNC_USEPARAM|MENU_FUNC_CHECK_RETVAL)
 
-MENUITEM_FUNCTION(games_item, ITEM_FLAG, ID2P(LANG_PLUGIN_GAMES), 
+MENUITEM_FUNCTION(games_item, ITEM_FLAG, ID2P(LANG_PLUGIN_GAMES),
                   plugins_menu, (void*)GAMES, NULL, Icon_Folder);
-MENUITEM_FUNCTION(apps_item,  ITEM_FLAG, ID2P(LANG_PLUGIN_APPS), 
+MENUITEM_FUNCTION(apps_item,  ITEM_FLAG, ID2P(LANG_PLUGIN_APPS),
                   plugins_menu, (void*)APPS,  NULL, Icon_Folder);
-MENUITEM_FUNCTION(demos_item, ITEM_FLAG, ID2P(LANG_PLUGIN_DEMOS), 
+MENUITEM_FUNCTION(demos_item, ITEM_FLAG, ID2P(LANG_PLUGIN_DEMOS),
                   plugins_menu, (void*)DEMOS, NULL, Icon_Folder);
 
 MAKE_MENU(plugin_menu, ID2P(LANG_PLUGINS), NULL,

@@ -152,7 +152,7 @@ int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_
         *sense_size = get_scsi_pt_sense_len(obj);
     if(flags & (DO_WRITE | DO_READ))
         *buf_size -= get_scsi_pt_resid(obj);
-    
+
     destruct_scsi_pt_obj(obj);
     return ret;
 }
@@ -180,10 +180,10 @@ int do_dnk_cmd(uint32_t cmd, uint8_t sub_cmd, uint16_t arg, void *buffer, int *b
     cdb[9] = (*buffer_size) & 0xff;
     cdb[4] = (arg >> 8) & 0xff;
     cdb[5] = arg & 0xff;
-    
+
     uint8_t sense[32];
     int sense_size = 32;
-    
+
     int ret = do_scsi(cdb, 12, DO_READ, sense, &sense_size, buffer, buffer_size);
     if(ret < 0)
         return ret;
@@ -450,7 +450,7 @@ int get_dnk_nvp(int argc, char **argv)
         cprintf(GREY, "Device didn't send the expected amount of data\n");
         return 2;
     }
-    
+
     if(prop.flags & DNK_STRING)
         cprintf_field("Node: ", "%s\n", buffer);
     else if(prop.flags & DNK_UINT32)
@@ -733,4 +733,3 @@ Lend:
 
     return ret;
 }
-

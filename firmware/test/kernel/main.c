@@ -64,13 +64,13 @@ int main(void)
     enable_irq();
 
     tick_add_task(testfunc);
-    
+
     debugf("sleeping 10s...\n");
     sleep(HZ*10);
     debugf("woke up\n");
-    
+
     queue_init(&main_q);
-    
+
     create_thread(t1, s1, 1024, 0);
     create_thread(t2, s2, 1024, 0);
 

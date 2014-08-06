@@ -117,7 +117,7 @@ int kbd_input(char* text, int buflen)
     editpos = utf8length(text);
 
     if (global_settings.talk_menu) /* voice UI? */
-        talk_spell(text, true); /* spell initial text */ 
+        talk_spell(text, true); /* spell initial text */
 
     while (!done)
     {
@@ -126,7 +126,7 @@ int kbd_input(char* text, int buflen)
 
         if (redraw)
         {
-            if (line_edit) 
+            if (line_edit)
             {
                 lcd_putc(0, 0, ' ');
                 lcd_putc(0, 1, KEYBOARD_ARROW);
@@ -136,7 +136,7 @@ int kbd_input(char* text, int buflen)
                 lcd_putc(0, 0, KEYBOARD_ARROW);
                 lcd_putc(0, 1, ' ');
             }
-            
+
             lcd_putc(1, 0, KEYBOARD_INSERT_LEFT);
             lcd_putc(2, 0, line[x]);
             lcd_putc(3, 0, KEYBOARD_INSERT_RIGHT);
@@ -188,7 +188,7 @@ int kbd_input(char* text, int buflen)
             case BUTTON_STOP:  /* abort */
                 ret = -1; done = true;
                 break;
-            
+
             case BUTTON_MENU:  /* page flip */
                 if (++page == KEYBOARD_PAGES)
                     page = 0;
@@ -304,9 +304,8 @@ int kbd_input(char* text, int buflen)
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
-    
+
     if (ret < 0)
         splash(HZ/2, ID2P(LANG_CANCEL));
     return ret;
 }
-

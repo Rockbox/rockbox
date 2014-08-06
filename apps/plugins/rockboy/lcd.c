@@ -895,7 +895,7 @@ void lcd_begin(void)
 #endif
 
 #ifdef HAVE_LCD_COLOR
-    
+
     if(options.rotate==1) {
         if(options.scaling == 0)
             vdest+=S2R;
@@ -996,7 +996,7 @@ void setvidmode(void)
             SCALEHS=1<<16;
     }
     swidth=((160*SCALEWL)>>16);
-    
+
     if(options.rotate==1) {
         sremain=-(((160*SCALEWL)>>16)*LCD_WIDTH+1);
     } else if(options.rotate==2) {

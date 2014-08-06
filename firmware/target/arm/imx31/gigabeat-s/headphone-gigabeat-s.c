@@ -162,7 +162,7 @@ void INIT_ATTR headphone_init(void)
 {
     /* A thread is required to monitor the remote ADC and jack state. */
     semaphore_init(&headphone_wakeup, 1, 1);
-    headphone_thread_id = create_thread(headphone_thread, 
+    headphone_thread_id = create_thread(headphone_thread,
                                         headphone_stack,
                                         sizeof(headphone_stack),
                                         0, headphone_thread_name

@@ -96,4 +96,3 @@ void lcd_enable_power(bool onoff)
 {
     ascodec_write(AS3514_DCDC15, onoff ? 1 : 0);
 }
-

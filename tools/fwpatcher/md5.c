@@ -123,7 +123,7 @@ void md5_process( md5_context *ctx, uint8 data[64] )
     P( B, C, D, A, 12, 20, 0x8D2A4C8A );
 
 #undef F
-    
+
 #define F(x,y,z) (x ^ y ^ z)
 
     P( A, B, C, D,  5,  4, 0xFFFA3942 );
@@ -243,4 +243,3 @@ void md5_finish( md5_context *ctx, uint8 digest[16] )
     PUT_UINT32( ctx->state[2], digest,  8 );
     PUT_UINT32( ctx->state[3], digest, 12 );
 }
-

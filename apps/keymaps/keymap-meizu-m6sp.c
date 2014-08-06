@@ -52,7 +52,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-#endif 
+#endif
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                BUTTON_NONE },
 
     { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_SELECT },

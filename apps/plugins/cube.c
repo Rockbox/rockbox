@@ -639,7 +639,7 @@ static void cube_draw(void)
     {
 #if LCD_DEPTH > 1 || defined(USEGSLIB)
       case SOLID:
-      
+
         old_foreground = mylcd_get_foreground();
         for (i = 0; i < 6; i++)
         {
@@ -885,7 +885,7 @@ enum plugin_status plugin_start(const void* parameter)
                 t_disp = DISP_TIME;
                 redraw = true;
                 break;
-                
+
             case CUBE_NEXT:
                 if (++curr > 2)
                     curr = 0;
@@ -950,5 +950,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-

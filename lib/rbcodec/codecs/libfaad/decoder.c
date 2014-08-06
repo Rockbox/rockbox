@@ -140,7 +140,7 @@ NeAACDecHandle NEAACDECAPI NeAACDecOpen(void)
 
     hDecoder->config.outputFormat  = FAAD_FMT_16BIT;
     hDecoder->config.defObjectType = MAIN;
-    hDecoder->config.defSampleRate = 44100; 
+    hDecoder->config.defSampleRate = 44100;
     hDecoder->config.downMatrix = 0;
     hDecoder->adts_header_present = 0;
     hDecoder->adif_header_present = 0;
@@ -528,8 +528,8 @@ int8_t NEAACDECAPI NeAACDecInitDRM(NeAACDecHandle *hDecoder, uint32_t samplerate
     if ((channels == DRMCH_MONO) || (channels == DRMCH_STEREO))
         (*hDecoder)->sbr_present_flag = 0;
     else
-        (*hDecoder)->sbr_present_flag = 1;    
-#endif        
+        (*hDecoder)->sbr_present_flag = 1;
+#endif
 
 
     return 0;

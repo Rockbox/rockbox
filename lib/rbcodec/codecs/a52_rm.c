@@ -120,7 +120,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                 bufptr = buf;
                 bufpos = buf + 7;
             }
-        }   
+        }
     }
 }
 
@@ -134,7 +134,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     }
     else if (reason == CODEC_UNLOAD) {
         if (state)
-            a52_free(state);        
+            a52_free(state);
     }
 
     return CODEC_OK;
@@ -166,7 +166,7 @@ enum codec_status codec_run(void)
 
     /* Intializations */
     state = a52_init(0);
-    ci->memset(&rmctx,0,sizeof(RMContext)); 
+    ci->memset(&rmctx,0,sizeof(RMContext));
     ci->memset(&pkt,0,sizeof(RMPacket));
     init_rm(&rmctx);
 

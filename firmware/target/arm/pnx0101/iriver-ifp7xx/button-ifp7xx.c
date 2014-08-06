@@ -58,7 +58,7 @@ int button_read_device(void)
         backlight_hold_changed(hold_button);
 
     if (!button_hold())
-    {          
+    {
         data = adc_read(ADC_BUTTONS);
         if (data < 0x35c)
         {

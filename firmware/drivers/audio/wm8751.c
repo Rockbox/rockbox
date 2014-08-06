@@ -105,7 +105,7 @@ static void wmcodec_clear_bits(unsigned int reg, unsigned int bits)
     wmcodec_set_reg(reg, wmcodec_regs[reg] & ~bits);
 }
 
-static void wmcodec_set_masked(unsigned int reg, unsigned int val, 
+static void wmcodec_set_masked(unsigned int reg, unsigned int val,
                           unsigned int mask )
 {
     wmcodec_set_reg(reg, (wmcodec_regs[reg] & ~mask) | val);
@@ -155,7 +155,7 @@ void audiohw_set_treble_cutoff(int val)
     if ( val == 8 )
         wmcodec_clear_bits(TREBCTRL, TREBCTRL_TC);
     else
-        wmcodec_set_bits(TREBCTRL, TREBCTRL_TC); 
+        wmcodec_set_bits(TREBCTRL, TREBCTRL_TC);
 }
 #endif
 
@@ -232,7 +232,7 @@ void audiohw_postinit(void)
      /* 4. Enable line and / or headphone output buffers as required. */
 #if defined(GIGABEAT_F)
     /* headphones + line-out */
-    wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | 
+    wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 |
                      PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
 #else
     /* headphones */
@@ -293,7 +293,7 @@ void audiohw_postinit(void)
 void audiohw_set_volume(int vol_l, int vol_r)
 {
     vol_l = vol_tenthdb2hw(vol_l);
-    vol_r = vol_tenthdb2hw(vol_r);   
+    vol_r = vol_tenthdb2hw(vol_r);
     wmcodec_set_masked(LOUT1, LOUT1_LOUT1VOL(vol_l),
                        LOUT1_LOUT1VOL_MASK);
     wmcodec_set_masked(ROUT1, ROUT1_RO1VU | ROUT1_ROUT1VOL(vol_r),
@@ -455,12 +455,12 @@ void audiohw_set_recsrc(int source, bool recording)
      * if recording == false we use analog bypass from input
      * turn off ADC, PGA to save power
      * turn on output buffer(s)
-     * 
+     *
      * if recording == true we route input signal to PGA
      * and monitoring picks up signal after PGA and ADC
      * turn on ADC, PGA, DAC, output buffer(s)
      */
-    
+
     switch(source)
     {
     case AUDIO_SRC_PLAYBACK:
@@ -488,7 +488,7 @@ void audiohw_set_recsrc(int source, bool recording)
         {
             audiohw_mute(true);
             /* Turn on PGA and ADC */
-            wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR | 
+            wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR |
                              PWRMGMT1_ADCL | PWRMGMT1_ADCR);
 
             /* Setup input source for PGA as INPUT1 */
@@ -527,7 +527,7 @@ void audiohw_set_recsrc(int source, bool recording)
             wmcodec_clear_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR |
                                PWRMGMT1_ADCL | PWRMGMT1_ADCR);
 
-            /* setup monitor mode by routing input signal to outmix 
+            /* setup monitor mode by routing input signal to outmix
              * at 0dB volume
              */
             wmcodec_set_masked(LEFTMIX1, LEFTMIX1_LI2LOVOL(0x20),
@@ -553,7 +553,7 @@ void audiohw_set_recsrc(int source, bool recording)
         wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR |
                          PWRMGMT1_ADCL | PWRMGMT1_ADCR);
 
-        /* Setup input source for PGA as INPUT2 
+        /* Setup input source for PGA as INPUT2
          * MICBOOST disabled
          */
         wmcodec_set_masked(ADCL, ADCL_LINSEL_LINPUT2, ADCL_LINSEL_MASK);
@@ -590,7 +590,7 @@ void audiohw_set_recsrc(int source, bool recording)
         wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR |
                          PWRMGMT1_ADCL | PWRMGMT1_ADCR);
 
-        /* Setup input source for PGA as INPUT3 
+        /* Setup input source for PGA as INPUT3
          * MICBOOST disabled
          */
         wmcodec_set_masked(ADCL, ADCL_LINSEL_LINPUT3, ADCL_LINSEL_MASK);

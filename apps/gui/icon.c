@@ -73,13 +73,13 @@ static struct iconset {
                              (*(inbuilt_iconset[screen])) : iconsets[Iconset_user][screen].bmp).width
 
 /* x,y in letters, not pixles */
-void screen_put_icon(struct screen * display, 
+void screen_put_icon(struct screen * display,
                        int x, int y, enum themable_icons icon)
 {
     screen_put_icon_with_offset(display, x, y, 0, 0, icon);
 }
 
-void screen_put_icon_with_offset(struct screen * display, 
+void screen_put_icon_with_offset(struct screen * display,
                        int x, int y, int off_x, int off_y,
                        enum themable_icons icon)
 {
@@ -106,7 +106,7 @@ void screen_put_iconxy(struct screen * display,
     const int height = ICON_HEIGHT(screen);
     const int is_rtl = lang_is_rtl();
     const struct bitmap *iconset;
-    
+
     if (icon == Icon_NOICON)
     {
         if (is_rtl)
@@ -118,7 +118,7 @@ void screen_put_iconxy(struct screen * display,
     {
         iconset = &iconsets[Iconset_viewers][screen].bmp;
         icon -= Icon_Last_Themeable;
-        if (!iconsets[Iconset_viewers][screen].loaded || 
+        if (!iconsets[Iconset_viewers][screen].loaded ||
            (global_status.viewer_icon_count * height > iconset->height) ||
            (icon * height + height > iconset->height))
         {
@@ -181,17 +181,17 @@ static void load_icons(const char* filename, enum Iconset iconset,
     int bmpformat = (FORMAT_ANY|FORMAT_DITHER|FORMAT_TRANSPARENT);
     struct iconset *ic = &iconsets[iconset][screen];
     int fd;
-    
+
     ic->loaded = false;
     if (filename[0] && filename[0] != '-')
     {
         char path[MAX_PATH];
-        
+
         snprintf(path, sizeof(path), ICON_DIR "/%s.bmp", filename);
         fd = open(path, O_RDONLY);
         if (fd < 0)
             return;
-        size_t buf_size = read_bmp_fd(fd, &ic->bmp, 0, 
+        size_t buf_size = read_bmp_fd(fd, &ic->bmp, 0,
                                         bmpformat|FORMAT_RETURN_SIZE, NULL);
         ic->handle = core_alloc_ex(filename, buf_size, &buflib_ops);
         if (ic->handle <= 0)
@@ -250,9 +250,9 @@ void icons_init(void)
         }
 
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-        load_icons(global_settings.remote_icon_file, 
+        load_icons(global_settings.remote_icon_file,
                 Iconset_user, SCREEN_REMOTE);
-        
+
         if (global_settings.remote_viewers_icon_file[0] &&
             global_settings.remote_viewers_icon_file[0] != '-')
         {

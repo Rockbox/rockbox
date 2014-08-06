@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2009 by Karl Kurbjun  
+ *   Copyright (C) 2009 by Karl Kurbjun
  *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
@@ -56,13 +56,13 @@ void display_header(struct olympus_header *header) {
 int main (int argc, char *argv[]) {
     uint32_t checksum;
     uint32_t stored_crc;
-    
+
     enum operations {
         decrypt,
         encrypt,
         patch
     } operation;
-    
+
     char *encrypt_file;
     char *decrypt_file;
 
@@ -72,7 +72,7 @@ int main (int argc, char *argv[]) {
         usage();
         return -1;
     }
-    
+
     if(!strcmp(argv[1], "-decrypt")) {
         if(argc < 3) {
             usage();
@@ -96,19 +96,19 @@ int main (int argc, char *argv[]) {
     } else {
         return -1;
     }
-    
+
     /* Initialize encryption/decryption routine */
     mr500_init();
-    
+
     if(operation == decrypt) {
         /* Read in the header of the encrypted file */
         if(mr500_read_header(encrypt_file, &header) < 0 ) {
             printf("ERROR: Unable to read header: %s\n", strerror(errno));
             return -1;
         }
-    
+
         /* Read CRC of encrypted file */
-        if(mr500_read_crc(encrypt_file, 
+        if(mr500_read_crc(encrypt_file,
                 header.header_length+header.image_length, &stored_crc) < 0 ) {
             printf("ERROR: Unable to read CRC: %s\n", strerror(errno));
             return -1;
@@ -116,61 +116,61 @@ int main (int argc, char *argv[]) {
 
         /* Display the header information */
         printf("File format:\n");
-        
+
         printf("*****Header*****\n");
         display_header(&header);
         printf("****************\n\n");
-    
+
         printf("*****Image******\n\n");
-    
+
         printf("*****Footer*****\n");
         printf("Checksum: \t0x%08X\n",      stored_crc);
         printf("****************\n\n");
-    
+
         printf("Writing Decrypted file...\n");
-    
+
         /*********************************************************************
         *  Save a decrypted file
         **********************************************************************/
-     
+
         /* Check to make sure this is a encrypted file (bogus flag not set) */
         if(header.flags & HEADER_DECRYPTED) {
             printf("ERROR: This appears to be a decrypted file! Quitting\n");
             return -1;
         }
-        
+
         /* Check to make sure MAGIC string matches expected*/
         if(strncmp((char *)header.magic_name, "OIMCFWUP", 8)) {
             printf("ERROR: Magic string does not match expected! Quitting\n");
             return -1;
         }
-     
+
         /* Set a bogus flag to let the tool know that this is a decrypted file*/
         header.flags |= HEADER_DECRYPTED;
-     
+
         /* Start by writing out the header */
         if(mr500_save_header(decrypt_file, &header) < 0 ) {
             printf("ERROR: Unable to save header: %s\n", strerror(errno));
             return -1;
         }
-    
+
         /* Read encrypted data and save decrypted data */
         if(mr500_save_data( encrypt_file, decrypt_file, header.header_length,
                     header.image_length, decrypt_array) < 0 ) {
             printf("ERROR: Unable to save decrypted data: %s\n", strerror(errno));
             return -1;
         }
-    
+
         printf("Calculating Checksum...\n");
         /* Calculate CRC of decrypted data */
-        if(mr500_calculate_crc( decrypt_file, header.header_length, 
+        if(mr500_calculate_crc( decrypt_file, header.header_length,
                     header.image_length, &checksum) < 0 ) {
             printf("ERROR: Unable to calculate CRC: %s\n", strerror(errno));
             return -1;
         }
-    
+
         printf("Calculated Checksum: \n\t\t0x%08X\n", checksum);
-    
+
         /* Double check to make sure that the two CRCs match */
         if(checksum!=stored_crc) {
             printf("\tERROR: \tCalculated checksum: \t0x%08X and\n", checksum);
@@ -179,124 +179,124 @@ int main (int argc, char *argv[]) {
         } else {
             printf("\tOK: Calculated checksum and stored checksum match.\n");
         }
-    
+
         printf("Saving Checksum...\n");
         /* Save the calculated CRC to the file */
         if(mr500_save_crc(decrypt_file, header.header_length+header.image_length,
                     &checksum) < 0 ) {
             printf("ERROR: Unable to save CRC: %s\n", strerror(errno));
             return -1;
-        } 
-    
+        }
+
     } else if(operation == patch) {
-    
+
         /**********************************************************************
          *  Patch decryped file with SVG exploit
          **********************************************************************/
         printf("Patching decrypted file.\n");
-        
+
         /* Read in the header of the encrypted file */
         if(mr500_read_header(decrypt_file, &header) < 0 ) {
             printf("ERROR: Unable to read header: %s\n", strerror(errno));
             return -1;
         }
-        
+
         /* Check to make sure this is a decrypted file (bogus flag not set) */
         if(!(header.flags & HEADER_DECRYPTED)) {
             printf("ERROR: This appears to be a encrypted file! Quitting\n");
             return -1;
         }
-        
+
         /* Check to make sure MAGIC string matches expected*/
         if(strncmp((char *)header.magic_name, "OIMCFWUP", 8)) {
             printf("ERROR: Magic string does not match expected! Quitting\n");
             return -1;
         }
-        
+
         printf("File Header:\n");
         display_header(&header);
-        
+
         if(mr500_patch_file (decrypt_file, hack, 2) < 0 ) {
             printf("ERROR: Unable to patch file: %s\n", strerror(errno));
             return -1;
         }
-        
+
         printf("\nCalculating new CRC\n");
-        
+
         /* Calculate the 'CRC' of the patched file */
-        if(mr500_calculate_crc( decrypt_file, header.header_length, 
+        if(mr500_calculate_crc( decrypt_file, header.header_length,
                             header.image_length, &checksum) < 0 ) {
             printf("ERROR: Unable to calculate CRC: %s\n", strerror(errno));
             return -1;
         }
-                            
+
         printf("Calculated CRC: \n\t\t0x%08X\n", checksum);
         /* Store the calculated 'CRC' (not encrypted) */
         if(mr500_save_crc(decrypt_file, header.header_length+header.image_length,
                     &checksum) < 0 ) {
             printf("ERROR: Unable to save CRC: %s\n", strerror(errno));
             return -1;
-        } 
-        
+        }
+
     } else if(operation == encrypt) {
-    
+
         /**********************************************************************
          *  Save an encrypted file
          **********************************************************************/
         printf("Saving Encrypted file\n");
-        
+
         /* Read in the header of the encrypted file */
         if(mr500_read_header(decrypt_file, &header) < 0 ) {
             printf("ERROR: Unable to read header: %s\n", strerror(errno));
             return -1;
         }
-        
+
         /* Check to make sure this is a decrypted file (bogus flag not set) */
         if(!(header.flags & HEADER_DECRYPTED)) {
             printf("ERROR: This appears to be a encrypted file! Quitting\n");
             return -1;
         }
-        
+
         /* Check to make sure MAGIC string matches expected*/
         if(strncmp((char *)header.magic_name, "OIMCFWUP", 7)) {
             printf("ERROR: Magic string does not match expected! Quitting\n");
             return -1;
         }
-        
+
         /* Remove the bogus flag */
         header.flags &= ~HEADER_DECRYPTED;
-        
+
         printf("File Header:\n");
         display_header(&header);
-    
+
         /* Header is not encrypted, save it */
         if(mr500_save_header(encrypt_file, &header) < 0 ) {
             printf("ERROR: Unable to save header: %s\n", strerror(errno));
             return -1;
         }
-        
+
         /* Read CRC of decrypted file */
-        if(mr500_read_crc(decrypt_file, 
+        if(mr500_read_crc(decrypt_file,
                 header.header_length+header.image_length, &stored_crc) < 0 ) {
             printf("ERROR: Unable to read CRC: %s\n", strerror(errno));
             return -1;
         }
-    
+
         /* Calculate the 'CRC' of the decrypted data */
-        if(mr500_calculate_crc( decrypt_file, header.header_length, 
+        if(mr500_calculate_crc( decrypt_file, header.header_length,
                             header.image_length, &checksum) < 0 ) {
             printf("ERROR: Unable to calculate CRC: %s\n", strerror(errno));
             return -1;
         }
-        
+
         if(stored_crc != checksum) {
             printf("\nERROR: Stored and calculated checksums do not match!\n"
                     "\tFile has been improperly modified. Quitting\n");
             return -1;
         }
-        
+
         printf("Encrypting data...\n");
-        
+
         /* Write the encrypted data to a file */
         if(mr500_save_data( decrypt_file, encrypt_file, header.header_length,
                     header.image_length, encrypt_array) < 0 ) {
@@ -305,18 +305,17 @@ int main (int argc, char *argv[]) {
         }
 
         printf("Saving CRC\n");
-    
+
         /* Store the calculated 'CRC' (not encrypted) */
         if(mr500_save_crc(encrypt_file, header.header_length+header.image_length,
                     &checksum) < 0 ) {
             printf("ERROR: Unable to save CRC: %s\n", strerror(errno));
             return -1;
-        } 
-                    
+        }
+
         printf("File sucesfully encrypted!\n");
     }
-    
+
     printf("Done\n");
     return 0;
 }
-

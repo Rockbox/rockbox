@@ -31,7 +31,7 @@ bool _backlight_init(void)
 {
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
-    
+
     return (GPIO1_OUT & 0x00020000) ? false : true;
 }
 

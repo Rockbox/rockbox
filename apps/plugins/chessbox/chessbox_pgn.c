@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Copyright (C) 2007 Mauricio Peccorini 
+* Copyright (C) 2007 Mauricio Peccorini
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -417,7 +417,7 @@ static void coords_to_pgn(struct pgn_ply_node* ply){
                     && ply->column_to + kn_offs[i][1] >= 0 && ply->column_to + kn_offs[i][1] <= 7
                     && board[locn[ply->row_to + kn_offs[i][0]][ply->column_to + kn_offs[i][1]]] == knight
                     && color[locn[ply->row_to + kn_offs[i][0]][ply->column_to + kn_offs[i][1]]] == ply->player
-                    && (ply->row_to + kn_offs[i][0] != ply->row_from 
+                    && (ply->row_to + kn_offs[i][0] != ply->row_from
                         || ply->column_to + kn_offs[i][1] != ply->column_from)){
                     if (ply->row_to + kn_offs[i][0] != ply->row_from){
                         unambiguous_position = '1' + ply->row_from;
@@ -878,5 +878,5 @@ void pgn_store_game(struct pgn_game_node* game){
     /* leave a blank line between the tag section and the game section */
     rb->fdprintf(fhandler,"\n\n");
 
-    rb->close(fhandler);    
+    rb->close(fhandler);
 }

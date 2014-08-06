@@ -34,7 +34,7 @@ static unsigned short adc_readings[NUM_ADC_CHANNELS];
 static unsigned short __adc_read(int channel);
 static void adc_tick(void);
 
-void adc_init(void) 
+void adc_init(void)
 {
     int i;
 
@@ -70,12 +70,12 @@ inline unsigned short adc_read(int channel)
     return adc_readings[channel];
 }
 
-/** 
+/**
   * Read the ADC by polling
   * @param channel The ADC channel to read
   * @return 10bit reading from ADC channel or ADC_READ_ERROR if timeout
   */
-static unsigned short __adc_read(int channel) 
+static unsigned short __adc_read(int channel)
 {
     int i;
 
@@ -86,16 +86,16 @@ static unsigned short __adc_read(int channel)
     ADCCON |= 0x1;
 
     /* Wait for a low Enable_start */
-    for (i = 20000;;) 
+    for (i = 20000;;)
     {
-        if(0 == (ADCCON & 0x1)) 
+        if(0 == (ADCCON & 0x1))
         {
             break;
         }
-        else 
+        else
         {
             i--;
-            if (0 == i) 
+            if (0 == i)
             {
                 /* Ran out of time */
                 return ADC_READ_ERROR;
@@ -104,16 +104,16 @@ static unsigned short __adc_read(int channel)
     }
 
     /* Wait for high End_of_Conversion */
-    for(i = 20000;;) 
+    for(i = 20000;;)
     {
-        if(ADCCON & (1<<15)) 
+        if(ADCCON & (1<<15))
         {
             break;
         }
-        else 
+        else
         {
             i--;
-            if(0 == i) 
+            if(0 == i)
             {
                 /* Ran out of time */
                 return ADC_READ_ERROR;
@@ -129,7 +129,7 @@ static void adc_tick(void)
     static unsigned channel=0;
 
     /* Check if the End Of Conversion is set */
-    if (ADCCON & (1<<15)) 
+    if (ADCCON & (1<<15))
     {
         adc_readings[channel] = (ADCDAT0 & 0x3FF);
         if (++channel >= NUM_ADC_CHANNELS)
@@ -144,4 +144,3 @@ static void adc_tick(void)
         ADCCON = (ADCCON & ~(0x7<<3)) | (channel<<3) | 0x01;
     }
 }
-

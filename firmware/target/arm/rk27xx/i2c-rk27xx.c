@@ -25,7 +25,7 @@
 #include "i2c-rk27xx.h"
 
 /*  Driver for the rockchip rk27xx built-in I2C controller in master mode
-    
+
     Both the i2c_read and i2c_write function take the following arguments:
     * slave, the address of the i2c slave device to read from / write to
     * address, optional sub-address in the i2c slave (unused if -1)

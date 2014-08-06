@@ -37,7 +37,7 @@ typedef size_t lua_UInteger;
 
 /* Define TOBIT to get a bit value */
 #ifdef BUILTIN_CAST
-#define 
+#define
 #define TOBIT(L, n, res)                    \
   ((void)(res), luaL_checkinteger((L), (n)))
 #else
@@ -64,7 +64,7 @@ typedef size_t lua_UInteger;
    ARITHMETIC_SHIFT does not truncate its left-hand operand, so that
    the sign bits are not removed and right shift work properly.
    */
-  
+
 #define MONADIC(name, op)                                       \
   static int bit_ ## name(lua_State *L) {                       \
     lua_Number f;                                               \

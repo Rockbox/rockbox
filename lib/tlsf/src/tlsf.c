@@ -1,4 +1,4 @@
-/* 
+/*
  * Two Levels Segregate Fit memory allocator (TLSF)
  * Version 2.4.4
  *
@@ -23,27 +23,27 @@
  *
  * - Add 64 bit support. It now runs on x86_64 and solaris64.
  * - I also tested this on vxworks/32and solaris/32 and i386/32 processors.
- * - Remove assembly code. I could not measure any performance difference 
+ * - Remove assembly code. I could not measure any performance difference
  *   on my core2 processor. This also makes the code more portable.
  * - Moved defines/typedefs from tlsf.h to tlsf.c
- * - Changed MIN_BLOCK_SIZE to sizeof (free_ptr_t) and BHDR_OVERHEAD to 
- *   (sizeof (bhdr_t) - MIN_BLOCK_SIZE). This does not change the fact 
- *    that the minumum size is still sizeof 
+ * - Changed MIN_BLOCK_SIZE to sizeof (free_ptr_t) and BHDR_OVERHEAD to
+ *   (sizeof (bhdr_t) - MIN_BLOCK_SIZE). This does not change the fact
+ *    that the minumum size is still sizeof
  *   (bhdr_t).
  * - Changed all C++ comment style to C style. (// -> /.* ... *./)
- * - Used ls_bit instead of ffs and ms_bit instead of fls. I did this to 
- *   avoid confusion with the standard ffs function which returns 
+ * - Used ls_bit instead of ffs and ms_bit instead of fls. I did this to
+ *   avoid confusion with the standard ffs function which returns
  *   different values.
- * - Created set_bit/clear_bit fuctions because they are not present 
+ * - Created set_bit/clear_bit fuctions because they are not present
  *   on x86_64.
  * - Added locking support + extra file target.h to show how to use it.
  * - Added get_used_size function (REMOVED in 2.4)
  * - Added rtl_realloc and rtl_calloc function
  * - Implemented realloc clever support.
  * - Added some test code in the example directory.
- *        
  *
- * (Oct 23 2006) Adam Scislowicz: 
+ *
+ * (Oct 23 2006) Adam Scislowicz:
  *
  * - Support for ARMv5 implemented
  *
@@ -76,7 +76,7 @@
 #include "target.h"
 #else
 #define TLSF_CREATE_LOCK(_unused_)   do{}while(0)
-#define TLSF_DESTROY_LOCK(_unused_)  do{}while(0) 
+#define TLSF_DESTROY_LOCK(_unused_)  do{}while(0)
 #define TLSF_ACQUIRE_LOCK(_unused_)  do{}while(0)
 #define TLSF_RELEASE_LOCK(_unused_)  do{}while(0)
 #endif
@@ -404,7 +404,7 @@ void * __attribute__((weak)) get_new_area(size_t * size)
 #endif
 
 #if USE_SBRK || USE_MMAP
-static __inline__ void *get_new_area(size_t * size) 
+static __inline__ void *get_new_area(size_t * size)
 {
     void *area;
 

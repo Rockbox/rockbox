@@ -122,4 +122,3 @@ void net_destroy(void)
     rb->queue_delete(&gui_to_core);
     rb->queue_delete(&core_to_gui);
 }
-

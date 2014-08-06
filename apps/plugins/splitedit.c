@@ -684,7 +684,7 @@ static int save(
         rb->find_next_frame(src_file, &offset, 8000, last_header);
         rb->lseek(src_file, 0, SEEK_SET);
         end += offset;
-        
+
         /* write the file 1 */
         if (file_name1 != NULL)
         {

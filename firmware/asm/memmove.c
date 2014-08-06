@@ -106,7 +106,7 @@ _DEFUN (memmove, (dst_void, src_void, length),
     }
   else
     {
-      /* Use optimizing algorithm for a non-destructive copy to closely 
+      /* Use optimizing algorithm for a non-destructive copy to closely
          match memcpy. If the size is small or either SRC or DST is unaligned,
          then punt into the byte copy loop.  This should be rare.  */
       if (!TOO_SMALL(len) && !UNALIGNED (src, dst))

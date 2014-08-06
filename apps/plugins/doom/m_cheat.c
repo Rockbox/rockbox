@@ -100,5 +100,3 @@ cht_GetParam
       *buffer = 0;
 
 }
-
-

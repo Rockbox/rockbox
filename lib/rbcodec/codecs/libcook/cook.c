@@ -64,7 +64,7 @@
 #ifndef COOKDEBUG
 #undef DEBUGF
 #define DEBUGF(...)
-#endif 
+#endif
 
 /**
  * Random bit stream generator.
@@ -119,7 +119,7 @@ static VLC_TYPE vlcbuf11[ 640][2] IBSS_ATTR_COOK_VLCBUF;
 static VLC_TYPE vlcbuf12[ 544][2] IBSS_ATTR_COOK_LARGE_IRAM;
 /* Used for sqvh[]. */
 static VLC_TYPE vlcbuf13[ 622][2] IBSS_ATTR_COOK_LARGE_IRAM;
-static VLC_TYPE vlcbuf14[ 308][2] IBSS_ATTR_COOK_LARGE_IRAM; 
+static VLC_TYPE vlcbuf14[ 308][2] IBSS_ATTR_COOK_LARGE_IRAM;
 static VLC_TYPE vlcbuf15[ 280][2] IBSS_ATTR_COOK_LARGE_IRAM;
 static VLC_TYPE vlcbuf16[1456][2] IBSS_ATTR_COOK_LARGE_IRAM;
 static VLC_TYPE vlcbuf17[ 694][2] IBSS_ATTR_COOK_LARGE_IRAM;
@@ -136,7 +136,7 @@ static int ccpl_size    = 88;
 
 static int init_cook_vlc_tables(COOKContext *q) {
     int i, result = 0;
-    
+
     /* Set pointers for codebooks. */
     q->envelope_quant_index[ 0].table = vlcbuf00;
     q->envelope_quant_index[ 1].table = vlcbuf01;
@@ -151,11 +151,11 @@ static int init_cook_vlc_tables(COOKContext *q) {
     q->envelope_quant_index[10].table = vlcbuf10;
     q->envelope_quant_index[11].table = vlcbuf11;
     q->envelope_quant_index[12].table = vlcbuf12;
-    q->sqvh[0].table = vlcbuf13; 
+    q->sqvh[0].table = vlcbuf13;
     q->sqvh[1].table = vlcbuf14;
-    q->sqvh[2].table = vlcbuf15; 
+    q->sqvh[2].table = vlcbuf15;
     q->sqvh[3].table = vlcbuf16;
-    q->sqvh[4].table = vlcbuf17; 
+    q->sqvh[4].table = vlcbuf17;
     q->sqvh[5].table = vlcbuf18;
     q->sqvh[6].table = vlcbuf19;
     q->ccpl.table = vlcbuf20;
@@ -796,7 +796,7 @@ int cook_decode_init(RMContext *rmctx, COOKContext *q)
     /* Take data from the RMContext (RM container). */
     q->sample_rate = rmctx->sample_rate;
     q->nb_channels = rmctx->nb_channels;
-    q->bit_rate = rmctx->bit_rate;  
+    q->bit_rate = rmctx->bit_rate;
 
     /* Initialize RNG. */
     q->random_state = 0;
@@ -904,4 +904,3 @@ int cook_decode_init(RMContext *rmctx, COOKContext *q)
 #endif
     return 0;
 }
-

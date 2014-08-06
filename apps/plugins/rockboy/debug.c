@@ -636,7 +636,7 @@ void debug_disassemble(addr a, int c)
             break;
         }
         rb->lcd_putsxyf(0,0,"%04X %s %-16.16s", opaddr, ops_str, mnemonic);
-        rb->lcd_update();        
+        rb->lcd_update();
         c--;
     }
 }

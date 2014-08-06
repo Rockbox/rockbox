@@ -1085,19 +1085,19 @@ static int parse_progressbar_tag(struct skin_element* element,
         else if (!strcmp(text, "notouch"))
             suppress_touchregion = true;
 #endif
-		else if (token->type == SKIN_TOKEN_SETTING && !strcmp(text, "setting"))
-		{
+                else if (token->type == SKIN_TOKEN_SETTING && !strcmp(text, "setting"))
+                {
             if (curr_param+1 < element->params_count)
             {
                 curr_param++;
                 param++;
                 text = SKINOFFSETTOPTR(skin_buffer, param->data.text);
 #ifndef __PCTOOL__
-				if (find_setting_by_cfgname(text, &pb->setting_id) == NULL)
-					return WPS_ERROR_INVALID_PARAM;
+                                if (find_setting_by_cfgname(text, &pb->setting_id) == NULL)
+                                        return WPS_ERROR_INVALID_PARAM;
 #endif
-			}
-		}
+                        }
+                }
         else if (curr_param == 4)
             image_filename = text;
 
@@ -1150,7 +1150,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     else if (token->type == SKIN_TOKEN_LIST_NEEDS_SCROLLBAR)
         token->type = SKIN_TOKEN_LIST_SCROLLBAR;
     else if (token->type == SKIN_TOKEN_SETTING)
-		token->type = SKIN_TOKEN_SETTINGBAR;
+                token->type = SKIN_TOKEN_SETTINGBAR;
     pb->type = token->type;
 
 #ifdef HAVE_TOUCHSCREEN

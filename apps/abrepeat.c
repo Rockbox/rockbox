@@ -143,7 +143,7 @@ by this fudge factor when setting a mark */
 void ab_set_A_marker(unsigned int song_position)
 {
     ab_A_marker = song_position;
-    ab_A_marker = (ab_A_marker >= EAR_TO_HAND_LATENCY_FUDGE) 
+    ab_A_marker = (ab_A_marker >= EAR_TO_HAND_LATENCY_FUDGE)
         ? (ab_A_marker - EAR_TO_HAND_LATENCY_FUDGE) : 0;
     /* check if markers are out of order */
     if ( (ab_B_marker != AB_MARKER_NONE) && (ab_A_marker > ab_B_marker) )
@@ -153,7 +153,7 @@ void ab_set_A_marker(unsigned int song_position)
 void ab_set_B_marker(unsigned int song_position)
 {
     ab_B_marker = song_position;
-    ab_B_marker = (ab_B_marker >= EAR_TO_HAND_LATENCY_FUDGE) 
+    ab_B_marker = (ab_B_marker >= EAR_TO_HAND_LATENCY_FUDGE)
         ? (ab_B_marker - EAR_TO_HAND_LATENCY_FUDGE) : 0;
     /* check if markers are out of order */
     if ( (ab_A_marker != AB_MARKER_NONE) && (ab_B_marker < ab_A_marker) )

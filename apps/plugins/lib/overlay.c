@@ -24,23 +24,23 @@
 #include "plugin.h"
 #include "overlay.h"
 
-/* load and run a plugin linked as an overlay. 
+/* load and run a plugin linked as an overlay.
 
  arguments:
    parameter = plugin parameter, passed on to the overlay
    filename  = overlay file name, absolute path as usual
    name      = overlay display name
-   
+
  result:
    return value from the overlay
-   
+
    As long as a large plugin to be overlayed doesn't use the audiobuffer
    itself, no adjustments in the plugin source code are necessary to make
    it work as an overlay, it only needs an adapted linker script.
-   
-   If the overlayed plugin *does* use the audiobuffer itself, it needs 
+
+   If the overlayed plugin *does* use the audiobuffer itself, it needs
    to make sure not to overwrite itself.
-   
+
    The linker script for the overlay should use a base address towards the
    end of the audiobuffer, just low enough to make the overlay fit. */
 
@@ -83,7 +83,7 @@ enum plugin_status run_overlay(const void* parameter,
         goto error_close;
     }
 
-    
+
     if (hdr->api_version > PLUGIN_API_VERSION
         || hdr->api_version < PLUGIN_MIN_API_VERSION)
     {

@@ -51,12 +51,12 @@ static t_int *sigbiquad_perform(t_int *w)
     t_sample ff3 = c->c_ff3;
     for (i = 0; i < n; i++)
     {
-    	t_sample output =  *in++ + mult(fb1,last) + mult(fb2,prev);
-	if (PD_BADFLOAT(output))
-	    output = 0; 
-    	*out++ = mult(ff1,output) + mult(ff2,last) + mult(ff3,prev);
-	prev = last;
-	last = output;
+        t_sample output =  *in++ + mult(fb1,last) + mult(fb2,prev);
+        if (PD_BADFLOAT(output))
+            output = 0;
+        *out++ = mult(ff1,output) + mult(ff2,last) + mult(ff3,prev);
+        prev = last;
+        last = output;
     }
     c->c_x1 = last;
     c->c_x2 = prev;
@@ -79,20 +79,20 @@ static void sigbiquad_list(t_sigbiquad *x, t_symbol *s, int argc, t_atom *argv)
     t_biquadctl *c = x->x_ctl;
     if (discriminant < 0) /* imaginary roots -- resonant filter */
     {
-    	    /* they're conjugates so we just check that the product
-    	    is less than one */
-    	if (fb2 >= -1.0f) goto stable;
+            /* they're conjugates so we just check that the product
+            is less than one */
+        if (fb2 >= -1.0f) goto stable;
     }
     else    /* real roots */
     {
-    	    /* check that the parabola 1 - fb1 x - fb2 x^2 has a
-    	    	vertex between -1 and 1, and that it's nonnegative
-    	    	at both ends, which implies both roots are in [1-,1]. */
-    	if (fb1 <= 2.0f && fb1 >= -2.0f &&
-    	    1.0f - fb1 -fb2 >= 0 && 1.0f + fb1 - fb2 >= 0)
-    	    	goto stable;
+            /* check that the parabola 1 - fb1 x - fb2 x^2 has a
+                vertex between -1 and 1, and that it's nonnegative
+                at both ends, which implies both roots are in [1-,1]. */
+        if (fb1 <= 2.0f && fb1 >= -2.0f &&
+            1.0f - fb1 -fb2 >= 0 && 1.0f + fb1 - fb2 >= 0)
+                goto stable;
     }
-    	/* if unstable, just bash to zero */
+        /* if unstable, just bash to zero */
     fb1 = fb2 = ff1 = ff2 = ff3 = 0;
 stable:
     c->c_fb1 = ftofix(fb1);
@@ -115,21 +115,20 @@ static void sigbiquad_set(t_sigbiquad *x, t_symbol *s, int argc, t_atom *argv)
 static void sigbiquad_dsp(t_sigbiquad *x, t_signal **sp)
 {
     dsp_add(sigbiquad_perform, 4,
-	sp[0]->s_vec, sp[1]->s_vec, 
-	    x->x_ctl, sp[0]->s_n);
+        sp[0]->s_vec, sp[1]->s_vec,
+            x->x_ctl, sp[0]->s_n);
 
 }
 
 void biquad_tilde_setup(void)
 {
     sigbiquad_class = class_new(gensym("biquad~"), (t_newmethod)sigbiquad_new,
-    	0, sizeof(t_sigbiquad), 0, A_GIMME, 0);
+        0, sizeof(t_sigbiquad), 0, A_GIMME, 0);
     CLASS_MAINSIGNALIN(sigbiquad_class, t_sigbiquad, x_f);
     class_addmethod(sigbiquad_class, (t_method)sigbiquad_dsp, gensym("dsp"), 0);
     class_addlist(sigbiquad_class, sigbiquad_list);
     class_addmethod(sigbiquad_class, (t_method)sigbiquad_set, gensym("set"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(sigbiquad_class, (t_method)sigbiquad_set, gensym("clear"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
 }
-

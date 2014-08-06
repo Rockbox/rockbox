@@ -46,12 +46,12 @@ static void vslider_draw_update(t_vslider *x, t_glist *glist)
 #else /* ROCKBOX */
     if (glist_isvisible(glist))
     {
-	int r = text_ypix(&x->x_gui.x_obj, glist) + x->x_gui.x_h - (x->x_val + 50)/100;
+        int r = text_ypix(&x->x_gui.x_obj, glist) + x->x_gui.x_h - (x->x_val + 50)/100;
         int xpos=text_xpix(&x->x_gui.x_obj, glist);
 
-	sys_vgui(".x%x.c coords %xKNOB %d %d %d %d\n",
-		 glist_getcanvas(glist), x, xpos+1, r,
-		 xpos + x->x_gui.x_w, r);
+        sys_vgui(".x%x.c coords %xKNOB %d %d %d %d\n",
+                 glist_getcanvas(glist), x, xpos+1, r,
+                 xpos + x->x_gui.x_w, r);
     }
 #endif /* ROCKBOX */
 }
@@ -68,12 +68,12 @@ static void vslider_draw_new(t_vslider *x, t_glist *glist)
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE\n",
-	     canvas, xpos, ypos-2,
-	     xpos + x->x_gui.x_w, ypos + x->x_gui.x_h+3,
-	     x->x_gui.x_bcol, x);
+             canvas, xpos, ypos-2,
+             xpos + x->x_gui.x_w, ypos + x->x_gui.x_h+3,
+             x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create line %d %d %d %d -width 3 -fill #%6.6x -tags %xKNOB\n",
-	     canvas, xpos+1, r,
-	     xpos + x->x_gui.x_w, r, x->x_gui.x_fcol, x);
+             canvas, xpos+1, r,
+             xpos + x->x_gui.x_w, r, x->x_gui.x_fcol, x);
     sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
 	     canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
@@ -710,4 +710,3 @@ void g_vslider_setup(void)
     class_setsavefn(vslider_class, vslider_save);
     class_setpropertiesfn(vslider_class, vslider_properties);
 }
-

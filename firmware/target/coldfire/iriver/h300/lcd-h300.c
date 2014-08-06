@@ -75,7 +75,7 @@ volatile int dma_count IBSS_ATTR;
 #define R_GAMMA_GRAD_ADJ_NEG    0x37
 
 #define R_GAMMA_AMP_ADJ_RES_POS     0x38
-#define R_GAMMA_AMP_AVG_ADJ_RES_NEG 0x39 
+#define R_GAMMA_AMP_AVG_ADJ_RES_NEG 0x39
 
 #define R_GATE_SCAN_POS         0x40
 #define R_VERT_SCROLL_CONTROL   0x41
@@ -148,7 +148,7 @@ void lcd_set_flip(bool yesno)
 static void _display_on(void)
 {
     /** Sequence according to datasheet, p. 132 **/
-    
+
     lcd_write_reg(R_START_OSC, 0x0001); /* Start Oscilation */
     sleep(1);
 
@@ -160,24 +160,24 @@ static void _display_on(void)
     sleep(1);
 
     /* initialise power supply */
-    
+
     /* DC12-10 = 000b: Step-up1 = clock/8,
      * DC02-00 = 000b: Step-up2 = clock/16,
      * VC2-0   = 010b: VciOUT = 0.87 * VciLVL */
-    lcd_write_reg(R_POWER_CONTROL2, 0x0002); 
-    
+    lcd_write_reg(R_POWER_CONTROL2, 0x0002);
+
     /* VRH3-0 = 1000b: Vreg1OUT = REGP * 1.90 */
     lcd_write_reg(R_POWER_CONTROL3, 0x0008);
-    
+
     /* VDV4-0 = 00110b: VcomA = Vreg1OUT * 0.76,
      * VCM4-0 = 10000b: VcomH = Vreg1OUT * 0.70*/
-    lcd_write_reg(R_POWER_CONTROL4, 0x0610);     
+    lcd_write_reg(R_POWER_CONTROL4, 0x0610);
 
     lcd_write_reg(R_POWER_CONTROL1, 0x0044); /* AP2-0 = 100b, DK = 1 */
     lcd_write_reg(R_POWER_CONTROL3, 0x0018); /* PON = 1 */
 
     sleep(4); /* Step-up circuit stabilising time */
-    
+
     /* start power supply */
 
     lcd_write_reg(R_POWER_CONTROL1, 0x0540); /* BT2-0 = 101b, DK = 0 */
@@ -215,7 +215,7 @@ static void _display_on(void)
     lcd_write_reg(R_DISP_CONTROL2, 0x0808);
 
     /* Scan mode by the gate driver in the non-display area: disabled;
-     * Cycle of scan by the gate driver - set to 31frames(518ms), 
+     * Cycle of scan by the gate driver - set to 31frames(518ms),
      * disabled by above setting */
     lcd_write_reg(R_DISP_CONTROL3, 0x003f);
 
@@ -232,15 +232,15 @@ static void _display_on(void)
 
     display_on=true;  /* must be done before calling lcd_update() */
     lcd_update();
-    
+
     sleep(4); /* op-amp stabilising time */
- 
+
     /** Sequence according to datasheet, p. 130 **/
 
     lcd_write_reg(R_POWER_CONTROL1, 0x4540); /* SAP2-0=100, BT2-0=101, AP2-0=100 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0005);  /* GON=0, DTE=0, REV=1, D1-0=01 */
     sleep(2);
-    
+
     lcd_write_reg(R_DISP_CONTROL1, 0x0025);  /* GON=1, DTE=0, REV=1, D1-0=01 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0027);  /* GON=1, DTE=0, REV=1, D1-0=11 */
     sleep(2);
@@ -298,7 +298,7 @@ void lcd_enable(bool on)
             lcd_write_reg(R_POWER_CONTROL1, 0x0000); /* SAP2-0=000, AP2-0=000 */
             lcd_write_reg(R_POWER_CONTROL3, 0x0000); /* PON=0 */
             lcd_write_reg(R_POWER_CONTROL4, 0x0000); /* VCOMG=0 */
-            
+
             /* datasheet p. 131 */
             lcd_write_reg(R_POWER_CONTROL1, 0x0001); /* STB=1: standby mode */
 
@@ -386,10 +386,10 @@ void DMA3(void)
         SAR3 = dma_addr;
         BCR3 = dma_len;
         DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
-             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) 
+             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
              | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
     }
-}      
+}
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
@@ -411,7 +411,7 @@ void lcd_update(void)
         SAR3 = (unsigned long)lcd_framebuffer;
         BCR3 = LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data);
         DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
-             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) 
+             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
              | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
 
         while (dma_count > 0)
@@ -443,7 +443,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
 
         lcd_begin_write_gram();
-        
+
         if (width == LCD_WIDTH)
         {
             dma_count = 1;

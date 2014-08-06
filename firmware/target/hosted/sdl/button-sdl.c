@@ -345,7 +345,7 @@ static void button_event(int key, bool pressed)
         }
         return;
 #endif
-        
+
 #ifdef HAS_REMOTE_BUTTON_HOLD
     case SDLK_j:
         if(pressed)
@@ -362,7 +362,7 @@ static void button_event(int key, bool pressed)
         if(pressed)
             switch(_remote_type)
             {
-                case REMOTETYPE_UNPLUGGED: 
+                case REMOTETYPE_UNPLUGGED:
                     _remote_type=REMOTETYPE_H100_LCD;
                     DEBUGF("Changed remote type to H100\n");
                     break;
@@ -415,11 +415,11 @@ static void button_event(int key, bool pressed)
     }
     /* Call to make up for scrollwheel target implementation.  This is
      * not handled in the main button.c driver, but on the target
-     * implementation (look at button-e200.c for example if you are trying to 
+     * implementation (look at button-e200.c for example if you are trying to
      * figure out why using button_get_data needed a hack before).
      */
 #if defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)
-    if((new_btn == BUTTON_SCROLL_FWD || new_btn == BUTTON_SCROLL_BACK) && 
+    if((new_btn == BUTTON_SCROLL_FWD || new_btn == BUTTON_SCROLL_BACK) &&
         pressed)
     {
         /* Clear these buttons from the data - adding them to the queue is

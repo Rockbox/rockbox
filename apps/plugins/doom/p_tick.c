@@ -252,4 +252,3 @@ void P_Ticker (void)
    P_MapEnd();
    leveltime++;                       // for par times
 }
-

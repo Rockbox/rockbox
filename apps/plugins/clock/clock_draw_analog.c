@@ -48,7 +48,7 @@ static void polar_to_cartesian(int a, int r, int* x, int* y)
     *y = (fp14_sin(a-90) * r) >> 14;
 }
 
-static void polar_to_cartesian_screen_centered(struct screen * display, 
+static void polar_to_cartesian_screen_centered(struct screen * display,
                                         int a, int r, int* x, int* y)
 {
     polar_to_cartesian(a, r, x, y);

@@ -37,7 +37,7 @@ void enable_logf(bool en)
 static int logf_push(void *userp, unsigned char c)
 {
     (void)userp;
-    
+
     logfbuffer[logfwrite++] = c;
     if(logfwrite == MAX_LOGF_SIZE)
         logfwrite = 0;

@@ -36,7 +36,7 @@ const unsigned long audio_master_sampr_list[SAMPR_NUM_FREQ] =
     [FREQ_16] = SAMPR_16,
     [FREQ_12] = SAMPR_12,
     [FREQ_11] = SAMPR_11,
-    [FREQ_8 ] = SAMPR_8, 
+    [FREQ_8 ] = SAMPR_8,
 };
 
 /* List of all hardware rates supported (set or subset of master list) */

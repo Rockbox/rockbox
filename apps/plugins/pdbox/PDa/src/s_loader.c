@@ -18,7 +18,7 @@
 #include <windows.h>
 #endif
 #ifdef MACOSX
-#include <mach-o/dyld.h> 
+#include <mach-o/dyld.h>
 #endif
 #include <string.h>
 #include <stdio.h>
@@ -29,7 +29,7 @@
 typedef void (*t_xxx)(void);
 
 #ifndef ROCKBOX
-static char sys_dllextent[] = 
+static char sys_dllextent[] =
 #ifdef __FreeBSD__
     ".pd_freebsd";
 #endif
@@ -69,7 +69,7 @@ int sys_load_lib(char *dirname, char *classname)
 int sys_load_lib(char *dirname, char *classname)
 {
     char symname[MAXPDSTRING], filename[MAXPDSTRING], dirbuf[MAXPDSTRING],
-    	classname2[MAXPDSTRING], *nameptr, *lastdot;
+        classname2[MAXPDSTRING], *nameptr, *lastdot;
     void *dlobj;
     t_xxx makeout = NULL;
     int fd;
@@ -79,36 +79,36 @@ int sys_load_lib(char *dirname, char *classname)
 #if 0
     fprintf(stderr, "lib %s %s\n", dirname, classname);
 #endif
-    	/* try looking in the path for (classname).(sys_dllextent) ... */
+        /* try looking in the path for (classname).(sys_dllextent) ... */
     if ((fd = open_via_path(dirname, classname, sys_dllextent,
-    	dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+        dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
     {
-    	    /* next try (classname)/(classname).(sys_dllextent) ... */
-	strncpy(classname2, classname, MAXPDSTRING);
-	filename[MAXPDSTRING-2] = 0;
-	strcat(classname2, "/");
-	strncat(classname2, classname, MAXPDSTRING-strlen(classname2));
-	filename[MAXPDSTRING-1] = 0;
-	if ((fd = open_via_path(dirname, classname2, sys_dllextent,
-    	    dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-	{
-    	    return (0);
-    	}
+            /* next try (classname)/(classname).(sys_dllextent) ... */
+        strncpy(classname2, classname, MAXPDSTRING);
+        filename[MAXPDSTRING-2] = 0;
+        strcat(classname2, "/");
+        strncat(classname2, classname, MAXPDSTRING-strlen(classname2));
+        filename[MAXPDSTRING-1] = 0;
+        if ((fd = open_via_path(dirname, classname2, sys_dllextent,
+            dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+        {
+            return (0);
+        }
     }
 
 
     close(fd);
     class_set_extern_dir(gensym(dirbuf));
 
-    	/* refabricate the pathname */
+        /* refabricate the pathname */
     strncpy(filename, dirbuf, MAXPDSTRING);
     filename[MAXPDSTRING-2] = 0;
     strcat(filename, "/");
     strncat(filename, nameptr, MAXPDSTRING-strlen(filename));
     filename[MAXPDSTRING-1] = 0;
-    	/* extract the setup function name */
+        /* extract the setup function name */
     if (lastdot = strrchr(nameptr, '.'))
-	*lastdot = 0;
+        *lastdot = 0;
 
 #ifdef MACOSX
     strcpy(symname, "_");
@@ -116,18 +116,18 @@ int sys_load_lib(char *dirname, char *classname)
 #else
     strcpy(symname, nameptr);
 #endif
-	/* if the last character is a tilde, replace with "_tilde" */
+        /* if the last character is a tilde, replace with "_tilde" */
     if (symname[strlen(symname) - 1] == '~')
-	strcpy(symname + (strlen(symname) - 1), "_tilde");
-	/* and append _setup to form the C setup function name */
+        strcpy(symname + (strlen(symname) - 1), "_tilde");
+        /* and append _setup to form the C setup function name */
     strcat(symname, "_setup");
 #ifdef DL_OPEN
     dlobj = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
     if (!dlobj)
     {
-	post("%s: %s", filename, dlerror());
-    	class_set_extern_dir(&s_);
-	return (0);
+        post("%s: %s", filename, dlerror());
+        class_set_extern_dir(&s_);
+        return (0);
     }
     makeout = (t_xxx)dlsym(dlobj,  symname);
 #endif
@@ -136,27 +136,27 @@ int sys_load_lib(char *dirname, char *classname)
     ntdll = LoadLibrary(filename);
     if (!ntdll)
     {
-	post("%s: couldn't load", filename);
-    	class_set_extern_dir(&s_);
-	return (0);
+        post("%s: couldn't load", filename);
+        class_set_extern_dir(&s_);
+        return (0);
     }
-    makeout = (t_xxx)GetProcAddress(ntdll, symname);  
+    makeout = (t_xxx)GetProcAddress(ntdll, symname);
 #endif
 #ifdef MACOSX
     {
-        NSObjectFileImage image; 
+        NSObjectFileImage image;
         void *ret;
-        NSSymbol s; 
+        NSSymbol s;
         if ( NSCreateObjectFileImageFromFile( filename, &image) != NSObjectFileImageSuccess )
         {
             post("%s: couldn't load", filename);
-    	    class_set_extern_dir(&s_);
+            class_set_extern_dir(&s_);
             return 0;
         }
-	ret = NSLinkModule( image, filename, 
-	       NSLINKMODULE_OPTION_BINDNOW + NSLINKMODULE_OPTION_PRIVATE); 
+        ret = NSLinkModule( image, filename,
+               NSLINKMODULE_OPTION_BINDNOW + NSLINKMODULE_OPTION_PRIVATE);
 
-        s = NSLookupSymbolInModule(ret, symname); 
+        s = NSLookupSymbolInModule(ret, symname);
 
         if (s)
             makeout = (t_xxx)NSAddressOfSymbol( s);
@@ -166,9 +166,9 @@ int sys_load_lib(char *dirname, char *classname)
 
     if (!makeout)
     {
-    	post("load_object: Symbol \"%s\" not found", symname);
-    	class_set_extern_dir(&s_);
-    	return 0;
+        post("load_object: Symbol \"%s\" not found", symname);
+        class_set_extern_dir(&s_);
+        return 0;
     }
     (*makeout)();
     class_set_extern_dir(&s_);
@@ -176,4 +176,3 @@ int sys_load_lib(char *dirname, char *classname)
 }
 
 #endif
-

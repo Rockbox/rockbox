@@ -110,7 +110,7 @@ static int find_closest_preset(int freq, int direction)
         int f = presets[i].frequency;
         if (f == freq)
             return i; /* Exact match = stop */
-        
+
         /* remember the highest and lowest presets for wraparound */
         if (f < presets[lowpreset].frequency)
             lowpreset = i;
@@ -223,7 +223,7 @@ void radio_load_presets(char *filename)
         return;
     }
     /* Temporary preset, loaded until player shuts down. */
-    else if(filename[0] == '/') 
+    else if(filename[0] == '/')
         strlcpy(filepreset, filename, sizeof(filepreset));
     /* Preset from default directory. */
     else
@@ -361,7 +361,7 @@ int preset_list_load(void)
 int preset_list_save(void)
 {
     if(num_presets > 0)
-    { 
+    {
         bool bad_file_name = true;
 
         if(!dir_exists(FMPRESET_PATH)) /* Check if there is preset folder */
@@ -426,11 +426,11 @@ int preset_list_clear(void)
     return true;
 }
 
-MENUITEM_FUNCTION(radio_edit_preset_item, MENU_FUNC_CHECK_RETVAL, 
-                    ID2P(LANG_FM_EDIT_PRESET), 
+MENUITEM_FUNCTION(radio_edit_preset_item, MENU_FUNC_CHECK_RETVAL,
+                    ID2P(LANG_FM_EDIT_PRESET),
                     radio_edit_preset, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(radio_delete_preset_item, MENU_FUNC_CHECK_RETVAL,
-                    ID2P(LANG_FM_DELETE_PRESET), 
+                    ID2P(LANG_FM_DELETE_PRESET),
                     radio_delete_preset, NULL, NULL, Icon_NOICON);
 static int radio_preset_callback(int action,
                                  const struct menu_item_ex *this_item)
@@ -441,7 +441,7 @@ static int radio_preset_callback(int action,
     (void)this_item;
 }
 MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_PRESET),
-            radio_preset_callback, Icon_NOICON, &radio_edit_preset_item, 
+            radio_preset_callback, Icon_NOICON, &radio_edit_preset_item,
             &radio_delete_preset_item);
 /* present a list of preset stations */
 static const char* presets_get_name(int selected_item, void *data,

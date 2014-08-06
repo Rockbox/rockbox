@@ -46,7 +46,7 @@ const unsigned long mp3_enc_bitr[MP3_ENC_NUM_BITR] =
 };
 
 /** wav_enc.codec **/
- 
+
 /** wavpack_enc.codec **/
 
 /** public functions **/

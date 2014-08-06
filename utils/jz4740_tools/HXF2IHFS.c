@@ -337,7 +337,7 @@ int main(int argc, char **argv)
     /* cleanup */
     close(hxf_img);
     close(ihfs_img);
-    
+
     printf("Done!\n");
 
     return 0;

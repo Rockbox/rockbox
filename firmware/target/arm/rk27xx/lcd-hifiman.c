@@ -165,12 +165,12 @@ static void lcd_v1_set_gram_area(int x_start, int y_start,
 {
     lcdctrl_bypass(1);
     LCDC_CTRL |= RGB24B;
-    
+
     lcd_write_reg(0x03, x_start);
     lcd_write_reg(0x05, x_end);
     lcd_write_reg(0x07, y_start);
     lcd_write_reg(0x09, y_end);
-    
+
     lcd_cmd(0x22);
     LCDC_CTRL &= ~RGB24B;
 }

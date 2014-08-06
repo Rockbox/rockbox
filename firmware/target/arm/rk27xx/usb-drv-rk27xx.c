@@ -75,7 +75,7 @@ struct endpoint_t {
     volatile void *buf;          /* tx/rx buffer address */
     volatile int len;            /* size of the transfer (bytes) */
     volatile int cnt;            /* number of bytes transfered/received  */
-    volatile bool block;         /* flag indicating that transfer is blocking */ 
+    volatile bool block;         /* flag indicating that transfer is blocking */
     struct semaphore complete;   /* semaphore for blocking transfers */
 };
 
@@ -106,7 +106,7 @@ static struct endpoint_t endpoints[16] = {
 static void setup_received(void)
 {
     static uint32_t setup_data[2];
-    
+
     /* copy setup data from packet */
     setup_data[0] = SETUP1;
     setup_data[1] = SETUP2;
@@ -114,7 +114,7 @@ static void setup_received(void)
     /* clear all pending control transfers
      * do we need this here?
      */
-    
+
     /* pass setup data to the upper layer */
     usb_core_control_request((struct usb_ctrlrequest*)setup_data);
 }
@@ -124,7 +124,7 @@ static void ctr_write(void)
 {
     int xfer_size = (ctrlep[DIR_IN].cnt > 64) ? 64 : ctrlep[DIR_IN].cnt;
     unsigned int timeout = current_tick + HZ/10;
-    
+
     while (TX0BUF & TXFULL) /* TX0FULL flag */
     {
         if(TIME_AFTER(current_tick, timeout))
@@ -135,7 +135,7 @@ static void ctr_write(void)
     TX0DMALM_IADDR = (uint32_t)ctrlep[DIR_IN].buf; /* local buffer address */
     TX0DMAINCTL = DMA_START;                       /* start DMA */
     TX0CON &= ~TXNAK;                              /* clear NAK */
-    
+
     /* Decrement by max packet size is intentional.
      * This way if we have final packet short one we will get negative len
      * after transfer, which in turn indicates we *don't* need to send
@@ -150,13 +150,13 @@ static void ctr_write(void)
 static void ctr_read(void)
 {
     int xfer_size = RX0STAT & 0xffff;
-    
+
     /* clear NAK bit */
     RX0CON &= ~RXNAK;
-    
+
     ctrlep[DIR_OUT].cnt -= xfer_size;
     ctrlep[DIR_OUT].buf += xfer_size;
-    
+
     RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf; /* buffer address */
     RX0DMACTLO = DMA_START;                          /* start DMA */
 }
@@ -165,20 +165,20 @@ static void blk_write(int ep)
 {
     int ep_num = EP_NUM(ep);
     int max = usb_drv_port_speed() ? 512 : 64;
-    int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;  
+    int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;
     unsigned int timeout = current_tick + HZ/10;
-    
+
     while (BIN_TXBUF(ep_num) & TXFULL) /* TXFULL flag */
     {
         if(TIME_AFTER(current_tick, timeout))
             break;
     }
-    
+
     BIN_TXSTAT(ep_num) = xfer_size;                            /* size */
     BIN_DMAINLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf; /* buf address */
     BIN_DMAINCTL(ep_num) = DMA_START;                          /* start DMA */
     BIN_TXCON(ep_num) &= ~TXNAK;                               /* clear NAK */
-    
+
     /* Decrement by max packet size is intentional.
      * This way if we have final packet short one we will get negative len
      * after transfer, which in turn indicates we *don't* need to send
@@ -194,13 +194,13 @@ static void blk_read(int ep)
 {
     int ep_num = EP_NUM(ep);
     int xfer_size = BOUT_RXSTAT(ep_num) & 0xffff;
-    
+
     /* clear NAK bit */
     BOUT_RXCON(ep_num) &= ~RXNAK;
-    
+
     endpoints[ep_num].cnt -= xfer_size;
     endpoints[ep_num].buf += xfer_size;
-    
+
     BOUT_DMAOUTLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf;
     BOUT_DMAOUTCTL(ep_num) = DMA_START;
 }
@@ -209,20 +209,20 @@ static void int_write(int ep)
 {
     int ep_num = EP_NUM(ep);
     int max = usb_drv_port_speed() ? 1024 : 64;
-    int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;  
+    int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;
     unsigned int timeout = current_tick + HZ/10;
-    
+
     while (IIN_TXBUF(ep_num) & TXFULL) /* TXFULL flag */
     {
         if(TIME_AFTER(current_tick, timeout))
             break;
     }
-    
+
     IIN_TXSTAT(ep_num) = xfer_size;                            /* size */
     IIN_DMAINLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf; /* buf address */
     IIN_DMAINCTL(ep_num) = DMA_START;                          /* start DMA */
     IIN_TXCON(ep_num) &= ~TXNAK;                               /* clear NAK */
-    
+
     /* Decrement by max packet size is intentional.
      * This way if we have final packet short one we will get negative len
      * after transfer, which in turn indicates we *don't* need to send
@@ -239,10 +239,10 @@ void INT_UDC(void)
 {
     uint32_t txstat, rxstat;
     int tmp, ep_num;
-    
+
     /* read what caused UDC irq */
     uint32_t intsrc = INT2FLAG & 0x7fffff;
-    
+
     if (intsrc & SETUP_INTR) /* setup interrupt */
     {
         setup_received();
@@ -250,7 +250,7 @@ void INT_UDC(void)
     else if (intsrc & IN0_INTR) /* ep0 in interrupt */
     {
         txstat = TX0STAT; /* read clears flags */
-        
+
         /* TODO handle errors */
         if (txstat & TXACK) /* check TxACK flag */
         {
@@ -266,7 +266,7 @@ void INT_UDC(void)
                                            USB_DIR_IN,          /* dir */
                                            0,                   /* status */
                                            ctrlep[DIR_IN].len); /* length */
-                
+
                 /* release semaphore for blocking transfer */
                 if (ctrlep[DIR_IN].block)
                     semaphore_release(&ctrlep[DIR_IN].complete);
@@ -286,7 +286,7 @@ void INT_UDC(void)
                 usb_core_transfer_complete(0,                    /* ep */
                                            USB_DIR_OUT,          /* dir */
                                            0,                    /* status */
-                                           ctrlep[DIR_OUT].len); /* length */                
+                                           ctrlep[DIR_OUT].len); /* length */
         }
     }
     else if (intsrc & USBRST_INTR) /* usb reset */
@@ -316,12 +316,12 @@ void INT_UDC(void)
             if (tmp & 0x01)
                 break;
         }
-        
+
         if (intsrc & ((1<<8)|(1<<11)|(1<<14)|(1<<17)|(1<<20)))
         {
             /* bulk out */
             rxstat = BOUT_RXSTAT(ep_num);
-            
+
             /* TODO handle errors */
             if (rxstat & (1<<18)) /* RxACK */
             {
@@ -331,14 +331,14 @@ void INT_UDC(void)
                     usb_core_transfer_complete(ep_num,               /* ep */
                                                USB_DIR_OUT,          /* dir */
                                                0,                    /* status */
-                                               endpoints[ep_num].len); /* length */                
+                                               endpoints[ep_num].len); /* length */
             }
         }
         else if (intsrc & ((1<<9)|(1<<12)|(1<<15)|(1<<18)|(1<<21)))
         {
             /* bulk in */
             txstat = BIN_TXSTAT(ep_num);
-            
+
             /* TODO handle errors */
             if (txstat & (1<<18)) /* check TxACK flag */
             {
@@ -354,7 +354,7 @@ void INT_UDC(void)
                                                USB_DIR_IN,          /* dir */
                                                0,                   /* status */
                                                endpoints[ep_num].len); /* length */
-                
+
                     /* release semaphore for blocking transfer */
                     if (endpoints[ep_num].block)
                         semaphore_release(&endpoints[ep_num].complete);
@@ -381,7 +381,7 @@ void INT_UDC(void)
                                                USB_DIR_IN,          /* dir */
                                                0,                   /* status */
                                                endpoints[ep_num].len); /* length */
-                
+
                     /* release semaphore for blocking transfer */
                     if (endpoints[ep_num].block)
                         semaphore_release(&endpoints[ep_num].complete);
@@ -408,22 +408,22 @@ int usb_drv_request_endpoint(int type, int dir)
     ep_type = type & USB_ENDPOINT_XFERTYPE_MASK;
 
     logf("req: %s %s", XFER_DIR_STR(ep_dir), XFER_TYPE_STR(ep_type));
-    
+
     /* Find an available ep/dir pair */
     for (ep_num=1;ep_num<USB_NUM_ENDPOINTS;ep_num++)
     {
         struct endpoint_t* endpoint = &endpoints[ep_num];
-        
+
         if (endpoint->type == ep_type &&
             endpoint->dir == ep_dir &&
             !endpoint->allocated)
         {
             /* mark endpoint as taken */
             endpoint->allocated = true;
-            
+
             /* enable interrupt from this endpoint */
             EN_INT |= (1<<(ep_num+7));
-            
+
             logf("add: ep%d %s", ep_num, XFER_DIR_STR(ep_dir));
             return (ep_num | (dir & USB_ENDPOINT_DIR_MASK));
         }
@@ -440,7 +440,7 @@ void usb_drv_release_endpoint(int ep)
 
     logf("rel: ep%d %s", ep_num, XFER_DIR_STR(ep_dir));
     endpoints[ep_num].allocated = false;
-    
+
     /* disable interrupt from this endpoint */
     EN_INT &= ~(1<<(ep_num+7));
 }
@@ -461,7 +461,7 @@ static int _usb_drv_send(int endpoint, void *ptr, int length, bool block)
 {
     struct endpoint_t *ep;
     int ep_num = EP_NUM(endpoint);
-    
+
     if (ep_num == 0)
         ep = &ctrlep[DIR_IN];
     else
@@ -469,27 +469,27 @@ static int _usb_drv_send(int endpoint, void *ptr, int length, bool block)
 
     ep->buf = ptr;
     ep->len = ep->cnt = length;
-    
+
     if (block)
         ep->block = true;
     else
         ep->block = false;
-    
+
     switch (ep->type)
     {
-        case USB_ENDPOINT_XFER_CONTROL:                     
+        case USB_ENDPOINT_XFER_CONTROL:
             ctr_write();
             break;
-        
+
         case USB_ENDPOINT_XFER_BULK:
             blk_write(ep_num);
             break;
-        
+
         case USB_ENDPOINT_XFER_INT:
             int_write(ep_num);
             break;
     }
-    
+
     if (block)
         /* wait for transfer to end */
         semaphore_wait(&ep->complete, TIMEOUT_BLOCK);
@@ -514,23 +514,23 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
 {
     struct endpoint_t *ep;
     int ep_num = EP_NUM(endpoint);
-    
+
     if (ep_num == 0)
     {
         ep = &ctrlep[DIR_OUT];
-        
+
         ctr_read();
     }
     else
     {
         ep = &endpoints[ep_num];
-        
+
         /* clear NAK bit */
         BOUT_RXCON(ep_num) &= ~RXNAK;
         BOUT_DMAOUTLMADDR(ep_num) = (uint32_t)ptr;
         BOUT_DMAOUTCTL(ep_num) = DMA_START;
     }
-       
+
     ep->buf = ptr;
     ep->len = ep->cnt = length;
 
@@ -538,7 +538,7 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
 }
 
 /* Kill all transfers. Usually you need to set a bit for each endpoint
- *  and flush fifos. You should also call the completion handler with 
+ *  and flush fifos. You should also call the completion handler with
  * error status for everything
  */
 void usb_drv_cancel_all_transfers(void)
@@ -575,13 +575,13 @@ bool usb_drv_stalled(int endpoint, bool in)
                 return (BOUT_RXCON(ep_num) & RXSTALL) ? true : false;
 
             break;
-            
+
         case USB_ENDPOINT_XFER_INT:
             if (in)
                 return (IIN_TXCON(ep_num) & TXSTALL) ? true : false;
             else
                 return false;    /* we don't have such endpoint anyway */
-                
+
             break;
     }
 
@@ -628,7 +628,7 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
                     BOUT_RXCON(ep_num) &= ~RXSTALL;
             }
             break;
-            
+
         case USB_ENDPOINT_XFER_INT:
             if (in)
             {
@@ -645,23 +645,23 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
 void usb_drv_init(void)
 {
     int ep_num;
-        
+
     /* enable USB clock */
     SCU_CLKCFG &= ~CLKCFG_UDC;
-    
+
     /* 1. do soft disconnect */
     DEV_CTL = DEV_SELF_PWR;
 
     /* 2. do power on reset to PHY */
     DEV_CTL = DEV_SELF_PWR |
               SOFT_POR;
-    
+
     /* 3. wait more than 10ms */
     udelay(20000);
-    
+
     /* 4. clear SOFT_POR bit */
     DEV_CTL  &= ~SOFT_POR;
-    
+
     /* 5. configure minimal EN_INT */
     EN_INT = EN_SUSP_INTR   |  /* Enable Suspend Interrupt */
              EN_RESUME_INTR |  /* Enable Resume Interrupt */
@@ -669,22 +669,22 @@ void usb_drv_init(void)
              EN_OUT0_INTR   |  /* Enable OUT Token receive Interrupt EP0 */
              EN_IN0_INTR    |  /* Enable IN Token transmits Interrupt EP0 */
              EN_SETUP_INTR;    /* Enable SETUP Packet Receive Interrupt */
-             
+
     /* 6. configure INTCON */
     INTCON = UDC_INTHIGH_ACT |  /* interrupt high active */
              UDC_INTEN;         /* enable EP0 interrupts */
-    
+
     /* 7. configure EP0 control registers */
     TX0CON = TXACKINTEN |  /* Set as one to enable the EP0 tx irq */
              TXNAK;        /* Set as one to response NAK handshake */
-             
+
     RX0CON = RXACKINTEN |
              RXEPEN     |  /* Endpoint 0 Enable. When cleared the endpoint does
                             * not respond to an SETUP or OUT token
                             */
 
              RXNAK;        /* Set as one to response NAK handshake */
-             
+
     /* 8. write final bits to DEV_CTL */
     DEV_CTL = CSR_DONE     | /* Configure CSR done */
               DEV_PHY16BIT | /* 16-bit data path enabled. udc_clk = 30MHz */
@@ -694,11 +694,11 @@ void usb_drv_init(void)
     /* init semaphore of ep0 */
     semaphore_init(&ctrlep[DIR_OUT].complete, 1, 0);
     semaphore_init(&ctrlep[DIR_IN].complete, 1, 0);
-    
+
     for (ep_num = 1; ep_num < USB_NUM_ENDPOINTS; ep_num++)
     {
         semaphore_init(&endpoints[ep_num].complete, 1, 0);
-        
+
         if (ep_num%3 == 0) /* IIN 3, 6, 9, 12, 15 */
         {
             IIN_TXCON(ep_num) |= (ep_num<<8)|TXEPEN|TXNAK; /* ep_num, enable, NAK */
@@ -718,11 +718,11 @@ void usb_drv_init(void)
 void usb_drv_exit(void)
 {
     DEV_CTL = DEV_SELF_PWR;
-    
+
     /* disable USB interrupts in interrupt controller */
     INTC_IMR &= ~IRQ_ARM_UDC;
     INTC_IECR &= ~IRQ_ARM_UDC;
-    
+
     /* we cannot disable UDC clock since this causes data abort
      * when reading DEV_INFO in order to check usb connect event
      */
@@ -735,4 +735,3 @@ int usb_detect(void)
     else
         return USB_EXTRACTED;
 }
-

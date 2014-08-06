@@ -57,11 +57,11 @@ int udacodec_write(unsigned char reg, unsigned short value)
     return 0;
 }
 
-int udacodec_write2(unsigned char reg, 
-                    unsigned short value1, unsigned short value2) 
+int udacodec_write2(unsigned char reg,
+                    unsigned short value1, unsigned short value2)
 {
     unsigned char data[5];
-    
+
     data[0] = reg;
     data[1] = value1 >> 8;
     data[2] = value1 & 0xFF;
@@ -72,5 +72,4 @@ int udacodec_write2(unsigned char reg,
         return -1;
     }
     return 0;
-}                            
-
+}

@@ -67,9 +67,9 @@ int storage_read_sectors(unsigned long start, int count, void* buf)
 {
     if ( count > 1 )
         DEBUGF("[Reading %d blocks: 0x%lx to 0x%lx]\n",
-               count, start, start+count-1); 
+               count, start, start+count-1);
     else
-        DEBUGF("[Reading block 0x%lx]\n", start); 
+        DEBUGF("[Reading block 0x%lx]\n", start);
 
     if(fseek(file,start*BLOCK_SIZE,SEEK_SET)) {
         perror("fseek");

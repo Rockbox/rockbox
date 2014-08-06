@@ -132,5 +132,3 @@ again:
     *p = '\0';
     return p - dst;
 }
-
-

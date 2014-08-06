@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "system.h"
 #include "jz4740.h"
@@ -70,23 +70,23 @@ const unsigned short percent_to_volt_charge[11] =
 int _battery_voltage(void)
 {
     unsigned int dummy, timeout=HZ/4;
-    
+
     mutex_lock(&battery_mtx);
-    
+
     dummy = REG_SADC_BATDAT;
     dummy = REG_SADC_BATDAT;
-    
+
     REG_SADC_ENA |= SADC_ENA_PBATEN;
     bat_val = 0;
-    
+
     /* primitive wakeup event */
     while(bat_val == 0 && timeout--)
         sleep(0);
-    
+
     logf("%d %d", bat_val, (bat_val*BATTERY_SCALE_FACTOR)>>10);
-    
+
     mutex_unlock(&battery_mtx);
-    
+
     return (bat_val*BATTERY_SCALE_FACTOR)>>10;
 }
 
@@ -96,17 +96,17 @@ void adc_init(void)
     REG_SADC_ENA = 0;
     REG_SADC_STATE &= ~REG_SADC_STATE;
     REG_SADC_CTRL = 0x1F;
-    
+
     REG_SADC_CFG = SADC_CFG_INIT;
-    
+
     system_enable_irq(IRQ_SADC);
-    
+
     REG_SADC_SAMETIME = 10;
     REG_SADC_WAITTIME = 100;
     REG_SADC_STATE &= ~REG_SADC_STATE;
     REG_SADC_CTRL = ~SADC_CTRL_PBATRDYM;
     REG_SADC_ENA = 0;
-    
+
     mutex_init(&battery_mtx);
 }
 
@@ -119,7 +119,7 @@ void SADC(void)
     sadcstate = REG_SADC_STATE;
     state = REG_SADC_STATE & (~REG_SADC_CTRL);
     REG_SADC_STATE &= sadcstate;
-    
+
     if(state & SADC_CTRL_PBATRDYM)
     {
         bat_val = REG_SADC_BATDAT;

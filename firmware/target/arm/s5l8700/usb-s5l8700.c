@@ -26,7 +26,7 @@
 void usb_init_device(void)
 {
     /* TODO implement */
-    
+
     /* enable USB2.0 function controller to allow VBUS monitoring */
     PWRCON &= ~(1 << 15);
 }
@@ -41,4 +41,3 @@ int usb_detect(void)
 {
     return (USB_TR & (1 << 15)) ? USB_INSERTED : USB_EXTRACTED;
 }
-

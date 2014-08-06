@@ -34,10 +34,10 @@ static t_int *sigsamphold_perform(t_int *w)
     t_sample lastout = x->x_lastout;
     for (i = 0; i < n; i++, in1++)
     {
-    	t_sample next = *in2++;
-    	if (next < lastin) lastout = *in1;
-    	*out++ = lastout;
-    	lastin = next;
+        t_sample next = *in2++;
+        if (next < lastin) lastout = *in1;
+        *out++ = lastout;
+        lastin = next;
     }
     x->x_lastin = lastin;
     x->x_lastout = lastout;
@@ -47,8 +47,8 @@ static t_int *sigsamphold_perform(t_int *w)
 static void sigsamphold_dsp(t_sigsamphold *x, t_signal **sp)
 {
     dsp_add(sigsamphold_perform, 5,
-	sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, 
-	    x, sp[0]->s_n);
+        sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec,
+            x, sp[0]->s_n);
 }
 
 static void sigsamphold_reset(t_sigsamphold *x)
@@ -64,13 +64,12 @@ static void sigsamphold_set(t_sigsamphold *x, t_float f)
 void samphold_tilde_setup(void)
 {
     sigsamphold_class = class_new(gensym("samphold~"),
-    	(t_newmethod)sigsamphold_new, 0, sizeof(t_sigsamphold), 0, 0);
+        (t_newmethod)sigsamphold_new, 0, sizeof(t_sigsamphold), 0, 0);
     CLASS_MAINSIGNALIN(sigsamphold_class, t_sigsamphold, x_f);
     class_addmethod(sigsamphold_class, (t_method)sigsamphold_set,
-    	gensym("set"), A_FLOAT, 0);
+        gensym("set"), A_FLOAT, 0);
     class_addmethod(sigsamphold_class, (t_method)sigsamphold_reset,
-    	gensym("reset"), 0);
+        gensym("reset"), 0);
     class_addmethod(sigsamphold_class, (t_method)sigsamphold_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
 }
-

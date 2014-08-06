@@ -95,7 +95,7 @@ static bool tv_overlap_page_mode_setting(void)
 
 static bool tv_autoscroll_speed_setting(void)
 {
-    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, 
+    return rb->set_int("Auto-scroll Speed", "", UNIT_INT,
                        &new_prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
 }
 
@@ -183,7 +183,7 @@ static bool tv_line_mode_setting(void)
 
 static bool tv_windows_setting(void)
 {
-    return rb->set_int("Screens Per Page", "", UNIT_INT, 
+    return rb->set_int("Screens Per Page", "", UNIT_INT,
                        &new_prefs.windows, NULL, 1, 1, 5, NULL);
 }
 
@@ -243,7 +243,7 @@ static bool tv_font_setting(void)
 
 static bool tv_indent_spaces_setting(void)
 {
-    return rb->set_int("Indent Spaces", "", UNIT_INT, 
+    return rb->set_int("Indent Spaces", "", UNIT_INT,
                        &new_prefs.indent_spaces, NULL, 1, 0, 5, NULL);
 }
 

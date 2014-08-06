@@ -17,7 +17,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/ 
+ ****************************************************************************/
 
 #include "audio.h"
 #include "registers.h"
@@ -34,21 +34,21 @@ void audiohw_init(void)
     XCR10 = (1 << 8) | (2 << 5); /* XFRLEN1  = 1 ** XWDLEN1  = 2 */
     XCR20 = 0;                   /* XPHASE   = 0 ** XFRLEN2  = 0 ** XWDLEN2  = 0 ** XCOMPAND = 0 ** XFIG     = 0 ** XDATDLY  = 0 */
     SRGR10 = 0;                  /* FWID     = 0 ** CLKGDV   = 0 */
-    SRGR20 = 0;                  /* FREE     = 0 ** CLKSP    = 0 ** CLKSM    = 0 ** FSGM     = 0 ** FPER     = 0 */             
+    SRGR20 = 0;                  /* FREE     = 0 ** CLKSP    = 0 ** CLKSM    = 0 ** FSGM     = 0 ** FPER     = 0 */
     PCR0 = (1 << 1) | 1;         /* IDLEEN   = 0 ** XIOEN    = 0 ** RIOEN    = 0 ** FSXM     = 0 ** FSRM     = 0 ** SCLKME   = 0 ** CLKSSTAT = 0 ** DXSTAT   = 0 ** DRSTAT   = 0 ** CLKXM    = 0 ** CLKRM    = 0 ** FSXP     = 0 ** FSRP     = 0 ** CLKXP    = 1 ** CLKRP    = 1 */
 #else
     SPCR10 = 0;
     SPCR20 = 0x0200; /* SPCR : free running mode */
-    
+
     RCR10 = 0x00A0;
     RCR20 = 0x00A1; /* RCR  : 32 bit receive data length */
-    
+
     XCR10 = 0x00A0;
     XCR20 = 0x00A0; /* XCR  : 32 bit transmit data length */
-    
+
     SRGR10 = 0;
     SRGR20 = 0x3000; /* SRGR 1 & 2 */
-    
+
     PCR0 = 0x000E - 8; /* PCR  : FSX, FSR active low, external FS/CLK source */
 #endif
 }

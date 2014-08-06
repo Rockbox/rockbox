@@ -51,7 +51,7 @@
 #endif
 
 #ifndef USBSTOR_WRITE_SECTORS_FILTER
-#define USBSTOR_WRITE_SECTORS_FILTER() ({ 0; }) 
+#define USBSTOR_WRITE_SECTORS_FILTER() ({ 0; })
 #endif
 
 /* the ARC driver currently supports up to 64k USB transfers. This is

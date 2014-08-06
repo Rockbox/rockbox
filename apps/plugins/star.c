@@ -948,8 +948,8 @@ static void star_display_board_info(int current_level)
                    label_pos_y, "C:");
 
     rb->lcd_bitmap_part(star_tiles, 0, control == STAR_CONTROL_BALL ?
-                        BALL*TILE_HEIGHT : BLOCK*TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+                        BALL*TILE_HEIGHT : BLOCK*TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH,
                         tile_pos_y, TILE_WIDTH, TILE_HEIGHT);
@@ -995,7 +995,7 @@ static int star_load_level(int current_level)
                          STAR_OFFSET_X + x * TILE_WIDTH,    \
                          STAR_OFFSET_Y + y * TILE_HEIGHT,   \
                          TILE_WIDTH, TILE_HEIGHT);
-                         
+
                 case STAR_VOID:
                     DRAW_TILE( SPACE );
                     break;
@@ -1041,12 +1041,12 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         for (i = 1 ; i <= TILE_WIDTH ; i++)
         {
             STAR_SLEEP
-            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT,
-                        STRIDE( SCREEN_MAIN, 
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x + delta_x * i, start_y, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_update_rect(start_x + delta_x * i - (delta_x>0?1:0),
@@ -1058,12 +1058,12 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         for (i = 1 ; i <= TILE_HEIGHT ; i++)
         {
             STAR_SLEEP
-            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y + delta_y * i, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_update_rect(start_x, start_y + delta_y * i - (delta_y>0?1:0),
@@ -1082,7 +1082,7 @@ static int star_run_game(int current_level)
     int key;
 #if defined(STAR_LEVEL_DOWN_PRE) || \
     defined(STAR_LEVEL_UP_PRE) || \
-    defined(STAR_TOGGLE_CONTROL_PRE) 
+    defined(STAR_TOGGLE_CONTROL_PRE)
     int lastkey = BUTTON_NONE;
 #endif
 
@@ -1174,7 +1174,7 @@ static int star_run_game(int current_level)
             }
 #if defined(STAR_LEVEL_DOWN_PRE) || \
     defined(STAR_LEVEL_UP_PRE) || \
-    defined(STAR_TOGGLE_CONTROL_PRE) 
+    defined(STAR_TOGGLE_CONTROL_PRE)
             if (key != BUTTON_NONE)
                 lastkey = key;
 #endif

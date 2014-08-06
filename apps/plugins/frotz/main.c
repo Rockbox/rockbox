@@ -1,5 +1,5 @@
 /* main.c - Frotz V2.40 main function
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * Changes for Rockbox copyright 2009 Torne Wuff
  *
@@ -149,7 +149,7 @@ char *option_zcode_path;
 /*
  * z_piracy, branch if the story file is a legal copy.
  *
- *	no zargs used
+ *      no zargs used
  *
  */
 

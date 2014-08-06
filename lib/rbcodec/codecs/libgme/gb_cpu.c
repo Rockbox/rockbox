@@ -19,35 +19,35 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 static inline void set_code_page( struct Gb_Cpu* this, int i, void* p )
 {
-	byte* p2 = STATIC_CAST(byte*,p) - GB_CPU_OFFSET( i * page_size );
-	this->cpu_state_.code_map [i] = p2;
-	this->cpu_state->code_map [i] = p2;
+        byte* p2 = STATIC_CAST(byte*,p) - GB_CPU_OFFSET( i * page_size );
+        this->cpu_state_.code_map [i] = p2;
+        this->cpu_state->code_map [i] = p2;
 }
 
 void Cpu_reset( struct Gb_Cpu* this, void* unmapped )
 {
-	check( this->cpu_state == &this->cpu_state_ );
-	this->cpu_state = &this->cpu_state_;
-	
-	this->cpu_state_.time = 0;
-	
-	int i;
-	for ( i = 0; i < page_count + 1; ++i )
-		set_code_page( this, i, unmapped );
-	
-	memset( &this->r, 0, sizeof this->r );
-	
-	blargg_verify_byte_order();
+        check( this->cpu_state == &this->cpu_state_ );
+        this->cpu_state = &this->cpu_state_;
+
+        this->cpu_state_.time = 0;
+
+        int i;
+        for ( i = 0; i < page_count + 1; ++i )
+                set_code_page( this, i, unmapped );
+
+        memset( &this->r, 0, sizeof this->r );
+
+        blargg_verify_byte_order();
 }
 
 void Cpu_map_code( struct Gb_Cpu* this, addr_t start, int size, void* data )
 {
-	// address range must begin and end on page boundaries
-	require( start % page_size == 0 );
-	require( size  % page_size == 0 );
-	require( start + size <= mem_size );
-	
-	int offset;
-	for ( offset = 0; offset < size; offset += page_size )
-		set_code_page( this, (start + offset) >> page_bits, STATIC_CAST(char*,data) + offset );
+        // address range must begin and end on page boundaries
+        require( start % page_size == 0 );
+        require( size  % page_size == 0 );
+        require( start + size <= mem_size );
+
+        int offset;
+        for ( offset = 0; offset < size; offset += page_size )
+                set_code_page( this, (start + offset) >> page_bits, STATIC_CAST(char*,data) + offset );
 }

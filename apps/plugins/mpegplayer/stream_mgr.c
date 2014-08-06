@@ -1130,7 +1130,7 @@ int stream_init(void)
         rb->splash(HZ, "Parser init failed!");
     }
     else
-    {    
+    {
         return STREAM_OK;
     }
 

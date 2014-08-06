@@ -88,7 +88,7 @@ static const struct button_mapping button_context_wps[]  = {
 
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,         BUTTON_MENU },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_MENU|BUTTON_REPEAT,      BUTTON_MENU },
-    
+
     { ACTION_WPS_BROWSE,        BUTTON_DISPLAY|BUTTON_REL,      BUTTON_DISPLAY },
     { ACTION_WPS_ABSETB_NEXTDIR,BUTTON_DISPLAY|BUTTON_RIGHT,    BUTTON_NONE },
     { ACTION_WPS_ABSETA_PREVDIR,BUTTON_DISPLAY|BUTTON_LEFT,     BUTTON_NONE },
@@ -107,7 +107,7 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGUP,     BUTTON_DISPLAY|BUTTON_UP|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,   BUTTON_DISPLAY|BUTTON_DOWN,     BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,   BUTTON_DISPLAY|BUTTON_DOWN|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
@@ -186,7 +186,7 @@ static const struct button_mapping button_context_colorchooser[]  = {
 
 static const struct button_mapping button_context_eq[]  = {
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,       BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
 }; /* button_context_eq */
 

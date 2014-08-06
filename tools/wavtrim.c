@@ -34,10 +34,10 @@
 /* place a 32 bit value into memory, little endian */
 void Write32(unsigned char* pByte, unsigned long value)
 {
-    pByte[0] = (unsigned char)value;    
-    pByte[1] = (unsigned char)(value >> 8);    
+    pByte[0] = (unsigned char)value;
+    pByte[1] = (unsigned char)(value >> 8);
     pByte[2] = (unsigned char)(value >> 16);
-    pByte[3] = (unsigned char)(value >> 24) ;    
+    pByte[3] = (unsigned char)(value >> 24) ;
 }
 
 
@@ -58,8 +58,8 @@ unsigned long Read32(unsigned char* pByte)
 /* place a 16 bit value into memory, little endian */
 void Write16(unsigned char* pByte, unsigned short value)
 {
-    pByte[0] = (unsigned char)value;    
-    pByte[1] = (unsigned char)(value >> 8);    
+    pByte[0] = (unsigned char)value;
+    pByte[1] = (unsigned char)(value >> 8);
 }
 
 
@@ -75,7 +75,7 @@ unsigned long Read16(unsigned char* pByte)
 }
 
 int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
-{    
+{
     FILE* pFile;
     long lFileSize, lGot;
     unsigned char* pBuf;
@@ -96,7 +96,7 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
         snprintf(errstring,errsize,"Error opening file %s for reading\n", filename);
         return -1;
     }
-    
+
     fseek(pFile, 0, SEEK_END);
     lFileSize = ftell(pFile);
     fseek(pFile, 0, SEEK_SET);
@@ -117,8 +117,8 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
         free(pBuf);
         return -1;
     }
-    
-    
+
+
     bps = Read16(pBuf + 32);
     datapos = 28 + Read16(pBuf + 16);
     databuf = &pBuf[datapos];
@@ -135,14 +135,14 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
 
     datalen = Read32(pBuf+datapos-4);
     skip_head = skip_tail = 0;
-    
+
     sps = Read32(pBuf + 24);
     pad_head = sps * 10 / 1000; /* 10 ms */
     pad_tail = sps * 10 / 1000; /* 10 ms */
 
     if (bps == 1) /* 8 bit samples */
     {
-        
+
         max_silence >>= 8;
 
         /* clip the start */
@@ -154,7 +154,7 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize)
         }
         skip_head = i;
         skip_head = (skip_head > pad_head) ? skip_head - pad_head : 0;
-        
+
         /* clip the end */
         for (i=datalen-1; i>skip_head; i--)
         {
@@ -235,21 +235,21 @@ int main (int argc, char** argv)
     int max_silence = 0;
     char errbuffer[255];
     int ret=0;
-    
+
     if (argc < 2)
     {
         printf("wavtrim removes silence at the begin and end of a WAV file.\n");
         printf("usage: wavtrim <filename.wav> [<max_silence>]\n");
         return 0;
     }
-    
+
     if (argc == 3)
     {
         max_silence = atoi(argv[2]);
     }
-    
-    
-    ret = wavtrim(argv[1],max_silence,errbuffer,255 ); 
+
+
+    ret = wavtrim(argv[1],max_silence,errbuffer,255 );
     if( ret< 0)
     {
         printf("%s", errbuffer);
@@ -258,7 +258,7 @@ int main (int argc, char** argv)
 }
 #endif
 /*
-RIFF Chunk (12 bytes in length total) 
+RIFF Chunk (12 bytes in length total)
 0 - 3  "RIFF" (ASCII Characters)
 4 - 7  Total Length Of Package To Follow (Binary, little endian)
 8 - 11  "WAVE" (ASCII Characters)
@@ -273,7 +273,7 @@ FORMAT Chunk (24 or 26 bytes in length total) Byte Number
 28 - 31 Bytes Per Second
 32 - 33 Bytes Per Sample: 1=8 bit Mono, 2=8 bit Stereo or 16 bit Mono, 4=16 bit Stereo
 34 - 35 Bits Per Sample
- 
+
 
 DATA Chunk Byte Number
 36 - 39 "data" (ASCII Characters)

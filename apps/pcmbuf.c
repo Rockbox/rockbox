@@ -544,7 +544,7 @@ size_t pcmbuf_init(void *bufend)
     }
 
     pcmbuf_finish_crossfade_enable();
-#else 
+#else
     pcmbuf_watermark = PCMBUF_WATERMARK;
 #endif /* HAVE_CROSSFADE */
 

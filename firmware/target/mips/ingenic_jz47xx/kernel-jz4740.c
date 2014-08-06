@@ -27,18 +27,18 @@
 void tick_start(unsigned int interval_in_ms)
 {
     unsigned int latch;
-    
+
     __cpm_start_tcu();
-    
+
     __tcu_stop_counter(0);
     __tcu_disable_pwm_output(0);
-    
-    __tcu_mask_half_match_irq(0); 
+
+    __tcu_mask_half_match_irq(0);
     __tcu_unmask_full_match_irq(0);
 
     __tcu_select_extalclk(0);
     __tcu_select_clk_div4(0);
-    
+
     /* 12Mhz / 4 = 3Mhz */
     latch = interval_in_ms*1000 * 3;
 
@@ -48,7 +48,7 @@ void tick_start(unsigned int interval_in_ms)
 
     __tcu_clear_full_match_flag(0);
     __tcu_start_counter(0);
-    
+
     system_enable_irq(IRQ_TCU0);
 }
 
@@ -56,7 +56,7 @@ void tick_start(unsigned int interval_in_ms)
 void TCU0(void)
 {
     __tcu_clear_full_match_flag(0);
-    
+
     /* Run through the list of tick tasks */
     call_tick_tasks();
 }

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Michiel van der Kolk 
+ * Copyright (C) 2005 by Michiel van der Kolk
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -51,7 +51,7 @@ char *getstring(struct token *token) {
             break;
         default:
             // report error
-            rb->snprintf(buf,199,"unknown token %d in getstring..",token->kind); 
+            rb->snprintf(buf,199,"unknown token %d in getstring..",token->kind);
             rb->splash(HZ*2,buf);
             return "";
     }

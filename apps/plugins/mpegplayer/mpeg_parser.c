@@ -434,7 +434,7 @@ static off_t mpeg_parser_seek_PTS(uint32_t time, unsigned id)
 
                 state = STATE2; /* Last scan was early */
                 sk.dir = SSCAN_REVERSE;
-   
+
                 DEBUGF(">> tl:%u t:%u ct:%u tr:%u\n   pl:%ld pn:%ld pr:%ld\n",
                        (unsigned)time_left, (unsigned)time, (unsigned)currpts,
                        (unsigned)time_right, (long)pos_left, (long)pos_new,
@@ -1094,7 +1094,7 @@ int parser_init_stream(void)
      * should succeed if it really is a video-only stream */
     video_str.hdr.pos = 0;
     video_str.hdr.limit = 256*1024;
-    
+
     if (parse_demux(&video_str, STREAM_PM_RANDOM_ACCESS) == STREAM_OK)
     {
         /* Found a video packet - assume program stream */

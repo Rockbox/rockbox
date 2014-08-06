@@ -113,7 +113,7 @@ static unsigned int __mkdir(const char *path)
 #endif
             *p = PATH_SEPARATOR;
         }
-    if(access(opath, F_OK))    
+    if(access(opath, F_OK))
 #ifdef _WIN32
         return mkdir(opath);
 #else
@@ -176,7 +176,7 @@ static int split_hxf(const unsigned char* infile, unsigned int size, const char*
 #endif
             infile += filenamesize + 1; /* + padding */
             size -= filenamesize + 1;
-            
+
             filesize = le2int((unsigned char*)infile);
             infile += 4;
             size -= 4;
@@ -193,7 +193,7 @@ static int split_hxf(const unsigned char* infile, unsigned int size, const char*
 #endif
                 }
             }
-            
+
             if(!file_exists(filename))
             {
                 printf("[INFO] %s: %d bytes\n", filename, filesize);
@@ -213,7 +213,7 @@ static int split_hxf(const unsigned char* infile, unsigned int size, const char*
                 }
                 fclose(outfile);
             }
-            
+
             infile += filesize;
             size -= filesize;
         }
@@ -237,11 +237,11 @@ int main(int argc, char *argv[])
     FILE *infile;
     struct header hdr;
     unsigned char *inbuffer;
-    
+
     fprintf(stderr, "HXFsplit v" VERSION " - (C) 2008 Maurus Cuelenaere\n");
     fprintf(stderr, "This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-    
+
     if(argc != 3)
     {
         print_usage();
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "[ERR]  Cannot open %s\n", argv[1]);
         return 3;
     }
-    
+
     if((inbuffer = (unsigned char*)malloc(sizeof(struct header))) == NULL)
     {
         fclose(infile);
@@ -279,30 +279,30 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Cannot read header of %s\n", argv[1]);
         return 5;
     }
-    
+
     memcpy(hdr.main_header, inbuffer, 20);
     hdr.size = le2int(&inbuffer[20]);
     hdr.checksum = le2int(&inbuffer[24]);
     hdr.unknown = le2int(&inbuffer[28]);
     memcpy(hdr.other_header, &inbuffer[32], 32);
     free(inbuffer);
-    
+
     if(strcmp(hdr.other_header, "Chinachip PMP firmware V1.0") != 0)
     {
         fclose(infile);
         fprintf(stderr, "[ERR]  Header doesn't match\n");
         return 6;
     }
-    
+
     if((inbuffer = (unsigned char*)malloc(hdr.size)) == NULL)
     {
         fclose(infile);
         fprintf(stderr, "[ERR]  Error allocating %d bytes buffer\n", hdr.size);
         return 7;
     }
-    
+
     fseek(infile, sizeof(struct header), SEEK_SET);
-    
+
     if(fread(inbuffer, hdr.size-sizeof(struct header), 1, infile) != 1)
     {
         fclose(infile);
@@ -310,12 +310,12 @@ int main(int argc, char *argv[])
         fprintf(stderr, "[ERR]  Cannot read file in buffer\n");
         return 8;
     }
-    
+
     fclose(infile);
-    
+
     split_hxf(inbuffer, hdr.size-sizeof(struct header), argv[2]);
-    
+
     free(inbuffer);
-    
+
     return 0;
 }

@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     unsigned char buf[128000];
 
     f = fopen("mp.mp3", "r");
-    
+
     if(f)
     {
     if(fread(buf, 1, 128000, f) < 128000)

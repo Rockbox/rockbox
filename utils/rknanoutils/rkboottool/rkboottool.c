@@ -176,7 +176,7 @@ static void save_blob(const struct rknano_blob_t *b, void *buf, uint32_t size,
         }
         encode_page(buff_ptr, out_ptr, len);
     }
-    
+
     if(f)
     {
         fwrite(ptr, b->size, 1, f);
@@ -348,7 +348,7 @@ static int do_nanostage_image(uint8_t *buf, unsigned long size)
     cprintf(YELLOW, "%#08x\n", hdr->addr);
     cprintf(GREEN, "  Load count: ");
     cprintf(YELLOW, "%d\n", hdr->count);
-    
+
     struct rknano_stage_section_t *sec = (void *)(hdr + 1);
 
     for(unsigned i = 0; i < hdr->count; i++, sec++)
@@ -588,7 +588,7 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
         cprintf(RED, "OK\n");
     else
         cprintf(RED, "Mismatch\n");
-    
+
 #define print(str, name) cprintf(GREEN, "  "str": ");cprintf(YELLOW, "%#x\n", (unsigned)hdr->name)
 #define print_arr(str, name, sz) \
     cprintf(GREEN, "  "str":");for(int i = 0; i < sz; i++)cprintf(YELLOW, " %#x", (unsigned)hdr->name[i]);printf("\n")
@@ -603,7 +603,7 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
 
     cprintf(GREEN, "  Chip: ");
     cprintf(YELLOW, "%#x\n", hdr->chip);
-    
+
     print_arr("field_2A", field_2B, 9);
     print("field_34", field_34);
 
@@ -625,7 +625,7 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
         cprintf(RED, "OK\n");
     else
         cprintf(RED, "Mismatch\n");
-    
+
     return 0;
 }
 
@@ -687,7 +687,7 @@ static int do_rkfw_image(uint8_t *buf, unsigned long size)
 
     cprintf(GREEN, "  Chip: ");
     cprintf(YELLOW, "%#x\n", hdr->chip);
-    
+
     cprintf(GREEN, "  Loader: ");
     print_blob_interval(&hdr->loader);
     cprintf(OFF, "\n");
@@ -852,7 +852,7 @@ int main(int argc, char **argv)
         perror("Cannot read file");
         return 1;
     }
-    
+
     fclose(fin);
 
     if(try_nanofw && !do_nanofw_image(buf, size))
@@ -873,4 +873,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-

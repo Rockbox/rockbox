@@ -10,14 +10,14 @@
 
 char* strdup(const char *__s)
 {
-	char *charptr;
+        char *charptr;
 
-	if (!__s)
-		return NULL;
+        if (!__s)
+                return NULL;
 
-	charptr=(char *)MikMod_malloc(sizeof(char) * (strlen(__s) + 1));
-	if (charptr) 
-		strcpy(charptr, __s);
+        charptr=(char *)MikMod_malloc(sizeof(char) * (strlen(__s) + 1));
+        if (charptr)
+                strcpy(charptr, __s);
 
-	return charptr;
+        return charptr;
 }

@@ -1,19 +1,19 @@
 /*
 ** FAAD2 - Freeware Advanced Audio (AAC) Decoder including SBR decoding
 ** Copyright (C) 2003-2004 M. Bakker, Ahead Software AG, http://www.nero.com
-**  
+**
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
-** 
+**
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software 
+** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 **
 ** Any non-GPL usage of this software or parts of this software is strictly
@@ -52,7 +52,7 @@ static real_t windowed_buf[2*FRAME_LEN] MEM_ALIGN_ATTR = {0};
 
 /*Windowing functions borrowed from libwmai*/
 #ifdef CPU_ARM
-static inline 
+static inline
 void vector_fmul_add_add(real_t *dst, const real_t *src0, const real_t *src1, const real_t *src2, int len)
 {
     /* Block sizes are always power of two */
@@ -71,7 +71,7 @@ void vector_fmul_add_add(real_t *dst, const real_t *src0, const real_t *src1, co
         "subs  %[n], %[n], #2;"
         "bne   0b;"
         : [d] "+r" (src0), [w] "+r" (src1), [src2] "+r" (src2), [dst] "+r" (dst), [n] "+r" (len)
-        : 
+        :
         : "r0", "r1", "r4", "r5", "r8", "r9", "memory", "cc");
 }
 static inline
@@ -92,7 +92,7 @@ void vector_fmul_reverse(real_t *dst, const real_t *src0, const real_t *src1,
         "subs  %[n], %[n], #2;"
         "bne   0b;"
         : [s0] "+r" (src0), [s1] "+r" (src1), [dst] "+r" (dst), [n] "+r" (len)
-        : 
+        :
         : "r0", "r1", "r4", "r5", "r8", "r9", "memory", "cc");
 }
 
@@ -127,7 +127,7 @@ void vector_fmul_add_add(real_t *dst, const real_t *src0, const real_t *src1, co
         "subq.l #4, %[n];"
         "jne 0b;"
         : [src0] "+a" (src0), [src1] "+a" (src1), [src2] "+a" (src2), [dst] "+a" (dst), [n] "+d" (len)
-        : 
+        :
         : "d0", "d1", "d2", "d3", "d4", "d5", "a0", "a1", "memory", "cc");
 }
 
@@ -209,7 +209,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 {
     int32_t i, idx0, idx1;
     real_t win0, win1, win2;
-     
+
     const real_t *window_long       = NULL;
     const real_t *window_long_prev  = NULL;
     const real_t *window_short      = NULL;
@@ -241,9 +241,9 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
         window_short = sine_short_128;
     } else {
         window_long  = kbd_long_1024;
-        window_short = kbd_short_128;            
+        window_short = kbd_short_128;
     }
-    
+
     if (window_shape_prev == 0) {
         window_long_prev  = sine_long_1024;
         window_short_prev = sine_short_128;
@@ -289,7 +289,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
 
         /* window the second half and save as overlap for next frame */
         /* construct second half window using padding with 1's and 0's */
-        
+
         memcpy(overlap, transf_buf+nlong, nflat_ls*sizeof(real_t));
 
         vector_fmul_reverse(overlap+nflat_ls, transf_buf+nlong+nflat_ls, window_short, nshort);
@@ -298,8 +298,8 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
         break;
 
     case EIGHT_SHORT_SEQUENCE:
-        /* this could be assemblerized too, but this case is extremely uncommon */   
-         
+        /* this could be assemblerized too, but this case is extremely uncommon */
+
         /* perform iMDCT for each short block */
         idx0 = 0;       ff_imdct_calc(8, transf_buf            , freq_in       );
         idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
@@ -310,7 +310,7 @@ void ifilter_bank(uint8_t window_sequence, uint8_t window_shape,
         idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
         idx0 += nshort; ff_imdct_calc(8, transf_buf + (idx0<<1), freq_in + idx0);
 
-        /* Add second half output of previous frame to windowed output of current 
+        /* Add second half output of previous frame to windowed output of current
          * frame */
         /* Step 1: copy */
         memcpy(time_out, overlap, nflat_ls*sizeof(real_t));

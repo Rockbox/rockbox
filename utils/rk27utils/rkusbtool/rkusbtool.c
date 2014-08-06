@@ -231,7 +231,7 @@ int main (int argc, char **argv)
         usage();
         return 1;
     }
-    
+
     /* print banner */
     fprintf(stderr,"rkusbtool " VERSION "\n");
     fprintf(stderr,"(C) Marcin Bukat 2011\n");
@@ -347,7 +347,7 @@ int main (int argc, char **argv)
         libusb_close(hdev);
         return -11;
     }
-    
+
     /* BulkOnly reset */
     //ret = libusb_control_transfer(hdev, 0x21, 0xff, 0, 0, NULL, 0, USB_TIMEOUT);
 
@@ -357,7 +357,7 @@ int main (int argc, char **argv)
     /* Devices that do not support multiple LUNs may STALL this command. */
    //if (ret == 0)
    //   maxlun = -1;
- 
+
     //printf("MAXLUN: %d\n", maxlun);
 
     get_sense(hdev);

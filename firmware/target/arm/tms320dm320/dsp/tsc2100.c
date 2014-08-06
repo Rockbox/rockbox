@@ -17,7 +17,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/ 
+ ****************************************************************************/
 
 #include "audio.h"
 #include "registers.h"
@@ -46,4 +46,3 @@ void audiohw_stop(void)
     /* Reset the transmitter */
     SPCR20&=0xFFFE;
 }
-

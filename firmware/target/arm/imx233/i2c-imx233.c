@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2011 by Amaury Pouly
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -155,7 +155,7 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
         i2c_stage[i2c_nr_stages].src = i2c_buffer + start_off;
         i2c_stage[i2c_nr_stages].dst = buffer;
     }
-    
+
     if(i2c_nr_stages > 0)
     {
         i2c_stage[i2c_nr_stages - 1].dma.next = &i2c_stage[i2c_nr_stages].dma;

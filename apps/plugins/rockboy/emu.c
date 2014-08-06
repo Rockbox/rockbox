@@ -55,17 +55,17 @@ void emu_run(void)
         rtc_tick();
 
         if (options.sound || !plugbuf)
-		{
+                {
             sound_mix();
             rockboy_pcm_submit();
-		}
+                }
 
         doevents();
         vid_begin();
 
         if (!(R_LCDC & 0x80))
             cpu_emulate(32832);
-        
+
         while (R_LY > 0) /* wait for next frame */
         {
             emu_step();

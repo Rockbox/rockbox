@@ -62,7 +62,7 @@ static void draw_image_rect(struct image_info *info,
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap_part((fb_data *)*pdisp, info->x + x, info->y + y,
-                        STRIDE(SCREEN_MAIN, info->width, info->height), 
+                        STRIDE(SCREEN_MAIN, info->width, info->height),
                         x + MAX(0, (LCD_WIDTH-info->width)/2),
                         y + MAX(0, (LCD_HEIGHT-info->height)/2),
                         width, height);
@@ -82,8 +82,8 @@ static int img_mem(int ds)
 #ifdef USEGSLIB
     return (p_decoder->infoPng.width/ds) * (p_decoder->infoPng.height/ds);
 #else
-    return (p_decoder->infoPng.width/ds) * 
-           (p_decoder->infoPng.height/ds) * 
+    return (p_decoder->infoPng.width/ds) *
+           (p_decoder->infoPng.height/ds) *
            FB_DATA_SZ;
 #endif
 }

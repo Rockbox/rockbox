@@ -121,13 +121,13 @@ void system_exception_wait(void)
 static void set_page_tables(void)
 {
     /* map every memory region to itself */
-    map_section(0, 0, 0x1000, CACHE_NONE); 
-    
+    map_section(0, 0, 0x1000, CACHE_NONE);
+
     /* map RAM to 0 and enable caching for it */
-    map_section(0x30000000, 0, MEMORYSIZE, CACHE_ALL); 
-    
+    map_section(0x30000000, 0, MEMORYSIZE, CACHE_ALL);
+
     /* enable buffered writing for the framebuffer */
-    map_section((int)FRAME, (int)FRAME, 1, BUFFERED); 
+    map_section((int)FRAME, (int)FRAME, 1, BUFFERED);
 }
 
 void memory_init(void)
@@ -159,7 +159,7 @@ void system_init(void)
     GPBCON |= 0x85;
     GPBDAT |= 0x07;
     GPBUP  |= 0x20F;
- 
+
     /* Take care of flash related pins */
     GPCCON |= 0x1000;
     GPCDAT &= ~0x40;
@@ -179,23 +179,23 @@ void system_init(void)
     GPHDAT |= 0x03;
 
     /* TODO: do something with PRIORITY */
- 
+
     /* Turn off currently-not or never-needed devices.
      *  Be careful here, it is possible to freeze the device by disabling
      *  clocks at the wrong time.
      *
-     * Turn off AC97, Camera, SPI, IIS, I2C, UARTS, MMC/SD/SDIO Controller 
+     * Turn off AC97, Camera, SPI, IIS, I2C, UARTS, MMC/SD/SDIO Controller
      * USB device, USB host, NAND flash controller.
      *
      * IDLE, Sleep, LCDC, PWM timer, GPIO, RTC, and ADC are untouched (on)
      */
     CLKCON &= ~0xFF1ED0;
- 
+
     CLKSLOW |= 0x80;
-#elif defined(MINI2440)        
+#elif defined(MINI2440)
     /* TODO: anything? */
 #else
-#error Unknown target    
+#error Unknown target
 #endif
 }
 

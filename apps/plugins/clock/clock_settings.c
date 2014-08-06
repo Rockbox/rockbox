@@ -47,7 +47,7 @@ enum settings_file_status{
 
 struct clock_settings clock_settings;
 
-/* The settings as they exist on the hard disk, so that 
+/* The settings as they exist on the hard disk, so that
  * we can know at saving time if changes have been made */
 struct clock_settings hdd_clock_settings;
 
@@ -148,7 +148,7 @@ static void draw_message(struct screen* display, int msg, int y){
                       display->getwidth(), message->slide_height);
     display->set_drawmode(DRMODE_SOLID);
     vertical_picture_draw_sprite(display, message, msg,
-                                 0, display->getheight() - 
+                                 0, display->getheight() -
                                     (message->slide_height*y));
 }
 

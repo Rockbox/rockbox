@@ -62,7 +62,7 @@ void lcd_set_flip(bool yesno)
     {
         xoffset = 132 - LCD_WIDTH; /* 132 colums minus the 128 we have */
     }
-    else 
+    else
     {
         xoffset = 0;
     }
@@ -95,7 +95,7 @@ static void lcd_writereg(uint32_t reg, uint32_t data)
 
 void lcd_on(void) {
     if (lcd_type == 1) {
-        LCD_WCMD = 0x29;    
+        LCD_WCMD = 0x29;
     } else {
         lcd_writereg(0x7, 0x21);
         lcd_writereg(0x12, 0x137);
@@ -113,7 +113,7 @@ void lcd_off(void) {
         LCD_WCMD = 0x28;
         LCD_WDATA = 0;
     } else {
-    
+
     }
 }
 
@@ -318,4 +318,3 @@ void lcd_blit_yuv(unsigned char * const src[3],
 {
     /* stub */
 }
-

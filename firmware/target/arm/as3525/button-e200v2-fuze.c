@@ -45,7 +45,7 @@ static bool hold_button_old = false;
 
 void button_init_device(void)
 {
-    GPIOA_DIR |= (1<<1);     
+    GPIOA_DIR |= (1<<1);
     GPIOA_PIN(1) = (1<<1);
 }
 

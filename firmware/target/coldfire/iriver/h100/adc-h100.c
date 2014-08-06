@@ -52,7 +52,7 @@ unsigned short adc_scan(int channel)
     int level = disable_irq_save();
     unsigned char data = 0;
     int i;
-    
+
     CS_LO;
 
     DI_HI;  /* Start bit */
@@ -60,7 +60,7 @@ unsigned short adc_scan(int channel)
     CLK_HI;
     DELAY;
     CLK_LO;
-    
+
     DI_HI;  /* Single channel */
     DELAY;
     CLK_HI;
@@ -75,7 +75,7 @@ unsigned short adc_scan(int channel)
     CLK_HI;
     DELAY;
     CLK_LO;
-    
+
     if(channel & 2) /* MSB of channel number */
         DI_HI;
     else

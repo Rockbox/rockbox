@@ -27,10 +27,10 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 #define CPU_BEGIN \
 bool run_cpu( struct Sgc_Emu* this, cpu_time_t end_time )\
 {\
-	Sgc_Cpu* cpu = &this->cpu; \
-	Z80_set_end_time( cpu, end_time );
+        Sgc_Cpu* cpu = &this->cpu; \
+        Z80_set_end_time( cpu, end_time );
 
-	#include "z80_cpu_run.h"
-	
-	return warning;
+        #include "z80_cpu_run.h"
+
+        return warning;
 }

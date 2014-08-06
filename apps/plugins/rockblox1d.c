@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/  
+ ****************************************************************************/
 
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
@@ -102,16 +102,16 @@ enum plugin_status plugin_start(const void* parameter)
 
     bool quit = false;
     int button;
-    
+
     int cycletime = 300;
     int end;
 
     int pos_cur_brick = 0;
     int type_cur_brick = 0;
     int type_next_brick = 0;
-    
+
     unsigned long int score = 34126;
-    
+
     (void)parameter;
 
 #if LCD_DEPTH > 1
@@ -121,20 +121,20 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     rb->lcd_setfont(FONT_SYSFIXED);
-    
+
     rb->lcd_getstringsize("100000000", &f_width, &f_height);
-    
+
     rb->lcd_clear_display();
-    
+
     /***********
     ** Draw EVERYTHING
     */
-    
+
     /* Playing filed box */
     rb->lcd_vline(CENTER_X-2, CENTER_Y, CENTER_Y + (WIDTH*TILES+TILES));
     rb->lcd_vline(CENTER_X + WIDTH + 1, CENTER_Y,
                   CENTER_Y + (WIDTH*TILES+TILES));
-    rb->lcd_hline(CENTER_X-2, CENTER_X + WIDTH + 1, 
+    rb->lcd_hline(CENTER_X-2, CENTER_X + WIDTH + 1,
                   CENTER_Y + (WIDTH*TILES+TILES));
 
     /* Score box */
@@ -146,7 +146,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_putsxy(2, SCORE_Y-6-f_height, "score");
 #endif
     score_x = SCORE_X;
-    
+
     /* Next box */
     rb->lcd_getstringsize("next", &f_width, NULL);
 #if (LCD_WIDTH > LCD_HEIGHT) && !(LCD_WIDTH > 132)
@@ -161,13 +161,13 @@ enum plugin_status plugin_start(const void* parameter)
     ** GAMELOOP
     */
     rb->srand( *rb->current_tick );
-    
+
     type_cur_brick = 2 + mrand(3);
     type_next_brick = 2 + mrand(3);
-    
+
     do {
         end = *rb->current_tick + (cycletime * HZ) / 1000;
-        
+
         draw_brick(pos_cur_brick, type_cur_brick);
 
         /* Draw next brick */
@@ -176,10 +176,10 @@ enum plugin_status plugin_start(const void* parameter)
         rb->lcd_set_drawmode(DRMODE_SOLID);
 
         for (i = 0; i < type_next_brick; ++i) {
-            rb->lcd_fillrect(NEXT_X, 
+            rb->lcd_fillrect(NEXT_X,
                              NEXT_Y + ((type_next_brick % 2) ? (int)(WIDTH/2) : ((type_next_brick == 2) ? (WIDTH+1) : 0)) + (WIDTH*i) + i,
                              WIDTH, WIDTH);
-        } 
+        }
 
         /* Score box */
         rb->lcd_putsxyf(score_x, SCORE_Y, "%8ld0", score);
@@ -205,7 +205,7 @@ enum plugin_status plugin_start(const void* parameter)
                     quit = true;
                 }
         }
-        
+
         if ((pos_cur_brick + type_cur_brick) > 10) {
              type_cur_brick = type_next_brick;
              type_next_brick = 2 + mrand(3);
@@ -221,6 +221,6 @@ enum plugin_status plugin_start(const void* parameter)
             rb->yield();
 
     } while (!quit);
- 
+
     return PLUGIN_OK;
 }

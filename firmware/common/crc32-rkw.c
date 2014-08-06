@@ -20,7 +20,7 @@
 
 #include "crc32-rkw.h"
 
-/* Slightly modified version of the crc32 algorithm generated with help of 
+/* Slightly modified version of the crc32 algorithm generated with help of
  * pycrc http://www.tty1.net/pycrc/index_en.html
  * pycrc.py --width 32 --xor-in 0 --xor-out 0 --poly 0x04c10db7 \
  *          --reflect-in false --reflect-out false \
@@ -108,4 +108,3 @@ uint32_t crc32_rkw(const uint8_t *data, uint32_t len)
 
     return crc;
 }
-

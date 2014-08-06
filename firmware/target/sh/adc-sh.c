@@ -73,7 +73,7 @@ void ADITI(void)
             adcdata[2] = ADDRC >> 6;
             adcdata[3] = ADDRD >> 6;
             current_channel = 4;
-            
+
             /* Convert the next group */
             ADCSR = ADCSR_ADST | ADCSR_ADIE | ADCSR_SCAN | 7;
         }
@@ -98,13 +98,13 @@ void adc_init(void)
                      to the manual... */
 
     ADCSR = 0;
-    
+
     current_channel = 0;
 
     /* Enable the A/D IRQ on level 1 */
     IPRE = (IPRE & 0xf0ff) | 0x0100;
-    
+
     tick_add_task(adc_tick);
-    
+
     sleep(2);    /* Ensure valid readings when adc_init returns */
 }

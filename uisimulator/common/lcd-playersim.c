@@ -75,12 +75,12 @@ void lcd_print_char(int x, int y, unsigned char ch)
 
     if (double_height > 1 && y == 1)
         return;  /* only one row available if text is double height */
-        
+
     for (row = 0; row < 7; row ++)
     {
         unsigned fontbitmap = (*font_player)[ch][row];
         int height = (row == 3) ? 1 : double_height;
-        
+
         y = ypos + row * CHAR_PIXEL * double_height;
         for (col = 0; col < 5; col++)
         {
@@ -104,7 +104,7 @@ void lcd_print_char(int x, int y, unsigned char ch)
 void lcd_double_height(bool on)
 {
     int newval = (is_new_player() && on) ? 2 : 1;
-    
+
     if (newval != double_height)
     {
         double_height = newval;

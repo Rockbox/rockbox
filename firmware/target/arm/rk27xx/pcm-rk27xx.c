@@ -37,7 +37,7 @@ void pcm_play_lock(void)
     if (++locked == 1)
     {
         int old = disable_irq_save();
-        INTC_IMR &= ~IRQ_ARM_HDMA; /* mask HDMA interrupt */ 
+        INTC_IMR &= ~IRQ_ARM_HDMA; /* mask HDMA interrupt */
         restore_irq(old);
     }
 }
@@ -151,7 +151,7 @@ static void i2s_init(void)
 
     /* enable i2s clocks */
     SCU_CLKCFG &= ~(CLKCFG_PCLK_I2S | CLKCFG_I2S);
-    
+
     /* configure I2S module */
     I2S_IER = 0; /* disable all i2s interrupts */
 
@@ -171,7 +171,7 @@ static void i2s_init(void)
      */
     I2S_FIFOSTS = (1<<18) | /* Tx trigger level half full */
                   (1<<16);  /* Rx trigger level half full */
-                  
+
     I2S_OPR = (1<<17) |  /* reset Tx */
               (1<<16) |  /* reset Rx */
               (0<<6)  |  /* HDMA Req1 enable */
@@ -203,7 +203,7 @@ static void set_codec_freq(unsigned int freq)
     long timeout;
 
     /* {CLKR, CLKF, CLKOD, CODECPLL_DIV} */
-    static const unsigned int pcm_freq_params[HW_NUM_FREQ][4] = 
+    static const unsigned int pcm_freq_params[HW_NUM_FREQ][4] =
     {
         [HW_FREQ_96] = {24, 255, 4, 1},
         [HW_FREQ_48] = {24, 127, 4, 1},
@@ -247,7 +247,7 @@ void pcm_play_dma_init(void)
     INTC_IECR |= IRQ_ARM_HDMA;
 
     audiohw_preinit();
-    
+
     i2s_init();
 }
 
@@ -287,7 +287,7 @@ void INT_HDMA(void)
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     uint32_t addr;
-    
+
     int old = disable_irq_save();
     addr = HDMA_CSRC0;
     *count = ((HDMA_CCNT0 & 0xffff)<<2);

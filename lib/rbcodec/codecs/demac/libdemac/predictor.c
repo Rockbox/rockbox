@@ -73,7 +73,7 @@ void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
                                               int32_t* decoded1,
                                               int count)
 {
-    int32_t predictionA, predictionB; 
+    int32_t predictionA, predictionB;
 
     while (LIKELY(count--))
     {
@@ -84,9 +84,9 @@ void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
         p->buf[YDELAYA-1] = p->buf[YDELAYA] - p->buf[YDELAYA-1];
         p->buf[YADAPTCOEFFSA-1] = SIGN(p->buf[YDELAYA-1]);
 
-        predictionA = (p->buf[YDELAYA] * p->YcoeffsA[0]) + 
-                      (p->buf[YDELAYA-1] * p->YcoeffsA[1]) + 
-                      (p->buf[YDELAYA-2] * p->YcoeffsA[2]) + 
+        predictionA = (p->buf[YDELAYA] * p->YcoeffsA[0]) +
+                      (p->buf[YDELAYA-1] * p->YcoeffsA[1]) +
+                      (p->buf[YDELAYA-2] * p->YcoeffsA[2]) +
                       (p->buf[YDELAYA-3] * p->YcoeffsA[3]);
 
         /*  Apply a scaled first-order filter compression */
@@ -97,10 +97,10 @@ void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
         p->buf[YDELAYB-1] = p->buf[YDELAYB] - p->buf[YDELAYB-1];
         p->buf[YADAPTCOEFFSB-1] = SIGN(p->buf[YDELAYB-1]);
 
-        predictionB = (p->buf[YDELAYB] * p->YcoeffsB[0]) + 
-                      (p->buf[YDELAYB-1] * p->YcoeffsB[1]) + 
-                      (p->buf[YDELAYB-2] * p->YcoeffsB[2]) + 
-                      (p->buf[YDELAYB-3] * p->YcoeffsB[3]) + 
+        predictionB = (p->buf[YDELAYB] * p->YcoeffsB[0]) +
+                      (p->buf[YDELAYB-1] * p->YcoeffsB[1]) +
+                      (p->buf[YDELAYB-2] * p->YcoeffsB[2]) +
+                      (p->buf[YDELAYB-3] * p->YcoeffsB[3]) +
                       (p->buf[YDELAYB-4] * p->YcoeffsB[4]);
 
         p->YlastA = *decoded0 + ((predictionA + (predictionB >> 1)) >> 10);
@@ -113,9 +113,9 @@ void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
         p->buf[XDELAYA-1] = p->buf[XDELAYA] - p->buf[XDELAYA-1];
         p->buf[XADAPTCOEFFSA-1] = SIGN(p->buf[XDELAYA-1]);
 
-        predictionA = (p->buf[XDELAYA] * p->XcoeffsA[0]) + 
-                      (p->buf[XDELAYA-1] * p->XcoeffsA[1]) + 
-                      (p->buf[XDELAYA-2] * p->XcoeffsA[2]) + 
+        predictionA = (p->buf[XDELAYA] * p->XcoeffsA[0]) +
+                      (p->buf[XDELAYA-1] * p->XcoeffsA[1]) +
+                      (p->buf[XDELAYA-2] * p->XcoeffsA[2]) +
                       (p->buf[XDELAYA-3] * p->XcoeffsA[3]);
 
         /*  Apply a scaled first-order filter compression */
@@ -125,13 +125,13 @@ void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
         p->buf[XDELAYB-1] = p->buf[XDELAYB] - p->buf[XDELAYB-1];
         p->buf[XADAPTCOEFFSB-1] = SIGN(p->buf[XDELAYB-1]);
 
-        predictionB = (p->buf[XDELAYB] * p->XcoeffsB[0]) + 
-                      (p->buf[XDELAYB-1] * p->XcoeffsB[1]) + 
-                      (p->buf[XDELAYB-2] * p->XcoeffsB[2]) + 
-                      (p->buf[XDELAYB-3] * p->XcoeffsB[3]) + 
+        predictionB = (p->buf[XDELAYB] * p->XcoeffsB[0]) +
+                      (p->buf[XDELAYB-1] * p->XcoeffsB[1]) +
+                      (p->buf[XDELAYB-2] * p->XcoeffsB[2]) +
+                      (p->buf[XDELAYB-3] * p->XcoeffsB[3]) +
                       (p->buf[XDELAYB-4] * p->XcoeffsB[4]);
 
-        p->XlastA = *decoded1 + ((predictionA + (predictionB >> 1)) >> 10); 
+        p->XlastA = *decoded1 + ((predictionA + (predictionB >> 1)) >> 10);
         p->XfilterA =  p->XlastA + ((p->XfilterA * 31) >> 5);
 
         if (LIKELY(*decoded0 != 0))
@@ -203,7 +203,7 @@ void ICODE_ATTR_DEMAC predictor_decode_stereo(struct predictor_t* p,
 
         /* Have we filled the history buffer? */
         if (UNLIKELY(p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE)) {
-            memmove(p->historybuffer, p->buf, 
+            memmove(p->historybuffer, p->buf,
                     PREDICTOR_SIZE * sizeof(int32_t));
             p->buf = p->historybuffer;
         }
@@ -225,16 +225,16 @@ void ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
         p->buf[YDELAYA] = currentA;
         p->buf[YDELAYA-1] = p->buf[YDELAYA] - p->buf[YDELAYA-1];
 
-        predictionA = (p->buf[YDELAYA] * p->YcoeffsA[0]) + 
-                      (p->buf[YDELAYA-1] * p->YcoeffsA[1]) + 
-                      (p->buf[YDELAYA-2] * p->YcoeffsA[2]) + 
+        predictionA = (p->buf[YDELAYA] * p->YcoeffsA[0]) +
+                      (p->buf[YDELAYA-1] * p->YcoeffsA[1]) +
+                      (p->buf[YDELAYA-2] * p->YcoeffsA[2]) +
                       (p->buf[YDELAYA-3] * p->YcoeffsA[3]);
 
         currentA = A + (predictionA >> 10);
 
         p->buf[YADAPTCOEFFSA] = SIGN(p->buf[YDELAYA]);
         p->buf[YADAPTCOEFFSA-1] = SIGN(p->buf[YDELAYA-1]);
-        
+
         if (LIKELY(A != 0))
         {
             if (A > 0)
@@ -257,7 +257,7 @@ void ICODE_ATTR_DEMAC predictor_decode_mono(struct predictor_t* p,
 
         /* Have we filled the history buffer? */
         if (UNLIKELY(p->buf == p->historybuffer + PREDICTOR_HISTORY_SIZE)) {
-            memmove(p->historybuffer, p->buf, 
+            memmove(p->historybuffer, p->buf,
                     PREDICTOR_SIZE * sizeof(int32_t));
             p->buf = p->historybuffer;
         }

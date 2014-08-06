@@ -104,7 +104,7 @@ static inline void lcd_send_data_swapped(unsigned v)
 {
     lcd_wait_write();
     LCD2_PORT = LCD2_DATA_MASK | (v & 0xff);  /* Send LSB first */
-    LCD2_PORT = LCD2_DATA_MASK | (v >> 8);    
+    LCD2_PORT = LCD2_DATA_MASK | (v >> 8);
 }
 
 /* Write value to register */
@@ -176,9 +176,9 @@ void lcd_set_flip(bool yesno)
 
 /* LCD init */
 void lcd_init_device(void)
-{  
+{
 #ifndef BOOTLOADER
-    /* The OF won't boot if this is done in the bootloader - ideally we should 
+    /* The OF won't boot if this is done in the bootloader - ideally we should
        tweak the lcd controller speed settings but this will do for now */
     CLCD_CLOCK_SRC |= 0xc0000000; /* Set LCD interface clock to PLL */
 #endif
@@ -432,10 +432,10 @@ void lcd_blit_yuv(unsigned char * const src[3],
     /* calculate the drawing region */
 
     /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
-     * is actually the bottom left and horizontal and vertical are swapped. 
-     * Rockbox expects the origin to be the top left so we need to use 
+     * is actually the bottom left and horizontal and vertical are swapped.
+     * Rockbox expects the origin to be the top left so we need to use
      * 127 - y instead of just y */
-    
+
     /* max vert << 8 | start vert */
     lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
 
@@ -505,16 +505,16 @@ void lcd_update_rect(int x0, int y0, int width, int height)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
     if(y1 >= LCD_HEIGHT)
         y1 = LCD_HEIGHT-1;
-        
+
     /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
-     * is actually the bottom left and horizontal and vertical are swapped. 
-     * Rockbox expects the origin to be the top left so we need to use 
+     * is actually the bottom left and horizontal and vertical are swapped.
+     * Rockbox expects the origin to be the top left so we need to use
      * 127 - y instead of just y */
-    
+
     /* max horiz << 8 | start horiz */
     lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
     lcd_send_data( (((LCD_HEIGHT-1)-y0+y_offset) << 8) | ((LCD_HEIGHT-1)-y1+y_offset) );
-    
+
     /* max vert << 8 | start vert */
     lcd_send_cmd(R_VERT_RAM_ADDR_POS);
     lcd_send_data((x1 << 8) | x0);

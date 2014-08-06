@@ -296,7 +296,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 #endif
             is_selected = true;
         }
-        
+
 #ifdef HAVE_LCD_COLOR
         /* if the list has a color callback */
         if (list->callback_get_item_color)
@@ -339,7 +339,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 /* This needs to be fixed if we ever get more than 1 touchscreen on a target. */
 
 /* difference in pixels between draws, above it means enough to start scrolling */
-#define SCROLL_BEGIN_THRESHOLD 3 
+#define SCROLL_BEGIN_THRESHOLD 3
 
 static enum {
     SCROLL_NONE,            /* no scrolling */
@@ -475,7 +475,7 @@ void _gui_synclist_stop_kinetic_scrolling(void)
  * but scrolling mode shouldn't be changed
  **/
 
- 
+
 static int scroll_begin_threshold;
 static int threshold_accumulation;
 static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
@@ -684,7 +684,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
     bool recurse;
     static bool initial_touch = true;
     static int last_y;
-    
+
     screen = SCREEN_MAIN;
     parent = list->parent[screen];
     line_height = list->line_height[screen];

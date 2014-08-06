@@ -105,6 +105,6 @@ int button_read_device(void)
     }
     else
         off_button_count = 0;
-        
+
     return btn;
 }

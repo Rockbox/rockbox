@@ -121,7 +121,7 @@ int button_read_device(void)
     {
         btn |= buttons;
     }
-    
+
     /* the touchpad - only watch the lines we actually read */
     touchpad = GPJDAT & touchpad_mask;
 
@@ -151,7 +151,7 @@ int button_read_device(void)
             btn |= BUTTON_LEFT;
 
     }
-    
+
     /* the cradle buttons */
     buttons = ~GPFDAT & 0xc0;
     if (buttons)
@@ -163,7 +163,7 @@ int button_read_device(void)
             btn |= BUTTON_POWER;
         buttonlight_on();
     }
-    
+
     return btn;
 }
 

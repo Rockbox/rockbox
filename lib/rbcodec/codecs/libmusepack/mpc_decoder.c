@@ -68,31 +68,31 @@ static MPC_SAMPLE_FORMAT g_V_R[MPC_V_MEM + 960 ] IBSS_ATTR                MEM_AL
 static MPC_SAMPLE_FORMAT g_Y_R[MPC_FRAME_LENGTH] IBSS_ATTR_MPC_LARGE_IRAM MEM_ALIGN_ATTR;
 
 //SV7 globals (decoding results for bundled quantizers (3- and 5-step))
-static const mpc_int32_t g_sv7_idx30[] ICONST_ATTR = 
+static const mpc_int32_t g_sv7_idx30[] ICONST_ATTR =
 {-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1};
-static const mpc_int32_t g_sv7_idx31[] ICONST_ATTR = 
+static const mpc_int32_t g_sv7_idx31[] ICONST_ATTR =
 {-1,-1,-1, 0, 0, 0, 1, 1, 1,-1,-1,-1, 0, 0, 0, 1, 1, 1,-1,-1,-1, 0, 0, 0, 1, 1, 1};
-static const mpc_int32_t g_sv7_idx32[] ICONST_ATTR = 
+static const mpc_int32_t g_sv7_idx32[] ICONST_ATTR =
 {-1,-1,-1,-1,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-static const mpc_int32_t g_sv7_idx50[] ICONST_ATTR = 
+static const mpc_int32_t g_sv7_idx50[] ICONST_ATTR =
 {-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2};
-static const mpc_int32_t g_sv7_idx51[] ICONST_ATTR = 
+static const mpc_int32_t g_sv7_idx51[] ICONST_ATTR =
 {-2,-2,-2,-2,-2,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
 
 //SV8 globals (decoding results for bundled quantizers (3- and 5-step))
-static const mpc_int8_t g_sv8_idx50[125] ICONST_ATTR = 
-{-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2, 
+static const mpc_int8_t g_sv8_idx50[125] ICONST_ATTR =
+{-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,
  -2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,
  -2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,
  -2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,
  -2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2,-2,-1, 0, 1, 2};
-static const mpc_int8_t g_sv8_idx51[125] ICONST_ATTR = 
+static const mpc_int8_t g_sv8_idx51[125] ICONST_ATTR =
 {-2,-2,-2,-2,-2,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
  -2,-2,-2,-2,-2,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
  -2,-2,-2,-2,-2,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
  -2,-2,-2,-2,-2,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2,
  -2,-2,-2,-2,-2,-1,-1,-1,-1,-1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2};
-static const mpc_int8_t g_sv8_idx52[125] ICONST_ATTR = 
+static const mpc_int8_t g_sv8_idx52[125] ICONST_ATTR =
 {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,
  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -100,9 +100,9 @@ static const mpc_int8_t g_sv8_idx52[125] ICONST_ATTR =
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 static const mpc_int8_t g_sv8_HuffQ2_var[125] ICONST_ATTR =
 { 6, 5, 4, 5, 6, 5, 4, 3, 4, 5, 4, 3, 2, 3, 4, 5, 4, 3, 4, 5, 6, 5, 4, 5, 6,
-  5, 4, 3, 4, 5, 4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2, 3, 4, 5, 4, 3, 4, 5, 
-  4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 2, 1, 0, 1, 2, 3, 2, 1, 2, 3, 4, 3, 2, 3, 4, 
-  5, 4, 3, 4, 5, 4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2, 3, 4, 5, 4, 3, 4, 5, 
+  5, 4, 3, 4, 5, 4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2, 3, 4, 5, 4, 3, 4, 5,
+  4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 2, 1, 0, 1, 2, 3, 2, 1, 2, 3, 4, 3, 2, 3, 4,
+  5, 4, 3, 4, 5, 4, 3, 2, 3, 4, 3, 2, 1, 2, 3, 4, 3, 2, 3, 4, 5, 4, 3, 4, 5,
   6, 5, 4, 5, 6, 5, 4, 3, 4, 5, 4, 3, 2, 3, 4, 5, 4, 3, 4, 5, 6, 5, 4, 5, 6};
 
 //------------------------------------------------------------------------------
@@ -335,16 +335,16 @@ void mpc_decoder_decode_frame(mpc_decoder * d,
             i->samples = 0;
         } else {
             i->samples -= d->samples_to_skip;
-            
+
             /* move valid samples to beginning for channel 0. noninterleaved! */
-            memmove(i->buffer, 
-                    i->buffer + d->samples_to_skip, 
+            memmove(i->buffer,
+                    i->buffer + d->samples_to_skip,
                     i->samples * sizeof(MPC_SAMPLE_FORMAT));
             /* move valid samples to beginning for channel 1. noninterleaved! */
-            memmove(i->buffer + MPC_FRAME_LENGTH, 
-                    i->buffer + MPC_FRAME_LENGTH + d->samples_to_skip, 
+            memmove(i->buffer + MPC_FRAME_LENGTH,
+                    i->buffer + MPC_FRAME_LENGTH + d->samples_to_skip,
                     i->samples * sizeof(MPC_SAMPLE_FORMAT));
-                    
+
             d->samples_to_skip = 0;
         }
     }
@@ -764,4 +764,3 @@ static void mpc_decoder_read_bitstream_sv8(mpc_decoder * d, mpc_bits_reader * r,
         } while (q == d->Q[n].L && (q = d->Q[n].R));
     }
 }
-

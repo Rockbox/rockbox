@@ -10,7 +10,7 @@
  * Copyright (C) 1999 Chris Allegretta
  * Copyright (C) 2005 Alastair S - ported to podzilla
  * Copyright (C) 2005 Jonas Häggqvist - ported to rockbox
- *   
+ *
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@
  ****************************************************************************/
 
 /*
- * TODO: 
+ * TODO:
  *  - The font is a bit large, create smaller one
  *  - For colour/greyscale displays, the font from the xscreensaver xmatrix
  *    should be converted and used
@@ -116,14 +116,14 @@ static void matrix_blit_char(const int row, const int col, int cha)
         cha = 0;
 
     if (matrix[row][col].bold == 1) {
-        rb->lcd_bitmap_part(matrix_bold, cha*COL_W, 0, 
-                STRIDE( SCREEN_MAIN, 
+        rb->lcd_bitmap_part(matrix_bold, cha*COL_W, 0,
+                STRIDE( SCREEN_MAIN,
                         BMPWIDTH_matrix_bold, BMPHEIGHT_matrix_bold),
                 col*COL_W + LEFTMARGIN, row*COL_H + TOPMARGIN, COL_W, COL_H);
     }
     else {
-        rb->lcd_bitmap_part(matrix_normal, cha*COL_W, 0, 
-                STRIDE( SCREEN_MAIN, 
+        rb->lcd_bitmap_part(matrix_normal, cha*COL_W, 0,
+                STRIDE( SCREEN_MAIN,
                         BMPWIDTH_matrix_normal, BMPHEIGHT_matrix_normal),
                 col*COL_W + LEFTMARGIN, row*COL_H + TOPMARGIN, COL_W, COL_H);
     }
@@ -159,7 +159,7 @@ static void matrix_loop(void)
             while (i <= ROWS) {
             /* Skip over spaces */
         /* this is whear the characters were disappearing */
-/*         
+/*
                 while (i <= ROWS && (matrix[i][j].val == 129 ||
                             matrix[i][j].val == -1))
                     i++;

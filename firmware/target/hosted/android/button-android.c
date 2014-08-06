@@ -120,7 +120,7 @@ void button_init_device(void)
     jmethodID constructor =     e->GetMethodID(env_ptr, class,
                                                 "<init>",
                                                 "(Landroid/content/Context;)V");
-    e->NewObject(env_ptr, class,         
+    e->NewObject(env_ptr, class,
                         constructor,
                         RockboxService_instance);
     /* when reaching this point, rockbox can be considered ready because the
@@ -160,7 +160,7 @@ Java_org_rockbox_monitors_HeadphoneMonitor_postHpStateChanged(JNIEnv *env,
     hp_state = state;
 }
 /* Tell if anything is in the jack.
- * 
+ *
  * since this is called from the tick task, which isn't attached to
  * the dalvik VM, it's not permitted to make JNI calls (therefore
  * we need the above callback) */
@@ -169,4 +169,3 @@ bool headphones_inserted(void)
     /* 0 is disconnected, 1 and 2 are connected */
     return (hp_state == 0) ? false : true;
 }
-

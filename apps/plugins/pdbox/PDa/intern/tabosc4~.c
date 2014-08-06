@@ -46,23 +46,23 @@ static t_int *tabosc4_tilde_perform(t_int *w)
 
     while (n--) {
         t_sample f2;
-	 phase+= mult(conv ,(*in++));
-	 phase &= (itofix(1) -1);
-	 off =  fixtoi((long long)phase<<logp);
+         phase+= mult(conv ,(*in++));
+         phase &= (itofix(1) -1);
+         off =  fixtoi((long long)phase<<logp);
 
 #ifdef NO_INTERPOLATION
-	 *out = *(tab+off);
+         *out = *(tab+off);
 #else
-	 frac = phase & ((1<<logp)-1);
+         frac = phase & ((1<<logp)-1);
          frac <<= (fix1-logp);
-         
-         f2 = (off == x->x_fnpoints) ? 
+
+         f2 = (off == x->x_fnpoints) ?
              mult(*(tab),frac) :
              mult(*(tab + off + 1),frac);
 
-	 *out = mult(*(tab + off),(itofix(1) - frac)) + f2;
+         *out = mult(*(tab + off),(itofix(1) - frac)) + f2;
 #endif
-	 out++;
+         out++;
     }
     x->x_phase = phase;
 
@@ -86,25 +86,25 @@ void tabosc4_tilde_set(t_tabosc4_tilde *x, t_symbol *s)
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
     {
-    	if (*s->s_name)
-    	    pd_error(x, "tabosc4~: %s: no such array", x->x_arrayname->s_name);
-    	x->x_vec = 0;
+        if (*s->s_name)
+            pd_error(x, "tabosc4~: %s: no such array", x->x_arrayname->s_name);
+        x->x_vec = 0;
     }
     else if (!garray_getfloatarray(a, &pointsinarray, &x->x_vec))
     {
-    	pd_error(x, "%s: bad template for tabosc4~", x->x_arrayname->s_name);
-    	x->x_vec = 0;
+        pd_error(x, "%s: bad template for tabosc4~", x->x_arrayname->s_name);
+        x->x_vec = 0;
     }
     else
     {
 #ifndef ROCKBOX
         int i;
 #endif
-    	x->x_fnpoints = pointsinarray;
-	x->x_lognpoints = ilog2(pointsinarray);
-	post("tabosc~: using %d (log %d) points of array",x->x_fnpoints,x->x_lognpoints);
+        x->x_fnpoints = pointsinarray;
+        x->x_lognpoints = ilog2(pointsinarray);
+        post("tabosc~: using %d (log %d) points of array",x->x_fnpoints,x->x_lognpoints);
 
-	garray_usedindsp(a);
+        garray_usedindsp(a);
     }
 }
 
@@ -120,20 +120,19 @@ static void tabosc4_tilde_dsp(t_tabosc4_tilde *x, t_signal **sp)
 
     tabosc4_tilde_set(x, x->x_arrayname);
     dsp_add(tabosc4_tilde_perform, 4, x,
-    	sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
+        sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
 void tabosc4_tilde_setup(void)
 {
     tabosc4_tilde_class = class_new(gensym("tabosc4~"),
-    	(t_newmethod)tabosc4_tilde_new, 0,
-    	sizeof(t_tabosc4_tilde), 0, A_DEFSYM, 0);
+        (t_newmethod)tabosc4_tilde_new, 0,
+        sizeof(t_tabosc4_tilde), 0, A_DEFSYM, 0);
     CLASS_MAINSIGNALIN(tabosc4_tilde_class, t_tabosc4_tilde, x_f);
     class_addmethod(tabosc4_tilde_class, (t_method)tabosc4_tilde_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
     class_addmethod(tabosc4_tilde_class, (t_method)tabosc4_tilde_set,
-    	gensym("set"), A_SYMBOL, 0);
+        gensym("set"), A_SYMBOL, 0);
     class_addmethod(tabosc4_tilde_class, (t_method)tabosc4_tilde_ft1,
-    	gensym("ft1"), A_FLOAT, 0);
+        gensym("ft1"), A_FLOAT, 0);
 }
-

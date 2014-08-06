@@ -29,7 +29,7 @@
 #include "ftl-target.h"
 #include "nand-target.h"
 
-/** static, private data **/ 
+/** static, private data **/
 static bool initialized = false;
 
 /* API Functions */
@@ -107,7 +107,7 @@ int nand_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif

@@ -2204,4 +2204,3 @@ void P_MapStart(void) {
 void P_MapEnd(void) {
    tmthing = NULL;
 }
-

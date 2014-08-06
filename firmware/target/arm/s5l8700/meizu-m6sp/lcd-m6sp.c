@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include <inttypes.h>
 
 #include "config.h"
@@ -37,7 +37,7 @@
     * Sometimes part of the top of the screen appears at the bottom
     * The Meizu seems to hang after LCD initialisation
     * The driver for the S6D0139 LCD has not been tested yet
-      
+
  */
 
 /* LCD SPI connections */
@@ -69,16 +69,16 @@ static void lcd_delay(int count)
 static unsigned int lcd_spi_transfer(int bits, unsigned int data_out)
 {
     unsigned int data_in = 0;
-    
+
     /* SSn active */
     PDAT7 &= ~LCD_SPI_SSn;
     lcd_delay(10);
-    
+
     /* send and receive data */
     while (bits--) {
         /* CLK low */
         PDAT3 &= ~LCD_SPI_SCLK;
-        
+
         /* set MOSI */
         if (data_out & (1 << bits)) {
             PDAT3 |= LCD_SPI_MOSI;
@@ -95,7 +95,7 @@ static unsigned int lcd_spi_transfer(int bits, unsigned int data_out)
         if (PDAT3 & LCD_SPI_MISO) {
             data_in |= 1;
         }
-        
+
         /* CLK high */
         PDAT3 |= LCD_SPI_SCLK;
 
@@ -106,7 +106,7 @@ static unsigned int lcd_spi_transfer(int bits, unsigned int data_out)
     /* SSn inactive */
     PDAT7 |= LCD_SPI_SSn;
     lcd_delay(10);
-    
+
     return data_in;
 }
 
@@ -115,10 +115,10 @@ static void lcd_spi_init(void)
 {
     /* configure SSn (P7.1) as output */
     PCON7 = (PCON7 & ~0x000000F0) | 0x00000010;
-    
+
     /* configure MISO (P3.2) input, MOSI (P3.6) output, SCLK (P3.7) output */
     PCON3 = (PCON3 & ~0xFF000F00) | 0x11000000;
-    
+
     /* set all outputs high */
     PDAT7 |= LCD_SPI_SSn;
     PDAT3 |= (LCD_SPI_MOSI | LCD_SPI_SCLK);
@@ -128,7 +128,7 @@ static void lcd_spi_init(void)
 static unsigned int lcd_read_reg(unsigned reg)
 {
     unsigned int data;
-    
+
     lcd_spi_transfer(24, (LCD_SPI_INDEX_WRITE << 16) | reg);
     data = lcd_spi_transfer(24, (LCD_SPI_DATA_READ << 16));
     return data & 0xFFFF;
@@ -158,17 +158,17 @@ static void lcd_init1(void)
     lcd_write_reg(0x07, 0x0000);    /* display control */
     lcd_write_reg(0x13, 0x0000);    /* power control 3 */
     lcd_delay(166670);
-    
+
     lcd_write_reg(0x11, 0x3304);    /* power control 2 */
     lcd_write_reg(0x14, 0x1300);    /* power control 4 */
     lcd_write_reg(0x10, 0x1A20);    /* power control 1 */
     lcd_write_reg(0x13, 0x0040);    /* power control 3 */
     lcd_delay(833350);
-    
+
     lcd_write_reg(0x13, 0x0060);    /* power control 3 */
     lcd_write_reg(0x13, 0x0070);    /* power control 3 */
     lcd_delay(3333400);
-    
+
     lcd_write_reg(0x01, 0x0127);    /* driver output control */
     lcd_write_reg(0x02, 0x0700);    /* lcd driving waveform control */
     lcd_write_reg(0x03, 0x1030);    /* entry mode */
@@ -194,11 +194,11 @@ static void lcd_init1(void)
     lcd_write_reg(0x46, 0xEF00);    /* horizontal window address */
     lcd_write_reg(0x47, 0x013F);    /* vertical window address (end) */
     lcd_write_reg(0x48, 0x0000);    /* vertical window address (start) */
-    
+
     lcd_write_reg(0x07, 0x0015);    /* display control */
     lcd_delay(500000);
     lcd_write_reg(0x07, 0x0017);    /* display control */
-    
+
     lcd_write_reg(0x20, 0x0000);    /* RAM address set (low part) */
     lcd_write_reg(0x21, 0x0000);    /* RAM address set (high part) */
     lcd_write_reg(0x22, 0x0000);    /* write data to GRAM */
@@ -220,11 +220,11 @@ static void lcd_init2(void)
     lcd_write_reg(0x11, 0x0738);
     lcd_write_reg(0x10, 0x7404);
     lcd_delay(833350);
-    
+
     lcd_write_reg(0x07, 0x0009);
     lcd_write_reg(0x12, 0x065C);
     lcd_delay(3333400);
-    
+
     lcd_write_reg(0x01, 0xE127);
     lcd_write_reg(0x02, 0x0300);
     lcd_write_reg(0x03, 0x1100);
@@ -235,7 +235,7 @@ static void lcd_init2(void)
     lcd_write_reg(0x15, 0x0003);
     lcd_write_reg(0x16, 0x0014);
     lcd_write_reg(0x17, 0x0000);
-    
+
     lcd_write_reg(0x30, 0x0503);    /* gamma? */
     lcd_write_reg(0x31, 0x0303);
     lcd_write_reg(0x32, 0x0305);
@@ -246,7 +246,7 @@ static void lcd_init2(void)
     lcd_write_reg(0x37, 0x0202);
     lcd_write_reg(0x38, 0x1000);
     lcd_write_reg(0x39, 0x1000);
-    
+
     lcd_write_reg(0x07, 0x0009);
     lcd_delay(666680);
 
@@ -264,7 +264,7 @@ static void lcd_enable1(bool on)
         lcd_delay(166670);
         lcd_write_reg(0x10, 0x0000);    /* power control 1 */
         lcd_delay(166670);
-        
+
         lcd_write_reg(0x11, 0x3304);    /* power control 2 */
         lcd_write_reg(0x14, 0x1300);    /* power control 4 */
         lcd_write_reg(0x10, 0x1A20);    /* power control 1 */
@@ -305,18 +305,18 @@ static void lcd_enable2(bool on)
         lcd_write_reg(0x11, 0x0738);
         lcd_write_reg(0x10, 0x7404);
         lcd_delay(833350);
-        
+
         lcd_write_reg(0x07, 0x0009);
         lcd_write_reg(0x12, 0x065C);
         lcd_delay(3333400);
-        
+
         lcd_write_reg(0x0B, 0x0000);
         lcd_write_reg(0x07, 0x0009);
         lcd_delay(666680);
-        
+
         lcd_write_reg(0x07, 0x0109);
         lcd_delay(666680);
-        
+
         lcd_write_reg(0x07, 0x010B);
     }
     else {
@@ -339,7 +339,7 @@ void lcd_enable(bool on)
     if (on) {
         /* enable controller clock */
         PWRCON &= ~(1 << 18);
-        
+
         lcd_controller_power(true);
         lcd_delay(166670);
     }
@@ -351,14 +351,14 @@ void lcd_enable(bool on)
     else {
         lcd_enable2(on);
     }
-    
+
     if (!on) {
         lcd_controller_power(false);
 
         /* disable controller clock */
         PWRCON |= (1 << 18);
     }
-    
+
     lcd_is_active = on;
 }
 
@@ -371,7 +371,7 @@ bool lcd_active(void)
 static void lcd_controller_init(void)
 {
     PWRCON &= ~(1 << 18);
-    
+
     LCDCON1 =   (0 << 28) |     /* BURSTLEN */
                 (0 << 19) |     /* DIVEN */
                 (12 << 13) |    /* CLKVAL */
@@ -421,11 +421,11 @@ void lcd_init_device(void)
 
     /* configure LCD SPI pins */
     lcd_spi_init();
-    
+
     /* identify display through SPI */
     lcd_id = lcd_read_reg(0);
     lcd_type = (lcd_id == LCD_TYPE1_ID) ? 1 : 2;
-    
+
     /* display specific init sequence */
     if (lcd_type == 1) {
         lcd_init1();
@@ -456,7 +456,7 @@ void lcd_init_device(void)
     LCDB2SADDR3 = window;
     LCDF1SADDR3 = window;
     LCDF2SADDR3 = window;
-    
+
     lcd_enable(true);
 
     /* configure LCD pins */
@@ -491,4 +491,3 @@ void lcd_blit_yuv(unsigned char * const src[3],
     (void)height;
     /* TODO: not implemented yet */
 }
-

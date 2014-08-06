@@ -40,9 +40,9 @@ extern unsigned char oc_bufferend[];
 static bool g_exit = false;
 
 /**
- * 
+ *
  * USB stack
- * 
+ *
  */
 
 static struct usb_device_descriptor __attribute__((aligned(2)))
@@ -295,7 +295,7 @@ static void handle_rw_mem(struct usb_ctrlrequest *req)
 {
     uint32_t addr = req->wValue | req->wIndex << 16;
     uint16_t length = req->wLength;
-    
+
     if(req->bRequestType & USB_DIR_IN)
     {
         memcpy(usb_buffer, (void *)addr, length);
@@ -363,9 +363,9 @@ static void handle_class_req(struct usb_ctrlrequest *req)
 }
 
 /**
- * 
+ *
  * Main
- * 
+ *
  */
 
 void main(uint32_t arg)

@@ -28,7 +28,7 @@
 
 /*
  * Jz4740 I2C routines.
- * 
+ *
  * Copyright (C) 2005,2006 Ingenic Semiconductor Inc.
  * Author: <lhhuang@ingenic.cn>
  *

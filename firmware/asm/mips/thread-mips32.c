@@ -108,4 +108,3 @@ static inline void load_context(const void* addr)
         : : "r" (addr) : "t0", "t1"
     );
 }
-

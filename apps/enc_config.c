@@ -279,9 +279,9 @@ static int enc_menuitem_enteritem(int action,
 static int enc_menuitem_callback(int action,
                                   const struct menu_item_ex *this_item)
 {
-    struct menucallback_data *data = 
+    struct menucallback_data *data =
             (struct menucallback_data*)this_item->function->param;
-    
+
     if (action == ACTION_EXIT_MENUITEM)
     {
         /* If the setting being configured is global, it must be placed

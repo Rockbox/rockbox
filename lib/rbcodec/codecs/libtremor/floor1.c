@@ -30,7 +30,7 @@
 
 typedef struct {
   int forward_index[VIF_POSIT+2];
-  
+
   int hineighbor[VIF_POSIT];
   int loneighbor[VIF_POSIT];
   int posts;
@@ -42,7 +42,7 @@ typedef struct {
 } vorbis_look_floor1;
 
 /***********************************************/
- 
+
 static void floor1_free_info(vorbis_info_floor *i){
   vorbis_info_floor1 *info=(vorbis_info_floor1 *)i;
   if(info){
@@ -102,12 +102,12 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
   }
 
   /* read the post list */
-  info->mult=oggpack_read(opb,2)+1;     /* only 1,2,3,4 legal now */ 
+  info->mult=oggpack_read(opb,2)+1;     /* only 1,2,3,4 legal now */
   rangebits=oggpack_read(opb,4);
   if(rangebits<0)goto err_out;
 
   for(j=0,k=0;j<info->partitions;j++){
-    count+=info->class_dim[info->partitionclass[j]]; 
+    count+=info->class_dim[info->partitionclass[j]];
     for(;k<count;k++){
       int t=info->postlist[k+2]=oggpack_read(opb,rangebits);
       if(t<0 || t>=(1<<rangebits))
@@ -129,7 +129,7 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
   }
 
   return(info);
-  
+
  err_out:
   floor1_free_info(info);
   return(NULL);
@@ -147,7 +147,7 @@ static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
   (void)mi;
   look->vi=info;
   look->n=info->postlist[1];
- 
+
   /* we drop each position value in-between already decoded values,
      and use linear interpolation to predict each new value past the
      edges.  The positions are read in the order of the position
@@ -165,7 +165,7 @@ static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,vorbis_info_mode *mi,
 
   /* points from sort order back to range number */
   for(i=0;i<n;i++)look->forward_index[i]=sortpointer[i]-info->postlist;
-  
+
   /* quantize values to multiplier spec */
   switch(info->mult){
   case 1: /* 1024 -> 256 */
@@ -295,15 +295,15 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
   vorbis_info_floor1 *info=look->vi;
   codec_setup_info   *ci=(codec_setup_info *)vb->vd->vi->codec_setup;
   int i,j,k;
-  codebook *books=ci->fullbooks;   
-  
+  codebook *books=ci->fullbooks;
+
   /* unpack wrapped/predicted values from stream */
   if(oggpack_read(&vb->opb,1)==1){
     int *fit_value=(int *)_vorbis_block_alloc(vb,(look->posts)*sizeof(*fit_value));
     int ilg = ilog(look->quant_q-1);
     fit_value[0]=oggpack_read(&vb->opb,ilg);
     fit_value[1]=oggpack_read(&vb->opb,ilg);
-    
+
     /* partition by partition */
     /* partition by partition */
     for(i=0,j=2;i<info->partitions;i++){
@@ -360,7 +360,7 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
           }
         }
 
-	fit_value[i]=(val+predicted)&0x7fff;;
+        fit_value[i]=(val+predicted)&0x7fff;;
         fit_value[look->loneighbor[i-2]]&=0x7fff;
         fit_value[look->hineighbor[i-2]]&=0x7fff;
 
@@ -399,19 +399,19 @@ static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
       int current=look->forward_index[j];
       int hy=fit_value[current]&0x7fff;
       if(hy==fit_value[current]){
-        
-	hx=info->postlist[current];
+
+        hx=info->postlist[current];
         hy*=info->mult;
         /* guard lookup against out-of-range values */
         hy=(hy<0?0:hy>255?255:hy);
 
         render_line(lx, ly, hx, hy, FLOOR_fromdB_LOOKUP, out);
-        
+
         lx=hx;
         ly=hy;
       }
     }
-    for(j=hx;j<n;j++)out[j]*=ly; /* be certain */    
+    for(j=hx;j<n;j++)out[j]*=ly; /* be certain */
     return(1);
   }
   memset(out,0,sizeof(*out)*n);
@@ -423,4 +423,3 @@ const vorbis_func_floor floor1_exportbundle ICONST_ATTR = {
   &floor1_unpack,&floor1_look,&floor1_free_info,
   &floor1_free_look,&floor1_inverse1,&floor1_inverse2
 };
-

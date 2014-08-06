@@ -110,4 +110,3 @@ struct tm *gmtime_r(const time_t *timep, struct tm *tm)
 
     return tm;
 }
-

@@ -173,4 +173,3 @@ int test_firmware_tcc(unsigned char* buf, int length)
 {
     return telechips_test_crc(buf, length);
 }
-

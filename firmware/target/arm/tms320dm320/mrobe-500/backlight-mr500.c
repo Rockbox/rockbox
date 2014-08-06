@@ -31,7 +31,7 @@
 
 short read_brightness = 0x0;
 
-static const char commands [][2] = 
+static const char commands [][2] =
 {   {0xA0, 0x00},
     {0xA1, 0x00},
     {0xA2, 0x00},
@@ -47,11 +47,11 @@ static const char commands [][2] =
 static void _backlight_write_brightness(int brightness)
 {
     uint8_t bl_command[] = {0xA4, 0x00, brightness, 0xA4};
-    
+
     spi_block_transfer(SPI_target_BACKLIGHT, commands[8], 2, (char *)&read_brightness, 2);
 
 //    bl_command[3] = (char) read_brightness;
-    
+
     spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
 }
 
@@ -105,4 +105,3 @@ bool _backlight_init(void)
     _backlight_set_brightness(backlight_brightness);
     return true;
 }
-

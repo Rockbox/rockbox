@@ -84,7 +84,7 @@ void INT_SD(void)
         /* get the status */
         cmd_error = SD_CMDRES;
         semaphore_release(&command_completion_signal);
-    }    
+    }
 
     /* data transfer status pending */
     if(status & DATA_XFER_STAT)
@@ -177,7 +177,7 @@ static bool send_cmd(const int cmd, const int arg, const int res,
 #if 0
 /* for some misterious reason the card does not report itself as being in TRAN
  * but transfers are successful. Rockchip OF does not check the card state
- * after SELECT. I checked two different cards. 
+ * after SELECT. I checked two different cards.
  */
 static void print_card_status(void)
 {
@@ -211,7 +211,7 @@ static int sd_wait_for_tran_state(void)
         {
             return 0;
         }
-    
+
         if(TIME_AFTER(current_tick, timeout))
         {
             return -10 * ((response >> 9) & 0xf);
@@ -252,7 +252,7 @@ static int sd_init_card(void)
     /* CMD0 Go Idle  */
     if(!send_cmd(SD_GO_IDLE_STATE, 0, RES_NO, NULL))
         return -1;
-    
+
     sleep(1);
 
     /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
@@ -727,7 +727,7 @@ int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
 #endif
 
     return ret;
-   
+
 #endif /* defined(BOOTLOADER) */
 }
 

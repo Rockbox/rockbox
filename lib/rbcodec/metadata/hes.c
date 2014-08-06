@@ -17,7 +17,7 @@ bool get_hes_metadata(int fd, struct mp3entry* id3)
     unsigned char* buf = (unsigned char *)id3->id3v2buf;
     int read_bytes;
 
-    if ((lseek(fd, 0, SEEK_SET) < 0) 
+    if ((lseek(fd, 0, SEEK_SET) < 0)
          || ((read_bytes = read(fd, buf, 4)) < 4))
         return false;
 
@@ -36,4 +36,3 @@ bool get_hes_metadata(int fd, struct mp3entry* id3)
 
     return true;
 }
-

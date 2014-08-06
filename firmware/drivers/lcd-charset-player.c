@@ -27,7 +27,7 @@
 int lcd_pattern_count;  /* actual number of user-definable hw patterns */
 
 const struct xchar_info *xchar_info;
-int xchar_info_size;  /* number of entries */       
+int xchar_info_size;  /* number of entries */
 
 enum {
     /* Standard ascii */
@@ -308,7 +308,7 @@ const struct xchar_info xchar_info_newlcd[] = {
     {   0xfd, XF_yACUTE,      1, 0x79 }, /* ý (y acute) */
 
     {   0xff, XF_yDIERESIS,   1, 0x79 }, /* ÿ (y dieresis) */
-    
+
     /* Latin extended A */
     { 0x0103, XF_aBREVE,      1, 0x61 }, /* a breve */
     { 0x0105, XF_aOGONEK,     1, 0x61 }, /* a ogonek */
@@ -348,7 +348,7 @@ const struct xchar_info xchar_info_newlcd[] = {
 
     /* Greek */
     { 0x037e, 0, 0, 0x3b }, /* greek question mark */
-    
+
     { 0x0386, 0, 0, 0x41 }, /* greek ALPHA with tonos */
     { 0x0387, 0, 0, 0xa5 }, /* greek ano teleia */
     { 0x0388, 0, 0, 0x45 }, /* greek EPSILON with tonos */
@@ -570,7 +570,7 @@ const struct xchar_info xchar_info_newlcd[] = {
     { 0xe118, 0, 0, 0x84 }, /* level 5/7 */
     { 0xe119, 0, 0, 0x85 }, /* level 6/7 */
     { 0xe11a, 0, 0, 0x86 }, /* level 7/7 */
-    
+
     /* Halfwidth CJK punctuation and katakana - new LCD only */
     { 0xff61, 0, 0, 0xa1 }, /* hw ideographic full stop */
     { 0xff62, 0, 0, 0xa2 }, /* hw left corner bracket */
@@ -834,7 +834,7 @@ const struct xchar_info xchar_info_oldlcd[] = {
     {   0xfd, 0, 0, 0xaf }, /* ý (y acute) */
 
     {   0xff, XF_yDIERESIS,   1, 0x7d }, /* ÿ (y dieresis) */
-    
+
     /* Latin extended A */
     { 0x0103, 0, 0, 0xe9 }, /* a breve */
     { 0x0105, 0, 0, 0xb3 }, /* a ogonek */
@@ -1026,7 +1026,7 @@ const struct xchar_info xchar_info_oldlcd[] = {
     { 0x044f, XF_CYR_ya,     2, 0x84 }, /* cyrillic ya */
     { 0x0450, 0, 0, 0x08 }, /* cyrillic ie grave */
     { 0x0451, 0, 0, 0xa0 }, /* cyrillic io */
-    
+
     { 0x0455, 0, 0, 0x77 }, /* cyrillic dze */
     { 0x0456, 0, 0, 0x6d }, /* cyrillic byeloruss-ukr. i */
     { 0x0457, 0, 0, 0xa3 }, /* cyrillic yi */

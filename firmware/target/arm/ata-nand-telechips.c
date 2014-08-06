@@ -180,7 +180,7 @@ static int phys_segment_to_page_addr(int phys_segment, int page_in_seg)
             break;
         }
     }
-    
+
     page_addr += (page_in_seg / nand_data->planes);
 
     return page_addr;
@@ -223,7 +223,7 @@ static void nand_chip_select(int bank)
 static void nand_read_id(int bank, unsigned char* id_buf)
 {
     int i;
-    
+
     /* Enable NFC bus clock */
     BCLKCTR |= DEV_NAND;
 
@@ -359,7 +359,7 @@ static void nand_setup_read(int bank, int row, int column)
 static void nand_end_read(void)
 {
     nand_chip_select(-1);
-        
+
     /* Disable NFC bus clock */
     BCLKCTR &= ~DEV_NAND;
 }
@@ -368,7 +368,7 @@ static void nand_end_read(void)
 static void nand_read_raw(int bank, int row, int column, int size, void* buf)
 {
     int i;
-    
+
     nand_setup_read(bank, row, column);
 
     /* Read data into page buffer */
@@ -389,7 +389,7 @@ static void nand_read_raw(int bank, int row, int column, int size, void* buf)
             ((unsigned int*)buf)[i] = NFC_WDATA;
         }
     }
-    
+
     nand_end_read();
 }
 
@@ -423,7 +423,7 @@ static void nand_get_chip_info(void)
     sectors_per_page = nand_data->page_size / SECTOR_SIZE;
 
     sectors_per_segment = bytes_per_segment / SECTOR_SIZE;
-    
+
     pages_per_segment = sectors_per_segment / sectors_per_page;
 
     /* Establish how many banks are present */
@@ -495,7 +495,7 @@ static bool nand_read_sector_of_phys_page(int bank, int page,
 
 #ifdef USE_ECC_CORRECTION
     unsigned long spare_buf[4];
-    
+
     /* Set up the ECC controller to monitor reads from NFC_WDATA */
     BCLKCTR |= DEV_ECC;
     ECC_BASE = (unsigned long)&NFC_WDATA;
@@ -515,27 +515,27 @@ static bool nand_read_sector_of_phys_page(int bank, int page,
            This way, reads are always done through NFC_WDATA - otherwise they
            would not be 'seen' by the ECC controller. */
         static char temp_buf[SECTOR_SIZE];
-        
+
         unsigned int* ptr = (unsigned int*) temp_buf;
-        
+
         for (i = 0; i < (SECTOR_SIZE/4); i++)
         {
             *ptr++ = NFC_WDATA;
         }
-        
+
         memcpy(buf, temp_buf, SECTOR_SIZE);
     }
     else
     {
         /* Use straight word copy as buffer and size are both word-aligned */
         unsigned int* ptr = (unsigned int*) buf;
-        
+
         for (i = 0; i < (SECTOR_SIZE/4); i++)
         {
             *ptr++ = NFC_WDATA;
         }
     }
-    
+
 #ifdef USE_ECC_CORRECTION
     /* Stop monitoring before we read the OOB data */
     ECC_CTRL &= ~ECC_M4EN;
@@ -550,29 +550,29 @@ static bool nand_read_sector_of_phys_page(int bank, int page,
     /* Calculate MLC4 ECC using bytes 0,1,8-15 */
     BCLKCTR |= DEV_ECC;
     ECC_CTRL |= ECC_M4EN;
-    
+
     MLC_ECC0W = *(unsigned short*)spare_buf;
     MLC_ECC1W = spare_buf[2];
     MLC_ECC2W = spare_buf[3];
-    
+
     while (!(ECC_CTRL & ECC_READY)) {};
 
     int errors = ECC_ERR_NUM & 7;
-    
+
     switch (errors)
     {
         case 4:     /* nothing to correct */
             break;
-            
+
         case 7:     /* fail, can't correct */
             ret = false;
             break;
-            
+
         default:    /* between 1 and 4 errors */
         {
             int i;
             unsigned char* char_buf = (unsigned char*)buf;
-            
+
             for (i = 0; i < errors + 1; i++)
             {
                 int offset = 0x207 - ECC_ERRADDR(i);
@@ -585,7 +585,7 @@ static bool nand_read_sector_of_phys_page(int bank, int page,
     ECC_CTRL &= ~ECC_M4EN;
     BCLKCTR &= ~DEV_ECC;
 #endif
-    
+
     nand_end_read();
 
     return ret;
@@ -620,7 +620,7 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
 
     int cache_num = 0;
     bool found = false;
-    
+
     while (!found && cache_num < write_caches_in_use)
     {
         if (write_caches[cache_num].log_segment == log_segment)
@@ -629,10 +629,10 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
             {
                 /* data is located in random pages cache */
                 found = true;
-                
+
                 bank = write_caches[cache_num].random_bank;
                 phys_segment = write_caches[cache_num].random_phys_segment;
-                
+
                 page_in_segment =
                     write_caches[cache_num].page_map[page_in_segment];
             }
@@ -641,7 +641,7 @@ static bool nand_read_sector_of_logical_segment(int log_segment, int sector,
             {
                 /* data is located in in-place pages cache */
                 found = true;
-                
+
                 bank = write_caches[cache_num].inplace_bank;
                 phys_segment = write_caches[cache_num].inplace_phys_segment;
             }
@@ -665,7 +665,7 @@ static inline unsigned char get_sector_type(char* spare_buf)
 static inline unsigned short get_log_segment_id(int phys_seg, char* spare_buf)
 {
     (void)phys_seg;
-    
+
     return ((spare_buf[OFF_LOG_SEG_HIBYTE] << 8) |
              spare_buf[OFF_LOG_SEG_LOBYTE])
 #if defined(FTL_V1)
@@ -703,7 +703,7 @@ static void read_random_writes_cache(int bank, int phys_segment)
                   16, spare_buf);
 
     log_segment = get_log_segment_id(phys_segment, spare_buf);
-    
+
     if (log_segment == -1)
         return;
 
@@ -735,13 +735,13 @@ static void read_random_writes_cache(int bank, int phys_segment)
          page++)
     {
         unsigned short cached_page;
-        
+
         nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, page),
                       SECTOR_SIZE, /* offset to first sector's spare */
                       16, spare_buf);
 
         cached_page = get_cached_page_id(spare_buf);
-        
+
         if (cached_page != 0xFFFF)
             write_caches[cache_no].page_map[cached_page] = page;
     }
@@ -760,10 +760,10 @@ static void read_inplace_writes_cache(int bank, int phys_segment)
                   16, spare_buf);
 
     log_segment = get_log_segment_id(phys_segment, spare_buf);
-    
+
     if (log_segment == -1)
         return;
-    
+
     /* Find which cache this is related to */
     int cache_no = find_write_cache(log_segment);
 
@@ -781,7 +781,7 @@ static void read_inplace_writes_cache(int bank, int phys_segment)
     }
 
     write_caches[cache_no].log_segment = log_segment;
-    
+
     /* Find how many pages have been written to the new segment */
     while (log_segment != -1 &&
            page < (nand_data->pages_per_block * nand_data->planes) - 1)
@@ -792,7 +792,7 @@ static void read_inplace_writes_cache(int bank, int phys_segment)
 
         log_segment = get_log_segment_id(phys_segment, spare_buf);
     }
-    
+
     if (page != 0)
     {
         write_caches[cache_no].inplace_bank = bank;
@@ -810,9 +810,9 @@ int nand_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
 #endif
 
     int ret = 0;
-    
+
     mutex_lock(&ata_mtx);
-    
+
     led(true);
 
     while (incount > 0)
@@ -840,7 +840,7 @@ int nand_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
             secmod++;
             done++;
         }
-    
+
         if (done < 0)
         {
             ret = -1;
@@ -853,7 +853,7 @@ nand_read_error:
 
     mutex_unlock(&ata_mtx);
     led(false);
-    
+
     return ret;
 }
 
@@ -904,7 +904,7 @@ int nand_init(void)
     unsigned char spare_buf[16];
 
     if (initialized) return 0;
-    
+
     mutex_init(&ata_mtx);
 
 #ifdef CPU_TCC77X
@@ -913,7 +913,7 @@ int nand_init(void)
     GPIOC_FUNC &= ~(CS_GPIO_BIT | WE_GPIO_BIT);
     GPIOC_FUNC |= 0x1;
 #endif
-    
+
     /* Set GPIO direction for chip select & write protect */
     NAND_GPIO_OUT_EN(CS_GPIO_BIT | WE_GPIO_BIT);
 
@@ -932,7 +932,7 @@ int nand_init(void)
 
     memset(lpt_lookup, 0xff, lptbuf_size);
     memset(write_caches, 0xff, sizeof(write_caches));
-    
+
     write_caches_in_use = 0;
 
     /* Scan banks to build up block translation table */
@@ -944,7 +944,7 @@ int nand_init(void)
             nand_read_raw(bank, phys_segment_to_page_addr(phys_segment, 0),
                           SECTOR_SIZE, /* offset */
                           16, spare_buf);
-            
+
             int type = get_sector_type(spare_buf);
 
 #ifdef FTL_V2
@@ -956,7 +956,7 @@ int nand_init(void)
                 nand_read_raw(bank, phys_segment_to_page_addr
                                 (phys_segment, pages_per_segment - 1),
                               SECTOR_SIZE, 16, spare_buf);
-                
+
                 if (get_sector_type(spare_buf) != 0xff)
                 {
                     type = SECTYPE_MAIN_DATA;
@@ -990,14 +990,14 @@ int nand_init(void)
                     }
                     break;
                 }
-                
+
                 case SECTYPE_MAIN_RANDOM_CACHE:
                 {
                     /* Newly-written random page data (Main data area) */
                     read_random_writes_cache(bank, phys_segment);
                     break;
                 }
-                
+
                 case SECTYPE_MAIN_INPLACE_CACHE:
                 {
                     /* Newly-written sequential page data (Main data area) */
@@ -1007,7 +1007,7 @@ int nand_init(void)
             }
         }
     }
-    
+
     initialized = true;
 
     return 0;
@@ -1037,7 +1037,7 @@ int nand_num_drives(int first_drive)
 {
     /* We don't care which logical drive number we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 

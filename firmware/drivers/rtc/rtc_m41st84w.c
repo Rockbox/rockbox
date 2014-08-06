@@ -31,7 +31,7 @@
 
 void rtc_init(void)
 {
-    unsigned char data; 
+    unsigned char data;
 
 #ifdef HAVE_RTC_ALARM
     /* Check + save alarm bit first, before the power thread starts watching */
@@ -51,12 +51,12 @@ void rtc_init(void)
         data &= ~0x40;
         rtc_write(0x0c,data);
     }
-    
-#ifdef HAVE_RTC_ALARM    
+
+#ifdef HAVE_RTC_ALARM
 
     /* Clear Trec bit, write-protecting the RTC for 200ms when shutting off */
     /* without this, the alarm won't work! */
-    
+
     data = rtc_read(0x04);
     if (data & 0x80)
     {
@@ -67,11 +67,11 @@ void rtc_init(void)
     /* Also, make sure that the OUT bit in register 8 is 1,
        otherwise the player can't be turned off. */
     rtc_write(8, rtc_read(8) | 0x80);
-    
+
 #endif
 }
 
-#ifdef HAVE_RTC_ALARM    
+#ifdef HAVE_RTC_ALARM
 
 /* check whether the unit has been started by the RTC alarm function */
 /* (check for AF, which => started using wakeup alarm) */
@@ -83,12 +83,12 @@ bool rtc_check_alarm_started(bool release_alarm)
     if (run_before) {
         rc = alarm_state;
         alarm_state &= ~release_alarm;
-    } else { 
-        /* This call resets AF, so we store the state for later recall */ 
+    } else {
+        /* This call resets AF, so we store the state for later recall */
         rc = alarm_state = rtc_check_alarm_flag();
-        run_before = true; 
+        run_before = true;
     }
- 
+
     return rc;
 }
 /*
@@ -97,7 +97,7 @@ bool rtc_check_alarm_started(bool release_alarm)
  * We're only interested if ABE is set.  AL is still raised regardless
  * even if the unit is off when the alarm occurs.
  */
-bool rtc_check_alarm_flag(void) 
+bool rtc_check_alarm_flag(void)
 {
     return ( ( (rtc_read(0x0f) & 0x40) != 0) &&
                (rtc_read(0x0a) & 0x20)  );
@@ -109,12 +109,12 @@ void rtc_set_alarm(int h, int m)
     unsigned char data;
 
     /* for daily alarm, RPT5=RPT4=on, RPT1=RPT2=RPT3=off */
-    
+
     rtc_write(0x0e, 0x00);      /* seconds 0 and RTP1 */
     rtc_write(0x0d, DEC2BCD(m)); /* minutes and RPT2 */
     rtc_write(0x0c, DEC2BCD(h)); /* hour and RPT3 */
     rtc_write(0x0b, 0xc1);      /* set date 01 and RPT4 and RTP5 */
-    
+
     /* set month to 1, if it's invalid, the rtc does an alarm every second instead */
     data = rtc_read(0x0a);
     data &= 0xe0;
@@ -129,7 +129,7 @@ void rtc_get_alarm(int *h, int *m)
 
     data = rtc_read(0x0c);
     *h = BCD2DEC(data & 0x3f);
-    
+
     data = rtc_read(0x0d);
     *m = BCD2DEC(data & 0x7f);
 }
@@ -147,7 +147,7 @@ void rtc_enable_alarm(bool enable)
     else
         data &= 0x5f; /* turn bit d7=AFE and d5=ABE off */
     rtc_write(0x0a, data);
-    
+
     /* check if alarm flag AF is off (as it should be) */
     /* in some cases enabling the alarm results in an activated AF flag */
     /* this should not happen, but it does */
@@ -172,7 +172,7 @@ int rtc_write(unsigned char address, unsigned char value)
     unsigned char buf[2];
 
     i2c_begin();
-    
+
     buf[0] = address;
     buf[1] = value;
 
@@ -192,7 +192,7 @@ int rtc_read(unsigned char address)
     unsigned char buf[1];
 
     i2c_begin();
-    
+
     buf[0] = address;
 
     /* send read command */
@@ -219,7 +219,7 @@ int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes)
     int i;
 
     i2c_begin();
-    
+
     obuf[0] = address;
 
     /* send read command */
@@ -231,7 +231,7 @@ int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes)
         {
             for(i = 0;i < numbytes-1;i++)
                 buf[i] = i2c_inb(0);
-            
+
             buf[i] = i2c_inb(1);
         }
         else
@@ -295,4 +295,3 @@ int rtc_write_datetime(const struct tm *tm)
 
     return rc;
 }
-

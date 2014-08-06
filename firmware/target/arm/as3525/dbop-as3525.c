@@ -110,7 +110,7 @@ static inline void dbop_set_mode(int mode)
 
 void dbop_write_data(const int16_t* p_bytes, int count)
 {
-    
+
     const int32_t *data;
     if ((intptr_t)p_bytes & 0x3 || count == 1)
     {   /* need to do a single 16bit write beforehand if the address is

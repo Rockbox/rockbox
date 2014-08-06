@@ -43,7 +43,7 @@ int rtc_write_datetime(const struct tm *tm)
 /**
  * Checks to see if an alarm interrupt has triggered since last we checked.
  */
-bool rtc_check_alarm_flag(void) 
+bool rtc_check_alarm_flag(void)
 {
 }
 
@@ -77,5 +77,3 @@ void rtc_get_alarm(int *h, int *m)
 //    *h = ((buf[1] >> 4) & 0x3)*10 + (buf[1] & 0x0f);
 }
 #endif /* HAVE_RTC_ALARM */
-
-

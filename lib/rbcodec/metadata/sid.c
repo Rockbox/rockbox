@@ -30,21 +30,21 @@
 #include "metadata_parsers.h"
 #include "rbunicode.h"
 
-/* PSID metadata info is available here: 
+/* PSID metadata info is available here:
    http://www.unusedino.de/ec64/technical/formats/sidplay.html */
 bool get_sid_metadata(int fd, struct mp3entry* id3)
-{    
+{
     /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char* buf = (unsigned char *)id3->path;    
+    unsigned char* buf = (unsigned char *)id3->path;
     char *p;
-    
 
-    if ((lseek(fd, 0, SEEK_SET) < 0) 
+
+    if ((lseek(fd, 0, SEEK_SET) < 0)
          || (read(fd, buf, 0x80) < 0x80))
     {
         return false;
     }
-    
+
     if ((memcmp(buf, "PSID", 4) != 0))
     {
         return false;

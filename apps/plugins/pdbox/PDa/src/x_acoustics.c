@@ -2,7 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/*  utility functions for signals 
+/*  utility functions for signals
 */
 
 #ifdef ROCKBOX
@@ -31,8 +31,8 @@ float powtodb(float f)
     if (f <= 0) return (0);
     else
     {
-    	float val = 100 + 10./LOGTEN * log(f);
-    	return (val < 0 ? 0 : val);
+        float val = 100 + 10./LOGTEN * log(f);
+        return (val < 0 ? 0 : val);
     }
 }
 
@@ -41,31 +41,31 @@ float rmstodb(float f)
     if (f <= 0) return (0);
     else
     {
-    	float val = 100 + 20./LOGTEN * log(f);
-    	return (val < 0 ? 0 : val);
+        float val = 100 + 20./LOGTEN * log(f);
+        return (val < 0 ? 0 : val);
     }
 }
 
 float dbtopow(float f)
 {
     if (f <= 0)
-    	return(0);
+        return(0);
     else
     {
-    	if (f > 870)
-	    f = 870;
-    	return (exp((LOGTEN * 0.1) * (f-100.)));
+        if (f > 870)
+            f = 870;
+        return (exp((LOGTEN * 0.1) * (f-100.)));
     }
 }
 
 float dbtorms(float f)
 {
     if (f <= 0)
-    	return(0);
+        return(0);
     else
     {
-    	if (f > 485)
-	    f = 485;
+        if (f > 485)
+            f = 485;
     }
     return (exp((LOGTEN * 0.05) * (f-100.)));
 }
@@ -166,33 +166,32 @@ void x_acoustics_setup(void)
 {
     t_symbol *s = gensym("acoustics.pd");
     mtof_class = class_new(gensym("mtof"), mtof_new, 0,
-    	sizeof(t_object), 0, 0);
+        sizeof(t_object), 0, 0);
     class_addfloat(mtof_class, (t_method)mtof_float);
     class_sethelpsymbol(mtof_class, s);
-    
+
     ftom_class = class_new(gensym("ftom"), ftom_new, 0,
-    	sizeof(t_object), 0, 0);
+        sizeof(t_object), 0, 0);
     class_addfloat(ftom_class, (t_method)ftom_float);
     class_sethelpsymbol(ftom_class, s);
 
     powtodb_class = class_new(gensym("powtodb"), powtodb_new, 0,
-    	sizeof(t_object), 0, 0);
+        sizeof(t_object), 0, 0);
     class_addfloat(powtodb_class, (t_method)powtodb_float);
     class_sethelpsymbol(powtodb_class, s);
 
     rmstodb_class = class_new(gensym("rmstodb"), rmstodb_new, 0,
-    	sizeof(t_object), 0, 0);
+        sizeof(t_object), 0, 0);
     class_addfloat(rmstodb_class, (t_method)rmstodb_float);
     class_sethelpsymbol(rmstodb_class, s);
 
     dbtopow_class = class_new(gensym("dbtopow"), dbtopow_new, 0,
-    	sizeof(t_object), 0, 0);
+        sizeof(t_object), 0, 0);
     class_addfloat(dbtopow_class, (t_method)dbtopow_float);
     class_sethelpsymbol(dbtopow_class, s);
 
     dbtorms_class = class_new(gensym("dbtorms"), dbtorms_new, 0,
-    	sizeof(t_object), 0, 0);
+        sizeof(t_object), 0, 0);
     class_addfloat(dbtorms_class, (t_method)dbtorms_float);
     class_sethelpsymbol(dbtorms_class, s);
 }
-

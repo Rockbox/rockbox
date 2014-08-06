@@ -71,6 +71,6 @@ int button_read_device(void)
         btn |= BUTTON_ON;
     if ( !(data & 0x0800) )
         btn |= BUTTON_STOP;
-        
+
     return btn;
 }

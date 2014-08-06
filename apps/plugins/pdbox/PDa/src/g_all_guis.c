@@ -136,23 +136,23 @@ char *iemgui_vu_scale_str[]=
 int iemgui_clip_size(int size)
 {
     if(size < IEM_GUI_MINSIZE)
-	size = IEM_GUI_MINSIZE;
+        size = IEM_GUI_MINSIZE;
     return(size);
 }
 
 int iemgui_clip_font(int size)
 {
     if(size < IEM_FONT_MINSIZE)
-	size = IEM_FONT_MINSIZE;
+        size = IEM_FONT_MINSIZE;
     return(size);
 }
 
 int iemgui_modulo_color(int col)
 {
     while(col >= IEM_GUI_MAX_COLOR)
-	col -= IEM_GUI_MAX_COLOR;
+        col -= IEM_GUI_MAX_COLOR;
     while(col < 0)
-	col += IEM_GUI_MAX_COLOR;
+        col += IEM_GUI_MAX_COLOR;
     return(col);
 }
 
@@ -160,11 +160,11 @@ t_symbol *iemgui_raute2dollar(t_symbol *s)
 {
     if (s->s_name[0] == '#')
     {
-    	char buf[MAXPDSTRING];
-	strncpy(buf, s->s_name, MAXPDSTRING);
-	buf[MAXPDSTRING-1] = 0;
-	buf[0] = '$';
-	return (gensym(buf));
+        char buf[MAXPDSTRING];
+        strncpy(buf, s->s_name, MAXPDSTRING);
+        buf[MAXPDSTRING-1] = 0;
+        buf[0] = '$';
+        return (gensym(buf));
     }
     else return (s);
 }
@@ -173,11 +173,11 @@ t_symbol *iemgui_dollar2raute(t_symbol *s)
 {
     if (s->s_name[0] == '$')
     {
-    	char buf[MAXPDSTRING];
-	strncpy(buf, s->s_name, MAXPDSTRING);
-	buf[MAXPDSTRING-1] = 0;
-	buf[0] = '#';
-	return (gensym(buf));
+        char buf[MAXPDSTRING];
+        strncpy(buf, s->s_name, MAXPDSTRING);
+        buf[MAXPDSTRING-1] = 0;
+        buf[0] = '#';
+        return (gensym(buf));
     }
     else return (s);
 }
@@ -187,8 +187,8 @@ void iemgui_verify_snd_ne_rcv(t_iemgui *iemgui)
     iemgui->x_fsf.x_put_in2out = 1;
     if(iemgui->x_fsf.x_snd_able && iemgui->x_fsf.x_rcv_able)
     {
-	if(!strcmp(iemgui->x_snd->s_name, iemgui->x_rcv->s_name))
-	    iemgui->x_fsf.x_put_in2out = 0;
+        if(!strcmp(iemgui->x_snd->s_name, iemgui->x_rcv->s_name))
+            iemgui->x_fsf.x_put_in2out = 0;
     }
 }
 
@@ -198,17 +198,17 @@ t_symbol *iemgui_new_dogetname(t_iemgui *iemgui, int indx, t_atom *argv)
     (void) iemgui;
 #endif
     if (IS_A_SYMBOL(argv, indx))
-	return (atom_getsymbolarg(indx, 100000, argv));
+        return (atom_getsymbolarg(indx, 100000, argv));
     else if (IS_A_FLOAT(argv, indx))
     {
-    	char str[80];
+        char str[80];
 #ifdef ROCKBOX
         snprintf(str, sizeof(str), "%d",
                                     (int) atom_getintarg(indx, 100000, argv));
 #else
-	sprintf(str, "%d", (int)atom_getintarg(indx, 100000, argv));
+        sprintf(str, "%d", (int)atom_getintarg(indx, 100000, argv));
 #endif
-	return (gensym(str));
+        return (gensym(str));
     }
     else return (gensym("empty"));
 }
@@ -217,13 +217,13 @@ void iemgui_new_getnames(t_iemgui *iemgui, int indx, t_atom *argv)
 {
     if (argv)
     {
-	iemgui->x_snd = iemgui_new_dogetname(iemgui, indx, argv);
-	iemgui->x_rcv = iemgui_new_dogetname(iemgui, indx+1, argv);
-	iemgui->x_lab = iemgui_new_dogetname(iemgui, indx+2, argv);
+        iemgui->x_snd = iemgui_new_dogetname(iemgui, indx, argv);
+        iemgui->x_rcv = iemgui_new_dogetname(iemgui, indx+1, argv);
+        iemgui->x_lab = iemgui_new_dogetname(iemgui, indx+2, argv);
     }
     else iemgui->x_snd = iemgui->x_rcv = iemgui->x_lab = gensym("empty");
     iemgui->x_snd_unexpanded = iemgui->x_rcv_unexpanded =
-    	iemgui->x_lab_unexpanded = 0;
+        iemgui->x_lab_unexpanded = 0;
     iemgui->x_binbufindex = indx;
     iemgui->x_labelbindex = indx + 3;
 }
@@ -231,7 +231,7 @@ void iemgui_new_getnames(t_iemgui *iemgui, int indx, t_atom *argv)
     /* convert symbols in "$" form to the expanded symbols */
 void iemgui_all_dollararg2sym(t_iemgui *iemgui, t_symbol **srlsym)
 {
-    	/* save unexpanded ones for later */
+        /* save unexpanded ones for later */
     iemgui->x_snd_unexpanded = srlsym[0];
     iemgui->x_rcv_unexpanded = srlsym[1];
     iemgui->x_lab_unexpanded = srlsym[2];
@@ -248,16 +248,16 @@ static void iemgui_init_sym2dollararg(t_iemgui *iemgui, t_symbol **symp,
 {
     if (!*symp)
     {
-    	t_binbuf *b = iemgui->x_obj.ob_binbuf;
-	if (binbuf_getnatom(b) > indx)
-	{
-    	    char buf[80];
-	    atom_string(binbuf_getvec(b) + indx, buf, 80);
-	    *symp = gensym(buf);
-	}
-	else if (fallback)
-	    *symp = fallback;
-	else *symp = gensym("empty");
+        t_binbuf *b = iemgui->x_obj.ob_binbuf;
+        if (binbuf_getnatom(b) > indx)
+        {
+            char buf[80];
+            atom_string(binbuf_getvec(b) + indx, buf, 80);
+            *symp = gensym(buf);
+        }
+        else if (fallback)
+            *symp = fallback;
+        else *symp = gensym("empty");
     }
 }
 
@@ -266,11 +266,11 @@ static void iemgui_init_sym2dollararg(t_iemgui *iemgui, t_symbol **symp,
 void iemgui_all_sym2dollararg(t_iemgui *iemgui, t_symbol **srlsym)
 {
     iemgui_init_sym2dollararg(iemgui, &iemgui->x_snd_unexpanded,
-    	iemgui->x_binbufindex+1, iemgui->x_snd);
+        iemgui->x_binbufindex+1, iemgui->x_snd);
     iemgui_init_sym2dollararg(iemgui, &iemgui->x_rcv_unexpanded,
-    	iemgui->x_binbufindex+2, iemgui->x_rcv);
+        iemgui->x_binbufindex+2, iemgui->x_rcv);
     iemgui_init_sym2dollararg(iemgui, &iemgui->x_lab_unexpanded,
-    	iemgui->x_labelbindex, iemgui->x_lab);
+        iemgui->x_labelbindex, iemgui->x_lab);
     srlsym[0] = iemgui->x_snd_unexpanded;
     srlsym[1] = iemgui->x_rcv_unexpanded;
     srlsym[2] = iemgui->x_lab_unexpanded;
@@ -288,47 +288,47 @@ void iemgui_first_dollararg2sym(t_iemgui *iemgui, t_symbol **srlsym)
 void iemgui_all_col2save(t_iemgui *iemgui, int *bflcol)
 {
     bflcol[0] = -1 - (((0xfc0000 & iemgui->x_bcol) >> 6)|
-		      ((0xfc00 & iemgui->x_bcol) >> 4)|((0xfc & iemgui->x_bcol) >> 2));
+                      ((0xfc00 & iemgui->x_bcol) >> 4)|((0xfc & iemgui->x_bcol) >> 2));
     bflcol[1] = -1 - (((0xfc0000 & iemgui->x_fcol) >> 6)|
-		      ((0xfc00 & iemgui->x_fcol) >> 4)|((0xfc & iemgui->x_fcol) >> 2));
+                      ((0xfc00 & iemgui->x_fcol) >> 4)|((0xfc & iemgui->x_fcol) >> 2));
     bflcol[2] = -1 - (((0xfc0000 & iemgui->x_lcol) >> 6)|
-		      ((0xfc00 & iemgui->x_lcol) >> 4)|((0xfc & iemgui->x_lcol) >> 2));
+                      ((0xfc00 & iemgui->x_lcol) >> 4)|((0xfc & iemgui->x_lcol) >> 2));
 }
 
 void iemgui_all_colfromload(t_iemgui *iemgui, int *bflcol)
 {
     if(bflcol[0] < 0)
     {
-	bflcol[0] = -1 - bflcol[0];
-	iemgui->x_bcol = ((bflcol[0] & 0x3f000) << 6)|((bflcol[0] & 0xfc0) << 4)|
-	    ((bflcol[0] & 0x3f) << 2);
+        bflcol[0] = -1 - bflcol[0];
+        iemgui->x_bcol = ((bflcol[0] & 0x3f000) << 6)|((bflcol[0] & 0xfc0) << 4)|
+            ((bflcol[0] & 0x3f) << 2);
     }
     else
     {
-	bflcol[0] = iemgui_modulo_color(bflcol[0]);
-	iemgui->x_bcol = iemgui_color_hex[bflcol[0]];
+        bflcol[0] = iemgui_modulo_color(bflcol[0]);
+        iemgui->x_bcol = iemgui_color_hex[bflcol[0]];
     }
     if(bflcol[1] < 0)
     {
-	bflcol[1] = -1 - bflcol[1];
-	iemgui->x_fcol = ((bflcol[1] & 0x3f000) << 6)|((bflcol[1] & 0xfc0) << 4)|
-	    ((bflcol[1] & 0x3f) << 2);
+        bflcol[1] = -1 - bflcol[1];
+        iemgui->x_fcol = ((bflcol[1] & 0x3f000) << 6)|((bflcol[1] & 0xfc0) << 4)|
+            ((bflcol[1] & 0x3f) << 2);
     }
     else
     {
-	bflcol[1] = iemgui_modulo_color(bflcol[1]);
-	iemgui->x_fcol = iemgui_color_hex[bflcol[1]];
+        bflcol[1] = iemgui_modulo_color(bflcol[1]);
+        iemgui->x_fcol = iemgui_color_hex[bflcol[1]];
     }
     if(bflcol[2] < 0)
     {
-	bflcol[2] = -1 - bflcol[2];
-	iemgui->x_lcol = ((bflcol[2] & 0x3f000) << 6)|((bflcol[2] & 0xfc0) << 4)|
-	    ((bflcol[2] & 0x3f) << 2);
+        bflcol[2] = -1 - bflcol[2];
+        iemgui->x_lcol = ((bflcol[2] & 0x3f000) << 6)|((bflcol[2] & 0xfc0) << 4)|
+            ((bflcol[2] & 0x3f) << 2);
     }
     else
     {
-	bflcol[2] = iemgui_modulo_color(bflcol[2]);
-	iemgui->x_lcol = iemgui_color_hex[bflcol[2]];
+        bflcol[2] = iemgui_modulo_color(bflcol[2]);
+        iemgui->x_lcol = iemgui_color_hex[bflcol[2]];
     }
 }
 
@@ -338,11 +338,11 @@ int iemgui_compatible_col(int i)
 
     if(i >= 0)
     {
-	j = iemgui_modulo_color(i);
-	return(iemgui_color_hex[(j)]);
+        j = iemgui_modulo_color(i);
+        return(iemgui_color_hex[(j)]);
     }
     else
-	return((-1 -i)&0xffffff);
+        return((-1 -i)&0xffffff);
 }
 
 void iemgui_all_dollar2raute(t_symbol **srlsym)
@@ -370,7 +370,7 @@ void iemgui_send(void *x, t_iemgui *iemgui, t_symbol *s)
 #endif
 
     if(iemgui->x_fsf.x_rcv_able)
-	oldsndrcvable += IEM_GUI_OLD_RCV_FLAG;
+        oldsndrcvable += IEM_GUI_OLD_RCV_FLAG;
     if(iemgui->x_fsf.x_snd_able)
         oldsndrcvable += IEM_GUI_OLD_SND_FLAG;
 
@@ -379,7 +379,7 @@ void iemgui_send(void *x, t_iemgui *iemgui, t_symbol *s)
     iemgui->x_snd_unexpanded = snd;
     iemgui->x_snd = snd = canvas_realizedollar(iemgui->x_glist, snd);
         post("send: before %s, after %s", iemgui->x_snd_unexpanded->s_name,
-    	    iemgui->x_snd->s_name);
+            iemgui->x_snd->s_name);
 
     iemgui->x_fsf.x_snd_able = sndable;
     iemgui_verify_snd_ne_rcv(iemgui);
@@ -397,7 +397,7 @@ void iemgui_receive(void *x, t_iemgui *iemgui, t_symbol *s)
 #endif
 
     if(iemgui->x_fsf.x_rcv_able)
-	oldsndrcvable += IEM_GUI_OLD_RCV_FLAG;
+        oldsndrcvable += IEM_GUI_OLD_RCV_FLAG;
     if(iemgui->x_fsf.x_snd_able)
         oldsndrcvable += IEM_GUI_OLD_SND_FLAG;
 
@@ -407,18 +407,18 @@ void iemgui_receive(void *x, t_iemgui *iemgui, t_symbol *s)
     iemgui->x_rcv = rcv = canvas_realizedollar(iemgui->x_glist, rcv);
     if(rcvable)
     {
-	if(strcmp(rcv->s_name, iemgui->x_rcv->s_name))
-	{
-	    if(iemgui->x_fsf.x_rcv_able)
-		pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
-	    iemgui->x_rcv = rcv;
-	    pd_bind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
-	}
+        if(strcmp(rcv->s_name, iemgui->x_rcv->s_name))
+        {
+            if(iemgui->x_fsf.x_rcv_able)
+                pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
+            iemgui->x_rcv = rcv;
+            pd_bind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
+        }
     }
     else if(!rcvable && iemgui->x_fsf.x_rcv_able)
     {
-	pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
-	iemgui->x_rcv = rcv;
+        pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
+        iemgui->x_rcv = rcv;
     }
     iemgui->x_fsf.x_rcv_able = rcvable;
     iemgui_verify_snd_ne_rcv(iemgui);
@@ -443,9 +443,9 @@ void iemgui_label(void *x, t_iemgui *iemgui, t_symbol *s)
 
 #ifndef ROCKBOX
     if(glist_isvisible(iemgui->x_glist))
-	sys_vgui(".x%x.c itemconfigure %xLABEL -text {%s} \n",
-		 glist_getcanvas(iemgui->x_glist), x,
-		 strcmp(s->s_name, "empty")?iemgui->x_lab->s_name:"");
+        sys_vgui(".x%x.c itemconfigure %xLABEL -text {%s} \n",
+                 glist_getcanvas(iemgui->x_glist), x,
+                 strcmp(s->s_name, "empty")?iemgui->x_lab->s_name:"");
 #endif
 }
 
@@ -461,10 +461,10 @@ void iemgui_label_pos(void *x, t_iemgui *iemgui, t_symbol *s, int ac, t_atom *av
 
 #ifndef ROCKBOX
     if(glist_isvisible(iemgui->x_glist))
-	sys_vgui(".x%x.c coords %xLABEL %d %d\n",
-		 glist_getcanvas(iemgui->x_glist), x,
-		 iemgui->x_obj.te_xpix+iemgui->x_ldx,
-		 iemgui->x_obj.te_ypix+iemgui->x_ldy);
+        sys_vgui(".x%x.c coords %xLABEL %d %d\n",
+                 glist_getcanvas(iemgui->x_glist), x,
+                 iemgui->x_obj.te_xpix+iemgui->x_ldx,
+                 iemgui->x_obj.te_ypix+iemgui->x_ldy);
 #endif
 }
 
@@ -481,18 +481,18 @@ void iemgui_label_font(void *x, t_iemgui *iemgui, t_symbol *s, int ac, t_atom *a
     else if(f == 2) strcpy(iemgui->x_font, "times");
     else
     {
-	f = 0;
-	strcpy(iemgui->x_font, "courier");
+        f = 0;
+        strcpy(iemgui->x_font, "courier");
     }
     iemgui->x_fsf.x_font_style = f;
     f = (int)atom_getintarg(1, ac, av);
     if(f < 4)
-	f = 4;
+        f = 4;
     iemgui->x_fontsize = f;
 #ifndef ROCKBOX
     if(glist_isvisible(iemgui->x_glist))
-	sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold}\n",
-		 glist_getcanvas(iemgui->x_glist), x, iemgui->x_font, iemgui->x_fontsize);
+        sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold}\n",
+                 glist_getcanvas(iemgui->x_glist), x, iemgui->x_font, iemgui->x_fontsize);
 #endif
 }
 
@@ -500,8 +500,8 @@ void iemgui_size(void *x, t_iemgui *iemgui)
 {
     if(glist_isvisible(iemgui->x_glist))
     {
-	(*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(iemgui->x_glist), (t_text*)x);
+        (*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_MOVE);
+        canvas_fixlinesfor(glist_getcanvas(iemgui->x_glist), (t_text*)x);
     }
 }
 
@@ -514,8 +514,8 @@ void iemgui_delta(void *x, t_iemgui *iemgui, t_symbol *s, int ac, t_atom *av)
     iemgui->x_obj.te_ypix += (int)atom_getintarg(1, ac, av);
     if(glist_isvisible(iemgui->x_glist))
     {
-	(*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(iemgui->x_glist), (t_text*)x);
+        (*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_MOVE);
+        canvas_fixlinesfor(glist_getcanvas(iemgui->x_glist), (t_text*)x);
     }
 }
 
@@ -528,8 +528,8 @@ void iemgui_pos(void *x, t_iemgui *iemgui, t_symbol *s, int ac, t_atom *av)
     iemgui->x_obj.te_ypix = (int)atom_getintarg(1, ac, av);
     if(glist_isvisible(iemgui->x_glist))
     {
-	(*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(iemgui->x_glist), (t_text*)x);
+        (*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_MOVE);
+        canvas_fixlinesfor(glist_getcanvas(iemgui->x_glist), (t_text*)x);
     }
 }
 
@@ -541,13 +541,13 @@ void iemgui_color(void *x, t_iemgui *iemgui, t_symbol *s, int ac, t_atom *av)
     iemgui->x_bcol = iemgui_compatible_col(atom_getintarg(0, ac, av));
     if(ac > 2)
     {
-	iemgui->x_fcol = iemgui_compatible_col(atom_getintarg(1, ac, av));
-	iemgui->x_lcol = iemgui_compatible_col(atom_getintarg(2, ac, av));
+        iemgui->x_fcol = iemgui_compatible_col(atom_getintarg(1, ac, av));
+        iemgui->x_lcol = iemgui_compatible_col(atom_getintarg(2, ac, av));
     }
     else
-	iemgui->x_lcol = iemgui_compatible_col(atom_getintarg(1, ac, av));
+        iemgui->x_lcol = iemgui_compatible_col(atom_getintarg(1, ac, av));
     if(glist_isvisible(iemgui->x_glist))
-	(*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_CONFIG);
+        (*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_CONFIG);
 }
 
 void iemgui_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -578,9 +578,9 @@ void iemgui_vis(t_gobj *z, t_glist *glist, int vis)
     t_iemguidummy *x = (t_iemguidummy *)z;
 
     if (vis)
-	(*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_NEW);
+        (*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_NEW);
     else
-	(*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_ERASE);
+        (*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_ERASE);
 }
 
 void iemgui_save(t_iemgui *iemgui, t_symbol **srl, int *bflcol)
@@ -615,41 +615,41 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     int sndable=1, rcvable=1, oldsndrcvable=0;
 
     if(iemgui->x_fsf.x_rcv_able)
-	oldsndrcvable += IEM_GUI_OLD_RCV_FLAG;
+        oldsndrcvable += IEM_GUI_OLD_RCV_FLAG;
     if(iemgui->x_fsf.x_snd_able)
         oldsndrcvable += IEM_GUI_OLD_SND_FLAG;
     if(IS_A_SYMBOL(argv,7))
-	srl[0] = atom_getsymbolarg(7, argc, argv);
+        srl[0] = atom_getsymbolarg(7, argc, argv);
     else if(IS_A_FLOAT(argv,7))
     {
 #ifdef ROCKBOX
         snprintf(str, sizeof(str), "%d", (int) atom_getintarg(7, argc, argv));
 #else
-	sprintf(str, "%d", (int)atom_getintarg(7, argc, argv));
+        sprintf(str, "%d", (int)atom_getintarg(7, argc, argv));
 #endif
-	srl[0] = gensym(str);
+        srl[0] = gensym(str);
     }
     if(IS_A_SYMBOL(argv,8))
-	srl[1] = atom_getsymbolarg(8, argc, argv);
+        srl[1] = atom_getsymbolarg(8, argc, argv);
     else if(IS_A_FLOAT(argv,8))
     {
 #ifdef ROCKBOX
         snprintf(str, sizeof(str), "%d", (int) atom_getintarg(8, argc, argv));
 #else
-	sprintf(str, "%d", (int)atom_getintarg(8, argc, argv));
+        sprintf(str, "%d", (int)atom_getintarg(8, argc, argv));
 #endif
-	srl[1] = gensym(str);
+        srl[1] = gensym(str);
     }
     if(IS_A_SYMBOL(argv,9))
-	srl[2] = atom_getsymbolarg(9, argc, argv);
+        srl[2] = atom_getsymbolarg(9, argc, argv);
     else if(IS_A_FLOAT(argv,9))
     {
 #ifdef ROCKBOX
         snprintf(str, sizeof(str), "%d", (int) atom_getintarg(9, argc, argv));
 #else
-	sprintf(str, "%d", (int)atom_getintarg(9, argc, argv));
+        sprintf(str, "%d", (int)atom_getintarg(9, argc, argv));
 #endif
-	srl[2] = gensym(str);
+        srl[2] = gensym(str);
     }
     if(init != 0) init = 1;
     iemgui->x_isa.x_loadinit = init;
@@ -659,18 +659,18 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     iemgui_all_dollararg2sym(iemgui, srl);
     if(rcvable)
     {
-	if(strcmp(srl[1]->s_name, iemgui->x_rcv->s_name))
-	{
-	    if(iemgui->x_fsf.x_rcv_able)
-		pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
-	    iemgui->x_rcv = srl[1];
-	    pd_bind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
-	}
+        if(strcmp(srl[1]->s_name, iemgui->x_rcv->s_name))
+        {
+            if(iemgui->x_fsf.x_rcv_able)
+                pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
+            iemgui->x_rcv = srl[1];
+            pd_bind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
+        }
     }
     else if(!rcvable && iemgui->x_fsf.x_rcv_able)
     {
-	pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
-	iemgui->x_rcv = srl[1];
+        pd_unbind(&iemgui->x_obj.ob_pd, iemgui->x_rcv);
+        iemgui->x_rcv = srl[1];
     }
     iemgui->x_snd = srl[0];
     iemgui->x_fsf.x_snd_able = sndable;
@@ -685,12 +685,12 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     else if(f == 2) strcpy(iemgui->x_font, "times");
     else
     {
-	f = 0;
-	strcpy(iemgui->x_font, "courier");
+        f = 0;
+        strcpy(iemgui->x_font, "courier");
     }
     iemgui->x_fsf.x_font_style = f;
     if(fs < 4)
-	fs = 4;
+        fs = 4;
     iemgui->x_fontsize = fs;
     iemgui_verify_snd_ne_rcv(iemgui);
     return(oldsndrcvable);
@@ -710,8 +710,8 @@ void iem_inttosymargs(t_iem_init_symargs *symargp, int n)
 int iem_symargstoint(t_iem_init_symargs *symargp)
 {
     return (
-	(((symargp->x_loadinit & 1) <<  0) |
-	((symargp->x_scale & 1) <<  20)));
+        (((symargp->x_loadinit & 1) <<  0) |
+        ((symargp->x_scale & 1) <<  20)));
 }
 
 void iem_inttofstyle(t_iem_fstyle_flags *fstylep, int n)
@@ -733,4 +733,3 @@ int iem_fstyletoint(t_iem_fstyle_flags *fstylep)
 {
     return ((fstylep->x_font_style << 0) & 63);
 }
-

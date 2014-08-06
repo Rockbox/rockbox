@@ -59,7 +59,6 @@ void ata_device_init(void)
 {
     /* ATA reset */
     ATA_RESET_DISABLE; /* Set the pin to disable an active low reset */
-    
+
     /* ATA INT pin 11 (currently unused) */
 }
-

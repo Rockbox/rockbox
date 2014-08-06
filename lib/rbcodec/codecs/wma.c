@@ -123,7 +123,7 @@ restart_track:
             wmadec.last_superframe_len = 0;
             wmadec.last_bitoffset = 0;
 
-            /*zero the frame out buffer so we don't overlap with a 
+            /*zero the frame out buffer so we don't overlap with a
                 stale samples*/
             memset((*(wmadec.frame_out)), 0,
                 sizeof(fixed32) * MAX_CHANNELS * BLOCK_MAX_SIZE * 2);

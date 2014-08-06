@@ -200,7 +200,7 @@ void irq_handler(void)
             irqvector[current_irq]();
     VIC0ADDRESS = NULL;
     VIC1ADDRESS = NULL;
-        
+
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */

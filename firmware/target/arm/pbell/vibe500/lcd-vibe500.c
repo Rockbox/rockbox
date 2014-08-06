@@ -495,7 +495,7 @@ void lcd_update_rect(int x0, int y0, int width, int height)
 }
 
 /* Update the display.
-   This must be called after all other LCD 
+   This must be called after all other LCD
    functions that change the display. */
 void lcd_update(void)
 {

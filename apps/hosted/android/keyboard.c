@@ -106,7 +106,7 @@ int kbd_input(char* text, int buflen)
     e->DeleteLocalRef(env_ptr, str);
     e->DeleteLocalRef(env_ptr, ok_text);
     e->DeleteLocalRef(env_ptr, cancel_text);
-    
+
     return !accepted; /* return 0 on success */
 }
 

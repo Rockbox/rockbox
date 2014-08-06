@@ -1,6 +1,6 @@
 /*
  * make_fw.c - iPodLinux loader installer
- * 
+ *
  * Copyright (C) 2003 Daniel Palffy
  *
  * based on Bernard Leach's patch_fw.c
@@ -44,16 +44,16 @@ int be;
 unsigned short fw_version = 2;
 
 typedef struct _image {
-    char type[4];		/* '' */
-    unsigned id;		/* */
-    char pad1[4];		/* 0000 0000 */
-    unsigned devOffset;		/* byte offset of start of image code */
-    unsigned len;		/* length in bytes of image */
-    unsigned addr;		/* load address */
-    unsigned entryOffset;	/* execution start within image */
-    unsigned chksum;		/* checksum for image */
-    unsigned vers;		/* image version */
-    unsigned loadAddr;		/* load address for image */
+    char type[4];               /* '' */
+    unsigned id;                /* */
+    char pad1[4];               /* 0000 0000 */
+    unsigned devOffset;         /* byte offset of start of image code */
+    unsigned len;               /* length in bytes of image */
+    unsigned addr;              /* load address */
+    unsigned entryOffset;       /* execution start within image */
+    unsigned chksum;            /* checksum for image */
+    unsigned vers;              /* image version */
+    unsigned loadAddr;          /* load address for image */
 } image_t;
 
 static char *apple_copyright = "{{~~  /-----\\   {{~~ /       \\  {{~~|         | {{~~| S T O P | {{~~|         | {{~~ \\       /  {{~~  \\-----/   Copyright(C) 2001 Apple Computer, Inc.---------------------------------------------------------------------------------------------------------";
@@ -62,65 +62,65 @@ unsigned
 switch_32(unsigned l)
 {
     if (be)
-	return ((l & 0xff) << 24)
-	    | ((l & 0xff00) << 8)
-	    | ((l & 0xff0000) >> 8)
-	    | ((l & 0xff000000) >> 24);
+        return ((l & 0xff) << 24)
+            | ((l & 0xff00) << 8)
+            | ((l & 0xff0000) >> 8)
+            | ((l & 0xff000000) >> 24);
     return l;
 }
 
 unsigned short
 switch_16(unsigned short s)
 {
-	if (be) {
-		return ((s & 0xff) << 8) | ((s & 0xff00) >> 8);
-	} else {
-		return s;
-	}
+        if (be) {
+                return ((s & 0xff) << 8) | ((s & 0xff00) >> 8);
+        } else {
+                return s;
+        }
 }
 
 void
 switch_endian(image_t *image)
 {
    if (be) {
-	image->id = switch_32(image->id);
-	image->devOffset = switch_32(image->devOffset);
-	image->len = switch_32(image->len);
-	image->addr = switch_32(image->addr);
-	image->entryOffset = switch_32(image->entryOffset);
-	image->chksum = switch_32(image->chksum);
-	image->vers = switch_32(image->vers);
-	image->loadAddr = switch_32(image->loadAddr);
+        image->id = switch_32(image->id);
+        image->devOffset = switch_32(image->devOffset);
+        image->len = switch_32(image->len);
+        image->addr = switch_32(image->addr);
+        image->entryOffset = switch_32(image->entryOffset);
+        image->chksum = switch_32(image->chksum);
+        image->vers = switch_32(image->vers);
+        image->loadAddr = switch_32(image->loadAddr);
     }
 }
 
 void
 print_image(image_t *image, const char *head)
 {
-    printf("%stype: '%s' id: 0x%08x len: 0x%x addr: 0x%08x vers: 0x%x\n", 
-	    head, image->type, image->id, image->len, image->addr, image->vers);
+    printf("%stype: '%s' id: 0x%08x len: 0x%x addr: 0x%08x vers: 0x%x\n",
+            head, image->type, image->id, image->len, image->addr, image->vers);
     printf("  devOffset: 0x%08X entryOffset: 0x%08X "
-	    "loadAddr: 0x%08X chksum: 0x%08X\n", 
-	    image->devOffset, image->entryOffset, 
-	    image->loadAddr, image->chksum);
+            "loadAddr: 0x%08X chksum: 0x%08X\n",
+            image->devOffset, image->entryOffset,
+            image->loadAddr, image->chksum);
 }
 
 void
 usage()
 {
     printf("Usage: ipod_fw [-h]\n"
-	   "       ipod_fw [-v] -o outfile -e img_no fw_file\n"
-	   "       ipod_fw [-v] -g gen [-r rev] -o outfile [-i img_from_-e]* [-l raw_img]* ldr_img\n\n"
-	   "  -g:    set target ipod generation, valid options are: 1g, 2g, 3g\n"
-	   "         4g, 5g, scroll, touch, dock, mini, photo, color, nano and video\n"
-	   "  -e:    extract the image at img_no in boot table to outfile\n"
-	   "         fw_file is an original firmware image\n"
-	   "         the original firmware has the sw at 0, and a flash updater at 1\n"
-	   "  -i|-l: create new image to outfile\n"
-	   "         up to 5 images, any of -i or -l allowed\n"
-	   "         -i: image extracted with -e, load and entry address preserved\n"
-	   "         -l: raw image, loaded to 0x28000000, entry at 0x00000000\n"
-	   "	     -r: set master revision to rev (for example 210 for 2.10)\n"
+           "       ipod_fw [-v] -o outfile -e img_no fw_file\n"
+           "       ipod_fw [-v] -g gen [-r rev] -o outfile [-i img_from_-e]* [-l raw_img]* ldr_img\n\n"
+           "  -g:    set target ipod generation, valid options are: 1g, 2g, 3g\n"
+           "         4g, 5g, scroll, touch, dock, mini, photo, color, nano and video\n"
+           "  -e:    extract the image at img_no in boot table to outfile\n"
+           "         fw_file is an original firmware image\n"
+           "         the original firmware has the sw at 0, and a flash updater at 1\n"
+           "  -i|-l: create new image to outfile\n"
+           "         up to 5 images, any of -i or -l allowed\n"
+           "         -i: image extracted with -e, load and entry address preserved\n"
+           "         -l: raw image, loaded to 0x28000000, entry at 0x00000000\n"
+           "	     -r: set master revision to rev (for example 210 for 2.10)\n"
 	   "             may be needed if newest -e img is not the same as the flash rev\n"
 	   "         ldr_img is the iPodLinux loader binary.\n"
 	   "         first image is loaded by default, 2., 3., 4. or 5. loaded if\n"
@@ -129,8 +129,8 @@ usage()
 	   " This program is used to create a bootable ipod image.\n\n");
 }
 
-/* read len bytes from the beginning of s, 
- * calculate checksum, and 
+/* read len bytes from the beginning of s,
+ * calculate checksum, and
  * if (d) copy to current offset in d */
 unsigned
 copysum(FILE *s, FILE *d, unsigned len, unsigned off)
@@ -152,7 +152,7 @@ copysum(FILE *s, FILE *d, unsigned len, unsigned off)
 	    return -1;
 	}
 	sum = sum + (temp & 0xff);
-	if (d) 
+	if (d)
 	    if (fwrite(&temp, 1, 1, d) != 1) {
 		fprintf(stderr, "Failure in copysum; fwrite error: %s\n", strerror(errno));
 		return -1;
@@ -161,11 +161,11 @@ copysum(FILE *s, FILE *d, unsigned len, unsigned off)
     return sum;
 }
 
-/* load the boot entry from 
- * boot table at offset, 
+/* load the boot entry from
+ * boot table at offset,
  * entry number entry
  * file fw */
-int 
+int
 load_entry(image_t *image, FILE *fw, unsigned offset, int entry)
 {
     if (fseek(fw, offset + entry * sizeof(image_t), SEEK_SET) == -1) {
@@ -195,10 +195,10 @@ load_entry(image_t *image, FILE *fw, unsigned offset, int entry)
 }
 
 /* store the boot entry to
- * boot table at offset, 
+ * boot table at offset,
  * entry number entry
  * file fw */
-int 
+int
 write_entry(image_t *image, FILE *fw, unsigned offset, int entry)
 {
     if (fseek(fw, offset + entry * sizeof(image_t), SEEK_SET) == -1) {
@@ -215,10 +215,10 @@ write_entry(image_t *image, FILE *fw, unsigned offset, int entry)
     return 0;
 }
 
-/* extract a single image from the fw 
- * the first 40 bytes contain a boot table entry, 
+/* extract a single image from the fw
+ * the first 40 bytes contain a boot table entry,
  * padded to one block (512 bytes */
-int 
+int
 extract(FILE *f, int idx, FILE *out)
 {
     image_t *image;
@@ -255,12 +255,12 @@ extract(FILE *f, int idx, FILE *out)
     }
     if (copysum(f, out, image->len, off) == -1)
 	return -1;
-		
+
     return 0;
 }
 
 /* list all images */
-int 
+int
 listall(FILE *f)
 {
     image_t *image;
@@ -272,7 +272,7 @@ listall(FILE *f)
     fw_version = switch_16(fw_version);
 
     image = (image_t *)buf;
-    
+
     idx = 0;
     while (idx < 20) {
 	char prefix[32];
@@ -287,7 +287,7 @@ listall(FILE *f)
 }
 
 /* return the size of f */
-unsigned 
+unsigned
 lengthof(FILE *f)
 {
     unsigned ret;
@@ -309,7 +309,7 @@ test_endian(void)
     char ch[4] = { '\0', '\1', '\2', '\3' };
     unsigned i = 0x00010203;
 
-    if (*((int *)ch) == i) 
+    if (*((int *)ch) == i)
 	be = 1;
     else
 	be = 0;
@@ -339,16 +339,16 @@ main(int argc, char **argv)
     int images_done = 0;
     unsigned version = 0, offset = 0, len = 0;
     int needs_rcsc = 0;
-    
+
     test_endian();
-    
+
     /* parse options */
     opterr = 0;
     while ((c = getopt(argc, argv, "3hve:o:i:l:r:g:")) != -1)
 	switch (c) {
 	    case 'h':
 		if (verbose || in || out || images_done || ext) {
-		    fprintf(stderr, 
+		    fprintf(stderr,
 			    "-[?h] is exclusive with other arguments\n");
 		    usage();
 		    return 1;
@@ -407,7 +407,7 @@ main(int argc, char **argv)
 		    usage();
 		    return 1;
 		}
-		    
+
 		ext = atoi(optarg) + 1;
 		break;
 	    case 'i':
@@ -432,7 +432,7 @@ main(int argc, char **argv)
 		    fprintf(stderr, "fseek failed: %s\n", strerror(errno));
 		    return 1;
 		}
-		if ((images[images_done].chksum = copysum(in, out, 
+		if ((images[images_done].chksum = copysum(in, out,
 			images[images_done].len, 0x200)) == -1)
 		    return 1;
 		offset += images[images_done].len;
@@ -463,7 +463,7 @@ main(int argc, char **argv)
 		    fprintf(stderr, "fseek failed: %s\n", strerror(errno));
 		    return 1;
 		}
-		if ((images[images_done].chksum = copysum(in, out, 
+		if ((images[images_done].chksum = copysum(in, out,
 			images[images_done].len, 0)) == -1)
 		    return 1;
 		offset += images[images_done].len;
@@ -492,7 +492,7 @@ main(int argc, char **argv)
 	usage();
 	return 1;
     }
- 
+
     if (ext) {
 	if ((in = fopen(argv[optind], "rb")) == NULL) {
 	    fprintf(stderr, "Cannot open firmware image file %s\n", argv[optind]);
@@ -614,4 +614,3 @@ main(int argc, char **argv)
 
     return 0;
 }
-

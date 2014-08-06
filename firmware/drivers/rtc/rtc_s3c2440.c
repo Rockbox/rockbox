@@ -60,28 +60,28 @@ int rtc_write_datetime(const struct tm *tm)
 /* This alarm code works with a flashed bootloader.  This will not work with
  * the OF bootloader.
  */
- 
+
 /* Check whether the unit has been started by the RTC alarm function */
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    if (GSTATUS3) 
+    if (GSTATUS3)
     {
-        GSTATUS3 &= ~release_alarm;  
+        GSTATUS3 &= ~release_alarm;
         return true;
-    } 
-    else 
-    { 
+    }
+    else
+    {
         return false;
     }
 }
 
 /* Check to see if the alarm has flaged since the last it was checked */
-bool rtc_check_alarm_flag(void) 
+bool rtc_check_alarm_flag(void)
 {
     bool ret=SRCPND & 0x40000000;
-    
+
     SRCPND=RTC_MASK;
-    
+
     return ret;
 }
 

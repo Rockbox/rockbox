@@ -200,7 +200,7 @@ static inline bool usb_configure_drivers(int for_state)
         usb_attach(); /* Powered only: attach now. */
         break;
         /* USB_POWERED: */
-    
+
     case USB_INSERTED:
 #ifdef USB_ENABLE_STORAGE
         usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
@@ -608,7 +608,7 @@ static void usb_tick(void)
 #ifdef USB_FIREWIRE_HANDLING
     static int firewire_countdown = -1;
     static int last_firewire_status = false;
-#endif    
+#endif
 
     if(usb_monitor_enabled)
     {
@@ -825,4 +825,3 @@ void usb_wait_for_disconnect(struct event_queue *q)
    (void)q;
 }
 #endif /* USB_NONE */
-

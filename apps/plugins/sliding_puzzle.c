@@ -91,7 +91,7 @@
 #define PUZZLE_PICTURE BUTTON_A
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-(CONFIG_KEYPAD == SANSA_C200_PAD) 
+(CONFIG_KEYPAD == SANSA_C200_PAD)
 #define PUZZLE_QUIT BUTTON_POWER
 #define PUZZLE_LEFT BUTTON_LEFT
 #define PUZZLE_RIGHT BUTTON_RIGHT
@@ -336,13 +336,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #ifndef PUZZLE_PICTURE
 #define PUZZLE_PICTURE BUTTON_CENTER
 #endif
-#ifndef PUZZLE_QUIT_TEXT 
+#ifndef PUZZLE_QUIT_TEXT
 #define PUZZLE_QUIT_TEXT "[TOPLEFT]"
 #endif
-#ifndef PUZZLE_SHUFFLE_TEXT 
+#ifndef PUZZLE_SHUFFLE_TEXT
 #define PUZZLE_SHUFFLE_TEXT "[BOTTOMLEFT]"
 #endif
-#ifndef PUZZLE_PICTURE_TEXT 
+#ifndef PUZZLE_PICTURE_TEXT
 #define PUZZLE_PICTURE_TEXT "[CENTER]"
 #endif
 #endif
@@ -516,7 +516,7 @@ static void draw_spot(int p, int x, int y)
            an appropriate hole graphic */
         rb->lcd_bitmap_part(sliding_puzzle, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
                     ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
-                    STRIDE( SCREEN_MAIN, 
+                    STRIDE( SCREEN_MAIN,
                             BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle),
                     x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
 #else
@@ -533,8 +533,8 @@ static void draw_spot(int p, int x, int y)
     {
         rb->lcd_bitmap_part( puzzle_bmp_ptr, ((p-1)%SPOTS_X)*SPOTS_WIDTH,
                      ((p-1)/SPOTS_X)*SPOTS_HEIGHT,
-                     STRIDE( SCREEN_MAIN, 
-                             BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle), 
+                     STRIDE( SCREEN_MAIN,
+                             BMPWIDTH_sliding_puzzle, BMPHEIGHT_sliding_puzzle),
                      x, y, SPOTS_WIDTH, SPOTS_HEIGHT);
     } else {
         rb->lcd_drawrect(x, y, SPOTS_WIDTH, SPOTS_HEIGHT);

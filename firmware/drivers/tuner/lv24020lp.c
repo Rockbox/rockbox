@@ -303,7 +303,7 @@ static void lv24020lp_send_byte(unsigned int byte)
     for (i = 0; i < 8; i++)
     {
         TUNER_GPIO_OUTPUT_VAL_CLEAR(1 << FM_CLOCK_PIN);
-        
+
 
         if (byte & 1)
             TUNER_GPIO_OUTPUT_VAL_SET(1 << FM_DATA_PIN);
@@ -568,7 +568,7 @@ static void set_frequency(int freq)
                     coef_00, coef_01);
 
     osc_value = sw_osc_low;
-    lv24020lp_write(FM_OSC, osc_value); 
+    lv24020lp_write(FM_OSC, osc_value);
 
     /* Just in case - don't go into infinite loop */
     for (count = 0; count < 30; count++)
@@ -578,7 +578,7 @@ static void set_frequency(int freq)
         int y1 = interpolate_y(cap_value, sw_cap_low, sw_cap_high,
                                 coef_10, coef_11);
         int coef_fcur, cap_new, coef_cor, range;
-         
+
         lv24020lp_write(FM_CAP, cap_value);
 
         range     = y1 - y0;
@@ -591,7 +591,7 @@ static void set_frequency(int freq)
         TUNER_LOG("%d %d %d %d %d %d %d %d\n",
                   f1, cap_value, coef, coef_fcur, coef_cor, y0, y1, range);
 
-        if (coef >= y0 && coef <= y1) 
+        if (coef >= y0 && coef <= y1)
         {
             osc_value = interpolate_x(coef, sw_osc_low, sw_osc_high,
                                         y0, y1);
@@ -798,7 +798,7 @@ static int lv24020lp_debug_info(int setting)
     if (setting >= LV24020LP_DEBUG_FIRST && setting <= LV24020LP_DEBUG_LAST)
     {
         val = 0;
-    
+
         if (tuner_awake())
         {
             switch (setting)

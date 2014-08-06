@@ -45,7 +45,7 @@ void irq(void)
         panicf("Unhandled IRQ 0x%08X", irq);
 }
 
-void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked)); 
+void fiq_handler(void) __attribute__((interrupt ("FIQ"), naked));
 
 #ifdef BOOTLOADER
 void fiq_handler(void)
@@ -65,7 +65,7 @@ void system_exception_wait(void)
 
 /* TODO - these should live in the target-specific directories and
    once we understand what all the GPIO pins do, move the init to the
-   specific driver for that hardware.   For now, we just perform the 
+   specific driver for that hardware.   For now, we just perform the
    same GPIO init as the original firmware - this makes it easier to
    investigate what the GPIO pins do.
 */
@@ -77,19 +77,19 @@ static void gpio_init(void)
     GPIOD_FUNC = 0;
     GPIOD_DIR = 0x3f0;
     GPIOD = 0xe0;
-    
+
     GPIOE_FUNC = 0;
     GPIOE_DIR = 0xe0;
     GPIOE = 0;
-    
+
     GPIOA_FUNC = 0;
     GPIOA_DIR = 0xffff1000;   /* 0 - 0xf000 */
     GPIOA = 0x1080;
-    
+
     GPIOB_FUNC = 0x16a3;
     GPIOB_DIR = 0x6ffff;
     GPIOB = 0;
-    
+
     GPIOC_FUNC = 1;
     GPIOC_DIR = 0x03ffffff;  /* mvn r2, 0xfc000000 */
     GPIOC = 0;
@@ -126,20 +126,20 @@ static void gpio_init(void)
     GPIOA_FUNC = 0;
     GPIOB_FUNC = 0x16A3;
     GPIOC_FUNC = 1;
-    GPIOD_FUNC |= 2; 
+    GPIOD_FUNC |= 2;
     GPIOE_FUNC = 0;
-    
-    GPIOA_DIR = 0xFFFF0E00;  
-    GPIOB_DIR = 0x6FFFF; 
-    GPIOC_DIR = 0x03FFFFFF; 
-    GPIOD_DIR = 0x3F7; 
-    GPIOE_DIR = 0x9B; 
-    
-    GPIOA = 0x80; 
+
+    GPIOA_DIR = 0xFFFF0E00;
+    GPIOB_DIR = 0x6FFFF;
+    GPIOC_DIR = 0x03FFFFFF;
+    GPIOD_DIR = 0x3F7;
+    GPIOE_DIR = 0x9B;
+
+    GPIOA = 0x80;
     GPIOB = 0;
     GPIOC = 0;
-    GPIOD |= 0xC0; 
-    GPIOE = 0x9B; 
+    GPIOD |= 0xC0;
+    GPIOE = 0x9B;
 }
 #endif
 
@@ -258,7 +258,7 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0201d/DDI0201D_arm946es_r1p1
         "mcr     p15, 0, r0, c6, c7, 0  \n\t"
         "mcr     p15, 0, r0, c6, c7, 1  \n\t"
 
-        
+
         /* Register 5 - Access Permission Registers */
 
         "ldr     r0, =0xffff            \n\t"
@@ -270,7 +270,7 @@ http://infocenter.arm.com/help/topic/com.arm.doc.ddi0201d/DDI0201D_arm946es_r1p1
 
 #if defined(LOGIK_DAX) || defined(SANSA_C100)
         "mov     r0, #0xa5              \n\t"
-#elif defined(IAUDIO_7) || defined(SANSA_M200) 
+#elif defined(IAUDIO_7) || defined(SANSA_M200)
         "mov     r0, #0xa7              \n\t"
 #else
     #error NOT DEFINED FOR THIS TARGET!
@@ -299,7 +299,7 @@ void system_init(void)
     IEN = 0;
 
     /* Set all interrupts as IRQ for now - some may need to be FIQ in future */
-    IRQSEL = 0xffffffff; 
+    IRQSEL = 0xffffffff;
 
     /* Set master enable bit */
     IEN = 0x80000000;

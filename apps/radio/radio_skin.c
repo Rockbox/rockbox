@@ -41,7 +41,7 @@
 char* default_radio_skin(enum screen_type screen)
 {
     (void)screen;
-    static char default_fms[] = 
+    static char default_fms[] =
         "%s%?Ti<%Ti. |>%?Tn<%Tn|%Tf>\n"
         "%Sx(Station:) %tf MHz\n"
         "%?St(force fm mono)<%Sx(Force Mono)|%?ts<%Sx(Stereo)|%Sx(Mono)>>\n"
@@ -68,7 +68,7 @@ void fms_fix_displays(enum fms_exiting toggle_state)
         struct wps_data *data = skin_get_gwps(FM_SCREEN, i)->data;
         if (toggle_state == FMS_ENTER)
         {
-            viewportmanager_theme_enable(i, skin_has_sbs(i, data), NULL);  
+            viewportmanager_theme_enable(i, skin_has_sbs(i, data), NULL);
 #ifdef HAVE_BACKDROP_IMAGE
             skin_backdrop_show(data->backdrop_id);
 #endif
@@ -86,12 +86,12 @@ void fms_fix_displays(enum fms_exiting toggle_state)
         }
 #ifdef HAVE_TOUCHSCREEN
         if (i==SCREEN_MAIN && !data->touchregions)
-            touchscreen_set_mode(toggle_state == FMS_ENTER ? 
+            touchscreen_set_mode(toggle_state == FMS_ENTER ?
                                  TOUCHSCREEN_BUTTON : global_settings.touch_mode);
 #endif
     }
 }
-        
+
 
 int fms_do_button_loop(bool update_screen)
 {
@@ -120,8 +120,7 @@ int fms_do_button_loop(bool update_screen)
         case ACTION_TOUCH_SCROLLBAR:
             /* TODO */
             break;
-    }   
+    }
 #endif
     return button;
 }
-

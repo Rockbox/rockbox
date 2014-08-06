@@ -34,7 +34,7 @@
 
   Since the fat32 driver only manages sectors, we maintain a one-sector
   cache for each open file. This way we can provide byte access without
-  having to re-read the sector each time. 
+  having to re-read the sector each time.
   The penalty is the RAM used for the cache and slightly more complex code.
 */
 
@@ -140,7 +140,7 @@ static int open_internal(const char* pathname, int flags, bool use_cache)
     /* locate filename */
     name=strrchr(pathnamecopy+1,'/');
     if ( name ) {
-        *name = 0; 
+        *name = 0;
         dir = opendir_uncached(pathnamecopy);
         *name = '/';
         name++;
@@ -646,7 +646,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
                     return nread ? nread : rc * 10 - 5;
                 }
                 /* seek back one sector to put file position right */
-                rc = fat_seek(&(file->fatfile), 
+                rc = fat_seek(&(file->fatfile),
                               (file->fileoffset + nread) /
                               SECTOR_SIZE);
                 if ( rc < 0 ) {

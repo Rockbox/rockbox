@@ -252,7 +252,7 @@ void cpu_reset(void)
 
     IME = 0;
     IMA = 0;
-    
+
     PC = 0x0100;
     SP = 0xFFFE;
     W(acc) = 0x01B0;
@@ -288,7 +288,7 @@ static void timer_advance(int cnt) ICODE_ATTR;
 static void timer_advance(int cnt)
 {
     int unit, tima;
-    
+
     if (!(R_TAC & 0x04)) return;
 
     unit = ((-R_TAC) & 3) << 1;
@@ -336,16 +336,16 @@ static int cpu_idle(int max)
     int cnt, unit;
 
     if (!(cpu.halt && IME)) return 0;
-	if (R_IF & R_IE)
-	{
-		cpu.halt = 0;
-		return 0;
-	}
+        if (R_IF & R_IE)
+        {
+                cpu.halt = 0;
+                return 0;
+        }
 
     /* Make sure we don't miss lcdc status events! */
     if ((R_IE & (IF_VBLANK | IF_STAT)) && (max > cpu.lcdc))
         max = cpu.lcdc;
-    
+
     /* If timer interrupt cannot happen, this is very simple! */
     if (!((R_IE & IF_TIMER) && (R_TAC & 0x04)))
     {
@@ -360,7 +360,7 @@ static int cpu_idle(int max)
 
     if (max < cnt)
         cnt = max;
-    
+
     cpu_timers(cnt);
     return cnt;
 }
@@ -414,7 +414,7 @@ next:
         }
     }
     IME = IMA;
-    
+
 /*    if (debug_trace) debug_disassemble(PC, 1); */
 #ifdef DYNAREC
     if(PC&0x8000) {
@@ -433,7 +433,7 @@ next:
     case 0x6D: /* LD L,L */
     case 0x7F: /* LD A,A */
         break;
-            
+
     case 0x41: /* LD B,C */
         B = C; break;
     case 0x42: /* LD B,D */
@@ -508,7 +508,7 @@ next:
         H = readb(xHL); break;
     case 0x67: /* LD H,A */
         H = A; break;
-            
+
     case 0x68: /* LD L,B */
         L = B; break;
     case 0x69: /* LD L,C */
@@ -523,7 +523,7 @@ next:
         L = readb(xHL); break;
     case 0x6F: /* LD L,A */
         L = A; break;
-            
+
     case 0x70: /* LD (HL),B */
         b = B; goto __LD_HL;
     case 0x71: /* LD (HL),C */
@@ -541,7 +541,7 @@ next:
     __LD_HL:
         writeb(xHL,b);
         break;
-            
+
     case 0x78: /* LD A,B */
         A = B; break;
     case 0x79: /* LD A,C */
@@ -572,10 +572,10 @@ next:
         W(acc) = readw(xPC);
         D=HB(acc);
         E=LB(acc);
-#else        
-        DE = readw(xPC); 
+#else
+        DE = readw(xPC);
 #endif
-        PC += 2; 
+        PC += 2;
         break;
     case 0x21: /* LD HL,imm */
         HL = readw(xPC); PC += 2; break;
@@ -630,7 +630,7 @@ next:
         A = readhi(FETCH); break;
     case 0xF2: /* LDH A,(C) (undocumented) */
         A = readhi(C); break;
-            
+
 
     case 0xF8: /* LD HL,SP+imm */
         b = FETCH; LDHLSP(b); break;
@@ -679,14 +679,14 @@ next:
         break;
     case 0x3C: /* INC A */
         INC(A); break;
-            
+
     case 0x03: /* INC BC */
 #ifdef DYNAREC
         W(acc)=((B<<8)|C)+1;
         B=HB(acc);
         C=LB(acc);
 #else
-        INCW(BC); 
+        INCW(BC);
 #endif
         break;
     case 0x13: /* INC DE */
@@ -695,14 +695,14 @@ next:
         D=HB(acc);
         E=LB(acc);
 #else
-        INCW(DE); 
+        INCW(DE);
 #endif
         break;
     case 0x23: /* INC HL */
         INCW(HL); break;
     case 0x33: /* INC SP */
         INCW(SP); break;
-            
+
     case 0x05: /* DEC B */
         DEC(B); break;
     case 0x0D: /* DEC C */
@@ -729,7 +729,7 @@ next:
         B=HB(acc);
         C=LB(acc);
 #else
-        DECW(BC); 
+        DECW(BC);
 #endif
         break;
     case 0x1B: /* DEC DE */
@@ -737,8 +737,8 @@ next:
         W(acc)=((D<<8)|E)-1;
         D=HB(acc);
         E=LB(acc);
-#else                
-        DECW(DE); 
+#else
+        DECW(DE);
 #endif
         break;
     case 0x2B: /* DEC HL */
@@ -830,14 +830,14 @@ next:
         b = 0x38;
     __RST:
         RST(b); break;
-            
+
     case 0xC1: /* POP BC */
 #ifdef DYNAREC
         POP(W(acc));
         B=HB(acc);
         C=LB(acc);
 #else
-        POP(BC); 
+        POP(BC);
 #endif
         break;
     case 0xC5: /* PUSH BC */
@@ -848,7 +848,7 @@ next:
         D=HB(acc);
         E=LB(acc);
 #else
-        POP(DE); 
+        POP(DE);
 #endif
         break;
     case 0xD5: /* PUSH DE */
@@ -863,7 +863,7 @@ next:
         A=HB(acc);
         F=LB(acc);
 #else
-        POP(AF); 
+        POP(AF);
         break;
 #endif
     case 0xF5: /* PUSH AF */
@@ -892,7 +892,7 @@ next:
         }
         /* NOTE - we do not implement dmg STOP whatsoever */
         break;
-            
+
     case 0x76: /* HALT */
         cpu.halt = 1;
         break;
@@ -920,7 +920,7 @@ next:
             break;
         }
         break;
-            
+
     default:
         die(
             "invalid opcode 0x%02X at address 0x%04X, rombank = %d\n",
@@ -928,7 +928,7 @@ next:
         break;
     }
 #ifdef DYNAREC
-    } 
+    }
     else
     {   /* ROM, dynarec. */
         struct dynarec_block *p=0,*b=address_map[PC&HASH_BITMASK];
@@ -961,12 +961,12 @@ next:
                         "movem.l %%d1-%%d7/%%a0-%%a1,(%0)\n\t"
                         :
                         : "a" (&cpu.a), "a" (b->block)
-                        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", 
+                        : "d0", "d1", "d2", "d3", "d4", "d5", "d6",
                           "d7", "a0","a1", "a2","a3","a4");
                         clen=blockclen;
                         fdprintf(fd,"after: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
                         cpu.a,cpu.b,cpu.c,cpu.d,cpu.e,cpu.hl,cpu.f,cpu.sp,
-                        cpu.pc,cpu.ime);       
+                        cpu.pc,cpu.ime);
                 }
                 else
                     die("end");
@@ -987,9 +987,9 @@ next:
         }
     }
 #endif
-        
-                              
-                                                
+
+
+
     clen <<= 1;
     div_advance(clen);
     timer_advance(clen);

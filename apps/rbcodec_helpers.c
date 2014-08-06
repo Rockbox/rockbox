@@ -101,4 +101,3 @@ void tdspeed_free_buffers(int32_t **buffers, int nbuf)
     }
 }
 #endif /* HAVE_PITCHCONTROL */
-

@@ -225,7 +225,7 @@ static int backlight_fading_state = NOT_FADING;
 /* s15.16 fixed point variables */
 static int32_t bl_fade_in_step  = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16)/300;
 static int32_t bl_fade_out_step = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16)/2000;
-static int32_t bl_dim_fraction  = 0;     
+static int32_t bl_dim_fraction  = 0;
 
 static int bl_dim_target  = 0;
 static int bl_dim_current = 0;
@@ -635,7 +635,7 @@ void backlight_thread(void)
                 _buttonlight_off();
                 break;
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-            case BUTTON_LIGHT_BRIGHTNESS_CHANGED:                
+            case BUTTON_LIGHT_BRIGHTNESS_CHANGED:
                 _buttonlight_set_brightness((int)ev.data);
                 break;
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */

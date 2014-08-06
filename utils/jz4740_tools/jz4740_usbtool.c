@@ -121,18 +121,18 @@ enum OPTION
 int filesize(FILE* fd)
 {
     int ret;
-    
+
     fseek(fd, 0, SEEK_END);
     ret = ftell(fd);
     fseek(fd, 0, SEEK_SET);
-    
+
     return ret;
 }
 
 bool file_exists(const char* filename)
 {
     FILE* fp = fopen(filename, "r");
-    
+
     if(fp)
     {
         fclose(fp);
@@ -191,7 +191,7 @@ int upload_data(usb_dev_handle* dh, int address, unsigned char* p, int len)
     /* Must not split the file in several packages! */
     SEND_DATA(p, len);
     fprintf(stderr, " Done!\n");
-    
+
     fprintf(stderr, "[INFO] Verifying data...");
     SEND_COMMAND(VR_SET_DATA_ADDRESS, address);
     SEND_COMMAND(VR_SET_DATA_LENGTH, len);
@@ -207,18 +207,18 @@ int upload_data(usb_dev_handle* dh, int address, unsigned char* p, int len)
     else
         fprintf(stderr, " Done!\n");
     free(tmp_buf);
-    
+
     return 0;
 }
 
 int boot(usb_dev_handle* dh, int address, bool stage2)
 {
     int err;
-    
+
     fprintf(stderr, "[INFO] Booting device STAGE%d...", (stage2 ? 2 : 1));
     SEND_COMMAND((stage2 ? VR_PROGRAM_START2 : VR_PROGRAM_START1), address );
     fprintf(stderr, " Done!\n");
-    
+
     return err;
 }
 
@@ -231,7 +231,7 @@ int upload_app(usb_dev_handle* dh, int address, unsigned char* p, int len, bool 
         if(err == 0)
             fprintf(stderr, "[INFO] Done!\n");
     }
-    
+
     return err;
 }
 
@@ -257,7 +257,7 @@ unsigned int read_reg(usb_dev_handle* dh, int address, int size)
 {
     int err;
     unsigned char buf[4];
-    
+
     SEND_COMMAND(VR_SET_DATA_ADDRESS, address);
     SEND_COMMAND(VR_SET_DATA_LENGTH, size);
     GET_DATA(buf, size);
@@ -276,7 +276,7 @@ int set_reg(usb_dev_handle* dh, int address, unsigned int val, int size)
 {
     int err, i;
     unsigned char buf[4];
-    
+
     buf[0] = val & 0xff;
     if(i > 1)
     {
@@ -287,7 +287,7 @@ int set_reg(usb_dev_handle* dh, int address, unsigned int val, int size)
             buf[3] = (val >> 24) & 0xff;
         }
     }
-    
+
     SEND_COMMAND(VR_SET_DATA_ADDRESS, address);
     SEND_DATA(buf, size);
 
@@ -306,7 +306,7 @@ int test_device(usb_dev_handle* dh)
     TEST(INTC_IMSR, 4);
     TEST(INTC_IMCR, 4);
     TEST(INTC_IPR, 4);
-    
+
     fprintf(stderr, "\n");
     TEST(RTC_RCR, 4);
     TEST(RTC_RSR, 4);
@@ -318,29 +318,29 @@ int test_device(usb_dev_handle* dh)
     TEST(RTC_HRCR, 4);
     TEST(RTC_HWCR, 4);
     TEST(RTC_HWSR, 4);
-    
+
     fprintf(stderr, "\n");
     TEST(GPIO_PXPIN(0), 4);
     TEST(GPIO_PXPIN(1), 4);
     TEST(GPIO_PXPIN(2), 4);
     TEST(GPIO_PXPIN(3), 4);
-    
+
     fprintf(stderr, "\n");
     TEST(CPM_CLKGR, 4);
-    
+
     fprintf(stderr, "\n");
     TEST(SADC_ENA, 1);
     TEST(SADC_CTRL, 1);
     TEST(SADC_TSDAT, 4);
     TEST(SADC_BATDAT, 2);
     TEST(SADC_STATE, 1);
-    
+
     fprintf(stderr, "\n");
-    
+
     TEST(SLCD_CFG, 4);
     TEST(SLCD_CTRL, 1);
     TEST(SLCD_STATE, 1);
-    
+
     return 0;
 }
 
@@ -348,16 +348,16 @@ unsigned int read_file(const char *name, unsigned char **buffer)
 {
     FILE *fd;
     int len, n;
-    
+
     fd = fopen(name, "rb");
     if (fd == NULL)
     {
         fprintf(stderr, "[ERR]  Could not open %s\n", name);
         return 0;
     }
-    
+
     len = filesize(fd);
-    
+
     *buffer = (unsigned char*)malloc(len);
     if (*buffer == NULL)
     {
@@ -365,7 +365,7 @@ unsigned int read_file(const char *name, unsigned char **buffer)
         fclose(fd);
         return 0;
     }
-    
+
     n = fread(*buffer, 1, len, fd);
     if (n != len)
     {
@@ -374,7 +374,7 @@ unsigned int read_file(const char *name, unsigned char **buffer)
         return 0;
     }
     fclose(fd);
-    
+
     return len;
 }
 #define _GET_CPU fprintf(stderr, "[INFO] GET_CPU_INFO:"); \
@@ -503,7 +503,7 @@ int send_rockbox(usb_dev_handle *dh, const char* filename)
 {
     int fsize;
     unsigned char *buffer;
-    
+
     fprintf(stderr, "[INFO] Start!\n");
     if(file_exists("jz_xloader.bin"))
     {
@@ -519,14 +519,14 @@ int send_rockbox(usb_dev_handle *dh, const char* filename)
     }
     boot(dh, 0x080000000, false);
     _SLEEP(1);
-    
+
     fsize = read_file(filename, &buffer);
     upload_data(dh, 0x080004000, buffer, fsize);
     free(buffer);
     boot(dh, 0x080004000, true);
-    
+
     fprintf(stderr, "[INFO] Done!\n");
-    
+
     return 0;
 }
 
@@ -538,14 +538,14 @@ int nand_dump(usb_dev_handle *dh)
     unsigned int n;
     FILE *fd;
     unsigned char* buffer;
-    
+
     fd = fopen("nand_dump.bin", "wb");
     if (fd == NULL)
     {
         fprintf(stderr, "[ERR]  Could not open nand_dump.bin\n");
         return 0;
     }
-    
+
     buffer = (unsigned char*)malloc(LENGTH);
     if (buffer == NULL)
     {
@@ -553,7 +553,7 @@ int nand_dump(usb_dev_handle *dh)
         fclose(fd);
         return 0;
     }
-    
+
     SEND_NAND_COMMAND(0, NAND_INIT, 0);
     /*
     fprintf(stderr, "[INFO] Querying NAND...\n");
@@ -564,10 +564,10 @@ int nand_dump(usb_dev_handle *dh)
     SEND_COMMAND(VR_SET_DATA_ADDRESS, 0);
     SEND_COMMAND(VR_SET_DATA_LENGTH, LENGTH);
     SEND_NAND_COMMAND(0, NAND_READ, NO_OOB);
-    
+
     fprintf(stderr, "[INFO] Reading data...\n");
     err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, LENGTH, TOUT);
-    if (err != LENGTH) 
+    if (err != LENGTH)
     {
         fprintf(stderr,"\n[ERR]  Error writing data\n");
         fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
@@ -575,7 +575,7 @@ int nand_dump(usb_dev_handle *dh)
         free(buffer);
         return -1;
     }
-    
+
     n = fwrite(buffer, 1, LENGTH, fd);
     if (n != LENGTH)
     {
@@ -586,7 +586,7 @@ int nand_dump(usb_dev_handle *dh)
     }
     fclose(fd);
     free(buffer);
-    
+
     return n;
 }
 
@@ -597,14 +597,14 @@ int rom_dump(usb_dev_handle *dh)
     unsigned int n;
     FILE *fd;
     unsigned char* buffer;
-    
+
     fd = fopen("rom_dump.bin", "wb");
     if (fd == NULL)
     {
         fprintf(stderr, "[ERR]  Could not open rom_dump.bin\n");
         return 0;
     }
-    
+
     buffer = (unsigned char*)malloc(ROM_LENGTH);
     if (buffer == NULL)
     {
@@ -612,13 +612,13 @@ int rom_dump(usb_dev_handle *dh)
         fclose(fd);
         return 0;
     }
-    
+
     SEND_COMMAND(VR_SET_DATA_ADDRESS, 0x1FC00000);
     SEND_COMMAND(VR_SET_DATA_LENGTH, ROM_LENGTH);
-    
+
     fprintf(stderr, "[INFO] Reading data...\n");
     err = usb_bulk_read(dh, USB_ENDPOINT_IN | EP_BULK_TO, (char*)buffer, ROM_LENGTH, TOUT);
-    if (err != ROM_LENGTH) 
+    if (err != ROM_LENGTH)
     {
         fprintf(stderr,"\n[ERR]  Error writing data\n");
         fprintf(stderr,"[ERR]  Bulk write error (%d, %s)\n", err, strerror(-err));
@@ -626,7 +626,7 @@ int rom_dump(usb_dev_handle *dh)
         free(buffer);
         return -1;
     }
-    
+
     n = fwrite(buffer, 1, ROM_LENGTH, fd);
     if (n != ROM_LENGTH)
     {
@@ -637,7 +637,7 @@ int rom_dump(usb_dev_handle *dh)
     }
     fclose(fd);
     free(buffer);
-    
+
     return n;
 }
 
@@ -650,7 +650,7 @@ int jzconnect(int address, unsigned char* buf, int len, int func)
     int err;
 
     fprintf(stderr,"[INFO] Searching for device...\n");
- 
+
     usb_init();
     if(usb_find_busses() < 0)
     {
@@ -687,7 +687,7 @@ found:
         fprintf(stderr,"[ERR]  Unable to open device.\n");
         return -5;
     }
-    
+
 /* usb_set_configuration() calls are already done in Linux */
 #ifdef _WIN32
     err = usb_set_configuration(dh, 1);
@@ -699,7 +699,7 @@ found:
         return -6;
     }
 #endif
-    
+
     /* "must be called" written in the libusb documentation */
     err = usb_claim_interface(dh, 0);
     if (err < 0)
@@ -711,7 +711,7 @@ found:
 
     fprintf(stderr,"[INFO] Found device, uploading application.\n");
 
-    /* Now we can transfer the application to the device. */ 
+    /* Now we can transfer the application to the device. */
 
     switch(func)
     {
@@ -739,12 +739,12 @@ found:
             err = send_rockbox(dh, (char*)buf);
         break;
     }
-    
+
     /* release claimed interface */
     usb_release_interface(dh, 0);
 
     usb_close(dh);
-    
+
     return err;
 }
 
@@ -786,7 +786,7 @@ int main(int argc, char* argv[])
     fprintf(stderr, "USBtool v" VERSION " - (C) 2008 Maurus Cuelenaere\n");
     fprintf(stderr, "This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-    
+
     if(argc > 1)
         sscanf(argv[1], "%d", &cmd);
     switch(cmd)
@@ -803,14 +803,14 @@ int main(int argc, char* argv[])
                     return -1;
                 }
             }
-            
+
             fd = fopen(argv[2], "rb");
             if (fd < 0)
             {
                 fprintf(stderr, "[ERR]  Could not open %s\n", argv[2]);
                 return 4;
             }
-            
+
             len = filesize(fd);
 
             if (len > MAX_FIRMWARESIZE)
@@ -819,7 +819,7 @@ int main(int argc, char* argv[])
                 fclose(fd);
                 return 5;
             }
-            
+
             buf = malloc(len);
             if (buf == NULL)
             {
@@ -827,7 +827,7 @@ int main(int argc, char* argv[])
                 fclose(fd);
                 return 6;
             }
-            
+
             n = fread(buf, 1, len, fd);
             if (n != len)
             {
@@ -836,9 +836,9 @@ int main(int argc, char* argv[])
                 return 7;
             }
             fclose(fd);
-            
+
             fprintf(stderr, "[INFO] File size: %d bytes\n", n);
-            
+
             return jzconnect(address, buf, len, cmd);
         case 2:
             if (sscanf(argv[3], "0x%x", &address) <= 0)
@@ -846,16 +846,16 @@ int main(int argc, char* argv[])
                 print_usage();
                 return -1;
             }
-            
+
             fd = fopen(argv[2], "wb");
             if (fd < 0)
             {
                 fprintf(stderr, "[ERR]  Could not open %s\n", argv[2]);
                 return 4;
             }
-            
+
             sscanf(argv[4], "%d", &len);
-            
+
             buf = malloc(len);
             if (buf == NULL)
             {
@@ -863,9 +863,9 @@ int main(int argc, char* argv[])
                 fclose(fd);
                 return 6;
             }
-            
+
             int err = jzconnect(address, buf, len, 2);
-            
+
             n = fwrite(buf, 1, len, fd);
             if (n != len)
             {
@@ -874,7 +874,7 @@ int main(int argc, char* argv[])
                 return 7;
             }
             fclose(fd);
-            
+
             return err;
         case 10:
             if(argc < 3)
@@ -882,7 +882,7 @@ int main(int argc, char* argv[])
                 print_usage();
                 return 1;
             }
-            
+
             if(!file_exists(argv[2]))
             {
                 print_usage();

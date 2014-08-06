@@ -69,4 +69,3 @@ void tx_writec(unsigned char c)
 {
     UTXD1=(int) c;
 }
-

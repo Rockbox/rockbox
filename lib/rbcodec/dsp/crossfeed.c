@@ -178,7 +178,7 @@ void crossfeed_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
 {
     struct crossfeed_state *state = (void *)this->data;
     struct dsp_buffer *buf = *buf_p;
-   
+
     int32_t *hist_l = &state->history[0];
     int32_t *hist_r = &state->history[2];
     int32_t *delay = state->delay;

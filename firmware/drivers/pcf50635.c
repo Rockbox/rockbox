@@ -55,7 +55,7 @@ int pcf50635_read_multiple(int address, unsigned char* buf, int count)
 void pcf50635_init(void)
 {
 #ifdef COWON_D2
-    static const char init_data[] = 
+    static const char init_data[] =
     {
         /* DOWN1: 1.2V, max DVM step, enabled */
         PCF5063X_REG_DOWN1OUT, 0x13,
@@ -63,56 +63,56 @@ void pcf50635_init(void)
         PCF5063X_REG_DOWN1ENA, 0x1,
 
         /* DOWN2: 1.8V, max DVM step, enabled */
-        PCF5063X_REG_DOWN2OUT, 0x2f,  
+        PCF5063X_REG_DOWN2OUT, 0x2f,
         PCF5063X_REG_DOWN2CTL, 0x1e,
         PCF5063X_REG_DOWN2ENA, 0x1,
-        
+
         /* AUTO: 3.0V, enabled */
         PCF5063X_REG_AUTOOUT,  0x5f,
         PCF5063X_REG_AUTOENA,  0x1,
-        
+
         /* LDO1: 3.3V, enabled */
         PCF5063X_REG_LDO1OUT,  0x18,
         PCF5063X_REG_LDO1ENA,  0x1,
-        
+
         /* LDO2: 3.0V, enabled */
         PCF5063X_REG_LDO2OUT,  0x15,
         PCF5063X_REG_LDO2ENA,  0x1,
-        
+
         /* LDO4: 3.0V, enabled */
         PCF5063X_REG_LDO4OUT,  0x15,
         PCF5063X_REG_LDO4ENA,  0x1,
-        
+
         /* LDO5: 1.8V, enabled */
         PCF5063X_REG_LDO5OUT,  0x9,
         PCF5063X_REG_LDO5ENA,  0x1,
-        
+
         /* LDO6: 2.1V, enabled */
         PCF5063X_REG_LDO6OUT,  0xc,
         PCF5063X_REG_LDO6ENA,  0x1,
-        
+
         /* LDO3 and HCLDO disabled */
         PCF5063X_REG_LDO3ENA,  0x0,
         PCF5063X_REG_HCLDOENA, 0x0,
-        
+
         /* Disable GPIOs */
         PCF5063X_REG_GPIOCTL,  0x0,
         PCF5063X_REG_GPIO1CFG, 0x0,
         PCF5063X_REG_GPIO2CFG, 0x0,
         PCF5063X_REG_GPIO3CFG, 0x0,
-        
+
         /* IRQ masks (OF values in brackets) */
         PCF5063X_REG_INT1M,    0xfa, /* (0x8a enable alarm, usbins, adpins) */
         PCF5063X_REG_INT2M,    0xff, /* (0xff all masked) */
         PCF5063X_REG_INT3M,    0x7f, /* (0x7f enable onkey1s) */
         PCF5063X_REG_INT4M,    0xff, /* (0xfd enable lowbat) */
         PCF5063X_REG_INT5M,    0xff, /* (0xff all masked) */
-        
+
         /* Wakeup mode */
         PCF5063X_REG_OOCMODE,  0x0,  /* onkey falling edge */
         PCF5063X_REG_OOCCTL,   0x2,  /* actphrst = phase 3 */
         PCF5063X_REG_OOCWAKE,  0xc1, /* wakeup on adapter, usb, onkey */
-        
+
         /* Configure battery charger as per OF */
         PCF5063X_REG_MBCC2,    0xa8, /* Vmax = 4.2V, Vbatcond = 2.7V, long debounce */
         PCF5063X_REG_MBCC3,    0x2a, /* precharge level = 16% */
@@ -132,7 +132,7 @@ void pcf50635_init(void)
     /* Enable automatic charging, preserving default values */
     pcf50635_write(PCF5063X_REG_MBCC1,
         pcf50635_read(PCF5063X_REG_MBCC1) | 7);
-    
+
 #endif
 }
 

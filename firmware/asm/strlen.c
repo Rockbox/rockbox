@@ -1,7 +1,7 @@
 /*
 FUNCTION
         <<strlen>>---character string length
-        
+
 INDEX
         strlen
 
@@ -75,7 +75,7 @@ _DEFUN (strlen, (str),
 
   if (!UNALIGNED (str))
     {
-      /* If the string is word-aligned, we can check for the presence of 
+      /* If the string is word-aligned, we can check for the presence of
          a null in each word-sized block.  */
       aligned_addr = (unsigned long*)str;
       while (!DETECTNULL (*aligned_addr))
@@ -85,7 +85,7 @@ _DEFUN (strlen, (str),
          precise position of the null.  */
       str = (char*)aligned_addr;
     }
- 
+
   while (*str)
     str++;
   return str - start;

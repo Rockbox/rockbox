@@ -104,5 +104,3 @@ unsigned int qt1106_io(unsigned int output)
 
     return (input);
 }
-
-

@@ -55,4 +55,3 @@ bool charging_state(void)
 {
     return (((GPIO_PFDR&(1<<2)) == 0) && ((pca9555_in_ports&(1<<11)) == 0));
 }
-

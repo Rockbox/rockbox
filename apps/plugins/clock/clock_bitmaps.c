@@ -46,7 +46,7 @@
 
 
 const struct picture logos[]={
-        {clock_logo, BMPWIDTH_clock_logo, BMPHEIGHT_clock_logo, 
+        {clock_logo, BMPWIDTH_clock_logo, BMPHEIGHT_clock_logo,
                 BMPHEIGHT_clock_logo},
 #if NB_SCREENS==2
         {clock_logo_remote,BMPWIDTH_clock_logo_remote,
@@ -55,16 +55,16 @@ const struct picture logos[]={
 };
 
 const struct picture messages[]={
-    {clock_messages,BMPWIDTH_clock_messages, BMPHEIGHT_clock_messages, 
+    {clock_messages,BMPWIDTH_clock_messages, BMPHEIGHT_clock_messages,
         BMPHEIGHT_clock_messages/6},
 #if NB_SCREENS==2
-    {clock_messages_remote,BMPWIDTH_clock_messages_remote, 
+    {clock_messages_remote,BMPWIDTH_clock_messages_remote,
         BMPHEIGHT_clock_messages_remote, BMPHEIGHT_clock_messages_remote/6}
 #endif
 };
 
 const struct picture binary[]={
-    {clock_binary, BMPWIDTH_clock_binary, BMPHEIGHT_clock_binary, 
+    {clock_binary, BMPWIDTH_clock_binary, BMPHEIGHT_clock_binary,
         BMPHEIGHT_clock_binary/2 },
 #if NB_SCREENS==2
     {clock_binary_remote, BMPWIDTH_clock_binary_remote,
@@ -73,7 +73,7 @@ const struct picture binary[]={
 };
 
 const struct picture digits[]={
-    {clock_digits, BMPWIDTH_clock_digits, BMPHEIGHT_clock_digits, 
+    {clock_digits, BMPWIDTH_clock_digits, BMPHEIGHT_clock_digits,
         BMPHEIGHT_clock_digits/13 },
 #if NB_SCREENS==2
     {clock_digits_remote,
@@ -83,30 +83,30 @@ const struct picture digits[]={
 };
 
 const struct picture smalldigits[]={
-    {clock_smalldigits, BMPWIDTH_clock_smalldigits, BMPHEIGHT_clock_smalldigits, 
+    {clock_smalldigits, BMPWIDTH_clock_smalldigits, BMPHEIGHT_clock_smalldigits,
         BMPHEIGHT_clock_smalldigits/13 },
 #if NB_SCREENS==2
-    {clock_smalldigits_remote, BMPWIDTH_clock_smalldigits_remote, 
-        BMPHEIGHT_clock_smalldigits_remote, 
+    {clock_smalldigits_remote, BMPWIDTH_clock_smalldigits_remote,
+        BMPHEIGHT_clock_smalldigits_remote,
         BMPHEIGHT_clock_smalldigits_remote/13}
 #endif
 };
 
 const struct picture segments[]={
-    {clock_segments, BMPWIDTH_clock_segments, BMPHEIGHT_clock_segments, 
+    {clock_segments, BMPWIDTH_clock_segments, BMPHEIGHT_clock_segments,
         BMPHEIGHT_clock_segments/13 },
 #if NB_SCREENS==2
-    {clock_segments_remote, BMPWIDTH_clock_segments_remote, 
+    {clock_segments_remote, BMPWIDTH_clock_segments_remote,
         BMPHEIGHT_clock_segments_remote, BMPHEIGHT_clock_segments_remote/13}
 #endif
 };
 
 const struct picture smallsegments[]={
-    {clock_smallsegments, BMPWIDTH_clock_smallsegments, 
+    {clock_smallsegments, BMPWIDTH_clock_smallsegments,
         BMPHEIGHT_clock_smallsegments, BMPHEIGHT_clock_smallsegments/13 },
 #if NB_SCREENS==2
     {clock_smallsegments_remote, BMPWIDTH_clock_smallsegments_remote,
-        BMPHEIGHT_clock_smallsegments_remote, 
+        BMPHEIGHT_clock_smallsegments_remote,
         BMPHEIGHT_clock_smallsegments_remote/13}
 #endif
 };

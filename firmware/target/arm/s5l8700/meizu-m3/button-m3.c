@@ -58,7 +58,7 @@ int button_read_device(void)
     if ((PDAT3 & (1 << 3)) == 0) {
         buttons |= BUTTON_PREVNEXT;
     }
-    
+
     return buttons;
 }
 
@@ -66,4 +66,3 @@ bool button_hold(void)
 {
     return ((PDAT0 & (1 << 5)) != 0);
 }
-

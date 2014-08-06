@@ -172,7 +172,7 @@ static int load_cp_table(int cp)
 
     while (i < tablesize) {
         if (!read(file, tmp, 2)) {
-            DEBUGF("Can't read from codepage file: %s.cp\n", 
+            DEBUGF("Can't read from codepage file: %s.cp\n",
                     filename[table-1]);
             loaded_cp_table = 0;
             return 0;

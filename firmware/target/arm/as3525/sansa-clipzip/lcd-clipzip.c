@@ -62,14 +62,14 @@ static int lcd_hw_init(void)
 
     /* configure GPIO B3 (lcd type detect) as input */
     GPIOB_DIR &= ~(1<<3);
-    
+
     /* configure GPIO A5 (lcd reset#) as output and perform lcd reset */
     GPIOA_DIR |= (1 << 5);
     GPIOA_PIN(5) = 0;
     sleep(HZ * 50/1000);
     GPIOA_PIN(5) = (1 << 5);
 
-    /* detect lcd type on GPIO B3 */    
+    /* detect lcd type on GPIO B3 */
     return GPIOB_PIN(3) ? 1 : 0;
 }
 
@@ -81,10 +81,10 @@ static void lcd_write_cmd(uint8_t byte)
 
     /* LCD command mode */
     GPIOB_PIN(2) = 0;
-    
+
     /* write data */
     SSP_DATA = byte;
-    
+
     /* wait until not busy */
     while (SSP_SR & (1<<4));
 
@@ -96,7 +96,7 @@ static void lcd_write_cmd(uint8_t byte)
 static void lcd_write_dat(uint8_t data)
 {
     /* wait while transmit FIFO */
-    while (!(SSP_SR & (1<<1)));   
+    while (!(SSP_SR & (1<<1)));
 
     /* write data */
     SSP_DATA = data;
@@ -305,7 +305,7 @@ void lcd_enable(bool on)
             lcd_write_dat(0x01);
         }
     }
-    
+
     lcd_enabled = on;
 }
 
@@ -337,7 +337,7 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
         lcd_write(0x35, x_end); /* MEM_X2 */
         lcd_write(0x36, y);     /* MEM_Y1 */
         lcd_write(0x37, y_end); /* MEM_Y2 */
-        
+
         lcd_write_cmd(0x08);    /* DDRAM_DATA_ACCESS_PORT */
     }
     else {
@@ -346,7 +346,7 @@ static void lcd_setup_rect(int x, int x_end, int y, int y_end)
         lcd_write_nibbles(x_end);
         lcd_write_nibbles(y);
         lcd_write_nibbles(y_end);
-        
+
         lcd_write_cmd(0x0C);
     }
 }
@@ -360,7 +360,7 @@ void oled_brightness(int brightness)
         r = 2 + 16*brightness;
         g = 1 + 10*brightness;
         b = 1 + (23*brightness)/2;
-    
+
         lcd_write(0x40, r); /* COLUMN_CURRENT_R */
         lcd_write(0x41, g); /* COLUMN_CURRENT_G */
         lcd_write(0x42, b); /* COLUMN_CURRENT_B */
@@ -369,7 +369,7 @@ void oled_brightness(int brightness)
         r = 6 + 10*brightness;
         g = 1 + 6*brightness;
         b = 3 + 10*brightness;
-    
+
         lcd_write_cmd(0x0E);
         lcd_write_nibbles(r);
         lcd_write_nibbles(g);
@@ -401,13 +401,13 @@ void lcd_update_rect(int x, int y, int width, int height)
         /* rectangle is outside visible display, do nothing */
         return;
     }
-    
+
     /* update entire horizontal strip for display type 0 (wisechip) */
     if (lcd_type == 0) {
         x = 0;
         x_end = 96;
     }
-    
+
     /* correct rectangle (if necessary) */
     if (x < 0) {
         x = 0;

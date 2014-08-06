@@ -41,6 +41,6 @@ void audiohw_init(void)
 void wmcodec_write(int reg, int data)
 {
     unsigned char d = data & 0xff;
-    
+
     i2c_write(0x34, (reg << 1) | ((data & 0x100) >> 8), 1, &d);
 }

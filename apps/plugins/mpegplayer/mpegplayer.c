@@ -23,9 +23,9 @@
 
 /****************************************************************************
  * NOTES:
- * 
+ *
  * mpegplayer is structured as follows:
- * 
+ *
  *                       +-->Video Thread-->Video Output-->LCD
  *                       |
  * UI-->Stream Manager-->+-->Audio Thread-->PCM buffer--Audio Device
@@ -36,53 +36,53 @@
  *                 |          Disk I/O
  *         Stream services
  *          (timing, etc.)
- * 
+ *
  * Thread list:
  *  1) The main thread - Handles user input, settings, basic playback control
  *     and USB connect.
- * 
+ *
  *  2) Stream Manager thread - Handles playback state, events from streams
  *     such as when a stream is finished, stream commands, PCM state. The
  *     layer in which this thread run also handles arbitration of data
  *     requests between the streams and the disk buffer. The actual specific
  *     transport layer code may get moved out to support multiple container
  *     formats.
- * 
+ *
  *  3) Buffer thread - Buffers data in the background, generates notifications
  *     to streams when their data has been buffered, and watches streams'
  *     progress to keep data available during playback. Handles synchronous
  *     random access requests when the file cache is missed.
- * 
+ *
  *  4) Video thread (running on the COP for PortalPlayer targets) - Decodes
  *     the video stream and renders video frames to the LCD. Handles
  *     miscellaneous video tasks like frame and thumbnail printing.
- * 
+ *
  *  5) Audio thread (running on the main CPU to maintain consistency with the
  *     audio FIQ hander on PP) - Decodes audio frames and places them into
  *     the PCM buffer for rendering by the audio device.
- * 
+ *
  * Streams are neither aware of one another nor care about one another. All
  * streams shall have their own thread (unless it is _really_ efficient to
  * have a single thread handle a couple minor streams). All coordination of
  * the streams is done through the stream manager. The clocking is controlled
  * by and exposed by the stream manager to other streams and implemented at
  * the PCM level.
- * 
+ *
  * Notes about MPEG files:
- * 
+ *
  * MPEG System Clock is 27MHz - i.e. 27000000 ticks/second.
- * 
+ *
  * FPS is represented in terms of a frame period - this is always an
  * integer number of 27MHz ticks.
- * 
+ *
  * e.g. 29.97fps (30000/1001) NTSC video has an exact frame period of
  * 900900 27MHz ticks.
- * 
+ *
  * In libmpeg2, info->sequence->frame_period contains the frame_period.
- * 
+ *
  * Working with Rockbox's 100Hz tick, the common frame rates would need
  * to be as follows (1):
- * 
+ *
  * FPS     | 27Mhz   | 100Hz          | 44.1KHz   | 48KHz
  * --------|-----------------------------------------------------------
  * 10*     | 2700000 | 10             | 4410      | 4800
@@ -93,9 +93,9 @@
  * 25      | 1080000 |  4             | 1764      | 1920
  * 29.9700 |  900900 |  3.336667      | 1471,47   | 1601.6
  * 30      |  900000 |  3.333333      | 1470      | 1600
- * 
+ *
  * *Unofficial framerates
- * 
+ *
  * (1) But we don't really care since the audio clock is used anyway and has
  *     very fine resolution ;-)
  *****************************************************************************/
@@ -2364,7 +2364,7 @@ enum plugin_status plugin_start(const void* parameter)
                     /* Enter button loop and process UI */
                     next_action = button_loop();
                     manual_skip = next_action & VIDEO_ACTION_MANUAL;
-                    next_action &= ~VIDEO_ACTION_MANUAL;                    
+                    next_action &= ~VIDEO_ACTION_MANUAL;
                 }
 
                 stream_close();

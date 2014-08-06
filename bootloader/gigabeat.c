@@ -58,11 +58,11 @@ void shutdown(void)
     {
         /* Make sure ATA has been initialized. */
         ata_init();
-        
+
         /* And put the disk into sleep immediately. */
         ata_sleepnow();
     }
-    
+
     _backlight_off();
 
     power_off();
@@ -87,7 +87,7 @@ void main(void)
     adc_init();
 
     lcd_setfont(FONT_SYSFIXED);
-    
+
     /* These checks should only run if the bootloader is flashed */
     if(GSTATUS3&0x02)
     {
@@ -109,8 +109,8 @@ void main(void)
                 lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
                         (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
                 lcd_update();
-                
-#if defined(HAVE_RTC_ALARM)            
+
+#if defined(HAVE_RTC_ALARM)
                 /* Check if the alarm went off while charging */
                 if(rtc_check_alarm_flag())
                 {
@@ -119,7 +119,7 @@ void main(void)
                 }
 #endif
             }
-            if(!(GPGDAT&BUTTON_POWER) 
+            if(!(GPGDAT&BUTTON_POWER)
 #if defined(HAVE_RTC_ALARM)
                 && !GSTATUS3
 #endif
@@ -136,9 +136,9 @@ void main(void)
             lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
                         (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
             lcd_update();
-            
+
             sleep(2*HZ);
-            
+
             shutdown();
         }
     }
@@ -167,7 +167,7 @@ void main(void)
         reset_screen();
         lcd_update();
     }
-    
+
     reset_screen();
 
     /* Show debug messages if button is pressed */
@@ -221,4 +221,3 @@ void main(void)
     /* Return and restart */
 #endif
 }
-

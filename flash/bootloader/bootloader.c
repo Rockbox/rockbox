@@ -40,7 +40,7 @@ static void SetLed(BOOL bOn);
 static void UartInit(void);
 static UINT8 UartRead(void);
 static void UartWrite(UINT8 byte);
-static void MiniMon(void);    
+static void MiniMon(void);
 
 
 #ifdef NO_ROM

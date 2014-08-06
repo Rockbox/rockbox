@@ -111,7 +111,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                 bufptr = buf;
                 bufpos = buf + 7;
             }
-        }   
+        }
     }
 }
 
@@ -144,7 +144,7 @@ enum codec_status codec_run(void)
 
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
-    
+
     /* Intialise the A52 decoder and check for success */
     state = a52_init(0);
 
@@ -193,7 +193,7 @@ enum codec_status codec_run(void)
 
         if (n == 0) /* End of Stream */
             break;
-  
+
         a52_decode_data(filebuf, filebuf + n);
         ci->advance_buffer(n);
     }

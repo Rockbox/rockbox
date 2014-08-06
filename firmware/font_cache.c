@@ -72,8 +72,8 @@ void font_cache_create(
 
 /*************************************************************************
  * Binary search that attempts a primary lucky guess that succeeds
- * when there are consecutive codes in the cache between previous 
- * search and new search. Returns a negative of insertion point if 
+ * when there are consecutive codes in the cache between previous
+ * search and new search. Returns a negative of insertion point if
  * not found.
  ************************************************************************/
 static int search(struct font_cache* fcache,
@@ -85,12 +85,12 @@ static int search(struct font_cache* fcache,
     int left, right, mid=-1, c;
     left = 0;
     right = size;
-    
+
     /* go for a lucky guess */
-    mid = char_code + 
+    mid = char_code +
         fcache->_prev_result - fcache->_prev_char_code;
-            
-    /* check bounds */        
+
+    /* check bounds */
     if ( mid < 0 || mid > right )
             mid = ( left + right ) / 2;
 
@@ -114,7 +114,7 @@ static int search(struct font_cache* fcache,
         mid = (left + right) / 2;
     }
     while (left <= right);
-    
+
     /* not found */
     *p_insertion_point = mid;
     return 0;
@@ -132,7 +132,7 @@ struct font_cache_entry* font_cache_get(
     struct font_cache_entry* p;
     int insertion_point;
     int index_to_replace;
-    
+
     /* check bounds */
     p = lru_data(&fcache->_lru, fcache->_index[0]);
     if( char_code < p->_char_code )
@@ -158,14 +158,14 @@ struct font_cache_entry* font_cache_get(
             }
             else
             {
-                p = lru_data(&fcache->_lru, 
+                p = lru_data(&fcache->_lru,
                 fcache->_index[insertion_point+1]);
                 if ( char_code > p->_char_code )
                      insertion_point++;
             }
         }
     }
-    
+
     /* not found */
     if (cache_only)
         return NULL;

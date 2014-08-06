@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -66,14 +66,14 @@ OPDEF(ret, 0xC9)
 OPDEF(exx, 0xD9)
 {
   register dbyte dtmp;
-  
+
   dtmp = BCBK, BCBK = BC, BC = dtmp;
   dtmp = DEBK, DEBK = DE, DE = dtmp;
   dtmp = HLBK, HLBK = HL, HL = dtmp;
-  
+
   ENTIME(4);
-}  
-  
+}
+
 #define JP_RR(rrn, rr) \
 OPDEF(jp_ ## rrn, 0xE9)            \
 {                                  \

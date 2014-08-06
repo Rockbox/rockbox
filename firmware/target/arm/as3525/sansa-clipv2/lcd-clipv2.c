@@ -89,4 +89,3 @@ void lcd_enable_power(bool onoff)
 {
     (void) onoff;
 }
-

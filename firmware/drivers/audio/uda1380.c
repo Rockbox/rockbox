@@ -62,7 +62,7 @@ static int mixer_tenthdb2hw(int db)
     else if (db < -600)            /* 0.75 dB steps */
         return (990 - db) * 2 / 15;
     else if (db < -460)            /* 0.5 dB steps */
-        return (460 - db) / 5; 
+        return (460 - db) / 5;
     else                           /* 0.25 dB steps */
         return -db * 2 / 5;
 }
@@ -115,7 +115,7 @@ static int uda1380_write_reg(unsigned char reg, unsigned short value)
     {
         DEBUGF("uda1380 error reg=0x%x", reg);
         return -1;
-    } 
+    }
 
     uda1380_regs[reg] = value;
 
@@ -285,7 +285,7 @@ void audiohw_close(void)
 /**
  * Calling this function enables the UDA1380 to send
  * sound samples over the I2S bus, which is connected
- * to the processor's IIS1 interface. 
+ * to the processor's IIS1 interface.
  *
  * source_mic: true=record from microphone, false=record from line-in (or radio)
  */
@@ -320,17 +320,17 @@ void audiohw_enable_recording(bool source_mic)
     sleep(HZ/8);
 
     uda1380_write_reg(REG_I2S,     uda1380_regs[REG_I2S] | I2S_MODE_MASTER);
-    uda1380_write_reg(REG_MIX_CTL, MIX_MODE(1)); 
+    uda1380_write_reg(REG_MIX_CTL, MIX_MODE(1));
 }
 
-/** 
+/**
  * Stop sending samples on the I2S bus
  */
 void audiohw_disable_recording(void)
 {
     uda1380_write_reg(REG_PGA, MUTE_ADC);
     sleep(HZ/8);
-    
+
     uda1380_write_reg(REG_I2S, I2S_IFMT_IIS);
 
     uda1380_regs[REG_PWR] &= ~(PON_LNA | PON_ADCL | PON_ADCR |
@@ -347,7 +347,7 @@ void audiohw_disable_recording(void)
 
 /**
  * Set recording gain and volume
- * 
+ *
  * type:                params:        ranges:
  * AUDIO_GAIN_MIC:      left           -128 .. 108 -> -64 .. 54 dB gain
  * AUDIO_GAIN_LINEIN    left & right   -128 ..  96 -> -64 .. 48 dB gain
@@ -371,22 +371,22 @@ void audiohw_set_recvol(int left, int right, int type)
             {
                 uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left)
                                                    | DEC_VOLR(left));
-                uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] 
-                                               & ~VGA_GAIN_MASK) 
+                uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC]
+                                               & ~VGA_GAIN_MASK)
                                             | VGA_GAIN(left_ag));
             }
             else
             {
-                uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] 
-                                               & ~VGA_GAIN_MASK) 
+                uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC]
+                                               & ~VGA_GAIN_MASK)
                                             | VGA_GAIN(left_ag));
-                uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) 
+                uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left)
                                                    | DEC_VOLR(left));
             }
             recgain_mic = left;
             logf("Mic: %dA/%dD", left_ag, left);
             break;
-        
+
         case AUDIO_GAIN_LINEIN:
             left_ag = MIN(MAX(0, left / 6), 8);
             left -= left_ag * 6;
@@ -415,7 +415,7 @@ void audiohw_set_recvol(int left, int right, int type)
             }
             else
             {
-                uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] 
+                uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA]
                                                & ~PGA_GAIN_MASK)
                                             | PGA_GAINL(left_ag)
                                             | PGA_GAINR(right_ag));
@@ -431,9 +431,9 @@ void audiohw_set_recvol(int left, int right, int type)
 }
 
 
-/** 
+/**
  * Enable or disable recording monitor (so one can listen to the recording)
- * 
+ *
  */
 void audiohw_set_monitor(bool enable)
 {

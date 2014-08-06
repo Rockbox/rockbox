@@ -160,7 +160,7 @@ static inline int get_next_context(const struct button_mapping *items, int i)
 static void gui_boost(bool want_to_boost)
 {
     static bool boosted = false;
-    
+
     if (want_to_boost && !boosted)
     {
         cpu_boost(true);
@@ -173,7 +173,7 @@ static void gui_boost(bool want_to_boost)
     }
 }
 
-/* gui_unboost_callback() is called GUI_BOOST_TIMEOUT seconds after the 
+/* gui_unboost_callback() is called GUI_BOOST_TIMEOUT seconds after the
  * last wheel scrolling event. */
 static int gui_unboost_callback(struct timeout *tmo)
 {
@@ -206,7 +206,7 @@ static int get_action_worker(int context, int timeout,
     int i=0;
     int ret = ACTION_UNKNOWN;
     static int last_context = CONTEXT_STD;
-    
+
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
     if (timeout == TIMEOUT_NOBLOCK)
@@ -218,9 +218,9 @@ static int get_action_worker(int context, int timeout,
 
 #if defined(HAVE_GUI_BOOST) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
     static struct timeout gui_unboost;
-    /* Boost the CPU in case of wheel scrolling activity in the defined contexts. 
+    /* Boost the CPU in case of wheel scrolling activity in the defined contexts.
      * Call unboost with a timeout of GUI_BOOST_TIMEOUT. */
-    if ((button&(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD)) && 
+    if ((button&(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD)) &&
         (context == CONTEXT_STD      || context == CONTEXT_LIST ||
          context == CONTEXT_MAINMENU || context == CONTEXT_TREE))
     {
@@ -268,7 +268,7 @@ static int get_action_worker(int context, int timeout,
         }
         return ACTION_NONE;
     }
-        
+
     if ((context != last_context) && ((last_button & BUTTON_REL) == 0)
 #ifdef HAVE_SCROLLWHEEL
         /* Scrollwheel doesn't generate release events  */
@@ -530,4 +530,3 @@ void action_wait_for_release(void)
 {
     wait_for_release = true;
 }
-    

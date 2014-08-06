@@ -361,7 +361,7 @@ int nvp_init(int size, nvp_read_fn_t read, bool debug)
         int kind = nvp_area_info[i].kind;
         if(kind != NVP_AREA_SMALL_KIND && kind != NVP_AREA_LARGE_KIND)
             continue;
-        
+
         uint32_t bitmap[256];
         memset(bitmap, 0, sizeof(bitmap));
 
@@ -406,7 +406,7 @@ int nvp_init(int size, nvp_read_fn_t read, bool debug)
             }
 
             nr_nodes++;
-            
+
             for(int k = 0; k < zones[j].count; k++)
             {
                 if(bitmap[zones[j].start + k])
@@ -551,6 +551,6 @@ int nvp_info(void)
             printf("\n");
         }
     }
-    
+
     return 0;
 }

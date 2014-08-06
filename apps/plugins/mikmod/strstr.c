@@ -8,14 +8,14 @@
 
 char *strstr(const char *haystack, const char *needle)
 {
-	const char *scan;
-	size_t len;
-	char firstc;
+        const char *scan;
+        size_t len;
+        char firstc;
 
-	firstc = *needle;
-	len = strlen(needle);
-	for (scan = haystack; *scan != firstc || strncmp(scan, needle, len); )
-		if (!*scan++)
-			return NULL;
-	return (char *)scan;
+        firstc = *needle;
+        len = strlen(needle);
+        for (scan = haystack; *scan != firstc || strncmp(scan, needle, len); )
+                if (!*scan++)
+                        return NULL;
+        return (char *)scan;
 }

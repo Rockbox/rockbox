@@ -64,7 +64,7 @@ static void debug_tx_char(char ch)
     {
         ;
     }
-    
+
     /*
      * Write data into TDR and clear TDRE
      */
@@ -81,7 +81,7 @@ static void debug_handle_error(char ssr)
 static int debug_rx_ready(void)
 {
    char ssr;
-  
+
    ssr = SSR1 & ( SCI_PER | SCI_FER | SCI_ORER );
    if ( ssr )
       debug_handle_error ( ssr );
@@ -130,20 +130,20 @@ static void putpacket (const char *buffer)
    /* Special debug hack. Shut off the Rx IRQ during I/O to prevent the debug
       stub from interrupting the message */
     SCR1 &= ~0x40;
-   
+
     debug_tx_char ('$');
     checksum = 0;
 
     while (*src)
     {
         int runlen;
-        
+
         /* Do run length encoding */
-        for (runlen = 0; runlen < 100; runlen ++) 
+        for (runlen = 0; runlen < 100; runlen ++)
         {
-            if (src[0] != src[runlen] || runlen == 99) 
+            if (src[0] != src[runlen] || runlen == 99)
             {
-                if (runlen > 3) 
+                if (runlen > 3)
                 {
                     int encode;
                     /* Got a useful amount */
@@ -165,8 +165,8 @@ static void putpacket (const char *buffer)
             }
         }
     }
-    
-    
+
+
     debug_tx_char ('#');
     debug_tx_char (highhex(checksum));
     debug_tx_char (lowhex(checksum));
@@ -198,7 +198,7 @@ static char *mem2hex (const char *mem, char *buf, int count)
 static void debug(const char *msg)
 {
     debugbuf[0] = 'O';
-    
+
     mem2hex(msg, &debugbuf[1], strlen(msg));
     putpacket(debugbuf);
 }
@@ -246,7 +246,7 @@ void debugf(const char *fmt, ...)
 {
 #ifdef DEBUG
     va_list ap;
-    
+
     va_start(ap, fmt);
     vsnprintf(debugmembuf, sizeof(debugmembuf), fmt, ap);
     va_end(ap);
@@ -255,4 +255,3 @@ void debugf(const char *fmt, ...)
     (void)fmt;
 #endif
 }
-

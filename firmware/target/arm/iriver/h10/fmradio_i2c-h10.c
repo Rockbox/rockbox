@@ -71,7 +71,7 @@ static void fmradio_i2c_ack(bool nack)
 
        In their infinite wisdom, iriver didn't pull up the SCL line, so
        we have to drive the SCL high repeatedly to simulate a pullup. */
-    
+
     if (nack)
         SDA_HI_IN;
     else
@@ -117,7 +117,7 @@ static int fmradio_i2c_getack(void)
 
     if (SDA)
         ret = 0;    /* ack failed */
-    
+
     SCL_OUTPUT;
     SCL_LO;
 
@@ -192,7 +192,7 @@ int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
     int i,x=0;
-    
+
     fmradio_i2c_start();
     fmradio_i2c_outb(address | 1);
 

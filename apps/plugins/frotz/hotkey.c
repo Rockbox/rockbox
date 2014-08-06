@@ -1,5 +1,5 @@
 /* hotkey.c - Hot key functions
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * Changes for Rockbox copyright 2009 Torne Wuff
  *
@@ -69,7 +69,7 @@ static bool hot_key_playback (void)
     rb->splash(HZ, "Playback on");
 
     if (!istream_replay)
-	replay_open ();
+        replay_open ();
 
     return FALSE;
 
@@ -86,14 +86,14 @@ static bool hot_key_recording (void)
 {
 
     if (istream_replay) {
-	rb->splash(HZ, "Playback off");
-	replay_close ();
+        rb->splash(HZ, "Playback off");
+        replay_close ();
     } else if (ostream_record) {
-	rb->splash(HZ, "Recording off");
-	record_close ();
+        rb->splash(HZ, "Recording off");
+        record_close ();
     } else {
-	rb->splash(HZ, "Recording on");
-	record_open ();
+        rb->splash(HZ, "Recording on");
+        record_open ();
     }
 
     return FALSE;
@@ -129,17 +129,17 @@ static bool hot_key_undo (void)
 
     if (restore_undo ()) {
 
-	print_string ("undo\n");
+        print_string ("undo\n");
 
-	if (h_version >= V5) {		/* for V5+ games we must */
-	    store (2);			/* store 2 (for success) */
-	    return TRUE;		/* and abort the input   */
-	}
+        if (h_version >= V5) {          /* for V5+ games we must */
+            store (2);                  /* store 2 (for success) */
+            return TRUE;                /* and abort the input   */
+        }
 
-	if (h_version <= V3) {		/* for V3- games we must */
-	    z_show_status ();		/* draw the status line  */
-	    return FALSE;		/* and continue input    */
-	}
+        if (h_version <= V3) {          /* for V3- games we must */
+            z_show_status ();           /* draw the status line  */
+            return FALSE;               /* and continue input    */
+        }
 
     } else rb->splash(HZ, "No undo information available.");
 
@@ -159,8 +159,8 @@ static bool hot_key_restart (void)
 
     if (read_yes_or_no ("Do you wish to restart")) {
 
-	z_restart ();
-	return TRUE;
+        z_restart ();
+        return TRUE;
 
     } else return FALSE;
 
@@ -178,7 +178,7 @@ bool hot_key_quit (void)
 
     if (read_yes_or_no ("Do you wish to quit")) {
 
-	exit(0);
+        exit(0);
 
     } else return FALSE;
 
@@ -197,22 +197,22 @@ bool handle_hot_key (zchar key)
 
     if (cwin == 0) {
 
-	bool aborting;
+        bool aborting;
 
-	aborting = FALSE;
+        aborting = FALSE;
 
-	switch (key) {
-	    case ZC_HKEY_RECORD: aborting = hot_key_recording (); break;
-	    case ZC_HKEY_PLAYBACK: aborting = hot_key_playback (); break;
-	    case ZC_HKEY_SEED: aborting = hot_key_seed (); break;
-	    case ZC_HKEY_UNDO: aborting = hot_key_undo (); break;
-	    case ZC_HKEY_RESTART: aborting = hot_key_restart (); break;
-	    case ZC_HKEY_QUIT: aborting = hot_key_quit (); break;
-	    case ZC_HKEY_DEBUG: aborting = hot_key_debugging (); break;
-	}
+        switch (key) {
+            case ZC_HKEY_RECORD: aborting = hot_key_recording (); break;
+            case ZC_HKEY_PLAYBACK: aborting = hot_key_playback (); break;
+            case ZC_HKEY_SEED: aborting = hot_key_seed (); break;
+            case ZC_HKEY_UNDO: aborting = hot_key_undo (); break;
+            case ZC_HKEY_RESTART: aborting = hot_key_restart (); break;
+            case ZC_HKEY_QUIT: aborting = hot_key_quit (); break;
+            case ZC_HKEY_DEBUG: aborting = hot_key_debugging (); break;
+        }
 
-	if (aborting)
-	    return TRUE;
+        if (aborting)
+            return TRUE;
 
     }
 

@@ -34,7 +34,7 @@
 #include "i2s.h"
 #include "ascodec.h"
 
-#if CONFIG_CPU == AS3525v2 
+#if CONFIG_CPU == AS3525v2
 /* Headphone volume goes from -81.0 ... +6dB */
 #define VOLUME_MIN -820
 #define VOLUME_MAX   60
@@ -153,7 +153,7 @@ void audiohw_preinit(void)
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
     /* Set ADC off, mixer on, DAC on, line out on, line in off, mic off */
     /* Turn on SUM, DAC */
-    as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_LOUT_on | 
+    as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_LOUT_on |
         AUDIOSET1_SUM_on);
 #else
     /* Set ADC off, mixer on, DAC on, line out off, line in off, mic off */
@@ -161,7 +161,7 @@ void audiohw_preinit(void)
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_SUM_on);
 #endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
 
-    /* Set BIAS on, DITH off, AGC off, IBR_DAC max reduction, LSP_LP on, 
+    /* Set BIAS on, DITH off, AGC off, IBR_DAC max reduction, LSP_LP on,
        IBR_LSP max reduction (50%), taken from c200v2 OF
      */
     as3514_write(AS3514_AUDIOSET2, AUDIOSET2_IBR_LSP_50 | AUDIOSET2_LSP_LP |
@@ -210,7 +210,7 @@ void audiohw_preinit(void)
 
 #if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
     /* Line Out Stereo, MUTE, Min volume */
-    as3514_write(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_SE_ST | 
+    as3514_write(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_SE_ST |
         LINE_OUT_L_LO_SES_DM_MUTE | 0x00);
 #endif /* SANSA_E200V2 || SANSA_FUZE */
 
@@ -268,10 +268,10 @@ void audiohw_set_volume(int vol_l, int vol_r)
     /* We combine the mixer/DAC channel volume range with the headphone volume
        range - keep first stage as loud as possible */
 
-/*AS3543 mixer can go a little louder then the as3514, although 
+/*AS3543 mixer can go a little louder then the as3514, although
  * it might be possible to go louder on the as3514 as well */
- 
-#if CONFIG_CPU == AS3525v2 
+
+#if CONFIG_CPU == AS3525v2
 #define MIXER_MAX_VOLUME 0x1b
 #else /* lets leave the AS3514 alone until its better tested*/
 #define MIXER_MAX_VOLUME 0x16
@@ -291,7 +291,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     } else {
         mix_l = MIXER_MAX_VOLUME;
         hph_l = vol_l - MIXER_MAX_VOLUME;
-    }    
+    }
 
     as3514_write_masked(AS3514_DAC_R, mix_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_DAC_L, mix_l, AS3514_VOL_MASK);
@@ -365,7 +365,7 @@ void audiohw_enable_recording(bool source_mic)
                             ADC_R_ADCMUX);
 
         /* MIC1_on, others off */
-        as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_MIC1_on, 
+        as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_MIC1_on,
                             AUDIOSET1_INPUT_MASK);
 
 #if CONFIG_CPU == AS3525v2
@@ -432,7 +432,7 @@ void audiohw_set_recvol(int left, int right, int type)
         } else if (left >= 32) {
             /* M1_Gain = +34db, ADR_Vol = +7.5dB .. +12.0 dB =>
                +13.5 dB .. +18.0 dB */
-            left -= 4; 
+            left -= 4;
             mic1_r = MIC1_R_M1_GAIN_34DB;
         } else {
             /* M1_Gain = +28db, ADR_Vol = -34.5dB .. +12.0 dB =>

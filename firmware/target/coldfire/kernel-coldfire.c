@@ -40,12 +40,12 @@ void tick_start(unsigned int interval_in_ms)
     prescale = cpu_frequency / CPU_FREQ;
     /* Note: The prescaler is later adjusted on-the-fly on CPU frequency
        changes within timer.c */
-    
+
     /* We are using timer 0 */
 
     TRR0 = (unsigned short)(count - 1); /* The reference count */
     TCN0 = 0; /* reset the timer */
-    TMR0 = 0x001d | ((unsigned short)(prescale - 1) << 8); 
+    TMR0 = 0x001d | ((unsigned short)(prescale - 1) << 8);
            /* restart, CLK/16, enabled, prescaler */
 
     TER0 = 0xff; /* Clear all events */

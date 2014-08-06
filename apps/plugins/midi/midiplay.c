@@ -559,4 +559,3 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     return PLUGIN_OK;
 }
-

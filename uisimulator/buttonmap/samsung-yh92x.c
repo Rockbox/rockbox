@@ -65,7 +65,7 @@ int key_to_button(int keyboard_button)
     return new_btn;
 }
 
-struct button_map bm[] = {  
+struct button_map bm[] = {
     { SDLK_KP9,     370,  32, 15, "FF" },
     { SDLK_KP5,     369,  84, 25, "Play" },
     { SDLK_KP5,     367, 125, 27, "Play" },

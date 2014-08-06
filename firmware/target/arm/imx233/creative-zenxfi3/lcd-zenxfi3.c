@@ -158,7 +158,7 @@ void lcd_update_rect(int x, int y, int w, int h)
     y = MIN(y, LCD_HEIGHT);
     w = MIN(w, LCD_WIDTH - x);
     h = MIN(h, LCD_HEIGHT - y);
-    
+
     imx233_lcdif_wait_ready();
     lcd_write_reg(0x37, x);
     lcd_write_reg(0x36, x + w - 1);
@@ -167,7 +167,7 @@ void lcd_update_rect(int x, int y, int w, int h)
     lcd_write_reg(0x20, x);
     lcd_write_reg(0x21, y);
     lcd_write_reg(0x22, 0);
-    
+
     imx233_lcdif_wait_ready();
     imx233_lcdif_set_word_length(16);
     imx233_lcdif_set_byte_packing_format(0xf); /* two pixels per 32-bit word */
@@ -215,4 +215,3 @@ void lcd_update_rect(int x, int y, int w, int h)
     }
     imx233_lcdif_dma_send((void *)FRAME_PHYS_ADDR, w, h);
 }
-

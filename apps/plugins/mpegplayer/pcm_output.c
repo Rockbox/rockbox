@@ -378,7 +378,7 @@ bool pcm_output_init(void)
         {
             silence[i] = -silence_amp;
             silence[i+1] = -silence_amp;
-        }           
+        }
     }
 #endif
 

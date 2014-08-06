@@ -13,8 +13,8 @@
 #endif /* ROCKBOX */
 
     /* convenience routines for checking and getting values of
-    	atoms.  There's no "pointer" version since there's nothing
-    	safe to return if there's an error. */
+        atoms.  There's no "pointer" version since there's nothing
+        safe to return if there's an error. */
 
 t_float atom_getfloat(t_atom *a)
 {
@@ -44,7 +44,7 @@ t_symbol *atom_gensym(t_atom *a)  /* this works  better for graph labels */
 #ifdef ROCKBOX
         ftoan(a->a_w.w_float, buf, sizeof(buf)-1);
 #else
-    	sprintf(buf, "%g", a->a_w.w_float);
+        sprintf(buf, "%g", a->a_w.w_float);
 #endif
     else strcpy(buf, "???");
     return (gensym(buf));
@@ -85,62 +85,61 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
     case A_SEMI: strcpy(buf, ";"); break;
     case A_COMMA: strcpy(buf, ","); break;
     case A_POINTER:
-    	strcpy(buf, "(pointer)");
-    	break;
+        strcpy(buf, "(pointer)");
+        break;
     case A_FLOAT:
 #ifdef ROCKBOX
         ftoan(a->a_w.w_float, tbuf, sizeof(tbuf)-1);
 #else
-    	sprintf(tbuf, "%g", a->a_w.w_float);
+        sprintf(tbuf, "%g", a->a_w.w_float);
 #endif
-    	if (strlen(tbuf) < bufsize-1) strcpy(buf, tbuf);
-    	else if (a->a_w.w_float < 0) strcpy(buf, "-");
-    	else  strcat(buf, "+");
-    	break;
+        if (strlen(tbuf) < bufsize-1) strcpy(buf, tbuf);
+        else if (a->a_w.w_float < 0) strcpy(buf, "-");
+        else  strcat(buf, "+");
+        break;
     case A_SYMBOL:
     {
-    	char *sp;
-    	unsigned int len;
-	int quote;
-    	for (sp = a->a_w.w_symbol->s_name, len = 0, quote = 0; *sp; sp++, len++)
-    	    if (*sp == ';' || *sp == ',' || *sp == '\\' || 
-	    	(*sp == '$' && sp == a->a_w.w_symbol->s_name && sp[1] >= '0'
-		    && sp[1] <= '9'))
-    	    	quote = 1;
-    	if (quote)
-    	{
-    	    char *bp = buf, *ep = buf + (bufsize-2);
-    	    sp = a->a_w.w_symbol->s_name;
-    	    while (bp < ep && *sp)
-    	    {
-    	    	if (*sp == ';' || *sp == ',' || *sp == '\\' ||
-    	    	    (*sp == '$' && bp == buf && sp[1] >= '0' && sp[1] <= '9'))
-    	    	    	*bp++ = '\\';
-    	    	*bp++ = *sp++;
-    	    }
-    	    if (*sp) *bp++ = '*';
-    	    *bp = 0;
-    	    /* post("quote %s -> %s", a->a_w.w_symbol->s_name, buf); */
-    	}
-    	else
-    	{
-    	    if (len < bufsize-1) strcpy(buf, a->a_w.w_symbol->s_name);
-    	    else
-    	    {
-    		strncpy(buf, a->a_w.w_symbol->s_name, bufsize - 2);
-    		strcpy(buf + (bufsize - 2), "*");
-    	    }
-	}
+        char *sp;
+        unsigned int len;
+        int quote;
+        for (sp = a->a_w.w_symbol->s_name, len = 0, quote = 0; *sp; sp++, len++)
+            if (*sp == ';' || *sp == ',' || *sp == '\\' ||
+                (*sp == '$' && sp == a->a_w.w_symbol->s_name && sp[1] >= '0'
+                    && sp[1] <= '9'))
+                quote = 1;
+        if (quote)
+        {
+            char *bp = buf, *ep = buf + (bufsize-2);
+            sp = a->a_w.w_symbol->s_name;
+            while (bp < ep && *sp)
+            {
+                if (*sp == ';' || *sp == ',' || *sp == '\\' ||
+                    (*sp == '$' && bp == buf && sp[1] >= '0' && sp[1] <= '9'))
+                        *bp++ = '\\';
+                *bp++ = *sp++;
+            }
+            if (*sp) *bp++ = '*';
+            *bp = 0;
+            /* post("quote %s -> %s", a->a_w.w_symbol->s_name, buf); */
+        }
+        else
+        {
+            if (len < bufsize-1) strcpy(buf, a->a_w.w_symbol->s_name);
+            else
+            {
+                strncpy(buf, a->a_w.w_symbol->s_name, bufsize - 2);
+                strcpy(buf + (bufsize - 2), "*");
+            }
+        }
     }
-    	break;
+        break;
     case A_DOLLAR:
-    	snprintf(buf, bufsize, "$%d", a->a_w.w_index);
-    	break;
+        snprintf(buf, bufsize, "$%d", a->a_w.w_index);
+        break;
     case A_DOLLSYM:
-    	snprintf(buf, bufsize, "$%s", a->a_w.w_symbol->s_name);
-    	break;
+        snprintf(buf, bufsize, "$%s", a->a_w.w_symbol->s_name);
+        break;
     default:
-    	bug("atom_string");
+        bug("atom_string");
     }
 }
-

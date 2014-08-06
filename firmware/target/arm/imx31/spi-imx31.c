@@ -99,7 +99,7 @@ static void spi_reset(struct spi_module_desc * const desc)
 static bool spi_set_context(struct spi_module_desc *desc,
                             struct spi_transfer_desc *xfer)
 {
-    const struct spi_node * const node = xfer->node; 
+    const struct spi_node * const node = xfer->node;
     volatile unsigned long * const base = desc->base;
 
     if (desc->enable == 0)

@@ -160,7 +160,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
 #ifdef BOOTLOADER
     (void)orientation;
     return utf16_buf;
-    
+
 #else /* !BOOTLOADER */
     if (target == utf16_buf) /* empty string */
         return target;
@@ -246,7 +246,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
         if (char_count==max_chars) { /* try to avoid breaking words */
             int new_char_count = char_count;
             int new_begin = begin;
-            
+
             while (new_char_count>0) {
                 if (_isblank(heb_str[new_begin]) ||
                     _isnewline(heb_str[new_begin])) {
@@ -261,11 +261,11 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
             }
         }
         orig_begin=begin;
-        
+
         /* if (_isblank(heb_str[begin])) {
             heb_str[begin]='\n';
         } */
-        
+
         /* skip leading newlines */
         while (begin<=end && _isnewline(heb_str[begin])) {
             begin++;
@@ -282,7 +282,7 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
             target++;
         }
         begin=orig_begin;
-        
+
         if (begin<=0) {
             *target = 0;
             break;
@@ -295,4 +295,3 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     return heb_str;
 #endif /* !BOOTLOADER */
 }
-

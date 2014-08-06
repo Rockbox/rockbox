@@ -89,7 +89,7 @@ void scrollstrip_isr(void)
 
     /* read GPIO6 and GPIO7 state*/
     new_scroll_lines = (GPIO_READ >> 6) & 0x03;
-    
+
     /* was it initialized? */
     if ( prev_scroll_lines == -1 )
     {
@@ -200,7 +200,7 @@ int button_read_device(void)
     /* read hold buttons status */
     hold_button_old = hold_button;
     hold_button = button_hold();
-    
+
 #ifndef BOOTLOADER
     /* Only main hold affects backlight */
     if (hold_button != hold_button_old)
@@ -245,9 +245,9 @@ int button_read_device(void)
          * GPIO45 active low ENTER
          * GPIO41 active low MENU
          */
- 
+
        data = GPIO1_READ;
-   
+
        if (data & (1<<24))
            btn |= BUTTON_PLAY;
 

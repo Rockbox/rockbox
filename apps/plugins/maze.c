@@ -272,7 +272,7 @@ static void coord_stack_pop(struct coord_stack* stack, int* x, int* y)
     *y = stack->y[stack->stp];
 }
 
-static int maze_pick_random_neighbour_cell_with_walls(struct maze* maze, 
+static int maze_pick_random_neighbour_cell_with_walls(struct maze* maze,
                                      int x, int y, int *pnx, int *pny)
 {
     int n, i;

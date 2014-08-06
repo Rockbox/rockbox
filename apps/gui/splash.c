@@ -66,7 +66,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 
     viewport_set_defaults(&vp, screen->screen_type);
     screen->set_viewport(&vp);
-    
+
     screen->getstringsize(" ", &space_w, &h);
 #else /* HAVE_LCD_CHARCELLS */
     vp.width = screen->lcdwidth;
@@ -149,7 +149,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     vp.y += (vp.height - height) / 2;
     vp.width = width;
     vp.height = height;
-    
+
     vp.flags |=  VP_FLAG_ALIGN_CENTER;
 #if LCD_DEPTH > 1
     if (screen->depth > 1)

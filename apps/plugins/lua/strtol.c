@@ -24,4 +24,3 @@ long int strtol(const char *nptr, char **endptr, int base)
   }
   return (neg?-v:v);
 }
-

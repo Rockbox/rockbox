@@ -498,4 +498,3 @@ get_prop (int handle)
     }
     return &(storage_buffer[index][handle].prop);
 }
-

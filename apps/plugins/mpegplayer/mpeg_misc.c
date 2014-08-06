@@ -220,4 +220,3 @@ int mpeg_button_get(int timeout)
 
     return mpeg_sysevent_callback(button, NULL);
 }
-

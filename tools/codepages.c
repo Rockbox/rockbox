@@ -44,7 +44,7 @@ unsigned short iso_decode(unsigned char *latin1, int cp, int count)
                     ucs = *latin1++;
                 else if (*latin1 > 0xB7)
                     ucs = *latin1++ + 0x02D0;
-                else 
+                else
                     ucs = iso8859_7_to_uni[*latin1++ - 0xA1];
             }
             break;

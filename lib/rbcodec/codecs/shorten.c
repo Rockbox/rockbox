@@ -131,7 +131,7 @@ seek_start:
         res = shorten_decode_frames(&sc, &nsamples, decoded0, decoded1,
                                     offset0, offset1, (unsigned char *)ibuf,
                                     bytesleft, ci->yield);
- 
+
         if (res == FN_ERROR) {
             LOGF("Shorten: shorten_decode_frames error (%lu)\n",
                 (unsigned long)samplesdone);

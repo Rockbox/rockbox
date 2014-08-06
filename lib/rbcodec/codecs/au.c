@@ -130,14 +130,14 @@ enum codec_status codec_run(void)
     const struct pcm_codec *codec;
     int offset = 0;
     intptr_t param;
- 
+
     if (codec_init()) {
         DEBUGF("codec_init() error\n");
         return CODEC_ERROR;
     }
 
     codec_set_replaygain(ci->id3);
-    
+
     /* Need to save offset for later use (cleared indirectly by advance_buffer) */
     param = ci->id3->elapsed;
     bytesdone = ci->id3->offset;

@@ -55,7 +55,7 @@ void pcf50606_init(void)
 {
 #ifdef COWON_D2
     /* Set outputs as per OF - further investigation required. */
-    static const char init_data[] = 
+    static const char init_data[] =
         {PCF5060X_DCDEC1,  0xe4,
          PCF5060X_IOREGC,  0xf5,
          PCF5060X_D1REGC1, 0xf5,

@@ -58,7 +58,7 @@ void power_init(void)
     GPIOD_OUTPUT_VAL |=  0x08; /* high */
 
     GPIOD_OUTPUT_EN  &= ~0x02; /* CLK  */
-    
+
     GPIOD_OUTPUT_EN  |=  0x10; /* DATA */
     GPIOD_OUTPUT_VAL |=  0x10; /* high */
 
@@ -85,7 +85,7 @@ void power_off(void)
 
     /* Send shutdown command to PMU */
     byte = ascodec_read(AS3514_SYSTEM);
-    byte &= ~0x1;   
+    byte &= ~0x1;
     ascodec_write(AS3514_SYSTEM, byte);
 
     /* Stop interrupts on both cores */

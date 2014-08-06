@@ -241,4 +241,3 @@ MAKE_MENU(audiohw_eq_tone_controls, ID2P(LANG_HW_EQ_TONE_CONTROLS),
 #endif
           ,&hardware_eq_tone_controls_advanced
     );
-

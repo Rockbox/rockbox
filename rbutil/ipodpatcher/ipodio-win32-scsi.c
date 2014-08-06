@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2009 Dave Chapman
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -24,7 +24,7 @@
  * Copyright (c) 1996 Eugene Roshal
  * Copyright (c) 2000 Far Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -35,7 +35,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the authors may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -90,7 +90,7 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
     sptwb.Spt.TimeOutValue = 2;  /* 2 seconds */
     sptwb.Spt.DataBufferOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, DataBuf);
     sptwb.Spt.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, SenseBuf);
-    length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, DataBuf) + 
+    length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, DataBuf) +
              sptwb.Spt.DataTransferLength;
 
     /* Set cdb info */
@@ -121,4 +121,3 @@ int ipod_scsi_inquiry(struct ipod_t* ipod, int page_code,
     }
 }
 #endif
-

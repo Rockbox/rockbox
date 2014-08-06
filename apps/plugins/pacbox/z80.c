@@ -31,21 +31,21 @@
 
 // Table with parity, sign and zero flags precomputed for each byte value
 unsigned char PSZ_[256] IDATA_ATTR = {
-    Zero|Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity, 
-    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0, 
-    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0, 
-    Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity, 
-    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0, 
-    Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity, 
-    Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity, 
-    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0, 
-    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, 
-    Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, 
-    Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, 
-    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, 
-    Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, 
-    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, 
-    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, 
+    Zero|Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity,
+    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0,
+    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0,
+    Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity,
+    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0,
+    Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity,
+    Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity,
+    0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0,
+    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign,
+    Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity,
+    Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity,
+    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign,
+    Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity,
+    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign,
+    Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign,
     Sign|Parity, Sign, Sign, Sign|Parity, Sign, Sign|Parity, Sign|Parity, Sign, Sign, Sign|Parity, Sign|Parity, Sign, Sign|Parity, Sign, Sign, Sign|Parity
 };
 
@@ -112,8 +112,8 @@ unsigned char   R  IBSS_ATTR;     //@- Refresh register
 #define DE() (((unsigned)D << 8) | E)
 #define HL() (((unsigned)H << 8) | L)
 
-/** 
-    Returns the number of Z80 CPU cycles elapsed so far. 
+/**
+    Returns the number of Z80 CPU cycles elapsed so far.
 
     The cycle count is reset to zero when reset() is called, or
     it can be set to any value with setCycles(). It is updated after
@@ -163,7 +163,7 @@ void callSub( unsigned addr )
 }
 
 /*
-    Decrements a byte value by one. 
+    Decrements a byte value by one.
     Note that this is different from subtracting one from the byte value,
     because flags behave differently.
 */
@@ -180,7 +180,7 @@ static inline unsigned char decByte( unsigned char b )
 }
 
 /*
-    Increments a byte value by one. 
+    Increments a byte value by one.
     Note that this is different from adding one to the byte value,
     because flags behave differently.
 */
@@ -240,7 +240,7 @@ static inline unsigned char rotateLeft( unsigned char op )
     op <<= 1;
     if( f & Carry ) op |= 0x01;
     F |= PSZ_[op];
-    
+
     return op;
 }
 
@@ -253,7 +253,7 @@ static inline unsigned char rotateLeftCarry( unsigned char op )
     if( op & 0x80 ) F |= Carry;
     op = (op << 1) | (op >> 7);
     F |= PSZ_[op];
-    
+
     return op;
 }
 
@@ -269,7 +269,7 @@ static inline unsigned char rotateRight( unsigned char op )
     op >>= 1;
     if( f & Carry ) op |= 0x80;
     F |= PSZ_[op];
-    
+
     return op;
 }
 
@@ -282,7 +282,7 @@ static inline unsigned char rotateRightCarry( unsigned char op )
     if( op & 0x01 ) F |= Carry;
     op = (op >> 1) | (op << 7);
     F |= PSZ_[op];
-    
+
     return op;
 }
 
@@ -295,7 +295,7 @@ static inline unsigned char shiftLeft( unsigned char op )
     if( op & 0x80 ) F |= Carry;
     op <<= 1;
     F |= PSZ_[op];
-    
+
     return op;
 }
 
@@ -309,7 +309,7 @@ static inline unsigned char shiftRightArith( unsigned char op )
     op = (op >> 1) | (op & 0x80);
 
     F |= PSZ_[op];
-    
+
     return op;
 }
 
@@ -323,7 +323,7 @@ static inline unsigned char shiftRightLogical( unsigned char op )
     op >>= 1;
 
     F |= PSZ_[op];
-    
+
     return op;
 }
 
@@ -375,7 +375,7 @@ static inline void addByte( unsigned char op, unsigned char cf )
         1   0   1
         1   1   0
 
-        Note that if only the lowest bit is used, then A+B, A-B and A^B yield the same 
+        Note that if only the lowest bit is used, then A+B, A-B and A^B yield the same
         value. If we know A, B and the sum A+B+C, then C is easily derived:
             C = A+B+C - A - B,  that is
             C = A+B+C ^ A ^ B.
@@ -396,7 +396,7 @@ static inline void addByte( unsigned char op, unsigned char cf )
 
         For a sum, we can only have overflow when adding two numbers that are both positive
         or both negative. For example 0x5E + 0x4B (94 + 75) yields 0xA9 (169), which fits
-        into an 8-bit register only if it is interpreted as an unsigned number. If we 
+        into an 8-bit register only if it is interpreted as an unsigned number. If we
         consider the result as a signed integer, then 0xA9 corresponds to decimal -87 and
         we have overflow.
         Note that if we add two signed numbers of opposite sign then we cannot overflow
@@ -500,9 +500,9 @@ void z80_reset()
     cycles_ = 0;    // Could that be 2 (according to some Zilog docs)?
 
     // There is no official documentation for the following!
-    B = B1 = 0; 
+    B = B1 = 0;
     C = C1 = 0;
-    D = D1 = 0; 
+    D = D1 = 0;
     E = E1 = 0;
     H = H1 = 0;
     L = L1 = 0;
@@ -524,7 +524,7 @@ unsigned z80_getSizeOfSnapshotBuffer(void)
         2 +     // PC
         2 +     // SP
         4 +     // iflags_
-        4;      // cycles_    
+        4;      // cycles_
 
     return result;
 }
@@ -656,12 +656,12 @@ OpcodeInfo OpInfoCB_[256] = {
     { &opcode_cb_2d,  8 }, // SRA L
     { &opcode_cb_2e, 15 }, // SRA (HL)
     { &opcode_cb_2f,  8 }, // SRA A
-    { &opcode_cb_30,  8 }, // SLL B 
-    { &opcode_cb_31,  8 }, // SLL C 
-    { &opcode_cb_32,  8 }, // SLL D 
-    { &opcode_cb_33,  8 }, // SLL E 
-    { &opcode_cb_34,  8 }, // SLL H 
-    { &opcode_cb_35,  8 }, // SLL L 
+    { &opcode_cb_30,  8 }, // SLL B
+    { &opcode_cb_31,  8 }, // SLL C
+    { &opcode_cb_32,  8 }, // SLL D
+    { &opcode_cb_33,  8 }, // SLL E
+    { &opcode_cb_34,  8 }, // SLL H
+    { &opcode_cb_35,  8 }, // SLL L
     { &opcode_cb_36, 15 }, // SLL (HL)
     { &opcode_cb_37,  8 }, // SLL A
     { &opcode_cb_38,  8 }, // SRL B
@@ -865,30 +865,30 @@ OpcodeInfo OpInfoCB_[256] = {
     { &opcode_cb_fe, 15 }, // SET 7, (HL)
     { &opcode_cb_ff,  8 }  // SET 7, A
 };
-    
+
 void opcode_cb_00()    // RLC B
 {
-    B = rotateLeftCarry( B );    
+    B = rotateLeftCarry( B );
 }
 
 void opcode_cb_01()    // RLC C
 {
-    C = rotateLeftCarry( C );    
+    C = rotateLeftCarry( C );
 }
 
 void opcode_cb_02()    // RLC D
 {
-    D = rotateLeftCarry( D );    
+    D = rotateLeftCarry( D );
 }
 
 void opcode_cb_03()    // RLC E
 {
-    E = rotateLeftCarry( E );    
+    E = rotateLeftCarry( E );
 }
 
 void opcode_cb_04()    // RLC H
 {
-    H = rotateLeftCarry( H );    
+    H = rotateLeftCarry( H );
 }
 
 void opcode_cb_05()    // RLC L
@@ -938,7 +938,7 @@ void opcode_cb_0d()    // RRC L
 
 void opcode_cb_0e()    // RRC (HL)
 {
-    writeByte( HL(), rotateRightCarry( readByte( HL() ) ) );    
+    writeByte( HL(), rotateRightCarry( readByte( HL() ) ) );
 }
 
 void opcode_cb_0f()    // RRC A
@@ -948,17 +948,17 @@ void opcode_cb_0f()    // RRC A
 
 void opcode_cb_10()    // RL B
 {
-    B = rotateLeft( B );    
+    B = rotateLeft( B );
 }
 
 void opcode_cb_11()    // RL C
 {
-    C = rotateLeft( C );    
+    C = rotateLeft( C );
 }
 
 void opcode_cb_12()    // RL D
 {
-    D = rotateLeft( D );    
+    D = rotateLeft( D );
 }
 
 void opcode_cb_13()    // RL E
@@ -968,62 +968,62 @@ void opcode_cb_13()    // RL E
 
 void opcode_cb_14()    // RL H
 {
-    H = rotateLeft( H );    
+    H = rotateLeft( H );
 }
 
 void opcode_cb_15()    // RL L
 {
-    L = rotateLeft( L );    
+    L = rotateLeft( L );
 }
 
 void opcode_cb_16()    // RL (HL)
 {
-    writeByte( HL(), rotateLeft( readByte( HL() ) ) );    
+    writeByte( HL(), rotateLeft( readByte( HL() ) ) );
 }
 
 void opcode_cb_17()    // RL A
 {
-    A = rotateLeft( A ); 
+    A = rotateLeft( A );
 }
 
 void opcode_cb_18()    // RR B
 {
-    B = rotateRight( B ); 
+    B = rotateRight( B );
 }
 
 void opcode_cb_19()    // RR C
 {
-    C = rotateRight( C ); 
+    C = rotateRight( C );
 }
 
 void opcode_cb_1a()    // RR D
 {
-    D = rotateRight( D ); 
+    D = rotateRight( D );
 }
 
 void opcode_cb_1b()    // RR E
 {
-    E = rotateRight( E ); 
+    E = rotateRight( E );
 }
 
 void opcode_cb_1c()    // RR H
 {
-    H = rotateRight( H ); 
+    H = rotateRight( H );
 }
 
 void opcode_cb_1d()    // RR L
 {
-    L = rotateRight( L ); 
+    L = rotateRight( L );
 }
 
 void opcode_cb_1e()    // RR (HL)
 {
-    writeByte( HL(), rotateRight( readByte( HL() ) ) );    
+    writeByte( HL(), rotateRight( readByte( HL() ) ) );
 }
 
 void opcode_cb_1f()    // RR A
 {
-    A = rotateRight( A ); 
+    A = rotateRight( A );
 }
 
 void opcode_cb_20()    // SLA B
@@ -2350,7 +2350,7 @@ OpcodeInfo OpInfoDD_[256] = {
     { 0, 0 }, // 0xC8
     { 0, 0 }, // 0xC9
     { 0, 0 }, // 0xCA
-    { &opcode_dd_cb,  0 }, // 
+    { &opcode_dd_cb,  0 }, //
     { 0, 0 }, // 0xCC
     { 0, 0 }, // 0xCD
     { 0, 0 }, // 0xCE
@@ -2837,7 +2837,7 @@ void opcode_dd_be()    // CP (IX + d)
     cmpByte( readByte( addDispl(IX,fetchByte()) ) );
 }
 
-void opcode_dd_cb()    // 
+void opcode_dd_cb()    //
 {
     do_opcode_xycb( IX );
 }
@@ -3171,7 +3171,7 @@ void opcode_ed_44()    // NEG
 void opcode_ed_45()    // RETN
 {
     retFromSub();
-    iflags_ &= ~IFF1; 
+    iflags_ &= ~IFF1;
     if( iflags_ & IFF2 ) iflags_ |= IFF1;
 }
 
@@ -3661,7 +3661,7 @@ void opcode_ed_ba()    // INDR
         PC -= 2; // Decrement PC so that instruction is re-executed at next step (this allows interrupts to occur)
     }
 }
-                            
+
 void opcode_ed_bb()    // OTDR
 {
     opcode_ed_ab(); // OUTD
@@ -3875,7 +3875,7 @@ OpcodeInfo OpInfoFD_[256] = {
     { 0, 0 }, // 0xC8
     { 0, 0 }, // 0xC9
     { 0, 0 }, // 0xCA
-    { &opcode_fd_cb,  0 }, // 
+    { &opcode_fd_cb,  0 }, //
     { 0, 0 }, // 0xCC
     { 0, 0 }, // 0xCD
     { 0, 0 }, // 0xCE
@@ -4362,7 +4362,7 @@ void opcode_fd_be()    // CP (IY + d)
     cmpByte( readByte( addDispl(IY,fetchByte()) ) );
 }
 
-void opcode_fd_cb()    // 
+void opcode_fd_cb()    //
 {
     do_opcode_xycb( IY );
 }
@@ -6374,7 +6374,7 @@ OpcodeInfo OpInfo_[256] = {
     { &opcode_fd,  0 }, // [IY Prefix]
     { &opcode_fe,  7 }, // CP   n
     { &opcode_ff, 11 }  // RST  38H
-};                          
+};
 
 void opcode_00()    // NOP
 {
@@ -6475,8 +6475,8 @@ void opcode_0f()    // RRCA
 void opcode_10()    // DJNZ d
 {
     unsigned char o = fetchByte();
-    
-    if( --B != 0 ) relJump( o ); 
+
+    if( --B != 0 ) relJump( o );
 }
 
 void opcode_11()    // LD   DE,nn
@@ -6577,7 +6577,7 @@ void opcode_1f()    // RRA
 void opcode_20()    // JR   NZ,d
 {
     unsigned char o = fetchByte();
-    
+
     if( ! (F & Zero) ) relJump( o );
 }
 
@@ -6670,7 +6670,7 @@ void opcode_27()    // DAA
 void opcode_28()    // JR   Z,d
 {
     unsigned char   o = fetchByte();
-    
+
     if( F & Zero ) relJump( o );
 }
 
@@ -6725,7 +6725,7 @@ void opcode_2f()    // CPL
 void opcode_30()    // JR   NC,d
 {
     unsigned char o = fetchByte();
-    
+
     if( ! (F & Carry) ) relJump( o );
 }
 
@@ -6767,7 +6767,7 @@ void opcode_37()    // SCF
 void opcode_38()    // JR   C,d
 {
     unsigned char o = fetchByte();
-    
+
     if( F & Carry ) relJump( o );
 }
 
@@ -7934,7 +7934,7 @@ void opcode_ff()    // RST  38H
 void step(void)
 {
     // Update memory refresh register (not strictly needed but...)
-    R = (R+1) & 0x7F; 
+    R = (R+1) & 0x7F;
 
     if( iflags_ & Halted ) {
         // CPU is halted, do a NOP instruction
@@ -7978,7 +7978,7 @@ unsigned z80_run( unsigned runCycles )
             unsigned op = fetchByte();
 
             // Update the cycles counter with the number of cycles for this opcode
-            cycles_ += OpInfo_[ op ].cycles; 
+            cycles_ += OpInfo_[ op ].cycles;
 
             // Execute the opcode handler
             OpInfo_[ op ].handler();
@@ -7999,7 +7999,7 @@ void z80_interrupt( unsigned char data )
     // Execute interrupt only if interrupts are enabled
     if( iflags_ & IFF1 ) {
         // Disable maskable interrupts and restart the CPU if halted
-        iflags_ &= ~(IFF1 | IFF2 | Halted); 
+        iflags_ &= ~(IFF1 | IFF2 | Halted);
 
         switch( getInterruptMode() ) {
         case 0:
@@ -8057,4 +8057,3 @@ void do_opcode_xy( OpcodeInfo * info )
         }
     }
 }
-

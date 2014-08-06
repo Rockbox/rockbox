@@ -58,7 +58,7 @@ void print_timers(char * path)
     PRINT_TIMER_PCT(dsp_mix,dsp,"mix");
 #endif
     ci->fdprintf(logfd,"\n");
-    
+
     ci->close(logfd);
     logfd=-1;
 }

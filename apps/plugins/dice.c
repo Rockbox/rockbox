@@ -143,7 +143,7 @@ static void dice_print(struct dices* dice, struct screen* display){
     int nb_dices_per_line=display_nb_col/4;/* 4 char per dice displayed*/
     if(!nb_dices_per_line)
         nb_dices_per_line++;
-    
+
     int nb_lines_required=dice->nb_dices/nb_dices_per_line;
     int current_row=0;
     if(dice->nb_dices%nb_dices_per_line!=0)
@@ -194,7 +194,7 @@ static bool dice_menu(struct dices * dice) {
                 break;
 
             case 2:
-                rb->set_option("Number of Sides", &sides_index, INT, 
+                rb->set_option("Number of Sides", &sides_index, INT,
                                nb_sides_option,
                                sizeof(nb_sides_values)/sizeof(int), NULL);
                 dice->nb_sides=nb_sides_values[sides_index];

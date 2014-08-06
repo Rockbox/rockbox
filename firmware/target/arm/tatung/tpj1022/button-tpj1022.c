@@ -24,7 +24,7 @@
 
 bool button_hold(void)
 {
-    return (GPIOK_INPUT_VAL & 0x40) ?  true : false; 
+    return (GPIOK_INPUT_VAL & 0x40) ?  true : false;
 }
 
 int button_read_device(void)
@@ -42,8 +42,8 @@ int button_read_device(void)
         if ((GPIO?_INPUT_VAL & 0x??) == 0) btn |= BUTTON_REC;
         if ((GPIO?_INPUT_VAL & 0x??) == 0) btn |= BUTTON_VOL_UP;
         if ((GPIO?_INPUT_VAL & 0x??) == 0) btn |= BUTTON_LEFT;
-         */  
+         */
     }
-    
+
     return btn;
 }

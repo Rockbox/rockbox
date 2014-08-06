@@ -66,7 +66,7 @@
 
 /* TODO: Check keyboard mappings */
 
-#define KBD_SELECT BUTTON_SELECT 
+#define KBD_SELECT BUTTON_SELECT
 #define KBD_ABORT BUTTON_PLAY
 #define KBD_LEFT BUTTON_LEFT
 #define KBD_RIGHT BUTTON_RIGHT
@@ -549,7 +549,7 @@ int zx_kbd_input(char* text/*, int buflen*/)
         }
         cur_blink = !cur_blink;
 
-        
+
             /* highlight the key that has focus */
             FOR_NB_SCREENS(l)
             {
@@ -559,7 +559,7 @@ int zx_kbd_input(char* text/*, int buflen*/)
                                         param[l].font_w, param[l].font_h);
                 rb->screens[l]->set_drawmode(DRMODE_SOLID);
             }
-        
+
         FOR_NB_SCREENS(l)
         rb->screens[l]->update();
 
@@ -655,7 +655,7 @@ int zx_kbd_input(char* text/*, int buflen*/)
                     char_screen = 0;
 
                 /* inserts the selected char */
-                
+
                     /* find input char */
                         k = (param[char_screen].page*param[char_screen].lines +
                             param[char_screen].y)*param[char_screen].max_chars +

@@ -13,4 +13,3 @@ uint32_t filesize(FILE * f)
 
     return filesize;
 }
-

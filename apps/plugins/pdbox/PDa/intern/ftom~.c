@@ -32,8 +32,8 @@ static t_int *ftom_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-    	t_sample f = *in;
-	*out = ftofix((fixtof(f) > 0 ? 17.3123405046 * log(.12231220585 * fixtof(f)) : -1500));
+        t_sample f = *in;
+        *out = ftofix((fixtof(f) > 0 ? 17.3123405046 * log(.12231220585 * fixtof(f)) : -1500));
     }
     return (w + 4);
 }
@@ -50,8 +50,7 @@ static void ftom_tilde_dsp(t_ftom_tilde *x, t_signal **sp)
 void ftom_tilde_setup(void)
 {
     ftom_tilde_class = class_new(gensym("ftom~"), (t_newmethod)ftom_tilde_new, 0,
-    	sizeof(t_ftom_tilde), 0, 0);
+        sizeof(t_ftom_tilde), 0, 0);
     CLASS_MAINSIGNALIN(ftom_tilde_class, t_ftom_tilde, x_f);
     class_addmethod(ftom_tilde_class, (t_method)ftom_tilde_dsp, gensym("dsp"), 0);
 }
-

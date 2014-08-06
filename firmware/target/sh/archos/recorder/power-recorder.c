@@ -49,8 +49,8 @@ void charger_enable(bool on)
     if(on)
     {
         and_b(~0x20, &PBDRL);
-    } 
-    else 
+    }
+    else
     {
         or_b(0x20, &PBDRL);
     }
@@ -80,7 +80,7 @@ void ide_power_enable(bool on)
     }
 #endif /* HAVE_ATA_POWER_OFF */
 
-/* late port preparation, else problems with read/modify/write 
+/* late port preparation, else problems with read/modify/write
    of other bits on same port, while input and floating high */
     if (touched)
     {

@@ -37,7 +37,7 @@ void stat_trigger(void)
     if (R_STAT & condbits[R_STAT&3]) flag = IF_STAT;
 
     if (!(R_LCDC & 0x80)) flag = 0;
-    
+
     hw_interrupt(flag, IF_STAT);
 }
 
@@ -162,10 +162,3 @@ void lcdc_trans(void)
         }
     }
 }
-
-
-
-
-
-
-

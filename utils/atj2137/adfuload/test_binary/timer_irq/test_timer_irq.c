@@ -52,7 +52,7 @@ int main(void)
     return 0;
 }
 
-/* Timer T0 interrupt service routine */ 
+/* Timer T0 interrupt service routine */
 INT_T0()
 {
     static int j = 0;

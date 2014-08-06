@@ -207,7 +207,7 @@ static int readwavpeaks(const char *filename)
         sampleval = letoh16(*(sampleshort+1));
         peak->rmin = sampleval;
         peak->rmax = sampleval;
-    
+
         while(bytes_read)
         {
             sampleval = letoh16(*sampleshort++);

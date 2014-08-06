@@ -1,21 +1,21 @@
-/*	MikMod sound library
-	(c) 1998, 1999, 2000, 2001 Miodrag Vallat and others - see file AUTHORS
-	for complete list.
+/*      MikMod sound library
+        (c) 1998, 1999, 2000, 2001 Miodrag Vallat and others - see file AUTHORS
+        for complete list.
 
-	This library is free software; you can redistribute it and/or modify
-	it under the terms of the GNU Library General Public License as
-	published by the Free Software Foundation; either version 2 of
-	the License, or (at your option) any later version.
- 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Library General Public License for more details.
- 
-	You should have received a copy of the GNU Library General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-	02111-1307, USA.
+        This library is free software; you can redistribute it and/or modify
+        it under the terms of the GNU Library General Public License as
+        published by the Free Software Foundation; either version 2 of
+        the License, or (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU Library General Public License for more details.
+
+        You should have received a copy of the GNU Library General Public
+        License along with this library; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+        02111-1307, USA.
 */
 
 /*==============================================================================
@@ -158,7 +158,7 @@ VC_PROC2(VoiceSetFrequency,UBYTE,ULONG)
 VC_FUNC1(VoiceGetFrequency,ULONG,UBYTE)
 VC_PROC2(VoiceSetPanning,UBYTE,ULONG)
 VC_FUNC1(VoiceGetPanning,ULONG,UBYTE)
-		
+
 void  VC_VoicePlay(UBYTE a,SWORD b,ULONG c,ULONG d,ULONG e,ULONG f,UWORD g)
 { VC_VoicePlay_ptr(a,b,c,d,e,f,g); }
 
@@ -166,58 +166,58 @@ VC_PROC1(VoiceStop,UBYTE)
 VC_FUNC1(VoiceStopped,int,UBYTE)
 VC_FUNC1(VoiceGetPosition,SLONG,UBYTE)
 VC_FUNC1(VoiceRealVolume,ULONG,UBYTE)
-		
+
 void VC_SetupPointers(void)
 {
     /*
-	if (md_mode&DMODE_HQMIXER) {
-		VC_Init_ptr=VC2_Init;
-		VC_Exit_ptr=VC2_Exit;
-		VC_SetNumVoices_ptr=VC2_SetNumVoices;
-		VC_SampleSpace_ptr=VC2_SampleSpace;
-		VC_SampleLength_ptr=VC2_SampleLength;
-		VC_PlayStart_ptr=VC2_PlayStart;
-		VC_PlayStop_ptr=VC2_PlayStop;
-		VC_SampleLoad_ptr=VC2_SampleLoad;
-		VC_SampleUnload_ptr=VC2_SampleUnload;
-		VC_WriteBytes_ptr=VC2_WriteBytes;
-		VC_SilenceBytes_ptr=VC2_SilenceBytes;
-		VC_VoiceSetVolume_ptr=VC2_VoiceSetVolume;
-		VC_VoiceGetVolume_ptr=VC2_VoiceGetVolume;
-		VC_VoiceSetFrequency_ptr=VC2_VoiceSetFrequency;
-		VC_VoiceGetFrequency_ptr=VC2_VoiceGetFrequency;
-		VC_VoiceSetPanning_ptr=VC2_VoiceSetPanning;
-		VC_VoiceGetPanning_ptr=VC2_VoiceGetPanning;
-		VC_VoicePlay_ptr=VC2_VoicePlay;
-		VC_VoiceStop_ptr=VC2_VoiceStop;
-		VC_VoiceStopped_ptr=VC2_VoiceStopped;
-		VC_VoiceGetPosition_ptr=VC2_VoiceGetPosition;
-		VC_VoiceRealVolume_ptr=VC2_VoiceRealVolume;
-	} else {
+        if (md_mode&DMODE_HQMIXER) {
+                VC_Init_ptr=VC2_Init;
+                VC_Exit_ptr=VC2_Exit;
+                VC_SetNumVoices_ptr=VC2_SetNumVoices;
+                VC_SampleSpace_ptr=VC2_SampleSpace;
+                VC_SampleLength_ptr=VC2_SampleLength;
+                VC_PlayStart_ptr=VC2_PlayStart;
+                VC_PlayStop_ptr=VC2_PlayStop;
+                VC_SampleLoad_ptr=VC2_SampleLoad;
+                VC_SampleUnload_ptr=VC2_SampleUnload;
+                VC_WriteBytes_ptr=VC2_WriteBytes;
+                VC_SilenceBytes_ptr=VC2_SilenceBytes;
+                VC_VoiceSetVolume_ptr=VC2_VoiceSetVolume;
+                VC_VoiceGetVolume_ptr=VC2_VoiceGetVolume;
+                VC_VoiceSetFrequency_ptr=VC2_VoiceSetFrequency;
+                VC_VoiceGetFrequency_ptr=VC2_VoiceGetFrequency;
+                VC_VoiceSetPanning_ptr=VC2_VoiceSetPanning;
+                VC_VoiceGetPanning_ptr=VC2_VoiceGetPanning;
+                VC_VoicePlay_ptr=VC2_VoicePlay;
+                VC_VoiceStop_ptr=VC2_VoiceStop;
+                VC_VoiceStopped_ptr=VC2_VoiceStopped;
+                VC_VoiceGetPosition_ptr=VC2_VoiceGetPosition;
+                VC_VoiceRealVolume_ptr=VC2_VoiceRealVolume;
+        } else {
         */
-		VC_Init_ptr=VC1_Init;
-		VC_Exit_ptr=VC1_Exit;
-		VC_SetNumVoices_ptr=VC1_SetNumVoices;
-		VC_SampleSpace_ptr=VC1_SampleSpace;
-		VC_SampleLength_ptr=VC1_SampleLength;
-		VC_PlayStart_ptr=VC1_PlayStart;
-		VC_PlayStop_ptr=VC1_PlayStop;
-		VC_SampleLoad_ptr=VC1_SampleLoad;
-		VC_SampleUnload_ptr=VC1_SampleUnload;
-		VC_WriteBytes_ptr=VC1_WriteBytes;
-		VC_SilenceBytes_ptr=VC1_SilenceBytes;
-		VC_VoiceSetVolume_ptr=VC1_VoiceSetVolume;
-		VC_VoiceGetVolume_ptr=VC1_VoiceGetVolume;
-		VC_VoiceSetFrequency_ptr=VC1_VoiceSetFrequency;
-		VC_VoiceGetFrequency_ptr=VC1_VoiceGetFrequency;
-		VC_VoiceSetPanning_ptr=VC1_VoiceSetPanning;
-		VC_VoiceGetPanning_ptr=VC1_VoiceGetPanning;
-		VC_VoicePlay_ptr=VC1_VoicePlay;
-		VC_VoiceStop_ptr=VC1_VoiceStop;
-		VC_VoiceStopped_ptr=VC1_VoiceStopped;
-		VC_VoiceGetPosition_ptr=VC1_VoiceGetPosition;
-		VC_VoiceRealVolume_ptr=VC1_VoiceRealVolume;
-	//}
+                VC_Init_ptr=VC1_Init;
+                VC_Exit_ptr=VC1_Exit;
+                VC_SetNumVoices_ptr=VC1_SetNumVoices;
+                VC_SampleSpace_ptr=VC1_SampleSpace;
+                VC_SampleLength_ptr=VC1_SampleLength;
+                VC_PlayStart_ptr=VC1_PlayStart;
+                VC_PlayStop_ptr=VC1_PlayStop;
+                VC_SampleLoad_ptr=VC1_SampleLoad;
+                VC_SampleUnload_ptr=VC1_SampleUnload;
+                VC_WriteBytes_ptr=VC1_WriteBytes;
+                VC_SilenceBytes_ptr=VC1_SilenceBytes;
+                VC_VoiceSetVolume_ptr=VC1_VoiceSetVolume;
+                VC_VoiceGetVolume_ptr=VC1_VoiceGetVolume;
+                VC_VoiceSetFrequency_ptr=VC1_VoiceSetFrequency;
+                VC_VoiceGetFrequency_ptr=VC1_VoiceGetFrequency;
+                VC_VoiceSetPanning_ptr=VC1_VoiceSetPanning;
+                VC_VoiceGetPanning_ptr=VC1_VoiceGetPanning;
+                VC_VoicePlay_ptr=VC1_VoicePlay;
+                VC_VoiceStop_ptr=VC1_VoiceStop;
+                VC_VoiceStopped_ptr=VC1_VoiceStopped;
+                VC_VoiceGetPosition_ptr=VC1_VoiceGetPosition;
+                VC_VoiceRealVolume_ptr=VC1_VoiceRealVolume;
+        //}
 }
 
 #else
@@ -227,35 +227,35 @@ void VC_SetupPointers(void)
 
 static ULONG samples2bytes(ULONG samples)
 {
-	if(vc_mode & DMODE_FLOAT) samples <<= 2;
-	else if(vc_mode & DMODE_16BITS) samples <<= 1;
-	if(vc_mode & DMODE_STEREO) samples <<= 1;
-	return samples;
+        if(vc_mode & DMODE_FLOAT) samples <<= 2;
+        else if(vc_mode & DMODE_16BITS) samples <<= 1;
+        if(vc_mode & DMODE_STEREO) samples <<= 1;
+        return samples;
 }
 
 static ULONG bytes2samples(ULONG bytes)
 {
-	if(vc_mode & DMODE_FLOAT) bytes >>= 2;
-	else if(vc_mode & DMODE_16BITS) bytes >>= 1;
-	if(vc_mode & DMODE_STEREO) bytes >>= 1;
-	return bytes;
+        if(vc_mode & DMODE_FLOAT) bytes >>= 2;
+        else if(vc_mode & DMODE_16BITS) bytes >>= 1;
+        if(vc_mode & DMODE_STEREO) bytes >>= 1;
+        return bytes;
 }
 
 /* Fill the buffer with 'todo' bytes of silence (it depends on the mixing mode
    how the buffer is filled) */
 ULONG VC1_SilenceBytes(SBYTE* buf,ULONG todo)
 {
-	todo=samples2bytes(bytes2samples(todo));
+        todo=samples2bytes(bytes2samples(todo));
 
-	/* clear the buffer to zero (16 bits signed) or 0x80 (8 bits unsigned) */
-	if(vc_mode & DMODE_FLOAT)
-		memset(buf,0,todo);
-	else if(vc_mode & DMODE_16BITS)
-		memset(buf,0,todo);
-	else
-		memset(buf,0x80,todo);
+        /* clear the buffer to zero (16 bits signed) or 0x80 (8 bits unsigned) */
+        if(vc_mode & DMODE_FLOAT)
+                memset(buf,0,todo);
+        else if(vc_mode & DMODE_16BITS)
+                memset(buf,0,todo);
+        else
+                memset(buf,0x80,todo);
 
-	return todo;
+        return todo;
 }
 
 void VC1_WriteSamples(SBYTE*,ULONG);
@@ -265,195 +265,195 @@ void VC1_WriteSamples(SBYTE*,ULONG);
    into 'todo' bytes). */
 ULONG VC1_WriteBytes(SBYTE* buf,ULONG todo)
 {
-	if(!vc_softchn)
-		return VC1_SilenceBytes(buf,todo);
+        if(!vc_softchn)
+                return VC1_SilenceBytes(buf,todo);
 
-	todo = bytes2samples(todo);
-	VC1_WriteSamples(buf,todo);
+        todo = bytes2samples(todo);
+        VC1_WriteSamples(buf,todo);
 
-	return samples2bytes(todo);
+        return samples2bytes(todo);
 }
 
 void VC1_Exit(void)
 {
-	if(vc_tickbuf) MikMod_free(vc_tickbuf);
-	if(vinf) MikMod_free(vinf);
-	if(Samples) MikMod_free(Samples);
+        if(vc_tickbuf) MikMod_free(vc_tickbuf);
+        if(vinf) MikMod_free(vinf);
+        if(Samples) MikMod_free(Samples);
 
-	vc_tickbuf = NULL;
-	vinf = NULL;
-	Samples = NULL;
-	
-	VC_SetupPointers();
+        vc_tickbuf = NULL;
+        vinf = NULL;
+        Samples = NULL;
+
+        VC_SetupPointers();
 }
 
 UWORD VC1_VoiceGetVolume(UBYTE voice)
 {
-	return vinf[voice].vol;
+        return vinf[voice].vol;
 }
 
 ULONG VC1_VoiceGetPanning(UBYTE voice)
 {
-	return vinf[voice].pan;
+        return vinf[voice].pan;
 }
 
 void VC1_VoiceSetFrequency(UBYTE voice,ULONG frq)
 {
-	vinf[voice].frq=frq;
+        vinf[voice].frq=frq;
 }
 
 ULONG VC1_VoiceGetFrequency(UBYTE voice)
 {
-	return vinf[voice].frq;
+        return vinf[voice].frq;
 }
 
 void VC1_VoicePlay(UBYTE voice,SWORD handle,ULONG start,ULONG size,ULONG reppos,ULONG repend,UWORD flags)
 {
-	vinf[voice].flags    = flags;
-	vinf[voice].handle   = handle;
-	vinf[voice].start    = start;
-	vinf[voice].size     = size;
-	vinf[voice].reppos   = reppos;
-	vinf[voice].repend   = repend;
-	vinf[voice].kick     = 1;
+        vinf[voice].flags    = flags;
+        vinf[voice].handle   = handle;
+        vinf[voice].start    = start;
+        vinf[voice].size     = size;
+        vinf[voice].reppos   = reppos;
+        vinf[voice].repend   = repend;
+        vinf[voice].kick     = 1;
 }
 
 void VC1_VoiceStop(UBYTE voice)
 {
-	vinf[voice].active = 0;
-}  
+        vinf[voice].active = 0;
+}
 
 int VC1_VoiceStopped(UBYTE voice)
 {
-	return(vinf[voice].active==0);
+        return(vinf[voice].active==0);
 }
 
 SLONG VC1_VoiceGetPosition(UBYTE voice)
 {
-	return (SLONG)(vinf[voice].current>>FRACBITS);
+        return (SLONG)(vinf[voice].current>>FRACBITS);
 }
 
 void VC1_VoiceSetVolume(UBYTE voice,UWORD vol)
-{    
-	/* protect against clicks if volume variation is too high */
-	if(abs((int)vinf[voice].vol-(int)vol)>32)
-		vinf[voice].rampvol=CLICK_BUFFER;
-	vinf[voice].vol=vol;
+{
+        /* protect against clicks if volume variation is too high */
+        if(abs((int)vinf[voice].vol-(int)vol)>32)
+                vinf[voice].rampvol=CLICK_BUFFER;
+        vinf[voice].vol=vol;
 }
 
 void VC1_VoiceSetPanning(UBYTE voice,ULONG pan)
 {
-	/* protect against clicks if panning variation is too high */
-	if(abs((int)vinf[voice].pan-(int)pan)>48)
-		vinf[voice].rampvol=CLICK_BUFFER;
-	vinf[voice].pan=pan;
+        /* protect against clicks if panning variation is too high */
+        if(abs((int)vinf[voice].pan-(int)pan)>48)
+                vinf[voice].rampvol=CLICK_BUFFER;
+        vinf[voice].pan=pan;
 }
 
 /*========== External mixer interface */
 
 void VC1_SampleUnload(SWORD handle)
 {
-	if (handle<MAXSAMPLEHANDLES) {
-		if (Samples[handle])
-			MikMod_free(Samples[handle]);
-		Samples[handle]=NULL;
-	}
+        if (handle<MAXSAMPLEHANDLES) {
+                if (Samples[handle])
+                        MikMod_free(Samples[handle]);
+                Samples[handle]=NULL;
+        }
 }
 
 SWORD VC1_SampleLoad(struct SAMPLOAD* sload,int type)
 {
-	SAMPLE *s = sload->sample;
-	int handle;
-	ULONG t, length,loopstart,loopend;
+        SAMPLE *s = sload->sample;
+        int handle;
+        ULONG t, length,loopstart,loopend;
 
-	if(type==MD_HARDWARE) return -1;
+        if(type==MD_HARDWARE) return -1;
 
-	/* Find empty slot to put sample address in */
-	for(handle=0;handle<MAXSAMPLEHANDLES;handle++)
-		if(!Samples[handle]) break;
+        /* Find empty slot to put sample address in */
+        for(handle=0;handle<MAXSAMPLEHANDLES;handle++)
+                if(!Samples[handle]) break;
 
-	if(handle==MAXSAMPLEHANDLES) {
-		_mm_errno = MMERR_OUT_OF_HANDLES;
-		return -1;
-	}
-	
-	/* Reality check for loop settings */
-	if (s->loopend > s->length)
-		s->loopend = s->length;
-	if (s->loopstart >= s->loopend)
-		s->flags &= ~SF_LOOP;
+        if(handle==MAXSAMPLEHANDLES) {
+                _mm_errno = MMERR_OUT_OF_HANDLES;
+                return -1;
+        }
 
-	length    = s->length;
-	loopstart = s->loopstart;
-	loopend   = s->loopend;
+        /* Reality check for loop settings */
+        if (s->loopend > s->length)
+                s->loopend = s->length;
+        if (s->loopstart >= s->loopend)
+                s->flags &= ~SF_LOOP;
 
-	SL_SampleSigned(sload);
-	SL_Sample8to16(sload);
+        length    = s->length;
+        loopstart = s->loopstart;
+        loopend   = s->loopend;
 
-	if(!(Samples[handle]=(SWORD*)MikMod_malloc((length+20)<<1))) {
-		_mm_errno = MMERR_SAMPLE_TOO_BIG;
-		return -1;
-	}
+        SL_SampleSigned(sload);
+        SL_Sample8to16(sload);
 
-	/* read sample into buffer */
-	if (SL_Load(Samples[handle],sload,length))
-		return -1;
+        if(!(Samples[handle]=(SWORD*)MikMod_malloc((length+20)<<1))) {
+                _mm_errno = MMERR_SAMPLE_TOO_BIG;
+                return -1;
+        }
 
-	/* Unclick sample */
-	if(s->flags & SF_LOOP) {
-		if(s->flags & SF_BIDI)
-			for(t=0;t<16;t++)
-				Samples[handle][loopend+t]=Samples[handle][(loopend-t)-1];
-		else
-			for(t=0;t<16;t++)
-				Samples[handle][loopend+t]=Samples[handle][t+loopstart];
-	} else
-		for(t=0;t<16;t++)
-			Samples[handle][t+length]=0;
+        /* read sample into buffer */
+        if (SL_Load(Samples[handle],sload,length))
+                return -1;
 
-	return handle;
+        /* Unclick sample */
+        if(s->flags & SF_LOOP) {
+                if(s->flags & SF_BIDI)
+                        for(t=0;t<16;t++)
+                                Samples[handle][loopend+t]=Samples[handle][(loopend-t)-1];
+                else
+                        for(t=0;t<16;t++)
+                                Samples[handle][loopend+t]=Samples[handle][t+loopstart];
+        } else
+                for(t=0;t<16;t++)
+                        Samples[handle][t+length]=0;
+
+        return handle;
 }
 
 ULONG VC1_SampleSpace(int type)
 {
     (void)type;
-	return vc_memory;
+        return vc_memory;
 }
 
 ULONG VC1_SampleLength(int type,SAMPLE* s)
 {
     (void)type;
-	if (!s) return 0;
+        if (!s) return 0;
 
-	return (s->length*((s->flags&SF_16BITS)?2:1))+16;
+        return (s->length*((s->flags&SF_16BITS)?2:1))+16;
 }
 
 ULONG VC1_VoiceRealVolume(UBYTE voice)
 {
-	ULONG i,s,size;
-	int k,j;
-	SWORD *smp;
-	SLONG t;
+        ULONG i,s,size;
+        int k,j;
+        SWORD *smp;
+        SLONG t;
 
-	t = (SLONG)(vinf[voice].current>>FRACBITS);
-	if(!vinf[voice].active) return 0;
+        t = (SLONG)(vinf[voice].current>>FRACBITS);
+        if(!vinf[voice].active) return 0;
 
-	s = vinf[voice].handle;
-	size = vinf[voice].size;
+        s = vinf[voice].handle;
+        size = vinf[voice].size;
 
-	i=64; t-=64; k=0; j=0;
-	if(i>size) i = size;
-	if(t<0) t = 0;
-	if(t+i > size) t = size-i;
+        i=64; t-=64; k=0; j=0;
+        if(i>size) i = size;
+        if(t<0) t = 0;
+        if(t+i > size) t = size-i;
 
-	i &= ~1;  /* make sure it's EVEN. */
+        i &= ~1;  /* make sure it's EVEN. */
 
-	smp = &Samples[s][t];
-	for(;i;i--,smp++) {
-		if(k<*smp) k = *smp;
-		if(j>*smp) j = *smp;
-	}
-	return abs(k-j);
+        smp = &Samples[s][t];
+        for(;i;i--,smp++) {
+                if(k<*smp) k = *smp;
+                if(j>*smp) j = *smp;
+        }
+        return abs(k-j);
 }
 
 

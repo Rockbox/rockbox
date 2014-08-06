@@ -47,7 +47,7 @@ int lcd_hw_init(void)
     udelay(1000);
     GPIOA_PIN(5) = (1<<5);
 
-    /* detect display type on GPIO B3 */    
+    /* detect display type on GPIO B3 */
     return GPIOB_PIN(3) ? 1 : 0;
 }
 
@@ -58,7 +58,7 @@ void lcd_write_command(int byte)
 
     /* LCD command mode */
     GPIOB_PIN(2) = 0;
-    
+
     SSP_DATA = byte;
     while(SSP_SR & (1<<4))  /* BSY flag */
         ;
@@ -82,4 +82,3 @@ void lcd_enable_power(bool onoff)
 {
     (void) onoff;
 }
-

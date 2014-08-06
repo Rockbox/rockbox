@@ -266,7 +266,7 @@ void skin_debug_params(int count, struct skin_tag_parameter params[])
         case INTEGER:
             printf("integer: %d", params[i].data.number);
             break;
-            
+
         case DECIMAL:
             printf("decimal: %d.%d", params[i].data.number/10,
                               params[i].data.number%10);

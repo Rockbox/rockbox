@@ -19,7 +19,7 @@ enum { max_field = 64 };
 
 struct header_t
 {
-    char tag [4]; 
+    char tag [4];
     byte data_size [4];
     byte version [4];
     byte psg_rate [4];
@@ -60,7 +60,7 @@ static byte const* get_gd3_str( byte const* in, byte const* end, char* field )
         field [len] = 0;
         /* Conver to utf8 */
         utf16LEdecode( in, field, len );
-        
+
         /* Copy string back to id3v2buf */
         strcpy( (char*) in, field );
     }
@@ -130,7 +130,7 @@ static void get_vgm_length( struct header_t* h, struct mp3entry* id3 )
             loop_length = 0;
             id3->tail_trim = 0;
         }
-        
+
         /* intro + 2 loops + fade */
         id3->length = intro_length + 2 * loop_length + id3->tail_trim;
         return;
@@ -146,7 +146,7 @@ bool get_vgm_metadata(int fd, struct mp3entry* id3)
     int read_bytes;
 
     memset(buf, 0, ID3V2_BUF_SIZE);
-    if ((lseek(fd, 0, SEEK_SET) < 0) 
+    if ((lseek(fd, 0, SEEK_SET) < 0)
          || ((read_bytes = read(fd, buf, header_size)) < header_size))
     {
         return false;
@@ -172,15 +172,15 @@ bool get_vgm_metadata(int fd, struct mp3entry* id3)
     get_vgm_length( header, id3 );
 
     long gd3_offset = get_long_le( header->gd3_offset ) - 0x2C;
-    
+
     /* No gd3 tag found */
     if ( gd3_offset < 0 )
         return true;
 
-    /*  Seek to gd3 offset and read as 
+    /*  Seek to gd3 offset and read as
          many bytes posible */
     gd3_offset = id3->filesize - (header_size + gd3_offset);
-    if ((lseek(fd, -gd3_offset, SEEK_END) < 0) 
+    if ((lseek(fd, -gd3_offset, SEEK_END) < 0)
          || ((read_bytes = read(fd, buf, ID3V2_BUF_SIZE)) <= 0))
         return true;
 

@@ -156,7 +156,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_KBD_SELECT,       BUTTON_SELECT,                         BUTTON_NONE },
@@ -199,7 +199,7 @@ const struct button_mapping button_context_recscreen[]  = {
      { ACTION_FM_STOP,           BUTTON_PLAY | BUTTON_REPEAT,     BUTTON_PLAY },
      { ACTION_FM_MODE,           BUTTON_SELECT,                   BUTTON_NONE },
      { ACTION_FM_EXIT,           BUTTON_MENU | BUTTON_REL,        BUTTON_MENU },
-     { ACTION_FM_PLAY,           BUTTON_PLAY | BUTTON_REL,        BUTTON_PLAY },   
+     { ACTION_FM_PLAY,           BUTTON_PLAY | BUTTON_REL,        BUTTON_PLAY },
      { ACTION_SETTINGS_INC,      BUTTON_SCROLL_FWD,               BUTTON_NONE },
      { ACTION_SETTINGS_INCREPEAT,BUTTON_SCROLL_FWD|BUTTON_REPEAT, BUTTON_NONE },
      { ACTION_SETTINGS_DEC,      BUTTON_SCROLL_BACK,              BUTTON_NONE },
@@ -333,19 +333,19 @@ static const struct button_mapping remote_button_context_wps[]  = {
 static const struct button_mapping remote_button_context_tree[]  = {
     { ACTION_TREE_WPS,          BUTTON_RC_PLAY|BUTTON_REL,    BUTTON_RC_PLAY },
     { ACTION_TREE_STOP,         BUTTON_RC_PLAY|BUTTON_REPEAT, BUTTON_RC_PLAY },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* remote_button_context_tree */
 
 #if CONFIG_TUNER
  static const struct button_mapping remote_button_context_radio[]  = {
      { ACTION_FM_STOP,           BUTTON_RC_PLAY | BUTTON_REPEAT,     BUTTON_NONE },
-     { ACTION_FM_PLAY,           BUTTON_RC_PLAY | BUTTON_REL,        BUTTON_RC_PLAY },   
+     { ACTION_FM_PLAY,           BUTTON_RC_PLAY | BUTTON_REL,        BUTTON_RC_PLAY },
      { ACTION_STD_NEXT,          BUTTON_RC_RIGHT|BUTTON_REL,         BUTTON_RC_RIGHT },
      { ACTION_STD_NEXTREPEAT,    BUTTON_RC_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
      { ACTION_STD_PREV,          BUTTON_RC_LEFT|BUTTON_REL,          BUTTON_RC_LEFT },
      { ACTION_STD_PREVREPEAT,    BUTTON_RC_LEFT|BUTTON_REPEAT,       BUTTON_NONE },
-     
+
      LAST_ITEM_IN_LIST
  }; /* remote_button_context_radio */
 #endif

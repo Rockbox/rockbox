@@ -83,7 +83,7 @@ int gigabeat_s_code(char *infile, char *outfile)
     fseek(in, 0, SEEK_END);
     size = ftell(in);
 
-    /* 15 bytes for header, 16 for signature bypass, 
+    /* 15 bytes for header, 16 for signature bypass,
      * 12 for record header, 12 for footer */
     newsize = 15 + 16 + 12 + size + 12;
     buf = malloc(newsize);
@@ -106,7 +106,7 @@ int gigabeat_s_code(char *infile, char *outfile)
     put_uint32le(0x88200000, buf+7);
     /* If the value below is too small, the update will attempt to flash.
      * Be careful when changing this (leaving it as is won't cause issues) */
-    put_uint32le(0xCC0CD8, buf+11); 
+    put_uint32le(0xCC0CD8, buf+11);
 
     /* Step 3: Add the signature bypass record */
     put_uint32le(0x88065A10, buf+15);
@@ -127,7 +127,7 @@ int gigabeat_s_code(char *infile, char *outfile)
     /* Step 6: Write the resulting file */
     fwrite(buf, newsize, 1, out);
     fclose(out);
-    
+
     fprintf(stderr, "File processed successfully\n" );
 
     return(0);

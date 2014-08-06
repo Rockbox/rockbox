@@ -150,7 +150,7 @@ static void isp1362_suspend(void)
 
     /* TODO: OTG wake-up cfg */
     /* TODO: Interrupt setup */
-    
+
     /* set the HC to operational */
     isp1362_write_hc_reg32(ISP1362_HC_CONTROL, 0x0680);
                            /* RWE = RWC = 1, HCFS = 0b10 (USBOperational) */

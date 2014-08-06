@@ -1011,10 +1011,10 @@ inflate_unzip(struct mbreader_t *in,char* outbuffer,uint32_t outbuflen)
         if((signed int)outbuflen-(signed int)gunzip_outbuf_count<0)
         {
             error_msg("write_error");
-		#ifdef TRIM_FILE_ON_ERROR
+                #ifdef TRIM_FILE_ON_ERROR
             return USE_DESKTOP(total) + 0;
         #else
-        	return -1;
+                return -1;
         #endif
         }
 
@@ -1069,12 +1069,12 @@ inflate_gunzip(struct mbreader_t *in,char* outbuffer,uint32_t outbuflen)
     if (stored_crc != (~gunzip_crc))
     {
         error_msg("crc error");
-    
-	#ifdef TRIM_FILE_ON_ERROR
-	    return USE_DESKTOP(total) + 0;
-	#else
-		return -1;
-	#endif
+
+        #ifdef TRIM_FILE_ON_ERROR
+            return USE_DESKTOP(total) + 0;
+        #else
+                return -1;
+        #endif
     }
 
     /* Validate decompression - size */
@@ -1112,11 +1112,11 @@ uint32_t decompress(const char *inbuffer,uint32_t inbuflen,char* outbuffer,uint3
     wpw_init_mempool_pdm(HUFT_MMP1,(unsigned char*)huftbuffer1,0x2A00);
     wpw_init_mempool_pdm(HUFT_MMP2,(unsigned char*)huftbuffer2,0xA00);
 
-	/* Initialize memory buffer reader */
+        /* Initialize memory buffer reader */
     src_md.ptr = inbuffer;
     src_md.size = inbuflen;
     src_md.offset = offset;
-    
+
     if ((exitcode=xread_char(&src_md)) == 0x1f)
     {
         unsigned char magic2;

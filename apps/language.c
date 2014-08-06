@@ -56,8 +56,8 @@ void lang_init(const unsigned char *builtin, unsigned char **dest, int count)
     }
 }
 
-int lang_load(const char *filename, const unsigned char *builtin, 
-              unsigned char **dest, unsigned char *buffer, 
+int lang_load(const char *filename, const unsigned char *builtin,
+              unsigned char **dest, unsigned char *buffer,
               unsigned int user_num, int max_lang_size,
               unsigned int max_id)
 {
@@ -132,7 +132,7 @@ int lang_english_to_id(const char *english)
 {
     int i;
     unsigned char *ptr = (unsigned char *) core_language_builtin;
-    
+
     for (i = 0; i < LANG_LAST_INDEX_IN_ARRAY; i++) {
         if (!strcmp(ptr, english))
             return i;

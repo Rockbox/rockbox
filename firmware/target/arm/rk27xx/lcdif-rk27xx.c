@@ -184,7 +184,7 @@ static void dwdma_start(uint8_t ch, struct llp_t *llp, uint8_t handshake)
                       (3<<14) |
                       (1<<27) |
                       (1<<28) ;
-              
+
    DWDMA_CTL_H(ch) = 1;
    DWDMA_CFG_L(ch) = (7<<5);
    DWDMA_CFG_H(ch) = (handshake<<11)|(1<<2);

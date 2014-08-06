@@ -214,7 +214,7 @@ bool dbg_hw_info_power(void)
         bool en;
         int linreg;
         char buf[16];
-        
+
         lcd_putsf(0, line++, "name  value bo linreg");
 #define DISP_REGULATOR(name) \
         imx233_power_get_regulator(REGULATOR_##name, &trg, &bo); \
@@ -250,7 +250,7 @@ bool dbg_hw_info_power(void)
 bool dbg_hw_info_lradc(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
         int button = my_get_action(HZ / 25);
@@ -667,7 +667,7 @@ bool dbg_hw_info_ocotp(void)
         }
         if(i < top_user)
             top_user = i - 1;
-        
+
         lcd_update();
         yield();
     }
@@ -916,7 +916,7 @@ bool dbg_hw_info_timrot(void)
                 case BV_TIMROT_TIMCTRLn_SELECT__8KHZ_XTAL: src_freq = 8000; break;
                 case BV_TIMROT_TIMCTRLn_SELECT__4KHZ_XTAL: src_freq = 4000; break;
                 case BV_TIMROT_TIMCTRLn_SELECT__1KHZ_XTAL: src_freq = 1000; break;
-                case BV_TIMROT_TIMCTRLn_SELECT__TICK_ALWAYS: 
+                case BV_TIMROT_TIMCTRLn_SELECT__TICK_ALWAYS:
                 default: src_freq = 24000000 / (1 << info.prescale); break;
             }
             int count = info.reload ? info.fixed_count + 1 : info.run_count;

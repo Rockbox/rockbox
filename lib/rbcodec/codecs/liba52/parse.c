@@ -61,7 +61,7 @@ a52_state_t * a52_init (uint32_t mm_accel)
     #if defined(CPU_COLDFIRE)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_ROUND | EMAC_SATURATE);
     #endif
-    /* 
+    /*
       this needs to come back if we ever want two decoder instances
       simultenously. NOTE, you also need to remove comments in a52_free.
     state = (a52_state_t *) malloc (sizeof (a52_state_t));
@@ -144,7 +144,7 @@ int a52_frame (a52_state_t * state, uint8_t * buf, int * flags,
 {
     static level_t clev[4] = { LEVEL (LEVEL_3DB), LEVEL (LEVEL_45DB),
                                LEVEL (LEVEL_6DB), LEVEL (LEVEL_45DB) };
-    static level_t slev[4] = { LEVEL (LEVEL_3DB), LEVEL (LEVEL_6DB), 
+    static level_t slev[4] = { LEVEL (LEVEL_3DB), LEVEL (LEVEL_6DB),
                                0,                 LEVEL (LEVEL_6DB) };
     int chaninfo;
     int acmod;
@@ -275,7 +275,7 @@ static int parse_exponents (a52_state_t * state, int expstr, int ngrps,
         case EXP_D15:
             *(dest++) = exponent;
         }
-    }   
+    }
 
     return 0;
 }
@@ -323,7 +323,7 @@ static inline int16_t dither_gen (a52_state_t * state)
     int16_t nstate;
 
     nstate = dither_lut[state->lfsr_state >> 8] ^ (state->lfsr_state << 8);
-        
+
     state->lfsr_state = (uint16_t) nstate;
 
     return (3 * nstate) >> 2;
@@ -694,7 +694,7 @@ int a52_block (a52_state_t * state)
         cplexpstr = bitstream_get (state, 2);
     for (i = 0; i < nfchans; i++)
         chexpstr[i] = bitstream_get (state, 2);
-    if (state->lfeon) 
+    if (state->lfeon)
         lfeexpstr = bitstream_get (state, 1);
 
     for (i = 0; i < nfchans; i++)
@@ -911,7 +911,7 @@ int a52_block (a52_state_t * state)
             if (coeff[i]) {
                 if (blksw[i])
                     a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i);
-                else 
+                else
                     a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i);
             } else {
                 int j;
@@ -938,7 +938,7 @@ int a52_block (a52_state_t * state)
         if (blksw[0])
             for (i = 0; i < nfchans; i++)
                 a52_imdct_256 (samples + 256 * i, samples + 1536 + 256 * i);
-        else 
+        else
             for (i = 0; i < nfchans; i++)
                 a52_imdct_512 (samples + 256 * i, samples + 1536 + 256 * i);
     }

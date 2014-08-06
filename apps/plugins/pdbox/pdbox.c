@@ -243,7 +243,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* If having an error creating threads, bail out. */
     if(core_thread_id == 0 || gui_thread_id == 0)
         return PLUGIN_ERROR;
-    
+
     /* Make backlight remain on -- making music requires attention. */
     backlight_ignore_timeout();
 
@@ -256,7 +256,7 @@ enum plugin_status plugin_start(const void* parameter)
         /* Sleep to the next time slice. */
         rb->sleep(1);
     }
-    
+
     /* Restore backlight. */
     backlight_use_settings();
 
@@ -280,4 +280,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-

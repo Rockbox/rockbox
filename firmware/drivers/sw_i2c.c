@@ -26,7 +26,7 @@
 
 /**
  * I2C-functions are copied and ported from fmradio.c.
- * later fixed, adapted and moved to a seperate file so they can be re-used 
+ * later fixed, adapted and moved to a seperate file so they can be re-used
  * by the rtc-ds1339c and later by the m:robe-100 code by Robert Kukla
  */
 
@@ -83,7 +83,7 @@ void sw_i2c_init(void)
     or_l(0x00001000, &GPIO_FUNCTION);
     or_l(0x00002000, &GPIO1_FUNCTION);
 #endif
-  
+
     SDA_HI;
     SCL_HI;
     SDA_OUT_LO;
@@ -125,7 +125,7 @@ static void sw_i2c_ack(void)
 {
     SDA_LO;
     DELAY;
-    
+
     SCL_HI;
     DELAY;
     SCL_LO;
@@ -138,7 +138,7 @@ static void sw_i2c_nack(void)
 {
     SDA_HI;          /* redundant */
     DELAY;
-    
+
     SCL_HI;
     DELAY;
     SCL_LO;
@@ -159,11 +159,11 @@ static bool sw_i2c_getack(void)
 
 /*    while (SDA && count--) */
 /*        DELAY; */
-    
+
     if (SDA)
         /* ack failed */
         ret = false;
-    
+
     SCL_LO;
 
     return ret;
@@ -200,9 +200,9 @@ static unsigned char sw_i2c_inb(void)
     unsigned char byte = 0;
 
     SDA_HI;   /* sets to input */
-    
+
     /* clock in each bit, MSB first */
-    for ( i=0x80; i; i>>=1 ) 
+    for ( i=0x80; i; i>>=1 )
     {
         DELAY;
         do {
@@ -232,14 +232,14 @@ int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf,
 
 #ifdef MROBE_100 /* does not use register addressing */
     (void) location;
-#else    
+#else
     sw_i2c_outb(location);
     if (!sw_i2c_getack())
     {
         sw_i2c_stop();
         return -2;
     }
-#endif  
+#endif
 
     for (i=0; i<count; i++)
     {
@@ -252,7 +252,7 @@ int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf,
     }
 
     sw_i2c_stop();
-    
+
     return 0;
 }
 
@@ -262,7 +262,7 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
 
 #ifdef MROBE_100 /* does not use register addressing */
     (void) location;
-#else    
+#else
     sw_i2c_start();
     sw_i2c_outb((chip & 0xfe) | SW_I2C_WRITE);
     if (!sw_i2c_getack())
@@ -277,7 +277,7 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
         sw_i2c_stop();
         return -2;
     }
-#endif  
+#endif
 
     sw_i2c_start();
     sw_i2c_outb((chip & 0xfe) | SW_I2C_READ);
@@ -286,7 +286,7 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
         sw_i2c_stop();
         return -3;
     }
-    
+
     for (i=0; i<count-1; i++)
     {
       buf[i] = sw_i2c_inb();
@@ -296,8 +296,8 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
     /* 1byte min */
     buf[i] = sw_i2c_inb();
     sw_i2c_nack();
-        
+
     sw_i2c_stop();
-    
+
     return 0;
 }

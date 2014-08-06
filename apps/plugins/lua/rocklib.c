@@ -38,7 +38,7 @@
  * from Lua in its stack in direct order (the first argument is pushed first). To return values to Lua,
  * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
  * and returns the number of results. Any other value in the stack below the results will be properly
- * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
+ * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results.
  *
  * When porting new functions, don't forget to check rocklib_aux.pl whether it automatically creates
  * wrappers for the function and if so, add the function names to @forbidden_functions. This is to
@@ -609,8 +609,8 @@ RB_WRAP(playlist_insert_track)
     int position, queue, sync;
 
     /* for now don't take a playlist_info pointer, but just pass NULL to use
-	   the current playlist. If this changes later, all the other
-	   parameters can be shifted back. */
+           the current playlist. If this changes later, all the other
+           parameters can be shifted back. */
     filename = luaL_checkstring(L, 1); /* only required parameter */
     position = luaL_optint(L, 2, PLAYLIST_INSERT);
     queue = lua_toboolean(L, 3); /* default to false */

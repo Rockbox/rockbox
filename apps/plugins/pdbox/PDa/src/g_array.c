@@ -13,7 +13,7 @@ int printf(const char *fmt, ...);
 #else /* ROCKBOX */
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>  	/* for read/write to files */
+#include <stdio.h>      /* for read/write to files */
 #include "m_pd.h"
 #include "g_canvas.h"
 #include <math.h>
@@ -31,11 +31,11 @@ static t_symbol *sharptodollar(t_symbol *s)
 {
     if (*s->s_name == '#')
     {
-	char buf[MAXPDSTRING];
-	strncpy(buf, s->s_name, MAXPDSTRING);
-	buf[MAXPDSTRING-1] = 0;
-	buf[0] = '$';
-	return (gensym(buf));
+        char buf[MAXPDSTRING];
+        strncpy(buf, s->s_name, MAXPDSTRING);
+        buf[MAXPDSTRING-1] = 0;
+        buf[0] = '$';
+        return (gensym(buf));
     }
     else return (s);
 }
@@ -58,10 +58,10 @@ t_array *array_new(t_symbol *templatesym, t_gpointer *parent)
     x->a_n = 1;
     x->a_elemsize = sizeof(t_word) * template->t_n;
     x->a_vec = (char *)getbytes(x->a_elemsize);
-    	/* note here we blithely copy a gpointer instead of "setting" a
-	new one; this gpointer isn't accounted for and needn't be since
-	we'll be deleted before the thing pointed to gets deleted anyway;
-	see array_free. */
+        /* note here we blithely copy a gpointer instead of "setting" a
+        new one; this gpointer isn't accounted for and needn't be since
+        we'll be deleted before the thing pointed to gets deleted anyway;
+        see array_free. */
     x->a_gp = *parent;
     x->a_stub = gstub_new(0, x);
     word_init((t_word *)(x->a_vec), template, parent);
@@ -76,22 +76,22 @@ void array_resize(t_array *x, t_template *template, int n)
 #endif
 
     if (n < 1)
-    	n = 1;
+        n = 1;
     oldn = x->a_n;
     elemsize = sizeof(t_word) * template->t_n;
-    
+
     x->a_vec = (char *)resizebytes(x->a_vec, oldn * elemsize,
-    	n * elemsize);
+        n * elemsize);
     x->a_n = n;
     if (n > oldn)
     {
-    	char *cp = x->a_vec + elemsize * oldn;
-    	int i = n - oldn;
-    	for (; i--; cp += elemsize)
-    	{
-    	    t_word *wp = (t_word *)cp;
-    	    word_init(wp, template, &x->a_gp);
-    	}
+        char *cp = x->a_vec + elemsize * oldn;
+        int i = n - oldn;
+        for (; i--; cp += elemsize)
+        {
+            t_word *wp = (t_word *)cp;
+            word_init(wp, template, &x->a_gp);
+        }
     }
 }
 
@@ -101,13 +101,13 @@ void array_free(t_array *x)
 {
     int i;
     t_template *scalartemplate = template_findbyname(x->a_templatesym);
-	/* we don't unset our gpointer here since it was never "set." */
+        /* we don't unset our gpointer here since it was never "set." */
     /* gpointer_unset(&x->a_gp); */
     gstub_cutoff(x->a_stub);
     for (i = 0; i < x->a_n; i++)
     {
-    	t_word *wp = (t_word *)(x->a_vec + x->a_elemsize * i);
-	word_free(wp, scalartemplate);
+        t_word *wp = (t_word *)(x->a_vec + x->a_elemsize * i);
+        word_free(wp, scalartemplate);
     }
     freebytes(x->a_vec, x->a_elemsize * x->a_n);
     freebytes(x, sizeof *x);
@@ -122,13 +122,13 @@ struct _garray
 {
     t_gobj x_gobj;
     t_glist *x_glist;
-    t_array x_array;	    /* actual array; note only 4 fields used as below */
+    t_array x_array;        /* actual array; note only 4 fields used as below */
     t_symbol *x_name;
     t_symbol *x_realname;   /* name with "$" expanded */
-    t_float x_firstx;	    /* X value of first item */
-    t_float x_xinc; 	    /* X increment */
-    char x_usedindsp;	    /* true if some DSP routine is using this */
-    char x_saveit;   	    /* true if we should save this with parent */
+    t_float x_firstx;       /* X value of first item */
+    t_float x_xinc;         /* X increment */
+    char x_usedindsp;       /* true if some DSP routine is using this */
+    char x_saveit;          /* true if we should save this with parent */
 };
 
     /* macros to get into the "array" structure */
@@ -148,60 +148,60 @@ t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *templatesym,
     char *str;
     if (s == &s_)
     {
-    	char buf[40];
+        char buf[40];
 #ifdef ROCKBOX
         snprintf(buf, sizeof(buf), "array%d", ++gcount);
 #else
-    	sprintf(buf, "array%d", ++gcount);
+        sprintf(buf, "array%d", ++gcount);
 #endif
-    	s = gensym(buf);    	
-    	templatesym = &s_float;
-    	n = 100;
+        s = gensym(buf);
+        templatesym = &s_float;
+        n = 100;
     }
     else if (!strncmp((str = s->s_name), "array", 5)
-    	&& (zz = atoi(str + 5)) > gcount) gcount = zz;
+        && (zz = atoi(str + 5)) > gcount) gcount = zz;
     template = template_findbyname(templatesym);
     if (!template)
     {
-    	error("array: couldn't find template %s", templatesym->s_name);
-    	return (0);
+        error("array: couldn't find template %s", templatesym->s_name);
+        return (0);
     }
     nwords =  template->t_n;
     for (i = 0; i < nwords; i++)
     {
-    	    /* we can't have array or list elements yet because what scalar
-	    can act as their "parent"??? */
-    	if (template->t_vec[i].ds_type == DT_ARRAY
-	    || template->t_vec[i].ds_type == DT_LIST)
-	{
-	    error("array: template %s can't have sublists or arrays",
-	    	templatesym->s_name);
-    	    return (0);
-    	}
+            /* we can't have array or list elements yet because what scalar
+            can act as their "parent"??? */
+        if (template->t_vec[i].ds_type == DT_ARRAY
+            || template->t_vec[i].ds_type == DT_LIST)
+        {
+            error("array: template %s can't have sublists or arrays",
+                templatesym->s_name);
+            return (0);
+        }
     }
     x = (t_garray *)pd_new(garray_class);
 
-    if (n <= 0) n = 100;  
+    if (n <= 0) n = 100;
     x->x_n = n;
     x->x_elemsize = nwords * sizeof(t_word);
     x->x_vec = getbytes(x->x_n * x->x_elemsize);
     memset(x->x_vec, 0, x->x_n * x->x_elemsize);
-    	/* LATER should check that malloc */
+        /* LATER should check that malloc */
     x->x_name = s;
     x->x_realname = canvas_realizedollar(gl, s);
     pd_bind(&x->x_gobj.g_pd, x->x_realname);
     x->x_templatesym = templatesym;
     x->x_firstx = 0;
-    x->x_xinc = 1;	    	/* LATER make methods to set this... */
+    x->x_xinc = 1;              /* LATER make methods to set this... */
     glist_add(gl, &x->x_gobj);
     x->x_glist = gl;
     x->x_usedindsp = 0;
     x->x_saveit = (saveit != 0);
     if((x2 = pd_findbyclass(gensym("#A"), garray_class)))
-    	pd_unbind(x2, gensym("#A"));
+        pd_unbind(x2, gensym("#A"));
 
     pd_bind(&x->x_gobj.g_pd, gensym("#A"));
-    
+
     return (x);
 }
 
@@ -214,7 +214,7 @@ void canvas_menuarray(t_glist *canvas)
     t_glist *x = (t_glist *)canvas;
     char cmdbuf[200];
     sprintf(cmdbuf, "pdtk_array_dialog %%s array%d 100 1 1\n",
-	++gcount);
+        ++gcount);
     gfxstub_new(&x->gl_pd, x, cmdbuf);
 #endif /* ROCKBOX */
 }
@@ -227,19 +227,19 @@ void garray_properties(t_garray *x)
 #else /* ROCKBOX */
     char cmdbuf[200];
     gfxstub_deleteforkey(x);
-    	/* create dialog window.  LATER fix this to escape '$'
-	properly; right now we just detect a leading '$' and escape
-	it.  There should be a systematic way of doing this. */
+        /* create dialog window.  LATER fix this to escape '$'
+        properly; right now we just detect a leading '$' and escape
+        it.  There should be a systematic way of doing this. */
     if (x->x_name->s_name[0] == '$')
-    	sprintf(cmdbuf, "pdtk_array_dialog %%s \\%s %d %d 0\n",
-	    x->x_name->s_name, x->x_n, x->x_saveit);
+        sprintf(cmdbuf, "pdtk_array_dialog %%s \\%s %d %d 0\n",
+            x->x_name->s_name, x->x_n, x->x_saveit);
     else sprintf(cmdbuf, "pdtk_array_dialog %%s %s %d %d 0\n",
-	x->x_name->s_name, x->x_n, x->x_saveit);
+        x->x_name->s_name, x->x_n, x->x_saveit);
     gfxstub_new(&x->x_gobj.g_pd, x, cmdbuf);
 #endif /* ROCKBOX */
 }
 
-    /* this is called back from the dialog window to create a garray. 
+    /* this is called back from the dialog window to create a garray.
     The otherflag requests that we find an existing graph to put it in. */
 void glist_arraydialog(t_glist *parent, t_symbol *name, t_floatarg size,
     t_floatarg saveit, t_floatarg otherflag)
@@ -247,10 +247,10 @@ void glist_arraydialog(t_glist *parent, t_symbol *name, t_floatarg size,
     t_glist *gl;
     /* t_garray *a; unused */
     if (size < 1)
-    	size = 1;
+        size = 1;
     if (otherflag == 0 || (!(gl = glist_findgraph(parent))))
-    	gl = glist_addglist(parent, &s_, 0, 1,
-	    (size > 1 ? size-1 : size), -1, 0, 0, 0, 0);
+        gl = glist_addglist(parent, &s_, 0, 1,
+            (size > 1 ? size-1 : size), -1, 0, 0, 0, 0);
     /* a = */ graph_array(gl, sharptodollar(name), &s_float, size, saveit);
 }
 
@@ -260,26 +260,26 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize,
 {
     if (deleteit != 0)
     {
-    	glist_delete(x->x_glist, &x->x_gobj);
+        glist_delete(x->x_glist, &x->x_gobj);
     }
     else
     {
-    	int size;
-	t_symbol *argname = sharptodollar(name);
-	if (argname != x->x_name)
-	{
-	    x->x_name = argname;
-    	    pd_unbind(&x->x_gobj.g_pd, x->x_realname);
-	    x->x_realname = canvas_realizedollar(x->x_glist, argname);
-    	    pd_bind(&x->x_gobj.g_pd, x->x_realname);
-	}
-	size = fsize;
-	if (size < 1)
-    	    size = 1;
-	if (size != x->x_n)
-    	    garray_resize(x, size);
-	garray_setsaveit(x, (saveit != 0));
-	garray_redraw(x);
+        int size;
+        t_symbol *argname = sharptodollar(name);
+        if (argname != x->x_name)
+        {
+            x->x_name = argname;
+            pd_unbind(&x->x_gobj.g_pd, x->x_realname);
+            x->x_realname = canvas_realizedollar(x->x_glist, argname);
+            pd_bind(&x->x_gobj.g_pd, x->x_realname);
+        }
+        size = fsize;
+        if (size < 1)
+            size = 1;
+        if (size != x->x_n)
+            garray_resize(x, size);
+        garray_setsaveit(x, (saveit != 0));
+        garray_redraw(x);
     }
 }
 
@@ -290,9 +290,9 @@ static void garray_free(t_garray *x)
     gfxstub_deleteforkey(x);
 #endif
     pd_unbind(&x->x_gobj.g_pd, x->x_realname);
-    	/* LATER find a way to get #A unbound earlier (at end of load?) */
+        /* LATER find a way to get #A unbound earlier (at end of load?) */
     while((x2 = pd_findbyclass(gensym("#A"), garray_class)))
-    	pd_unbind(x2, gensym("#A"));
+        pd_unbind(x2, gensym("#A"));
     freebytes(x->x_vec, x->x_n * x->x_elemsize);
 }
 
@@ -306,19 +306,19 @@ void array_getcoordinate(t_glist *glist,
 {
     float xval, yval, ypix, wpix;
     if (xonset >= 0)
-    	xval = fixtof(*(t_sample *)(elem + xonset));
+        xval = fixtof(*(t_sample *)(elem + xonset));
     else xval = indx * xinc;
     if (yonset >= 0)
-    	yval = fixtof(*(t_sample *)(elem + yonset));
+        yval = fixtof(*(t_sample *)(elem + yonset));
     else yval = 0;
     ypix = glist_ytopixels(glist, basey + yval);
     if (wonset >= 0)
     {
-    	    /* found "w" field which controls linewidth. */
-    	float wval = *(float *)(elem + wonset);
-	wpix = glist_ytopixels(glist, basey + yval + wval) - ypix;
-	if (wpix < 0)
-	    wpix = -wpix;
+            /* found "w" field which controls linewidth. */
+        float wval = *(float *)(elem + wonset);
+        wpix = glist_ytopixels(glist, basey + yval + wval) - ypix;
+        if (wpix < 0)
+            wpix = -wpix;
     }
     else wpix = 1;
     *xp = glist_xtopixels(glist, basex + xval);
@@ -357,71 +357,71 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
     array_motion_ycumulative += dy * array_motion_yperpix;
     if (*array_motion_xfield->s_name)
     {
-    	    /* it's an x, y plot; can drag many points at once */
-    	int i;
-	char *charword = (char *)array_motion_wp;
-	for (i = 0; i < array_motion_npoints; i++)
-	{
-	    t_word *thisword = (t_word *)(charword + i * array_motion_elemsize);
-	    if (*array_motion_xfield->s_name)
-	    {
-	    	float xwas = template_getfloat(array_motion_template,
-    		    array_motion_xfield, thisword, 1);
-		template_setfloat(array_motion_template,
-    		    array_motion_xfield, thisword, xwas + dx, 1);
-	    }
-	    if (*array_motion_yfield->s_name)
-	    {
-	    	float ywas = template_getfloat(array_motion_template,
-    		    array_motion_yfield, thisword, 1);
-		if (array_motion_fatten)
-		{
-		    if (i == 0)
-		    {
-    			float newy = ywas + dy * array_motion_yperpix;
-			if (newy < 0)
-    			    newy = 0;
-			template_setfloat(array_motion_template,
-    			    array_motion_yfield, thisword, newy, 1);
-		    }
-		}
-		else
-		{
-		    template_setfloat(array_motion_template,
-    		    	array_motion_yfield, thisword,
-			    ywas + dy * array_motion_yperpix, 1);
-	    	}
-	    }
-	}
+            /* it's an x, y plot; can drag many points at once */
+        int i;
+        char *charword = (char *)array_motion_wp;
+        for (i = 0; i < array_motion_npoints; i++)
+        {
+            t_word *thisword = (t_word *)(charword + i * array_motion_elemsize);
+            if (*array_motion_xfield->s_name)
+            {
+                float xwas = template_getfloat(array_motion_template,
+                    array_motion_xfield, thisword, 1);
+                template_setfloat(array_motion_template,
+                    array_motion_xfield, thisword, xwas + dx, 1);
+            }
+            if (*array_motion_yfield->s_name)
+            {
+                float ywas = template_getfloat(array_motion_template,
+                    array_motion_yfield, thisword, 1);
+                if (array_motion_fatten)
+                {
+                    if (i == 0)
+                    {
+                        float newy = ywas + dy * array_motion_yperpix;
+                        if (newy < 0)
+                            newy = 0;
+                        template_setfloat(array_motion_template,
+                            array_motion_yfield, thisword, newy, 1);
+                    }
+                }
+                else
+                {
+                    template_setfloat(array_motion_template,
+                        array_motion_yfield, thisword,
+                            ywas + dy * array_motion_yperpix, 1);
+                }
+            }
+        }
     }
     else
     {
-    	    /* a y-only plot. */
-    	int thisx = array_motion_initx +
-	    array_motion_xcumulative, x2;
-	int increment, i, nchange;
-	char *charword = (char *)array_motion_wp;
-	float newy = array_motion_ycumulative,
-	    oldy = template_getfloat(
-	    array_motion_template, array_motion_yfield,
-    	    (t_word *)(charword + array_motion_elemsize * array_motion_lastx), 1);
-	float ydiff = newy - oldy;
-	if (thisx < 0) thisx = 0;
-	else if (thisx >= array_motion_npoints)
-	    thisx = array_motion_npoints - 1;
-	increment = (thisx > array_motion_lastx ? -1 : 1);
-	nchange = 1 + increment * (array_motion_lastx - thisx);
+            /* a y-only plot. */
+        int thisx = array_motion_initx +
+            array_motion_xcumulative, x2;
+        int increment, i, nchange;
+        char *charword = (char *)array_motion_wp;
+        float newy = array_motion_ycumulative,
+            oldy = template_getfloat(
+            array_motion_template, array_motion_yfield,
+            (t_word *)(charword + array_motion_elemsize * array_motion_lastx), 1);
+        float ydiff = newy - oldy;
+        if (thisx < 0) thisx = 0;
+        else if (thisx >= array_motion_npoints)
+            thisx = array_motion_npoints - 1;
+        increment = (thisx > array_motion_lastx ? -1 : 1);
+        nchange = 1 + increment * (array_motion_lastx - thisx);
 
-    	for (i = 0, x2 = thisx; i < nchange; i++, x2 += increment)
-	{
-	    template_setfloat(array_motion_template,
-    		array_motion_yfield,
-	    	    (t_word *)(charword + array_motion_elemsize * x2),
-	    		newy, 1);
-	    if (nchange > 1)
-	    	newy -= ydiff * (1./(nchange - 1));
-    	 }
-	 array_motion_lastx = thisx;
+        for (i = 0, x2 = thisx; i < nchange; i++, x2 += increment)
+        {
+            template_setfloat(array_motion_template,
+                array_motion_yfield,
+                    (t_word *)(charword + array_motion_elemsize * x2),
+                        newy, 1);
+            if (nchange > 1)
+                newy -= ydiff * (1./(nchange - 1));
+         }
+         array_motion_lastx = thisx;
     }
     glist_redrawitem(array_motion_glist, array_motion_gobj);
 }
@@ -442,153 +442,153 @@ int array_doclick(t_array *array, t_glist *glist, t_gobj *gobj,
 #endif
 
     if (!array_getfields(elemtemplatesym, &elemtemplatecanvas,
-    	&elemtemplate, &elemsize, &xonset, &yonset, &wonset))
+        &elemtemplate, &elemsize, &xonset, &yonset, &wonset))
     {
-    	float best = 100;
-	int incr;
-	    /* if it has more than 2000 points, just check 300 of them. */
-	if (array->a_n < 2000)
-	    incr = 1;
-	else incr = array->a_n / 300;
-	for (i = 0; i < array->a_n; i += incr)
-    	{
-	    float pxpix, pypix, pwpix, dx, dy;
-    	    array_getcoordinate(glist, (char *)(array->a_vec) + i * elemsize,
-    		xonset, yonset, wonset, i, xloc, yloc, xinc,
-    		&pxpix, &pypix, &pwpix);
-	    if (pwpix < 4)
-	    	pwpix = 4;
-	    dx = pxpix - xpix;
-	    if (dx < 0) dx = -dx;
-	    if (dx > 8)
-	    	continue;   
-	    dy = pypix - ypix;
-	    if (dy < 0) dy = -dy;
-	    if (dx + dy < best)
-	    	best = dx + dy;
-	    if (wonset >= 0)
-	    {
-		dy = (pypix + pwpix) - ypix;
-		if (dy < 0) dy = -dy;
-		if (dx + dy < best)
-	    	    best = dx + dy;
-		dy = (pypix - pwpix) - ypix;
-		if (dy < 0) dy = -dy;
-		if (dx + dy < best)
-	    	    best = dx + dy;
-	    }
-	}
-	if (best > 8)
-	    return (0);
-	best += 0.001;  /* add truncation error margin */
-	for (i = 0; i < array->a_n; i += incr)
-    	{
-	    float pxpix, pypix, pwpix, dx, dy, dy2, dy3;
-    	    array_getcoordinate(glist, (char *)(array->a_vec) + i * elemsize,
-    		xonset, yonset, wonset, i, xloc, yloc, xinc,
-    		&pxpix, &pypix, &pwpix);
-	    if (pwpix < 4)
-	    	pwpix = 4;
-	    dx = pxpix - xpix;
-	    if (dx < 0) dx = -dx;
-	    dy = pypix - ypix;
-	    if (dy < 0) dy = -dy;
-	    if (wonset >= 0)
-	    {
-		dy2 = (pypix + pwpix) - ypix;
-		if (dy2 < 0) dy2 = -dy2;
-		dy3 = (pypix - pwpix) - ypix;
-		if (dy3 < 0) dy3 = -dy3;
-		if (yonset <= 0)
-		    dy = 100;
-	    }
-	    else dy2 = dy3 = 100;
-	    if (dx + dy <= best || dx + dy2 <= best || dx + dy3 <= best)
-	    {
-	    	if (dy < dy2 && dy < dy3)
-		    array_motion_fatten = 0;
-    		else if (dy2 < dy3)
-		    array_motion_fatten = -1;
-		else array_motion_fatten = 1;
-		if (doit)
-		{
-		    char *elem = (char *)array->a_vec;
-    	    	    array_motion_elemsize = elemsize;
-		    array_motion_glist = glist;
-		    array_motion_gobj = gobj;
-		    array_motion_template = elemtemplate;
-		    array_motion_xperpix = glist_dpixtodx(glist, 1);
-		    array_motion_yperpix = glist_dpixtody(glist, 1);
-		    if (alt && xpix < pxpix) /* delete a point */
-		    {
-		    	if (array->a_n <= 1)
-			    return (0);
-		    	memmove((char *)(array->a_vec) + elemsize * i, 
-			    (char *)(array->a_vec) + elemsize * (i+1),
-			    	(array->a_n - 1 - i) * elemsize);
-			array_resize(array, elemtemplate, array->a_n - 1);
-			glist_redrawitem(array_motion_glist, array_motion_gobj);
-			return (0);
-		    }
-		    else if (alt)
-		    {
-			/* add a point (after the clicked-on one) */
-			array_resize(array, elemtemplate, array->a_n + 1);
-		    	elem = (char *)array->a_vec;
-			memmove(elem + elemsize * (i+1), 
-			    elem + elemsize * i,
-			    	(array->a_n - i - 1) * elemsize);
-			i++;
-		    }
-		    if (xonset >= 0)
-		    {
-		    	array_motion_xfield = gensym("x");
-			array_motion_xcumulative = 
-			    *(float *)((elem + elemsize * i) + xonset);
-		    	array_motion_wp = (t_word *)(elem + i * elemsize);
-			array_motion_npoints = array->a_n - i;
-		    }
-		    else
-		    {
-		    	array_motion_xfield = &s_;
-			array_motion_xcumulative = 0;
-			array_motion_wp = (t_word *)elem;
-			array_motion_npoints = array->a_n;
+        float best = 100;
+        int incr;
+            /* if it has more than 2000 points, just check 300 of them. */
+        if (array->a_n < 2000)
+            incr = 1;
+        else incr = array->a_n / 300;
+        for (i = 0; i < array->a_n; i += incr)
+        {
+            float pxpix, pypix, pwpix, dx, dy;
+            array_getcoordinate(glist, (char *)(array->a_vec) + i * elemsize,
+                xonset, yonset, wonset, i, xloc, yloc, xinc,
+                &pxpix, &pypix, &pwpix);
+            if (pwpix < 4)
+                pwpix = 4;
+            dx = pxpix - xpix;
+            if (dx < 0) dx = -dx;
+            if (dx > 8)
+                continue;
+            dy = pypix - ypix;
+            if (dy < 0) dy = -dy;
+            if (dx + dy < best)
+                best = dx + dy;
+            if (wonset >= 0)
+            {
+                dy = (pypix + pwpix) - ypix;
+                if (dy < 0) dy = -dy;
+                if (dx + dy < best)
+                    best = dx + dy;
+                dy = (pypix - pwpix) - ypix;
+                if (dy < 0) dy = -dy;
+                if (dx + dy < best)
+                    best = dx + dy;
+            }
+        }
+        if (best > 8)
+            return (0);
+        best += 0.001;  /* add truncation error margin */
+        for (i = 0; i < array->a_n; i += incr)
+        {
+            float pxpix, pypix, pwpix, dx, dy, dy2, dy3;
+            array_getcoordinate(glist, (char *)(array->a_vec) + i * elemsize,
+                xonset, yonset, wonset, i, xloc, yloc, xinc,
+                &pxpix, &pypix, &pwpix);
+            if (pwpix < 4)
+                pwpix = 4;
+            dx = pxpix - xpix;
+            if (dx < 0) dx = -dx;
+            dy = pypix - ypix;
+            if (dy < 0) dy = -dy;
+            if (wonset >= 0)
+            {
+                dy2 = (pypix + pwpix) - ypix;
+                if (dy2 < 0) dy2 = -dy2;
+                dy3 = (pypix - pwpix) - ypix;
+                if (dy3 < 0) dy3 = -dy3;
+                if (yonset <= 0)
+                    dy = 100;
+            }
+            else dy2 = dy3 = 100;
+            if (dx + dy <= best || dx + dy2 <= best || dx + dy3 <= best)
+            {
+                if (dy < dy2 && dy < dy3)
+                    array_motion_fatten = 0;
+                else if (dy2 < dy3)
+                    array_motion_fatten = -1;
+                else array_motion_fatten = 1;
+                if (doit)
+                {
+                    char *elem = (char *)array->a_vec;
+                    array_motion_elemsize = elemsize;
+                    array_motion_glist = glist;
+                    array_motion_gobj = gobj;
+                    array_motion_template = elemtemplate;
+                    array_motion_xperpix = glist_dpixtodx(glist, 1);
+                    array_motion_yperpix = glist_dpixtody(glist, 1);
+                    if (alt && xpix < pxpix) /* delete a point */
+                    {
+                        if (array->a_n <= 1)
+                            return (0);
+                        memmove((char *)(array->a_vec) + elemsize * i,
+                            (char *)(array->a_vec) + elemsize * (i+1),
+                                (array->a_n - 1 - i) * elemsize);
+                        array_resize(array, elemtemplate, array->a_n - 1);
+                        glist_redrawitem(array_motion_glist, array_motion_gobj);
+                        return (0);
+                    }
+                    else if (alt)
+                    {
+                        /* add a point (after the clicked-on one) */
+                        array_resize(array, elemtemplate, array->a_n + 1);
+                        elem = (char *)array->a_vec;
+                        memmove(elem + elemsize * (i+1),
+                            elem + elemsize * i,
+                                (array->a_n - i - 1) * elemsize);
+                        i++;
+                    }
+                    if (xonset >= 0)
+                    {
+                        array_motion_xfield = gensym("x");
+                        array_motion_xcumulative =
+                            *(float *)((elem + elemsize * i) + xonset);
+                        array_motion_wp = (t_word *)(elem + i * elemsize);
+                        array_motion_npoints = array->a_n - i;
+                    }
+                    else
+                    {
+                        array_motion_xfield = &s_;
+                        array_motion_xcumulative = 0;
+                        array_motion_wp = (t_word *)elem;
+                        array_motion_npoints = array->a_n;
 
-			array_motion_initx = i;
-			array_motion_lastx = i;
-			array_motion_xperpix *= (xinc == 0 ? 1 : 1./xinc);
-		    }
-		    if (array_motion_fatten)
-		    {
-		    	array_motion_yfield = gensym("w");
-			array_motion_ycumulative = 
-			    *(float *)((elem + elemsize * i) + wonset);
-			array_motion_yperpix *= array_motion_fatten;
-		    }
-		    else if (yonset >= 0)
-		    {
-		    	array_motion_yfield = gensym("y");
-			array_motion_ycumulative = 
-			    *(float *)((elem + elemsize * i) + yonset);
-		    }
-		    else
-		    {
-		    	array_motion_yfield = &s_;
-			array_motion_ycumulative = 0;
-		    }
-		    glist_grab(glist, 0, array_motion, 0, xpix, ypix);
-		}
-		if (alt)
-		{
-		    if (xpix < pxpix)
-		    	return (CURSOR_EDITMODE_DISCONNECT);
-		    else return (CURSOR_RUNMODE_ADDPOINT);
-		}
-    		else return (array_motion_fatten ?
-		    CURSOR_RUNMODE_THICKEN : CURSOR_RUNMODE_CLICKME);
-    	    }
-    	}   
+                        array_motion_initx = i;
+                        array_motion_lastx = i;
+                        array_motion_xperpix *= (xinc == 0 ? 1 : 1./xinc);
+                    }
+                    if (array_motion_fatten)
+                    {
+                        array_motion_yfield = gensym("w");
+                        array_motion_ycumulative =
+                            *(float *)((elem + elemsize * i) + wonset);
+                        array_motion_yperpix *= array_motion_fatten;
+                    }
+                    else if (yonset >= 0)
+                    {
+                        array_motion_yfield = gensym("y");
+                        array_motion_ycumulative =
+                            *(float *)((elem + elemsize * i) + yonset);
+                    }
+                    else
+                    {
+                        array_motion_yfield = &s_;
+                        array_motion_ycumulative = 0;
+                    }
+                    glist_grab(glist, 0, array_motion, 0, xpix, ypix);
+                }
+                if (alt)
+                {
+                    if (xpix < pxpix)
+                        return (CURSOR_EDITMODE_DISCONNECT);
+                    else return (CURSOR_RUNMODE_ADDPOINT);
+                }
+                else return (array_motion_fatten ?
+                    CURSOR_RUNMODE_THICKEN : CURSOR_RUNMODE_CLICKME);
+            }
+        }
     }
     return (0);
 }
@@ -605,35 +605,35 @@ static void garray_getrect(t_gobj *z, t_glist *glist,
     int elemsize, yonset, wonset, xonset, i;
 
     if (!array_getfields(x->x_templatesym, &elemtemplatecanvas,
-    	&elemtemplate, &elemsize, &xonset, &yonset, &wonset))
+        &elemtemplate, &elemsize, &xonset, &yonset, &wonset))
     {
-    	int incr;
-	    /* if it has more than 2000 points, just check 300 of them. */
-	if (x->x_array.a_n < 2000)
-	    incr = 1;
-	else incr = x->x_array.a_n / 300;
-	for (i = 0; i < x->x_array.a_n; i += incr)
-    	{
+        int incr;
+            /* if it has more than 2000 points, just check 300 of them. */
+        if (x->x_array.a_n < 2000)
+            incr = 1;
+        else incr = x->x_array.a_n / 300;
+        for (i = 0; i < x->x_array.a_n; i += incr)
+        {
 #ifdef ROCKBOX
             float pxpix, pypix, pwpix;
 #else /* ROCKBOX */
-	    float pxpix, pypix, pwpix, dx, dy;
+            float pxpix, pypix, pwpix, dx, dy;
 #endif /* ROCKBOX */
-    	    array_getcoordinate(glist, (char *)(x->x_array.a_vec) +
-	    	i * elemsize,
-    		xonset, yonset, wonset, i, 0, 0, 1,
-    		&pxpix, &pypix, &pwpix);
-	    if (pwpix < 2)
-	    	pwpix = 2;
-	    if (pxpix < x1)
-		x1 = pxpix;
-	    if (pxpix > x2)
-		x2 = pxpix;
-	    if (pypix - pwpix < y1)
-		y1 = pypix - pwpix;
-	    if (pypix + pwpix > y2)
-		y2 = pypix + pwpix;
-	}
+            array_getcoordinate(glist, (char *)(x->x_array.a_vec) +
+                i * elemsize,
+                xonset, yonset, wonset, i, 0, 0, 1,
+                &pxpix, &pypix, &pwpix);
+            if (pwpix < 2)
+                pwpix = 2;
+            if (pxpix < x1)
+                x1 = pxpix;
+            if (pxpix > x2)
+                x2 = pxpix;
+            if (pypix - pwpix < y1)
+                y1 = pypix - pwpix;
+            if (pypix + pwpix > y2)
+                y2 = pypix + pwpix;
+        }
     }
     *xp1 = x1;
     *yp1 = y1;
@@ -687,18 +687,18 @@ static void garray_vis(t_gobj *z, t_glist *glist, int vis)
     t_garray *x = (t_garray *)z;
     if (vis)
     {
-    	int i, xonset, yonset, type;
-	t_symbol *arraytype;
-	t_template *template = template_findbyname(x->x_templatesym);
-	if (!template)
-	    return;
-    	if (!template_find_field(template, gensym("y"), &yonset, &type,
-	    &arraytype) || type != DT_FLOAT)
-    	{
-    	    error("%s: needs floating-point 'y' field",
-	    	x->x_templatesym->s_name);
+        int i, xonset, yonset, type;
+        t_symbol *arraytype;
+        t_template *template = template_findbyname(x->x_templatesym);
+        if (!template)
+            return;
+        if (!template_find_field(template, gensym("y"), &yonset, &type,
+            &arraytype) || type != DT_FLOAT)
+        {
+            error("%s: needs floating-point 'y' field",
+                x->x_templatesym->s_name);
 #ifndef ROCKBOX
-    	    sys_vgui(".x%x.c create text 50 50 -text foo\
+            sys_vgui(".x%x.c create text 50 50 -text foo\
     	    	-tags .x%x.a%x\n",
     	    	glist_getcanvas(glist), glist_getcanvas(glist), x);
 #endif
@@ -834,7 +834,7 @@ void garray_redraw(t_garray *x)
 {
     if (glist_isvisible(x->x_glist))
     {
-    	garray_vis(&x->x_gobj, x->x_glist, 0); 
+    	garray_vis(&x->x_gobj, x->x_glist, 0);
     	garray_vis(&x->x_gobj, x->x_glist, 1);
     }
 }
@@ -967,7 +967,7 @@ static void garray_sinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 #else
     t_template *template = garray_template(x);
 #endif
-    
+
     t_float *svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
     int npoints, i;
     if (argc < 2)
@@ -979,10 +979,10 @@ static void garray_sinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 
     npoints = atom_getfloatarg(0, argc, argv);
     argv++, argc--;
-    
+
     svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
     if (!svec) return;
-    
+
     for (i = 0; i < argc; i++)
     	svec[i] = atom_getfloatarg(i, argc, argv);
     garray_dofo(x, npoints, 0, argc, svec, 1);
@@ -996,7 +996,7 @@ static void garray_cosinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 #else
     t_template *template = garray_template(x);
 #endif
-    
+
     t_float *svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
     int npoints, i;
     if (argc < 2)
@@ -1008,7 +1008,7 @@ static void garray_cosinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv)
 
     npoints = atom_getfloatarg(0, argc, argv);
     argv++, argc--;
-    
+
     svec = (t_float *)t_getbytes(sizeof(t_float) * argc);
     if (!svec) return;
 
@@ -1028,7 +1028,7 @@ static void garray_normalize(t_garray *x, t_float f)
 #endif
     double maxv, renormer;
     t_symbol *arraytype;
-    
+
     if (f <= 0)
     	f = 1;
 
@@ -1092,7 +1092,7 @@ static void garray_list(t_garray *x, t_symbol *s, int argc, t_atom *argv)
     	    if (argc <= 0) return;
     	}
     	for (i = 0; i < argc; i++)
-    	    *(t_sample *)((x->x_vec + sizeof(t_word) * (i + firstindex)) + yonset) = 
+    	    *(t_sample *)((x->x_vec + sizeof(t_word) * (i + firstindex)) + yonset) =
     	    	ftofix(atom_getfloat(argv + i));
     }
     garray_redraw(x);
@@ -1155,7 +1155,7 @@ static void garray_read(t_garray *x, t_symbol *filename)
     }
     if ((filedesc = open_via_path(
     	canvas_getdir(glist_getcanvas(x->x_glist))->s_name,
-    	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 0)) < 0 
+    	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 0)) < 0
 #ifdef ROCKBOX
                 || !(fd = filedesc))
 #else
@@ -1235,7 +1235,7 @@ static void garray_read16(t_garray *x, t_symbol *filename,
     }
     if ((filedesc = open_via_path(
     	canvas_getdir(glist_getcanvas(x->x_glist))->s_name,
-    	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 1)) < 0 
+    	    filename->s_name, "", buf, &bufptr, MAXPDSTRING, 1)) < 0
 #ifdef ROCKBOX
         || !(fd = filedesc))
 #else
@@ -1320,7 +1320,7 @@ static void garray_write(t_garray *x, t_symbol *filename)
     for (i = 0; i < x->x_n; i++)
     {
 #ifdef ROCKBOX
-        if(rb_fprintf_f(fd, 
+        if(rb_fprintf_f(fd,
 #else /* ROCKBOX */
     	if (fprintf(fd, "%g\n",
 #endif /* ROCKBOX */
@@ -1463,7 +1463,7 @@ void garray_resize(t_garray *x, t_floatarg f)
 #endif
     int n = f;
     char *nvec;
-    
+
     if (n < 1) n = 1;
     elemsize = template_findbyname(x->x_templatesym)->t_n * sizeof(t_word);
     nvec = t_resizebytes(x->x_vec, was * elemsize, n * elemsize);
@@ -1478,7 +1478,7 @@ void garray_resize(t_garray *x, t_floatarg f)
     	memset(x->x_vec + was*elemsize,
     	    0, (n - was) * elemsize);
     x->x_n = n;
-    
+
     	/* if this is the only array in the graph,
     	    reset the graph's coordinates */
     gl = x->x_glist;
@@ -1496,7 +1496,7 @@ void garray_resize(t_garray *x, t_floatarg f)
 }
 
 static void garray_print(t_garray *x)
-{  
+{
     post("garray %s: template %s, length %d",
     	x->x_name->s_name, x->x_templatesym->s_name, x->x_n);
 }
@@ -1543,4 +1543,3 @@ void g_array_setup(void)
     	gensym("arraydialog"), A_SYMBOL, A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
     class_setsavefn(garray_class, garray_save);
 }
-

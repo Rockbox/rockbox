@@ -64,7 +64,7 @@ void tone_set_prescale(int prescale)
     for (int i = 0; (dsp = dsp_get_config(i)); i++)
     {
         update_filter(i, dsp_get_output_frequency(dsp));
-    
+
         bool enable = bass != 0 || treble != 0;
         dsp_proc_enable(dsp, DSP_PROC_TONE_CONTROLS, enable);
 

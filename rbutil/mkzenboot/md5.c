@@ -243,4 +243,3 @@ void md5_finish( md5_context *ctx, uint8 digest[16] )
     PUT_UINT32( ctx->state[2], digest,  8 );
     PUT_UINT32( ctx->state[3], digest, 12 );
 }
-

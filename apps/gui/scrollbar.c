@@ -109,7 +109,7 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
         inner_ht = height - 2;
     }
     /* Boundary check to make sure that height is reasonable, otherwise nothing
-     *  to do 
+     *  to do
      */
     if ((inner_wd | inner_ht) < 0)
         return;

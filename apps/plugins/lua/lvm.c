@@ -29,7 +29,7 @@
 
 
 /* limit for table tag-method chains (to avoid loops) */
-#define MAXTAGLOOP	100
+#define MAXTAGLOOP      100
 
 
 const TValue *luaV_tonumber (const TValue *obj, TValue *n) {
@@ -125,7 +125,7 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       callTMres(L, val, tm, t, key);
       return;
     }
-    t = tm;  /* else repeat with `tm' */ 
+    t = tm;  /* else repeat with `tm' */
   }
   luaG_runerror(L, "loop in gettable");
 }
@@ -152,7 +152,7 @@ void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       callTM(L, tm, t, key, val);
       return;
     }
-    t = tm;  /* else repeat with `tm' */ 
+    t = tm;  /* else repeat with `tm' */
   }
   luaG_runerror(L, "loop in settable");
 }
@@ -338,23 +338,23 @@ static void Arith (lua_State *L, StkId ra, const TValue *rb,
 ** some macros for common tasks in `luaV_execute'
 */
 
-#define runtime_check(L, c)	{ if (!(c)) break; }
+#define runtime_check(L, c)     { if (!(c)) break; }
 
-#define RA(i)	(base+GETARG_A(i))
+#define RA(i)   (base+GETARG_A(i))
 /* to be used after possible stack reallocation */
-#define RB(i)	check_exp(getBMode(GET_OPCODE(i)) == OpArgR, base+GETARG_B(i))
-#define RC(i)	check_exp(getCMode(GET_OPCODE(i)) == OpArgR, base+GETARG_C(i))
-#define RKB(i)	check_exp(getBMode(GET_OPCODE(i)) == OpArgK, \
-	ISK(GETARG_B(i)) ? k+INDEXK(GETARG_B(i)) : base+GETARG_B(i))
-#define RKC(i)	check_exp(getCMode(GET_OPCODE(i)) == OpArgK, \
-	ISK(GETARG_C(i)) ? k+INDEXK(GETARG_C(i)) : base+GETARG_C(i))
-#define KBx(i)	check_exp(getBMode(GET_OPCODE(i)) == OpArgK, k+GETARG_Bx(i))
+#define RB(i)   check_exp(getBMode(GET_OPCODE(i)) == OpArgR, base+GETARG_B(i))
+#define RC(i)   check_exp(getCMode(GET_OPCODE(i)) == OpArgR, base+GETARG_C(i))
+#define RKB(i)  check_exp(getBMode(GET_OPCODE(i)) == OpArgK, \
+        ISK(GETARG_B(i)) ? k+INDEXK(GETARG_B(i)) : base+GETARG_B(i))
+#define RKC(i)  check_exp(getCMode(GET_OPCODE(i)) == OpArgK, \
+        ISK(GETARG_C(i)) ? k+INDEXK(GETARG_C(i)) : base+GETARG_C(i))
+#define KBx(i)  check_exp(getBMode(GET_OPCODE(i)) == OpArgK, k+GETARG_Bx(i))
 
 
-#define dojump(L,pc,i)	{(pc) += (i); luai_threadyield(L);}
+#define dojump(L,pc,i)  {(pc) += (i); luai_threadyield(L);}
 
 
-#define Protect(x)	{ L->savedpc = pc; {x;}; base = L->base; }
+#define Protect(x)      { L->savedpc = pc; {x;}; base = L->base; }
 
 
 #define arith_op(op,tm) { \
@@ -760,4 +760,3 @@ void luaV_execute (lua_State *L, int nexeccalls) {
     }
   }
 }
-

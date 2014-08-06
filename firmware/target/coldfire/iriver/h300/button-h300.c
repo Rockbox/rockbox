@@ -90,8 +90,8 @@ int button_read_device(void)
     /* normal buttons */
     hold_button_old = hold_button;
     hold_button = button_hold();
-    
-    
+
+
 #ifndef BOOTLOADER
     if (hold_button != hold_button_old)
         backlight_hold_changed(hold_button);
@@ -107,7 +107,7 @@ int button_read_device(void)
             last_valid = data;
         prev_data = data;
         data = last_valid;
-        
+
         if (data < 0xba)
         {
             if (data < 0x54)
@@ -250,6 +250,6 @@ int button_read_device(void)
                 btn |= BUTTON_RC_MENU;
                 break;
         }
-        
+
     return btn;
 }

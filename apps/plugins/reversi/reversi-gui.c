@@ -76,15 +76,15 @@ static int font_height;
 #define CELL_PRE    (   ( (LCD_WIDTH * LCD_PIXEL_ASPECT_WIDTH     / \
                             LCD_PIXEL_ASPECT_HEIGHT) - MARGIN_W)     / \
                         (BOARD_SIZE+MARGIN_C_W) )
-                        
+
 #define CELL_WIDTH  (CELL_PRE*LCD_PIXEL_ASPECT_HEIGHT / LCD_PIXEL_ASPECT_WIDTH)
-#define CELL_HEIGHT (CELL_PRE) 
+#define CELL_HEIGHT (CELL_PRE)
 #else
 #define CELL_PRE    (   ( (LCD_HEIGHT * LCD_PIXEL_ASPECT_HEIGHT     / \
                             LCD_PIXEL_ASPECT_WIDTH) - MARGIN_H)     / \
                         (BOARD_SIZE+MARGIN_C_H) )
-                        
-#define CELL_WIDTH  (CELL_PRE) 
+
+#define CELL_WIDTH  (CELL_PRE)
 #define CELL_HEIGHT (CELL_PRE*LCD_PIXEL_ASPECT_WIDTH / LCD_PIXEL_ASPECT_HEIGHT)
 #endif
 
@@ -178,7 +178,7 @@ static bool game_finished;
 #define B_QUIT_H    (2*CELL_HEIGHT)
 #endif
 
-/* This is the button initialization/definition.  The first element is the 
+/* This is the button initialization/definition.  The first element is the
  *  Viewport.  This is defined in lcd.h, but the elements are:
  *      int x                   - X location of button/viewport
  *      int y                   - Y location of button/viewport
@@ -193,17 +193,17 @@ static bool game_finished;
  *   bool repeat    - requires the area be held for the action
  *   int action     - action this button will return
  *   bool invisible - Is this an invisible button?
- *   char *title    - Specify a title 
+ *   char *title    - Specify a title
  *   fb_data *pixmap- Currently unused, but will allow for a graphic
  */
-struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] = 
+struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] =
   {
     { {B_MENU_X, B_MENU_Y, B_MENU_W, B_MENU_H, 0, FONT_UI, DRMODE_SOLID, 0, 0xFFFF},
       false, REVERSI_BUTTON_MENU, false, "Menu", NULL },
-      
+
     { {B_QUIT_X, B_QUIT_Y, B_QUIT_W, B_QUIT_H, 0, FONT_UI, DRMODE_SOLID, 0, 0xFFFF},
       false, REVERSI_BUTTON_QUIT, false, "Quit", NULL },
-      
+
     { {0, 0, XOFS+BOARD_WIDTH, YOFS+BOARD_HEIGHT, 0, 0,  DRMODE_SOLID, 0, 0xFFFF},
       false, REVERSI_BUTTON_MAKE_MOVE, true, NULL, NULL }
 };
@@ -254,9 +254,9 @@ static void reversi_gui_draw_cell(int x, int y, int color) {
     if (color == WHITE) {
         for (i = 0; i < CELL_LINE_THICKNESS; i++) {
             rb->lcd_drawrect(
-                    x+STONE_MARGIN+i, 
+                    x+STONE_MARGIN+i,
                     y+STONE_MARGIN+i,
-                    CELL_WIDTH+1-2*(STONE_MARGIN+i), 
+                    CELL_WIDTH+1-2*(STONE_MARGIN+i),
                     CELL_HEIGHT+1-2*(STONE_MARGIN+i)
                 );
         }
@@ -312,7 +312,7 @@ static void reversi_gui_display_board(void) {
     rb->snprintf(buf, sizeof(buf), "%01d", c);
 
     rb->viewport_set_defaults(&tempvp, SCREEN_MAIN);
-    
+
     tempvp.x=x+CELL_WIDTH+2;
     tempvp.y=y;
     tempvp.width=LCD_WIDTH-tempvp.x;
@@ -327,10 +327,10 @@ static void reversi_gui_display_board(void) {
     rb->screens[SCREEN_MAIN]->set_viewport(NULL);
 
     y = LEGEND_Y(1);
-    
+
     reversi_gui_draw_cell(x, y+(LEGEND_Y(1)-LEGEND_Y(0))/2-CELL_WIDTH/2, WHITE);
     rb->snprintf(buf, sizeof(buf), "%01d", r);
-    
+
     tempvp.y=y;
     rb->screens[SCREEN_MAIN]->set_viewport(&tempvp);
     rb->lcd_puts_scroll(0, 0, buf);
@@ -395,10 +395,10 @@ static bool reversi_gui_choose_strategy(
             break;
         }
     }
-    
-    result = 
+
+    result =
         rb->set_option(prompt, &index, INT, strategy_settings, num_items, NULL);
-        
+
     (*player) = strategy_values[index];
 
     if((*player)->init_func)
@@ -438,7 +438,7 @@ static bool reversi_gui_menu(void) {
             break;
 
         case 4: /* Cursor wrap mode */
-            num_items = sizeof(cursor_wrap_mode_values) / 
+            num_items = sizeof(cursor_wrap_mode_values) /
                 sizeof(cursor_wrap_mode_values[0]);
             index = 0;
             for (i = 0; i < num_items; i++) {
@@ -472,7 +472,7 @@ static bool reversi_gui_menu(void) {
  * Returns true iff the cursor would be really moved. In any case, the
  * new cursor position is stored in (new_row, new_col).
  */
-static bool 
+static bool
 reversi_gui_cursor_pos_vmove(int row_delta, int *new_row, int *new_col) {
     *new_row = cur_row + row_delta;
     *new_col = cur_col;
@@ -522,7 +522,7 @@ reversi_gui_cursor_pos_vmove(int row_delta, int *new_row, int *new_col) {
  * Returns true iff the cursor would be really moved. In any case, the
  * new cursor position is stored in (new_row, new_col).
  */
-static bool 
+static bool
 reversi_gui_cursor_pos_hmove(int col_delta, int *new_row, int *new_col) {
     *new_row = cur_row;
     *new_col = cur_col + col_delta;
@@ -594,10 +594,10 @@ enum plugin_status plugin_start(const void *parameter) {
 #endif
     int row, col;
     int w_cnt, b_cnt;
-    
+
     /* Initialize Font Width and height */
     rb->lcd_getstringsize("0", &font_width, &font_height);
-    
+
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
@@ -663,7 +663,7 @@ enum plugin_status plugin_start(const void *parameter) {
          * Button handling code happens below here
          **********************************************************************/
         button = rb->button_get(true);
-        
+
         /* The touchscreen buttons can act as true buttons so OR them in */
 #ifdef HAVE_TOUCHSCREEN
         button |= touchbutton_check_button(button, reversi_buttons, TOUCHBUTTON_COUNT);
@@ -686,7 +686,7 @@ enum plugin_status plugin_start(const void *parameter) {
                 /* Check if the click was in the gameboard, if so move cursor.
                  *  This has to happen before MAKE_MOVE is processed.
                  */
-                if( (CELL_R(button_y)<BOARD_SIZE) && 
+                if( (CELL_R(button_y)<BOARD_SIZE) &&
                     (CELL_C(button_x)<BOARD_SIZE) )
                 {
                     reversi_gui_move_cursor(CELL_R(button_y), CELL_C(button_x));
@@ -704,7 +704,7 @@ enum plugin_status plugin_start(const void *parameter) {
                 }
                 draw_screen = true;
             }
-            
+
             if(button&REVERSI_BUTTON_MAKE_MOVE
 #if defined(REVERSI_BUTTON_MAKE_MOVE_SHORTPRESS)
                 && !(lastbutton&BUTTON_REPEAT)
@@ -713,7 +713,7 @@ enum plugin_status plugin_start(const void *parameter) {
                 /* If you touch the game board instead of hitting menu after it
                  *  has completed the game will exit out.
                  */
-                if (game_finished) 
+                if (game_finished)
                     break;
                 if (reversi_make_move(&game, cur_row, cur_col, cur_player) > 0) {
                     /* Move was made. Global changes on the board are possible */

@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 /*
  * Jz OnChip Real Time Clock interface for Linux
  *
@@ -99,7 +99,7 @@ void rtc_init(void)
     REG_RTC_RCR = RTC_RCR_RTCE;
     udelay(70);
     while( !(REG_RTC_RCR & RTC_RCR_WRDY) );
-    REG_RTC_RGR = (0x7fff | RTC_RGR_LOCK); 
+    REG_RTC_RGR = (0x7fff | RTC_RGR_LOCK);
     udelay(70);
     __cpm_stop_rtc();
 }

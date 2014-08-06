@@ -253,4 +253,3 @@ void rsrc_dump(struct rsrc_file_t *file, void *u, rsrc_color_printf cprintf)
     #undef printf
     #undef print_hex
 }
-

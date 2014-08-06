@@ -73,7 +73,7 @@ static void alarm_read(void)
         buf[i] = ascodec_read(AS3543_WAKEUP);
     }
     restore_irq(oldstatus);
-    
+
     /* decode */
     alarm.seconds = buf[0] | (buf[1] << 8) | ((buf[2] & 0x7F) << 16);
     alarm.enabled = buf[2] & (1 << 7);
@@ -88,7 +88,7 @@ static void alarm_write(void)
     unsigned char buf[6];
     unsigned int i;
     int oldstatus;
-    
+
     /* encode */
     buf[0] = alarm.seconds  & 0xFF;
     buf[1] = (alarm.seconds >> 8) & 0xFF;
@@ -96,7 +96,7 @@ static void alarm_write(void)
     buf[3] = alarm.flag;
     buf[4] = alarm.hour;
     buf[5] = alarm.min;
-    
+
     /* write raw data */
     oldstatus = disable_irq_save();
     ascodec_read(0);
@@ -205,7 +205,7 @@ int rtc_write_datetime(const struct tm *tm)
     time_t time;
     unsigned int seconds;
     int i;
-    
+
     /* convert struct tm to time stamp */
     time = mktime((struct tm *)tm);
     seconds = time - SECS_ADJUST;

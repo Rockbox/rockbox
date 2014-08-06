@@ -44,8 +44,8 @@ static float sigbp_qcos(float f)
 {
     if (f >= -(0.5f*3.14159f) && f <= 0.5f*3.14159f)
     {
-    	float g = f*f;
-    	return (((g*g*g * (-1.0f/720.0f) + g*g*(1.0f/24.0f)) - g*0.5) + 1);
+        float g = f*f;
+        return (((g*g*g * (-1.0f/720.0f) + g*g*(1.0f/24.0f)) - g*0.5) + 1);
     }
     else return (0);
 }
@@ -66,7 +66,7 @@ static void sigbp_docoef(t_sigbp *x, t_floatarg f, t_floatarg q)
     x->x_ctl->c_coef2 = ftofix(- r * r);
     x->x_ctl->c_gain = ftofix(2 * oneminusr * (oneminusr + r * omega));
     /* post("r %f, omega %f, coef1 %f, coef2 %f",
-    	r, omega, x->x_ctl->c_coef1, x->x_ctl->c_coef2); */
+        r, omega, x->x_ctl->c_coef1, x->x_ctl->c_coef2); */
 }
 
 static void sigbp_ft1(t_sigbp *x, t_floatarg f)
@@ -101,15 +101,15 @@ static t_int *sigbp_perform(t_int *w)
     t_sample gain = c->c_gain;
     for (i = 0; i < n; i++)
     {
-    	t_sample output =  *in++ + mult(coef1,last) + mult(coef2,prev);
-    	*out++ = mult(gain,output);
-	prev = last;
-	last = output;
+        t_sample output =  *in++ + mult(coef1,last) + mult(coef2,prev);
+        *out++ = mult(gain,output);
+        prev = last;
+        last = output;
     }
     if (PD_BADFLOAT(last))
-    	last = 0;
+        last = 0;
     if (PD_BADFLOAT(prev))
-    	prev = 0;
+        prev = 0;
     c->c_x1 = last;
     c->c_x2 = prev;
     return (w+5);
@@ -120,22 +120,21 @@ static void sigbp_dsp(t_sigbp *x, t_signal **sp)
     x->x_sr = sp[0]->s_sr;
     sigbp_docoef(x, x->x_freq, x->x_q);
     dsp_add(sigbp_perform, 4,
-	sp[0]->s_vec, sp[1]->s_vec, 
-	    x->x_ctl, sp[0]->s_n);
+        sp[0]->s_vec, sp[1]->s_vec,
+            x->x_ctl, sp[0]->s_n);
 
 }
 
 void bp_tilde_setup(void)
 {
     sigbp_class = class_new(gensym("bp~"), (t_newmethod)sigbp_new, 0,
-	sizeof(t_sigbp), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+        sizeof(t_sigbp), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(sigbp_class, t_sigbp, x_f);
     class_addmethod(sigbp_class, (t_method)sigbp_dsp, gensym("dsp"), 0);
     class_addmethod(sigbp_class, (t_method)sigbp_ft1,
-    	gensym("ft1"), A_FLOAT, 0);
+        gensym("ft1"), A_FLOAT, 0);
     class_addmethod(sigbp_class, (t_method)sigbp_ft2,
-    	gensym("ft2"), A_FLOAT, 0);
+        gensym("ft2"), A_FLOAT, 0);
     class_addmethod(sigbp_class, (t_method)sigbp_clear, gensym("clear"), 0);
     class_sethelpsymbol(sigbp_class, gensym("lop~-help.pd"));
 }
-

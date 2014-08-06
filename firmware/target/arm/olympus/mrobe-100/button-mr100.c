@@ -43,7 +43,7 @@ void button_init_device(void)
     /* enable touchpad leds */
     GPIOA_ENABLE     |= BUTTONLIGHT_ALL;
     GPIOA_OUTPUT_EN  |= BUTTONLIGHT_ALL;
-    
+
     /* enable touchpad */
     GPO32_ENABLE     |=  0x40000000;
     GPO32_VAL        &= ~0x40000000;
@@ -55,7 +55,7 @@ void button_init_device(void)
     GPIOD_OUTPUT_VAL |=  0x1; /* high */
 
     GPIOD_OUTPUT_EN  &= ~0x2; /* CLK  */
-    
+
     GPIOD_OUTPUT_EN  |=  0x4; /* DATA */
     GPIOD_OUTPUT_VAL |=  0x4; /* high */
 

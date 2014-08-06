@@ -164,7 +164,7 @@ void lcd_set_flip(bool yesno)
     {
         xoffset = 132 - LCD_WIDTH; /* 132 colums minus the 128 we have */
     }
-    else 
+    else
     {
         xoffset = 0;
     }

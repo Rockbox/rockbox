@@ -367,8 +367,8 @@ static int folder_action_callback(int action, struct gui_synclist *list)
         list->nb_items = count_items(root);
         return ACTION_REDRAW;
     }
-            
-        
+
+
     return action;
 }
 

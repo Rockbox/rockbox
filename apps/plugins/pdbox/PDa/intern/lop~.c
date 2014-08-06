@@ -64,9 +64,9 @@ static t_int *siglop_perform(t_int *w)
     t_sample coef = c->c_coef;
     t_sample feedback = ftofix(1) - coef;
     for (i = 0; i < n; i++)
-	last = *out++ = mult(coef, *in++) + mult(feedback,last);
+        last = *out++ = mult(coef, *in++) + mult(feedback,last);
     if (PD_BADFLOAT(last))
-    	last = 0;
+        last = 0;
     c->c_x = last;
     return (w+5);
 }
@@ -76,19 +76,18 @@ static void siglop_dsp(t_siglop *x, t_signal **sp)
     x->x_sr = sp[0]->s_sr;
     siglop_ft1(x,  x->x_hz);
     dsp_add(siglop_perform, 4,
-	sp[0]->s_vec, sp[1]->s_vec, 
-	    x->x_ctl, sp[0]->s_n);
+        sp[0]->s_vec, sp[1]->s_vec,
+            x->x_ctl, sp[0]->s_n);
 
 }
 
 void lop_tilde_setup(void)
 {
     siglop_class = class_new(gensym("lop~"), (t_newmethod)siglop_new, 0,
-	sizeof(t_siglop), 0, A_DEFFLOAT, 0);
+        sizeof(t_siglop), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(siglop_class, t_siglop, x_f);
     class_addmethod(siglop_class, (t_method)siglop_dsp, gensym("dsp"), 0);
     class_addmethod(siglop_class, (t_method)siglop_ft1,
-    	gensym("ft1"), A_FLOAT, 0);
+        gensym("ft1"), A_FLOAT, 0);
     class_addmethod(siglop_class, (t_method)siglop_clear, gensym("clear"), 0);
 }
-

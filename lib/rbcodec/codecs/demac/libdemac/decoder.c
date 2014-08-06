@@ -34,18 +34,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 /* Statically allocate the filter buffers */
 
 #ifdef FILTER256_IRAM
-static filter_int filterbuf32[(32*3 + FILTER_HISTORY_SIZE) * 2]   
-                  IBSS_ATTR_DEMAC MEM_ALIGN_ATTR; 
+static filter_int filterbuf32[(32*3 + FILTER_HISTORY_SIZE) * 2]
+                  IBSS_ATTR_DEMAC MEM_ALIGN_ATTR;
                   /* 2432 or 4864 bytes */
 static filter_int filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2]
-                  IBSS_ATTR_DEMAC MEM_ALIGN_ATTR; 
+                  IBSS_ATTR_DEMAC MEM_ALIGN_ATTR;
                   /* 5120 or 10240 bytes */
 #define FILTERBUF64 filterbuf256
 #define FILTERBUF32 filterbuf32
 #define FILTERBUF16 filterbuf32
 #else
-static filter_int filterbuf64[(64*3 + FILTER_HISTORY_SIZE) * 2]   
-                  IBSS_ATTR_DEMAC MEM_ALIGN_ATTR; 
+static filter_int filterbuf64[(64*3 + FILTER_HISTORY_SIZE) * 2]
+                  IBSS_ATTR_DEMAC MEM_ALIGN_ATTR;
                   /* 2432 or 4864 bytes */
 static filter_int filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2]
                   MEM_ALIGN_ATTR; /* 5120 or 10240 bytes */
@@ -56,7 +56,7 @@ static filter_int filterbuf256[(256*3 + FILTER_HISTORY_SIZE) * 2]
 
 /* This is only needed for "insane" files, and no current Rockbox targets
    can hope to decode them in realtime, except the Gigabeat S (at 528MHz). */
-static filter_int filterbuf1280[(1280*3 + FILTER_HISTORY_SIZE) * 2] 
+static filter_int filterbuf1280[(1280*3 + FILTER_HISTORY_SIZE) * 2]
                   IBSS_ATTR_DEMAC_INSANEBUF MEM_ALIGN_ATTR;
                   /* 17408 or 34816 bytes */
 
@@ -105,7 +105,7 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
 #else
     #define SCALE(x) (x)
 #endif
-         
+
     if ((ape_ctx->channels==1) || ((ape_ctx->frameflags
         & (APE_FRAMECODE_PSEUDO_STEREO|APE_FRAMECODE_STEREO_SILENCE))
         == APE_FRAMECODE_PSEUDO_STEREO)) {
@@ -123,16 +123,16 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
             case 2000:
                 apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
                 break;
-    
+
             case 3000:
                 apply_filter_64_11(ape_ctx->fileversion,0,decoded0,count);
                 break;
-    
+
             case 4000:
                 apply_filter_32_10(ape_ctx->fileversion,0,decoded0,count);
                 apply_filter_256_13(ape_ctx->fileversion,0,decoded0,count);
                 break;
-    
+
             case 5000:
                 apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
                 apply_filter_256_13(ape_ctx->fileversion,0,decoded0,count);
@@ -177,19 +177,19 @@ int ICODE_ATTR_DEMAC decode_chunk(struct ape_ctx_t* ape_ctx,
                 apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
                 apply_filter_16_11(ape_ctx->fileversion,1,decoded1,count);
                 break;
-    
+
             case 3000:
                 apply_filter_64_11(ape_ctx->fileversion,0,decoded0,count);
                 apply_filter_64_11(ape_ctx->fileversion,1,decoded1,count);
                 break;
-    
+
             case 4000:
                 apply_filter_32_10(ape_ctx->fileversion,0,decoded0,count);
                 apply_filter_32_10(ape_ctx->fileversion,1,decoded1,count);
                 apply_filter_256_13(ape_ctx->fileversion,0,decoded0,count);
                 apply_filter_256_13(ape_ctx->fileversion,1,decoded1,count);
                 break;
-    
+
             case 5000:
                 apply_filter_16_11(ape_ctx->fileversion,0,decoded0,count);
                 apply_filter_16_11(ape_ctx->fileversion,1,decoded1,count);

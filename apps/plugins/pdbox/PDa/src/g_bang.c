@@ -46,8 +46,8 @@ void bng_draw_update(t_bng *x, t_glist *glist)
 #else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
-	sys_vgui(".x%x.c itemconfigure %xBUT -fill #%6.6x\n", glist_getcanvas(glist), x,
-		 x->x_flashed?x->x_gui.x_fcol:x->x_gui.x_bcol);
+        sys_vgui(".x%x.c itemconfigure %xBUT -fill #%6.6x\n", glist_getcanvas(glist), x,
+                 x->x_flashed?x->x_gui.x_fcol:x->x_gui.x_bcol);
     }
 #endif /* ROCKBOX */
 }
@@ -63,13 +63,13 @@ void bng_draw_new(t_bng *x, t_glist *glist)
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE\n",
-	     canvas, xpos, ypos,
-	     xpos + x->x_gui.x_w, ypos + x->x_gui.x_h,
-	     x->x_gui.x_bcol, x);
+             canvas, xpos, ypos,
+             xpos + x->x_gui.x_w, ypos + x->x_gui.x_h,
+             x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create oval %d %d %d %d -fill #%6.6x -tags %xBUT\n",
-	     canvas, xpos+1, ypos+1,
-	     xpos + x->x_gui.x_w-1, ypos + x->x_gui.x_h-1,
-	     x->x_flashed?x->x_gui.x_fcol:x->x_gui.x_bcol, x);
+             canvas, xpos+1, ypos+1,
+             xpos + x->x_gui.x_w-1, ypos + x->x_gui.x_h-1,
+             x->x_flashed?x->x_gui.x_fcol:x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
 	     canvas, xpos+x->x_gui.x_ldx,
@@ -666,4 +666,3 @@ void g_bang_setup(void)
     class_setsavefn(bng_class, bng_save);
     class_setpropertiesfn(bng_class, bng_properties);
 }
-

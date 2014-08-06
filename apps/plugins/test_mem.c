@@ -155,7 +155,7 @@ static int line;
 
 static int test(volatile int *buf, int buf_size, int loop_cnt,
                 enum test_type type)
-{    
+{
     int delta, dMB;
     int last_tick = *rb->current_tick;
     int ret = 0;
@@ -167,12 +167,12 @@ static int test(volatile int *buf, int buf_size, int loop_cnt,
         case MEMSET: memset_test(buf, buf_size, loop_cnt); break;
         case MEMCPY: memcpy_test(buf, buf_size, loop_cnt); break;
     }
-    
+
     delta = *rb->current_tick - last_tick;
 
     if (delta <= 20)
     {
-        /* The loop_cnt will be increased for the next measurement set until 
+        /* The loop_cnt will be increased for the next measurement set until
          * each measurement at least takes 10 ticks. This is to ensure a
          * minimum accuracy. */
         ret = 1;
@@ -180,7 +180,7 @@ static int test(volatile int *buf, int buf_size, int loop_cnt,
 
     delta = delta>0 ? delta : delta+1;
     dMB   = dMB_PER_SEC(buf_size, loop_cnt, delta);
-    TEST_MEM_PRINTF("%s: %3d.%d MB/s (%3d ms)", 
+    TEST_MEM_PRINTF("%s: %3d.%d MB/s (%3d ms)",
         tests[type], dMB/10, dMB%10, delta*10);
 
     return ret;
@@ -198,7 +198,7 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
 #endif
-    
+
     rb->screens[0]->clear_display();
     TEST_MEM_PRINTF("patience, may take some seconds...");
     rb->screens[0]->update();
@@ -214,7 +214,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
         TEST_MEM_PRINTF("loop#: %d", ++count);
 
-        TEST_MEM_PRINTF("DRAM cnt: %d size: %d MB", loop_repeat_dram, 
+        TEST_MEM_PRINTF("DRAM cnt: %d size: %d MB", loop_repeat_dram,
             (loop_repeat_dram*BUF_SIZE*sizeof(buf_dram[0]))>>20);
         ret = 0;
         ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, READ);
@@ -223,7 +223,7 @@ enum plugin_status plugin_start(const void* parameter)
         ret |= test(buf_dram, BUF_SIZE, loop_repeat_dram, MEMCPY);
         if (ret != 0) loop_repeat_dram *= 2;
 #if defined(PLUGIN_USE_IRAM)
-        TEST_MEM_PRINTF("IRAM cnt: %d size: %d MB", loop_repeat_iram, 
+        TEST_MEM_PRINTF("IRAM cnt: %d size: %d MB", loop_repeat_iram,
             (loop_repeat_iram*BUF_SIZE*sizeof(buf_iram[0]))>>20);
         ret = 0;
         ret |= test(buf_iram, BUF_SIZE, loop_repeat_iram, READ);

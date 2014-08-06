@@ -10,8 +10,8 @@
 * Plasma demo plugin
 *
 * My crack at making a 80's style retro plasma effect for the fantastic
-* rockbox! 
-* Okay, I could've hard-coded the sine wave values, I just wanted the 
+* rockbox!
+* Okay, I could've hard-coded the sine wave values, I just wanted the
 * challange of calculating them! silly: maybe, fun: yes!
 *
 * This program is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ static const struct button_mapping* plugin_contexts[]= {
 #define WAV_AMP 90
 
 /*
- * Main wave function so we don't have to re-calc the sine 
+ * Main wave function so we don't have to re-calc the sine
  * curve every time. Mess around WAV_AMP and FREQ to make slighlty
  * weirder looking plasmas!
  */

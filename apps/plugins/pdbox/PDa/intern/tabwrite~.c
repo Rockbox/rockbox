@@ -33,24 +33,24 @@ static t_int *tabwrite_tilde_perform(t_int *w)
     t_sample *in = (t_sample *)(w[2]);
     int n = (int)(w[3]), phase = x->x_phase, endphase = x->x_nsampsintab;
     if (!x->x_vec) goto bad;
-    
+
     if (endphase > phase)
     {
-    	int nxfer = endphase - phase;
-    	t_sample *fp = x->x_vec + phase;
-    	if (nxfer > n) nxfer = n;
-    	phase += nxfer;
-    	while (nxfer--)
-	{
-	    t_sample f = *in++;
-	    *fp++ = f;
-    	}
-	if (phase >= endphase)
-    	{
-    	    clock_delay(x->x_clock, 0);
-    	    phase = 0x7fffffff;
-    	}
-    	x->x_phase = phase;
+        int nxfer = endphase - phase;
+        t_sample *fp = x->x_vec + phase;
+        if (nxfer > n) nxfer = n;
+        phase += nxfer;
+        while (nxfer--)
+        {
+            t_sample f = *in++;
+            *fp++ = f;
+        }
+        if (phase >= endphase)
+        {
+            clock_delay(x->x_clock, 0);
+            phase = 0x7fffffff;
+        }
+        x->x_phase = phase;
     }
 bad:
     return (w+4);
@@ -63,14 +63,14 @@ void tabwrite_tilde_set(t_tabwrite_tilde *x, t_symbol *s)
     x->x_arrayname = s;
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
     {
-    	if (*s->s_name) pd_error(x, "tabwrite~: %s: no such array",
-    	    x->x_arrayname->s_name);
-    	x->x_vec = 0;
+        if (*s->s_name) pd_error(x, "tabwrite~: %s: no such array",
+            x->x_arrayname->s_name);
+        x->x_vec = 0;
     }
     else if (!garray_getfloatarray(a, &x->x_nsampsintab, &x->x_vec))
     {
-    	error("%s: bad template for tabwrite~", x->x_arrayname->s_name);
-    	x->x_vec = 0;
+        error("%s: bad template for tabwrite~", x->x_arrayname->s_name);
+        x->x_vec = 0;
     }
     else garray_usedindsp(a);
 }
@@ -98,8 +98,8 @@ static void tabwrite_tilde_stop(t_tabwrite_tilde *x)
 {
     if (x->x_phase != 0x7fffffff)
     {
-    	tabwrite_tilde_tick(x);
-    	x->x_phase = 0x7fffffff;
+        tabwrite_tilde_tick(x);
+        x->x_phase = 0x7fffffff;
     }
 }
 
@@ -118,16 +118,15 @@ static void tabwrite_tilde_free(t_tabwrite_tilde *x)
 void tabwrite_tilde_setup(void)
 {
     tabwrite_tilde_class = class_new(gensym("tabwrite~"),
-    	(t_newmethod)tabwrite_tilde_new, (t_method)tabwrite_tilde_free,
-    	sizeof(t_tabwrite_tilde), 0, A_DEFSYM, 0);
+        (t_newmethod)tabwrite_tilde_new, (t_method)tabwrite_tilde_free,
+        sizeof(t_tabwrite_tilde), 0, A_DEFSYM, 0);
     CLASS_MAINSIGNALIN(tabwrite_tilde_class, t_tabwrite_tilde, x_f);
     class_addmethod(tabwrite_tilde_class, (t_method)tabwrite_tilde_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
     class_addmethod(tabwrite_tilde_class, (t_method)tabwrite_tilde_set,
-    	gensym("set"), A_SYMBOL, 0);
+        gensym("set"), A_SYMBOL, 0);
     class_addmethod(tabwrite_tilde_class, (t_method)tabwrite_tilde_stop,
-    	gensym("stop"), 0);
+        gensym("stop"), 0);
     class_addbang(tabwrite_tilde_class, tabwrite_tilde_bang);
     class_addfloat(tabwrite_tilde_class, tabwrite_tilde_float);
 }
-

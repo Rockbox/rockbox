@@ -112,8 +112,8 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
 
     infile = openinfile(infile_name);
     outfile = openoutfile(outfile_name);
-	if (!infile || !outfile) return -1;
-	
+        if (!infile || !outfile) return -1;
+
     lenread = fread( headerdata, 1, 512, infile );
     if( lenread != 512 )
     {
@@ -148,7 +148,7 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
     {
         fprintf( stderr, "This doesn't look like a valid encrypted "
                  "iHP firmware - reason: file 'length' data\n" );
-		goto error;
+                goto error;
     };
 
     pChecksums = ppChecksums = (unsigned char *)( malloc( dwLength3 ) );
@@ -208,7 +208,7 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
     {
         fprintf( stderr, "This doesn't look like a valid encrypted "
                  "iHP firmware - reason: 'length2' mismatch\n" );
-		goto error;
+                goto error;
     };
 
     fp = 0;
@@ -223,7 +223,7 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
         {
             fprintf( stderr, "This doesn't look like a valid encrypted "
                      "iHP firmware - reason: Checksum mismatch!" );
-			goto error;
+                        goto error;
         };
         ppChecksums += lenread;
     };
@@ -232,7 +232,7 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
     {
         fprintf( stderr, "This doesn't look like a valid encrypted "
                  "iHP firmware - reason: 'length3' mismatch\n" );
-		goto error;
+                goto error;
     };
 
 
@@ -254,13 +254,13 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
             break;
     };
 
-	fclose(infile);
-	fclose(outfile);
+        fclose(infile);
+        fclose(outfile);
     return 0;
 error:
-	fclose(infile);
-	fclose(outfile);
-	return -1;
+        fclose(infile);
+        fclose(outfile);
+        return -1;
 };
 
 int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
@@ -282,7 +282,7 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
 
     infile = openinfile(infile_name);
     outfile = openoutfile(outfile_name);
-	if (!infile || !outfile) return -1;
+        if (!infile || !outfile) return -1;
 
     lenread = fread( headerdata, 1, 512, infile );
     if( lenread != 512 )
@@ -383,11 +383,11 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
 
     fprintf( stderr, "File encoded successfully and checksum table built!\n" );
 
-	fclose(infile);
-	fclose(outfile);
+        fclose(infile);
+        fclose(outfile);
     return 0;
 error:
-	fclose(infile);
-	fclose(outfile);
-	return -1;
+        fclose(infile);
+        fclose(outfile);
+        return -1;
 };

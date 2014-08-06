@@ -54,4 +54,3 @@ int _battery_level(void)
         new_battery_monitor();
     return (*env_ptr)->GetIntField(env_ptr, BatteryMonitor_instance, __battery_level);
 }
-

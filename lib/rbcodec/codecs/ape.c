@@ -29,7 +29,7 @@ CODEC_HEADER
 #define MAX_BYTESPERSAMPLE  3
 
 /* Monkey's Audio files have one seekpoint per frame.  The framesize
-   varies between 73728 and 1179648 samples.  
+   varies between 73728 and 1179648 samples.
 
    At the smallest framesize, 30000 frames would be 50155 seconds of
    audio - almost 14 hours.  This should be enough for any file a user
@@ -82,8 +82,8 @@ static bool ape_calc_seekpos(struct ape_ctx_t* ape_ctx,
 /* The resume offset is a value in bytes - we need to
    turn it into a frame number and samplestoskip value */
 
-static void ape_resume(struct ape_ctx_t* ape_ctx, size_t resume_offset, 
-                       uint32_t* currentframe, uint32_t* samplesdone, 
+static void ape_resume(struct ape_ctx_t* ape_ctx, size_t resume_offset,
+                       uint32_t* currentframe, uint32_t* samplesdone,
                        uint32_t* samplestoskip, int* firstbyte)
 {
     off_t newfilepos;
@@ -102,7 +102,7 @@ static void ape_resume(struct ape_ctx_t* ape_ctx, size_t resume_offset,
         *samplesdone += ape_ctx->blocksperframe;
     }
 
-    if ((*currentframe > 0) && 
+    if ((*currentframe > 0) &&
         (ape_ctx->seektable[*currentframe] > resume_offset)) {
         --*currentframe;
         *samplesdone -= ape_ctx->blocksperframe;
@@ -201,7 +201,7 @@ enum codec_status codec_run(void)
 #endif
 
     /* Now advance the file position to the first frame */
-    ci->advance_buffer(ape_ctx.firstframe - 
+    ci->advance_buffer(ape_ctx.firstframe -
                        (ape_ctx.seektablefilepos +
                         ape_ctx.numseekpoints * sizeof(uint32_t)));
 
@@ -216,7 +216,7 @@ enum codec_status codec_run(void)
         /* The resume offset is a value in bytes - we need to
            turn it into a frame number and samplestoskip value */
 
-        ape_resume(&ape_ctx, resume_offset, 
+        ape_resume(&ape_ctx, resume_offset,
                    &currentframe, &samplesdone, &samplestoskip, &firstbyte);
         elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
     }
@@ -315,8 +315,8 @@ frame_start:
 
             if (samplestoskip > 0) {
                 if (samplestoskip < blockstodecode) {
-                    ci->pcmbuf_insert(decoded0 + samplestoskip, 
-                                      decoded1 + samplestoskip, 
+                    ci->pcmbuf_insert(decoded0 + samplestoskip,
+                                      decoded1 + samplestoskip,
                                       blockstodecode - samplestoskip);
                     samplestoskip = 0;
                 } else {
@@ -325,7 +325,7 @@ frame_start:
             } else {
                 ci->pcmbuf_insert(decoded0, decoded1, blockstodecode);
             }
-        
+
             samplesdone += blockstodecode;
 
             if (!samplestoskip) {

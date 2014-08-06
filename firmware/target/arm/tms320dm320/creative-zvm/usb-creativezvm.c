@@ -66,6 +66,6 @@ void IRAM_ATTR GIO7(void)
     //printf("GIO7 interrupt... [%d]", current_tick);
 #endif
     usb_drv_int();
-    
+
     IO_INTC_IRQ1 = INTR_IRQ1_EXT7;
 }

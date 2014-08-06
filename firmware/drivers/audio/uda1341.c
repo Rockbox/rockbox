@@ -31,7 +31,7 @@
 /* convert tenth of dB volume (-600..0) to volume register value */
 static int vol_tenthdb2hw(int db)
 {
-    if (db <= -610) 
+    if (db <= -610)
         return 63;
     else                            /* 1 dB steps */
         return -(db / 10) + 1;
@@ -55,12 +55,12 @@ static unsigned short uda_regs[NUM_REG_ID];
 static void l3_init (void)
 {
     L3PORT |= L3MODE | L3CLOCK;
-    L3PORT &= ~L3DATA; 
+    L3PORT &= ~L3DATA;
 
     S3C2440_GPIO_CONFIG (GPBCON, 2, GPIO_OUTPUT);   /* L3 MODE */
     S3C2440_GPIO_CONFIG (GPBCON, 3, GPIO_OUTPUT);   /* L3 DATA */
     S3C2440_GPIO_CONFIG (GPBCON, 4, GPIO_OUTPUT);   /* L3 CLOCK */
-    
+
     S3C2440_GPIO_PULLUP (GPBUP, 2, GPIO_PULLUP_DISABLE);
     S3C2440_GPIO_PULLUP (GPBUP, 3, GPIO_PULLUP_DISABLE);
     S3C2440_GPIO_PULLUP (GPBUP, 4, GPIO_PULLUP_DISABLE);
@@ -76,14 +76,14 @@ static void bit_delay (void)
 static void l3_write_byte (unsigned char data, bool address_mode)
 {
     int bit;
-    
+
     L3PORT |= L3CLOCK;
     if (address_mode)
         L3PORT &= ~L3MODE;
     else
         L3PORT |= L3MODE;
     bit_delay();
-    
+
     for (bit=0; bit < 8; bit++)
     {
         if (data & 1)
@@ -98,10 +98,10 @@ static void l3_write_byte (unsigned char data, bool address_mode)
         bit_delay();
         L3PORT |= L3CLOCK;
         bit_delay();
-        
+
         data >>= 1;
-    }    
-    
+    }
+
     if (address_mode)
         L3PORT |= L3MODE;
     else
@@ -136,15 +136,15 @@ static void udacodec_reset(void)
 {
     /* uda reset */
     l3_init();
-    
-    udacodec_write (UDA_REG_STATUS, UDA_STATUS_0 | UDA_RESET | UDA_SYSCLK_256FS | 
+
+    udacodec_write (UDA_REG_STATUS, UDA_STATUS_0 | UDA_RESET | UDA_SYSCLK_256FS |
                                     I2S_IFMT_IIS);
     udacodec_write (UDA_REG_STATUS, UDA_STATUS_0 | UDA_SYSCLK_256FS | I2S_IFMT_IIS);
     udacodec_write (UDA_REG_STATUS, UDA_STATUS_1 | UDA_POWER_DAC_ON);
-    
-    uda_regs[UDA_REG_ID_CTRL2] = UDA_PEAK_DETECT_POS_AFTER | 
+
+    uda_regs[UDA_REG_ID_CTRL2] = UDA_PEAK_DETECT_POS_AFTER |
             UDA_DE_EMPHASIS_NONE | UDA_MUTE_OFF | UDA_MODE_SWITCH_FLAT;
-    
+
 }
 
 /****************************************************************************/
@@ -163,9 +163,9 @@ static const unsigned char uda_freq_parms[HW_NUM_FREQ][2] =
 void audiohw_init(void)
 {
     udacodec_reset();
-     
-    audiohw_set_bass (0);  
-    audiohw_set_treble (0);  
+
+    audiohw_set_bass (0);
+    audiohw_set_treble (0);
     audiohw_set_volume (-250);    /* -25 dB */
 }
 
@@ -183,7 +183,7 @@ void audiohw_set_bass(int value)
 {
     uda_regs [UDA_REG_ID_CTRL1] &= UDA_BASS_BOOST (UDA_BASS_BOOST_MASK);
     uda_regs [UDA_REG_ID_CTRL1] |= UDA_BASS_BOOST (value & UDA_BASS_BOOST_MASK);
-     
+
     udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL1 | uda_regs [UDA_REG_ID_CTRL1] );
 }
 
@@ -191,7 +191,7 @@ void audiohw_set_treble(int value)
 {
     uda_regs [UDA_REG_ID_CTRL1] &= UDA_TREBLE (UDA_TREBLE_MASK);
     uda_regs [UDA_REG_ID_CTRL1] |= UDA_TREBLE (value & UDA_TREBLE_MASK);
-     
+
     udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL1 | uda_regs [UDA_REG_ID_CTRL1] );
 }
 
@@ -199,9 +199,9 @@ void audiohw_set_treble(int value)
 {
     if (mute)
         uda_regs [UDA_REG_ID_CTRL2] |= UDA_MUTE_ON;
-    else    
+    else
         uda_regs [UDA_REG_ID_CTRL2] &= ~UDA_MUTE_ON;
-    
+
     udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL2 | uda_regs [UDA_REG_ID_CTRL2] );
 }
 */

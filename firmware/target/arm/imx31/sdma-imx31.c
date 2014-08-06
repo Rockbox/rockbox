@@ -579,7 +579,7 @@ void sdma_channel_stop(unsigned int channel)
     chmsk = 1ul << channel;
 
     /* Lock callback */
-    oldstatus = disable_irq_save();    
+    oldstatus = disable_irq_save();
     intmsk = sdma_enabled_ints;
     sdma_enabled_ints &= ~chmsk;
     restore_irq(oldstatus);
@@ -690,7 +690,7 @@ void sdma_write_words(const unsigned long *buf, unsigned long start, int count)
 {
     /* Setup buffer descriptor with channel 0 command */
     set_buffer_descriptor(&c0_buffer_desc.bd,
-                          C0_SETDM, 
+                          C0_SETDM,
                           BD_DONE | BD_WRAP | BD_EXTD,
                           count,
                           (void *)addr_virt_to_phys((unsigned long)buf),
@@ -705,7 +705,7 @@ void sdma_read_words(unsigned long *buf, unsigned long start, int count)
 {
     /* Setup buffer descriptor with channel 0 command */
     set_buffer_descriptor(&c0_buffer_desc.bd,
-                          C0_GETDM, 
+                          C0_GETDM,
                           BD_DONE | BD_WRAP | BD_EXTD,
                           count,
                           (void *)addr_virt_to_phys((unsigned long)buf),

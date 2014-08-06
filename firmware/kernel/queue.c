@@ -331,7 +331,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
         disable_irq();
         corelock_lock(&q->cl);
-    } 
+    }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if(ev)
@@ -386,7 +386,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
         current->bqp = &q->queue;
 
         block_thread(current, ticks);
-        corelock_unlock(&q->cl);    
+        corelock_unlock(&q->cl);
 
         switch_thread();
 
@@ -466,7 +466,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 
     q->events[wr].id   = id;
     q->events[wr].data = data;
-    
+
     if(LIKELY(q->send))
     {
         struct queue_sender_list *send = q->send;
@@ -505,7 +505,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
-    
+
     return 0;
 }
 
@@ -747,7 +747,7 @@ void queue_clear(struct event_queue* q)
 
 /**
  * The number of events waiting in the queue.
- * 
+ *
  * @param struct of event_queue
  * @return number of events in the queue
  */
@@ -775,7 +775,7 @@ int queue_broadcast(long id, intptr_t data)
     corelock_unlock(&all_queues.cl);
     restore_irq(oldlevel);
 #endif
-   
+
     return p - all_queues.queues;
 }
 

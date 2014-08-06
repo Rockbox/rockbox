@@ -50,7 +50,7 @@ void grey_set_position(int x, int y)
 #endif /* LCD_PIXELFORMAT */
     _grey_info.x = x;
     _grey_info.y = y;
-    
+
     if (_grey_info.flags & _GREY_RUNNING)
     {
 #ifdef SIMULATOR
@@ -256,5 +256,5 @@ void grey_framebuffer_set_pos(int x, int y, int width, int height)
     _grey_info.cb_width = width;
     _grey_info.cb_height = height;
 
-    grey_update_clip_rect();    
+    grey_update_clip_rect();
 }

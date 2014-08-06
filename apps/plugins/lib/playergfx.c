@@ -66,7 +66,7 @@ bool pgfx_init(int cwidth, int cheight)
 void pgfx_release(void)
 {
     int i;
-    
+
     for (i = 0; i < 8; i++)
         if (gfx_chars[i])
             rb->lcd_unlock_pattern(gfx_chars[i]);
@@ -98,7 +98,7 @@ void pgfx_update(void)
 
     for (i = 0; i < char_width * char_height; i++)
         rb->lcd_define_pattern(gfx_chars[i], gfx_buffer + 7 * i);
-    
+
     rb->lcd_update();
 }
 
@@ -141,7 +141,7 @@ lcd_pixelfunc_type* pgfx_pixelfuncs[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
-                               
+
 static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     *address ^= (bits & mask);
@@ -160,7 +160,7 @@ static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     unsigned data = *(char *)address;
-    
+
     bits    ^= data;
     *address = data ^ (bits & mask);
 }
@@ -183,7 +183,7 @@ static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
     unsigned data = *(char *)address;
-    
+
     bits     = ~bits ^ data;
     *address = data ^ (bits & mask);
 }
@@ -206,7 +206,7 @@ void pgfx_clear_display(void)
 /* Set a single pixel */
 void pgfx_drawpixel(int x, int y)
 {
-    if (((unsigned)x < (unsigned)pixel_width) 
+    if (((unsigned)x < (unsigned)pixel_width)
         && ((unsigned)y < (unsigned)pixel_height))
         pgfx_pixelfuncs[drawmode](x, y);
 }
@@ -300,16 +300,16 @@ void pgfx_hline(int x1, int x2, int y)
     }
 
     /* nothing to draw? */
-    if (((unsigned)y >= (unsigned)pixel_height) || (x1 >= pixel_width) 
+    if (((unsigned)y >= (unsigned)pixel_height) || (x1 >= pixel_width)
         || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
     if (x2 >= pixel_width)
         x2 = pixel_width - 1;
-        
+
     bfunc = pgfx_blockfuncs[drawmode];
     dst   = &gfx_buffer[pixel_height * (x1/5) + y];
     nx    = x2 - (x1 - (x1 % 5));
@@ -341,18 +341,18 @@ void pgfx_vline(int x, int y1, int y2)
         y1 = y2;
         y2 = y;
     }
-    
+
     /* nothing to draw? */
-    if (((unsigned)x >= (unsigned)pixel_width) || (y1 >= pixel_height) 
+    if (((unsigned)x >= (unsigned)pixel_width) || (y1 >= pixel_height)
         || (y2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
     if (y2 >= pixel_height)
         y2 = pixel_height - 1;
-        
+
     bfunc = pgfx_blockfuncs[drawmode];
     dst   = &gfx_buffer[pixel_height * (x/5) + y1];
     mask  = 0x10 >> (x % 5);
@@ -406,7 +406,7 @@ void pgfx_fillrect(int x, int y, int width, int height)
         width = pixel_width - x;
     if (y + height > pixel_height)
         height = pixel_height - y;
-    
+
     bfunc = pgfx_blockfuncs[drawmode];
     dst   = &gfx_buffer[pixel_height * (x/5) + y];
     nx    = width - 1 + (x % 5);
@@ -436,7 +436,7 @@ void pgfx_fillrect(int x, int y, int width, int height)
 /* About PlayerGFX internal bitmap format:
  *
  * A bitmap contains one bit for every pixel that defines if that pixel is
- * black (1) or white (0). Bits within a byte are arranged horizontally, 
+ * black (1) or white (0). Bits within a byte are arranged horizontally,
  * MSB at the left.
  * The bytes are stored in row-major order, with byte 0 being top left,
  * byte 1 2nd from left etc. Each row of bytes defines one pixel row.
@@ -453,10 +453,10 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
     lcd_blockfunc_type *bfunc;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= pixel_width) 
+    if ((width <= 0) || (height <= 0) || (x >= pixel_width)
         || (y >= pixel_height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -474,10 +474,10 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
         width = pixel_width - x;
     if (y + height > pixel_height)
         height = pixel_height - y;
-        
+
     stride = (stride + 7) >> 3; /* convert to no. of bytes */
 
-    src   += stride * src_y + (src_x >> 3); /* move starting point */  
+    src   += stride * src_y + (src_x >> 3); /* move starting point */
     dst   = &gfx_buffer[pixel_height * (x/5) + y];
     shift = 3 + (x % 5) - (src_x & 7);
     nx    = width - 1 + (x % 5);
@@ -485,7 +485,7 @@ void pgfx_bitmap_part(const unsigned char *src, int src_x, int src_y,
     bfunc  = pgfx_blockfuncs[drawmode];
     mask  = 0x1F >> (x % 5);
     mask_right = 0x1F0 >> (nx % 5);
-    
+
     dst_end = dst + height;
     do
     {

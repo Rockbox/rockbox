@@ -687,7 +687,7 @@ static void refresh_board (void)
 #else
     x = BOARD_X + CUBE_SIZE * BOARD_W - 40;
 #endif
-    rb->lcd_putsxyf (x, BOARD_Y + CUBE_SIZE * BOARD_H - 8, 
+    rb->lcd_putsxyf (x, BOARD_Y + CUBE_SIZE * BOARD_H - 8,
                  (player.lives != 1) ? "%d Lives" : "%d Life", player.lives);
 
 #if LCD_DEPTH>=2
@@ -1110,7 +1110,7 @@ static int xobox_menu_cb(int action, const struct menu_item_ex *this_item)
 static int xobox_menu(bool ingame)
 {
     rb->button_clear_queue();
-    
+
     int selection = 0;
     MENUITEM_STRINGLIST(main_menu, "Xobox Menu", xobox_menu_cb,
                         "Resume Game", "Start New Game",

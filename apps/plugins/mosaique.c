@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Itai Shaked 
+ * Copyright (C) 2002 Itai Shaked
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -72,26 +72,26 @@ enum plugin_status plugin_start(const void* parameter)
     while (1) {
 
         x+=sx;
-        if (x>GFX_WIDTH) 
+        if (x>GFX_WIDTH)
         {
             x = 2*GFX_WIDTH-x;
             sx=-sx;
         }
 
-        if (x<0) 
+        if (x<0)
         {
             x = -x;
             sx = -sx;
         }
 
         y+=sy;
-        if (y>GFX_HEIGHT) 
+        if (y>GFX_HEIGHT)
         {
             y = 2*GFX_HEIGHT-y;
             sy=-sy;
         }
 
-        if (y<0) 
+        if (y<0)
         {
             y = -y;
             sy = -sy;

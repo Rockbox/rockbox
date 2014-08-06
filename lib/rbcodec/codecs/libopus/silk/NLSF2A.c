@@ -175,4 +175,3 @@ void silk_NLSF2A(
         }
     }
 }
-

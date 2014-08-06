@@ -86,7 +86,7 @@ void ascodec_lock(void)
     i2c_lock();
 }
 
-void ascodec_unlock(void) 
+void ascodec_unlock(void)
 {
     i2c_unlock();
 }

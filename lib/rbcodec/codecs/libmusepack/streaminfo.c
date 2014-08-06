@@ -118,7 +118,7 @@ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
     si->ms                 = mpc_bits_read(r, 1);
     si->max_band           = mpc_bits_read(r, 6);
     si->profile            = mpc_bits_read(r, 4);
-/* rockbox: not used    
+/* rockbox: not used
     si->profile_name       = mpc_get_version_string(si->profile);
 */
     mpc_bits_read(r, 2); // Link ?
@@ -149,13 +149,13 @@ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
         if (tmp >= (1 << 16) || tmp < 0) tmp = 0;
         si->gain_album = (mpc_int16_t) tmp;
     }
-    
+
     if (si->peak_title != 0)
         si->peak_title = (mpc_uint16_t) (log10(si->peak_title) * 20 * 256 + .5);
 
     if (si->peak_album != 0)
         si->peak_album = (mpc_uint16_t) (log10(si->peak_album) * 20 * 256 + .5);
-        
+
     mpc_get_encoder_string(si);
 */
 
@@ -167,7 +167,7 @@ streaminfo_read_header_sv7(mpc_streaminfo* si, mpc_bits_reader * r)
     else
         si->samples -= MPC_DECODER_SYNTH_DELAY;
 
-    si->average_bitrate = 8LL * (si->tag_offset - si->header_position) 
+    si->average_bitrate = 8LL * (si->tag_offset - si->header_position)
                           *  si->sample_freq / si->samples;
 
     return check_streaminfo(si);
@@ -216,7 +216,7 @@ streaminfo_read_header_sv8(mpc_streaminfo* si, const mpc_bits_reader * r_in,
     si->bitrate = 0;
 
     if ((si->samples - si->beg_silence) != 0)
-        si->average_bitrate = 8LL * (si->tag_offset - si->header_position) 
+        si->average_bitrate = 8LL * (si->tag_offset - si->header_position)
                               *  si->sample_freq / (si->samples - si->beg_silence);
 
     return check_streaminfo(si);
@@ -228,7 +228,7 @@ void  streaminfo_encoder_info(mpc_streaminfo* si, const mpc_bits_reader * r_in)
     mpc_bits_reader r = *r_in;
 
     si->profile            = mpc_bits_read(&r, 7); // to be divided by 8
-/* rockbox: not used    
+/* rockbox: not used
     si->profile_name       = mpc_get_version_string(si->profile);
 */
     si->pns                = mpc_bits_read(&r, 1);
@@ -236,7 +236,7 @@ void  streaminfo_encoder_info(mpc_streaminfo* si, const mpc_bits_reader * r_in)
     si->encoder_version |= mpc_bits_read(&r, 8) << 16; // minor
     si->encoder_version |= mpc_bits_read(&r, 8) << 8; // build
 
-/* rockbox: not used   
+/* rockbox: not used
     mpc_get_encoder_string(si);
 */
 }

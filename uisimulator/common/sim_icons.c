@@ -282,7 +282,7 @@ struct icon_info
 
 static struct icon_info icons [] =
 {
-    
+
   {icon_battery, 0, 0},
   {icon_battery_bit, 2, 0},
   {icon_battery_bit, 8, 0},
@@ -309,4 +309,3 @@ lcd_icon(int icon, bool enable)
   lcd_print_icon(icons[icon].xpos, icons[icon].row, enable,
          icons[icon].bitmap);
 }
-

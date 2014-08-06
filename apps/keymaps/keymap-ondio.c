@@ -88,7 +88,7 @@ static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_MENU|BUTTON_REL,       BUTTON_MENU },
     { ACTION_TREE_STOP,   BUTTON_OFF,                   BUTTON_NONE },
     { ACTION_STD_CANCEL,  BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_listtree */
 
@@ -108,9 +108,9 @@ static const struct button_mapping button_context_tree_scroll_lr[]  = {
 
 static const struct button_mapping button_context_yesno[] = {
     { ACTION_YESNO_ACCEPT,      BUTTON_RIGHT,    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; 
+};
 
 static const struct button_mapping button_context_bmark[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                 BUTTON_NONE },
@@ -131,22 +131,22 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_TOGGLE_MODE,    BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU },
     { ACTION_PS_RESET,          BUTTON_MENU,                BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchscreen */
 
 #ifdef HAVE_RECORDING
 static const struct button_mapping button_context_rectrigger[]  = {
-    { ACTION_STD_OK,                BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },  
+    { ACTION_STD_OK,                BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_RECSCREEN)
 };
 static const struct button_mapping button_context_recscreen[]  = {
-    { ACTION_REC_PAUSE,             BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },  
+    { ACTION_REC_PAUSE,             BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 #endif /* HAVE_RECORDING  */
@@ -210,21 +210,21 @@ const struct button_mapping* get_context_mapping( int context )
     {
         case CONTEXT_STD:
             return button_context_standard;
-            
+
         case CONTEXT_WPS:
             return button_context_wps;
 
         case CONTEXT_SETTINGS:
             return button_context_settings;
-            
+
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;
-            
+
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
-        case CONTEXT_TREE:     
+        case CONTEXT_TREE:
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;

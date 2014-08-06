@@ -1016,7 +1016,7 @@ int ov_open_callbacks(void *f,OggVorbis_File *vf,
 /* returns: total PCM length (samples) of content if i==-1 PCM length
             (samples) of that logical bitstream for i==0 to n
             OV_EINVAL if the stream is not seekable (we can't know the
-            length) or only partially open 
+            length) or only partially open
 */
 ogg_int64_t ov_pcm_total(OggVorbis_File *vf,int i){
   if(vf->ready_state<OPENED)return(OV_EINVAL);
@@ -1035,7 +1035,7 @@ ogg_int64_t ov_pcm_total(OggVorbis_File *vf,int i){
 /* returns: total milliseconds of content if i==-1
             milliseconds in that logical bitstream for i==0 to n
             OV_EINVAL if the stream is not seekable (we can't know the
-            length) or only partially open 
+            length) or only partially open
 */
 ogg_int64_t ov_time_total(OggVorbis_File *vf,int i){
   if(vf->ready_state<OPENED)return(OV_EINVAL);
@@ -1303,8 +1303,8 @@ int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos){
       }else{
         /* take a (pretty decent) guess. */
         bisect=begin + rescale64(target-begintime,
-				 endtime-begintime,
-				 end-begin) - CHUNKSIZE;
+                                 endtime-begintime,
+                                 end-begin) - CHUNKSIZE;
         if(bisect<begin+CHUNKSIZE)
           bisect=begin;
       }
@@ -1589,7 +1589,7 @@ ogg_int64_t ov_time_tell(OggVorbis_File *vf){
   if(vf->seekable){
     pcm_total=ov_pcm_total(vf,-1);
     time_total=ov_time_total(vf,-1);
-  
+
     /* which bitstream section does this time offset occur in? */
     for(link=vf->links-1;link>=0;link--){
       pcm_total-=vf->pcmlengths[link*2+1];
@@ -1667,4 +1667,3 @@ long ov_read_fixed(OggVorbis_File *vf,ogg_int32_t ***pcm_channels,int length,
     }
   }
 }
-

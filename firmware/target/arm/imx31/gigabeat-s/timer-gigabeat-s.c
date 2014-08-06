@@ -58,7 +58,7 @@ bool timer_set(long cycles, bool start)
      * and the modulus counter is capable of 2^32-1 and as a result there is
      * no requirement to use a prescaler > 1. This gives a frequency range of
      * ~0.015366822Hz - 66000000Hz. The highest input frequency gives the
-     * greatest possible accuracy anyway. */ 
+     * greatest possible accuracy anyway. */
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
 
     /* Halt timer if running - leave module clock enabled */

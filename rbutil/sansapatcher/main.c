@@ -215,32 +215,32 @@ int main(int argc, char* argv[])
         } else if (strcmp(argv[i],"--install")==0) {
             action = INSTALL;
             i++;
-        } else if ((strcmp(argv[i],"-d")==0) || 
+        } else if ((strcmp(argv[i],"-d")==0) ||
                    (strcmp(argv[i],"--delete-bootloader")==0)) {
             action = DELETE_BOOTLOADER;
             i++;
-        } else if ((strcmp(argv[i],"-a")==0) || 
+        } else if ((strcmp(argv[i],"-a")==0) ||
                    (strcmp(argv[i],"--add-bootloader")==0)) {
             action = ADD_BOOTLOADER;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-of")==0) || 
+        } else if ((strcmp(argv[i],"-of")==0) ||
                    (strcmp(argv[i],"--update-original-firmware")==0)) {
             action = UPDATE_OF;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-bl")==0) || 
+        } else if ((strcmp(argv[i],"-bl")==0) ||
                    (strcmp(argv[i],"--update-ppbl")==0)) {
             action = UPDATE_PPBL;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-rf")==0) || 
+        } else if ((strcmp(argv[i],"-rf")==0) ||
                    (strcmp(argv[i],"--read-firmware")==0)) {
             action = READ_FIRMWARE;
             i++;
@@ -392,7 +392,7 @@ int main(int argc, char* argv[])
                     if (sansa_reopen_rw(&sansa) < 0) {
                         return 5;
                     }
-        
+
                     if (sansa_update_ppbl(&sansa, filename)==0) {
                         fprintf(stderr,"[INFO] PPBL updated successfully.\n");
                     } else {

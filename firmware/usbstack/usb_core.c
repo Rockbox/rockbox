@@ -493,11 +493,11 @@ void usb_core_hotswap_event(int volume, bool inserted)
 static void usb_core_set_serial_function_id(void)
 {
     int i, id = 0;
-    
+
     for(i = 0; i < USB_NUM_DRIVERS; i++)
         if(drivers[i].enabled)
             id |= 1 << i;
-    
+
     usb_string_iSerial.wString[0] = hex[id];
 }
 
@@ -826,10 +826,10 @@ static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
     if(EP_NUM(req->wIndex) < USB_NUM_ENDPOINTS)
         control_handler =
             ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
-    
+
     if(control_handler)
         handled = control_handler(req, response_data);
-    
+
     if(!handled) {
         /* nope. flag error */
         logf("usb bad req %d", req->bRequest);
@@ -850,7 +850,7 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
             logf("usb_core: SET FEATURE (%d)", req->wValue);
             if(req->wValue == USB_ENDPOINT_HALT)
                usb_drv_stall(EP_NUM(req->wIndex), true, EP_DIR(req->wIndex));
-            
+
             usb_drv_send(EP_CONTROL, NULL, 0);
             break;
         case USB_REQ_GET_STATUS:
@@ -860,7 +860,7 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
             if(req->wIndex > 0)
                 response_data[0] = usb_drv_stalled(EP_NUM(req->wIndex),
                                                     EP_DIR(req->wIndex));
-            
+
             usb_drv_recv(EP_CONTROL, NULL, 0);
             usb_drv_send(EP_CONTROL, response_data, 2);
             break;

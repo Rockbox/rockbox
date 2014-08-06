@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -86,9 +86,9 @@ static void put_seg_desc(void)
     long len;
     int i, ml;
     char *me;
-    
+
     len = get_seglen();
-    
+
     me = msgbuf;
     rb->snprintf(me,MAXDESCLEN, "%4d: ", currseg);
     me = me+rb->strlen(me);
@@ -96,13 +96,13 @@ static void put_seg_desc(void)
       rb->snprintf(me,MAXDESCLEN, "%5ld bytes, ", len);
       me = me+rb->strlen(me);
     }
-    
+
     ml = 0;
     for(i = 0; seg_desc[i]; i++) {
       if(seg_desc[i] == '\n') {
         *me = '\0';
         put_msg(msgbuf);
-        
+
         me = msgbuf;
         rb->snprintf(me,MAXDESCLEN, "      ");
         me = me+rb->strlen(me);
@@ -125,13 +125,13 @@ static void put_seg_desc(void)
   }
 #ifdef DEBUG_TAPE
   else fprintf(stderr, "virtual   segment\n");
-#endif    
+#endif
 }
 
 static void get_next_segment(void)
 {
   int propseg;
-  
+
   do {
     propseg = 1;
 
@@ -139,34 +139,34 @@ static void get_next_segment(void)
     currseg = segment_pos();
 
     put_seg_desc();
-    
+
     switch(segtype) {
     case SEG_ERROR:
     case SEG_END:
       stop_playing();
       break;
-      
+
     case SEG_STOP:
       pause_playing();
       put_msg(" * Tape paused; Press Ctrl-o to restart * ");
       break;
-      
+
     case SEG_SKIP:
       propseg = 0;
       break;
-      
+
     case SEG_GRP_BEG:
       ingroup = 1;
       propseg = 0;
       break;
-      
+
     case SEG_GRP_END:
       ingroup = 0;
       propseg = 0;
       break;
     }
   } while(!propseg);
-  
+
   lastdatak = 0;
 }
 
@@ -179,9 +179,9 @@ void play_tape(void)
   static dbyte *impbufp;
   static int impbufrem;
   static long imprem;
-  
+
   static int cleared_buffers = 1;
- 
+
   int tsn;
   dbyte *ibp;
   byte *tsp;
@@ -195,7 +195,7 @@ void play_tape(void)
   tsp = sp_tape_impinfo;
   op  = sp_tape_sound;
   tsn = TMNUM;
-  
+
   if(!playing) {
     if(cleared_buffers) return;
 
@@ -214,7 +214,7 @@ void play_tape(void)
   else if(!sp_playing_tape) {
     sp_playing_tape = 1;
     cleared_buffers = 0;
-    
+
     impbufrem = 0;
     imprem = 0;
     clevel = get_level() ? ~(0) : 0;
@@ -224,10 +224,10 @@ void play_tape(void)
   else ca = 0;
 
 #ifdef DEBUG_TAPE
-  if(((clevel ? 1 : 0) ^ 
-      (DANM(ula_inport) & EARBIT ? 1 : 0) ^ 
-      (DANM(imp_change) ? 1 : 0) ^ 
-      (ca ? 1 : 0)) == 0) 
+  if(((clevel ? 1 : 0) ^
+      (DANM(ula_inport) & EARBIT ? 1 : 0) ^
+      (DANM(imp_change) ? 1 : 0) ^
+      (ca ? 1 : 0)) == 0)
     fprintf(stderr, "Levels don't match %i %i\n", imprem, impbufrem);
 #endif
 
@@ -262,7 +262,7 @@ void play_tape(void)
     if(ibr) {
       if(!ca) {
     if(cl) {
-      ov += ir; 
+      ov += ir;
       ca = (CHKTICK/2) - ov + 1;
     }
     else {
@@ -307,9 +307,9 @@ void play_tape(void)
   imprem = ir;
   impbufp = ibp;
 
-  if(segtype >= SEG_DATA) { 
+  if(segtype >= SEG_DATA) {
     int datak;
-    
+
     datak = (int) (get_segpos() / 1000);
     if(datak > lastdatak) {
       if(ingroup) rb->snprintf(msgbuf,MAXDESCLEN, "%4d: ", currseg);
@@ -324,14 +324,14 @@ void play_tape(void)
 
 /*
 
-2168 
+2168
 2168  (9-10)
 
 667
 735   (2-4)
 
 855
-855   (3-5)    
+855   (3-5)
 
 1710
 1710  (7-9)
@@ -402,7 +402,7 @@ void rec_tape(void)
       if(lastlen < MAXLEN) continue;
     }
     else lastmic = ~lastmic & MICBIT;
-    
+
     switch(rec_state) {
     case RC_NONE:
       if(lastlen >= LEADER_MIN && lastlen <= LEADER_MAX) {
@@ -413,7 +413,7 @@ void rec_tape(void)
       }
       if((frameswait++ & 15)) break;
       frameswait &= 0x3F;
-      sprintf(msgbuf, "  %s: WAITING %c", 
+      sprintf(msgbuf, "  %s: WAITING %c",
           tapename, waitchars[(frameswait >> 4)]);
       put_tmp_msg(msgbuf);
       break;
@@ -426,7 +426,7 @@ void rec_tape(void)
     }
     break;
       }
-      if(leadercount >= LEADER_MIN_COUNT && 
+      if(leadercount >= LEADER_MIN_COUNT &&
      lastlen >= SYNC_MIN && lastlen <= SYNC_MAX) rec_state = RC_SYNC;
       else rec_state = RC_NONE;
       break;
@@ -450,7 +450,7 @@ void rec_tape(void)
       thishalf = -1;
       if(lastlen >= BIT0_MIN && lastlen <= BIT0_MAX) thishalf = 0;
       else if(lastlen >= BIT1_MIN && lastlen <= BIT1_MAX) thishalf = 1;
-      
+
       if(thishalf < 0 || (whole && firsthalf != thishalf)) {
     char filename[11];
     int filesize;
@@ -459,14 +459,14 @@ void rec_tape(void)
     sprintf(msgbuf, "%s: %03d", tapename, rec_segment);
     if(bytecount >= 1) {
       sprintf(msgbuf+strlen(msgbuf),
-          " %02X %5d %3s", recbuf[0], bytecount-2, 
+          " %02X %5d %3s", recbuf[0], bytecount-2,
          parity == 0 ? "OK" : "ERR");
       if(recbuf[0] == 0 && bytecount - 2 >= 17) {
         filetype = recbuf[1];
         strncpy(filename, (char*) recbuf+2, 10);
         filename[10] = '\0';
         filesize = recbuf[12] + (recbuf[13] << 8);
-        
+
         sprintf(msgbuf+strlen(msgbuf),
             "  %02X %10s %5i", filetype, filename, filesize);
       }
@@ -475,7 +475,7 @@ void rec_tape(void)
 
     putc(bytecount & 0xFF, tapefp);
     putc((bytecount >> 8) & 0xFF, tapefp);
-    
+
     fwrite(recbuf, 1, (size_t) bytecount, tapefp);
     fflush(tapefp);
 
@@ -485,7 +485,7 @@ void rec_tape(void)
     rec_state = RC_NONE;
     break;
       }
-      
+
       if(!whole) {
     whole = 1;
     firsthalf = thishalf;
@@ -494,7 +494,7 @@ void rec_tape(void)
     whole = 0;
     data |= thishalf;
     bitnum++;
-    
+
     if(bitnum == 8) {
       bitnum = 0;
       if(recbufsize <= bytecount) {
@@ -509,9 +509,9 @@ void rec_tape(void)
       parity = parity ^ data;
       data = 0;
       bytecount++;
-      
+
       if(!(bytecount & 1023)) {
-        sprintf(msgbuf, "  %s: DATA %i kB", 
+        sprintf(msgbuf, "  %s: DATA %i kB",
             tapename, bytecount >> 10);
         put_tmp_msg(msgbuf);
       }
@@ -597,7 +597,7 @@ void start_play_file_type(char *name, int seg, int type)
 
   currseg = seg;
   tapetype = type;
-  
+
   spcf_find_file_type(tapename, &filetype, &tapetype);
   if(currseg < 0) currseg = 0;
 
@@ -620,7 +620,7 @@ void start_play(void)
   name = spif_get_tape_fileinfo(&seg, &t);
   if(name == NULL) return;
 
-  start_play_file_type(name, seg, -1); 
+  start_play_file_type(name, seg, -1);
 }
 
 
@@ -646,7 +646,7 @@ void start_rec(void)
 {
 #if 0
   char *name;
-  
+
   if(playing || paused || recording) return;
 
   put_msg("Enter tape file to record (default: '.tap'):");
@@ -656,9 +656,9 @@ void start_rec(void)
 
   strncpy(tapename, name, MAXFILENAME-10);
   tapename[MAXFILENAME-10] = '\0';
-  
+
   if(!check_ext(tapename, "tap")) add_extension(tapename, "tap");
-  
+
   tapefp = fopen(tapename, "ab");
   if(tapefp == NULL) {
     sprintf(msgbuf, "Could not open tape file `%s', %s",
@@ -666,12 +666,12 @@ void start_rec(void)
     put_msg(msgbuf);
     return;
   }
-  
+
   recording = 1;
   rec_segment = 0;
   rec_state = RC_NONE;
 
-  sprintf(msgbuf, 
+  sprintf(msgbuf,
       "Recordind tape file `%s'. To stop press Ctrl-s", tapename);
   put_msg(msgbuf);
 #endif
@@ -705,7 +705,7 @@ void qload(void)
       put_msg("Not quick loading tape");
       return;
     }
-    while(playing && (segtype != SEG_DATA || get_segpos() > 0)) 
+    while(playing && (segtype != SEG_DATA || get_segpos() > 0))
       get_next_segment();
 
   } while(!playing);
@@ -713,13 +713,13 @@ void qload(void)
   dtmp = AFBK;
   AFBK = AF;
   AF = dtmp;
-  
+
   type = RA;
   verify = !(RF & CF);
   length = DE;
   firstbyte = !(RF & ZF);
   dest = IX;
-  
+
   parity = 0;
   success = 0;
 
@@ -728,7 +728,7 @@ void qload(void)
     if(nextdata < 0) break;
 
     parity ^= nextdata;
-    
+
     if(!length) {
       if(!parity) success = 1;
       break;
@@ -758,7 +758,7 @@ void qload(void)
   PC = SA_LD_RET;
   DANM(iff1) = DANM(iff2) = 1;
   DANM(haltstate) = 1;
-  
+
   sp_init_screen_mark();
 
   if(spt_auto_stop) pause_playing();

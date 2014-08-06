@@ -36,10 +36,10 @@ static t_int *clip_perform(t_int *w)
 
     while (n--)
     {
-    	t_sample f = *in++;
-	if (f < lo) f = lo;
-	if (f > hi) f = hi;
-    	*out++ = f;
+        t_sample f = *in++;
+        if (f < lo) f = lo;
+        if (f > hi) f = hi;
+        *out++ = f;
     }
     return (w+5);
 }
@@ -52,8 +52,7 @@ static void clip_dsp(t_clip *x, t_signal **sp)
 void clip_tilde_setup(void)
 {
     clip_class = class_new(gensym("clip~"), (t_newmethod)clip_new, 0,
-    	sizeof(t_clip), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+        sizeof(t_clip), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(clip_class, t_clip, x_f);
     class_addmethod(clip_class, (t_method)clip_dsp, gensym("dsp"), 0);
 }
-

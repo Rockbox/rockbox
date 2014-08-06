@@ -120,8 +120,8 @@ AV out    = 9F06 */
 
 #define HEADPHONE_PLUGIN_A              0xAF06
 #define HEADPHONE_PLUGIN_B              0x00AF06 //Dummy Value
-#define HEADPHONE_UNPLUG_A              0x00BF06 //Dummy Value 
-#define HEADPHONE_UNPLUG_B              0x00BF061 //Dummy Value 
+#define HEADPHONE_UNPLUG_A              0x00BF06 //Dummy Value
+#define HEADPHONE_UNPLUG_B              0x00BF061 //Dummy Value
 
 #define DOCK_INSERT                     0x00003 //Dummy Value
 #define DOCK_UNPLUG                     0x00002 //Dummy Value
@@ -185,7 +185,7 @@ void GIO0(void)
 {
     /* Mask GIO0 interrupt */
     IO_INTC_IRQ1 = INTR_IRQ1_EXT0;
-    
+
     unsigned char msg[4];
     i2c_read(PIC_ADR, msg, sizeof(msg));
     tick_diff = current_tick - last_tick;

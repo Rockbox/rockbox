@@ -303,7 +303,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         return;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) ||
         (y >= LCD_HEIGHT) || (x + width <= 0) || (y + height <= 0))
         return;
 

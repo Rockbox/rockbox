@@ -47,7 +47,7 @@ void lcd_set_flip(bool yesno)
 
 /* LCD init */
 void lcd_init_device(void)
-{  
+{
 
 }
 

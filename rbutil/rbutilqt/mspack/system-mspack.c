@@ -61,7 +61,7 @@ int mspack_valid_system(struct mspack_system *sys) {
 
 /* returns the length of a file opened for reading */
 int mspack_sys_filelen(struct mspack_system *system,
-		       struct mspack_file *file, off_t *length)
+                       struct mspack_file *file, off_t *length)
 {
   off_t current;
 
@@ -111,7 +111,7 @@ struct mspack_file_p {
 };
 
 static struct mspack_file *msp_open(struct mspack_system *self,
-				    const char *filename, int mode)
+                                    const char *filename, int mode)
 {
   struct mspack_file_p *fh;
   const char *fmode;

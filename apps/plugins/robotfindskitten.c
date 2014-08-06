@@ -9,7 +9,7 @@
  *
  * robotfindskitten: A Zen simulation
  *
- * Copyright (C) 1997,2000 Leonard Richardson 
+ * Copyright (C) 1997,2000 Leonard Richardson
  *                         leonardr@segfault.org
  *                         http://www.crummy.com/devel/
  *
@@ -39,8 +39,8 @@
 /*Be sure to change MESSAGES when you change the array, or bad things
   will happen.*/
 
-/*Also, take note that robotfindskitten.c and configure.in 
-  currently have the version number hardcoded into them, and they 
+/*Also, take note that robotfindskitten.c and configure.in
+  currently have the version number hardcoded into them, and they
   should reflect MESSAGES. */
 
 /* Watch out for fenceposts.*/
@@ -327,7 +327,7 @@ static char* messages[] =
   "A discredited cosmology, relic of a bygone era.",
   "A hollow voice says \"Plugh\".",
   "A knight who says \"Either I am an insane knave, or you will find kitten.\"",
-  "The secret meeting place of the Knights of the Lambda Calculus.",     
+  "The secret meeting place of the Knights of the Lambda Calculus.",
   "A neural net -- maybe it's trying to recognize kitten.",
   "A screwdriver.",
   "A statue of a girl holding a goose like the one in Gottingen, Germany.",
@@ -350,18 +350,18 @@ static char* messages[] =
   "Sutro Tower is visible at some distance through the fog.",
   "The Digital Millennium Copyright Act of 1998.",
   "The United States Court of Appeals for the Federal Circuit.",
-  "The non-kitten item like this but with \"false\" and \"true\" switched is true.", 
+  "The non-kitten item like this but with \"false\" and \"true\" switched is true.",
   "The non-kitten item like this but with \"true\" and \"false\" switched is false.",
-  "This is the chapter called \"A Map of the Cat?\" from Feynman's autobiography.",  
+  "This is the chapter called \"A Map of the Cat?\" from Feynman's autobiography.",
   "This is the forest primeval.",
   "Werner's \"Pocket Field Guide to Things That Are Not Kitten\".",
   "You found nettik, but that's backwards.",
-  "You have found some zinc, but you must not stop here, for you must find kitten.", 
+  "You have found some zinc, but you must not stop here, for you must find kitten.",
   "\"50 Years Among the Non-Kitten Items\", by Ann Droyd.",
   "\"Robot may not injure kitten, or, through inaction, ...\"",
   "\"Address Allocation for Private Internets\" by Yakov Rekhter et al.",
   "\"Mail Routing and the Domain System\" by Craig Partridge.",
-  "\"The Theory and Practice of Oligarchical Collectivism\" by Emmanuel Goldstein.", 
+  "\"The Theory and Practice of Oligarchical Collectivism\" by Emmanuel Goldstein.",
   "\"201 Kitten Verbs, Fully Conjugated\".  You look for \"find\".",
   "A card shark sits here, practicing his Faro shuffle.  He ignores you.",
   "A copy of DeCSS.  They're a dime a dozen these days.",
@@ -639,19 +639,19 @@ static void play_game()
     while (input != RFK_QUIT && exit_rfk == false)
     {
         process_input(input);
-      
+
         /*Redraw robot, where applicable. We're your station, robot.*/
         if (!(old_x == robot.x && old_y == robot.y))
         {
             /*Get rid of the old robot*/
             drawchar(old_x, old_y, ' ');
             screen[old_x][old_y] = EMPTY;
-      
+
             /*Meet the new robot, same as the old robot.*/
             draw(robot);
             refresh();
             screen[robot.x][robot.y] = ROBOT;
-      
+
             old_x = robot.x;
             old_y = robot.y;
         }
@@ -690,7 +690,7 @@ static void process_input(int input)
       check_x++;
       break;
     }
-  
+
   /*Check for going off the edge of the screen.*/
   if (check_y < Y_MIN || check_y > Y_MAX || check_x < X_MIN || check_x > X_MAX)
     {
@@ -702,7 +702,7 @@ static void process_input(int input)
    * disabled because it breaks the scrolling for some reason
    */
   /* rb->lcd_puts_scroll(0, ADV_ROW, " "); */
-  
+
   /*Check for collision*/
   if (screen[check_x][check_y] != EMPTY)
     {
@@ -849,7 +849,7 @@ static void initialize_arrays()
 #endif
   empty.bold = false;
   empty.character = ' ';
-  
+
   for (counter = 0; counter <= X_MAX; counter++)
   {
     for (counter2 = 0; counter2 <= Y_MAX; counter2++)
@@ -857,7 +857,7 @@ static void initialize_arrays()
       screen[counter][counter2] = EMPTY;
     }
   }
-  
+
   /*Initialize the other arrays.*/
   for (counter = 0; counter < MESSAGES; counter++)
   {
@@ -891,7 +891,7 @@ static void initialize_kitten()
         kitten.x = randx();
         kitten.y = randy();
     } while (screen[kitten.x][kitten.y] != EMPTY);
-  
+
     /*Assign the kitten a character and a color.*/
     do {
         kitten.character = randchar();
@@ -911,12 +911,12 @@ static void initialize_bogus()
         /*Give it a color.*/
         bogus[counter].color = colors[randcolor()];
         bogus[counter].bold = randbold();
-      
+
         /*Give it a character.*/
         do {
             bogus[counter].character = randchar();
         } while (!(validchar(bogus[counter].character)));
-      
+
         /*Give it a position.*/
         do {
             bogus[counter].x = randx();
@@ -924,7 +924,7 @@ static void initialize_bogus()
         } while (screen[bogus[counter].x][bogus[counter].y] != EMPTY);
 
         screen[bogus[counter].x][bogus[counter].y] = counter+2;
-      
+
         /*Find a message for this object.*/
         do {
             index = rb->rand() % MESSAGES;
@@ -949,7 +949,7 @@ static void initialize_screen()
   rb->snprintf(buf, sizeof(buf), "robotfindskitten %s", RFK_VERSION);
   rb->lcd_puts_scroll(0, 0, buf);
   refresh();
-  
+
   /*Draw a line across the screen.*/
   for (counter = X_MIN; counter <= X_MAX + 1; counter++)
     {

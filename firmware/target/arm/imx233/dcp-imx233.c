@@ -8,7 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2011 by Amaury Pouly
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -187,7 +187,7 @@ enum imx233_dcp_error_t imx233_dcp_blit_ex(int ch, bool fill, const void *src, s
     channel_packet[ch].size = w | h << HW_DCP_SIZE__NUMBER_LINES_BP;
     channel_packet[ch].payload = 0;
     channel_packet[ch].status = 0;
-    
+
     /* we have a problem here to discard the output buffer since it's not contiguous
      * so only commit the source */
     if(!fill)

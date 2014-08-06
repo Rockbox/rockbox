@@ -29,7 +29,7 @@ static void usage(char *name)
     printf("\n");
     printf("options:\n");
     printf("-e1 - encode stage1 bootloader\n");
-    printf("-e2 - encode stage2 bootloader\n");    
+    printf("-e2 - encode stage2 bootloader\n");
 }
 
 int main(int argc, char **argv)
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
         return -5;
     }
 
- 
+
     fprintf(stderr,"rk27load " VERSION "\n");
     fprintf(stderr,"(C) Marcin Bukat 2011\n");
     fprintf(stderr,"Based on rk27load ver. 0.1 written by AleMaxx (alemaxx at hotmail.de)\n\n");

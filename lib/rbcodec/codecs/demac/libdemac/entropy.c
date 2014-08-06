@@ -172,7 +172,7 @@ static inline void range_start_decoding(void)
 static inline void range_dec_normalize(void)
 {
     while (rc.range <= BOTTOM_VALUE)
-    {   
+    {
         rc.buffer = (rc.buffer << 8) | read_byte();
         rc.low = (rc.low << 8) | ((rc.buffer >> 1) & 0xff);
         rc.range <<= 8;

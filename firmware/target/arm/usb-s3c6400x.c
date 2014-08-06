@@ -422,7 +422,7 @@ void usb_drv_exit(void)
     ORSTCON = 7;  /* Put the PHY into reset (needed to get current down) */
     udelay(10);
     PCGCCTL = 1;  /* Shut down PHY clock */
-    
+
 #if CONFIG_CPU==S5L8701
     PWRCON |= 0x4000;
     PWRCONEXT |= 0x800;

@@ -84,25 +84,25 @@ void start_firmware(void)
 void shutdown(void)
 {
     printf("Shutting down...");
-    
+
     /* We need to gracefully spin down the disk to prevent clicks. */
     if (ide_powered())
     {
         /* Make sure ATA has been initialized. */
         storage_init();
-        
+
         /* And put the disk into sleep immediately. */
         storage_sleepnow();
     }
 
     sleep(HZ*2);
-    
+
     /* Backlight OFF */
     _backlight_off();
 #ifdef HAVE_REMOTE_LCD
     _remote_backlight_off();
 #endif
-    
+
     __reset_cookie();
     power_off();
 }
@@ -111,14 +111,14 @@ void shutdown(void)
 void check_battery(void)
 {
     int battery_voltage, batt_int, batt_frac;
-    
+
     battery_voltage = _battery_voltage();
     batt_int = battery_voltage / 1000;
     batt_frac = (battery_voltage % 1000) / 10;
 
     printf("Batt: %d.%02dV", batt_int, batt_frac);
 
-    if (battery_voltage <= 3500) 
+    if (battery_voltage <= 3500)
     {
         printf("WARNING! BATTERY LOW!!");
         sleep(HZ*2);
@@ -142,10 +142,10 @@ void main(void)
     or_l(0x80000000, &GPIO_FUNCTION);  /* remote Play button */
     and_l(~0x80000000, &GPIO_ENABLE);
     or_l(0x00000202, &GPIO1_FUNCTION); /* main Hold & Play */
-    
+
     if ((GPIO1_READ & 0x000000002) == 0)
         on_button = true;
-        
+
     if ((GPIO_READ & 0x80000000) == 0)
         rc_on_button = true;
 #elif defined(IAUDIO_M5) || defined(IAUDIO_X5)
@@ -176,7 +176,7 @@ void main(void)
     font_init();
     adc_init();
     button_init();
-    
+
     if ((!on_button || button_hold())
         && (!rc_on_button || remote_button_hold())
         && !charger_inserted())
@@ -190,9 +190,9 @@ void main(void)
 
     printf("Rockbox boot loader");
     printf("Version " RBVERSION);
-    
+
     check_battery();
-    
+
     rc = storage_init();
     if(rc)
         error(EATA, rc, true);

@@ -30,7 +30,7 @@ bool _backlight_init(void)
 {
     _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
     _backlight_on();
-    
+
     return true; /* Backlight always ON after boot. */
 }
 

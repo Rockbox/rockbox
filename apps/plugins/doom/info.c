@@ -5182,4 +5182,3 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 #undef STEALTH_EDNUM_BASE
 
                                     };
-

@@ -7,7 +7,7 @@
 // http://en.wikipedia.org/wiki/Rijndael_S-box
 // This code is public domain, or any OSI-approved license, your choice. No warranty.
 #include "crypto.h"
- 
+
 // Here are all the lookup tables for the row shifts, rcon, s-boxes, and galois field multiplications
 byte shift_rows_table[]     = {0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11};
 byte shift_rows_table_inv[] = {0,13,10,7,4,1,14,11,8,5,2,15,12,9,6,3};
@@ -48,7 +48,7 @@ static void sub_bytes_inv(byte *a,int n) {
 
 // Perform the core key schedule transform on 4 bytes, as part of the key expansion process
 // http://en.wikipedia.org/wiki/Rijndael_key_schedule#Key_schedule_core
-static void key_schedule_core(byte *a, int i) { 
+static void key_schedule_core(byte *a, int i) {
   byte temp = a[0];     // Rotate the output eight bits to the left
   a[0]=a[1];
   a[1]=a[2];
@@ -67,12 +67,12 @@ static void expand_key(byte *key, byte *keys) {
   int j;                    // For repeating the second stage 3 times
   byte t[4];                // Temporary working area known as 't' in the Wiki article
   memcpy(keys,key,16);      // The first 16 bytes of the expanded key are simply the encryption key
-  
+
   while (bytes<176) {       // Until we have 176 bytes of expanded key, we do the following:
     memcpy(t,keys+bytes-4,4);          // We assign the value of the previous four bytes in the expanded key to t
     key_schedule_core(t, i);           // We perform the key schedule core on t, with i as the rcon iteration value
     i++;                               // We increment i by 1
-    xor_(t,keys+bytes-16,4);            // We exclusive-or t with the four-byte block 16 bytes before the new expanded key. 
+    xor_(t,keys+bytes-16,4);            // We exclusive-or t with the four-byte block 16 bytes before the new expanded key.
     memcpy(keys+bytes,t,4);            // This becomes the next 4 bytes in the expanded key
     bytes+=4;                          // Keep track of how many expanded key bytes we've added
 
@@ -149,11 +149,11 @@ static void mix_cols_inv (byte *state) {
 // http://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 void EncryptAES(byte *msg, byte *key, byte *c) {
   int i; // To count the rounds
-  
+
   // Key expansion
   byte keys[176];
   expand_key(key,keys);
-  
+
   // First Round
   memmove(c, msg, 16);
   xor_round_key(c,keys,0);
@@ -176,17 +176,17 @@ void EncryptAES(byte *msg, byte *key, byte *c) {
 // http://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 void DecryptAES(byte *c, byte *key, byte *m) {
   int i; // To count the rounds
-  
+
   // Key expansion
   byte keys[176];
   expand_key(key,keys);
-  
+
   // Reverse the final Round
   memcpy(m,c,16);
   xor_round_key(m,keys,10);
   shift_rows_inv(m);
   sub_bytes_inv(m, 16);
-  
+
   // Reverse the middle rounds
   for (i=0; i<9; i++) {
     xor_round_key(m,keys,9-i);
@@ -194,7 +194,7 @@ void DecryptAES(byte *c, byte *key, byte *m) {
     shift_rows_inv(m);
     sub_bytes_inv(m, 16);
   }
-  
+
   // Reverse the first Round
   xor_round_key(m, keys, 0);
 }
@@ -230,7 +230,7 @@ int main(void)
 
   DecryptAES(encrypted,key,decrypted);
   Pretty(decrypted,16,"Decrypted:   ");
-  
+
   return 0;
 }
 */

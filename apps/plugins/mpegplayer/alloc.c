@@ -84,7 +84,7 @@ const char * mpeg_get_reason_str(int reason)
         str = "Unknown";
     }
 
-    return str;        
+    return str;
 }
 #endif
 

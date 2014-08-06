@@ -66,7 +66,7 @@ static void lcd_write_reg(uint32_t reg, uint32_t data)
     imx233_lcdif_set_word_length(18);
     reg = encode_16_to_18(reg);
     data = encode_16_to_18(data);
-    
+
     imx233_lcdif_pio_send(false, 1, &reg);
     if(old_reg != 0 && old_reg != 0x202)
         imx233_lcdif_pio_send(true, 1, &data);
@@ -189,7 +189,7 @@ void lcd_enable(bool enable)
         return;
 
     lcd_on = enable;
-    
+
     lcd_enable_seq(enable);
     if(enable)
         send_event(LCD_EVENT_ACTIVATION, NULL);
@@ -212,7 +212,7 @@ void lcd_update_rect(int x, int y, int w, int h)
     y = MIN(y, LCD_HEIGHT);
     w = MIN(w, LCD_WIDTH - x);
     h = MIN(h, LCD_HEIGHT - y);
-    
+
     imx233_lcdif_wait_ready();
     lcd_write_reg(0x210, x);
     lcd_write_reg(0x211, x + w - 1);

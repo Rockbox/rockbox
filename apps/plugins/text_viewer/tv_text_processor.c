@@ -62,7 +62,7 @@ static unsigned short break_chars[] =
     {
         0,
         /* halfwidth characters */
-        '\t', '\n', 0x0b, 0x0c, ' ', '!', ',', '-', '.', ':', ';', '?', 0xb7, 
+        '\t', '\n', 0x0b, 0x0c, ' ', '!', ',', '-', '.', ':', ';', '?', 0xb7,
         /* fullwidth characters */
         0x2010, /* hyphen */
         0x3000, /* fullwidth space */

@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -87,33 +87,33 @@ int spkb_state_changed;
 
 #define SKP(x) BIT_N(x)
 
-#define SKN0(x) {SKP(x), 0, 0, 0, 0, 0, 0, 0} 
-#define SKN1(x) {0, SKP(x), 0, 0, 0, 0, 0, 0} 
-#define SKN2(x) {0, 0, SKP(x), 0, 0, 0, 0, 0} 
-#define SKN3(x) {0, 0, 0, SKP(x), 0, 0, 0, 0} 
-#define SKN4(x) {0, 0, 0, 0, SKP(x), 0, 0, 0} 
-#define SKN5(x) {0, 0, 0, 0, 0, SKP(x), 0, 0} 
-#define SKN6(x) {0, 0, 0, 0, 0, 0, SKP(x), 0} 
-#define SKN7(x) {0, 0, 0, 0, 0, 0, 0, SKP(x)} 
+#define SKN0(x) {SKP(x), 0, 0, 0, 0, 0, 0, 0}
+#define SKN1(x) {0, SKP(x), 0, 0, 0, 0, 0, 0}
+#define SKN2(x) {0, 0, SKP(x), 0, 0, 0, 0, 0}
+#define SKN3(x) {0, 0, 0, SKP(x), 0, 0, 0, 0}
+#define SKN4(x) {0, 0, 0, 0, SKP(x), 0, 0, 0}
+#define SKN5(x) {0, 0, 0, 0, 0, SKP(x), 0, 0}
+#define SKN6(x) {0, 0, 0, 0, 0, 0, SKP(x), 0}
+#define SKN7(x) {0, 0, 0, 0, 0, 0, 0, SKP(x)}
 
-#define SKCS0(x) {SKP(0) | SKP(x), 0, 0, 0, 0, 0, 0, 0} 
-#define SKCS1(x) {SKP(0), SKP(x), 0, 0, 0, 0, 0, 0} 
-#define SKCS2(x) {SKP(0), 0, SKP(x), 0, 0, 0, 0, 0} 
-#define SKCS3(x) {SKP(0), 0, 0, SKP(x), 0, 0, 0, 0} 
-#define SKCS4(x) {SKP(0), 0, 0, 0, SKP(x), 0, 0, 0} 
-#define SKCS5(x) {SKP(0), 0, 0, 0, 0, SKP(x), 0, 0} 
-#define SKCS6(x) {SKP(0), 0, 0, 0, 0, 0, SKP(x), 0} 
-#define SKCS7(x) {SKP(0), 0, 0, 0, 0, 0, 0, SKP(x)} 
+#define SKCS0(x) {SKP(0) | SKP(x), 0, 0, 0, 0, 0, 0, 0}
+#define SKCS1(x) {SKP(0), SKP(x), 0, 0, 0, 0, 0, 0}
+#define SKCS2(x) {SKP(0), 0, SKP(x), 0, 0, 0, 0, 0}
+#define SKCS3(x) {SKP(0), 0, 0, SKP(x), 0, 0, 0, 0}
+#define SKCS4(x) {SKP(0), 0, 0, 0, SKP(x), 0, 0, 0}
+#define SKCS5(x) {SKP(0), 0, 0, 0, 0, SKP(x), 0, 0}
+#define SKCS6(x) {SKP(0), 0, 0, 0, 0, 0, SKP(x), 0}
+#define SKCS7(x) {SKP(0), 0, 0, 0, 0, 0, 0, SKP(x)}
 
 
-#define SKSS0(x) {SKP(x), 0, 0, 0, 0, 0, 0, SKP(1)} 
-#define SKSS1(x) {0, SKP(x), 0, 0, 0, 0, 0, SKP(1)} 
-#define SKSS2(x) {0, 0, SKP(x), 0, 0, 0, 0, SKP(1)} 
-#define SKSS3(x) {0, 0, 0, SKP(x), 0, 0, 0, SKP(1)} 
-#define SKSS4(x) {0, 0, 0, 0, SKP(x), 0, 0, SKP(1)} 
-#define SKSS5(x) {0, 0, 0, 0, 0, SKP(x), 0, SKP(1)} 
-#define SKSS6(x) {0, 0, 0, 0, 0, 0, SKP(x), SKP(1)} 
-#define SKSS7(x) {0, 0, 0, 0, 0, 0, 0, SKP(x) | SKP(1)} 
+#define SKSS0(x) {SKP(x), 0, 0, 0, 0, 0, 0, SKP(1)}
+#define SKSS1(x) {0, SKP(x), 0, 0, 0, 0, 0, SKP(1)}
+#define SKSS2(x) {0, 0, SKP(x), 0, 0, 0, 0, SKP(1)}
+#define SKSS3(x) {0, 0, 0, SKP(x), 0, 0, 0, SKP(1)}
+#define SKSS4(x) {0, 0, 0, 0, SKP(x), 0, 0, SKP(1)}
+#define SKSS5(x) {0, 0, 0, 0, 0, SKP(x), 0, SKP(1)}
+#define SKSS6(x) {0, 0, 0, 0, 0, 0, SKP(x), SKP(1)}
+#define SKSS7(x) {0, 0, 0, 0, 0, 0, 0, SKP(x) | SKP(1)}
 
 
 #define KEMP(x)  {x, 0, 0, 0, 0, 0, 0, 0}
@@ -297,7 +297,7 @@ static struct spnamedkey spkey_misc[] = {
   {"enter",           SPK_ENTER,        SKE},
   {"capsshift",       SPK_CAPSSHIFT,    SKE},
   {"symbolshift",     SPK_SYMBOLSHIFT,  SKE},
-  
+
   {"kempston_up",     SKE,              KEMP(KEMPU)},
   {"kempston_down",   SKE,              KEMP(KEMPD)},
   {"kempston_left",   SKE,              KEMP(KEMPL)},
@@ -353,7 +353,7 @@ static struct spbasekey normalkeys[] = {
   {'x',    SPK_X,   SKE},  /* x */
   {'y',    SPK_Y,   SKE},  /* y */
   {'z',    SPK_Z,   SKE},  /* z */
-  
+
   {-1, SKE, SKE}
 };
 
@@ -377,25 +377,25 @@ static struct spbasekey spectrumkeys[] = {
   {';',                SPK_ENTER,         SKE},
 
   {-1, SKE, SKE}
-};                      
-                      
-                      
-static struct spbasekey compatkeys[] = {  
+};
+
+
+static struct spbasekey compatkeys[] = {
   {TRKS(SK_Shift_L),   SPK_CAPSSHIFT,     SKE}, /* caps shift */
-  {TRKS(SK_Shift_R),   SPK_CAPSSHIFT,     SKE}, 
+  {TRKS(SK_Shift_R),   SPK_CAPSSHIFT,     SKE},
   {TRKS(SK_Alt_L),     SPK_SYMBOLSHIFT,   SKE}, /* symbol shift */
-  {TRKS(SK_Alt_R),     SPK_SYMBOLSHIFT,   SKE}, 
+  {TRKS(SK_Alt_R),     SPK_SYMBOLSHIFT,   SKE},
   {TRKS(SK_Meta_L),    SPK_SYMBOLSHIFT,   SKE},
-  {TRKS(SK_Meta_R),    SPK_SYMBOLSHIFT,   SKE}, 
-#ifdef TRUEKOMPAT                  
+  {TRKS(SK_Meta_R),    SPK_SYMBOLSHIFT,   SKE},
+#ifdef TRUEKOMPAT
   {TRKS(SK_Control_L), SPK_EXTRA,         SKE}, /* caps shift + symbol shift */
   {TRKS(SK_Control_R), SPK_EXTRA,         SKE},
-#endif                      
+#endif
 
   {-1, SKE, SKE}
-};                      
-                      
-static struct spbasekey shiftedcurs[] = { 
+};
+
+static struct spbasekey shiftedcurs[] = {
   {TRKS(SK_Up),        SPK_UP,            SKE}, /* up */
   {TRKS(SK_KP_Up),     SPK_UP,            SKE},
   {TRKS(SK_Down),      SPK_DOWN,          SKE}, /* down */
@@ -406,9 +406,9 @@ static struct spbasekey shiftedcurs[] = {
   {TRKS(SK_KP_Right),  SPK_RIGHT,         SKE},
 
   {-1, SKE, SKE}
-};                      
+};
 
-static struct spbasekey rawcurs[] = {      
+static struct spbasekey rawcurs[] = {
   {TRKS(SK_Up),        SPK_7,             SKE}, /* up */
   {TRKS(SK_KP_Up),     SPK_7,             SKE},
   {TRKS(SK_Down),      SPK_6,             SKE}, /* down */
@@ -501,7 +501,7 @@ void process_keys(void)
   int kalone;
   static int extrai = 0;
   static qbyte extraendframe;
-  
+
   if(extrai && !spkb_kbstate[extrai].state) extrai = 0;
 
   if(!spkb_state_changed && (!extrai || !extraendframe)) return;
@@ -514,12 +514,12 @@ void process_keys(void)
   tsh = spkb_last.modif & trueshift;
   key_reset(ck);
 
-  
+
   if(spkb_allow_ascii && ck->state && (!ck->base || tsh)) {
     unsigned ks;
     ks = tsh ? spkb_last.shifted : spkb_last.keysym;
     if(ks >= 32 && ks < 127) {
-      if(spkey_ascii[ks-32].type <= T_CMPX) { 
+      if(spkey_ascii[ks-32].type <= T_CMPX) {
     SP_COMBINE(spkey_state, spkey_ascii[ks-32].kb);
     kalone = 1;
       }
@@ -539,10 +539,10 @@ void process_keys(void)
       }
     }
   }
-  
+
   if(!kalone) {
     for(i = 0; i < numbasekeys; i++) {
-      ck = spkb_kbstate + basekeys[i].index; 
+      ck = spkb_kbstate + basekeys[i].index;
       key_reset(ck);
       if(ck->state) {
     SP_COMBINE(spkey_state, basekeys[i].kb);
@@ -584,7 +584,7 @@ static void copy_key(struct spbasekey *addk)
   if(SP_NONEMPTY(addk->kb) || SP_NONEMPTY(addk->misc)) {
     for(i = 0; i < numbasekeys; i++) {
       if(basekeys[i].index == nindex) {                /* Replace */
-    keycpy(&basekeys[i], addk); 
+    keycpy(&basekeys[i], addk);
     return;
       }
     }
@@ -633,15 +633,15 @@ void init_basekeys(void)
   copy_basekeys(normalkeys);
   copy_basekeys(extendedkeys);
   copy_basekeys(shiftedcurs);
-  
+
   switch(keyboard_type) {
   case 0:
     break;
-    
+
   case 1:
     copy_basekeys(spectrumkeys);
     break;
-    
+
   case 2:
     if(spkb_trueshift == -1) spkb_trueshift = 0;
 #ifdef TRUEKOMPAT
@@ -655,15 +655,15 @@ void init_basekeys(void)
     copy_basekeys(customkeys);
     break;
   }
-  
+
   switch(cursor_type) {
   case 0:
     break;
-    
+
   case 1:
     copy_basekeys(rawcurs);
     break;
-    
+
   case 2:
     copy_basekeys(joycurs);
     break;
@@ -698,7 +698,7 @@ void spkb_refresh(void)
 
     /* Matrix behavior: ONLY 1 level, does anybody need more ? */
 
-    for(i = 0; i < 8; i++) {  
+    for(i = 0; i < 8; i++) {
       pv = spkey_state[i];
       mm = pv;
       if(pv) {
@@ -710,7 +710,7 @@ void spkb_refresh(void)
       }
       statemx[i] = mm;
     }
-    
+
     for(port = 0; port < 256; port++) {
       km = statemx;
       pv = 0;
@@ -720,8 +720,8 @@ void spkb_refresh(void)
     pb >>= 1;
     km++;
       }
-      sp_fe_inport_high[port] = 
-    (sp_fe_inport_high[port] | 0x1F) & ~(pv & 0x1F); 
+      sp_fe_inport_high[port] =
+    (sp_fe_inport_high[port] | 0x1F) & ~(pv & 0x1F);
     }
   }
 
@@ -731,4 +731,3 @@ void spkb_refresh(void)
   if((pv & KEMPU) && (pv & KEMPD)) pv &= ~(KEMPD | KEMPU);
   z80_inports[KEMP_PORT] = pv;
 }
-

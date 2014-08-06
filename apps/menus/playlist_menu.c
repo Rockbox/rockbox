@@ -42,7 +42,7 @@ int save_playlist_screen(struct playlist_info* playlist)
 {
     char temp[MAX_PATH+1], *dot;
     int len;
-    
+
     playlist_get_name(playlist, temp, sizeof(temp)-1);
     len = strlen(temp);
 
@@ -76,13 +76,13 @@ static int playlist_view_(void)
     return 0;
 }
 
-MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST), 
+MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST),
                   (int(*)(void))create_playlist, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(view_cur_playlist, 0,
-                  ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), 
+                  ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
                   (int(*)(void))playlist_view_, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), 
-                         (int(*)(void*))save_playlist_screen, 
+MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
+                         (int(*)(void*))save_playlist_screen,
                         NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
 MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
@@ -93,15 +93,15 @@ static int clear_catalog_directory(void)
     splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;
 }
-MENUITEM_FUNCTION(clear_catalog_directory_item, 0, ID2P(LANG_RESET_PLAYLISTCAT_DIR), 
+MENUITEM_FUNCTION(clear_catalog_directory_item, 0, ID2P(LANG_RESET_PLAYLISTCAT_DIR),
                   clear_catalog_directory, NULL, NULL, Icon_file_view_menu);
 
 /* Playlist viewer settings submenu */
 MENUITEM_SETTING(show_icons, &global_settings.playlist_viewer_icons, NULL);
 MENUITEM_SETTING(show_indices, &global_settings.playlist_viewer_indices, NULL);
-MENUITEM_SETTING(track_display, 
+MENUITEM_SETTING(track_display,
                  &global_settings.playlist_viewer_track_display, NULL);
-MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS), 
+MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS),
           NULL, Icon_Playlist,
           &show_icons, &show_indices, &track_display);
 

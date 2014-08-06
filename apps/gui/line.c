@@ -85,7 +85,7 @@ static void scroller(struct scrollinfo *s, struct screen *display)
      * has only the rect for the text itself, which is off depending on the
      * line padding. this needs to be corrected for calling style_line().
      * The alternative would be to really redraw only the text area,
-     * but that would complicate the code a lot */ 
+     * but that would complicate the code a lot */
     struct line_desc_scroll *line = s->userdata;
     if (!s->line)
     {
@@ -403,7 +403,7 @@ void vput_line(struct screen *display,
     print_line(display, x, y, line, fmt, ap);
 #if (LCD_DEPTH > 1 || (defined(LCD_REMOTE_DEPTH) && LCD_REMOTE_DEPTH > 1))
     if (display->depth > 1 && line->style > STYLE_INVERT)
-    {    
+    {
         display->set_foreground(fg);
         display->set_background(bg);
     }

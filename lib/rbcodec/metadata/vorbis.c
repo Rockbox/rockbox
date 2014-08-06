@@ -56,7 +56,7 @@ static bool file_read_page_header(struct file* file)
     {
         return false;
     }
-        
+
     if (memcmp("OggS", buffer, 4))
     {
         return false;
@@ -78,30 +78,30 @@ static bool file_read_page_header(struct file* file)
         {
             return false;
         }
-        
+
         table_left -= count;
-        
+
         for (i = 0; i < count; i++)
         {
             file->packet_remaining += buffer[i];
-            
+
             if (buffer[i] < 255)
             {
                 file->packet_ended = true;
-                
+
                 /* Skip remainder of the table */
                 if (lseek(file->fd, table_left, SEEK_CUR) < 0)
                 {
                     return false;
                 }
-                
+
                 table_left = 0;
                 break;
             }
         }
     }
     while (table_left > 0);
-    
+
     return true;
 }
 
@@ -115,7 +115,7 @@ static ssize_t file_read(struct file* file, void* buffer, size_t buffer_size)
 {
     ssize_t done = 0;
     ssize_t count = -1;
-    
+
     do
     {
         if (file->packet_remaining <= 0)
@@ -145,7 +145,7 @@ static ssize_t file_read(struct file* file, void* buffer, size_t buffer_size)
                 count = -1;
             }
         }
-        
+
         if (count <= 0)
         {
             break;
@@ -176,7 +176,7 @@ static bool file_read_int32(struct file* file, int32_t* value)
     {
         return false;
     }
-    
+
     *value = get_long_le(buf);
     return true;
 }
@@ -195,7 +195,7 @@ static long file_read_string(struct file* file, char* buffer,
     long buffer_size, int eos, long size)
 {
     long read_bytes = 0;
-    
+
     while (size > 0)
     {
         char c;
@@ -205,15 +205,15 @@ static long file_read_string(struct file* file, char* buffer,
             read_bytes = -1;
             break;
         }
-        
+
         read_bytes++;
         size--;
-        
+
         if ((eos != -1) && (eos == (unsigned char) c))
         {
             break;
         }
-        
+
         if (buffer_size > 1)
         {
             *buffer++ = c;
@@ -230,11 +230,11 @@ static long file_read_string(struct file* file, char* buffer,
             {
                 read_bytes += size;
             }
-            
+
             break;
         }
     }
-    
+
     *buffer = 0;
     return read_bytes;
 }
@@ -249,7 +249,7 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
 {
     memset(file, 0, sizeof(*file));
     file->fd = fd;
-    
+
     if (type == AFMT_OGG_VORBIS || type == AFMT_SPEEX || type == AFMT_OPUS)
     {
         if (!file_read_page_header(file))
@@ -297,7 +297,7 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
         file->packet_remaining = remaining;
         file->packet_ended = true;
     }
-    
+
     return true;
 }
 
@@ -307,7 +307,7 @@ static bool file_init(struct file* file, int fd, int type, int remaining)
  * data (i.e., the vendor string length). Returns total size of the
  * comments, or 0 if there was a read error.
  */
-long read_vorbis_tags(int fd, struct mp3entry *id3, 
+long read_vorbis_tags(int fd, struct mp3entry *id3,
     long tag_remaining)
 {
     struct file file;
@@ -317,12 +317,12 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
     long comment_size = 0;
     int buf_remaining = sizeof(id3->id3v2buf) + sizeof(id3->id3v1buf);
     int i;
-    
+
     if (!file_init(&file, fd, id3->codectype, tag_remaining))
     {
         return 0;
     }
-    
+
     /* Skip vendor string */
 
     if (!file_read_int32(&file, &len) || (file_read(&file, NULL, len) < 0))
@@ -334,7 +334,7 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
     {
         return 0;
     }
-    
+
     comment_size += 4 + len + 4;
 
     for (i = 0; i < comment_count && file.packet_remaining > 0; i++)
@@ -346,10 +346,10 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
         {
             return 0;
         }
-        
+
         comment_size += 4 + len;
         read_len = file_read_string(&file, name, sizeof(name), '=', len);
-        
+
         if (read_len < 0)
         {
             return 0;

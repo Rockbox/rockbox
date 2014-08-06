@@ -32,7 +32,7 @@ void udacodec_reset(void)
     PCON5 = (PCON5 & ~0xF) | 1;
     PDAT5 |= (1 << 0);
     sleep(HZ/100);
-    
+
     /* Set codec reset pin inactive */
     PDAT5 &= ~(1 << 0);
 }
@@ -40,7 +40,7 @@ void udacodec_reset(void)
 int udacodec_write(unsigned char reg, unsigned short value)
 {
     unsigned char data[2];
-    
+
     data[0] = value >> 8;
     data[1] = value & 0xFF;
 
@@ -51,12 +51,11 @@ int udacodec_write2(unsigned char reg,
                     unsigned short value1, unsigned short value2)
 {
     unsigned char data[4];
-    
+
     data[0] = value1 >> 8;
     data[1] = value1 & 0xFF;
     data[2] = value2 >> 8;
     data[3] = value2 & 0xFF;
-    
+
     return i2c_write(UDA1380_ADDR, reg, 4, data);
 }
-

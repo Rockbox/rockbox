@@ -44,7 +44,7 @@ bool timer_set(long cycles, bool start)
         return false;
 
     oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    
+
     bitset16(&IO_CLK_MOD2, CLK_MOD2_TMR0); /* enable TIMER0 clock */
 
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
@@ -79,9 +79,9 @@ static void stop_timer(void)
 
     /* clear TIMER0 interrupt */
     IO_INTC_IRQ0 = INTR_IRQ0_TMR0;
-    
+
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
-    
+
     /* disable TIMER0 clock */
     bitclr16(&IO_CLK_MOD2, CLK_MOD2_TMR0);
 }
@@ -89,9 +89,9 @@ static void stop_timer(void)
 bool timer_start(void)
 {
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
-    
+
     stop_timer();
-    
+
     /* enable TIMER0 clock */
     bitset16(&IO_CLK_MOD2, CLK_MOD2_TMR0);
 

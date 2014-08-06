@@ -123,9 +123,9 @@ void writeByte( unsigned addr, unsigned char b )
             setOutputFlipFlop( PlayerTwoLight, b & 0x01 );
             break;
         case 0x5006:
-            // Coin lockout: bit 0 is used to enable/disable the coin insert slots 
+            // Coin lockout: bit 0 is used to enable/disable the coin insert slots
             // (0=disable).
-            // The coin slot is enabled at startup and (temporarily) disabled when 
+            // The coin slot is enabled at startup and (temporarily) disabled when
             // the maximum number of credits (99) is inserted.
             setOutputFlipFlop( CoinLockout, b & 0x01 );
             break;
@@ -154,7 +154,7 @@ void writeByte( unsigned addr, unsigned char b )
                     sprites_[ idx ].x = 240 - b - 1;
 
                     if( idx <= 2 ) {
-                        // In Pacman the first few sprites must be further offset 
+                        // In Pacman the first few sprites must be further offset
                         // to the left to get a correct display (is this a hack?)
                         sprites_[ idx ].x -= 1;
                     }
@@ -170,7 +170,7 @@ void writeByte( unsigned addr, unsigned char b )
 
     Note: all ports in Pacman are memory mapped so they are read with readByte().
 */
-unsigned char readPort( unsigned port ) 
+unsigned char readPort( unsigned port )
 {
     (void)port;
     return 0;

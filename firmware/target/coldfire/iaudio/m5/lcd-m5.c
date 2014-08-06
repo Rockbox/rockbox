@@ -81,7 +81,7 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
     {
         lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 0);
         lcd_write_command(LCD_CNTL_COMMON_OUTPUT_STATUS | 1);

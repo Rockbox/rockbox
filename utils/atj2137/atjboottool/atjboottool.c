@@ -193,10 +193,10 @@ static int decode_block_A(uint8_t block[1020])
     }
     for(int i = 20; i < 32; i++)
         key[i] = key[i - 20];
-    
+
     for(int i = 0; i < 992; i++)
         block[i] ^= key[i % 32] ^ g_check_block_A_table[i];
-    
+
     return check_block(block - 1, block + 1000, 1001);
 }
 
@@ -321,7 +321,7 @@ static int process_block_A(uint8_t block[1024])
     g_crypto_info_byte = block[offset - 1];
     g_decode_buffer = malloc(g_decode_A_info.size);
     g_decode_buffer2 = malloc(g_decode_A_info.size);
-    
+
     memset(g_decode_buffer, 0, g_decode_A_info.size);
     memset(g_decode_buffer2, 0, g_decode_A_info.size);
 
@@ -332,7 +332,7 @@ static int process_block_A(uint8_t block[1024])
 
     cprintf_field("  Word: ", "%d ", *(uint16_t *)&g_subblock_A[286]);
     check_field(*(uint16_t *)&g_subblock_A[286], 1, "Ok\n", "Mismatch\n");
-    
+
     return 0;
 }
 
@@ -634,7 +634,7 @@ static int crypto3(uint32_t *a1, ptr_bundle_t *ptrs_alt, ptr_bundle_t *ptrs)
     clear_memory(ptrs_others.ptrA, g_decode_A_info.nr_dwords);
     clear_memory(ptrs_others.ptrB, g_decode_A_info.nr_dwords);
     int pos = find_last_bit_set(a1, 1);
-    
+
     copy_memory(ptrs_others.ptrA, ptrs_alt->ptrA);
     copy_memory(ptrs_others.ptrB, ptrs_alt->ptrB);
     for(int bit = (pos % 32) - 1; bit >= 0; bit--)
@@ -674,7 +674,7 @@ static int crypto3(uint32_t *a1, ptr_bundle_t *ptrs_alt, ptr_bundle_t *ptrs)
 static int crypto4(uint8_t *a1, ptr_bundle_t *ptrs, uint32_t *a3)
 {
     ptr_bundle_t ptrs_others;
-    
+
     ptrs_others.ptrA = malloc(g_decode_A_info.size);
     ptrs_others.ptrB = malloc(g_decode_A_info.size);
     clear_memory(ptrs_others.ptrA, g_decode_A_info.nr_dwords);
@@ -772,20 +772,20 @@ static int do_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
 
     memset(smallblock, 0, sizeof(smallblock));
     memset(bigblock, 0, sizeof(bigblock));
-    
+
     uint8_t ba = buf[0x1ee] & 0xf;
     uint8_t bb = buf[0x1fe] & 0xf;
-    
+
     cprintf_field("  Block A: ", "%d\n", ba + 2);
     cprintf("  Block B: ", "%d\n", ba + bb + 5);
-    
+
     *blockA = buf[494] & 0xf;
     *blockB = buf[510] & 0xf;
     memcpy(bigblock, &buf[512 * (*blockA + 2)], sizeof(bigblock));
 
     int ret = process_block_A(bigblock);
     continue_the_force(ret);
-    
+
     memcpy(smallblock, &buf[512 * (*blockA + *blockB + 5)], sizeof(smallblock));
     ret = process_block_B(smallblock);
     continue_the_force(ret);
@@ -816,7 +816,7 @@ static int do_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
 
     memcpy(unk2, &smallbuf[17], 32);
     int offset = g_decode_A_info.nr_words + 91;
-    
+
     decode_block_with_swap(unk2, 0, &buf[offset], 512 - offset, g_perm_B);
 
     int pos = *(uint16_t *)&buf[offset];
@@ -1006,7 +1006,7 @@ static int do_fwu(uint8_t *buf, int size)
         else
             cprintf(RED, "Failed: %m\n");
     }
-    
+
     return 0;
 }
 
@@ -1153,7 +1153,7 @@ static int do_afi(uint8_t *buf, int size)
         afi->hdr.res[1], afi->hdr.res[2]);
 
     build_out_prefix(".fw", "", true);
-    
+
     cprintf(BLUE, "Entries\n");
     for(int i = 0; i < AFI_ENTRIES; i++)
     {
@@ -1177,7 +1177,7 @@ static int do_afi(uint8_t *buf, int size)
 
         char *name = malloc(strlen(g_out_prefix) + strlen(filename) + 16);
         sprintf(name, "%s%s", g_out_prefix, filename);
-        
+
         cprintf(GREY, "Unpacking to %s... ", name);
         FILE *f = fopen(name, "wb");
         if(f)
@@ -1321,7 +1321,7 @@ static int do_fw(uint8_t *buf, int size)
     cprintf_field("  FW Version: ", "%.64s\n", hdr->fw_ver);
 
     build_out_prefix(".unpack", "", true);
-    
+
     cprintf(BLUE, "Entries\n");
     for(int i = 0; i < AFI_ENTRIES; i++)
     {
@@ -1342,7 +1342,7 @@ static int do_fw(uint8_t *buf, int size)
         {
             char *name = malloc(strlen(g_out_prefix) + strlen(filename) + 16);
             sprintf(name, "%s%s", g_out_prefix, filename);
-            
+
             cprintf(GREY, "Unpacking to %s... ", name);
             FILE *f = fopen(name, "wb");
             if(f)
@@ -1391,7 +1391,7 @@ int main(int argc, char **argv)
     bool try_fwu = false;
     bool try_afi = false;
     bool try_fw = false;
-    
+
     while(1)
     {
         static struct option long_options[] =
@@ -1471,7 +1471,7 @@ int main(int argc, char **argv)
         perror("Cannot read file");
         return 1;
     }
-    
+
     fclose(fin);
 
     int ret = -99;
@@ -1486,7 +1486,7 @@ int main(int argc, char **argv)
         cprintf(GREY, "No valid format found\n");
         ret = 1;
     }
-    
+
     if(ret != 0)
     {
         cprintf(GREY, "Error: %d", ret);
@@ -1501,4 +1501,3 @@ int main(int argc, char **argv)
 
     return ret;
 }
-

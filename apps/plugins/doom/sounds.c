@@ -237,4 +237,3 @@ sfxinfo_t S_sfx[] =
       { "dgpain", false,   96, 0, -1, -1, 0, 0, 0 },
 #endif
    };
-

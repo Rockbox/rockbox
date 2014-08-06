@@ -39,7 +39,7 @@ int button_read_device(void)
 
         int i=20; while (i--);
 
-        if (GPIOA & 0x10) btn |= BUTTON_UP; 
+        if (GPIOA & 0x10) btn |= BUTTON_UP;
         if (GPIOA & 0x20) btn |= BUTTON_RIGHT;
         if (GPIOA & 0x40) btn |= BUTTON_LEFT;
 
@@ -50,9 +50,9 @@ int button_read_device(void)
 
         if (GPIOA & 0x10) btn |= BUTTON_VOLUP;
         if (GPIOA & 0x20) btn |= BUTTON_VOLDOWN;
-        if (GPIOA & 0x40) btn |= BUTTON_DOWN; 
+        if (GPIOA & 0x40) btn |= BUTTON_DOWN;
 
-        if (GPIOA & 0x80) btn |= BUTTON_SELECT;  
+        if (GPIOA & 0x80) btn |= BUTTON_SELECT;
         if (GPIOA & 0x100) btn |= BUTTON_POWER;
     }
     return btn;

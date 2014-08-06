@@ -33,10 +33,10 @@ static void dsp_status(void)
     unsigned short hpib_ctl = IO_DSPC_HPIB_CONTROL;
     unsigned short hpib_stat = IO_DSPC_HPIB_STATUS;
     char buffer1[80], buffer2[80];
-    
+
     DEBUGF("dsp_status(): clkc_hpib=%u clkc_dsp=%u",
            !!(IO_CLK_MOD0 & (1 << 11)), !!(IO_CLK_MOD0 & (1 << 10)));
-    
+
     DEBUGF("dsp_status(): irq_dsphint=%u 7fff=%04x scratch_status=%04x",
            (IO_INTC_IRQ0 >> IRQ_DSPHINT) & 1, DSP_(0x7fff), DSP_(_status));
 #define B(f,w,b,m) if ((w & (1 << b)) == 0) \
@@ -50,11 +50,11 @@ static void dsp_status(void)
     B(buffer1, hpib_ctl, 8, DRST);
     B(buffer1, hpib_ctl, 9, DHOLD);
     B(buffer1, hpib_ctl, 10, BIO);
-    
+
     strcpy(buffer2, "");
     B(buffer2, hpib_stat, 8, HOLDA);
     B(buffer2, hpib_stat, 12, DXF);
-    
+
     DEBUGF("dsp_status(): hpib: ctl=%s stat=%s", buffer1, buffer2);
 #undef B
 }
@@ -63,12 +63,12 @@ static void dsp_status(void)
 void dsp_reset(void)
 {
     DSP_(0x7fff) = 0xdead;
-    
+
     bitclr16(&IO_DSPC_HPIB_CONTROL, 1 << 8);
     /* HPIB bus cycles will lock up the ARM in here. Don't touch DSP RAM. */
     udelay(1);
     bitset16(&IO_DSPC_HPIB_CONTROL, 1 << 8);
-    
+
     /* TODO: Timeout. */
     while (DSP_(0x7fff) != 0);
 }
@@ -78,13 +78,13 @@ void dsp_wake(void)
     /* If this is called concurrently, we may overlap setting and resetting the
        bit, which causes lost interrupts to the DSP. */
     int old_level = disable_irq_save();
-    
+
     /* The first time you INT0 the DSP, the ROM loader will branch to your RST
        handler. Subsequent times, your INT0 handler will get executed. */
     bitclr16(&IO_DSPC_HPIB_CONTROL, 1 << 7);
     udelay(1); /* wait atleast two DSP clocks */
     bitset16(&IO_DSPC_HPIB_CONTROL, 1 << 7);
-    
+
     restore_irq(old_level);
 }
 
@@ -93,13 +93,13 @@ void dsp_load(const struct dsp_section *im)
     while (im->raw_data_size_half) {
         volatile unsigned short *data_ptr = &DSP_(im->physical_addr);
         unsigned int i;
-        
+
         /* Use 16-bit writes. */
         if (im->raw_data) {
             DEBUGF("dsp_load(): loading %u words at 0x%04x (0x%08lx)",
                    im->raw_data_size_half, im->physical_addr,
                    (unsigned long)data_ptr);
-            
+
             for (i = 0; i < im->raw_data_size_half; i++) {
                 data_ptr[i] = im->raw_data[i];
             }
@@ -107,13 +107,12 @@ void dsp_load(const struct dsp_section *im)
             DEBUGF("dsp_load(): clearing %u words at 0x%04x (0x%08lx)",
                    im->raw_data_size_half, im->physical_addr,
                    (unsigned long)data_ptr);
-            
+
             for (i = 0; i < im->raw_data_size_half; i++) {
                 data_ptr[i] = 0;
             }
         }
-        
+
         im++;
     }
 }
-

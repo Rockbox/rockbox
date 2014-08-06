@@ -34,11 +34,11 @@ void *getbytes(size_t nbytes)
     totalmem += nbytes;
 #endif
     if (!ret)
-    	post("pd: getbytes() failed -- out of memory");
+        post("pd: getbytes() failed -- out of memory");
     return (ret);
 }
 
-void *getzbytes(size_t nbytes)	/* obsolete name */
+void *getzbytes(size_t nbytes)  /* obsolete name */
 {
     return (getbytes(nbytes));
 }
@@ -48,7 +48,7 @@ void *copybytes(void *src, size_t nbytes)
     void *ret;
     ret = getbytes(nbytes);
     if (nbytes)
-    	memcpy(ret, src, nbytes);
+        memcpy(ret, src, nbytes);
     return (ret);
 }
 
@@ -59,7 +59,7 @@ void *resizebytes(void *old, size_t oldsize, size_t newsize)
     if (oldsize < 1) oldsize = 1;
     ret = (void *)realloc((char *)old, newsize);
     if (newsize > oldsize && ret)
-    	memset(((char *)ret) + oldsize, 0, newsize - oldsize);
+        memset(((char *)ret) + oldsize, 0, newsize - oldsize);
 #ifdef LOUD
     fprintf(stderr, "resize %x %d --> %x %d\n", (int)old, oldsize, (int)ret, newsize);
 #endif /* LOUD */
@@ -67,14 +67,14 @@ void *resizebytes(void *old, size_t oldsize, size_t newsize)
     totalmem += (newsize - oldsize);
 #endif
     if (!ret)
-    	post("pd: resizebytes() failed -- out of memory");
+        post("pd: resizebytes() failed -- out of memory");
     return (ret);
 }
 
 void freebytes(void *fatso, size_t nbytes)
 {
     if (nbytes == 0)
-    	nbytes = 1;
+        nbytes = 1;
 #ifdef LOUD
     fprintf(stderr, "free %x %d\n", (int)fatso, nbytes);
 #endif /* LOUD */
@@ -92,4 +92,3 @@ void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv)
     fprintf(stderr, "total mem %d\n", totalmem);
 }
 #endif
-

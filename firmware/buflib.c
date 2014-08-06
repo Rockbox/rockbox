@@ -13,7 +13,7 @@
 *
 * Copyright (C) 2009 Andrew Mahone
 * Copyright (C) 2011 Thomas Martitz
-* 
+*
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -69,14 +69,14 @@
  * crc - crc32 protecting buflib cookie integrity
  * X - actual payload
  * Y - unallocated space
- * 
+ *
  * A - pointer to start of payload (first X) in the handle table (may be null)
  *
  * The blocks can be walked by jumping the abs() of the L length marker, i.e.
  * union buflib_data* L;
  * for(L = start; L < end; L += abs(L->val)) { .... }
  *
- * 
+ *
  * The allocator functions are passed a context struct so that two allocators
  * can be run, for example, one per core may be used, with convenience wrappers
  * for the single-allocator case that use a predefined context.
@@ -403,7 +403,7 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
                  * shrinkable but not movable */
                 if (pos_hints == BUFLIB_SHRINK_POS_FRONT
                     && before != this && before->val < 0)
-                {   
+                {
                     size_t free_space = (-before->val) * sizeof(union buflib_data);
                     size_t wanted = shrink_hints & BUFLIB_SHRINK_SIZE_MASK;
                     if (wanted < free_space) /* no shrink needed? */

@@ -24,7 +24,7 @@
 #include <string.h>
 #define BAR_PARAMS "?[iP][iP][iP][iP]|s*"
 /* The tag definition table */
-static const struct tag_info legal_tags[] = 
+static const struct tag_info legal_tags[] =
 {
     { SKIN_TOKEN_ALIGN_CENTER,          "ac", "", 0 },
     { SKIN_TOKEN_ALIGN_LEFT,            "al", "", 0 },
@@ -32,11 +32,11 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_ALIGN_RIGHT,           "ar", "", 0 },
     { SKIN_TOKEN_ALIGN_RIGHT_RTL,       "aR", "", 0 },
     { SKIN_TOKEN_ALIGN_LANGDIRECTION,   "ax", "", 0 },
-    
+
     { SKIN_TOKEN_LOGICAL_IF,            "if", "TS[ITS]|D", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_LOGICAL_AND,           "and", "T*", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_LOGICAL_OR,            "or", "T*", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_BATTERY_PERCENT,       "bl" , BAR_PARAMS, SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BATTERY_VOLTS,         "bv", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BATTERY_TIME,          "bt", "", SKIN_REFRESH_DYNAMIC },
@@ -44,8 +44,8 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_BATTERY_CHARGING,      "bc", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BATTERY_CHARGER_CONNECTED, "bp", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_USB_POWERED,           "bu", "", SKIN_REFRESH_DYNAMIC },
-    
-    
+
+
     { SKIN_TOKEN_RTC_PRESENT,           "cc", "", FEATURE_TAG },
     { SKIN_TOKEN_RTC_DAY_OF_MONTH,      "cd", "", SKIN_RTC_REFRESH },
     { SKIN_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED, "ce", "", SKIN_RTC_REFRESH },
@@ -65,7 +65,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_RTC_MONTH_NAME,        "cb", "", SKIN_RTC_REFRESH },
     { SKIN_TOKEN_RTC_DAY_OF_WEEK_START_MON, "cu", "", SKIN_RTC_REFRESH },
     { SKIN_TOKEN_RTC_DAY_OF_WEEK_START_SUN, "cw", "", SKIN_RTC_REFRESH },
-        
+
     { SKIN_TOKEN_FILE_BITRATE,          "fb", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_CODEC,            "fc", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_FREQUENCY,        "ff", "", SKIN_REFRESH_STATIC },
@@ -76,7 +76,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_FILE_SIZE,             "fs", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_VBR,              "fv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_DIRECTORY,        "d"  , "I", SKIN_REFRESH_STATIC },
-    
+
     { SKIN_TOKEN_FILE_BITRATE,          "Fb", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_CODEC,            "Fc", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_FREQUENCY,        "Ff", "", SKIN_REFRESH_STATIC },
@@ -87,8 +87,8 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_FILE_SIZE,             "Fs", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_VBR,              "Fv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_FILE_DIRECTORY,        "D"  , "I", SKIN_REFRESH_STATIC },
-    
-    
+
+
     { SKIN_TOKEN_METADATA_ARTIST,       "ia", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMPOSER,     "ic", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_ALBUM,        "id", "", SKIN_REFRESH_STATIC },
@@ -101,7 +101,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_METADATA_VERSION,      "iv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_YEAR,         "iy", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMMENT,      "iC", "", SKIN_REFRESH_STATIC },
-    
+
     { SKIN_TOKEN_METADATA_ARTIST,       "Ia", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMPOSER,     "Ic", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_ALBUM,        "Id", "", SKIN_REFRESH_STATIC },
@@ -114,22 +114,22 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_METADATA_VERSION,      "Iv", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_YEAR,         "Iy", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_METADATA_COMMENT,      "IC", "", SKIN_REFRESH_STATIC },
-    
+
     { SKIN_TOKEN_SOUND_PITCH,           "Sp", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_SOUND_SPEED,           "Ss", "", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_VLED_HDD,              "lh", "", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_MAIN_HOLD,             "mh", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_REMOTE_HOLD,           "mr", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_REPEAT_MODE,           "mm", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_PLAYBACK_STATUS,       "mp", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BUTTON_VOLUME,         "mv", "|D", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_PEAKMETER,             "pm", "", SKIN_REFRESH_PEAK_METER },
     { SKIN_TOKEN_PEAKMETER_LEFT,        "pL", BAR_PARAMS, SKIN_REFRESH_PEAK_METER },
     { SKIN_TOKEN_PEAKMETER_RIGHT,       "pR", BAR_PARAMS, SKIN_REFRESH_PEAK_METER },
-    
+
     { SKIN_TOKEN_PLAYER_PROGRESSBAR,    "pf", "", SKIN_REFRESH_DYNAMIC|SKIN_REFRESH_PLAYER_PROGRESS },
     { SKIN_TOKEN_PROGRESSBAR,           "pb" , BAR_PARAMS, SKIN_REFRESH_PLAYER_PROGRESS },
     { SKIN_TOKEN_VOLUME,                "pv" , BAR_PARAMS, SKIN_REFRESH_DYNAMIC },
@@ -143,14 +143,14 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_PLAYLIST_ENTRIES,      "pe", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_PLAYLIST_NAME,         "pn", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_PLAYLIST_SHUFFLE,      "ps", "", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_DATABASE_PLAYCOUNT,    "rp", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_DATABASE_RATING,       "rr", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_DATABASE_AUTOSCORE,    "ra", "", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_REPLAYGAIN,            "rg", "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_CROSSFADE,             "xf", "", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_HAVE_TUNER,            "tp", "", FEATURE_TAG },
     { SKIN_TOKEN_TUNER_TUNED,           "tt", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_TUNER_SCANMODE,        "tm", "", SKIN_REFRESH_DYNAMIC },
@@ -175,20 +175,20 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_ENABLE_THEME,          "we", "", 0|NOBREAK },
     { SKIN_TOKEN_DISABLE_THEME,         "wd", "", 0|NOBREAK },
     { SKIN_TOKEN_DRAW_INBUILTBAR,       "wi", "", SKIN_REFRESH_STATIC|NOBREAK },
-    
+
     { SKIN_TOKEN_IMAGE_PRELOAD,         "xl", "SF|[IP][IP]I", 0|NOBREAK },
     { SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY, "xd", "S|[IT]I", 0 },
     { SKIN_TOKEN_IMAGE_DISPLAY,         "x", "SF|II", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT, "x9", "S", 0 },
-    
+
     { SKIN_TOKEN_LOAD_FONT,             "Fl" , "IF|I", 0|NOBREAK },
     { SKIN_TOKEN_ALBUMART_LOAD,         "Cl" , "[iP][iP][iP][iP]|ss", 0|NOBREAK },
     { SKIN_TOKEN_ALBUMART_DISPLAY,      "Cd" , "", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_ALBUMART_FOUND,        "C" , "", SKIN_REFRESH_STATIC },
-    
+
     { SKIN_TOKEN_VIEWPORT_ENABLE,       "Vd" , "S", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_UIVIEWPORT_ENABLE,     "VI" , "S", SKIN_REFRESH_STATIC },
-    
+
     { SKIN_TOKEN_VIEWPORT_CUSTOMLIST,   "Vp" , "IC", SKIN_REFRESH_DYNAMIC|NOBREAK },
     { SKIN_TOKEN_LIST_TITLE_TEXT,       "Lt" , "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_LIST_ITEM_TEXT,        "LT", "|IS",  SKIN_REFRESH_DYNAMIC },
@@ -200,35 +200,35 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_LIST_ITEM_CFG,         "Lb" , "Sii|S", SKIN_REFRESH_DYNAMIC},
     { SKIN_TOKEN_LIST_ITEM_IS_SELECTED, "Lc" , "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_LIST_NEEDS_SCROLLBAR,  "LB", BAR_PARAMS, SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_VIEWPORT_FGCOLOUR,       "Vf" , "s", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_VIEWPORT_BGCOLOUR,       "Vb" , "s", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_VIEWPORT_TEXTSTYLE,      "Vs" , "S|s", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP, "Vg" , "SS|s", SKIN_REFRESH_STATIC|NOBREAK },
     { SKIN_TOKEN_VIEWPORT_DRAWONBG,       "VB" , "", SKIN_REFRESH_STATIC|NOBREAK },
-    
+
     { SKIN_TOKEN_VIEWPORT_CONDITIONAL,  "Vl" , "S[IP][IP][ip][ip]i", 0 },
     { SKIN_TOKEN_UIVIEWPORT_LOAD,       "Vi" , "s[IP][IP][ip][ip]i", 0 },
     { SKIN_TOKEN_VIEWPORT_LOAD,         "V"  , "[IP][IP][ip][ip]i", 0 },
-    
+
     { SKIN_TOKEN_IMAGE_BACKDROP,        "X"  , "f", SKIN_REFRESH_STATIC|NOBREAK },
     /* This uses the bar tag params also but the first item can be a string
      * and we don't allow no params. */
     { SKIN_TOKEN_SETTING,               "St" , "[Sip]|[ip][ip][ip]s*", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_TRANSLATEDSTRING,      "Sx" , "S", SKIN_REFRESH_STATIC },
     { SKIN_TOKEN_LANG_IS_RTL,           "Sr" , "", SKIN_REFRESH_STATIC },
-    
+
     /* HACK Alert (jdgordon): The next two tags have hacks so we could
      * add a S param at the front without breaking old skins.
      * [SD]D <- handled by the callback, allows SD or S or D params
-     * [SI]III[SI]|SN <- SIIIIS|S or IIIIS|S 
+     * [SI]III[SI]|SN <- SIIIIS|S or IIIIS|S
      *  keep in sync with parse_touchregion() and parse_lasttouch() */
     { SKIN_TOKEN_LASTTOUCH,             "Tl" , "|[SD]D", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_TOUCHREGION,           "T"  , "[Sip][ip][ip][ip][Sip]|S*", 0|NOBREAK },
     { SKIN_TOKEN_HAVE_TOUCH,            "Tp", "", FEATURE_TAG },
-    
+
     { SKIN_TOKEN_CURRENT_SCREEN,        "cs", "", SKIN_REFRESH_DYNAMIC },
-    
+
     { SKIN_TOKEN_HAVE_RECORDING,        "Rp"   , "", FEATURE_TAG },
     { SKIN_TOKEN_IS_RECORDING,          "Rr"   , "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_REC_FREQ,              "Rf"   , "", SKIN_REFRESH_DYNAMIC },
@@ -238,7 +238,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_REC_SECONDS,           "Rs"   , "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_REC_MINUTES,           "Rn"   , "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_REC_HOURS,             "Rh"   , "", SKIN_REFRESH_DYNAMIC },
-    
+
     /* Skin variables */
     { SKIN_TOKEN_VAR_SET,               "vs",   "SSi|I", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_VAR_GETVAL,            "vg",   "S", SKIN_REFRESH_DYNAMIC },
@@ -259,15 +259,15 @@ static const char legal_escape_characters[] = "%(,);#<|>";
  */
 const struct tag_info* find_tag(const char* name)
 {
-    
+
     const struct tag_info* current = legal_tags;
-    
-    /* 
+
+    /*
      * Continue searching so long as we have a non-empty name string
      * and the name of the current element doesn't match the name
      * we're searching for
      */
-    
+
     while(strcmp(current->name, name) && current->name[0] != '\0')
         current++;
 

@@ -102,22 +102,22 @@ void lcd_remote_on(void)
     CS_HI;
     CLK_HI;
     sleep(HZ/100);
-    
+
     lcd_remote_write_command(LCD_SET_DUTY_RATIO);
     lcd_remote_write_command(0x70);  /* 1/128 */
-    
+
     lcd_remote_write_command(LCD_OSC_ON);
-    
+
     lcd_remote_write_command(LCD_SELECT_DCDC | 2); /* DC/DC 5xboost */
-    
+
     lcd_remote_write_command(LCD_SELECT_RES | 7); /* Regulator resistor: 7.2 */
-    
+
     lcd_remote_write_command(LCD_SET_BIAS | 6); /* 1/11 */
-    
+
     lcd_remote_write_command(LCD_CONTROL_POWER | 7); /* All circuits ON */
 
     sleep(3*HZ/100);
-    
+
     lcd_remote_write_command_ex(LCD_SET_GRAY | 0, 0x00);
     lcd_remote_write_command_ex(LCD_SET_GRAY | 1, 0x00);
     lcd_remote_write_command_ex(LCD_SET_GRAY | 2, 0x0c);
@@ -126,9 +126,9 @@ void lcd_remote_on(void)
     lcd_remote_write_command_ex(LCD_SET_GRAY | 5, 0x00);
     lcd_remote_write_command_ex(LCD_SET_GRAY | 6, 0xcc);
     lcd_remote_write_command_ex(LCD_SET_GRAY | 7, 0x0c);
-    
+
     lcd_remote_write_command(LCD_SET_PWM_FRC | 6); /* 3FRC + 12PWM */
-    
+
     lcd_remote_write_command(LCD_DISPLAY_ON | 1); /* display on */
 
     remote_initialized = true;
@@ -197,11 +197,11 @@ void lcd_remote_init_device(void)
     or_l(0x0000e000, &GPIO_OUT);
     or_l(0x0000e000, &GPIO_ENABLE);
     or_l(0x0000e000, &GPIO_FUNCTION);
-    
+
     or_l(0x00000020, &GPIO1_OUT);
     or_l(0x00000020, &GPIO1_ENABLE);
     or_l(0x00000020, &GPIO1_FUNCTION);
-    
+
     and_l(~0x01000000, &GPIO_OUT);
     and_l(~0x01000000, &GPIO_ENABLE);
     or_l(0x01000000, &GPIO_FUNCTION);
@@ -219,9 +219,9 @@ void lcd_remote_init_device(void)
 void lcd_remote_update(void)
 {
     int y;
-    if(remote_initialized) 
+    if(remote_initialized)
     {
-        for(y = 0;y < LCD_REMOTE_FBHEIGHT;y++) 
+        for(y = 0;y < LCD_REMOTE_FBHEIGHT;y++)
         {
             /* Copy display bitmap to hardware.
                The COM48-COM63 lines are not connected so we have to skip
@@ -237,7 +237,7 @@ void lcd_remote_update(void)
 /* Update a fraction of the display. */
 void lcd_remote_update_rect(int x, int y, int width, int height)
 {
-    if(remote_initialized) 
+    if(remote_initialized)
     {
         int ymax;
 
@@ -254,9 +254,9 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
 
         /* Copy specified rectangle bitmap to hardware
            COM48-COM63 are not connected, so we need to skip those */
-        for (; y <= ymax; y++) 
+        for (; y <= ymax; y++)
         {
-            lcd_remote_write_command(LCD_SET_PAGE 
+            lcd_remote_write_command(LCD_SET_PAGE
                                      | ((y > 5 ? y + 2 : y) & 0xf));
             lcd_remote_write_command_ex(LCD_SET_COLUMN | ((x >> 4) & 0xf),
                                         x & 0xf);
@@ -276,15 +276,15 @@ void lcd_remote_set_invert_display(bool yesno)
 void lcd_remote_set_flip(bool yesno)
 {
     cached_flip = yesno;
-    if(remote_initialized) 
+    if(remote_initialized)
     {
-        if(yesno) 
+        if(yesno)
         {
             lcd_remote_write_command(LCD_SELECT_ADC | 0);
             lcd_remote_write_command(LCD_SELECT_SHL | 0);
             lcd_remote_write_command_ex(LCD_SET_COM0, 16);
-        } 
-        else 
+        }
+        else
         {
             lcd_remote_write_command(LCD_SELECT_ADC | 1);
             lcd_remote_write_command(LCD_SELECT_SHL | 8);

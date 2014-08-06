@@ -153,7 +153,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 {
     pcm_data_start = addr;
     pcm_data_size = size;
-    
+
     pcm_play_dma_pause(false);
 }
 

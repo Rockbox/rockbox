@@ -2,7 +2,7 @@
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
 
 #include <codecs/lib/codeclib.h>
-#include "libgme/gbs_emu.h" 
+#include "libgme/gbs_emu.h"
 
 CODEC_HEADER
 
@@ -15,7 +15,7 @@ static struct Gbs_Emu gbs_emu;
 /****************** rockbox interface ******************/
 
 static void set_codec_track(int t) {
-    Gbs_start_track(&gbs_emu, t); 
+    Gbs_start_track(&gbs_emu, t);
 
     /* for loop mode we disable track limits */
     if (!ci->loop_track()) {
@@ -66,7 +66,7 @@ enum codec_status codec_run(void)
         DEBUGF("GBS: file load failed\n");
         return CODEC_ERROR;
     }
-   
+
     if ((err = Gbs_load_mem(&gbs_emu, buf, ci->filesize))) {
         DEBUGF("GBS: Gbs_load_mem failed (%s)\n", err);
         return CODEC_ERROR;

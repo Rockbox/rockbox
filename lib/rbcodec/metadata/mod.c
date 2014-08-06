@@ -33,7 +33,7 @@
 #define MODULEHEADERSIZE 0x438
 
 bool get_mod_metadata(int fd, struct mp3entry* id3)
-{    
+{
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char *buf = id3->id3v2buf;
     unsigned char id[4];
@@ -57,7 +57,7 @@ bool get_mod_metadata(int fd, struct mp3entry* id3)
     if ((!memcmp(id, "M.K.", 4)) || (!memcmp(id, "M!K!", 4))) {
         is_mod_file = true;
     }
-    
+
     /* Star Tracker */
     if (((!memcmp(id, "FLT", 3)) || (!memcmp(id, "EXO", 3))) &&
         (isdigit(id[3]))) {
@@ -97,7 +97,6 @@ bool get_mod_metadata(int fd, struct mp3entry* id3)
     id3->length = 120*1000;
     id3->vbr = false;
     id3->filesize = filesize(fd);
-        
+
     return true;
 }
-

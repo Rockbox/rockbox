@@ -34,7 +34,7 @@
 void power_init(void)
 {
     ide_power_enable(true); /* Power up the drive */
-    
+
     /* Power down pin */
     IO_GIO_BITCLR1  =   1<<10; /* Make sure it is not active */
 }
@@ -50,7 +50,7 @@ unsigned int power_input_status(void)
 }
 
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) 
+bool charging_state(void)
 {
     return false;
 }

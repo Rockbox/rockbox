@@ -84,7 +84,7 @@ static int16_t create_pcmdata(int ch, uint8_t nibble)
     pcmdata += (delta[ch] * (nibble - ((nibble & 0x8) << 1)));
 
     CLIP(pcmdata, -32768, 32767);
-  
+
     sample[ch][1] = sample[ch][0];
     sample[ch][0] = pcmdata;
 

@@ -1,7 +1,7 @@
 /*
 FUNCTION
         <<strcmp>>---character string compare
-        
+
 INDEX
         strcmp
 
@@ -62,7 +62,7 @@ int
 _DEFUN (strcmp, (s1, s2),
         _CONST char *s1 _AND
         _CONST char *s2)
-{ 
+{
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   while (*s1 != '\0' && *s1 == *s2)
     {
@@ -77,7 +77,7 @@ _DEFUN (strcmp, (s1, s2),
 
   /* If s1 or s2 are unaligned, then compare bytes. */
   if (!UNALIGNED (s1, s2))
-    {  
+    {
       /* If s1 and s2 are word-aligned, compare them a word at a time. */
       a1 = (unsigned long*)s1;
       a2 = (unsigned long*)s2;

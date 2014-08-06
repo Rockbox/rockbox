@@ -149,7 +149,7 @@ static void polygon_move_init(struct polygon_move * polygon_move)
     int i;
     for(i=0;i<NB_POINTS;++i)
     {
-        polygon_move->move_steps[i].x=get_new_step(-1); 
+        polygon_move->move_steps[i].x=get_new_step(-1);
         /* -1 because we want a positive random step */
         polygon_move->move_steps[i].y=get_new_step(-1);
     }
@@ -159,7 +159,7 @@ static void polygon_move_init(struct polygon_move * polygon_move)
  * Update the given polygon's position according to the given informations in
  * polygon_move (polygon_move may be updated)
  */
-static void polygon_update(struct polygon *polygon, struct screen * display, 
+static void polygon_update(struct polygon *polygon, struct screen * display,
                            struct polygon_move *polygon_move)
 {
     int i, x, y, step;
@@ -358,7 +358,7 @@ static int plugin_main(void)
                 fifo_pop(&polygons[i]);
             }
             if(nb_wanted_polygons==polygons[i].nb_items)
-            {   /* We have the good number of polygons, we can safely drop 
+            {   /* We have the good number of polygons, we can safely drop
                 the last one to add the new one later */
                 fifo_pop(&polygons[i]);
             }
@@ -366,7 +366,7 @@ static int plugin_main(void)
 
             /*
             * Then we update the leading polygon for the next round acording to
-            * current move (the move may be altered in case of sreen border 
+            * current move (the move may be altered in case of sreen border
             * collision)
             */
             polygon_update(&leading_polygon[i], display, &move[i]);

@@ -54,7 +54,7 @@ void power_init(void)
 
     /* PWM mode */
     tps65021_write_reg(0x04, 0xB2);
- 
+
     /* Set core voltage to 1.5V */
     tps65021_write_reg(0x06, 0x1C);
 
@@ -91,4 +91,3 @@ void ide_power_enable(bool on)
 {
   (void)on;
 }
-

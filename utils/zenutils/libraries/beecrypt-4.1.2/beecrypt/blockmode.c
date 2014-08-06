@@ -33,105 +33,105 @@
 
 int blockEncryptECB(const blockCipher* bc, blockCipherParam* bp, uint32_t* dst, const uint32_t* src, unsigned int nblocks)
 {
-	register const unsigned int blockwords = bc->blocksize >> 2;
+        register const unsigned int blockwords = bc->blocksize >> 2;
 
-	while (nblocks > 0)
-	{
-		bc->raw.encrypt(bp, dst, src);
+        while (nblocks > 0)
+        {
+                bc->raw.encrypt(bp, dst, src);
 
-		dst += blockwords;
-		src += blockwords;
+                dst += blockwords;
+                src += blockwords;
 
-		nblocks--;
-	}
+                nblocks--;
+        }
 
-	return 0;
+        return 0;
 }
 
 int blockDecryptECB(const blockCipher* bc, blockCipherParam* bp, uint32_t* dst, const uint32_t* src, unsigned int nblocks)
 {
-	register const unsigned int blockwords = bc->blocksize >> 2;
+        register const unsigned int blockwords = bc->blocksize >> 2;
 
-	while (nblocks > 0)
-	{
-		bc->raw.decrypt(bp, dst, src);
+        while (nblocks > 0)
+        {
+                bc->raw.decrypt(bp, dst, src);
 
-		dst += blockwords;
-		src += blockwords;
+                dst += blockwords;
+                src += blockwords;
 
-		nblocks--;
-	}
+                nblocks--;
+        }
 
-	return 0;
+        return 0;
 }
 
 int blockEncryptCBC(const blockCipher* bc, blockCipherParam* bp, uint32_t* dst, const uint32_t* src, unsigned int nblocks)
 {
-	register const unsigned int blockwords = bc->blocksize >> 2;
-	register uint32_t* fdback = bc->getfb(bp);
+        register const unsigned int blockwords = bc->blocksize >> 2;
+        register uint32_t* fdback = bc->getfb(bp);
 
-	if (nblocks > 0)
-	{
-		register unsigned int i;
+        if (nblocks > 0)
+        {
+                register unsigned int i;
 
-		for (i = 0; i < blockwords; i++)
-			dst[i] = src[i] ^ fdback[i];
+                for (i = 0; i < blockwords; i++)
+                        dst[i] = src[i] ^ fdback[i];
 
-		bc->raw.encrypt(bp, dst, dst);
+                bc->raw.encrypt(bp, dst, dst);
 
-		nblocks--;
+                nblocks--;
 
-		while (nblocks > 0)
-		{
-			for (i = 0; i < blockwords; i++)
-				dst[i+blockwords] = src[i+blockwords] ^ dst[i];
+                while (nblocks > 0)
+                {
+                        for (i = 0; i < blockwords; i++)
+                                dst[i+blockwords] = src[i+blockwords] ^ dst[i];
 
-			dst += blockwords;
+                        dst += blockwords;
 
-			bc->raw.encrypt(bp, dst, dst);
+                        bc->raw.encrypt(bp, dst, dst);
 
-			src += blockwords;
+                        src += blockwords;
 
-			nblocks--;
-		}
+                        nblocks--;
+                }
 
-		for (i = 0; i < blockwords; i++)
-			fdback[i] = dst[i];
-	}
+                for (i = 0; i < blockwords; i++)
+                        fdback[i] = dst[i];
+        }
 
-	return 0;
+        return 0;
 }
 
 int blockDecryptCBC(const blockCipher* bc, blockCipherParam* bp, uint32_t* dst, const uint32_t* src, unsigned int nblocks)
 {
-	register const unsigned int blockwords = bc->blocksize >> 2;
-	register uint32_t* fdback = bc->getfb(bp);
-	register uint32_t* buf = (uint32_t*) malloc(blockwords * sizeof(uint32_t));
+        register const unsigned int blockwords = bc->blocksize >> 2;
+        register uint32_t* fdback = bc->getfb(bp);
+        register uint32_t* buf = (uint32_t*) malloc(blockwords * sizeof(uint32_t));
 
-	if (buf)
-	{
-		while (nblocks > 0)
-		{
-			register uint32_t tmp;
-			register unsigned int i;
+        if (buf)
+        {
+                while (nblocks > 0)
+                {
+                        register uint32_t tmp;
+                        register unsigned int i;
 
-			bc->raw.decrypt(bp, buf, src);
+                        bc->raw.decrypt(bp, buf, src);
 
-			for (i = 0; i < blockwords; i++)
-			{
-				tmp = src[i];
-				dst[i] = buf[i] ^ fdback[i];
-				fdback[i] = tmp;
-			}
+                        for (i = 0; i < blockwords; i++)
+                        {
+                                tmp = src[i];
+                                dst[i] = buf[i] ^ fdback[i];
+                                fdback[i] = tmp;
+                        }
 
-			dst += blockwords;
-			src += blockwords;
+                        dst += blockwords;
+                        src += blockwords;
 
-			nblocks--;
-		}
-		free(buf);
-		return 0;
-	}
+                        nblocks--;
+                }
+                free(buf);
+                return 0;
+        }
 
-	return -1;
+        return -1;
 }

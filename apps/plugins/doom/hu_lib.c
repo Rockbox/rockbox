@@ -772,4 +772,3 @@ void HUlib_eraseIText(hu_itext_t* it)
    HUlib_eraseTextLine(&it->l);
    it->laston = *it->on;
 }
-

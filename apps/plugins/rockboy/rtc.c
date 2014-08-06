@@ -86,7 +86,7 @@ void rtc_tick(void)
 void rtc_save_internal(int fd)
 {
     int rt = 0;
-    
+
 #if CONFIG_RTC
     rt = rb->mktime(rb->get_time());
 #endif
@@ -98,34 +98,22 @@ void rtc_load_internal(int fd)
 {
     int rt = 0;
     char buf[32];
-    
-    rb->read_line(fd, buf, sizeof(buf));
-    sscanf(buf, "%d %d %d %d %d %d %d %d\n", &rtc.carry, &rtc.stop, &rtc.d, 
-           &rtc.h, &rtc.m, &rtc.s, &rtc.t, &rt);    
-    
-	while (rtc.t >= 60) rtc.t -= 60;
-	while (rtc.s >= 60) rtc.s -= 60;
-	while (rtc.m >= 60) rtc.m -= 60;
-	while (rtc.h >= 24) rtc.h -= 24;
-	while (rtc.d >= 365) rtc.d -= 365;
-	rtc.stop &= 1;
-	rtc.carry &= 1;
 
-#if CONFIG_RTC    
+    rb->read_line(fd, buf, sizeof(buf));
+    sscanf(buf, "%d %d %d %d %d %d %d %d\n", &rtc.carry, &rtc.stop, &rtc.d,
+           &rtc.h, &rtc.m, &rtc.s, &rtc.t, &rt);
+
+        while (rtc.t >= 60) rtc.t -= 60;
+        while (rtc.s >= 60) rtc.s -= 60;
+        while (rtc.m >= 60) rtc.m -= 60;
+        while (rtc.h >= 24) rtc.h -= 24;
+        while (rtc.d >= 365) rtc.d -= 365;
+        rtc.stop &= 1;
+        rtc.carry &= 1;
+
+#if CONFIG_RTC
     if (rt) rt = (rb->mktime(rb->get_time()) - rt) * 60;
 #endif
     while (rt-- > 0) rtc_tick();
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

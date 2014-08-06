@@ -184,7 +184,7 @@ void D_Display (void)
    boolean viewactive = false, isborder = false;
 
    if (nodrawers)                   // for comparative timing / profiling
-      return; 
+      return;
 
    // save the current screen if about to wipe
    if ((wipe = gamestate != wipegamestate))
@@ -727,8 +727,8 @@ void D_DoomMainSetup(void)
    printf ("W_Init: Init WADfiles.\n");
    W_Init();
 
-	if ((p = W_CheckNumForName("DEHACKED")) != -1) // cph - add dehacked-in-a-wad support
-		ProcessDehFile(NULL, dehout ? "/dehlog.txt" : NULL, p);
+        if ((p = W_CheckNumForName("DEHACKED")) != -1) // cph - add dehacked-in-a-wad support
+                ProcessDehFile(NULL, dehout ? "/dehlog.txt" : NULL, p);
 
    V_InitColorTranslation(); //jff 4/24/98 load color translation lumps
 

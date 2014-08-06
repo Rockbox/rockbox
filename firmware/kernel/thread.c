@@ -72,14 +72,14 @@
  * unlock and the other processor's handler may proceed at that time. Not
  * nescessary when the resource in question is definitely not available to
  * interrupt handlers.
- *  
+ *
  * 2) Kernel Object
  * 1) May be needed beforehand if the kernel object allows dual-use such as
  * event queues. The kernel object must have a scheme to protect itself from
  * access by another processor and is responsible for serializing the calls
  * to block_thread(_w_tmo) and wakeup_thread both to themselves and to each
  * other. Objects' queues are also protected here.
- * 
+ *
  * 3) Thread Slot
  * This locks access to the thread's slot such that its state cannot be
  * altered by another processor when a state change is in progress such as
@@ -436,7 +436,7 @@ static void remove_from_list_l(struct thread_entry **list,
     }
 
     prev = thread->l.prev;
-    
+
     /* Fix links to jump over the removed entry. */
     next->l.prev = prev;
     prev->l.next = next;
@@ -529,7 +529,7 @@ static void remove_from_list_tmo(struct thread_entry *thread)
  *
  *        / if H[n] != 0 : 1
  * b[n] = |
- *        \ else         : 0 
+ *        \ else         : 0
  *
  *---------------------------------------------------------------------------
  * Basic priority inheritance priotocol (PIP):
@@ -698,7 +698,7 @@ static void inherit_priority(
         {
             /* Multiple owners */
             struct blocker_splay *blsplay = (struct blocker_splay *)bl;
-            
+
             /* Recurse down the all the branches of this; it's the only way.
                We might meet the same queue several times if more than one of
                these threads is waiting the same queue. That isn't a problem
@@ -1717,7 +1717,7 @@ unsigned int create_thread(void (*function)(void),
 
     state = (flags & CREATE_THREAD_FROZEN) ?
         STATE_FROZEN : STATE_RUNNING;
-    
+
     thread->context.sp = (typeof (thread->context.sp))stackend;
 
     /* Load the thread's context structure with needed startup information */
@@ -2333,7 +2333,7 @@ void init_threads(void)
          * for each core by CPU, let the remainder proceed in parallel and
          * signal CPU when all are finished. */
         core_thread_init(CPU);
-    } 
+    }
     else
     {
         /* Initial stack is the idle stack */

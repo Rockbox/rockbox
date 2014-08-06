@@ -79,8 +79,8 @@ void mspack_destroy_kwaj_decompressor(struct mskwaj_decompressor *base)
 {
     struct mskwaj_decompressor_p *self = (struct mskwaj_decompressor_p *) base;
     if (self) {
-	struct mspack_system *sys = self->system;
-	sys->free(self);
+        struct mspack_system *sys = self->system;
+        sys->free(self);
     }
 }
 
@@ -90,7 +90,7 @@ void mspack_destroy_kwaj_decompressor(struct mskwaj_decompressor *base)
  * opens a KWAJ file without decompressing, reads header
  */
 static struct mskwajd_header *kwajd_open(struct mskwaj_decompressor *base,
-					 const char *filename)
+                                         const char *filename)
 {
     struct mskwaj_decompressor_p *self = (struct mskwaj_decompressor_p *) base;
     struct mskwajd_header *hdr;
@@ -103,18 +103,18 @@ static struct mskwajd_header *kwajd_open(struct mskwaj_decompressor *base,
     fh  = sys->open(sys, filename, MSPACK_SYS_OPEN_READ);
     hdr = (struct mskwajd_header *) sys->alloc(sys, sizeof(struct mskwajd_header_p));
     if (fh && hdr) {
-	((struct mskwajd_header_p *) hdr)->fh = fh;
-	self->error = kwajd_read_headers(sys, fh, hdr);
+        ((struct mskwajd_header_p *) hdr)->fh = fh;
+        self->error = kwajd_read_headers(sys, fh, hdr);
     }
     else {
-	if (!fh)  self->error = MSPACK_ERR_OPEN;
-	if (!hdr) self->error = MSPACK_ERR_NOMEMORY;
+        if (!fh)  self->error = MSPACK_ERR_OPEN;
+        if (!hdr) self->error = MSPACK_ERR_NOMEMORY;
     }
-    
+
     if (self->error) {
-	if (fh)  sys->close(fh);
-	if (hdr) sys->free(hdr);
-	hdr = NULL;
+        if (fh)  sys->close(fh);
+        if (hdr) sys->free(hdr);
+        hdr = NULL;
     }
 
     return hdr;
@@ -126,7 +126,7 @@ static struct mskwajd_header *kwajd_open(struct mskwaj_decompressor *base,
  * closes a KWAJ file
  */
 static void kwajd_close(struct mskwaj_decompressor *base,
-			struct mskwajd_header *hdr)
+                        struct mskwajd_header *hdr)
 {
     struct mskwaj_decompressor_p *self = (struct mskwaj_decompressor_p *) base;
     struct mskwajd_header_p *hdr_p = (struct mskwajd_header_p *) hdr;
@@ -148,22 +148,22 @@ static void kwajd_close(struct mskwaj_decompressor *base,
  * reads the headers of a KWAJ format file
  */
 static int kwajd_read_headers(struct mspack_system *sys,
-			      struct mspack_file *fh,
-			      struct mskwajd_header *hdr)
+                              struct mspack_file *fh,
+                              struct mskwajd_header *hdr)
 {
     unsigned char buf[16];
     int i;
 
     /* read in the header */
     if (sys->read(fh, &buf[0], kwajh_SIZEOF) != kwajh_SIZEOF) {
-	return MSPACK_ERR_READ;
+        return MSPACK_ERR_READ;
     }
 
     /* check for "KWAJ" signature */
     if (((unsigned int) EndGetI32(&buf[kwajh_Signature1]) != 0x4A41574B) ||
-	((unsigned int) EndGetI32(&buf[kwajh_Signature2]) != 0xD127F088))
+        ((unsigned int) EndGetI32(&buf[kwajh_Signature2]) != 0xD127F088))
     {
-	return MSPACK_ERR_SIGNATURE;
+        return MSPACK_ERR_SIGNATURE;
     }
 
     /* basic header fields */
@@ -179,61 +179,61 @@ static int kwajd_read_headers(struct mspack_system *sys,
 
     /* 4 bytes: length of unpacked file */
     if (hdr->headers & MSKWAJ_HDR_HASLENGTH) {
-	if (sys->read(fh, &buf[0], 4) != 4) return MSPACK_ERR_READ;
-	hdr->length = EndGetI32(&buf[0]);
+        if (sys->read(fh, &buf[0], 4) != 4) return MSPACK_ERR_READ;
+        hdr->length = EndGetI32(&buf[0]);
     }
 
     /* 2 bytes: unknown purpose */
     if (hdr->headers & MSKWAJ_HDR_HASUNKNOWN1) {
-	if (sys->read(fh, &buf[0], 2) != 2) return MSPACK_ERR_READ;
+        if (sys->read(fh, &buf[0], 2) != 2) return MSPACK_ERR_READ;
     }
 
     /* 2 bytes: length of section, then [length] bytes: unknown purpose */
     if (hdr->headers & MSKWAJ_HDR_HASUNKNOWN2) {
-	if (sys->read(fh, &buf[0], 2) != 2) return MSPACK_ERR_READ;
-	i = EndGetI16(&buf[0]);
-	if (sys->seek(fh, (off_t)i, MSPACK_SYS_SEEK_CUR)) return MSPACK_ERR_SEEK;
+        if (sys->read(fh, &buf[0], 2) != 2) return MSPACK_ERR_READ;
+        i = EndGetI16(&buf[0]);
+        if (sys->seek(fh, (off_t)i, MSPACK_SYS_SEEK_CUR)) return MSPACK_ERR_SEEK;
     }
 
     /* filename and extension */
     if (hdr->headers & (MSKWAJ_HDR_HASFILENAME | MSKWAJ_HDR_HASFILEEXT)) {
-	off_t pos = sys->tell(fh);
-	char *fn = (char *) sys->alloc(sys, (size_t) 13);
+        off_t pos = sys->tell(fh);
+        char *fn = (char *) sys->alloc(sys, (size_t) 13);
 
-	/* allocate memory for maximum length filename */
-	if (! fn) return MSPACK_ERR_NOMEMORY;
-	hdr->filename = fn;
+        /* allocate memory for maximum length filename */
+        if (! fn) return MSPACK_ERR_NOMEMORY;
+        hdr->filename = fn;
 
-	/* copy filename if present */
-	if (hdr->headers & MSKWAJ_HDR_HASFILENAME) {
-	    if (sys->read(fh, &buf[0], 9) != 9) return MSPACK_ERR_READ;
-	    for (i = 0; i < 9; i++, fn++) if (!(*fn = buf[i])) break;
-	    pos += (i < 9) ? i+1 : 9;
-	    if (sys->seek(fh, pos, MSPACK_SYS_SEEK_START))
-		return MSPACK_ERR_SEEK;
-	}
+        /* copy filename if present */
+        if (hdr->headers & MSKWAJ_HDR_HASFILENAME) {
+            if (sys->read(fh, &buf[0], 9) != 9) return MSPACK_ERR_READ;
+            for (i = 0; i < 9; i++, fn++) if (!(*fn = buf[i])) break;
+            pos += (i < 9) ? i+1 : 9;
+            if (sys->seek(fh, pos, MSPACK_SYS_SEEK_START))
+                return MSPACK_ERR_SEEK;
+        }
 
-	/* copy extension if present */
-	if (hdr->headers & MSKWAJ_HDR_HASFILEEXT) {
-	    *fn++ = '.';
-	    if (sys->read(fh, &buf[0], 4) != 4) return MSPACK_ERR_READ;
-	    for (i = 0; i < 4; i++, fn++) if (!(*fn = buf[i])) break;
-	    pos += (i < 4) ? i+1 : 4;
-	    if (sys->seek(fh, pos, MSPACK_SYS_SEEK_START))
-		return MSPACK_ERR_SEEK;
-	}
-	*fn = '\0';
+        /* copy extension if present */
+        if (hdr->headers & MSKWAJ_HDR_HASFILEEXT) {
+            *fn++ = '.';
+            if (sys->read(fh, &buf[0], 4) != 4) return MSPACK_ERR_READ;
+            for (i = 0; i < 4; i++, fn++) if (!(*fn = buf[i])) break;
+            pos += (i < 4) ? i+1 : 4;
+            if (sys->seek(fh, pos, MSPACK_SYS_SEEK_START))
+                return MSPACK_ERR_SEEK;
+        }
+        *fn = '\0';
     }
 
     /* 2 bytes: extra text length then [length] bytes of extra text data */
     if (hdr->headers & MSKWAJ_HDR_HASEXTRATEXT) {
-	if (sys->read(fh, &buf[0], 2) != 2) return MSPACK_ERR_READ;
-	i = EndGetI16(&buf[0]);
-	hdr->extra = (char *) sys->alloc(sys, (size_t)i+1);
-	if (! hdr->extra) return MSPACK_ERR_NOMEMORY;
-	if (sys->read(fh, hdr->extra, i) != i) return MSPACK_ERR_READ;
-	hdr->extra[i] = '\0';
-	hdr->extra_length = i;
+        if (sys->read(fh, &buf[0], 2) != 2) return MSPACK_ERR_READ;
+        i = EndGetI16(&buf[0]);
+        hdr->extra = (char *) sys->alloc(sys, (size_t)i+1);
+        if (! hdr->extra) return MSPACK_ERR_NOMEMORY;
+        if (sys->read(fh, hdr->extra, i) != i) return MSPACK_ERR_READ;
+        hdr->extra[i] = '\0';
+        hdr->extra_length = i;
     }
     return MSPACK_ERR_OK;
 }
@@ -244,7 +244,7 @@ static int kwajd_read_headers(struct mspack_system *sys,
  * decompresses a KWAJ file
  */
 static int kwajd_extract(struct mskwaj_decompressor *base,
-			 struct mskwajd_header *hdr, const char *filename)
+                         struct mskwajd_header *hdr, const char *filename)
 {
     struct mskwaj_decompressor_p *self = (struct mskwaj_decompressor_p *) base;
     struct mspack_system *sys;
@@ -258,51 +258,51 @@ static int kwajd_extract(struct mskwaj_decompressor *base,
 
     /* seek to the compressed data */
     if (sys->seek(fh, hdr->data_offset, MSPACK_SYS_SEEK_START)) {
-	return self->error = MSPACK_ERR_SEEK;
+        return self->error = MSPACK_ERR_SEEK;
     }
 
     /* open file for output */
     if (!(outfh = sys->open(sys, filename, MSPACK_SYS_OPEN_WRITE))) {
-	return self->error = MSPACK_ERR_OPEN;
+        return self->error = MSPACK_ERR_OPEN;
     }
 
     self->error = MSPACK_ERR_OK;
 
     /* decompress based on format */
     if (hdr->comp_type == MSKWAJ_COMP_NONE ||
-	hdr->comp_type == MSKWAJ_COMP_XOR)
+        hdr->comp_type == MSKWAJ_COMP_XOR)
     {
-	/* NONE is a straight copy. XOR is a copy xored with 0xFF */
-	unsigned char *buf = (unsigned char *) sys->alloc(sys, (size_t) KWAJ_INPUT_SIZE);
-	if (buf) {
-	    int read, i;
-	    while ((read = sys->read(fh, buf, KWAJ_INPUT_SIZE)) > 0) {
-		if (hdr->comp_type == MSKWAJ_COMP_XOR) {
-		    for (i = 0; i < read; i++) buf[i] ^= 0xFF;
-		}
-		if (sys->write(outfh, buf, read) != read) {
-		    self->error = MSPACK_ERR_WRITE;
-		    break;
-		}
-	    }
-	    if (read < 0) self->error = MSPACK_ERR_READ;
-	    sys->free(buf);
-	}
-	else {
-	    self->error = MSPACK_ERR_NOMEMORY;
-	}
+        /* NONE is a straight copy. XOR is a copy xored with 0xFF */
+        unsigned char *buf = (unsigned char *) sys->alloc(sys, (size_t) KWAJ_INPUT_SIZE);
+        if (buf) {
+            int read, i;
+            while ((read = sys->read(fh, buf, KWAJ_INPUT_SIZE)) > 0) {
+                if (hdr->comp_type == MSKWAJ_COMP_XOR) {
+                    for (i = 0; i < read; i++) buf[i] ^= 0xFF;
+                }
+                if (sys->write(outfh, buf, read) != read) {
+                    self->error = MSPACK_ERR_WRITE;
+                    break;
+                }
+            }
+            if (read < 0) self->error = MSPACK_ERR_READ;
+            sys->free(buf);
+        }
+        else {
+            self->error = MSPACK_ERR_NOMEMORY;
+        }
     }
     else if (hdr->comp_type == MSKWAJ_COMP_SZDD) {
-	self->error = lzss_decompress(sys, fh, outfh, KWAJ_INPUT_SIZE,
-				      LZSS_MODE_EXPAND);
+        self->error = lzss_decompress(sys, fh, outfh, KWAJ_INPUT_SIZE,
+                                      LZSS_MODE_EXPAND);
     }
     else if (hdr->comp_type == MSKWAJ_COMP_LZH) {
-	struct kwajd_stream *lzh = lzh_init(sys, fh, outfh);
-	self->error = (lzh) ? lzh_decompress(lzh) : MSPACK_ERR_NOMEMORY;
-	lzh_free(lzh);
+        struct kwajd_stream *lzh = lzh_init(sys, fh, outfh);
+        self->error = (lzh) ? lzh_decompress(lzh) : MSPACK_ERR_NOMEMORY;
+        lzh_free(lzh);
     }
     else {
-	self->error = MSPACK_ERR_DATAFORMAT;
+        self->error = MSPACK_ERR_DATAFORMAT;
     }
 
     /* close output file */
@@ -317,7 +317,7 @@ static int kwajd_extract(struct mskwaj_decompressor *base,
  * unpacks directly from input to output
  */
 static int kwajd_decompress(struct mskwaj_decompressor *base,
-			    const char *input, const char *output)
+                            const char *input, const char *output)
 {
     struct mskwaj_decompressor_p *self = (struct mskwaj_decompressor_p *) base;
     struct mskwajd_header *hdr;
@@ -353,13 +353,13 @@ static int kwajd_error(struct mskwaj_decompressor *base)
 #define BITS_VAR lzh
 #define BITS_ORDER_MSB
 #define BITS_NO_READ_INPUT
-#define READ_BYTES do {					\
-    if (i_ptr >= i_end) {				\
-	if ((err = lzh_read_input(lzh))) return err;	\
-	i_ptr = lzh->i_ptr;				\
-	i_end = lzh->i_end;				\
-    }							\
-    INJECT_BITS(*i_ptr++, 8);				\
+#define READ_BYTES do {                                 \
+    if (i_ptr >= i_end) {                               \
+        if ((err = lzh_read_input(lzh))) return err;    \
+        i_ptr = lzh->i_ptr;                             \
+        i_end = lzh->i_end;                             \
+    }                                                   \
+    INJECT_BITS(*i_ptr++, 8);                           \
 } while (0)
 #include "readbits.h"
 
@@ -381,31 +381,31 @@ static int kwajd_error(struct mskwaj_decompressor *base)
  * isn't how the default readbits.h read_input() works (it simply lets
  * 2 fake bytes in then stops), so we implement our own.
  */
-#define READ_BITS_SAFE(val, n) do {			\
-    READ_BITS(val, n);					\
-    if (lzh->input_end && bits_left < lzh->input_end)	\
-	return MSPACK_ERR_OK;				\
+#define READ_BITS_SAFE(val, n) do {                     \
+    READ_BITS(val, n);                                  \
+    if (lzh->input_end && bits_left < lzh->input_end)   \
+        return MSPACK_ERR_OK;                           \
 } while (0)
 
-#define READ_HUFFSYM_SAFE(tbl, val) do {		\
-    READ_HUFFSYM(tbl, val);				\
-    if (lzh->input_end && bits_left < lzh->input_end)	\
-	return MSPACK_ERR_OK;				\
+#define READ_HUFFSYM_SAFE(tbl, val) do {                \
+    READ_HUFFSYM(tbl, val);                             \
+    if (lzh->input_end && bits_left < lzh->input_end)   \
+        return MSPACK_ERR_OK;                           \
 } while (0)
 
-#define BUILD_TREE(tbl, type)					\
-    STORE_BITS;							\
-    err = lzh_read_lens(lzh, type, MAXSYMBOLS(tbl),		\
-			 &HUFF_LEN(tbl,0), &HUFF_TABLE(tbl,0));	\
-    if (err) return err;					\
-    RESTORE_BITS;						\
-    if (make_decode_table(MAXSYMBOLS(tbl), TABLEBITS(tbl),	\
-	&HUFF_LEN(tbl,0), &HUFF_TABLE(tbl,0)))			\
-	return MSPACK_ERR_DATAFORMAT;
+#define BUILD_TREE(tbl, type)                                   \
+    STORE_BITS;                                                 \
+    err = lzh_read_lens(lzh, type, MAXSYMBOLS(tbl),             \
+                         &HUFF_LEN(tbl,0), &HUFF_TABLE(tbl,0)); \
+    if (err) return err;                                        \
+    RESTORE_BITS;                                               \
+    if (make_decode_table(MAXSYMBOLS(tbl), TABLEBITS(tbl),      \
+        &HUFF_LEN(tbl,0), &HUFF_TABLE(tbl,0)))                  \
+        return MSPACK_ERR_DATAFORMAT;
 
-#define WRITE_BYTE do {							\
-    if (lzh->sys->write(lzh->output, &lzh->window[pos], 1) != 1)	\
-        return MSPACK_ERR_WRITE;					\
+#define WRITE_BYTE do {                                                 \
+    if (lzh->sys->write(lzh->output, &lzh->window[pos], 1) != 1)        \
+        return MSPACK_ERR_WRITE;                                        \
 } while (0)
 
 static struct kwajd_stream *lzh_init(struct mspack_system *sys,
@@ -447,33 +447,33 @@ static int lzh_decompress(struct kwajd_stream *lzh)
     BUILD_TREE(LITERAL,   types[4]);
 
     while (!lzh->input_end) {
-	if (lit_run) READ_HUFFSYM_SAFE(MATCHLEN2, len);
-	else         READ_HUFFSYM_SAFE(MATCHLEN1, len);
+        if (lit_run) READ_HUFFSYM_SAFE(MATCHLEN2, len);
+        else         READ_HUFFSYM_SAFE(MATCHLEN1, len);
 
-	if (len > 0) {
-	    len += 2;
-	    lit_run = 0; /* not the end of a literal run */
-	    READ_HUFFSYM_SAFE(OFFSET, j); offset = j << 6;
-	    READ_BITS_SAFE(j, 6);         offset |= j;
+        if (len > 0) {
+            len += 2;
+            lit_run = 0; /* not the end of a literal run */
+            READ_HUFFSYM_SAFE(OFFSET, j); offset = j << 6;
+            READ_BITS_SAFE(j, 6);         offset |= j;
 
-	    /* copy match as output and into the ring buffer */
-	    while (len-- > 0) {
-		lzh->window[pos] = lzh->window[(pos+4096-offset) & 4095];
-		WRITE_BYTE;
-		pos++; pos &= 4095;
-	    }
-	}
-	else {
-	    READ_HUFFSYM_SAFE(LITLEN, len); len++;
-	    lit_run = (len == 32) ? 0 : 1; /* end of a literal run? */
-	    while (len-- > 0) {
-		READ_HUFFSYM_SAFE(LITERAL, j);
-		/* copy as output and into the ring buffer */
-		lzh->window[pos] = j;
-		WRITE_BYTE;
-		pos++; pos &= 4095;
-	    }
-	}
+            /* copy match as output and into the ring buffer */
+            while (len-- > 0) {
+                lzh->window[pos] = lzh->window[(pos+4096-offset) & 4095];
+                WRITE_BYTE;
+                pos++; pos &= 4095;
+            }
+        }
+        else {
+            READ_HUFFSYM_SAFE(LITLEN, len); len++;
+            lit_run = (len == 32) ? 0 : 1; /* end of a literal run? */
+            while (len-- > 0) {
+                READ_HUFFSYM_SAFE(LITERAL, j);
+                /* copy as output and into the ring buffer */
+                lzh->window[pos] = j;
+                WRITE_BYTE;
+                pos++; pos &= 4095;
+            }
+        }
     }
     return MSPACK_ERR_OK;
 }
@@ -487,8 +487,8 @@ static void lzh_free(struct kwajd_stream *lzh)
 }
 
 static int lzh_read_lens(struct kwajd_stream *lzh,
-			 unsigned int type, unsigned int numsyms,
-			 unsigned char *lens, unsigned short *table)
+                         unsigned int type, unsigned int numsyms,
+                         unsigned char *lens, unsigned short *table)
 {
     register unsigned int bit_buffer;
     register int bits_left;
@@ -499,33 +499,33 @@ static int lzh_read_lens(struct kwajd_stream *lzh,
     RESTORE_BITS;
     switch (type) {
     case 0:
-	i = numsyms; c = (i==16)?4: (i==32)?5: (i==64)?6: (i==256)?8 :0;
-	for (i = 0; i < numsyms; i++) lens[i] = c;
-	break;
+        i = numsyms; c = (i==16)?4: (i==32)?5: (i==64)?6: (i==256)?8 :0;
+        for (i = 0; i < numsyms; i++) lens[i] = c;
+        break;
 
     case 1:
-	READ_BITS_SAFE(c, 4); lens[0] = c;
-	for (i = 1; i < numsyms; i++) {
-    	           READ_BITS_SAFE(sel, 1); if (sel == 0)  lens[i] = c;
-	    else { READ_BITS_SAFE(sel, 1); if (sel == 0)  lens[i] = ++c;
-	    else { READ_BITS_SAFE(c, 4);                  lens[i] = c; }}
-	}
-	break;
+        READ_BITS_SAFE(c, 4); lens[0] = c;
+        for (i = 1; i < numsyms; i++) {
+                   READ_BITS_SAFE(sel, 1); if (sel == 0)  lens[i] = c;
+            else { READ_BITS_SAFE(sel, 1); if (sel == 0)  lens[i] = ++c;
+            else { READ_BITS_SAFE(c, 4);                  lens[i] = c; }}
+        }
+        break;
 
     case 2:
-	READ_BITS_SAFE(c, 4); lens[0] = c;
-	for (i = 1; i < numsyms; i++) {
-	    READ_BITS_SAFE(sel, 2);
-	    if (sel == 3) READ_BITS_SAFE(c, 4); else c += (char) sel-1;
-	    lens[i] = c;
-	}
-	break;
+        READ_BITS_SAFE(c, 4); lens[0] = c;
+        for (i = 1; i < numsyms; i++) {
+            READ_BITS_SAFE(sel, 2);
+            if (sel == 3) READ_BITS_SAFE(c, 4); else c += (char) sel-1;
+            lens[i] = c;
+        }
+        break;
 
     case 3:
-	for (i = 0; i < numsyms; i++) {
-	    READ_BITS_SAFE(c, 4); lens[i] = c;
-	}
-	break;
+        for (i = 0; i < numsyms; i++) {
+            READ_BITS_SAFE(c, 4); lens[i] = c;
+        }
+        break;
     }
     STORE_BITS;
     return MSPACK_ERR_OK;
@@ -534,18 +534,18 @@ static int lzh_read_lens(struct kwajd_stream *lzh,
 static int lzh_read_input(struct kwajd_stream *lzh) {
     int read;
     if (lzh->input_end) {
-	lzh->input_end += 8;
-	lzh->inbuf[0] = 0;
-	read = 1;
+        lzh->input_end += 8;
+        lzh->inbuf[0] = 0;
+        read = 1;
     }
     else {
-	read = lzh->sys->read(lzh->input, &lzh->inbuf[0], KWAJ_INPUT_SIZE);
-	if (read < 0) return MSPACK_ERR_READ;
-	if (read == 0) {
-	    lzh->input_end = 8;
-	    lzh->inbuf[0] = 0;
-	    read = 1;
-	}
+        read = lzh->sys->read(lzh->input, &lzh->inbuf[0], KWAJ_INPUT_SIZE);
+        if (read < 0) return MSPACK_ERR_READ;
+        if (read == 0) {
+            lzh->input_end = 8;
+            lzh->inbuf[0] = 0;
+            read = 1;
+        }
     }
 
     /* update i_ptr and i_end */

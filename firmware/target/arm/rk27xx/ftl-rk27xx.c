@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "ftl-target.h"
 
@@ -53,4 +53,3 @@ uint32_t ftl_sync(void)
     /* TODO implement */
     return 0;
 }
-

@@ -117,16 +117,16 @@ void main(void)
     unsigned short data = 0;
     char write_data[2], read_data[16];
     struct tm tm;
-    
+
     //Set backlight pin to output and enable
     int oldval = PCON0;
     PCON0 = ((oldval & ~(3 << 4)) | (1 << 4));
     PDAT0 |= (1 << 2);
-    
+
     // Set codec reset pin inactive
     PCON5 = (PCON5 & ~0xF) | 1;
     PDAT5 &= ~(1 << 0);
-    
+
     //power on
 //    oldval = PCON1;
 //    PCON1 = ((oldval & ~(0xf << 12)) | (1 << 12));
@@ -145,7 +145,7 @@ void main(void)
     INTMSK = 0x11;
     EINTMSK = 0x11;
     asm volatile("msr cpsr_c, #0x13\n\t"); // enable interrupts
-        
+
     system_init();
     kernel_init();
 
@@ -154,7 +154,7 @@ void main(void)
     lcd_update();
 
     i2c_init();
-    
+
     init_qt1106();
 
     /* Calibrate the lot */
@@ -178,7 +178,7 @@ void main(void)
         snprintf(mystring, 64, "%x %2.2x",(slider & 0x008000)>>15, slider&0xff);
         lcd_puts(0,1,mystring);
         _backlight_set_brightness((slider & 0xFF) >> 4);
-        
+
         /*
         if(slider & 0x008000)
             bl_debug_count(((slider&0xff)) + 1);
@@ -191,7 +191,7 @@ void main(void)
             tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
             tm.tm_hour, tm.tm_min, tm.tm_sec);
         lcd_puts(0, 10, mystring);
-#endif 
+#endif
 
 #if 1   /* enable this so see info about the UDA1380 codec */
         memset(read_data, 0, sizeof(read_data));
@@ -207,11 +207,11 @@ void main(void)
 #if 1   /* enable this to see info about IODMA channel 0 (PCM) */
         snprintf(mystring, 64, "DMA: %08X %08X", (int)DMACADDR0, (int)DMACTCNT0);
         lcd_puts(0, 12, mystring);
-#endif        
+#endif
 #if 1   /* enable this to see info about IIS */
         snprintf(mystring, 64, "IIS: %08X", (int)I2SSTATUS);
         lcd_puts(0, 13, mystring);
-#endif        
+#endif
 
         lcd_update();
     }
@@ -219,4 +219,3 @@ void main(void)
     //power off
     PDAT1&=~(1<<3);
 }
-

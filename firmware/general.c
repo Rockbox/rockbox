@@ -136,7 +136,7 @@ char *create_numbered_filename(char *buffer, const char *path,
 
         if (strncasecmp((char *)entry->d_name, prefix, prefixlen))
             continue;
-            
+
         namelen = strlen((char *)entry->d_name);
         if ((namelen <= prefixlen + suffixlen)
             || strcasecmp((char *)entry->d_name + namelen - suffixlen, suffix))

@@ -200,19 +200,19 @@ static int remove_dircache_file(void)
     return remove(DIRCACHE_FILE);
 }
 #endif
-/** 
+/**
  * Internal function to allocate a new dircache_entry from memory.
  */
 static struct dircache_entry* allocate_entry(void)
 {
     struct dircache_entry *next_entry;
-    
+
     if (dircache_size > allocated_size - MAX_PATH*2)
     {
         logf("size limit reached");
         return NULL;
     }
-    
+
     next_entry = &dircache_root[entry_count++];
     next_entry->d_name = NULL;
     next_entry->up = NULL;
@@ -225,7 +225,7 @@ static struct dircache_entry* allocate_entry(void)
 }
 
 /**
- * Internal function to allocate a dircache_entry and set 
+ * Internal function to allocate a dircache_entry and set
  * ->next entry pointers.
  */
 static struct dircache_entry* dircache_gen_next(struct dircache_entry *ce)
@@ -236,7 +236,7 @@ static struct dircache_entry* dircache_gen_next(struct dircache_entry *ce)
         return NULL;
     next_entry->up = ce->up;
     ce->next = next_entry;
-    
+
     return next_entry;
 }
 
@@ -252,7 +252,7 @@ static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
         return NULL;
     next_entry->up = ce;
     ce->down = next_entry;
-    
+
     return next_entry;
 }
 
@@ -263,10 +263,10 @@ static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
 static bool check_event_queue(void)
 {
     struct queue_event ev;
-    
+
     if(!queue_peek(&dircache_queue, &ev))
         return false;
-    
+
     switch (ev.id)
     {
         case DIRCACHE_STOP:
@@ -276,7 +276,7 @@ static bool check_event_queue(void)
 #endif
             return true;
     }
-    
+
     return false;
 }
 
@@ -296,7 +296,7 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
     /* normally, opendir expects a full fat_dir as parent but in our case,
      * it's completely useless because we don't modify anything
      * WARNING: this heavily relies on current FAT implementation ! */
-    
+
     /* those field are necessary to update the FAT entry in case of modification
        here we don't touch anything so we put dummy values */
     sab.dir->entry = 0;
@@ -309,10 +309,10 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
         logf("fat_opendir failed: %d", rc);
         return rc;
     }
-    
+
     /* first pass : read dir */
     struct dircache_entry *first_ce = ce;
-    
+
     /* read through directory */
     while((rc = fat_getnext(sab.dir, sab.direntry)) >= 0 && sab.direntry->name[0])
     {
@@ -328,16 +328,16 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
         ce->info.wrtdate = sab.direntry->wrtdate;
         ce->info.wrttime = sab.direntry->wrttime;
 
-        strcpy(ce->d_name, sab.direntry->name); 
+        strcpy(ce->d_name, sab.direntry->name);
         dircache_size += size;
-        
+
         if(ce->info.attribute & FAT_ATTR_DIRECTORY)
             dircache_gen_down(ce);
-                
+
         ce = dircache_gen_next(ce);
         if(ce == NULL)
             return -5;
-        
+
         /* When simulator is used, it's only safe to yield here. */
         if(thread_enabled)
         {
@@ -347,34 +347,34 @@ static int sab_process_dir(unsigned long startcluster, struct dircache_entry *ce
             yield();
         }
     }
-    
+
     /* add "." and ".." */
     ce->d_name = dot;
     ce->info.attribute = FAT_ATTR_DIRECTORY;
     ce->startcluster = startcluster;
     ce->info.size = 0;
     ce->down = first_ce;
-    
+
     ce = dircache_gen_next(ce);
-    
+
     ce->d_name = dotdot;
     ce->info.attribute = FAT_ATTR_DIRECTORY;
     ce->startcluster = (first_ce->up ? first_ce->up->startcluster : 0);
     ce->info.size = 0;
     ce->down = first_ce->up;
-    
+
     /* second pass: recurse ! */
     ce = first_ce;
-    
+
     while(rc >= 0 && ce)
     {
         if(ce->d_name != NULL && ce->down != NULL && strcmp(ce->d_name, ".")
                 && strcmp(ce->d_name, ".."))
             rc = sab_process_dir(ce->startcluster, ce->down);
-        
+
         ce = ce->next;
     }
-    
+
     return rc;
 }
 
@@ -407,7 +407,7 @@ static int dircache_scan_and_build(IF_MV(int volume,) struct dircache_entry *ce)
 #endif
     sab.dir = &sab_fat_dir;
     sab.direntry = &direntry;
-    
+
     return sab_process_dir(0, ce);
 }
 #elif (CONFIG_PLATFORM & PLATFORM_HOSTED) /* PLATFORM_HOSTED */
@@ -423,7 +423,7 @@ static int sab_process_dir(struct dircache_entry *ce)
         logf("Failed to opendir_uncached(%s)", sab_path);
         return -1;
     }
-    
+
     while((entry = readdir_uncached(dir)))
     {
         if(!strcmp(".", entry->d_name) ||
@@ -436,7 +436,7 @@ static int sab_process_dir(struct dircache_entry *ce)
 
         strcpy(ce->d_name, entry->d_name);
         dircache_size += size;
-        
+
         if(entry->info.attribute & ATTR_DIRECTORY)
         {
             dircache_gen_down(ce);
@@ -450,22 +450,22 @@ static int sab_process_dir(struct dircache_entry *ce)
             /* append entry */
             strlcpy(&sab_path[pathpos], "/", sizeof(sab_path) - pathpos);
             strlcpy(&sab_path[pathpos+1], entry->d_name, sizeof(sab_path) - pathpos - 1);
-            
+
             int rc = sab_process_dir(ce->down);
             /* restore path */
             sab_path[pathpos] = '\0';
-            
+
             if(rc < 0)
             {
                 closedir_uncached(dir);
                 return rc;
             }
         }
-        
+
         ce = dircache_gen_next(ce);
         if(ce == NULL)
             return -5;
-        
+
         /* When simulator is used, it's only safe to yield here. */
         if(thread_enabled)
         {
@@ -475,20 +475,20 @@ static int sab_process_dir(struct dircache_entry *ce)
             yield();
         }
     }
-    
+
     /* add "." and ".." */
     ce->d_name = dot;
     ce->info.attribute = ATTR_DIRECTORY;
     ce->info.size = 0;
     ce->down = first_ce;
-    
+
     ce = dircache_gen_next(ce);
-    
+
     ce->d_name = dotdot;
     ce->info.attribute = ATTR_DIRECTORY;
     ce->info.size = 0;
     ce->down = first_ce->up;
-    
+
     closedir_uncached(dir);
     return 0;
 }
@@ -499,7 +499,7 @@ static int dircache_scan_and_build(IF_MV(int volume,) struct dircache_entry *ce)
     (void) volume;
     #endif
     memset(ce, 0, sizeof(struct dircache_entry));
-    
+
     strlcpy(sab_path, "/", sizeof sab_path);
     return sab_process_dir(ce);
 }
@@ -515,7 +515,7 @@ static int dircache_scan_and_build(IF_MV(int volume,) struct dircache_entry *ce)
  *
  * * If get_down=true:
  *   If path="/", the returned entry is the first of root directory (ie dircache_root)
- *   Otherwise, if 'entry' is the returned value when get_down=false, 
+ *   Otherwise, if 'entry' is the returned value when get_down=false,
  *   the functions returns entry->down (which can be NULL)
  *
  * * If get_down=false:
@@ -534,12 +534,12 @@ static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
     char namecopy[MAX_PATH];
     char* part;
     char* end;
-    
+
     bool at_root = true;
     struct dircache_entry *cache_entry = dircache_root;
-    
+
     strlcpy(namecopy, path, sizeof(namecopy));
-    
+
     for(part = strtok_r(namecopy, "/", &end); part; part = strtok_r(NULL, "/", &end))
     {
         /* If request another chunk, the current entry has to be directory
@@ -551,7 +551,7 @@ static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
             cache_entry = cache_entry->down;
         else
             at_root = false;
-        
+
         /* scan dir for name */
         while(cache_entry != NULL)
         {
@@ -567,7 +567,7 @@ static struct dircache_entry* dircache_get_entry(const char *path, bool go_down)
             /* go to next entry */
             cache_entry = cache_entry->next;
         }
-        
+
         /* handle not found case */
         if(cache_entry == NULL)
             return NULL;
@@ -601,17 +601,17 @@ int dircache_load(void)
     struct dircache_maindata maindata;
     ssize_t bytes_read;
     int fd;
-        
+
     if (dircache_initialized)
         return -1;
-        
+
     logf("Loading directory cache");
     dircache_size = 0;
-    
+
     fd = open_dircache_file(O_RDONLY, 0);
     if (fd < 0)
         return -2;
-        
+
     bytes_read = read(fd, &maindata, sizeof(struct dircache_maindata));
     if (bytes_read != sizeof(struct dircache_maindata)
         || maindata.magic != DIRCACHE_MAGIC || maindata.size <= 0)
@@ -621,7 +621,7 @@ int dircache_load(void)
         remove_dircache_file();
         return -3;
     }
-    
+
     allocated_size = maindata.size + DIRCACHE_RESERVE;
     dircache_handle = core_alloc_ex("dircache", allocated_size, &ops);
     /* block movement during upcoming I/O */
@@ -635,7 +635,7 @@ int dircache_load(void)
      * start with the struct dircache_entries */
     ssize_t bytes_to_read = entry_count*sizeof(struct dircache_entry);
     bytes_read = read(fd, dircache_root, bytes_to_read);
-    
+
     if (bytes_read != bytes_to_read)
     {
         logf("Dircache read failed #1");
@@ -708,7 +708,7 @@ int dircache_save(void)
     unsigned long bytes_written;
 
     remove_dircache_file();
-    
+
     if (!dircache_initialized)
         return -1;
 
@@ -765,7 +765,7 @@ static int dircache_do_rebuild(void)
     struct dircache_entry* root_entry;
     unsigned int start_tick;
     int i;
-    
+
     /* Measure how long it takes build the cache. */
     start_tick = current_tick;
     dircache_initializing = true;
@@ -805,17 +805,17 @@ static int dircache_do_rebuild(void)
 #endif
 
     logf("Done, %ld KiB used", dircache_size / 1024);
-    
+
     dircache_initialized = true;
     dircache_initializing = false;
     cache_build_ticks = current_tick - start_tick;
-    
+
     /* Initialized fd bindings. */
     memset(fd_bindings, 0, sizeof(fd_bindings));
     for (i = 0; i < fdbind_idx; i++)
         dircache_bind(fdbind_cache[i].fd, fdbind_cache[i].path);
     fdbind_idx = 0;
-    
+
     if (thread_enabled)
     {
         if (allocated_size - dircache_size < DIRCACHE_RESERVE)
@@ -860,12 +860,12 @@ static void dircache_thread(void)
                     dircache_free();
                 thread_enabled = false;
                 break ;
-                
+
             case DIRCACHE_STOP:
                 logf("Stopped the rebuilding.");
                 dircache_initialized = false;
                 break ;
-            
+
             case SYS_USB_CONNECTED:
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&dircache_queue);
@@ -906,7 +906,7 @@ int dircache_build(int last_size)
         thread_enabled = true;
         dircache_initializing = true;
         generate_dot_d_names();
-        
+
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 2;
     }
@@ -968,7 +968,7 @@ int dircache_build(int last_size)
      * equivaent to dircache_size - entry_count*sizeof(struct dircache_entry) */
     ptrdiff_t size_to_move = d_names_end - d_names_start;
     memmove(dst, d_names_start, size_to_move);
-    
+
     /* fix up pointers to the d_names */
     for(unsigned i = 0; i < entry_count; i++)
         dircache_root[i].d_name -= offset;
@@ -977,7 +977,7 @@ int dircache_build(int last_size)
     d_names_end -= offset;
     dot -= offset;
     dotdot -= offset;
-    
+
     /* equivalent to dircache_size + DIRCACHE_RESERVE + align */
     allocated_size = (d_names_end - buf);
     reserve_used = 0;
@@ -997,16 +997,16 @@ void dircache_init(void)
 {
     int i;
     int thread_id __attribute__((unused));
-    
+
     dircache_initialized = false;
     dircache_initializing = false;
-    
+
     memset(opendirs, 0, sizeof(opendirs));
     for (i = 0; i < MAX_OPEN_DIRS; i++)
     {
         opendirs[i].theent.d_name = opendir_dnames[i];
     }
-    
+
     queue_init(&dircache_queue, true);
     thread_id = create_thread(dircache_thread, dircache_stack,
                 sizeof(dircache_stack), 0, dircache_thread_name
@@ -1091,10 +1091,10 @@ void dircache_suspend(void)
 {
     int i;
     bool cache_in_use;
-    
+
     if (thread_enabled)
         queue_post(&dircache_queue, DIRCACHE_STOP, 0);
-    
+
     while (thread_enabled)
         sleep(1);
     dircache_initialized = false;
@@ -1111,7 +1111,7 @@ void dircache_suspend(void)
             }
         }
     } while (cache_in_use) ;
-    
+
     logf("Cache released");
     entry_count = 0;
 }
@@ -1157,7 +1157,7 @@ void* dircache_steal_buffer(size_t *size)
     /* since we give up the buffer (without freeing), it must not move anymore */
     dont_move = true;
     *size = dircache_size + (DIRCACHE_RESERVE-reserve_used);
-    
+
     return dircache_root;
 }
 
@@ -1168,7 +1168,7 @@ static int dircache_get_entry_id_ex(const char *filename, bool go_down)
 {
     if (!dircache_initialized || filename == NULL)
         return -1;
-    
+
     struct dircache_entry* res = dircache_get_entry(filename, go_down);
     return res ? res - dircache_root : -1;
 }
@@ -1241,10 +1241,10 @@ static int block_until_ready(void)
     /* Block until dircache has been built. */
     while (!dircache_initialized && dircache_is_initializing())
         sleep(1);
-    
+
     if (!dircache_initialized)
         return -1;
-    
+
     return 0;
 }
 
@@ -1283,7 +1283,7 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
         dircache_initialized = false;
         return NULL;
     }
-    
+
     while (entry->next != NULL)
         entry = entry->next;
 
@@ -1311,7 +1311,7 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
         logf("gen_down");
         dircache_gen_down(entry);
     }
-        
+
     reserve_used += dircache_size - last_cache_size;
 
     return entry;
@@ -1320,19 +1320,19 @@ static struct dircache_entry* dircache_new_entry(const char *path, int attribute
 void dircache_bind(int fd, const char *path)
 {
     struct dircache_entry *entry;
-    
+
     /* Queue requests until dircache has been built. */
     if (!dircache_initialized && dircache_is_initializing())
     {
         if (fdbind_idx >= MAX_PENDING_BINDINGS)
             return ;
-        strlcpy(fdbind_cache[fdbind_idx].path, path, 
+        strlcpy(fdbind_cache[fdbind_idx].path, path,
                 sizeof(fdbind_cache[fdbind_idx].path));
         fdbind_cache[fdbind_idx].fd = fd;
         fdbind_idx++;
         return ;
     }
-    
+
     if (!dircache_initialized)
         return ;
 
@@ -1359,7 +1359,7 @@ void dircache_update_filesize(int fd, long newsize, long startcluster)
         dircache_initialized = false;
         return ;
     }
-    
+
     fd_bindings[fd]->info.size = newsize;
     fd_bindings[fd]->startcluster = startcluster;
 }
@@ -1393,8 +1393,8 @@ void dircache_mkdir(const char *path)
 { /* Test ok. */
     if (block_until_ready())
         return ;
-        
-        
+
+
     logf("mkdir: %s", path);
     dircache_new_entry(path, ATTR_DIRECTORY);
 }
@@ -1402,10 +1402,10 @@ void dircache_mkdir(const char *path)
 void dircache_rmdir(const char *path)
 { /* Test ok. */
     struct dircache_entry *entry;
-    
+
     if (block_until_ready())
         return ;
-        
+
     logf("rmdir: %s", path);
     entry = dircache_get_entry(path, false);
     if (entry == NULL || entry->down == NULL)
@@ -1423,12 +1423,12 @@ void dircache_rmdir(const char *path)
 void dircache_remove(const char *name)
 { /* Test ok. */
     struct dircache_entry *entry;
-    
+
     if (block_until_ready())
         return ;
-        
+
     logf("remove: %s", name);
-    
+
     entry = dircache_get_entry(name, false);
 
     if (entry == NULL)
@@ -1437,7 +1437,7 @@ void dircache_remove(const char *name)
         dircache_initialized = false;
         return ;
     }
-    
+
     entry->d_name = NULL;
 }
 
@@ -1447,12 +1447,12 @@ void dircache_rename(const char *oldpath, const char *newpath)
     struct dircache_entry oldentry;
     char absolute_path[MAX_PATH*2];
     char *p;
-    
+
     if (block_until_ready())
         return ;
-        
+
     logf("rename: %s->%s", oldpath, newpath);
-    
+
     entry = dircache_get_entry(oldpath, false);
     if (entry == NULL)
     {
@@ -1479,12 +1479,12 @@ void dircache_rename(const char *oldpath, const char *newpath)
             dircache_initialized = false;
             return ;
         }
-        
+
         *p = '\0';
         strlcpy(p, absolute_path, sizeof(absolute_path)-strlen(p));
         newpath = absolute_path;
     }
-    
+
     newentry = dircache_new_entry(newpath, entry->info.attribute);
     if (newentry == NULL)
     {
@@ -1502,15 +1502,15 @@ void dircache_rename(const char *oldpath, const char *newpath)
 void dircache_add_file(const char *path, long startcluster)
 {
     struct dircache_entry *entry;
-    
+
     if (block_until_ready())
         return ;
-    
+
     logf("add file: %s", path);
     entry = dircache_new_entry(path, 0);
     if (entry == NULL)
         return ;
-    
+
     entry->startcluster = startcluster;
 }
 
@@ -1541,13 +1541,13 @@ DIR_CACHED* opendir_cached(const char* name)
         errno = EMFILE;
         return NULL;
     }
-    
+
     pdir->busy = true;
 
     if (!dircache_initialized || is_disable_msg_pending())
     {
         pdir->internal_entry = -1;
-        pdir->regulardir = opendir_uncached(name);   
+        pdir->regulardir = opendir_uncached(name);
     }
     else
     {
@@ -1569,7 +1569,7 @@ struct dirent_cached* readdir_cached(DIR_CACHED* dir)
 {
     struct dircache_entry *ce = get_entry(dir->internal_entry);
     struct dirent_uncached *regentry;
-    
+
     if (!dir->busy)
         return NULL;
 
@@ -1582,10 +1582,10 @@ struct dirent_cached* readdir_cached(DIR_CACHED* dir)
         strlcpy(dir->theent.d_name, regentry->d_name, MAX_PATH);
         dir->theent.startcluster = regentry->startcluster;
         dir->theent.info = regentry->info;
-        
+
         return &dir->theent;
     }
-    
+
     /* if theent.attribute=-1 then this is the first call */
     /* otherwise, this is is not so we first take the entry's ->next */
     /* NOTE: normal file can't have attribute=-1 */
@@ -1594,7 +1594,7 @@ struct dirent_cached* readdir_cached(DIR_CACHED* dir)
     /* skip unused entries */
     while(ce != NULL && ce->d_name == NULL)
         ce = ce->next;
-    
+
     if (ce == NULL)
             return NULL;
 
@@ -1613,11 +1613,11 @@ int closedir_cached(DIR_CACHED* dir)
 {
     if (!dir->busy)
         return -1;
-        
+
     dir->busy=false;
     if (dir->regulardir != NULL)
         return closedir_uncached(dir->regulardir);
-    
+
     return 0;
 }
 

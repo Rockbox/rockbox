@@ -48,4 +48,3 @@ const unsigned short percent_to_volt_charge[11] =
     3364, 3816, 3879, 3903, 3934, 3983, 4051, 4119, 4188, 4188, 4188
 };
 #endif /* CONFIG_CHARGING */
-

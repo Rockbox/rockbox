@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -80,7 +80,7 @@ OPDEF(special_dd_cb, 0xCB)
   DANM(tc) -= 4;
   IXDGET(IX, DANM(cbaddr));
 #ifdef DEBUG_Z80
-  if((*PCP & 0x07) != 6) 
+  if((*PCP & 0x07) != 6)
     printf("DD_CB unimplemented!\n");
 #endif
   NEXTTAB(cb);
@@ -91,7 +91,7 @@ OPDEF(special_fd_cb, 0xCB)
   DANM(tc) -= 4;
   IXDGET(IY, DANM(cbaddr));
 #ifdef DEBUG_Z80
-  if((*PCP & 0x07) != 6) 
+  if((*PCP & 0x07) != 6)
     printf("FD_CB unimplemented!\n");
 #endif
   NEXTTAB(cb);
@@ -114,7 +114,7 @@ op_f z80c_op_tab[] = {
   z80op_dec_c,
   z80op_ld_c_n,
   z80op_rrca,
-  
+
   z80op_djnz_e,
   z80op_ld_de_nn,
   z80op_ld_ide_a,
