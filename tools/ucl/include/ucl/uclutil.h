@@ -68,4 +68,3 @@ ucl_fwrite(FILE *f, const ucl_voidp buf, ucl_uint size);
 #endif
 
 #endif /* already included */
-

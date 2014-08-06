@@ -32,9 +32,9 @@ const struct picture* smalldigits_skin[]={smalldigits,smallsegments};
     buffer_pos+=rb->snprintf(&buffer[buffer_pos], sizeof(buffer)-buffer_pos, __VA_ARGS__);
 
 void digital_clock_draw(struct screen* display,
-                        struct time* time, 
-                        struct clock_settings* settings, 
-                        struct counter* counter, 
+                        struct time* time,
+                        struct clock_settings* settings,
+                        struct counter* counter,
                         int skin){
     bool display_colon;
     const struct picture* digits_bitmaps = &(digits_skin[skin][display->screen_type]);

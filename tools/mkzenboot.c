@@ -98,17 +98,17 @@ static bool crypt_firmware(const char* key, unsigned char* buffer, size_t len)
     unsigned int i;
     unsigned int tmp = 0;
     int key_length = strlen(key);
-    
+
     strcpy(key_cpy, key);
     for(i=0; i < strlen(key); i++)
         key_cpy[i] = key[i] - 1;
-    
+
     for(i=0; i < len; i++)
     {
         buffer[i] ^= key_cpy[tmp] | 0x80;
         tmp = (tmp + 1) % key_length;
     }
-    
+
     return true;
 }
 
@@ -131,10 +131,10 @@ static bool inflate_to_buffer(const unsigned char *buffer, size_t len, unsigned 
         *err_msg = d_stream.msg;
         return false;
     }
-        
+
     d_stream.next_out = out_buffer;
     d_stream.avail_out = out_len;
-    
+
     ret = inflate(&d_stream, Z_SYNC_FLUSH);
     if(ret < 0)
     {
@@ -143,7 +143,7 @@ static bool inflate_to_buffer(const unsigned char *buffer, size_t len, unsigned 
     }
     else
         inflateEnd(&d_stream);
-    
+
     return true;
 }
 
@@ -746,7 +746,7 @@ static bool bf_cbc_decrypt(const unsigned char* key, size_t keylen,
     struct blowfishParam param;
     unsigned char *cipher;
     unsigned int nblocks;
-    
+
     if (datalen % BLOWFISH_BLOCKSIZE)
         return false;
 
@@ -853,21 +853,21 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     char *err_msg;
     const char *fw_key;
     uint32_t i, fw_offset, fw_size, data_ptr, data_size, ciff_size, cenc_size, iv[2];
-    
+
     /* TODO */
     if(player->big_endian)
     {
         log_message("[ERR]  Big-endian players are currently unsupported\n");
         return -255;
     }
-    
+
     infd = fopen(infile, "rb");
     if(infd == NULL)
     {
         log_message("[ERR]  Could not open %s\n", infile);
         return -1;
     }
-    
+
     buffer = malloc(filesize(infd));
     if(buffer == NULL)
     {
@@ -875,7 +875,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         fclose(infd);
         return -2;
     }
-    
+
     if(fread(buffer, filesize(infd), 1, infd) != 1)
     {
         log_message("[ERR]  Short read\n");
@@ -883,9 +883,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -3;
     }
-    
+
     fclose(infd);
-    
+
     /* Rudimentary Win32 PE reading */
     if(memcmp(&buffer[0], "MZ", 2) != 0 &&
        memcmp(&buffer[0x118], "PE", 2) != 0)
@@ -894,7 +894,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -4;
     }
-    
+
     data_ptr = 0, data_size = 0;
     for(i=0x210; i < 0x1000; i+=0x28)
     {
@@ -905,16 +905,16 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
             break;
         }
     }
-    
+
     if(data_ptr == 0 || data_size == 0)
     {
         log_message("[ERR]  Couldn't find .data section\n");
         free(buffer);
         return -5;
     }
-    
+
     log_message("[INFO] .data section is at 0x%x with size 0x%x\n", data_ptr, data_size);
-    
+
     fw_offset = find_firmware_offset(&buffer[data_ptr], data_size);
     if(fw_offset == 0)
     {
@@ -924,7 +924,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     }
     fw_size = le2int(&buffer[data_ptr+fw_offset]);
     log_message("[INFO] Firmware offset is at 0x%x with size 0x%x\n", data_ptr+fw_offset, fw_size);
-    
+
     fw_key = find_firmware_key(&buffer[0], filesize(infd));
     if(fw_key == NULL)
     {
@@ -933,7 +933,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         return -7;
     }
     log_message("[INFO] Firmware key is %s\n", fw_key);
-    
+
     log_message("[INFO] Descrambling firmware... ");
     if(!crypt_firmware(fw_key, &buffer[data_ptr+fw_offset+4], fw_size))
     {
@@ -943,7 +943,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     }
     else
         log_message("Done!\n");
-    
+
     out_buffer = malloc(fw_size*2);
     if(out_buffer == NULL)
     {
@@ -951,9 +951,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -9;
     }
-    
+
     memset(out_buffer, 0, fw_size*2);
-    
+
     err_msg = NULL;
     log_message("[INFO] Decompressing firmware... ");
     if(!inflate_to_buffer(&buffer[data_ptr+fw_offset+4], fw_size, out_buffer, fw_size*2, &err_msg))
@@ -968,16 +968,16 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         log_message("Done!\n");
         free(buffer);
     }
-    
+
     if(memcmp(out_buffer, "FFIC", 4) != 0)
     {
         log_message("[ERR]  CIFF header doesn't match\n");
         free(out_buffer);
         return -11;
     }
-    
+
     ciff_size = le2int(&out_buffer[4])+8+28; /* CIFF block + NULL block*/
-    
+
     bootfd = fopen(bootfile, "rb");
     if(bootfd == NULL)
     {
@@ -985,7 +985,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -12;
     }
-    
+
     out_buffer = realloc(out_buffer, ciff_size+filesize(bootfd));
     if(out_buffer == NULL)
     {
@@ -993,9 +993,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         fclose(bootfd);
         return -13;
     }
-    
+
     log_message("[INFO] Locating encoded block... ");
-    
+
     i = 8;
     while(memcmp(&out_buffer[i], " LT©", 4) != 0 && i < ciff_size)
     {
@@ -1015,7 +1015,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
             return -14;
         }
     }
-    
+
     if(i > ciff_size || memcmp(&out_buffer[i], " LT©", 4) != 0)
     {
         log_message("Fail!\n[ERR]  Couldn't find encoded block\n");
@@ -1023,9 +1023,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -15;
     }
-    
+
     log_message("Done!\n");
-    
+
     outfd = fopen(outfile, "wb+");
     if(outfd == NULL)
     {
@@ -1034,7 +1034,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -16;
     }
-    
+
     if(fwrite(&out_buffer[0], i, 1, outfd) != 1)
     {
         log_message("[ERR]  Short write\n");
@@ -1043,9 +1043,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -17;
     }
-    
+
     log_message("[INFO] Decrypting encoded block... ");
-    
+
     iv[0] = 0;
     iv[1] = swap(le2int(&out_buffer[i+4]));
     if(bf_cbc_decrypt((unsigned char*)player->tl_key, strlen(player->tl_key)+1, &out_buffer[i+8],
@@ -1058,11 +1058,11 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -18;
     }
-    
+
     log_message("Done!\n");
-    
+
     cenc_size = le2int(&out_buffer[i+8]);
-    
+
     if(cenc_size > le2int(&out_buffer[i+4])*3)
     {
         log_message("[ERR]  Decrypted length of encoded block is unexpectedly large: 0x%08x\n", cenc_size);
@@ -1071,7 +1071,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -19;
     }
-    
+
     buffer = malloc(cenc_size);
     if(buffer == NULL)
     {
@@ -1081,11 +1081,11 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -20;
     }
-    
+
     memset(buffer, 0, cenc_size);
-    
+
     log_message("[INFO] Decompressing encoded block... ");
-    
+
     if(!cenc_decode(&out_buffer[i+12], le2int(&out_buffer[i+4])-4, &buffer[0], cenc_size))
     {
         log_message("Fail!\n[ERR]  Couldn't decompress the encoded block\n");
@@ -1095,11 +1095,11 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -21;
     }
-    
+
     log_message("Done!\n");
-    
+
     log_message("[INFO] Renaming encoded block to Hcreativeos.jrm... ");
-    
+
     memcpy(&enc_data, "ATAD", 4);
     int2le(cenc_size+32, &enc_data[4]);
     memset(&enc_data[8], 0, 32);
@@ -1113,7 +1113,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -22;
     }
-    
+
     if(fwrite(&buffer[0], cenc_size, 1, outfd) != 1)
     {
         log_message("Fail!\n[ERR]  Short write\n");
@@ -1123,10 +1123,10 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -23;
     }
-    
+
     free(buffer);
     log_message("Done!\n[INFO] Adding Hjukebox2.jrm... ");
-    
+
     memcpy(&enc_data, "ATAD", 4);
     int2le(filesize(bootfd)+32, &enc_data[4]);
     memset(&enc_data[8], 0, 32);
@@ -1139,7 +1139,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -24;
     }
-    
+
     if(fread(&out_buffer[ciff_size], filesize(bootfd), 1, bootfd) != 1)
     {
         log_message("Fail!\n[ERR]  Short read\n");
@@ -1148,7 +1148,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -25;
     }
-    
+
     if(memcmp(&out_buffer[ciff_size], "EDOC", 4) != 0)
     {
         log_message("Fail!\n[ERR]  Faulty bootloader\n");
@@ -1157,7 +1157,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         fclose(outfd);
         return -26;
     }
-    
+
     if(fwrite(&out_buffer[ciff_size], filesize(bootfd), 1, outfd) != 1)
     {
         log_message("Fail!\n[ERR]  Short write\n");
@@ -1166,10 +1166,10 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -27;
     }
-    
+
     fclose(bootfd);
     log_message("Done!\n");
-    
+
     if(fwrite(&out_buffer[i+8+le2int(&out_buffer[i+4])], ciff_size-i-8-le2int(&out_buffer[i+4]), 1, outfd) != 1)
     {
         log_message("[ERR]  Short write\n");
@@ -1178,7 +1178,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -28;
     }
-    
+
     fseek(outfd, 4, SEEK_SET);
     int2le(filesize(outfd)-8-28, enc_data);
     if(fwrite(enc_data, 4, 1, outfd) != 1)
@@ -1188,12 +1188,12 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(out_buffer);
         return -29;
     }
-    
+
     free(out_buffer);
     fflush(outfd);
-    
+
     log_message("[INFO] Updating checksum... ");
-    
+
     buffer = malloc(filesize(outfd)-28);
     if(buffer == NULL)
     {
@@ -1201,7 +1201,7 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         fclose(outfd);
         return -30;
     }
-    
+
     fseek(outfd, 0, SEEK_SET);
     if(fread(buffer, filesize(outfd)-28, 1, outfd) != 1)
     {
@@ -1210,9 +1210,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -31;
     }
-    
+
     hmac_sha1((unsigned char*)player->null_key, strlen(player->null_key), &buffer[0], filesize(outfd)-28, &hash_key);
-    
+
     fseek(outfd, filesize(outfd)-20, SEEK_SET);
     if(fwrite(hash_key, 20, 1, outfd) != 1)
     {
@@ -1221,9 +1221,9 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
         free(buffer);
         return -32;
     }
-    
+
     fclose(outfd);
-    
+
     log_message("Done!\n");
     return 0;
 }
@@ -1232,23 +1232,23 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
 static void usage(void)
 {
     int i;
-    
+
     fprintf(stdout, "Usage: mkzenboot <firmware file> <boot file> <output file> <player>\n");
     fprintf(stdout, "Players:\n");
     for (i = 0; players[i].name != NULL; i++)
         fprintf(stdout, " * \"%s\"\n", players[i].name);
-    
+
     exit(1);
 }
 
 void log_message(const char* format, ...)
 {
     va_list ap;
-    
+
     va_start(ap, format);
-    
+
     vfprintf(stderr, format, ap);
-    
+
     va_end(ap);
 }
 
@@ -1264,19 +1264,19 @@ int main(int argc, char *argv[])
     infile = argv[1];
     bootfile = argv[2];
     outfile = argv[3];
-    
+
     for (i = 0; players[i].name != NULL; i++)
     {
         if(!strcasecmp(players[i].name, argv[4]))
             player = &players[i];
     }
-    
+
     if(player == NULL)
     {
         fprintf(stderr, "[ERR]  %s isn't listed as a player!\n", argv[4]);
         exit(1);
     }
-    
+
     return mkboot(infile, bootfile, outfile, player);
 }
 #endif

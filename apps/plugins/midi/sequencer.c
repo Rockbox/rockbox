@@ -504,4 +504,3 @@ void seekForward(int nsec)
     int desired_time = playing_time + nsec;
     while (tick() && playing_time < desired_time);
 }
-

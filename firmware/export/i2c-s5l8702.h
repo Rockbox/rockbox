@@ -29,4 +29,3 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
 int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *data);
 
 #endif /* _I2C_S5l8702_H */
-

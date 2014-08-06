@@ -35,7 +35,7 @@ void backdrop_show(char* backdrop_buffer);
 #define LCD_BACKDROP_BYTES 0
 #endif
 
-#if defined(HAVE_REMOTE_LCD) 
+#if defined(HAVE_REMOTE_LCD)
 bool remote_backdrop_load(const char *filename, char* backdrop_buffer);
 void remote_backdrop_show(char* backdrop_buffer);
 

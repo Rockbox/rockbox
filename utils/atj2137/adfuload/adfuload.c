@@ -195,7 +195,7 @@ static void adfu_download(libusb_device_handle *hdev, unsigned char *buf, int si
     int transferred, ret, repeat;
     uint32_t reftag;
 
-    fprintf(stderr, "[info]: downloading %d bytes from 0x%08x\n", size, address); 
+    fprintf(stderr, "[info]: downloading %d bytes from 0x%08x\n", size, address);
     memset(cmdbuf, 0, sizeof(cmdbuf));
 
     cmdbuf[0] = 0x05;

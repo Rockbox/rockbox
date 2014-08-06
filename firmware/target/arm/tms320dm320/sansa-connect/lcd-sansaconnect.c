@@ -59,7 +59,7 @@ void lcd_awake(void)
         lcd_on = true;
 
         /* enable video encoder clock */
-        bitset16(&IO_CLK_MOD1, CLK_MOD1_VENC); 
+        bitset16(&IO_CLK_MOD1, CLK_MOD1_VENC);
 
         /* enable video encoder */
         bitset16(&IO_VID_ENC_VMOD, 0x01);
@@ -76,13 +76,13 @@ void lcd_awake(void)
 void lcd_init_device(void)
 {
     unsigned int addr;
- 
+
     /* Disable Video Encoder clock */
     bitclr16(&IO_CLK_MOD1, CLK_MOD1_VENC);
 
     /* configure GIO39, GIO34 as outputs */
     IO_GIO_DIR2 &= ~((1 << 7) /* GIO39 */ | (1 << 2) /* GIO34 */);
-    
+
     IO_GIO_FSEL3 = (IO_GIO_FSEL3 & ~(0x300F)) |
                    (0x1000) /* GIO39 - FIELD_VENC */ |
                    (0x4);   /* GIO34 - PWM1 (brightness control) */
@@ -168,14 +168,14 @@ static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
     /* Set source and destination addresses */
     dst = (char*)(FRAME + LCD_WIDTH*y + x);
     src = (char*)(FBADDR(x,y));
- 
+
     /* Flush cache to memory */
     commit_dcache();
 
     /* Addresses are relative to start of SDRAM */
     src -= CONFIG_SDRAM_START;
     dst -= CONFIG_SDRAM_START;
-    
+
     /* Enable Image Buffer clock */
     bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
 
@@ -192,7 +192,7 @@ static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
 
     /* Set the start address of buffer */
     COP_BUF_ADDR = 0x0000;
-    
+
     /* Setup SDRAM stride */
     COP_SDEM_LOFST = LCD_WIDTH;
 
@@ -201,28 +201,28 @@ static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
 
         addr = (int)src;
         addr >>= 1; /* Addresses are in 16-bit words */
-        
+
         /* Setup the registers to initiate the read from SDRAM */
         COP_SDEM_ADDRH = addr >> 16;
         COP_SDEM_ADDRL = addr & 0xFFFF;
-        
+
         /* Set direction and start */
         COP_DMA_CTRL = 0x0001;
         COP_DMA_CTRL |= 0x0002;
 
         /* Wait for read to finish */
         while (COP_DMA_CTRL & 0x02) {};
-        
+
         addr = (int)dst;
         addr >>= 1;
-        
+
         COP_SDEM_ADDRH = addr >> 16;
         COP_SDEM_ADDRL = addr & 0xFFFF;
-        
+
         /* Set direction and start transfer */
         COP_DMA_CTRL = 0x0000;
         COP_DMA_CTRL |= 0x0002;
-        
+
         /* Wait for the transfer to complete */
         while (COP_DMA_CTRL & 0x02) {};
 

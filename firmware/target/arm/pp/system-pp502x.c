@@ -323,9 +323,9 @@ static void pp_set_cpu_frequency(long frequency)
       /* Note1: The PP5022 PLL must be run at >= 96MHz
        * Bits 20..21 select the post divider (1/2/4/8).
        * PP5026 is similar to PP5022 except it doesn't
-       * have this limitation (and the post divider?) 
+       * have this limitation (and the post divider?)
        * Note2: CLOCK_SOURCE is set via 0=32kHz, 1=16MHz,
-       * 2=24MHz, 3=33MHz, 4=48MHz, 5=SLOW, 6=FAST, 7=PLL. 
+       * 2=24MHz, 3=33MHz, 4=48MHz, 5=SLOW, 6=FAST, 7=PLL.
        * SLOW = 24MHz / (DIV_SLOW + 1), DIV = Bits 16-19
        * FAST = PLL   / (DIV_FAST + 1), DIV = Bits 20-23 */
       case CPUFREQ_SLEEP:

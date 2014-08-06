@@ -69,4 +69,3 @@ class EncoderLame : public EncoderBase
 };
 
 #endif
-

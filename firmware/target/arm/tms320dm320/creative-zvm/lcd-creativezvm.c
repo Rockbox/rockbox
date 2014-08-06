@@ -102,10 +102,10 @@ static void sleep_ms(unsigned int ms)
 }
 
 static void lcd_display_on(bool reset)
-{  
+{
     /* Enable main power */
     IO_GIO_BITSET2 |= (1 << 3);
-    
+
     /* power on sequence as per the ZVM firmware */
     sleep_ms(250);
     IO_GIO_BITSET1 = (1 << 13);
@@ -113,10 +113,10 @@ static void lcd_display_on(bool reset)
     IO_GIO_BITSET2 = (1 << 5);
     IO_GIO_BITSET2 = (1 << 8);
     sleep_ms(1);
-    
+
     /*Init SPI here... */
     sleep_ms(32);
-    
+
     IO_GIO_BITSET2 = (1 << 0);
     sleep_ms(5);
     IO_GIO_BITSET2 = (1 << 7);
@@ -127,7 +127,7 @@ static void lcd_display_on(bool reset)
     /*TODO: figure out what OF does after this... */
     IO_GIO_BITSET2 = (1 << 8);
     sleep_ms(1);
-    
+
     lcd_write_reg(LTV_IFCTL,     LTV_NL(29));
     lcd_write_reg(LTV_DATACTL,   0);
     lcd_write_reg(LTV_ENTRY_MODE,0);
@@ -149,14 +149,14 @@ static void lcd_display_on(bool reset)
     lcd_write_reg(LTV_GAMMA(8),  0);
     lcd_write_reg(LTV_GAMMA(9),  0);
     sleep_ms(10);
-    
+
     lcd_write_reg(LTV_PWRCTL1,   (LTV_VCOM_DISABLE | LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
     lcd_write_reg(LTV_PWRCTL2,   0);
     sleep_ms(40);
-    
+
     lcd_write_reg(LTV_PWRCTL2,   LTV_VCOML_ENABLE);
     sleep_ms(40);
-    
+
     lcd_write_reg(LTV_IFCTL,     (LTV_NMD | LTV_NL(29)));
     lcd_write_reg(LTV_DATACTL,   (LTV_DS_SAME | LTV_CHS_480 | LTV_DF_RGB | LTV_RGB_BGR));
     lcd_write_reg(LTV_ENTRY_MODE,(LTV_VSPL_ACTIVE_LOW | LTV_HSPL_ACTIVE_LOW | LTV_DPL_SAMPLE_RISING | LTV_EPL_ACTIVE_LOW | LTV_SS_RIGHT_TO_LEFT));
@@ -176,7 +176,7 @@ static void lcd_display_on(bool reset)
     lcd_write_reg(LTV_GAMMA(8),  0);
     lcd_write_reg(LTV_GAMMA(9),  0);
     sleep_ms(60);
-    
+
     lcd_write_reg(LTV_PWRCTL1,   (LTV_VCOMOUT_ENABLE | LTV_POWER_ON | LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
     lcd_write_reg(LTV_PWRCTL2,   (LTV_VCOML_VOLTAGE(17) | LTV_VCOMH_VOLTAGE(26))); /* VCOML=0,0625V VCOMH=1,21875V */
     sleep_ms(10);
@@ -197,18 +197,18 @@ static void lcd_display_off(void)
     /* LQV shutdown sequence */
     lcd_write_reg(LTV_PWRCTL1,  (LTV_VCOMOUT_ENABLE | LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
     sleep_ms(20);
-    
+
     lcd_write_reg(LTV_PWRCTL1,  (LTV_DRIVE_CURRENT(5) | LTV_SUPPLY_CURRENT(5)));
     lcd_write_reg(LTV_GATECTL2, (LTV_NW_INV_1LINE | LTV_FTI(3) | LTV_FWI(3)));
     lcd_write_reg(LTV_PWRCTL2,  0);
     sleep_ms(20);
-    
+
     lcd_write_reg(LTV_PWRCTL1,  0);
     sleep_ms(10);
     unsigned char temp[1];
     temp[0] = 0;
     spi_block_transfer(SPI_target_LTV250QV, temp, sizeof(temp), NULL, 0);
-    
+
     IO_GIO_BITCLR2 = (1 << 4);
     sleep_ms(5);
     IO_GIO_BITCLR2 = (1 << 7);
@@ -217,12 +217,12 @@ static void lcd_display_off(void)
     sleep_ms(2);
     IO_GIO_BITCLR2 = (1 << 8);
     IO_GIO_BITCLR2 = (1 << 5);
-    
+
     /* Disable main power */
     IO_GIO_BITCLR2 |= (1 << 3);
-    
+
     enable_venc(false);
-    
+
     lcd_on = false;
 }
 
@@ -279,13 +279,13 @@ static bool _lcd_enabled(void)
 }
 
 void lcd_init_device(void)
-{    
+{
     if(!_lcd_enabled())
     {
         lcd_display_on(true);
-        
+
         enable_venc(true);
-        
+
         /* Set LCD values in Video Encoder */
         IO_VID_ENC_VMOD &= 0x8800; /* Clear all values */
         IO_VID_ENC_VMOD |= (VENC_VMOD_DACPD | VENC_VMOD_VMD | VENC_VMOD_ITLC | VENC_VMOD_VDMD(2)); /* set mode to RGB666 parallel 16 bit */
@@ -320,7 +320,7 @@ void lcd_init_device(void)
     /* Based on lcd-mr500.c from Catalin Patulea */
     /* Clear the Frame */
     memset16(FRAME, 0x0000, LCD_WIDTH*LCD_HEIGHT);
-    
+
     IO_OSD_MODE = 0x00ff;
     IO_OSD_VIDWINMD = 0x0002;
     IO_OSD_OSDWINMD0 = 0x2001;
@@ -395,7 +395,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     }
 #else
     src = FBADDR(x,y);
-    
+
     register int xc, yc;
     register fb_data *start=FRAME + LCD_HEIGHT*(LCD_WIDTH-x-1) + y + 1;
 

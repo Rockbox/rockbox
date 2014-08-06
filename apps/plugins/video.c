@@ -146,9 +146,9 @@ static char gPrint[32]; /* a global printf buffer, saves stack */
 
 
 /* playstate */
-static struct 
+static struct
 {
-    enum 
+    enum
     {
         paused,
         playing,
@@ -224,7 +224,7 @@ static void DrawBuf(void)
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
     rb->lcd_fillrect(0, gBuf.osd_ypos, LCD_WIDTH, gBuf.osd_height);
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    
+
     ypos = gBuf.osd_ypos + gBuf.osd_height/2 - 3; /* center vertically */
 
     rb->lcd_hline(1, LCD_WIDTH-2, ypos + 3);
@@ -319,7 +319,7 @@ static void ChangeVolume(int delta)
     {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
-        
+
         rb->snprintf(gPrint, sizeof(gPrint), "Vol: %d dB", vol);
         osd_show_text();
     }
@@ -359,9 +359,9 @@ static void SyncVideo(void)
     {
         gBuf.vidcount = 0; /* nothing known */
         /* sync the video position */
-        gBuf.pReadVideo = gBuf.pReadAudio + 
+        gBuf.pReadVideo = gBuf.pReadAudio +
             (long)pAudioBuf->associated_video * (long)gFileHdr.blocksize;
-    
+
         /* handle possible wrap */
         if (gBuf.pReadVideo >= gBuf.pBufEnd)
             gBuf.pReadVideo -= gBuf.bufsize;
@@ -428,14 +428,14 @@ static void timer4_isr(void)
 
         if (!gPlay.bHasAudio)
             break; /* no need to skip any audio */
-        
+
         if (gBuf.vidcount)
-        {   
+        {
             /* we know the next is a video frame */
             gBuf.vidcount--;
             break; /* exit the loop */
         }
-        
+
         pAudioBuf = (tAudioFrameHeader*)(gBuf.pReadVideo);
         if (pAudioBuf->magic == AUDIO_MAGIC)
         {   /* we ran into audio, can happen after seek */
@@ -462,7 +462,7 @@ static void GetMoreMp3(const void** start, size_t* size)
     /* just for the statistics */
     if (!gBuf.bEOF && available < gStats.minAudioAvail)
         gStats.minAudioAvail = available;
-    
+
     if (available < advance + (int)gFileHdr.blocksize || advance == 0)
     {
         gPlay.bAudioUnderrun = true;
@@ -481,13 +481,13 @@ static void GetMoreMp3(const void** start, size_t* size)
 static int WaitForButton(void)
 {
     int button;
-    
+
     do
     {
         button = rb->button_get(true);
         rb->default_event_handler(button);
     } while ((button & BUTTON_REL) && button != SYS_USB_CONNECTED);
-    
+
     return button;
 }
 
@@ -544,7 +544,7 @@ static int SeekTo(int fd, int nPos)
             /* search for audio frame */
             while (((tAudioFrameHeader*)(gBuf.pReadAudio))->magic != AUDIO_MAGIC)
                 gBuf.pReadAudio += gFileHdr.blocksize;
-            
+
             if (gPlay.bHasVideo)
                 SyncVideo(); /* pick the right video for that */
         }
@@ -603,7 +603,7 @@ static int PlayTick(int fd)
     int filepos;
 
     /* check buffer level */
-    
+
     if (gPlay.bHasAudio)
         avail_audio = Available(gBuf.pReadAudio);
     if (gPlay.bHasVideo)
@@ -638,7 +638,7 @@ static int PlayTick(int fd)
         int read_now, got_now;
         int buf_free;
         long spinup; /* measure the spinup time */
-        
+
         /* how much can we reload, don't fill completely, would appear empty */
         buf_free = gBuf.bufsize - MAX(avail_audio, avail_video) - gBuf.high_water;
         if (buf_free < 0)
@@ -655,7 +655,7 @@ static int PlayTick(int fd)
             gPlay.bRefilling = false; /* last piece requested */
 
         spinup = *rb->current_tick; /* in case this is interesting below */
-        
+
         got_now = rb->read(fd, gBuf.pBufFill, read_now);
         if (got_now != read_now || read_now == 0)
         {
@@ -673,7 +673,7 @@ static int PlayTick(int fd)
                 gStats.minSpinup = spinup;
 
             /* recalculate the low water mark from real measurements */
-            gBuf.low_water = (gStats.maxSpinup + gBuf.spinup_safety) 
+            gBuf.low_water = (gStats.maxSpinup + gBuf.spinup_safety)
                              * gFileHdr.bps_peak / 8 / HZ;
         }
 
@@ -705,7 +705,7 @@ static int PlayTick(int fd)
             filepos -= Available(gBuf.pReadVideo); /* take video position */
         else
             filepos -= Available(gBuf.pReadAudio); /* else audio */
-            
+
         switch (button) {   /* set exit conditions */
         case BUTTON_OFF:
             if (gFileHdr.magic == HEADER_MAGIC /* only if file has header */
@@ -822,16 +822,16 @@ static int PlayTick(int fd)
         lastbutton = button;
     } /*  if (button != BUTTON_NONE) */
 
-    
+
     /* handle seeking */
-    
+
     if (gPlay.bSeeking) /* seeking? */
     {
         if (gPlay.nSeekAcc < -MAX_ACC)
             gPlay.nSeekAcc = -MAX_ACC;
         else if (gPlay.nSeekAcc > MAX_ACC)
             gPlay.nSeekAcc = MAX_ACC;
-        
+
         gPlay.nSeekPos += gPlay.nSeekAcc * gBuf.nSeekChunk;
         if (gPlay.nSeekPos < 0)
             gPlay.nSeekPos = 0;
@@ -845,7 +845,7 @@ static int PlayTick(int fd)
 
 
     /* check + recover underruns */
-    
+
     if ((gPlay.bAudioUnderrun || gPlay.bVideoUnderrun) && !gBuf.bEOF)
     {
         gBuf.spinup_safety += HZ/2; /* add extra spinup time for the future */
@@ -882,7 +882,7 @@ static int main(char* filename)
     if (fd < 0)
         return PLUGIN_ERROR;
     file_size =  rb->filesize(fd);
-    
+
     /* reset pitch value to ensure synchronous playback */
     rb->sound_set_pitch(PITCH_SPEED_100);
 
@@ -899,7 +899,7 @@ static int main(char* filename)
     gBuf.pBufStart = rb->plugin_get_audio_buffer((size_t *)&gBuf.bufsize);
     /*gBuf.bufsize = 1700*1024; // test, like 2MB version!!!! */
     gBuf.pBufFill = gBuf.pBufStart; /* all empty */
-    
+
     /* init OSD */
     rb->lcd_getstringsize("X", NULL, &retval);
     gBuf.osd_height = (retval + 7) & ~7;
@@ -1004,7 +1004,7 @@ static int main(char* filename)
         rb->lcd_puts(0, 6, gPrint);
         rb->snprintf(gPrint, sizeof(gPrint), "HighWater: %d", gBuf.high_water);
         rb->lcd_puts(0, 7, gPrint);
- 
+
         rb->lcd_update();
         button = WaitForButton();
     }
@@ -1027,4 +1027,3 @@ enum plugin_status plugin_start(const void* parameter)
 }
 
 #endif /* #ifdef HAVE_LCD_BITMAP */
-

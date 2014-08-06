@@ -10,4 +10,3 @@
 #define spx_uint64_t uint64_t
 
 #endif
-

@@ -6,7 +6,7 @@
 Pd, but not shared with Pd objects. */
 
 /* NOTE: this file describes Pd implementation details which may change
-in future releases.  The public (stable) API is in m_pd.h. */  
+in future releases.  The public (stable) API is in m_pd.h. */
 
 /* LATER consider whether to use 'char' for method arg types to save space */
 
@@ -29,28 +29,28 @@ typedef void (*t_anymethod)(t_pd *x, t_symbol *s, int argc, t_atom *argv);
 
 struct _class
 {
-    t_symbol *c_name;	    	    	/* name (mostly for error reporting) */
-    t_symbol *c_helpname;   	    	/* name of help file */
-    t_symbol *c_externdir;  	    	/* directory extern was loaded from */
-    size_t c_size;  	    	    	/* size of an instance */
-    t_methodentry *c_methods;	    	/* methods other than bang, etc below */
-    int c_nmethod;  	    	    	/* number of methods */
-    t_method c_freemethod;	    	/* function to call before freeing */
-    t_bangmethod c_bangmethod;	    	/* common methods */
+    t_symbol *c_name;                   /* name (mostly for error reporting) */
+    t_symbol *c_helpname;               /* name of help file */
+    t_symbol *c_externdir;              /* directory extern was loaded from */
+    size_t c_size;                      /* size of an instance */
+    t_methodentry *c_methods;           /* methods other than bang, etc below */
+    int c_nmethod;                      /* number of methods */
+    t_method c_freemethod;              /* function to call before freeing */
+    t_bangmethod c_bangmethod;          /* common methods */
     t_pointermethod c_pointermethod;
     t_floatmethod c_floatmethod;
     t_symbolmethod c_symbolmethod;
     t_listmethod c_listmethod;
     t_anymethod c_anymethod;
-    struct _widgetbehavior *c_wb; 	/* "gobjs" only */
+    struct _widgetbehavior *c_wb;       /* "gobjs" only */
     struct _parentwidgetbehavior *c_pwb;/* widget behavior in parent */
-    t_savefn c_savefn;	    	    	/* function to call when saving */
-    t_propertiesfn c_propertiesfn; 	/* function to start prop dialog */
-    int c_floatsignalin; 	    	/* onset to float for signal input */
-    char c_gobj;	    		/* true if is a gobj */
-    char c_patchable;	    	    	/* true if we have a t_object header */
-    char c_firstin; 	    	    /* if patchable, true if draw first inlet */
-    char c_drawcommand; 	    /* a drawing command for a template */
+    t_savefn c_savefn;                  /* function to call when saving */
+    t_propertiesfn c_propertiesfn;      /* function to start prop dialog */
+    int c_floatsignalin;                /* onset to float for signal input */
+    char c_gobj;                        /* true if is a gobj */
+    char c_patchable;                   /* true if we have a t_object header */
+    char c_firstin;                 /* if patchable, true if draw first inlet */
+    char c_drawcommand;             /* a drawing command for a template */
 };
 
 
@@ -76,4 +76,3 @@ EXTERN int obj_sigoutletindex(t_object *x, int m);
 /* misc */
 EXTERN void glob_evalfile(t_pd *ignore, t_symbol *name, t_symbol *dir);
 EXTERN void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv);
-

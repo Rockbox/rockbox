@@ -24,7 +24,7 @@
             : [x]"r"(X), [y]"r"(Y), [shr]"r"(Z), [shl]"r"(32-Z)); \
         lo; \
     })
-     
+
     /* Calculates: result = (X*Y)>>16 */
     #define fixmul16(X,Y) \
      ({ \
@@ -38,7 +38,7 @@
            : [x]"r"(X), [y]"r"(Y)); \
         lo; \
      })
-     
+
     /* Calculates: result = (X*Y)>>24 */
     #define fixmul24(X,Y) \
      ({ \
@@ -52,7 +52,7 @@
            : [x]"r"(X), [y]"r"(Y)); \
         lo; \
      })
-     
+
     /* Calculates: result = (X*Y)>>31, loose 1 bit precision */
     #define fixmul31(X,Y) \
      ({ \
@@ -124,42 +124,42 @@
         int64_t temp;
         temp = x;
         temp *= y;
-    
+
         temp >>= shamt;
-    
+
         return (int32_t)temp;
     }
-    
+
     static inline int32_t fixmul31(int32_t x, int32_t y)
     {
         int64_t temp;
         temp = x;
         temp *= y;
-    
+
         temp >>= 31;
-    
+
         return (int32_t)temp;
     }
-    
+
     static inline int32_t fixmul24(int32_t x, int32_t y)
     {
         int64_t temp;
         temp = x;
         temp *= y;
-    
+
         temp >>= 24;
-    
+
         return (int32_t)temp;
     }
-    
+
     static inline int32_t fixmul16(int32_t x, int32_t y)
     {
         int64_t temp;
         temp = x;
         temp *= y;
-    
+
         temp >>= 16;
-    
+
         return (int32_t)temp;
     }
 #endif /* CPU_COLDFIRE, CPU_ARM */
@@ -185,8 +185,8 @@
         dst[j] = fixmul31(wi, s0) + fixmul31(wj, s1);
 #endif /* CPU_COLDFIRE */
 
-static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0, 
-                                   const int32_t *src1, const int32_t *win, 
+static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
+                                   const int32_t *src1, const int32_t *win,
                                    int len)
 {
     int i, j;
@@ -230,7 +230,7 @@ static inline void vector_fixmul_window(int32_t *dst, const int32_t *src0,
         dst[i+3] = fixmul16(src[i+3], mul);
 #endif /* CPU_ARM, CPU_COLDFIRE */
 
-static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src, 
+static inline void vector_fixmul_scalar(int32_t *dst, const int32_t *src,
                                         int32_t mul, int len)
 {
     /* len is _always_ a multiple of 4, because len is the difference of sfb's

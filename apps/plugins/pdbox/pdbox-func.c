@@ -114,7 +114,7 @@ double rb_strtod(const char *str, char **endptr)
 
   // Handle optional sign
   negative = 0;
-  switch (*p) 
+  switch (*p)
   {
     case '-': negative = 1; // Fall through to increment position
     case '+': p++;
@@ -134,7 +134,7 @@ double rb_strtod(const char *str, char **endptr)
   }
 
   // Process decimal part
-  if (*p == '.') 
+  if (*p == '.')
   {
     p++;
 
@@ -163,25 +163,25 @@ double rb_strtod(const char *str, char **endptr)
   if (negative) number = -number;
 
   // Process an exponent string
-  if (*p == 'e' || *p == 'E') 
+  if (*p == 'e' || *p == 'E')
   {
     // Handle optional sign
     negative = 0;
-    switch(*++p) 
-    {   
+    switch(*++p)
+    {
       case '-': negative = 1;   // Fall through to increment pos
       case '+': p++;
     }
 
     // Process string of digits
     n = 0;
-    while (isdigit(*p)) 
-    {   
+    while (isdigit(*p))
+    {
       n = n * 10 + (*p - '0');
       p++;
     }
 
-    if (negative) 
+    if (negative)
       exponent -= n;
     else
       exponent += n;
@@ -199,9 +199,9 @@ double rb_strtod(const char *str, char **endptr)
   p10 = 10.;
   n = exponent;
   if (n < 0) n = -n;
-  while (n) 
+  while (n)
   {
-    if (n & 1) 
+    if (n & 1)
     {
       if (exponent < 0)
         number /= p10;
@@ -441,11 +441,11 @@ int rb_fprintf_f(int fd, float f)
 /* Natural logarithm.
    Taken from glibc-2.8 */
 static const float
-ln2_hi =   6.9313812256e-01,	/* 0x3f317180 */
-ln2_lo =   9.0580006145e-06,	/* 0x3717f7d1 */
-two25 =    3.355443200e+07,	/* 0x4c000000 */
-Lg1 = 6.6666668653e-01,	/* 3F2AAAAB */
-Lg2 = 4.0000000596e-01,	/* 3ECCCCCD */
+ln2_hi =   6.9313812256e-01,    /* 0x3f317180 */
+ln2_lo =   9.0580006145e-06,    /* 0x3717f7d1 */
+two25 =    3.355443200e+07,     /* 0x4c000000 */
+Lg1 = 6.6666668653e-01, /* 3F2AAAAB */
+Lg2 = 4.0000000596e-01, /* 3ECCCCCD */
 Lg3 = 2.8571429849e-01, /* 3E924925 */
 Lg4 = 2.2222198546e-01, /* 3E638E29 */
 Lg5 = 1.8183572590e-01, /* 3E3A3325 */
@@ -465,20 +465,20 @@ typedef union
 
 /* Get a 32 bit int from a float.  */
 
-#define GET_FLOAT_WORD(i,d)					\
-do {								\
-  ieee_float_shape_type gf_u;					\
-  gf_u.value = (d);						\
-  (i) = gf_u.word;						\
+#define GET_FLOAT_WORD(i,d)                                     \
+do {                                                            \
+  ieee_float_shape_type gf_u;                                   \
+  gf_u.value = (d);                                             \
+  (i) = gf_u.word;                                              \
 } while (0)
 
 /* Set a float from a 32 bit int.  */
 
-#define SET_FLOAT_WORD(d,i)					\
-do {								\
-  ieee_float_shape_type sf_u;					\
-  sf_u.word = (i);						\
-  (d) = sf_u.value;						\
+#define SET_FLOAT_WORD(d,i)                                     \
+do {                                                            \
+  ieee_float_shape_type sf_u;                                   \
+  sf_u.word = (i);                                              \
+  (d) = sf_u.value;                                             \
 } while (0)
 
 
@@ -492,8 +492,8 @@ float rb_log(float x)
     k=0;
     if (ix < 0x00800000) {          /* x < 2**-126  */
         if ((ix&0x7fffffff)==0)
-            return -two25/(x-x);		/* log(+-0)=-inf */
-        if (ix<0) return (x-x)/(x-x);	/* log(-#) = NaN */
+            return -two25/(x-x);                /* log(+-0)=-inf */
+        if (ix<0) return (x-x)/(x-x);   /* log(-#) = NaN */
         k -= 25; x *= two25; /* subnormal number, scale up x */
         GET_FLOAT_WORD(ix,x);
     }
@@ -501,10 +501,10 @@ float rb_log(float x)
     k += (ix>>23)-127;
     ix &= 0x007fffff;
     i = (ix+(0x95f64<<3))&0x800000;
-    SET_FLOAT_WORD(x,ix|(i^0x3f800000));	/* normalize x or x/2 */
+    SET_FLOAT_WORD(x,ix|(i^0x3f800000));        /* normalize x or x/2 */
     k += (i>>23);
     f = x-(float)1.0;
-    if((0x007fffff&(15+ix))<16) {	/* |f| < 2**-20 */
+    if((0x007fffff&(15+ix))<16) {       /* |f| < 2**-20 */
         if(f==zero) {
             if(k==0)
                 return zero;
@@ -558,27 +558,27 @@ log10_2lo  =  7.9034151668e-07; /* 0x355427db */
 
 float rb_log10(float x)
 {
-	float y,z;
-	int32_t i,k,hx;
+        float y,z;
+        int32_t i,k,hx;
 
-	GET_FLOAT_WORD(hx,x);
+        GET_FLOAT_WORD(hx,x);
 
         k=0;
-        if (hx < 0x00800000) {			/* x < 2**-126  */
+        if (hx < 0x00800000) {                  /* x < 2**-126  */
             if ((hx&0x7fffffff)==0)
-                return -two25/(x-x);		/* log(+-0)=-inf */
-            if (hx<0) return (x-x)/(x-x);	/* log(-#) = NaN */
+                return -two25/(x-x);            /* log(+-0)=-inf */
+            if (hx<0) return (x-x)/(x-x);       /* log(-#) = NaN */
             k -= 25; x *= two25; /* subnormal number, scale up x */
-	    GET_FLOAT_WORD(hx,x);
+            GET_FLOAT_WORD(hx,x);
         }
-	if (hx >= 0x7f800000) return x+x;
-	k += (hx>>23)-127;
-	i  = ((uint32_t)k&0x80000000)>>31;
+        if (hx >= 0x7f800000) return x+x;
+        k += (hx>>23)-127;
+        i  = ((uint32_t)k&0x80000000)>>31;
         hx = (hx&0x007fffff)|((0x7f-i)<<23);
         y  = (float)(k+i);
-	SET_FLOAT_WORD(x,hx);
-	z  = y*log10_2lo + ivln10*rb_log(x);
-	return  z+y*log10_2hi;
+        SET_FLOAT_WORD(x,hx);
+        z  = y*log10_2lo + ivln10*rb_log(x);
+        return  z+y*log10_2hi;
 }
 
 
@@ -638,67 +638,67 @@ float rb_pow(float x, float y)
 /* Square root function, original. */
 float rb_sqrt(float x)
 {
-	float z;
-	int32_t sign = (int)0x80000000; 
-	int32_t ix,s,q,m,t,i;
-	uint32_t r;
+        float z;
+        int32_t sign = (int)0x80000000;
+        int32_t ix,s,q,m,t,i;
+        uint32_t r;
 
-	GET_FLOAT_WORD(ix,x);
+        GET_FLOAT_WORD(ix,x);
 
     /* take care of Inf and NaN */
-	if((ix&0x7f800000)==0x7f800000) {			
-	    return x*x+x;		/* sqrt(NaN)=NaN, sqrt(+inf)=+inf
-					   sqrt(-inf)=sNaN */
-	} 
+        if((ix&0x7f800000)==0x7f800000) {
+            return x*x+x;               /* sqrt(NaN)=NaN, sqrt(+inf)=+inf
+                                           sqrt(-inf)=sNaN */
+        }
     /* take care of zero */
-	if(ix<=0) {
-	    if((ix&(~sign))==0) return x;/* sqrt(+-0) = +-0 */
-	    else if(ix<0)
-		return (x-x)/(x-x);		/* sqrt(-ve) = sNaN */
-	}
+        if(ix<=0) {
+            if((ix&(~sign))==0) return x;/* sqrt(+-0) = +-0 */
+            else if(ix<0)
+                return (x-x)/(x-x);             /* sqrt(-ve) = sNaN */
+        }
     /* normalize x */
-	m = (ix>>23);
-	if(m==0) {				/* subnormal x */
-	    for(i=0;(ix&0x00800000)==0;i++) ix<<=1;
-	    m -= i-1;
-	}
-	m -= 127;	/* unbias exponent */
-	ix = (ix&0x007fffff)|0x00800000;
-	if(m&1)	/* odd m, double x to make it even */
-	    ix += ix;
-	m >>= 1;	/* m = [m/2] */
+        m = (ix>>23);
+        if(m==0) {                              /* subnormal x */
+            for(i=0;(ix&0x00800000)==0;i++) ix<<=1;
+            m -= i-1;
+        }
+        m -= 127;       /* unbias exponent */
+        ix = (ix&0x007fffff)|0x00800000;
+        if(m&1) /* odd m, double x to make it even */
+            ix += ix;
+        m >>= 1;        /* m = [m/2] */
 
     /* generate sqrt(x) bit by bit */
-	ix += ix;
-	q = s = 0;		/* q = sqrt(x) */
-	r = 0x01000000;		/* r = moving bit from right to left */
+        ix += ix;
+        q = s = 0;              /* q = sqrt(x) */
+        r = 0x01000000;         /* r = moving bit from right to left */
 
-	while(r!=0) {
-	    t = s+r; 
-	    if(t<=ix) { 
-		s    = t+r; 
-		ix  -= t; 
-		q   += r; 
-	    } 
-	    ix += ix;
-	    r>>=1;
-	}
+        while(r!=0) {
+            t = s+r;
+            if(t<=ix) {
+                s    = t+r;
+                ix  -= t;
+                q   += r;
+            }
+            ix += ix;
+            r>>=1;
+        }
 
     /* use floating add to find out rounding direction */
-	if(ix!=0) {
-	    z = one-tiny; /* trigger inexact flag */
-	    if (z>=one) {
-	        z = one+tiny;
-		if (z>one)
-		    q += 2;
-		else
-		    q += (q&1);
-	    }
-	}
-	ix = (q>>1)+0x3f000000;
-	ix += (m <<23);
-	SET_FLOAT_WORD(z,ix);
-	return z;
+        if(ix!=0) {
+            z = one-tiny; /* trigger inexact flag */
+            if (z>=one) {
+                z = one+tiny;
+                if (z>one)
+                    q += 2;
+                else
+                    q += (q&1);
+            }
+        }
+        ix = (q>>1)+0x3f000000;
+        ix += (m <<23);
+        SET_FLOAT_WORD(z,ix);
+        return z;
 }
 
 /* Absolute value, simple calculus */
@@ -741,47 +741,47 @@ static const float aT[] = {
 
 float rb_atan(float x)
 {
-	float w,s1,s2,z;
-	int32_t ix,hx,id;
+        float w,s1,s2,z;
+        int32_t ix,hx,id;
 
-	GET_FLOAT_WORD(hx,x);
-	ix = hx&0x7fffffff;
-	if(ix>=0x50800000) {	/* if |x| >= 2^34 */
-	    if(ix>0x7f800000)
-		return x+x;		/* NaN */
-	    if(hx>0) return  atanhi[3]+atanlo[3];
-	    else     return -atanhi[3]-atanlo[3];
-	} if (ix < 0x3ee00000) {	/* |x| < 0.4375 */
-	    if (ix < 0x31000000) {	/* |x| < 2^-29 */
-		if(huge+x>one) return x;	/* raise inexact */
-	    }
-	    id = -1;
-	} else {
-	x = rb_fabs(x);
-	if (ix < 0x3f980000) {		/* |x| < 1.1875 */
-	    if (ix < 0x3f300000) {	/* 7/16 <=|x|<11/16 */
-		id = 0; x = ((float)2.0*x-one)/((float)2.0+x); 
-	    } else {			/* 11/16<=|x|< 19/16 */
-		id = 1; x  = (x-one)/(x+one); 
-	    }
-	} else {
-	    if (ix < 0x401c0000) {	/* |x| < 2.4375 */
-		id = 2; x  = (x-(float)1.5)/(one+(float)1.5*x);
-	    } else {			/* 2.4375 <= |x| < 2^66 */
-		id = 3; x  = -(float)1.0/x;
-	    }
-	}}
+        GET_FLOAT_WORD(hx,x);
+        ix = hx&0x7fffffff;
+        if(ix>=0x50800000) {    /* if |x| >= 2^34 */
+            if(ix>0x7f800000)
+                return x+x;             /* NaN */
+            if(hx>0) return  atanhi[3]+atanlo[3];
+            else     return -atanhi[3]-atanlo[3];
+        } if (ix < 0x3ee00000) {        /* |x| < 0.4375 */
+            if (ix < 0x31000000) {      /* |x| < 2^-29 */
+                if(huge+x>one) return x;        /* raise inexact */
+            }
+            id = -1;
+        } else {
+        x = rb_fabs(x);
+        if (ix < 0x3f980000) {          /* |x| < 1.1875 */
+            if (ix < 0x3f300000) {      /* 7/16 <=|x|<11/16 */
+                id = 0; x = ((float)2.0*x-one)/((float)2.0+x);
+            } else {                    /* 11/16<=|x|< 19/16 */
+                id = 1; x  = (x-one)/(x+one);
+            }
+        } else {
+            if (ix < 0x401c0000) {      /* |x| < 2.4375 */
+                id = 2; x  = (x-(float)1.5)/(one+(float)1.5*x);
+            } else {                    /* 2.4375 <= |x| < 2^66 */
+                id = 3; x  = -(float)1.0/x;
+            }
+        }}
     /* end of argument reduction */
-	z = x*x;
-	w = z*z;
+        z = x*x;
+        w = z*z;
     /* break sum from i=0 to 10 aT[i]z**(i+1) into odd and even poly */
-	s1 = z*(aT[0]+w*(aT[2]+w*(aT[4]+w*(aT[6]+w*(aT[8]+w*aT[10])))));
-	s2 = w*(aT[1]+w*(aT[3]+w*(aT[5]+w*(aT[7]+w*aT[9]))));
-	if (id<0) return x - x*(s1+s2);
-	else {
-	    z = atanhi[id] - ((x*(s1+s2) - atanlo[id]) - x);
-	    return (hx<0)? -z:z;
-	}
+        s1 = z*(aT[0]+w*(aT[2]+w*(aT[4]+w*(aT[6]+w*(aT[8]+w*aT[10])))));
+        s2 = w*(aT[1]+w*(aT[3]+w*(aT[5]+w*(aT[7]+w*aT[9]))));
+        if (id<0) return x - x*(s1+s2);
+        else {
+            z = atanhi[id] - ((x*(s1+s2) - atanlo[id]) - x);
+            return (hx<0)? -z:z;
+        }
 }
 
 /* Arc tangent from two variables, original. */
@@ -794,69 +794,69 @@ pi_lo   = -8.7422776573e-08; /* 0xb3bbbd2e */
 
 float rb_atan2(float x, float y)
 {
-	float z;
-	int32_t k,m,hx,hy,ix,iy;
+        float z;
+        int32_t k,m,hx,hy,ix,iy;
 
-	GET_FLOAT_WORD(hx,x);
-	ix = hx&0x7fffffff;
-	GET_FLOAT_WORD(hy,y);
-	iy = hy&0x7fffffff;
-	if((ix>0x7f800000)||
-	   (iy>0x7f800000))	/* x or y is NaN */
-	   return x+y;
-	if(hx==0x3f800000) return rb_atan(y);   /* x=1.0 */
-	m = ((hy>>31)&1)|((hx>>30)&2);	/* 2*sign(x)+sign(y) */
+        GET_FLOAT_WORD(hx,x);
+        ix = hx&0x7fffffff;
+        GET_FLOAT_WORD(hy,y);
+        iy = hy&0x7fffffff;
+        if((ix>0x7f800000)||
+           (iy>0x7f800000))     /* x or y is NaN */
+           return x+y;
+        if(hx==0x3f800000) return rb_atan(y);   /* x=1.0 */
+        m = ((hy>>31)&1)|((hx>>30)&2);  /* 2*sign(x)+sign(y) */
 
     /* when y = 0 */
-	if(iy==0) {
-	    switch(m) {
-		case 0:
-		case 1: return y; 	/* atan(+-0,+anything)=+-0 */
-		case 2: return  pi+tiny;/* atan(+0,-anything) = pi */
-		case 3: return -pi-tiny;/* atan(-0,-anything) =-pi */
-	    }
-	}
+        if(iy==0) {
+            switch(m) {
+                case 0:
+                case 1: return y;       /* atan(+-0,+anything)=+-0 */
+                case 2: return  pi+tiny;/* atan(+0,-anything) = pi */
+                case 3: return -pi-tiny;/* atan(-0,-anything) =-pi */
+            }
+        }
     /* when x = 0 */
-	if(ix==0) return (hy<0)?  -pi_o_2-tiny: pi_o_2+tiny;
+        if(ix==0) return (hy<0)?  -pi_o_2-tiny: pi_o_2+tiny;
 
     /* when x is INF */
-	if(ix==0x7f800000) {
-	    if(iy==0x7f800000) {
-		switch(m) {
-		    case 0: return  pi_o_4+tiny;/* atan(+INF,+INF) */
-		    case 1: return -pi_o_4-tiny;/* atan(-INF,+INF) */
-		    case 2: return  (float)3.0*pi_o_4+tiny;/*atan(+INF,-INF)*/
-		    case 3: return (float)-3.0*pi_o_4-tiny;/*atan(-INF,-INF)*/
-		}
-	    } else {
-		switch(m) {
-		    case 0: return  zero  ;	/* atan(+...,+INF) */
-		    case 1: return -zero  ;	/* atan(-...,+INF) */
-		    case 2: return  pi+tiny  ;	/* atan(+...,-INF) */
-		    case 3: return -pi-tiny  ;	/* atan(-...,-INF) */
-		}
-	    }
-	}
+        if(ix==0x7f800000) {
+            if(iy==0x7f800000) {
+                switch(m) {
+                    case 0: return  pi_o_4+tiny;/* atan(+INF,+INF) */
+                    case 1: return -pi_o_4-tiny;/* atan(-INF,+INF) */
+                    case 2: return  (float)3.0*pi_o_4+tiny;/*atan(+INF,-INF)*/
+                    case 3: return (float)-3.0*pi_o_4-tiny;/*atan(-INF,-INF)*/
+                }
+            } else {
+                switch(m) {
+                    case 0: return  zero  ;     /* atan(+...,+INF) */
+                    case 1: return -zero  ;     /* atan(-...,+INF) */
+                    case 2: return  pi+tiny  ;  /* atan(+...,-INF) */
+                    case 3: return -pi-tiny  ;  /* atan(-...,-INF) */
+                }
+            }
+        }
     /* when y is INF */
-	if(iy==0x7f800000) return (hy<0)? -pi_o_2-tiny: pi_o_2+tiny;
+        if(iy==0x7f800000) return (hy<0)? -pi_o_2-tiny: pi_o_2+tiny;
 
     /* compute y/x */
-	k = (iy-ix)>>23;
-	if(k > 60) z=pi_o_2+(float)0.5*pi_lo; 	/* |y/x| >  2**60 */
-	else if(hx<0&&k<-60) z=0.0; 	/* |y|/x < -2**60 */
-	else z=rb_atan(rb_fabs(y/x));	/* safe to do y/x */
-	switch (m) {
-	    case 0: return       z  ;	/* atan(+,+) */
-	    case 1: {
-	    	      uint32_t zh;
-		      GET_FLOAT_WORD(zh,z);
-		      SET_FLOAT_WORD(z,zh ^ 0x80000000);
-		    }
-		    return       z  ;	/* atan(-,+) */
-	    case 2: return  pi-(z-pi_lo);/* atan(+,-) */
-	    default: /* case 3 */
-	    	    return  (z-pi_lo)-pi;/* atan(-,-) */
-	}
+        k = (iy-ix)>>23;
+        if(k > 60) z=pi_o_2+(float)0.5*pi_lo;   /* |y/x| >  2**60 */
+        else if(hx<0&&k<-60) z=0.0;     /* |y|/x < -2**60 */
+        else z=rb_atan(rb_fabs(y/x));   /* safe to do y/x */
+        switch (m) {
+            case 0: return       z  ;   /* atan(+,+) */
+            case 1: {
+                      uint32_t zh;
+                      GET_FLOAT_WORD(zh,z);
+                      SET_FLOAT_WORD(z,zh ^ 0x80000000);
+                    }
+                    return       z  ;   /* atan(-,+) */
+            case 2: return  pi-(z-pi_lo);/* atan(+,-) */
+            default: /* case 3 */
+                    return  (z-pi_lo)-pi;/* atan(-,-) */
+        }
 }
 
 
@@ -1330,12 +1330,12 @@ __fpclassifyf (float x)
 int
 __isinff (float x)
 {
-	int32_t ix,t;
-	GET_FLOAT_WORD(ix,x);
-	t = ix & 0x7fffffff;
-	t ^= 0x7f800000;
-	t |= -t;
-	return ~(t >> 31) & (ix >> 30);
+        int32_t ix,t;
+        GET_FLOAT_WORD(ix,x);
+        t = ix & 0x7fffffff;
+        t ^= 0x7f800000;
+        t |= -t;
+        return ~(t >> 31) & (ix >> 30);
 }
 
 /* Return nonzero value if arguments are unordered.  */
@@ -1344,24 +1344,24 @@ __isinff (float x)
 
 # ifndef isunordered
 #  define isunordered(u, v) \
-  (__extension__							      \
-   ({ __typeof__(u) __u = (u); __typeof__(v) __v = (v);			      \
+  (__extension__                                                              \
+   ({ __typeof__(u) __u = (u); __typeof__(v) __v = (v);                       \
       fpclassify (__u) == FP_NAN || fpclassify (__v) == FP_NAN; }))
 # endif
 
 /* Return nonzero value if X is less than Y.  */
 # ifndef isless
 #  define isless(x, y) \
-  (__extension__							      \
-   ({ __typeof__(x) __x = (x); __typeof__(y) __y = (y);			      \
+  (__extension__                                                              \
+   ({ __typeof__(x) __x = (x); __typeof__(y) __y = (y);                       \
       !isunordered (__x, __y) && __x < __y; }))
 # endif
 
 /* Return nonzero value if X is greater than Y.  */
 # ifndef isgreater
 #  define isgreater(x, y) \
-  (__extension__							      \
-   ({ __typeof__(x) __x = (x); __typeof__(y) __y = (y);			      \
+  (__extension__                                                              \
+   ({ __typeof__(x) __x = (x); __typeof__(y) __y = (y);                       \
       !isunordered (__x, __y) && __x > __y; }))
 # endif
 
@@ -1373,17 +1373,17 @@ union ieee754_double
     struct
       {
 #ifdef ROCKBOX_BIG_ENDIAN
-	unsigned int negative:1;
-	unsigned int exponent:11;
-	/* Together these comprise the mantissa.  */
-	unsigned int mantissa0:20;
-	unsigned int mantissa1:32;
+        unsigned int negative:1;
+        unsigned int exponent:11;
+        /* Together these comprise the mantissa.  */
+        unsigned int mantissa0:20;
+        unsigned int mantissa1:32;
 #else /* ROCKBOX_LITTLE_ENDIAN */
-	/* Together these comprise the mantissa.  */
-	unsigned int mantissa1:32;
-	unsigned int mantissa0:20;
-	unsigned int exponent:11;
-	unsigned int negative:1;
+        /* Together these comprise the mantissa.  */
+        unsigned int mantissa1:32;
+        unsigned int mantissa0:20;
+        unsigned int exponent:11;
+        unsigned int negative:1;
 #endif /* ROCKBOX_LITTLE_ENDIAN */
       } ieee;
 
@@ -1391,19 +1391,19 @@ union ieee754_double
     struct
       {
 #ifdef ROCKBOX_BIG_ENDIAN
-	unsigned int negative:1;
-	unsigned int exponent:11;
-	unsigned int quiet_nan:1;
-	/* Together these comprise the mantissa.  */
-	unsigned int mantissa0:19;
-	unsigned int mantissa1:32;
+        unsigned int negative:1;
+        unsigned int exponent:11;
+        unsigned int quiet_nan:1;
+        /* Together these comprise the mantissa.  */
+        unsigned int mantissa0:19;
+        unsigned int mantissa1:32;
 #else /* ROCKBOX_LITTLE_ENDIAN */
-	/* Together these comprise the mantissa.  */
-	unsigned int mantissa1:32;
-	unsigned int mantissa0:19;
-	unsigned int quiet_nan:1;
-	unsigned int exponent:11;
-	unsigned int negative:1;
+        /* Together these comprise the mantissa.  */
+        unsigned int mantissa1:32;
+        unsigned int mantissa0:19;
+        unsigned int quiet_nan:1;
+        unsigned int exponent:11;
+        unsigned int negative:1;
 #endif /* ROCKBOX_LITTLE_ENDIAN */
       } ieee_nan;
   };
@@ -1456,17 +1456,17 @@ float rb_exp(float x)
       tval = (int) (t * 512.0);
 
       if (t >= 0)
-	delta = - __exp_deltatable[tval];
+        delta = - __exp_deltatable[tval];
       else
-	delta = __exp_deltatable[-tval];
+        delta = __exp_deltatable[-tval];
 
       /* Compute ex2 = 2^n e^(t/512+delta[t]).  */
       ex2_u.d = __exp_atable[tval+177];
       ex2_u.ieee.exponent += (int) n;
 
       /* Approximate e^(dx+delta) - 1, using a second-degree polynomial,
-	 with maximum error in [-2^-10-2^-28,2^-10+2^-28]
-	 less than 5e-11.  */
+         with maximum error in [-2^-10-2^-28,2^-10+2^-28]
+         less than 5e-11.  */
       x22 = (0.5000000496709180453 * dx + 1.0000001192102037084) * dx + delta;
 
       /* Return result.  */
@@ -1481,11 +1481,11 @@ float rb_exp(float x)
   else if (isless (x, himark))
     {
       if (__isinff (x))
-	/* e^-inf == 0, with no error.  */
-	return 0;
+        /* e^-inf == 0, with no error.  */
+        return 0;
       else
-	/* Underflow */
-	return TWOM100 * TWOM100;
+        /* Underflow */
+        return TWOM100 * TWOM100;
     }
   else
     /* Return x, if x is a NaN or Inf; or overflow, otherwise.  */
@@ -1579,14 +1579,14 @@ void openit(const char *dirname, const char *filename)
     strcat(ffilename, filename);
 
     int fd = open_via_path(dirname, ffilename, "", dirbuf, &nameptr,
-    	MAXPDSTRING, 0);
+        MAXPDSTRING, 0);
     if (fd)
     {
-    	close (fd);
-    	glob_evalfile(0, gensym(nameptr), gensym(dirbuf));
+        close (fd);
+        glob_evalfile(0, gensym(nameptr), gensym(dirbuf));
     }
     else
-    	error("%s: can't open", filename);
+        error("%s: can't open", filename);
 }
 
 
@@ -1641,7 +1641,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 /* Fake GUI start. Originally in s_inter.c */
 static int defaultfontshit[] = {
     8, 5, 9, 10, 6, 10, 12, 7, 13, 14, 9, 17, 16, 10, 19, 24, 15, 28,
-    	24, 15, 28};
+        24, 15, 28};
 extern t_binbuf* inbinbuf;
 int sys_startgui(const char *guidir)
 {

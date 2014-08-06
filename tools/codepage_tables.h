@@ -29,4 +29,3 @@ extern const unsigned short cp932_table[];
 extern const unsigned short cp936_table[];
 extern const unsigned short cp949_table[];
 extern const unsigned short cp950_table[];
-

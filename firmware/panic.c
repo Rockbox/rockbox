@@ -53,7 +53,7 @@ void panicf( const char *fmt, ...)
 }
 
 /*
- * "Dude. This is pretty fucked-up, right here." 
+ * "Dude. This is pretty fucked-up, right here."
  */
 void panicf_f( const char *fmt, ...)
 {
@@ -127,7 +127,7 @@ void panicf( const char *fmt, ...)
     DEBUGF("%s", panic_buf);
 
     set_cpu_frequency(0);
-    
+
 #ifdef HAVE_ATA_POWER_OFF
     ide_power_enable(false);
 #endif

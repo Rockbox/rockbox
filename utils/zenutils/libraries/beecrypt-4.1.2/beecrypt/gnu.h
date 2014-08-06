@@ -61,7 +61,7 @@ typedef pthread_t bc_thread_t;
  * make assumptions about the size set by the configure script
  */
 #if !defined(MP_WBITS)
-# define MP_WBITS	64U
+# define MP_WBITS       64U
 #endif
 
 #endif

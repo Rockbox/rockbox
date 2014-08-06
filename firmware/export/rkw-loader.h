@@ -34,9 +34,9 @@ struct rkw_header_t {
     uint32_t reserved0;       /* reserved - I've seen only zeros in this field so far */
     uint32_t reserved1;       /* reserved - I've seen only zeros in this field so far */
     uint32_t entry_point;     /* Entry point address */
-    uint32_t load_options;    /* 0x80000000 - setup flag (I don't know what it means 
-                               * but is present in every RKW I saw), 
-                               * 0x40000000 - check header crc, 
+    uint32_t load_options;    /* 0x80000000 - setup flag (I don't know what it means
+                               * but is present in every RKW I saw),
+                               * 0x40000000 - check header crc,
                                * 0x20000000 - check firmware crc
                                */
     uint32_t crc;              /* crc32 of the header (excluding crc32 field itself) */

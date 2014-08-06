@@ -48,7 +48,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 };
 
 /* ADC should read 0x3ff=5.12V */
-#define BATTERY_SCALE_FACTOR 2562       
+#define BATTERY_SCALE_FACTOR 2562
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
@@ -56,4 +56,3 @@ int _battery_voltage(void)
 {
     return (adc_read(ADC_VBAT) * BATTERY_SCALE_FACTOR) >> 10;
 }
-

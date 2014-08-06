@@ -129,7 +129,7 @@ typedef struct
 #define SHT_PREINIT_ARRAY   16 /* Array of pre-constructors */
 #define SHT_GROUP           17 /* Section group */
 #define SHT_SYMTAB_SHNDX    18 /* Extended section indeces */
-#define	SHT_NUM             19 /* Number of defined types.  */
+#define SHT_NUM             19 /* Number of defined types.  */
 
 #define SHF_WRITE       (1 << 0) /* Writable */
 #define SHF_ALLOC       (1 << 1) /* Occupies memory during execution */

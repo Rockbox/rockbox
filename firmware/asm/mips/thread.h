@@ -28,4 +28,3 @@ struct regs
 };
 
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
-

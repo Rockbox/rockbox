@@ -36,7 +36,7 @@
 #ifndef BUILD_STANDALONE
 #include "codeclib.h"
 #endif
- 
+
 #include "bitstream.h"
 #include "golomb.h"
 
@@ -53,12 +53,12 @@ static const int sample_rate_table[] ICONST_ATTR =
   8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000,
   0, 0, 0, 0 };
 
-static const int sample_size_table[] ICONST_ATTR = 
+static const int sample_size_table[] ICONST_ATTR =
 { 0, 8, 12, 0, 16, 20, 24, 0 };
 
 static const int blocksize_table[] ICONST_ATTR = {
-     0,    192, 576<<0, 576<<1, 576<<2, 576<<3,      0,      0, 
-256<<0, 256<<1, 256<<2, 256<<3, 256<<4, 256<<5, 256<<6, 256<<7 
+     0,    192, 576<<0, 576<<1, 576<<2, 576<<3,      0,      0,
+256<<0, 256<<1, 256<<2, 256<<3, 256<<4, 256<<5, 256<<6, 256<<7
 };
 
 static const uint8_t table_crc8[256] ICONST_ATTR = {
@@ -101,18 +101,18 @@ static int64_t get_utf8(GetBitContext *gb)
 {
     uint64_t val;
     int ones=0, bytes;
-    
+
     while(get_bits1(gb))
         ones++;
 
     if     (ones==0) bytes=0;
     else if(ones==1) return -1;
     else             bytes= ones - 1;
-    
+
     val= get_bits(gb, 7-ones);
     while(bytes--){
         const int tmp = get_bits(gb, 8);
-        
+
         if((tmp>>6) != 2)
             return -2;
         val<<=6;
@@ -126,7 +126,7 @@ static int get_crc8(const uint8_t *buf, int count)
 {
     int crc=0;
     int i;
-    
+
     for(i=0; i<count; i++){
         crc = table_crc8[crc ^ buf[i]];
     }
@@ -145,12 +145,12 @@ static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
         //fprintf(stderr,"illegal residual coding method %d\n", method_type);
         return -3;
     }
-    
+
     rice_order = get_bits(&s->gb, 4);
 
     samples= s->blocksize >> rice_order;
 
-    sample= 
+    sample=
     i= pred_order;
     for (partition = 0; partition < (1 << rice_order); partition++)
     {
@@ -172,20 +172,20 @@ static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
     }
 
     return 0;
-}    
+}
 
 static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR_FLAC;
 static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order)
 {
     const int blocksize = s->blocksize;
     int a, b, c, d, i;
-        
+
     /* warm up samples */
     for (i = 0; i < pred_order; i++)
     {
         decoded[i] = get_sbits(&s->gb, s->curr_bps);
     }
-    
+
     if (decode_residuals(s, decoded, pred_order) < 0)
         return -4;
 
@@ -234,7 +234,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
     {
         decoded[i] = get_sbits(&s->gb, s->curr_bps);
     }
-    
+
     coeff_prec = get_bits(&s->gb, 4) + 1;
     if (coeff_prec == 16)
     {
@@ -242,7 +242,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
         return -6;
     }
     qlevel = get_sbits(&s->gb, 5);
-    if (qlevel < 0) 
+    if (qlevel < 0)
     {
         //fprintf(stderr,"qlevel %d not supported, maybe buggy stream\n", qlevel);
         return -7;
@@ -252,7 +252,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
     {
         coeffs[i] = get_sbits(&s->gb, coeff_prec);
     }
-    
+
     if (decode_residuals(s, decoded, pred_order) < 0)
         return -8;
 
@@ -290,7 +290,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
         }
         #endif
     }
-    
+
     return 0;
 }
 
@@ -298,7 +298,7 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
 {
     int type, wasted = 0;
     int i, tmp;
-    
+
     s->curr_bps = s->bps;
     if(channel == 0){
         if(s->decorrelation == RIGHT_SIDE)
@@ -315,7 +315,7 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
     }
     type = get_bits(&s->gb, 6);
 //    wasted = get_bits1(&s->gb);
-    
+
 //    if (wasted)
 //    {
 //        while (!get_bits1(&s->gb))
@@ -369,7 +369,7 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
         //fprintf(stderr,"Unknown coding type: %d\n",type);
         return -12;
     }
-        
+
     if (wasted)
     {
         int i;
@@ -388,11 +388,11 @@ static int decode_frame(FLACContext *s,
     int blocksize_code, sample_rate_code, sample_size_code, assignment, crc8;
     int decorrelation, bps, blocksize, samplerate;
     int res, ch;
-    
+
     blocksize_code = get_bits(&s->gb, 4);
 
     sample_rate_code = get_bits(&s->gb, 4);
-    
+
     assignment = get_bits(&s->gb, 4); /* channel assignment */
     if (assignment < 8 && s->channels == assignment+1)
         decorrelation = INDEPENDENT;
@@ -402,13 +402,13 @@ static int decode_frame(FLACContext *s,
     {
         return -13;
     }
-        
+
     sample_size_code = get_bits(&s->gb, 3);
     if(sample_size_code == 0)
         bps= s->bps;
     else if((sample_size_code != 3) && (sample_size_code != 7))
         bps = sample_size_table[sample_size_code];
-    else 
+    else
     {
         return -14;
     }
@@ -428,7 +428,7 @@ static int decode_frame(FLACContext *s,
         s->samplenumber*=s->min_blocksize;
     }
 
-#if 0    
+#if 0
     if (/*((blocksize_code == 6) || (blocksize_code == 7)) &&*/
         (s->min_blocksize != s->max_blocksize)){
     }else{
@@ -441,7 +441,7 @@ static int decode_frame(FLACContext *s,
         blocksize = get_bits(&s->gb, 8)+1;
     else if (blocksize_code == 7)
         blocksize = get_bits(&s->gb, 16)+1;
-    else 
+    else
         blocksize = blocksize_table[blocksize_code];
 
     if(blocksize > s->max_blocksize){
@@ -467,7 +467,7 @@ static int decode_frame(FLACContext *s,
     if(crc8){
         return -18;
     }
-    
+
     s->blocksize    = blocksize;
     s->samplerate   = samplerate;
     s->bps          = bps;
@@ -478,7 +478,7 @@ static int decode_frame(FLACContext *s,
         if ((res=decode_subframe(s, ch, s->decoded[ch])) < 0)
             return res-100;
     }
-    
+
     yield();
     align_get_bits(&s->gb);
 
@@ -590,7 +590,7 @@ int flac_decode_frame(FLACContext *s,
     }
 
     yield();
-    
+
 #define DECORRELATE(left, right)\
              for (i = 0; i < s->blocksize; i++) {\
                 int32_t a = s->decoded[0][i];\

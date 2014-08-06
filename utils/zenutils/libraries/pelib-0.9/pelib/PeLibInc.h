@@ -6,7 +6,7 @@
 *
 * This software is licensed under the zlib/libpng License.
 * For more details see http://www.opensource.org/licenses/zlib-license.php
-* or the license information file (license.htm) in the root directory 
+* or the license information file (license.htm) in the root directory
 * of PeLib.
 */
 
@@ -14,9 +14,9 @@
 #define STD_H
 
 #ifdef _MSC_VER
-	#ifndef for
-		#define for if (0) {} else for
-	#endif
+        #ifndef for
+                #define for if (0) {} else for
+        #endif
 #endif
 
 #include <algorithm>

@@ -188,7 +188,7 @@ enum plugin_status {
 struct plugin_api {
 
     /* lcd */
-    
+
 #ifdef HAVE_LCD_CONTRAST
     void (*lcd_set_contrast)(int x);
 #endif
@@ -370,7 +370,7 @@ struct plugin_api {
                               int width, int height);
 #endif
     void (*viewport_set_defaults)(struct viewport *vp,
-                                  const enum screen_type screen);                                  
+                                  const enum screen_type screen);
 #ifdef HAVE_LCD_BITMAP
     void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
                                          struct viewport *viewport);

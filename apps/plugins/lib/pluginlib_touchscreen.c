@@ -29,7 +29,7 @@
  * Touchbutton functions: These functions allow the plugin to specify a button
  *  location that, in turn gets mapped to a button press return value.
  ******************************************************************************/
- 
+
 /* touchbutton_check_button:
  *  This function checks the touchbutton structure passed to it for hits.  When
  *  one is found it returns action. It doesn't block because it doesn't actually
@@ -49,7 +49,7 @@
  */
 int touchbutton_check_button(int button, struct touchbutton *data, int num_buttons) {
     short x,y;
-    
+
     /* Get the x/y location of the button press, this is set by button_get when
      *  a button is pulled from the queue.
      */
@@ -58,14 +58,14 @@ int touchbutton_check_button(int button, struct touchbutton *data, int num_butto
     struct viewport *v;
 
     int i;
-    
+
     /* Loop over the data array to check if any of the buttons were pressed */
     for (i=0; i<num_buttons; i++) {
         v=&data[i].vp;
         /* See if the point is inside the button viewport */
         if(     x >= v->x && x < (v->x + v->width) &&
                 y >= v->y && y < (v->y + v->height) ) {
-            if(     ((button & BUTTON_REPEAT) && data[i].repeat) || 
+            if(     ((button & BUTTON_REPEAT) && data[i].repeat) ||
                     ((button & BUTTON_REL) && !data[i].repeat) ) {
                 return data[i].action;
             }
@@ -114,7 +114,7 @@ int touchbutton_get(struct touchbutton *data, int num_buttons)
     return touchbutton_get_w_tmo(TIMEOUT_BLOCK, data, num_buttons);
 }
 
-/* touchbutton_draw: 
+/* touchbutton_draw:
  *  This function draws the button with the associated text as long as the
  *      invisible flag is not set.  Support for pixmaps needs to be added.
  *  inputs:
@@ -142,7 +142,7 @@ void touchbutton_draw(struct touchbutton *data, int num_buttons) {
 
             /* TODO: Center text vert*/
             data[i].vp.flags |= VP_FLAG_ALIGN_CENTER;
-            
+
             /* If the width offset was 0, use a scrolling puts, else center and
              *  print the title.
              */
@@ -168,26 +168,26 @@ unsigned int touchscreen_map(struct ts_mappings *map, int x, int y)
            && y > _MAP(i).tl_y && y < (_MAP(i).tl_y+_MAP(i).height))
             return i;
     }
-    
+
     return -1;
 }
 
 unsigned int touchscreen_map_raster(struct ts_raster *map, int x, int y, struct ts_raster_result *result)
 {
     int res1_x, res2_x, res1_y, res2_y;
-    
+
     if((x - map->tl_x) < 0 ||
        (x - map->tl_x) > map->width)
         return -1;
     res1_x = (x - map->tl_x)/(map->raster_width);
     res2_x = (x - map->tl_x)%(map->raster_width);
-    
+
     if((y - map->tl_y) < 0 ||
        (y - map->tl_y) > map->height)
         return -1;
     res1_y = (y - map->tl_y)/(map->raster_height);
     res2_y = (y - map->tl_y)%(map->raster_height);
-    
+
     if(res2_x == 0 || res2_y == 0) /* pen hit a raster boundary */
         return -2;
     else
@@ -202,11 +202,11 @@ struct ts_raster_button_result touchscreen_raster_map_button(struct ts_raster_bu
 {
     struct ts_raster_button_result ret = {0, {0, 0}, {0, 0}};
     struct ts_raster_result tmp;
-    
+
     ret.action = TS_ACTION_NONE;
     if(touchscreen_map_raster(map->raster, x, y, &tmp) != 1)
         return ret;
-    
+
     #define NOT_HANDLED (ret.action == TS_ACTION_NONE)
     if((button == BUTTON_REPEAT) && (map->_prev_btn_state != BUTTON_REPEAT) && map->drag_drop_enable)
     {
@@ -260,7 +260,7 @@ struct ts_raster_button_result touchscreen_raster_map_button(struct ts_raster_bu
         ret.from.x = ret.to.x = tmp.x;
         ret.from.y = ret.to.y = tmp.y;
     }
-    
+
     map->_prev_btn_state = button;
     return ret;
 }

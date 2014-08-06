@@ -32,4 +32,3 @@ int rects_move_left(void);
 int rects_move_right(void);
 
 #endif
-

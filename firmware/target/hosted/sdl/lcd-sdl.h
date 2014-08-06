@@ -3,7 +3,7 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \ 
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
@@ -39,4 +39,3 @@ void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
                       int first, int steps);
 
 #endif /* #ifndef __LCDSDL_H__ */
-

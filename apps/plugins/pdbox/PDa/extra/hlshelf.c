@@ -44,10 +44,10 @@ typedef struct _hlshelf
 
 
 int hlshelf_check_stability(t_float fb1,
-			    t_float fb2, 
-			    t_float ff1,
-			    t_float ff2,
-			    t_float ff3)
+                            t_float fb2,
+                            t_float ff1,
+                            t_float ff2,
+                            t_float ff3)
 {
 #ifdef ROCKBOX
     (void) ff1;
@@ -58,18 +58,18 @@ int hlshelf_check_stability(t_float fb1,
 
     if (discriminant < 0) /* imaginary roots -- resonant filter */
     {
-    	    /* they're conjugates so we just check that the product
-    	    is less than one */
-    	if (fb2 >= -1.0f) goto stable;
+            /* they're conjugates so we just check that the product
+            is less than one */
+        if (fb2 >= -1.0f) goto stable;
     }
     else    /* real roots */
     {
-    	    /* check that the parabola 1 - fb1 x - fb2 x^2 has a
-    	    	vertex between -1 and 1, and that it's nonnegative
-    	    	at both ends, which implies both roots are in [1-,1]. */
-    	if (fb1 <= 2.0f && fb1 >= -2.0f &&
-    	    1.0f - fb1 -fb2 >= 0 && 1.0f + fb1 - fb2 >= 0)
-    	    	goto stable;
+            /* check that the parabola 1 - fb1 x - fb2 x^2 has a
+                vertex between -1 and 1, and that it's nonnegative
+                at both ends, which implies both roots are in [1-,1]. */
+        if (fb1 <= 2.0f && fb1 >= -2.0f &&
+            1.0f - fb1 -fb2 >= 0 && 1.0f + fb1 - fb2 >= 0)
+                goto stable;
     }
     return 0;
 stable:
@@ -81,28 +81,28 @@ void hlshelf_check(t_hlshelf *x)
 {
 
      if(x->s_gain0 - x->s_gain1 > MAX_GAIN) {
-	  x->s_gain0 = x->s_gain1 + MAX_GAIN; 
-	  post("setting gain0 to %f",x->s_gain0);
+          x->s_gain0 = x->s_gain1 + MAX_GAIN;
+          post("setting gain0 to %f",x->s_gain0);
      }
 
 
      if(x->s_gain1 > MAX_GAIN) {
-	  x->s_gain1 = MAX_GAIN;
-	  post("setting gain1 to %f",x->s_gain1);
+          x->s_gain1 = MAX_GAIN;
+          post("setting gain1 to %f",x->s_gain1);
      }
 
      if(x->s_gain2 - x->s_gain1 > MAX_GAIN) {
-	  x->s_gain2 = x->s_gain1 + MAX_GAIN; 
-	  post("setting gain2 to %f",x->s_gain2);
+          x->s_gain2 = x->s_gain1 + MAX_GAIN;
+          post("setting gain2 to %f",x->s_gain2);
      }
 
   /* constrain: 0 <= x->s_ltransfq < x->s_htransfq. */
      x->s_ltransfq = (x->s_ltransfq < x->s_htransfq) ? x->s_ltransfq : x->s_htransfq - 0.5f;
-     
+
      if (x->s_ltransfq < 0) x->s_ltransfq = 0.0f;
-     
+
      x->s_lradians = M_PI * x->s_ltransfq / x->s_rate;
-     x->s_hradians= M_PI * (0.5f - (x->s_htransfq / x->s_rate));	
+     x->s_hradians= M_PI * (0.5f - (x->s_htransfq / x->s_rate));
 
 }
 
@@ -114,60 +114,60 @@ void hlshelf_bang(t_hlshelf *x)
      float c0;
      float g1, g2;
 #endif
-     float c1, c2, d0, d1, d2;	/* output coefs */
-     float a1, a2, b1, b2;	/* temp coefs */
+     float c1, c2, d0, d1, d2;  /* output coefs */
+     float a1, a2, b1, b2;      /* temp coefs */
      double xf;
 
      hlshelf_check(x);
-     
+
      /* low shelf */
      xf = 0.5 * 0.115129255 * (double)(x->s_gain0 - x->s_gain1); /* ln(10) / 20 = 0.115129255 */
      if(xf < -200.) /* exp(x) -> 0 */
      {
-	  a1 = 1.0f;
-	  b1 = -1.0f;
+          a1 = 1.0f;
+          b1 = -1.0f;
 #ifndef ROCKBOX
-	  g1 = 0.0f;
+          g1 = 0.0f;
 #endif
      }
      else
      {
-	  double t = tan(x->s_lradians);
-	  double e = exp(xf);
-	  double r = t / e;
-	  double kr = t * e;
-	  
-	  a1 = (r - 1) / (r + 1);		
-	  b1 = (kr - 1) / (kr + 1);
+          double t = tan(x->s_lradians);
+          double e = exp(xf);
+          double r = t / e;
+          double kr = t * e;
+
+          a1 = (r - 1) / (r + 1);
+          b1 = (kr - 1) / (kr + 1);
 #ifndef ROCKBOX
-	  g1 = (kr + 1) / (r + 1);
+          g1 = (kr + 1) / (r + 1);
 #endif
      }
-     
+
      /* high shelf */
      xf = 0.5 * 0.115129255 * (double)(x->s_gain2 - x->s_gain1); /* ln(10) / 20 = 0.115129255 */
      if(xf < -200.) /* exp(x) -> 0 */
      {
-	  a2 = -1.0f;
-	  b2 = 1.0f;
+          a2 = -1.0f;
+          b2 = 1.0f;
 #ifndef ROCKBOX
-	  g2 = 0.0f;
+          g2 = 0.0f;
 #endif
      }
      else
      {
-	  double t = tan(x->s_hradians);
-	  double e = exp(xf);
-	  double r = t / e;
-	  double kr = t * e;
-	  
-	  a2 = (1 - r) / (1 + r);
-	  b2 = (1 - kr) / (1 + kr);
+          double t = tan(x->s_hradians);
+          double e = exp(xf);
+          double r = t / e;
+          double kr = t * e;
+
+          a2 = (1 - r) / (1 + r);
+          b2 = (1 - kr) / (1 + kr);
 #ifndef ROCKBOX
-	  g2 = (1 + kr) / (1 + r);
+          g2 = (1 + kr) / (1 + r);
 #endif
      }
-     
+
      /* form product */
 #ifndef ROCKBOX
      c0 = g1 * g2 * (float)(exp((double)(x->s_gain1) * 0.05f * 2.302585093f));
@@ -181,7 +181,7 @@ void hlshelf_bang(t_hlshelf *x)
      if (!hlshelf_check_stability(-c1/d0,-c2/d0,d0/d0,d1/d0,d2/d0)) {
        post("hlshelf: filter unstable -> resetting");
 #ifndef ROCKBOX
-       c0=1.; 
+       c0=1.;
 #endif
        c1=0.;c2=0.;
        d0=1.;d1=0.;d2=0.;
@@ -192,7 +192,7 @@ void hlshelf_bang(t_hlshelf *x)
      SETFLOAT(at+2,d0/d0);
      SETFLOAT(at+3,d1/d0);
      SETFLOAT(at+4,d2/d0);
-     
+
      outlet_list(x->x_obj.ob_outlet,&s_list,5,at);
 }
 
@@ -221,18 +221,18 @@ static void *hlshelf_new(t_symbol* s,t_int argc, t_atom* at)
     f2 = atom_getfloat(at);
 
     if ((f1 == 0.0f && f2 == 0.0f) || f1 > f2){ /* all gains = 0db */
-	 f1 = 150.0f;	
-	 f2 = 5000.0f;
+         f1 = 150.0f;
+         f2 = 5000.0f;
     }
 
     if (f1 < 0) f1 = 0.0f;
     if (f2 > SRATE) f2 = .5f*SRATE;
- 
-    x->s_rate = SRATE;		/* srate default  */
+
+    x->s_rate = SRATE;          /* srate default  */
     x->s_gain0 = k0;
     x->s_gain1 = k1;
     x->s_gain2 = k2;
-    
+
     x->s_ltransfq = 0.0f;
     x->s_htransfq = SRATE/2;
 
@@ -251,9 +251,7 @@ static void *hlshelf_new(t_symbol* s,t_int argc, t_atom* at)
 void hlshelf_setup(void)
 {
     hlshelf_class = class_new(gensym("hlshelf"), (t_newmethod)hlshelf_new, 0,
-				sizeof(t_hlshelf), 0, A_GIMME, 0);
+                                sizeof(t_hlshelf), 0, A_GIMME, 0);
     class_addbang(hlshelf_class,hlshelf_bang);
     class_addfloat(hlshelf_class,hlshelf_float);
 }
-
-

@@ -29,25 +29,25 @@ static t_int *line_perform(t_int *w)
 
     if (x->x_retarget)
     {
-    	int nticks = mult(ftofix(x->x_inletwas),x->x_msectodsptick);
-    	if (!nticks) nticks = itofix(1);
-    	x->x_ticksleft = fixtoi(nticks);
-    	x->x_biginc = (x->x_target - x->x_value);
-	x->x_biginc = idiv(x->x_biginc,nticks);
-    	x->x_inc = mult(x->x_1overn, x->x_biginc);
-    	x->x_retarget = 0;
+        int nticks = mult(ftofix(x->x_inletwas),x->x_msectodsptick);
+        if (!nticks) nticks = itofix(1);
+        x->x_ticksleft = fixtoi(nticks);
+        x->x_biginc = (x->x_target - x->x_value);
+        x->x_biginc = idiv(x->x_biginc,nticks);
+        x->x_inc = mult(x->x_1overn, x->x_biginc);
+        x->x_retarget = 0;
     }
     if (x->x_ticksleft)
     {
-    	t_sample f = x->x_value;
-    	while (n--) *out++ = f, f += x->x_inc;
-    	x->x_value += x->x_biginc;
-    	x->x_ticksleft--;
+        t_sample f = x->x_value;
+        while (n--) *out++ = f, f += x->x_inc;
+        x->x_value += x->x_biginc;
+        x->x_ticksleft--;
     }
     else
     {
-    	x->x_value = x->x_target;
-    	while (n--) *out++ = x->x_value;
+        x->x_value = x->x_target;
+        while (n--) *out++ = x->x_value;
     }
     return (w+4);
 }
@@ -56,15 +56,15 @@ static void line_float(t_line *x, t_float f)
 {
     if (x->x_inletvalue <= 0)
     {
-    	x->x_target = x->x_value = ftofix(f);
-    	x->x_ticksleft = x->x_retarget = 0;
+        x->x_target = x->x_value = ftofix(f);
+        x->x_ticksleft = x->x_retarget = 0;
     }
     else
     {
-    	x->x_target = ftofix(f);
-    	x->x_retarget = 1;
-    	x->x_inletwas = x->x_inletvalue;
-    	x->x_inletvalue = 0;
+        x->x_target = ftofix(f);
+        x->x_retarget = 1;
+        x->x_inletwas = x->x_inletvalue;
+        x->x_inletvalue = 0;
     }
 }
 
@@ -94,9 +94,8 @@ static void *line_new(void)
 void line_tilde_setup(void)
 {
     line_class = class_new(gensym("line~"), line_new, 0,
-    	sizeof(t_line), 0, 0);
+        sizeof(t_line), 0, 0);
     class_addfloat(line_class, (t_method)line_float);
     class_addmethod(line_class, (t_method)line_dsp, gensym("dsp"), 0);
     class_addmethod(line_class, (t_method)line_stop, gensym("stop"), 0);
 }
-

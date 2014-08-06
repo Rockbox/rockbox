@@ -33,7 +33,7 @@ bool _backlight_init()
     GPIOB_DIR |= (1 << 1);
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x91);
     GPIOB_PIN(1) = (1 << 1);
-    
+
     return true;
 }
 
@@ -57,4 +57,3 @@ void _backlight_set_brightness(int brightness)
 {
     oled_brightness(brightness);
 }
-

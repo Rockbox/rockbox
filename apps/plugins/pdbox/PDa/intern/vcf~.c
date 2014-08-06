@@ -3,9 +3,9 @@
 #include "cos_table.h"
 
 /* ---------------- vcf~ - 2-pole bandpass filter. ----------------- */
-/* GG: complex resonator with signal frequency control 
-   this time using the bigger cos_table without interpolation 
-   really have to switch to a separate fixpoint format sometime 
+/* GG: complex resonator with signal frequency control
+   this time using the bigger cos_table without interpolation
+   really have to switch to a separate fixpoint format sometime
 */
 
 typedef struct vcfctl
@@ -64,30 +64,30 @@ static t_int *sigvcf_perform(t_int *w)
     t_sample isr = c->c_isr;
     t_sample coefr, coefi;
     t_sample *tab = cos_table;
-    	t_sample oneminusr,cfindx,cf,r;
+        t_sample oneminusr,cfindx,cf,r;
 
     for (i = 0; i < n; i++)
     {
-    	cf = mult(*in2++,isr);
-    	if (cf < 0) cf = 0;
+        cf = mult(*in2++,isr);
+        if (cf < 0) cf = 0;
         cfindx = mult(cf,ftofix(0.15915494))>>(fix1-ILOGCOSTABSIZE); /* 1/2*PI */
-    	r = (qinv > 0 ? ftofix(1.01) - mult(cf,qinv) : 0);
-      
-    	if (r < 0) r = 0;
-    	oneminusr = ftofix(1.02f) - r; /* hand adapted */
+        r = (qinv > 0 ? ftofix(1.01) - mult(cf,qinv) : 0);
+
+        if (r < 0) r = 0;
+        oneminusr = ftofix(1.02f) - r; /* hand adapted */
 
         /* r*cos(cf) */
-	coefr = mult(r,tab[cfindx]);
+        coefr = mult(r,tab[cfindx]);
 
         /* r*sin(cf) */
         cfindx-=(ICOSTABSIZE>>2);
         cfindx += cfindx < 0 ? ICOSTABSIZE:0;
-	coefi = mult(r,tab[cfindx]);
+        coefi = mult(r,tab[cfindx]);
 
-    	re2 = re;
-    	*out1++ = re = mult(ampcorrect,mult(oneminusr,*in1++)) 
-    	    + mult(coefr,re2) - mult(coefi, im);
-    	*out2++ = im = mult(coefi,re2) + mult(coefr,im);
+        re2 = re;
+        *out1++ = re = mult(ampcorrect,mult(oneminusr,*in1++))
+            + mult(coefr,re2) - mult(coefi, im);
+        *out2++ = im = mult(coefi,re2) + mult(coefr,im);
     }
     c->c_re = re;
     c->c_im = im;
@@ -101,19 +101,18 @@ static void sigvcf_dsp(t_sigvcf *x, t_signal **sp)
 // idiv(ftofix(6.28318),ftofix(sp[0]->s_sr));
     post("%f",fixtof(x->x_ctl->c_isr));
    dsp_add(sigvcf_perform, 6,
-	sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[3]->s_vec, 
-	    x->x_ctl, sp[0]->s_n);
+        sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[3]->s_vec,
+            x->x_ctl, sp[0]->s_n);
 
 }
 
 void vcf_tilde_setup(void)
 {
     sigvcf_class = class_new(gensym("vcf~"), (t_newmethod)sigvcf_new, 0,
-	sizeof(t_sigvcf), 0, A_DEFFLOAT, 0);
+        sizeof(t_sigvcf), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(sigvcf_class, t_sigvcf, x_f);
     class_addmethod(sigvcf_class, (t_method)sigvcf_dsp, gensym("dsp"), 0);
     class_addmethod(sigvcf_class, (t_method)sigvcf_ft1,
-    	gensym("ft1"), A_FLOAT, 0);
+        gensym("ft1"), A_FLOAT, 0);
     class_sethelpsymbol(sigvcf_class, gensym("lop~-help.pd"));
 }
-

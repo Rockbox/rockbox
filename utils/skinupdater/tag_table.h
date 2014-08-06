@@ -51,7 +51,7 @@ namespace wps
  *          one integer must be specified, one integer can be
  *          specified or set to default with '-', and the user can
  *          stop providing parameters at any time after that.
- *          To specify multiple instances of the same type, put a 
+ *          To specify multiple instances of the same type, put a
  *          number before the character.  For instance, the string...
  *             2s
  *          will specify two strings.  An asterisk (*) at the beginning of the
@@ -66,14 +66,14 @@ struct tag_info
 
 };
 
-/* 
+/*
  * Finds a tag by name and returns its parameter list, or an empty
  * string if the tag is not found in the table
  */
 char* find_tag(char* name);
 
 /*
- * Determines whether a character is legal to escape or not.  If 
+ * Determines whether a character is legal to escape or not.  If
  * lookup is not found in the legal escape characters string, returns
  * false, otherwise returns true
  */

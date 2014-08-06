@@ -52,7 +52,7 @@
  *   and be of type LRADC. For example, if a channel is VDDIO relative, set
  *   .relative to IMX233_BUTTON_VDDIO and create an entry which .btn set to
  *   IMX233_BUTTON_VDDIO, channel set to VDDIO source and value set to the ideal values
- *   for which no correction is necessary. Note that the IMX233_BUTTON_VDDIO value is 
+ *   for which no correction is necessary. Note that the IMX233_BUTTON_VDDIO value is
  *   defined for convenience */
 struct imx233_button_map_t
 {
@@ -143,7 +143,7 @@ struct imx233_button_map_t
  *   IMX233_BUTTON_(VDDIO, VDDIO(4000), "vddio")
  * - last entry:
  *   IMX233_BUTTON_(END, END(), "")
- * 
+ *
  * The driver also provides default implementations for headphones_inserted()
  * and button_hold() which can be overriden since they have weak linkage.
  */

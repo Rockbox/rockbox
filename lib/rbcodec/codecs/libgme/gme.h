@@ -5,14 +5,14 @@
 #define GME_H
 
 #ifdef __cplusplus
-	extern "C" {
+        extern "C" {
 #endif
 
 /* Error string returned by library functions, or NULL if no error (success) */
 typedef const char* gme_err_t;
 
 #ifdef __cplusplus
-	}
+        }
 #endif
 
 #endif

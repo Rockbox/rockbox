@@ -51,4 +51,3 @@ int alac_decode_frame(alac_file *alac,
 void alac_set_info(alac_file *alac, char *inputbuffer) ICODE_ATTR_ALAC;
 
 #endif /* __ALAC__DECOMP_H */
-

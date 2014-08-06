@@ -97,13 +97,13 @@ int main (int argc, char** argv)
         gigabeat_code(iname, oname);
         return 0;
     }
-    
+
     if(!strcmp(argv[1], "-iaudio")) {
         iname = argv[2];
         oname = argv[3];
         return iaudio_decode(iname, oname);
     }
-    
+
     /* open file and check size */
     file = fopen(iname,"rb");
     if (!file) {
@@ -118,7 +118,7 @@ int main (int argc, char** argv)
        perror(iname);
        return -1;
     }
-    
+
     inbuf = malloc(length);
     outbuf = malloc(length);
     if ( !inbuf || !outbuf ) {
@@ -177,7 +177,7 @@ int main (int argc, char** argv)
             xorstring[i] = topchar;
         }
         printf("XOR string: %.*s\n", stringlen, xorstring);
-        
+
         /* xor the buffer */
         for (i=0; i<length; i++)
             outbuf[i] = inbuf[i] ^ xorstring[i & (stringlen-1)];
@@ -226,11 +226,11 @@ int main (int argc, char** argv)
        return -1;
     }
     fclose(file);
-    
+
     free(inbuf);
     free(outbuf);
-    
-    return 0;	
+
+    return 0;
 }
 
 int iaudio_decode(char *iname, char *oname)
@@ -242,7 +242,7 @@ int iaudio_decode(char *iname, char *oname)
     int i;
     unsigned char sum = 0;
     unsigned char filesum;
-    
+
     file = fopen(iname, "rb");
     if (!file) {
         perror(iname);
@@ -250,8 +250,8 @@ int iaudio_decode(char *iname, char *oname)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
-    fseek(file,0,SEEK_SET); 
+
+    fseek(file,0,SEEK_SET);
     outbuf = malloc(length);
 
     if ( !outbuf ) {
@@ -266,7 +266,7 @@ int iaudio_decode(char *iname, char *oname)
     }
 
     fclose(file);
-    
+
     for(i = 0; i < length-0x1030;i++)
         sum += outbuf[0x1030 + i];
 
@@ -282,7 +282,7 @@ int iaudio_decode(char *iname, char *oname)
         perror(oname);
         return -3;
     }
-    
+
     len = fwrite(outbuf+0x1030, 1, length-0x1030, file);
     if(len < (size_t)length-0x1030) {
         perror(oname);

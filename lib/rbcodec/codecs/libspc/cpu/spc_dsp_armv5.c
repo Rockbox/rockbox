@@ -36,7 +36,7 @@ static inline int gaussian_fast_interp( int16_t const* samples,
     "ldrh    %[t3], [%[fwd], #2]          \n" /* r3=f1      */
     "smulbb  %[out], %[t0], %[t2]         \n" /* out=s0*f0  */
     "ldrh    %[t2], [%[rev], #2]          \n" /* r2=r1      */
-    "ldrh    %[t0], [%[samp], #4]         \n" /* t0=s2      */            
+    "ldrh    %[t0], [%[samp], #4]         \n" /* t0=s2      */
     "smlabb  %[out], %[t1], %[t3], %[out] \n" /* out+=s1*f1 */
     "ldrh    %[t3], [%[rev]]              \n" /* t3=r0      */
     "ldrh    %[t1], [%[samp], #6]         \n" /* t1=s3      */
@@ -209,7 +209,7 @@ static inline void echo_feedback(struct Spc_Dsp* this, uint8_t* echo_ptr,
 
 #define SPC_DSP_GENERATE_OUTPUT
 static inline void echo_output( struct Spc_Dsp* this, int global_muting,
-    int global_vol_0, int global_vol_1, int chans_0, int chans_1, 
+    int global_vol_0, int global_vol_1, int chans_0, int chans_1,
     int fb_0, int fb_1, int* out_0, int* out_1 )
 {
     int t0, t1;
@@ -231,7 +231,7 @@ static inline void echo_output( struct Spc_Dsp* this, int global_muting,
     "mov      %[o0], %[t0], asr %[gm]     \n"
     "mov      %[o1], %[t1], asr %[gm]     \n"
     : [o0]"=&r"(*out_0), [o1]"=r"(*out_1)
-    : [t0]"r"(t0), [t1]"r"(t1), 
+    : [t0]"r"(t0), [t1]"r"(t1),
       [gm]"r"(global_muting));
 }
 

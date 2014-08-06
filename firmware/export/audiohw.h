@@ -533,7 +533,7 @@ void audiohw_set_pitch(int32_t val);
 
 /**
  * Return the set pitch ratio
- */ 
+ */
 int32_t audiohw_get_pitch(void);
 #endif /* HAVE_PITCHCONTROL */
 

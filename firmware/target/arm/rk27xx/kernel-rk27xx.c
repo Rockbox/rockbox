@@ -37,10 +37,10 @@ void INT_TIMER0(void)
 void tick_start(unsigned int interval_in_ms)
 {
     unsigned int cycles = 50000 * interval_in_ms;
-    
+
     /* enable timer clock */
     SCU_CLKCFG &= ~CLKCFG_TIMER;
-    
+
     /* configure timer0 */
     TMR0LR = cycles;
     TMR0CON = (1<<8) | (1<<7) | (1<<1); /* periodic, 1/1, interrupt enable */
@@ -51,4 +51,3 @@ void tick_start(unsigned int interval_in_ms)
     /* enable timer0 interrupt */
     INTC_IECR |= IRQ_ARM_TIMER0;
 }
-

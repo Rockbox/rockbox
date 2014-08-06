@@ -41,7 +41,7 @@
 #define APETAG_AA_HEADER_LENGTH     22
 #endif
 
-struct apetag_header 
+struct apetag_header
 {
     char id[8];
     long version;
@@ -51,13 +51,13 @@ struct apetag_header
     char reserved[8];
 };
 
-struct apetag_item_header 
+struct apetag_item_header
 {
     long length;
     long flags;
 };
 
-/* Read the items in an APEV2 tag. Only looks for a tag at the end of a 
+/* Read the items in an APEV2 tag. Only looks for a tag at the end of a
  * file. Returns true if a tag was found and fully read, false otherwise.
  */
 bool read_ape_tags(int fd, struct mp3entry* id3)
@@ -73,14 +73,14 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
     }
 
     if ((header.version == 2000) && (header.item_count > 0)
-        && (header.length > APETAG_HEADER_LENGTH)) 
+        && (header.length > APETAG_HEADER_LENGTH))
     {
         char *buf = id3->id3v2buf;
-        unsigned int buf_remaining = sizeof(id3->id3v2buf) 
+        unsigned int buf_remaining = sizeof(id3->id3v2buf)
             + sizeof(id3->id3v1buf);
         unsigned int tag_remaining = header.length - APETAG_HEADER_LENGTH;
         int i;
-        
+
         if (lseek(fd, -header.length, SEEK_END) < 0)
         {
             return false;
@@ -97,16 +97,16 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
             {
                 break;
             }
-            
+
             if (ecread(fd, &item, 1, APETAG_ITEM_HEADER_FORMAT, IS_BIG_ENDIAN)
                 < (long) sizeof(item))
             {
                 return false;
             }
-            
+
             tag_remaining -= sizeof(item);
             r = read_string(fd, name, sizeof(name), 0, tag_remaining);
-            
+
             if (r == -1)
             {
                 return false;
@@ -114,17 +114,17 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
 
             tag_remaining -= r + item.length;
 
-            if ((item.flags & APETAG_ITEM_TYPE_MASK) == 0) 
+            if ((item.flags & APETAG_ITEM_TYPE_MASK) == 0)
             {
                 long len;
-                
-                if (read_string(fd, value, sizeof(value), -1, item.length) 
+
+                if (read_string(fd, value, sizeof(value), -1, item.length)
                     != item.length)
                 {
                     return false;
                 }
 
-                len = parse_tag(name, value, id3, buf, buf_remaining, 
+                len = parse_tag(name, value, id3, buf, buf_remaining,
                     TAGTYPE_APE);
                 buf += len;
                 buf_remaining -= len;
@@ -160,7 +160,7 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
                         id3->albumart.size = item.length - r;
                         id3->has_embedded_albumart = true;
                     }
-                    
+
                     /* Seek back to this APE items begin. */
                     if (lseek(fd, -r, SEEK_CUR) < 0)
                     {

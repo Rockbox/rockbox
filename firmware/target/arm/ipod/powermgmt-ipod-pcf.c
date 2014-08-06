@@ -119,7 +119,7 @@ void accessory_supply_set(bool enable)
 {
     /* Set accessory power supply to 3.3V, otherwise switch it off. */
     unsigned char value = enable ? 0xf8 : 0x18;
-    
+
     /* Write to register. */
     pcf50605_write(PCF5060X_D2REGC1, value);
 }

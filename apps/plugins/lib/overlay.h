@@ -20,7 +20,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef __OVERLAY_H__
 #define __OVERLAY_H__
 
@@ -33,4 +33,3 @@ enum plugin_status run_overlay(const void* parameter,
 
 #endif /* !SIMULATOR */
 #endif /* __OVERLAY_H__ */
-

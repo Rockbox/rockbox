@@ -97,24 +97,24 @@ struct font {
     const unsigned char *width;   /* character widths or NULL if fixed*/
     int          defaultchar;     /* default char (not glyph index)*/
     int32_t      bits_size;       /* # bytes of glyph bits*/
-    
+
     /* file, buffer and cache management */
     int          fd;              /* fd for the font file. >= 0 if cached */
     int          fd_width;        /* fd for the font file. >= 0 if cached */
-    int          fd_offset;       /* fd for the font file. >= 0 if cached */    
+    int          fd_offset;       /* fd for the font file. >= 0 if cached */
     int          handle;          /* core_allocator handle */
-    unsigned char *buffer_start;    /* buffer to store the font in */       
-    unsigned char *buffer_position; /* position in the buffer */    
+    unsigned char *buffer_start;    /* buffer to store the font in */
+    unsigned char *buffer_position; /* position in the buffer */
     unsigned char *buffer_end;      /* end of the buffer */
     size_t         buffer_size;     /* size of the buffer in bytes */
     bool         disabled;        /* font disabled (use blank as fallback if not in cache) */
-#ifndef __PCTOOL__    
+#ifndef __PCTOOL__
     struct font_cache cache;
     uint32_t file_width_offset;    /* offset to file width data    */
     uint32_t file_offset_offset;   /* offset to file offset data   */
     int long_offset;
-#endif    
-    
+#endif
+
 };
 
 /* font routines*/

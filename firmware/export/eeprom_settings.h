@@ -42,9 +42,9 @@ struct eeprom_settings
     bool disk_clean;    /* Is disk intact from last reboot */
     uint8_t bootmethod; /* The default boot method. */
     uint8_t bl_version; /* Installed bootloader version */
-    
+
     long reserved;      /* A few reserved bits for the future. */
-    
+
     /* This must be the last entry */
     uint32_t checksum;  /* Checksum of this structure */
 };
@@ -55,4 +55,3 @@ bool eeprom_settings_init(void);
 bool eeprom_settings_store(void);
 
 #endif
-

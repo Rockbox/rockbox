@@ -93,7 +93,7 @@ void remote_backlight_use_settings(void)
     rb->remote_backlight_set_timeout(rb->global_settings->
                                      remote_backlight_timeout);
 #if CONFIG_CHARGING
-    rb->remote_backlight_set_timeout_plugged(rb->global_settings-> 
+    rb->remote_backlight_set_timeout_plugged(rb->global_settings->
                                              remote_backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
 }

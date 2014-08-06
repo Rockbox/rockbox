@@ -124,7 +124,7 @@ int plugin_main(void)
     int button;
     bool done = false;
     bool change = true;
-    
+
     rb->lcd_setfont(FONT_SYSFIXED);
 
     rb->lcd_putsxy(TEXT_X, TEXT_Y+12, "Adjust Frequ.");

@@ -53,4 +53,3 @@ opus_int silk_init_decoder(
 
     return(0);
 }
-

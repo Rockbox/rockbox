@@ -30,7 +30,7 @@
 /*  Button driver for the touch keys on the Samsung YP-S3
 
     The exact controller is not known, but it is likely from Melfas.
-    
+
     The protocol is as follows:
     * the communication is done using three signals: DRDY, DCLK and DOUT
     * in the idle state these signals are all high.
@@ -47,19 +47,19 @@
 void button_init_device(void)
 {
     /* P0.5/P1.0 power switch input */
-    PCON0 &= ~(3 << 10);    
+    PCON0 &= ~(3 << 10);
     PCON1 &= ~0x0000000F;
-    
+
     /* P1.3 headphones detect input */
     PCON1 &= ~0x0000F000;
 
     /* P1.5 DATA, P1.6 DRDY inputs (touch key controller) */
-    PCON1 &= ~0x0FF00000; 
-    
+    PCON1 &= ~0x0FF00000;
+
     /* P3.4 DCLK output (touch key controller) */
     PCON3 = (PCON3 & ~0x000F0000) | 0x00010000;
     PDAT3 |= (1 << 4);
-    
+
     /* P4.3 hold switch input */
     PCON4 &= ~0x0000F000;
 }
@@ -116,7 +116,7 @@ int button_read_device(void)
     if (PDAT1 & (1 << 0)) {
         buttons |= BUTTON_POWER;
     }
-    
+
     /* touch keys */
     tkey_data = tkey_read();
     if (tkey_data & (1 << 9)) {
@@ -140,7 +140,7 @@ int button_read_device(void)
     if (tkey_data & (1 << 3)) {
         buttons |= BUTTON_DOWN;
     }
-    
+
     return buttons;
 }
 
@@ -153,4 +153,3 @@ bool headphones_inserted(void)
 {
     return ((PDAT1 & (1 << 3)) == 0);
 }
-

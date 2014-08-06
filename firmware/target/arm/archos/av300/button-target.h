@@ -41,5 +41,5 @@
 #define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT\
                 |BUTTON_UP|BUTTON_DOWN|BUTTON_SELECT\
                 |BUTTON_F1|BUTTON_F2|BUTTON_F3)
-                
+
 #endif /* _BUTTON_TARGET_H_ */

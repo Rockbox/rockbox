@@ -20,7 +20,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-  
+
 /* The CPU portion (shock!) */
 #include "codeclib.h"
 #include "spc_codec.h"
@@ -63,10 +63,10 @@ static unsigned char const cycle_table [0x100] = {
 };
 
 #define MEM_BIT() CPU_mem_bit( this, pc, spc_time_ )
-    
+
 static unsigned CPU_mem_bit( THIS, uint8_t const* pc, long const spc_time_ )
     ICODE_ATTR_SPC;
-    
+
 static unsigned CPU_mem_bit( THIS, uint8_t const* pc, long const spc_time_ )
 {
     unsigned addr = READ_PC16( pc );
@@ -83,7 +83,7 @@ enum { st_h = 0x08 };
 enum { st_i = 0x04 };
 enum { st_z = 0x02 };
 enum { st_c = 0x01 };
-    
+
 #define IS_NEG (nz & 0x880)
 
 #define CALC_STATUS( out )\
@@ -114,25 +114,25 @@ enum { st_c = 0x01 };
 long CPU_run( THIS, long start_time )
 {
     ENTER_TIMER(cpu);
-    
+
     register long spc_time_ = start_time;
-    
+
 #ifdef CPU_ARM
     uint8_t* const ram_ = ram.ram;
     #undef RAM
     #define RAM ram_
 #endif
-    
+
     int a = this->r.a;
     int x = this->r.x;
     int y = this->r.y;
-    
+
     uint8_t const* pc;
     SET_PC( this->r.pc );
-    
+
     uint8_t* sp;
     SET_SP( this->r.sp );
-    
+
     int status;
     int c;
     int nz;
@@ -143,7 +143,7 @@ long CPU_run( THIS, long start_time )
     }
 
     goto loop;
-    
+
     /* main loop */
 cbranch_taken_loop:
     pc += *(int8_t const*) pc;
@@ -156,7 +156,7 @@ loop:
     check( (unsigned) a < 0x100 );
     check( (unsigned) x < 0x100 );
     check( (unsigned) y < 0x100 );
-    
+
     unsigned opcode = *pc;
     int cycles = this->cycle_table [opcode];
     unsigned data = *++pc;
@@ -164,7 +164,7 @@ loop:
         goto out_of_time;
     switch ( opcode )
     {
-    
+
 /* Common instructions */
 
 #define BRANCH( cond )\
@@ -177,18 +177,18 @@ loop:
     }\
     goto loop;\
 }
-    
+
     case 0xF0: /* BEQ (most common) */
         BRANCH( !(uint8_t) nz )
-    
+
     case 0xD0: /* BNE */
         BRANCH( (uint8_t) nz )
-    
+
     case 0x3F: /* CALL */
         PUSH16( GET_PC() + 2 );
         SET_PC( READ_PC16( pc ) );
         goto loop;
-    
+
     case 0x6F: /* RET */
         SET_PC( POP() );
         pc += POP() * 0x100;
@@ -236,12 +236,12 @@ loop:
         x = (uint8_t) (x + 1);
         pc--;
         goto mov_a_addr;
-    
+
     case 0xE8: /* MOV A,imm */
         a = data;
         nz = data;
         goto inc_pc_loop;
-    
+
     case 0xF9: /* MOV X,dp+Y */
         data = (uint8_t) (data + y);
     case 0xF8: /* MOV X,dp */
@@ -256,7 +256,7 @@ loop:
         x = data;
         nz = data;
         goto inc_pc_loop;
-    
+
     case 0xFB: /* MOV Y,dp+X */
         data = (uint8_t) (data + x);
     case 0xEB: /* MOV Y,dp */
@@ -277,7 +277,7 @@ loop:
     ADDR_MODES( 0xC8 ) /* MOV addr,A */
         WRITE( data, a );
         goto inc_pc_loop;
-    
+
     {
         int temp;
     case 0xCC: /* MOV abs,Y */
@@ -290,13 +290,13 @@ loop:
         pc += 2;
         goto loop;
     }
-    
+
     case 0xD9: /* MOV dp+Y,X */
         data = (uint8_t) (data + y);
     case 0xD8: /* MOV dp,X */
         WRITE( data + dp, x );
         goto inc_pc_loop;
-    
+
     case 0xDB: /* MOV dp+X,Y */
         data = (uint8_t) (data + x);
     case 0xCB: /* MOV dp,Y */
@@ -308,46 +308,46 @@ loop:
     case 0x8F: /* MOV dp,#imm */
         WRITE_DP( READ_PC( ++pc ), data );
         goto inc_pc_loop;
-    
+
 /* 3. 8-BIT DATA TRANSMISSIN COMMANDS, GROUP 3. */
-    
+
     case 0x7D: /* MOV A,X */
         a = x;
         nz = x;
         goto loop;
-    
+
     case 0xDD: /* MOV A,Y */
         a = y;
         nz = y;
         goto loop;
-    
+
     case 0x5D: /* MOV X,A */
         x = a;
         nz = a;
         goto loop;
-    
+
     case 0xFD: /* MOV Y,A */
         y = a;
         nz = a;
         goto loop;
-    
+
     case 0x9D: /* MOV X,SP */
         x = nz = GET_SP();
         goto loop;
-    
+
     case 0xBD: /* MOV SP,X */
         SET_SP( x );
         goto loop;
-    
+
     /*case 0xC6:*/ /* MOV (X),A (handled by MOV addr,A in group 2) */
-    
+
     case 0xAF: /* MOV (X)+,A */
         WRITE_DP( x, a );
         x++;
         goto loop;
-    
+
 /* 5. 8-BIT LOGIC OPERATION COMMANDS */
-    
+
 #define LOGICAL_OP( op, func )\
     ADDR_MODES( op ) /* addr */\
         data = READ( data );\
@@ -369,13 +369,13 @@ loop:
         WRITE( addr, nz );\
         goto inc_pc_loop;\
     }
-    
+
     LOGICAL_OP( 0x28, & ); /* AND */
-    
+
     LOGICAL_OP( 0x08, | ); /* OR */
-    
+
     LOGICAL_OP( 0x48, ^ ); /* EOR */
-    
+
 /* 4. 8-BIT ARITHMETIC OPERATION COMMANDS */
 
     ADDR_MODES( 0x68 ) /* CMP addr */
@@ -385,14 +385,14 @@ loop:
         c = ~nz;
         nz &= 0xFF;
         goto inc_pc_loop;
-    
+
     case 0x79: /* CMP (X),(Y) */
         data = READ_DP( x );
         nz = data - READ_DP( y );
         c = ~nz;
         nz &= 0xFF;
         goto loop;
-    
+
     case 0x69: /* CMP (dp),(dp) */
         data = READ_DP( data );
     case 0x78: /* CMP dp,imm */
@@ -400,7 +400,7 @@ loop:
         c = ~nz;
         nz &= 0xFF;
         goto inc_pc_loop;
-    
+
     case 0x3E: /* CMP X,dp */
         data += dp;
         goto cmp_x_addr;
@@ -414,7 +414,7 @@ loop:
         c = ~nz;
         nz &= 0xFF;
         goto inc_pc_loop;
-    
+
     case 0x7E: /* CMP Y,dp */
         data += dp;
         goto cmp_y_addr;
@@ -428,7 +428,7 @@ loop:
         c = ~nz;
         nz &= 0xFF;
         goto inc_pc_loop;
-    
+
     {
         int addr;
     case 0xB9: /* SBC (x),(y) */
@@ -446,7 +446,7 @@ loop:
     adc_addr:
         nz = READ( addr );
         goto adc_data;
-        
+
 /* catch ADC and SBC together, then decode later based on operand */
 #undef CASE
 #define CASE( n ) case n: case (n) + 0x20:
@@ -473,9 +473,9 @@ loop:
         WRITE( addr, (uint8_t) nz );
         goto inc_pc_loop;
     }
-    
+
     }
-    
+
 /* 6. ADDITION & SUBTRACTION COMMANDS */
 
 #define INC_DEC_REG( reg, n )\
@@ -486,7 +486,7 @@ loop:
     case 0xBC: INC_DEC_REG( a, 1 )  /* INC A */
     case 0x3D: INC_DEC_REG( x, 1 )  /* INC X */
     case 0xFC: INC_DEC_REG( y, 1 )  /* INC Y */
-    
+
     case 0x9C: INC_DEC_REG( a, -1 ) /* DEC A */
     case 0x1D: INC_DEC_REG( x, -1 ) /* DEC X */
     case 0xDC: INC_DEC_REG( y, -1 ) /* DEC Y */
@@ -507,7 +507,7 @@ loop:
         nz += READ( data );
         WRITE( data, (uint8_t) nz );
         goto inc_pc_loop;
-    
+
 /* 7. SHIFT, ROTATION COMMANDS */
 
     case 0x5C: /* LSR A */
@@ -518,7 +518,7 @@ loop:
         a = nz;
         goto loop;
     }
-    
+
     case 0x1C: /* ASL A */
         c = 0;
     case 0x3C:{/* ROL A */
@@ -528,7 +528,7 @@ loop:
         a = (uint8_t) nz;
         goto loop;
     }
-    
+
     case 0x0B: /* ASL dp */
         c = 0;
         data += dp;
@@ -550,7 +550,7 @@ loop:
         nz |= (c = READ( data ) << 1);
         WRITE( data, (uint8_t) nz );
         goto inc_pc_loop;
-    
+
     case 0x4B: /* LSR dp */
         c = 0;
         data += dp;
@@ -587,34 +587,34 @@ loop:
         y = READ_DP( (uint8_t) (data + 1) );
         nz |= y;
         goto inc_pc_loop;
-    
+
     case 0xDA: /* MOVW dp,YA */
         WRITE_DP( data, a );
         WRITE_DP( (uint8_t) (data + 1), y );
         goto inc_pc_loop;
-    
+
 /* 9. 16-BIT OPERATION COMMANDS */
 
     case 0x3A: /* INCW dp */
     case 0x1A:{/* DECW dp */
         data += dp;
-        
+
         /* low byte */
         int temp = READ( data );
         temp += ((opcode >> 4) & 2) - 1; /* +1 for INCW, -1 for DECW */
         nz = ((temp >> 1) | temp) & 0x7F;
         WRITE( data, (uint8_t) temp );
-        
+
         /* high byte */
         data = ((uint8_t) (data + 1)) + dp;
         temp >>= 8;
         temp = (uint8_t) (temp + READ( data ));
         nz |= temp;
         WRITE( data, temp );
-        
+
         goto inc_pc_loop;
     }
-        
+
     case 0x9A: /* SUBW YA,dp */
     case 0x7A: /* ADDW YA,dp */
     {
@@ -623,38 +623,38 @@ loop:
         int sign = READ_DP( (uint8_t) (data + 1) );
         temp += 0x100 * sign;
         status &= ~(st_v | st_h);
-        
+
         /* to do: fix half-carry for SUBW (it's probably wrong) */
-        
+
         /* for SUBW, negate and truncate to 16 bits */
         if ( opcode & 0x80 ) {
             temp = (temp ^ 0xFFFF) + 1;
             sign = temp >> 8;
         }
-        
+
         /* add low byte (A) */
         temp += a;
         a = (uint8_t) temp;
         nz = (temp | (temp >> 1)) & 0x7F;
-        
+
         /* add high byte (Y) */
         temp >>= 8;
         c = y + temp;
         nz = (nz | c) & 0xFF;
-        
+
         /* half-carry (temporary avoids CodeWarrior optimizer bug) */
         unsigned hc = (c & 15) - (y & 15);
         status |= (hc >> 4) & st_h;
-        
+
         /* overflow if sign of YA changed when previous sign
            and addend sign were same */
         status |= (((c ^ y) & ~(y ^ sign)) >> 1) & st_v;
-        
+
         y = (uint8_t) c;
-        
+
         goto inc_pc_loop;
     }
-    
+
     case 0x5A: { /* CMPW YA,dp */
         int temp = a - READ_DP( data );
         nz = ((temp >> 1) | temp) & 0x7F;
@@ -665,7 +665,7 @@ loop:
         nz &= 0xFF;
         goto inc_pc_loop;
     }
-    
+
 /* 10. MULTIPLICATION & DIVISON COMMANDS */
 
     case 0xCF: { /* MUL YA */
@@ -676,19 +676,19 @@ loop:
         nz |= y;
         goto loop;
     }
-    
+
     case 0x9E: /* DIV YA,X */
     {
         /* behavior based on SPC CPU tests */
-        
+
         status &= ~(st_h | st_v);
-        
+
         if ( (y & 15) >= (x & 15) )
             status |= st_h;
-        
+
         if ( y >= x )
             status |= st_v;
-        
+
         unsigned ya = y * 0x100 + a;
         if ( y < x * 2 )
         {
@@ -700,43 +700,43 @@ loop:
             a = 255 - (ya - x * 0x200) / (256 - x);
             y = x   + (ya - x * 0x200) % (256 - x);
         }
-        
+
         nz = (uint8_t) a;
         a = (uint8_t) a;
-        
+
         goto loop;
     }
-    
+
 /* 11. DECIMAL COMPENSATION COMMANDS */
-    
+
     /* seem unused */
     /* case 0xDF: */ /* DAA */
     /* case 0xBE: */ /* DAS */
-    
+
 /* 12. BRANCHING COMMANDS */
 
     case 0x2F: /* BRA rel */
         pc += (int8_t) data;
         goto inc_pc_loop;
-    
+
     case 0x30: /* BMI */
         BRANCH( IS_NEG )
-    
+
     case 0x10: /* BPL */
         BRANCH( !IS_NEG )
-    
+
     case 0xB0: /* BCS */
         BRANCH( c & 0x100 )
-    
+
     case 0x90: /* BCC */
         BRANCH( !(c & 0x100) )
-    
+
     case 0x70: /* BVS */
         BRANCH( status & st_v )
-    
+
     case 0x50: /* BVC */
         BRANCH( !(status & st_v) )
-    
+
     case 0x03: /* BBS dp.bit,rel */
     case 0x23:
     case 0x43:
@@ -749,7 +749,7 @@ loop:
         if ( (READ_DP( data ) >> (opcode >> 5)) & 1 )
             goto cbranch_taken_loop;
         goto inc_pc_loop;
-    
+
     case 0x13: /* BBC dp.bit,rel */
     case 0x33:
     case 0x53:
@@ -762,7 +762,7 @@ loop:
         if ( !((READ_DP( data ) >> (opcode >> 5)) & 1) )
             goto cbranch_taken_loop;
         goto inc_pc_loop;
-    
+
     case 0xDE: /* CBNE dp+X,rel */
         data = (uint8_t) (data + x);
         /* fall through */
@@ -771,11 +771,11 @@ loop:
         if ( READ_DP( data ) != a )
             goto cbranch_taken_loop;
         goto inc_pc_loop;
-    
+
     case 0xFE: /* DBNZ Y,rel */
         y = (uint8_t) (y - 1);
         BRANCH( y )
-    
+
     case 0x6E: { /* DBNZ dp,rel */
         pc++;
         unsigned temp = READ_DP( data ) - 1;
@@ -784,16 +784,16 @@ loop:
             goto cbranch_taken_loop;
         goto inc_pc_loop;
     }
-    
+
     case 0x1F: /* JMP (abs+X) */
         SET_PC( READ_PC16( pc ) + x );
         /* fall through */
     case 0x5F: /* JMP abs */
         SET_PC( READ_PC16( pc ) );
         goto loop;
-    
+
 /* 13. SUB-ROUTINE CALL RETURN COMMANDS */
-    
+
     case 0x0F:{/* BRK */
         check( 0 ); /* untested */
         PUSH16( GET_PC() + 1 );
@@ -804,12 +804,12 @@ loop:
         status = (status | st_b) & ~st_i;
         goto loop;
     }
-    
+
     case 0x4F: /* PCALL offset */
         PUSH16( GET_PC() + 1 );
         SET_PC( 0xFF00 + data );
         goto loop;
-    
+
     case 0x01: /* TCALL n */
     case 0x11:
     case 0x21:
@@ -829,7 +829,7 @@ loop:
         PUSH16( GET_PC() );
         SET_PC( READ_PROG16( 0xFFDE - (opcode >> 3) ) );
         goto loop;
-    
+
 /* 14. STACK OPERATION COMMANDS */
 
     {
@@ -845,7 +845,7 @@ loop:
         SET_STATUS( temp );
         goto loop;
     }
-    
+
     case 0x0D: { /* PUSH PSW */
         int temp;
         CALC_STATUS( temp );
@@ -856,27 +856,27 @@ loop:
     case 0x2D: /* PUSH A */
         PUSH( a );
         goto loop;
-    
+
     case 0x4D: /* PUSH X */
         PUSH( x );
         goto loop;
-    
+
     case 0x6D: /* PUSH Y */
         PUSH( y );
         goto loop;
-    
+
     case 0xAE: /* POP A */
         a = POP();
         goto loop;
-    
+
     case 0xCE: /* POP X */
         x = POP();
         goto loop;
-    
+
     case 0xEE: /* POP Y */
         y = POP();
         goto loop;
-    
+
 /* 15. BIT OPERATION COMMANDS */
 
     case 0x02: /* SET1 */
@@ -903,7 +903,7 @@ loop:
         WRITE( data, (READ( data ) & mask) | bit );
         goto inc_pc_loop;
     }
-        
+
     case 0x0E: /* TSET1 abs */
     case 0x4E:{/* TCLR1 abs */
         data = READ_PC16( pc );
@@ -916,35 +916,35 @@ loop:
         WRITE( data, temp );
         goto loop;
     }
-    
+
     case 0x4A: /* AND1 C,mem.bit */
         c &= MEM_BIT();
         pc += 2;
         goto loop;
-    
+
     case 0x6A: /* AND1 C,/mem.bit */
         check( 0 ); /* untested */
         c &= ~MEM_BIT();
         pc += 2;
         goto loop;
-    
+
     case 0x0A: /* OR1 C,mem.bit */
         check( 0 ); /* untested */
         c |= MEM_BIT();
         pc += 2;
         goto loop;
-    
+
     case 0x2A: /* OR1 C,/mem.bit */
         check( 0 ); /* untested */
         c |= ~MEM_BIT();
         pc += 2;
         goto loop;
-    
+
     case 0x8A: /* EOR1 C,mem.bit */
         c ^= MEM_BIT();
         pc += 2;
         goto loop;
-    
+
     case 0xEA: { /* NOT1 mem.bit */
         data = READ_PC16( pc );
         pc += 2;
@@ -953,7 +953,7 @@ loop:
         WRITE( data & 0x1FFF, temp );
         goto loop;
     }
-    
+
     case 0xCA: { /* MOV1 mem.bit,C */
         data = READ_PC16( pc );
         pc += 2;
@@ -963,77 +963,77 @@ loop:
         WRITE( data & 0x1FFF, temp );
         goto loop;
     }
-    
+
     case 0xAA: /* MOV1 C,mem.bit */
         c = MEM_BIT();
         pc += 2;
         goto loop;
-    
+
 /* 16. PROGRAM STATUS FLAG OPERATION COMMANDS */
 
     case 0x60: /* CLRC */
         c = 0;
         goto loop;
-        
+
     case 0x80: /* SETC */
         c = ~0;
         goto loop;
-    
+
     case 0xED: /* NOTC */
         c ^= 0x100;
         goto loop;
-        
+
     case 0xE0: /* CLRV */
         status &= ~(st_v | st_h);
         goto loop;
-    
+
     case 0x20: /* CLRP */
         dp = 0;
         goto loop;
-    
+
     case 0x40: /* SETP */
         dp = 0x100;
         goto loop;
-    
+
     case 0xA0: /* EI */
         check( 0 ); /* untested */
         status |= st_i;
         goto loop;
-    
+
     case 0xC0: /* DI */
         check( 0 ); /* untested */
         status &= ~st_i;
         goto loop;
-    
+
 /* 17. OTHER COMMANDS */
 
     case 0x00: /* NOP */
         goto loop;
-    
+
     /*case 0xEF:*/ /* SLEEP */
     /*case 0xFF:*/ /* STOP */
     case 0xFF:
         c |= 1; /* force switch table to have 256 entries,
                    hopefully helping optimizer */
     } /* switch */
-    
+
     /* unhandled instructions fall out of switch so emulator can catch them */
-    
+
 out_of_time:
     /* undo partial execution of opcode */
-    spc_time_ -= this->cycle_table [*--pc]; 
+    spc_time_ -= this->cycle_table [*--pc];
     {
         int temp;
         CALC_STATUS( temp );
         this->r.status = (uint8_t) temp;
     }
-    
+
     this->r.pc = GET_PC();
     this->r.sp = (uint8_t) GET_SP();
     this->r.a  = (uint8_t) a;
     this->r.x  = (uint8_t) x;
     this->r.y  = (uint8_t) y;
- 
+
     EXIT_TIMER(cpu);
     return spc_time_;
 }
@@ -1042,4 +1042,3 @@ void CPU_Init( THIS )
 {
     ci->memcpy( this->cycle_table, cycle_table, sizeof cycle_table );
 }
-

@@ -46,14 +46,14 @@ extern void sha1_init_ctx (struct sha1_ctx *ctx);
    starting at BUFFER.
    It is necessary that LEN is a multiple of 64!!! */
 extern void sha1_process_block (const void *buffer, size_t len,
-				struct sha1_ctx *ctx);
+                                struct sha1_ctx *ctx);
 
 /* Starting with the result of former calls of this function (or the
    initialization function update the context for the next LEN bytes
    starting at BUFFER.
    It is NOT required that LEN is a multiple of 64.  */
 extern void sha1_process_bytes (const void *buffer, size_t len,
-				struct sha1_ctx *ctx);
+                                struct sha1_ctx *ctx);
 
 /* Process the remaining bytes in the buffer and put result from CTX
    in first 20 bytes following RESBUF.  The result is always in little
@@ -118,6 +118,6 @@ extern void *sha1_buffer (const char *buffer, size_t len, void *resblock);
    success.  */
 int
 hmac_sha1 (const void *key, size_t keylen,
-	   const void *in, size_t inlen, void *resbuf);
+           const void *in, size_t inlen, void *resbuf);
 
 #endif /* HMAC_H */

@@ -45,4 +45,3 @@ class BootloaderInstallFile : public BootloaderInstallBase
 };
 
 #endif
-

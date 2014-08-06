@@ -67,7 +67,7 @@ static void skip_whitespace(const char** document)
 }
 
 #ifdef ROCKBOX
-struct skin_element* skin_parse(const char* document, 
+struct skin_element* skin_parse(const char* document,
                                 skin_callback cb, void* cb_data)
 {
     callback = cb;
@@ -80,7 +80,7 @@ struct skin_element* skin_parse(const char* document)
     struct skin_element* last = NULL;
 
     const char* cursor = document; /*Keeps track of location in the document*/
-    
+
     skin_line = 1;
     skin_start = (char*)document;
     viewport_line = 0;
@@ -223,7 +223,7 @@ static struct skin_element* skin_parse_viewport(const char** document)
             {
                 skip_comment(&cursor);
                 skin_line++;
-                
+
             }
             if (check_viewport(cursor))
                 break;
@@ -259,7 +259,7 @@ static struct skin_element* skin_parse_viewport(const char** document)
         {
             skip_comment(&cursor);
             skin_line++;
-            
+
         }
         if (check_viewport(cursor))
             break;
@@ -390,7 +390,7 @@ static struct skin_element* skin_parse_line_optional(const char** document,
 
     /* Moving up the calling function's pointer */
     *document = cursor;
-    
+
     if(root)
     {
         children[0] = skin_buffer_to_offset(root);
@@ -548,7 +548,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
        || (tag_args[0] == '|' && *cursor != ARGLISTOPENSYM)
        || (qmark && *cursor != ARGLISTOPENSYM))
     {
-        
+
 #ifdef ROCKBOX
         if (callback)
         {
@@ -630,7 +630,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
 
         if (*tag_args == '[')
         {
-            /* we need to guess which type of param it is. 
+            /* we need to guess which type of param it is.
              * guess using this priority:
              * default > decimal/integer > single tag/code > string
              */
@@ -652,7 +652,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             {
                 haspercent = haspercent || (cursor[j] == '%');
                 hasdecimal = hasdecimal || (cursor[j] == '.');
-                number = number && (isdigit(cursor[j]) || 
+                number = number && (isdigit(cursor[j]) ||
                                     (cursor[j] == '.') ||
                                     (cursor[j] == '-') ||
                                     (cursor[j] == '%'));
@@ -672,12 +672,12 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             {
                 type_code = 'p';
             }
-            else if (number && 
+            else if (number &&
                      (strchr(temp_params, 'i') || strchr(temp_params, 'd')))
             {
                 type_code = strchr(temp_params, 'i') ? 'i' : 'd';
             }
-            else if (haspercent && 
+            else if (haspercent &&
                     (strchr(temp_params, 't') || strchr(temp_params, 'c')))
             {
                 type_code = strchr(temp_params, 't') ? 't' : 'c';
@@ -690,7 +690,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             {
                 skin_error(INSUFFICIENT_ARGS, cursor);
                 return 0;
-            }   
+            }
         }
         else
             type_code = *tag_args;
@@ -781,7 +781,7 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
             params[i].type = CODE;
             params[i].data.code = skin_buffer_to_offset(child);
         }
-            
+
 
         skip_whitespace(&cursor);
 
@@ -887,7 +887,7 @@ static int skin_parse_text(struct skin_element* element, const char** document,
     element->data = skin_buffer_to_offset(text);
     if (element->data < 0)
         return 0;
-    
+
     for(dest = 0; dest < length; dest++)
     {
         /* Advancing cursor if we've encountered an escaped character */
@@ -898,7 +898,7 @@ static int skin_parse_text(struct skin_element* element, const char** document,
         cursor++;
     }
     text[length] = '\0';
-    
+
 #ifdef ROCKBOX
     if (callback)
     {
@@ -921,7 +921,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
     const char* bookmark;
     int children = 1;
     int i;
-    
+
 #ifdef ROCKBOX
     bool feature_available = true;
     const char *false_branch = NULL;
@@ -956,7 +956,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         }
     }
 #endif
-    
+
     /* Counting the children */
     if(*(cursor++) != ENUMLISTOPENSYM)
     {
@@ -994,7 +994,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         }
     }
 #ifdef ROCKBOX
-    if (*cursor == ENUMLISTCLOSESYM && 
+    if (*cursor == ENUMLISTCLOSESYM &&
         false_branch == NULL && !feature_available)
     {
         false_branch = cursor+1;
@@ -1012,11 +1012,11 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
     cursor = bookmark;
 #endif
     /* Parsing the children */
-    
+
     /* Feature tags could end up having 0 children which breaks
      * the render in dangerous ways. Minor hack, but insert an empty
      * child.  (e.g %?xx<foo> when xx isnt available ) */
-    
+
     if (children == 0)
     {
         const char* emptyline= "";
@@ -1028,7 +1028,7 @@ static int skin_parse_conditional(struct skin_element* element, const char** doc
         children_array[0] = skin_buffer_to_offset(skin_parse_code_as_arg(&emptyline));
     }
     else
-    {    
+    {
         children_array = skin_alloc_children(children);
         if (!children_array)
             return 0;
@@ -1088,9 +1088,9 @@ static int skin_parse_comment(struct skin_element* element, const char** documen
 
     element->type = COMMENT;
     element->line = skin_line;
-#ifdef ROCKBOX 
+#ifdef ROCKBOX
     element->data = INVALID_OFFSET;
-#else    
+#else
     element->data = text = skin_alloc_string(length);
     if (!element->data)
         return 0;

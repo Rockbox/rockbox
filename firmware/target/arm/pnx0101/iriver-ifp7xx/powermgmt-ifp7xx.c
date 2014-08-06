@@ -44,7 +44,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 };
 
 /* TODO: only roughly correct */
-#define BATTERY_SCALE_FACTOR 3072 
+#define BATTERY_SCALE_FACTOR 3072
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
@@ -52,4 +52,3 @@ int _battery_voltage(void)
 {
     return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
-

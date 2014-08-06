@@ -98,9 +98,9 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
         lcd_write_command(LCD_SET_REVERSE_DISPLAY);
-    else 
+    else
         lcd_write_command(LCD_SET_NORMAL_DISPLAY);
 }
 

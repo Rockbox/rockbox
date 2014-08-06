@@ -26,10 +26,10 @@
 
 #include "pcf50606.h"
 
-void sw_i2c_init(void) 
+void sw_i2c_init(void)
 {
-       /* no extra init required */ 
-}       
+       /* no extra init required */
+}
 
 int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf, int count)
 {
@@ -42,14 +42,14 @@ int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf,
         pcf50606_i2c_stop();
         return -1;
     }
-    
+
     pcf50606_i2c_outb(location);
     if (!pcf50606_i2c_getack())
     {
         pcf50606_i2c_stop();
         return -2;
     }
-    
+
     for (i=0; i<count; i++)
     {
         pcf50606_i2c_outb(buf[i]);
@@ -61,14 +61,14 @@ int sw_i2c_write(unsigned char chip, unsigned char location, unsigned char* buf,
     }
 
     pcf50606_i2c_stop();
-    
+
     return 0;
 }
 
 int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, int count)
 {
     int i;
-  
+
     pcf50606_i2c_start();
     pcf50606_i2c_outb((chip & 0xfe) | SW_I2C_WRITE);
     if (!pcf50606_i2c_getack())
@@ -83,7 +83,7 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
         pcf50606_i2c_stop();
         return -2;
     }
-    
+
     pcf50606_i2c_start();
     pcf50606_i2c_outb((chip & 0xfe) | SW_I2C_READ);
     if (!pcf50606_i2c_getack())
@@ -91,7 +91,7 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
         pcf50606_i2c_stop();
         return -3;
     }
-    
+
     for (i=0; i<count-1; i++)
     {
       buf[i] = pcf50606_i2c_inb(true);
@@ -99,9 +99,9 @@ int sw_i2c_read(unsigned char chip, unsigned char location, unsigned char* buf, 
 
     /* 1byte min */
     buf[i] = pcf50606_i2c_inb(false);
-    
-        
+
+
     pcf50606_i2c_stop();
-    
+
     return 0;
 }

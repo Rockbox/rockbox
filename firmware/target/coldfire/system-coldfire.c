@@ -267,7 +267,7 @@ void system_init(void)
        what'll be the most useful for most things which the main thread
        will do. */
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
-    
+
     coldfire_imr_mod(0x3ffff, 0x3ffff);
     INTPRI1 = 0;
     INTPRI2 = 0;
@@ -283,7 +283,7 @@ void system_init(void)
     SPURVEC = 24;
 
     MPARK     = 0x81;   /* PARK[1,0]=10 + BCR24BIT                   */
-    
+
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
     cf_set_cpu_frequency(CPUFREQ_DEFAULT);
 #endif

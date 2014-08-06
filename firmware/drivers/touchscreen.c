@@ -152,7 +152,7 @@ int touchscreen_to_pixels(int x, int y, int *data)
            row = 2;
         else
             return BUTTON_NONE;
-        
+
         return touchscreen_buttons[row][column];
     }
     else

@@ -443,7 +443,7 @@ static struct {
 } timer_holder[MAX_PLAYERS];
 
 static int run_timer(int nr);
-static int chessclock_set_int(char* string, 
+static int chessclock_set_int(char* string,
                               int* variable,
                               int step,
                               int min,
@@ -746,7 +746,7 @@ static int run_timer(int nr)
     return retval;
 }
 
-static int chessclock_set_int(char* string, 
+static int chessclock_set_int(char* string,
                               int* variable,
                               int step,
                               int min,
@@ -818,4 +818,3 @@ static char * show_time(int seconds)
     rb->snprintf(buf, sizeof(buf), "%02d:%02d", seconds/60, seconds%60);
     return buf;
 }
-

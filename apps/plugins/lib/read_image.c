@@ -34,4 +34,3 @@ int read_image_file(const char* filename, struct bitmap *bm, int maxsize,
     else
         return scaled_read_bmp_file(filename, bm, maxsize, format, cformat);
 }
-

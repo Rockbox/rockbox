@@ -76,7 +76,7 @@ void setOutputFlipFlop( unsigned char bit, unsigned char value );
     For Z80 Environment: read a byte from high memory addresses (i.e. the
     memory-mapped registers)
 */
-static inline unsigned char readByte( unsigned addr ) 
+static inline unsigned char readByte( unsigned addr )
 {
     addr &= 0xFFFF;
 
@@ -86,7 +86,7 @@ static inline unsigned char readByte( unsigned addr )
     // Address is not in RAM, check to see if it's a memory mapped register
     switch( addr & 0xFFC0 ) {
     // IN0
-    case 0x5000: 
+    case 0x5000:
         // bit 0 : up
         // bit 1 : left
         // bit 2 : right
@@ -97,7 +97,7 @@ static inline unsigned char readByte( unsigned addr )
         // bit 7 : credit (same as coin but coin counter is not incremented)
         return port1_;
     // IN1
-    case 0x5040: 
+    case 0x5040:
         // bit 0 : up (2nd player)
         // bit 1 : left (2nd player)
         // bit 2 : right (2nd player)

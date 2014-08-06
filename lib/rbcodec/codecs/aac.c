@@ -28,7 +28,7 @@
 CODEC_HEADER
 
 /* The maximum buffer size handled by faad. 12 bytes are required by libfaad
- * as headroom (see libfaad/bits.c). FAAD_BYTE_BUFFER_SIZE bytes are buffered 
+ * as headroom (see libfaad/bits.c). FAAD_BYTE_BUFFER_SIZE bytes are buffered
  * for each frame. */
 #define FAAD_BYTE_BUFFER_SIZE (2048-12)
 
@@ -129,10 +129,10 @@ enum codec_status codec_run(void)
 #endif
 
     i = 0;
-    
+
     if (file_offset > 0) {
         /* Resume the desired (byte) position. Important: When resuming SBR
-         * upsampling files the resulting sound_samples_done must be expanded 
+         * upsampling files the resulting sound_samples_done must be expanded
          * by a factor of 2. This is done via using sbr_fac. */
         if (m4a_seek_raw(&demux_res, &input_stream, file_offset,
                           &sound_samples_done, (int*) &i)) {
@@ -152,8 +152,8 @@ enum codec_status codec_run(void)
     }
 
     ci->set_elapsed(elapsed_time);
-    
-    if (i == 0) 
+
+    if (i == 0)
     {
         lead_trim = ci->id3->lead_trim;
     }
@@ -169,8 +169,8 @@ enum codec_status codec_run(void)
         /* Deal with any pending seek requests */
         if (action == CODEC_ACTION_SEEK_TIME) {
             /* Seek to the desired time position. Important: When seeking in SBR
-             * upsampling files the seek_time must be divided by 2 when calling 
-             * m4a_seek and the resulting sound_samples_done must be expanded 
+             * upsampling files the seek_time must be divided by 2 when calling
+             * m4a_seek and the resulting sound_samples_done must be expanded
              * by a factor 2. This is done via using sbr_fac. */
             if (m4a_seek(&demux_res, &input_stream,
                           (param/10/sbr_fac)*(ci->id3->frequency/100),
@@ -180,7 +180,7 @@ enum codec_status codec_run(void)
                 ci->set_elapsed(elapsed_time);
                 seek_idx = 0;
 
-                if (i == 0) 
+                if (i == 0)
                 {
                     lead_trim = ci->id3->lead_trim;
                 }
@@ -192,9 +192,9 @@ enum codec_status codec_run(void)
         action = CODEC_ACTION_NULL;
 
         /* There can be gaps between chunks, so skip ahead if needed. It
-         * doesn't seem to happen much, but it probably means that a 
+         * doesn't seem to happen much, but it probably means that a
          * "proper" file can have chunks out of order. Why one would want
-         * that an good question (but files with gaps do exist, so who 
+         * that an good question (but files with gaps do exist, so who
          * knows?), so we don't support that - for now, at least.
          */
         file_offset = m4a_check_sample_offset(&demux_res, i, &seek_idx);
@@ -208,7 +208,7 @@ enum codec_status codec_run(void)
             LOGF("AAC: get_sample_offset error\n");
             return CODEC_ERROR;
         }
-        
+
         /* Request the required number of bytes from the input buffer */
         buffer=ci->request_buffer(&n, FAAD_BYTE_BUFFER_SIZE);
 
@@ -226,7 +226,7 @@ enum codec_status codec_run(void)
 
         /* Output the audio */
         ci->yield();
-        
+
         frame_samples = frame_info.samples >> 1;
 
         if (empty_first_frame)
@@ -245,7 +245,7 @@ enum codec_status codec_run(void)
 
         /* Gather number of samples for the decoded frame. */
         framelength = frame_samples - lead_trim;
-        
+
         if (i == demux_res.num_sample_byte_sizes - 1)
         {
             // Size of the last frame

@@ -385,7 +385,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         )
 #if ORDER > 32
         "subs    %[cnt], %[cnt], #1      \n"
-        "bne     1b                      \n"  
+        "bne     1b                      \n"
 #endif
 
     "99:                                 \n"

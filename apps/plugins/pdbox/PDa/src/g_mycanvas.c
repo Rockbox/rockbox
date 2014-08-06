@@ -48,13 +48,13 @@ void my_canvas_draw_new(t_my_canvas *x, t_glist *glist)
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -outline #%6.6x -tags %xRECT\n",
-	     canvas, xpos, ypos,
-	     xpos + x->x_vis_w, ypos + x->x_vis_h,
-	     x->x_gui.x_bcol, x->x_gui.x_bcol, x);
+             canvas, xpos, ypos,
+             xpos + x->x_vis_w, ypos + x->x_vis_h,
+             x->x_gui.x_bcol, x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create rectangle %d %d %d %d -outline #%6.6x -tags %xBASE\n",
-	     canvas, xpos, ypos,
-	     xpos + x->x_gui.x_w, ypos + x->x_gui.x_h,
-	     x->x_gui.x_bcol, x);
+             canvas, xpos, ypos,
+             xpos + x->x_gui.x_w, ypos + x->x_gui.x_h,
+             x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
 	     canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
@@ -155,7 +155,7 @@ void my_canvas_draw(t_my_canvas *x, t_glist *glist, int mode)
 static void my_canvas_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int *xp2, int *yp2)
 {
     t_my_canvas *x = (t_my_canvas *)z;
-    
+
     *xp1 = text_xpix(&x->x_gui.x_obj, glist);
     *yp1 = text_ypix(&x->x_gui.x_obj, glist);
     *xp2 = *xp1 + x->x_gui.x_w;
@@ -449,4 +449,3 @@ void g_mycanvas_setup(void)
     class_setsavefn(my_canvas_class, my_canvas_save);
     class_setpropertiesfn(my_canvas_class, my_canvas_properties);
 }
-

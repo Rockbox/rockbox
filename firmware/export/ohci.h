@@ -72,5 +72,3 @@ struct ohci_hcca
     uint32_t done_head;
     unsigned char reserved[116];
 };
-
-

@@ -81,4 +81,3 @@ int _battery_voltage(void)
 
     return current_voltage;
 }
-

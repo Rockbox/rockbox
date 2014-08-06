@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-class CProgressHelper : 
+class CProgressHelper :
     public IWMDMProgress
 {
     void          (*m_callback)(unsigned int progress, unsigned int max);
@@ -49,4 +49,3 @@ public:
     STDMETHOD_(ULONG, AddRef)( void );
     STDMETHOD_(ULONG, Release)( void );
 };
-

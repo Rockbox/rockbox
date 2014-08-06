@@ -24,37 +24,37 @@ enum { blip_time_bits = 12 };
 enum { header_size = 0x40 };
 struct header_t
 {
-	char tag [4];
-	byte data_size [4];
-	byte version [4];
-	byte psg_rate [4];
-	byte ym2413_rate [4];
-	byte gd3_offset [4];
-	byte track_duration [4];
-	byte loop_offset [4];
-	byte loop_duration [4];
-	byte frame_rate [4];
-	byte noise_feedback [2];
-	byte noise_width;
-	byte unused1;
-	byte ym2612_rate [4];
-	byte ym2151_rate [4];
-	byte data_offset [4];
-	byte unused2 [8];
+        char tag [4];
+        byte data_size [4];
+        byte version [4];
+        byte psg_rate [4];
+        byte ym2413_rate [4];
+        byte gd3_offset [4];
+        byte track_duration [4];
+        byte loop_offset [4];
+        byte loop_duration [4];
+        byte frame_rate [4];
+        byte noise_feedback [2];
+        byte noise_width;
+        byte unused1;
+        byte ym2612_rate [4];
+        byte ym2151_rate [4];
+        byte data_offset [4];
+        byte unused2 [8];
 };
 
 enum { gme_max_field = 63 };
 struct track_info_t
 {
-	/* times in milliseconds; -1 if unknown */
-	int length;
-	int intro_length;
-	int loop_length;
-	
-	/* empty string if not available */
-	char game      [64];
-	char song      [96];
-	char author    [64];
+        /* times in milliseconds; -1 if unknown */
+        int length;
+        int intro_length;
+        int loop_length;
+
+        /* empty string if not available */
+        char game      [64];
+        char song      [96];
+        char author    [64];
 };
 
 // Emulates VGM music using SN76489/SN76496 PSG, YM2612, and YM2413 FM sound chips.
@@ -63,56 +63,56 @@ struct track_info_t
 // aliasing on high notes. Currently YM2413 support requires that you supply a
 // YM2413 sound chip emulator. I can provide one I've modified to work with the library.
 struct Vgm_Emu {
-	int fm_rate;
-	int psg_rate;
-	int vgm_rate;
-	bool disable_oversampling;
-	
-	int fm_time_offset;
-	int fm_time_factor;
+        int fm_rate;
+        int psg_rate;
+        int vgm_rate;
+        bool disable_oversampling;
 
-	int blip_time_factor;
-	
-	byte const* file_begin;
-	byte const* file_end;
-	
-	vgm_time_t vgm_time;
-	byte const* loop_begin;
-	byte const* pos;
-	
-	byte const* pcm_data;
-	byte const* pcm_pos;
-	int dac_amp;
-	int dac_disabled; // -1 if disabled
+        int fm_time_offset;
+        int fm_time_factor;
 
-	// general
-	int current_track;
-	int clock_rate_;
-	unsigned buf_changed_count;
-	int max_initial_silence;
-	int voice_count;
-	int const *voice_types;
-	int mute_mask_;
-	int tempo;
-	int gain;
-	
-	int sample_rate;
-	
-	// larger items at the end
-	struct track_info_t info;
-	
-	struct setup_t tfilter;
-	struct Track_Filter track_filter;
+        int blip_time_factor;
 
-	struct Ym2612_Emu ym2612;
-	struct Ym2413_Emu ym2413;
-	
-	struct Sms_Apu psg;
-	struct Blip_Synth pcm;
-	struct Blip_Buffer blip_buf;
-	
-	struct Resampler resampler;
-	struct Multi_Buffer stereo_buf;
+        byte const* file_begin;
+        byte const* file_end;
+
+        vgm_time_t vgm_time;
+        byte const* loop_begin;
+        byte const* pos;
+
+        byte const* pcm_data;
+        byte const* pcm_pos;
+        int dac_amp;
+        int dac_disabled; // -1 if disabled
+
+        // general
+        int current_track;
+        int clock_rate_;
+        unsigned buf_changed_count;
+        int max_initial_silence;
+        int voice_count;
+        int const *voice_types;
+        int mute_mask_;
+        int tempo;
+        int gain;
+
+        int sample_rate;
+
+        // larger items at the end
+        struct track_info_t info;
+
+        struct setup_t tfilter;
+        struct Track_Filter track_filter;
+
+        struct Ym2612_Emu ym2612;
+        struct Ym2413_Emu ym2413;
+
+        struct Sms_Apu psg;
+        struct Blip_Synth pcm;
+        struct Blip_Buffer blip_buf;
+
+        struct Resampler resampler;
+        struct Multi_Buffer stereo_buf;
 };
 
 void Vgm_init( struct Vgm_Emu* this );
@@ -159,27 +159,27 @@ void Track_set_fade( struct Vgm_Emu* this, int start_msec, int length_msec );
 // True if a track has reached its end
 static inline bool Track_ended( struct Vgm_Emu* this )
 {
-	return track_ended( &this->track_filter );
+        return track_ended( &this->track_filter );
 }
 
 // Disables automatic end-of-track detection and skipping of silence at beginning
 static inline void Track_ignore_silence( struct Vgm_Emu* this, bool disable )
 {
-	this->track_filter.silence_ignored_ = disable;
+        this->track_filter.silence_ignored_ = disable;
 }
 
 // Get track length in milliseconds
 static inline int Track_get_length( struct Vgm_Emu* this )
 {
-	int length = this->info.length;
-	if ( length <= 0 )
-	{
-		length = this->info.intro_length + 2 * this->info.loop_length; // intro + 2 loops
-		if ( length <= 0 )
-			length = 150 * 1000; // 2.5 minutes
-	}
-	
-	return length;
+        int length = this->info.length;
+        if ( length <= 0 )
+        {
+                length = this->info.intro_length + 2 * this->info.loop_length; // intro + 2 loops
+                if ( length <= 0 )
+                        length = 150 * 1000; // 2.5 minutes
+        }
+
+        return length;
 }
 
 // Sound customization
@@ -199,8 +199,8 @@ void Sound_mute_voices( struct Vgm_Emu* this, int mask );
 // Must be called before set_sample_rate().
 static inline void Sound_set_gain( struct Vgm_Emu* this, int g )
 {
-	assert( !this->sample_rate ); // you must set gain before setting sample rate
-	this->gain = g;
+        assert( !this->sample_rate ); // you must set gain before setting sample rate
+        this->gain = g;
 }
 
 #endif

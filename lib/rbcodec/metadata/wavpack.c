@@ -37,10 +37,10 @@
 #define MONO_FLAG       4
 #define HYBRID_FLAG     8
 
-static const long wavpack_sample_rates [] = 
+static const long wavpack_sample_rates [] =
 {
-     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000, 
-    32000, 44100, 48000, 64000, 88200, 96000, 192000 
+     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000,
+    32000, 44100, 48000, 64000, 88200, 96000, 192000
 };
 
 /* A simple parser to read basic information from a WavPack file. This

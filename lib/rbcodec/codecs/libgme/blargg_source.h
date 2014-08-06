@@ -37,26 +37,26 @@ static inline void blargg_dprintf_( const char* fmt, ... ) { }
 otherwise continues normally. */
 #undef  RETURN_ERR
 #define RETURN_ERR( expr ) \
-	do {\
-		blargg_err_t blargg_return_err_ = (expr);\
-		if ( blargg_return_err_ )\
-			return blargg_return_err_;\
-	} while ( 0 )
+        do {\
+                blargg_err_t blargg_return_err_ = (expr);\
+                if ( blargg_return_err_ )\
+                        return blargg_return_err_;\
+        } while ( 0 )
 
 /* If ptr is NULL, returns out-of-memory error, otherwise continues normally. */
 #undef  CHECK_ALLOC
 #define CHECK_ALLOC( ptr ) \
-	do {\
-		if ( !(ptr) )\
-			return "Out of memory";\
-	} while ( 0 )
+        do {\
+                if ( !(ptr) )\
+                        return "Out of memory";\
+        } while ( 0 )
 
 #ifndef max
-	#define max(a,b) (((a) > (b)) ? (a) : (b))
+        #define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif
 
 #ifndef min
-	#define min(a,b) (((a) < (b)) ? (a) : (b))
+        #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
 // typedef unsigned char byte;
@@ -70,7 +70,7 @@ typedef unsigned char blargg_byte;
 
 // BLARGG_SOURCE_BEGIN: If defined, #included, allowing redefition of dprintf and check
 #ifdef BLARGG_SOURCE_BEGIN
-	#include BLARGG_SOURCE_BEGIN
+        #include BLARGG_SOURCE_BEGIN
 #endif
 
 #endif

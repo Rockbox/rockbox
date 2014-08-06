@@ -42,7 +42,7 @@ void* skin_buffer_from_offset(long offset);
 
 /* #define DEBUG_SKIN_ALLOCATIONS */
 
-#ifdef DEBUG_SKIN_ALLOCATIONS 
+#ifdef DEBUG_SKIN_ALLOCATIONS
 #define FOO(X) #X
 #define STRNG(X) FOO(X)
 #define skin_buffer_alloc(s) skin_buffer_alloc_ex(s, __FILE__ ":" STRNG(__LINE__))

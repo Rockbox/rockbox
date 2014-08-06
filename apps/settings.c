@@ -140,7 +140,7 @@ static bool read_nvram_data(char* buf, int max_len)
         buf[i] = rtc_read(0x14+i);
 #endif
     /* check magic, version */
-    if ((buf[0] != 'R') || (buf[1] != 'b') 
+    if ((buf[0] != 'R') || (buf[1] != 'b')
         || (buf[2] != NVRAM_CONFIG_VERSION))
         return false;
     /* check crc32 */
@@ -215,7 +215,7 @@ static bool write_nvram_data(char* buf, int max_len)
        supports that, but this will have to do for now 8-) */
     for (i=0; i < NVRAM_BLOCK_SIZE; i++ ) {
         int r = rtc_write(0x14+i, buf[i]);
-        if (r) 
+        if (r)
             return false;
     }
 #endif
@@ -301,8 +301,8 @@ bool settings_load_config(const char* file, bool apply)
 #ifdef HAVE_LCD_COLOR
                         if (settings[i].flags&F_RGB)
                             hex_to_rgb(value, (int*)settings[i].setting);
-                        else 
-#endif 
+                        else
+#endif
                             if (settings[i].cfg_vals == NULL)
                         {
                             *(int*)settings[i].setting = atoi(value);
@@ -386,7 +386,7 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
     const char* start = settings[setting_id].cfg_vals;
     char* end = NULL;
     int count = 0;
-    
+
     if ((flags&F_T_MASK)==F_T_INT &&
         flags&F_TABLE_SETTING)
     {
@@ -398,7 +398,7 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
             {
                 if (end == NULL)
                     strlcpy(buf, start, buf_len);
-                else 
+                else
                 {
                     int len = (buf_len > (end-start))? end-start: buf_len;
                     strlcpy(buf, start, len+1);
@@ -406,7 +406,7 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
                 return true;
             }
             count++;
-            
+
             if (end)
                 start = end+1;
             else
@@ -414,7 +414,7 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
         }
         return false;
     }
-                
+
     while (count < val)
     {
         start = strchr(start,',');
@@ -426,7 +426,7 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
     end = strchr(start,',');
     if (end == NULL)
         strlcpy(buf, start, buf_len);
-    else 
+    else
     {
         int len = (buf_len > (end-start))? end-start: buf_len;
         strlcpy(buf, start, len+1);
@@ -555,7 +555,7 @@ static bool settings_write_config(const char* filename, int options)
         value[0] = '\0';
         if (settings[i].flags & F_DEPRECATED)
             continue;
-        
+
         switch (options)
         {
             case SETTINGS_SAVE_CHANGED:
@@ -924,7 +924,7 @@ void settings_apply(bool read_disk)
             && global_settings.font_file[0] != '-') {
             int font_ui = screens[SCREEN_MAIN].getuifont();
             const char* loaded_font = font_filename(font_ui);
-            
+
             snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                      global_settings.font_file);
             if (!loaded_font || strcmp(loaded_font, buf))
@@ -938,7 +938,7 @@ void settings_apply(bool read_disk)
                 screens[SCREEN_MAIN].setfont(rc);
             }
         }
-#ifdef HAVE_REMOTE_LCD        
+#ifdef HAVE_REMOTE_LCD
         if ( global_settings.remote_font_file[0]
             && global_settings.remote_font_file[0] != '-') {
             int font_ui = screens[SCREEN_REMOTE].getuifont();
@@ -1216,7 +1216,7 @@ bool set_int_ex(const unsigned char* string,
     (void)unit;
     struct settings_list item;
     struct int_setting data = {
-        function, voice_unit, min, max, step, 
+        function, voice_unit, min, max, step,
         formatter, get_talk_id
     };
     item.int_setting = &data;
@@ -1242,7 +1242,7 @@ static int32_t set_option_get_talk_id(int value, int unit)
 }
 
 bool set_option(const char* string, const void* variable, enum optiontype type,
-                const struct opt_items* options, 
+                const struct opt_items* options,
                 int numoptions, void (*function)(int))
 {
     int temp;
@@ -1259,7 +1259,7 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
     item.setting = &temp;
     if (type == BOOL)
         temp = *(bool*)variable? 1: 0;
-    else 
+    else
         temp = *(int*)variable;
     if (!option_screen(&item, NULL, false, NULL))
     {

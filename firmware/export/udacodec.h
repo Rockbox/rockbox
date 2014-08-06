@@ -28,4 +28,3 @@ int udacodec_write(unsigned char reg, unsigned short value);
 /* write two consecutive registers */
 int udacodec_write2(unsigned char reg,
                     unsigned short value1, unsigned short value2);
-

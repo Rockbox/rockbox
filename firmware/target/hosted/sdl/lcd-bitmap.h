@@ -3,7 +3,7 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \ 
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
@@ -32,4 +32,3 @@ void sim_lcd_ex_update_rect(int x, int y, int width, int height);
 #endif
 
 #endif /* #ifndef __LCDBITMAP_H__ */
-

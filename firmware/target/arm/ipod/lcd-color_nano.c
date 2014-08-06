@@ -94,7 +94,7 @@ void lcd_set_flip(bool yesno)
 
 /* LCD init */
 void lcd_init_device(void)
-{  
+{
 #if CONFIG_LCD == LCD_IPODCOLOR
     if (IPOD_HW_REVISION == 0x60000) {
         lcd_type = 0;
@@ -158,7 +158,7 @@ void lcd_shutdown(void) {
 static void lcd_setup_drawing_region(int x, int y, int width, int height)
 {
     int y0, x0, y1, x1;
-    
+
     /* calculate the drawing region */
 #if CONFIG_LCD == LCD_IPODNANO
     y0 = x;                         /* start horiz */
@@ -174,7 +174,7 @@ static void lcd_setup_drawing_region(int x, int y, int width, int height)
 
     /* setup the drawing region */
     if ((lcd_type&1) == 0) {
-        /* x0 and x1 need to be swapped until 
+        /* x0 and x1 need to be swapped until
          * proper direction setup is added */
         lcd_cmd_data(0x12, y0);      /* start vert */
         lcd_cmd_data(0x13, x1);      /* start horiz */
@@ -237,7 +237,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
             h = ((0x10000/2) / width) & ~1; /* ensure h is even */
             pixels_to_write = (width * h) * 2;
         }
-        
+
         LCD2_BLOCK_CTRL   = 0x10000080;
         LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
         LCD2_BLOCK_CTRL   = 0x34000000;
@@ -249,11 +249,11 @@ void lcd_blit_yuv(unsigned char * const src[3],
             yuv_src[1] += stride >> 1;
             yuv_src[2] += stride >> 1;
         } while (--r > 0);
-        
+
         /* transfer of pixels_to_write bytes finished */
         while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
         LCD2_BLOCK_CONFIG = 0;
-        
+
         height -= h;
     }
 }
@@ -273,7 +273,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     unsigned long *addr;
 
-    /* Ensure both x and width are even to be able to read 32-bit aligned 
+    /* Ensure both x and width are even to be able to read 32-bit aligned
      * data from lcd_framebuffer */
     x     =  x & ~1;            /* use the smaller even number */
     width = (width + 1) & ~1;   /* use the bigger even number  */

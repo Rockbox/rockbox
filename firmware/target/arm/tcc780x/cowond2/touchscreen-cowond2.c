@@ -82,18 +82,18 @@ static int touchscreen_read_pcf50606(int *data, int *old_data)
             /* sort the 5 data taken and use the median value */
             qsort(x, NO_OF_TOUCH_DATA, sizeof(short), short_cmp);
             qsort(y, NO_OF_TOUCH_DATA, sizeof(short), short_cmp);
-            
+
             x_touch = last_x = x[(NO_OF_TOUCH_DATA - 1)/2];
             y_touch = last_y = y[(NO_OF_TOUCH_DATA - 1)/2];
-            
+
             last_touch = current_tick;
-            
+
             touch_hold = true;
             touch_available = false;
         }
-        
+
         *old_data = *data = touch_to_pixels(x_touch, y_touch);
-        
+
         btn |= touchscreen_to_pixels((*data&0xffff0000) >> 16,
                                      (*data&0x0000ffff),
                                      data);
@@ -105,7 +105,7 @@ static int touchscreen_read_pcf50606(int *data, int *old_data)
         touch_hold = false;
         pcf50606_write(PCF5060X_ADCC1, 1);
     }
-    
+
     return btn;
 }
 
@@ -113,7 +113,7 @@ static int touchscreen_read_tsc200x(int *data, int *old_data)
 {
     int btn = BUTTON_NONE;
     short x_touch, y_touch;
-    
+
     static long last_read = 0;
     static int last_btn = BUTTON_NONE;
 
@@ -129,7 +129,7 @@ static int touchscreen_read_tsc200x(int *data, int *old_data)
     {
         if (tsc200x_read_coords(&x_touch, &y_touch))
         {
-            *old_data = *data = touch_to_pixels(x_touch, y_touch);  
+            *old_data = *data = touch_to_pixels(x_touch, y_touch);
 
             btn = touchscreen_to_pixels((*data & 0xffff0000) >> 16,
                                         (*data & 0x0000ffff),
@@ -147,7 +147,7 @@ static int touchscreen_read_tsc200x(int *data, int *old_data)
 void touchscreen_init_device(void)
 {
     touch_available = false;
-    
+
     if (get_pmu_type() != PCF50606)
     {
         tsc200x_init();
@@ -158,7 +158,7 @@ void touchscreen_handle_device_irq(void)
 {
     static long last_touch_interrupt = 0;
     static int touch_data_index = 0;
-    
+
     /* don't read the coordinates when hold is enabled */
     if (button_hold()) return;
 
@@ -196,11 +196,11 @@ void touchscreen_handle_device_irq(void)
 int touchscreen_read_device(int *data, int *old_data)
 {
     int btn;
-    
+
     if (get_pmu_type() == PCF50606)
         btn = touchscreen_read_pcf50606(data, old_data);
     else
         btn = touchscreen_read_tsc200x(data, old_data);
-        
+
     return btn;
 }

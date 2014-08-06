@@ -175,4 +175,3 @@ extern int number_of_samples;
 extern int playing_time IBSS_ATTR;
 extern int samples_this_second IBSS_ATTR;
 extern long bpm;
-

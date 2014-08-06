@@ -30,7 +30,7 @@
  * PortalPlayer i2c driver
  *
  */
- 
+
 #ifndef _I2C_PP_H
 #define _I2C_PP_H
 

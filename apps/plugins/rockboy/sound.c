@@ -134,11 +134,11 @@ static void gbSoundChannel1(int *r, int *l)
 
     if(S1.on)
     {
-        if(S1.len) 
+        if(S1.len)
         {
             S1.len-=snd.quality;
 
-            if(S1.len <=0 && S1.cont) 
+            if(S1.len <=0 && S1.cont)
             {
                 R_NR52 &= 0xfe;
                 S1.on = 0;
@@ -149,14 +149,14 @@ static void gbSoundChannel1(int *r, int *l)
         {
             S1.enlen-=snd.quality;
 
-            if(S1.enlen<=0) 
+            if(S1.enlen<=0)
             {
                 if(S1.endir)
                 {
                     if(S1.envol < 15)
                         S1.envol++;
                 }
-                else 
+                else
                 {
                     if(S1.envol)
                         S1.envol--;
@@ -175,7 +175,7 @@ static void gbSoundChannel1(int *r, int *l)
                 freq = (((int)(R_NR14&7) << 8) | R_NR13);
 
                 int updown = 1;
-        
+
                 if(S1.swdir)
                     updown = -1;
 
@@ -198,8 +198,8 @@ static void gbSoundChannel1(int *r, int *l)
                     S1.swlen = 0;
                     S1.on = 0;
                     R_NR52 &= 0xfe;
-                } 
-                else 
+                }
+                else
                 {
                     S1.swlen += S1.swlenreload;
                     S1.skip = SOUND_MAGIC/(2048 - newfreq);
@@ -215,14 +215,14 @@ static void gbSoundChannel1(int *r, int *l)
 static void gbSoundChannel2(int *r, int *l)
 {
     int vol = S2.envol;
-  
+
     int value = 0;
-    
+
     if(S2.on && (S2.len || !S2.cont))
     {
         S2.pos += snd.quality*S2.skip;
         S2.pos &= 0x1fffffff;
-    
+
         value = ((signed char)S2.wave[S2.pos>>24]) * vol;
     }
 
@@ -232,16 +232,16 @@ static void gbSoundChannel2(int *r, int *l)
     if(S2.on) {
         if(S2.len) {
             S2.len-=snd.quality;
-            
+
             if(S2.len <= 0 && S2.cont) {
                 R_NR52 &= 0xfd;
                 S2.on = 0;
             }
         }
-        
+
         if(S2.enlen) {
             S2.enlen-=snd.quality;
-          
+
             if(S2.enlen <= 0) {
                 if(S2.endir) {
                     if(S2.envol < 15)
@@ -307,16 +307,16 @@ static void gbSoundChannel3(int *r, int *l)
 static void gbSoundChannel4(int *r, int *l)
 {
     int vol = S4.envol;
-  
+
     int value = 0;
-  
+
     if(S4.clock <= 0x0c)
     {
         if(S4.on && (S4.len || !S4.cont))
         {
             S4.pos += snd.quality*S4.skip;
             S4.shiftpos += snd.quality*S4.shiftskip;
-      
+
             if(S4.nsteps)
             {
                 while(S4.shiftpos > 0x1fffff) {
@@ -324,8 +324,8 @@ static void gbSoundChannel4(int *r, int *l)
                         (S4.shiftright << 5)) & 0x40) | (S4.shiftright >> 1);
                     S4.shiftpos -= 0x200000;
                 }
-            } 
-            else 
+            }
+            else
             {
                 while(S4.shiftpos > 0x1fffff)
                 {
@@ -334,42 +334,42 @@ static void gbSoundChannel4(int *r, int *l)
                     S4.shiftpos -= 0x200000;
                 }
             }
-      
+
             S4.pos &= 0x1fffff;
             S4.shiftpos &= 0x1fffff;
-          
+
             value = ((S4.shiftright & 1)*2-1) * vol;
-        } 
+        }
         else
         {
             value = 0;
         }
     }
-  
+
     if (snd.balance & 8) *r += value;
     if (snd.balance & 128) *l += value;
-  
+
     if(S4.on) {
         if(S4.len) {
             S4.len-=snd.quality;
-            
+
             if(S4.len <= 0 && S4.cont) {
                 R_NR52 &= 0xfd;
                 S4.on = 0;
             }
         }
-        
+
         if(S4.enlen) {
             S4.enlen-=snd.quality;
-            
+
             if(S4.enlen <= 0)
             {
                 if(S4.endir)
                 {
                     if(S4.envol < 15)
                         S4.envol++;
-                } 
-                else 
+                }
+                else
                 {
                     if(S4.envol)
                         S4.envol--;
@@ -413,7 +413,7 @@ void sound_mix(void)
             l = 32767;
         if(l < -32768)
             l = -32768;
-            
+
         if(r > 32767)
             r = 32767;
         if(r < -32768)
@@ -487,10 +487,10 @@ void sound_write(byte r, byte b)
         freq = 2048 - freq;
         S1.len = 172 * (64 - (R_NR11 & 0x3f));
         S1.cont = b & 0x40;
-        if(freq) 
+        if(freq)
         {
             S1.skip = SOUND_MAGIC / freq;
-        } 
+        }
         else
         {
             S1.skip = 0;
@@ -506,7 +506,7 @@ void sound_write(byte r, byte b)
             S1.swsteps = R_NR10 & 7;
             S1.swdir = R_NR10 & 0x08;
             S1.swstep = 0;
-  
+
             S1.pos = 0;
             S1.on = 1;
         }
@@ -527,7 +527,7 @@ void sound_write(byte r, byte b)
         if(freq)
         {
             S2.skip = SOUND_MAGIC / freq;
-        } 
+        }
         else
         {
             S2.skip = 0;
@@ -618,18 +618,18 @@ void sound_write(byte r, byte b)
             S4.enlenreload = S4.enlen = 689 * (R_NR42 & 7);
 
             S4.on = 1;
-            
+
             S4.pos = 0;
             S4.shiftpos = 0;
-            
+
             freq = soundFreqRatio[R_NR43 & 7];
-      
+
             S4.shiftpos = (freq << 8) / NOISE_MAGIC;
 
             S4.nsteps = R_NR43 & 0x08;
-            
+
             freq = freq / soundShiftClock[R_NR43 >> 4];
-      
+
             S4.shiftskip = (freq << 8) / NOISE_MAGIC;
             if(S4.nsteps)
             {
@@ -658,7 +658,7 @@ void sound_write(byte r, byte b)
         }
         break;
     }
-    
+
     snd.gbDigitalSound = true;
 
     if(S1.on && S1.envol != 0)
@@ -704,39 +704,39 @@ void sound_reset(void)
     sound_write(0x16, 0x3f);
     sound_write(0x17, 0x00);
     sound_write(0x19, 0xbf);
-  
+
     sound_write(0x1a, 0x7f);
     sound_write(0x1b, 0xff);
     sound_write(0x1c, 0xbf);
     sound_write(0x1e, 0xbf);
-  
+
     sound_write(0x20, 0xff);
     sound_write(0x21, 0x00);
     sound_write(0x22, 0x00);
     sound_write(0x23, 0xbf);
     sound_write(0x24, 0x77);
     sound_write(0x25, 0xf3);
-  
+
     sound_write(0x26, 0xf0);
-  
+
     S1.on = 0;
     S2.on = 0;
     S3.on = 0;
     S4.on = 0;
 
     int addr = 0x30;
-	while(addr < 0x40) 
+        while(addr < 0x40)
     {
         ram.hi[addr++] = 0x00;
         ram.hi[addr++] = 0xff;
     }
 
-	if (pcm.hz)
+        if (pcm.hz)
     {
         snd.rate = (1<<21) / pcm.hz;
         snd.quality=44100 / pcm.hz;
     }
-	else snd.rate = 0;
+        else snd.rate = 0;
 }
 
 void sound_dirty(void)
@@ -746,22 +746,22 @@ void sound_dirty(void)
     sound_write(RI_NR12, R_NR12);
     sound_write(RI_NR13, R_NR13);
     sound_write(RI_NR14, R_NR14);
-    
+
     sound_write(RI_NR21, R_NR21);
     sound_write(RI_NR22, R_NR22);
     sound_write(RI_NR23, R_NR23);
     sound_write(RI_NR24, R_NR24);
-    
+
     sound_write(RI_NR30, R_NR30);
     sound_write(RI_NR31, R_NR31);
     sound_write(RI_NR32, R_NR32);
     sound_write(RI_NR33, R_NR33);
     sound_write(RI_NR34, R_NR34);
-    
+
     sound_write(RI_NR42, R_NR42);
     sound_write(RI_NR43, R_NR43);
     sound_write(RI_NR44, R_NR44);
-    
+
     sound_write(RI_NR50, R_NR50);
     sound_write(RI_NR51, R_NR51);
     sound_write(RI_NR52, R_NR52);

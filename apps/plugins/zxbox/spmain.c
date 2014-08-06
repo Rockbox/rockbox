@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -257,21 +257,21 @@ static void options_menu(void){
         {
             case 0:
                 new_setting=settings.kempston;
-                rb->set_option("Map Keys to kempston",&new_setting,INT, 
+                rb->set_option("Map Keys to kempston",&new_setting,INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.kempston )
                     settings.kempston=new_setting;
                 break;
             case 1:
                 new_setting = settings.showfps;
-                rb->set_option("Display Speed",&new_setting,INT, 
+                rb->set_option("Display Speed",&new_setting,INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.showfps )
                     settings.showfps=new_setting;
                 break;
             case 2:
                 new_setting = settings.invert_colors;
-                rb->set_option("Invert Colors",&new_setting,INT, 
+                rb->set_option("Invert Colors",&new_setting,INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.invert_colors )
                     settings.invert_colors=new_setting;
@@ -279,14 +279,14 @@ static void options_menu(void){
                 break;
             case 3:
                 new_setting = settings.frameskip;
-                rb->set_option("Frameskip",&new_setting,INT, 
+                rb->set_option("Frameskip",&new_setting,INT,
                                frameskip_items, 10, NULL);
                 if (new_setting != settings.frameskip )
                     settings.frameskip=new_setting;
                 break;
             case 4:
                 new_setting = settings.sound;
-                rb->set_option("Sound",&new_setting,INT, 
+                rb->set_option("Sound",&new_setting,INT,
                                no_yes, 2, NULL);
                 if (new_setting != settings.sound )
                     settings.sound=new_setting;
@@ -296,7 +296,7 @@ static void options_menu(void){
                 break;
             case 5:
                 new_setting = 9 - settings.volume;
-                rb->set_option("Volume",&new_setting,INT, 
+                rb->set_option("Volume",&new_setting,INT,
                                frameskip_items, 10, NULL);
                 new_setting = 9 - new_setting;
                 if (new_setting != settings.volume )
@@ -450,7 +450,7 @@ static void run_singlemode(void)
     halfsec = !(sp_int_ctr % 25);
     evenframe = !(sp_int_ctr & 1);
 
-    if(screen_visible) updateframe = sp_nosync ? halfsec : 
+    if(screen_visible) updateframe = sp_nosync ? halfsec :
       !((sp_int_ctr+SHOW_OFFS) % showframe);
     else updateframe = 0;
     if(halfsec) {
@@ -481,7 +481,7 @@ static void run_singlemode(void)
     }
     else if(updateframe) update();
   }
-  
+
 }
 
 
@@ -500,11 +500,11 @@ static void init_load(const void *parameter)
 #ifndef USE_GREY
     rb->splashf(HZ, "Loading snapshot '%s'", spcf_init_snapshot);
 #endif
-    
+
     load_snapshot_file_type(spcf_init_snapshot, spcf_init_snapshot_type);
     free_string(spcf_init_snapshot);
   }
-  
+
   if(spcf_init_tapefile != NULL) {
     /*sprintf(msgbuf, "Loading tape '%s'", spcf_init_tapefile);
     put_msg(msgbuf);*/
@@ -521,10 +521,6 @@ void start_spectemu(const void *parameter)
   init_spect_scr();
   init_spect_sound();
   init_spect_key();
- 
+
   run_singlemode();
 }
-
-
-
-

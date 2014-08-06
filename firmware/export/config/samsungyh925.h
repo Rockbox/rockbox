@@ -51,7 +51,7 @@
 #define HAVE_BACKLIGHT
 
 /* Define this if your LCD can set contrast */
-#define HAVE_LCD_CONTRAST 
+#define HAVE_LCD_CONTRAST
 
 #define MIN_CONTRAST_SETTING        0
 #define MAX_CONTRAST_SETTING        30

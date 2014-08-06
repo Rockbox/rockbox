@@ -25,23 +25,23 @@
 #include "powermgmt-imx233.h"
 
 /* ZEN X-Fi OF settings:
- * - current ramp slope: 
- * - conditioning threshold voltage: 
- * - conditioning max voltage: 
- * - conditioning current: 
- * - conditioning timeout: 
- * - charging voltage: 
- * - charging current: 
- * - charging threshold current: 
+ * - current ramp slope:
+ * - conditioning threshold voltage:
+ * - conditioning max voltage:
+ * - conditioning current:
+ * - conditioning timeout:
+ * - charging voltage:
+ * - charging current:
+ * - charging threshold current:
  * - charging timeout:
- * - top off period: 
- * - high die temperature: 
- * - low die temperature: 
- * - safe die temperature current: 
- * - battery temperature channel: 
- * - high battery temperature: 
- * - low battery temperature: 
- * - safe battery temperature current: 
+ * - top off period:
+ * - high die temperature:
+ * - low die temperature:
+ * - safe die temperature current:
+ * - battery temperature channel:
+ * - high battery temperature:
+ * - low battery temperature:
+ * - safe battery temperature current:
  * - low DCDC battery voltage:
  */
 

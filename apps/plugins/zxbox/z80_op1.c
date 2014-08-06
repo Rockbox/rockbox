@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,7 @@ OPDEF(nop, 0x00)
 OPDEF(ex_af_afb, 0x08)
 {
   register byte *ptmp;
-    
+
   ptmp = DANM(br)[ZI_AF].p;
   DANM(br)[ZI_AF].p = DANM(nr)[ZI_AF].p;
   DANM(nr)[ZI_AF].p = ptmp;
@@ -95,7 +95,7 @@ LD_RR_NN(sp, SP, 3)
   rr1 = dtmp + rr2;                \
   idx = DIDXCALC(dtmp, rr2, rr1);  \
   SETFLAGS(CF | NF | HF, TAB(addf_tbl)[idx] & (CF | HF))
-     
+
 
 #define ADD_RR_RR(rrn1, rr1, rrn2, rr2, n) \
 OPDEF(add_## rrn1 ## _ ## rrn2, 0x09+n*0x10) \

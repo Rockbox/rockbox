@@ -72,26 +72,26 @@ extern const char *largefile_msg;
 
 /* endian-neutral reading of little-endian data */
 #define __egi32(a,n) ( ((((unsigned char *) a)[n+3]) << 24) | \
-		       ((((unsigned char *) a)[n+2]) << 16) | \
-		       ((((unsigned char *) a)[n+1]) <<  8) | \
-		       ((((unsigned char *) a)[n+0])))
+                       ((((unsigned char *) a)[n+2]) << 16) | \
+                       ((((unsigned char *) a)[n+1]) <<  8) | \
+                       ((((unsigned char *) a)[n+0])))
 #define EndGetI64(a) ((((unsigned long long int) __egi32(a,4)) << 32) | \
-		      ((unsigned int) __egi32(a,0)))
+                      ((unsigned int) __egi32(a,0)))
 #define EndGetI32(a) __egi32(a,0)
 #define EndGetI16(a) ((((a)[1])<<8)|((a)[0]))
 
 /* endian-neutral reading of big-endian data */
 #define EndGetM32(a) (((((unsigned char *) a)[0]) << 24) | \
-		      ((((unsigned char *) a)[1]) << 16) | \
-		      ((((unsigned char *) a)[2]) <<  8) | \
-		      ((((unsigned char *) a)[3])))
+                      ((((unsigned char *) a)[1]) << 16) | \
+                      ((((unsigned char *) a)[2]) <<  8) | \
+                      ((((unsigned char *) a)[3])))
 #define EndGetM16(a) ((((a)[0])<<8)|((a)[1]))
 
 extern struct mspack_system *mspack_default_system;
 
 /* returns the length of a file opened for reading */
 extern int mspack_sys_filelen(struct mspack_system *system,
-			      struct mspack_file *file, off_t *length);
+                              struct mspack_file *file, off_t *length);
 
 /* validates a system structure */
 extern int mspack_valid_system(struct mspack_system *sys);

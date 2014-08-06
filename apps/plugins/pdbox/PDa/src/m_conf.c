@@ -103,6 +103,5 @@ void conf_init(void)
 #endif
     d_soundfile_setup();
     d_ugen_setup();
-	    
-}
 
+}

@@ -16,5 +16,3 @@ typedef struct event_s
 
 int ev_postevent(event_t *ev);
 int ev_getevent(event_t *ev);
-
-

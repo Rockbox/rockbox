@@ -85,7 +85,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ABSETB_NEXTDIR, BUTTON_ON|BUTTON_RIGHT,  BUTTON_NONE },
     { ACTION_WPS_ABSETA_PREVDIR, BUTTON_ON|BUTTON_LEFT,   BUTTON_NONE },
     { ACTION_WPS_ABRESET,        BUTTON_ON|BUTTON_OFF,    BUTTON_ON },
-    
+
 
     LAST_ITEM_IN_LIST
 };
@@ -128,9 +128,9 @@ static const struct button_mapping button_context_tree_scroll_lr[]  = {
 
 static const struct button_mapping button_context_yesno[] = {
     { ACTION_YESNO_ACCEPT,     BUTTON_SELECT,    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; 
+};
 static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_TOP,        BUTTON_UP,                      BUTTON_NONE },
     { ACTION_QS_TOP,        BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
@@ -141,7 +141,7 @@ static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_SELECT,                  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
@@ -159,7 +159,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
@@ -171,13 +171,13 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_ON|BUTTON_LEFT,                 BUTTON_NONE },
@@ -203,7 +203,7 @@ static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,      BUTTON_SELECT|BUTTON_ON, BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
-    
+
 }; /* button_context_settings_bmark */
 
 static const struct button_mapping button_context_radio[]  = {
@@ -216,7 +216,7 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_EXIT,        BUTTON_ON | BUTTON_REL,                BUTTON_ON },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
-    
+
 };
 
 const struct button_mapping* get_context_mapping( int context )

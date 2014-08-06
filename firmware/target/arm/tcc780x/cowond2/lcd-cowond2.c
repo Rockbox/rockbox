@@ -86,7 +86,7 @@ static void delay_loop(void)
 static void ltv250qv_write(unsigned int command)
 {
     int i;
-    
+
     GPIOA_CLEAR = LTV250QV_CS;
     DELAY;
 
@@ -99,7 +99,7 @@ static void ltv250qv_write(unsigned int command)
         GPIOA_SET = LTV250QV_SDI;
       else
         GPIOA_CLEAR = LTV250QV_SDI;
-      
+
       DELAY;
       GPIOA_SET = LTV250QV_SCL;
     }
@@ -111,10 +111,10 @@ static void ltv250qv_write(unsigned int command)
 static void lcd_write_reg(unsigned char reg, unsigned short val)
 {
     int level = disable_irq_save();
-    
+
     ltv250qv_write(0x740000 | reg);
     ltv250qv_write(0x760000 | val);
-    
+
     restore_irq(level);
 }
 
@@ -123,7 +123,7 @@ static void lcd_display_on(void)
     /* power on sequence as per the D2 firmware */
     GPIOA_SET = (1<<16);
     udelay(10000);
-    
+
     lcd_write_reg(1,  0x1D);
     lcd_write_reg(2,  0x0);
     lcd_write_reg(3,  0x0);
@@ -145,14 +145,14 @@ static void lcd_display_on(void)
     lcd_write_reg(24, 0x0);
     lcd_write_reg(25, 0x0);
     udelay(10000);
-    
+
     lcd_write_reg(9,  0x4055);
     lcd_write_reg(10, 0x0);
     udelay(40000);
-    
+
     lcd_write_reg(10, 0x2000);
     udelay(40000);
-    
+
     lcd_write_reg(1,  0xC01D);
     lcd_write_reg(2,  0x204);
     lcd_write_reg(3,  0xE100);
@@ -172,7 +172,7 @@ static void lcd_display_on(void)
     lcd_write_reg(24, 0x2);
     lcd_write_reg(25, 0x0);
     udelay(60000);
-    
+
     lcd_write_reg(9,  0xA55);
     lcd_write_reg(10, 0x111F);
     udelay(10000);
@@ -191,10 +191,10 @@ static void lcd_display_off(void)
     lcd_write_reg(10, 0x1417);
     lcd_write_reg(5,  0x4003);
     udelay(10000);
-    
+
     lcd_write_reg(9, 0x0);
     udelay(10000);
-    
+
     /* kill power to LCD panel (unconfirmed) */
     GPIOA_CLEAR = (1<<16);
 }
@@ -224,20 +224,20 @@ void lcd_enable(bool on)
 void lcd_init_device(void)
 {
     BCLKCTR |= 4;   /* enable LCD bus clock */
-    
+
     /* set PCK_LCD to 108Mhz */
     PCLK_LCD &= ~PCK_EN;
     PCLK_LCD = PCK_EN | (CKSEL_PLL1<<24) | 1;  /* source = PLL1, divided by 2 */
-    
+
     /* reset the LCD controller */
     SWRESET |= 4;
     SWRESET &= ~4;
-    
+
     /* set port configuration */
     PORTCFG1 &= ~0xC0000000;
     PORTCFG1 &= ~0x3FC0;
     PORTCFG2 &= ~0x100;
-    
+
     /* set physical display size */
     LCDC_DS = (LCD_HEIGHT<<16) | LCD_WIDTH;
 
@@ -255,7 +255,7 @@ void lcd_init_device(void)
     LCDC_CTRL &= ~(1<<28);
 
     LCDC_CLKDIV = (LCDC_CLKDIV &~ 0xFF00FF) | (1<<16) | 2; /* and this means? */
-    
+
     /* set and clear various flags - not investigated yet */
     LCDC_CTRL &= ~(0x090006AA); /* clear bits 1,3,5,7,9,10,24,27 */
     LCDC_CTRL |= 0x02800144;    /*   set bits 2,6,8,25,23 */
@@ -264,7 +264,7 @@ void lcd_init_device(void)
 
     /* enable LCD controller */
     LCDC_CTRL |= 1;
-    
+
     /* enable LTV250QV panel */
     lcd_display_on();
 }

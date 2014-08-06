@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2009 by Jens Arnold
@@ -32,7 +32,7 @@
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
-#endif                  
+#endif
 
 #if LCD_DEPTH == 16
 #define BMP_COMPRESSION 3 /* BI_BITFIELDS */
@@ -144,7 +144,7 @@ void screen_dump(void)
 
         /* BMP image goes bottom up */
         for (y = LCD_HEIGHT - 1; y >= 0; y--)
-        {                                  
+        {
             memset(linebuf, 0, DUMP_BMP_LINESIZE);
 
 #if defined(HAVE_LCD_SPLIT) && (LCD_SPLIT_LINES == 2)
@@ -153,7 +153,7 @@ void screen_dump(void)
                 write(fd, linebuf, DUMP_BMP_LINESIZE);
                 write(fd, linebuf, DUMP_BMP_LINESIZE);
             }
-#endif     
+#endif
             dst = linebuf;
 
 #if LCD_DEPTH == 1
@@ -219,7 +219,7 @@ void screen_dump(void)
 #elif LCD_DEPTH == 16
             dst_end = dst + LCD_WIDTH;
             src = FBADDR(0, y);
-            
+
             do
             {
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)

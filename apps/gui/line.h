@@ -35,7 +35,7 @@
 enum line_styles {
     /* Just print the text. Do not clear or draw line decorations */
     STYLE_NONE       = 0x00,
-    /* Line background filled with the bg color (or backdrop if present) */ 
+    /* Line background filled with the bg color (or backdrop if present) */
     STYLE_DEFAULT    = 0x01,
     /* Like STYLE_DFEAULT except that text and background color will be swapped */
     STYLE_INVERT     = 0x02,
@@ -115,7 +115,7 @@ struct line_desc {
  * intermixed with tags. Inline text will be truncated after MAX_PATH+31 bytes.
  * If you have a longer inline string use a separate buffer and pass that via $t,
  * which does not suffer from this truncation.
- * 
+ *
  * Text can appear anywhere, before or after (or both) tags. However, when the
  * line can scroll, only the last piece of text (whether inline or via $t) can
  * scroll. This is due to a scroll_engine limitation.

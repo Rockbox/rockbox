@@ -39,4 +39,3 @@ bool bookmark_exists(void);
 bool bookmark_is_bookmarkable_state(void);
 
 #endif /* __BOOKMARK_H__ */
-

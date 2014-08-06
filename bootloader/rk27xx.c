@@ -153,9 +153,9 @@ void main(void)
         error(EDISK, ret, true);
 
     loadbuffer = (unsigned char*)DRAM_ORIG; /* DRAM */
-   
+
     if (boot == rb)
-        snprintf(filename,sizeof(filename), BOOTDIR "/%s", BOOTFILE);    
+        snprintf(filename,sizeof(filename), BOOTDIR "/%s", BOOTFILE);
     else if (boot == of)
         snprintf(filename,sizeof(filename), BOOTDIR "/%s", "BASE.RKW");
 
@@ -170,7 +170,7 @@ void main(void)
 
         /* if we boot rockbox we shutdown on error
          * if we boot OF we fall back to rkusb mode on error
-         */        
+         */
         if (boot == rb)
         {
             power_off();
@@ -213,7 +213,7 @@ void main(void)
         lcd_update();
 
         enter_rkusb();
-    }   
+    }
 
     /* hang */
     while(1);

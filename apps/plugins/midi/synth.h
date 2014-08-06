@@ -28,4 +28,3 @@ static inline struct Event * getEvent(struct Track * tr, int evNum)
 {
     return tr->dataBlock + (evNum*sizeof(struct Event));
 }
-

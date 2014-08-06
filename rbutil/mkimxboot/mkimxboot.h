@@ -103,4 +103,3 @@ enum imx_error_t extract_firmware(const char *infile,
 }
 #endif
 #endif
-

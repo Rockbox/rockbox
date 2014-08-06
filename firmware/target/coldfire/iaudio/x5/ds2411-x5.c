@@ -122,7 +122,7 @@ static unsigned char ds2411_read_byte(void)
             data |= 1 << i;
 
         /* Wait out the remainder of Tslot */
-        DELAY(60);   
+        DELAY(60);
     }
     while (++i < 8);
 
@@ -143,7 +143,7 @@ int ds2411_read_id(struct ds2411_id *id)
     /* Initialize delay factor based on loop time: 3*(uS-1) + 3 */
     ds2411_delay_factor = MAX(cpu_frequency / (1000000*3), 1);
 
-    /* Init GPIO 1 wire bus for bit banging with a pullup resistor where 
+    /* Init GPIO 1 wire bus for bit banging with a pullup resistor where
      * it is set low as output and switched between input and output mode.
      * Required for bidirectional communication on a single wire.
      */

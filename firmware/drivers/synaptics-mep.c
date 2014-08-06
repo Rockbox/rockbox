@@ -348,7 +348,7 @@ static int syn_read_data(char *data, int data_len)
     syn_wait_clk_change(HI);
 
     /* 4. If the guest is still driving DATA low, the transfer is commited
-          to occur. Otherwise, the transfer is aborted. In either case, 
+          to occur. Otherwise, the transfer is aborted. In either case,
           the host raises ACK. */
     if (syn_get_data() == HI)
     {
@@ -439,7 +439,7 @@ static int syn_read_data(char *data, int data_len)
     /* 7d. The host lowers ACK */
     syn_set_ack(LO);
 
-    /* 7e. The host waits for the guest to raise CLK indicating 
+    /* 7e. The host waits for the guest to raise CLK indicating
            that the stop bit is ready */
     syn_wait_clk_change(HI);
 

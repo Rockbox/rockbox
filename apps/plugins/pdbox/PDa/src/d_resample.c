@@ -41,7 +41,7 @@ t_int *upsampling_perform_0(t_int *w)
 
   int n=parent*up;
   t_sample *dummy = out;
-  
+
   while(n--)*out++=0;
 
   n = parent;
@@ -65,7 +65,7 @@ t_int *upsampling_perform_hold(t_int *w)
   int n=parent;
   t_sample *dum_out = out;
   t_sample *dum_in  = in;
-  
+
   while (i--) {
     n = parent;
     out = dum_out+i;
@@ -90,7 +90,7 @@ t_int *upsampling_perform_linear(t_int *w)
   t_sample *fp;
   t_sample a=*x->buffer, b=*in;
 
-  
+
   for (n=0; n<length; n++) {
     t_float findex = (t_float)(n+1)/up;
     int     index  = findex;
@@ -134,9 +134,9 @@ void resample_free(t_resample *x)
 /* dsp-adding */
 
 void resample_dsp(t_resample *x,
-		  t_sample* in,  int insize,
-		  t_sample* out, int outsize,
-		  int method)
+                  t_sample* in,  int insize,
+                  t_sample* out, int outsize,
+                  int method)
 {
   if (insize == outsize){
     bug("nothing to be done");
@@ -165,9 +165,9 @@ void resample_dsp(t_resample *x,
       break;
     case 2:
       if (x->bufsize != 1) {
-	t_freebytes(x->buffer, x->bufsize*sizeof(*x->buffer));
-	x->bufsize = 1;
-	x->buffer = t_getbytes(x->bufsize*sizeof(*x->buffer));
+        t_freebytes(x->buffer, x->bufsize*sizeof(*x->buffer));
+        x->bufsize = 1;
+        x->buffer = t_getbytes(x->bufsize*sizeof(*x->buffer));
       }
       dsp_add(upsampling_perform_linear, 5, x, in, out, outsize/insize, insize);
       break;
@@ -178,8 +178,8 @@ void resample_dsp(t_resample *x,
 }
 
 void resamplefrom_dsp(t_resample *x,
-			   t_sample *in,
-			   int insize, int outsize, int method)
+                           t_sample *in,
+                           int insize, int outsize, int method)
 {
   if (insize==outsize) {
    t_freebytes(x->s_vec, x->s_n * sizeof(*x->s_vec));
@@ -201,8 +201,8 @@ void resamplefrom_dsp(t_resample *x,
 }
 
 void resampleto_dsp(t_resample *x,
-			 t_sample *out, 
-			 int insize, int outsize, int method)
+                         t_sample *out,
+                         int insize, int outsize, int method)
 {
   if (insize==outsize) {
     if (x->s_n)t_freebytes(x->s_vec, x->s_n * sizeof(*x->s_vec));
@@ -223,4 +223,3 @@ void resampleto_dsp(t_resample *x,
 
   return;
 }
-

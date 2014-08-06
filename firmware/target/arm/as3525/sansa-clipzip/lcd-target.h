@@ -21,4 +21,3 @@
 
 /* target-specific OLED brightness function */
 void oled_brightness(int brightness);
-

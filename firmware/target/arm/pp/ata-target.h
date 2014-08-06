@@ -65,7 +65,7 @@
 /* Maximum multi-word DMA mode supported by the controller */
 #define ATA_MAX_MWDMA 2
 
-#ifndef BOOTLOADER    
+#ifndef BOOTLOADER
 /* The PP5020 supports UDMA 4, but it needs cpu boosting and only
  * improves performance by ~10% with a stock disk.
  * UDMA 2 is stable at 30 Mhz.

@@ -43,52 +43,52 @@
 
 int16_t swap16(int16_t n)
 {
-	return (    ((n & 0xff) << 8) |
-				((n & 0xff00) >> 8) );
+        return (    ((n & 0xff) << 8) |
+                                ((n & 0xff00) >> 8) );
 }
 
 uint16_t swapu16(uint16_t n)
 {
-	return (    ((n & 0xffU) << 8) |
-				((n & 0xff00U) >> 8) );
+        return (    ((n & 0xffU) << 8) |
+                                ((n & 0xff00U) >> 8) );
 }
 
 int32_t swap32(int32_t n)
 {
-	return (    ((n & 0xff) << 24) |
-				((n & 0xff00) << 8) |
-				((n & 0xff0000) >> 8) |
-				((n & 0xff000000) >> 24) );
+        return (    ((n & 0xff) << 24) |
+                                ((n & 0xff00) << 8) |
+                                ((n & 0xff0000) >> 8) |
+                                ((n & 0xff000000) >> 24) );
 }
 
 uint32_t swapu32(uint32_t n)
 {
-	return (    ((n & 0xffU) << 24) |
-				((n & 0xff00U) << 8) |
-				((n & 0xff0000U) >> 8) |
-				((n & 0xff000000U) >> 24) );
+        return (    ((n & 0xffU) << 24) |
+                                ((n & 0xff00U) << 8) |
+                                ((n & 0xff0000U) >> 8) |
+                                ((n & 0xff000000U) >> 24) );
 }
 
 int64_t swap64(int64_t n)
 {
-	return (    ((n & (((int64_t) 0xff)      )) << 56) |
-				((n & (((int64_t) 0xff) <<  8)) << 40) |
-				((n & (((int64_t) 0xff) << 16)) << 24) |
-				((n & (((int64_t) 0xff) << 24)) <<  8) |
-				((n & (((int64_t) 0xff) << 32)) >>  8) |
-				((n & (((int64_t) 0xff) << 40)) >> 24) |
-				((n & (((int64_t) 0xff) << 48)) >> 40) |
-				((n & (((int64_t) 0xff) << 56)) >> 56) );
+        return (    ((n & (((int64_t) 0xff)      )) << 56) |
+                                ((n & (((int64_t) 0xff) <<  8)) << 40) |
+                                ((n & (((int64_t) 0xff) << 16)) << 24) |
+                                ((n & (((int64_t) 0xff) << 24)) <<  8) |
+                                ((n & (((int64_t) 0xff) << 32)) >>  8) |
+                                ((n & (((int64_t) 0xff) << 40)) >> 24) |
+                                ((n & (((int64_t) 0xff) << 48)) >> 40) |
+                                ((n & (((int64_t) 0xff) << 56)) >> 56) );
 }
 
 uint64_t swapu64(uint64_t n)
 {
-	return (    ((n & (((uint64_t) 0xff)      )) << 56) |
-				((n & (((uint64_t) 0xff) <<  8)) << 40) |
-				((n & (((uint64_t) 0xff) << 16)) << 24) |
-				((n & (((uint64_t) 0xff) << 24)) <<  8) |
-				((n & (((uint64_t) 0xff) << 32)) >>  8) |
-				((n & (((uint64_t) 0xff) << 40)) >> 24) |
-				((n & (((uint64_t) 0xff) << 48)) >> 40) |
-				((n & (((uint64_t) 0xff) << 56)) >> 56) );
+        return (    ((n & (((uint64_t) 0xff)      )) << 56) |
+                                ((n & (((uint64_t) 0xff) <<  8)) << 40) |
+                                ((n & (((uint64_t) 0xff) << 16)) << 24) |
+                                ((n & (((uint64_t) 0xff) << 24)) <<  8) |
+                                ((n & (((uint64_t) 0xff) << 32)) >>  8) |
+                                ((n & (((uint64_t) 0xff) << 40)) >> 24) |
+                                ((n & (((uint64_t) 0xff) << 48)) >> 40) |
+                                ((n & (((uint64_t) 0xff) << 56)) >> 56) );
 }

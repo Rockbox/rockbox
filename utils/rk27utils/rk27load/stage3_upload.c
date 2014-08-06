@@ -90,4 +90,3 @@ int upload_stage3_code(libusb_device_handle *hdev, char *fn_stage3)
     fprintf(stderr,"done (sent %d blocks)\n", i);
     return 0;
 }
-

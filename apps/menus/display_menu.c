@@ -56,7 +56,7 @@ static int filterfirstkeypress_callback(int action,const struct menu_item_ex *th
             set_remote_backlight_filter_keypress(
                                 global_settings.remote_bl_filter_first_keypress);
 #endif
-        
+
             break;
     }
     return action;
@@ -87,11 +87,11 @@ static int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
 #ifdef HAVE_BACKLIGHT
 MENUITEM_SETTING(backlight_timeout, &global_settings.backlight_timeout, NULL);
 #if CONFIG_CHARGING
-MENUITEM_SETTING(backlight_timeout_plugged, 
+MENUITEM_SETTING(backlight_timeout_plugged,
                 &global_settings.backlight_timeout_plugged, NULL);
 #endif
 #ifdef HAS_BUTTON_HOLD
-MENUITEM_SETTING(backlight_on_button_hold, 
+MENUITEM_SETTING(backlight_on_button_hold,
                 &global_settings.backlight_on_button_hold, NULL);
 #endif
 MENUITEM_SETTING(caption_backlight, &global_settings.caption_backlight, NULL);
@@ -100,8 +100,8 @@ MENUITEM_SETTING(caption_backlight, &global_settings.caption_backlight, NULL);
 MENUITEM_SETTING(backlight_fade_in, &global_settings.backlight_fade_in, NULL);
 MENUITEM_SETTING(backlight_fade_out, &global_settings.backlight_fade_out, NULL);
 #endif
-MENUITEM_SETTING(bl_filter_first_keypress, 
-                    &global_settings.bl_filter_first_keypress, 
+MENUITEM_SETTING(bl_filter_first_keypress,
+                    &global_settings.bl_filter_first_keypress,
                     filterfirstkeypress_callback);
 #ifdef HAVE_LCD_SLEEP_SETTING
 MENUITEM_SETTING(lcd_sleep_after_backlight_off,
@@ -166,31 +166,31 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 /********************************/
 /* Remote LCD settings menu     */
 #ifdef HAVE_REMOTE_LCD
-MENUITEM_SETTING(remote_backlight_timeout, 
+MENUITEM_SETTING(remote_backlight_timeout,
                     &global_settings.remote_backlight_timeout, NULL);
 
 #if CONFIG_CHARGING
-MENUITEM_SETTING(remote_backlight_timeout_plugged, 
+MENUITEM_SETTING(remote_backlight_timeout_plugged,
                     &global_settings.remote_backlight_timeout_plugged, NULL);
 #endif
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
-MENUITEM_SETTING(remote_backlight_on_button_hold, 
+MENUITEM_SETTING(remote_backlight_on_button_hold,
                     &global_settings.remote_backlight_on_button_hold, NULL);
 #endif
 
-MENUITEM_SETTING(remote_caption_backlight, 
+MENUITEM_SETTING(remote_caption_backlight,
                     &global_settings.remote_caption_backlight, NULL);
-MENUITEM_SETTING(remote_bl_filter_first_keypress, 
-                    &global_settings.remote_bl_filter_first_keypress, 
+MENUITEM_SETTING(remote_bl_filter_first_keypress,
+                    &global_settings.remote_bl_filter_first_keypress,
                     filterfirstkeypress_callback);
-MENUITEM_SETTING(remote_contrast, 
+MENUITEM_SETTING(remote_contrast,
                     &global_settings.remote_contrast, NULL);
-MENUITEM_SETTING(remote_invert, 
+MENUITEM_SETTING(remote_invert,
                     &global_settings.remote_invert, NULL);
-   
-#ifdef HAVE_LCD_FLIP                    
-MENUITEM_SETTING(remote_flip_display, 
+
+#ifdef HAVE_LCD_FLIP
+MENUITEM_SETTING(remote_flip_display,
                     &global_settings.remote_flip_display, flipdisplay_callback);
 #endif
 
@@ -206,7 +206,7 @@ static int ticking_callback(int action,const struct menu_item_ex *this_item)
     }
     return action;
 }
-MENUITEM_SETTING(remote_reduce_ticking, 
+MENUITEM_SETTING(remote_reduce_ticking,
                     &global_settings.remote_reduce_ticking, ticking_callback);
 #endif
 
@@ -221,7 +221,7 @@ MAKE_MENU(lcd_remote_settings, ID2P(LANG_LCD_REMOTE_MENU),
 #endif
             &remote_caption_backlight, &remote_bl_filter_first_keypress,
             &remote_contrast, &remote_invert
-            
+
 #ifdef HAVE_LCD_FLIP
             ,&remote_flip_display
 #endif
@@ -318,15 +318,15 @@ static int peakmeter_callback(int action,const struct menu_item_ex *this_item)
     }
     return action;
 }
-MENUITEM_SETTING(peak_meter_hold, 
+MENUITEM_SETTING(peak_meter_hold,
                  &global_settings.peak_meter_hold, peakmeter_callback);
-MENUITEM_SETTING(peak_meter_clip_hold, 
+MENUITEM_SETTING(peak_meter_clip_hold,
                  &global_settings.peak_meter_clip_hold, peakmeter_callback);
 #ifdef HAVE_RECORDING
 MENUITEM_SETTING(peak_meter_clipcounter,
                  &global_settings.peak_meter_clipcounter, NULL);
 #endif
-MENUITEM_SETTING(peak_meter_release, 
+MENUITEM_SETTING(peak_meter_release,
                  &global_settings.peak_meter_release, peakmeter_callback);
 /**
  * Menu to select wether the scale of the meter
@@ -355,7 +355,7 @@ static int peak_meter_scale(void) {
             /* we only store -dBfs */
             global_settings.peak_meter_min = -peak_meter_get_min() / 100;
             global_settings.peak_meter_max = -peak_meter_get_max() / 100;
-            
+
             /* limit the returned value to the allowed range */
             if(global_settings.peak_meter_min > 89)
                 global_settings.peak_meter_min = 89;
@@ -471,12 +471,12 @@ MENUITEM_FUNCTION(histogram, 0,
 
 MENUITEM_FUNCTION(peak_meter_scale_item, 0, ID2P(LANG_PM_SCALE),
                     peak_meter_scale, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(peak_meter_min_item, 0, ID2P(LANG_PM_MIN), 
+MENUITEM_FUNCTION(peak_meter_min_item, 0, ID2P(LANG_PM_MIN),
                     peak_meter_min, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(peak_meter_max_item, 0, ID2P(LANG_PM_MAX), 
+MENUITEM_FUNCTION(peak_meter_max_item, 0, ID2P(LANG_PM_MAX),
                     peak_meter_max, NULL, NULL, Icon_NOICON);
 MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
-          &peak_meter_release, &peak_meter_hold, 
+          &peak_meter_release, &peak_meter_hold,
           &peak_meter_clip_hold,
 #ifdef HAVE_RECORDING
           &peak_meter_clipcounter,

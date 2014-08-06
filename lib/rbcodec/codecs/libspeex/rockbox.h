@@ -116,4 +116,3 @@ static inline void _speex_putc(int ch, void *file)
 #endif /* ROCKBOX_VOICE_ENCODER */
 
 #endif
-

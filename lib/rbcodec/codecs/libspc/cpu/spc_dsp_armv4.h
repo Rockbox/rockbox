@@ -40,6 +40,6 @@ struct echo_filter
      * |LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|LL|RR|...
      * |--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--| */
     /* copy of echo FIR constants as int32_t, for faster access */
-    int32_t coeff [VOICE_COUNT]; 
+    int32_t coeff [VOICE_COUNT];
 };
 #endif /* SPC_NOECHO */

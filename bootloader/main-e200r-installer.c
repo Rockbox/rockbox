@@ -11,7 +11,7 @@
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -50,7 +50,7 @@
 static unsigned char knownBytes[] = {0x00, 0x24, 0x07, 0xe1};
 static unsigned char changedBytes[] = {0xc0, 0x46, 0xc0, 0x46 };
 
-/* 
+/*
    CRC32s of sector 63 from E200 bootloaders - so we can tell users if they're
    trying to use e200rpatcher with a vanilla e200.
 
@@ -75,7 +75,7 @@ static bool is_e200(uint32_t crc)
 {
     int i;
 
-    for (i = 0 ; i < NUM_E200_CRCS ; i++) 
+    for (i = 0 ; i < NUM_E200_CRCS ; i++)
     {
         if (crc == e200_crcs[i])
             return true;
@@ -101,7 +101,7 @@ void* main(void)
     button_init();
     i2c_init();
     _backlight_on();
-    
+
     lcd_set_foreground(LCD_WHITE);
     lcd_set_background(LCD_BLACK);
     lcd_clear_display();
@@ -149,8 +149,8 @@ void* main(void)
         /* Bootloader already patched */
         printf("Already unlocked");
         printf("Proceed to Step 2");
-    } else if ((crc32 == KNOWN_CRC32) && 
-                !memcmp(&sector[HACK_OFFSET], knownBytes, 
+    } else if ((crc32 == KNOWN_CRC32) &&
+                !memcmp(&sector[HACK_OFFSET], knownBytes,
                 sizeof(knownBytes)/sizeof(*knownBytes)))
     {
         /* E200R bootloader detected - patch it */

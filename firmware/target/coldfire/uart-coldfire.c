@@ -57,4 +57,3 @@ void tx_writec(unsigned char c)
 {
     UTB0 = c;
 }
-

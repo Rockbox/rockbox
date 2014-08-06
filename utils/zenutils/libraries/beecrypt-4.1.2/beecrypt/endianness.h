@@ -32,15 +32,15 @@
 
 static inline int16_t _swap16(int16_t n)
 {
-	return (    ((n & 0xff) << 8) |
-				((n & 0xff00) >> 8) );
+        return (    ((n & 0xff) << 8) |
+                                ((n & 0xff00) >> 8) );
 }
 # define swap16(n) _swap16(n)
 
 static inline uint16_t _swapu16(uint16_t n)
 {
-	return (    ((n & 0xffU) << 8) |
-				((n & 0xff00U) >> 8) );
+        return (    ((n & 0xffU) << 8) |
+                                ((n & 0xff00U) >> 8) );
 }
 # define swapu16(n) _swap16(n)
 
@@ -51,19 +51,19 @@ static inline uint16_t _swapu16(uint16_t n)
 
 static inline int32_t _swap32(int32_t n)
 {
-	return (    ((n & 0xff) << 24) |
-				((n & 0xff00) << 8) |
-				((n & 0xff0000) >> 8) |
-				((n & 0xff000000) >> 24) );
+        return (    ((n & 0xff) << 24) |
+                                ((n & 0xff00) << 8) |
+                                ((n & 0xff0000) >> 8) |
+                                ((n & 0xff000000) >> 24) );
 }
 #  define swap32(n) _swap32(n)
 
 static inline uint32_t _swapu32(uint32_t n)
 {
-	return (    ((n & 0xffU) << 24) |
-				((n & 0xff00U) << 8) |
-				((n & 0xff0000U) >> 8) |
-				((n & 0xff000000U) >> 24) );
+        return (    ((n & 0xffU) << 24) |
+                                ((n & 0xff00U) << 8) |
+                                ((n & 0xff0000U) >> 8) |
+                                ((n & 0xff000000U) >> 24) );
 }
 #  define swapu32(n) _swapu32(n)
 
@@ -76,27 +76,27 @@ static inline uint32_t _swapu32(uint32_t n)
 
 static inline int64_t _swap64(int64_t n)
 {
-	return (    ((n & ((int64_t) 0xff)      ) << 56) |
-				((n & ((int64_t) 0xff) <<  8) << 40) |
-				((n & ((int64_t) 0xff) << 16) << 24) |
-				((n & ((int64_t) 0xff) << 24) <<  8) |
-				((n & ((int64_t) 0xff) << 32) >>  8) |
-				((n & ((int64_t) 0xff) << 40) >> 24) |
-				((n & ((int64_t) 0xff) << 48) >> 40) |
-				((n & ((int64_t) 0xff) << 56) >> 56) );
+        return (    ((n & ((int64_t) 0xff)      ) << 56) |
+                                ((n & ((int64_t) 0xff) <<  8) << 40) |
+                                ((n & ((int64_t) 0xff) << 16) << 24) |
+                                ((n & ((int64_t) 0xff) << 24) <<  8) |
+                                ((n & ((int64_t) 0xff) << 32) >>  8) |
+                                ((n & ((int64_t) 0xff) << 40) >> 24) |
+                                ((n & ((int64_t) 0xff) << 48) >> 40) |
+                                ((n & ((int64_t) 0xff) << 56) >> 56) );
 }
 #  define swap64(n) _swap64(n)
 
 static inline uint64_t _swapu64(uint64_t n)
 {
-	return (    ((n & ((uint64_t) 0xff)      ) << 56) |
-				((n & ((uint64_t) 0xff) <<  8) << 40) |
-				((n & ((uint64_t) 0xff) << 16) << 24) |
-				((n & ((uint64_t) 0xff) << 24) <<  8) |
-				((n & ((uint64_t) 0xff) << 32) >>  8) |
-				((n & ((uint64_t) 0xff) << 40) >> 24) |
-				((n & ((uint64_t) 0xff) << 48) >> 40) |
-				((n & ((uint64_t) 0xff) << 56) >> 56) );
+        return (    ((n & ((uint64_t) 0xff)      ) << 56) |
+                                ((n & ((uint64_t) 0xff) <<  8) << 40) |
+                                ((n & ((uint64_t) 0xff) << 16) << 24) |
+                                ((n & ((uint64_t) 0xff) << 24) <<  8) |
+                                ((n & ((uint64_t) 0xff) << 32) >>  8) |
+                                ((n & ((uint64_t) 0xff) << 40) >> 24) |
+                                ((n & ((uint64_t) 0xff) << 48) >> 40) |
+                                ((n & ((uint64_t) 0xff) << 56) >> 56) );
 }
 #  define swapu64(n) _swapu64(n)
 

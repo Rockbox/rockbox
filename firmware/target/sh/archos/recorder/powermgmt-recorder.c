@@ -472,7 +472,7 @@ void charging_algorithm_step(void)
 
     case TOPOFF:
     case TRICKLE:
-        topoff_trickle_step();        
+        topoff_trickle_step();
         break;
 
     case DISCHARGING:

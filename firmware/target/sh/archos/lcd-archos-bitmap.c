@@ -86,9 +86,9 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
         lcd_write_command(LCD_SET_REVERSE_DISPLAY);
-    else 
+    else
         lcd_write_command(LCD_SET_NORMAL_DISPLAY);
 }
 
@@ -96,16 +96,16 @@ void lcd_set_invert_display(bool yesno)
 void lcd_set_flip(bool yesno)
 {
 #ifdef HAVE_DISPLAY_FLIPPED
-    if (!yesno) 
+    if (!yesno)
 #else
-    if (yesno) 
+    if (yesno)
 #endif
     {
         lcd_write_command(LCD_SET_SEGMENT_REMAP);
         lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
         xoffset = 132 - LCD_WIDTH; /* 132 colums minus the 112 we have */
     }
-    else 
+    else
     {
         lcd_write_command(LCD_SET_SEGMENT_REMAP | 0x01);
         lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);

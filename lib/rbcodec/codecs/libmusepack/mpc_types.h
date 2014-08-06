@@ -88,9 +88,9 @@ typedef struct mpc_quantizer {
 
 /// Libmpcdec error codes
 typedef enum mpc_status {
-	// Success.
+        // Success.
     MPC_STATUS_OK        =  0,
-	// Generic failure (I/O error or invalid file).
+        // Generic failure (I/O error or invalid file).
     MPC_STATUS_FAIL      = -1
 } mpc_status;
 

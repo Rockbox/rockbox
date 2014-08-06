@@ -51,7 +51,7 @@ void scrollwheel(unsigned int wheel_value)
     /* We only post every 4th action, as this matches better with the physical
      * clicks of the wheel */
     static int        counter = 0;
-    /* Read wheel 
+    /* Read wheel
      * Bits 13 and 14 of DBOP_DIN change as follows (Gray Code):
      * Clockwise rotation   00 -> 01 -> 11 -> 10 -> 00
      * Counter-clockwise    00 -> 10 -> 11 -> 01 -> 00
@@ -62,7 +62,7 @@ void scrollwheel(unsigned int wheel_value)
     static const unsigned char wheel_tbl[2][4] =
     {
         { 2, 0, 3, 1 }, /* Clockwise rotation */
-        { 1, 3, 0, 2 }, /* Counter-clockwise  */ 
+        { 1, 3, 0, 2 }, /* Counter-clockwise  */
     };
 
     if(button_hold())
@@ -103,7 +103,7 @@ void scrollwheel(unsigned int wheel_value)
         accel += ACCEL_INCREMENT;
 
         /* the wheel is more reliable if we don't send every change,
-         * every WHEEL_COUNTER_DIVth is basically one "physical click" 
+         * every WHEEL_COUNTER_DIVth is basically one "physical click"
          * which should make up 1 item in lists */
         if (++counter >= WHEEL_COUNTER_DIV && queue_empty(&button_queue))
         {

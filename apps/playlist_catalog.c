@@ -160,7 +160,7 @@ restart:
 
         if (view)
         {
-            
+
             if (!bookmark_autoload(selected_playlist))
             {
                 if (playlist_viewer_ex(selected_playlist) == PLAYLIST_VIEWER_CANCEL)
@@ -183,7 +183,7 @@ restart:
 static void display_insert_count(int count)
 {
     static long talked_tick = 0;
-    if(global_settings.talk_menu && count && 
+    if(global_settings.talk_menu && count &&
         (talked_tick == 0 || TIME_AFTER(current_tick, talked_tick+5*HZ)))
     {
         talked_tick = current_tick;
@@ -349,7 +349,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
             strcat(playlist, "8");
         else if(len <= 5 || strcasecmp(&playlist[len-5], ".m3u8"))
             strcat(playlist, ".m3u8");
-        
+
         if (kbd_input(playlist, MAX_PATH))
             return false;
     }

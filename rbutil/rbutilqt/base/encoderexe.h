@@ -52,4 +52,3 @@ class EncoderExe : public EncoderBase
         QString m_EncTemplate;
 };
 #endif
-

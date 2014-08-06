@@ -214,7 +214,7 @@ void sim_lcd_ex_update_rect(int x_start, int y_start, int width, int height)
     if (lcd_ex_getpixel) {
         sdl_update_rect(lcd_surface, x_start, y_start, width, height,
                         LCD_WIDTH, LCD_HEIGHT, lcd_ex_getpixel);
-        sdl_gui_update(lcd_surface, x_start, y_start, width, 
+        sdl_gui_update(lcd_surface, x_start, y_start, width,
                        height + LCD_SPLIT_LINES, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
                        background ? UI_LCD_POSX : 0,
                        background ? UI_LCD_POSY : 0);

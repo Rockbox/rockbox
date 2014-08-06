@@ -35,7 +35,7 @@ static bool wsg3_get_voice(struct wsg3_voice *voice, int index)
     int base = 5*index;
     const unsigned char *regs = wsg3.sound_regs;
     unsigned x;
-    
+
     x = regs[0x15 + base] & 0x0F;
 
     if (x == 0)
@@ -52,7 +52,7 @@ static bool wsg3_get_voice(struct wsg3_voice *voice, int index)
     if (index == 0)
     {
         /* The first voice has an extra 4-bit of data */
-        x |= regs[0x10 + base] & 0x0F; 
+        x |= regs[0x10 + base] & 0x0F;
     }
 
     if (x == 0)

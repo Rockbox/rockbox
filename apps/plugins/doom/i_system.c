@@ -69,7 +69,7 @@
 // returns time in 1/70th second tics
 //
 
-/* NOTE: 
+/* NOTE:
 
    The user timer is used to generate a 70Hz tick for Doom.  But it
    is unavailable for the greyscale targets (it's used by the greyscale

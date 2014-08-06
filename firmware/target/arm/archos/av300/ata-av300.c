@@ -12,7 +12,7 @@
  * Based on code from the ArchOpen project - http://www.archopen.org
  * Adapted for Rockbox in January 2007
  *
- * Original file: 
+ * Original file:
  *   lib/target/arch_AV3XX/ata.c
  *
  *   AvLo - linav project
@@ -32,7 +32,7 @@
 #include "system.h"
 #include "ata-driver.h"
 
-void ata_reset() 
+void ata_reset()
 {
     /* arch_ata_reset_HD(void) */
     cpld_set_port_2(CPLD_HD_RESET);

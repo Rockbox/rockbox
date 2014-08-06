@@ -56,7 +56,7 @@ void startpost(char *fmt, ...)
 
     va_end(ap);
     printf(fmt, arg[0], arg[1], arg[2], arg[3],
-    	arg[4], arg[5], arg[6], arg[7]);
+        arg[4], arg[5], arg[6], arg[7]);
 #else /* SIMULATOR */
     (void) fmt;
 #endif /* SIMULATOR */
@@ -65,11 +65,11 @@ void startpost(char *fmt, ...)
     t_int arg[8];
     int i;
     va_start(ap, fmt);
-    
+
     for (i = 0 ; i < 8; i++) arg[i] = va_arg(ap, t_int);
     va_end(ap);
     fprintf(stderr, fmt, arg[0], arg[1], arg[2], arg[3],
-    	arg[4], arg[5], arg[6], arg[7]);
+        arg[4], arg[5], arg[6], arg[7]);
 #endif /* ROCKBOX */
 }
 
@@ -91,9 +91,9 @@ void postatom(int argc, t_atom *argv)
     int i;
     for (i = 0; i < argc; i++)
     {
-    	char buf[80];
-    	atom_string(argv+i, buf, 80);
-    	poststring(buf);
+        char buf[80];
+        atom_string(argv+i, buf, 80);
+        poststring(buf);
     }
 }
 
@@ -182,8 +182,8 @@ void pd_error(void *object, char *fmt, ...)
     error_object = object;
     if (!saidit)
     {
-    	post("... you might be able to track this down from the Find menu.");
-    	saidit = 1;
+        post("... you might be able to track this down from the Find menu.");
+        saidit = 1;
     }
 #endif /* ROCKBOX */
 }
@@ -194,12 +194,12 @@ void glob_finderror(t_pd *dummy)
     (void) dummy;
 #endif /* ROCKBOX */
     if (!error_object)
-    	post("no findable error yet.");
+        post("no findable error yet.");
     else
     {
-    	post("last trackable error:");
-    	post("%s", error_string);
-    	canvas_finderror(error_object);
+        post("last trackable error:");
+        post("%s", error_string);
+        canvas_finderror(error_object);
     }
 }
 
@@ -228,12 +228,12 @@ void bug(char *fmt, ...)
     t_int arg[8];
     int i;
     va_start(ap, fmt);
-    
+
     for (i = 0 ; i < 8; i++) arg[i] = va_arg(ap, t_int);
     va_end(ap);
     fprintf(stderr, "Consistency check failed: ");
     fprintf(stderr, fmt, arg[0], arg[1], arg[2], arg[3],
-    	arg[4], arg[5], arg[6], arg[7]);
+        arg[4], arg[5], arg[6], arg[7]);
     putc('\n', stderr);
 #endif /* ROCKBOX */
 }
@@ -263,4 +263,3 @@ void sys_ouch(void)
     if (*errobject) error("%s: %s", errobject, errstring);
     else error("%s", errstring);
 }
-

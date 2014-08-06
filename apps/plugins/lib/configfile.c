@@ -56,7 +56,7 @@ int configfile_save(const char *filename, struct configdata *cfg,
 
     /* pre-allocate 10 bytes for INT */
     rb->fdprintf(fd, "file version: %10d\n", version);
-    
+
     for(i = 0;i < num_items;i++) {
         switch(cfg[i].type) {
             case TYPE_INT:
@@ -118,7 +118,7 @@ int configfile_load(const char *filename, struct configdata *cfg,
                 return -1;
             }
         }
-        
+
         for(i = 0;i < num_items;i++) {
             if(!rb->strcmp(cfg[i].name, name)) {
                 switch(cfg[i].type) {
@@ -149,7 +149,7 @@ int configfile_load(const char *filename, struct configdata *cfg,
             }
         }
     }
-    
+
     rb->close(fd);
     return 0;
 }
@@ -190,13 +190,13 @@ int configfile_update_entry(const char* filename, const char* name, int val)
     int found = 0;
     int line_len = 0;
     int pos = 0;
-    
+
     /* open the current config file */
     get_cfg_filename(path, MAX_PATH, filename);
     fd = rb->open(path, O_RDWR);
     if(fd < 0)
         return -1;
-    
+
     /* read in the current stored settings */
     while((line_len = rb->read_line(fd, buf, 256)) > 0)
     {
@@ -211,13 +211,13 @@ int configfile_update_entry(const char* filename, const char* name, int val)
         }
         pos += line_len;
     }
-    
+
     /* if (name/val) is a new entry just append to file */
     if (found == 0)
         /* pre-allocate 10 bytes for INT */
         rb->fdprintf(fd, "%s: %10d\n", name, val);
-    
+
     rb->close(fd);
-    
+
     return found;
 }

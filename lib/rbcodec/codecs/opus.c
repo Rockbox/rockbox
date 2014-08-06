@@ -171,7 +171,7 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
                     offset = ret;
                     continue;
                 }
-            } else if (ret == -3) 
+            } else if (ret == -3)
                 return(-3);
             else if (ret<=0)
                 break;
@@ -190,8 +190,8 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
 static int speex_seek_page_granule(int64_t pos, int64_t curpos,
                                    ogg_sync_state *oy, ogg_stream_state *os)
 {
-    /* TODO: Someone may want to try to implement seek to packet, 
-             instead of just to page (should be more accurate, not be any 
+    /* TODO: Someone may want to try to implement seek to packet,
+             instead of just to page (should be more accurate, not be any
              faster) */
 
     int64_t crofs;
@@ -208,7 +208,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
         /* if seeking for more that 10sec,
            headersize is known & more than 10kb is played,
            try to guess a place to seek from the number of
-           bytes playe for this position, this works best when 
+           bytes playe for this position, this works best when
            the bitrate is relativly constant.
          */
 
@@ -279,7 +279,7 @@ static int speex_seek_page_granule(int64_t pos, int64_t curpos,
 
             lastgranule = ogg_page_granulepos(&og);
 
-            if ( ((lastgranule - (avgpagelen/4)) < pos && ( lastgranule + 
+            if ( ((lastgranule - (avgpagelen/4)) < pos && ( lastgranule +
                   avgpagelen + (avgpagelen / 4)) > pos) ||
                  lastgranule > pos) {
 
@@ -376,7 +376,7 @@ enum codec_status codec_run(void)
                     seek_target -= skip;
 
                     LOGF("Opus seek page:%lld,%lld,%ld\n",
-    		            seek_target, page_granule, (long)param);
+                            seek_target, page_granule, (long)param);
                     speex_seek_page_granule(seek_target, page_granule, &oy, &os);
                 }
 
@@ -415,7 +415,7 @@ enum codec_status codec_run(void)
             while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
                 if (op.packetno == 0){
                     /* identification header */
-                
+
                     if (opus_header_parse(op.packet, op.bytes, &header) == 0) {
                         LOGF("Could not parse header");
                         goto done;
@@ -488,4 +488,3 @@ done:
     ogg_malloc_destroy();
     return error;
 }
-

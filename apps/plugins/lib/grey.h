@@ -138,7 +138,7 @@ void grey_ub_scroll_down(int count);
 #ifdef SIMULATOR                /* Standard PC gamma */
 #define _GREY_GAMMA ((200<<8)/100)
 #else   /* Target LCDs have a smaller contrast range */
-#define _GREY_GAMMA ((180<<8)/100)  
+#define _GREY_GAMMA ((180<<8)/100)
 #endif
 
 /* flag definitions */

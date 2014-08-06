@@ -18,14 +18,14 @@
  * KIND, either express or implied.
  *
  * A tool to generate the Rockbox "voicefont", a collection of all the UI
- * strings. 
- * 
+ * strings.
+ *
  * Details at http://www.rockbox.org/twiki/bin/view/Main/VoiceBuilding
  *
  ****************************************************************************/
 
-#include "voicefont.h" 
- 
+#include "voicefont.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -44,7 +44,7 @@
 /* bitswap audio bytes, LSB becomes MSB and vice versa */
 int BitswapAudio (unsigned char* pDest, unsigned char* pSrc, size_t len)
 {
-    static const unsigned char Lookup[256] = 
+    static const unsigned char Lookup[256] =
     {
         0x00,0x80,0x40,0xC0,0x20,0xA0,0x60,0xE0,0x10,0x90,0x50,0xD0,0x30,0xB0,0x70,0xF0,
         0x08,0x88,0x48,0xC8,0x28,0xA8,0x68,0xE8,0x18,0x98,0x58,0xD8,0x38,0xB8,0x78,0xF8,
@@ -212,7 +212,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
 
     return 0;
 
-    
+
 }
 #ifndef RBUTIL
 int main (int argc, char** argv)
@@ -228,7 +228,7 @@ int main (int argc, char** argv)
         printf("voicefont voicefontids.txt 2 voice\\ voicefont.bin\n");
         return -1;
     }
-    
+
     ids = fopen(argv[1], "r");
     if (ids == NULL)
     {
@@ -242,9 +242,8 @@ int main (int argc, char** argv)
         printf("Error opening output file %s\n", argv[4]);
         return -2;
     }
-    
+
     voicefont(ids, atoi(argv[2]),argv[3],output, 400);
     return 0;
 }
 #endif
-

@@ -84,9 +84,9 @@ static void copy_ay_fields( struct file_t const* file, struct mp3entry* id3, int
             id3->length = get_be16( track_info + 4 ) * (1000 / 50); /* frames to msec */
         else id3->length = 120 * 1000;
     }
-    
+
     if ( id3->length <= 0 )
-        id3->length = 120 * 1000;  /* 2 minutes */ 
+        id3->length = 120 * 1000;  /* 2 minutes */
 
     /* If meta info was found in the m3u skip next step */
     if (id3->title && id3->title[0]) return;
@@ -102,7 +102,7 @@ static void copy_ay_fields( struct file_t const* file, struct mp3entry* id3, int
     /* Author */
     tmp = (char *) get_data( file, file->header->author, 1 );
     if (tmp) id3->artist = tmp;
-    
+
     /* Comment */
     tmp = (char *) get_data( file, file->header->comment, 1 );
     if (tmp) id3->comment = tmp;
@@ -120,7 +120,7 @@ static bool parse_ay_header(int fd, struct mp3entry *id3)
         return false;
 
     buf [ID3V2_BUF_SIZE] = '\0';
-    if ( parse_header( buf, read_bytes, &file ) ) 
+    if ( parse_header( buf, read_bytes, &file ) )
         return false;
 
     copy_ay_fields( &file, id3, 0 );
@@ -139,7 +139,7 @@ bool get_ay_metadata(int fd, struct mp3entry* id3)
 
     id3->bitrate = 706;
     id3->frequency = 44100;
-  
+
     /* Make sure this is a ZX Ay file */
     if (memcmp( ay_type, "ZXAYEMUL", 8 ) != 0)
         return false;

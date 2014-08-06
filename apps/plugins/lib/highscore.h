@@ -27,7 +27,7 @@ struct highscore
 {
     char name[32];
     int score;
-    int level; 
+    int level;
 };
 
 /* Saves the scores to a file
@@ -83,9 +83,9 @@ bool highscore_would_update(int score, struct highscore *scores,
                             int num_scores);
 
 /* Displays a nice highscore table. In general the font is FONT_UI, but if
- * the highscore table doesn't fit on the the display size it uses 
+ * the highscore table doesn't fit on the the display size it uses
  * FONT_SYSFIXED.
- * 
+ *
  *  - position : highlight position line
  *  - scores   : the array of existing scores
  *  - num_scores: number of elements in 'scores'

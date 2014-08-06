@@ -31,7 +31,7 @@
 #include "powermgmt.h"
 #include "adc.h"
 #include "hwcompat.h"    /* ROM_VERSION */
-#include "crc32.h"      
+#include "crc32.h"
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 #   define DEBUG_CANCEL  BUTTON_OFF

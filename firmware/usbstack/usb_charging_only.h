@@ -30,4 +30,3 @@ int usb_charging_only_get_config_descriptor(unsigned char *dest,int max_packet_s
 bool usb_charging_only_control_request(struct usb_ctrlrequest* req);
 
 #endif
-

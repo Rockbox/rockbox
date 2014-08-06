@@ -53,7 +53,7 @@ static void display_clocks(void)
             __cpm_get_plln() + 2,
             od[__cpm_get_pllod()]
         );
-    lcd_putsf(0, line++, "C:H:M:P :   %d:%d:%d:%d", 
+    lcd_putsf(0, line++, "C:H:M:P :   %d:%d:%d:%d",
             div[__cpm_get_cdiv()],
             div[__cpm_get_hdiv()],
             div[__cpm_get_mdiv()],
@@ -85,12 +85,12 @@ static void display_enabled_clocks(void)
     unsigned long lcr = REG_CPM_LCR;
     unsigned long clkgr = REG_CPM_CLKGR;
 
-    lcd_putsf(0, line++, "Low Power Mode : %s", 
+    lcd_putsf(0, line++, "Low Power Mode : %s",
             ((lcr & CPM_LCR_LPM_MASK) == CPM_LCR_LPM_IDLE) ?
             "IDLE" : (((lcr & CPM_LCR_LPM_MASK) == CPM_LCR_LPM_SLEEP) ? "SLEEP" : "HIBERNATE")
           );
 
-    lcd_putsf(0, line++, "Doze Mode      : %s", 
+    lcd_putsf(0, line++, "Doze Mode      : %s",
             (lcr & CPM_LCR_DOZE_ON) ? "ON" : "OFF");
     if (lcr & CPM_LCR_DOZE_ON)
         lcd_putsf(0, line++, "     duty      : %d", (int)((lcr & CPM_LCR_DOZE_DUTY_MASK) >> CPM_LCR_DOZE_DUTY_BIT));
@@ -164,4 +164,3 @@ bool dbg_hw_info(void)
     }
     return true;
 }
-

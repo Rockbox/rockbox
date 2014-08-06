@@ -47,7 +47,7 @@ void _backlight_hw_on(void)
     if (_backlight_on)
         return;
 #endif
-   
+
     _backlight_set_brightness(_brightness);
     _backlight_on = true;
 
@@ -77,7 +77,7 @@ void _backlight_set_brightness(int val)
         or_l((1<<28),&GPIO_OUT);
         and_l(~(1<<28),&GPIO_OUT);
     }
-    
+
     or_l((1<<28),&GPIO_OUT);
 
     _brightness = val;

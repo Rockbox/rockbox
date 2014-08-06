@@ -30,18 +30,18 @@
 
 #if 1 /* ANSI colors */
 
-#	define color(a) printf("%s",a)
-char OFF[] 		= { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
+#       define color(a) printf("%s",a)
+char OFF[]              = { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
 
-char GREY[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
-char RED[] 		= { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
-char GREEN[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
-char YELLOW[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
-char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
+char GREY[]     = { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
+char RED[]              = { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
+char GREEN[]    = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
+char YELLOW[]   = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
+char BLUE[]     = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 #else
-	/* disable colors */
-#	define color(a)
+        /* disable colors */
+#       define color(a)
 #endif
 
 #define bug(...) do { fprintf(stderr,"ERROR: "__VA_ARGS__); exit(1); } while(0)
@@ -60,7 +60,7 @@ char BLUE[] 	= { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 /* globals */
 
-size_t sz;	/* file size */
+size_t sz;      /* file size */
 uint8_t *buf; /* file content */
 
 
@@ -71,209 +71,209 @@ uint32_t unknown_4_2,unknown_4_3;
 
 static void *xmalloc(size_t s) /* malloc helper */
 {
-	void * r = malloc(s);
-	if(!r) bugp("malloc");
-	return r;
+        void * r = malloc(s);
+        if(!r) bugp("malloc");
+        return r;
 }
 
 /* checksums the firmware (the firmware header contains the verification) */
 static uint32_t do_checksum(void)
 {
-	uint32_t c = 0;
+        uint32_t c = 0;
 
-	size_t i = 0x400/4;
-	while(i<(0x400+firmware_sz)/4)
-		c += ((uint32_t*)buf)[i++];
+        size_t i = 0x400/4;
+        while(i<(0x400+firmware_sz)/4)
+                c += ((uint32_t*)buf)[i++];
 
-	return c;
+        return c;
 }
 
 /* verify the firmware header */
 static void check(void)
 {
-	uint32_t checksum2;
+        uint32_t checksum2;
 
-	assert(sz >= 0x400 && sz % 0x200 == 0);
+        assert(sz >= 0x400 && sz % 0x200 == 0);
 
-	size_t i;
-	checksum2 = 0;
-	for(i=0;i<sz/4-1;i++)
-		checksum2 += ((uint32_t*)buf)[i];
+        size_t i;
+        checksum2 = 0;
+        for(i=0;i<sz/4-1;i++)
+                checksum2 += ((uint32_t*)buf)[i];
 
-	uint32_t last_word = get32le(sz - 4);
+        uint32_t last_word = get32le(sz - 4);
 
-	switch(last_word)
-	{
-		case 0:				/* no whole file checksum */
-			break;
-		case 0xefbeadde:	/* no whole file checksum */
-			break;
-		default:			/* verify whole file checksum */
-			assert(last_word == checksum2);
-	}
+        switch(last_word)
+        {
+                case 0:                         /* no whole file checksum */
+                        break;
+                case 0xefbeadde:        /* no whole file checksum */
+                        break;
+                default:                        /* verify whole file checksum */
+                        assert(last_word == checksum2);
+        }
 
-	idx = get32le(0);
-	unsigned int shift = (get32le(4) == 0x0000f000) ? 4 : 0;
-	checksum = get32le(4 + shift);
-	bs_multiplier = get32le(8 + shift);
-	firmware_sz = get32le(0xc + shift);
-	assert(bs_multiplier << 9 == PAD_TO_BOUNDARY(firmware_sz)); /* 0x200 * bs_multiplier */
+        idx = get32le(0);
+        unsigned int shift = (get32le(4) == 0x0000f000) ? 4 : 0;
+        checksum = get32le(4 + shift);
+        bs_multiplier = get32le(8 + shift);
+        firmware_sz = get32le(0xc + shift);
+        assert(bs_multiplier << 9 == PAD_TO_BOUNDARY(firmware_sz)); /* 0x200 * bs_multiplier */
 
-	unknown_4_1 = get32le(0x10 + shift);
-	unknown_1 = get16le(0x14 + shift);
-	unknown_2 = get16le(0x16 + shift);
-	unknown_4_2 = get32le(0x18 + shift);
-	unknown_4_3 = get32le(0x1c + shift);
+        unknown_4_1 = get32le(0x10 + shift);
+        unknown_1 = get16le(0x14 + shift);
+        unknown_2 = get16le(0x16 + shift);
+        unknown_4_2 = get32le(0x18 + shift);
+        unknown_4_3 = get32le(0x1c + shift);
 
-	color(GREEN);
-	printf("4 Index                  %d\n",idx);
-	assert(idx == 0);
-	color(GREEN);
-	printf("4 Firmware Checksum      %x",checksum);
-	checksum2=do_checksum();
-	color(GREEN);
-	printf(" (%x)\n",checksum2);
-	assert(checksum == checksum2);
-	color(GREEN);
-	printf("4 Block Size Multiplier  %x\n",bs_multiplier);
-	color(GREEN);
-	printf("4 Firmware block size    %x (%d)\n",firmware_sz,firmware_sz);
+        color(GREEN);
+        printf("4 Index                  %d\n",idx);
+        assert(idx == 0);
+        color(GREEN);
+        printf("4 Firmware Checksum      %x",checksum);
+        checksum2=do_checksum();
+        color(GREEN);
+        printf(" (%x)\n",checksum2);
+        assert(checksum == checksum2);
+        color(GREEN);
+        printf("4 Block Size Multiplier  %x\n",bs_multiplier);
+        color(GREEN);
+        printf("4 Firmware block size    %x (%d)\n",firmware_sz,firmware_sz);
 
-	color(GREEN);
-	printf("4 Unknown (should be 3)  %x\n",unknown_4_1);
-	assert(unknown_4_1 == 3);
+        color(GREEN);
+        printf("4 Unknown (should be 3)  %x\n",unknown_4_1);
+        assert(unknown_4_1 == 3);
 
-	/* variable */
-	color(GREEN);
-	printf("1 Unknown                %x\n",unknown_1);
+        /* variable */
+        color(GREEN);
+        printf("1 Unknown                %x\n",unknown_1);
 
-	color(GREEN);
-	printf("2 Unknown (should be 0)  %x\n",unknown_2);
-	assert(unknown_2 == 0);
+        color(GREEN);
+        printf("2 Unknown (should be 0)  %x\n",unknown_2);
+        assert(unknown_2 == 0);
 
-	color(GREEN);
-	printf("4 Unknown (should be 40) %x\n",unknown_4_2);
-	assert(unknown_4_2 == 0x40 );
+        color(GREEN);
+        printf("4 Unknown (should be 40) %x\n",unknown_4_2);
+        assert(unknown_4_2 == 0x40 );
 
-	color(GREEN);
-	printf("4 Unknown (should be 1)  %x\n",unknown_4_3);
-	assert(unknown_4_3 == 1);
+        color(GREEN);
+        printf("4 Unknown (should be 1)  %x\n",unknown_4_3);
+        assert(unknown_4_3 == 1);
 
-	/* the 2nd block is identical, except that the 1st byte has been incremented */
-	assert(buf[0x0]==0&&buf[0x200]==1);
-	assert(!memcmp(&buf[1],&buf[0x201],0x1FF - shift));
+        /* the 2nd block is identical, except that the 1st byte has been incremented */
+        assert(buf[0x0]==0&&buf[0x200]==1);
+        assert(!memcmp(&buf[1],&buf[0x201],0x1FF - shift));
 }
 
 typedef enum
 {
 #if 0
-	FW_HEADER,
-	FW,
+        FW_HEADER,
+        FW,
 #endif
-	LIB,
-	PAD,
-	HEADER,
-	UNKNOWN
+        LIB,
+        PAD,
+        HEADER,
+        UNKNOWN
 } type;
 
 static unsigned int n_libs = 0, n_pads_ff = 0, n_pads_deadbeef = 0, n_unkn = 0, n_headers = 0;
 
 static void show_lib(size_t off)
 {
-	/* first word: char* */
-	uint32_t start = get32le(off+4);
-	uint32_t stop = get32le(off+8);
+        /* first word: char* */
+        uint32_t start = get32le(off+4);
+        uint32_t stop = get32le(off+8);
 
-	uint32_t size = get32le(off+0xc);
+        uint32_t size = get32le(off+0xc);
 
 #if 0 /* library block hacking */
-	/* assert(stop > start); */
+        /* assert(stop > start); */
 
-	/* assert(stop - start == size); */
+        /* assert(stop - start == size); */
 
-	if(stop - start != size)
-	{
-		color(RED);
-		printf("STOP - START != SIZE || 0x%.8x - 0x%.8x == 0x%.8x != 0x%.8x\n",
-				stop, start, stop - start, size);
-	}
+        if(stop - start != size)
+        {
+                color(RED);
+                printf("STOP - START != SIZE || 0x%.8x - 0x%.8x == 0x%.8x != 0x%.8x\n",
+                                stop, start, stop - start, size);
+        }
 
-	color(RED);
-	printf("0x%.8x -> 0x%.8x SIZE 0x%.6x\n", start, stop, size);
+        color(RED);
+        printf("0x%.8x -> 0x%.8x SIZE 0x%.6x\n", start, stop, size);
 
-	uint32_t first = get32le(off+0x10); /* ? */
-	printf("? = 0x%.8x , ",first);
+        uint32_t first = get32le(off+0x10); /* ? */
+        printf("? = 0x%.8x , ",first);
 #endif
 
-	uint32_t funcs = get32le(off+0x14); /* nmbr of functions */
-	color(YELLOW);
-	printf("\t%d funcs",funcs);
+        uint32_t funcs = get32le(off+0x14); /* nmbr of functions */
+        color(YELLOW);
+        printf("\t%d funcs",funcs);
 
-	unsigned int i;
-	for(i=0;i<funcs;i++)
-	{
-		uint32_t fptr = get32le(off+0x18+i*4);
-		if(!fptr)
-		{
-			assert(funcs==1); /* if 1 function is exported, it's empty */
-		}
-		else
-		{
-			assert(fptr - start < 0x0000ffff);
-			/* printf("0x%.4x ",fptr); */
-		}
-	}
+        unsigned int i;
+        for(i=0;i<funcs;i++)
+        {
+                uint32_t fptr = get32le(off+0x18+i*4);
+                if(!fptr)
+                {
+                        assert(funcs==1); /* if 1 function is exported, it's empty */
+                }
+                else
+                {
+                        assert(fptr - start < 0x0000ffff);
+                        /* printf("0x%.4x ",fptr); */
+                }
+        }
 
-	color(BLUE);
-	printf("\tBASE 0x%.8x (code + 0x%x) END 0x%.8x : SIZE 0x%.8x\n",start, 0x18 + i*4, stop, stop - start);
+        color(BLUE);
+        printf("\tBASE 0x%.8x (code + 0x%x) END 0x%.8x : SIZE 0x%.8x\n",start, 0x18 + i*4, stop, stop - start);
 
-	char name[12+sizeof(".bin")];
-	memcpy(name,&buf[off+get32le(off)],12);
-	strcpy(&name[12], ".bin");
+        char name[12+sizeof(".bin")];
+        memcpy(name,&buf[off+get32le(off)],12);
+        strcpy(&name[12], ".bin");
 
-	FILE *out = fopen(name,"w");
-	if(!out)
-		bug("library block");
+        FILE *out = fopen(name,"w");
+        if(!out)
+                bug("library block");
 
-	if(fwrite(&buf[off],size,1,out)!=1)
-		bug();
+        if(fwrite(&buf[off],size,1,out)!=1)
+                bug();
 
-	fclose(out);
+        fclose(out);
 }
 
 static int unknown = 0;
 static int padding = 0;
 static void print_block(size_t off, type t)
 {
-	/* reset counters if needed */
-	if(t != UNKNOWN && unknown)
-	{	/* print only the number of following blocks */
-		color(GREY);
-		printf("%d unknown blocks (0x%.6x bytes)\n",unknown,unknown*0x200);
-		unknown = 0;
-	}
-	else if(t != PAD && padding)
-	{	/* same */
-		color(GREY);
-		printf("%d padding blocks (0x%.6x bytes)\n",padding,padding*0x200);
-		padding = 0;
-	}
+        /* reset counters if needed */
+        if(t != UNKNOWN && unknown)
+        {       /* print only the number of following blocks */
+                color(GREY);
+                printf("%d unknown blocks (0x%.6x bytes)\n",unknown,unknown*0x200);
+                unknown = 0;
+        }
+        else if(t != PAD && padding)
+        {       /* same */
+                color(GREY);
+                printf("%d padding blocks (0x%.6x bytes)\n",padding,padding*0x200);
+                padding = 0;
+        }
 
-	if(t != UNKNOWN && t != PAD) /* for other block types, always print the offset */
-	{
-		color(GREEN);
-		printf("0x%.6x\t", (unsigned int)off);
-		color(OFF);
-	}
+        if(t != UNKNOWN && t != PAD) /* for other block types, always print the offset */
+        {
+                color(GREEN);
+                printf("0x%.6x\t", (unsigned int)off);
+                color(OFF);
+        }
 
-	switch(t)
-	{
-		size_t s;
-		FILE *f;
-		char filename[8+4]; /* unknown\0 , 10K max */
+        switch(t)
+        {
+                size_t s;
+                FILE *f;
+                char filename[8+4]; /* unknown\0 , 10K max */
 #if 0
-		case FW_HEADER:
-			printf("firmware header	0x%x\n",off);
+                case FW_HEADER:
+                        printf("firmware header	0x%x\n",off);
 			break;
 		case FW:
 			printf("firmware block	0x%x\n",off);
@@ -363,7 +363,7 @@ static size_t verify_block(size_t off)
 	else if(off+offset_str+12<sz) /* XXX: we should check that the address at which
 									* the string is located is included in this
 									* library block's size, but we only know the
-									* block's size after we confirmed that this is 
+									* block's size after we confirmed that this is
 									* a library block (by looking at the 11 chars
 									* ASCII string). */
 	{

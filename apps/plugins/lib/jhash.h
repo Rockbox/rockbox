@@ -64,4 +64,3 @@ hashs2() -- hash an array of bytes into two 32-bit values
 */
 void hashs2(const void *key, size_t length, uint32_t *pc, uint32_t *pb);
 #endif
-

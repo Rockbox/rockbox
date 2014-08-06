@@ -69,4 +69,3 @@ void qt1106_wait(void);
 unsigned int qt1106_io(unsigned int input);
 
 #endif
-

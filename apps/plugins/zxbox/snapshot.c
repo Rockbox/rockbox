@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -64,7 +64,7 @@ static int snread(void *ptr, int size, SNFILE *snfp)
         return (int) rb->read( snfp->fd,ptr, (size_t) size);
 
   dest = (byte *) ptr;
-  for(i = 0; snfp->len && size; i++, snfp->len--, size--) 
+  for(i = 0; snfp->len && size; i++, snfp->len--, size--)
     *dest++ = *snfp->at++;
 
   return i;
@@ -279,7 +279,7 @@ static void snsh_z80_save(int fd)
   rb->write(fd,&z80,z80_145_size);
 
   if(!to_comp)
-      rb->write(fd,z80_proc.mem + 0x4000,0xC000);    
+      rb->write(fd,z80_proc.mem + 0x4000,0xC000);
   else {
     memptr = 0x4000;
     savfd = fd;
@@ -307,7 +307,7 @@ static void snsh_sna_save(int fd)
   sna.spl = SPL;
 
   saves1 = z80_proc.mem[SP];
-  saves2 = z80_proc.mem[(dbyte)(SP+1)]; 
+  saves2 = z80_proc.mem[(dbyte)(SP+1)];
   if(SP >= 0x4000) {
     z80_proc.mem[SP] = PCL;
     if(SP < 0xFFFF) z80_proc.mem[SP+1] = PCH;
@@ -324,7 +324,7 @@ static void snsh_sna_save(int fd)
     z80_proc.mem[SP] = saves1;
     if(SP < 0xFFFF) z80_proc.mem[SP+1] = saves2;
   }
-  
+
   SP += 2;
 }
 
@@ -333,16 +333,16 @@ static void snsh_sna_save(int fd)
   c = sngetc(fp);             \
   if(c == EOF) break;       \
   if(datalen > 0) datalen--; \
-} 
+}
 
 
-static void read_compressed_data(SNFILE *fp, byte *start, unsigned size, 
+static void read_compressed_data(SNFILE *fp, byte *start, unsigned size,
                  long datalen)
 {
   int j;
   int times, last_ed, ch;
   byte *p, *end;
-  
+
   p = start;
   end = start+size;
   last_ed = 0;
@@ -374,7 +374,7 @@ static void read_compressed_data(SNFILE *fp, byte *start, unsigned size,
   }
 
   if(datalen < 0) {
-    if(sngetc(fp) != 0 || sngetc(fp) != 0xED || 
+    if(sngetc(fp) != 0 || sngetc(fp) != 0xED ||
        sngetc(fp) != 0xED || sngetc(fp) != 0)
       put_msg("Warning: Illegal ending of snapshot");
   }
@@ -417,9 +417,9 @@ static int read_z80_page(SNFILE *fp)
     put_msg("Error, End Of File in page header");
     return 0;
   }
-  
+
   datalen = (page.blklen_h << 8) | page.blklen_l;
-  
+
   validpage = 1;
   switch(page.page_num) {
   case 4:
@@ -433,7 +433,7 @@ static int read_z80_page(SNFILE *fp)
   case 8:
     pos = 0x4000;
     break;
-    
+
   default:
     validpage = 0;
     while(datalen) {
@@ -444,8 +444,8 @@ static int read_z80_page(SNFILE *fp)
       datalen--;
     }
   }
-  
-  if(validpage) read_compressed_data(fp, z80_proc.mem+pos, 0x4000, 
+
+  if(validpage) read_compressed_data(fp, z80_proc.mem+pos, 0x4000,
                      (long) datalen);
   return 1;
 }
@@ -469,7 +469,7 @@ static void snsh_z80_load(SNFILE *fp)
     rem = ext_size - z80_201_ext_size;
     for(; rem; rem--) sngetc(fp);
 
-    if(z80_2.hardware >= 3 && (ext_size == z80_201_ext_size || 
+    if(z80_2.hardware >= 3 && (ext_size == z80_201_ext_size ||
                 z80_2.hardware >= 4)) {
       put_msg("Can't load non 48k snapshot");
       return;
@@ -486,12 +486,12 @@ static void snsh_z80_load(SNFILE *fp)
   }
   else {
     if(z80.data == 0xFF) z80.data = 1;
-    if(z80.data & 0x20) 
+    if(z80.data & 0x20)
       read_compressed_data(fp, z80_proc.mem + 0x4000, 0xC000, -1);
     else {
-      if(snread(z80_proc.mem + 0x4000, 0xC000, fp) != 0xC000) 
+      if(snread(z80_proc.mem + 0x4000, 0xC000, fp) != 0xC000)
     put_msg("Warning: Snapshot file too short (z80)");
-      else if(sngetc(fp) != EOF) 
+      else if(sngetc(fp) != EOF)
     put_msg("Warning: Snapshot file too long");
     }
 
@@ -548,9 +548,9 @@ static void snsh_sna_load(SNFILE *fp)
 
   if(!read_header(&sna, sna_size, fp)) return;
 
-  if(snread(z80_proc.mem+0x4000, 0xC000, fp) != 0xC000) 
+  if(snread(z80_proc.mem+0x4000, 0xC000, fp) != 0xC000)
     put_msg("Warning: Snapshot file too short (sna)");
-  else if(sngetc(fp) != EOF) 
+  else if(sngetc(fp) != EOF)
     put_msg("Warning: Snapshot file too long");
 
   LOAD_NORMAL_REGS(sna);
@@ -573,7 +573,7 @@ static void snsh_sna_load(SNFILE *fp)
 
   z80_proc.iff1 = z80_proc.iff2 = sna.iff2 ? 1 : 0;
   z80_proc.it_mode = sna.im & 0x03;
-  
+
   z80_proc.haltstate = 0;
 
   sp_init_screen_mark();
@@ -590,7 +590,7 @@ static void save_snapshot_file_type(char *name, int type)
         return;
       }
   }
-  
+
   if(type == SN_SNA) snsh_sna_save(snsh);
   else if(type == SN_Z80) snsh_z80_save(snsh);
 
@@ -651,7 +651,7 @@ void load_snapshot_file_type(char *name, int type)
 #endif
     return;
   }
-  
+
   snfil.isfile = 1;
   snfil.fd = snsh;
 
@@ -664,11 +664,11 @@ void load_snapshot_file_type(char *name, int type)
 void snsh_z80_load_intern(byte *p, unsigned len)
 {
   SNFILE snfil;
-  
+
   snfil.isfile = 0;
   snfil.at = p;
   snfil.len = len;
-  
+
   snsh_z80_load(&snfil);
 }
 
@@ -681,7 +681,7 @@ void load_quick_snapshot(void)
     return;
   }
   else
-	  rb->close ( qsnap );
+          rb->close ( qsnap );
   load_snapshot_file_type(quick_snap_file, SN_Z80);
 }
 
@@ -697,4 +697,3 @@ void load_snapshot(void)
 
   load_snapshot_file_type(name, -1);
 }
-

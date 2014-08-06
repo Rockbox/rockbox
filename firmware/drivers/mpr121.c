@@ -17,7 +17,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/ 
+ ****************************************************************************/
 
 /** Driver for the Freescale MPR121 Capacitive Proximity Sensor */
 #include "system.h"
@@ -309,7 +309,7 @@ int mpr121_set_config(struct mpr121_config_t *conf)
         if(ELE_GPIO_EN(conf->ele[i].gpio))
             ctl |= REG_GPIO_EN__ENx(i);
     safe_write(REG_GPIO_EN, ctl);
-    
+
     return 0;
 }
 

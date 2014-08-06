@@ -206,4 +206,3 @@ int rects_move_right(void)
     /* add left region */
     return rects_add(0, 0, LCD_SHIFT_X, LCD_HEIGHT);
 }
-

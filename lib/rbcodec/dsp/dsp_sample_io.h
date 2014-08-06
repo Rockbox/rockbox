@@ -44,7 +44,7 @@ struct sample_io_data
 {
     int outcount;                 /* 00h: Output count */
     struct sample_format format;  /* Format for next dsp_process call */
-    int sample_depth;             /* Codec-specified sample depth */           
+    int sample_depth;             /* Codec-specified sample depth */
     int stereo_mode;              /* Codec-specified channel format */
     sample_input_fn_type input_samples; /* Initial input function */
     struct dsp_buffer sample_buf; /* Buffer descriptor for converted samples */

@@ -114,7 +114,7 @@ hybrid_filter (fltst *fs, int *in) {
 
     /*
      * Rockbox speciffic
-     *     in order to make speed up, memshl() is executed at the rate once every 16 times. 
+     *     in order to make speed up, memshl() is executed at the rate once every 16 times.
      */
     if (++fs->index == 16)
     {

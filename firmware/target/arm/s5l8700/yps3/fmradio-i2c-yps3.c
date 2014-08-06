@@ -43,4 +43,3 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
     return i2c_read(address, -1, count, buf);
 }
-

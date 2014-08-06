@@ -31,7 +31,7 @@
 /* The M3 ADC is hooked exclusively to the secondary I²C bus, and requires
  * very slow transfers (I²C clock <= 16kHz). So we start one 4-byte read
  * transfer each tick, and handle it via an ISR. At 11MHz, one transfer
- * takes too long to be started every tick, but it seems we have to live 
+ * takes too long to be started every tick, but it seems we have to live
  * with that. */
 
 static unsigned char adc_data[NUM_ADC_CHANNELS] IBSS_ATTR;
@@ -51,7 +51,7 @@ void IIC2(void) __attribute__((interrupt_handler));
 void IIC2(void)
 {
     static int bytenum = 0;
-    
+
     MBSR2 &= ~IIF;            /* Clear interrupt flag */
 
     if (MBSR2 & IAL)          /* Arbitration lost - shouldn't never happen */
@@ -77,7 +77,7 @@ void IIC2(void)
           case 2:
             MBCR2 |= TXAK;    /* Don't ACK the last byte */
             break;
-            
+
           case 3:
             MBCR2 &= ~MSTA;   /* STOP before reading the last value */
             data_ready = true; /* Simplification - the last byte is a dummy. */
@@ -103,7 +103,7 @@ void adc_init(void)
     or_l(  0x04000000, &INTPRI8); /* INT62 - Priority 4 */
 
     tick_add_task(adc_tick);
-    
+
     while (!data_ready)
         sleep(1);             /* Ensure valid readings when adc_init returns */
 }

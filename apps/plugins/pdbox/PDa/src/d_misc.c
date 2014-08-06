@@ -35,19 +35,19 @@ static t_int *print_perform(t_int *w)
     int n = (int)(w[3]);
     if (x->x_count)
     {
-    	post("%s:", x->x_sym->s_name);
-    	if (n == 1) post("%8g", in[0]);
-    	else if (n == 2) post("%8g %8g", in[0], in[1]);
-    	else if (n == 4) post("%8g %8g %8g %8g",
-    	    in[0], in[1], in[2], in[3]);
-    	else while (n > 0)
-    	{
-    	    post("%-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g",
-    	    	in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7]);
-    	    n -= 8;
-    	    in += 8;
-    	}
-    	x->x_count--;
+        post("%s:", x->x_sym->s_name);
+        if (n == 1) post("%8g", in[0]);
+        else if (n == 2) post("%8g %8g", in[0], in[1]);
+        else if (n == 4) post("%8g %8g %8g %8g",
+            in[0], in[1], in[2], in[3]);
+        else while (n > 0)
+        {
+            post("%-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g",
+                in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7]);
+            n -= 8;
+            in += 8;
+        }
+        x->x_count--;
     }
     return (w+4);
 }
@@ -83,7 +83,7 @@ static
 void print_setup(void)
 {
     print_class = class_new(gensym("print~"), (t_newmethod)print_new, 0,
-    	sizeof(t_print), 0, A_DEFSYM, 0);
+        sizeof(t_print), 0, A_DEFSYM, 0);
     CLASS_MAINSIGNALIN(print_class, t_print, x_f);
     class_addmethod(print_class, (t_method)print_dsp, gensym("dsp"), 0);
     class_addbang(print_class, print_bang);
@@ -92,7 +92,7 @@ void print_setup(void)
 
 /* ------------------------- scope~ -------------------------- */
 /* this has been replaced by arrays; to be deleted later */
- 
+
 #include "g_canvas.h"
 
 static t_class *scope_class;
@@ -115,8 +115,8 @@ static t_int *scope_perform(t_int *w)
     int n = (int)(w[3]), phase = x->x_phase;
     while (n--)
     {
-    	x->x_samps[phase] = *in++;
-    	phase = (phase + 1) & (SCOPESIZE-1);
+        x->x_samps[phase] = *in++;
+        phase = (phase + 1) & (SCOPESIZE-1);
     }
     x->x_phase = phase;
     return (w+4);
@@ -149,12 +149,12 @@ static void scope_bang(t_scope *x)
     sprintf(s, ".x%x.c create line ", (t_int)x->x_canvas);
     s += strlen(s);
     for (n = 0, phase = x->x_phase;
-    	n < SCOPESIZE; phase = ((phase+1) & (SCOPESIZE-1)), n++)
+        n < SCOPESIZE; phase = ((phase+1) & (SCOPESIZE-1)), n++)
     {
-    	sprintf(s, "%fc %fc ", X1 + (X2 - X1) * (float)n * (1./SCOPESIZE),
-    	    YC - 5 * x->x_samps[phase]);
-    	s += strlen(s);
-    	/* post("phase %d", phase); */
+        sprintf(s, "%fc %fc ", X1 + (X2 - X1) * (float)n * (1./SCOPESIZE),
+            YC - 5 * x->x_samps[phase]);
+        s += strlen(s);
+        /* post("phase %d", phase); */
     }
     sprintf(s, "-tags gumbo\n");
     sys_gui(hugebuf);
@@ -182,8 +182,8 @@ static void *scope_new(t_symbol *s)
 
 static void scope_setup(void)
 {
-    scope_class = class_new(gensym("scope~"), (t_newmethod)scope_new, 
-    	(t_method)scope_free, sizeof(t_scope), 0, A_DEFSYM, 0);
+    scope_class = class_new(gensym("scope~"), (t_newmethod)scope_new,
+        (t_method)scope_free, sizeof(t_scope), 0, A_DEFSYM, 0);
     class_addmethod(scope_class, nullfn, gensym("signal"), 0);
     class_addmethod(scope_class, (t_method)scope_dsp, gensym("dsp"), 0);
     class_addbang(scope_class, scope_bang);
@@ -238,9 +238,9 @@ static void *bang_tilde_new(t_symbol *s)
 static void bang_tilde_setup(void)
 {
     bang_tilde_class = class_new(gensym("bang~"), (t_newmethod)bang_tilde_new,
-    	(t_method)bang_tilde_free, sizeof(t_bang), 0, 0);
+        (t_method)bang_tilde_free, sizeof(t_bang), 0, 0);
     class_addmethod(bang_tilde_class, (t_method)bang_tilde_dsp,
-    	gensym("dsp"), 0);
+        gensym("dsp"), 0);
 }
 
 /* ------------------------ samplerate~~ -------------------------- */
@@ -270,7 +270,7 @@ static void *samplerate_tilde_new(t_symbol *s)
 static void samplerate_tilde_setup(void)
 {
     samplerate_tilde_class = class_new(gensym("samplerate~"),
-    	(t_newmethod)samplerate_tilde_new, 0, sizeof(t_samplerate), 0, 0);
+        (t_newmethod)samplerate_tilde_new, 0, sizeof(t_samplerate), 0, 0);
     class_addbang(samplerate_tilde_class, samplerate_tilde_bang);
 }
 
@@ -285,4 +285,3 @@ void d_misc_setup(void)
     bang_tilde_setup();
     samplerate_tilde_setup();
 }
-

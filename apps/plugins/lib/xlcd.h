@@ -51,4 +51,3 @@ void xlcd_scroll_down(int count);
 
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __XLCD_H__ */
-

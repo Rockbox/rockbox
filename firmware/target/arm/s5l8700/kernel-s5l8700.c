@@ -38,10 +38,10 @@ void INT_TIMERB(void)
 void tick_start(unsigned int interval_in_ms)
 {
     int cycles = 10 * interval_in_ms;
-    
+
     /* enable timer clock */
     PWRCON &= ~(1 << 4);
-    
+
     /* configure timer for 10 kHz */
     TBCMD = (1 << 1);   /* TB_CLR */
     TBPRE = 300 - 1;    /* prescaler for 48 MHz PCLK */
@@ -56,4 +56,3 @@ void tick_start(unsigned int interval_in_ms)
     /* enable timer interrupt */
     INTMSK |= INTMSK_TIMERB;
 }
-

@@ -46,4 +46,3 @@ int lowlatency_callback(int action, const struct menu_item_ex *this_item)
     return action;
 }
 #endif
-

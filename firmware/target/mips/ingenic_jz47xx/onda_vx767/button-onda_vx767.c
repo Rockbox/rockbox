@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "system.h"
 #include "jz4740.h"
@@ -42,7 +42,7 @@ bool button_hold(void)
 }
 
 void button_init_device(void)
-{  
+{
     __gpio_port_as_input(3, 30);
     __gpio_port_as_input(3, 21);
     __gpio_port_as_input(3, 27);
@@ -59,10 +59,10 @@ int button_read_device(void)
 {
     if(button_hold())
         return 0;
-    
+
     unsigned int key = ~(__gpio_get_port(3));
     int ret = 0;
-    
+
     if(key & BTN_MASK)
     {
         if(key & BTN_VOL_DOWN)

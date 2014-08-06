@@ -64,20 +64,20 @@ void touchpad_set_sensitivity(int level);
        1023              N/A               No                  No
 */
 
-/* 
+/*
     Notes:
 
     Buttons on the remote are translated into equivalent button presses just
     as if you were pressing them on the Gigabeat itself.
-    
-    We cannot tell if the hold is asserted on the remote. The Hold function on 
+
+    We cannot tell if the hold is asserted on the remote. The Hold function on
     the remote is to block the output of the buttons changing.
 
     Only one button can be sensed at a time. If another is pressed, the button
     with the lowest reading is dominant. So, if Rewind and Vol + are pressed
     at the same time, Rewind value is the one that is read.
 */
-    
+
 
 
 

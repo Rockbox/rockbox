@@ -18,7 +18,7 @@
 * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 * KIND, either express or implied.
 *
-****************************************************************************/ 
+****************************************************************************/
 
 #include "config.h"
 #include "system.h"
@@ -55,11 +55,11 @@ static inline void delay_cycles(volatile int delay)
 
 static void LCD_CTRL_setup(void)
 {
-    LCDCON1 = (LCD_CLKVAL << 8) | (LCD_MMODE << 7) | (LCD_PNRMODE << 5) | 
-                (LCD_BPPMODE << 1);  
-    LCDCON2 = (LCD_UPPER_MARGIN << 24) | ((LCD_HEIGHT - 1) << 14) | 
+    LCDCON1 = (LCD_CLKVAL << 8) | (LCD_MMODE << 7) | (LCD_PNRMODE << 5) |
+                (LCD_BPPMODE << 1);
+    LCDCON2 = (LCD_UPPER_MARGIN << 24) | ((LCD_HEIGHT - 1) << 14) |
                 (LCD_LOWER_MARGIN << 6) | (LCD_VSYNC_LEN << 0);
-    LCDCON3 = (LCD_LEFT_MARGIN << 19) | ((LCD_WIDTH  - 1) <<  8) | 
+    LCDCON3 = (LCD_LEFT_MARGIN << 19) | ((LCD_WIDTH  - 1) <<  8) |
                 (LCD_RIGHT_MARGIN << 0);
     LCDCON4 = (LCD_HSYNC_LEN << 0);
 
@@ -360,7 +360,7 @@ void lcd_set_invert_display(bool yesno)
     LCD_SPI_stop();
 }
 #else
-void lcd_set_flip(bool yesno) 
+void lcd_set_flip(bool yesno)
 {
     (void)yesno;
     /* Not implemented */
@@ -371,13 +371,13 @@ int lcd_default_contrast(void)
     return DEFAULT_CONTRAST_SETTING;
 }
 
-void lcd_set_contrast(int val) 
+void lcd_set_contrast(int val)
 {
     (void)val;
     /* Not implemented */
 }
 
-void lcd_set_invert_display(bool yesno) 
+void lcd_set_invert_display(bool yesno)
 {
     (void)yesno;
     /* Not implemented */

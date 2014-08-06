@@ -46,4 +46,3 @@ extern int errno;
 extern int PREFIX(fscanf)(int fd, const char *fmt, ...);
 
 #endif /* _ROCKLIBC_H_ */
-

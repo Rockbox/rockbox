@@ -355,7 +355,7 @@ void lcd_update(void)
 }
 
 /* Line write helper function. */
-extern void lcd_write_line(const fb_data *addr, 
+extern void lcd_write_line(const fb_data *addr,
                            int pixelcount,
                            const unsigned int lcd_base_addr);
 
@@ -430,7 +430,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     int pixels = width * height;
     fb_data* p = FBADDR(x,y);
     uint16_t* out = lcd_dblbuf[0];
-    
+
 #ifdef HAVE_LCD_SLEEP
     if (!lcd_active()) return;
 #endif
@@ -469,7 +469,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 {
     unsigned int z;
     unsigned char const * yuv_src[3];
-    
+
 #ifdef HAVE_LCD_SLEEP
     if (!lcd_active()) return;
 #endif

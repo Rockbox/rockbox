@@ -19,84 +19,84 @@ enum { info_offset = 0x20 };
 enum { header_size = 0x20 };
 struct header_t
 {
-	byte tag       [4];
-	byte vers;
-	byte first_track;
-	byte init_addr [2];
-	byte banks     [8];
-	byte data_tag  [4];
-	byte size      [4];
-	byte addr      [4];
-	byte unused    [4];
+        byte tag       [4];
+        byte vers;
+        byte first_track;
+        byte init_addr [2];
+        byte banks     [8];
+        byte data_tag  [4];
+        byte size      [4];
+        byte addr      [4];
+        byte unused    [4];
 };
 
 
 struct timer_t {
-	hes_time_t last_time;
-	int        count;
-	int        load;
-	int        raw_load;
-	byte       enabled;
-	byte       fired;
+        hes_time_t last_time;
+        int        count;
+        int        load;
+        int        raw_load;
+        byte       enabled;
+        byte       fired;
 };
-	
+
 struct vdp_t {
-	hes_time_t next_vbl;
-	byte       latch;
-	byte       control;
+        hes_time_t next_vbl;
+        byte       latch;
+        byte       control;
 };
-	
+
 struct irq_t {
-	hes_time_t timer;
-	hes_time_t vdp;
-	byte       disables;
+        hes_time_t timer;
+        hes_time_t vdp;
+        byte       disables;
 };
 
 struct Hes_Emu {
-	hes_time_t play_period;
-	int timer_base;
-	
-	struct timer_t timer;
-	struct vdp_t   vdp;
-	struct irq_t   irq;
-	
-	// Sound
-	int clock_rate_;
-	int sample_rate_;
-	unsigned buf_changed_count;
-	int voice_count_;
-	int const* voice_types_;
-	int mute_mask_;
-	int tempo_;
-	int gain_;
-	
-	// track-specific
-	byte track_count;
-	int current_track_;
-	
-	// Larger files at the end
-	// Header for currently loaded file
-	struct header_t header;
-	
-	// M3u Playlist
-	struct M3u_Playlist m3u;
-	
-	struct setup_t tfilter;
-	struct Track_Filter track_filter;
-	
-	// Hes Cpu
-	struct Hes_Cpu cpu;
-	struct Rom_Data rom;
-	
-	struct Hes_Apu apu;
-	struct Hes_Apu_Adpcm adpcm;
+        hes_time_t play_period;
+        int timer_base;
 
-	struct Multi_Buffer stereo_buf;
-	
-	// rom & ram
-	byte*   write_pages [page_count + 1]; // 0 if unmapped or I/O space	
-	byte    ram [page_size];
-	byte    sgx [3 * page_size + cpu_padding];
+        struct timer_t timer;
+        struct vdp_t   vdp;
+        struct irq_t   irq;
+
+        // Sound
+        int clock_rate_;
+        int sample_rate_;
+        unsigned buf_changed_count;
+        int voice_count_;
+        int const* voice_types_;
+        int mute_mask_;
+        int tempo_;
+        int gain_;
+
+        // track-specific
+        byte track_count;
+        int current_track_;
+
+        // Larger files at the end
+        // Header for currently loaded file
+        struct header_t header;
+
+        // M3u Playlist
+        struct M3u_Playlist m3u;
+
+        struct setup_t tfilter;
+        struct Track_Filter track_filter;
+
+        // Hes Cpu
+        struct Hes_Cpu cpu;
+        struct Rom_Data rom;
+
+        struct Hes_Apu apu;
+        struct Hes_Apu_Adpcm adpcm;
+
+        struct Multi_Buffer stereo_buf;
+
+        // rom & ram
+        byte*   write_pages [page_count + 1]; // 0 if unmapped or I/O space
+        byte    ram [page_size];
+        byte    sgx [3 * page_size + cpu_padding];
 };
 
 
@@ -137,25 +137,25 @@ void Track_set_fade( struct Hes_Emu* this, int start_msec, int length_msec );
 // True if a track has reached its end
 static inline bool Track_ended( struct Hes_Emu* this )
 {
-	return track_ended( &this->track_filter );
+        return track_ended( &this->track_filter );
 }
 
 // Disables automatic end-of-track detection and skipping of silence at beginning
 static inline void Track_ignore_silence( struct Hes_Emu* this, bool disable )
 {
-	this->track_filter.silence_ignored_ = disable;
+        this->track_filter.silence_ignored_ = disable;
 }
 
 // Get track length in milliseconds
 static inline int Track_get_length( struct Hes_Emu* this, int n )
 {
-	int length = 120 * 1000;  /* 2 minutes */ 
-	if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
-		struct entry_t* entry = &this->m3u.entries [n];
-		length = entry->length;
-	} 
-	
-	return length;
+        int length = 120 * 1000;  /* 2 minutes */
+        if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
+                struct entry_t* entry = &this->m3u.entries [n];
+                length = entry->length;
+        }
+
+        return length;
 }
 
 
@@ -175,8 +175,8 @@ void Sound_mute_voices( struct Hes_Emu* this, int mask );
 // Must be called before set_sample_rate().
 static inline void Sound_set_gain( struct Hes_Emu* this, int g )
 {
-	assert( !this->sample_rate_ ); // you must set gain before setting sample rate
-	this->gain_ = g;
+        assert( !this->sample_rate_ ); // you must set gain before setting sample rate
+        this->gain_ = g;
 }
 
 // Emulation (You shouldn't touch these)

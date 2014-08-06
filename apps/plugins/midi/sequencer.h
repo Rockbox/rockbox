@@ -28,4 +28,3 @@ void seekForward(int nSec);
 void seekBackward(int nSec);
 
 extern long tempo;
-

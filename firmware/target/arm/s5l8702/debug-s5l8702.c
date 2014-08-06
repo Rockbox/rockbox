@@ -71,11 +71,11 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("PMU:");
             for(i=0;i<7;i++)
             {
-                char *device[] = {"(unknown)", 
-                                  "(unknown)", 
-                                  "(unknown)", 
-                                  "(unknown)", 
-                                  "(unknown)", 
+                char *device[] = {"(unknown)",
+                                  "(unknown)",
+                                  "(unknown)",
+                                  "(unknown)",
+                                  "(unknown)",
                                   "(unknown)",
                                   "(unknown)"};
                 _DEBUG_PRINTF("ldo%d %s: %dmV %s",i,
@@ -106,7 +106,7 @@ bool dbg_hw_info(void)
         }
 
 
-        lcd_update(); 
+        lcd_update();
         switch(button_get_w_tmo(HZ/20))
         {
             case BUTTON_SCROLL_BACK:
@@ -141,7 +141,7 @@ bool dbg_ports(void)
     {
         lcd_clear_display();
         line = 0;
-        
+
         _DEBUG_PRINTF("GPIO  0: %08x",(unsigned int)PDAT(0));
         _DEBUG_PRINTF("GPIO  1: %08x",(unsigned int)PDAT(1));
         _DEBUG_PRINTF("GPIO  2: %08x",(unsigned int)PDAT(2));
@@ -167,4 +167,3 @@ bool dbg_ports(void)
     lcd_setfont(FONT_UI);
     return false;
 }
-

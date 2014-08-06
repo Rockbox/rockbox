@@ -47,5 +47,3 @@ class MsPackUtil : public ArchiveUtil
 
 };
 #endif
-
- 

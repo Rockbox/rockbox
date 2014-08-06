@@ -291,7 +291,7 @@ int buflib_free(struct buflib_context *context, int handle);
  *
  * To make space available in the front, everything is moved up.
  * It does _NOT_ call the move callbacks
- * 
+ *
  *
  * size: size in bytes to move the buffer up (take away). The actual
  * bytes moved is returned in this

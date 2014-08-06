@@ -406,7 +406,7 @@ void LCDFN(clear_viewport)(void)
         lastmode = current_vp->drawmode;
 
         /* Invert the INVERSEVID bit and set basic mode to SOLID */
-        current_vp->drawmode = (~lastmode & DRMODE_INVERSEVID) | 
+        current_vp->drawmode = (~lastmode & DRMODE_INVERSEVID) |
                                DRMODE_SOLID;
 
         LCDFN(fillrect)(0, 0, current_vp->width, current_vp->height);
@@ -420,7 +420,7 @@ void LCDFN(clear_viewport)(void)
 /* Set a single pixel */
 void LCDFN(drawpixel)(int x, int y)
 {
-    if (   ((unsigned)x < (unsigned)current_vp->width) 
+    if (   ((unsigned)x < (unsigned)current_vp->width)
         && ((unsigned)y < (unsigned)current_vp->height)
 #if defined(HAVE_VIEWPORT_CLIP)
         && ((unsigned)x < (unsigned)LCDM(WIDTH))
@@ -495,7 +495,7 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if (   ((unsigned)x < (unsigned)current_vp->width) 
+        if (   ((unsigned)x < (unsigned)current_vp->width)
             && ((unsigned)y < (unsigned)current_vp->height)
 #if defined(HAVE_VIEWPORT_CLIP)
             && ((unsigned)x < (unsigned)LCDM(WIDTH))
@@ -535,13 +535,13 @@ void LCDFN(hline)(int x1, int x2, int y)
         x1 = x2;
         x2 = x;
     }
-    
+
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned)current_vp->height) || (x1 >= current_vp->width)
         || (x2 < 0))
         return;
-        
+
     if (x1 < 0)
         x1 = 0;
     if (x2 >= current_vp->width)
@@ -557,8 +557,8 @@ void LCDFN(hline)(int x1, int x2, int y)
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned) LCDM(HEIGHT)) || (x1 >= LCDM(WIDTH))
         || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
@@ -609,14 +609,14 @@ void LCDFN(vline)(int x, int y1, int y2)
     y1 += current_vp->y;
     y2 += current_vp->y;
     x += current_vp->x;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if (( (unsigned) x >= (unsigned)LCDM(WIDTH)) || (y1 >= LCDM(HEIGHT)) 
+    if (( (unsigned) x >= (unsigned)LCDM(WIDTH)) || (y1 >= LCDM(HEIGHT))
         || (y2 < 0))
         return;
-    
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
@@ -672,7 +672,7 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width)
         || (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     if (x < 0)
     {
         width += x;
@@ -691,14 +691,14 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT)) 
+    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT))
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -818,14 +818,14 @@ void ICODE_ATTR LCDFN(mono_bitmap_part)(const unsigned char *src, int src_x,
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT)) 
+    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT))
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -990,10 +990,10 @@ void ICODE_ATTR LCDFN(bitmap_part)(const FBFN(data) *src, int src_x,
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT)) 
+    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT))
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {

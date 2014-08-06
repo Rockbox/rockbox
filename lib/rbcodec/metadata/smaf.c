@@ -110,7 +110,7 @@ static void set_length(struct mp3entry *id3, unsigned int ch, unsigned int baseb
 
 /* contents parse functions */
 
-/* Note: 
+/* Note:
  *  1) When the codepage is UTF-8 or UCS2, contents data do not start BOM.
  *  2) The byte order of contents data is big endian.
  */

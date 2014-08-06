@@ -21,7 +21,7 @@
 
  /* This stuff is for the wps engine only.. anyone caught using this outside
   * of apps/gui/wps_engine will be shot on site! */
- 
+
 #ifndef _WPS_ENGINE_INTERNALS_
 #define _WPS_ENGINE_INTERNALS_
 
@@ -115,9 +115,9 @@ struct progressbar {
     short width;
     short height;
     bool  follow_lang_direction;
-    
+
     OFFSETTYPE(struct gui_img *) image;
-    
+
     bool invert_fill_direction;
     bool nofill;
     bool noborder;
@@ -126,7 +126,7 @@ struct progressbar {
     bool horizontal;
     OFFSETTYPE(struct gui_img *) backdrop;
     int setting_id; /* for the setting bar type */
-    
+
 };
 
 struct draw_rectangle {
@@ -214,7 +214,7 @@ struct touchregion {
         PRESS,               /* quick press only */
         LONG_PRESS,          /* Long press without repeat */
         REPEAT,              /* long press allowing repeats */
-    } press_length;          
+    } press_length;
     int action;              /* action this button will return */
     bool armed;              /* A region is armed on press. Only armed regions are triggered
                                 on repeat or release. */
@@ -271,12 +271,12 @@ struct skin_albumart {
     unsigned char xalign; /* WPS_ALBUMART_ALIGN_LEFT, _CENTER, _RIGHT */
     unsigned char yalign; /* WPS_ALBUMART_ALIGN_TOP, _CENTER, _BOTTOM */
     unsigned char state; /* WPS_ALBUMART_NONE, _CHECK, _LOAD */
-    
+
     OFFSETTYPE(struct viewport *) vp;
     int draw_handle;
 };
 #endif
-    
+
 
 struct line {
     unsigned update_mode;

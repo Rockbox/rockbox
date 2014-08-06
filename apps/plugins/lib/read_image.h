@@ -28,4 +28,3 @@
 int read_image_file(const char* filename, struct bitmap *bm, int maxsize,
                     int format, const struct custom_format *cformat);
 #endif
-

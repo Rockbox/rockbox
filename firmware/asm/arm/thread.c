@@ -90,5 +90,3 @@ static inline void load_context(const void* addr)
         : : "r" (addr) : "r0" /* only! */
     );
 }
-
-

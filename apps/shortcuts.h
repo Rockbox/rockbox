@@ -23,7 +23,7 @@
 #define __SHORTCUTS_H__
 #include <stdbool.h>
 #include <stdlib.h>
- 
+
 enum shortcut_type {
     SHORTCUT_UNDEFINED = -1,
     SHORTCUT_SETTING = 0,

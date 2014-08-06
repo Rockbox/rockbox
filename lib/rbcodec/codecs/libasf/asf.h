@@ -38,9 +38,9 @@ struct asf_waveformatex_s {
 };
 typedef struct asf_waveformatex_s asf_waveformatex_t;
 
-int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength, 
+int asf_read_packet(uint8_t** audiobuf, int* audiobufsize, int* packetlength,
                     asf_waveformatex_t* wfx);
-                    
+
 int asf_get_timestamp(int *duration);
 
 int asf_seek(int ms, asf_waveformatex_t* wfx);

@@ -27,8 +27,8 @@ void lang_init(const unsigned char *builtin, unsigned char **dest, int count);
 /* load a given language file */
 int lang_core_load(const char *filename);
 
-int lang_load(const char *filename, const unsigned char *builtin, 
-              unsigned char **dest, unsigned char *buffer, 
+int lang_load(const char *filename, const unsigned char *builtin,
+              unsigned char **dest, unsigned char *buffer,
               unsigned int user_num, int max_lang_size,
               unsigned int max_id);
 

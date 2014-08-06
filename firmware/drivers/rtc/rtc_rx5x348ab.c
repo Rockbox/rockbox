@@ -33,7 +33,7 @@
 void rtc_init(void)
 {
 }
-    
+
 int rtc_read_datetime(struct tm *tm)
 {
     unsigned int i;
@@ -78,4 +78,3 @@ int rtc_write_datetime(const struct tm *tm)
     spi_block_transfer(SPI_target_RX5X348AB, buf, sizeof(buf), NULL, 0);
     return 1;
 }
-

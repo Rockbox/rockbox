@@ -157,7 +157,7 @@ static void lcd_power_on(void)
 
     /* Start Oscillation */
     lcd_write_reg(R_START_OSC, 0x0001);
-    
+
     sleep(HZ/20); /* 50ms or more */
 
     /* DSTB=0, SAP2-0=001, BT2-0=101, DC2-0=000, AP2-0=001, SLP=0, STB=0 */
@@ -485,7 +485,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     /* BGR=1, MDT1-0=00, I/D1-0=11, AM=0 */
     lcd_write_reg(R_ENTRY_MODE, 0x1030);
 }
- 
+
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void)

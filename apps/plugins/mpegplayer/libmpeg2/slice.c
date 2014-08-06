@@ -1380,7 +1380,7 @@ static void skip_non_intra_block (mpeg2_decoder_t * const decoder)
                 break;        /* illegal, check needed to avoid buffer overflow */
 
             if (decoder->mpeg1)
-            {    
+            {
                 DUMPBITS (bit_buf, bits, 12);
                 NEEDBITS (bit_buf, bits, bit_ptr);
 
@@ -1391,7 +1391,7 @@ static void skip_non_intra_block (mpeg2_decoder_t * const decoder)
             }
             else
             {
-                DUMPBITS (bit_buf, bits, 12); 
+                DUMPBITS (bit_buf, bits, 12);
                 NEEDBITS (bit_buf, bits, bit_ptr);
                 DUMPBITS (bit_buf, bits, 12);
             }

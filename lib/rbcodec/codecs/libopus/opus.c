@@ -351,4 +351,3 @@ int opus_packet_parse(const unsigned char *data, opus_int32 len,
                                  frames, size, payload_offset, NULL);
 }
 #endif
-

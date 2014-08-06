@@ -63,7 +63,7 @@ static int find_oldest_image_index(void)
     return oldest_idx;
 }
 
-static int load_radioart_image(struct radioart *ra, const char* preset_name, 
+static int load_radioart_image(struct radioart *ra, const char* preset_name,
                                struct dim *dim)
 {
     char path[MAX_PATH];
@@ -100,7 +100,7 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
 #ifndef HAVE_NOISY_IDLE_MODE
     cpu_idle_mode(true);
 #endif
-    return ra->handle;    
+    return ra->handle;
 }
 int radio_get_art_hid(struct dim *requested_dim)
 {
@@ -128,7 +128,7 @@ int radio_get_art_hid(struct dim *requested_dim)
     }
     if (free_idx >= 0)
     {
-        return load_radioart_image(&radioart[free_idx], 
+        return load_radioart_image(&radioart[free_idx],
                                    preset_name, requested_dim);
     }
     else
@@ -141,7 +141,7 @@ int radio_get_art_hid(struct dim *requested_dim)
                                        preset_name, requested_dim);
         }
     }
-        
+
     return -1;
 }
 

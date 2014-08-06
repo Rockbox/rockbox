@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -62,12 +62,12 @@ char *spif_get_tape_fileinfo(int *startp, int *nump)
 
   char *name, *s;
   int res;
-  
+
   s = get_filename_line();
   for(; *s && isspace((int) *s); s++);
   name = s;
   for(; *s && isgraph((int) *s); s++);
-  
+
   if(name != s) res = 1;
   else res = 0;
 
@@ -98,7 +98,7 @@ void put_msg(const char *msg)
 #ifndef USE_GREY
     rb->splash (HZ/2, msg );
 #else
-	LOGF(msg);
+        LOGF(msg);
     (void)msg;
 #endif
 }
@@ -110,7 +110,6 @@ void put_tmp_msg(const char *msg)
     rb->splash (HZ/10, msg );
 #else
     LOGF(msg);
-	(void)msg;
+        (void)msg;
 #endif
 }
-

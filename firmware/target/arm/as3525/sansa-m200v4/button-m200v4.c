@@ -41,7 +41,7 @@ int button_read_device(void)
     int result = BUTTON_NONE;
     if(button_hold())
         return result;
-    
+
     /* direct GPIO connections */
     if (GPIOA_PIN(3))
         result |= BUTTON_POWER;
@@ -49,7 +49,7 @@ int button_read_device(void)
     /* This is a keypad using A4-A6 as columns and A0-A2 as rows */
     GPIOA_PIN(4) = (1<<4);
     btn_delay();
-   
+
     /* A4A0 is unused */
 
     if (GPIOA_PIN(1))
@@ -58,11 +58,11 @@ int button_read_device(void)
     if (GPIOA_PIN(2))
         result |= BUTTON_UP;
 
-    GPIOA_PIN(4) = 0x00;  
-    
+    GPIOA_PIN(4) = 0x00;
+
     GPIOA_PIN(5) = (1<<5);
     btn_delay();
-    
+
     if (GPIOA_PIN(0))
         result |= BUTTON_LEFT;
 
@@ -77,7 +77,7 @@ int button_read_device(void)
 
     GPIOA_PIN(6) = (1<<6);
     btn_delay();
-    
+
     if (GPIOA_PIN(0))
         result |= BUTTON_DOWN;
 
@@ -85,7 +85,7 @@ int button_read_device(void)
         result |= BUTTON_VOL_UP;
 
     /* hold button is read in button_hold() */
-        
+
     GPIOA_PIN(6) = 0x00;
 
     return result;
@@ -97,11 +97,11 @@ bool button_hold(void)
     static bool hold_button_old = false;
 #endif
     bool hold_button = false;
-    
+
     GPIOA_PIN(6) = (1<<6);
     if (GPIOA_PIN(2))
         hold_button = true;
-    GPIOA_PIN(6) = 0x00; 
+    GPIOA_PIN(6) = 0x00;
 
 #ifndef BOOTLOADER
     /* light handling */

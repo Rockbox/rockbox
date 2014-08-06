@@ -122,7 +122,7 @@ int main (int argc, char* argv[])
         /* pad to 32bit with zeros */
         if (len > orig_len)
             memset(buf+orig_len, 0, len-orig_len);
-        
+
         /* remove file extension */
         ext = strchr (array, '.');
         if (ext != NULL)

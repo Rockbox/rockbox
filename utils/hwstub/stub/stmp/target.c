@@ -241,7 +241,7 @@ void target_get_config_desc(void *buffer, int *size)
 
 void target_udelay(int us)
 {
-    volatile uint32_t *reg = g_stmp_family == STMP3600 ? 
+    volatile uint32_t *reg = g_stmp_family == STMP3600 ?
         &HW_DIGCTL_MICROSECONDS_STMP3600 : &HW_DIGCTL_MICROSECONDS;
     uint32_t cur = *reg;
     uint32_t end = cur + us;

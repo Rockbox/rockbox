@@ -64,4 +64,3 @@ long lpow(long x, long y);
 #define strlen   rb->strlen
 
 #endif /* _ROCKCONF_H_ */
-

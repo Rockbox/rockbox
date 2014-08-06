@@ -13,15 +13,15 @@
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
- * This General Public License does NOT permit incorporating this software 
- * into proprietary programs.  If you are unable to comply with the GPL, a 
+ * This General Public License does NOT permit incorporating this software
+ * into proprietary programs.  If you are unable to comply with the GPL, a
  * commercial license for this software may be purchased from PeerSec Networks
  * at http://www.peersec.com
- * 
- * This program is distributed in WITHOUT ANY WARRANTY; without even the 
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+ *
+ * This program is distributed in WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -32,8 +32,8 @@
 #include "arc4.h"
 
 /*
-    Some accounts, such as O'Reilly's Secure Programming Cookbook say that no 
-    more than 2^30 bytes should be processed without rekeying, so we 
+    Some accounts, such as O'Reilly's Secure Programming Cookbook say that no
+    more than 2^30 bytes should be processed without rekeying, so we
     enforce that limit here.  FYI, this is equal to 1GB of data transferred.
 */
 #define ARC4_MAX_BYTES 0x40000000
@@ -74,9 +74,9 @@ int32_t matrixArc4(struct rc4_key_t *ctx, unsigned char *in,
 {
     unsigned char    x, y, *state, xorIndex, tmp;
     int   counter;     /* NOTE BY DAVE CHAPMAN: This was a short in
-			  the original code, which caused a segfault
-			  when attempting to process data > 32767
-			  bytes. */
+                          the original code, which caused a segfault
+                          when attempting to process data > 32767
+                          bytes. */
 
     ctx->byteCount += len;
     if (ctx->byteCount > ARC4_MAX_BYTES) {

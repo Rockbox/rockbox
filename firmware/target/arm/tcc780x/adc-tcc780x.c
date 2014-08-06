@@ -34,9 +34,9 @@ static unsigned short adcdata[8];
 static void adc_tick(void)
 {
     int i;
-    
+
     PCLK_ADC |= PCK_EN;   /* Enable ADC clock */
-    
+
     /* Start converting the first 4 channels */
     for (i = 0; i < 4; i++)
         ADCCON = i;
@@ -79,7 +79,7 @@ unsigned short adc_read(int channel)
     {
         /* Wait for data to become stable */
         while ((ADCDATA & 0x1) == 0);
-        
+
         adc_status = ADCSTATUS;
         adcdata[(adc_status >> 16) & 0x7] = adc_status & 0x3ff;
     }
@@ -93,16 +93,16 @@ unsigned short adc_read(int channel)
 void adc_init(void)
 {
     /* consider configuring PCK_ADC source here */
-    
+
     ADCCON = (1<<4);         /* Enter standby mode */
     ADCCFG |= 0x00000003;    /* Single-mode, auto power-down */
 
 #ifndef BOOTLOADER
     ADCCFG |= (1<<3);        /* Request IRQ on ADC completion */
     IEN |= ADC_IRQ_MASK;     /* Unmask ADC IRQs */
-    
+
     tick_add_task(adc_tick);
-    
+
     sleep(2);    /* Ensure valid readings when adc_init returns */
 #endif
 }

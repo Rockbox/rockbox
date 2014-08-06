@@ -52,5 +52,5 @@
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 10
-                
+
 #endif /* _BUTTON_TARGET_H_ */

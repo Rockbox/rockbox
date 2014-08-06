@@ -13,18 +13,18 @@ enum { scc_amp_range = 0x8000 };
 
 struct scc_osc_t
 {
-	int delay;
-	int phase;
-	int last_amp;
-	struct Blip_Buffer* output;
+        int delay;
+        int phase;
+        int last_amp;
+        struct Blip_Buffer* output;
 };
 
 struct Scc_Apu {
-	struct scc_osc_t oscs [scc_osc_count];
-	blip_time_t last_time;
-	unsigned char regs [scc_reg_count];
+        struct scc_osc_t oscs [scc_osc_count];
+        blip_time_t last_time;
+        unsigned char regs [scc_reg_count];
 
-	struct Blip_Synth synth;
+        struct Blip_Synth synth;
 };
 
 void Scc_init( struct Scc_Apu* this );
@@ -37,8 +37,8 @@ void Scc_volume( struct Scc_Apu* this, int v );
 
 static inline void Scc_set_output( struct Scc_Apu* this, int index, struct Blip_Buffer* b )
 {
-	assert( (unsigned) index < scc_osc_count );
-	this->oscs [index].output = b;
+        assert( (unsigned) index < scc_osc_count );
+        this->oscs [index].output = b;
 }
 
 // Emulates to time t, then writes data to reg

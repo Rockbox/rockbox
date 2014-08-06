@@ -356,7 +356,7 @@ static size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
     size_t bufsize;
 
     /* LRU bytes per glyph */
-    bufsize = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) + 
+    bufsize = LRU_SLOT_OVERHEAD + sizeof(struct font_cache_entry) +
         sizeof( unsigned short);
     /* Image bytes per glyph */
     bufsize += glyph_bytes(pf, pf->maxwidth);
@@ -366,7 +366,7 @@ static size_t font_glyphs_to_bufsize(struct font *pf, int glyphs)
 }
 
 static struct font* font_load_header(int fd, struct font *pheader,
-                                     struct font *pf, 
+                                     struct font *pf,
                                      uint32_t *nwidth, uint32_t *noffset)
 {
     /* Load the header. Readshort() and readlong()              *
@@ -415,11 +415,11 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     struct font header;
     struct font f;
 
-    uint32_t nwidth, noffset;     
+    uint32_t nwidth, noffset;
     if ( !font_load_header( fd, &header, &f, &nwidth, &noffset )
 #if LCD_DEPTH < 16
         || f.depth
-#endif  
+#endif
     )
     {
         close(fd);
@@ -448,7 +448,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         cached = true;
     else
         bufsize = file_size;
-    
+
     /* check already loaded */
     int font_id = find_font_index(path);
 
@@ -493,7 +493,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
                 return -1;
         }
         pd->refcount++;
-        //printf("reusing handle %d for %s (count: %d)\n", font_id, path, pd->refcount); 
+        //printf("reusing handle %d for %s (count: %d)\n", font_id, path, pd->refcount);
         close(fd);
         return font_id;
     }
@@ -512,9 +512,9 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         return -1;
     font_id = open_slot;
 
-    /* allocate mem */    
-    int handle = core_alloc_ex( path, 
-                     bufsize + sizeof( struct buflib_alloc_data ), 
+    /* allocate mem */
+    int handle = core_alloc_ex( path,
+                     bufsize + sizeof( struct buflib_alloc_data ),
                      &buflibops );
     if ( handle <= 0 )
     {
@@ -561,7 +561,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         pf->fd_offset = -1;
     }
     else
-    {           
+    {
         lseek( fd, 0, SEEK_SET);
         read(fd, pf->buffer_start, pf->buffer_size);
 
@@ -816,7 +816,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 
     if (pf->fd >= 0 && pf != &sysfont)
     {
-        bits = 
+        bits =
             (unsigned char*)font_cache_get(&pf->cache, char_code,
                                 false, load_cache_entry, pf)->bitmap;
     }
@@ -883,7 +883,7 @@ static void glyph_file_write(void* data)
     }
     if ( p->_char_code == 0xffff )
         return;
-    
+
     ch = p->_char_code + pf->firstchar;
     buffer[buffer_pos] = ch >> 8;
     buffer[buffer_pos+1] = ch & 0xff;
@@ -915,7 +915,7 @@ static void glyph_cache_save(int font_id)
         cache_fd = fd;
         lru_traverse(&cache_pf->cache._lru, glyph_file_write);
         glyph_file_write(NULL);
-        if (cache_fd >= 0) 
+        if (cache_fd >= 0)
         {
             close(cache_fd);
             cache_fd = -1;
@@ -939,8 +939,8 @@ static void glyph_cache_load(const char *font_path, struct font *pf)
         unsigned short glyphs[MAX_SORT];
         unsigned short glyphs_lru_order[MAX_SORT];
         int glyph_file_skip=0, glyph_file_size=0;
-        
-        int sort_size = pf->cache._capacity;        
+
+        int sort_size = pf->cache._capacity;
         if ( sort_size > MAX_SORT )
              sort_size = MAX_SORT;
 
@@ -965,20 +965,20 @@ static void glyph_cache_load(const char *font_path, struct font *pf)
 
                 for ( size = 0;
                       read( fd, tmp, 2 ) == 2 && size < sort_size;
-                      size++ ) 
+                      size++ )
                 {
                     glyphs[size] = (tmp[0] << 8) | tmp[1];
                     glyphs_lru_order[size] = glyphs[size];
                 }
-                
+
                 /* sort glyphs array to make sector cache happy */
-                qsort((void *)glyphs, size, sizeof(unsigned short), 
+                qsort((void *)glyphs, size, sizeof(unsigned short),
                       ushortcmp );
 
                 /* load font bitmaps */
                 for( i = 0; i < size ; i++ )
                          font_get_bits(pf, glyphs[i]);
-                
+
                 /* redo to fix lru order */
                 for ( i = 0; i < size ; i++)
                     font_get_bits(pf, glyphs_lru_order[i]);
@@ -1050,7 +1050,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 #endif /* BOOTLOADER */
 
 /*
- * Returns the stringsize of a given string. 
+ * Returns the stringsize of a given string.
  */
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
 {

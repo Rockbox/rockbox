@@ -1526,4 +1526,3 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
 
    RESTORE_STACK;
 }
-

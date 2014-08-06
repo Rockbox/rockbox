@@ -63,25 +63,25 @@
 # define ROTR64(x, s) (((x) >> (s)) | ((x) << (64 - (s))))
 #endif
 
-typedef uint8_t		byte;
+typedef uint8_t         byte;
 
-typedef int8_t		javabyte;
-typedef int16_t		javashort;
-typedef int32_t		javaint;
-typedef int64_t		javalong;
+typedef int8_t          javabyte;
+typedef int16_t         javashort;
+typedef int32_t         javaint;
+typedef int64_t         javalong;
 
-typedef uint16_t	javachar;
+typedef uint16_t        javachar;
 
 #if (MP_WBITS == 64)
-typedef uint64_t	mpw;
-typedef uint32_t	mphw;
+typedef uint64_t        mpw;
+typedef uint32_t        mphw;
 #elif (MP_WBITS == 32)
 # if HAVE_UINT64_T
 #  define HAVE_MPDW 1
-typedef uint64_t	mpdw;
+typedef uint64_t        mpdw;
 # endif
-typedef uint32_t	mpw;
-typedef uint16_t	mphw;
+typedef uint32_t        mpw;
+typedef uint16_t        mphw;
 #else
 # error
 #endif

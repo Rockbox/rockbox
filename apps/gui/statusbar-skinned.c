@@ -73,7 +73,7 @@ enum themable_icons sb_get_icon(enum screen_type screen)
 {
     return sbs_has_title[screen] ? sbs_icon[screen] : Icon_NOICON + 2;
 }
-    
+
 int sb_preproccess(enum screen_type screen, struct wps_data *data)
 {
     (void)data;
@@ -85,14 +85,14 @@ int sb_preproccess(enum screen_type screen, struct wps_data *data)
 int sb_postproccess(enum screen_type screen, struct wps_data *data)
 {
     if (data->wps_loaded)
-    {  
+    {
         /* hide the sb's default viewport because it has nasty effect with stuff
         * not part of the statusbar,
         * hence .sbs's without any other vps are unsupported*/
         struct skin_viewport *vp = skin_find_item(VP_DEFAULT_LABEL_STRING, SKIN_FIND_VP, data);
         struct skin_element *tree = SKINOFFSETTOPTR(get_skin_buffer(data), data->tree);
         struct skin_element *next_vp = SKINOFFSETTOPTR(get_skin_buffer(data), tree->next);
-        
+
         if (vp)
         {
             if (!next_vp)
@@ -115,7 +115,7 @@ void sb_set_info_vp(enum screen_type screen, OFFSETTYPE(char*) label)
 {
     infovp_label[screen] = label;
 }
-    
+
 struct viewport *sb_skin_get_info_vp(enum screen_type screen)
 {
     if (sbs_loaded[screen] == false)
@@ -151,7 +151,7 @@ int sb_get_backdrop(enum screen_type screen)
     else
         return -1;
 }
-        
+
 #endif
 static bool force_waiting = false;
 void sb_skin_update(enum screen_type screen, bool force)
@@ -209,7 +209,7 @@ char* sb_create_from_settings(enum screen_type screen)
     int bar_position = statusbar_position(screen);
     ptr = buf;
     ptr[0] = '\0';
-    
+
     /* setup the inbuilt statusbar */
     if (bar_position != STATUSBAR_OFF)
     {
@@ -218,7 +218,7 @@ char* sb_create_from_settings(enum screen_type screen)
         {
             y = screens[screen].lcdheight - STATUSBAR_HEIGHT;
         }
-        len = snprintf(ptr, remaining, "%%V(0,%d,-,%d,0)\n%%wi\n", 
+        len = snprintf(ptr, remaining, "%%V(0,%d,-,%d,0)\n%%wi\n",
                        y, height);
         remaining -= len;
         ptr += len;
@@ -230,7 +230,7 @@ char* sb_create_from_settings(enum screen_type screen)
     else
 #endif
         ptr2 = global_settings.ui_vp_config;
-    
+
     if (ptr2[0] && ptr2[0] != '-') /* from ui viewport setting */
     {
         char *comma = ptr;
@@ -241,7 +241,7 @@ char* sb_create_from_settings(enum screen_type screen)
         do {
             param_count++;
             comma = strchr(comma+1, ',');
-            
+
         } while (comma && param_count < 6);
         if (comma)
         {
@@ -254,9 +254,9 @@ char* sb_create_from_settings(enum screen_type screen)
             fg[i] = '\0'; comma++; i=0;
             while (*comma != ')')
                 bg[i++] = *comma++;
-            bg[i] = '\0'; 
+            bg[i] = '\0';
             len += snprintf(end, remaining-len, ") %%Vf(%s) %%Vb(%s)\n", fg, bg);
-        }       
+        }
     }
     else
     {
@@ -271,7 +271,7 @@ char* sb_create_from_settings(enum screen_type screen)
             default:
                 height = screens[screen].lcdheight;
         }
-        len = snprintf(ptr, remaining, "%%ax%%Vi(-,0,%d,-,%d,1)\n", 
+        len = snprintf(ptr, remaining, "%%ax%%Vi(-,0,%d,-,%d,1)\n",
                        y, height);
     }
     return buf;
@@ -299,13 +299,13 @@ int sb_touch_to_button(int context)
     int button, offset;
     if (bypass_sb_touchregions)
         return ACTION_TOUCHSCREEN;
-    
+
     if (last_context != context)
         skin_disarm_touchregions(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data);
     last_context = context;
     button = skin_get_touchaction(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data,
                                   &offset, &region);
-    
+
     switch (button)
     {
 #ifdef HAVE_VOLUME_IN_LIST

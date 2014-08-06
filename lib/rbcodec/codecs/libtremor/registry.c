@@ -45,6 +45,3 @@ vorbis_func_residue  *_residue_P[] ICONST_ATTR = {
 vorbis_func_mapping  *_mapping_P[] ICONST_ATTR = {
   &mapping0_exportbundle,
 };
-
-
-

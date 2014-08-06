@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Michiel van der Kolk 
+ * Copyright (C) 2005 by Michiel van der Kolk
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

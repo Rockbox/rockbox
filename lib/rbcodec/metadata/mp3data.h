@@ -59,16 +59,16 @@ struct mp3info {
 
 #define MAX_XING_HEADER_SIZE 576
 
-unsigned long find_next_frame(int fd, 
-                              long *offset, 
+unsigned long find_next_frame(int fd,
+                              long *offset,
                               long max_offset,
                               unsigned long reference_header);
-unsigned long mem_find_next_frame(int startpos, 
-                                  long *offset, 
+unsigned long mem_find_next_frame(int startpos,
+                                  long *offset,
                                   long max_offset,
                                   unsigned long reference_header,
                                   unsigned char* buf, size_t buflen);
-int get_mp3file_info(int fd, 
+int get_mp3file_info(int fd,
                      struct mp3info *info);
 
 int count_mp3_frames(int fd,  int startpos,  int filesize,

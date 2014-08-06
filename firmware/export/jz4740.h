@@ -711,7 +711,7 @@
 #define DMAC_DCCSR_CT        (1 << 1)  /* count terminated */
 #define DMAC_DCCSR_EN        (1 << 0)  /* channel enable bit */
 
-// DMA channel command register 
+// DMA channel command register
 #define DMAC_DCMD_SAI        (1 << 23) /* source address increment */
 #define DMAC_DCMD_DAI        (1 << 22) /* dest address increment */
 #define DMAC_DCMD_RDIL_BIT    16        /* request detection interval length */
@@ -2688,7 +2688,7 @@
 //
 //////////////////////////////////////////////////////////
 
-/* 
+/*
  * p is the port number (0,1,2,3)
  * o is the pin offset (0-31) inside the port
  * n is the absolute number of a pin (0-127), regardless of the port
@@ -2716,7 +2716,7 @@ do {                        \
 } while (0)
 
 /*
- * D0 ~ D31, A0 ~ A16, DCS#, RAS#, CAS#, CKE#, 
+ * D0 ~ D31, A0 ~ A16, DCS#, RAS#, CAS#, CKE#,
  * RDWE#, CKO#, WE0#, WE1#, WE2#, WE3#
  */
 #define __gpio_as_sdram_32bit()            \
@@ -2735,7 +2735,7 @@ do {                        \
 //#ifdef JZ4740_PAVO
 #ifdef JZ4740_4740
 /*
- * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#, 
+ * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#,
  * RDWE#, CKO#, WE0#, WE1#, WE2#, WE3#
  */
 #define __gpio_as_sdram_16bit()            \
@@ -2756,7 +2756,7 @@ do {                        \
 //#ifdef JZ4740_VIRGO
 #ifdef JZ4740_4720
 /*
- * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#, 
+ * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#,
  * RDWE#, CKO#, WE0#, WE1#, WE2#, WE3#
  */
 #define __gpio_as_sdram_16bit()            \
@@ -2776,7 +2776,7 @@ do {                        \
 
 #ifdef JZ4740_4725
 /*
- * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#, 
+ * D0 ~ D15, A0 ~ A16, DCS#, RAS#, CAS#, CKE#,
  * RDWE#, CKO#, WE0#, WE1#, WE2#, WE3#
  */
 #define __jz4725__gpio_as_sdram_16bit()            \
@@ -3378,7 +3378,7 @@ static __inline__ unsigned int __cpm_get_pllout(void)
     unsigned long m, n, no, pllout;
     unsigned long cppcr = REG_CPM_CPPCR;
     unsigned long od[4] = {1, 2, 2, 4};
-    
+
     if ((cppcr & CPM_CPPCR_PLLEN) && !(cppcr & CPM_CPPCR_PLLBP))
     {
         m = __cpm_get_pllm() + 2;
@@ -3388,7 +3388,7 @@ static __inline__ unsigned int __cpm_get_pllout(void)
     }
     else
         pllout = JZ_EXTAL;
-    
+
     return pllout;
 }
 
@@ -3879,7 +3879,7 @@ do {                                    \
     REG_AIC_ACCR1 |= AC97_PCM_XS_L_FRONT | AC97_PCM_XS_R_FRONT;    \
 } while(0)
 
-/* In fact, only stereo is support now. */ 
+/* In fact, only stereo is support now. */
 #define __ac97_set_rs_none()    ( REG_AIC_ACCR1 &= ~AIC_ACCR1_RS_MASK )
 #define __ac97_set_rs_mono()                         \
 do {                                    \
@@ -3985,7 +3985,7 @@ do {                                     \
 #define __aic_write_tfifo(v)  ( REG_AIC_DR = (v) )
 #define __aic_read_rfifo()    ( REG_AIC_DR )
 
-#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC ) 
+#define __aic_internal_codec()  ( REG_AIC_FR |= AIC_FR_ICDC )
 #define __aic_external_codec()  ( REG_AIC_FR &= ~AIC_FR_ICDC )
 
 #define    AIC_FR_LSMP        (1 << 6)
@@ -4369,7 +4369,7 @@ do {                                 \
 #define __ssi_set_lsb() ( REG_SSI_CR1 |= SSI_CR1_LFST )
 
 #define __ssi_set_frame_length(n) \
-    REG_SSI_CR1 = (REG_SSI_CR1 & ~SSI_CR1_FLEN_MASK) | (((n) - 2) << 4) 
+    REG_SSI_CR1 = (REG_SSI_CR1 & ~SSI_CR1_FLEN_MASK) | (((n) - 2) << 4)
 
 /* n = 1 - 16 */
 #define __ssi_set_microwire_command_length(n) \
@@ -4631,7 +4631,7 @@ do {                        \
 #define __lcd_panel_white()        ( REG_LCD_CFG |= LCD_CFG_WHITE )
 #define __lcd_panel_black()        ( REG_LCD_CFG &= ~LCD_CFG_WHITE )
 
-/* n=1,2,4,8 for single mono-STN 
+/* n=1,2,4,8 for single mono-STN
  * n=4,8 for dual mono-STN
  */
 #define __lcd_set_panel_datawidth(n)         \
@@ -4843,7 +4843,7 @@ do{                                 \
        REG_RTC_RSR;                \
 })
 //while(0)
- 
+
 #define __rtc_set_second(v)         \
 do{                                 \
       while(!__rtc_write_ready());  \
@@ -4857,7 +4857,7 @@ do{                                \
       REG_RTC_RSAR;                \
 }while(0)
 
-      
+
 #define __rtc_set_alarm_second(v)   \
 do{                                 \
       while(!__rtc_write_ready());  \
@@ -4894,7 +4894,7 @@ do{                                 \
 
 #define __rtc_get_nc1Hz_val()       \
      ( (REG_RTC_RGR & RTC_RGR_NC1HZ_MASK) >> RTC_RGR_NC1HZ_BIT )
-      
+
 #define __rtc_set_nc1Hz_val(v)      \
 do{                                 \
       while(!__rtc_write_ready());  \

@@ -46,12 +46,12 @@ int key_to_button(int keyboard_button)
 
         case SDLK_SPACE:
         case SDLK_ESCAPE:
-	  new_btn = BUTTON_MENU;
-	  break;
+          new_btn = BUTTON_MENU;
+          break;
 
         case SDLK_RETURN:
-	  new_btn = BUTTON_ENTER;
-	  break;
+          new_btn = BUTTON_ENTER;
+          break;
 
         case SDLK_p:
             new_btn = BUTTON_PLAY;

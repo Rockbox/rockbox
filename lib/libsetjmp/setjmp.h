@@ -1,7 +1,7 @@
 #ifndef _SETJMP_H_
 #define _SETJMP_H_
 
-/* Combined parts of include/setjmp.h and include/machine/setjmp.h in 
+/* Combined parts of include/setjmp.h and include/machine/setjmp.h in
  * newlib 1.17.0, with minor changes for Rockbox.
  */
 

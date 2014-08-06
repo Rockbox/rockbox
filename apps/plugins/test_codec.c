@@ -231,7 +231,7 @@ static int process_dsp(const void *ch1, const void *ch2, int count)
     {
         int old_remcount = dst.remcount;
         rb->dsp_process(ci.dsp, &src, &dst);
-        
+
         if (dst.bufcount <= 0 ||
             (src.remcount <= 0 && dst.remcount <= old_remcount))
         {
@@ -239,7 +239,7 @@ static int process_dsp(const void *ch1, const void *ch2, int count)
             break;
         }
     }
-    
+
     return dst.remcount;
 }
 
@@ -254,20 +254,20 @@ static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
 }
 
 /*
- *  Helper function used when the file is larger then the available memory. 
- *  Rebuffers the file by setting the start of the audio buffer to be 
+ *  Helper function used when the file is larger then the available memory.
+ *  Rebuffers the file by setting the start of the audio buffer to be
  *  new_offset and filling from there.
  */
 static int fill_buffer(int new_offset){
     size_t n, bytestoread;
     long temp = *rb->current_tick;
     rb->lseek(fd,new_offset,SEEK_SET);
-    
+
     if(new_offset + audiobufsize <= track.filesize)
         bytestoread = audiobufsize;
     else
         bytestoread = track.filesize-new_offset;
-    
+
     n = rb->read(fd, audiobuf,bytestoread);
 
     if (n != bytestoread)
@@ -284,10 +284,10 @@ static int fill_buffer(int new_offset){
         return -1;
     }
     offset = new_offset;
-    
+
     /*keep track of how much time we spent buffering*/
     rebuffertick += *rb->current_tick-temp;
-    
+
     return 0;
 }
 
@@ -318,7 +318,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
         }
     }
     else
-    { 
+    {
         const int16_t* data1_16;
         const int16_t* data2_16;
         const int32_t* data1_32;
@@ -341,7 +341,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
                         p += 2;
                     }
                     break;
- 
+
                 case STEREO_NONINTERLEAVED:
                     while (count--) {
                         int2le16(p,*data1_16++);
@@ -373,7 +373,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
                         p += 2;
                     }
                     break;
- 
+
                 case STEREO_NONINTERLEAVED:
                     while (count--) {
                         int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
@@ -418,14 +418,14 @@ static size_t read_filebuf(void *ptr, size_t size)
        return 0;
    } else {
         size_t realsize = MIN(track.filesize-ci.curpos,size);
-        
+
        /* check if we have enough bytes ready*/
        if(realsize >(audiobufsize - (ci.curpos-offset)))
        {
            /*rebuffer so that we start at ci.curpos*/
            fill_buffer(ci.curpos);
         }
-       
+
        rb->memcpy(ptr, audiobuf + (ci.curpos-offset), realsize);
        ci.curpos += realsize;
        return realsize;
@@ -447,7 +447,7 @@ static void* request_buffer(size_t *realsize, size_t reqsize)
         /*rebuffer so that we start at ci.curpos*/
        fill_buffer(ci.curpos);
     }
-    
+
     return (audiobuf + (ci.curpos-offset));
 }
 
@@ -636,7 +636,7 @@ static enum plugin_status test_track(const char* filename)
     /* Display filename (excluding any path)*/
     ch = rb->strrchr(filename, '/');
     if (ch==NULL)
-       ch = filename; 
+       ch = filename;
     else
        ch++;
 
@@ -666,8 +666,8 @@ static enum plugin_status test_track(const char* filename)
     if (track.filesize > audiosize)
     {
         audiobufsize=audiosize;
-        
-    } else 
+
+    } else
     {
         audiobufsize=track.filesize;
     }
@@ -679,7 +679,7 @@ static enum plugin_status test_track(const char* filename)
         log_text("Read failed.",true);
         goto exit;
     }
-    
+
 
     /* Initialise the function pointers in the codec API */
     init_ci();
@@ -729,13 +729,13 @@ static enum plugin_status test_track(const char* filename)
     if (codec_action == CODEC_ACTION_HALT)
     {
         /* User aborted test */
-    }    
+    }
     else if (checksum)
     {
         rb->snprintf(str, sizeof(str), "CRC32 - %08x", (unsigned)crc32);
         log_text(str,true);
     }
-    else if (wavinfo.fd < 0) 
+    else if (wavinfo.fd < 0)
     {
         /* Display benchmark information */
         rb->snprintf(str,sizeof(str),"Decode time - %d.%02ds",(int)ticks/100,(int)ticks%100);
@@ -752,19 +752,19 @@ static enum plugin_status test_track(const char* filename)
 
         rb->snprintf(str,sizeof(str),"%d.%02d%% realtime",(int)speed/100,(int)speed%100);
         log_text(str,true);
-        
+
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         /* show effective clockrate in MHz needed for realtime decoding */
         if (speed > 0)
         {
             int freq;
             freq = *rb->cpu_frequency;
-            
+
             speed = freq / speed;
             rb->snprintf(str,sizeof(str),"%d.%02dMHz needed for realtime",
             (int)speed/100,(int)speed%100);
             log_text(str,true);
-        }   
+        }
 #endif
     }
 
@@ -897,14 +897,14 @@ enum plugin_status plugin_start(const void* parameter)
         "Boosting",
 #endif
     );
-    
+
 
 show_menu:
     rb->lcd_clear_display();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 menu:
-#endif 
+#endif
 
     result = rb->do_menu(&menu, &selection, NULL, false);
 
@@ -925,13 +925,13 @@ menu:
 
     scandir = 0;
 
-    /* Map test runs with checksum calcualtion to standard runs 
+    /* Map test runs with checksum calcualtion to standard runs
      * SPEED_TEST and SPEED_TEST_DIR and set the 'checksum' flag. */
-    if ((checksum = (result == CHECKSUM || 
+    if ((checksum = (result == CHECKSUM ||
                      result == CHECKSUM_DIR)))
         result -= 6;
 
-    /* Map test runs with DSP to standard runs SPEED_TEST, 
+    /* Map test runs with DSP to standard runs SPEED_TEST,
      * SPEED_TEST_DIR and WRITE_WAV and set the 'use_dsp' flag. */
     if ((use_dsp = (result >= SPEED_TEST_WITH_DSP &&
                     result <= WRITE_WAV_WITH_DSP)))
@@ -998,7 +998,7 @@ menu:
                 /* Read next entry */
                 entry = rb->readdir(dir);
             }
-            
+
             rb->closedir(dir);
         }
     } else {

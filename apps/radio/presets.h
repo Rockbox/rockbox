@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 int  handle_radio_presets(void);
 int  handle_radio_add_preset(void);
 
@@ -34,4 +34,3 @@ void preset_next(int direction);
 void preset_set_current(int preset);
 int  preset_find(int freq);
 void preset_talk(int preset, bool fallback, bool enqueue);
-

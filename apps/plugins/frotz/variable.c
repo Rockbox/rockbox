@@ -1,5 +1,5 @@
 /* variable.c - Variable and stack related opcodes
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * This file is part of Frotz.
  *
@@ -23,7 +23,7 @@
 /*
  * z_dec, decrement a variable.
  *
- * 	zargs[0] = variable to decrement
+ *      zargs[0] = variable to decrement
  *
  */
 
@@ -32,14 +32,14 @@ void z_dec (void)
     zword value;
 
     if (zargs[0] == 0)
-	(*sp)--;
+        (*sp)--;
     else if (zargs[0] < 16)
-	(*(fp - zargs[0]))--;
+        (*(fp - zargs[0]))--;
     else {
-	zword addr = h_globals + 2 * (zargs[0] - 16);
-	LOW_WORD (addr, value)
-	value--;
-	SET_WORD (addr, value)
+        zword addr = h_globals + 2 * (zargs[0] - 16);
+        LOW_WORD (addr, value)
+        value--;
+        SET_WORD (addr, value)
     }
 
 }/* z_dec */
@@ -47,8 +47,8 @@ void z_dec (void)
 /*
  * z_dec_chk, decrement a variable and branch if now less than value.
  *
- * 	zargs[0] = variable to decrement
- * 	zargs[1] = value to check variable against
+ *      zargs[0] = variable to decrement
+ *      zargs[1] = value to check variable against
  *
  */
 
@@ -57,14 +57,14 @@ void z_dec_chk (void)
     zword value;
 
     if (zargs[0] == 0)
-	value = --(*sp);
+        value = --(*sp);
     else if (zargs[0] < 16)
-	value = --(*(fp - zargs[0]));
+        value = --(*(fp - zargs[0]));
     else {
-	zword addr = h_globals + 2 * (zargs[0] - 16);
-	LOW_WORD (addr, value)
-	value--;
-	SET_WORD (addr, value)
+        zword addr = h_globals + 2 * (zargs[0] - 16);
+        LOW_WORD (addr, value)
+        value--;
+        SET_WORD (addr, value)
     }
 
     branch ((short) value < (short) zargs[1]);
@@ -74,7 +74,7 @@ void z_dec_chk (void)
 /*
  * z_inc, increment a variable.
  *
- * 	zargs[0] = variable to increment
+ *      zargs[0] = variable to increment
  *
  */
 
@@ -83,14 +83,14 @@ void z_inc (void)
     zword value;
 
     if (zargs[0] == 0)
-	(*sp)++;
+        (*sp)++;
     else if (zargs[0] < 16)
-	(*(fp - zargs[0]))++;
+        (*(fp - zargs[0]))++;
     else {
-	zword addr = h_globals + 2 * (zargs[0] - 16);
-	LOW_WORD (addr, value)
-	value++;
-	SET_WORD (addr, value)
+        zword addr = h_globals + 2 * (zargs[0] - 16);
+        LOW_WORD (addr, value)
+        value++;
+        SET_WORD (addr, value)
     }
 
 }/* z_inc */
@@ -98,8 +98,8 @@ void z_inc (void)
 /*
  * z_inc_chk, increment a variable and branch if now greater than value.
  *
- * 	zargs[0] = variable to increment
- * 	zargs[1] = value to check variable against
+ *      zargs[0] = variable to increment
+ *      zargs[1] = value to check variable against
  *
  */
 
@@ -108,14 +108,14 @@ void z_inc_chk (void)
     zword value;
 
     if (zargs[0] == 0)
-	value = ++(*sp);
+        value = ++(*sp);
     else if (zargs[0] < 16)
-	value = ++(*(fp - zargs[0]));
+        value = ++(*(fp - zargs[0]));
     else {
-	zword addr = h_globals + 2 * (zargs[0] - 16);
-	LOW_WORD (addr, value)
-	value++;
-	SET_WORD (addr, value)
+        zword addr = h_globals + 2 * (zargs[0] - 16);
+        LOW_WORD (addr, value)
+        value++;
+        SET_WORD (addr, value)
     }
 
     branch ((short) value > (short) zargs[1]);
@@ -125,7 +125,7 @@ void z_inc_chk (void)
 /*
  * z_load, store the value of a variable.
  *
- *	zargs[0] = variable to store
+ *      zargs[0] = variable to store
  *
  */
 
@@ -134,12 +134,12 @@ void z_load (void)
     zword value;
 
     if (zargs[0] == 0)
-	value = *sp;
+        value = *sp;
     else if (zargs[0] < 16)
-	value = *(fp - zargs[0]);
+        value = *(fp - zargs[0]);
     else {
-	zword addr = h_globals + 2 * (zargs[0] - 16);
-	LOW_WORD (addr, value)
+        zword addr = h_globals + 2 * (zargs[0] - 16);
+        LOW_WORD (addr, value)
     }
 
     store (value);
@@ -149,7 +149,7 @@ void z_load (void)
 /*
  * z_pop, pop a value off the game stack and discard it.
  *
- *	no zargs used
+ *      no zargs used
  *
  */
 
@@ -163,25 +163,25 @@ void z_pop (void)
 /*
  * z_pop_stack, pop n values off the game or user stack and discard them.
  *
- *	zargs[0] = number of values to discard
- *	zargs[1] = address of user stack (optional)
+ *      zargs[0] = number of values to discard
+ *      zargs[1] = address of user stack (optional)
  *
  */
 
 void z_pop_stack (void)
 {
 
-    if (zargc == 2) {		/* it's a user stack */
+    if (zargc == 2) {           /* it's a user stack */
 
-	zword size;
-	zword addr = zargs[1];
+        zword size;
+        zword addr = zargs[1];
 
-	LOW_WORD (addr, size)
+        LOW_WORD (addr, size)
 
-	size += zargs[0];
-	storew (addr, size);
+        size += zargs[0];
+        storew (addr, size);
 
-    } else sp += zargs[0];	/* it's the game stack */
+    } else sp += zargs[0];      /* it's the game stack */
 
 }/* z_pop_stack */
 
@@ -190,11 +190,11 @@ void z_pop_stack (void)
  *
  * a) ...the game or a user stack and store it (V6)
  *
- *	zargs[0] = address of user stack (optional)
+ *      zargs[0] = address of user stack (optional)
  *
  * b) ...the game stack and write it to a variable (other than V6)
  *
- *	zargs[0] = variable to write value to
+ *      zargs[0] = variable to write value to
  *
  */
 
@@ -202,37 +202,37 @@ void z_pull (void)
 {
     zword value;
 
-    if (h_version != V6) {	/* not a V6 game, pop stack and write */
+    if (h_version != V6) {      /* not a V6 game, pop stack and write */
 
-	value = *sp++;
+        value = *sp++;
 
-	if (zargs[0] == 0)
-	    *sp = value;
-	else if (zargs[0] < 16)
-	    *(fp - zargs[0]) = value;
-	else {
-	    zword addr = h_globals + 2 * (zargs[0] - 16);
-	    SET_WORD (addr, value)
-	}
+        if (zargs[0] == 0)
+            *sp = value;
+        else if (zargs[0] < 16)
+            *(fp - zargs[0]) = value;
+        else {
+            zword addr = h_globals + 2 * (zargs[0] - 16);
+            SET_WORD (addr, value)
+        }
 
-    } else {			/* it's V6, but is there a user stack? */
+    } else {                    /* it's V6, but is there a user stack? */
 
-	if (zargc == 1) {	/* it's a user stack */
+        if (zargc == 1) {       /* it's a user stack */
 
-	    zword size;
-	    zword addr = zargs[0];
+            zword size;
+            zword addr = zargs[0];
 
-	    LOW_WORD (addr, size)
+            LOW_WORD (addr, size)
 
-	    size++;
-	    storew (addr, size);
+            size++;
+            storew (addr, size);
 
-	    addr += 2 * size;
-	    LOW_WORD (addr, value)
+            addr += 2 * size;
+            LOW_WORD (addr, value)
 
-	} else value = *sp++;	/* it's the game stack */
+        } else value = *sp++;   /* it's the game stack */
 
-	store (value);
+        store (value);
 
     }
 
@@ -241,7 +241,7 @@ void z_pull (void)
 /*
  * z_push, push a value onto the game stack.
  *
- *	zargs[0] = value to push onto the stack
+ *      zargs[0] = value to push onto the stack
  *
  */
 
@@ -255,8 +255,8 @@ void z_push (void)
 /*
  * z_push_stack, push a value onto a user stack then branch if successful.
  *
- *	zargs[0] = value to push onto the stack
- *	zargs[1] = address of user stack
+ *      zargs[0] = value to push onto the stack
+ *      zargs[1] = address of user stack
  *
  */
 
@@ -269,10 +269,10 @@ void z_push_stack (void)
 
     if (size != 0) {
 
-	storew ((zword) (addr + 2 * size), zargs[0]);
+        storew ((zword) (addr + 2 * size), zargs[0]);
 
-	size--;
-	storew (addr, size);
+        size--;
+        storew (addr, size);
 
     }
 
@@ -283,7 +283,7 @@ void z_push_stack (void)
 /*
  * z_store, write a value to a variable.
  *
- * 	zargs[0] = variable to be written to
+ *      zargs[0] = variable to be written to
  *      zargs[1] = value to write
  *
  */
@@ -293,12 +293,12 @@ void z_store (void)
     zword value = zargs[1];
 
     if (zargs[0] == 0)
-	*sp = value;
+        *sp = value;
     else if (zargs[0] < 16)
-	*(fp - zargs[0]) = value;
+        *(fp - zargs[0]) = value;
     else {
-	zword addr = h_globals + 2 * (zargs[0] - 16);
-	SET_WORD (addr, value)
+        zword addr = h_globals + 2 * (zargs[0] - 16);
+        SET_WORD (addr, value)
     }
 
 }/* z_store */

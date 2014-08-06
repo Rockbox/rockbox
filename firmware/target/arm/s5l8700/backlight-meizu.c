@@ -27,7 +27,7 @@
 
 /*
     Backlight driver using the PWM mode of a hardware timer.
-    
+
     The PWM duty cycle depends exponentially on the configured brightness
     level. This makes the brightness curve more linear to the human eye.
  */
@@ -71,9 +71,8 @@ bool _backlight_init(void)
     TCDATA1 = 256;      /* set PWM period */
     TCPRE = 20;         /* prescaler */
     TCCMD = (1 << 0);   /* TC_EN */
-   
+
     _backlight_on();
 
     return true;
 }
-

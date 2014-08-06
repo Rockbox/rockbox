@@ -49,7 +49,7 @@ int current_playmode(void)
        and that supercedes the other modes */
     if(ff_mode)
         return ff_mode;
-    
+
     if(audio_stat & AUDIO_STATUS_PLAY)
     {
         if(audio_stat & AUDIO_STATUS_PAUSE)
@@ -76,7 +76,7 @@ int current_playmode(void)
     if(audio_stat & FMRADIO_PAUSED)
        return STATUS_RADIO_PAUSE;
 #endif
-    
+
     return STATUS_STOP;
 }
 

@@ -67,10 +67,10 @@ static mpc_inline mpc_uint32_t mpc_bits_read(mpc_bits_reader * r, const unsigned
  * buffer does not fit into IRAM the read accesses to the uint8 buffer are very
  * expensive in terms of CPU cycles.
  * The following code uses two variables in IRAM. The variable last_code keeps
- * the 4-byte value of buf[0]<<16 | buf[1]<<8 | buf[2]. As long as buf[0] will 
- * read from the same address the following code will avoid re-reading of the 
+ * the 4-byte value of buf[0]<<16 | buf[1]<<8 | buf[2]. As long as buf[0] will
+ * read from the same address the following code will avoid re-reading of the
  * buffers. If buf[0] did advance to the next uint8-entry since the last call
- * the following will only need to load 1 uint8-entry instead of 3. 
+ * the following will only need to load 1 uint8-entry instead of 3.
  */
 static mpc_inline mpc_uint16_t get_code_from_buffer(mpc_bits_reader *r)
 {

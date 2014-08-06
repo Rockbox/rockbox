@@ -27,7 +27,7 @@
 #include "button-target.h"
 
 /*  Button driver for the meizu M6SP
-    
+
     Future improvements:
     * touch strip support
     * left/right buttons (probably read out with ADC0)
@@ -65,4 +65,3 @@ bool button_hold(void)
 {
     return ((PDAT0 & (1 << 5)) != 0);
 }
-

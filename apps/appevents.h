@@ -83,5 +83,3 @@ enum {
     RECORDING_EVENT_STOP,
 };
 #endif
-
-

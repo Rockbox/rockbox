@@ -8,4 +8,3 @@
 #define VCMD_UPLOAD             0x0c
 #define VCMD_INDEX_STAGE1       0x471
 #define VCMD_INDEX_STAGE2       0x472
-

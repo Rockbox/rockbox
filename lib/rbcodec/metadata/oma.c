@@ -173,7 +173,7 @@ static int oma_read_header(int fd, struct mp3entry* id3)
 
     /* Store the the offset of the first audio frame, to be able to seek to it *
      * directly in atrac3_oma.codec.                                           */
-    id3->first_frame_offset = EA3_pos + EA3_HEADER_SIZE; 
+    id3->first_frame_offset = EA3_pos + EA3_HEADER_SIZE;
     return 0;
 }
 

@@ -243,4 +243,3 @@ void sc606_init(void)
     GPHUP &= ~(3<<9);
     GPHCON = (GPHCON & ~(0xF<<18)) | 5<<18;
 }
-

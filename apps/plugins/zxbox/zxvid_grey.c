@@ -21,7 +21,7 @@ void init_spect_scr(void)
     int i;
     unsigned mask = settings.invert_colors ? 0xFF : 0;
 
-    for(i = 0; i < 16; i++) 
+    for(i = 0; i < 16; i++)
         sp_colors[i] = graylevels[i] ^ mask;
 
     sp_image = (char *) &image_array;
@@ -33,7 +33,7 @@ void init_spect_scr(void)
 void update_screen(void)
 {
     char str[80];
-  
+
     int y=0;
     int x=0;
     unsigned char* image;

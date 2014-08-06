@@ -25,9 +25,8 @@
 #include <sys/types.h>
 #include <stdbool.h>
 
-void structec_convert(void *structure, const char *ecinst, 
+void structec_convert(void *structure, const char *ecinst,
                       long count, bool enable);
 ssize_t ecread(int fd, void *buf, size_t scount, const char *ecinst, bool ec);
 ssize_t ecwrite(int fd, const void *buf, size_t scount,  const char *ecinst, bool ec);
 #endif
-

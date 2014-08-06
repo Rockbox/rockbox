@@ -50,7 +50,7 @@ void touchpad_set_sensitivity(int level);
 #define BUTTON_TOUCH        0x200000
 
 
-#define BUTTON_MENU         BUTTON_ONE         
+#define BUTTON_MENU         BUTTON_ONE
 #define BUTTON_UP           BUTTON_TWO
 #define BUTTON_SELECT       BUTTON_THREE
 #define BUTTON_DOWN         BUTTON_FOUR

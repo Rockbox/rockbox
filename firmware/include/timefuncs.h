@@ -34,4 +34,3 @@ void set_day_of_week(struct tm *tm);
 #endif
 
 #endif /* _TIMEFUNCS_H_ */
-

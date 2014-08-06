@@ -32,7 +32,7 @@ class EncoderBase : public EncTtsSettingInterface
     public:
         EncoderBase(QObject *parent );
 
-        //! Child class should encode a wav file 
+        //! Child class should encode a wav file
         virtual bool encode(QString input,QString output) =0;
         //! Child class should do startup
         virtual bool start()=0;
@@ -60,4 +60,3 @@ class EncoderBase : public EncTtsSettingInterface
 };
 
 #endif
-

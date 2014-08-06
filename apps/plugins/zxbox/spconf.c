@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,7 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
- 
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -68,8 +68,8 @@ int spcf_find_file_type(char *filename, int *ftp, int *ftsubp)
   if(*ftp >= 0 && *ftsubp >= 0) return 1;
 
   found = 0;
-  
-  for(i = 0; extensions[i].ext != NULL; i++) 
+
+  for(i = 0; extensions[i].ext != NULL; i++)
     if((*ftp < 0 || *ftp == extensions[i].type) &&
        (*ftsubp < 0 || *ftsubp == extensions[i].subtype) &&
        check_ext(filename, extensions[i].ext)) {
@@ -79,7 +79,7 @@ int spcf_find_file_type(char *filename, int *ftp, int *ftsubp)
       break;
     }
 
-  if(!found) for(i = 0; extensions[i].ext != NULL; i++) 
+  if(!found) for(i = 0; extensions[i].ext != NULL; i++)
     if((*ftp < 0 || *ftp == extensions[i].type) &&
        (*ftsubp < 0 || *ftsubp == extensions[i].subtype) &&
        try_extension(filename, extensions[i].ext)) {
@@ -88,7 +88,7 @@ int spcf_find_file_type(char *filename, int *ftp, int *ftsubp)
       *ftsubp = extensions[i].subtype;
       break;
     }
-  
+
   return found;
 }
 
@@ -108,7 +108,7 @@ void spcf_read_command_line(const void* parameter)
   int ix;
 
   ix = find_extension( parameter - 3 + rb->strlen (parameter) );
-      
+
   file_type = extensions[ix].type;
   file_subtype = extensions[ix].subtype;
   rb->strlcpy(filenamebuf, parameter, MAXFILENAME - 10 + 1);
@@ -125,4 +125,3 @@ void spcf_read_command_line(const void* parameter)
     spcf_init_tapefile_type = file_subtype;
   }
 }
-

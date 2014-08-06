@@ -55,7 +55,7 @@ enum plugin_status plugin_start(const void* void_parameter)
 {
     bool found;
     bool its_a_dir;
-    
+
     /* This is a viewer, so a parameter must have been specified */
     if (void_parameter == NULL) {
         rb->splash(HZ*2, "No parameter specified!");
@@ -95,12 +95,12 @@ enum plugin_status plugin_start(const void* void_parameter)
         DEBUGF("Couldn't load '%s'\n", SHORTCUTS_FILENAME);
         return PLUGIN_ERROR;
     }
-    
+
     if (!append_entry_to_file(&sc_file, parameter, its_a_dir)) {
         DEBUGF("Couldn't append entry (too many entries?)\n");
         return PLUGIN_ERROR;
     }
-    
+
     if (!dump_sc_file(&sc_file, SHORTCUTS_FILENAME)) {
         DEBUGF("Couldn't write shortcuts to '%s'\n", SHORTCUTS_FILENAME);
         return PLUGIN_ERROR;

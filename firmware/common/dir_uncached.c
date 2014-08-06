@@ -170,7 +170,7 @@ struct dirent_uncached* readdir_uncached(DIR_UNCACHED* dir)
             {
                 memset(theent, 0, sizeof(*theent));
                 theent->info.attribute = FAT_ATTR_DIRECTORY | FAT_ATTR_VOLUME;
-                snprintf(theent->d_name, sizeof(theent->d_name), 
+                snprintf(theent->d_name, sizeof(theent->d_name),
                          VOL_NAMES, dir->volumecounter);
                 return theent;
             }
@@ -236,16 +236,16 @@ int mkdir_uncached(const char *name)
         parent = "/";
     else
         parent = namecopy;
-        
+
     DEBUGF("mkdir: parent: %s, name: %s\n", parent, basename);
 
     dir = opendir_uncached(parent);
-    
+
     if(!dir) {
         DEBUGF("mkdir: can't open parent dir\n");
         pdir->busy = false;
         return -2;
-    }    
+    }
 
     if(basename[0] == 0) {
         DEBUGF("mkdir: Empty dir name\n");
@@ -253,7 +253,7 @@ int mkdir_uncached(const char *name)
         errno = EINVAL;
         return -3;
     }
-    
+
     /* Now check if the name already exists */
     while ((entry = readdir_uncached(dir))) {
         if ( !strcasecmp(basename, entry->d_name) ) {
@@ -266,11 +266,11 @@ int mkdir_uncached(const char *name)
     }
 
     memset(newdir, 0, sizeof(struct fat_dir));
-    
+
     rc = fat_create_dir(basename, newdir, &(dir->fatdir));
     closedir_uncached(dir);
     pdir->busy = false;
-    
+
     return rc;
 }
 
@@ -279,7 +279,7 @@ int rmdir_uncached(const char* name)
     int rc;
     DIR_UNCACHED* dir;
     struct dirent_uncached* entry;
-    
+
     dir = opendir_uncached(name);
     if (!dir)
     {

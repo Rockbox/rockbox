@@ -46,4 +46,3 @@ const unsigned short percent_to_volt_charge[11] =
     /* Sansa Li Ion 750mAH FIXME */
     3300, 3680, 3740, 3760, 3780, 3810, 3870, 3930, 3970, 4070, 4160
 };
-

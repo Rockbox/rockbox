@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2002 by Daniel Stenberg
@@ -50,9 +50,9 @@ void format_time(char* buf, int buf_size, long t);
 bool warn_on_pl_erase(void);
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
- * read (which may be larger than the number of bytes stored in buffer). If 
- * an error occurs, -1 is returned (and buffer contains whatever could be 
- * read). A line is terminated by a LF char. Neither LF nor CR chars are 
+ * read (which may be larger than the number of bytes stored in buffer). If
+ * an error occurs, -1 is returned (and buffer contains whatever could be
+ * read). A line is terminated by a LF char. Neither LF nor CR chars are
  * stored in buffer.
  */
 int read_line(int fd, char* buffer, int buffer_size);

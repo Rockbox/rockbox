@@ -104,7 +104,7 @@ void __buttonlight_mode(enum buttonlight_mode mode)
         case BUTTONLIGHT_ON:
         buttonlight_control = BUTTONLIGHT_CONTROL_ON;
         break;
-        
+
         case BUTTONLIGHT_FOLLOW:
         buttonlight_control = BUTTONLIGHT_CONTROL_FADE;
         break;
@@ -341,7 +341,7 @@ void _backlight_on(void)
     lcd_enable(true); /* power on lcd + visible display */
 #endif
     __backlight_dim(false);
-}    
+}
 
 void _backlight_off(void)
 {

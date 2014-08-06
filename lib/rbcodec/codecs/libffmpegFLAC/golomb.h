@@ -24,31 +24,31 @@
 
 /**
  * @file golomb.h
- * @brief 
+ * @brief
  *     exp golomb vlc stuff
  * @author Michael Niedermayer <michaelni@gmx.at> and Alex Beregszaszi
  */
 
- 
+
 /**
  * read unsigned golomb rice code (jpegls).
  */
 static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit, int esc_len){
     unsigned int buf;
     int log;
-    
+
     OPEN_READER(re, gb);
     UPDATE_CACHE(re, gb);
     buf=GET_CACHE(re, gb);
 
     log= av_log2(buf);
-    
+
     if(log - k >= 32-MIN_CACHE_BITS+(MIN_CACHE_BITS==32) && 32-log < limit){
         buf >>= log - k;
         buf += (30-log)<<k;
         LAST_SKIP_BITS(re, gb, 32 + k - log);
         CLOSE_READER(re, gb);
-    
+
         return buf;
     }else{
         int i;
@@ -72,7 +72,7 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit, int 
             buf = SHOW_UBITS(re, gb, esc_len);
             LAST_SKIP_BITS(re, gb, esc_len);
             CLOSE_READER(re, gb);
-    
+
             return buf + 1;
         }else
             return -1;

@@ -57,7 +57,7 @@ static inline bool ab_repeat_mode_enabled(void)
 static inline bool ab_reached_B_marker(unsigned int song_position)
 {
 /* following is the size of the window in which we'll detect that the B marker
-was hit; it must be larger than the frequency (in milliseconds) at which this 
+was hit; it must be larger than the frequency (in milliseconds) at which this
 function is called otherwise detection of the B marker will be unreliable */
 #if (CONFIG_CODEC == SWCODEC)
 /* On swcodec, the worst case seems to be 9600kHz with 1024 samples between
@@ -65,13 +65,13 @@ function is called otherwise detection of the B marker will be unreliable */
 #define B_MARKER_DETECT_WINDOW 200
 #else
 /* we assume that this function will be called on each system tick and derive
-the window size from this with a generous margin of error (note: the number 
+the window size from this with a generous margin of error (note: the number
 of ticks per second is given by HZ) */
 #define B_MARKER_DETECT_WINDOW ((1000/HZ)*10)
 #endif
     if (ab_B_marker != AB_MARKER_NONE)
     {
-        if ( (song_position >= ab_B_marker) 
+        if ( (song_position >= ab_B_marker)
         && (song_position <= (ab_B_marker+B_MARKER_DETECT_WINDOW)) )
             return true;
     }
@@ -83,7 +83,7 @@ static inline void ab_position_report(unsigned long position)
 {
     if (ab_repeat_mode_enabled())
     {
-        if ( !(audio_status() & AUDIO_STATUS_PAUSE) && 
+        if ( !(audio_status() & AUDIO_STATUS_PAUSE) &&
                 ab_reached_B_marker(position) )
         {
             ab_jump_to_A_marker();

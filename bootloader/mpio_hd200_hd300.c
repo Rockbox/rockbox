@@ -144,7 +144,7 @@ static void __shutdown(void)
     {
         /* Make sure ATA has been initialized. */
         storage_init();
-        
+
         /* And put the disk into sleep immediately. */
         storage_sleepnow();
     }
@@ -161,14 +161,14 @@ static void check_battery(void)
 {
 
     int battery_voltage, batt_int, batt_frac;
-    
+
     battery_voltage = _battery_voltage();
     batt_int = battery_voltage / 1000;
     batt_frac = (battery_voltage % 1000) / 10;
 
     printf("Battery: %d.%02dV", batt_int, batt_frac);
 
-    if (battery_voltage <= 3500) 
+    if (battery_voltage <= 3500)
     {
         printf("WARNING! BATTERY LOW!!");
         sleep(HZ*2);
@@ -211,7 +211,7 @@ static void rb_boot(void)
 
     printf("Loading firmware");
 
-    rc = load_firmware((unsigned char *)DRAM_START, 
+    rc = load_firmware((unsigned char *)DRAM_START,
                        BOOTFILE, MAX_LOADSIZE);
 
     if (rc <= EFILE_EMPTY)
@@ -265,7 +265,7 @@ static void bootmenu(void)
 
         line = 15;
 
-        printf("Time left: %ds",(BOOTMENU_TIMEOUT - 
+        printf("Time left: %ds",(BOOTMENU_TIMEOUT -
                                  (current_tick - start_tick))/HZ);
 
         lcd_update();
@@ -407,7 +407,7 @@ void main(void)
 #endif
            )
             event |= EVENT_ON;
- 
+
         if ( usb_detect() == USB_INSERTED )
             event |= EVENT_USB;
 
@@ -457,7 +457,7 @@ void main(void)
                     ide_power_enable(false);
                     sleep(HZ);
                 }
-                   
+
                 if(!_battery_full())
                 {
                     if (blink_toggle)
@@ -506,7 +506,7 @@ void main(void)
                     ata_enable(false);
                     usb_enable(true);
                 }
-                
+
                 /* display blinking USB indicator */
                 line = 0;
 

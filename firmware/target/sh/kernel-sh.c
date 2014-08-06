@@ -35,9 +35,9 @@ void tick_start(unsigned int interval_in_ms)
                interval_in_ms);
         return;
     }
-    
+
     /* We are using timer 0 */
-    
+
     TSTR &= ~0x01; /* Stop the timer */
     TSNC &= ~0x01; /* No synchronization */
     TMDR &= ~0x01; /* Operate normally */
@@ -48,7 +48,7 @@ void tick_start(unsigned int interval_in_ms)
 
     /* Enable interrupt on level 1 */
     IPRC = (IPRC & ~0x00f0) | 0x0010;
-    
+
     TSR0 &= ~0x01;
     TIER0 = 0xf9; /* Enable GRA match interrupt */
 

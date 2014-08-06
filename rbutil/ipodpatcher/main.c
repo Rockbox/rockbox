@@ -230,11 +230,11 @@ int main(int argc, char* argv[])
             action = INSTALL;
             i++;
 #endif
-        } else if ((strcmp(argv[i],"-d")==0) || 
+        } else if ((strcmp(argv[i],"-d")==0) ||
                    (strcmp(argv[i],"--delete-bootloader")==0)) {
             action = DELETE_BOOTLOADER;
             i++;
-        } else if ((strcmp(argv[i],"-a")==0) || 
+        } else if ((strcmp(argv[i],"-a")==0) ||
                    (strcmp(argv[i],"--add-bootloader")==0)) {
             action = ADD_BOOTLOADER;
             type = FILETYPE_DOT_IPOD;
@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-ab")==0) || 
+        } else if ((strcmp(argv[i],"-ab")==0) ||
                    (strcmp(argv[i],"--add-bootloader-bin")==0)) {
             action = ADD_BOOTLOADER;
             type = FILETYPE_DOT_BIN;
@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-rf")==0) || 
+        } else if ((strcmp(argv[i],"-rf")==0) ||
                    (strcmp(argv[i],"--read-firmware")==0)) {
             action = READ_FIRMWARE;
             type = FILETYPE_DOT_IPOD;
@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-rfb")==0) || 
+        } else if ((strcmp(argv[i],"-rfb")==0) ||
                    (strcmp(argv[i],"--read-firmware-bin")==0)) {
             action = READ_FIRMWARE;
             type = FILETYPE_DOT_BIN;
@@ -267,14 +267,14 @@ int main(int argc, char* argv[])
             filename=argv[i];
             i++;
 #ifdef WITH_BOOTOBJS
-        } else if ((strcmp(argv[i],"-we")==0) || 
+        } else if ((strcmp(argv[i],"-we")==0) ||
                    (strcmp(argv[i],"--write-embedded")==0)) {
             action = WRITE_FIRMWARE;
             type = FILETYPE_INTERNAL;
             filename="[embedded bootloader]";  /* Only displayed for user */
             i++;
 #endif
-        } else if ((strcmp(argv[i],"-wf")==0) || 
+        } else if ((strcmp(argv[i],"-wf")==0) ||
                    (strcmp(argv[i],"--write-firmware")==0)) {
             action = WRITE_FIRMWARE;
             type = FILETYPE_DOT_IPOD;
@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-wfb")==0) || 
+        } else if ((strcmp(argv[i],"-wfb")==0) ||
                    (strcmp(argv[i],"--write-firmware-bin")==0)) {
             action = WRITE_FIRMWARE;
             type = FILETYPE_DOT_BIN;
@@ -290,25 +290,25 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-r")==0) || 
+        } else if ((strcmp(argv[i],"-r")==0) ||
                    (strcmp(argv[i],"--read-partition")==0)) {
             action = READ_PARTITION;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-w")==0) || 
+        } else if ((strcmp(argv[i],"-w")==0) ||
                    (strcmp(argv[i],"--write-partition")==0)) {
             action = WRITE_PARTITION;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-v")==0) || 
+        } else if ((strcmp(argv[i],"-v")==0) ||
                    (strcmp(argv[i],"--verbose")==0)) {
             ipod_verbose++;
             i++;
-        } else if ((strcmp(argv[i],"-f")==0) || 
+        } else if ((strcmp(argv[i],"-f")==0) ||
                    (strcmp(argv[i],"--format")==0)) {
             action = FORMAT_PARTITION;
             i++;
@@ -331,7 +331,7 @@ int main(int argc, char* argv[])
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
             i++;
-        } else if ((strcmp(argv[i],"-c")==0) || 
+        } else if ((strcmp(argv[i],"-c")==0) ||
                    (strcmp(argv[i],"--convert")==0)) {
             action = CONVERT_TO_FAT32;
             i++;
@@ -385,7 +385,7 @@ int main(int argc, char* argv[])
 #endif
 
 
-    /* Read the XML info, and if successful, look for the ramsize 
+    /* Read the XML info, and if successful, look for the ramsize
        (only available for some models - set to 0 if not known) */
 
     ipod.ramsize = 0;
@@ -401,7 +401,7 @@ int main(int argc, char* argv[])
     if (ipod.macpod) {
         print_macpod_warning();
     }
-  
+
     if (action==LIST_IMAGES) {
         list_images(&ipod);
 #ifdef WITH_BOOTOBJS
@@ -563,7 +563,7 @@ int main(int argc, char* argv[])
         printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FEATURE.\n");
         printf("ALL DATA ON YOUR IPOD WILL BE ERASED.\n");
         printf("Are you sure you want to format your ipod? (y/n):");
-        
+
         if (fgets(yesno,4,stdin)) {
             if (yesno[0]=='y') {
                 if (ipod_reopen_rw(&ipod) < 0) {
@@ -584,7 +584,7 @@ int main(int argc, char* argv[])
             printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FEATURE.\n");
             printf("ALL DATA ON YOUR IPOD WILL BE ERASED.\n");
             printf("Are you sure you want to convert your ipod to FAT32? (y/n):");
-        
+
             if (fgets(yesno,4,stdin)) {
                 if (yesno[0]=='y') {
                     if (ipod_reopen_rw(&ipod) < 0) {

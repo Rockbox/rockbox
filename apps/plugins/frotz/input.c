@@ -1,5 +1,5 @@
 /* input.c - High level input functions
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * Changes for Rockbox copyright 2009 Torne Wuff
  *
@@ -40,27 +40,27 @@ bool is_terminator (zchar key)
 {
 
     if (key == ZC_TIME_OUT)
-	return TRUE;
+        return TRUE;
     if (key == ZC_RETURN)
-	return TRUE;
+        return TRUE;
     if (key >= ZC_HKEY_MIN && key <= ZC_HKEY_MAX)
-	return TRUE;
+        return TRUE;
 
     if (h_terminating_keys != 0)
 
-	if (key >= ZC_ARROW_MIN && key <= ZC_MENU_CLICK) {
+        if (key >= ZC_ARROW_MIN && key <= ZC_MENU_CLICK) {
 
-	    zword addr = h_terminating_keys;
-	    zbyte c;
+            zword addr = h_terminating_keys;
+            zbyte c;
 
-	    do {
-		LOW_BYTE (addr, c)
-		if (c == 255 || key == translate_from_zscii (c))
-		    return TRUE;
-		addr++;
-	    } while (c != 0);
+            do {
+                LOW_BYTE (addr, c)
+                if (c == 255 || key == translate_from_zscii (c))
+                    return TRUE;
+                addr++;
+            } while (c != 0);
 
-	}
+        }
 
     return FALSE;
 
@@ -69,8 +69,8 @@ bool is_terminator (zchar key)
 /*
  * z_make_menu, add or remove a menu and branch if successful.
  *
- * 	zargs[0] = number of menu
- *	zargs[1] = table of menu entries or 0 to remove menu
+ *      zargs[0] = number of menu
+ *      zargs[1] = table of menu entries or 0 to remove menu
  *
  */
 
@@ -102,7 +102,7 @@ void read_string (int max, zchar *buffer)
 
     do {
 
-	key = stream_read_input (max, buffer, 0, 0, FALSE, FALSE);
+        key = stream_read_input (max, buffer, 0, 0, FALSE, FALSE);
 
     } while (key != ZC_RETURN);
 
@@ -124,8 +124,8 @@ int read_number (void)
     read_string (5, buffer);
 
     for (i = 0; buffer[i] != 0; i++)
-	if (buffer[i] >= '0' && buffer[i] <= '9')
-	    value = 10 * value + buffer[i] - '0';
+        if (buffer[i] >= '0' && buffer[i] <= '9')
+            value = 10 * value + buffer[i] - '0';
 
     return value;
 
@@ -134,10 +134,10 @@ int read_number (void)
 /*
  * z_read, read a line of input and (in V5+) store the terminating key.
  *
- *	zargs[0] = address of text buffer
- *	zargs[1] = address of token buffer
- *	zargs[2] = timeout in tenths of a second (optional)
- *	zargs[3] = packed address of routine to be called on timeout
+ *      zargs[0] = address of text buffer
+ *      zargs[1] = address of token buffer
+ *      zargs[2] = timeout in tenths of a second (optional)
+ *      zargs[3] = packed address of routine to be called on timeout
  *
  */
 
@@ -153,7 +153,7 @@ void z_read (void)
     /* Supply default arguments */
 
     if (zargc < 3)
-	zargs[2] = 0;
+        zargs[2] = 0;
 
     /* Get maximum input size */
 
@@ -162,24 +162,24 @@ void z_read (void)
     LOW_BYTE (addr, max)
 
     if (h_version <= V4)
-	max--;
+        max--;
 
     if (max >= INPUT_BUFFER_SIZE)
-	max = INPUT_BUFFER_SIZE - 1;
+        max = INPUT_BUFFER_SIZE - 1;
 
     /* Get initial input size */
 
     if (h_version >= V5) {
-	addr++;
-	LOW_BYTE (addr, size)
+        addr++;
+        LOW_BYTE (addr, size)
     } else size = 0;
 
     /* Copy initial input to local buffer */
 
     for (i = 0; i < size; i++) {
-	addr++;
-	LOW_BYTE (addr, c)
-	buffer[i] = translate_from_zscii (c);
+        addr++;
+        LOW_BYTE (addr, c)
+        buffer[i] = translate_from_zscii (c);
     }
 
     buffer[i] = 0;
@@ -187,67 +187,67 @@ void z_read (void)
     /* Draw status line for V1 to V3 games */
 
     if (h_version <= V3)
-	z_show_status ();
+        z_show_status ();
 
     /* Read input from current input stream */
 
     key = stream_read_input (
-	max, buffer,		/* buffer and size */
-	zargs[2],		/* timeout value   */
-	zargs[3],		/* timeout routine */
-	TRUE,	        	/* enable hot keys */
-	h_version == V6);	/* no script in V6 */
+        max, buffer,            /* buffer and size */
+        zargs[2],               /* timeout value   */
+        zargs[3],               /* timeout routine */
+        TRUE,                   /* enable hot keys */
+        h_version == V6);       /* no script in V6 */
 
     if (key == ZC_BAD)
-	return;
+        return;
 
     /* Perform save_undo for V1 to V4 games */
 
     if (h_version <= V4)
-	save_undo ();
+        save_undo ();
 
     /* Copy local buffer back to dynamic memory */
 
     for (i = 0; buffer[i] != 0; i++) {
 
-	if (key == ZC_RETURN) {
+        if (key == ZC_RETURN) {
 
-	    if (buffer[i] >= 'A' && buffer[i] <= 'Z')
-		buffer[i] += 'a' - 'A';
-	    if (buffer[i] >= 0xc0 && buffer[i] <= 0xde && buffer[i] != 0xd7)
-		buffer[i] += 0x20;
+            if (buffer[i] >= 'A' && buffer[i] <= 'Z')
+                buffer[i] += 'a' - 'A';
+            if (buffer[i] >= 0xc0 && buffer[i] <= 0xde && buffer[i] != 0xd7)
+                buffer[i] += 0x20;
 
-	}
+        }
 
-	storeb ((zword) (zargs[0] + ((h_version <= V4) ? 1 : 2) + i), translate_to_zscii (buffer[i]));
+        storeb ((zword) (zargs[0] + ((h_version <= V4) ? 1 : 2) + i), translate_to_zscii (buffer[i]));
 
     }
 
     /* Add null character (V1-V4) or write input length into 2nd byte */
 
     if (h_version <= V4)
-	storeb ((zword) (zargs[0] + 1 + i), 0);
+        storeb ((zword) (zargs[0] + 1 + i), 0);
     else
-	storeb ((zword) (zargs[0] + 1), i);
+        storeb ((zword) (zargs[0] + 1), i);
 
     /* Tokenise line if a token buffer is present */
 
     if (key == ZC_RETURN && zargs[1] != 0)
-	tokenise_line (zargs[0], zargs[1], 0, FALSE);
+        tokenise_line (zargs[0], zargs[1], 0, FALSE);
 
     /* Store key */
 
     if (h_version >= V5)
-	store (translate_to_zscii (key));
+        store (translate_to_zscii (key));
 
 }/* z_read */
 
 /*
  * z_read_char, read and store a key.
  *
- *	zargs[0] = input device (must be 1)
- *	zargs[1] = timeout in tenths of a second (optional)
- *	zargs[2] = packed address of routine to be called on timeout
+ *      zargs[0] = input device (must be 1)
+ *      zargs[1] = timeout in tenths of a second (optional)
+ *      zargs[2] = packed address of routine to be called on timeout
  *
  */
 
@@ -258,17 +258,17 @@ void z_read_char (void)
     /* Supply default arguments */
 
     if (zargc < 2)
-	zargs[1] = 0;
+        zargs[1] = 0;
 
     /* Read input from the current input stream */
 
     key = stream_read_key (
-	zargs[1],	/* timeout value   */
-	zargs[2],	/* timeout routine */
-	TRUE);  	/* enable hot keys */
+        zargs[1],       /* timeout value   */
+        zargs[2],       /* timeout routine */
+        TRUE);          /* enable hot keys */
 
     if (key == ZC_BAD)
-	return;
+        return;
 
     /* Store key */
 
@@ -279,7 +279,7 @@ void z_read_char (void)
 /*
  * z_read_mouse, write the current mouse status into a table.
  *
- *	zargs[0] = address of table
+ *      zargs[0] = address of table
  *
  */
 
@@ -295,7 +295,7 @@ void z_read_mouse (void)
 
     storew ((zword) (zargs[0] + 0), hx_mouse_y);
     storew ((zword) (zargs[0] + 2), hx_mouse_x);
-    storew ((zword) (zargs[0] + 4), btn);	/* mouse button bits */
-    storew ((zword) (zargs[0] + 6), 0);		/* menu selection */
+    storew ((zword) (zargs[0] + 4), btn);       /* mouse button bits */
+    storew ((zword) (zargs[0] + 6), 0);         /* menu selection */
 
 }/* z_read_mouse */

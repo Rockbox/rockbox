@@ -44,12 +44,12 @@ static void vu_update_rms(t_vu *x, t_glist *glist)
 #else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
-	int w4=x->x_gui.x_w/4, off=text_ypix(&x->x_gui.x_obj, glist)-1;
-	int xpos=text_xpix(&x->x_gui.x_obj, glist), quad1=xpos+w4+1, quad3=xpos+x->x_gui.x_w-w4-1;
+        int w4=x->x_gui.x_w/4, off=text_ypix(&x->x_gui.x_obj, glist)-1;
+        int xpos=text_xpix(&x->x_gui.x_obj, glist), quad1=xpos+w4+1, quad3=xpos+x->x_gui.x_w-w4-1;
 
-	sys_vgui(".x%x.c coords %xRCOVER %d %d %d %d\n",
-		 glist_getcanvas(glist), x, quad1, off, quad3,
-		 off + (x->x_led_size+1)*(IEM_VU_STEPS-x->x_rms));
+        sys_vgui(".x%x.c coords %xRCOVER %d %d %d %d\n",
+                 glist_getcanvas(glist), x, quad1, off, quad3,
+                 off + (x->x_led_size+1)*(IEM_VU_STEPS-x->x_rms));
     }
 #endif /* ROCKBOX */
 }
@@ -65,30 +65,30 @@ static void vu_update_peak(t_vu *x, t_glist *glist)
     if(glist_isvisible(glist))
     {
         int xpos=text_xpix(&x->x_gui.x_obj, glist);
-	int ypos=text_ypix(&x->x_gui.x_obj, glist);
+        int ypos=text_ypix(&x->x_gui.x_obj, glist);
 
-	if(x->x_peak)
-	{
-	    int i=iemgui_vu_col[x->x_peak];
-	    int j=ypos + (x->x_led_size+1)*(IEM_VU_STEPS+1-x->x_peak)
-		- (x->x_led_size+1)/2;
+        if(x->x_peak)
+        {
+            int i=iemgui_vu_col[x->x_peak];
+            int j=ypos + (x->x_led_size+1)*(IEM_VU_STEPS+1-x->x_peak)
+                - (x->x_led_size+1)/2;
 
-	    sys_vgui(".x%x.c coords %xPLED %d %d %d %d\n", canvas, x,
-		     xpos, j,
-		     xpos+x->x_gui.x_w+1, j);
-	    sys_vgui(".x%x.c itemconfigure %xPLED -fill #%6.6x\n", canvas, x,
-		     iemgui_color_hex[i]);
-	}
-	else
-	{
-	    int mid=xpos+x->x_gui.x_w/2;
+            sys_vgui(".x%x.c coords %xPLED %d %d %d %d\n", canvas, x,
+                     xpos, j,
+                     xpos+x->x_gui.x_w+1, j);
+            sys_vgui(".x%x.c itemconfigure %xPLED -fill #%6.6x\n", canvas, x,
+                     iemgui_color_hex[i]);
+        }
+        else
+        {
+            int mid=xpos+x->x_gui.x_w/2;
 
-	    sys_vgui(".x%x.c itemconfigure %xPLED -fill #%6.6x\n",
-		     canvas, x, x->x_gui.x_bcol);
-	    sys_vgui(".x%x.c coords %xPLED %d %d %d %d\n",
-		     canvas, x, mid, ypos+20,
-		     mid, ypos+20);
-	}
+            sys_vgui(".x%x.c itemconfigure %xPLED -fill #%6.6x\n",
+                     canvas, x, x->x_gui.x_bcol);
+            sys_vgui(".x%x.c coords %xPLED %d %d %d %d\n",
+                     canvas, x, mid, ypos+20,
+                     mid, ypos+20);
+        }
     }
 #endif /* ROCKBOX */
 }
@@ -104,24 +104,24 @@ static void vu_draw_new(t_vu *x, t_glist *glist)
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
     int w4=x->x_gui.x_w/4, mid=xpos+x->x_gui.x_w/2,
-    	quad1=xpos+w4+1;
+        quad1=xpos+w4+1;
     int quad3=xpos+x->x_gui.x_w-w4,
-    	end=xpos+x->x_gui.x_w+4;
+        end=xpos+x->x_gui.x_w+4;
     int k1=x->x_led_size+1, k2=IEM_VU_STEPS+1, k3=k1/2;
     int led_col, yyy, i, k4=ypos-k3;
 
     sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE\n",
-	     canvas, xpos-1, ypos-2,
-	     xpos+x->x_gui.x_w+1,
-	     ypos+x->x_gui.x_h+2, x->x_gui.x_bcol, x);
+             canvas, xpos-1, ypos-2,
+             xpos+x->x_gui.x_w+1,
+             ypos+x->x_gui.x_h+2, x->x_gui.x_bcol, x);
     for(i=1; i<=IEM_VU_STEPS; i++)
     {
-	led_col = iemgui_vu_col[i];
-	yyy = k4 + k1*(k2-i);
-	sys_vgui(".x%x.c create line %d %d %d %d -width %d -fill #%6.6x -tags %xRLED%d\n",
-		 canvas, quad1, yyy, quad3, yyy, x->x_led_size, iemgui_color_hex[led_col], x, i);
-	if(((i+2)&3) && (x->x_scale))
-	    sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
+        led_col = iemgui_vu_col[i];
+        yyy = k4 + k1*(k2-i);
+        sys_vgui(".x%x.c create line %d %d %d %d -width %d -fill #%6.6x -tags %xRLED%d\n",
+                 canvas, quad1, yyy, quad3, yyy, x->x_led_size, iemgui_color_hex[led_col], x, i);
+        if(((i+2)&3) && (x->x_scale))
+            sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 		     -font {%s %d bold} -fill #%6.6x -tags %xSCALE%d\n",
 		     canvas, end, yyy+k3, iemgui_vu_scale_str[i], x->x_gui.x_font, x->x_gui.x_fontsize,
 		     x->x_gui.x_lcol, x, i);
@@ -787,4 +787,3 @@ void g_vumeter_setup(void)
     class_setsavefn(vu_class, vu_save);
     class_setpropertiesfn(vu_class, vu_properties);
 }
-

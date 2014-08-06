@@ -54,7 +54,7 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
             else if (setting->flags&F_T_SOUND)
                 rb->snprintf(text, sizeof(text), "Min: %d, Max %d",
                          rb->sound_min(setting->sound_setting->setting),
-                         rb->sound_max(setting->sound_setting->setting)); 
+                         rb->sound_max(setting->sound_setting->setting));
             else if (setting->flags&F_TABLE_SETTING)
             {
                 char temp[8];
@@ -63,7 +63,7 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
                              setting->flags&F_ALLOW_ARBITRARY_VALS? " (And any value between)":"");
                 for(i=0;i<setting->table_setting->count;i++)
                 {
-                    rb->snprintf(temp, 8, "%d, ", 
+                    rb->snprintf(temp, 8, "%d, ",
                                  setting->table_setting->values[i]);
                     rb->strcat(text, temp);
                 }
@@ -71,7 +71,7 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
             else if (setting->flags&F_INT_SETTING)
             {
                 int min = setting->int_setting->min,
-                    max = setting->int_setting->max, 
+                    max = setting->int_setting->max,
                     step = setting->int_setting->step;
                 rb->snprintf(text, sizeof(text), "Min: %d, Max: %d, Step size: %d",
                          min, max, step);
@@ -84,7 +84,7 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
                 temp[0] = '\0';
                 for(i=0;i<setting->choice_setting->count;i++)
                 {
-                    rb->snprintf(temp, 64, "%s, ", 
+                    rb->snprintf(temp, 64, "%s, ",
                                  setting->choice_setting->desc[i]);
                     rb->strcat(text, temp);
                 }
@@ -114,7 +114,7 @@ static void write_setting(const struct settings_list *setting, int fd, unsigned 
     }
     rb->fdprintf(fd, "%s: %s\r\n", setting->cfg_name, text);
 }
-                    
+
 
 
 /* this is the plugin entry point */
@@ -125,18 +125,18 @@ enum plugin_status plugin_start(
     int setting_count, i;
     int fd;
     (void)parameter;
-    
+
     fd = rb->open(FILENAME, O_CREAT|O_TRUNC|O_WRONLY, 0666);
     if (fd < 0)
         return PLUGIN_ERROR;
     list = rb->get_settings_list(&setting_count);
     rb->fdprintf(fd, "# .cfg file created by rockbox %s - "
             "http://www.rockbox.org\r\n\r\n", rb->rbversion);
-    
+
     rb->fdprintf(fd, "# -- Sound settings -- #\r\n");
     for(i=0;i<setting_count;i++)
         write_setting(&list[i], fd, F_SOUNDSETTING);
-    
+
     rb->fdprintf(fd, "\r\n\r\n# -- Theme settings -- #\r\n");
     for(i=0;i<setting_count;i++)
         write_setting(&list[i], fd, F_THEMESETTING);
@@ -148,11 +148,11 @@ enum plugin_status plugin_start(
     rb->fdprintf(fd, "\r\n\r\n# -- EQ settings -- #\r\n");
     for(i=0;i<setting_count;i++)
         write_setting(&list[i], fd, F_EQSETTING);
-    
+
     rb->fdprintf(fd, "\r\n\r\n# -- Other settings -- #\r\n");
     for(i=0;i<setting_count;i++)
         write_setting(&list[i], fd, 0);
-    
+
     rb->fdprintf(fd, "\r\n\r\n# Total settings count: %d\r\n", setting_count);
     rb->close(fd);
     rb->splash(HZ, "Done!");

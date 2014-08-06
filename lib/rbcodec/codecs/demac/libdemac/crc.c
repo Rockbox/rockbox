@@ -117,4 +117,3 @@ uint32_t ape_finishcrc(uint32_t crc)
 
     return crc;
 }
-

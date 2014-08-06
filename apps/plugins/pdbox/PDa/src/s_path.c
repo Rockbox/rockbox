@@ -8,7 +8,7 @@
  *
  * Generalized by MSP to provide an open_via_path function
  * and lists of files for all purposes.
- */ 
+ */
 
 /* #define PD_DEBUG(x) x */
 #define PD_DEBUG(x)
@@ -53,7 +53,7 @@ static const char* strtokcpy(char *to, const char *from, int delim)
     int size = 0;
 
     while (from[size] != (char)delim && from[size] != '\0')
-    	size++;
+        size++;
 
     strncpy(to,from,size);
     to[size] = '\0';
@@ -83,7 +83,7 @@ static t_namelist *namelist_doappend(t_namelist *listwas, const char *s)
     else
     {
         while (nl->nl_next)
-    	    nl = nl->nl_next;
+            nl = nl->nl_next;
         nl->nl_next = nl2;
     }
     return (rtn);
@@ -95,7 +95,7 @@ t_namelist *namelist_append(t_namelist *listwas, const char *s)
     const char *npos;
     char temp[MAXPDSTRING];
     t_namelist *nl = listwas, *rtn = listwas;
-    
+
 #ifdef ROCKBOX
     (void) rtn;
 #endif
@@ -103,11 +103,11 @@ t_namelist *namelist_append(t_namelist *listwas, const char *s)
     npos = s;
     do
     {
-	npos = strtokcpy(temp, npos, SEPARATOR);
-	if (! *temp) continue;
-	nl = namelist_doappend(nl, temp);
+        npos = strtokcpy(temp, npos, SEPARATOR);
+        if (! *temp) continue;
+        nl = namelist_doappend(nl, temp);
     }
-	while (npos);
+        while (npos);
     return (nl);
 }
 
@@ -116,9 +116,9 @@ void namelist_free(t_namelist *listwas)
     t_namelist *nl, *nl2;
     for (nl = listwas; nl; nl = nl2)
     {
-    	nl2 = nl->nl_next;
-	t_freebytes(nl->nl_string, strlen(nl->nl_string) + 1);
-	t_freebytes(nl, sizeof(*nl));
+        nl2 = nl->nl_next;
+        t_freebytes(nl->nl_string, strlen(nl->nl_string) + 1);
+        t_freebytes(nl, sizeof(*nl));
     }
 }
 
@@ -157,75 +157,75 @@ int open_via_path(const char *dir, const char *name, const char* ext,
     (void) bin;
 #endif
 
-    if (name[0] == '/' 
+    if (name[0] == '/'
 #ifdef MSW
-    	|| (name[1] == ':' && name[2] == '/')
+        || (name[1] == ':' && name[2] == '/')
 #endif
-    	    )
+            )
     {
-    	thislist.nl_next = 0;
-    	thislist.nl_string = listbuf;
-    	listbuf[0] = 0;
+        thislist.nl_next = 0;
+        thislist.nl_string = listbuf;
+        listbuf[0] = 0;
     }
     else
     {
-    	thislist.nl_string = listbuf;
-	thislist.nl_next = pd_path;
-	strncpy(listbuf, dir, MAXPDSTRING);
-	listbuf[MAXPDSTRING-1] = 0;
-	sys_unbashfilename(listbuf, listbuf);
+        thislist.nl_string = listbuf;
+        thislist.nl_next = pd_path;
+        strncpy(listbuf, dir, MAXPDSTRING);
+        listbuf[MAXPDSTRING-1] = 0;
+        sys_unbashfilename(listbuf, listbuf);
     }
 
     for (nl = &thislist; nl; nl = nl->nl_next)
     {
-    	if (strlen(nl->nl_string) + strlen(name) + strlen(ext) + 4 >
-	    size)
-	    	continue;
-	strcpy(dirresult, nl->nl_string);
-	if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
-	       strcat(dirresult, "/");
-	strcat(dirresult, name);
-	strcat(dirresult, ext);
-	sys_bashfilename(dirresult, dirresult);
+        if (strlen(nl->nl_string) + strlen(name) + strlen(ext) + 4 >
+            size)
+                continue;
+        strcpy(dirresult, nl->nl_string);
+        if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
+               strcat(dirresult, "/");
+        strcat(dirresult, name);
+        strcat(dirresult, ext);
+        sys_bashfilename(dirresult, dirresult);
 
-	PD_DEBUG(post("looking for %s",dirresult));
-	    /* see if we can open the file for reading */
-	if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(bin))) >= 0)
-	{
-	    	/* in UNIX, further check that it's not a directory */
+        PD_DEBUG(post("looking for %s",dirresult));
+            /* see if we can open the file for reading */
+        if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(bin))) >= 0)
+        {
+                /* in UNIX, further check that it's not a directory */
 #ifdef UNIX
-    	    struct stat statbuf;
-	    int ok =  ((fstat(fd, &statbuf) >= 0) &&
-	    	!S_ISDIR(statbuf.st_mode));
-	    if (!ok)
-	    {
-	    	if (sys_verbose) post("tried %s; stat failed or directory",
-		    dirresult);
-	    	close (fd);
-		fd = -1;
-    	    }
-	    else
+            struct stat statbuf;
+            int ok =  ((fstat(fd, &statbuf) >= 0) &&
+                !S_ISDIR(statbuf.st_mode));
+            if (!ok)
+            {
+                if (sys_verbose) post("tried %s; stat failed or directory",
+                    dirresult);
+                close (fd);
+                fd = -1;
+            }
+            else
 #endif
-    	    {
-	    	char *slash;
-		if (sys_verbose) post("tried %s and succeeded", dirresult);
-		sys_unbashfilename(dirresult, dirresult);
+            {
+                char *slash;
+                if (sys_verbose) post("tried %s and succeeded", dirresult);
+                sys_unbashfilename(dirresult, dirresult);
 
-		slash = strrchr(dirresult, '/');
-		if (slash)
-		{
-		    *slash = 0;
-		    *nameresult = slash + 1;
-		}
-		else *nameresult = dirresult;
-		
-	    	return (fd);
-	    }
-	}
-	else
-	{
-	    if (sys_verbose) post("tried %s and failed", dirresult);
-	}
+                slash = strrchr(dirresult, '/');
+                if (slash)
+                {
+                    *slash = 0;
+                    *nameresult = slash + 1;
+                }
+                else *nameresult = dirresult;
+
+                return (fd);
+            }
+        }
+        else
+        {
+            if (sys_verbose) post("tried %s and failed", dirresult);
+        }
     }
     *dirresult = 0;
     *nameresult = dirresult;
@@ -239,46 +239,46 @@ static int do_open_via_helppath(const char *realname, t_namelist *listp)
     char dirresult[MAXPDSTRING], realdir[MAXPDSTRING];
     for (nl = listp; nl; nl = nl->nl_next)
     {
-	strcpy(dirresult, nl->nl_string);
-	strcpy(realdir, dirresult);
-	if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
-	       strcat(dirresult, "/");
-	strcat(dirresult, realname);
-	sys_bashfilename(dirresult, dirresult);
+        strcpy(dirresult, nl->nl_string);
+        strcpy(realdir, dirresult);
+        if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
+               strcat(dirresult, "/");
+        strcat(dirresult, realname);
+        sys_bashfilename(dirresult, dirresult);
 
-	PD_DEBUG(post("looking for %s",dirresult));
-	    /* see if we can open the file for reading */
-	if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(0))) >= 0)
-	{
-	    	/* in UNIX, further check that it's not a directory */
+        PD_DEBUG(post("looking for %s",dirresult));
+            /* see if we can open the file for reading */
+        if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(0))) >= 0)
+        {
+                /* in UNIX, further check that it's not a directory */
 #ifdef UNIX
-    	    struct stat statbuf;
-	    int ok =  ((fstat(fd, &statbuf) >= 0) &&
-	    	!S_ISDIR(statbuf.st_mode));
-	    if (!ok)
-	    {
-	    	if (sys_verbose) post("tried %s; stat failed or directory",
-		    dirresult);
-	    	close (fd);
-		fd = -1;
-    	    }
-	    else
+            struct stat statbuf;
+            int ok =  ((fstat(fd, &statbuf) >= 0) &&
+                !S_ISDIR(statbuf.st_mode));
+            if (!ok)
+            {
+                if (sys_verbose) post("tried %s; stat failed or directory",
+                    dirresult);
+                close (fd);
+                fd = -1;
+            }
+            else
 #endif
-    	    {
+            {
 #ifndef ROCKBOX
-	    	char *slash;
+                char *slash;
 #endif
-		if (sys_verbose) post("tried %s and succeeded", dirresult);
-		sys_unbashfilename(dirresult, dirresult);
-		close (fd);
-		glob_evalfile(0, gensym((char*)realname), gensym(realdir));
-		return (1);
-	    }
-	}
-	else
-	{
-	    if (sys_verbose) post("tried %s and failed", dirresult);
-	}
+                if (sys_verbose) post("tried %s and succeeded", dirresult);
+                sys_unbashfilename(dirresult, dirresult);
+                close (fd);
+                glob_evalfile(0, gensym((char*)realname), gensym(realdir));
+                return (1);
+            }
+        }
+        else
+        {
+            if (sys_verbose) post("tried %s and failed", dirresult);
+        }
     }
     return (0);
 }
@@ -296,34 +296,34 @@ void open_via_helppath(const char *name, const char *dir)
 #endif /* ROCKBOX */
     char dirbuf2[MAXPDSTRING], realname[MAXPDSTRING];
 
-    	/* if directory is supplied, put it at head of search list. */
+        /* if directory is supplied, put it at head of search list. */
     if (*dir)
     {
         thislist.nl_string = dirbuf2;
-	thislist.nl_next = pd_helppath;
-	strncpy(dirbuf2, dir, MAXPDSTRING);
-	dirbuf2[MAXPDSTRING-1] = 0;
-	sys_unbashfilename(dirbuf2, dirbuf2);
-	listp = &thislist;
+        thislist.nl_next = pd_helppath;
+        strncpy(dirbuf2, dir, MAXPDSTRING);
+        dirbuf2[MAXPDSTRING-1] = 0;
+        sys_unbashfilename(dirbuf2, dirbuf2);
+        listp = &thislist;
     }
     else listp = pd_helppath;
-    	/* 1. "objectname-help.pd" */
+        /* 1. "objectname-help.pd" */
     strncpy(realname, name, MAXPDSTRING-10);
     realname[MAXPDSTRING-10] = 0;
     if (strlen(realname) > 3 && !strcmp(realname+strlen(realname)-3, ".pd"))
-    	realname[strlen(realname)-3] = 0;
+        realname[strlen(realname)-3] = 0;
     strcat(realname, "-help.pd");
     if (do_open_via_helppath(realname, listp))
-    	return;
-    	/* 2. "help-objectname.pd" */
+        return;
+        /* 2. "help-objectname.pd" */
     strcpy(realname, "help-");
     strncat(realname, name, MAXPDSTRING-10);
     realname[MAXPDSTRING-1] = 0;
     if (do_open_via_helppath(realname, listp))
-    	return;
-    	/* 3. "objectname.pd" */
+        return;
+        /* 3. "objectname.pd" */
     if (do_open_via_helppath(name, listp))
-    	return;
+        return;
     post("sorry, couldn't find help patch for \"%s\"", name);
     return;
 }
@@ -351,8 +351,8 @@ int sys_rcfile(void)
     char  fname[MAXPDSTRING], buf[1000], *home = getenv("HOME");
 
     /* parse a startup file */
-    
-    *fname = '\0'; 
+
+    *fname = '\0';
 
     strncat(fname, home? home : ".", MAXPDSTRING-10);
     strcat(fname, "/");
@@ -360,23 +360,23 @@ int sys_rcfile(void)
     strcat(fname, STARTUPNAME);
 
     if (!(file = fopen(fname, "r")))
-    	return 1;
+        return 1;
 
     post("reading startup file: %s", fname);
 
-    rcargv[0] = ".";	/* this no longer matters to sys_argparse() */
+    rcargv[0] = ".";    /* this no longer matters to sys_argparse() */
 
     for (i = 1; i < NUMARGS-1; i++)
     {
-    	if (fscanf(file, "%999s", buf) < 0)
-	    break;
-	buf[1000] = 0;
-	if (!(rcargv[i] = malloc(strlen(buf) + 1)))
-	    return (1);
-	strcpy(rcargv[i], buf);
+        if (fscanf(file, "%999s", buf) < 0)
+            break;
+        buf[1000] = 0;
+        if (!(rcargv[i] = malloc(strlen(buf) + 1)))
+            return (1);
+        strcpy(rcargv[i], buf);
     }
     if (i >= NUMARGS-1)
-    	fprintf(stderr, "startup file too long; extra args dropped\n");
+        fprintf(stderr, "startup file too long; extra args dropped\n");
     rcargv[i] = 0;
 
     rcargc = i;
@@ -386,18 +386,18 @@ int sys_rcfile(void)
     fclose(file);
     if (sys_verbose)
     {
-    	if (rcargv)
-	{
-    	    post("startup args from RC file:");
-	    for (i = 1; i < rcargc; i++)
-	    	post("%s", rcargv[i]);
-    	}
-	else post("no RC file arguments found");
+        if (rcargv)
+        {
+            post("startup args from RC file:");
+            for (i = 1; i < rcargc; i++)
+                post("%s", rcargv[i]);
+        }
+        else post("no RC file arguments found");
     }
     if (sys_argparse(rcargc, rcargv))
     {
-    	post("error parsing RC arguments");
-	return (1);
+        post("error parsing RC arguments");
+        return (1);
     }
     return (0);
 }
@@ -413,11 +413,11 @@ void glob_start_path_dialog(t_pd *dummy, t_floatarg flongform)
     char buf[MAXPDSTRING];
     int i;
     t_namelist *nl;
-    
+
     for (nl = pd_path, i = 0; nl && i < 10; nl = nl->nl_next, i++)
-	sys_vgui("pd_set pd_path%d \"%s\"\n", i, nl->nl_string);
+        sys_vgui("pd_set pd_path%d \"%s\"\n", i, nl->nl_string);
     for (; i < 10; i++)
-	sys_vgui("pd_set pd_path%d \"\"\n", i);
+        sys_vgui("pd_set pd_path%d \"\"\n", i);
 
     sprintf(buf, "pdtk_path_dialog %%s\n");
     gfxstub_new(&glob_pdobject, glob_start_path_dialog, buf);
@@ -438,9 +438,8 @@ void glob_path_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     pd_path = 0;
     for (i = 0; i < argc; i++)
     {
-    	t_symbol *s = atom_getsymbolarg(i, argc, argv);
-	if (*s->s_name)
-    	    sys_addpath(s->s_name);
+        t_symbol *s = atom_getsymbolarg(i, argc, argv);
+        if (*s->s_name)
+            sys_addpath(s->s_name);
     }
 }
-

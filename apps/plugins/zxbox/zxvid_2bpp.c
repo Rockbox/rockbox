@@ -3,7 +3,7 @@
 #ifndef USE_GREY
 /* screen routines for greyscale targets not using greyscale lib */
 
-#if LCD_PIXELFORMAT == HORIZONTAL_PACKING 
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define FB_WIDTH ((LCD_WIDTH+3)/4)
 fb_data pixmask[4] ICONST_ATTR = {
     0xC0, 0x30, 0x0C, 0x03
@@ -30,7 +30,7 @@ void init_spect_scr(void)
 {
     int i;
     unsigned mask = settings.invert_colors ? 0 : 3;
-    
+
     for(i = 0; i < 16; i++)
         sp_colors[i] = graylevels[i] ^ mask;
 

@@ -40,7 +40,7 @@ void uart_init(void)
 {
     /* Enable UART clock */
     bitset16(&IO_CLK_MOD2, CLK_MOD2_UART1);
-    
+
     // 8-N-1
     IO_UART1_MSR = 0xC400;
     IO_UART1_BRSR = 0x0057;
@@ -51,7 +51,7 @@ void uart_init(void)
     uart1_receive_count=0;
     uart1_receive_read=0;
     uart1_receive_write=0;
-    
+
     /* init the send buffer */
     uart1_send_count=0;
     uart1_send_read=0;
@@ -69,7 +69,7 @@ void uart1_putc(char ch)
 
     /* Wait for room in FIFO */
     while ((IO_UART1_TFCR & 0x3f) >= 0x20);
-    
+
     /* Write character */
     IO_UART1_DTRR=ch;
 }
@@ -81,22 +81,22 @@ void uart1_puts(const char *str, int size)
 
     /* Wait for the previous transfer to finish */
     while(uart1_send_count>0);
-        
+
     memcpy(uart1_send_buffer_ring, str, size);
-    
+
     /* Disable interrupt while modifying the pointers */
     bitclr16(&IO_INTC_EINT0, INTR_EINT0_UART1);
-    
+
     uart1_send_count=size;
     uart1_send_read=0;
-    
+
     /* prime the hardware buffer */
     while(((IO_UART1_TFCR & 0x3f) < 0x20) && (uart1_send_count > 0))
     {
         IO_UART1_DTRR=uart1_send_buffer_ring[uart1_send_read++];
         uart1_send_count--;
     }
-    
+
     /* Enable interrupt */
     bitset16(&IO_INTC_EINT0, INTR_EINT0_UART1);
 }
@@ -120,17 +120,17 @@ int uart1_gets_queue(char *str, int size)
     /* Disable the interrupt while modifying the pointers */
     bitclr16(&IO_INTC_EINT0, INTR_EINT0_UART1);
     int retval;
-    
+
     if(uart1_receive_count<size)
     {
         retval= -1;
-    }    
+    }
     else
     {
         if(uart1_receive_read+size<=RECEIVE_RING_SIZE)
         {
             memcpy(str,uart1_receive_buffer_ring+uart1_receive_read,size);
-            
+
             uart1_receive_read+=size;
         }
         else
@@ -138,10 +138,10 @@ int uart1_gets_queue(char *str, int size)
             int tempcount=(RECEIVE_RING_SIZE-uart1_receive_read);
             memcpy(str,uart1_receive_buffer_ring+uart1_receive_read,tempcount);
             memcpy(str+tempcount,uart1_receive_buffer_ring,size-tempcount);
-            
+
             uart1_receive_read=size-tempcount;
         }
-    
+
         uart1_receive_count-=size;
 
         retval=uart1_receive_count;
@@ -178,4 +178,3 @@ void UART1(void)
         uart1_send_count--;
     }
 }
-

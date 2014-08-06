@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef SPI_TARGET_H
 #define SPI_TARGET_H
 

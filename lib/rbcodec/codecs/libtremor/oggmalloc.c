@@ -31,7 +31,7 @@ void *ogg_malloc(size_t size)
 
     if (x == NULL)
         LONGJMP(1);
-    
+
     return x;
 }
 
@@ -41,7 +41,7 @@ void *ogg_calloc(size_t nmemb, size_t size)
 
     if (x == NULL)
         LONGJMP(1);
-    
+
     return x;
 }
 
@@ -51,7 +51,7 @@ void *ogg_realloc(void *ptr, size_t size)
 
     if (x == NULL)
         LONGJMP(1);
-    
+
     return x;
 }
 

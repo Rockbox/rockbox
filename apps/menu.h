@@ -83,14 +83,14 @@ struct menu_item_ex {
         int (*menu_callback)(int action, const struct menu_item_ex *this_item);
         /* For everything else, except if the text is dynamic */
         const struct menu_callback_with_desc {
-            int (*menu_callback)(int action, 
+            int (*menu_callback)(int action,
                                  const struct menu_item_ex *this_item);
             unsigned char *desc; /* string or ID */
             int icon_id; /* from icons_6x8 in icons.h */
         } *callback_and_desc;
         /* For when the item text is dynamic */
         const struct menu_get_name_and_icon {
-            int (*menu_callback)(int action, 
+            int (*menu_callback)(int action,
                                  const struct menu_item_ex *this_item);
             char *(*list_get_name)(int selected_item, void * data, char *buffer);
             int (*list_speak_item)(int selected_item, void * data);
@@ -107,18 +107,18 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
 void do_setting_screen(const struct settings_list *setting, const char * title,
                         struct viewport parent[NB_SCREENS]);
 
-/* 
+/*
    int do_menu(const struct menu_item_ex *menu, int *start_selected)
-    
+
    Return value - usually one of the GO_TO_* values from root_menu.h,
-   however, some of the following defines can cause this to 
+   however, some of the following defines can cause this to
    return a different value.
-   
+
    *menu - The menu to run, can be a pointer to a MAKE_MENU() variable,
             MENUITEM_STRINGLIST() or MENUITEM_RETURNVALUE() variable.
-            
+
    *start_selected - the item to select when the menu is first run.
-                     When do_menu() returns, this will be set to the 
+                     When do_menu() returns, this will be set to the
                      index of the selected item at the time of the exit.
                      This is always set, even if the menu was cancelled.
                      If NULL it is ignored and the firs item starts selected
@@ -163,14 +163,14 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),            \
             { .strings = name##_},{.callback_and_desc = & name##__}};
 
-            
+
 /* causes do_menu() to return a value associated with the item */
 #define MENUITEM_RETURNVALUE(name, str, val, cb, icon)                      \
      static const struct menu_callback_with_desc name##_ = {cb,str,icon};   \
      static const struct menu_item_ex name   =                              \
          { MT_RETURN_VALUE|MENU_HAS_DESC, { .value = val},                  \
          {.callback_and_desc = & name##_}};
-         
+
 /* same as above, except the item name is dynamic */
 #define MENUITEM_RETURNVALUE_DYNTEXT(name, val, cb, text_callback,          \
                                      voice_callback, text_cb_data, icon)    \
@@ -179,7 +179,7 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
      static const struct menu_item_ex name   =                              \
         { MT_RETURN_VALUE|MENU_DYNAMIC_DESC, { .value = val},               \
         {.menu_get_name_and_icon = & name##_}};
-        
+
 /*  Use this to put a function call into the menu.
     When the user selects this item the function will be run,
     if MENU_FUNC_CHECK_RETVAL is set, the return value
@@ -193,7 +193,7 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
     const struct menu_item_ex name   =                                         \
         { MT_FUNCTION_CALL|MENU_HAS_DESC|flags,                                \
          { .function = & name##__}, {.callback_and_desc = & name##_}};
-            
+
 /* As above, except the text is dynamic */
 #define MENUITEM_FUNCTION_DYNTEXT(name, flags, func, param,                 \
                                   text_callback, voice_callback,            \
@@ -205,8 +205,8 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
         { MT_FUNCTION_CALL|MENU_DYNAMIC_DESC|flags,                            \
          { .function = & name##__}, {.menu_get_name_and_icon = & name##_}};
 
-/*  Use this to actually create a menu. the ... argument is a list of pointers 
-    to any of the above macro'd variables. 
+/*  Use this to actually create a menu. the ... argument is a list of pointers
+    to any of the above macro'd variables.
     (It can also have other menus in the list.) */
 #define MAKE_MENU( name, str, callback, icon, ... )                            \
     static const struct menu_item_ex *name##_[]  = {__VA_ARGS__};              \
@@ -215,6 +215,6 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected,
         {MT_MENU|MENU_HAS_DESC|                                                \
          MENU_ITEM_COUNT(sizeof( name##_)/sizeof(*name##_)),                   \
             { (void*)name##_},{.callback_and_desc = & name##__}};
-            
+
 
 #endif /* End __MENU_H__ */

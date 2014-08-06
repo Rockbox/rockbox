@@ -115,7 +115,7 @@ static int tta_fseek(long offset, int origin)
 #define UPDATE_CRC32(x, crc) crc = \
     (((crc>>8) & 0x00FFFFFF) ^ crc32_table[(crc^x) & 0xFF])
 
-static unsigned int 
+static unsigned int
 crc32 (unsigned char *buffer, unsigned int len) {
     unsigned int i;
     unsigned int crc = 0xFFFFFFFF;
@@ -216,7 +216,7 @@ static int done_buffer_read(void) {
     ci->memcpy(&crc32, bitpos, 4);
     crc32 = ENDSWAP_INT32(crc32);
     bitpos += sizeof(int);
-    
+
     if (crc32 != frame_crc32) return -1;
 
     bit_cache = bit_count = 0;

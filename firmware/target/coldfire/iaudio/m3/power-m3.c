@@ -28,9 +28,9 @@
 #include "system.h"
 
 void power_init(void)
-{   
+{
     /* Set KEEPACT */
-    or_l(0x00040000, &GPIO_OUT); 
+    or_l(0x00040000, &GPIO_OUT);
     or_l(0x00040000, &GPIO_ENABLE);
     or_l(0x00040000, &GPIO_FUNCTION);
 

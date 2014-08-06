@@ -17,34 +17,34 @@ enum { apu_io_size = 10 };
 
 struct Hes_Osc
 {
-	byte wave [32];
-	int  delay;
-	int  period;
-	int  phase;
-	
-	int  noise_delay;
-	byte noise;
-	unsigned lfsr;
-	
-	byte control;
-	byte balance;
-	byte dac;
-	short volume [2];
-	int last_amp [2];
-	
-	blip_time_t last_time;
-	struct Blip_Buffer* output [2];
-	struct Blip_Buffer* outputs [3];
+        byte wave [32];
+        int  delay;
+        int  period;
+        int  phase;
+
+        int  noise_delay;
+        byte noise;
+        unsigned lfsr;
+
+        byte control;
+        byte balance;
+        byte dac;
+        short volume [2];
+        int last_amp [2];
+
+        blip_time_t last_time;
+        struct Blip_Buffer* output [2];
+        struct Blip_Buffer* outputs [3];
 };
 
 void Osc_run_until( struct Hes_Osc* this, struct Blip_Synth* synth, blip_time_t );
 
 struct Hes_Apu {
-	
-	int latch;
-	int balance;
-	struct Blip_Synth synth;
-	struct Hes_Osc oscs [osc_count];
+
+        int latch;
+        int balance;
+        struct Blip_Synth synth;
+        struct Hes_Osc oscs [osc_count];
 };
 
 // Init HES apu sound chip

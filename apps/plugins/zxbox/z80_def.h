@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,7 +25,7 @@
 typedef Z80 *z80t;
 
 #define OPDEF(name, num) z80t z80op_ ## name (z80t z80p)
-#define ENDOP() return z80p 
+#define ENDOP() return z80p
 #undef DANM
 #define DANM(x) z80p->x
 
@@ -38,7 +38,7 @@ typedef Z80 *z80t;
 typedef void z80t;
 
 #define OPDEF(name, num) void z80op_ ## name (z80t)
-#define ENDOP() 
+#define ENDOP()
 
 #define TAB(t) z80c_ ## t
 #define PORT(t) PRNM(t)

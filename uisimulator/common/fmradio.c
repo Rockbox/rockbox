@@ -70,7 +70,7 @@ int tuner_get(int setting)
 #ifdef HAVE_RADIO_RSSI
     static int rssi = 0, rssidiff = 2;
 #endif
-    
+
     switch(setting)
     {
         case RADIO_PRESENT:
@@ -86,7 +86,7 @@ int tuner_get(int setting)
             if(frequency == 99500000)
                 val = mono?0:1;
             break;
-            
+
 #ifdef HAVE_RADIO_RSSI
         case RADIO_RSSI_MIN:
             val = 5;
@@ -127,7 +127,7 @@ bool tuner_power(bool status)
 char* tuner_get_rds_info(int setting)
 {
     char *text = NULL;
-    
+
     switch(setting)
     {
         case RADIO_RDS_NAME:

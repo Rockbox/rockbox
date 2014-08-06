@@ -60,7 +60,7 @@ unsigned int power_input_status(void)
 }
 
 /* Returns true if the unit is charging the batteries. */
-bool charging_state(void) 
+bool charging_state(void)
 {
   /* We use the information from the ADC_EXT_POWER ADC channel, which
     tells us the charging current from the LTC1734. When DC is
@@ -88,7 +88,7 @@ void ide_power_enable(bool on)
     }
 #endif /* HAVE_ATA_POWER_OFF */
 
-/* late port preparation, else problems with read/modify/write 
+/* late port preparation, else problems with read/modify/write
    of other bits on same port, while input and floating high */
     if (touched)
     {

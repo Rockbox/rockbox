@@ -103,12 +103,12 @@ void lcd_icon(int icon, bool enable)
 
     pos = icontab[icon].pos;
     mask = icontab[icon].mask;
-      
+
     if (enable)
         icon_mirror[pos] |= mask;
     else
         icon_mirror[pos] &= ~mask;
-    
+
     lcd_write_command_e(LCD_ICON(pos), icon_mirror[pos]);
 }
 
@@ -159,7 +159,7 @@ void lcd_init_device(void)
 
         lcd_write_command(OLD_LCD_NOP);
         lcd_write_command(OLD_LCD_SYSTEM_SET|1);  /* CGRAM selected */
-        lcd_write_command(OLD_LCD_SET_POWER_SAVE_OSC_CONTROL|2); 
+        lcd_write_command(OLD_LCD_SET_POWER_SAVE_OSC_CONTROL|2);
                                             /* oscillator on */
         lcd_write_command(OLD_LCD_SET_POWER_CONTROL|7);
         /* voltage regulator, voltage follower and booster on */
@@ -191,7 +191,7 @@ void lcd_init_device(void)
 void lcd_update(void)
 {
     int y;
-    
+
     for (y = 0; y < lcd_pattern_count; y++)
     {
         if (lcd_patterns[y].count > 0)

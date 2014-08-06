@@ -82,4 +82,3 @@ struct GPatch
     unsigned char noteTable[128];
     struct GWaveform * waveforms[255];
 };
-

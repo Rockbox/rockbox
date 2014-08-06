@@ -138,9 +138,9 @@ unsigned getDipSwitches(void);
 
 /**
     Sets the value of the DIP switches that control several game settings
-    (see the Dip... constants above). 
-    
-    Most of the DIP switches are read at program startup and take effect 
+    (see the Dip... constants above).
+
+    Most of the DIP switches are read at program startup and take effect
     only after a machine reset.
 */
 void setDipSwitches( unsigned value );
@@ -150,10 +150,10 @@ void setDipSwitches( unsigned value );
 
     The buffer must be at least 224*288 bytes long. Pixels are stored in
     left-to-right/top-to-bottom order starting from the upper left corner.
-    There is one byte per pixel, containing an index into the color palette 
+    There is one byte per pixel, containing an index into the color palette
     returned by getPalette().
 
-    It's up to the application to display the buffer to the user. The 
+    It's up to the application to display the buffer to the user. The
     code might look like this:
     <BLOCKQUOTE>
     <PRE>

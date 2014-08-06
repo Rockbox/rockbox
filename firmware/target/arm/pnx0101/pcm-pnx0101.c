@@ -165,7 +165,7 @@ void pcm_init(void)
 
     DMAINTSTAT = 0xc000ffff;
     DMAINTEN = 0xc000ffff;
-    
+
     DMASRC(0) = physical_address(dma_buf_left);
     DMADEST(0) = 0x80200280;
     DMALEN(0) = 0xff;

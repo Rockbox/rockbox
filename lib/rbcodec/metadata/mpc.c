@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Thom Johansen 
+ * Copyright (C) 2005 Thom Johansen
  * Copyright (C) 2010 Andree Buschmann
  *
  * This program is free software; you can redistribute it and/or
@@ -35,26 +35,26 @@
 #define SV8_TO_SV7_CONVERT_GAIN (6482)  /* 64.82 * 100, MPC_OLD_GAIN_REF */
 #define SV8_TO_SV7_CONVERT_PEAK (23119) /* 256 * 20 * log10(32768) */
 
-static int set_replaygain_sv7(struct mp3entry* id3, 
-                              bool album, 
-                              long value, 
+static int set_replaygain_sv7(struct mp3entry* id3,
+                              bool album,
+                              long value,
                               long used)
 {
     long gain = (int16_t) ((value >> 16) & 0xffff);
     long peak = (uint16_t) (value & 0xffff);
-    
+
     /* We use a peak value of 0 to indicate a given gain type isn't used. */
     if (peak != 0) {
         /* Save the ReplayGain data to id3-structure for further processing. */
         parse_replaygain_int(album, gain * 512 / 100, peak << 9, id3);
     }
-    
+
     return used;
 }
 
-static int set_replaygain_sv8(struct mp3entry* id3, 
-                              bool album, 
-                              long gain, 
+static int set_replaygain_sv8(struct mp3entry* id3,
+                              bool album,
+                              long gain,
                               long peak,
                               long used)
 {
@@ -74,7 +74,7 @@ static int set_replaygain_sv8(struct mp3entry* id3,
         /* Save the ReplayGain data to id3-structure for further processing. */
         parse_replaygain_int(album, gain * 512 / 100, peak, id3);
     }
-    
+
     return used;
 }
 
@@ -98,13 +98,13 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
     uint32_t header[8];
     uint64_t samples = 0;
     int i;
-    
+
     if (!skip_id3v2(fd, id3))
         return false;
     if (read(fd, header, 4*8) != 4*8) return false;
     /* Musepack files are little endian, might need swapping */
-    for (i = 1; i < 8; i++) 
-       header[i] = letoh32(header[i]); 
+    for (i = 1; i < 8; i++)
+       header[i] = letoh32(header[i]);
     if (!memcmp(header, "MP+", 3)) { /* Compare to sig "MP+" */
         unsigned int streamversion;
         header[0] = letoh32(header[0]);
@@ -113,17 +113,17 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
             unsigned int gapless = (header[5] >> 31) & 0x0001;
             unsigned int last_frame_samples = (header[5] >> 20) & 0x07ff;
             unsigned int bufused = 0;
-            
+
             id3->frequency = sfreqs[(header[2] >> 16) & 0x0003];
             samples = (uint64_t)header[1]*1152; /* 1152 is mpc frame size */
             if (gapless)
                 samples -= 1152 - last_frame_samples;
             else
                 samples -= 481; /* Musepack subband synth filter delay */
-           
+
             bufused = set_replaygain_sv7(id3, false, header[3], bufused);
             bufused = set_replaygain_sv7(id3, true , header[4], bufused);
-            
+
             id3->codectype = AFMT_MPC_SV7;
         } else {
             return false; /* only SV7 is allowed within a "MP+" signature */
@@ -142,26 +142,26 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
             /* 4 bytes 'MPCK' +  2 'SH' */
             lseek(fd, 6, SEEK_SET);
             if (read(fd, sv8_header, 32) != 32) return false;
-            
+
             /* Read the size of 'SH'-tag */
             k = sv8_get_size(sv8_header, k, &size);
-            
+
             /* Skip crc32 */
             k += 4;
-        
+
             /* Read stream version */
             streamversion = sv8_header[k++];
             if (streamversion != 8) return false; /* Only SV8 is allowed. */
-            
+
             /* Number of samples */
             k = sv8_get_size(sv8_header, k, &samples);
-            
+
             /* Number of leading zero-samples */
             k = sv8_get_size(sv8_header, k, &dummy);
-            
+
             /* Sampling frequency */
             id3->frequency = sfreqs[(sv8_header[k++] >> 5) & 0x0003];
-            
+
             /* Number of channels */
             id3->channels = (sv8_header[k++] >> 4) + 1;
 
@@ -169,15 +169,15 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
             k = size - 2;
 
             if (!memcmp(sv8_header+k, "RG", 2)) { /* Replay Gain ID */
-                long peak, gain; 
+                long peak, gain;
                 int bufused = 0;
-                
+
                 k += 2; /* 2 bytes 'RG' */
-                
+
                 /* sv8_get_size must be called to skip the right amount of
                  * bits within the header data. */
                 k = sv8_get_size(sv8_header, k, &size);
-                
+
                 /* Read and set replay gain */
                 if (sv8_header[k++] == 1) {
                     /* Title's peak and gain */
@@ -191,7 +191,7 @@ bool get_musepack_metadata(int fd, struct mp3entry *id3)
                     bufused += set_replaygain_sv8(id3, true , gain, peak, bufused);
                 }
             }
-            
+
             id3->codectype = AFMT_MPC_SV8;
         } else {
             /* No sv8 stream header found */

@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-/* Created from power.c using some iPod code, and some custom stuff based on 
+/* Created from power.c using some iPod code, and some custom stuff based on
    GPIO analysis
 */
 

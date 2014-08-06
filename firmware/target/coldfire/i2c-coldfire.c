@@ -55,7 +55,7 @@ void i2c_init(void)
     or_l(0x03000000, &GPIO1_ENABLE);
     or_l(0x03000000, &GPIO1_FUNCTION);
 #endif
-    
+
     /* I2C Clock divisor = 160 => 124.1556 MHz / 2 / 160 = 388.08 kHz */
     MFDR  = 0x0d;
 
@@ -94,22 +94,22 @@ static inline void i2c_stop(volatile unsigned char *iface)
  *
  * Returns number of bytes successfully sent or a negative value on error.
  */
-int i2c_write(volatile unsigned char *iface, unsigned char addr, 
+int i2c_write(volatile unsigned char *iface, unsigned char addr,
               const unsigned char *buf, int count)
 {
     int i, rc;
 
     if (count <= 0)
         return 0;
-   
+
     rc = i2c_start(iface);
     if (rc < 0)
         return rc;
-    
+
     rc = i2c_outb(iface, addr & 0xfe);
     if (rc < 0)
         return rc;
-    
+
     for (i = 0; i < count; i++)
     {
         rc = i2c_outb(iface, *buf++);
@@ -117,7 +117,7 @@ int i2c_write(volatile unsigned char *iface, unsigned char addr,
             return rc;
     }
     i2c_stop(iface);
-    
+
     return count;
 }
 
@@ -126,14 +126,14 @@ int i2c_write(volatile unsigned char *iface, unsigned char addr,
  *
  * Returns number of bytes successfully received or a negative value on error.
  */
-int i2c_read(volatile unsigned char *iface, unsigned char addr, 
+int i2c_read(volatile unsigned char *iface, unsigned char addr,
              unsigned char *buf, int count)
 {
     int i, rc;
 
     if (count <= 0)
         return 0;
-   
+
     rc = i2c_start(iface);
     if (rc < 0)
         return rc;
@@ -148,10 +148,10 @@ int i2c_read(volatile unsigned char *iface, unsigned char addr,
     /* Turn on ACK generation if reading multiple bytes */
     if (count > 1)
         iface[O_MBCR] &= ~TXAK;
- 
+
     /* Dummy read */
     rc = (int) iface[O_MBDR];
-  
+
     for (i = count; i > 0; i--)
     {
         rc = i2c_wait_for_slave(iface);
@@ -187,11 +187,11 @@ int i2c_start(volatile unsigned char *iface)
         logf("i2c: bus is busy (iface=%08lX)", (uintptr_t)iface);
         return -1;
     }
- 
+
     /* Generate START and prepare for write */
     iface[O_MBCR] |= (MSTA | TXAK | MTX);
-  
-    return 0; 
+
+    return 0;
 }
 
 /* Wait for slave to act on given I2C interface.
@@ -206,13 +206,13 @@ int i2c_wait_for_slave(volatile unsigned char *iface)
     if (!j)
     {
         logf("i2c: IIF not set (iface=%08lX)", (uintptr_t)iface);
-        i2c_stop(iface); 
+        i2c_stop(iface);
         return -2;
     }
-  
+
     /* Clear interrupt flag */
     iface[O_MBSR] &= ~IIF;
-    
+
     return 0;
 }
 
@@ -229,22 +229,22 @@ int i2c_outb(volatile unsigned char *iface, unsigned char byte)
     rc = i2c_wait_for_slave(iface);
     if (rc < 0)
         return rc;
-    
+
     /* Check that transfer is complete */
     if ( !(iface[O_MBSR] & ICF))
     {
         logf("i2c: transfer error (iface=%08lX)", (uintptr_t)iface);
-        i2c_stop(iface); 
+        i2c_stop(iface);
         return -3;
     }
-    
+
     /* Check that the byte has been ACKed */
     if (iface[O_MBSR] & RXAK)
     {
         logf("i2c: no ACK (iface=%08lX)", (uintptr_t)iface);
-        i2c_stop(iface); 
+        i2c_stop(iface);
         return -4;
     }
-    
+
     return 0;
 }

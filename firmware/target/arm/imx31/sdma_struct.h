@@ -53,7 +53,7 @@
     (CHANNEL_CONTEXT_BASE_ADDR+sizeof(struct context_data)/4*(channel))
 
 /**
- * Error bit set in the CCB status field by the SDMA, 
+ * Error bit set in the CCB status field by the SDMA,
  * in setbd routine, in case of a transfer error
  */
 #define DATA_ERROR  (1 << 28) /* BD_RROR set on last buffer descriptor */
@@ -134,7 +134,7 @@
 #define MAX_BD_NUM         256
 #define MAX_BD_SIZE        65536
 #define MAX_BLOCKING       2
-#define MAX_SYNCH          2   
+#define MAX_SYNCH          2
 #define MAX_OWNERSHIP      8
 #define MAX_CH_PRIORITY    8
 #define MAX_TRUST          2
@@ -168,7 +168,7 @@
 
 /**
  * Command/Mode/Count of buffer descriptors
- */ 
+ */
 struct mode_count_ipcv2
 {
     unsigned long count    : 16; /* size of the buffer pointed by this BD */
@@ -190,12 +190,12 @@ struct mode_count_ipcv1_v2
 {
     unsigned long count      : 16; /* size of the buffer pointed by this BD */
     unsigned long status     :  8; /* E,R,I,C,W,D status bits stored here */
-    unsigned long reserved   :  7;  
+    unsigned long reserved   :  7;
     unsigned long endianness :  1;
 };
 
 /**
- * Buffer descriptor 
+ * Buffer descriptor
  * (differentiated between evolutions of SDMA)
  */
 struct buffer_descriptor_ipcv1_v2
@@ -208,7 +208,7 @@ struct buffer_descriptor_ipcv1_v2
 
 /**
  * Mode/Count of data node descriptors - IPCv2
- */ 
+ */
 struct mode_count
 {
     unsigned long count   : 16; /* size of the buffer pointed by this BD */
@@ -331,7 +331,7 @@ struct channel_control_block
     struct buffer_descriptor  *base_bd_ptr;
     /* pointer to the channel descriptor: SDMA ignored */
     struct channel_descriptor *channel_desc;
-    /* open/close ; started/stopped ; read/write: SDMA r/w */ 
+    /* open/close ; started/stopped ; read/write: SDMA r/w */
     volatile struct channel_status status;
 };
 
@@ -343,7 +343,7 @@ struct channel_control_block
 struct state_registers
 {
     /* Offset 0 */
-    unsigned long pc      : 14; /* program counter */  
+    unsigned long pc      : 14; /* program counter */
     unsigned long unused0 :  1;
     unsigned long t       :  1; /* test bit: status of arithmetic & test
                                    instruction */
@@ -398,12 +398,12 @@ struct context_data
 };
 
 /**
- * This structure holds the necessary data for the assignment in the 
+ * This structure holds the necessary data for the assignment in the
  * dynamic channel-script association
  */
 struct script_data
 {
-    unsigned long load_address; /* start address of the script */   
+    unsigned long load_address; /* start address of the script */
     unsigned long wml;          /* parameters for the channel descriptor */
     unsigned long shp_addr;     /* shared peripheral base address */
     unsigned long event_mask1;  /* first event mask */

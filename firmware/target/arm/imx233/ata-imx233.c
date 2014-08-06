@@ -227,6 +227,3 @@ void ata_device_init(void)
 }
 
 #endif /* ATA_IMX233_H */
-
-
- 

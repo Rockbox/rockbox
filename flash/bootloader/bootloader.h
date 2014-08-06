@@ -16,15 +16,15 @@ typedef int(*tpMain)(void); // type for start vector to main()
 
 
 // structure of an image in the flash
-typedef struct 
+typedef struct
 {
-	UINT32* pDestination; // address to copy it to
-	UINT32 size;          // how many bytes of payload (to the next header)
-	tpFunc pExecute;      // entry point
-	UINT32 flags;         // uncompressed or compressed
-	// end of header, now comes the payload
-	UINT32 image[];       // the binary image starts here
-	// after the payload, the next header may follow, all 0xFF if none
+        UINT32* pDestination; // address to copy it to
+        UINT32 size;          // how many bytes of payload (to the next header)
+        tpFunc pExecute;      // entry point
+        UINT32 flags;         // uncompressed or compressed
+        // end of header, now comes the payload
+        UINT32 image[];       // the binary image starts here
+        // after the payload, the next header may follow, all 0xFF if none
 } tImage;
 
 // flags valid for image header

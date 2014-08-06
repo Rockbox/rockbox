@@ -143,7 +143,7 @@
  * => Devices
  *
  * Each device <dev> has its base address defined as REGS_<dev>_base:
- * 
+ *
  * Example:
  *  #define REGS_APBHBASE (0x80004000)
  *  #define REGS_SSPBASE(i) ((i) == 1 ? 0x80010000 : 0x80034000)
@@ -152,7 +152,7 @@
  *
  * Each register <reg> in device <dev> has its address(es) defined as
  * HW_<dev>_<reg>[_{SET,CLR,TOG}]
- * 
+ *
  * Examples:
  *  #define HW_APBH_CTRL1 (*(volatile unsigned long *)(REGS_APBHBASE + 0x10 + 0))
  *  #define HW_APBH_CHn_CURCMDAR(n) (*(volatile unsigned long *)(REGS_APBHBASE + 0x40+(n)*0x70))
@@ -164,9 +164,9 @@
  * and bitmask defined as {BP,BM}_<dev>_<reg>_<field>
  *
  * Examples:
- * 
- * 
- * 
+ *
+ *
+ *
  */
 
 /**
@@ -188,7 +188,7 @@
  *
  * The BF_RDX(val, reg, field) reads from the value provided instead of the register
  * Similarly for BF_WRX
- * 
+ *
  */
 
 /**

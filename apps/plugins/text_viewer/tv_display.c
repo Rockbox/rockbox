@@ -369,7 +369,7 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
         {
             /*
              * tv_set_font(rb->global_settings->font_file) doesn't fail usually.
-             * if it fails, a fatal problem occurs in Rockbox. 
+             * if it fails, a fatal problem occurs in Rockbox.
              */
             if (!rb->strcmp(preferences->font_name, rb->global_settings->font_file))
                 return TV_CALLBACK_ERROR;

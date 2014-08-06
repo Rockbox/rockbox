@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 

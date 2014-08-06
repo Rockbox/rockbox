@@ -72,28 +72,28 @@ static inline FIXP fixp_pow2(FIXP x, int i)
 #else
 static inline FIXP fixp_mult_su(FIXP a, FIXPU b)
 {
-    int32_t hb = (a >> 16) * b;      
-    uint32_t lb = (a & 0xffff) * b;      
+    int32_t hb = (a >> 16) * b;
+    uint32_t lb = (a & 0xffff) * b;
 
-    return hb + (lb >> 16) + ((lb & 0x8000) >> 15);      
+    return hb + (lb >> 16) + ((lb & 0x8000) >> 15);
 }
 #endif
 
 /* Faster version of the above using 32x32=64 bit multiply */
 #ifdef ROCKBOX
 #define fixmul31(x,y) (MULT31(x,y))
-#else    
-static inline int32_t fixmul31(int32_t x, int32_t y)     
-{    
-    int64_t temp;    
+#else
+static inline int32_t fixmul31(int32_t x, int32_t y)
+{
+    int64_t temp;
 
-    temp = x;    
-    temp *= y;   
+    temp = x;
+    temp *= y;
 
-    temp >>= 31;        //16+31-16 = 31 bits     
-    
-    return (int32_t)temp;    
-}    
+    temp >>= 31;        //16+31-16 = 31 bits
+
+    return (int32_t)temp;
+}
 #endif
 
 /**
@@ -138,7 +138,7 @@ static void scalar_dequant_math(COOKContext *q, int index,
 
     if(s >= 64)
         memset(mlt_p, 0, sizeof(REAL_T)*SUBBAND_SIZE);
-    else 
+    else
     {
         for(i=0 ; i<SUBBAND_SIZE ; i++) {
             f = (table[subband_coef_index[i]]) >> (s >> 1);
@@ -179,13 +179,13 @@ void imlt_math(COOKContext *q, FIXP *in)
         tmp = mdct_out[i];
         mdct_out[i  ] = fixmul31(-mdct_out[n+i], (sincos_lookup0[j  ]));
         mdct_out[n+i] = fixmul31(tmp           , (sincos_lookup0[j+1]));
-            
-        j += step;   
+
+        j += step;
     } while (++i < n/2);
 
     do {
         j -= step;
-        
+
         tmp = mdct_out[i];
         mdct_out[i  ] = fixmul31(-mdct_out[n+i], (sincos_lookup0[j+1]));
         mdct_out[n+i] = fixmul31(tmp           , (sincos_lookup0[j  ]));
@@ -207,11 +207,11 @@ void overlap_math(COOKContext *q, int gain, FIXP buffer[])
     if(LIKELY(gain == 0))
     {
         vect_add(q->mono_mdct_output, buffer, q->samples_per_channel);
-        
+
     } else if (gain > 0){
         for(i=0 ; i<q->samples_per_channel ; i++) {
-            q->mono_mdct_output[i] = (q->mono_mdct_output[i]<< gain) + buffer[i];        }          
-        
+            q->mono_mdct_output[i] = (q->mono_mdct_output[i]<< gain) + buffer[i];        }
+
     } else {
         for(i=0 ; i<q->samples_per_channel ; i++) {
             q->mono_mdct_output[i] = (q->mono_mdct_output[i]>>-gain) + buffer[i];

@@ -17,7 +17,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/ 
+ ****************************************************************************/
 #ifndef __PINS_STMP3600__
 #define __PINS_STMP3600__
 

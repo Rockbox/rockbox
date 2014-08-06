@@ -845,8 +845,8 @@ do {                                    \
         ".set\tmips0"                                           \
         : : "r" (value))
 
-/* 
- * This should be changed when we get a compiler that support the MIPS32 ISA. 
+/*
+ * This should be changed when we get a compiler that support the MIPS32 ISA.
  */
 #define read_mips32_cp0_config1()                               \
 ({ int __res;                                                   \
@@ -958,7 +958,7 @@ __BUILD_SET_C0(config,CP0_CONFIG)
 #define set_cp0_status(x)    set_c0_status(x)
 #define set_cp0_cause(x)    set_c0_cause(x)
 #define set_cp0_config(x)    set_c0_config(x)
-     
+
 #endif /* !__ASSEMBLY__ */
 
 #endif /* _ASM_MIPSREGS_H */

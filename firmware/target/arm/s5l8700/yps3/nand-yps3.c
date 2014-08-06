@@ -81,29 +81,28 @@ unsigned int nand_ll_read_id(int bank)
     unsigned int nand_id;
 
     nand_chip_select(bank);
-    
+
     /* send "read id" command */
     FMCMD = 0x90;
     while ((FMCSTAT & FMSTAT_CMDDone) == 0);
     FMCSTAT = FMSTAT_CMDDone;
-    
+
     /* transfer address */
     FMANUM = 0;
     FMADDR0 = 0;
     FMCTRL1 = FMCTRL1_DoTransAddr;
     while ((FMCSTAT & FMSTAT_AddrDone) == 0);
     FMCSTAT = FMSTAT_AddrDone;
-    
+
     /* read back data */
     FMDNUM = 3;
     FMCTRL1 = FMCTRL1_DoReadData;
     while ((FMCSTAT & FMSTAT_TransDone) == 0);
     FMCSTAT = FMSTAT_TransDone;
     nand_id = FMFIFO;
-    
+
     /* clear read FIFO */
     FMCTRL1 = FMCTRL1_ClearRFIFO;
-    
-    return nand_id;    
-}
 
+    return nand_id;
+}

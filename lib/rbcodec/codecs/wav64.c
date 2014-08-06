@@ -189,7 +189,7 @@ enum codec_status codec_run(void)
     }
 
     codec_set_replaygain(ci->id3);
-    
+
     /* Need to save offset for later use (cleared indirectly by advance_buffer) */
     param = ci->id3->elapsed;
     bytesdone = ci->id3->offset;
@@ -284,7 +284,7 @@ enum codec_status codec_run(void)
             codec = get_wave_codec(format.formattag);
             if (!codec)
             {
-                DEBUGF("CODEC_ERROR: unsupported wave format 0x%x\n", 
+                DEBUGF("CODEC_ERROR: unsupported wave format 0x%x\n",
                     (unsigned int) format.formattag);
                 return CODEC_ERROR;
             }

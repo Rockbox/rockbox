@@ -66,7 +66,7 @@ int gigabeat_code(char *infile, char *outfile)
 
         /* Read in little-endian */
         data = le2int(buf);
-        
+
         data = data ^ key;
 
         key = key + (key << 1);

@@ -988,7 +988,7 @@ static void pegbox_draw_board(struct game_context* pb)
 
             if(type != SPACE) {
                 rb->lcd_bitmap_part(pegbox_pieces, 0, (type-1)*PIECE_HEIGHT,
-                        STRIDE( SCREEN_MAIN, 
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_pegbox_pieces,BMPHEIGHT_pegbox_pieces),
                         c * PIECE_WIDTH + BOARD_X,
                         r * PIECE_HEIGHT + BOARD_Y, PIECE_WIDTH,

@@ -104,7 +104,7 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("Uncached %c: [0x%x,0x%x[ (size=0x%x / %s)",
                 'A' + i, addr, addr + size, size, size_name);
         }
-        lcd_update(); 
+        lcd_update();
         switch(button_get_w_tmo(HZ/20))
         {
             case DEBUG_CANCEL:
@@ -128,7 +128,7 @@ bool dbg_ports(void)
     {
         lcd_clear_display();
         line = 0;
-        
+
         _DEBUG_PRINTF("GPIO_PADR:  %02x",(unsigned char)GPIO_PADR);
         _DEBUG_PRINTF("GPIO_PACON: %02x",(unsigned char)GPIO_PACON);
         _DEBUG_PRINTF("GPIO_PBDR:  %02x",(unsigned char)GPIO_PBDR);
@@ -153,4 +153,3 @@ bool dbg_ports(void)
     lcd_setfont(FONT_UI);
     return false;
 }
-

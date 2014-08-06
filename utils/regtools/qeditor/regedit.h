@@ -280,4 +280,4 @@ protected:
     QWidget *m_right_panel;
 };
 
-#endif /* REGEDIT_H */ 
+#endif /* REGEDIT_H */

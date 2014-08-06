@@ -2084,4 +2084,3 @@ static LOOKUP_T vwin8192[4096]  = {
   X(0x7fffffff), X(0x7fffffff), X(0x7fffffff), X(0x7fffffff),
   X(0x7fffffff), X(0x7fffffff), X(0x7fffffff), X(0x7fffffff),
 };
-

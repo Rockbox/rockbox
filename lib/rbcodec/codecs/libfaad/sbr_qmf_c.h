@@ -169,4 +169,3 @@ static const real_t qmf_c[640] ICONST_ATTR_FAAD_LARGE_IRAM MEM_ALIGN_ATTR = {
 };
 
 #endif
-

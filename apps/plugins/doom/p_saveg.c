@@ -986,4 +986,3 @@ void P_UnArchiveMap(void)
       save_p += markpointnum * sizeof *markpoints;
    }
 }
-

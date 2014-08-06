@@ -297,7 +297,7 @@ void S_StopSound(void *origin)
 
    if (!enable_sound)
       return;
-  
+
    for (cnum=0 ; cnum<numChannels ; cnum++)
       if (channels[cnum].sfxinfo && channels[cnum].origin == origin)
       {
@@ -376,7 +376,7 @@ void S_UpdateSounds(void* listener_p)
             // check non-local sounds for distance clipping
             // or modify their params
             if (c->origin && listener_p != c->origin) // killough 3/20/98
-            { 
+            {
                if (!S_AdjustSoundParams(listener, c->origin,
                                         &volume, &sep, &pitch))
                   S_StopChannel(cnum);

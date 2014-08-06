@@ -45,12 +45,12 @@ void toggle_draw_update(t_toggle *x, t_glist *glist)
 #else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
-	t_canvas *canvas=glist_getcanvas(glist);
+        t_canvas *canvas=glist_getcanvas(glist);
 
-	sys_vgui(".x%x.c itemconfigure %xX1 -fill #%6.6x\n", canvas, x,
-		 (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol);
-	sys_vgui(".x%x.c itemconfigure %xX2 -fill #%6.6x\n", canvas, x,
-		 (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol);
+        sys_vgui(".x%x.c itemconfigure %xX1 -fill #%6.6x\n", canvas, x,
+                 (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol);
+        sys_vgui(".x%x.c itemconfigure %xX2 -fill #%6.6x\n", canvas, x,
+                 (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol);
     }
 #endif /* ROCKBOX */
 }
@@ -65,18 +65,18 @@ void toggle_draw_new(t_toggle *x, t_glist *glist)
     int w=1, xx=text_xpix(&x->x_gui.x_obj, glist), yy=text_ypix(&x->x_gui.x_obj, glist);
 
     if(x->x_gui.x_w >= 30)
-	w = 2;
+        w = 2;
     if(x->x_gui.x_w >= 60)
-	w = 3;
+        w = 3;
     sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE\n",
-	     canvas, xx, yy, xx + x->x_gui.x_w, yy + x->x_gui.x_h,
-	     x->x_gui.x_bcol, x);
+             canvas, xx, yy, xx + x->x_gui.x_w, yy + x->x_gui.x_h,
+             x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create line %d %d %d %d -width %d -fill #%6.6x -tags %xX1\n",
-	     canvas, xx+w+1, yy+w+1, xx + x->x_gui.x_w-w, yy + x->x_gui.x_h-w, w,
-	     (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol, x);
+             canvas, xx+w+1, yy+w+1, xx + x->x_gui.x_w-w, yy + x->x_gui.x_h-w, w,
+             (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create line %d %d %d %d -width %d -fill #%6.6x -tags %xX2\n",
-	     canvas, xx+w+1, yy + x->x_gui.x_h-w-1, xx + x->x_gui.x_w-w, yy+w, w,
-	     (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol, x);
+             canvas, xx+w+1, yy + x->x_gui.x_h-w-1, xx + x->x_gui.x_w-w, yy+w, w,
+             (x->x_on!=0.0)?x->x_gui.x_fcol:x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
 	     canvas, xx+x->x_gui.x_ldx,
@@ -556,4 +556,3 @@ void g_toggle_setup(void)
     class_setsavefn(toggle_class, toggle_save);
     class_setpropertiesfn(toggle_class, toggle_properties);
 }
-

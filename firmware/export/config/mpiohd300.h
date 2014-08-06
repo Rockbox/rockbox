@@ -79,7 +79,7 @@
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
-#define MIN_BRIGHTNESS_SETTING      0 
+#define MIN_BRIGHTNESS_SETTING      0
 #define MAX_BRIGHTNESS_SETTING      31
 #define DEFAULT_BRIGHTNESS_SETTING  20
 

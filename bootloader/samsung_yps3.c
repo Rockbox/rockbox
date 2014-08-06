@@ -82,13 +82,13 @@ void main(void)
     unsigned int fm_frequency = 100700000;
     int audiovol = 0x60;
     unsigned nand_ids[4];
-    
+
     // enable all peripherals
     PWRCON = 0;
-    
+
     // disable all interrupts
     INTMSK = 0;
-    
+
     // start with all GPIOs as input
     PCON0 = 0;
     PCON1 = 0;
@@ -98,26 +98,26 @@ void main(void)
     PCON5 = 0;
     PCON6 = 0;
     PCON7 = 0;
-    
+
     system_init();
     kernel_init();
-    
+
     asm volatile("msr cpsr_c, #0x13\n\t"); // enable interrupts
 
     lcd_init();
-    
+
     lcd_clear_display();
     lcd_bitmap(rockboxlogo, 0, 160, BMPWIDTH_rockboxlogo, BMPHEIGHT_rockboxlogo);
     lcd_update();
 
     power_init();
-    
+
     i2c_init();
     fmradio_i2c_init();
     adc_init();
     _backlight_init();
     button_init_device();
-        
+
     // FM power
     si4700_init();
     tuner_power(true);
@@ -125,7 +125,7 @@ void main(void)
     si4700_set(RADIO_MUTE, 0);
     si4700_set(RADIO_REGION, 0);
     si4700_set(RADIO_FREQUENCY, fm_frequency);
-    
+
     lcd_puts_scroll(0,0,"+++ this is a very very long line to test scrolling. ---");
 
     // WM1800 codec configuration
@@ -137,7 +137,7 @@ void main(void)
     wmcodec_write(0x03, audiovol | (1 << 8));   // ROUT1VOL
     wmcodec_write(0x22, (1 << 7) | (7 << 4));   // left out mix (1)
     wmcodec_write(0x25, (1 << 7) | (7 << 4));   // right out mix (2)
-    
+
     // enable audio
     PCON5 = (PCON5 & ~0x0000000F) | 0x00000001;
     PDAT5 |= 1;
@@ -163,7 +163,7 @@ void main(void)
             dt.tm_year + 1900, dt.tm_mon+1, dt.tm_mday,
             dt.tm_hour, dt.tm_min, dt.tm_sec);
         lcd_puts(0, line++, mystring);
-#endif 
+#endif
 
 #if 1   /* enable this to see radio debug info */
         button = button_read_device();
@@ -211,7 +211,7 @@ void main(void)
 #endif
 
 #if 1   /* enable this to see ADC info */
-        snprintf(mystring, 64, "ADC: %04X %04X %04X %04X", 
+        snprintf(mystring, 64, "ADC: %04X %04X %04X %04X",
             adc_read(0), adc_read(1), adc_read(2), adc_read(3));
         lcd_puts(0, line++, mystring);
         snprintf(mystring, 64, "ADC:USB %4d mV BAT %4d mV",
@@ -239,7 +239,7 @@ void main(void)
             PDAT3 |= (1 << 3);
         }
         else {
-            PDAT3 &= ~(1 << 3); 
+            PDAT3 &= ~(1 << 3);
         }
         if (button & (BUTTON_BACK | BUTTON_MENU)) {
             PDAT3 |= (1 << 2);
@@ -313,11 +313,11 @@ static int rds_decode(int line, struct si4700_dbg_info *nfo)
     static unsigned int day = 0, hour = 0, minute = 0;
     static unsigned int abflag_prev = -1;
     static char mystring[64];
-    
+
     /* big RDS arrays */
     static char ps[9];
     static char rt[65];
-    
+
     rdsdata[0] = nfo->regs[12];
     rdsdata[1] = nfo->regs[13];
     rdsdata[2] = nfo->regs[14];
@@ -327,9 +327,9 @@ static int rds_decode(int line, struct si4700_dbg_info *nfo)
     group = (rdsdata[1] >> 11) & 0x1F;
     tp = (rdsdata[1] >> 10) & 1;
     pty = (rdsdata[1] >> 5) & 0x1F;
-    
+
     switch (group) {
-    
+
     case 0: /* group 0A: basic info */
         af1 = (rdsdata[2] >> 8) & 0xFF;
         af2 = (rdsdata[2] >> 0) & 0xFF;
@@ -339,14 +339,14 @@ static int rds_decode(int line, struct si4700_dbg_info *nfo)
         ps[segment * 2 + 0]  = (rdsdata[3] >> 8) & 0xFF;
         ps[segment * 2 + 1]  = (rdsdata[3] >> 0) & 0xFF;
         break;
-    
+
     case 2: /* group 1A: programme item */
     case 3: /* group 1B: programme item */
         day = (rdsdata[3] >> 11) & 0x1F;
         hour = (rdsdata[3] >> 6) & 0x1F;
         minute = (rdsdata[3] >> 0) & 0x3F;
         break;
-        
+
     case 4: /* group 2A: radio text */
         segment = rdsdata[1] & 0xF;
         abflag = (rdsdata[1] >> 4) & 1;
@@ -359,7 +359,7 @@ static int rds_decode(int line, struct si4700_dbg_info *nfo)
         rt[segment * 4 + 2] = (rdsdata[3] >> 8) & 0xFF;
         rt[segment * 4 + 3] = (rdsdata[3] >> 0) & 0xFF;
         break;
-        
+
     case 5: /* group 2B: radio text */
         segment = rdsdata[1] & 0xF;
         abflag = (rdsdata[1] >> 4) & 1;
@@ -370,7 +370,7 @@ static int rds_decode(int line, struct si4700_dbg_info *nfo)
         rt[segment * 2 + 0] = (rdsdata[3] >> 8) & 0xFF;
         rt[segment * 2 + 1] = (rdsdata[3] >> 0) & 0xFF;
         break;
-    
+
     default:
         break;
     }
@@ -381,8 +381,6 @@ static int rds_decode(int line, struct si4700_dbg_info *nfo)
     lcd_puts(0, line++, mystring);
     snprintf(mystring, 64, "RT:%s", rt);
     lcd_puts(0, line++, mystring);
-    
+
     return line;
 }
-
-

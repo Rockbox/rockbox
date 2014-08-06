@@ -356,4 +356,3 @@ __UCL_EXTERN_C const ucl_uint32 _ucl_crc32_table[256];
 /*
 vi:ts=4:et
 */
-

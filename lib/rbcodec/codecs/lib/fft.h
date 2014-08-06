@@ -18,9 +18,9 @@
  */
 #ifndef CODECLIB_FFT_H_INCLUDED
 #define CODECLIB_FFT_H_INCLUDED
- 
+
 #include <inttypes.h>
-typedef int32_t fixed32; 
+typedef int32_t fixed32;
 typedef int64_t fixed64;
 
 #define FFT_FIXED
@@ -61,4 +61,3 @@ typedef struct FFTContext {
 void ff_fft_calc_c(int nbits, FFTComplex *z);
 
 #endif // CODECLIB_FFT_H_INCLUDED
-

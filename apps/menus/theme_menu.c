@@ -116,7 +116,7 @@ static int reset_color(void)
     global_settings.lse_color = LCD_DEFAULT_BG;
     global_settings.lst_color = LCD_DEFAULT_FG;
     global_settings.list_separator_color = LCD_DARKGRAY;
-    
+
     settings_save();
     settings_apply(false);
     settings_apply_skins();
@@ -148,7 +148,7 @@ MAKE_MENU(colors_settings, ID2P(LANG_COLORS_MENU),
             &lss_settings,  &set_sep_col,
             &set_bg_col, &set_fg_col, &reset_colors
          );
-         
+
 #endif /* HAVE_LCD_COLOR */
 /*    LCD MENU                    */
 /***********************************/
@@ -222,7 +222,7 @@ MAKE_MENU(bars_menu, ID2P(LANG_BARS_MENU), 0, Icon_NOICON,
           &scrollbar_item, &scrollbar_width, &statusbar,
 #ifdef HAVE_REMOTE_LCD
           &remote_statusbar,
-#endif  
+#endif
 #if CONFIG_KEYPAD == RECORDER_PAD
           &buttonbar,
 #endif
@@ -338,32 +338,32 @@ int browse_folder(void *param)
 }
 
 #ifdef HAVE_LCD_BITMAP
-MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_CUSTOM_FONT), 
+MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM,
+        ID2P(LANG_CUSTOM_FONT),
         browse_folder, (void*)&fonts, NULL, Icon_Font);
 
-MENUITEM_FUNCTION(browse_sbs, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_BASE_SKIN), 
+MENUITEM_FUNCTION(browse_sbs, MENU_FUNC_USEPARAM,
+        ID2P(LANG_BASE_SKIN),
         browse_folder, (void*)&sbs, NULL, Icon_Wps);
 #if CONFIG_TUNER
-MENUITEM_FUNCTION(browse_fms, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_RADIOSCREEN), 
+MENUITEM_FUNCTION(browse_fms, MENU_FUNC_USEPARAM,
+        ID2P(LANG_RADIOSCREEN),
         browse_folder, (void*)&fms, NULL, Icon_Wps);
 #endif
 #endif
-MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_WHILE_PLAYING), 
+MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM,
+        ID2P(LANG_WHILE_PLAYING),
         browse_folder, (void*)&wps, NULL, Icon_Wps);
 #ifdef HAVE_REMOTE_LCD
-MENUITEM_FUNCTION(browse_rwps, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_REMOTE_WHILE_PLAYING), 
+MENUITEM_FUNCTION(browse_rwps, MENU_FUNC_USEPARAM,
+        ID2P(LANG_REMOTE_WHILE_PLAYING),
         browse_folder, (void*)&rwps, NULL, Icon_Wps);
-MENUITEM_FUNCTION(browse_rsbs, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_REMOTE_BASE_SKIN), 
+MENUITEM_FUNCTION(browse_rsbs, MENU_FUNC_USEPARAM,
+        ID2P(LANG_REMOTE_BASE_SKIN),
         browse_folder, (void*)&rsbs, NULL, Icon_Wps);
 #if CONFIG_TUNER
-MENUITEM_FUNCTION(browse_rfms, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_REMOTE_RADIOSCREEN), 
+MENUITEM_FUNCTION(browse_rfms, MENU_FUNC_USEPARAM,
+        ID2P(LANG_REMOTE_RADIOSCREEN),
         browse_folder, (void*)&rfms, NULL, Icon_Wps);
 #endif
 #endif
@@ -387,8 +387,8 @@ static int showicons_callback(int action, const struct menu_item_ex *this_item)
 }
 
 MENUITEM_SETTING(show_icons, &global_settings.show_icons, showicons_callback);
-MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM, 
-        ID2P(LANG_CUSTOM_THEME), 
+MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM,
+        ID2P(LANG_CUSTOM_THEME),
         browse_folder, (void*)&themes, NULL, Icon_Config);
 #ifdef HAVE_LCD_BITMAP
 MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, NULL);

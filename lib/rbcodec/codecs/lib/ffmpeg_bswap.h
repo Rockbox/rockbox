@@ -18,7 +18,7 @@
 #ifndef bswap_64
 static inline uint64_t ByteSwap64(uint64_t x)
 {
-    union { 
+    union {
         uint64_t ll;
         struct {
            uint32_t l,h;
@@ -43,7 +43,7 @@ static inline uint64_t ByteSwap64(uint64_t x)
 
 static inline uint64_t ByteSwap64(uint64_t x)
 {
-    union { 
+    union {
         uint64_t ll;
         struct {
            uint32_t l,h;
@@ -113,7 +113,7 @@ static inline uint32_t ByteSwap32(uint32_t x) {
 
 static inline uint64_t ByteSwap64(uint64_t x)
 {
-    union { 
+    union {
         uint64_t ll;
         struct {
            uint32_t l,h;
@@ -137,9 +137,9 @@ static inline uint64_t ByteSwap64(uint64_t x)
 
 static inline uint64_t ByteSwap64(uint64_t x)
 {
-    union { 
+    union {
         uint64_t ll;
-        uint32_t l[2]; 
+        uint32_t l[2];
     } w, r;
     w.ll = x;
     r.l[0] = bswap_32 (w.l[1]);

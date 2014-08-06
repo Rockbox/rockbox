@@ -32,7 +32,7 @@ AUDIOHW_SETTING(DEPTH_3D,        "%", 0,  1,    0,   15,    0, (100 * val + 8) /
      * digital gain 0dB to 30.0dB in 0.5dB increments
      * we use 0.75dB fake steps through whole range
      *
-     * This combined gives -17.25 to 60.0dB 
+     * This combined gives -17.25 to 60.0dB
      */
 AUDIOHW_SETTING(LEFT_GAIN,      "dB", 2, 75,-1725, 6000,    0, val * 5)
 AUDIOHW_SETTING(RIGHT_GAIN,     "dB", 2, 75,-1725, 6000,    0, val * 5)
@@ -258,8 +258,8 @@ AUDIOHW_SETTING(TREBLE_CUTOFF, "kHz", 0,  4,    4,    8,    4)
 #define ADCL_LINSEL_LINPUT1         (0 << 6)
 #define ADCL_LINSEL_LINPUT2         (1 << 6)
 #define ADCL_LINSEL_LINPUT3         (2 << 6)
-#define ADCL_LINSEL_DIFF            (3 << 6)        
-#define ADCL_LINSEL_MASK            (3 << 6) 
+#define ADCL_LINSEL_DIFF            (3 << 6)
+#define ADCL_LINSEL_MASK            (3 << 6)
 
 #define ADCR                        0x21
 #define ADCR_RMICBOOST_DISABLED     (0 << 4)

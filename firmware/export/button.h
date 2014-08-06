@@ -44,7 +44,7 @@ int button_read_device(void);
 #ifdef HAS_BUTTON_HOLD
 bool button_hold(void);
 #endif
-#ifdef HAS_REMOTE_BUTTON_HOLD 
+#ifdef HAS_REMOTE_BUTTON_HOLD
 bool remote_button_hold(void);
 #endif
 

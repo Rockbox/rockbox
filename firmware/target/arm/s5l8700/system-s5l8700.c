@@ -29,7 +29,7 @@
 #endif
 
 /* MIUSDPARA_BOOST taken from OF (see crt0.S). MIUSDPARA_UNBOOST is derived
- * from MIUSDPARA_BOOST due to the fact that the minimum allowed DRAM timings 
+ * from MIUSDPARA_BOOST due to the fact that the minimum allowed DRAM timings
  * are fix, but HCLK clock cycle time is doubled in unboosted state. */
 #if   defined(IPOD_NANO2G)
     #define MIUSDPARA_BOOST   0x006A49A5
@@ -147,13 +147,13 @@ void irq_handler(void)
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
     int irq_no = INTOFFSET;
-    
+
     irqvector[irq_no]();
 
     /* clear interrupt */
     SRCPND = (1 << irq_no);
     INTPND = INTPND;
-    
+
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */

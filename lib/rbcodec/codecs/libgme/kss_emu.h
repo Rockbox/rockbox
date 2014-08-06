@@ -24,12 +24,12 @@ typedef struct Z80_Cpu Kss_Cpu;
 
 // Sound chip flags
 enum {
-	sms_psg_flag   = 1 << 0,
-	sms_fm_flag    = 1 << 1,
-	msx_psg_flag   = 1 << 2,
-	msx_scc_flag   = 1 << 3,
-	msx_music_flag = 1 << 4,
-	msx_audio_flag = 1 << 5
+        sms_psg_flag   = 1 << 0,
+        sms_fm_flag    = 1 << 1,
+        msx_psg_flag   = 1 << 2,
+        msx_scc_flag   = 1 << 3,
+        msx_music_flag = 1 << 4,
+        msx_audio_flag = 1 << 5
 };
 
 enum { idle_addr = 0xFFFF };
@@ -43,85 +43,85 @@ enum { header_ext_size = header_size - header_base_size };
 
 struct header_t
 {
-	byte tag [4];
-	byte load_addr [2];
-	byte load_size [2];
-	byte init_addr [2];
-	byte play_addr [2];
-	byte first_bank;
-	byte bank_mode;
-	byte extra_header;
-	byte device_flags;
-	
-	// KSSX extended data, if extra_header==0x10
-	byte data_size [4];
-	byte unused [4];
-	byte first_track [2];
-	byte last_track [2]; // if no extended data, we set this to 0xFF
-	byte psg_vol;
-	byte scc_vol;
-	byte msx_music_vol;
-	byte msx_audio_vol;
+        byte tag [4];
+        byte load_addr [2];
+        byte load_size [2];
+        byte init_addr [2];
+        byte play_addr [2];
+        byte first_bank;
+        byte bank_mode;
+        byte extra_header;
+        byte device_flags;
+
+        // KSSX extended data, if extra_header==0x10
+        byte data_size [4];
+        byte unused [4];
+        byte first_track [2];
+        byte last_track [2]; // if no extended data, we set this to 0xFF
+        byte psg_vol;
+        byte scc_vol;
+        byte msx_music_vol;
+        byte msx_audio_vol;
 };
 
 struct sms_t {
-	struct Sms_Apu psg;
-	struct Opl_Apu fm;
+        struct Sms_Apu psg;
+        struct Opl_Apu fm;
 };
 
 struct msx_t {
-	struct Ay_Apu  psg;
-	struct Scc_Apu scc;
-	struct Opl_Apu music;
-	struct Opl_Apu audio;
+        struct Ay_Apu  psg;
+        struct Scc_Apu scc;
+        struct Opl_Apu music;
+        struct Opl_Apu audio;
 };
 
 struct Kss_Emu {
-	struct header_t header;
-	
-	int chip_flags;
-	bool scc_accessed;
-	bool gain_updated;
-	
-	unsigned scc_enabled; // 0 or 0xC000
-	int bank_count;
-	
-	blip_time_t play_period;
-	blip_time_t next_play;
-	int ay_latch;
-	
-	// general
-	int voice_count;
-	int const* voice_types;
-	int mute_mask_;
-	int tempo;
-	int gain;
-	
-	int sample_rate;
-	
-	// track-specific
-	int track_count;
-	int current_track;
-	
-	int clock_rate_;
-	unsigned buf_changed_count;
-	
-	// M3u Playlist
-	struct M3u_Playlist m3u;
-	
-	struct setup_t tfilter;
-	struct Track_Filter track_filter;
-	
-	struct sms_t sms;
-	struct msx_t msx;
+        struct header_t header;
 
-	Kss_Cpu cpu;
-	struct Multi_Buffer stereo_buf; // NULL if using custom buffer
-	struct Rom_Data rom;
-	
-	byte unmapped_read  [0x100];
-	byte unmapped_write [page_size];
-	byte ram [mem_size + cpu_padding];
+        int chip_flags;
+        bool scc_accessed;
+        bool gain_updated;
+
+        unsigned scc_enabled; // 0 or 0xC000
+        int bank_count;
+
+        blip_time_t play_period;
+        blip_time_t next_play;
+        int ay_latch;
+
+        // general
+        int voice_count;
+        int const* voice_types;
+        int mute_mask_;
+        int tempo;
+        int gain;
+
+        int sample_rate;
+
+        // track-specific
+        int track_count;
+        int current_track;
+
+        int clock_rate_;
+        unsigned buf_changed_count;
+
+        // M3u Playlist
+        struct M3u_Playlist m3u;
+
+        struct setup_t tfilter;
+        struct Track_Filter track_filter;
+
+        struct sms_t sms;
+        struct msx_t msx;
+
+        Kss_Cpu cpu;
+        struct Multi_Buffer stereo_buf; // NULL if using custom buffer
+        struct Rom_Data rom;
+
+        byte unmapped_read  [0x100];
+        byte unmapped_write [page_size];
+        byte ram [mem_size + cpu_padding];
 };
 
 // Basic functionality (see Gme_File.h for file loading/track info functions)
@@ -158,29 +158,29 @@ void Track_set_fade( struct Kss_Emu* this, int start_msec, int length_msec );
 // True if a track has reached its end
 static inline bool Track_ended( struct Kss_Emu* this )
 {
-	return track_ended( &this->track_filter );
+        return track_ended( &this->track_filter );
 }
 
 // Disables automatic end-of-track detection and skipping of silence at beginning
 static inline void Track_ignore_silence( struct Kss_Emu* this, bool disable )
 {
-	this->track_filter.silence_ignored_ = disable;
+        this->track_filter.silence_ignored_ = disable;
 }
 
 // Get track length in milliseconds
 static inline int Track_get_length( struct Kss_Emu* this, int n )
 {
-	int length = 0;
-	
-	if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
-		struct entry_t* entry = &this->m3u.entries [n];
-		length = entry->length;
-	} 
-	
-	if ( length <= 0 )
-		length = 120 * 1000;  /* 2 minutes */ 
+        int length = 0;
 
-	return length;
+        if ( (this->m3u.size > 0) && (n < this->m3u.size) ) {
+                struct entry_t* entry = &this->m3u.entries [n];
+                length = entry->length;
+        }
+
+        if ( length <= 0 )
+                length = 120 * 1000;  /* 2 minutes */
+
+        return length;
 }
 
 // Sound customization
@@ -200,8 +200,8 @@ void Sound_mute_voices( struct Kss_Emu* this, int mask );
 // Must be called before set_sample_rate().
 static inline void Sound_set_gain( struct Kss_Emu* this, int g )
 {
-	assert( !this->sample_rate ); // you must set gain before setting sample rate
-	this->gain = g;
+        assert( !this->sample_rate ); // you must set gain before setting sample rate
+        this->gain = g;
 }
 
 // Emulation (You shouldn't touch these

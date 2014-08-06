@@ -5,12 +5,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -55,14 +55,14 @@ struct BEECRYPTAPI entropySource
 struct _entropySource
 #endif
 {
-	/*!\var name
-	 * \brief The entropy source's name.
-	 */
-	const char*			name;
-	/*!\var next
-	 * \brief Points to the function which produces the entropy.
-	 */
-	const entropyNext	next;
+        /*!\var name
+         * \brief The entropy source's name.
+         */
+        const char*                     name;
+        /*!\var next
+         * \brief Points to the function which produces the entropy.
+         */
+        const entropyNext       next;
 };
 
 #ifndef __cplusplus
@@ -79,7 +79,7 @@ extern "C" {
  * \return The number of implemented entropy sources.
  */
 BEECRYPTAPI
-int						entropySourceCount(void);
+int                                             entropySourceCount(void);
 
 /*!\fn const entropySource* entropySourceGet(int n)
  * \brief This function returns the \a n -th entropy source implemented by
@@ -90,7 +90,7 @@ int						entropySourceCount(void);
  *  range.
  */
 BEECRYPTAPI
-const entropySource*	entropySourceGet(int n);
+const entropySource*    entropySourceGet(int n);
 
 /*!\fn const entropySource* entropySourceFind(const char* name)
  * \brief This function returns the entropy source specified by the given name.
@@ -98,7 +98,7 @@ const entropySource*	entropySourceGet(int n);
  * \return A pointer to an entropy source or null, if the name wasn't found.
  */
 BEECRYPTAPI
-const entropySource*	entropySourceFind(const char* name);
+const entropySource*    entropySourceFind(const char* name);
 
 /*!\fn const entropySource* entropySourceDefault()
  * \brief This functions returns the default entropy source; the default value
@@ -106,7 +106,7 @@ const entropySource*	entropySourceFind(const char* name);
  * \return A pointer to an entropy source or null, in case an error occured.
  */
 BEECRYPTAPI
-const entropySource*	entropySourceDefault(void);
+const entropySource*    entropySourceDefault(void);
 
 /*!\fn int entropyGatherNext(byte* data, size_t size)
  * \brief This function gathers \a size bytes of entropy into \a data.
@@ -120,7 +120,7 @@ const entropySource*	entropySourceDefault(void);
  * \retval -1 On failure.
  */
 BEECRYPTAPI
-int						entropyGatherNext(byte*, size_t);
+int                                             entropyGatherNext(byte*, size_t);
 
 #ifdef __cplusplus
 }
@@ -163,32 +163,32 @@ struct BEECRYPTAPI randomGenerator
 struct _randomGenerator
 #endif
 {
-	/*!\var name
-	 * \brief The random generator's name.
-	 */
-	const char*						name;
-	/*!\var paramsize
-	 * \brief The size of the random generator's parameters.
-	 * \note The implementor should set this by using sizeof(<struct holding
+        /*!\var name
+         * \brief The random generator's name.
+         */
+        const char*                                             name;
+        /*!\var paramsize
+         * \brief The size of the random generator's parameters.
+         * \note The implementor should set this by using sizeof(<struct holding
      *  random generator's parameters>).
-	 */
-	const size_t					paramsize;
-	/*!\var setup
-	 * \brief Points to the setup function.
-	 */
-	const randomGeneratorSetup		setup;
-	/*!\var seed
-	 * \brief Points to the seeding function.
-	 */
-	const randomGeneratorSeed		seed;
-	/*!\var seed
-	 * \brief Points to the function which generates the random data.
-	 */
-	const randomGeneratorNext		next;
-	/*!\var seed
-	 * \brief Points to the cleanup function.
-	 */
-	const randomGeneratorCleanup	cleanup;
+         */
+        const size_t                                    paramsize;
+        /*!\var setup
+         * \brief Points to the setup function.
+         */
+        const randomGeneratorSetup              setup;
+        /*!\var seed
+         * \brief Points to the seeding function.
+         */
+        const randomGeneratorSeed               seed;
+        /*!\var seed
+         * \brief Points to the function which generates the random data.
+         */
+        const randomGeneratorNext               next;
+        /*!\var seed
+         * \brief Points to the cleanup function.
+         */
+        const randomGeneratorCleanup    cleanup;
 };
 
 #ifndef __cplusplus
@@ -214,13 +214,13 @@ extern "C" {
 #endif
 
 BEECRYPTAPI
-int						randomGeneratorCount(void);
+int                                             randomGeneratorCount(void);
 BEECRYPTAPI
-const randomGenerator*	randomGeneratorGet(int);
+const randomGenerator*  randomGeneratorGet(int);
 BEECRYPTAPI
-const randomGenerator*	randomGeneratorFind(const char*);
+const randomGenerator*  randomGeneratorFind(const char*);
 BEECRYPTAPI
-const randomGenerator*	randomGeneratorDefault(void);
+const randomGenerator*  randomGeneratorDefault(void);
 
 #ifdef __cplusplus
 }
@@ -237,14 +237,14 @@ struct BEECRYPTAPI randomGeneratorContext
 struct _randomGeneratorContext
 #endif
 {
-	const randomGenerator* rng;
-	randomGeneratorParam* param;
+        const randomGenerator* rng;
+        randomGeneratorParam* param;
 
-	#ifdef __cplusplus
-	randomGeneratorContext();
-	randomGeneratorContext(const randomGenerator*);
-	~randomGeneratorContext();
-	#endif
+        #ifdef __cplusplus
+        randomGeneratorContext();
+        randomGeneratorContext(const randomGenerator*);
+        ~randomGeneratorContext();
+        #endif
 };
 
 #ifndef __cplusplus
@@ -303,13 +303,13 @@ struct BEECRYPTAPI hashFunction
 struct _hashFunction
 #endif
 {
-	const char*					name;
-	const size_t				paramsize;	/* in bytes */
-	const size_t				blocksize;	/* in bytes */
-	const size_t				digestsize;	/* in bytes */
-	const hashFunctionReset		reset;
-	const hashFunctionUpdate	update;
-	const hashFunctionDigest	digest;
+        const char*                                     name;
+        const size_t                            paramsize;      /* in bytes */
+        const size_t                            blocksize;      /* in bytes */
+        const size_t                            digestsize;     /* in bytes */
+        const hashFunctionReset         reset;
+        const hashFunctionUpdate        update;
+        const hashFunctionDigest        digest;
 };
 
 #ifndef __cplusplus
@@ -335,13 +335,13 @@ extern "C" {
 #endif
 
 BEECRYPTAPI
-int					hashFunctionCount(void);
+int                                     hashFunctionCount(void);
 BEECRYPTAPI
-const hashFunction*	hashFunctionGet(int);
+const hashFunction*     hashFunctionGet(int);
 BEECRYPTAPI
-const hashFunction*	hashFunctionFind(const char*);
+const hashFunction*     hashFunctionFind(const char*);
 BEECRYPTAPI
-const hashFunction*	hashFunctionDefault(void);
+const hashFunction*     hashFunctionDefault(void);
 
 #ifdef __cplusplus
 }
@@ -357,14 +357,14 @@ struct BEECRYPTAPI hashFunctionContext
 struct _hashFunctionContext
 #endif
 {
-	const hashFunction* algo;
-	hashFunctionParam* param;
+        const hashFunction* algo;
+        hashFunctionParam* param;
 
-	#ifdef __cplusplus
-	hashFunctionContext();
-	hashFunctionContext(const hashFunction*);
-	~hashFunctionContext();
-	#endif
+        #ifdef __cplusplus
+        hashFunctionContext();
+        hashFunctionContext(const hashFunction*);
+        ~hashFunctionContext();
+        #endif
 };
 
 #ifndef __cplusplus
@@ -426,7 +426,7 @@ typedef int (*keyedHashFunctionDigest )(keyedHashFunctionParam*, byte*);
  * The struct field 'keybitsmin' contains the minimum number of bits a key
  * must contains, 'keybitsmax' the maximum number of bits a key may contain,
  * 'keybitsinc', the increment in bits that may be used between min and max.
- * 
+ *
  * NOTE: data must be at least have a bytesize of 'digestsize' as described
  * in the keyedHashFunction struct.
  * NOTE: for safety reasons, after calling digest, each specific implementation
@@ -438,17 +438,17 @@ struct BEECRYPTAPI keyedHashFunction
 struct _keyedHashFunction
 #endif
 {
-	const char*						name;
-	const size_t					paramsize;	/* in bytes */
-	const size_t					blocksize;	/* in bytes */
-	const size_t					digestsize;	/* in bytes */
-	const size_t					keybitsmin;	/* in bits */
-	const size_t					keybitsmax;	/* in bits */
-	const size_t					keybitsinc;	/* in bits */
-	const keyedHashFunctionSetup	setup;
-	const keyedHashFunctionReset	reset;
-	const keyedHashFunctionUpdate	update;
-	const keyedHashFunctionDigest	digest;
+        const char*                                             name;
+        const size_t                                    paramsize;      /* in bytes */
+        const size_t                                    blocksize;      /* in bytes */
+        const size_t                                    digestsize;     /* in bytes */
+        const size_t                                    keybitsmin;     /* in bits */
+        const size_t                                    keybitsmax;     /* in bits */
+        const size_t                                    keybitsinc;     /* in bits */
+        const keyedHashFunctionSetup    setup;
+        const keyedHashFunctionReset    reset;
+        const keyedHashFunctionUpdate   update;
+        const keyedHashFunctionDigest   digest;
 };
 
 #ifndef __cplusplus
@@ -474,13 +474,13 @@ extern "C" {
 #endif
 
 BEECRYPTAPI
-int							keyedHashFunctionCount(void);
+int                                                     keyedHashFunctionCount(void);
 BEECRYPTAPI
-const keyedHashFunction*	keyedHashFunctionGet(int);
+const keyedHashFunction*        keyedHashFunctionGet(int);
 BEECRYPTAPI
-const keyedHashFunction*	keyedHashFunctionFind(const char*);
+const keyedHashFunction*        keyedHashFunctionFind(const char*);
 BEECRYPTAPI
-const keyedHashFunction*	keyedHashFunctionDefault(void);
+const keyedHashFunction*        keyedHashFunctionDefault(void);
 
 #ifdef __cplusplus
 }
@@ -496,14 +496,14 @@ struct BEECRYPTAPI keyedHashFunctionContext
 struct _keyedHashFunctionContext
 #endif
 {
-	const keyedHashFunction*	algo;
-	keyedHashFunctionParam*		param;
+        const keyedHashFunction*        algo;
+        keyedHashFunctionParam*         param;
 
-	#ifdef __cplusplus
-	keyedHashFunctionContext();
-	keyedHashFunctionContext(const keyedHashFunction*);
-	~keyedHashFunctionContext();
-	#endif
+        #ifdef __cplusplus
+        keyedHashFunctionContext();
+        keyedHashFunctionContext(const keyedHashFunction*);
+        ~keyedHashFunctionContext();
+        #endif
 };
 
 #ifndef __cplusplus
@@ -555,9 +555,9 @@ int keyedHashFunctionContextDigestMatch(keyedHashFunctionContext*, const mpnumbe
  */
 typedef enum
 {
-	NOCRYPT,
-	ENCRYPT,
-	DECRYPT
+        NOCRYPT,
+        ENCRYPT,
+        DECRYPT
 } cipherOperation;
 
 /*!\typedef void blockCipherParam
@@ -611,14 +611,14 @@ typedef uint32_t* (*blockCipherFeedback)(blockCipherParam*);
 
 typedef struct
 {
-	const blockCipherRawcrypt encrypt;
-	const blockCipherRawcrypt decrypt;
+        const blockCipherRawcrypt encrypt;
+        const blockCipherRawcrypt decrypt;
 } blockCipherRaw;
 
 typedef struct
 {
-	const blockCipherModcrypt encrypt;
-	const blockCipherModcrypt decrypt;
+        const blockCipherModcrypt encrypt;
+        const blockCipherModcrypt decrypt;
 } blockCipherMode;
 
 /*!\brief Holds information and pointers to code specific to each cipher.
@@ -633,52 +633,52 @@ struct BEECRYPTAPI blockCipher
 struct _blockCipher
 #endif
 {
-	/*!\var name
-	 * \brief The blockcipher's name.
-	 */
-	const char*					name;
-	/*!\var paramsize
-	 * \brief The size of the parameters required by this cipher, in bytes.
-	 */
-	const size_t				paramsize;
-	/*!\var blocksize
-	 * \brief The size of one block of data, in bytes.
-	 */
-	const size_t				blocksize;
-	/*!\var keybitsmin
-	 * \brief The minimum number of key bits.
-	 */
-	const size_t				keybitsmin;
-	/*!\var keybitsmax
-	 * \brief The maximum number of key bits.
-	 */
-	const size_t				keybitsmax;
-	/*!\var keybitsinc
-	 * \brief The allowed increment in key bits between min and max.
-	 * \see keybitsmin and keybitsmax.
-	 */
-	const size_t				keybitsinc;
-	/*!\var setup
-	 * \brief Pointer to the cipher's setup function.
-	 */
-	const blockCipherSetup		setup;
-	/*!\var setiv
-	 * \brief Pointer to the cipher's initialization vector setup function.
-	 */
-	const blockCipherSetIV		setiv;
-	/*!\var raw
-	 * \brief The cipher's raw functions.
-	 */
-	const blockCipherRaw		raw;
-	/*!\var ecb
-	 * \brief The cipher's ECB functions.
-	 */
-	const blockCipherMode		ecb;
-	const blockCipherMode		cbc;
-	/*!\var getfb
-	 * \brief Pointer to the cipher's feedback-returning function.
-	 */
-	const blockCipherFeedback	getfb;
+        /*!\var name
+         * \brief The blockcipher's name.
+         */
+        const char*                                     name;
+        /*!\var paramsize
+         * \brief The size of the parameters required by this cipher, in bytes.
+         */
+        const size_t                            paramsize;
+        /*!\var blocksize
+         * \brief The size of one block of data, in bytes.
+         */
+        const size_t                            blocksize;
+        /*!\var keybitsmin
+         * \brief The minimum number of key bits.
+         */
+        const size_t                            keybitsmin;
+        /*!\var keybitsmax
+         * \brief The maximum number of key bits.
+         */
+        const size_t                            keybitsmax;
+        /*!\var keybitsinc
+         * \brief The allowed increment in key bits between min and max.
+         * \see keybitsmin and keybitsmax.
+         */
+        const size_t                            keybitsinc;
+        /*!\var setup
+         * \brief Pointer to the cipher's setup function.
+         */
+        const blockCipherSetup          setup;
+        /*!\var setiv
+         * \brief Pointer to the cipher's initialization vector setup function.
+         */
+        const blockCipherSetIV          setiv;
+        /*!\var raw
+         * \brief The cipher's raw functions.
+         */
+        const blockCipherRaw            raw;
+        /*!\var ecb
+         * \brief The cipher's ECB functions.
+         */
+        const blockCipherMode           ecb;
+        const blockCipherMode           cbc;
+        /*!\var getfb
+         * \brief Pointer to the cipher's feedback-returning function.
+         */
+        const blockCipherFeedback       getfb;
 };
 
 #ifndef __cplusplus
@@ -695,7 +695,7 @@ extern "C" {
  * \return The number of implemented blockciphers.
  */
 BEECRYPTAPI
-int						blockCipherCount(void);
+int                                             blockCipherCount(void);
 
 /*!\fn const blockCipher* blockCipherGet(int n)
  * \brief This function returns the \a n -th blockcipher implemented by
@@ -706,7 +706,7 @@ int						blockCipherCount(void);
  *  range.
  */
 BEECRYPTAPI
-const blockCipher*		blockCipherGet(int);
+const blockCipher*              blockCipherGet(int);
 
 /*!\fn const blockCipher* blockCipherFind(const char* name)
  * \brief This function returns the blockcipher specified by the given name.
@@ -714,7 +714,7 @@ const blockCipher*		blockCipherGet(int);
  * \return A pointer to a blockcipher or null, if the name wasn't found.
  */
 BEECRYPTAPI
-const blockCipher*		blockCipherFind(const char*);
+const blockCipher*              blockCipherFind(const char*);
 
 /*!\fn const blockCipher* blockCipherDefault()
  * \brief This functions returns the default blockcipher; the default value
@@ -722,7 +722,7 @@ const blockCipher*		blockCipherFind(const char*);
  * \return A pointer to a blockcipher or null, in case an error occured.
  */
 BEECRYPTAPI
-const blockCipher*		blockCipherDefault(void);
+const blockCipher*              blockCipherDefault(void);
 
 #ifdef __cplusplus
 }
@@ -738,23 +738,23 @@ struct BEECRYPTAPI blockCipherContext
 struct _blockCipherContext
 #endif
 {
-	/*!\var algo
-	 * \brief Pointer to a blockCipher.
-	 */
-	const blockCipher*	algo;
-	/*!\var param
-	 * \brief Pointer to the parameters used by algo.
-	 */
-	blockCipherParam*	param;
-	/*!\var op
-	 */
-	cipherOperation		op;
+        /*!\var algo
+         * \brief Pointer to a blockCipher.
+         */
+        const blockCipher*      algo;
+        /*!\var param
+         * \brief Pointer to the parameters used by algo.
+         */
+        blockCipherParam*       param;
+        /*!\var op
+         */
+        cipherOperation         op;
 
-	#ifdef __cplusplus
-	blockCipherContext();
-	blockCipherContext(const blockCipher*);
-	~blockCipherContext();
-	#endif
+        #ifdef __cplusplus
+        blockCipherContext();
+        blockCipherContext(const blockCipher*);
+        ~blockCipherContext();
+        #endif
 };
 
 #ifndef __cplusplus

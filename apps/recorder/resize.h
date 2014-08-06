@@ -35,7 +35,7 @@
  * - otherwise "Bilinear" or "Nearest Neighbour"
  *
  * If !(HAVE_LCD_COLOR) then use simple scaling algorithm "Nearest Neighbour"
- * 
+ *
  * return -1 for error
  ****************************************************************/
 
@@ -92,7 +92,7 @@ static inline uint32_t sc_mul_u32_rnd(uint32_t op1, uint32_t op2)
     tmp += 1LU << 31;
     tmp >>= 32;
     return tmp;
-}   
+}
 #else
 #define SC_OUT(n, c) (((n) + (1 << 23)) >> 24)
 #endif
@@ -102,7 +102,7 @@ static inline uint32_t sc_mul_u32_rnd(uint32_t op1, uint32_t op2)
 
 struct img_part {
     int len;
-#if !defined(HAVE_LCD_COLOR)    
+#if !defined(HAVE_LCD_COLOR)
     uint8_t *buf;
 #else
     struct uint8_rgb* buf;

@@ -90,66 +90,66 @@ static const int R04_IRQ_RESET    = 0x80;
 enum { ATTACK,DECAY,SUSHOLD,SUSTINE,RELEASE,FINISH };
 
 struct Patch {
-	bool AM, PM, EG;
-	byte KR; // 0-1
-	byte ML; // 0-15
-	byte KL; // 0-3
-	byte TL; // 0-63
-	byte FB; // 0-7
-	byte AR; // 0-15
-	byte DR; // 0-15
-	byte SL; // 0-15
-	byte RR; // 0-15
+        bool AM, PM, EG;
+        byte KR; // 0-1
+        byte ML; // 0-15
+        byte KL; // 0-3
+        byte TL; // 0-63
+        byte FB; // 0-7
+        byte AR; // 0-15
+        byte DR; // 0-15
+        byte SL; // 0-15
+        byte RR; // 0-15
 };
 
 void patchReset(struct Patch* p);
 
 struct Slot {
-	// OUTPUT
-	int feedback;
-	/** Output value of slot. */
-	int output[5];
+        // OUTPUT
+        int feedback;
+        /** Output value of slot. */
+        int output[5];
 
-	// for Phase Generator (PG)
-	/** Phase. */
-	unsigned int phase;
-	/** Phase increment amount. */
-	unsigned int dphase;
-	/** Output. */
-	int pgout;
+        // for Phase Generator (PG)
+        /** Phase. */
+        unsigned int phase;
+        /** Phase increment amount. */
+        unsigned int dphase;
+        /** Output. */
+        int pgout;
 
-	// for Envelope Generator (EG)
-	/** F-Number. */
-	int fnum;
-	/** Block. */
-	int block;
-	/** Total Level + Key scale level. */
-	int tll;
-	/** Key scale offset (Rks). */
-	int rks;
-	/** Current state. */
-	int eg_mode;
-	/** Phase. */
-	unsigned int eg_phase;
-	/** Phase increment amount. */
-	unsigned int eg_dphase;
-	/** Output. */
-	int egout;
+        // for Envelope Generator (EG)
+        /** F-Number. */
+        int fnum;
+        /** Block. */
+        int block;
+        /** Total Level + Key scale level. */
+        int tll;
+        /** Key scale offset (Rks). */
+        int rks;
+        /** Current state. */
+        int eg_mode;
+        /** Phase. */
+        unsigned int eg_phase;
+        /** Phase increment amount. */
+        unsigned int eg_dphase;
+        /** Output. */
+        int egout;
 
-	bool slotStatus;
-	struct Patch patch;
+        bool slotStatus;
+        struct Patch patch;
 
-	// refer to Y8950->
-	int *plfo_pm;
-	int *plfo_am;
+        // refer to Y8950->
+        int *plfo_pm;
+        int *plfo_am;
 };
 
 void slotReset(struct Slot* slot);
 
 
 struct OPLChannel {
-	bool alg;
-	struct Slot mod, car;
+        bool alg;
+        struct Slot mod, car;
 };
 
 void channelReset(struct OPLChannel* ch);
@@ -157,54 +157,54 @@ void channelReset(struct OPLChannel* ch);
 
 struct Y8950
 {
-	int adr;
-	int output[2];
-	// Register
-	byte reg[0x100];
-	bool rythm_mode;
-	// Pitch Modulator
-	int pm_mode;
-	unsigned int pm_phase;
-	// Amp Modulator
-	int am_mode;
-	unsigned int am_phase;
+        int adr;
+        int output[2];
+        // Register
+        byte reg[0x100];
+        bool rythm_mode;
+        // Pitch Modulator
+        int pm_mode;
+        unsigned int pm_phase;
+        // Amp Modulator
+        int am_mode;
+        unsigned int am_phase;
 
-	// Noise Generator
-	int noise_seed;
-	int whitenoise;
-	int noiseA;
-	int noiseB;
-	unsigned int noiseA_phase;
-	unsigned int noiseB_phase;
-	unsigned int noiseA_dphase;
-	unsigned int noiseB_dphase;
+        // Noise Generator
+        int noise_seed;
+        int whitenoise;
+        int noiseA;
+        int noiseB;
+        unsigned int noiseA_phase;
+        unsigned int noiseB_phase;
+        unsigned int noiseA_dphase;
+        unsigned int noiseB_dphase;
 
-	// Channel & Slot
-	struct OPLChannel ch[9];
-	struct Slot *slot[18];
+        // Channel & Slot
+        struct OPLChannel ch[9];
+        struct Slot *slot[18];
 
-	unsigned int pm_dphase;
-	int lfo_pm;
-	unsigned int am_dphase;
-	int lfo_am;
+        unsigned int pm_dphase;
+        int lfo_pm;
+        unsigned int am_dphase;
+        int lfo_am;
 
-	int maxVolume;
-	bool internalMuted;
-	
-	int clockRate;
+        int maxVolume;
+        bool internalMuted;
 
-	/** STATUS Register. */
-	byte status;
-	/** bit=0 -> masked. */
-	byte statusMask;
-	/* MsxAudioIRQHelper irq; */
+        int clockRate;
 
-	// ADPCM
-	struct Y8950Adpcm adpcm;
+        /** STATUS Register. */
+        byte status;
+        /** bit=0 -> masked. */
+        byte statusMask;
+        /* MsxAudioIRQHelper irq; */
 
-	/** 13-bit (exponential) DAC. */
-	/* DACSound16S dac13; */
-    
+        // ADPCM
+        struct Y8950Adpcm adpcm;
+
+        /** 13-bit (exponential) DAC. */
+        /* DACSound16S dac13; */
+
     // DAC stuff
     int dacSampleVolume;
     int dacOldSampleVolume;
@@ -212,7 +212,7 @@ struct Y8950
     int dacCtrlVolume;
     int dacDaVolume;
     int dacEnabled;
-    
+
     // Internal buffer
     int buffer[AUDIO_MONO_BUFFER_SIZE];
 };
@@ -225,7 +225,7 @@ byte OPL_readReg(struct Y8950* this_, byte reg);
 byte OPL_readStatus(struct Y8950* this_);
 static inline void OPL_setInternalMute(struct Y8950* this_, bool muted) { this_->internalMuted = muted; }
 static inline bool OPL_isInternalMuted(struct Y8950* this_) { return this_->internalMuted; }
-    
+
 void OPL_setSampleRate(struct Y8950* this_, int sampleRate, int clockRate);
 int* OPL_updateBuffer(struct Y8950* this_, int length);
 
@@ -240,9 +240,9 @@ void OPL_changeStatusMask(struct Y8950* this_, byte newMask);
 // Adjust envelope speed which depends on sampling rate
 static inline unsigned int rate_adjust(int x, int rate, int clk)
 {
-	unsigned int tmp = (long long)x * clk / 72 / rate;
-//	assert (tmp <= 4294967295U);
-	return tmp;
+        unsigned int tmp = (long long)x * clk / 72 / rate;
+//      assert (tmp <= 4294967295U);
+        return tmp;
 }
 
 #endif

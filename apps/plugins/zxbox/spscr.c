@@ -5,7 +5,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,7 +46,7 @@ byte *update_screen_line(byte *scrp, int coli, int scri, int border,
   int i;
   qbyte *tmptr, *mptr;
   qbyte mark, cmark;
-  
+
   cmark = *cmarkp;
   scrptr = (qbyte *) scrp;
   if(scri >= 0) {          /* normal line */
@@ -72,18 +72,18 @@ byte *update_screen_line(byte *scrp, int coli, int scri, int border,
     }
     else cmark |= mark;
     mptr = SPNM(scr_mark) + scri;
-    
+
     mark = *mptr | cmark;
     if(mark) {
       byte *spmp, *spcp;
       qbyte *scr_tab;
-      
+
       *mptr = 0;
       SPNM(imag_mark)[coli] |= mark;
       SPNM(imag_horiz) |= mark;
       coli >>= 3;
       SPNM(imag_vert) |= BIT_N(coli);
-      
+
       spmp = PRNM(proc).mem + (scri << 5);
       spcp = PRNM(proc).mem + 0x5800 + (coli << 5);
 
@@ -132,12 +132,12 @@ void spscr_init_mask_color(void)
 
   sp_colors[8] = sp_colors[0];
 
-  for(clb = 0; clb < 256; clb++) 
+  for(clb = 0; clb < 256; clb++)
     for(hb = 0; hb < 16; hb++) {
 
       bc = (clb & 0x38) >> 3;
       fc = clb & 0x07;
-      
+
       if(clb & 0x40) {
     fc |= 0x08;
     bc |= 0x08;
@@ -150,7 +150,7 @@ void spscr_init_mask_color(void)
 
       for(j = 4; j; bwb >>= 1, j--)  {
     *tab_f0-- = (byte) sp_colors[(bwb & 0x01) ? fc : bc];
-    *tab_f1-- = (byte) sp_colors[(clb & 0x80) ? 
+    *tab_f1-- = (byte) sp_colors[(clb & 0x80) ?
                     ((bwb & 0x01) ? bc : fc) :
                     ((bwb & 0x01) ? fc : bc)];
       }
@@ -183,7 +183,7 @@ void spscr_init_line_pointers(int lines)
   int bs;
   int y;
   int scline;
-  
+
   bs = (lines - 192) / 2;
 
   for(i = 0; i < PORT_TIME_NUM; i++) {
@@ -192,7 +192,7 @@ void spscr_init_line_pointers(int lines)
 
     if(i < ODDHF) scline = i;
     else scline = i - ODDHF;
-    
+
     if(scline >= 64-bs && scline < 256+bs) {
       if(scline >= 64 && scline < 256) {
     y = scline - 64;

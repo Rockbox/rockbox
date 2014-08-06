@@ -90,10 +90,10 @@ static void UIRQ(void)
 void irq_handler(void)
 {
     asm volatile("stmfd sp!, {r0-r5, ip, lr} \n" /* store context */
-                 "ldr   r4, =0x18080000      \n" /* INTC base */        
+                 "ldr   r4, =0x18080000      \n" /* INTC base */
                  "ldr   r5, [r4, #0x104]     \n" /* INTC_ISR */
                  "and   r5, r5, #0x1f        \n" /* irq_no = INTC_ISR & 0x1f */
-                 "ldr   r3, =irqvector       \n"  
+                 "ldr   r3, =irqvector       \n"
                  "ldr   r3,[r3, r5, lsl #2]  \n"
                  "blx   r3                   \n" /* irqvector[irq_no]() */
                  "mov   r3, #1               \n"

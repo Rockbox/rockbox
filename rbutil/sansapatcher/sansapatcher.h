@@ -48,4 +48,3 @@ int sansa_list_images(struct sansa_t* sansa);
 }
 #endif
 #endif
-

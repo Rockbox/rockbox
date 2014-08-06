@@ -37,5 +37,3 @@ class ArchiveUtil : public QObject
        void logItem(QString, int);
 };
 #endif
-
- 

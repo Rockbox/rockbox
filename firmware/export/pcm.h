@@ -43,7 +43,7 @@ typedef void (*pcm_play_callback_type)(const void **start, size_t *size);
 /* Typedef for registered status callback */
 typedef enum pcm_dma_status (*pcm_status_callback_type)(enum pcm_dma_status status);
 
-/* set the pcm frequency - use values in hw_sampr_list 
+/* set the pcm frequency - use values in hw_sampr_list
  * when CONFIG_SAMPR_TYPES is #defined, or-in SAMPR_TYPE_* fields with
  * frequency value. SAMPR_TYPE_PLAY is 0 and the default if none is
  * specified. */

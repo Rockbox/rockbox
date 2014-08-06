@@ -63,7 +63,7 @@ enum codec_status codec_run(void)
 
     codec_set_replaygain(ci->id3);
     ci->memset(&q,0,sizeof(ATRAC3Context));
- 
+
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
     ci->configure(DSP_SET_STEREO_MODE, ci->id3->channels == 1 ?
@@ -79,7 +79,7 @@ enum codec_status codec_run(void)
 
     total_frames = (ci->id3->filesize - ci->id3->first_frame_offset) / FRAMESIZE;
     frame_counter = 0;
-    
+
     /* check for a mid-track resume and force a seek time accordingly */
     if (resume_offset) {
         resume_offset -= MIN(resume_offset, ci->id3->first_frame_offset);
@@ -95,7 +95,7 @@ enum codec_status codec_run(void)
         ci->seek_buffer(ci->id3->first_frame_offset);
     }
 
-    /* The main decoder loop */  
+    /* The main decoder loop */
     while(frame_counter < total_frames)
     {
         if (action == CODEC_ACTION_NULL)
@@ -110,7 +110,7 @@ enum codec_status codec_run(void)
                 ci->set_elapsed(ci->id3->length);
                 ci->seek_complete();
                 break;
-            }       
+            }
 
             /* Seek to the start of the track */
             if (param == 0) {
@@ -119,15 +119,15 @@ enum codec_status codec_run(void)
                 ci->seek_buffer(ci->id3->first_frame_offset);
                 ci->seek_complete();
                 action = CODEC_ACTION_NULL;
-                continue;           
-            }                                                                
+                continue;
+            }
 
             seek_frame_offset = (param * BITRATE) / (8 * FRAMESIZE);
             frame_counter = seek_frame_offset;
             ci->seek_buffer(ci->id3->first_frame_offset + seek_frame_offset* FRAMESIZE);
             elapsed = param;
             ci->set_elapsed(elapsed);
-            ci->seek_complete(); 
+            ci->seek_complete();
         }
 
         action = CODEC_ACTION_NULL;
@@ -152,5 +152,5 @@ enum codec_status codec_run(void)
         frame_counter++;
     }
 
-    return CODEC_OK;    
+    return CODEC_OK;
 }

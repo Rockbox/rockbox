@@ -46,4 +46,3 @@ void tea5760_dbg_info(struct tea5760_dbg_info *info);
 #endif
 
 #endif /* _TEA5760_H_ */
-

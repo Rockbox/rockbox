@@ -26,8 +26,8 @@
 #include "md5.h"
 #include "resource.h"
 
-#define WINDOW_WIDTH 280 
-#define WINDOW_HEIGHT 130 
+#define WINDOW_WIDTH 280
+#define WINDOW_HEIGHT 130
 
 #define IDM_RESTORE 1000
 #define IDM_EXIT 1010
@@ -105,11 +105,11 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
         perror(infile);
         return 0;
     }
-    
+
     fclose(f);
 
     memcpy(image + 0x220 + origin, bldata, bllen);
-    
+
     f = _tfopen(outfile, TEXT("wb"));
     if(!f) {
         perror(outfile);
@@ -130,7 +130,7 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
     image[0x20d] = (actual_length >> 16) & 0xff;
     image[0x20e] = (actual_length >> 8) & 0xff;
     image[0x20f] = actual_length & 0xff;
-    
+
     image[0x21c] = (actual_length >> 24) & 0xff;
     image[0x21d] = (actual_length >> 16) & 0xff;
     image[0x21e] = (actual_length >> 8) & 0xff;
@@ -151,17 +151,17 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
     image[1] = (total_length >> 8) & 0xff;
     image[2] = (total_length >> 16) & 0xff;
     image[3] = (total_length >> 24) & 0xff;
-    
+
     image[4] = binary_length & 0xff;
     image[5] = (binary_length >> 8) & 0xff;
     image[6] = (binary_length >> 16) & 0xff;
     image[7] = (binary_length >> 24) & 0xff;
-    
+
     image[8] = num_chksums & 0xff;
     image[9] = (num_chksums >> 8) & 0xff;
     image[10] = (num_chksums >> 16) & 0xff;
     image[11] = (num_chksums >> 24) & 0xff;
-    
+
     i = fwrite(image, 1, total_length, f);
     if(i < total_length) {
         perror(outfile);
@@ -169,7 +169,7 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
     }
 
     fclose(f);
-    
+
     return 1;
 }
 
@@ -193,7 +193,7 @@ int FileMD5(TCHAR *name, char *md5)
     unsigned char md5sum[16];
     unsigned char block[32768];
     FILE *file;
-    
+
     file = _tfopen(name, TEXT("rb"));
     if (!file) {
         MessageBox(NULL,
@@ -224,7 +224,7 @@ int PatchFirmware(int series, int table_entry)
     int i;
     struct sumpairs *sums;
     int origin;
-    
+
     /* get pointer to the correct bootloader.bin */
     switch(series) {
         case 100:
@@ -246,7 +246,7 @@ int PatchFirmware(int series, int table_entry)
     resload = LoadResource(NULL, res);
     bootloader = (unsigned char *)LockResource(resload);
     blsize = SizeofResource(NULL, res);
-    
+
     /* get filename from edit box */
     GetWindowText(controls[EDIT_FILENAME], fn, MAX_PATH);
     /* store temp files in temp directory */
@@ -322,7 +322,7 @@ int FileDialog(TCHAR *fn)
     ofn.nMaxFileTitle = 0;
     ofn.lpstrInitialDir = NULL;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-    
+
     if (GetOpenFileName(&ofn) == TRUE) {
         _tcscpy(fn, filename);
         return 1;
@@ -338,12 +338,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
    TCHAR fn[MAX_PATH];
    case WM_CREATE:
        /* text label */
-       controls[LABEL_FILENAME] = 
+       controls[LABEL_FILENAME] =
            CreateWindowEx(0, TEXT("STATIC"), TEXT("Firmware file name:"),
                           WS_CHILD | WS_VISIBLE, 10, 14,
                           100, 32, hwnd, 0, 0, 0);
        /* text field for inputing file name */
-       controls[EDIT_FILENAME] = 
+       controls[EDIT_FILENAME] =
            CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("EDIT"), TEXT(""),
                           WS_CHILD | WS_TABSTOP | WS_VISIBLE | ES_AUTOHSCROLL,
                           10, 35, 180, 20, hwnd, 0, 0, 0);
@@ -351,7 +351,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
        controls[BUTTON_BROWSE] =
            CreateWindowEx(0, TEXT("BUTTON"), TEXT("Browse"),
                           WS_CHILD | WS_TABSTOP | WS_VISIBLE, 200, 32, 70, 25,
-                          hwnd, 0, 0, 0);        
+                          hwnd, 0, 0, 0);
        /* patch button */
        controls[BUTTON_PATCH] =
            CreateWindowEx(0, TEXT("BUTTON"), TEXT("Patch"),
@@ -359,7 +359,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                           hwnd, 0, 0, 0);
        /* set default font on all controls, will be ugly if we don't do this */
        deffont = GetStockObject(DEFAULT_GUI_FONT);
-       for (i = 0; i < CTL_NUM; ++i) 
+       for (i = 0; i < CTL_NUM; ++i)
            SendMessage(controls[i], WM_SETFONT, (WPARAM)deffont,
                        MAKELPARAM(FALSE, 0));
         break;
@@ -458,7 +458,7 @@ void getargs(LPTSTR p, int * argc, LPCTSTR * argv, int MAXARGS)
                 {
                     p++;
                     tok=p;
-                } 
+                }
                 quote = !quote;
             }
             else p++;
@@ -469,7 +469,7 @@ void getargs(LPTSTR p, int * argc, LPCTSTR * argv, int MAXARGS)
 #define MAXARGC 4
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
-                   LPSTR command_line, int command_show) 
+                   LPSTR command_line, int command_show)
 {
     HWND window;
     WNDCLASSEX wc;
@@ -481,7 +481,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
     getargs(cmdline, &argc, argv, MAXARGC);
     if (argc > 1)
         command_show = SW_HIDE;
-    
+
     rbicon = LoadIcon(instance, MAKEINTRESOURCE(IDI_RBICON));
     ZeroMemory(&wc, sizeof(wc));
     wc.cbSize = sizeof(wc);
@@ -514,4 +514,3 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
     }
     return 0;
 }
-

@@ -31,7 +31,7 @@
 bool timer_set(long cycles, bool start)
 {
     #warning function not implemented
-    
+
     (void)cycles;
     (void)start;
     return false;
@@ -40,7 +40,7 @@ bool timer_set(long cycles, bool start)
 bool timer_start(void)
 {
     #warning function not implemented
-    
+
     return false;
 }
 
@@ -57,7 +57,7 @@ void TIMER(void)
     {
         /* Run through the list of tick tasks */
         call_tick_tasks();
-        
+
         /* reset Timer 0 IRQ & ref flags */
         TIREQ |= TI0 | TF0;
     }

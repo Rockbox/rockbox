@@ -59,7 +59,7 @@ void button_int(void)
     int_btn = BUTTON_NONE;
 
     val = touchpad_read_device(data, 4);
-    
+
     if (val == MEP_BUTTON_HEADER)
     {
         /* Buttons packet */

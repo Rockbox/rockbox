@@ -71,5 +71,3 @@ unsigned int input_millivolts(void)
 
     return batt_millivolts;
 }
-
-

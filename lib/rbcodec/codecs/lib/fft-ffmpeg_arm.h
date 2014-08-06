@@ -66,15 +66,15 @@ static inline FFTComplex* TRANSFORM( FFTComplex* z, int n, FFTSample wre, FFTSam
     z += n*2; /* z[o2] */
     asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
     XPROD31_R(r_re, r_im, wre, wim, t1,t2);
-    
+
     z += n; /* z[o3] */
     asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
     XNPROD31_R(r_re, r_im, wre, wim, t5,t6);
-    
+
     BF_OPT(t1, t5, t5, t1);
     BF_OPT(t6, t2, t2, t6);
 
-    {    
+    {
         register FFTSample rt0temp asm("r4");
         /*{*/
         /*   BF_OPT(t1, t5, t5, t1);*/
@@ -103,7 +103,7 @@ static inline FFTComplex* TRANSFORM( FFTComplex* z, int n, FFTSample wre, FFTSam
         asm volatile( "stmia %[my_z], {%[rt0temp],%[t2]}\n\t"::[my_z] "r" (z), [rt0temp] "r" (rt0temp), [t2] "r" (t2):"memory");
     }
     z += n;
-   
+
     /* my_z[0] = t5; my_z[1] = t6; */
     asm volatile( "stmia %[my_z]!, {%[t5],%[t6]}\n\t":[my_z] "+r" (z) : [t5] "r" (t5), [t6] "r" (t6):"memory");
     z -= n*3;
@@ -113,7 +113,7 @@ static inline FFTComplex* TRANSFORM( FFTComplex* z, int n, FFTSample wre, FFTSam
 static inline FFTComplex* TRANSFORM_W01( FFTComplex* z, int n, const FFTSample* w )
 {
     register FFTSample t1,t2 asm("r5"),t5 asm("r6"),t6 asm("r7"),r_re asm("r8"),r_im asm("r9");
-    
+
     /* load wre,wim into t5,t6 */
     asm volatile( "ldmia %[w], {%[wre], %[wim]}\n\t":[wre] "=r" (t5), [wim] "=r" (t6):[w] "r" (w));
     z += n*2; /* z[o2] -- 2n * 2 since complex numbers */
@@ -123,7 +123,7 @@ static inline FFTComplex* TRANSFORM_W01( FFTComplex* z, int n, const FFTSample* 
     z += n; /* z[o3] */
     asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
     XNPROD31_R(r_re, r_im, t5 /*wre*/, t6 /*wim*/, t5,t6);
-    
+
     BF_OPT(t1, t5, t5, t1);
     BF_OPT(t6, t2, t2, t6);
     {
@@ -165,7 +165,7 @@ static inline FFTComplex* TRANSFORM_W01( FFTComplex* z, int n, const FFTSample* 
 static inline FFTComplex* TRANSFORM_W10( FFTComplex* z, int n, const FFTSample* w )
 {
     register FFTSample t1,t2 asm("r5"),t5 asm("r6"),t6 asm("r7"),r_re asm("r8"),r_im asm("r9");
-    
+
     /* load wim,wre into t5,t6 */
     asm volatile( "ldmia %[w], {%[wim], %[wre]}\n\t":[wim] "=r" (t5), [wre] "=r" (t6):[w] "r" (w));
     z += n*2; /* z[o2] -- 2n * 2 since complex numbers */
@@ -175,7 +175,7 @@ static inline FFTComplex* TRANSFORM_W10( FFTComplex* z, int n, const FFTSample* 
     z += n; /* z[o3] */
     asm volatile( "ldmia %[my_z], {%[r_re],%[r_im]}\n\t":[r_re] "=r" (r_re), [r_im] "=r" (r_im):[my_z] "r" (z));
     XNPROD31_R(r_re, r_im, t6 /*wim*/, t5 /*wre*/, t5,t6);
-    
+
     BF_OPT(t1, t5, t5, t1);
     BF_OPT(t6, t2, t2, t6);
     {
@@ -238,12 +238,12 @@ static inline FFTComplex* TRANSFORM_EQUAL( FFTComplex* z, int n )
     t6   = MULT31(cPI2_8, t6);
     r_re = MULT31(cPI2_8, r_re);
     t5   = MULT31(cPI2_8, r_im);
-    
+
     t1 = ( t6 + t2 );
     t2 = ( t6 - t2 );
     t6 = ( r_re + t5 );
     t5 = ( r_re - t5 );
-    
+
     BF_OPT(t1, t5, t5, t1);
     BF_OPT(t6, t2, t2, t6);
     {
@@ -333,7 +333,7 @@ static inline FFTComplex* TRANSFORM_ZERO( FFTComplex* z, int n )
 static inline FFTComplex* fft4(FFTComplex * z)
 {
     FFTSample temp;
-    
+
     /* input[0..7] -> output[0..7] */
     /* load r1=z[0],r2=z[1],...,r8=z[7] */
     asm volatile(
@@ -342,23 +342,23 @@ static inline FFTComplex* fft4(FFTComplex * z)
       "sub r3,r1,r3, lsl #1\n\t" /* r3 :=t3 */
       "sub r7,r7,r5\n\t"         /* r10:=t8 */
       "add r5,r7,r5, lsl #1\n\t" /* r5 :=t6 */
-      
+
       "add r1,r1,r5\n\t"                 /* r1 = o[0] */
       "sub r5,r1,r5, lsl #1\n\t"         /* r5 = o[4] */
-      
+
       "add r2,r2,r4\n\t"         /* r2 :=t2 */
       "sub r4,r2,r4, lsl #1\n\t" /* r9 :=t4 */
-      
+
       "add %[temp],r6,r8\n\t"        /* r10:=t5 */
       "sub r6,r6,r8\n\t"         /* r6 :=t7 */
-      
-      "sub r8,r4,r7\n\t"                 /* r8 = o[7]*/ 
-      "add r4,r4,r7\n\t"                 /* r4 = o[3]*/ 
-      "sub r7,r3,r6\n\t"                 /* r7 = o[6]*/ 
-      "add r3,r3,r6\n\t"                 /* r3 = o[2]*/ 
-      "sub r6,r2,%[temp]\n\t"                /* r6 = o[5]*/ 
-      "add r2,r2,%[temp]\n\t"                /* r2 = o[1]*/ 
-      
+
+      "sub r8,r4,r7\n\t"                 /* r8 = o[7]*/
+      "add r4,r4,r7\n\t"                 /* r4 = o[3]*/
+      "sub r7,r3,r6\n\t"                 /* r7 = o[6]*/
+      "add r3,r3,r6\n\t"                 /* r3 = o[2]*/
+      "sub r6,r2,%[temp]\n\t"                /* r6 = o[5]*/
+      "add r2,r2,%[temp]\n\t"                /* r2 = o[1]*/
+
       "stmia %[z]!, {r1-r8}\n\t"
       : /* outputs */ [z] "+r" (z), [temp] "=r" (temp)
       : /* inputs */
@@ -370,7 +370,7 @@ static inline FFTComplex* fft4(FFTComplex * z)
 
 #define FFT_FFMPEG_INCL_OPTIMISED_FFT8
         /* The chunk of asm below is equivalent to the following:
-        
+
         // first load in z[4].re thru z[7].im into local registers
         // ...
         BF_OPT2_REV(z[4].re, z[5].re, z[4].re, z[5].re); // x=a+b; y=x-(b<<1)
@@ -379,18 +379,18 @@ static inline FFTComplex* fft4(FFTComplex * z)
         BF_REV     (z[6].re, z[7].im, z[6].im, z[7].im);
         // save z[7].re and z[7].im as those are complete now
         // z[5].re and z[5].im are also complete now but save these later on
-        
+
         BF(z[6].im, z[4].re, temp, z[4].re);        // x=a-b; y=a+b
         BF_OPT(z[6].re, z[4].im, z[4].im, z[6].re); // y=a+b; x=y-(b<<1)
         // now load z[2].re and z[2].im
-        // ...        
+        // ...
         BF_OPT(z[6].re, z[2].re, z[2].re, z[6].re); // y=a+b; x=y-(b<<1)
         BF_OPT(z[6].im, z[2].im, z[2].im, z[6].im); // y=a+b; x=y-(b<<1)
         // Now save z[6].re and z[6].im, along with z[5].re and z[5].im
         // for efficiency.  Also save z[2].re and z[2].im.
         // Now load z[0].re and z[0].im
         // ...
-        
+
         BF_OPT(z[4].re, z[0].re, z[0].re, z[4].re); // y=a+b; x=y-(b<<1)
         BF_OPT(z[4].im, z[0].im, z[0].im, z[4].im); // y=a+b; x=y-(b<<1)
         // Finally save out z[4].re, z[4].im, z[0].re and z[0].im
@@ -400,9 +400,9 @@ static inline void fft8(FFTComplex * z)
 {
     FFTComplex* m4 = fft4(z);
     {
-        /* note that we increment z_ptr on the final stmia, which 
+        /* note that we increment z_ptr on the final stmia, which
            leaves z_ptr pointing to z[1].re ready for the Transform step */
-           
+
         register FFTSample temp;
 
         asm volatile(

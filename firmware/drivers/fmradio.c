@@ -56,7 +56,7 @@ int fmradio_read(int addr)
     int data = 0;
 
     START;
-    
+
     /* First address bit */
     CL_LO;
     if(addr & 2)
@@ -88,14 +88,14 @@ int fmradio_read(int addr)
     }
 
     CE_LO;
-    
+
     return data;
 }
 
 void fmradio_set(int addr, int data)
 {
     int i;
-    
+
     /* Include the address in the data */
     data |= addr << 21;
 

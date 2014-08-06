@@ -147,7 +147,7 @@ int button_read_device(void) {
         backlight_hold_changed(hold_button);
     }
 #endif
-    
+
     if (hold_button) {
         return 0;
     } else if (kbd_type == KEYBOARD_V1) {
@@ -156,4 +156,3 @@ int button_read_device(void) {
         return button_read_device_v2();
     }
 }
-

@@ -24,7 +24,7 @@
 /*  Channel 0 is connected to an on board pot for testing
     Channels 0-3 are available via expansion connector CON4
     Channels 4-7 are routed to LCD connector for touchscreen operation if
-        supported by display panel. 
+        supported by display panel.
 */
 #define NUM_ADC_CHANNELS 4
 

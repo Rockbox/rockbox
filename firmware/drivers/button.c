@@ -94,7 +94,7 @@ static int button_read(void);
 
 #ifdef HAVE_TOUCHSCREEN
 static int last_touchscreen_touch;
-#endif    
+#endif
 #if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
 /* This callback can be used for many different functions if needed -
@@ -297,7 +297,7 @@ static void button_tick(void)
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                     if (btn & BUTTON_REMOTE) {
-                        if (!remote_filter_first_keypress 
+                        if (!remote_filter_first_keypress
                             || is_remote_backlight_on(false)
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
                             || (remote_type()==REMOTETYPE_H300_NONLCD)
@@ -353,7 +353,7 @@ static void button_tick(void)
 static void button_boost(bool state)
 {
     static bool boosted = false;
-    
+
     if (state && !boosted)
     {
         cpu_boost(true);
@@ -384,30 +384,30 @@ long button_get(bool block)
     else if (pending_count > 2)
         button_boost(true);
 #endif
-    
+
     if ( block || pending_count )
     {
         queue_wait(&button_queue, &ev);
-        
+
         button_data = ev.data;
         return ev.id;
     }
-    
+
     return BUTTON_NONE;
 }
 
 long button_get_w_tmo(int ticks)
 {
     struct queue_event ev;
-    
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* Be sure to keep boosted state. */
     if (!queue_empty(&button_queue))
         return button_get(true);
-    
+
     button_boost(false);
 #endif
-    
+
     queue_wait_w_tmo(&button_queue, &ev, ticks);
     if (ev.id == SYS_TIMEOUT)
         ev.id = BUTTON_NONE;
@@ -439,7 +439,7 @@ void button_init(void)
     button_read();
     lastbtn = button_read();
 #endif
-    
+
     reset_poweroff_timer();
 
 #ifdef HAVE_LCD_BITMAP
@@ -449,11 +449,11 @@ void button_init(void)
     filter_first_keypress = false;
 #ifdef HAVE_REMOTE_LCD
     remote_filter_first_keypress = false;
-#endif    
+#endif
 #endif
 #ifdef HAVE_TOUCHSCREEN
     last_touchscreen_touch = 0xffff;
-#endif    
+#endif
     /* Start polling last */
     tick_add_task(button_tick);
 }
@@ -590,7 +590,7 @@ static int button_read(void)
 #ifdef HAVE_TOUCHSCREEN
     if (btn & BUTTON_TOUCHSCREEN)
         last_touchscreen_touch = current_tick;
-#endif        
+#endif
     /* Filter the button status. It is only accepted if we get the same
        status twice in a row. */
 #ifndef HAVE_TOUCHSCREEN
@@ -639,8 +639,8 @@ int touchscreen_last_touch(void)
  *  [23:0] Velocity - degree/sec
  *
  * WHEEL_ACCEL_FACTOR:
- * Value in degree/sec -- configurable via settings -- above which 
- * the accelerated scrolling starts. Factor is internally scaled by 
+ * Value in degree/sec -- configurable via settings -- above which
+ * the accelerated scrolling starts. Factor is internally scaled by
  * 1<<16 in respect to the following 32bit integer operations.
  */
 int button_apply_acceleration(const unsigned int data)

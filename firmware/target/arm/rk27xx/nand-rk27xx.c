@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
  #include "config.h"
  #include "nand-target.h"
 

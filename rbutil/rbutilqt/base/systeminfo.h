@@ -97,4 +97,3 @@ class SystemInfo : public QObject
 };
 
 #endif
-

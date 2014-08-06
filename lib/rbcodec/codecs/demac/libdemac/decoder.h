@@ -35,6 +35,6 @@ void init_frame_decoder(struct ape_ctx_t* ape_ctx,
 int decode_chunk(struct ape_ctx_t* ape_ctx,
                  unsigned char* inbuffer, int* firstbyte,
                  int* bytesconsumed,
-                 int32_t* decoded0, int32_t* decoded1, 
+                 int32_t* decoded0, int32_t* decoded1,
                  int count);
 #endif

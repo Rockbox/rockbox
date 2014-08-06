@@ -84,7 +84,7 @@ void usb_init_device(void)
 }
 
 void usb_enable(bool on)
-{    
+{
     if (on)
     {
         USB_VBUS_PWR_ASSERT;

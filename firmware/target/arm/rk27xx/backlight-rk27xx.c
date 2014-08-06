@@ -98,7 +98,7 @@ bool _backlight_init(void)
 
     /* reset counter */
     PWMT0_CNTR = 0x00;
-    
+
     /* DIV/2, PWM output enable, PWM timer enable */
     PWMT0_CTRL = (0<<9) | (1<<3) | (1<<0);
 

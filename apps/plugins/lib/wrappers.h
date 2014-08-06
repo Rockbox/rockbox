@@ -55,4 +55,3 @@
 #define strrchr rb->strrchr
 
 #endif
-

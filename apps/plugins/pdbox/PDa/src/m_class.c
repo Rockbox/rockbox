@@ -34,8 +34,8 @@
 static t_symbol *class_loadsym;     /* name under which an extern is invoked */
 static void pd_defaultfloat(t_pd *x, t_float f);
 static void pd_defaultlist(t_pd *x, t_symbol *s, int argc, t_atom *argv);
-t_pd pd_objectmaker; 	/* factory for creating "object" boxes */
-t_pd pd_canvasmaker; 	/* factory for creating canvases */
+t_pd pd_objectmaker;    /* factory for creating "object" boxes */
+t_pd pd_canvasmaker;    /* factory for creating canvases */
 
 static t_symbol *class_extern_dir = &s_;
 
@@ -51,7 +51,7 @@ static void pd_defaultanything(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 static void pd_defaultbang(t_pd *x)
 {
     if (*(*x)->c_listmethod != pd_defaultlist)
-    	(*(*x)->c_listmethod)(x, 0, 0, 0);
+        (*(*x)->c_listmethod)(x, 0, 0, 0);
     else (*(*x)->c_anymethod)(x, &s_bang, 0, 0);
 }
 
@@ -59,15 +59,15 @@ static void pd_defaultpointer(t_pd *x, t_gpointer *gp)
 {
     if (*(*x)->c_listmethod != pd_defaultlist)
     {
-    	t_atom at;
-    	SETPOINTER(&at, gp);
-    	(*(*x)->c_listmethod)(x, 0, 1, &at);
+        t_atom at;
+        SETPOINTER(&at, gp);
+        (*(*x)->c_listmethod)(x, 0, 1, &at);
     }
     else
     {
-    	t_atom at;
-    	SETPOINTER(&at, gp);
-    	(*(*x)->c_anymethod)(x, &s_pointer, 1, &at);
+        t_atom at;
+        SETPOINTER(&at, gp);
+        (*(*x)->c_anymethod)(x, &s_pointer, 1, &at);
     }
 }
 
@@ -75,15 +75,15 @@ static void pd_defaultfloat(t_pd *x, t_float f)
 {
     if (*(*x)->c_listmethod != pd_defaultlist)
     {
-    	t_atom at;
-    	SETFLOAT(&at, f);
-    	(*(*x)->c_listmethod)(x, 0, 1, &at);
+        t_atom at;
+        SETFLOAT(&at, f);
+        (*(*x)->c_listmethod)(x, 0, 1, &at);
     }
     else
     {
-	t_atom at;
-	SETFLOAT(&at, f);
-	(*(*x)->c_anymethod)(x, &s_float, 1, &at);
+        t_atom at;
+        SETFLOAT(&at, f);
+        (*(*x)->c_anymethod)(x, &s_float, 1, &at);
     }
 }
 
@@ -91,15 +91,15 @@ static void pd_defaultsymbol(t_pd *x, t_symbol *s)
 {
     if (*(*x)->c_listmethod != pd_defaultlist)
     {
-    	t_atom at;
-    	SETSYMBOL(&at, s);
-    	(*(*x)->c_listmethod)(x, 0, 1, &at);
+        t_atom at;
+        SETSYMBOL(&at, s);
+        (*(*x)->c_listmethod)(x, 0, 1, &at);
     }
     else
     {
-    	t_atom at;
-    	SETSYMBOL(&at, s);
-    	(*(*x)->c_anymethod)(x, &s_symbol, 1, &at);
+        t_atom at;
+        SETSYMBOL(&at, s);
+        (*(*x)->c_anymethod)(x, &s_symbol, 1, &at);
     }
 }
 
@@ -109,38 +109,38 @@ static void class_nosavefn(t_gobj *z, t_binbuf *b);
     /* handle "list" messages to Pds without explicit list methods defined. */
 static void pd_defaultlist(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 {
-    	    /* a list with one element which is a number can be handled by a
-	    "float" method if any is defined; same for "symbol", "pointer". */
+            /* a list with one element which is a number can be handled by a
+            "float" method if any is defined; same for "symbol", "pointer". */
     if (argc == 1)
     {
-    	if (argv->a_type == A_FLOAT &&
-    	*(*x)->c_floatmethod != pd_defaultfloat)
-    	{
-    	    (*(*x)->c_floatmethod)(x, argv->a_w.w_float);
-	    return;
-	}
-	else if (argv->a_type == A_SYMBOL &&
-    	    *(*x)->c_symbolmethod != pd_defaultsymbol)
-	{
-    	    (*(*x)->c_symbolmethod)(x, argv->a_w.w_symbol);
-	    return;
-	}
-	else if (argv->a_type == A_POINTER &&
-    	    *(*x)->c_pointermethod != pd_defaultpointer)
-	{
-    	    (*(*x)->c_pointermethod)(x, argv->a_w.w_gpointer);
-	    return;
-	}
+        if (argv->a_type == A_FLOAT &&
+        *(*x)->c_floatmethod != pd_defaultfloat)
+        {
+            (*(*x)->c_floatmethod)(x, argv->a_w.w_float);
+            return;
+        }
+        else if (argv->a_type == A_SYMBOL &&
+            *(*x)->c_symbolmethod != pd_defaultsymbol)
+        {
+            (*(*x)->c_symbolmethod)(x, argv->a_w.w_symbol);
+            return;
+        }
+        else if (argv->a_type == A_POINTER &&
+            *(*x)->c_pointermethod != pd_defaultpointer)
+        {
+            (*(*x)->c_pointermethod)(x, argv->a_w.w_gpointer);
+            return;
+        }
     }
-    	/* Next try for an "anything" method */
+        /* Next try for an "anything" method */
     if ((*x)->c_anymethod != pd_defaultanything)
-    	(*(*x)->c_anymethod)(x, &s_list, argc, argv);
+        (*(*x)->c_anymethod)(x, &s_list, argc, argv);
 
-    	/* if the object is patchable (i.e., can have proper inlets)
-	    send it on to obj_list which will unpack the list into the inlets */
+        /* if the object is patchable (i.e., can have proper inlets)
+            send it on to obj_list which will unpack the list into the inlets */
     else if ((*x)->c_patchable)
-    	obj_list((t_object *)x, s, argc, argv);
-	    /* otherwise gove up and complain. */
+        obj_list((t_object *)x, s, argc, argv);
+            /* otherwise gove up and complain. */
     else pd_defaultanything(x, &s_list, argc, argv);
 }
 
@@ -176,34 +176,34 @@ t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
     va_start(ap, type1);
     while (*vp)
     {
-	if (count == MAXPDARG)
-	{
-    	    error("class %s: sorry: only %d creation args allowed",
-    		s->s_name, MAXPDARG);
-    	    break;
-	}
-	vp++;
-	count++;
-	*vp = va_arg(ap, t_atomtype);
+        if (count == MAXPDARG)
+        {
+            error("class %s: sorry: only %d creation args allowed",
+                s->s_name, MAXPDARG);
+            break;
+        }
+        vp++;
+        count++;
+        *vp = va_arg(ap, t_atomtype);
     }
     va_end(ap);
     if (pd_objectmaker && newmethod)
     {
-    	    /* add a "new" method by the name specified by the object */
-    	class_addmethod(pd_objectmaker, (t_method)newmethod, s,
-    	    vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]);
-	if (class_loadsym)
-	{
-	    	/* if we're loading an extern it might have been invoked by a
-		longer file name; in this case, make this an admissible name
-		too. */
-    	    char *loadstring = class_loadsym->s_name,
-	    	l1 = strlen(s->s_name), l2 = strlen(loadstring);
-	    if (l2 > l1 && !strcmp(s->s_name, loadstring + (l2 - l1)))
-	    	class_addmethod(pd_objectmaker, (t_method)newmethod,
-		    class_loadsym,
-    	    	    vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]);
-	}
+            /* add a "new" method by the name specified by the object */
+        class_addmethod(pd_objectmaker, (t_method)newmethod, s,
+            vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]);
+        if (class_loadsym)
+        {
+                /* if we're loading an extern it might have been invoked by a
+                longer file name; in this case, make this an admissible name
+                too. */
+            char *loadstring = class_loadsym->s_name,
+                l1 = strlen(s->s_name), l2 = strlen(loadstring);
+            if (l2 > l1 && !strcmp(s->s_name, loadstring + (l2 - l1)))
+                class_addmethod(pd_objectmaker, (t_method)newmethod,
+                    class_loadsym,
+                    vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]);
+        }
     }
     c = (t_class *)t_getbytes(sizeof(*c));
     c->c_name = c->c_helpname = s;
@@ -226,7 +226,7 @@ t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
     c->c_floatsignalin = 0;
     c->c_externdir = class_extern_dir;
     c->c_savefn = (typeflag == CLASS_PATCHABLE ? text_save : class_nosavefn);
-#if 0 
+#if 0
     post("class: %s", c->c_name->s_name);
 #endif
     return (c);
@@ -237,7 +237,7 @@ t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
     can belong to, but this won't be used until the newmethod is actually
     called back (and the new method explicitly takes care of this.) */
 
-void class_addcreator(t_newmethod newmethod, t_symbol *s, 
+void class_addcreator(t_newmethod newmethod, t_symbol *s,
     t_atomtype type1, ...)
 {
     va_list ap;
@@ -248,19 +248,19 @@ void class_addcreator(t_newmethod newmethod, t_symbol *s,
     va_start(ap, type1);
     while (*vp)
     {
-	if (count == MAXPDARG)
-	{
-    	    error("class %s: sorry: only %d creation args allowed",
-    		s->s_name, MAXPDARG);
-    	    break;
-	}
-	vp++;
-	count++;
-	*vp = va_arg(ap, t_atomtype);
-    } 
+        if (count == MAXPDARG)
+        {
+            error("class %s: sorry: only %d creation args allowed",
+                s->s_name, MAXPDARG);
+            break;
+        }
+        vp++;
+        count++;
+        *vp = va_arg(ap, t_atomtype);
+    }
     va_end(ap);
     class_addmethod(pd_objectmaker, (t_method)newmethod, s,
-    	vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]);
+        vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]);
 }
 
 void class_addmethod(t_class *c, t_method fn, t_symbol *sel,
@@ -270,69 +270,69 @@ void class_addmethod(t_class *c, t_method fn, t_symbol *sel,
     t_methodentry *m;
     t_atomtype argtype = arg1;
     int nargs;
-    
+
     va_start(ap, arg1);
-    	/* "signal" method specifies that we take audio signals but
-	that we don't want automatic float to signal conversion.  This
-	is obsolete; you should now use the CLASS_MAINSIGNALIN macro. */
+        /* "signal" method specifies that we take audio signals but
+        that we don't want automatic float to signal conversion.  This
+        is obsolete; you should now use the CLASS_MAINSIGNALIN macro. */
     if (sel == &s_signal)
     {
-    	if (c->c_floatsignalin)
-	    post("warning: signal method overrides class_mainsignalin");
-    	c->c_floatsignalin = -1;
+        if (c->c_floatsignalin)
+            post("warning: signal method overrides class_mainsignalin");
+        c->c_floatsignalin = -1;
     }
-    	/* check for special cases.  "Pointer" is missing here so that
-    	pd_objectmaker's pointer method can be typechecked differently.  */
+        /* check for special cases.  "Pointer" is missing here so that
+        pd_objectmaker's pointer method can be typechecked differently.  */
     if (sel == &s_bang)
     {
-    	if (argtype) goto phooey;
-    	class_addbang(c, fn);
+        if (argtype) goto phooey;
+        class_addbang(c, fn);
     }
     else if (sel == &s_float)
     {
-    	if (argtype != A_FLOAT || va_arg(ap, t_atomtype)) goto phooey;
-    	class_doaddfloat(c, fn);
+        if (argtype != A_FLOAT || va_arg(ap, t_atomtype)) goto phooey;
+        class_doaddfloat(c, fn);
     }
     else if (sel == &s_symbol)
     {
-    	if (argtype != A_SYMBOL || va_arg(ap, t_atomtype)) goto phooey;
-    	class_addsymbol(c, fn);
+        if (argtype != A_SYMBOL || va_arg(ap, t_atomtype)) goto phooey;
+        class_addsymbol(c, fn);
     }
     else if (sel == &s_list)
     {
-    	if (argtype != A_GIMME) goto phooey;
-    	class_addlist(c, fn);
+        if (argtype != A_GIMME) goto phooey;
+        class_addlist(c, fn);
     }
     else if (sel == &s_anything)
     {
-    	if (argtype != A_GIMME) goto phooey;
-    	class_addanything(c, fn);
+        if (argtype != A_GIMME) goto phooey;
+        class_addanything(c, fn);
     }
     else
     {
-	c->c_methods = t_resizebytes(c->c_methods,
-    	    c->c_nmethod * sizeof(*c->c_methods),
-    	    (c->c_nmethod + 1) * sizeof(*c->c_methods));
-	m = c->c_methods +  c->c_nmethod;
-	c->c_nmethod++;
-	m->me_name = sel;
-	m->me_fun = (t_gotfn)fn;
-	nargs = 0;
-	while (argtype != A_NULL && nargs < MAXPDARG)
-	{
-    	    m->me_arg[nargs++] = argtype;
-    	    argtype = va_arg(ap, t_atomtype);
-	}
-	if (argtype != A_NULL)
-	    error("%s_%s: only 5 arguments are typecheckable; use A_GIMME",
-	    	c->c_name->s_name, sel->s_name);
-	va_end(ap);
-	m->me_arg[nargs] = A_NULL;
+        c->c_methods = t_resizebytes(c->c_methods,
+            c->c_nmethod * sizeof(*c->c_methods),
+            (c->c_nmethod + 1) * sizeof(*c->c_methods));
+        m = c->c_methods +  c->c_nmethod;
+        c->c_nmethod++;
+        m->me_name = sel;
+        m->me_fun = (t_gotfn)fn;
+        nargs = 0;
+        while (argtype != A_NULL && nargs < MAXPDARG)
+        {
+            m->me_arg[nargs++] = argtype;
+            argtype = va_arg(ap, t_atomtype);
+        }
+        if (argtype != A_NULL)
+            error("%s_%s: only 5 arguments are typecheckable; use A_GIMME",
+                c->c_name->s_name, sel->s_name);
+        va_end(ap);
+        m->me_arg[nargs] = A_NULL;
     }
     return;
 phooey:
     bug("class_addmethod: %s_%s: bad argument types\n",
-    	c->c_name->s_name, sel->s_name);
+        c->c_name->s_name, sel->s_name);
 }
 
     /* Instead of these, see the "class_addfloat", etc.,  macros in m_pd.h */
@@ -410,10 +410,10 @@ static void pd_floatforsignal(t_pd *x, t_float f)
 {
     int offset = (*x)->c_floatsignalin;
     if (offset > 0)
-    	*(t_sample *)(((char *)x) + offset) = ftofix(f);
+        *(t_sample *)(((char *)x) + offset) = ftofix(f);
     else
-    	pd_error(x, "%s: float unexpected for signal input",
-	    (*x)->c_name->s_name);
+        pd_error(x, "%s: float unexpected for signal input",
+            (*x)->c_name->s_name);
 }
 
 void class_domainsignalin(t_class *c, int onset)
@@ -421,9 +421,9 @@ void class_domainsignalin(t_class *c, int onset)
     if (onset <= 0) onset = -1;
     else
     {
-    	if (c->c_floatmethod != pd_defaultfloat)
-	    post("warning: %s: float method overwritten", c->c_name->s_name);
-	c->c_floatmethod = (t_floatmethod)pd_floatforsignal;
+        if (c->c_floatmethod != pd_defaultfloat)
+            post("warning: %s: float method overwritten", c->c_name->s_name);
+        c->c_floatmethod = (t_floatmethod)pd_floatforsignal;
     }
     c->c_floatsignalin = onset;
 }
@@ -481,25 +481,25 @@ t_symbol *dogensym(char *s, t_symbol *oldsym)
     char *s2 = s;
     while (*s2)
     {
-	hash1 += *s2;
-	hash2 += hash1;
-	length++;
-	s2++;
+        hash1 += *s2;
+        hash2 += hash1;
+        length++;
+        s2++;
     }
     sym1 = symhash + (hash2 & (HASHSIZE-1));
     while ((sym2 = *sym1))
     {
-	if (!strcmp(sym2->s_name, s)) return(sym2);
-	sym1 = &sym2->s_next;
+        if (!strcmp(sym2->s_name, s)) return(sym2);
+        sym1 = &sym2->s_next;
     }
     if (oldsym) sym2 = oldsym;
     else
     {
-    	sym2 = (t_symbol *)t_getbytes(sizeof(*sym2));
-    	sym2->s_name = t_getbytes(length+1);
-    	sym2->s_next = 0;
-    	sym2->s_thing = 0;
-    	strcpy(sym2->s_name, s);
+        sym2 = (t_symbol *)t_getbytes(sizeof(*sym2));
+        sym2->s_name = t_getbytes(length+1);
+        sym2->s_next = 0;
+        sym2->s_thing = 0;
+        strcpy(sym2->s_name, s);
     }
     *sym1 = sym2;
     return (sym2);
@@ -550,44 +550,44 @@ void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv)
     class_loadsym = s;
     if (sys_load_lib(dir->s_name, s->s_name))
     {
-    	tryingalready = 1;
-    	typedmess(dummy, s, argc, argv);
-    	tryingalready = 0;
-    	return;
+        tryingalready = 1;
+        typedmess(dummy, s, argc, argv);
+        tryingalready = 0;
+        return;
     }
     class_loadsym = 0;
     current = s__X.s_thing;
     if ((fd = open_via_path(dir->s_name, s->s_name, ".pd",
-    	dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0 ||
-	    (fd = open_via_path(dir->s_name, s->s_name, ".pat",
-    	    	dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0)
+        dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0 ||
+            (fd = open_via_path(dir->s_name, s->s_name, ".pat",
+                dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0)
     {
-    	close (fd);
-	if (!pd_setloadingabstraction(s))
-	{
-    	    canvas_setargs(argc, argv); /* bug fix by Krzysztof Czaja */
-    	    binbuf_evalfile(gensym(nameptr), gensym(dirbuf));
-    	    if (s__X.s_thing != current)
-    	    	canvas_popabstraction((t_canvas *)(s__X.s_thing));
-    	    canvas_setargs(0, 0);
-	}
-	else error("%s: can't load abstraction within itself\n", s->s_name);
+        close (fd);
+        if (!pd_setloadingabstraction(s))
+        {
+            canvas_setargs(argc, argv); /* bug fix by Krzysztof Czaja */
+            binbuf_evalfile(gensym(nameptr), gensym(dirbuf));
+            if (s__X.s_thing != current)
+                canvas_popabstraction((t_canvas *)(s__X.s_thing));
+            canvas_setargs(0, 0);
+        }
+        else error("%s: can't load abstraction within itself\n", s->s_name);
     }
     else newest = 0;
 }
 
 t_symbol  s_pointer =   {"pointer", 0, 0};
-t_symbol  s_float = 	{"float", 0, 0};
+t_symbol  s_float =     {"float", 0, 0};
 t_symbol  s_symbol =    {"symbol", 0, 0};
-t_symbol  s_bang =  	{"bang", 0, 0};
-t_symbol  s_list =  	{"list", 0, 0};
-t_symbol  s_anything =	{"anything", 0, 0};
-t_symbol  s_signal =	{"signal", 0, 0};
-t_symbol  s__N =	{"#N", 0, 0};
-t_symbol  s__X =	{"#X", 0, 0};
-t_symbol  s_x =     	{"x", 0, 0};
-t_symbol  s_y =     	{"y", 0, 0};
-t_symbol  s_ = 	    	{"", 0, 0};
+t_symbol  s_bang =      {"bang", 0, 0};
+t_symbol  s_list =      {"list", 0, 0};
+t_symbol  s_anything =  {"anything", 0, 0};
+t_symbol  s_signal =    {"signal", 0, 0};
+t_symbol  s__N =        {"#N", 0, 0};
+t_symbol  s__X =        {"#X", 0, 0};
+t_symbol  s_x =         {"x", 0, 0};
+t_symbol  s_y =         {"y", 0, 0};
+t_symbol  s_ =          {"", 0, 0};
 
 static t_symbol *symlist[] = { &s_pointer, &s_float, &s_symbol, &s_bang,
     &s_list, &s_anything, &s_signal, &s__N, &s__X, &s_x, &s_y, &s_};
@@ -597,13 +597,13 @@ void mess_init(void)
     t_symbol **sp;
     int i;
 
-    if (pd_objectmaker) return;    
+    if (pd_objectmaker) return;
     for (i = sizeof(symlist)/sizeof(*symlist), sp = symlist; i--; sp++)
-    	(void) dogensym((*sp)->s_name, *sp);
+        (void) dogensym((*sp)->s_name, *sp);
     pd_objectmaker = class_new(gensym("objectmaker"), 0, 0, sizeof(t_pd),
-    	CLASS_DEFAULT, A_NULL);
+        CLASS_DEFAULT, A_NULL);
     pd_canvasmaker = class_new(gensym("classmaker"), 0, 0, sizeof(t_pd),
-    	CLASS_DEFAULT, A_NULL);
+        CLASS_DEFAULT, A_NULL);
     pd_bind(&pd_canvasmaker, &s__N);
     class_addanything(pd_objectmaker, (t_method)new_anything);
 }
@@ -651,138 +651,138 @@ void pd_typedmess(t_pd *x, t_symbol *s, int argc, t_atom *argv)
     int narg = 0;
     t_pd *bonzo;
 
-    	/* check for messages that are handled by fixed slots in the class
-    	structure.  We don't catch "pointer" though so that sending "pointer"
-	to pd_objectmaker doesn't require that we supply a pointer value. */
+        /* check for messages that are handled by fixed slots in the class
+        structure.  We don't catch "pointer" though so that sending "pointer"
+        to pd_objectmaker doesn't require that we supply a pointer value. */
     if (s == &s_float)
     {
-    	if (!argc) (*c->c_floatmethod)(x, 0.);
-    	else if (argv->a_type == A_FLOAT)
-    	    (*c->c_floatmethod)(x, argv->a_w.w_float);
-    	else goto badarg;
-    	return;
+        if (!argc) (*c->c_floatmethod)(x, 0.);
+        else if (argv->a_type == A_FLOAT)
+            (*c->c_floatmethod)(x, argv->a_w.w_float);
+        else goto badarg;
+        return;
     }
     if (s == &s_bang)
     {
-    	(*c->c_bangmethod)(x);
-    	return;
+        (*c->c_bangmethod)(x);
+        return;
     }
     if (s == &s_list)
     {
-    	(*c->c_listmethod)(x, s, argc, argv);
-    	return;
+        (*c->c_listmethod)(x, s, argc, argv);
+        return;
     }
     if (s == &s_symbol)
     {
-    	if (argc && argv->a_type == A_SYMBOL)
-    	    (*c->c_symbolmethod)(x, argv->a_w.w_symbol);
-    	else
-    	    (*c->c_symbolmethod)(x, &s_);
-    	return;
+        if (argc && argv->a_type == A_SYMBOL)
+            (*c->c_symbolmethod)(x, argv->a_w.w_symbol);
+        else
+            (*c->c_symbolmethod)(x, &s_);
+        return;
     }
     for (i = c->c_nmethod, m = c->c_methods; i--; m++)
-	if (m->me_name == s)
+        if (m->me_name == s)
     {
-	wp = m->me_arg;
-	if (*wp == A_GIMME)
-	{
-	    if (x == &pd_objectmaker)
-		newest = (*((t_newgimme)(m->me_fun)))(s, argc, argv);
-	    else (*((t_messgimme)(m->me_fun)))(x, s, argc, argv);
-	    return;
-	}
+        wp = m->me_arg;
+        if (*wp == A_GIMME)
+        {
+            if (x == &pd_objectmaker)
+                newest = (*((t_newgimme)(m->me_fun)))(s, argc, argv);
+            else (*((t_messgimme)(m->me_fun)))(x, s, argc, argv);
+            return;
+        }
 
-	if (argc > MAXPDARG) argc = MAXPDARG;
-	if (x != &pd_objectmaker) *(ap++) = (t_int)x, narg++;
-	while((wanttype = *wp++))
-	{
-	    switch (wanttype)
-	    {
-	    case A_POINTER:
-		if (!argc) goto badarg;
-		else
-		{
-	    	    if (argv->a_type == A_POINTER)
-	    	    	*ap = (t_int)(argv->a_w.w_gpointer);
-	    	    else goto badarg;
-		    argc--;
-		    argv++;
-		}
-		narg++;
-		ap++;
-		break;
-	    case A_FLOAT:
-		if (!argc) goto badarg;
-    	    case A_DEFFLOAT:
-    		if (!argc) *dp = 0;
-		else
-		{
-	    	    if (argv->a_type == A_FLOAT)
-		    	*dp = argv->a_w.w_float;
-		    else goto badarg;
-		    argc--;
-		    argv++;
-		}
-		dp++;
-		break;
-	    case A_SYMBOL:
-		if (!argc) goto badarg;
-    	    case A_DEFSYM:
-    		if (!argc) *ap = (t_int)(&s_);
-    		else
-    		{
-	    	    if (argv->a_type == A_SYMBOL)
-		    	*ap = (t_int)(argv->a_w.w_symbol);
-			    /* if it's an unfilled "dollar" argument it appears
-			    as zero here; cheat and bash it to the null
-			    symbol.  Unfortunately, this lets real zeros
-			    pass as symbols too, which seems wrong... */
-		    else if (x == &pd_objectmaker && argv->a_type == A_FLOAT
-		    	&& argv->a_w.w_float == 0)
-		    	*ap = (t_int)(&s_);
-		    else goto badarg;
-		    argc--;
-		    argv++;
-		}
-		narg++;
-		ap++;
+        if (argc > MAXPDARG) argc = MAXPDARG;
+        if (x != &pd_objectmaker) *(ap++) = (t_int)x, narg++;
+        while((wanttype = *wp++))
+        {
+            switch (wanttype)
+            {
+            case A_POINTER:
+                if (!argc) goto badarg;
+                else
+                {
+                    if (argv->a_type == A_POINTER)
+                        *ap = (t_int)(argv->a_w.w_gpointer);
+                    else goto badarg;
+                    argc--;
+                    argv++;
+                }
+                narg++;
+                ap++;
+                break;
+            case A_FLOAT:
+                if (!argc) goto badarg;
+            case A_DEFFLOAT:
+                if (!argc) *dp = 0;
+                else
+                {
+                    if (argv->a_type == A_FLOAT)
+                        *dp = argv->a_w.w_float;
+                    else goto badarg;
+                    argc--;
+                    argv++;
+                }
+                dp++;
+                break;
+            case A_SYMBOL:
+                if (!argc) goto badarg;
+            case A_DEFSYM:
+                if (!argc) *ap = (t_int)(&s_);
+                else
+                {
+                    if (argv->a_type == A_SYMBOL)
+                        *ap = (t_int)(argv->a_w.w_symbol);
+                            /* if it's an unfilled "dollar" argument it appears
+                            as zero here; cheat and bash it to the null
+                            symbol.  Unfortunately, this lets real zeros
+                            pass as symbols too, which seems wrong... */
+                    else if (x == &pd_objectmaker && argv->a_type == A_FLOAT
+                        && argv->a_w.w_float == 0)
+                        *ap = (t_int)(&s_);
+                    else goto badarg;
+                    argc--;
+                    argv++;
+                }
+                narg++;
+                ap++;
 #ifdef ROCKBOX
                 break;
             default:
                 break;
 #endif
-    	    }
-	}
-	switch (narg)
-	{
-    	case 0 : bonzo = (*(t_fun0)(m->me_fun))
-	    (ad[0], ad[1], ad[2], ad[3], ad[4]); break;
-    	case 1 : bonzo = (*(t_fun1)(m->me_fun))
-	    (ai[0], ad[0], ad[1], ad[2], ad[3], ad[4]); break;
-    	case 2 : bonzo = (*(t_fun2)(m->me_fun))
-	    (ai[0], ai[1], ad[0], ad[1], ad[2], ad[3], ad[4]); break;
-    	case 3 : bonzo = (*(t_fun3)(m->me_fun))
-	    (ai[0], ai[1], ai[2], ad[0], ad[1], ad[2], ad[3], ad[4]); break;
-    	case 4 : bonzo = (*(t_fun4)(m->me_fun))
-	    (ai[0], ai[1], ai[2], ai[3],
-	    	ad[0], ad[1], ad[2], ad[3], ad[4]); break;
-    	case 5 : bonzo = (*(t_fun5)(m->me_fun))
-	    (ai[0], ai[1], ai[2], ai[3], ai[4],
-	    	ad[0], ad[1], ad[2], ad[3], ad[4]); break;
-    	case 6 : bonzo = (*(t_fun6)(m->me_fun))
-	    (ai[0], ai[1], ai[2], ai[3], ai[4], ai[5],
-	    	ad[0], ad[1], ad[2], ad[3], ad[4]); break;
-	default: bonzo = 0;
-	}
-	if (x == &pd_objectmaker)
-	    newest = bonzo;
-	return;
+            }
+        }
+        switch (narg)
+        {
+        case 0 : bonzo = (*(t_fun0)(m->me_fun))
+            (ad[0], ad[1], ad[2], ad[3], ad[4]); break;
+        case 1 : bonzo = (*(t_fun1)(m->me_fun))
+            (ai[0], ad[0], ad[1], ad[2], ad[3], ad[4]); break;
+        case 2 : bonzo = (*(t_fun2)(m->me_fun))
+            (ai[0], ai[1], ad[0], ad[1], ad[2], ad[3], ad[4]); break;
+        case 3 : bonzo = (*(t_fun3)(m->me_fun))
+            (ai[0], ai[1], ai[2], ad[0], ad[1], ad[2], ad[3], ad[4]); break;
+        case 4 : bonzo = (*(t_fun4)(m->me_fun))
+            (ai[0], ai[1], ai[2], ai[3],
+                ad[0], ad[1], ad[2], ad[3], ad[4]); break;
+        case 5 : bonzo = (*(t_fun5)(m->me_fun))
+            (ai[0], ai[1], ai[2], ai[3], ai[4],
+                ad[0], ad[1], ad[2], ad[3], ad[4]); break;
+        case 6 : bonzo = (*(t_fun6)(m->me_fun))
+            (ai[0], ai[1], ai[2], ai[3], ai[4], ai[5],
+                ad[0], ad[1], ad[2], ad[3], ad[4]); break;
+        default: bonzo = 0;
+        }
+        if (x == &pd_objectmaker)
+            newest = bonzo;
+        return;
     }
     (*c->c_anymethod)(x, s, argc, argv);
     return;
 badarg:
     pd_error(x, "Bad arguments for message '%s' to object '%s'",
-    	s->s_name, c->c_name->s_name);
+        s->s_name, c->c_name->s_name);
 }
 
 void pd_vmess(t_pd *x, t_symbol *sel, char *fmt, ...)
@@ -795,21 +795,21 @@ void pd_vmess(t_pd *x, t_symbol *sel, char *fmt, ...)
     va_start(ap, fmt);
     while (1)
     {
-    	if (nargs > MAXPDARG)
-    	{
-    	    pd_error(x, "pd_vmess: only %d allowed", MAXPDARG);
-    	    break;
-    	}
-    	switch(*fp++)
-    	{
-    	case 'f': SETFLOAT(at, va_arg(ap, double)); break;
-    	case 's': SETSYMBOL(at, va_arg(ap, t_symbol *)); break;
-    	case 'i': SETFLOAT(at, va_arg(ap, t_int)); break;	
-    	case 'p': SETPOINTER(at, va_arg(ap, t_gpointer *)); break;
-    	default: goto done;
-    	}
-    	at++;
-    	nargs++;
+        if (nargs > MAXPDARG)
+        {
+            pd_error(x, "pd_vmess: only %d allowed", MAXPDARG);
+            break;
+        }
+        switch(*fp++)
+        {
+        case 'f': SETFLOAT(at, va_arg(ap, double)); break;
+        case 's': SETSYMBOL(at, va_arg(ap, t_symbol *)); break;
+        case 'i': SETFLOAT(at, va_arg(ap, t_int)); break;
+        case 'p': SETPOINTER(at, va_arg(ap, t_gpointer *)); break;
+        default: goto done;
+        }
+        at++;
+        nargs++;
     }
 done:
     va_end(ap);
@@ -820,19 +820,19 @@ void pd_forwardmess(t_pd *x, int argc, t_atom *argv)
 {
     if (argc)
     {
-    	t_atomtype t = argv->a_type;
-    	if (t == A_SYMBOL) pd_typedmess(x, argv->a_w.w_symbol, argc-1, argv+1);
-    	else if (t == A_POINTER)
-    	{
-    	    if (argc == 1) pd_pointer(x, argv->a_w.w_gpointer);
-    	    else pd_list(x, &s_list, argc, argv);
-    	}
-    	else if (t == A_FLOAT)
-    	{
-    	    if (argc == 1) pd_float(x, argv->a_w.w_float);
-    	    else pd_list(x, &s_list, argc, argv);
-    	}
-    	else bug("pd_forwardmess");
+        t_atomtype t = argv->a_type;
+        if (t == A_SYMBOL) pd_typedmess(x, argv->a_w.w_symbol, argc-1, argv+1);
+        else if (t == A_POINTER)
+        {
+            if (argc == 1) pd_pointer(x, argv->a_w.w_gpointer);
+            else pd_list(x, &s_list, argc, argv);
+        }
+        else if (t == A_FLOAT)
+        {
+            if (argc == 1) pd_float(x, argv->a_w.w_float);
+            else pd_list(x, &s_list, argc, argv);
+        }
+        else bug("pd_forwardmess");
     }
 
 }
@@ -846,7 +846,7 @@ t_gotfn getfn(t_pd *x, t_symbol *s)
     int i;
 
     for (i = c->c_nmethod, m = c->c_methods; i--; m++)
-	if (m->me_name == s) return(m->me_fun);
+        if (m->me_name == s) return(m->me_fun);
     pd_error(x, "%s: no method for message '%s'", c->c_name->s_name, s->s_name);
     return((t_gotfn)nullfn);
 }
@@ -858,7 +858,6 @@ t_gotfn zgetfn(t_pd *x, t_symbol *s)
     int i;
 
     for (i = c->c_nmethod, m = c->c_methods; i--; m++)
-	if (m->me_name == s) return(m->me_fun);
+        if (m->me_name == s) return(m->me_fun);
     return(0);
 }
-

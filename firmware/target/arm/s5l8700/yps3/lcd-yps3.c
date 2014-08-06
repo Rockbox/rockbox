@@ -29,7 +29,7 @@
     It appears that this player can contain two display types.
     Detection of the display type is done by looking at the level of pin P0.4.
     Currently only display "type 2" has been implemented and tested.
-    
+
     This driver could use DMA to do the screen updates, but currently writes
     the data to the LCD using the processor instead.
 */
@@ -54,7 +54,7 @@ static void lcd_reset(void)
     LCD_CON = 0xDB8;
     LCD_PHTIME = 0x22;
     LCD_RST_TIME = 0x7FFF;
-    
+
     lcd_reset_delay();
     LCD_DRV_RST = 0;
     lcd_reset_delay();
@@ -63,7 +63,7 @@ static void lcd_reset(void)
     LCD_DRV_RST = 0;
     lcd_reset_delay();
     LCD_DRV_RST = 1;
-    
+
     LCD_INTCON = 0;
 }
 
@@ -89,31 +89,31 @@ static void lcd_init1(void)
 {
     lcd_wcmd(0x11);
     lcd_delay(10000);
-    
+
     lcd_wcmd(0xF0);
     lcd_wdata(0x5A);
-    
+
     lcd_wcmd(0xC0);
     lcd_wdata(0x05);
     lcd_wdata(0x01);
-    
+
     lcd_wcmd(0xC1);
     lcd_wdata(0x04);
-    
+
     lcd_wcmd(0xC5);
     lcd_wdata(0xB0);
-    
+
     lcd_wcmd(0xC6);
     lcd_wdata(0x0);
-    
+
     lcd_wcmd(0xB1);
     lcd_wdata(0x02);
     lcd_wdata(0x0E);
     lcd_wdata(0x00);
-    
+
     lcd_wcmd(0xF2);
     lcd_wdata(0x01);
-    
+
     lcd_wcmd(0xE0);
     lcd_wdata(0x09);
     lcd_wdata(0x00);
@@ -130,7 +130,7 @@ static void lcd_init1(void)
     lcd_wdata(0x05);
     lcd_wdata(0x02);
     lcd_wdata(0x05);
-    
+
     lcd_wcmd(0xE1);
     lcd_wdata(0x06);
     lcd_wdata(0x23);
@@ -148,12 +148,12 @@ static void lcd_init1(void)
     lcd_wdata(0x0B);
     lcd_wdata(0x05);
     lcd_wdata(0x05);
-    
+
     lcd_wcmd(0x3A);
     lcd_wdata(0x05);
-    
+
     lcd_wcmd(0x29);
-    
+
     lcd_wcmd(0x2C);
 }
 
@@ -161,11 +161,11 @@ static void lcd_init2(void)
 {
     lcd_wcmd_data(0x00, 0x0001);
     lcd_delay(50000);
-    
+
     lcd_wcmd_data(0x07, 0x0000);
     lcd_wcmd_data(0x12, 0x0000);
     lcd_delay(10000);
-    
+
     lcd_wcmd(0);
     lcd_wcmd(0);
     lcd_wcmd(0);
@@ -220,15 +220,15 @@ static void lcd_init2(void)
     lcd_wcmd_data(0x98, 0x0001);
     lcd_wcmd_data(0x99, 0x030C);
     lcd_wcmd_data(0x9A, 0x030C);
-    
+
     lcd_delay(50000);
     lcd_wcmd_data(0x07, 0x0001);
     lcd_delay(30000);
     lcd_wcmd_data(0x07, 0x0021);
-    
+
     lcd_wcmd_data(0x12, 0x1134);
     lcd_delay(10000);
-    
+
     lcd_wcmd_data(0x07, 0x0233);
     lcd_delay(30000);
 }
@@ -283,10 +283,10 @@ void lcd_init_device(void)
     PCON_ASRAM = 2;
 
     lcd_reset();
-    
+
     /* detect LCD type on P0.4 */
     lcd_type = (PDAT0 & (1 << 4)) ? 1 : 2;
-    
+
     /* initialise display */
     if (lcd_type == 1) {
         lcd_init1();
@@ -299,12 +299,12 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     fb_data* p;
     int h, w;
-    
+
     if (lcd_type == 1) {
         /* TODO implement and test */
         lcd_set_window1(x, y, width, height);
         lcd_set_position1(x, y);
-    
+
         for (h = 0; h < height; h++) {
             p = FBADDR(0,y);
             for (w = 0; w < LCD_WIDTH; w++) {
@@ -317,7 +317,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     else {
         lcd_set_window2(x, y, width, height);
         lcd_set_position2(x, y);
-    
+
         for (h = 0; h < height; h++) {
             p = FBADDR(x,y);
             for (w = 0; w < width; w++) {
@@ -333,4 +333,3 @@ void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
-

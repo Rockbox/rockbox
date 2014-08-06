@@ -310,8 +310,8 @@ void read_viewer_theme_file(void)
     {
         custom_filetype_icons[i] = filetypes[i].icon;
     }
-    
-    snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
+
+    snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR,
              global_settings.viewers_icon_file);
     fd = open(buffer, O_RDONLY);
     if (fd < 0)
@@ -542,7 +542,7 @@ char* filetype_get_plugin(const struct entry* file)
         return NULL;
     if (filetypes[index].plugin == NULL)
         return NULL;
-    snprintf(plugin_name, MAX_PATH, "%s/%s.%s", 
+    snprintf(plugin_name, MAX_PATH, "%s/%s.%s",
              PLUGIN_DIR, filetypes[index].plugin, ROCK_EXTENSION);
     return plugin_name;
 }

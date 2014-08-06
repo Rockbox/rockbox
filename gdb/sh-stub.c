@@ -20,13 +20,13 @@
  ****************************************************************************/
 /* sh-stub.c -- debugging stub for the Hitachi-SH.
 
- NOTE!! This code has to be compiled with optimization, otherwise the 
+ NOTE!! This code has to be compiled with optimization, otherwise the
  function inlining which generates the exception handlers won't work.
 
 */
 
 /*   This is originally based on an m68k software stub written by Glenn
-     Engel at HP, but has changed quite a bit. 
+     Engel at HP, but has changed quite a bit.
 
      Modifications for the SH by Ben Lee and Steve Chamberlain
 
@@ -36,7 +36,7 @@
 
 /****************************************************************************
 
-		THIS SOFTWARE IS NOT COPYRIGHTED
+                THIS SOFTWARE IS NOT COPYRIGHTED
 
    HP offers the following for use in the public domain.  HP makes no
    warranty with regard to the software or it's performance and the
@@ -54,117 +54,117 @@
    A debug packet whose contents are <data>
    is encapsulated for transmission in the form:
 
-	$ <data> # CSUM1 CSUM2
+        $ <data> # CSUM1 CSUM2
 
-	<data> must be ASCII alphanumeric and cannot include characters
-	'$' or '#'.  If <data> starts with two characters followed by
-	':', then the existing stubs interpret this as a sequence number.
+        <data> must be ASCII alphanumeric and cannot include characters
+        '$' or '#'.  If <data> starts with two characters followed by
+        ':', then the existing stubs interpret this as a sequence number.
 
-	CSUM1 and CSUM2 are ascii hex representation of an 8-bit 
-	checksum of <data>, the most significant nibble is sent first.
-	the hex digits 0-9,a-f are used.
+        CSUM1 and CSUM2 are ascii hex representation of an 8-bit
+        checksum of <data>, the most significant nibble is sent first.
+        the hex digits 0-9,a-f are used.
 
    Receiver responds with:
 
-	+	- if CSUM is correct and ready for next packet
-	-	- if CSUM is incorrect
+        +       - if CSUM is correct and ready for next packet
+        -       - if CSUM is incorrect
 
    <data> is as follows:
    All values are encoded in ascii hex digits.
 
-	Request		Packet
+        Request         Packet
 
-	read registers  g
-	reply		XX....X		Each byte of register data
-					is described by two hex digits.
-					Registers are in the internal order
-					for GDB, and the bytes in a register
-					are in the same order the machine uses.
-			or ENN		for an error.
+        read registers  g
+        reply           XX....X         Each byte of register data
+                                        is described by two hex digits.
+                                        Registers are in the internal order
+                                        for GDB, and the bytes in a register
+                                        are in the same order the machine uses.
+                        or ENN          for an error.
 
-	write regs	GXX..XX		Each byte of register data
-					is described by two hex digits.
-	reply		OK		for success
-			ENN		for an error
+        write regs      GXX..XX         Each byte of register data
+                                        is described by two hex digits.
+        reply           OK              for success
+                        ENN             for an error
 
-        write reg	Pn...=r...	Write register n... with value r...,
-					which contains two hex digits for each
-					byte in the register (target byte
-					order).
-	reply		OK		for success
-			ENN		for an error
-	(not supported by all stubs).
+        write reg       Pn...=r...      Write register n... with value r...,
+                                        which contains two hex digits for each
+                                        byte in the register (target byte
+                                        order).
+        reply           OK              for success
+                        ENN             for an error
+        (not supported by all stubs).
 
-	read mem	mAA..AA,LLLL	AA..AA is address, LLLL is length.
-	reply		XX..XX		XX..XX is mem contents
-					Can be fewer bytes than requested
-					if able to read only part of the data.
-			or ENN		NN is errno
+        read mem        mAA..AA,LLLL    AA..AA is address, LLLL is length.
+        reply           XX..XX          XX..XX is mem contents
+                                        Can be fewer bytes than requested
+                                        if able to read only part of the data.
+                        or ENN          NN is errno
 
-	write mem	MAA..AA,LLLL:XX..XX
-					AA..AA is address,
-					LLLL is number of bytes,
-					XX..XX is data
-	reply		OK		for success
-			ENN		for an error (this includes the case
-					where only part of the data was
-					written).
+        write mem       MAA..AA,LLLL:XX..XX
+                                        AA..AA is address,
+                                        LLLL is number of bytes,
+                                        XX..XX is data
+        reply           OK              for success
+                        ENN             for an error (this includes the case
+                                        where only part of the data was
+                                        written).
 
-	cont		cAA..AA		AA..AA is address to resume
-					If AA..AA is omitted,
-					resume at same address.
+        cont            cAA..AA         AA..AA is address to resume
+                                        If AA..AA is omitted,
+                                        resume at same address.
 
-	step		sAA..AA		AA..AA is address to resume
-					If AA..AA is omitted,
-					resume at same address.
+        step            sAA..AA         AA..AA is address to resume
+                                        If AA..AA is omitted,
+                                        resume at same address.
 
-	last signal     ?               Reply the current reason for stopping.
+        last signal     ?               Reply the current reason for stopping.
                                         This is the same reply as is generated
-					for step or cont : SAA where AA is the
-					signal number.
+                                        for step or cont : SAA where AA is the
+                                        signal number.
 
-	There is no immediate reply to step or cont.
-	The reply comes when the machine stops.
-	It is		SAA		AA is the "signal number"
+        There is no immediate reply to step or cont.
+        The reply comes when the machine stops.
+        It is           SAA             AA is the "signal number"
 
-	or...		TAAn...:r...;n:r...;n...:r...;
-					AA = signal number
-					n... = register number
-					r... = register contents
-	or...		WAA		The process exited, and AA is
-					the exit status.  This is only
-					applicable for certains sorts of
-					targets.
-	kill request	k
+        or...           TAAn...:r...;n:r...;n...:r...;
+                                        AA = signal number
+                                        n... = register number
+                                        r... = register contents
+        or...           WAA             The process exited, and AA is
+                                        the exit status.  This is only
+                                        applicable for certains sorts of
+                                        targets.
+        kill request    k
 
-	toggle debug	d		toggle debug flag (see 386 & 68k stubs)
-	reset		r		reset -- see sparc stub.
-	reserved	<other>		On other requests, the stub should
-					ignore the request and send an empty
-					response ($#<checksum>).  This way
-					we can extend the protocol and GDB
-					can tell whether the stub it is
-					talking to uses the old or the new.
-	search		tAA:PP,MM	Search backwards starting at address
-					AA for a match with pattern PP and
-					mask MM.  PP and MM are 4 bytes.
-					Not supported by all stubs.
+        toggle debug    d               toggle debug flag (see 386 & 68k stubs)
+        reset           r               reset -- see sparc stub.
+        reserved        <other>         On other requests, the stub should
+                                        ignore the request and send an empty
+                                        response ($#<checksum>).  This way
+                                        we can extend the protocol and GDB
+                                        can tell whether the stub it is
+                                        talking to uses the old or the new.
+        search          tAA:PP,MM       Search backwards starting at address
+                                        AA for a match with pattern PP and
+                                        mask MM.  PP and MM are 4 bytes.
+                                        Not supported by all stubs.
 
-	general query	qXXXX		Request info about XXXX.
-	general set	QXXXX=yyyy	Set value of XXXX to yyyy.
-	query sect offs	qOffsets	Get section offsets.  Reply is
-					Text=xxx;Data=yyy;Bss=zzz
-	console output	Otext		Send text to stdout.  Only comes from
-					remote target.
+        general query   qXXXX           Request info about XXXX.
+        general set     QXXXX=yyyy      Set value of XXXX to yyyy.
+        query sect offs qOffsets        Get section offsets.  Reply is
+                                        Text=xxx;Data=yyy;Bss=zzz
+        console output  Otext           Send text to stdout.  Only comes from
+                                        remote target.
 
-	Responses can be run-length encoded to save space.  A '*' means that
-	the next character is an ASCII encoding giving a repeat count which
-	stands for that many repititions of the character preceding the '*'.
-	The encoding is n+29, yielding a printable character where n >=3 
-	(which is where rle starts to win).  Don't use an n > 126. 
+        Responses can be run-length encoded to save space.  A '*' means that
+        the next character is an ASCII encoding giving a repeat count which
+        stands for that many repititions of the character preceding the '*'.
+        The encoding is n+29, yielding a printable character where n >=3
+        (which is where rle starts to win).  Don't use an n > 126.
 
-	So 
-	"0* " means the same as "0000".  */
+        So
+        "0* " means the same as "0000".  */
 
 #include "sh7034.h"
 #include <string.h>
@@ -214,7 +214,7 @@ int setjmp(jmp_buf __jmpb);
 /*
  * Number of bytes for registers
  */
-#define NUMREGBYTES 112		/* 92 */
+#define NUMREGBYTES 112         /* 92 */
 
 /*
  * Forward declarations
@@ -443,10 +443,10 @@ int ata_wait_for_rdy(void)
 
 int ata_spindown(int time)
 {
-	/* Port A setup */
-	PAIOR |= 0x0280; /* output for ATA reset, IDE enable */
-	PADR |= 0x0200; /* release ATA reset */
- 	PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
+        /* Port A setup */
+        PAIOR |= 0x0280; /* output for ATA reset, IDE enable */
+        PADR |= 0x0200; /* release ATA reset */
+        PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
 
     /* activate ATA */
     PADR &= ~0x80;
@@ -661,11 +661,11 @@ static void putpacket (register char *buffer)
             int runlen;
 
             /* Do run length encoding */
-            for (runlen = 0; runlen < 100; runlen ++) 
+            for (runlen = 0; runlen < 100; runlen ++)
             {
-                if (src[0] != src[runlen] || runlen == 99) 
+                if (src[0] != src[runlen] || runlen == 99)
                 {
-                    if (runlen > 3) 
+                    if (runlen > 3)
                     {
                         int encode;
                         /* Got a useful amount */
@@ -722,19 +722,19 @@ static int computeSignal (int exceptionVector)
     {
         case INVALID_INSN_VEC:
             sigval = SIGILL;
-            break;			
+            break;
         case INVALID_SLOT_VEC:
             sigval = SIGILL;
-            break;			
+            break;
         case CPU_BUS_ERROR_VEC:
             sigval = SIGBUS;
-            break;			
+            break;
         case DMA_BUS_ERROR_VEC:
             sigval = SIGBUS;
-            break;	
+            break;
         case NMI_VEC:
             sigval = SIGINT;
-            break;	
+            break;
 
         case TRAP_VEC:
         case USER_VEC:
@@ -1018,7 +1018,7 @@ typedef struct
 ** firmware has its entry point at 0x200
 */
 const vec_type vectable  __attribute__ ((section (".vectors"))) =
-{ 
+{
     &start,			        /* 0: Power-on reset PC */
     stack,                              /* 1: Power-on reset SP */
     &start,			        /* 2: Manual reset PC */
@@ -1165,7 +1165,7 @@ void INIT (void)
     stepped = 0;
 
     ata_spindown(-1);
-    
+
     stub_sp = stub_stack;
     breakpoint ();
 
@@ -1229,7 +1229,7 @@ void sr(void)
         "	mov.l	@(L_reg, pc), r1\n"
         "	bra	restoreRegisters\n"
         "	mov.l	r15, @r0		! save __stub_stack\n"
-	
+
         "	.align 2\n"
         "L_reg:\n"
         "	.long	_registers\n"
@@ -1284,13 +1284,13 @@ void rr(void)
 
 static inline void code_for_catch_exception(unsigned int n)
 {
-    asm("		.globl	_catch_exception_%O0" : : "X" (n) ); 
+    asm("		.globl	_catch_exception_%O0" : : "X" (n) );
     asm("	_catch_exception_%O0:" :: "X" (n) );
-    
+
     asm("		add	#-4, r15 	! reserve spot on stack ");
     asm("		mov.l	r1, @-r15	! push R1		");
-    
-    if (n == NMI_VEC) 
+
+    if (n == NMI_VEC)
     {
         /* Special case for NMI - make sure that they don't nest */
         asm("	mov.l	r0, @-r15	! push R0");
@@ -1588,7 +1588,7 @@ void serial_putc (char ch)
     {
         ;
     }
-    
+
     /*
      * Write data into TDR and clear TDRE
      */
@@ -1606,13 +1606,13 @@ void *memcpy(void *dest, const void *src0, size_t n)
 {
     char *dst = (char *) dest;
     char *src = (char *) src0;
-    
+
     void *save = dest;
-    
+
     while(n--)
     {
         *dst++ = *src++;
     }
-    
+
     return save;
 }

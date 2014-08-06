@@ -41,15 +41,15 @@
 /* based on implementation by Finn Yannick Jacobs */
 
 /* crc_tab[] -- this crcTable is being build by chksum_crc32GenTab().
- *		so make sure, you call it before using the other
- *		functions!
+ *              so make sure, you call it before using the other
+ *              functions!
  */
 static unsigned int crc_tab[256];
 
 /* chksum_crc() -- to a given block, this one calculates the
- *				crc32-checksum until the length is
- *				reached. the crc32-checksum will be
- *				the result.
+ *                              crc32-checksum until the length is
+ *                              reached. the crc32-checksum will be
+ *                              the result.
  */
 static unsigned int chksum_crc32 (unsigned char *block, unsigned int length)
 {
@@ -65,8 +65,8 @@ static unsigned int chksum_crc32 (unsigned char *block, unsigned int length)
 }
 
 /* chksum_crc32gentab() --      to a global crc_tab[256], this one will
- *				calculate the crcTable for crc32-checksums.
- *				it is generated to the polynom [..]
+ *                              calculate the crcTable for crc32-checksums.
+ *                              it is generated to the polynom [..]
  */
 
 static void chksum_crc32gentab (void)
@@ -80,14 +80,14 @@ static void chksum_crc32gentab (void)
       crc = i;
       for (j = 8; j > 0; j--)
       {
-	 if (crc & 1)
-	 {
-	    crc = (crc >> 1) ^ poly;
-	 }
-	 else
-	 {
-	    crc >>= 1;
-	 }
+         if (crc & 1)
+         {
+            crc = (crc >> 1) ^ poly;
+         }
+         else
+         {
+            crc >>= 1;
+         }
       }
       crc_tab[i] = crc;
    }
@@ -118,7 +118,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
+
     fseek(file,0,SEEK_SET);
 
     /* Add 4 bytes to length (for magic), the 0x200 byte header and
@@ -150,10 +150,10 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
     int2le(length+4,     &outbuf[0x2e8]);   /* length plus 0xaa55aa55 */
 
     int2le(0xaa55aa55,   &outbuf[0x200+length]);  /* More Magic */
-    
+
     strncpy((char *)outbuf+0x1f8, type, 4);  /* type of binary (RBBL, RBOS) */
     strncpy((char *)outbuf+0x1fc, model, 4); /* 4 character model id */
-    
+
     /* Calculate CRC32 checksum */
     chksum_crc32gentab ();
     crc = chksum_crc32 (outbuf+0x200,mi4length-0x200);
@@ -168,7 +168,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
 
     /* v3 files require a dummy DSA signature */
     if (version == 0x00010301) {
-        outbuf[0x2f]=0x01;                
+        outbuf[0x2f]=0x01;
     }
 
     file = fopen(oname, "wb");
@@ -176,7 +176,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
         perror(oname);
         return -3;
     }
-    
+
     len = fwrite(outbuf, 1, mi4length, file);
     if(len < (size_t)length) {
         perror(oname);

@@ -29,4 +29,3 @@ int i2c_write(unsigned char slave, int address, int len, const unsigned char *da
 int i2c_read(unsigned char slave, int address, int len, unsigned char *data);
 
 #endif /* _I2C_S5l8700_H */
-

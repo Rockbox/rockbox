@@ -36,11 +36,11 @@ static void NO_INLINE ICODE_ATTR_SPC
 Timer_run_( struct Timer* t, long time )
 {
     /* when disabled, next_tick should always be in the future */
-    assert( t->enabled ); 
-    
+    assert( t->enabled );
+
     int elapsed = ((time - t->next_tick) >> t->shift) + 1;
     t->next_tick += elapsed << t->shift;
-    
+
     elapsed += t->count;
     if ( elapsed >= t->period ) /* avoid unnecessary division */
     {
@@ -75,11 +75,11 @@ void SPC_Init( THIS )
     this->timer [0].shift = 4 + 3; /* 8 kHz */
     this->timer [1].shift = 4 + 3; /* 8 kHz */
     this->timer [2].shift = 4; /* 8 kHz */
-    
+
     /* Put STOP instruction around memory to catch PC underflow/overflow. */
     ci->memset( ram.padding1, 0xFF, sizeof ram.padding1 );
     ci->memset( ram.padding2, 0xFF, sizeof ram.padding2 );
-    
+
     /* A few tracks read from the last four bytes of IPL ROM */
     this->boot_rom [sizeof this->boot_rom - 2] = 0xC0;
     this->boot_rom [sizeof this->boot_rom - 1] = 0xFF;
@@ -94,41 +94,41 @@ static void SPC_load_state( THIS, struct cpu_regs_t const* cpu_state,
         const void* new_ram, const void* dsp_state )
 {
     ci->memcpy(&(this->r),cpu_state,sizeof this->r);
-        
+
     /* ram */
     ci->memcpy( RAM, new_ram, sizeof RAM );
     ci->memcpy( this->extra_ram, RAM + ROM_ADDR, sizeof this->extra_ram );
-    
+
     /* boot rom (have to force enable_rom() to update it) */
     this->rom_enabled = !(RAM [0xF1] & 0x80);
     SPC_enable_rom( this, !this->rom_enabled );
-    
+
     /* dsp */
     /* some SPCs rely on DSP immediately generating one sample */
-    this->extra_cycles = 32; 
+    this->extra_cycles = 32;
     DSP_reset( &this->dsp );
     int i;
     for ( i = 0; i < REGISTER_COUNT; i++ )
         DSP_write( &this->dsp, i, ((uint8_t const*) dsp_state) [i] );
-    
+
     /* timers */
     for ( i = 0; i < TIMER_COUNT; i++ )
     {
         struct Timer* t = &this->timer [i];
-        
+
         t->next_tick = -EXTRA_CLOCKS;
         t->enabled = (RAM [0xF1] >> i) & 1;
         if ( !t->enabled )
             t->next_tick = TIMER_DISABLED_TIME;
         t->count = 0;
         t->counter = RAM [0xFD + i] & 15;
-        
+
         int p = RAM [0xFA + i];
         if ( !p )
             p = 0x100;
         t->period = p;
     }
-    
+
     /* Handle registers which already give 0 when read by
        setting RAM and not changing it.
        Put STOP instruction in registers which can be read,
@@ -161,27 +161,27 @@ int SPC_load_spc( THIS, const void* data, long size )
 {
     struct spc_file_t const* spc = (struct spc_file_t const*) data;
     struct cpu_regs_t regs;
-    
+
     if ( size < SPC_FILE_SIZE )
         return -1;
-    
+
     if ( ci->memcmp( spc->signature, "SNES-SPC700 Sound File Data", 27 ) != 0 )
         return -1;
-    
+
     regs.pc     = spc->pc [1] * 0x100 + spc->pc [0];
     regs.a      = spc->a;
     regs.x      = spc->x;
     regs.y      = spc->y;
     regs.status = spc->status;
     regs.sp     = spc->sp;
-    
+
     if ( (unsigned long) size >= sizeof *spc )
         ci->memcpy( this->boot_rom, spc->ipl_rom, sizeof this->boot_rom );
-    
+
     SPC_load_state( this, &regs, spc->ram, spc->dsp );
-    
+
     clear_echo(this);
-    
+
     return 0;
 }
 
@@ -190,7 +190,7 @@ static void NO_INLINE ICODE_ATTR_SPC
 SPC_run_dsp_( THIS, long time )
 {
     /* divide by CLOCKS_PER_SAMPLE */
-    int count = ((time - this->next_dsp) >> 5) + 1; 
+    int count = ((time - this->next_dsp) >> 5) + 1;
     int32_t* buf = this->sample_buf;
     this->sample_buf = buf + count;
     this->next_dsp += count * CLOCKS_PER_SAMPLE;
@@ -206,11 +206,11 @@ static inline void SPC_run_dsp( THIS, long time )
 int SPC_read( THIS, unsigned addr, long const time )
 {
     int result = RAM [addr];
-    
+
     if ( ((unsigned) (addr - 0xF0)) < 0x10 )
     {
         assert( 0xF0 <= addr && addr <= 0xFF );
-        
+
         /* counters */
         int i = addr - 0xFD;
         if ( i >= 0 )
@@ -252,7 +252,7 @@ void SPC_write( THIS, unsigned addr, int data, long const time )
                     RAM [addr] = (uint8_t) data;
             }
             break;
-        
+
         /* DSP */
         /*case 0xF2:*/ /* mapped to RAM */
         case 0xF3: {
@@ -266,11 +266,11 @@ void SPC_write( THIS, unsigned addr, int data, long const time )
             }
             break;
         }
-        
+
         case 0xF0: /* Test register */
             /*dprintf( "Wrote $%02X to $F0\n", (int) data ); */
             break;
-        
+
         /* Config */
         case 0xF1:
         {
@@ -293,7 +293,7 @@ void SPC_write( THIS, unsigned addr, int data, long const time )
                     t->next_tick = time;
                 }
             }
-            
+
             /* port clears */
             if ( data & 0x10 )
             {
@@ -305,11 +305,11 @@ void SPC_write( THIS, unsigned addr, int data, long const time )
                 RAM [0xF6] = 0;
                 RAM [0xF7] = 0;
             }
-            
+
             SPC_enable_rom( this, (data & 0x80) != 0 );
             break;
         }
-        
+
         /* Ports */
         case 0xF4:
         case 0xF5:
@@ -321,7 +321,7 @@ void SPC_write( THIS, unsigned addr, int data, long const time )
         /* verified on SNES that these are read/write (RAM) */
         /*case 0xF8: */
         /*case 0xF9: */
-        
+
         /* Timers */
         case 0xFA:
         case 0xFB:
@@ -335,7 +335,7 @@ void SPC_write( THIS, unsigned addr, int data, long const time )
             }
             break;
         }
-        
+
         /* Counters (cleared on write) */
         case 0xFD:
         case 0xFE:
@@ -351,13 +351,13 @@ int SPC_play( THIS, long count, int32_t* out )
 {
     int i;
     assert( count % 2 == 0 ); /* output is always in pairs of samples */
-    
+
     long start_time = -(count >> 1) * CLOCKS_PER_SAMPLE - EXTRA_CLOCKS;
-    
+
     /* DSP output is made on-the-fly when DSP registers are read or written */
     this->sample_buf = out;
     this->next_dsp = start_time + CLOCKS_PER_SAMPLE;
-    
+
     /* Localize timer next_tick times and run them to the present to prevent
        a running but ignored timer's next_tick from getting too far behind
        and overflowing. */
@@ -370,7 +370,7 @@ int SPC_play( THIS, long count, int32_t* out )
             Timer_run( t, start_time );
         }
     }
-    
+
     /* Run from start_time to 0, pre-advancing by extra cycles from last run */
     this->extra_cycles = CPU_run( this, start_time + this->extra_cycles ) +
                          EXTRA_CLOCKS;
@@ -378,10 +378,10 @@ int SPC_play( THIS, long count, int32_t* out )
     {
         /*dprintf( "Unhandled instruction $%02X, pc = $%04X\n",
                 (int) CPU_read( r.pc ), (unsigned) r.pc ); */
-        
+
         return -1;
     }
-    
+
     /* Catch DSP up to present */
     ENTER_TIMER(cpu);
     SPC_run_dsp( this, -EXTRA_CLOCKS );
@@ -389,6 +389,6 @@ int SPC_play( THIS, long count, int32_t* out )
 
     assert( this->next_dsp == CLOCKS_PER_SAMPLE - EXTRA_CLOCKS );
     assert( this->sample_buf - out == count );
-    
+
     return 0;
 }

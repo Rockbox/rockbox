@@ -75,7 +75,7 @@
 #define HAVE_SDL
 #define HAVE_SDL_AUDIO
 
-#define HAVE_SW_TONE_CONTROLS 
+#define HAVE_SW_TONE_CONTROLS
 
 /* Define this to the CPU frequency */
 /*

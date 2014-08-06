@@ -70,9 +70,9 @@ static const char *apple_stop_sign = "{{~~  /-----\\   "\
                                      "----------------"\
                                      "---------------";
 
-/* Windows requires the buffer for disk I/O to be aligned in memory on a 
+/* Windows requires the buffer for disk I/O to be aligned in memory on a
    multiple of the disk volume size - so we use a single global variable
-   and initialise it with ipod_alloc_buf() 
+   and initialise it with ipod_alloc_buf()
 */
 
 char* get_parttype(int pt)
@@ -236,7 +236,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
             /* see if it's a partition entry */
             if ((ipod->sectorbuf[0] != 'P') || (ipod->sectorbuf[1] != 'M')) {
                 /* end of partition table -> leave the loop */
-                break;  
+                break;
             }
 
             /* Extract the interesting entries */
@@ -272,8 +272,8 @@ int read_partinfo(struct ipod_t* ipod, int silent)
            1) Partition 1 is of type 0 (Empty) but isn't empty.
            2) Partition 2 is of type 0xb or 0xc (winpod) or -1 (macpod)
     */
-    if ((ipod->pinfo[0].type != 0) || (ipod->pinfo[0].size == 0) || 
-        ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != 0xc) && 
+    if ((ipod->pinfo[0].type != 0) || (ipod->pinfo[0].size == 0) ||
+        ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != 0xc) &&
          (ipod->pinfo[1].type != PARTTYPE_HFS))) {
         if (!silent) fprintf(stderr,"[ERR]  Partition layout is not an ipod\n");
         return -1;
@@ -375,7 +375,7 @@ int write_partition(struct ipod_t* ipod, int infile)
            /* We need to pad the last write to a multiple of SECTOR_SIZE */
            if ((n % ipod->sector_size) != 0) {
                padding = (ipod->sector_size-(n % ipod->sector_size));
-               n += padding; 
+               n += padding;
            }
         }
 
@@ -413,8 +413,8 @@ int diskmove(struct ipod_t* ipod, int delta)
     int n;
 
     src_start = ipod->ipod_directory[1].devOffset;
-    src_end = (ipod->ipod_directory[ipod->nimages-1].devOffset + ipod->sector_size + 
-              ipod->ipod_directory[ipod->nimages-1].len + 
+    src_end = (ipod->ipod_directory[ipod->nimages-1].devOffset + ipod->sector_size +
+              ipod->ipod_directory[ipod->nimages-1].len +
               (ipod->sector_size-1)) & ~(ipod->sector_size-1);
     bytesleft = src_end - src_start;
 
@@ -499,13 +499,13 @@ static int rename_image(struct ipod_t* ipod, char* from, char* to)
         return -1;
     }
     /* Read directory */
-    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) {
         fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
         return -1;
     }
 
     n=ipod_read(ipod, ipod->sector_size);
-    if (n < 0) { 
+    if (n < 0) {
         fprintf(stderr,"[ERR]  Read of directory failed.\n");
         return -1;
     }
@@ -519,7 +519,7 @@ static int rename_image(struct ipod_t* ipod, char* from, char* to)
         ipod->diroffset += ipod->sector_size - x;
 
         n=ipod_read(ipod, ipod->sector_size);
-        if (n < 0) { 
+        if (n < 0) {
             fprintf(stderr,"[ERR]  Read of directory failed.\n");
             return -1;
         }
@@ -542,13 +542,13 @@ static int rename_image(struct ipod_t* ipod, char* from, char* to)
     }
 
     /* Write directory back to disk */
-    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) {
         fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
         return -1;
     }
 
     n=ipod_write(ipod, ipod->sector_size);
-    if (n < 0) { 
+    if (n < 0) {
         fprintf(stderr,"[ERR]  Write of directory failed in rename_image.\n");
         return -1;
     }
@@ -568,13 +568,13 @@ static int delete_image(struct ipod_t* ipod, char* name)
     x = ipod->diroffset % ipod->sector_size;
 
     /* Read directory */
-    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) {
         fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
         return -1;
     }
 
     n=ipod_read(ipod, ipod->sector_size);
-    if (n < 0) { 
+    if (n < 0) {
         fprintf(stderr,"[ERR]  Read of directory failed.\n");
         return -1;
     }
@@ -588,7 +588,7 @@ static int delete_image(struct ipod_t* ipod, char* name)
         ipod->diroffset += ipod->sector_size - x;
 
         n=ipod_read(ipod, ipod->sector_size);
-        if (n < 0) { 
+        if (n < 0) {
             fprintf(stderr,"[ERR]  Read of directory failed.\n");
             return -1;
         }
@@ -610,13 +610,13 @@ static int delete_image(struct ipod_t* ipod, char* name)
     }
 
     /* Write directory back to disk */
-    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) {
         fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
         return -1;
     }
 
     n=ipod_write(ipod, ipod->sector_size);
-    if (n < 0) { 
+    if (n < 0) {
         fprintf(stderr,"[ERR]  Write of directory failed in delete_image.\n");
         return -1;
     }
@@ -648,8 +648,8 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
         fprintf(stderr,"[INFO] Using internal bootloader - %d bytes\n",ipod->bootloader_len);
         length = ipod->bootloader_len;
         infile = -1;
-    } 
-    else 
+    }
+    else
 #endif
     {
         /* First check that the input file is the correct type for this ipod. */
@@ -658,7 +658,7 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
             fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
             return -1;
         }
-    
+
         if (type==FILETYPE_DOT_IPOD) {
             n = read(infile,header,8);
             if (n < 8) {
@@ -666,16 +666,16 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
                 close(infile);
                 return -1;
             }
-    
+
             if (memcmp(header+4, ipod->modelname,4)!=0) {
                 fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
                         header[4],header[5],header[6],header[7], ipod->modelname);
                 close(infile);
                 return -1;
             }
-    
+
             filechksum = be2int(header);
-    
+
             length = filesize(infile)-8;
         } else {
             length = filesize(infile);
@@ -698,7 +698,7 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
 #ifdef WITH_BOOTOBJS
     if (type == FILETYPE_INTERNAL) {
         memcpy(ipod->sectorbuf,ipod->bootloader,ipod->bootloader_len);
-    } 
+    }
     else
 #endif
     {
@@ -738,7 +738,7 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
     /* 2nd Gen Nano has encrypted firmware, and the sector
        preceeding the firmware contains hashes that need to be
        preserved.  Nano 2G images include these extra 2048 (0x800)
-       bytes 
+       bytes
      */
     if (ipod_seek(ipod, offset - (ipod->modelnum == 62 ? 0x800 : 0)) < 0) {
         fprintf(stderr,"[ERR]  Seek failed\n");
@@ -757,7 +757,7 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
     }
     fprintf(stderr,"[INFO]  Wrote %d bytes to firmware partition\n",n);
 
-    /* Now we need to create a new directory entry 
+    /* Now we need to create a new directory entry
 
        NOTE: On the Nano 2G, the checksum is the checksum of the
              unencrypted firmware.  But this isn't checked by the NOR
@@ -807,7 +807,7 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
     int2le(length - (ipod->modelnum==62 ? 0x800: 0), p + 16);    /* len */
     int2le(chksum, p + 28);                                      /* checksum */
 
-    /* Write directory */    
+    /* Write directory */
     if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { return -1; }
     n=ipod_write(ipod, ipod->sector_size);
     if (n < 0) { return -1; }
@@ -934,8 +934,8 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
         memcpy(ipod->sectorbuf+entryOffset,ipod->bootloader,ipod->bootloader_len);
         length = ipod->bootloader_len;
         paddedlength=(ipod->bootloader_len+ipod->sector_size-1)&~(ipod->sector_size-1);
-    } 
-    else 
+    }
+    else
 #endif
     {
         infile=open(filename,O_RDONLY);
@@ -952,16 +952,16 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
                 close(infile);
                 return -1;
             }
-    
+
             if (memcmp(header+4, ipod->modelname,4)!=0) {
                 fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
                         header[4],header[5],header[6],header[7], ipod->modelname);
                 close(infile);
                 return -1;
             }
-    
+
             filechksum = be2int(header);
-    
+
             length=filesize(infile)-8;
         } else {
             length=filesize(infile);
@@ -981,7 +981,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
             fprintf(stderr,"[ERR]  Couldn't read input file\n");
             return -1;
         }
-    
+
         if (type==FILETYPE_DOT_IPOD) {
             /* Calculate and confirm bootloader checksum */
             chksum = ipod->modelnum;
@@ -989,7 +989,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
                  /* add 8 unsigned bits but keep a 32 bit sum */
                  chksum += bootloader_buf[i];
             }
-    
+
             if (chksum == filechksum) {
                 fprintf(stderr,"[INFO] Checksum OK in %s\n",filename);
             } else {
@@ -1062,7 +1062,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
     chksum = 0;
     for (i=0;i<entryOffset + length; i++) {
          chksum += ipod->sectorbuf[i];
-    }    
+    }
 
     /* Now write the combined firmware image to the disk */
 
@@ -1087,7 +1087,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
     x = ipod->diroffset % ipod->sector_size;
 
     /* Read directory */
-    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) {
         fprintf(stderr,"[ERR]  Seek failed\n");
         return -1;
     }
@@ -1111,13 +1111,13 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
         }
     }
 
-    /* Write directory */    
-    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+    /* Write directory */
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) {
         fprintf(stderr,"[ERR]  Seek to %d failed\n", (int)(ipod->start+ipod->diroffset-x));
         return -1;
     }
     n=ipod_write(ipod, ipod->sector_size);
-    if (n < 0) { 
+    if (n < 0) {
         fprintf(stderr,"[ERR]  Directory write failed\n");
         return -1;
     }
@@ -1199,7 +1199,7 @@ int delete_bootloader(struct ipod_t* ipod)
     int2le(0,ipod->sectorbuf+x+24);
     int2le(chksum,ipod->sectorbuf+x+28);
 
-    /* Write directory */    
+    /* Write directory */
     if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { return -1; }
     n=ipod_write(ipod, ipod->sector_size);
     if (n < 0) { return -1; }
@@ -1231,8 +1231,8 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
         fprintf(stderr,"[INFO] Using internal bootloader - %d bytes\n",ipod->bootloader_len);
         length = ipod->bootloader_len;
         infile = -1;
-    } 
-    else 
+    }
+    else
 #endif
     {
         /* First check that the input file is the correct type for this ipod. */
@@ -1241,7 +1241,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
             fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
             return -1;
         }
-    
+
         if (type==FILETYPE_DOT_IPOD) {
             n = read(infile,header,8);
             if (n < 8) {
@@ -1249,16 +1249,16 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
                 close(infile);
                 return -1;
             }
-    
+
             if (memcmp(header+4, ipod->modelname,4)!=0) {
                 fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
                         header[4],header[5],header[6],header[7], ipod->modelname);
                 close(infile);
                 return -1;
             }
-    
+
             filechksum = be2int(header);
-    
+
             length = filesize(infile)-8;
         } else {
             length = filesize(infile);
@@ -1293,7 +1293,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
 #ifdef WITH_BOOTOBJS
     if (type == FILETYPE_INTERNAL) {
         memcpy(ipod->sectorbuf,ipod->bootloader,ipod->bootloader_len);
-    } 
+    }
     else
 #endif
     {
@@ -1334,7 +1334,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
         /* 2nd Gen Nano has encrypted firmware, and the sector
            preceeding the firmware contains hashes that need to be
            preserved.  Nano 2G images include these extra 2048 (0x800)
-           bytes 
+           bytes
         */
 
         offset -= 0x800;
@@ -1485,17 +1485,17 @@ int read_directory(struct ipod_t* ipod)
 
     ipod->nimages=0;
 
-    /* Read firmware partition header (first 512 bytes of disk - but 
+    /* Read firmware partition header (first 512 bytes of disk - but
        let's read a whole sector) */
 
-    if (ipod_seek(ipod, ipod->start) < 0) { 
+    if (ipod_seek(ipod, ipod->start) < 0) {
         fprintf(stderr,"[ERR]  Seek to 0x%08x in read_directory() failed.\n",
                        (unsigned int)(ipod->start));
         return -1;
     }
 
     n=ipod_read(ipod, ipod->sector_size);
-    if (n < 0) { 
+    if (n < 0) {
         fprintf(stderr,"[ERR]  ipod_read(ipod,0x%08x) failed in read_directory()\n", ipod->sector_size);
         return -1;
     }
@@ -1521,13 +1521,13 @@ int read_directory(struct ipod_t* ipod)
     x = ipod->diroffset % ipod->sector_size;
 
     /* Read directory */
-    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { 
+    if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) {
         fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)ipod->diroffset);
         return -1;
     }
 
     n=ipod_read(ipod, ipod->sector_size);
-    if (n < 0) { 
+    if (n < 0) {
         fprintf(stderr,"[ERR]  Read of directory failed.\n");
         return -1;
     }
@@ -1541,7 +1541,7 @@ int read_directory(struct ipod_t* ipod)
         ipod->diroffset += ipod->sector_size - x;
 
         n=ipod_read(ipod, ipod->sector_size);
-        if (n < 0) { 
+        if (n < 0) {
             fprintf(stderr,"[ERR]  Read of directory failed.\n");
             return -1;
         }
@@ -1549,7 +1549,7 @@ int read_directory(struct ipod_t* ipod)
     }
 
     ipod->ososimage = -1;
-    while ((ipod->nimages < MAX_IMAGES) && (p < (ipod->sectorbuf + x + 400)) && 
+    while ((ipod->nimages < MAX_IMAGES) && (p < (ipod->sectorbuf + x + 400)) &&
            ((memcmp(p,"!ATA",4)==0) || (memcmp(p,"DNAN",4)==0))) {
         p+=4;
         if (memcmp(p,"soso",4)==0) {
@@ -1828,7 +1828,7 @@ int ipod_scan(struct ipod_t* ipod)
          }
 
 #ifdef __WIN32__
-         printf("[INFO] Ipod found - %s (\"%s\") - disk device %d\n", 
+         printf("[INFO] Ipod found - %s (\"%s\") - disk device %d\n",
              ipod->modelstr,ipod->macpod ? "macpod" : "winpod",i);
 #else
          printf("[INFO] Ipod found - %s (\"%s\") - %s\n",
@@ -1885,7 +1885,7 @@ int write_dos_partition_table(struct ipod_t* ipod)
     memset(ipod->sectorbuf, 0, ipod->sector_size);
 
     /* Now add the partition info */
-    for (i=0; i < 4 ; i++) 
+    for (i=0; i < 4 ; i++)
     {
         p = ipod->sectorbuf + 0x1be + i*16;
 
@@ -1937,7 +1937,7 @@ int ipod_get_xmlinfo(struct ipod_t* ipod)
         return -1;
     }
 
-    /* Reading directly into hdr[] causes problems (for an unknown reason) on 
+    /* Reading directly into hdr[] causes problems (for an unknown reason) on
        win32 */
     memcpy(hdr, buf, sizeof(hdr));
 
@@ -1945,7 +1945,7 @@ int ipod_get_xmlinfo(struct ipod_t* ipod)
 
     psize = npages * 0xf8; /* Hopefully this is enough. */
 
-    ipod->xmlinfo = malloc(psize); 
+    ipod->xmlinfo = malloc(psize);
     ipod->xmlinfo_len = 0;
 
     if (ipod->xmlinfo == NULL) {
@@ -1954,7 +1954,7 @@ int ipod_get_xmlinfo(struct ipod_t* ipod)
     }
 
     p = ipod->xmlinfo;
-    
+
     for (i=0; i < npages; i++) {
         if (ipod_scsi_inquiry(ipod, hdr[i+4], buf, sizeof(buf)) < 0) {
             fprintf(stderr,"[ERR]  Sending SCSI Command failed.\n");
@@ -1971,7 +1971,7 @@ int ipod_get_xmlinfo(struct ipod_t* ipod)
 
         memcpy(p, buf + 4, buf[3]);
         p += buf[3];
-        ipod->xmlinfo_len += buf[3];        
+        ipod->xmlinfo_len += buf[3];
     }
 
     /* NULL-terminate the XML info */
@@ -2245,7 +2245,7 @@ int write_aupd(struct ipod_t* ipod, char* filename)
         fprintf(stderr,"[ERR]  Couldn't open input file %s\n",filename);
         return -1;
     }
-    
+
     length = filesize(infile);
     newsize=(length+ipod->sector_size-1)&~(ipod->sector_size-1);
 
@@ -2339,7 +2339,7 @@ int write_aupd(struct ipod_t* ipod, char* filename)
     fprintf(stderr,"[INFO] Updating checksum to 0x%08x (was 0x%08x)\n",(unsigned int)chksum,le2int(ipod->sectorbuf + x + aupd*40 + 28));
     int2le(chksum,ipod->sectorbuf+x+aupd*40+28);
 
-    /* Write directory */    
+    /* Write directory */
     if (ipod_seek(ipod, ipod->start + ipod->diroffset - x) < 0) { return -1; }
     n=ipod_write(ipod, ipod->sector_size);
     if (n < 0) { return -1; }

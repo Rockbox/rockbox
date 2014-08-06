@@ -1,7 +1,7 @@
 /*
 
  These filter coefficients computations are taken from
- http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt  
+ http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt
 
  written by Robert Bristow-Johnson
 
@@ -41,10 +41,10 @@ typedef struct _rbjfilter
 
 
 static int check_stability(t_float fb1,
-			    t_float fb2, 
-			    t_float ff1,
-			    t_float ff2,
-			    t_float ff3)
+                            t_float fb2,
+                            t_float ff1,
+                            t_float ff2,
+                            t_float ff3)
 {
 #ifdef ROCKBOX
     (void) ff1;
@@ -55,18 +55,18 @@ static int check_stability(t_float fb1,
 
     if (discriminant < 0) /* imaginary roots -- resonant filter */
     {
-    	    /* they're conjugates so we just check that the product
-    	    is less than one */
-    	if (fb2 >= -1.0f) goto stable;
+            /* they're conjugates so we just check that the product
+            is less than one */
+        if (fb2 >= -1.0f) goto stable;
     }
     else    /* real roots */
     {
-    	    /* check that the parabola 1 - fb1 x - fb2 x^2 has a
-    	    	vertex between -1 and 1, and that it's nonnegative
-    	    	at both ends, which implies both roots are in [1-,1]. */
-    	if (fb1 <= 2.0f && fb1 >= -2.0f &&
-    	    1.0f - fb1 -fb2 >= 0 && 1.0f + fb1 - fb2 >= 0)
-    	    	goto stable;
+            /* check that the parabola 1 - fb1 x - fb2 x^2 has a
+                vertex between -1 and 1, and that it's nonnegative
+                at both ends, which implies both roots are in [1-,1]. */
+        if (fb1 <= 2.0f && fb1 >= -2.0f &&
+            1.0f - fb1 -fb2 >= 0 && 1.0f + fb1 - fb2 >= 0)
+                goto stable;
     }
     return 0;
 stable:
@@ -79,4 +79,3 @@ stable:
 
 
 #endif
-

@@ -27,8 +27,8 @@
 
 typedef struct
 {
-	size_t	size;
-	byte*	data;
+        size_t  size;
+        byte*   data;
 } memchunk;
 
 #ifdef __cplusplus
@@ -36,15 +36,15 @@ extern "C" {
 #endif
 
 BEECRYPTAPI
-memchunk*	memchunkAlloc(size_t);
+memchunk*       memchunkAlloc(size_t);
 BEECRYPTAPI
-void		memchunkWipe(memchunk*);
+void            memchunkWipe(memchunk*);
 BEECRYPTAPI
-void		memchunkFree(memchunk*);
+void            memchunkFree(memchunk*);
 BEECRYPTAPI
-memchunk*	memchunkResize(memchunk*, size_t);
+memchunk*       memchunkResize(memchunk*, size_t);
 BEECRYPTAPI
-memchunk*	memchunkClone(const memchunk*);
+memchunk*       memchunkClone(const memchunk*);
 
 #ifdef __cplusplus
 }

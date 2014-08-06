@@ -289,4 +289,3 @@ static inline int32_t CLIP_TO_15(int32_t x) {
 */
 
 #endif
-

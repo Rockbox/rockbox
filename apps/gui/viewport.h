@@ -56,7 +56,7 @@ void viewportmanager_init(void) INIT_ATTR;
 #ifdef HAVE_LCD_BITMAP
 void viewportmanager_theme_enable(enum screen_type screen, bool enable,
                                  struct viewport *viewport);
-/* Force will cause a redraw even if the theme was previously and 
+/* Force will cause a redraw even if the theme was previously and
  * currently enabled (i,e the undo doing nothing).
  * Should almost always be set to false except coming out of fully skinned screens */
 void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw);

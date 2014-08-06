@@ -78,4 +78,3 @@ int key_to_button(int keyboard_button)
 struct button_map bm[] = {
     { 0, 0, 0, 0, "None" }
 };
-

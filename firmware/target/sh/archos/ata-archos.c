@@ -58,7 +58,7 @@ void ata_device_init(void)
     or_b(0x02, &PAIORH); /* output for ATA reset */
     or_b(0x02, &PADRH);  /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
- 
+
     if (HW_MASK & ATA_ADDRESS_200)
         ata_control = ATA_CONTROL1;
     else

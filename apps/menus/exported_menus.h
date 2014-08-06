@@ -23,9 +23,9 @@
 
 #include "menu.h"
 /* not needed for plugins */
-#ifndef PLUGIN 
+#ifndef PLUGIN
 
-extern const struct menu_item_ex 
+extern const struct menu_item_ex
         display_menu,               /* display_menu.c   */
         playback_settings,          /* playback_menu.c  */
 #ifdef HAVE_RECORDING

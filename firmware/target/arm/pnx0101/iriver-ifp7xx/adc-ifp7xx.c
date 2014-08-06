@@ -53,7 +53,6 @@ void adc_init(void)
 
     while (!(ADCST & 0x10));
     adc_tick();
-  
+
     tick_add_task(adc_tick);
 }
-

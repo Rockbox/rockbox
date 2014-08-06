@@ -134,7 +134,7 @@ int ramdisk_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif
@@ -158,4 +158,3 @@ bool ramdisk_present(IF_MD(int drive))
     return true;
 }
 #endif
-

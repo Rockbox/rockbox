@@ -32,7 +32,7 @@
  ******************************************************************************/
 struct touchbutton {
     /* Each button has it's own viewport to define colors, drawstyle, location*/
-    struct viewport vp;     
+    struct viewport vp;
     bool repeat;            /* requires the area be held for the action */
     int action;             /* action this button will return */
     bool invisible;         /* Is this an invisible button? */

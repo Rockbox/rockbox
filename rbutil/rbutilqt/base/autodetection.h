@@ -69,4 +69,3 @@ private:
 
 
 #endif /*AUTODETECTION_H_*/
-

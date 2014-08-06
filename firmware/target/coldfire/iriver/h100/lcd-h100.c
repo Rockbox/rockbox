@@ -80,7 +80,7 @@ void lcd_set_invert_display(bool yesno)
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
     {
         lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 1);
         lcd_write_command(LCD_CNTL_COMMON_OUTPUT_STATUS | 0);
@@ -133,7 +133,7 @@ void lcd_init_device(void)
     lcd_write_command_ex(LCD_CNTL_GRAY_SCALE_PATTERN, 0x43, -1);
     lcd_write_command_ex(LCD_CNTL_DISPLAY_MODE, 0, -1); /* Greyscale mode */
     lcd_write_command(LCD_CNTL_DATA_INPUT_DIR | 0); /* Column mode */
-    
+
     lcd_update();
     lcd_write_command(LCD_CNTL_ON_OFF | 1); /* LCD ON */
 }

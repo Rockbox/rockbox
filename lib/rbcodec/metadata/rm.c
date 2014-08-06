@@ -50,7 +50,7 @@ static inline void print_cook_extradata(RMContext *rmctx) {
         DEBUGF("            joint_stereo_subband_start = %d\n",rm_get_uint16be(&rmctx->codec_extradata[12]));
         DEBUGF("            joint_stereo_vlc_bits = %d\n", rm_get_uint16be(&rmctx->codec_extradata[14]));
     }
-} 
+}
 
 
 struct real_object_t
@@ -163,9 +163,9 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
            lseek(fd, 1, SEEK_CUR); /* unknown */
            skipped += 1;
        }
-  
+
        switch(fourcc) {
-           case FOURCC('c','o','o','k'):               
+           case FOURCC('c','o','o','k'):
                rmctx->codec_type = CODEC_COOK;
                read_uint32be(fd, &rmctx->extradata_size);
                skipped += 4;
@@ -186,7 +186,7 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
                rmctx->codec_type = CODEC_AC3;
                break;
 
-           case FOURCC('a','t','r','c'):  
+           case FOURCC('a','t','r','c'):
                rmctx->codec_type = CODEC_ATRAC;
                read_uint32be(fd, &rmctx->extradata_size);
                skipped += 4;
@@ -197,7 +197,7 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
            default: /* Not a supported codec */
                return -1;
        }
-       
+
        DEBUGF("        flavor = %d\n",flavor);
        DEBUGF("        coded_frame_size = %ld\n",coded_framesize);
        DEBUGF("        sub_packet_h = %d\n",rmctx->sub_packet_h);
@@ -233,7 +233,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
     uint32_t packet_count;
     uint32_t duration;
     uint32_t preroll;
-    uint32_t index_offset;    
+    uint32_t index_offset;
     uint16_t stream_id;
     uint32_t start_time;
     uint32_t codec_data_size;
@@ -245,14 +245,14 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
     uint8_t  header_end;
 
     memset(&obj,0,sizeof(obj));
-    curpos = lseek(fd, 0, SEEK_SET);    
+    curpos = lseek(fd, 0, SEEK_SET);
     res = real_read_object_header(fd, &obj);
 
     if (obj.fourcc == FOURCC('.','r','a',0xfd))
     {
         /* Very old .ra format - not yet supported */
         return -1;
-    } 
+    }
     else if (obj.fourcc != FOURCC('.','R','M','F'))
     {
         return -1;
@@ -374,7 +374,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                         return -1;
                     else
                         skipped += temp;
-                } 
+                }
                 else if (v == FOURCC('L','S','D',':'))
                 {
                     DEBUGF("Real audio lossless is not supported.");
@@ -387,11 +387,11 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                      * other metadata. */
                     DEBUGF("Unknown header signature :\"%s\"\n", fourcc2str(v));
                 }
-                    
+
 
                 break;
 
-            case FOURCC('D','A','T','A'):             
+            case FOURCC('D','A','T','A'):
                 read_uint32be(fd,&rmctx->nb_packets);
                 skipped += 4;
                 read_uint32be(fd,&next_data_off);
@@ -401,7 +401,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                * nb_packets correction :
                *   in some samples, number of packets may not exactly form
                *   an integer number of scrambling units. This is corrected
-               *   by constructing a partially filled unit out of the few 
+               *   by constructing a partially filled unit out of the few
                *   remaining samples at the end of decoding.
                ***/
                 if(rmctx->nb_packets % rmctx->sub_packet_h)
@@ -409,8 +409,8 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
 
                 DEBUGF("    data_nb_packets = %ld\n",rmctx->nb_packets);
                 DEBUGF("    next DATA offset = %ld\n",next_data_off);
-                header_end = 1;         
-                break; 
+                header_end = 1;
+                break;
         }
         if(header_end) break;
         curpos = lseek(fd, obj.size - skipped, SEEK_CUR);
@@ -448,7 +448,7 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
         case CODEC_AC3:
             id3->codectype = AFMT_RM_AC3;
             break;
-        
+
         case CODEC_ATRAC:
             id3->codectype = AFMT_RM_ATRAC3;
             break;

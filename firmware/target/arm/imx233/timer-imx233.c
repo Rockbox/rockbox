@@ -33,7 +33,7 @@ static void timer_fn(void)
 bool timer_set(long cycles, bool start)
 {
     timer_stop();
-    
+
     if(start && pfn_unregister)
     {
         pfn_unregister();

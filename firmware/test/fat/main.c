@@ -208,7 +208,7 @@ int dbg_chkfile(char* name, int size)
         }
         block++;
     }
-    
+
     return close(fd);
 }
 
@@ -278,7 +278,7 @@ int dbg_wrtest(char* name)
         }
         block++;
     }
-    
+
     return close(fd);
 }
 
@@ -292,7 +292,7 @@ void dbg_type(char* name)
     if (fd<0)
         return;
     DEBUGF("Got file descriptor %d\n",fd);
-    
+
     while ( 1 ) {
         rc = read(fd, buf, size);
         if( rc > 0 )
@@ -388,7 +388,7 @@ int dbg_test(char* name)
 
         if (close(fd) < 0)
             return -1;
-    }    
+    }
 
     return 0;
 }
@@ -426,7 +426,7 @@ void dbg_tail(char* name)
     if (fd<0)
         return;
     DEBUGF("Got file descriptor %d\n",fd);
-    
+
     rc = lseek(fd,-SECTOR_SIZE,SEEK_END);
     if ( rc >= 0 ) {
         rc = read(fd, buf, SECTOR_SIZE);
@@ -459,7 +459,7 @@ int dbg_head(char* name)
     if (fd<0)
         return -1;
     DEBUGF("Got file descriptor %d\n",fd);
-    
+
     rc = read(fd, buf, SECTOR_SIZE*3);
     if( rc > 0 )
     {
@@ -564,7 +564,7 @@ int dbg_cmd(int argc, char *argv[])
     }
 
     if (!strcasecmp(cmd, "ds"))
-    {                    
+    {
         if ( arg1 ) {
             DEBUGF("secnum: %ld\n", strtol(arg1, NULL, 0));
             dbg_dump_sector(strtol(arg1, NULL, 0));
@@ -582,7 +582,7 @@ int dbg_cmd(int argc, char *argv[])
         if (arg1)
             return dbg_head(arg1);
     }
-            
+
     if (!strcasecmp(cmd, "tail"))
     {
         if (arg1)
@@ -691,7 +691,7 @@ int main(int argc, char *argv[])
     }
 
     for ( i=0; i<4; i++ ) {
-        if ( pinfo[i].type == PARTITION_TYPE_FAT32 
+        if ( pinfo[i].type == PARTITION_TYPE_FAT32
 #ifdef HAVE_FAT16SUPPORT
           || pinfo[i].type == PARTITION_TYPE_FAT16
 #endif
@@ -721,4 +721,3 @@ int main(int argc, char *argv[])
 
     return rc;
 }
-

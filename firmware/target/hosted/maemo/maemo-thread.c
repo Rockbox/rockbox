@@ -77,7 +77,7 @@ void get_battery_values(LibHalContext *ctx)
 }
 
 static void on_battery_changed (LibHalContext *ctx,
-                                  const char *udi, 
+                                  const char *udi,
                                   const char *key,
                                   dbus_bool_t is_removed,
                                   dbus_bool_t is_added)

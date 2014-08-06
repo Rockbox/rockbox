@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef __INTTYPES_H__
 #define __INTTYPES_H__
 

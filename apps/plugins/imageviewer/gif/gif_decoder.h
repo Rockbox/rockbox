@@ -32,4 +32,3 @@ struct gif_decoder {
 void gif_decoder_init(struct gif_decoder *decoder, void *mem, size_t size);
 void gif_open(char *filename, struct gif_decoder *d);
 void gif_decode(struct gif_decoder *d, void (*pf_progress)(int current, int total));
-

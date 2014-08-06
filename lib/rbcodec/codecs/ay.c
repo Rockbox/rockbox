@@ -2,7 +2,7 @@
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
 
 #include <codecs/lib/codeclib.h>
-#include "libgme/ay_emu.h" 
+#include "libgme/ay_emu.h"
 
 CODEC_HEADER
 
@@ -15,7 +15,7 @@ static struct Ay_Emu ay_emu;
 /****************** rockbox interface ******************/
 
 static void set_codec_track(int t, int multitrack) {
-    Ay_start_track(&ay_emu, t); 
+    Ay_start_track(&ay_emu, t);
 
     /* for loop mode we disable track limits */
     if (!ci->loop_track()) {
@@ -61,10 +61,10 @@ enum codec_status codec_run(void)
     DEBUGF("AY: next_track\n");
     if (codec_init()) {
         return CODEC_ERROR;
-    }  
+    }
 
     codec_set_replaygain(ci->id3);
-        
+
     /* Read the entire file */
     DEBUGF("AY: request file\n");
     ci->seek_buffer(0);
@@ -73,7 +73,7 @@ enum codec_status codec_run(void)
         DEBUGF("AY: file load failed\n");
         return CODEC_ERROR;
     }
-   
+
     if ((err = Ay_load_mem(&ay_emu, buf, ci->filesize))) {
         DEBUGF("AY: Ay_load_mem failed (%s)\n", err);
         return CODEC_ERROR;
@@ -115,7 +115,7 @@ next_track:
             elapsed_time = param;
             Track_seek(&ay_emu, param);
             ci->seek_complete();
-            
+
             /* Set fade again */
             if (!ci->loop_track()) {
                 Track_set_fade(&ay_emu, Track_get_length( &ay_emu, track ) - 4000, 4000);

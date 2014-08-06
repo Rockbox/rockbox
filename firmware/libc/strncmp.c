@@ -1,7 +1,7 @@
 /*
 FUNCTION
         <<strncmp>>---character string compare
-        
+
 INDEX
         strncmp
 
@@ -59,7 +59,7 @@ QUICKREF
 #error long int is not a 32bit or 64bit byte
 #endif
 
-int 
+int
 _DEFUN (strncmp, (s1, s2, n),
         _CONST char *s1 _AND
         _CONST char *s2 _AND

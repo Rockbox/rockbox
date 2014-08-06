@@ -198,7 +198,7 @@
     #define ECC_CNT_MASK  (7<<1)
     #define ECC_CNT       (1<<1)
     #define ECC_SLC       (1<<0)
-    
+
 #define ECC_BASE       (*(volatile unsigned long *)0x80000904)
 #define ECC_MASK       (*(volatile unsigned long *)0x80000908)
 #define ECC_CLR        (*(volatile unsigned long *)0x8000090c)

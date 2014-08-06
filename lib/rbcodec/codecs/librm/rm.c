@@ -86,7 +86,7 @@ static void print_cook_extradata(RMContext *rmctx) {
         DEBUGF("            joint_stereo_subband_start = %d\n",rm_get_uint16be(&rmctx->codec_extradata[12]));
         DEBUGF("            joint_stereo_vlc_bits = %d\n", rm_get_uint16be(&rmctx->codec_extradata[14]));
     }
-} 
+}
 
 
 struct real_object_t
@@ -216,9 +216,9 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
            read_uint8(fd, &unknown11);
            skipped += 1;
        }
-  
+
        switch(fourcc) {
-           case FOURCC('c','o','o','k'):               
+           case FOURCC('c','o','o','k'):
                rmctx->codec_type = CODEC_COOK;
                read_uint32be(fd, &rmctx->extradata_size);
                skipped += 4;
@@ -226,7 +226,7 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
                skipped += rmctx->extradata_size;
                break;
 
-           case FOURCC('a','t','r','c'):  
+           case FOURCC('a','t','r','c'):
                rmctx->codec_type = CODEC_ATRAC;
                read_uint32be(fd, &rmctx->extradata_size);
                skipped += 4;
@@ -250,8 +250,8 @@ static int real_read_audio_stream_info(int fd, RMContext *rmctx)
            default: /* Not a supported codec */
                return -1;
        }
-       
-       
+
+
        DEBUGF("        flavor = %d\n",flavor);
        DEBUGF("        coded_frame_size = %d\n",coded_framesize);
        DEBUGF("        sub_packet_h = %d\n",rmctx->sub_packet_h);
@@ -308,14 +308,14 @@ int real_parse_header(int fd, RMContext *rmctx)
     uint32_t next_data_off;
     uint8_t  header_end;
 
-    curpos = lseek(fd, 0, SEEK_SET);    
+    curpos = lseek(fd, 0, SEEK_SET);
     res = real_read_object_header(fd, &obj);
 
     if (obj.fourcc == FOURCC('.','r','a',0xfd))
     {
         /* Very old .ra format - not yet supported */
         return -1;
-    } 
+    }
     else if (obj.fourcc != FOURCC('.','R','M','F'))
     {
         return -1;
@@ -423,20 +423,20 @@ int real_parse_header(int fd, RMContext *rmctx)
 
                 break;
 
-            case FOURCC('D','A','T','A'):    
-                
+            case FOURCC('D','A','T','A'):
+
               read_uint32be(fd,&rmctx->nb_packets);
               skipped += 4;
               read_uint32be(fd,&next_data_off);
               skipped += 4;
               if (!rmctx->nb_packets && (rmctx->flags & 4))
-                  rmctx->nb_packets = 3600 * 25;        
+                  rmctx->nb_packets = 3600 * 25;
 
               /***
                * nb_packets correction :
                *   in some samples, number of packets may not exactly form
                *   an integer number of scrambling units. This is corrected
-               *   by constructing a partially filled unit out of the few 
+               *   by constructing a partially filled unit out of the few
                *   remaining samples at the end of decoding.
                ***/
               if(rmctx->nb_packets % rmctx->sub_packet_h)
@@ -444,8 +444,8 @@ int real_parse_header(int fd, RMContext *rmctx)
 
               DEBUGF("    data_nb_packets = %d\n",rmctx->nb_packets);
               DEBUGF("    next DATA offset = %d\n",next_data_off);
-              header_end = 1;           
-                break; 
+              header_end = 1;
+                break;
         }
         if(header_end) break;
         curpos = lseek(fd, obj.size - skipped, SEEK_CUR);
@@ -457,7 +457,7 @@ int real_parse_header(int fd, RMContext *rmctx)
 }
 
 void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
-{   
+{
     uint8_t unknown,packet_group;
     uint16_t x;
     uint16_t sps = rmctx->sub_packet_size;
@@ -501,7 +501,7 @@ void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
 #endif /*TEST*/
 
 int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
-{   
+{
     int consumed = 0;
     /* rockbox: comment 'set but unused' variables
     uint8_t unknown;
@@ -517,12 +517,12 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
         pkt->version       = rm_get_uint16be(*src);
 
         /* Simple error checking */
-        if(pkt->version != 0 && pkt->version != 1) 
+        if(pkt->version != 0 && pkt->version != 1)
         {
              DEBUGF("parsing packets failed\n");
              return -1;
         }
-        
+
         pkt->length        = rm_get_uint16be(*src+2);
         pkt->stream_number = rm_get_uint16be(*src+4);
         pkt->timestamp     = rm_get_uint32be(*src+6);
@@ -540,14 +540,14 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
             y = rmctx->sub_packet_cnt = 0;
         if (!y)
             rmctx->audiotimestamp = pkt->timestamp;
-        
+
         /* Skip packet header */
         advance_buffer(src, PACKET_HEADER_SIZE);
         consumed += PACKET_HEADER_SIZE;
         if (rmctx->codec_type == CODEC_COOK || rmctx->codec_type == CODEC_ATRAC) {
             for(x = 0 ; x < w/sps; x++)
             {
-                place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 
+                place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1));
                 pkt->frames[place/sps] = *src;
                 advance_buffer(src,sps);
                 consumed += sps;
@@ -562,16 +562,16 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
                     rmctx->sub_packet_lengths[x] = rm_get_uint16be(*src);
                     advance_buffer(src, 2);
                     consumed += 2;
-                }                
+                }
                 rmctx->audio_pkt_cnt = --rmctx->sub_packet_cnt;
             }
-        } 
+        }
 
         else if (rmctx->codec_type == CODEC_AC3) {
         /* The byte order of the data is reversed from standard AC3 */
             for(x = 0; x < pkt->length - PACKET_HEADER_SIZE; x+=2) {
                 SWAP((*src)[0], (*src)[1]);
-                *src += 2;                                
+                *src += 2;
             }
             *src -= x;
         }

@@ -307,4 +307,3 @@ static inline int32_t VFLOAT_ADD(int32_t a,int32_t ap,
 }
 
 #endif
-

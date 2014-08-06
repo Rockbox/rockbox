@@ -1,6 +1,6 @@
 /*
  * time.h
- * 
+ *
  * Struct declaration for dealing with time.
  */
 
@@ -43,9 +43,7 @@ time_t mktime(struct tm *t);
 #ifdef __PCTOOL__
 /* this time.h does not define struct timespec,
    so tell sys/stat.h not to use it */
-#undef __USE_MISC  
+#undef __USE_MISC
 #endif
 
 #endif /* _TIME_H_ */
-
-

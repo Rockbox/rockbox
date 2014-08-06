@@ -50,12 +50,12 @@
 /* Only some targets are too slow for gaussian and realtime BRR decode */
 #if defined(CPU_COLDFIRE)
     /* Cache BRR waves */
-    #define SPC_BRRCACHE 1 
+    #define SPC_BRRCACHE 1
     /* Disable gaussian interpolation */
     #define SPC_NOINTERP 1
 #elif defined (CPU_PP)
     /* Cache BRR waves */
-    #define SPC_BRRCACHE 1 
+    #define SPC_BRRCACHE 1
     /* Disable gaussian interpolation */
     #define SPC_NOINTERP 1
 #if !SPC_DUAL_CORE
@@ -226,7 +226,7 @@ struct raw_voice_t
     int8_t  outx;       /* current sample */
     int8_t  unused [6];
 };
-    
+
 struct globals_t
 {
     int8_t  unused1 [12];
@@ -332,7 +332,7 @@ struct Spc_Dsp;
 #include "cpu/spc_dsp_coldfire.h"
 #endif
 
-/* Above may still use generic implementations. Also defines final 
+/* Above may still use generic implementations. Also defines final
    function names. */
 #include "spc_dsp_generic.h"
 
@@ -349,7 +349,7 @@ struct Spc_Dsp
         struct globals_t g;
         int16_t align;
     } r;
-    
+
     int keys_down;
     int noise_count;
     uint16_t noise; /* also read as int16_t */
@@ -359,7 +359,7 @@ struct Spc_Dsp
     unsigned echo_pos;
     struct echo_filter fir;
 #endif /* !SPC_NOECHO */
-    
+
 #if SPC_BRRCACHE
     unsigned oldsize;
     struct cache_entry_t wave_entry     [256];
@@ -378,13 +378,13 @@ static inline void DSP_run( struct Spc_Dsp* this, long count, int32_t* out )
     /* during this run so it seems it should keep resetting every sample. */
     if ( this->r.g.flags & 0x80 )
         DSP_reset( this );
-    
+
     DSP_run_( this, count, out );
 }
 
 /**************** SPC emulator ****************/
 /* 1.024 MHz clock / 32000 samples per second */
-enum { CLOCKS_PER_SAMPLE = 32 }; 
+enum { CLOCKS_PER_SAMPLE = 32 };
 
 enum { EXTRA_CLOCKS = CLOCKS_PER_SAMPLE / 2 };
 
@@ -410,14 +410,14 @@ struct Spc_Emu
 {
     uint8_t cycle_table [0x100];
     struct cpu_regs_t r;
-    
+
     int32_t* sample_buf;
     long next_dsp;
     int rom_enabled;
     int extra_cycles;
-    
+
     struct Timer timer [TIMER_COUNT];
-    
+
     /* large objects at end */
     struct Spc_Dsp dsp;
     uint8_t extra_ram [ROM_SIZE];

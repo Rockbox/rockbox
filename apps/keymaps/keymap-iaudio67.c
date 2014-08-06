@@ -65,7 +65,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_SKIPPREV,      BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
     { ACTION_WPS_SEEKBACK,      BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,      BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT|BUTTON_REPEAT },
-    
+
     { ACTION_WPS_SKIPNEXT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
     { ACTION_WPS_SEEKFWD,       BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE  },
     { ACTION_WPS_STOPSEEK,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
@@ -156,13 +156,13 @@ static const struct button_mapping button_context_quickscreen[]  = {
 #if 0
     { ACTION_NONE,              BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_MENU|BUTTON_REL,        BUTTON_NONE },
-    
+
     { ACTION_QS_TOP,            BUTTON_VOLUP|BUTTON_REL,           BUTTON_NONE },
     { ACTION_QS_TOP,        BUTTON_VOLUP|BUTTON_REPEAT,        BUTTON_NONE },
 
     { ACTION_QS_DOWN,           BUTTON_VOLDOWN|BUTTON_REL,         BUTTON_NONE },
     { ACTION_QS_DOWN,           BUTTON_VOLDOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    
+
     { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
     { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
@@ -176,7 +176,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 #if 0
     { ACTION_SETTINGS_INC,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
-    
+
     { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
@@ -192,13 +192,13 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 
     { ACTION_PS_DEC_SMALL,      BUTTON_VOLDOWN,                    BUTTON_NONE },
     { ACTION_PS_DEC_BIG,        BUTTON_VOLDOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    
+
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
-    
+
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
-    
+
     { ACTION_PS_RESET,          BUTTON_PLAY,                  BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_MENU,                   BUTTON_NONE },
 

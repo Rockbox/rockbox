@@ -63,10 +63,10 @@ static unsigned long char_patterns[NB_SLOTS];
 #endif
 
 const struct picture jackpot_pictures[]={
-    {jackpot_slots, BMPWIDTH_jackpot_slots, BMPHEIGHT_jackpot_slots, 
+    {jackpot_slots, BMPWIDTH_jackpot_slots, BMPHEIGHT_jackpot_slots,
             PICTURE_HEIGHT},
 #if NB_SCREENS==2
-    {jackpot_slots_remote,BMPWIDTH_jackpot_slots_remote, 
+    {jackpot_slots_remote,BMPWIDTH_jackpot_slots_remote,
             BMPHEIGHT_jackpot_slots_remote, REMOTE_PICTURE_HEIGHT}
 #endif
 };

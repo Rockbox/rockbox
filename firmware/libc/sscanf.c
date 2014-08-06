@@ -68,7 +68,7 @@ static int parse_chars(int (*peek)(void *userp),
 
         n++;
         (*pop)(userp);
-    } 
+    }
 
     if(fake==false)
         (*pt)='\0';
@@ -84,7 +84,7 @@ static int parse_hex(int (*peek)(void *userp),
     unsigned long v = 0;
     int n = 0;
     char ch;
-    
+
     ch = (*peek)(userp);
     if (!my_isxdigit(ch))
         return -1;
@@ -213,7 +213,7 @@ static int scan(int (*peek)(void *userp),
                                 {
                                     *(va_arg(ap, long *)) = lval;
                                     n++;
-                                }    
+                                }
                                 n_chars += r;
                             }
                             else

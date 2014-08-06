@@ -45,4 +45,3 @@ void *lru_data(struct lru* pl, short handle);
 void lru_traverse(struct lru* pl, void (*callback)(void* data));
 
 #endif /* LRU_H */
-

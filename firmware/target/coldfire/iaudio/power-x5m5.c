@@ -32,7 +32,7 @@ void power_init(void)
     /* Charger detect */
     and_l(~0x01000000, &GPIO1_ENABLE);
     or_l(0x01000000, &GPIO1_FUNCTION);
-    
+
     pcf50606_init();
 }
 

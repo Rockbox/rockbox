@@ -39,4 +39,3 @@ void counter_get_elapsed_time(struct counter* counter, struct time* elapsed_time
     elapsed_time->month=0;
     elapsed_time->year=0;
 }
-

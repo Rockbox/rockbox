@@ -29,9 +29,9 @@
 
 void usb_init_device(void) {
     logf("mxx: SOC Init");
-    
+
     udelay(100);
-    
+
     /* Drive the reset pin low */
     IO_GIO_BITCLR0  = 1<<2;
 
@@ -40,7 +40,7 @@ void usb_init_device(void) {
 
     /* Release the reset (drive it high) */
     IO_GIO_BITSET0  = 1<<2;
-    
+
     udelay(500);
 
     /* Enable the MXX interrupt */
@@ -56,9 +56,8 @@ void GIO3 (void) {
      *
      * The M66591 interrupt line is attached to GPIO3.
      */
-    IO_INTC_IRQ1 = (1<<8); 
-    
+    IO_INTC_IRQ1 = (1<<8);
+
     /* Start the full handler which is located in the driver */
     USB_DEVICE();
 }
-

@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2010 by Marcin Bukat
  *
- * code taken mostly from mkboot.c 
+ * code taken mostly from mkboot.c
  * Copyright (C) 2005 by Linus Nielsen Feltzing
  *
  * This program is free software; you can redistribute it and/or
@@ -72,7 +72,7 @@ static long checksum(unsigned char* buf, int model, unsigned long length)
 {
     unsigned long chksum = model;
     unsigned long i;
-    
+
     if(buf == NULL)
         return -1;
 
@@ -106,7 +106,7 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     i = fread(image, 1, OF_FIRMWARE_LEN, f);
     if(i < OF_FIRMWARE_LEN)
     {
-        fprintf(stderr, "[ERR]  %s file read error\n", infile);        
+        fprintf(stderr, "[ERR]  %s file read error\n", infile);
         fclose(f);
         return -2;
     }
@@ -114,7 +114,7 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
     fclose(f);
 
     /* Now check if we have OF file loaded based on presence
-     * of the version string in firmware 
+     * of the version string in firmware
      */
 
     for(model_index = 0; model_index < NUM_MODELS; model_index++)
@@ -214,7 +214,7 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
 
     fprintf(stderr, "[INFO] Patching reset vector\n");
 
-    /* Patch the stack pointer address */    
+    /* Patch the stack pointer address */
     image[0] = image[origin + 0];
     image[1] = image[origin + 1];
     image[2] = image[origin + 2];
@@ -236,8 +236,8 @@ int mkmpioboot(const char* infile, const char* bootfile, const char* outfile, in
 
     fprintf(stderr,"[INFO] Wrote 0x%x bytes in %s\n", OF_FIRMWARE_LEN, outfile);
     fprintf(stderr,"[INFO] Patching succeeded!\n");
-   
+
     fclose(f);
-    
+
     return 0;
 }

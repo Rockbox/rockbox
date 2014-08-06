@@ -28,7 +28,7 @@ PLUGIN_HEADER
 /*
  * EXIT_MAGIC magic, because 0 cannot be used due to setjmp()
  * must be > 0
- */                      
+ */
 #define EXIT_MAGIC 0x0CDEBABE
 
 extern enum plugin_status plugin_start(const void*);

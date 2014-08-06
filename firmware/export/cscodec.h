@@ -24,4 +24,3 @@ void cscodec_write(int reg, unsigned char data);
 void cscodec_power(bool state);
 void cscodec_clock(bool state);
 void cscodec_reset(bool state);
-

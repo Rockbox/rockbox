@@ -737,4 +737,3 @@ UnwResult UnwStartThumb(UnwState * const state)
 #endif /* UPGRADE_ARM_STACK_UNWIND */
 
 /* END OF FILE */
-

@@ -9,14 +9,14 @@
 #undef WIN32
 
 #ifndef NO_MMSUPP_DEFINES
-#define snprintf(...)		rb->snprintf(__VA_ARGS__)
-#define fdprintf(...)		rb->fdprintf(__VA_ARGS__)
-#define vsnprintf(...)		rb->vsnprintf(__VA_ARGS__)
+#define snprintf(...)           rb->snprintf(__VA_ARGS__)
+#define fdprintf(...)           rb->fdprintf(__VA_ARGS__)
+#define vsnprintf(...)          rb->vsnprintf(__VA_ARGS__)
 
-#define srand(a)			rb->srand(a)
-#define rand()				rb->rand()
-#define qsort(a,b,c,d)		rb->qsort(a,b,c,d)
-#define atoi(a)				rb->atoi(a)
+#define srand(a)                        rb->srand(a)
+#define rand()                          rb->rand()
+#define qsort(a,b,c,d)          rb->qsort(a,b,c,d)
+#define atoi(a)                         rb->atoi(a)
 
 #undef strlen
 #define strlen(a)           rb->strlen(a)
@@ -30,23 +30,23 @@
 #define strcasecmp(a,b)     rb->strcasecmp(a,b)
 
 #undef open
-#define open(a,b)		rb->open(a,b)
+#define open(a,b)               rb->open(a,b)
 #undef lseek
-#define lseek(a,b,c)	rb->lseek(a,b,c)
+#define lseek(a,b,c)    rb->lseek(a,b,c)
 #undef close
-#define close(a)		rb->close(a)
+#define close(a)                rb->close(a)
 #undef read
-#define read(a,b,c)		rb->read(a,b,c)
+#define read(a,b,c)             rb->read(a,b,c)
 #undef write
-#define write(a,b,c)	rb->write(a,b,c)
+#define write(a,b,c)    rb->write(a,b,c)
 #undef filesize
-#define filesize(a)		rb->filesize(a)
+#define filesize(a)             rb->filesize(a)
 #endif
 
-#define malloc(x)		tlsf_malloc(x)
-#define free(x)			tlsf_free(x)
-#define realloc(x,y)	tlsf_realloc(x,y)
-#define calloc(x,y)		tlsf_calloc(x,y)
+#define malloc(x)               tlsf_malloc(x)
+#define free(x)                 tlsf_free(x)
+#define realloc(x,y)    tlsf_realloc(x,y)
+#define calloc(x,y)             tlsf_calloc(x,y)
 
 #undef strncat
 #define strncat mmsupp_strncat
@@ -64,8 +64,8 @@ int mmsupp_sprintf(char *buf, const char *fmt, ... );
 extern const struct plugin_api * rb;
 
 
-#ifdef SIMULATOR 
-#define SAMPLE_RATE SAMPR_44		/* Simulator requires 44100Hz */
+#ifdef SIMULATOR
+#define SAMPLE_RATE SAMPR_44            /* Simulator requires 44100Hz */
 #else
 #if (HW_SAMPR_CAPS & SAMPR_CAP_22)  /* use 22050Hz if we can */
 #define SAMPLE_RATE SAMPR_22        /* 22050 */

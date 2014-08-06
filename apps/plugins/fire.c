@@ -176,7 +176,7 @@ static inline void fire_convolve(struct fire* fire)
             break;
 
         case 1:
-            mult -= 2; 
+            mult -= 2;
             do{
                 pixel_value = ptr[FIRE_WIDTH-1]  /* fire[y+1][x-1] */
                         + ptr[FIRE_WIDTH]    /* fire[y+1][x] */
@@ -374,7 +374,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     ret = main();
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif

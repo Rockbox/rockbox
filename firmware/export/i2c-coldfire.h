@@ -24,16 +24,16 @@
  *  2005-02-17 hubble@mochine.com
  *
  */
- 
+
 #ifndef _I2C_COLDFIRE_H
 #define _I2C_COLDFIRE_H
 
 #include "cpu.h"
 
 void i2c_init(void);
-int i2c_read (volatile unsigned char *iface, unsigned char addr, 
+int i2c_read (volatile unsigned char *iface, unsigned char addr,
               unsigned char *buf, int count);
-int i2c_write(volatile unsigned char *iface, unsigned char addr, 
+int i2c_write(volatile unsigned char *iface, unsigned char addr,
               const unsigned char *buf, int count);
 void i2c_close(void);
 void i2c_adjust_prescale(int multiplier);

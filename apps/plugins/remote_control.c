@@ -220,4 +220,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return rc;
 }
-

@@ -40,13 +40,13 @@ bool backdrop_load(const char* filename, char *backdrop_buffer)
     return ((ret > 0)
             && (bm.width == LCD_WIDTH) && (bm.height == LCD_HEIGHT));
 }
-  
-  
+
+
 void backdrop_show(char *backdrop_buffer)
 {
     lcd_set_backdrop((fb_data*)backdrop_buffer);
 }
-  
+
 
 #if defined(HAVE_REMOTE_LCD)
 

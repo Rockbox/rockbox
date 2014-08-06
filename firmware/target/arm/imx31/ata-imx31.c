@@ -395,12 +395,12 @@ static void ata_set_udma_timings(unsigned int mode)
     ATA_TIME_RPX = (timings->time_rpx + T) / T;
     ATA_TIME_ZAH = (timings->time_zah + T) / T;
     ATA_TIME_MLIX = (timings->time_mlix + T) / T;
-    ATA_TIME_DVH = (timings->time_dvh + T) / T + 1; 
-    ATA_TIME_DZFS = (timings->time_dzfs + T) / T; 
-    ATA_TIME_DVS = (timings->time_dvs + T) / T; 
-    ATA_TIME_CVH = (timings->time_cvh + T) / T; 
-    ATA_TIME_SS = (timings->time_ss + T) / T;      
-    ATA_TIME_CYC = (timings->time_cyc + T) / T;     
+    ATA_TIME_DVH = (timings->time_dvh + T) / T + 1;
+    ATA_TIME_DZFS = (timings->time_dzfs + T) / T;
+    ATA_TIME_DVS = (timings->time_dvs + T) / T;
+    ATA_TIME_CVH = (timings->time_cvh + T) / T;
+    ATA_TIME_SS = (timings->time_ss + T) / T;
+    ATA_TIME_CYC = (timings->time_cyc + T) / T;
 }
 
 void ata_dma_set_mode(unsigned char mode)
@@ -652,7 +652,7 @@ static int ata_wait_status(unsigned status, unsigned mask, int timeout)
 {
     long busy_timeout = usec_timer() + 2;
     long end_tick = current_tick + timeout;
-    
+
     while (1)
     {
         if ((ATA_DRIVE_STATUS & mask) == status)

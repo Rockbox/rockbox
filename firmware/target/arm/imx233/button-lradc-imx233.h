@@ -42,7 +42,7 @@
  * and do the following comparison:
  *      lradc_value <=? imx233_button_lradc_mapping[i] * vddio_ref / vddio_value
  * where vddio_ref is IMX233_BUTTON_LRADC_VDDIO.
- * 
+ *
  * The available values of IMX233_BUTTON_LRADC_HOLD are:
  * - BLH_ADC: detect hold using adc
  * - BLH_EXT: target button driver implements imx233_button_lradc_hold() using

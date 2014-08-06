@@ -91,9 +91,9 @@ static const short sin_table[91] =
  *        2*pi respectively.
  * @param cos return address for cos
  * @return sin of phase, value is a signed value from LONG_MIN to LONG_MAX,
- *         representing -1 and 1 respectively. 
+ *         representing -1 and 1 respectively.
  */
-long fp_sincos(unsigned long phase, long *cos) 
+long fp_sincos(unsigned long phase, long *cos)
 {
     int32_t x, x1, y, y1;
     unsigned long z, z1;
@@ -149,7 +149,7 @@ long fp_sincos(unsigned long phase, long *cos)
  * @return Square root of argument in same fixed point format as input.
  *
  * This routine has been modified to run longer for greater precision,
- * but cuts calculation short if the answer is reached sooner. 
+ * but cuts calculation short if the answer is reached sooner.
  */
 long fp_sqrt(long x, unsigned int fracbits)
 {
@@ -187,7 +187,7 @@ unsigned long isqrt(unsigned long x)
     unsigned long g = 0;
     int bshift = 15;
     unsigned long b = 1ul << bshift;
-    
+
     do
     {
         unsigned long temp = (g + g + b) << bshift;
@@ -321,7 +321,7 @@ long fp16_exp(int x)
 }
 
 /** MODIFIED FROM replaygain.c */
- 
+
 #define FP_MUL_FRAC(x, y) fp_mul(x, y, fracbits)
 #define FP_DIV_FRAC(x, y) fp_div(x, y, fracbits)
 
@@ -350,7 +350,7 @@ long fp_exp10(long x, unsigned int fracbits)
     long z;
     long R;
     long xp;
-    
+
     /* scale constants */
     const long fp_one       = (1 << fracbits);
     const long fp_half      = (1 << (fracbits - 1));
@@ -362,30 +362,30 @@ long fp_exp10(long x, unsigned int fracbits)
     const long fp_exp_zero  = (FP28_EXP_ZERO    >> (28 - fracbits));
     const long fp_exp_one   = (FP28_EXP_ONE     >> (28 - fracbits));
     const long fp_exp_two   = (FP28_EXP_TWO     >> (28 - fracbits));
-    
+
     /* exp(0) = 1 */
     if (x == 0)
     {
         return fp_one;
     }
-    
+
     /* convert from base 10 to base e */
     x = FP_MUL_FRAC(x, fp_ln10);
-    
+
     /* calculate exp(x) */
     k = (FP_MUL_FRAC(abs(x), fp_ln2_inv) + fp_half) & ~fp_mask;
-    
+
     if (x < 0)
     {
         k = -k;
     }
-    
+
     x -= FP_MUL_FRAC(k, fp_ln2);
     z = FP_MUL_FRAC(x, x);
     R = fp_two + FP_MUL_FRAC(z, fp_exp_zero + FP_MUL_FRAC(z, fp_exp_one
         + FP_MUL_FRAC(z, fp_exp_two)));
     xp = fp_one + FP_DIV_FRAC(FP_MUL_FRAC(fp_two, x), R - x);
-    
+
     if (k < 0)
     {
         k = fp_one >> (-k >> fracbits);
@@ -394,7 +394,7 @@ long fp_exp10(long x, unsigned int fracbits)
     {
         k = fp_one << (k >> fracbits);
     }
-    
+
     return FP_MUL_FRAC(k, xp);
 }
 
@@ -409,7 +409,7 @@ long fp_log10(long n, unsigned int fracbits)
     const long fp_one       = (1 << fracbits);
     const long fp_two       = (2 << fracbits);
     const long tolerance    = (1 << ((fracbits / 2) + 2));
-    
+
     if (n <=0) return FP_NEGINF;
     log2 = 0;
 
@@ -424,7 +424,7 @@ long fp_log10(long n, unsigned int fracbits)
         log2 += fp_one;
         n >>= 1;
     }
-    
+
     /* fractional part */
     frac = fp_one;
     while (frac > tolerance)
@@ -437,7 +437,7 @@ long fp_log10(long n, unsigned int fracbits)
             log2 += frac;
         }
     }
-    
+
     /* convert log2 to log10 */
     return FP_MUL_FRAC(log2, (FP28_LOG10OF2 >> (28 - fracbits)));
 }

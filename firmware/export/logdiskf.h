@@ -76,5 +76,3 @@ void _logdiskf(const char* file, const char level,
 
 #endif
 #endif /* LOGDISKF_H */
-    
-    

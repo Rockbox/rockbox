@@ -46,8 +46,8 @@ bool get_monkeys_metadata(int fd, struct mp3entry* id3)
     {
         return rc;
     }
-    
-    if (memcmp(buf, "MAC ", 4) != 0) 
+
+    if (memcmp(buf, "MAC ", 4) != 0)
     {
         return rc;
     }
@@ -71,8 +71,8 @@ bool get_monkeys_metadata(int fd, struct mp3entry* id3)
         finalframeblocks = get_long_le(header+8);
         totalframes = get_long_le(header+12);
         id3->frequency = get_long_le(header+20);
-    } 
-    else 
+    }
+    else
     {
         /* v3.95 and later files all have a fixed framesize */
         blocksperframe = 73728 * 4;

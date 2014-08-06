@@ -723,7 +723,7 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
 
     case USB_TYPE_CLASS:
     {
-        logf("req %d %s", req->bRequest, 
+        logf("req %d %s", req->bRequest,
             (req->bRequest == USB_HID_SET_IDLE) ? "set idle" :
             ((req->bRequest == USB_HID_SET_REPORT) ? "set report" : ""));
         switch (req->bRequest)

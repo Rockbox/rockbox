@@ -8,7 +8,7 @@
  * $Id$
  *
  * Profiling routines counts ticks and calls to each profiled function.
- * 
+ *
  * Copyright (C) 2005 by Brandon Low
  *
  * This program is free software; you can redistribute it and/or
@@ -138,7 +138,7 @@ void profile_thread_started(int current_thread) {
         /* if profiling was busy or idle */
         if (profiling < PROF_ERROR) {
             /* After we de-mask, if profiling is active, reactivate the timer */
-            timer_register(0, profile_timer_unregister, 
+            timer_register(0, profile_timer_unregister,
                     TIMER_FREQ/10000, profile_timer_tick IF_COP(, 0 ) );
         }
     }
@@ -174,9 +174,9 @@ void profstart(int current_thread) {
 
 static void write_function_recursive(int fd, struct pfd_struct *pfd, int depth){
     unsigned short link = pfd->link;
-    fdprintf(fd,"0x%08lX\t%08ld\t%08ld\t%04d\n", (size_t)pfd->self_pc, 
+    fdprintf(fd,"0x%08lX\t%08ld\t%08ld\t%04d\n", (size_t)pfd->self_pc,
             pfd->count, pfd->time, depth);
-    if (link > 0 && link < NUMPFDS) { 
+    if (link > 0 && link < NUMPFDS) {
         write_function_recursive(fd, &pfds[link], ++depth);
     }
 }
@@ -199,7 +199,7 @@ void profstop() {
     fdprintf(fd,"FUNCTION_PC\tCALL_COUNT\tTICKS\t\tDEPTH\n");
     for (i = 0; i < INDEX_SIZE; i++) {
         current_index = indices[i];
-        if (current_index != 0) { 
+        if (current_index != 0) {
             write_function_recursive(fd, &pfds[current_index], 0);
         }
     }
@@ -337,7 +337,3 @@ overflow:
     profiling = PROF_ERROR;
     return;
 }
-
-
-
-

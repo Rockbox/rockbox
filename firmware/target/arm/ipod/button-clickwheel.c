@@ -57,8 +57,8 @@
 
 #define WHEELCLICKS_PER_ROTATION     96 /* wheelclicks per full rotation */
 
-/* This amount of clicks is needed for at least scrolling 1 item. Choose small values 
- * to have high sensitivity but few precision, choose large values to have less 
+/* This amount of clicks is needed for at least scrolling 1 item. Choose small values
+ * to have high sensitivity but few precision, choose large values to have less
  * sensitivity and good precision. */
 #if defined(IPOD_NANO) || defined(IPOD_NANO2G)
 #define WHEEL_SENSITIVITY 6 /* iPod nano has smaller wheel, lower sensitivity needed */
@@ -106,13 +106,13 @@ static inline int ipod_4g_button_read(void)
     int whl = -1;
     int btn = BUTTON_NONE;
 
-#ifdef CPU_PP    
-    if ((inl(0x7000c104) & 0x04000000) != 0) 
+#ifdef CPU_PP
+    if ((inl(0x7000c104) & 0x04000000) != 0)
     {
 #endif
         unsigned status = CLICKWHEEL_DATA;
 
-        if ((status & 0x800000ff) == 0x8000001a) 
+        if ((status & 0x800000ff) == 0x8000001a)
         {
             if (status & 0x00000100)
                 btn |= BUTTON_SELECT;
@@ -124,18 +124,18 @@ static inline int ipod_4g_button_read(void)
                 btn |= BUTTON_PLAY;
             if (status & 0x00001000)
                 btn |= BUTTON_MENU;
-            if (status & 0x40000000) 
+            if (status & 0x40000000)
             {
                 unsigned long usec = USEC_TIMER;
-                
+
                 /* Highest wheel = 0x5F, clockwise increases */
                 new_wheel_value = (status >> 16) & 0x7f;
                 whl = new_wheel_value;
-                
+
                 /* switch on backlight (again), reset power-off timer */
                 backlight_on();
                 reset_poweroff_timer();
-                
+
                 /* Check whether the scrollwheel was untouched by accident or by will. */
                 /* This is needed because wheel may be untoched very shortly during rotation */
                 if ( (!wheel_is_touched) && TIME_AFTER(usec, last_wheel_usec + WHEEL_UNTOUCH_TIMEOUT) )
@@ -158,36 +158,36 @@ static inline int ipod_4g_button_read(void)
                     wheel_delta = new_wheel_value - old_wheel_value;
                     unsigned int wheel_keycode = BUTTON_NONE;
 
-                    /* Taking into account wrapping during transition from highest 
+                    /* Taking into account wrapping during transition from highest
                      * to lowest wheel position and back */
                     if      (wheel_delta < -WHEELCLICKS_PER_ROTATION/2)
                         wheel_delta += WHEELCLICKS_PER_ROTATION; /* Forward wrapping case */
                     else if (wheel_delta >  WHEELCLICKS_PER_ROTATION/2)
                         wheel_delta -= WHEELCLICKS_PER_ROTATION; /* Backward wrapping case */
-    
+
                     /* Getting direction and wheel_keycode from wheel_delta.
                      * Need at least some clicks to be sure to avoid haptic fuzziness */
                     if      (wheel_delta >=  WHEEL_SENSITIVITY)
                         wheel_keycode = BUTTON_SCROLL_FWD;
                     else if (wheel_delta <= -WHEEL_SENSITIVITY)
                         wheel_keycode = BUTTON_SCROLL_BACK;
-                    else 
+                    else
                         wheel_keycode = BUTTON_NONE;
 
                     if (wheel_keycode != BUTTON_NONE)
                     {
                         long v = (usec - last_wheel_usec) & 0x7fffffff;
-                        
+
                         /* undo signedness */
                         wheel_delta = (wheel_delta>0) ? wheel_delta : -wheel_delta;
-                        
+
                         /* add the current wheel_delta */
                         accumulated_wheel_delta += wheel_delta;
 
                         v = v ? (1000000 * wheel_delta) / v : 0;  /* clicks/sec = 1000000 * clicks/usec */
                         v = (v * 360) / WHEELCLICKS_PER_ROTATION; /* conversion to degree/sec */
                         v = (v<0) ? -v : v;                       /* undo signedness */
-            
+
                         /* some velocity filtering to smooth things out */
                         wheel_velocity = (15 * wheel_velocity + v) / 16;
                         /* limit to 24 bit */
@@ -195,7 +195,7 @@ static inline int ipod_4g_button_read(void)
 
                         /* assume REPEAT = off */
                         repeat = 0;
-                        
+
                         /* direction reversals must nullify acceleration and accumulator */
                         if (wheel_keycode != wheel_repeat)
                         {
@@ -216,7 +216,7 @@ static inline int ipod_4g_button_read(void)
                         }
 
 #ifdef HAVE_WHEEL_POSITION
-                        if (send_events) 
+                        if (send_events)
 #endif
                         /* The queue should have no other events when scrolling */
                         if (queue_empty(&button_queue))
@@ -228,11 +228,11 @@ static inline int ipod_4g_button_read(void)
                             /* always use acceleration mode (1<<31) */
                             /* always set message post count to (1<<24) for iPod */
                             /* this way the scrolling is always calculated from wheel_velocity */
-                            queue_post(&button_queue, wheel_keycode | repeat, 
+                            queue_post(&button_queue, wheel_keycode | repeat,
                                        (1<<31) | (1 << 24) | wheel_velocity);
-                                       
+
 #else
-                            queue_post(&button_queue, wheel_keycode | repeat, 
+                            queue_post(&button_queue, wheel_keycode | repeat,
                                        (accumulated_wheel_delta << 16) | new_wheel_value);
 #endif
                             accumulated_wheel_delta = 0;
@@ -251,7 +251,7 @@ static inline int ipod_4g_button_read(void)
             else
             {
                 /* In this case the finger was lifted from the scrollwheel. */
-                wheel_is_touched = false; 
+                wheel_is_touched = false;
             }
 
         }
@@ -272,7 +272,7 @@ static inline int ipod_4g_button_read(void)
         }
 #endif
 
-#ifdef CPU_PP    
+#ifdef CPU_PP
     }
 #endif
 
@@ -288,7 +288,7 @@ int wheel_status(void)
 {
     return wheel_position;
 }
- 
+
 void wheel_send_events(bool send)
 {
     send_events = send;
@@ -300,12 +300,12 @@ void ipod_4g_button_int(void)
 {
     CPU_HI_INT_DIS = I2C_MASK;
 
-    /* The following delay was 250 in the ipodlinux source, but 50 seems to 
+    /* The following delay was 250 in the ipodlinux source, but 50 seems to
        work fine - tested on Nano, Color/Photo and Video. */
     udelay(50);
 
     int_btn = ipod_4g_button_read();
-    
+
     outl(inl(0x7000c104) | 0x0c000000, 0x7000c104);
     outl(0x400a1f00, 0x7000c100);
 
@@ -315,11 +315,11 @@ void ipod_4g_button_int(void)
 void button_init_device(void)
 {
     opto_i2c_init();
-    
+
     /* hold button - enable as input */
     GPIOA_ENABLE |= 0x20;
-    GPIOA_OUTPUT_EN &= ~0x20; 
-    
+    GPIOA_OUTPUT_EN &= ~0x20;
+
     /* unmask interrupt */
     CPU_INT_EN = HI_MASK;
     CPU_HI_INT_EN = I2C_MASK;
@@ -430,7 +430,7 @@ int button_read_device(void)
 #ifndef BOOTLOADER
         backlight_hold_changed(hold_button);
 #endif
-        
+
         if (hold_button)
         {
 #ifdef CPU_PP

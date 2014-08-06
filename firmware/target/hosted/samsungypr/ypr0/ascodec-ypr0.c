@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * 
+ *
  * Module wrapper for AS3543 audio codec, using /dev/afe (afe.ko) of Samsung YP-R0
  *
  * Copyright (c) 2011-2013 Lorenzo Miori
@@ -122,7 +122,7 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
  * adc-as3514.c to protect against other threads corrupting the result by using
  * the ADC at the same time. this adc_read() doesn't yield but blocks, so
  * lock/unlock is not needed
- * 
+ *
  * Additionally, concurrent ascodec_?(read|write) calls are instead protected
  * by the R0's Kernel I2C driver for ascodec (mutexed), so it's automatically
  * safe
@@ -139,7 +139,7 @@ void ascodec_unlock(void)
 bool ascodec_chg_status(void)
 {
     return ascodec_read(AS3514_IRQ_ENRD0) & CHG_STATUS;
-}   
+}
 
 bool ascodec_endofch(void)
 {

@@ -44,13 +44,13 @@ void button_init_device(void)
     S3C2440_GPIO_PULLUP (GPGUP, 6, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPGUP, 7, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPGUP, 11, GPIO_PULLUP_ENABLE);
-    
+
     /* These are additional buttons on my add on keypad */
     S3C2440_GPIO_CONFIG (GPGCON, 9, GPIO_INPUT);
     S3C2440_GPIO_CONFIG (GPGCON, 10, GPIO_INPUT);
     S3C2440_GPIO_PULLUP (GPGUP, 9, GPIO_PULLUP_ENABLE);
     S3C2440_GPIO_PULLUP (GPGUP, 10, GPIO_PULLUP_ENABLE);
-    
+
     /* init touchscreen */
     touchscreen_init_device();
 }
@@ -70,9 +70,9 @@ int button_read_device(int* data)
     /* Read the buttons - active low */
     btn = (GPGDAT & BUTTON_MAIN) ^ BUTTON_MAIN;
 
-    /* read touchscreen */ 
+    /* read touchscreen */
     btn |= touchscreen_read_device(data, &old_data);
-    
+
     return btn;
 }
 
@@ -89,4 +89,3 @@ bool headphones_inserted(void)
     return false;
 }
 #endif /* HAVE_HEADPHONE_DETECTION */
-

@@ -65,4 +65,3 @@ class SelectiveInstallWidget : public QWidget
 };
 
 #endif
-

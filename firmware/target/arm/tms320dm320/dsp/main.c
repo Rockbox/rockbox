@@ -89,10 +89,10 @@ void main(void) {
             ((unsigned short *)&status)[3]);
         return;
     }
-    
+
     memcpy(&init, (void *)&status.payload.init, sizeof(init));
 #endif
-    
+
 #ifdef IPC_SIZES
     debugf("sizeof(ipc_message)=%uw offset(ipc_message.payload)=%uw",
         sizeof(struct ipc_message), (int)&((struct ipc_message*)0)->payload);

@@ -12,7 +12,7 @@
 /* define this if you use an ATA controller */
 #define CONFIG_STORAGE STORAGE_ATA
 
-#define HAVE_ATA_DMA 
+#define HAVE_ATA_DMA
 #define ATA_MAX_UDMA 4
 #define ATA_MAX_MWDMA 2
 

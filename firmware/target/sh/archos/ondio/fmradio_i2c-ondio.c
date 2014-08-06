@@ -72,14 +72,14 @@ static void fmradio_i2c_ack(bool nack)
        before it can receive the acknowledge. Therefore it forces the clock
        low until it is ready. We need to poll the clock line until it goes
        high before we release the ack. */
-    
+
     SCL_LO;      /* Set the clock low */
 
     if (nack)
         SDA_HI;
     else
         SDA_LO;
-    
+
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
         sleep(0);
@@ -102,11 +102,11 @@ static int fmradio_i2c_getack(void)
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
         sleep(0);
-    
+
     if (SDA)
         /* ack failed */
         ret = 0;
-    
+
     SCL_OUTPUT;
     SCL_LO;
     SDA_HI;
@@ -149,7 +149,7 @@ static unsigned char fmradio_i2c_inb(void)
        SCL_LO;
        SDA_OUTPUT;
    }
-   
+
    return byte;
 }
 
@@ -183,7 +183,7 @@ int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
     int i,x=0;
-    
+
     fmradio_i2c_start();
     fmradio_i2c_outb(address | 1);
     if (fmradio_i2c_getack()) {

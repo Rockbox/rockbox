@@ -89,4 +89,3 @@ unsigned dpad_to_button(int keyboard_key)
             return BUTTON_NONE;
     }
 }
-    

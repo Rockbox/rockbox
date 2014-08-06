@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -152,7 +152,7 @@ OPDEF(neg, 0x44 0x4C 0x54 0x5C 0x64 0x6C 0x74 0x7C)
   register byte res;
   register int idx;
   register int flag;
-  
+
   res = 0 - RA;
   idx = IDXCALC(0, RA, res);
   RA = res;
@@ -218,7 +218,7 @@ OPDEF(ld_a_i, 0x57)
   if(!RA) flag |= ZF;
   if(DANM(iff2)) flag |= PVF;
   RF = flag;
-  
+
   ENTIME(9);
 }
 
@@ -231,7 +231,7 @@ OPDEF(ld_a_r, 0x5F)
   if(!RA) flag |= ZF;
   if(DANM(iff2)) flag |= PVF;
   RF = flag;
-  
+
   ENTIME(9);
 }
 
@@ -244,14 +244,14 @@ OPDEF(rrd, 0x67)
   SETFLAGS(ABUTCF, TAB(orf_tbl)[RA]);
   dtmp >>= 4;
   PUTMEM(HL, HLP, (byte) dtmp);
-  
+
   ENTIME(18);
 }
 
 OPDEF(rld, 0x6F)
 {
   register dbyte dtmp;
-  
+
   dtmp = (*HLP << 4) | (RA & 0x0F);
   RA = (RA & 0xF0) | ((dtmp >> 8) & 0x0F);
   SETFLAGS(ABUTCF, TAB(orf_tbl)[RA]);
@@ -381,7 +381,7 @@ OPDEF(cpdr, 0xB9)
   PUTMEM(HL, HLP, res);            \
   HL dir
 
- 
+
 OPDEF(ini, 0xA2)
 {
   INID(++);

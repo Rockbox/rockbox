@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 {
     struct samsung_firmware_t *fw = malloc(sizeof(struct samsung_firmware_t));
     memset(fw, 0, sizeof(struct samsung_firmware_t));
-    
+
     if(argc <= 1)
         usage();
 

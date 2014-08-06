@@ -50,4 +50,3 @@ class BootloaderInstallHex : public BootloaderInstallBase
 
 
 #endif
-

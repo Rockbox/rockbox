@@ -385,7 +385,7 @@ static void save_config(void)
         return;
 
     for (unsigned i=0; i<tidy_type_count; i++)
-        rb->fdprintf(fd, "%s%s%s: %s\n", 
+        rb->fdprintf(fd, "%s%s%s: %s\n",
                      tidy_types[i].filestring[0] == '#' ? "\\" : "",
                      tidy_types[i].filestring,
                      tidy_types[i].directory ? "/" : "",

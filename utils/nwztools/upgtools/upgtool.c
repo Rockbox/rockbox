@@ -226,7 +226,7 @@ static int do_upg(void *buf, long size)
             cprintf(GREY, "The specified sig has wrong length (must be 8 hex digits)\n");
             return 5;
         }
-        
+
         memcpy(keysig + 33, g_key, 8);
         if(!g_sig)
             cprintf(GREY, "Warning: you have specified a key but no sig, I won't be able to do any checks\n");
@@ -357,7 +357,7 @@ static int do_upg(void *buf, long size)
                     return ret;
                 // but write the *good* amount of data
                 fwrite(buf + entry->offset, 1, entry->size, f);
-                
+
                 fclose(f);
             }
             else
@@ -435,7 +435,7 @@ static int create_upg(int argc, char **argv)
         printf("You must specify a firmware filename\n");
         usage();
     }
-    
+
     if(g_model_index == -1 && (g_key == NULL || g_sig == NULL) && g_kas == NULL)
     {
         cprintf(GREY, "A KAS or a keysig is needed to encrypt the firmware\n");
@@ -579,7 +579,7 @@ static int create_upg(int argc, char **argv)
     memcpy(hdr.sig, g_sig, 8);
     hdr.nr_files = nr_files;
     hdr.pad = 0;
-    
+
     int ret = fwp_write(&hdr, sizeof(hdr), &hdr, (void *)g_key);
     if(ret)
         return ret;
@@ -594,7 +594,7 @@ static int create_upg(int argc, char **argv)
         entry.offset = offset;
         entry.size = filesize(files[i]);
         offset += ROUND_UP(entry.size, 8); // do it before encryption !!
-        
+
         ret = fwp_write(&entry, sizeof(entry), &entry, (void *)g_key);
         if(ret)
             return ret;
@@ -664,7 +664,7 @@ int main(int argc, char **argv)
 
     if(argc <= 1)
         usage();
-    
+
     while(1)
     {
         static struct option long_options[] =
@@ -806,4 +806,3 @@ int main(int argc, char **argv)
 
     return ret;
 }
-

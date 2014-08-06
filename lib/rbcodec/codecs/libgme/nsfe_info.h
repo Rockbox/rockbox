@@ -10,14 +10,14 @@ struct Nsf_Emu;
 
 // Allows reading info from NSFE file without creating emulator
 struct Nsfe_Info {
-	int playlist_size;
-	int track_times_size;
-	int track_count;
-	int actual_track_count_;
-	bool playlist_disabled;
-	
-	unsigned char playlist [256];
-	int32_t track_times [256];
+        int playlist_size;
+        int track_times_size;
+        int track_count;
+        int actual_track_count_;
+        bool playlist_disabled;
+
+        unsigned char playlist [256];
+        int32_t track_times [256];
 };
 
 void Info_init( struct Nsfe_Info* this );

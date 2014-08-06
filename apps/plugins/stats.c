@@ -121,7 +121,7 @@ static void traversedir(char* location, char* name)
                     case FILE_ATTR_M3U:
                         m3ufiles++;
                         break;
- 
+
                     default:
                     {
                         /* use hardcoded filetype_exts to count

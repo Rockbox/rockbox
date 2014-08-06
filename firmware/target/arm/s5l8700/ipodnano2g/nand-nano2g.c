@@ -408,7 +408,7 @@ uint32_t nand_read_page(uint32_t bank, uint32_t page, void* databuffer,
         {
             if (nand_transfer_data(bank, 0, spare, 0x40))
                 return nand_unlock(1);
-            if (sparebuffer && spare != sparebuffer) 
+            if (sparebuffer && spare != sparebuffer)
                 memcpy(sparebuffer, spare, 0x800);
             if (checkempty)
                 rc = nand_check_empty((uint8_t*)sparebuffer) << 1;

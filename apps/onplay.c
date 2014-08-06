@@ -326,18 +326,18 @@ MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
 
 MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                  treeplaylist_callback, Icon_Playlist,
-                 
+
                  /* view */
                  &view_playlist_item,
-                 
+
                  /* insert */
                  &i_pl_item, &i_first_pl_item, &i_last_pl_item,
                  &i_shuf_pl_item, &i_last_shuf_pl_item,
                  /* queue */
-                 
+
                  &q_pl_item, &q_first_pl_item, &q_last_pl_item,
                  &q_shuf_pl_item, &q_last_shuf_pl_item,
-                 
+
                  /* replace */
                  &replace_pl_item
                );
@@ -956,10 +956,10 @@ static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
 MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING),
                   set_rating_inline, NULL,
                   ratingitem_callback, Icon_Questionmark);
-#endif                  
-#ifdef HAVE_PICTUREFLOW_INTEGRATION                  
-MENUITEM_RETURNVALUE(pictureflow_item, ID2P(LANG_ONPLAY_PICTUREFLOW), 
-                  GO_TO_PICTUREFLOW, NULL, Icon_NOICON);                  
+#endif
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
+MENUITEM_RETURNVALUE(pictureflow_item, ID2P(LANG_ONPLAY_PICTUREFLOW),
+                  GO_TO_PICTUREFLOW, NULL, Icon_NOICON);
 #endif
 
 static bool view_cue(void)
@@ -1079,7 +1079,7 @@ MENUITEM_FUNCTION(set_recdir_item, 0, ID2P(LANG_SET_AS_REC_DIR),
 #endif
 static bool set_startdir(void)
 {
-    snprintf(global_settings.start_directory, 
+    snprintf(global_settings.start_directory,
              sizeof(global_settings.start_directory),
              "%s/", selected_file);
     settings_save();
@@ -1183,10 +1183,10 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_TAGCACHE
            &rating_item,
 #endif
-           &bookmark_menu, 
+           &bookmark_menu,
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
            &pictureflow_item,
-#endif           
+#endif
            &browse_id3_item, &list_viewers_item,
            &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHCONTROL
@@ -1260,7 +1260,7 @@ static int playlist_insert_shuffled(void)
         playlist_insert_func((intptr_t*)PLAYLIST_INSERT_SHUFFLED);
         return ONPLAY_START_PLAY;
     }
-    
+
     return ONPLAY_RELOAD_DIR;
 }
 
@@ -1274,7 +1274,7 @@ struct hotkey_assignment {
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
 
 /* Any desired hotkey functions go here, in the enum in onplay.h,
-   and in the settings menu in settings_list.c.  The order here 
+   and in the settings menu in settings_list.c.  The order here
    is not important. */
 static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_VIEW_PLAYLIST,     LANG_VIEW_DYNAMIC_PLAYLIST,
@@ -1316,7 +1316,7 @@ int get_hotkey_lang_id(int action)
         if (hotkey_items[i].action == action)
             return hotkey_items[i].lang_id;
     }
-    
+
     return LANG_OFF;
 }
 
@@ -1327,7 +1327,7 @@ static int execute_hotkey(bool is_wps)
     struct hotkey_assignment *this_item;
     const int action = (is_wps ? global_settings.hotkey_wps :
         global_settings.hotkey_tree);
-    
+
     /* search assignment struct for a match for the hotkey setting */
     while (i--)
     {
@@ -1352,7 +1352,7 @@ static int execute_hotkey(bool is_wps)
             return return_code;
         }
     }
-    
+
     /* no valid hotkey set, ignore hotkey */
     return ONPLAY_RELOAD_DIR;
 }

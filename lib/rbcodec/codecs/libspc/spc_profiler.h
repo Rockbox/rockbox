@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 /* a fun simple elapsed time profiler */
 #ifndef _SPC_PROFILER_H_
 #define _SPC_PROFILER_H_

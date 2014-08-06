@@ -123,7 +123,7 @@ bool load_sc_file(sc_file_t *file, char *filename, bool must_exist,
 #ifdef SC_DEBUG
     print_file(file);
 #endif
-    
+
     ret_val = true; /* Everything went ok */
 
 end_of_proc:
@@ -188,7 +188,7 @@ bool parse_entry_content(char *line, sc_entry_t *entry, int last_segm)
     char *path, *disp;
     unsigned int path_len, disp_len;
     bool expl;
-    
+
     sep = rb->strcasestr(line, PATH_DISP_SEPARATOR);
     expl = (sep != NULL);
     if (expl) {
@@ -208,7 +208,7 @@ bool parse_entry_content(char *line, sc_entry_t *entry, int last_segm)
         }
         disp_len = rb->strlen(disp);
     }
-    
+
     if (path_len >= sizeof(entry->path) || disp_len >= sizeof(entry->disp)) {
         DEBUGF("Bad entry: pathlen=%d, displen=%d\n", path_len, disp_len);
         return false;
@@ -248,13 +248,13 @@ bool is_control(char *line, sc_file_t *file)
         return false;
     }
     line += CONTROL_PREFIX_LEN;
-    
+
     if (!parse_name_value(line, name, sizeof(name),
             value, sizeof(value))) {
         DEBUGF("Bad processing instruction: '%s'\n", line);
         return true;
     }
-    
+
     /* Process control instruction */
     if (rb->strcasestr(name, INSTR_DISPLAY_LAST_SEGMENTS)) {
         file->show_last_segments = rb->atoi(value);
@@ -263,7 +263,7 @@ bool is_control(char *line, sc_file_t *file)
         /* Unknown instruction -> ignore */
         DEBUGF("Unknown processing instruction: '%s'\n", name);
     }
-    
+
     return true;
 }
 
@@ -283,7 +283,7 @@ bool parse_name_value(char *line, char *name, int namesize,
     char *sep;
     int name_len, val_len;
     name[0] = value[0] = '\0';
-    
+
     sep = rb->strcasestr(line, NAME_VALUE_SEPARATOR);
     if (sep == NULL) {
         /* No separator char -> weird instruction */
@@ -295,7 +295,7 @@ bool parse_name_value(char *line, char *name, int namesize,
         return false;
     }
     rb->strlcpy(name, line, name_len + 1);
-    
+
     val_len = rb->strlen(line) - name_len - NAME_VALUE_SEPARATOR_LEN;
     if (val_len >= valuesize) {
         /* Too long value */
@@ -321,7 +321,7 @@ bool dump_sc_file(sc_file_t *file, char *filename)
                 filename);
         return false;
     }
-    
+
     /*
      * Write instructions
      */
@@ -330,7 +330,7 @@ bool dump_sc_file(sc_file_t *file, char *filename)
      * to remember the setting name */
     write_int_instruction_to_file(fd,
             INSTR_DISPLAY_LAST_SEGMENTS, file->show_last_segments);
-    
+
     int i;
     sc_entry_t *entry;
     for (i=0, entry=file->entries; i<file->entry_cnt; i++,entry++) {

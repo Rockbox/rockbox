@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by William Poetra Yoga Hadisoeseno 
+ * Copyright (C) 2008 by William Poetra Yoga Hadisoeseno
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

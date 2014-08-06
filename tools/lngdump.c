@@ -21,7 +21,7 @@ int lang_load(const char *filename)
                lang_header[0], lang_header[1], lang_header[2]);
 
         fsize = read(fd, language_buffer, MAX_LANGUAGE_SIZE);
-        
+
         while(fsize>3) {
             id = (ptr[0]<<8) | ptr[1];  /* get two-byte id */
             ptr+=2;                     /* pass the id */

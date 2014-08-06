@@ -54,7 +54,7 @@ void ide_power_enable(bool on)
     }
 #endif /* HAVE_ATA_POWER_OFF */
 
-/* late port preparation, else problems with read/modify/write 
+/* late port preparation, else problems with read/modify/write
    of other bits on same port, while input and floating high */
     if (touched)
     {

@@ -1,5 +1,5 @@
 /* files.c - Transscription, recording and playback
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * Changes for Rockbox copyright 2009 Torne Wuff
  *
@@ -65,10 +65,10 @@ void script_open (void)
 
     if (h_version >= V5 || !script_valid) {
 
-	if (!os_read_file_name (new_name, script_name, FILE_SCRIPT))
-	    goto done;
+        if (!os_read_file_name (new_name, script_name, FILE_SCRIPT))
+            goto done;
 
-	strcpy (script_name, new_name);
+        strcpy (script_name, new_name);
 
     }
 
@@ -76,14 +76,14 @@ void script_open (void)
 
     if ((sfp = rb->open (script_name, O_RDWR|O_CREAT, 0666)) != -1) {
 
-	fseek (sfp, 0, SEEK_END);
+        fseek (sfp, 0, SEEK_END);
 
-	h_flags |= SCRIPTING_FLAG;
+        h_flags |= SCRIPTING_FLAG;
 
-	script_valid = TRUE;
-	ostream_script = TRUE;
+        script_valid = TRUE;
+        ostream_script = TRUE;
 
-	script_width = 0;
+        script_width = 0;
 
     } else print_string ("Cannot open file\n");
 
@@ -122,7 +122,7 @@ void script_new_line (void)
 {
 
     if (fputc ('\n', sfp) == EOF)
-	script_close ();
+        script_close ();
 
     script_width = 0;
 
@@ -139,16 +139,16 @@ void script_char (zchar c)
 {
 
     if (c == ZC_INDENT && script_width != 0)
-	c = ' ';
+        c = ' ';
 
     if (c == ZC_INDENT)
-	{ script_char (' '); script_char (' '); script_char (' '); return; }
+        { script_char (' '); script_char (' '); script_char (' '); return; }
     if (c == ZC_GAP)
-	{ script_char (' '); script_char (' '); return; }
+        { script_char (' '); script_char (' '); return; }
 
 #ifdef __MSDOS__
     if (c >= ZC_LATIN1_MIN)
-	c = latin1_to_ibm[c - ZC_LATIN1_MIN];
+        c = latin1_to_ibm[c - ZC_LATIN1_MIN];
 #endif
 
     fputc (c, sfp); script_width++;
@@ -168,34 +168,34 @@ void script_word (const zchar *s)
     int i;
 
     if (*s == ZC_INDENT && script_width != 0)
-	script_char (*s++);
+        script_char (*s++);
 
     for (i = 0, width = 0; s[i] != 0; i++)
 
-	if (s[i] == ZC_NEW_STYLE || s[i] == ZC_NEW_FONT)
-	    i++;
-	else if (s[i] == ZC_GAP)
-	    width += 3;
-	else if (s[i] == ZC_INDENT)
-	    width += 2;
-	else
-	    width += 1;
+        if (s[i] == ZC_NEW_STYLE || s[i] == ZC_NEW_FONT)
+            i++;
+        else if (s[i] == ZC_GAP)
+            width += 3;
+        else if (s[i] == ZC_INDENT)
+            width += 2;
+        else
+            width += 1;
 
     if (f_setup.script_cols != 0 && script_width + width > f_setup.script_cols) {
 
-	if (*s == ' ' || *s == ZC_INDENT || *s == ZC_GAP)
-	    s++;
+        if (*s == ' ' || *s == ZC_INDENT || *s == ZC_GAP)
+            s++;
 
-	script_new_line ();
+        script_new_line ();
 
     }
 
     for (i = 0; s[i] != 0; i++)
 
-	if (s[i] == ZC_NEW_FONT || s[i] == ZC_NEW_STYLE)
-	    i++;
-	else
-	    script_char (s[i]);
+        if (s[i] == ZC_NEW_FONT || s[i] == ZC_NEW_STYLE)
+            i++;
+        else
+            script_char (s[i]);
 
 }/* script_word */
 
@@ -212,16 +212,16 @@ void script_write_input (const zchar *buf, zchar key)
     int i;
 
     for (i = 0, width = 0; buf[i] != 0; i++)
-	width++;
+        width++;
 
     if (f_setup.script_cols != 0 && script_width + width > f_setup.script_cols)
-	script_new_line ();
+        script_new_line ();
 
     for (i = 0; buf[i] != 0; i++)
-	script_char (buf[i]);
+        script_char (buf[i]);
 
     if (key == ZC_RETURN)
-	script_new_line ();
+        script_new_line ();
 
 }/* script_write_input */
 
@@ -238,7 +238,7 @@ void script_erase_input (const zchar *buf)
     int i;
 
     for (i = 0, width = 0; buf[i] != 0; i++)
-	width++;
+        width++;
 
     fseek (sfp, -width, SEEK_CUR); script_width -= width;
 
@@ -255,7 +255,7 @@ void script_mssg_on (void)
 {
 
     if (script_width != 0)
-	script_new_line ();
+        script_new_line ();
 
     script_char (ZC_INDENT);
 
@@ -288,12 +288,12 @@ void record_open (void)
 
     if (os_read_file_name (new_name, command_name, FILE_RECORD)) {
 
-	strcpy (command_name, new_name);
+        strcpy (command_name, new_name);
 
-	if ((rfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) != -1)
-	    ostream_record = TRUE;
-	else
-	    print_string ("Cannot open file\n");
+        if ((rfp = rb->open (new_name, O_WRONLY|O_CREAT|O_TRUNC, 0666)) != -1)
+            ostream_record = TRUE;
+        else
+            print_string ("Cannot open file\n");
 
     }
 
@@ -326,15 +326,15 @@ static void record_code (int c, bool force_encoding)
 
     if (force_encoding || c == '[' || c < 0x20 || c > 0x7e) {
 
-	int i;
+        int i;
 
-	fputc ('[', rfp);
+        fputc ('[', rfp);
 
-	for (i = 10000; i != 0; i /= 10)
-	    if (c >= i || i == 1)
-		fputc ('0' + (c / i) % 10, rfp);
+        for (i = 10000; i != 0; i /= 10)
+            if (c >= i || i == 1)
+                fputc ('0' + (c / i) % 10, rfp);
 
-	fputc (']', rfp);
+        fputc (']', rfp);
 
     } else fputc (c, rfp);
 
@@ -351,13 +351,13 @@ static void record_char (zchar c)
 {
 
     if (c != ZC_RETURN) {
-	if (c < ZC_HKEY_MIN || c > ZC_HKEY_MAX) {
-	    record_code (translate_to_zscii (c), FALSE);
-	    if (c == ZC_SINGLE_CLICK || c == ZC_DOUBLE_CLICK) {
-		record_code (mouse_x, TRUE);
-		record_code (mouse_y, TRUE);
-	    }
-	} else record_code (1000 + c - ZC_HKEY_MIN, TRUE);
+        if (c < ZC_HKEY_MIN || c > ZC_HKEY_MAX) {
+            record_code (translate_to_zscii (c), FALSE);
+            if (c == ZC_SINGLE_CLICK || c == ZC_DOUBLE_CLICK) {
+                record_code (mouse_x, TRUE);
+                record_code (mouse_y, TRUE);
+            }
+        } else record_code (1000 + c - ZC_HKEY_MIN, TRUE);
     }
 
 }/* record_char */
@@ -375,7 +375,7 @@ void record_write_key (zchar key)
     record_char (key);
 
     if (fputc ('\n', rfp) == EOF)
-	record_close ();
+        record_close ();
 
 }/* record_write_key */
 
@@ -391,12 +391,12 @@ void record_write_input (const zchar *buf, zchar key)
     zchar c;
 
     while ((c = *buf++) != 0)
-	record_char (c);
+        record_char (c);
 
     record_char (key);
 
     if (fputc ('\n', rfp) == EOF)
-	record_close ();
+        record_close ();
 
 }/* record_write_input */
 
@@ -413,15 +413,15 @@ void replay_open (void)
 
     if (os_read_file_name (new_name, command_name, FILE_PLAYBACK)) {
 
-	strcpy (command_name, new_name);
+        strcpy (command_name, new_name);
 
-	if ((pfp = rb->open (new_name, O_RDONLY)) != -1) {
+        if ((pfp = rb->open (new_name, O_RDONLY)) != -1) {
 
-	    set_more_prompts (read_yes_or_no ("Do you want MORE prompts"));
+            set_more_prompts (read_yes_or_no ("Do you want MORE prompts"));
 
-	    istream_replay = TRUE;
+            istream_replay = TRUE;
 
-	} else print_string ("Cannot open file\n");
+        } else print_string ("Cannot open file\n");
 
     }
 
@@ -457,14 +457,14 @@ static int replay_code (void)
 
     if ((c = fgetc (pfp)) == '[') {
 
-	int c2;
+        int c2;
 
-	c = 0;
+        c = 0;
 
-	while ((c2 = fgetc (pfp)) != EOF && c2 >= '0' && c2 <= '9')
-	    c = 10 * c + c2 - '0';
+        while ((c2 = fgetc (pfp)) != EOF && c2 >= '0' && c2 <= '9')
+            c = 10 * c + c2 - '0';
 
-	return (c2 == ']') ? c : EOF;
+        return (c2 == ']') ? c : EOF;
 
     } else return c;
 
@@ -483,25 +483,25 @@ static zchar replay_char (void)
 
     if ((c = replay_code ()) != EOF) {
 
-	if (c != '\n') {
+        if (c != '\n') {
 
-	    if (c < 1000) {
+            if (c < 1000) {
 
-		c = translate_from_zscii (c);
+                c = translate_from_zscii (c);
 
-		if (c == ZC_SINGLE_CLICK || c == ZC_DOUBLE_CLICK) {
-		    mouse_x = replay_code ();
-		    mouse_y = replay_code ();
-		}
+                if (c == ZC_SINGLE_CLICK || c == ZC_DOUBLE_CLICK) {
+                    mouse_x = replay_code ();
+                    mouse_y = replay_code ();
+                }
 
-		return c;
+                return c;
 
-	    } else return ZC_HKEY_MIN + c - 1000;
-	}
+            } else return ZC_HKEY_MIN + c - 1000;
+        }
 
-	ungetc ('\n', pfp);
+        ungetc ('\n', pfp);
 
-	return ZC_RETURN;
+        return ZC_RETURN;
 
     } else return ZC_BAD;
 
@@ -522,8 +522,8 @@ zchar replay_read_key (void)
 
     if (fgetc (pfp) != '\n') {
 
-	replay_close ();
-	return ZC_BAD;
+        replay_close ();
+        return ZC_BAD;
 
     } else return key;
 
@@ -542,12 +542,12 @@ zchar replay_read_input (zchar *buf)
 
     for (;;) {
 
-	c = replay_char ();
+        c = replay_char ();
 
-	if (c == ZC_BAD || is_terminator (c))
-	    break;
+        if (c == ZC_BAD || is_terminator (c))
+            break;
 
-	*buf++ = c;
+        *buf++ = c;
 
     }
 
@@ -555,8 +555,8 @@ zchar replay_read_input (zchar *buf)
 
     if (fgetc (pfp) != '\n') {
 
-	replay_close ();
-	return ZC_BAD;
+        replay_close ();
+        return ZC_BAD;
 
     } else return c;
 

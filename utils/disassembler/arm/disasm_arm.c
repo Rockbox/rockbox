@@ -300,7 +300,7 @@ void single_data(char *stg, ULONG val)
   if(val & 0x2000000) {// reg offset
     if(val & 16) // shift type
       sprintf(op2, "error: reg defined shift");
-    else 
+    else
       if((val>>7) & 31)
         sprintf(op2, SHFTFRMC, regs[val&15], shfts[(val>>5)&3], (val>>7) & 31);
       else
@@ -344,7 +344,7 @@ void single_data(char *stg, ULONG val)
           if(val & 0xfff)                  sprintf(stg+strlen(stg), "%s, [%s, -"FRMT"]", regs[(val>>12)&15], regs[(val>>16)&15], val & 0xfff);
           else                             sprintf(stg+strlen(stg), "%s, [%s]",          regs[(val>>12)&15], regs[(val>>16)&15]);
     else
-      if(val & 0x200000) // write back    
+      if(val & 0x200000) // write back
                                            sprintf(stg+strlen(stg), "error 'write back' set");
       else
         if(val & 0x800000) // up offset (+)
@@ -409,9 +409,9 @@ void dis_asm(ULONG off, ULONG val, char *stg)
     case  3: opcode_stg(stg, val, off); break;
     case  4:
     case  5:
-    case  6: 
+    case  6:
     case  7: single_data(stg, val); break;
-    case  8: 
+    case  8:
     case  9: block_data(stg, val); break;
     case 10:
     case 11: branch_stg(stg, val, off); break;

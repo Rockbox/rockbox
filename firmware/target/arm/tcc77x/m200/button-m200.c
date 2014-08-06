@@ -24,7 +24,7 @@
 #include "button.h"
 #include "adc.h"
 
-/* 
+/*
 
 Results of button testing (viewing ADC values whilst pressing buttons):
 
@@ -55,9 +55,9 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
     int adc;
- 
-    /* TODO - determine how to detect BUTTON_MENU - it doesn't appear to 
-              be connected to a GPIO or to an ADC 
+
+    /* TODO - determine how to detect BUTTON_MENU - it doesn't appear to
+              be connected to a GPIO or to an ADC
      */
 
     adc = adc_read(ADC_BUTTONS);

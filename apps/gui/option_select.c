@@ -48,10 +48,10 @@ int option_value_as_int(const struct settings_list *setting)
         temp = *(int*)setting->setting;
     return temp;
 }
-static const char *unit_strings[] = 
-{   
+static const char *unit_strings[] =
+{
     [UNIT_INT] = "",    [UNIT_MS]  = "ms",
-    [UNIT_SEC] = "s",   [UNIT_MIN] = "min", 
+    [UNIT_SEC] = "s",   [UNIT_MIN] = "min",
     [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "kHz",
     [UNIT_DB]  = "dB",  [UNIT_PERCENT] = "%",
     [UNIT_MAH] = "mAh", [UNIT_PIXEL] = "px",
@@ -63,7 +63,7 @@ static const char *unit_strings[] =
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
-const char *option_get_valuestring(const struct settings_list *setting, 
+const char *option_get_valuestring(const struct settings_list *setting,
                                    char *buffer, int buf_len,
                                    intptr_t temp_var)
 {
@@ -211,7 +211,7 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
         }
     }
 }
-    
+
 static int option_talk(int selected_item, void * data)
 {
     struct settings_list *setting = (struct settings_list *)data;
@@ -329,7 +329,7 @@ static int selection_to_val(const struct settings_list *setting, int selection)
     else if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
     {
         const struct table_setting *info = setting->table_setting;
-        if (setting->flags&F_ALLOW_ARBITRARY_VALS && 
+        if (setting->flags&F_ALLOW_ARBITRARY_VALS &&
             table_setting_array_position != -1    &&
             (selection >= table_setting_array_position))
         {
@@ -370,7 +370,7 @@ static int selection_to_val(const struct settings_list *setting, int selection)
     return max- (selection * step);
 }
 
-static const char * value_setting_get_name_cb(int selected_item, 
+static const char * value_setting_get_name_cb(int selected_item,
                                               void * data,
                                               char *buffer,
                                               size_t buffer_len)
@@ -499,16 +499,16 @@ bool option_screen(const struct settings_list *setting,
         title = (char*)setting->cfg_vals;
     else
         title = P2STR(option_title);
-    
+
     gui_synclist_set_title(&lists, title, Icon_Questionmark);
     gui_synclist_set_icon_callback(&lists, NULL);
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&lists, option_talk);
-    
+
     val_to_selection(setting, oldvalue, &nb_items, &selected, &function);
     gui_synclist_set_nb_items(&lists, nb_items);
     gui_synclist_select_item(&lists, selected);
-    
+
     gui_synclist_limit_scroll(&lists, true);
     gui_synclist_draw(&lists);
     /* talk the item */
@@ -558,7 +558,7 @@ bool option_screen(const struct settings_list *setting,
             {
                 if (var_type == F_T_INT || var_type == F_T_UINT)
                     *(int*)setting->setting = *variable;
-                else 
+                else
                     *(bool*)setting->setting = (*variable==1);
             }
             settings_save();

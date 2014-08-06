@@ -264,7 +264,7 @@ void a52_imdct_512 (sample_t * data, sample_t * delay)
     sample_t t_r, t_i, a_r, a_i, b_r, b_i, w_1, w_2;
     const sample_t * window = a52_imdct_window;
     FFTComplex buf[128];
-        
+
     for (i = 0; i < 128; i++) {
         k = fftorder[i];
         t_r = pre1[i].real;
@@ -320,7 +320,7 @@ void a52_imdct_256 (sample_t * data, sample_t * delay)
     /* Post IFFT complex multiply */
     /* Window and convert to real valued signal */
     for (i = 0; i < 32; i++) {
-        /* y1[n] = z1[n] * (xcos2[n] + j * xs in2[n]) ; */ 
+        /* y1[n] = z1[n] * (xcos2[n] + j * xs in2[n]) ; */
         t_r = post2[i].real;
         t_i = post2[i].imag;
         BUTTERFLY_0 (a_r, a_i, t_i, t_r, buf1[i].im, buf1[i].re);
@@ -368,7 +368,7 @@ void a52_imdct_init (uint32_t mm_accel)
   (void)mm_accel;
   //ff_fft_init(&s128, 7, 1);
   //ff_fft_init(&s64, 6, 1);
-  
+
 /*    int i, k;
     double sum;
     double local_imdct_window[256];*/
@@ -465,7 +465,7 @@ void a52_imdct_init (uint32_t mm_accel)
     printf("static complex_t post2[32]={");
     for (i=0;i<32;i++) { printf("{%d,%d}%s",post2[i].real,post2[i].imag,(i < 31 ? "," : "")); }
     printf("};\n");
-    
+
 
 #ifdef LIBA52_DJBFFT
     if (mm_accel & MM_ACCEL_DJBFFT) {

@@ -33,7 +33,7 @@ namespace Ui {
 
 class FontDownloader : public QDialog {
     Q_OBJECT
-public:    
+public:
     FontDownloader(QWidget *parent, QString dir);
     virtual ~FontDownloader();
 

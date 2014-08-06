@@ -24,4 +24,3 @@ bool logfdisplay(void);
 bool logfdump(void);
 
 #endif /* LOGFDISP_H */
-

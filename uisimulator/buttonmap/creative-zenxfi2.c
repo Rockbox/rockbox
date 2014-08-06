@@ -49,4 +49,3 @@ struct button_map bm[] = {
     { SDLK_ESCAPE, 315, 514, 26, "Power" },
     { 0, 0, 0, 0, "None" }
 };
- 

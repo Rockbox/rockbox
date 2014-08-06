@@ -51,8 +51,8 @@ static void print_list(t_print *x, t_symbol *s, int argc, t_atom *argv)
 #endif
     if (argc && argv->a_type != A_SYMBOL) startpost("%s:", x->x_sym->s_name);
     else startpost("%s%s", x->x_sym->s_name,
-    	(argc > 1 ? s_list.s_name : (argc == 1 ? s_symbol.s_name :
-	    s_bang.s_name)));
+        (argc > 1 ? s_list.s_name : (argc == 1 ? s_symbol.s_name :
+            s_bang.s_name)));
     postatom(argc, argv);
     endpost();
 }
@@ -71,7 +71,7 @@ static void print_anything(t_print *x, t_symbol *s, int argc, t_atom *argv)
 static void print_setup(void)
 {
     print_class = class_new(gensym("print"), (t_newmethod)print_new, 0,
-    	sizeof(t_print), 0, A_DEFSYM, 0);
+        sizeof(t_print), 0, A_DEFSYM, 0);
     class_addbang(print_class, print_bang);
     class_addfloat(print_class, print_float);
     class_addpointer(print_class, print_pointer);
@@ -85,4 +85,3 @@ void x_interface_setup(void)
 {
     print_setup();
 }
-

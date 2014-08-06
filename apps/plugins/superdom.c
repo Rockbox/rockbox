@@ -375,18 +375,18 @@ void draw_board(void) {
             } else {
                 rb->lcd_set_foreground(LCD_LIGHTGRAY);
             }
-            rb->lcd_fillrect(MARGIN+(BOX_WIDTH*(i-1)), 
-                            MARGIN+(BOX_HEIGHT*(j-1)), BOX_WIDTH, 
+            rb->lcd_fillrect(MARGIN+(BOX_WIDTH*(i-1)),
+                            MARGIN+(BOX_HEIGHT*(j-1)), BOX_WIDTH,
                             BOX_HEIGHT);
 #if LCD_DEPTH != 16
-            rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID); 
+            rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
 #endif
             if(board[i][j].ind) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, 0, ICON_STRIDE, 
+                                board[i][j].colour?ICON_WIDTH:0, 0, ICON_STRIDE,
 #if LCD_WIDTH > LCD_HEIGHT
-                                MARGIN+(BOX_WIDTH*(i-1))+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
+                                MARGIN+(BOX_WIDTH*(i-1))+1,
+                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
 #else
                                 MARGIN+(BOX_WIDTH*(i-1))+1+ICON_WIDTH,
                                 MARGIN+(BOX_HEIGHT*(j-1))+1,
@@ -395,16 +395,16 @@ void draw_board(void) {
             }
             if(board[i][j].farm) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT, 
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT,
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
+                                MARGIN+(BOX_HEIGHT*(j-1))+1,
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].tank) {
                 MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*2,
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
+                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].men) {
@@ -412,7 +412,7 @@ void draw_board(void) {
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*3,
 #if LCD_WIDTH > LCD_HEIGHT
                                 ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                                MARGIN+(BOX_HEIGHT*(j-1))+1,
 #else
                                 ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+1+ICON_HEIGHT,
@@ -436,7 +436,7 @@ void draw_board(void) {
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*5,
 #if LCD_WIDTH > LCD_HEIGHT
                                 ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                                MARGIN+(BOX_HEIGHT*(j-1))+1,
 #else
                                 ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
@@ -489,7 +489,7 @@ void gen_interest(void) {
 
 void draw_cursor(void) {
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(MARGIN+((cursor.x-1)*BOX_WIDTH), 
+    rb->lcd_fillrect(MARGIN+((cursor.x-1)*BOX_WIDTH),
                   MARGIN+((cursor.y-1)*BOX_HEIGHT), BOX_WIDTH+1, BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
@@ -516,10 +516,10 @@ void gen_resources(void) {
             ratefood = incfood/humanres.farms;
         if(ratecash > 450) {
             if(ratefood > 350) {
-                rb->splash(HZ*2, "Patriotism sweeps the land, all production" 
+                rb->splash(HZ*2, "Patriotism sweeps the land, all production"
                                 " is up this year!");
             } else {
-                rb->splash(HZ*2, "Factories working at maximum efficiency," 
+                rb->splash(HZ*2, "Factories working at maximum efficiency,"
                                 " cash production up this year!");
             }
         } else if(ratecash > 350) {
@@ -528,17 +528,17 @@ void gen_resources(void) {
             } else if(ratefood > 250) {
                 rb->splash(HZ*2, "Production continues as normal");
             } else {
-                rb->splash(HZ*2, "Spoilage of crops leads to reduced farm" 
+                rb->splash(HZ*2, "Spoilage of crops leads to reduced farm"
                                 " output this  year");
             }
         } else {
             if(ratefood > 350) {
                 rb->splash(HZ*2, "Record crop harvest this year!");
             } else if(ratefood > 250) {
-                rb->splash(HZ*2, "Factory unions introduced. Industrial" 
+                rb->splash(HZ*2, "Factory unions introduced. Industrial"
                                 " production is down this year.");
             } else {
-                rb->splash(HZ*2, "Internet created. All production is down" 
+                rb->splash(HZ*2, "Internet created. All production is down"
                                 " due to time wasted.");
             }
         }
@@ -582,18 +582,18 @@ static int settings_menu(void) {
     while(1) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
         case 0:
-            rb->set_int("Computer starting farms", "", UNIT_INT, 
-                            &superdom_settings.compstartfarms, NULL, 
+            rb->set_int("Computer starting farms", "", UNIT_INT,
+                            &superdom_settings.compstartfarms, NULL,
                             1, 0, 5, NULL);
             break;
         case 1:
-            rb->set_int("Computer starting factories", "", UNIT_INT, 
-                            &superdom_settings.compstartinds, NULL, 
+            rb->set_int("Computer starting factories", "", UNIT_INT,
+                            &superdom_settings.compstartinds, NULL,
                             1, 0, 5, NULL);
             break;
         case 2:
-            rb->set_int("Human starting farms", "", UNIT_INT, 
-                            &superdom_settings.humanstartfarms, NULL, 
+            rb->set_int("Human starting farms", "", UNIT_INT,
+                            &superdom_settings.humanstartfarms, NULL,
                             1, 0, 5, NULL);
             break;
         case 3:
@@ -602,17 +602,17 @@ static int settings_menu(void) {
                             1, 0, 5, NULL);
             break;
         case 4:
-            rb->set_int("Starting cash", "", UNIT_INT, 
-                            &superdom_settings.startcash, NULL, 
+            rb->set_int("Starting cash", "", UNIT_INT,
+                            &superdom_settings.startcash, NULL,
                             250, 0, 5000, NULL);
             break;
         case 5:
-            rb->set_int("Starting food", "", UNIT_INT, 
-                            &superdom_settings.startfood, NULL, 
+            rb->set_int("Starting food", "", UNIT_INT,
+                            &superdom_settings.startfood, NULL,
                             250, 0, 5000, NULL);
             break;
         case 6:
-            rb->set_int("Moves per turn", "", UNIT_INT, 
+            rb->set_int("Moves per turn", "", UNIT_INT,
                             &superdom_settings.movesperturn, NULL,
                             1, 1, 5, NULL);
             break;
@@ -801,8 +801,8 @@ static int get_number(char* param, int* value, int max) {
     else
         rb->lcd_puts_scroll(0, (NUM_MARGIN_Y/height-1)/2, param);
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x), 
-                    NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y), 
+    rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
+                    NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
                     NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
@@ -905,8 +905,8 @@ static int get_number(char* param, int* value, int max) {
                 break;
         }
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x), 
-                        NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y), 
+        rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
+                        NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
                         NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
         rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_update();
@@ -1274,7 +1274,7 @@ static int movement_menu(void) {
                     if(move_unit_menu()==RET_VAL_USB)
                         return RET_VAL_USB;
                 } else {
-                    rb->splash(HZ, "You have no more moves left." 
+                    rb->splash(HZ, "You have no more moves left."
                                    " You can buy more for $100 each.");
                 }
                 break;
@@ -1282,7 +1282,7 @@ static int movement_menu(void) {
                 if(humanres.cash > 100) {
                     humanres.moves++;
                     humanres.cash -= 100;
-                    rb->snprintf(buf, sizeof(buf), "You now have %d moves", 
+                    rb->snprintf(buf, sizeof(buf), "You now have %d moves",
                                     humanres.moves);
                     rb->splash(HZ, buf);
                 }
@@ -1705,7 +1705,7 @@ static bool place_adjacent(bool tank, int x, int y) {
 }
 
 static bool has_adjacent(int x, int y) {
-    if((board[x][y].colour == COLOUR_LIGHT) && 
+    if((board[x][y].colour == COLOUR_LIGHT) &&
        ((board[x-1][y].colour == COLOUR_DARK) ||
        (board[x+1][y].colour == COLOUR_DARK) ||
        (board[x][y+1].colour == COLOUR_DARK) ||
@@ -1808,7 +1808,7 @@ static void computer_allocate(void) {
             }
         }
         if(k == 0) {
-            /* No targets found! Randomly pick squares and if they're owned 
+            /* No targets found! Randomly pick squares and if they're owned
              * by the computer then stick a tank on it. */
                 rb->srand(*rb->current_tick);
                 while(compres.cash >= 300 && compres.tanks < numterritory) {
@@ -1899,25 +1899,25 @@ static void computer_allocate(void) {
 static int find_adj_target(int x, int y, struct cursor* adj) {
     /* Find a square next to a computer's farm or factory owned by the player
      * that is vulnerable. Return 1 on success, 0 otherwise */
-    if(board[x+1][y].colour == COLOUR_LIGHT && 
+    if(board[x+1][y].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x+1,y)<=calc_strength(COLOUR_DARK,x+1,y)) {
         adj->x = x+1;
         adj->y = y;
         return 1;
     }
-    if(board[x-1][y].colour == COLOUR_LIGHT && 
+    if(board[x-1][y].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x-1,y)<=calc_strength(COLOUR_DARK,x-1,y)) {
         adj->x = x-1;
         adj->y = y;
         return 1;
     }
-    if(board[x][y+1].colour == COLOUR_LIGHT && 
+    if(board[x][y+1].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x,y+1)<=calc_strength(COLOUR_DARK,x,y+1)) {
         adj->x = x;
         adj->y = y+1;
         return 1;
     }
-    if(board[x][y-1].colour == COLOUR_LIGHT && 
+    if(board[x][y-1].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x,y-1)<=calc_strength(COLOUR_DARK,x,y-1)) {
         adj->x = x;
         adj->y = y-1;
@@ -1977,8 +1977,8 @@ static void computer_war(void) {
         found_target = false;
         for(i=1;i<11;i++) {
             for(j=1;j<11;j++) {
-                if(board[i][j].colour == COLOUR_LIGHT && 
-                  (calc_strength(COLOUR_DARK, i, j)  >= 
+                if(board[i][j].colour == COLOUR_LIGHT &&
+                  (calc_strength(COLOUR_DARK, i, j)  >=
                    calc_strength(COLOUR_LIGHT, i, j))) {
                     found_target = true;
                     if(attack_territory(COLOUR_DARK, i, j) >= 0) {

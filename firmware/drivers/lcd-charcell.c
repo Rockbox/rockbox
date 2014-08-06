@@ -86,14 +86,14 @@ void lcd_set_viewport(struct viewport* vp)
         current_vp = &default_vp;
     else
         current_vp = vp;
-        
+
 #if defined(SIMULATOR)
     /* Force the viewport to be within bounds.  If this happens it should
      *  be considered an error - the viewport will not draw as it might be
      *  expected.
      */
-    if((unsigned) current_vp->x > (unsigned) LCD_WIDTH 
-        || (unsigned) current_vp->y > (unsigned) LCD_HEIGHT 
+    if((unsigned) current_vp->x > (unsigned) LCD_WIDTH
+        || (unsigned) current_vp->y > (unsigned) LCD_HEIGHT
         || current_vp->x + current_vp->width > LCD_WIDTH
         || current_vp->y + current_vp->height > LCD_HEIGHT)
     {
@@ -102,11 +102,11 @@ void lcd_set_viewport(struct viewport* vp)
 #else
         DEBUGF("NOTE: "
 #endif
-            "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n", 
-            current_vp->x, current_vp->y, 
+            "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n",
+            current_vp->x, current_vp->y,
             current_vp->width, current_vp->height);
     }
-    
+
 #endif
 }
 
@@ -143,14 +143,14 @@ int lcd_getheight(void)
 }
 
 int lcd_getstringsize(const unsigned char *str, int *w, int *h)
-{                     
+{
     int width = utf8length(str);
-    
+
     if (w)
         *w = width;
     if (h)
         *h = 1;
-        
+
     return width;
 }
 
@@ -220,7 +220,7 @@ static int lcd_get_free_pat(int xchar)
     {
         if (++pat >= lcd_pattern_count)  /* Keep 'pat' within limits */
             pat = 0;
-            
+
         if (lcd_patterns[pat].count == 0)
         {
             last_used_pat = pat;
@@ -258,14 +258,14 @@ static int map_xchar(int xchar, unsigned char *substitute)
     {
         glyph = xchar_info[xchar].glyph;
         pat = glyph_to_pat(glyph);
- 
+
         if (pat == NO_PATTERN)               /* not yet mapped */
         {
             pat = lcd_get_free_pat(xchar);   /* try to map */
 
             if (pat == NO_PATTERN)           /* failed: just use substitute */
                 return xchar_info[xchar].hw_char;
-            else 
+            else
             {                            /* define pattern */
                 lcd_patterns[pat].priority = xchar_info[xchar].priority;
                 lcd_patterns[pat].glyph = glyph;
@@ -380,9 +380,9 @@ void lcd_clear_viewport(void)
     {
         /* Remove the cursor if it is within the current viewport */
         if (lcd_cursor.enabled &&
-            (lcd_cursor.x >= current_vp->x) && 
+            (lcd_cursor.x >= current_vp->x) &&
             (lcd_cursor.x <= current_vp->x + current_vp->width) &&
-            (lcd_cursor.y >= current_vp->y) && 
+            (lcd_cursor.y >= current_vp->y) &&
             (lcd_cursor.y <= current_vp->y + current_vp->height))
         {
             lcd_remove_cursor();
@@ -399,7 +399,7 @@ void lcd_clear_viewport(void)
 /* Put an unicode character at the given position */
 void lcd_putc(int x, int y, unsigned long ucs)
 {
-    if ((unsigned)x >= (unsigned)current_vp->width || 
+    if ((unsigned)x >= (unsigned)current_vp->width ||
         (unsigned)y >= (unsigned)current_vp->height)
         return;
 
@@ -409,7 +409,7 @@ void lcd_putc(int x, int y, unsigned long ucs)
 /* Show cursor (alternating with existing character) at the given position */
 void lcd_put_cursor(int x, int y, unsigned long cursor_ucs)
 {
-    if ((unsigned)x >= (unsigned)current_vp->width || 
+    if ((unsigned)x >= (unsigned)current_vp->width ||
         (unsigned)y >= (unsigned)current_vp->height ||
         lcd_cursor.enabled)
         return;
@@ -444,7 +444,7 @@ static int lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
     while (*utf8 && x < current_vp->width)
     {
         utf8 = utf8decode(utf8, &ucs);
-        
+
         if (ofs > 0)
         {
             ofs--;

@@ -38,10 +38,10 @@ void adc_init(void)
 
     /* Initialize the touchscreen and the battery readout */
     tsc2100_adc_init();
-    
+
     /* Enable the tsc2100 interrupt */
     IO_INTC_EINT2 |= (1<<3); /* IRQ_GIO14 */
-    
+
     /* Read all registers to make sure they are clear */
     tsc2100_read_data();
 }
@@ -54,8 +54,7 @@ void GIO14(void)
 
     /* Always read all registers in one go to clear any missed flags */
     tsc2100_read_data();
-    
+
     /* Stop the scan, firmware will initiate another scan with a mode set */
     tsc2100_set_mode(true, 0x00);
 }
-

@@ -451,9 +451,9 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
         int nword;
         int word_count, word_width;
         const unsigned char *str;
-    } 
-#ifndef HAVE_LCD_CHARCELLS 
-        sp, 
+    }
+#ifndef HAVE_LCD_CHARCELLS
+        sp,
 #endif
         cr;
 
@@ -2808,7 +2808,7 @@ static int lrc_main(void)
         backlight_ignore_timeout();
 
 #ifdef HAVE_LCD_BITMAP
-    /* in case settings that may affect break position 
+    /* in case settings that may affect break position
      * are changed (statusbar_on and wrap). */
     if (!current.too_many_lines)
         calc_brpos(NULL, 0);

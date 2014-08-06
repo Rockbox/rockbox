@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-             
+
 #include "config.h"
 
 /* target dependent - to be adjusted for other charcell targets */

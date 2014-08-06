@@ -461,7 +461,7 @@ void output_row_8_native(uint32_t row, void * row_in,
                 fb_data *dest = STRIDE_MAIN((fb_data *)ctx->bm->data + fb_width * row,
                                             (fb_data *)ctx->bm->data + row);
                 int delta = 127;
-                unsigned r, g, b;                
+                unsigned r, g, b;
                 /* setup alpha channel buffer */
                 unsigned char *bm_alpha = NULL;
                 if (ctx->bm->alpha_offset > 0)

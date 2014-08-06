@@ -338,4 +338,3 @@ void free_vlc(VLC *vlc)
 {
     av_freep(&vlc->table);
 }
-

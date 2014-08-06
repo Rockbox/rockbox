@@ -65,4 +65,3 @@ int ipod_has_bootloader(struct ipod_t* ipod);
 }
 #endif
 #endif
-

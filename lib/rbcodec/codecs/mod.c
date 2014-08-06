@@ -239,7 +239,7 @@ struct s_modplayer modplayer IDATA_ATTR;        /* The Module Player */
 struct s_mixer mixer IDATA_ATTR;
 
 /* The Amiga Period Table (+1 because we use index 0 for period 0 = no new note) */
-static unsigned short s_periodtable[37*8+1] IDATA_ATTR = 
+static unsigned short s_periodtable[37*8+1] IDATA_ATTR =
     { 0,  907,  900,  893,  887,  881,  874,  868,
     862,  856,  849,  843,  837,  831,  825,  819,
     813,  808,  802,  796,  790,  785,  779,  773,
@@ -280,7 +280,7 @@ static unsigned short s_periodtable[37*8+1] IDATA_ATTR =
     107};
 
 /* The sin table */
-static signed short s_sintable[0x40] IDATA_ATTR = 
+static signed short s_sintable[0x40] IDATA_ATTR =
     {  0,   25,   49,   74,   97,  120,  141,  162,
      180,  197,  212,  225,  235,  244,  250,  254,
      255,  254,  250,  244,  235,  225,  212,  197,
@@ -352,7 +352,7 @@ void initmodplayer(void)
 {
     unsigned int c;
 #if 0
-    /* As the calculation of periodtable and sintable uses float and double 
+    /* As the calculation of periodtable and sintable uses float and double
      * rockbox uses two predefined tables. This reduces the codesize by
      * several KB. */
 
@@ -506,13 +506,13 @@ bool loadmod(void *modfile)
 
     /* use 'restartposition' (historically set to 127) which is not used here
        as a marker that periods have already been converted */
-       
-    periodsconverted = (char*)modfile + 20 + modsong.noofinstruments*30 + 1; 
+
+    periodsconverted = (char*)modfile + 20 + modsong.noofinstruments*30 + 1;
 
     /* Get the pattern data; ST doesn't have fileformattag, so 4 bytes less */
-    modsong.patterndata = periodsconverted + 
-                          (modsong.noofinstruments==15 ? 129 : 133); 
- 
+    modsong.patterndata = periodsconverted +
+                          (modsong.noofinstruments==15 ? 129 : 133);
+
     /* Convert the period values in the mod file to offsets
      * in our periodtable (but only, if we haven't done this yet) */
     p = (unsigned char *) modsong.patterndata;
@@ -538,9 +538,9 @@ bool loadmod(void *modfile)
                 p += 4;
             }
         /* Remember that we already converted the periods,
-         * in case the file gets reloaded by rewinding 
+         * in case the file gets reloaded by rewinding
          * with 0xfe (arbitary magic value > 127) */
-        *periodsconverted = 0xfe;  
+        *periodsconverted = 0xfe;
     }
 
     /* Get the samples

@@ -22,7 +22,7 @@
 #ifndef _SPEEX_TYPES_H
 #define _SPEEX_TYPES_H
 
-#if defined(_WIN32) 
+#if defined(_WIN32)
 
 #  if defined(__CYGWIN__)
 #    include <_G_config.h>
@@ -31,10 +31,10 @@
      typedef _G_int16_t spx_int16_t;
      typedef _G_uint16_t spx_uint16_t;
 #  elif defined(__MINGW32__)
-     typedef short spx_int16_t;                                                                             
-     typedef unsigned short spx_uint16_t;                                                                   
-     typedef int spx_int32_t;                                                                               
-     typedef unsigned int spx_uint32_t;                                                                     
+     typedef short spx_int16_t;
+     typedef unsigned short spx_uint16_t;
+     typedef int spx_int32_t;
+     typedef unsigned int spx_uint32_t;
 #  elif defined(__MWERKS__)
      typedef int spx_int32_t;
      typedef unsigned int spx_uint32_t;

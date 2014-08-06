@@ -70,4 +70,3 @@ class TTSCarbon : public TTSBase
 };
 
 #endif // TTSCARBON_H
-

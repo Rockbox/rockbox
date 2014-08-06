@@ -477,4 +477,3 @@ void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
 
     return;  /* No more ghetto lowpass filter. Linear interpolation works well. */
 }
-

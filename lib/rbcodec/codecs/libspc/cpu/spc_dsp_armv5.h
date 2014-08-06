@@ -25,6 +25,6 @@ struct echo_filter
      * |LR|LR|LR|LR|LR|LR|LR|LR|--|--|--|--|--|--|--|--| */
     /* copy of echo FIR constants as int16_t, loaded as int32 for
      * halfword, packed multiples */
-    int16_t coeff [VOICE_COUNT]; 
+    int16_t coeff [VOICE_COUNT];
 };
 #endif /* SPC_NOECHO */

@@ -57,11 +57,11 @@ void main(void)
     unsigned long dst_len; /* dummy */
     unsigned long *src = (unsigned long *)image;
     unsigned long *dst = (unsigned long *)(dramend - ALIGNED_IMG_SIZE);
-    
+
     do
         *dst++ = *src++;
     while (dst < (unsigned long *)dramend);
-    
+
     ucl_nrv2e_decompress_8(dramend - ALIGNED_IMG_SIZE, loadaddress, &dst_len);
 
     asm(

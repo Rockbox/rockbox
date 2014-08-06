@@ -656,8 +656,8 @@ void M_SaveSelect(int choice)
    saveStringEnter = 1;
 
    saveSlot = choice;
-   snprintf(savegamestrings[choice], sizeof(savegamestrings[choice]), 
-      (gamemode==shareware||gamemode==registered||gamemode==retail) ? 
+   snprintf(savegamestrings[choice], sizeof(savegamestrings[choice]),
+      (gamemode==shareware||gamemode==registered||gamemode==retail) ?
       *mapnames[(gameepisode-1)*9+gamemap-1]  : (gamemission==doom2)     ?
       *mapnames2[gamemap-1] : (gamemission==pack_plut) ?
       *mapnamesp[gamemap-1] : (gamemission==pack_tnt)  ?
@@ -1859,4 +1859,3 @@ void M_Init (void)
    }
 
 }
-

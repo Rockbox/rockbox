@@ -31,7 +31,7 @@
 /* Hardware Config */
 
 /* TODO: ??? */
-#define CONFIG_SDRAM_START 0x30000000 
+#define CONFIG_SDRAM_START 0x30000000
 
 /* Flash storage */
 #define HAVE_FLASH_STORAGE

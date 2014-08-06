@@ -39,11 +39,11 @@
 
 **/
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 static const struct button_mapping button_context_standard[]  = {
 
@@ -66,15 +66,15 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
-            
+
         case CONTEXT_TREE:
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
-            
+
         case CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS|CONTEXT_REMOTE:
         default:
             return button_context_standard;
-    } 
+    }
     return button_context_standard;
 }

@@ -24,7 +24,7 @@ typedef struct _qlist
     t_object x_ob;
     t_outlet *x_bangout;
     void *x_binbuf;
-    int x_onset;		/* playback position */
+    int x_onset;                /* playback position */
     t_clock *x_clock;
     float x_tempo;
     double x_whenclockset;
@@ -70,70 +70,70 @@ static void qlist_donext(t_qlist *x, int drop, int automatic)
     t_pd *target = 0;
     while (1)
     {
-    	int argc = binbuf_getnatom(x->x_binbuf),
-    	    count, onset = x->x_onset, onset2, wasreentered;
-    	t_atom *argv = binbuf_getvec(x->x_binbuf);
-    	t_atom *ap = argv + onset, *ap2;
-	if (onset >= argc) goto end;
-    	while (ap->a_type == A_SEMI || ap->a_type == A_COMMA)
-    	{
-    	    if (ap->a_type == A_SEMI) target = 0;
-    	    onset++, ap++;
-    	    if (onset >= argc) goto end;
-	}
+        int argc = binbuf_getnatom(x->x_binbuf),
+            count, onset = x->x_onset, onset2, wasreentered;
+        t_atom *argv = binbuf_getvec(x->x_binbuf);
+        t_atom *ap = argv + onset, *ap2;
+        if (onset >= argc) goto end;
+        while (ap->a_type == A_SEMI || ap->a_type == A_COMMA)
+        {
+            if (ap->a_type == A_SEMI) target = 0;
+            onset++, ap++;
+            if (onset >= argc) goto end;
+        }
 
-	if (!target && ap->a_type == A_FLOAT)
-	{
-    	    ap2 = ap + 1;
-    	    onset2 = onset + 1;
-    	    while (onset2 < argc && ap2->a_type == A_FLOAT)
-    	    	onset2++, ap2++;
-    	    x->x_onset = onset2;
-    	    if (automatic)
-    	    {
-    	    	clock_delay(x->x_clock,
-    	    	    x->x_clockdelay = ap->a_w.w_float * x->x_tempo);
-    	    	x->x_whenclockset = clock_getsystime();
-    	    }
-    	    else outlet_list(x->x_ob.ob_outlet, 0, onset2-onset, ap);
-    	    return;
-    	}
-    	ap2 = ap + 1;
-    	onset2 = onset + 1;
-    	while (onset2 < argc &&
-    	    (ap2->a_type == A_FLOAT || ap2->a_type == A_SYMBOL))
-    	    	onset2++, ap2++;
-    	x->x_onset = onset2;
-    	count = onset2 - onset;
-    	if (!target)
-    	{
-    	    if (ap->a_type != A_SYMBOL) continue;
-    	    else if (!(target = ap->a_w.w_symbol->s_thing))
-    	    {
-    	    	error("qlist: %s: no such object", ap->a_w.w_symbol->s_name);
-    	    	continue;
-    	    }
-    	    ap++;
-    	    onset++;
-    	    count--;
-    	    if (!count) 
-    	    {
-    	    	x->x_onset = onset2;
-    	    	continue;
-    	    }
-    	}
-	wasreentered = x->x_reentered;
-	x->x_reentered = 0;
-	if (!drop)
-	{   
-    	    if (ap->a_type == A_FLOAT)
-	      	typedmess(target, &s_list, count, ap);
-	    else if (ap->a_type == A_SYMBOL)
-	    	typedmess(target, ap->a_w.w_symbol, count-1, ap+1);
-	}
-	if (x->x_reentered)
-	    return;
-	x->x_reentered = wasreentered;
+        if (!target && ap->a_type == A_FLOAT)
+        {
+            ap2 = ap + 1;
+            onset2 = onset + 1;
+            while (onset2 < argc && ap2->a_type == A_FLOAT)
+                onset2++, ap2++;
+            x->x_onset = onset2;
+            if (automatic)
+            {
+                clock_delay(x->x_clock,
+                    x->x_clockdelay = ap->a_w.w_float * x->x_tempo);
+                x->x_whenclockset = clock_getsystime();
+            }
+            else outlet_list(x->x_ob.ob_outlet, 0, onset2-onset, ap);
+            return;
+        }
+        ap2 = ap + 1;
+        onset2 = onset + 1;
+        while (onset2 < argc &&
+            (ap2->a_type == A_FLOAT || ap2->a_type == A_SYMBOL))
+                onset2++, ap2++;
+        x->x_onset = onset2;
+        count = onset2 - onset;
+        if (!target)
+        {
+            if (ap->a_type != A_SYMBOL) continue;
+            else if (!(target = ap->a_w.w_symbol->s_thing))
+            {
+                error("qlist: %s: no such object", ap->a_w.w_symbol->s_name);
+                continue;
+            }
+            ap++;
+            onset++;
+            count--;
+            if (!count)
+            {
+                x->x_onset = onset2;
+                continue;
+            }
+        }
+        wasreentered = x->x_reentered;
+        x->x_reentered = 0;
+        if (!drop)
+        {
+            if (ap->a_type == A_FLOAT)
+                typedmess(target, &s_list, count, ap);
+            else if (ap->a_type == A_SYMBOL)
+                typedmess(target, ap->a_w.w_symbol, count-1, ap+1);
+        }
+        if (x->x_reentered)
+            return;
+        x->x_reentered = wasreentered;
     }  /* while (1); never falls through */
 
 end:
@@ -194,13 +194,13 @@ static void qlist_read(t_qlist *x, t_symbol *filename, t_symbol *format)
 {
     int cr = 0;
     if (!strcmp(format->s_name, "cr"))
-    	cr = 1;
+        cr = 1;
     else if (*format->s_name)
-    	error("qlist_read: unknown flag: %s", format->s_name);
-	
+        error("qlist_read: unknown flag: %s", format->s_name);
+
     if (binbuf_read_via_path(x->x_binbuf, filename->s_name,
-    	canvas_getdir(x->x_canvas)->s_name, cr))
-    	    error("%s: read failed", filename->s_name);
+        canvas_getdir(x->x_canvas)->s_name, cr))
+            error("%s: read failed", filename->s_name);
     x->x_onset = 0x7fffffff;
     x->x_reentered = 1;
 }
@@ -210,13 +210,13 @@ static void qlist_write(t_qlist *x, t_symbol *filename, t_symbol *format)
     int cr = 0;
     char buf[MAXPDSTRING];
     canvas_makefilename(x->x_canvas, filename->s_name,
-    	buf, MAXPDSTRING);
+        buf, MAXPDSTRING);
     if (!strcmp(format->s_name, "cr"))
-    	cr = 1;
+        cr = 1;
     else if (*format->s_name)
-    	error("qlist_read: unknown flag: %s", format->s_name);
+        error("qlist_read: unknown flag: %s", format->s_name);
     if (binbuf_write(x->x_binbuf, buf, "", cr))
-    	    error("%s: write failed", filename->s_name);
+            error("%s: write failed", filename->s_name);
 }
 
 static void qlist_print(t_qlist *x)
@@ -233,11 +233,11 @@ static void qlist_tempo(t_qlist *x, t_float f)
     newtempo = 1./f;
     if (x->x_whenclockset != 0)
     {
-    	float elapsed = clock_gettimesince(x->x_whenclockset);
-    	float left = x->x_clockdelay - elapsed;
-    	if (left < 0) left = 0;
-    	left *= newtempo / x->x_tempo;
-    	clock_delay(x->x_clock, left);
+        float elapsed = clock_gettimesince(x->x_whenclockset);
+        float left = x->x_clockdelay - elapsed;
+        if (left < 0) left = 0;
+        left *= newtempo / x->x_tempo;
+        clock_delay(x->x_clock, left);
     }
     x->x_tempo = newtempo;
 }
@@ -278,30 +278,30 @@ static void textfile_bang(t_textfile *x)
 #ifdef ROCKBOX
         onset = x->x_onset, onset2;
 #else
-    	count, onset = x->x_onset, onset2;
+        count, onset = x->x_onset, onset2;
 #endif
     t_atom *argv = binbuf_getvec(x->x_binbuf);
     t_atom *ap = argv + onset, *ap2;
     while (onset < argc &&
-    	(ap->a_type == A_SEMI || ap->a_type == A_COMMA))
-	    onset++, ap++;
+        (ap->a_type == A_SEMI || ap->a_type == A_COMMA))
+            onset++, ap++;
     onset2 = onset;
     ap2 = ap;
     while (onset2 < argc &&
-	(ap2->a_type != A_SEMI && ap2->a_type != A_COMMA))
-	    onset2++, ap2++;
+        (ap2->a_type != A_SEMI && ap2->a_type != A_COMMA))
+            onset2++, ap2++;
     if (onset2 > onset)
     {
-    	x->x_onset = onset2;
-    	if (ap->a_type == A_SYMBOL)
-    	    outlet_anything(x->x_ob.ob_outlet, ap->a_w.w_symbol,
-    	    	onset2-onset-1, ap+1);
-    	else outlet_list(x->x_ob.ob_outlet, 0, onset2-onset, ap);
+        x->x_onset = onset2;
+        if (ap->a_type == A_SYMBOL)
+            outlet_anything(x->x_ob.ob_outlet, ap->a_w.w_symbol,
+                onset2-onset-1, ap+1);
+        else outlet_list(x->x_ob.ob_outlet, 0, onset2-onset, ap);
     }
     else
     {
-    	x->x_onset = 0x7fffffff;
-    	outlet_bang(x->x_bangout);
+        x->x_onset = 0x7fffffff;
+        outlet_bang(x->x_bangout);
     }
 }
 
@@ -320,48 +320,47 @@ static void textfile_free(t_textfile *x)
 void x_qlist_setup(void )
 {
     qlist_class = class_new(gensym("qlist"), (t_newmethod)qlist_new,
-    	(t_method)qlist_free, sizeof(t_qlist), 0, 0);
+        (t_method)qlist_free, sizeof(t_qlist), 0, 0);
     class_addmethod(qlist_class, (t_method)qlist_rewind, gensym("rewind"), 0);
     class_addmethod(qlist_class, (t_method)qlist_next,
-    	gensym("next"), A_DEFFLOAT, 0);  
+        gensym("next"), A_DEFFLOAT, 0);
     class_addmethod(qlist_class, (t_method)qlist_set, gensym("set"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(qlist_class, (t_method)qlist_clear, gensym("clear"), 0);
     class_addmethod(qlist_class, (t_method)qlist_add, gensym("add"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(qlist_class, (t_method)qlist_add2, gensym("add2"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(qlist_class, (t_method)qlist_add, gensym("append"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(qlist_class, (t_method)qlist_read, gensym("read"),
-    	A_SYMBOL, A_DEFSYM, 0);
+        A_SYMBOL, A_DEFSYM, 0);
     class_addmethod(qlist_class, (t_method)qlist_write, gensym("write"),
-    	A_SYMBOL, A_DEFSYM, 0);
+        A_SYMBOL, A_DEFSYM, 0);
     class_addmethod(qlist_class, (t_method)qlist_print, gensym("print"),
-    	A_DEFSYM, 0);
+        A_DEFSYM, 0);
     class_addmethod(qlist_class, (t_method)qlist_tempo,
-    	gensym("tempo"), A_FLOAT, 0);
+        gensym("tempo"), A_FLOAT, 0);
     class_addbang(qlist_class, qlist_bang);
 
     textfile_class = class_new(gensym("textfile"), (t_newmethod)textfile_new,
-    	(t_method)textfile_free, sizeof(t_textfile), 0, 0);
+        (t_method)textfile_free, sizeof(t_textfile), 0, 0);
     class_addmethod(textfile_class, (t_method)textfile_rewind, gensym("rewind"),
-    	0);
+        0);
     class_addmethod(textfile_class, (t_method)qlist_set, gensym("set"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(textfile_class, (t_method)qlist_clear, gensym("clear"), 0);
     class_addmethod(textfile_class, (t_method)qlist_add, gensym("add"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(textfile_class, (t_method)qlist_add2, gensym("add2"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(textfile_class, (t_method)qlist_add, gensym("append"),
-    	A_GIMME, 0);
-    class_addmethod(textfile_class, (t_method)qlist_read, gensym("read"), 
-    	A_SYMBOL, A_DEFSYM, 0);
-    class_addmethod(textfile_class, (t_method)qlist_write, gensym("write"), 
-    	A_SYMBOL, A_DEFSYM, 0);
+        A_GIMME, 0);
+    class_addmethod(textfile_class, (t_method)qlist_read, gensym("read"),
+        A_SYMBOL, A_DEFSYM, 0);
+    class_addmethod(textfile_class, (t_method)qlist_write, gensym("write"),
+        A_SYMBOL, A_DEFSYM, 0);
     class_addmethod(textfile_class, (t_method)qlist_print, gensym("print"),
-    	A_DEFSYM, 0);
+        A_DEFSYM, 0);
     class_addbang(textfile_class, textfile_bang);
 }
-

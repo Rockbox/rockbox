@@ -21,7 +21,7 @@
 
 /* Define how IRAM is used on the various targets.  Note that this
    file is included by both .c and .S files so must not contain any C
-   code. 
+   code.
 */
 
 #ifndef _LIBMAD_IRAM_H

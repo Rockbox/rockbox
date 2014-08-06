@@ -31,7 +31,7 @@ static inline void delay_nop(int cycles)
 {
     asm volatile ("1: subs %[n], %[n], #1     \n\t"
                   "   bne  1b"
-                  :  
+                  :
                   : [n] "r" (cycles));
 }
 
@@ -70,7 +70,7 @@ void lcd_display_init(void)
     lcd_write_reg(IF_ENDIAN,       0x0000); /* order of receiving data */
     lcd_write_reg(DRIVER_OUT_CTRL, 0x0000);
     lcd_write_reg(ENTRY_MODE,      0x1038);
-    lcd_write_reg(WAVEFORM_CTRL,   0x0100); 
+    lcd_write_reg(WAVEFORM_CTRL,   0x0100);
     lcd_write_reg(SHAPENING_CTRL,  0x0000);
     lcd_write_reg(DISPLAY_CTRL2,   0x0808);
     lcd_write_reg(LOW_PWR_CTRL1,   0x0001);
@@ -149,8 +149,8 @@ void lcd_display_init(void)
     delay_nop(100000);
     lcd_write_reg(DISPLAY_CTRL1,   0x0173);
     delay_nop(300000);
-   
- 
+
+
     /* clear screen */
     lcd_cmd(GRAM_WRITE);
 

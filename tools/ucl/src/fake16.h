@@ -78,4 +78,3 @@ typedef short               ucl_int;
 #endif
 
 #endif /* already included */
-

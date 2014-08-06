@@ -27,7 +27,7 @@
 enum power_input_flags {
     /* No external power source? Default. */
     POWER_INPUT_NONE = 0x00,
- 
+
     /* Main power source is available (AC?), the default other than
      * battery if for instance USB and others cannot be distinguished or
      * USB is the only possibility. */

@@ -24,7 +24,7 @@
 #include "button.h"
 #include "adc.h"
 
-/* 
+/*
 
 Results of button testing:
 
@@ -55,7 +55,7 @@ int button_read_device(void)
 {
     int btn = BUTTON_NONE;
     int adc;
- 
+
     adc = adc_read(ADC_BUTTONS);
 
     if (adc < 0x384) {

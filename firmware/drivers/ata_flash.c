@@ -120,7 +120,7 @@ int flash_map_sector(int sector, int* chip, int* chip_sector)
     int ord, c;
     if (flash_disk.model ==  FLASH_MODEL_NONE)
         return -1;
-    
+
     ord = model_n_sectors_order[flash_disk.model];
     c = sector >> ord;
     *chip_sector = sector & ((1 << ord) - 1);
@@ -152,7 +152,7 @@ int flash_read_sector(int sector, unsigned char* buf,
     unsigned long *bufl = (unsigned long *)buf;
     int chip, chip_sector;
     int i;
-    
+
     if (flash_map_sector(sector, &chip, &chip_sector) < 0)
         return -1;
 
@@ -165,9 +165,9 @@ int flash_read_sector(int sector, unsigned char* buf,
     flash_write_addr((chip_sector >> 10) & 0xff);
     flash_write_addr((chip_sector >> 18) & 0xff);
     flash_write_cmd(0x30);
-    
+
     flash_wait_ready();
-    
+
     if ((unsigned long)buf & 3)
     {
         for (i = 0; i < 512; i++)
@@ -208,7 +208,7 @@ int flash_read_sector_oob(int sector, unsigned char* oob)
 {
     int chip, chip_sector;
     int i;
-    
+
     if (flash_map_sector(sector, &chip, &chip_sector) < 0)
         return -1;
 
@@ -221,9 +221,9 @@ int flash_read_sector_oob(int sector, unsigned char* oob)
     flash_write_addr((chip_sector >> 10) & 0xff);
     flash_write_addr((chip_sector >> 18) & 0xff);
     flash_write_cmd(0x30);
-    
+
     flash_wait_ready();
-    
+
     for (i = 0; i < 16; i++)
         oob[i] = flash_read_data();
 
@@ -299,7 +299,7 @@ int flash_disk_scan(void)
     int n_segments, n_phblocks;
     unsigned char oob[16];
     int s, b;
-    
+
     /* TODO: checking for double blocks */
 
     n_segments = flash_get_n_segments();
@@ -332,7 +332,7 @@ int flash_disk_find_block(int block)
     int seg, bmod, phb;
     unsigned char oob[16];
     int r;
-   
+
     if (block >= SEGMENT_SIZE * flash_get_n_segments())
         return -1;
 
@@ -438,7 +438,7 @@ int nand_init(void)
         if (id2 == id)
             flash_disk.chip_no[flash_disk.n_chips++] = i;
     }
-        
+
     if (flash_disk_scan() < 0)
         return -2;
 
@@ -477,8 +477,7 @@ int nand_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif
-

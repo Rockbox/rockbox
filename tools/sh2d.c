@@ -262,7 +262,7 @@ int FindOption(char *option, int p, int h, int u, int argc, char **argv)
                                 0, 0, 0, 0, 0, 0, 0, 0 };
         int             i;
         char            *c;
-      
+
         if (argc > 128)
                 argc = 128;     /* maximum this function can handle is 128 */
 
@@ -286,7 +286,7 @@ int FindOption(char *option, int p, int h, int u, int argc, char **argv)
         if (p)  /* find option and return integer value following it */
         {
                 for (i = 1; i < argc; i++)
-                {                
+                {
                         if (strcmp(argv[i], option) == 0)       /* found */
                         {
                                 if (i >= argc)                  /* bounds! */
@@ -300,16 +300,16 @@ int FindOption(char *option, int p, int h, int u, int argc, char **argv)
                 }
                 return 0;                                       /* no match */
         }
-        else    /* find option and return position */        
+        else    /* find option and return position */
         {
                 for (i = 1; i < argc; i++)
-                {                
+                {
                         if (strcmp(argv[i], option) == 0)
                         {
                                 t[i] = 1;
                                 return i;       /* found! return position */
                         }
-                }                                                          
+                }
                 return 0;
         }
 }
@@ -318,7 +318,7 @@ int FindOption(char *option, int p, int h, int u, int argc, char **argv)
  * SH2Disasm(): SH-1/SH-2 disassembler routine. If mode = 0 then SH-2 mode,
  *              otherwise SH-1 mode
  */
- 
+
 void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
   {
     int            i;
@@ -414,7 +414,7 @@ void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
                           printf(tab[i].mnem,
                           ((op & 0xff) * 2) +
                           v_addr + 4);
-                      }        
+                      }
                   }
                 else if (tab[i].format == D12_F)
                   {
@@ -428,7 +428,7 @@ void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
                   }
                 else if (tab[i].format == ND8_F)
                   {
-                    int imm = (op & 0xff) * tab[i].dat + 4; 
+                    int imm = (op & 0xff) * tab[i].dat + 4;
                     if ((op & 0xf000) == 0x9000)    /* .W */
                       {
                         int dat =  (unsigned short) (*(imm + p_addr) << 8) | *(imm + p_addr + 1);
@@ -445,10 +445,10 @@ void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
                         unsigned char *b_addr = (unsigned char *)((intptr_t)p_addr & ~3);
                         int dat =  (unsigned int) (*(imm + b_addr) << 24) | (*(imm + b_addr + 1) << 16)
                           | (*(imm + b_addr + 2) << 8) | *(imm + b_addr + 3) ;
-			/* SH-1 register name lookup */
-			char* str = "";
-			if ( (dat & 0xfffffe00) == 0x05fffe00 )
-			   str = regname[dat & 0x1ff];
+                        /* SH-1 register name lookup */
+                        char* str = "";
+                        if ( (dat & 0xfffffe00) == 0x05fffe00 )
+                           str = regname[dat & 0x1ff];
                         m_addr[imm+(b_addr-p_addr)+0] = ND8_F; /* this couldn't be an instruction so mark it ! */
                         m_addr[imm+(b_addr-p_addr)+1] = imm;
                         m_addr[imm+(b_addr-p_addr)+2] = -1;
@@ -470,7 +470,7 @@ void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
                 return;
               }
           }
-     
+
         printf("???");
 
       }
@@ -544,7 +544,7 @@ int main(int argc, char **argv)
         rewind(fp);
         if ((buffer = (char *) calloc(fsize * 2, sizeof(unsigned short)))
             == NULL)
-        {                      
+        {
                 fprintf(stderr, "sh2d: Not enough memory to load input "
                                 "file: %s, %lu bytes\n", argv[file], fsize);
                 exit(1);

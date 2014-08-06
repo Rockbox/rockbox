@@ -8,7 +8,7 @@
  *                     \/            \/     \/    \/            \/
  *
  * $Id$
- * 
+ *
  * Rockbox plugin copyright (C) 2009 Dave Chapman.
  * Based on encryption code (C) 2009 Michael Sparmann
  *
@@ -22,7 +22,7 @@
  *
  ****************************************************************************/
 
-/* 
+/*
 
    This viewer plugin is for the encryption/decryption of iPod Nano
    (2nd generation) firmware images using the hardware AES crypto unit
@@ -190,7 +190,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     size = length - 8;  /* Size of firmware image */
 
-    if (calc_checksum(MODEL_NUMBER, (unsigned char*)(buf + 2), size) != 
+    if (calc_checksum(MODEL_NUMBER, (unsigned char*)(buf + 2), size) !=
         get_uint32be((unsigned char*)buf)) {
         rb->splash(HZ*2, "Bad checksum in input file");
         return PLUGIN_ERROR;
@@ -241,7 +241,7 @@ enum plugin_status plugin_start(const void* parameter)
         /* 3 - Update the Rockbox header */
 
         sum = calc_checksum(MODEL_NUMBER, (unsigned char*)hash, sizeof(hash));
-        sum = calc_checksum(sum, (unsigned char*)(buf + 2), size); 
+        sum = calc_checksum(sum, (unsigned char*)(buf + 2), size);
         put_uint32be((unsigned char*)buf, sum);
         memcpy(buf + 1, "nn2x", 4);
 
@@ -302,7 +302,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         /* 3 - Update the Rockbox header */
 
-        sum = calc_checksum(MODEL_NUMBER, (unsigned char*)(&buf[0x202]), size); 
+        sum = calc_checksum(MODEL_NUMBER, (unsigned char*)(&buf[0x202]), size);
         put_uint32be((unsigned char*)buf, sum);
         memcpy(buf + 1, "nn2g", 4);
 

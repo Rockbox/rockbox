@@ -68,7 +68,7 @@ unsigned int power_input_status(void)
     if (PDAT1 & (1 << 1)) {
         return POWER_INPUT_USB;
     }
-    
+
     return POWER_INPUT_NONE;
 }
 
@@ -93,7 +93,7 @@ bool tuner_power(bool status)
         PDAT4 &= ~(1 << 7);
     }
     /* TODO what should we return here? */
-    return status;    
+    return status;
 }
 
 bool tuner_powered(void)
@@ -101,4 +101,3 @@ bool tuner_powered(void)
     return (PDAT4 & (1 << 7));
 }
 #endif /* CONFIG_TUNER */
-

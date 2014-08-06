@@ -194,7 +194,7 @@ void init_threads(void)
     thread->context.s = SDL_CreateSemaphore(0);
     thread->context.t = NULL; /* NULL for the implicit main thread */
     cores[CURRENT_CORE].running = thread;
- 
+
     if (thread->context.s == NULL)
     {
         fprintf(stderr, "Failed to create main semaphore\n");

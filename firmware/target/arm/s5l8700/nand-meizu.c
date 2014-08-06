@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
  #include "config.h"
  #include "nand-target.h"
 
@@ -78,4 +78,3 @@ long nand_last_activity(void)
     /* TODO implement */
     return 0;
 }
-

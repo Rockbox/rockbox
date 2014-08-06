@@ -110,7 +110,7 @@ void onReturnFromInterrupt(void);
         the stack and assigned the specified address. When the interrupt handler
         returns, execution resumes from the point where the interrupt occurred.
 
-        The actual interrupt address depends on the current interrupt mode and 
+        The actual interrupt address depends on the current interrupt mode and
         on the interrupt type. For maskable interrupts, data is as follows:
         - mode 0: data is an opcode that is executed (usually RST xxh);
         - mode 1: data is ignored and a call is made to address 0x38;
@@ -131,7 +131,7 @@ void onReturnFromInterrupt(void);
     /** Returns the size of the buffer needed to take a snapshot of the CPU. */
     unsigned getSizeOfSnapshotBuffer(void);
 
-    /**         
+    /**
         Takes a snapshot of the CPU.
 
         A snapshot saves all of the CPU registers and internals. It can be

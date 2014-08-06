@@ -18,11 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
  #include "i2c-dm320.h"
- 
+
  #define I2C_ADDRESS 0x51
- 
+
  unsigned char* rtc_send_command(short unk1, short unk2)
  {
     unsigned char ret[12];
@@ -30,7 +30,7 @@
     i2c_read(I2C_ADDRESS, ret, 12);
     return ret;
  }
- 
+
  unsigned char* rtc_read(void)
  {
     unsigned char ret[12];

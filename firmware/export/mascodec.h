@@ -42,4 +42,3 @@ unsigned long mas_readver(void);
 void mas_store_pllfreq(int freq);
 int mas_get_pllfreq(void);
 #endif
-

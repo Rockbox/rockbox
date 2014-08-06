@@ -28,7 +28,7 @@ void TIMER1(void)
     /* Run through the list of tick tasks (using main core) */
     TIMER1_VAL; /* Read value to ack IRQ */
 
-    /* Run through the list of tick tasks using main CPU core - 
+    /* Run through the list of tick tasks using main CPU core -
        wake up the COP through its control interface to provide pulse */
     call_tick_tasks();
 

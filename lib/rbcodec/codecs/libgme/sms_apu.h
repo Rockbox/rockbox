@@ -9,29 +9,29 @@
 
 // 0: Square 1, 1: Square 2, 2: Square 3, 3: Noise
 enum { sms_osc_count = 4 }; // 0 <= chan < osc_count
-	
+
 struct Osc
 {
-	struct Blip_Buffer* outputs [4]; // NULL, right, left, center
-	struct Blip_Buffer* output;
-	int          last_amp;
-	
-	int         volume;
-	int         period;
-	int         delay;
-	unsigned    phase;
+        struct Blip_Buffer* outputs [4]; // NULL, right, left, center
+        struct Blip_Buffer* output;
+        int          last_amp;
+
+        int         volume;
+        int         period;
+        int         delay;
+        unsigned    phase;
 };
 
 struct Sms_Apu {
-	struct Osc     oscs [sms_osc_count];
-	int     ggstereo;
-	int     latch;
-	
-	blip_time_t last_time;
-	int         min_tone_period;
-	unsigned    noise_feedback;
-	unsigned    looped_feedback;
-	struct Blip_Synth synth;
+        struct Osc     oscs [sms_osc_count];
+        int     ggstereo;
+        int     latch;
+
+        blip_time_t last_time;
+        int         min_tone_period;
+        unsigned    noise_feedback;
+        unsigned    looped_feedback;
+        struct Blip_Synth synth;
 };
 
 // Basics

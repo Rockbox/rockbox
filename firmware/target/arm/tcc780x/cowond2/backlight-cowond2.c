@@ -37,7 +37,7 @@ int _backlight_init(void)
 void _backlight_set_brightness(int brightness)
 {
     int level = disable_irq_save();
-    
+
     if (get_pmu_type() == PCF50606)
     {
         pcf50606_write(PCF5060X_PWMC1,
@@ -52,7 +52,7 @@ void _backlight_set_brightness(int brightness)
 
         pcf50635_write(PCF5063X_REG_LEDOUT, brightness_lookup[brightness]);
     }
-    
+
     restore_irq(level);
 }
 

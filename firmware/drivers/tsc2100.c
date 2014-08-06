@@ -36,12 +36,12 @@ void tsc2100_read_data(void)
     unsigned short command = 0x8000|(page << 11)|(address << 5);
     unsigned char out[] = {command >> 8, command & 0xff};
     unsigned char *p_adc_data=(unsigned char *)&adc_data;
-    
+
     adc_status|=tsc2100_readreg(TSSTAT_PAGE, TSSTAT_ADDRESS);
-    
+
     spi_block_transfer(SPI_target_TSC2100,
                        out, sizeof(out), (char *)adc_data, sizeof(adc_data));
-                       
+
     for(i=0; i<sizeof(adc_data); i+=2)
         adc_data[i>>1]=(short)(p_adc_data[i]<<8|p_adc_data[i+1]);
 }
@@ -54,9 +54,9 @@ bool tsc2100_read_touch(short *x, short* y, short *z1, short *z2)
         *y      = adc_data[1];
         *z1     = adc_data[2];
         *z2     = adc_data[3];
-        
+
         adc_status&=~(3<<9);
-        
+
         return true;
     } else {
         return false;
@@ -69,7 +69,7 @@ bool tsc2100_read_volt(short *bat1, short *bat2, short *aux)
         *bat1   = adc_data[5];
         *bat2   = adc_data[6];
         *aux    = adc_data[7];
-        
+
         adc_status&=~(7<<4);
         return true;
     } else {
@@ -85,15 +85,15 @@ void tsc2100_set_mode(bool poweron, unsigned char scan_mode)
                  (0x2<<TSADC_ADCR_SHIFT )| /* 2 MHz internal clock */
                  (0x3<<TSADC_PVSTC_SHIFT)| /* 1 ms stabalization */
                  (TSADC_AVGFS);            /* Median filter ( 9 sample ) */
-                 
+
     if(!poweron)
     {
         tsadc|=TSADC_ADST;
     }
-                 
+
     if(scan_mode<6)
         tsadc|=TSADC_PSTCM;
-        
+
     tsc2100_writereg(TSADC_PAGE, TSADC_ADDRESS, tsadc);
 }
 
@@ -102,7 +102,7 @@ void tsc2100_adc_init(void)
     /* Set the TSC2100 to read touchscreen */
     tsc2100_set_mode(true, 0x02);
 
-    tsc2100_writereg(TSSTAT_PAGE, TSSTAT_ADDRESS, 
+    tsc2100_writereg(TSSTAT_PAGE, TSSTAT_ADDRESS,
                      (0x1<<TSSTAT_PINTDAV_SHIFT) /* Data available only */
                      );
 

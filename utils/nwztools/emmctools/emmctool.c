@@ -158,7 +158,7 @@ static int do_emmc(void)
     uint32_t linux_size = do_image(EMMC_LINUX_START, "Linux");
     if(!linux_size)
         return 1;
-    
+
     int ret = nvp_info();
     continue_the_force(ret);
 
@@ -177,7 +177,7 @@ static int do_nvp_extract(void)
         cprintf(GREY, "Invalid NVP node %d\n", g_nvp_node);
         return 3;
     }
-    
+
     FILE *f = fopen(g_out_prefix, "wb");
     if(!f)
     {
@@ -283,4 +283,3 @@ int main(int argc, char **argv)
 
     return ret;
 }
-

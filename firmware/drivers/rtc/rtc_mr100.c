@@ -7,8 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by Robert Kukla 
- * 
+ * Copyright (C) 2008 by Robert Kukla
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -18,12 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "rtc.h" 
+#include "rtc.h"
 #include "logf.h"
 #include "sw_i2c.h"
 #include "i2c-pp.h"
 
-/* The RTC chip is unknown, the information about it was gathered by 
+/* The RTC chip is unknown, the information about it was gathered by
  * reverse engineering the bootloader.
  */
 
@@ -40,17 +40,17 @@ static void reverse_bits(unsigned char* v, int size) {
 
     int i,j,in,out=0;
 
-    for(j=0; j<size; j++) {   
+    for(j=0; j<size; j++) {
         in = v[j];
         out = in;
         for(i=0; i<7; i++) {
            in  = in >>1;
            out = out<<1;
            out |= (in & 1);
-        }   
+        }
         v[j] = out;
-    }   
-}    
+    }
+}
 
 static int sw_i2c(int access, int cmd, unsigned char* buf, int count) {
     int i, addr;
@@ -66,11 +66,11 @@ static int sw_i2c(int access, int cmd, unsigned char* buf, int count) {
     } else {
         reverse_bits(buf, count);
         i = sw_i2c_write(addr, 0, buf, count);
-    }    
+    }
 
     GPIOC_ENABLE &= ~0x00000030;
     i2c_unlock();
-    
+
     return i;
 }
 
@@ -79,48 +79,48 @@ static int sw_i2c(int access, int cmd, unsigned char* buf, int count) {
 void rtc_init(void)
 {
     sw_i2c_init();
- 
-#if 0    
+
+#if 0
     /* init sequence from OF for reference */
-    /* currently we rely on the bootloader doing it for us */       
-    
+    /* currently we rely on the bootloader doing it for us */
+
     bool flag = true;
-    unsigned char data;   
+    unsigned char data;
     unsigned char v[7] = {0x00,0x47,0x17,0x06,0x03,0x02,0x08}; /* random time */
-    
-    if(flag) { 
-        
+
+    if(flag) {
+
         GPIOB_ENABLE |= 0x80;
         GPIOB_OUTPUT_EN |= 0x80;
         GPIOB_OUTPUT_VAL &= ~0x80;
-        
+
         DEV_EN |= 0x1000;
-        /* some more stuff that is not clear */ 
-        
-        sw_i2c(SW_I2C_READ, RTC_CMD_CTRL, &data, 1);       
+        /* some more stuff that is not clear */
+
+        sw_i2c(SW_I2C_READ, RTC_CMD_CTRL, &data, 1);
         if((data<<0x18)>>0x1e) {        /* bit 7 & 6 */
-            
+
             data = 1;
             sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);
-    
+
             data = 1;
             sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);
-        
+
             data = 8;
             sw_i2c(SW_I2C_WRITE, RTC_CMD_UNKN, &data, 1);
-        
+
             /* more stuff, perhaps set up time array? */
-            
+
             rtc_write_datetime(v);
-                
+
         }
         data = 2;
         sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);
-    
+
     }
     data = 2;
-    sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);   
-#endif    
+    sw_i2c(SW_I2C_WRITE, RTC_CMD_CTRL, &data, 1);
+#endif
 
 }
 
@@ -133,7 +133,7 @@ int rtc_read_datetime(struct tm *tm)
     rc = sw_i2c(SW_I2C_READ, RTC_CMD_DATA, buf, sizeof(buf));
 
     buf[4] &= 0x3f; /* mask out p.m. flag */
-    
+
     for (i = 0; i < sizeof(buf); i++)
         buf[i] = BCD2DEC(buf[i]);
 
@@ -169,4 +169,3 @@ int rtc_write_datetime(const struct tm *tm)
 
     return rc;
 }
-

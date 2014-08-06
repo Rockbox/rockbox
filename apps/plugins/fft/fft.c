@@ -471,7 +471,7 @@ static struct fft_config
     int amp_scale;
     int freq_scale;
     int window_func;
-} fft_disk = 
+} fft_disk =
 {
      /* Defaults */
     .orientation = FFT_OR_VERT,
@@ -588,7 +588,7 @@ static void apply_window_func(enum fft_window_func mode)
 /* Calculates the magnitudes from complex numbers and returns the maximum */
 static unsigned calc_magnitudes(enum fft_amp_scale scale)
 {
-    /* A major assumption made when calculating the Q*MAX constants 
+    /* A major assumption made when calculating the Q*MAX constants
      * is that the maximum magnitude is 29 bits long. */
     unsigned this_max = 0;
     kiss_fft_cpx *this_output = output[output_head] + 1; /* skip DC */
@@ -747,7 +747,7 @@ static void draw_lines_vertical(unsigned this_max, unsigned graph_max)
     {
         int bins_acc = LCD_WIDTH / 2;
         unsigned bins_max = 0;
-        
+
         for(int i = 0, x = 0; i < ARRAYLEN_PLOT; ++i)
         {
             unsigned bin = plot[i];
@@ -1048,7 +1048,7 @@ static inline bool fft_get_fft(void)
     /* This block can introduce discontinuities in our data. Meaning, the
      * FFT will not be done a continuous segment of the signal. Which can
      * be bad. Or not.
-     * 
+     *
      * Anyway, this is a demo, not a scientific tool. If you want accuracy,
      * do a proper spectrum analysis.*/
 
@@ -1101,7 +1101,7 @@ static void fft_thread_entry(void)
     fft_thread_run = true;
 
     while(fft_thread_run)
-	{
+        {
         if (!is_playing())
         {
             rb->sleep(HZ/5);
@@ -1131,7 +1131,7 @@ static void fft_thread_entry(void)
 
             rb->sleep(0);
         }
-	}
+        }
 }
 
 static bool fft_have_fft(void)
@@ -1350,7 +1350,7 @@ static void fft_setting_update(unsigned which)
             [FFT_OR_HORZ] = draw_bars_horizontal,
             [FFT_OR_VERT] = draw_bars_vertical,
         },
-        [FFT_DM_SPECTROGRAM] = 
+        [FFT_DM_SPECTROGRAM] =
         {
             [FFT_OR_HORZ] = draw_spectrogram_horizontal,
             [FFT_OR_VERT] = draw_spectrogram_vertical,
@@ -1474,7 +1474,7 @@ static void fft_cleanup(void)
 {
     myosd_destroy();
 
-    fft_close_fft();    
+    fft_close_fft();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cancel_cpu_boost();
@@ -1555,7 +1555,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     while(run)
     {
-	    long delay = fft_draw();
+            long delay = fft_draw();
 
         if(delay <= 0)
         {
@@ -1563,7 +1563,7 @@ enum plugin_status plugin_start(const void* parameter)
             rb->yield(); /* tmo = 0 won't yield */
         }
 
-		int button = rb->button_get_w_tmo(delay);
+                int button = rb->button_get_w_tmo(delay);
 
         switch (button)
         {

@@ -100,4 +100,3 @@ class RbSettings : public QObject
 };
 
 #endif
-

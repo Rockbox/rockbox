@@ -56,4 +56,4 @@ private:
     Backend *m_backend;
 };
 
-#endif 
+#endif

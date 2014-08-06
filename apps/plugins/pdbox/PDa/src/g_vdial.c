@@ -48,14 +48,14 @@ void vradio_draw_update(t_vradio *x, t_glist *glist)
 #else /* ROCKBOX */
     if(glist_isvisible(glist))
     {
-	t_canvas *canvas=glist_getcanvas(glist);
+        t_canvas *canvas=glist_getcanvas(glist);
 
-	sys_vgui(".x%x.c itemconfigure %xBUT%d -fill #%6.6x -outline #%6.6x\n",
-		 canvas, x, x->x_on_old,
-		 x->x_gui.x_bcol, x->x_gui.x_bcol);
-	sys_vgui(".x%x.c itemconfigure %xBUT%d -fill #%6.6x -outline #%6.6x\n",
-		 canvas, x, x->x_on,
-		 x->x_gui.x_fcol, x->x_gui.x_fcol);
+        sys_vgui(".x%x.c itemconfigure %xBUT%d -fill #%6.6x -outline #%6.6x\n",
+                 canvas, x, x->x_on_old,
+                 x->x_gui.x_bcol, x->x_gui.x_bcol);
+        sys_vgui(".x%x.c itemconfigure %xBUT%d -fill #%6.6x -outline #%6.6x\n",
+                 canvas, x, x->x_on,
+                 x->x_gui.x_fcol, x->x_gui.x_fcol);
     }
 #endif /* ROCKBOX */
 }
@@ -68,7 +68,7 @@ void vradio_draw_new(t_vradio *x, t_glist *glist)
 #else /* ROCKBOX */
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i, dy=x->x_gui.x_h, s4=dy/4;
-    int yy11b=text_ypix(&x->x_gui.x_obj, glist); 
+    int yy11b=text_ypix(&x->x_gui.x_obj, glist);
     int yy11=yy11b, yy12=yy11+dy;
     int yy21=yy11+s4, yy22=yy12-s4;
     int xx11=text_xpix(&x->x_gui.x_obj, glist), xx12=xx11+dy;
@@ -76,17 +76,17 @@ void vradio_draw_new(t_vradio *x, t_glist *glist)
 
     for(i=0; i<n; i++)
     {
-	sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE%d\n",
-		 canvas, xx11, yy11, xx12, yy12,
-		 x->x_gui.x_bcol, x, i);
-	sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -outline #%6.6x -tags %xBUT%d\n",
-		 canvas, xx21, yy21, xx22, yy22,
-		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol,
-		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol, x, i);
-	yy11 += dy;
-	yy12 += dy;
-	yy21 += dy;
-	yy22 += dy;
+        sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE%d\n",
+                 canvas, xx11, yy11, xx12, yy12,
+                 x->x_gui.x_bcol, x, i);
+        sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -outline #%6.6x -tags %xBUT%d\n",
+                 canvas, xx21, yy21, xx22, yy22,
+                 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol,
+                 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol, x, i);
+        yy11 += dy;
+        yy12 += dy;
+        yy21 += dy;
+        yy22 += dy;
     }
     sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
@@ -793,4 +793,3 @@ void g_vradio_setup(void)
     class_setwidget(vradio_old_class, &vradio_widgetbehavior);
     class_sethelpsymbol(vradio_old_class, gensym("vradio"));
 }
-

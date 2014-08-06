@@ -112,7 +112,7 @@ void do_patching(void)
     int err;
 
     fprintf(stderr,"[INFO] Searching for E200R\n");
- 
+
     usb_init();
 
     if(usb_find_busses() < 0) {
@@ -170,7 +170,7 @@ found:
 
     fprintf(stderr,"[INFO] Found E200R, uploading patching application.\n");
 
-    /* Now we can transfer the application to the device. */ 
+    /* Now we can transfer the application to the device. */
 
     if (upload_app(dh) < 0)
     {
@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
     char input[4];
     int silent = 0;
     int i;
-    
+
     /* check args */
     if ((argc > 1) && ((strcmp(argv[1],"-h")==0) || (strcmp(argv[1],"--help")==0))) {
         print_usage();
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
         printf("\n");
         printf("NOTE: If your E200R starts in the normal Sansa firmware, you have\n");
         printf("      failed to enter manufacturing mode and should try again at step 1).\n\n");
-    
+
         printf("[INFO] Press Enter to continue:");
         fgets(input, 4, stdin);
     }

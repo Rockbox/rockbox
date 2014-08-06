@@ -147,7 +147,7 @@ UnwindCallbacks;
  **************************************************************************/
 
 /** Start unwinding the current stack.
- * This will unwind the stack starting at the PC value supplied and 
+ * This will unwind the stack starting at the PC value supplied and
  * the stack pointer value supplied.
  */
 UnwResult UnwindStart(Int32                  pcValue,

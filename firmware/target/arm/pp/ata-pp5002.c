@@ -25,7 +25,7 @@
 #include "system.h"
 #include "ata-driver.h"
 
-void ata_reset() 
+void ata_reset()
 {
 
 }

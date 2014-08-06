@@ -25,7 +25,7 @@
 
 #define ADC_BUTTON_LEFT         0
 #define ADC_BUTTON_MENU         1
-#define ADC_BUTTON_RIGHT        2 
+#define ADC_BUTTON_RIGHT        2
 #define ADC_BUTTON_PLAY         3
 #define ADC_UNREG_POWER         6 /* Battery voltage with a better scaling */
 #define ADC_EXT_POWER           7 /* The external power voltage, 0v or 2.7v */

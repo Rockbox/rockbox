@@ -50,7 +50,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         "clr.w  " #sum "          \n"  /* 's1' is clobbered! */             \
         "add.l  " #s2  ", " #sum "\n"  \
         "move.w " #s1  ", " #sum "\n"
-        
+
 #define ADDHALFXREGS(s1, s2, sum)      /* Add register halves across. */    \
         "clr.w  " #sum "          \n"  /* Needs 'sum' pre-swapped, swaps */ \
         "add.l  " #s1  ", " #sum "\n"  /* 's2', and clobbers 's1'. */       \
@@ -153,7 +153,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t* s2)
         [cnt]"[res]"(cnt)
 #endif
         : /* clobbers */
-        "d0", "d1", "d2", "d6", "d7", 
+        "d0", "d1", "d2", "d6", "d7",
         "a0", "a1", "memory"
 
     );
@@ -177,8 +177,8 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         "sub.l  " #sub ", " #min "\n" /* 'sub' and 'dif' must be D regs */     \
         "clr.w  " #sub           "\n" /* 'min' and 'sub' are clobbered! */     \
         "sub.l  " #sub ", " #dif "\n" \
-        "move.w " #min ", " #dif "\n" 
-        
+        "move.w " #min ", " #dif "\n"
+
 #define SUBHALFXREGS(min, s2, s1d)    /* Subtract register halves across. */ \
         "clr.w  " #s1d           "\n" /* Needs 's1d' pre-swapped, swaps */   \
         "sub.l  " #s1d ", " #min "\n" /* 's2' and clobbers 'min'. */         \
@@ -283,7 +283,7 @@ static inline int32_t vector_sp_sub(int16_t* v1, int16_t* f2, int16_t* s2)
         [cnt]"[res]"(cnt)
 #endif
         : /* clobbers */
-        "d0", "d1", "d2", "d6", "d7", 
+        "d0", "d1", "d2", "d6", "d7",
         "a0", "a1", "memory"
 
     );
@@ -323,7 +323,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
         "mac.w   %%d0l, %%d1u, %%acc0                \n"
 #endif
         "jra     99f                                  \n"
-        
+
     "20:                                             \n"
         "move.l  (%[v1])+, %%d0                      \n"
         "move.l  (%[v2])+, %%d1                      \n"

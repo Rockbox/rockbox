@@ -8,4 +8,3 @@ void pdgui_mess(char *s);
 void pdgui_evalfile(char *s);
 
 #define GUISTRING 1000
-

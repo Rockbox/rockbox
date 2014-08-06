@@ -259,7 +259,7 @@ struct pnx0101_audio {
 };
 
 #define AUDIO (*(volatile struct pnx0101_audio *)0x80200380)
- 
+
 #endif /* ASM */
 
 /* Timer frequency */

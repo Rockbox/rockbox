@@ -39,7 +39,7 @@
 #define INTFRC      (0x050 / sizeof (unsigned long)) /* 050h H,L */
 #define NIPND       (0x058 / sizeof (unsigned long)) /* 058h H,L */
 #define FIPND       (0x060 / sizeof (unsigned long)) /* 060h H,L */
-#define VECTOR      (0x100 / sizeof (unsigned long)) /* 100h     */ 
+#define VECTOR      (0x100 / sizeof (unsigned long)) /* 100h     */
 
 static const char * const avic_int_names[64] =
 {

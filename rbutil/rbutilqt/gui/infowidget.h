@@ -38,4 +38,3 @@ class InfoWidget : public QWidget
 };
 
 #endif
-

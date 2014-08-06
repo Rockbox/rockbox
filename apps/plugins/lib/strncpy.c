@@ -1,32 +1,32 @@
 /*
 FUNCTION
-	<<strncpy>>---counted copy string
+        <<strncpy>>---counted copy string
 
 INDEX
-	strncpy
+        strncpy
 
 ANSI_SYNOPSIS
-	#include <string.h>
-	char *strncpy(char *<[dst]>, const char *<[src]>, size_t <[length]>);
+        #include <string.h>
+        char *strncpy(char *<[dst]>, const char *<[src]>, size_t <[length]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
-	char *strncpy(<[dst]>, <[src]>, <[length]>)
-	char *<[dst]>;
-	char *<[src]>;
-	size_t <[length]>;
+        #include <string.h>
+        char *strncpy(<[dst]>, <[src]>, <[length]>)
+        char *<[dst]>;
+        char *<[src]>;
+        size_t <[length]>;
 
 DESCRIPTION
-	<<strncpy>> copies not more than <[length]> characters from the
-	the string pointed to by <[src]> (including the terminating
-	null character) to the array pointed to by <[dst]>.  If the
-	string pointed to by <[src]> is shorter than <[length]>
-	characters, null characters are appended to the destination
-	array until a total of <[length]> characters have been
-	written.
+        <<strncpy>> copies not more than <[length]> characters from the
+        the string pointed to by <[src]> (including the terminating
+        null character) to the array pointed to by <[dst]>.  If the
+        string pointed to by <[src]> is shorter than <[length]>
+        characters, null characters are appended to the destination
+        array until a total of <[length]> characters have been
+        written.
 
 RETURNS
-	This function returns the initial value of <[dst]>.
+        This function returns the initial value of <[dst]>.
 
 PORTABILITY
 <<strncpy>> is ANSI C.
@@ -34,7 +34,7 @@ PORTABILITY
 <<strncpy>> requires no supporting OS subroutines.
 
 QUICKREF
-	strncpy ansi pure
+        strncpy ansi pure
 */
 
 #include <string.h>
@@ -68,9 +68,9 @@ QUICKREF
 
 char *
 _DEFUN (strncpy, (dst0, src0),
-	char *dst0 _AND
-	_CONST char *src0 _AND
-	size_t count)
+        char *dst0 _AND
+        _CONST char *src0 _AND
+        size_t count)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *dscan;
@@ -82,7 +82,7 @@ _DEFUN (strncpy, (dst0, src0),
     {
       --count;
       if ((*dscan++ = *sscan++) == '\0')
-	break;
+        break;
     }
   while (count-- > 0)
     *dscan++ = '\0';
@@ -101,12 +101,12 @@ _DEFUN (strncpy, (dst0, src0),
       aligned_src = (long*)src;
 
       /* SRC and DEST are both "long int" aligned, try to do "long int"
-	 sized copies.  */
+         sized copies.  */
       while (count >= sizeof (long int) && !DETECTNULL(*aligned_src))
-	{
-	  count -= sizeof (long int);
-	  *aligned_dst++ = *aligned_src++;
-	}
+        {
+          count -= sizeof (long int);
+          *aligned_dst++ = *aligned_src++;
+        }
 
       dst = (char*)aligned_dst;
       src = (char*)aligned_src;
@@ -116,7 +116,7 @@ _DEFUN (strncpy, (dst0, src0),
     {
       --count;
       if ((*dst++ = *src++) == '\0')
-	break;
+        break;
     }
 
   while (count-- > 0)

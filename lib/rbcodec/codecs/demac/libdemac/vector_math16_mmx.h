@@ -31,9 +31,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #define REPEAT_MB8(x, n) REPEAT_MB7(x, n) x(n+56)
 
 #if ORDER == 16     /* 3 times */
-#define REPEAT_MB(x) REPEAT_MB3(x, 8) 
+#define REPEAT_MB(x) REPEAT_MB3(x, 8)
 #elif ORDER == 32   /* 7 times */
-#define REPEAT_MB(x) REPEAT_MB7(x, 8) 
+#define REPEAT_MB(x) REPEAT_MB7(x, 8)
 #elif ORDER == 64   /* 5*3 == 15 times */
 #define REPEAT_MB(x) REPEAT_MB3(x,  8) REPEAT_MB3(x, 32) REPEAT_MB3(x, 56) \
                      REPEAT_MB3(x, 80) REPEAT_MB3(x, 104)
@@ -76,7 +76,7 @@ static inline int32_t vector_sp_add(int16_t* v1, int16_t* f2, int16_t *s2)
         "paddw   " #n "(%[s2]), %%mm0    \n" \
         "movq    %%mm0, " #n "(%[v1])    \n" \
         "paddd   %%mm1, %%mm2            \n"
-        
+
 REPEAT_MB(SP_ADD_BLOCK)
 
 #if ORDER > 256
@@ -184,7 +184,7 @@ static inline int32_t scalarproduct(int16_t* v1, int16_t* v2)
 #if ORDER > 256
     int cnt = ORDER>>8;
 #endif
-               
+
     asm volatile (
 #if ORDER > 256
         "pxor    %%mm1, %%mm1        \n"

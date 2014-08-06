@@ -66,6 +66,6 @@ int button_read_device(void)
         btn |= BUTTON_MENU;
     if(adc_read(ADC_BUTTON_ONOFF) < 0x120) /* active low */
         btn |= BUTTON_OFF;
-        
+
     return btn;
 }

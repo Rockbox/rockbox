@@ -104,4 +104,3 @@ class RbUtilQt : public QMainWindow
 };
 
 #endif
-

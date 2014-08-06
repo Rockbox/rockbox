@@ -56,7 +56,7 @@ static void draw_image_rect(struct image_info *info,
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap_part((fb_data *)*pdisp, info->x + x, info->y + y,
-                        STRIDE(SCREEN_MAIN, info->width, info->height), 
+                        STRIDE(SCREEN_MAIN, info->width, info->height),
                         x + MAX(0, (LCD_WIDTH-info->width)/2),
                         y + MAX(0, (LCD_HEIGHT-info->height)/2),
                         width, height);
@@ -97,7 +97,7 @@ static int load_image(char *filename, struct image_info *info,
         }
 #endif
 
-        /* initialize decoder context struct, set buffer decoder is free 
+        /* initialize decoder context struct, set buffer decoder is free
          * to use.
          */
         gif_decoder_init(p_decoder, memory, memory_size);

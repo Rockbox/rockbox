@@ -42,7 +42,7 @@
 #define SCL_LO     and_b(~0x40, &PBDRL)
 #define SCL_HI     or_b(0x40, &PBDRL)
 #define SCL        (PBDRL & 0x40)
-#else 
+#else
 /* "classic" pinout, SCL is PB13 */
 #define SCL_INPUT  and_b(~0x20, &PBIORH)
 #define SCL_OUTPUT or_b(0x20, &PBIORH)
@@ -89,7 +89,7 @@ void i2c_init(void)
    int i;
 
    mutex_init(&i2c_mtx);
- 
+
 #if CONFIG_I2C == I2C_ONDIO
    /* make PB6 & PB7 general I/O */
    PBCR2 &= ~0xf000;
@@ -113,7 +113,7 @@ void i2c_ack(int bit)
        before it can receive the acknowledge. Therefore it forces the clock
        low until it is ready. We need to poll the clock line until it goes
        high before we release the ack. */
-    
+
     SCL_LO;      /* Set the clock low */
     if ( bit )
     {
@@ -123,7 +123,7 @@ void i2c_ack(int bit)
     {
         SDA_LO;
     }
-    
+
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the MAS to release it */
         sleep(0);
@@ -149,11 +149,11 @@ int i2c_getack(void)
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the MAS to release it */
         sleep(0);
-    
+
     if (SDA)
         /* ack failed */
         ret = 0;
-    
+
     SCL_OUTPUT;
     SCL_LO;
     SDA_HI;
@@ -201,9 +201,9 @@ unsigned char i2c_inb(int ack)
        SCL_LO;
        SDA_OUTPUT;
    }
-   
+
    i2c_ack(ack);
-   
+
    return byte;
 }
 
@@ -238,7 +238,7 @@ int i2c_write(int address, const unsigned char* buf, int count )
 int i2c_read(int address, unsigned char* buf, int count )
 {
     int i,x=0;
-    
+
     i2c_start();
     i2c_outb(address | 1);
     if (i2c_getack()) {

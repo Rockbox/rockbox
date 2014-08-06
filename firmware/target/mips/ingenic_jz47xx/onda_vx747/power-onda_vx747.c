@@ -64,7 +64,7 @@ bool tuner_power(bool status)
         status = !status;
     }
 
-    return status;    
+    return status;
 }
 
 bool tuner_powered(void)

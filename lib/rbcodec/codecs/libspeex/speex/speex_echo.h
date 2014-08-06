@@ -55,7 +55,7 @@ extern "C" {
 struct SpeexEchoState_;
 
 /** @class SpeexEchoState
- * This holds the state of the echo canceller. You need one per channel. 
+ * This holds the state of the echo canceller. You need one per channel.
 */
 
 /** Internal echo canceller state. Should never be accessed directly. */
@@ -68,7 +68,7 @@ typedef struct SpeexEchoState_ SpeexEchoState;
  */
 SpeexEchoState *speex_echo_state_init(int frame_size, int filter_length);
 
-/** Destroys an echo canceller state 
+/** Destroys an echo canceller state
  * @param st Echo canceller state
 */
 void speex_echo_state_destroy(SpeexEchoState *st);
@@ -100,7 +100,7 @@ void speex_echo_capture(SpeexEchoState *st, const spx_int16_t *rec, spx_int16_t 
 */
 void speex_echo_playback(SpeexEchoState *st, const spx_int16_t *play);
 
-/** Reset the echo canceller to its original state 
+/** Reset the echo canceller to its original state
  * @param st Echo canceller state
  */
 void speex_echo_state_reset(SpeexEchoState *st);

@@ -67,7 +67,7 @@ enum
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_OFF
 /*allow people to define this in config-target.h if they need it*/
-#elif !defined(USBPOWER_BTN_IGNORE) 
+#elif !defined(USBPOWER_BTN_IGNORE)
 #define USBPOWER_BTN_IGNORE 0
 #endif
 #endif

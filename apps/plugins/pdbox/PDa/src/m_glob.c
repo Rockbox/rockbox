@@ -49,11 +49,11 @@ void max_default(t_pd *x, t_symbol *s, int argc, t_atom *argv)
     int i;
     char str[80];
     startpost("%s: unknown message %s ", class_getname(pd_class(x)),
-    	s->s_name);
+        s->s_name);
     for (i = 0; i < argc; i++)
     {
-    	atom_string(argv+i, str, 80);
-    	poststring(str);
+        atom_string(argv+i, str, 80);
+        poststring(str);
     }
     endpost();
 }
@@ -61,48 +61,47 @@ void max_default(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 void glob_init(void)
 {
     maxclass = class_new(gensym("max"), 0, 0, sizeof(t_pd),
-    	CLASS_DEFAULT, A_NULL);
+        CLASS_DEFAULT, A_NULL);
     class_addanything(maxclass, max_default);
     pd_bind(&maxclass, gensym("max"));
 
     glob_pdobject = class_new(gensym("pd"), 0, 0, sizeof(t_pd),
-    	CLASS_DEFAULT, A_NULL);
+        CLASS_DEFAULT, A_NULL);
     class_addmethod(glob_pdobject, (t_method)glob_initfromgui, gensym("init"),
-    	A_GIMME, 0);
+        A_GIMME, 0);
     class_addmethod(glob_pdobject, (t_method)glob_setfilename, gensym("filename"),
-    	A_SYMBOL, A_SYMBOL, 0);
+        A_SYMBOL, A_SYMBOL, 0);
     class_addmethod(glob_pdobject, (t_method)glob_evalfile, gensym("open"),
-    	A_SYMBOL, A_SYMBOL, 0);
+        A_SYMBOL, A_SYMBOL, 0);
     class_addmethod(glob_pdobject, (t_method)glob_quit, gensym("quit"), 0);
     class_addmethod(glob_pdobject, (t_method)glob_foo, gensym("foo"), A_GIMME, 0);
     class_addmethod(glob_pdobject, (t_method)glob_dsp, gensym("dsp"), A_GIMME, 0);
     class_addmethod(glob_pdobject, (t_method)glob_meters, gensym("meters"),
-    	A_FLOAT, 0);
+        A_FLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_key, gensym("key"), A_GIMME, 0);
     class_addmethod(glob_pdobject, (t_method)glob_audiostatus,
-    	gensym("audiostatus"), 0);
+        gensym("audiostatus"), 0);
     class_addmethod(glob_pdobject, (t_method)glob_finderror,
-    	gensym("finderror"), 0);
+        gensym("finderror"), 0);
 #ifndef ROCKBOX
     class_addmethod(glob_pdobject, (t_method)glob_audio_properties,
-    	gensym("audio-properties"), A_DEFFLOAT, 0);
+        gensym("audio-properties"), A_DEFFLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_audio_dialog,
-    	gensym("audio-dialog"), A_GIMME, 0);
+        gensym("audio-dialog"), A_GIMME, 0);
     class_addmethod(glob_pdobject, (t_method)glob_audio_setapi,
-    	gensym("audio-setapi"), A_FLOAT, 0);
+        gensym("audio-setapi"), A_FLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_midi_properties,
-    	gensym("midi-properties"), A_DEFFLOAT, 0);
+        gensym("midi-properties"), A_DEFFLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_midi_dialog,
-    	gensym("midi-dialog"), A_GIMME, 0);
+        gensym("midi-dialog"), A_GIMME, 0);
 #endif /* ROCKBOX */
     class_addmethod(glob_pdobject, (t_method)glob_start_path_dialog,
-    	gensym("start-path-dialog"), A_DEFFLOAT, 0);
+        gensym("start-path-dialog"), A_DEFFLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_path_dialog,
-    	gensym("path-dialog"), A_GIMME, 0);
+        gensym("path-dialog"), A_GIMME, 0);
 #ifdef __linux__
     class_addmethod(glob_pdobject, (t_method)glob_ping, gensym("ping"), 0);
 #endif
     class_addanything(glob_pdobject, max_default);
     pd_bind(&glob_pdobject, gensym("pd"));
 }
-

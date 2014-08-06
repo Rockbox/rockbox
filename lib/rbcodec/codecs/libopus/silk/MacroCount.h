@@ -715,4 +715,3 @@ static OPUS_INLINE opus_int silk_LIMIT_32(opus_int32 a, opus_int32 limit1, opus_
 
 #endif
 #endif
-

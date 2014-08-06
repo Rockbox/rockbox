@@ -117,25 +117,25 @@ static int decode(const uint8_t *inbuf, size_t inbufsize,
     else if (fmt->bitspersample == 16)
     {
         for (i = 0; i < inbufsize; i += 2)
-        { 
+        {
             pcm = inbuf[0]|((inbuf[1]&0x03)<<8);
             exp = ((inbuf[1]&0x7c)>>2)-15;
             sgn = (inbuf[1] & 0x80)>>7;
-      
-	    if(exp == -15)
-	         pcm =0;
-	    else
-	    {
-	        pcm+=1<<10;
-	        exp+=2; /*shift by 2 for rockbox fixed format*/
-	        if(exp>=0)
-	            pcm <<= (exp); 
-            else
-	            pcm >>= (-exp);             
 
-        	if (sgn)
-        	    pcm = -pcm;
-		}
+            if(exp == -15)
+                 pcm =0;
+            else
+            {
+                pcm+=1<<10;
+                exp+=2; /*shift by 2 for rockbox fixed format*/
+                if(exp>=0)
+                    pcm <<= (exp);
+            else
+                    pcm >>= (-exp);
+
+                if (sgn)
+                    pcm = -pcm;
+                }
         outbuf[i/2] = pcm;
         inbuf += 2;
         }

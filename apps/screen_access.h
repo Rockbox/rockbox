@@ -149,7 +149,7 @@ struct screen
 #endif
 #if defined(HAVE_LCD_BITMAP)
     void (*set_framebuffer)(void *framebuffer);
-#if defined(HAVE_LCD_COLOR)    
+#if defined(HAVE_LCD_COLOR)
     void (*gradient_fillrect)(int x, int y, int width, int height,
             unsigned start, unsigned end);
     void (*gradient_fillrect_part)(int x, int y, int width, int height,

@@ -115,4 +115,3 @@ static inline int disable_interrupt_save(int mask)
 }
 
 #endif /* __HWSTUB_SYSTEM__ */
- 

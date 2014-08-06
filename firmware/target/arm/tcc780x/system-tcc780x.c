@@ -132,12 +132,12 @@ void irq_handler(void)
                     "sub   sp, sp, #8           \n"); /* Reserve stack */
 
     int irq_no = VNIRQ;   /* Read clears the corresponding IRQ status */
-    
+
     if ((irq_no & (1<<31)) == 0)  /* Ensure invalid flag is not set */
     {
         irqvector[irq_no]();
     }
-    
+
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
@@ -146,7 +146,7 @@ void irq_handler(void)
 
 /* TODO - these should live in the target-specific directories and
    once we understand what all the GPIO pins do, move the init to the
-   specific driver for that hardware.   For now, we just perform the 
+   specific driver for that hardware.   For now, we just perform the
    same GPIO init as the original firmware - this makes it easier to
    investigate what the GPIO pins do.
 */
@@ -165,7 +165,7 @@ static void gpio_init(void)
     GPIOD_DIR = 0;
     GPIOD = 0;
     GPIOD_DIR = 0x00480000;
-    
+
     PORTCFG0 = 0x00034540;
     PORTCFG1 = 0x0566A000;
     PORTCFG2 = 0x000004C0;
@@ -180,7 +180,7 @@ static void gpio_init(void)
 static void clock_init(void)
 {
     int i;
-    
+
     CSCFG3  = (CSCFG3 &~ 0x3fff) | 0x841;
 
     /* Enable Xin (12Mhz), Fsys = Xin, Fbus = Fsys/2, MCPU=Fsys, SCPU=Fsys */
@@ -190,12 +190,12 @@ static void clock_init(void)
         "nop      \n\t"
         "nop      \n\t"
     );
-    
+
     PCLK_RFREQ = 0x1401002d; /* RAM refresh source = Xin (4) / 0x2d = 266kHz */
-    
+
     MCFG |= 1;
     SDCFG = (SDCFG &~ 0x7000) | 0x2000;
-    
+
     MCFG1 |= 1;
     SDCFG1 = (SDCFG &~ 0x7000) | 0x2000;
 
@@ -225,13 +225,13 @@ static void clock_init(void)
         "nop      \n\t"
         "nop      \n\t"
     );
-    
+
     /* Configure PCK_TCT to 2Mhz (Xin divided by 6) */
     PCLK_TCT = PCK_EN | (CKSEL_XIN<<24) | 5;
-    
+
     /* Set TC32 timer to be our USEC_TIMER (Xin divided by 12 = 1MHz) */
     TC32EN = (1<<24) | 11;
-    
+
     /* Unmask common timer IRQ (shared by tick and user timer) */
     IEN |= TIMER0_IRQ_MASK;
 }
@@ -277,7 +277,7 @@ void system_init(void)
 void system_reboot(void)
 {
     disable_interrupt(IRQ_FIQ_DISABLED);
-    
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     set_cpu_frequency(CPUFREQ_DEFAULT);
 #endif
@@ -307,7 +307,7 @@ void set_cpu_frequency(long frequency)
 {
     if (cpu_frequency == frequency)
         return;
-    
+
     /* CPU/COP frequencies can be scaled between Fbus (min) and Fsys (max).
        Fbus should not be set below ~32Mhz with LCD enabled or the display
        will be garbled. */

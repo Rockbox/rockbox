@@ -14,15 +14,15 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
- * 
+ *
  *     * Redistributions in binary form must reproduce the above
  *       copyright notice, this list of conditions and the following
  *       disclaimer in the documentation and/or other materials provided
  *       with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -59,7 +59,7 @@
 
 /*
 
-Description of nk.bin from 
+Description of nk.bin from
 
 http://www.xs4all.nl/~itsme/projects/xda/wince-flashfile-formats.html
 
@@ -75,7 +75,7 @@ may be present and an entrypoint in the code.
          2. DWORD with the length of this block
          3. DWORD with the 32 bit checksum of this block, in perl:
             unpack("%32C*", $data);
-         4. followed by <length> bytes of data 
+         4. followed by <length> bytes of data
    5. the last record has address ZERO, in the length the entrypoint
       into the rom, and ZERO as checksum.
 
@@ -97,10 +97,10 @@ mknkboot.c appends two images:
 
 #define DISABLE_ADDR    0x88065A10 /* in EBoot */
 #define DISABLE_INSN    0xe3a00001
-#define DISABLE_SUM     (0xe3+0xa0+0x00+0x01)  
+#define DISABLE_SUM     (0xe3+0xa0+0x00+0x01)
 
 /* Code to dual-boot - this is inserted at NK_ENTRY_POINT */
-static uint32_t dualboot[] = 
+static uint32_t dualboot[] =
 {
     0xe59f900c,      /* ldr     r9, [pc, #12] -> 0x53fa4000 */
     0xe5999000,      /* ldr     r9, [r9] */
@@ -191,7 +191,7 @@ int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
     for (i = 0; i < bootdata->len; i++) {
         sum += boot[12 + i];
     }
-    
+
     put_uint32le(BL_ENTRY_POINT, boot); /* Our entry point */
     put_uint32le(bootdata->len, boot + 4);
     put_uint32le(sum, boot + 8);
@@ -209,7 +209,7 @@ int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
     for (i = 0; i < (signed int)sizeof(dualboot); i++) {
         sum += boot2[i+12];
     }
-    
+
     put_uint32le(NK_ENTRY_POINT, boot2); /* New entry point for our nk.bin */
     put_uint32le(sizeof(dualboot), boot2 + 4);
     put_uint32le(sum, boot2 + 8);
@@ -316,4 +316,3 @@ quit:
 
 }
 #endif
-

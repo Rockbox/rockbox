@@ -632,7 +632,7 @@ void *(Z_Calloc)(size_t n1, size_t n2, int tag, void **user
 #endif
                 )
 {
-   return 
+   return
       (n1*=n2) ? memset((Z_Malloc)(n1, tag, user DA(file, line)), 0, n1) : NULL;
 }
 

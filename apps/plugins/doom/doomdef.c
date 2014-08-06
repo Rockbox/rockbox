@@ -38,4 +38,3 @@ bool rotate_screen=0;
 int SCREENWIDTH;
 int SCREENHEIGHT;
 #endif
-

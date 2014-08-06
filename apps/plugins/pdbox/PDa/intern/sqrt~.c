@@ -23,16 +23,16 @@ static void init_rsqrt(void)
         f2i.i = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
         rsqrt_exptab[i] = 1./sqrt(f2i.f);
 #else /* ROCKBOX */
-	float f;
-	long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
-	*(long *)(&f) = l;
-	rsqrt_exptab[i] = 1./sqrt(f);	
+        float f;
+        long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
+        *(long *)(&f) = l;
+        rsqrt_exptab[i] = 1./sqrt(f);
 #endif /* ROCKBOX */
     }
     for (i = 0; i < DUMTAB2SIZE; i++)
     {
-	float f = 1 + (1./DUMTAB2SIZE) * i;
-	rsqrt_mantissatab[i] = 1./sqrt(f);	
+        float f = 1 + (1./DUMTAB2SIZE) * i;
+        rsqrt_mantissatab[i] = 1./sqrt(f);
     }
 }
 
@@ -57,16 +57,16 @@ t_int *sigsqrt_perform(t_int *w)    /* not static; also used in d_fft.c */
     float *in = *(t_float **)(w+1), *out = *(t_float **)(w+2);
     t_int n = *(t_int *)(w+3);
     while (n--)
-    {	
-	float f = *in;
-	long l = *(long *)(in++);
-	if (f < 0) *out++ = 0;
-	else
-	{
-	    float g = rsqrt_exptab[(l >> 23) & 0xff] *
-	    	rsqrt_mantissatab[(l >> 13) & 0x3ff];
-    	    *out++ = f * (1.5 * g - 0.5 * g * g * g * f);
-	}
+    {
+        float f = *in;
+        long l = *(long *)(in++);
+        if (f < 0) *out++ = 0;
+        else
+        {
+            float g = rsqrt_exptab[(l >> 23) & 0xff] *
+                rsqrt_mantissatab[(l >> 13) & 0x3ff];
+            *out++ = f * (1.5 * g - 0.5 * g * g * g * f);
+        }
     }
     return (w + 4);
 }
@@ -83,9 +83,8 @@ void sqrt_tilde_setup(void)
 {
     init_rsqrt();
     sigsqrt_class = class_new(gensym("sqrt~"), (t_newmethod)sigsqrt_new, 0,
-    	sizeof(t_sigsqrt), 0, 0);
+        sizeof(t_sigsqrt), 0, 0);
     class_addcreator(sigsqrt_new, gensym("q8_sqrt~"), 0);   /* old name */
     CLASS_MAINSIGNALIN(sigsqrt_class, t_sigsqrt, x_f);
     class_addmethod(sigsqrt_class, (t_method)sigsqrt_dsp, gensym("dsp"), 0);
 }
-

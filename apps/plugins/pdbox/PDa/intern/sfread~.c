@@ -51,12 +51,12 @@ void sfread_open(t_sfread *x,t_symbol *filename)
      char fname[MAXPDSTRING];
 
      if (filename == &s_) {
-	  post("sfread: open without filename");
-	  return;
+          post("sfread: open without filename");
+          return;
      }
 
      canvas_makefilename(glist_getcanvas(x->x_glist), filename->s_name,
-			 fname, MAXPDSTRING);
+                         fname, MAXPDSTRING);
 
 
      /* close the old file */
@@ -70,10 +70,10 @@ void sfread_open(t_sfread *x,t_symbol *filename)
 
      if ((x->x_fd = open(fname,O_RDONLY)) < 0)
      {
-	  error("can't open %s",fname);
-	  x->x_play = 0;
-	  x->x_mapaddr = NULL;
-	  return;
+          error("can't open %s",fname);
+          x->x_play = 0;
+          x->x_mapaddr = NULL;
+          return;
      }
 
      /* get the size */
@@ -90,20 +90,20 @@ void sfread_open(t_sfread *x,t_symbol *filename)
      x->x_mapaddr = getbytes(x->x_size);
      if (!x->x_mapaddr)
      {
-	  error("can't mmap %s",fname);
-	  return;
+          error("can't mmap %s",fname);
+          return;
      }
      int r = read(x->x_fd, x->x_mapaddr, x->x_size);
      if (r != x->x_size)
      {
-	  error("can't mmap %s",fname);
-	  return;
+          error("can't mmap %s",fname);
+          return;
      }
 #else
      if (!(x->x_mapaddr = mmap(NULL,x->x_size,PROT_READ,MAP_PRIVATE,x->x_fd,0)))
      {
-	  error("can't mmap %s",fname);
-	  return;
+          error("can't mmap %s",fname);
+          return;
      }
 #endif
 }
@@ -121,66 +121,66 @@ static t_int *sfread_perform(t_int *w)
      t_time end =  itofix(x->x_size/sizeof(short)/c);
      int i,n;
      t_sample* out[MAX_CHANS];
-     
-     for (i=0;i<c;i++)  
-	  out[i] = (t_sample *)(w[3+i]);
+
+     for (i=0;i<c;i++)
+          out[i] = (t_sample *)(w[3+i]);
      n = (int)(w[3+c]);
-     
+
      /* loop */
 
      if (pos >  end)
-	  pos = end;
+          pos = end;
 
      if (pos + n*speed >= end) { // playing forward end
-	  if (!x->x_loop) {
-	       x->x_play=0;
-	  }
-	  pos = x->x_skip;
+          if (!x->x_loop) {
+               x->x_play=0;
+          }
+          pos = x->x_skip;
      }
      /* tmp = n*speed; unused */
 
      if (pos + n*speed <= 0) {  // playing backwards end
-	  if (!x->x_loop) {
-	       x->x_play=0;
-	  }
+          if (!x->x_loop) {
+               x->x_play=0;
+          }
           pos = end;
 
      }
      if (x->x_play && x->x_mapaddr) {
        t_time aoff = fixtoi(pos)*c;
        while (n--) {
-	 long frac = (long long)((1<<fix1)-1)&pos;
+         long frac = (long long)((1<<fix1)-1)&pos;
 
-	 for (i=0;i<c;i++)  {
-	   t_sample bs = *(buf+aoff+i)<<(fix1-16);
-	   t_sample cs = *(buf+aoff+i+1)<<(fix1-16);
-	   *out[i]++ = bs + mult((cs - bs),frac);
-	  	   
-	 }
-	 pos += speed;
-	 aoff = fixtoi(pos)*c;
-	 if (aoff > end) { 
-	   if (x->x_loop) pos = x->x_skip;
-	   else break;
-	 }
-	 if (aoff < x->x_skip) {
-	   if (x->x_loop) pos = end;
-	   else break;
-	 }
+         for (i=0;i<c;i++)  {
+           t_sample bs = *(buf+aoff+i)<<(fix1-16);
+           t_sample cs = *(buf+aoff+i+1)<<(fix1-16);
+           *out[i]++ = bs + mult((cs - bs),frac);
+
+         }
+         pos += speed;
+         aoff = fixtoi(pos)*c;
+         if (aoff > end) {
+           if (x->x_loop) pos = x->x_skip;
+           else break;
+         }
+         if (aoff < x->x_skip) {
+           if (x->x_loop) pos = end;
+           else break;
+         }
        }
-       /* Fill with zero in case of end */ 
+       /* Fill with zero in case of end */
        n++;
-       while (n--) 
-	 for (i=0;i<c;i++)  
-	   *out[i]++ = 0;
+       while (n--)
+         for (i=0;i<c;i++)
+           *out[i]++ = 0;
      }
      else {
        while (n--) {
-	 for (i=0;i<c;i++)
-	   *out[i]++ = 0.;
+         for (i=0;i<c;i++)
+           *out[i]++ = 0.;
        }
      }
-     
+
      x->x_pos = pos;
      return (w+c+4);
 }
@@ -190,10 +190,10 @@ static void sfread_float(t_sfread *x, t_floatarg f)
 {
      int t = f;
      if (t && x->x_mapaddr) {
-	  x->x_play=1;
+          x->x_play=1;
      }
      else {
-	  x->x_play=0;
+          x->x_play=0;
      }
 
 }
@@ -236,29 +236,29 @@ static void sfread_dsp(t_sfread *x, t_signal **sp)
 /*     post("sfread: dsp"); */
      switch (x->x_channels) {
      case 1:
-	  dsp_add(sfread_perform, 4, x, sp[0]->s_vec, 
-		  sp[1]->s_vec, sp[0]->s_n);
-	  break;
+          dsp_add(sfread_perform, 4, x, sp[0]->s_vec,
+                  sp[1]->s_vec, sp[0]->s_n);
+          break;
      case 2:
-	  dsp_add(sfread_perform, 5, x, sp[0]->s_vec, 
-		  sp[1]->s_vec,sp[2]->s_vec, sp[0]->s_n);
-	  break;
+          dsp_add(sfread_perform, 5, x, sp[0]->s_vec,
+                  sp[1]->s_vec,sp[2]->s_vec, sp[0]->s_n);
+          break;
      case 4:
-	  dsp_add(sfread_perform, 6, x, sp[0]->s_vec, 
-		  sp[1]->s_vec,sp[2]->s_vec,
-		  sp[3]->s_vec,sp[4]->s_vec,
-		  sp[0]->s_n);
-	  break;
+          dsp_add(sfread_perform, 6, x, sp[0]->s_vec,
+                  sp[1]->s_vec,sp[2]->s_vec,
+                  sp[3]->s_vec,sp[4]->s_vec,
+                  sp[0]->s_n);
+          break;
      }
 }
 
 
-static void sfread_speed(t_sfread* x, t_floatarg f) 
+static void sfread_speed(t_sfread* x, t_floatarg f)
 {
   x->x_speed = ftofix(f);
 }
 
-static void sfread_offset(t_sfread* x, t_floatarg f) 
+static void sfread_offset(t_sfread* x, t_floatarg f)
 {
   x->x_pos = (int)f;
 }
@@ -291,7 +291,7 @@ static void *sfread_new(t_floatarg chan,t_floatarg skip)
     x->x_play = 0;
 
     while (c--) {
-	 outlet_new(&x->x_obj, gensym("signal"));
+         outlet_new(&x->x_obj, gensym("signal"));
     }
 
      x->x_bangout = outlet_new(&x->x_obj, &s_float);
@@ -304,7 +304,7 @@ void sfread_tilde_setup(void)
      /* sfread */
 
     sfread_class = class_new(gensym("sfread~"), (t_newmethod)sfread_new, 0,
-    	sizeof(t_sfread), 0,A_DEFFLOAT,A_DEFFLOAT,0);
+        sizeof(t_sfread), 0,A_DEFFLOAT,A_DEFFLOAT,0);
     class_addmethod(sfread_class, nullfn, gensym("signal"), 0);
     class_addmethod(sfread_class, (t_method) sfread_dsp, gensym("dsp"), 0);
     class_addmethod(sfread_class, (t_method) sfread_open, gensym("open"), A_SYMBOL,A_NULL);
@@ -317,4 +317,3 @@ void sfread_tilde_setup(void)
     class_addmethod(sfread_class,(t_method)sfread_loop,gensym("loop"),A_FLOAT,A_NULL);
 
 }
-

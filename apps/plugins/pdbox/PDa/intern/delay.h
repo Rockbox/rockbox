@@ -32,12 +32,11 @@ static void sigdelwrite_checkvecsize(t_sigdelwrite *x, int vecsize)
 {
     if (x->x_rsortno != ugen_getsortno())
     {
-    	x->x_vecsize = vecsize;
-	x->x_rsortno = ugen_getsortno();
+        x->x_vecsize = vecsize;
+        x->x_rsortno = ugen_getsortno();
     }
     else if (vecsize != x->x_vecsize)
-    	pd_error(x, "delread/delwrite/vd vector size mismatch");
+        pd_error(x, "delread/delwrite/vd vector size mismatch");
 }
 
 #endif
-

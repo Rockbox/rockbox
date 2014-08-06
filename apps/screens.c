@@ -102,7 +102,7 @@ static void charging_display_info(bool animate)
     }
 #elif defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
     /* IDE power is normally off here, so display input current instead */
-    lcd_putsf(7, 7, "%dmA  ", 
+    lcd_putsf(7, 7, "%dmA  ",
               (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 10000);
 #endif
 
@@ -616,7 +616,7 @@ static const int id3_headers[]=
 {
     LANG_ID3_TITLE,
     LANG_ID3_ARTIST,
-    LANG_ID3_COMPOSER,    
+    LANG_ID3_COMPOSER,
     LANG_ID3_ALBUM,
     LANG_ID3_ALBUMARTIST,
     LANG_ID3_GROUPING,
@@ -742,7 +742,7 @@ static const char* id3_get_info(int selected_item, void* data,
 #endif
             case LANG_ID3_PATH:
                 val=id3->path;
-                break;    
+                break;
             case LANG_ID3_COMPOSER:
                 val=id3->composer;
                 break;
@@ -851,7 +851,7 @@ bool view_runtime(void)
     while(1)
     {
         global_status.runtime += ((current_tick - lasttime) / HZ);
-        
+
         lasttime = current_tick;
         gui_synclist_draw(&lists);
         list_do_action(CONTEXT_STD, HZ,
@@ -921,13 +921,13 @@ int calibrate(void)
     enum touchscreen_mode old_mode = touchscreen_get_mode();
     struct touchscreen_calibration cal;
     int i, ret = 0;
-    
+
     /* hide the statusbar */
     viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
 
     touchscreen_disable_mapping(); /* set raw mode */
     touchscreen_set_mode(TOUCHSCREEN_POINT);
-    
+
     for(i=0; i<3; i++)
     {
         screen->clear_display();

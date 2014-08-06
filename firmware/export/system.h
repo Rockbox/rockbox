@@ -195,7 +195,7 @@ enum {
     MAXMEMGUARD
 };
 
-#if !defined(SIMULATOR) && !defined(__PCTOOL__) 
+#if !defined(SIMULATOR) && !defined(__PCTOOL__)
 #include "system-target.h"
 #elif defined(HAVE_SDL) /* SDL build */
 #include "system-sdl.h"

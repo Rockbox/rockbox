@@ -38,4 +38,3 @@ void (* const irqvector[])(void) __attribute__((used)) =
     UIRQ, INT_EXT, INT_KEY, INT_DMA, INT_RTC, INT_T0, INT_T1, INT_WD,
     INT_PCNT, UIRQ, INT_DSP, UIRQ, INT_MHA, INT_SD, UIRQ, INT_MCA
 };
-

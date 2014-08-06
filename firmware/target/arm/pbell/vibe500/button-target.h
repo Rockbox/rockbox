@@ -56,4 +56,3 @@ void button_int(void);
 #define POWEROFF_COUNT 10
 
 #endif /* _BUTTON_TARGET_H_ */
-

@@ -97,7 +97,7 @@ int ape_parseheaderbuf(unsigned char* buf, struct ape_ctx_t* ape_ctx)
         ape_ctx->channels = get_uint16(header + 18);
         ape_ctx->samplerate = get_uint32(header + 20);
 
-        ape_ctx->seektablefilepos = ape_ctx->junklength + 
+        ape_ctx->seektablefilepos = ape_ctx->junklength +
                                     ape_ctx->descriptorlength +
                                     ape_ctx->headerlength;
 

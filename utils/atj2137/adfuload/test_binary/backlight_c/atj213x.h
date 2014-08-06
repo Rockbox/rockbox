@@ -18,7 +18,7 @@ typedef unsigned int uint32_t;
 #define CMU_COREPLL           (*(volatile uint32_t *)(CMU_BASE + 0x00))
 #define CMU_DSPPLL            (*(volatile uint32_t *)(CMU_BASE + 0x04))
 #define CMU_AUDIOPLL          (*(volatile uint32_t *)(CMU_BASE + 0x08))
-#define CMU_BUSCLK            (*(volatile uint32_t *)(CMU_BASE + 0x0C))                                    
+#define CMU_BUSCLK            (*(volatile uint32_t *)(CMU_BASE + 0x0C))
 #define CMU_SDRCLK            (*(volatile uint32_t *)(CMU_BASE + 0x10))
 #define CMU_ATACLK            (*(volatile uint32_t *)(CMU_BASE + 0x04))
 #define CMU_NANDCLK           (*(volatile uint32_t *)(CMU_BASE + 0x18))
@@ -95,10 +95,10 @@ typedef unsigned int uint32_t;
 #define DSP_HDR5              (*(volatile uint32_t *)(DSP_BASE + 0x14))
 #define DSP_HSR6              (*(volatile uint32_t *)(DSP_BASE + 0x18))
 #define DSP_HSR7              (*(volatile uint32_t *)(DSP_BASE + 0x1C))
-#define DSP_CTL               (*(volatile uint32_t *)(DSP_BASE + 0x20)) 
+#define DSP_CTL               (*(volatile uint32_t *)(DSP_BASE + 0x20))
 
 #define DMAC_BASE(n)          (0xB0060000 + (n<<5))
-#define DMAC_CTL              (*(volatile uint32_t *)(DMAC_BASE(0) + 0x00))  
+#define DMAC_CTL              (*(volatile uint32_t *)(DMAC_BASE(0) + 0x00))
 #define DMAC_IRQEN            (*(volatile uint32_t *)(DMAC_BASE(0) + 0x04))
 #define DMAC_IRQPD            (*(volatile uint32_t *)(DMAC_BASE(0) + 0x08))
 
@@ -111,14 +111,14 @@ typedef unsigned int uint32_t;
 #define DMA_CMD(n)            (*(volatile uint32_t *)(DMAC_BASE(n) + 0x114))
 
 #define SDR_BASE              0xB0070000
-#define SDR_CTL               (*(volatile uint32_t *)(SDR_BASE + 0x00))    
+#define SDR_CTL               (*(volatile uint32_t *)(SDR_BASE + 0x00))
 #define SDR_ADDRCFG           (*(volatile uint32_t *)(SDR_BASE + 0x04))
-#define SDR_EN                (*(volatile uint32_t *)(SDR_BASE + 0x08))     
-#define SDR_CMD               (*(volatile uint32_t *)(SDR_BASE + 0x0C))    
-#define SDR_STAT              (*(volatile uint32_t *)(SDR_BASE + 0x10))   
-#define SDR_RFSH              (*(volatile uint32_t *)(SDR_BASE + 0x14))   
-#define SDR_MODE              (*(volatile uint32_t *)(SDR_BASE + 0x18))   
-#define SDR_MOBILE            (*(volatile uint32_t *)(SDR_BASE + 0x1C)) 
+#define SDR_EN                (*(volatile uint32_t *)(SDR_BASE + 0x08))
+#define SDR_CMD               (*(volatile uint32_t *)(SDR_BASE + 0x0C))
+#define SDR_STAT              (*(volatile uint32_t *)(SDR_BASE + 0x10))
+#define SDR_RFSH              (*(volatile uint32_t *)(SDR_BASE + 0x14))
+#define SDR_MODE              (*(volatile uint32_t *)(SDR_BASE + 0x18))
+#define SDR_MOBILE            (*(volatile uint32_t *)(SDR_BASE + 0x1C))
 
 #define MCA_BASE              0xB0080000
 #define MCA_CTL               (*(volatile uint32_t *)(MCA_BASE + 0x00))
@@ -126,63 +126,63 @@ typedef unsigned int uint32_t;
 #define ATA_BASE              0xB0090000
 #define ATA_CONFIG            (*(volatile uint32_t *)(ATA_BASE + 0x00))
 #define ATA_UDMACTL           (*(volatile uint32_t *)(ATA_BASE + 0x04))
-#define ATA_DATA              (*(volatile uint32_t *)(ATA_BASE + 0x08))   
+#define ATA_DATA              (*(volatile uint32_t *)(ATA_BASE + 0x08))
 #define ATA_FEATURE           (*(volatile uint32_t *)(ATA_BASE + 0x0C))
-#define ATA_SECCNT            (*(volatile uint32_t *)(ATA_BASE + 0x10)) 
-#define ATA_SECNUM            (*(volatile uint32_t *)(ATA_BASE + 0x14)) 
-#define ATA_CLDLOW            (*(volatile uint32_t *)(ATA_BASE + 0x18)) 
-#define ATA_CLDHI             (*(volatile uint32_t *)(ATA_BASE + 0x1C))  
-#define ATA_HEAD              (*(volatile uint32_t *)(ATA_BASE + 0x20))   
-#define ATA_CMD               (*(volatile uint32_t *)(ATA_BASE + 0x24))    
+#define ATA_SECCNT            (*(volatile uint32_t *)(ATA_BASE + 0x10))
+#define ATA_SECNUM            (*(volatile uint32_t *)(ATA_BASE + 0x14))
+#define ATA_CLDLOW            (*(volatile uint32_t *)(ATA_BASE + 0x18))
+#define ATA_CLDHI             (*(volatile uint32_t *)(ATA_BASE + 0x1C))
+#define ATA_HEAD              (*(volatile uint32_t *)(ATA_BASE + 0x20))
+#define ATA_CMD               (*(volatile uint32_t *)(ATA_BASE + 0x24))
 #define ATA_BYTECNT           (*(volatile uint32_t *)(ATA_BASE + 0x28))
 #define ATA_FIFOCTL           (*(volatile uint32_t *)(ATA_BASE + 0x2C))
 #define ATA_FIFOCFG           (*(volatile uint32_t *)(ATA_BASE + 0x30))
 #define ATA_ADDRDEC           (*(volatile uint32_t *)(ATA_BASE + 0x34))
-#define ATA_IRQCTL            (*(volatile uint32_t *)(ATA_BASE + 0x38)) 
+#define ATA_IRQCTL            (*(volatile uint32_t *)(ATA_BASE + 0x38))
 
 #define NAND_BASE             0xB00A0000
-#define NAND_CTL              (*(volatile uint32_t *)(NAND_BASE + 0x00))       
-#define NAND_STATUS           (*(volatile uint32_t *)(NAND_BASE + 0x04))    
-#define NAND_FIFOTIM          (*(volatile uint32_t *)(NAND_BASE + 0x08))   
-#define NAND_CLKCTL           (*(volatile uint32_t *)(NAND_BASE + 0x0C))    
-#define NAND_BYTECNT          (*(volatile uint32_t *)(NAND_BASE + 0x10))   
+#define NAND_CTL              (*(volatile uint32_t *)(NAND_BASE + 0x00))
+#define NAND_STATUS           (*(volatile uint32_t *)(NAND_BASE + 0x04))
+#define NAND_FIFOTIM          (*(volatile uint32_t *)(NAND_BASE + 0x08))
+#define NAND_CLKCTL           (*(volatile uint32_t *)(NAND_BASE + 0x0C))
+#define NAND_BYTECNT          (*(volatile uint32_t *)(NAND_BASE + 0x10))
 #define NAND_ADDRLO1234       (*(volatile uint32_t *)(NAND_BASE + 0x14))
-#define NAND_ADDRLO56         (*(volatile uint32_t *)(NAND_BASE + 0x18))  
+#define NAND_ADDRLO56         (*(volatile uint32_t *)(NAND_BASE + 0x18))
 #define NAND_ADDRHI1234       (*(volatile uint32_t *)(NAND_BASE + 0x1C))
-#define NAND_ADDRHI56         (*(volatile uint32_t *)(NAND_BASE + 0x20))  
-#define NAND_BUF0             (*(volatile uint32_t *)(NAND_BASE + 0x24))      
-#define NAND_BUF1             (*(volatile uint32_t *)(NAND_BASE + 0x28))      
-#define NAND_CMD              (*(volatile uint32_t *)(NAND_BASE + 0x2C))       
-#define NAND_ECCCTL           (*(volatile uint32_t *)(NAND_BASE + 0x30))    
-#define NAND_HAMECC0          (*(volatile uint32_t *)(NAND_BASE + 0x34))   
-#define NAND_HAMECC1          (*(volatile uint32_t *)(NAND_BASE + 0x38))   
-#define NAND_HAMECC2          (*(volatile uint32_t *)(NAND_BASE + 0x3C))   
-#define NAND_HAMCEC           (*(volatile uint32_t *)(NAND_BASE + 0x40))    
-#define NAND_RSE0             (*(volatile uint32_t *)(NAND_BASE + 0x44))      
-#define NAND_RSE1             (*(volatile uint32_t *)(NAND_BASE + 0x48))      
-#define NAND_RSE2             (*(volatile uint32_t *)(NAND_BASE + 0x4C))      
-#define NAND_RSE3             (*(volatile uint32_t *)(NAND_BASE + 0x50))      
-#define NAND_RSPS0            (*(volatile uint32_t *)(NAND_BASE + 0x54))     
-#define NAND_RSPS1            (*(volatile uint32_t *)(NAND_BASE + 0x58))     
-#define NAND_RSPS2            (*(volatile uint32_t *)(NAND_BASE + 0x5C))     
-#define NAND_FIFODATA         (*(volatile uint32_t *)(NAND_BASE + 0x60))  
-#define NAND_DEBUG            (*(volatile uint32_t *)(NAND_BASE + 0x70))     
+#define NAND_ADDRHI56         (*(volatile uint32_t *)(NAND_BASE + 0x20))
+#define NAND_BUF0             (*(volatile uint32_t *)(NAND_BASE + 0x24))
+#define NAND_BUF1             (*(volatile uint32_t *)(NAND_BASE + 0x28))
+#define NAND_CMD              (*(volatile uint32_t *)(NAND_BASE + 0x2C))
+#define NAND_ECCCTL           (*(volatile uint32_t *)(NAND_BASE + 0x30))
+#define NAND_HAMECC0          (*(volatile uint32_t *)(NAND_BASE + 0x34))
+#define NAND_HAMECC1          (*(volatile uint32_t *)(NAND_BASE + 0x38))
+#define NAND_HAMECC2          (*(volatile uint32_t *)(NAND_BASE + 0x3C))
+#define NAND_HAMCEC           (*(volatile uint32_t *)(NAND_BASE + 0x40))
+#define NAND_RSE0             (*(volatile uint32_t *)(NAND_BASE + 0x44))
+#define NAND_RSE1             (*(volatile uint32_t *)(NAND_BASE + 0x48))
+#define NAND_RSE2             (*(volatile uint32_t *)(NAND_BASE + 0x4C))
+#define NAND_RSE3             (*(volatile uint32_t *)(NAND_BASE + 0x50))
+#define NAND_RSPS0            (*(volatile uint32_t *)(NAND_BASE + 0x54))
+#define NAND_RSPS1            (*(volatile uint32_t *)(NAND_BASE + 0x58))
+#define NAND_RSPS2            (*(volatile uint32_t *)(NAND_BASE + 0x5C))
+#define NAND_FIFODATA         (*(volatile uint32_t *)(NAND_BASE + 0x60))
+#define NAND_DEBUG            (*(volatile uint32_t *)(NAND_BASE + 0x70))
 
 #define SD_BASE               0xB00B0000
-#define SD_CTL                (*(volatile uint32_t *)(SD_BASE + 0x00))    
-#define SD_CMDRSP             (*(volatile uint32_t *)(SD_BASE + 0x04)) 
-#define SD_RW                 (*(volatile uint32_t *)(SD_BASE + 0x08))     
+#define SD_CTL                (*(volatile uint32_t *)(SD_BASE + 0x00))
+#define SD_CMDRSP             (*(volatile uint32_t *)(SD_BASE + 0x04))
+#define SD_RW                 (*(volatile uint32_t *)(SD_BASE + 0x08))
 #define SD_FIFOCTL            (*(volatile uint32_t *)(SD_BASE + 0x0C))
-#define SD_CMD                (*(volatile uint32_t *)(SD_BASE + 0x10))    
-#define SD_ARG                (*(volatile uint32_t *)(SD_BASE + 0x14))    
-#define SD_CRC7               (*(volatile uint32_t *)(SD_BASE + 0x18))   
+#define SD_CMD                (*(volatile uint32_t *)(SD_BASE + 0x10))
+#define SD_ARG                (*(volatile uint32_t *)(SD_BASE + 0x14))
+#define SD_CRC7               (*(volatile uint32_t *)(SD_BASE + 0x18))
 #define SD_RSPBUF0            (*(volatile uint32_t *)(SD_BASE + 0x1C))
 #define SD_RSPBUF1            (*(volatile uint32_t *)(SD_BASE + 0x20))
 #define SD_RSPBUF2            (*(volatile uint32_t *)(SD_BASE + 0x24))
 #define SD_RSPBUF3            (*(volatile uint32_t *)(SD_BASE + 0x28))
 #define SD_RSPBUF4            (*(volatile uint32_t *)(SD_BASE + 0x2C))
-#define SD_DAT                (*(volatile uint32_t *)(SD_BASE + 0x30))    
-#define SD_CLK                (*(volatile uint32_t *)(SD_BASE + 0x34))    
+#define SD_DAT                (*(volatile uint32_t *)(SD_BASE + 0x30))
+#define SD_CLK                (*(volatile uint32_t *)(SD_BASE + 0x34))
 #define SD_BYTECNT            (*(volatile uint32_t *)(SD_BASE + 0x38))
 
 #define MHA_BASE              0xB00C0000
@@ -204,7 +204,7 @@ typedef unsigned int uint32_t;
 #define BT_VEIVSEPEF          (*(volatile uint32_t *)(BT_BASE + 0x18))
 #define BT_VEIFTP             (*(volatile uint32_t *)(BT_BASE + 0x24))
 #define BT_VEIFIFOCTL         (*(volatile uint32_t *)(BT_BASE + 0x30))
-                                     
+
 /* Video Decoder */
 #define BT_VDICTL             (*(volatile uint32_t *)(BT_BASE + 0x08))
 #define BT_VDIHSPOS           (*(volatile uint32_t *)(BT_BASE + 0x0C))
@@ -214,7 +214,7 @@ typedef unsigned int uint32_t;
 #define BT_VDIIRQSTA          (*(volatile uint32_t *)(BT_BASE + 0x28))
 #define BT_VDIXYDAT           (*(volatile uint32_t *)(BT_BASE + 0x2C))
 #define BT_VDIFIFOCTL         (*(volatile uint32_t *)(BT_BASE + 0x30))
-                                     
+
 /* CMOS Sensor Interface */
 #define BT_CSICTL             (*(volatile uint32_t *)(BT_BASE + 0x08))
 #define BT_CSIHSPOS           (*(volatile uint32_t *)(BT_BASE + 0x0C))
@@ -224,11 +224,11 @@ typedef unsigned int uint32_t;
 #define BT_CSIIRQSTA          (*(volatile uint32_t *)(BT_BASE + 0x28))
 #define BT_CSIXYDAT           (*(volatile uint32_t *)(BT_BASE + 0x2C))
 #define BT_CSIFIFOCTL         (*(volatile uint32_t *)(BT_BASE + 0x30))
-                                     
+
 /* TS */
 #define  BT_TSICTL            (*(volatile uint32_t *)(BT_BASE + 0x08))
 #define  BT_TSIFIFOCTL        (*(volatile uint32_t *)(BT_BASE + 0x30))
-                                     
+
 /* Integrated Video Encoder */
 #define BT_IVECTL             (*(volatile uint32_t *)(BT_BASE + 0x34))
 #define BT_IVEOUTCTL          (*(volatile uint32_t *)(BT_BASE + 0x38))
@@ -255,7 +255,7 @@ typedef unsigned int uint32_t;
 #define OTG_IN2BCL            (*(volatile uint8_t *)(OTG_BASE + 0x14)) // missing in rt
 #define OTG_IN2BCH            (*(volatile uint8_t *)(OTG_BASE + 0x15)) // missing in rt
 #define OTG_IN2CON            (*(volatile uint8_t *)(OTG_BASE + 0x16)) // ok
-#define OTG_IN2CS             (*(volatile uint8_t *)(OTG_BASE + 0x17)) // 
+#define OTG_IN2CS             (*(volatile uint8_t *)(OTG_BASE + 0x17)) //
 
 #define OTG_FIFO1DAT          (*(volatile uint32_t *)(OTG_BASE + 0x84)) // missing in rt
 #define OTG_FIFO2DAT          (*(volatile uint32_t *)(OTG_BASE + 0x88)) // missing in rt
@@ -277,12 +277,12 @@ typedef unsigned int uint32_t;
 #define OTG_FIFOCTL           (*(volatile uint8_t *)(OTG_BASE + 0x1A8)) // ok
 
 
-#define OTG_OTGIRQ            (*(volatile uint8_t *)(OTG_BASE + 0x1BC)) 
+#define OTG_OTGIRQ            (*(volatile uint8_t *)(OTG_BASE + 0x1BC))
 #define OTG_FSMSTAT           (*(volatile uint8_t *)(OTG_BASE + 0x1BD))
 #define OTG_CTRL              (*(volatile uint8_t *)(OTG_BASE + 0x1BE))
 #define OTG_STAT              (*(volatile uint8_t *)(OTG_BASE + 0x1BF))
 #define OTG_OTGIEN            (*(volatile uint8_t *)(OTG_BASE + 0x1C0))
-                                    
+
 #define OTG_TAAIDLBDIS        (*(volatile uint8_t *)(OTG_BASE + 0x1C1))
 #define OTG_TAWAITBCON        (*(volatile uint8_t *)(OTG_BASE + 0x1C2))
 #define OTG_TBVBUSPLS         (*(volatile uint8_t *)(OTG_BASE + 0x1C3))

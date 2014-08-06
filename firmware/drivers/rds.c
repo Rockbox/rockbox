@@ -155,7 +155,7 @@ static bool handle_group2(uint16_t data[4])
     for(int i = 0; i < 16; i++)
         if(TIME_AFTER(current_tick, rt_segment_timeout[i]))
             rt_segment &= ~(1 << i);
-    
+
     /* reset parsing if the message type changed */
     abflag = (data[1] >> 4) & 1;
     segment = data[1] & 0xF;
@@ -240,22 +240,22 @@ bool rds_process(uint16_t data[4])
         pi_code = pi;
     }
     pi_last = pi;
-    
+
     /* handle rds data based on group */
     group = (data[1] >> 11) & 0x1F;
     switch (group) {
-    
+
     case 0: /* group 0A: basic info */
     case 1: /* group 0B: basic info */
         return handle_group0(data);
-    
+
     case 4: /* group 2A: radio text */
     case 5: /* group 2B: radio text */
         return handle_group2(data);
 
     case 8: /* group 4A: clock-time */
         return handle_group4a(data);
-    
+
     default:
         break;
     }
@@ -289,4 +289,3 @@ time_t rds_get_ct(void)
 {
     return ct_data;
 }
-

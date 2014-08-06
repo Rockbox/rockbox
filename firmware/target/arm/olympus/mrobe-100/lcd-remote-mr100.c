@@ -165,7 +165,7 @@ static bool remote_tx(unsigned char *data, int len)
     unsigned char chksum[2];
 
     rc_status &= ~RC_TX_ERROR;
-    
+
     chksum[0] = chksum[1] = 0;
 
     for (i = 0; i < len; i++)

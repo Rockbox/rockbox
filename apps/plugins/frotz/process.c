@@ -1,5 +1,5 @@
 /* process.c - Interpreter loop and program control
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * This file is part of Frotz.
  *
@@ -195,29 +195,29 @@ static void load_operand (zbyte type)
 {
     zword value;
 
-    if (type & 2) { 			/* variable */
+    if (type & 2) {                     /* variable */
 
-	zbyte variable;
+        zbyte variable;
 
-	CODE_BYTE (variable)
+        CODE_BYTE (variable)
 
-	if (variable == 0)
-	    value = *sp++;
-	else if (variable < 16)
-	    value = *(fp - variable);
-	else {
-	    zword addr = h_globals + 2 * (variable - 16);
-	    LOW_WORD (addr, value)
-	}
+        if (variable == 0)
+            value = *sp++;
+        else if (variable < 16)
+            value = *(fp - variable);
+        else {
+            zword addr = h_globals + 2 * (variable - 16);
+            LOW_WORD (addr, value)
+        }
 
-    } else if (type & 1) { 		/* small constant */
+    } else if (type & 1) {              /* small constant */
 
-	zbyte bvalue;
+        zbyte bvalue;
 
-	CODE_BYTE (bvalue)
-	value = bvalue;
+        CODE_BYTE (bvalue)
+        value = bvalue;
 
-    } else CODE_WORD (value) 		/* large constant */
+    } else CODE_WORD (value)            /* large constant */
 
     zargs[zargc++] = value;
 
@@ -237,12 +237,12 @@ static void load_all_operands (zbyte specifier)
 
     for (i = 6; i >= 0; i -= 2) {
 
-	zbyte type = (specifier >> i) & 0x03;
+        zbyte type = (specifier >> i) & 0x03;
 
-	if (type == 3)
-	    break;
+        if (type == 3)
+            break;
 
-	load_operand (type);
+        load_operand (type);
 
     }
 
@@ -260,51 +260,51 @@ void interpret (void)
 
     do {
 
-	zbyte opcode;
+        zbyte opcode;
 
-	CODE_BYTE (opcode)
+        CODE_BYTE (opcode)
 
-	zargc = 0;
+        zargc = 0;
 
-	if (opcode < 0x80) {			/* 2OP opcodes */
+        if (opcode < 0x80) {                    /* 2OP opcodes */
 
-	    load_operand ((zbyte) (opcode & 0x40) ? 2 : 1);
-	    load_operand ((zbyte) (opcode & 0x20) ? 2 : 1);
+            load_operand ((zbyte) (opcode & 0x40) ? 2 : 1);
+            load_operand ((zbyte) (opcode & 0x20) ? 2 : 1);
 
-	    var_opcodes[opcode & 0x1f] ();
+            var_opcodes[opcode & 0x1f] ();
 
-	} else if (opcode < 0xb0) {		/* 1OP opcodes */
+        } else if (opcode < 0xb0) {             /* 1OP opcodes */
 
-	    load_operand ((zbyte) (opcode >> 4));
+            load_operand ((zbyte) (opcode >> 4));
 
-	    op1_opcodes[opcode & 0x0f] ();
+            op1_opcodes[opcode & 0x0f] ();
 
-	} else if (opcode < 0xc0) {		/* 0OP opcodes */
+        } else if (opcode < 0xc0) {             /* 0OP opcodes */
 
-	    op0_opcodes[opcode - 0xb0] ();
+            op0_opcodes[opcode - 0xb0] ();
 
-	} else {				/* VAR opcodes */
+        } else {                                /* VAR opcodes */
 
-	    zbyte specifier1;
-	    zbyte specifier2;
+            zbyte specifier1;
+            zbyte specifier2;
 
-	    if (opcode == 0xec || opcode == 0xfa) {	/* opcodes 0xec */
-		CODE_BYTE (specifier1)                  /* and 0xfa are */
-		CODE_BYTE (specifier2)                  /* call opcodes */
-		load_all_operands (specifier1);		/* with up to 8 */
-		load_all_operands (specifier2);         /* arguments    */
-	    } else {
-		CODE_BYTE (specifier1)
-		load_all_operands (specifier1);
-	    }
+            if (opcode == 0xec || opcode == 0xfa) {     /* opcodes 0xec */
+                CODE_BYTE (specifier1)                  /* and 0xfa are */
+                CODE_BYTE (specifier2)                  /* call opcodes */
+                load_all_operands (specifier1);         /* with up to 8 */
+                load_all_operands (specifier2);         /* arguments    */
+            } else {
+                CODE_BYTE (specifier1)
+                load_all_operands (specifier1);
+            }
 
-	    var_opcodes[opcode - 0xc0] ();
+            var_opcodes[opcode - 0xc0] ();
 
-	}
+        }
 
 #if defined(DJGPP) && defined(SOUND_SUPPORT)
     if (end_of_sound_flag)
-	end_of_sound ();
+        end_of_sound ();
 #endif
 
     } while (finished == 0);
@@ -331,7 +331,7 @@ void call (zword routine, int argc, zword *args, int ct)
     int i;
 
     if (sp - stack < 4)
-	runtime_error (ERR_STK_OVF);
+        runtime_error (ERR_STK_OVF);
 
     GET_PC (pc)
 
@@ -346,16 +346,16 @@ void call (zword routine, int argc, zword *args, int ct)
     /* Calculate byte address of routine */
 
     if (h_version <= V3)
-	pc = (long) routine << 1;
+        pc = (long) routine << 1;
     else if (h_version <= V5)
-	pc = (long) routine << 2;
+        pc = (long) routine << 2;
     else if (h_version <= V7)
-	pc = ((long) routine << 2) + ((long) h_functions_offset << 3);
+        pc = ((long) routine << 2) + ((long) h_functions_offset << 3);
     else /* h_version == V8 */
-	pc = (long) routine << 3;
+        pc = (long) routine << 3;
 
     if (pc >= story_size)
-	runtime_error (ERR_ILL_CALL_ADDR);
+        runtime_error (ERR_ILL_CALL_ADDR);
 
     SET_PC (pc)
 
@@ -364,28 +364,28 @@ void call (zword routine, int argc, zword *args, int ct)
     CODE_BYTE (count)
 
     if (count > 15)
-	runtime_error (ERR_CALL_NON_RTN);
+        runtime_error (ERR_CALL_NON_RTN);
     if (sp - stack < count)
-	runtime_error (ERR_STK_OVF);
+        runtime_error (ERR_STK_OVF);
 
     if (f_setup.save_quetzal)
-	fp[0] |= (zword) count << 8;	/* Save local var count for Quetzal. */
+        fp[0] |= (zword) count << 8;    /* Save local var count for Quetzal. */
 
     value = 0;
 
     for (i = 0; i < count; i++) {
 
-	if (h_version <= V4)		/* V1 to V4 games provide default */
-	    CODE_WORD (value)		/* values for all local variables */
+        if (h_version <= V4)            /* V1 to V4 games provide default */
+            CODE_WORD (value)           /* values for all local variables */
 
-	*--sp = (zword) ((argc-- > 0) ? args[i] : value);
+        *--sp = (zword) ((argc-- > 0) ? args[i] : value);
 
     }
 
     /* Start main loop for direct calls */
 
     if (ct == 2)
-	interpret ();
+        interpret ();
 
 }/* call */
 
@@ -405,7 +405,7 @@ void ret (zword value)
     int ct;
 
     if (sp > fp)
-	runtime_error (ERR_STK_UNDF);
+        runtime_error (ERR_STK_UNDF);
 
     sp = fp;
 
@@ -420,14 +420,14 @@ void ret (zword value)
     /* Handle resulting value */
 
     if (ct == 0)
-	store (value);
+        store (value);
     if (ct == 2)
-	*--sp = value;
+        *--sp = value;
 
     /* Stop main loop for direct calls */
 
     if (ct == 2)
-	finished++;
+        finished++;
 
 }/* ret */
 
@@ -459,28 +459,28 @@ void branch (bool flag)
     off1 = specifier & 0x3f;
 
     if (!flag)
-	specifier ^= 0x80;
+        specifier ^= 0x80;
 
-    if (!(specifier & 0x40)) {		/* it's a long branch */
+    if (!(specifier & 0x40)) {          /* it's a long branch */
 
-	if (off1 & 0x20)		/* propagate sign bit */
-	    off1 |= 0xc0;
+        if (off1 & 0x20)                /* propagate sign bit */
+            off1 |= 0xc0;
 
-	CODE_BYTE (off2)
+        CODE_BYTE (off2)
 
-	offset = (off1 << 8) | off2;
+        offset = (off1 << 8) | off2;
 
-    } else offset = off1;		/* it's a short branch */
+    } else offset = off1;               /* it's a short branch */
 
     if (specifier & 0x80) {
 
-	if (offset > 1) {		/* normal branch */
+        if (offset > 1) {               /* normal branch */
 
-	    GET_PC (pc)
-	    pc += (short) offset - 2;
-	    SET_PC (pc)
+            GET_PC (pc)
+            pc += (short) offset - 2;
+            SET_PC (pc)
 
-	} else ret (offset);		/* special case, return 0 or 1 */
+        } else ret (offset);            /* special case, return 0 or 1 */
     }
 
 }/* branch */
@@ -499,12 +499,12 @@ void store (zword value)
     CODE_BYTE (variable)
 
     if (variable == 0)
-	*--sp = value;
+        *--sp = value;
     else if (variable < 16)
-	*(fp - variable) = value;
+        *(fp - variable) = value;
     else {
-	zword addr = h_globals + 2 * (variable - 16);
-	SET_WORD (addr, value)
+        zword addr = h_globals + 2 * (variable - 16);
+        SET_WORD (addr, value)
     }
 
 }/* store */
@@ -531,12 +531,12 @@ int direct_call (zword addr)
     /* Calls to address 0 return false */
 
     if (addr == 0)
-	return 0;
+        return 0;
 
     /* Save operands and operand count */
 
     for (i = 0; i < 8; i++)
-	saved_zargs[i] = zargs[i];
+        saved_zargs[i] = zargs[i];
 
     saved_zargc = zargc;
 
@@ -547,7 +547,7 @@ int direct_call (zword addr)
     /* Restore operands and operand count */
 
     for (i = 0; i < 8; i++)
-	zargs[i] = saved_zargs[i];
+        zargs[i] = saved_zargs[i];
 
     zargc = saved_zargc;
 
@@ -574,8 +574,8 @@ static void __extended__ (void)
 
     load_all_operands (specifier);
 
-    if (opcode < 0x1d)			/* extended opcodes from 0x1d on */
-	ext_opcodes[opcode] ();		/* are reserved for future spec' */
+    if (opcode < 0x1d)                  /* extended opcodes from 0x1d on */
+        ext_opcodes[opcode] ();         /* are reserved for future spec' */
 
 }/* __extended__ */
 
@@ -596,7 +596,7 @@ static void __illegal__ (void)
 /*
  * z_catch, store the current stack frame for later use with z_throw.
  *
- *	no zargs used
+ *      no zargs used
  *
  */
 
@@ -610,8 +610,8 @@ void z_catch (void)
 /*
  * z_throw, go back to the given stack frame and return the given value.
  *
- *	zargs[0] = value to return
- *	zargs[1] = stack frame
+ *      zargs[0] = value to return
+ *      zargs[1] = stack frame
  *
  */
 
@@ -619,17 +619,17 @@ void z_throw (void)
 {
 
     if (f_setup.save_quetzal) {
-	if (zargs[1] > frame_count)
-	    runtime_error (ERR_BAD_FRAME);
+        if (zargs[1] > frame_count)
+            runtime_error (ERR_BAD_FRAME);
 
-	/* Unwind the stack a frame at a time. */
-	for (; frame_count > zargs[1]; --frame_count)
-	    fp = stack + 1 + fp[1];
+        /* Unwind the stack a frame at a time. */
+        for (; frame_count > zargs[1]; --frame_count)
+            fp = stack + 1 + fp[1];
     } else {
-	if (zargs[1] > STACK_SIZE)
-	    runtime_error (ERR_BAD_FRAME);
+        if (zargs[1] > STACK_SIZE)
+            runtime_error (ERR_BAD_FRAME);
 
-	fp = stack + zargs[1];
+        fp = stack + zargs[1];
     }
 
     ret (zargs[0]);
@@ -639,10 +639,10 @@ void z_throw (void)
 /*
  * z_call_n, call a subroutine and discard its result.
  *
- * 	zargs[0] = packed address of subroutine
- *	zargs[1] = first argument (optional)
- *	...
- *	zargs[7] = seventh argument (optional)
+ *      zargs[0] = packed address of subroutine
+ *      zargs[1] = first argument (optional)
+ *      ...
+ *      zargs[7] = seventh argument (optional)
  *
  */
 
@@ -650,17 +650,17 @@ void z_call_n (void)
 {
 
     if (zargs[0] != 0)
-	call (zargs[0], zargc - 1, zargs + 1, 1);
+        call (zargs[0], zargc - 1, zargs + 1, 1);
 
 }/* z_call_n */
 
 /*
  * z_call_s, call a subroutine and store its result.
  *
- * 	zargs[0] = packed address of subroutine
- *	zargs[1] = first argument (optional)
- *	...
- *	zargs[7] = seventh argument (optional)
+ *      zargs[0] = packed address of subroutine
+ *      zargs[1] = first argument (optional)
+ *      ...
+ *      zargs[7] = seventh argument (optional)
  *
  */
 
@@ -668,16 +668,16 @@ void z_call_s (void)
 {
 
     if (zargs[0] != 0)
-	call (zargs[0], zargc - 1, zargs + 1, 0);
+        call (zargs[0], zargc - 1, zargs + 1, 0);
     else
-	store (0);
+        store (0);
 
 }/* z_call_s */
 
 /*
  * z_check_arg_count, branch if subroutine was called with >= n arg's.
  *
- * 	zargs[0] = number of arguments
+ *      zargs[0] = number of arguments
  *
  */
 
@@ -685,16 +685,16 @@ void z_check_arg_count (void)
 {
 
     if (fp == stack + STACK_SIZE)
-	branch (zargs[0] == 0);
+        branch (zargs[0] == 0);
     else
-	branch (zargs[0] <= (*fp & 0xff));
+        branch (zargs[0] <= (*fp & 0xff));
 
 }/* z_check_arg_count */
 
 /*
  * z_jump, jump unconditionally to the given address.
  *
- *	zargs[0] = PC relative address
+ *      zargs[0] = PC relative address
  *
  */
 
@@ -707,7 +707,7 @@ void z_jump (void)
     pc += (short) zargs[0] - 2;
 
     if (pc >= story_size)
-	runtime_error (ERR_ILL_JUMP_ADDR);
+        runtime_error (ERR_ILL_JUMP_ADDR);
 
     SET_PC (pc)
 
@@ -716,7 +716,7 @@ void z_jump (void)
 /*
  * z_nop, no operation.
  *
- *	no zargs used
+ *      no zargs used
  *
  */
 
@@ -730,7 +730,7 @@ void z_nop (void)
 /*
  * z_quit, stop game and exit interpreter.
  *
- *	no zargs used
+ *      no zargs used
  *
  */
 
@@ -744,7 +744,7 @@ void z_quit (void)
 /*
  * z_ret, return from a subroutine with the given value.
  *
- *	zargs[0] = value to return
+ *      zargs[0] = value to return
  *
  */
 
@@ -758,7 +758,7 @@ void z_ret (void)
 /*
  * z_ret_popped, return from a subroutine with a value popped off the stack.
  *
- *	no zargs used
+ *      no zargs used
  *
  */
 
@@ -772,7 +772,7 @@ void z_ret_popped (void)
 /*
  * z_rfalse, return from a subroutine with false (0).
  *
- * 	no zargs used
+ *      no zargs used
  *
  */
 
@@ -786,7 +786,7 @@ void z_rfalse (void)
 /*
  * z_rtrue, return from a subroutine with true (1).
  *
- * 	no zargs used
+ *      no zargs used
  *
  */
 

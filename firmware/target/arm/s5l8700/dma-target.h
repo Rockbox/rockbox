@@ -38,4 +38,3 @@ void dma_setup_channel(int channel, int sel, int dir, int dsize, int blen,
 
 void dma_enable_channel(int channel);
 void dma_disable_channel(int channel);
-

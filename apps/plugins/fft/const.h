@@ -8,4 +8,3 @@ extern const int16_t hann_4096[4096];
 extern const int16_t hann_2048[2048];
 extern const int16_t hann_1024[1024];
 extern const int16_t hann_512[512];
-

@@ -64,4 +64,3 @@ class ServerInfo : public QObject
 };
 
 #endif
-

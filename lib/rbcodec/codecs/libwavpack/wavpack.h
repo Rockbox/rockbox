@@ -236,7 +236,7 @@ typedef struct {
 
     uchar *wrapper_data;
     int wrapper_bytes;
- 
+
     uchar read_buffer [1024];
     char error_message [80];
 
@@ -444,4 +444,3 @@ int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sa
 uint32_t WavpackFinishBlock (WavpackContext *wpc);
 void WavpackUpdateNumSamples (WavpackContext *wpc, void *first_block);
 void *WavpackGetWrapperLocation (void *first_block);
-

@@ -385,24 +385,24 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
     }
 }
 
-/* 
+/*
  * Load saved stopwatch state, if exists.
  */
 static void load_stopwatch(void)
 {
     int fd;
-    
+
     fd = rb->open(STOPWATCH_FILE, O_RDONLY);
-    
+
     if (fd < 0)
     {
         return;
     }
-    
+
     /* variable stopwatch isn't saved/loaded, because it is only used
      * temporarily in main loop
      */
-    
+
     rb->read(fd, &start_at, sizeof(start_at));
     rb->read(fd, &prev_total, sizeof(prev_total));
     rb->read(fd, &counting, sizeof(counting));
@@ -410,7 +410,7 @@ static void load_stopwatch(void)
     rb->read(fd, &lap_scroll, sizeof(lap_scroll));
     rb->read(fd, &lap_start, sizeof(lap_start));
     rb->read(fd, lap_times, sizeof(lap_times));
-    
+
     if (counting && start_at > *rb->current_tick)
     {
         /* Stopwatch started in the future? Unlikely; probably started on a
@@ -421,28 +421,28 @@ static void load_stopwatch(void)
         start_at = 0;
         counting = false;
     }
-    
+
     rb->close(fd);
 }
 
-/* 
+/*
  * Save stopwatch state.
  */
 static void save_stopwatch(void)
 {
     int fd;
-    
+
     fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC, 0666);
-    
+
     if (fd < 0)
     {
         return;
     }
-    
+
     /* variable stopwatch isn't saved/loaded, because it is only used
      * temporarily in main loop
      */
-    
+
     rb->write(fd, &start_at, sizeof(start_at));
     rb->write(fd, &prev_total, sizeof(prev_total));
     rb->write(fd, &counting, sizeof(counting));
@@ -450,7 +450,7 @@ static void save_stopwatch(void)
     rb->write(fd, &lap_scroll, sizeof(lap_scroll));
     rb->write(fd, &lap_start, sizeof(lap_start));
     rb->write(fd, lap_times, sizeof(lap_times));
-    
+
     rb->close(fd);
 }
 
@@ -475,9 +475,9 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     load_stopwatch();
-    
+
     rb->lcd_clear_display();
-    
+
     while (!done)
     {
         if (counting)

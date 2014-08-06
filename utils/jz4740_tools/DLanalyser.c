@@ -37,13 +37,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with ; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, 
+ * Foundation, Inc., 51 Franklin St, Fifth Floor,
  * Boston, MA  02110-1301  USA
 
     The DL file can not find any entry point,
     so I think it just a dynamic library
     not executable.
-    
+
     IN THE FILE
     +--------------------------
     +      block_header_t
@@ -68,7 +68,7 @@
     +      inited mem seg
     +
     +-------------------------- <-----(raw->offset + raw->size)(bss start)
-    
+
     IN THE MEMORY
     +-------------------------- <-----(raw->mem2)
     +
@@ -83,9 +83,9 @@
     +      BSS(Not in file)
     +
     +-------------------------- <-----(raw->mem2 + raw->memsize)(bss end)
-    
+
     HOW TO disassemble (Ex: VX767_V1.0.dl)
-    
+
     STEP 1:
     ./dl_analyser VX767_V1.0.dl
 
@@ -139,15 +139,15 @@
 
     STEP 2:
     mips-linux-objdump -bbinary -mmips -D VX767_V1.0.dl > 767.as
-    
+
     STEP 3:
     for function lcd_set_direction_mode(address 0x80f8269c)
     we translate that address into 'file address'
     file address = 0x80f8269c - 0x80f80000 + 0x230 = 0x28CC
-    
+
     STEP 4:
     Find code in 767.as use this 'file address'
-    
+
     2008.10.20 6:23PM
 */
 
@@ -237,7 +237,7 @@ void dump_header(block_header_t *header)
             header->date[2], header->date[3],
             header->date[4], header->date[5],
             header->date[6]);
-    tmp = header->padding[0] + header->padding[1] + header->padding[2] + header->padding[3] + header->padding[4] + 
+    tmp = header->padding[0] + header->padding[1] + header->padding[2] + header->padding[3] + header->padding[4] +
             header->padding[5] + header->padding[6] + header->padding[7] + header->padding[8];
     fprintf(stderr, "PaddindSum: 0x%x\n", tmp);
 }
@@ -288,14 +288,14 @@ void dump_symbol_table(import_export_symbol_t *sym, char *prefix)
 {
     int tmp;
     int i;
-    
+
     fprintf(stderr, "=====================%s==================\n", prefix);
     fprintf(stderr, "number symbols  : 0x%x\n", sym->numsymbol);
     tmp = sym->padding[0] + sym->padding[1] + sym->padding[2];
     fprintf(stderr, "PaddindSum      : 0x%x\n", tmp);
     for(i=0; i<sym->numsymbol; i++)
     {
-        fprintf(stderr, "Sym[%02d] offset 0x%04x padding 0x%x flag 0x%x address 0x%x name: %s\n", 
+        fprintf(stderr, "Sym[%02d] offset 0x%04x padding 0x%x flag 0x%x address 0x%x name: %s\n",
                         i, sym->symbol[i].offset, sym->symbol[i].padding,
                         sym->symbol[i].flag, sym->symbol[i].address, sym->symbol[i].name);
     }
@@ -308,7 +308,7 @@ static int read_symbols(int fd, import_export_symbol_t *sym)
     int len = 0, flag = 0;
     char buffer;
     int nametab_offset;
-    
+
     if(numbers == 0 || fd < 0)
         return 0;
     /*Read table*/
@@ -367,7 +367,7 @@ int analyze_dl(int fd)
     block_raw_header_t raw;
     import_export_symbol_t isym;
     import_export_symbol_t esym;
-    
+
     /*Read Header*/
     if((ret = read(fd, &header, sizeof(block_header_t))) < 0)
         return -1;
@@ -384,7 +384,7 @@ int analyze_dl(int fd)
     if((ret = read(fd, &raw, sizeof(block_raw_header_t))) < 0)
         return -1;
     dump_raw_data_header(&raw);
-    
+
     /*read import symbol*/
     lseek(fd, impt.offset, SEEK_SET);
     /*number*/
@@ -398,7 +398,7 @@ int analyze_dl(int fd)
         return -1;
     }
     dump_symbol_table(&isym, "IMPORT SYMBOL");
-    
+
     /*read export symbol*/
     lseek(fd, expt.offset, SEEK_SET);
     /*number*/

@@ -226,8 +226,8 @@ extern bool list_do_action(int context, int timeout,
 
 
 /** Simplelist implementation.
-    USe this if you dont need to reimplement the list code, 
-    and just need to show a list 
+    USe this if you dont need to reimplement the list code,
+    and just need to show a list
  **/
 
 struct simplelist_info {
@@ -243,7 +243,7 @@ struct simplelist_info {
                        was exited with ACTION_STD_CANCEL                  */
     int (*action_callback)(int action, struct gui_synclist *lists); /* can be NULL */
         /* action_callback notes:
-            action == the action pressed by the user 
+            action == the action pressed by the user
                 _after_ gui_synclist_do_button returns.
             lists == the lists struct so the callback can get selection and count etc. */
     enum themable_icons title_icon;

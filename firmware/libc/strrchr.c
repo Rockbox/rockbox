@@ -55,6 +55,6 @@ _DEFUN (strrchr, (s, i),
     {
       last = strchr(s, i);
     }
-                  
+
   return (char *) last;
 }

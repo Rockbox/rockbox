@@ -31,13 +31,13 @@
 
 /*===========================================================================
  * These parameters may be defined per target:
- * 
+ *
  *   BATT_FULL_VOLTAGE - Upon connect a charge cycle begins if the reading is
  *                       lower than this value (millivolts).
  *
  * BATT_VAUTO_RECHARGE - While left plugged after cycle completion, the
  *                       charger restarts automatically if the reading drops
- *                       below this value (millivolts). Must be less than 
+ *                       below this value (millivolts). Must be less than
  *                       BATT_FULL_VOLTAGE.
  *
  *         ADC_BATTERY - ADC channel from which to read the battery voltage

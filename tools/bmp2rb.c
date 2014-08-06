@@ -445,7 +445,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                 dest.d16[(row/8) * dst_w + col] |= data << (row & 7);
             }
         break;
-        
+
       case 8: /* 16-bit packed RGB (5-6-5) vertical stride*/
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
@@ -454,7 +454,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                     (((src[row * width + col].rgbRed >> 3) << 11) |
                      ((src[row * width + col].rgbGreen >> 2) << 5) |
                      ((src[row * width + col].rgbBlue >> 3)));
-                     
+
                 dest.d16[col * dst_h + row] = rgb;
             }
         break;
@@ -578,7 +578,7 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
     }
 }
 
-void generate_raw_file(const union RAWDATA *t_bitmap, 
+void generate_raw_file(const union RAWDATA *t_bitmap,
                        int t_width, int t_height, int t_depth)
 {
     FILE *f;
@@ -792,13 +792,13 @@ int main(int argc, char **argv)
     }
     else
     {
-        if (transform_bitmap(bitmap, width, height, format, &t_bitmap, 
+        if (transform_bitmap(bitmap, width, height, format, &t_bitmap,
                              &t_width, &t_height, &t_depth))
             exit(1);
         if(raw)
             generate_raw_file(&t_bitmap, t_width, t_height, t_depth);
         else
-            generate_c_source(id, header_dir, width, height, &t_bitmap, 
+            generate_c_source(id, header_dir, width, height, &t_bitmap,
                               t_width, t_height, t_depth,
                               format <= 1, create_bm);
     }

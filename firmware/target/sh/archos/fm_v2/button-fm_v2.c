@@ -94,6 +94,6 @@ int button_read_device(void)
         btn |= BUTTON_ON;
     if ( adc_read(ADC_BUTTON_OFF) > 512 )
         btn |= BUTTON_OFF;
-        
+
     return btn;
 }

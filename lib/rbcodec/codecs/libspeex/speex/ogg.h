@@ -101,7 +101,7 @@ typedef struct {
   long  e_o_s;
 
   spx_ogg_int64_t  granulepos;
-  
+
   spx_ogg_int64_t  packetno;     /* sequence number for decode; the framing
                 knows where there's a hole in the data,
                 but we need coupling so that the codec
@@ -208,9 +208,3 @@ extern void     spx_ogg_packet_clear(spx_ogg_packet *op);
 #endif
 
 #endif  /* _OGG_H */
-
-
-
-
-
-

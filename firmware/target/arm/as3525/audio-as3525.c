@@ -154,4 +154,3 @@ unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
     (void)type;
 }
 #endif /* CONFIG_SAMPR_TYPES */
-

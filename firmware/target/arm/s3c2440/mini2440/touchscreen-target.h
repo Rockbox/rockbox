@@ -30,4 +30,3 @@ void touchscreen_init_device(void);
 int touchscreen_read_device(int *data, int *old_data);
 
 #endif
-

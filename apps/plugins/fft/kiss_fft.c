@@ -26,8 +26,8 @@ static size_t ntmpbuf SHAREDBSS_ATTR = 0;
 #define CHECKBUF(buf,nbuf,n) \
     do { \
         if ( nbuf < (size_t)(n) ) {\
-        	DEBUGF("CHECKBUF NOT IMPLEMENTED!");\
-        	break;\
+                DEBUGF("CHECKBUF NOT IMPLEMENTED!");\
+                break;\
         } \
    }while(0)
 
@@ -353,8 +353,8 @@ kiss_fft_cfg kiss_fft_alloc(int nfft,int inverse_fft,void * mem,size_t * lenmem 
         + sizeof(kiss_fft_cpx)*(nfft-1); /* twiddle factors*/
 
     if ( lenmem==NULL ) {
-    	DEBUGF("This version of kiss fft can't use malloc");
-    	return st;
+        DEBUGF("This version of kiss fft can't use malloc");
+        return st;
         /* st = ( kiss_fft_cfg)KISS_FFT_MALLOC( memneeded ); */
     }else{
         if (mem != NULL && *lenmem >= memneeded)
@@ -362,21 +362,21 @@ kiss_fft_cfg kiss_fft_alloc(int nfft,int inverse_fft,void * mem,size_t * lenmem 
         *lenmem = memneeded;
     }
     if (st) {
-		int i;
-		st->nfft=nfft;
-		st->inverse = inverse_fft;
+                int i;
+                st->nfft=nfft;
+                st->inverse = inverse_fft;
 
-		for (i=0;i<nfft;++i) {
-			/* const double pi=3.141592653589793238462643383279502884197169399375105820974944;
-			double phase = -2*pi*i / nfft; */
-			if (st->inverse)
-				DEBUGF("Inverse FFT not implemented!"); /* kf_cexp(st->twiddles+i, -1*i, nfft ); */
-			else
-				kf_cexp( st->twiddles+i, i, nfft );
-		}
+                for (i=0;i<nfft;++i) {
+                        /* const double pi=3.141592653589793238462643383279502884197169399375105820974944;
+                        double phase = -2*pi*i / nfft; */
+                        if (st->inverse)
+                                DEBUGF("Inverse FFT not implemented!"); /* kf_cexp(st->twiddles+i, -1*i, nfft ); */
+                        else
+                                kf_cexp( st->twiddles+i, i, nfft );
+                }
 
-		kf_factor(nfft,st->factors);
-	}
+                kf_factor(nfft,st->factors);
+        }
     return st;
 }
 

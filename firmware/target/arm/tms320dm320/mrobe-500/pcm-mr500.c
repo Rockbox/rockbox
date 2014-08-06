@@ -30,7 +30,7 @@
 #include "mmu-arm.h"
 #include "pcm-internal.h"
 
-/* This is global to save some latency when pcm_play_dma_get_peak_buffer is 
+/* This is global to save some latency when pcm_play_dma_get_peak_buffer is
  *  called.
  */
 static const void *start;
@@ -57,7 +57,7 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
     int cnt = DSP_(_sdem_level);
 
     unsigned long addr = (unsigned long) start + cnt;
-    
+
     *count = (cnt & 0xFFFFF) >> 1;
     return (void *)((addr + 2) & ~3);
 }
@@ -66,17 +66,17 @@ void pcm_play_dma_init(void)
 {
     IO_INTC_IRQ0 = INTR_IRQ0_IMGBUF;
     bitset16(&IO_INTC_EINT0, INTR_EINT0_IMGBUF);
-    
+
     /* Set this as a FIQ */
     bitset16(&IO_INTC_FISEL0, INTR_EINT0_IMGBUF);
-    
+
     /* Enable the HPIB clock */
     bitset16(&IO_CLK_MOD0, (CLK_MOD0_HPIB | CLK_MOD0_DSP));
 
     IO_SDRAM_SDDMASEL = 0x24;
 
     IO_DSPC_HPIB_CONTROL = 1 << 10 | 1 << 9 | 1 << 8 | 1 << 7 | 1 << 3 | 1 << 0;
-    
+
     dsp_reset();
     dsp_load(dsp_image);
 
@@ -100,7 +100,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     DSP_(_sdem_addrh) = sdem_addr >> 16;
     DSP_(_sdem_dsp_size) = size;
     DSP_(_dma0_stopped)=0;
-    
+
     dsp_wake();
 }
 
@@ -149,19 +149,19 @@ void DSPHINT(void)
     size_t size;
 
     IO_INTC_FIQ0 = INTR_IRQ0_IMGBUF;
-    
-    switch (dsp_message.msg) 
+
+    switch (dsp_message.msg)
     {
     case MSG_DEBUGF:
         /* DSP stores one character per word. */
-        for (i = 0; i < sizeof(buffer); i++) 
+        for (i = 0; i < sizeof(buffer); i++)
         {
             buffer[i] = dsp_message.payload.debugf.buffer[i];
         }
-        
+
         DEBUGF("DSP: %s", buffer);
         break;
-        
+
     case MSG_REFILL:
         /* Buffer empty.  Try to get more. */
         if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
@@ -174,22 +174,21 @@ void DSPHINT(void)
             DSP_(_sdem_addrl) = sdem_addr & 0xffff;
             DSP_(_sdem_addrh) = sdem_addr >> 16;
             DSP_(_sdem_dsp_size) = size;
-            
+
             DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
                 (unsigned long)start, (unsigned long)sdem_addr);
 
             pcm_play_dma_status_callback(PCM_DMAST_STARTED);
         }
-        
+
         break;
     default:
         DEBUGF("DSP: unknown msg 0x%04x", dsp_message.msg);
         break;
     }
-    
+
     /* Re-Activate the channel */
     dsp_wake();
-    
+
     DEBUGF("DSP: %s", buffer);
 }
-    

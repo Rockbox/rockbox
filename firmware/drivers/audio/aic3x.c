@@ -98,7 +98,7 @@ static void aic3x_change_reg(unsigned reg, unsigned char or_mask,
 
     aic3x_write_reg(reg, data);
 }
-                                    
+
 static void aic3x_apply_volume(void)
 {
     unsigned char data[3];
@@ -134,7 +134,7 @@ static void audiohw_mute(bool mute)
         aic3x_write_reg(AIC3X_DAC_R1_VOL, 0xF6);
         /* DAC_L1 routed to MONO_LOP/M, mute */
         aic3x_write_reg(AIC3X_DAC_L1_MONO_LOP_M_VOL, 0xF6);
-        /* DAC_R1 routed to MONO_LOP/M, mute */ 
+        /* DAC_R1 routed to MONO_LOP/M, mute */
         aic3x_write_reg(AIC3X_DAC_R1_MONO_LOP_M_VOL, 0xF6);
 
         volume_left |= 0x80;
@@ -148,7 +148,7 @@ static void audiohw_mute(bool mute)
         aic3x_write_reg(AIC3X_DAC_R1_VOL, 0x8C);
         /* DAC_L1 routed to MONO_LOP/M, gain 0x2 (-1.0dB) */
         aic3x_write_reg(AIC3X_DAC_L1_MONO_LOP_M_VOL, 0x92);
-        /* DAC_R1 routed to MONO_LOP/M, gain 0x2 (-1.0dB) */ 
+        /* DAC_R1 routed to MONO_LOP/M, gain 0x2 (-1.0dB) */
         aic3x_write_reg(AIC3X_DAC_R1_MONO_LOP_M_VOL, 0x92);
 
         volume_left &= 0x7F;
@@ -187,7 +187,7 @@ void audiohw_init(void)
     /* data offset = 0 clocks */
     aic3x_write_reg(AIC3X_DATA_REG_C, 0);
 
-    /* Left DAC plays left channel, Right DAC plays right channel */ 
+    /* Left DAC plays left channel, Right DAC plays right channel */
     aic3x_write_reg(AIC3X_DATAPATH, 0xA);
 
     /* power left and right DAC, HPLCOM constant VCM output */
@@ -221,7 +221,7 @@ void audiohw_init(void)
     /* PLL J = 53 */
     aic3x_write_reg(AIC3X_PLL_REG_B, 0xD4);
     /* PLL D = 5211 */
-    aic3x_write_reg(AIC3X_PLL_REG_C, 0x51); 
+    aic3x_write_reg(AIC3X_PLL_REG_C, 0x51);
     aic3x_write_reg(AIC3X_PLL_REG_D, 0x6C);
     /* PLL R = 1 */
     aic3x_write_reg(AIC3X_OVERFLOW, 0x01);
@@ -326,4 +326,3 @@ void aic3x_switch_output(bool stereo)
         aic3x_change_reg(AIC3X_HPLCOM_LVL, 0x00, 0xFE);
     }
 }
-

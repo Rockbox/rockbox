@@ -72,7 +72,7 @@
 #define SYS_CPUREG_GP    28
 #define SYS_CPUREG_SP    29
 #define SYS_CPUREG_S8    30
-#define SYS_CPUREG_FP    SYS_CPUREG_S8        
+#define SYS_CPUREG_FP    SYS_CPUREG_S8
 #define SYS_CPUREG_RA    31
 
 
@@ -352,7 +352,7 @@
 #define C0_PRID_PRID_4KEc        K_PRIdImp_4KEc
 #define C0_PRID_PRID_4KEmp        K_PRIdImp_4KEmp
 /* Coral */
-#define C0_PRID_PRID_4KSc            K_PRIdImp_4KSc    
+#define C0_PRID_PRID_4KSc            K_PRIdImp_4KSc
 /* Opal */
 #define C0_PRID_PRID_5K            K_PRIdImp_Opal
 /* Ruby */
@@ -577,7 +577,7 @@
 
 #define SCACHE_ADDR_HIT_WRITEBACK_INVALIDATE    CACHE_OP(0x5, 3)
 
-/*  Workaround for bug in early revisions of MIPS 4K family of 
+/*  Workaround for bug in early revisions of MIPS 4K family of
  *  processors. Only relevant in early engineering samples of test
  *  chips (RTL revision <= 3.0).
  *
@@ -636,7 +636,7 @@ SET_POP();                  \
 
 /**** Move from/to Coprocessor operations ****/
 
-/*  We use ssnop instead of nop operations in order to handle 
+/*  We use ssnop instead of nop operations in order to handle
  *  superscalar CPUs.
  *  The "sll zero,zero,1" notation is compiler backwards compatible.
  */
@@ -647,10 +647,10 @@ SET_POP();                  \
         mflo dst;\
            NOPS
 
-/*  Workaround for bug in early revisions of MIPS 4K family of 
+/*  Workaround for bug in early revisions of MIPS 4K family of
  *  processors.
  *
- *  This concerns the nop instruction before mtc0 in the 
+ *  This concerns the nop instruction before mtc0 in the
  *  MTC0 macro below.
  *
  *  The bug is described in :

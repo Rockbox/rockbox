@@ -169,7 +169,7 @@ bool alarm_screen(void)
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
              h = (h+23) % 24;
-             
+
              if (global_settings.talk_menu)
                  talk_value(h, UNIT_HOUR, false);
              break;

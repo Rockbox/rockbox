@@ -27,7 +27,7 @@
 
 /*
         NOTE: storage_idle_notify usage notes..
-        
+
 1) The callbacks are called in the ata thread, not main/your thread.
 2) Asynchronous callbacks (like the buffer refill) should be avoided.
     If you must use an async callback, remember to check storage_is_active() before

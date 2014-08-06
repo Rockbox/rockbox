@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,7 @@
 
 #include "z80_type.h"
 
-struct keystate { 
+struct keystate {
   dbyte press;
   byte state;
   byte base;
@@ -43,26 +43,26 @@ typedef byte spkeyboard[8];
 
 #define SP_COMBINE(spk1, spk2) \
   SPIP(spk1, 0) |= SPIP(spk2, 0), \
-  SPIP(spk1, 1) |= SPIP(spk2, 1) 
+  SPIP(spk1, 1) |= SPIP(spk2, 1)
 
 
 #define SP_SUBSTRACT(spk1, spk2) \
   SPIP(spk1, 0) &= ~SPIP(spk2, 0), \
-  SPIP(spk1, 1) &= ~SPIP(spk2, 1) 
+  SPIP(spk1, 1) &= ~SPIP(spk2, 1)
 
 
 #define SP_NONEMPTY(spk) (SPIP(spk, 0) || SPIP(spk, 1))
 
 #define SP_CONTAINS(spk1, spk2) \
-  ((SPIP(spk1, 0) & SPIP(spk2, 0)) || (SPIP(spk1, 1) & SPIP(spk2, 1))) 
+  ((SPIP(spk1, 0) & SPIP(spk2, 0)) || (SPIP(spk1, 1) & SPIP(spk2, 1)))
 
 #define SP_SETEMPTY(spk) \
   SPIP(spk, 0) = 0, \
-  SPIP(spk, 1) = 0 
+  SPIP(spk, 1) = 0
 
 #define SP_COPY(spk1, spk2) \
   SPIP(spk1, 0) = SPIP(spk2, 0), \
-  SPIP(spk1, 1) = SPIP(spk2, 1) 
+  SPIP(spk1, 1) = SPIP(spk2, 1)
 
 
 #define TRKS(ks) ((ks) - 0xFF00 + 0x100)
@@ -206,7 +206,7 @@ extern void spkey_textmode(void);
 extern void spkey_screenmode(void);
 
 extern const int need_switch_mode;
-    
+
 extern void spkb_refresh(void);
 extern void clear_keystates(void);
 extern int display_keyboard(void);

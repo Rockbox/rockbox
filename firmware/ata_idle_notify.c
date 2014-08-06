@@ -51,7 +51,7 @@ void register_storage_idle_func(void (*function)(void))
 void unregister_storage_idle_func(void (*func)(void), bool run)
 {
     remove_event_ex(DISK_EVENT_SPINUP, wrapper, func);
-    
+
     if (run)
         func();
 }
@@ -68,7 +68,7 @@ bool call_storage_idle_notifys(bool force)
     lock_until = current_tick + 30*HZ;
 
     send_event(DISK_EVENT_SPINUP, NULL);
-    
+
     return true;
 }
 #endif

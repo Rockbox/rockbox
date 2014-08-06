@@ -1,5 +1,5 @@
 /* random.c - Z-machine random number generator
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * This file is part of Frotz.
  *
@@ -35,15 +35,15 @@ static int counter = 0;
 void seed_random (int value)
 {
 
-    if (value == 0) {		/* ask interface for seed value */
-	A = os_random_seed ();
-	interval = 0;
-    } else if (value < 1000) {	/* special seed value */
-	counter = 0;
-	interval = value;
-    } else {			/* standard seed value */
-	A = value;
-	interval = 0;
+    if (value == 0) {           /* ask interface for seed value */
+        A = os_random_seed ();
+        interval = 0;
+    } else if (value < 1000) {  /* special seed value */
+        counter = 0;
+        interval = value;
+    } else {                    /* standard seed value */
+        A = value;
+        interval = 0;
     }
 
 }/* seed_random */
@@ -51,31 +51,31 @@ void seed_random (int value)
 /*
  * z_random, store a random number or set the random number seed.
  *
- *	zargs[0] = range (positive) or seed value (negative)
+ *      zargs[0] = range (positive) or seed value (negative)
  *
  */
 
 void z_random ()
 {
 
-    if ((short) zargs[0] <= 0) {	/* set random seed */
+    if ((short) zargs[0] <= 0) {        /* set random seed */
 
-	seed_random (- (short) zargs[0]);
-	store (0);
+        seed_random (- (short) zargs[0]);
+        store (0);
 
-    } else {				/* generate random number */
+    } else {                            /* generate random number */
 
-	zword result;
+        zword result;
 
-	if (interval != 0) {		/* ...in special mode */
-	    result = counter++;
-	    if (counter == interval) counter = 0;
-	} else {			/* ...in standard mode */
-	    A = 0x015a4e35L * A + 1;
-	    result = (A >> 16) & 0x7fff;
-	}
+        if (interval != 0) {            /* ...in special mode */
+            result = counter++;
+            if (counter == interval) counter = 0;
+        } else {                        /* ...in standard mode */
+            A = 0x015a4e35L * A + 1;
+            result = (A >> 16) & 0x7fff;
+        }
 
-	store ((zword) (result % zargs[0] + 1));
+        store ((zword) (result % zargs[0] + 1));
 
     }
 

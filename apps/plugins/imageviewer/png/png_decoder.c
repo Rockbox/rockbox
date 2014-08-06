@@ -189,7 +189,7 @@ static unsigned readBitsFromReversedStream(size_t* bitpointer,
     return result;
 }
 
-static void setBitOfReversedStream0(size_t* bitpointer, 
+static void setBitOfReversedStream0(size_t* bitpointer,
                                     unsigned char* bitstream,
                                     unsigned char bit)
 {
@@ -209,7 +209,7 @@ static void setBitOfReversedStream(size_t* bitpointer,
 {
     /* the current bit in bitstream may be 0 or 1 for this to work */
     if (bit == 0)
-        bitstream[(*bitpointer) >> 3] &= 
+        bitstream[(*bitpointer) >> 3] &=
             (unsigned char)(~(1 << (7 - ((*bitpointer) & 0x7))));
     else
         bitstream[(*bitpointer) >> 3] |=  (1 << (7 - ((*bitpointer) & 0x7)));
@@ -232,9 +232,9 @@ static unsigned LodePNG_chunk_length(const uint8_t* chunk)
 /* check if the type is the given type */
 static bool LodePNG_chunk_type_equals(const uint8_t* chunk, uint32_t type)
 {
-    /* chunk type field: A 4-byte chunk type code. For convenience in 
+    /* chunk type field: A 4-byte chunk type code. For convenience in
      * description and in examining PNG files, type codes are restricted
-     * to consist of uppercase and lowercase ASCII letters 
+     * to consist of uppercase and lowercase ASCII letters
      * (A-Z and a-z, or 65-90 and 97-122 decimal). However, encoders and
      * decoders must treat the codes as fixed binary values, not character
      * strings."
@@ -253,7 +253,7 @@ static inline bool LodePNG_chunk_critical(const uint8_t* chunk)
 }
 
 /* 0: public, 1: private */
-static inline bool LodePNG_chunk_private(const uint8_t* chunk) 
+static inline bool LodePNG_chunk_private(const uint8_t* chunk)
 {
     return((chunk[6] & 32) != 0);
 }
@@ -292,7 +292,7 @@ static const uint8_t* LodePNG_chunk_next(const uint8_t* chunk)
 /* return type is a LodePNG error code
  * bd - bit depth
  */
-static uint8_t checkColorValidity(uint8_t colorType, uint8_t bd) 
+static uint8_t checkColorValidity(uint8_t colorType, uint8_t bd)
 {
     switch (colorType)
     {
@@ -510,7 +510,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                                   alpha_complement*infoIn->background_r)>>8;
                     pixel->green = (infoIn->color.palette[j + 1] * alpha +
                                     alpha_complement*infoIn->background_g)>>8;
-                    pixel->blue = (infoIn->color.palette[j + 2] * alpha + 
+                    pixel->blue = (infoIn->color.palette[j + 2] * alpha +
                                    alpha_complement*infoIn->background_b)>>8;
                     pixel++;
                 }
@@ -541,7 +541,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                     j = i++ << 2;
                     alpha = in[j + 3];
                     alpha_complement = (256 - alpha);
-                    pixel->red = (in[j] * alpha + 
+                    pixel->red = (in[j] * alpha +
                                   alpha_complement*infoIn->background_r)>>8;
                     pixel->green = (in[j + 1] * alpha +
                                     alpha_complement*infoIn->background_g)>>8;
@@ -573,7 +573,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                         value == infoIn->color.key_r)
                         value = infoIn->background_r<<8;
 
-                    pixel->red = 
+                    pixel->red =
                     pixel->green =
                     pixel->blue = (uint8_t)(value>>8);
                     pixel++;
@@ -590,11 +590,11 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
 
                     /* tRNS and bKGD */
                     if (infoIn->color.key_defined &&
-                        ((uint16_t)(in[j]<<8|in[j + 1])  == 
+                        ((uint16_t)(in[j]<<8|in[j + 1])  ==
                             infoIn->color.key_r) &&
-                        ((uint16_t)(in[j + 2]<<8|in[j + 3]) == 
+                        ((uint16_t)(in[j + 2]<<8|in[j + 3]) ==
                             infoIn->color.key_g) &&
-                        ((uint16_t)(in[j + 4]<<8|in[j + 5]) == 
+                        ((uint16_t)(in[j + 4]<<8|in[j + 5]) ==
                             infoIn->color.key_b))
                     {
                         pixel->red = (uint8_t)infoIn->background_r;
@@ -662,7 +662,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                 for (x = 0 ; x < w ; x++) {
                     value = readBitsFromReversedStream(&bp, in, infoIn->color.bitDepth);
 
-                    /* tRNS and bKGD */ 
+                    /* tRNS and bKGD */
                     if (infoIn->color.key_defined)
                         if ( value == infoIn->color.key_r )
                             value = infoIn->background_r; /* full transparent */
@@ -695,11 +695,11 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                     /* tRNS and bKGD */
                     alpha = infoIn->color.palette[j + 3];
                     alpha_complement = (256 - alpha);
-                    pixel->red = (alpha * infoIn->color.palette[j] + 
+                    pixel->red = (alpha * infoIn->color.palette[j] +
                                   alpha_complement*infoIn->background_r)>>8;
-                    pixel->green = (alpha * infoIn->color.palette[j + 1] + 
+                    pixel->green = (alpha * infoIn->color.palette[j + 1] +
                                     alpha_complement*infoIn->background_g)>>8;
-                    pixel->blue = (alpha * infoIn->color.palette[j + 2] + 
+                    pixel->blue = (alpha * infoIn->color.palette[j + 2] +
                                    alpha_complement*infoIn->background_b)>>8;
                     pixel++;
                 }
@@ -797,7 +797,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                                   alpha_complement*background_grey)>>8;
                     px_rgb.green = (alpha * infoIn->color.palette[j + 1] +
                                     alpha_complement*background_grey)>>8;
-                    px_rgb.blue = (alpha * infoIn->color.palette[j + 2] + 
+                    px_rgb.blue = (alpha * infoIn->color.palette[j + 2] +
                                    alpha_complement*background_grey)>>8;
 
                     *pixel++ = brightness(px_rgb);
@@ -834,7 +834,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                     px_rgb.red = in[j];
                     px_rgb.green = in[j + 1];
                     px_rgb.blue = in[j + 2];
-                    *pixel++ = (alpha * brightness(px_rgb) + 
+                    *pixel++ = (alpha * brightness(px_rgb) +
                                 alpha_complement)>>8;
                 }
                 output_row_8(y,(void *)line_buf,&ctx);
@@ -886,7 +886,7 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
 
                     /* tRNS and bKGD */
                     if (infoIn->color.key_defined &&
-                        (uint16_t)(in[j]<<8|in[j + 1]) == 
+                        (uint16_t)(in[j]<<8|in[j + 1]) ==
                             infoIn->color.key_r &&
                         (uint16_t)(in[j + 2]<<8|in[j + 3]) ==
                             infoIn->color.key_g &&
@@ -992,11 +992,11 @@ static void LodePNG_convert(LodePNG_Decoder *decoder)
                     alpha = infoIn->color.palette[j + 3];
                     alpha_complement = (256 - alpha) * background_grey;
 
-                    px_rgb.red = (alpha * infoIn->color.palette[j] + 
+                    px_rgb.red = (alpha * infoIn->color.palette[j] +
                                   alpha_complement)>>8;
-                    px_rgb.green = (alpha * infoIn->color.palette[j + 1] + 
+                    px_rgb.green = (alpha * infoIn->color.palette[j + 1] +
                                     alpha_complement)>>8;
-                    px_rgb.blue = (alpha * infoIn->color.palette[j + 2] + 
+                    px_rgb.blue = (alpha * infoIn->color.palette[j + 2] +
                                    alpha_complement)>>8;
                     *pixel++ = brightness(px_rgb);
                 }
@@ -1031,16 +1031,16 @@ static const uint8_t ADAM7_DX[7] = { 8, 8, 4, 4, 2, 2, 1 }; /*x delta values*/
 static const uint8_t ADAM7_DY[7] = { 8, 8, 8, 4, 4, 2, 2 }; /*y delta values*/
 
 static void Adam7_getpassvalues(uint16_t passw[7],
-                                uint16_t passh[7], 
-                                size_t filter_passstart[8], 
-                                size_t padded_passstart[8], 
-                                size_t passstart[8], 
+                                uint16_t passh[7],
+                                size_t filter_passstart[8],
+                                size_t padded_passstart[8],
+                                size_t passstart[8],
                                 uint16_t w,
                                 uint16_t h,
                                 uint8_t bpp)
 {
-    /* the passstart values have 8 values: 
-     * the 8th one actually indicates the byte after the end 
+    /* the passstart values have 8 values:
+     * the 8th one actually indicates the byte after the end
      * of the 7th (= last) pass
      */
     uint8_t i;
@@ -1062,7 +1062,7 @@ static void Adam7_getpassvalues(uint16_t passw[7],
                                   passh[i] * (1 + (passw[i] * bpp + 7) / 8):0);
 
         /* bits padded if needed to fill full byte at end of each scanline */
-        padded_passstart[i + 1] = padded_passstart[i] + 
+        padded_passstart[i + 1] = padded_passstart[i] +
                                   passh[i] * ((passw[i] * bpp + 7) / 8);
 
         /* only padded at end of reduced image */
@@ -1301,10 +1301,10 @@ static uint8_t unfilterScanline(uint8_t* recon,
         {
             /*
             for (i = 0; i < bytewidth; i++)
-                recon[i] = (uint8_t)(scanline[i] + 
+                recon[i] = (uint8_t)(scanline[i] +
                                      paethPredictor(0, precon[i], 0));
             for (i = bytewidth; i < length; i++)
-                recon[i] = (uint8_t)(scanline[i] + 
+                recon[i] = (uint8_t)(scanline[i] +
                                      paethPredictor(recon[i - bytewidth],
                                                     precon[i],
                                                     precon[i - bytewidth]));
@@ -1325,8 +1325,8 @@ static uint8_t unfilterScanline(uint8_t* recon,
                 memcpy(p_cache_1, precon, 256);
 
                 for (i=bytewidth; i < 256 + bytewidth; i++)
-                    cache[i] += paethPredictor(cache[i - bytewidth], 
-                                               p_cache[i], 
+                    cache[i] += paethPredictor(cache[i - bytewidth],
+                                               p_cache[i],
                                                p_cache[i - bytewidth]);
 
                 memcpy(recon, cache, 256);
@@ -1437,7 +1437,7 @@ static uint8_t unfilter(uint8_t* out,
     /* bytewidth is used for filtering, is 1 when bpp < 8,
      * number of bytes per pixel otherwise
      */
-    size_t bytewidth = (bpp + 7) / 8; 
+    size_t bytewidth = (bpp + 7) / 8;
     size_t linebytes = (w * bpp + 7) / 8;
 
     for (y = 0; y < h; y++)
@@ -1488,7 +1488,7 @@ static void Adam7_deinterlace(uint8_t* out,
             for (y = 0; y < passh[i]; y++)
                 for (x = 0; x < passw[i]; x++)
                 {
-                    size_t pixelinstart = passstart[i] + 
+                    size_t pixelinstart = passstart[i] +
                                           (y * passw[i] + x) * bytewidth;
                     size_t pixeloutstart = ((ADAM7_IY[i] + y * ADAM7_DY[i]) * w +
                                              ADAM7_IX[i] + x * ADAM7_DX[i]) * bytewidth;
@@ -1511,12 +1511,12 @@ static void Adam7_deinterlace(uint8_t* out,
                 for (x = 0; x < passw[i]; x++)
                 {
                     ibp = (8 * passstart[i]) + (y * ilinebits + x * bpp);
-                    obp = (ADAM7_IY[i] + y * ADAM7_DY[i]) * olinebits + 
+                    obp = (ADAM7_IY[i] + y * ADAM7_DY[i]) * olinebits +
                            (ADAM7_IX[i] + x * ADAM7_DX[i]) * bpp;
                     for (b = 0; b < bpp; b++)
                     {
                         uint8_t bit = readBitFromReversedStream(&ibp, in);
-                        /* note that this function assumes the out buffer 
+                        /* note that this function assumes the out buffer
                          * is completely 0, use setBitOfReversedStream
                          * otherwise*/
                         setBitOfReversedStream0(&obp, out, bit);
@@ -1533,7 +1533,7 @@ static void removePaddingBits(uint8_t* out,
                               uint16_t h)
 {
     /* After filtering there are still padding bits if scanlines have
-     * non multiple of 8 bit amounts. They need to be removed 
+     * non multiple of 8 bit amounts. They need to be removed
      * (except at last scanline of (Adam7-reduced) image) before working
      * with pure image buffers for the Adam7 code, the color convert code
      * and the output to the user.
@@ -1565,7 +1565,7 @@ static void removePaddingBits(uint8_t* out,
  */
 static uint8_t postProcessScanlines(uint8_t* out,
                                     uint8_t* in,
-                                    const LodePNG_Decoder* decoder) 
+                                    const LodePNG_Decoder* decoder)
 {
    /*return value is error*/
 
@@ -1577,7 +1577,7 @@ static uint8_t postProcessScanlines(uint8_t* out,
     *     2) remove padding bits (= posible extra bits per scanline if bpp < 8)
     * II) if adam7:
     *     1) 7x unfilter
-    *     2) 7x remove padding bits 
+    *     2) 7x remove padding bits
     *     3) Adam7_deinterlace
     *
     * NOTE: the in buffer will be overwritten with intermediate data!
@@ -1791,8 +1791,8 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                 }
                 /* transparent color definition */
                 decoder->infoPng.color.key_defined = 1;
-                decoder->infoPng.color.key_r = 
-                decoder->infoPng.color.key_g = 
+                decoder->infoPng.color.key_r =
+                decoder->infoPng.color.key_g =
                 decoder->infoPng.color.key_b = data[0]<<8|data[1];
             }
             else if (decoder->infoPng.color.colorType == PNG_COLORTYPE_RGB)
@@ -1803,13 +1803,13 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                     decoder->error = 41;
                     break;
                 }
-                /* transparent color definition */ 
+                /* transparent color definition */
                 decoder->infoPng.color.key_defined = 1;
                 decoder->infoPng.color.key_r = data[0]<<8|data[1];
                 decoder->infoPng.color.key_g = data[2]<<8|data[3];
                 decoder->infoPng.color.key_b = data[4]<<8|data[5];
             }
-            else 
+            else
             {
                 /* error: tRNS chunk not allowed for other color models */
                 decoder->error = 42;
@@ -1827,7 +1827,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                     decoder->error = 43;
                     break;
                 }
-                decoder->infoPng.background_r = 
+                decoder->infoPng.background_r =
                     decoder->infoPng.color.palette[(data[0]<<2)];
 
                 decoder->infoPng.background_g =
@@ -1837,7 +1837,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                     decoder->infoPng.color.palette[(data[0]<<2) | 2];
 
             }
-            else if (decoder->infoPng.color.colorType == PNG_COLORTYPE_GREY || 
+            else if (decoder->infoPng.color.colorType == PNG_COLORTYPE_GREY ||
                      decoder->infoPng.color.colorType == PNG_COLORTYPE_GREYA)
             {
                 if (chunkLength != 2)
@@ -1846,11 +1846,11 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
                     decoder->error = 44;
                     break;
                 }
-                decoder->infoPng.background_r = 
-                decoder->infoPng.background_g = 
+                decoder->infoPng.background_r =
+                decoder->infoPng.background_g =
                 decoder->infoPng.background_b = data[0];
             }
-            else if (decoder->infoPng.color.colorType == PNG_COLORTYPE_RGB || 
+            else if (decoder->infoPng.color.colorType == PNG_COLORTYPE_RGB ||
                      decoder->infoPng.color.colorType == PNG_COLORTYPE_RGBA)
             {
                 if (chunkLength != 6)
@@ -1872,7 +1872,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
              */
             if (LodePNG_chunk_critical(chunk))
             {
-                /* error: unknown critical chunk 
+                /* error: unknown critical chunk
                  * (5th bit of first byte of chunk type is 0)
                  */
                 decoder->error = 69;
@@ -1911,19 +1911,19 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
 
         free_mem -= scanline_size;
         /* possible memory saving (at cost of memcpy)
-         * memcpy(decoder->buf - scanlines_size, 
+         * memcpy(decoder->buf - scanlines_size,
          *        scanlines,
          *        scanlines_size * sizeof(uint8_t));
-         * this will free compressed IDATs and 
+         * this will free compressed IDATs and
          * will trash raw PNG file (it is trashed anyway
          */
         if (!decoder->error)
         {
             /* size of decoded image in bytes rounded up */
-            size_t decoded_img_size = (decoder->infoPng.height * 
-                                       decoder->infoPng.width * 
+            size_t decoded_img_size = (decoder->infoPng.height *
+                                       decoder->infoPng.width *
                                        getBpp(decoder->infoPng.color.colorType,
-                                              decoder->infoPng.color.bitDepth) + 
+                                              decoder->infoPng.color.bitDepth) +
                                        7) / 8;
 
             /* at this time buffer contains:
@@ -1944,7 +1944,7 @@ static void decodeGeneric(LodePNG_Decoder* decoder)
              * decoded image is put in the end of allocated buffer
              */
             decoder->decoded_img = decoder->buf +
-                                   decoder->buf_size - 
+                                   decoder->buf_size -
                                    decoded_img_size;
 
             /* clear memory as filters assume 0'ed memory */
@@ -1991,7 +1991,7 @@ void LodePNG_inspect(LodePNG_Decoder* decoder, uint8_t *in, size_t inlength)
     decoder->file_size = inlength;
 
     if (in[0] != 137 || in[1] != 80 || in[2] != 78 || in[3] != 71 ||
-        in[4] != 13 || in[5] != 10 || in[6] != 26 || in[7] != 10) 
+        in[4] != 13 || in[5] != 10 || in[6] != 26 || in[7] != 10)
     {
         /* error: the first 8 bytes are not the correct PNG signature */
         decoder->error = 28;
@@ -2060,14 +2060,14 @@ void LodePNG_decode(LodePNG_Decoder* decoder,
     size_t line_buf_size;
     /* parse header */
     LodePNG_inspect(decoder, in, insize);
-    
-    
+
+
     /* Check memory available against worst case where
      * we have to have decoded PNG image
      * and converted to the native pixel format image
      * in buffer at the same time (do we realy need that much?)
      */
-    
+
     size_t decoded_img_size = (decoder->infoPng.height *
                                decoder->infoPng.width *
                                getBpp(decoder->infoPng.color.colorType,

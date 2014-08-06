@@ -33,7 +33,7 @@ namespace Ui {
 
 class TargetDownloader : public QDialog {
     Q_OBJECT
-public:    
+public:
     TargetDownloader(QWidget *parent, QString dir);
     virtual ~TargetDownloader();
 

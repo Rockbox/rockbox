@@ -19,4 +19,3 @@
 #endif /* NDEBUG */
 
 void _EXFUN(__assert,(const char *, int, const char *));
-

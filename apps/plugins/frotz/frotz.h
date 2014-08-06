@@ -107,24 +107,24 @@ typedef unsigned char zchar;
 #define CONFIG_PROPORTIONAL 0x40 /* Interpr uses proportional font     - V3  */
 
 #define CONFIG_COLOUR       0x01 /* Interpr supports colour            - V5+ */
-#define CONFIG_PICTURES	    0x02 /* Interpr supports pictures	       - V6  */
+#define CONFIG_PICTURES     0x02 /* Interpr supports pictures          - V6  */
 #define CONFIG_BOLDFACE     0x04 /* Interpr supports boldface style    - V4+ */
 #define CONFIG_EMPHASIS     0x08 /* Interpr supports emphasis style    - V4+ */
 #define CONFIG_FIXED        0x10 /* Interpr supports fixed width style - V4+ */
-#define CONFIG_SOUND	    0x20 /* Interpr supports sound             - V6  */
+#define CONFIG_SOUND        0x20 /* Interpr supports sound             - V6  */
 
 #define CONFIG_TIMEDINPUT   0x80 /* Interpr supports timed input       - V4+ */
 
-#define SCRIPTING_FLAG	  0x0001 /* Outputting to transscription file  - V1+ */
+#define SCRIPTING_FLAG    0x0001 /* Outputting to transscription file  - V1+ */
 #define FIXED_FONT_FLAG   0x0002 /* Use fixed width font               - V3+ */
-#define REFRESH_FLAG 	  0x0004 /* Refresh the screen                 - V6  */
-#define GRAPHICS_FLAG	  0x0008 /* Game wants to use graphics         - V5+ */
-#define OLD_SOUND_FLAG	  0x0010 /* Game wants to use sound effects    - V3  */
-#define UNDO_FLAG	  0x0010 /* Game wants to use UNDO feature     - V5+ */
-#define MOUSE_FLAG	  0x0020 /* Game wants to use a mouse          - V5+ */
-#define COLOUR_FLAG	  0x0040 /* Game wants to use colours          - V5+ */
-#define SOUND_FLAG	  0x0080 /* Game wants to use sound effects    - V5+ */
-#define MENU_FLAG	  0x0100 /* Game wants to use menus            - V6  */
+#define REFRESH_FLAG      0x0004 /* Refresh the screen                 - V6  */
+#define GRAPHICS_FLAG     0x0008 /* Game wants to use graphics         - V5+ */
+#define OLD_SOUND_FLAG    0x0010 /* Game wants to use sound effects    - V3  */
+#define UNDO_FLAG         0x0010 /* Game wants to use UNDO feature     - V5+ */
+#define MOUSE_FLAG        0x0020 /* Game wants to use a mouse          - V5+ */
+#define COLOUR_FLAG       0x0040 /* Game wants to use colours          - V5+ */
+#define SOUND_FLAG        0x0080 /* Game wants to use sound effects    - V5+ */
+#define MENU_FLAG         0x0100 /* Game wants to use menus            - V6  */
 
 #define INTERP_DEFAULT 0
 #define INTERP_DEC_20 1
@@ -147,10 +147,10 @@ typedef unsigned char zchar;
 #define MAGENTA_COLOUR 7
 #define CYAN_COLOUR 8
 #define WHITE_COLOUR 9
-#define GREY_COLOUR 10		/* INTERP_MSDOS only */
-#define LIGHTGREY_COLOUR 10 	/* INTERP_AMIGA only */
-#define MEDIUMGREY_COLOUR 11 	/* INTERP_AMIGA only */
-#define DARKGREY_COLOUR 12 	/* INTERP_AMIGA only */
+#define GREY_COLOUR 10          /* INTERP_MSDOS only */
+#define LIGHTGREY_COLOUR 10     /* INTERP_AMIGA only */
+#define MEDIUMGREY_COLOUR 11    /* INTERP_AMIGA only */
+#define DARKGREY_COLOUR 12      /* INTERP_AMIGA only */
 
 #define REVERSE_STYLE 1
 #define BOLDFACE_STYLE 2
@@ -162,8 +162,8 @@ typedef unsigned char zchar;
 #define GRAPHICS_FONT 3
 #define FIXED_WIDTH_FONT 4
 
-#define BEEP_HIGH	1
-#define BEEP_LOW	2
+#define BEEP_HIGH       1
+#define BEEP_LOW        2
 
 /*** Constants for os_restart_game */
 
@@ -224,15 +224,15 @@ typedef unsigned char zchar;
 
 #define SET_BYTE(addr,v)  { zmp[addr] = v; }
 #define LOW_BYTE(addr,v)  { v = zmp[addr]; }
-#define CODE_BYTE(v)	  { v = *pcp++;    }
+#define CODE_BYTE(v)      { v = *pcp++;    }
 
 #if defined (AMIGA)
 
 extern zbyte *pcp;
 extern zbyte *zmp;
 
-#define lo(v)	((zbyte *)&v)[1]
-#define hi(v)	((zbyte *)&v)[0]
+#define lo(v)   ((zbyte *)&v)[1]
+#define hi(v)   ((zbyte *)&v)[0]
 
 #define SET_WORD(addr,v)  { zmp[addr] = hi(v); zmp[addr+1] = lo(v); }
 #define LOW_WORD(addr,v)  { hi(v) = zmp[addr]; lo(v) = zmp[addr+1]; }
@@ -250,8 +250,8 @@ extern zbyte *zmp;
 extern zbyte *pcp;
 extern zbyte *zmp;
 
-#define lo(v)	(v & 0xff)
-#define hi(v)	(v >> 8)
+#define lo(v)   (v & 0xff)
+#define hi(v)   (v >> 8)
 
 #define SET_WORD(addr,v)  { zmp[addr] = hi(v); zmp[addr+1] = lo(v); }
 #define LOW_WORD(addr,v)  { v = ((zword) zmp[addr] << 8) | zmp[addr+1]; }
@@ -338,7 +338,7 @@ extern bool enable_scrolling;
 extern bool enable_buffering;
 
 
-extern char *option_zcode_path;	/* dg */
+extern char *option_zcode_path; /* dg */
 
 
 /*** Blorb stuff ***/
@@ -349,162 +349,162 @@ bb_map_t       *blorb_map;
 
 /*** Z-machine opcodes ***/
 
-void 	z_add (void);
-void 	z_and (void);
-void 	z_art_shift (void);
-void 	z_buffer_mode (void);
-void 	z_call_n (void);
-void 	z_call_s (void);
-void 	z_catch (void);
-void 	z_check_arg_count (void);
-void	z_check_unicode (void);
-void 	z_clear_attr (void);
-void 	z_copy_table (void);
-void 	z_dec (void);
-void 	z_dec_chk (void);
-void 	z_div (void);
-void 	z_draw_picture (void);
-void 	z_encode_text (void);
-void 	z_erase_line (void);
-void 	z_erase_picture (void);
-void 	z_erase_window (void);
-void 	z_get_child (void);
-void 	z_get_cursor (void);
-void 	z_get_next_prop (void);
-void 	z_get_parent (void);
-void 	z_get_prop (void);
-void 	z_get_prop_addr (void);
-void 	z_get_prop_len (void);
-void 	z_get_sibling (void);
-void 	z_get_wind_prop (void);
-void 	z_inc (void);
-void 	z_inc_chk (void);
-void 	z_input_stream (void);
-void 	z_insert_obj (void);
-void 	z_je (void);
-void 	z_jg (void);
-void 	z_jin (void);
-void 	z_jl (void);
-void 	z_jump (void);
-void 	z_jz (void);
-void 	z_load (void);
-void 	z_loadb (void);
-void 	z_loadw (void);
-void 	z_log_shift (void);
-void 	z_make_menu (void);
-void 	z_mod (void);
-void 	z_mouse_window (void);
-void 	z_move_window (void);
-void 	z_mul (void);
-void 	z_new_line (void);
-void 	z_nop (void);
-void 	z_not (void);
-void 	z_or (void);
-void 	z_output_stream (void);
-void 	z_picture_data (void);
-void 	z_picture_table (void);
-void 	z_piracy (void);
-void 	z_pop (void);
-void 	z_pop_stack (void);
-void 	z_print (void);
-void 	z_print_addr (void);
-void 	z_print_char (void);
-void 	z_print_form (void);
-void 	z_print_num (void);
-void 	z_print_obj (void);
-void 	z_print_paddr (void);
-void 	z_print_ret (void);
-void 	z_print_table (void);
-void	z_print_unicode (void);
-void 	z_pull (void);
-void 	z_push (void);
-void 	z_push_stack (void);
-void 	z_put_prop (void);
-void 	z_put_wind_prop (void);
-void 	z_quit (void);
-void 	z_random (void);
-void 	z_read (void);
-void 	z_read_char (void);
-void 	z_read_mouse (void);
-void 	z_remove_obj (void);
-void 	z_restart (void);
-void 	z_restore (void);
-void 	z_restore_undo (void);
-void 	z_ret (void);
-void 	z_ret_popped (void);
-void 	z_rfalse (void);
-void 	z_rtrue (void);
-void 	z_save (void);
-void 	z_save_undo (void);
-void 	z_scan_table (void);
-void 	z_scroll_window (void);
-void 	z_set_attr (void);
-void 	z_set_font (void);
-void 	z_set_colour (void);
-void 	z_set_cursor (void);
-void 	z_set_margins (void);
-void 	z_set_window (void);
-void 	z_set_text_style (void);
-void 	z_show_status (void);
-void 	z_sound_effect (void);
-void 	z_split_window (void);
-void 	z_store (void);
-void 	z_storeb (void);
-void 	z_storew (void);
-void 	z_sub (void);
-void 	z_test (void);
-void 	z_test_attr (void);
-void 	z_throw (void);
-void 	z_tokenise (void);
-void 	z_verify (void);
-void 	z_window_size (void);
-void 	z_window_style (void);
+void    z_add (void);
+void    z_and (void);
+void    z_art_shift (void);
+void    z_buffer_mode (void);
+void    z_call_n (void);
+void    z_call_s (void);
+void    z_catch (void);
+void    z_check_arg_count (void);
+void    z_check_unicode (void);
+void    z_clear_attr (void);
+void    z_copy_table (void);
+void    z_dec (void);
+void    z_dec_chk (void);
+void    z_div (void);
+void    z_draw_picture (void);
+void    z_encode_text (void);
+void    z_erase_line (void);
+void    z_erase_picture (void);
+void    z_erase_window (void);
+void    z_get_child (void);
+void    z_get_cursor (void);
+void    z_get_next_prop (void);
+void    z_get_parent (void);
+void    z_get_prop (void);
+void    z_get_prop_addr (void);
+void    z_get_prop_len (void);
+void    z_get_sibling (void);
+void    z_get_wind_prop (void);
+void    z_inc (void);
+void    z_inc_chk (void);
+void    z_input_stream (void);
+void    z_insert_obj (void);
+void    z_je (void);
+void    z_jg (void);
+void    z_jin (void);
+void    z_jl (void);
+void    z_jump (void);
+void    z_jz (void);
+void    z_load (void);
+void    z_loadb (void);
+void    z_loadw (void);
+void    z_log_shift (void);
+void    z_make_menu (void);
+void    z_mod (void);
+void    z_mouse_window (void);
+void    z_move_window (void);
+void    z_mul (void);
+void    z_new_line (void);
+void    z_nop (void);
+void    z_not (void);
+void    z_or (void);
+void    z_output_stream (void);
+void    z_picture_data (void);
+void    z_picture_table (void);
+void    z_piracy (void);
+void    z_pop (void);
+void    z_pop_stack (void);
+void    z_print (void);
+void    z_print_addr (void);
+void    z_print_char (void);
+void    z_print_form (void);
+void    z_print_num (void);
+void    z_print_obj (void);
+void    z_print_paddr (void);
+void    z_print_ret (void);
+void    z_print_table (void);
+void    z_print_unicode (void);
+void    z_pull (void);
+void    z_push (void);
+void    z_push_stack (void);
+void    z_put_prop (void);
+void    z_put_wind_prop (void);
+void    z_quit (void);
+void    z_random (void);
+void    z_read (void);
+void    z_read_char (void);
+void    z_read_mouse (void);
+void    z_remove_obj (void);
+void    z_restart (void);
+void    z_restore (void);
+void    z_restore_undo (void);
+void    z_ret (void);
+void    z_ret_popped (void);
+void    z_rfalse (void);
+void    z_rtrue (void);
+void    z_save (void);
+void    z_save_undo (void);
+void    z_scan_table (void);
+void    z_scroll_window (void);
+void    z_set_attr (void);
+void    z_set_font (void);
+void    z_set_colour (void);
+void    z_set_cursor (void);
+void    z_set_margins (void);
+void    z_set_window (void);
+void    z_set_text_style (void);
+void    z_show_status (void);
+void    z_sound_effect (void);
+void    z_split_window (void);
+void    z_store (void);
+void    z_storeb (void);
+void    z_storew (void);
+void    z_sub (void);
+void    z_test (void);
+void    z_test_attr (void);
+void    z_throw (void);
+void    z_tokenise (void);
+void    z_verify (void);
+void    z_window_size (void);
+void    z_window_style (void);
 
 /* Definitions for error handling functions and error codes. */
 
 /* extern int err_report_mode; */
 
-void	init_err (void);
-void	runtime_error (int);
- 
+void    init_err (void);
+void    runtime_error (int);
+
 /* Error codes */
-#define ERR_TEXT_BUF_OVF 1	/* Text buffer overflow */
-#define ERR_STORE_RANGE 2	/* Store out of dynamic memory */
-#define ERR_DIV_ZERO 3		/* Division by zero */
-#define ERR_ILL_OBJ 4		/* Illegal object */
-#define ERR_ILL_ATTR 5		/* Illegal attribute */
-#define ERR_NO_PROP 6		/* No such property */
-#define ERR_STK_OVF 7		/* Stack overflow */
-#define ERR_ILL_CALL_ADDR 8	/* Call to illegal address */
-#define ERR_CALL_NON_RTN 9	/* Call to non-routine */
-#define ERR_STK_UNDF 10		/* Stack underflow */
-#define ERR_ILL_OPCODE 11	/* Illegal opcode */
-#define ERR_BAD_FRAME 12	/* Bad stack frame */
-#define ERR_ILL_JUMP_ADDR 13	/* Jump to illegal address */
-#define ERR_SAVE_IN_INTER 14	/* Can't save while in interrupt */
-#define ERR_STR3_NESTING 15	/* Nesting stream #3 too deep */
-#define ERR_ILL_WIN 16		/* Illegal window */
-#define ERR_ILL_WIN_PROP 17	/* Illegal window property */
-#define ERR_ILL_PRINT_ADDR 18	/* Print at illegal address */
+#define ERR_TEXT_BUF_OVF 1      /* Text buffer overflow */
+#define ERR_STORE_RANGE 2       /* Store out of dynamic memory */
+#define ERR_DIV_ZERO 3          /* Division by zero */
+#define ERR_ILL_OBJ 4           /* Illegal object */
+#define ERR_ILL_ATTR 5          /* Illegal attribute */
+#define ERR_NO_PROP 6           /* No such property */
+#define ERR_STK_OVF 7           /* Stack overflow */
+#define ERR_ILL_CALL_ADDR 8     /* Call to illegal address */
+#define ERR_CALL_NON_RTN 9      /* Call to non-routine */
+#define ERR_STK_UNDF 10         /* Stack underflow */
+#define ERR_ILL_OPCODE 11       /* Illegal opcode */
+#define ERR_BAD_FRAME 12        /* Bad stack frame */
+#define ERR_ILL_JUMP_ADDR 13    /* Jump to illegal address */
+#define ERR_SAVE_IN_INTER 14    /* Can't save while in interrupt */
+#define ERR_STR3_NESTING 15     /* Nesting stream #3 too deep */
+#define ERR_ILL_WIN 16          /* Illegal window */
+#define ERR_ILL_WIN_PROP 17     /* Illegal window property */
+#define ERR_ILL_PRINT_ADDR 18   /* Print at illegal address */
 #define ERR_MAX_FATAL 18
 
 /* Less serious errors */
-#define ERR_JIN_0 19		/* @jin called with object 0 */
-#define ERR_GET_CHILD_0 20	/* @get_child called with object 0 */
-#define ERR_GET_PARENT_0 21	/* @get_parent called with object 0 */
-#define ERR_GET_SIBLING_0 22	/* @get_sibling called with object 0 */
-#define ERR_GET_PROP_ADDR_0 23	/* @get_prop_addr called with object 0 */
-#define ERR_GET_PROP_0 24	/* @get_prop called with object 0 */
-#define ERR_PUT_PROP_0 25	/* @put_prop called with object 0 */
-#define ERR_CLEAR_ATTR_0 26	/* @clear_attr called with object 0 */
-#define ERR_SET_ATTR_0 27	/* @set_attr called with object 0 */
-#define ERR_TEST_ATTR_0 28	/* @test_attr called with object 0 */
-#define ERR_MOVE_OBJECT_0 29	/* @move_object called moving object 0 */
-#define ERR_MOVE_OBJECT_TO_0 30	/* @move_object called moving into object 0 */
-#define ERR_REMOVE_OBJECT_0 31	/* @remove_object called with object 0 */
-#define ERR_GET_NEXT_PROP_0 32	/* @get_next_prop called with object 0 */
+#define ERR_JIN_0 19            /* @jin called with object 0 */
+#define ERR_GET_CHILD_0 20      /* @get_child called with object 0 */
+#define ERR_GET_PARENT_0 21     /* @get_parent called with object 0 */
+#define ERR_GET_SIBLING_0 22    /* @get_sibling called with object 0 */
+#define ERR_GET_PROP_ADDR_0 23  /* @get_prop_addr called with object 0 */
+#define ERR_GET_PROP_0 24       /* @get_prop called with object 0 */
+#define ERR_PUT_PROP_0 25       /* @put_prop called with object 0 */
+#define ERR_CLEAR_ATTR_0 26     /* @clear_attr called with object 0 */
+#define ERR_SET_ATTR_0 27       /* @set_attr called with object 0 */
+#define ERR_TEST_ATTR_0 28      /* @test_attr called with object 0 */
+#define ERR_MOVE_OBJECT_0 29    /* @move_object called moving object 0 */
+#define ERR_MOVE_OBJECT_TO_0 30 /* @move_object called moving into object 0 */
+#define ERR_REMOVE_OBJECT_0 31  /* @remove_object called with object 0 */
+#define ERR_GET_NEXT_PROP_0 32  /* @get_next_prop called with object 0 */
 #define ERR_NUM_ERRORS (32)
- 
+
 /* There are four error reporting modes: never report errors;
   report only the first time a given error type occurs; report
   every time an error occurs; or treat all errors as fatal
@@ -525,59 +525,59 @@ void	runtime_error (int);
 
 /*** Various global functions ***/
 
-zchar	translate_from_zscii (zbyte);
-zbyte	translate_to_zscii (zchar);
+zchar   translate_from_zscii (zbyte);
+zbyte   translate_to_zscii (zchar);
 
-void 	flush_buffer (void);
-void	new_line (void);
-void	print_char (zchar);
-void	print_num (zword);
-void	print_object (zword);
-void 	print_string (const char *);
+void    flush_buffer (void);
+void    new_line (void);
+void    print_char (zchar);
+void    print_num (zword);
+void    print_object (zword);
+void    print_string (const char *);
 
-void 	stream_mssg_on (void);
-void 	stream_mssg_off (void);
+void    stream_mssg_on (void);
+void    stream_mssg_off (void);
 
-void	ret (zword);
-void 	store (zword);
-void 	branch (bool);
+void    ret (zword);
+void    store (zword);
+void    branch (bool);
 
-void	storeb (zword, zbyte);
-void	storew (zword, zword);
+void    storeb (zword, zbyte);
+void    storew (zword, zword);
 
 /*** Interface functions ***/
 
-void 	os_beep (int);
-int  	os_char_width (zchar);
-void 	os_display_char (zchar);
-void 	os_display_string (const zchar *);
-void 	os_draw_picture (int, int, int);
-void 	os_erase_area (int, int, int, int);
-void 	os_fatal (const char *) NORETURN_ATTR;
-void 	os_finish_with_sample (int);
-int  	os_font_data (int, int *, int *);
-void 	os_init_screen (void);
-void 	os_more_prompt (void);
-int  	os_peek_colour (void);
-bool 	os_picture_data (int, int *, int *);
-void 	os_prepare_sample (int);
-void 	os_process_arguments (int, char *[]);
-int	os_random_seed (void);
-int  	os_read_file_name (char *, const char *, int);
-zchar	os_read_key (int, bool);
-zchar	os_read_line (int, zchar *, int, int, int);
-zchar	os_read_mouse (void);
-void 	os_reset_screen (void);
-void 	os_restart_game (int);
-void 	os_scroll_area (int, int, int, int, int);
-void 	os_set_colour (int, int);
-void 	os_set_cursor (int, int);
-void 	os_set_font (int);
-void 	os_set_text_style (int);
-void 	os_start_sample (int, int, int, zword);
-void 	os_stop_sample (int);
-int  	os_string_width (const zchar *);
-void	os_init_setup (void);
-int	os_speech_output(const zchar *);
+void    os_beep (int);
+int     os_char_width (zchar);
+void    os_display_char (zchar);
+void    os_display_string (const zchar *);
+void    os_draw_picture (int, int, int);
+void    os_erase_area (int, int, int, int);
+void    os_fatal (const char *) NORETURN_ATTR;
+void    os_finish_with_sample (int);
+int     os_font_data (int, int *, int *);
+void    os_init_screen (void);
+void    os_more_prompt (void);
+int     os_peek_colour (void);
+bool    os_picture_data (int, int *, int *);
+void    os_prepare_sample (int);
+void    os_process_arguments (int, char *[]);
+int     os_random_seed (void);
+int     os_read_file_name (char *, const char *, int);
+zchar   os_read_key (int, bool);
+zchar   os_read_line (int, zchar *, int, int, int);
+zchar   os_read_mouse (void);
+void    os_reset_screen (void);
+void    os_restart_game (int);
+void    os_scroll_area (int, int, int, int, int);
+void    os_set_colour (int, int);
+void    os_set_cursor (int, int);
+void    os_set_font (int);
+void    os_set_text_style (int);
+void    os_start_sample (int, int, int, zword);
+void    os_stop_sample (int);
+int     os_string_width (const zchar *);
+void    os_init_setup (void);
+int     os_speech_output(const zchar *);
 
 #include "setup.h"

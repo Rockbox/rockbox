@@ -70,10 +70,10 @@ struct mad_frame {
   int options;              /* decoding options (from stream) */
 
   mad_fixed_t (*sbsample)[2][36][32] MEM_ALIGN_ATTR;   /* synthesis subband filter samples */
-  mad_fixed_t (*sbsample_prev)[2][36][32] MEM_ALIGN_ATTR;  /* synthesis subband filter samples 
+  mad_fixed_t (*sbsample_prev)[2][36][32] MEM_ALIGN_ATTR;  /* synthesis subband filter samples
                                                from previous frame only needed
                                                when synthesis is on cop */
-                                               
+
   mad_fixed_t (*overlap)[2][32][18] MEM_ALIGN_ATTR;    /* Layer III block overlap data */
 };
 

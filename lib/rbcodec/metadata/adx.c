@@ -36,7 +36,7 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
     unsigned char * buf = (unsigned char *)id3->path;
     int chanstart, channels;
     int looping = 0, start_adr = 0, end_adr = 0;
-    
+
     /* try to get the basic header */
     if ((lseek(fd, 0, SEEK_SET) < 0)
         || (read(fd, buf, 0x38) < 0x38))
@@ -44,13 +44,13 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
         DEBUGF("lseek or read failed\n");
         return false;
     }
-    
+
     /* ADX starts with 0x80 */
     if (buf[0] != 0x80) {
         DEBUGF("get_adx_metadata: wrong first byte %c\n",buf[0]);
         return false;
     }
-    
+
     /* check for a reasonable offset */
     chanstart = ((buf[2] << 8) | buf[3]) + 4;
     if (chanstart > 4096) {
@@ -64,14 +64,14 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
         DEBUGF("get_adx_metadata: bad channel count %i\n",channels);
         return false;
     }
-    
+
     id3->frequency = get_long_be(&buf[8]);
     /* 32 samples per 18 bytes */
     id3->bitrate = id3->frequency * channels * 18 * 8 / 32 / 1000;
     id3->length = get_long_be(&buf[12]) / id3->frequency * 1000;
     id3->vbr = false;
     id3->filesize = filesize(fd);
-    
+
     /* get loop info */
     if (!memcmp(buf+0x10,"\x01\xF4\x03",3)) {
         /* Soul Calibur 2 style (type 03) */
@@ -97,28 +97,28 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
         DEBUGF("get_adx_metadata: error, couldn't determine ADX type\n");
         return false;
     }
-    
+
     /* is file using encryption */
     if (buf[0x13]==0x08) {
         DEBUGF("get_adx_metadata: error, encrypted ADX not supported\n");
         return false;
     }
-    
+
     if (looping) {
         /* 2 loops, 10 second fade */
         id3->length = (start_adr-chanstart + 2*(end_adr-start_adr))
                       *8 / id3->bitrate + 10000;
     }
-        
+
     /* try to get the channel header */
     if ((lseek(fd, chanstart-6, SEEK_SET) < 0)
         || (read(fd, buf, 6) < 6))
     {
         return false;
     }
-    
+
     /* check channel header */
     if (memcmp(buf, "(c)CRI", 6) != 0) return false;
-    
-    return true;    
+
+    return true;
 }

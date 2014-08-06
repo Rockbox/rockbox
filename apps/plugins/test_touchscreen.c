@@ -50,7 +50,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* standard stuff */
     (void)parameter;
-    
+
     rb->touchscreen_set_mode(mode);
 
     /* wait until user closes plugin */
@@ -59,7 +59,7 @@ enum plugin_status plugin_start(const void* parameter)
         short x = 0;
         short y = 0;
         bool draw_rect = false;
-        
+
         button = rb->button_get(true);
 
         if (button & BUTTON_TOPLEFT)
@@ -113,7 +113,7 @@ enum plugin_status plugin_start(const void* parameter)
             mode = (mode == TOUCHSCREEN_POINT) ? TOUCHSCREEN_BUTTON : TOUCHSCREEN_POINT;
             rb->touchscreen_set_mode(mode);
         }
-        
+
         if (button & BUTTON_REL) draw_rect = false;
 
         rb->lcd_clear_display();
@@ -132,7 +132,7 @@ enum plugin_status plugin_start(const void* parameter)
 
             rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0xc0));
             rb->lcd_fillrect(x-7, y-7, 14, 14);
-            
+
             /* in stylus mode, show REL position in black */
             if (mode == TOUCHSCREEN_POINT && (button & BUTTON_REL))
                 rb->lcd_set_foreground(LCD_BLACK);

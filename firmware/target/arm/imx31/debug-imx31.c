@@ -137,7 +137,7 @@ bool dbg_hw_info(void)
         lcd_putsf(0, line++, "DVCR2,3: %08lX %08lX", CCM_DCVR2, CCM_DCVR3);
         lcd_putsf(0, line++, "SWITCHERS0: %08lX", mc13783_read(MC13783_SWITCHERS0));
         lcd_putsf(0, line++, "SWITCHERS1: %08lX", mc13783_read(MC13783_SWITCHERS1));
-          
+
         lcd_update();
 
         if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))

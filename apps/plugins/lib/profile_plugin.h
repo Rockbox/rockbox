@@ -32,4 +32,3 @@ void __cyg_profile_func_exit(void *this_fn, void *call_site)
     NO_PROF_ATTR ICODE_ATTR;
 
 #endif /* __PROFILE_PLUGIN_H__ */
-

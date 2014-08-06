@@ -222,7 +222,7 @@ void usb_charging_maxcurrent_change(int maxcurrent)
 #else
     if (fast_charging)
         GPO32_VAL |= 0x40;
-    else 
+    else
         GPO32_VAL &= ~0x40;
 #endif
 
@@ -235,12 +235,12 @@ void usb_charging_maxcurrent_change(int maxcurrent)
 #if defined(IPOD_VIDEO)
     if (unlimited_charging)
         GPO32_VAL |= 0x10000000;
-    else 
+    else
         GPO32_VAL &= ~0x10000000;
 #elif defined(IPOD_4G) || defined(IPOD_COLOR)
     if (unlimited_charging)
         GPO32_VAL |= 0x200;
-    else 
+    else
         GPO32_VAL &= ~0x200;
 #endif
     /* This might be GPIOD & 40 on 2G */

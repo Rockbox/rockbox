@@ -25,7 +25,7 @@
  * of importance (according to gprof):
  * <ul>
  *  <li>mpaddmul
- *  <li>mpsetmul 
+ *  <li>mpsetmul
  *  <li>mpaddsqrtrc
  *  <li>mpsub
  *  <li>mpadd
@@ -44,31 +44,31 @@
 #include "beecrypt/api.h"
 #include "beecrypt/mpopt.h"
 
-#define MP_HWBITS	(MP_WBITS >> 1)
-#define MP_WBYTES	(MP_WBITS >> 3)
-#define MP_WNIBBLES	(MP_WBITS >> 2)
+#define MP_HWBITS       (MP_WBITS >> 1)
+#define MP_WBYTES       (MP_WBITS >> 3)
+#define MP_WNIBBLES     (MP_WBITS >> 2)
 
 #if (MP_WBITS == 64)
-# define MP_WORDS_TO_BITS(x)	((x) << 6)
-# define MP_WORDS_TO_NIBBLES(x)	((x) << 4)
-# define MP_WORDS_TO_BYTES(x)	((x) << 3)
-# define MP_BITS_TO_WORDS(x)	((x) >> 6)
-# define MP_NIBBLES_TO_WORDS(x)	((x) >> 4)
-# define MP_BYTES_TO_WORDS(x)	((x) >> 3)
+# define MP_WORDS_TO_BITS(x)    ((x) << 6)
+# define MP_WORDS_TO_NIBBLES(x) ((x) << 4)
+# define MP_WORDS_TO_BYTES(x)   ((x) << 3)
+# define MP_BITS_TO_WORDS(x)    ((x) >> 6)
+# define MP_NIBBLES_TO_WORDS(x) ((x) >> 4)
+# define MP_BYTES_TO_WORDS(x)   ((x) >> 3)
 #elif (MP_WBITS == 32)
-# define MP_WORDS_TO_BITS(x)	((x) << 5)
-# define MP_WORDS_TO_NIBBLES(x)	((x) << 3)
-# define MP_WORDS_TO_BYTES(x)	((x) << 2)
-# define MP_BITS_TO_WORDS(x)	((x) >> 5) 
-# define MP_NIBBLES_TO_WORDS(x)	((x) >> 3)
-# define MP_BYTES_TO_WORDS(x)	((x) >> 2)
+# define MP_WORDS_TO_BITS(x)    ((x) << 5)
+# define MP_WORDS_TO_NIBBLES(x) ((x) << 3)
+# define MP_WORDS_TO_BYTES(x)   ((x) << 2)
+# define MP_BITS_TO_WORDS(x)    ((x) >> 5)
+# define MP_NIBBLES_TO_WORDS(x) ((x) >> 3)
+# define MP_BYTES_TO_WORDS(x)   ((x) >> 2)
 #else
 # error
 #endif
 
-#define MP_MSBMASK	(((mpw) 0x1) << (MP_WBITS-1))
-#define MP_LSBMASK	 ((mpw) 0x1)
-#define MP_ALLMASK	~((mpw) 0x0)
+#define MP_MSBMASK      (((mpw) 0x1) << (MP_WBITS-1))
+#define MP_LSBMASK       ((mpw) 0x1)
+#define MP_ALLMASK      ~((mpw) 0x0)
 
 #ifdef __cplusplus
 extern "C" {
@@ -417,7 +417,7 @@ void mpclrlsb(size_t size, mpw* data);
 BEECRYPTAPI
 void mpand(size_t size, mpw* xdata, const mpw* ydata);
 
-/*!\fn void mpor(size_t size, mpw* xdata, const mpw* ydata) 
+/*!\fn void mpor(size_t size, mpw* xdata, const mpw* ydata)
  * \brief This function computes the bit-wise OR of two multi-precision
  *  integers. Modifies xdata.
  * \param size The size of the multi-precision integer.
@@ -427,7 +427,7 @@ void mpand(size_t size, mpw* xdata, const mpw* ydata);
 BEECRYPTAPI
 void mpor(size_t size, mpw* xdata, const mpw* ydata);
 
-/*!\fn void mpxor(size_t size, mpw* xdata, const mpw* ydata) 
+/*!\fn void mpxor(size_t size, mpw* xdata, const mpw* ydata)
  * \brief This function computes the bit-wise XOR of two multi-precision
  *  integers. Modifies xdata.
  * \param size The size of the multi-precision integer.

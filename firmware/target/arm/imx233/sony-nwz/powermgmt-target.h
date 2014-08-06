@@ -25,24 +25,24 @@
 #include "powermgmt-imx233.h"
 
 /* Sony NWZ-E360/NWZ-E370 settings:
- * - current ramp slope: 
+ * - current ramp slope:
  * - conditioning threshold voltage:
- * - conditioning max voltage: 
+ * - conditioning max voltage:
  * - conditioning current:
- * - conditioning timeout: 
- * - charging voltage: 
- * - charging current: 
- * - charging threshold current: 
- * - charging timeout: 
- * - top off period: 
- * - high die temperature: 
+ * - conditioning timeout:
+ * - charging voltage:
+ * - charging current:
+ * - charging threshold current:
+ * - charging timeout:
+ * - top off period:
+ * - high die temperature:
  * - low die temperature:
- * - safe die temperature current: 
- * - battery temperature channel: 
- * - high battery temperature: 
- * - low battery temperature: 
- * - safe battery temperature current: 
- * - low DCDC battery voltage: 
+ * - safe die temperature current:
+ * - battery temperature channel:
+ * - high battery temperature:
+ * - low battery temperature:
+ * - safe battery temperature current:
+ * - low DCDC battery voltage:
  */
 
 #define IMX233_CHARGE_CURRENT   260

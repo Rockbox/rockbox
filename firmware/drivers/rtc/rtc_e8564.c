@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing, Uwe Freese, Laurent Baum, 
+ * Copyright (C) 2002 by Linus Nielsen Feltzing, Uwe Freese, Laurent Baum,
  *                       Przemyslaw Holubowski
  *
  * This program is free software; you can redistribute it and/or
@@ -59,11 +59,11 @@ void rtc_init(void)
 {
     unsigned char tmp;
     int rv;
-    
+
     /* initialize Control 1 register */
     tmp = 0;
     pp_i2c_send(RTC_ADDR, RTC_CTRL1, tmp);
-    
+
     /* read value of the Control 2 register - we'll need it to preserve alarm and timer interrupt assertion flags */
     rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
     /* preserve alarm and timer interrupt flags */
@@ -126,7 +126,7 @@ void rtc_set_alarm(int h, int m)
     else
         /* ignore minutes comparison query */
         buf[0] = RTC_AE;
-    
+
     if( h >= 0 )
         buf[1] = DEC2BCD(h);
     else
@@ -170,7 +170,7 @@ void rtc_enable_alarm(bool enable)
     }
     else
     {
-        /* disable alarm interrupt */       
+        /* disable alarm interrupt */
         if(rtc_lock_alarm_clear)
             /* lock disabling alarm before it was checked whether or not the unit was started by RTC alarm */
             return;
@@ -191,14 +191,14 @@ bool rtc_check_alarm_started(bool release_alarm)
     {
         started = alarm_state;
         alarm_state &= ~release_alarm;
-    } 
-    else 
-    { 
+    }
+    else
+    {
         /* read Control 2 register which contains alarm flag */
         rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
 
         alarm_state = started = ( (tmp & RTC_AF) && (tmp & RTC_AIE) );
-        
+
         if(release_alarm && started)
         {
             rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
@@ -209,7 +209,7 @@ bool rtc_check_alarm_started(bool release_alarm)
         run_before = true;
         rtc_lock_alarm_clear = false;
     }
-    
+
     return started;
 }
 
@@ -217,11 +217,10 @@ bool rtc_check_alarm_flag(void)
 {
     unsigned char tmp=0;
     int rv=0;
-    
+
     /* read Control 2 register which contains alarm flag */
     rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
 
     return (tmp & RTC_AF);
 }
 #endif /* HAVE_RTC_ALARM */
-

@@ -38,7 +38,7 @@ void init_spect_scr(void)
     int i;
     int offset = settings.invert_colors ? 16 : 0;
 
-    for(i = 0; i < 16; i++) 
+    for(i = 0; i < 16; i++)
         sp_colors[i] = i + offset;
 
     sp_image = (char *) &image_array;
@@ -50,9 +50,9 @@ void init_spect_scr(void)
 void update_screen(void)
 {
     fb_data *frameb;
-  
+
     int y=0;
-   
+
 #if LCD_HEIGHT >= ZX_HEIGHT && LCD_WIDTH >= ZX_WIDTH
     /* 'set but not used'
     byte *scrptr;

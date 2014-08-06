@@ -3,7 +3,7 @@
 
 
 // Commands
-// all multibyte values (address, halfwords) are passed as big endian 
+// all multibyte values (address, halfwords) are passed as big endian
 //  (most significant of the bytes first)
 
 // set the address (all read/write commands will auto-increment it)

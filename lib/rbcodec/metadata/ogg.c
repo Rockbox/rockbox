@@ -30,13 +30,13 @@
 #include "metadata_parsers.h"
 #include "logf.h"
 
-/* A simple parser to read vital metadata from an Ogg Vorbis file. 
+/* A simple parser to read vital metadata from an Ogg Vorbis file.
  * Can also handle parsing Ogg Speex files for metadata. Returns
  * false if metadata needed by the codec couldn't be read.
  */
 bool get_ogg_metadata(int fd, struct mp3entry* id3)
 {
-    /* An Ogg File is split into pages, each starting with the string 
+    /* An Ogg File is split into pages, each starting with the string
      * "OggS". Each page has a timestamp (in PCM samples) referred to as
      * the "granule position".
      *
@@ -124,14 +124,14 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
     }
 
     id3->filesize = filesize(fd);
-    
+
     /* We need to ensure the serial number from this page is the same as the
      * one from the last page (since we only support a single bitstream).
      */
     serial = get_long_le(&buf[14]);
     comment_size = read_vorbis_tags(fd, id3, remaining);
 
-    /* We now need to search for the last page in the file - identified by 
+    /* We now need to search for the last page in the file - identified by
      * by ('O','g','g','S',0) and retrieve totalsamples.
      */
 
@@ -143,27 +143,27 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
 
     remaining = 0;
 
-    while (!eof) 
+    while (!eof)
     {
         r = read(fd, &buf[remaining], MAX_PATH - remaining);
-        
-        if (r <= 0) 
+
+        if (r <= 0)
         {
             eof = true;
-        } 
-        else 
+        }
+        else
         {
             remaining += r;
         }
-        
+
         /* Inefficient (but simple) search */
         i = 0;
-        
-        while (i < (remaining - 3)) 
+
+        while (i < (remaining - 3))
         {
             if ((buf[i] == 'O') && (memcmp(&buf[i], "OggS", 4) == 0))
             {
-                if (i < (remaining - 17)) 
+                if (i < (remaining - 17))
                 {
                     /* Note that this only reads the low 32 bits of a
                      * 64 bit value.
@@ -175,19 +175,19 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
                      * header could be in buffer. Jump near end of this header
                      * and continue */
                     i += 27;
-                } 
-                else 
+                }
+                else
                 {
                     break;
                 }
-            } 
-            else 
+            }
+            else
             {
                 i++;
             }
         }
 
-        if (i < remaining) 
+        if (i < remaining)
         {
             /* Move the remaining bytes to start of buffer.
              * Reuse var 'segments' as it is no longer needed */
@@ -221,9 +221,8 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
         logf("ogg length invalid!");
         return false;
     }
-    
+
     id3->bitrate = (((int64_t) id3->filesize - comment_size) * 8) / id3->length;
-    
+
     return true;
 }
-

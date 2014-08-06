@@ -186,7 +186,7 @@ static int elf_convert(const unsigned char *inbuf, unsigned char *outbuf)
     Elf32_Shdr *section_header;
     unsigned int i, j, sum;
     intptr_t startaddr;
-    
+
     main_header = (Elf32_Ehdr*)inbuf;
     if( !( main_header->e_ident[0] == ELFMAG0 && main_header->e_ident[1] == ELFMAG1
         && main_header->e_ident[2] == ELFMAG2 && main_header->e_ident[3] == ELFMAG3 ) )
@@ -194,15 +194,15 @@ static int elf_convert(const unsigned char *inbuf, unsigned char *outbuf)
         printf("Invalid ELF header!\n");
         return -1;
     }
-    
+
     startaddr = (intptr_t)outbuf;
-    
+
     for(i = 0; i < main_header->e_shnum; i++)
     {
         section_header = (Elf32_Shdr*)(inbuf+main_header->e_shoff+i*sizeof(Elf32_Shdr));
-        
+
         if( (section_header->sh_flags & SHF_WRITE || section_header->sh_flags & SHF_ALLOC
-             || section_header->sh_flags & SHF_EXECINSTR) && section_header->sh_size > 0 
+             || section_header->sh_flags & SHF_EXECINSTR) && section_header->sh_size > 0
              && section_header->sh_type != SHT_NOBITS                                     )
         {
             /* Address */
@@ -240,7 +240,7 @@ static int make_jrm_file(const unsigned char *inbuf, unsigned char *outbuf)
     memset(&outbuf[0x4], 0, 4);
     /* 4 bytes of zero */
     memset(&outbuf[0x8], 0, 4);
-    
+
     length = elf_convert(inbuf, &outbuf[0xC]);
     if(length < 0)
         return -1;

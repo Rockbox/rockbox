@@ -90,7 +90,7 @@ int rkw_encode(char *iname, char *oname, unsigned long modelnum)
 
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
+
     fseek(file,0,SEEK_SET);
 
     /* length of the RKW header + binary length + 4 bytes of CRC */
@@ -148,7 +148,7 @@ int rkw_encode(char *iname, char *oname, unsigned long modelnum)
         free(outbuf);
         return -3;
     }
-    
+
     len = fwrite(outbuf, 1, rkwlength, file);
     if(len < (size_t)length)
     {

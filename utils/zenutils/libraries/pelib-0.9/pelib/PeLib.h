@@ -6,7 +6,7 @@
 *
 * This software is licensed under the zlib/libpng License.
 * For more details see http://www.opensource.org/licenses/zlib-license.php
-* or the license information file (license.htm) in the root directory 
+* or the license information file (license.htm) in the root directory
 * of PeLib.
 */
 

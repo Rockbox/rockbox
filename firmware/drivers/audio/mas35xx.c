@@ -171,7 +171,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
 #endif /* CONFIG_CODEC == MAS3507D */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-void audiohw_set_volume(int val) 
+void audiohw_set_volume(int val)
 {
     unsigned tmp = ((unsigned)(val + 115) & 0xff) << 8;
     mas_codec_writereg(MAS_REG_VOLUME_CONTROL, tmp);
@@ -247,7 +247,7 @@ void audiohw_set_superbass(int value)
     mas_codec_writereg(MAS_REG_KLOUDNESS, loudness_shadow);
 }
 
-void audiohw_set_balance(int val) 
+void audiohw_set_balance(int val)
 {
     unsigned tmp = ((unsigned)(val * 127 / 100) & 0xff) << 8;
     mas_codec_writereg(MAS_REG_BALANCE, tmp);
@@ -282,4 +282,3 @@ int32_t audiohw_get_pitch(void)
 }
 
 #endif /* CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F */
-

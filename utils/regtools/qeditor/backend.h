@@ -65,9 +65,9 @@ public:
 
     virtual bool SupportAccess(AccessType type) { Q_UNUSED(type); return false; }
     virtual QString GetSocName() { return ""; }
-    virtual bool ReadRegister(const QString& name, soc_word_t& value) 
+    virtual bool ReadRegister(const QString& name, soc_word_t& value)
         { Q_UNUSED(name); Q_UNUSED(value); return false; }
-    virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value) 
+    virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value)
         { Q_UNUSED(addr); Q_UNUSED(value); return false; }
     virtual bool Reload() { return false; }
     virtual bool IsReadOnly() { return true; }

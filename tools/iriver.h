@@ -48,4 +48,3 @@ int iriver_encode(const char *infile_name, const char *outfile_name, BOOL modify
 #ifdef __cplusplus
 }
 #endif
-

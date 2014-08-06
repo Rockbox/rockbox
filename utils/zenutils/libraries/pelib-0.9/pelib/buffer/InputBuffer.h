@@ -6,7 +6,7 @@
 *
 * This software is licensed under the zlib/libpng License.
 * For more details see http://www.opensource.org/licenses/zlib-license.php
-* or the license information file (license.htm) in the root directory 
+* or the license information file (license.htm) in the root directory
 * of PeLib.
 */
 
@@ -19,34 +19,34 @@
 
 namespace PeLib
 {
-	class InputBuffer
-	{
-		private:
-		  std::vector<unsigned char>& m_vBuffer;
-		  unsigned long ulIndex;
-		  
-		public:
-		  InputBuffer(std::vector<unsigned char>& vBuffer);
-		  
-		  const unsigned char* data() const;
-		  unsigned long size();
+        class InputBuffer
+        {
+                private:
+                  std::vector<unsigned char>& m_vBuffer;
+                  unsigned long ulIndex;
 
-		  template<typename T>
-		  InputBuffer& operator>>(T& value)
-		  {
-			assert(ulIndex + sizeof(value) <= m_vBuffer.size());
-			value = *(T*)(&m_vBuffer[ulIndex]);//reinterpret_cast<T*>(&m_vBuffer[ulIndex]);
-			ulIndex += sizeof(T);
-			return *this;
-		  }
+                public:
+                  InputBuffer(std::vector<unsigned char>& vBuffer);
 
-		  void read(char* lpBuffer, unsigned long ulSize);
-		  void reset();
-		  void set(unsigned long ulIndex);
-		  unsigned long get();
-		  void setBuffer(std::vector<unsigned char>& vBuffer);
-//		  void updateData(unsigned long ulIndex,
-	};
+                  const unsigned char* data() const;
+                  unsigned long size();
+
+                  template<typename T>
+                  InputBuffer& operator>>(T& value)
+                  {
+                        assert(ulIndex + sizeof(value) <= m_vBuffer.size());
+                        value = *(T*)(&m_vBuffer[ulIndex]);//reinterpret_cast<T*>(&m_vBuffer[ulIndex]);
+                        ulIndex += sizeof(T);
+                        return *this;
+                  }
+
+                  void read(char* lpBuffer, unsigned long ulSize);
+                  void reset();
+                  void set(unsigned long ulIndex);
+                  unsigned long get();
+                  void setBuffer(std::vector<unsigned char>& vBuffer);
+//                void updateData(unsigned long ulIndex,
+        };
 }
 
 #endif

@@ -92,7 +92,7 @@ void button_int(void)
                 Position ranges from 1-4095, with 1 at the bottom. */
             val = ((data[1] >> 4) << 8) | data[2]; /* position */
 
-            /* The HDD63x0 actually has 2 scrollbars. One vertical and one horizontal 
+            /* The HDD63x0 actually has 2 scrollbars. One vertical and one horizontal
             (where the prev, play, and next buttons are). Because of that, we need to know
             which sensor is reporting data. */
             if ((data[3] >> 6) == 1) /* index = 1 */

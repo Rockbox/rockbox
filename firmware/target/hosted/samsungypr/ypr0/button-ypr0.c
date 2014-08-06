@@ -73,7 +73,7 @@ void button_init_device(void)
     /* Setup GPIO pin for headphone sense, copied from OF */
     gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_HEADPHONE_SENSE, CONFIG_SION, PAD_CTL_47K_PU);
     gpio_control(DEV_CTRL_GPIO_SET_INPUT, GPIO_HEADPHONE_SENSE, CONFIG_SION, PAD_CTL_47K_PU);
-    
+
     /* No need to initialize any GPIO pin, since this is done loading the r0Btn module */
 }
 

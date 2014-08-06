@@ -237,7 +237,7 @@ static void ICODE_ATTR solidblock(fb_data *address, unsigned mask,
 {
     unsigned data = *address;
     unsigned bgp  = bg_pattern;
-    
+
     bits     = bgp  ^ ((bgp ^ fg_pattern) & bits);
     *address = data ^ ((data ^ bits) & mask);
 }
@@ -247,7 +247,7 @@ static void ICODE_ATTR solidimgblock(fb_data *address, unsigned mask,
 {
     unsigned data = *address;
     unsigned bgp  = *(address + lcd_backdrop_offset);
-    
+
     bits     = bgp  ^ ((bgp ^ fg_pattern) & bits);
     *address = data ^ ((data ^ bits) & mask);
 }
@@ -287,7 +287,7 @@ static void ICODE_ATTR solidinvblock(fb_data *address, unsigned mask,
 {
     unsigned data = *address;
     unsigned fgp  = fg_pattern;
-    
+
     bits     = fgp  ^ ((fgp ^ bg_pattern) & bits);
     *address = data ^ ((data ^ bits) & mask);
 }
@@ -297,7 +297,7 @@ static void ICODE_ATTR solidimginvblock(fb_data *address, unsigned mask,
 {
     unsigned data = *address;
     unsigned fgp  = fg_pattern;
-    
+
     bits     = fgp  ^ ((fgp ^ *(address + lcd_backdrop_offset)) & bits);
     *address = data ^ ((data ^ bits) & mask);
 }
@@ -324,7 +324,7 @@ void lcd_set_backdrop(fb_data* backdrop)
         lcd_pixelfuncs = lcd_pixelfuncs_backdrop;
         lcd_blockfuncs = lcd_blockfuncs_backdrop;
     }
-    else 
+    else
     {
         lcd_backdrop_offset = 0;
         lcd_pixelfuncs = lcd_pixelfuncs_bgcolor;
@@ -394,7 +394,7 @@ void lcd_clear_viewport(void)
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
 {
-    if (   ((unsigned)x < (unsigned)current_vp->width) 
+    if (   ((unsigned)x < (unsigned)current_vp->width)
         && ((unsigned)y < (unsigned)current_vp->height)
 #if defined(HAVE_VIEWPORT_CLIP)
         && ((unsigned)x < (unsigned)LCD_WIDTH)
@@ -469,7 +469,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if (   ((unsigned)x < (unsigned)current_vp->width) 
+        if (   ((unsigned)x < (unsigned)current_vp->width)
             && ((unsigned)y < (unsigned)current_vp->height)
 #if defined(HAVE_VIEWPORT_CLIP)
             && ((unsigned)x < (unsigned)LCD_WIDTH)
@@ -509,12 +509,12 @@ void lcd_hline(int x1, int x2, int y)
         x1 = x2;
         x2 = x;
     }
-    
+
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned)current_vp->height) || (x1 >= current_vp->width)
         || (x2 < 0))
-        return;  
+        return;
 
     if (x1 < 0)
         x1 = 0;
@@ -525,14 +525,14 @@ void lcd_hline(int x1, int x2, int y)
     x1 += current_vp->x;
     x2 += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned) LCD_HEIGHT) || (x1 >= LCD_WIDTH)
         || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
@@ -572,25 +572,25 @@ void lcd_vline(int x, int y1, int y2)
     /* nothing to draw? */
     if (((unsigned)x >= (unsigned)current_vp->width) || (y1 >= current_vp->height)
         || (y2 < 0))
-        return;  
-        
+        return;
+
     if (y1 < 0)
         y1 = 0;
     if (y2 >= current_vp->height)
         y2 = current_vp->height-1;
-        
+
     /* adjust for viewport */
     y1 += current_vp->y;
     y2 += current_vp->y;
     x += current_vp->x;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if (( (unsigned) x >= (unsigned)LCD_WIDTH) || (y1 >= LCD_HEIGHT) 
+    if (( (unsigned) x >= (unsigned)LCD_WIDTH) || (y1 >= LCD_HEIGHT)
         || (y2 < 0))
         return;
-    
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
@@ -659,18 +659,18 @@ void lcd_fillrect(int x, int y, int width, int height)
         width = current_vp->width - x;
     if (y + height > current_vp->height)
         height = current_vp->height - y;
-    
+
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -787,14 +787,14 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -825,7 +825,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     mask_bottom  = 0xFFFFu >> (2 * (~ny & 7));
 
     bfunc  = lcd_blockfuncs[current_vp->drawmode];
-    
+
     if (shift == 0)
     {
         unsigned dmask1, dmask2, data;
@@ -837,7 +837,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
         {
             const unsigned char *src_row = src;
             fb_data *dst_row = dst + LCD_WIDTH;
-            
+
             dst_end = dst_row + width;
 
             if (dmask1 != 0)
@@ -864,7 +864,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                   /* & 0xFFu is unnecessary here - dmask1 can't exceed that*/
         dmask2 &= (mask_bottom >> 8);
         dst_end = dst + width;
-        
+
         if (dmask1 != 0)
         {
             if (dmask2 != 0)
@@ -900,8 +900,8 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             fb_data *dst_col = dst++;
             unsigned mask_col = mask;
             unsigned data = 0;
-            
-            for (y = ny; y >= 8; y -= 8)                    
+
+            for (y = ny; y >= 8; y -= 8)
             {
                 data |= *src_col << shift;
 
@@ -963,7 +963,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width)
         || (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     if (x < 0)
     {
         width += x;
@@ -984,14 +984,14 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -1020,7 +1020,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 
     mask   = 0xFFu << (2 * (shift + src_y));
     mask_bottom = 0xFFu >> (2 * (~ny & 3));
-    
+
     if (shift == 0)
     {
         for (; ny >= 4; ny -= 4)
@@ -1031,9 +1031,9 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
             {
                 const fb_data *src_row = src;
                 fb_data *dst_row = dst;
-                
+
                 dst_end = dst_row + width;
-                do 
+                do
                     setblock(dst_row++, mask, *src_row++);
                 while (dst_row < dst_end);
             }
@@ -1063,7 +1063,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
             fb_data *dst_col = dst++;
             unsigned mask_col = mask;
             unsigned data = 0;
-            
+
             for (y = ny; y >= 4; y -= 4)
             {
                 data |= *src_col << shift;

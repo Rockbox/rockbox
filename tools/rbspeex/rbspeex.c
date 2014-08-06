@@ -207,7 +207,7 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
      * make sure the Speex encoder is allowed to spit out all its data at clip
      * end */
     numsamples += lookahead;
-   
+
     inpos = in;
     while (numsamples > 0) {
         int samples = frame_size;
@@ -271,5 +271,3 @@ finish:
         free(in);
     return ret;
 }
-
-

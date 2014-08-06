@@ -79,7 +79,7 @@ static void battery_status_update(void)
 #if CONFIG_CHARGING >= CHARGING_MONITOR
             /* Keep external power until tick */
             ext_power_until_tick = current_tick + POWER_AFTER_CHARGE_TICKS;
-#elif CONFIG_CHARGING 
+#elif CONFIG_CHARGING
             /* Pretend the charger was disconnected */
             charger_input_state = CHARGER_UNPLUGGED;
 #endif

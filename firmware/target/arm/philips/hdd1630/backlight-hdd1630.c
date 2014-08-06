@@ -68,7 +68,7 @@ void _buttonlight_on(void)
         buttonlight_status = 1;
     }
 }
- 
+
 void _buttonlight_off(void)
 {
     if (buttonlight_status)

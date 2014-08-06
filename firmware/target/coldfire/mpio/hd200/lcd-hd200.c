@@ -27,7 +27,7 @@
 
 /*** definitions ***/
 /* TOMATO LSI 0350 - definitions and slightly tweaked functions
- * taken from lcd-remote-iaudio.c 
+ * taken from lcd-remote-iaudio.c
  */
 
 #define LCD_SET_DUTY_RATIO 0x48
@@ -127,12 +127,12 @@ void lcd_shutdown(void)
 
 void lcd_init_device(void)
 {
-    and_l(~0x00000800, &GPIO_FUNCTION); /* CS3 line */ 
+    and_l(~0x00000800, &GPIO_FUNCTION); /* CS3 line */
 
     /* LCD Reset GPO34 */
     or_l(0x00000004, &GPIO1_ENABLE);    /* set as output */
     or_l(0x00000004, &GPIO1_FUNCTION);  /* switch to secondary function - GPIO */
-   
+
     and_l(~0x00000004, &GPIO1_OUT);     /* RESET low */
     sleep(1);                           /* delay at least 1000 ns */
     or_l(0x00000004, &GPIO1_OUT);       /* RESET high */
@@ -163,7 +163,7 @@ void lcd_init_device(void)
     lcd_set_invert_display(cached_invert);
 
     /* Configure DMA3 */
-    DAR3 = 0xf0000002; 
+    DAR3 = 0xf0000002;
     DSR3 = 1;
     DIVR3 = 57;        /* DMA3 is mapped into vector 57 in system.c */
     ICR9 = (6 << 2);   /* Enable DMA3 interrupt at level 6, priority 0 */
@@ -184,7 +184,7 @@ void DMA3(void)
     {
         /* Setup write address in lcd controller ram*/
         lcd_write_command(LCD_SET_PAGE | ++page);
-        lcd_write_command_e(LCD_SET_COLUMN | ((column >> 4) & 0xf), 
+        lcd_write_command_e(LCD_SET_COLUMN | ((column >> 4) & 0xf),
                             column & 0x0f);
 
         SAR3 = (unsigned long)FBADDR(column,page);
@@ -213,7 +213,7 @@ void lcd_update(void)
 
     /* Number of pages to address */
     dma_count = LCD_FBHEIGHT;
-    
+
     /* Transfer size in bytes to the given page */
     dma_len = LCD_WIDTH*2;
 
@@ -252,7 +252,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         ymax = LCD_FBHEIGHT-1;
 
     /* Initial lcd ram address*/
-    lcd_write_command(LCD_SET_PAGE | y ); 
+    lcd_write_command(LCD_SET_PAGE | y );
     lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0x0f);
 
     page = y;
@@ -314,4 +314,3 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
         by++;
     }
 }
-

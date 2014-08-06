@@ -416,7 +416,7 @@ void audiohw_enable_lineout(bool enable);
 #define NGCTL_NGDELEAY_150      (2 << 0)
 #define NGCTL_NGDELEAY_200      (3 << 0)
 #define NGCTL_THRESH_MASK       (7 << 2)
-#define NGCTL_THRESH_SHIFT      2       
+#define NGCTL_THRESH_SHIFT      2
 #define NGCTL_NG_BOOST30        (1 << 5)
 #define NGCTL_NG                (1 << 6)
 #define NGCTL_NGALL             (1 << 7)

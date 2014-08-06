@@ -48,26 +48,26 @@ static void hslider_draw_update(t_hslider *x, t_glist *glist)
 
     if (glist_isvisible(glist))
     {
-	int r = text_xpix(&x->x_gui.x_obj, glist) + (x->x_val + 50)/100;
-	sys_vgui(".x%x.c coords %xKNOB %d %d %d %d\n",
-		 canvas, x, r, ypos+1,
-		 r, ypos + x->x_gui.x_h);
-	if(x->x_val == x->x_center)
-	{
-	    if(!x->x_thick)
-	    {
-		sys_vgui(".x%x.c itemconfigure %xKNOB -width 7\n", canvas, x);
-		x->x_thick = 1;
-	    }
-	}
-	else
-	{
-	    if(x->x_thick)
-	    {
-		sys_vgui(".x%x.c itemconfigure %xKNOB -width 3\n", canvas, x);
-		x->x_thick = 0;
-	    }
-	}
+        int r = text_xpix(&x->x_gui.x_obj, glist) + (x->x_val + 50)/100;
+        sys_vgui(".x%x.c coords %xKNOB %d %d %d %d\n",
+                 canvas, x, r, ypos+1,
+                 r, ypos + x->x_gui.x_h);
+        if(x->x_val == x->x_center)
+        {
+            if(!x->x_thick)
+            {
+                sys_vgui(".x%x.c itemconfigure %xKNOB -width 7\n", canvas, x);
+                x->x_thick = 1;
+            }
+        }
+        else
+        {
+            if(x->x_thick)
+            {
+                sys_vgui(".x%x.c itemconfigure %xKNOB -width 3\n", canvas, x);
+                x->x_thick = 0;
+            }
+        }
     }
 #endif /* ROCKBOX */
 }
@@ -84,12 +84,12 @@ static void hslider_draw_new(t_hslider *x, t_glist *glist)
     t_canvas *canvas=glist_getcanvas(glist);
 
     sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE\n",
-	     canvas, xpos-3, ypos,
-	     xpos + x->x_gui.x_w+2, ypos + x->x_gui.x_h,
-	     x->x_gui.x_bcol, x);
+             canvas, xpos-3, ypos,
+             xpos + x->x_gui.x_w+2, ypos + x->x_gui.x_h,
+             x->x_gui.x_bcol, x);
     sys_vgui(".x%x.c create line %d %d %d %d -width 3 -fill #%6.6x -tags %xKNOB\n",
-	     canvas, r, ypos+1, r,
-	     ypos + x->x_gui.x_h, x->x_gui.x_fcol, x);
+             canvas, r, ypos+1, r,
+             ypos + x->x_gui.x_h, x->x_gui.x_fcol, x);
     sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
 	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
 	     canvas, xpos+x->x_gui.x_ldx,
@@ -736,4 +736,3 @@ void g_hslider_setup(void)
     class_setsavefn(hslider_class, hslider_save);
     class_setpropertiesfn(hslider_class, hslider_properties);
 }
-

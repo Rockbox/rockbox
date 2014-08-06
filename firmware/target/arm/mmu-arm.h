@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 /*  This file MUST be included in your system-target.h file if you want arm
- *  cache coherence functions to be called (I.E. during codec load, etc).   
+ *  cache coherence functions to be called (I.E. during codec load, etc).
  */
 
 #ifndef MMU_ARM_H

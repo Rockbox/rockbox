@@ -94,7 +94,7 @@ typedef struct {
     int                 weighting_delay[6];
     //@}
     //@{
-    /** data buffers */    
+    /** data buffers */
     uint8_t             decoded_bytes_buffer[1024] MEM_ALIGN_ATTR;
     int32_t             tempBuf[1070]              MEM_ALIGN_ATTR;
     //@}
@@ -111,4 +111,3 @@ int atrac3_decode_init(ATRAC3Context *q, struct mp3entry *id3);
 
 int atrac3_decode_frame(unsigned long block_align, ATRAC3Context *q,
                         int *data_size, const uint8_t *buf, int buf_size);
-

@@ -111,7 +111,7 @@ int a52_downmix_init (int input, int flags, level_t * level,
                       level_t clev, level_t slev);
 int a52_downmix_coeff (level_t * coeff, int acmod, int output, level_t level,
                        level_t clev, level_t slev);
-void a52_downmix (sample_t * samples, int acmod, int output, 
+void a52_downmix (sample_t * samples, int acmod, int output,
                   level_t clev, level_t slev);
 void a52_upmix (sample_t * samples, int acmod, int output);
 
@@ -194,7 +194,7 @@ typedef int16_t quantizer_t;
             : "cc");  \
        __result;  \
     })
-    
+
 
 #elif 1
 #define MUL(a,b) \

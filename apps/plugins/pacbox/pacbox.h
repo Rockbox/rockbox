@@ -392,7 +392,7 @@
  */
 #if defined(TOSHIBA_GIGABEAT_S) || defined (TOSHIBA_GIGABEAT_F) || \
     defined(SANSA_FUZEPLUS)
-/* Gigabeat S,F and Sansa Fuze+ can manage the full framerate 
+/* Gigabeat S,F and Sansa Fuze+ can manage the full framerate
    (1 in 1 frames) */
 #define FPS 60
 #elif defined(IPOD_NANO)

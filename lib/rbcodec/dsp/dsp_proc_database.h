@@ -20,11 +20,11 @@
  ****************************************************************************/
 
 /****************************************************************************
- * -_-~-_-~-_-~-_-~-_-~-_- Main database of effects _-~-_-~-_-~-_-~-_-~-_-~- 
+ * -_-~-_-~-_-~-_-~-_-~-_- Main database of effects _-~-_-~-_-~-_-~-_-~-_-~-
  *
  * Order is not particularly relevant and has no intended correlation with
  * IDs.
- * 
+ *
  * Notable exceptions in ordering:
  *  * Sample input: which is first in line and has special responsibilities
  *    (not an effect per se).

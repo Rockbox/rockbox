@@ -33,24 +33,24 @@ static t_int *cos_perform(t_int *w)
     unsigned int phase;
 
     while (n--) {
-	 phase = *in++;
-	 phase &= ((1<<fix1)-1);
-	 off =  fixtoi((long long)phase<<ILOGCOSTABSIZE);
+         phase = *in++;
+         phase &= ((1<<fix1)-1);
+         off =  fixtoi((long long)phase<<ILOGCOSTABSIZE);
 #ifdef ROCKBOX
 #ifdef NO_INTERPOLATION
         *out = *(tab+off);
 #else /* NO_INTERPOLATION */
         frac = phase & ((1<<(fix1-ILOGCOSTABSIZE))-1);
         frac <<= ILOGCOSTABSIZE;
-        *out = mult(*(tab + off    ), (itofix(1) - frac)) + 
+        *out = mult(*(tab + off    ), (itofix(1) - frac)) +
                mult(*(tab + off + 1), frac);
 #endif /* NO_INTERPOLATION */
 #else /* ROCKBOX */
-	 frac = phase&(itofix(1)-1);
-	 *out = mult(*(tab + off),itofix(1) - frac) + 
-	      mult(*(tab + off + 1),frac);
+         frac = phase&(itofix(1)-1);
+         *out = mult(*(tab + off),itofix(1) - frac) +
+              mult(*(tab + off + 1),frac);
 #endif /* ROCKBOX */
-	 out++;
+         out++;
     }
     return (w+4);
 }
@@ -67,9 +67,8 @@ static void cos_dsp(t_cos *x, t_signal **sp)
 void cos_tilde_setup(void)
 {
     cos_class = class_new(gensym("cos~"), (t_newmethod)cos_new, 0,
-    	sizeof(t_cos), 0, A_DEFFLOAT, 0);
+        sizeof(t_cos), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(cos_class, t_cos, x_f);
     class_addmethod(cos_class, (t_method)cos_dsp, gensym("dsp"), 0);
     class_sethelpsymbol(cos_class, gensym("osc~-help.pd"));
 }
-

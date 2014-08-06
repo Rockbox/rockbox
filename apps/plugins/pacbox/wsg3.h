@@ -29,7 +29,7 @@
 #define WSG3_H
 
 /**
-    Namco 3-channel sound generator voice properties.    
+    Namco 3-channel sound generator voice properties.
 
     This information is only needed by applications that want to do their own
     sound rendering, as the playSound() function already plays and mixes all
@@ -42,7 +42,7 @@ struct wsg3_voice
     /** Volume (from 0 to 15) */
     unsigned volume;
     /** Index into the 4-bit 32-entry waveform table (0 to 7) */
-    unsigned waveform; 
+    unsigned waveform;
     /** Frequency */
     unsigned frequency;
 };
@@ -94,7 +94,7 @@ static inline unsigned char wsg3_get_register(unsigned reg)
     The sound chip has three independent voices that generate 8-bit signed
     PCM audio. This function resamples the voices at the currently specified
     sampling rate and mixes them into the output buffer. The output buffer
-    can be converted to 8-bit (signed) PCM by dividing each sample by 3 (since 
+    can be converted to 8-bit (signed) PCM by dividing each sample by 3 (since
     there are three voices) or it can be expanded to 16-bit by multiplying
     each sample by 85 (i.e. 256 divided by 3). If necessary, it is possible
     to approximate these values with 4 and 64 in order to use arithmetic

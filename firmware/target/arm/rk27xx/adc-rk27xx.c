@@ -53,7 +53,7 @@ unsigned short adc_read(int channel)
     /* turn off lsadc clock when not in use */
     SCU_CLKCFG |= (CLKCFG_LSADC|CLKCFG_PCLK_LSADC);
 
-    return result; 
+    return result;
 }
 
 void adc_init(void)

@@ -27,14 +27,14 @@
  */
 #ifndef _RBUNICODE_H_
 #define _RBUNICODE_H_
- 
+
 #include "config.h"
 
 #define MASK   0xC0 /* 11000000 */
 #define COMP   0x80 /* 10x      */
 
 #ifdef HAVE_LCD_BITMAP
- 
+
 enum codepages {
     ISO_8859_1 = 0, /* Latin1 */
     ISO_8859_7,     /* Greek */

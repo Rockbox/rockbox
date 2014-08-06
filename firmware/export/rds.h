@@ -31,5 +31,3 @@ uint16_t rds_get_pi(void);
 char* rds_get_ps(void);
 char* rds_get_rt(void);
 time_t rds_get_ct(void);
-
-

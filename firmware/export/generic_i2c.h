@@ -32,7 +32,7 @@ struct i2c_interface
     bool (*scl_in)(void);       /* Read SCL, returns true if high */
     bool (*sda_in)(void);       /* Read SDA, returns true if high */
     void (*delay)(int delay);   /* Delay for the specified amount */
-    
+
     /* These are the delays specified in the I2C specification, the
        time pairs to the right are the minimum 100kHz and 400kHz specs */
     int delay_hd_sta;           /* START SDA hold (tHD:SDA)    4.0us/0.6us */
@@ -50,4 +50,3 @@ int i2c_read_data(int bus_index, int bus_address, int address,
                   unsigned char* buf, int count);
 
 #endif /* _GEN_I2C_ */
-

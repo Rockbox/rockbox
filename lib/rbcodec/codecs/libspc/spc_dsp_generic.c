@@ -129,7 +129,7 @@ static inline void echo_apply(struct Spc_Dsp* this,
 {
     int fb_0 = GET_LE16SA( echo_ptr     );
     int fb_1 = GET_LE16SA( echo_ptr + 2 );
-        
+
     /* Keep last 8 samples */
     int (* const fir_ptr) [2] = this->fir.buf + this->fir.pos;
     this->fir.pos = (this->fir.pos + 1) & (FIR_BUF_HALF - 1);
@@ -179,7 +179,7 @@ static inline void echo_feedback( struct Spc_Dsp* this, uint8_t *echo_ptr,
 #ifndef SPC_DSP_GENERATE_OUTPUT
 /* Generate final output */
 static inline void echo_output( struct Spc_Dsp* this, int global_muting,
-    int global_vol_0, int global_vol_1, int chans_0, int chans_1, 
+    int global_vol_0, int global_vol_1, int chans_0, int chans_1,
     int fb_0, int fb_1, int* out_0, int* out_1 )
 {
     *out_0 = (chans_0 * global_vol_0 + fb_0 * this->r.g.echo_volume_0)
@@ -196,7 +196,7 @@ static inline void echo_output( struct Spc_Dsp* this, int global_muting,
 #ifndef SPC_DSP_GENERATE_OUTPUT
 /* Generate final output */
 static inline void noecho_output( struct Spc_Dsp* this, int global_muting,
-    int global_vol_0, int global_vol_1, int chans_0, int chans_1, 
+    int global_vol_0, int global_vol_1, int chans_0, int chans_1,
     int* out_0, int* out_1 )
 {
     *out_0 = (chans_0 * global_vol_0) >> global_muting;

@@ -256,7 +256,7 @@ static void tv_serialize_preferences(unsigned char *buf, const struct tv_prefere
 static bool tv_write_preferences(int pfd, const struct tv_preferences *prefs)
 {
     unsigned char buf[TV_PREFERENCES_SIZE];
-    
+
     tv_serialize_preferences(buf, prefs);
 
     return (rb->write(pfd, buf, TV_PREFERENCES_SIZE) >= 0);
@@ -449,7 +449,7 @@ bool tv_load_settings(const unsigned char *file_name)
         {
             version = buf[TV_SETTINGS_HEADER_SIZE - 1] - TV_SETTINGS_FIRST_VERSION;
             fcount = (buf[TV_SETTINGS_HEADER_SIZE] << 8) | buf[TV_SETTINGS_HEADER_SIZE+1];
-            
+
             current_pref_offset = rb->lseek(fd, 0, SEEK_CUR);
 
             for (i = 0; i < fcount; i++)
@@ -461,7 +461,7 @@ bool tv_load_settings(const unsigned char *file_name)
                     {
                         if (tv_read_preferences(fd, version, &prefs))
                             res = tv_deserialize_bookmarks(fd);
-                        
+
                         if (res) {
                             stored_preferences_offset = current_pref_offset;
                             stored_preferences_size = size;
@@ -519,7 +519,7 @@ bool tv_save_settings(void)
     preferences_buf[MAX_PATH + 0] = size >> 8;
     preferences_buf[MAX_PATH + 1] = size;
 
-    
+
     /* Just overwrite preferences if possible*/
     if ( (stored_preferences_offset > 0) && (stored_preferences_size == size) )
     {
@@ -536,7 +536,7 @@ bool tv_save_settings(void)
     if (!rb->file_exists(TV_SETTINGS_FILE))
         tv_convert_settings_file();
 
-    
+
     /* Try appending preferences */
     if ( (stored_preferences_offset == 0) &&
          ( (tfd = rb->open(TV_SETTINGS_FILE, O_RDWR)) >= 0) )

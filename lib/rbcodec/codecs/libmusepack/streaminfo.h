@@ -83,12 +83,12 @@ typedef struct mpc_streaminfo {
     /// @name Encoder informations
     //@{
     mpc_uint32_t         encoder_version;    ///< Version of encoder used
-/* rockbox: not used    
+/* rockbox: not used
     char                 encoder[256];       ///< Encoder name
 */
     mpc_bool_t           pns;                ///< pns used
     mpc_uint32_t         profile;            ///< Quality profile of stream
-/* rockbox: not used    
+/* rockbox: not used
     const char*          profile_name;       ///< Name of profile used by stream
 */
     //@}

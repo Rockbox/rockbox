@@ -101,7 +101,7 @@ struct button_map bm[] = {
     { SDLK_KP_PLUS,    95, 326, 27, "Play" },
     { SDLK_KP8,        57, 233, 29, "Scroll Back" },
     { SDLK_KP2,       132, 226, 29, "Scroll Fwd" },
-#elif defined (IPOD_COLOR) 
+#elif defined (IPOD_COLOR)
     { SDLK_KP5,        128, 362, 35, "Select" },
     { SDLK_KP4,         55, 358, 38, "Left" },
     { SDLK_KP6,        203, 359, 39, "Right" },
@@ -109,7 +109,7 @@ struct button_map bm[] = {
     { SDLK_KP_PLUS,    129, 439, 41, "Play" },
     { SDLK_KP8,         76, 309, 34, "Scroll Back" },
     { SDLK_KP2,        182, 311, 45, "Scroll Fwd" },
-#elif defined (IPOD_1G2G) 
+#elif defined (IPOD_1G2G)
     { SDLK_KP5,       112, 265, 31, "Select" },
     { SDLK_KP8,        74, 224, 28, "Scroll Back" },
     { SDLK_KP2,       146, 228, 28, "Scroll Fwd" },
@@ -121,7 +121,7 @@ struct button_map bm[] = {
     { SDLK_KP4,        62, 266, 62, "Left" },
     { SDLK_KP_PERIOD, 111, 216, 64, "Menu" },
     { SDLK_KP_PLUS,   111, 326, 55, "Down" },
-#elif defined (IPOD_NANO) 
+#elif defined (IPOD_NANO)
     { SDLK_KP5,       98, 316, 37, "Select" },
     { SDLK_KP4,       37, 312, 28, "Left" },
     { SDLK_KP6,      160, 313, 25, "Right" },
@@ -129,7 +129,7 @@ struct button_map bm[] = {
     { SDLK_KP_PLUS,   99, 378, 28, "Play" },
     { SDLK_KP8,       58, 272, 24, "Scroll Back" },
     { SDLK_KP2,      141, 274, 22, "Scroll Fwd" },
-#elif defined (IPOD_NANO2G) 
+#elif defined (IPOD_NANO2G)
     { SDLK_KP5,       118, 346, 37, "Select" },
     { SDLK_KP4,        51, 345, 28, "Left" },
     { SDLK_KP6,       180, 346, 26, "Right" },

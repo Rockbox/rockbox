@@ -112,9 +112,9 @@
 
 /* The start address index for ROM builds */
 /* #define ROM_START 0x11010 for behind original Archos */
-#define ROM_START 0x7010 /* for behind BootBox */      
+#define ROM_START 0x7010 /* for behind BootBox */
 
-#define CONFIG_LCD LCD_S6B33B2 
+#define CONFIG_LCD LCD_S6B33B2
 
 #define BOOTFILE_EXT "c100"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

@@ -106,7 +106,7 @@ void ipod_2g_adc_int(void)
 void adc_init(void)
 {
     mutex_init(&adc_mtx);
-    
+
     GPIOB_ENABLE |= 0x1e;  /* enable B1..B4 */
 
     if ((IPOD_HW_REVISION >> 16) == 1)

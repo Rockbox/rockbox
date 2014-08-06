@@ -697,7 +697,7 @@ static void play_tock(void)
     sound_active = true;
     rb->led(1);
     rb->mp3_play_data(sound, sizeof(sound), callback);
-    rb->mp3_play_pause(true); /* kickoff audio */ 
+    rb->mp3_play_pause(true); /* kickoff audio */
 }
 
 #else /*  CONFIG_CODEC == SWCODEC */
@@ -737,7 +737,7 @@ static void metronome_draw(struct screen* display)
 {
     display->clear_display();
 
-#ifdef HAVE_LCD_BITMAP 
+#ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_SYSFIXED);
     display->puts(0, 0, "Metronome");
     if(display->screen_type==SCREEN_MAIN)
@@ -813,7 +813,7 @@ static void change_bpm(int direction)
     else if (bpm_step_counter < 60)
         bpm = bpm + direction * 2;
     else
-        bpm = bpm + direction * 9; 
+        bpm = bpm + direction * 9;
 
     if (bpm > 400) bpm = 400;
     if (bpm < 1) bpm = 1;
@@ -861,7 +861,7 @@ static void tap(void)
 {
     if (tap_count == 0 || tap_time < tap_count) {
         tap_time = 0;
-    } 
+    }
     else {
         if (tap_time > 0) {
             bpm = 61440/(tap_time/tap_count);
@@ -994,4 +994,3 @@ enum plugin_status plugin_start(const void* parameter)
         rb->yield();
     }
 }
-

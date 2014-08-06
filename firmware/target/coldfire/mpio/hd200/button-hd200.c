@@ -79,7 +79,7 @@ int button_read_device(void)
     hold_button_old = hold_button;
     hold_button = button_hold();
     remote_hold_button = remote_button_hold();
-    
+
 #ifndef BOOTLOADER
     /* Only main hold affects backlight */
     if (hold_button != hold_button_old)
@@ -176,6 +176,6 @@ int button_read_device(void)
     /* GPIO41 active high remote PLAY/PAUSE/ON */
     if (remote_present && !remote_hold_button && ((data & (1<<9))))
         btn |= BUTTON_RC_PLAY;
-        
+
     return btn;
 }

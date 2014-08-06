@@ -1067,7 +1067,7 @@ enum mc13783_regs_enum
     #define MC13783_ICHRG_1064MA        (0xc << 3) /*  967 1064 1170 */
     #define MC13783_ICHRG_1152MA        (0xd << 3) /* 1048 1152 1268 */
     #define MC13783_ICHRG_1596MA        (0xe << 3) /* 1450 1596 1755 */
-    #define MC13783_ICHRG_FULLY_ON      (0xf << 3) /* Disallow HW FET turn on */ 
+    #define MC13783_ICHRG_FULLY_ON      (0xf << 3) /* Disallow HW FET turn on */
 #define MC13783_ICHRGTR                 (0x7 << 7) /*  Min  Nom  Max */
     #define MC13783_ICHRGTR_POS         (7)
     #define MC13783_ICHRGTR_0MA         (0x0 << 7) /*    0    0    0 */

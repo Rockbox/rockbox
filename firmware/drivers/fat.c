@@ -248,7 +248,7 @@ static long cluster2sec(IF_MV(struct bpb* fat_bpb,) long cluster)
         return -1;
     }
 
-    return (cluster - zerocluster) * fat_bpb->bpb_secperclus 
+    return (cluster - zerocluster) * fat_bpb->bpb_secperclus
            + fat_bpb->firstdatasector;
 }
 
@@ -333,7 +333,7 @@ static int fat_mount_internal(IF_MV(int volume,) IF_MD(int drive,) long startsec
 #endif
 
     fat_bpb->bpb_bytspersec = BYTES2INT16(buf,BPB_BYTSPERSEC);
-    secmult = fat_bpb->bpb_bytspersec / SECTOR_SIZE; 
+    secmult = fat_bpb->bpb_bytspersec / SECTOR_SIZE;
     /* Sanity check is performed later */
 
     fat_bpb->bpb_secperclus = secmult * buf[BPB_SECPERCLUS];
@@ -412,7 +412,7 @@ static int fat_mount_internal(IF_MV(int volume,) IF_MD(int drive,) long startsec
 #ifdef HAVE_FAT16SUPPORT
     if (fat_bpb->is_fat16)
     { /* FAT16 specific part of BPB */
-        int dirclusters;  
+        int dirclusters;
         fat_bpb->rootdirsector = fat_bpb->bpb_rsvdseccnt
             + fat_bpb->bpb_numfats * fat_bpb->bpb_fatsz16;
         dirclusters = ((rootdirsectors + fat_bpb->bpb_secperclus - 1)
@@ -1045,7 +1045,7 @@ static int flush_fat(IF_MV_NONVOID(struct bpb* fat_bpb))
     for(i = 0;i < FAT_CACHE_SIZE;i++)
     {
         struct fat_cache_entry *fce = &fat_cache[i];
-        if(fce->inuse 
+        if(fce->inuse
 #ifdef HAVE_MULTIVOLUME
             && fce->fat_vol == fat_bpb
 #endif
@@ -1107,7 +1107,7 @@ static void fat_time(unsigned short* date,
         *date = BUILD_DATE_FAT;
         date_forced = true;
     }
-    
+
     if (time)
     {
         time2 = *time << 1;
@@ -1119,7 +1119,7 @@ static void fat_time(unsigned short* date,
         {
             unsigned mins  = (time2 >> 6) & 0x3f;
             unsigned hours = (time2 >> 12) & 0x1f;
-            
+
             mins = 11 * ((mins/11) + 1); /* advance to next multiple of 11 */
             if (mins > 59)
             {
@@ -1134,7 +1134,7 @@ static void fat_time(unsigned short* date,
         }
         *time = time2 >> 1;
     }
-    
+
     if (tenth)
         *tenth = (time2 & 1) * 100;
 
@@ -1757,7 +1757,7 @@ int fat_open(IF_MV(int volume,)
         file->direntries = dir->entrycount;
         file->dircluster = dir->file.firstcluster;
     }
-    
+
     file->firstcluster = startcluster;
     file->lastcluster = startcluster;
     file->lastsector = 0;
@@ -2074,8 +2074,8 @@ int fat_remove(struct fat_file* file)
     return 0;
 }
 
-int fat_rename(struct fat_file* file, 
-                struct fat_dir* dir, 
+int fat_rename(struct fat_file* file,
+                struct fat_dir* dir,
                 const unsigned char* newname,
                 long size,
                 int attr)
@@ -2232,7 +2232,7 @@ static long next_write_cluster(struct fat_file* file,
     return cluster;
 }
 
-static int transfer(IF_MV(struct bpb* fat_bpb,) 
+static int transfer(IF_MV(struct bpb* fat_bpb,)
                     unsigned long start, long count, char* buf, bool write )
 {
 #ifndef HAVE_MULTIVOLUME
@@ -2264,7 +2264,7 @@ static int transfer(IF_MV(struct bpb* fat_bpb,)
                               start + fat_bpb->startsector, count, buf);
     if (rc < 0) {
         DEBUGF( "transfer() - Couldn't %s sector %lx"
-                " (error code %d)\n", 
+                " (error code %d)\n",
                 write ? "write":"read", start, rc);
         return rc;
     }
@@ -2442,7 +2442,7 @@ int fat_seek(struct fat_file *file, unsigned long seeksector )
     return 0;
 }
 
-int fat_opendir(IF_MV(int volume,) 
+int fat_opendir(IF_MV(int volume,)
                 struct fat_dir *dir, unsigned long startcluster,
                 const struct fat_dir *parent_dir)
 {
@@ -2469,7 +2469,7 @@ int fat_opendir(IF_MV(int volume,)
                 " (error code %d)\n", rc);
         return rc * 10 - 1;
     }
-    
+
     /* assign them after fat_open call so that fat_opendir can be called with the same
      * fat_dir as parent and result */
     dir->entry = 0;
@@ -2555,7 +2555,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                         /* ignore */
                         continue;
                     }
-                    
+
                     /* check order */
                     if (order != (last_long_ord - 1)) {
                         logf("fat warning: wrong LFN ordinal");

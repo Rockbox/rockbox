@@ -114,13 +114,13 @@ static void merge_hxf(const char* indir, FILE* outfile, const char* add)
     char dir[255];
     strcpy(dir, indir);
     strcat(dir, add);
-    
+
     if((indir_handle = opendir(dir)) == NULL)
     {
         fprintf(stderr, "[ERR]  Error opening dir %s\n", indir);
         return;
     }
-    
+
     while((dirs = readdir(indir_handle)) != NULL)
     {
         if(strcmp(dirs->d_name, "..") != 0 &&
@@ -170,7 +170,7 @@ static void merge_hxf(const char* indir, FILE* outfile, const char* add)
                     }
                 }
                 fclose(filehandle);
-                
+
                 if(strlen(add)>0)
                 {
 #ifdef _DIRENT_HAVE_D_NAMLEN
@@ -228,16 +228,16 @@ static int checksum(FILE *file)
     int oldpos = ftell(file);
     int ret=0, i, filesize = _filesize(file)-0x40;
     unsigned char *buf;
-    
+
     buf = (unsigned char*)malloc(filesize);
-    
+
     if(buf == NULL)
     {
         fseek(file, oldpos, SEEK_SET);
         fprintf(stderr, "[ERR] Error while allocating memory\n");
         return 0;
     }
-    
+
     fseek(file, 0x40, SEEK_SET);
     if(fread(buf, filesize, 1, file) != 1)
     {
@@ -246,15 +246,15 @@ static int checksum(FILE *file)
         fprintf(stderr, "[ERR] Error while reading from file\n");
         return 0;
     }
-    
+
     fprintf(stderr, "[INFO] Computing checksum...");
-    
+
     for(i = 0; i < filesize; i+=4)
         ret += le2int(&buf[i]);
-    
+
     free(buf);
     fseek(file, oldpos, SEEK_SET);
-    
+
     fprintf(stderr, " Done!\n");
     return ret;
 }
@@ -262,11 +262,11 @@ static int checksum(FILE *file)
 int main(int argc, char *argv[])
 {
     FILE *outfile;
-    
+
     fprintf(stderr, "HXFmerge v" VERSION " - (C) 2008 Maurus Cuelenaere\n");
     fprintf(stderr, "This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-    
+
     if(argc != 3)
     {
         print_usage();
@@ -290,15 +290,15 @@ int main(int argc, char *argv[])
         fprintf(stderr, "[ERR]  Cannot open %s\n", argv[2]);
         return 3;
     }
-    
+
     fseek(outfile, 0x40, SEEK_SET);
-    
+
     merge_hxf(argv[1], outfile, "");
-    
+
     fflush(outfile);
-    
+
     fprintf(stderr, "[INFO] Filling header...\n");
-    
+
 #undef WRITE
 #define WRITE(x, len) if(fwrite(x, len, 1, outfile) != 1) \
                       { \
@@ -314,8 +314,8 @@ int main(int argc, char *argv[])
     WRITE(int2le(0), 4);
     WRITE("Chinachip PMP firmware V1.0\0\0\0\0\0", 32);
     fclose(outfile);
-    
+
     fprintf(stderr, "[INFO] Done!\n");
-    
+
     return 0;
 }

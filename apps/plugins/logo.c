@@ -181,7 +181,7 @@ enum plugin_status plugin_start(const void* parameter) {
             case LP_INC_Y_REPEAT:
                 dy += (dy < 0) ? -1 : 1;
                 break;
-                
+
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
 #ifdef HAVE_LCD_CHARCELLS

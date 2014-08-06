@@ -388,7 +388,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-#ifndef SNAKE2_LEFT 
+#ifndef SNAKE2_LEFT
 #define SNAKE2_LEFT        BUTTON_MIDLEFT
 #endif
 #ifndef SNAKE2_RIGHT

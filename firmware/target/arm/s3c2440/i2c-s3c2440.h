@@ -43,4 +43,3 @@
 
 void i2c_init(void);
 void i2c_write(int addr, const unsigned char *data, int count);
-

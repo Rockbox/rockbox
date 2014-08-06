@@ -51,7 +51,7 @@ void sim_thread(void)
     struct queue_event ev;
     long last_broadcast_tick = current_tick;
     int num_acks_to_expect = 0;
-    
+
     while (1)
     {
         queue_wait(&sim_queue, &ev);
@@ -118,7 +118,7 @@ void sim_thread(void)
 void sim_tasks_init(void)
 {
     queue_init(&sim_queue, false);
-    
+
     create_thread(sim_thread, sim_thread_stack, sizeof(sim_thread_stack), 0,
                   sim_thread_name IF_PRIO(,PRIORITY_BACKGROUND) IF_COP(,CPU));
 }

@@ -26,7 +26,3 @@ extern struct fb fb;
 
 
 #endif
-
-
-
-

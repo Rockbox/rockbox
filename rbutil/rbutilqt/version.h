@@ -41,4 +41,3 @@
 #define PUREVERSION "$Rev$"
 
 #define FULLVERSION VERSION" ("PUREVERSION"), built "__DATE__" "__TIME__
-

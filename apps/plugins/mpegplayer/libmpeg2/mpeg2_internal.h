@@ -65,8 +65,8 @@ typedef struct
 } motion_t;
 
 typedef void motion_parser_t(mpeg2_decoder_t * decoder,
-			                 motion_t * motion,
-			                 mpeg2_mc_fct * const * table);
+                                         motion_t * motion,
+                                         mpeg2_mc_fct * const * table);
 
 struct mpeg2_decoder_s
 {
@@ -74,9 +74,9 @@ struct mpeg2_decoder_s
     /* next inside a slice, and is never used outside of mpeg2_slice() */
 
     /* bit parsing stuff */
-    uint32_t bitstream_buf;		/* current 32 bit working set */
-    int bitstream_bits;			/* used bits in working set */
-    const uint8_t * bitstream_ptr;	/* buffer with stream data */
+    uint32_t bitstream_buf;             /* current 32 bit working set */
+    int bitstream_bits;                 /* used bits in working set */
+    const uint8_t * bitstream_ptr;      /* buffer with stream data */
 
     uint8_t * dest[MPEG2_COMPONENTS];
 
@@ -106,7 +106,7 @@ struct mpeg2_decoder_s
 
     uint8_t * picture_dest[MPEG2_COMPONENTS];
     void (* convert) (void * convert_id, uint8_t * const * src,
-		              unsigned int v_offset);
+                              unsigned int v_offset);
     void * convert_id;
 
     int dmv_offset;
@@ -202,7 +202,7 @@ struct mpeg2dec_s
     mpeg2_picture_t new_picture;
     mpeg2_picture_t pictures[4];
     mpeg2_picture_t * picture;
-    /*const*/ mpeg2_fbuf_t * fbuf[3];	/* 0: current fbuf, 1-2: prediction fbufs */
+    /*const*/ mpeg2_fbuf_t * fbuf[3];   /* 0: current fbuf, 1-2: prediction fbufs */
 
     fbuf_alloc_t fbuf_alloc[3];
     int custom_fbuf;
@@ -214,8 +214,8 @@ struct mpeg2dec_s
     unsigned int convert_id_size;
     int convert_stride;
     void (* convert_start) (void * id, const mpeg2_fbuf_t * fbuf,
- 			                const mpeg2_picture_t * picture,
- 			                const mpeg2_gop_t * gop);
+                                        const mpeg2_picture_t * picture,
+                                        const mpeg2_gop_t * gop);
 
     uint8_t * buf_start;
     uint8_t * buf_end;
@@ -271,4 +271,3 @@ typedef struct
 extern const mpeg2_mc_t mpeg2_mc;
 
 #endif /* MPEG2_INTERNAL_H */
-

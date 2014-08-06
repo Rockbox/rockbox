@@ -36,12 +36,12 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char * buf = (unsigned char *)id3->path;
     char * p;
-    
+
     unsigned long length;
     unsigned long fade;
     bool isbinary = true;
     int i;
-    
+
     /* try to get the ID666 tag */
     if ((lseek(fd, 0x2e, SEEK_SET) < 0)
         || (read(fd, buf, 0xD2) < 0xD2))
@@ -51,7 +51,7 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
     }
 
     p = id3->id3v2buf;
-    
+
     id3->title = p;
     buf[31] = 0;
     p = iso_decode(buf, p, 0, 32);
@@ -61,66 +61,66 @@ bool get_spc_metadata(int fd, struct mp3entry* id3)
     buf[31] = 0;
     p = iso_decode(buf, p, 0, 32);
     buf += 48;
-    
+
     id3->comment = p;
     buf[31] = 0;
     p = iso_decode(buf, p, 0, 32);
     buf += 32;
-    
+
     /* Date check */
     if(buf[2] == '/' && buf[5] == '/')
         isbinary = false;
-    
+
     /* Reserved bytes check */
     if(buf[0xD2 - 0x2E - 112] >= '0' &&
        buf[0xD2 - 0x2E - 112] <= '9' &&
        buf[0xD3 - 0x2E - 112] == 0x00)
         isbinary = false;
-    
+
     /* is length & fade only digits? */
-    for (i=0;i<8 && ( 
+    for (i=0;i<8 && (
         (buf[0xA9 - 0x2E - 112+i]>='0'&&buf[0xA9 - 0x2E - 112+i]<='9') ||
         buf[0xA9 - 0x2E - 112+i]=='\0');
         i++);
     if (i==8) isbinary = false;
-    
+
     if(isbinary) {
         id3->year = buf[0] | (buf[1]<<8);
         buf += 11;
-        
+
         length = (buf[0] | (buf[1]<<8) | (buf[2]<<16)) * 1000;
         buf += 3;
-        
+
         fade = (buf[0] | (buf[1]<<8) | (buf[2]<<16) | (buf[3]<<24));
         buf += 4;
     } else {
         char tbuf[6];
-        
+
         buf += 6;
         buf[4] = 0;
         id3->year = atoi(buf);
         buf += 5;
-        
+
         memcpy(tbuf, buf, 3);
         tbuf[3] = 0;
         length = atoi(tbuf) * 1000;
         buf += 3;
-        
+
         memcpy(tbuf, buf, 5);
         tbuf[5] = 0;
         fade = atoi(tbuf);
         buf += 5;
     }
-    
+
     id3->artist = p;
     buf[31] = 0;
     iso_decode(buf, p, 0, 32);
-    
+
     if (length==0) {
         length=3*60*1000; /* 3 minutes */
         fade=5*1000; /* 5 seconds */
     }
-    
+
     id3->bitrate = 1536; /* 32kHz * 24bits/ch / 1000 */
     id3->frequency = 32000;
     id3->length = length+fade;

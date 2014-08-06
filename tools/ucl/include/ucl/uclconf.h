@@ -404,4 +404,3 @@ UCL_EXTERN(unsigned) __ucl_align_gap(const ucl_voidp _ptr, ucl_uint _size);
 #endif
 
 #endif /* already included */
-

@@ -363,7 +363,7 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
 }
 #endif
 
-/* parse user defined text, looking for album artist and replaygain 
+/* parse user defined text, looking for album artist and replaygain
  * information.
  */
 static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
@@ -376,7 +376,7 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
         /* At least part of the value was read, so we can safely try to
          * parse it */
         value = tag + desc_len + 1;
-        
+
         if (!strcasecmp(tag, "ALBUM ARTIST")) {
             length = strlen(value) + 1;
             strlcpy(tag, value, length);
@@ -404,7 +404,7 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
     /* Only parse RVA2 replaygain tags if tag version == 2.4 and channel
      * type is master volume.
      */
-    if (entry->id3version == ID3_VER_2_4 && end_pos < bufferpos 
+    if (entry->id3version == ID3_VER_2_4 && end_pos < bufferpos
             && *value++ == 1) {
         long gain = 0;
         long peak = 0;
@@ -415,12 +415,12 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
         /* The RVA2 specification is unclear on some things (id string and
          * peak volume), but this matches how Quod Libet use them.
          */
-            
+
         gain = (int16_t) ((value[0] << 8) | value[1]);
         value += 2;
         peakbits = *value++;
         peakbytes = (peakbits + 7) / 8;
-    
+
         /* Only use the topmost 24 bits for peak volume */
         if (peakbytes > 3) {
             peakbytes = 3;
@@ -434,14 +434,14 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
                 peak <<= 8;
                 peak += *value++;
             }
-    
+
             peak <<= shift;
-    
+
             if (peakbits > 24) {
                 peak += *value >> (8 - shift);
             }
         }
-    
+
         if (strcasecmp(tag, "album") == 0) {
             album = true;
         } else if (strcasecmp(tag, "track") != 0) {
@@ -452,7 +452,7 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
                 return start_pos;
             }
         }
-            
+
         parse_replaygain_int(album, gain, peak * 2, entry);
     }
 
@@ -466,7 +466,7 @@ static int parsembtid( struct mp3entry* entry, char* tag, int bufferpos )
     int desc_len = strlen(tag);
     /*DEBUGF("MBID len: %d\n", desc_len);*/
     /* Musicbrainz track IDs are always 36 chars long */
-    const size_t mbtid_len = 36; 
+    const size_t mbtid_len = 36;
 
     if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos)
     {
@@ -505,8 +505,8 @@ static const struct tag_resolver taglist[] = {
     { "TP2",  3, offsetof(struct mp3entry, albumartist), NULL, false },
     { "TIT1", 4, offsetof(struct mp3entry, grouping), NULL, false },
     { "TT1",  3, offsetof(struct mp3entry, grouping), NULL, false },
-    { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false }, 
-    { "COM",  3, offsetof(struct mp3entry, comment), NULL, false }, 
+    { "COMM", 4, offsetof(struct mp3entry, comment), NULL, false },
+    { "COM",  3, offsetof(struct mp3entry, comment), NULL, false },
     { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
     { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
 #ifdef HAVE_ALBUMART
@@ -899,13 +899,13 @@ void setid3v2title(int fd, struct mp3entry *entry)
                 }
             }
         }
-        
+
         if (framelen == 0)
             continue;
 
         if (framelen < 0)
             return;
-        
+
         /* Keep track of the remaining frame size */
         totframelen = framelen;
 
@@ -971,7 +971,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
                 if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
                     bytesread = unsynchronize_frame(tag, bytesread);
 
-                /* the COMM frame has a 3 char field to hold an ISO-639-1 
+                /* the COMM frame has a 3 char field to hold an ISO-639-1
                  * language string and an optional short description;
                  * remove them so unicode_munge can work correctly
                  */

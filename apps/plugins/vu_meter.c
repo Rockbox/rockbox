@@ -498,7 +498,7 @@ struct saved_settings {
     bool analog_minimeters;
     bool digital_minimeters;
     int analog_decay;
-    int digital_decay; 
+    int digital_decay;
 } vumeter_settings;
 
 static void reset_settings(void) {
@@ -508,7 +508,7 @@ static void reset_settings(void) {
     vumeter_settings.analog_minimeters=true;
     vumeter_settings.digital_minimeters=false;
     vumeter_settings.analog_decay=3;
-    vumeter_settings.digital_decay=0; 
+    vumeter_settings.digital_decay=0;
 }
 
 static void calc_scales(void)
@@ -586,11 +586,11 @@ static bool vu_meter_menu(void)
     int selection;
     bool menu_quit = false;
     bool exit = false;
-    
+
     MENUITEM_STRINGLIST(menu,"VU Meter Menu",NULL,"Meter Type","Scale",
                         "Minimeters","Decay Speed","Playback Control",
                         "Quit");
-    
+
     static const struct opt_items meter_type_option[2] = {
         { "Analog", -1 },
         { "Digital", -1 },
@@ -613,7 +613,7 @@ static bool vu_meter_menu(void)
                 rb->set_option("Meter Type", &vumeter_settings.meter_type, INT,
                                meter_type_option, 2, NULL);
                 break;
-                
+
             case 1:
                 if(vumeter_settings.meter_type==ANALOG)
                 {
@@ -626,7 +626,7 @@ static bool vu_meter_menu(void)
                                          "dBfs", -1, "Linear", -1, NULL);
                 }
                 break;
-                
+
             case 2:
                 if(vumeter_settings.meter_type==ANALOG)
                 {
@@ -639,16 +639,16 @@ static bool vu_meter_menu(void)
                                  &vumeter_settings.digital_minimeters);
                 }
                 break;
-                
+
             case 3:
                 if(vumeter_settings.meter_type==ANALOG)
                 {
-                    rb->set_option("Decay Speed", &vumeter_settings.analog_decay, INT, 
+                    rb->set_option("Decay Speed", &vumeter_settings.analog_decay, INT,
                                decay_speed_option, 7, NULL);
                 }
                 else
                 {
-                    rb->set_option("Decay Speed", &vumeter_settings.digital_decay, INT, 
+                    rb->set_option("Decay Speed", &vumeter_settings.digital_decay, INT,
                                decay_speed_option, 7, NULL);
                 }
                 break;
@@ -726,7 +726,7 @@ static void draw_digital_minimeters(void) {
     if(8<(num_right_leds))
         rb->lcd_mono_bitmap(sound_max_level, 46, half_height+8, 3, 8);
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    
+
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(screen_foreground);
 #endif
@@ -837,10 +837,10 @@ static void digital_meter(void) {
         rb->lcd_set_foreground(LCD_RGBPACK(255, 255 - 23 * i, 0));
 #endif
         rb->lcd_fillrect((digital_lead + (i*digital_block_width)),
-            (half_height + 20), digital_block_width - digital_block_gap, 
+            (half_height + 20), digital_block_width - digital_block_gap,
             digital_block_height);
     }
-    
+
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(screen_foreground);
 #endif

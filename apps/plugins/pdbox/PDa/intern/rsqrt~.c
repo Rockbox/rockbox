@@ -23,16 +23,16 @@ static void init_rsqrt(void)
         f2i.i = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
         rsqrt_exptab[i] = 1./sqrt(f2i.f);
 #else /* ROCKBOX */
-	float f;
-	long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
-	*(long *)(&f) = l;
-	rsqrt_exptab[i] = 1./sqrt(f);	
+        float f;
+        long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
+        *(long *)(&f) = l;
+        rsqrt_exptab[i] = 1./sqrt(f);
 #endif /* ROCKBOX */
     }
     for (i = 0; i < DUMTAB2SIZE; i++)
     {
-	float f = 1 + (1./DUMTAB2SIZE) * i;
-	rsqrt_mantissatab[i] = 1./sqrt(f);	
+        float f = 1 + (1./DUMTAB2SIZE) * i;
+        rsqrt_mantissatab[i] = 1./sqrt(f);
     }
 }
 
@@ -48,13 +48,13 @@ float q8_rsqrt(float f)
     {
         f2i.f = f;
         return (rsqrt_exptab[(f2i.i >> 23) & 0xff] *
-	    rsqrt_mantissatab[(f2i.i >> 13) & 0x3ff]);
+            rsqrt_mantissatab[(f2i.i >> 13) & 0x3ff]);
     }
 #else /* ROCKBOX */
     long l = *(long *)(&f);
     if (f < 0) return (0);
     else return (rsqrt_exptab[(l >> 23) & 0xff] *
-	    rsqrt_mantissatab[(l >> 13) & 0x3ff]);
+            rsqrt_mantissatab[(l >> 13) & 0x3ff]);
 #endif /* ROCKBOX */
 }
 
@@ -68,13 +68,13 @@ float q8_sqrt(float f)
     {
         f2i.f = f;
         return (f * rsqrt_exptab[(f2i.i >> 23) & 0xff] *
-	    rsqrt_mantissatab[(f2i.i >> 13) & 0x3ff]);
+            rsqrt_mantissatab[(f2i.i >> 13) & 0x3ff]);
     }
 #else /* ROCKBOX */
     long l = *(long *)(&f);
     if (f < 0) return (0);
     else return (f * rsqrt_exptab[(l >> 23) & 0xff] *
-	    rsqrt_mantissatab[(l >> 13) & 0x3ff]);
+            rsqrt_mantissatab[(l >> 13) & 0x3ff]);
 #endif /* ROCKBOX */
 }
 
@@ -108,16 +108,16 @@ static t_int *sigrsqrt_perform(t_int *w)
     float *in = *(t_float **)(w+1), *out = *(t_float **)(w+2);
     t_int n = *(t_int *)(w+3);
     while (n--)
-    {	
-	float f = *in;
-	long l = *(long *)(in++);
-	if (f < 0) *out++ = 0;
-	else
-	{
-	    float g = rsqrt_exptab[(l >> 23) & 0xff] *
-	    	rsqrt_mantissatab[(l >> 13) & 0x3ff];
-    	    *out++ = 1.5 * g - 0.5 * g * g * g * f;
-	}
+    {
+        float f = *in;
+        long l = *(long *)(in++);
+        if (f < 0) *out++ = 0;
+        else
+        {
+            float g = rsqrt_exptab[(l >> 23) & 0xff] *
+                rsqrt_mantissatab[(l >> 13) & 0x3ff];
+            *out++ = 1.5 * g - 0.5 * g * g * g * f;
+        }
     }
     return (w + 4);
 }
@@ -134,10 +134,9 @@ void rsqrt_tilde_setup(void)
 {
     init_rsqrt();
     sigrsqrt_class = class_new(gensym("rsqrt~"), (t_newmethod)sigrsqrt_new, 0,
-    	sizeof(t_sigrsqrt), 0, 0);
-    	    /* an old name for it: */
+        sizeof(t_sigrsqrt), 0, 0);
+            /* an old name for it: */
     class_addcreator(sigrsqrt_new, gensym("q8_rsqrt~"), 0);
     CLASS_MAINSIGNALIN(sigrsqrt_class, t_sigrsqrt, x_f);
     class_addmethod(sigrsqrt_class, (t_method)sigrsqrt_dsp, gensym("dsp"), 0);
 }
-

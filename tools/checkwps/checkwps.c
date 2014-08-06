@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2008 by Dave Chapman
@@ -160,9 +160,9 @@ int remote_getwidth(void) { return LCD_REMOTE_WIDTH; }
 int remote_getheight(void) { return LCD_REMOTE_HEIGHT; }
 #endif
 
-static inline bool backdrop_load(const char *filename, char* backdrop_buffer) 	 
-{ 	 
- (void)filename; (void)backdrop_buffer; return true; 	 
+static inline bool backdrop_load(const char *filename, char* backdrop_buffer)
+{
+ (void)filename; (void)backdrop_buffer; return true;
 }
 
 struct screen screens[NB_SCREENS] =
@@ -233,7 +233,7 @@ int font_load(const char *path)
     loaded_fonts++;
     return id;
 }
-    
+
 void font_unload(int font_id)
 {
     (void)font_id;

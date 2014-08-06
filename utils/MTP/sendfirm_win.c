@@ -65,22 +65,22 @@ int main(int argc, char **argv)
         usage();
         return 1;
     }
-    
+
     wchar_t *tmp;
-    
+
     tmp = (LPWSTR)malloc(strlen(argv[1])*2+1);
     mbstowcs(tmp, argv[1], strlen(argv[1])*2+1);
-    
+
     wprintf(tmp);
     printf("\n");
-    
+
     fprintf(stdout, "Sending firmware...\n");
-    
+
     if(mtp_sendnk(tmp, filesize(argv[1]), &callback))
         fprintf(stdout, "Firmware sent successfully!\n");
     else
         fprintf(stdout, "Error occured during sending!\n");
-        
+
     free(tmp);
 
     exit(0);

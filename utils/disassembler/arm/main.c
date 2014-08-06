@@ -55,7 +55,7 @@ int main(int argc, char **argv)
       /* read next code dword */
       fseek(in, pos, SEEK_SET);
       fread(buf, 1, 4, in);
-      
+
       val = le2int(buf);
 
       /* check for data tag set: if 1 byte out of 4 is marked => assume data */
@@ -113,11 +113,11 @@ int main(int argc, char **argv)
           fseek(in, pos+offset+8, SEEK_SET);
           fread(&buf, 1, 4, in);
           offset = le2int(buf);
-          
+
           sprintf(stg+strlen(stg), " <- 0x%x", offset);
         }
       }
-    
+
       /* remove trailing spaces */
       while(stg[strlen(stg)-1] == 32)
         stg[strlen(stg)-1] = 0;

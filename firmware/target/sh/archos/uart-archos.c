@@ -164,4 +164,3 @@ int remote_control_rx(void)
 
     return ret;
 }
-

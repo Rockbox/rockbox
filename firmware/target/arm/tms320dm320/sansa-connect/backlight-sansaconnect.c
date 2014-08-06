@@ -96,4 +96,3 @@ bool _backlight_init(void)
     _backlight_set_brightness(backlight_brightness);
     return true;
 }
-

@@ -39,16 +39,16 @@
 ** max size of array part is 2^MAXBITS
 */
 #if LUAI_BITSINT > 26
-#define MAXBITS		26
+#define MAXBITS         26
 #else
-#define MAXBITS		(LUAI_BITSINT-2)
+#define MAXBITS         (LUAI_BITSINT-2)
 #endif
 
-#define MAXASIZE	(1 << MAXBITS)
+#define MAXASIZE        (1 << MAXBITS)
 
 
 #define hashpow2(t,n)      (gnode(t, lmod((n), sizenode(t))))
-  
+
 #define hashstr(t,str)  hashpow2(t, (str)->tsv.hash)
 #define hashboolean(t,p)        hashpow2(t, p)
 
@@ -57,20 +57,20 @@
 ** for some types, it is better to avoid modulus by power of 2, as
 ** they tend to have many 2 factors.
 */
-#define hashmod(t,n)	(gnode(t, ((n) % ((sizenode(t)-1)|1))))
+#define hashmod(t,n)    (gnode(t, ((n) % ((sizenode(t)-1)|1))))
 
 
-#define hashpointer(t,p)	hashmod(t, IntPoint(p))
+#define hashpointer(t,p)        hashmod(t, IntPoint(p))
 
 
 /*
 ** number of ints inside a lua_Number
 */
-#define numints		cast_int(sizeof(lua_Number)/sizeof(int))
+#define numints         cast_int(sizeof(lua_Number)/sizeof(int))
 
 
 
-#define dummynode		(&dummynode_)
+#define dummynode               (&dummynode_)
 
 static const Node dummynode_ = {
   {{NULL}, LUA_TNIL},  /* value */
@@ -302,7 +302,7 @@ static void resize (lua_State *L, Table *t, int nasize, int nhsize) {
   if (nasize > oldasize)  /* array part must grow? */
     setarrayvector(L, t, nasize);
   /* create new hash part with appropriate size */
-  setnodevector(L, t, nhsize);  
+  setnodevector(L, t, nhsize);
   if (nasize < oldasize) {  /* array part must shrink? */
     t->sizearray = nasize;
     /* re-insert elements from vanishing slice */
@@ -390,11 +390,11 @@ static Node *getfreepos (Table *t) {
 
 
 /*
-** inserts a new key into a hash table; first, check whether key's main 
-** position is free. If not, check whether colliding node is in its main 
-** position or not: if it is not, move colliding node to an empty place and 
-** put new key in its main position; otherwise (colliding node is in its main 
-** position), new key goes to an empty position. 
+** inserts a new key into a hash table; first, check whether key's main
+** position is free. If not, check whether colliding node is in its main
+** position or not: if it is not, move colliding node to an empty place and
+** put new key in its main position; otherwise (colliding node is in its main
+** position), new key goes to an empty position.
 */
 static TValue *newkey (lua_State *L, Table *t, const TValue *key) {
   Node *mp = mainposition(t, key);

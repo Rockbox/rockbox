@@ -21,7 +21,7 @@
 
 /* The H10 display (and hence backlight) possibly identical to that of the X5,
   so that code was used here but left #if 0'ed  out for the moment */
-   
+
 #include "config.h"
 #include "cpu.h"
 #include "system.h"

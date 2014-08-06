@@ -126,15 +126,15 @@ static const MPC_SAMPLE_FORMAT  Di_opt [512] ICONST_ATTR MEM_ALIGN_ATTR = {
  * mpc_dct32(const int *in, int *out)
  *
  * mpc_dct32 is a dct32 with in[32]->dct[32] that contains the mirroring from
- * dct[32] to the expected out[64]. The symmetry is 
- * out[16] = 0, 
- * out[ 0..15] =  dct[ 0..15], 
- * out[32..17] = -dct[ 0..15], 
+ * dct[32] to the expected out[64]. The symmetry is
+ * out[16] = 0,
+ * out[ 0..15] =  dct[ 0..15],
+ * out[32..17] = -dct[ 0..15],
  * out[33..48] = -dct[16..31],
  * out[63..48] = -dct[16..31].
  * The cos-tab has the format s0.31.
  *****************************************************************************/
-void 
+void
 mpc_dct32(const MPC_SAMPLE_FORMAT *in, MPC_SAMPLE_FORMAT *v)
 ICODE_ATTR_MPC_LARGE_IRAM;
 
@@ -481,17 +481,17 @@ mpc_dct32(const MPC_SAMPLE_FORMAT *in, MPC_SAMPLE_FORMAT *v)
 
 #if defined(CPU_ARM) || defined(CPU_COLDFIRE)
 extern void
-mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data, 
+mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
                         const MPC_SAMPLE_FORMAT * V,
                         const MPC_SAMPLE_FORMAT * D);
 #else
-static void 
-mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data, 
+static void
+mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
                         const MPC_SAMPLE_FORMAT * V,
                         const MPC_SAMPLE_FORMAT * D)
 {
     mpc_int32_t k;
-    
+
     // 64=64x64-multiply (FIXED_POINT) or float=float*float (!FIXED_POINT) in C
     for ( k = 0; k < 32; k++, D += 16, V++ )
     {
@@ -509,18 +509,18 @@ mpc_decoder_windowing_D(MPC_SAMPLE_FORMAT * Data,
 }
 #endif /* CPU_ARM || CPU_COLDFIRE */
 
-static void 
-mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, 
+static void
+mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V,
                           const MPC_SAMPLE_FORMAT *Y) ICODE_ATTR_MPC_LARGE_IRAM;
-static void 
-mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V, 
+static void
+mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V,
                           const MPC_SAMPLE_FORMAT *Y)
 {
     mpc_uint32_t n;
-    
+
     if (NULL != OutData)
-    {    
-        for ( n = 0; n < 36; n++, Y += 32, OutData += 32 ) 
+    {
+        for ( n = 0; n < 36; n++, Y += 32, OutData += 32 )
         {
             V -= 64;
             mpc_dct32(Y, V);
@@ -531,10 +531,10 @@ mpc_full_synthesis_filter(MPC_SAMPLE_FORMAT *OutData, MPC_SAMPLE_FORMAT *V,
 
 void
 mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT *OutData,
-                                  int num_channels) 
+                                  int num_channels)
 {
     (void)num_channels;
-    
+
     /********* left channel ********/
     memmove(d->V_L + MPC_V_MEM, d->V_L, 960 * sizeof(MPC_SAMPLE_FORMAT) );
     mpc_full_synthesis_filter(OutData,
@@ -592,7 +592,7 @@ static const unsigned char Parity [256] = {  // parity
  *  XORed values of both generators.
  */
 mpc_uint32_t
-mpc_random_int(mpc_decoder *d) 
+mpc_random_int(mpc_decoder *d)
 {
 #if 1
     mpc_uint32_t  t1, t2, t3, t4;

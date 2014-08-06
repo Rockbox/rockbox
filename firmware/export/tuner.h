@@ -34,7 +34,7 @@ enum
     RADIO_MUTE,
     RADIO_FORCE_MONO,
     RADIO_SCAN_FREQUENCY,
-    
+
     /* Put new general-purpose settings above this line */
     __RADIO_SET_STANDARD_LAST
 };

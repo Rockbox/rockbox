@@ -604,13 +604,13 @@ static uint8_t quant_to_spec(NeAACDecHandle hDecoder,
                     wb = wa + bin;
 
                     spec_data[wb+0] = iquant(quant_data[k+0], tab, &error) * scf;
-                    spec_data[wb+1] = iquant(quant_data[k+1], tab, &error) * scf;                        
-                    spec_data[wb+2] = iquant(quant_data[k+2], tab, &error) * scf;                        
+                    spec_data[wb+1] = iquant(quant_data[k+1], tab, &error) * scf;
+                    spec_data[wb+2] = iquant(quant_data[k+2], tab, &error) * scf;
                     spec_data[wb+3] = iquant(quant_data[k+3], tab, &error) * scf;
-                        
+
 #else
                     wb = wa + bin;
-                    
+
                     if (exp>=0)
                     {
                         spec_data[wb+0] = MUL_C((iquant(quant_data[k+0], tab, &error)<< exp), scf);
@@ -1012,7 +1012,7 @@ uint8_t reconstruct_channel_pair(NeAACDecHandle hDecoder, ic_stream *ics1, ic_st
     if (hDecoder->object_type != SSR)
     {
 #endif
-        ifilter_bank(ics1->window_sequence,ics1->window_shape, 
+        ifilter_bank(ics1->window_sequence,ics1->window_shape,
             hDecoder->window_shape_prev[cpe->channel],spec_coef1,
             hDecoder->time_out[cpe->channel], hDecoder->fb_intermed[cpe->channel],
             hDecoder->object_type, hDecoder->frameLength);
@@ -1059,7 +1059,7 @@ uint8_t reconstruct_channel_pair(NeAACDecHandle hDecoder, ic_stream *ics1, ic_st
         if (hDecoder->sbr[ele] == NULL)
         {
             hDecoder->sbr[ele] = sbrDecodeInit(hDecoder->frameLength,
-                hDecoder->element_id[ele], ele, 
+                hDecoder->element_id[ele], ele,
                 2*get_sample_rate(hDecoder->sf_index),
                 hDecoder->downSampledSBR, 0);
 #ifndef FAAD_STATIC_ALLOC

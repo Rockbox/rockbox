@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@
 
 #ifndef COMPARISON
 #define PRNM(x) z80_ ## x
-#else 
+#else
 #define PRNM(x) z80x_ ## x
 #endif
 
@@ -62,11 +62,11 @@ union dregp {
 typedef struct {
   union dregp nr[NUMDREGS];
   union dregp br[BACKDREGS];
-  
+
   int haltstate;
   int it_mode;
   int iff1, iff2;
-  
+
   byte *mem;
 
   int tc;
@@ -174,7 +174,7 @@ extern byte PRNM(outports)[];
 #ifdef __cplusplus
 extern "C" {
 #endif
- 
+
 extern void PRNM(init)(void);
 extern int  PRNM(step)(int ticknum);
 

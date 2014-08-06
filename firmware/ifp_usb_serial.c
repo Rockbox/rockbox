@@ -209,7 +209,7 @@ static unsigned char string_descriptor_vendor[] = {
     'i', 0, 'R', 0, 'i', 0, 'v', 0, 'e', 0, 'r', 0, ' ', 0, 'L', 0,
     't', 0, 'd', 0, ' ', 0, 'a', 0, 'n', 0, 'd', 0, ' ', 0, 'R', 0,
     'o', 0, 'c', 0, 'k', 0, 'b', 0, 'o', 0, 'x', 0};
-    
+
 static unsigned char string_descriptor_product[] = {
     0x1c, 0x03,
     'i', 0, 'R', 0, 'i', 0, 'v', 0, 'e', 0, 'r', 0, ' ', 0, 'i', 0,
@@ -310,7 +310,7 @@ void usb_setup(int reset)
 
     usb_setup_endpoint(ep_index(0, DIR_RX), 64, 0);
     usb_setup_endpoint(ep_index(0, DIR_TX), 64, 0);
-    
+
     ISP1582_MODE |= 1; /* SOFTCT on */
 
     usb_state = STATE_DEFAULT;
@@ -399,13 +399,13 @@ static void usb_send(int n)
                                        endpoints[n].out_len);
         return;
     }
-    
+
     if (usb_out_buffer_full(n))
     {
         log_char('F');
         return;
     }
-    
+
     usb_select_endpoint(ep_index(n, DIR_TX));
     max_pkt_size = endpoints[n].max_pkt_size[DIR_TX];
     len = endpoints[n].out_len - endpoints[n].out_ptr;
@@ -837,7 +837,7 @@ static void usb_handle_int(int i)
                 break;
         }
     }
-        
+
 }
 
 void usb_handle_interrupts(void)
@@ -1020,8 +1020,8 @@ void usb_serial_handle(void)
             usb_reconnect();
     }
 #endif
-    
-    
+
+
     if (!usb_connect_state)
     {
         if (usb_connected())
@@ -1046,7 +1046,7 @@ void usb_serial_handle(void)
         else
         {
             usb_handle_interrupts();
-            
+
             if (usb_state == STATE_CONFIGURED)
             {
                 if (endpoints[1].in_min_len < 0)

@@ -50,7 +50,7 @@ const unsigned short percent_to_volt_charge[11] =
 };
 
 /* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
-#define BATTERY_SCALE_FACTOR 8275 
+#define BATTERY_SCALE_FACTOR 8275
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */

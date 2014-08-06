@@ -129,8 +129,8 @@ void main(void)
         ret = kernel_entry();
         printf("FAILED!");
     }
-    
+
     storage_sleepnow();
-    
+
     while(1);
 }

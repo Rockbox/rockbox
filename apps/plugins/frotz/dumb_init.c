@@ -67,20 +67,20 @@ void os_fatal (const char *s)
 
 void os_init_setup(void)
 {
-	f_setup.attribute_assignment = 0;
-	f_setup.attribute_testing = 0;
-	f_setup.context_lines = 0;
-	f_setup.object_locating = 0;
-	f_setup.object_movement = 0;
-	f_setup.left_margin = 0;
-	f_setup.right_margin = 0;
-	f_setup.ignore_errors = 0;
-	f_setup.piracy = 0;
-	f_setup.undo_slots = MAX_UNDO_SLOTS;
-	f_setup.expand_abbreviations = 0;
-	f_setup.script_cols = 80;
-	f_setup.save_quetzal = 1;
-	f_setup.sound = 1;
-	f_setup.err_report_mode = ERR_DEFAULT_REPORT_MODE;
+        f_setup.attribute_assignment = 0;
+        f_setup.attribute_testing = 0;
+        f_setup.context_lines = 0;
+        f_setup.object_locating = 0;
+        f_setup.object_movement = 0;
+        f_setup.left_margin = 0;
+        f_setup.right_margin = 0;
+        f_setup.ignore_errors = 0;
+        f_setup.piracy = 0;
+        f_setup.undo_slots = MAX_UNDO_SLOTS;
+        f_setup.expand_abbreviations = 0;
+        f_setup.script_cols = 80;
+        f_setup.save_quetzal = 1;
+        f_setup.sound = 1;
+        f_setup.err_report_mode = ERR_DEFAULT_REPORT_MODE;
 
 }

@@ -67,7 +67,7 @@ int s1a0903x01_set(int setting, int value)
             /* Shift the MAS internal clock away for certain frequencies to
              * avoid interference. */
             int pitch = 1000;
-            
+
             /* 4th harmonic falls in the FM frequency range */
             int if_freq = 4 * mas_get_pllfreq();
 
@@ -90,7 +90,7 @@ int s1a0903x01_set(int setting, int value)
             ** The reference frequency is set to 50kHz, and the VCO
             ** output is prescaled by 2.
             */
-    
+
             pll_cnt = (value + 10700000) / (PLL_FREQ_STEP/2) / 2;
 
             /* 0x100000 == FM mode

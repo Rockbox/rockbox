@@ -809,7 +809,7 @@ static void anim_draw_cursor_h(int x)
 {
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(CURSOR_COLOR);
-    rb->lcd_vline(x, 0, LCD_HEIGHT-1); 
+    rb->lcd_vline(x, 0, LCD_HEIGHT-1);
     rb->lcd_set_foreground(GRAPH_COLOR);
 #else
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
@@ -823,7 +823,7 @@ static void anim_draw_cursor_v(int y)
 {
 #if LCD_DEPTH > 1               /* cursor bar */
     rb->lcd_set_foreground(CURSOR_COLOR);
-    rb->lcd_hline(0, LCD_WIDTH-1, y); 
+    rb->lcd_hline(0, LCD_WIDTH-1, y);
     rb->lcd_set_foreground(GRAPH_COLOR);
 #else
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
@@ -979,9 +979,9 @@ static long anim_peaks_horizontal(void)
             }
             else
             {
-                left  = last_left 
+                left  = last_left
                       + (LCD_WIDTH - last_pos) * (last_left - cur_left) / d;
-                right = last_right 
+                right = last_right
                       + (LCD_WIDTH - last_pos) * (last_right - cur_right) / d;
 
                 rb->lcd_drawline(
@@ -1005,7 +1005,7 @@ static long anim_peaks_horizontal(void)
                 }
             }
             break;
-            
+
         case DRAW_PIXEL:
             left = last_left;
             right = last_right;
@@ -1029,14 +1029,14 @@ static long anim_peaks_horizontal(void)
 
     last_left  = cur_left;
     last_right = cur_right;
-    
+
     if (full_update)
     {
         osd_lcd_update();
     }
     else
     {
-        anim_draw_cursor_h(cur_x + 1); /* cursor bar */    
+        anim_draw_cursor_h(cur_x + 1); /* cursor bar */
 
         if (cur_x > last_pos)
         {
@@ -1103,7 +1103,7 @@ static long anim_peaks_vertical(void)
             cur_y -= shift;
             last_pos -= shift;
         }
-        else 
+        else
         {
             cur_y -= LCD_HEIGHT;
         }
@@ -1158,7 +1158,7 @@ static long anim_peaks_vertical(void)
             }
             else
             {
-                left  = last_left 
+                left  = last_left
                       + (LCD_HEIGHT - last_pos) * (last_left - cur_left) / d;
                 right = last_right
                       + (LCD_HEIGHT - last_pos) * (last_right - cur_right) / d;
@@ -1184,7 +1184,7 @@ static long anim_peaks_vertical(void)
                 }
             }
             break;
-            
+
         case DRAW_PIXEL:
             left = last_left;
             right = last_right;
@@ -1208,7 +1208,7 @@ static long anim_peaks_vertical(void)
 
     last_left  = cur_left;
     last_right = cur_right;
-    
+
     if (full_update)
     {
         osd_lcd_update();
@@ -1297,7 +1297,7 @@ static void waveform_buffer_done(void)
 
     waveform_buffer_have = have;
 }
-    
+
 /* where the samples are obtained and buffered */
 static void waveform_buffer_callback(const void *start, size_t size)
 {
@@ -1989,7 +1989,7 @@ enum plugin_status plugin_start(const void* parameter)
                 osc_popupmsg(OSC_MSG_GRAPHMODE, osc.graphmode);
                 break;
 #endif /* OSCILLOSCOPE_GRAPHMODE */
-                
+
             case OSCILLOSCOPE_ORIENTATION:
 #ifdef OSCILLOSCOPE_ORIENTATION_PRE
                 if (lastbutton != OSCILLOSCOPE_ORIENTATION_PRE)
@@ -2011,7 +2011,7 @@ enum plugin_status plugin_start(const void* parameter)
                 graphmode_pause_unpause(paused);
                 osc_popupmsg(OSC_MSG_PAUSED, paused ? 1 : 0);
                 break;
-                
+
             case OSCILLOSCOPE_SPEED_UP:
             case OSCILLOSCOPE_SPEED_UP | BUTTON_REPEAT:
             {
@@ -2024,7 +2024,7 @@ enum plugin_status plugin_start(const void* parameter)
                 osc_popupmsg(OSC_MSG_SPEED, *val);
                 break;
             }
-                
+
             case OSCILLOSCOPE_SPEED_DOWN:
             case OSCILLOSCOPE_SPEED_DOWN | BUTTON_REPEAT:
             {

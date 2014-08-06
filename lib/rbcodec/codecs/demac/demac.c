@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
 */
 
-/* 
+/*
 
 This example is intended to demonstrate how the decoder can be used in
 embedded devices - there is no usage of dynamic memory (i.e. no
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
     if (argc != 3) {
         fprintf(stderr,"Usage: demac infile.ape outfile.wav\n");
         return 0;
-    }        
+    }
 
     res = ape_decode(argv[1], argv[2]);
 
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
     {
         fprintf(stderr,"DECODING ERROR %d, ABORTING\n", res);
     }
-    else 
+    else
     {
         fprintf(stderr,"DECODED OK - NO CRC ERRORS.\n");
     }

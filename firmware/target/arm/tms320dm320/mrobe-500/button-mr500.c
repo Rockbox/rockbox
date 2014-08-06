@@ -65,7 +65,7 @@ static int touch_to_pixels(short *val_x, short *val_y)
         x = 0;
     else if (x>=LCD_WIDTH)
         x=LCD_WIDTH-1;
-        
+
     if (y < 0)
         y = 0;
     else if (y>=LCD_HEIGHT)
@@ -83,15 +83,15 @@ void button_init_device(void)
     IO_GIO_DIR0 |= 0x01;
 
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
-    topleft.val_x = 200;        
+    topleft.val_x = 200;
     topleft.val_y = 3900;
-    
+
     bottomright.val_x = 3880;
     bottomright.val_y = 270;
 #else
     topleft.val_x = 270;
     topleft.val_y = 200;
-    
+
     bottomright.val_x = 3900;
     bottomright.val_y = 3880;
 #endif
@@ -114,42 +114,42 @@ static int remote_read_buttons(void)
 {
     static char read_buffer[5];
     int read_button = BUTTON_NONE;
-    
+
     static int oldbutton=BUTTON_NONE;
-    
+
     /* Handle remote buttons */
     if(uart1_gets_queue(read_buffer, 5)>=0)
     {
         int button_location;
-        
+
         for(button_location=0;button_location<4;button_location++)
         {
-            if((read_buffer[button_location]&0xF0)==0xF0 
+            if((read_buffer[button_location]&0xF0)==0xF0
                 && (read_buffer[button_location+1]&0xF0)!=0xF0)
                 break;
         }
-        
+
         if(button_location==4)
             button_location=0;
-        
+
         button_location++;
-            
+
         read_button |= read_buffer[button_location];
-        
+
         /* Find the hold status location */
         if(button_location==4)
             button_location=0;
         else
             button_location++;
-            
+
         remote_hold_button=((read_buffer[button_location]&0x80)?true:false);
-        
+
         uart1_clear_queue();
         oldbutton=read_button;
     }
     else
         read_button=oldbutton;
-        
+
     return read_button;
 }
 #endif
@@ -176,7 +176,7 @@ int button_read_device(int *data)
     }
 
     tsc2100_set_mode(true, 0x02);
-        
+
     /* Handle power button */
     if ((IO_GIO_BITSET0&0x01) == 0) {
         button_read |=  BUTTON_POWER;
@@ -187,7 +187,7 @@ int button_read_device(int *data)
     button_read |= remote_read_buttons();
     hold_button=remote_hold_button;
 #endif
-    
+
     /* Take care of hold notifications */
 #ifndef BOOTLOADER
     /* give BL notice if HB state chaged */
@@ -201,7 +201,6 @@ int button_read_device(int *data)
     {
         button_read = BUTTON_NONE;
     }
-    
+
     return button_read;
 }
-

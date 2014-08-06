@@ -33,9 +33,9 @@
  */
 typedef struct
 {
-	sha1Param sparam;
-	byte kxi[64];
-	byte kxo[64];
+        sha1Param sparam;
+        byte kxi[64];
+        byte kxo[64];
 } hmacsha1Param;
 
 #ifdef __cplusplus

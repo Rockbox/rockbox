@@ -24,17 +24,17 @@ struct Track_Filter {
     struct setup_t setup_;
     const char* emu_error;
     bool silence_ignored_;
-    
+
     // Timing
     int out_time;  // number of samples played since start of track
     int emu_time;  // number of samples emulator has generated since start of track
     int emu_track_ended_; // emulator has reached end of track
     volatile int track_ended_;
-    
+
     // Fading
     int fade_start;
     int fade_step;
-    
+
     // Silence detection
     int silence_time;   // absolute number of samples where most recent silence began
     int silence_count;  // number of samples of silence to play before using buf
@@ -55,7 +55,7 @@ static inline void track_ignore_silence( struct Track_Filter* this, bool disable
 
 // Clears state and skips initial silence in track
 blargg_err_t track_start( struct Track_Filter* this );
-    
+
 // Sets time that fade starts, and how long until track ends.
 void track_set_fade( struct Track_Filter* this, sample_count_t start, sample_count_t length );
 
@@ -74,7 +74,7 @@ static inline bool track_ended( struct Track_Filter* this ) { return this->track
 
 // Clears state
 void track_stop( struct Track_Filter* this );
-    
+
 // For use by callbacks
 
 // Sets internal "track ended" flag and stops generation of further source samples

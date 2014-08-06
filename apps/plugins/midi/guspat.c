@@ -212,4 +212,3 @@ struct GPatch * gusload(char * filename)
 
     return gp;
 }
-

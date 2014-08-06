@@ -67,4 +67,3 @@ unsigned int input_millivolts(void)
     return batt_millivolts;
 }
 #endif /* HAVE_BATTERY_SWITCH */
-

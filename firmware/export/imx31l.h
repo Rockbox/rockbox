@@ -78,7 +78,7 @@
 #define UART5_BASE_ADDR         0x43FB4000
 #define ECT_IP1_BASE_ADDR       0x43FB8000
 #define ECT_IP2_BASE_ADDR       0x43FBC000
- 
+
 /*
  * SPBA
  */
@@ -1803,14 +1803,14 @@
 #define MX31EVB_CS_UART_BASE        (CS4_BASE_ADDR + 0x00010000)
 
 #define REDBOOT_IMAGE_SIZE              0x40000
- 
+
 #define SDRAM_WORKAROUND_FULL_PAGE
- 
+
 #define ARMHIPG_208_52_52         /* ARM: 208MHz, HCLK=IPG=52MHz*/
 #define ARMHIPG_52_52_52          /* ARM: 52MHz, HCLK=IPG=52MHz*/
 #define ARMHIPG_399_66_66
 #define ARMHIPG_399_133_66
- 
+
 /* MX31 EVB SDRAM is from 0x80000000, 64M */
 #define SDRAM_BASE_ADDR                 CSD0_BASE_ADDR
 #define SDRAM_SIZE                      0x04000000

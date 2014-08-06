@@ -51,7 +51,7 @@ void power_init(void)
         pmu = PCF50635;
 
         pcf50635_init();
-        
+
         /* Clear pending interrupts from pcf50635 */
         unsigned char data[5]; /* 0 = INT1, 1 = INT2, 2 = INT3, ... 4 = INT5 */
         pcf50635_read_multiple(PCF5063X_REG_INT1, data, 5);
@@ -120,7 +120,7 @@ void EXT3(void)
 
         if (data[2] & PCF5063X_INT3_ONKEY1S)
         {
-           
+
             if (!charger_inserted())
                 sys_poweroff();
         }
@@ -134,13 +134,13 @@ unsigned int power_input_status(void)
     /* Players with a PCF50606 can use GPIOs to determine whether AC is inserted
        and whether charging is taking place. Newer players re-use C26 for the
        touchscreen, so we need to monitor PCF50635 USB/adapter IRQs for this. */
-    
+
     if (get_pmu_type() == PCF50606)
     {
         /* Check AC adapter */
         if (GPIOD & (1<<23))
             return POWER_INPUT_MAIN_CHARGER;
-        
+
         /* C26 indicates charging, without AC connected it implies USB power */
         if ((GPIOC & (1<<26)) == 0)
             return POWER_INPUT_USB_CHARGER;
@@ -148,17 +148,17 @@ unsigned int power_input_status(void)
     else
     {
         /* pcf50635 power input status can be obtained from MBCS1 register */
-	
-	int mbcs1 = pcf50635_read(PCF5063X_REG_MBCS1); 
+
+        int mbcs1 = pcf50635_read(PCF5063X_REG_MBCS1);
         /* Check AC adapter presence*/
         if (mbcs1 & PCF5063X_MBCS1_ADAPTPRES)
             return POWER_INPUT_MAIN_CHARGER;
-        
+
         /* Check USB presence */
         if (mbcs1 & PCF5063X_MBCS1_USBPRES)
             return POWER_INPUT_USB_CHARGER;
     }
-    
+
     return POWER_INPUT_NONE;
 }
 #endif

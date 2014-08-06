@@ -133,9 +133,9 @@
 #define CONFIG_CHARGING CHARGING_MONITOR
 
 /* define current usage levels */
-#define CURRENT_NORMAL     46 /* 18 hours from an 830 mah battery*/  
-#define CURRENT_BACKLIGHT  30 /* seems reasonable */ 
-#define CURRENT_RECORD     0  /* no recording on the gigabeat F/X */ 
+#define CURRENT_NORMAL     46 /* 18 hours from an 830 mah battery*/
+#define CURRENT_BACKLIGHT  30 /* seems reasonable */
+#define CURRENT_RECORD     0  /* no recording on the gigabeat F/X */
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

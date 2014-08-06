@@ -208,8 +208,8 @@ static int set_features(void);
 static ICODE_ATTR int wait_for_bsy(void)
 {
     long timeout = current_tick + HZ*30;
-    
-    do 
+
+    do
     {
         if (!(ATA_IN8(ATA_STATUS) & STATUS_BSY))
             return 1;
@@ -228,8 +228,8 @@ static ICODE_ATTR int wait_for_rdy(void)
         return 0;
 
     timeout = current_tick + HZ*10;
-    
-    do 
+
+    do
     {
         if (ATA_IN8(ATA_ALT_STATUS) & STATUS_RDY)
             return 1;
@@ -256,15 +256,15 @@ static ICODE_ATTR int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
-    return (ATA_IN8(ATA_ALT_STATUS) & 
+    return (ATA_IN8(ATA_ALT_STATUS) &
             (STATUS_BSY|STATUS_RDY|STATUS_DF|STATUS_DRQ|STATUS_ERR))
            == STATUS_RDY;
-}    
+}
 
 #if (CONFIG_LED == LED_REAL)
 /* Conditionally block LED access for the ATA driver, so the LED can be
  * (mis)used for other purposes */
-static void ata_led(bool on) 
+static void ata_led(bool on)
 {
     ata_led_on = on;
     if (ata_led_enabled)
@@ -599,7 +599,7 @@ static int cache_sector(unsigned long sector)
 {
     int rc;
 
-    sector &= ~(phys_sector_mult - 1); 
+    sector &= ~(phys_sector_mult - 1);
               /* round down to physical sector boundary */
 
     /* check whether the sector is already cached */
@@ -610,7 +610,7 @@ static int cache_sector(unsigned long sector)
     sector_cache.inuse = false;
     rc = ata_transfer_sectors(sector, phys_sector_mult, sector_cache.data, false);
     if (!rc)
-    {    
+    {
         sector_cache.sectornum = sector;
         sector_cache.inuse = true;
     }
@@ -635,19 +635,19 @@ int ata_read_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
-    
+
     offset = start & (phys_sector_mult - 1);
-    
+
     if (offset) /* first partial sector */
     {
         int partcount = MIN(incount, phys_sector_mult - offset);
-        
+
         rc = cache_sector(start);
         if (rc)
         {
             rc = rc * 10 - 1;
             goto error;
-        }                          
+        }
         memcpy(inbuf, sector_cache.data + offset * SECTOR_SIZE,
                partcount * SECTOR_SIZE);
 
@@ -659,7 +659,7 @@ int ata_read_sectors(IF_MD(int drive,)
     {
         offset = incount & (phys_sector_mult - 1);
         incount -= offset;
-        
+
         if (incount)
         {
             rc = ata_transfer_sectors(start, incount, inbuf, false);
@@ -701,9 +701,9 @@ int ata_write_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
-    
+
     offset = start & (phys_sector_mult - 1);
-    
+
     if (offset) /* first partial sector */
     {
         int partcount = MIN(count, phys_sector_mult - offset);
@@ -713,7 +713,7 @@ int ata_write_sectors(IF_MD(int drive,)
         {
             rc = rc * 10 - 1;
             goto error;
-        }                          
+        }
         memcpy(sector_cache.data + offset * SECTOR_SIZE, buf,
                partcount * SECTOR_SIZE);
         rc = flush_current_sector();
@@ -721,7 +721,7 @@ int ata_write_sectors(IF_MD(int drive,)
         {
             rc = rc * 10 - 2;
             goto error;
-        }                          
+        }
         start += partcount;
         buf += partcount * SECTOR_SIZE;
         count -= partcount;
@@ -730,7 +730,7 @@ int ata_write_sectors(IF_MD(int drive,)
     {
         offset = count & (phys_sector_mult - 1);
         count -= offset;
-        
+
         if (count)
         {
             rc = ata_transfer_sectors(start, count, (void*)buf, true);
@@ -750,7 +750,7 @@ int ata_write_sectors(IF_MD(int drive,)
                 rc = rc * 10 - 4;
                 goto error;
             }
-            memcpy(sector_cache.data, buf, offset * SECTOR_SIZE); 
+            memcpy(sector_cache.data, buf, offset * SECTOR_SIZE);
             rc = flush_current_sector();
             if (rc)
             {
@@ -844,7 +844,7 @@ static int ata_perform_sleep(void)
     }
 
     sleeping = true;
-    return 0; 
+    return 0;
 }
 
 void ata_sleep(void)
@@ -877,7 +877,7 @@ static void ata_thread(void)
 #ifdef ALLOW_USB_SPINDOWN
     static bool usb_mode = false;
 #endif
-    
+
     while (1) {
         queue_wait_w_tmo(&ata_queue, &ev, HZ/2);
 
@@ -885,7 +885,7 @@ static void ata_thread(void)
             case SYS_TIMEOUT:
                 if (!spinup && !sleeping)
                 {
-                    if (TIME_AFTER( current_tick, 
+                    if (TIME_AFTER( current_tick,
                                     last_disk_activity + (HZ*2) ) )
                     {
 #ifdef ALLOW_USB_SPINDOWN
@@ -897,9 +897,9 @@ static void ata_thread(void)
                     }
 
                     if ( sleep_timeout &&
-                         TIME_AFTER( current_tick, 
+                         TIME_AFTER( current_tick,
                                     last_user_activity + sleep_timeout ) &&
-                         TIME_AFTER( current_tick, 
+                         TIME_AFTER( current_tick,
                                     last_disk_activity + sleep_timeout ) )
                     {
 #ifdef ALLOW_USB_SPINDOWN
@@ -963,7 +963,7 @@ static void ata_thread(void)
                 usb_wait_for_disconnect(&ata_queue);
 #endif
                 break;
-                
+
 #ifdef ALLOW_USB_SPINDOWN
             case SYS_USB_DISCONNECTED:
                 /* Tell the USB thread that we are ready again */
@@ -1095,7 +1095,7 @@ static int perform_soft_reset(void)
 int ata_soft_reset(void)
 {
     int ret;
-    
+
     mutex_lock(&ata_mtx);
 
     ret = perform_soft_reset();
@@ -1108,7 +1108,7 @@ int ata_soft_reset(void)
 static int ata_power_on(void)
 {
     int rc;
-    
+
     ide_power_enable(true);
     sleep(HZ/4); /* allow voltage to build up */
 
@@ -1225,7 +1225,7 @@ static int set_features(void)
 
     /* Update the table: set highest supported pio mode that we also support */
     features[0].parameter = 8 + pio_mode;
-    
+
 #ifdef HAVE_ATA_DMA
     if (identify_info[53] & (1<<2))
         /* Ultra DMA mode info present, find a mode */
@@ -1238,7 +1238,7 @@ static int set_features(void)
     }
     else
         features[4].id_word = 88;
-    
+
     features[4].id_bit = dma_mode & 7;
     features[4].parameter = dma_mode;
 #endif /* HAVE_ATA_DMA */
@@ -1310,7 +1310,7 @@ static int STORAGE_INIT_ATTR init_and_check(bool hard_reset)
     rc = check_registers();
     if (rc)
         return -30 + rc;
-    
+
     return 0;
 }
 
@@ -1382,7 +1382,7 @@ int STORAGE_INIT_ATTR ata_init(void)
         {                                    /* (needs BigLBA addressing) */
             if (identify_info[102] || identify_info[103])
                 panicf("Unsupported disk size: >= 2^32 sectors");
-                
+
             total_sectors = identify_info[100] | (identify_info[101] << 16);
             lba48 = true; /* use BigLBA */
         }
@@ -1416,7 +1416,7 @@ int STORAGE_INIT_ATTR ata_init(void)
             if (rc == 0)
                 phys_sector_mult = 1;
         }
- 
+
         if (phys_sector_mult > (MAX_PHYS_SECTOR_SIZE/SECTOR_SIZE))
             panicf("Unsupported physical sector size: %d",
                    phys_sector_mult * SECTOR_SIZE);
@@ -1447,7 +1447,7 @@ int STORAGE_INIT_ATTR ata_init(void)
 void ata_close(void)
 {
     unsigned int thread_id = ata_thread_id;
-    
+
     if (thread_id == 0)
         return;
 
@@ -1459,7 +1459,7 @@ void ata_close(void)
 #endif /* ATA_DRIVER_CLOSE */
 
 #if (CONFIG_LED == LED_REAL)
-void ata_set_led_enabled(bool enabled) 
+void ata_set_led_enabled(bool enabled)
 {
     ata_led_enabled = enabled;
     if (ata_led_enabled)
@@ -1532,7 +1532,7 @@ int ata_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif

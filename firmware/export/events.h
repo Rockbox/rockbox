@@ -40,7 +40,7 @@
 /*
  * Only CLASS defines and firmware/ level events should be defined here.
  * apps/ level events are defined in apps/appevents.h
- * 
+ *
  * High byte = Event class definition
  * Low byte  = Event ID
  */
@@ -57,7 +57,7 @@
  * synchronously everytime the event fires, passing the event id and data to
  * the callback.
  *
- * Must be removed with remove_event(). 
+ * Must be removed with remove_event().
  */
 bool add_event(unsigned short id, void (*handler)(unsigned short id, void *event_data));
 
@@ -71,7 +71,7 @@ bool add_event(unsigned short id, void (*handler)(unsigned short id, void *event
  * removed with remove_event_ex().
  *
  * Must be removed with remove_event_ex(). remove_event() will never remove
- * events added with this function. 
+ * events added with this function.
  */
 bool add_event_ex(unsigned short id, bool oneshot, void (*handler)(unsigned short id, void *event_data, void *user_data), void *user_data);
 

@@ -63,7 +63,7 @@ static void watchdog_service(void)
         (*(volatile unsigned long *)0x80002804) = 0;
         (*(volatile unsigned long *)0x80002808) = 0;
         (*(volatile unsigned long *)0x80002804) = 1;
-    }        
+    }
 }
 
 static inline bool isxdigit(char c)
@@ -354,7 +354,7 @@ static void cmd_get_memory(char *args, char *reply) {
         reply_error(1, reply);
         return;
     }
-  
+
     gdb_mem_access = 1;
     for (i = 0; i < len; i++)
         hex_byte(reply + i * 2, *((unsigned char *)(addr + i)));
@@ -491,7 +491,7 @@ void gdb_loop(void) {
 
     while (1) {
         get_packet(packet_buf, sizeof(packet_buf) - 1);
-            
+
         no_reply = 0;
         switch (packet_buf[0]) {
             case '?':
@@ -572,7 +572,7 @@ void gdb_loop_from_exc(void)
 {
     if (gdb_mem_access)
         reply_error(1, reply_buf);
-    else        
+    else
         reply_signal(gdb_exception_no, reply_buf);
     put_packet(reply_buf);
     gdb_loop();
@@ -616,7 +616,7 @@ static void system_init(void)
         IRQ_WRITE_WAIT(0x404 + i * 4, 0x4000000, (v & 0x10000) == 0);
         IRQ_WRITE_WAIT(0x404 + i * 4, 0x10000001, (v & 0xf) == 1);
     }
-    
+
     GPIO3_CLR = 1;
 }
 

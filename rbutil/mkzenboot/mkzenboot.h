@@ -83,4 +83,3 @@ enum zen_error_t mkzenboot(const char *infile, const char *bootfile,
 }
 #endif
 #endif
-

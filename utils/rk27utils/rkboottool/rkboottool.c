@@ -269,7 +269,7 @@ int main (int argc, char **argv)
         }
 
         fwrite(buff, 1, rkboot_info.s1_len, fp_out);
- 
+
         fprintf(stderr, "[info]: extracted rkboot_s1.bin file\n");
         free(buff);
         fclose(fp_out);
@@ -357,4 +357,3 @@ int main (int argc, char **argv)
     fclose(fp_in);
     return 0;
 }
-

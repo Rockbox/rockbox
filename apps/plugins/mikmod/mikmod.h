@@ -1,21 +1,21 @@
-/*	MikMod sound library
-	(c) 1998, 1999, 2000 Miodrag Vallat and others - see file AUTHORS
-	for complete list.
+/*      MikMod sound library
+        (c) 1998, 1999, 2000 Miodrag Vallat and others - see file AUTHORS
+        for complete list.
 
-	This library is free software; you can redistribute it and/or modify
-	it under the terms of the GNU Library General Public License as
-	published by the Free Software Foundation; either version 2 of
-	the License, or (at your option) any later version.
- 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Library General Public License for more details.
- 
-	You should have received a copy of the GNU Library General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-	02111-1307, USA.
+        This library is free software; you can redistribute it and/or modify
+        it under the terms of the GNU Library General Public License as
+        published by the Free Software Foundation; either version 2 of
+        the License, or (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU Library General Public License for more details.
+
+        You should have received a copy of the GNU Library General Public
+        License along with this library; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+        02111-1307, USA.
 */
 
 /*==============================================================================
@@ -53,7 +53,7 @@ extern "C" {
 #endif
 
 /*
- *	========== Library version
+ *      ========== Library version
  */
 
 #define LIBMIKMOD_VERSION_MAJOR 3L
@@ -61,14 +61,14 @@ extern "C" {
 #define LIBMIKMOD_REVISION      0L
 
 #define LIBMIKMOD_VERSION \
-	((LIBMIKMOD_VERSION_MAJOR<<16)| \
-	 (LIBMIKMOD_VERSION_MINOR<< 8)| \
-	 (LIBMIKMOD_REVISION))
+        ((LIBMIKMOD_VERSION_MAJOR<<16)| \
+         (LIBMIKMOD_VERSION_MINOR<< 8)| \
+         (LIBMIKMOD_REVISION))
 
 MIKMODAPI extern long MikMod_GetVersion(void);
 
 /*
- *	========== Platform independent-type definitions
+ *      ========== Platform independent-type definitions
  */
 #if 0
 #ifdef WIN32
@@ -115,88 +115,88 @@ typedef unsigned long   ULONG;      /* 4 bytes, unsigned */
 #endif
 
 /*
- *	========== Error codes
+ *      ========== Error codes
  */
 
 enum {
-	MMERR_OPENING_FILE = 1,
-	MMERR_OUT_OF_MEMORY,
-	MMERR_DYNAMIC_LINKING,
+        MMERR_OPENING_FILE = 1,
+        MMERR_OUT_OF_MEMORY,
+        MMERR_DYNAMIC_LINKING,
 
-	MMERR_SAMPLE_TOO_BIG,
-	MMERR_OUT_OF_HANDLES,
-	MMERR_UNKNOWN_WAVE_TYPE,
+        MMERR_SAMPLE_TOO_BIG,
+        MMERR_OUT_OF_HANDLES,
+        MMERR_UNKNOWN_WAVE_TYPE,
 
-	MMERR_LOADING_PATTERN,
-	MMERR_LOADING_TRACK,
-	MMERR_LOADING_HEADER,
-	MMERR_LOADING_SAMPLEINFO,
-	MMERR_NOT_A_MODULE,
-	MMERR_NOT_A_STREAM,
-	MMERR_MED_SYNTHSAMPLES,
-	MMERR_ITPACK_INVALID_DATA,
+        MMERR_LOADING_PATTERN,
+        MMERR_LOADING_TRACK,
+        MMERR_LOADING_HEADER,
+        MMERR_LOADING_SAMPLEINFO,
+        MMERR_NOT_A_MODULE,
+        MMERR_NOT_A_STREAM,
+        MMERR_MED_SYNTHSAMPLES,
+        MMERR_ITPACK_INVALID_DATA,
 
-	MMERR_DETECTING_DEVICE,
-	MMERR_INVALID_DEVICE,
-	MMERR_INITIALIZING_MIXER,
-	MMERR_OPENING_AUDIO,
-	MMERR_8BIT_ONLY,
-	MMERR_16BIT_ONLY,
-	MMERR_STEREO_ONLY,
-	MMERR_ULAW,
-	MMERR_NON_BLOCK,
+        MMERR_DETECTING_DEVICE,
+        MMERR_INVALID_DEVICE,
+        MMERR_INITIALIZING_MIXER,
+        MMERR_OPENING_AUDIO,
+        MMERR_8BIT_ONLY,
+        MMERR_16BIT_ONLY,
+        MMERR_STEREO_ONLY,
+        MMERR_ULAW,
+        MMERR_NON_BLOCK,
 
-	MMERR_AF_AUDIO_PORT,
+        MMERR_AF_AUDIO_PORT,
 
-	MMERR_AIX_CONFIG_INIT,
-	MMERR_AIX_CONFIG_CONTROL,
-	MMERR_AIX_CONFIG_START,
+        MMERR_AIX_CONFIG_INIT,
+        MMERR_AIX_CONFIG_CONTROL,
+        MMERR_AIX_CONFIG_START,
 
-	MMERR_GUS_SETTINGS,
-	MMERR_GUS_RESET,
-	MMERR_GUS_TIMER,
+        MMERR_GUS_SETTINGS,
+        MMERR_GUS_RESET,
+        MMERR_GUS_TIMER,
 
-	MMERR_HP_SETSAMPLESIZE,
-	MMERR_HP_SETSPEED,
-	MMERR_HP_CHANNELS,
-	MMERR_HP_AUDIO_OUTPUT,
-	MMERR_HP_AUDIO_DESC,
-	MMERR_HP_BUFFERSIZE,
+        MMERR_HP_SETSAMPLESIZE,
+        MMERR_HP_SETSPEED,
+        MMERR_HP_CHANNELS,
+        MMERR_HP_AUDIO_OUTPUT,
+        MMERR_HP_AUDIO_DESC,
+        MMERR_HP_BUFFERSIZE,
 
-	MMERR_OSS_SETFRAGMENT,
-	MMERR_OSS_SETSAMPLESIZE,
-	MMERR_OSS_SETSTEREO,
-	MMERR_OSS_SETSPEED,
+        MMERR_OSS_SETFRAGMENT,
+        MMERR_OSS_SETSAMPLESIZE,
+        MMERR_OSS_SETSTEREO,
+        MMERR_OSS_SETSPEED,
 
-	MMERR_SGI_SPEED,
-	MMERR_SGI_16BIT,
-	MMERR_SGI_8BIT,
-	MMERR_SGI_STEREO,
-	MMERR_SGI_MONO,
+        MMERR_SGI_SPEED,
+        MMERR_SGI_16BIT,
+        MMERR_SGI_8BIT,
+        MMERR_SGI_STEREO,
+        MMERR_SGI_MONO,
 
-	MMERR_SUN_INIT,
+        MMERR_SUN_INIT,
 
-	MMERR_OS2_MIXSETUP,
-	MMERR_OS2_SEMAPHORE,
-	MMERR_OS2_TIMER,
-	MMERR_OS2_THREAD,
+        MMERR_OS2_MIXSETUP,
+        MMERR_OS2_SEMAPHORE,
+        MMERR_OS2_TIMER,
+        MMERR_OS2_THREAD,
 
-	MMERR_DS_PRIORITY,
-	MMERR_DS_BUFFER,
-	MMERR_DS_FORMAT,
-	MMERR_DS_NOTIFY,
-	MMERR_DS_EVENT,
-	MMERR_DS_THREAD,
-	MMERR_DS_UPDATE,
+        MMERR_DS_PRIORITY,
+        MMERR_DS_BUFFER,
+        MMERR_DS_FORMAT,
+        MMERR_DS_NOTIFY,
+        MMERR_DS_EVENT,
+        MMERR_DS_THREAD,
+        MMERR_DS_UPDATE,
 
-	MMERR_WINMM_HANDLE,
-	MMERR_WINMM_ALLOCATED,
-	MMERR_WINMM_DEVICEID,
-	MMERR_WINMM_FORMAT,
-	MMERR_WINMM_UNKNOWN,
+        MMERR_WINMM_HANDLE,
+        MMERR_WINMM_ALLOCATED,
+        MMERR_WINMM_DEVICEID,
+        MMERR_WINMM_FORMAT,
+        MMERR_WINMM_UNKNOWN,
 
-	MMERR_MAC_SPEED,
-	MMERR_MAC_START,
+        MMERR_MAC_SPEED,
+        MMERR_MAC_START,
 
     MMERR_OSX_UNKNOWN_DEVICE,
     MMERR_OSX_BAD_PROPERTY,
@@ -205,16 +205,16 @@ enum {
     MMERR_OSX_BUFFER_ALLOC,
     MMERR_OSX_ADD_IO_PROC,
     MMERR_OSX_DEVICE_START,
-	MMERR_OSX_PTHREAD,
+        MMERR_OSX_PTHREAD,
 
-	MMERR_DOSWSS_STARTDMA,
-	MMERR_DOSSB_STARTDMA,
-	
-	MMERR_MAX
+        MMERR_DOSWSS_STARTDMA,
+        MMERR_DOSSB_STARTDMA,
+
+        MMERR_MAX
 };
 
 /*
- *	========== Error handling
+ *      ========== Error handling
  */
 
 typedef void (MikMod_handler)(void);
@@ -227,7 +227,7 @@ MIKMODAPI extern char *MikMod_strerror(int);
 MIKMODAPI extern MikMod_handler_t MikMod_RegisterErrorHandler(MikMod_handler_t);
 
 /*
- *	========== Library initialization and core functions
+ *      ========== Library initialization and core functions
  */
 
 struct MDRIVER;
@@ -258,28 +258,28 @@ MIKMODAPI extern void*  MikMod_calloc(size_t,size_t);
 MIKMODAPI extern void   MikMod_free(void*);
 
 /*
- *	========== Reader, Writer
+ *      ========== Reader, Writer
  */
 
 typedef struct MREADER {
-	int (*Seek)(struct MREADER*,long,int);
-	long (*Tell)(struct MREADER*);
-	int (*Read)(struct MREADER*,void*,size_t);
-	int  (*Get)(struct MREADER*);
-	int (*Eof)(struct MREADER*);
-	long iobase;
-	long prev_iobase;
+        int (*Seek)(struct MREADER*,long,int);
+        long (*Tell)(struct MREADER*);
+        int (*Read)(struct MREADER*,void*,size_t);
+        int  (*Get)(struct MREADER*);
+        int (*Eof)(struct MREADER*);
+        long iobase;
+        long prev_iobase;
 } MREADER;
 
 typedef struct MWRITER {
-	int (*Seek)(struct MWRITER*,long,int);
-	long (*Tell)(struct MWRITER*);
-	int (*Write)(struct MWRITER*,void*,size_t);
-	int (*Put)(struct MWRITER*,int);
+        int (*Seek)(struct MWRITER*,long,int);
+        long (*Tell)(struct MWRITER*);
+        int (*Write)(struct MWRITER*,void*,size_t);
+        int (*Put)(struct MWRITER*,int);
 } MWRITER;
 
 /*
- *	========== Samples
+ *      ========== Samples
  */
 
 /* Sample playback should not be interrupted */
@@ -291,9 +291,9 @@ typedef struct MWRITER {
 #define SF_SIGNED       0x0004
 #define SF_BIG_ENDIAN   0x0008
 #define SF_DELTA        0x0010
-#define SF_ITPACKED		0x0020
+#define SF_ITPACKED             0x0020
 
-#define	SF_FORMATMASK	0x003F
+#define SF_FORMATMASK   0x003F
 
 /* General Playback flags */
 
@@ -302,51 +302,51 @@ typedef struct MWRITER {
 #define SF_REVERSE      0x0400
 #define SF_SUSTAIN      0x0800
 
-#define SF_PLAYBACKMASK	0x0C00
+#define SF_PLAYBACKMASK 0x0C00
 
 /* Module-only Playback Flags */
 
-#define SF_OWNPAN		0x1000
+#define SF_OWNPAN               0x1000
 #define SF_UST_LOOP     0x2000
 
-#define SF_EXTRAPLAYBACKMASK	0x3000
+#define SF_EXTRAPLAYBACKMASK    0x3000
 
 /* Panning constants */
-#define PAN_LEFT		0
-#define PAN_HALFLEFT 	64
-#define PAN_CENTER		128
-#define PAN_HALFRIGHT	192
-#define PAN_RIGHT		255
-#define PAN_SURROUND	512 /* panning value for Dolby Surround */
+#define PAN_LEFT                0
+#define PAN_HALFLEFT    64
+#define PAN_CENTER              128
+#define PAN_HALFRIGHT   192
+#define PAN_RIGHT               255
+#define PAN_SURROUND    512 /* panning value for Dolby Surround */
 
 typedef struct SAMPLE {
-	SWORD  panning;     /* panning (0-255 or PAN_SURROUND) */
-	ULONG  speed;       /* Base playing speed/frequency of note */
-	UBYTE  volume;      /* volume 0-64 */
-	UWORD  inflags;		/* sample format on disk */
-	UWORD  flags;       /* sample format in memory */
-	ULONG  length;      /* length of sample (in samples!) */
-	ULONG  loopstart;   /* repeat position (relative to start, in samples) */
-	ULONG  loopend;     /* repeat end */
-	ULONG  susbegin;    /* sustain loop begin (in samples) \  Not Supported */
-	ULONG  susend;      /* sustain loop end                /      Yet! */
+        SWORD  panning;     /* panning (0-255 or PAN_SURROUND) */
+        ULONG  speed;       /* Base playing speed/frequency of note */
+        UBYTE  volume;      /* volume 0-64 */
+        UWORD  inflags;         /* sample format on disk */
+        UWORD  flags;       /* sample format in memory */
+        ULONG  length;      /* length of sample (in samples!) */
+        ULONG  loopstart;   /* repeat position (relative to start, in samples) */
+        ULONG  loopend;     /* repeat end */
+        ULONG  susbegin;    /* sustain loop begin (in samples) \  Not Supported */
+        ULONG  susend;      /* sustain loop end                /      Yet! */
 
-	/* Variables used by the module player only! (ignored for sound effects) */
-	UBYTE  globvol;     /* global volume */
-	UBYTE  vibflags;    /* autovibrato flag stuffs */
-	UBYTE  vibtype;     /* Vibratos moved from INSTRUMENT to SAMPLE */
-	UBYTE  vibsweep;
-	UBYTE  vibdepth;
-	UBYTE  vibrate;
-	CHAR*  samplename;  /* name of the sample */
+        /* Variables used by the module player only! (ignored for sound effects) */
+        UBYTE  globvol;     /* global volume */
+        UBYTE  vibflags;    /* autovibrato flag stuffs */
+        UBYTE  vibtype;     /* Vibratos moved from INSTRUMENT to SAMPLE */
+        UBYTE  vibsweep;
+        UBYTE  vibdepth;
+        UBYTE  vibrate;
+        CHAR*  samplename;  /* name of the sample */
 
-	/* Values used internally only */
-	UWORD  avibpos;     /* autovibrato pos [player use] */
-	UBYTE  divfactor;   /* for sample scaling, maintains proper period slides */
-	ULONG  seekpos;     /* seek position in file */
-	SWORD  handle;      /* sample handle used by individual drivers */
-	void (*onfree)(void *ctx); /* called from Sample_Free if not NULL */
-	void *ctx;			/* context passed to previous function*/
+        /* Values used internally only */
+        UWORD  avibpos;     /* autovibrato pos [player use] */
+        UBYTE  divfactor;   /* for sample scaling, maintains proper period slides */
+        ULONG  seekpos;     /* seek position in file */
+        SWORD  handle;      /* sample handle used by individual drivers */
+        void (*onfree)(void *ctx); /* called from Sample_Free if not NULL */
+        void *ctx;                      /* context passed to previous function*/
 } SAMPLE;
 
 /* Sample functions */
@@ -376,12 +376,12 @@ MIKMODAPI extern SLONG  Voice_GetPosition(SBYTE);
 MIKMODAPI extern ULONG  Voice_RealVolume(SBYTE);
 
 /*
- *	========== Internal module representation (UniMod)
+ *      ========== Internal module representation (UniMod)
  */
 
 /*
-	Instrument definition - for information only, the only field which may be
-	of use in user programs is the name field
+        Instrument definition - for information only, the only field which may be
+        of use in user programs is the name field
 */
 
 /* Instrument note count */
@@ -389,8 +389,8 @@ MIKMODAPI extern ULONG  Voice_RealVolume(SBYTE);
 
 /* Envelope point */
 typedef struct ENVPT {
-	SWORD pos;
-	SWORD val;
+        SWORD pos;
+        SWORD val;
 } ENVPT;
 
 /* Envelope point count */
@@ -398,154 +398,154 @@ typedef struct ENVPT {
 
 /* Instrument structure */
 typedef struct INSTRUMENT {
-	CHAR* insname;
+        CHAR* insname;
 
-	UBYTE flags;
-	UWORD samplenumber[INSTNOTES];
-	UBYTE samplenote[INSTNOTES];
+        UBYTE flags;
+        UWORD samplenumber[INSTNOTES];
+        UBYTE samplenote[INSTNOTES];
 
-	UBYTE nnatype;
-	UBYTE dca;              /* duplicate check action */
-	UBYTE dct;              /* duplicate check type */
-	UBYTE globvol;
-	UWORD volfade;
-	SWORD panning;          /* instrument-based panning var */
+        UBYTE nnatype;
+        UBYTE dca;              /* duplicate check action */
+        UBYTE dct;              /* duplicate check type */
+        UBYTE globvol;
+        UWORD volfade;
+        SWORD panning;          /* instrument-based panning var */
 
-	UBYTE pitpansep;        /* pitch pan separation (0 to 255) */
-	UBYTE pitpancenter;     /* pitch pan center (0 to 119) */
-	UBYTE rvolvar;          /* random volume varations (0 - 100%) */
-	UBYTE rpanvar;          /* random panning varations (0 - 100%) */
+        UBYTE pitpansep;        /* pitch pan separation (0 to 255) */
+        UBYTE pitpancenter;     /* pitch pan center (0 to 119) */
+        UBYTE rvolvar;          /* random volume varations (0 - 100%) */
+        UBYTE rpanvar;          /* random panning varations (0 - 100%) */
 
-	/* volume envelope */
-	UBYTE volflg;           /* bit 0: on 1: sustain 2: loop */
-	UBYTE volpts;
-	UBYTE volsusbeg;
-	UBYTE volsusend;
-	UBYTE volbeg;
-	UBYTE volend;
-	ENVPT volenv[ENVPOINTS];
-	/* panning envelope */
-	UBYTE panflg;           /* bit 0: on 1: sustain 2: loop */
-	UBYTE panpts;
-	UBYTE pansusbeg;
-	UBYTE pansusend;
-	UBYTE panbeg;
-	UBYTE panend;
-	ENVPT panenv[ENVPOINTS];
-	/* pitch envelope */
-	UBYTE pitflg;           /* bit 0: on 1: sustain 2: loop */
-	UBYTE pitpts;
-	UBYTE pitsusbeg;
-	UBYTE pitsusend;
-	UBYTE pitbeg;
-	UBYTE pitend;
-	ENVPT pitenv[ENVPOINTS];
+        /* volume envelope */
+        UBYTE volflg;           /* bit 0: on 1: sustain 2: loop */
+        UBYTE volpts;
+        UBYTE volsusbeg;
+        UBYTE volsusend;
+        UBYTE volbeg;
+        UBYTE volend;
+        ENVPT volenv[ENVPOINTS];
+        /* panning envelope */
+        UBYTE panflg;           /* bit 0: on 1: sustain 2: loop */
+        UBYTE panpts;
+        UBYTE pansusbeg;
+        UBYTE pansusend;
+        UBYTE panbeg;
+        UBYTE panend;
+        ENVPT panenv[ENVPOINTS];
+        /* pitch envelope */
+        UBYTE pitflg;           /* bit 0: on 1: sustain 2: loop */
+        UBYTE pitpts;
+        UBYTE pitsusbeg;
+        UBYTE pitsusend;
+        UBYTE pitbeg;
+        UBYTE pitend;
+        ENVPT pitenv[ENVPOINTS];
 } INSTRUMENT;
 
 struct MP_CONTROL;
 struct MP_VOICE;
 
 /*
-	Module definition
+        Module definition
 */
 
 /* maximum master channels supported */
-#define UF_MAXCHAN	64
+#define UF_MAXCHAN      64
 
 /* Module flags */
-#define UF_XMPERIODS	0x0001 /* XM periods / finetuning */
-#define UF_LINEAR		0x0002 /* LINEAR periods (UF_XMPERIODS must be set) */
-#define UF_INST			0x0004 /* Instruments are used */
-#define UF_NNA			0x0008 /* IT: NNA used, set numvoices rather
-								  than numchn */
-#define UF_S3MSLIDES	0x0010 /* uses old S3M volume slides */
-#define UF_BGSLIDES		0x0020 /* continue volume slides in the background */
-#define UF_HIGHBPM		0x0040 /* MED: can use >255 bpm */
-#define UF_NOWRAP		0x0080 /* XM-type (i.e. illogical) pattern break
-								  semantics */
-#define UF_ARPMEM		0x0100 /* IT: need arpeggio memory */
-#define UF_FT2QUIRKS	0x0200 /* emulate some FT2 replay quirks */
-#define UF_PANNING		0x0400 /* module uses panning effects or have
-								  non-tracker default initial panning */
+#define UF_XMPERIODS    0x0001 /* XM periods / finetuning */
+#define UF_LINEAR               0x0002 /* LINEAR periods (UF_XMPERIODS must be set) */
+#define UF_INST                 0x0004 /* Instruments are used */
+#define UF_NNA                  0x0008 /* IT: NNA used, set numvoices rather
+                                                                  than numchn */
+#define UF_S3MSLIDES    0x0010 /* uses old S3M volume slides */
+#define UF_BGSLIDES             0x0020 /* continue volume slides in the background */
+#define UF_HIGHBPM              0x0040 /* MED: can use >255 bpm */
+#define UF_NOWRAP               0x0080 /* XM-type (i.e. illogical) pattern break
+                                                                  semantics */
+#define UF_ARPMEM               0x0100 /* IT: need arpeggio memory */
+#define UF_FT2QUIRKS    0x0200 /* emulate some FT2 replay quirks */
+#define UF_PANNING              0x0400 /* module uses panning effects or have
+                                                                  non-tracker default initial panning */
 
 typedef struct MODULE {
-	/* general module information */
-		CHAR*       songname;    /* name of the song */
-		CHAR*       modtype;     /* string type of module loaded */
-		CHAR*       comment;     /* module comments */
+        /* general module information */
+                CHAR*       songname;    /* name of the song */
+                CHAR*       modtype;     /* string type of module loaded */
+                CHAR*       comment;     /* module comments */
 
-		UWORD       flags;       /* See module flags above */
-		UBYTE       numchn;      /* number of module channels */
-		UBYTE       numvoices;   /* max # voices used for full NNA playback */
-		UWORD       numpos;      /* number of positions in this song */
-		UWORD       numpat;      /* number of patterns in this song */
-		UWORD       numins;      /* number of instruments */
-		UWORD       numsmp;      /* number of samples */
+                UWORD       flags;       /* See module flags above */
+                UBYTE       numchn;      /* number of module channels */
+                UBYTE       numvoices;   /* max # voices used for full NNA playback */
+                UWORD       numpos;      /* number of positions in this song */
+                UWORD       numpat;      /* number of patterns in this song */
+                UWORD       numins;      /* number of instruments */
+                UWORD       numsmp;      /* number of samples */
 struct  INSTRUMENT* instruments; /* all instruments */
 struct  SAMPLE*     samples;     /* all samples */
-		UBYTE       realchn;     /* real number of channels used */
-		UBYTE       totalchn;    /* total number of channels used (incl NNAs) */
+                UBYTE       realchn;     /* real number of channels used */
+                UBYTE       totalchn;    /* total number of channels used (incl NNAs) */
 
-	/* playback settings */
-		UWORD       reppos;      /* restart position */
-		UBYTE       initspeed;   /* initial song speed */
-		UWORD       inittempo;   /* initial song tempo */
-		UBYTE       initvolume;  /* initial global volume (0 - 128) */
-		UWORD       panning[UF_MAXCHAN]; /* panning positions */
-		UBYTE       chanvol[UF_MAXCHAN]; /* channel positions */
-		UWORD       bpm;         /* current beats-per-minute speed */
-		UWORD       sngspd;      /* current song speed */
-		SWORD       volume;      /* song volume (0-128) (or user volume) */
+        /* playback settings */
+                UWORD       reppos;      /* restart position */
+                UBYTE       initspeed;   /* initial song speed */
+                UWORD       inittempo;   /* initial song tempo */
+                UBYTE       initvolume;  /* initial global volume (0 - 128) */
+                UWORD       panning[UF_MAXCHAN]; /* panning positions */
+                UBYTE       chanvol[UF_MAXCHAN]; /* channel positions */
+                UWORD       bpm;         /* current beats-per-minute speed */
+                UWORD       sngspd;      /* current song speed */
+                SWORD       volume;      /* song volume (0-128) (or user volume) */
 
-		int        extspd;      /* extended speed flag (default enabled) */
-		int        panflag;     /* panning flag (default enabled) */
-		int        wrap;        /* wrap module ? (default disabled) */
-		int        loop;		 /* allow module to loop ? (default enabled) */
-		int        fadeout;	 /* volume fade out during last pattern */
+                int        extspd;      /* extended speed flag (default enabled) */
+                int        panflag;     /* panning flag (default enabled) */
+                int        wrap;        /* wrap module ? (default disabled) */
+                int        loop;                 /* allow module to loop ? (default enabled) */
+                int        fadeout;      /* volume fade out during last pattern */
 
-		UWORD       patpos;      /* current row number */
-		SWORD       sngpos;      /* current song position */
-		ULONG       sngtime;     /* current song time in 2^-10 seconds */
+                UWORD       patpos;      /* current row number */
+                SWORD       sngpos;      /* current song position */
+                ULONG       sngtime;     /* current song time in 2^-10 seconds */
 
-		SWORD       relspd;      /* relative speed factor */
+                SWORD       relspd;      /* relative speed factor */
 
-	/* internal module representation */
-		UWORD       numtrk;      /* number of tracks */
-		UBYTE**     tracks;      /* array of numtrk pointers to tracks */
-		UWORD*      patterns;    /* array of Patterns */
-		UWORD*      pattrows;    /* array of number of rows for each pattern */
-		UWORD*      positions;   /* all positions */
+        /* internal module representation */
+                UWORD       numtrk;      /* number of tracks */
+                UBYTE**     tracks;      /* array of numtrk pointers to tracks */
+                UWORD*      patterns;    /* array of Patterns */
+                UWORD*      pattrows;    /* array of number of rows for each pattern */
+                UWORD*      positions;   /* all positions */
 
-		int        forbid;      /* if true, no player update! */
-		UWORD       numrow;      /* number of rows on current pattern */
-		UWORD       vbtick;      /* tick counter (counts from 0 to sngspd) */
-		UWORD       sngremainder;/* used for song time computation */
+                int        forbid;      /* if true, no player update! */
+                UWORD       numrow;      /* number of rows on current pattern */
+                UWORD       vbtick;      /* tick counter (counts from 0 to sngspd) */
+                UWORD       sngremainder;/* used for song time computation */
 
 struct MP_CONTROL*  control;     /* Effects Channel info (size pf->numchn) */
 struct MP_VOICE*    voice;       /* Audio Voice information (size md_numchn) */
 
-		UBYTE       globalslide; /* global volume slide rate */
-		UBYTE       pat_repcrazy;/* module has just looped to position -1 */
-		UWORD       patbrk;      /* position where to start a new pattern */
-		UBYTE       patdly;      /* patterndelay counter (command memory) */
-		UBYTE       patdly2;     /* patterndelay counter (real one) */
-		SWORD       posjmp;      /* flag to indicate a jump is needed... */
-		UWORD		bpmlimit;	 /* threshold to detect bpm or speed values */
+                UBYTE       globalslide; /* global volume slide rate */
+                UBYTE       pat_repcrazy;/* module has just looped to position -1 */
+                UWORD       patbrk;      /* position where to start a new pattern */
+                UBYTE       patdly;      /* patterndelay counter (command memory) */
+                UBYTE       patdly2;     /* patterndelay counter (real one) */
+                SWORD       posjmp;      /* flag to indicate a jump is needed... */
+                UWORD           bpmlimit;        /* threshold to detect bpm or speed values */
 } MODULE;
 
 
 /* This structure is used to query current playing voices status */
 typedef struct VOICEINFO {
-		INSTRUMENT* i;            /* Current channel instrument */
-		SAMPLE*     s;            /* Current channel sample */
-		SWORD       panning;      /* panning position */
-		SBYTE       volume;       /* channel's "global" volume (0..64) */
-		UWORD       period;       /* period to play the sample at */
-		UBYTE       kick;         /* if true = sample has been restarted */
+                INSTRUMENT* i;            /* Current channel instrument */
+                SAMPLE*     s;            /* Current channel sample */
+                SWORD       panning;      /* panning position */
+                SBYTE       volume;       /* channel's "global" volume (0..64) */
+                UWORD       period;       /* period to play the sample at */
+                UBYTE       kick;         /* if true = sample has been restarted */
 } VOICEINFO;
 
 /*
- *	========== Module loaders
+ *      ========== Module loaders
  */
 
 struct MLOADER;
@@ -576,7 +576,7 @@ MIKMODAPI extern struct MLOADER load_uni; /* MikMod and APlayer internal module 
 MIKMODAPI extern struct MLOADER load_xm;  /* FastTracker 2 (by Triton) */
 
 /*
- *	========== Module player
+ *      ========== Module player
  */
 
 MIKMODAPI extern MODULE* Player_Load(CHAR*,int,int);
@@ -607,9 +607,9 @@ MIKMODAPI extern void    Player_Mute(SLONG,...);
 MIKMODAPI extern void    Player_ToggleMute(SLONG,...);
 MIKMODAPI extern int     Player_GetChannelVoice(UBYTE);
 MIKMODAPI extern UWORD   Player_GetChannelPeriod(UBYTE);
-MIKMODAPI extern int     Player_QueryVoices(UWORD numvoices, VOICEINFO *vinfo); 
+MIKMODAPI extern int     Player_QueryVoices(UWORD numvoices, VOICEINFO *vinfo);
 MIKMODAPI extern int     Player_GetRow(void);
-MIKMODAPI extern int     Player_GetOrder(void); 
+MIKMODAPI extern int     Player_GetOrder(void);
 
 typedef void (*MikMod_player_t)(void);
 typedef void (*MikMod_callback_t)(unsigned char *data, size_t len);
@@ -620,17 +620,17 @@ MIKMODAPI extern MikMod_player_t MikMod_RegisterPlayer(MikMod_player_t);
 #define MUTE_INCLUSIVE  32001
 
 /*
- *	========== Drivers
+ *      ========== Drivers
  */
 
 enum {
-	MD_MUSIC = 0,
-	MD_SNDFX
+        MD_MUSIC = 0,
+        MD_SNDFX
 };
 
 enum {
-	MD_HARDWARE = 0,
-	MD_SOFTWARE
+        MD_HARDWARE = 0,
+        MD_SOFTWARE
 };
 
 /* Mixing flags */
@@ -652,40 +652,40 @@ enum {
 struct SAMPLOAD;
 typedef struct MDRIVER {
 struct MDRIVER* next;
-	CHAR*       Name;
-	CHAR*       Version;
+        CHAR*       Name;
+        CHAR*       Version;
 
-	UBYTE       HardVoiceLimit; /* Limit of hardware mixer voices */
-	UBYTE       SoftVoiceLimit; /* Limit of software mixer voices */
+        UBYTE       HardVoiceLimit; /* Limit of hardware mixer voices */
+        UBYTE       SoftVoiceLimit; /* Limit of software mixer voices */
 
-	CHAR        *Alias;
-	CHAR        *CmdLineHelp;
+        CHAR        *Alias;
+        CHAR        *CmdLineHelp;
 
-	void        (*CommandLine)      (CHAR*);
-	int        (*IsPresent)        (void);
-	SWORD       (*SampleLoad)       (struct SAMPLOAD*,int);
-	void        (*SampleUnload)     (SWORD);
-	ULONG       (*FreeSampleSpace)  (int);
-	ULONG       (*RealSampleLength) (int,struct SAMPLE*);
-	int        (*Init)             (void);
-	void        (*Exit)             (void);
-	int        (*Reset)            (void);
-	int        (*SetNumVoices)     (void);
-	int        (*PlayStart)        (void);
-	void        (*PlayStop)         (void);
-	void        (*Update)           (void);
-	void		(*Pause)			(void);
-	void        (*VoiceSetVolume)   (UBYTE,UWORD);
-	UWORD       (*VoiceGetVolume)   (UBYTE);
-	void        (*VoiceSetFrequency)(UBYTE,ULONG);
-	ULONG       (*VoiceGetFrequency)(UBYTE);
-	void        (*VoiceSetPanning)  (UBYTE,ULONG);
-	ULONG       (*VoiceGetPanning)  (UBYTE);
-	void        (*VoicePlay)        (UBYTE,SWORD,ULONG,ULONG,ULONG,ULONG,UWORD);
-	void        (*VoiceStop)        (UBYTE);
-	int        (*VoiceStopped)     (UBYTE);
-	SLONG       (*VoiceGetPosition) (UBYTE);
-	ULONG       (*VoiceRealVolume)  (UBYTE);
+        void        (*CommandLine)      (CHAR*);
+        int        (*IsPresent)        (void);
+        SWORD       (*SampleLoad)       (struct SAMPLOAD*,int);
+        void        (*SampleUnload)     (SWORD);
+        ULONG       (*FreeSampleSpace)  (int);
+        ULONG       (*RealSampleLength) (int,struct SAMPLE*);
+        int        (*Init)             (void);
+        void        (*Exit)             (void);
+        int        (*Reset)            (void);
+        int        (*SetNumVoices)     (void);
+        int        (*PlayStart)        (void);
+        void        (*PlayStop)         (void);
+        void        (*Update)           (void);
+        void            (*Pause)                        (void);
+        void        (*VoiceSetVolume)   (UBYTE,UWORD);
+        UWORD       (*VoiceGetVolume)   (UBYTE);
+        void        (*VoiceSetFrequency)(UBYTE,ULONG);
+        ULONG       (*VoiceGetFrequency)(UBYTE);
+        void        (*VoiceSetPanning)  (UBYTE,ULONG);
+        ULONG       (*VoiceGetPanning)  (UBYTE);
+        void        (*VoicePlay)        (UBYTE,SWORD,ULONG,ULONG,ULONG,ULONG,UWORD);
+        void        (*VoiceStop)        (UBYTE);
+        int        (*VoiceStopped)     (UBYTE);
+        SLONG       (*VoiceGetPosition) (UBYTE);
+        ULONG       (*VoiceRealVolume)  (UBYTE);
 } MDRIVER;
 
 /* These variables can be changed at ANY time and results will be immediate */
@@ -717,14 +717,14 @@ MIKMODAPI extern struct MDRIVER drv_wav;    /* RIFF WAVE file disk writer [music
 MIKMODAPI extern struct MDRIVER drv_aiff;   /* AIFF file disk writer [music.aiff] */
 
 MIKMODAPI extern struct MDRIVER drv_ultra;  /* Linux Ultrasound driver */
-MIKMODAPI extern struct MDRIVER drv_sam9407;	/* Linux sam9407 driver */
+MIKMODAPI extern struct MDRIVER drv_sam9407;    /* Linux sam9407 driver */
 
 MIKMODAPI extern struct MDRIVER drv_AF;     /* Dec Alpha AudioFile */
 MIKMODAPI extern struct MDRIVER drv_aix;    /* AIX audio device */
 MIKMODAPI extern struct MDRIVER drv_alsa;   /* Advanced Linux Sound Architecture (ALSA) */
 MIKMODAPI extern struct MDRIVER drv_esd;    /* Enlightened sound daemon (EsounD) */
 MIKMODAPI extern struct MDRIVER drv_hp;     /* HP-UX audio device */
-MIKMODAPI extern struct MDRIVER drv_nas;    /* Network Audio System (NAS) */	
+MIKMODAPI extern struct MDRIVER drv_nas;    /* Network Audio System (NAS) */
 MIKMODAPI extern struct MDRIVER drv_oss;    /* OpenSound System (Linux,FreeBSD...) */
 MIKMODAPI extern struct MDRIVER drv_sgi;    /* SGI audio library */
 MIKMODAPI extern struct MDRIVER drv_sun;    /* Sun/NetBSD/OpenBSD audio device */
@@ -736,7 +736,7 @@ MIKMODAPI extern struct MDRIVER drv_ds;     /* Win32 DirectSound driver */
 MIKMODAPI extern struct MDRIVER drv_win;    /* Win32 multimedia API driver */
 
 MIKMODAPI extern struct MDRIVER drv_mac;    /* Macintosh Sound Manager driver */
-MIKMODAPI extern struct MDRIVER drv_osx;	/* MacOS X CoreAudio Driver */
+MIKMODAPI extern struct MDRIVER drv_osx;        /* MacOS X CoreAudio Driver */
 
 MIKMODAPI extern struct MDRIVER drv_gp32;   /* GP32 Sound driver */
 

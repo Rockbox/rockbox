@@ -62,7 +62,7 @@ static inline void fft4(FFTComplex * z)
                   : :[z] "a" (z)
                   : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7",
                     "a0", "cc", "memory");
-                  
+
 }
 
 #define FFT_FFMPEG_INCL_OPTIMISED_FFT8
@@ -72,27 +72,27 @@ static inline void fft8(FFTComplex *z)
                   "move.l  %%d0, %%a1\n\t"
                   "add.l   %%d2, %%a1\n\t" /* a1 == t1 */
                   "sub.l   %%d2, %%d0\n\t" /* d0 == z[5].re */
-                  
+
                   "move.l  %%d1, %%a2\n\t"
                   "add.l   %%d3, %%a2\n\t" /* a2 == t2 */
                   "sub.l   %%d3, %%d1\n\t" /* d1 == z[5].im */
-                  
+
                   "move.l  %%d4, %%d2\n\t"
                   "add.l   %%d6, %%d2\n\t" /* d2 == t3 */
                   "sub.l   %%d6, %%d4\n\t" /* d4 == z[7].re */
-                  
+
                   "move.l  %%d5, %%d3\n\t"
                   "add.l   %%d7, %%d3\n\t" /* d3 == t4 */
                   "sub.l   %%d7, %%d5\n\t" /* d5 == z[7].im */
-                  
+
                   "move.l  %%d2, %%a4\n\t"
                   "sub.l   %%a1, %%a4\n\t" /* a4 == t8 */
                   "add.l   %%d2, %%a1\n\t" /* a1 == t1, d2 free */
-                  
+
                   "move.l  %%a2, %%a3\n\t"
                   "sub.l   %%d3, %%a3\n\t" /* a3 == t7 */
                   "add.l   %%d3, %%a2\n\t" /* a2 == t2, d3 free */
-                  
+
                   /* emac block from TRANSFORM_EQUAL, do this now
                      so we don't need to store and load z[5] and z[7] */
                   "move.l  %[_cPI2_8], %%d2\n\t"
@@ -100,7 +100,7 @@ static inline void fft8(FFTComplex *z)
                   "mac.l   %%d2, %%d1, %%acc1\n\t"
                   "mac.l   %%d2, %%d4, %%acc2\n\t"
                   "mac.l   %%d2, %%d5, %%acc3\n\t"
-                  
+
                   /* fft4, clobbers all d regs and a0 */
                   "movem.l (%[z]), %%d0-%%d7\n\t"
                   "move.l  %%d0, %%a0\n\t"
@@ -230,7 +230,7 @@ static inline FFTComplex* TRANSFORM(FFTComplex * z, unsigned int n, FFTSample wr
 
                   "movclr.l %%acc3,    %%d7\n\t"       /* t6 */
                   "movclr.l %%acc1,    %%d3\n\t"       /* t2 */
-                  
+
                   "move.l   %%d3,      %[wre]\n\t"
                   "add.l    %%d7,      %[wre]\n\t"
                   "sub.l    %%d7,      %%d3\n\t"       /* t2 = t6-t2 */
@@ -322,7 +322,7 @@ static inline FFTComplex* TRANSFORM_EQUAL(FFTComplex * z, unsigned int n)
                   "movclr.l %%acc1,    %%d1\n\t"
                   "movclr.l %%acc2,    %%d2\n\t"
                   "movclr.l %%acc3,    %%d3\n\t"
-                  
+
                   "move.l   %%d0, %%d7\n\t"
                   "add.l    %%d1, %%d0\n\t"            /* d0 == t1 */
                   "sub.l    %%d7, %%d1\n\t"            /* d1 == t2 */

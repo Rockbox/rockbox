@@ -54,7 +54,7 @@ int blockclen;
     DYNA_JSR((n)); \
     DYNA_MOVEA_l_i_to_r(&cpu.a,3); \
     DYNA_MOVEM(3,0x3FE,1);
-    
+
 /*
  * SUBQ 2, %a0                 decrease gb sp
  * PEA #(n)                    push n
@@ -67,8 +67,8 @@ int blockclen;
     DYNA_PEA_w_i((n)); \
     DYNA_PUSH_l_r(0,1); \
     CALL_NATIVE(&writew); \
-    DYNA_ADDQ_l_i_to_r(0,7,1);    
-    
+    DYNA_ADDQ_l_i_to_r(0,7,1);
+
 /*
  * PUSH %a0                push gb sp
  * call_native readw(SP);
@@ -344,7 +344,7 @@ void DYNA_BCC_c(un8 cond, int size,int i)
     }
     if((size==2&&displace>0x7f) || (size==4 && displace>0x7FFF))
         die("Dynarec error! BCC invalid displacement");
-    else if(displace>0&&displace<0x7F) 
+    else if(displace>0&&displace<0x7F)
         *( (unsigned short *) branchp[i])=0x6000|((cond&0xF)<<8)|(displace&0xFF);
     else if(displace>0x7F&&displace<0x7FFF)
     {
@@ -354,7 +354,7 @@ void DYNA_BCC_c(un8 cond, int size,int i)
     }
     else
         die("Dynarec error! BCC invalid displacement");
-        
+
     branchp[i]=0;
 }
 
@@ -447,9 +447,9 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 break;
             case 0x01: /* LD BC,imm */
                 /* warning (do we have endianness right?) */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD BC,#0x%x\n",readw(xPC)); 
-#endif              
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD BC,#0x%x\n",readw(xPC));
+#endif
                 temp=readw(xPC);
                 DYNA_MOVEQ_l_i_to_r((temp&0xFF00)>>8,2);
                 DYNA_MOVEQ_l_i_to_r(temp&0xFF,3);
@@ -478,8 +478,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_DEC_l_r(2,0); /* Is this right? */
                 break;
             case 0x06: /* LD B,imm */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD B,#0x%x\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD B,#0x%x\n",readb(xPC));
 #endif
                 DYNA_MOVEQ_l_i_to_r(FETCH,2);
                 break;
@@ -526,8 +526,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_DEC_l_r(3,0);  /* Is this right? */
                 break;
             case 0x0E: /* LD C,imm */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD C,#0x%x\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD C,#0x%x\n",readb(xPC));
 #endif
                 DYNA_MOVEQ_l_i_to_r(FETCH,3);
                 break;
@@ -573,8 +573,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_DEC_l_r(4,0);  /* Is this right? */
                 break;
             case 0x16: /* LD D,imm */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD D,#0x%x\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD D,#0x%x\n",readb(xPC));
 #endif
                 DYNA_MOVEQ_l_i_to_r(FETCH,4);
                 break;
@@ -621,8 +621,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_DEC_l_r(5,0);  /* Is this right? */
                 break;
             case 0x1E: /* LD E,imm */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD E,#0x%x\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD E,#0x%x\n",readb(xPC));
 #endif
                 DYNA_MOVEQ_l_i_to_r(FETCH,5);
                 break;
@@ -632,8 +632,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x20: /* JR NZ */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"JR NZ\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"JR NZ\n");
 #endif
                 DYNA_BTST_l_r(8,7); /* btst #8,d7 */
                 DYNA_DUMMYBRANCH(2,0);
@@ -678,8 +678,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x26: /* LD H,imm */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD H,#0x%x\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD H,#0x%x\n",readb(xPC));
 #endif
                 DYNA_AND_l_i_to_r(0xFF,6);
                 DYNA_OR_l_i_to_r(FETCH<<8,6);
@@ -720,8 +720,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x2E: /* LD L,imm */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD L,#0x%x\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD L,#0x%x\n",readb(xPC));
 #endif
                 DYNA_AND_l_i_to_r(0xFF00,6);
                 DYNA_OR_l_i_to_r(FETCH,6);
@@ -741,7 +741,7 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 fdprintf(fd,"LD SP,#0x%x\n",readw(xPC));
 #endif
                 DYNA_MOVEA_l_i_to_r(readw(xPC),0);
-                PC += 2; 
+                PC += 2;
                 break;
             case 0x32: /* LD (HLD),A */
 #ifdef DYNA_DEBUG
@@ -806,8 +806,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_DEC_l_r(1,0);  /* Is this right? */
                 break;
             case 0x3E: /* LD A,imm */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,#0x%x\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,#0x%x\n",readb(xPC));
 #endif
                 DYNA_MOVEQ_l_i_to_r(FETCH,1);
                 break;
@@ -825,7 +825,7 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #ifdef DYNA_DEBUG
                 fdprintf(fd,"LD B,C\n");
 #endif
-                DYNA_MOVE_b_r_to_r(3,2); 
+                DYNA_MOVE_b_r_to_r(3,2);
                 break;
             case 0x42: /* LD B,D */
 #ifdef DYNA_DEBUG
@@ -834,21 +834,21 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_MOVE_b_r_to_r(4,2);
                 break;
             case 0x43: /* LD B,E */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD B,E\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD B,E\n");
 #endif
                 DYNA_MOVE_b_r_to_r(5,2);
                 break;
             case 0x44: /* LD B,H */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD B,H\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD B,H\n");
 #endif
                 GETUPPER(6,0);
                 DYNA_MOVE_b_r_to_r(0,2);
                 break;
             case 0x45: /* LD B,L */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD B,L\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD B,L\n");
 #endif
                 DYNA_MOVE_b_r_to_r(6,2);
                 break;
@@ -858,41 +858,41 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x47: /* LD B,A */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD B,A\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD B,A\n");
 #endif
                 DYNA_MOVE_b_r_to_r(1,2);
                 break;
             case 0x48: /* LD C,B */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD C,B\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD C,B\n");
 #endif
                 DYNA_MOVE_b_r_to_r(2,3);
-                break;                
+                break;
             case 0x49: /* LD C,C */
                 break;
             case 0x4A: /* LD C,D */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD C,D\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD C,D\n");
 #endif
                 DYNA_MOVE_b_r_to_r(4,3);
                 break;
             case 0x4B: /* LD C,E */
-#ifdef DYNA_DEBUG 
+#ifdef DYNA_DEBUG
                 fdprintf(fd,"LD C,E\n");
 #endif
                 DYNA_MOVE_b_r_to_r(5,3);
                 break;
             case 0x4C: /* LD C,H */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD C,H\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD C,H\n");
 #endif
                 GETUPPER(6,0);
                 DYNA_MOVE_b_r_to_r(0,3);
                 break;
             case 0x4D: /* LD C,L */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD C,L\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD C,L\n");
 #endif
                 DYNA_MOVE_b_r_to_r(6,3);
                 break;
@@ -902,41 +902,41 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x4F: /* LD C,A */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD C,A\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD C,A\n");
 #endif
                 DYNA_MOVE_b_r_to_r(1,3);
                 break;
             case 0x50: /* LD D,B */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD D,B\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD D,B\n");
 #endif
                 DYNA_MOVE_b_r_to_r(2,4);
                 break;
             case 0x51: /* LD D,C */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD D,C\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD D,C\n");
 #endif
                 DYNA_MOVE_b_r_to_r(3,4);
-                break;  
+                break;
             case 0x52: /* LD D,D */
                 break;
             case 0x53: /* LD D,E */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD D,E\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD D,E\n");
 #endif
                 DYNA_MOVE_b_r_to_r(5,4);
                 break;
             case 0x54: /* LD D,H */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD D,H\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD D,H\n");
 #endif
                 GETUPPER(6,0);
                 DYNA_MOVE_b_r_to_r(0,4);
                 break;
             case 0x55: /* LD D,L */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD D,L\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD D,L\n");
 #endif
                 DYNA_MOVE_b_r_to_r(6,4);
                 break;
@@ -946,41 +946,41 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x57: /* LD D,A */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD D,A\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD D,A\n");
 #endif
                 DYNA_MOVE_b_r_to_r(1,4);
-                break;      
+                break;
             case 0x58: /* LD E,B */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD E,B\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD E,B\n");
 #endif
                 DYNA_MOVE_b_r_to_r(2,5);
                 break;
             case 0x59: /* LD E,C */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD E,C\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD E,C\n");
 #endif
                 DYNA_MOVE_b_r_to_r(3,5);
                 break;
             case 0x5A: /* LD E,D */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD E,D\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD E,D\n");
 #endif
                 DYNA_MOVE_b_r_to_r(4,5);
-                break;         
+                break;
             case 0x5B: /* LD E,E */
                 break;
             case 0x5C: /* LD E,H */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD E,H\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD E,H\n");
 #endif
                 GETUPPER(6,0);
-                DYNA_MOVE_b_r_to_r(0,5); 
+                DYNA_MOVE_b_r_to_r(0,5);
                 break;
             case 0x5D: /* LD E,L */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD E,L\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD E,L\n");
 #endif
                 DYNA_MOVE_b_r_to_r(6,5);
                 break;
@@ -990,35 +990,35 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x5F: /* LD E,A */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD E,A\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD E,A\n");
 #endif
-                DYNA_MOVE_b_r_to_r(1,5); 
+                DYNA_MOVE_b_r_to_r(1,5);
                 break;
             case 0x60: /* LD H,B */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD H,B\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD H,B\n");
 #endif
                 DYNA_MOVE_b_r_to_r(2,0);
                 PUTUPPER(0,6);
                 break;
             case 0x61: /* LD H,C */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD H,C\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD H,C\n");
 #endif
                 DYNA_MOVE_b_r_to_r(3,0);
                 PUTUPPER(0,6);
                 break;
             case 0x62: /* LD H,D */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD H,D\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD H,D\n");
 #endif
                 DYNA_MOVE_b_r_to_r(4,0);
                 PUTUPPER(0,6);
                 break;
             case 0x63: /* LD H,E */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD H,E\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD H,E\n");
 #endif
                 DYNA_MOVE_b_r_to_r(5,0);
                 PUTUPPER(0,6);
@@ -1026,8 +1026,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
             case 0x64: /* LD H,H */
                 break;
             case 0x65: /* LD H,L */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD H,L\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD H,L\n");
 #endif
                 DYNA_MOVE_b_r_to_r(6,0);
                 PUTUPPER(0,6);
@@ -1038,43 +1038,43 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x67: /* LD H,A */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD H,A\n"); 
-#endif          
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD H,A\n");
+#endif
                 DYNA_MOVE_b_r_to_r(1,0);
                 PUTUPPER(0,6);
                 break;
             case 0x68: /* LD L,B */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD L,B\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD L,B\n");
 #endif
                 DYNA_MOVE_b_r_to_r(2,6);
                 break;
             case 0x69: /* LD L,C */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD L,C\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD L,C\n");
 #endif
                 DYNA_MOVE_b_r_to_r(3,6);
                 break;
             case 0x6A: /* LD L,D */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD L,D\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD L,D\n");
 #endif
                 DYNA_MOVE_b_r_to_r(4,6);
                 break;
             case 0x6B: /* LD L,E */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD L,E\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD L,E\n");
 #endif
                 DYNA_MOVE_b_r_to_r(5,6);
                 break;
             case 0x6C: /* LD L,H */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD L,H\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD L,H\n");
 #endif
                 GETUPPER(6,0);
                 DYNA_MOVE_b_r_to_r(0,6);
-                break;    
+                break;
             case 0x6D: /* LD L,L */
                 break;
             case 0x6E: /* LD L,(HL) */
@@ -1128,42 +1128,42 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0x78: /* LD A,B */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,B\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,B\n");
 #endif
                 DYNA_MOVE_b_r_to_r(2,1);
                 break;
             case 0x79: /* LD A,C */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,C\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,C\n");
 #endif
                 DYNA_MOVE_b_r_to_r(3,1);
                 break;
             case 0x7A: /* LD A,D */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,D\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,D\n");
 #endif
                 DYNA_MOVE_b_r_to_r(4,1);
                 break;
             case 0x7B: /* LD A,E */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,E\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,E\n");
 #endif
                 DYNA_MOVE_b_r_to_r(5,1);
                 break;
             case 0x7C: /* LD A,H */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,H\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,H\n");
 #endif
                 GETUPPER(5,0);
                 DYNA_MOVE_b_r_to_r(0,1);
                 break;
             case 0x7D: /* LD A,L */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,L\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,L\n");
 #endif
                 DYNA_MOVE_b_r_to_r(5,1);
-                break; 
+                break;
             case 0x7E: /* LD A,HL */
 #ifdef DYNA_DEBUG
                 fdprintf(fd, "LD A,HL\n");
@@ -1212,7 +1212,7 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 /* code taken from gcc -O3 output by compiling;
                  *     c=(2*b)&0xFF;
-                 *     a=(c) ? 0 : 0x80 |            zero flag 
+                 *     a=(c) ? 0 : 0x80 |            zero flag
                  *           (0x20 & (c) << 1) |     halfcarry
                  *           ((2*b)&0x100)>>4;       carry
                  */
@@ -1220,9 +1220,9 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_ADD_l_r_to_r(0,0,0); /* add.l d0, d0 */
                 DYNA_AND_l_i_to_r(510,0); /* and.l #510, d0 */
                 DYNA_MOVEA_l_r_to_r(0,3,0); /* movea.l d0,a3 */
-                DYNA_CLR_b_r(7); /* clr.b d7 */ 
+                DYNA_CLR_b_r(7); /* clr.b d7 */
                 DYNA_TST_b_r(0,0); /* tst.b d0 */
-                DYNA_DUMMYBRANCH(2,0); 
+                DYNA_DUMMYBRANCH(2,0);
                 DYNA_MOVE_l_r_to_r(1,0,0); /* move.l d1,d0 */
                 DYNA_LSHIFT_l(3,0,0,0); /* lsr.l #3, d0 */
                 DYNA_MOVEQ_l_i_to_r(16,1); /* moveq #16,d1 */
@@ -1527,8 +1527,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break;
             case 0xC2: /* JP NZ */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"JP NZ\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"JP NZ\n");
 #endif
                 DYNA_BTST_l_r(8,7); /* btst #8,d7 */
                 DYNA_DUMMYBRANCH(2,0);
@@ -1541,8 +1541,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 PC+=2;
                 break;
             case 0xC3: /* JP (imm) PC = readw(PC) */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"JP (0x%x)\n",readw(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"JP (0x%x)\n",readw(xPC));
 #endif
                 PC=readw(PC);
                 done=1;
@@ -1573,8 +1573,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xC9: /* RET */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"RET\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"RET\n");
 #endif
                 POPA(1);
                 writepc=0;
@@ -1583,8 +1583,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
             case 0xCA: /* JP Z */
                 break; /* FIXME: Implement */
             case 0xCB: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xCC: /* CALL Z */
@@ -1611,8 +1611,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xD0: /* RET NC */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"RET NC\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"RET NC\n");
 #endif
                 DYNA_BTST_l_r(5,7); /* btst #5,d7 */
                 DYNA_DUMMYBRANCH(2,0);
@@ -1634,8 +1634,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xD3: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xD4: /* CALL NC */
@@ -1674,8 +1674,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xDB: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xDC: /* CALL NC */
@@ -1684,8 +1684,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xDD: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xDE: /* SBC A,imm */
@@ -1699,8 +1699,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xE0: /* LDH (imm),A */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD (0x%x),A\n",readb(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD (0x%x),A\n",readb(xPC));
 #endif
                 DYNA_PUSH_l_r(1,0);
                 DYNA_PEA_w_i(FETCH);
@@ -1719,14 +1719,14 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xE3: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xE4: /* NULL */
                 break;
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
             case 0xE5: /* PUSH HL */
 #ifdef DYNA_DEBUG
@@ -1759,18 +1759,18 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xEB: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xEC: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xED: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xEE: /* XOR imm */
@@ -1813,8 +1813,8 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 /* cpu.halt = cpu.ima = cpu.ime = 0; */
                 break;
             case 0xF4: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xF5: /* PUSH AF */
@@ -1838,14 +1838,14 @@ void dynamic_recompile (struct dynarec_block *newblock)
 #endif
                 break; /* FIXME: Implement */
             case 0xF9: /* LD SP,HL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD SP,HL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD SP,HL\n");
 #endif
                 DYNA_MOVEA_w_r_to_r(6,0,0);
                 break;
             case 0xFA: /* LD A, (imm) */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"LD A,(0x%x)\n",readw(xPC)); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"LD A,(0x%x)\n",readw(xPC));
 #endif
                 /*DYNA_PEA_w_i(readw(xPC));
                 PC+=2; \
@@ -1854,22 +1854,22 @@ void dynamic_recompile (struct dynarec_block *newblock)
                 DYNA_MOVE_l_r_to_r(0,1,0);*/
                 break;
             case 0xFB: /* EI */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"EI\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"EI\n");
 #endif
                 DYNA_MOVEQ_l_i_to_r(1,0);
                 DYNA_MOVEA_l_i_to_r(&cpu.ima,3);
                 DYNA_MOVE_l_r_to_m(0,3);
                 /*cpu.ima=1; */
-                break; 
+                break;
             case 0xFC: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xFD: /* NULL */
-#ifdef DYNA_DEBUG 
-                fdprintf(fd,"NULL\n"); 
+#ifdef DYNA_DEBUG
+                fdprintf(fd,"NULL\n");
 #endif
                 break;
             case 0xFE: /* CMP #<imm> TODO: can be (much) more efficient.*/
@@ -1891,12 +1891,12 @@ void dynamic_recompile (struct dynarec_block *newblock)
                die(meow);
                return;
                break;
-        }  
+        }
     }
-#ifdef DYNA_DEBUG 
-    fdprintf(fd,"(End of Block)\n"); 
+#ifdef DYNA_DEBUG
+    fdprintf(fd,"(End of Block)\n");
     close(fd);
-#endif    
+#endif
     DYNA_MOVEA_l_i_to_r(&blockclen,3);
     DYNA_MOVE_l_i_to_m(tclen,3);
     if(writepc)

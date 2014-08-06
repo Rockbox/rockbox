@@ -281,7 +281,7 @@ void dsp_proc_activate(struct dsp_config *dsp, enum dsp_proc_ids id,
     {
         dsp->proc_mask_active |= mask;
         s->mask &= ~NACT_BIT;
-    }        
+    }
     else
     {
         dsp->proc_mask_active &= ~mask;

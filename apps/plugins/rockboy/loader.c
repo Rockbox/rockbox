@@ -42,23 +42,23 @@ static const int mbc_table[256] =
     0,
     0,
     0,
-    MBC_BAT, 
-    0, 
+    MBC_BAT,
+    0,
     MBC_MBC3 | MBC_BAT | MBC_RTC,
     MBC_MBC3 | MBC_BAT | MBC_RTC,
-    MBC_MBC3, 
-    MBC_MBC3, 
+    MBC_MBC3,
+    MBC_MBC3,
     MBC_MBC3 | MBC_BAT,
     0,
-    0, 
-    0, 
-    0, 
     0,
-    MBC_MBC5, 
+    0,
+    0,
+    0,
     MBC_MBC5,
-    MBC_MBC5 | MBC_BAT, 
-    MBC_RUMBLE, 
-    MBC_RUMBLE, 
+    MBC_MBC5,
+    MBC_MBC5 | MBC_BAT,
+    MBC_RUMBLE,
+    MBC_RUMBLE,
     MBC_RUMBLE | MBC_BAT,
     0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -77,8 +77,8 @@ static const int mbc_table[256] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    MBC_HUC3, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    MBC_HUC3,
     MBC_HUC1
 };
 
@@ -135,7 +135,7 @@ static byte *loadfile(int fd, int *len)
         return 0;
     }
     lseek(fd,0,SEEK_SET);
-    
+
     read(fd, d, *len);
 
     return d;
@@ -148,7 +148,7 @@ static int rom_load(void)
     int len = 0, rlen;
 
     fd = open(romfile, O_RDONLY);
-    
+
     if (fd<0)
     {
       die("cannot open rom file %s", romfile);
@@ -163,7 +163,7 @@ static int rom_load(void)
         return 1;
     }
     header = data; /* no zip. = decompress(data, &len); */
-    
+
     memcpy(rom.name, header+0x0134, 16);
     if (rom.name[14] & 0x80) rom.name[14] = 0;
     if (rom.name[15] & 0x80) rom.name[15] = 0;
@@ -181,7 +181,7 @@ static int rom_load(void)
         die("unknown ROM size %02X\n", header[0x0148]);
         return 1;
     }
-    
+
     if(header[0x0149]<5)
         mbc.ramsize = ramsize_table[header[0x0149]];
     else
@@ -232,7 +232,7 @@ static int sram_load(void)
     if (fd<0) return -1;
     read(fd,ram.sbank, 8192*mbc.ramsize);
     close(fd);
-    
+
     return 0;
 }
 
@@ -248,7 +248,7 @@ static int sram_save(void)
     if (fd<0) return -1;
     write(fd,ram.sbank, 8192*mbc.ramsize);
     close(fd);
-    
+
     return 0;
 }
 
@@ -272,7 +272,7 @@ static void rtc_load(void)
 
 void sn_save(void)
 {
-    int fd;    
+    int fd;
     if ((fd = open(snfile, O_WRONLY | O_CREAT, 0666)) < 0)
         return;
     savestate(fd);
@@ -281,7 +281,7 @@ void sn_save(void)
 
 void sn_load(void)
 {
-    int fd;    
+    int fd;
     if ((fd = open(snfile, O_RDONLY, 0666)) < 0)
         return;
     loadstate(fd);
@@ -300,7 +300,7 @@ void loader_init(const char *s)
     romfile = s;
     if(rom_load())
         return;
-    
+
     snprintf(saveprefix, 499, "%s/%s", savedir, rom.name);
 
     strcpy(sramfile, saveprefix);
@@ -310,7 +310,7 @@ void loader_init(const char *s)
     strcat(rtcfile, ".rtc");
     strcpy(snfile, saveprefix);
     strcat(snfile, ".sn");
-    
+
     sram_load();
     rtc_load();
 }

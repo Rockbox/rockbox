@@ -30,7 +30,7 @@
 #define PACKET_HEADER_SIZE 12
 
 enum codecs {
-    CODEC_COOK, 
+    CODEC_COOK,
     CODEC_AAC,
     CODEC_AC3,
     CODEC_ATRAC
@@ -49,8 +49,8 @@ typedef struct rm_packet
     uint8_t  data[30000]; /* Reordered data. No malloc, hence the size */
 #endif
 }RMPacket;
-    
-typedef struct rm_context 
+
+typedef struct rm_context
 {
     /* Demux Context */
     int old_format;
@@ -69,7 +69,7 @@ typedef struct rm_context
     uint16_t sub_packet_lengths[16]; /* Length of each subpacket */
 
     /* Codec Context */
-    enum codecs codec_type; 
+    enum codecs codec_type;
     uint16_t block_align;
     uint32_t nb_packets;
     int frame_number;
@@ -80,7 +80,7 @@ typedef struct rm_context
 
     /*codec extradata*/
     uint32_t extradata_size;
-    uint8_t  codec_extradata[MAX_EXTRADATA_SIZE];    
+    uint8_t  codec_extradata[MAX_EXTRADATA_SIZE];
 
 } RMContext;
 

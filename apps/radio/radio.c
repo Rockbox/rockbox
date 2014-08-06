@@ -295,7 +295,7 @@ void remember_frequency(void)
 {
     const struct fm_region_data * const fmr =
         &fm_region_data[global_settings.fm_region];
-    global_status.last_frequency = (curr_freq - fmr->freq_min) 
+    global_status.last_frequency = (curr_freq - fmr->freq_min)
                                    / fmr->freq_step;
     status_save();
 }
@@ -386,7 +386,7 @@ void radio_screen(void)
     skin_get_global_state()->id3 = NULL;
 #ifdef HAVE_ALBUMART
     radioart_init(true);
-#endif    
+#endif
 
     if(radio_status == FMRADIO_OFF)
         audio_stop();

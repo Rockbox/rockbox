@@ -12,25 +12,25 @@
 #  define TEXT .text
 # endif
 
-# define _ENTRY(name)	\
-	TEXT; .balign 8; .globl name; name:
+# define _ENTRY(name)   \
+        TEXT; .balign 8; .globl name; name:
 #else
-#define _ENTRY(name)	\
-	.text; .align 2; .globl name; name:
+#define _ENTRY(name)    \
+        .text; .align 2; .globl name; name:
 #endif /* __SH5__ */
 
-#define ENTRY(name)	\
-	_ENTRY(_C_LABEL(name))
+#define ENTRY(name)     \
+        _ENTRY(_C_LABEL(name))
 
 #if (defined (__sh2__) || defined (__SH2E__) || defined (__sh3__) || defined (__SH3E__) \
      || defined (__SH4_SINGLE__) || defined (__SH4__)) \
      || defined (__SH4_SINGLE_ONLY__) || defined (__SH5__) || defined (__SH2A__)
 #define DELAYED_BRANCHES
 #define SL(branch, dest, in_slot, in_slot_arg2) \
-	branch##.s dest; in_slot, in_slot_arg2
+        branch##.s dest; in_slot, in_slot_arg2
 #else
 #define SL(branch, dest, in_slot, in_slot_arg2) \
-	in_slot, in_slot_arg2; branch dest
+        in_slot, in_slot_arg2; branch dest
 #endif
 
 #ifdef __LITTLE_ENDIAN__

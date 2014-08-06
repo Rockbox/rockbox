@@ -160,4 +160,3 @@ int midi_debug(const char *fmt, ...)
     }
     return 1;
 }
-

@@ -47,7 +47,7 @@ void vcf_tilde_setup(void);
 void vd_tilde_setup(void);
 void vline_tilde_setup(void);
 void vsnapshot_tilde_setup(void);
-void wrap_tilde_setup(void); 
+void wrap_tilde_setup(void);
 #endif /* ROCKBOX */
 
 void d_intern_setup(void) {
@@ -95,6 +95,5 @@ void d_intern_setup(void) {
     vd_tilde_setup();
     vline_tilde_setup();
     vsnapshot_tilde_setup();
-    wrap_tilde_setup(); 
+    wrap_tilde_setup();
 }
-

@@ -113,4 +113,3 @@ class BootloaderInstallBase : public QObject
 Q_DECLARE_OPERATORS_FOR_FLAGS(BootloaderInstallBase::Capabilities)
 
 #endif
-

@@ -306,5 +306,3 @@ int main(int argc, char **argv)
     /* send file */
     return send_recovery(dev, xfer_size, file_buf, size);
 }
-
- 

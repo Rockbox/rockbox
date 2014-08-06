@@ -24,8 +24,8 @@
 #include "ltm.h"
 
 
-#define state_size(x)	(sizeof(x) + LUAI_EXTRASPACE)
-#define fromstate(l)	(cast(lu_byte *, (l)) - LUAI_EXTRASPACE)
+#define state_size(x)   (sizeof(x) + LUAI_EXTRASPACE)
+#define fromstate(l)    (cast(lu_byte *, (l)) - LUAI_EXTRASPACE)
 #define tostate(l)   (cast(lua_State *, cast(lu_byte *, l) + LUAI_EXTRASPACE))
 
 
@@ -36,7 +36,7 @@ typedef struct LG {
   lua_State l;
   global_State g;
 } LG;
-  
+
 
 
 static void stack_init (lua_State *L1, lua_State *L) {
@@ -211,4 +211,3 @@ LUA_API void lua_close (lua_State *L) {
   luai_userstateclose(L);
   close_state(L);
 }
-

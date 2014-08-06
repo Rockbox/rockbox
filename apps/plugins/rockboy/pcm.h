@@ -20,5 +20,3 @@ int  rockboy_pcm_submit(void);
 void rockboy_pcm_close(void);
 
 #endif
-
-

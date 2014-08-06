@@ -39,7 +39,7 @@
 /* sqrt(220^2 + 176^2) / 2.2 = 128.1 */
 #define LCD_DPI 128
 #define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565 
+#define LCD_PIXELFORMAT RGB565
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 

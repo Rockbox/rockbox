@@ -127,7 +127,7 @@ static int toggle_radio_mode(void)
     return 0;
 }
 MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0,
-                                 toggle_radio_mode, NULL, 
+                                 toggle_radio_mode, NULL,
                                  get_mode_text, mode_speak_item,
                                  NULL, NULL, Icon_NOICON);
 #endif
@@ -157,4 +157,3 @@ MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
             &recsettings_item,
 #endif
             &scan_presets_item);
-

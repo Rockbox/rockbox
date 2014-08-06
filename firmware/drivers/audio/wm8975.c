@@ -50,7 +50,7 @@ static unsigned short wm8975_regs[WM8975_NUM_REGISTERS] =
 #else
     [PWRMGMT1] = PWRMGMT1_VMIDSEL_5K | PWRMGMT1_VREF,
 #endif
-    [PWRMGMT2] = PWRMGMT2_DACL | PWRMGMT2_DACR | PWRMGMT2_LOUT1 
+    [PWRMGMT2] = PWRMGMT2_DACL | PWRMGMT2_DACR | PWRMGMT2_LOUT1
                  | PWRMGMT2_ROUT1 | PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2,
 };
 
@@ -138,10 +138,10 @@ void audiohw_preinit(void)
     sleep(HZ/50);
     wm8975_regs[PWRMGMT1] &= ~PWRMGMT1_VMIDSEL_MASK;
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1] | PWRMGMT1_VMIDSEL_50K);
-    
+
     /* 4. Enable DACs, line and headphone output buffers as required. */
     wm8975_write(PWRMGMT2, wm8975_regs[PWRMGMT2]);
-    
+
     wm8975_write(AINTFCE, AINTFCE_MS | AINTFCE_LRP_I2S_RLO
                         | AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
 
@@ -156,10 +156,10 @@ void audiohw_preinit(void)
 
     wm8975_write(LOUTMIX1, LOUTMIX1_LD2LO| LOUTMIX1_LI2LOVOL(5));
     wm8975_write(LOUTMIX2, LOUTMIX2_RI2LOVOL(5));
-    
+
     wm8975_write(ROUTMIX1, ROUTMIX1_LI2ROVOL(5));
     wm8975_write(ROUTMIX2, ROUTMIX2_RD2RO| ROUTMIX2_RI2ROVOL(5));
-    
+
     wm8975_write(MOUTMIX1, 0);
     wm8975_write(MOUTMIX2, 0);
 }
@@ -278,7 +278,7 @@ void audiohw_enable_recording(bool source_mic)
     wm8975_write_and(RINVOL, ~RINVOL_RINMUTE);
 }
 
-void audiohw_disable_recording(void) 
+void audiohw_disable_recording(void)
 {
     /* mute inputs */
     wm8975_write_or(LINVOL, LINVOL_LINMUTE);

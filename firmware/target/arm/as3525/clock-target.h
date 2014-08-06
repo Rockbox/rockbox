@@ -167,7 +167,7 @@
 
 #define AS3525_PCLK_SEL          AS3525_CLK_PLLA
          /*unable to use AS3525_PCLK_DIV1 != 0 successfuly so far*/
-#define AS3525_PCLK_DIV1         (CLK_DIV(AS3525_DRAM_FREQ, AS3525_PCLK_FREQ) - 1)/* div = 1/(n+1)*/ 
+#define AS3525_PCLK_DIV1         (CLK_DIV(AS3525_DRAM_FREQ, AS3525_PCLK_FREQ) - 1)/* div = 1/(n+1)*/
 #define AS3525_PCLK_DIV0         (CLK_DIV(AS3525_PLLA_FREQ, AS3525_DRAM_FREQ) - 1) /*div=1/(n+1)*/
 #else
 

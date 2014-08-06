@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  * A tool to generate the Rockbox "voicefont", a collection of all the UI
- * strings. 
- * 
+ * strings.
+ *
  * Details at http://www.rockbox.org/twiki/bin/view/Main/VoiceBuilding
  *
  ****************************************************************************/
@@ -40,4 +40,3 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
 }
 #endif
 #endif
-

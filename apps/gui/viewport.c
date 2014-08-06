@@ -208,7 +208,7 @@ void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw)
     int top = --theme_stack_top[screen];
     if (top < 0)
         panicf("Stack underflow... viewportmanager");
-    
+
     toggle_theme(screen, force_redraw);
 }
 
@@ -352,7 +352,7 @@ void viewport_set_defaults(struct viewport *vp,
         return;
     }
     sbs_area = sb_skin_get_info_vp(screen);
-    
+
     if (sbs_area)
         *vp = *sbs_area;
     else

@@ -50,4 +50,3 @@ int _battery_voltage(void)
 {
     return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
-

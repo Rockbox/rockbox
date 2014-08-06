@@ -44,4 +44,3 @@ class SysTrace : public QDialog
 };
 
 #endif
-

@@ -31,7 +31,7 @@ void led_init (void)
     S3C2440_GPIO_CONFIG (GPBCON, 6, GPIO_OUTPUT);
     S3C2440_GPIO_CONFIG (GPBCON, 7, GPIO_OUTPUT);
     S3C2440_GPIO_CONFIG (GPBCON, 8, GPIO_OUTPUT);
-    
+
     S3C2440_GPIO_PULLUP (GPBUP, 5, GPIO_PULLUP_DISABLE);
     S3C2440_GPIO_PULLUP (GPBUP, 6, GPIO_PULLUP_DISABLE);
     S3C2440_GPIO_PULLUP (GPBUP, 7, GPIO_PULLUP_DISABLE);
@@ -50,16 +50,16 @@ void clear_leds (int led_mask)
   GPBDAT |= led_mask;
 }
 
-/* Alternate flash pattern1 and pattern2 */ 
+/* Alternate flash pattern1 and pattern2 */
 /* Never returns */
 void led_flash (int led_pattern1, int led_pattern2)
-{   
+{
     while (1)
     {
         set_leds (led_pattern1);
         sleep(HZ/2);
         clear_leds (led_pattern1);
-        
+
         set_leds(led_pattern2);
         sleep(HZ/2);
         clear_leds (led_pattern2);

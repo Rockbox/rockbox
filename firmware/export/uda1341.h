@@ -34,7 +34,7 @@ AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1,  1,-128,  96,   0)
 AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,  1,-128, 108,  16)
 #endif /* HAVE_RECORDING */
 
-/* These are logical register numbers for driver */ 
+/* These are logical register numbers for driver */
 enum uda_register {
     UDA_REG_ID_STATUS_0,
     UDA_REG_ID_STATUS_1,
@@ -93,9 +93,9 @@ enum uda_register {
 #define UDA_VOLUME(x)           ((x) << 0)  /* 1=0dB, 61=-60dB */
 
 #define UDA_BASS_BOOST(x)       ((x) << 2)  /* see datasheet */
-#define UDA_BASS_BOOST_MASK     0x0F  
+#define UDA_BASS_BOOST_MASK     0x0F
 #define UDA_TREBLE(x)           ((x) << 0)  /* see datasheet */
-#define UDA_TREBLE_MASK         0x03  
+#define UDA_TREBLE_MASK         0x03
 
 #define UDA_PEAK_DETECT_POS_BEFORE  (0 << 5)
 #define UDA_PEAK_DETECT_POS_AFTER   (1 << 5)

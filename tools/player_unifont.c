@@ -567,7 +567,7 @@ bool is_new_player(void)
 static void draw_pattern(int fg, int bg, int x, const unsigned char *pattern)
 {
     int x2, y2;
-    
+
     for (y2 = 0; y2 < 7; y2++)
     {
         unsigned data = pattern[y2];
@@ -593,7 +593,7 @@ static void flush_bitmap(FILE *fp)
 {
     int x, y;
 
-    for (y = 0; y < CHAR_HEIGHT; y++) 
+    for (y = 0; y < CHAR_HEIGHT; y++)
     {
         int i, z;
 
@@ -602,7 +602,7 @@ static void flush_bitmap(FILE *fp)
             for (x = 0; x < BITMAP_WIDTH; x++)
             {
                 unsigned int col = bitmap[x][y];
- 
+
                 for (z = 0; z < SIZE; z++)
                 {
                     fprintf(fp, "%d %d %d  ", (col >> 16) & 255,
@@ -625,10 +625,10 @@ int main(int argc, char **argv)
 
     printf("This tool will generate gif-pictures that reflect the current "
            "unicode charset of the Player.\n");
-  
+
     for (loop = 0; loop < 6; loop++)
     {
-        switch (loop) 
+        switch (loop)
         {
           case 0:
             font_player = &font_player_oldlcd;
@@ -738,7 +738,7 @@ int main(int argc, char **argv)
                 if (xchar_info[i].priority == 0)
                 {
                     draw_pattern(CHAR_FG_STD, CHAR_BG_STD,
-                                3*CHAR_WIDTH+1 
+                                3*CHAR_WIDTH+1
                                 + (xchar_info[i].ucs & 0xf) * CHAR_WIDTH,
                                 (*font_player)[xchar_info[i].hw_char]);
                 }
@@ -747,7 +747,7 @@ int main(int argc, char **argv)
                     if (show_subst)
                     {
                         draw_pattern(CHAR_FG_ALT, CHAR_BG_STD,
-                                    3*CHAR_WIDTH+1 
+                                    3*CHAR_WIDTH+1
                                     + (xchar_info[i].ucs & 0xf) * CHAR_WIDTH,
                                     (*font_player)[xchar_info[i].hw_char]);
                     }

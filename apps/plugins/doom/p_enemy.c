@@ -2621,4 +2621,3 @@ void P_DecreaseVisibility(mobj_t* actor)
    }
 }
 /***** End of new functions for Andy Baker's stealth monsters ******/
-

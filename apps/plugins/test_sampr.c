@@ -56,7 +56,7 @@ static const uint32_t gen_frequency = 1000;
  * phase has range from 0 to 0xffffffff, representing 0 and
  * 2*pi respectively.
  * Return value is a signed value from LONG_MIN to LONG_MAX, representing
- * -1 and 1 respectively. 
+ * -1 and 1 respectively.
  */
 static int16_t ICODE_ATTR fsin(uint32_t phase)
 {
@@ -85,7 +85,7 @@ static int16_t ICODE_ATTR fsin(uint32_t phase)
     unsigned int pos = phase >> 25;
     unsigned short frac = (phase & 0x01ffffff) >> 9;
     short diff = sinetab[pos + 1] - sinetab[pos];
-    
+
     return sinetab[pos] + (frac*diff >> 16);
 }
 

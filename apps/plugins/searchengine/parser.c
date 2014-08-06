@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Michiel van der Kolk 
+ * Copyright (C) 2005 by Michiel van der Kolk
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -113,7 +113,7 @@ unsigned char *parseCompareNum() {
         n1=getvalue(&number1);
     if(number2.kind==TOKEN_NUM)
         n2=getvalue(&number2);
-    for(i=0;i<rb->tagdbheader->filecount;i++) 
+    for(i=0;i<rb->tagdbheader->filecount;i++)
         if(filter[currentlevel][i]) {
             loadentry(i);
             if(number1.kind==TOKEN_NUMIDENTIFIER)
@@ -185,7 +185,7 @@ unsigned char *parseCompareString() {
         s1=getstring(&string1);
     if(string2.kind==TOKEN_STRING)
         s2=getstring(&string2);
-    for(i=0;i<rb->tagdbheader->filecount;i++) 
+    for(i=0;i<rb->tagdbheader->filecount;i++)
         if(filter[currentlevel][i]) {
             loadentry(i);
             if(string1.kind==TOKEN_STRINGIDENTIFIER)
@@ -215,7 +215,7 @@ unsigned char *parseExpr() {
     unsigned char *ret;
     int i;
     if(syntaxerror) return 0;
-    PUTS("parseExpr");       
+    PUTS("parseExpr");
     switch(currentToken->kind) {
         case TOKEN_NOT:
             parser_accept(TOKEN_NOT);
@@ -258,7 +258,7 @@ unsigned char *parseMExpr() {
     unsigned char *ret,*ret2;
     int i;
     if(syntaxerror) return 0;
-    PUTS("parseMExpr");       
+    PUTS("parseMExpr");
     ret=parseLExpr();
     while(currentToken->kind==TOKEN_OR) {
         parser_accept(TOKEN_OR);

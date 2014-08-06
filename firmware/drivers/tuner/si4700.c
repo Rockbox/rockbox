@@ -224,7 +224,7 @@ static void si4700_read(int len)
     unsigned char buf[32];
     unsigned char *ptr = buf;
     uint16_t data;
-    
+
     fmradio_i2c_read(I2C_ADR, buf, len * 2);
     for (i = 0; i < len; i++) {
         data = ptr[0] << 8 | ptr[1];
@@ -292,7 +292,7 @@ static void si4700_sleep(int snooze)
     if (snooze)
     {
         /** power down **/
-#ifdef HAVE_RDS_CAP        
+#ifdef HAVE_RDS_CAP
         if (cache[CHIPID] & CHIPID_DEV_0) {
             si4700_rds_powerup(false);
             si4700_write_clear(SYSCONFIG1, SYSCONFIG1_RDS | SYSCONFIG1_RDSIEN);
@@ -332,7 +332,7 @@ static void si4700_sleep(int snooze)
                             SYSCONFIG1_GPIO3);
 #endif
         /* set mono->stereo switching RSSI range to lowest setting */
-        si4700_write_masked(SYSCONFIG1, SYSCONFIG1_BLNDADJ_19_37_RSSI, 
+        si4700_write_masked(SYSCONFIG1, SYSCONFIG1_BLNDADJ_19_37_RSSI,
                             SYSCONFIG1_BLNDADJ);
 
         si4700_write_masked(SYSCONFIG2,
@@ -482,7 +482,7 @@ int si4700_set(int setting, int value)
             si4700_write_masked(POWERCFG, value ? POWERCFG_MONO : 0,
                                 POWERCFG_MONO);
             break;
-            
+
         default:
             val = -1;
             break;
@@ -516,7 +516,7 @@ int si4700_get(int setting)
         case RADIO_STEREO:
             val = si4700_st();
             break;
-    
+
         case RADIO_RSSI:
             val = STATUSRSSI_RSSIr(si4700_read_reg(STATUSRSSI));
             break;
@@ -528,7 +528,7 @@ int si4700_get(int setting)
         case RADIO_RSSI_MAX:
             val = RSSI_MAX;
             break;
-            
+
 #ifdef HAVE_RDS_CAP
         case RADIO_EVENT:
         {
@@ -610,7 +610,7 @@ bool si4700_rds_read_raw(uint16_t data[4])
 
     mutex_unlock(&fmr_mutex);
 
-    return retval;   
+    return retval;
 }
 
 /* Set the event flag */
@@ -625,7 +625,7 @@ void si4700_rds_set_event(void)
 char * si4700_get_rds_info(int setting)
 {
     char *text = NULL;
-    
+
     switch(setting)
     {
         case RADIO_RDS_NAME:
@@ -640,4 +640,3 @@ char * si4700_get_rds_info(int setting)
     return text;
 }
 #endif /* HAVE_RDS_CAP */
-

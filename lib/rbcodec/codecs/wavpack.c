@@ -124,7 +124,7 @@ enum codec_status codec_run(void)
             ci->seek_complete();
         }
 
-        nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / nchans);  
+        nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / nchans);
 
         if (!nsamples)
             break;

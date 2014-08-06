@@ -8,17 +8,17 @@
 enum { fm_apu_osc_count = 1 };
 
 struct Sms_Fm_Apu {
-	struct Blip_Buffer* output_;
-	blip_time_t next_time;
-	int last_amp;
-	int addr;
-	
-	int clock_;
-	int rate_;
-	blip_time_t period_;
-	
-	struct Blip_Synth synth;
-	struct Ym2413_Emu apu;
+        struct Blip_Buffer* output_;
+        blip_time_t next_time;
+        int last_amp;
+        int addr;
+
+        int clock_;
+        int rate_;
+        blip_time_t period_;
+
+        struct Blip_Synth synth;
+        struct Ym2413_Emu apu;
 };
 
 void Fm_apu_create( struct Sms_Fm_Apu* this );
@@ -28,7 +28,7 @@ blargg_err_t Fm_apu_init( struct Sms_Fm_Apu* this, int clock_rate, int sample_ra
 
 static inline void Fm_apu_set_output( struct Sms_Fm_Apu* this, struct Blip_Buffer* b )
 {
-	this->output_ = b;
+        this->output_ = b;
 }
 
 static inline void Fm_apu_volume( struct Sms_Fm_Apu* this, int v ) { Synth_volume( &this->synth, (v*2) / 5 / 4096 ); }

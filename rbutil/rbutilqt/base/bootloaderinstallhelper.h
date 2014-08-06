@@ -33,4 +33,3 @@ class BootloaderInstallHelper : public QObject
 };
 
 #endif
-

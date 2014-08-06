@@ -50,8 +50,8 @@ struct device_t
     uint32_t sdcfg;
 };
 
-static struct device_t devices[] = 
-{ 
+static struct device_t devices[] =
+{
     {"c100",     "Sansa C100 series",            0xb021, 0x20000000, 0x42e97010 },
     {"m200",     "Sansa M200 series",            0xb021, 0x20000000, 0x42e97010 },
     {"cowond2",  "Cowon D2",                     0xb011, 0x20000000, 0xa2e92010 },
@@ -166,7 +166,7 @@ int do_patching(int device, char* buf, int len)
     int err;
 
     fprintf(stderr,"[INFO] Searching for TCC device...\n");
- 
+
     usb_init();
     if(usb_find_busses() < 0) {
         fprintf(stderr, "[ERR]  Could not find any USB busses.\n");
@@ -224,7 +224,7 @@ found:
 
     fprintf(stderr,"[INFO] Found TCC device, uploading application.\n");
 
-    /* Now we can transfer the application to the device. */ 
+    /* Now we can transfer the application to the device. */
 
     if ( (err = upload_app(dh, device, buf, len)) < 0)
     {
@@ -319,7 +319,7 @@ int main(int argc, char* argv[])
         close(fd);
         return 6;
     }
-    
+
     n = read(fd, buf, len);
     if (n != len)
     {

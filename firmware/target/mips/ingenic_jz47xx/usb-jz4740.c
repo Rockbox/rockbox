@@ -274,7 +274,7 @@ static void EPIN_handler(unsigned int endpoint)
     }
 
     logf("EP%d: %d -> %d", endpoint, ep->sent, ep->length);
-    
+
     if(ep->sent == 0)
         length = MIN(ep->length, ep->fifo_size);
     else

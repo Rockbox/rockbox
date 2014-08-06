@@ -46,7 +46,7 @@ void TIMER0(void)
     {
         /* Run through the list of tick tasks */
         call_tick_tasks();
-        
+
         /* reset Timer 0 IRQ & ref flags */
         TIREQ = TIREQ_TI0 | TIREQ_TF0;
     }

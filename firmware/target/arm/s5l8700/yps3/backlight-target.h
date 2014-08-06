@@ -30,4 +30,3 @@ void _buttonlight_on(void);
 void _buttonlight_off(void);
 
 #endif /* BACKLIGHT_TARGET_H */
-

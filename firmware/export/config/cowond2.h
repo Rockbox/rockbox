@@ -144,9 +144,9 @@
 #define HAVE_USB_POWER
 
 /* Define current usage levels. */
-#define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */  
-#define CURRENT_BACKLIGHT  30 /* TBD */ 
-#define CURRENT_RECORD     0  /* no recording yet */ 
+#define CURRENT_NORMAL     88 /* 18 hours from a 1600 mAh battery */
+#define CURRENT_BACKLIGHT  30 /* TBD */
+#define CURRENT_RECORD     0  /* no recording yet */
 
 /* Define this if you have a TCC7801 */
 #define CONFIG_CPU TCC7801

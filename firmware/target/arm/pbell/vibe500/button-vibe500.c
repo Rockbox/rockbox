@@ -86,8 +86,8 @@ void button_int(void)
         }
         else
         {
-            old_pos = -1; 
-            scroll_repeat = BUTTON_NONE; 
+            old_pos = -1;
+            scroll_repeat = BUTTON_NONE;
         }
     }
 }

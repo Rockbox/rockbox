@@ -509,8 +509,8 @@ static int cursor_pos, moves;
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p)
 {
-    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, 
-                         STRIDE(SCREEN_MAIN, BMPWIDTH_flipit_tokens, 
+    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT,
+                         STRIDE(SCREEN_MAIN, BMPWIDTH_flipit_tokens,
                             BMPHEIGHT_flipit_tokens),
                          GRID_LEFT + (p%5) * (TK_WIDTH+TK_SPACE),
                          GRID_TOP + (p/5) * (TK_HEIGHT+TK_SPACE),
@@ -518,7 +518,7 @@ static void draw_spot(int p)
 }
 
 /* draw the cursor at the current cursor position */
-static void draw_cursor(void) 
+static void draw_cursor(void)
 {
 #ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap_transparent( flipit_cursor,
@@ -567,7 +567,7 @@ static unsigned long gfx_chars[5];
 static void release_gfx(void)
 {
     int i;
-    
+
     for (i = 0; i < 5; i++)
         if (gfx_chars[i])
             rb->lcd_unlock_pattern(gfx_chars[i]);
@@ -598,7 +598,7 @@ static void draw_spot(int p)
 }
 
 /* draw the cursor at the current cursor position */
-static void draw_cursor(void) 
+static void draw_cursor(void)
 {
     if ((cursor_pos/5) & 1) {
         rb->memcpy( cur_pat, tk_pat[2*spots[cursor_pos-5]+spots[cursor_pos]], 7 );
@@ -630,7 +630,7 @@ static inline void clear_cursor(void)
 }
 
 /* check if the puzzle is finished */
-static bool flipit_finished(void) 
+static bool flipit_finished(void)
 {
     int i;
     for (i=0; i<20; i++)
@@ -671,7 +671,7 @@ static void flipit_toggle(void)
 }
 
 /* move the cursor in any direction */
-static void move_cursor(int x, int y) 
+static void move_cursor(int x, int y)
 {
     if (!(flipit_finished())) {
         clear_cursor();
@@ -683,7 +683,7 @@ static void move_cursor(int x, int y)
 }
 
 /* initialize the board */
-static void flipit_init(void) 
+static void flipit_init(void)
 {
     int i;
 
@@ -708,7 +708,7 @@ static void flipit_init(void)
 }
 
 /* the main game loop */
-static bool flipit_loop(void) 
+static bool flipit_loop(void)
 {
     int i;
     int button;
@@ -793,7 +793,7 @@ static bool flipit_loop(void)
             /*move cursor though the entire field*/
 #ifdef FLIPIT_SCROLLWHEEL
             case FLIPIT_PREV:
-            case FLIPIT_PREV|BUTTON_REPEAT:    
+            case FLIPIT_PREV|BUTTON_REPEAT:
                 if ((cursor_pos)%5 == 0) {
                     move_cursor(-1, -1);
                 }

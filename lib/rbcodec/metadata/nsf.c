@@ -70,7 +70,7 @@ static bool parse_nsfe(int fd, struct mp3entry *id3)
      /* default values */
     info.nTrackCount = 1;
     id3->length = 150 * 1000;
-    
+
     /* begin reading chunks */
     while (!(chunks_found & CHUNK_NEND))
     {
@@ -250,7 +250,7 @@ static bool parse_nesm(int fd, struct mp3entry *id3)
     /* Copyright (per codec) */
     id3->album = p;
     strlcpy(p, hdr.szCopyright, 32);
-        
+
     return true;
 }
 
@@ -275,4 +275,3 @@ bool get_nsf_metadata(int fd, struct mp3entry* id3)
     /* not a valid format*/
     return false;
 }
-

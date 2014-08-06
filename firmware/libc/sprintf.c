@@ -70,7 +70,7 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
 
     /* make sure it ends with a trailing zero */
     pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';
-    
+
     return pr.bytes;
 }
 
@@ -86,6 +86,6 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 
     /* make sure it ends with a trailing zero */
     pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';
-    
+
     return pr.bytes;
 }

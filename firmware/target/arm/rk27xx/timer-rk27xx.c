@@ -75,4 +75,3 @@ void timer_stop(void)
     INTC_IMR &= ~IRQ_ARM_TIMER1;
     INTC_IECR &= ~IRQ_ARM_TIMER1;
 }
-

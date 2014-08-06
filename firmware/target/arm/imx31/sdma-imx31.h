@@ -108,7 +108,7 @@ enum SDMA_REQUEST_TYPE
                                 controlled by the pgp_firi signal
                                 from the IOMUXC PGP register */
     SDMA_REQ_UART2_RX   = 16, /* RxFIFO of UART2 */
-    SDMA_REQ_FIRI_TX    = 17, /* DMA request of FIR's transmitter 
+    SDMA_REQ_FIRI_TX    = 17, /* DMA request of FIR's transmitter
                                 FIFO controled by the pgp_firi signal
                                 the IOMUXC PGP register */
     SDMA_REQ_UART2_TX   = 17, /* TxFIFO of UART2 */

@@ -45,7 +45,7 @@ static struct thread_entry_item {
 static struct thread_entry_item *__find_thread_entry(unsigned thread_id)
 {
     int i;
-    
+
     for (i = 0; i < 32; i++)
     {
         if (entry_lookup[i].thread_id == thread_id)
@@ -133,7 +133,7 @@ unsigned int create_thread(void (*function)(void),
     data->function = function;
     data->start_frozen = flags & CREATE_THREAD_FROZEN;
     data->entry = entry;
-    pthread_cond_init(&entry->cond, NULL);         
+    pthread_cond_init(&entry->cond, NULL);
     entry->runnable = true;
     entry->l = (struct thread_list) { NULL, NULL };
     sem_init(&data->init_sem, 0, 0);
@@ -148,7 +148,7 @@ unsigned int create_thread(void (*function)(void),
     item->entry = entry;
 
     pthread_setname_np(retval, name);
-    
+
 
     return retval;
 }
@@ -205,7 +205,7 @@ unsigned int thread_queue_wake(struct thread_entry **list)
         if (rc == THREAD_NONE)
             break;
 
-        result |= rc;        
+        result |= rc;
     }
 
     return result;

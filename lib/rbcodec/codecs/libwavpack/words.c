@@ -603,7 +603,7 @@ void send_words (int32_t *buffer, int nsamples, uint32_t flags,
 
         w->holding_one = ones_count * 2;
 
-        if (high != low) {  
+        if (high != low) {
             uint32_t maxcode = high - low, code = value - low;
             int bitcount = count_bits (maxcode);
             uint32_t extras = (1L << bitcount) - maxcode - 1;

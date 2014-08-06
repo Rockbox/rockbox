@@ -322,7 +322,7 @@ local uLong ziplocal_TmzDateToDosDate(ptm,dosDate)
 {
     uLong year = (uLong)ptm->tm_year;
     (void) dosDate; /* avoid "unused parameter" warning */
-	if (year>1980)
+        if (year>1980)
         year-=1980;
     else if (year>80)
         year-=80;

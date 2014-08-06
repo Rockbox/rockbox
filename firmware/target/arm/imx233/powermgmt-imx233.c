@@ -82,7 +82,7 @@ void charging_algorithm_step(void)
     if(!is_5v_present && charge_state != DISCHARGING)
     {
         logf("pwrmgmt: * -> discharging");
-        logf("pwrmgmt: disable charger and 4p2"); 
+        logf("pwrmgmt: disable charger and 4p2");
         /* 5V has been lost: disable 4p2 power rail */
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
 #if IMX233_SUBTARGET >= 3780

@@ -30,7 +30,7 @@ void usb_init_device(void)
     and_l(~0x10000000, &GPIO_OUT);   /* USB enable bit */
     or_l(0x10000000, &GPIO_ENABLE);
     or_l(0x10000000, &GPIO_FUNCTION);
-    
+
     or_l(0x00000400, &GPIO1_FUNCTION);  /* USB detect */
 }
 

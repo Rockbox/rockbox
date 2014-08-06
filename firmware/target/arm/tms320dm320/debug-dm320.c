@@ -109,7 +109,7 @@ static bool gio_is_inverted(int gio)
         reg = IO_GIO_INV2, bit = (1 << (gio-32));
 
     return reg & bit;
-}   
+}
 
 static bool gio_is_output(int gio)
 {
@@ -155,7 +155,7 @@ bool dbg_ports(void)
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_clear_display();
-    
+
     while(!done)
     {
         line = 0;
@@ -166,7 +166,7 @@ bool dbg_ports(void)
 
 #if defined(MROBE_500)
         lcd_puts(0, line++, "[USB Information]");
-        
+
         lcd_putsf(0, line++, "TRN_CTRL:     0x%04x TRN_LNSTAT:   0x%04x",
             M66591_TRN_CTRL, M66591_TRN_LNSTAT);
         lcd_putsf(0, line++, "HSFS:         0x%04x TESTMODE:     0x%04x",
@@ -192,38 +192,38 @@ bool dbg_ports(void)
         lcd_putsf(0, line++, "INTSTAT_EMP:  0x%04x USB_ADDRESS:  0x%04x",
             M66591_INTSTAT_EMP, M66591_USB_ADDRESS);
         lcd_putsf(0, line++, "USB_REQ0:     0x%04x USB_REQ1:     0x%04x",
-            M66591_USB_REQ0, M66591_USB_REQ1);  
+            M66591_USB_REQ0, M66591_USB_REQ1);
         lcd_putsf(0, line++, "USB_REQ2:     0x%04x USB_REQ3:     0x%04x",
-            M66591_USB_REQ2, M66591_USB_REQ3);  
+            M66591_USB_REQ2, M66591_USB_REQ3);
         lcd_putsf(0, line++, "DCP_CNTMD:    0x%04x DCP_MXPKSZ:   0x%04x",
-            M66591_DCP_CNTMD, M66591_DCP_MXPKSZ);  
-        lcd_putsf(0, line++, "DCPCTRL:      0x%04x", M66591_DCPCTRL);  
-            
+            M66591_DCP_CNTMD, M66591_DCP_MXPKSZ);
+        lcd_putsf(0, line++, "DCPCTRL:      0x%04x", M66591_DCPCTRL);
+
         line++;
         for(i=1; i<6; i++) {
             M66591_PIPE_CFGWND=i;
-            lcd_putsf(0, line++, "PIPE_CFGSEL:0x%04x PIPE_CFGWND: 0x%04x", 
+            lcd_putsf(0, line++, "PIPE_CFGSEL:0x%04x PIPE_CFGWND: 0x%04x",
                 M66591_PIPE_CFGSEL, M66591_PIPE_CFGWND);
         }
         line++;
-            
+
         lcd_putsf(0, line++, "PIPECTRL1:    0x%04x PIPECTRL2:    0x%04x",
-            M66591_PIPECTRL1, M66591_PIPECTRL2);  
+            M66591_PIPECTRL1, M66591_PIPECTRL2);
         lcd_putsf(0, line++, "PIPECTRL3:    0x%04x PIPECTRL4:    0x%04x",
-            M66591_PIPECTRL3, M66591_PIPECTRL4);  
+            M66591_PIPECTRL3, M66591_PIPECTRL4);
         lcd_putsf(0, line++, "PIPECTRL5:    0x%04x PIPECTRL6:    0x%04x",
-            M66591_PIPECTRL5, M66591_PIPECTRL6);  
-            
+            M66591_PIPECTRL5, M66591_PIPECTRL6);
+
         lcd_putsf(0, line++, "GIO_BITSET0:  0x%04x GIO_BITSET1:  0x%04x",
-            IO_GIO_BITSET0, IO_GIO_BITSET1);  
-            
-        lcd_putsf(0, line++, "GIO_BITSET2:  0x%04x", IO_GIO_BITSET2);  
-            
+            IO_GIO_BITSET0, IO_GIO_BITSET1);
+
+        lcd_putsf(0, line++, "GIO_BITSET2:  0x%04x", IO_GIO_BITSET2);
+
         lcd_putsf(0, line++, "SDRAM_SDMODE: 0x%04x SDRAM_REFCTL: 0x%04x",
-            IO_SDRAM_SDMODE, IO_SDRAM_REFCTL);  
-            
+            IO_SDRAM_SDMODE, IO_SDRAM_REFCTL);
+
         lcd_putsf(0, line++, "EMIF_CS4CTRL1:0x%04x EMIF_CS4CTRL2:0x%04x",
-            IO_EMIF_CS4CTRL1, IO_EMIF_CS4CTRL2);  
+            IO_EMIF_CS4CTRL1, IO_EMIF_CS4CTRL2);
 #elif !defined(DEBUG_GIO)
         lcd_putsf(0, line++, "/* GIO0 - GIO15 */");
         lcd_putsf(0, line++, "GIO_DIR0: 0x%04X", IO_GIO_DIR0);
@@ -309,31 +309,31 @@ bool dbg_hw_info(void)
         "IO_CLK_MOD2: 0x%04x IO_CLK_LPCTL0: 0x%04x",
         IO_CLK_MOD0, IO_CLK_MOD1, IO_CLK_MOD2, IO_CLK_LPCTL0);
 #else
-    lcd_putsf(0, line++, " IO_CLK_PLLA: 0x%04x IO_CLK_PLLB: 0x%04x", 
+    lcd_putsf(0, line++, " IO_CLK_PLLA: 0x%04x IO_CLK_PLLB: 0x%04x",
         IO_CLK_PLLA, IO_CLK_PLLB);
-    lcd_putsf(0, line++, " IO_CLK_SEL0: 0x%04x IO_CLK_SEL1: 0x%04x", 
+    lcd_putsf(0, line++, " IO_CLK_SEL0: 0x%04x IO_CLK_SEL1: 0x%04x",
         IO_CLK_SEL0, IO_CLK_SEL1);
-    lcd_putsf(0, line++, " IO_CLK_SEL2: 0x%04x IO_CLK_DIV0: 0x%04x", 
+    lcd_putsf(0, line++, " IO_CLK_SEL2: 0x%04x IO_CLK_DIV0: 0x%04x",
         IO_CLK_SEL2, IO_CLK_DIV0);
-    lcd_putsf(0, line++, " IO_CLK_DIV1: 0x%04x IO_CLK_DIV2: 0x%04x", 
+    lcd_putsf(0, line++, " IO_CLK_DIV1: 0x%04x IO_CLK_DIV2: 0x%04x",
         IO_CLK_DIV1, IO_CLK_DIV2);
-    lcd_putsf(0, line++, " IO_CLK_DIV3: 0x%04x IO_CLK_DIV4: 0x%04x", 
+    lcd_putsf(0, line++, " IO_CLK_DIV3: 0x%04x IO_CLK_DIV4: 0x%04x",
         IO_CLK_DIV3, IO_CLK_DIV4);
-    lcd_putsf(0, line++, " IO_CLK_BYP : 0x%04x IO_CLK_INV : 0x%04x", 
+    lcd_putsf(0, line++, " IO_CLK_BYP : 0x%04x IO_CLK_INV : 0x%04x",
         IO_CLK_BYP, IO_CLK_INV);
-    lcd_putsf(0, line++, " IO_CLK_MOD0: 0x%04x IO_CLK_MOD1: 0x%04x ", 
+    lcd_putsf(0, line++, " IO_CLK_MOD0: 0x%04x IO_CLK_MOD1: 0x%04x ",
         IO_CLK_MOD0, IO_CLK_MOD1);
-    lcd_putsf(0, line++, " IO_CLK_MOD2: 0x%04x IO_CLK_LPCTL0: 0x%04x ", 
+    lcd_putsf(0, line++, " IO_CLK_MOD2: 0x%04x IO_CLK_LPCTL0: 0x%04x ",
         IO_CLK_MOD2, IO_CLK_LPCTL0);
 #endif
     lcd_puts(0, line++, "Interrupt info:");
-    lcd_putsf(0, line++, " IO_INTC_EINT0: 0x%04x IO_INTC_EINT1: 0x%04x ", 
+    lcd_putsf(0, line++, " IO_INTC_EINT0: 0x%04x IO_INTC_EINT1: 0x%04x ",
         IO_INTC_EINT0, IO_INTC_EINT1);
-    lcd_putsf(0, line++, " IO_INTC_EINT2: 0x%04x IO_INTC_IRQ0: 0x%04x ", 
+    lcd_putsf(0, line++, " IO_INTC_EINT2: 0x%04x IO_INTC_IRQ0: 0x%04x ",
         IO_INTC_EINT2, IO_INTC_IRQ0);
-    lcd_putsf(0, line++, " IO_INTC_IRQ1: 0x%04x IO_INTC_IRQ2: 0x%04x ", 
+    lcd_putsf(0, line++, " IO_INTC_IRQ1: 0x%04x IO_INTC_IRQ2: 0x%04x ",
         IO_INTC_IRQ1, IO_INTC_IRQ2);
-        
+
     lcd_puts(0, line++, "Board revision:");
     switch (IO_BUSC_REVR) {
             case 0x0010:
@@ -377,7 +377,7 @@ bool dbg_hw_info(void)
             lcd_set_direct_fb(true);
 
         lcd_puts(0, line++, "LCD info:");
-        lcd_putsf(0, line++, " LCD direct FB access? %s", 
+        lcd_putsf(0, line++, " LCD direct FB access? %s",
             (lcd_get_direct_fb() ? "yes" : "no"));
         line++;
 #endif
@@ -386,7 +386,7 @@ bool dbg_hw_info(void)
         lcd_putsf(0, line++, "current tick: %08x Seconds running: %08d",
             (unsigned int)current_tick, (unsigned int)current_tick/100);
 #if defined(MROBE_500)
-        lcd_putsf(0, line++, "Address: 0x%08x Data: 0x%08x", 
+        lcd_putsf(0, line++, "Address: 0x%08x Data: 0x%08x",
             (unsigned int)address, *address);
         lcd_putsf(0, line++, "Address: 0x%08x Data: 0x%08x",
             (unsigned int)(address+1), *(address+1));

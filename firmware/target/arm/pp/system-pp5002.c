@@ -44,7 +44,7 @@ void __attribute__((interrupt("IRQ"))) irq_handler(void)
                 ipod_2g_adc_int();
 #endif
         }
-    } 
+    }
     else
     {
         if (COP_INT_STAT & TIMER2_MASK)
@@ -120,7 +120,7 @@ static void ipod_init_cache(void)
 
     CACHE_CTL = CACHE_CTL_INIT | CACHE_CTL_RUN;
 }
-    
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 #else
@@ -150,7 +150,7 @@ static void pp_set_cpu_frequency(long frequency)
         PLL_MULT     = 5;
         udelay(200);           /* wait for relock */
         break;
-        
+
       case CPUFREQ_SLEEP:
         CLOCK_SOURCE = 0x51;   /* source #2: 32kHz, #1, #2, #4: 24MHz */
         PLL_CONTROL  = 0x6000; /* PLL disabled */

@@ -28,4 +28,3 @@
 #include "xlcd.h"
 
 #endif /* HAVE_LCD_BITMAP */
-

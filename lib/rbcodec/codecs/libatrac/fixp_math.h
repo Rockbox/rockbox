@@ -44,7 +44,7 @@
            : [x]"r"(X), [y]"r"(Y)); \
         lo; \
      })
-     
+
     /* Calculates: result = (X*Y)>>31 */
     /* Use scratch register r12 */
     #define fixmul31(X,Y) \
@@ -92,20 +92,20 @@
         int64_t temp;
         temp = x;
         temp *= y;
-    
+
         temp >>= 16;
-    
+
         return (int32_t)temp;
     }
-    
+
     static inline int32_t fixmul31(int32_t x, int32_t y)
     {
         int64_t temp;
         temp = x;
         temp *= y;
-    
+
         temp >>= 31;        //16+31-16 = 31 bits
-    
+
         return (int32_t)temp;
     }
 #endif

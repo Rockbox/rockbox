@@ -79,7 +79,7 @@
 /* define this if the host platform can change volume outside of rockbox */
 #define PLATFORM_HAS_VOLUME_CHANGE
 
-#define HAVE_SW_TONE_CONTROLS 
+#define HAVE_SW_TONE_CONTROLS
 
 #define HAVE_HEADPHONE_DETECTION
 

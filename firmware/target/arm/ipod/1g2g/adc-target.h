@@ -31,7 +31,7 @@
 unsigned short adc_scan(int channel);
 void ipod_2g_adc_int(void);
 static inline unsigned short adc_read(int channel)
-{ 
-    return adc_scan(channel); 
+{
+    return adc_scan(channel);
 }
 #endif

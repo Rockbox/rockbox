@@ -95,7 +95,7 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno) 
+    if (yesno)
         lcd_write_command(LCD_SET_REVERSE_DISPLAY);
     else
         lcd_write_command(LCD_SET_NORMAL_DISPLAY);
@@ -151,7 +151,7 @@ void lcd_init_device(void)
     lcd_write_command(LCD_SOFTWARE_RESET);                   /* 0xE2 */
     lcd_write_command(LCD_SET_POWER_CONTROL_REGISTER + 7);   /* 0x2F */
                /* power control register: op-amp=1, regulator=1, booster=1 */
-    lcd_write_command(LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 6); /* 0x26 */ 
+    lcd_write_command(LCD_SET_INTERNAL_REGULATOR_RESISTOR_RATIO + 6); /* 0x26 */
 
     lcd_set_flip(false);                                    /* 0xCC */
 
@@ -221,7 +221,7 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
         phases += stride;
     }
 }
- 
+
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void) ICODE_ATTR;

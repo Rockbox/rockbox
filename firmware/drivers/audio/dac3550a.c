@@ -112,4 +112,3 @@ void dac_init(void)
     i2c_write(DAC_DEV_WRITE,buf,2);
     i2c_end();
 }
-

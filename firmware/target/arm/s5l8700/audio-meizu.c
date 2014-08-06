@@ -65,4 +65,3 @@ void audio_input_mux(int source, unsigned flags)
 
     last_source = source;
 } /* audio_input_mux */
-

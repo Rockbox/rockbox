@@ -23,7 +23,7 @@
 /* Jz47xx Ingenic Media Extension Instruction Set
 
    These are ~60 SIMD instructions for the Jz47xx MIPS core.
-   
+
    To compile assembly files using these instructions, they
    must be piped through a bash script called mxu_as.
 */
@@ -1773,7 +1773,7 @@ __extension__ ({                                \
     : "i" (op), "m" (*(unsigned char *)(addr)))
 
 #define i_pref(hint,base,offset)    \
-    ({ __asm__ __volatile__("pref %0,%2(%1)"::"i"(hint),"r"(base),"i"(offset):"memory");})    
+    ({ __asm__ __volatile__("pref %0,%2(%1)"::"i"(hint),"r"(base),"i"(offset):"memory");})
 
 struct unaligned_32 { unsigned int l; } __attribute__((packed));
 #define LD32(a) (((const struct unaligned_32 *) (a))->l)

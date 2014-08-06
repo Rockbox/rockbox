@@ -45,4 +45,3 @@ class BootloaderInstallMi4 : public BootloaderInstallBase
 };
 
 #endif
-

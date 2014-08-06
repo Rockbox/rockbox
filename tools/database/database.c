@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     tagcache_init();
     do_tagcache_build(paths);
     tagcache_reverse_scan();
-    
+
     return 0;
 }
 
@@ -39,25 +39,24 @@ const char *sim_root_dir = ".";
 void mutex_init(struct mutex *m)
 {
     (void)m;
-}   
+}
 
 void mutex_lock(struct mutex *m)
 {
     (void)m;
-}   
+}
 
 void mutex_unlock(struct mutex *m)
 {
     (void)m;
-}   
+}
 
 void sim_thread_lock(void *me)
 {
     (void)me;
-}   
+}
 
 void * sim_thread_unlock(void)
 {
     return (void*)1;
-}   
-    
+}

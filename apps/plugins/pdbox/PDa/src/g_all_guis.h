@@ -151,14 +151,14 @@ typedef struct _iemgui
     int                x_fcol;
     int                x_bcol;
     int                x_lcol;
-    t_symbol           *x_snd;	    	    /* send symbol */
-    t_symbol           *x_rcv;	    	    /* receive */
-    t_symbol           *x_lab;	    	    /* label */
-    t_symbol	       *x_snd_unexpanded;   /* same 3, with '$' unexpanded */
-    t_symbol	       *x_rcv_unexpanded;
-    t_symbol	       *x_lab_unexpanded;
-    int                x_binbufindex;	    /* where in binbuf to find these */
-    int                x_labelbindex;	    /* where in binbuf to find label */
+    t_symbol           *x_snd;              /* send symbol */
+    t_symbol           *x_rcv;              /* receive */
+    t_symbol           *x_lab;              /* label */
+    t_symbol           *x_snd_unexpanded;   /* same 3, with '$' unexpanded */
+    t_symbol           *x_rcv_unexpanded;
+    t_symbol           *x_lab_unexpanded;
+    int                x_binbufindex;       /* where in binbuf to find these */
+    int                x_labelbindex;       /* where in binbuf to find label */
 } t_iemgui;
 
 typedef struct _iemguidummy
@@ -327,4 +327,3 @@ EXTERN void iem_inttosymargs(t_iem_init_symargs *symargp, int n);
 EXTERN int iem_symargstoint(t_iem_init_symargs *symargp);
 EXTERN void iem_inttofstyle(t_iem_fstyle_flags *fstylep, int n);
 EXTERN int iem_fstyletoint(t_iem_fstyle_flags *fstylep);
-

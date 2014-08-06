@@ -106,7 +106,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
 {
     struct tag_info *tag;
     int len = 0;
-    for(tag = legal_tags; 
+    for(tag = legal_tags;
         tag->name[0] && strncmp(start, tag->name, strlen(tag->name)) != 0;
         tag++) ;
     if (!tag->name[0])
@@ -121,7 +121,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
         fprintf(out, "Cd");
         return 1;
     }
-        
+
     fprintf(out, "%s", tag->name);
     len += strlen(tag->name);
     start += len;
@@ -194,7 +194,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
         }
         PUTCH(out, '(');
         PUTCH(out, *start++); len++;
-        if (i<image_count && 
+        if (i<image_count &&
             ((*start >= 'a' && *start <= 'z') ||
              (*start >= 'A' && *start <= 'Z')))
         {
@@ -274,7 +274,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
                 xalign = 'l';
             if (xalign == '+')
                 xalign = 'r';
-            fprintf(out, ",%c", xalign); 
+            fprintf(out, ",%c", xalign);
         }
         if (yalign)
         {
@@ -282,7 +282,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
                 yalign = 't';
             if (yalign == '+')
                 yalign = 'b';
-            fprintf(out, ",%s%c", xalign?"":"-,", yalign); 
+            fprintf(out, ",%s%c", xalign?"":"-,", yalign);
         }
         PUTCH(out, ')');
         len += read;
@@ -317,7 +317,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     else if (MATCH("Vi"))
     {
         int read = 1;
-        
+
         PUTCH(out, '(');
         if ((start[1] >= 'a' && start[1] <= 'z') ||
             (start[1] >= 'A' && start[1] <= 'Z'))
@@ -362,7 +362,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
         PUTCH(out, '(');
         len += 1+dump_arg(out, start+1, 1, true);
     }
-    
+
     else if (MATCH("T"))
     {
         PUTCH(out, '(');
@@ -370,7 +370,7 @@ int parse_tag(FILE* out, const char* start, bool in_conditional)
     }
     return len;
 }
-        
+
 void parse_text(const char* in, FILE* out)
 {
     const char* end = in+strlen(in);
@@ -449,14 +449,14 @@ top:
         {
             PUTCH(out, *in++);
         }
-        else 
+        else
         {
             if (find_escape_character(*in))
             {
                 PUTCH(out, '%');
             }
             PUTCH(out, *in++);
-        }            
+        }
     }
 }
 
@@ -475,7 +475,7 @@ int main(int argc, char* argv[])
         printf("\t-m\tSkin is for a mono display (different viewport tags)\n");
         return 0;
     }
-    
+
     while ((argc > filearg) && argv[filearg][0] == '-')
     {
         i=1;
@@ -499,7 +499,7 @@ int main(int argc, char* argv[])
         printf("Missing input filename\n");
         return 1;
     }
-    
+
     in = fopen(argv[filearg], "r");
     if (!in)
         return 1;
@@ -507,7 +507,7 @@ int main(int argc, char* argv[])
         strcat(buffer, temp);
     fclose(in);
     filearg++;
-    
+
     if (argc > filearg)
     {
         out = fopen(argv[filearg], "w");
@@ -516,8 +516,8 @@ int main(int argc, char* argv[])
             printf("Couldn't open %s\n", argv[filearg]);
             return 1;
         }
-    }        
-    
+    }
+
     parse_text(buffer, out);
     if (out != stdout)
         fclose(out);

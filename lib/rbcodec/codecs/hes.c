@@ -3,7 +3,7 @@
 #include <string.h>
 #include "codeclib.h"
 #include "libgme/hes_emu.h"
- 
+
 CODEC_HEADER
 
 /* Maximum number of bytes to process in one iteration */
@@ -15,7 +15,7 @@ static struct Hes_Emu hes_emu;
 /****************** rockbox interface ******************/
 
 static void set_codec_track(int t) {
-    Hes_start_track(&hes_emu, t); 
+    Hes_start_track(&hes_emu, t);
 
     /* for loop mode we disable track limits */
     if (!ci->loop_track()) {
@@ -50,11 +50,11 @@ enum codec_status codec_run(void)
     size_t n;
     intptr_t param;
     int track = 0;
-    
+
     DEBUGF("HES: next_track\n");
     if (codec_init()) {
         return CODEC_ERROR;
-    }  
+    }
 
     codec_set_replaygain(ci->id3);
 

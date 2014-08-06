@@ -406,4 +406,3 @@ ssize_t ipod_write(struct ipod_t* ipod, int nbytes)
 }
 
 #endif
-

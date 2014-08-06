@@ -26,7 +26,7 @@
 /* We are currently lacking a datasheet for the M5636. No mnemonics available.
    The registers are named according to their respective hexadecimal offsets.
 */
-   
+
 #define M5636_4064 (*(volatile unsigned short *)(M5636_BASE + 0x64L))
 #define M5636_4068 (*(volatile unsigned short *)(M5636_BASE + 0x68L))
 #define M5636_4078 (*(volatile unsigned short *)(M5636_BASE + 0x78L))

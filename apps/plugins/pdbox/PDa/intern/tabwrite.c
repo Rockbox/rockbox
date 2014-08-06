@@ -33,28 +33,28 @@ static void tabwrite_float(t_tabwrite *x, t_float f)
     t_sample *vec;
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
-    	pd_error(x, "%s: no such array", x->x_arrayname->s_name);
+        pd_error(x, "%s: no such array", x->x_arrayname->s_name);
     else if (!garray_getfloatarray(a, &vecsize, &vec))
-    	pd_error(x, "%s: bad template for tabwrite", x->x_arrayname->s_name);
+        pd_error(x, "%s: bad template for tabwrite", x->x_arrayname->s_name);
     else
     {
-    	int n = x->x_ft1;
-    	double timesince = clock_gettimesince(x->x_updtime);
-    	if (n < 0) n = 0;
-    	else if (n >= vecsize) n = vecsize-1;
-    	vec[n] = ftofix(f);
-    	if (timesince > 1000)
-    	{
-    	    tabwrite_tick(x);
-    	}
-    	else
-    	{
-    	    if (x->x_set == 0)
-    	    {
-    	    	clock_delay(x->x_clock, 1000 - timesince);
-    	    	x->x_set = 1;
-    	    }
-    	}
+        int n = x->x_ft1;
+        double timesince = clock_gettimesince(x->x_updtime);
+        if (n < 0) n = 0;
+        else if (n >= vecsize) n = vecsize-1;
+        vec[n] = ftofix(f);
+        if (timesince > 1000)
+        {
+            tabwrite_tick(x);
+        }
+        else
+        {
+            if (x->x_set == 0)
+            {
+                clock_delay(x->x_clock, 1000 - timesince);
+                x->x_set = 1;
+            }
+        }
     }
 }
 
@@ -82,8 +82,7 @@ static void *tabwrite_new(t_symbol *s)
 void tabwrite_setup(void)
 {
     tabwrite_class = class_new(gensym("tabwrite"), (t_newmethod)tabwrite_new,
-    	(t_method)tabwrite_free, sizeof(t_tabwrite), 0, A_DEFSYM, 0);
+        (t_method)tabwrite_free, sizeof(t_tabwrite), 0, A_DEFSYM, 0);
     class_addfloat(tabwrite_class, (t_method)tabwrite_float);
     class_addmethod(tabwrite_class, (t_method)tabwrite_set, gensym("set"), A_SYMBOL, 0);
 }
-

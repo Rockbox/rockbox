@@ -36,4 +36,3 @@ void usb_storage_notify_hotswap(int volume,bool inserted);
 #endif
 
 #endif
-

@@ -24,7 +24,7 @@ Snake!
 
 by Itai Shaked
 
-ok, a little explanation - 
+ok, a little explanation -
 board holds the snake and apple position - 1+ - snake body (the number
 represents the age [1 is the snake's head]).
 -1 is an apple, and 0 is a clear spot.

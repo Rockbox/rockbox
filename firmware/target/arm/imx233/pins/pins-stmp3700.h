@@ -80,4 +80,3 @@
 #define VPIN_LCD_CS         VPIN_PACK(1, 20, MAIN)
 
 #endif /* __PINS_IMX233__ */
- 

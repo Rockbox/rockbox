@@ -280,7 +280,7 @@ int imx233_lradc_sense_ext_temperature(int chan, int sensor)
     }
     /* disable sensor current */
     imx233_lradc_set_temp_isrc(sensor, BV_LRADC_CTRL2_TEMP_ISRC0__ZERO);
-    
+
     return (abs(b - a) / EXT_TEMP_ACC_COUNT) * 1104 / 1000;
 }
 

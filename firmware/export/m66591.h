@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 
 #define M66591_REG(addr)  (*(volatile unsigned short *) \
@@ -83,7 +83,7 @@ void USB_DEVICE(void);
 #define M66591_PIPECTRL5        M66591_REG(0xA8) /* pg 71 */
 #define M66591_PIPECTRL6        M66591_REG(0xAA) /* pg 71 */
 
-/* These defines are used for CTRL register handshake setup 
+/* These defines are used for CTRL register handshake setup
  *  They are used on the following registers:
  *  DCPCTRL and PIPECTRL(1-6)
  */
@@ -99,4 +99,3 @@ void USB_DEVICE(void);
 #define CTRL_WTSS               0x04 /* Write transfer status stage */
 #define CTRL_WTND               0x05 /* Write transfer no data stage */
 #define CTRL_TRER               0x06 /* Transmit error stage */
-

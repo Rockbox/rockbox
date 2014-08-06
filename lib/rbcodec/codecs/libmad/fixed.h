@@ -234,7 +234,7 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 
 # elif defined(FPM_ARM)
 
-/* 
+/*
  * This ARM V4 version is as accurate as FPM_64BIT but much faster. The
  * least significant bit is properly rounded at no CPU cycle cost!
  */
@@ -293,7 +293,7 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 # elif defined(FPM_MIPS)
 
 #if GCCNUM >= 404
-typedef unsigned int u64_di_t __attribute__ ((mode (DI))); 
+typedef unsigned int u64_di_t __attribute__ ((mode (DI)));
 # define MAD_F_MLX(hi, lo, x, y) \
 do { \
    u64_di_t __ll = (u64_di_t) (x) * (y); \
@@ -331,7 +331,7 @@ do { \
 #  define MAD_F_MLZ(hi, lo)  ((mad_fixed_t) (lo))
 # endif
 
-#endif /* GCCNUM */ 
+#endif /* GCCNUM */
 
 # if defined(OPT_SPEED)
 #  define mad_f_scale64(hi, lo)  \
@@ -430,7 +430,7 @@ do { \
    Note that we don't define any of the libmad accumulator macros, as
    any functions that use these should have the relevant sections rewritten
    in assembler to utilise the EMAC accumulators properly.
-   Assumes the default +/- 3.28 fixed point format 
+   Assumes the default +/- 3.28 fixed point format
  */
 #define mad_f_mul(x, y) \
 ({ \

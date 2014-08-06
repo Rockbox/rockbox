@@ -44,4 +44,3 @@ int usb_drv_port_speed(void);
 void usb_drv_configure_endpoint(int ep_num, int type);
 
 #endif /* _USB_DRV_H */
- 

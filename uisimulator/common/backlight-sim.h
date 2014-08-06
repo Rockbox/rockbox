@@ -40,4 +40,3 @@ void _buttonlight_set_brightness(int val);
 #endif /* HAVE_BUTTON_LIGHT */
 
 #endif /* BACKLIGHT_SIM_H */
-

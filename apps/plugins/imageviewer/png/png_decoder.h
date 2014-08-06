@@ -78,7 +78,7 @@ typedef struct LodePNG_InfoColor /*info about the color type of an image*/
 
     /*palette (PLTE)*/
     unsigned char palette[256 * 4]; /*palette in RGBARGBA... order*/
-    size_t palettesize; /* palette size in number of colors 
+    size_t palettesize; /* palette size in number of colors
                          * (amount of bytes is 4 * palettesize)
                          */
 
@@ -115,12 +115,12 @@ typedef struct LodePNG_Decoder
                               * filled by LodePNG_Decoder_init()
                               */
     unsigned char *file;     /* ptr to raw png file loaded */
-    size_t file_size;        /* size of the raw png file in mem */ 
+    size_t file_size;        /* size of the raw png file in mem */
     unsigned char *decoded_img; /* ptr to decoded PNG image in PNG pixel
                                  * format. set by decodeGeneric()
                                  */
-    unsigned int native_img_size; /* size of the image in native pixel 
-                                   * format 
+    unsigned int native_img_size; /* size of the image in native pixel
+                                   * format
                                    */
     LodePNG_InfoPng infoPng; /*info of the PNG image obtained after decoding*/
     long error;

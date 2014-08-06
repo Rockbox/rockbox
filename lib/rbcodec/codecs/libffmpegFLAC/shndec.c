@@ -23,7 +23,7 @@
  * @author Jeff Muizelaar
  *
  */
- 
+
 #include "bitstream.h"
 #include "golomb.h"
 #include "shndec.h"

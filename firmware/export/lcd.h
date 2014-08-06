@@ -55,7 +55,7 @@ struct viewport {
  * Stride describes the amount that you need to increment to get to the next
  *  line.  For screens that have the pixels in contiguous horizontal strips
  *  stride should be equal to the image width.
- *  
+ *
  *      For example, if the screen pixels are layed out as follows:
  *
  *                  width0  width1  width2                      widthX-1
@@ -78,9 +78,9 @@ struct viewport {
  *      height2     |   pixel2
  *         |        |     |
  *        \|/       |    \|/
- *      heightY-1   |   pixelY-1 
+ *      heightY-1   |   pixelY-1
  *
- *      then you would need to add Y pixels to get to the next line (the next 
+ *      then you would need to add Y pixels to get to the next line (the next
  *      line in this case is from width0 to width1).
  *
  * The remote might have a different stride than the main screen so the screen

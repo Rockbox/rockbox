@@ -77,7 +77,7 @@ static void handle_scroll_wheel(int new_scroll)
         prev_scroll = new_scroll;
         return;
     }
-    
+
     scroll = scroll_state[prev_scroll][new_scroll];
     prev_scroll = new_scroll;
 

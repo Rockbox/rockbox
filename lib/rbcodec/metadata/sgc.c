@@ -58,7 +58,7 @@ bool get_sgc_metadata(int fd, struct mp3entry* id3)
     /* we only render 16 bits, 44.1KHz, Stereo */
     id3->bitrate = 706;
     id3->frequency = 44100;
-  
+
     /* Make sure this is an SGC file */
     if (sgc_type != FOURCC('S','G','C',0x1A))
         return false;

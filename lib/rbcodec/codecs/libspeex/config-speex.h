@@ -1,5 +1,5 @@
 #ifndef ROCKBOX_VOICE_ENCODER
-#include "codeclib.h" 
+#include "codeclib.h"
 #include "autoconf.h"
 #else
 #define ICODE_ATTR
@@ -40,10 +40,10 @@
 
 #ifndef ROCKBOX_VOICE_ENCODER
 /* Compile target codec as fixed point */
-#define FIXED_POINT 
+#define FIXED_POINT
 #else
 /* Compile voice clip encoder as floating point */
-#define FLOATING_POINT 
+#define FLOATING_POINT
 #endif
 
 #ifndef ROCKBOX_VOICE_CODEC
@@ -155,7 +155,7 @@
 /* #undef USE_ALLOCA */
 
 /* Use C99 variable-size arrays */
-#define VAR_ARRAYS 
+#define VAR_ARRAYS
 
 /* Enable Vorbis-style psychoacoustics (EXPERIMENTAL) */
 /* #undef VORBIS_PSYCHO */
@@ -183,4 +183,3 @@
 #define restrict __restrict
 
 #define RELEASE 1
-

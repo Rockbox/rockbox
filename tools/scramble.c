@@ -155,7 +155,7 @@ int main (int argc, char** argv)
     bool creative_enable_ciff;
 
     model_id = ARCHOS_PLAYER;
-    
+
     if (argc < 3) {
         usage();
     }
@@ -167,7 +167,7 @@ int main (int argc, char** argv)
         version = 4;
         model_id = ARCHOS_FMRECORDER;
     }
-    
+
     else if(!strcmp(argv[1], "-v2")) {
         headerlen = 24;
         iname = argv[2];
@@ -302,8 +302,8 @@ int main (int argc, char** argv)
             modelnum = 25;
         else if (!strcmp(&argv[1][5], "m200"))
             modelnum = 29;
-        else if(!strcmp(&argv[1][5], "c100")) 
-            modelnum = 30;            
+        else if(!strcmp(&argv[1][5], "c100"))
+            modelnum = 30;
         else if(!strcmp(&argv[1][5], "1630")) /* Philips HDD1630 */
             modelnum = 31;
         else if (!strcmp(&argv[1][5], "i7"))
@@ -487,7 +487,7 @@ int main (int argc, char** argv)
         int mi4magic;
         char model[4] = "";
         char type[4] = "";
-        
+
         if(!strcmp(&argv[1][4], "v2")) {
             mi4magic = MI4_MAGIC_DEFAULT;
             version = 0x00010201;
@@ -507,12 +507,12 @@ int main (int argc, char** argv)
 
         iname = argv[2];
         oname = argv[3];
-        
+
         if(!strncmp(argv[2], "-model=", 7)) {
             iname = argv[3];
             oname = argv[4];
             strncpy(model, &argv[2][7], 4);
-            
+
             if(!strncmp(argv[3], "-type=", 6)) {
                 iname = argv[4];
                 oname = argv[5];
@@ -522,7 +522,7 @@ int main (int argc, char** argv)
 
         return mi4_encode(iname, oname, version, mi4magic, model, type);
     }
-    
+
     /* open file */
     file = fopen(iname,"rb");
     if (!file) {
@@ -532,7 +532,7 @@ int main (int argc, char** argv)
     fseek(file,0,SEEK_END);
     length = ftell(file);
     length = (length + 3) & ~3; /* Round up to nearest 4 byte boundary */
-    
+
     if ((method == scramble) &&
         ((length + headerlen) >= size_limit[model_id])) {
         printf("error: firmware image is %ld bytes while max size is %u!\n",
@@ -542,7 +542,7 @@ int main (int argc, char** argv)
         return -1;
     }
 
-    fseek(file,0,SEEK_SET); 
+    fseek(file,0,SEEK_SET);
     inbuf = malloc(length);
     if (method == xor)
         outbuf = malloc(length*2);
@@ -640,14 +640,14 @@ int main (int argc, char** argv)
                     header[1] =
                     header[2] =
                     header[3] = 0xff; /* ??? */
-                
+
                 header[6] = (crc >> 8) & 0xff;
                 header[7] = crc & 0xff;
-                
+
                 header[11] = version;
-                
+
                 header[15] = headerlen; /* really? */
-                
+
                 int2be(length, &header[20]);
             }
             break;
@@ -659,7 +659,7 @@ int main (int argc, char** argv)
             /* xor data */
             for (i=0; i<slen; i++)
                 outbuf[i] ^= xorstring[i & (xorlen-1)];
-            
+
             /* calculate checksum */
             for (i=0; i<slen; i++)
                 crc += outbuf[i];
@@ -702,10 +702,10 @@ int main (int argc, char** argv)
        return -1;
     }
     fclose(file);
-    
+
     free(inbuf);
     free(outbuf);
-    
+
     return 0;
 }
 
@@ -717,7 +717,7 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
     unsigned char *outbuf;
     int i;
     unsigned char sum = 0;
-    
+
     file = fopen(iname, "rb");
     if (!file) {
        perror(iname);
@@ -725,8 +725,8 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
-    fseek(file,0,SEEK_SET); 
+
+    fseek(file,0,SEEK_SET);
     outbuf = malloc(length+0x1030);
 
     if ( !outbuf ) {
@@ -739,10 +739,10 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
         perror(iname);
         return -2;
     }
-    
+
     memset(outbuf, 0, 0x1030);
     strcpy((char *)outbuf, idstring);
-    memcpy(outbuf+0x20, iaudio_bl_flash, 
+    memcpy(outbuf+0x20, iaudio_bl_flash,
            BMPWIDTH_iaudio_bl_flash * (BMPHEIGHT_iaudio_bl_flash/8) * 2);
     short2be(BMPWIDTH_iaudio_bl_flash, &outbuf[0x10]);
     short2be((BMPHEIGHT_iaudio_bl_flash/8), &outbuf[0x12]);
@@ -761,7 +761,7 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
        perror(oname);
        return -3;
     }
-    
+
     len = fwrite(outbuf, 1, length+0x1030, file);
     if(len < (size_t)length) {
         perror(oname);
@@ -773,14 +773,14 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
 }
 
 
-/* Create an ipod firmware partition image 
+/* Create an ipod firmware partition image
 
    fw_ver = 2 for 3rd Gen ipods, 3 for all later ipods including 5g.
 
    This function doesn't yet handle the Broadcom resource image for the 5g,
    so the resulting images won't be usable.
 
-   This has also only been tested on an ipod Photo 
+   This has also only been tested on an ipod Photo
 */
 
 static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
@@ -819,7 +819,7 @@ static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
+
     fseek(file,0,SEEK_SET);
 
     bufsize=(length+0x4600);
@@ -841,7 +841,7 @@ static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
     fclose(file);
 
-    /* Calculate checksum for later use in header */    
+    /* Calculate checksum for later use in header */
     for(i = 0x4600; i < 0x4600+length;i++)
         sum += outbuf[i];
 
@@ -890,7 +890,7 @@ static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
        perror(oname);
        return -3;
     }
-    
+
     len = fwrite(outbuf, 1, length+0x4600, file);
     if(len < (size_t)length) {
         perror(oname);
@@ -917,7 +917,7 @@ static int ccpmp_encode(char *iname, char *oname)
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
+
     fseek(file,0,SEEK_SET);
 
     outbuf = malloc(CCPMP_SIZE);
@@ -945,7 +945,7 @@ static int ccpmp_encode(char *iname, char *oname)
        perror(oname);
        return -3;
     }
-    
+
     len = fwrite(outbuf, 1, CCPMP_SIZE, file);
     if(len < (size_t)length) {
         perror(oname);
@@ -956,4 +956,3 @@ static int ccpmp_encode(char *iname, char *oname)
 
     return 0;
 }
-

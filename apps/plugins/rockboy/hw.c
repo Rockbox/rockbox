@@ -32,7 +32,7 @@ void hw_interrupt(byte i, byte mask)
     if ((R_IF & (R_IF ^ oldif) & R_IE) && cpu.ime) cpu.halt = 0;
     /* if ((i & (hw.ilines ^ i) & R_IE) && cpu.ime) cpu.halt = 0; */
     /* if ((i & R_IE) && cpu.ime) cpu.halt = 0; */
-    
+
     hw.ilines &= ~mask;
     hw.ilines |= i;
 }
@@ -88,7 +88,7 @@ void hw_hdma_cmd(byte c)
         if ((R_STAT&0x03) == 0x00) hw_hdma();
         return;
     }
-    
+
     /* Perform GDMA */
     sa = ((addr)R_HDMA1 << 8) | (R_HDMA2&0xf0);
     da = 0x8000 | ((int)(R_HDMA3&0x1f) << 8) | (R_HDMA4&0xf0);
@@ -96,7 +96,7 @@ void hw_hdma_cmd(byte c)
     /* FIXME - this should use cpu time! */
     /*cpu_timers(102 * cnt);*/
     cpu_timers((460>>cpu.speed)+cnt); /*dalias*/
-	/*cpu_timers(228 + (16*cnt));*/ /* this should be right according to no$ */
+        /*cpu_timers(228 + (16*cnt));*/ /* this should be right according to no$ */
     while (cnt--)
         writeb(da++, readb(sa++));
     R_HDMA1 = sa >> 8;

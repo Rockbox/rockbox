@@ -29,7 +29,7 @@ const uint32_t sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000, 22050,
 ///////////////////////////// executable code ////////////////////////////////
 
 static uint32_t read_next_header (read_stream infile, WavpackHeader *wphdr);
-        
+
 // This function reads data from the specified stream in search of a valid
 // WavPack 4.0 audio block. If this fails in 1 megabyte (or an invalid or
 // unsupported WavPack block is encountered) then an appropriate message is
@@ -93,7 +93,7 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
     wpc.config.bytes_per_sample = (wps->wphdr.flags & BYTES_STORED) + 1;
     wpc.config.float_norm_exp = wps->float_norm_exp;
 
-    wpc.config.bits_per_sample = (wpc.config.bytes_per_sample * 8) - 
+    wpc.config.bits_per_sample = (wpc.config.bytes_per_sample * 8) -
         ((wps->wphdr.flags & SHIFT_MASK) >> SHIFT_LSB);
 
     if (!wpc.config.sample_rate) {
@@ -381,7 +381,7 @@ WavpackContext *WavpackOpenFileOutput (void)
 // config->num_channels         self evident
 // config->sample_rate          self evident
 
-// In addition, the following fields and flags may be set: 
+// In addition, the following fields and flags may be set:
 
 // config->flags:
 // --------------
@@ -552,4 +552,3 @@ void *WavpackGetWrapperLocation (void *first_block)
     else
         return NULL;
 }
-

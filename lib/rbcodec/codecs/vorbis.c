@@ -150,7 +150,7 @@ enum codec_status codec_run(void)
 
     /* Open a non-seekable stream */
     error = ov_open_callbacks(ci, &vf, NULL, 0, callbacks);
-    
+
     /* If the non-seekable open was successful, we need to supply the missing
      * data to make it seekable.  This is a hack, but it's reasonable since we
      * don't want to run the whole file through the buffer before we start

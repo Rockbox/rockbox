@@ -36,7 +36,7 @@ int highscore_save(char *filename, struct highscore *scores, int num_scores)
     fd = rb->open(filename, O_WRONLY|O_CREAT, 0666);
     if(fd < 0)
         return -1;
-    
+
     for(i = 0;i < num_scores;i++)
     {
         rb->snprintf(buf, sizeof(buf), "%d:%d:%s\n",
@@ -91,7 +91,7 @@ int highscore_update(int score, int level, const char *name,
 {
     int pos;
     struct highscore *entry;
-    
+
     if (!highscore_would_update(score, scores, num_scores))
         return -1;
 
@@ -103,7 +103,7 @@ int highscore_update(int score, int level, const char *name,
                    sizeof(struct highscore));
         pos--;
     }
-    
+
     entry = scores + pos;
     entry->score = score;
     entry->level = level;
@@ -142,7 +142,7 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
     }
     rb->lcd_putsxy(LCD_WIDTH/2-w/2, MARGIN, "High Scores");
     rb->lcd_putsxy(LCD_WIDTH/4-w/4,2*h, "Score");
-    
+
     if(show_level) {
         rb->lcd_putsxy(LCD_WIDTH*3/4-w/4,2*h, "Level");
     }
@@ -156,11 +156,11 @@ void highscore_show(int position, struct highscore *scores, int num_scores,
 #endif
         rb->lcd_putsxyf (MARGIN,3*h + h*i, "%d)", i+1);
         rb->lcd_putsxyf (LCD_WIDTH/4-w/4,3*h + h*i, "%d", scores[i].score);
-        
+
         if(show_level) {
             rb->lcd_putsxyf (LCD_WIDTH*3/4-w/4,3*h + h*i, "%d", scores[i].level);
         }
-        
+
         if(i == position) {
 #ifdef HAVE_LCD_COLOR
             rb->lcd_set_foreground(LCD_WHITE);

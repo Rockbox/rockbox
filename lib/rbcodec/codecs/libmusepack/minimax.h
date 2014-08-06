@@ -54,4 +54,3 @@
 # define absd(A)    ( (A) >= 0.   ?  (A)  : -(A) )
 
 #endif
-

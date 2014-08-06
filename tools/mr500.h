@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- *   Copyright (C) 2009 by Karl Kurbjun 
+ *   Copyright (C) 2009 by Karl Kurbjun
  *   $Id$
  *
  * All files in this archive are subject to the GNU General Public License.
@@ -22,7 +22,7 @@ extern int decrypt_array[];
 extern int encrypt_array[];
 
 /* Notes about the header:
- *  The magic_name should always be "OIMCFWUP" 
+ *  The magic_name should always be "OIMCFWUP"
  *  Header length is always 18 bytes
  *  The flags have the following mask:
  *      CHECK_CRC   0x01    : Tells the firmware whether or not to check CRC
@@ -53,4 +53,3 @@ int mr500_read_crc(char *, off_t, uint32_t *);
 int mr500_calculate_crc(char *, off_t, unsigned int, uint32_t *);
 int mr500_save_data(char *, char *, off_t, unsigned int, int*);
 int mr500_init(void);
-

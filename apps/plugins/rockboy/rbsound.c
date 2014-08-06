@@ -57,15 +57,15 @@ void rockboy_pcm_init(void)
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-   
+
     rb->pcm_set_frequency(pcm.hz); /* 44100 22050 11025 */
 }
 
 void rockboy_pcm_close(void)
 {
-    memset(&pcm, 0, sizeof pcm);    
-    newly_started = true;   
-    rb->pcm_play_stop();    
+    memset(&pcm, 0, sizeof pcm);
+    newly_started = true;
+    rb->pcm_play_stop();
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 

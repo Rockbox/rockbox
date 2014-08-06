@@ -281,7 +281,7 @@ struct screen screens[NB_SCREENS] =
 #endif
 #if defined(HAVE_LCD_BITMAP)
         .set_framebuffer = (void*)lcd_set_framebuffer,
-#if defined(HAVE_LCD_COLOR)    
+#if defined(HAVE_LCD_COLOR)
         .gradient_fillrect = lcd_gradient_fillrect,
         .gradient_fillrect_part = lcd_gradient_fillrect_part,
 #endif
@@ -369,7 +369,7 @@ struct screen screens[NB_SCREENS] =
         .backlight_off=&remote_backlight_off,
         .is_backlight_on=&is_remote_backlight_on,
         .backlight_set_timeout=&remote_backlight_set_timeout,
-        
+
 #if LCD_DEPTH > 1
         .backdrop_load=&remote_backdrop_load,
         .backdrop_show=&remote_backdrop_show,

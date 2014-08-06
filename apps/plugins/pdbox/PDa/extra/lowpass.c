@@ -4,7 +4,7 @@
 /*
 
  These filter coefficients computations are taken from
- http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt  
+ http://www.harmony-central.com/Computer/Programming/Audio-EQ-Cookbook.txt
 
  written by Robert Bristow-Johnson
 
@@ -44,7 +44,7 @@ void lowpass_bang(t_rbjfilter *x)
      t_float a2 = 1 - alpha;
 
 /*     post("bang %f %f %f",x->x_freq, x->x_gain, x->x_bw); */
-     
+
      if (!check_stability(-a1/a0,-a2/a0,b0/a0,b1/a0,b2/a0)) {
        post("lowpass: filter unstable -> resetting");
        a0=1.;a1=0.;a2=0.;
@@ -56,7 +56,7 @@ void lowpass_bang(t_rbjfilter *x)
      SETFLOAT(at+2,b0/a0);
      SETFLOAT(at+3,b1/a0);
      SETFLOAT(at+4,b2/a0);
-     
+
      outlet_list(x->x_obj.ob_outlet,&s_list,5,at);
 }
 
@@ -86,9 +86,7 @@ static void *lowpass_new(t_floatarg f,t_floatarg bw)
 void lowpass_setup(void)
 {
     lowpass_class = class_new(gensym("lowpass"), (t_newmethod)lowpass_new, 0,
-				sizeof(t_rbjfilter), 0,A_DEFFLOAT,A_DEFFLOAT,0);
+                                sizeof(t_rbjfilter), 0,A_DEFFLOAT,A_DEFFLOAT,0);
     class_addbang(lowpass_class,lowpass_bang);
     class_addfloat(lowpass_class,lowpass_float);
 }
-
-

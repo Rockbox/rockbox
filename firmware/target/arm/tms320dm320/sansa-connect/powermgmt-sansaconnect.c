@@ -62,4 +62,3 @@ void set_battery_level(unsigned int level)
 {
     current_battery_level = level;
 }
-

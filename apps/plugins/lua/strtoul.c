@@ -21,8 +21,8 @@ unsigned long int strtoul(const char *ptr, char **endptr, int base)
       base=8;
 skip0x:
       if ((nptr[1]=='x'||nptr[1]=='X') && isxdigit(nptr[2])) {
-	nptr+=2;
-	base=16;
+        nptr+=2;
+        base=16;
       }
     } else
       base=10;
@@ -30,7 +30,7 @@ skip0x:
   while(__likely(*nptr)) {
     register unsigned char c=*nptr;
     c=(c>='a'?c-'a'+10:c>='A'?c-'A'+10:c<='9'?c-'0':0xff);
-    if (__unlikely(c>=base)) break;	/* out of base */
+    if (__unlikely(c>=base)) break;     /* out of base */
     {
       register unsigned long x=(v&0xff)*base+c;
       register unsigned long w=(v>>8)*base+(x>>8);
@@ -39,7 +39,7 @@ skip0x:
     }
     ++nptr;
   }
-  if (__unlikely(nptr==orig)) {		/* no conversion done */
+  if (__unlikely(nptr==orig)) {         /* no conversion done */
     nptr=ptr;
     errno=EINVAL;
     v=0;

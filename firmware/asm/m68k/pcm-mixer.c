@@ -138,5 +138,5 @@ static FORCE_INLINE void write_samples(void *out,
               "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
             : "r"(amp), "d"(16)
         );
-    }     
+    }
 }

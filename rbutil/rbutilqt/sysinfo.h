@@ -47,4 +47,3 @@ class Sysinfo : public QDialog
 };
 
 #endif
-

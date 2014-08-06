@@ -524,7 +524,7 @@ struct user_settings
     int statusbar;    /* STATUSBAR_* enum values */
 #ifdef HAVE_REMOTE_LCD
     int remote_statusbar;
-#endif        
+#endif
 
 #if CONFIG_KEYPAD == RECORDER_PAD
     bool buttonbar;    /* 0=hide, 1=show */
@@ -682,7 +682,7 @@ struct user_settings
     bool backlight_fade_in;
     bool backlight_fade_out;
 #endif
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
     int brightness;
 #endif
 

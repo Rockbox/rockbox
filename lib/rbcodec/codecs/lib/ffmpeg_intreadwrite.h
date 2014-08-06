@@ -186,7 +186,7 @@ union unaligned_16 { uint16_t l; } __attribute__((packed)) av_alias;
 #endif
 
 #ifndef AV_RB32
-/* Coldfire and ARMv6 and above support unaligned long reads */ 
+/* Coldfire and ARMv6 and above support unaligned long reads */
 #if defined CPU_COLDFIRE || (defined CPU_ARM && ARM_ARCH >= 6)
 #define AV_RB32(x) (htobe32(*(const uint32_t*)(x)))
 #else

@@ -55,9 +55,9 @@
     #define PCLK (HCLK/2)   /* =  50,625,000 */
 
     #define CPUFREQ_DEFAULT FCLK    /* 406 MHz */
-    #define CPUFREQ_NORMAL  (FCLK/4)/* 101.25 MHz */   
+    #define CPUFREQ_NORMAL  (FCLK/4)/* 101.25 MHz */
     #define CPUFREQ_MAX     FCLK    /* 406 MHz */
-    
+
     #define UNCACHED_BASE_ADDR 0x30000000
     #define UNCACHED_ADDR(a)  ((typeof(a))((unsigned int)(a) | UNCACHED_BASE_ADDR ))
 

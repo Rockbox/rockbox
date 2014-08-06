@@ -175,7 +175,7 @@ static int send_hid(libusb_device_handle *dev, int xfer_size, uint8_t *data, int
     }
 
     Lstatus:
-    ret = libusb_interrupt_transfer(dev, 0x81, xfer_buf, xfer_size, 
+    ret = libusb_interrupt_transfer(dev, 0x81, xfer_buf, xfer_size,
         &recv_size, 1000);
     if(ret == 0 && recv_size == sizeof(struct hid_status_report_t))
     {
@@ -637,4 +637,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-

@@ -11,32 +11,32 @@ struct Y8950;
 
 struct Y8950Adpcm
 {
-	struct Y8950* y8950;
+        struct Y8950* y8950;
 
-	int sampleRate;
-	int clockRate;
-	
-	int ramSize;
-	int startAddr;
-	int stopAddr;
-	int playAddr;
-	int addrMask;
-	int memPntr;
-	bool romBank;
-	byte* ramBank;
+        int sampleRate;
+        int clockRate;
 
-	bool playing;
-	int volume;
-	word delta;
-	unsigned int nowStep, step;
-	int out, output;
-	int diff;
-	int nextLeveling;
-	int sampleStep;
-	int volumeWStep;
+        int ramSize;
+        int startAddr;
+        int stopAddr;
+        int playAddr;
+        int addrMask;
+        int memPntr;
+        bool romBank;
+        byte* ramBank;
 
-	byte reg7;
-	byte reg15;
+        bool playing;
+        int volume;
+        word delta;
+        unsigned int nowStep, step;
+        int out, output;
+        int diff;
+        int nextLeveling;
+        int sampleStep;
+        int volumeWStep;
+
+        byte reg7;
+        byte reg15;
 };
 
 
@@ -49,4 +49,4 @@ byte ADPCM_readReg(struct Y8950Adpcm* this_, byte rg);
 int ADPCM_calcSample(struct Y8950Adpcm* this_);
 
 
-#endif 
+#endif

@@ -30,7 +30,7 @@
 #else
 #define NUM_ADC_CHANNELS 2
 #endif
- 
+
 /* Force a scan now */
 unsigned short adc_scan(int channel);
 #endif

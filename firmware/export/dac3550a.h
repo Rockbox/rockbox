@@ -43,4 +43,3 @@ extern void dac_line_in(bool enable);
 extern void dac_init(void);
 
 #endif /* _DAC3550A_H_ */
-

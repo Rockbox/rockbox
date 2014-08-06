@@ -232,4 +232,3 @@ ucl_nrv2e_test_overlap_le32     ( const ucl_bytep buf, ucl_uint src_off,
 #endif
 
 #endif /* already included */
-

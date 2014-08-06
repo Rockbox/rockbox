@@ -33,7 +33,7 @@
 */
 
 /// \file math.h
-/// Libmpcdec internal math routines.  
+/// Libmpcdec internal math routines.
 
 #ifndef _mpcdec_math_h_
 #define _mpcdec_math_h_
@@ -53,14 +53,14 @@
 
    #define MAKE_MPC_SAMPLE(X)      (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<MPC_FIXED_POINT_FRACTPART))
    #define MAKE_MPC_SAMPLE_EX(X,Y) (MPC_SAMPLE_FORMAT)((double)(X) * (double)(((mpc_int64_t)1)<<(Y)))
-   
+
    #define MPC_SHR_RND(X, Y)       ((X+(1<<(Y-1)))>>Y)
 
 #if defined(CPU_COLDFIRE)
 
       #define MPC_MULTIPLY(X,Y)      mpc_multiply((X), (Y))
       #define MPC_MULTIPLY_EX(X,Y,Z) mpc_multiply_ex((X), (Y), (Z))
-      
+
       static inline MPC_SAMPLE_FORMAT mpc_multiply(MPC_SAMPLE_FORMAT x,
                                                    MPC_SAMPLE_FORMAT y)
       {
@@ -128,7 +128,7 @@
                : [x]"r"(X), [y]"r"(Y)); \
             lo; \
          })
-      
+
       /* Calculate: result = (X*Y)>>Z */
       #define MPC_MULTIPLY_EX(X,Y,Z) \
          ({ \
@@ -157,7 +157,7 @@
             assert(temp == (MPC_SAMPLE_FORMAT_MULTIPLY)(MPC_SAMPLE_FORMAT)temp);
             return (MPC_SAMPLE_FORMAT)temp;
          }
-         
+
          static inline MPC_SAMPLE_FORMAT MPC_MULTIPLY_EX(MPC_SAMPLE_FORMAT item1,MPC_SAMPLE_FORMAT item2,unsigned shift)
          {
             MPC_SAMPLE_FORMAT_MULTIPLY temp = MPC_MULTIPLY_EX_NOTRUNCATE(item1,item2,shift);
@@ -205,27 +205,26 @@
    #endif
 
    #define MPC_MAKE_FRACT_CONST(X) (MPC_SAMPLE_FORMAT)((X) * (double)(((mpc_int64_t)1)<<32) )
-   
+
    #define MPC_MULTIPLY_FLOAT_INT(X,Y) ((X)*(Y))
 
 #else
    //in floating-point mode, decoded samples are in -1...1 range
 
    typedef float MPC_SAMPLE_FORMAT;
-   
+
    #define MAKE_MPC_SAMPLE(X)      ((MPC_SAMPLE_FORMAT)(X))
    #define MAKE_MPC_SAMPLE_EX(X,Y) ((MPC_SAMPLE_FORMAT)(X))
-   
+
    #define MPC_MULTIPLY_FRACT(X,Y) ((X)*(Y))
    #define MPC_MAKE_FRACT_CONST(X) (X)
-   
+
    #define MPC_MULTIPLY_FLOAT_INT(X,Y) ((X)*(Y))
    #define MPC_MULTIPLY(X,Y)           ((X)*(Y))
    #define MPC_MULTIPLY_EX(X,Y,Z)      ((X)*(Y))
-   
+
    #define MPC_SHR_RND(X, Y) (X)
 
 #endif
 
 #endif // _mpcdec_math_h_
-

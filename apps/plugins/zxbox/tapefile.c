@@ -1,11 +1,11 @@
-/* 
+/*
  * Copyright (C) 1996-1998 Szeredi Miklos
  * Email: mszeredi@inf.bme.hu
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version. See the file COPYING. 
+ * (at your option) any later version. See the file COPYING.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -88,7 +88,7 @@ struct tzxblock {
   int type;
   int lenbytes;
   int lenmul;
-  int hlen;        
+  int hlen;
 };
 
 #define NUMBLOCKID 0x60
@@ -234,25 +234,25 @@ static void premature(struct seginfo *csp)
 
 static int read_tzx_header(byte *hb, struct seginfo *csp)
 {
-  int res;  
+  int res;
   int segid, seght;
   int lenoffs, lenbytes, lenmul, lenadd;
   int hlen;
   long length;
   byte *hip;
-  
+
   segid = getc(tapefd);
   if(segid == EOF) {
     csp->segtype = SEG_END;
     rb->snprintf(seg_desc,DESC_LEN, "End of Tape");
     return 0;
   }
-  
+
   hb[0] = (byte) segid;
-  
+
   if(segid < NUMBLOCKID) seght = tzxb[segid].type;
   else seght = 0; /* was NONE here*/
-  
+
   if(seght == COMM) {
     lenbytes = tzxb[segid].lenbytes;
     lenmul   = tzxb[segid].lenmul;
@@ -267,7 +267,7 @@ static int read_tzx_header(byte *hb, struct seginfo *csp)
     lenadd = 0x00;
     hlen = 0x04;
   }
-  
+
   if(seght == STAN) hlen += tzxb[segid].hlen;
 
   hip = hb+1;
@@ -277,11 +277,11 @@ static int read_tzx_header(byte *hb, struct seginfo *csp)
     return 0;
   }
   length = 0;
-  for(;lenbytes; lenbytes--) 
+  for(;lenbytes; lenbytes--)
     length = (length << 8) + hip[lenoffs + lenbytes - 1];
-  
+
   length = (length * lenmul) + lenadd - hlen;
-  
+
   csp->len = length;
   return 1;
 }
@@ -309,9 +309,9 @@ static int read_header(byte *hb, struct seginfo *csp)
   csp->ptr = 0;
 
   csp->segtype = SEG_OTHER;
-  if(tf_tpi.type == TAP_TAP) 
+  if(tf_tpi.type == TAP_TAP)
     return read_tap_header(hb, csp);
-  else if(tf_tpi.type == TAP_TZX) 
+  else if(tf_tpi.type == TAP_TZX)
     return read_tzx_header(hb, csp);
 
   return 0;
@@ -366,7 +366,7 @@ static int next_data(void)
 {
   int res;
   if(tf_cseg.ptr == tf_cseg.len) return DAT_END;
-  
+
   res = getc(tapefd);
   if(res == EOF) {
     rb->snprintf(seg_desc, DESC_LEN,"Premature end of segment");
@@ -402,13 +402,13 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
 
   segid = hb[0];
   hip = hb+1;
-  
+
   switch(segid) {
   case 0x10:
     normal_segment(csp);
     csp->pause   = DBYTE(hip, 0x00);
     break;
-    
+
   case 0x11:
     rb->snprintf(seg_desc,DESC_LEN, "Turbo Data");
     csp->type    = ST_NORM;
@@ -422,7 +422,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     csp->bused   = BYTE(hip, 0x0C);
     csp->pause   = DBYTE(hip, 0x0D);
     break;
-    
+
   case 0x12:
     rb->snprintf(seg_desc,DESC_LEN, "Pure Tone");
     csp->type    = ST_NORM;
@@ -436,14 +436,14 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     csp->bused   = 0;
     csp->pause   = 0;
     break;
-    
+
   case 0x13:
     rb->snprintf(seg_desc,DESC_LEN, "Pulse Sequence");
     csp->type    = ST_PSEQ;
     csp->segtype = SEG_OTHER;
     csp->pause   = 0;
     break;
-    
+
   case 0x14:
     rb->snprintf(seg_desc,DESC_LEN, "Pure Data");
     csp->type    = ST_NORM;
@@ -457,16 +457,16 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     csp->sync1p  = 0;
     csp->sync2p  = 0;
     break;
-    
+
   case 0x15:
     rb->snprintf(seg_desc,DESC_LEN, "Direct Recording");
     csp->type    = ST_DIRE;
-    csp->segtype = SEG_OTHER; 
+    csp->segtype = SEG_OTHER;
     csp->pulse   = DBYTE(hip, 0x00);
     csp->pause   = DBYTE(hip, 0x02);
     csp->bused   = BYTE(hip, 0x04);
     break;
-    
+
   case 0x20:
     dtmp = DBYTE(hip, 0x00);
     if(dtmp == 0) {
@@ -485,7 +485,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
       csp->pause = dtmp;
       csp->type = ST_NORM;
       csp->segtype = SEG_PAUSE;
-      rb->snprintf(seg_desc,DESC_LEN, "Pause for %i.%03is", 
+      rb->snprintf(seg_desc,DESC_LEN, "Pause for %i.%03is",
           csp->pause / 1000, csp->pause % 1000);
     }
     csp->pulse   = 0;
@@ -496,7 +496,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     csp->onep    = 0;
     csp->bused   = 0;
     break;
-    
+
   case 0x21:
     csp->type    = ST_MISC;
     csp->segtype = SEG_GRP_BEG;
@@ -595,7 +595,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     break;
 
   case 0x2A:
-    if(tapeopt.machine == MACHINE_48) { 
+    if(tapeopt.machine == MACHINE_48) {
       rb->snprintf(seg_desc,DESC_LEN, "Stop the Tape in 48k Mode (Stopped)");
       csp->type = ST_MISC;
       csp->segtype = SEG_STOP;
@@ -625,7 +625,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     csp->segtype = SEG_SKIP;
     {
       int numstr, i;
-      
+
       i = 0;
       numstr = next_data();
       for(;numstr > 0; numstr--) {
@@ -634,7 +634,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     tid = next_data();
     tlen = next_data();
     if(tid < 0 || tlen < 0) return 0;
-    
+
     for(; tlen; tlen--) {
       b = next_data();
       if(b < 0) return 0;
@@ -645,7 +645,7 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
       seg_desc[i] = '\0';
     }
     break;
-    
+
   case 0x33:
     rb->snprintf(seg_desc,DESC_LEN, "Hardware Information (Not yet supported)");
     csp->type    = ST_MISC;
@@ -674,11 +674,11 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     rb->snprintf(seg_desc, DESC_LEN,"Tapefile Concatenation Point");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
-    
+
   default:
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
-    rb->snprintf(seg_desc,DESC_LEN, "Unknown TZX block (id: %02X, version: %i.%02i)", 
+    rb->snprintf(seg_desc,DESC_LEN, "Unknown TZX block (id: %02X, version: %i.%02i)",
         segid, tf_tpi.tzxmajver, tf_tpi.tzxminver);
     break;
   }
@@ -694,11 +694,11 @@ static int interpret_header(byte *hb, struct seginfo *csp)
 
     return 1;
   }
-  else if(tf_tpi.type == TAP_TZX) 
+  else if(tf_tpi.type == TAP_TZX)
     return interpret_tzx_header(hb, csp);
 
   return 0;
-}  
+}
 
 byte *tf_get_block(int i)
 {
@@ -707,7 +707,7 @@ byte *tf_get_block(int i)
   if(jump_to_segment(i, &tf_cseg)) {
     tf_segoffs = ftell(tapefd);
 
-    if(read_header(rbuf, &tf_cseg) && 
+    if(read_header(rbuf, &tf_cseg) &&
        interpret_header(rbuf, &tf_cseg)) return rbuf;
   }
   return NULL;
@@ -729,22 +729,22 @@ int next_imps(unsigned short *impbuf, int buflen, long timelen)
   static int bitrem;
   static dbyte dirpulse;
   unsigned short *impbufend, *impbufstart;
-  
+
   impbufstart = impbuf;
   impbufend = impbuf + buflen;
-  
+
   while(impbuf < impbufend - 1 && timelen > 0) {
     switch(playstate) {
-      
+
     case PL_PAUSE:
       if(currlev && lead_pause) {
     PULSE(IMP_1MS);
     lead_pause --;
       }
       else if(lead_pause > 10) {
-    if(tapeopt.blanknoise && !(rb->rand() % 64)) 
-      DPULSE(IMP_1MS * 10 - 1000, 1000); 
-    else 
+    if(tapeopt.blanknoise && !(rb->rand() % 64))
+      DPULSE(IMP_1MS * 10 - 1000, 1000);
+    else
       DPULSE(IMP_1MS * 10, 0);
     lead_pause -= 10;
       }
@@ -776,13 +776,13 @@ int next_imps(unsigned short *impbuf, int buflen, long timelen)
     tf_cseg.num --;
       }
       else { /* PL_SYNC */
-    if(tf_cseg.sync1p || tf_cseg.sync2p) 
+    if(tf_cseg.sync1p || tf_cseg.sync2p)
       DPULSE(tf_cseg.sync1p, tf_cseg.sync2p);
     bitrem = 0;
     playstate = PL_DATA;
       }
       break;
-      
+
     case PL_DATA:
       if(!bitrem) {
     toput = next_data();
@@ -791,15 +791,15 @@ int next_imps(unsigned short *impbuf, int buflen, long timelen)
       break;
     }
     if(tf_cseg.ptr != tf_cseg.len) {
-      if(timelen > 16 * max(tf_cseg.onep, tf_cseg.zerop) && 
+      if(timelen > 16 * max(tf_cseg.onep, tf_cseg.zerop) &&
          impbuf <= impbufend - 16) {
         int p1, p2, br, tp;
-        
+
         p1 = tf_cseg.onep;
         p2 = tf_cseg.zerop;
         br = 8;
         tp = toput;
-        
+
         while(br) {
           if(tp & 0x80) DPULSE(p1, p1);
           else          DPULSE(p2, p2);
@@ -885,7 +885,7 @@ int next_imps(unsigned short *impbuf, int buflen, long timelen)
       }
       playstate = PL_NONE;
       break;
-      
+
     case PL_NONE:
     default:
       return PTRDIFF(impbuf, impbufstart);
@@ -908,7 +908,7 @@ int next_segment(void)
 
   seg_desc[0] = '\0';
   lead_pause = tf_cseg.pause;
-  
+
   if(end_seg(&tf_cseg)) {
     currsegi = segi;
     if(read_header(rbuf, &tf_cseg)) interpret_header(rbuf, &tf_cseg);
@@ -919,7 +919,7 @@ int next_segment(void)
     if(lead_pause) finished = 1;
   }
   else playstate = PL_NONE;
-  
+
   if(tf_cseg.segtype <= SEG_STOP && !finished) {
     endnext = 1;
     endtype = tf_cseg.segtype;
@@ -978,7 +978,7 @@ int open_tapefile(char *name, int type)
     /*rb->snprintf(seg_desc,DESC_LEN, "Could not open `%s': %s", name, strerror(errno));*/
     return 0;
   }
-  
+
   tf_tpi.type = type;
   tf_cseg.pause = DEF_LEAD_PAUSE;
   INITTAPEOPT(tapeopt);
@@ -987,20 +987,20 @@ int open_tapefile(char *name, int type)
   isbeg();
 
   firstseg_offs = 0;
-  
+
   ok = 1;
-  
+
   if(tf_tpi.type == TAP_TZX) {
-    
+
     firstseg_offs = 10;
     res = readbuf(rbuf, 10, tapefd);
     if(res == 10 && rb->strncasecmp((char *)rbuf, tzxheader, 8) == 0) {
       tf_tpi.tzxmajver = rbuf[8];
       tf_tpi.tzxminver = rbuf[9];
-      
+
       if(tf_tpi.tzxmajver > TZXMAJPROG) {
     rb->snprintf(seg_desc, DESC_LEN,
-        "Cannot handle TZX file version (%i.%02i)", 
+        "Cannot handle TZX file version (%i.%02i)",
         tf_tpi.tzxmajver, tf_tpi.tzxminver);
     ok = 0;
       }
@@ -1010,7 +1010,7 @@ int open_tapefile(char *name, int type)
       ok = 0;
     }
   }
-  
+
   if(!ok) {
     close_tapefile();
     return 0;
@@ -1042,4 +1042,3 @@ void set_tapefile_options(struct tape_options *to)
 {
   rb->memcpy(&tapeopt, to, sizeof(tapeopt));
 }
-

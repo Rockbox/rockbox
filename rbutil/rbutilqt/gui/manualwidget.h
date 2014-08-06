@@ -39,4 +39,3 @@ class ManualWidget : public QWidget
 };
 
 #endif
-

@@ -30,4 +30,3 @@ unsigned int nand_ll_read_id(int bank);
 /* TODO later: create nand_ll_read/write/erase prototypes */
 
 #endif /* _NAND_TARGET_H_ */
-

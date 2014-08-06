@@ -3097,7 +3097,7 @@ static struct i2c_block maspcm[] = {
 
 /************ End of MAS pcm codec ************/
 
-#define WAVPLAY_QUIT BUTTON_OFF         
+#define WAVPLAY_QUIT BUTTON_OFF
 
 #define PCM_MAIN_IO_CONTROL      0x0661
 #define PCM_IF_STATUS_CONTROL    0x0662
@@ -3147,7 +3147,7 @@ static bool filling;
 static int last_dma_chunksize;
 static int aud_read = 0;
 static int aud_write = 0;
-static int low_water = (256*1024);   
+static int low_water = (256*1024);
 
 /** i2c, MAS configuration **/
 
@@ -3203,13 +3203,13 @@ void mas_restore(void)
     static const unsigned char resetdsp[] = { 0x88, 0x00 };
     static const unsigned char initdsp[] =  { 0x8c, 0x00 };
     unsigned long val;
-    
+
     i2c_random_write(MAS_ADR, MAS_CONTROL, resetdsp, sizeof(resetdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8d00); in core implementation */
     rb->sleep(1);
     i2c_random_write(MAS_ADR, MAS_CONTROL, initdsp, sizeof(initdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8c00); in core implementation */
-    
+
     /* Stop the current application */
     val = 0;
     rb->mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
@@ -3241,10 +3241,10 @@ void pcm_channel_config(int channel_config, int stereo_width)
     unsigned long val_lr = 0;
     unsigned long val_rl = 0;
     unsigned long val_rr = 0x80001;
-    
+
     switch(channel_config)
     {
-        /* Note: cases are in different order that in firmware/sound.c 
+        /* Note: cases are in different order that in firmware/sound.c
          * to work around a gcc bug (jumptable creation)! */
 
         /* case SOUND_CHAN_STEREO unnecessary */
@@ -3283,7 +3283,7 @@ void pcm_channel_config(int channel_config, int stereo_width)
                    integer part: upper 13 bits (inlcuding sign)
                    fractional part: lower 19 bits */
                 long fp_width, fp_straight, fp_cross;
-                
+
                 fp_width = (stereo_width * 0x7ffff) / 100;
                 if (stereo_width <= 100)
                 {
@@ -3346,7 +3346,7 @@ void dma_end_isr(void)
 void demand_irq_enable(bool on)
 {
     int oldlevel = disable_irq_save();
-    
+
     if(on)
     {
         IPRA = (IPRA & 0xfff0) | 0x000b;
@@ -3379,7 +3379,7 @@ void pcm_get_more(unsigned char** start, int* size)
 
     advance = MIN(available(), aud_size - aud_read);
     advance = MIN(0x4000, advance);
-    
+
     *start = aud_buf + aud_read;
     *size = advance;
 
@@ -3389,13 +3389,13 @@ void pcm_get_more(unsigned char** start, int* size)
 void pcm_start(void)
 {
     int advance;
-    
+
     advance = MIN(available(), aud_size - aud_read);
     advance = MIN(0x4000, advance);
 
     if (!advance)
         return;
-      
+
     pcm_callback = pcm_get_more;
 
     /* init DMA */
@@ -3403,7 +3403,7 @@ void pcm_start(void)
     CHCR3 &= ~0x0002; /* Clear interrupt */
     CHCR3 = 0x1504; /* Single address destination, TXI0, IE=1 */
     DMAOR = 0x0001; /* Enable DMA */
-    
+
     SAR3 = (unsigned int)(aud_buf + aud_read);
     DTCR3 = advance;
     last_dma_chunksize = advance;
@@ -3417,7 +3417,7 @@ void hijack_interrupts(bool on)
 {
     static bool taken = false;
     static unsigned long orig_DEI3, orig_IRQ3, orig_IRQ6;
-    
+
     if (on && !taken)
     {
         orig_IRQ3 = IRQ3;
@@ -3440,7 +3440,7 @@ void cleanup(void *fd)
 {
     demand_irq_enable(false);
     hijack_interrupts(false);
-    
+
     mas_restore();
     rb->sound_set(SOUND_CHANNELS, rb->global_settings->channel_config);
     rb->sound_set(SOUND_STEREO_WIDTH, rb->global_settings->stereo_width);
@@ -3458,7 +3458,7 @@ int play_file(char* filename)
     int fd;
     int wanted, got;
     unsigned format, channels, samplerate, samplebits, bytes, time;
-    unsigned rate = 0;                                      
+    unsigned rate = 0;
     unsigned long mas;
 
     fd = rb->open(filename, O_RDONLY);
@@ -3572,7 +3572,7 @@ int play_file(char* filename)
 #if !(CONFIG_STORAGE & STORAGE_MMC)
     low_water =   5 /* seconds */
                 * 2 /* bytes per sample */
-                * channels 
+                * channels
                 * samplerate;
 #endif
 
@@ -3589,7 +3589,7 @@ int play_file(char* filename)
             if (free_space <= 0)
                 free_space += aud_size;
             free_space -= 2;
-            
+
             if (free_space <= 0)
             {
                 filling = false;
@@ -3620,7 +3620,7 @@ int play_file(char* filename)
                 {
                     filling = false;
                 }
-                    
+
                 if (((available() >= low_water) || !filling) && !playing)
                     pcm_start();
             }
@@ -3636,7 +3636,7 @@ int play_file(char* filename)
             break;
         else if (rb->default_event_handler_ex(button, cleanup, &fd) == SYS_USB_CONNECTED)
             return PLAY_GOT_USB;
-            
+
 
     }
     cleanup(&fd);

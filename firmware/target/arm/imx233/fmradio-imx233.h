@@ -61,4 +61,3 @@
 #define FMP_GPIO    1
 
 #endif /* __fmradio_imx233__ */
- 

@@ -23,7 +23,7 @@
 
 #include <lcd.h>
 
-/* 
+/*
  * Icons of size 5x7 pixels for the Player LCD
  */
 

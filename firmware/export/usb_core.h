@@ -74,4 +74,3 @@ int usb_charging_maxcurrent(void);
 #endif
 
 #endif
-

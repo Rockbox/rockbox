@@ -50,9 +50,9 @@ void sys_bashfilename(const char *from, char *to)
     while((c = *from++))
     {
 #ifdef MSW
-    	if (c == '/') c = '\\';
+        if (c == '/') c = '\\';
 #endif
-    	*to++ = c;
+        *to++ = c;
     }
     *to = 0;
 }
@@ -65,10 +65,9 @@ void sys_unbashfilename(const char *from, char *to)
     while((c = *from++))
     {
 #ifdef MSW
-    	if (c == '\\') c = '/';
+        if (c == '\\') c = '/';
 #endif
-    	*to++ = c;
+        *to++ = c;
     }
     *to = 0;
 }
-

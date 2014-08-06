@@ -53,7 +53,7 @@ void fmradio_i2c_init(void)
 
     /* open-drain pins - external pullups on PCB. Pullup default but
      * disabled */
-    /* RI_DTE1 (I2C2_SCLK) */                          
+    /* RI_DTE1 (I2C2_SCLK) */
     iomuxc_set_pad_config(IOMUXC_RI_DTE1,
         IOMUXC_PAD_PUE_PKE_DISABLE | IOMUXC_PAD_PUS_UP_100K |
         IOMUXC_PAD_HYS | IOMUXC_PAD_ODE);
@@ -78,7 +78,7 @@ void fmradio_i2c_enable(bool enable)
         /* place in GPIO mode to hold SDIO low during RESET release,
          * SEN1 should be high already (pullup) and GPIO3 left alone */
         bitset32(&GPIO2_GDIR, (1 << 15)); /* SDIO OUT */
-        /* I2C2_SDA => MCU2_15 */ 
+        /* I2C2_SDA => MCU2_15 */
         iomuxc_set_pin_mux(IOMUXC_DCD_DTE1,
                            IOMUXC_MUX_OUT_GPIO | IOMUXC_MUX_IN_GPIO);
         /* enable CLK32KMCU clock */
@@ -173,7 +173,7 @@ void si4700_stc_rds_event(void)
 {
     /* read and clear the interrupt */
     SI4700_GPIO_STC_RDS_ISR = (1ul << SI4700_GPIO_STC_RDS_LINE);
-    si4700_rds_read_raw_async(); 
+    si4700_rds_read_raw_async();
 }
 
 /* Called with on=true after full radio power up, and with on=false before

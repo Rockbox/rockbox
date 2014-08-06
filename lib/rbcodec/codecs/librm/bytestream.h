@@ -34,4 +34,3 @@ static inline uint32_t rm_get_uint32le(uint8_t *buf)
 }
 
 #endif /* RM_BYTESTREAM_H */
-

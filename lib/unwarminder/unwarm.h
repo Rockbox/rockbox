@@ -174,5 +174,3 @@ void    UnwMemHashGC        (UnwState * const state);
 #endif /* UNWARM_H */
 
 /* END OF FILE */
-
-

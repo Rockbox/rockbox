@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2006 by Daniel Everton <dan@iocaine.org>
@@ -103,14 +103,14 @@ static int sdl_event_thread(void * param)
             DEBUGF("warn: %s\n", SDL_GetError());
         }
     }
-    
+
     /* Set things up */
     if (background)
     {
         width = UI_WIDTH;
         height = UI_HEIGHT;
-    } 
-    else 
+    }
+    else
     {
 #ifdef HAVE_REMOTE_LCD
         if (showremote)
@@ -307,29 +307,29 @@ int hostfs_flush(void)
 
 void sys_handle_argv(int argc, char *argv[])
 {
-    if (argc >= 1) 
+    if (argc >= 1)
     {
         int x;
-        for (x = 1; x < argc; x++) 
+        for (x = 1; x < argc; x++)
         {
 #ifdef DEBUG
-            if (!strcmp("--debugaudio", argv[x])) 
+            if (!strcmp("--debugaudio", argv[x]))
             {
                 debug_audio = true;
                 printf("Writing debug audio file.\n");
             }
-            else 
+            else
 #endif
                 if (!strcmp("--debugwps", argv[x]))
             {
                 debug_wps = true;
                 printf("WPS debug mode enabled.\n");
-            } 
+            }
             else if (!strcmp("--nobackground", argv[x]))
             {
                 background = false;
                 printf("Disabling background image.\n");
-            } 
+            }
 #ifdef HAVE_REMOTE_LCD
             else if (!strcmp("--noremote", argv[x]))
             {
@@ -376,7 +376,7 @@ void sys_handle_argv(int argc, char *argv[])
                     debug_buttons = true;
                     printf("Printing background button clicks.\n");
             }
-            else 
+            else
             {
                 printf("rockboxui\n");
                 printf("Arguments:\n");

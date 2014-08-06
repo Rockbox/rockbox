@@ -97,7 +97,7 @@ enum codec_status codec_run(void)
     }
 
     codec_set_replaygain(ci->id3);
-    
+
     /* Need to save offset for later use (cleared indirectly by advance_buffer) */
     param = ci->id3->elapsed;
     bytesdone = ci->id3->offset;
@@ -153,7 +153,7 @@ enum codec_status codec_run(void)
             num_sample_frames = ((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)
                                 |buf[13]);
             */
-            
+
             /* sample_size */
             format.bitspersample = ((buf[14]<<8)|buf[15]);
             /* sample_rate (don't use last 4 bytes, only integer fs) */
@@ -225,7 +225,7 @@ enum codec_status codec_run(void)
     codec = get_codec(format.formattag);
     if (codec == 0)
     {
-        DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n", 
+        DEBUGF("CODEC_ERROR: AIFC does not support compressionType: 0x%x\n",
             (unsigned int)format.formattag);
         return CODEC_ERROR;
     }

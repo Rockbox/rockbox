@@ -120,14 +120,14 @@ static long video_frames = 0;
 
 static int dipDifficulty[] = { DipDifficulty_Normal, DipDifficulty_Hard };
 static int dipLives[] = { DipLives_1, DipLives_2, DipLives_3, DipLives_5 };
-static int dipBonus[] = { DipBonus_10000, DipBonus_15000, DipBonus_20000, 
+static int dipBonus[] = { DipBonus_10000, DipBonus_15000, DipBonus_20000,
                           DipBonus_None };
 static int dipGhostNames[] = { DipGhostNames_Normal, DipGhostNames_Alternate };
 
 static int settings_to_dip(struct pacman_settings settings)
 {
-    return ( DipPlay_OneCoinOneGame | 
-             DipCabinet_Upright | 
+    return ( DipPlay_OneCoinOneGame |
+             DipCabinet_Upright |
              DipMode_Play |
              DipRackAdvance_Off |
 
@@ -193,7 +193,7 @@ static bool pacbox_menu(void)
                         "Restart", "Quit");
 
     rb->button_clear_queue();
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
@@ -256,7 +256,7 @@ static bool pacbox_menu(void)
                 break;
         }
     }
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
@@ -265,7 +265,7 @@ static bool pacbox_menu(void)
         init_PacmanMachine(settings_to_dip(settings));
     }
 
-    /* Possible results: 
+    /* Possible results:
          exit game
          restart game
          usb connected
@@ -307,7 +307,7 @@ static void get_more(const void **start, size_t *size)
     while (out < outend);
 
     *start = sound_buf;
-    *size = NBSAMPLES*sizeof(sound_buf[0]); 
+    *size = NBSAMPLES*sizeof(sound_buf[0]);
 }
 
 /*
@@ -320,7 +320,7 @@ static void start_sound(void)
     if (sound_playing)
         return;
 
-#ifndef PLUGIN_USE_IRAM    
+#ifndef PLUGIN_USE_IRAM
     /* Ensure control of PCM - stopping music isn't obligatory */
     rb->plugin_get_audio_buffer(NULL);
 #endif
@@ -434,7 +434,7 @@ static int gameProc( void )
 #endif
 #endif
 
-        /* We only update the screen every third frame - Pacman's native 
+        /* We only update the screen every third frame - Pacman's native
            framerate is 60fps, so we are attempting to display 20fps */
         if (frame_counter == 60 / FPS) {
 
@@ -448,16 +448,16 @@ static int gameProc( void )
                 rb->yield ();
             }
 
-            /* The following functions render the Pacman screen from the 
-               contents of the video and color ram.  We first update the 
-               background, and then draw the Sprites on top. 
+            /* The following functions render the Pacman screen from the
+               contents of the video and color ram.  We first update the
+               background, and then draw the Sprites on top.
             */
 
             renderBackground( video_buffer );
             renderSprites( video_buffer );
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-            rb->lcd_blit_pal256(    video_buffer, 0, 0, XOFS, YOFS, 
+            rb->lcd_blit_pal256(    video_buffer, 0, 0, XOFS, YOFS,
                                     ScreenWidth, ScreenHeight);
 #else
             blit_display(rb->lcd_framebuffer,video_buffer);
@@ -519,13 +519,13 @@ enum plugin_status plugin_start(const void* parameter)
                         SETTINGS_VERSION);
     }
 
-    /* Keep a copy of the saved version of the settings - so we can check if 
+    /* Keep a copy of the saved version of the settings - so we can check if
        the settings have changed when we quit */
     old_settings = settings;
 
     /* Initialise the hardware */
     init_PacmanMachine(settings_to_dip(settings));
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
@@ -546,7 +546,7 @@ enum plugin_status plugin_start(const void* parameter)
     } else {
         rb->splashf(HZ*2, "No ROMs in %s/pacman/", ROCKBOX_DIR);
     }
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif

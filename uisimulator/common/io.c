@@ -360,7 +360,7 @@ static const char *get_sim_pathname(const char *name)
 
     if(name[0] == '/')
     {
-        snprintf(buffer, sizeof(buffer), "%s%s", 
+        snprintf(buffer, sizeof(buffer), "%s%s",
                  sim_root_dir ?: SIMULATOR_DEFAULT_ROOT, name);
         return handle_special_links(buffer);
     }
@@ -456,7 +456,7 @@ read_next:
         secret.info.attribute = ATTR_DIRECTORY;
 
     secret.info.size = s.st_size;
-    
+
     if (localtime_r(&(s.st_mtime), &tm) == NULL)
         return NULL;
     secret.info.wrtdate = ((tm.tm_year - 80) << 9) |

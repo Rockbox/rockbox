@@ -33,4 +33,3 @@ int wavtrim(char * filename, int maxsilence ,char* errstring,int errsize);
 }
 #endif
 #endif
-

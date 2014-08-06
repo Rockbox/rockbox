@@ -47,17 +47,17 @@ static void ipod_connect(void)
     int intarg;
     if (x_fd >= 0)
     {
-    	error("ipod_connect: already connected");
-    	return;
+        error("ipod_connect: already connected");
+        return;
     }
 
-    	/* create a socket */
+        /* create a socket */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
     if (sockfd < 0)
     {
-    	sys_sockerror("socket");
-    	return;
+        sys_sockerror("socket");
+        return;
     }
 
     /* connect socket using hostname provided in command line */
@@ -66,8 +66,8 @@ static void ipod_connect(void)
     hp = gethostbyname(hostname);
     if (hp == 0)
     {
-	post("bad host?\n");
-	return;
+        post("bad host?\n");
+        return;
     }
 
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -75,9 +75,9 @@ static void ipod_connect(void)
     server.sin_port = htons((u_short)portno);
     if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
     {
-    	sys_sockerror("connecting stream socket");
-    	sys_closesocket(sockfd);
-    	return;
+        sys_sockerror("connecting stream socket");
+        sys_closesocket(sockfd);
+        return;
     }
     post("connected %s %d",hostname,portno);
     x_fd = sockfd;
@@ -132,7 +132,7 @@ static void *ipod_new(t_symbol* what)
 static void ipod_setup(void)
 {
     ipod_class = class_new(gensym("ipod"), (t_newmethod)ipod_new, 0,
-    	sizeof(t_ipod), 0, A_DEFSYM, 0);
+        sizeof(t_ipod), 0, A_DEFSYM, 0);
     class_addbang(ipod_class, ipod_bang);
     class_addfloat(ipod_class, ipod_float);
     ipod_connect();
@@ -147,11 +147,10 @@ void pd_checkgui(t_pd *x, t_symbol *s)
             !strcmp((*x)->c_name->s_name,"bng") ||
             !strcmp((*x)->c_name->s_name,"vradio") ||
             !strcmp((*x)->c_name->s_name,"hradio")) {
-            
+
             post("binding %s to %s",s->s_name,(*x)->c_name->s_name);
             if (!ipod_class) ipod_setup();
             ipod = ipod_new(s);
             pd_bind(&ipod->x_obj.ob_pd,s);
         }
 }
-

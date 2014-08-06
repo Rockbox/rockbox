@@ -76,7 +76,7 @@ void lcd_sleep()
         /* Disabling these saves another ~15mA */
         bitclr16(&IO_OSD_OSDWINMD0, 0x01);
         bitclr16(&IO_VID_ENC_VMOD, 0x01);
-        
+
         /* Disabling the LCD saves ~50mA */
         IO_GIO_BITCLR2=1<<4; /* pin 36 */
     }
@@ -90,12 +90,12 @@ void lcd_awake(void)
         lcd_on=true;
         bitset16(&IO_OSD_OSDWINMD0, 0x01);
         bitset16(&IO_VID_ENC_VMOD, 0x01);
-    
+
         sleep(2);
         IO_GIO_BITSET2      = 1<<4;
-        
+
         lcd_update();
-        
+
         /* Wait long enough for a frame to be written */
         sleep(HZ/10);
 
@@ -109,7 +109,7 @@ void lcd_enable_composite(bool enable)
     /* Pin 39 appears to be related to the composite output */
 
     short vidtemp = (IO_VID_ENC_VMOD & 0x7E8);
-    
+
     if(enable)
     {
         IO_GIO_BITSET2   = 0x80;
@@ -119,10 +119,10 @@ void lcd_enable_composite(bool enable)
     {
         IO_GIO_BITCLR2   = 0x80;
         vidtemp |= 0x2015;
-        IO_VID_ENC_DCLKCTL  = 0x0800;   
+        IO_VID_ENC_DCLKCTL  = 0x0800;
         IO_VID_ENC_DCLKPTN0 = 0x0001;
     }
-    
+
     IO_VID_ENC_VMOD = vidtemp;
 }
 
@@ -137,7 +137,7 @@ void lcd_enable_composite(bool enable)
 void lcd_init_device(void)
 {
     unsigned int addr;
-    
+
     IO_GIO_BITCLR2      = 0x10; /* LCD off */
 
 #if LCD_NATIVE_HEIGHT > 320
@@ -158,7 +158,7 @@ void lcd_init_device(void)
 
     IO_VID_ENC_VMOD = 0x4;
 
-    IO_VID_ENC_DCLKCTL  = 0x0800;   
+    IO_VID_ENC_DCLKCTL  = 0x0800;
     IO_VID_ENC_DCLKPTN0 = 0x0001;
 
     IO_OSD_OSDWINMD0    &= ~(0x0001);
@@ -167,7 +167,7 @@ void lcd_init_device(void)
     /* Setup the LCD controller */
     IO_VID_ENC_HSPLS    = 1; /* HSYNC pulse width */
     IO_VID_ENC_VSPLS    = 1; /* VSYNC pulse width */
-    
+
     /* These calculations support 640x480 and 320x240 (based on OF) */
     IO_VID_ENC_HINT     = LCD_NATIVE_WIDTH+LCD_NATIVE_WIDTH/3;
     IO_VID_ENC_HSTART   = LCD_NATIVE_WIDTH/6;   /* Back porch */
@@ -180,7 +180,7 @@ void lcd_init_device(void)
     IO_VID_ENC_VDCTL    = 0x2000;
     IO_VID_ENC_VDPRO    = 0x0000;
     IO_VID_ENC_SYNCTL   = 0x100E;
-    
+
     IO_VID_ENC_HSDLY    = 0x0000;
     IO_VID_ENC_VSDLY    = 0x0000;
     IO_VID_ENC_YCCTL    = 0x0000;
@@ -197,35 +197,35 @@ void lcd_init_device(void)
 
     /* Setup the display */
     IO_OSD_MODE         = 0x00ff;
-    
+
     IO_OSD_ATRMD        = 0x0000;
     IO_OSD_RECTCUR      = 0x0000;
-    
+
     IO_OSD_BASEPX       = IO_VID_ENC_HSTART;
     IO_OSD_BASEPY       = IO_VID_ENC_VSTART;
-    
+
     addr                = ((int)FRAME-CONFIG_SDRAM_START) / 32;
 
     /* Setup the OSD windows */
-    
+
     /* Used for 565 RGB */
     IO_OSD_OSDWINMD0    = 0x30C1;
 
     IO_OSD_OSDWIN0OFST  = LCD_NATIVE_WIDTH *2 / 32;
-    
+
     IO_OSD_OSDWINADH    = addr >> 16;
     IO_OSD_OSDWIN0ADL   = addr & 0xFFFF;
 
     IO_OSD_OSDWIN0XP    = 0;
     IO_OSD_OSDWIN0YP    = 0;
-    
+
     /* read from OF */
     IO_OSD_OSDWIN0XL    = LCD_NATIVE_WIDTH;
     IO_OSD_OSDWIN0YL    = LCD_NATIVE_HEIGHT;
-    
+
     /* Unused */
     IO_OSD_OSDWINMD1    = 0x10C0;
-    
+
 #if LCD_NATIVE_WIDTH%32!=0
     IO_OSD_OSDWIN1OFST  = LCD_NATIVE_WIDTH / 32+1;
 #else
@@ -233,19 +233,19 @@ void lcd_init_device(void)
 #endif
 
     IO_OSD_OSDWIN1ADL   = addr & 0xFFFF;
-    
+
     IO_OSD_OSDWIN1XP    = 0;
     IO_OSD_OSDWIN1YP    = 0;
-    
+
     IO_OSD_OSDWIN1XL    = LCD_NATIVE_WIDTH;
     IO_OSD_OSDWIN1YL    = LCD_NATIVE_HEIGHT;
-    
+
     IO_OSD_VIDWINMD     = 0x0000;
-    
-    addr                = ((int)FRAME2-CONFIG_SDRAM_START + 
+
+    addr                = ((int)FRAME2-CONFIG_SDRAM_START +
                             2*(LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-320)/2+
                                 (LCD_NATIVE_WIDTH-240)/2))/ 32;
-    
+
     /* This is a bit messy, the LCD transfers appear to happen in chunks of 32
      * pixels. (based on OF)
      */
@@ -254,18 +254,18 @@ void lcd_init_device(void)
 #else
     IO_OSD_VIDWIN0OFST  = LCD_NATIVE_WIDTH * 2 / 32;
 #endif
-    
+
     IO_OSD_VIDWINADH    = addr >> 16;
     IO_OSD_VIDWIN0ADL   = addr & 0xFFFF;
-    
+
     IO_OSD_VIDWIN0XP    = 0;
     IO_OSD_VIDWIN0YP    = 0;
-    
+
     IO_OSD_VIDWIN0XL    = LCD_NATIVE_WIDTH;
     IO_OSD_VIDWIN0YL    = LCD_NATIVE_HEIGHT;
 
     IO_OSD_OSDWINMD0    |= 0x01;
-    
+
     IO_GIO_BITSET2      = 0x10; /* LCD on */
 //    lcd_enable_composite(false);
 }
@@ -312,18 +312,18 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
                                     int x, int y,
                                     int width, int height, int pix_width) {
     char *dst;
-    
+
     /* Addresses are relative to start of SDRAM */
     src     =  src + (src_y*LCD_HEIGHT + src_x) * pix_width;
     dst     =   (char *)FRAME + (y * LCD_HEIGHT + x) * pix_width;
-                    
+
     /* Flush the area that is being copied from. */
     commit_dcache_range(src, (stride*pix_width*width));
-    
+
     /* Addresses are relative to start of SDRAM */
     src     -=  CONFIG_SDRAM_START;
     dst     -=  CONFIG_SDRAM_START;
-    
+
     /* Enable Image Buffer clock */
     bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
 
@@ -331,7 +331,7 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
     COP_BUF_MUX1    = 0x0005;
     /* Give the DMA access to the buffer */
     COP_BUF_MUX0    = 0x0663;
-    
+
     /* Setup buffer offsets and transfer width/height */
     COP_BUF_LOFST   = width;
     COP_DMA_XNUM    = width;
@@ -339,38 +339,38 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
 
     /* ... */
     COP_IMG_MODE    = 0x0000;
-    
+
     /* Set the start address of buffer */
     COP_BUF_ADDR    = 0x0000;
-    
+
     /* Setup SDRAM stride */
     COP_SDEM_LOFST  = stride;
     do {
         int addr;
         addr            = (int)src;
         addr            >>= 1; /* Addresses are in 16-bit words */
-        
+
         /* Setup the registers to initiate the read from SDRAM */
         COP_SDEM_ADDRH  = addr >> 16;
         COP_SDEM_ADDRL  = addr & 0xFFFF;
-        
+
         /* Set direction and start */
         COP_DMA_CTRL    = 0x0001;
         COP_DMA_CTRL    |= 0x0003;
-        
+
         /* Wait for read to finish */
         while(COP_DMA_CTRL & 0x02) {};
-        
+
         addr            = (int)dst;
         addr            >>= 1;
-        
+
         COP_SDEM_ADDRH  = addr >> 16;
         COP_SDEM_ADDRL  = addr & 0xFFFF;
-        
+
         /* Set direction and start transfer */
         COP_DMA_CTRL    = 0x0000;
         COP_DMA_CTRL    = 0x0002;
-        
+
         /* Wait for the transfer to complete */
         while(COP_DMA_CTRL & 0x02) {};
 
@@ -388,21 +388,21 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
                                     int x, int y,
                                     int width, int height, int pix_width) {
     char *dst;
-    
+
     /* Calculate starting place */
     src     =  src + (src_x*LCD_HEIGHT + src_y) * pix_width;
-    dst     =   (char *)FRAME + (LCD_HEIGHT*(LCD_WIDTH-1) - x * LCD_HEIGHT + y) 
+    dst     =   (char *)FRAME + (LCD_HEIGHT*(LCD_WIDTH-1) - x * LCD_HEIGHT + y)
                 * pix_width;
-    
+
     /* Flush the area that is being copied from. */
     commit_dcache();
-    
+
 //    commit_dcache_range(src, (stride*pix_width*width));
-    
+
     /* Addresses are relative to start of SDRAM */
     src     -=  CONFIG_SDRAM_START;
     dst     -=  CONFIG_SDRAM_START;
-    
+
     /* Enable Image Buffer clock */
     bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
 
@@ -410,7 +410,7 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
     COP_BUF_MUX1    = 0x0005;
     /* Give the DMA access to the buffer */
     COP_BUF_MUX0    = 0x0663;
-    
+
     /* Setup buffer offsets and transfer width/height */
     COP_BUF_LOFST   = height;
     COP_DMA_XNUM    = height;
@@ -418,41 +418,41 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
 
     /* ... */
     COP_IMG_MODE    = 0x0000;
-    
+
     /* Set the start address of buffer */
     COP_BUF_ADDR    = 0x0000;
-    
+
     /* Setup SDRAM stride */
     COP_SDEM_LOFST  = stride;
     do {
         int addr;
         addr            = (int)src;
         addr            >>= 1; /* Addresses are in 16-bit words */
-        
+
         /* Setup the registers to initiate the read from SDRAM */
         COP_SDEM_ADDRH  = addr >> 16;
         COP_SDEM_ADDRL  = addr & 0xFFFF;
-        
+
         /* Set direction and start */
         COP_DMA_CTRL    = 0x0001;
         COP_DMA_CTRL    |= 0x0003;
-        
+
         /* Wait for read to finish */
         while(COP_DMA_CTRL & 0x02) {};
-        
+
         addr            = (int)dst;
         addr            >>= 1;
-        
+
         COP_SDEM_ADDRH  = addr >> 16;
         COP_SDEM_ADDRL  = addr & 0xFFFF;
-        
+
         /* Set direction and start transfer */
         COP_DMA_CTRL    = 0x0000;
         COP_DMA_CTRL    = 0x0002;
-        
+
         /* Wait for the transfer to complete */
         while(COP_DMA_CTRL & 0x02) {};
-        
+
         /* update the width, update pointers/counters */
         src     += (stride*pix_width);
         dst     -= (stride*pix_width);
@@ -466,7 +466,7 @@ static void dma_start_transfer16(   char *src, int src_x, int src_y, int stride,
 #endif
 
 /* Update a fraction of the display. */
-void lcd_update_rect(int x, int y, int width, int height) 
+void lcd_update_rect(int x, int y, int width, int height)
                 __attribute__ ((section(".icode")));
 void lcd_update_rect(int x, int y, int width, int height)
 {
@@ -489,7 +489,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
 
 #if defined(LCD_USE_DMA)
-    dma_start_transfer16( (char *)lcd_framebuffer, x, y, LCD_WIDTH, 
+    dma_start_transfer16( (char *)lcd_framebuffer, x, y, LCD_WIDTH,
         x, y, width, height, 2);
 #else
     register fb_data *dst;
@@ -514,7 +514,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 
 #if defined(LCD_USE_DMA)
-    dma_start_transfer16( (char *)lcd_framebuffer, x, y, LCD_HEIGHT, 
+    dma_start_transfer16( (char *)lcd_framebuffer, x, y, LCD_HEIGHT,
         x, y, width, height, 2);
 #else
     fb_data *src;
@@ -534,19 +534,19 @@ void lcd_update_rect(int x, int y, int width, int height)
     register fb_data *dst, *src;
     src = FBADDR(x,y);
 
-    dst=FRAME + (LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-1)) 
+    dst=FRAME + (LCD_NATIVE_WIDTH*(LCD_NATIVE_HEIGHT-1))
         - LCD_NATIVE_WIDTH*x + y ;
 
     height--;
     do {
         register int c_width=width-1;
         register fb_data *c_dst=dst;
-        
+
         do {
             *c_dst=*src++;
             c_dst-=LCD_NATIVE_WIDTH;
         } while(c_width--);
-        
+
         src+=LCD_WIDTH-width;
         dst++;
     } while(height--);
@@ -562,7 +562,7 @@ void lcd_update(void)
 {
     if (!lcd_on)
         return;
-        
+
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
@@ -575,7 +575,7 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
 #if defined(LCD_USE_DMA)
 //    char *dst=(char *)FRAME+x+y*(LCD_NATIVE_WIDTH+LCD_FUDGE);
-    
+
     dma_start_transfer16(   src, src_x, src_y, LCD_WIDTH,
                             x, y, width, height, 1);
 #else
@@ -586,7 +586,7 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
     {
         memcpy(dst, src, width);
 
-        dst = dst + ((LCD_WIDTH -x +LCD_FUDGE)); 
+        dst = dst + ((LCD_WIDTH -x +LCD_FUDGE));
         src = src + (LCD_WIDTH - x);
     }
 #endif
@@ -597,7 +597,7 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
     char *dst=(char *)FRAME
         + (LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)
         - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y;
-    
+
     src=src+src_x+src_y*width;
 
     do
@@ -619,7 +619,7 @@ void lcd_blit_pal256(unsigned char *src, int src_x, int src_y, int x, int y,
 void lcd_pal256_update_pal(fb_data *palette)
 {
     unsigned int index = 255;
-    
+
     do
     {
         int y, cb, cr;
@@ -627,23 +627,23 @@ void lcd_pal256_update_pal(fb_data *palette)
         unsigned char r = RGB_UNPACK_RED_LCD    (index_value)<<3;
         unsigned char g = RGB_UNPACK_GREEN_LCD  (index_value)<<2;
         unsigned char b = RGB_UNPACK_BLUE_LCD   (index_value)<<3;
-        
+
         y  = (( 77 * r + 150 * g + 29  * b) >> 8);
         cb = ((-43 * r - 85  * g + 128 * b) >> 8) + 128;
         cr = ((128 * r - 107 * g - 21  * b) >> 8) + 128;
-        
+
         while(IO_OSD_MISCCTL&0x08)
         {};
-        
+
         /* Write in y and cb */
         IO_OSD_CLUTRAMYCB= ((unsigned char)y << 8) | (unsigned char)cb;
-        
+
         /* Write in the index and cr */
         IO_OSD_CLUTRAMCR=((unsigned char)cr << 8) | (unsigned char)index;
     } while (index--); /* Write 256 values in */
 }
 #endif
-                                           
+
 /* Performance function to blit a YUV bitmap directly to the LCD */
 /* Show it rotated so the LCD_WIDTH is now the height */
 void lcd_blit_yuv(unsigned char * const src[3],
@@ -654,11 +654,11 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
     if (!lcd_on)
         return;
-    
+
     /* y has to be on a 16 pixel boundary */
     y &= ~0xF;
 
-    if(     ((y | x | height | width ) < 0) 
+    if(     ((y | x | height | width ) < 0)
             || y>LCD_NATIVE_HEIGHT || x>LCD_NATIVE_WIDTH )
         return;
 
@@ -675,8 +675,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
     width &= ~1;
     height>>=1;
 
-    fb_data * dst = FRAME2 
-        + ((LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)) 
+    fb_data * dst = FRAME2
+        + ((LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1))
         - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y ;
 
     /* Scope z */
@@ -699,19 +699,19 @@ void lcd_blit_yuv(unsigned char * const src[3],
             register unsigned short Y=*((unsigned short*)yuv_src[0]);
             register unsigned short Yst=*((unsigned short*)(yuv_src[0]+stride));
             yuv_src[0]+=2;
-            
+
             register unsigned char Cb=*yuv_src[1]++;
             register unsigned char Cr=*yuv_src[2]++;
-            
+
             *c_dst = (Yst<<24) | (Cr << 16) | ((Y&0xFF)<<8) | Cb;
-            *(c_dst - (LCD_NATIVE_WIDTH+LCD_FUDGE)/2) = 
+            *(c_dst - (LCD_NATIVE_WIDTH+LCD_FUDGE)/2) =
                     ( (Yst&0xFF00)<<16) | (Cr << 16) | (Y&0xFF00) | Cb;
-                    
+
             c_dst -= (LCD_NATIVE_WIDTH+LCD_FUDGE);
-            
+
             c_width -= 2;
         } while (c_width);
-        
+
         yuv_src[0] += y_remain; /* Skip down two luma lines-width */
         yuv_src[1] += cbcr_remain; /* Skip down one chroma line-width/2 */
         yuv_src[2] += cbcr_remain;
@@ -734,4 +734,3 @@ void lcd_set_flip(bool yesno) {
   (void) yesno;
   // TODO:
 }
-

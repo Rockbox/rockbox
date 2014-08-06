@@ -32,7 +32,7 @@ static unsigned short codec_base_gain;
 static unsigned short codec_mic_gain;
 static int HP_register_value;
 #endif
-static bool HP_on_off_flag; 
+static bool HP_on_off_flag;
 
 static void i2s_codec_reset(void)
 {
@@ -54,7 +54,7 @@ static void i2s_codec_init(void)
     __i2s_internal_codec();
     __i2s_as_slave();
     __i2s_select_i2s();
-    __aic_select_i2s(); 
+    __aic_select_i2s();
 
     __aic_disable_byteswap();
     __aic_disable_unsignadj();
@@ -90,9 +90,9 @@ static void i2s_codec_set_mic(unsigned short v) /* 0 <= v <= 100 */
     v &= 0xff;
 
     if(v > 100)
-        v = 100; 
+        v = 100;
     codec_mic_gain = 31 * v/100;
-    
+
     REG_ICDC_CDCCR2 = ((REG_ICDC_CDCCR2 & ~(0x1f << 16)) | (codec_mic_gain << 16));
 }
 
@@ -111,7 +111,7 @@ static void i2s_codec_set_base(unsigned short v) /* 0 <= v <= 100 */
         codec_base_gain = 2;
     if(v >= 75 && v <= 100)
         codec_base_gain = 3;
-    
+
     REG_ICDC_CDCCR2 = ((REG_ICDC_CDCCR2 & ~(0x3 << 4)) | (codec_base_gain << 4));
 }
 
@@ -130,7 +130,7 @@ static void i2s_codec_set_volume(unsigned short v) /* 0 <= v <= 100 */
         codec_volume = 2;
     if(v >= 75 && v <= 100)
         codec_volume = 3;
-    
+
     REG_ICDC_CDCCR2 = ((REG_ICDC_CDCCR2 & ~(0x3)) | codec_volume);
 }
 
@@ -138,7 +138,7 @@ static unsigned short i2s_codec_get_bass(void)
 {
     unsigned short val;
     int ret;
-    
+
     if(codec_base_gain == 0)
         val = 0;
     if(codec_base_gain == 1)
@@ -147,10 +147,10 @@ static unsigned short i2s_codec_get_bass(void)
         val = 50;
     if(codec_base_gain == 3)
         val = 75;
-    
+
     ret = val << 8;
     val |= ret;
-    
+
     return val;
 }
 
@@ -161,7 +161,7 @@ static unsigned short i2s_codec_get_mic(void)
     val = 100 * codec_mic_gain / 31;
     ret = val << 8;
     val |= ret;
-    
+
     return val;
 }
 
@@ -178,29 +178,29 @@ static unsigned short i2s_codec_get_volume(void)
         val = 50;
     if(codec_volume == 3)
         val = 75;
-    
+
     ret = val << 8;
     val |= ret;
-    
+
     return val;
 }
 
 static unsigned long HP_register_value;
 static void HP_turn_on(void)
-{ 
+{
     //see 1.3.4.1
-    
+
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_SUSPD | ICDC_CDCCR1_RST); //set suspend 0
 
     mdelay(15);
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVR | ICDC_CDCCR1_VRCGL | ICDC_CDCCR1_VRCGH);
     REG_ICDC_CDCCR1 |= (ICDC_CDCCR1_EDAC | ICDC_CDCCR1_HPCG);
-    
+
     mdelay(600);
     REG_ICDC_CDCCR1 &= ~(ICDC_CDCCR1_PDVRA | ICDC_CDCCR1_HPCG | ICDC_CDCCR1_PDHPM | ICDC_CDCCR1_PDHP);
-    
+
     mdelay(2);
-    HP_register_value = REG_ICDC_CDCCR1; 
+    HP_register_value = REG_ICDC_CDCCR1;
 
     //see 1.3.4.2
     /*REG_ICDC_CDCCR1 &= 0xfffffffc;
@@ -242,7 +242,7 @@ static void HP_turn_off(void)
     REG_ICDC_CDCCR1 &= 0xfffffdff;
     mdelay(7);
     REG_ICDC_CDCCR1 |= 0x00000002;*/
-    
+
     //see 1.3.4.3
 }
 #endif
@@ -363,7 +363,7 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_MIC:             /* recording only */
             audio_channels = 1;
             if(source != last_source)
-                REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE)) 
+                REG_ICDC_CDCCR1 = (REG_ICDC_CDCCR1 & ~(ICDC_CDCCR1_ELININ | ICDC_CDCCR1_EDAC | ICDC_CDCCR1_SW2ON | ICDC_CDCCR1_HPMUTE))
                                     | (ICDC_CDCCR1_EADC | ICDC_CDCCR1_SW1ON | ICDC_CDCCR1_EMIC);
             break;
 #endif

@@ -1,6 +1,6 @@
 /* Copyright (c) 2007, Christophe Fergeau  <teuf@gnome.org>
  * Part of the libgpod project.
- * 
+ *
  * URL: http://www.gtkpod.org/
  * URL: http://gtkpod.sourceforge.net/
  *
@@ -41,19 +41,19 @@ static int do_sg_write_buffer (const char *device, void *buffer, size_t len)
 
     fd = open (device, O_RDWR);
     if (fd < 0) {
-	printf ("Couldn't open device %s\n", device);
-	return -1;
+        printf ("Couldn't open device %s\n", device);
+        return -1;
     }
 
     printf ("    Data Payload: ");
     for (i = 0; i < len; i++) {
-	printf ("%02x ", *((uint8_t *)buffer+i));
+        printf ("%02x ", *((uint8_t *)buffer+i));
     }
     printf ("\n");
 
     if (sg_ll_write_buffer (fd, 1, 0, 0x0c0000, buffer, len, 1, 1) != 0) {
-	close(fd);
-	return -2;
+        close(fd);
+        return -2;
     }
     close(fd);
 
@@ -63,21 +63,21 @@ static int do_sg_write_buffer (const char *device, void *buffer, size_t len)
 int sync_time (const char *device, struct tm *tm)
 {
     struct iPodTime {
-	uint16_t year;
-	uint16_t days;
-	uint8_t timezone;
-	uint8_t hour;
-	uint8_t minute;
-	uint8_t second;
-	uint8_t dst;
-	uint8_t padding[3];
+        uint16_t year;
+        uint16_t days;
+        uint8_t timezone;
+        uint8_t hour;
+        uint8_t minute;
+        uint8_t second;
+        uint8_t dst;
+        uint8_t padding[3];
     } __attribute__((__packed__));
     struct iPodTime ipod_time;
 
     if (tm == NULL) {
-	time_t current_time;
-	current_time = time (NULL);
-	tm = localtime (&current_time);
+        time_t current_time;
+        current_time = time (NULL);
+        tm = localtime (&current_time);
     }
 
     ipod_time.year = htobe16 (1900+tm->tm_year);
@@ -90,9 +90,9 @@ int sync_time (const char *device, struct tm *tm)
     ipod_time.minute = tm->tm_min;
     ipod_time.second = tm->tm_sec;
     if (tm->tm_isdst) {
-	ipod_time.dst = 1;
+        ipod_time.dst = 1;
     } else {
-	ipod_time.dst = 0;
+        ipod_time.dst = 0;
     }
     memset (ipod_time.padding, 0, sizeof (ipod_time.padding));
 

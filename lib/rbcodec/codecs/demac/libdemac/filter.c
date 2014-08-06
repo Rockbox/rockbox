@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #include "demac.h"
 #include "filter.h"
 #include "demac_config.h"
-     
+
 #if FILTER_BITS == 32
 
 #if defined(CPU_ARM) && (ARM_ARCH == 4)
@@ -131,7 +131,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3980(struct filter_t* f,
                                                   int32_t* data, int count)
 {
     int res;
-    int absres; 
+    int absres;
 
 #ifdef PREPARE_SCALARPRODUCT
     PREPARE_SCALARPRODUCT
@@ -205,7 +205,7 @@ static void ICODE_ATTR_DEMAC do_apply_filter_3970(struct filter_t* f,
                                                   int32_t* data, int count)
 {
     int res;
-    
+
 #ifdef PREPARE_SCALARPRODUCT
     PREPARE_SCALARPRODUCT
 #endif

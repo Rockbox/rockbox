@@ -89,7 +89,7 @@ bool button_hold(void)
 #ifndef BOOTLOADER
 static int read_wheel_keycode(void)
 {
-    /* Read wheel 
+    /* Read wheel
      * Bits 6 and 7 of GPIOH change as follows:
      * Clockwise rotation   01 -> 00 -> 10 -> 11
      * Counter-clockwise    11 -> 10 -> 00 -> 01
@@ -102,7 +102,7 @@ static int read_wheel_keycode(void)
     {
        /* 0x00  0x40  0x80  0xc0 */ /* Wheel value        */
         { 0x40, 0xc0, 0x00, 0x80 }, /* Clockwise rotation */
-        { 0x80, 0x00, 0xc0, 0x40 }, /* Counter-clockwise  */ 
+        { 0x80, 0x00, 0xc0, 0x40 }, /* Counter-clockwise  */
     };
 
     static unsigned long prev_value;

@@ -63,7 +63,7 @@ void format(
         width = 10*width + ch - '0';
         ch = *fmt++;
         }
-        
+
         precision = 0;
         if(ch == '.')
         {
@@ -236,7 +236,7 @@ static int fprfunc(void *pr, unsigned char letter)
 {
     struct for_fprintf *fpr  = (struct for_fprintf *)pr;
     int rc = write(fpr->fd, &letter, 1);
-    
+
     if(rc > 0) {
         fpr->bytes++; /* count them */
         return true;  /* we are ok */

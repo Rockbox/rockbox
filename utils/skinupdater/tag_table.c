@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* The tag definition table */
-struct tag_info legal_tags[] = 
+struct tag_info legal_tags[] =
 {
     { "ac", "" },
     { "al", "" },
@@ -32,7 +32,7 @@ struct tag_info legal_tags[] =
     { "ar", "" },
     { "aR", "" },
     { "ax", "" },
-    
+
     { "bl" , "*fIIII" },
     { "bv", "" },
     { "bt", "" },
@@ -40,8 +40,8 @@ struct tag_info legal_tags[] =
     { "bc", "" },
     { "bp", "" },
     { "bu", "" },
-    
-    
+
+
     { "cc", "" },
     { "cd", "" },
     { "ce", "" },
@@ -61,7 +61,7 @@ struct tag_info legal_tags[] =
     { "cb", "" },
     { "cu", "" },
     { "cw", "" },
-        
+
     { "fb", "" },
     { "fc", "" },
     { "ff", "" },
@@ -72,7 +72,7 @@ struct tag_info legal_tags[] =
     { "fs", "" },
     { "fv", "" },
     { "d"  , "I" },
-    
+
     { "Fb", "" },
     { "Fc", "" },
     { "Ff", "" },
@@ -83,8 +83,8 @@ struct tag_info legal_tags[] =
     { "Fs", "" },
     { "Fv", "" },
     { "D"  , "I" },
-    
-    
+
+
     { "ia", "" },
     { "ic", "" },
     { "id", "" },
@@ -97,7 +97,7 @@ struct tag_info legal_tags[] =
     { "iv", "" },
     { "iy", "" },
     { "iC", "" },
-    
+
     { "Ia", "" },
     { "Ic", "" },
     { "Id", "" },
@@ -110,23 +110,23 @@ struct tag_info legal_tags[] =
     { "Iv", "" },
     { "Iy", "" },
     { "IC", "" },
-    
+
     { "Sp", "" },
     { "Ss", "" },
-    
+
     { "lh", "" },
-    
+
     { "mh", "" },
     { "mr", "" },
     { "mm", "" },
     { "mp", "" },
     { "mv", "|I" },
-    
+
     { "pm", "" },
     { "pf", "" },
     { "pb" , "*fIIII" },
     { "pv" , "*fIIII" },
-    
+
     { "px", "" },
     { "pc", "" },
     { "pr", "" },
@@ -137,14 +137,14 @@ struct tag_info legal_tags[] =
     { "pe", "" },
     { "pn", "" },
     { "ps", "" },
-    
+
     { "rp", "" },
     { "rr", "" },
     { "ra", "" },
-    
+
     { "rg", "" },
     { "xf", "" },
-    
+
     { "tp", "" },
     { "tt", "" },
     { "tm", "" },
@@ -159,43 +159,43 @@ struct tag_info legal_tags[] =
     { "tx", "" },
     { "ty", "" },
     { "tz", "" },
-    
+
     { "s", "" },
     { "t"  , "I" },
-    
+
     { "we", "" },
     { "wd", "" },
     { "wi", "" },
-    
+
     { "xl", "SFIIi" },
     { "xd", "S" },
     { "x", "SFII" },
-    
+
     { "Fl" , "IF"},
     { "Cl" , "IISS"},
     { "C" , "important"},
-    
+
     { "Vd" , "S"},
     { "VI" , "S"},
-    
+
     { "Vp" , "ICC"},
     { "Lt" , ""},
     { "Li" , ""},
-    
+
     { "Vl" , "SIIiii|ii"},
     { "Vi" , "sIIiii|ii"},
     { "V"  , "IIiii|ii"},
-    
+
     { "X"  , "f"},
-    
+
     { "St" , "S"},
     { "Sx" , "S"},
     { "Sr" , ""},
-    
+
     { "Tl" , "|I"},
     { "cs", "" },
     { "T"  , "IIiiI"},
-    
+
     { "Rp"   , ""},
     { "Rr"   , ""},
     { "Rf"   , ""},
@@ -206,7 +206,7 @@ struct tag_info legal_tags[] =
     { "Rn"   , ""},
     { "Rh"   , ""},
     { "s",""},
-    
+
     { ""   , ""} /* Keep this here to mark the end of the table */
 };
 
@@ -219,15 +219,15 @@ char legal_escape_characters[] = "%(,);#<|>";
  */
 char* find_tag(char* name)
 {
-    
+
     struct tag_info* current = legal_tags;
-    
-    /* 
+
+    /*
      * Continue searching so long as we have a non-empty name string
      * and the name of the current element doesn't match the name
      * we're searching for
      */
-    
+
     while(strcmp(current->name, name) && current->name[0] != '\0')
         current++;
 

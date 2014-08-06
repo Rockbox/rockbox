@@ -11,10 +11,10 @@ struct sndchan
 
     /* S1, S2, S4 */
     int enlen, envol, endir, enlenreload;
-    
+
     /* S1, S2 */
     const byte *wave;
-    
+
     /* S1 only */
     int swlen, swlenreload, swsteps, swstep, swdir;
 

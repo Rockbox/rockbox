@@ -1,7 +1,7 @@
 #ifndef _CONFIG_TREMOR_H
 #define _CONFIG_TREMOR_H
 
-#include "codeclib.h" 
+#include "codeclib.h"
 
 #ifdef CPU_ARM
 #define _ARM_ASSEM_

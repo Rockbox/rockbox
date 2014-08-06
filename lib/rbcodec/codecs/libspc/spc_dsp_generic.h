@@ -38,7 +38,7 @@ struct echo_filter
     int pos; /* (0 to 7) */
     int buf [FIR_BUF_HALF * 2] [2];
     /* copy of echo FIR constants as int, for faster access */
-    int coeff [VOICE_COUNT]; 
+    int coeff [VOICE_COUNT];
 };
 #endif /* SPC_DSP_ECHO_APPLY */
 

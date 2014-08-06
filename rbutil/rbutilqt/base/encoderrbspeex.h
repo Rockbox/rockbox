@@ -58,4 +58,3 @@ class EncoderRbSpeex : public EncoderBase
 };
 
 #endif
-

@@ -54,7 +54,7 @@ static void move_object(void* cv,void* o,char c,int x, int y,int w,int h) {
     (void) w;
     (void) h;
 #else /* ROCKBOX */
-	  sys_vgui(".x%x.c coords %x%c %d %d %d %d\n",
+          sys_vgui(".x%x.c coords %x%c %d %d %d %d\n",
                    cv,o,c,x,y,x+w,y+h);
 #endif /* ROCKBOX */
 }
@@ -66,8 +66,8 @@ static void color_object(void* cv,void* o,char c,char* color) {
     (void) c;
     (void) color;
 #else /* ROCKBOX */
-     sys_vgui(".x%x.c itemconfigure %x%c -fill %s\n", cv, 
-	     o, c,color);
+     sys_vgui(".x%x.c itemconfigure %x%c -fill %s\n", cv,
+             o, c,color);
 #endif /* ROCKBOX */
 }
 
@@ -78,7 +78,7 @@ static void delete_object(void* cv,void* o,char c) {
     (void) c;
 #else /* ROCKBOX */
      sys_vgui(".x%x.c delete %x%c\n",
-	      cv, o,c);
+              cv, o,c);
 #endif /* ROCKBOX */
 }
 
@@ -105,75 +105,75 @@ void gcanvas_drawme(t_gcanvas *x, t_glist *glist, int firsttime)
 {
      int i;
      if (firsttime) {
-	  rectangle(glist_getcanvas(glist),x,'a',
+          rectangle(glist_getcanvas(glist),x,'a',
                     x->x_obj.te_xpix, x->x_obj.te_ypix,
                     x->x_width, x->x_height,BACKGROUNDCOLOR);
-          for (i=1;i<x->x_xgrid;i++) 
+          for (i=1;i<x->x_xgrid;i++)
                line(glist_getcanvas(glist),x,'b'+ i,
-                    x->x_obj.te_xpix + x->x_width*i/x->x_xgrid, 
+                    x->x_obj.te_xpix + x->x_width*i/x->x_xgrid,
                     x->x_obj.te_ypix,
-                    0, x->x_height,"red");                    
-          for (i=1;i<x->x_ygrid;i++) 
+                    0, x->x_height,"red");
+          for (i=1;i<x->x_ygrid;i++)
                line(glist_getcanvas(glist),x,'B'+ i,
-                    x->x_obj.te_xpix, 
+                    x->x_obj.te_xpix,
                     x->x_obj.te_ypix + x->x_height*i/x->x_ygrid,
-                    x->x_width, 0,"blue");                    
-     }     
+                    x->x_width, 0,"blue");
+     }
      else {
           move_object(
                glist_getcanvas(glist),x,'a',
                x->x_obj.te_xpix, x->x_obj.te_ypix,
                x->x_width, x->x_height);
-          for (i=1;i<x->x_xgrid;i++) 
+          for (i=1;i<x->x_xgrid;i++)
                move_object(glist_getcanvas(glist),x,'b'+ i,
-                    x->x_obj.te_xpix + x->x_width*i/x->x_xgrid, 
+                    x->x_obj.te_xpix + x->x_width*i/x->x_xgrid,
                     x->x_obj.te_ypix,
-                    0, x->x_height);                    
-          for (i=1;i<x->x_ygrid;i++) 
+                    0, x->x_height);
+          for (i=1;i<x->x_ygrid;i++)
                move_object(glist_getcanvas(glist),x,'B'+ i,
-                    x->x_obj.te_xpix, 
+                    x->x_obj.te_xpix,
                     x->x_obj.te_ypix + x->x_height*i/x->x_ygrid,
-                    x->x_width, 0);                    
+                    x->x_width, 0);
      }
 #ifndef ROCKBOX
      {
        /* outlets */
-	  int n = 3;
-	  int nplus, i;
-	  nplus = (n == 1 ? 1 : n-1);
-	  for (i = 0; i < n; i++)
-	  {
-	       int onset = x->x_obj.te_xpix + (x->x_width - IOWIDTH) * i / nplus;
-	       if (firsttime)
-		    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xo%d\n",
-			     glist_getcanvas(glist),
-			     onset, x->x_obj.te_ypix + x->x_height - 1,
-			     onset + IOWIDTH, x->x_obj.te_ypix + x->x_height,
-			     x, i);
-	       else
-		    sys_vgui(".x%x.c coords %xo%d %d %d %d %d\n",
-			     glist_getcanvas(glist), x, i,
-			     onset, x->x_obj.te_ypix + x->x_height - 1,
-			     onset + IOWIDTH, x->x_obj.te_ypix + x->x_height);
-	  }
-	  /* inlets */
-	  n = 0; 
-	  nplus = (n == 1 ? 1 : n-1);
-	  for (i = 0; i < n; i++)
-	  {
-	       int onset = x->x_obj.te_xpix + (x->x_width - IOWIDTH) * i / nplus;
-	       if (firsttime)
-		    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xi%d\n",
-			     glist_getcanvas(glist),
-			     onset, x->x_obj.te_ypix,
-			     onset + IOWIDTH, x->x_obj.te_ypix + 1,
-			     x, i);
-	       else
-		    sys_vgui(".x%x.c coords %xi%d %d %d %d %d\n",
-			     glist_getcanvas(glist), x, i,
-			     onset, x->x_obj.te_ypix,
-			     onset + IOWIDTH, x->x_obj.te_ypix + 1);
-	  }
+          int n = 3;
+          int nplus, i;
+          nplus = (n == 1 ? 1 : n-1);
+          for (i = 0; i < n; i++)
+          {
+               int onset = x->x_obj.te_xpix + (x->x_width - IOWIDTH) * i / nplus;
+               if (firsttime)
+                    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xo%d\n",
+                             glist_getcanvas(glist),
+                             onset, x->x_obj.te_ypix + x->x_height - 1,
+                             onset + IOWIDTH, x->x_obj.te_ypix + x->x_height,
+                             x, i);
+               else
+                    sys_vgui(".x%x.c coords %xo%d %d %d %d %d\n",
+                             glist_getcanvas(glist), x, i,
+                             onset, x->x_obj.te_ypix + x->x_height - 1,
+                             onset + IOWIDTH, x->x_obj.te_ypix + x->x_height);
+          }
+          /* inlets */
+          n = 0;
+          nplus = (n == 1 ? 1 : n-1);
+          for (i = 0; i < n; i++)
+          {
+               int onset = x->x_obj.te_xpix + (x->x_width - IOWIDTH) * i / nplus;
+               if (firsttime)
+                    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xi%d\n",
+                             glist_getcanvas(glist),
+                             onset, x->x_obj.te_ypix,
+                             onset + IOWIDTH, x->x_obj.te_ypix + 1,
+                             x, i);
+               else
+                    sys_vgui(".x%x.c coords %xi%d %d %d %d %d\n",
+                             glist_getcanvas(glist), x, i,
+                             onset, x->x_obj.te_ypix,
+                             onset + IOWIDTH, x->x_obj.te_ypix + 1);
+          }
      }
 #endif /* ROCKBOX */
 }
@@ -185,19 +185,19 @@ void gcanvas_erase(t_gcanvas* x,t_glist* glist)
 {
      int n,i;
      delete_object(glist_getcanvas(glist),x,'a');
-     for (i=1;i<x->x_xgrid;i++) 
+     for (i=1;i<x->x_xgrid;i++)
           delete_object(glist_getcanvas(glist),x,'b'+ i);
-     for (i=1;i<x->x_ygrid;i++) 
+     for (i=1;i<x->x_ygrid;i++)
           delete_object(glist_getcanvas(glist),x,'B'+ i);
 
      n = 2;
      while (n--) {
 #ifndef ROCKBOX
-	  sys_vgui(".x%x.c delete %xo%d\n",glist_getcanvas(glist),x,n);
+          sys_vgui(".x%x.c delete %xo%d\n",glist_getcanvas(glist),x,n);
 #endif
      }
 }
-	
+
 
 
 /* ------------------------ gcanvas widgetbehaviour----------------------------- */
@@ -256,14 +256,14 @@ static void gcanvas_delete(t_gobj *z, t_glist *glist)
     canvas_deletelinesfor(glist_getcanvas(glist), x);
 }
 
-       
+
 static void gcanvas_vis(t_gobj *z, t_glist *glist, int vis)
 {
     t_gcanvas* s = (t_gcanvas*)z;
     if (vis)
-	 gcanvas_drawme(s, glist, 1);
+         gcanvas_drawme(s, glist, 1);
     else
-	 gcanvas_erase(s,glist);
+         gcanvas_erase(s,glist);
 }
 
 /* can we use the normal text save function ?? */
@@ -272,8 +272,8 @@ static void gcanvas_save(t_gobj *z, t_binbuf *b)
 {
     t_gcanvas *x = (t_gcanvas *)z;
     binbuf_addv(b, "ssiisiiii", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,  
-		gensym("gcanvas"),x->x_width,x->x_height,
+                (t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+                gensym("gcanvas"),x->x_width,x->x_height,
                 x->x_xgrid,
                 x->x_ygrid);
     binbuf_addv(b, ";");
@@ -311,7 +311,7 @@ static void gcanvas_click(t_gcanvas *x,
     (void) up;
 #endif
     glist_grab(x->x_glist, &x->x_obj.te_g, (t_glistmotionfn) gcanvas_motion,
-		(t_glistkeyfn) NULL, xpos, ypos);
+                (t_glistkeyfn) NULL, xpos, ypos);
 
     x->x = xpos - x->x_obj.te_xpix;
     x->y = ypos - x->x_obj.te_ypix;
@@ -326,9 +326,9 @@ static int gcanvas_newclick(t_gobj *z, struct _glist *glist,
 #ifdef ROCKBOX
     (void) glist;
 #endif
-    	if (doit)
-	    gcanvas_click((t_gcanvas *)z, (t_floatarg)xpix, (t_floatarg)ypix,
-	    	(t_floatarg)shift, 0, (t_floatarg)alt,dbl);
+        if (doit)
+            gcanvas_click((t_gcanvas *)z, (t_floatarg)xpix, (t_floatarg)ypix,
+                (t_floatarg)shift, 0, (t_floatarg)alt,dbl);
 
     if (dbl) outlet_float(((t_gcanvas*)z)->out3,1);
     return (1);
@@ -371,7 +371,7 @@ static void *gcanvas_new(t_symbol* s,t_int ac,t_atom* at)
               error("gcanvas: wrong argument type");
          else
               x->x_width = atom_getfloat(at++);
-         
+
          if (x->x_width < 0 || x->x_width > 2000) {
               error("gcanvas: unallowed width %f",x->x_width);
               x->x_width = DEFAULTSIZE;
@@ -384,9 +384,9 @@ static void *gcanvas_new(t_symbol* s,t_int ac,t_atom* at)
     if (ac-- > 0) {
          if (at->a_type != A_FLOAT)
               error("gcanvas: wrong argument type");
-         else 
+         else
               x->x_height = atom_getfloat(at++);
-         
+
          if (x->x_height < 0 || x->x_height > 2000) {
               error("gcanvas: unallowed height %f",x->x_height);
               x->x_width = DEFAULTSIZE;
@@ -401,7 +401,7 @@ static void *gcanvas_new(t_symbol* s,t_int ac,t_atom* at)
               error("gcanvas: wrong argument type");
          else
               x->x_xgrid = atom_getfloat(at++);
-         
+
          if (x->x_xgrid < 0 || x->x_xgrid > x->x_width/2) {
               error("gcanvas: unallowed xgrid %f",x->x_xgrid);
               x->x_xgrid = 0;
@@ -416,7 +416,7 @@ static void *gcanvas_new(t_symbol* s,t_int ac,t_atom* at)
               error("gcanvas: wrong argument type");
          else
               x->x_ygrid = atom_getfloat(at++);
-         
+
          if (x->x_ygrid < 0 || x->x_ygrid > x->x_height/2) {
               error("gcanvas: unallowed xgrid %f",x->x_ygrid);
               x->x_ygrid = 0;
@@ -434,15 +434,13 @@ static void *gcanvas_new(t_symbol* s,t_int ac,t_atom* at)
 void gcanvas_setup(void)
 {
     gcanvas_class = class_new(gensym("gcanvas"), (t_newmethod)gcanvas_new, 0,
-				sizeof(t_gcanvas),0, A_GIMME,0);
+                                sizeof(t_gcanvas),0, A_GIMME,0);
 
     class_addmethod(gcanvas_class, (t_method)gcanvas_click, gensym("click"),
-    	A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
+        A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
     class_addmethod(gcanvas_class, (t_method)gcanvas_size, gensym("size"),
-    	A_FLOAT, A_FLOAT, 0);
+        A_FLOAT, A_FLOAT, 0);
 
     gcanvas_setwidget();
     class_setwidget(gcanvas_class,&gcanvas_widgetbehavior);
 }
-
-

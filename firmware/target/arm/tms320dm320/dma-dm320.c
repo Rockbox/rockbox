@@ -46,14 +46,14 @@ int dma_request_channel(int peripheral, int mode)
     if (peripheral == DMA_PERIPHERAL_MMCSD)
     {
         /* Set first DMA channel */
-        IO_SDRAM_SDDMASEL = (IO_SDRAM_SDDMASEL & 0xFFE0) | peripheral | 
+        IO_SDRAM_SDDMASEL = (IO_SDRAM_SDDMASEL & 0xFFE0) | peripheral |
                             (mode << 3);
         channel = 1;
     }
     else if (peripheral == DMA_PERIPHERAL_DSP)
     {
         /* Set second DMA channel */
-        IO_SDRAM_SDDMASEL = (IO_SDRAM_SDDMASEL & 0xFC1F) | 
+        IO_SDRAM_SDDMASEL = (IO_SDRAM_SDDMASEL & 0xFC1F) |
                             (peripheral << 5) |
                             (mode << 8);
         channel = 2;
@@ -74,5 +74,3 @@ void dma_release_channel(int channel)
     (void)channel;
     /* TODO */
 }
-
-

@@ -31,4 +31,3 @@ void sim_thread_shutdown(void); /* Shut down all kernel threads gracefully */
 #endif
 
 #endif /* #ifndef __THREADSDL_H__ */
-

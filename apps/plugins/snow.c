@@ -92,7 +92,7 @@ static void snow_move(void)
 #endif
             mylcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_REMOTE_LCD
-            if (particles[i][0] <= LCD_REMOTE_WIDTH 
+            if (particles[i][0] <= LCD_REMOTE_WIDTH
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
                 rb->lcd_remote_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
                 rb->lcd_remote_fillrect(particles[i][0],particles[i][1],
@@ -124,7 +124,7 @@ static void snow_move(void)
                 pgfx_drawpixel(particles[i][0],particles[i][1]);
 #endif
 #ifdef HAVE_REMOTE_LCD
-            if (particles[i][0] <= LCD_REMOTE_WIDTH 
+            if (particles[i][0] <= LCD_REMOTE_WIDTH
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
                 rb->lcd_remote_mono_bitmap(flake,particles[i][0],particles[i][1],
                                            FLAKE_WIDTH,FLAKE_WIDTH);
@@ -142,7 +142,7 @@ static void snow_init(void)
     for (i=0; i<NUM_PARTICLES; i++) {
         particles[i][0]=-1;
         particles[i][1]=-1;
-    }        
+    }
 #ifdef HAVE_LCD_CHARCELLS
     pgfx_display(0, 0); /* display three times */
     pgfx_display(4, 0);
@@ -179,7 +179,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->lcd_remote_update();
 #endif
         rb->sleep(HZ/20);
-        
+
                 /*We get button from PLA this way */
         button = pluginlib_getaction(TIMEOUT_NOBLOCK, plugin_contexts,
                                ARRAYLEN(plugin_contexts));
@@ -201,4 +201,3 @@ enum plugin_status plugin_start(const void* parameter)
             }
     }
 }
-

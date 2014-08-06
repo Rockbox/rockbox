@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 typedef struct
-{  
+{
     bool initialized;
 
     unsigned long read_timeout;     /* n * 8 clock cycles */

@@ -153,7 +153,7 @@ void pcm_play_dma_start(const void* addr, size_t size)
 
     /* IIS Tx clock on */
     I2SCLKCON = (1 << 0);   /* 1 = power on */
-    
+
     /* IIS Tx on */
     I2STXCOM = (1 << 3) |   /* 1 = transmit mode on */
                (1 << 2) |   /* 1 = I2S interface enable */
@@ -165,7 +165,7 @@ void pcm_play_dma_stop(void)
 {
     /* DMA channel off */
     DMACOM0 = 5;
-    
+
     /* IIS Tx off */
     I2STXCOM = (1 << 3) |   /* 1 = transmit mode on */
                (0 << 2) |   /* 1 = I2S interface enable */
@@ -199,7 +199,7 @@ static void pcm_dma_set_freq(enum hw_freq_indexes idx)
     while ((PLLLOCK & (1 << 1)) == 0);
 
     /* configure MCLK */
-    CLKCON = (CLKCON & ~(0xFF)) | 
+    CLKCON = (CLKCON & ~(0xFF)) |
              (0 << 7) |         /* MCLK_MASK */
              (2 << 5) |         /* MCLK_SEL = PLL1 */
              (1 << 4) |         /* MCLK_DIV_ON */
@@ -232,7 +232,7 @@ void pcm_play_dma_init(void)
 
     /* setup PLL */
     pcm_dma_set_freq(HW_FREQ_44);
-    
+
     /* enable clock to the IIS module */
     PWRCON &= ~(1 << 6);
 
@@ -271,7 +271,7 @@ void pcm_play_dma_postinit(void)
 /* set the configured PCM frequency */
 void pcm_dma_apply_settings(void)
 {
-    pcm_dma_set_freq(pcm_fsel);    
+    pcm_dma_set_freq(pcm_fsel);
 }
 
 size_t pcm_get_bytes_waiting(void)

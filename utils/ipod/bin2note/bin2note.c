@@ -137,7 +137,7 @@ int main (int argc, char* argv[])
     }
 
     /* **** Input file is OK, now build the note **** */
-    
+
     /* Insert URL at start of note */
     insert_link(buf, 0x08640568);
 

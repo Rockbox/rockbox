@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "sd.h"
 #include "system.h"
 #include <string.h>
@@ -101,7 +101,7 @@ struct sd_card_status
     int retry_max;
 };
 
-/** static, private data **/ 
+/** static, private data **/
 
 /* for compatibility */
 static long last_disk_activity = -1;
@@ -130,7 +130,7 @@ static struct mutex             sd_mtx SHAREDBSS_ATTR;
 static struct event_queue       sd_queue;
 static volatile unsigned int    transfer_error[NUM_DRIVES];
 /* align on cache line size */
-static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE] 
+static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE]
                         __attribute__((aligned(32)));
 
 static void sd_card_mux(int card_no)
@@ -406,7 +406,7 @@ static int sd_init_card(const int card_no)
                      SDHC_RESP_FMT_1, &currcard->rca);
     if (ret < 0)
     {
-        dbgprintf("SD_SEND_RELATIVE_ADDR failed"); 
+        dbgprintf("SD_SEND_RELATIVE_ADDR failed");
         return -1;
     }
 
@@ -572,7 +572,7 @@ bool sd_removable(IF_MD_NONVOID(int card_no))
 #ifdef HAVE_MULTIDRIVE
     (void)card_no;
 #endif
-    
+
     /* not applicable */
     return false;
 }
@@ -645,7 +645,7 @@ static void sd_thread(void)
                 idle_notified = true;
             }
             break;
-        }        
+        }
     }
 }
 
@@ -957,11 +957,10 @@ long sd_last_disk_activity(void)
 }
 
 tCardInfo *card_get_info_target(int card_no)
-{    
+{
     return &card_info[card_no];
 }
 
 void sd_sleepnow(void)
 {
 }
-

@@ -41,7 +41,7 @@
  || defined ARCHOS_RECORDERV2   /* should be identical */  \
  || defined ARCHOS_ONDIOFM      /* verified */  \
  || defined ARCHOS_ONDIOSP      /* verified */
-/* Average measurements of a Recorder v1, an Ondio FM, a backlight-modded 
+/* Average measurements of a Recorder v1, an Ondio FM, a backlight-modded
  * Ondio FM, and an Ondio SP. */
 static const unsigned char lcdlinear[256] = {
   5,   8,  10,  12,  14,  16,  18,  20,  22,  24,  26,  28,  29,  31,  33,  35,
@@ -387,7 +387,7 @@ static void invert_gvalues(void)
     unsigned last_i = 0;
     unsigned x = 0;
     unsigned last_x;
-    
+
     /* Step 1: Calculate a transposed table for undoing the old mapping */
     for (i = 0; i < 256; i++)
     {
@@ -452,7 +452,7 @@ static unsigned long _grey_get_pixel(int x, int y)
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     int idx = _grey_info.width * yg + xg;
 #else /* vertical packing or vertical interleaved */
-    int idx = _grey_info.width * (yg & ~_GREY_BMASK) 
+    int idx = _grey_info.width * (yg & ~_GREY_BMASK)
             + (xg << _GREY_BSHIFT) + (~yg & _GREY_BMASK);
 #endif
 
@@ -471,7 +471,7 @@ static void _timer_isr(void)
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
     unsigned long check = rb->is_backlight_on(true)
                         ? 0 : _GREY_BACKLIGHT_ON;
-    
+
     if ((_grey_info.flags & (_GREY_BACKLIGHT_ON|GREY_RAWMAPPED)) == check)
     {
         _grey_info.flags ^= _GREY_BACKLIGHT_ON;
@@ -582,7 +582,7 @@ bool grey_init(unsigned char *gbuf, long gbuf_size,
     plane_size += (-plane_size) & 0xf;
     buftaken    = (-(long)gbuf) & 0xf;
 #else                                  /* Buffers must be 32 bit aligned. */
-    buftaken    = (-(long)gbuf) & 3;   
+    buftaken    = (-(long)gbuf) & 3;
 #endif
     gbuf += buftaken;
 
@@ -653,7 +653,7 @@ bool grey_init(unsigned char *gbuf, long gbuf_size,
 #endif
         fill_gvalues();
     }
-        
+
     if (buf_taken)  /* caller requested info about space taken */
         *buf_taken = buftaken;
 
@@ -874,7 +874,7 @@ static void grey_screendump_hook(int fd)
 
 #if LCD_DEPTH == 2
         src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_FBWIDTH, y);
-        
+
         do
         {
             if (((unsigned)gy < (unsigned)_grey_info.height)
@@ -937,7 +937,7 @@ static void grey_screendump_hook(int fd)
 #elif LCD_DEPTH == 2
         shift = 2 * (y & 3);
         src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 2);
-        
+
         do
         {
             if (((unsigned)gy < (unsigned)_grey_info.height)
@@ -962,7 +962,7 @@ static void grey_screendump_hook(int fd)
 #if LCD_DEPTH == 2
         shift = y & 7;
         src = rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
-        
+
         do
         {
             if (((unsigned)gy < (unsigned)_grey_info.height)

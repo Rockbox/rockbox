@@ -34,7 +34,7 @@ extern int _ilog(unsigned int v);
 
 #ifndef _V_WIDE_MATH
 #define _V_WIDE_MATH
-  
+
 #ifndef  _LOW_ACCURACY_
 /* 64 bit multiply */
 /* #include <sys/types.h> */
@@ -83,7 +83,7 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
 
 /*
  * For MULT32 and MULT31: The second argument is always a lookup table
- * value already preshifted from 31 to 8 bits.  We therefore take the 
+ * value already preshifted from 31 to 8 bits.  We therefore take the
  * opportunity to save on text space and use unsigned char for those
  * tables in this case.
  */
@@ -118,7 +118,7 @@ static inline ogg_int32_t MULT31_SHIFT15(ogg_int32_t x, ogg_int32_t y) {
  * macros.
  */
 
-/* replaced XPROD32 with a macro to avoid memory reference 
+/* replaced XPROD32 with a macro to avoid memory reference
    _x, _y are the results (must be l-values) */
 /*
 #define XPROD32(_a, _b, _t, _v, _x, _y) \
@@ -162,7 +162,7 @@ static inline void XNPROD31(ogg_int32_t  a, ogg_int32_t  b,
 /* generic misc.h has symmetrical versions of vect_add_right_left
    and vect_add_left_right  (since symmetrical versions of
    vect_mult_fw and vect_mult_bw  i.e.  both use MULT31) */
-static inline 
+static inline
 void vect_add_right_left(ogg_int32_t *x, const ogg_int32_t *y, int n)
 {
   while (n>0) {
@@ -177,7 +177,7 @@ void vect_add_left_right(ogg_int32_t *x, const ogg_int32_t *y, int n)
   vect_add_right_left(x,y,n);
 }
 
-static inline 
+static inline
 void ogg_vect_mult_fw(ogg_int32_t *data, LOOKUP_T *window, int n)
 {
   while(n>0) {
@@ -215,7 +215,7 @@ static inline ogg_int32_t VFLOAT_MULT(ogg_int32_t a,ogg_int32_t ap,
     return MULT32(a,b);
 #else
     *p=ap+bp+31;
-    return (a>>15)*(b>>16); 
+    return (a>>15)*(b>>16);
 #endif
   }else
     return 0;
@@ -264,7 +264,7 @@ static inline ogg_int32_t VFLOAT_ADD(ogg_int32_t a,ogg_int32_t ap,
   }
 
   a+=b;
-  if((a&0xc0000000)==0xc0000000 || 
+  if((a&0xc0000000)==0xc0000000 ||
      (a&0xc0000000)==0){
     a<<=1;
     (*p)--;
@@ -273,4 +273,3 @@ static inline ogg_int32_t VFLOAT_ADD(ogg_int32_t a,ogg_int32_t ap,
 }
 #endif
 #endif
-

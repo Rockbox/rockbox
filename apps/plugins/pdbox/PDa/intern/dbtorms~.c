@@ -31,14 +31,14 @@ static t_int *dbtorms_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	float f = *in;
-	if (f <= 0) *out = 0;
-	else
-	{
-    	    if (f > 485)
-		f = 485;
-	    *out = exp((LOGTEN * 0.05) * (f-100.));
-	}
+        float f = *in;
+        if (f <= 0) *out = 0;
+        else
+        {
+            if (f > 485)
+                f = 485;
+            *out = exp((LOGTEN * 0.05) * (f-100.));
+        }
     }
     return (w + 4);
 }
@@ -55,8 +55,7 @@ static void dbtorms_tilde_dsp(t_dbtorms_tilde *x, t_signal **sp)
 void dbtorms_tilde_setup(void)
 {
     dbtorms_tilde_class = class_new(gensym("dbtorms~"), (t_newmethod)dbtorms_tilde_new, 0,
-    	sizeof(t_dbtorms_tilde), 0, 0);
+        sizeof(t_dbtorms_tilde), 0, 0);
     CLASS_MAINSIGNALIN(dbtorms_tilde_class, t_dbtorms_tilde, x_f);
     class_addmethod(dbtorms_tilde_class, (t_method)dbtorms_tilde_dsp, gensym("dsp"), 0);
 }
-

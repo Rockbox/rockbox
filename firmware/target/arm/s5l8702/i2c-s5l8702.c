@@ -18,21 +18,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
 #include "i2c-s5l8702.h"
 
 /*  Driver for the s5l8700 built-in I2C controller in master mode
-    
+
     Both the i2c_read and i2c_write function take the following arguments:
     * slave, the address of the i2c slave device to read from / write to
     * address, optional sub-address in the i2c slave (unused if -1)
     * len, number of bytes to be transfered
     * data, pointer to data to be transfered
     A return value < 0 indicates an error.
-    
+
     Note:
     * blocks the calling thread for the entire duraton of the i2c transfer but
       uses wakeup_wait/wakeup_signal to allow other threads to run.
@@ -88,7 +88,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
             return 1;
         }
 
-    
+
     if (address >= 0) {
         /* write address */
         IICDS(bus) = address;
@@ -100,7 +100,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
                 return 2;
             }
     }
-    
+
     /* write data */
     while (len--) {
         IICDS(bus) = *data++;
@@ -122,7 +122,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
             mutex_unlock(&i2c_mtx[bus]);
             return 5;
         }
-    
+
     i2c_off(bus);
     mutex_unlock(&i2c_mtx[bus]);
     return 0;
@@ -156,7 +156,7 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
                 return 2;
             }
     }
-    
+
     /* (repeated) START */
     IICDS(bus) = slave | 1;
     IICSTAT(bus) = 0xB0;
@@ -167,7 +167,7 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
             mutex_unlock(&i2c_mtx[bus]);
             return 3;
         }
-    
+
     while (len--) {
         IICCON(bus) = (len == 0) ? 0x33 : 0xB3; /* NAK or ACK */
         while ((IICCON(bus) & 0x10) == 0)
@@ -188,9 +188,8 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
             mutex_unlock(&i2c_mtx[bus]);
             return 5;
         }
-    
+
     i2c_off(bus);
     mutex_unlock(&i2c_mtx[bus]);
     return 0;
 }
-

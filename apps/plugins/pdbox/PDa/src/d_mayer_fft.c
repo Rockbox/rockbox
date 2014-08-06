@@ -1,7 +1,7 @@
 /*
 ** FFT and FHT routines
 **  Copyright 1988, 1993; Ron Mayer
-**  
+**
 **  mayer_fht(fz,n);
 **      Does a hartley transform of "n" points in the array "fz".
 **  mayer_fft(n,real,imag)
@@ -17,8 +17,8 @@
 **      transform ends up in the second half of the array.
 **  mayer_realifft(n,real)
 **      The inverse of the realfft() routine above.
-**      
-**      
+**
+**
 ** NOTE: This routine uses at least 2 patented algorithms, and may be
 **       under the restrictions of a bunch of different organizations.
 **       Although I wrote it completely myself, it is kind of a derivative
@@ -64,29 +64,29 @@
 
 #if defined(GOOD_TRIG)
 #define FHT_SWAP(a,b,t) {(t)=(a);(a)=(b);(b)=(t);}
-#define TRIG_VARS					         \
+#define TRIG_VARS                                                \
       int t_lam=0;
-#define TRIG_INIT(k,c,s)					 \
-     {								 \
-      int i;							 \
-      for (i=2 ; i<=k ; i++)					 \
-          {coswrk[i]=costab[i];sinwrk[i]=sintab[i];}		 \
-      t_lam = 0;					         \
-      c = 1;							 \
-      s = 0;							 \
+#define TRIG_INIT(k,c,s)                                         \
+     {                                                           \
+      int i;                                                     \
+      for (i=2 ; i<=k ; i++)                                     \
+          {coswrk[i]=costab[i];sinwrk[i]=sintab[i];}             \
+      t_lam = 0;                                                 \
+      c = 1;                                                     \
+      s = 0;                                                     \
      }
-#define TRIG_NEXT(k,c,s)					 \
-     {								 \
-	 int i,j;	                                         \
-         (t_lam)++;	  					 \
-         for (i=0 ; !((1<<i)&t_lam) ; i++);			 \
-         i = k-i;						 \
-         s = sinwrk[i];						 \
-         c = coswrk[i];						 \
-         if (i>1)   						 \
-            {	    						 \
-             for (j=k-i+2 ; (1<<j)&t_lam ; j++);		 \
-             j	       = k - j;					 \
+#define TRIG_NEXT(k,c,s)                                         \
+     {                                                           \
+         int i,j;                                                \
+         (t_lam)++;                                              \
+         for (i=0 ; !((1<<i)&t_lam) ; i++);                      \
+         i = k-i;                                                \
+         s = sinwrk[i];                                          \
+         c = coswrk[i];                                          \
+         if (i>1)                                                \
+            {                                                    \
+             for (j=k-i+2 ; (1<<j)&t_lam ; j++);                 \
+             j         = k - j;                                  \
              sinwrk[i] = halsec[i] * (sinwrk[i-1] + sinwrk[j]);  \
              coswrk[i] = halsec[i] * (coswrk[i-1] + coswrk[j]);  \
             }                                                    \
@@ -95,20 +95,20 @@
 #endif
 
 #if defined(FAST_TRIG)
-#define TRIG_VARS					 \
+#define TRIG_VARS                                        \
       REAL t_c,t_s;
-#define TRIG_INIT(k,c,s)				 \
-    {				        		 \
-     t_c  = costab[k];				         \
-     t_s  = sintab[k];				         \
-     c    = 1;				    		 \
-     s    = 0;				    		 \
+#define TRIG_INIT(k,c,s)                                 \
+    {                                                    \
+     t_c  = costab[k];                                   \
+     t_s  = sintab[k];                                   \
+     c    = 1;                                           \
+     s    = 0;                                           \
     }
-#define TRIG_NEXT(k,c,s)				 \
+#define TRIG_NEXT(k,c,s)                                 \
     {                                                    \
      REAL t = c;                                         \
-     c   = t*t_c - s*t_s;				 \
-     s   = t*t_s + s*t_c;				 \
+     c   = t*t_c - s*t_s;                                \
+     s   = t*t_s + s*t_c;                                \
     }
 #define TRIG_RESET(k,c,s)
 #endif
@@ -227,58 +227,58 @@ REAL c1,s1,s2,c2,s3,c3,s4,c4;
      REAL aa;
      for (k=n>>1; (!((k2^=k)&k)); k>>=1);
      if (k1>k2)
-	{
-	     aa=fz[k1];fz[k1]=fz[k2];fz[k2]=aa;
-	}
+        {
+             aa=fz[k1];fz[k1]=fz[k2];fz[k2]=aa;
+        }
     }
  for ( k=0 ; (1<<k)<n ; k++ );
  k  &= 1;
  if (k==0)
     {
-	 for (fi=fz,fn=fz+n;fi<fn;fi+=4)
-	    {
-	     REAL f0,f1,f2,f3;
-	     f1     = fi[0 ]-fi[1 ];
-	     f0     = fi[0 ]+fi[1 ];
-	     f3     = fi[2 ]-fi[3 ];
-	     f2     = fi[2 ]+fi[3 ];
-	     fi[2 ] = (f0-f2);	
-	     fi[0 ] = (f0+f2);
-	     fi[3 ] = (f1-f3);	
-	     fi[1 ] = (f1+f3);
-	    }
+         for (fi=fz,fn=fz+n;fi<fn;fi+=4)
+            {
+             REAL f0,f1,f2,f3;
+             f1     = fi[0 ]-fi[1 ];
+             f0     = fi[0 ]+fi[1 ];
+             f3     = fi[2 ]-fi[3 ];
+             f2     = fi[2 ]+fi[3 ];
+             fi[2 ] = (f0-f2);
+             fi[0 ] = (f0+f2);
+             fi[3 ] = (f1-f3);
+             fi[1 ] = (f1+f3);
+            }
     }
  else
     {
-	 for (fi=fz,fn=fz+n,gi=fi+1;fi<fn;fi+=8,gi+=8)
-	    {
-	     REAL bs1,bc1,bs2,bc2,bs3,bc3,bs4,bc4,
-	     	bg0,bf0,bf1,bg1,bf2,bg2,bf3,bg3;
-	     bc1     = fi[0 ] - gi[0 ];
-	     bs1     = fi[0 ] + gi[0 ];
-	     bc2     = fi[2 ] - gi[2 ];
-	     bs2     = fi[2 ] + gi[2 ];
-	     bc3     = fi[4 ] - gi[4 ];
-	     bs3     = fi[4 ] + gi[4 ];
-	     bc4     = fi[6 ] - gi[6 ];
-	     bs4     = fi[6 ] + gi[6 ];
-	     bf1     = (bs1 - bs2);	
-	     bf0     = (bs1 + bs2);
-	     bg1     = (bc1 - bc2);	
-	     bg0     = (bc1 + bc2);
-	     bf3     = (bs3 - bs4);	
-	     bf2     = (bs3 + bs4);
-	     bg3     = SQRT2*bc4;		
-	     bg2     = SQRT2*bc3;
-	     fi[4 ] = bf0 - bf2;
-	     fi[0 ] = bf0 + bf2;
-	     fi[6 ] = bf1 - bf3;
-	     fi[2 ] = bf1 + bf3;
-	     gi[4 ] = bg0 - bg2;
-	     gi[0 ] = bg0 + bg2;
-	     gi[6 ] = bg1 - bg3;
-	     gi[2 ] = bg1 + bg3;
-	    }
+         for (fi=fz,fn=fz+n,gi=fi+1;fi<fn;fi+=8,gi+=8)
+            {
+             REAL bs1,bc1,bs2,bc2,bs3,bc3,bs4,bc4,
+                bg0,bf0,bf1,bg1,bf2,bg2,bf3,bg3;
+             bc1     = fi[0 ] - gi[0 ];
+             bs1     = fi[0 ] + gi[0 ];
+             bc2     = fi[2 ] - gi[2 ];
+             bs2     = fi[2 ] + gi[2 ];
+             bc3     = fi[4 ] - gi[4 ];
+             bs3     = fi[4 ] + gi[4 ];
+             bc4     = fi[6 ] - gi[6 ];
+             bs4     = fi[6 ] + gi[6 ];
+             bf1     = (bs1 - bs2);
+             bf0     = (bs1 + bs2);
+             bg1     = (bc1 - bc2);
+             bg0     = (bc1 + bc2);
+             bf3     = (bs3 - bs4);
+             bf2     = (bs3 + bs4);
+             bg3     = SQRT2*bc4;
+             bg2     = SQRT2*bc3;
+             fi[4 ] = bf0 - bf2;
+             fi[0 ] = bf0 + bf2;
+             fi[6 ] = bf1 - bf3;
+             fi[2 ] = bf1 + bf3;
+             gi[4 ] = bg0 - bg2;
+             gi[0 ] = bg0 + bg2;
+             gi[6 ] = bg1 - bg3;
+             gi[2 ] = bg1 + bg3;
+            }
     }
  if (n<16) return;
 
@@ -292,71 +292,71 @@ REAL c1,s1,s2,c2,s3,c3,s4,c4;
      k4  = k2 << 1;
      k3  = k2 + k1;
      kx  = k1 >> 1;
-	 fi  = fz;
-	 gi  = fi + kx;
-	 fn  = fz + n;
-	 do
-	    {
-	     REAL g0,f0,f1,g1,f2,g2,f3,g3;
-	     f1      = fi[0 ] - fi[k1];
-	     f0      = fi[0 ] + fi[k1];
-	     f3      = fi[k2] - fi[k3];
-	     f2      = fi[k2] + fi[k3];
-	     fi[k2]  = f0	  - f2;
-	     fi[0 ]  = f0	  + f2;
-	     fi[k3]  = f1	  - f3;
-	     fi[k1]  = f1	  + f3;
-	     g1      = gi[0 ] - gi[k1];
-	     g0      = gi[0 ] + gi[k1];
-	     g3      = SQRT2  * gi[k3];
-	     g2      = SQRT2  * gi[k2];
-	     gi[k2]  = g0	  - g2;
-	     gi[0 ]  = g0	  + g2;
-	     gi[k3]  = g1	  - g3;
-	     gi[k1]  = g1	  + g3;
-	     gi     += k4;
-	     fi     += k4;
-	    } while (fi<fn);
+         fi  = fz;
+         gi  = fi + kx;
+         fn  = fz + n;
+         do
+            {
+             REAL g0,f0,f1,g1,f2,g2,f3,g3;
+             f1      = fi[0 ] - fi[k1];
+             f0      = fi[0 ] + fi[k1];
+             f3      = fi[k2] - fi[k3];
+             f2      = fi[k2] + fi[k3];
+             fi[k2]  = f0         - f2;
+             fi[0 ]  = f0         + f2;
+             fi[k3]  = f1         - f3;
+             fi[k1]  = f1         + f3;
+             g1      = gi[0 ] - gi[k1];
+             g0      = gi[0 ] + gi[k1];
+             g3      = SQRT2  * gi[k3];
+             g2      = SQRT2  * gi[k2];
+             gi[k2]  = g0         - g2;
+             gi[0 ]  = g0         + g2;
+             gi[k3]  = g1         - g3;
+             gi[k1]  = g1         + g3;
+             gi     += k4;
+             fi     += k4;
+            } while (fi<fn);
      TRIG_INIT(k,c1,s1);
      for (ii=1;ii<kx;ii++)
         {
-	 REAL c2,s2;
+         REAL c2,s2;
          TRIG_NEXT(k,c1,s1);
          c2 = c1*c1 - s1*s1;
          s2 = 2*(c1*s1);
-	     fn = fz + n;
-	     fi = fz +ii;
-	     gi = fz +k1-ii;
-	     do
-		{
-		 REAL a,b,g0,f0,f1,g1,f2,g2,f3,g3;
-		 b       = s2*fi[k1] - c2*gi[k1];
-		 a       = c2*fi[k1] + s2*gi[k1];
-		 f1      = fi[0 ]    - a;
-		 f0      = fi[0 ]    + a;
-		 g1      = gi[0 ]    - b;
-		 g0      = gi[0 ]    + b;
-		 b       = s2*fi[k3] - c2*gi[k3];
-		 a       = c2*fi[k3] + s2*gi[k3];
-		 f3      = fi[k2]    - a;
-		 f2      = fi[k2]    + a;
-		 g3      = gi[k2]    - b;
-		 g2      = gi[k2]    + b;
-		 b       = s1*f2     - c1*g3;
-		 a       = c1*f2     + s1*g3;
-		 fi[k2]  = f0        - a;
-		 fi[0 ]  = f0        + a;
-		 gi[k3]  = g1        - b;
-		 gi[k1]  = g1        + b;
-		 b       = c1*g2     - s1*f3;
-		 a       = s1*g2     + c1*f3;
-		 gi[k2]  = g0        - a;
-		 gi[0 ]  = g0        + a;
-		 fi[k3]  = f1        - b;
-		 fi[k1]  = f1        + b;
-		 gi     += k4;
-		 fi     += k4;
-		} while (fi<fn);
+             fn = fz + n;
+             fi = fz +ii;
+             gi = fz +k1-ii;
+             do
+                {
+                 REAL a,b,g0,f0,f1,g1,f2,g2,f3,g3;
+                 b       = s2*fi[k1] - c2*gi[k1];
+                 a       = c2*fi[k1] + s2*gi[k1];
+                 f1      = fi[0 ]    - a;
+                 f0      = fi[0 ]    + a;
+                 g1      = gi[0 ]    - b;
+                 g0      = gi[0 ]    + b;
+                 b       = s2*fi[k3] - c2*gi[k3];
+                 a       = c2*fi[k3] + s2*gi[k3];
+                 f3      = fi[k2]    - a;
+                 f2      = fi[k2]    + a;
+                 g3      = gi[k2]    - b;
+                 g2      = gi[k2]    + b;
+                 b       = s1*f2     - c1*g3;
+                 a       = c1*f2     + s1*g3;
+                 fi[k2]  = f0        - a;
+                 fi[0 ]  = f0        + a;
+                 gi[k3]  = g1        - b;
+                 gi[k1]  = g1        + b;
+                 b       = c1*g2     - s1*f3;
+                 a       = s1*g2     + c1*f3;
+                 gi[k2]  = g0        - a;
+                 gi[0 ]  = g0        + a;
+                 fi[k3]  = f1        - b;
+                 fi[k1]  = f1        + b;
+                 gi     += k4;
+                 fi     += k4;
+                } while (fi<fn);
         }
      TRIG_RESET(k,c1,s1);
     } while (k4<n);
@@ -425,4 +425,3 @@ void mayer_realifft(int n, REAL *real)
  }
  mayer_fht(real,n);
 }
-

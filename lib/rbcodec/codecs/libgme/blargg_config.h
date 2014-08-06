@@ -8,7 +8,7 @@
 
 // Uncomment if automatic byte-order determination doesn't work
 #ifdef ROCKBOX_BIG_ENDIAN
-	#define BLARGG_BIG_ENDIAN 1
+        #define BLARGG_BIG_ENDIAN 1
 #endif
 
 // Uncomment if you get errors in the bool section of blargg_common.h
@@ -36,7 +36,7 @@
 #define HAVE_CONFIG_H 1
 
 #ifdef HAVE_CONFIG_H
-	#include "config.h"
+        #include "config.h"
 #endif
 
 #endif

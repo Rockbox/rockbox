@@ -53,7 +53,7 @@ static unsigned char wmc_regs[WMC_NUM_REGS] =
 #if defined(HAVE_WM8711) || defined(HAVE_WM8731)
     /* BYPASS on by default - OFF until needed */
     [AAPCTRL]    = AAPCTRL_DEFAULT & ~AAPCTRL_BYPASS,
-    /* CLKOUT and OSC on by default - OFF unless needed by a target */ 
+    /* CLKOUT and OSC on by default - OFF unless needed by a target */
     [PDCTRL]     = PDCTRL_DEFAULT | PDCTRL_CLKOUTPD | PDCTRL_OSCPD,
 #elif defined(HAVE_WM8721)
     /* No BYPASS */

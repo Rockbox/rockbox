@@ -50,7 +50,7 @@ extern "C"
                                  SKIN_REFRESH_PEAK_METER)
 
 enum skin_token_type {
-    
+
     SKIN_TOKEN_NO_TOKEN,
     SKIN_TOKEN_UNKNOWN,
 
@@ -66,12 +66,12 @@ enum skin_token_type {
     SKIN_TOKEN_ALIGN_RIGHT,
     SKIN_TOKEN_ALIGN_RIGHT_RTL,
     SKIN_TOKEN_ALIGN_LANGDIRECTION,
-    
+
 
     /* Sublines */
     SKIN_TOKEN_SUBLINE_TIMEOUT,
     SKIN_TOKEN_SUBLINE_SCROLL,
-    
+
     /* Conditional */
     SKIN_TOKEN_LOGICAL_IF,
     SKIN_TOKEN_LOGICAL_AND,
@@ -164,7 +164,7 @@ enum skin_token_type {
     SKIN_TOKEN_IMAGE_DISPLAY,
     SKIN_TOKEN_IMAGE_DISPLAY_LISTICON,
     SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT,
-    
+
     /* Albumart */
     SKIN_TOKEN_ALBUMART_LOAD,
     SKIN_TOKEN_ALBUMART_DISPLAY,
@@ -227,15 +227,15 @@ enum skin_token_type {
     SKIN_TOKEN_LIST_ITEM_ICON,
     SKIN_TOKEN_LIST_NEEDS_SCROLLBAR,
     SKIN_TOKEN_LIST_SCROLLBAR,
-    
+
     SKIN_TOKEN_LOAD_FONT,
-    
+
     /* buttons */
     SKIN_TOKEN_BUTTON_VOLUME,
     SKIN_TOKEN_LASTTOUCH,
     SKIN_TOKEN_TOUCHREGION,
     SKIN_TOKEN_HAVE_TOUCH,
-    
+
     /* Virtual LED */
     SKIN_TOKEN_VLED_HDD,
     /* Volume level */
@@ -250,7 +250,7 @@ enum skin_token_type {
     SKIN_TOKEN_SETTINGBAR,
     SKIN_TOKEN_CURRENT_SCREEN,
     SKIN_TOKEN_LANG_IS_RTL,
-    
+
     /* Recording Tokens */
     SKIN_TOKEN_HAVE_RECORDING,
     SKIN_TOKEN_IS_RECORDING,
@@ -261,8 +261,8 @@ enum skin_token_type {
     SKIN_TOKEN_REC_SECONDS,
     SKIN_TOKEN_REC_MINUTES,
     SKIN_TOKEN_REC_HOURS,
-    
-    
+
+
     /* Radio Tokens */
     SKIN_TOKEN_HAVE_TUNER,
     SKIN_TOKEN_TUNER_TUNED,
@@ -302,7 +302,7 @@ enum skin_token_type {
  *          characters for parameters are:
  *             I - Required integer
  *             i - Nullable integer
- *             D - Required decimal 
+ *             D - Required decimal
  *             d - Nullable decimal
  *                  Decimals are stored as (whole*10)+part
  *             P - Required percentage
@@ -325,13 +325,13 @@ enum skin_token_type {
  *          one integer must be specified, one integer can be
  *          specified or set to default with '-', and the user can
  *          stop providing parameters at any time after that.
- *          To specify multiple instances of the same type, put a 
+ *          To specify multiple instances of the same type, put a
  *          number before the character.  For instance, the string...
  *             2s
  *          will specify two strings.  A ? at the beginning of the
  *          string will specify that you may choose to omit all arguments
- * 
- *          You may also group param types in [] which will tell the parser to 
+ *
+ *          You may also group param types in [] which will tell the parser to
  *          accept any *one* of those types for that param. i.e [IT] will
  *          accept either an integer or tag type. [ITs] will also accept a string or -
  *
@@ -344,14 +344,14 @@ struct tag_info
     int flags;
 };
 
-/* 
+/*
  * Finds a tag by name and returns its parameter list, or an empty
  * string if the tag is not found in the table
  */
 const struct tag_info* find_tag(const char* name);
 
 /*
- * Determines whether a character is legal to escape or not.  If 
+ * Determines whether a character is legal to escape or not.  If
  * lookup is not found in the legal escape characters string, returns
  * false, otherwise returns true
  */

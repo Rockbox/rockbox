@@ -28,4 +28,3 @@ extern void gui_usb_screen_run(bool early_usb);
 #endif
 
 #endif
-

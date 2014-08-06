@@ -85,4 +85,4 @@ private slots:
     void OnRegFieldValueChanged(int row, int col);
 };
 
-#endif /* REGDISPLAYPANEL_H */ 
+#endif /* REGDISPLAYPANEL_H */

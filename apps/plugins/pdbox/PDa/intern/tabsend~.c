@@ -36,16 +36,16 @@ static t_int *tabsend_perform(t_int *w)
     if (!x->x_vec) goto bad;
 
     while (n--)
-    {	
-    	t_sample f = *in++;
-    	if (PD_BADFLOAT(f))
-	    f = 0;
-	 *dest++ = f;
+    {
+        t_sample f = *in++;
+        if (PD_BADFLOAT(f))
+            f = 0;
+         *dest++ = f;
     }
     if (!i--)
     {
-    	clock_delay(x->x_clock, 0);
-    	i = x->x_graphperiod;
+        clock_delay(x->x_clock, 0);
+        i = x->x_graphperiod;
     }
     x->x_graphcount = i;
 bad:
@@ -63,21 +63,21 @@ static void tabsend_dsp(t_tabsend *x, t_signal **sp)
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
     {
-    	if (*x->x_arrayname->s_name)
-	    error("tabsend~: %s: no such array", x->x_arrayname->s_name);
+        if (*x->x_arrayname->s_name)
+            error("tabsend~: %s: no such array", x->x_arrayname->s_name);
     }
     else if (!garray_getfloatarray(a, &vecsize, &x->x_vec))
-    	error("%s: bad template for tabsend~", x->x_arrayname->s_name);
+        error("%s: bad template for tabsend~", x->x_arrayname->s_name);
     else
     {
-    	int n = sp[0]->s_n;
-    	int ticksper = sp[0]->s_sr/n;
-    	if (ticksper < 1) ticksper = 1;
-    	x->x_graphperiod = ticksper;
-    	if (x->x_graphcount > ticksper) x->x_graphcount = ticksper;
-    	if (n < vecsize) vecsize = n;
-    	garray_usedindsp(a);
-    	dsp_add(tabsend_perform, 3, x, sp[0]->s_vec, vecsize);
+        int n = sp[0]->s_n;
+        int ticksper = sp[0]->s_sr/n;
+        if (ticksper < 1) ticksper = 1;
+        x->x_graphperiod = ticksper;
+        if (x->x_graphcount > ticksper) x->x_graphcount = ticksper;
+        if (n < vecsize) vecsize = n;
+        garray_usedindsp(a);
+        dsp_add(tabsend_perform, 3, x, sp[0]->s_vec, vecsize);
     }
 }
 
@@ -96,8 +96,7 @@ static void tabsend_free(t_tabsend *x)
 void tabsend_tilde_setup(void)
 {
     tabsend_class = class_new(gensym("tabsend~"), (t_newmethod)tabsend_new,
-    	(t_method)tabsend_free, sizeof(t_tabsend), 0, A_DEFSYM, 0);
+        (t_method)tabsend_free, sizeof(t_tabsend), 0, A_DEFSYM, 0);
     CLASS_MAINSIGNALIN(tabsend_class, t_tabsend, x_f);
     class_addmethod(tabsend_class, (t_method)tabsend_dsp, gensym("dsp"), 0);
 }
-

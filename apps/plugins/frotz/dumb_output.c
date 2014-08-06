@@ -122,7 +122,7 @@ void os_display_string (const zchar *s)
     else if (c == ZC_NEW_STYLE)
       os_set_text_style(*s++);
     else {
-     os_display_char (c); 
+     os_display_char (c);
      }
 }
 
@@ -190,7 +190,7 @@ void os_more_prompt(void)
   int old_row = cursor_row;
   int old_col = cursor_col;
   int old_style = current_style;
-  
+
   current_style = REVERSE_STYLE;
   os_display_string("[MORE]");
   wait_for_key();

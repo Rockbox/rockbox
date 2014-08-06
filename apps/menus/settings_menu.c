@@ -132,7 +132,7 @@ static int clear_start_directory(void)
     splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;
 }
-MENUITEM_FUNCTION(clear_start_directory_item, 0, ID2P(LANG_RESET_START_DIR), 
+MENUITEM_FUNCTION(clear_start_directory_item, 0, ID2P(LANG_RESET_START_DIR),
                   clear_start_directory, NULL, NULL, Icon_file_view_menu);
 static int fileview_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -522,7 +522,7 @@ MAKE_MENU(bookmark_settings_menu, ID2P(LANG_BOOKMARK_SETTINGS), 0,
 /***********************************/
 /*    AUTORESUME MENU              */
 #ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC 
+#if CONFIG_CODEC == SWCODEC
 
 static int autoresume_callback(int action, const struct menu_item_ex *this_item)
 {
@@ -535,7 +535,7 @@ static int autoresume_callback(int action, const struct menu_item_ex *this_item)
         static const char *lines[] = {ID2P(LANG_TAGCACHE_BUSY),
                                       ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
         static const struct text_message message = {lines, 2};
-        
+
         if (gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
             tagcache_rebuild_with_splash();
     }
@@ -650,9 +650,9 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           &startup_shutdown_menu,
           &bookmark_settings_menu,
 #ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC 
+#if CONFIG_CODEC == SWCODEC
           &autoresume_menu,
-#endif          
+#endif
 #endif
           &browse_langs, &voice_settings_menu,
 #ifdef HAVE_HOTKEY

@@ -158,7 +158,7 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
         }
         /* Step 2: Calculate a single pair with half zero'ed */
         if (kx&1) {
-            idx0 = 2*n; idx1 = idx0 + 1; 
+            idx0 = 2*n; idx1 = idx0 + 1;
             QMF_RE(pX[idx0]) = FAAD_ANALYSIS_SCALE2( real[n]);
             QMF_IM(pX[idx0]) = FAAD_ANALYSIS_SCALE2( imag[n]);
             QMF_RE(pX[idx1]) = QMF_IM(pX[idx1]) = 0;
@@ -345,7 +345,7 @@ static const complex_t qmf32_pre_twiddle[] =
 #define FAAD_CMPLX_PRETWIDDLE_SUB(k) \
         (MUL_F(QMF_RE(X[l][k]), RE(qmf32_pre_twiddle[k])) - \
          MUL_F(QMF_IM(X[l][k]), IM(qmf32_pre_twiddle[k])))
-        
+
 #define FAAD_CMPLX_PRETWIDDLE_ADD(k) \
         (MUL_F(QMF_IM(X[l][k]), RE(qmf32_pre_twiddle[k])) + \
          MUL_F(QMF_RE(X[l][k]), IM(qmf32_pre_twiddle[k])))
@@ -379,7 +379,7 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
         DCT4_32(x1, x1);
         DST4_32(x2, x2);
 
-        idx0 = qmfs->v_index; 
+        idx0 = qmfs->v_index;
         idx1 = qmfs->v_index + 63;
         for (n = 0; n < 32; n+=2)
         {
@@ -416,15 +416,15 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
 void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
                           real_t *output)
 {
-    real_t real1[32] MEM_ALIGN_ATTR; 
+    real_t real1[32] MEM_ALIGN_ATTR;
     real_t imag1[32] MEM_ALIGN_ATTR;
-    real_t real2[32] MEM_ALIGN_ATTR; 
+    real_t real2[32] MEM_ALIGN_ATTR;
     real_t imag2[32] MEM_ALIGN_ATTR;
     qmf_t *pX;
     real_t *p_buf_1, *p_buf_3;
     int32_t n, k, idx0, idx1, out = 0;
     uint32_t l;
-    
+
     /* qmf subsample l */
     for (l = 0; l < sbr->numTimeSlotsRate; l++)
     {
@@ -438,9 +438,9 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
         {
             idx0 = 2*k; idx1 = idx0+1;
             real1[   k] = QMF_RE(pX[idx0]); imag2[   k] = QMF_IM(pX[idx0]);
-            imag1[31-k] = QMF_RE(pX[idx1]); real2[31-k] = QMF_IM(pX[idx1]);    
+            imag1[31-k] = QMF_RE(pX[idx1]); real2[31-k] = QMF_IM(pX[idx1]);
         }
-        
+
         // dct4_kernel is DCT_IV without reordering which is done before and after FFT
         dct4_kernel(real1, imag1);
         dct4_kernel(real2, imag2);

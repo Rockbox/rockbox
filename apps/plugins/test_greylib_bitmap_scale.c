@@ -36,7 +36,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 
 GREY_INFO_STRUCT
-static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT + 
+static unsigned char grey_bm_buf[LCD_WIDTH * LCD_HEIGHT +
                    BM_SCALED_SIZE(LCD_WIDTH,0,FORMAT_NATIVE,0)];
 
 /* this is the plugin entry point */
@@ -60,7 +60,7 @@ enum plugin_status plugin_start(const void* parameter)
     ret = BMP_LOAD(filename, &grey_bm, sizeof(grey_bm_buf),
                    FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
                    &format_grey);
-    
+
     if(ret < 1)
     {
         rb->splash(HZ*2, "failed to load bitmap");
@@ -88,6 +88,6 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
     grey_release();
-    
+
     return PLUGIN_OK;
 }

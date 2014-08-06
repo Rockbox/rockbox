@@ -84,7 +84,7 @@ void rolo_restart_cop(void)
 
     /* Invalidate cache */
     commit_discard_idcache();
-    
+
     /* Disable cache */
     CACHE_CTL = CACHE_CTL_DISABLE;
 

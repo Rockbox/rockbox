@@ -236,7 +236,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
                 int cols = (parent->width / listcfg[screen]->width);
                 current_column = (cur_line)%cols;
                 current_row = (cur_line)/cols;
-                
+
                 skin_viewport->vp.x = parent->x + listcfg[screen]->width*current_column + original_x;
                 skin_viewport->vp.y = parent->y + listcfg[screen]->height*current_row + original_y;
             }
@@ -282,4 +282,3 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     current_drawing_line = list->selected_item;
     return true;
 }
-

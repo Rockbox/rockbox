@@ -160,7 +160,7 @@ static int wav2wv(const char *infile)
     WavpackAddWrapper (wpc, &raw_header, sizeof (raw_header));
 
     rb->strcpy(outfile, infile);
-    outextension = outfile + rb->strlen(outfile) - 3; 
+    outextension = outfile + rb->strlen(outfile) - 3;
     outextension[1] = outextension[2];
     outextension[2] = 0;
     out_fd = rb->creat(outfile, 0666);
@@ -178,7 +178,7 @@ static int wav2wv(const char *infile)
         int cnt, buttons;
         int32_t value, *lp;
         signed char *cp;
- 
+
         samples_count = SAMPLES_PER_BLOCK;
 
         if (samples_count > samples_remaining)
@@ -214,13 +214,13 @@ static int wav2wv(const char *infile)
                     value = *cp++ & 0xff;
                     value += *cp++ << 8;
                     *lp++ = value;
-                } 
+                }
             else
                 while (cnt--) {
                     value = *cp++ & 0xff;
                     value += *cp++ << 8;
                     *lp++ = value;
-                } 
+                }
 
             if (!WavpackPackSamples (wpc, temp_buffer, samples_this_pass)) {
                 rb->splash(HZ*2, "internal error!");
@@ -283,7 +283,7 @@ enum plugin_status plugin_start(const void *parameter)
         rb->splash(HZ*2, "not enough memory!");
         return PLUGIN_ERROR;
     }
-    
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif

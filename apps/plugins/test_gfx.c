@@ -55,7 +55,7 @@ static int log_init(void)
 static void init_rand_table(void)
 {
     int i;
-    
+
     rb->srand(RND_SEED); /* make it reproducable */
     for (i = 0; i < 0x400; i++)
         rand_table[i] = rb->rand();
@@ -350,7 +350,7 @@ static void time_text(void) /* tests mono_bitmap performance */
     long time_start;  /* start tickcount */
     long time_end;    /* end tickcount */
     int count1, count2, count3, count4;
-    
+
     rb->lcd_setfont(FONT_SYSFIXED);
 
     /* Test 1: DRMODE_SOLID */
@@ -469,7 +469,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->splash(HZ, "Could not create logfile");
         return PLUGIN_ERROR;
     }
-    rb->fdprintf(log_fd, "%s", 
+    rb->fdprintf(log_fd, "%s",
 #ifdef TEST_GREYLIB
                  "Greylib performance test.\n"
 #else

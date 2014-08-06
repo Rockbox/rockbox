@@ -38,25 +38,25 @@ struct BEECRYPTAPI mpnumber
 struct _mpnumber
 #endif
 {
-	size_t	size;
-	mpw*	data;
+        size_t  size;
+        mpw*    data;
 
 #ifdef __cplusplus
-	static const mpnumber ZERO;
-	static const mpnumber ONE;
+        static const mpnumber ZERO;
+        static const mpnumber ONE;
 
-	mpnumber();
-	mpnumber(unsigned int);
-	mpnumber(const mpnumber&);
-	~mpnumber();
+        mpnumber();
+        mpnumber(unsigned int);
+        mpnumber(const mpnumber&);
+        ~mpnumber();
 
-	const mpnumber& operator=(const mpnumber&);
-	bool operator==(const mpnumber&) const throw ();
-	bool operator!=(const mpnumber&) const throw ();
+        const mpnumber& operator=(const mpnumber&);
+        bool operator==(const mpnumber&) const throw ();
+        bool operator!=(const mpnumber&) const throw ();
 
-	void wipe();
+        void wipe();
 
-	size_t bitlength() const throw ();
+        size_t bitlength() const throw ();
 #endif
 };
 

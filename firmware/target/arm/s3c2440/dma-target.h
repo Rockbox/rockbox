@@ -36,7 +36,7 @@
 #error Unsupported target
 #endif
 
-struct dma_request 
+struct dma_request
 {
     volatile void *source_addr;
     volatile void *dest_addr;

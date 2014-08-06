@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Copyright (C) 2007 Mauricio Peccorini 
+* Copyright (C) 2007 Mauricio Peccorini
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License

@@ -62,13 +62,13 @@ static void cgu_configure_div(int div, int n, int m)
 {
     int msub, madd, div_size, max_n;
     unsigned long cfg;
-    
+
     if (n == m)
     {
         CGU.base_fdc[div] = CGU.base_fdc[div] & ~1;
         return;
     }
-    
+
     msub = -n;
     madd = m - n;
     div_size = (div == PNX0101_HIPREC_FDC) ? 10 : 8;
@@ -217,7 +217,7 @@ void set_cpu_frequency(long frequency)
             cpu_frequency = CPUFREQ_DEFAULT;
             break;
     }
-    
+
 }
 #endif
 

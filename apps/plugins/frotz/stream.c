@@ -1,5 +1,5 @@
 /* stream.c - IO stream implementation
- *	Copyright (c) 1995-1997 Stefan Jokisch
+ *      Copyright (c) 1995-1997 Stefan Jokisch
  *
  * This file is part of Frotz.
  *
@@ -72,9 +72,9 @@ void stream_mssg_on (void)
     flush_buffer ();
 
     if (ostream_screen)
-	screen_mssg_on ();
+        screen_mssg_on ();
     if (ostream_script && enable_scripting)
-	script_mssg_on ();
+        script_mssg_on ();
 
     message = TRUE;
 
@@ -93,9 +93,9 @@ void stream_mssg_off (void)
     flush_buffer ();
 
     if (ostream_screen)
-	screen_mssg_off ();
+        screen_mssg_off ();
     if (ostream_script && enable_scripting)
-	script_mssg_off ();
+        script_mssg_off ();
 
     message = FALSE;
 
@@ -104,9 +104,9 @@ void stream_mssg_off (void)
 /*
  * z_output_stream, open or close an output stream.
  *
- *	zargs[0] = stream to open (positive) or close (negative)
- *	zargs[1] = address to redirect output to (stream 3 only)
- *	zargs[2] = width of redirected output (stream 3 only, optional)
+ *      zargs[0] = stream to open (positive) or close (negative)
+ *      zargs[1] = address to redirect output to (stream 3 only)
+ *      zargs[2] = width of redirected output (stream 3 only, optional)
  *
  */
 
@@ -118,21 +118,21 @@ void z_output_stream (void)
     switch ((short) zargs[0]) {
 
     case  1: ostream_screen = TRUE;
-	     break;
+             break;
     case -1: ostream_screen = FALSE;
-	     break;
+             break;
     case  2: if (!ostream_script) script_open ();
-	     break;
+             break;
     case -2: if (ostream_script) script_close ();
-	     break;
+             break;
     case  3: memory_open (zargs[1], zargs[2], zargc >= 3);
-	     break;
+             break;
     case -3: memory_close ();
-	     break;
+             break;
     case  4: if (!ostream_record) record_open ();
-	     break;
+             break;
     case -4: if (ostream_record) record_close ();
-	     break;
+             break;
 
     }
 
@@ -149,9 +149,9 @@ void stream_char (zchar c)
 {
 
     if (ostream_screen)
-	screen_char (c);
+        screen_char (c);
     if (ostream_script && enable_scripting)
-	script_char (c);
+        script_char (c);
 
 }/* stream_char */
 
@@ -167,14 +167,14 @@ void stream_word (const zchar *s)
 
     if (ostream_memory && !message)
 
-	memory_word (s);
+        memory_word (s);
 
     else {
 
-	if (ostream_screen)
-	    screen_word (s);
-	if (ostream_script && enable_scripting)
-	    script_word (s);
+        if (ostream_screen)
+            screen_word (s);
+        if (ostream_script && enable_scripting)
+            script_word (s);
 
     }
 
@@ -192,14 +192,14 @@ void stream_new_line (void)
 
     if (ostream_memory && !message)
 
-	memory_new_line ();
+        memory_new_line ();
 
     else {
 
-	if (ostream_screen)
-	    screen_new_line ();
-	if (ostream_script && enable_scripting)
-	    script_new_line ();
+        if (ostream_screen)
+            screen_new_line ();
+        if (ostream_script && enable_scripting)
+            script_new_line ();
 
     }
 
@@ -208,7 +208,7 @@ void stream_new_line (void)
 /*
  * z_input_stream, select an input stream.
  *
- *	zargs[0] = input stream to be selected
+ *      zargs[0] = input stream to be selected
  *
  */
 
@@ -218,9 +218,9 @@ void z_input_stream (void)
     flush_buffer ();
 
     if (zargs[0] == 0 && istream_replay)
-	replay_close ();
+        replay_close ();
     if (zargs[0] == 1 && !istream_replay)
-	replay_open ();
+        replay_open ();
 
 }/* z_input_stream */
 
@@ -232,7 +232,7 @@ void z_input_stream (void)
  */
 
 zchar stream_read_key ( zword timeout, zword routine,
-			bool hot_keys )
+                        bool hot_keys )
 {
     zchar key = ZC_BAD;
 
@@ -244,40 +244,40 @@ continue_input:
 
     do {
 
-	if (istream_replay)
-	    key = replay_read_key ();
-	else
-	    key = console_read_key (timeout);
+        if (istream_replay)
+            key = replay_read_key ();
+        else
+            key = console_read_key (timeout);
 
     } while (key == ZC_BAD);
 
     /* Verify mouse clicks */
 
     if (key == ZC_SINGLE_CLICK || key == ZC_DOUBLE_CLICK)
-	if (!validate_click ())
-	    goto continue_input;
+        if (!validate_click ())
+            goto continue_input;
 
     /* Copy key to the command file */
 
     if (ostream_record && !istream_replay)
-	record_write_key (key);
+        record_write_key (key);
 
     /* Handle timeouts */
 
     if (key == ZC_TIME_OUT)
-	if (direct_call (routine) == 0)
-	    goto continue_input;
+        if (direct_call (routine) == 0)
+            goto continue_input;
 
     /* Handle hot keys */
 
     if (hot_keys && key >= ZC_HKEY_MIN && key <= ZC_HKEY_MAX) {
 
-	if (h_version == V4 && key == ZC_HKEY_UNDO)
-	    goto continue_input;
-	if (!handle_hot_key (key))
-	    goto continue_input;
+        if (h_version == V4 && key == ZC_HKEY_UNDO)
+            goto continue_input;
+        if (!handle_hot_key (key))
+            goto continue_input;
 
-	return ZC_BAD;
+        return ZC_BAD;
 
     }
 
@@ -295,9 +295,9 @@ continue_input:
  */
 
 zchar stream_read_input ( int max, zchar *buf,
-			  zword timeout, zword routine,
-			  bool hot_keys,
-			  bool no_scripting )
+                          zword timeout, zword routine,
+                          bool hot_keys,
+                          bool no_scripting )
 {
     zchar key = ZC_BAD;
 
@@ -306,9 +306,9 @@ zchar stream_read_input ( int max, zchar *buf,
     /* Remove initial input from the transscript file or from the screen */
 
     if (ostream_script && enable_scripting && !no_scripting)
-	script_erase_input (buf);
+        script_erase_input (buf);
     if (istream_replay)
-	screen_erase_input (buf);
+        screen_erase_input (buf);
 
     /* Read input line from current input stream */
 
@@ -316,47 +316,47 @@ continue_input:
 
     do {
 
-	if (istream_replay)
-	    key = replay_read_input (buf);
-	else
-	    key = console_read_input (max, buf, timeout, key != ZC_BAD);
+        if (istream_replay)
+            key = replay_read_input (buf);
+        else
+            key = console_read_input (max, buf, timeout, key != ZC_BAD);
 
     } while (key == ZC_BAD);
 
     /* Verify mouse clicks */
 
     if (key == ZC_SINGLE_CLICK || key == ZC_DOUBLE_CLICK)
-	if (!validate_click ())
-	    goto continue_input;
+        if (!validate_click ())
+            goto continue_input;
 
     /* Copy input line to the command file */
 
     if (ostream_record && !istream_replay)
-	record_write_input (buf, key);
+        record_write_input (buf, key);
 
     /* Handle timeouts */
 
     if (key == ZC_TIME_OUT)
-	if (direct_call (routine) == 0)
-	    goto continue_input;
+        if (direct_call (routine) == 0)
+            goto continue_input;
 
     /* Handle hot keys */
 
     if (hot_keys && key >= ZC_HKEY_MIN && key <= ZC_HKEY_MAX) {
 
-	if (!handle_hot_key (key))
-	    goto continue_input;
+        if (!handle_hot_key (key))
+            goto continue_input;
 
-	return ZC_BAD;
+        return ZC_BAD;
 
     }
 
     /* Copy input line to transscript file or to the screen */
 
     if (ostream_script && enable_scripting && !no_scripting)
-	script_write_input (buf, key);
+        script_write_input (buf, key);
     if (istream_replay)
-	screen_write_input (buf, key);
+        screen_write_input (buf, key);
 
     /* Return terminating key */
 

@@ -249,7 +249,7 @@ static const uint32_t keys[][4] = {
     { 0xe494e96e, 0x3ee32966, 0x6f48512b, 0xa93fbb42 }, /* "sansa" */
     { 0xd7b10538, 0xc662945b, 0x1b3fce68, 0xf389c0e6 }, /* "sansa_gh" */
     { 0x1d29ddc0, 0x2579c2cd, 0xce339e1a, 0x75465dfe }, /* sansa 103 */
-    
+
     { 0x2a7968de, 0x15127979, 0x142e60a7, 0xe49c1893 }, /* c200 1.00.03 */
     { 0xbf2d06fa, 0xf0e23d59, 0x29738132, 0xe2d04ca7 }, /* c200 1.00.04 and up*/
     { 0xa913d139, 0xf842f398, 0x3e03f1a6, 0x060ee012 }, /* c200 1.01.05 and up*/
@@ -397,7 +397,7 @@ int is_sansa(struct sansa_t* sansa)
          (sansa->pinfo[0].type != 0x0c) &&
          (sansa->pinfo[0].type != 0x0e)) ||
         (sansa->pinfo[1].type != 0x84) ||
-        (sansa->pinfo[2].type != 0x00) || 
+        (sansa->pinfo[2].type != 0x00) ||
         (sansa->pinfo[3].type != 0x00)) {
         /* Bad partition layout, abort */
         return -1;
@@ -618,7 +618,7 @@ static int load_original_firmware(struct sansa_t* sansa, unsigned char* buf, str
 {
     int ppmi_length;
     int n;
-    
+
     /* Read 512 bytes from PPMI_OFFSET - the PPMI header plus the mi4 header */
     if (sansa_seek_and_read(sansa, sansa->start + PPMI_OFFSET, buf, 512) < 0) {
         return -1;
@@ -836,7 +836,7 @@ int sansa_update_of(struct sansa_t* sansa, const char* filename)
     struct mi4header_t mi4header;
     unsigned char buf[512];
 
-    /* Step 1 - check we have an OF on the Sansa to upgrade. We expect the 
+    /* Step 1 - check we have an OF on the Sansa to upgrade. We expect the
        Rockbox bootloader to be installed and the OF to be after it on disk. */
 
     /* Read 512 bytes from PPMI_OFFSET - the PPMI header */
@@ -906,7 +906,7 @@ int sansa_update_of(struct sansa_t* sansa, const char* filename)
         fprintf(stderr,"[ERR]  Short write in sansa_update_of\n");
         return -1;
     }
-    
+
     /* Step 4 - zero out the nvparams section - we have to do this or we end up
        with multiple copies of the nvparams data and don't know which one to
        work with for the database rebuild disabling trick in our bootloader */
@@ -917,7 +917,7 @@ int sansa_update_of(struct sansa_t* sansa, const char* filename)
                        sansa->start+NVPARAMS_OFFSET+0x200);
             return -1;
         }
-        
+
         memset(sansa->sectorbuf,0,NVPARAMS_SIZE);
         n=sansa_write(sansa, NVPARAMS_SIZE);
         if (n < NVPARAMS_SIZE) {
@@ -925,7 +925,7 @@ int sansa_update_of(struct sansa_t* sansa, const char* filename)
             return -1;
         }
     }
-    
+
     return 0;
 }
 
@@ -972,4 +972,3 @@ int sansa_update_ppbl(struct sansa_t* sansa, const char* filename)
 
     return 0;
 }
-

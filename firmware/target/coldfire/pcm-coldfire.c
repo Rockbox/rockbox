@@ -140,7 +140,7 @@ static void iis_play_reset_if_playback(bool if_playback)
 
 /* apply audio settings */
 /* This clears the reset bit to enable monitoring immediately if monitoring
-   recording sources or always if playback is in progress - we might be 
+   recording sources or always if playback is in progress - we might be
    switching samplerates on the fly */
 void pcm_dma_apply_settings(void)
 {
@@ -148,7 +148,7 @@ void pcm_dma_apply_settings(void)
 
     /* remember table entry */
     freq_ent = pcm_freq_parms[pcm_fsel];
- 
+
     /* Reprogramming bits 15-12 requires FIFO to be in a reset
        condition - Users Manual 17-8, Note 11 */
     or_l(IIS_FIFO_RESET, &IIS_PLAY);

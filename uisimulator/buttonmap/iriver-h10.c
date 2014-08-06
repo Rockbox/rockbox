@@ -68,7 +68,7 @@ int key_to_button(int keyboard_button)
     return new_btn;
 }
 
-struct button_map bm[] = {  
+struct button_map bm[] = {
 #if defined (IRIVER_H10)
     { SDLK_KP_PLUS,       38,  70, 37, "Power" },
     { SDLK_KP4,          123, 194, 26, "Cancel" },

@@ -10,7 +10,7 @@
  * Based on code from the ArchOpen project - http://www.archopen.org
  * Adapted for Rockbox in January 2007
  *
- * Original files: 
+ * Original files:
  *   lib/target/arch_AV3XX/ata.c
  *
  *   AvLo - linav project

@@ -31,7 +31,7 @@
  */
 
 /*****************************************************************************
- *    Main control mappings 
+ *    Main control mappings
  *****************************************************************************/
 
 static const struct button_mapping button_context_standard[]  = {
@@ -48,7 +48,7 @@ static const struct button_mapping button_context_standard[]  = {
 /*  { ACTION_STD_REC,            BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_STD_HOTKEY,         BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_F3,                 BUTTON_,                       BUTTON_ }, */
-  
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -78,7 +78,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,          BUTTON_VOL_UP,                 BUTTON_NONE },
     { ACTION_WPS_VOLUP,          BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
 /*  { ACTION_WPS_PITCHSCREEN,    BUTTON_,                       BUTTON_ }, */
-/*  { ACTION_WPS_ID3SCREEN,      BUTTON_,                       BUTTON_ }, */ 
+/*  { ACTION_WPS_ID3SCREEN,      BUTTON_,                       BUTTON_ }, */
     { ACTION_WPS_CONTEXT,        BUTTON_FUNC|BUTTON_REPEAT,     BUTTON_FUNC },
     { ACTION_WPS_QUICKSCREEN,    BUTTON_REC|BUTTON_REPEAT,      BUTTON_REC },
     { ACTION_WPS_MENU,           BUTTON_REC|BUTTON_REL,         BUTTON_REC },
@@ -196,7 +196,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 }; /* button_context_keyboard */
 
 /*****************************************************************************
- *    Remote control mappings 
+ *    Remote control mappings
  *****************************************************************************/
 
 static const struct button_mapping button_rc_context_standard[]  = {
@@ -213,7 +213,7 @@ static const struct button_mapping button_rc_context_standard[]  = {
 /*  { ACTION_STD_REC,            BUTTON_,                          BUTTON_ }, */
 /*  { ACTION_STD_HOTKEY,         BUTTON_,                          BUTTON_ }, */
 /*  { ACTION_F3,                 BUTTON_,                          BUTTON_ }, */
-  
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -243,7 +243,7 @@ static const struct button_mapping button_rc_context_wps[]  = {
     { ACTION_WPS_VOLUP,          BUTTON_RC_VOL_UP,                 BUTTON_NONE },
     { ACTION_WPS_VOLUP,          BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
 /*  { ACTION_WPS_PITCHSCREEN,    BUTTON_,                          BUTTON_ }, */
-/*  { ACTION_WPS_ID3SCREEN,      BUTTON_,                          BUTTON_ }, */ 
+/*  { ACTION_WPS_ID3SCREEN,      BUTTON_,                          BUTTON_ }, */
     { ACTION_WPS_CONTEXT,        BUTTON_RC_FUNC|BUTTON_REPEAT,     BUTTON_RC_FUNC },
 /*  { ACTION_WPS_QUICKSCREEN,    BUTTON_REC|BUTTON_REL,            BUTTON_REC }, */
     { ACTION_WPS_MENU,           BUTTON_RC_FUNC|BUTTON_RC_PLAY,    BUTTON_RC_FUNC },
@@ -395,4 +395,3 @@ const struct button_mapping* get_context_mapping(int context)
     }
     return button_context_standard;
 }
-

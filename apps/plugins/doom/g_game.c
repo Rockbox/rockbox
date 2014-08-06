@@ -118,7 +118,7 @@ boolean         haswolflevels = false;// jff 4/18/98 wolf levels present
 static byte     *savebuffer;          // CPhipps - static
 int             autorun = false;      // always running?          // phares
 int             totalleveltimes;      // CPhipps - total time for all completed levels
-int		longtics;
+int             longtics;
 
 //
 // controls (have defaults)
@@ -325,7 +325,7 @@ void G_BuildTiccmd(ticcmd_t* cmd)
          side += 5*sidemove[speed];
    if (scrollmag < 0)
          side -= 5*sidemove[speed];
-   scrollmag = 0;         
+   scrollmag = 0;
 
    if (strafe)
    {
@@ -892,7 +892,7 @@ void G_Ticker (void)
                   else
                      S_ResumeSound ();
                   break;
-   
+
                case BTS_SAVEGAME:
                   if (!savedescription[0])
                      strcpy(savedescription, "NET GAME");
@@ -919,7 +919,7 @@ void G_Ticker (void)
                }
                players[i].cmd.buttons = 0;
             }
-         }  
+         }
       }
    }
 
@@ -1138,14 +1138,14 @@ boolean G_CheckSpot(int playernum, mapthing_t *mthing)
       case -2048: xa = finesine[0];   // finecosine[-2048]
          ya = finetangent[2048];   // finesine[-2048]
          break;
-      case -1024:	xa = finesine[1024];     // finecosine[-1024]
+      case -1024:       xa = finesine[1024];     // finecosine[-1024]
          ya = finetangent[3072];  // finesine[-1024]
          break;
       case 1024:
       case 2048:
       case 3072:
       case 4096:
-      case 0:	xa = finecosine[an];
+      case 0:   xa = finecosine[an];
          ya = finesine[an];
          break;
       default: I_Error("G_CheckSpot: unexpected angle %d\n",an);
@@ -2828,4 +2828,3 @@ void doom_printf(const char *s, ...)
    va_end(v);
    players[consoleplayer].message = msg;  // set new message
 }
-

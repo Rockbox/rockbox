@@ -303,7 +303,7 @@ void lcd_init_device(void)
     /** Datasheet states:
      * 257H >= VBP >= 3H, VBP > VLW, VFP >= 1H
      * 1533clk >= HBP >= 24clk, HBP > HLW, HFP >= 4clk
-     * 
+     *
      * Take VLW=1H, VBP=3H, VFP=1H, HLW=8, HBP=24, HFP=4
      * Take 3clk/pix because we send 24-bit/pix with 8-bit data bus
      * Keep consistent with register setting in lcd_init_seq

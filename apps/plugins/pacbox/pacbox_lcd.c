@@ -56,8 +56,8 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             }
         }
 #elif (LCD_WIDTH >= 216) && (LCD_HEIGHT >= 168)
-        /* 0.75 scaling - display 3 out of 4 pixels - rotated = 216x168 
-           Skipping pixel #2 out of 4 seems to give the most legible display 
+        /* 0.75 scaling - display 3 out of 4 pixels - rotated = 216x168
+           Skipping pixel #2 out of 4 seems to give the most legible display
          */
         next_dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+((ScreenHeight*3)/4)-1];
         for (y=ScreenHeight-1;y >= 0; y--) {
@@ -76,7 +76,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
         }
 #elif (LCD_WIDTH >= 168) && (LCD_HEIGHT >= 216)
         /* 0.75 scaling - display 3 out of 4 pixels - = 168x216
-           Skipping pixel #2 out of 4 seems to give the most legible display 
+           Skipping pixel #2 out of 4 seems to give the most legible display
          */
         (void)next_dst;
         dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS];
@@ -111,10 +111,10 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
          * else center vertically without clipping */
         (void)next_dst;
         dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS];
-        
+
         /* Skip first YCLIP lines */
         vbuf+=ScreenWidth*YCLIP;
-        
+
         /* Show regular screen */
         for (y=0;y<(ScreenHeight/2-YCLIP);y++) {
             for (x=0;x<ScreenWidth/2;x++) {

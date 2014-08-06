@@ -166,8 +166,8 @@ void init_PacmanMachine(int dip)
     /* Set the DIP switches to a default configuration */
     setDipSwitches( dip );
 
-    /* Initialize the video character translation tables: video memory has a 
-       very peculiar arrangement in Pacman so we precompute a few tables to 
+    /* Initialize the video character translation tables: video memory has a
+       very peculiar arrangement in Pacman so we precompute a few tables to
        move around faster */
 
     for( i=0x000; i<0x400; i++ ) {
@@ -297,7 +297,7 @@ static void decodeSprites( unsigned char * mem, unsigned char * sprite_data )
     Decode one byte from the encoded color palette.
 
     An encoded palette byte contains RGB information bit-packed as follows:
-        
+
           bit: 7 6 5 4 3 2 1 0
         color: b b g g g r r r
 */
@@ -344,12 +344,12 @@ void decodeROMs(void)
                                  (unsigned char) (c >> 8),
                                  (unsigned char) (c >> 16));
 #else
-        palette[i] = rgb_to_gray((unsigned char) (c), 
-                                 (unsigned char) (c >> 8), 
+        palette[i] = rgb_to_gray((unsigned char) (c),
+                                 (unsigned char) (c >> 8),
                                  (unsigned char) (c >> 16) );
 #endif
     }
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_pal256_update_pal(palette);
 #endif
@@ -508,9 +508,9 @@ static inline void drawSprite( unsigned char * buffer, int index )
 
     // Exit now if sprite not visible at all
     if( (ps.color == 0) || (ps.x >= ScreenWidth) || (ps.y < 16) || (ps.y >= (ScreenHeight-32)) ) {
-        return;    
+        return;
     }
-    
+
     // Clip the sprite coordinates to cut the parts that fall off the screen
     int start_x = (ps.x < 0) ? 0 : ps.x;
     int end_x = (ps.x < (ScreenWidth-16)) ? ps.x+15 : ScreenWidth-1;
@@ -518,7 +518,7 @@ static inline void drawSprite( unsigned char * buffer, int index )
     // Prepare variables for drawing
     int color = (ps.color & 0x3F)*4;
     unsigned char * spritemap_base = spritemap_ + ((ps.n & 0x3F)*256);
-    
+
     buffer += ScreenWidth*ps.y;
 
     dirty_[(start_x >> 3) + (ps.y >> 3)*28] = 1;

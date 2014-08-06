@@ -207,7 +207,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
 
     get_volume_params(vol_l, &dac_l, &amp_l);
     get_volume_params(vol_r, &dac_r, &amp_r);
- 
+
     /* set DAC
        Important: DAC is global and will also affect lineout */
     wmcodec_write(LDACVOL, dac_l);
@@ -227,7 +227,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 
     get_volume_params(vol_l, &dac_l, &amp_l);
     get_volume_params(vol_r, &dac_r, &amp_r);
- 
+
     /* set lineout amp OUT2 */
     wmcodec_write(LOUT2VOL, amp_l);
     wmcodec_write(ROUT2VOL, amp_r | 0x100);

@@ -42,7 +42,7 @@
 #define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT\
                 |BUTTON_UP|BUTTON_DOWN|BUTTON_PLAY\
                 |BUTTON_F1|BUTTON_F2|BUTTON_F3)
-                
+
     /* Remote control's buttons */
 #define BUTTON_RC_PLAY      0x00100000
 #define BUTTON_RC_STOP      0x00080000

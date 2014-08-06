@@ -45,4 +45,3 @@ class BackupDialog : public QDialog
 };
 
 #endif
-

@@ -58,7 +58,7 @@ static void (*dma_callback[4])(void);
 void dma_init(void)
 {
     int i;
-    
+
     for (i = 0; i < 4; i++) {
         dma_callback[i] = NULL;
         dma_disable_channel(i);
@@ -116,4 +116,3 @@ void INT_DMA(void)
         mask <<= 4;
     }
 }
-

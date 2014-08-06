@@ -8,8 +8,8 @@
  * $Id$
  *
  * Copyright (C) 2009 by Bertrik Sikken
- * Copyright (C) 2008 by Robert Kukla 
- * 
+ * Copyright (C) 2008 by Robert Kukla
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -20,7 +20,7 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "rtc.h" 
+#include "rtc.h"
 #include "i2c-s5l8700.h"
 
 /*  Driver for the Seiko S35390A real-time clock chip with i2c interface
@@ -47,12 +47,12 @@ static void reverse_bits(unsigned char* v, int size)
         {0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
          0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F};
     int i;
-                                            
+
     for (i = 0; i < size; i++) {
         v[i] = (flipnibble[v[i] & 0x0F] << 4) |
                 flipnibble[(v[i] >> 4) & 0x0F];
     }
-}    
+}
 
 void rtc_init(void)
 {
@@ -79,7 +79,7 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_mday = buf[2];
     tm->tm_mon = buf[1] - 1;
     tm->tm_year = buf[0] + 100;
-    
+
     return ret;
 }
 
@@ -105,4 +105,3 @@ int rtc_write_datetime(const struct tm *tm)
 
     return ret;
 }
-

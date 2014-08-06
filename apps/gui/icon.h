@@ -30,7 +30,7 @@ typedef const unsigned char * ICON;
 typedef long ICON;
 #endif
 
-/* Don't #ifdef icon values, or we wont be able to use the same 
+/* Don't #ifdef icon values, or we wont be able to use the same
    bmp for every target. */
 enum themable_icons {
     NOICON = -1,
@@ -98,7 +98,7 @@ extern void screen_put_iconxy(struct screen * screen,
 extern void screen_put_icon(struct screen * screen,
                               int x, int y, enum themable_icons icon);
 /* as above (x,y are letter pos), but with a pxiel offset for both */
-extern void screen_put_icon_with_offset(struct screen * display, 
+extern void screen_put_icon_with_offset(struct screen * display,
                        int x, int y, int off_x, int off_y,
                        enum themable_icons icon);
 #endif

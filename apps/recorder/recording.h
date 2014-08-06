@@ -39,7 +39,7 @@ void rec_set_source(int source, unsigned flags);
 #endif /* CONFIG_CODEC == SW_CODEC */
 
 /* Initializes a recording_options structure with global settings.
-   pass returned data to audio_set_recording_options or 
+   pass returned data to audio_set_recording_options or
    rec_set_recording_options */
 void rec_init_recording_options(struct audio_recording_options *options);
 /* steals mp3 buffer, sets source and then options */

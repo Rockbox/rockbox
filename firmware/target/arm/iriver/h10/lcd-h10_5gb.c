@@ -107,9 +107,9 @@ void lcd_set_flip(bool yesno)
 
 /* LCD init */
 void lcd_init_device(void)
-{  
+{
 #ifndef BOOTLOADER
-    /* The OF won't boot if this is done in the bootloader - ideally we should 
+    /* The OF won't boot if this is done in the bootloader - ideally we should
        tweak the lcd controller speed settings but this will do for now */
     CLCD_CLOCK_SRC |= 0xc0000000; /* Set LCD interface clock to PLL */
 #endif
@@ -212,7 +212,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                simultaneously.  */
             if (((unsigned)(red1 | green1 | blue1 |
                      red2 | green2 | blue2)) > (RYFAC*255+ROUNDOFFS)) {
-                if (((unsigned)(red1 | green1 | blue1)) > 
+                if (((unsigned)(red1 | green1 | blue1)) >
                     (RYFAC*255+ROUNDOFFS)) {
                     if ((unsigned)red1 > (RYFAC*255+ROUNDOFFS))
                     {
@@ -237,7 +237,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                     }
                 }
 
-                if (((unsigned)(red2 | green2 | blue2)) > 
+                if (((unsigned)(red2 | green2 | blue2)) >
                     (RYFAC*255+ROUNDOFFS)) {
                     if ((unsigned)red2 > (RYFAC*255+ROUNDOFFS))
                     {
@@ -262,7 +262,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
                     }
                 }
             }
-                
+
             rbits = red1 >> 16 ;
             gbits = green1 >> 15 ;
             bbits = blue1 >> 16 ;
@@ -287,7 +287,7 @@ void lcd_update_rect(int x0, int y0, int width, int height)
     int newx,newwidth;
     unsigned long *addr;
 
-    /* Ensure x and width are both even - so we can read 32-bit aligned 
+    /* Ensure x and width are both even - so we can read 32-bit aligned
        data from lcd_framebuffer */
     newx=x0&~1;
     newwidth=width&~1;

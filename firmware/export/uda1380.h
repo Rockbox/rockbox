@@ -79,7 +79,7 @@ AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,  1,-128, 108,  16, val * 5)
 #define PON_PLL             (1 << 15)   /* Power-on WSPLL                     */
 #define PON_HP              (1 << 13)   /* Power-on Headphone driver          */
 #define PON_DAC             (1 << 10)   /* Power-on DAC                       */
-#define PON_BIAS            (1 << 8)    /* Power-on BIAS for ADC, AVC, FSDAC  */ 
+#define PON_BIAS            (1 << 8)    /* Power-on BIAS for ADC, AVC, FSDAC  */
 #define EN_AVC              (1 << 7)    /* Enable analog mixer                */
 #define PON_AVC             (1 << 6)    /* Power-on analog mixer              */
 #define PON_LNA             (1 << 4)    /* Power-on LNA & SDC                 */
@@ -140,7 +140,7 @@ AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,  1,-128, 108,  16, val * 5)
 #define MIX_CTL_SEL_NS      (1 << 14)      /* 0 = 3rd, 1 = 5th order   */
 #define MIX_CTL_MIX_POS     (1 << 13)      /* MIX MODE bit MIX POS     */
 #define MIX_CTL_MIX         (1 << 12)      /* MIX MODE bit MIX         */
-#define MIX_MODE(x)         (((x) & 0x3) << 12) /* Mixer mode: See table 48 */ 
+#define MIX_MODE(x)         (((x) & 0x3) << 12) /* Mixer mode: See table 48 */
 #define SILENCE_MODE        (1 << 7)       /* force silence output     */
 #define SILENCE_DET_ON      (1 << 6)       /* enable silence detection */
 #define SILENCE_DET(x)      (((x) & 0x3) << 4) /* silence detection value  */

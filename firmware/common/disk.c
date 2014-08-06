@@ -77,8 +77,8 @@ struct partinfo* disk_init(IF_MD_NONVOID(int drive))
 {
     int i;
 #ifdef HAVE_MULTIDRIVE
-    /* For each drive, start at a different position, in order not to destroy 
-       the first entry of drive 0. 
+    /* For each drive, start at a different position, in order not to destroy
+       the first entry of drive 0.
        That one is needed to calculate config sector position. */
     struct partinfo* pinfo = &part[drive*4];
     if ((size_t)drive >= sizeof(part)/sizeof(*part)/4)
@@ -132,7 +132,7 @@ int disk_mount_all(void)
 {
     int mounted=0;
     int i;
-    
+
 #ifdef HAVE_HOTSWAP
     mutex_lock(&disk_mutex);
 #endif
@@ -149,7 +149,7 @@ int disk_mount_all(void)
 #ifdef HAVE_HOTSWAP
         if (storage_present(i))
 #endif
-            mounted += disk_mount(i); 
+            mounted += disk_mount(i);
     }
 #endif
 
@@ -207,7 +207,7 @@ int disk_mount(int drive)
 
 #ifdef MAX_LOG_SECTOR_SIZE
         int j;
-        
+
         for (j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
             if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))

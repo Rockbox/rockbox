@@ -58,7 +58,7 @@ unsigned short adc_read(int channel)
     }
 
     ascodec_unlock();
-    
+
     return data;
 }
 

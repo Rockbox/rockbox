@@ -12,7 +12,7 @@
  * Based on code from the Linux Kernel
  * available at http://www.kernel.org
  * Original file: <kernel>/include/linux/usb/ch9.h
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2

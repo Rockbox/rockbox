@@ -26,7 +26,7 @@
 #include "ipc.h"
 
 /* Size of data buffer in words (16 bit) */
-#define DSP_BUFFER_SIZE (0x1000) 
+#define DSP_BUFFER_SIZE (0x1000)
 
 /* Put the "data" buffer in it's own .dma section so that it can
  *  be handled in the linker.cmd. */
@@ -43,8 +43,8 @@ volatile unsigned short sdem_addrl;
 volatile unsigned short sdem_dsp_size;
 
 /* These two variables keep track of the buffer level in the DSP, dsp_level,
- *  (SARAM to McBSP) and the level on the ARM buffer (sdem_level). 
- * sdem_level is used in the main firmware to keep track of the current 
+ *  (SARAM to McBSP) and the level on the ARM buffer (sdem_level).
+ * sdem_level is used in the main firmware to keep track of the current
  *  playback status.  dsp_level is only used in this function. */
 volatile unsigned short dsp_level;
 volatile unsigned short sdem_level;
@@ -55,7 +55,7 @@ volatile unsigned short   last_size;
 /* This tells us which half of the DSP buffer (data) is free */
 volatile unsigned short   dma0_unlocked;
 
-/* This is used by the ARM to flag playback status and start/stop the DMA 
+/* This is used by the ARM to flag playback status and start/stop the DMA
  *  transfers. */
 volatile unsigned short dma0_stopped;
 
@@ -65,8 +65,8 @@ volatile short waiting;
 /* rebuffer sets up the next SDRAM to SARAM transfer and tells the ARM when DMA
  *  needs a new buffer.
  *
- * Note: The upper limit on larger buffers is the size of a short.  If larger 
- *  buffer sizes are needed the code on the ARM side needs to be changed to 
+ * Note: The upper limit on larger buffers is the size of a short.  If larger
+ *  buffer sizes are needed the code on the ARM side needs to be changed to
  *  update a full long.
  */
 void rebuffer(void)
@@ -79,18 +79,18 @@ void rebuffer(void)
         DMPREC      &=  0xFFFE;
         /* Shut the transmitter down */
         audiohw_stop();
-        
+
         /* Stop the HPIB transfer if it is running */
-        DMA_TRG     =   0; 
-        
+        DMA_TRG     =   0;
+
         /* Reset the following variables for DMA restart */
         sdem_level  =   0;
         dsp_level   =   0;
-        last_size   =   0; 
-        
+        last_size   =   0;
+
         return;
     }
-    
+
     /* If the sdem_level is equal to the buffer size the ARM code gave
      *  (sdem_dsp_size) then reset the size and ask the arm for another buffer
      */
@@ -120,7 +120,7 @@ void rebuffer(void)
             last_size = sdem_dsp_size - sdem_level;
         }
 
-        /* DSP addresses are 16 bit (word). dsp_level is in bytes so it needs to 
+        /* DSP addresses are 16 bit (word). dsp_level is in bytes so it needs to
          *  be converted to words. */
         DSP_ADDRL = (unsigned short)data + dma0_unlocked + (dsp_level >> 1);
         DSP_ADDRH = 0;
@@ -153,7 +153,7 @@ void rebuffer(void)
  * It interupts at 1/2 empty and empty so that we can start filling a new buffer
  * from SDRAM when a half is free. dsp_level should always be full when this
  * interupt occurs except for the initial start. */
-interrupt void handle_dma0(void) 
+interrupt void handle_dma0(void)
 {
     /* Byte offset to half-buffer locked by DMA0.
             0 for top, DSP_BUFFER_SIZE/2 for bottom */
@@ -163,20 +163,20 @@ interrupt void handle_dma0(void)
 
     /* DMSRC0 is the beginning of the DMA0-locked SARAM half-buffer. */
     DMSA = 0x00 /* DMSRC0 (banked register, see page 133 of SPRU302B */;
-    
-    /* Note that these address offsets (dma0_locked and dma0_unlocked are in 
+
+    /* Note that these address offsets (dma0_locked and dma0_unlocked are in
      *  words. */
     dma0_locked     = DMSDN         & (DSP_BUFFER_SIZE>>1);
     dma0_unlocked   = dma0_locked   ^ (DSP_BUFFER_SIZE>>1);
 
     dsp_level = 0;
-    
+
     /* Start the SDRAM to SARAM copy */
     rebuffer();
 }
 
-/* This interupt handler runs every time a DMA transfer is complete from SDRAM 
- *  to the SARAM buffer.  It is used to update the SARAM buffer level 
+/* This interupt handler runs every time a DMA transfer is complete from SDRAM
+ *  to the SARAM buffer.  It is used to update the SARAM buffer level
  *  (dsp_level), the SDRAM buffer level (sdem_level) and to rebuffer if the dsp
  *  buffer is not full. */
 interrupt void handle_dmac(void) {
@@ -186,7 +186,7 @@ interrupt void handle_dmac(void) {
     dsp_level   += last_size;
     sdem_level  += last_size;
 
-    /* compare to DSP_BUFFER_SIZE without a divide because it is in words and 
+    /* compare to DSP_BUFFER_SIZE without a divide because it is in words and
      *  we want half the total size in bytes. */
     if(dsp_level < DSP_BUFFER_SIZE)
     {
@@ -201,19 +201,19 @@ void dma_init(void) {
     /* Configure SARAM to McBSP DMA */
 
     /* Event XEVT0, 32-bit transfers, 0 frame count */
-    DMSFC0 = 2 << 12 | 1 << 11; 
+    DMSFC0 = 2 << 12 | 1 << 11;
 
     /* Interrupts generated, Half and full buffer.
-     * ABU mode, From data space with postincrement, to data space with no 
+     * ABU mode, From data space with postincrement, to data space with no
      *  change
      */
-    DMMCR0 =    1 << 14 | 1 << 13 | 1 << 12 | 1 << 8 | 1 << 6 | 1; 
-             
+    DMMCR0 =    1 << 14 | 1 << 13 | 1 << 12 | 1 << 8 | 1 << 6 | 1;
+
     /* Set the source (incrementing) location */
     DMSRC0 = (unsigned short)&data;
 
     /* Set the destination (static) location to the McBSP IIS interface */
-    DMDST0 = (unsigned short)&DXR20; 
+    DMDST0 = (unsigned short)&DXR20;
 
     /* Set the size of the buffer */
     DMCTR0 = sizeof(data);

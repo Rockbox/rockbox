@@ -35,7 +35,7 @@ class BootloaderInstallMpio : public BootloaderInstallBase
         QString ofHint();
 
     private:
-        
+
     private slots:
         void installStage2(void);
 };

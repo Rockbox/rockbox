@@ -114,7 +114,7 @@ int tea5760_set(int setting, int value)
             tea5760_set_clear(4, (1<<1), deemphasis);
             }
             break;
-            
+
         case RADIO_FORCE_MONO:
             tea5760_set_clear(4, (1<<3), value);
             break;
@@ -153,7 +153,7 @@ int tea5760_get(int setting)
         case RADIO_STEREO:
             val = read_bytes[9] >> 2;
             break;
-            
+
         case RADIO_RSSI:
             val = (read_bytes[9] >> 4) & 0x0F;
             val = 4 + (28 * val + 5) / 10;
@@ -205,4 +205,3 @@ void tea5760_dbg_info(struct tea5760_dbg_info *info)
     fmradio_i2c_read(I2C_ADR, info->read_regs, sizeof(info->read_regs));
     memcpy(info->write_regs, write_bytes, sizeof(info->write_regs));
 }
-

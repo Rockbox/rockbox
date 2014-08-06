@@ -85,7 +85,7 @@
 
 typedef struct CoefVLCTable
 {
-    int n;                               /* total number of codes */ 
+    int n;                               /* total number of codes */
     const uint32_t *huffcodes;           /* VLC bit values */
     const uint8_t *huffbits;             /* VLC bit size */
     const uint16_t *levels;              /* table to build run/level tables */

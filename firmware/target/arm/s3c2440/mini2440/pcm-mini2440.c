@@ -79,15 +79,15 @@ void pcm_play_dma_init(void)
      * when a clock is not present.
      */
     bitset32(&CLKCON, 1<<17);
-    
+
 #ifdef HAVE_UDA1341
     /* master, transmit mode, 16 bit samples, BCLK 32fs, PCLK */
     IISMOD = IISMOD_MASTER_CLOCK_PCLK | IISMOD_MASTER_MODE | IISMOD_TRANSMIT_MODE
              | IISMOD_16_BIT | IISMOD_MASTER_CLOCK_256FS | IISMOD_BIT_CLOCK_32FS;
-             
+
     /* TX idle, enable prescaler */
     IISCON |= IISCON_TX_IDLE | IISCON_IIS_PRESCALER_ENABLE;
-#else 
+#else
     /* slave, transmit mode, 16 bit samples - MCLK 384fs - use 16.9344Mhz -
        BCLK 32fs */
     IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2) | (1<<0);
@@ -101,12 +101,12 @@ void pcm_play_dma_init(void)
     audiohw_init();
 
     /* init GPIO */
-#ifdef GIGABEAT_F    
+#ifdef GIGABEAT_F
 /*    GPCCON = (GPCCON & ~(3<<14)) | (1<<14); */
     S3C244_GPIO_CONFIG (GPCCON, 7, GPIO_OUTPUT);
     GPCDAT |= (1<<7);
 #endif
-    
+
     /* GPE4=I2SDO, GPE3=I2SDI, GPE2=CDCLK, GPE1=I2SSCLK, GPE0=I2SLRCK */
     GPECON = (GPECON & ~0x3ff) | 0x2aa;
 

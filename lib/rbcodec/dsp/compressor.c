@@ -294,7 +294,7 @@ static bool compressor_update(struct dsp_config *dsp,
      * comp_curve[0] is 0 (-infinity db) input
      */
     comp_curve[0] = UNITY;
-    /** comp_curve[1 to 63] are intermediate compression values 
+    /** comp_curve[1 to 63] are intermediate compression values
      * corresponding to the 6 MSB of the input values of a non-clipped
      * signal
      */
@@ -501,7 +501,7 @@ static void compressor_process(struct dsp_proc_entry *this,
            /** reset it to delay time so it cannot release before the
             *  delayed signal releases
             */
-           release_holdoff = delay_time;   
+           release_holdoff = delay_time;
        }
        else
        /* Reverse exponential decay to current gain value */

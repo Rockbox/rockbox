@@ -99,4 +99,3 @@ void sd_get_info(IF_MD(int drive,) struct storage_info *info)
     info->revision="0.00";
 }
 #endif
-

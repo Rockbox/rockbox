@@ -166,7 +166,7 @@ int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_
         *sense_size = get_scsi_pt_sense_len(obj);
     if(flags & (DO_WRITE | DO_READ))
         *buf_size -= get_scsi_pt_resid(obj);
-    
+
     destruct_scsi_pt_obj(obj);
     return ret;
 }
@@ -615,7 +615,7 @@ static int do_info(void)
         if(!ret && len == 8)
         {
             u.u64 = fix_endian64be(u.u64);
-            cprintf_field("  Media Size: ", "%llu B (%.3f %s)\n", (unsigned long long)u.u64, 
+            cprintf_field("  Media Size: ", "%llu B (%.3f %s)\n", (unsigned long long)u.u64,
                 get_size_natural(u.u64), get_size_suffix(u.u64));
         }
 
@@ -688,14 +688,14 @@ static int do_info(void)
             cprintf_field("  Allocation Unit Size: ", "%d B\n", u.u32);
         }
     }while(0);
-    
+
     struct scsi_stmp_chip_major_rev_id_t chip_rev;
     ret = stmp_get_chip_major_rev_id(&chip_rev);
     if(ret)
         cprintf(GREY, "Cannot get chip major revision id: %d\n", ret);
     else
         cprintf_field("  Chip Major Rev ID: ", "%x\n", chip_rev.rev);
-    
+
     struct scsi_stmp_rom_rev_id_t rom_rev;
     ret = stmp_get_rom_rev_id(&rom_rev);
     if(ret)
@@ -747,7 +747,7 @@ static int do_info(void)
             }u;
             uint8_t drive = table.entry[i].drive_no;
             cprintf_field("  Drive ", "%02x\n", drive);
-            
+
             int len = 4;
             ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &u.u32, &len);
             if(!ret && len == 4)
@@ -1206,4 +1206,3 @@ Lend:
 
     return ret;
 }
-

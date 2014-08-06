@@ -69,7 +69,7 @@ static void random_bang(t_random *x)
     unsigned int randval = x->x_state;
     x->x_state = randval = randval * 472940017 + 832416023;
     nval = ((double)range) * ((double)randval)
-    	* (1./4294967296.);
+        * (1./4294967296.);
     if (nval >= range) nval = range-1;
     outlet_float(x->x_obj.ob_outlet, nval);
 }
@@ -85,10 +85,10 @@ static void random_seed(t_random *x, float f, float glob)
 static void random_setup(void)
 {
     random_class = class_new(gensym("random"), (t_newmethod)random_new, 0,
-    	sizeof(t_random), 0, A_DEFFLOAT, 0);
+        sizeof(t_random), 0, A_DEFFLOAT, 0);
     class_addbang(random_class, random_bang);
     class_addmethod(random_class, (t_method)random_seed,
-    	gensym("seed"), A_FLOAT, 0);
+        gensym("seed"), A_FLOAT, 0);
 }
 
 
@@ -110,15 +110,15 @@ static void *loadbang_new(void)
 static void loadbang_loadbang(t_loadbang *x)
 {
     if (!sys_noloadbang)
-    	outlet_bang(x->x_obj.ob_outlet);
+        outlet_bang(x->x_obj.ob_outlet);
 }
 
 static void loadbang_setup(void)
 {
     loadbang_class = class_new(gensym("loadbang"), (t_newmethod)loadbang_new, 0,
-    	sizeof(t_loadbang), 0, 0);
+        sizeof(t_loadbang), 0, 0);
     class_addmethod(loadbang_class, (t_method)loadbang_loadbang,
-    	gensym("loadbang"), 0);
+        gensym("loadbang"), 0);
 }
 
 /* ------------- namecanvas (delete this later) --------------------- */
@@ -148,8 +148,8 @@ static void namecanvas_free(t_namecanvas *x)
 static void namecanvas_setup(void)
 {
     namecanvas_class = class_new(gensym("namecanvas"),
-    	(t_newmethod)namecanvas_new, (t_method)namecanvas_free,
-	    sizeof(t_namecanvas), CLASS_NOINLET, A_DEFSYM, 0);
+        (t_newmethod)namecanvas_new, (t_method)namecanvas_free,
+            sizeof(t_namecanvas), CLASS_NOINLET, A_DEFSYM, 0);
 }
 
 /* ---------------serial ports (MSW only -- hack) ------------------------- */
@@ -174,8 +174,8 @@ static void serial_float(t_serial *x, t_float f)
     char message[MAXSERIAL * 4 + 100];
     if (!x->x_open)
     {
-    	sys_vgui("com%d_open\n", x->x_portno);
-    	x->x_open = 1;
+        sys_vgui("com%d_open\n", x->x_portno);
+        x->x_open = 1;
     }
     sprintf(message, "com%d_send \"\\%3.3o\"\n", x->x_portno, n);
     sys_gui(message);
@@ -195,7 +195,7 @@ static void *serial_new(t_floatarg fportno)
 static void serial_setup(void)
 {
     serial_class = class_new(gensym("serial"), (t_newmethod)serial_new, 0,
-    	sizeof(t_serial), 0, A_DEFFLOAT, 0);
+        sizeof(t_serial), 0, A_DEFFLOAT, 0);
     class_addfloat(serial_class, serial_float);
 }
 
@@ -231,14 +231,14 @@ static void cputime_bang(t_cputime *x)
     FILETIME ignorethis, ignorethat;
     BOOL retval;
     retval = GetProcessTimes(GetCurrentProcess(), &ignorethis, &ignorethat,
-    	(FILETIME *)&x->x_kerneltime, (FILETIME *)&x->x_usertime);
+        (FILETIME *)&x->x_kerneltime, (FILETIME *)&x->x_usertime);
     if (!retval)
     {
-    	if (!x->x_warned)
-    	    post("cputime is apparently not supported on your platform");
-    	x->x_warned = 1;
-    	x->x_kerneltime.QuadPart = 0;
-    	x->x_usertime.QuadPart = 0;
+        if (!x->x_warned)
+            post("cputime is apparently not supported on your platform");
+        x->x_warned = 1;
+        x->x_kerneltime.QuadPart = 0;
+        x->x_usertime.QuadPart = 0;
     }
 #endif
 }
@@ -258,8 +258,8 @@ static void cputime_bang2(t_cputime *x)
     struct tms newcputime;
     times(&newcputime);
     elapsedcpu = 1000 * (
-    	newcputime.tms_utime + newcputime.tms_stime -
-	    x->x_setcputime.tms_utime - x->x_setcputime.tms_stime) / HZ;
+        newcputime.tms_utime + newcputime.tms_stime -
+            x->x_setcputime.tms_utime - x->x_setcputime.tms_stime) / HZ;
     outlet_float(x->x_obj.ob_outlet, elapsedcpu);
 #endif
 #ifdef MSW
@@ -267,13 +267,13 @@ static void cputime_bang2(t_cputime *x)
     FILETIME ignorethis, ignorethat;
     LARGE_INTEGER usertime, kerneltime;
     BOOL retval;
-    
+
     retval = GetProcessTimes(GetCurrentProcess(), &ignorethis, &ignorethat,
-    	(FILETIME *)&kerneltime, (FILETIME *)&usertime);
+        (FILETIME *)&kerneltime, (FILETIME *)&usertime);
     if (retval)
-    	elapsedcpu = 0.0001 *
-    	    ((kerneltime.QuadPart - x->x_kerneltime.QuadPart) +
-    	    	(usertime.QuadPart - x->x_usertime.QuadPart));
+        elapsedcpu = 0.0001 *
+            ((kerneltime.QuadPart - x->x_kerneltime.QuadPart) +
+                (usertime.QuadPart - x->x_usertime.QuadPart));
     else elapsedcpu = 0;
     outlet_float(x->x_obj.ob_outlet, elapsedcpu);
 #endif
@@ -295,7 +295,7 @@ static void *cputime_new(void)
 static void cputime_setup(void)
 {
     cputime_class = class_new(gensym("cputime"), (t_newmethod)cputime_new, 0,
-    	sizeof(t_cputime), 0, 0);
+        sizeof(t_cputime), 0, 0);
     class_addbang(cputime_class, cputime_bang);
     class_addmethod(cputime_class, (t_method)cputime_bang2, gensym("bang2"), 0);
 }
@@ -318,7 +318,7 @@ static void realtime_bang(t_realtime *x)
 static void realtime_bang2(t_realtime *x)
 {
     outlet_float(x->x_obj.ob_outlet,
-    	(sys_getrealtime() - x->x_setrealtime) * 1000.);
+        (sys_getrealtime() - x->x_setrealtime) * 1000.);
 }
 
 static void *realtime_new(void)
@@ -333,10 +333,10 @@ static void *realtime_new(void)
 static void realtime_setup(void)
 {
     realtime_class = class_new(gensym("realtime"), (t_newmethod)realtime_new, 0,
-    	sizeof(t_realtime), 0, 0);
+        sizeof(t_realtime), 0, 0);
     class_addbang(realtime_class, realtime_bang);
     class_addmethod(realtime_class, (t_method)realtime_bang2, gensym("bang2"),
-    	0);
+        0);
 }
 
 void x_misc_setup(void)
@@ -348,4 +348,3 @@ void x_misc_setup(void)
     cputime_setup();
     realtime_setup();
 }
-

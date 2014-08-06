@@ -60,7 +60,7 @@ int main(void)
     led_init();
     clear_leds(LED_ALL);
     /* NB: something in system_init() prevents H-JTAG from downloading */
-/*    system_init(); */ 
+/*    system_init(); */
     kernel_init();
 /*    enable_interrupt(IRQ_FIQ_STATUS); */
     backlight_init();
@@ -68,17 +68,17 @@ int main(void)
     lcd_setfont(FONT_SYSFIXED);
     button_init();
     dma_init();
-    
+
     uart_init();
     uart_init_device(DEBUG_UART_PORT);
 
-/*    mini2440_test(); */  
-        
+/*    mini2440_test(); */
+
     /* Show debug messages if button is pressed */
     int touch_data;
-    if(button_read_device(&touch_data) & BUTTON_MENU) 
+    if(button_read_device(&touch_data) & BUTTON_MENU)
         verbose = true;
-        
+
     printf("Rockbox boot loader");
     printf("Version " RBVERSION);
 
@@ -109,14 +109,14 @@ int main(void)
         error(EBOOTFILE, rc, true);
 
     printf("Loaded firmware %d\n", rc);
-    
+
 /*    storage_close(); */
     system_prepare_fw_start();
 
     commit_discard_idcache();
     kernel_entry = (void*) loadbuffer;
     rc = kernel_entry();
-        
+
     /* end stop - should not get here */
     led_flash(LED_ALL, LED_NONE);
     while (1); /* avoid warning */

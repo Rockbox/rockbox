@@ -44,7 +44,7 @@
 /*
    Adapted to Rockbox by Jens Arnold
 */
- 
+
 #include <stdlib.h>
 
 /* Period parameters */
@@ -90,7 +90,7 @@ static void next_state(void)
 
     left = N;
     next = state;
-    
+
     for (j = N - M + 1; --j; p++)
         *p = p[M] ^ TWIST(p[0], p[1]);
 

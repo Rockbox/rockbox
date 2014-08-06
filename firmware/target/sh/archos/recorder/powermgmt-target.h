@@ -45,7 +45,7 @@
 /* minutes: maximum charging time for 1500 mAh batteries
  * actual max time depends also on BATTERY_CAPACITY! */
 #define CHARGE_MAX_MIN_1500   450
-/* minutes: minimum charging time */     
+/* minutes: minimum charging time */
 #define CHARGE_MIN_MIN         10
 /* After charging, go to top off charge. How long should top off charge be? */
 #define TOPOFF_MAX_MIN         90

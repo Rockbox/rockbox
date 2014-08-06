@@ -53,6 +53,6 @@ void wmcodec_write(int reg, int data)
     unsigned char d[2];
     d[0] = (reg << 1) | ((data & 0x100) >> 8);
     d[1] = data;
-    
+
     i2c_write(I2C_AUDIO_ADDRESS, d, 2);
 }

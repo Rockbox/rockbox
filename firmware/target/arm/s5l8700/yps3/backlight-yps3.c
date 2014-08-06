@@ -27,10 +27,10 @@
 
 /*
     Backlight driver using the PWM mode of a hardware timer.
-    
+
     The PWM duty cycle depends exponentially on the configured brightness
     level. This makes the brightness curve more linear to the human eye.
-    
+
     The button LEDs are all activated at the same time (even though there
     are three individually controllable groups: menu/back, cursor, middle).
  */
@@ -92,9 +92,8 @@ bool _backlight_init(void)
     TADATA1 = 256;      /* set PWM period */
     TAPRE = 20;         /* prescaler */
     TACMD = (1 << 0);   /* TA_EN */
-   
+
     _backlight_on();
 
     return true;
 }
-

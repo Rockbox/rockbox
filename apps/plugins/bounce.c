@@ -297,7 +297,7 @@ static void addclock(void)
     rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[hour], yhour[hour]);
 
     /* draw a circle */
-    for(i = 1; i < 60; i += 3) 
+    for(i = 1; i < 60; i += 3)
         rb->lcd_drawline(xminute[i], yminute[i],
                          xminute[(i+1)%60], yminute[(i+1)%60]);
 }

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Michiel van der Kolk 
+ * Copyright (C) 2005 by Michiel van der Kolk
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -50,7 +50,7 @@ void *my_malloc(size_t size)
     return alloc;
 }
 
-void setmallocpos(void *pointer) 
+void setmallocpos(void *pointer)
 {
     audio_bufferpointer = pointer;
     audio_buffer_free = audio_bufferpointer - audio_bufferbase;
@@ -70,7 +70,7 @@ enum plugin_status plugin_start(const void* parameter)
     parsefd=rb->open(parameter,O_RDONLY);
     if(parsefd<0) {
         rb->splash(2*HZ,"Unable to open search tokenstream");
-        return PLUGIN_ERROR;    
+        return PLUGIN_ERROR;
     }
     result=parse(parsefd);
     rb->snprintf(buf,250,"Retval: 0x%x",result);

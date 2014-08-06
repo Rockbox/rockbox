@@ -44,7 +44,7 @@ static bool do_add_event(unsigned short id, bool oneshot, bool user_data_valid,
                          void *handler, void *user_data)
 {
     int i;
-    
+
     /* Check if the event already exists. */
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
@@ -52,7 +52,7 @@ static bool do_add_event(unsigned short id, bool oneshot, bool user_data_valid,
                 && (!user_data_valid || (user_data == events[i].handler.user_data)))
             return false;
     }
-    
+
     /* Try to find a free slot. */
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
@@ -66,7 +66,7 @@ static bool do_add_event(unsigned short id, bool oneshot, bool user_data_valid,
             return true;
         }
     }
-    
+
     panicf("event line full");
     return false;
 }
@@ -85,7 +85,7 @@ void do_remove_event(unsigned short id, bool user_data_valid,
                   void *handler, void *user_data)
 {
     int i;
-    
+
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
         if (events[i].id == id && events[i].handler.callback == handler
@@ -112,7 +112,7 @@ void remove_event_ex(unsigned short id,
 void send_event(unsigned short id, void *data)
 {
     int i;
-    
+
     for (i = 0; i < MAX_SYS_EVENTS; i++)
     {
         if (events[i].id == id && events[i].handler.callback != NULL)
@@ -121,7 +121,7 @@ void send_event(unsigned short id, void *data)
                 events[i].handler.callback2(id, data, events[i].handler.user_data);
             else
                 events[i].handler.callback(id, data);
-            
+
             if (events[i].oneshot)
                 events[i].handler.callback = NULL;
         }

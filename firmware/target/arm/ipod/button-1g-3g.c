@@ -192,13 +192,13 @@ static int ipod_3g_button_read(void)
 {
     unsigned char source, state;
     int btn = BUTTON_NONE;
-    
+
     /* get source of interupts */
     source = GPIOA_INT_STAT;
 
     /* get current keypad status */
     state = GPIOA_INPUT_VAL;
-    
+
     /* toggle interrupt level */
     GPIOA_INT_LEV = ~state;
 
@@ -350,5 +350,3 @@ bool headphones_inserted(void)
     return (GPIOC_INPUT_VAL & 0x1)?true:false;
 #endif
 }
-
-

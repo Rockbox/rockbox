@@ -11,9 +11,9 @@ int storage_read_sectors(unsigned long start, int count, void* buf)
 {
     if ( count > 1 )
         DEBUGF("[Reading %d blocks: 0x%lx to 0x%lx]\n",
-               count, start, start+count-1); 
+               count, start, start+count-1);
     else
-        DEBUGF("[Reading block 0x%lx]\n", start); 
+        DEBUGF("[Reading block 0x%lx]\n", start);
 
     if(fseek(file,start*SECTOR_SIZE,SEEK_SET)) {
         perror("fseek");
@@ -31,9 +31,9 @@ int storage_write_sectors(unsigned long start, int count, void* buf)
 {
     if ( count > 1 )
         DEBUGF("[Writing %d blocks: 0x%lx to 0x%lx]\n",
-               count, start, start+count-1); 
+               count, start, start+count-1);
     else
-        DEBUGF("[Writing block 0x%lx]\n", start); 
+        DEBUGF("[Writing block 0x%lx]\n", start);
 
     if (start == 0)
         panicf("Writing on sector 0!\n");

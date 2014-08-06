@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 

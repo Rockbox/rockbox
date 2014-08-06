@@ -38,28 +38,28 @@ struct BEECRYPTAPI sha1Param
 struct _sha1Param
 #endif
 {
-	/*!\var h
-	 */
-	uint32_t h[5];
-	/*!\var data
-	 */
-	uint32_t data[80];
-	/*!\var length
-	 * \brief Multi-precision integer counter for the bits that have been
-	 *  processed so far.
-	 */
-	#if (MP_WBITS == 64)
-	mpw length[1];
-	#elif (MP_WBITS == 32)
-	mpw length[2];
-	#else
-	# error
-	#endif
-	/*!\var offset
-	 * \brief Offset into \a data; points to the place where new data will be
-	 *  copied before it is processed.
-	 */
-	uint32_t offset;
+        /*!\var h
+         */
+        uint32_t h[5];
+        /*!\var data
+         */
+        uint32_t data[80];
+        /*!\var length
+         * \brief Multi-precision integer counter for the bits that have been
+         *  processed so far.
+         */
+        #if (MP_WBITS == 64)
+        mpw length[1];
+        #elif (MP_WBITS == 32)
+        mpw length[2];
+        #else
+        # error
+        #endif
+        /*!\var offset
+         * \brief Offset into \a data; points to the place where new data will be
+         *  copied before it is processed.
+         */
+        uint32_t offset;
 };
 
 #ifndef __cplusplus
@@ -87,13 +87,13 @@ void sha1Process(sha1Param* sp);
  * \brief This function resets the parameter block so that it's ready for a
  *  new hash.
  * \param sp The hash function's parameter block.
- * \retval 0 on success. 
+ * \retval 0 on success.
  */
 BEECRYPTAPI
 int  sha1Reset  (sha1Param* sp);
 
 /*!\fn int sha1Update(sha1Param* sp, const byte* data, size_t size)
- * \brief This function should be used to pass successive blocks of data 
+ * \brief This function should be used to pass successive blocks of data
  *  to be hashed.
  * \param sp The hash function's parameter block.
  * \param data

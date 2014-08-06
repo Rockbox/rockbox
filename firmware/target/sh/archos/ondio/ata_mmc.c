@@ -105,7 +105,7 @@ static bool new_mmc_circuit;
 static enum {
     MMC_UNKNOWN,
     MMC_UNTOUCHED,
-    MMC_TOUCHED 
+    MMC_TOUCHED
 } mmc_status = MMC_UNKNOWN;
 
 static enum {
@@ -129,7 +129,7 @@ static tCardInfo card_info[2];
 static int current_card = 0;
 #endif
 static bool last_mmc_status = false;
-static int countdown = -1; /* for mmc switch debouncing. -1 because the 
+static int countdown = -1; /* for mmc switch debouncing. -1 because the
                               countdown should not happen if the card
                               is inserted at boot */
 static bool usb_activity;    /* monitoring the USB bridge */
@@ -300,7 +300,7 @@ static unsigned char poll_busy(long timeout)
 {
     long i;
     unsigned char data, dummy;
-    
+
     if (serial_mode != SER_POLL_READ)
         set_sci1_poll_read();
 
@@ -316,7 +316,7 @@ static unsigned char poll_busy(long timeout)
         while (!(SSR1 & SCI_RDRF)); /* wait for data */
         dummy = RDR1;               /* read byte */
     } while ((dummy != 0xFF) && (++i < timeout));
-    
+
     return (dummy == 0xFF) ? data : 0;
 }
 
@@ -371,7 +371,7 @@ static int receive_cxd(unsigned char *buf)
         write_transfer(dummy, 1);
         return -1;                /* not start of data */
     }
-    
+
     read_transfer(buf, 16);
     write_transfer(dummy, 3);     /* 2 bytes dontcare crc + 1 byte trailer */
     return 0;
@@ -479,7 +479,7 @@ static int initialize_card(int card_no)
 tCardInfo *mmc_card_info(int card_no)
 {
     tCardInfo *card = &card_info[card_no];
-    
+
     if (!card->initialized && ((card_no == 0) || mmc_detect()))
     {
         select_card(card_no);
@@ -503,7 +503,7 @@ static int receive_block(unsigned char *inbuf, long timeout)
 
     SCR1 = 0;                     /* disable serial */
     SSR1 = 0;                     /* clear all flags */
-    
+
     /* setup DMA channel 0 */
     CHCR0 = 0;                    /* disable */
     SAR0 = RDR1_ADDR;
@@ -519,7 +519,7 @@ static int receive_block(unsigned char *inbuf, long timeout)
      * behaviour conveniently discards the crc. */
 
     yield();                      /* be nice */
-    
+
     /* Bitswap received data, chasing the DMA pointer */
     buf_end = (unsigned long)inbuf + BLOCK_SIZE;
     do
@@ -636,7 +636,7 @@ int mmc_read_sectors(IF_MD(int drive,)
      * read with CMD_READ_SINGLE_BLOCK. */
     if (end_block == card->numblocks)
         lastblock = 1;
-        
+
     if (incount > 1)
     {
                      /* MMC4.2: make multiplication conditional */
@@ -685,7 +685,7 @@ int mmc_read_sectors(IF_MD(int drive,)
   error:
 
     deselect_card();
-    
+
     return rc;
 }
 
@@ -709,7 +709,7 @@ int mmc_write_sectors(IF_MD(int drive,)
         rc = rc * 10 - 1;
         goto error;
     }
-    
+
     if (start + count  > card->numblocks)
         panicf("Writing past end of card");
 
@@ -770,7 +770,7 @@ static void mmc_thread(void)
 
     while (1) {
         queue_wait_w_tmo(&mmc_queue, &ev, HZ);
-        switch ( ev.id ) 
+        switch ( ev.id )
         {
             case SYS_USB_CONNECTED:
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -789,7 +789,7 @@ static void mmc_thread(void)
                 queue_broadcast(SYS_FS_CHANGED, 0);
                 break;
 #endif
-                
+
             default:
                 if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
                 {
@@ -899,7 +899,7 @@ int mmc_init(void)
 {
     int rc = 0;
 
-    if (!initialized) 
+    if (!initialized)
     {
         mutex_init(&mmc_mutex);
         queue_init(&mmc_queue, true);
@@ -1017,7 +1017,7 @@ int mmc_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
 #ifdef HAVE_MULTIDRIVE
     return 2;
 #else

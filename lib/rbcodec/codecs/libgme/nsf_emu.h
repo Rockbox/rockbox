@@ -13,24 +13,24 @@
 #include "track_filter.h"
 
 #ifndef NSF_EMU_APU_ONLY
-	#include "nes_namco_apu.h"
-	#include "nes_vrc6_apu.h"
-	#include "nes_fme7_apu.h"
-	#include "nes_fds_apu.h"
-	#include "nes_mmc5_apu.h"
-	#ifndef NSF_EMU_NO_VRC7
-		#include "nes_vrc7_apu.h"
-	#endif
+        #include "nes_namco_apu.h"
+        #include "nes_vrc6_apu.h"
+        #include "nes_fme7_apu.h"
+        #include "nes_fds_apu.h"
+        #include "nes_mmc5_apu.h"
+        #ifndef NSF_EMU_NO_VRC7
+                #include "nes_vrc7_apu.h"
+        #endif
 #endif
 
 // Sound chip flags
 enum {
-	vrc6_flag  = 1 << 0,
-	vrc7_flag  = 1 << 1,
-	fds_flag   = 1 << 2,
-	mmc5_flag  = 1 << 3,
-	namco_flag = 1 << 4,
-	fme7_flag  = 1 << 5
+        vrc6_flag  = 1 << 0,
+        vrc7_flag  = 1 << 1,
+        fds_flag   = 1 << 2,
+        mmc5_flag  = 1 << 3,
+        namco_flag = 1 << 4,
+        fme7_flag  = 1 << 5
 };
 
 enum { fds_banks    = 2 };
@@ -38,8 +38,8 @@ enum { bank_count   = fds_banks + 8 };
 
 enum { rom_begin = 0x8000 };
 enum { bank_select_addr = 0x5FF8 };
-enum { mem_size  = 0x10000 };	
-	
+enum { mem_size  = 0x10000 };
+
 // cpu sits here when waiting for next call to play routine
 enum { idle_addr = 0x5FF6 };
 enum { banks_addr = idle_addr };
@@ -57,82 +57,82 @@ enum { max_voices = 32 };
 enum { header_size = 0x80 };
 struct header_t
 {
-	char tag [5];
-	byte vers;
-	byte track_count;
-	byte first_track;
-	byte load_addr [2];
-	byte init_addr [2];
-	byte play_addr [2];
-	char game [32];
-	char author [32];
-	char copyright [32];
-	byte ntsc_speed [2];
-	byte banks [8];
-	byte pal_speed [2];
-	byte speed_flags;
-	byte chip_flags;
-	byte unused [4];
+        char tag [5];
+        byte vers;
+        byte track_count;
+        byte first_track;
+        byte load_addr [2];
+        byte init_addr [2];
+        byte play_addr [2];
+        char game [32];
+        char author [32];
+        char copyright [32];
+        byte ntsc_speed [2];
+        byte banks [8];
+        byte pal_speed [2];
+        byte speed_flags;
+        byte chip_flags;
+        byte unused [4];
 };
 
 struct Nsf_Emu {
-	// Play routine timing
-	nes_time_t next_play;
-	nes_time_t play_period;
-	int play_extra;
-	int play_delay;
-	struct registers_t saved_state; // of interrupted init routine
+        // Play routine timing
+        nes_time_t next_play;
+        nes_time_t play_period;
+        int play_extra;
+        int play_delay;
+        struct registers_t saved_state; // of interrupted init routine
 
-	// general
-	int voice_count;
-	int voice_types [32];
-	int mute_mask_;
-	int tempo;
-	int gain;
-	
-	int sample_rate;
-	
-	// track-specific
-	int track_count;
-	int current_track;
-	
-	int clock_rate__;
-	unsigned buf_changed_count;
+        // general
+        int voice_count;
+        int voice_types [32];
+        int mute_mask_;
+        int tempo;
+        int gain;
 
-	// M3u Playlist
-	struct M3u_Playlist m3u;
+        int sample_rate;
 
-	// Larger items at the end
-	#ifndef NSF_EMU_APU_ONLY
-		byte mmc5_mul [2];
-		
-		struct Nes_Fds_Apu   fds;
-		struct Nes_Mmc5_Apu  mmc5;
-		struct Nes_Namco_Apu namco;
-		struct Nes_Vrc6_Apu  vrc6;
-		struct Nes_Fme7_Apu  fme7;
-		#ifndef NSF_EMU_NO_VRC7
-			struct Nes_Vrc7_Apu  vrc7;
-		#endif
-	#endif
-	
-	struct Nes_Cpu cpu;
-	struct Nes_Apu apu;
-	
-	// Header for currently loaded file
-	struct header_t header;
-	
-	struct setup_t tfilter;
-	struct Track_Filter track_filter;
-	
-	struct Multi_Buffer stereo_buf;
-	struct Rom_Data rom;
-	
-	// Extended nsf info
-	struct Nsfe_Info info;
-	
-	byte high_ram[fdsram_size + fdsram_offset];
-	byte low_ram [low_ram_size];
+        // track-specific
+        int track_count;
+        int current_track;
+
+        int clock_rate__;
+        unsigned buf_changed_count;
+
+        // M3u Playlist
+        struct M3u_Playlist m3u;
+
+        // Larger items at the end
+        #ifndef NSF_EMU_APU_ONLY
+                byte mmc5_mul [2];
+
+                struct Nes_Fds_Apu   fds;
+                struct Nes_Mmc5_Apu  mmc5;
+                struct Nes_Namco_Apu namco;
+                struct Nes_Vrc6_Apu  vrc6;
+                struct Nes_Fme7_Apu  fme7;
+                #ifndef NSF_EMU_NO_VRC7
+                        struct Nes_Vrc7_Apu  vrc7;
+                #endif
+        #endif
+
+        struct Nes_Cpu cpu;
+        struct Nes_Apu apu;
+
+        // Header for currently loaded file
+        struct header_t header;
+
+        struct setup_t tfilter;
+        struct Track_Filter track_filter;
+
+        struct Multi_Buffer stereo_buf;
+        struct Rom_Data rom;
+
+        // Extended nsf info
+        struct Nsfe_Info info;
+
+        byte high_ram[fdsram_size + fdsram_offset];
+        byte low_ram [low_ram_size];
 };
 
 // Basic functionality (see Gme_File.h for file loading/track info functions)
@@ -172,13 +172,13 @@ void Track_set_fade( struct Nsf_Emu* this, int start_msec, int length_msec );
 // True if a track has reached its end
 static inline bool Track_ended( struct Nsf_Emu* this )
 {
-	return track_ended( &this->track_filter );
+        return track_ended( &this->track_filter );
 }
 
 // Disables automatic end-of-track detection and skipping of silence at beginning
 static inline void Track_ignore_silence( struct Nsf_Emu* this, bool disable )
 {
-	this->track_filter.silence_ignored_ = disable;
+        this->track_filter.silence_ignored_ = disable;
 }
 
 // Get track length in milliseconds
@@ -201,8 +201,8 @@ void Sound_mute_voices( struct Nsf_Emu* this, int mask );
 // Must be called before set_sample_rate().
 static inline void Sound_set_gain( struct Nsf_Emu* this, int g )
 {
-	assert( !this->sample_rate ); // you must set gain before setting sample rate
-	this->gain = g;
+        assert( !this->sample_rate ); // you must set gain before setting sample rate
+        this->gain = g;
 }
 
 // Emulation (You shouldn't touch these)
@@ -248,14 +248,14 @@ static inline byte* sram( struct Nsf_Emu* this )            { return this->high_
 static inline byte* unmapped_code( struct Nsf_Emu* this )   { return &this->high_ram [sram_size]; }
 
 #ifndef NSF_EMU_APU_ONLY
-	static inline int fds_enabled( struct Nsf_Emu* this )   { return this->header.chip_flags & fds_flag;   }
-	static inline int vrc6_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & vrc6_flag;  }
-	#ifndef NSF_EMU_NO_VRC7
-		static inline int vrc7_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & vrc7_flag;  }
-	#endif
-	static inline int mmc5_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & mmc5_flag;  }
-	static inline int namco_enabled( struct Nsf_Emu* this ) { return this->header.chip_flags & namco_flag; }
-	static inline int fme7_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & fme7_flag;  }
+        static inline int fds_enabled( struct Nsf_Emu* this )   { return this->header.chip_flags & fds_flag;   }
+        static inline int vrc6_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & vrc6_flag;  }
+        #ifndef NSF_EMU_NO_VRC7
+                static inline int vrc7_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & vrc7_flag;  }
+        #endif
+        static inline int mmc5_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & mmc5_flag;  }
+        static inline int namco_enabled( struct Nsf_Emu* this ) { return this->header.chip_flags & namco_flag; }
+        static inline int fme7_enabled( struct Nsf_Emu* this )  { return this->header.chip_flags & fme7_flag;  }
 #endif
-	
+
 #endif

@@ -69,7 +69,7 @@ _DEFUN (memcmp, (m1, m2, n),
       s2++;
     }
   return 0;
-#else  
+#else
   unsigned char *s1 = (unsigned char *) m1;
   unsigned char *s2 = (unsigned char *) m2;
   unsigned long *a1;
@@ -80,13 +80,13 @@ _DEFUN (memcmp, (m1, m2, n),
      not turn up in inner loops.  */
   if (!TOO_SMALL(n) && !UNALIGNED(s1,s2))
     {
-      /* Otherwise, load and compare the blocks of memory one 
+      /* Otherwise, load and compare the blocks of memory one
          word at a time.  */
       a1 = (unsigned long*) s1;
       a2 = (unsigned long*) s2;
       while (n >= LBLOCKSIZE)
         {
-          if (*a1 != *a2) 
+          if (*a1 != *a2)
             break;
           a1++;
           a2++;
@@ -110,4 +110,3 @@ _DEFUN (memcmp, (m1, m2, n),
   return 0;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }
-

@@ -58,8 +58,8 @@ static long fp_atof(const char* s, int precision)
     bool point = false;
 
     while ((*s != '\0') && isspace(*s))
-    {    
-        s++;     
+    {
+        s++;
     }
 
     if (*s == '-')
@@ -157,48 +157,48 @@ long get_replaygain_int(long int_gain)
 }
 
 /* Parse a ReplayGain tag conforming to the "VorbisGain standard". If a
- * valid tag is found, update mp3entry struct accordingly. Existing values 
+ * valid tag is found, update mp3entry struct accordingly. Existing values
  * are not overwritten.
  *
  * key     Name of the tag.
  * value   Value of the tag.
  * entry   mp3entry struct to update.
  */
-void parse_replaygain(const char* key, const char* value, 
+void parse_replaygain(const char* key, const char* value,
                       struct mp3entry* entry)
 {
-    if (((strcasecmp(key, "replaygain_track_gain") == 0) || 
-         (strcasecmp(key, "rg_radio") == 0)) && 
+    if (((strcasecmp(key, "replaygain_track_gain") == 0) ||
+         (strcasecmp(key, "rg_radio") == 0)) &&
         !entry->track_gain)
     {
         entry->track_level = get_replaygain(value);
         entry->track_gain  = convert_gain(entry->track_level);
     }
-    else if (((strcasecmp(key, "replaygain_album_gain") == 0) || 
-              (strcasecmp(key, "rg_audiophile") == 0)) && 
+    else if (((strcasecmp(key, "replaygain_album_gain") == 0) ||
+              (strcasecmp(key, "rg_audiophile") == 0)) &&
              !entry->album_gain)
     {
         entry->album_level = get_replaygain(value);
         entry->album_gain  = convert_gain(entry->album_level);
     }
-    else if (((strcasecmp(key, "replaygain_track_peak") == 0) || 
-              (strcasecmp(key, "rg_peak") == 0)) && 
+    else if (((strcasecmp(key, "replaygain_track_peak") == 0) ||
+              (strcasecmp(key, "rg_peak") == 0)) &&
              !entry->track_peak)
     {
         entry->track_peak = get_replaypeak(value);
     }
-    else if ((strcasecmp(key, "replaygain_album_peak") == 0) && 
+    else if ((strcasecmp(key, "replaygain_album_peak") == 0) &&
              !entry->album_peak)
     {
         entry->album_peak = get_replaypeak(value);
     }
 }
 
-/* Set ReplayGain values from integers. Existing values are not overwritten. 
+/* Set ReplayGain values from integers. Existing values are not overwritten.
  *
  * album   If true, set album values, otherwise set track values.
  * gain    Gain value in dB, multiplied by 512. 0 for no gain.
- * peak    Peak volume in Q7.24 format, where 1.0 is full scale. 0 for no 
+ * peak    Peak volume in Q7.24 format, where 1.0 is full scale. 0 for no
  *         peak volume.
  * entry   mp3entry struct to update.
  */

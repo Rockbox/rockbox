@@ -1,7 +1,7 @@
 /*
- *	Interface to MP3 LAME encoding engine
+ *      Interface to MP3 LAME encoding engine
  *
- *	Copyright (c) 1999 Mark Taylor
+ *      Copyright (c) 1999 Mark Taylor
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1155,7 +1155,7 @@ void CDECL id3tag_set_artist(lame_t gfp, const char* artist);
 void CDECL id3tag_set_album(lame_t gfp, const char* album);
 void CDECL id3tag_set_year(lame_t gfp, const char* year);
 void CDECL id3tag_set_comment(lame_t gfp, const char* comment);
-            
+
 /* return -1 result if track number is out of ID3v1 range
                     and ignored for ID3v1 */
 int CDECL id3tag_set_track(lame_t gfp, const char* track);
@@ -1216,7 +1216,7 @@ extern const int      samplerate_table [3] [ 4];
 #define LAME_MAXALBUMART    (128 * 1024)
 
 /* maximum size of mp3buffer needed if you encode at most 1152 samples for
-   each call to lame_encode_buffer.  see lame_encode_buffer() below  
+   each call to lame_encode_buffer.  see lame_encode_buffer() below
    (LAME_MAXMP3BUFFER is now obsolete)  */
 #define LAME_MAXMP3BUFFER   (16384 + LAME_MAXALBUMART)
 
@@ -1240,4 +1240,3 @@ typedef enum {
 }
 #endif
 #endif /* LAME_LAME_H */
-

@@ -31,7 +31,7 @@
 #include "mpeg2dec_config.h"
 
 #define MPEG2_VERSION(a,b,c) (((a)<<16)|((b)<<8)|(c))
-#define MPEG2_RELEASE MPEG2_VERSION (0, 5, 0)	/* 0.5.0 */
+#define MPEG2_RELEASE MPEG2_VERSION (0, 5, 0)   /* 0.5.0 */
 
 #define SEQ_FLAG_MPEG2                  1
 #define SEQ_FLAG_CONSTRAINED_PARAMETERS 2
@@ -100,7 +100,7 @@ typedef struct mpeg2_picture_s
     uint32_t flags;
     struct
     {
- 	    int x, y;
+            int x, y;
     } display_offset[3];
 } mpeg2_picture_t;
 
@@ -150,7 +150,7 @@ typedef struct mpeg2_convert_init_s
     unsigned int id_size;
     unsigned int buf_size[MPEG2_COMPONENTS];
     void (* start)(void * id, const mpeg2_fbuf_t * fbuf,
-		           const mpeg2_picture_t * picture, const mpeg2_gop_t * gop);
+                           const mpeg2_picture_t * picture, const mpeg2_gop_t * gop);
     void (* copy)(void * id, uint8_t * const * src, unsigned int v_offset);
 } mpeg2_convert_init_t;
 
@@ -162,8 +162,8 @@ typedef enum
 } mpeg2_convert_stage_t;
 
 typedef int mpeg2_convert_t (int stage, void * id,
-			     const mpeg2_sequence_t * sequence, int stride,
-			     void * arg, mpeg2_convert_init_t * result);
+                             const mpeg2_sequence_t * sequence, int stride,
+                             void * arg, mpeg2_convert_init_t * result);
 int mpeg2_convert (mpeg2dec_t * mpeg2dec, mpeg2_convert_t convert, void * arg);
 int mpeg2_stride (mpeg2dec_t * mpeg2dec, int stride);
 void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[MPEG2_COMPONENTS],

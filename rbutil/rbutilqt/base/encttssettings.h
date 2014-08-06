@@ -20,7 +20,7 @@
 
 #ifndef ENCTTSSETTINGS_H
 #define ENCTTSSETTINGS_H
- 
+
 #include <QtCore>
 
 //! \brief This class stores everything needed to display a Setting.
@@ -45,10 +45,10 @@ public:
         eBROWSEBTN,
         eREFRESHBTN
     };
-    
+
     //! constructor for a String or Bool setting
     EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current,EButton btn = eNOBTN);
-    //! contructor for a  Stringlist setting, ie a enumeration   
+    //! contructor for a  Stringlist setting, ie a enumeration
     EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current,QStringList list,EButton btn = eNOBTN);
     //! constructor for a setting with a min-max range
     EncTtsSetting(QObject* parent,ESettingType type,QString name,QVariant current,QVariant min,QVariant max,EButton = eNOBTN);
@@ -57,7 +57,7 @@ public:
     QVariant current() {return m_currentValue;}
     //! set currentValue
     void setCurrent(QVariant current,bool noticeGui=true);
-      
+
    //! get name of the Setting
     QString name() {return m_name;}
     //! get the type of the setting
@@ -72,7 +72,7 @@ public:
     QStringList list() {return m_list;}
     //! set the enumeration list
     void setList(QStringList list){m_list = list;}
-    
+
 signals:
     //! connect to this signal if you want to get noticed when the data changes
     void dataChanged();
@@ -80,9 +80,9 @@ signals:
     void refresh();
     //! will be emited when the gui should update this setting
     void updateGui();
-    
+
 private:
-    ESettingType m_type;  
+    ESettingType m_type;
     EButton m_btn;
     QString m_name;
     QVariant m_currentValue;
@@ -106,7 +106,7 @@ public:
 
     //! Chlid class should commit the from SettingsList to permanent storage
     virtual void saveSettings() = 0;
-    
+
 signals:
     void busy();  // emit this if a operation takes time
     void busyEnd(); // emit this at the end of a busy section
@@ -119,7 +119,7 @@ protected:
     void insertSetting(int id,EncTtsSetting* setting);
     //! retrieve a specific setting
     EncTtsSetting* getSetting(int id);
-    
+
 private:
     //! The setting storage.
     QList<EncTtsSetting*> settingsList;

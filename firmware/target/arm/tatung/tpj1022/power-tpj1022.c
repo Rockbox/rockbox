@@ -19,8 +19,8 @@
  *
  ****************************************************************************/
 
-/* Created from power.c using some iPod code, and some custom stuff based on 
-   GPIO analysis 
+/* Created from power.c using some iPod code, and some custom stuff based on
+   GPIO analysis
 */
 
 #include "config.h"
@@ -58,6 +58,6 @@ void power_off(void)
 {
     /* Give things a second to settle before cutting power */
     sleep(HZ);
-    
+
     //GPIOF_OUTPUT_VAL &=~ 0x20;
 }

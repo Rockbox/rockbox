@@ -436,7 +436,7 @@ struct sudoku_state_t {
   char savedboard[9][9];    /* Cached copy of saved state */
   int x,y;                  /* Cursor position */
   int editmode;             /* We are editing the start board */
-#ifdef SUDOKU_BUTTON_POSSIBLE 
+#ifdef SUDOKU_BUTTON_POSSIBLE
   short possiblevals[9][9];  /* possible values a cell could be, user sets them */
   short savedpossible[9][9]; /* cached copy of possible cell values */
 #endif

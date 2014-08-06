@@ -3145,7 +3145,7 @@ struct riff_header
     uint16_t block_align;     /* 20h - num_channels*bits_per_samples/8   */
     uint16_t bits_per_sample; /* 22h - 8=8 bits, 16=16 bits, etc.        */
     /* Not for audio_format=1 (PCM) */
-/*  unsigned short extra_param_size;   24h - size of extra data          */ 
+/*  unsigned short extra_param_size;   24h - size of extra data          */
 /*  unsigned char  *extra_params; */
     /* data header */
     uint8_t  data_id[4];      /* 24h - "data" */
@@ -3161,14 +3161,14 @@ struct riff_header
 #define PCM_DEPTH_BITS             16
 
 /* Define our own source constants since REC_SRC_FMRADIO will intrude on the count */
-enum {   
-  WAV_SRC_LINE = 0,   
-  WAV_SRC_MIC,   
+enum {
+  WAV_SRC_LINE = 0,
+  WAV_SRC_MIC,
 #ifdef HAVE_SPDIF_REC
-  WAV_SRC_SPDIF,   
-#endif   
-  WAV_NUM_SRC,   
-}; 
+  WAV_SRC_SPDIF,
+#endif
+  WAV_NUM_SRC,
+};
 
 void rec_tick(void) __attribute__((interrupt_handler));
 
@@ -3214,7 +3214,7 @@ static const struct riff_header header_template =
     /* "RIFF" header */
     { 'R', 'I', 'F', 'F' },         /* riff_id          */
     0,                              /* riff_size   (*)  */
-    /* format header */ 
+    /* format header */
     { 'W', 'A', 'V', 'E' },         /* format           */
     { 'f', 'm', 't', ' ' },         /* format_id        */
     htole32(16),                    /* format_size      */
@@ -3285,13 +3285,13 @@ void mas_restore(void)
     static const unsigned char resetdsp[] = { 0x88, 0x00 };
     static const unsigned char initdsp[] =  { 0x8c, 0x00 };
     unsigned long val;
-    
+
     i2c_random_write(MAS_ADR, MAS_CONTROL, resetdsp, sizeof(resetdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8d00); in core implementation */
     rb->sleep(1);
     i2c_random_write(MAS_ADR, MAS_CONTROL, initdsp, sizeof(initdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8c00); in core implementation */
-    
+
     /* Stop the current application */
     val = 0;
     rb->mas_writemem(MAS_BANK_D0, MAS_D0_APP_SELECT, &val, 1);
@@ -3324,7 +3324,7 @@ void rec_tick(void)
 
     ICR |= 0x0010;        /* Begin with setting the IRQ to edge sensitive */
 
-    if(!(PADRH & 0x80))   
+    if(!(PADRH & 0x80))
     {   /* /EOD is low - transfer 36 bytes (9 sample pairs, 1 MASPCM DMA block) */
         asm volatile (
             "add     %[buf], %[writ]     \n"  /* write pos -> addr */
@@ -3432,7 +3432,7 @@ void hijack_interrupts(bool on)
 {
     static bool taken = false;
     static unsigned long orig_IRQ3;
-    
+
     if (on && !taken)
     {
         orig_IRQ3 = IRQ3;
@@ -3451,11 +3451,11 @@ static bool update_wav_header(char *filename, int sample_rate,
     struct riff_header hdr;
     int fd;
     bool ret;
-    
+
     fd = rb->open(filename, O_RDWR);
     if (fd < 0)
         return false;
-        
+
     rb->memcpy(&hdr, &header_template, sizeof (struct riff_header));
 
     /* "RIFF" header */
@@ -3471,7 +3471,7 @@ static bool update_wav_header(char *filename, int sample_rate,
     /* data header */
     hdr.data_size    = htole32(num_bytes);
 
-    ret = (rb->write(fd, &hdr, sizeof (struct riff_header)) 
+    ret = (rb->write(fd, &hdr, sizeof (struct riff_header))
            == sizeof (struct riff_header));
     rb->close(fd);
     return ret;
@@ -3498,7 +3498,7 @@ static int record_file(char *filename)
         return PLUGIN_ERROR;
     }
     /* write template header */
-    if (rb->write(fd, &header_template, sizeof (struct riff_header)) 
+    if (rb->write(fd, &header_template, sizeof (struct riff_header))
         != sizeof (struct riff_header))
     {
         rb->close(fd);
@@ -3510,7 +3510,7 @@ static int record_file(char *filename)
     mas_download_pcm();
     num_rec_bytes = 0;
     bytes_written = 0;
-    
+
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, filename);
 
@@ -3545,7 +3545,7 @@ static int record_file(char *filename)
              samplerate_str[reccfg.samplerate], channel_str[reccfg.channels]);
 
     rb->lcd_update();
-    
+
     mas = 0x0060                /* no framing, little endian */
         | ((reccfg.channels == 0) ? 0x10 : 0) /* mono/stereo */
         | sampr[reccfg.samplerate][0];
@@ -3565,7 +3565,7 @@ static int record_file(char *filename)
 #endif
         mas = 0x2125;   /* recording, ADC input, validate */
     rb->mas_writemem(MAS_BANK_D0, PCM_MAIN_IO_CONTROL, &mas, 1);
-    
+
     mas = 0x80001; /* avoid distortion (overflow on full-range input samples) */
     rb->mas_writemem(MAS_BANK_D0, PCM_VOL_IN_LL, &mas, 1); /* LL */
     rb->mas_writemem(MAS_BANK_D0, PCM_VOL_IN_RR, &mas, 1); /* RR */
@@ -3578,11 +3578,11 @@ static int record_file(char *filename)
               * PCM_DEPTH_BYTES
               * sampr[reccfg.samplerate][1] /* samples per second */
               * (reccfg.channels + 1);
-              
+
     while (recording || saving)
     {
         int to_save, write_now, result;
-        
+
         if (saving)
         {
             to_save = num_rec_bytes - bytes_written;
@@ -3727,7 +3727,7 @@ static int recording_menu(void)
                 break;
 
             case 3: /* Start recording */
-                rb->create_numbered_filename(recfilename, 
+                rb->create_numbered_filename(recfilename,
                                              rb->global_settings->rec_directory,
                                              "rec_", ".wav", 4
                                              IF_CNFN_NUM_(, NULL));
@@ -3758,14 +3758,14 @@ enum plugin_status plugin_start(const void* parameter)
     const char *recbasedir;
 
     (void)parameter;
-    
+
     plug_buf = rb->plugin_get_buffer(&buf_size);
     if (buf_size < 6700)  /* needed for i2c transfer */
     {
         rb->splash(HZ, "Out of memory.");
         return PLUGIN_ERROR;
     }
-    
+
     recbasedir = rb->global_settings->rec_directory;
     if (rb->strcmp(recbasedir, "/") && !rb->dir_exists(recbasedir))
     {
@@ -3784,7 +3784,7 @@ enum plugin_status plugin_start(const void* parameter)
     aud_buf += align;
     aud_size -= align;
     aud_size &= ~3;
-    
+
     configfile_load(cfg_filename, disk_config,
                     sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);

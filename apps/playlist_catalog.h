@@ -27,13 +27,13 @@ const char* catalog_get_directory(void);
 /* Set the playlist catalog dir */
 void catalog_set_directory(const char* directory);
 
-/* 
+/*
  * View list of playlists in catalog.
  *  ret : true if no error
  */
 bool catalog_view_playlists(void);
 
-/* 
+/*
  * Add something to a playlist (new or select from list of playlists in
  * catalog).
  *  sel          : the path of the music file, playlist or directory to add

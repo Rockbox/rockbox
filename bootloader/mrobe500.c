@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "inttypes.h"
 #include "string.h"
 #include "cpu.h"
@@ -61,7 +61,7 @@ void main(void)
     set_fiq_status(FIQ_DISABLED);
     system_init();
     kernel_init();
-    
+
     /* Now enable interrupts */
     set_irq_level(IRQ_ENABLED);
     set_fiq_status(FIQ_ENABLED);
@@ -71,8 +71,8 @@ void main(void)
     font_init();
     button_init();
     usb_init();
-    
-    
+
+
     power_init();
 //    enable_irq();
 //    enable_fiq();
@@ -113,7 +113,7 @@ void main(void)
         reset_screen();
         lcd_update();
     }
-    
+
     sleep(50);
 
     printf("ATA");

@@ -136,7 +136,7 @@ static void set_canvas_background(pixel_t *out, GifFileType *GifFile)
      * to reset canvas to global background color specified in gif BUT
      * all renderers I know use transparency instead.
      */
-    memset(out, PIXEL_TRANSPARENT, PIXELS_SZ);    
+    memset(out, PIXEL_TRANSPARENT, PIXELS_SZ);
 }
 
 /* var names adhere to giflib coding style */
@@ -406,7 +406,7 @@ void gif_decode(struct gif_decoder *d,
         free(pixels_buffer[1]);
 
     free(Line);
-  
+
     /* WARNING !!!! */
     /* GifFile object is trashed from now on, DONT use it */
     /* Move bitmap in native format to the front of the buff */

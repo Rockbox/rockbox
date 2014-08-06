@@ -40,7 +40,7 @@ QUICKREF
 #define UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
-_PTR 
+_PTR
 _DEFUN (memset, (m, c, n),
         _PTR m _AND
         int c _AND

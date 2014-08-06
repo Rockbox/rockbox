@@ -26,4 +26,3 @@ int lcd_hw_init(void) INIT_ATTR;
 
 /* target-specific power enable */
 void lcd_enable_power(bool onoff);
-

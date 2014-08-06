@@ -172,7 +172,7 @@ static void time_main_yuv(void)
     const int part14_w = YUV_WIDTH/2;   /* x-size for 1/4 update test */
     const int part14_y = YUV_HEIGHT/4;  /* y-offset for 1/4 update test */
     const int part14_h = YUV_HEIGHT/2;  /* y-size for 1/4 update test */
-    
+
     log_text("Main LCD YUV");
 
     rb->memset(ydata, 128, sizeof(ydata)); /* medium grey */
@@ -313,7 +313,7 @@ static void time_greyscale(void)
             frames_1++;
         }
         time_1 = time_end - time_start;
-    
+
         /* Test 2 - greyscale overlay enabled */
         grey_show(true);
         frames_2 = 0;
@@ -392,7 +392,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* standard stuff */
     (void)parameter;
-    
+
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
