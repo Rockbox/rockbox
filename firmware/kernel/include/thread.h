@@ -360,8 +360,7 @@ void block_thread(struct thread_entry *current, int timeout);
                                higher priority than current were woken) */
 
 /* A convenience function for waking an entire queue of threads. */
-unsigned int thread_queue_wake(struct thread_entry **list,
-                               volatile int *count);
+unsigned int thread_queue_wake(struct thread_entry **list);
 
 /* Wakeup a thread at the head of a list */
 enum wakeup_thread_protocol

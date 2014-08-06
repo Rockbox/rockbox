@@ -124,8 +124,15 @@ static FORCE_INLINE unsigned int
 mrsw_writer_wakeup_readers(struct mrsw_lock *mrsw)
 {
     mrsw->splay.blocker.thread = NULL;
-    for (int count = 0; mrsw->queue && mrsw->queue->retval != 0; count++)
+    int count = 0;
+
+    while (mrsw->queue && mrsw->queue->retval != 0)
+    {
         wakeup_thread(&mrsw->queue);
+        count++;
+    }
+
+    mrsw->count = count;
     return THREAD_OK;
 }
 

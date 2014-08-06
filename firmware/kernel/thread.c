@@ -1527,10 +1527,8 @@ void block_thread(struct thread_entry *current, int timeout)
  * INTERNAL: Intended for use by kernel objects and not for programs.
  *---------------------------------------------------------------------------
  */
-unsigned int thread_queue_wake(struct thread_entry **list,
-                               volatile int *count)
+unsigned int thread_queue_wake(struct thread_entry **list)
 {
-    int num = 0;
     unsigned result = THREAD_NONE;
 
     for (;;)
@@ -1541,11 +1539,7 @@ unsigned int thread_queue_wake(struct thread_entry **list,
             break; /* No more threads */
 
         result |= rc;
-        num++;
     }
-
-    if (count)
-        *count = num;
 
     return result;
 }
@@ -1821,7 +1815,7 @@ static inline void thread_final_exit(struct thread_entry *current)
      * execution except the slot itself. */
 
     /* Signal this thread */
-    thread_queue_wake(&current->queue, NULL);
+    thread_queue_wake(&current->queue);
     corelock_unlock(&current->waiter_cl);
     switch_thread();
     /* This should never and must never be reached - if it is, the

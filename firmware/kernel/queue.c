@@ -267,7 +267,7 @@ void queue_delete(struct event_queue *q)
     corelock_unlock(&all_queues.cl);
 
     /* Release thread(s) waiting on queue head */
-    thread_queue_wake(&q->queue, NULL);
+    thread_queue_wake(&q->queue);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if(q->send)
