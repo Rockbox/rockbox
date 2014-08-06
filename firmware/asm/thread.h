@@ -35,7 +35,7 @@ struct regs
     size_t stack_size;   /* stack size, not always used */
     uintptr_t stack;     /* pointer to start of the stack buffer */
 };
-
+  #include <errno.h>
   #ifdef HAVE_SIGALTSTACK_THREADS
     #include <signal.h>
     /* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
