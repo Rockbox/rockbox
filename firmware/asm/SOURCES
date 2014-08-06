@@ -7,6 +7,10 @@ memset.c
 strlen.c
 #endif
 
+#if defined(WIN32) || defined(APPLICATION)
+mempcpy.c
+#endif
+
 #if (defined(SANSA_E200) || defined(GIGABEAT_F) || defined(GIGABEAT_S) || \
     defined(CREATIVE_ZVx) || defined(SANSA_CONNECT) || defined(SANSA_FUZEPLUS) || \
     defined(COWON_D2) || defined(MINI2440) || defined(SAMSUNG_YPR0) || \
