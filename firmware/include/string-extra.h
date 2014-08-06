@@ -18,8 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-
+#ifndef STRING_EXTRA_H
+#define STRING_EXTRA_H
 #include <string.h>
 #include "strlcpy.h"
 #include "strlcat.h"
@@ -27,3 +27,11 @@
 #include "strcasestr.h"
 #include "strtok_r.h"
 #include "memset16.h"
+
+#if defined(WIN32) || defined(APPLICATION)
+#ifndef mempcpy
+#define mempcpy __builtin_mempcpy
+#endif
+#endif
+
+#endif /* STRING_EXTRA_H */
