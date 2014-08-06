@@ -24,8 +24,10 @@
 
     .align      2
     .global     _memcpy
+    .global     _mempcpy
     .global     ___memcpy_fwd_entry
     .type       _memcpy,@function
+    .type       _mempcpy,@function
 
 /* Copies <length> bytes of data in memory from <source> to <dest>
  * This version is optimized for speed
@@ -51,6 +53,10 @@
  * The instruction order is devised in a way to utilize the pipelining
  * of the SH1 to the max. The routine also tries to utilize fast page mode.
  */
+_mempcpy:
+    mov     r4,r7       /* store dest + length for returning */
+    bra     ___memcpy_fwd_entry
+     add    r6,r7
 
 _memcpy:
     mov     r4,r7       /* store dest for returning */
@@ -217,3 +223,5 @@ ___memcpy_fwd_entry:
     mov     r7,r0       /* return dest start address */
 .end:
     .size   _memcpy,.end-_memcpy
+    .size   _mempcpy,.end-_mempcpy
+

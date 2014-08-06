@@ -43,8 +43,16 @@
 
     .global    memcpy
     .type      memcpy, %function
+    .global    mempcpy
+    .type      mempcpy, %function
     
     .set       noreorder
+mempcpy:
+    slti       t0, a2, 8                # Less than 8?
+    bne        t0, zero, last8
+     addu      v0, a0, a2               # exit value = s1 + n
+    b          1f
+     xor       t0, a1, a0               # Find a0/a1 displacement (fill delay)
 
 memcpy:
     slti       t0, a2, 8                # Less than 8?
@@ -52,7 +60,8 @@ memcpy:
     move       v0, a0                   # Setup exit value before too late
 
     xor        t0, a1, a0               # Find a0/a1 displacement
-    andi       t0, 0x3
+
+1:  andi       t0, 0x3
     bne        t0, zero, shift          # Go handle the unaligned case
     subu       t1, zero, a1
     andi       t1, 0x3                  # a0/a1 are aligned, but are we
