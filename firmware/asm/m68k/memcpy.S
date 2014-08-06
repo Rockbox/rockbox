@@ -27,6 +27,8 @@
     .global memcpy
     .global __memcpy_fwd_entry
     .type   memcpy,@function
+    .global mempcpy
+    .type   mempcpy,@function
 
 /* Copies <length> bytes of data in memory from <source> to <dest>
  * This version is optimized for speed
@@ -53,6 +55,14 @@
  * long+3) it writes longwords only. Same goes for word aligned destinations
  * if FULLSPEED is undefined.
  */
+mempcpy:
+    move.l  (4,%sp),%a1     /* Destination */
+    move.l  (8,%sp),%a0     /* Source */
+    move.l  (12,%sp),%d1    /* Length */
+
+    add.l   %d1,(4,%sp)     /* retval=Destination + Length */
+    bra.b   __memcpy_fwd_entry
+
 memcpy:
     move.l  (4,%sp),%a1     /* Destination */
     move.l  (8,%sp),%a0     /* Source */
