@@ -36,6 +36,21 @@ rockchip player.
 
 You need libusb-1.0 + header files in order to compile this utility.
 
+
+rkwtool
+This directory contains tool to inspect and extract content of
+'full' update RKW file.
+
+The RKW file contains specific section which instruct update
+routine of the DAP what to do, custom archive with firmware files,
+images of stage1 and stage2 nand bootloader and Rock27Boot.bin file
+image. Nand bootloader images are stored in scrambled form but
+the tool deciphers it to plain binary during extraction.
+
+More complete descritpion of file format can be found on wiki:
+http://www.rockbox.org/wiki/RKWFileFormat
+
+
 nandextract
 This directory contains quick and dirty tool which allows to extract
 nand bootloader from raw dump of the first nand block. The main reason
