@@ -39,10 +39,9 @@
  */
 struct mrsw_lock
 {
-    int volatile count; /* rd/wr counter; >0 = reader(s), <0 = writer */
-    struct thread_entry *queue;
-    struct blocker_splay splay; /* priority inheritance info
-                                   for waiters */
+    int volatile         count; /* counter; >0 = reader(s), <0 = writer */
+    struct __wait_queue  queue; /* waiter list */
+    struct blocker_splay splay; /* priority inheritance/owner info  */
     uint8_t rdrecursion[MAXTHREADS]; /* per-thread reader recursion counts */
     IF_COP( struct corelock cl; )
 };

@@ -86,6 +86,8 @@ static inline void load_context(const void* addr)
     );
 }
 
+
+#ifdef RB_PROFILE
 /*---------------------------------------------------------------------------
  * Call this from asm to make sure the sp is pointing to the
  * correct place before the context is saved.
@@ -99,3 +101,6 @@ static inline void _profile_thread_stopped(int current_thread)
                   :: [id] "r" (current_thread)
                   : "cc", "memory");
 }
+
+#define profile_thread_stopped  _profile_thread_stopped
+#endif /* RB_PROFILE */

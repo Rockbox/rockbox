@@ -88,7 +88,7 @@ struct queue_sender_list
     /* If non-NULL, there is a thread waiting for the corresponding event */
     /* Must be statically allocated to put in non-cached ram. */
     struct thread_entry *senders[QUEUE_LENGTH]; /* message->thread map */
-    struct thread_entry *list;                  /* list of senders in map */
+    struct __wait_queue list;                   /* list of senders in map */
     /* Send info for last message dequeued or NULL if replied or not sent */
     struct thread_entry * volatile curr_sender;
 #ifdef HAVE_PRIORITY_SCHEDULING
@@ -108,7 +108,7 @@ struct queue_sender_list
 
 struct event_queue
 {
-    struct thread_entry *queue;         /* waiter list */
+    struct __wait_queue queue;          /* waiter list */
     struct queue_event events[QUEUE_LENGTH]; /* list of events */
     unsigned int volatile read;         /* head of queue */
     unsigned int volatile write;        /* tail of queue */

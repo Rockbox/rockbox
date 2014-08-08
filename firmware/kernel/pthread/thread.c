@@ -3,8 +3,8 @@
 #include <errno.h>
 #include <pthread.h>
 #include "/usr/include/semaphore.h"
+#include "thread-internal.h"
 #include "kernel.h"
-#include "thread.h"
 
 #define NSEC_PER_SEC 1000000000L
 static inline void timespec_add_ns(struct timespec *a, uint64_t ns)
@@ -24,11 +24,6 @@ struct thread_init_data {
 };
 
 __thread struct thread_entry *_current;
-
-struct thread_entry* thread_self_entry(void)
-{
-    return _current;
-}
 
 unsigned int thread_self(void)
 {
@@ -70,12 +65,10 @@ static void *trampoline(void *arg)
     if (data->start_frozen)
     {
         struct corelock thaw_lock;
-        struct thread_entry *queue = NULL;
         corelock_init(&thaw_lock);
         corelock_lock(&thaw_lock);
 
         _current->lock = &thaw_lock;
-        _current->bqp = &queue;
         sem_post(&data->init_sem);
         block_thread_switch(_current, _current->lock);
         _current->lock = NULL;
@@ -97,7 +90,7 @@ void thread_thaw(unsigned int thread_id)
     if (e->lock)
     {
         corelock_lock(e->lock);
-        wakeup_thread(e->bqp);
+        wakeup_thread(e);
         corelock_unlock(e->lock);
     }
     /* else: no lock. must be running already */
@@ -135,7 +128,7 @@ unsigned int create_thread(void (*function)(void),
     data->entry = entry;
     pthread_cond_init(&entry->cond, NULL);         
     entry->runnable = true;
-    entry->l = (struct thread_list) { NULL, NULL };
+
     sem_init(&data->init_sem, 0, 0);
 
     if (pthread_create(&retval, NULL, trampoline, data) < 0)
@@ -153,58 +146,19 @@ unsigned int create_thread(void (*function)(void),
     return retval;
 }
 
-static void add_to_list_l(struct thread_entry **list,
-                          struct thread_entry *thread)
-{
-    if (*list == NULL)
-    {
-        /* Insert into unoccupied list */
-        thread->l.next = thread;
-        thread->l.prev = thread;
-        *list = thread;
-    }
-    else
-    {
-        /* Insert last */
-        thread->l.next = *list;
-        thread->l.prev = (*list)->l.prev;
-        thread->l.prev->l.next = thread;
-        (*list)->l.prev = thread;
-    }
-}
-
-static void remove_from_list_l(struct thread_entry **list,
-                               struct thread_entry *thread)
-{
-    if (thread == thread->l.next)
-    {
-        /* The only item */
-        *list = NULL;
-        return;
-    }
-
-    if (thread == *list)
-    {
-        /* List becomes next item */
-        *list = thread->l.next;
-    }
-
-    /* Fix links to jump over the removed entry. */
-    thread->l.prev->l.next = thread->l.next;
-    thread->l.next->l.prev = thread->l.prev;
-}
-
 /* for block_thread(), _w_tmp() and wakeup_thread() t->lock must point
  * to a corelock instance, and this corelock must be held by the caller */
 void block_thread_switch(struct thread_entry *t, struct corelock *cl)
 {
     t->runnable = false;
-    add_to_list_l(t->bqp, t);
+    if (wait_queue_ptr(t))
+        wait_queue_register(t);
     while(!t->runnable)
         pthread_cond_wait(&t->cond, &cl->mutex);
 }
 
-void block_thread_switch_w_tmo(struct thread_entry *t, int timeout, struct corelock *cl)
+void block_thread_switch_w_tmo(struct thread_entry *t, int timeout,
+                               struct corelock *cl)
 {
     int err = 0;
     struct timespec ts;
@@ -213,30 +167,25 @@ void block_thread_switch_w_tmo(struct thread_entry *t, int timeout, struct corel
     timespec_add_ns(&ts, timeout * (NSEC_PER_SEC/HZ));
 
     t->runnable = false;
-    add_to_list_l(t->bqp, t);
+    wait_queue_register(t->wqp, t);
     while(!t->runnable && !err)
         err = pthread_cond_timedwait(&t->cond, &cl->mutex, &ts);
 
     if (err == ETIMEDOUT)
     {   /* the thread timed out and was not explicitely woken up.
          * we need to do this now to mark it runnable again */
-        remove_from_list_l(t->bqp, t);
         t->runnable = true;
-        if (t->wakeup_ext_cb)
-            t->wakeup_ext_cb(t);
+        /* NOTE: objects do their own removal upon timer expiration */
     }
 }
 
-unsigned int wakeup_thread(struct thread_entry **list)
+unsigned int wakeup_thread(struct thread_entry *t)
 {
-    struct thread_entry *t = *list;
-    if (t)
-    {
-        remove_from_list_l(list, t);
-        t->runnable = true;
-        pthread_cond_signal(&t->cond);
-    }
-    return THREAD_NONE;
+    if (t->wqp)
+        wait_queue_remove(t);
+    t->runnable = true;
+    pthread_cond_signal(&t->cond);
+    return THREAD_OK;
 }
 
 

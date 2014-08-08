@@ -82,46 +82,22 @@ static void INIT_ATTR core_thread_init(unsigned int core)
  * to use a stack from an unloaded module until another thread runs on it.
  *---------------------------------------------------------------------------
  */
-static inline void NORETURN_ATTR __attribute__((always_inline))
-    thread_final_exit(struct thread_entry *current)
+static void __attribute__((naked, noinline, noreturn))
+    thread_exit_finalize(unsigned int core, struct thread_entry *current)
 {
     asm volatile (
-        "cmp    %1, #0               \n" /* CPU? */
+        "ldr    r2, =idle_stacks     \n" /* switch to idle stack  */
+        "ldr    sp, [r2, r0, lsl #2] \n"
+        "add    sp, sp, %0*4         \n"
+        "cmp    r0, #0               \n" /* CPU? */
+        "mov    r4, r1               \n"
         "blne   commit_dcache        \n"
-        "mov    r0, %0               \n" /* copy thread parameter */
-        "mov    sp, %2               \n" /* switch to idle stack  */
-        "bl     thread_final_exit_do \n" /* finish removal        */
-        : : "r"(current),
-            "r"(current->core),
-            "r"(&idle_stacks[current->core][IDLE_STACK_WORDS])
-        : "r0", "r1", "r2", "r3", "ip", "lr"); /* Because of flush call,
-                                                  force inputs out
-                                                  of scratch regs */
-    while (1);
-}
+        "mov    r0, r4               \n"
+        "b      thread_exit_final    \n"
+        : : "i"(IDLE_STACK_WORDS));
 
-/*---------------------------------------------------------------------------
- * Perform core switch steps that need to take place inside switch_thread.
- *
- * These steps must take place while before changing the processor and after
- * having entered switch_thread since switch_thread may not do a normal return
- * because the stack being used for anything the compiler saved will not belong
- * to the thread's destination core and it may have been recycled for other
- * purposes by the time a normal context load has taken place. switch_thread
- * will also clobber anything stashed in the thread's context or stored in the
- * nonvolatile registers if it is saved there before the call since the
- * compiler's order of operations cannot be known for certain.
- */
-static void core_switch_blk_op(unsigned int core, struct thread_entry *thread)
-{
-    /* Flush our data to ram */
-    commit_dcache();
-    /* Stash thread in r4 slot */
-    thread->context.r[0] = (uint32_t)thread;
-    /* Stash restart address in r5 slot */
-    thread->context.r[1] = thread->context.start;
-    /* Save sp in context.sp while still running on old core */
-    thread->context.sp = idle_stacks[core][IDLE_STACK_WORDS-1];
+    while (1);
+    (void)core; (void)current;
 }
 
 /*---------------------------------------------------------------------------
@@ -136,31 +112,32 @@ static void core_switch_blk_op(unsigned int core, struct thread_entry *thread)
 /*---------------------------------------------------------------------------
  * This actually performs the core switch.
  */
-static void __attribute__((naked))
-    switch_thread_core(unsigned int core, struct thread_entry *thread)
+static void __attribute__((naked, noinline))
+    switch_thread_core(unsigned int old_core, struct thread_entry *thread)
 {
-    /* Pure asm for this because compiler behavior isn't sufficiently predictable.
-     * Stack access also isn't permitted until restoring the original stack and
-     * context. */
     asm volatile (
-        "stmfd  sp!, { r4-r11, lr }      \n" /* Stack all non-volatile context on current core */
-        "ldr    r2, =idle_stacks         \n" /* r2 = &idle_stacks[core][IDLE_STACK_WORDS] */
-        "ldr    r2, [r2, r0, lsl #2]     \n"
-        "add    r2, r2, %0*4             \n"
-        "stmfd  r2!, { sp }              \n" /* save original stack pointer on idle stack */
-        "mov    sp, r2                   \n" /* switch stacks */
-        "adr    r2, 1f                   \n" /* r2 = new core restart address */
-        "str    r2, [r1, #40]            \n" /* thread->context.start = r2 */
-        "ldr    pc, =switch_thread       \n" /* r0 = thread after call - see load_context */
-    "1:                                  \n"
-        "ldr    sp, [r0, #32]            \n" /* Reload original sp from context structure */
-        "mov    r1, #0                   \n" /* Clear start address */
-        "str    r1, [r0, #40]            \n"
-        "bl     commit_discard_idcache   \n" /* Invalidate new core's cache */
-        "ldmfd  sp!, { r4-r11, pc }      \n" /* Restore non-volatile context to new core and return */
-        : : "i"(IDLE_STACK_WORDS)
-    );
-    (void)core; (void)thread;
+        "stmfd  sp!, { r4-r5, lr }     \n" /* can't use the first two ctx fields */
+        "add    r2, r1, #8             \n"
+        "stmia  r2, { r6-r11, sp }     \n" /* save remaining context */
+        "adr    r2, .new_core_restart  \n" /* save context ptr + restart address */
+        "str    r2, [r1, #40]          \n" /* make 'start' non-null */
+        "stmia  r1, { r1-r2 }          \n"
+        "ldr    r2, =idle_stacks       \n" /* switch to idle stack on old core */
+        "ldr    sp, [r2, r0, lsl #2]   \n"
+        "add    sp, sp, %0*4           \n"
+        "stmfd  sp!, { r0-r1 }         \n"
+        "bl     commit_dcache          \n" /* write back everything */
+        "ldmfd  sp!, { r0-r1 }         \n"
+        "b      switch_core_final      \n"
+    ".new_core_restart:                \n"
+        "mov    r1, #0                 \n" /* mark as started */
+        "str    r1, [r0, #40]          \n"
+        "add    r0, r0, #8             \n"
+        "ldmia  r0, { r6-r11, sp }     \n" /* restore non-volatiles and stack */
+        "bl     commit_discard_idcache \n" /* invalidate new core's cache */
+        "ldmfd  sp!, { r4-r5, pc }     \n" /* restore remaining context */
+        : : "i"(IDLE_STACK_WORDS));
+    (void)old_core; (void)thread;
 }
 
 /** PP-model-specific dual-core code **/

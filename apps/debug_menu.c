@@ -151,25 +151,21 @@ static const char* threads_getname(int selected_item, void *data,
     selected_item -= NUM_CORES;
 #endif
 
+    const char *fmtstr = "%2d: ---";
+
     struct thread_debug_info threadinfo;
-    if (thread_get_debug_info(selected_item, &threadinfo) <= 0)
+    if (thread_get_debug_info(selected_item, &threadinfo) > 0)
     {
-        snprintf(buffer, buffer_len, "%2d: ---", selected_item);
-        return buffer;
+        fmtstr = "%2d:" IF_COP(" (%d)") " %s" IF_PRIO(" %d %d")
+                 IFN_SDL(" %2d%%") " %s";
     }
 
-    snprintf(buffer, buffer_len,
-             "%2d: " IF_COP("(%d) ") "%s " IF_PRIO("%d %d ") "%2d%% %s",
+    snprintf(buffer, buffer_len, fmtstr,
              selected_item,
-#if NUM_CORES > 1
-             threadinfo.core,
-#endif
+             IF_COP(threadinfo.core,)
              threadinfo.statusstr,
-#ifdef HAVE_PRIORITY_SCHEDULING
-             threadinfo.base_priority,
-             threadinfo.current_priority,
-#endif
-             threadinfo.stack_usage,
+             IF_PRIO(threadinfo.base_priority, threadinfo.current_priority,)
+             IFN_SDL(threadinfo.stack_usage,)
              threadinfo.name);
 
     return buffer;
@@ -187,16 +183,9 @@ static bool dbg_os(void)
 {
     struct simplelist_info info;
     simplelist_info_init(&info, IF_COP("Core and ") "Stack usage:",
-#if NUM_CORES == 1
-                            MAXTHREADS,
-#else
-                            MAXTHREADS+NUM_CORES,
-#endif
-                            NULL);
-#ifndef ROCKBOX_HAS_LOGF
+                         MAXTHREADS IF_COP( + NUM_CORES ), NULL);
     info.hide_selection = true;
     info.scroll_all = true;
-#endif
     info.action_callback = dbg_threads_action_callback;
     info.get_name = threads_getname;
     return simplelist_show_list(&info);

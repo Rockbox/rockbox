@@ -51,7 +51,7 @@ static struct
  * q->events[]:          |  XX  |  E1  |  E2  |  E3  |  E4  |  XX  |
  * q->send->senders[]:   | NULL |  T1  |  T2  | NULL |  T3  | NULL |
  *                                 \/     \/            \/
- * q->send->list:       >->|T0|<->|T1|<->|T2|<-------->|T3|<-<
+ * q->send->list:       0<-|T0|<->|T1|<->|T2|<-------->|T3|->0
  * q->send->curr_sender:    /\
  *
  * Thread has E0 in its own struct queue_event.
@@ -65,20 +65,20 @@ static struct
  * more efficent to reject the majority of cases that don't need this
  * called.
  */
-static void queue_release_sender(struct thread_entry * volatile * sender,
-                                 intptr_t retval)
+static void queue_release_sender_inner(
+    struct thread_entry * volatile * sender, intptr_t retval)
 {
     struct thread_entry *thread = *sender;
-
     *sender = NULL;               /* Clear slot. */
-#ifdef HAVE_WAKEUP_EXT_CB
-    thread->wakeup_ext_cb = NULL; /* Clear callback. */
-#endif
     thread->retval = retval;      /* Assign thread-local return value. */
-    *thread->bqp = thread;        /* Move blocking queue head to thread since
-                                     wakeup_thread wakes the first thread in
-                                     the list. */
-    wakeup_thread(thread->bqp, WAKEUP_RELEASE);
+    wakeup_thread(thread, WAKEUP_RELEASE);
+}
+
+static inline void queue_release_sender(
+    struct thread_entry * volatile * sender, intptr_t retval)
+{
+    if(UNLIKELY(*sender))
+        queue_release_sender_inner(sender, retval);
 }
 
 /* Releases any waiting threads that are queued with queue_send -
@@ -93,25 +93,10 @@ static void queue_release_all_senders(struct event_queue *q)
         {
             struct thread_entry **spp =
                 &q->send->senders[i & QUEUE_LENGTH_MASK];
-
-            if(*spp)
-            {
-                queue_release_sender(spp, 0);
-            }
+            queue_release_sender(spp, 0);
         }
     }
 }
-
-#ifdef HAVE_WAKEUP_EXT_CB
-/* Callback to do extra forced removal steps from sender list in addition
- * to the normal blocking queue removal and priority dis-inherit */
-static void queue_remove_sender_thread_cb(struct thread_entry *thread)
-{
-    *((struct thread_entry **)thread->retval) = NULL;
-    thread->wakeup_ext_cb = NULL;
-    thread->retval = 0;
-}
-#endif /* HAVE_WAKEUP_EXT_CB */
 
 /* Enables queue_send on the specified queue - caller allocates the extra
  * data structure. Only queues which are taken to be owned by a thread should
@@ -132,11 +117,12 @@ void queue_enable_queue_send(struct event_queue *q,
     if(send != NULL && q->send == NULL)
     {
         memset(send, 0, sizeof(*send));
+        wait_queue_init(&send->list);
 #ifdef HAVE_PRIORITY_SCHEDULING
-        send->blocker.priority = PRIORITY_IDLE;
+        blocker_init(&send->blocker);
         if(owner_id != 0)
         {
-            send->blocker.thread = thread_id_entry(owner_id);
+            send->blocker.thread = __thread_id_entry(owner_id);
             q->blocker_p = &send->blocker;
         }
 #endif
@@ -154,24 +140,14 @@ static inline void queue_do_unblock_sender(struct queue_sender_list *send,
                                            unsigned int i)
 {
     if(send)
-    {
-        struct thread_entry **spp = &send->senders[i];
-
-        if(UNLIKELY(*spp))
-        {
-            queue_release_sender(spp, 0);
-        }
-    }
+        queue_release_sender(&send->senders[i], 0);
 }
 
 /* Perform the auto-reply sequence */
 static inline void queue_do_auto_reply(struct queue_sender_list *send)
 {
-    if(send && send->curr_sender)
-    {
-        /* auto-reply */
+    if(send)
         queue_release_sender(&send->curr_sender, 0);
-    }
 }
 
 /* Moves waiting thread's refrence from the senders array to the
@@ -191,7 +167,6 @@ static inline void queue_do_fetch_sender(struct queue_sender_list *send,
             /* Move thread reference from array to the next thread
                that queue_reply will release */
             send->curr_sender = *spp;
-            (*spp)->retval = (intptr_t)spp;
             *spp = NULL;
         }
         /* else message was posted asynchronously with queue_post */
@@ -205,18 +180,28 @@ static inline void queue_do_fetch_sender(struct queue_sender_list *send,
 #define queue_do_fetch_sender(send, rd)
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
+static void queue_wake_waiter_inner(struct thread_entry *thread)
+{
+    wakeup_thread(thread, WAKEUP_DEFAULT);
+}
+
+static inline void queue_wake_waiter(struct event_queue *q)
+{
+    struct thread_entry *thread = WQ_THREAD_FIRST(&q->queue);
+    if(thread != NULL)
+        queue_wake_waiter_inner(thread);
+}
+
 /* Queue must not be available for use during this call */
 void queue_init(struct event_queue *q, bool register_queue)
 {
     int oldlevel = disable_irq_save();
 
     if(register_queue)
-    {
         corelock_lock(&all_queues.cl);
-    }
 
     corelock_init(&q->cl);
-    q->queue = NULL;
+    wait_queue_init(&q->queue);
     /* What garbage is in write is irrelevant because of the masking design-
      * any other functions the empty the queue do this as well so that
      * queue_count and queue_empty return sane values in the case of a
@@ -261,7 +246,7 @@ void queue_delete(struct event_queue *q)
     corelock_unlock(&all_queues.cl);
 
     /* Release thread(s) waiting on queue head */
-    thread_queue_wake(&q->queue);
+    wait_queue_wake(&q->queue);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     if(q->send)
@@ -293,7 +278,7 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
 #ifdef HAVE_PRIORITY_SCHEDULING
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == thread_self_entry(),
+                  QUEUE_GET_THREAD(q) == __running_self_entry(),
                   "queue_wait->wrong thread\n");
 #endif
 
@@ -307,18 +292,12 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 
     while(1)
     {
-        struct thread_entry *current;
-
         rd = q->read;
         if (rd != q->write) /* A waking message could disappear */
             break;
 
-        current = thread_self_entry();
-
-        IF_COP( current->obj_cl = &q->cl; )
-        current->bqp = &q->queue;
-
-        block_thread(current, TIMEOUT_BLOCK);
+        struct thread_entry *current = __running_self_entry();
+        block_thread(current, TIMEOUT_BLOCK, &q->queue, NULL);
 
         corelock_unlock(&q->cl);
         switch_thread();
@@ -349,16 +328,9 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
     int oldlevel;
     unsigned int rd, wr;
 
-    /* this function works only with a positive number (or zero) of ticks */
-    if (ticks == TIMEOUT_BLOCK)
-    {
-        queue_wait(q, ev);
-        return;
-    }
-
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
     KERNEL_ASSERT(QUEUE_GET_THREAD(q) == NULL ||
-                  QUEUE_GET_THREAD(q) == thread_self_entry(),
+                  QUEUE_GET_THREAD(q) == __running_self_entry(),
                   "queue_wait_w_tmo->wrong thread\n");
 #endif
 
@@ -372,14 +344,10 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
     rd = q->read;
     wr = q->write;
-    if (rd == wr && ticks > 0)
+    if (rd == wr && ticks != 0)
     {
-        struct thread_entry *current = thread_self_entry();
-
-        IF_COP( current->obj_cl = &q->cl; )
-        current->bqp = &q->queue;
-
-        block_thread(current, ticks);
+        struct thread_entry *current = __running_self_entry();
+        block_thread(current, ticks, &q->queue, NULL);
         corelock_unlock(&q->cl);    
 
         switch_thread();
@@ -389,6 +357,8 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
         rd = q->read;
         wr = q->write;
+
+        wait_queue_try_remove(current);
     }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -436,7 +406,7 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     queue_do_unblock_sender(q->send, wr);
 
     /* Wakeup a waiting thread if any */
-    wakeup_thread(&q->queue, WAKEUP_DEFAULT);
+    queue_wake_waiter(q);
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
@@ -465,28 +435,17 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     {
         struct queue_sender_list *send = q->send;
         struct thread_entry **spp = &send->senders[wr];
-        struct thread_entry *current = thread_self_entry();
+        struct thread_entry *current = __running_self_entry();
 
-        if(UNLIKELY(*spp))
-        {
-            /* overflow protect - unblock any thread waiting at this index */
-            queue_release_sender(spp, 0);
-        }
+        /* overflow protect - unblock any thread waiting at this index */
+        queue_release_sender(spp, 0);
 
         /* Wakeup a waiting thread if any */
-        wakeup_thread(&q->queue, WAKEUP_DEFAULT);
+        queue_wake_waiter(q);
 
         /* Save thread in slot, add to list and wait for reply */
         *spp = current;
-        IF_COP( current->obj_cl = &q->cl; )
-        IF_PRIO( current->blocker = q->blocker_p; )
-#ifdef HAVE_WAKEUP_EXT_CB
-        current->wakeup_ext_cb = queue_remove_sender_thread_cb;
-#endif
-        current->retval = (intptr_t)spp;
-        current->bqp = &send->list;
-
-        block_thread(current, TIMEOUT_BLOCK);
+        block_thread(current, TIMEOUT_BLOCK, &send->list, q->blocker_p);
 
         corelock_unlock(&q->cl);
         switch_thread();
@@ -495,7 +454,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     }
 
     /* Function as queue_post if sending is not enabled */
-    wakeup_thread(&q->queue, WAKEUP_DEFAULT);
+    queue_wake_waiter(q);
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
@@ -530,16 +489,12 @@ void queue_reply(struct event_queue *q, intptr_t retval)
 {
     if(q->send && q->send->curr_sender)
     {
-        struct queue_sender_list *sender;
-
         int oldlevel = disable_irq_save();
         corelock_lock(&q->cl);
 
-        sender = q->send;
-
-        /* Double-check locking */
-        if(LIKELY(sender && sender->curr_sender))
-            queue_release_sender(&sender->curr_sender, retval);
+        struct queue_sender_list *send = q->send;
+        if(send)
+            queue_release_sender(&send->curr_sender, retval);
 
         corelock_unlock(&q->cl);
         restore_irq(oldlevel);

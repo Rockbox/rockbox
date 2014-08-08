@@ -118,15 +118,17 @@ int get_cpu_boost_counter(void);
 #define ALIGN_UP(n, a)       ALIGN_DOWN((n)+((a)-1),a)
 
 /* align start and end of buffer to nearest integer multiple of a */
-#define ALIGN_BUFFER(ptr,len,align) \
-{\
-    uintptr_t tmp_ptr1 = (uintptr_t)ptr; \
-    uintptr_t tmp_ptr2 = tmp_ptr1 + len;\
-    tmp_ptr1 = ALIGN_UP(tmp_ptr1,align); \
-    tmp_ptr2 = ALIGN_DOWN(tmp_ptr2,align); \
-    len = tmp_ptr2 - tmp_ptr1; \
-    ptr = (typeof(ptr))tmp_ptr1; \
-}
+#define ALIGN_BUFFER(ptr, size, align) \
+({                                           \
+    size_t    __sz = (size);                 \
+    size_t   __ali = (align);                \
+    uintptr_t __a1 = (uintptr_t)(ptr);       \
+    uintptr_t __a2 = __a1 + __sz;            \
+    __a1 = ALIGN_UP(__a1, __ali);            \
+    __a2 = ALIGN_DOWN(__a2, __ali);          \
+    (ptr)  = (typeof (ptr))__a1;             \
+    (size) = __a2 > __a1 ?  __a2 - __a1 : 0; \
+})
 
 #define PTR_ADD(ptr, x) ((typeof(ptr))((char*)(ptr) + (x)))
 #define PTR_SUB(ptr, x) ((typeof(ptr))((char*)(ptr) - (x)))
@@ -150,11 +152,16 @@ int get_cpu_boost_counter(void);
 #endif
 
 /* Get the byte offset of a type's member */
-#define OFFSETOF(type, membername) ((off_t)&((type *)0)->membername)
+#ifndef offsetof
+#define offsetof(type, member)  __builtin_offsetof(type, member)
+#endif
 
-/* Get the type pointer from one of its members */
-#define TYPE_FROM_MEMBER(type, memberptr, membername) \
-    ((type *)((intptr_t)(memberptr) - OFFSETOF(type, membername)))
+/* Get the containing item of *ptr in type */
+#ifndef container_of
+#define container_of(ptr, type, member) ({              \
+    const typeof (((type *)0)->member) *__mptr = (ptr); \
+    (type *)((void *)(__mptr) - offsetof(type, member)); })
+#endif
 
 /* returns index of first set bit or 32 if no bits are set */
 #if defined(CPU_ARM) && ARM_ARCH >= 5 && !defined(__thumb__)
@@ -324,6 +331,11 @@ static inline uint32_t swaw32_hw(uint32_t value)
  * for all ARM CPUs. */
 #ifdef CPU_ARM
     #define HAVE_CPU_CACHE_ALIGN
+    #define MIN_STACK_ALIGN 8
+#endif
+
+#ifndef MIN_STACK_ALIGN
+#define MIN_STACK_ALIGN (sizeof (uintptr_t))
 #endif
 
 /* Calculate CACHEALIGN_SIZE from CACHEALIGN_BITS */

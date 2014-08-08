@@ -19,7 +19,8 @@
  *
  ****************************************************************************/
 #include "kernel-internal.h"
-#include "mrsw-lock.h"
+#include <string.h>
+#include "mrsw_lock.h"
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 
@@ -34,13 +35,14 @@ mrsw_reader_claim(struct mrsw_lock *mrsw, struct thread_entry *current,
 
 static FORCE_INLINE void
 mrsw_reader_relinquish(struct mrsw_lock *mrsw, struct thread_entry *current,
-                       int count, unsigned int slotnum)
+                       struct thread_entry *first, int count,
+                       unsigned int slotnum)
 {
     /* If no writer is queued or has ownership then noone is queued;
        if a writer owns it, then the reader would be blocked instead.
        Therefore, if the queue has threads, then the next after the
        owning readers is a writer and this is not the last reader. */
-    if (mrsw->queue)
+    if (first)
         corelock_lock(&mrsw->splay.cl);
 
     threadbit_clear_bit(&mrsw->splay.mask, slotnum);
@@ -61,10 +63,10 @@ mrsw_reader_relinquish(struct mrsw_lock *mrsw, struct thread_entry *current,
                       threadbit_popcount(&mrsw->splay.mask));
         /* switch owner to sole remaining reader */
         slotnum = threadbit_ffs(&mrsw->splay.mask);
-        mrsw->splay.blocker.thread = thread_id_entry(slotnum);
+        mrsw->splay.blocker.thread = __thread_slot_entry(slotnum);
     }
 
-    if (mrsw->queue)
+    if (first)
     {
         priority_disinherit(current, &mrsw->splay.blocker);
         corelock_unlock(&mrsw->splay.cl);
@@ -72,23 +74,25 @@ mrsw_reader_relinquish(struct mrsw_lock *mrsw, struct thread_entry *current,
 }
 
 static FORCE_INLINE unsigned int
-mrsw_reader_wakeup_writer(struct mrsw_lock *mrsw, unsigned int slotnum)
+mrsw_reader_wakeup_writer(struct mrsw_lock *mrsw, struct thread_entry *thread,
+                          unsigned int slotnum)
 {
     threadbit_clear_bit(&mrsw->splay.mask, slotnum);
-    return wakeup_thread(&mrsw->queue, WAKEUP_TRANSFER);
+    return wakeup_thread(thread, WAKEUP_TRANSFER);
 }
 
 static FORCE_INLINE unsigned int
-mrsw_writer_wakeup_writer(struct mrsw_lock *mrsw)
+mrsw_writer_wakeup_writer(struct mrsw_lock *mrsw, struct thread_entry *thread)
 {
-    return wakeup_thread(&mrsw->queue, WAKEUP_TRANSFER);
+    return wakeup_thread(thread, WAKEUP_TRANSFER);
+    (void)mrsw;
 }
 
 static FORCE_INLINE unsigned int
-mrsw_writer_wakeup_readers(struct mrsw_lock *mrsw)
+mrsw_writer_wakeup_readers(struct mrsw_lock *mrsw, struct thread_entry *first)
 {
-    unsigned int result = wakeup_thread(&mrsw->queue, WAKEUP_TRANSFER_MULTI);
-    mrsw->count = thread_self_entry()->retval;
+    unsigned int result = wakeup_thread(first, WAKEUP_TRANSFER_MULTI);
+    mrsw->count = __running_self_entry()->retval;
     return result;
 }
 
@@ -97,32 +101,36 @@ mrsw_writer_wakeup_readers(struct mrsw_lock *mrsw)
 #define mrsw_reader_claim(mrsw, current, count, slotnum) \
     do {} while (0)
 
-#define mrsw_reader_relinquish(mrsw, current, count, slotnum) \
+#define mrsw_reader_relinquish(mrsw, current, first, count, slotnum) \
     do {} while (0)
 
 static FORCE_INLINE unsigned int
-mrsw_reader_wakeup_writer(struct mrsw_lock *mrsw)
+mrsw_reader_wakeup_writer(struct mrsw_lock *mrsw, struct thread_entry *thread)
 {
-    mrsw->splay.blocker.thread = mrsw->queue;
-    return wakeup_thread(&mrsw->queue);
+    mrsw->splay.blocker.thread = thread;
+    return wakeup_thread(thread);
 }
 
 static FORCE_INLINE unsigned int
-mrsw_writer_wakeup_writer(struct mrsw_lock *mrsw)
+mrsw_writer_wakeup_writer(struct mrsw_lock *mrsw, struct thread_entry *thread)
 {
-    mrsw->splay.blocker.thread = mrsw->queue;
-    return wakeup_thread(&mrsw->queue);
+    mrsw->splay.blocker.thread = thread;
+    return wakeup_thread(thread);
 }
 
 static FORCE_INLINE unsigned int
-mrsw_writer_wakeup_readers(struct mrsw_lock *mrsw)
+mrsw_writer_wakeup_readers(struct mrsw_lock *mrsw, struct thread_entry *first)
 {
     mrsw->splay.blocker.thread = NULL;
-    int count = 0;
+    int count = 1;
 
-    while (mrsw->queue && mrsw->queue->retval != 0)
+    while (1)
     {
-        wakeup_thread(&mrsw->queue);
+        wakeup_thread(first);
+
+        if (!(first = WQ_THREAD_FIRST(&mrsw->queue)) || first->retval == 0)
+            break;
+
         count++;
     }
 
@@ -138,14 +146,11 @@ mrsw_writer_wakeup_readers(struct mrsw_lock *mrsw)
 void mrsw_init(struct mrsw_lock *mrsw)
 {
     mrsw->count = 0;
-    mrsw->queue = NULL;
-    mrsw->splay.blocker.thread = NULL;
+    wait_queue_init(&mrsw->queue);
+    blocker_splay_init(&mrsw->splay);
 #ifdef HAVE_PRIORITY_SCHEDULING
-    mrsw->splay.blocker.priority = PRIORITY_IDLE;
-    threadbit_clear(&mrsw->splay.mask);
-    corelock_init(&mrsw->splay.cl);
     memset(mrsw->rdrecursion, 0, sizeof (mrsw->rdrecursion));
-#endif /* HAVE_PRIORITY_SCHEDULING */
+#endif
     corelock_init(&mrsw->cl);
 }
 
@@ -154,7 +159,7 @@ void mrsw_init(struct mrsw_lock *mrsw)
  * access recursively. The current writer is ignored and gets access. */
 void mrsw_read_acquire(struct mrsw_lock *mrsw)
 {
-    struct thread_entry *current = thread_self_entry();
+    struct thread_entry *current = __running_self_entry();
 
     if (current == mrsw->splay.blocker.thread IF_PRIO( && mrsw->count < 0 ))
         return; /* Read request while holding write access; pass */
@@ -178,7 +183,7 @@ void mrsw_read_acquire(struct mrsw_lock *mrsw)
 
     int count = mrsw->count;
 
-    if (LIKELY(count >= 0 && !mrsw->queue))
+    if (LIKELY(count >= 0 && mrsw->queue.head == NULL))
     {
         /* Lock open to readers:
            IFN_PRIO, mrsw->count tracks reader recursion */
@@ -189,13 +194,10 @@ void mrsw_read_acquire(struct mrsw_lock *mrsw)
     }
 
     /* A writer owns it or is waiting; block... */
-    IF_COP( current->obj_cl = &mrsw->cl; )
-    IF_PRIO( current->blocker = &mrsw->splay.blocker; )
-    current->bqp = &mrsw->queue;
     current->retval = 1; /* indicate multi-wake candidate */
 
     disable_irq();
-    block_thread(current, TIMEOUT_BLOCK);
+    block_thread(current, TIMEOUT_BLOCK, &mrsw->queue, &mrsw->splay.blocker);
 
     corelock_unlock(&mrsw->cl);
 
@@ -207,7 +209,7 @@ void mrsw_read_acquire(struct mrsw_lock *mrsw)
  * leave opens up access to writer threads. The current writer is ignored. */
 void mrsw_read_release(struct mrsw_lock *mrsw)
 {
-    struct thread_entry *current = thread_self_entry();
+    struct thread_entry *current = __running_self_entry();
 
     if (current == mrsw->splay.blocker.thread IF_PRIO( && mrsw->count < 0 ))
         return; /* Read release while holding write access; ignore */
@@ -237,17 +239,18 @@ void mrsw_read_release(struct mrsw_lock *mrsw)
     unsigned int result = THREAD_NONE;
     const int oldlevel = disable_irq_save();
 
-    if (--count == 0 && mrsw->queue)
+    struct thread_entry *thread = WQ_THREAD_FIRST(&mrsw->queue);
+    if (--count == 0 && thread != NULL)
     {
         /* No readers remain and a writer is waiting */
         mrsw->count = -1;
-        result = mrsw_reader_wakeup_writer(mrsw IF_PRIO(, slotnum));
+        result = mrsw_reader_wakeup_writer(mrsw, thread IF_PRIO(, slotnum));
     }
     else
     {
         /* Giving up readership; we may be the last, or not */
         mrsw->count = count;
-        mrsw_reader_relinquish(mrsw, current, count, slotnum);
+        mrsw_reader_relinquish(mrsw, current, thread, count, slotnum);
     }
 
     restore_irq(oldlevel);
@@ -265,7 +268,7 @@ void mrsw_read_release(struct mrsw_lock *mrsw)
  * safely call recursively. */
 void mrsw_write_acquire(struct mrsw_lock *mrsw)
 {
-    struct thread_entry *current = thread_self_entry();
+    struct thread_entry *current = __running_self_entry();
 
     if (current == mrsw->splay.blocker.thread)
     {
@@ -288,13 +291,10 @@ void mrsw_write_acquire(struct mrsw_lock *mrsw)
     }
 
     /* Readers present or a writer owns it - block... */
-    IF_COP( current->obj_cl = &mrsw->cl; )
-    IF_PRIO( current->blocker = &mrsw->splay.blocker; )
-    current->bqp = &mrsw->queue;
     current->retval = 0; /* indicate single-wake candidate */
 
     disable_irq();
-    block_thread(current, TIMEOUT_BLOCK);
+    block_thread(current, TIMEOUT_BLOCK, &mrsw->queue, &mrsw->splay.blocker);
 
     corelock_unlock(&mrsw->cl);
 
@@ -305,9 +305,9 @@ void mrsw_write_acquire(struct mrsw_lock *mrsw)
 /* Release writer thread lock and open the lock to readers and writers */
 void mrsw_write_release(struct mrsw_lock *mrsw)
 {
-    KERNEL_ASSERT(thread_self_entry() == mrsw->splay.blocker.thread,
+    KERNEL_ASSERT(__running_self_entry() == mrsw->splay.blocker.thread,
                   "mrsw_write_release->wrong thread (%s != %s)\n",
-                  thread_self_entry()->name,
+                  __running_self_entry()->name,
                   mrsw->splay.blocker.thread->name);
 
     int count = mrsw->count;
@@ -323,15 +323,16 @@ void mrsw_write_release(struct mrsw_lock *mrsw)
     corelock_lock(&mrsw->cl);
     const int oldlevel = disable_irq_save();
 
-    if (mrsw->queue == NULL)           /* 'count' becomes zero */
+    struct thread_entry *thread = WQ_THREAD_FIRST(&mrsw->queue);
+    if (thread == NULL)           /* 'count' becomes zero */
     {
         mrsw->splay.blocker.thread = NULL;
         mrsw->count = 0;
     }
-    else if (mrsw->queue->retval == 0) /* 'count' stays -1 */
-        result = mrsw_writer_wakeup_writer(mrsw);
-    else                               /* 'count' becomes # of readers */
-        result = mrsw_writer_wakeup_readers(mrsw);
+    else if (thread->retval == 0) /* 'count' stays -1 */
+        result = mrsw_writer_wakeup_writer(mrsw, thread);
+    else                          /* 'count' becomes # of readers */
+        result = mrsw_writer_wakeup_readers(mrsw, thread);
 
     restore_irq(oldlevel);
     corelock_unlock(&mrsw->cl);

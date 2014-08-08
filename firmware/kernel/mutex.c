@@ -30,20 +30,19 @@
  * the object is available to other threads */
 void mutex_init(struct mutex *m)
 {
-    corelock_init(&m->cl);
-    m->queue = NULL;
+    wait_queue_init(&m->queue);
     m->recursion = 0;
-    m->blocker.thread = NULL;
+    blocker_init(&m->blocker);
 #ifdef HAVE_PRIORITY_SCHEDULING
-    m->blocker.priority = PRIORITY_IDLE;
     m->no_preempt = false;
 #endif
+    corelock_init(&m->cl);
 }
 
 /* Gain ownership of a mutex object or block until it becomes free */
 void mutex_lock(struct mutex *m)
 {
-    struct thread_entry *current = thread_self_entry();
+    struct thread_entry *current = __running_self_entry();
 
     if(current == m->blocker.thread)
     {
@@ -65,12 +64,8 @@ void mutex_lock(struct mutex *m)
     }
 
     /* block until the lock is open... */
-    IF_COP( current->obj_cl = &m->cl; )
-    IF_PRIO( current->blocker = &m->blocker; )
-    current->bqp = &m->queue;
-
     disable_irq();
-    block_thread(current, TIMEOUT_BLOCK);
+    block_thread(current, TIMEOUT_BLOCK, &m->queue, &m->blocker);
 
     corelock_unlock(&m->cl);
 
@@ -82,10 +77,10 @@ void mutex_lock(struct mutex *m)
 void mutex_unlock(struct mutex *m)
 {
     /* unlocker not being the owner is an unlocking violation */
-    KERNEL_ASSERT(m->blocker.thread == thread_self_entry(),
+    KERNEL_ASSERT(m->blocker.thread == __running_self_entry(),
                   "mutex_unlock->wrong thread (%s != %s)\n",
                   m->blocker.thread->name,
-                  thread_self_entry()->name);
+                  __running_self_entry()->name);
 
     if(m->recursion > 0)
     {
@@ -98,7 +93,8 @@ void mutex_unlock(struct mutex *m)
     corelock_lock(&m->cl);
 
     /* transfer to next queued thread if any */
-    if(LIKELY(m->queue == NULL))
+    struct thread_entry *thread = WQ_THREAD_FIRST(&m->queue);
+    if(LIKELY(thread == NULL))
     {
         /* no threads waiting - open the lock */
         m->blocker.thread = NULL;
@@ -107,11 +103,7 @@ void mutex_unlock(struct mutex *m)
     }
 
     const int oldlevel = disable_irq_save();
-    /* Tranfer of owning thread is handled in the wakeup protocol
-     * if priorities are enabled otherwise just set it from the
-     * queue head. */
-    IFN_PRIO( m->blocker.thread = m->queue; )
-    unsigned int result = wakeup_thread(&m->queue, WAKEUP_TRANSFER);
+    unsigned int result = wakeup_thread(thread, WAKEUP_TRANSFER);
     restore_irq(oldlevel);
 
     corelock_unlock(&m->cl);

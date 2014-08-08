@@ -26,6 +26,7 @@
 #include <stdbool.h>
 #include "config.h"
 #include "gcc_extensions.h"
+#include "linked_list.h"
 #include "bitarray.h"
 #include "corelock.h"
 
@@ -52,7 +53,7 @@
 #define PRIORITY_REALTIME_4      4
 #define PRIORITY_REALTIME        4   /* Lowest realtime range */
 #define PRIORITY_BUFFERING       15  /* Codec buffering thread */
-#define PRIORITY_USER_INTERFACE  16  /* The main thread */
+#define PRIORITY_USER_INTERFACE  16  /* For most UI thrads */
 #define PRIORITY_RECORDING       16  /* Recording thread */
 #define PRIORITY_PLAYBACK        16  /* Variable between this and MAX */
 #define PRIORITY_PLAYBACK_MAX    5   /* Maximum allowable playback priority */
@@ -61,6 +62,7 @@
 #define NUM_PRIORITIES           32
 #define PRIORITY_IDLE            32  /* Priority representative of no tasks */
 
+#define PRIORITY_MAIN_THREAD     PRIORITY_USER_INTERFACE
 #define IO_PRIORITY_IMMEDIATE    0
 #define IO_PRIORITY_BACKGROUND   32
 
@@ -107,6 +109,9 @@ extern unsigned sleep(unsigned ticks);
 #define IF_PRIO(...)
 #define IFN_PRIO(...)   __VA_ARGS__
 #endif
+
+#define __wait_queue      lld_head
+#define __wait_queue_node lld_node
 
 /* Basic structure describing the owner of an object */
 struct blocker
@@ -168,6 +173,7 @@ int thread_get_priority(unsigned int thread_id);
 void thread_set_io_priority(unsigned int thread_id, int io_priority);
 int thread_get_io_priority(unsigned int thread_id);
 #endif /* HAVE_IO_PRIORITY */
+
 #if NUM_CORES > 1
 unsigned int switch_core(unsigned int new_core);
 #endif
@@ -186,11 +192,21 @@ int core_get_debug_info(unsigned int core, struct core_debug_info *infop);
 
 #endif /* NUM_CORES */
 
+#ifdef HAVE_SDL_THREADS
+#define IF_SDL(x...) x
+#define IFN_SDL(x...)
+#else
+#define IF_SDL(x...)
+#define IFN_SDL(x...) x
+#endif
+
 struct thread_debug_info
 {
     char         statusstr[4];
     char         name[32];
+#ifndef HAVE_SDL_THREADS
     unsigned int stack_usage;
+#endif
 #if NUM_CORES > 1
     unsigned int core;
 #endif

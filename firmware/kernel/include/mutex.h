@@ -26,13 +26,13 @@
 
 struct mutex
 {
-    struct thread_entry *queue;   /* waiter list */
-    int recursion;                /* lock owner recursion count */
-    struct blocker blocker;       /* priority inheritance info
-                                     for waiters and owner*/
-    IF_COP( struct corelock cl; ) /* multiprocessor sync */
+    struct __wait_queue queue;     /* waiter list */
+    int                 recursion; /* lock owner recursion count */
+    struct blocker      blocker;   /* priority inheritance info
+                                      for waiters and owner*/
+    IF_COP( struct corelock cl; )  /* multiprocessor sync */
 #ifdef HAVE_PRIORITY_SCHEDULING
-    bool no_preempt;
+    bool                no_preempt;
 #endif
 };
 

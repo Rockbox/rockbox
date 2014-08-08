@@ -24,6 +24,7 @@
 /****************************************************************************
  * Simple semaphore functions ;)
  ****************************************************************************/
+
 /* Initialize the semaphore object.
  * max = maximum up count the semaphore may assume (max >= 1)
  * start = initial count of semaphore (0 <= count <= max) */
@@ -31,7 +32,7 @@ void semaphore_init(struct semaphore *s, int max, int start)
 {
     KERNEL_ASSERT(max > 0 && start >= 0 && start <= max,
                   "semaphore_init->inv arg\n");
-    s->queue = NULL;
+    wait_queue_init(&s->queue);
     s->max = max;
     s->count = start;
     corelock_init(&s->cl);
@@ -42,44 +43,49 @@ void semaphore_init(struct semaphore *s, int max, int start)
  * safely be used in an ISR. */
 int semaphore_wait(struct semaphore *s, int timeout)
 {
-    int ret;
-    int oldlevel;
-    int count;
+    int ret = OBJ_WAIT_TIMEDOUT;
 
-    oldlevel = disable_irq_save();
+    int oldlevel = disable_irq_save();
     corelock_lock(&s->cl);
 
-    count = s->count;
-
+    int count = s->count;
     if(LIKELY(count > 0))
     {
         /* count is not zero; down it */
         s->count = count - 1;
         ret = OBJ_WAIT_SUCCEEDED;
     }
-    else if(timeout == 0)
-    {
-        /* just polling it */
-        ret = OBJ_WAIT_TIMEDOUT;
-    }
-    else
+    else if(timeout != 0)
     {
         /* too many waits - block until count is upped... */
-        struct thread_entry * current = thread_self_entry();
-        IF_COP( current->obj_cl = &s->cl; )
-        current->bqp = &s->queue;
-        /* return value will be OBJ_WAIT_SUCCEEDED after wait if wake was
-         * explicit in semaphore_release */
-        current->retval = OBJ_WAIT_TIMEDOUT;
+        struct thread_entry *current = __running_self_entry();
 
-        block_thread(current, timeout);
+        block_thread(current, timeout, &s->queue, NULL);
         corelock_unlock(&s->cl);
 
         /* ...and turn control over to next thread */
         switch_thread();
 
-        return current->retval;
+        /* if explicit wake indicated; do no more */
+        if(LIKELY(!wait_queue_ptr(current)))
+            return OBJ_WAIT_SUCCEEDED;
+
+        disable_irq();
+        corelock_lock(&s->cl);
+
+        /* see if anyone got us after the expired wait */
+        if(wait_queue_try_remove(current))
+        {
+            count = s->count;
+            if(count > 0)
+            {
+                /* down it lately */
+                s->count = count - 1;
+                ret = OBJ_WAIT_SUCCEEDED;
+            }
+        }
     }
+    /* else just polling it */
 
     corelock_unlock(&s->cl);
     restore_irq(oldlevel);
@@ -93,18 +99,17 @@ int semaphore_wait(struct semaphore *s, int timeout)
 void semaphore_release(struct semaphore *s)
 {
     unsigned int result = THREAD_NONE;
-    int oldlevel;
 
-    oldlevel = disable_irq_save();
+    int oldlevel = disable_irq_save();
     corelock_lock(&s->cl);
 
-    if(LIKELY(s->queue != NULL))
+    struct thread_entry *thread = WQ_THREAD_FIRST(&s->queue);
+    if(LIKELY(thread != NULL))
     {
         /* a thread was queued - wake it up and keep count at 0 */
         KERNEL_ASSERT(s->count == 0,
             "semaphore_release->threads queued but count=%d!\n", s->count);
-        s->queue->retval = OBJ_WAIT_SUCCEEDED; /* indicate explicit wake */
-        result = wakeup_thread(&s->queue, WAKEUP_DEFAULT);
+        result = wakeup_thread(thread, WAKEUP_DEFAULT);
     }
     else
     {

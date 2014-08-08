@@ -125,6 +125,7 @@ SECTIONS
     .idle_stacks (NOLOAD) :
     {
        *(.idle_stacks)
+       . = ALIGN(8);
 #if NUM_CORES > 1
        cpu_idlestackbegin = .;
        . += IDLE_STACK_SIZE;

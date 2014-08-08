@@ -78,30 +78,11 @@ struct priority_distribution
 
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
-#ifdef HAVE_CORELOCK_OBJECT
-/* Operations to be performed just before stopping a thread and starting
-   a new one if specified before calling switch_thread */
-enum
-{
-    TBOP_CLEAR = 0,       /* No operation to do */
-    TBOP_UNLOCK_CORELOCK, /* Unlock a corelock variable */
-    TBOP_SWITCH_CORE,     /* Call the core switch preparation routine */
-};
+#define __rtr_queue         lldc_head
+#define __rtr_queue_node    lldc_node
 
-struct thread_blk_ops
-{
-    struct corelock *cl_p;    /* pointer to corelock */
-    unsigned char    flags;   /* TBOP_* flags */
-};
-#endif /* NUM_CORES > 1 */
-
-/* Link information for lists thread is in */
-struct thread_entry; /* forward */
-struct thread_list
-{
-    struct thread_entry *prev; /* Previous thread in a list */
-    struct thread_entry *next; /* Next thread in a list */
-};
+#define __tmo_queue         ll_head
+#define __tmo_queue_node    ll_node
 
 /* Information kept in each thread slot
  * members are arranged according to size - largest first - in order
@@ -109,94 +90,53 @@ struct thread_list
  */
 struct thread_entry
 {
-    struct regs context;       /* Register context at switch -
-                                  _must_ be first member */
-    uintptr_t *stack;          /* Pointer to top of stack */
-    const char *name;          /* Thread name */
-    long tmo_tick;             /* Tick when thread should be woken from
-                                  timeout -
-                                  states: STATE_SLEEPING/STATE_BLOCKED_W_TMO */
-    struct thread_list l;      /* Links for blocked/waking/running -
-                                  circular linkage in both directions */
-    struct thread_list tmo;    /* Links for timeout list -
-                                  Circular in reverse direction, NULL-terminated in
-                                  forward direction -
-                                  states: STATE_SLEEPING/STATE_BLOCKED_W_TMO */
-    struct thread_entry **bqp; /* Pointer to list variable in kernel
-                                  object where thread is blocked - used
-                                  for implicit unblock and explicit wake
-                                  states: STATE_BLOCKED/STATE_BLOCKED_W_TMO  */
-#ifdef HAVE_CORELOCK_OBJECT
-    struct corelock *obj_cl;   /* Object corelock where thead is blocked -
-                                  states: STATE_BLOCKED/STATE_BLOCKED_W_TMO */
-    struct corelock waiter_cl; /* Corelock for thread_wait */
-    struct corelock slot_cl;   /* Corelock to lock thread slot */
-    unsigned char core;        /* The core to which thread belongs */
+    struct regs context;         /* Register context at switch -
+                                    _must_ be first member */
+#ifndef HAVE_SDL_THREADS
+    uintptr_t *stack;            /* Pointer to top of stack */
 #endif
-    struct thread_entry *queue; /* List of threads waiting for thread to be
-                                  removed */
-#ifdef HAVE_WAKEUP_EXT_CB
-    void (*wakeup_ext_cb)(struct thread_entry *thread); /* Callback that
-                                  performs special steps needed when being
-                                  forced off of an object's wait queue that
-                                  go beyond the standard wait queue removal
-                                  and priority disinheritance */
-    /* Only enabled when using queue_send for now */
+    const char *name;            /* Thread name */
+    long tmo_tick;               /* Tick when thread should be woken */
+    struct __rtr_queue_node rtr; /* Node for run queue */
+    struct __tmo_queue_node tmo; /* Links for timeout list */
+    struct __wait_queue_node wq; /* Node for wait queue */
+    struct __wait_queue *volatile wqp; /* Pointer to registered wait queue */
+#if NUM_CORES > 1
+    struct corelock waiter_cl;   /* Corelock for thread_wait */
+    struct corelock slot_cl;     /* Corelock to lock thread slot */
+    unsigned char core;          /* The core to which thread belongs */
 #endif
-#if defined(HAVE_SEMAPHORE_OBJECTS) || \
-    defined(HAVE_EXTENDED_MESSAGING_AND_NAME) || \
-    NUM_CORES > 1
-    volatile intptr_t retval;  /* Return value from a blocked operation/
-                                  misc. use */
-#endif
-    uint32_t id;               /* Current slot id */
-    int __errno;               /* Thread error number (errno tls) */
+    struct __wait_queue queue;   /* List of threads waiting for thread to be
+                                    removed */
+    volatile intptr_t retval;    /* Return value from a blocked operation/
+                                    misc. use */
+    uint32_t id;                 /* Current slot id */
+    int __errno;                 /* Thread error number (errno tls) */
 #ifdef HAVE_PRIORITY_SCHEDULING
     /* Priority summary of owned objects that support inheritance */
-    struct blocker *blocker;   /* Pointer to blocker when this thread is blocked
-                                  on an object that supports PIP -
-                                  states: STATE_BLOCKED/STATE_BLOCKED_W_TMO  */
+    struct blocker *blocker;     /* Pointer to blocker when this thread is blocked
+                                    on an object that supports PIP -
+                                    states: STATE_BLOCKED/STATE_BLOCKED_W_TMO  */
     struct priority_distribution pdist; /* Priority summary of owned objects
-                                  that have blocked threads and thread's own
-                                  base priority */
-    int skip_count;            /* Number of times skipped if higher priority
-                                  thread was running */
+                                    that have blocked threads and thread's own
+                                    base priority */
+    int skip_count;              /* Number of times skipped if higher priority
+                                    thread was running */
     unsigned char base_priority; /* Base priority (set explicitly during
                                   creation or thread_set_priority) */
-    unsigned char priority;    /* Scheduled priority (higher of base or
-                                  all threads blocked by this one) */
+    unsigned char priority;      /* Scheduled priority (higher of base or
+                                    all threads blocked by this one) */
 #endif
-    unsigned short stack_size; /* Size of stack in bytes */
-    unsigned char state;       /* Thread slot state (STATE_*) */
+#ifndef HAVE_SDL_THREADS
+    unsigned short stack_size;   /* Size of stack in bytes */
+#endif
+    unsigned char state;         /* Thread slot state (STATE_*) */
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-    unsigned char cpu_boost;   /* CPU frequency boost flag */
+    unsigned char cpu_boost;     /* CPU frequency boost flag */
 #endif
 #ifdef HAVE_IO_PRIORITY
     unsigned char io_priority;
 #endif
-};
-
-/* Information kept for each core
- * Members are arranged for the same reason as in thread_entry
- */
-struct core_entry
-{
-    /* "Active" lists - core is constantly active on these and are never
-       locked and interrupts do not access them */
-    struct thread_entry *running;  /* threads that are running (RTR) */
-    struct thread_entry *timeout;  /* threads that are on a timeout before
-                                      running again */
-    struct thread_entry *block_task; /* Task going off running list */
-#ifdef HAVE_PRIORITY_SCHEDULING
-    struct priority_distribution rtr; /* Summary of running and ready-to-run
-                                         threads */
-#endif
-    long next_tmo_check;           /* soonest time to check tmo threads */
-#ifdef HAVE_CORELOCK_OBJECT
-    struct thread_blk_ops blk_ops; /* operations to perform when
-                                      blocking a thread */
-    struct corelock rtr_cl;        /* Lock for rtr list */
-#endif /* NUM_CORES */
 };
 
 /* Thread ID, 32 bits = |VVVVVVVV|VVVVVVVV|VVVVVVVV|SSSSSSSS| */
@@ -206,30 +146,106 @@ struct core_entry
 #define THREAD_ID_INIT(n)       ((1u << THREAD_ID_VERSION_SHIFT) | (n))
 #define THREAD_ID_SLOT(id)      ((id) & THREAD_ID_SLOT_MASK)
 
-/* Thread locking */
-#if NUM_CORES > 1
-#define LOCK_THREAD(thread) \
-    ({ corelock_lock(&(thread)->slot_cl); })
-#define TRY_LOCK_THREAD(thread) \
-    ({ corelock_try_lock(&(thread)->slot_cl); })
-#define UNLOCK_THREAD(thread) \
-    ({ corelock_unlock(&(thread)->slot_cl); })
-#define UNLOCK_THREAD_AT_TASK_SWITCH(thread) \
-    ({ unsigned int _core = (thread)->core; \
-       cores[_core].blk_ops.flags |= TBOP_UNLOCK_CORELOCK; \
-       cores[_core].blk_ops.cl_p = &(thread)->slot_cl; })
-#else /* NUM_CORES == 1*/
-#define LOCK_THREAD(thread) \
-    ({ (void)(thread); })
-#define TRY_LOCK_THREAD(thread) \
-    ({ (void)(thread); })
-#define UNLOCK_THREAD(thread) \
-    ({ (void)(thread); })
-#define UNLOCK_THREAD_AT_TASK_SWITCH(thread) \
-    ({ (void)(thread); })
-#endif /* NUM_CORES */
-
 #define DEADBEEF ((uintptr_t)0xdeadbeefdeadbeefull)
+
+/* Information kept for each core
+ * Members are arranged for the same reason as in thread_entry
+ */
+struct core_entry
+{
+    /* "Active" lists - core is constantly active on these and are never
+       locked and interrupts do not access them */
+    struct __rtr_queue rtr;          /* Threads that are runnable */
+    struct __tmo_queue tmo;          /* Threads on a bounded wait */
+    struct thread_entry *running;    /* Currently running thread */
+#ifdef HAVE_PRIORITY_SCHEDULING
+    struct priority_distribution rtr_dist; /* Summary of runnables */
+#endif
+    long next_tmo_check;             /* Next due timeout check */
+#if NUM_CORES > 1
+    struct corelock rtr_cl;          /* Lock for rtr list */
+#endif /* NUM_CORES */
+};
+
+/* Hide a few scheduler details from itself to make allocation more flexible */
+#define __main_thread_name \
+    ({ extern const char __main_thread_name_str[]; \
+       __main_thread_name_str; })
+
+static FORCE_INLINE
+    void * __get_main_stack(size_t *stacksize)
+{
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+    extern uintptr_t stackbegin[];
+    extern uintptr_t stackend[];
+#else
+    extern uintptr_t *stackbegin;
+    extern uintptr_t *stackend;
+#endif
+    *stacksize = (uintptr_t)stackend - (uintptr_t)stackbegin;
+    return stackbegin;
+}
+
+void format_thread_name(char *buf, size_t bufsize,
+                        const struct thread_entry *thread);
+
+static FORCE_INLINE
+    struct core_entry * __core_id_entry(unsigned int core)
+{
+#if NUM_CORES > 1
+    extern struct core_entry * __cores[NUM_CORES];
+    return __cores[core];
+#else
+    extern struct core_entry __cores[NUM_CORES];
+    return &__cores[core];
+#endif
+}
+
+#define __running_self_entry() \
+    __core_id_entry(CURRENT_CORE)->running
+
+static FORCE_INLINE
+    struct thread_entry * __thread_slot_entry(unsigned int slotnum)
+{
+    extern struct thread_entry * __threads[MAXTHREADS];
+    return __threads[slotnum];
+}
+
+#define __thread_id_entry(id) \
+    __thread_slot_entry(THREAD_ID_SLOT(id))
+
+#define THREAD_FROM(p, member) \
+    container_of(p, struct thread_entry, member)
+
+#define RTR_EMPTY(rtrp) \
+    ({ (rtrp)->head == NULL; })
+
+#define RTR_THREAD_FIRST(rtrp) \
+    ({ THREAD_FROM((rtrp)->head, rtr); })
+
+#define RTR_THREAD_NEXT(thread) \
+    ({ THREAD_FROM((thread)->rtr.next, rtr); })
+
+#define TMO_THREAD_FIRST(tmop) \
+    ({ struct __tmo_queue *__tmop = (tmop); \
+       __tmop->head ? THREAD_FROM(__tmop->head, tmo) : NULL; })
+
+#define TMO_THREAD_NEXT(thread) \
+    ({ struct __tmo_queue_node *__next = (thread)->tmo.next; \
+       __next ? THREAD_FROM(__next, tmo) : NULL; })
+
+#define WQ_THREAD_FIRST(wqp) \
+    ({ struct __wait_queue *__wqp = (wqp); \
+       __wqp->head ? THREAD_FROM(__wqp->head, wq) : NULL; })
+
+#define WQ_THREAD_NEXT(thread) \
+    ({ struct __wait_queue_node *__next = (thread)->wq.next; \
+       __next ? THREAD_FROM(__next, wq) : NULL; })
+
+void thread_alloc_init(void) INIT_ATTR;
+struct thread_entry * thread_alloc(void);
+void thread_free(struct thread_entry *thread);
+void new_thread_id(struct thread_entry *thread);
 
 /* Switch to next runnable thread */
 void switch_thread(void);
@@ -237,7 +253,21 @@ void switch_thread(void);
  * next tick) */
 void sleep_thread(int ticks);
 /* Blocks the current thread on a thread queue (< 0 == infinite) */
-void block_thread(struct thread_entry *current, int timeout);
+void block_thread_(struct thread_entry *current, int timeout);
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+#define block_thread(thread, timeout, __wqp, bl) \
+    ({ struct thread_entry *__t = (thread);   \
+       __t->wqp = (__wqp);                    \
+       if (!__builtin_constant_p(bl) || (bl)) \
+           __t->blocker = (bl);               \
+       block_thread_(__t, (timeout)); })
+#else
+#define block_thread(thread, timeout, __wqp, bl...) \
+    ({ struct thread_entry *__t = (thread); \
+       __t->wqp = (__wqp);                  \
+       block_thread_(__t, (timeout)); })
+#endif
 
 /* Return bit flags for thread wakeup */
 #define THREAD_NONE     0x0 /* No thread woken up (exclusive) */
@@ -246,7 +276,7 @@ void block_thread(struct thread_entry *current, int timeout);
                                higher priority than current were woken) */
 
 /* A convenience function for waking an entire queue of threads. */
-unsigned int thread_queue_wake(struct thread_entry **list);
+unsigned int wait_queue_wake(struct __wait_queue *wqp);
 
 /* Wakeup a thread at the head of a list */
 enum wakeup_thread_protocol
@@ -257,36 +287,139 @@ enum wakeup_thread_protocol
     WAKEUP_TRANSFER_MULTI,
 };
 
-unsigned int wakeup_thread_(struct thread_entry **list
+unsigned int wakeup_thread_(struct thread_entry *thread
                             IF_PRIO(, enum wakeup_thread_protocol proto));
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-#define wakeup_thread(list, proto) \
-    wakeup_thread_((list), (proto))
-#else /* !HAVE_PRIORITY_SCHEDULING */
-#define wakeup_thread(list, proto...) \
-    wakeup_thread_((list));
-#endif /* HAVE_PRIORITY_SCHEDULING */
-
-#ifdef HAVE_IO_PRIORITY
-void thread_set_io_priority(unsigned int thread_id, int io_priority);
-int thread_get_io_priority(unsigned int thread_id);
-#endif /* HAVE_IO_PRIORITY */
-#if NUM_CORES > 1
-unsigned int switch_core(unsigned int new_core);
+#define wakeup_thread(thread, proto) \
+    wakeup_thread_((thread), (proto))
+#else
+#define wakeup_thread(thread, proto...) \
+    wakeup_thread_((thread));
 #endif
-
-/* Return the id of the calling thread. */
-unsigned int thread_self(void);
-
-/* Return the thread_entry for the calling thread */
-struct thread_entry* thread_self_entry(void);
-
-/* Return thread entry from id */
-struct thread_entry *thread_id_entry(unsigned int thread_id);
 
 #ifdef RB_PROFILE
 void profile_thread(void);
 #endif
+
+static inline void rtr_queue_init(struct __rtr_queue *rtrp)
+{
+    lldc_init(rtrp);
+}
+
+static inline void rtr_queue_make_first(struct __rtr_queue *rtrp,
+                                        struct thread_entry *thread)
+{
+    rtrp->head = &thread->rtr;
+}
+
+static inline void rtr_queue_add(struct __rtr_queue *rtrp,
+                                 struct thread_entry *thread)
+{
+    lldc_insert_last(rtrp, &thread->rtr);
+}
+
+static inline void rtr_queue_remove(struct __rtr_queue *rtrp,
+                                    struct thread_entry *thread)
+{
+    lldc_remove(rtrp, &thread->rtr);
+}
+
+#define TMO_NOT_QUEUED (NULL + 1)
+
+static inline bool tmo_is_queued(struct thread_entry *thread)
+{
+    return thread->tmo.next != TMO_NOT_QUEUED;
+}
+
+static inline void tmo_set_dequeued(struct thread_entry *thread)
+{
+    thread->tmo.next = TMO_NOT_QUEUED;
+}
+
+static inline void tmo_queue_init(struct __tmo_queue *tmop)
+{
+    ll_init(tmop);
+}
+
+static inline void tmo_queue_expire(struct __tmo_queue *tmop,
+                                    struct thread_entry *prev,
+                                    struct thread_entry *thread)
+{
+    ll_remove_next(tmop, prev ? &prev->tmo : NULL);
+    tmo_set_dequeued(thread);
+}
+
+static inline void tmo_queue_remove(struct __tmo_queue *tmop,
+                                    struct thread_entry *thread)
+{
+    if (tmo_is_queued(thread))
+    {
+        ll_remove(tmop, &thread->tmo);
+        tmo_set_dequeued(thread);
+    }
+}
+
+static inline void tmo_queue_register(struct __tmo_queue *tmop,
+                                      struct thread_entry *thread)
+{
+    if (!tmo_is_queued(thread))
+        ll_insert_last(tmop, &thread->tmo);
+}
+
+static inline void wait_queue_init(struct __wait_queue *wqp)
+{
+    lld_init(wqp);
+}
+
+static inline void wait_queue_register(struct thread_entry *thread)
+{
+    lld_insert_last(thread->wqp, &thread->wq);
+}
+
+static inline struct __wait_queue *
+    wait_queue_ptr(struct thread_entry *thread)
+{
+    return thread->wqp;
+}
+
+static inline struct __wait_queue *
+    wait_queue_remove(struct thread_entry *thread)
+{
+    struct __wait_queue *wqp = thread->wqp;
+    thread->wqp = NULL;
+    lld_remove(wqp, &thread->wq);
+    return wqp;
+}
+
+static inline struct __wait_queue *
+    wait_queue_try_remove(struct thread_entry *thread)
+{
+    struct __wait_queue *wqp = thread->wqp;
+    if (wqp)
+    {
+        thread->wqp = NULL;
+        lld_remove(wqp, &thread->wq);
+    }
+
+    return wqp;
+}
+
+static inline void blocker_init(struct blocker *bl)
+{
+    bl->thread = NULL;
+#ifdef HAVE_PRIORITY_SCHEDULING
+    bl->priority = PRIORITY_IDLE;
+#endif
+}
+
+static inline void blocker_splay_init(struct blocker_splay *blsplay)
+{
+    blocker_init(&blsplay->blocker);
+#ifdef HAVE_PRIORITY_SCHEDULING
+    threadbit_clear(&blsplay->mask);
+#endif
+    corelock_init(&blsplay->cl);
+}
 
 #endif /* THREAD_INTERNAL_H */
