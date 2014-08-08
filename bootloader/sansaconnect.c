@@ -19,8 +19,7 @@
 
 #include "system.h"
 #include "lcd.h"
-#include "kernel.h"
-#include "thread.h"
+#include "../kernel-internal.h"
 #include "storage.h"
 #include "disk.h"
 #include "font.h"

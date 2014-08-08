@@ -27,6 +27,7 @@
 #include <inttypes.h>
 #include "config.h"
 #include "gcc_extensions.h"
+#include "../kernel-internal.h"
 #include "lcd.h"
 #ifdef USE_ROCKBOX_USB
 #include "usb.h"

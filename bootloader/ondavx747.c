@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "jz4740.h"
+#include "../kernel-internal.h"
 #include "backlight.h"
 #include "font.h"
 #include "lcd.h"

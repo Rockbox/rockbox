@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 /* Include Standard files */
-#include "kernel.h"
+#include "../kernel-internal.h"
 #include "system.h"
 
 /* Show the Rockbox logo - in show_logo.c */

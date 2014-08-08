@@ -26,6 +26,7 @@
 #include <system.h>
 #include <inttypes.h>
 #include "config.h"
+#include "../kernel-internal.h"
 #include "gcc_extensions.h"
 #include "lcd.h"
 #include "backlight.h"

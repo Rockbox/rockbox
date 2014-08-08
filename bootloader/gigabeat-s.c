@@ -21,7 +21,7 @@
 #include "config.h"
 #include "system.h"
 #include <stdio.h>
-#include "kernel.h"
+#include "../kernel-internal.h"
 #include "gcc_extensions.h"
 #include "string.h"
 #include "adc.h"

@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include "config.h"
 #include "system.h"
-#include "kernel.h"
+#include "../kernel-internal.h"
 #include "gcc_extensions.h"
 #include "lcd.h"
 #include "font.h"
