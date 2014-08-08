@@ -189,10 +189,6 @@ void switch_thread(void)
 #include "thread-pp.c"
 #endif /* CPU_PP */
 
-#ifndef IF_NO_SKIP_YIELD
-#define IF_NO_SKIP_YIELD(...)
-#endif
-
 /*
  * End Processor-specific section
  ***************************************************************************/
@@ -1014,8 +1010,7 @@ unsigned int wakeup_thread_(struct thread_entry **list
         {
             /* No PIP - just boost the thread by aging */
 #ifdef HAVE_PRIORITY_SCHEDULING
-            IF_NO_SKIP_YIELD( if (thread->skip_count != -1) )
-                thread->skip_count = thread->priority;
+            thread->skip_count = thread->priority;
 #endif /* HAVE_PRIORITY_SCHEDULING */
             remove_from_list_l(list, thread);
             core_schedule_wakeup(thread);
@@ -1303,9 +1298,8 @@ void switch_thread(void)
 #endif
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-    IF_NO_SKIP_YIELD( if (thread->skip_count != -1) )
     /* Reset the value of thread's skip count */
-        thread->skip_count = 0;
+    thread->skip_count = 0;
 #endif
 
     for (;;)
@@ -1365,7 +1359,6 @@ void switch_thread(void)
                  * processes aging; they must give up the processor by going
                  * off the run list. */
                 if (LIKELY(priority <= max) ||
-                    IF_NO_SKIP_YIELD( thread->skip_count == -1 || )
                     (priority > PRIORITY_REALTIME &&
                      (diff = priority - max,
                          ++thread->skip_count > diff*diff)))

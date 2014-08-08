@@ -500,14 +500,14 @@ void lcd_remote_off(void)
 
 void lcd_remote_on(void)
 {
-    /* Only wake the remote thread if it's in the blocked state. */
-    struct thread_entry *rc_thread = thread_id_entry(remote_thread_id);
-    if (rc_thread->state == STATE_BLOCKED || (rc_status & RC_FORCE_DETECT))
+    if (semaphore_wait(&rc_thread_wakeup, 0) == OBJ_WAIT_TIMEDOUT ||
+        (rc_status & RC_FORCE_DETECT))
     {
         rc_status &= ~RC_FORCE_DETECT;
         rc_status &= ~RC_POWER_OFF;
-        semaphore_release(&rc_thread_wakeup);
     }
+
+    semaphore_release(&rc_thread_wakeup);
 }
 
 bool remote_detect(void)

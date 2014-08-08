@@ -21,11 +21,6 @@
  *
  ****************************************************************************/
 
-#if defined(MAX_PHYS_SECTOR_SIZE) && MEMORYSIZE == 64
-/* Support a special workaround object for large-sector disks */
-#define IF_NO_SKIP_YIELD(...) __VA_ARGS__
-#endif
-
 #if NUM_CORES == 1
 /* Single-core variants for FORCE_SINGLE_CORE */
 static inline void core_sleep(void)
