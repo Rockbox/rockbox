@@ -22,7 +22,6 @@
 #ifndef SEMAPHORE_H
 #define SEMAPHORE_H
 
-#include "config.h"
 #include "thread.h"
 
 struct semaphore

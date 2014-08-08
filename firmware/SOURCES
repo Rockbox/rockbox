@@ -1838,6 +1838,7 @@ target/hosted/sdl/thread-sdl.c
 #else
 kernel/thread.c
 #endif
+kernel/thread-common.c
 kernel/tick.c
 #ifdef INCLUDE_TIMEOUT_API
 kernel/timeout.c

@@ -18,12 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <string.h>
-#include "config.h"
-#include "system.h"
-#include "thread.h"
-#include "kernel.h"
 #include "kernel-internal.h"
+#include "mrsw-lock.h"
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 
@@ -45,9 +41,7 @@ mrsw_reader_relinquish(struct mrsw_lock *mrsw, struct thread_entry *current,
        Therefore, if the queue has threads, then the next after the
        owning readers is a writer and this is not the last reader. */
     if (mrsw->queue)
-    {
         corelock_lock(&mrsw->splay.cl);
-    }
 
     threadbit_clear_bit(&mrsw->splay.mask, slotnum);
 

@@ -28,11 +28,7 @@
 #undef _FORTIFY_SOURCE
 #endif
 
-#include <stdbool.h>
-#include <stdio.h>
-#include "thread.h"
-#include "panic.h"
-#include "system.h"
+#include "thread-internal.h"
 #include "kernel.h"
 #include "cpu.h"
 #include "string.h"
@@ -40,8 +36,6 @@
 #include <profile.h>
 #endif
 #include "core_alloc.h"
-#include "gcc_extensions.h"
-#include "corelock.h"
 
 /****************************************************************************
  *                              ATTENTION!!                                 *
@@ -131,7 +125,6 @@
 
 /* Cast to the the machine pointer size, whose size could be < 4 or > 32
  * (someday :). */
-#define DEADBEEF ((uintptr_t)0xdeadbeefdeadbeefull)
 static struct core_entry cores[NUM_CORES] IBSS_ATTR;
 struct thread_entry threads[MAXTHREADS] IBSS_ATTR;
 
@@ -204,56 +197,35 @@ void switch_thread(void)
  * End Processor-specific section
  ***************************************************************************/
 
-#if THREAD_EXTRA_CHECKS
-static void thread_panicf(const char *msg, struct thread_entry *thread)
+static NO_INLINE
+  void thread_panicf(const char *msg, struct thread_entry *thread)
 {
     IF_COP( const unsigned int core = thread->core; )
-    static char name[32];
-    thread_get_name(name, 32, thread);
+    static char namebuf[sizeof (((struct thread_debug_info *)0)->name)];
+    const char *name = thread->name;
+    if (!name)
+        name = "";
+    snprintf(namebuf, sizeof (namebuf), *name ? "%s" : "%s%08lX",
+             name, (unsigned long)thread->id);
     panicf ("%s %s" IF_COP(" (%d)"), msg, name IF_COP(, core));
 }
+
 static void thread_stkov(struct thread_entry *thread)
 {
     thread_panicf("Stkov", thread);
 }
+
+#if THREAD_EXTRA_CHECKS
 #define THREAD_PANICF(msg, thread) \
     thread_panicf(msg, thread)
 #define THREAD_ASSERT(exp, msg, thread) \
     ({ if (!({ exp; })) thread_panicf((msg), (thread)); })
 #else
-static void thread_stkov(struct thread_entry *thread)
-{
-    IF_COP( const unsigned int core = thread->core; )
-    static char name[32];
-    thread_get_name(name, 32, thread);
-    panicf("Stkov %s" IF_COP(" (%d)"), name IF_COP(, core));
-}
-#define THREAD_PANICF(msg, thread)
-#define THREAD_ASSERT(exp, msg, thread)
+#define THREAD_PANICF(msg, thread) \
+    do {} while (0)
+#define THREAD_ASSERT(exp, msg, thread) \
+    do {} while (0)
 #endif /* THREAD_EXTRA_CHECKS */
-
-/* Thread locking */
-#if NUM_CORES > 1
-#define LOCK_THREAD(thread) \
-    ({ corelock_lock(&(thread)->slot_cl); })
-#define TRY_LOCK_THREAD(thread) \
-    ({ corelock_try_lock(&(thread)->slot_cl); })
-#define UNLOCK_THREAD(thread) \
-    ({ corelock_unlock(&(thread)->slot_cl); })
-#define UNLOCK_THREAD_AT_TASK_SWITCH(thread) \
-    ({ unsigned int _core = (thread)->core; \
-       cores[_core].blk_ops.flags |= TBOP_UNLOCK_CORELOCK; \
-       cores[_core].blk_ops.cl_p = &(thread)->slot_cl; })
-#else
-#define LOCK_THREAD(thread) \
-    ({ (void)(thread); })
-#define TRY_LOCK_THREAD(thread) \
-    ({ (void)(thread); })
-#define UNLOCK_THREAD(thread) \
-    ({ (void)(thread); })
-#define UNLOCK_THREAD_AT_TASK_SWITCH(thread) \
-    ({ (void)(thread); })
-#endif
 
 /* RTR list */
 #define RTR_LOCK(core) \
@@ -993,27 +965,6 @@ static void wakeup_thread_release(struct thread_entry *thread)
     inherit_priority(bl, bl, blt, newblpr);
 }
 
-/*---------------------------------------------------------------------------
- * No threads must be blocked waiting for this thread except for it to exit.
- * The alternative is more elaborate cleanup and object registration code.
- * Check this for risk of silent data corruption when objects with
- * inheritable blocking are abandoned by the owner - not precise but may
- * catch something.
- *---------------------------------------------------------------------------
- */
-static void __attribute__((noinline)) check_for_obj_waiters(
-    const char *function, struct thread_entry *thread)
-{
-    /* Only one bit in the mask should be set with a frequency on 1 which
-     * represents the thread's own base priority */
-    if (priobit_popcount(&thread->pdist.mask) != 1 ||
-        thread->pdist.hist[priobit_ffs(&thread->pdist.mask)] > 1)
-    {
-        unsigned char name[32];
-        thread_get_name(name, 32, thread);
-        panicf("%s->%s with obj. waiters", function, name);
-    }
-}
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
 /*---------------------------------------------------------------------------
@@ -1520,31 +1471,6 @@ void block_thread(struct thread_entry *current, int timeout)
 }
 
 /*---------------------------------------------------------------------------
- * Wakeup an entire queue of threads - returns bitwise-or of return bitmask
- * from each operation or THREAD_NONE of nothing was awakened. Object owning
- * the queue must be locked first.
- *
- * INTERNAL: Intended for use by kernel objects and not for programs.
- *---------------------------------------------------------------------------
- */
-unsigned int thread_queue_wake(struct thread_entry **list)
-{
-    unsigned result = THREAD_NONE;
-
-    for (;;)
-    {
-        unsigned int rc = wakeup_thread(list, WAKEUP_DEFAULT);
-
-        if (rc == THREAD_NONE)
-            break; /* No more threads */
-
-        result |= rc;
-    }
-
-    return result;
-}
-
-/*---------------------------------------------------------------------------
  * Assign the thread slot a new ID. Version is 0x00000100..0xffffff00.
  *---------------------------------------------------------------------------
  */
@@ -1580,7 +1506,7 @@ static struct thread_entry * find_empty_thread_slot(void)
         struct thread_entry *t = &threads[n];
         LOCK_THREAD(t);
 
-        if (t->state == STATE_KILLED IF_COP( && t->name != THREAD_DESTRUCT ))
+        if (t->state == STATE_KILLED)
         {
             /* Slot is empty - leave it locked and caller will unlock */
             thread = t;
@@ -1836,21 +1762,14 @@ void thread_exit(void)
     corelock_lock(&current->waiter_cl);
     LOCK_THREAD(current);
 
-#if defined (ALLOW_REMOVE_THREAD) && NUM_CORES > 1
-    if (current->name == THREAD_DESTRUCT)
-    {
-        /* Thread being killed - become a waiter */
-        unsigned int id = current->id;
-        UNLOCK_THREAD(current);
-        corelock_unlock(&current->waiter_cl);
-        thread_wait(id);
-        THREAD_PANICF("thread_exit->WK:*R", current);
-    }
-#endif
-
 #ifdef HAVE_PRIORITY_SCHEDULING
-    check_for_obj_waiters("thread_exit", current);
-#endif
+    /* Only one bit in the mask should be set with a frequency on 1 which
+     * represents the thread's own base priority otherwise threads are waiting
+     * on an abandoned object */
+    if (priobit_popcount(&current->pdist.mask) != 1 ||
+        current->pdist.hist[priobit_ffs(&current->pdist.mask)] > 1)
+        thread_panicf("abandon ship!", current);
+#endif /* HAVE_PRIORITY_SCHEDULING */
 
     if (current->tmo.prev != NULL)
     {
@@ -1871,186 +1790,6 @@ void thread_exit(void)
     /* Do final cleanup and remove the thread */
     thread_final_exit(current);
 }
-
-#ifdef ALLOW_REMOVE_THREAD
-/*---------------------------------------------------------------------------
- * Remove a thread from the scheduler. Not The Right Way to Do Things in
- * normal programs.
- *
- * Parameter is the ID as returned from create_thread().
- *
- * Use with care on threads that are not under careful control as this may
- * leave various objects in an undefined state.
- *---------------------------------------------------------------------------
- */
-void remove_thread(unsigned int thread_id)
-{
-#ifdef HAVE_CORELOCK_OBJECT
-    /* core is not constant here because of core switching */
-    unsigned int core = CURRENT_CORE;
-    unsigned int old_core = NUM_CORES;
-    struct corelock *ocl = NULL;
-#else
-    const unsigned int core = CURRENT_CORE;
-#endif
-    struct thread_entry *current = cores[core].running;
-    struct thread_entry *thread = thread_id_entry(thread_id);
-
-    unsigned state;
-    int oldlevel;
-
-    if (thread == current)
-        thread_exit(); /* Current thread - do normal exit */
-
-    oldlevel = disable_irq_save();
-
-    corelock_lock(&thread->waiter_cl);
-    LOCK_THREAD(thread);
-
-    state = thread->state;
-
-    if (thread->id != thread_id || state == STATE_KILLED)
-        goto thread_killed;
-
-#if NUM_CORES > 1
-    if (thread->name == THREAD_DESTRUCT)
-    {
-        /* Thread being killed - become a waiter */
-        UNLOCK_THREAD(thread);
-        corelock_unlock(&thread->waiter_cl);
-        restore_irq(oldlevel);
-        thread_wait(thread_id);
-        return;
-    }
-
-    thread->name = THREAD_DESTRUCT; /* Slot can't be used for now */
-
-#ifdef HAVE_PRIORITY_SCHEDULING
-    check_for_obj_waiters("remove_thread", thread);
-#endif
-
-    if (thread->core != core)
-    {
-        /* Switch cores and safely extract the thread there */
-        /* Slot HAS to be unlocked or a deadlock could occur which means other
-         * threads have to be guided into becoming thread waiters if they
-         * attempt to remove it. */
-        unsigned int new_core = thread->core;
-
-        corelock_unlock(&thread->waiter_cl);
-
-        UNLOCK_THREAD(thread);
-        restore_irq(oldlevel);
-
-        old_core = switch_core(new_core);
-
-        oldlevel = disable_irq_save();
-
-        corelock_lock(&thread->waiter_cl);
-        LOCK_THREAD(thread);
-
-        state = thread->state;
-        core = new_core;
-        /* Perform the extraction and switch ourselves back to the original
-           processor */
-    }
-#endif /* NUM_CORES > 1 */
-
-    if (thread->tmo.prev != NULL)
-    {
-        /* Clean thread off the timeout list if a timeout check hasn't
-         * run yet */
-        remove_from_list_tmo(thread);
-    }
-
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-    /* Cancel CPU boost if any */
-    boost_thread(thread, false);
-#endif
-
-IF_COP( retry_state: )
-
-    switch (state)
-    {
-    case STATE_RUNNING:
-        RTR_LOCK(core);
-        /* Remove thread from ready to run tasks */
-        remove_from_list_l(&cores[core].running, thread);
-        rtr_subtract_entry(core, thread->priority);
-        RTR_UNLOCK(core);
-        break;
-    case STATE_BLOCKED:
-    case STATE_BLOCKED_W_TMO:
-        /* Remove thread from the queue it's blocked on - including its
-         * own if waiting there */
-#if NUM_CORES > 1
-        if (&thread->waiter_cl != thread->obj_cl)
-        {
-            ocl = thread->obj_cl;
-
-            if (UNLIKELY(corelock_try_lock(ocl) == 0))
-            {
-                UNLOCK_THREAD(thread);
-                corelock_lock(ocl);
-                LOCK_THREAD(thread);
-
-                if (UNLIKELY(thread->state != state))
-                {
-                    /* Something woke the thread */
-                    state = thread->state;
-                    corelock_unlock(ocl);
-                    goto retry_state;
-                }
-            }
-        }
-#endif
-#ifdef HAVE_WAKEUP_EXT_CB
-        if (thread->wakeup_ext_cb != NULL)
-            thread->wakeup_ext_cb(thread);
-#endif
-
-#ifdef HAVE_PRIORITY_SCHEDULING
-        /* Remove thread's priority influence from its chain if needed */
-        if (thread->blocker != NULL)
-            wakeup_priority_protocol_release(thread);
-        else
-#endif
-            remove_from_list_l(thread->bqp, thread);
-
-#if NUM_CORES > 1
-        if (ocl != NULL)
-            corelock_unlock(ocl);
-#endif
-        break;
-    /* Otherwise thread is frozen and hasn't run yet */
-    }
-
-    new_thread_id(thread_id, thread);
-    thread->state = STATE_KILLED;
-
-    /* If thread was waiting on itself, it will have been removed above.
-     * The wrong order would result in waking the thread first and deadlocking
-     * since the slot is already locked. */
-    thread_queue_wake(&thread->queue);
-
-    thread->name = NULL;
-
-thread_killed: /* Thread was already killed */
-    /* Removal complete - safe to unlock and reenable interrupts */
-    corelock_unlock(&thread->waiter_cl);
-    UNLOCK_THREAD(thread);
-    restore_irq(oldlevel);
-
-#if NUM_CORES > 1
-    if (old_core < NUM_CORES)
-    {
-        /* Did a removal on another processor's thread - switch back to
-           native core */
-        switch_core(old_core);
-    }
-#endif
-}
-#endif /* ALLOW_REMOVE_THREAD */
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 /*---------------------------------------------------------------------------
@@ -2205,19 +1944,8 @@ unsigned int switch_core(unsigned int new_core)
         return core;
     }
 
-    int oldlevel = disable_irq_save();
+    disable_irq();
     LOCK_THREAD(current);
-
-    if (current->name == THREAD_DESTRUCT)
-    {
-        /* Thread being killed - deactivate and let process complete */
-        unsigned int id = current->id;
-        UNLOCK_THREAD(current);
-        restore_irq(oldlevel);
-        thread_wait(id);
-        /* Should never be reached */
-        THREAD_PANICF("switch_core->D:*R", current);
-    }
 
     /* Get us off the running list for the current core */
     RTR_LOCK(core);
@@ -2274,7 +2002,7 @@ unsigned int switch_core(unsigned int new_core)
  * are safe to perform.
  *---------------------------------------------------------------------------
  */
-void init_threads(void)
+void INIT_ATTR init_threads(void)
 {
     const unsigned int core = CURRENT_CORE;
     struct thread_entry *thread;
@@ -2351,82 +2079,6 @@ void init_threads(void)
 #ifdef INIT_MAIN_THREAD
     init_main_thread(&thread->context);
 #endif
-}
-
-/* Shared stack scan helper for thread_stack_usage and idle_stack_usage */
-#if NUM_CORES == 1
-static inline int stack_usage(uintptr_t *stackptr, size_t stack_size)
-#else
-static int stack_usage(uintptr_t *stackptr, size_t stack_size)
-#endif
-{
-    unsigned int stack_words = stack_size / sizeof (uintptr_t);
-    unsigned int i;
-    int usage = 0;
-
-    for (i = 0; i < stack_words; i++)
-    {
-        if (stackptr[i] != DEADBEEF)
-        {
-            usage = ((stack_words - i) * 100) / stack_words;
-            break;
-        }
-    }
-
-    return usage;
-}
-
-/*---------------------------------------------------------------------------
- * Returns the maximum percentage of stack a thread ever used while running.
- * NOTE: Some large buffer allocations that don't use enough the buffer to
- * overwrite stackptr[0] will not be seen.
- *---------------------------------------------------------------------------
- */
-int thread_stack_usage(const struct thread_entry *thread)
-{
-    if (LIKELY(thread->stack_size > 0))
-        return stack_usage(thread->stack, thread->stack_size);
-    return 0;
-}
-
-#if NUM_CORES > 1
-/*---------------------------------------------------------------------------
- * Returns the maximum percentage of the core's idle stack ever used during
- * runtime.
- *---------------------------------------------------------------------------
- */
-int idle_stack_usage(unsigned int core)
-{
-    return stack_usage(idle_stacks[core], IDLE_STACK_SIZE);
-}
-#endif
-
-/*---------------------------------------------------------------------------
- * Fills in the buffer with the specified thread's name. If the name is NULL,
- * empty, or the thread is in destruct state a formatted ID is written
- * instead.
- *---------------------------------------------------------------------------
- */
-void thread_get_name(char *buffer, int size,
-                     struct thread_entry *thread)
-{
-    if (size <= 0)
-        return;
-
-    *buffer = '\0';
-
-    if (thread)
-    {
-        /* Display thread name if one or ID if none */
-        const char *name = thread->name;
-        const char *fmt = "%s";
-        if (name == NULL IF_COP(|| name == THREAD_DESTRUCT) || *name == '\0')
-        {
-            name = (const char *)(uintptr_t)thread->id;
-            fmt = "%04lX";
-        }
-        snprintf(buffer, size, fmt, name);
-    }
 }
 
 /* Unless otherwise defined, do nothing */

@@ -28,10 +28,7 @@
 #include <setjmp.h>
 #include "system-sdl.h"
 #include "thread-sdl.h"
-#include "system.h"
-#include "kernel.h"
-#include "thread.h"
-#include "debug.h"
+#include "../kernel-internal.h"
 #include "core_alloc.h"
 
 /* Define this as 1 to show informational messages that are not errors. */
@@ -165,6 +162,7 @@ static struct thread_entry * find_empty_thread_slot(void)
 /* Initialize SDL threading */
 void init_threads(void)
 {
+    static uintptr_t main_stack[] = { DEADBEEF, 0 };
     struct thread_entry *thread;
     int n;
 
@@ -187,8 +185,8 @@ void init_threads(void)
        then create the SDL thread - it is possible to have a quick, early
        shutdown try to access the structure. */
     thread = &threads[0];
-    thread->stack = (uintptr_t *)"       ";
-    thread->stack_size = 8;
+    thread->stack = main_stack;
+    thread->stack_size = sizeof (main_stack);
     thread->name = "main";
     thread->state = STATE_RUNNING;
     thread->context.s = SDL_CreateSemaphore(0);
@@ -439,23 +437,6 @@ unsigned int wakeup_thread_(struct thread_entry **list)
     return THREAD_NONE;
 }
 
-unsigned int thread_queue_wake(struct thread_entry **list)
-{
-    unsigned int result = THREAD_NONE;
-
-    for (;;)
-    {
-        unsigned int rc = wakeup_thread_(list);
-
-        if (rc == THREAD_NONE)
-            break;
-
-        result |= rc;
-    }
-
-    return result;
-}
-
 void thread_thaw(unsigned int thread_id)
 {
     struct thread_entry *thread = thread_id_entry(thread_id);
@@ -542,6 +523,10 @@ unsigned int create_thread(void (*function)(void),
         return 0;
     }
 
+    unsigned int stack_words = stack_size / sizeof (uintptr_t);
+    for (unsigned int i = stack_words; i-- > 0;)
+        ((uintptr_t *)stack)[i] = DEADBEEF;
+
     thread->stack = stack;
     thread->stack_size = stack_size;
     thread->name = name;
@@ -557,11 +542,7 @@ unsigned int create_thread(void (*function)(void),
     return thread->id;
 }
 
-#ifndef ALLOW_REMOVE_THREAD
 static void remove_thread(unsigned int thread_id)
-#else
-void remove_thread(unsigned int thread_id)
-#endif
 {
     struct thread_entry *current = cores[CURRENT_CORE].running;
     struct thread_entry *thread = thread_id_entry(thread_id);
@@ -657,41 +638,6 @@ void thread_wait(unsigned int thread_id)
     }
 }
 
-int thread_stack_usage(const struct thread_entry *thread)
-{
-    return 50;
-    (void)thread;
-}
-
-/* Return name if one or ID if none */
-void thread_get_name(char *buffer, int size,
-                     struct thread_entry *thread)
-{
-    if (size <= 0)
-        return;
-
-    *buffer = '\0';
-
-    if (thread)
-    {
-        /* Display thread name if one or ID if none */
-        bool named = thread->name && *thread->name;
-        const char *fmt = named ? "%s" : "%04lX";
-        intptr_t name = named ?
-            (intptr_t)thread->name : (intptr_t)thread->id;
-        snprintf(buffer, size, fmt, name);
-    }
-}
-
-/* Unless otherwise defined, do nothing */
-#ifndef YIELD_KERNEL_HOOK
-#define YIELD_KERNEL_HOOK() false
-#endif
-#ifndef SLEEP_KERNEL_HOOK
-#define SLEEP_KERNEL_HOOK(ticks) false
-#endif
-
-
 /*---------------------------------------------------------------------------
  * Suspends a thread's execution for at least the specified number of ticks.
  *
@@ -707,11 +653,6 @@ void thread_get_name(char *buffer, int size,
  */
 unsigned sleep(unsigned ticks)
 {
-    /* In certain situations, certain bootloaders in particular, a normal
-     * threading call is inappropriate. */
-    if (SLEEP_KERNEL_HOOK(ticks))
-        return 0; /* Handled */
-
     disable_irq();
     sleep_thread(ticks);
     switch_thread();
@@ -725,10 +666,5 @@ unsigned sleep(unsigned ticks)
  */
 void yield(void)
 {
-    /* In certain situations, certain bootloaders in particular, a normal
-     * threading call is inappropriate. */
-    if (YIELD_KERNEL_HOOK())
-        return; /* handled */
-
     switch_thread();
 }

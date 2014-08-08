@@ -194,23 +194,6 @@ static void remove_from_list_l(struct thread_entry **list,
     thread->l.next->l.prev = thread->l.prev;
 }
 
-unsigned int thread_queue_wake(struct thread_entry **list)
-{
-    unsigned int result = THREAD_NONE;
-
-    for (;;)
-    {
-        unsigned int rc = wakeup_thread(list);
-
-        if (rc == THREAD_NONE)
-            break;
-
-        result |= rc;        
-    }
-
-    return result;
-}
-
 /* for block_thread(), _w_tmp() and wakeup_thread() t->lock must point
  * to a corelock instance, and this corelock must be held by the caller */
 void block_thread_switch(struct thread_entry *t, struct corelock *cl)

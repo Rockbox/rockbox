@@ -18,18 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-
-/****************************************************************************
- * Simple mutex functions ;)
- ****************************************************************************/
-
-#include <stdbool.h>
-#include "config.h"
-#include "kernel.h"
-#include "semaphore.h"
 #include "kernel-internal.h"
-#include "thread-internal.h"
+#include "semaphore.h"
 
 /****************************************************************************
  * Simple semaphore functions ;)

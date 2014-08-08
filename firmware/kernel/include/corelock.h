@@ -28,10 +28,14 @@
 #ifndef HAVE_CORELOCK_OBJECT
 
 /* No atomic corelock op needed or just none defined */
-#define corelock_init(cl)
-#define corelock_lock(cl)
-#define corelock_try_lock(cl)
-#define corelock_unlock(cl)
+#define corelock_init(cl) \
+    do {} while (0)
+#define corelock_lock(cl) \
+    do {} while (0)
+#define corelock_try_lock(cl) \
+    do {} while (0)
+#define corelock_unlock(cl) \
+    do {} while (0)
 
 #else
 

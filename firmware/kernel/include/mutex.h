@@ -22,8 +22,6 @@
 #ifndef MUTEX_H
 #define MUTEX_H
 
-#include <stdbool.h>
-#include "config.h"
 #include "thread.h"
 
 struct mutex

@@ -23,13 +23,8 @@
 /****************************************************************************
  * Simple mutex functions ;)
  ****************************************************************************/
-
-#include <stdbool.h>
-#include "config.h"
-#include "system.h"
-#include "kernel.h"
-#include "thread-internal.h"
 #include "kernel-internal.h"
+#include "mutex.h"
 
 /* Initialize a mutex object - call before any use and do not call again once
  * the object is available to other threads */

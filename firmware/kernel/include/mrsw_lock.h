@@ -21,6 +21,8 @@
 #ifndef MRSW_LOCK_H
 #define MRSW_LOCK_H
 
+#include "thread.h"
+
 /* Multi-reader, single-writer object that allows mutltiple readers or a
  * single writer thread access to a critical section.
  *

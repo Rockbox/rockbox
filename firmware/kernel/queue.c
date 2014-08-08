@@ -18,16 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include <string.h>
-#include "config.h"
-#include "kernel.h"
-#include "system.h"
-#include "queue.h"
-#include "corelock.h"
 #include "kernel-internal.h"
+#include "queue.h"
 #include "general.h"
-#include "panic.h"
 
 /* This array holds all queues that are initiated. It is used for broadcast. */
 static struct

@@ -22,8 +22,8 @@
 #ifndef KERNEL_INTERNAL_H
 #define KERNEL_INTERNAL_H
 
-#include "config.h"
-#include "debug.h"
+#include "thread-internal.h"
+#include "kernel.h"
 
 /* Make this nonzero to enable more elaborate checks on objects */
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -45,5 +45,23 @@
 #define KERNEL_ASSERT(exp, msg...) ({})
 #endif
 
+static inline void kernel_init(void)
+{
+    /* Init the threading API */
+    extern void init_threads(void);
+    init_threads();
+
+    /* Other processors will not reach this point in a multicore build.
+     * In a single-core build with multiple cores they fall-through and
+     * sleep in cop_main without returning. */
+    if (CURRENT_CORE == CPU)
+    {
+        init_queues();
+        init_tick();
+#ifdef KDEV_INIT
+        kernel_device_init();
+#endif
+    }
+}
 
 #endif /* KERNEL_INTERNAL_H */

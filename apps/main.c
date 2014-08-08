@@ -28,7 +28,7 @@
 #include "rtc.h"
 #include "debug.h"
 #include "led.h"
-#include "kernel.h"
+#include "../kernel-internal.h"
 #include "button.h"
 #include "tree.h"
 #include "filetypes.h"
@@ -44,7 +44,6 @@
 #endif
 #include "audio.h"
 #include "mp3_playback.h"
-#include "thread.h"
 #include "settings.h"
 #include "backlight.h"
 #include "status.h"

@@ -133,69 +133,44 @@
 
 #include "talk.h"
 
-/*---------------------------------------------------*/
-/*    SPECIAL DEBUG STUFF                            */
-/*---------------------------------------------------*/
-extern struct thread_entry threads[MAXTHREADS];
-
-static char thread_status_char(unsigned status)
-{
-    static const char thread_status_chars[THREAD_NUM_STATES+1] =
-    {
-        [0 ... THREAD_NUM_STATES] = '?',
-        [STATE_RUNNING]           = 'R',
-        [STATE_BLOCKED]           = 'B',
-        [STATE_SLEEPING]          = 'S',
-        [STATE_BLOCKED_W_TMO]     = 'T',
-        [STATE_FROZEN]            = 'F',
-        [STATE_KILLED]            = 'K',
-    };
-
-    if (status > THREAD_NUM_STATES)
-        status = THREAD_NUM_STATES;
-
-    return thread_status_chars[status];
-}
-
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
 {
     (void)data;
-    struct thread_entry *thread;
-    char name[32];
 
 #if NUM_CORES > 1
     if (selected_item < (int)NUM_CORES)
     {
+        struct core_debug_info coreinfo;
+        core_get_debug_info(selected_item, &coreinfo);
         snprintf(buffer, buffer_len, "Idle (%d): %2d%%", selected_item,
-                 idle_stack_usage(selected_item));
+                 coreinfo.idle_stack_usage);
         return buffer;
     }
 
     selected_item -= NUM_CORES;
 #endif
 
-    thread = &threads[selected_item];
-
-    if (thread->state == STATE_KILLED)
+    struct thread_debug_info threadinfo;
+    if (thread_get_debug_info(selected_item, &threadinfo) <= 0)
     {
         snprintf(buffer, buffer_len, "%2d: ---", selected_item);
         return buffer;
     }
 
-    thread_get_name(name, 32, thread);
-
     snprintf(buffer, buffer_len,
-             "%2d: " IF_COP("(%d) ") "%c%c " IF_PRIO("%d %d ") "%2d%% %s",
+             "%2d: " IF_COP("(%d) ") "%s " IF_PRIO("%d %d ") "%2d%% %s",
              selected_item,
-             IF_COP(thread->core,)
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-             (thread->cpu_boost) ? '+' :
+#if NUM_CORES > 1
+             threadinfo.core,
 #endif
-                 ((thread->state == STATE_RUNNING) ? '*' : ' '),
-             thread_status_char(thread->state),
-             IF_PRIO(thread->base_priority, thread->priority, )
-             thread_stack_usage(thread), name);
+             threadinfo.statusstr,
+#ifdef HAVE_PRIORITY_SCHEDULING
+             threadinfo.base_priority,
+             threadinfo.current_priority,
+#endif
+             threadinfo.stack_usage,
+             threadinfo.name);
 
     return buffer;
 }
@@ -203,19 +178,6 @@ static const char* threads_getname(int selected_item, void *data,
 static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 {
     (void)lists;
-#ifdef ROCKBOX_HAS_LOGF
-    if (action == ACTION_STD_OK)
-    {
-        int selpos = gui_synclist_get_sel_pos(lists);
-#if NUM_CORES > 1
-        if (selpos >= NUM_CORES)
-            remove_thread(threads[selpos - NUM_CORES].id);
-#else
-        remove_thread(threads[selpos].id);
-#endif
-        return ACTION_REDRAW;
-    }
-#endif /* ROCKBOX_HAS_LOGF */
     if (action == ACTION_NONE)
         action = ACTION_REDRAW;
     return action;

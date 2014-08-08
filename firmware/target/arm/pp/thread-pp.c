@@ -45,7 +45,7 @@ extern uintptr_t cpu_idlestackbegin[];
 extern uintptr_t cpu_idlestackend[];
 extern uintptr_t cop_idlestackbegin[];
 extern uintptr_t cop_idlestackend[];
-static uintptr_t * const idle_stacks[NUM_CORES] =
+uintptr_t * const idle_stacks[NUM_CORES] =
 {
     [CPU] = cpu_idlestackbegin,
     [COP] = cop_idlestackbegin
@@ -92,9 +92,7 @@ static inline void NORETURN_ATTR __attribute__((always_inline))
 {
     asm volatile (
         "cmp    %1, #0               \n" /* CPU? */
-        "ldrne  r0, =commit_dcache   \n" /* No? write back data */
-        "movne  lr, pc               \n"
-        "bxne   r0                   \n"
+        "blne   commit_dcache        \n"
         "mov    r0, %0               \n" /* copy thread parameter */
         "mov    sp, %2               \n" /* switch to idle stack  */
         "bl     thread_final_exit_do \n" /* finish removal        */
@@ -163,9 +161,7 @@ static void __attribute__((naked))
         "ldr    sp, [r0, #32]            \n" /* Reload original sp from context structure */
         "mov    r1, #0                   \n" /* Clear start address */
         "str    r1, [r0, #40]            \n"
-        "ldr    r0, =commit_discard_idcache \n" /* Invalidate new core's cache */
-        "mov    lr, pc                   \n"
-        "bx     r0                       \n"
+        "bl     commit_discard_idcache   \n" /* Invalidate new core's cache */
         "ldmfd  sp!, { r4-r11, pc }      \n" /* Restore non-volatile context to new core and return */
         : : "i"(IDLE_STACK_WORDS)
     );

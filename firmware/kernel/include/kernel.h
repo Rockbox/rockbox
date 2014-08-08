@@ -48,23 +48,4 @@
 #define TIMEOUT_BLOCK   -1
 #define TIMEOUT_NOBLOCK  0
 
-static inline void kernel_init(void)
-{
-    /* Init the threading API */
-    init_threads();
-
-    /* Other processors will not reach this point in a multicore build.
-     * In a single-core build with multiple cores they fall-through and
-     * sleep in cop_main without returning. */
-    if (CURRENT_CORE == CPU)
-    {
-        init_queues();
-        init_tick();
-#ifdef KDEV_INIT
-        kernel_device_init();
-#endif
-    }
-}
-
-
 #endif /* KERNEL_H */
