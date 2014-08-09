@@ -16,7 +16,19 @@ namespace
 enum
 {
     RegTreeDevType = QTreeWidgetItem::UserType,
-    RegTreeRegType
+    RegTreeRegType,
+    RegTreeSocType
+};
+
+class SocTreeItem : public QTreeWidgetItem
+{
+public:
+    SocTreeItem(const QString& string, const SocRef& ref)
+        :QTreeWidgetItem(QStringList(string), RegTreeSocType), m_ref(ref) {}
+
+    const SocRef& GetRef() { return m_ref; }
+private:
+    SocRef m_ref;
 };
 
 class DevTreeItem : public QTreeWidgetItem
@@ -293,6 +305,11 @@ void RegTab::OnRegItemClicked(QTreeWidgetItem *current, int col)
     Q_UNUSED(col);
     if(current == 0)
         return;
+    if(current->type() == RegTreeSocType)
+    {
+        SocTreeItem *item = dynamic_cast< SocTreeItem * >(current);
+        DisplaySoc(item->GetRef());
+    }
     if(current->type() == RegTreeRegType)
     {
         RegTreeItem *item = dynamic_cast< RegTreeItem * >(current);
@@ -327,6 +344,11 @@ void RegTab::DisplayRegister(const SocRegRef& ref)
 void RegTab::DisplayDevice(const SocDevRef& ref)
 {
     SetPanel(new DevDisplayPanel(this, ref));
+}
+
+void RegTab::DisplaySoc(const SocRef& ref)
+{
+    SetPanel(new SocDisplayPanel(this, ref));
 }
 
 void RegTab::SetPanel(RegTabPanel *panel)
@@ -410,19 +432,30 @@ void RegTab::FillDevSubTree(QTreeWidgetItem *_item)
     }
 }
 
-void RegTab::FillRegTree()
+void RegTab::FillSocSubTree(QTreeWidgetItem *_item)
 {
-    for(size_t i = 0; i < m_cur_soc.GetSoc().dev.size(); i++)
+    SocTreeItem *item = dynamic_cast< SocTreeItem* >(_item);
+    const soc_t& soc = item->GetRef().GetSoc();
+    for(size_t i = 0; i < soc.dev.size(); i++)
     {
-        const soc_dev_t& dev = m_cur_soc.GetSoc().dev[i];
+        const soc_dev_t& dev = soc.dev[i];
         for(size_t j = 0; j < dev.addr.size(); j++)
         {
             DevTreeItem *dev_item = new DevTreeItem(dev.addr[j].name.c_str(),
                 SocDevRef(m_cur_soc, i, j));
             FillDevSubTree(dev_item);
-            m_reg_tree->addTopLevelItem(dev_item);
+            item->addChild(dev_item);
         }
     }
+}
+
+void RegTab::FillRegTree()
+{
+    SocTreeItem *soc_item = new SocTreeItem(m_cur_soc.GetSoc().name.c_str(),
+        m_cur_soc);
+    FillSocSubTree(soc_item);
+    m_reg_tree->addTopLevelItem(soc_item);
+    m_reg_tree->expandItem(soc_item);
 }
 
 void RegTab::FillAnalyserList()

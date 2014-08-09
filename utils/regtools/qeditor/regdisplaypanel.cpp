@@ -17,6 +17,40 @@ QByteArray RegItemEditorCreator::valuePropertyName () const
 }
 
 /**
+ * SocDisplayPanel
+ */
+SocDisplayPanel::SocDisplayPanel(QWidget *parent, const SocRef& dev_ref)
+    :QGroupBox(parent), m_soc(dev_ref)
+{
+    QVBoxLayout *right_layout = new QVBoxLayout;
+
+    m_name = new QLabel(this);
+    m_name->setTextFormat(Qt::RichText);
+    m_name->setText("<h1>" + QString::fromStdString(m_soc.GetSoc().name) + "</h1>");
+
+    m_desc = new QLabel(this);
+    m_name->setTextFormat(Qt::RichText);
+    m_desc->setText(QString::fromStdString(m_soc.GetSoc().desc));
+
+    right_layout->addWidget(m_name, 0);
+    right_layout->addWidget(m_desc, 0);
+    right_layout->addStretch(1);
+
+    setTitle("System-on-Chip Description");
+    setLayout(right_layout);
+}
+
+void SocDisplayPanel::AllowWrite(bool en)
+{
+    Q_UNUSED(en);
+}
+
+QWidget *SocDisplayPanel::GetWidget()
+{
+    return this;
+}
+
+/**
  * DevDisplayPanel
  */
 DevDisplayPanel::DevDisplayPanel(QWidget *parent, const SocDevRef& dev_ref)
@@ -51,8 +85,8 @@ DevDisplayPanel::DevDisplayPanel(QWidget *parent, const SocDevRef& dev_ref)
     m_name->setTextFormat(Qt::RichText);
     m_desc->setText(QString::fromStdString(m_dev.GetDev().desc));
 
-    right_layout->addLayout(top_layout, 0);
     right_layout->addWidget(m_name, 0);
+    right_layout->addLayout(top_layout, 0);
     right_layout->addWidget(m_desc, 0);
     right_layout->addStretch(1);
 

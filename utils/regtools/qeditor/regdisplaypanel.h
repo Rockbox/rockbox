@@ -23,6 +23,23 @@ public:
     virtual QByteArray  valuePropertyName () const;
 };
 
+class SocDisplayPanel : public QGroupBox, public RegTabPanel
+{
+    Q_OBJECT
+public:
+    SocDisplayPanel(QWidget *parent, const SocRef& reg);
+    void Reload();
+    void AllowWrite(bool en);
+    QWidget *GetWidget();
+    bool Quit();
+
+protected:
+
+    const SocRef& m_soc;
+    QLabel *m_name;
+    QLabel *m_desc;
+};
+
 class DevDisplayPanel : public QGroupBox, public RegTabPanel
 {
     Q_OBJECT

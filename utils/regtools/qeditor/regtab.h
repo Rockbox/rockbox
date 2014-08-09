@@ -57,11 +57,13 @@ protected:
     };
 
     void FillDevSubTree(QTreeWidgetItem *item);
+    void FillSocSubTree(QTreeWidgetItem *item);
     void FillRegTree();
     void FillAnalyserList();
     void UpdateSocList();
     void DisplayRegister(const SocRegRef& ref);
     void DisplayDevice(const SocDevRef& ref);
+    void DisplaySoc(const SocRef& ref);
     void SetDataSocName(const QString& socname);
     void SetPanel(RegTabPanel *panel);
     void UpdateSocFilename();
