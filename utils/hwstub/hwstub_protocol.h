@@ -28,6 +28,10 @@
 #define HWSTUB_VERSION_MAJOR    4
 #define HWSTUB_VERSION_MINOR    0
 
+#define HWSTUB_VERSION__(maj, min) #maj"."#min
+#define HWSTUB_VERSION_(maj, min) HWSTUB_VERSION__(maj, min)
+#define HWSTUB_VERSION  HWSTUB_VERSION_(HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR)
+
 /**
  * A device can use any VID:PID but in case hwstub is in full control of the
  * device, the preferred VID:PID is the following.
