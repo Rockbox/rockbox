@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MIN(a,b) ((a) <= (b) ? (a) : (b))
 #endif
 
 struct hwstub_device_t
@@ -32,6 +32,7 @@ struct hwstub_device_t
     int intf;
     unsigned buf_sz;
     uint16_t id;
+    uint8_t minor_ver;
 };
 
 int hwstub_probe(libusb_device *dev)
@@ -97,9 +98,19 @@ struct hwstub_device_t *hwstub_open(libusb_device_handle *handle)
     dev->intf = hwstub_probe(mydev);
     if(dev->intf == -1)
         goto Lerr;
+    /* try to get version */
+    struct hwstub_version_desc_t m_hwdev_ver;
+    int sz = hwstub_get_desc(dev, HWSTUB_DT_VERSION, &m_hwdev_ver, sizeof(m_hwdev_ver));
+    if(sz != sizeof(m_hwdev_ver))
+        goto Lerr;
+    /* major version must match, minor version is taken to be the minimum between
+     * what library and device support */
+    if(m_hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR)
+        goto Lerr;
+    dev->minor_ver = MIN(m_hwdev_ver.bMinor, HWSTUB_VERSION_MINOR);
     /* try to get actual buffer size */
     struct hwstub_layout_desc_t layout;
-    int sz = hwstub_get_desc(dev, HWSTUB_DT_LAYOUT, &layout, sizeof(layout));
+    sz = hwstub_get_desc(dev, HWSTUB_DT_LAYOUT, &layout, sizeof(layout));
     if(sz == (int)sizeof(layout))
         dev->buf_sz = layout.dBufferSize;
     return dev;

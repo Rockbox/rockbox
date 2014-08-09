@@ -39,7 +39,7 @@ struct hwstub_device_t;
 /* Returns hwstub interface, or -1 if none was found */
 int hwstub_probe(libusb_device *dev);
 /* Helper function which returns a list of all hwstub devices found. The caller
- * must unref all of them when done, possibly using  libusb_free_device_list().
+ * must unref all of them when done, possibly using libusb_free_device_list().
  * Return number of devices or <0 on error */
 ssize_t hwstub_get_device_list(libusb_context *ctx, libusb_device ***list);
 /* Returns NULL on error */
