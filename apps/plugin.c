@@ -43,6 +43,10 @@
 #include "filefuncs.h"
 #include "load_code.h"
 
+#ifdef HAVE_HARDWARE_CLICK
+#include "piezo.h"
+#endif
+
 #if CONFIG_CHARGING
 #include "power.h"
 #endif
@@ -94,6 +98,54 @@ static int app_ftruncate(int fd, off_t length)
     return ftruncate(fd,length);
 }
 #endif
+
+#ifdef HAVE_HARDWARE_CLICK
+void piezo_click(bool wait)
+{
+    piezo_button_beep(false, true);
+    if(wait)
+        while(piezo_busy())
+            yield();
+}
+
+void piezo_beep(bool wait)
+{
+    piezo_button_beep(true, true);
+    if(wait)
+        while(piezo_busy())
+            yield();
+}
+void piezo_play(unsigned int usecs, unsigned int freq, bool wait)
+{
+#if defined(IPOD_6G) || defined(IPOD_NANO2G)
+    if(freq)
+    {
+        /* integer overflow? */
+        unsigned long long periods=freq*(usecs/1000000);
+        unsigned short cycles=50000/freq;
+        if(periods>65535)
+        {
+            while(periods>65535)
+            {
+                piezo_start(cycles, 65535);
+                while(piezo_busy())
+                    yield();
+                periods-=65535;
+            }
+        }
+        piezo_start(cycles, periods);
+    }
+#else
+    if(freq)
+    {
+        piezo_play_for_usec(piezo_hz(freq), 0x80, usecs);
+    }
+#endif
+    if(wait)
+        while(piezo_busy())
+            yield();
+}
+#endif /* HAVE_HARDWARE_CLICK */
 
 #if defined(HAVE_PLUGIN_CHECK_OPEN_CLOSE) && (MAX_OPEN_FILES>32)
 #warning "MAX_OPEN_FILES>32, disabling plugin file open/close checking"
@@ -805,6 +857,11 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     plugin_release_audio_buffer, /* defined in plugin.c */
+#ifdef HAVE_HARDWARE_CLICK
+    piezo_click,
+    piezo_beep,
+    piezo_play
+#endif
 };
 
 static int plugin_buffer_handle;
