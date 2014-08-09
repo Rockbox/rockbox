@@ -211,20 +211,10 @@ int HWStubDevice::GetDevAddress()
 
 bool HWStubDevice::Probe()
 {
-    struct libusb_device_descriptor desc;
-    if(libusb_get_device_descriptor(m_dev, &desc))
-        return false;
-    if(desc.idVendor != HWSTUB_USB_VID || desc.idProduct != HWSTUB_USB_PID)
-        return false;
     if(!Open())
         return false;
-    int ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_VERSION, &m_hwdev_ver, sizeof(m_hwdev_ver));
-    if(ret != sizeof(m_hwdev_ver))
-        goto Lerr;
-    if(m_hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR || m_hwdev_ver.bMinor < HWSTUB_VERSION_MINOR)
-        goto Lerr;
     // get target
-    ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_TARGET, &m_hwdev_target, sizeof(m_hwdev_target));
+    int ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_TARGET, &m_hwdev_target, sizeof(m_hwdev_target));
     if(ret != sizeof(m_hwdev_target))
         goto Lerr;
     // get STMP information
@@ -373,10 +363,13 @@ HWStubBackendHelper::HWStubBackendHelper()
     m_hotplug = libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG);
     if(m_hotplug)
     {
+        int evt = LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
+            LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT;
         m_hotplug = LIBUSB_SUCCESS == libusb_hotplug_register_callback(
-            NULL,   (libusb_hotplug_event)(LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED | LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT),
-            LIBUSB_HOTPLUG_ENUMERATE, HWSTUB_USB_VID, HWSTUB_USB_PID, HWSTUB_CLASS,
-            &HWStubBackendHelper::HotPlugCallback, reinterpret_cast< void* >(this), &m_hotplug_handle);
+            NULL, (libusb_hotplug_event)evt, LIBUSB_HOTPLUG_ENUMERATE,
+            LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY,
+            &HWStubBackendHelper::HotPlugCallback, reinterpret_cast< void* >(this),
+            &m_hotplug_handle);
     }
 #endif
 }
@@ -393,7 +386,7 @@ QList< HWStubDevice* > HWStubBackendHelper::GetDevList()
 {
     QList< HWStubDevice* > list;
     libusb_device **dev_list;
-    ssize_t cnt = libusb_get_device_list(NULL, &dev_list);
+    ssize_t cnt = hwstub_get_device_list(NULL, &dev_list);
     for(int i = 0; i < cnt; i++)
     {
         HWStubDevice *dev = new HWStubDevice(dev_list[i]);
