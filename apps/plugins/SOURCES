@@ -260,4 +260,11 @@ test_sampr.c
 test_touchscreen.c
 #endif
 test_viewports.c
+#ifdef HAVE_HARDWARE_CLICK
+test_piezo.c
+#endif
 #endif /* HAVE_TEST_PLUGINS */
+
+#ifdef HAVE_HARDWARE_CLICK
+tonebox.c
+#endif
