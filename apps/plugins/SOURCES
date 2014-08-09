@@ -259,4 +259,11 @@ test_sampr.c
 test_touchscreen.c
 #endif
 test_viewports.c
+#if defined(HAVE_HARDWARE_CLICK) && !defined(SIMULATOR)
+test_piezo.c
+#endif
 #endif /* HAVE_TEST_PLUGINS */
+
+#if defined(HAVE_HARDWARE_CLICK) && !defined(SIMULATOR)
+tinbox.c
+#endif

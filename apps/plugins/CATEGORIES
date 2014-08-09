@@ -115,6 +115,7 @@ test_disk,apps
 test_fps,apps
 test_grey,apps
 test_gfx,apps
+test_piezo,apps
 test_resize,apps
 test_sampr,apps
 test_scanrate,apps
@@ -124,6 +125,7 @@ test_greylib_bitmap_scale,viewers
 text_editor,apps
 text_viewer,viewers
 theme_remove,viewers
+tinbox,viewers
 vbrfix,viewers
 video,viewers
 viewer,viewers
