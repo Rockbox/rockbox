@@ -160,7 +160,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 230
+#define PLUGIN_API_VERSION 231
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -977,6 +977,15 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     void (*plugin_release_audio_buffer)(void);
+
+#if defined(HAVE_HARDWARE_CLICK) && !defined(SIMULATOR)
+    /* piezo */
+
+    void (*piezo_click)(bool wait);
+    void (*piezo_beep)(bool wait);
+    void (*piezo_play)(unsigned int usecs, unsigned int freq, bool wait);
+#endif
+
 };
 
 /* plugin header */
