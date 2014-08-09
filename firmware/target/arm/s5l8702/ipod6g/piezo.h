@@ -21,6 +21,7 @@
 
 void piezo_init(void);
 void piezo_stop(void);
+void piezo_start(unsigned short cycles, unsigned short periods);
 void piezo_clear(void);
 bool piezo_busy(void);
 void piezo_button_beep(bool beep, bool force);
