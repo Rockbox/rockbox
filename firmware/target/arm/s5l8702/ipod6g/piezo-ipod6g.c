@@ -37,7 +37,7 @@ void INT_TIMERA(void)
     }
 }
 
-static void piezo_start(unsigned short cycles, unsigned short periods)
+void piezo_start(unsigned short cycles, unsigned short periods)
 {
 #ifndef SIMULATOR
     duration = periods;

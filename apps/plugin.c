@@ -46,6 +46,10 @@
 #include "load_code.h"
 #include "file.h"
 
+#ifdef HAVE_HARDWARE_CLICK
+#include "piezo.h"
+#endif
+
 #if CONFIG_CHARGING
 #include "power.h"
 #endif
@@ -146,6 +150,54 @@ static int WRAPPER(close)(int fildes)
 
     return rc;
 }
+
+#if defined(HAVE_HARDWARE_CLICK) && !defined(SIMULATOR)
+void piezo_click(bool wait)
+{
+    piezo_button_beep(false, true);
+    if(wait)
+        while(piezo_busy())
+            yield();
+}
+
+void piezo_beep(bool wait)
+{
+    piezo_button_beep(true, true);
+    if(wait)
+        while(piezo_busy())
+            yield();
+}
+void piezo_play(unsigned int usecs, unsigned int freq, bool wait)
+{
+#if defined(IPOD_6G) || defined(IPOD_NANO2G)
+    if(freq)
+    {
+        /* integer overflow? */
+        unsigned long long periods=freq*(usecs/1000000.0);
+        unsigned short cycles=50000.0/freq;
+        if(periods>65535)
+        {
+            while(periods>65535)
+            {
+                piezo_start(cycles, 65535);
+                while(piezo_busy())
+                    yield();
+                periods-=65535;
+            }
+        }
+        piezo_start(cycles, periods);
+    }
+#else
+    if(freq)
+    {
+        piezo_play_for_usec(piezo_hz(freq), 0x80, usecs);
+    }
+#endif
+    if(wait)
+        while(piezo_busy())
+            yield();
+}
+#endif /* HAVE_HARDWARE_CLICK */
 
 static void plugin_check_open_close__exit(void)
 {
@@ -840,6 +892,14 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+    /* piezo */
+#if defined(HAVE_HARDWARE_CLICK) && !defined(SIMULATOR)
+    /* all these are defined in plugin.c */
+    piezo_click,
+    piezo_beep,
+    piezo_play,
+#endif
 };
 
 static int plugin_buffer_handle;
