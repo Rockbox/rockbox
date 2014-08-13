@@ -8,16 +8,21 @@ At global level:
 - exit()    Same as quit()
 
 In the hwp table:
-- load_file(filename)       Load a firmware and guess type
-- load_elf_file(filename)   Load a firmware as ELF
-- load_sb_file(filename)    Load a firmware as SB
-- load_sb1_file(filename)   Load a firmware as SB1
-- load_bin_file(filename)   Load a firmware as binary
-- save_file(obj, filename)  Save a firmware to a file
-- read(obj, addr, len)      Read data from a firmware
-- write(obj, addr, data)    Write data to a firmware
-- section_info(obj, sec)    Return information about a section in a table (or nil)
-- md5sum(filename)          Compute the MD5 sum of a file
+- load_file(filename)           Load a firmware and guess type
+- load_elf_file(filename)       Load a firmware as ELF
+- load_sb_file(filename)        Load a firmware as SB
+- load_sb1_file(filename)       Load a firmware as SB1
+- load_bin_file(filename)       Load a firmware as binary
+- save_file(fw, filename)       Save a firmware to a file
+- read(fw, addr, len)           Read data from a firmware
+- write(fw, addr, data)         Write data to a firmware
+- section_info(fw, sec)         Return information about a section in a table (or nil)
+- md5sum(filename)              Compute the MD5 sum of a file
+- crc_buf(crc_type, buf)        Compute the CRC of a byte buffer and return a byte buffer
+- crc(crc_type, fw, addr, len)  Compute the CRC of a firmware part
+
+The list of CRCs available is available the hwp.CRC table:
+- RKW
 
 Data read/written from/to a firmware must must be an array of bytes.
 The address must be a table of the following fields:
@@ -27,7 +32,7 @@ Data section information is a table with the following fields:
 - address: first address if the section
 - size: size of the section
 We provide the following functions to help dealing with addresses:
-- make_addr
+- make_addr(addr, section)      Build a firmware address from a raw address and a section
 
 ]]--
 
@@ -104,4 +109,9 @@ function hwp.md5str(md5)
         s = s .. string.format("%02x", md5[i])
     end
     return s
+end
+
+-- compute the CRC of a firmware part
+function hwp.crc(crc_type, fw, addr, len)
+    return hwp.crc_buf(crc_type, hwp.read(fw, addr, len))
 end
