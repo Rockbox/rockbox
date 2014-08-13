@@ -47,6 +47,8 @@
 #include "misc.h"
 #include "md5.h"
 
+#define ARRAYLEN(arr) (sizeof(arr) / sizeof(arr[0]))
+
 lua_State *g_lua;
 bool g_exit = false;
 
@@ -57,6 +59,18 @@ bool g_exit = false;
 enum fw_type_t
 {
     FW_UNK, FW_ELF, FW_SB1, FW_SB2, FW_BIN, FW_EDOC
+};
+
+enum crc_type_t
+{
+    CRC_RKW
+};
+
+struct crc_type_desc_t
+{
+    enum crc_type_t type;
+    const char *lua_name;
+    unsigned (*fn)(uint8_t *buf, size_t len);
 };
 
 struct bin_file_t
@@ -849,6 +863,66 @@ int my_lua_section_info(lua_State *state)
     return 1;
 }
 
+unsigned crc_rkw(uint8_t *buf, size_t len)
+{
+    /* polynomial 0x04c10db7 */
+    static const uint32_t crc32_lookup[16] =
+    {   /* lookup table for 4 bits at a time is affordable */
+        0x00000000, 0x04C10DB7, 0x09821B6E, 0x0D4316D9,
+        0x130436DC, 0x17C53B6B, 0x1A862DB2, 0x1E472005,
+        0x26086DB8, 0x22C9600F, 0x2F8A76D6, 0x2B4B7B61,
+        0x350C5B64, 0x31CD56D3, 0x3C8E400A, 0x384F4DBD
+    };
+
+    uint32_t crc32 = 0;
+    unsigned char byte;
+    uint32_t t;
+
+    while (len--)
+    {
+        byte = *buf++; /* get one byte of data */
+
+        /* upper nibble of our data */
+        t = crc32 >> 28; /* extract the 4 most significant bits */
+        t ^= byte >> 4; /* XOR in 4 bits of data into the extracted bits */
+        crc32 <<= 4; /* shift the CRC register left 4 bits */
+        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
+
+        /* lower nibble of our data */
+        t = crc32 >> 28; /* extract the 4 most significant bits */
+        t ^= byte & 0x0F; /* XOR in 4 bits of data into the extracted bits */
+        crc32 <<= 4; /* shift the CRC register left 4 bits */
+        crc32 ^= crc32_lookup[t]; /* do the table lookup and XOR the result */
+    }
+
+    return crc32;
+}
+
+struct crc_type_desc_t crc_types[] =
+{
+    {CRC_RKW, "RKW", crc_rkw}
+};
+
+int my_lua_crc_buf(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 2)
+        return luaL_error(state, "crc_buf takes two arguments: a crc type and a buffer");
+    unsigned type = lua_tounsigned(state, 1);
+    size_t len;
+    void *buf = my_lua_get_buffer(state, 2, &len);
+    for(int i = 0; i < ARRAYLEN(crc_types); i++)
+        if(crc_types[i].type == type)
+        {
+            lua_pushunsigned(state, crc_types[i].fn(buf, len));
+            free(buf);
+            return 1;
+        }
+    free(buf);
+    luaL_error(state, "crc_buf: unknown crc type");
+    return 0;
+}
+
 /* compute MD5 sum of a buffer */
 static bool compute_md5sum_buf(void *buf, size_t sz, uint8_t file_md5sum[16])
 {
@@ -944,6 +1018,17 @@ static bool init_lua_hwp(void)
 
     lua_pushcfunction(g_lua, my_lua_md5sum);
     lua_setfield(g_lua, -2, "md5sum");
+
+    lua_newtable(g_lua);
+    for(int i = 0; i < ARRAYLEN(crc_types); i++)
+    {
+        lua_pushunsigned(g_lua, crc_types[i].type);
+        lua_setfield(g_lua, -2, crc_types[i].lua_name);
+    }
+    lua_setfield(g_lua, -2, "CRC");
+
+    lua_pushcfunction(g_lua, my_lua_crc_buf);
+    lua_setfield(g_lua, -2, "crc_buf");
 
     return true;
 }
