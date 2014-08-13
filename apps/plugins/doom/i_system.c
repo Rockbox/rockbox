@@ -87,15 +87,17 @@ void doomtime(void)
 
 int  I_GetTime (void)
 {
+/*
 #if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
    return doomtimer;
 #else
+*/
 #if HZ==100
    return ((7*(*rb->current_tick))/20);
 #else
    #error FIX - I assumed HZ was 100
 #endif
-#endif
+/*#endif*/
 }
 
 //
