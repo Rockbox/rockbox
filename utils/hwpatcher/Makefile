@@ -15,7 +15,7 @@ all: $(EXEC)
 %.o: $(SBTOOLS_DIR)/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
-%.o: $%.c
+%.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 hwpatcher: hwpatcher.o md5.o $(SBTOOLS_OBJ)
