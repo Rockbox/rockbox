@@ -697,6 +697,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     plugin_get_buffer,
     plugin_get_audio_buffer,     /* defined in plugin.c */
+    plugin_release_audio_buffer, /* defined in plugin.c */
     plugin_tsr,                  /* defined in plugin.c */ 
     plugin_get_current_filename,
 #if defined(DEBUG) || defined(SIMULATOR)
@@ -804,7 +805,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    plugin_release_audio_buffer, /* defined in plugin.c */
 };
 
 static int plugin_buffer_handle;

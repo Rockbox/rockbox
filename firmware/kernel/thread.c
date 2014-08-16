@@ -289,6 +289,7 @@ should_switch_tasks(struct thread_entry *thread)
     return THREAD_OK | THREAD_SWITCH;
 #else
     return THREAD_OK;
+    (void)thread;
 #endif /* HAVE_PRIORITY_SCHEDULING */
 }
 
