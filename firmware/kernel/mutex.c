@@ -103,6 +103,12 @@ void mutex_unlock(struct mutex *m)
     }
 
     const int oldlevel = disable_irq_save();
+    /* Tranfer of owning thread is handled in the wakeup protocol
+     * if priorities are enabled otherwise just set it from the
+     * queue head. */
+#ifndef HAVE_PRIORITY_SCHEDULING
+    m->blocker.thread = thread;
+#endif
     unsigned int result = wakeup_thread(thread, WAKEUP_TRANSFER);
     restore_irq(oldlevel);
 
