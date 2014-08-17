@@ -37,6 +37,11 @@
 #define AUDIOHW_SOUND_SETTINGS_VAL2PHYS
 #include "audiohw_settings.h"
 
+#if defined(PLATFORM_HOSTED) && \
+    (defined(PLATFORM_ANDROID) || defined(PLATFORM_MAEMO5) || defined(PLATFORM_MAEMO4))
+#include "balance.h"
+#endif
+
 extern bool audio_is_initialized;
 
 static const struct sound_setting_entry * get_setting_entry(int setting)
@@ -187,6 +192,12 @@ static void set_prescaled_volume(void)
 
 #if defined(AUDIOHW_HAVE_MONO_VOLUME)
     audiohw_set_volume(volume);
+#if defined(PLATFORM_HOSTED) && \
+    (defined(PLATFORM_ANDROID) || defined(PLATFORM_MAEMO5) || defined(PLATFORM_MAEMO4))
+    int balance = sound_prescaler.balance; /* percent */
+    dsp_balance_enable(balance);
+#endif
+
 #else /* Stereo volume */
     int l = volume, r = volume;
 
