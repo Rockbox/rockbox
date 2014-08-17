@@ -48,6 +48,7 @@ DSP_PROC_DB_START
 #endif
     DSP_PROC_DB_ITEM(CHANNEL_MODE)  /* channel modes */
     DSP_PROC_DB_ITEM(COMPRESSOR)    /* dynamic-range compressor */
+    DSP_PROC_DB_ITEM(BALANCE)       /* audio balance for mono-volume HW */
 DSP_PROC_DB_STOP
 
 /* This file is included multiple times with different macro definitions so
