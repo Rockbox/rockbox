@@ -29,6 +29,10 @@ AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -80,   0,   0)
 AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -99,   0,   0)
 #endif /* CONFIG_PLATFORM & PLATFORM_SDL */
 
+#ifdef HAVE_SW_VOLUME_CONTROL
+#undef AUDIOHW_CAPS
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 /* Bass and treble tone controls */
 #ifdef AUDIOHW_HAVE_BASS
