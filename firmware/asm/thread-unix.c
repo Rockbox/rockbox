@@ -41,11 +41,30 @@ static pthread_t main_thread;
 static struct ctx {
     jmp_buf thread_buf;
 } thread_bufs[MAXTHREADS];
+static threadbit_t free_thread_bufs;
 static struct ctx* thread_context, *target_context;
-static int curr_uc;
 
 static void trampoline(int sig);
 static void bootstrap_context(void) __attribute__((noinline));
+
+static void init_thread_bufs(void)
+{
+    for (unsigned int bufidx = 0; bufidx < MAXTHREADS; bufidx++)
+        threadbit_set_bit(&free_thread_bufs, bufidx);
+}
+
+static struct ctx * alloc_thread_buf(void)
+{
+    unsigned int bufidx = threadbit_ffs(&free_thread_bufs);
+    threadbit_clear_bit(&free_thread_bufs, bufidx);
+    return &thread_bufs[bufidx];
+}
+
+static void free_thread_buf(struct ctx *threadbuf)
+{
+    unsigned int bufidx = threadbuf - thread_bufs;
+    threadbit_set_bit(&free_thread_bufs, bufidx);
+}
 
 /* The *_context functions are heavily based on Gnu pth
  * http://www.gnu.org/software/pth/
@@ -228,6 +247,7 @@ void bootstrap_context(void)
      */
     thread_entry();
     DEBUGF("thread left\n");
+    free_thread_buf(t);
     thread_exit();
 }
 
@@ -238,7 +258,7 @@ static inline void set_context(struct ctx *c)
 
 static inline void swap_context(struct ctx *old, struct ctx *new)
 {
-    if (setjmp(old->thread_buf) == 0)
+    if (!old || setjmp(old->thread_buf) == 0)
         longjmp(new->thread_buf, 1);
 }
 
@@ -256,7 +276,8 @@ static void init_main_thread(void *addr)
     /* get a context for the main thread so that we can jump to it from
      * other threads */
     struct regs *context = (struct regs*)addr;
-    context->uc = &thread_bufs[curr_uc++];
+    init_thread_bufs();
+    context->uc = alloc_thread_buf();
     get_context(context->uc);
 }
 
@@ -273,7 +294,7 @@ static void init_main_thread(void *addr)
 static void setup_thread(struct regs *context)
 {
     void (*fn)(void) = context->start;
-    context->uc = &thread_bufs[curr_uc++];
+    context->uc = alloc_thread_buf();
     while (!make_context(context->uc, fn, (char*)context->stack, context->stack_size))
         DEBUGF("Thread creation failed. Retrying");
 }
@@ -304,4 +325,5 @@ static inline void load_context(const void* addr)
         r->start = NULL;
     }
     swap_context(target_context, r->uc);
+    target_context = NULL;
 }
