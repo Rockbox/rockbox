@@ -703,6 +703,9 @@ static void exit_handler(void)
     cleanup();
     if(abnormal_exit)
         save_game();
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false); /* back to idle */
+#endif
     return;
 }
 static bool check_hs;
