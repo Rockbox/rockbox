@@ -144,6 +144,7 @@ metronome.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Archos Player */
 
+2048.c
 /* Lua needs at least 160 KB to work in */
 #if PLUGIN_BUFFER_SIZE >= 0x80000
 boomshine.lua
@@ -209,12 +210,8 @@ euroconverter.c
 nim.c
 #endif /* HAVE_LCD_CHARCELLS */
 
-
-
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 
-/* 2048 runs on 1-bit LCDs, but it is unplayable */
-2048.c
 matrix.c
 
 #if (LCD_WIDTH > 138)
