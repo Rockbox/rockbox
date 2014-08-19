@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7a1b2928_760350b9",
+        "filename": "firmware/target/hosted/android/pcm-android.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-08-19T10:39:54Z",
+      "side": 1,
+      "message": "Global references can be used from all threads. Besides, you don\u0027t use the return value (pcm_class) at all.",
+      "parentUuid": "7a1b2928_36f9d8c9",
+      "revId": "f869eeed489127827148c0895442fa0576ffe2ed",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a1b2928_9609cce0",
         "filename": "firmware/target/hosted/android/pcm-android.c",
         "patchSetId": 4
