@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a1b2928_36f9d8c9",
+        "filename": "firmware/target/hosted/android/pcm-android.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1000348
+      },
+      "writtenOn": "2014-08-19T10:37:10Z",
+      "side": 1,
+      "message": "this may run in different thread. Just want to make sure the instance(object) is the one from the right class. but you are right, maybe its not needed. I will test without this class check to see how.",
+      "parentUuid": "7a1b2928_b604c8c6",
+      "revId": "f869eeed489127827148c0895442fa0576ffe2ed",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a1b2928_9609cce0",
         "filename": "firmware/target/hosted/android/pcm-android.c",
         "patchSetId": 4
