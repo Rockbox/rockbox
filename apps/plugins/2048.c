@@ -83,10 +83,10 @@
 #define SCORE_Y (max_numeral_height)
 #define BEST_SCORE_X 0
 #define BEST_SCORE_Y (2*max_numeral_height)
-#endif
+#endif /* LCD_WIDTH<LCD_HEIGHT */
 
-#define BACKGROUND_X (BASE_X-MIN_SPACE)
-#define BACKGROUND_Y (BASE_Y-MIN_SPACE)
+#define BACKGROUND_X (int)(BASE_X-MIN_SPACE)
+#define BACKGROUND_Y (int)(BASE_Y-MIN_SPACE)
 
 /* key mappings */
 
@@ -121,6 +121,9 @@ static struct game_ctx_t *ctx=&ctx_data;
 static bool merged_grid[GRID_SIZE][GRID_SIZE];
 static int old_grid[GRID_SIZE][GRID_SIZE];
 static int max_numeral_height=-1;
+#if LCD_DEPTH <= 1
+static int max_numeral_width;
+#endif
 static bool loaded=false;
 
 /* first init_game will set this, when it is exceeded, it will be updated in the slide functions */
@@ -180,7 +183,8 @@ static bool do_help(void)
 static inline void slide_internal(int startx, int starty,
                                   int stopx, int stopy,
                                   int dx, int dy,
-                                  int lookx, int looky)
+                                  int lookx, int looky,
+                                  bool update_best)
 {
     int best_score_before=best_score;
     for(int y=starty;y!=stopy;y+=dy)
@@ -202,7 +206,7 @@ static inline void slide_internal(int startx, int starty,
             }
         }
     }
-    if(ctx->score>best_score_before)
+    if(ctx->score>best_score_before && update_best)
         best_score=ctx->score;
 }
 
@@ -215,12 +219,13 @@ static inline void slide_internal(int startx, int starty,
    3 ^ ^ ^ ^
    0 1 2 3
 */
-static void up(void)
+static void up(bool update_best)
 {
     slide_internal(0, 1,  /* start values */
                    GRID_SIZE, GRID_SIZE, /* stop values */
                    1, 1, /* delta values */
-                   0, -1); /* lookahead values */
+                   0, -1, /* lookahead values */
+                   update_best);
 }
 /* Down
    0 v v v v
@@ -229,12 +234,13 @@ static void up(void)
    3
    0 1 2 3
 */
-static void down(void)
+static void down(bool update_best)
 {
     slide_internal(0, GRID_SIZE-2,
                    GRID_SIZE, -1,
                    1, -1,
-                   0, 1);
+                   0, 1,
+                   update_best);
 }
 /* Left
    0   < < <
@@ -243,12 +249,13 @@ static void down(void)
    3   < < <
    0 1 2 3
 */
-static void left(void)
+static void left(bool update_best)
 {
     slide_internal(1, 0,
                    GRID_SIZE, GRID_SIZE,
                    1, 1,
-                   -1, 0);
+                   -1, 0,
+                   update_best);
 }
 /* Right
    0 > > >
@@ -257,12 +264,13 @@ static void left(void)
    3 > > >
    0 1 2 3
 */
-static void right(void)
+static void right(bool update_best)
 {
     slide_internal(GRID_SIZE-2, 0, /* start */
                    -1, GRID_SIZE, /* stop */
                    -1, 1, /* delta */
-                   1, 0); /* lookahead */
+                   1, 0, /* lookahead */
+                   update_best);
 }
 
 /* slightly modified version of base 2 log, returns 1 when given zero, and log2(n)+1 for anything else */
@@ -279,6 +287,7 @@ static inline int ilog2(int n)
     }
     return log+1;
 }
+#if LCD_DEPTH > 1
 static void draw(void)
 {
 #ifdef HAVE_LCD_COLOR
@@ -318,13 +327,22 @@ static void draw(void)
     int w, h;
     rb->lcd_setfont(FONT_UI);
     rb->font_getstringsize(buf, &w, &h, FONT_UI);
+    bool draw_title=true;
     if(w+TITLE_X>=BACKGROUND_X && h+TITLE_Y>=BACKGROUND_Y)
     {
         /* if it goes into the grid, use the system font, which should be smaller */
         rb->lcd_setfont(FONT_SYSFIXED);
+        rb->font_getstringsize(buf, &w, &h, FONT_SYSFIXED);
+        if(w+TITLE_X>=BACKGROUND_X && h+TITLE_Y>=BACKGROUND_Y)
+        {
+            /* title can't fit, don't draw it */
+            draw_title=false;
+            h=0;
+        }
     }
-    rb->lcd_putsxy(TITLE_X, TITLE_Y, buf);
-
+    if(draw_title)
+        rb->lcd_putsxy(TITLE_X, TITLE_Y, buf);
+    int score_y=TITLE_Y+h+VERT_SPACING;
     /* draw the score */
     rb->snprintf(buf, 31, "Score: %d", ctx->score);
 #ifdef HAVE_LCD_COLOR
@@ -366,13 +384,18 @@ static void draw(void)
 
         /* as a last resort, don't use Score: and use the system font */
         rb->snprintf(buf, 31, "%d", ctx->score);
+        rb->font_getstringsize(buf, &w, &h, FONT_SYSFIXED);
         rb->lcd_setfont(FONT_SYSFIXED);
+        if(w+SCORE_X<BACKGROUND_X)
+            goto draw_lbl;
+        else
+            goto skip_draw_score;
     }
 draw_lbl:
-    rb->lcd_putsxy(SCORE_X, SCORE_Y, buf);
-
+    rb->lcd_putsxy(SCORE_X, score_y, buf);
+    score_y+=h+VERT_SPACING;
     /* draw the best score */
-
+skip_draw_score:
     rb->snprintf(buf, 31, "Best: %d", best_score);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
@@ -413,16 +436,70 @@ draw_lbl:
 
         /* as a last resort, don't use Score: and use the system font */
         rb->snprintf(buf, 31, "%d", best_score);
+        rb->font_getstringsize(buf, &w, &h, FONT_SYSFIXED);
         rb->lcd_setfont(FONT_SYSFIXED);
+        if(w+BEST_SCORE_X<BACKGROUND_X)
+            goto draw_best;
+        else
+            goto skip_draw_best;
     }
 draw_best:
-    rb->lcd_putsxy(BEST_SCORE_X, BEST_SCORE_Y, buf);
-
+    rb->lcd_putsxy(BEST_SCORE_X, score_y, buf);
+skip_draw_best:
     rb->lcd_update();
     /* revert the font back */
     rb->lcd_setfont(WHAT_FONT);
 }
+#else /* LCD_DEPTH > 1 */
+/* 1-bit display :( */
+/* bitmaps are unreadable with these screens, so just resort to text */
+static void draw(void)
+{
+    rb->lcd_clear_display();
+    /* Draw the grid */
+    /* find the biggest tile */
+    int biggest_tile=-1;
+    for(int x=0;x<GRID_SIZE;++x)
+    {
+        for(int y=0;y<GRID_SIZE;++y)
+            if(ctx->grid[x][y]>biggest_tile)
+                biggest_tile=ctx->grid[x][y];
+    }
+    char str[32];
+    rb->snprintf(str, 31,"%d", biggest_tile);
+    int biggest_tile_width=rb->strlen(str)*rb->font_get_width(rb->font_get(WHAT_FONT), '0')+MIN_SPACE;
+    for(int y=0;y<GRID_SIZE;++y)
+    {
+        for(int x=0;x<GRID_SIZE;++x)
+        {
+            if(ctx->grid[x][y])
+            {
+                if(ctx->grid[x][y]>biggest_tile)
+                    biggest_tile=ctx->grid[x][y];
+                rb->snprintf(str,31,"%d", ctx->grid[x][y]);
+                rb->lcd_putsxy(biggest_tile_width*x,y*max_numeral_height+max_numeral_height,str);
+            }
+        }
+    }
+    /* Now draw the score, and the game title */
+    rb->snprintf(str, 31, "Score: %d", ctx->score);
+    int str_width, str_height;
+    rb->font_getstringsize(str, &str_width, &str_height, WHAT_FONT);
+    int score_leftmost=LCD_WIDTH-str_width-1;
+    /* Check if there is enough space to display "Score: ", otherwise, only display the score */
+    if(score_leftmost>=0)
+        rb->lcd_putsxy(score_leftmost,0,str);
+    else
+        rb->lcd_putsxy(score_leftmost,0,str+rb->strlen("Score: "));
+    /* Reuse the same string for the title */
 
+    rb->snprintf(str, 31, "%d", WINNING_TILE);
+    rb->font_getstringsize(str, &str_width, &str_height, WHAT_FONT);
+    if(str_width<score_leftmost)
+        rb->lcd_putsxy(0,0,str);
+    rb->lcd_update();
+}
+#endif /* LCD_DEPTH > 1 */
 /* place a 2 or 4 in a random empty space */
 static void place_random(void)
 {
@@ -455,73 +532,65 @@ static void restore_old_grid(void)
 /* checks for a win or loss */
 static bool check_gameover(void)
 {
-    int numempty=0;
+    /* first, check for a loss */
+    int oldscore=ctx->score;
+    bool have_legal_move=false;
+    memset(&merged_grid,0,SPACES*sizeof(bool));
+    up(false);
+    if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
+    {
+        restore_old_grid();
+        ctx->score=oldscore;
+        have_legal_move=true;
+    }
+    restore_old_grid();
+    memset(&merged_grid,0,SPACES*sizeof(bool));
+    down(false);
+    if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
+    {
+        restore_old_grid();
+        ctx->score=oldscore;
+        have_legal_move=true;
+    }
+    restore_old_grid();
+    memset(&merged_grid,0,SPACES*sizeof(bool));
+    left(false);
+    if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
+    {
+        restore_old_grid();
+        ctx->score=oldscore;
+        have_legal_move=true;
+    }
+    restore_old_grid();
+    memset(&merged_grid,0,SPACES*sizeof(bool));
+    right(false);
+    if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
+    {
+        restore_old_grid();
+        ctx->score=oldscore;
+        have_legal_move=true;
+    }
+    ctx->score=oldscore;
+    if(!have_legal_move)
+    {
+        /* no more legal moves */
+        draw(); /* Shame the player :) */
+        rb->splash(HZ*2, "Game Over!");
+        return true;
+    }
     for(int y=0;y<GRID_SIZE;++y)
     {
         for(int x=0;x<GRID_SIZE;++x)
         {
-            if(ctx->grid[x][y]==0)
-                ++numempty;
             if(ctx->grid[x][y]==WINNING_TILE && !ctx->already_won)
             {
                 /* Let the user see the tile in its full glory... */
                 draw();
                 ctx->already_won=true;
                 rb->splash(HZ*2,"You win!");
-                const struct text_message prompt={(const char*[]){"Keep going?"}, 1};
-                enum yesno_res keepgoing=rb->gui_syncyesno_run(&prompt, NULL, NULL);
-                if(keepgoing==YESNO_NO)
-                    return true;
-                else
-                    return false;
+                /* don't let the user quit here :) */
             }
         }
-    }
-    if(!numempty)
-    {
-        /* No empty spaces, check for valid moves */
-        /* Then, get the current score */
-        int oldscore=ctx->score;
-        memset(&merged_grid,0,SPACES*sizeof(bool));
-        up();
-        if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
-        {
-            restore_old_grid();
-            ctx->score=oldscore;
-            return false;
-        }
-        restore_old_grid();
-        memset(&merged_grid,0,SPACES*sizeof(bool));
-        down();
-        if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
-        {
-            restore_old_grid();
-            ctx->score=oldscore;
-            return false;
-        }
-        restore_old_grid();
-        memset(&merged_grid,0,SPACES*sizeof(bool));
-        left();
-        if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
-        {
-            restore_old_grid();
-            ctx->score=oldscore;
-            return false;
-        }
-        restore_old_grid();
-        memset(&merged_grid,0,SPACES*sizeof(bool));
-        right();
-        if(memcmp(&old_grid, &ctx->grid, sizeof(int)*SPACES))
-        {
-            restore_old_grid();
-            ctx->score=oldscore;
-            return false;
-        }
-        /* no more legal moves */
-        ctx->score=oldscore;
-        draw(); /* Shame the player :) */
-        rb->splash(HZ*2, "Game Over!");
-        return true;
     }
     return false;
 }
@@ -540,6 +609,8 @@ static void load_hs(void)
 static void init_game(bool newgame)
 {
     best_score=highscores[0].score;
+    if(loaded && ctx->score > best_score)
+        best_score=ctx->score;
     if(newgame)
     {
         /* initialize the game context */
@@ -558,6 +629,9 @@ static void init_game(bool newgame)
     /* Now get the height of the font */
     rb->font_getstringsize("0123456789", NULL, &max_numeral_height,WHAT_FONT);
     max_numeral_height+=VERT_SPACING;
+#if LCD_DEPTH <= 1
+    max_numeral_width=rb->font_get_width(rb->font_get(WHAT_FONT), '0');
+#endif
     backlight_ignore_timeout();
     rb->lcd_clear_display();
     draw();
@@ -735,7 +809,7 @@ static enum plugin_status do_game(bool newgame)
             for(int i=0;i<GRID_SIZE-1;++i)
             {
                 memcpy(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES);
-                up();
+                up(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
                     rb->sleep(ANIM_SLEEPTIME);
@@ -748,7 +822,7 @@ static enum plugin_status do_game(bool newgame)
             for(int i=0;i<GRID_SIZE-1;++i)
             {
                 memcpy(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES);
-                down();
+                down(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
                     rb->sleep(ANIM_SLEEPTIME);
@@ -761,7 +835,7 @@ static enum plugin_status do_game(bool newgame)
             for(int i=0;i<GRID_SIZE-1;++i)
             {
                 memcpy(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES);
-                left();
+                left(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
                     rb->sleep(ANIM_SLEEPTIME);
@@ -774,7 +848,7 @@ static enum plugin_status do_game(bool newgame)
             for(int i=0;i<GRID_SIZE-1;++i)
             {
                 memcpy(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES);
-                right();
+                right(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
                     rb->sleep(ANIM_SLEEPTIME);
