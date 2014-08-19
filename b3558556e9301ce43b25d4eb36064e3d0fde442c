@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_161dbc0f",
+        "filename": "firmware/target/hosted/android/pcm-android.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-08-19T11:28:50Z",
+      "side": 1,
+      "message": "can reuse cls here",
+      "revId": "b3558556e9301ce43b25d4eb36064e3d0fde442c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
