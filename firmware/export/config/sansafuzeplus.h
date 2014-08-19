@@ -114,8 +114,8 @@
 
 /* Main LCD backlight brightness range and defaults */
 #define MIN_BRIGHTNESS_SETTING      0
-#define MAX_BRIGHTNESS_SETTING      80
-#define DEFAULT_BRIGHTNESS_SETTING  40
+#define MAX_BRIGHTNESS_SETTING      32
+#define DEFAULT_BRIGHTNESS_SETTING  16
 
 /* Which backlight fading type? */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING

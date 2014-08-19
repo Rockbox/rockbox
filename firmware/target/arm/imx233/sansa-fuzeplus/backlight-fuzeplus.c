@@ -29,7 +29,7 @@
 void _backlight_set_brightness(int brightness)
 {
     if(brightness != 0)
-        brightness = 32 - (brightness * 32) / 100;
+        brightness = MAX_BRIGHTNESS_SETTING + 1 - brightness;
     imx233_pinctrl_set_gpio(1, 28, false);
     udelay(600);
     while(brightness-- > 0)
