@@ -1542,7 +1542,7 @@ static bool chip8_run(const char* file)
 #endif
     rb->lcd_update();
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_CODEC != SWCODEC)
     /* init sound */
     is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
     if (!is_playing) /* no? then we can make sound */
