@@ -254,18 +254,18 @@ static NO_INLINE void thread_stkov(struct thread_entry *thread)
 
 static FORCE_INLINE void thread_store_context(struct thread_entry *thread)
 {
+    store_context(&thread->context);
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     thread->__errno = errno;
 #endif
-    store_context(&thread->context);
 }
 
 static FORCE_INLINE void thread_load_context(struct thread_entry *thread)
 {
-    load_context(&thread->context);
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     errno = thread->__errno;
 #endif
+    load_context(&thread->context);
 }
 
 static FORCE_INLINE unsigned int
@@ -1101,12 +1101,12 @@ void switch_thread(void)
     RTR_UNLOCK(corep);
     enable_irq();
 
-    /* And finally, give control to the next thread. */
-    thread_load_context(thread);
-
 #ifdef RB_PROFILE
     profile_thread_started(THREAD_ID_SLOT(thread->id));
 #endif
+
+    /* And finally, give control to the next thread. */
+    thread_load_context(thread);
 }
 
 /*---------------------------------------------------------------------------
