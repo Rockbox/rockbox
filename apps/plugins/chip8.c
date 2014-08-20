@@ -1541,8 +1541,7 @@ static bool chip8_run(const char* file)
     rb->lcd_drawrect(CHIP8_X-1,CHIP8_Y-1,CHIP8_LCDWIDTH+2,CHIP8_HEIGHT+2);
 #endif
     rb->lcd_update();
-
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_CODEC == HWCODEC)
     /* init sound */
     is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
     if (!is_playing) /* no? then we can make sound */
