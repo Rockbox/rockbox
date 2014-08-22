@@ -37,12 +37,10 @@ struct dsp_filter
 };
 
 void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c);
-#ifdef HAVE_SW_TONE_CONTROLS
 void filter_bishelf_coefs(unsigned long cutoff_low,
                           unsigned long cutoff_high,
                           long A_low, long A_high, long A,
                           struct dsp_filter *f);
-#endif /* HAVE_SW_TONE_CONTROLS */
 void filter_pk_coefs(unsigned long cutoff, unsigned long Q, long db,
                      struct dsp_filter *f);
 void filter_ls_coefs(unsigned long cutoff, unsigned long Q, long db,
@@ -53,5 +51,7 @@ void filter_copy(struct dsp_filter *dst, const struct dsp_filter *src);
 void filter_flush(struct dsp_filter *f);
 void filter_process(struct dsp_filter *f, int32_t * const buf[], int count,
                     unsigned int channels);
-
+/* ring buffer */
+void enqueue(int32_t var, int32_t* buffer, int *head, int boundary);
+int32_t dequeue(int32_t* buffer, int *head, int boundary);
 #endif /* DSP_FILTER_H */
