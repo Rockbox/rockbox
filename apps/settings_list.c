@@ -1667,7 +1667,20 @@ const struct settings_list settings[] = {
     /* dithering */
     OFFON_SETTING(F_SOUNDSETTING, dithering_enabled, LANG_DITHERING, false,
                   "dithering enabled", dsp_dither_enable),
-
+    /* auditory fatigue reduction */
+    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, afr_enabled,
+                       LANG_AFR, 0,"afr enabled",
+                       "off,weak,moderate,strong", dsp_afr_enable, 4,
+                       ID2P(LANG_OFF), ID2P(LANG_WEAK),ID2P(LANG_MODERATE),ID2P(LANG_STRONG)),
+    /* PBE */
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, pbe,
+                       LANG_PBE, 0,
+                       "pbe", UNIT_PERCENT, 0, 100,
+                       25, NULL, NULL, dsp_pbe_enable),
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, pbe_precut,
+                       LANG_EQUALIZER_PRECUT, -25,
+                       "pbe precut", UNIT_DB, -45, 0,
+                       1, db_format, NULL, dsp_pbe_precut),
 #ifdef HAVE_PITCHCONTROL
     /* timestretch */
     OFFON_SETTING(F_SOUNDSETTING, timestretch_enabled, LANG_TIMESTRETCH, false,
