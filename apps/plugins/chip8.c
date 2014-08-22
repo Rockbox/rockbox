@@ -1315,13 +1315,14 @@ static unsigned char beep[]={255,
  20,100, 18, 96, 41, 96, 78,102,  7,201,122, 76,119, 20,137, 37,177, 15,132,224,
  20, 17,191, 67,147,187,116,211, 41,169, 63,172,182,186,217,155,111,140,104,254,
 111,181,184,144, 17,148, 21,101,166,227,100, 86, 85, 85, 85}; 
-
+#if (CONFIG_CODEC != SWCODEC)
 /* callback to request more mp3 data */
 static void callback(const void** start, size_t* size)
 {
     *start = beep; /* give it the same frame again */
     *size = sizeof(beep);
 }
+#endif /* CONFIG_CODEC == HWCODEC */
 #endif /* PLATFORM_NATIVE */
 
 /****************************************************************************/
@@ -1541,7 +1542,7 @@ static bool chip8_run(const char* file)
     rb->lcd_drawrect(CHIP8_X-1,CHIP8_Y-1,CHIP8_LCDWIDTH+2,CHIP8_HEIGHT+2);
 #endif
     rb->lcd_update();
-#if (CONFIG_CODEC == HWCODEC)
+#if (CONFIG_CODEC != SWCODEC)
     /* init sound */
     is_playing = rb->mp3_is_playing(); /* would we disturb playback? */
     if (!is_playing) /* no? then we can make sound */
