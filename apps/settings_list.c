@@ -446,6 +446,12 @@ static void crossfeed_cross_set(int val)
                                   global_settings.crossfeed_hf_cutoff);
 }
 
+static void surround_set_factor(int val)
+{
+    (void)val;
+    dsp_surround_set_cutoff(global_settings.surround_fx1, global_settings.surround_fx2);
+}
+
 static void compressor_set(int val)
 {
     (void)val;
@@ -1667,7 +1673,44 @@ const struct settings_list settings[] = {
     /* dithering */
     OFFON_SETTING(F_SOUNDSETTING, dithering_enabled, LANG_DITHERING, false,
                   "dithering enabled", dsp_dither_enable),
-
+    /* surround */
+    TABLE_SETTING(F_SOUNDSETTING, surround_enabled,
+                  LANG_SURROUND, 0, "surround enabled", "off",
+                  UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
+                  dsp_surround_enable, 6,
+                  0,5,8,10,15,30),
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, surround_balance,
+                       LANG_BALANCE, 35,
+                       "surround balance", UNIT_PERCENT, 0, 99,
+                       1, NULL, NULL, dsp_surround_set_balance),
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, surround_fx1,
+                       LANG_SURROUND_FX1, 3400,
+                       "surround_fx1", UNIT_HERTZ, 600, 8000,
+                       200, NULL, NULL, surround_set_factor),
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, surround_fx2,
+                       LANG_SURROUND_FX2, 320,
+                       "surround_fx2", UNIT_HERTZ, 40, 400,
+                       40, NULL, NULL, surround_set_factor),
+    OFFON_SETTING(F_SOUNDSETTING, surround_method2, LANG_SURROUND_METHOD2, false,
+                  "side only", dsp_surround_side_only),
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, surround_mix,
+                       LANG_SURROUND_MIX, 50,
+                       "surround mix", UNIT_PERCENT, 0, 100,
+                       5, NULL, NULL, dsp_surround_mix),
+    /* auditory fatigue reduction */
+    CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, afr_enabled,
+                       LANG_AFR, 0,"afr enabled",
+                       "off,weak,moderate,strong", dsp_afr_enable, 4,
+                       ID2P(LANG_OFF), ID2P(LANG_WEAK),ID2P(LANG_MODERATE),ID2P(LANG_STRONG)),
+    /* PBE */
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, pbe,
+                       LANG_PBE, 0,
+                       "pbe", UNIT_PERCENT, 0, 100,
+                       25, NULL, NULL, dsp_pbe_enable),
+    INT_SETTING_NOWRAP(F_SOUNDSETTING, pbe_precut,
+                       LANG_EQUALIZER_PRECUT, -25,
+                       "pbe precut", UNIT_DB, -45, 0,
+                       1, db_format, NULL, dsp_pbe_precut),
 #ifdef HAVE_PITCHCONTROL
     /* timestretch */
     OFFON_SETTING(F_SOUNDSETTING, timestretch_enabled, LANG_TIMESTRETCH, false,
