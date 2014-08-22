@@ -12349,6 +12349,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Лінія розділювач"
+  </dest>
+  <voice>
+    *: "Лінія розділювач"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Колір лінії розділювача"
+  </dest>
+  <voice>
+    *: "Колір лінії розділювача"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_RESET_START_DIR
   desc: reset the browser start directory
   user: core
@@ -12966,6 +12994,20 @@
   </dest>
   <voice>
     *: "Оберіть теки для сканування"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Обмеження максимальної гучності"
+  </dest>
+  <voice>
+    *: "Обмеження максимальної гучності"
   </voice>
 </phrase>
 <phrase>
