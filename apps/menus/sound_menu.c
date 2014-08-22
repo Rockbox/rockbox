@@ -166,6 +166,14 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 
     MENUITEM_SETTING(dithering_enabled,
                      &global_settings.dithering_enabled, lowlatency_callback);
+    MENUITEM_SETTING(afr_enabled,
+                     &global_settings.afr_enabled, lowlatency_callback);
+    MENUITEM_SETTING(pbe,
+                     &global_settings.pbe, lowlatency_callback);
+    MENUITEM_SETTING(pbe_precut,
+                     &global_settings.pbe_precut, lowlatency_callback);
+    MAKE_MENU(pbe_menu,ID2P(LANG_PBE), NULL, Icon_NOICON,
+              &pbe,&pbe_precut);
 
     /* compressor submenu */
     MENUITEM_SETTING(compressor_threshold,
@@ -235,7 +243,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           ,&roll_off
 #endif
 #if CONFIG_CODEC == SWCODEC
-          ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
+          ,&crossfeed_menu, &equalizer_menu, &dithering_enabled, &pbe_menu, &afr_enabled
 #ifdef HAVE_PITCHCONTROL
           ,&timestretch_enabled
 #endif
