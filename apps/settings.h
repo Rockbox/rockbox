@@ -838,6 +838,19 @@ struct user_settings
     int play_frequency; /* core audio output frequency selection */
 #endif
     int volume_limit; /* maximum volume limit */
+
+    int surround_enabled;
+    int surround_balance;
+    int surround_fx1;
+    int surround_fx2;
+    bool surround_method2;
+    int surround_mix;
+
+    int pbe;
+    int pbe_precut;
+
+    int afr_enabled;
+    int pbe_mix;
 };
 
 /** global variables **/
