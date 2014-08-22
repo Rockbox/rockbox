@@ -72,7 +72,7 @@ void filter_shelf_coefs(unsigned long cutoff, long A, bool low, int32_t *c)
     *c++ = -FRACMUL_SHL(a1, rcp_a0, 1);      /* -1 .. 1 */
 }
 
-#ifdef HAVE_SW_TONE_CONTROLS
+
 /** 
  * Calculate second order section filter consisting of one low-shelf and one
  * high-shelf section.
@@ -114,7 +114,7 @@ void filter_bishelf_coefs(unsigned long cutoff_low, unsigned long cutoff_high,
 
     f->shift = FILTER_BISHELF_SHIFT;
 }
-#endif /* HAVE_SW_TONE_CONTROLS */
+
 
 /* Coef calculation taken from Audio-EQ-Cookbook.txt by Robert Bristow-Johnson.
  * Slightly faster calculation can be done by deriving forms which use tan()
@@ -303,3 +303,23 @@ void filter_process(struct dsp_filter *f, int32_t * const buf[], int count,
     }
 }
 #endif /* CPU */
+
+/* ring buffer */
+int32_t dequeue(int32_t* buffer, int *head, int boundary)
+{
+    int32_t var = buffer[*head];
+    if (*head +1 >= boundary)
+        *head = 0;
+    else
+        *head += 1;
+    return var;
+}
+
+void enqueue(int32_t var, int32_t* buffer, int *head, int boundary)
+{
+    buffer[*head] = var;
+    if (*head +1 >= boundary)
+        *head = 0;
+    else
+        *head += 1;
+}
