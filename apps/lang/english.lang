@@ -13237,3 +13237,54 @@
     swcodec: "Q"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE_PRECUT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "PRECUT"
+  </source>
+  <dest>
+    *: none
+    swcodec: "PRECUT"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "PRECUT"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </voice>
+</phrase>
