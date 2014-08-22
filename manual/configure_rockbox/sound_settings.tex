@@ -573,6 +573,17 @@ Rockbox uses highpass triangular distribution noise as the dithering noise
 source, and a third order noise shaper.
 }
 
+\opt{swcodec}{
+\section{Perceptual Bass Enchancement}
+Perceptual bass enchancement boosts lower frequencies while applying a 
+frequency-dependent phase delay that emphasizes bass.  Note that this effect
+will stack on top of any EQ-effects.
+
+\section{PBE Precut}
+Digital attenuation applied to PBE prior to processing to reduce clipping.
+
+}
+
 \opt{swcodec}{%
 \opt{pitchscreen}{%
 \section{Timestretch}
