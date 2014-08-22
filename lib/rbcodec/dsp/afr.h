@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 Michael Sevakis
+ * Copyright (C) 2014 by Chiwen Chang
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,24 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DSP_PROC_SETTINGS_H
-#define DSP_PROC_SETTINGS_H
+#ifndef AFR_H
+#define AFR_H
 
-/* Collect all headers together */
-#include "channel_mode.h"
-#include "compressor.h"
-#include "crossfeed.h"
-#include "dsp_misc.h"
-#include "eq.h"
-#include "pga.h"
-#include "surround.h"
-#include "afr.h"
-#include "pbe.h"
-#ifdef HAVE_PITCHCONTROL
-#include "tdspeed.h"
-#endif
-#ifdef HAVE_SW_TONE_CONTROLS
-#include "tone_controls.h"
-#endif
+#include <stdbool.h>
+void dsp_afr_enable(int var);
 
-#endif /* DSP_PROC_SETTINGS_H */
+#endif /* AFR_H */

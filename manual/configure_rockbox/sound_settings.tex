@@ -591,6 +591,33 @@ details about how to use the feature.
 }
 
 \opt{swcodec}{
+\section{Haas Surround}
+This setting does Haas effect with adjustable delay time to enhance the stereo stage
+of the sound. A full range haas effect may sounds like everything starts from left channel ends at right.
+Therefore, four additional functions are provided to move the stage back to the center:
+First is a \setting{Balance} setting for change left-right channel output ratio.  Second
+is a bypass band for frequency mostly contain vocals, using \setting{f(x1)}, \setting{f(x2)} to reserved the
+frequncy range. The \setting{SIDE ONLY} setting uses mid-side
+processing to determine and apply effect to side only. And finally, a \setting{Dry/Wet Mix}
+to adjust the proportion of mix between the original (dry) and 'effected' (wet) signals.
+}
+
+\opt{swcodec}{
+\section{Perceptual Bass Enhancement}
+This setting dose a group delay correction and an additional Biophonic EQ to
+emphasize the clarity of the sounds. The \setting{Precut} setting provides
+negative overall gain to prevent possible audio distortion due to the EQ
+gain.  The defult precut value is set to -2.5 dB and can be adjust from 0 dB to -4.5 dB.
+}
+
+\opt{swcodec}{
+\section{Auditory Fatigue Reduction}
+Human hearing are most senstive to some frequency bands, and this setting applies custom presets
+of equalization and bi-shelf filter to reduce signals in those bands to minimize
+the chance that temporary threshold shift (Auditory Fatigue) occurs.
+}
+
+\opt{swcodec}{
 \section{Compressor}
 The \setting{Compressor} reduces, or compresses, the dynamic range of the audio
 signal.  This makes the quieter and louder sections closer to the same volume
