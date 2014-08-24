@@ -61,6 +61,7 @@
 #ifdef HAVE_HOTKEY
 #include "onplay.h"
 #endif
+#include "pcmbuf.h"
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
@@ -451,6 +452,74 @@ static void compressor_set(int val)
     (void)val;
     dsp_set_compressor(&global_settings.compressor_settings);
 }
+
+static void settings_apply_eq(int band)
+{
+    pcmbuf_set_low_latency(true);
+    dsp_set_eq_coefs(band, &global_settings.eq_band_settings[band]);
+    pcmbuf_set_low_latency(false);
+}
+
+static void settings_apply_eq_b0(int val)
+{
+    (void)val;
+    settings_apply_eq(0);
+}
+
+static void settings_apply_eq_b1(int val)
+{
+    (void)val;
+    settings_apply_eq(1);
+}
+
+static void settings_apply_eq_b2(int val)
+{
+    (void)val;
+    settings_apply_eq(2);
+}
+
+static void settings_apply_eq_b3(int val)
+{
+    (void)val;
+    settings_apply_eq(3);
+}
+
+static void settings_apply_eq_b4(int val)
+{
+    (void)val;
+    settings_apply_eq(4);
+}
+
+static void settings_apply_eq_b5(int val)
+{
+    (void)val;
+    settings_apply_eq(5);
+}
+
+static void settings_apply_eq_b6(int val)
+{
+    (void)val;
+    settings_apply_eq(6);
+}
+
+static void settings_apply_eq_b7(int val)
+{
+    (void)val;
+    settings_apply_eq(7);
+}
+
+static void settings_apply_eq_b8(int val)
+{
+    (void)val;
+    settings_apply_eq(8);
+}
+
+static void settings_apply_eq_b9(int val)
+{
+    (void)val;
+    settings_apply_eq(9);
+}
+
 
 static const char* db_format(char* buffer, size_t buffer_size, int value,
                       const char* unit)
@@ -1547,7 +1616,7 @@ const struct settings_list settings[] = {
 
     /* equalizer */
     OFFON_SETTING(F_EQSETTING, eq_enabled, LANG_EQUALIZER_ENABLED, false,
-                  "eq enabled", NULL),
+                  "eq enabled", dsp_eq_enable),
 
     INT_SETTING_NOWRAP(F_EQSETTING, eq_precut, LANG_EQUALIZER_PRECUT, 0,
                        "eq precut", UNIT_DB, 0, 240, 1, eq_precut_format,
@@ -1556,96 +1625,96 @@ const struct settings_list settings[] = {
     /* 0..32768 Hz */
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[0].cutoff, LANG_EQUALIZER_BAND_CUTOFF,
                        32, "eq band 0 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b0),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[1].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        64, "eq band 1 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b1),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[2].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        125, "eq band 2 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b2),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[3].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        250, "eq band 3 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b3),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[4].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        500, "eq band 4 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b4),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[5].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        1000, "eq band 5 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b5),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[6].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        2000, "eq band 6 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b6),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[7].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        4000, "eq band 7 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b7),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[8].cutoff, LANG_EQUALIZER_BAND_CENTER,
                        8000, "eq band 8 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b8),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[9].cutoff, LANG_EQUALIZER_BAND_CUTOFF,
                        16000, "eq band 9 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
+                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, settings_apply_eq_b9),
     /* 0..64 (or 0.0 to 6.4) */
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[0].q, LANG_EQUALIZER_BAND_Q, 7,
                        "eq band 0 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b0),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[1].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 1 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b1),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[2].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 2 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b2),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[3].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 3 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b3),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[4].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 4 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b4),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[5].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 5 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b5),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[6].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 6 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b6),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[7].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 7 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b7),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[8].q, LANG_EQUALIZER_BAND_Q, 10,
                        "eq band 8 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b8),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[9].q, LANG_EQUALIZER_BAND_Q, 7,
                        "eq band 9 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
+                       eq_q_format, get_dec_talkid, settings_apply_eq_b9),
     /* -240..240 (or -24db to +24db) */
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[0].gain, LANG_GAIN, 0,
                        "eq band 0 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b0),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[1].gain, LANG_GAIN, 0,
                        "eq band 1 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b1),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[2].gain, LANG_GAIN, 0,
                        "eq band 2 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b2),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[3].gain, LANG_GAIN, 0,
                        "eq band 3 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b3),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[4].gain, LANG_GAIN, 0,
                        "eq band 4 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b4),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[5].gain, LANG_GAIN, 0,
                        "eq band 5 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b5),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[6].gain, LANG_GAIN, 0,
                        "eq band 6 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b6),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[7].gain, LANG_GAIN, 0,
                        "eq band 7 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b7),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[8].gain, LANG_GAIN, 0,
                        "eq band 8 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b8),
     INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[9].gain, LANG_GAIN, 0,
                        "eq band 9 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
+                       EQ_GAIN_STEP, db_format, get_dec_talkid, settings_apply_eq_b9),
 
 #define EQ_BAND(id, string) \
         CUSTOM_SETTING(F_EQSETTING, eq_band_settings[id], -1,   \
