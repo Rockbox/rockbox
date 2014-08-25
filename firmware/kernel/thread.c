@@ -193,7 +193,6 @@ static NO_INLINE NORETURN_ATTR
     static char name[sizeof (((struct thread_debug_info *)0)->name)];
     format_thread_name(name, sizeof (name), thread);
     panicf ("%s %s" IF_COP(" (%d)"), msg, name IF_COP(, core));
-    while (1);
 }
 
 static NO_INLINE void thread_stkov(struct thread_entry *thread)

@@ -44,12 +44,13 @@ static char panic_buf[128];
 void panicf_f( const char *fmt, ...);
 
 /* we wrap panicf() here with naked function to catch SP value */
-void panicf( const char *fmt, ...)
+void __attribute__((naked)) panicf( const char *fmt, ...)
 {
     (void)fmt;
     asm volatile ("mov r4, sp \n"
                   "b panicf_f \n"
                  );
+    while (1);
 }
 
 /*

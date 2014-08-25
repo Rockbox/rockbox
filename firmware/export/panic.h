@@ -25,9 +25,6 @@
 #include "config.h"
 #include "gcc_extensions.h"
 
-#if defined(CPU_ARM)
-void panicf( const char *fmt, ... ) __attribute__ ((naked)) ATTRIBUTE_PRINTF(1, 2);
-#else
-void panicf( const char *fmt, ... ) ATTRIBUTE_PRINTF(1, 2);
-#endif
+void panicf( const char *fmt, ... ) ATTRIBUTE_PRINTF(1, 2) NORETURN_ATTR;
+
 #endif /* __PANIC_H__ */
