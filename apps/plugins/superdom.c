@@ -19,8 +19,9 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "lib/playback_control.h"
 #include "lib/display_text.h"
+#include "lib/playback_control.h"
+#include "lib/pluginlib_actions.h"
 #include "pluginbitmaps/superdom_boarditems.h"
 
 char buf[255];
@@ -64,194 +65,23 @@ char buf[255];
 #define ICON_HEIGHT     (BMPHEIGHT_superdom_boarditems/6)
 #define ICON_WIDTH      (BMPWIDTH_superdom_boarditems/2)
 
+#define SUPERDOM_OK PLA_SELECT
+#define SUPERDOM_CANCEL PLA_CANCEL
+#define SUPERDOM_RIGHT PLA_RIGHT
+#define SUPERDOM_LEFT PLA_LEFT
+#define SUPERDOM_UP PLA_UP
+#define SUPERDOM_DOWN PLA_DOWN
+
+#define SUPERDOM_RIGHT_REPEAT PLA_RIGHT_REPEAT
+#define SUPERDOM_LEFT_REPEAT PLA_LEFT_REPEAT
+#define SUPERDOM_UP_REPEAT PLA_UP_REPEAT
+#define SUPERDOM_DOWN_REPEAT PLA_DOWN_REPEAT
+
+
+
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_CANCEL BUTTON_MENU
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
 #define IPOD_STYLE
-
-#elif CONFIG_KEYPAD == IRIVER_H300_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_CANCEL BUTTON_OFF
-
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_CANCEL BUTTON_REC
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define SUPERDOM_OK BUTTON_RIGHT
-#define SUPERDOM_UP BUTTON_SCROLL_UP
-#define SUPERDOM_DOWN BUTTON_SCROLL_DOWN
-#define SUPERDOM_CANCEL BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_POWER
-
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_UP BUTTON_SCROLL_BACK
-#define SUPERDOM_DOWN BUTTON_SCROLL_FWD
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_POWER
-
-#elif CONFIG_KEYPAD == SANSA_FUZE_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_UP BUTTON_SCROLL_BACK
-#define SUPERDOM_DOWN BUTTON_SCROLL_FWD
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_CANCEL (BUTTON_HOME|BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD || \
-      CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_BACK
-
-#elif CONFIG_KEYPAD == COWON_D2_PAD
-#define SUPERDOM_CANCEL BUTTON_POWER
-
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_BACK
-
-#elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
-#define SUPERDOM_OK (BUTTON_PLAY|BUTTON_REL)
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_BACK
-#define SUPERDOM_RIGHT BUTTON_MENU
-#define SUPERDOM_CANCEL (BUTTON_PLAY|BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-#define SUPERDOM_OK BUTTON_PLAY
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_PREV
-#define SUPERDOM_RIGHT BUTTON_NEXT
-#define SUPERDOM_CANCEL BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-#define SUPERDOM_OK BUTTON_PLAY
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_PREV
-#define SUPERDOM_RIGHT BUTTON_NEXT
-#define SUPERDOM_CANCEL BUTTON_LEFT
-
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD) || (CONFIG_KEYPAD == MROBE500_PAD)
-#define SUPERDOM_CANCEL BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
-#define SUPERDOM_OK     BUTTON_PLAY
-#define SUPERDOM_UP     BUTTON_UP
-#define SUPERDOM_DOWN   BUTTON_DOWN
-#define SUPERDOM_LEFT   BUTTON_LEFT
-#define SUPERDOM_RIGHT  BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_REW
-
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define SUPERDOM_OK     BUTTON_OK
-#define SUPERDOM_UP     BUTTON_UP
-#define SUPERDOM_DOWN   BUTTON_DOWN
-#define SUPERDOM_LEFT   BUTTON_PREV
-#define SUPERDOM_RIGHT  BUTTON_NEXT
-#define SUPERDOM_CANCEL BUTTON_CANCEL
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define SUPERDOM_OK     BUTTON_ENTER
-#define SUPERDOM_UP     BUTTON_UP
-#define SUPERDOM_DOWN   BUTTON_DOWN
-#define SUPERDOM_LEFT   BUTTON_REW
-#define SUPERDOM_RIGHT  BUTTON_FF
-#define SUPERDOM_CANCEL BUTTON_MENU
-
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#define SUPERDOM_OK     BUTTON_SELECT
-#define SUPERDOM_UP     BUTTON_UP
-#define SUPERDOM_DOWN   BUTTON_DOWN
-#define SUPERDOM_LEFT   BUTTON_LEFT
-#define SUPERDOM_RIGHT  BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_BACK
-
-#elif CONFIG_KEYPAD == SONY_NWZ_PAD
-#define SUPERDOM_OK     BUTTON_PLAY
-#define SUPERDOM_UP     BUTTON_UP
-#define SUPERDOM_DOWN   BUTTON_DOWN
-#define SUPERDOM_LEFT   BUTTON_LEFT
-#define SUPERDOM_RIGHT  BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_BACK
-
-#elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
-#define SUPERDOM_OK     BUTTON_SELECT
-#define SUPERDOM_UP     BUTTON_UP
-#define SUPERDOM_DOWN   BUTTON_DOWN
-#define SUPERDOM_LEFT   BUTTON_LEFT
-#define SUPERDOM_RIGHT  BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_BACK
-
-#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == HM60X_PAD) || \
-    (CONFIG_KEYPAD == HM801_PAD)
-#define SUPERDOM_OK BUTTON_SELECT
-#define SUPERDOM_UP BUTTON_UP
-#define SUPERDOM_DOWN BUTTON_DOWN
-#define SUPERDOM_LEFT BUTTON_LEFT
-#define SUPERDOM_RIGHT BUTTON_RIGHT
-#define SUPERDOM_CANCEL BUTTON_POWER
-
-#endif
-
-#ifdef HAVE_TOUCHSCREEN
-#ifndef SUPERDOM_OK
-#define SUPERDOM_OK     BUTTON_CENTER
-#endif
-#ifndef SUPERDOM_UP
-#define SUPERDOM_UP     BUTTON_TOPMIDDLE
-#endif
-#ifndef SUPERDOM_LEFT
-#define SUPERDOM_LEFT   BUTTON_MIDLEFT
-#endif
-#ifndef SUPERDOM_RIGHT
-#define SUPERDOM_RIGHT  BUTTON_MIDRIGHT
-#endif
-#ifndef SUPERDOM_DOWN
-#define SUPERDOM_DOWN   BUTTON_BOTTOMMIDDLE
-#endif
-#ifndef SUPERDOM_CANCEL
-#define SUPERDOM_CANCEL BUTTON_TOPLEFT
-#endif
 #endif
 
 enum {
@@ -312,6 +142,8 @@ static struct cursor{
 } cursor;
 
 static struct tile board[12][12];
+
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 static void init_board(void) {
     int i,j;
@@ -375,18 +207,18 @@ void draw_board(void) {
             } else {
                 rb->lcd_set_foreground(LCD_LIGHTGRAY);
             }
-            rb->lcd_fillrect(MARGIN+(BOX_WIDTH*(i-1)), 
-                            MARGIN+(BOX_HEIGHT*(j-1)), BOX_WIDTH, 
+            rb->lcd_fillrect(MARGIN+(BOX_WIDTH*(i-1)),
+                            MARGIN+(BOX_HEIGHT*(j-1)), BOX_WIDTH,
                             BOX_HEIGHT);
 #if LCD_DEPTH != 16
-            rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID); 
+            rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
 #endif
             if(board[i][j].ind) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, 0, ICON_STRIDE, 
+                                board[i][j].colour?ICON_WIDTH:0, 0, ICON_STRIDE,
 #if LCD_WIDTH > LCD_HEIGHT
-                                MARGIN+(BOX_WIDTH*(i-1))+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
+                                MARGIN+(BOX_WIDTH*(i-1))+1,
+                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
 #else
                                 MARGIN+(BOX_WIDTH*(i-1))+1+ICON_WIDTH,
                                 MARGIN+(BOX_HEIGHT*(j-1))+1,
@@ -395,16 +227,16 @@ void draw_board(void) {
             }
             if(board[i][j].farm) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT, 
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT,
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
+                                MARGIN+(BOX_HEIGHT*(j-1))+1,
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].tank) {
                 MY_BITMAP_PART(superdom_boarditems,
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*2,
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
+                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
+                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
                                 ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].men) {
@@ -412,7 +244,7 @@ void draw_board(void) {
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*3,
 #if LCD_WIDTH > LCD_HEIGHT
                                 ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                                MARGIN+(BOX_HEIGHT*(j-1))+1,
 #else
                                 ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+1+ICON_HEIGHT,
@@ -436,7 +268,7 @@ void draw_board(void) {
                                 board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*5,
 #if LCD_WIDTH > LCD_HEIGHT
                                 ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                                MARGIN+(BOX_HEIGHT*(j-1))+1,
 #else
                                 ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+1,
                                 MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
@@ -462,8 +294,7 @@ static int calc_strength(int colour, int x, int y) {
     int a, b, score=0;
     for (a = -1; a < 2; a++) {
         for (b = -1; b < 2; b++) {
-            if ((b == 0 || a == 0) &&
-                (board[x + a][y + b].colour == colour)) {
+            if(board[x+a][y+b].colour==colour) {
                 score += 10;
                 if(board[x + a][y + b].tank || board[x + a][y + b].farm)
                     score += 30;
@@ -489,7 +320,7 @@ void gen_interest(void) {
 
 void draw_cursor(void) {
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(MARGIN+((cursor.x-1)*BOX_WIDTH), 
+    rb->lcd_fillrect(MARGIN+((cursor.x-1)*BOX_WIDTH),
                   MARGIN+((cursor.y-1)*BOX_HEIGHT), BOX_WIDTH+1, BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
@@ -516,10 +347,10 @@ void gen_resources(void) {
             ratefood = incfood/humanres.farms;
         if(ratecash > 450) {
             if(ratefood > 350) {
-                rb->splash(HZ*2, "Patriotism sweeps the land, all production" 
+                rb->splash(HZ*2, "Patriotism sweeps the land, all production"
                                 " is up this year!");
             } else {
-                rb->splash(HZ*2, "Factories working at maximum efficiency," 
+                rb->splash(HZ*2, "Factories working at maximum efficiency,"
                                 " cash production up this year!");
             }
         } else if(ratecash > 350) {
@@ -528,17 +359,17 @@ void gen_resources(void) {
             } else if(ratefood > 250) {
                 rb->splash(HZ*2, "Production continues as normal");
             } else {
-                rb->splash(HZ*2, "Spoilage of crops leads to reduced farm" 
+                rb->splash(HZ*2, "Spoilage of crops leads to reduced farm"
                                 " output this  year");
             }
         } else {
             if(ratefood > 350) {
                 rb->splash(HZ*2, "Record crop harvest this year!");
             } else if(ratefood > 250) {
-                rb->splash(HZ*2, "Factory unions introduced. Industrial" 
+                rb->splash(HZ*2, "Factory unions introduced. Industrial"
                                 " production is down this year.");
             } else {
-                rb->splash(HZ*2, "Internet created. All production is down" 
+                rb->splash(HZ*2, "Internet created. All production is down"
                                 " due to time wasted.");
             }
         }
@@ -582,18 +413,18 @@ static int settings_menu(void) {
     while(1) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
         case 0:
-            rb->set_int("Computer starting farms", "", UNIT_INT, 
-                            &superdom_settings.compstartfarms, NULL, 
+            rb->set_int("Computer starting farms", "", UNIT_INT,
+                            &superdom_settings.compstartfarms, NULL,
                             1, 0, 5, NULL);
             break;
         case 1:
-            rb->set_int("Computer starting factories", "", UNIT_INT, 
-                            &superdom_settings.compstartinds, NULL, 
+            rb->set_int("Computer starting factories", "", UNIT_INT,
+                            &superdom_settings.compstartinds, NULL,
                             1, 0, 5, NULL);
             break;
         case 2:
-            rb->set_int("Human starting farms", "", UNIT_INT, 
-                            &superdom_settings.humanstartfarms, NULL, 
+            rb->set_int("Human starting farms", "", UNIT_INT,
+                            &superdom_settings.humanstartfarms, NULL,
                             1, 0, 5, NULL);
             break;
         case 3:
@@ -602,17 +433,17 @@ static int settings_menu(void) {
                             1, 0, 5, NULL);
             break;
         case 4:
-            rb->set_int("Starting cash", "", UNIT_INT, 
-                            &superdom_settings.startcash, NULL, 
+            rb->set_int("Starting cash", "", UNIT_INT,
+                            &superdom_settings.startcash, NULL,
                             250, 0, 5000, NULL);
             break;
         case 5:
-            rb->set_int("Starting food", "", UNIT_INT, 
-                            &superdom_settings.startfood, NULL, 
+            rb->set_int("Starting food", "", UNIT_INT,
+                            &superdom_settings.startfood, NULL,
                             250, 0, 5000, NULL);
             break;
         case 6:
-            rb->set_int("Moves per turn", "", UNIT_INT, 
+            rb->set_int("Moves per turn", "", UNIT_INT,
                             &superdom_settings.movesperturn, NULL,
                             1, 1, 5, NULL);
             break;
@@ -635,12 +466,15 @@ static int superdom_help(void) {
         "Each", "year", "you", "are", "allocated", "an", "amount", "of", "cash",
         "and", "food,", "depending", "on", "how", "many", "farms", "and",
         "factories", "you", "control.", "",
-        "Use", "this", "cash", "and", "food", "to", "buy", "and", "feed", "your",
+        "Use", "this", "cash", "and", "food", "to", "build", "and", "feed", "your",
         "army.", "Each", "tile", "has", "a", "strength,", "calculated", "by",
-        "the", "ownership", "of", "adjacent", "tiles,", "and", "the", "type",
+        "the", "ownership", "of", "surrounding", "tiles,", "and", "the", "type",
         "and", "number", "of", "troops", "on", "them.",
     };
-
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_BLACK);
+#endif
     if (display_text(ARRAYLEN(help_text), help_text, NULL, NULL, true))
         return RET_VAL_USB;
     return RET_VAL_OK;
@@ -801,13 +635,13 @@ static int get_number(char* param, int* value, int max) {
     else
         rb->lcd_puts_scroll(0, (NUM_MARGIN_Y/height-1)/2, param);
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x), 
-                    NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y), 
+    rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
+                    NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
                     NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
     while(!done) {
-        button = rb->button_get(true);
+        button=pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
         rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
                         NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
@@ -843,12 +677,6 @@ static int get_number(char* param, int* value, int max) {
 #if CONFIG_KEYPAD != IRIVER_H10_PAD
             case SUPERDOM_LEFT:
                 if(x==0) {
-#ifdef IPOD_STYLE
-                    if(y>0)
-                        y--;
-                    else
-                        y=3;
-#endif
                     x=2;
                 } else {
                     x--;
@@ -856,19 +684,12 @@ static int get_number(char* param, int* value, int max) {
                 break;
             case SUPERDOM_RIGHT:
                 if(x==2) {
-#ifdef IPOD_STYLE
-                    if(y==3)
-                        y=0;
-                    else
-                        y++;
-#endif
                     x=0;
                 } else {
                     x++;
                 }
                 break;
 #endif
-#ifndef IPOD_STYLE
             case SUPERDOM_UP:
                 if(y==0) {
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
@@ -889,13 +710,12 @@ static int get_number(char* param, int* value, int max) {
                         x++;
                     else
                         x=0;
-#endif
+#endif /* CONFIG_KEYPAD == IRIVER_H10_PAD */
                     y=0;
                 } else {
                     y++;
                 }
                 break;
-#endif
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
@@ -905,8 +725,8 @@ static int get_number(char* param, int* value, int max) {
                 break;
         }
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x), 
-                        NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y), 
+        rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
+                        NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
                         NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
         rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_update();
@@ -1274,7 +1094,7 @@ static int movement_menu(void) {
                     if(move_unit_menu()==RET_VAL_USB)
                         return RET_VAL_USB;
                 } else {
-                    rb->splash(HZ, "You have no more moves left." 
+                    rb->splash(HZ, "You have no more moves left."
                                    " You can buy more for $100 each.");
                 }
                 break;
@@ -1282,7 +1102,7 @@ static int movement_menu(void) {
                 if(humanres.cash > 100) {
                     humanres.moves++;
                     humanres.cash -= 100;
-                    rb->snprintf(buf, sizeof(buf), "You now have %d moves", 
+                    rb->snprintf(buf, sizeof(buf), "You now have %d moves",
                                     humanres.moves);
                     rb->splash(HZ, buf);
                 }
@@ -1469,7 +1289,7 @@ static int select_square(void) {
 #endif
     rb->lcd_update();
     while(1) {
-        button = rb->button_get(true);
+        button=pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
         switch(button) {
             case SUPERDOM_CANCEL:
                 rb->splash(HZ, "Cancelled");
@@ -1480,43 +1300,30 @@ static int select_square(void) {
                 break;
 #if CONFIG_KEYPAD != IRIVER_H10_PAD
             case SUPERDOM_LEFT:
-            case (SUPERDOM_LEFT|BUTTON_REPEAT):
+            case SUPERDOM_LEFT_REPEAT:
                 draw_cursor(); /* Deselect the current tile */
                 if(cursor.x>1) {
                     cursor.x--;
                 } else {
-#ifdef IPOD_STYLE
-                    if(cursor.y>1)
-                        cursor.y--;
-                    else
-                        cursor.y = 10;
-#endif
                     cursor.x = 10;
                 }
                 update_score();
                 draw_cursor();
                 break;
             case SUPERDOM_RIGHT:
-            case (SUPERDOM_RIGHT|BUTTON_REPEAT):
+            case SUPERDOM_RIGHT_REPEAT:
                 draw_cursor(); /* Deselect the current tile */
                 if(cursor.x<10) {
                     cursor.x++;
                 } else {
-#ifdef IPOD_STYLE
-                    if(cursor.y<10)
-                        cursor.y++;
-                    else
-                        cursor.y = 1;
-#endif
                     cursor.x = 1;
                 }
                 update_score();
                 draw_cursor();
                 break;
 #endif
-#ifndef IPOD_STYLE
             case SUPERDOM_UP:
-            case (SUPERDOM_UP|BUTTON_REPEAT):
+            case SUPERDOM_UP_REPEAT:
                 draw_cursor(); /* Deselect the current tile */
                 if(cursor.y>1) {
                     cursor.y--;
@@ -1533,7 +1340,7 @@ static int select_square(void) {
                 draw_cursor();
                 break;
             case SUPERDOM_DOWN:
-            case (SUPERDOM_DOWN|BUTTON_REPEAT):
+            case SUPERDOM_DOWN_REPEAT:
                 draw_cursor(); /* Deselect the current tile */
                 if(cursor.y<10) {
                     cursor.y++;
@@ -1549,7 +1356,6 @@ static int select_square(void) {
                 update_score();
                 draw_cursor();
                 break;
-#endif
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
@@ -1705,7 +1511,7 @@ static bool place_adjacent(bool tank, int x, int y) {
 }
 
 static bool has_adjacent(int x, int y) {
-    if((board[x][y].colour == COLOUR_LIGHT) && 
+    if((board[x][y].colour == COLOUR_LIGHT) &&
        ((board[x-1][y].colour == COLOUR_DARK) ||
        (board[x+1][y].colour == COLOUR_DARK) ||
        (board[x][y+1].colour == COLOUR_DARK) ||
@@ -1808,7 +1614,7 @@ static void computer_allocate(void) {
             }
         }
         if(k == 0) {
-            /* No targets found! Randomly pick squares and if they're owned 
+            /* No targets found! Randomly pick squares and if they're owned
              * by the computer then stick a tank on it. */
                 rb->srand(*rb->current_tick);
                 while(compres.cash >= 300 && compres.tanks < numterritory) {
@@ -1899,25 +1705,25 @@ static void computer_allocate(void) {
 static int find_adj_target(int x, int y, struct cursor* adj) {
     /* Find a square next to a computer's farm or factory owned by the player
      * that is vulnerable. Return 1 on success, 0 otherwise */
-    if(board[x+1][y].colour == COLOUR_LIGHT && 
+    if(board[x+1][y].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x+1,y)<=calc_strength(COLOUR_DARK,x+1,y)) {
         adj->x = x+1;
         adj->y = y;
         return 1;
     }
-    if(board[x-1][y].colour == COLOUR_LIGHT && 
+    if(board[x-1][y].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x-1,y)<=calc_strength(COLOUR_DARK,x-1,y)) {
         adj->x = x-1;
         adj->y = y;
         return 1;
     }
-    if(board[x][y+1].colour == COLOUR_LIGHT && 
+    if(board[x][y+1].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x,y+1)<=calc_strength(COLOUR_DARK,x,y+1)) {
         adj->x = x;
         adj->y = y+1;
         return 1;
     }
-    if(board[x][y-1].colour == COLOUR_LIGHT && 
+    if(board[x][y-1].colour == COLOUR_LIGHT &&
          calc_strength(COLOUR_LIGHT,x,y-1)<=calc_strength(COLOUR_DARK,x,y-1)) {
         adj->x = x;
         adj->y = y-1;
@@ -1977,8 +1783,8 @@ static void computer_war(void) {
         found_target = false;
         for(i=1;i<11;i++) {
             for(j=1;j<11;j++) {
-                if(board[i][j].colour == COLOUR_LIGHT && 
-                  (calc_strength(COLOUR_DARK, i, j)  >= 
+                if(board[i][j].colour == COLOUR_LIGHT &&
+                  (calc_strength(COLOUR_DARK, i, j)  >=
                    calc_strength(COLOUR_LIGHT, i, j))) {
                     found_target = true;
                     if(attack_territory(COLOUR_DARK, i, j) >= 0) {
