@@ -1271,6 +1271,10 @@ static int movement_menu(void)
                              humanres.moves);
                 rb->splash(HZ, buf);
             }
+            else
+            {
+                rb->splash(HZ, "Not enough money!");
+            }
             break;
         case 2:
             if(humanres.nukes==0)
