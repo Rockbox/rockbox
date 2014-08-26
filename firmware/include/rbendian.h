@@ -22,7 +22,10 @@
 #define _RBENDIAN_H_
 
 #include "config.h"
+
+#ifndef __MINGW32__
 #include <endian.h>
+#endif
 
 /* clear these out since we redefine them to be truely constant compatible */
 #undef swap16
@@ -42,6 +45,34 @@
 #undef htobe32
 #undef htobe64
 
+/* static/generic endianness conversion */
+#define SWAP16_CONST(x) \
+    ((typeof(x))( ((uint16_t)(x) >> 8) | ((uint16_t)(x) << 8) ))
+
+#define SWAP32_CONST(x) \
+    ((typeof(x))( (((uint32_t)(x) & 0xff000000) >> 24) | \
+                  (((uint32_t)(x) & 0x00ff0000) >>  8) | \
+                  (((uint32_t)(x) & 0x0000ff00) <<  8) | \
+                  (((uint32_t)(x) & 0x000000ff) << 24) ))
+
+#define SWAP64_CONST(x) \
+    ((typeof(x))( (((uint64_t)(x) & 0xff00000000000000ull) >> 56) | \
+                  (((uint64_t)(x) & 0x00ff000000000000ull) >> 40) | \
+                  (((uint64_t)(x) & 0x0000ff0000000000ull) >> 24) | \
+                  (((uint64_t)(x) & 0x000000ff00000000ull) >>  8) | \
+                  (((uint64_t)(x) & 0x00000000ff000000ull) <<  8) | \
+                  (((uint64_t)(x) & 0x0000000000ff0000ull) << 24) | \
+                  (((uint64_t)(x) & 0x000000000000ff00ull) << 40) | \
+                  (((uint64_t)(x) & 0x00000000000000ffull) << 56) ))
+
+#define SWAP_ODD_EVEN32_CONST(x) \
+    ((typeof(x))( ((uint32_t)SWAP16_CONST((uint32_t)(x) >> 16) << 16) | \
+                             SWAP16_CONST((uint32_t)(x))) )
+
+#define SWAW32_CONST(x) \
+    ((typeof(x))( ((uint32_t)(x) << 16) | ((uint32_t)(x) >> 16) ))
+
+
 #ifndef __ENDIAN_H_NATIVE_RB
 
 #if defined (__bswap_16)
@@ -52,11 +83,16 @@
   #define __swap16_os(x)    __swap16(x)
   #define __swap32_os(x)    __swap32(x)
   #define __swap64_os(x)    __swap64(x)
+#elif defined (__MINGW32__)
+  /* kinda hacky but works */
+  #define __swap16_os(x)    SWAP16_CONST(x)
+  #define __swap32_os(x)    SWAP32_CONST(x)
+  #define __swap64_os(x)    SWAP64_CONST(x)
 #else
   #error "Missing OS swap defines."
 #endif
 
-/* wrap these because they aren't compatible with compound initializers */
+/* wrap these because they aren't always compatible with compound initializers */
 static FORCE_INLINE uint16_t swap16_hw(uint16_t x)
   { return __swap16_os(x); }
 static FORCE_INLINE uint32_t swap32_hw(uint32_t x)
@@ -87,33 +123,6 @@ static inline uint32_t swaw32_hw(uint32_t value)
     return (value >> 16) | (value << 16);
 }
 #endif /* Generic */
-
-/* static endianness conversion */
-#define SWAP16_CONST(x) \
-    ((typeof(x))( ((uint16_t)(x) >> 8) | ((uint16_t)(x) << 8) ))
-
-#define SWAP32_CONST(x) \
-    ((typeof(x))( (((uint32_t)(x) & 0xff000000) >> 24) | \
-                  (((uint32_t)(x) & 0x00ff0000) >>  8) | \
-                  (((uint32_t)(x) & 0x0000ff00) <<  8) | \
-                  (((uint32_t)(x) & 0x000000ff) << 24) ))
-
-#define SWAP64_CONST(x) \
-    ((typeof(x))( (((uint64_t)(x) & 0xff00000000000000ull) >> 56) | \
-                  (((uint64_t)(x) & 0x00ff000000000000ull) >> 40) | \
-                  (((uint64_t)(x) & 0x0000ff0000000000ull) >> 24) | \
-                  (((uint64_t)(x) & 0x000000ff00000000ull) >>  8) | \
-                  (((uint64_t)(x) & 0x00000000ff000000ull) <<  8) | \
-                  (((uint64_t)(x) & 0x0000000000ff0000ull) << 24) | \
-                  (((uint64_t)(x) & 0x000000000000ff00ull) << 40) | \
-                  (((uint64_t)(x) & 0x00000000000000ffull) << 56) ))
-
-#define SWAP_ODD_EVEN32_CONST(x) \
-    ((typeof(x))( ((uint32_t)SWAP16_CONST((uint32_t)(x) >> 16) << 16) | \
-                             SWAP16_CONST((uint32_t)(x))) )
-
-#define SWAW32_CONST(x) \
-    ((typeof(x))( ((uint32_t)(x) << 16) | ((uint32_t)(x) >> 16) ))
 
 /* select best method based upon whether x is a constant expression */
 #define swap16(x) \
