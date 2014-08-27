@@ -389,9 +389,47 @@ static void bool_funcwrapper(int value)
         boolfunction(false);
 }
 
+typedef void (*callback_fn)(int);
+
+static callback_fn get_callback(const struct settings_list *setting, 
+        bool *needs_boolwrapper)
+{
+    *needs_boolwrapper = false;
+    int var_type = setting->flags&F_T_MASK;
+    /* set the number of items and current selection */
+    if (var_type == F_T_INT || var_type == F_T_UINT)
+    {
+        if (setting->flags&F_CHOICE_SETTING)
+        {
+            return setting->choice_setting->option_callback;
+        }
+        else if (setting->flags&F_TABLE_SETTING)
+        {
+            const struct table_setting *info = setting->table_setting;
+            return info->option_callback;
+        }
+        else if (setting->flags&F_T_SOUND)
+        {
+            int setting_id = setting->sound_setting->setting;
+            return sound_get_fn(setting_id);
+        }
+        else
+        {
+            const struct int_setting *info = setting->int_setting;
+            return info->option_callback;
+        }
+    }
+    else if (var_type == F_T_BOOL)
+    {
+        *needs_boolwrapper = true;
+        return (callback_fn)setting->bool_setting->option_callback;
+    }
+    
+    return NULL;
+}
+
 static void val_to_selection(const struct settings_list *setting, int oldvalue,
-                             int *nb_items, int *selected,
-                             void (**function)(int))
+                             int *nb_items, int *selected)
 {
     int var_type = setting->flags&F_T_MASK;
     /* set the number of items and current selection */
@@ -401,7 +439,6 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
         {
             *nb_items = setting->choice_setting->count;
             *selected = oldvalue;
-            *function = setting->choice_setting->option_callback;
         }
         else if (setting->flags&F_TABLE_SETTING)
         {
@@ -423,7 +460,6 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
                 else if (oldvalue == info->values[i])
                     *selected = i;
             }
-            *function = info->option_callback;
         }
         else if (setting->flags&F_T_SOUND)
         {
@@ -438,7 +474,6 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
 #else
             *selected = (oldvalue - min) / steps;
 #endif
-            *function = sound_get_fn(setting_id);
         }
         else
         {
@@ -453,16 +488,12 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
 #else
             *selected = (oldvalue - min) / step;
 #endif
-            *function = info->option_callback;
         }
     }
     else if (var_type == F_T_BOOL)
     {
         *selected = oldvalue;
         *nb_items = 2;
-        boolfunction = setting->bool_setting->option_callback;
-        if (boolfunction)
-            *function = bool_funcwrapper;
     }
 }
 
@@ -477,7 +508,8 @@ bool option_screen(const struct settings_list *setting,
     int *variable;
     bool allow_wrap = setting->flags & F_NO_WRAP ? false : true;
     int var_type = setting->flags&F_T_MASK;
-    void (*function)(int) = NULL;
+    bool needs_wrapper = false;
+    callback_fn function = get_callback(setting, &needs_wrapper);
     char *title;
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
@@ -505,7 +537,7 @@ bool option_screen(const struct settings_list *setting,
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&lists, option_talk);
     
-    val_to_selection(setting, oldvalue, &nb_items, &selected, &function);
+    val_to_selection(setting, oldvalue, &nb_items, &selected);
     gui_synclist_set_nb_items(&lists, nb_items);
     gui_synclist_select_item(&lists, selected);
     
@@ -546,7 +578,7 @@ bool option_screen(const struct settings_list *setting,
             if (var_type == F_T_BOOL && !use_temp_var)
                 *(bool*)setting->setting = (*variable==1);
             val_to_selection(setting, *variable, &nb_items,
-                                &selected, &function);
+                                &selected);
             gui_synclist_select_item(&lists, selected);
             gui_synclist_draw(&lists);
             gui_synclist_speak_item(&lists);
@@ -568,7 +600,17 @@ bool option_screen(const struct settings_list *setting,
             return true;
         /* callback */
         if ( function )
-            function(*variable);
+        {
+            if (needs_wrapper)
+            {
+                boolfunction = (void (*)(bool))function;
+                bool_funcwrapper(*variable);
+            }
+            else
+            {
+                function(*variable);
+            }
+        }
         /* if the volume is changing we need to let the skins know */
         if (function == sound_get_fn(SOUND_VOLUME))
             global_status.last_volume_change = current_tick;
@@ -581,7 +623,6 @@ int get_setting_info_for_bar(int setting_id, int *count, int *val)
 {
     const struct settings_list *setting = &settings[setting_id];
     int var_type = setting->flags&F_T_MASK;
-    void (*function)(int) = NULL;
     int oldvalue;
 
     if (var_type == F_T_INT || var_type == F_T_UINT)
@@ -599,7 +640,7 @@ int get_setting_info_for_bar(int setting_id, int *count, int *val)
         return false; /* only int/bools can go here */
     }
 
-    val_to_selection(setting, oldvalue, count, val, &function);
+    val_to_selection(setting, oldvalue, count, val);
     return true;
 }
 
@@ -609,6 +650,8 @@ void update_setting_value_from_touch(int setting_id, int selection)
     const struct settings_list *setting = &settings[setting_id];
     int new_val = selection_to_val(setting, selection);
     int var_type = setting->flags&F_T_MASK;
+    bool needs_wrapper = false;
+    callback_fn function = get_callback(setting, &needs_wrapper);
 
     if (var_type == F_T_INT || var_type == F_T_UINT)
     {
@@ -617,6 +660,20 @@ void update_setting_value_from_touch(int setting_id, int selection)
     else if (var_type == F_T_BOOL)
     {
         *(bool*)setting->setting = new_val ? true : false;
+    }
+    settings_save();
+    /* callback */
+    if ( function )
+    {
+        if (needs_wrapper)
+        {
+            boolfunction = (void (*)(bool))function;
+            bool_funcwrapper(new_val);
+        }
+        else
+        {
+            function(new_val);
+        }
     }
 }
 #endif
