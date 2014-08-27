@@ -22,7 +22,7 @@
 #ifndef __SYSTEM_HOSTED_H__
 #define __SYSTEM_HOSTED_H__
 
-#include "system.h"
+#ifndef __PCTOOL__
 
 static inline void commit_dcache(void) {}
 static inline void commit_discard_dcache(void) {}
@@ -33,5 +33,15 @@ static inline void core_sleep(void)
     enable_irq();
     wait_for_interrupt();
 }
+
+#endif /* __PCTOOL__ */
+
+#if defined(WIN32) || defined(__PCTOOL__)
+
+#ifndef alloca
+#define alloca __builtin_alloca
+#endif
+
+#endif /* WIN32 || __PCTOOL__ */
 
 #endif
